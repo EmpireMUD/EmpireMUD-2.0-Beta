@@ -1386,7 +1386,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 		return FALSE;
 	}
 
-	if (CHECK_MAJESTY(vict) || MORPH_FLAGGED(vict, MORPH_FLAG_ANIMAL)) {
+	if (CHECK_MAJESTY(vict) || MORPH_FLAGGED(vict, MORPHF_ANIMAL)) {
 		return FALSE;
 	}
 	

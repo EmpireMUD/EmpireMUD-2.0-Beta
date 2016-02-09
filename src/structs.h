@@ -216,6 +216,7 @@ typedef struct crop_data crop_data;
 typedef struct descriptor_data descriptor_data;
 typedef struct empire_data empire_data;
 typedef struct index_data index_data;
+typedef struct morph_data morph_data;
 typedef struct obj_data obj_data;
 typedef struct player_index_data player_index_data;
 typedef struct room_data room_data;
@@ -1389,33 +1390,15 @@ typedef struct vehicle_data vehicle_data;
 #define LORE_PROMOTED			12
 
 
-// Morph forms
-#define MORPH_NONE  0
-#define MORPH_BAT  1
-#define MORPH_WOLF  2
-#define MORPH_HORRID_FORM  3
-#define MORPH_DREAD_BLOOD  4
-#define MORPH_MIST  5
-#define MORPH_SAVAGE_WEREWOLF  6
-#define MORPH_TOWERING_WEREWOLF  7
-#define MORPH_SAGE_WEREWOLF  8
-#define MORPH_DEER  9
-#define MORPH_OSTRICH  10
-#define MORPH_TAPIR  11
-#define NUM_MORPHS  12
-
-// flags for morphs
-#define MORPH_FLAG_NO_CLAWS  BIT(0)	// can't use claws
-#define MORPH_FLAG_ANIMAL  BIT(1)	// treated like an npc animal (disguise)
-#define MORPH_FLAG_VAMPIRE_ONLY  BIT(2)	// requires vampire status
-#define MORPH_FLAG_TEMPERATE_AFFINITY  BIT(3)	// requires temperate
-#define MORPH_FLAG_ARID_AFFINITY  BIT(4)	// requires arid
-#define MORPH_FLAG_TROPICAL_AFFINITY  BIT(5)	// requires tropical
-#define MORPH_FLAG_CHECK_SOLO  BIT(6)	// check for the solo role
-
-// for morph data
-#define MORPH_STRING_NAME  0
-#define MORPH_STRING_DESC  1
+// MORPHF_x: flags for morphs
+#define MORPHF_IN_DEVELOPMENT  BIT(0)	// a. can't be used by players
+#define MORPHF_NO_CLAWS  BIT(1)	// b. can't use claws
+#define MORPHF_ANIMAL  BIT(2)	// c. treated like an npc animal (disguise)
+#define MORPHF_VAMPIRE_ONLY  BIT(3)	// d. requires vampire status
+#define MORPHF_TEMPERATE_AFFINITY  BIT(4)	// e. requires temperate
+#define MORPHF_ARID_AFFINITY  BIT(5)	// f. requires arid
+#define MORPHF_TROPICAL_AFFINITY  BIT(6)	// g. requires tropical
+#define MORPHF_CHECK_SOLO  BIT(7)	// h. check for the solo role
 
 
 // mount flags -- MOUNT_FLAGGED(ch, flag)
@@ -1809,6 +1792,14 @@ struct ability_data {
 };
 
 
+// apply types for augments and morphs
+struct apply_data {
+	int location;	// APPLY_x
+	int weight;	// what percent of points go to this
+	struct apply_data *next;	// linked list
+};
+
+
 // Simple affect structure
 struct affected_type {
 	sh_int type;	// The type of spell that caused this
@@ -1950,6 +1941,26 @@ struct interaction_item {
 	char exclusion_code;	// creates mutually-exclusive sets
 	
 	struct interaction_item *next;
+};
+
+
+// see morph.c
+struct morph_data {
+	any_vnum vnum;
+	char *name;	// descriptive text
+	char *short_desc;	// short description (a bat)
+	char *long_desc;	// long description (seen in room)
+	
+	bitvector_t flags;	// MORPHF_x flags
+	struct apply_data *applies;	// how it modifies players
+	
+	int cost_type;	// any pool (NUM_POOLS)
+	int cost;	// amount it costs in that pool
+	any_vnum ability;	// required ability or NO_ABIL
+	obj_vnum requires_obj;	// required item or NOTHING
+	
+	UT_hash_handle hh;	// morph_table hash
+	UT_hash_handle sorted_hh;	// sorted_morphs hash
 };
 
 
@@ -2244,19 +2255,11 @@ struct augment_data {
 	
 	any_vnum ability;	// required ability or NO_ABIL
 	obj_vnum requires_obj;	// required item or NOTHING
-	struct augment_apply *applies;	// how it modifies items
+	struct apply_data *applies;	// how it modifies items
 	struct resource_data *resources;	// resources required
 	
 	UT_hash_handle hh;	// augment_table hash
 	UT_hash_handle sorted_hh;	// sorted_augments hash
-};
-
-
-// apply types for augment_data
-struct augment_apply {
-	int location;	// APPLY_x
-	int weight;	// what percent of points go to this
-	struct augment_apply *next;	// linked list
 };
 
 

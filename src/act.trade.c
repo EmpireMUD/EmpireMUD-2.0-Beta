@@ -903,7 +903,7 @@ ACMD(do_gen_augment) {
 	double points_available, remaining, share;
 	struct obj_apply *apply, *last_apply;
 	int scale, total_weight, value;
-	struct augment_apply *app;
+	struct apply_data *app;
 	ability_data *abil;
 	augment_data *aug;
 	obj_data *obj;

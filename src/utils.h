@@ -32,6 +32,7 @@
 *   Map Utils
 *   Memory Utils
 *   Mobile Utils
+*   Morph Utils
 *   Object Utils
 *   Objval Utils
 *   Player Utils
@@ -324,7 +325,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define CAN_CARRY_N(ch)  (25 + GET_BONUS_INVENTORY(ch) + (HAS_BONUS_TRAIT(ch, BONUS_INVENTORY) ? 5 : 0) + (GET_EQ((ch), WEAR_PACK) ? GET_PACK_CAPACITY(GET_EQ(ch, WEAR_PACK)) : 0))
 #define CAN_CARRY_OBJ(ch,obj)  (IS_COINS(obj) ? TRUE : ((IS_CARRYING_N(ch) + obj_carry_size(obj)) <= CAN_CARRY_N(ch)))
 #define CAN_GET_OBJ(ch, obj)  (CAN_WEAR((obj), ITEM_WEAR_TAKE) && CAN_CARRY_OBJ((ch),(obj)) && CAN_SEE_OBJ((ch),(obj)))
-#define CAN_RECOGNIZE(ch, vict)  (IS_IMMORTAL(ch) || (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM | AFF_HIDE) && !MORPH_FLAGGED(vict, MORPH_FLAG_ANIMAL) && !IS_DISGUISED(vict)))
+#define CAN_RECOGNIZE(ch, vict)  (IS_IMMORTAL(ch) || (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM | AFF_HIDE) && !MORPH_FLAGGED(vict, MORPHF_ANIMAL) && !IS_DISGUISED(vict)))
 #define CAN_RIDE_FLYING_MOUNT(ch)  (has_ability((ch), ABIL_ALL_TERRAIN_RIDING) || has_ability((ch), ABIL_FLY) || has_ability((ch), ABIL_DRAGONRIDING))
 #define CAN_SEE_IN_DARK(ch)  (HAS_INFRA(ch) || (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_HOLYLIGHT)))
 #define CAN_SEE_IN_DARK_ROOM(ch, room)  ((WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room) || (room == IN_ROOM(ch) && (has_ability(ch, ABIL_BY_MOONLIGHT))) || CAN_SEE_IN_DARK(ch)) && (!MAGIC_DARKNESS(room) || CAN_SEE_IN_MAGIC_DARKNESS(ch)))
@@ -608,6 +609,24 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define IS_MOB(ch)  (IS_NPC(ch) && GET_MOB_VNUM(ch) != NOTHING)
 #define IS_TAGGED_BY(mob, player)  (IS_NPC(mob) && !IS_NPC(player) && find_id_in_tag_list(GET_IDNUM(player), MOB_TAGGED_BY(mob)))
 #define MOB_FLAGGED(ch, flag)  (IS_NPC(ch) && IS_SET(MOB_FLAGS(ch), (flag)))
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MORPH UTILS /////////////////////////////////////////////////////////////
+
+#define MORPH_ABILITY(mph)  ((mph)->ability)
+#define MORPH_APPLIES(mph)  ((mph)->applies)
+#define MORPH_COST(mph)  ((mph)->cost)
+#define MORPH_COST_TYPE(mph)  ((mph)->cost_type)
+#define MORPH_FLAGS(mph)  ((mph)->flags)
+#define MORPH_LONG_DESC(mph)  ((mph)->long_desc)
+#define MORPH_NAME(mph)  ((mph)->name)
+#define MORPH_REQUIRES_OBJ(mph)  ((mph)->requires_obj)
+#define MORPH_SHORT_DESC(mph)  ((mph)->short_desc)
+#define MORPH_VNUM(mph)  ((mph)->vnum)
+
+// helpers
+#define MORPH_FLAGGED(mph, flg)  IS_SET(MORPH_FLAGS(mpg), (flg))
 
 
  //////////////////////////////////////////////////////////////////////////////

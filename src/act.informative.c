@@ -710,7 +710,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	}
 	
 	// empire prefixing
-	if (!MORPH_FLAGGED(i, MORPH_FLAG_ANIMAL)) {
+	if (!MORPH_FLAGGED(i, MORPHF_ANIMAL)) {
 		if (IS_DISGUISED(i)) {
 			if (ROOM_OWNER(IN_ROOM(i))) {
 				// disguised player shows loyalty of the area you're in -- players can't tell you're not an npc
@@ -971,9 +971,9 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	}
 	
 	// only show this block if the person is not morphed, or the morph is not an npc disguise
-	if (IS_NPC(i) || IS_IMMORTAL(ch) || GET_MORPH(i) == MORPH_NONE || !MORPH_FLAGGED(i, MORPH_FLAG_ANIMAL)) {
+	if (IS_NPC(i) || IS_IMMORTAL(ch) || GET_MORPH(i) == MORPH_NONE || !MORPH_FLAGGED(i, MORPHF_ANIMAL)) {
 		
-		if (GET_LOYALTY(i) && !IS_DISGUISED(i) && !MORPH_FLAGGED(i, MORPH_FLAG_ANIMAL)) {
+		if (GET_LOYALTY(i) && !IS_DISGUISED(i) && !MORPH_FLAGGED(i, MORPHF_ANIMAL)) {
 			sprintf(buf, "   $E is a member of %s.", EMPIRE_NAME(GET_LOYALTY(i)));
 			act(buf, FALSE, ch, NULL, i, TO_CHAR);
 		}
@@ -1029,7 +1029,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		return;
 	}
 
-	if (ch != i && (IS_IMMORTAL(ch) || IS_NPC(i) || GET_MORPH(i) == MORPH_NONE || !MORPH_FLAGGED(i, MORPH_FLAG_ANIMAL)) && has_ability(ch, ABIL_APPRAISAL)) {
+	if (ch != i && (IS_IMMORTAL(ch) || IS_NPC(i) || GET_MORPH(i) == MORPH_NONE || !MORPH_FLAGGED(i, MORPHF_ANIMAL)) && has_ability(ch, ABIL_APPRAISAL)) {
 		act("\r\nYou appraise $s inventory:", FALSE, i, 0, ch, TO_VICT);
 		list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
 

@@ -269,7 +269,7 @@ modify.o: modify.c conf.h sysdep.h structs.h uthash.h utils.h \
   interpreter.h handler.h db.h comm.h boards.h olc.h
 	$(CC) -c $(CFLAGS) modify.c
 morph.o: morph.c conf.h sysdep.h structs.h uthash.h utils.h comm.h db.h \
-  skills.h handler.h interpreter.h dg_scripts.h
+  skills.h handler.h interpreter.h dg_scripts.h vnums.h
 	$(CC) -c $(CFLAGS) morph.c
 objsave.o: objsave.c conf.h sysdep.h structs.h uthash.h comm.h handler.h \
   db.h interpreter.h utils.h dg_scripts.h

@@ -254,3 +254,21 @@
 #define MILL_WORKER  272
 #define VEHICLE_REPAIRMAN  273
 #define OVERSEER  274
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MORPHS //////////////////////////////////////////////////////////////////
+
+#define MORPH_NONE  0
+#define MORPH_BAT  1
+#define MORPH_WOLF  2
+#define MORPH_HORRID_FORM  3
+#define MORPH_DREAD_BLOOD  4
+#define MORPH_MIST  5
+#define MORPH_SAVAGE_WEREWOLF  6
+#define MORPH_TOWERING_WEREWOLF  7
+#define MORPH_SAGE_WEREWOLF  8
+#define MORPH_DEER  9
+#define MORPH_OSTRICH  10
+#define MORPH_TAPIR  11
+#define NUM_MORPHS  12

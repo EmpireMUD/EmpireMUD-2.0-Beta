@@ -204,6 +204,17 @@ OLC_MODULE(mapedit_ruin);
 OLC_MODULE(mapedit_terrain);
 OLC_MODULE(mapedit_unclaimable);
 
+// morph modules
+OLC_MODULE(morphedit_ability);
+OLC_MODULE(morphedit_apply);
+OLC_MODULE(morphedit_cost);
+OLC_MODULE(morphedit_costtype);
+OLC_MODULE(morphedit_flags);
+OLC_MODULE(morphedit_longdesc);
+OLC_MODULE(morphedit_name);
+OLC_MODULE(morphedit_requiresobject);
+OLC_MODULE(morphedit_shortdesc);
+
 // object modules
 OLC_MODULE(oedit_action_desc);
 OLC_MODULE(oedit_affects);
@@ -368,16 +379,16 @@ extern bool validate_icon(char *icon);
 // master olc command structure
 const struct olc_command_data olc_data[] = {
 	// OLC_x: main commands
-	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_ROOM_TEMPLATE | OLC_SKILL | OLC_VEHICLE, NOBITS },
-	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
+	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_ROOM_TEMPLATE | OLC_SKILL | OLC_VEHICLE, NOBITS },
+	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
-	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	
 	// admin
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
@@ -543,6 +554,17 @@ const struct olc_command_data olc_data[] = {
 	{ "ruin", mapedit_ruin, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "terrain", mapedit_terrain, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "unclaimable", mapedit_unclaimable, OLC_MAP, OLC_CF_MAP_EDIT },
+	
+	// morph commands
+	{ "apply", morphedit_apply, OLC_MORPH, OLC_CF_EDITOR },
+	{ "cost", morphedit_cost, OLC_MORPH, OLC_CF_EDITOR },
+	{ "costtype", morphedit_costtype, OLC_MORPH, OLC_CF_EDITOR },
+	{ "flags", morphedit_flags, OLC_MORPH, OLC_CF_EDITOR },
+	{ "longdescription", morphedit_longdesc, OLC_MORPH, OLC_CF_EDITOR },
+	{ "name", morphedit_name, OLC_MORPH, OLC_CF_EDITOR },
+	{ "requiresability", morphedit_ability, OLC_MORPH, OLC_CF_EDITOR },
+	{ "requiresobject", morphedit_requiresobject, OLC_MORPH, OLC_CF_EDITOR },
+	{ "shortdescription", morphedit_shortdesc, OLC_MORPH, OLC_CF_EDITOR },
 	
 	// object commands
 	{ "affects", oedit_affects, OLC_OBJECT, OLC_CF_EDITOR },
@@ -819,6 +841,11 @@ OLC_MODULE(olc_abort) {
 				GET_OLC_MOBILE(ch->desc) = NULL;
 				break;
 			}
+			case OLC_MORPH: {
+				free_morph(GET_OLC_MORPH(ch->desc));
+				GET_OLC_MORPH(ch->desc) = NULL;
+				break;
+			}
 			case OLC_OBJECT: {
 				free_obj(GET_OLC_OBJECT(ch->desc));
 				GET_OLC_OBJECT(ch->desc) = NULL;
@@ -999,6 +1026,16 @@ OLC_MODULE(olc_audit) {
 				}
 				break;
 			}
+			case OLC_MORPH: {
+				extern bool audit_morph(morph_data *morph, char_data *ch);
+				morph_data *morph, *next_morph;
+				HASH_ITER(hh, morph_table, morph, next_morph) {
+					if (MORPH_VNUM(morph) >= from_vnum && MORPH_VNUM(morph) <= to_vnum) {
+						found |= audit_morph(morph, ch);
+					}
+				}
+				break;
+			}
 			case OLC_OBJECT: {
 				extern bool audit_object(obj_data *obj, char_data *ch);
 				obj_data *obj, *next_obj;
@@ -1171,6 +1208,11 @@ OLC_MODULE(olc_copy) {
 			exists = (mob_proto(from_vnum) != NULL);
 			break;
 		}
+		case OLC_MORPH: {
+			found = (morph_proto(vnum) != NULL);
+			exists = (morph_proto(from_vnum) != NULL);
+			break;
+		}
 		case OLC_OBJECT: {
 			found = (obj_proto(vnum) != NULL);
 			exists = (obj_proto(from_vnum) != NULL);
@@ -1319,6 +1361,13 @@ OLC_MODULE(olc_copy) {
 			olc_show_mobile(ch);
 			break;
 		}
+		case OLC_MORPH: {
+			GET_OLC_MORPH(ch->desc) = setup_olc_morph(morph_proto(from_vnum));
+			GET_OLC_MORPH(ch->desc)->vnum = vnum;
+			SET_BIT(MORPH_FLAGS(GET_OLC_MORPH(ch->desc)), MORPHF_IN_DEVELOPMENT);	// ensure flag
+			olc_show_morph(ch);
+			break;
+		}
 		case OLC_OBJECT: {
 			// copy over the from-vnum
 			GET_OLC_OBJECT(ch->desc) = setup_olc_object(obj_proto(from_vnum));
@@ -1383,6 +1432,7 @@ OLC_MODULE(olc_delete) {
 	void olc_delete_crop(char_data *ch, crop_vnum vnum);
 	void olc_delete_global(char_data *ch, any_vnum vnum);
 	void olc_delete_mobile(char_data *ch, mob_vnum vnum);
+	void olc_delete_morph(char_data *ch, any_vnum vnum);
 	void olc_delete_object(char_data *ch, obj_vnum vnum);
 	void olc_delete_room_template(char_data *ch, rmt_vnum vnum);
 	void olc_delete_sector(char_data *ch, sector_vnum vnum);
@@ -1470,6 +1520,10 @@ OLC_MODULE(olc_delete) {
 			olc_delete_mobile(ch, vnum);
 			break;
 		}
+		case OLC_MORPH: {
+			olc_delete_morph(ch, vnum);
+			break;
+		}
 		case OLC_OBJECT: {
 			olc_delete_object(ch, vnum);
 			break;
@@ -1547,6 +1601,10 @@ OLC_MODULE(olc_display) {
 		}
 		case OLC_MOBILE: {
 			olc_show_mobile(ch);
+			break;
+		}
+		case OLC_MORPH: {
+			olc_show_morph(ch);
 			break;
 		}
 		case OLC_OBJECT: {
@@ -1716,6 +1774,13 @@ OLC_MODULE(olc_edit) {
 			olc_show_mobile(ch);
 			break;
 		}
+		case OLC_MORPH: {
+			// this will set up from existing OR new automatically
+			GET_OLC_MORPH(ch->desc) = setup_olc_morph(morph_proto(vnum));
+			GET_OLC_MORPH(ch->desc)->vnum = vnum;			
+			olc_show_morph(ch);
+			break;
+		}
 		case OLC_OBJECT: {
 			// this will set up from existing OR new automatically
 			GET_OLC_OBJECT(ch->desc) = setup_olc_object(obj_proto(vnum));
@@ -1844,6 +1909,10 @@ OLC_MODULE(olc_free) {
 				}
 				case OLC_MOBILE: {
 					free = (mob_proto(iter) == NULL);
+					break;
+				}
+				case OLC_MORPH: {
+					free = (morph_proto(iter) == NULL);
 					break;
 				}
 				case OLC_OBJECT: {
@@ -2114,6 +2183,20 @@ OLC_MODULE(olc_list) {
 				}
 				break;
 			}
+			case OLC_MORPH: {
+				extern char *list_one_morph(morph_data *morph, bool detail);
+				morph_data *morph, *next_morph;
+				HASH_ITER(hh, morph_table, morph, next_morph) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (MORPH_VNUM(morph) >= from_vnum && MORPH_VNUM(morph) <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_morph(morph, show_details));
+					}
+				}
+				break;
+			}
 			case OLC_OBJECT: {
 				extern char *list_one_object(obj_data *obj, bool detail);
 				obj_data *obj, *next_obj;
@@ -2218,6 +2301,7 @@ OLC_MODULE(olc_removeindev) {
 	bool use_adv = FALSE, any = FALSE;
 	struct global_data *glb, *next_glb;
 	archetype_data *arch, *next_arch;
+	morph_adta *morph, *next_morph;
 	craft_data *craft, *next_craft;
 	skill_data *skill, *next_skill;
 	augment_data *aug, *next_aug;
@@ -2358,6 +2442,23 @@ OLC_MODULE(olc_removeindev) {
 			any = TRUE;
 		}
 		
+		HASH_ITER(hh, morph_table, morph, next_morph) {
+			if (MORPH_VNUM(morph) < from || MORPH_VNUM(morph) > to) {
+				continue;
+			}
+			if (!MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (!player_can_olc_edit(ch, OLC_MORPH, MORPH_VNUM(morph))) {
+				continue;
+			}
+			
+			REMOVE_BIT(MORPH_FLAGS(morph), MORPHF_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_MORPH, MORPH_VNUM(morph));
+			msg_to_char(ch, "Removed IN-DEV flag from morph [%d] %s.\r\n", MORPH_VNUM(morph), MORPH_NAME(morph));
+			any = TRUE;
+		}
+		
 		HASH_ITER(hh, skill_table, skill, next_skill) {
 			if (SKILL_VNUM(skill) < from || SKILL_VNUM(skill) > to) {
 				continue;
@@ -2400,6 +2501,7 @@ OLC_MODULE(olc_save) {
 	void save_olc_crop(descriptor_data *desc);
 	void save_olc_global(descriptor_data *desc);
 	void save_olc_mobile(descriptor_data *desc);
+	void save_olc_morph(descriptor_data *desc);
 	void save_olc_object(descriptor_data *desc);
 	void save_olc_room_template(descriptor_data *desc);
 	void save_olc_sector(descriptor_data *desc);	
@@ -2488,6 +2590,12 @@ OLC_MODULE(olc_save) {
 				GET_OLC_MOBILE(ch->desc) = NULL;
 				break;
 			}
+			case OLC_MORPH: {
+				save_olc_morph(ch->desc);
+				free_morph(GET_OLC_MORPH(ch->desc));
+				GET_OLC_MORPH(ch->desc) = NULL;
+				break;
+			}
 			case OLC_OBJECT: {
 				save_olc_object(ch->desc);
 				free_obj(GET_OLC_OBJECT(ch->desc));
@@ -2554,6 +2662,7 @@ OLC_MODULE(olc_search) {
 	void olc_search_crop(char_data *ch, crop_vnum vnum);
 	void olc_search_global(char_data *ch, any_vnum vnum);
 	void olc_search_mob(char_data *ch, mob_vnum vnum);
+	void olc_search_morph(char_data *ch, any_vnum vnum);
 	void olc_search_obj(char_data *ch, obj_vnum vnum);
 	void olc_search_room_template(char_data *ch, rmt_vnum vnum);
 	void olc_search_sector(char_data *ch, sector_vnum vnum);
@@ -2608,6 +2717,10 @@ OLC_MODULE(olc_search) {
 			}
 			case OLC_MOBILE: {
 				olc_search_mob(ch, vnum);
+				break;
+			}
+			case OLC_MORPH: {
+				olc_search_morph(ch, vnum);
 				break;
 			}
 			case OLC_OBJECT: {
@@ -3299,6 +3412,9 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 		else if (IS_SET(type, OLC_MOBILE) && !OLC_FLAGGED(ch, OLC_FLAG_NO_MOBILE)) {
 			return TRUE;
 		}
+		else if (IS_SET(type, OLC_MORPH) && !OLC_FLAGGED(ch, OLC_FLAG_NO_MORPHS)) {
+			return TRUE;
+		}
 		else if (IS_SET(type, OLC_OBJECT) && !OLC_FLAGGED(ch, OLC_FLAG_NO_OBJECT)) {
 			return TRUE;
 		}
@@ -3689,6 +3805,138 @@ int olc_process_type(char_data *ch, char *argument, char *name, char *command, c
 		msg_to_char(ch, "You set the %s to %s.\r\n", name, buf);
 	}
 	return type;
+}
+
+
+void olc_process_applies(char_data *ch, char *argument, struct apply_data **list) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	struct apply_data *apply, *next_apply, *change, *temp;
+	int loc, num, iter;
+	bool found;
+	
+	// arg1 arg2 arg3
+	half_chop(argument, arg1, buf);
+	half_chop(buf, arg2, arg3);
+	
+	if (is_abbrev(arg1, "remove")) {
+		if (!*arg2) {
+			msg_to_char(ch, "Remove which apply (number)?\r\n");
+		}
+		else if (!str_cmp(arg2, "all")) {
+			free_apply_list(*list);
+			*list = NULL;
+			msg_to_char(ch, "You remove all the applies.\r\n");
+		}
+		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
+			msg_to_char(ch, "Invalid apply number.\r\n");
+		}
+		else {
+			found = FALSE;
+			for (apply = *list; apply && !found; apply = next_apply) {
+				next_apply = apply->next;
+				if (--num == 0) {
+					found = TRUE;
+					
+					msg_to_char(ch, "You remove the %d to %s.\r\n", apply->weight, apply_types[apply->location]);
+					REMOVE_FROM_LIST(apply, *list, next);
+					free(apply);
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid apply number.\r\n");
+			}
+		}
+	}
+	else if (is_abbrev(arg1, "add")) {
+		num = atoi(arg2);
+		
+		if (!*arg2 || !*arg3 || !isdigit(*arg2) || num <= 0) {
+			msg_to_char(ch, "Usage: apply add <value> <apply>\r\n");
+		}
+		else if ((loc = search_block(arg3, apply_types, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid apply.\r\n");
+		}
+		else {
+			CREATE(apply, struct apply_data, 1);
+			apply->location = loc;
+			apply->weight = num;
+			
+			// append to end
+			if ((temp = *list)) {
+				while (temp->next) {
+					temp = temp->next;
+				}
+				temp->next = apply;
+			}
+			else {
+				*list = apply;
+			}
+			
+			msg_to_char(ch, "You add %d to %s.\r\n", num, apply_types[loc]);
+		}
+	}
+	else if (is_abbrev(arg1, "change")) {
+		strcpy(num_arg, arg2);
+		half_chop(arg3, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: apply change <number> <value | apply> <new value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid apply number.\r\n");
+			return;
+		}
+		change = NULL;
+		for (apply = *list; apply && !change; apply = apply->next) {
+			if (--num == 0) {
+				change = apply;
+				break;
+			}
+		}
+		if (!change) {
+			msg_to_char(ch, "Invalid apply number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "value")) {
+			num = atoi(val_arg);
+			if ((!isdigit(*val_arg) && *val_arg != '-') || num == 0) {
+				msg_to_char(ch, "Invalid value '%s'.\r\n", val_arg);
+			}
+			else {
+				change->weight = num;
+				msg_to_char(ch, "Apply %d changed to value %d.\r\n", atoi(num_arg), num);
+			}
+		}
+		else if (is_abbrev(type_arg, "apply")) {
+			if ((loc = search_block(val_arg, apply_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid apply.\r\n");
+			}
+			else {
+				change->location = loc;
+				msg_to_char(ch, "Apply %d changed to %s.\r\n", atoi(num_arg), apply_types[loc]);
+			}
+		}
+		else {
+			msg_to_char(ch, "You can only change the value or apply.\r\n");
+		}
+	}
+	else {
+		msg_to_char(ch, "Usage: apply add <value> <apply>\r\n");
+		msg_to_char(ch, "Usage: apply change <number> <value | apply> <new value>\r\n");
+		msg_to_char(ch, "Usage: apply remove <number | all>\r\n");
+		
+		msg_to_char(ch, "Available applies:\r\n");
+		for (iter = 0; *apply_types[iter] != '\n'; ++iter) {
+			msg_to_char(ch, " %-24.24s%s", apply_types[iter], ((iter % 2) ? "\r\n" : ""));
+		}
+		if ((iter % 2) != 0) {
+			msg_to_char(ch, "\r\n");
+		}
+	}
 }
 
 

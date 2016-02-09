@@ -1,6 +1,6 @@
 /* ************************************************************************
 *   File: morph.c                                         EmpireMUD 2.0b3 *
-*  Usage: morph-related code                                              *
+*  Usage: morph loading, saving, and OLC                                  *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
 *  All rights reserved.  See license.doc for complete information.        *
@@ -15,599 +15,888 @@
 
 #include "structs.h"
 #include "utils.h"
-#include "comm.h"
+#include "interpreter.h"
 #include "db.h"
+#include "comm.h"
+#include "olc.h"
 #include "skills.h"
 #include "handler.h"
-#include "interpreter.h"
 #include "dg_scripts.h"
+#include "vnums.h"
 
 /**
 * Contents:
-*   Data
 *   Helpers
-*   Commands
+*   Utilities
+*   Database
+*   OLC Handlers
+*   Displays
+*   Edit Modules
 */
+
+// local data
+const char *default_morph_name = "unnamed morph";
+const char *default_morph_short_desc = "a shapeless morph";
+const char *default_morph_long_desc = "A shapeless morph is standing here.";
+
+// external consts
+extern const char *apply_types[];
+extern const char *pool_types[];
+
+// external funcs
+extern struct resource_data *copy_resource_list(struct resource_data *input);
+void get_resource_display(struct resource_data *list, char *save_buffer);
 
 // local protos
 void finish_morphing(char_data *ch, int morph_to);
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// DATA ////////////////////////////////////////////////////////////////////
-
-// validates morphs
-#define MORPH_OK(ch, morph)  ( \
-	(morph_data[(morph)].ability == NO_ABIL || has_ability((ch), morph_data[(morph)].ability)) && \
-	(!IS_SET(morph_data[(morph)].morph_flags, MORPH_FLAG_VAMPIRE_ONLY) || IS_VAMPIRE(ch)) \
-)
-
-
-/* The main data structure */
-struct morph_data_structure {
-	char *name;	// for "morph <form>" -- "\n" to not be able to manually morph to this form
-	any_vnum ability;	// required ability, or NO_ABIL for none
-	int normal_cost[NUM_POOLS];	// cost when out of combat (slow morph)
-	int combat_cost[NUM_POOLS];	// cost when in combat
-	
-	byte attribute_bonus[NUM_ATTRIBUTES];	// attributes +/- this number
-	int pool_mod[NUM_POOLS];	// health (etc) pools modified by this percent
-	
-	int attack_type, aff_bits;	// TYPE_x, AFF_x
-	bitvector_t morph_flags;	// MORPH_FLAG_x
-	char *short_desc;	// "a black bat"
-	char *extra_desc;	// the description for "look <person>"
-};
-
-const struct morph_data_structure morph_data[] = {
-	/* Notes on adding forms:
-	 *  1. add a MORPH_x definition for your morph
-	 *  2. add an entry to this table (the extra desc should NOT end in \r\n)
-	 *  3. find a place to cause the morph
-	 * It's that easy.
-	 */
-
-	// normal form (no morph -- used mainly for morphing back)
-	{ "normal", NO_ABIL,	// morph command arg, ability required
-		{ 0, 0, 0, 0 },	// cost when not in combat (health, move, mana, blood)
-		{ 0, 0, 0, 0 },	// cost when fighting (health, move, mana, blood)
-		{ 0, 0, 0, 0, 0, 0 },	// attribute mods (+/- this number)
-		{ 100, 100, 100, 100 },	// health/move/mana/blood pools modified by this percent
-		TYPE_HIT, 0,	// attack type, aff flags
-		0,	// morph flags
-		"",	// short desc
-		""	// extra desc
-	},
-
-	// bat form
-	{ "bat", ABIL_BAT_FORM,
-		{ 0, 0, 0, 50 },
-		{ 0, 0, 0, 100 },
-		{ -2, 0, 0, 0, 0, 0 },
-		{ 25, 200, 100, 100 },
-		TYPE_BITE, AFF_FLY,
-		MORPH_FLAG_ANIMAL | MORPH_FLAG_NO_CLAWS | MORPH_FLAG_VAMPIRE_ONLY,
-		"a black bat",
-		"   The bat is small and awkward as it flaps its wings around. It flitters\r\naround you menacingly, but keeps its distance. Though its size is not\r\nthreatening, the bat seems somehow capable of more."
-	},
-
-	// wolf form
-	{ "wolf", ABIL_WOLF_FORM,
-		{ 0, 0, 0, 20 },
-		{ 0, 0, 0, 40 },
-		{ 0, 0, 0, 0, 0, 0 },
-		{ 50, 125, 100, 100 },
-		TYPE_CLAW, 0,
-		MORPH_FLAG_ANIMAL | MORPH_FLAG_VAMPIRE_ONLY,
-		"a brown wolf",
-		"   As you look at the wolf, you first see $s cold, black eyes which stare you\r\ndown harshly. Larger than the other wolves which roam the plains, $s this\r\ncreature frightens you deeply. Wolves of this stature are known to be\r\nvicious, and you feel like running."
-	},
-
-	// horrid form
-	{ "horrid form", ABIL_HORRID_FORM,
-		{ 0, 0, 0, 30 },
-		{ 0, 0, 0, 60 },
-		{ 2, 0, 0, 0, 0, 0 },
-		{ 150, 150, 25, 100 },
-		TYPE_CLAW, 0,
-		MORPH_FLAG_VAMPIRE_ONLY | MORPH_FLAG_CHECK_SOLO,
-		"a horrid monstrosity",
-		"   The horrid monstrosity is huge! At well over eight feet tall, with greenish-\r\ngray flesh, it's like nothing you've ever seen! Its arms are long, thin, and\r\nedged black nails. Its face is something out of a nightmare. A row of spines\r\nrun down its back, and bony plates protect its skin!"
-	},
-
-	// dread blood form
-	{ "dread blood", ABIL_DREAD_BLOOD_FORM,
-		{ 0, 0, 0, 30 },
-		{ 0, 0, 0, 60 },
-		{ 0, 0, 0, 0, 2, 0 },
-		{ 50, 100, 150, 100 },
-		TYPE_HIT, 0,
-		MORPH_FLAG_VAMPIRE_ONLY | MORPH_FLAG_CHECK_SOLO,
-		"the dread blood",
-		"   What stands before you is a twisting, swirling, oozing mass of red blood.\r\nIts shape resembles a man, but its fanged, gaping maw is too large. Its limbs\r\nare too long. And when you look upon it, you're barely certain what's real and\r\nwhat exists only in your mind."
-	},
-
-	// mist form
-	{ "mist", ABIL_MIST_FORM,
-		{ 0, 0, 0, 20 },
-		{ 0, 0, 0, 40 },
-		{ -5, 0, 0, 0, 0, 0 },
-		{ 10, 200, 100, 100 },
-		TYPE_UNDEFINED, AFF_NO_ATTACK | AFF_IMMUNE_PHYSICAL,
-		MORPH_FLAG_ANIMAL | MORPH_FLAG_VAMPIRE_ONLY,
-		"a cloud of swirling mist",
-		"   The mist swirls around, periodically taking form and then swirling away\r\nagain. It floats around you, chilling your flesh, then covers the ground,\r\nfeeling the terrain. It swirls up again, and again seems to take some shape."
-	},
-
-	// savage werewolf form
-	{ "savage werewolf", ABIL_SAVAGE_WEREWOLF_FORM,
-		{ 0, 50, 0, 0 },
-		{ 0, 100, 0, 0 },
-		{ 2, 0, 0, 0, 0, 0 },
-		{ 100, 200, 25, 100 },
-		TYPE_CLAW, 0,
-		MORPH_FLAG_CHECK_SOLO,
-		"a savage werewolf",
-		"   The werewolf stands over you, snarling, baring every one of its long\r\ncanine teeth. It stands on two legs, more like a man than a wolf, and yet\r\nthere is something disturbingly bestial about it. You can't bring yourself\r\nto stop looking at it, for fear that turning away would spell your doom."
-	},
-
-	// towering werewolf form
-	{ "towering werewolf", ABIL_TOWERING_WEREWOLF_FORM,
-		{ 0, 50, 0, 0 },
-		{ 0, 100, 0, 0 },
-		{ 1, 3, 0, 0, 0, -1 },
-		{ 200, 125, 20, 100 },
-		TYPE_CLAW, 0,
-		MORPH_FLAG_CHECK_SOLO,
-		"a towering werewolf",
-		"   You can scarcely avoid the shadow of this massive wolf-man, which towers\r\nover you and everything else. Its massive, powerful muscles are etched with\r\nthe scars of dozens of battles -- or hundreds -- and you wonder how many\r\nchildren this creature has orphaned on its quest for blood."
-	},
-
-	// sage werewolf form
-	{ "sage werewolf", ABIL_SAGE_WEREWOLF_FORM,
-		{ 0, 50, 0, 0 },
-		{ 0, 100, 0, 0 },
-		{ 1, 0, 0, 0, 2, 0 },
-		{ 50, 100, 150, 100 },
-		TYPE_CLAW, 0,
-		MORPH_FLAG_CHECK_SOLO,
-		"a sage werewolf",
-		"   Though you have seen other werewolves, this one looks somehow smaller and\r\ngentler. It isn't the size of an ox cart, and its arms are not muscled to the\r\npoint of straining its armor. Instead, it has a serene look about it, as if it\r\nis in tune with the nature around it."
-	},
-
-	// deer form
-	{ "deer", ABIL_ANIMAL_FORMS,
-		{ 0, 0, 25, 0 },
-		{ 0, 0, 50, 0 },
-		{ 0, 0, 0, 0, 0, 0 },
-		{ 50, 125, 100, 100 },
-		TYPE_BITE, 0,
-		MORPH_FLAG_ANIMAL | MORPH_FLAG_TEMPERATE_AFFINITY,
-		"a deer",
-		"   The deer eyes you warily, apparently unsure of whether it should hold\r\nperfectly still, or turn and bolt. Its big, brown eyes never seem to move, and\r\nyet you're certain they are trained upon you."
-	},
-
-	// ostrich form
-	{ "ostrich", ABIL_ANIMAL_FORMS,
-		{ 0, 0, 25, 0 },
-		{ 0, 0, 50, 0 },
-		{ 0, 0, 0, 0, 0, 0 },
-		{ 50, 125, 100, 100 },
-		TYPE_BITE, 0,
-		MORPH_FLAG_ANIMAL | MORPH_FLAG_ARID_AFFINITY,
-		"an ostrich",
-		"   The ostrich notices you looking at it, and stops moving. It slowly raises\r\nits head until its eyes are above yours, and then somehow widens its giant\r\neyes further. It raises the backs of its wings up, making its body appear to\r\ndouble in size, and then stands motionless until you pass."
-	},
-
-	// tapir form
-	{ "tapir", ABIL_ANIMAL_FORMS,
-		{ 0, 0, 25, 0 },
-		{ 0, 0, 50, 0 },
-		{ 0, 0, 0, 0, 0, 0 },
-		{ 50, 125, 100, 100 },
-		TYPE_BITE, 0,
-		MORPH_FLAG_ANIMAL | MORPH_FLAG_TROPICAL_AFFINITY,
-		"a tapir",
-		"   The tapir roots around at the ground, largely ignoring you, although you\r\ncan't help but notice its eyes never seem to look away from yours. In fact,\r\nthe more you watch the tapir, the more certain you are that it's actually\r\nwatching you."
-	},
-
-	// This must go last
-	{ "\n", NO_ABIL,
-		{ 0, 0, 0, 0 },
-		{ 0, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0 }, 
-		{ 100, 100, 100, 100 },
-		0, 0,
-		0,
-		"",
-		""
-	}
-};
-
-
- //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
-* Ensures that a player can still be in their morph. This may un-morph them.
+* Used for choosing a morph that's valid for the player.
 *
-* @param char_data *ch The character to check.
+* @param char_data *ch The person trying to morph.
+* @param char *name The argument.
+* @return morph_data* The matching morph, or NULL if none.
 */
-void check_morph_ability(char_data *ch) {
-	bool revert = FALSE;
+morph_data *find_morph_by_name(char_data *ch, char *name) {
+	morph_data *morph, *next_morph, *partial = NULL;
 	
-	// nothing to check
-	if (IS_NPC(ch) || GET_MORPH(ch) == MORPH_NONE) {
-		return;
-	}
-	
-	if (!revert && morph_data[GET_MORPH(ch)].ability != NO_ABIL && !has_ability(ch, morph_data[GET_MORPH(ch)].ability)) {
-		revert = TRUE;
-	}
-	if (!revert && IS_SET(morph_data[GET_MORPH(ch)].morph_flags, MORPH_FLAG_CHECK_SOLO) && !check_solo_role(ch)) {
-		revert = TRUE;
-	}
-	
-	if (revert) {
-		finish_morphing(ch, MORPH_NONE);
-	}
-}
-
-
-/**
-*
-* @param room_data *location Where the morph affinity is happening.
-* @param int morph Which MORPH_x the person is trying to morph into.
-* @return bool TRUE if the morph passes the affinities check.
-*/
-bool morph_affinity_ok(room_data *location, int morph) {
-	int climate = NOTHING;
-	crop_data *cp;
-	bool ok = TRUE;
-	
-	if (ROOM_SECT_FLAGGED(location, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(location))) {
-		climate = GET_CROP_CLIMATE(cp);
-	}
-	else {
-		climate = GET_SECT_CLIMATE(SECT(location));
-	}
-	
-	if (IS_SET(morph_data[(morph)].morph_flags, MORPH_FLAG_TEMPERATE_AFFINITY) && climate != CLIMATE_TEMPERATE) {
-		ok = FALSE;
-	}
-	if (IS_SET(morph_data[(morph)].morph_flags, MORPH_FLAG_ARID_AFFINITY) && climate != CLIMATE_ARID) {
-		ok = FALSE;
-	}
-	if (IS_SET(morph_data[(morph)].morph_flags, MORPH_FLAG_TROPICAL_AFFINITY) && climate != CLIMATE_TROPICAL) {
-		ok = FALSE;
-	}
-	
-	return ok;
-}
-
-
-/**
-* This function gets the short description or extra description for a morphed
-* player.
-*
-* @param char_data *ch The player character.
-* @param byte type Either MORPH_STRING_NAME or MORPH_STRING_DESC
-* @return char* The string.
-*/
-char *morph_string(char_data *ch, byte type) {
-	if (!IS_NPC(ch) && GET_MORPH(ch) > MORPH_NONE && GET_MORPH(ch) < NUM_MORPHS) {
-		if (type == MORPH_STRING_NAME) {
-			return morph_data[(int) GET_MORPH(ch)].short_desc;
+	HASH_ITER(sorted_hh, sorted_morphs, morph, next_morph) {
+		if (MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+			continue;
 		}
-		else {
-			return morph_data[(int) GET_MORPH(ch)].extra_desc;
+		if (MORPH_ABILITY(morph) != NO_ABIL && !has_ability(ch, MORPH_ABILITY(morph))) {
+			continue;
 		}
-	}
-
-	/* Oops */
-	if (type == MORPH_STRING_NAME) {
-		return "a morphed creature";
-	}
-	else {
-		return "There is no string provided for this morph.\r\n";
-	}
-}
-
-
-/**
-* @param char_data *ch The player to check
-* @return int Any of the attack types (TYPE_x), defaulting to TYPE_HIT.
-*/
-int get_morph_attack_type(char_data *ch) {
-	int type = TYPE_HIT;
-	
-	if (!IS_NPC(ch) && GET_MORPH(ch) > MORPH_NONE && GET_MORPH(ch) < NUM_MORPHS) {
-		if (morph_data[(int) GET_MORPH(ch)].attack_type != TYPE_UNDEFINED) {
-			type = morph_data[(int) GET_MORPH(ch)].attack_type;
+		if (MORPH_REQUIRES_OBJ(morph) != NOTHING && !get_obj_in_list_vnum(MORPH_REQUIRES_OBJ(morph), ch->carrying)) {
+			continue;
 		}
-	}
-
-	return type;
-}
-
-
-/**
-* This checks whether a player's current morph form has any morph flags set.
-*
-* @param char_data *ch The player character to check.
-* @param bitvector_t flag The flag(s) to check.
-* @return TRUE if the character is morphed and has the morph flag.
-*/
-bool MORPH_FLAGGED(char_data *ch, bitvector_t flag) {
-	bool flagged = FALSE;
-	
-	if (!IS_NPC(ch)) {
-		if (GET_MORPH(ch) > MORPH_NONE && GET_MORPH(ch) < NUM_MORPHS) {
-			flagged = IS_SET(morph_data[(int) GET_MORPH(ch)].morph_flags, flag) ? TRUE : FALSE;
+		
+		// matches:
+		if (!str_cmp(name, MORPH_NAME(morph))) {
+			// perfect match
+			return morph;
+		}
+		if (!partial && is_multiword_abbrev(name, MORPH_NAME(morph))) {
+			// probable match
+			partial = morph;
 		}
 	}
 	
-	return flagged;
-}
-
-
-/**
-* Morphs a player back to normal. This function takes just 1 arg so it can
-* be passed e.g. as a function pointer in vampire blood upkeep.
-*
-* @param char_data *ch The morph-ed one.
-*/
-void end_morph(char_data *ch) {
-	if (GET_MORPH(ch) != MORPH_NONE) {
-		perform_morph(ch, MORPH_NONE);
-	}
-}
-
-
-/* return the modifier to a certain APPLY_x */
-int morph_modifier(char_data *ch, byte loc) {
-	int mod = 0;
-	double prc;
-	
-	switch (loc) {
-		case APPLY_STRENGTH: {
-			mod = morph_data[GET_MORPH(ch)].attribute_bonus[STRENGTH];
-			break;
-		}
-		case APPLY_DEXTERITY: {
-			mod = morph_data[GET_MORPH(ch)].attribute_bonus[DEXTERITY];
-			break;
-		}
-		case APPLY_CHARISMA: {
-			mod = morph_data[GET_MORPH(ch)].attribute_bonus[CHARISMA];
-			break;
-		}
-		case APPLY_GREATNESS: {
-			mod = morph_data[GET_MORPH(ch)].attribute_bonus[GREATNESS];
-			break;
-		}
-		case APPLY_INTELLIGENCE: {
-			mod = morph_data[GET_MORPH(ch)].attribute_bonus[INTELLIGENCE];
-			break;
-		}
-		case APPLY_WITS: {
-			mod = morph_data[GET_MORPH(ch)].attribute_bonus[WITS];
-			break;
-		}
-		case APPLY_HEALTH: {
-			prc = morph_data[GET_MORPH(ch)].pool_mod[HEALTH] / 100.0;
-			mod = (GET_MAX_HEALTH(ch) * prc) - GET_MAX_HEALTH(ch);
-			break;
-		}
-		case APPLY_MOVE: {
-			prc = morph_data[GET_MORPH(ch)].pool_mod[MOVE] / 100.0;
-			mod = (GET_MAX_MOVE(ch) * prc) - GET_MAX_MOVE(ch);
-			break;
-		}
-		case APPLY_MANA: {
-			prc = morph_data[GET_MORPH(ch)].pool_mod[MANA] / 100.0;
-			mod = (GET_MAX_MANA(ch) * prc) - GET_MAX_MANA(ch);
-			break;
-		}
-	}
-
-	return mod;
-}
-
-
-/* Update the stats on a morph */
-void update_morph_stats(char_data *ch, bool add) {
-	if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
-		if (morph_data[GET_MORPH(ch)].aff_bits) {
-			affect_modify(ch, 0, 0, morph_data[GET_MORPH(ch)].aff_bits, add);
-		}
-
-		affect_modify(ch, APPLY_STRENGTH, morph_modifier(ch, APPLY_STRENGTH), 0, add);
-		affect_modify(ch, APPLY_DEXTERITY, morph_modifier(ch, APPLY_DEXTERITY), 0, add);
-		affect_modify(ch, APPLY_CHARISMA, morph_modifier(ch, APPLY_CHARISMA), 0, add);
-		affect_modify(ch, APPLY_GREATNESS, morph_modifier(ch, APPLY_GREATNESS), 0, add);
-		affect_modify(ch, APPLY_INTELLIGENCE, morph_modifier(ch, APPLY_INTELLIGENCE), 0, add);
-		affect_modify(ch, APPLY_WITS, morph_modifier(ch, APPLY_WITS), 0, add);
-		affect_modify(ch, APPLY_HEALTH, morph_modifier(ch, APPLY_HEALTH), 0, add);
-		affect_modify(ch, APPLY_MOVE, morph_modifier(ch, APPLY_MOVE), 0, add);
-		affect_modify(ch, APPLY_MANA, morph_modifier(ch, APPLY_MANA), 0, add);
-	}
-}
-
-
-/* cause the morph to happen: universal thru this function to prevent errors */
-void perform_morph(char_data *ch, ubyte form) {
-	ACMD(do_dismount);
-	double move_mod, health_mod, mana_mod;
-
-	if (IS_NPC(ch)) {
-		return;
-	}
-
-	if (IS_RIDING(ch) && form != MORPH_NONE) {
-		do_dismount(ch, "", 0, 0);
-	}
-
-	// read current pools
-	health_mod = (double) GET_HEALTH(ch) / GET_MAX_HEALTH(ch);
-	move_mod = (double) GET_MOVE(ch) / GET_MAX_MOVE(ch);
-	mana_mod = (double) GET_MANA(ch) / GET_MAX_MANA(ch);
-
-	/* Remove his morph bonuses from his current form */
-	update_morph_stats(ch, FALSE);
-
-	/* Set the new form */
-	GET_MORPH(ch) = form;
-
-	/* Add new morph bonuses */
-	update_morph_stats(ch, TRUE);
-	
-	// this fixes all the things
-	affect_total(ch);
-
-	// set new pools
-	GET_HEALTH(ch) = (sh_int) (GET_MAX_HEALTH(ch) * health_mod);
-	GET_MOVE(ch) = (sh_int) (GET_MAX_MOVE(ch) * move_mod);
-	GET_MANA(ch) = (sh_int) (GET_MAX_MANA(ch) * mana_mod);
-
-	/* check for claws */
-	if (MORPH_FLAGGED(ch, MORPH_FLAG_NO_CLAWS) && AFF_FLAGGED(ch, AFF_CLAWS)) {
-		affects_from_char_by_aff_flag(ch, AFF_CLAWS);
-	}
-}
-
-
-/**
-* This is called by the morphing action, as well as the instamorph in do_morph.
-* It sends messages and finishes the morph.
-*
-* @param char_data *ch the morpher
-* @param int morph_to any MORPH_x const
-*/
-void finish_morphing(char_data *ch, int morph_to) {
-	void undisguise(char_data *ch);
-
-	char lbuf[MAX_STRING_LENGTH];
-	
-	// can't be disguised while morphed
-	if (IS_DISGUISED(ch) && morph_to != MORPH_NONE) {
-		undisguise(ch);
-	}
-	
-	sprintf(lbuf, "%s has become $n!", PERS(ch, ch, FALSE));
-
-	perform_morph(ch, morph_to);
-
-	act(lbuf, TRUE, ch, 0, 0, TO_ROOM);
-	act("You have become $n!", FALSE, ch, 0, 0, TO_CHAR);
-	
-	if (morph_data[morph_to].ability != NOTHING) {
-		gain_ability_exp(ch, morph_data[morph_to].ability, 33.4);
-	}
+	// no exact match...
+	return partial;
 }
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// COMMANDS ////////////////////////////////////////////////////////////////
+//// UTILITIES ///////////////////////////////////////////////////////////////
 
-ACMD(do_morph) {
-	extern bool check_vampire_sun(char_data *ch, bool message);
+/**
+* Checks for common morph problems and reports them to ch.
+*
+* @param morph_data *morph The item to audit.
+* @param char_data *ch The person to report to.
+* @return bool TRUE if any problems were reported; FALSE if all good.
+*/
+bool audit_morph(morph_data *morph, char_data *ch) {
+	char temp[MAX_STRING_LENGTH];
+	struct apply_data *app;
+	bool problem = FALSE;
 	
-	int morph_to = NOTHING;
-	int cost[NUM_POOLS];
-	int iter;
-	bool found, fighting;
-	
-	// safety first
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "You can't morph.\r\n");
-		return;
+	if (MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT)) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "IN-DEVELOPMENT");
+		problem = TRUE;
+	}
+	if (!MORPH_NAME(morph) || !*MORPH_NAME(morph) || !str_cmp(MORPH_NAME(morph), default_morph_name)) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "No name set");
+		problem = TRUE;
 	}
 	
-	one_argument(argument, arg);
+	strcpy(temp, MORPH_NAME(morph));
+	strtolower(temp);
+	if (strcmp(MORPH_NAME(morph), temp)) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "Non-lowercase name");
+		problem = TRUE;
+	}
 	
-	if (!*arg) {
-		msg_to_char(ch, "You know the following morphs: ");
-		found = FALSE;
-		
-		for (iter = 0; iter < NUM_MORPHS; ++iter) {
-			if (*morph_data[iter].name != '\n' && MORPH_OK(ch, iter)) {
-				msg_to_char(ch, "%s%s", (found ? ", " : ""), morph_data[iter].name);
-				found = TRUE;
-			}
+	if (!MORPH_SHORT_DESC(morph) || !*MORPH_SHORT_DESC(morph) || !str_cmp(MORPH_SHORT_DESC(morph), default_morph_short_desc)) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "No short description");
+		problem = TRUE;
+	}
+	any_one_arg(MORPH_SHORT_DESC(morph), temp);
+	if ((fill_word(temp) || reserved_word(temp)) && isupper(*temp)) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "Short desc capitalized");
+		problem = TRUE;
+	}
+	if (ispunct(MORPH_SHORT_DESC(morph)[strlen(MORPH_SHORT_DESC(morph)) - 1])) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "Short desc has punctuation");
+		problem = TRUE;
+	}
+	
+	if (!MORPH_LONG_DESC(morph) || !*MORPH_LONG_DESC(morph) || !str_cmp(MORPH_LONG_DESC(morph), default_morph_long_desc)) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "No long description");
+		problem = TRUE;
+	}
+	if (!ispunct(MORPH_LONG_DESC(morph)[strlen(MORPH_LONG_DESC(morph)) - 1])) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "Long desc missing punctuation");
+		problem = TRUE;
+	}
+	if (islower(*MORPH_LONG_DESC(morph))) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "Long desc not capitalized");
+		problem = TRUE;
+	}
+	
+	for (app = MORPH_APPLIES(morph); app; app = app->next) {
+		if (app->location == APPLY_NONE || app->weight == 0) {
+			olc_audit_msg(ch, MORPH_VNUM(morph), "Invalid apply: %d to %s", app->weight, apply_types[app->location]);
+			problem = TRUE;
 		}
+	}
+	
+	if (MORPH_ABILITY(morph) == NO_ABIL && MORPH_REQUIRES_OBJ(morph) == NOTHING) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "Requires no ability or object");
+		problem = TRUE;
+	}
+	if (MORPH_REQUIRES_OBJ(morph) != NOTHING && !obj_proto(MORPH_REQUIRES_OBJ(morph))) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "Requires-object does not exist");
+		problem = TRUE;
+	}
 		
-		msg_to_char(ch, "\r\n");
-		return;
-	}
-	
-	// find target morph
-	for (iter = 0; iter < NUM_MORPHS && morph_to == NOTHING; ++iter) {
-		// match name
-		if (*morph_data[iter].name != '\n' && is_abbrev(arg, morph_data[iter].name)) {
-			if (MORPH_OK(ch, iter)) {
-				morph_to = iter;
-			}
-		}
-	}
-	
-	if (morph_to == NOTHING) {
-		msg_to_char(ch, "You don't know any such morph.\r\n");
-		return;
-	}
+	return problem;
+}
 
-	// set up costs costs -- health and blood require 1 more than the morph cost, as you'd die from hitting 0
-	fighting = (FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING);
-	for (iter = 0; iter < NUM_POOLS; ++iter) {
-		cost[iter] = (fighting ? morph_data[morph_to].combat_cost[iter] : morph_data[morph_to].normal_cost[iter]);
-	}
+
+/**
+* For the .list command.
+*
+* @param morph_data *morph The thing to list.
+* @param bool detail If TRUE, provide additional details
+* @return char* The line to show (without a CRLF).
+*/
+char *list_one_morph(morph_data *morph, bool detail) {
+	static char output[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH], applies[MAX_STRING_LENGTH];
+	struct apply_data *app;
+	ability_data *abil;
 	
-	if (IS_SET(morph_data[morph_to].morph_flags, MORPH_FLAG_VAMPIRE_ONLY) && !check_vampire_sun(ch, TRUE)) {
-		// sends own sun message
-		return;
-	}
-	else if (GET_MORPH(ch) == morph_to) {
-		msg_to_char(ch, "You are already in that form.\r\n");
-	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		msg_to_char(ch, "You're too busy to morph now!\r\n");
-	}
-	else if (!morph_affinity_ok(IN_ROOM(ch), morph_to)) {
-		msg_to_char(ch, "You can't morph into that here.\r\n");
-	}
-	else if (cost[HEALTH] > 0 && GET_HEALTH(ch) < cost[HEALTH] + 1) {
-		msg_to_char(ch, "You need %d health points to morph.\r\n", cost[HEALTH]);
-	}
-	else if (cost[MOVE] > 0 && GET_MOVE(ch) < cost[MOVE]) {
-		msg_to_char(ch, "You need %d move points to morph.\r\n", cost[MOVE]);
-	}
-	else if (cost[MANA] > 0 && GET_MANA(ch) < cost[MANA]) {
-		msg_to_char(ch, "You need %d mana points to morph.\r\n", cost[MANA]);
-	}
-	else if (cost[BLOOD] > 0 && GET_BLOOD(ch) < cost[BLOOD] + 1) {
-		msg_to_char(ch, "You need %d blood points to morph.\r\n", cost[BLOOD]);
-	}
-	else if (cost[BLOOD] > 0 && !CAN_SPEND_BLOOD(ch)) {
-		msg_to_char(ch, "Your blood is inert, you can't do that!\r\n");
-	}
-	else if (morph_data[morph_to].ability != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, NULL, morph_data[morph_to].ability)) {
-		return;
-	}
-	else {
-		// charge costs
-		for (iter = 0; iter < NUM_POOLS; ++iter) {
-			GET_CURRENT_POOL(ch, iter) -= cost[iter];
-		}
-		
-		if (fighting) {
-			// insta-morph!
-			finish_morphing(ch, morph_to);
-			command_lag(ch, WAIT_OTHER);
+	if (detail) {
+		// ability required
+		if (MORPH_ABILITY(morph) == NO_ABIL) {
+			*part = '\0';
 		}
 		else {
-			start_action(ch, ACT_MORPHING, config_get_int("morph_timer"));
-			GET_ACTION_VNUM(ch, 0) = morph_to;
-			msg_to_char(ch, "You begin to transform!\r\n");
+			sprintf(part, " (%s", get_ability_name_by_vnum(MORPH_ABILITY(morph)));
+			if ((abil = find_ability_by_vnum(MORPH_ABILITY(morph))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
+				sprintf(part + strlen(part), " - %s %d", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+			}
+			strcat(part, ")");
+		}
+		
+		// applies
+		*applies = '\0';
+		for (app = MORPH_APPLIES(morph); app; app = app->next) {
+			sprintf(applies + strlen(applies), "%s%d to %s", (app == MORPH_APPLIES(morph)) ? " " : ", ", app->weight, apply_types[app->location]);
+		}
+		
+		snprintf(output, sizeof(output), "[%5d] %s%s%s", MORPH_VNUM(morph), MORPH_NAME(morph), part, applies);
+	}
+	else {
+		snprintf(output, sizeof(output), "[%5d] %s", MORPH_VNUM(morph), MORPH_NAME(morph));
+	}
+		
+	return output;
+}
+
+
+/**
+* Searches for all uses of a morph and displays them.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The morph vnum.
+*/
+void olc_search_morph(char_data *ch, any_vnum vnum) {
+	char buf[MAX_STRING_LENGTH];
+	morph_data *morph = morph_proto(vnum);
+	int size, found;
+	
+	if (!morph) {
+		msg_to_char(ch, "There is no morph %d.\r\n", vnum);
+		return;
+	}
+	
+	found = 0;
+	size = snprintf(buf, sizeof(buf), "Occurrences of morph %d (%s):\r\n", vnum, MORPH_NAME(morph));
+	
+	// morphs are not actually used anywhere else
+	
+	if (found > 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+	}
+	else {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	
+	page_string(ch->desc, buf, TRUE);
+}
+
+
+// Simple vnum sorter for the morph hash
+int sort_morphs(morph_data *a, morph_data *b) {
+	return MORPH_VNUM(a) - MORPH_VNUM(b);
+}
+
+
+// typealphabetic sorter for sorted_morphs
+int sort_morphs_by_data(morph_data *a, morph_data *b) {
+	ability_data *a_abil, *b_abil;
+	int a_level, b_level;
+	
+	a_abil = find_ability_by_vnum(MORPH_ABILITY(a));
+	b_abil = find_ability_by_vnum(MORPH_ABILITY(b));
+	a_level = a_abil ? ABIL_SKILL_LEVEL(a_abil) : 0;
+	b_level = b_abil ? ABIL_SKILL_LEVEL(b_abil) : 0;
+	
+	// reverse level sort
+	if (a_level != b_level) {
+		return b_level - a_level;
+	}
+	
+	return strcmp(NULLSAFE(MORPH_NAME(a)), NULLSAFE(MORPH_NAME(b)));
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// DATABASE ////////////////////////////////////////////////////////////////
+
+/**
+* Puts a morph into the hash table.
+*
+* @param morph_data *morph The morph data to add to the table.
+*/
+void add_morph_to_table(morph_data *morph) {
+	morph_data *find;
+	any_vnum vnum;
+	
+	if (morph) {
+		vnum = MORPH_VNUM(morph);
+		HASH_FIND_INT(morph_table, &vnum, find);
+		if (!find) {
+			HASH_ADD_INT(morph_table, vnum, morph);
+			HASH_SORT(morph_table, sort_morphs);
+		}
+		
+		// sorted table
+		HASH_FIND(sorted_hh, sorted_morphs, &vnum, sizeof(int), find);
+		if (!find) {
+			HASH_ADD(sorted_hh, sorted_morphs, vnum, sizeof(int), morph);
+			HASH_SRT(sorted_hh, sorted_morphs, sort_morphs_by_data);
 		}
 	}
+}
+
+
+/**
+* @param any_vnum vnum Any morph vnum
+* @return morph_data* The morph, or NULL if it doesn't exist
+*/
+morph_data *morph_proto(any_vnum vnum) {
+	morph_data *morph;
+	
+	if (vnum < 0 || vnum == NOTHING) {
+		return NULL;
+	}
+	
+	HASH_FIND_INT(morph_table, &vnum, morph);
+	return morph;
+}
+
+
+/**
+* Removes a morph from the hash table.
+*
+* @param morph_data *morph The morph data to remove from the table.
+*/
+void remove_morph_from_table(morph_data *morph) {
+	HASH_DEL(morph_table, morph);
+	HASH_DELETE(sorted_hh, sorted_morphs, morph);
+}
+
+
+/**
+* Initializes a new morph. This clears all memory for it, so set the vnum
+* AFTER.
+*
+* @param morph_data *morph The morph to initialize.
+*/
+void clear_morph(morph_data *morph) {
+	memset((char *) morph, 0, sizeof(morph_data));
+	
+	MORPH_VNUM(morph) = NOTHING;
+	MORPH_ABILITY(morph) = NO_ABIL;
+	MORPH_REQUIRES_OBJ(morph) = NOTHING;
+}
+
+
+/**
+* frees up memory for a morph data item.
+*
+* See also: olc_delete_morph
+*
+* @param morph_data *morph The morph data to free.
+*/
+void free_morph(morph_data *morph) {
+	morph_data *proto = morph_proto(MORPH_VNUM(morph));
+	
+	if (MORPH_NAME(morph) && (!proto || MORPH_NAME(morph) != MORPH_NAME(proto))) {
+		free(MORPH_NAME(morph));
+	}
+	if (MORPH_SHORT_DESC(morph) && (!proto || MORPH_SHORT_DESC(morph) != MORPH_SHORT_DESC(proto))) {
+		free(MORPH_SHORT_DESC(morph));
+	}
+	if (MORPH_LONG_DESC(morph) && (!proto || MORPH_LONG_DESC(morph) != MORPH_LONG_DESC(proto))) {
+		free(MORPH_LONG_DESC(morph));
+	}
+	
+	if (MORPH_APPLIES(morph) && (!proto || MORPH_APPLIES(morph) != MORPH_APPLIES(proto))) {
+		free_apply_list(MORPH_APPLIES(morph));
+	}
+	
+	free(morph);
+}
+
+
+/**
+* Read one morph from file.
+*
+* @param FILE *fl The open .morph file
+* @param any_vnum vnum The morph vnum
+*/
+void parse_morph(FILE *fl, any_vnum vnum) {
+	void parse_apply(FILE *fl, struct apply_data **list, char *error_str);
+	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
+
+	char line[256], error[256], str_in[256];
+	morph_data *morph, *find;
+	int int_in[4];
+	
+	CREATE(morph, morph_data, 1);
+	clear_morph(morph);
+	MORPH_VNUM(morph) = vnum;
+	
+	HASH_FIND_INT(morph_table, &vnum, find);
+	if (find) {
+		log("WARNING: Duplicate morph vnum #%d", vnum);
+		// but have to load it anyway to advance the file
+	}
+	add_morph_to_table(morph);
+		
+	// for error messages
+	sprintf(error, "morph vnum %d", vnum);
+	
+	// lines 1-3
+	MORPH_NAME(morph) = fread_string(fl, error);
+	MORPH_SHORT_DESC(morph) = fread_string(fl, error);
+	MORPH_LONG_DESC(morph) = fread_string(fl, error);
+	
+	// 4. flags cost-type cost-amount ability requires-obj
+	if (!get_line(fl, line) || sscanf(line, "%s %d %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 5) {
+		log("SYSERR: Format error in line 2 of %s", error);
+		exit(1);
+	}
+	
+	MORPH_FLAGS(morph) = asciiflag_conv(str_in);
+	MORPH_COST_TYPE(morph) = int_in[0];
+	MORPH_COST(morph) = int_in[1];
+	MORPH_ABILITY(morph) = int_in[2];
+	MORPH_REQUIRES_OBJ(morph) = int_in[3];
+		
+	// optionals
+	for (;;) {
+		if (!get_line(fl, line)) {
+			log("SYSERR: Format error in %s, expecting alphabetic flags", error);
+			exit(1);
+		}
+		switch (*line) {
+			case 'A': {	// applies
+				parse_apply(fl, &MORPH_APPLIES(morph), error);
+				break;
+			}
+						
+			// end
+			case 'S': {
+				return;
+			}
+			
+			default: {
+				log("SYSERR: Format error in %s, expecting alphabetic flags", error);
+				exit(1);
+			}
+		}
+	}
+}
+
+
+// writes entries in the morph index
+void write_morphs_index(FILE *fl) {
+	morph_data *morph, *next_morph;
+	int this, last;
+	
+	last = -1;
+	HASH_ITER(hh, morph_table, morph, next_morph) {
+		// determine "zone number" by vnum
+		this = (int)(MORPH_VNUM(morph) / 100);
+	
+		if (this != last) {
+			fprintf(fl, "%d%s\n", this, MORPH_SUFFIX);
+			last = this;
+		}
+	}
+}
+
+
+/**
+* Outputs one morph item in the db file format, starting with a #VNUM and
+* ending with an S.
+*
+* @param FILE *fl The file to write it to.
+* @param morph_data *morph The thing to save.
+*/
+void write_morph_to_file(FILE *fl, morph_data *morph) {
+	void write_applies_to_file(FILE *fl, struct apply_data *list);
+	void write_resources_to_file(FILE *fl, struct resource_data *list);
+	
+	char temp[256], temp2[256];
+	struct apply_data *app;
+	
+	if (!fl || !morph) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_morph_to_file called without %s", !fl ? "file" : "morph");
+		return;
+	}
+	
+	fprintf(fl, "#%d\n", MORPH_VNUM(morph));
+	
+	// 1-3. strings
+	fprintf(fl, "%s~\n", NULLSAFE(MORPH_NAME(morph)));
+	fprintf(fl, "%s~\n", NULLSAFE(MORPH_SHORT_DESC(morph)));
+	fprintf(fl, "%s~\n", NULLSAFE(MORPH_LONG_DESC(morph)));
+	
+	// 4. flags cost-type cost-amount ability requires-obj
+	strcpy(temp, bitv_to_alpha(MORPH_FLAGS(morph)));
+	fprintf(fl, "%s %d %d %d %d\n", temp, MORPH_COST_TYPE(morph), MORPH_COST(morph), MORPH_ABILITY(morph), MORPH_REQUIRES_OBJ(morph));
+	
+	// 'A': applies
+	write_applies_to_file(fl, MORPH_APPLIES(morph));
+	
+	// end
+	fprintf(fl, "S\n");
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// OLC HANDLERS ////////////////////////////////////////////////////////////
+
+
+/**
+* Creates a new morph entry.
+* 
+* @param any_vnum vnum The number to create.
+* @return morph_data* The new morph's prototype.
+*/
+morph_data *create_morph_table_entry(any_vnum vnum) {
+	morph_data *morph;
+	
+	// sanity
+	if (morph_proto(vnum)) {
+		log("SYSERR: Attempting to insert morph at existing vnum %d", vnum);
+		return morph_proto(vnum);
+	}
+	
+	CREATE(morph, morph_data, 1);
+	clear_morph(morph);
+	MORPH_VNUM(morph) = vnum;
+	MORPH_NAME(morph) = str_dup(default_morph_name);
+	MORPH_SHORT_DESC(morph) = str_dup(default_morph_short_desc);
+	MORPH_LONG_DESC(morph) = str_dup(default_morph_long_desc);
+	add_morph_to_table(morph);
+
+	// save index and morph file now
+	save_index(DB_BOOT_MORPH);
+	save_library_file_for_vnum(DB_BOOT_MORPH, vnum);
+
+	return morph;
+}
+
+
+/**
+* WARNING: This function actually deletes a morph.
+*
+* @param char_data *ch The person doing the deleting.
+* @param any_vnum vnum The vnum to delete.
+*/
+void olc_delete_morph(char_data *ch, any_vnum vnum) {
+	morph_data *morph;
+	
+	if (!(morph = morph_proto(vnum))) {
+		msg_to_char(ch, "There is no such morph %d.\r\n", vnum);
+		return;
+	}
+	
+	// remove it from the hash table first
+	remove_morph_from_table(morph);
+
+	// save index and morph file now
+	save_index(DB_BOOT_MORPH);
+	save_library_file_for_vnum(DB_BOOT_MORPH, vnum);
+	
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted morph %d", GET_NAME(ch), vnum);
+	msg_to_char(ch, "Morph %d deleted.\r\n", vnum);
+	
+	free_morph(morph);
+}
+
+
+/**
+* Function to save a player's changes to a morph (or a new one).
+*
+* @param descriptor_data *desc The descriptor who is saving.
+*/
+void save_olc_morph(descriptor_data *desc) {	
+	morph_data *proto, *morph = GET_OLC_MORPH(desc);
+	any_vnum vnum = GET_OLC_VNUM(desc);
+	UT_hash_handle hh, sorted;
+
+	// have a place to save it?
+	if (!(proto = morph_proto(vnum))) {
+		proto = create_morph_table_entry(vnum);
+	}
+	
+	// free prototype strings and pointers
+	if (MORPH_NAME(proto)) {
+		free(MORPH_NAME(proto));
+	}
+	if (MORPH_SHORT_DESC(proto)) {
+		free(MORPH_SHORT_DESC(proto));
+	}
+	if (MORPH_LONG_DESC(proto)) {
+		free(MORPH_LONG_DESC(proto));
+	}
+	free_apply_list(MORPH_APPLIES(proto));
+	
+	// sanity
+	if (!MORPH_NAME(morph) || !*MORPH_NAME(morph)) {
+		if (MORPH_NAME(morph)) {
+			free(MORPH_NAME(morph));
+		}
+		MORPH_NAME(morph) = str_dup(default_morph_name);
+	}
+	if (!MORPH_SHORT_DESC(morph) || !*MORPH_SHORT_DESC(morph)) {
+		if (MORPH_SHORT_DESC(morph)) {
+			free(MORPH_SHORT_DESC(morph));
+		}
+		MORPH_SHORT_DESC(morph) = str_dup(default_morph_short_desc);
+	}
+	if (!MORPH_LONG_DESC(morph) || !*MORPH_LONG_DESC(morph)) {
+		if (MORPH_LONG_DESC(morph)) {
+			free(MORPH_LONG_DESC(morph));
+		}
+		MORPH_LONG_DESC(morph) = str_dup(default_morph_long_desc);
+	}
+
+	// save data back over the proto-type
+	hh = proto->hh;	// save old hash handle
+	sorted = proto->sorted_hh;
+	*proto = *morph;	// copy over all data
+	proto->vnum = vnum;	// ensure correct vnum
+	proto->hh = hh;	// restore old hash handle
+	proto->sorted_hh = sorted;
+		
+	// and save to file
+	save_library_file_for_vnum(DB_BOOT_MORPH, vnum);
+
+	// ... and re-sort
+	HASH_SRT(sorted_hh, sorted_morphs, sort_morphs_by_data);
+}
+
+
+/**
+* Creates a copy of a morph, or clears a new one, for editing.
+* 
+* @param morph_data *input The morph to copy, or NULL to make a new one.
+* @return morph_data* The copied morph.
+*/
+morph_data *setup_olc_morph(morph_data *input) {
+	extern struct apply_data *copy_apply_list(struct apply_data *input);
+	
+	morph_data *new;
+	
+	CREATE(new, morph_data, 1);
+	clear_morph(new);
+	
+	if (input) {
+		// copy normal data
+		*new = *input;
+
+		// copy things that are pointers
+		MORPH_NAME(new) = MORPH_NAME(input) ? str_dup(MORPH_NAME(input)) : NULL;
+		MORPH_SHORT_DESC(new) = MORPH_SHORT_DESC(input) ? str_dup(MORPH_SHORT_DESC(input)) : NULL;
+		MORPH_LONG_DESC(new) = MORPH_LONG_DESC(input) ? str_dup(MORPH_LONG_DESC(input)) : NULL;
+		
+		// copy lists
+		MORPH_APPLIES(new) = copy_apply_list(MORPH_APPLIES(input));
+	}
+	else {
+		// brand new: some defaults
+		MORPH_NAME(new) = str_dup(default_morph_name);
+		MORPH_SHORT_DESC(new) = str_dup(default_morph_short_desc);
+		MORPH_LONG_DESC(new) = str_dup(default_morph_long_desc);
+		MORPH_FLAGS(new) = MORPHF_IN_DEVELOPMENT;
+	}
+	
+	// done
+	return new;	
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// DISPLAYS ////////////////////////////////////////////////////////////////
+
+/**
+* For vstat.
+*
+* @param char_data *ch The player requesting stats.
+* @param morph_data *morph The morph to display.
+*/
+void do_stat_morph(char_data *ch, morph_data *morph) {
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	struct apply_data *app;
+	ability_data *abil;
+	size_t size;
+	int num;
+	
+	if (!morph) {
+		return;
+	}
+	
+	// first line
+	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0, Short desc: \ty%s\t0\r\n", MORPH_VNUM(morph), MORPH_NAME(morph), MORPH_SHORT_DESC(morph));
+	size += snprintf(buf + size, sizeof(buf) - size, "L-Desc: \ty%s\t0\r\n", MORPH_LONG_DESC(morph));
+	
+	snprintf(part, sizeof(part), "%s", (MORPH_ABILITY(morph) == NO_ABIL ? "none" : get_ability_name_by_vnum(MORPH_ABILITY(morph))));
+	if ((abil = find_ability_by_vnum(MORPH_ABILITY(morph))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
+		snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+	}
+	size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\ty%d %s\t0], Requires Ability: [\ty%s\t0]\r\n", MORPH_COST(morph), MORPH_COST(morph) > 0 ? pool_types[MORPH_COST_TYPE(morph)] : "/ none", part);
+	
+	if (MORPH_REQUIRES_OBJ(morph) != NOTHING) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Requires item: [%d] \tg%s\t0\r\n", MORPH_REQUIRES_OBJ(morph), skip_filler(get_obj_name_by_proto(MORPH_REQUIRES_OBJ(morph))));
+	}
+	
+	sprintbit(MORPH_FLAGS(morph), morph_flags, part, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+		
+	// applies
+	size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
+	for (app = MORPH_APPLIES(morph), num = 0; app; app = app->next, ++num) {
+		size += snprintf(buf + size, sizeof(buf) - size, "%s%d to %s", num ? ", " : "", app->weight, apply_types[app->location]);
+	}
+	if (!MORPH_APPLIES(morph)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "none");
+	}
+	size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+		
+	page_string(ch->desc, buf, TRUE);
+}
+
+
+/**
+* This is the main recipe display for morph OLC. It displays the user's
+* currently-edited morph.
+*
+* @param char_data *ch The person who is editing a morph and will see its display.
+*/
+void olc_show_morph(char_data *ch) {
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	struct apply_data *app;
+	ability_data *abil;
+	int num;
+	
+	if (!morph) {
+		return;
+	}
+	
+	*buf = '\0';
+	
+	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !morph_proto(MORPH_VNUM(morph)) ? "new morph" : MORPH_NAME(morph_proto(MORPH_VNUM(morph))));
+	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(MORPH_NAME(morph)));
+	sprintf(buf + strlen(buf), "<\tyshortdescription\t0> %s\r\n", NULLSAFE(MORPH_SHORT_DESC(morph)));
+	sprintf(buf + strlen(buf), "<\tylongdescription\t0> %s\r\n", NULLSAFE(MORPH_LONG_DESC(morph)));
+	
+	sprintbit(MORPH_FLAGS(morph), morph_flags, lbuf, TRUE);
+	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
+	
+	sprintf(buf + strlen(buf), "<\tycosttype\t0> %s\r\n", pool_types[MORPH_COST_TYPE(morph)]);
+	sprintf(buf + strlen(buf), "<\tycost\t0> %d %s\r\n", MORPH_COST(morph), pool_types[MORPH_COST_TYPE(morph)]);
+	
+	// ability required
+	if (MORPH_ABILITY(morph) == NO_ABIL || !(abil = find_ability_by_vnum(MORPH_ABILITY(morph)))) {
+		strcpy(buf1, "none");
+	}
+	else {
+		sprintf(buf1, "%s", ABIL_NAME(abil));
+		if (ABIL_ASSIGNED_SKILL(abil)) {
+			sprintf(buf1 + strlen(buf1), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+		}
+	}
+	sprintf(buf + strlen(buf), "<\tyrequiresability\t0> %s\r\n", buf1);
+
+	sprintf(buf + strlen(buf), "<\tyrequiresobject\t0> %d - %s\r\n", MORPH_REQUIRES_OBJ(morph), MORPH_REQUIRES_OBJ(morph) == NOTHING ? "none" : get_obj_name_by_proto(MORPH_REQUIRES_OBJ(morph)));
+	
+	// applies
+	sprintf(buf + strlen(buf), "Applies: <\tyapply\t0>\r\n");
+	for (app = MORPH_APPLIES(morph), num = 1; app; app = app->next, ++num) {
+		sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", num, app->weight, apply_types[app->location]);
+	}
+	if (!MORPH_APPLIES(morph)) {
+		strcat(buf, "  none\r\n");
+	}
+	
+	page_string(ch->desc, buf, TRUE);
+}
+
+
+/**
+* Searches the morph db for a match, and prints it to the character.
+*
+* @param char *searchname The search string.
+* @param char_data *ch The player who is searching.
+* @return int The number of matches shown.
+*/
+int vnum_morph(char *searchname, char_data *ch) {
+	morph_data *iter, *next_iter;
+	int found = 0;
+	
+	HASH_ITER(hh, morph_table, iter, next_iter) {
+		if (multi_isname(searchname, MORPH_NAME(iter))) {
+			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, MORPH_VNUM(iter), MORPH_NAME(iter));
+		}
+	}
+	
+	return found;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// OLC MODULES /////////////////////////////////////////////////////////////
+
+OLC_MODULE(morphedit_ability) {
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+	ability_data *abil;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Require what ability (or 'none')?\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		MORPH_ABILITY(morph) = NO_ABIL;
+		
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It will require no ability.\r\n");
+		}
+	}
+	else if (!(abil = find_ability(argument))) {
+		msg_to_char(ch, "Invalid ability '%s'.\r\n", argument);
+	}
+	else {
+		MORPH_ABILITY(morph) = ABIL_VNUM(abil);
+		
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It now requires the %s ability.\r\n", ABIL_NAME(abil));
+		}
+	}
+}
+
+
+OLC_MODULE(morphedit_apply) {
+	void olc_process_applies(char_data *ch, char *argument, struct apply_data **list);
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+	olc_process_applies(ch, argument, &MORPH_APPLIES(morph));
+}
+
+
+OLC_MODULE(morphedit_cost) {
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+	MORPH_COST(morph) = olc_process_number(ch, argument, "cost", "cost", 0, INT_MAX, MORPH_COST(morph));
+}
+
+
+OLC_MODULE(morphedit_costtype) {
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+	MORPH_COST_TYPE(morph) = olc_process_type(ch, argument, "cost type", "costtype", pool_types, MORPH_COST_TYPE(morph));
+}
+
+
+OLC_MODULE(morphedit_flags) {
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+	bool had_indev = IS_SET(MORPH_FLAGS(morph), MORPHF_IN_DEVELOPMENT) ? TRUE : FALSE;
+	
+	MORPH_FLAGS(morph) = olc_process_flag(ch, argument, "morph", "flags", morph_flags, MORPH_FLAGS(morph));
+	
+	// validate removal of IN-DEVELOPMENT
+	if (had_indev && !IS_SET(MORPH_FLAGS(morph), MORPHF_IN_DEVELOPMENT) && GET_ACCESS_LEVEL(ch) < LVL_UNRESTRICTED_BUILDER && !OLC_FLAGGED(ch, OLC_FLAG_CLEAR_IN_DEV)) {
+		msg_to_char(ch, "You don't have permission to remove the IN-DEVELOPMENT flag.\r\n");
+		SET_BIT(MORPH_FLAGS(morph), MORPHF_IN_DEVELOPMENT);
+	}
+}
+
+
+OLC_MODULE(morphedit_longdesc) {
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+	olc_process_string(ch, argument, "long description", &MORPH_LONG_DESC(morph));
+}
+
+
+OLC_MODULE(morphedit_name) {
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+	olc_process_string(ch, argument, "name", &MORPH_NAME(morph));
+}
+
+
+OLC_MODULE(morphedit_requiresobject) {
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+	obj_vnum old = MORPH_REQUIRES_OBJ(morph);
+	
+	if (!str_cmp(argument, "none") || atoi(argument) == NOTHING) {
+		MORPH_REQUIRES_OBJ(morph) = NOTHING;
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It no longer requires an object.\r\n");
+		}
+	}
+	else {
+		MORPH_REQUIRES_OBJ(morph) = olc_process_number(ch, argument, "object vnum", "requiresobject", 0, MAX_VNUM, MORPH_REQUIRES_OBJ(morph));
+		if (!obj_proto(MORPH_REQUIRES_OBJ(morph))) {
+			MORPH_REQUIRES_OBJ(morph) = old;
+			msg_to_char(ch, "There is no object with that vnum. Old value restored.\r\n");
+		}
+		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			msg_to_char(ch, "It now requires %s.\r\n", get_obj_name_by_proto(MORPH_REQUIRES_OBJ(morph)));
+		}
+	}
+}
+
+
+OLC_MODULE(morphedit_shortdesc) {
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+	olc_process_string(ch, argument, "short description", &MORPH_SHORT_DESC(morph));
 }

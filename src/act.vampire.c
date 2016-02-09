@@ -591,7 +591,7 @@ void update_vampire_sun(char_data *ch) {
 	}
 	
 	// revert vampire morphs
-	if (GET_MORPH(ch) != MORPH_NONE && MORPH_FLAGGED(ch, MORPH_FLAG_VAMPIRE_ONLY)) {
+	if (GET_MORPH(ch) != MORPH_NONE && MORPH_FLAGGED(ch, MORPHF_VAMPIRE_ONLY)) {
 		if (!found) {
 			sun_message(ch);
 		}
@@ -939,7 +939,7 @@ ACMD(do_claws) {
 	if (!check_vampire_sun(ch, TRUE)) {
 		return;
 	}
-	if (MORPH_FLAGGED(ch, MORPH_FLAG_NO_CLAWS)) {
+	if (MORPH_FLAGGED(ch, MORPHF_NO_CLAWS)) {
 		msg_to_char(ch, "You can't grow claws in this form!\r\n");
 		return;
 	}

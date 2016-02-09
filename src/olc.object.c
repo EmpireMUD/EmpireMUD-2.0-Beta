@@ -999,7 +999,7 @@ void save_olc_object(descriptor_data *desc) {
 	}
 	
 	// old applies
-	free_apply_list(GET_OBJ_APPLIES(proto));
+	free_obj_apply_list(GET_OBJ_APPLIES(proto));
 	GET_OBJ_APPLIES(proto) = NULL;
 	
 	// free old script?
@@ -1142,7 +1142,7 @@ obj_data *setup_olc_object(obj_data *input) {
 		}
 		
 		// copy applies
-		GET_OBJ_APPLIES(new) = copy_apply_list(GET_OBJ_APPLIES(input));
+		GET_OBJ_APPLIES(new) = copy_obj_apply_list(GET_OBJ_APPLIES(input));
 		
 		// copy scripts
 		SCRIPT(new) = NULL;
@@ -1440,7 +1440,7 @@ OLC_MODULE(oedit_apply) {
 			msg_to_char(ch, "Remove which apply (number)?\r\n");
 		}
 		else if (!str_cmp(arg2, "all")) {
-			free_apply_list(GET_OBJ_APPLIES(obj));
+			free_obj_apply_list(GET_OBJ_APPLIES(obj));
 			GET_OBJ_APPLIES(obj) = NULL;
 			msg_to_char(ch, "You remove all the applies.\r\n");
 		}

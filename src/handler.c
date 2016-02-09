@@ -3509,7 +3509,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
 		GET_OBJ_VAL(obj, iter) = GET_OBJ_VAL(input, iter);
 	}
-	GET_OBJ_APPLIES(obj) = copy_apply_list(GET_OBJ_APPLIES(input));
+	GET_OBJ_APPLIES(obj) = copy_obj_apply_list(GET_OBJ_APPLIES(input));
 	
 	return obj;
 }
@@ -3735,7 +3735,7 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 	}
 	
 	// to compare applies, we're going to copy and delete as we find them
-	b_list = copy_apply_list(GET_OBJ_APPLIES(obj_b));
+	b_list = copy_obj_apply_list(GET_OBJ_APPLIES(obj_b));
 	for (a_apply = GET_OBJ_APPLIES(obj_a); a_apply; a_apply = a_apply->next) {
 		found = FALSE;
 		for (b_apply = b_list; b_apply; b_apply = b_apply->next) {
@@ -3748,12 +3748,12 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 		}
 		
 		if (!found) {
-			free_apply_list(b_list);
+			free_obj_apply_list(b_list);
 			return FALSE;
 		}
 	}
 	if (b_list) {	// more things in b_list than a
-		free_apply_list(b_list);
+		free_obj_apply_list(b_list);
 		return FALSE;
 	}
 	

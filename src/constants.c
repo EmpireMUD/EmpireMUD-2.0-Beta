@@ -1913,6 +1913,7 @@ const char *olc_flag_bits[] = {
 	"CLASSES",
 	"SKILLS",
 	"!VEHICLES",
+	"!MORPHS",
 	"\n"
 };
 
@@ -1937,6 +1938,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"class",
 	"skill",
 	"vehicle",
+	"morph",
 	"\n"
 };
 
@@ -3016,6 +3018,20 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,
 	TYPE_OBJ,
 	TYPE_OBJ	// mine
+};
+
+
+// MORPHF_x
+const char *morph_flags[] = {
+	"IN-DEVELOPMENT",
+	"!CLAWS",
+	"ANIMAL",
+	"VAMPIRE-ONLY",
+	"TEMPERATE-AFFINITY",
+	"ARID-AFFINITY",	// 5
+	"TROPICAL-AFFINITY",
+	"CHECK-SOLO",
+	"\n"
 };
 
 

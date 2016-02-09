@@ -134,6 +134,10 @@ char_data *combat_list = NULL;	// head of l-list of fighting chars
 char_data *next_combat_list = NULL;	// used for iteration of combat_list when more than 1 person can be removed from combat in 1 loop iteration
 struct generic_name_data *generic_names = NULL;	// LL of generic name sets
 
+// morphs
+morph_data *morph_table = NULL;	// master morph hash table
+morph_data *sorted_morphs = NULL;	// alphabetic version // sorted_hh
+
 // objects
 obj_data *object_list = NULL;	// global linked list of objs
 obj_data *object_table = NULL;	// hash table of objs
@@ -220,6 +224,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ CLASS_PREFIX, CLASS_SUFFIX },	// DB_BOOT_CLASS
 	{ SKILL_PREFIX, SKILL_SUFFIX },	// DB_BOOT_SKILL
 	{ VEH_PREFIX, VEH_SUFFIX },	// DB_BOOT_SKILL
+	{ MORPH_PREFIX, MORPH_SUFFIX },	// DB_BOOT_MORPH
 };
 
 
@@ -459,6 +464,9 @@ void boot_world(void) {
 	
 	log("Loading augments.");
 	index_boot(DB_BOOT_AUG);
+	
+	log("Loading morphs.");
+	index_boot(DB_BOOT_MORPH);
 	
 	log("Loading instances.");
 	load_instances();
@@ -1609,7 +1617,7 @@ obj_data *read_object(obj_vnum nr, bool with_triggers) {
 	add_to_object_list(obj);
 	
 	// applies are ALWAYS a copy
-	GET_OBJ_APPLIES(obj) = copy_apply_list(GET_OBJ_APPLIES(proto));
+	GET_OBJ_APPLIES(obj) = copy_obj_apply_list(GET_OBJ_APPLIES(proto));
 	
 	if (obj->obj_flags.timer == 0)
 		obj->obj_flags.timer = UNLIMITED;
