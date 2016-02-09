@@ -898,8 +898,8 @@ void olc_show_morph(char_data *ch) {
 		sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
 	}
 	
+	sprintf(buf + strlen(buf), "<\tycost\t0> %d\r\n", MORPH_COST(morph));
 	sprintf(buf + strlen(buf), "<\tycosttype\t0> %s\r\n", pool_types[MORPH_COST_TYPE(morph)]);
-	sprintf(buf + strlen(buf), "<\tycost\t0> %d %s\r\n", MORPH_COST(morph), pool_types[MORPH_COST_TYPE(morph)]);
 	
 	// ability required
 	if (MORPH_ABILITY(morph) == NO_ABIL || !(abil = find_ability_by_vnum(MORPH_ABILITY(morph)))) {
