@@ -1399,6 +1399,7 @@ typedef struct vehicle_data vehicle_data;
 #define MORPHF_ARID_AFFINITY  BIT(5)	// f. requires arid
 #define MORPHF_TROPICAL_AFFINITY  BIT(6)	// g. requires tropical
 #define MORPHF_CHECK_SOLO  BIT(7)	// h. check for the solo role
+#define MORPHF_NO_SLEEP  BIT(8)	// i. cannot sleep in this form
 
 
 // mount flags -- MOUNT_FLAGGED(ch, flag)
