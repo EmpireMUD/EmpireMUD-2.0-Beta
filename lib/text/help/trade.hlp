@@ -60,7 +60,7 @@ With Advanced Woodworking you can craft:
 
 * Crafts marked with an asterisk require the Carpenter building.
 
-See also: CRAFT
+See also: CRAFT, LAND VEHICLES
 #
 "ALCHEMIST CRAFTS"
 
@@ -87,6 +87,8 @@ A forgemaster with the Armorsmithing specialization can create many armors:
   copper mask (head)  4 copper ingot, 1 cloth
   copper vambraces (arms)  8 copper ingot, 2 small leather
   copper buckler (shield)  6 copper ingot, 1 small leather, 1 lumber
+  
+These armor pieces are all classified as Medium Armor.
 
 Armorsmithing -> Sturdy Armors -> Imperial Armors
 
@@ -127,6 +129,24 @@ Basic Crafts:
   orange dye  2 oranges, 1 magenta arrowfish, (glassblowing)
 
 See also: CRAFTING LEVEL, WOODWORKING
+#
+CARTS WAGONS CARRIAGES CARAVANS "LAND VEHICLES"
+
+Carts and their more advanced counsins, carriages, caravans and wagons, are
+essentially large chests on wheels, allowing you to carry large piles of
+resources quickly from one place to another. They can also be ridden on and
+driven to move around without spending moves.
+
+You can board caravans and carriages, and ride around inside them. Caravans can
+even have a few different rooms redesignated inside.
+
+Storage capacities (large items count twice):
+Cart: 200 items
+Carriage: 200 items, 1 room inside
+Wagon: 400 items
+Caravan: 100 items: 2 rooms inside
+
+See also: DRIVE, ENTER, GET, HARNESS, LEAD, MOUNT, PUT, VEHICLE
 #
 CLOTHING CLOTHES
 
@@ -235,7 +255,7 @@ With Exquisite Woodworking you can craft:
 
 * Crafts marked with an asterisk require the Carpenter building.
 
-See also: CRAFT
+See also: CRAFT, LAND VEHICLES
 #
 "FINE POTTERY"
 
@@ -443,7 +463,7 @@ Rawhide Stitching -> Leatherworking -> Dangerous Leathers
 See also: SEWING, DANGEROUS LEATHERS, MASTER TAILOR, RAWHIDE STITCHING, SKIN,
   TAN
 #
-"MAGIC ATTIRE" "MAGICAL ATTIRE"
+"MAGIC ATTIRE" "MAGICAL ATTIRE" "MAGE ATTIRE"
 
 Magic Attire (Trade ability)
 Command:  sew [number] <item>
@@ -783,6 +803,8 @@ Sturdy Armors:
   mail coif (head)  4 iron ingots, 1 small leather, 1 cloth
   splint vambraces (arms)  8 iron ingots, 2 large leather
   kite shield  6 iron ingots, 2 small leather
+  
+These armor pieces are all classified as Medium Armor.
 
 Armorsmithing -> Sturdy Armors -> Imperial Armors
 
@@ -808,7 +830,7 @@ Forge items:
 
 See also: FORGE
 #
-WEAPONCRAFTING
+WEAPONCRAFTING WEAPONSMITHING
 
 Weaponcrafting (Trade ability)
 Building:  forge
@@ -859,6 +881,6 @@ With Woodworking you can craft:
 
 * Crafts marked with an asterisk require the Carpenter building.
 
-See also: CRAFT
+See also: CRAFT, LAND VEHICLES
 #
 $

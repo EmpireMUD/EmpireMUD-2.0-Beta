@@ -251,6 +251,10 @@ Resources:  12 lumber, 4 nails, 40 sticks
 Built on: oasis
 
 By building drainage for an oasis, it can be converted into a normal desert.
+If the oasis was created using the 'excavate' command, you can alternatively use
+'fillin' instead.
+
+See also: EXCAVATE
 #
 ESTUARYGARDEN "ESTUARY GARDEN"
 

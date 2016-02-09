@@ -97,7 +97,7 @@ A dragonstooth sceptre is lying here.~
 with 'use sceptre' when wielded to summon skeleton minions to guard your
 empire!
 ~
-1 ho an 4
+1 ho an 5
 0 2 5
 14 0
 A
@@ -105,6 +105,7 @@ A
 C
 0 150
 T 10505
+T 10508
 S
 #10506
 seeds spadebrush handful~
@@ -189,7 +190,7 @@ a sack of ironflour~
 A sack of ironflour is sitting on the ground.~
    This sack of "flour" resembles iron filings in appearance and texture. It
 can be cooked (though perhaps forged would be a better term) into long-lasting
-iron rations.  
+iron rations.
 
 Cook (no skill required): ironbread
   2x sack of ironflour
@@ -208,7 +209,7 @@ an ironbread ration~
 An ironbread ration has been dropped here.~
    This hard bread is cooked, or perhaps forged, from magi-netically engineered
 ironflour, using the ancient cooking techniques of the Dwarves! It keeps for
-months and is rich in iron. Actually, it might even be made of iron.  
+months and is rich in iron. Actually, it might even be made of iron.
 ~
 6 0 a 7
 120 0 0

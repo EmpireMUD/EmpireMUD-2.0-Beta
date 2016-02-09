@@ -417,7 +417,7 @@ You can use "efind all" to find all items on the ground in your empire. The
 Example:
  > efind cart
 
-See also: NAVIGATION
+See also: EINVENTORY, NAVIGATION
 #
 ELOG ELOGS "EMPIRE LOGS"
 
@@ -469,7 +469,7 @@ You can use "warehouse inventory" to see items in warehouse (unique) storage.
 their own empire. If the empire name has more than one word, you can use
 quotation marks.
 
-See also: SHIPPING, WORKFORCE
+See also: EFIND, SHIPPING, WORKFORCE
 #
 "EMPIRE SCORE" ESCORE
 
@@ -546,6 +546,8 @@ There are three ways to fill a finished trench with water:
  - If you wait long enough, it will fill with rain water on its own.
 
 An unfinished trench will not fill with water.
+
+See also: OASIS DRAINAGE
 #
 EXCHANGE
 
@@ -677,7 +679,7 @@ house is full.
 
 [--] stonehouse  6 lumber, 6 blocks
 [==] largehouse  4 lumber, 1 nails, 12 bricks
-&g^&0()&g^&0 treehouse  6 lumber, 2 nails
+&g^&0()&g^&0 treehouse  6 lumber, 2 nails  (chameleon)
 &g^&0[]&g^&0 treecomplex  20 lumber, 8 nails  (chameleon)
 &g.&0()&g.&0 undergroundcomplex  20 lumber, 2 blocks, 8 nails  (chameleon)
 &y/&0[]&y\&0 minecomplex  30 lumber, 12 nails
@@ -718,6 +720,8 @@ This command lists the islands your empire has territory or einventory on
 coordinates for each island are the approximate center of the island.
 
 Note: Immortals with the 'empires' grant can list the islands of any empire.
+
+See also: SURVEY
 #
 LOCKSMITHING
 
