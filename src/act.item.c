@@ -3392,6 +3392,12 @@ ACMD(do_drink) {
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = 0;
 			GET_OBJ_TIMER(obj) = UNLIMITED;
 		}
+		
+		// ensure binding
+		if (!IS_NPC(ch) && OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
+			bind_obj_to_player(obj, ch);
+			reduce_obj_binding(obj, ch);
+		}
 	}
 }
 

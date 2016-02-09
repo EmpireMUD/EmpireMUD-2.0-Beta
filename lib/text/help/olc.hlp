@@ -686,7 +686,7 @@ The following affect flags are available:
  INFRA - Can see in the dark (glowing red eyes).
  SNEAK - Cannot be seen while moving.
  HIDE - Cannot be seen in room (without search).
- CHARM - NPC will take orders from its master -- do not use this on items.
+ *CHARM - NPC will take orders from its master -- do not use this on items.
  INVIS - Can't be seen, except by magic.
  !BATTLE - Immune to the Battle debuffs.
  SENSE-HIDE - Can see hidden people.
@@ -2821,7 +2821,7 @@ Available flags:
  CREATABLE - can be created using the 'create' command (usually resources)
  SCALABLE - item can be scaled (see HELP ITEM SCALING)
  TWO-HANDED - weapon requires both hand slots
- BOE - item binds to a player when it is equipped
+ BOE - item binds to a player when it is equipped (or used)
  BOP - item binds to a player when it is picked up
  STAFF - counts as a staff (even if it doesn't have a staff weapon type)
  UNCOLLECTED-LOOT - will decay on the ground if no player gets it
@@ -2833,7 +2833,7 @@ Available flags:
  GROUP-DROP - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)
  GENERIC-DROP - never receives the HARD-DROP/GROUP-DROP flags
 
-See also: OLC OBJECTS
+See also: BINDING, OLC OBJECTS
 #d
 "OEDIT FULLNESS"
 

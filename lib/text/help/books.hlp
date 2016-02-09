@@ -275,7 +275,7 @@ Command:  library browse  -- see books shelved here
 You can collect books and put them into your own library, which is a Grand
 Monument in the Empire skill tree. Once you shelve a book in your library, you
 can take as many copies of it as you want. The only way to permanently remove
-it form your collection is to use the 'library burn' command.
+it from your collection is to use the 'library burn' command.
 
 The 'checkout' and 'burn' commands target books in the library's collection,
 not items in your inventory. You can pick these books by name or by number.

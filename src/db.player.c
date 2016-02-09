@@ -2793,11 +2793,11 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	extern bool global_mute_slash_channel_joins;
 
 	struct slash_channel *load_slash, *next_slash, *temp;
+	bool stop_action = FALSE, try_home = FALSE;
 	room_data *load_room = NULL, *map_loc;
 	char_data *ch = d->character;
 	char lbuf[MAX_STRING_LENGTH];
 	player_index_data *index;
-	bool try_home = FALSE;
 	empire_data *emp;
 	int iter;
 
@@ -2847,6 +2847,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 				// ensure they are on the same continent they used to be when it finds them a new loadroom
 				GET_LAST_ROOM(ch) = GET_LOAD_ROOM_CHECK(ch);
 				load_room = NULL;
+				stop_action = TRUE;
 			}
 		}
 	}
@@ -2866,16 +2867,19 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// on request, try to send them home
 	if (try_home) {
 		load_room = find_home(ch);
+		stop_action = TRUE;
 	}
 
 	// nowhere found? must detect load room
 	if (!load_room) {
 		load_room = find_load_room(d->character);
+		stop_action = TRUE;
 	}
 
 	// absolute failsafe
 	if (!load_room) {
 		load_room = real_room(0);
+		stop_action = TRUE;
 	}
 
 
@@ -2897,6 +2901,10 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 	
 	affect_total(ch);
+	
+	if (stop_action) {
+		cancel_action(ch);
+	}
 		
 	// verify skills, abilities, and class and skill/gear levels are up-to-date
 	check_skills_and_abilities(ch);

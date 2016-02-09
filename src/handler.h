@@ -215,7 +215,7 @@ extern obj_data *get_obj_in_list_num(int num, obj_data *list);
 extern obj_data *get_obj_in_list_vnum(obj_vnum vnum, obj_data *list);
 extern obj_data *get_obj_in_list_vis(char_data *ch, char *name, obj_data *list);
 extern int get_obj_pos_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[]);
-extern obj_vnum get_obj_vnum_by_name(char *name);
+extern obj_vnum get_obj_vnum_by_name(char *name, bool storable_only);
 extern obj_data *get_obj_vis(char_data *ch, char *name);
 extern obj_data *get_object_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[], int *pos);
 extern obj_data *get_obj_world(char *name);

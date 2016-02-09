@@ -57,7 +57,7 @@ else
       makeuid rat mob rat
       if %rat%
         %echo% %rat.name% scurries out from a cage!
-        %force% %rat% %kill% %actor%
+        %force% %rat% mkill %actor%
       end
     break
     case 3

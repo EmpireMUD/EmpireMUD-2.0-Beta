@@ -2291,7 +2291,7 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 				// scale item to minimum level
 				scale_item_to_level(obj, 0);
 				
-				obj_to_char_or_room(obj, ch);
+				obj_to_char(obj, ch);
 				load_otrigger(obj);
 			}
 		}

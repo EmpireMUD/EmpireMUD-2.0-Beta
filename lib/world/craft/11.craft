@@ -1,6 +1,6 @@
 #1107
 staff~
-1107 1  # 1x a wooden staff
+1107 1
 2 164 g 8 -1
 R
 124 1  # 1x a heavy log
@@ -9,7 +9,7 @@ R
 S
 #1108
 wanderer staff~
-1108 1  # 1x a wanderer's staff
+1108 1
 2 164 g 8 -1
 R
 124 1  # 1x a heavy log
@@ -18,7 +18,7 @@ R
 S
 #1109
 sorcerer staff~
-1109 1  # 1x a sorcerer's staff
+1109 1
 2 164 g 8 -1
 R
 124 1  # 1x a heavy log
@@ -27,7 +27,7 @@ R
 S
 #1110
 staff of wisdom~
-1110 1  # 1x a staff of wisdom
+1110 1
 2 164 g 8 -1
 R
 124 1  # 1x a heavy log
@@ -36,7 +36,7 @@ R
 S
 #1111
 staff of lightning~
-1111 1  # 1x a staff of lightning
+1111 1
 2 170 g 16 -1
 R
 124 1  # 1x a heavy log
@@ -47,7 +47,7 @@ R
 S
 #1112
 burning staff~
-1112 1  # 1x a burning staff
+1112 1
 2 170 g 16 -1
 R
 124 1  # 1x a heavy log
@@ -58,7 +58,7 @@ R
 S
 #1113
 staff of agony~
-1113 1  # 1x a staff of agony
+1113 1
 2 170 g 16 -1
 R
 124 1  # 1x a heavy log
@@ -69,37 +69,44 @@ R
 S
 #1114
 imperium spike~
-1114 3  # 3x an imperium spike
+1114 3
 1 51 0 2 -1
 R
 177 1  # 1x an imperium ingot
 S
 #1115
 nexus crystal~
-1115 2  # 2x a nexus crystal
+1115 2
 2 189 h 2 104
 R
 104 1  # 1x a red bloodstone
 S
 #1116
 nexus crystal~
-1115 2  # 2x a nexus crystal
+1115 2
 2 189 h 2 103
 R
 103 1  # 1x a yellow lightning stone
 S
 #1117
 nexus crystal~
-1115 2  # 2x a nexus crystal
+1115 2
 2 189 h 2 1206
 R
 1206 1  # 1x an iridescent blue iris
 S
 #1118
 nexus crystal~
-1115 2  # 2x a nexus crystal
+1115 2
 2 189 h 2 1300
 R
 1300 1  # 1x a glowing green seashell
+S
+#1119
+nocturnium spike~
+1119 3
+1 51 0 2 -1
+R
+176 1  # 1x an ingot of nocturnium
 S
 $

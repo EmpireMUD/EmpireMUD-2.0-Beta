@@ -6,7 +6,8 @@ The Trade skill contains abilities for collecting, crafting, and trading goods
 of all kinds.
 
 You can get started in Trade by chipping rocks together to make handaxes,
-tanning leather, crafting certain items, or weaving cloth.
+tanning leather, or crafting certain items (from the unskilled crafts section 
+of HELP CRAFT).
 
 Many craftable items are scalable, meaning their stats depend on the level of
 the person who crafts them. HELP SCALABLE CRAFTS has a full explanation.
@@ -59,7 +60,7 @@ With Advanced Woodworking you can craft:
 
 * Crafts marked with an asterisk require the Carpenter building.
 
-See also: CRAFT
+See also: CRAFT, LAND VEHICLES
 #
 "ALCHEMIST CRAFTS"
 
@@ -86,6 +87,8 @@ A forgemaster with the Armorsmithing specialization can create many armors:
   copper mask (head)  4 copper ingot, 1 cloth
   copper vambraces (arms)  8 copper ingot, 2 small leather
   copper buckler (shield)  6 copper ingot, 1 small leather, 1 lumber
+  
+These armor pieces are all classified as Medium Armor.
 
 Armorsmithing -> Sturdy Armors -> Imperial Armors
 
@@ -110,6 +113,7 @@ Command:  craft [number] <item>
 Unskilled crafts:
   handle  1 stick               stone axe  1 handaxe, 1 handle
   flint set  1 flint, 1 rock    stone hammer  1 rock, 1 handle
+  spear  1 spear head, 1 handle
 
 With Archery, you can craft:
   arrows  1 lumber
@@ -125,6 +129,24 @@ Basic Crafts:
   orange dye  2 oranges, 1 magenta arrowfish, (glassblowing)
 
 See also: CRAFTING LEVEL, WOODWORKING
+#
+CARTS WAGONS CARRIAGES CARAVANS "LAND VEHICLES"
+
+Carts and their more advanced counsins, carriages, caravans and wagons, are
+essentially large chests on wheels, allowing you to carry large piles of
+resources quickly from one place to another. They can also be ridden on and
+driven to move around without spending moves.
+
+You can board caravans and carriages, and ride around inside them. Caravans can
+even have a few different rooms redesignated inside.
+
+Storage capacities (large items count twice):
+Cart: 200 items
+Carriage: 200 items, 1 room inside
+Wagon: 400 items
+Caravan: 100 items: 2 rooms inside
+
+See also: DRIVE, ENTER, GET, HARNESS, LEAD, MOUNT, PUT, VEHICLE
 #
 CLOTHING CLOTHES
 
@@ -218,7 +240,7 @@ Deadly Weapons:
   maul  6 iron ingots, 5 imperium ingots, 1 handle
 
 Ship Weapons:
-  cannon  14 iron ignot, 1 imperium ingot
+  cannon  14 iron ingots, 1 imperium ingot
 
 Weaponcrafting -> Iron Blades -> Deadly Weapons
 
@@ -233,7 +255,7 @@ With Exquisite Woodworking you can craft:
 
 * Crafts marked with an asterisk require the Carpenter building.
 
-See also: CRAFT
+See also: CRAFT, LAND VEHICLES
 #
 "FINE POTTERY"
 
@@ -269,6 +291,7 @@ and Jewelry. You can also learn to be a Master Blacksmith.
 With the basic Forge skill, you can create:
   nails (x4)  1 iron ingot
   imperium spike (x3)  1 imperium ingot
+  nocturnium spike (x3)  1 nocturnium ingot
   hammer  1 copper ingot, 1 handle
   woodsman axe  1 copper ingot, 1 handle -- for chopping
   short sword  2 copper ingots, 1 small leather -- basic weapon
@@ -288,10 +311,10 @@ See also: CRAFTING LEVEL, SMELT, WEAPONCRAFTING, ARMORSMITHING, JEWELRY,
 Guildsman Crafts
 Class ability: Guildsman
 
-Sew items:
+Weave items:
   guild patterned cloth  4 cloth, 2 silver nuggets  (crafter item)
 
-See also: SEW
+See also: WEAVE
 #
 HANDLE
 
@@ -440,7 +463,7 @@ Rawhide Stitching -> Leatherworking -> Dangerous Leathers
 See also: SEWING, DANGEROUS LEATHERS, MASTER TAILOR, RAWHIDE STITCHING, SKIN,
   TAN
 #
-"MAGIC ATTIRE" "MAGICAL ATTIRE"
+"MAGIC ATTIRE" "MAGICAL ATTIRE" "MAGE ATTIRE"
 
 Magic Attire (Trade ability)
 Command:  sew [number] <item>
@@ -579,7 +602,7 @@ Usage:  recipes <item>
 
 This command allows you to see which recipes (forge, craft, cook, etc) you
 know that require a given item. It also shows which augments (enchant, hone)
-you know that us the item.
+you know that require the item.
 #
 REFORGE REFASHION
 
@@ -780,6 +803,8 @@ Sturdy Armors:
   mail coif (head)  4 iron ingots, 1 small leather, 1 cloth
   splint vambraces (arms)  8 iron ingots, 2 large leather
   kite shield  6 iron ingots, 2 small leather
+  
+These armor pieces are all classified as Medium Armor.
 
 Armorsmithing -> Sturdy Armors -> Imperial Armors
 
@@ -805,7 +830,7 @@ Forge items:
 
 See also: FORGE
 #
-WEAPONCRAFTING
+WEAPONCRAFTING WEAPONSMITHING
 
 Weaponcrafting (Trade ability)
 Building:  forge
@@ -856,6 +881,6 @@ With Woodworking you can craft:
 
 * Crafts marked with an asterisk require the Carpenter building.
 
-See also: CRAFT
+See also: CRAFT, LAND VEHICLES
 #
 $

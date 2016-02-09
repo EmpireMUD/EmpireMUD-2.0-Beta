@@ -294,6 +294,12 @@ ACMD(do_hit) {
 			if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && FIGHTING(ch) && FIGHTING(ch) != vict) {
 				FIGHTING(ch) = vict;
 			}
+			
+			// cancel combat if auto-execute is off and the mob is unconscious after the hit
+			if (FIGHTING(ch) == vict && GET_HEALTH(vict) <= 0 && !WOULD_EXECUTE(ch, vict)) {
+				stop_fighting(ch);
+			}
+			
 			command_lag(ch, WAIT_OTHER);
 		}
 	}
@@ -400,7 +406,7 @@ ACMD(do_stake) {
 		if (GET_HEALTH(victim) > 0)
 			GET_POS(victim) = POS_RESTING;
 		REMOVE_BIT(INJURY_FLAGS(victim), INJ_STAKED);
-		obj_to_char_or_room((stake = read_object(o_STAKE, TRUE)), ch);
+		obj_to_char((stake = read_object(o_STAKE, TRUE)), ch);
 		scale_item_to_level(stake, 1);	// min scale
 		load_otrigger(stake);
 	}

@@ -990,7 +990,8 @@ struct set_struct {
 		{ "vampire",	LVL_START_IMM,	PC, 	BINARY },
 		{ "wizhide",	LVL_START_IMM,	PC,		BINARY },
 		{ "account",	LVL_START_IMM,	PC,		MISC },
-		{ "bonus",		LVL_START_IMM,	PC,		MISC },
+		{ "bonustrait",	LVL_START_IMM,	PC,		MISC },
+		{ "bonusexp", LVL_START_IMM, PC, NUMBER },
 		{ "grants",		LVL_CIMPL,	PC,		MISC },
 		{ "skill", LVL_START_IMM, PC, MISC },
 
@@ -1323,7 +1324,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
     		sprintf(output, "%s's last name is now: %s", GET_NAME(vict), GET_LASTNAME(vict));
 		}
 	}
-	else if SET_CASE("bonus") {
+	else if SET_CASE("bonustrait") {
 		void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
 
 		bitvector_t diff, new, old = GET_BONUS_TRAITS(vict);
@@ -1347,6 +1348,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			// no change
 			return 0;
 		}
+	}
+	else if SET_CASE("bonusexp") {
+		GET_DAILY_BONUS_EXPERIENCE(vict) = RANGE(0, 255);
 	}
 	else if SET_CASE("grants") {
 		bitvector_t new, old = GET_GRANT_FLAGS(vict);

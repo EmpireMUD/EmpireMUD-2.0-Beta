@@ -30,6 +30,7 @@
 *   Data
 *   Helpers
 *   Commands
+*   Chants
 *   Rituals
 *   Study Stuff
 */
@@ -117,6 +118,18 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation);
 RITUAL_SETUP_FUNC(start_siege_ritual);
 RITUAL_SETUP_FUNC(start_simple_ritual);
 
+// chant prototypes
+RITUAL_FINISH_FUNC(perform_chant_of_druids);
+RITUAL_FINISH_FUNC(perform_chant_of_illusions);
+RITUAL_FINISH_FUNC(perform_chant_of_nature);
+RITUAL_SETUP_FUNC(start_chant_of_druids);
+RITUAL_SETUP_FUNC(start_chant_of_illusions);
+
+
+// SCMD_RITUAL, SCMD_CHANT
+const char *ritual_scmd[] = { "ritual", "chant" };
+const int ritual_action[] = { ACT_RITUAL, ACT_CHANTING };
+
 
 // Ritual data
 // TODO this could all be moved to live data, but would need a lot of support and a custom editor
@@ -125,12 +138,13 @@ struct ritual_data_type {
 	int cost;
 	any_vnum ability;
 	bitvector_t flags;
+	int subcmd;
 	RITUAL_SETUP_FUNC(*begin);	// function pointer
 	RITUAL_FINISH_FUNC(*perform);	// function pointer
 	struct ritual_strings strings[24];	// one sent per tick, terminate with MESSAGE_END
 } ritual_data[] = {
 	// 0: ritual of burdens
-	{ "burdens", 5, ABIL_RITUAL_OF_BURDENS, 0,
+	{ "burdens", 5, ABIL_RITUAL_OF_BURDENS, 0, SCMD_RITUAL,
 		start_simple_ritual,
 		perform_ritual_of_burdens,
 		{{ "You whisper your burdens into the air...", "$n whispers $s burdens into the air..." },
@@ -138,7 +152,7 @@ struct ritual_data_type {
 	}},
 	
 	// 1: ritual of teleportation
-	{ "teleportation", 25, ABIL_RITUAL_OF_TELEPORTATION, 0,
+	{ "teleportation", 25, ABIL_RITUAL_OF_TELEPORTATION, 0, SCMD_RITUAL,
 		start_ritual_of_teleportation,
 		perform_ritual_of_teleportation,
 		{{ "You wrap yourself up and begin chanting...", "$n wraps $mself up and begins chanting..." },
@@ -147,7 +161,7 @@ struct ritual_data_type {
 	}},
 	
 	// 2: phoenix rite
-	{ "phoenix", 25, ABIL_PHOENIX_RITE, 0,
+	{ "phoenix", 25, ABIL_PHOENIX_RITE, 0, SCMD_RITUAL,
 		start_simple_ritual,
 		perform_phoenix_rite,
 		{{ "You light some candles and begin the Phoenix Rite.", "$n lights some candles." },
@@ -160,7 +174,7 @@ struct ritual_data_type {
 	}},
 	
 	// 3: ritual of defense
-	{ "defense", 15, ABIL_RITUAL_OF_DEFENSE, 0,
+	{ "defense", 15, ABIL_RITUAL_OF_DEFENSE, 0, SCMD_RITUAL,
 		start_ritual_of_defense,
 		perform_ritual_of_defense,
 		{{ "You begin the incantation for the Ritual of Defense.", "\t" },
@@ -172,7 +186,7 @@ struct ritual_data_type {
 	}},
 	
 	// 4: sense life ritual
-	{ "senselife", 15, ABIL_SENSE_LIFE_RITUAL, 0,
+	{ "senselife", 15, ABIL_SENSE_LIFE_RITUAL, 0, SCMD_RITUAL,
 		start_simple_ritual,
 		perform_sense_life_ritual,
 		{{ "You murmur the words to the Sense Life Ritual...", "$n murmurs some arcane words..." },
@@ -180,7 +194,7 @@ struct ritual_data_type {
 	}},
 	
 	// 5: ritual of detection
-	{ "detection", 15, ABIL_RITUAL_OF_DETECTION, 0,
+	{ "detection", 15, ABIL_RITUAL_OF_DETECTION, 0, SCMD_RITUAL,
 		start_ritual_of_detection,
 		perform_ritual_of_detection,
 		{{ "You pull a piece of chalk from your pocket and begin drawing circles on the ground.", "$n pulls out a piece of chalk and begins drawing circles on the ground." },
@@ -192,7 +206,7 @@ struct ritual_data_type {
 	}},
 	
 	// 6: siege ritual
-	{ "siege", 30, ABIL_SIEGE_RITUAL, 0,
+	{ "siege", 30, ABIL_SIEGE_RITUAL, 0, SCMD_RITUAL,
 		start_siege_ritual,
 		perform_siege_ritual,
 		{{ "You draw mana to yourself...", "$n begins drawing mana to $mself..." },
@@ -207,7 +221,7 @@ struct ritual_data_type {
 	}},
 	
 	// 7: devastation ritual
-	{ "devastation", 15, ABIL_DEVASTATION_RITUAL, 0,
+	{ "devastation", 15, ABIL_DEVASTATION_RITUAL, 0, SCMD_RITUAL,
 		start_devastation_ritual,
 		perform_devastation_ritual,
 		{{ "You plant your staff hard into the ground and begin focusing mana...", "$n plants $s staff hard into the ground and begins drawing mana toward $mself..." },
@@ -217,7 +231,65 @@ struct ritual_data_type {
 		MESSAGE_END
 	}},
 	
-	{ "\n", 0, NO_ABIL, 0, NULL, NULL, { MESSAGE_END } },
+	// 8: chant of druids
+	{ "druids", 0, NO_ABIL, 0, SCMD_CHANT,
+		start_chant_of_druids,
+		perform_chant_of_druids,
+		{{ "You start the chant of druids...", "$n starts the chant of druids..." },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		MESSAGE_END
+	}},
+	
+	// 9: chant of nature
+	{ "nature", 0, ABIL_CHANT_OF_NATURE, 0, SCMD_CHANT,
+		start_simple_ritual,
+		perform_chant_of_nature,
+		{{ "You start the chant of nature...", "$n starts the chant of nature..." },
+		{ "You chant, 'Chant of nature placeholder text.'", "$n chants, 'Chant of nature placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of nature placeholder text.'", "$n chants, 'Chant of nature placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of nature placeholder text.'", "$n chants, 'Chant of nature placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of nature placeholder text.'", "$n chants, 'Chant of nature placeholder text.'" },
+		NO_MESSAGE,
+		MESSAGE_END
+	}},
+	
+	// 10: chant of illusions
+	{ "illusions", 0, ABIL_CHANT_OF_ILLUSIONS, 0, SCMD_CHANT,
+		start_chant_of_illusions,
+		perform_chant_of_illusions,
+		{{ "You start the chant of illusions...", "$n starts the chant of illusions..." },
+		{ "You chant, 'Chant of illusions placeholder text.'", "$n chants, 'Chant of illusions placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of illusions placeholder text.'", "$n chants, 'Chant of illusions placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of illusions placeholder text.'", "$n chants, 'Chant of illusions placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of illusions placeholder text.'", "$n chants, 'Chant of illusions placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of illusions placeholder text.'", "$n chants, 'Chant of illusions placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of illusions placeholder text.'", "$n chants, 'Chant of illusions placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of illusions placeholder text.'", "$n chants, 'Chant of illusions placeholder text.'" },
+		NO_MESSAGE,
+		MESSAGE_END
+	}},
+	
+	{ "\n", 0, NO_ABIL, 0, 0, NULL, NULL, { MESSAGE_END } },
 };
 
 
@@ -235,11 +307,7 @@ bool can_use_ritual(char_data *ch, int ritual) {
 	if (ritual_data[ritual].ability != NO_ABIL && !has_ability(ch, ritual_data[ritual].ability)) {
 		return FALSE;
 	}
-	
-//	if (IS_SET(ritual_data[ritual].flags, RIT_HENGE) && (!IS_COMPLETE(IN_ROOM(ch)) || BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_HENGE)) {
-//		return FALSE;
-//	}
-	
+		
 	return TRUE;
 }
 
@@ -356,7 +424,7 @@ void start_ritual(char_data *ch, int ritual) {
 	// first message
 	send_ritual_messages(ch, ritual, 0);
 	
-	start_action(ch, ACT_RITUAL, 0);
+	start_action(ch, ritual_action[ritual_data[ritual].subcmd], 0);
 	GET_ACTION_VNUM(ch, 0) = ritual;
 }
 
@@ -669,7 +737,7 @@ ACMD(do_disenchant) {
 		
 			if (vnum != NOTHING) {
 				reward = read_object(vnum, TRUE);
-				obj_to_char_or_room(reward, ch);
+				obj_to_char(reward, ch);
 				act("You manage to weave the freed mana into $p!", FALSE, ch, reward, NULL, TO_CHAR);
 				act("$n weaves the freed mana into $p!", TRUE, ch, reward, NULL, TO_ROOM);
 				load_otrigger(reward);
@@ -994,21 +1062,22 @@ ACMD(do_mirrorimage) {
 
 
 ACMD(do_ritual) {
-	char arg2[MAX_INPUT_LENGTH];
+	char arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	int iter, rit = NOTHING;
 	bool found, result = FALSE;
 	
 	half_chop(argument, arg, arg2);
 	
 	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot perform rituals.\r\n");
+		msg_to_char(ch, "NPCs cannot perform %ss.\r\n", ritual_scmd[subcmd]);
 		return;
 	}
 	
 	// just ending
-	if (GET_ACTION(ch) == ACT_RITUAL) {
-		msg_to_char(ch, "You stop the ritual.\r\n");
-		act("$n stops the ritual.", FALSE, ch, NULL, NULL, TO_ROOM);
+	if (GET_ACTION(ch) == ACT_RITUAL || GET_ACTION(ch) == ACT_CHANTING) {
+		msg_to_char(ch, "You stop the %s.\r\n", ritual_scmd[subcmd]);
+		sprintf(buf, "$n stops the %s.", ritual_scmd[subcmd]);
+		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		cancel_action(ch);
 		return;
 	}
@@ -1019,11 +1088,11 @@ ACMD(do_ritual) {
 	
 	// list rituals
 	if (!*arg) {
-		msg_to_char(ch, "You can perform the following rituals:");
+		msg_to_char(ch, "You can perform the following %ss:", ritual_scmd[subcmd]);
 		
 		found = FALSE;
 		for (iter = 0; *ritual_data[iter].name != '\n'; ++iter) {
-			if (can_use_ritual(ch, iter)) {
+			if (ritual_data[iter].subcmd == subcmd && can_use_ritual(ch, iter)) {
 				msg_to_char(ch, "%s%s", (found ? ", " : " "), ritual_data[iter].name);
 				found = TRUE;
 			}
@@ -1041,14 +1110,14 @@ ACMD(do_ritual) {
 	// find ritual
 	found = FALSE;
 	for (iter = 0; *ritual_data[iter].name != '\n' && rit == NOTHING; ++iter) {
-		if (can_use_ritual(ch, iter) && is_abbrev(arg, ritual_data[iter].name)) {
+		if (ritual_data[iter].subcmd == subcmd && can_use_ritual(ch, iter) && is_abbrev(arg, ritual_data[iter].name)) {
 			found = TRUE;
 			rit = iter;
 		}
 	}
 	
 	if (!found) {
-		msg_to_char(ch, "You don't know that ritual.\r\n");
+		msg_to_char(ch, "You don't know that %s.\r\n", ritual_scmd[subcmd]);
 		return;
 	}
 	
@@ -1058,7 +1127,7 @@ ACMD(do_ritual) {
 	}
 	
 	if (GET_MANA(ch) < ritual_data[rit].cost) {
-		msg_to_char(ch, "You need %d mana to perform that ritual.\r\n", ritual_data[rit].cost);
+		msg_to_char(ch, "You need %d mana to perform that %s.\r\n", ritual_data[rit].cost, ritual_scmd[subcmd]);
 		return;
 	}
 	
@@ -1066,7 +1135,7 @@ ACMD(do_ritual) {
 		result = (ritual_data[rit].begin)(ch, arg2, rit);
 	}
 	else {
-		msg_to_char(ch, "That ritual is not implemented.\r\n");
+		msg_to_char(ch, "That %s is not implemented.\r\n", ritual_scmd[subcmd]);
 	}
 	
 	if (result) {
@@ -1299,6 +1368,115 @@ ACMD(do_vigor) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
 		}
 	}
+}
+
+
+ ///////////////////////////////////////////////////////////////////////////////
+//// CHANTS ///////////////////////////////////////////////////////////////////
+
+RITUAL_SETUP_FUNC(start_chant_of_druids) {
+	if (BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_HENGE) {
+		msg_to_char(ch, "You can't perform the chant of druids unless you are at a henge.\r\n");
+		return FALSE;
+	}
+	if (!IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "You need to finish it before you can perform the chant of druids.\r\n");
+		return FALSE;
+	}
+	
+	// OK
+	start_ritual(ch, ritual);
+	return TRUE;
+}
+
+RITUAL_FINISH_FUNC(perform_chant_of_druids) {
+	if (CAN_GAIN_NEW_SKILLS(ch) && get_skill_level(ch, SKILL_NATURAL_MAGIC) == 0 && noskill_ok(ch, SKILL_NATURAL_MAGIC) && BUILDING_VNUM(IN_ROOM(ch)) == BUILDING_HENGE && IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "&gAs you finish the chant, you begin to see the weave of mana through nature...&0\r\n");
+		set_skill(ch, SKILL_NATURAL_MAGIC, 1);
+		SAVE_CHAR(ch);
+	}
+	else {
+		msg_to_char(ch, "You have finished the chant.\r\n");
+	}
+}
+
+
+RITUAL_SETUP_FUNC(start_chant_of_illusions) {
+	static struct resource_data *illusion_res = NULL;
+	if (!illusion_res) {
+		illusion_res = create_resource_list(o_NOCTURNIUM_SPIKE, 1, o_IRIDESCENT_IRIS, 1, NOTHING);
+	}
+	
+	if (!IS_ROAD(IN_ROOM(ch)) || !IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't perform the chant of illusions here.\r\n");
+		return FALSE;
+	}
+	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
+		msg_to_char(ch, "You don't have permission to perform that chant here.\r\n");
+		return FALSE;
+	}
+	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_CHAMELEON)) {
+		msg_to_char(ch, "This road is already cloaked in illusion.\r\n");
+		return FALSE;
+	}
+	if (!has_resources(ch, illusion_res, TRUE, TRUE)) {
+		// message sent by has_resources
+		return FALSE;
+	}
+	
+	// OK
+	extract_resources(ch, illusion_res, TRUE);
+	start_ritual(ch, ritual);
+	return TRUE;
+}
+
+RITUAL_FINISH_FUNC(perform_chant_of_illusions) {
+	if (!IS_ROAD(IN_ROOM(ch)) || !IS_COMPLETE(IN_ROOM(ch)) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
+		msg_to_char(ch, "You finish the chant, but it has no effect.\r\n");
+		return;
+	}
+	
+	SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_CHAMELEON);
+	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_CHAMELEON);
+	msg_to_char(ch, "As you finish the chant, the road is cloaked in illusion!\r\n");
+}
+
+
+RITUAL_FINISH_FUNC(perform_chant_of_nature) {
+	sector_data *new_sect, *preserve;
+	struct evolution_data *evo;
+	
+	// percentage is checked in the evolution data
+	if ((evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_MAGIC_GROWTH))) {
+		new_sect = sector_proto(evo->becomes);
+		preserve = (BASE_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) ? BASE_SECT(IN_ROOM(ch)) : NULL;
+		
+		// messaging based on whether or not it's choppable
+		if (new_sect && has_evolution_type(new_sect, EVO_CHOPPED_DOWN)) {
+			msg_to_char(ch, "As you chant, a mighty tree springs from the ground!\r\n");
+			act("As $n chants, a mighty tree springs from the ground!", FALSE, ch, NULL, NULL, TO_ROOM);
+		}
+		else {
+			msg_to_char(ch, "As you chant, the plants around you grow with amazing speed!\r\n");
+			act("As $n chants, the plants around $m grow with amazing speed!", FALSE, ch, NULL, NULL, TO_ROOM);
+		}
+		
+		change_terrain(IN_ROOM(ch), evo->becomes);
+		if (preserve) {
+			change_base_sector(IN_ROOM(ch), preserve);
+		}
+		
+		remove_depletion(IN_ROOM(ch), DPLTN_PICK);
+		remove_depletion(IN_ROOM(ch), DPLTN_FORAGE);
+		
+		gain_ability_exp(ch, ABIL_CHANT_OF_NATURE, 20);
+	}
+	else {
+		gain_ability_exp(ch, ABIL_CHANT_OF_NATURE, 0.5);
+	}
+	
+	// restart it automatically
+	start_ritual(ch, ritual);
 }
 
 

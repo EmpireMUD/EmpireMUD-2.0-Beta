@@ -110,6 +110,10 @@ static void special_building_completion(room_data *room) {
 			change_terrain(room, climate_default_sector[CLIMATE_TEMPERATE]);
 			break;
 		}
+		case BUILDING_OASIS_DRAINAGE: {
+			change_terrain(room, climate_default_sector[CLIMATE_ARID]);
+			break;
+		}
 	}
 }
 
@@ -566,8 +570,13 @@ void finish_dismantle(char_data *ch, room_data *room) {
 				obj_to_room(newobj, room);
 			}
 			else {
-				obj_to_char_or_room(newobj, ch);
+				obj_to_char(newobj, ch);
 				act("You get $p.", FALSE, ch, newobj, 0, TO_CHAR);
+				
+				// ensure binding
+				if (OBJ_FLAGGED(newobj, OBJ_BIND_FLAGS)) {
+					bind_obj_to_player(newobj, ch);
+				}
 			}
 			load_otrigger(newobj);
 		}
@@ -1091,6 +1100,7 @@ char *vnum_to_interlink(room_vnum vnum) {
 //// MAIN BUILDING COMMANDS //////////////////////////////////////////////////
 
 ACMD(do_build) {
+	extern bool find_and_bind(char_data *ch, obj_vnum vnum);
 	extern int get_crafting_level(char_data *ch);
 	
 	room_data *to_room = NULL, *to_rev = NULL;

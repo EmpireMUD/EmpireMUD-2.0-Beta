@@ -304,6 +304,7 @@ void point_update_char(char_data *ch) {
 		// in an empire with Prominence?
 		if (emp) {
 			gain_ability_exp(ch, ABIL_PROMINENCE, 2);
+			gain_ability_exp(ch, ABIL_LOCKS, 1);
 		}
 		// city lights after dark
 		if (weather_info.sunlight == SUN_DARK) {

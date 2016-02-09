@@ -149,6 +149,9 @@ in territory claimed by other empires. Bound items will disappear from the
 ground if left on unclaimed land, like normal. They are safe to leave longer on
 claimed land (although not forever) or in your private chest (no time limit).
 
+Bind-on-equip items bind when equipped (gear), consumed (drink containers),
+or used (books, patterns, and recipes).
+
 You cannot unbind items.
 
 See also: TAGS, HOME
@@ -187,7 +190,7 @@ When a vampire is low on blood, they will not be able to regenerate health
 as quickly (just like being hungry). If a player runs out of blood, he or she
 will die.
 
-See also: ANCIENT BLOOD
+See also: ANCIENT BLOOD, HUNGER
 #
 BOARDS READ WRITE RESPOND
 
@@ -370,8 +373,9 @@ banks will eventually run out. For most resources, you will receive a message
 telling you the area is depleted. For example, digging might tell you the
 ground is too hard and there are no good rocks left.
 
-Most depletions recover over time, at the rate of 1/2 per game year. However,
-mines will never replenish unless you dismantle them completely.
+Most depleted resources recover over time. In each tile, half of the depleted
+resources (not the total resources) will return. However, mines will never
+replenish unless you dismantle them completely.
 
 Forests will spread at their edges over time, creating more trees to chop.
 Desert Groves re-grow on their own, at random.
@@ -425,11 +429,12 @@ come from spells, abilities, scripts, and other sources. They deal damage every
 five seconds until they expire.
 
 Some DoT effects can stack multiple times. The damage shown on your score or
-affects command is the total damage per 5 seconds (base x stacks), and the number at the end
-like (1/5) is the number and maximum number of stacks.
+affects command is the total damage per 5 seconds (base multiplied by stacks),
+and the number at the end (example: 1/5) is the current and maximum number of
+stacks.
 
-Physical DoTs can be removed by firstaid. Magical and poison DoTs can be
-removed by cleanse.
+Physical and poison DoTs can be removed by firstaid and cleanse. Magical and
+fire DoTs can be removed by dispel.
 
 See also: AFFECTS, CLEANSE, DISPEL, FIRSTAID, SCORE
 #
@@ -495,6 +500,22 @@ cooldowns.
 
 See also: COOLDOWNS
 #
+HUNGER THIRST HUNGRY THIRSTY STARVING STARVED STARVATION
+
+Over time, you will naturally become hungry and thirsty. This has no effect
+until 24 hours have passed since you were last fully sated, at which point your
+regeneration will be greatly slowed. Hunger and thirst penalties do not stack.
+You will continue to accumulate hunger and thirst (making it more difficult to
+remove these penalties) until 50 hours have passed.
+
+Vampires with low blood pools suffer a starvation penalty identical to hunger
+and thirst.
+
+All timed actions, such as crafting and chores, take twice as long while you
+are hungry, thirsty, or blood-starved.
+
+See also: BLOOD, EAT, UNNATURAL THIRST, SATED THIRST
+#
 INFRA INFRAVISION
 
 The INFRA affect, which appears on some spells and items, allows a character
@@ -541,9 +562,11 @@ Composite level: This is the sum of your skill and gear levels. It is the
    number used for scaling mobs to fight you. This is the level shown on your
    "score".
 
-Note: You can't use gear that's more than 25 levels above you (50 for BoP
-   items). Your highest recent level is used, so you should still be able to
-   remove all your gear and re-equip it.
+Note: Until level 100, you must be in the same level range as an item
+   (1-50, 50-75, 75-100, or 101+) or higher to equip it. After level 100, you
+   can't use gear that's more than 25 levels above you (50 for BoP items). Your
+   highest recent level is used, so you should still be able to remove all your
+   gear and re-equip it.
 
 See also: CLASS, SCALING
 #
@@ -559,10 +582,10 @@ Do not try to get out of a fight by breaking link. You will likely still die.
 MANA "MANA POINTS" "MANA POOL" "MAGIC POINTS"
 
 The mana pool is the amount of magical energy you can channel before you must
-stop to recover some. All players begin with 50 mana points and start to rise
-around level 80. Your base mana at level 100 is based on your class.
+stop to recover some. All players begin with 50 mana points and start to gain
+more around level 75. Your base mana at level 100 is based on your class.
 
-See also: CLASS, GIFT OF NATURE
+See also: ARCANE POWER, CLASS, GIFT OF NATURE, SOLAR POWER
 #
 MOVE MOVES "MOVE POINTS" "MOVEMENT POINTS"
 
@@ -570,10 +593,12 @@ Move points are the basic energy pool for physical effort. It takes move points
 to walk around, and it takes move points to use many physical abilities like
 Kick or Shadowstep.
 
-All players begin with 100 move points and start to rise around level 80. Your
-base move points at level 100 is based on your class. The easiest ways to get
-more move points at any level are to make a walking stick or a good pair of
+All players begin with 100 move points and start to gain more around level 75.
+Your base move points at level 100 is based on your class. The easiest ways to
+get more move points at any level are to make a walking stick or a good pair of
 shoes.
+
+See also: FLY, RIDE, STAMINA, VIGOR
 #
 MSDP "MUD SERVER DATA PROTOCOL" "MSDP VARIABLES" "MSDP VARS"
 
@@ -924,8 +949,8 @@ have many different properties -- some can be lead, dragged, boarded, or burnt.
 Vehicles appear in the room when you look, colored &wgray&0, between objects and
 people.
 
-See also: BOARD, CUSTOMIZE, DESIGNATE, DISEMBARK, DRAG, DRIVE, HARNESS, LEAD,
-LIGHT, REPAIR, SCRAP, SIT
+See also: BOARD, CUSTOMIZE, DESIGNATE, DISEMBARK, DRAG, DRIVE, HARNESS,
+LAND VEHICLES, LEAD, LIGHT, REPAIR, SCRAP, SHIPS, SIT
 #
 WHEREAMI "WHERE AM I"
 

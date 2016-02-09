@@ -60,7 +60,6 @@ void cancel_smelting(char_data *ch);
 void cancel_tanning(char_data *ch);
 
 // process protos
-void perform_chant(char_data *ch);
 void process_chipping(char_data *ch);
 void process_driving(char_data *ch);
 void perform_ritual(char_data *ch);
@@ -124,7 +123,7 @@ const struct action_data_struct action_data[] = {
 	{ "morphing", "is morphing and changing shape!", ACTF_ANYWHERE, process_morphing, NULL },	// ACT_MORPHING
 	{ "scraping", "is scraping at a tree.", ACTF_HASTE | ACTF_FAST_CHORES, process_scraping, cancel_scraping },	// ACT_SCRAPING
 	{ "bathing", "is bathing in the water.", NOBITS, process_bathing, NULL },	// ACT_BATHING
-	{ "chanting", "is chanting a strange song.", NOBITS, perform_chant, NULL },	// ACT_CHANTING
+	{ "chanting", "is chanting a strange song.", NOBITS, perform_ritual, NULL },	// ACT_CHANTING
 	{ "prospecting", "is prospecting.", NOBITS, process_prospecting, NULL },	// ACT_PROSPECTING
 	{ "filling", "is filling in the trench.", ACTF_HASTE | ACTF_FAST_CHORES, process_fillin, NULL },	// ACT_FILLING_IN
 	{ "reclaiming", "is reclaiming this acre!", NOBITS, process_reclaim, NULL },	// ACT_RECLAIMING
@@ -331,7 +330,7 @@ obj_data *has_shovel(char_data *ch) {
 */
 void cancel_chipping(char_data *ch) {
 	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
-	obj_to_char_or_room(obj, ch);
+	obj_to_char(obj, ch);
 	load_otrigger(obj);
 }
 
@@ -343,7 +342,7 @@ void cancel_chipping(char_data *ch) {
 */
 void cancel_minting(char_data *ch) {
 	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
-	obj_to_char_or_room(obj, ch);
+	obj_to_char(obj, ch);
 	load_otrigger(obj);
 }
 
@@ -355,7 +354,7 @@ void cancel_minting(char_data *ch) {
 */
 void cancel_sawing(char_data *ch) {
 	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
-	obj_to_char_or_room(obj, ch);
+	obj_to_char(obj, ch);
 	load_otrigger(obj);
 }
 
@@ -367,7 +366,7 @@ void cancel_sawing(char_data *ch) {
 */
 void cancel_scraping(char_data *ch) {
 	obj_data *obj = read_object(o_TREE, TRUE);
-	obj_to_char_or_room(obj, ch);
+	obj_to_char(obj, ch);
 	load_otrigger(obj);
 }
 
@@ -391,7 +390,7 @@ void cancel_smelting(char_data *ch) {
 	if (type != NOTHING) {
 		for (iter = 0; iter < smelt_data[type].from_amt; ++iter) {
 			obj = read_object(smelt_data[type].from, TRUE);
-			obj_to_char_or_room(obj, ch);
+			obj_to_char(obj, ch);
 			load_otrigger(obj);
 		}
 	}
@@ -405,7 +404,7 @@ void cancel_smelting(char_data *ch) {
 */
 void cancel_tanning(char_data *ch) {
 	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
-	obj_to_char_or_room(obj, ch);
+	obj_to_char(obj, ch);
 	load_otrigger(obj);
 }
 
@@ -914,7 +913,7 @@ void process_chipping(char_data *ch) {
 			switch (GET_ACTION_VNUM(ch, 0)) {
 				case o_ROCK: {
 					obj = read_object(o_CHIPPED, TRUE);
-					obj_to_char_or_room(obj, ch);
+					obj_to_char(obj, ch);
 					msg_to_char(ch, "It splits open!\r\n");
 					if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
 						gain_skill_exp(ch, SKILL_TRADE, 25);
@@ -924,7 +923,7 @@ void process_chipping(char_data *ch) {
 				}
 				case o_CHIPPED: {
 					obj = read_object(o_HANDAXE, TRUE);
-					obj_to_char_or_room(obj, ch);
+					obj_to_char(obj, ch);
 					act("You have crafted $p!", FALSE, ch, obj, 0, TO_CHAR);
 					if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
 						gain_skill_exp(ch, SKILL_TRADE, 25);
@@ -934,7 +933,7 @@ void process_chipping(char_data *ch) {
 				}
 				case o_HANDAXE: {
 					obj = read_object(o_SPEARHEAD, TRUE);
-					obj_to_char_or_room(obj, ch);
+					obj_to_char(obj, ch);
 					act("You have crafted $p!", FALSE, ch, obj, 0, TO_CHAR);
 					if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
 						gain_skill_exp(ch, SKILL_TRADE, 25);
@@ -1553,7 +1552,7 @@ void process_panning(char_data *ch) {
 			
 			if (!number(0, 19) && get_depletion(IN_ROOM(ch), DPLTN_PAN) <= short_depletion) {
 				in_room = IN_ROOM(ch);
-				obj_to_char_or_room((obj = read_object(o_GOLD_SMALL, TRUE)), ch);
+				obj_to_char((obj = read_object(o_GOLD_SMALL, TRUE)), ch);
 				act("You find $p!", FALSE, ch, obj, 0, TO_CHAR);
 				add_depletion(IN_ROOM(ch), DPLTN_PAN, TRUE);
 				load_otrigger(obj);
@@ -1984,7 +1983,7 @@ void process_smelting(char_data *ch) {
 		}
 		else {
 			for (iter = 0; iter < smelt_data[type].to_amt; ++iter) {
-				obj_to_char_or_room((obj = read_object(smelt_data[type].to, TRUE)), ch);
+				obj_to_char((obj = read_object(smelt_data[type].to, TRUE)), ch);
 				load_otrigger(obj);
 			}
 

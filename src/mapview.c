@@ -353,7 +353,7 @@ int pick_season(room_data *room) {
 bool can_see_player_in_other_room(char_data *ch, char_data *vict) {
 	int distance_can_see_players = 7;
 	
-	if (!IS_NPC(vict) && CAN_SEE(ch, vict) && CAN_RECOGNIZE(ch, vict)) {
+	if (!IS_NPC(vict) && CAN_SEE(ch, vict) && WIZHIDE_OK(ch, vict) && CAN_RECOGNIZE(ch, vict)) {
 		if (compute_distance(IN_ROOM(ch), IN_ROOM(vict)) <= distance_can_see_players) {
 			if (has_ability(vict, ABIL_CLOAK_OF_DARKNESS)) {
 				gain_ability_exp(vict, ABIL_CLOAK_OF_DARKNESS, 10);
@@ -961,7 +961,7 @@ void look_in_direction(char_data *ch, int dir) {
 				to_room = ex->room_ptr;
 				if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
 					for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
-						if (CAN_SEE(ch, c)) {
+						if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
 							if (last_comma_pos != -1) {
 								prev_comma_pos = last_comma_pos;
@@ -1056,7 +1056,7 @@ void look_in_direction(char_data *ch, int dir) {
 
 		if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
 			for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
-				if (CAN_SEE(ch, c)) {
+				if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 					bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
 					if (last_comma_pos != -1) {
 						prev_comma_pos = last_comma_pos;
@@ -1083,7 +1083,7 @@ void look_in_direction(char_data *ch, int dir) {
 		if (to_room && !ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) && !ROOM_IS_CLOSED(to_room)) {
 			if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
 				for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
-					if (CAN_SEE(ch, c)) {
+					if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 						bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
 						if (last_comma_pos != -1) {
 							prev_comma_pos = last_comma_pos;
@@ -1098,7 +1098,7 @@ void look_in_direction(char_data *ch, int dir) {
 			if (to_room && !ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) && !ROOM_IS_CLOSED(to_room)) {
 				if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
 					for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
-						if (CAN_SEE(ch, c)) {
+						if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
 							if (last_comma_pos != -1) {
 								prev_comma_pos = last_comma_pos;
@@ -1459,6 +1459,9 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 					strcpy(buf2, "&r");
 				}
 			}
+			else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_WORK)) {
+				strcpy(buf2, "&B");
+			}
 			else {
 				strcpy(buf2, "&0");
 			}
@@ -1539,8 +1542,11 @@ char *get_screenreader_room_name(room_data *from_room, room_data *to_room) {
 	crop_data *cp;
 	
 	strcpy(lbuf, "*");
-
-	if (ROOM_CUSTOM_NAME(to_room)) {
+	
+	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && compute_distance(from_room, to_room) >= 2) {
+		strcpy(lbuf, GET_SECT_NAME(BASE_SECT(to_room)));
+	}
+	else if (ROOM_CUSTOM_NAME(to_room)) {
 		strcpy(lbuf, ROOM_CUSTOM_NAME(to_room));
 	}
 	else if (GET_BUILDING(to_room) && ROOM_BLD_FLAGGED(to_room, BLD_BARRIER) && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY)) {
@@ -1667,6 +1673,12 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 						sprintf(infobuf + strlen(infobuf), "%sdepleted", *infobuf ? ", " :"");
 					}
 				}
+				if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_WORK)) {
+					sprintf(infobuf + strlen(infobuf), "%sno-work", *infobuf ? ", " :"");
+				}
+				if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_IMMORTAL(ch)) {
+					sprintf(infobuf + strlen(infobuf), "%schameleon", *infobuf ? ", " :"");
+				}
 			
 				if (*infobuf) {
 					sprintf(roombuf + strlen(roombuf), " [%s]", infobuf);
@@ -1721,11 +1733,13 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 * @param bitvector_t options Any LLR_x flags that get passed along.
 */
 void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options) {
-	int each_dir;
+	extern int get_north_for_char(char_data *ch);
+	
+	int each_dir, north = get_north_for_char(ch);
 		
 	// each_dir: iterate over directions and show them in order
 	for (each_dir = 0; each_dir < NUM_2D_DIRS; ++each_dir) {
-		screenread_one_dir(ch, room, each_dir);
+		screenread_one_dir(ch, room, confused_dirs[north][0][each_dir]);
 	}
 	
 	if (!IS_SET(options, LRR_SHIP_PARTIAL)) {

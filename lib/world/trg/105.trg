@@ -262,6 +262,18 @@ end
 %terracrop% %room% %vnum%
 %echo% As the whirlwind fades away, crops burst from the soil here!
 ~
+#10508
+Dragonstooth sceptre equip first~
+1 c 2
+use~
+eval test %%self.is_name(%arg%)%%
+if !%test%
+  return 0
+  halt
+end
+%send% %actor% You must wield %self.shortdesc% to use it.
+return 1
+~
 #10514
 Gemfruit decay~
 1 f 0

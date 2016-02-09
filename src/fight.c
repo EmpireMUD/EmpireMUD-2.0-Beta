@@ -65,10 +65,6 @@ void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);
  //////////////////////////////////////////////////////////////////////////////
 //// GETTERS / HELPERS ///////////////////////////////////////////////////////
 
-// used by several functions to determine auto-kill
-#define WOULD_EXECUTE(ch, vict)  (IS_NPC(ch) ? (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP)) : (PRF_FLAGGED((ch), PRF_AUTOKILL) || MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP)))
-
-
 /**
 * Determine if ch blocks the attacker.
 *
@@ -1185,7 +1181,7 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 	// take care of the corpse
 	if ((corpse = find_obj(GET_LAST_CORPSE_ID(ch))) && IS_CORPSE(corpse)) {
 		while (corpse->contains) {
-			obj_to_char_or_room(corpse->contains, ch);
+			obj_to_char(corpse->contains, ch);
 		}
 		extract_obj(corpse);
 	}

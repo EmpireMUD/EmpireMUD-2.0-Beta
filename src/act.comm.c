@@ -837,14 +837,14 @@ ACMD(do_slash_channel) {
 		if (!*arg2) {
 			msg_to_char(ch, "Usage: /who <channel>\r\n");
 		}
-		else if (!(chan = find_slash_channel_for_char(ch, arg2))) {
+		else if (!(chan = find_slash_channel_for_char(ch, arg2)) && (!IS_IMMORTAL(ch) || !(chan = find_slash_channel_by_name(arg2, TRUE)))) {
 			msg_to_char(ch, "You're not even on that channel.\r\n");
 		}
 		else {
 			msg_to_char(ch, "Players on \t%c/%s\tn:\r\n", chan->color, chan->name);
 			
 			for (desc = descriptor_list; desc; desc = desc->next) {
-				if (desc->character && !IS_NPC(desc->character) && STATE(desc) == CON_PLAYING && find_on_slash_channel(desc->character, chan->id) && CAN_SEE(ch, desc->character)) {
+				if (desc->character && !IS_NPC(desc->character) && STATE(desc) == CON_PLAYING && find_on_slash_channel(desc->character, chan->id) && CAN_SEE(ch, desc->character) && INCOGNITO_OK(ch, desc->character)) {
 					msg_to_char(ch, " %s\r\n", PERS(desc->character, ch, TRUE));
 				}
 			}

@@ -394,7 +394,7 @@ INTERACTION_FUNC(shear_interact) {
 	
 	for (iter = 0; iter < amt; ++iter) {
 		obj = read_object(interaction->vnum, TRUE);
-		obj_to_char_or_room(obj, ch);
+		obj_to_char(obj, ch);
 		load_otrigger(obj);
 	}
 	
@@ -428,7 +428,7 @@ INTERACTION_FUNC(skin_interact) {
 	for (num = 0; num < interaction->quantity; ++num) {
 		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// min scale
-		obj_to_char_or_room(obj, ch);
+		obj_to_char(obj, ch);
 		load_otrigger(obj);
 	}
 	

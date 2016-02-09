@@ -29,7 +29,8 @@ Usage:  chip <item>
 This lets you chip a rock down to a sharper, more refined tool. You need to be
 wielding a rock or other hammer to do this.
 
-If you keep chipping, you can make a handaxe.
+If you keep chipping, you can make a handaxe. You can chip this again to make
+a spear head.
 
 See also: CRAFT
 #
@@ -158,7 +159,8 @@ HARVEST HARVESTING
 Usage:  harvest
 
 Allows you to harvest a crop. Be careful that you also replant some,
-otherwise you'll run out of that crop quickly.
+otherwise you'll run out of that crop quickly. You must be wielding a slashing
+or slicing weapon (sword or axe) to harvest crops.
 
 See also: PLANT
 #
@@ -300,6 +302,14 @@ Planting takes a little while, but you don't actually have to wait the whole
 time. If you immediately stop planting, your character just scatters the seeds
 and the crop will grow eventually. If you take care to plant neat rows, and
 water them (let the planting action finish), the crop will grow very quickly.
+
+Crops must be planted on the following tiles:
+Temperate: plains
+Arid: desert
+Jungle: light jungle
+
+Light jungle is jungle which has been partially chopped, but not reduced to
+plains.
 
 See also: HARVEST, WHEAT, CORN, APPLES
 #
@@ -517,8 +527,9 @@ Commands: sew tent
 Requires 8 large leather to sew.
 
 Once you have sewn a tent, you can carry it with you in your inventory and set
-it up or take it down using build and dismantle. The tent requires no add-
-itional resources each time you set it up.
+it up or take it down using build and dismantle. The basic tent requires no
+additional resources each time you set it up. The interior provides the same
+increased regeneration rate while resting as a bedroom.
 
 Building the tent will claim the land, just like any building command. When
 you dismantle it later, be sure to abandon the claim.

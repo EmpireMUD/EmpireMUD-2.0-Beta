@@ -24,8 +24,9 @@ S
 fireball~
 a fireball~
 A fireball is rolling around here.~
+You're ready to shoot fireballs.
 ~
-1 g ano 1
+1 g ano 2
 0 0 16
 10 0
 S
@@ -190,5 +191,19 @@ There are 4 recipes for item 1115.
 0 0 0 1
 0 0 0
 0 0
+S
+#1119
+spike nocturnium~
+a nocturnium spike~
+A nocturnium spike is stamped into the ground.~
+The nocturnium spike can be used for the Chant of Illusions.
+~
+1 h ano 2
+0 3 8
+2 0
+R
+5164 0
+R
+5511 0
 S
 $
