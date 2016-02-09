@@ -1258,7 +1258,7 @@ tag next to your name on the "who" list.
 
 See also: TOGGLE
 #
-SAIL DRIVE PILOT
+SAIL DRIVE PILOT SAILING DRIVING PILOTING
 
 Usage:  sail <direction | portal> [distance]
         drive <direction | portal> [distance]
@@ -1267,7 +1267,9 @@ Usage:  sail <direction | portal> [distance]
 These three commands are used to control ships, carriages, and other vehicles.
 Which command you use depends upon the type of vehicle. Travel in this manner
 is usually slow, but does not require movement points. You need to either be
-sitting on the vehicle, or inside of it, to do this.
+sitting on the vehicle, or inside of it and able to see out, to do this.
+
+Many vehicles cannot move through portals.
 
 If you specify a distance, you will only travel that many tiles. If not, you
 will continue to move until you hit an obstacle.
