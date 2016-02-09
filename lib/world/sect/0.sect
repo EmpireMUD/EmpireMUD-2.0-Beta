@@ -33,7 +33,7 @@ E
 E
 8 0 100.00 13
 E
-9 0 4.00 1
+9 0 50.00 1
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3013 100.00 1  # FORAGE: a handful of nuts
@@ -178,7 +178,7 @@ E
 E
 4 0 0.20 2
 E
-9 0 4.00 2
+9 0 50.00 2
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
@@ -318,7 +318,7 @@ E
 E
 4 0 0.20 3
 E
-9 0 4.00 3
+9 0 50.00 3
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
@@ -430,7 +430,7 @@ E
 E
 4 0 0.20 4
 E
-9 0 4.00 4
+9 0 50.00 4
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
@@ -1081,7 +1081,7 @@ D0
 E
 1 0 100.00 7
 E
-9 0 4.00 7
+9 0 50.00 7
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3003 100.00 1  # FORAGE: a handful of grain
@@ -1143,7 +1143,7 @@ D0
 E
 1 0 100.00 12
 E
-9 0 4.00 12
+9 0 50.00 12
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
@@ -1244,7 +1244,7 @@ D0
 E
 1 0 100.00 16
 E
-9 0 4.00 16
+9 0 50.00 16
 I 6 3017 100.00 1  # FORAGE: a plump fig
 I 9 121 100.00 1  # GATHER: a stick
 M
@@ -1472,7 +1472,7 @@ E
 E
 8 0 100.00 14
 E
-9 0 4.00 26
+9 0 50.00 26
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
@@ -1824,7 +1824,7 @@ E
 E
 8 0 100.00 15
 E
-9 0 4.00 28
+9 0 50.00 28
 I 6 3017 100.00 1  # FORAGE: a plump fig
 I 9 121 100.00 1  # GATHER: a stick
 M
@@ -2008,7 +2008,7 @@ D0
 &g^&?~~~~
 &c~
 E
-9 0 2.00 27
+9 0 25.00 27
 E
 11 5 1.00 27
 I 6 3310 100.00 1  # FORAGE: a wood ear mushroom
@@ -2154,7 +2154,7 @@ E
 E
 8 0 100.00 13
 E
-9 0 4.00 71
+9 0 50.00 71
 E
 11 5 1.00 20
 I 5 102 9.00 1 X  # DIG: a flint stone
