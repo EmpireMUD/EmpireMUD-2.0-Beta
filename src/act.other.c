@@ -1522,8 +1522,8 @@ ACMD(do_morph) {
 	extern bool morph_affinity_ok(room_data *location, morph_data *morph);
 	
 	morph_data *morph, *next_morph;
-	bool found, normal;
 	double multiplier;
+	bool normal;
 	
 	// safety first: mobs must use %morph%
 	if (IS_NPC(ch)) {
@@ -1534,9 +1534,8 @@ ACMD(do_morph) {
 	skip_spaces(&argument);
 	
 	if (!*argument) {
-		msg_to_char(ch, "You know the following morphs: ");
+		msg_to_char(ch, "You know the following morphs: normal");
 		
-		found = FALSE;
 		HASH_ITER(hh, morph_table, morph, next_morph) {
 			if (MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT | MORPHF_SCRIPT_ONLY)) {
 				continue;
@@ -1548,16 +1547,10 @@ ACMD(do_morph) {
 				continue;
 			}
 			
-			msg_to_char(ch, "%s%s", (found ? ", " : ""), MORPH_NAME(morph));
-			found = TRUE;
+			msg_to_char(ch, ", %s", skip_filler(MORPH_SHORT_DESC(morph)));
 		}
 		
-		if (found) {
-			msg_to_char(ch, "\r\n");
-		}
-		else {
-			msg_to_char(ch, "none\r\n");
-		}
+		msg_to_char(ch, "\r\n");
 		return;
 	} // end no-argument
 	

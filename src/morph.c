@@ -37,8 +37,8 @@
 */
 
 // local data
-const char *default_morph_name = "unnamed morph";
-const char *default_morph_short_desc = "a shapeless morph";
+const char *default_morph_keywords = "morph unnamed shapeless";
+const char *default_morph_short_desc = "an unnamed morph";
 const char *default_morph_long_desc = "A shapeless morph is standing here.";
 
 // external consts
@@ -184,6 +184,7 @@ void end_morph(char_data *ch) {
 */
 morph_data *find_morph_by_name(char_data *ch, char *name) {
 	morph_data *morph, *next_morph, *partial = NULL;
+	char temp[MAX_STRING_LENGTH];
 	
 	HASH_ITER(sorted_hh, sorted_morphs, morph, next_morph) {
 		if (MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT | MORPHF_SCRIPT_ONLY) && !IS_IMMORTAL(ch)) {
@@ -197,11 +198,12 @@ morph_data *find_morph_by_name(char_data *ch, char *name) {
 		}
 		
 		// matches:
-		if (!str_cmp(name, MORPH_NAME(morph))) {
+		strcpy(temp, skip_filler(MORPH_KEYWORDS(morph)));
+		if (!str_cmp(name, temp)) {
 			// perfect match
 			return morph;
 		}
-		if (!partial && is_multiword_abbrev(name, MORPH_NAME(morph))) {
+		if (!partial && is_multiword_abbrev(name, temp)) {
 			// probable match
 			partial = morph;
 		}
@@ -340,15 +342,8 @@ bool audit_morph(morph_data *morph, char_data *ch) {
 		olc_audit_msg(ch, MORPH_VNUM(morph), "IN-DEVELOPMENT");
 		problem = TRUE;
 	}
-	if (!MORPH_NAME(morph) || !*MORPH_NAME(morph) || !str_cmp(MORPH_NAME(morph), default_morph_name)) {
-		olc_audit_msg(ch, MORPH_VNUM(morph), "No name set");
-		problem = TRUE;
-	}
-	
-	strcpy(temp, MORPH_NAME(morph));
-	strtolower(temp);
-	if (strcmp(MORPH_NAME(morph), temp)) {
-		olc_audit_msg(ch, MORPH_VNUM(morph), "Non-lowercase name");
+	if (!MORPH_KEYWORDS(morph) || !*MORPH_KEYWORDS(morph) || !str_cmp(MORPH_KEYWORDS(morph), default_morph_keywords)) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "Keywords not set");
 		problem = TRUE;
 	}
 	
@@ -408,8 +403,7 @@ bool audit_morph(morph_data *morph, char_data *ch) {
 */
 char *list_one_morph(morph_data *morph, bool detail) {
 	static char output[MAX_STRING_LENGTH];
-	char part[MAX_STRING_LENGTH], applies[MAX_STRING_LENGTH];
-	struct apply_data *app;
+	char part[MAX_STRING_LENGTH];
 	ability_data *abil;
 	
 	if (detail) {
@@ -425,16 +419,10 @@ char *list_one_morph(morph_data *morph, bool detail) {
 			strcat(part, ")");
 		}
 		
-		// applies
-		*applies = '\0';
-		for (app = MORPH_APPLIES(morph); app; app = app->next) {
-			sprintf(applies + strlen(applies), "%s%d to %s", (app == MORPH_APPLIES(morph)) ? " " : ", ", app->weight, apply_types[app->location]);
-		}
-		
-		snprintf(output, sizeof(output), "[%5d] %s%s%s", MORPH_VNUM(morph), MORPH_NAME(morph), part, applies);
+		snprintf(output, sizeof(output), "[%5d] %s%s", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph), part);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", MORPH_VNUM(morph), MORPH_NAME(morph));
+		snprintf(output, sizeof(output), "[%5d] %s", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
 	}
 		
 	return output;
@@ -458,7 +446,7 @@ void olc_search_morph(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of morph %d (%s):\r\n", vnum, MORPH_NAME(morph));
+	size = snprintf(buf, sizeof(buf), "Occurrences of morph %d (%s):\r\n", vnum, MORPH_SHORT_DESC(morph));
 	
 	// morphs are not actually used anywhere else
 	
@@ -494,7 +482,7 @@ int sort_morphs_by_data(morph_data *a, morph_data *b) {
 		return b_level - a_level;
 	}
 	
-	return strcmp(NULLSAFE(MORPH_NAME(a)), NULLSAFE(MORPH_NAME(b)));
+	return strcmp(NULLSAFE(MORPH_KEYWORDS(a)), NULLSAFE(MORPH_KEYWORDS(b)));
 }
 
 
@@ -581,8 +569,8 @@ void clear_morph(morph_data *morph) {
 void free_morph(morph_data *morph) {
 	morph_data *proto = morph_proto(MORPH_VNUM(morph));
 	
-	if (MORPH_NAME(morph) && (!proto || MORPH_NAME(morph) != MORPH_NAME(proto))) {
-		free(MORPH_NAME(morph));
+	if (MORPH_KEYWORDS(morph) && (!proto || MORPH_KEYWORDS(morph) != MORPH_KEYWORDS(proto))) {
+		free(MORPH_KEYWORDS(morph));
 	}
 	if (MORPH_SHORT_DESC(morph) && (!proto || MORPH_SHORT_DESC(morph) != MORPH_SHORT_DESC(proto))) {
 		free(MORPH_SHORT_DESC(morph));
@@ -628,7 +616,7 @@ void parse_morph(FILE *fl, any_vnum vnum) {
 	sprintf(error, "morph vnum %d", vnum);
 	
 	// lines 1-3
-	MORPH_NAME(morph) = fread_string(fl, error);
+	MORPH_KEYWORDS(morph) = fread_string(fl, error);
 	MORPH_SHORT_DESC(morph) = fread_string(fl, error);
 	MORPH_LONG_DESC(morph) = fread_string(fl, error);
 	
@@ -719,7 +707,7 @@ void write_morph_to_file(FILE *fl, morph_data *morph) {
 	fprintf(fl, "#%d\n", MORPH_VNUM(morph));
 	
 	// 1-3. strings
-	fprintf(fl, "%s~\n", NULLSAFE(MORPH_NAME(morph)));
+	fprintf(fl, "%s~\n", NULLSAFE(MORPH_KEYWORDS(morph)));
 	fprintf(fl, "%s~\n", NULLSAFE(MORPH_SHORT_DESC(morph)));
 	fprintf(fl, "%s~\n", NULLSAFE(MORPH_LONG_DESC(morph)));
 	
@@ -761,7 +749,7 @@ morph_data *create_morph_table_entry(any_vnum vnum) {
 	CREATE(morph, morph_data, 1);
 	clear_morph(morph);
 	MORPH_VNUM(morph) = vnum;
-	MORPH_NAME(morph) = str_dup(default_morph_name);
+	MORPH_KEYWORDS(morph) = str_dup(default_morph_keywords);
 	MORPH_SHORT_DESC(morph) = str_dup(default_morph_short_desc);
 	MORPH_LONG_DESC(morph) = str_dup(default_morph_long_desc);
 	add_morph_to_table(morph);
@@ -818,8 +806,8 @@ void save_olc_morph(descriptor_data *desc) {
 	}
 	
 	// free prototype strings and pointers
-	if (MORPH_NAME(proto)) {
-		free(MORPH_NAME(proto));
+	if (MORPH_KEYWORDS(proto)) {
+		free(MORPH_KEYWORDS(proto));
 	}
 	if (MORPH_SHORT_DESC(proto)) {
 		free(MORPH_SHORT_DESC(proto));
@@ -830,11 +818,11 @@ void save_olc_morph(descriptor_data *desc) {
 	free_apply_list(MORPH_APPLIES(proto));
 	
 	// sanity
-	if (!MORPH_NAME(morph) || !*MORPH_NAME(morph)) {
-		if (MORPH_NAME(morph)) {
-			free(MORPH_NAME(morph));
+	if (!MORPH_KEYWORDS(morph) || !*MORPH_KEYWORDS(morph)) {
+		if (MORPH_KEYWORDS(morph)) {
+			free(MORPH_KEYWORDS(morph));
 		}
-		MORPH_NAME(morph) = str_dup(default_morph_name);
+		MORPH_KEYWORDS(morph) = str_dup(default_morph_keywords);
 	}
 	if (!MORPH_SHORT_DESC(morph) || !*MORPH_SHORT_DESC(morph)) {
 		if (MORPH_SHORT_DESC(morph)) {
@@ -884,7 +872,7 @@ morph_data *setup_olc_morph(morph_data *input) {
 		*new = *input;
 
 		// copy things that are pointers
-		MORPH_NAME(new) = MORPH_NAME(input) ? str_dup(MORPH_NAME(input)) : NULL;
+		MORPH_KEYWORDS(new) = MORPH_KEYWORDS(input) ? str_dup(MORPH_KEYWORDS(input)) : NULL;
 		MORPH_SHORT_DESC(new) = MORPH_SHORT_DESC(input) ? str_dup(MORPH_SHORT_DESC(input)) : NULL;
 		MORPH_LONG_DESC(new) = MORPH_LONG_DESC(input) ? str_dup(MORPH_LONG_DESC(input)) : NULL;
 		
@@ -893,7 +881,7 @@ morph_data *setup_olc_morph(morph_data *input) {
 	}
 	else {
 		// brand new: some defaults
-		MORPH_NAME(new) = str_dup(default_morph_name);
+		MORPH_KEYWORDS(new) = str_dup(default_morph_keywords);
 		MORPH_SHORT_DESC(new) = str_dup(default_morph_short_desc);
 		MORPH_LONG_DESC(new) = str_dup(default_morph_long_desc);
 		MORPH_FLAGS(new) = MORPHF_IN_DEVELOPMENT;
@@ -925,7 +913,7 @@ void do_stat_morph(char_data *ch, morph_data *morph) {
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0, Short desc: \ty%s\t0\r\n", MORPH_VNUM(morph), MORPH_NAME(morph), MORPH_SHORT_DESC(morph));
+	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Keywords: \tc%s\t0, Short desc: \ty%s\t0\r\n", MORPH_VNUM(morph), MORPH_KEYWORDS(morph), MORPH_SHORT_DESC(morph));
 	size += snprintf(buf + size, sizeof(buf) - size, "L-Desc: \ty%s\t0\r\n", MORPH_LONG_DESC(morph));
 	
 	snprintf(part, sizeof(part), "%s", (MORPH_ABILITY(morph) == NO_ABIL ? "none" : get_ability_name_by_vnum(MORPH_ABILITY(morph))));
@@ -979,8 +967,8 @@ void olc_show_morph(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !morph_proto(MORPH_VNUM(morph)) ? "new morph" : MORPH_NAME(morph_proto(MORPH_VNUM(morph))));
-	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(MORPH_NAME(morph)));
+	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !morph_proto(MORPH_VNUM(morph)) ? "new morph" : MORPH_SHORT_DESC(morph_proto(MORPH_VNUM(morph))));
+	sprintf(buf + strlen(buf), "<\tykeywords\t0> %s\r\n", NULLSAFE(MORPH_KEYWORDS(morph)));
 	sprintf(buf + strlen(buf), "<\tyshortdescription\t0> %s\r\n", NULLSAFE(MORPH_SHORT_DESC(morph)));
 	sprintf(buf + strlen(buf), "<\tylongdescription\t0> %s\r\n", NULLSAFE(MORPH_LONG_DESC(morph)));
 	
@@ -1041,8 +1029,8 @@ int vnum_morph(char *searchname, char_data *ch) {
 	int found = 0;
 	
 	HASH_ITER(hh, morph_table, iter, next_iter) {
-		if (multi_isname(searchname, MORPH_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, MORPH_VNUM(iter), MORPH_NAME(iter));
+		if (multi_isname(searchname, MORPH_KEYWORDS(iter))) {
+			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, MORPH_VNUM(iter), MORPH_SHORT_DESC(iter));
 		}
 	}
 	
@@ -1132,6 +1120,12 @@ OLC_MODULE(morphedit_flags) {
 }
 
 
+OLC_MODULE(morphedit_keywords) {
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+	olc_process_string(ch, argument, "keywords", &MORPH_KEYWORDS(morph));
+}
+
+
 OLC_MODULE(morphedit_longdesc) {
 	morph_data *morph = GET_OLC_MORPH(ch->desc);
 	olc_process_string(ch, argument, "long description", &MORPH_LONG_DESC(morph));
@@ -1141,12 +1135,6 @@ OLC_MODULE(morphedit_longdesc) {
 OLC_MODULE(morphedit_maxlevel) {
 	morph_data *morph = GET_OLC_MORPH(ch->desc);
 	MORPH_MAX_SCALE(morph) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, MORPH_MAX_SCALE(morph));
-}
-
-
-OLC_MODULE(morphedit_name) {
-	morph_data *morph = GET_OLC_MORPH(ch->desc);
-	olc_process_string(ch, argument, "name", &MORPH_NAME(morph));
 }
 
 

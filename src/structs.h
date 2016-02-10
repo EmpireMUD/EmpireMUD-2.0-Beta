@@ -1949,7 +1949,7 @@ struct interaction_item {
 // see morph.c
 struct morph_data {
 	any_vnum vnum;
-	char *name;	// descriptive text
+	char *keywords;
 	char *short_desc;	// short description (a bat)
 	char *long_desc;	// long description (seen in room)
 	

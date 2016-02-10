@@ -212,9 +212,9 @@ OLC_MODULE(morphedit_attack);
 OLC_MODULE(morphedit_cost);
 OLC_MODULE(morphedit_costtype);
 OLC_MODULE(morphedit_flags);
+OLC_MODULE(morphedit_keywords);
 OLC_MODULE(morphedit_longdesc);
 OLC_MODULE(morphedit_maxlevel);
-OLC_MODULE(morphedit_name);
 OLC_MODULE(morphedit_requiresobject);
 OLC_MODULE(morphedit_shortdesc);
 
@@ -567,9 +567,9 @@ const struct olc_command_data olc_data[] = {
 	{ "cost", morphedit_cost, OLC_MORPH, OLC_CF_EDITOR },
 	{ "costtype", morphedit_costtype, OLC_MORPH, OLC_CF_EDITOR },
 	{ "flags", morphedit_flags, OLC_MORPH, OLC_CF_EDITOR },
+	{ "keywords", morphedit_keywords, OLC_MORPH, OLC_CF_EDITOR },
 	{ "longdescription", morphedit_longdesc, OLC_MORPH, OLC_CF_EDITOR },
 	{ "maxlevel", morphedit_maxlevel, OLC_MORPH, OLC_CF_EDITOR },
-	{ "name", morphedit_name, OLC_MORPH, OLC_CF_EDITOR },
 	{ "requiresability", morphedit_ability, OLC_MORPH, OLC_CF_EDITOR },
 	{ "requiresobject", morphedit_requiresobject, OLC_MORPH, OLC_CF_EDITOR },
 	{ "shortdescription", morphedit_shortdesc, OLC_MORPH, OLC_CF_EDITOR },
@@ -2463,7 +2463,7 @@ OLC_MODULE(olc_removeindev) {
 			
 			REMOVE_BIT(MORPH_FLAGS(morph), MORPHF_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_MORPH, MORPH_VNUM(morph));
-			msg_to_char(ch, "Removed IN-DEV flag from morph [%d] %s.\r\n", MORPH_VNUM(morph), MORPH_NAME(morph));
+			msg_to_char(ch, "Removed IN-DEV flag from morph [%d] %s.\r\n", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
 			any = TRUE;
 		}
 		
