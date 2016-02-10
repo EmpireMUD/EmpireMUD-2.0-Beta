@@ -68,8 +68,8 @@ void add_morph_affects(char_data *ch) {
 	
 	double points_available, remaining, share;
 	morph_data *morph = GET_MORPH(ch);
+	struct affected_type *af = NULL;
 	int scale, total_weight, value;
-	struct affected_type *af;
 	struct apply_data *app;
 	bool any;
 	
@@ -121,8 +121,11 @@ void add_morph_affects(char_data *ch) {
 			continue;
 		}
 		
-		affect_to_char(ch, af);
-		free(af);
+		if (af) {
+			affect_to_char(ch, af);
+			free(af);
+			af = NULL;
+		}
 	}
 	
 	if (MORPH_AFFECTS(morph)) {
