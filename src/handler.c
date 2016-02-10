@@ -616,6 +616,9 @@ void affect_total(char_data *ch) {
 		EMPIRE_GREATNESS(emp) += GET_GREATNESS(ch);
 	}
 	
+	// limit this
+	GET_MAX_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch));
+	
 	// restore these because in some cases, they mess up during an affect_total
 	GET_HEALTH(ch) = health;
 	GET_MOVE(ch) = move;
