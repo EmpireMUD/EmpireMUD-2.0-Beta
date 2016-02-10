@@ -731,12 +731,17 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS) && IS_NPC(i)) {
 		msg_to_char(ch, "[%d] %s", GET_MOB_VNUM(i), SCRIPT(i) ? "[TRIG] " : "");
 	}
-
-	if (IS_NPC(i) && GET_LONG_DESC(i) && GET_POS(i) == POS_STANDING) {
+	
+	if (IS_MORPHED(i) && GET_POS(i) == POS_STANDING) {
 		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
 			msg_to_char(ch, "*");
 		}
-
+		msg_to_char(ch, "%s\r\n", MORPH_LONG_DESC(GET_MORPH(i)));
+	}
+	else if (IS_NPC(i) && GET_LONG_DESC(i) && GET_POS(i) == POS_STANDING) {
+		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
+			msg_to_char(ch, "*");
+		}
 		msg_to_char(ch, GET_LONG_DESC(i));
 	}
 	else {
@@ -959,11 +964,6 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 
 	if (ch != i) {
 		act("You look at $N.", FALSE, ch, 0, i, TO_CHAR);
-	}
-
-	// For morphs, we show a description
-	if (IS_MORPHED(i)) {
-		act(MORPH_LONG_DESC(GET_MORPH(i)), FALSE, ch, 0, i, TO_CHAR);
 	}
 	
 	// only show this block if the person is not morphed, or the morph is not an npc disguise
