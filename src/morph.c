@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -62,14 +64,72 @@ void finish_morphing(char_data *ch, morph_data *morph);
 * @param char_data *ch The character to add morph affects to.
 */
 void add_morph_affects(char_data *ch) {
+	extern const double apply_values[];
+	
+	double points_available, remaining, share;
 	morph_data *morph = GET_MORPH(ch);
+	int scale, total_weight, value;
+	struct affected_type *af;
+	struct apply_data *app;
+	bool any;
 	
 	// no work
 	if (!morph) {
 		return;
 	}
 	
-	// TODO
+	// determine scale cap
+	scale = get_approximate_level(ch);
+	if (MORPH_MAX_SCALE(morph) > 0) {
+		scale = MIN(scale, MORPH_MAX_SCALE(morph));
+	}
+	
+	// determine points
+	points_available = scale / 100.0 * config_get_double("scale_points_at_100");
+	points_available = MAX(points_available, 1.0);
+	
+	// figure out how many total weight points are used
+	total_weight = 0;
+	LL_FOREACH(MORPH_APPLIES(morph), app) {
+		total_weight += ABSOLUTE(app->weight);
+	}
+	
+	// start adding applies
+	remaining = points_available;
+	any = FALSE;
+	LL_FOREACH(MORPH_APPLIES(morph), app) {
+		if (app->weight > 0 && remaining > 0) {	// positive aff
+			// check remaining
+			share = (((double)app->weight) / total_weight) * points_available;	// % of total
+			share = MIN(share, remaining);	// check limit
+			value = round(share * (1.0 / apply_values[app->location]));
+			if (value > 0 || !any) {	// always give at least 1 point on the first one
+				any = TRUE;
+				value = MAX(1, value);
+				remaining -= (value * apply_values[app->location]);	// subtract actual amount used
+				
+				// create the actual apply
+				af = create_mod_aff(ATYPE_MORPH, UNLIMITED, app->location, value, ch);
+			}
+		}
+		else if (app->weight < 0) {	// negative aff
+			value = round(app->weight * (1.0 / apply_values[app->location]));
+			value = MIN(-1, value);	// minimum of -1
+			af = create_mod_aff(ATYPE_MORPH, UNLIMITED, app->location, value, ch);
+		}
+		else {	// no aff
+			continue;
+		}
+		
+		affect_to_char(ch, af);
+		free(af);
+	}
+	
+	if (MORPH_AFFECTS(morph)) {
+		af = create_flag_aff(ATYPE_MORPH, UNLIMITED, MORPH_AFFECTS(morph), ch);
+		affect_to_char(ch, af);
+		free(af);
+	}
 }
 
 
@@ -190,6 +250,11 @@ bool morph_affinity_ok(room_data *location, morph_data *morph) {
 	int climate = NOTHING;
 	crop_data *cp;
 	bool ok = TRUE;
+	
+	// shortcut
+	if (!morph) {
+		return TRUE;
+	}
 	
 	if (ROOM_SECT_FLAGGED(location, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(location))) {
 		climate = GET_CROP_CLIMATE(cp);

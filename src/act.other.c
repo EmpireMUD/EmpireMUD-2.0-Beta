@@ -1587,15 +1587,15 @@ ACMD(do_morph) {
 	else if (morph && !can_use_ability(ch, MORPH_ABILITY(morph), MORPH_COST_TYPE(morph), MORPH_COST(morph) * multiplier, NOTHING)) {
 		// sends own message
 	}
-	else if (MORPH_COST_TYPE(morph) == BLOOD && MORPH_COST(morph) > 0 && !CAN_SPEND_BLOOD(ch)) {
+	else if (morph && MORPH_COST_TYPE(morph) == BLOOD && MORPH_COST(morph) > 0 && !CAN_SPEND_BLOOD(ch)) {
 		msg_to_char(ch, "Your blood is inert, you can't do that!\r\n");
 	}
-	else if (MORPH_ABILITY(morph) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, NULL, MORPH_ABILITY(morph))) {
+	else if (morph && MORPH_ABILITY(morph) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, NULL, MORPH_ABILITY(morph))) {
 		return;
 	}
 	else {
 		// charge costs
-		if (MORPH_COST(morph) > 0) {
+		if (morph && MORPH_COST(morph) > 0) {
 			GET_CURRENT_POOL(ch, MORPH_COST_TYPE(morph)) -= MORPH_COST(morph) * multiplier;
 		}
 		
