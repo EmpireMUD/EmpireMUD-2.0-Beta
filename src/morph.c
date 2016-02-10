@@ -123,7 +123,7 @@ morph_data *find_morph_by_name(char_data *ch, char *name) {
 	morph_data *morph, *next_morph, *partial = NULL;
 	
 	HASH_ITER(sorted_hh, sorted_morphs, morph, next_morph) {
-		if (MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+		if (MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT | MORPHF_SCRIPT_ONLY) && !IS_IMMORTAL(ch)) {
 			continue;
 		}
 		if (MORPH_ABILITY(morph) != NO_ABIL && !has_ability(ch, MORPH_ABILITY(morph))) {
@@ -176,6 +176,39 @@ void finish_morphing(char_data *ch, morph_data *morph) {
 	if (morph && MORPH_ABILITY(morph) != NO_ABIL) {
 		gain_ability_exp(ch, MORPH_ABILITY(morph), 33.4);
 	}
+}
+
+
+/**
+* Checks morph affinities.
+*
+* @param room_data *location Where the morph affinity is happening.
+* @param morph_data *morph Which morph the person is trying to morph into.
+* @return bool TRUE if the morph passes the affinities check.
+*/
+bool morph_affinity_ok(room_data *location, morph_data *morph) {
+	int climate = NOTHING;
+	crop_data *cp;
+	bool ok = TRUE;
+	
+	if (ROOM_SECT_FLAGGED(location, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(location))) {
+		climate = GET_CROP_CLIMATE(cp);
+	}
+	else {
+		climate = GET_SECT_CLIMATE(SECT(location));
+	}
+	
+	if (MORPH_FLAGGED(morph, MORPHF_TEMPERATE_AFFINITY) && climate != CLIMATE_TEMPERATE) {
+		ok = FALSE;
+	}
+	if (MORPH_FLAGGED(morph, MORPHF_ARID_AFFINITY) && climate != CLIMATE_ARID) {
+		ok = FALSE;
+	}
+	if (MORPH_FLAGGED(morph, MORPHF_TROPICAL_AFFINITY) && climate != CLIMATE_TROPICAL) {
+		ok = FALSE;
+	}
+	
+	return ok;
 }
 
 
