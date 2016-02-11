@@ -50,7 +50,7 @@ See also: OLC ABORT, OLC AUDIT, OLC COPY, OLC DELETE, OLC EDIT, OLC FREE,
 Sometimes abbreviations are used for core "thing" types, like mobs. Here are
 some common ones:
 
-abl - ability
+abil - ability
 adv - adventure
 bld (or bdg) - building (these include designated rooms)
 cft - craft
@@ -58,12 +58,14 @@ cls - class
 crp - crop
 glb - global
 mob - mobile/npc
+mph - morph
 npc - non-player character (mob)
 obj - object
 rmt - room template
 sct - sector/terrain
 skl - skill
 trg - trigger
+veh - vehicle
 #d
 "OLC LICENSE" "OLC RIGHTS"
 
@@ -214,6 +216,10 @@ Mobs (MEDIT):
   rather than the AGGR flag.
 - If your mob spawns in a dark adventure, strongly consider giving it INFRA.
 - Animal mobs usually need a BUTCHER and SKIN interaction.
+
+Morphs (MORPHEDIT):
+- Be sure to set the SCRIPT-ONLY flag if your morph isn't meant to show up in
+  player morph lists.
 
 Objects (OEDIT):
 - The most significant keyword should always be first. A fiery torch should put
@@ -380,7 +386,7 @@ See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 
 Usage:  .flags [add | remove] <flags>
 
-The following adventure flags are available:
+The following ability flags are available:
  * - There are noflags for abilities yet
 #d
 "ABILEDIT MASTERYABILITY" "ABILEDIT MASTERY ABILITY"
@@ -2296,7 +2302,7 @@ always active on the mob, as if a spell had been cast on them.
 
 See also: AFFECT FLAGS, OLC MOBILES
 #d
-"MEDIT ATTACK"
+"MEDIT ATTACK" "ATTACK TYPES"
 
 Usage:  .attack <type>
 
@@ -2563,6 +2569,172 @@ Examples:
  Charles the Great
 
 See also: MEDIT LONG DESCRIPTION
+#d
+MORPHEDIT "OLC MORPHS" "MORPH EDITOR"
+
+Usage:  .morph <command>
+        .command
+
+The .olc morph editor allows you to configure the data for morphs, which are
+used by players (and NPCs) to change shape.
+
+All commands in the editor arg highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP MORPHEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .morph edit 123
+> .shortdesc a shapeshifting demon
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"MORPHEDIT AFFECTS"
+
+Usage:  .affects [add | remove] <flags>
+
+This command adds, removes, or toggles a set of affect flags. These flags are
+given to players while they are in this form.
+
+See also: AFFECT FLAGS, OLC MORPHS
+#d
+"MORPHEDIT APPLY" "MORPHEDIT APPLIES"
+
+Usage:  .apply add <value> <apply>
+        .apply change <number> <value | apply> <new value>
+        .apply remove <number | all>
+
+Applies are bonuses (or penalties) that a morph grants to the player who is
+using it.
+
+See also: APPLIES, OLC MORPHS
+#d
+"MORPHEDIT ATTACK"
+
+Usage:  .attack <type>
+
+This command sets the base attack type of the morph, when unarmed.
+
+See also: ATTACK TYPES, OLC MORPHS
+#d
+"MORPHEDIT COST" "MORPHEDIT COSTTYPE" "MORPHEDIT COST TYPE"
+
+Usage:  .cost <amount>
+        .costtype <health | move | mana | blood>
+
+This allows you to set the cost to use a morph. If a cost is set, the player
+must spend that much of the given type in order to start morphing.
+
+If the cost is 0, the cost type doesn't matter. Players can't go below 1 health
+or blood, so they must have cost+1 in order to morph. If the cost type is
+blood, Heartstop can prevent the player from morphing.
+
+See also: OLC MORPHS
+#d
+"MORPHEDIT FLAGS" "MORPH FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The following morph flags are available:
+ IN-DEVELOPMENT - Not live yet (can't be used by players).
+ SCRIPT-ONLY - Players can't choose this morph, but scripts can.
+ ANIMAL - Morph counts as an animal and is disguised from other players.
+ VAMPIRE-ONLY - This is a vampire morph and will check sunlight.
+ TEMPERATE-AFFINITY - Can only be used on temperate terrain.
+ ARID-AFFINITY - Can only be used on arid terrain (desert).
+ TROPICAL-AFFINITY - Can only be used on tropical terrain (jungle).
+ CHECK-SOLO - Can't be used if in the Solo role and not solo.
+ !SLEEP - Cannot sleep in this form.
+ GENDER-NEUTRAL - Shows as "it" instead of he/she/him/her.
+
+See also: OLC MORPHS
+#d
+"MORPHEDIT KEYWORDS"
+
+Usage:  .keywords <keywords>
+
+This command updates the keywords on a morph. The keywords are a list of single
+words that can be used to target a person in this morph. It should include any
+words from the morph's short or long description that identify the person.
+
+Usually the most significant keyword should be first.
+
+Example:
+ name: a fiery dragon
+ long description: A huge red dragon is flying overhead!
+ keywords: dragon fiery huge red
+
+See also: MORPHEDIT SHORTDESCRIPTION, MORPHEDIT LONGDESCRIPTION, OLC MORPHS
+#d
+"MORPHEDIT LONGDESCRIPTION" "MORPHEDIT LONG DESCRIPTION"
+
+Usage:  .longdescription <string>
+
+The long description is the text you see when the morphed character is in the
+room. Its name should appear somewhere near the beginning, and the rest should
+be a complete sentence indicating that the person is present.
+
+Examples:
+There is a cow munching on some grass.
+A fiery dragon circles overhead.
+You're standing at the foot of a huge giant!
+
+See also: OLC MORPHS
+#d
+"MORPHEDIT MAXLEVEL" "MORPHEDIT MAX LEVEL"
+
+Usage:  .maxlevel <level>
+
+This command determines the maximum level a morph will scale to. Morphs scale
+in power to the level of the player/npc who is morphing, up to this maximum.
+
+If you set the maxlevel to 0, there will be no maximum and the morph can scale
+to any level.
+
+See also: OLC MORPHS
+#d
+"MORPHEDIT REQUIRESABILITY" "MORPHEDIT REQUIRES ABILITY"
+
+Usage:  .requiresability <name | none>
+
+This allows you to require the player to have a certain ability in order to
+use this morph. Setting it to 'none' removes this requirement.
+
+See also: OLC MORPHS
+#d
+"MORPHEDIT REQUIRESOBJECT" "MORPHEDIT REQUIRES OBJECT"
+
+Usage:  .requiresobject <vnum>
+
+Some morphs may require a specific object. If the user doesn't have the object,
+the morph won't show up in the list at all. This essentially associates the
+morph to the object.
+
+The required object isn't consumed when the person morphs.
+
+See also: OLC MORPHS
+#d
+"MORPHEDIT SHORTDESCRIPTION" "MORPHEDIT SHORT DESCRIPTION"
+
+Usage:  .shortdescription <string>
+
+The 'short description' is the trait that's shown in lists, in action messages,
+and almost everywhere else except when a player types 'look' in the room (where
+the long description is shown instead). This should be short, should generally
+begin with a/an/the unless it's a proper noun, and should not be capitalized
+(again unless it's a proper noun).
+
+The short description is also shown in the available morphs list (with any
+leading a/an/the removed).
+
+Examples:
+ the dragon
+ a mongoose
+
+See also: MORPHEDIT LONG DESCRIPTION, OLC MORPHS
 #d
 "OEDIT AFFECTS"
 

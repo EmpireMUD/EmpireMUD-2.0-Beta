@@ -894,10 +894,6 @@ ACMD(do_claws) {
 	if (!check_vampire_sun(ch, TRUE)) {
 		return;
 	}
-	if (CHAR_MORPH_FLAGGED(ch, MORPHF_NO_CLAWS)) {
-		msg_to_char(ch, "You can't grow claws in this form!\r\n");
-		return;
-	}
 	
 	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_CLAWS)) {
 		return;

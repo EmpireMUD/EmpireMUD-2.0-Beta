@@ -1396,7 +1396,7 @@ typedef struct vehicle_data vehicle_data;
 
 // MORPHF_x: flags for morphs
 #define MORPHF_IN_DEVELOPMENT  BIT(0)	// a. can't be used by players
-#define MORPHF_NO_CLAWS  BIT(1)	// b. can't use claws
+#define MORPHF_SCRIPT_ONLY  BIT(1)	// b. can't be morphed manually
 #define MORPHF_ANIMAL  BIT(2)	// c. treated like an npc animal (disguise)
 #define MORPHF_VAMPIRE_ONLY  BIT(3)	// d. requires vampire status
 #define MORPHF_TEMPERATE_AFFINITY  BIT(4)	// e. requires temperate
@@ -1404,7 +1404,7 @@ typedef struct vehicle_data vehicle_data;
 #define MORPHF_TROPICAL_AFFINITY  BIT(6)	// g. requires tropical
 #define MORPHF_CHECK_SOLO  BIT(7)	// h. check for the solo role
 #define MORPHF_NO_SLEEP  BIT(8)	// i. cannot sleep in this form
-#define MORPHF_SCRIPT_ONLY  BIT(9)	// j. can't be morphed manually
+#define MORPHF_GENDER_NEUTRAL  BIT(9)	// j. causes an "it" instead of him/her
 
 
 // mount flags -- MOUNT_FLAGGED(ch, flag)

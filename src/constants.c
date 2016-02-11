@@ -3064,7 +3064,7 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 // MORPHF_x
 const char *morph_flags[] = {
 	"IN-DEVELOPMENT",
-	"!CLAWS",
+	"SCRIPT-ONLY",
 	"ANIMAL",
 	"VAMPIRE-ONLY",
 	"TEMPERATE-AFFINITY",
@@ -3072,7 +3072,7 @@ const char *morph_flags[] = {
 	"TROPICAL-AFFINITY",
 	"CHECK-SOLO",
 	"!SLEEP",
-	"SCRIPT-ONLY",
+	"GENDER-NEUTRAL",
 	"\n"
 };
 

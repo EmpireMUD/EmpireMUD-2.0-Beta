@@ -318,11 +318,6 @@ void perform_morph(char_data *ch, morph_data *morph) {
 	GET_HEALTH(ch) = (sh_int) (GET_MAX_HEALTH(ch) * health_mod);
 	GET_MOVE(ch) = (sh_int) (GET_MAX_MOVE(ch) * move_mod);
 	GET_MANA(ch) = (sh_int) (GET_MAX_MANA(ch) * mana_mod);
-	
-	// flag-specific changes
-	if (CHAR_MORPH_FLAGGED(ch, MORPHF_NO_CLAWS) && AFF_FLAGGED(ch, AFF_CLAWS)) {
-		affects_from_char_by_aff_flag(ch, AFF_CLAWS);
-	}
 }
 
 

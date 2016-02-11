@@ -1100,9 +1100,9 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
  //////////////////////////////////////////////////////////////////////////////
 //// STRING UTILS ////////////////////////////////////////////////////////////
 
-#define HSHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "their" : (GET_SEX(ch) ? (GET_SEX(ch) == SEX_MALE ? "his":"her") :"its"))
-#define HSSH(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "they" : (GET_SEX(ch) ? (GET_SEX(ch) == SEX_MALE ? "he" :"she") : "it"))
-#define HMHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "them" : (GET_SEX(ch) ? (GET_SEX(ch) == SEX_MALE ? "him":"her") : "it"))
+#define HSHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "their" : ((GET_SEX(ch) && !CHAR_MORPH_FLAGGED(ch, MORPHF_GENDER_NEUTRAL)) ? (GET_SEX(ch) == SEX_MALE ? "his":"her") :"its"))
+#define HSSH(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "they" : ((GET_SEX(ch) && !CHAR_MORPH_FLAGGED(ch, MORPHF_GENDER_NEUTRAL)) ? (GET_SEX(ch) == SEX_MALE ? "he" :"she") : "it"))
+#define HMHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "them" : ((GET_SEX(ch) && !CHAR_MORPH_FLAGGED(ch, MORPHF_GENDER_NEUTRAL)) ? (GET_SEX(ch) == SEX_MALE ? "him":"her") : "it"))
 
 #define AN(string)  (strchr("aeiouAEIOU", *string) ? "an" : "a")
 #define SANA(obj)  (strchr("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")
