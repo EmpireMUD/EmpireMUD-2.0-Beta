@@ -4907,6 +4907,7 @@ void remove_depletion(room_data *room, int type) {
 */
 void attach_building_to_room(bld_data *bld, room_data *room) {
 	if (!bld || !room) {
+		log("SYSERR: attach_building_to_room called without %s", bld ? "room" : "building");
 		return;
 	}
 	if (!COMPLEX_DATA(room)) {
