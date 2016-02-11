@@ -76,8 +76,8 @@ void cancel_blood_upkeeps(char_data *ch) {
 					break;
 				}
 				
-				msg_to_char(ch, "Your %s fades.\r\n", affect_types[aff->type]);
-				snprintf(buf, sizeof(buf), "$n's %s fades.", affect_types[aff->type]);
+				msg_to_char(ch, "Your %s effect fades.\r\n", affect_types[aff->type]);
+				snprintf(buf, sizeof(buf), "$n's %s effect fades.", affect_types[aff->type]);
 				act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 				
 				affect_from_char(ch, aff->type);
