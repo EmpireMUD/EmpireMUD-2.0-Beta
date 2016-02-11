@@ -198,7 +198,7 @@ morph_data *find_morph_by_name(char_data *ch, char *name) {
 		}
 		
 		// matches:
-		strcpy(temp, skip_filler(MORPH_KEYWORDS(morph)));
+		strcpy(temp, skip_filler(MORPH_SHORT_DESC(morph)));
 		if (!str_cmp(name, temp)) {
 			// perfect match
 			return morph;
