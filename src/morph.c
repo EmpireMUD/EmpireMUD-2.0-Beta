@@ -335,6 +335,7 @@ bool audit_morph(morph_data *morph, char_data *ch) {
 	char temp[MAX_STRING_LENGTH];
 	struct apply_data *app;
 	bool problem = FALSE;
+	obj_data *obj = NULL;
 	
 	if (MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT)) {
 		olc_audit_msg(ch, MORPH_VNUM(morph), "IN-DEVELOPMENT");
@@ -383,11 +384,30 @@ bool audit_morph(morph_data *morph, char_data *ch) {
 		olc_audit_msg(ch, MORPH_VNUM(morph), "Requires no ability or object");
 		problem = TRUE;
 	}
-	if (MORPH_REQUIRES_OBJ(morph) != NOTHING && !obj_proto(MORPH_REQUIRES_OBJ(morph))) {
-		olc_audit_msg(ch, MORPH_VNUM(morph), "Requires-object does not exist");
+	if (MORPH_REQUIRES_OBJ(morph) != NOTHING) {
+		if (!(obj = obj_proto(MORPH_REQUIRES_OBJ(morph)))) {
+			olc_audit_msg(ch, MORPH_VNUM(morph), "Requires-object does not exist");
+			problem = TRUE;
+		}
+		if (MORPH_FLAGGED(morph, MORPHF_CONSUME_OBJ) && obj && OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+			olc_audit_msg(ch, MORPH_VNUM(morph), "Consumed requires-obj is scalable");
+			problem = TRUE;
+		}
+	}
+	if (MORPH_FLAGGED(morph, MORPHF_CONSUME_OBJ) && MORPH_REQUIRES_OBJ(morph) == NOTHING) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "Flagged CONSUME-OBJ but no object required");
 		problem = TRUE;
 	}
-		
+	if (MORPH_ATTACK_TYPE(morph) == TYPE_RESERVED) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "Invalid attack type");
+		problem = TRUE;
+	}
+	
+	if (count_bits(MORPH_FLAGS(morph) & (MORPHF_TEMPERATE_AFFINITY | MORPHF_ARID_AFFINITY | MORPHF_TROPICAL_AFFINITY)) > 1) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "Multiple affinities");
+		problem = TRUE;
+	}
+	
 	return problem;
 }
 
