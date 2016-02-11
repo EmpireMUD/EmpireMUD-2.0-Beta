@@ -2612,6 +2612,7 @@ Most applies are self-explanatory:
  BONUS-HEALING - added to damage healed (by abilities this player uses)
  RESIST-MAGICAL - magical damage reduction
  CRAFTING - bonus to craft level
+ BLOOD-UPKEEP - adds to how much blood vampires must spend per hour
 
 See also: OLC OBJECTS
 #d
