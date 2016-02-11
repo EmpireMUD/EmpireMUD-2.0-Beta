@@ -220,6 +220,10 @@ Mobs (MEDIT):
 Morphs (MORPHEDIT):
 - Be sure to set the SCRIPT-ONLY flag if your morph isn't meant to show up in
   player morph lists.
+- If you use a required object and the CONSUME-OBJ flag, be sure not to use a
+  scalable item. Scalable items will refund at the wrong level.
+- If the morph requires a class ability, you should also set the CHECK-SOLO
+  flag. This is necessary to use it in the Solo role.
 
 Objects (OEDIT):
 - The most significant keyword should always be first. A fiery torch should put
@@ -2649,6 +2653,7 @@ The following morph flags are available:
  CHECK-SOLO - Can't be used if in the Solo role and not solo.
  !SLEEP - Cannot sleep in this form.
  GENDER-NEUTRAL - Shows as "it" instead of he/she/him/her.
+ CONSUME-OBJ - Will use up the requiresobj to morph.
 
 See also: OLC MORPHS
 #d
@@ -2713,7 +2718,8 @@ Some morphs may require a specific object. If the user doesn't have the object,
 the morph won't show up in the list at all. This essentially associates the
 morph to the object.
 
-The required object isn't consumed when the person morphs.
+The required object isn't consumed when the person morphs, unless the CONSUME-
+OBJ flag is set. You should never use a scalable item if it will be consumed.
 
 See also: OLC MORPHS
 #d

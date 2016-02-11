@@ -3073,6 +3073,7 @@ const char *morph_flags[] = {
 	"CHECK-SOLO",
 	"!SLEEP",
 	"GENDER-NEUTRAL",
+	"CONSUME-OBJ",	// 10
 	"\n"
 };
 

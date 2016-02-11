@@ -1523,6 +1523,7 @@ ACMD(do_morph) {
 	
 	morph_data *morph, *next_morph;
 	double multiplier;
+	obj_data *obj;
 	bool normal;
 	
 	// safety first: mobs must use %morph%
@@ -1590,6 +1591,11 @@ ACMD(do_morph) {
 		// charge costs
 		if (morph && MORPH_COST(morph) > 0) {
 			GET_CURRENT_POOL(ch, MORPH_COST_TYPE(morph)) -= MORPH_COST(morph) * multiplier;
+		}
+		
+		// take the obj
+		if (MORPH_REQUIRES_OBJ(morph) != NOTHING && MORPH_FLAGGED(morph, MORPHF_CONSUME_OBJ) && (obj = get_obj_in_list_vnum(MORPH_REQUIRES_OBJ(morph), ch->carrying))) {
+			extract_obj(obj);
 		}
 		
 		if (IS_NPC(ch) || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING || subcmd == SCMD_FASTMORPH) {

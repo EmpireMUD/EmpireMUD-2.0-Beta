@@ -1405,6 +1405,7 @@ typedef struct vehicle_data vehicle_data;
 #define MORPHF_CHECK_SOLO  BIT(7)	// h. check for the solo role
 #define MORPHF_NO_SLEEP  BIT(8)	// i. cannot sleep in this form
 #define MORPHF_GENDER_NEUTRAL  BIT(9)	// j. causes an "it" instead of him/her
+#define MORPHF_CONSUME_OBJ  BIT(10)	// k. uses up the requiresobj
 
 
 // mount flags -- MOUNT_FLAGGED(ch, flag)
