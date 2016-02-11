@@ -2749,6 +2749,8 @@ Message types:
  &ccraft-to-room&0 - Shown to the room when building a vehicle ($V for vehicle).
  &cwear-to-char&0 - Shown to the person when they wear an item ($p for item).
  &cwear-to-room&0 - Shown to the room when the person wears an item ($p for item).
+ &cremove-to-char&0 - Shown to the person when they remove an item ($p for item).
+ &cremove-to-room&0 - Shown to the room when the person removes an item ($p for item).
 
 See also: OLC OBJECTS
 #d

@@ -203,7 +203,7 @@ morph_data *find_morph_by_name(char_data *ch, char *name) {
 			// perfect match
 			return morph;
 		}
-		if (!partial && is_multiword_abbrev(name, temp)) {
+		if (!partial && multi_isname(name, MORPH_KEYWORDS(morph))) {
 			// probable match
 			partial = morph;
 		}

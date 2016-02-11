@@ -563,8 +563,21 @@ void perform_remove(char_data *ch, int pos) {
 			return;
 		}
 
-		act("You stop using $p.", FALSE, ch, obj, 0, TO_CHAR);
-		act("$n stops using $p.", TRUE, ch, obj, 0, TO_ROOM);
+		// char message
+		if (has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR)) {
+			act(get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		else {
+			act("You stop using $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		
+		// room message
+		if (has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM)) {
+			act(get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
+		}
+		else {
+			act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
+		}
 		
 		// this may extract it, or drop it
 		unequip_char_to_inventory(ch, pos);
