@@ -416,6 +416,19 @@ Here is a workaround to use a variable:
   eval making %%self.give_coins(%coins%)%%
   nop %making%
 #d
+%MORPH% MMORPH OMORPH VMORPH WMORPH
+
+Usage:  %morph% <person> <vnum | normal>
+
+This causes a player or mob to morph, similar to the normal morph abilities.
+This morph is instantaneous and sends no messages.
+
+Examples:
+  %morph% %self% 441
+  %morph% %actor% normal
+
+See also: MORPH, MORPHEDIT
+#d
 %OWN% MOWN OOWN VOWN WOWN
 
 Usage:  %own% [type] <target> <empire>
