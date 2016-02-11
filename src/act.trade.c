@@ -971,7 +971,9 @@ ACMD(do_gen_augment) {
 		// figure out how many total weight points are used
 		total_weight = 0;
 		for (app = GET_AUG_APPLIES(aug); app; app = app->next) {
-			total_weight += app->weight;
+			if (!apply_never_scales[app->location]) {
+				total_weight += ABSOLUTE(app->weight);
+			}
 		}
 		
 		// find end of current applies on obj
@@ -983,16 +985,14 @@ ACMD(do_gen_augment) {
 		
 		// start adding applies
 		remaining = points_available;
-		for (app = GET_AUG_APPLIES(aug); app && remaining > 0; app = app->next) {
+		LL_FOREACH(GET_AUG_APPLIES(aug), app) {
 			apply = NULL;
 			
-			if (apply_never_scales[app->location]) {
+			if (apply_never_scales[app->location]) {	// non-scaling apply
 				CREATE(apply, struct obj_apply, 1);
-				apply->apply_type = augment_info[subcmd].apply_type;
-				apply->location = app->location;
 				apply->modifier = app->weight;
 			}
-			else {
+			else if (app->weight > 0 && remaining > 0) {	// positive apply
 				share = (((double)app->weight) / total_weight) * points_available;	// % of total
 				share = MIN(share, remaining);	// check limit
 				value = round(share * (1.0 / apply_values[app->location]));
@@ -1002,14 +1002,22 @@ ACMD(do_gen_augment) {
 				
 					// create the actual apply
 					CREATE(apply, struct obj_apply, 1);
-					apply->apply_type = augment_info[subcmd].apply_type;
-					apply->location = app->location;
 					apply->modifier = value;
 				}
+			}
+			else if (app->weight < 0) {	// negative apply
+				value = round(app->weight * (1.0 / apply_values[app->location]));
+				value = MIN(-1, value);	// minimum of -1
+				
+				CREATE(apply, struct obj_apply, 1);
+				apply->modifier = value;
 			}
 			
 			// add it
 			if (apply) {
+				apply->apply_type = augment_info[subcmd].apply_type;
+				apply->location = app->location;
+				
 				if (last_apply) {
 					last_apply->next = apply;
 				}
