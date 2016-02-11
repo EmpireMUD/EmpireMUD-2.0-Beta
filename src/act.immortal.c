@@ -2288,6 +2288,46 @@ SHOW(show_spawns) {
 }
 
 
+SHOW(show_variables) {
+	void find_uid_name(char *uid, char *name);
+	
+	char uname[MAX_INPUT_LENGTH];
+	struct trig_var_data *tv;
+	char_data *plr = NULL;
+	bool file = FALSE;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Usage: show variables <player>\r\n");
+	}
+	else if (!(plr = find_or_load_player(argument, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		msg_to_char(ch, "Global variables:\r\n");
+		
+		if (plr->script && plr->script->global_vars) {
+			msg_to_char(ch, "Global Variables:\r\n");
+
+			/* currently, variable context for players is always 0, so it is */
+			/* not displayed here. in the future, this might change */
+			for (tv = plr->script->global_vars; tv; tv = tv->next) {
+				if (*(tv->value) == UID_CHAR) {
+					find_uid_name(tv->value, uname);
+					msg_to_char(ch, " %10s:  [UID]: %s\r\n", tv->name, uname);
+				}
+				else {
+					msg_to_char(ch, " %10s:  %s\r\n", tv->name, tv->value);
+				}
+			}
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// STAT / VSTAT ////////////////////////////////////////////////////////////
 
@@ -2532,7 +2572,6 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 /* Sends ch information on the character or animal k */
 void do_stat_character(char_data *ch, char_data *k) {
 	void check_delayed_load(char_data *ch);
-	void find_uid_name(char *uid, char *name);
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
 	extern int total_bonus_healing(char_data *ch);
@@ -2555,9 +2594,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern struct promo_code_list promo_codes[];
 
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
-	char uname[MAX_INPUT_LENGTH];
 	struct script_memory *mem;
-	struct trig_var_data *tv;
 	struct cooldown_data *cool;
 	int i, i2, diff, found = 0, val;
 	obj_data *j;
@@ -2818,24 +2855,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 				}
 				
 				mem = mem->next;
-			}
-		}
-	}
-	else {
-		/* this is a PC, display their global variables */
-		if (k->script && k->script->global_vars) {
-			msg_to_char(ch, "Global Variables:\r\n");
-
-			/* currently, variable context for players is always 0, so it is */
-			/* not displayed here. in the future, this might change */
-			for (tv = k->script->global_vars; tv; tv = tv->next) {
-				if (*(tv->value) == UID_CHAR) {
-					find_uid_name(tv->value, uname);
-					msg_to_char(ch, "    %10s:  [UID]: %s\r\n", tv->name, uname);
-				}
-				else {
-					msg_to_char(ch, "    %10s:  %s\r\n", tv->name, tv->value);
-				}
 			}
 		}
 	}
@@ -5849,6 +5868,7 @@ ACMD(do_show) {
 		{ "ignoring", LVL_START_IMM, show_ignoring },
 		{ "workforce", LVL_START_IMM, show_workforce },
 		{ "islands", LVL_START_IMM, show_islands },
+		{ "variables", LVL_START_IMM, show_variables },
 
 		// last
 		{ "\n", 0, NULL }
