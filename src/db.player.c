@@ -2896,6 +2896,12 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// place character
 	char_to_room(ch, load_room);
 	ch->prev_logon = ch->player.time.logon;	// and update prev_logon now
+	
+	// verify morph stats
+	if (!IS_MORPHED(ch)) {
+		affect_from_char(ch, ATYPE_MORPH);
+	}
+	
 	if (dolog) {
 		announce_login(ch);
 	}

@@ -307,9 +307,6 @@ void perform_morph(char_data *ch, morph_data *morph) {
 	// Set the new form
 	GET_MORPH(ch) = morph;
 	add_morph_affects(ch);
-	
-	// this fixes all the things
-	affect_total(ch);
 
 	// set new pools
 	GET_HEALTH(ch) = (sh_int) (GET_MAX_HEALTH(ch) * health_mod);
