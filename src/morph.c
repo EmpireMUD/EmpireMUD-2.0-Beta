@@ -43,6 +43,7 @@ const char *default_morph_long_desc = "A shapeless morph is standing here.";
 
 // external consts
 extern const char *affected_bits[];
+extern const bool apply_never_scales[];
 extern const char *apply_types[];
 extern const char *morph_flags[];
 extern const char *pool_types[];
@@ -91,14 +92,19 @@ void add_morph_affects(char_data *ch) {
 	// figure out how many total weight points are used
 	total_weight = 0;
 	LL_FOREACH(MORPH_APPLIES(morph), app) {
-		total_weight += ABSOLUTE(app->weight);
+		if (!apply_never_scales[app->location]) {
+			total_weight += ABSOLUTE(app->weight);
+		}
 	}
 	
 	// start adding applies
 	remaining = points_available;
 	any = FALSE;
 	LL_FOREACH(MORPH_APPLIES(morph), app) {
-		if (app->weight > 0 && remaining > 0) {	// positive aff
+		if (apply_never_scales[app->location]) {
+			af = create_mod_aff(ATYPE_MORPH, UNLIMITED, app->location, app->weight, ch);
+		}
+		else if (app->weight > 0 && remaining > 0) {	// positive aff
 			// check remaining
 			share = (((double)app->weight) / total_weight) * points_available;	// % of total
 			share = MIN(share, remaining);	// check limit

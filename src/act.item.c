@@ -1309,6 +1309,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	extern const double apply_values[];
 	void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, int *min, int *max);
 	extern double get_weapon_speed(obj_data *weapon);
+	extern const bool apply_never_scales[];
 	extern const int wear_significance[];
 	
 	int total_share, bonus, iter, amt;
@@ -1401,8 +1402,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	
 	// first check applies, count share/bonus
 	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
-		// TODO non-scalable traits should be an array
-		if (apply->location != APPLY_GREATNESS && apply->location != APPLY_CRAFTING) {
+		if (!apply_never_scales[(int)apply->location]) {
 			SHARE_OR_BONUS(apply->modifier);
 		}
 	}
@@ -1568,8 +1568,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	for (apply = GET_OBJ_APPLIES(obj); apply; apply = next_apply) {
 		next_apply = apply->next;
 		
-		// TODO non-scalable traits should be an array
-		if (apply->location != APPLY_GREATNESS && apply->location != APPLY_CRAFTING) {
+		if (!apply_never_scales[(int)apply->location]) {
 			this_share = MAX(0, MIN(share, points_to_give));
 			// raw amount
 			per_point = (1.0 / apply_values[(int)apply->location]);

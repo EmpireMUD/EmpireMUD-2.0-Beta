@@ -897,6 +897,7 @@ bool validate_item_rename(char_data *ch, obj_data *obj, char *name) {
 ACMD(do_gen_augment) {
 	extern augment_data *find_augment_by_name(char_data *ch, char *name, int type);
 	extern char *shared_by(obj_data *obj, char_data *ch);
+	extern const bool apply_never_scales[];
 	extern const double apply_values[];
 	
 	char buf[MAX_STRING_LENGTH], target_arg[MAX_INPUT_LENGTH], *augment_arg;
@@ -983,19 +984,32 @@ ACMD(do_gen_augment) {
 		// start adding applies
 		remaining = points_available;
 		for (app = GET_AUG_APPLIES(aug); app && remaining > 0; app = app->next) {
-			share = (((double)app->weight) / total_weight) * points_available;	// % of total
-			share = MIN(share, remaining);	// check limit
-			value = round(share * (1.0 / apply_values[app->location]));
-			if (value > 0 || (app == GET_AUG_APPLIES(aug))) {	// always give at least 1 point on the first one
-				value = MAX(1, value);
-				remaining -= (value * apply_values[app->location]);	// subtract actual amount used
-				
-				// create the actual apply
+			apply = NULL;
+			
+			if (apply_never_scales[app->location]) {
 				CREATE(apply, struct obj_apply, 1);
 				apply->apply_type = augment_info[subcmd].apply_type;
 				apply->location = app->location;
-				apply->modifier = value;
+				apply->modifier = app->weight;
+			}
+			else {
+				share = (((double)app->weight) / total_weight) * points_available;	// % of total
+				share = MIN(share, remaining);	// check limit
+				value = round(share * (1.0 / apply_values[app->location]));
+				if (value > 0 || (app == GET_AUG_APPLIES(aug))) {	// always give at least 1 point on the first one
+					value = MAX(1, value);
+					remaining -= (value * apply_values[app->location]);	// subtract actual amount used
 				
+					// create the actual apply
+					CREATE(apply, struct obj_apply, 1);
+					apply->apply_type = augment_info[subcmd].apply_type;
+					apply->location = app->location;
+					apply->modifier = value;
+				}
+			}
+			
+			// add it
+			if (apply) {
 				if (last_apply) {
 					last_apply->next = apply;
 				}

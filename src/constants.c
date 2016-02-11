@@ -1025,7 +1025,7 @@ const char *apply_type_names[] = {
 };
 
 
-/* APPLY_x (1/3) */
+/* APPLY_x (1/4) */
 const char *apply_types[] = {
 	"NONE",
 	"STRENGTH",
@@ -1058,7 +1058,7 @@ const char *apply_types[] = {
 };
 
 
-// APPLY_x (2/3) -- for rate_item (amount multiplied by the apply modifier to make each of these equal to 1)
+// APPLY_x (2/4) -- for rate_item (amount multiplied by the apply modifier to make each of these equal to 1)
 const double apply_values[] = {
 	0.01,	// "NONE",
 	1,	// "STRENGTH",
@@ -1090,7 +1090,7 @@ const double apply_values[] = {
 };
 
 
-// APPLY_x (3/3) applies that are directly tied to attributes
+// APPLY_x (3/4) applies that are directly tied to attributes
 const int apply_attribute[] = {
 	NOTHING,
 	STRENGTH,
@@ -1119,6 +1119,38 @@ const int apply_attribute[] = {
 	NOTHING,	// resist-magical
 	NOTHING,	// crafting
 	NOTHING	// blood-upkeep
+};
+
+
+// APPLY_x (4/4) if TRUE, this apply is not scaled (applied as-is)
+const bool apply_never_scales[] = {
+	FALSE,	// "NONE",
+	FALSE,	// "STRENGTH",
+	FALSE,	// "DEXTERITY",
+	FALSE,	// "HEALTH-REGEN",
+	FALSE,	// "CHARISMA",
+	TRUE,	// "GREATNESS",
+	FALSE,	// "MOVE-REGEN",
+	FALSE,	// "MANA-REGEN",
+	FALSE,	// "INTELLIGENCE",
+	FALSE,	// "WITS",
+	TRUE,	// "AGE",
+	FALSE,	// "MAX-MOVE",
+	FALSE,	// RESIST-PHYSICAL
+	FALSE,	// "BLOCK",
+	FALSE,	// "HEAL-OVER-TIME",
+	FALSE,	// "HEALTH",
+	FALSE,	// "MAX-MANA",
+	FALSE,	// "TO-HIT",
+	FALSE,	// "DODGE",
+	FALSE,	// "INVENTORY",
+	FALSE,	// "BLOOD",
+	FALSE,	// BONUS-PHYSICAL
+	FALSE,	// BONUS-MAGICAL
+	FALSE,	// BONUS-HEALING
+	FALSE,	// RESIST-MAGICAL
+	TRUE,	// CRAFTING
+	TRUE	// BLOOD-UPKEEP
 };
 
 
