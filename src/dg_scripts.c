@@ -1979,32 +1979,38 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 	char *name;
 	int num, count;
 
-	// x_TRIGGER: mob, obj, world, rmt, adv, vehicle
-	char *send_cmd[] = {"msend ", "osend ", "wsend ", "wsend ", "wsend ", "vsend " };
-	char *echo_cmd[] = {"mecho ", "oecho ", "wecho ", "wecho ", "wecho ", "vecho " };
-	char *echoaround_cmd[] = {"mechoaround ", "oechoaround ", "wechoaround ", "wechoaround ", "wechoaround ", "vechoaround " };
-	char *echoneither_cmd[] = {"mechoneither ", "oechoneither ", "wechoneither ", "wechoneither ", "wechoneither ", "vechoneither " };
-	char *door[] = {"mdoor ", "odoor ", "wdoor ", "wdoor ", "wdoor ", "vdoor " };
-	char *force[] = {"mforce ", "oforce ", "wforce ", "wforce ", "wforce ", "vforce " };
-	char *load[] = {"mload ", "oload ", "wload ", "wload ", "wload ", "vload " };
-	char *purge[] = {"mpurge ", "opurge ", "wpurge ", "wpurge ", "wpurge ", "vpurge " };
-	char *scale[] = {"mscale ", "oscale ", "wscale ", "wscale ", "wscale ", "vscale " };
-	char *siege[] = {"msiege ", "osiege ", "wsiege ", "wsiege ", "wsiege ", "vsiege " };
-	char *teleport[] = {"mteleport ", "oteleport ", "wteleport ", "wteleport ", "wteleport ", "vteleport " };
-	char *terracrop[] = {"mterracrop ", "oterracrop ", "wterracrop ", "wterracrop ", "wterracrop ", "vterracrop " };
-	char *terraform[] = {"mterraform ", "oterraform ", "wterraform ", "wterraform ", "wterraform ", "vterraform " };
-	/* the x kills a 'shadow' warning in gcc. */
-	char *xdamage[] = {"mdamage ", "odamage ", "wdamage ", "wdamage ", "wdamage ", "vdamage " };
-	char *xaoe[] = {"maoe ", "oaoe ", "waoe ", "waoe ", "waoe ", "vaoe " };
-	char *xdot[] = {"mdot ", "odot ", "wdot ", "wdot ", "wdot ", "vdot " };
-	char *buildingecho[] = {"mbuildingecho ", "obuildingecho ", "wbuildingecho ", "wbuildingecho ", "wbuildingecho ", "vbuildingecho " };
-	char *regionecho[] = {"mregionecho ", "oregionecho ", "wregionecho ", "wregionecho ", "wregionecho ", "vregionecho " };
-	char *vehicleecho[] = {"mvehicleecho ", "ovehicleecho ", "wvehicleecho ", "wvehicleecho ", "wvehicleecho ", "vvehicleecho " };
-	char *asound[] = {"masound ", "oasound ", "wasound ", "wasound ", "wasound ", "vasound " };
-	char *at[] = {"mat ", "oat ", "wat ", "wat ", "wat ", "vat " };
-	char *adventurecomplete[] = {"madventurecomplete", "oadventurecomplete", "wadventurecomplete", "wadventurecomplete", "wadventurecomplete", "vadventurecomplete" };
-	char *transform[] = {"mtransform ", "otransform ", "wtransform ", "wtransform ", "wtransform ", "vtransform " };
-	char *own[] = {"mown ", "oown ", "wown ", "wown ", "wown ", "vown " };
+	// x_TRIGGER: mob, obj, world, rmt, adv, vehicle	
+	const char cmd_prefix[] = { 'm', 'o', 'w', 'w', 'w', 'v' };
+	
+	// commands that work with '%command%' syntax (will be replaced with 'mcommand', 'ocommand', etc)
+	const char *script_commands[] = {
+		"adventurecomplete",
+		"aoe",
+		"asound",
+		"at",
+		"buildingecho",
+		"damage",
+		"door",
+		"dot",
+		"echo",
+		"echoaround",
+		"echoneither",
+		"force",
+		"load",
+		"morph",
+		"own",
+		"purge",
+		"regionecho",
+		"scale",
+		"send",
+		"siege",
+		"teleport",
+		"terracrop",
+		"terraform",
+		"transform",
+		"vehicleecho",
+		"\n"	// must be last
+	};
 	
 	/* X.global() will have a NULL trig */
 	if (trig) {
@@ -2048,54 +2054,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 				}
 			//        snprintf(str, slen, "self");
-			else if (!str_cmp(var, "door"))
-				snprintf(str, slen, "%s", door[type]);
-			else if (!str_cmp(var, "force"))
-				snprintf(str, slen, "%s", force[type]);
-			else if (!str_cmp(var, "load"))
-				snprintf(str, slen, "%s", load[type]);
-			else if (!str_cmp(var, "own"))
-				snprintf(str, slen, "%s", own[type]);
-			else if (!str_cmp(var, "purge"))
-				snprintf(str, slen, "%s", purge[type]);
-			else if (!str_cmp(var, "scale"))
-				snprintf(str, slen, "%s", scale[type]);
-			else if (!str_cmp(var, "siege"))
-				snprintf(str, slen, "%s", siege[type]);
-			else if (!str_cmp(var, "teleport"))
-				snprintf(str, slen, "%s", teleport[type]);
-			else if (!str_cmp(var, "terracrop"))
-				snprintf(str, slen, "%s", terracrop[type]);
-			else if (!str_cmp(var, "terraform"))
-				snprintf(str, slen, "%s", terraform[type]);
-			else if (!str_cmp(var, "damage"))
-				snprintf(str, slen, "%s", xdamage[type]);
-			else if (!str_cmp(var, "aoe"))
-				snprintf(str, slen, "%s", xaoe[type]);
-			else if (!str_cmp(var, "dot"))
-				snprintf(str, slen, "%s", xdot[type]);
-			else if (!str_cmp(var, "send"))
-				snprintf(str, slen, "%s", send_cmd[type]);
-			else if (!str_cmp(var, "echo"))
-				snprintf(str, slen, "%s", echo_cmd[type]);
-			else if (!str_cmp(var, "echoaround"))
-				snprintf(str, slen, "%s", echoaround_cmd[type]);
-			else if (!str_cmp(var, "echoneither"))
-				snprintf(str, slen, "%s", echoneither_cmd[type]);
-			else if (!str_cmp(var, "buildingecho"))
-				snprintf(str, slen, "%s", buildingecho[type]);
-			else if (!str_cmp(var, "regionecho"))
-				snprintf(str, slen, "%s", regionecho[type]);
-			else if (!str_cmp(var, "vehicleecho"))
-				snprintf(str, slen, "%s", vehicleecho[type]);
-			else if (!str_cmp(var, "asound"))
-				snprintf(str, slen, "%s", asound[type]);
-			else if (!str_cmp(var, "at"))
-				snprintf(str, slen, "%s", at[type]);
-			else if (!str_cmp(var, "transform"))
-				snprintf(str, slen, "%s", transform[type]);
-			else if (!str_cmp(var, "adventurecomplete")) {
-				snprintf(str, slen, "%s", adventurecomplete[type]);
+			else if ((num = search_block(var, script_commands, TRUE)) != NOTHING) {
+				snprintf(str, slen, "%c%s", cmd_prefix[type], script_commands[num]);
 			}
 			else if (!str_cmp(var, "timestamp")) {
 				snprintf(str, slen, "%ld", time(0));
