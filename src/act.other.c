@@ -1557,7 +1557,7 @@ ACMD(do_morph) {
 	// initialize
 	morph = NULL;
 	normal = !str_cmp(argument, "normal");
-	multiplier = (FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) ? 2.0 : 1.0;
+	multiplier = (subcmd == SCMD_FASTMORPH || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) ? 2.0 : 1.0;
 	
 	if (normal && !IS_MORPHED(ch)) {
 		msg_to_char(ch, "You aren't morphed.\r\n");
@@ -1592,7 +1592,7 @@ ACMD(do_morph) {
 			GET_CURRENT_POOL(ch, MORPH_COST_TYPE(morph)) -= MORPH_COST(morph) * multiplier;
 		}
 		
-		if (IS_NPC(ch) || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) {
+		if (IS_NPC(ch) || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING || subcmd == SCMD_FASTMORPH) {
 			// insta-morph!
 			finish_morphing(ch, morph);
 			command_lag(ch, WAIT_OTHER);
