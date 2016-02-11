@@ -609,9 +609,8 @@ void check_for_bad_buildings(void) {
 			unlink_instance_entrance(room);
 		}
 		else if (COMPLEX_DATA(room) && !GET_BUILDING(room) && !GET_ROOM_TEMPLATE(room)) {
-			log(" removing complex data for no building, no template data");
-			free_complex_data(COMPLEX_DATA(room));
-			COMPLEX_DATA(room) = NULL;
+			log(" removing complex data from %d for no building, no template data", GET_ROOM_VNUM(room));
+			disassociate_building(room);
 		}
 	}
 	if (deleted) {
