@@ -208,6 +208,8 @@ are player-only), in addition to some special commands:
 &c%echoneither%&0 - Sends a message to all but two targets.
 &c%force%&0 - Forces a person to perform a command.
 &c%load%&0 - Loads a mob, object, etc.
+&c%morph%&0 - Causes a person to morph.
+&c%own%&0 - Changes ownership on something.
 &c%purge%&0 - Purges a mob, object, etc.
 &c%regionecho%&0 - Sends a message to a whole map region.
 &c%scale%&0 - Re-scales the target to a different level.
