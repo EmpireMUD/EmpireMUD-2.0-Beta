@@ -282,6 +282,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 	struct global_data *glb, *next_glb;
 	ability_data *abiter, *next_abiter;
 	craft_data *craft, *next_craft;
+	morph_data *morph, *next_morph;
 	skill_data *skill, *next_skill;
 	augment_data *aug, *next_aug;
 	class_data *cls, *next_cls;
@@ -337,6 +338,14 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		if (GET_GLOBAL_ABILITY(glb) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+		}
+	}
+	
+	// morphs
+	HASH_ITER(hh, morph_table, morph, next_morph) {
+		if (MORPH_ABILITY(morph) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "MPH [%5d] %s\r\n", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
 		}
 	}
 	
@@ -627,6 +636,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	ability_data *abil, *abiter, *next_abiter;
 	struct global_data *glb, *next_glb;
 	craft_data *craft, *next_craft;
+	morph_data *morph, *next_morph;
 	skill_data *skill, *next_skill;
 	augment_data *aug, *next_aug;
 	class_data *cls, *next_cls;
@@ -685,6 +695,15 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update morphs
+	HASH_ITER(hh, morph_table, morph, next_morph) {
+		if (MORPH_ABILITY(morph) == vnum) {
+			MORPH_ABILITY(morph) = NOTHING;
+			SET_BIT(MORPH_FLAGS(morph), MORPHF_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_MORPH, MORPH_VNUM(morph));
+		}
+	}
+	
 	// update skills
 	HASH_ITER(hh, skill_table, skill, next_skill) {
 		found = remove_vnum_from_skill_abilities(&SKILL_ABILITIES(skill), vnum);
@@ -739,6 +758,12 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			if (GET_GLOBAL_ABILITY(GET_OLC_GLOBAL(desc)) == vnum) {
 				GET_GLOBAL_ABILITY(GET_OLC_GLOBAL(desc)) = NOTHING;
 				msg_to_desc(desc, "The required ability has been deleted from the global you're editing.\r\n");
+			}
+		}
+		if (GET_OLC_MORPH(desc)) {
+			if (MORPH_ABILITY(GET_OLC_MORPH(desc)) == vnum) {
+				MORPH_ABILITY(GET_OLC_MORPH(desc)) = NOTHING;
+				msg_to_desc(desc, "The required ability has been deleted from the morph you're editing.\r\n");
 			}
 		}
 		if (GET_OLC_SKILL(desc)) {

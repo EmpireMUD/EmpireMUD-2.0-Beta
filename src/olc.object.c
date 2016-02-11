@@ -361,6 +361,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	craft_data *craft, *next_craft;
+	morph_data *morph, *next_morph;
 	augment_data *aug, *next_aug;
 	crop_data *crop, *next_crop;
 	empire_data *emp, *next_emp;
@@ -548,6 +549,21 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// update morphs
+	HASH_ITER(hh, morph_table, morph, next_morph) {
+		found = FALSE;
+		
+		if (MORPH_REQUIRES_OBJ(morph) == vnum) {
+			MORPH_REQUIRES_OBJ(morph) = NOTHING;
+			found = TRUE;
+		}
+		
+		if (found) {
+			SET_BIT(MORPH_FLAGS(morph), MORPHF_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_MORPH, MORPH_VNUM(morph));
+		}
+	}
+	
 	// update room templates
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_OBJ, vnum);
@@ -647,6 +663,20 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				msg_to_char(desc->character, "One of the objects in an interaction for the mob you're editing was deleted.\r\n");
 			}
 		}
+		if (GET_OLC_MORPH(desc)) {
+			found = FALSE;
+			
+			if (MORPH_REQUIRES_OBJ(GET_OLC_MORPH(desc)) == vnum) {
+				MORPH_REQUIRES_OBJ(GET_OLC_MORPH(desc)) = NOTHING;
+				found = TRUE;
+			}
+			
+			if (found) {
+				SET_BIT(MORPH_FLAGS(GET_OLC_MORPH(desc)), MORPHF_IN_DEVELOPMENT);
+				msg_to_char(desc->character, "The object required by the morph you're editing was deleted.\r\n");
+			}
+	
+		}
 		if (GET_OLC_ROOM_TEMPLATE(desc)) {
 			if (delete_from_spawn_template_list(&GET_OLC_ROOM_TEMPLATE(desc)->spawns, ADV_SPAWN_OBJ, vnum)) {
 				msg_to_char(desc->character, "One of the objects that spawns in the room template you're editing was deleted.\r\n");
@@ -685,6 +715,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	struct global_data *glb, *next_glb;
 	archetype_data *arch, *next_arch;
 	craft_data *craft, *next_craft;
+	morph_data *morph, *next_morph;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	augment_data *aug, *next_aug;
@@ -813,6 +844,14 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 			}
+		}
+	}
+	
+	// morphs
+	HASH_ITER(hh, morph_table, morph, next_morph) {
+		if (MORPH_REQUIRES_OBJ(morph) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "MPH [%5d] %s\r\n", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
 		}
 	}
 	
