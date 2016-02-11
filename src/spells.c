@@ -71,7 +71,7 @@ struct damage_spell_type {
 	// affect group: all this only matters if aff_type != -1
 	int aff_type;	// ATYPE_, -1 for none
 	int duration;	// time for the affect
-	int apply;	// APPLY_x, 0 for none
+	int apply;	// APPLY_, 0 for none
 	int modifier;	// +/- value, if apply != 0
 	bitvector_t aff_flag;	// AFF_x, 0 for none
 	

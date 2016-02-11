@@ -405,7 +405,6 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	void show_character_affects(char_data *ch, char_data *to);
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
-	extern int get_blood_upkeep_cost(char_data *ch);
 	extern int get_crafting_level(char_data *ch);
 	extern int total_bonus_healing(char_data *ch);
 	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
@@ -491,7 +490,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	msg_to_char(to, "  Conditions: %-*.*s", count, count, lbuf);
 	
 	if (IS_VAMPIRE(ch)) {
-		msg_to_char(to, " Blood: &r%d&0/&r%d&0-&r%d&0/hr\r\n", GET_BLOOD(ch), GET_MAX_BLOOD(ch), get_blood_upkeep_cost(ch));
+		msg_to_char(to, " Blood: &r%d&0/&r%d&0-&r%d&0/hr\r\n", GET_BLOOD(ch), GET_MAX_BLOOD(ch), MAX(0, GET_BLOOD_UPKEEP(ch)));
 	}
 	else {
 		msg_to_char(to, "\r\n");

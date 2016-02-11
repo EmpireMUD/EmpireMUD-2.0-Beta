@@ -286,7 +286,6 @@ int limit_crowd_control(char_data *victim, int atype) {
 * @param char_data *ch The character to update.
 */
 void point_update_char(char_data *ch) {
-	extern int get_blood_upkeep_cost(char_data *ch);
 	void despawn_mob(char_data *ch);
 	
 	struct cooldown_data *cool, *next_cool;
@@ -346,7 +345,7 @@ void point_update_char(char_data *ch) {
 	
 	// bloody upkeep
 	if (IS_VAMPIRE(ch)) {
-		GET_BLOOD(ch) -= get_blood_upkeep_cost(ch);
+		GET_BLOOD(ch) -= MAX(0, GET_BLOOD_UPKEEP(ch));
 		
 		if (GET_BLOOD(ch) < 0) {
 			out_of_blood(ch);
@@ -659,7 +658,7 @@ void real_update_char(char_data *ch) {
 		update_vampire_sun(ch);
 	}
 
-	if (!AWAKE(ch) && IS_MORPHED(ch) && MORPH_VNUM(GET_MORPH(ch)) == MORPH_MIST) {
+	if (!AWAKE(ch) && IS_MORPHED(ch) && CHAR_MORPH_FLAGGED(ch, MORPHF_NO_SLEEP)) {
 		sprintf(buf, "%s has become $n!", PERS(ch, ch, 0));
 
 		perform_morph(ch, NULL);

@@ -232,8 +232,8 @@ struct b2_affected_type {
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// For how long its effects will last
 	int modifier;	// This is added to apropriate ability
-	byte location;	// Tells which ability to change - APPLY_x
-	bitvector_t bitvector;	// Tells which bits to set - AFF_x
+	byte location;	// Tells which ability to change - APPLY_
+	bitvector_t bitvector;	// Tells which bits to set - AFF_
 
 	struct b2_affected_type *next;
 };
@@ -243,7 +243,7 @@ struct b2_char_point_data {
 	int max_pools[b2_NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	int deficit[b2_NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	
-	int extra_attributes[b2_TOTAL_EXTRA_ATTRIBUTES];	// ATT_x (dodge, etc)
+	int extra_attributes[b2_TOTAL_EXTRA_ATTRIBUTES];	// ATT_ (dodge, etc)
 };
 
 struct b2_over_time_effect_type {
@@ -479,8 +479,8 @@ struct b3_affected_type {
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// For how long its effects will last
 	int modifier;	// This is added to apropriate ability
-	byte location;	// Tells which ability to change - APPLY_x
-	bitvector_t bitvector;	// Tells which bits to set - AFF_x
+	byte location;	// Tells which ability to change - APPLY_
+	bitvector_t bitvector;	// Tells which bits to set - AFF_
 
 	struct b3_affected_type *next;
 };
@@ -490,7 +490,7 @@ struct b3_char_point_data {
 	int max_pools[b3_NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	int deficit[b3_NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	
-	int extra_attributes[b3_TOTAL_EXTRA_ATTRIBUTES];	// ATT_x (dodge, etc)
+	int extra_attributes[b3_TOTAL_EXTRA_ATTRIBUTES];	// ATT_ (dodge, etc)
 };
 
 struct b3_over_time_effect_type {

@@ -281,6 +281,7 @@
 #define GET_MOVE(ch)  GET_CURRENT_POOL(ch, MOVE)
 #define GET_MAX_MOVE(ch)  GET_MAX_POOL(ch, MOVE)
 #define GET_BLOOD(ch)  GET_CURRENT_POOL(ch, BLOOD)
+#define GET_BLOOD_UPKEEP(ch)  GET_EXTRA_ATT(ch, ATT_BLOOD_UPKEEP)
 extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max pools, and max_pools[BLOOD] is not used.
 #define GET_HEALTH_DEFICIT(ch)  GET_DEFICIT((ch), HEALTH)
 #define GET_MOVE_DEFICIT(ch)  GET_DEFICIT((ch), MOVE)

@@ -236,10 +236,10 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 * This is the core function used by various affects and equipment to apply or
 * remove things to a player.
 *
-* This is where APPLY_x consts are mapped to their effects.
+* This is where APPLY_ consts are mapped to their effects.
 *
 * @param char_data *ch The person to apply to
-* @param byte loc APPLY_x const
+* @param byte loc APPLY_ const
 * @param sh_int mod The modifier amount for the apply
 * @param bitvector_t bitv AFF_x bits
 * @param bool add if TRUE, applies this effect; if FALSE, removes it
@@ -255,7 +255,8 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		REMOVE_BIT(AFF_FLAGS(ch), bitv);
 		mod = -mod;
 	}
-
+	
+	// APPLY_x:
 	switch (loc) {
 		case APPLY_NONE:
 			break;
@@ -407,6 +408,10 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		}
 		case APPLY_CRAFTING: {
 			SAFE_ADD(GET_CRAFTING_BONUS(ch), mod, INT_MIN, INT_MAX, TRUE);
+			break;
+		}
+		case APPLY_BLOOD_UPKEEP: {
+			SAFE_ADD(GET_BLOOD_UPKEEP(ch), mod, INT_MIN, INT_MAX, TRUE);
 			break;
 		}
 		default:

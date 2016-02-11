@@ -265,6 +265,7 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_BONUS_HEALING  23	// add to healing
 #define APPLY_RESIST_MAGICAL  24	// Apply to magic damage resistance
 #define APPLY_CRAFTING  25	// bonus craft levels
+#define APPLY_BLOOD_UPKEEP  26	// vampire blood requirement
 
 
 // don't change these
@@ -572,7 +573,8 @@ typedef struct vehicle_data vehicle_data;
 #define ATT_HEAL_OVER_TIME  9	// heal per 5
 #define ATT_RESIST_MAGICAL  10	// damage reduction
 #define ATT_CRAFTING_BONUS  11	// levels added to crafting
-#define NUM_EXTRA_ATTRIBUTES  12
+#define ATT_BLOOD_UPKEEP  12	// blood cost per hour
+#define NUM_EXTRA_ATTRIBUTES  13
 
 
 /* Affect bits */
@@ -1798,7 +1800,7 @@ struct ability_data {
 
 // apply types for augments and morphs
 struct apply_data {
-	int location;	// APPLY_x
+	int location;	// APPLY_
 	int weight;	// what percent of points go to this
 	struct apply_data *next;	// linked list
 };
@@ -1810,8 +1812,8 @@ struct affected_type {
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// For how long its effects will last
 	int modifier;	// This is added to apropriate ability
-	byte location;	// Tells which ability to change - APPLY_x
-	bitvector_t bitvector;	// Tells which bits to set - AFF_x
+	byte location;	// Tells which ability to change - APPLY_
+	bitvector_t bitvector;	// Tells which bits to set - AFF_
 
 	struct affected_type *next;
 };
@@ -1974,7 +1976,7 @@ struct morph_data {
 // for items -- this replaces CircleMUD's obj_affected_type
 struct obj_apply {
 	byte apply_type;	// APPLY_TYPE_x
-	byte location;	// Which ability to change (APPLY_XXX)
+	byte location;	// Which ability to change (APPLY_)
 	sh_int modifier;	// How much it changes by
 	
 	struct obj_apply *next;	// linked list
@@ -2815,7 +2817,7 @@ struct char_point_data {
 	int max_pools[NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	int deficit[NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	
-	int extra_attributes[NUM_EXTRA_ATTRIBUTES];	// ATT_x (dodge, etc)
+	int extra_attributes[NUM_EXTRA_ATTRIBUTES];	// ATT_ (dodge, etc)
 };
 
 
@@ -3417,7 +3419,7 @@ struct obj_data {
 	room_data *in_room;	// In what room -- NULL when container/carried
 
 	struct obj_flag_data obj_flags;	// Object information
-	struct obj_apply *applies;	// APPLY_x list
+	struct obj_apply *applies;	// APPLY_ list
 
 	char *name;	// Title of object: get, etc.
 	char *description;	// When in room (long desc)

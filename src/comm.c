@@ -276,7 +276,6 @@ void msdp_update_room(char_data *ch) {
 */
 static void msdp_update(void) {
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
-	extern int get_blood_upkeep_cost(char_data *ch);
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_crafting_level(char_data *ch);
 	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
@@ -323,7 +322,7 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_MOVEMENT_REGEN, move_gain(ch, TRUE));
 			MSDPSetNumber(d, eMSDP_BLOOD, GET_BLOOD(ch));
 			MSDPSetNumber(d, eMSDP_BLOOD_MAX, GET_MAX_BLOOD(ch));
-			MSDPSetNumber(d, eMSDP_BLOOD_UPKEEP, get_blood_upkeep_cost(ch));
+			MSDPSetNumber(d, eMSDP_BLOOD_UPKEEP, MAX(0, GET_BLOOD_UPKEEP(ch)));
 			
 			// affects
 			*buf = '\0';

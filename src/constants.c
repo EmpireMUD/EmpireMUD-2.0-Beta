@@ -322,6 +322,7 @@ const char *extra_attribute_types[] = {
 	"Heal-Over-Time",
 	"Resist-Magical",	// 10
 	"Crafting-Bonus",
+	"Blood-Upkeep",
 	"\n"
 };
 
@@ -1052,6 +1053,7 @@ const char *apply_types[] = {
 	"BONUS-HEALING",
 	"RESIST-MAGICAL",
 	"CRAFTING",
+	"BLOOD-UPKEEP",
 	"\n"
 };
 
@@ -1083,7 +1085,8 @@ const double apply_values[] = {
 	1,	// BONUS-MAGICAL
 	1,	// BONUS-HEALING
 	0.5,	// RESIST-MAGICAL
-	0.01	// CRAFTING
+	0.01,	// CRAFTING
+	1,	// BLOOD-UPKEEP
 };
 
 
@@ -1114,7 +1117,8 @@ const int apply_attribute[] = {
 	NOTHING,	// bonus-mag
 	NOTHING,	// bonus-heal
 	NOTHING,	// resist-magical
-	NOTHING	// crafting
+	NOTHING,	// crafting
+	NOTHING	// blood-upkeep
 };
 
 
