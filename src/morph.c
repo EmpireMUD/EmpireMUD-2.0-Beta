@@ -767,11 +767,19 @@ morph_data *create_morph_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_morph(char_data *ch, any_vnum vnum) {
+	char_data *chiter, *next_ch;
 	morph_data *morph;
 	
 	if (!(morph = morph_proto(vnum))) {
 		msg_to_char(ch, "There is no such morph %d.\r\n", vnum);
 		return;
+	}
+	
+	// un-morph everyone
+	LL_FOREACH_SAFE(character_list, chiter, next_ch) {
+		if (IS_MORPHED(chiter) && MORPH_VNUM(GET_MORPH(chiter)) == vnum) {
+			finish_morphing(chiter, NULL);
+		}
 	}
 	
 	// remove it from the hash table first
