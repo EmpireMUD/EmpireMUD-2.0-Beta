@@ -2973,6 +2973,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");
 						}
 					}
+					else if (!str_cmp(field, "morph")) {
+						snprintf(str, slen, "%d", IS_MORPHED(c) ? MORPH_VNUM(GET_MORPH(c)) : 0);
+					}
 				
 					break;
 				}

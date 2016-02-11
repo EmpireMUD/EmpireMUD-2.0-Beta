@@ -344,6 +344,7 @@ When using field  - The variable returns:
 &cmaxmana&0 - The maximum mana points of the actor.
 &cmaxmove&0 - The maximum movement points of the actor.
 &cmob_flagged(FLAG)&0 - Returns TRUE if the NPC has the given flag, e.g. VAMPIRE.
+&cmorph&0 - The vnum of the person's morph form (if morphed) or 0 if not morphed.
 &cmove&0 - The movement points of the actor.
 &cmove(amount)&0 - Add/subtract movement points on the actor.
 &cname&0 - The actor's name (the short description for mobs).
