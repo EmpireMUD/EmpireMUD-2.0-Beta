@@ -2587,14 +2587,14 @@ Apply types (optional) let you specify which applies come from enchantments or
 other sources (the default is "natural").
 
 Most applies are self-explanatory:
- STRENGTH - characters can't use an item that would reduce them below 1 strength
+ STRENGTH - characters can't use an item that would reduce them below 1
  DEXTERITY - chance to hit/dodge
  HEALTH-REGEN - rate of health regen (per 5 second tick)
- CHARISMA - characters can't use an item that would reduce them below 1 charisma
- GREATNESS - empire meta-trait
+ CHARISMA - characters can't use an item that would reduce them below 1
+ GREATNESS - empire meta-trait (unscaled)
  MOVE-REGEN - rate of move regen (per 5 second tick)
  MANA-REGEN - rate of mana regen (per 5 second tick)
- INTELLIGENCE - characters can't use an item that would reduce them below 1 intelligence
+ INTELLIGENCE - characters can't use an item that would reduce them below 1
  WITS - combat speed
  AGE - this actually raises/lowers the player's age, which has no effect
  MAX-MOVE - move pool
@@ -2611,8 +2611,8 @@ Most applies are self-explanatory:
  BONUS-MAGICAL - added to magical damage
  BONUS-HEALING - added to damage healed (by abilities this player uses)
  RESIST-MAGICAL - magical damage reduction
- CRAFTING - bonus to craft level
- BLOOD-UPKEEP - adds to how much blood vampires must spend per hour
+ CRAFTING - bonus to craft level (unscaled)
+ BLOOD-UPKEEP - adds to how much blood vampires must spend per hour (unscaled)
 
 See also: OLC OBJECTS
 #d
