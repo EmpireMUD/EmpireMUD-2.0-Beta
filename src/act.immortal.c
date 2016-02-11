@@ -2704,6 +2704,13 @@ void do_stat_character(char_data *ch, char_data *k) {
 		msg_to_char(ch, "Hunger: %d, Thirst: %d, Drunk: %d\r\n", GET_COND(k, FULL), GET_COND(k, THIRST), GET_COND(k, DRUNK));
 		msg_to_char(ch, "Recent deaths: %d\r\n", GET_RECENT_DEATH_COUNT(k));
 	}
+	
+	if (IS_MORPHED(k)) {
+		msg_to_char(ch, "Morphed into: %d - %s\r\n", MORPH_VNUM(GET_MORPH(k)), MORPH_SHORT_DESC(GET_MORPH(k)));
+	}
+	if (IS_DISGUISED(k)) {
+		msg_to_char(ch, "Disguised as: %s\r\n", GET_DISGUISED_NAME(k));
+	}
 
 	if (!is_proto) {
 		sprintf(buf, "Master is: %s, Followers are:", ((k->master) ? GET_NAME(k->master) : "<none>"));
