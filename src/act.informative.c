@@ -952,10 +952,16 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch) {
 */
 void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	char buf[MAX_STRING_LENGTH];
+	bool disguise;
 	int j, found;
+		// only show this block if the person is not morphed, or the morph is not an npc disguise
+	//if (IS_NPC(i) || IS_IMMORTAL(ch) || !IS_MORPHED(i) || !CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)) {
+
 
 	if (!i || !ch || !ch->desc)
 		return;
+	
+	disguise = !IS_IMMORTAL(ch) && (IS_DISGUISED(i) || (IS_MORPHED(i) && CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)));
 	
 	if (show_eq && ch != i && !IS_IMMORTAL(ch) && !IS_NPC(i) && has_ability(i, ABIL_CONCEALMENT)) {
 		show_eq = FALSE;
@@ -963,52 +969,48 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	}
 
 	if (ch != i) {
-		act("You look at $N.", FALSE, ch, 0, i, TO_CHAR);
+		act("You look at $N.", FALSE, ch, FALSE, i, TO_CHAR);
 	}
 	
-	// only show this block if the person is not morphed, or the morph is not an npc disguise
-	if (IS_NPC(i) || IS_IMMORTAL(ch) || !IS_MORPHED(i) || !CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)) {
-		
-		if (GET_LOYALTY(i) && !IS_DISGUISED(i) && !CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)) {
-			sprintf(buf, "   $E is a member of %s.", EMPIRE_NAME(GET_LOYALTY(i)));
-			act(buf, FALSE, ch, NULL, i, TO_CHAR);
-		}
-		
-		if (!IS_NPC(i) && !IS_DISGUISED(i)) {
-			// basic description -- don't show if morphed
-			if (GET_LONG_DESC(i) && !IS_MORPHED(i)) {
-				msg_to_char(ch, "%s&0", GET_LONG_DESC(i));
-			}
-
-			if (HAS_INFRA(i)) {
-				act("   You notice a distinct, red glint in $S eyes.", FALSE, ch, NULL, i, TO_CHAR);
-			}
-			if (AFF_FLAGGED(i, AFF_CLAWS)) {
-				act("   $N's hands are huge, distorted, and very sharp!", FALSE, ch, NULL, i, TO_CHAR);
-			}
-			if (AFF_FLAGGED(i, AFF_MAJESTY)) {
-				act("   $N has an aura of majesty about $M.", FALSE, ch, NULL, i, TO_CHAR);
-			}
-			if (AFF_FLAGGED(i, AFF_MUMMIFY)) {
-				act("   $E is mummified in a hard, dark substance!", FALSE, ch, NULL, i, TO_CHAR);
-			}
-			diag_char_to_char(i, ch);
-		}
-		else {
-			diag_char_to_char(i, ch);
+	if (GET_LOYALTY(i) && !disguise) {
+		sprintf(buf, "   $E is a member of %s.", EMPIRE_NAME(GET_LOYALTY(i)));
+		act(buf, FALSE, ch, NULL, i, TO_CHAR);
+	}
+	
+	if (!IS_NPC(i) && !disguise) {
+		// basic description -- don't show if morphed
+		if (GET_LONG_DESC(i) && !IS_MORPHED(i)) {
+			msg_to_char(ch, "%s&0", GET_LONG_DESC(i));
 		}
 
-		if (!show_eq) {
-			return;
+		if (HAS_INFRA(i)) {
+			act("   You notice a distinct, red glint in $S eyes.", FALSE, ch, NULL, i, TO_CHAR);
 		}
+		if (AFF_FLAGGED(i, AFF_CLAWS)) {
+			act("   $N's hands are huge, distorted, and very sharp!", FALSE, ch, NULL, i, TO_CHAR);
+		}
+		if (AFF_FLAGGED(i, AFF_MAJESTY)) {
+			act("   $N has an aura of majesty about $M.", FALSE, ch, NULL, i, TO_CHAR);
+		}
+		if (AFF_FLAGGED(i, AFF_MUMMIFY)) {
+			act("   $E is mummified in a hard, dark substance!", FALSE, ch, NULL, i, TO_CHAR);
+		}
+		diag_char_to_char(i, ch);
+	}
+	else {	// npc or disguised
+		diag_char_to_char(i, ch);
+	}
 
+	if (show_eq && !disguise) {
+		// check if there's eq to see
 		found = FALSE;
 		for (j = 0; !found && j < NUM_WEARS; j++) {
 			if (GET_EQ(i, j) && CAN_SEE_OBJ(ch, GET_EQ(i, j))) {
 				found = TRUE;
 			}
 		}
-
+	
+		// show eq
 		if (found) {
 			msg_to_char(ch, "\r\n");	/* act() does capitalization. */
 			act("$n is using:", FALSE, i, 0, ch, TO_VICT);
@@ -1019,21 +1021,18 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 				}
 			}
 		}
-	}
+	
+		// show inventory
+		if (ch != i && has_ability(ch, ABIL_APPRAISAL)) {
+			act("\r\nYou appraise $s inventory:", FALSE, i, 0, ch, TO_VICT);
+			list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
 
-	if (!show_eq) {
-		return;
-	}
-
-	if (ch != i && (IS_IMMORTAL(ch) || !IS_MORPHED(i) || !CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)) && has_ability(ch, ABIL_APPRAISAL)) {
-		act("\r\nYou appraise $s inventory:", FALSE, i, 0, ch, TO_VICT);
-		list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
-
-		if (ch != i && i->carrying) {
-			if (can_gain_exp_from(ch, i)) {
-				gain_ability_exp(ch, ABIL_APPRAISAL, 5);
+			if (ch != i && i->carrying) {
+				if (can_gain_exp_from(ch, i)) {
+					gain_ability_exp(ch, ABIL_APPRAISAL, 5);
+				}
+				GET_WAIT_STATE(ch) = MAX(GET_WAIT_STATE(ch), 0.5 RL_SEC);
 			}
-			GET_WAIT_STATE(ch) = MAX(GET_WAIT_STATE(ch), 0.5 RL_SEC);
 		}
 	}
 }
