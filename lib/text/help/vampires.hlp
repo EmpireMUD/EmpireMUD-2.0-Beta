@@ -388,12 +388,15 @@ the strength of others for 75 seconds.
 
 Wolf Form (Vampire ability)
 
-Usage:  morph wolf
+Usage:  morph <wolf>
 Cost:  20 blood (40 in combat)
 Upkeep:  1 blood/hr
 
 With Wolf Form, the vampire taps into its primal nature to become a wolf. In
 this form, he is nearly indistinguishable from a wild animal.
+
+This also allows him to turn into coyotes and ocelots, which are useful more
+disguises in certain terrains.
 
 See also: MORPH
 #

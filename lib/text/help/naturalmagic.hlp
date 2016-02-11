@@ -40,19 +40,19 @@ Note: Bonus healing does not add to the cost of healing spells.
 
 See also: HEAL, REJUVENATE
 #
-"ANIMAL FORMS" "DEER FORM" "OSTRICH FORM" "TAPIR FORM"
+"ANIMAL FORMS"
 
 Animal Forms (Natural Magic ability)
 
-Usage:  morph <deer | ostrich | tapir>
+Usage:  morph <type>
 Cost:  25 mana (50 in combat)
 
 A skilled nature mage can take on the forms of different animals to disguise
 him- or herself. Each of these forms must be used in a different environment:
 
-deer: plains or forest
-ostrich: desert, grove, or oasis
-tapir: jungle or swamp
+plains/forest: deer, raccoon, forest turtle
+desert/grove: ostrich, bobcat, sidewinder
+jungle/swamp: tapir, monkey, muskrat
 
 See also: MORPH
 #
