@@ -69,6 +69,13 @@ void cancel_blood_upkeeps(char_data *ch) {
 		any = FALSE;
 		LL_FOREACH(ch->affected, aff) {
 			if (aff->location == APPLY_BLOOD_UPKEEP && aff->modifier > 0) {
+				// special case: morphs
+				if (aff->type == ATYPE_MORPH) {
+					perform_morph(ch, NULL);
+					any = TRUE;
+					break;
+				}
+				
 				msg_to_char(ch, "Your %s fades.\r\n", affect_types[aff->type]);
 				snprintf(buf, sizeof(buf), "$n's %s fades.", affect_types[aff->type]);
 				act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
