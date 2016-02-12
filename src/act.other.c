@@ -1557,7 +1557,7 @@ ACMD(do_morph) {
 	
 	// initialize
 	morph = NULL;
-	normal = !str_cmp(argument, "normal");
+	normal = (!str_cmp(argument, "normal") | !str_cmp(argument, "norm"));
 	multiplier = (subcmd == SCMD_FASTMORPH || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) ? 2.0 : 1.0;
 	
 	if (normal && !IS_MORPHED(ch)) {
