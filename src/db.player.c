@@ -1420,7 +1420,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 				}
 				else if (PFILE_TAG(line, "Morph:", length)) {
-					GET_MORPH(ch) = atoi(line + length + 1);
+					GET_MORPH(ch) = morph_proto(atoi(line + length + 1));
 				}
 				else if (PFILE_TAG(line, "Mount Flags:", length)) {
 					GET_MOUNT_FLAGS(ch) = asciiflag_conv(line + length + 1);
@@ -2088,8 +2088,8 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (GET_MAPSIZE(ch)) {
 		fprintf(fl, "Mapsize: %d\n", GET_MAPSIZE(ch));
 	}
-	if (GET_MORPH(ch) != MORPH_NONE) {
-		fprintf(fl, "Morph: %d\n", GET_MORPH(ch));
+	if (IS_MORPHED(ch)) {
+		fprintf(fl, "Morph: %d\n", MORPH_VNUM(GET_MORPH(ch)));
 	}
 	if (GET_MOUNT_FLAGS(ch) != NOBITS) {
 		fprintf(fl, "Mount Flags: %s\n", bitv_to_alpha(GET_MOUNT_FLAGS(ch)));
@@ -2896,6 +2896,12 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// place character
 	char_to_room(ch, load_room);
 	ch->prev_logon = ch->player.time.logon;	// and update prev_logon now
+	
+	// verify morph stats
+	if (!IS_MORPHED(ch)) {
+		affect_from_char(ch, ATYPE_MORPH);
+	}
+	
 	if (dolog) {
 		announce_login(ch);
 	}

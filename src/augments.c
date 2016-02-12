@@ -147,7 +147,7 @@ bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug, bo
 */
 bool audit_augment(augment_data *aug, char_data *ch) {
 	char temp[MAX_STRING_LENGTH];
-	struct augment_apply *app;
+	struct apply_data *app;
 	bool problem = FALSE;
 	
 	if (AUGMENT_FLAGGED(aug, AUG_IN_DEVELOPMENT)) {
@@ -211,7 +211,7 @@ bool audit_augment(augment_data *aug, char_data *ch) {
 char *list_one_augment(augment_data *aug, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	char part[MAX_STRING_LENGTH], applies[MAX_STRING_LENGTH];
-	struct augment_apply *app;
+	struct apply_data *app;
 	ability_data *abil;
 	
 	if (detail) {
@@ -377,49 +377,6 @@ void clear_augment(augment_data *aug) {
 
 
 /**
-* Copies a list of augment applies.
-*
-* @param struct augment_apply *input The list to copy.
-* @return struct augment_apply* The copied list.
-*/
-struct augment_apply *copy_augment_applies(struct augment_apply *input) {
-	struct augment_apply *new, *last, *list, *iter;
-	
-	last = NULL;
-	list = NULL;
-	for (iter = input; iter; iter = iter->next) {
-		CREATE(new, struct augment_apply, 1);
-		*new = *iter;
-		new->next = NULL;
-		
-		if (last) {
-			last->next = new;
-		}
-		else {
-			list = new;
-		}
-		last = new;
-	}
-	
-	return list;
-}
-
-
-/**
-* Frees a list of augment applies.
-*
-* @param struct augment_apply *list The start of the list to free.
-*/
-void free_augment_applies(struct augment_apply *list) {
-	struct augment_apply *app;
-	while ((app = list)) {
-		list = app->next;
-		free(app);
-	}
-}
-
-
-/**
 * frees up memory for an augment data item.
 *
 * See also: olc_delete_augment
@@ -434,7 +391,7 @@ void free_augment(augment_data *aug) {
 	}
 	
 	if (GET_AUG_APPLIES(aug) && (!proto || GET_AUG_APPLIES(aug) != GET_AUG_APPLIES(proto))) {
-		free_augment_applies(GET_AUG_APPLIES(aug));
+		free_apply_list(GET_AUG_APPLIES(aug));
 	}
 	
 	if (GET_AUG_RESOURCES(aug) && (!proto || GET_AUG_RESOURCES(aug) != GET_AUG_RESOURCES(proto))) {
@@ -452,10 +409,10 @@ void free_augment(augment_data *aug) {
 * @param any_vnum vnum The augment vnum
 */
 void parse_augment(FILE *fl, any_vnum vnum) {
+	void parse_apply(FILE *fl, struct apply_data **list, char *error_str);
 	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 
 	char line[256], error[256], str_in[256], str_in2[256];
-	struct augment_apply *app, *last_app = NULL;
 	augment_data *aug, *find;
 	int int_in[4];
 	
@@ -496,23 +453,7 @@ void parse_augment(FILE *fl, any_vnum vnum) {
 		}
 		switch (*line) {
 			case 'A': {	// applies
-				if (!get_line(fl, line) || sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
-					log("SYSERR: format error in A line of %s", error);
-					exit(1);
-				}
-				
-				CREATE(app, struct augment_apply, 1);
-				app->location = int_in[0];
-				app->weight = int_in[1];
-				
-				// append
-				if (last_app) {
-					last_app->next = app;
-				}
-				else {
-					GET_AUG_APPLIES(aug) = app;
-				}
-				last_app = app;
+				parse_apply(fl, &GET_AUG_APPLIES(aug), error);
 				break;
 			}
 			
@@ -561,10 +502,10 @@ void write_augments_index(FILE *fl) {
 * @param augment_data *aug The thing to save.
 */
 void write_augment_to_file(FILE *fl, augment_data *aug) {
+	void write_applies_to_file(FILE *fl, struct apply_data *list);
 	void write_resources_to_file(FILE *fl, struct resource_data *list);
 	
 	char temp[256], temp2[256];
-	struct augment_apply *app;
 	
 	if (!fl || !aug) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_augment_to_file called without %s", !fl ? "file" : "augment");
@@ -582,9 +523,7 @@ void write_augment_to_file(FILE *fl, augment_data *aug) {
 	fprintf(fl, "%d %s %s %d %d\n", GET_AUG_TYPE(aug), temp, temp2, GET_AUG_ABILITY(aug), GET_AUG_REQUIRES_OBJ(aug));
 	
 	// 'A': applies
-	for (app = GET_AUG_APPLIES(aug); app; app = app->next) {
-		fprintf(fl, "A\n%d %d\n", app->location, app->weight);
-	}
+	write_applies_to_file(fl, GET_AUG_APPLIES(aug));
 	
 	// 'R': resources
 	write_resources_to_file(fl, GET_AUG_RESOURCES(aug));
@@ -674,7 +613,7 @@ void save_olc_augment(descriptor_data *desc) {
 	if (GET_AUG_NAME(proto)) {
 		free(GET_AUG_NAME(proto));
 	}
-	free_augment_applies(GET_AUG_APPLIES(proto));
+	free_apply_list(GET_AUG_APPLIES(proto));
 	free_resource_list(GET_AUG_RESOURCES(proto));
 	
 	// sanity
@@ -708,6 +647,8 @@ void save_olc_augment(descriptor_data *desc) {
 * @return augment_data* The copied augment.
 */
 augment_data *setup_olc_augment(augment_data *input) {
+	extern struct apply_data *copy_apply_list(struct apply_data *input);
+	
 	augment_data *new;
 	
 	CREATE(new, augment_data, 1);
@@ -721,7 +662,7 @@ augment_data *setup_olc_augment(augment_data *input) {
 		GET_AUG_NAME(new) = GET_AUG_NAME(input) ? str_dup(GET_AUG_NAME(input)) : NULL;
 		
 		// copy lists
-		GET_AUG_APPLIES(new) = copy_augment_applies(GET_AUG_APPLIES(input));
+		GET_AUG_APPLIES(new) = copy_apply_list(GET_AUG_APPLIES(input));
 		GET_AUG_RESOURCES(new) = copy_resource_list(GET_AUG_RESOURCES(input));
 	}
 	else {
@@ -746,7 +687,7 @@ augment_data *setup_olc_augment(augment_data *input) {
 */
 void do_stat_augment(char_data *ch, augment_data *aug) {
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	struct augment_apply *app;
+	struct apply_data *app;
 	ability_data *abil;
 	size_t size;
 	int num;
@@ -801,7 +742,7 @@ void do_stat_augment(char_data *ch, augment_data *aug) {
 void olc_show_augment(char_data *ch) {
 	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
-	struct augment_apply *app;
+	struct apply_data *app;
 	ability_data *abil;
 	int num;
 	
@@ -912,135 +853,9 @@ OLC_MODULE(augedit_ability) {
 
 
 OLC_MODULE(augedit_apply) {
+	void olc_process_applies(char_data *ch, char *argument, struct apply_data **list);
 	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
-	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	struct augment_apply *apply, *next_apply, *change, *temp;
-	int loc, num, iter;
-	bool found;
-	
-	// arg1 arg2 arg3
-	half_chop(argument, arg1, buf);
-	half_chop(buf, arg2, arg3);
-	
-	if (is_abbrev(arg1, "remove")) {
-		if (!*arg2) {
-			msg_to_char(ch, "Remove which apply (number)?\r\n");
-		}
-		else if (!str_cmp(arg2, "all")) {
-			free_augment_applies(GET_AUG_APPLIES(aug));
-			GET_AUG_APPLIES(aug) = NULL;
-			msg_to_char(ch, "You remove all the applies.\r\n");
-		}
-		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
-			msg_to_char(ch, "Invalid apply number.\r\n");
-		}
-		else {
-			found = FALSE;
-			for (apply = GET_AUG_APPLIES(aug); apply && !found; apply = next_apply) {
-				next_apply = apply->next;
-				if (--num == 0) {
-					found = TRUE;
-					
-					msg_to_char(ch, "You remove the %d to %s.\r\n", apply->weight, apply_types[apply->location]);
-					REMOVE_FROM_LIST(apply, GET_AUG_APPLIES(aug), next);
-					free(apply);
-				}
-			}
-			
-			if (!found) {
-				msg_to_char(ch, "Invalid apply number.\r\n");
-			}
-		}
-	}
-	else if (is_abbrev(arg1, "add")) {
-		num = atoi(arg2);
-		
-		if (!*arg2 || !*arg3 || !isdigit(*arg2) || num <= 0) {
-			msg_to_char(ch, "Usage: apply add <value> <apply>\r\n");
-		}
-		else if ((loc = search_block(arg3, apply_types, FALSE)) == NOTHING) {
-			msg_to_char(ch, "Invalid apply.\r\n");
-		}
-		else {
-			CREATE(apply, struct augment_apply, 1);
-			apply->location = loc;
-			apply->weight = num;
-			
-			// append to end
-			if ((temp = GET_AUG_APPLIES(aug))) {
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = apply;
-			}
-			else {
-				GET_AUG_APPLIES(aug) = apply;
-			}
-			
-			msg_to_char(ch, "You add %d to %s.\r\n", num, apply_types[loc]);
-		}
-	}
-	else if (is_abbrev(arg1, "change")) {
-		strcpy(num_arg, arg2);
-		half_chop(arg3, type_arg, val_arg);
-		
-		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
-			msg_to_char(ch, "Usage: apply change <number> <value | apply> <new value>\r\n");
-			return;
-		}
-		
-		// find which one to change
-		if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
-			msg_to_char(ch, "Invalid apply number.\r\n");
-			return;
-		}
-		change = NULL;
-		for (apply = GET_AUG_APPLIES(aug); apply && !change; apply = apply->next) {
-			if (--num == 0) {
-				change = apply;
-				break;
-			}
-		}
-		if (!change) {
-			msg_to_char(ch, "Invalid apply number.\r\n");
-		}
-		else if (is_abbrev(type_arg, "value")) {
-			num = atoi(val_arg);
-			if ((!isdigit(*val_arg) && *val_arg != '-') || num == 0) {
-				msg_to_char(ch, "Invalid value '%s'.\r\n", val_arg);
-			}
-			else {
-				change->weight = num;
-				msg_to_char(ch, "Apply %d changed to value %d.\r\n", atoi(num_arg), num);
-			}
-		}
-		else if (is_abbrev(type_arg, "apply")) {
-			if ((loc = search_block(val_arg, apply_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid apply.\r\n");
-			}
-			else {
-				change->location = loc;
-				msg_to_char(ch, "Apply %d changed to %s.\r\n", atoi(num_arg), apply_types[loc]);
-			}
-		}
-		else {
-			msg_to_char(ch, "You can only change the value or apply.\r\n");
-		}
-	}
-	else {
-		msg_to_char(ch, "Usage: apply add <value> <apply>\r\n");
-		msg_to_char(ch, "Usage: apply change <number> <value | apply> <new value>\r\n");
-		msg_to_char(ch, "Usage: apply remove <number | all>\r\n");
-		
-		msg_to_char(ch, "Available applies:\r\n");
-		for (iter = 0; *apply_types[iter] != '\n'; ++iter) {
-			msg_to_char(ch, " %-24.24s%s", apply_types[iter], ((iter % 2) ? "\r\n" : ""));
-		}
-		if ((iter % 2) != 0) {
-			msg_to_char(ch, "\r\n");
-		}
-	}
+	olc_process_applies(ch, argument, &GET_AUG_APPLIES(aug));
 }
 
 

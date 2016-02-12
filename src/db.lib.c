@@ -3447,7 +3447,7 @@ void free_obj(obj_data *obj) {
 	free_obj_binding(&OBJ_BOUND_TO(obj));
 	
 	// applies are ALWAYS a copy
-	free_apply_list(GET_OBJ_APPLIES(obj));
+	free_obj_apply_list(GET_OBJ_APPLIES(obj));
 	
 	/* free any assigned scripts */
 	if (SCRIPT(obj)) {
@@ -5095,6 +5095,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	void parse_augment(FILE *fl, any_vnum vnum);
 	void parse_book(FILE *fl, int book_id);
 	void parse_class(FILE *fl, any_vnum vnum);
+	void parse_morph(FILE *fl, any_vnum vnum);
 	void parse_skill(FILE *fl, any_vnum vnum);
 	void parse_vehicle(FILE *fl, any_vnum vnum);
 	
@@ -5102,7 +5103,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	char line[256];
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle" };
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -5171,6 +5172,10 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 				case DB_BOOT_MOB:
 					parse_mobile(fl, nr);
 					break;
+				case DB_BOOT_MORPH: {
+					parse_morph(fl, nr);
+					break;
+				}
 				case DB_BOOT_EMP:
 					parse_empire(fl, nr);
 					break;
@@ -5264,7 +5269,7 @@ void index_boot(int mode) {
 
 	if (!rec_count) {
 		// DB_BOOT_x: some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL || mode == DB_BOOT_VEH) {
+		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL || mode == DB_BOOT_VEH || mode == DB_BOOT_MORPH) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -5344,6 +5349,11 @@ void index_boot(int mode) {
 			log("   %d globals, %d bytes in globals table.", rec_count, size[0]);
 			break;
 		}
+		case DB_BOOT_MORPH: {
+   			size[0] = sizeof(morph_data) * rec_count;
+			log("   %d morphs, %d bytes in prototypes.", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_NAMES: {
 			log("   %d name lists.", rec_count);
 			break;
@@ -5405,6 +5415,7 @@ void index_boot(int mode) {
 			case DB_BOOT_GLB:
 			case DB_BOOT_OBJ:
 			case DB_BOOT_MOB:
+			case DB_BOOT_MORPH:
 			case DB_BOOT_EMP:
 			case DB_BOOT_BOOKS:
 			case DB_BOOT_RMT:
@@ -5566,6 +5577,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, mobile_table, mob, next_mob) {
 				if (GET_MOB_VNUM(mob) >= (zone * 100) && GET_MOB_VNUM(mob) <= (zone * 100 + 99)) {
 					write_mob_to_file(fl, mob);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_MORPH: {
+			void write_morph_to_file(FILE *fl, morph_data *morph);
+			morph_data *morph, *next_morph;
+			HASH_ITER(hh, morph_table, morph, next_morph) {
+				if (MORPH_VNUM(morph) >= (zone * 100) && MORPH_VNUM(morph) <= (zone * 100 + 99)) {
+					write_morph_to_file(fl, morph);
 				}
 			}
 			break;
@@ -5903,6 +5924,11 @@ void save_index(int type) {
 		}
 		case DB_BOOT_MOB: {
 			write_mobile_index(fl);
+			break;
+		}
+		case DB_BOOT_MORPH: {
+			void write_morphs_index(FILE *fl);
+			write_morphs_index(fl);
 			break;
 		}
 		case DB_BOOT_OBJ: {
@@ -6810,12 +6836,41 @@ void sort_world_table(void) {
 //// MISCELLANEOUS LIB ///////////////////////////////////////////////////////
 
 /**
+* Copies a list of augment applies.
+*
+* @param struct apply_data *input The list to copy.
+* @return struct apply_data* The copied list.
+*/
+struct apply_data *copy_apply_list(struct apply_data *input) {
+	struct apply_data *new, *last, *list, *iter;
+	
+	last = NULL;
+	list = NULL;
+	for (iter = input; iter; iter = iter->next) {
+		CREATE(new, struct apply_data, 1);
+		*new = *iter;
+		new->next = NULL;
+		
+		if (last) {
+			last->next = new;
+		}
+		else {
+			list = new;
+		}
+		last = new;
+	}
+	
+	return list;
+}
+
+
+/**
 * Creates a copy of a list of applies.
 *
 * @param struct obj_apply *list The list to copy.
 * @return struct obj_apply* A pointer to the copy list.
 */
-struct obj_apply *copy_apply_list(struct obj_apply *list) {
+struct obj_apply *copy_obj_apply_list(struct obj_apply *list) {
 	struct obj_apply *new_list, *last, *iter, *new;
 	
 	new_list = last = NULL;
@@ -6891,11 +6946,25 @@ struct resource_data *create_resource_list(int first_vnum, int first_amount, ...
 
 
 /**
+* Frees a list of augment applies.
+*
+* @param struct apply_data *list The start of the list to free.
+*/
+void free_apply_list(struct apply_data *list) {
+	struct apply_data *app;
+	while ((app = list)) {
+		list = app->next;
+		free(app);
+	}
+}
+
+
+/**
 * Frees the memory for a list of object applies.
 *
 * @param struct obj_apply *list The start of the list to free.
 */
-void free_apply_list(struct obj_apply *list) {
+void free_obj_apply_list(struct obj_apply *list) {
 	struct obj_apply *app;
 	
 	while ((app = list)) {
@@ -6955,6 +7024,32 @@ void free_complex_data(struct complex_room_data *data) {
 	}
 	
 	free(data);
+}
+
+
+/**
+* Parses an 'A' apply tag, written by write_applies_to_file(). This file
+* should have just read the 'A' line, and the next line to read is its data.
+*
+* @param FILE *fl The file to read from.
+* @param struct apply_data **list The apply list to append to.
+* @param char *error_str An identifier to log if there is a problem.
+*/
+void parse_apply(FILE *fl, struct apply_data **list, char *error_str) {
+	struct apply_data *new;
+	char line[256];
+	int int_in[2];
+	
+	if (!fl || !list || !get_line(fl, line) || sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
+		log("SYSERR: format error in A line of %s", error_str ? error_str : "apply");
+		exit(1);
+	}
+	
+	CREATE(new, struct apply_data, 1);
+	new->location = int_in[0];
+	new->weight = int_in[1];
+	
+	LL_APPEND(*list, new);
 }
 
 
@@ -7040,4 +7135,19 @@ void parse_generic_name_file(FILE *fl, char *err_str) {
 	
 	// store actual final size
 	data->size = pos;
+}
+
+
+/**
+* Writes the A tag for any apply_data list.
+*
+* @param FILE *fl The file to write to.
+* @param struct apply_data *list The list of applies to write.
+*/
+void write_applies_to_file(FILE *fl, struct apply_data *list) {
+	struct apply_data *app;
+	
+	LL_FOREACH(list, app) {
+		fprintf(fl, "A\n%d %d\n", app->location, app->weight);
+	}
 }

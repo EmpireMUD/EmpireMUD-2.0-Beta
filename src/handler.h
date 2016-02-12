@@ -45,7 +45,7 @@
 //// HANDLER MACROS //////////////////////////////////////////////////////////
 
 #define MATCH_ITEM_NAME(str, obj)  (isname((str), GET_OBJ_KEYWORDS(obj)) || (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0 && isname((str), drinks[GET_DRINK_CONTAINER_TYPE(obj)])))
-#define MATCH_CHAR_DISGUISED_NAME(str, ch)  (isname((str), PERS((ch),(ch),FALSE)))
+#define MATCH_CHAR_DISGUISED_NAME(str, ch)  ((IS_MORPHED(ch) && isname((str), MORPH_KEYWORDS(GET_MORPH(ch)))) || (IS_DISGUISED(ch) && isname((str), GET_DISGUISED_NAME(ch))))
 #define MATCH_CHAR_NAME(str, ch)  ((!IS_NPC(ch) && GET_LASTNAME(ch) && isname((str), GET_LASTNAME(ch))) || isname((str), GET_PC_NAME(ch)) || MATCH_CHAR_DISGUISED_NAME(str, ch))
 #define MATCH_CHAR_NAME_ROOM(viewer, str, target)  ((IS_DISGUISED(target) && !IS_IMMORTAL(viewer) && !SAME_EMPIRE(viewer, target)) ? MATCH_CHAR_DISGUISED_NAME(str, target) : MATCH_CHAR_NAME(str, target))
 
@@ -330,9 +330,7 @@ void update_pos(char_data *victim);
 extern int limit_crowd_control(char_data *victim, int atype);
 
 // morph.c
-extern int get_morph_attack_type(char_data *ch);
-extern bool MORPH_FLAGGED(char_data *ch, bitvector_t flag);
-void perform_morph(char_data *ch, ubyte form);
+void perform_morph(char_data *ch, morph_data *morph);
 
 // objsave.c
 

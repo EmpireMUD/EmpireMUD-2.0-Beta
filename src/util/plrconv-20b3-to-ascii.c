@@ -364,8 +364,8 @@ struct b3_affected_type {
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// For how long its effects will last
 	int modifier;	// This is added to apropriate ability
-	byte location;	// Tells which ability to change - APPLY_x
-	bitvector_t bitvector;	// Tells which bits to set - AFF_x
+	byte location;	// Tells which ability to change - APPLY_
+	bitvector_t bitvector;	// Tells which bits to set - AFF_
 
 	struct b3_affected_type *next;
 };
@@ -375,14 +375,14 @@ struct b3_char_point_data {
 	int max_pools[b3_NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	int deficit[b3_NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	
-	int extra_attributes[b3_TOTAL_EXTRA_ATTRIBUTES];	// ATT_x (dodge, etc)
+	int extra_attributes[b3_TOTAL_EXTRA_ATTRIBUTES];	// ATT_ (dodge, etc)
 };
 
 struct b3_over_time_effect_type {
-	sh_int type;	// ATYPE_x
+	sh_int type;	// ATYPE_
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// time in 5-second real-updates
-	sh_int damage_type;	// DAM_x type
+	sh_int damage_type;	// DAM_ type
 	sh_int damage;	// amount
 	sh_int stack;	// damage is multiplied by this
 	sh_int max_stack;	// how high it's allowed to stack
@@ -1301,9 +1301,6 @@ void convert_char(struct b3_char_file_u *cfu) {
 	fprintf(fl, "Load Room Check: %d\n", cfu->player_specials_saved.load_room_check);
 	if (cfu->player_specials_saved.mapsize) {
 		fprintf(fl, "Mapsize: %d\n", cfu->player_specials_saved.mapsize);
-	}
-	if (cfu->player_specials_saved.morph != MORPH_NONE) {
-		fprintf(fl, "Morph: %d\n", cfu->player_specials_saved.morph);
 	}
 	if (cfu->player_specials_saved.mount_flags) {
 		fprintf(fl, "Mount Flags: %s\n", bitv_to_alpha(cfu->player_specials_saved.mount_flags));

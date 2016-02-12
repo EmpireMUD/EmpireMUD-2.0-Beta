@@ -330,16 +330,14 @@ struct time_info_data *mud_time_passed(time_t t2, time_t t1) {
 * @param bool real If TRUE, uses real name instead of disguise/morph.
 */
 char *PERS(char_data *ch, char_data *vict, bool real) {
-	extern char *morph_string(char_data *ch, byte type);
-	
 	static char output[MAX_INPUT_LENGTH];
 
 	if (!CAN_SEE(vict, ch)) {
 		return "someone";
 	}
 
-	if (!IS_NPC(ch) && GET_MORPH(ch) && !real) {
-		return morph_string(ch, MORPH_STRING_NAME);
+	if (IS_MORPHED(ch) && !real) {
+		return MORPH_SHORT_DESC(GET_MORPH(ch));
 	}
 	
 	if (!real && IS_DISGUISED(ch)) {

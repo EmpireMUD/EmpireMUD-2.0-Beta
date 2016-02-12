@@ -1051,6 +1051,33 @@ WCMD(do_wload) {
 }
 
 
+WCMD(do_wmorph) {
+	char tar_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH];
+	morph_data *morph = NULL;
+	char_data *vict;
+	bool normal;
+	
+	two_arguments(argument, tar_arg, num_arg);
+	normal = !str_cmp(num_arg, "normal");
+	
+	if (!*tar_arg || !*num_arg) {
+		wld_log(room, "wmorph: missing argument(s)");
+	}
+	else if (!(vict = get_char_by_room(room, tar_arg))) {
+		wld_log(room, "wmorph: invalid target '%s'", tar_arg);
+	}
+	else if (!normal && (!isdigit(*num_arg) || !(morph = morph_proto(atoi(num_arg))))) {
+		wld_log(room, "wmorph: invalid morph '%s'", num_arg);
+	}
+	else if (morph && MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT)) {
+		wld_log(room, "wmorph: morph %d set in-development", MORPH_VNUM(morph));
+	}
+	else {
+		perform_morph(vict, morph);
+	}
+}
+
+
 WCMD(do_wdamage) {
 	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
 	double modifier = 1.0;
@@ -1269,6 +1296,7 @@ const struct wld_command_info wld_cmd_info[] = {
 	{ "wechoneither", do_wechoneither, NO_SCMD },
 	{ "wforce", do_wforce, NO_SCMD },
 	{ "wload", do_wload, NO_SCMD },
+	{ "wmorph", do_wmorph, NO_SCMD },
 	{ "wpurge", do_wpurge, NO_SCMD },
 	{ "wscale", do_wscale, NO_SCMD },
 	{ "wsend", do_wsend, SCMD_WSEND },

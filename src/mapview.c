@@ -919,7 +919,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 
 	/* Exits ? */
-	if (ROOM_IS_CLOSED(room)) {
+	if (COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
 		do_exits(ch, "", 0, GET_ROOM_VNUM(room));
 	}
 }

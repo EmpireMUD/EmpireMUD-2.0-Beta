@@ -230,8 +230,8 @@ struct b1_affected_type {
 	sh_int type;	// The type of spell that caused this
 	sh_int duration;	// For how long its effects will last
 	int modifier;	// This is added to apropriate ability
-	byte location;	// Tells which ability to change - APPLY_x
-	bitvector_t bitvector;	// Tells which bits to set - AFF_x
+	byte location;	// Tells which ability to change - APPLY_
+	bitvector_t bitvector;	// Tells which bits to set - AFF_
 
 	struct b1_affected_type *next;
 };
@@ -240,13 +240,13 @@ struct b1_char_point_data {
 	int current_pools[b1_NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	int max_pools[b1_NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	
-	int extra_attributes[b1_TOTAL_EXTRA_ATTRIBUTES];	// ATT_x (dodge, etc)
+	int extra_attributes[b1_TOTAL_EXTRA_ATTRIBUTES];	// ATT_ (dodge, etc)
 };
 
 struct b1_over_time_effect_type {
-	sh_int type;	// ATYPE_x
+	sh_int type;	// ATYPE_
 	sh_int duration;	// time in 5-second real-updates
-	sh_int damage_type;	// DAM_x type
+	sh_int damage_type;	// DAM_ type
 	sh_int damage;	// amount
 	sh_int stack;	// damage is multiplied by this
 	sh_int max_stack;	// how high it's allowed to stack
@@ -473,8 +473,8 @@ struct b2_affected_type {
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// For how long its effects will last
 	int modifier;	// This is added to apropriate ability
-	byte location;	// Tells which ability to change - APPLY_x
-	bitvector_t bitvector;	// Tells which bits to set - AFF_x
+	byte location;	// Tells which ability to change - APPLY_
+	bitvector_t bitvector;	// Tells which bits to set - AFF_
 
 	struct b2_affected_type *next;
 };
@@ -484,14 +484,14 @@ struct b2_char_point_data {
 	int max_pools[b2_NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	int deficit[b2_NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	
-	int extra_attributes[b2_TOTAL_EXTRA_ATTRIBUTES];	// ATT_x (dodge, etc)
+	int extra_attributes[b2_TOTAL_EXTRA_ATTRIBUTES];	// ATT_ (dodge, etc)
 };
 
 struct b2_over_time_effect_type {
-	sh_int type;	// ATYPE_x
+	sh_int type;	// ATYPE_
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// time in 5-second real-updates
-	sh_int damage_type;	// DAM_x type
+	sh_int damage_type;	// DAM_ type
 	sh_int damage;	// amount
 	sh_int stack;	// damage is multiplied by this
 	sh_int max_stack;	// how high it's allowed to stack

@@ -22,8 +22,10 @@ S
 chest gilded~
 a gilded chest~
 A gilded chest sits at the foot of the bed.~
+   You can store your bound items safely in here. Items not bound to you may
+still be autostored.  
 ~
-4 0 0 1
+4 0 0 2
 200 1 0
 0 0
 S

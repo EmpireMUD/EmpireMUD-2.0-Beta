@@ -352,6 +352,33 @@ VCMD(do_vsend) {
 }
 
 
+VCMD(do_vmorph) {
+	char tar_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH];
+	morph_data *morph = NULL;
+	char_data *vict;
+	bool normal;
+	
+	two_arguments(argument, tar_arg, num_arg);
+	normal = !str_cmp(num_arg, "normal");
+	
+	if (!*tar_arg || !*num_arg) {
+		veh_log(veh, "vmorph: missing argument(s)");
+	}
+	else if (!(vict = get_char_by_vehicle(veh, tar_arg))) {
+		veh_log(veh, "vmorph: invalid target '%s'", tar_arg);
+	}
+	else if (!normal && (!isdigit(*num_arg) || !(morph = morph_proto(atoi(num_arg))))) {
+		veh_log(veh, "vmorph: invalid morph '%s'", num_arg);
+	}
+	else if (morph && MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT)) {
+		veh_log(veh, "vmorph: morph %d set in-development", MORPH_VNUM(morph));
+	}
+	else {
+		perform_morph(vict, morph);
+	}
+}
+
+
 // incoming subcmd is direction
 VCMD(do_vmove) {
 	extern bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd);
@@ -1327,6 +1354,7 @@ const struct vehicle_command_info veh_cmd_info[] = {
 	{ "vechoneither", do_vechoneither, NO_SCMD },
 	{ "vforce", do_vforce, NO_SCMD },
 	{ "vload", do_dgvload, NO_SCMD },
+	{ "vmorph", do_vmorph, NO_SCMD },
 	{ "vpurge", do_vpurge, NO_SCMD },
 	{ "vscale", do_vscale, NO_SCMD },
 	{ "vsend", do_vsend, SCMD_VSEND },

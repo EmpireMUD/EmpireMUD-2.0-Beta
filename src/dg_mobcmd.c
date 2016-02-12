@@ -705,6 +705,38 @@ ACMD(do_mload) {
 }
 
 
+ACMD(do_mmorph) {
+	char tar_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH];
+	morph_data *morph = NULL;
+	char_data *vict;
+	bool normal;
+	
+	if (!MOB_OR_IMPL(ch)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	
+	two_arguments(argument, tar_arg, num_arg);
+	normal = !str_cmp(num_arg, "normal");
+	
+	if (!*tar_arg || !*num_arg) {
+		mob_log(ch, "mmorph: missing argument(s)");
+	}
+	else if ((*tar_arg == UID_CHAR && !(vict = get_char(tar_arg))) || !(vict = get_char_room_vis(ch, tar_arg))) {
+		mob_log(ch, "mmorph: invalid target '%s'", tar_arg);
+	}
+	else if (!normal && (!isdigit(*num_arg) || !(morph = morph_proto(atoi(num_arg))))) {
+		mob_log(ch, "mmorph: invalid morph '%s'", num_arg);
+	}
+	else if (morph && MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT)) {
+		mob_log(ch, "mmorph: morph %d set in-development", MORPH_VNUM(morph));
+	}
+	else {
+		perform_morph(vict, morph);
+	}
+}
+
+
 ACMD(do_mmove) {
 	extern bool try_mobile_movement(char_data *ch);
 

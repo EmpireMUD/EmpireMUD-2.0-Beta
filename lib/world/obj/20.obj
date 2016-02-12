@@ -462,8 +462,10 @@ S
 tent collapsed folded~
 a collapsed tent~
 A folded up tent has been left on the ground.~
+   You can pitch this small leather tent with 'build tent <direction>'. You
+must have permission to build things on your current tile.  
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 7 0
 S

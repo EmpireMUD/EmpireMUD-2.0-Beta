@@ -382,7 +382,7 @@ ACMD(do_pub_comm) {
 			case PUB_COMM_SHORT_RANGE: {
 				// leading color code is handled later
 				
-				if (!IS_NPC(ch) && (IS_DISGUISED(ch) || GET_MORPH(ch) != MORPH_NONE)) {
+				if (IS_DISGUISED(ch) || IS_MORPHED(ch)) {
 					sprintf(msgbuf, "$n ($o)%s %ss%s, '%s%s'\tn", invis_string, pub_comm[subcmd].name, level_string, argument, pub_comm[subcmd].color);
 				}
 				else {

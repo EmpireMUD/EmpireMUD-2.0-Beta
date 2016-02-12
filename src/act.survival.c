@@ -306,7 +306,7 @@ ACMD(do_mount) {
 	else if (!can_use_ability(ch, ABIL_RIDE, NOTHING, 0, NOTHING)) {
 		// sends own msgs
 	}
-	else if (GET_MORPH(ch) != MORPH_NONE) {
+	else if (IS_MORPHED(ch)) {
 		msg_to_char(ch, "You can't ride anything in this form.\r\n");
 	}
 	else if (AFF_FLAGGED(ch, AFF_FLY)) {

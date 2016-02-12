@@ -216,6 +216,7 @@ typedef struct crop_data crop_data;
 typedef struct descriptor_data descriptor_data;
 typedef struct empire_data empire_data;
 typedef struct index_data index_data;
+typedef struct morph_data morph_data;
 typedef struct obj_data obj_data;
 typedef struct player_index_data player_index_data;
 typedef struct room_data room_data;
@@ -264,6 +265,7 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_BONUS_HEALING  23	// add to healing
 #define APPLY_RESIST_MAGICAL  24	// Apply to magic damage resistance
 #define APPLY_CRAFTING  25	// bonus craft levels
+#define APPLY_BLOOD_UPKEEP  26	// vampire blood requirement
 
 
 // don't change these
@@ -571,7 +573,8 @@ typedef struct vehicle_data vehicle_data;
 #define ATT_HEAL_OVER_TIME  9	// heal per 5
 #define ATT_RESIST_MAGICAL  10	// damage reduction
 #define ATT_CRAFTING_BONUS  11	// levels added to crafting
-#define NUM_EXTRA_ATTRIBUTES  12
+#define ATT_BLOOD_UPKEEP  12	// blood cost per hour
+#define NUM_EXTRA_ATTRIBUTES  13
 
 
 /* Affect bits */
@@ -750,6 +753,10 @@ typedef struct vehicle_data vehicle_data;
 #define DIPL_TRADE  BIT(5)	// Open trading
 #define DIPL_DISTRUST  BIT(6)	// Distrusting of one another
 #define DIPL_TRUCE  BIT(7)	// end of war but not peace
+
+// combo of all of them
+#define ALL_DIPLS  (DIPL_PEACE | DIPL_WAR | DIPL_ALLIED | DIPL_NONAGGR | DIPL_TRADE | DIPL_DISTRUST | DIPL_TRUCE)
+#define ALL_DIPLS_EXCEPT(flag)  (ALL_DIPLS & ~(flag))
 
 
 // empire_log_data types
@@ -990,6 +997,13 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_MOVE_SKIS  23
 #define MOB_MOVE_SLIDES  24
 #define MOB_MOVE_SOARS  25
+#define MOB_MOVE_LUMBERS  26
+#define MOB_MOVE_FLOATS  27
+#define MOB_MOVE_LOPES  28
+#define MOB_MOVE_BLOWS  29
+#define MOB_MOVE_DRIFTS  30
+#define MOB_MOVE_BOUNCES  31
+#define MOB_MOVE_FLOWS  32
 
 
 // name sets: add matching files in lib/text/names/
@@ -1152,6 +1166,8 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_CUSTOM_CRAFT_TO_ROOM  7
 #define OBJ_CUSTOM_WEAR_TO_CHAR  8
 #define OBJ_CUSTOM_WEAR_TO_ROOM  9
+#define OBJ_CUSTOM_REMOVE_TO_CHAR  10
+#define OBJ_CUSTOM_REMOVE_TO_ROOM  11
 
 
 // storage flags (for obj storage locations)
@@ -1389,33 +1405,18 @@ typedef struct vehicle_data vehicle_data;
 #define LORE_PROMOTED			12
 
 
-// Morph forms
-#define MORPH_NONE  0
-#define MORPH_BAT  1
-#define MORPH_WOLF  2
-#define MORPH_HORRID_FORM  3
-#define MORPH_DREAD_BLOOD  4
-#define MORPH_MIST  5
-#define MORPH_SAVAGE_WEREWOLF  6
-#define MORPH_TOWERING_WEREWOLF  7
-#define MORPH_SAGE_WEREWOLF  8
-#define MORPH_DEER  9
-#define MORPH_OSTRICH  10
-#define MORPH_TAPIR  11
-#define NUM_MORPHS  12
-
-// flags for morphs
-#define MORPH_FLAG_NO_CLAWS  BIT(0)	// can't use claws
-#define MORPH_FLAG_ANIMAL  BIT(1)	// treated like an npc animal (disguise)
-#define MORPH_FLAG_VAMPIRE_ONLY  BIT(2)	// requires vampire status
-#define MORPH_FLAG_TEMPERATE_AFFINITY  BIT(3)	// requires temperate
-#define MORPH_FLAG_ARID_AFFINITY  BIT(4)	// requires arid
-#define MORPH_FLAG_TROPICAL_AFFINITY  BIT(5)	// requires tropical
-#define MORPH_FLAG_CHECK_SOLO  BIT(6)	// check for the solo role
-
-// for morph data
-#define MORPH_STRING_NAME  0
-#define MORPH_STRING_DESC  1
+// MORPHF_x: flags for morphs
+#define MORPHF_IN_DEVELOPMENT  BIT(0)	// a. can't be used by players
+#define MORPHF_SCRIPT_ONLY  BIT(1)	// b. can't be morphed manually
+#define MORPHF_ANIMAL  BIT(2)	// c. treated like an npc animal (disguise)
+#define MORPHF_VAMPIRE_ONLY  BIT(3)	// d. requires vampire status
+#define MORPHF_TEMPERATE_AFFINITY  BIT(4)	// e. requires temperate
+#define MORPHF_ARID_AFFINITY  BIT(5)	// f. requires arid
+#define MORPHF_TROPICAL_AFFINITY  BIT(6)	// g. requires tropical
+#define MORPHF_CHECK_SOLO  BIT(7)	// h. check for the solo role
+#define MORPHF_NO_SLEEP  BIT(8)	// i. cannot sleep in this form
+#define MORPHF_GENDER_NEUTRAL  BIT(9)	// j. causes an "it" instead of him/her
+#define MORPHF_CONSUME_OBJ  BIT(10)	// k. uses up the requiresobj
 
 
 // mount flags -- MOUNT_FLAGGED(ch, flag)
@@ -1809,14 +1810,22 @@ struct ability_data {
 };
 
 
+// apply types for augments and morphs
+struct apply_data {
+	int location;	// APPLY_
+	int weight;	// what percent of points go to this
+	struct apply_data *next;	// linked list
+};
+
+
 // Simple affect structure
 struct affected_type {
 	sh_int type;	// The type of spell that caused this
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// For how long its effects will last
 	int modifier;	// This is added to apropriate ability
-	byte location;	// Tells which ability to change - APPLY_x
-	bitvector_t bitvector;	// Tells which bits to set - AFF_x
+	byte location;	// Tells which ability to change - APPLY_
+	bitvector_t bitvector;	// Tells which bits to set - AFF_
 
 	struct affected_type *next;
 };
@@ -1953,10 +1962,34 @@ struct interaction_item {
 };
 
 
+// see morph.c
+struct morph_data {
+	any_vnum vnum;
+	char *keywords;
+	char *short_desc;	// short description (a bat)
+	char *long_desc;	// long description (seen in room)
+	
+	bitvector_t flags;	// MORPHF_ flags
+	bitvector_t affects;	// AFF_ flags added
+	int attack_type;	// TYPE_ const
+	int move_type;	// MOVE_TYPE_ const
+	struct apply_data *applies;	// how it modifies players
+	
+	int cost_type;	// any pool (NUM_POOLS)
+	int cost;	// amount it costs in that pool
+	any_vnum ability;	// required ability or NO_ABIL
+	obj_vnum requires_obj;	// required item or NOTHING
+	int max_scale;	// highest possible level
+	
+	UT_hash_handle hh;	// morph_table hash
+	UT_hash_handle sorted_hh;	// sorted_morphs hash
+};
+
+
 // for items -- this replaces CircleMUD's obj_affected_type
 struct obj_apply {
 	byte apply_type;	// APPLY_TYPE_x
-	byte location;	// Which ability to change (APPLY_XXX)
+	byte location;	// Which ability to change (APPLY_)
 	sh_int modifier;	// How much it changes by
 	
 	struct obj_apply *next;	// linked list
@@ -2244,19 +2277,11 @@ struct augment_data {
 	
 	any_vnum ability;	// required ability or NO_ABIL
 	obj_vnum requires_obj;	// required item or NOTHING
-	struct augment_apply *applies;	// how it modifies items
+	struct apply_data *applies;	// how it modifies items
 	struct resource_data *resources;	// resources required
 	
 	UT_hash_handle hh;	// augment_table hash
 	UT_hash_handle sorted_hh;	// sorted_augments hash
-};
-
-
-// apply types for augment_data
-struct augment_apply {
-	int location;	// APPLY_x
-	int weight;	// what percent of points go to this
-	struct augment_apply *next;	// linked list
 };
 
 
@@ -2578,6 +2603,7 @@ struct descriptor_data {
 	char *olc_storage;	// a character buffer created and used by some olc modes
 	any_vnum olc_vnum;	// vnum being edited
 	
+	// OLC_x: olc types
 	ability_data *olc_ability;	// abil being edited
 	adv_data *olc_adventure;	// adv being edited
 	archetype_data *olc_archetype;	// arch being edited
@@ -2586,6 +2612,7 @@ struct descriptor_data {
 	class_data *olc_class;	// class being edited
 	obj_data *olc_object;	// item being edited
 	char_data *olc_mobile;	// mobile being edited
+	morph_data *olc_morph;	// morph being edited
 	craft_data *olc_craft;	// craft recipe being edited
 	bld_data *olc_building;	// building being edited
 	crop_data *olc_crop;	// crop being edited
@@ -2752,7 +2779,6 @@ struct player_special_data {
 	byte confused_dir;  // people without Navigation think this dir is north
 	char *disguised_name;	// verbatim copy of name -- grabs custom mob names and empire names
 	byte disguised_sex;	// sex of the mob you're disguised as
-	sh_int morph;	// MORPH_x form
 	bitvector_t mount_flags;	// flags for the stored mount
 	mob_vnum mount_vnum;	// stored mount
 	byte using_poison;	// poison preference for Stealth
@@ -2804,7 +2830,7 @@ struct char_point_data {
 	int max_pools[NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	int deficit[NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	
-	int extra_attributes[NUM_EXTRA_ATTRIBUTES];	// ATT_x (dodge, etc)
+	int extra_attributes[NUM_EXTRA_ATTRIBUTES];	// ATT_ (dodge, etc)
 };
 
 
@@ -2825,6 +2851,7 @@ struct char_special_data {
 	bitvector_t act;	// mob flag for NPCs; player flag for PCs
 	bitvector_t injuries;	// Bitvectors including damage to the player
 	bitvector_t affected_by;	// Bitvector for spells/skills affected by
+	morph_data *morph;	// for morphed players
 
 	// UNSAVED SECTION //
 	
@@ -2908,7 +2935,7 @@ struct cooldown_data {
 
 // for damage-over-time (DoTs)
 struct over_time_effect_type {
-	sh_int type;	// ATYPE_x
+	sh_int type;	// ATYPE_
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// time in 5-second real-updates
 	sh_int damage_type;	// DAM_x type
@@ -3059,15 +3086,15 @@ struct poison_data_type {
 	char *name;
 	any_vnum ability;
 	
-	int atype;	// ATYPE_x
-	int apply;	// APPLY_x
+	int atype;	// ATYPE_
+	int apply;	// APPLY_
 	int mod;	// +/- value
 	bitvector_t aff;
 	
 	// dot affect
-	int dot_type;	// ATYPE_x, -1 for none
+	int dot_type;	// ATYPE_, -1 for none
 	int dot_duration;	// time for the dot
-	int dot_damage_type;	// DAM_x for the dot
+	int dot_damage_type;	// DAM_ for the dot
 	int dot_damage;	// damage for the dot
 	int dot_max_stacks;	// how high the dot can stack
 	
@@ -3079,10 +3106,10 @@ struct poison_data_type {
 // see act.naturalmagic.c
 struct potion_data_type {
 	char *name;	// name for olc, etc
-	int atype;	// ATYPE_x
-	int apply;	// APPLY_x
+	int atype;	// ATYPE_
+	int apply;	// APPLY_
 	bitvector_t aff;
-	int spec;	// POTION_SPEC_x
+	int spec;	// POTION_SPEC_
 };
 
 
@@ -3405,7 +3432,7 @@ struct obj_data {
 	room_data *in_room;	// In what room -- NULL when container/carried
 
 	struct obj_flag_data obj_flags;	// Object information
-	struct obj_apply *applies;	// APPLY_x list
+	struct obj_apply *applies;	// APPLY_ list
 
 	char *name;	// Title of object: get, etc.
 	char *description;	// When in room (long desc)

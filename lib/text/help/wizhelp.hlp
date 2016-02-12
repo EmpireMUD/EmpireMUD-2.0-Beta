@@ -796,6 +796,7 @@ startlocs  Immort   Shows the location of all starting location tiles.
 storage    Immort   Shows items that can be stored in a given building/room type.
 terrain    Immort   Shows total counts for all terrain types.
 workforce  Immort   Shows you an empire's workforce setup.
+variables  Immort   Shows script variables on a player character.
 commons    Asst     Shows players currently connected from duplicate sites.
 site       Asst     Shows all players with a specific site segment.
 account    Co-Impl  Shows all the alts associated with a given player.
@@ -982,8 +983,8 @@ specified name. If you specify more than one keyword, it will find things
 that match ALL of those keywords.
 
 Valid types are: adventure, ability, archetype, augment, book, building, craft,
-                 class, crop, global, obj, mob, roomtemplate, sector, skill,
-                 vehicle
+                 class, crop, global, obj, mob, morph, roomtemplate, sector,
+                 skill, vehicle
 
 Examples:
 
@@ -1004,8 +1005,8 @@ Usage:  vstat <type> <vnum>
 Used to stat a prototypical object by virtual number.
 
 Valid types are: adventure, ability, archetype, augment, building, book, craft,
-                 class, crop, global, obj, mob, roomtemplate, sector, skill,
-                 vehicle
+                 class, crop, global, obj, mob, morph, roomtemplate, sector,
+                 skill, vehicle
 
 Examples:
 

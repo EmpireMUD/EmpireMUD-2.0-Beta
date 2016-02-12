@@ -194,6 +194,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *apply_type_names[];
+	extern const char *climate_types[];
 	extern const char *extra_bits[];
 	extern const char *drinks[];
 	extern const char *affected_bits[];
@@ -205,6 +206,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	player_index_data *index;
 	struct obj_apply *apply;
 	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH];
+	crop_data *cp;
 	bld_data *bld;
 	int found;
 	double rating;
@@ -324,8 +326,6 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			break;
 		case ITEM_FOOD:
 			msg_to_char(ch, "Fills for %d hours.\r\n", GET_FOOD_HOURS_OF_FULLNESS(obj));
-			if (OBJ_FLAGGED(obj, OBJ_PLANTABLE))
-				msg_to_char(ch, "Plants %s.\r\n", GET_CROP_NAME(crop_proto(GET_FOOD_CROP_TYPE(obj))));
 			break;
 		case ITEM_CORPSE:
 			msg_to_char(ch, "Corpse of ");
@@ -365,6 +365,11 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			msg_to_char(ch, "Adds %d wealth when stored.\r\n", GET_WEALTH_VALUE(obj));
 			break;
 		}
+	}
+	
+	// data that isn't type-based:
+	if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)))) {
+		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), climate_types[GET_CROP_CLIMATE(cp)]);
 	}
 	
 	
@@ -563,8 +568,21 @@ void perform_remove(char_data *ch, int pos) {
 			return;
 		}
 
-		act("You stop using $p.", FALSE, ch, obj, 0, TO_CHAR);
-		act("$n stops using $p.", TRUE, ch, obj, 0, TO_ROOM);
+		// char message
+		if (has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR)) {
+			act(get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		else {
+			act("You stop using $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		
+		// room message
+		if (has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM)) {
+			act(get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
+		}
+		else {
+			act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
+		}
 		
 		// this may extract it, or drop it
 		unequip_char_to_inventory(ch, pos);
@@ -1296,6 +1314,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	extern const double apply_values[];
 	void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, int *min, int *max);
 	extern double get_weapon_speed(obj_data *weapon);
+	extern const bool apply_never_scales[];
 	extern const int wear_significance[];
 	
 	int total_share, bonus, iter, amt;
@@ -1388,8 +1407,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	
 	// first check applies, count share/bonus
 	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
-		// TODO non-scalable traits should be an array
-		if (apply->location != APPLY_GREATNESS && apply->location != APPLY_CRAFTING) {
+		if (!apply_never_scales[(int)apply->location]) {
 			SHARE_OR_BONUS(apply->modifier);
 		}
 	}
@@ -1555,8 +1573,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	for (apply = GET_OBJ_APPLIES(obj); apply; apply = next_apply) {
 		next_apply = apply->next;
 		
-		// TODO non-scalable traits should be an array
-		if (apply->location != APPLY_GREATNESS && apply->location != APPLY_CRAFTING) {
+		if (!apply_never_scales[(int)apply->location]) {
 			this_share = MAX(0, MIN(share, points_to_give));
 			// raw amount
 			per_point = (1.0 / apply_values[(int)apply->location]);
