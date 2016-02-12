@@ -2701,7 +2701,7 @@ ACMD(do_deposit) {
 }
 
 
-ACMD(do_diplomacy) {	
+ACMD(do_diplomacy) {
 	struct empire_political_data *pol_a, *pol_b;
 	empire_data *e, *f;
 	int i;

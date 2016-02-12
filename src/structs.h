@@ -754,6 +754,10 @@ typedef struct vehicle_data vehicle_data;
 #define DIPL_DISTRUST  BIT(6)	// Distrusting of one another
 #define DIPL_TRUCE  BIT(7)	// end of war but not peace
 
+// combo of all of them
+#define ALL_DIPLS  (DIPL_PEACE | DIPL_WAR | DIPL_ALLIED | DIPL_NONAGGR | DIPL_TRADE | DIPL_DISTRUST | DIPL_TRUCE)
+#define ALL_DIPLS_EXCEPT(flag)  (ALL_DIPLS & ~(flag))
+
 
 // empire_log_data types
 #define ELOG_NONE  0	// does not log to file
