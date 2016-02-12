@@ -3552,7 +3552,9 @@ Available flags:
  - !ARCHETYPE -- Cannot edit archetypes
  - ABILITIES -- CAN edit abilities
  - CLASSES -- CAN edit classes
- -- SKILLS -- CAN edit skills
+ - SKILLS -- CAN edit skills
+ - !VEHICLES -- Cannot edit vehicles
+ - !MORPHS -- Cannot edit morphs
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 #d

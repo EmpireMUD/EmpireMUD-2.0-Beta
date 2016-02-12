@@ -2303,11 +2303,9 @@ SHOW(show_variables) {
 		send_to_char("There is no such player.\r\n", ch);
 	}
 	else {
-		msg_to_char(ch, "Global variables:\r\n");
+		msg_to_char(ch, "Global Variables:\r\n");
 		
 		if (plr->script && plr->script->global_vars) {
-			msg_to_char(ch, "Global Variables:\r\n");
-
 			/* currently, variable context for players is always 0, so it is */
 			/* not displayed here. in the future, this might change */
 			for (tv = plr->script->global_vars; tv; tv = tv->next) {

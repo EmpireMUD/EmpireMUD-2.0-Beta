@@ -972,7 +972,12 @@ ACMD(do_gen_augment) {
 		total_weight = 0;
 		for (app = GET_AUG_APPLIES(aug); app; app = app->next) {
 			if (!apply_never_scales[app->location]) {
-				total_weight += ABSOLUTE(app->weight);
+				if (app->weight > 0) {
+					total_weight += app->weight;
+				}
+				else if (app->weight < 0) {
+					points_available += ABSOLUTE(app->weight);
+				}
 			}
 		}
 		
