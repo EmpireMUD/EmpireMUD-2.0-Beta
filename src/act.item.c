@@ -194,6 +194,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *apply_type_names[];
+	extern const char *climate_types[];
 	extern const char *extra_bits[];
 	extern const char *drinks[];
 	extern const char *affected_bits[];
@@ -205,6 +206,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	player_index_data *index;
 	struct obj_apply *apply;
 	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH];
+	crop_data *cp;
 	bld_data *bld;
 	int found;
 	double rating;
@@ -324,8 +326,6 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			break;
 		case ITEM_FOOD:
 			msg_to_char(ch, "Fills for %d hours.\r\n", GET_FOOD_HOURS_OF_FULLNESS(obj));
-			if (OBJ_FLAGGED(obj, OBJ_PLANTABLE))
-				msg_to_char(ch, "Plants %s.\r\n", GET_CROP_NAME(crop_proto(GET_FOOD_CROP_TYPE(obj))));
 			break;
 		case ITEM_CORPSE:
 			msg_to_char(ch, "Corpse of ");
@@ -365,6 +365,11 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			msg_to_char(ch, "Adds %d wealth when stored.\r\n", GET_WEALTH_VALUE(obj));
 			break;
 		}
+	}
+	
+	// data that isn't type-based:
+	if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)))) {
+		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), climate_types[GET_CROP_CLIMATE(cp)]);
 	}
 	
 	
