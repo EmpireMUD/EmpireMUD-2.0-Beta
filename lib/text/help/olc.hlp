@@ -2701,6 +2701,16 @@ to any level.
 
 See also: OLC MORPHS
 #d
+"MORPHEDIT MOVETYPE" "MORPHEDIT MOVE TYPE"
+
+Usage:  .movetype <type>
+
+The move type determines what message is sent when the morphed person moves.
+Sometimes other types are substituted, for example a flying person always says
+"flies" even if its move type is different.
+
+See also: OLC MORPHS
+#d
 "MORPHEDIT REQUIRESABILITY" "MORPHEDIT REQUIRES ABILITY"
 
 Usage:  .requiresability <name | none>

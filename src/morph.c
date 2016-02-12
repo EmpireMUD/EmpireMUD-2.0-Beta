@@ -45,6 +45,7 @@ const char *default_morph_long_desc = "A shapeless morph is standing here.";
 extern const char *affected_bits[];
 extern const bool apply_never_scales[];
 extern const char *apply_types[];
+extern const char *mob_move_types[];
 extern const char *morph_flags[];
 extern const char *pool_types[];
 
@@ -638,15 +639,16 @@ void parse_morph(FILE *fl, any_vnum vnum) {
 	MORPH_SHORT_DESC(morph) = fread_string(fl, error);
 	MORPH_LONG_DESC(morph) = fread_string(fl, error);
 	
-	// 4. flags attack-type max-level affects
-	if (!get_line(fl, line) || sscanf(line, "%s %d %d %s", str_in, &int_in[0], &int_in[1], str_in2) != 4) {
+	// 4. flags attack-type move-type max-level affects
+	if (!get_line(fl, line) || sscanf(line, "%s %d %d %d %s", str_in, &int_in[0], &int_in[1], &int_in[2], str_in2) != 5) {
 		log("SYSERR: Format error in line 4 of %s", error);
 		exit(1);
 	}
 	
 	MORPH_FLAGS(morph) = asciiflag_conv(str_in);
 	MORPH_ATTACK_TYPE(morph) = int_in[0];
-	MORPH_MAX_SCALE(morph) = int_in[1];
+	MORPH_MOVE_TYPE(morph) = int_in[1];
+	MORPH_MAX_SCALE(morph) = int_in[2];
 	MORPH_AFFECTS(morph) = asciiflag_conv(str_in2);
 	
 	// 5. cost-type cost-amount ability requires-obj
@@ -729,10 +731,10 @@ void write_morph_to_file(FILE *fl, morph_data *morph) {
 	fprintf(fl, "%s~\n", NULLSAFE(MORPH_SHORT_DESC(morph)));
 	fprintf(fl, "%s~\n", NULLSAFE(MORPH_LONG_DESC(morph)));
 	
-	// 4. flags attack-type max-level affs
+	// 4. flags attack-type move-type max-level affs
 	strcpy(temp, bitv_to_alpha(MORPH_FLAGS(morph)));
 	strcpy(temp2, bitv_to_alpha(MORPH_AFFECTS(morph)));
-	fprintf(fl, "%s %d %d %s\n", temp, MORPH_ATTACK_TYPE(morph), MORPH_MAX_SCALE(morph), temp2);
+	fprintf(fl, "%s %d %d %d %s\n", temp, MORPH_ATTACK_TYPE(morph), MORPH_MOVE_TYPE(morph), MORPH_MAX_SCALE(morph), temp2);
 	
 	// 5. cost-type cost-amount ability requires-obj
 	fprintf(fl, "%d %d %d %d\n", MORPH_COST_TYPE(morph), MORPH_COST(morph), MORPH_ABILITY(morph), MORPH_REQUIRES_OBJ(morph));
@@ -952,13 +954,13 @@ void do_stat_morph(char_data *ch, morph_data *morph) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Requires item: [%d] \tg%s\t0\r\n", MORPH_REQUIRES_OBJ(morph), skip_filler(get_obj_name_by_proto(MORPH_REQUIRES_OBJ(morph))));
 	}
 	
+	size += snprintf(buf + size, sizeof(buf) - size, "Attack type: \ty%s\t0, Move type: \ty%s\t0\r\n", attack_hit_info[MORPH_ATTACK_TYPE(morph)].name, mob_move_types[MORPH_MOVE_TYPE(morph)]);
+	
 	sprintbit(MORPH_FLAGS(morph), morph_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
 	
 	sprintbit(MORPH_AFFECTS(morph), affected_bits, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Affects: \tc%s\t0\r\n", part);
-	
-	size += snprintf(buf + size, sizeof(buf) - size, "Attack type: \ty%s\t0\r\n", attack_hit_info[MORPH_ATTACK_TYPE(morph)].name);
 	
 	// applies
 	size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
@@ -1001,16 +1003,17 @@ void olc_show_morph(char_data *ch) {
 	sprintbit(MORPH_FLAGS(morph), morph_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
 	
-	sprintf(buf + strlen(buf), "<&yattack&0> %s\r\n", attack_hit_info[MORPH_ATTACK_TYPE(morph)].name);
+	sprintf(buf + strlen(buf), "<\tyattack\t0> %s\r\n", attack_hit_info[MORPH_ATTACK_TYPE(morph)].name);
+	sprintf(buf + strlen(buf), "<\tymovetype\t0> %s\r\n", mob_move_types[MORPH_MOVE_TYPE(morph)]);
 
 	sprintbit(MORPH_AFFECTS(morph), affected_bits, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<&yaffects&0> %s\r\n", lbuf);
+	sprintf(buf + strlen(buf), "<\tyaffects\t0> %s\r\n", lbuf);
 	
 	if (MORPH_MAX_SCALE(morph) > 0) {
-		sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", MORPH_MAX_SCALE(morph));
+		sprintf(buf + strlen(buf), "<\tymaxlevel\t0> %d\r\n", MORPH_MAX_SCALE(morph));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
+		sprintf(buf + strlen(buf), "<\tymaxlevel\t0> none\r\n");
 	}
 	
 	sprintf(buf + strlen(buf), "<\tycost\t0> %d\r\n", MORPH_COST(morph));
@@ -1161,6 +1164,12 @@ OLC_MODULE(morphedit_longdesc) {
 OLC_MODULE(morphedit_maxlevel) {
 	morph_data *morph = GET_OLC_MORPH(ch->desc);
 	MORPH_MAX_SCALE(morph) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, MORPH_MAX_SCALE(morph));
+}
+
+
+OLC_MODULE(morphedit_movetype) {
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+	MORPH_MOVE_TYPE(morph) = olc_process_type(ch, argument, "move type", "movetype", mob_move_types, MORPH_MOVE_TYPE(morph));
 }
 
 

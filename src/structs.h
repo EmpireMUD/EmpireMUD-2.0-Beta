@@ -1960,7 +1960,8 @@ struct morph_data {
 	
 	bitvector_t flags;	// MORPHF_ flags
 	bitvector_t affects;	// AFF_ flags added
-	int attack_type;	// TYPE_ flags
+	int attack_type;	// TYPE_ const
+	int move_type;	// MOVE_TYPE_ const
 	struct apply_data *applies;	// how it modifies players
 	
 	int cost_type;	// any pool (NUM_POOLS)
