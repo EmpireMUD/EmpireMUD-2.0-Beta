@@ -1587,6 +1587,9 @@ ACMD(do_morph) {
 	else if (morph && MORPH_ABILITY(morph) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, NULL, MORPH_ABILITY(morph))) {
 		return;
 	}
+	else if (morph && MORPH_FLAGGED(morph, MORPHF_VAMPIRE_ONLY) && !IS_VAMPIRE(ch)) {
+		msg_to_char(ch, "You must be a vampire to do that.\r\n");
+	}
 	else {
 		// charge costs
 		if (morph && MORPH_COST(morph) > 0) {
