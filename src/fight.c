@@ -3028,7 +3028,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 		}
 	}
 
-	if (revert && IS_MORPHED(ch)) {
+	if (revert && IS_MORPHED(victim)) {
 		sprintf(buf, "%s reverts into $n!", PERS(victim, victim, FALSE));
 
 		perform_morph(victim, NULL);
