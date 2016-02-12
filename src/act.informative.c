@@ -953,10 +953,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	char buf[MAX_STRING_LENGTH];
 	bool disguise;
 	int j, found;
-		// only show this block if the person is not morphed, or the morph is not an npc disguise
-	//if (IS_NPC(i) || IS_IMMORTAL(ch) || !IS_MORPHED(i) || !CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)) {
-
-
+	
 	if (!i || !ch || !ch->desc)
 		return;
 	
