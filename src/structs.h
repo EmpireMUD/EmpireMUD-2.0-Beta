@@ -993,6 +993,13 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_MOVE_SKIS  23
 #define MOB_MOVE_SLIDES  24
 #define MOB_MOVE_SOARS  25
+#define MOB_MOVE_LUMBERS  26
+#define MOB_MOVE_FLOATS  27
+#define MOB_MOVE_LOPES  28
+#define MOB_MOVE_BLOWS  29
+#define MOB_MOVE_DRIFTS  30
+#define MOB_MOVE_BOUNCES  31
+#define MOB_MOVE_FLOWS  32
 
 
 // name sets: add matching files in lib/text/names/

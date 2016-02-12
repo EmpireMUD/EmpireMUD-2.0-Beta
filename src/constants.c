@@ -1443,6 +1443,13 @@ const char *mob_move_types[] = {
 	"skis",
 	"slides",
 	"soars",
+	"lumbers",
+	"floats",
+	"lopes",
+	"blows",
+	"drifts",
+	"bounces",
+	"flows",
 	"\n"
 };
 
