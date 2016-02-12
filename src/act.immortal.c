@@ -2583,6 +2583,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern const char *cooldown_types[];
 	extern const char *damage_types[];
 	extern const double hit_per_dex;
+	extern const char *mob_move_types[];
 	extern const char *player_bits[];
 	extern const char *position_types[];
 	extern const char *preference_bits[];
@@ -2689,7 +2690,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	sprintf(buf, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
 
 	if (IS_NPC(k)) {
-		sprintf(buf + strlen(buf), ", Attack type: %s", attack_hit_info[MOB_ATTACK_TYPE(k)].name);
+		sprintf(buf + strlen(buf), ", Attack: %s, Move: %s", attack_hit_info[MOB_ATTACK_TYPE(k)].name, mob_move_types[(int)MOB_MOVE_TYPE(k)]);
 	}
 	if (k->desc) {
 		sprinttype(STATE(k->desc), connected_types, buf2);
