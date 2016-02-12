@@ -2,7 +2,7 @@
 bat black~
 a black bat~
 A black bat is flying here.~
-bcd 9 0 m
+cdj 9 2 100 m
 3 50 162 -1
 A
 11 2
@@ -21,7 +21,7 @@ S
 wolf brown~
 a brown wolf~
 A brown wolf is sitting here.~
-cd 10 100 0
+cdj 10 0 100 0
 3 20 4 -1
 A
 11 1
@@ -38,7 +38,7 @@ S
 monstrosity horrid~
 a horrid monstrosity~
 A horrid monstrosity towers over you, like something out of a nightmare!~
-dh 10 0 0
+dh 10 13 0 0
 3 30 21 -1
 A
 1 2
@@ -53,10 +53,10 @@ S
 blood dread~
 the dread blood~
 The dread blood stands before you, oozing and swirling.~
-dh 15 0 0
+dh 28 10 0 0
 3 30 211 -1
 A
-8 2
+22 2
 A
 16 1
 S
@@ -64,10 +64,8 @@ S
 mist cloud swirling~
 the mist~
 A cloud of swirling mist is floating here.~
-cd 15 0 jn
+cdij 15 30 0 jn
 3 20 24 -1
-A
-1 -5
 A
 26 1
 S
@@ -75,7 +73,7 @@ S
 coyote lanky~
 a coyote~
 A lanky coyote dashes past you.~
-cd 10 100 0
+cdj 10 0 100 0
 3 20 4 -1
 A
 11 1
@@ -92,7 +90,7 @@ S
 ocelot~
 an ocelot~
 An ocelot is cleaning its paws.~
-cd 10 100 0
+cdj 10 0 100 0
 3 20 4 -1
 A
 11 1

@@ -2,7 +2,7 @@
 werewolf savage~
 a savage werewolf~
 A savage werewolf stands over you, snarling and baring its teeth.~
-h 10 0 0
+h 10 28 0 0
 1 50 212 -1
 A
 1 2
@@ -10,12 +10,14 @@ A
 11 2
 A
 6 1
+A
+18 -2
 S
 #501
 werewolf towering~
 a towering werewolf~
 A towering werewolf looms over you, covered with terrible scars.~
-h 10 0 0
+h 10 28 0 0
 1 50 213 -1
 A
 15 2
@@ -25,27 +27,31 @@ A
 9 -1
 A
 2 2
+A
+21 -3
 S
 #502
 werewolf sage~
 a sage werewolf~
 A sage werewolf stands here, looking serene and in tune with nature.~
-h 10 0 0
+h 10 28 0 0
 1 50 214 -1
 A
 7 2
 A
-11 1
-A
 1 1
 A
-8 2
+23 2
+A
+22 -2
+A
+18 -2
 S
 #503
 deer white-tailed tailed~
 a deer~
 A white-tailed deer is grazing here.~
-ce 9 100 0
+cej 9 0 100 0
 2 25 215 -1
 A
 6 2
@@ -60,7 +66,7 @@ S
 raccoon~
 a raccoon~
 A raccoon is cleaning its paws.~
-ce 9 100 0
+cej 9 0 100 0
 2 25 215 -1
 A
 6 2
@@ -75,7 +81,7 @@ S
 turtle forest~
 a forest turtle~
 A forest turtle is munching on something.~
-ce 9 100 0
+cej 9 0 100 0
 2 25 215 -1
 A
 6 2
@@ -90,7 +96,7 @@ S
 ostrich~
 an ostrich~
 An ostrich ruffles its feathers and backs away from you.~
-cf 10 100 0
+cfj 11 0 100 0
 2 25 215 -1
 A
 6 2
@@ -105,7 +111,7 @@ S
 bobcat cat curious~
 a bobcat~
 A curious bobcat is sitting here, waiting.~
-cf 10 100 0
+cfj 10 0 100 0
 2 25 215 -1
 A
 6 2
@@ -120,7 +126,7 @@ S
 rattlesnake snake sidewinder~
 a sidewinder~
 A sidewinder rattlesnake is coiled and rattling.~
-cf 10 100 0
+cfj 9 5 100 0
 2 25 215 -1
 A
 6 2
@@ -135,7 +141,7 @@ S
 tapir~
 a tapir~
 A tapir is rooting around a bush.~
-cg 11 100 0
+cgj 9 0 100 0
 2 25 215 -1
 A
 6 2
@@ -150,7 +156,7 @@ S
 monkey brown little~
 a monkey~
 A little brown monkey is walking along a low branch.~
-cg 9 100 0
+cgj 9 0 100 0
 2 25 215 -1
 A
 6 2
@@ -165,7 +171,7 @@ S
 muskrat~
 a muskrat~
 A muskrat is digging around.~
-cg 9 100 0
+cgj 9 0 100 0
 2 25 215 -1
 A
 6 2
