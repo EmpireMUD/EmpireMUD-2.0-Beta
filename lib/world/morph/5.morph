@@ -33,19 +33,21 @@ S
 #502
 werewolf sage~
 a sage werewolf~
-A sage werewolf stands here, looking serene and in tune with nature.~
-h 10 28 0 0
+A sage werewolf stands in serene contemplation.~
+h 28 28 0 0
 1 50 214 -1
+A
+23 3
 A
 7 2
 A
 1 1
 A
-23 2
-A
 22 -2
 A
 18 -2
+A
+17 -2
 S
 #503
 deer white-tailed tailed~
@@ -181,5 +183,24 @@ A
 1 -1
 A
 8 -1
+S
+#512
+werewolf astral~
+an astral werewolf~
+An astral werewolf stands here, head held high.~
+h 28 28 0 0
+1 50 267 -1
+A
+22 3
+A
+17 2
+A
+9 1
+A
+23 -2
+A
+18 -2
+A
+12 -2
 S
 $
