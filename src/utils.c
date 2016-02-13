@@ -1525,7 +1525,7 @@ char *room_log_identifier(room_data *room) {
 * This is the main syslog function (mudlog in CircleMUD). It logs to all
 * immortals who are listening.
 *
-* @param bitvector_t type Any SYS_x type
+* @param bitvector_t type Any SYS_ type
 * @param int level The minimum level to see the log.
 * @param bool file If TRUE, also outputs to the mud's log file.
 * @param const char *str The log string.

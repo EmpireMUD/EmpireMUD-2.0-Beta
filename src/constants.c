@@ -551,6 +551,7 @@ const char *syslog_types[] = {
 	"script",
 	"system",
 	"validation",
+	"empire",
 	"\n"
 };
 
