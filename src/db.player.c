@@ -84,6 +84,7 @@ char_data *find_or_load_player(char *name, bool *is_file) {
 	if ((index = find_player_index_by_name(name))) {
 		if (!(ch = is_playing(index->idnum))) {
 			if ((ch = load_player(index->name, TRUE))) {
+				SET_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);
 				*is_file = TRUE;
 			}
 		}
