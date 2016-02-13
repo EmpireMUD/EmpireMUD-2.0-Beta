@@ -2862,7 +2862,7 @@ ACMD(do_diplomacy) {
 		
 		if (IS_SET(diplo_option[type].flags, DIPF_UNILATERAL)) {
 			// demand
-			ch_pol->start_time = ch_pol->start_time = time(0);
+			ch_pol->start_time = vict_pol->start_time = time(0);
 			REMOVE_BIT(ch_pol->type, diplo_option[type].remove_bits);
 			REMOVE_BIT(ch_pol->offer, diplo_option[type].remove_bits);
 			REMOVE_BIT(vict_pol->type, diplo_option[type].remove_bits);
@@ -2878,7 +2878,7 @@ ACMD(do_diplomacy) {
 		}
 		else if (POL_OFFERED(vict_pol, diplo_option[type].add_bits)) {
 			// accept
-			ch_pol->start_time = ch_pol->start_time = time(0);
+			ch_pol->start_time = vict_pol->start_time = time(0);
 			REMOVE_BIT(ch_pol->type, diplo_option[type].remove_bits);
 			REMOVE_BIT(ch_pol->offer, diplo_option[type].remove_bits);
 			REMOVE_BIT(vict_pol->type, diplo_option[type].remove_bits);
