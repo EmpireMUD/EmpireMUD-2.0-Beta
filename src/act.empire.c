@@ -1282,7 +1282,7 @@ struct diplomacy_type {
 	char *desc;	// short explanation
 } diplo_option[] = {
 	{ "peace", DIPL_PEACE, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_WAR | DIPL_DISTRUST, NOBITS, "end a war or state of distrust" },
-	{ "truce", NOBITS, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_WAR, NOBITS, "end a war without declaring peace" },
+	{ "truce", DIPL_TRUCE, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_WAR, NOBITS, "end a war without declaring peace" },
 	
 	{ "alliance ally", DIPL_ALLIED, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_NONAGGR, NOBITS, "propose or accept a full alliance" },
 	{ "nonaggression pact", DIPL_NONAGGR, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_PEACE, NOBITS, "propose or accept a pact of non-aggression" },
