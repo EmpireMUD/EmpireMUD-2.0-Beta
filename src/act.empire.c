@@ -221,7 +221,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		{ DIPL_PEACE, "peace", "At peace with", FALSE },
 		{ DIPL_TRUCE, "a truce", "In a truce with", FALSE },
 		{ DIPL_DISTRUST, "distrust", "Distrustful of", FALSE },
-		{ DIPL_WAR, "war", "At war with", FALSE },
+		{ DIPL_WAR, "battle", "At war with", FALSE },
 		{ DIPL_TRADE, "trade", "", TRUE },
 		
 		// goes last
@@ -319,47 +319,49 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	if (EMPIRE_DIPLOMACY(e)) {
 		msg_to_char(ch, "Diplomatic relations:\r\n");
 	}
-
-	// display political information by diplomacy type
-	for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
-		if (!diplomacy_display[iter].offers_only) {
-			found = FALSE;
-			for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
-				if (IS_SET(emp_pol->type, diplomacy_display[iter].type) && (other = real_empire(emp_pol->id))) {
-					if (!found) {
-						msg_to_char(ch, "%s ", diplomacy_display[iter].text);
-					}
+	
+	if (is_own_empire || !EMPIRE_IS_TIMED_OUT(e)) {
+		// display political information by diplomacy type
+		for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
+			if (!diplomacy_display[iter].offers_only) {
+				found = FALSE;
+				for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
+					if (IS_SET(emp_pol->type, diplomacy_display[iter].type) && (other = real_empire(emp_pol->id)) && !EMPIRE_IS_TIMED_OUT(other)) {
+						if (!found) {
+							msg_to_char(ch, "%s ", diplomacy_display[iter].text);
+						}
 				
-					msg_to_char(ch, "%s%s%s&0%s", (found ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other), (IS_SET(emp_pol->type, DIPL_TRADE) ? " (trade)" : ""));
-					found = TRUE;
+						msg_to_char(ch, "%s%s%s&0%s", (found ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other), (IS_SET(emp_pol->type, DIPL_TRADE) ? " (trade)" : ""));
+						found = TRUE;
+					}
+				}
+			
+				if (found) {
+					msg_to_char(ch, ".\r\n");
 				}
 			}
-			
+		}
+
+		// now show any open offers
+		for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
+			found = FALSE;
+			for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
+				// only show offers to members
+				if (is_own_empire || (GET_LOYALTY(ch) && EMPIRE_VNUM(GET_LOYALTY(ch)) == emp_pol->id)) {
+					if (IS_SET(emp_pol->offer, diplomacy_display[iter].type) && (other = real_empire(emp_pol->id)) && !EMPIRE_IS_TIMED_OUT(other)) {
+						if (!found) {
+							msg_to_char(ch, "Offering %s to ", diplomacy_display[iter].name);
+						}
+				
+						msg_to_char(ch, "%s%s%s&0", (found ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other));
+						found = TRUE;
+					}
+				}
+			}
+		
 			if (found) {
 				msg_to_char(ch, ".\r\n");
 			}
-		}
-	}
-
-	// now show any open offers
-	for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
-		found = FALSE;
-		for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
-			// only show offers to members
-			if (is_own_empire || (GET_LOYALTY(ch) && EMPIRE_VNUM(GET_LOYALTY(ch)) == emp_pol->id)) {
-				if (IS_SET(emp_pol->offer, diplomacy_display[iter].type) && (other = real_empire(emp_pol->id))) {
-					if (!found) {
-						msg_to_char(ch, "Offering %s to ", diplomacy_display[iter].name);
-					}
-				
-					msg_to_char(ch, "%s%s%s&0", (found ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other));
-					found = TRUE;
-				}
-			}
-		}
-		
-		if (found) {
-			msg_to_char(ch, ".\r\n");
 		}
 	}
 
