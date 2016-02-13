@@ -1269,6 +1269,7 @@ void upgrade_city(char_data *ch, char *argument) {
 #define DIPF_REQUIRE_PRESENCE  BIT(0)	// Only works if the other side is online.
 #define DIPF_UNILATERAL  BIT(1)	// No need to offer first.
 #define DIPF_WAR_COST  BIT(2)	// Empire must pay to do this.
+#define DIPF_NOT_MUTUAL_WAR  BIT(3)	// Won't work if mutual_war_only is set
 
 struct diplomacy_type {
 	char *keywords;	// keyword list (first word is displayed to players, any word matches)
@@ -1286,7 +1287,7 @@ struct diplomacy_type {
 	{ "trade trading", DIPL_TRADE, NOBITS, NOBITS, NOBITS, "propose or accept a trade agreement" },
 	{ "distrust", DIPL_DISTRUST, ALL_DIPLS, NOBITS, DIPF_UNILATERAL, "declare that your empire distrusts, but is not at war with, another" },
 	
-	{ "war", DIPL_WAR, ALL_DIPLS, NOBITS, DIPF_UNILATERAL | DIPF_WAR_COST | DIPF_REQUIRE_PRESENCE, "declare war on an empire!" },
+	{ "war", DIPL_WAR, ALL_DIPLS, NOBITS, DIPF_UNILATERAL | DIPF_WAR_COST | DIPF_REQUIRE_PRESENCE | DIPF_NOT_MUTUAL_WAR, "declare war on an empire!" },
 	{ "battle", DIPL_WAR, ALL_DIPLS, NOBITS, DIPF_REQUIRE_PRESENCE, "suggest a friendly war" },
 	
 	{ "\n", NOBITS, NOBITS, NOBITS, NOBITS }	// this goes last
@@ -2793,6 +2794,9 @@ ACMD(do_diplomacy) {
 	// option validation
 	else if ((type = find_diplomacy_option(type_arg)) == NOTHING) {
 		msg_to_char(ch, "Unknown option '%s'.\r\n", type_arg);
+	}
+	else if (IS_SET(diplo_option[type].flags, DIPF_NOT_MUTUAL_WAR) && config_get_bool("mutual_war_only")) {
+		msg_to_char(ch, "You can't unilaterally declare %s.\r\n", fname(diplo_option[type].keywords));
 	}
 	
 	// empire validation
