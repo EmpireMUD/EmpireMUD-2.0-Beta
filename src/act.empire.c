@@ -1282,7 +1282,7 @@ struct diplomacy_type {
 	{ "truce", NOBITS, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_WAR, NOBITS, "end a war without declaring peace" },
 	
 	{ "alliance ally", DIPL_ALLIED, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_NONAGGR, NOBITS, "propose or accept a full alliance" },
-	{ "non-aggression nonaggression pact", DIPL_NONAGGR, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_PEACE, NOBITS, "propose or accept a pact of non-aggression" },
+	{ "nonaggression pact", DIPL_NONAGGR, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_PEACE, NOBITS, "propose or accept a pact of non-aggression" },
 	{ "trade trading", DIPL_TRADE, NOBITS, NOBITS, NOBITS, "propose or accept a trade agreement" },
 	{ "distrust", DIPL_DISTRUST, ALL_DIPLS, NOBITS, DIPF_UNILATERAL, "declare that your empire distrusts, but is not at war with, another" },
 	
