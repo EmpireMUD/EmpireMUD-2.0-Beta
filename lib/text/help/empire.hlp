@@ -329,10 +329,11 @@ See also: COMMERCE, EXCHANGE, MINT, VAULT, WITHDRAW
 DIPLOMACY PEACE WAR ALLIANCE TRUCE DISTRUST
 
 Usage:  diplomacy <option> <empire>
+        diplomacy cancel <option> <empire>
 
-This command is the basis for the interaction among empires. It allows an
-empire to voice its political opinion on another empire and announce it to
-that empire.
+Engage in politics with another empire. This command is used to offer, accept,
+or demand political relations. You can also cancel open offers. Check the
+empire detail page to see current relationships.
 
 You can only burn down or besiege another empires buildings if you are at war.
 You can only go to war with or steal from an empire if at least one of their
