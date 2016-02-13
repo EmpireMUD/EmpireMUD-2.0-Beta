@@ -2798,7 +2798,7 @@ ACMD(do_diplomacy) {
 		msg_to_char(ch, "Unknown option '%s'.\r\n", type_arg);
 	}
 	else if (IS_SET(diplo_option[type].flags, DIPF_NOT_MUTUAL_WAR) && config_get_bool("mutual_war_only")) {
-		msg_to_char(ch, "You can't unilaterally declare %s.\r\n", fname(diplo_option[type].keywords));
+		msg_to_char(ch, "This EmpireMUD does not allow you to unilaterally declare %s.\r\n", fname(diplo_option[type].keywords));
 	}
 	
 	// empire validation

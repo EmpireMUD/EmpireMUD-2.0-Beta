@@ -1809,7 +1809,7 @@ double exchange_rate(empire_data *from, empire_data *to) {
 		modifier = 0.65;
 	}
 	else if (IS_SET(pol->type, DIPL_WAR)) {
-		modifier = 0;
+		modifier = 0.1;
 	}
 	else if (IS_SET(pol->type, DIPL_DISTRUST)) {
 		modifier = 0.25;
@@ -1824,7 +1824,7 @@ double exchange_rate(empire_data *from, empire_data *to) {
 		modifier += 0.25;
 	}
 
-	modifier = MAX(0.0, MIN(1.0, modifier));
+	modifier = MAX(0.1, MIN(1.0, modifier));
 	return modifier;
 }
 
