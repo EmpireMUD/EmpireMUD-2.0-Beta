@@ -1062,6 +1062,10 @@ bool can_use_room(char_data *ch, room_data *room, int mode) {
 			return TRUE;
 		}
 	}
+	// public + guest + hostile + no-empire exclusion
+	if (ROOM_AFF_FLAGGED(homeroom, ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED && !GET_LOYALTY(ch) && IS_HOSTILE(ch)) {
+		return FALSE;
+	}
 	
 	// otherwise it's just whether ch's empire can use it
 	return emp_can_use_room(GET_LOYALTY(ch), room, mode);
@@ -1088,8 +1092,8 @@ bool emp_can_use_room(empire_data *emp, room_data *room, int mode) {
 	if (!ROOM_OWNER(homeroom)) {
 		return TRUE;
 	}
-	// public + guests
-	if (ROOM_AFF_FLAGGED(homeroom, ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED) {
+	// public + guests (not at war or hostile)
+	if (ROOM_AFF_FLAGGED(homeroom, ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED && !has_relationship(emp, ROOM_OWNER(homeroom), DIPL_WAR)) {
 		return TRUE;
 	}
 	// empire ownership
