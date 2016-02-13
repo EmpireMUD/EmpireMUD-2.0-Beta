@@ -808,7 +808,7 @@ void check_wars(void) {
 						rev->start_time = time(0);
 					}
 					
-					syslog(SYS_INFO, 0, TRUE, "WAR: The war between %s and %s has timed out", EMPIRE_NAME(emp), EMPIRE_NAME(enemy));
+					syslog(SYS_INFO, 0, TRUE, "DIPL: The war between %s and %s has timed out", EMPIRE_NAME(emp), EMPIRE_NAME(enemy));
 					log_to_empire(emp, ELOG_DIPLOMACY, "The war with %s is over", EMPIRE_NAME(enemy));
 					log_to_empire(enemy, ELOG_DIPLOMACY, "The war with %s is over", EMPIRE_NAME(emp));
 				}

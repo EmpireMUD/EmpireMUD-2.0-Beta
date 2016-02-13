@@ -130,7 +130,7 @@ struct file_lookup_struct file_lookup[] = {
 	{ "syserr", LVL_CIMPL, "../log/syserr" },
 	{ "level", LVL_CIMPL, "../log/levels" },
 	{ "olc", LVL_CIMPL, "../log/olc" },
-	{ "war", LVL_CIMPL, "../log/war" },
+	{ "diplomacy", LVL_CIMPL, "../log/diplomacy" },
 	{ "scripterr", LVL_CIMPL, "../log/scripterr" },
 
 	// last

@@ -724,7 +724,7 @@ void perform_reboot(void) {
 		system("fgrep \"SYSERR:\" syslog >> log/syserr");
 		system("fgrep \"LVL:\" syslog >> log/levels");
 		system("fgrep \"OLC:\" syslog >> log/olc");
-		system("fgrep \"WAR:\" syslog >> log/war");
+		system("fgrep \"DIPL:\" syslog >> log/diplomacy");
 		system("fgrep \"SCRIPT ERR:\" syslog >> log/scripterr");
 		system("cp syslog log/syslog.old");
 		system("echo 'Rebooting EmpireMUD...' > syslog");
