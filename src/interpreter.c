@@ -423,6 +423,7 @@ ACMD(do_wear);
 ACMD(do_weather);
 ACMD(do_where);
 ACMD(do_whereami);
+ACMD(do_whisperstride);
 ACMD(do_who);
 ACMD(do_whois);
 ACMD(do_wield);
@@ -979,6 +980,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "where", POS_RESTING, do_where, NO_MIN, CTYPE_COMM ),
 	SIMPLE_CMD( "whereami", POS_RESTING, do_whereami, NO_MIN, CTYPE_COMM ),
 	SCMD_CMD( "whisper", POS_RESTING, do_spec_comm, NO_MIN, CTYPE_COMM, SCMD_WHISPER ),
+	ABILITY_CMD( "whisperstride", POS_STANDING, do_whisperstride, NO_MIN, CTYPE_SKILL, ABIL_WHISPERSTRIDE ),
 	SIMPLE_CMD( "wield", POS_RESTING, do_wield, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "withdraw", POS_STANDING, do_withdraw, LVL_APPROVED, CTYPE_EMPIRE ),
 	SCMD_CMD( "wiznet", POS_DEAD, do_pub_comm, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_WIZNET ),
