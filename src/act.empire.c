@@ -1278,7 +1278,7 @@ struct diplomacy_type {
 	bitvector_t flags;	// DIPF_ flags for do_diplomacy
 	char *desc;	// short explanation
 } diplo_option[] = {
-	{ "peace", DIPL_PEACE, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_WAR, NOBITS, "end a war or begin a relationship with a neutral empire" },
+	{ "peace", DIPL_PEACE, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_WAR | DIPL_DISTRUST, NOBITS, "end a war or state of distrust" },
 	{ "truce", NOBITS, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_WAR, NOBITS, "end a war without declaring peace" },
 	
 	{ "alliance ally", DIPL_ALLIED, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_NONAGGR, NOBITS, "propose or accept a full alliance" },
@@ -2831,7 +2831,7 @@ ACMD(do_diplomacy) {
 	else if (ch_pol && POL_FLAGGED(ch_pol, diplo_option[type].add_bits)) {
 		msg_to_char(ch, "You already have that relationship with %s.\r\n", EMPIRE_NAME(vict_emp));
 	}
-	else if (diplo_option[type].requires_bits && (!ch_pol || !POL_FLAGGED(ch_pol, diplo_option[type].requires_bits))) {
+	else if (diplo_option[type].requires_bits && (!ch_pol || !IS_SET(ch_pol->type, diplo_option[type].requires_bits))) {
 		msg_to_char(ch, "You can't do that with your current diplomatic relations.\r\n");
 	}
 	else if (IS_SET(diplo_option[type].flags, DIPF_REQUIRE_PRESENCE) && count_members_online(vict_emp) == 0) {
