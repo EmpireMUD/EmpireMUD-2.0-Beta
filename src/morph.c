@@ -145,6 +145,9 @@ void add_morph_affects(char_data *ch) {
 		affect_to_char(ch, af);
 		free(af);
 	}
+	
+	// in case nothing else did
+	affect_total(ch);
 }
 
 
@@ -324,6 +327,11 @@ void perform_morph(char_data *ch, morph_data *morph) {
 	GET_HEALTH(ch) = (sh_int) (GET_MAX_HEALTH(ch) * health_mod);
 	GET_MOVE(ch) = (sh_int) (GET_MAX_MOVE(ch) * move_mod);
 	GET_MANA(ch) = (sh_int) (GET_MAX_MANA(ch) * mana_mod);
+	
+	// in case this is called by something else while they're already morphing
+	if (!IS_NPC(ch) && GET_ACTION(ch) == ACT_MORPHING) {
+		GET_ACTION(ch) = ACT_NONE;
+	}
 }
 
 
