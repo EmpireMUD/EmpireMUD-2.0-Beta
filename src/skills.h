@@ -390,6 +390,7 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_CHANT_OF_ILLUSIONS  265
 #define ABIL_ELDER_CRAFTS  266
 #define ABIL_ASTRAL_WEREWOLF_FORM  267
+#define ABIL_WHISPERSTRIDE 268
 
 
 // cooldowns -- see COOLDOWN_x in constants.c
@@ -585,8 +586,9 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ATYPE_CONFER  60
 #define ATYPE_CONFERRED  61
 #define ATYPE_MORPH  62
+#define ATYPE_WHISPERSTRIDE  63
 
-#define NUM_ATYPES  63	// total number, for bounds checking
+#define NUM_ATYPES  64	// total number, for bounds checking
 
 
 // armor types
