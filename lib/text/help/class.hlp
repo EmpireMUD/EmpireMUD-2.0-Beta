@@ -256,7 +256,7 @@ See also: CLASS, CASTER, UTILITY
 Feral
 Natural Magic + Survival
 
-All: Basilisk (familiar), Resurrect
+All: Basilisk (familiar), Resurrect, Werewolf Form
 Tank: Towering Werewolf Form
 Caster: Astral Werewolf Form
 Healer: Fastcasting, Healing Boost, Sage Werewolf Form
@@ -417,7 +417,7 @@ See also: CLASS, MELEE
 Shadow Wolf
 Natural Magic + Stealth
 
-All: Moonrise
+All: Moonrise, Werewolf Form
 Melee: Howl, Savage Werewolf Form, Scorpion Shadow (familiar)
 Caster: Astral Werewolf Form, Scorpion Shadow (familiar)
 Healer: Fastcasting, Healing Boost, Owl Shadow (familiar), Sage Werewolf Form
@@ -524,7 +524,7 @@ See also: CASTER, HEALER, MELEE, TANK
 Werewolf
 Battle + Natural Magic
 
-All: Resurrect
+All: Resurrect, Werewolf Form
 Tank: Spirit Wolf (familiar), Towering Werewolf Form
 Melee: Dire Wolf (familiar), Savage Werewolf Form
 Caster: Astral Werewolf Form, Dire Wolf (familiar)

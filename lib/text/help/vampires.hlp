@@ -51,7 +51,7 @@ victim is drained fatally.
 Bat Form (Vampire ability)
 
 Usage:  morph bat
-Cost:  50 blood (100 in combat)
+Cost:  50 blood (150 in combat)
 Upkeep:  1 blood/hr
 
 A master vampire can turn into a tiny bat, capable of flight.
@@ -180,7 +180,7 @@ Dread Blood Form
 Class ability: Lich, Necromancer
 
 Usage:  morph dread blood
-Cost:  30 blood (60 in combat)
+Cost:  30 blood (90 in combat)
 
 The dread blood form is a liquid red terror with a shape that only vaguely
 resembles the man it once was. By channeling its full power through its
@@ -203,7 +203,7 @@ Horrid Form
 Class ability: Reaper, Shade, Wight
 
 Usage:  morph horrid
-Cost:  30 blood (60 in combat)
+Cost:  30 blood (90 in combat)
 
 The vampire takes on the horrid form, a twisted bestial monstrosity.
 
@@ -230,7 +230,7 @@ that are immune to Vampire debuffs are also immune to Majesty.
 Mist Form (Vampire ability)
 
 Usage:  morph mist
-Cost: 20 blood (40 in combat)
+Cost: 20 blood (60 in combat)
 Upkeep:  1 blood/hr
 
 The vampire dissolves into mist, unable to be harmed. Many spells and abilities
@@ -389,7 +389,7 @@ the strength of others for 75 seconds.
 Wolf Form (Vampire ability)
 
 Usage:  morph <type>
-Cost:  20 blood (40 in combat)
+Cost:  20 blood (60 in combat)
 Upkeep:  1 blood/hr
 Morph types:  wolf, coyote, ocelot
 
