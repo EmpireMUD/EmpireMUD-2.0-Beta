@@ -129,6 +129,7 @@ See also: CLASS, CASTER, UTILITY
 Assassin
 Battle + Stealth
 
+All: Whisperstride
 Melee: Dual-Wield, Shadow Kick
 
 Note: Class abilities are unfinished.
@@ -140,6 +141,7 @@ See also: CLASS, MELEE
 Bandit
 Stealth + Survival
 
+All: Whisperstride
 Melee: Crucial Jab, Dual-Wield
 
 Note: Class abilities are unfinished.
@@ -382,7 +384,7 @@ See also: CLASS, MELEE
 Powerbroker
 Empire + Stealth
 
-All: Dragonriding
+All: Dragonriding, Whisperstride
 Melee: Stagger Jab
 
 Note: Class abilities are unfinished.
@@ -431,7 +433,7 @@ See also: CLASS, MELEE, HEALER
 Smuggler
 Stealth + Trade
 
-All: Smuggler Crafts
+All: Smuggler Crafts, Whisperstride
 Melee: Diversion, Dual-Wield
 
 Note: Class abilities are unfinished.

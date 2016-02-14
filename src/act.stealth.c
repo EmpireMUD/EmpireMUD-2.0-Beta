@@ -1784,15 +1784,18 @@ ACMD(do_whisperstride) {
 	struct affected_type *af;
 	int cost = 100;
 	int duration = 6; // 30 seconds
-
-	if (!can_use_ability(ch, ABIL_WHISPERSTRIDE, MOVE, cost, NOTHING)) {
+	if (!can_use_ability(ch, ABIL_WHISPERSTRIDE, MOVE, cost, COOLDOWN_WHISPERSTRIDE)) {
 		return;
 	}
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_WHISPERSTRIDE)) {
 		return;
 	}
+	else if (IS_RIDING(ch)) {
+		msg_to_char(ch, "You can't use Whisperstride while mounted!\r\n");
+		return;
+	}
 	else {
-		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_WHISPERSTRIDE, 300, WAIT_ABILITY);
 		
 		msg_to_char(ch, "You cloak yourself with dark whispers, muffling your movement...\r\n");
 		act("$n is surrounded by dark whispers...", TRUE, ch, NULL, NULL, TO_ROOM);
