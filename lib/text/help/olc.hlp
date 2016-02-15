@@ -260,6 +260,9 @@ Objects (OEDIT):
   for build-to-char and build-to-room.
 - All lights must have a timer. If you want a player to activate a light before
   it starts timing down, make an unlit version with a LIGHT interaction.
+- The COMBINE and SEPARATE interactions should always use 1 exclusion set, as
+  they will extract the original item if their interaction succeeds, and it's
+  not safe to run additional interactions.
 
 Room Templates (REDIT):
 - Don't confuse room templates with the designated rooms that players can add
@@ -2416,6 +2419,11 @@ Mob interaction types:
  
 Object interaction types:
  LIGHT - Item something is converted into when lit on fire.
+ COMBINE** - Combine multiple copies of an obj into another obj (quantity is the
+    number required, rather than number you get).
+ SEPARATE** - Split this item into multiple other items.
+ ** Both COMBINE and SEPARATE should be set exclusive, as they will extract
+    the original item.
 
 Room interaction types:
  DIG - Items received when using the dig action.

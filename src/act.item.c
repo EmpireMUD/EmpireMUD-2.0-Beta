@@ -724,7 +724,7 @@ INTERACTION_FUNC(separate_obj_interact) {
 	// how many they need
 	res = create_resource_list(interaction->vnum, interaction->quantity, NOTHING);
 	
-	snprintf(to_char, sizeof(to_char), "You separates %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+	snprintf(to_char, sizeof(to_char), "You separate %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
 	act(to_char, FALSE, ch, NULL, NULL, TO_CHAR);
 	snprintf(to_room, sizeof(to_room), "$n separates %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
 	act(to_room, TRUE, ch, NULL, NULL, TO_ROOM);
