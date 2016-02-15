@@ -191,8 +191,9 @@ NAVIGATION COORDINATES
 
 Navigation (Survival ability)
 
-Navigation allows you to tell which way is North. Without it, each time you
-log into the game you will see a different direction as North.
+Navigation allows you to tell which way is North. Without it, any time you are
+logged out of the game for over an hour you will see a random direction as
+North.
 
 Once you learn Navigation, you'll also be able to see coordinates for map
 locations. This game uses Cartesian coordinates (x, y).
