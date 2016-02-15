@@ -328,6 +328,9 @@ ACMD(do_mount) {
 			send_config_msg(ch, "no_person");
 		}
 	}
+	else if (AFF_FLAGGED(ch, AFF_SNEAK)) {
+		msg_to_char(ch, "You can't mount while sneaking.\r\n");
+	}
 	else if (!mob && IS_COMPLETE(IN_ROOM(ch)) && !BLD_ALLOWS_MOUNTS(IN_ROOM(ch))) {
 		// only check this if they didn't target a mob -- still need to be able to pick up new mounts indoors
 		msg_to_char(ch, "You can't mount here.\r\n");
