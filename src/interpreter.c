@@ -338,6 +338,7 @@ ACMD(do_scrape);
 ACMD(do_search);
 ACMD(do_send);
 ACMD(do_selfdelete);
+ACMD(do_separate);
 ACMD(do_set);
 ACMD(do_shadowcage);
 ACMD(do_shadowstep);
@@ -877,6 +878,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "search", POS_STANDING, do_search, NO_MIN, CTYPE_COMBAT, ABIL_SEARCH ),
 	STANDARD_CMD( "selfdelete", POS_SLEEPING, do_selfdelete, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_UTIL, CMD_NO_ABBREV, NO_ABIL ),
 	GRANT_CMD( "send", POS_SLEEPING, do_send, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SEND ),
+	SIMPLE_CMD( "separate", POS_RESTING, do_separate, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "set", POS_DEAD, do_set, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SET ),
 	STANDARD_CMD( "sew", POS_STANDING, do_gen_craft, LVL_APPROVED, NO_GRANTS, CRAFT_TYPE_SEW, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "share", POS_RESTING, do_share, NO_MIN, CTYPE_UTIL ),

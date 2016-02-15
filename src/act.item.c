@@ -104,6 +104,7 @@ INTERACTION_FUNC(combine_obj_interact) {
 	
 	if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE)) {
 		// error message sent by has_resources
+		free_resource_list(res);
 		return TRUE;
 	}
 	
@@ -131,6 +132,7 @@ INTERACTION_FUNC(combine_obj_interact) {
 	act(to_char, FALSE, ch, new_obj, NULL, TO_CHAR);
 	act(to_room, TRUE, ch, new_obj, NULL, TO_ROOM);
 	
+	free_resource_list(res);
 	return TRUE;
 }
 
@@ -708,6 +710,29 @@ void remove_armor_by_type(char_data *ch, int armor_type) {
 			unequip_char_to_inventory(ch, iter);
 		}
 	}
+}
+
+
+/**
+* Interaction func for "separate". This always extracts the original
+* item, so it should basically always return TRUE.
+*/
+INTERACTION_FUNC(separate_obj_interact) {
+	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
+	struct resource_data *res;
+	
+	// how many they need
+	res = create_resource_list(interaction->vnum, interaction->quantity, NOTHING);
+	
+	snprintf(to_char, sizeof(to_char), "You separates %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+	act(to_char, FALSE, ch, NULL, NULL, TO_CHAR);
+	snprintf(to_room, sizeof(to_room), "$n separates %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+	act(to_room, TRUE, ch, NULL, NULL, TO_ROOM);
+	
+	give_resources(ch, res, FALSE);
+	extract_obj(inter_item);
+	free_resource_list(res);
+	return TRUE;
 }
 
 
@@ -4804,6 +4829,31 @@ ACMD(do_roadsign) {
 
 		gain_ability_exp(ch, ABIL_ROADS, 33.4);
 		extract_obj(sign);
+	}
+}
+
+
+ACMD(do_separate) {
+	char arg[MAX_INPUT_LENGTH];
+	obj_data *obj;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Separate what?\r\n");
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
+	}
+	else if (!has_interaction(obj->interactions, INTERACT_SEPARATE)) {
+		msg_to_char(ch, "You can't separate that!\r\n");
+	}
+	else {		
+		// will extract no matter what happens here
+		if (!run_interactions(ch, obj->interactions, INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, separate_obj_interact)) {
+			act("You fail to separate $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		command_lag(ch, WAIT_OTHER);
 	}
 }
 
