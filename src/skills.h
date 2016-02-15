@@ -449,6 +449,7 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define COOLDOWN_DIVERSION  51
 #define COOLDOWN_ROGUE_FLAG  52
 #define COOLDOWN_PORTAL_SICKNESS  53
+#define COOLDOWN_WHISPERSTRIDE  54
 
 
 /* WEAPON ATTACK TYPES */
