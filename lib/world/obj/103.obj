@@ -327,9 +327,10 @@ a scaly dragonfruit~
 A scaly dragonfruit is lying here.~
 This exotic red fruit has green, scaly leaves coming out of its leathery skin.
 ~
-6 0 a 2
+6 0 a 4
 6 0 0
 7 48
+I 14 10339 100.00 4 x  # COMBINE: a basket of dragonfruit
 S
 #10339
 dragonfruit fruit basket~
@@ -339,9 +340,10 @@ A basket of dragonfruit is sitting here.~
 on a cactus, and as they require little water, they should be easy to farm in
 the desert. You could probably preserve the dragonfruit by making it into jam.
 ~
-6 b a 4
+6 b a 5
 24 10338 0
 7 168
+I 15 10338 100.00 4 x  # SEPARATE: a scaly dragonfruit
 R
 5114 0
 S

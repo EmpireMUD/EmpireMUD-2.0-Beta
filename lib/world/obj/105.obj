@@ -6,9 +6,10 @@ Someone has dropped a glowing vegetable.~
 appears to be a magi-netically modified crop from the deranged druids of the
 Magiterranean.
 ~
-6 0 a 5
+6 0 a 6
 6 0 0
 7 48
+I 14 10501 100.00 4 x  # COMBINE: a handful of glowkra pods
 M
 5
 $n pops a glowing seedpod into $s mouth.~
@@ -25,9 +26,10 @@ You've heard they glow brighter when pickled. You also have a good recipe for
 seafood glowkra gumbo that just needs some magenta arrowfish and some rice.
 This strange crop is surely the work of the mad druids of the Magiterranean.
 ~
-6 b a 5
+6 b a 6
 24 10500 0
 7 168
+I 15 10500 100.00 4 x  # SEPARATE: a glowkra pod
 R
 5114 0
 S
@@ -260,9 +262,10 @@ a magic mushroom~
 A magic mushroom is lying here.~
 You trip while looking at the mushroom.
 ~
-6 0 a 4
+6 0 a 5
 1 0 0
 7 48
+I 14 10516 100.00 4 x  # COMBINE: a basket of magic mushrooms
 M
 4
 You chew $p until your mouth is dry, and suddenly you don't feel so good...~
@@ -279,9 +282,10 @@ Brew (Healing Elixirs): magic mushroom potion
   4x basket of magic mushrooms
   6x magewhisper sepals
 ~
-6 b a 6
+6 b a 7
 24 10505 0
 7 168
+I 15 10515 100.00 4 x  # SEPARATE: a magic mushroom
 M
 4
 You chew $p until your mouth is dry, and suddenly you don't feel so good...~
