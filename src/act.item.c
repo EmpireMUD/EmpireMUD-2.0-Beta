@@ -419,6 +419,12 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), climate_types[GET_CROP_CLIMATE(cp)]);
 	}
 	
+	if (has_interaction(obj->interactions, INTERACT_COMBINE)) {
+		msg_to_char(ch, "It can be combined.\r\n");
+	}
+	if (has_interaction(obj->interactions, INTERACT_SEPARATE)) {
+		msg_to_char(ch, "It can be separated.\r\n");
+	}
 	
 	*lbuf = '\0';
 	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
