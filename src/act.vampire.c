@@ -811,7 +811,7 @@ ACMD(do_boost) {
 		return;
 	}
 	else if (!*arg) {
-		msg_to_char(ch, "Which attribute do you wish to boost (strength or dexterity), or 'end' to cancel boosts?\r\n");
+		msg_to_char(ch, "Which attribute do you wish to boost (strength, charisma, or intelligence), or 'end' to cancel boosts?\r\n");
 	}
 	
 	else if (is_abbrev(arg, "end")) {
@@ -827,7 +827,30 @@ ACMD(do_boost) {
 		return;
 	}
 
-	/* Strength */
+	// Charisma
+	else if (is_abbrev(arg, "charisma")) {
+		if (GET_CHARISMA(ch) >= att_max(ch)) {
+			msg_to_char(ch, "Your charisma is already at maximum!\r\n");
+		}
+		else if (affected_by_spell_and_apply(ch, ATYPE_BOOST, APPLY_CHARISMA)) {
+			msg_to_char(ch, "Your charisma is already boosted!\r\n");
+		}
+		else {
+			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_CHARISMA, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0), ch);
+			affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
+			
+			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_BLOOD_UPKEEP, 1, ch);
+			affect_to_char(ch, af);
+			free(af);
+
+			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
+
+			msg_to_char(ch, "You focus your blood into your skin and voice, increasing your charisma!\r\n");
+			gain_ability_exp(ch, ABIL_BOOST, 20);
+		}
+	}
+
+	// Strength
 	else if (is_abbrev(arg, "strength")) {
 		if (GET_STRENGTH(ch) >= att_max(ch)) {
 			msg_to_char(ch, "Your strength is already at maximum!\r\n");
@@ -850,16 +873,16 @@ ACMD(do_boost) {
 		}
 	}
 
-	/* Dexterity */
-	else if (is_abbrev(arg, "dexterity")) {
-		if (GET_DEXTERITY(ch) >= att_max(ch)) {
-			msg_to_char(ch, "Your dexterity is already at maximum!\r\n");
+	// Intelligence
+	else if (is_abbrev(arg, "intelligence")) {
+		if (GET_INTELLIGENCE(ch) >= att_max(ch)) {
+			msg_to_char(ch, "Your intelligence is already at maximum!\r\n");
 		}
-		else if (affected_by_spell_and_apply(ch, ATYPE_BOOST, APPLY_DEXTERITY)) {
-			msg_to_char(ch, "Your dexterity is already boosted!\r\n");
+		else if (affected_by_spell_and_apply(ch, ATYPE_BOOST, APPLY_INTELLIGENCE)) {
+			msg_to_char(ch, "Your intelligence is already boosted!\r\n");
 		}
 		else {
-			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_DEXTERITY, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0), ch);
+			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_INTELLIGENCE, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0), ch);
 			affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
 			
 			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_BLOOD_UPKEEP, 1, ch);
@@ -868,12 +891,13 @@ ACMD(do_boost) {
 
 			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 
-			msg_to_char(ch, "You focus your blood, increasing your dexterity!\r\n");
+			msg_to_char(ch, "You focus your blood into your mind, increasing your intelligence!\r\n");
 			gain_ability_exp(ch, ABIL_BOOST, 20);
 		}
 	}
+	
 	else {
-		msg_to_char(ch, "Would you like to increase your strength or dexterity?\r\n");
+		msg_to_char(ch, "Would you like to increase your strength, charisma, or intelligence?\r\n");
 	}
 }
 

@@ -115,13 +115,13 @@ BOOST
 
 Boost (Vampire ability)
 
-Usage:  boost <strength | dexterity>
+Usage:  boost <strength | charisma | intelligence>
         boost end
 Cost:  10 blood
 Upkeep:  1 blood/hr per boost
 
-This ability allows a vampire to boost strength or dexterity by spending
-blood. At high skill levels, you may get a stronger boost at the same cost.
+This ability allows a vampire to boost primary attributes by spending blood.
+At high skill levels, you may get a stronger boost at the same cost.
 
 You can end your boosts early by typing "boost end".
 #
