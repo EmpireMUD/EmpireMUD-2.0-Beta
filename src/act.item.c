@@ -91,6 +91,51 @@ bool can_take_obj(char_data *ch, obj_data *obj) {
 
 
 /**
+* Interaction func for "combine". This almost always extracts the original
+* item, so it should basically always return TRUE.
+*/
+INTERACTION_FUNC(combine_obj_interact) {
+	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
+	struct resource_data *res;
+	obj_data *new_obj;
+	
+	// how many they need
+	res = create_resource_list(GET_OBJ_VNUM(inter_item), interaction->quantity, NOTHING);
+	
+	if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE)) {
+		// error message sent by has_resources
+		return TRUE;
+	}
+	
+	snprintf(to_char, sizeof(to_char), "You combine %dx %s into $p!", interaction->quantity, skip_filler(GET_OBJ_SHORT_DESC(inter_item)));
+	snprintf(to_room, sizeof(to_room), "$n combines %dx %s into $p!", interaction->quantity, skip_filler(GET_OBJ_SHORT_DESC(inter_item)));
+	
+	new_obj = read_object(interaction->vnum, TRUE);
+	scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
+	
+	extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY));
+	
+	// ownership
+	new_obj->last_owner_id = GET_IDNUM(ch);
+	new_obj->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
+	
+	// put it somewhere
+	if (CAN_WEAR(new_obj, ITEM_WEAR_TAKE)) {
+		obj_to_char(new_obj, ch);
+	}
+	else {
+		obj_to_room(new_obj, IN_ROOM(ch));
+	}
+	load_otrigger(new_obj);
+	
+	act(to_char, FALSE, ch, new_obj, NULL, TO_CHAR);
+	act(to_room, TRUE, ch, new_obj, NULL, TO_ROOM);
+	
+	return TRUE;
+}
+
+
+/**
 * @param room_data *room The room to check.
 * @return int Number of items in the room (large counts double).
 */
@@ -3199,6 +3244,31 @@ void warehouse_store(char_data *ch, char *argument) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
+
+ACMD(do_combine) {
+	char arg[MAX_INPUT_LENGTH];
+	obj_data *obj;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Combine what?\r\n");
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
+	}
+	else if (!has_interaction(obj->interactions, INTERACT_COMBINE)) {
+		msg_to_char(ch, "You can't combine that!\r\n");
+	}
+	else {		
+		// will extract no matter what happens here
+		if (!run_interactions(ch, obj->interactions, INTERACT_COMBINE, IN_ROOM(ch), NULL, obj, combine_obj_interact)) {
+			act("You fail to combine $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		command_lag(ch, WAIT_OTHER);
+	}
+}
+
 
 ACMD(do_draw) {
 	obj_data *obj = NULL;

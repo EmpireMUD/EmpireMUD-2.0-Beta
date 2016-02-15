@@ -3030,6 +3030,8 @@ const char *interact_types[] = {
 	"LIGHT",
 	"PICKPOCKET",
 	"MINE",
+	"COMBINE",
+	"SEPARATE",
 	"\n"
 };
 
@@ -3049,7 +3051,9 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_ROOM,
 	TYPE_OBJ,	// light
 	TYPE_MOB,	// pickpocket
-	TYPE_MINE_DATA	// mine
+	TYPE_MINE_DATA,	// mine
+	TYPE_OBJ,	// combine
+	TYPE_OBJ,	// separate
 };
 
 
@@ -3068,7 +3072,9 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_MOB,	// encounter
 	TYPE_OBJ,
 	TYPE_OBJ,
-	TYPE_OBJ	// mine
+	TYPE_OBJ,	// mine
+	TYPE_OBJ,	// combine
+	TYPE_OBJ,	// separate
 };
 
 

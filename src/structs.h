@@ -306,7 +306,9 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_LIGHT  11
 #define INTERACT_PICKPOCKET  12
 #define INTERACT_MINE  13
-#define NUM_INTERACTS  14
+#define INTERACT_COMBINE  14
+#define INTERACT_SEPARATE  15
+#define NUM_INTERACTS  16
 
 
 // for object saving

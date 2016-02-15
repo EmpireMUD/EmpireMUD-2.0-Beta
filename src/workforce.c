@@ -484,7 +484,7 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore,
 * @param room_data *location The place we'll check for resource overages.
 * @param int chore which CHORE_
 * @param struct interaction_item *list The list of interactions to check.
-* @param int interaction_type Any INTERACT_x types.
+* @param int interaction_type Any INTERACT_ types.
 * @param bool highest_only If TRUE, only checks if the empire can gain the thing with the highest percent.
 * @return bool TRUE if the empire could gain the resource(s) from the interaction list.
 */
@@ -517,7 +517,7 @@ bool can_gain_chore_resource_from_interaction_list(empire_data *emp, room_data *
 * @param empire_data *emp The empire whose inventory we'll check.
 * @param room_data *room The room whose interactions we'll check.
 * @param int chore which CHORE_
-* @param int interaction_type Any INTERACT_x types.
+* @param int interaction_type Any INTERACT_ types.
 * @return bool TRUE if the empire could gain at least one resource from the interactions on this room.
 */
 bool can_gain_chore_resource_from_interaction(empire_data *emp, room_data *room, int chore, int interaction_type) {
