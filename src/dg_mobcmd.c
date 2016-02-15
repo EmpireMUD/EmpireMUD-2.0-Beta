@@ -722,7 +722,7 @@ ACMD(do_mmorph) {
 	if (!*tar_arg || !*num_arg) {
 		mob_log(ch, "mmorph: missing argument(s)");
 	}
-	else if ((*tar_arg == UID_CHAR && !(vict = get_char(tar_arg))) && !(vict = get_char_room_vis(ch, tar_arg))) {
+	else if (*tar_arg == UID_CHAR ? !(vict = get_char(tar_arg)) : !(vict = get_char_room_vis(ch, tar_arg))) {
 		mob_log(ch, "mmorph: invalid target '%s'", tar_arg);
 	}
 	else if (!normal && (!isdigit(*num_arg) || !(morph = morph_proto(atoi(num_arg))))) {
