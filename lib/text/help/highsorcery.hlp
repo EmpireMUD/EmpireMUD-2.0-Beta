@@ -22,6 +22,8 @@ Arcane Power (High Sorcery ability)
 Sorcerers who have mastered the arcane arts can channel 35% more mana than
 those without. Your total mana increases by this amount, including any bonuses
 from equipment and other abilities.
+
+Gain experience passively over time.
 #
 "CITY TELEPORTATION"
 
@@ -34,7 +36,7 @@ Cost:  15 mana
 This ability expands your teleport power to any of your empire's cities. You
 can use the city's name or number. Use "city list" to see available cities.
 
-This ability levels up High Sorcery any time you teleport to a city.
+This ability gains experience any time you use it to teleport to a city.
 
 See also: TELEPORTATION, CITY
 #
@@ -53,6 +55,8 @@ on your skill level, with a bonus based on your Intelligence.
 
 In combat, colorburst will automatically target your current opponent if you
 do not provide a target.
+
+Gain experience by casting this spell.
 
 See also: TO-HIT
 #
@@ -83,6 +87,8 @@ Sometimes you can create magical gems from the released energy.
 
 You can only disenchant items from your own inventory.
 
+Gain experience by disenchanting things.
+
 See also: ENCHANT
 #
 DISPEL
@@ -94,7 +100,10 @@ Cooldown:  9 seconds
 Cost:  30 mana
 
 This spell removes any magical or fire-based damage-over-time effects on the
-target.
+target. The target must be affected by at least one such effect for this spell
+to work.
+
+Gain experience by casting this spell.
 
 See also: CLEANSE
 #
@@ -114,6 +123,8 @@ below level 100, the enchanter's High Sorcery skill also limits the effect.
 An item must be in your inventory to enchant it. However, if another player
 "shares" an item, you can enchant that item by targeting that player by name
 (e.g. "enchant Lyra striking").
+
+Each ability gains experience when you use enchantments that require it.
 
 Enchant Weapons:
   striking - strength, to-hit  (5 bloodstones)
@@ -161,6 +172,8 @@ Your victim is enervated: he loses move regen. You are able to leech some
 of this for yourself, and your move regeneration receive a temporary boost.
 
 In combat, enervate will automatically target your opponent.
+
+Gain experience by casting this spell.
 #
 FORESIGHT
 
@@ -173,15 +186,18 @@ When granted the gift of foresight, a person gains +5, +10, or +15 Dodge
 (based on skill, modified by Intelligence) as she begins to see the arc of an
 opponent's weapon before it strikes.
 
-Gain skill by casting foresight or by fighting while it is active on you.
-
 If your target is in combat, you will join the combat upon using this ability.
+
+Gain experience by casting foresight or by taking damage while it is active on
+you.
 #
 "GREATER ENCHANTMENTS"
 
 Greater Enchantments (High Sorcery ability)
 
 This ability raises the strength of all your enchantments by 50%.
+
+Gain experience when you apply any enchantment.
 
 See also: ENCHANT
 #
@@ -198,7 +214,7 @@ pool for reduced combat damage.
 Mana Shield reduces your mana by 25 (this effect is modified by abilities which
 change your mana pool size, such as Gift of Nature).
 
-Gain skill by fighting while manashielded.
+Gain skill by taking damage while manashielded, not by reapplying it.
 #
 MIRRORIMAGE "MIRROR IMAGE"
 
@@ -212,6 +228,8 @@ This spell creates an identical duplicate of the caster (with reduced health).
 It's good enough to fool at least one of the people hitting you.
 
 The mirror image counts as a familiar.
+
+Gain experience by summoning it.
 
 See also: FAMILIAR, DISMISS, ORDER
 #
@@ -228,8 +246,8 @@ performed, the Phoenix Rite does not expire until it saves you from death.
 When you are restored from death, you will have 20% of your health and at least
 20% each of blood, mana, and moves.
 
-You can re-cast the ritual to gain skill, but it will level your High Sorcery
-when it saves you as well.
+You can re-cast the ritual to gain experience, but it will gain experience when
+it saves you as well.
 
 See also: RITUAL
 #
@@ -261,8 +279,8 @@ Cost:  15 mana
 Becoming a Portal Master removes the range limit on your empire's portals.
 It also allows you to collapse portals yourself.
 
-You can gain Portal Master skill whenever someone in your empire uses your
-portal mastery to open a portal.
+You can gain Portal Master skill whenever someone in your empire opens a
+portal, and whenever you collapse a portal.
 
 See also: PORTAL, PORTAL MAGIC
 #
@@ -283,7 +301,7 @@ Cost:  5 mana
 
 This ritual allows you to carry 6, 12, or 18 more items (based on your level).
 
-You can level up High Sorcery by re-casting this ritual.
+You can gain experience by re-casting this ritual.
 
 See also: RITUAL
 #
@@ -298,7 +316,7 @@ This ritual enchants a wall to be able to repel anyone flying. It will go away
 if you dismantle the wall. You will not get your resources back if you cancel
 the ritual; they are spent immediately.
 
-Cast it on more walls to raise your skill.
+This ability gains experience each time the ritual is completed.
 
 See also: RITUAL
 #
@@ -339,7 +357,8 @@ With the basic teleportation ability, you can teleport at random (2 to 7 map
 tiles in any direction) or you can teleport to your home. You won't be able to
 teleport out of (or into) any room owned by a non-allied empire.
 
-This ability levels up High Sorcery any time you teleport.
+This ability gains experience any time you teleport (using this ability or City
+Teleportation).
 
 See also: CITY TELEPORTATION, RITUAL
 #
@@ -369,6 +388,10 @@ Debuff type:  High Sorcery
 You can steal mana from other casters using the mana siphon ability. If you are
 in combat, it will automatically target your current opponent. This will boost
 your own mana regen while dropping theirs significantly.
+
+Obviously, this spell does not work on foes with no mana of their own.
+
+Gain experience by casting this spell.
 #
 SLOW
 
@@ -382,6 +405,8 @@ Debuff type:  High Sorcery
 This ability hexes your victim with lethargy, causing them to attack more
 slowly in combat. If you're already fighting and do not specify a victim, it
 will target the person you are fighting.
+
+Gain experience by casting this spell.
 #
 STAFFMAKING "STAFF MAKING" STAFF STAVES "POWERFUL STAVES"
 
@@ -435,6 +460,8 @@ this ability, and it may be used to grab as many items as the sorcerer wishes.
 You cannot summon items out of the vault (or other secure locations), and you
 must have the "storage" empire privilege to use this ability at all.
 
+Gains experience when you open the portal to summon items.
+
 See also: VAULT
 #
 "SUMMON SWIFT"
@@ -474,6 +501,8 @@ Sunshock does 2x damage to vampires.
 If you are in combat and specify no target, Sunshock hits your current
 opponent.
 
+Gain experience by casting this spell.
+
 See also: BLIND
 #
 VIGOR
@@ -490,5 +519,7 @@ igence and High Sorcery level.
 The vigor bonus is doubled if the target is not in combat.
 
 If your target is in combat, you will join the combat upon using this ability.
+
+Vigor gains experience when you cast it.
 #
 $
