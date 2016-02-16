@@ -2981,7 +2981,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'n': {	// char.n*
 					if (!str_cmp(field, "name"))
-						snprintf(str, slen, "%s", GET_NAME(c));
+						snprintf(str, slen, "%s", PERS(c, c, FALSE));
 
 					else if (!str_cmp(field, "next_in_room")) {
 						char_data *temp_ch;

@@ -745,7 +745,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	}
 	else {
 		if (IS_NPC(i)) {
-			strcpy(buf, GET_SHORT_DESC(i));
+			strcpy(buf, PERS(i, ch, FALSE));
 			CAP(buf);
 		}
 		else {
