@@ -84,7 +84,7 @@ void check_attribute_gear(char_data *ch) {
 	}
 	
 	// don't bother if morphed -- let them keep using gear, but not equip any more
-	if (GET_MORPH(ch) != MORPH_NONE) {
+	if (IS_MORPHED(ch)) {
 		return;
 	}
 	
@@ -253,7 +253,7 @@ void eliminate_linkdead_players(void) {
 * All other chars in the room that have the same affect will be freed from it.
 *
 * @param char_data *victim The person that was just crowd-controlled.
-* @param int atype The ATYPE_x spell type to limit.
+* @param int atype The ATYPE_ spell type to limit.
 * @return int The number of people freed by this function.
 */
 int limit_crowd_control(char_data *victim, int atype) {
@@ -286,7 +286,6 @@ int limit_crowd_control(char_data *victim, int atype) {
 * @param char_data *ch The character to update.
 */
 void point_update_char(char_data *ch) {
-	extern int get_blood_upkeep_cost(char_data *ch);
 	void despawn_mob(char_data *ch);
 	
 	struct cooldown_data *cool, *next_cool;
@@ -345,15 +344,15 @@ void point_update_char(char_data *ch) {
 	}
 	
 	// bloody upkeep
-	if (IS_VAMPIRE(ch)) {
-		GET_BLOOD(ch) -= get_blood_upkeep_cost(ch);
+	if (IS_VAMPIRE(ch) && !IS_IMMORTAL(ch)) {
+		GET_BLOOD(ch) -= MAX(0, GET_BLOOD_UPKEEP(ch));
 		
 		if (GET_BLOOD(ch) < 0) {
 			out_of_blood(ch);
 			return;
 		}
 	}
-	else {	// not a vampire
+	else {	// not a vampire (or is imm)
 		// don't gain blood whilst being fed upon
 		if (GET_FED_ON_BY(ch) == NULL) {
 			GET_BLOOD(ch) = MIN(GET_BLOOD(ch) + 1, GET_MAX_BLOOD(ch));
@@ -442,7 +441,7 @@ void real_update_char(char_data *ch) {
 		adventure_unsummon(ch);
 	}
 	
-	if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
+	if (!IS_NPC(ch) && IS_MORPHED(ch)) {
 		check_morph_ability(ch);
 	}
 	
@@ -659,10 +658,10 @@ void real_update_char(char_data *ch) {
 		update_vampire_sun(ch);
 	}
 
-	if (!AWAKE(ch) && GET_MORPH(ch) == MORPH_MIST) {
+	if (!AWAKE(ch) && IS_MORPHED(ch) && CHAR_MORPH_FLAGGED(ch, MORPHF_NO_SLEEP)) {
 		sprintf(buf, "%s has become $n!", PERS(ch, ch, 0));
 
-		perform_morph(ch, MORPH_NONE);
+		perform_morph(ch, NULL);
 
 		act(buf, TRUE, ch, 0, 0, TO_ROOM);
 		msg_to_char(ch, "You revert to normal!\r\n");
@@ -809,7 +808,7 @@ void check_wars(void) {
 						rev->start_time = time(0);
 					}
 					
-					syslog(SYS_INFO, 0, TRUE, "WAR: The war between %s and %s has timed out", EMPIRE_NAME(emp), EMPIRE_NAME(enemy));
+					syslog(SYS_INFO, 0, TRUE, "DIPL: The war between %s and %s has timed out", EMPIRE_NAME(emp), EMPIRE_NAME(enemy));
 					log_to_empire(emp, ELOG_DIPLOMACY, "The war with %s is over", EMPIRE_NAME(enemy));
 					log_to_empire(enemy, ELOG_DIPLOMACY, "The war with %s is over", EMPIRE_NAME(emp));
 				}

@@ -29,6 +29,7 @@
 * Contents:
 *   Helpers
 *   City Helpers
+*   Diplomacy Helpers
 *   Efind Helpers
 *   Import / Export Helpers
 *   Inspire Helpers
@@ -220,7 +221,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		{ DIPL_PEACE, "peace", "At peace with", FALSE },
 		{ DIPL_TRUCE, "a truce", "In a truce with", FALSE },
 		{ DIPL_DISTRUST, "distrust", "Distrustful of", FALSE },
-		{ DIPL_WAR, "war", "At war with", FALSE },
+		{ DIPL_WAR, "battle", "At war with", FALSE },
 		{ DIPL_TRADE, "trade", "", TRUE },
 		
 		// goes last
@@ -318,47 +319,49 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	if (EMPIRE_DIPLOMACY(e)) {
 		msg_to_char(ch, "Diplomatic relations:\r\n");
 	}
-
-	// display political information by diplomacy type
-	for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
-		if (!diplomacy_display[iter].offers_only) {
-			found = FALSE;
-			for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
-				if (IS_SET(emp_pol->type, diplomacy_display[iter].type) && (other = real_empire(emp_pol->id))) {
-					if (!found) {
-						msg_to_char(ch, "%s ", diplomacy_display[iter].text);
-					}
+	
+	if (is_own_empire || !EMPIRE_IS_TIMED_OUT(e)) {
+		// display political information by diplomacy type
+		for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
+			if (!diplomacy_display[iter].offers_only) {
+				found = FALSE;
+				for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
+					if (IS_SET(emp_pol->type, diplomacy_display[iter].type) && (other = real_empire(emp_pol->id)) && !EMPIRE_IS_TIMED_OUT(other)) {
+						if (!found) {
+							msg_to_char(ch, "%s ", diplomacy_display[iter].text);
+						}
 				
-					msg_to_char(ch, "%s%s%s&0%s", (found ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other), (IS_SET(emp_pol->type, DIPL_TRADE) ? " (trade)" : ""));
-					found = TRUE;
+						msg_to_char(ch, "%s%s%s&0%s", (found ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other), (IS_SET(emp_pol->type, DIPL_TRADE) ? " (trade)" : ""));
+						found = TRUE;
+					}
+				}
+			
+				if (found) {
+					msg_to_char(ch, ".\r\n");
 				}
 			}
-			
+		}
+
+		// now show any open offers
+		for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
+			found = FALSE;
+			for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
+				// only show offers to members
+				if (is_own_empire || (GET_LOYALTY(ch) && EMPIRE_VNUM(GET_LOYALTY(ch)) == emp_pol->id)) {
+					if (IS_SET(emp_pol->offer, diplomacy_display[iter].type) && (other = real_empire(emp_pol->id)) && !EMPIRE_IS_TIMED_OUT(other)) {
+						if (!found) {
+							msg_to_char(ch, "Offering %s to ", diplomacy_display[iter].name);
+						}
+				
+						msg_to_char(ch, "%s%s%s&0", (found ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other));
+						found = TRUE;
+					}
+				}
+			}
+		
 			if (found) {
 				msg_to_char(ch, ".\r\n");
 			}
-		}
-	}
-
-	// now show any open offers
-	for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
-		found = FALSE;
-		for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
-			// only show offers to members
-			if (is_own_empire || (GET_LOYALTY(ch) && EMPIRE_VNUM(GET_LOYALTY(ch)) == emp_pol->id)) {
-				if (IS_SET(emp_pol->offer, diplomacy_display[iter].type) && (other = real_empire(emp_pol->id))) {
-					if (!found) {
-						msg_to_char(ch, "Offering %s to ", diplomacy_display[iter].name);
-					}
-				
-					msg_to_char(ch, "%s%s%s&0", (found ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other));
-					found = TRUE;
-				}
-			}
-		}
-		
-		if (found) {
-			msg_to_char(ch, ".\r\n");
 		}
 	}
 
@@ -1256,6 +1259,57 @@ void upgrade_city(char_data *ch, char *argument) {
 	log_to_empire(emp, ELOG_TERRITORY, "%s has upgraded %s to a %s", PERS(ch, ch, 1), city->name, city_type[city->type].name);
 	read_empire_territory(emp);
 	save_empire(emp);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// DIPLOMACY HELPERS ///////////////////////////////////////////////////////
+
+#define POL_FLAGGED(pol, flg)  (IS_SET((pol)->type, (flg)) == (flg))
+#define POL_OFFERED(pol, flg)  (IS_SET((pol)->offer, (flg)) == (flg))
+
+#define DIPF_REQUIRE_PRESENCE  BIT(0)	// Only works if the other side is online.
+#define DIPF_UNILATERAL  BIT(1)	// No need to offer first.
+#define DIPF_WAR_COST  BIT(2)	// Empire must pay to do this.
+#define DIPF_NOT_MUTUAL_WAR  BIT(3)	// Won't work if mutual_war_only is set
+
+struct diplomacy_type {
+	char *keywords;	// keyword list (first word is displayed to players, any word matches)
+	bitvector_t add_bits;	// DIPL_ represented by this
+	bitvector_t remove_bits;	// DIPL_ to be removed
+	bitvector_t requires_bits;	// DIPL_ required to use this
+	bitvector_t flags;	// DIPF_ flags for do_diplomacy
+	char *desc;	// short explanation
+} diplo_option[] = {
+	{ "peace", DIPL_PEACE, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_WAR | DIPL_DISTRUST | DIPL_TRUCE, NOBITS, "end a war or state of distrust" },
+	{ "truce", DIPL_TRUCE, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_WAR | DIPL_DISTRUST, NOBITS, "end a war without declaring peace" },
+	
+	{ "alliance ally", DIPL_ALLIED, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_NONAGGR, NOBITS, "propose or accept a full alliance" },
+	{ "nonaggression pact", DIPL_NONAGGR, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_TRUCE | DIPL_PEACE, NOBITS, "propose or accept a pact of non-aggression" },
+	{ "trade trading", DIPL_TRADE, NOBITS, NOBITS, NOBITS, "propose or accept a trade agreement" },
+	{ "distrust", DIPL_DISTRUST, ALL_DIPLS, NOBITS, DIPF_UNILATERAL, "declare that your empire distrusts, but is not at war with, another" },
+	
+	{ "war", DIPL_WAR, ALL_DIPLS, NOBITS, DIPF_UNILATERAL | DIPF_WAR_COST | DIPF_REQUIRE_PRESENCE | DIPF_NOT_MUTUAL_WAR, "declare war on an empire!" },
+	{ "battle", DIPL_WAR, ALL_DIPLS, NOBITS, DIPF_REQUIRE_PRESENCE, "suggest a friendly war" },
+	
+	{ "\n", NOBITS, NOBITS, NOBITS, NOBITS }	// this goes last
+};
+
+
+/**
+* Matches input text to a diplomacy option.
+*
+* @param char *arg The typed-in arg (may be 1 or more keywords).
+* @return int The diplo_option[] position, or NOTHING if no match.
+*/
+int find_diplomacy_option(char *arg) {
+	int iter;
+	for (iter = 0; *(diplo_option[iter].keywords) != '\n'; ++iter) {
+		if (multi_isname(arg, diplo_option[iter].keywords)) {
+			return iter;
+		}
+	}
+	return NOTHING;
 }
 
 
@@ -2701,239 +2755,178 @@ ACMD(do_deposit) {
 }
 
 
-ACMD(do_diplomacy) {	
-	struct empire_political_data *pol_a, *pol_b;
-	empire_data *e, *f;
-	int i;
-
-	char *dipl_commands[] = {
-		"peace",	"war",		"ally",		"pact",
-		"trade",	"distrust",	"truce",	"\n"
-		};
-
-	#define DIPLOMACY_FORMAT		\
-		"Usage: diplomacy <action> <empire>\r\n"	\
-		"Actions are:\r\n"	\
-		" &gtrade&0 - propose or accept a trade agreement\r\n" \
-		" &gally&0 - propose or accept a full alliance\r\n" \
-		" &ypact&0 - propose or accept a pact of non-aggression\r\n" \
-		" &ypeace&0 - end a war or begin a relationship with a neutral empire\r\n"	\
-		" &ytruce&0 - end a war without declaring peace\r\n"	\
-		" &rdistrust&0 - declare that your empire distrusts, but is not at war with, another\r\n"	\
-		" &rwar&0 - declare war on an empire\r\n"
-
-	argument = one_argument(argument, arg);
-	skip_spaces(&argument);
-
-	if (!*arg || !*argument) {
-		msg_to_char(ch, DIPLOMACY_FORMAT);
-		return;
+ACMD(do_diplomacy) {
+	char type_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], ch_log[MAX_STRING_LENGTH], vict_log[MAX_STRING_LENGTH];
+	struct empire_political_data *ch_pol = NULL, *vict_pol = NULL;
+	empire_data *ch_emp, *vict_emp;
+	int iter, type, war_cost = 0;
+	bool cancel = FALSE;
+	
+	half_chop(argument, type_arg, emp_arg);
+	
+	// check for optional cancel arg
+	if (!str_cmp(type_arg, "cancel")) {
+		cancel = TRUE;
+		strcpy(buf, emp_arg);
+		half_chop(buf, type_arg, emp_arg);
 	}
-
-	if (!(e = GET_LOYALTY(ch))) {
-		msg_to_char(ch, "You don't belong to any empire!\r\n");
-		return;
+	
+	if (!*type_arg) {
+		msg_to_char(ch, "Usage: diplomacy <option> <empire>\r\n");
+		msg_to_char(ch, "       diplomacy cancel <option> <empire>\r\n");
+		msg_to_char(ch, "Options:\r\n");
+		
+		for (iter = 0; *(diplo_option[iter].keywords) != '\n'; ++iter) {
+			msg_to_char(ch, "  \ty%s\t0 - %s\r\n", fname(diplo_option[iter].keywords), diplo_option[iter].desc);
+		}
 	}
-	if (EMPIRE_IMM_ONLY(e)) {
+	else if (!(ch_emp = GET_LOYALTY(ch)) || IS_NPC(ch)) {
+		msg_to_char(ch, "You can't engage in diplomacy if you're not a member of an empire.\r\n");
+	}
+	
+	// own empire validation
+	else if (EMPIRE_IMM_ONLY(ch_emp)) {
 		msg_to_char(ch, "Empires belonging to immortals cannot engage in diplomacy.\r\n");
-		return;
 	}
-	if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_DIPLOMACY)) {
+	else if (GET_RANK(ch) < EMPIRE_PRIV(ch_emp, PRIV_DIPLOMACY)) {
 		// don't use has_permission, it would check the ownership of the room
 		msg_to_char(ch, "You don't have the authority to make diplomatic relations.\r\n");
-		return;
 	}
-	if (!(f = get_empire_by_name(argument))) {
-		msg_to_char(ch, "Unknown empire.\r\n");
-		return;
+	
+	// option validation
+	else if ((type = find_diplomacy_option(type_arg)) == NOTHING) {
+		msg_to_char(ch, "Unknown option '%s'.\r\n", type_arg);
 	}
-	if (EMPIRE_IMM_ONLY(f)) {
+	else if (IS_SET(diplo_option[type].flags, DIPF_NOT_MUTUAL_WAR) && config_get_bool("mutual_war_only")) {
+		msg_to_char(ch, "This EmpireMUD does not allow you to unilaterally declare %s.\r\n", fname(diplo_option[type].keywords));
+	}
+	
+	// empire validation
+	else if (!*emp_arg) {
+		msg_to_char(ch, "Which empire would you like to offer %s?\r\n", fname(diplo_option[type].keywords));
+	}
+	else if (!(vict_emp = get_empire_by_name(emp_arg))) {
+		msg_to_char(ch, "Unknown empire '%s'.\r\n", emp_arg);
+	}
+	else if (EMPIRE_IMM_ONLY(vict_emp)) {
 		msg_to_char(ch, "Empires belonging to immortals cannot engage in diplomacy.\r\n");
-		return;
 	}
-
-	if (e == f) {
+	else if (ch_emp == vict_emp) {
 		msg_to_char(ch, "You can't engage in diplomacy with your own empire!\r\n");
-		return;
 	}
-
-	/* Find the command */
-	for (i = 0; str_cmp(dipl_commands[i], "\n") && !is_abbrev(arg, dipl_commands[i]); i++);
-
-	if (!str_cmp(dipl_commands[i], "\n")) {
-		msg_to_char(ch, DIPLOMACY_FORMAT);
-		return;
+	
+	// cancel? (has its own logic not based on current relations)
+	else if (cancel) {
+		if (!(ch_pol = find_relation(ch_emp, vict_emp)) || !POL_OFFERED(ch_pol, diplo_option[type].add_bits)) {
+			msg_to_char(ch, "You haven't offered that to %s.\r\n", EMPIRE_NAME(vict_emp));
 		}
-
-	if (!(pol_a = find_relation(e, f))) {
-		pol_a = create_relation(e, f);
+		else {
+			REMOVE_BIT(ch_pol->offer, diplo_option[type].add_bits);
+			log_to_empire(ch_emp, ELOG_DIPLOMACY, "The offer of %s to %s has been canceled", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
+			log_to_empire(vict_emp, ELOG_DIPLOMACY, "%s has withdrawn the offer of %s", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
+			msg_to_char(ch, "You have withdrawn the offer of %s to %s.\r\n", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
+			save_empire(ch_emp);
+		}
+		return;
 	}
-	if (!(pol_b = find_relation(f, e))) {
-		pol_b = create_relation(f, e);
+	
+	// relationship validation
+	else if ((ch_pol = find_relation(ch_emp, vict_emp)) && POL_FLAGGED(ch_pol, DIPL_WAR) && !IS_SET(diplo_option[type].requires_bits, DIPL_WAR)) {
+		msg_to_char(ch, "You can't do that while you're at war.\r\n");
 	}
-
-	// TODO could split this out into different functions
-	switch (i) {
-		case 0:		/* Peace */
-			if (IS_SET(pol_b->offer, DIPL_PEACE)) {
-				REMOVE_BIT(pol_a->offer, DIPL_PEACE | DIPL_TRUCE);
-				REMOVE_BIT(pol_b->offer, DIPL_PEACE | DIPL_TRUCE);
-				if (IS_SET(pol_a->type, DIPL_WAR)) {
-					syslog(SYS_INFO, 0, TRUE, "WAR: %s (%s) has ended the war with %s", EMPIRE_NAME(e), GET_NAME(ch), EMPIRE_NAME(f));
-				}
-				pol_a->type = pol_b->type = DIPL_PEACE;
-				log_to_empire(e, ELOG_DIPLOMACY, "The empire is now at peace with %s", EMPIRE_NAME(f));
-				log_to_empire(f, ELOG_DIPLOMACY, "The empire is now at peace with %s", EMPIRE_NAME(e));
-				send_config_msg(ch, "ok_string");
-			}
-			else if (IS_SET(pol_a->type, DIPL_WAR | DIPL_DISTRUST | DIPL_TRUCE) || !pol_a->type) {
-				SET_BIT(pol_a->offer, DIPL_PEACE);
-				log_to_empire(e, ELOG_DIPLOMACY, "The empire has offered peace to %s", EMPIRE_NAME(f));
-				log_to_empire(f, ELOG_DIPLOMACY, "%s has offered peace to the empire", EMPIRE_NAME(e));
-				send_config_msg(ch, "ok_string");
-			}
-			else if (IS_SET(pol_a->type, DIPL_ALLIED))
-				msg_to_char(ch, "But you're already allied!\r\n");
-			else if (IS_SET(pol_a->type, DIPL_NONAGGR))
-				msg_to_char(ch, "But you've already got a non-aggression pact!\r\n");
-			else
-				msg_to_char(ch, "But you already have better relations!\r\n");
-			break;
-		case 1: {	/* War */
-			int war_cost = get_war_cost(e, f);
+	else if (ch_pol && POL_FLAGGED(ch_pol, diplo_option[type].add_bits)) {
+		msg_to_char(ch, "You already have that relationship with %s.\r\n", EMPIRE_NAME(vict_emp));
+	}
+	else if (diplo_option[type].requires_bits && (!ch_pol || !IS_SET(ch_pol->type, diplo_option[type].requires_bits))) {
+		msg_to_char(ch, "You can't do that with your current diplomatic relations.\r\n");
+	}
+	else if (IS_SET(diplo_option[type].flags, DIPF_REQUIRE_PRESENCE) && count_members_online(vict_emp) == 0) {
+		msg_to_char(ch, "You can't do that when no members of %s are online.\r\n", EMPIRE_NAME(vict_emp));
+	}
+	else if (IS_SET(diplo_option[type].flags, DIPF_WAR_COST) && EMPIRE_COINS(ch_emp) < (war_cost = get_war_cost(ch_emp, vict_emp))) {
+		msg_to_char(ch, "The empire requires %d coin%s in the vault in order to finance the war with %s!\r\n", war_cost, PLURAL(war_cost), EMPIRE_NAME(vict_emp));
+	}
+	else if (ch_pol && POL_OFFERED(ch_pol, diplo_option[type].add_bits)) {
+		msg_to_char(ch, "Your empire has already made that offer.\r\n");
+	}
+	
+	// ready to go
+	else {
+		if (!ch_pol) {
+			ch_pol = create_relation(ch_emp, vict_emp);
+		}
+		if (!(vict_pol = find_relation(vict_emp, ch_emp))) {
+			ch_pol = create_relation(vict_emp, ch_emp);
+		}
+		
+		if (war_cost > 0) {
+			EMPIRE_COINS(ch_emp) -= war_cost;
+		}
+		
+		*ch_log = '\0';	// leave trailing punctuation off of ch_log (for war cost)
+		*vict_log = '\0';
+		
+		if (IS_SET(diplo_option[type].flags, DIPF_UNILATERAL)) {
+			// demand
+			ch_pol->start_time = vict_pol->start_time = time(0);
+			REMOVE_BIT(ch_pol->type, diplo_option[type].remove_bits);
+			REMOVE_BIT(ch_pol->offer, diplo_option[type].remove_bits);
+			REMOVE_BIT(vict_pol->type, diplo_option[type].remove_bits);
+			REMOVE_BIT(vict_pol->offer, diplo_option[type].remove_bits);
 			
-			if (IS_SET(pol_a->type, DIPL_WAR))
-				msg_to_char(ch, "You're already at war!\r\n");
-			else if (count_members_online(f) == 0) {
-				msg_to_char(ch, "You can't declare war on an empire if none of their members are online!\r\n");
-			}
-			else if (EMPIRE_COINS(e) < war_cost) {
-				msg_to_char(ch, "The empire requires %d coin%s in the vault in order to finance the war with %s!\r\n", war_cost, PLURAL(war_cost), EMPIRE_NAME(f));
-			}
-			else {
-				pol_a->start_time = pol_b->start_time = time(0);
-				pol_a->offer = pol_b->offer = 0;
-				pol_a->type = pol_b->type = DIPL_WAR;
-				
-				EMPIRE_COINS(e) -= war_cost;
-				
-				log_to_empire(e, ELOG_DIPLOMACY, "War has been declared upon %s for %d coin%s!", EMPIRE_NAME(f), war_cost, PLURAL(war_cost));
-				log_to_empire(f, ELOG_DIPLOMACY, "%s has declared war!", EMPIRE_NAME(e));
-				syslog(SYS_INFO, 0, TRUE, "WAR: %s (%s) has declared war on %s", EMPIRE_NAME(e), GET_NAME(ch), EMPIRE_NAME(f));
-				send_config_msg(ch, "ok_string");
-			}
-			break;
+			SET_BIT(ch_pol->type, diplo_option[type].add_bits);
+			SET_BIT(vict_pol->type, diplo_option[type].add_bits);
+			
+			snprintf(ch_log, sizeof(ch_log), "%s has been declared with %s", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
+			snprintf(vict_log, sizeof(vict_log), "%s has declared %s!", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
+			syslog(SYS_EMPIRE, 0, TRUE, "DIPL: %s (%s) has declared %s with %s", EMPIRE_NAME(ch_emp), GET_NAME(ch), fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
+			msg_to_char(ch, "You have declared %s with %s!\r\n", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
 		}
-		case 2:		/* Ally */
-			if (IS_SET(pol_b->offer, DIPL_ALLIED)) {
-				REMOVE_BIT(pol_b->offer, DIPL_ALLIED | DIPL_NONAGGR | DIPL_PEACE | DIPL_TRUCE);
-				REMOVE_BIT(pol_a->offer, DIPL_ALLIED | DIPL_NONAGGR | DIPL_PEACE | DIPL_TRUCE);
-				REMOVE_BIT(pol_b->type, DIPL_NONAGGR | DIPL_PEACE | DIPL_TRUCE);
-				REMOVE_BIT(pol_a->type, DIPL_NONAGGR | DIPL_PEACE | DIPL_TRUCE);
-				SET_BIT(pol_a->type, DIPL_ALLIED);
-				SET_BIT(pol_b->type, DIPL_ALLIED);
-				log_to_empire(e, ELOG_DIPLOMACY, "An alliance has been established with %s!", EMPIRE_NAME(f));
-				log_to_empire(f, ELOG_DIPLOMACY, "%s has accepted the offer of alliance!", EMPIRE_NAME(e));
-				send_config_msg(ch, "ok_string");
-			}
-			else if (IS_SET(pol_a->type, DIPL_WAR | DIPL_DISTRUST))
-				msg_to_char(ch, "You'll have to establish peace first.\r\n");
-			else if (IS_SET(pol_a->type, DIPL_ALLIED))
-				msg_to_char(ch, "You're already allied!\r\n");
-			else {
-				SET_BIT(pol_a->offer, DIPL_ALLIED);
-				log_to_empire(e, ELOG_DIPLOMACY, "The empire has suggested an alliance to %s", EMPIRE_NAME(f));
-				log_to_empire(f, ELOG_DIPLOMACY, "%s has suggested an alliance", EMPIRE_NAME(e));
-				send_config_msg(ch, "ok_string");
-			}
-			break;
-		case 3:		/* Pact */
-			if (IS_SET(pol_b->offer, DIPL_NONAGGR)) {
-				REMOVE_BIT(pol_b->offer, DIPL_NONAGGR | DIPL_PEACE | DIPL_TRUCE);
-				REMOVE_BIT(pol_a->offer, DIPL_NONAGGR | DIPL_PEACE | DIPL_TRUCE);
-				REMOVE_BIT(pol_b->type, DIPL_PEACE | DIPL_TRUCE);
-				REMOVE_BIT(pol_a->type, DIPL_PEACE | DIPL_TRUCE);
-				SET_BIT(pol_a->type, DIPL_NONAGGR);
-				SET_BIT(pol_b->type, DIPL_NONAGGR);
-				log_to_empire(e, ELOG_DIPLOMACY, "A non-aggression pact has been established with %s!", EMPIRE_NAME(f));
-				log_to_empire(f, ELOG_DIPLOMACY, "%s has accepted the offer of a non-aggression pact!", EMPIRE_NAME(e));
-				send_config_msg(ch, "ok_string");
-			}
-			else if (IS_SET(pol_a->type, DIPL_WAR | DIPL_DISTRUST))
-				msg_to_char(ch, "You'll have to establish peace first.\r\n");
-			else if (IS_SET(pol_a->type, DIPL_ALLIED))
-				msg_to_char(ch, "You're already allied!\r\n");
-			else if (IS_SET(pol_a->type, DIPL_NONAGGR))
-				msg_to_char(ch, "You've already got a pact!\r\n");
-			else {
-				SET_BIT(pol_a->offer, DIPL_NONAGGR);
-				log_to_empire(e, ELOG_DIPLOMACY, "The empire has offered a non-aggression pact to %s", EMPIRE_NAME(f));
-				log_to_empire(f, ELOG_DIPLOMACY, "%s has offered a non-aggression pact", EMPIRE_NAME(e));
-				send_config_msg(ch, "ok_string");
-			}
-			break;
-		case 4:		/* Trade */
-			if (IS_SET(pol_b->offer, DIPL_TRADE)) {
-				REMOVE_BIT(pol_b->offer, DIPL_TRADE);
-				SET_BIT(pol_a->type, DIPL_TRADE);
-				SET_BIT(pol_b->type, DIPL_TRADE);
-				log_to_empire(e, ELOG_DIPLOMACY, "A trade agreement has been established with %s!", EMPIRE_NAME(f));
-				log_to_empire(f, ELOG_DIPLOMACY, "%s has accepted the offer of a trade agreement!", EMPIRE_NAME(e));
-				send_config_msg(ch, "ok_string");
-			}
-			else if (IS_SET(pol_a->type, DIPL_WAR | DIPL_DISTRUST) || !pol_a->type)
-				msg_to_char(ch, "You'll have to establish peace first.\r\n");
-			else if (IS_SET(pol_a->type, DIPL_TRADE))
-				msg_to_char(ch, "You're already trading with them!\r\n");
-			else {
-				SET_BIT(pol_a->offer, DIPL_TRADE);
-				log_to_empire(e, ELOG_DIPLOMACY, "The empire has offered a trade agreement to %s", EMPIRE_NAME(f));
-				log_to_empire(f, ELOG_DIPLOMACY, "%s has offered a trade agreement", EMPIRE_NAME(e));
-				send_config_msg(ch, "ok_string");
-			}
-			break;
-		case 5:		/* Distrust */
-			if (IS_SET(pol_a->type, DIPL_WAR))
-				msg_to_char(ch, "You're already at war!\r\n");
-			else if (IS_SET(pol_a->type, DIPL_DISTRUST))
-				msg_to_char(ch, "You already distrust them!\r\n");
-			else {
-				pol_a->offer = pol_b->offer = 0;
-				pol_a->type = pol_b->type = DIPL_DISTRUST;
-				log_to_empire(e, ELOG_DIPLOMACY, "The empire now officially distrusts %s", EMPIRE_NAME(f));
-				log_to_empire(f, ELOG_DIPLOMACY, "%s has declared that they officially distrust the empire", EMPIRE_NAME(e));
-				send_config_msg(ch, "ok_string");
-			}
-			break;
-		case 6: {		/* Truce */
-			if (IS_SET(pol_b->offer, DIPL_TRUCE)) {
-				REMOVE_BIT(pol_b->offer, DIPL_TRUCE | DIPL_PEACE);
-				if (IS_SET(pol_a->type, DIPL_WAR)) {
-					syslog(SYS_INFO, 0, TRUE, "WAR: %s (%s) has ended the war with %s", EMPIRE_NAME(e), GET_NAME(ch), EMPIRE_NAME(f));
-				}
-				pol_a->type = pol_b->type = DIPL_TRUCE;
-				log_to_empire(e, ELOG_DIPLOMACY, "The empire now has a truce with %s", EMPIRE_NAME(f));
-				log_to_empire(f, ELOG_DIPLOMACY, "The empire now has a truce with %s", EMPIRE_NAME(e));
-				send_config_msg(ch, "ok_string");
-			}
-			else if (IS_SET(pol_a->type, DIPL_WAR | DIPL_DISTRUST)) {
-				SET_BIT(pol_a->offer, DIPL_TRUCE);
-				log_to_empire(e, ELOG_DIPLOMACY, "The empire has offered a truce to %s", EMPIRE_NAME(f));
-				log_to_empire(f, ELOG_DIPLOMACY, "%s has offered a truce to the empire", EMPIRE_NAME(e));
-				send_config_msg(ch, "ok_string");
-			}
-			else if (IS_SET(pol_a->type, DIPL_ALLIED))
-				msg_to_char(ch, "But you're already allied!\r\n");
-			else if (IS_SET(pol_a->type, DIPL_NONAGGR))
-				msg_to_char(ch, "But you've already got a non-aggression pact!\r\n");
-			else
-				msg_to_char(ch, "But you already have better relations!\r\n");
-			break;
+		else if (POL_OFFERED(vict_pol, diplo_option[type].add_bits)) {
+			// accept
+			ch_pol->start_time = vict_pol->start_time = time(0);
+			REMOVE_BIT(ch_pol->type, diplo_option[type].remove_bits);
+			REMOVE_BIT(ch_pol->offer, diplo_option[type].remove_bits);
+			REMOVE_BIT(vict_pol->type, diplo_option[type].remove_bits);
+			REMOVE_BIT(vict_pol->offer, diplo_option[type].remove_bits);
+			
+			SET_BIT(ch_pol->type, diplo_option[type].add_bits);
+			SET_BIT(vict_pol->type, diplo_option[type].add_bits);
+			
+			snprintf(ch_log, sizeof(ch_log), "%s has been accepted with %s", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
+			snprintf(vict_log, sizeof(vict_log), "%s has accepted %s!", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
+			syslog(SYS_EMPIRE, 0, TRUE, "DIPL: %s (%s) has accepted %s with %s", EMPIRE_NAME(ch_emp), GET_NAME(ch), fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
+			msg_to_char(ch, "You have accepted %s with %s!\r\n", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
 		}
-	}
+		else {
+			// offer
+			// don't set start time
+			REMOVE_BIT(ch_pol->offer, diplo_option[type].remove_bits);
+			REMOVE_BIT(vict_pol->offer, diplo_option[type].remove_bits);
+			
+			SET_BIT(ch_pol->offer, diplo_option[type].add_bits);
+			
+			snprintf(ch_log, sizeof(ch_log), "The empire has offered %s to %s", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
+			snprintf(vict_log, sizeof(vict_log), "%s offers %s to the empire", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
+			msg_to_char(ch, "You have offered %s to %s!\r\n", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));	
+		}
+		
+		// logs
+		if (*ch_log) {
+			if (war_cost > 0) {
+				log_to_empire(ch_emp, ELOG_DIPLOMACY, "%s for %d coin%s!", CAP(ch_log), war_cost, PLURAL(war_cost));
+			}
+			else {
+				log_to_empire(ch_emp, ELOG_DIPLOMACY, "%s!", CAP(ch_log));
+			}
+		}
+		if (*vict_log) {
+			log_to_empire(vict_emp, ELOG_DIPLOMACY, "%s", CAP(vict_log));
+		}
 
-	save_empire(e);
-	save_empire(f);
+		save_empire(ch_emp);
+		save_empire(vict_emp);
+	}
 }
 
 

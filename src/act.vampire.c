@@ -25,7 +25,6 @@
 
 /**
 * Contents:
-*   Consts
 *   Helpers
 *   Commands
 */
@@ -40,46 +39,6 @@ void end_morph(char_data *ch);
 // locals
 bool check_vampire_sun(char_data *ch, bool message);
 ACMD(do_bite);
-void end_alacrity(char_data *ch);
-void end_boost(char_data *ch);
-void end_majesty(char_data *ch);
-void retract_claws(char_data *ch);
-void un_deathshroud(char_data *ch);
-void un_mummify(char_data *ch);
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// CONSTS //////////////////////////////////////////////////////////////////
-
-// flags for vampire_upkeep[] -- if you add a new one, modify get_blood_upkeep_cost() and cancel_blood_upkeeps()
-#define VUP_AFFECT  1	// represents an active affect ATYPE_x
-#define VUP_MORPH  2	// represents a MORPH_x state
-
-
-// The structure of upkeep costs for vampire powers
-struct vampire_upkeep_type {
-	int type;	// VUP_x
-	bitvector_t value;	// depending on the type, a AFF flag, affect id, &c.
-	int blood;	// blood cost per hour
-	void (*cancel_function) (char_data *ch);	// the function to cancel the power if upkeep runs out
-};
-
-const struct vampire_upkeep_type vampire_upkeep[] = {
-	{ VUP_MORPH, MORPH_WOLF, 1, end_morph },
-	{ VUP_MORPH, MORPH_BAT, 1, end_morph },
-	{ VUP_MORPH, MORPH_MIST, 1, end_morph },
-	
-	// affects are charged per instance of the ATYPE_x flag, so boost may charge twice
-	{ VUP_AFFECT, ATYPE_ALACRITY, 3, end_alacrity },
-	{ VUP_AFFECT, ATYPE_BOOST, 1, end_boost },
-	{ VUP_AFFECT, ATYPE_CLAWS, 2, retract_claws },
-	{ VUP_AFFECT, ATYPE_MAJESTY, 3, end_majesty },
-	{ VUP_AFFECT, ATYPE_MUMMIFY, 1, un_mummify },
-	{ VUP_AFFECT, ATYPE_DEATHSHROUD, 1, un_deathshroud },
-
-	// this goes last
-	{ NOTHING, NOTHING, NOTHING, NULL }
-};
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -92,28 +51,55 @@ const struct vampire_upkeep_type vampire_upkeep[] = {
 * @param char_data *ch The vampire paying upkeeps.
 */
 void cancel_blood_upkeeps(char_data *ch) {
-	int iter;
-	bool active = FALSE;
+	extern const char *affect_types[];
 	
-	if (!IS_NPC(ch) && IS_VAMPIRE(ch)) {
-		for (iter = 0; vampire_upkeep[iter].type != NOTHING; ++iter) {
-			active = FALSE;
-			
-			// see if active
-			switch (vampire_upkeep[iter].type) {
-				case VUP_AFFECT: {
-					active = affected_by_spell(ch, vampire_upkeep[iter].value);
+	char buf[MAX_STRING_LENGTH];
+	struct affected_type *aff;
+	struct obj_apply *app;
+	obj_data *obj;
+	int iter;
+	bool any;
+	
+	if (IS_NPC(ch) || !IS_VAMPIRE(ch)) {
+		return;
+	}
+	
+	// affs: loop because removing multiple affects makes iterating over affects hard
+	do {
+		any = FALSE;
+		LL_FOREACH(ch->affected, aff) {
+			if (aff->location == APPLY_BLOOD_UPKEEP && aff->modifier > 0) {
+				// special case: morphs
+				if (aff->type == ATYPE_MORPH) {
+					perform_morph(ch, NULL);
+					any = TRUE;
 					break;
 				}
-				case VUP_MORPH: {
-					active = (GET_MORPH(ch) == vampire_upkeep[iter].value);
-					break;
-				}
+				
+				msg_to_char(ch, "Your %s effect fades.\r\n", affect_types[aff->type]);
+				snprintf(buf, sizeof(buf), "$n's %s effect fades.", affect_types[aff->type]);
+				act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
+				
+				affect_from_char(ch, aff->type);
+				any = TRUE;
+				break;	// this removes multiple affs so it's not safe to continue on the list
 			}
-			
-			// did we find it?
-			if (active && vampire_upkeep[iter].cancel_function != NULL) {
-				(vampire_upkeep[iter].cancel_function)(ch);
+		}
+	} while (any);
+	
+	// gear:
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (!(obj = GET_EQ(ch, iter))) {
+			continue;
+		}
+		
+		LL_FOREACH(obj->applies, app) {
+			if (app->location == APPLY_BLOOD_UPKEEP && app->modifier > 0) {
+				act("You can no longer use $p.", FALSE, ch, obj, NULL, TO_CHAR);
+				act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
+				// this may extract it
+				unequip_char_to_inventory(ch, iter);
+				break;	// only need 1 matching apply
 			}
 		}
 	}
@@ -212,49 +198,6 @@ void end_majesty(char_data *ch) {
 			act("$n seems less majestic now.", TRUE, ch, 0, 0, TO_ROOM);
 		}
 	}
-}
-
-
-/**
-* Computes the total upkeep for a character based on the vampire_upkeep[]
-* struct.
-*
-* @param char_data *ch The vampire.
-* @return int The upkeep blood cost total.
-*/
-int get_blood_upkeep_cost(char_data *ch) {
-	struct affected_type *af;
-	int iter;
-	int cost = 0;
-	
-	if (!IS_NPC(ch) && IS_VAMPIRE(ch) && !IS_IMMORTAL(ch)) {
-		// low skill vamp upkeep
-		if (get_skill_level(ch, SKILL_VAMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-			cost += 1;
-		}
-	
-		// normal upkeeps from the table
-		for (iter = 0; vampire_upkeep[iter].type != NOTHING; ++iter) {
-			switch (vampire_upkeep[iter].type) {
-				case VUP_AFFECT: {
-					for (af = ch->affected; af; af = af->next) {
-						if (af->type == vampire_upkeep[iter].value) {
-							cost += vampire_upkeep[iter].blood;
-						}
-					}
-					break;
-				}
-				case VUP_MORPH: {
-					if (GET_MORPH(ch) == vampire_upkeep[iter].value) {
-						cost += vampire_upkeep[iter].blood;
-					}
-					break;
-				}
-			}
-		}
-	}
-	
-	return cost;
 }
 
 
@@ -591,7 +534,7 @@ void update_vampire_sun(char_data *ch) {
 	}
 	
 	// revert vampire morphs
-	if (GET_MORPH(ch) != MORPH_NONE && MORPH_FLAGGED(ch, MORPH_FLAG_VAMPIRE_ONLY)) {
+	if (IS_MORPHED(ch) && CHAR_MORPH_FLAGGED(ch, MORPHF_VAMPIRE_ONLY)) {
 		if (!found) {
 			sun_message(ch);
 		}
@@ -599,7 +542,7 @@ void update_vampire_sun(char_data *ch) {
 		// store morph name
 		sprintf(buf, "%s lurches and reverts into $n!", PERS(ch, ch, 0));
 
-		perform_morph(ch, MORPH_NONE);
+		perform_morph(ch, NULL);
 
 		act(buf, TRUE, ch, 0, 0, TO_ROOM);
 		msg_to_char(ch, "You revert to your natural form!\r\n");
@@ -652,6 +595,10 @@ ACMD(do_alacrity) {
 	
 	af = create_flag_aff(ATYPE_ALACRITY, UNLIMITED, AFF_HASTE, ch);
 	affect_join(ch, af, 0);
+	
+	af = create_mod_aff(ATYPE_ALACRITY, UNLIMITED, APPLY_BLOOD_UPKEEP, 3, ch);
+	affect_to_char(ch, af);
+	free(af);
 
 	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 	gain_ability_exp(ch, ABIL_ALACRITY, 20);
@@ -864,7 +811,7 @@ ACMD(do_boost) {
 		return;
 	}
 	else if (!*arg) {
-		msg_to_char(ch, "Which attribute do you wish to boost (strength or dexterity), or 'end' to cancel boosts?\r\n");
+		msg_to_char(ch, "Which attribute do you wish to boost (strength, charisma, or intelligence), or 'end' to cancel boosts?\r\n");
 	}
 	
 	else if (is_abbrev(arg, "end")) {
@@ -880,7 +827,30 @@ ACMD(do_boost) {
 		return;
 	}
 
-	/* Strength */
+	// Charisma
+	else if (is_abbrev(arg, "charisma")) {
+		if (GET_CHARISMA(ch) >= att_max(ch)) {
+			msg_to_char(ch, "Your charisma is already at maximum!\r\n");
+		}
+		else if (affected_by_spell_and_apply(ch, ATYPE_BOOST, APPLY_CHARISMA)) {
+			msg_to_char(ch, "Your charisma is already boosted!\r\n");
+		}
+		else {
+			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_CHARISMA, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0), ch);
+			affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
+			
+			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_BLOOD_UPKEEP, 1, ch);
+			affect_to_char(ch, af);
+			free(af);
+
+			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
+
+			msg_to_char(ch, "You focus your blood into your skin and voice, increasing your charisma!\r\n");
+			gain_ability_exp(ch, ABIL_BOOST, 20);
+		}
+	}
+
+	// Strength
 	else if (is_abbrev(arg, "strength")) {
 		if (GET_STRENGTH(ch) >= att_max(ch)) {
 			msg_to_char(ch, "Your strength is already at maximum!\r\n");
@@ -891,6 +861,10 @@ ACMD(do_boost) {
 		else {
 			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_STRENGTH, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0), ch);
 			affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
+			
+			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_BLOOD_UPKEEP, 1, ch);
+			affect_to_char(ch, af);
+			free(af);
 
 			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 
@@ -899,26 +873,31 @@ ACMD(do_boost) {
 		}
 	}
 
-	/* Dexterity */
-	else if (is_abbrev(arg, "dexterity")) {
-		if (GET_DEXTERITY(ch) >= att_max(ch)) {
-			msg_to_char(ch, "Your dexterity is already at maximum!\r\n");
+	// Intelligence
+	else if (is_abbrev(arg, "intelligence")) {
+		if (GET_INTELLIGENCE(ch) >= att_max(ch)) {
+			msg_to_char(ch, "Your intelligence is already at maximum!\r\n");
 		}
-		else if (affected_by_spell_and_apply(ch, ATYPE_BOOST, APPLY_DEXTERITY)) {
-			msg_to_char(ch, "Your dexterity is already boosted!\r\n");
+		else if (affected_by_spell_and_apply(ch, ATYPE_BOOST, APPLY_INTELLIGENCE)) {
+			msg_to_char(ch, "Your intelligence is already boosted!\r\n");
 		}
 		else {
-			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_DEXTERITY, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0), ch);
+			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_INTELLIGENCE, 1 + (skill_check(ch, ABIL_BOOST, DIFF_HARD) ? 1 : 0), ch);
 			affect_join(ch, af, AVG_DURATION | ADD_MODIFIER);
+			
+			af = create_mod_aff(ATYPE_BOOST, 3 MUD_HOURS, APPLY_BLOOD_UPKEEP, 1, ch);
+			affect_to_char(ch, af);
+			free(af);
 
 			charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 
-			msg_to_char(ch, "You focus your blood, increasing your dexterity!\r\n");
+			msg_to_char(ch, "You focus your blood into your mind, increasing your intelligence!\r\n");
 			gain_ability_exp(ch, ABIL_BOOST, 20);
 		}
 	}
+	
 	else {
-		msg_to_char(ch, "Would you like to increase your strength or dexterity?\r\n");
+		msg_to_char(ch, "Would you like to increase your strength, charisma, or intelligence?\r\n");
 	}
 }
 
@@ -937,10 +916,6 @@ ACMD(do_claws) {
 		return;
 	}
 	if (!check_vampire_sun(ch, TRUE)) {
-		return;
-	}
-	if (MORPH_FLAGGED(ch, MORPH_FLAG_NO_CLAWS)) {
-		msg_to_char(ch, "You can't grow claws in this form!\r\n");
 		return;
 	}
 	
@@ -964,6 +939,10 @@ ACMD(do_claws) {
 	
 	af = create_flag_aff(ATYPE_CLAWS, UNLIMITED, AFF_CLAWS, ch);
 	affect_join(ch, af, 0);
+			
+	af = create_mod_aff(ATYPE_CLAWS, UNLIMITED, APPLY_BLOOD_UPKEEP, 2, ch);
+	affect_to_char(ch, af);
+	free(af);
 
 	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 	gain_ability_exp(ch, ABIL_CLAWS, 20);
@@ -1083,6 +1062,10 @@ ACMD(do_deathshroud) {
 
 		af = create_flag_aff(ATYPE_DEATHSHROUD, UNLIMITED, AFF_DEATHSHROUD, ch);
 		affect_join(ch, af, 0);
+			
+		af = create_mod_aff(ATYPE_DEATHSHROUD, UNLIMITED, APPLY_BLOOD_UPKEEP, 1, ch);
+		affect_to_char(ch, af);
+		free(af);
 
 		GET_POS(ch) = POS_SLEEPING;
 		charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
@@ -1147,6 +1130,10 @@ ACMD(do_majesty) {
 
 		af = create_flag_aff(ATYPE_MAJESTY, UNLIMITED, AFF_MAJESTY, ch);
 		affect_join(ch, af, 0);
+			
+		af = create_mod_aff(ATYPE_MAJESTY, UNLIMITED, APPLY_BLOOD_UPKEEP, 3, ch);
+		affect_to_char(ch, af);
+		free(af);
 	}
 	
 	command_lag(ch, WAIT_ABILITY);
@@ -1187,8 +1174,12 @@ ACMD(do_mummify) {
 		GET_POS(ch) = POS_SLEEPING;
 		charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
 
-		af = create_aff(ATYPE_MUMMIFY, -1, APPLY_NONE, 0, AFF_IMMUNE_PHYSICAL | AFF_MUMMIFY | AFF_NO_ATTACK, ch);
+		af = create_aff(ATYPE_MUMMIFY, UNLIMITED, APPLY_NONE, 0, AFF_IMMUNE_PHYSICAL | AFF_MUMMIFY | AFF_NO_ATTACK, ch);
 		affect_join(ch, af, 0);
+			
+		af = create_mod_aff(ATYPE_MUMMIFY, UNLIMITED, APPLY_BLOOD_UPKEEP, 1, ch);
+		affect_to_char(ch, af);
+		free(af);
 		
 		gain_ability_exp(ch, ABIL_MUMMIFY, 50);
 	}

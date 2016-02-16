@@ -853,7 +853,11 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	
 	// determine real move type
 	move_type = IS_NPC(ch) ? MOB_MOVE_TYPE(ch) : MOB_MOVE_WALK;
-	if (AFF_FLAGGED(ch, AFF_FLY) && !IS_NPC(ch)) {
+	if (IS_MORPHED(ch)) {
+		move_type = MORPH_MOVE_TYPE(GET_MORPH(ch));
+	}
+	
+	if (AFF_FLAGGED(ch, AFF_FLY) && !IS_MORPHED(ch) && !IS_NPC(ch)) {
 		move_type = MOB_MOVE_FLY;
 	}
 	else if (IS_RIDING(ch)) {

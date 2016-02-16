@@ -2288,6 +2288,44 @@ SHOW(show_spawns) {
 }
 
 
+SHOW(show_variables) {
+	void find_uid_name(char *uid, char *name);
+	
+	char uname[MAX_INPUT_LENGTH];
+	struct trig_var_data *tv;
+	char_data *plr = NULL;
+	bool file = FALSE;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Usage: show variables <player>\r\n");
+	}
+	else if (!(plr = find_or_load_player(argument, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		msg_to_char(ch, "Global Variables:\r\n");
+		
+		if (plr->script && plr->script->global_vars) {
+			/* currently, variable context for players is always 0, so it is */
+			/* not displayed here. in the future, this might change */
+			for (tv = plr->script->global_vars; tv; tv = tv->next) {
+				if (*(tv->value) == UID_CHAR) {
+					find_uid_name(tv->value, uname);
+					msg_to_char(ch, " %10s:  [UID]: %s\r\n", tv->name, uname);
+				}
+				else {
+					msg_to_char(ch, " %10s:  %s\r\n", tv->name, tv->value);
+				}
+			}
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// STAT / VSTAT ////////////////////////////////////////////////////////////
 
@@ -2532,7 +2570,6 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 /* Sends ch information on the character or animal k */
 void do_stat_character(char_data *ch, char_data *k) {
 	void check_delayed_load(char_data *ch);
-	void find_uid_name(char *uid, char *name);
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
 	extern int total_bonus_healing(char_data *ch);
@@ -2546,6 +2583,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern const char *cooldown_types[];
 	extern const char *damage_types[];
 	extern const double hit_per_dex;
+	extern const char *mob_move_types[];
 	extern const char *player_bits[];
 	extern const char *position_types[];
 	extern const char *preference_bits[];
@@ -2555,9 +2593,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern struct promo_code_list promo_codes[];
 
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
-	char uname[MAX_INPUT_LENGTH];
 	struct script_memory *mem;
-	struct trig_var_data *tv;
 	struct cooldown_data *cool;
 	int i, i2, diff, found = 0, val;
 	obj_data *j;
@@ -2654,7 +2690,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	sprintf(buf, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
 
 	if (IS_NPC(k)) {
-		sprintf(buf + strlen(buf), ", Attack type: %s", attack_hit_info[MOB_ATTACK_TYPE(k)].name);
+		sprintf(buf + strlen(buf), ", Attack: %s, Move: %s", attack_hit_info[MOB_ATTACK_TYPE(k)].name, mob_move_types[(int)MOB_MOVE_TYPE(k)]);
 	}
 	if (k->desc) {
 		sprinttype(STATE(k->desc), connected_types, buf2);
@@ -2703,6 +2739,13 @@ void do_stat_character(char_data *ch, char_data *k) {
 	if (!IS_NPC(k)) {
 		msg_to_char(ch, "Hunger: %d, Thirst: %d, Drunk: %d\r\n", GET_COND(k, FULL), GET_COND(k, THIRST), GET_COND(k, DRUNK));
 		msg_to_char(ch, "Recent deaths: %d\r\n", GET_RECENT_DEATH_COUNT(k));
+	}
+	
+	if (IS_MORPHED(k)) {
+		msg_to_char(ch, "Morphed into: %d - %s\r\n", MORPH_VNUM(GET_MORPH(k)), MORPH_SHORT_DESC(GET_MORPH(k)));
+	}
+	if (IS_DISGUISED(k)) {
+		msg_to_char(ch, "Disguised as: %s\r\n", GET_DISGUISED_NAME(k));
 	}
 
 	if (!is_proto) {
@@ -2811,24 +2854,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 				}
 				
 				mem = mem->next;
-			}
-		}
-	}
-	else {
-		/* this is a PC, display their global variables */
-		if (k->script && k->script->global_vars) {
-			msg_to_char(ch, "Global Variables:\r\n");
-
-			/* currently, variable context for players is always 0, so it is */
-			/* not displayed here. in the future, this might change */
-			for (tv = k->script->global_vars; tv; tv = tv->next) {
-				if (*(tv->value) == UID_CHAR) {
-					find_uid_name(tv->value, uname);
-					msg_to_char(ch, "    %10s:  [UID]: %s\r\n", tv->name, uname);
-				}
-				else {
-					msg_to_char(ch, "    %10s:  %s\r\n", tv->name, tv->value);
-				}
 			}
 		}
 	}
@@ -5842,6 +5867,7 @@ ACMD(do_show) {
 		{ "ignoring", LVL_START_IMM, show_ignoring },
 		{ "workforce", LVL_START_IMM, show_workforce },
 		{ "islands", LVL_START_IMM, show_islands },
+		{ "variables", LVL_START_IMM, show_variables },
 
 		// last
 		{ "\n", 0, NULL }
@@ -6502,6 +6528,12 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No globals by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "morph")) {
+		extern int vnum_morph(char *searchname, char_data *ch);
+		if (!vnum_morph(buf2, ch)) {
+			msg_to_char(ch, "No morphs by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "roomtemplate")) {
 		if (!vnum_room_template(buf2, ch)) {
 			msg_to_char(ch, "No room templates by that name.\r\n");
@@ -6645,6 +6677,15 @@ ACMD(do_vstat) {
 		char_to_room(mob, world_table);
 		do_stat_character(ch, mob);
 		extract_char(mob);
+	}
+	else if (is_abbrev(buf, "morph")) {
+		void do_stat_morph(char_data *ch, morph_data *morph);
+		morph_data *morph = morph_proto(number);
+		if (!morph) {
+			msg_to_char(ch, "There is no morph with that number.\r\n");
+			return;
+		}
+		do_stat_morph(ch, morph);
 	}
 	else if (is_abbrev(buf, "object")) {
 		if (!obj_proto(number)) {

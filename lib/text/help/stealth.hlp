@@ -478,4 +478,21 @@ This ability allows you to use the "steal" command in vaults and secret caches.
 
 See also: STEAL
 #
+WHISPERSTRIDE
+
+Whisperstride
+Class ability: Assassin, Bandit, Powerbroker, Smuggler
+Usage:  whisperstride
+Cooldown:  5 minutes
+Cost:  100 move
+Duration:  30 seconds
+
+Whisperstride allows you to surround yourself with unnatural whispering sounds,
+making your normal movement act as sneaking for a short time. You can still be
+seen in the room unless you hide.
+
+You cannot use Whisperstride while mounted.
+
+See also: SNEAK
+#
 $

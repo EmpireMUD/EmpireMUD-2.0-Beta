@@ -40,19 +40,19 @@ Note: Bonus healing does not add to the cost of healing spells.
 
 See also: HEAL, REJUVENATE
 #
-"ANIMAL FORMS" "DEER FORM" "OSTRICH FORM" "TAPIR FORM"
+"ANIMAL FORMS"
 
 Animal Forms (Natural Magic ability)
 
-Usage:  morph <deer | ostrich | tapir>
-Cost:  25 mana (50 in combat)
+Usage:  morph <type>
+Cost:  25 mana (75 in combat)
 
 A skilled nature mage can take on the forms of different animals to disguise
 him- or herself. Each of these forms must be used in a different environment:
 
-deer: plains or forest
-ostrich: desert, grove, or oasis
-tapir: jungle or swamp
+plains/forest: deer, raccoon, forest turtle
+desert/grove: ostrich, bobcat, sidewinder
+jungle/swamp: tapir, monkey, muskrat
 
 See also: MORPH
 #
@@ -69,6 +69,18 @@ The banshee familiar will use the following abilities in combat:
 - Blood-curdling wail: Magical DoT on enemies (30 sec)
 
 See also: DEBUFF, FAMILIAR, NECROMANCER CLASS
+#
+"ASTRAL WEREWOLF FORM"
+
+Astral Werewolf Form
+Class ability:  Werewolf, Shadow Wolf, Feral
+
+Usage:  morph astral werewolf
+Cost:  50 move (150 in combat)
+
+The astral wolf form is a powerful and formidable caster.
+
+See also: CASTER, MORPH
 #
 "BASILISK FAMILIAR"
 
@@ -226,8 +238,8 @@ until it deflects a spell.
 "DIRE WOLF FAMILIAR"
 
 Dire Wolf
-Class ability:  Werewolf (melee)
-Familiar type:  melee
+Class ability:  Werewolf
+Familiar type:  damage
 
 The dire wolf will assist you in combat, adding to the damage against your
 enemy.
@@ -610,10 +622,10 @@ See also: ACCEPT, MOONRISE, RESPAWN
 "SAGE WEREWOLF FORM"
 
 Sage Werewolf Form
-Class ability: Werewolf
+Class ability:  Werewolf, Shadow Wolf, Feral
 
 Usage:  morph sage werewolf
-Cost:  50 move (100 in combat)
+Cost:  50 move (150 in combat)
 
 The sage wolf form is a strong healer.
 
@@ -636,10 +648,10 @@ See also: BUFF, FAMILIAR, ALCHEMIST CLASS
 "SAVAGE WEREWOLF FORM"
 
 Savage Werewolf Form
-Class ability: Werewolf
+Class ability:  Werewolf, Shadow Wolf
 
 Usage:  morph savage werewolf
-Cost:  50 move (100 in combat)
+Cost:  50 move (150 in combat)
 
 The savage wolf form is strong in melee combat.
 
@@ -748,12 +760,26 @@ See also: LIGHT
 "TOWERING WEREWOLF FORM"
 
 Towering Werewolf Form
-Class ability: Werewolf
+Class ability:  Werewolf, Feral
 
 Usage:  morph towering werewolf
-Cost:  50 move (100 in combat)
+Cost:  50 move (150 in combat)
 
 The towering wolf form is best-suited for tanking.
+
+See also: MORPH
+#
+"WEREWOLF FORM"
+
+Werewolf Form
+Class ability:  Werewolf, Shadow Wolf, Feral
+
+Usage:  morph werewolf
+Cost:  50 move (150 in combat)
+
+The werewolf form is a light, quick morph that works well for solo and pvp
+players, as it doesn't have the penalties of the role-based forms (but its
+bonuses are also lower).
 
 See also: MORPH
 #

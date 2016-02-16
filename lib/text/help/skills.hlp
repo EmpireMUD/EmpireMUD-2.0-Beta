@@ -267,14 +267,15 @@ repeat; stopping the action will give you back the item you were minting.
 
 See also: COINS, COMMERCE, STOP
 #
-MORPH MORPHING SHAPESHIFTING
+MORPH MORPHING SHAPESHIFTING FASTMORPH
 
 Usage:  morph <form>
         morph normal
+        fastmorph <form | normal>
 
 Some powers allow you to change shape, using the morph command. Morphing takes
-a few seconds, but if you're in combat you can morph instantly at a higher
-cost than normal.
+a few seconds, but if you're in combat you can morph instantly at a 3x higher
+cost than normal (you can also morph instantly using 'fastmorph').
 
 Morphing will remove your disguise, if you have one.
 

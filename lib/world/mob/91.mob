@@ -44,7 +44,7 @@ a tapir~
 A tapir is rooting around a bush.
 ~
 75 100 djo 0
-0 0 0 11
+0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
@@ -257,7 +257,7 @@ an ostrich~
 An ostrich ruffles its feathers and backs away from you.
 ~
 10 20 djo c
-0 0 0 10
+0 0 0 11
 I 0 3200 100.00 2  # BUTCHER: a cut of poultry
 I 1 1351 100.00 1  # SKIN: a large skin
 S
@@ -471,7 +471,7 @@ I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #9144
-raccoon coon~
+raccoon~
 a raccoon~
 A raccoon is cleaning its paws.
 ~

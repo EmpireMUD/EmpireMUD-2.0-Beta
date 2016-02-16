@@ -195,6 +195,10 @@ struct alias_data {
 #define SCMD_KEEP  0
 #define SCMD_UNKEEP  1
 
+// do_morph
+#define SCMD_MORPH  0
+#define SCMD_FASTMORPH  1
+
 // do_prompt
 #define SCMD_PROMPT  0
 #define SCMD_FPROMPT  1

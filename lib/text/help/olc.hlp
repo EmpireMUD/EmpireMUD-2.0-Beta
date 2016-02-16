@@ -50,7 +50,7 @@ See also: OLC ABORT, OLC AUDIT, OLC COPY, OLC DELETE, OLC EDIT, OLC FREE,
 Sometimes abbreviations are used for core "thing" types, like mobs. Here are
 some common ones:
 
-abl - ability
+abil - ability
 adv - adventure
 bld (or bdg) - building (these include designated rooms)
 cft - craft
@@ -58,12 +58,14 @@ cls - class
 crp - crop
 glb - global
 mob - mobile/npc
+mph - morph
 npc - non-player character (mob)
 obj - object
 rmt - room template
 sct - sector/terrain
 skl - skill
 trg - trigger
+veh - vehicle
 #d
 "OLC LICENSE" "OLC RIGHTS"
 
@@ -215,6 +217,14 @@ Mobs (MEDIT):
 - If your mob spawns in a dark adventure, strongly consider giving it INFRA.
 - Animal mobs usually need a BUTCHER and SKIN interaction.
 
+Morphs (MORPHEDIT):
+- Be sure to set the SCRIPT-ONLY flag if your morph isn't meant to show up in
+  player morph lists.
+- If you use a required object and the CONSUME-OBJ flag, be sure not to use a
+  scalable item. Scalable items will refund at the wrong level.
+- If the morph requires a class ability, you should also set the CHECK-SOLO
+  flag. This is necessary to use it in the Solo role.
+
 Objects (OEDIT):
 - The most significant keyword should always be first. A fiery torch should put
   "torch" first. Joe's amazing magical wand should put "wand" first. The first
@@ -250,6 +260,9 @@ Objects (OEDIT):
   for build-to-char and build-to-room.
 - All lights must have a timer. If you want a player to activate a light before
   it starts timing down, make an unlit version with a LIGHT interaction.
+- The COMBINE and SEPARATE interactions should always use 1 exclusion set, as
+  they will extract the original item if their interaction succeeds, and it's
+  not safe to run additional interactions.
 
 Room Templates (REDIT):
 - Don't confuse room templates with the designated rooms that players can add
@@ -380,7 +393,7 @@ See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 
 Usage:  .flags [add | remove] <flags>
 
-The following adventure flags are available:
+The following ability flags are available:
  * - There are noflags for abilities yet
 #d
 "ABILEDIT MASTERYABILITY" "ABILEDIT MASTERY ABILITY"
@@ -2296,7 +2309,7 @@ always active on the mob, as if a spell had been cast on them.
 
 See also: AFFECT FLAGS, OLC MOBILES
 #d
-"MEDIT ATTACK"
+"MEDIT ATTACK" "ATTACK TYPES"
 
 Usage:  .attack <type>
 
@@ -2406,6 +2419,11 @@ Mob interaction types:
  
 Object interaction types:
  LIGHT - Item something is converted into when lit on fire.
+ COMBINE** - Combine multiple copies of an obj into another obj (quantity is the
+    number required, rather than number you get).
+ SEPARATE** - Split this item into multiple other items.
+ ** Both COMBINE and SEPARATE should be set exclusive, as they will extract
+    the original item.
 
 Room interaction types:
  DIG - Items received when using the dig action.
@@ -2564,6 +2582,184 @@ Examples:
 
 See also: MEDIT LONG DESCRIPTION
 #d
+MORPHEDIT "OLC MORPHS" "MORPH EDITOR"
+
+Usage:  .morph <command>
+        .command
+
+The .olc morph editor allows you to configure the data for morphs, which are
+used by players (and NPCs) to change shape.
+
+All commands in the editor arg highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP MORPHEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .morph edit 123
+> .shortdesc a shapeshifting demon
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"MORPHEDIT AFFECTS"
+
+Usage:  .affects [add | remove] <flags>
+
+This command adds, removes, or toggles a set of affect flags. These flags are
+given to players while they are in this form.
+
+See also: AFFECT FLAGS, OLC MORPHS
+#d
+"MORPHEDIT APPLY" "MORPHEDIT APPLIES"
+
+Usage:  .apply add <value> <apply>
+        .apply change <number> <value | apply> <new value>
+        .apply remove <number | all>
+
+Applies are bonuses (or penalties) that a morph grants to the player who is
+using it.
+
+See also: APPLIES, OLC MORPHS
+#d
+"MORPHEDIT ATTACK"
+
+Usage:  .attack <type>
+
+This command sets the base attack type of the morph, when unarmed.
+
+See also: ATTACK TYPES, OLC MORPHS
+#d
+"MORPHEDIT COST" "MORPHEDIT COSTTYPE" "MORPHEDIT COST TYPE"
+
+Usage:  .cost <amount>
+        .costtype <health | move | mana | blood>
+
+This allows you to set the cost to use a morph. If a cost is set, the player
+must spend that much of the given type in order to start morphing.
+
+If the cost is 0, the cost type doesn't matter. Players can't go below 1 health
+or blood, so they must have cost+1 in order to morph. If the cost type is
+blood, Heartstop can prevent the player from morphing.
+
+See also: OLC MORPHS
+#d
+"MORPHEDIT FLAGS" "MORPH FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The following morph flags are available:
+ IN-DEVELOPMENT - Not live yet (can't be used by players).
+ SCRIPT-ONLY - Players can't choose this morph, but scripts can.
+ ANIMAL - Morph counts as an animal and is disguised from other players.
+ VAMPIRE-ONLY - This is a vampire morph and will check sunlight.
+ TEMPERATE-AFFINITY - Can only be used on temperate terrain.
+ ARID-AFFINITY - Can only be used on arid terrain (desert).
+ TROPICAL-AFFINITY - Can only be used on tropical terrain (jungle).
+ CHECK-SOLO - Can't be used if in the Solo role and not solo.
+ !SLEEP - Cannot sleep in this form.
+ GENDER-NEUTRAL - Shows as "it" instead of he/she/him/her.
+ CONSUME-OBJ - Will use up the requiresobj to morph.
+
+See also: OLC MORPHS
+#d
+"MORPHEDIT KEYWORDS"
+
+Usage:  .keywords <keywords>
+
+This command updates the keywords on a morph. The keywords are a list of single
+words that can be used to target a person in this morph. It should include any
+words from the morph's short or long description that identify the person.
+
+Usually the most significant keyword should be first.
+
+Example:
+ name: a fiery dragon
+ long description: A huge red dragon is flying overhead!
+ keywords: dragon fiery huge red
+
+See also: MORPHEDIT SHORTDESCRIPTION, MORPHEDIT LONGDESCRIPTION, OLC MORPHS
+#d
+"MORPHEDIT LONGDESCRIPTION" "MORPHEDIT LONG DESCRIPTION"
+
+Usage:  .longdescription <string>
+
+The long description is the text you see when the morphed character is in the
+room. Its name should appear somewhere near the beginning, and the rest should
+be a complete sentence indicating that the person is present.
+
+Examples:
+There is a cow munching on some grass.
+A fiery dragon circles overhead.
+You're standing at the foot of a huge giant!
+
+See also: OLC MORPHS
+#d
+"MORPHEDIT MAXLEVEL" "MORPHEDIT MAX LEVEL"
+
+Usage:  .maxlevel <level>
+
+This command determines the maximum level a morph will scale to. Morphs scale
+in power to the level of the player/npc who is morphing, up to this maximum.
+
+If you set the maxlevel to 0, there will be no maximum and the morph can scale
+to any level.
+
+See also: OLC MORPHS
+#d
+"MORPHEDIT MOVETYPE" "MORPHEDIT MOVE TYPE"
+
+Usage:  .movetype <type>
+
+The move type determines what message is sent when the morphed person moves.
+Sometimes other types are substituted, for example a flying person always says
+"flies" even if its move type is different.
+
+See also: OLC MORPHS
+#d
+"MORPHEDIT REQUIRESABILITY" "MORPHEDIT REQUIRES ABILITY"
+
+Usage:  .requiresability <name | none>
+
+This allows you to require the player to have a certain ability in order to
+use this morph. Setting it to 'none' removes this requirement.
+
+See also: OLC MORPHS
+#d
+"MORPHEDIT REQUIRESOBJECT" "MORPHEDIT REQUIRES OBJECT"
+
+Usage:  .requiresobject <vnum>
+
+Some morphs may require a specific object. If the user doesn't have the object,
+the morph won't show up in the list at all. This essentially associates the
+morph to the object.
+
+The required object isn't consumed when the person morphs, unless the CONSUME-
+OBJ flag is set. You should never use a scalable item if it will be consumed.
+
+See also: OLC MORPHS
+#d
+"MORPHEDIT SHORTDESCRIPTION" "MORPHEDIT SHORT DESCRIPTION"
+
+Usage:  .shortdescription <string>
+
+The 'short description' is the trait that's shown in lists, in action messages,
+and almost everywhere else except when a player types 'look' in the room (where
+the long description is shown instead). This should be short, should generally
+begin with a/an/the unless it's a proper noun, and should not be capitalized
+(again unless it's a proper noun).
+
+The short description is also shown in the available morphs list (with any
+leading a/an/the removed).
+
+Examples:
+ the dragon
+ a mongoose
+
+See also: MORPHEDIT LONG DESCRIPTION, OLC MORPHS
+#d
 "OEDIT AFFECTS"
 
 Usage:  .affects [add | remove] <flags>
@@ -2587,14 +2783,14 @@ Apply types (optional) let you specify which applies come from enchantments or
 other sources (the default is "natural").
 
 Most applies are self-explanatory:
- STRENGTH - characters can't use an item that would reduce them below 1 strength
+ STRENGTH - characters can't use an item that would reduce them below 1
  DEXTERITY - chance to hit/dodge
  HEALTH-REGEN - rate of health regen (per 5 second tick)
- CHARISMA - characters can't use an item that would reduce them below 1 charisma
- GREATNESS - empire meta-trait
+ CHARISMA - characters can't use an item that would reduce them below 1
+ GREATNESS - empire meta-trait (unscaled)
  MOVE-REGEN - rate of move regen (per 5 second tick)
  MANA-REGEN - rate of mana regen (per 5 second tick)
- INTELLIGENCE - characters can't use an item that would reduce them below 1 intelligence
+ INTELLIGENCE - characters can't use an item that would reduce them below 1
  WITS - combat speed
  AGE - this actually raises/lowers the player's age, which has no effect
  MAX-MOVE - move pool
@@ -2611,7 +2807,8 @@ Most applies are self-explanatory:
  BONUS-MAGICAL - added to magical damage
  BONUS-HEALING - added to damage healed (by abilities this player uses)
  RESIST-MAGICAL - magical damage reduction
- CRAFTING - bonus to craft level
+ CRAFTING - bonus to craft level (unscaled)
+ BLOOD-UPKEEP - adds to how much blood vampires must spend per hour (unscaled)
 
 See also: OLC OBJECTS
 #d
@@ -2749,6 +2946,8 @@ Message types:
  &ccraft-to-room&0 - Shown to the room when building a vehicle ($V for vehicle).
  &cwear-to-char&0 - Shown to the person when they wear an item ($p for item).
  &cwear-to-room&0 - Shown to the room when the person wears an item ($p for item).
+ &cremove-to-char&0 - Shown to the person when they remove an item ($p for item).
+ &cremove-to-room&0 - Shown to the room when the person removes an item ($p for item).
 
 See also: OLC OBJECTS
 #d
@@ -3361,7 +3560,9 @@ Available flags:
  - !ARCHETYPE -- Cannot edit archetypes
  - ABILITIES -- CAN edit abilities
  - CLASSES -- CAN edit classes
- -- SKILLS -- CAN edit skills
+ - SKILLS -- CAN edit skills
+ - !VEHICLES -- Cannot edit vehicles
+ - !MORPHS -- Cannot edit morphs
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 #d

@@ -329,27 +329,25 @@ See also: COMMERCE, EXCHANGE, MINT, VAULT, WITHDRAW
 DIPLOMACY PEACE WAR ALLIANCE TRUCE DISTRUST
 
 Usage:  diplomacy <option> <empire>
+        diplomacy cancel <option> <empire>
 
-This command is the basis for the interaction among empires. It allows an
-empire to voice its political opinion on another empire and announce it to
-that empire.
+Engage in politics with another empire. This command is used to offer, accept,
+or demand political relations. You can also cancel open offers. Check the
+empire detail page to see current relationships.
 
 You can only burn down or besiege another empires buildings if you are at war.
 You can only go to war with or steal from an empire if at least one of their
 members is online.
 
 Options:
-  peace    - an end to a war, or a good starting relationship
-  war*     - a state of supreme distrust and hate
-             depending on the pk option set on the mud, you may only be able
-             to kill someone from an empire you're at war with
-  ally     - share facilities and friendship
-  pact     - non-aggression pact, prevents guard towers from shooting and
-             demonstrates a mutual trust
-  trade    - purely a cosmetic attribute, but demonstrates an agreement to
-             exchange goods and services
-  distrust - a state just short of war which indicates hatred
-  truce    - ends a war or distrustful state without creating peace
+  &ypeace&0 - end a war or state of distrust
+  &ytruce&0 - end a war without declaring peace
+  &yalliance&0 - propose or accept a full alliance
+  &ynonaggression&0 - propose or accept a pact of non-aggression
+  &ytrade&0 - propose or accept a trade agreement
+  &ydistrust&0 - declare that your empire distrusts but is not at war with another
+  &ywar&0 - declare war on an empire!
+  &ybattle&0 - suggest a friendly war
 
 * To declare war, an empire must immediately spend an amount of money based
 on the difference between the two empires' composite scores. You can see the

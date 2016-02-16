@@ -276,7 +276,6 @@ void msdp_update_room(char_data *ch) {
 */
 static void msdp_update(void) {
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
-	extern int get_blood_upkeep_cost(char_data *ch);
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_crafting_level(char_data *ch);
 	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
@@ -323,7 +322,7 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_MOVEMENT_REGEN, move_gain(ch, TRUE));
 			MSDPSetNumber(d, eMSDP_BLOOD, GET_BLOOD(ch));
 			MSDPSetNumber(d, eMSDP_BLOOD_MAX, GET_MAX_BLOOD(ch));
-			MSDPSetNumber(d, eMSDP_BLOOD_UPKEEP, get_blood_upkeep_cost(ch));
+			MSDPSetNumber(d, eMSDP_BLOOD_UPKEEP, MAX(0, GET_BLOOD_UPKEEP(ch)));
 			
 			// affects
 			*buf = '\0';
@@ -725,7 +724,7 @@ void perform_reboot(void) {
 		system("fgrep \"SYSERR:\" syslog >> log/syserr");
 		system("fgrep \"LVL:\" syslog >> log/levels");
 		system("fgrep \"OLC:\" syslog >> log/olc");
-		system("fgrep \"WAR:\" syslog >> log/war");
+		system("fgrep \"DIPL:\" syslog >> log/diplomacy");
 		system("fgrep \"SCRIPT ERR:\" syslog >> log/scripterr");
 		system("cp syslog log/syslog.old");
 		system("echo 'Rebooting EmpireMUD...' > syslog");
@@ -1524,7 +1523,7 @@ void close_socket(descriptor_data *d) {
 	
 	ProtocolDestroy(d->pProtocol);
 
-	// olc data
+	// OLC_x: olc data
 	if (d->olc_storage) {
 		free(d->olc_storage);
 	}
@@ -1551,6 +1550,9 @@ void close_socket(descriptor_data *d) {
 	}
 	if (d->olc_mobile) {
 		free_char(d->olc_mobile);
+	}
+	if (d->olc_morph) {
+		free_morph(d->olc_morph);
 	}
 	if (d->olc_building) {
 		free_building(d->olc_building);
@@ -2745,7 +2747,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					if (IS_HUNGRY(ch)) {
 						strcat(i, "\t0H");
 					}
-					if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
+					if (IS_MORPHED(ch)) {
 						strcat(i, "\t0M");
 					}
 					if (IS_PVP_FLAGGED(ch)) {
@@ -2794,7 +2796,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					if (IS_HUNGRY(ch)) {
 						sprintf(i + strlen(i), "%shungry", (*i ? " " : ""));
 					}
-					if (!IS_NPC(ch) && GET_MORPH(ch) != MORPH_NONE) {
+					if (IS_MORPHED(ch)) {
 						sprintf(i + strlen(i), "%smorphed", (*i ? " " : ""));
 					}
 					if (IS_PVP_FLAGGED(ch)) {

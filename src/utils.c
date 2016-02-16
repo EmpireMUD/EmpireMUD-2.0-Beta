@@ -330,16 +330,14 @@ struct time_info_data *mud_time_passed(time_t t2, time_t t1) {
 * @param bool real If TRUE, uses real name instead of disguise/morph.
 */
 char *PERS(char_data *ch, char_data *vict, bool real) {
-	extern char *morph_string(char_data *ch, byte type);
-	
 	static char output[MAX_INPUT_LENGTH];
 
 	if (!CAN_SEE(vict, ch)) {
 		return "someone";
 	}
 
-	if (!IS_NPC(ch) && GET_MORPH(ch) && !real) {
-		return morph_string(ch, MORPH_STRING_NAME);
+	if (IS_MORPHED(ch) && !real) {
+		return MORPH_SHORT_DESC(GET_MORPH(ch));
 	}
 	
 	if (!real && IS_DISGUISED(ch)) {
@@ -1064,6 +1062,10 @@ bool can_use_room(char_data *ch, room_data *room, int mode) {
 			return TRUE;
 		}
 	}
+	// public + guest + hostile + no-empire exclusion
+	if (ROOM_AFF_FLAGGED(homeroom, ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED && !GET_LOYALTY(ch) && IS_HOSTILE(ch)) {
+		return FALSE;
+	}
 	
 	// otherwise it's just whether ch's empire can use it
 	return emp_can_use_room(GET_LOYALTY(ch), room, mode);
@@ -1090,8 +1092,8 @@ bool emp_can_use_room(empire_data *emp, room_data *room, int mode) {
 	if (!ROOM_OWNER(homeroom)) {
 		return TRUE;
 	}
-	// public + guests
-	if (ROOM_AFF_FLAGGED(homeroom, ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED) {
+	// public + guests (not at war or hostile)
+	if (ROOM_AFF_FLAGGED(homeroom, ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED && !has_relationship(emp, ROOM_OWNER(homeroom), DIPL_WAR)) {
 		return TRUE;
 	}
 	// empire ownership
@@ -1527,7 +1529,7 @@ char *room_log_identifier(room_data *room) {
 * This is the main syslog function (mudlog in CircleMUD). It logs to all
 * immortals who are listening.
 *
-* @param bitvector_t type Any SYS_x type
+* @param bitvector_t type Any SYS_ type
 * @param int level The minimum level to see the log.
 * @param bool file If TRUE, also outputs to the mud's log file.
 * @param const char *str The log string.

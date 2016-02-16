@@ -91,6 +91,53 @@ bool can_take_obj(char_data *ch, obj_data *obj) {
 
 
 /**
+* Interaction func for "combine". This almost always extracts the original
+* item, so it should basically always return TRUE.
+*/
+INTERACTION_FUNC(combine_obj_interact) {
+	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
+	struct resource_data *res;
+	obj_data *new_obj;
+	
+	// how many they need
+	res = create_resource_list(GET_OBJ_VNUM(inter_item), interaction->quantity, NOTHING);
+	
+	if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE)) {
+		// error message sent by has_resources
+		free_resource_list(res);
+		return TRUE;
+	}
+	
+	snprintf(to_char, sizeof(to_char), "You combine %dx %s into $p!", interaction->quantity, skip_filler(GET_OBJ_SHORT_DESC(inter_item)));
+	snprintf(to_room, sizeof(to_room), "$n combines %dx %s into $p!", interaction->quantity, skip_filler(GET_OBJ_SHORT_DESC(inter_item)));
+	
+	new_obj = read_object(interaction->vnum, TRUE);
+	scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
+	
+	extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY));
+	
+	// ownership
+	new_obj->last_owner_id = GET_IDNUM(ch);
+	new_obj->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
+	
+	// put it somewhere
+	if (CAN_WEAR(new_obj, ITEM_WEAR_TAKE)) {
+		obj_to_char(new_obj, ch);
+	}
+	else {
+		obj_to_room(new_obj, IN_ROOM(ch));
+	}
+	load_otrigger(new_obj);
+	
+	act(to_char, FALSE, ch, new_obj, NULL, TO_CHAR);
+	act(to_room, TRUE, ch, new_obj, NULL, TO_ROOM);
+	
+	free_resource_list(res);
+	return TRUE;
+}
+
+
+/**
 * @param room_data *room The room to check.
 * @return int Number of items in the room (large counts double).
 */
@@ -194,6 +241,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *apply_type_names[];
+	extern const char *climate_types[];
 	extern const char *extra_bits[];
 	extern const char *drinks[];
 	extern const char *affected_bits[];
@@ -205,6 +253,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	player_index_data *index;
 	struct obj_apply *apply;
 	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH];
+	crop_data *cp;
 	bld_data *bld;
 	int found;
 	double rating;
@@ -324,8 +373,6 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			break;
 		case ITEM_FOOD:
 			msg_to_char(ch, "Fills for %d hours.\r\n", GET_FOOD_HOURS_OF_FULLNESS(obj));
-			if (OBJ_FLAGGED(obj, OBJ_PLANTABLE))
-				msg_to_char(ch, "Plants %s.\r\n", GET_CROP_NAME(crop_proto(GET_FOOD_CROP_TYPE(obj))));
 			break;
 		case ITEM_CORPSE:
 			msg_to_char(ch, "Corpse of ");
@@ -367,6 +414,17 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		}
 	}
 	
+	// data that isn't type-based:
+	if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)))) {
+		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), climate_types[GET_CROP_CLIMATE(cp)]);
+	}
+	
+	if (has_interaction(obj->interactions, INTERACT_COMBINE)) {
+		msg_to_char(ch, "It can be combined.\r\n");
+	}
+	if (has_interaction(obj->interactions, INTERACT_SEPARATE)) {
+		msg_to_char(ch, "It can be separated.\r\n");
+	}
 	
 	*lbuf = '\0';
 	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
@@ -563,8 +621,21 @@ void perform_remove(char_data *ch, int pos) {
 			return;
 		}
 
-		act("You stop using $p.", FALSE, ch, obj, 0, TO_CHAR);
-		act("$n stops using $p.", TRUE, ch, obj, 0, TO_ROOM);
+		// char message
+		if (has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR)) {
+			act(get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		else {
+			act("You stop using $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		
+		// room message
+		if (has_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM)) {
+			act(get_custom_message(obj, OBJ_CUSTOM_REMOVE_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
+		}
+		else {
+			act("$n stops using $p.", TRUE, ch, obj, NULL, TO_ROOM);
+		}
 		
 		// this may extract it, or drop it
 		unequip_char_to_inventory(ch, pos);
@@ -645,6 +716,29 @@ void remove_armor_by_type(char_data *ch, int armor_type) {
 			unequip_char_to_inventory(ch, iter);
 		}
 	}
+}
+
+
+/**
+* Interaction func for "separate". This always extracts the original
+* item, so it should basically always return TRUE.
+*/
+INTERACTION_FUNC(separate_obj_interact) {
+	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
+	struct resource_data *res;
+	
+	// how many they need
+	res = create_resource_list(interaction->vnum, interaction->quantity, NOTHING);
+	
+	snprintf(to_char, sizeof(to_char), "You separate %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+	act(to_char, FALSE, ch, NULL, NULL, TO_CHAR);
+	snprintf(to_room, sizeof(to_room), "$n separates %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+	act(to_room, TRUE, ch, NULL, NULL, TO_ROOM);
+	
+	give_resources(ch, res, FALSE);
+	extract_obj(inter_item);
+	free_resource_list(res);
+	return TRUE;
 }
 
 
@@ -1296,6 +1390,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	extern const double apply_values[];
 	void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, int *min, int *max);
 	extern double get_weapon_speed(obj_data *weapon);
+	extern const bool apply_never_scales[];
 	extern const int wear_significance[];
 	
 	int total_share, bonus, iter, amt;
@@ -1388,8 +1483,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	
 	// first check applies, count share/bonus
 	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
-		// TODO non-scalable traits should be an array
-		if (apply->location != APPLY_GREATNESS && apply->location != APPLY_CRAFTING) {
+		if (!apply_never_scales[(int)apply->location]) {
 			SHARE_OR_BONUS(apply->modifier);
 		}
 	}
@@ -1555,8 +1649,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	for (apply = GET_OBJ_APPLIES(obj); apply; apply = next_apply) {
 		next_apply = apply->next;
 		
-		// TODO non-scalable traits should be an array
-		if (apply->location != APPLY_GREATNESS && apply->location != APPLY_CRAFTING) {
+		if (!apply_never_scales[(int)apply->location]) {
 			this_share = MAX(0, MIN(share, points_to_give));
 			// raw amount
 			per_point = (1.0 / apply_values[(int)apply->location]);
@@ -3183,6 +3276,31 @@ void warehouse_store(char_data *ch, char *argument) {
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
+ACMD(do_combine) {
+	char arg[MAX_INPUT_LENGTH];
+	obj_data *obj;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Combine what?\r\n");
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
+	}
+	else if (!has_interaction(obj->interactions, INTERACT_COMBINE)) {
+		msg_to_char(ch, "You can't combine that!\r\n");
+	}
+	else {		
+		// will extract no matter what happens here
+		if (!run_interactions(ch, obj->interactions, INTERACT_COMBINE, IN_ROOM(ch), NULL, obj, combine_obj_interact)) {
+			act("You fail to combine $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		command_lag(ch, WAIT_OTHER);
+	}
+}
+
+
 ACMD(do_draw) {
 	obj_data *obj = NULL;
 	int loc = 0;
@@ -4717,6 +4835,31 @@ ACMD(do_roadsign) {
 
 		gain_ability_exp(ch, ABIL_ROADS, 33.4);
 		extract_obj(sign);
+	}
+}
+
+
+ACMD(do_separate) {
+	char arg[MAX_INPUT_LENGTH];
+	obj_data *obj;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Separate what?\r\n");
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
+	}
+	else if (!has_interaction(obj->interactions, INTERACT_SEPARATE)) {
+		msg_to_char(ch, "You can't separate that!\r\n");
+	}
+	else {		
+		// will extract no matter what happens here
+		if (!run_interactions(ch, obj->interactions, INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, separate_obj_interact)) {
+			act("You fail to separate $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		command_lag(ch, WAIT_OTHER);
 	}
 }
 

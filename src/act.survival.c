@@ -306,7 +306,7 @@ ACMD(do_mount) {
 	else if (!can_use_ability(ch, ABIL_RIDE, NOTHING, 0, NOTHING)) {
 		// sends own msgs
 	}
-	else if (GET_MORPH(ch) != MORPH_NONE) {
+	else if (IS_MORPHED(ch)) {
 		msg_to_char(ch, "You can't ride anything in this form.\r\n");
 	}
 	else if (AFF_FLAGGED(ch, AFF_FLY)) {
@@ -327,6 +327,9 @@ ACMD(do_mount) {
 		else {
 			send_config_msg(ch, "no_person");
 		}
+	}
+	else if (AFF_FLAGGED(ch, AFF_SNEAK)) {
+		msg_to_char(ch, "You can't mount while sneaking.\r\n");
 	}
 	else if (!mob && IS_COMPLETE(IN_ROOM(ch)) && !BLD_ALLOWS_MOUNTS(IN_ROOM(ch))) {
 		// only check this if they didn't target a mob -- still need to be able to pick up new mounts indoors

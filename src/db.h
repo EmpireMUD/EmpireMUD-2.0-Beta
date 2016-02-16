@@ -32,7 +32,8 @@
 #define DB_BOOT_CLASS  18
 #define DB_BOOT_SKILL  19
 #define DB_BOOT_VEH  20
-#define NUM_DB_BOOT_TYPES  21	// total
+#define DB_BOOT_MORPH  21
+#define NUM_DB_BOOT_TYPES  22	// total
 
 
 // library sub-dirs
@@ -77,6 +78,7 @@
 #define GLB_PREFIX  LIB_WORLD"glb/"	// global templates
 #define WLD_PREFIX  LIB_WORLD"wld/"	// room definitions
 #define MOB_PREFIX  LIB_WORLD"mob/"	// monster prototypes
+#define MORPH_PREFIX  LIB_WORLD"morph/"	// morphs
 #define NAMES_PREFIX  LIB_TEXT"names/"	// mob namelists
 #define OBJ_PREFIX  LIB_WORLD"obj/"	// object prototypes
 #define RMT_PREFIX  LIB_WORLD"rmt/"	// room templates
@@ -103,6 +105,7 @@
 #define EMPIRE_SUFFIX  ".empire"	// empire file suffix
 #define GLB_SUFFIX  ".glb"	// global suffix
 #define MOB_SUFFIX  ".mob"	// mob suffix for file saves
+#define MORPH_SUFFIX  ".morph"	// morph file suffix
 #define OBJ_SUFFIX  ".obj"	// obj suffix for file saves
 #define RMT_SUFFIX  ".rmt"	// room template suffix
 #define SECTOR_SUFFIX  ".sect"	// sector file suffix
@@ -307,6 +310,12 @@ extern char_data *find_or_load_player(char *name, bool *is_file);
 void store_loaded_char(char_data *ch);
 char_data *load_player(char *name, bool normal);
 
+// morphs
+extern morph_data *morph_table;
+extern morph_data *sorted_morphs;
+extern morph_data *morph_proto(any_vnum vnum);
+void free_morph(morph_data *morph);
+
 // objects
 extern obj_data *object_list;
 extern obj_data *object_table;
@@ -364,12 +373,13 @@ room_data *real_real_room(room_vnum vnum);
 room_data *real_room(room_vnum vnum);
 
 // misc
-extern struct obj_apply *copy_apply_list(struct obj_apply *list);
+extern struct obj_apply *copy_obj_apply_list(struct obj_apply *list);
 extern struct resource_data *create_resource_list(int first_vnum, int first_amount, ...);
 void free_resource_list(struct resource_data *list);
 
 // more frees
-void free_apply_list(struct obj_apply *list);
+void free_apply_list(struct apply_data *list);
+void free_obj_apply_list(struct obj_apply *list);
 void free_icon_set(struct icon_data **set);
 void free_exit_template(struct exit_template *ex);
 

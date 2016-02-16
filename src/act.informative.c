@@ -48,7 +48,6 @@ extern struct instance_data *find_instance_by_room(room_data *room, bool check_h
 extern char *get_room_name(room_data *room, bool color);
 extern char *list_harnessed_mobs(vehicle_data *veh);
 void look_at_vehicle(vehicle_data *veh, char_data *ch);
-extern char *morph_string(char_data *ch, byte type);
 
 // local protos
 ACMD(do_affects);
@@ -406,7 +405,6 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	void show_character_affects(char_data *ch, char_data *to);
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
-	extern int get_blood_upkeep_cost(char_data *ch);
 	extern int get_crafting_level(char_data *ch);
 	extern int total_bonus_healing(char_data *ch);
 	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
@@ -492,7 +490,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	msg_to_char(to, "  Conditions: %-*.*s", count, count, lbuf);
 	
 	if (IS_VAMPIRE(ch)) {
-		msg_to_char(to, " Blood: &r%d&0/&r%d&0-&r%d&0/hr\r\n", GET_BLOOD(ch), GET_MAX_BLOOD(ch), get_blood_upkeep_cost(ch));
+		msg_to_char(to, " Blood: &r%d&0/&r%d&0-&r%d&0/hr\r\n", GET_BLOOD(ch), GET_MAX_BLOOD(ch), MAX(0, GET_BLOOD_UPKEEP(ch)));
 	}
 	else {
 		msg_to_char(to, "\r\n");
@@ -710,7 +708,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	}
 	
 	// empire prefixing
-	if (!MORPH_FLAGGED(i, MORPH_FLAG_ANIMAL)) {
+	if (!CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)) {
 		if (IS_DISGUISED(i)) {
 			if (ROOM_OWNER(IN_ROOM(i))) {
 				// disguised player shows loyalty of the area you're in -- players can't tell you're not an npc
@@ -732,17 +730,22 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS) && IS_NPC(i)) {
 		msg_to_char(ch, "[%d] %s", GET_MOB_VNUM(i), SCRIPT(i) ? "[TRIG] " : "");
 	}
-
-	if (IS_NPC(i) && GET_LONG_DESC(i) && GET_POS(i) == POS_STANDING) {
+	
+	if (IS_MORPHED(i) && GET_POS(i) == POS_STANDING) {
 		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
 			msg_to_char(ch, "*");
 		}
-
+		msg_to_char(ch, "%s\r\n", MORPH_LONG_DESC(GET_MORPH(i)));
+	}
+	else if (IS_NPC(i) && GET_LONG_DESC(i) && GET_POS(i) == POS_STANDING) {
+		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
+			msg_to_char(ch, "*");
+		}
 		msg_to_char(ch, GET_LONG_DESC(i));
 	}
 	else {
 		if (IS_NPC(i)) {
-			strcpy(buf, GET_SHORT_DESC(i));
+			strcpy(buf, PERS(i, ch, FALSE));
 			CAP(buf);
 		}
 		else {
@@ -843,10 +846,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		}
 	if (!IS_NPC(i) && GET_ACTION(i) == ACT_MORPHING)
 		act("...$e is undergoing a hideous transformation!", FALSE, i, 0, ch, TO_VICT);
-	if (IS_IMMORTAL(ch) && !IS_NPC(i) && GET_MORPH(i) != MORPH_NONE)
-		act("...this appears to be $o.", FALSE, i, 0, ch, TO_VICT);
-	
-	if (IS_IMMORTAL(ch) && !IS_NPC(i) && IS_DISGUISED(i)) {
+	if (IS_IMMORTAL(ch) && (IS_MORPHED(i) || IS_DISGUISED(i))) {
 		act("...this appears to be $o.", FALSE, i, 0, ch, TO_VICT);
 	}
 	
@@ -951,10 +951,13 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch) {
 */
 void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	char buf[MAX_STRING_LENGTH];
+	bool disguise;
 	int j, found;
-
+	
 	if (!i || !ch || !ch->desc)
 		return;
+	
+	disguise = !IS_IMMORTAL(ch) && (IS_DISGUISED(i) || (IS_MORPHED(i) && CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)));
 	
 	if (show_eq && ch != i && !IS_IMMORTAL(ch) && !IS_NPC(i) && has_ability(i, ABIL_CONCEALMENT)) {
 		show_eq = FALSE;
@@ -962,57 +965,48 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	}
 
 	if (ch != i) {
-		act("You look at $N.", FALSE, ch, 0, i, TO_CHAR);
-	}
-
-	// For morphs, we show a description
-	if (!IS_NPC(i) && GET_MORPH(i) != MORPH_NONE) {
-		act(morph_string(i, MORPH_STRING_DESC), FALSE, ch, 0, i, TO_CHAR);
+		act("You look at $N.", FALSE, ch, FALSE, i, TO_CHAR);
 	}
 	
-	// only show this block if the person is not morphed, or the morph is not an npc disguise
-	if (IS_NPC(i) || IS_IMMORTAL(ch) || GET_MORPH(i) == MORPH_NONE || !MORPH_FLAGGED(i, MORPH_FLAG_ANIMAL)) {
-		
-		if (GET_LOYALTY(i) && !IS_DISGUISED(i) && !MORPH_FLAGGED(i, MORPH_FLAG_ANIMAL)) {
-			sprintf(buf, "   $E is a member of %s.", EMPIRE_NAME(GET_LOYALTY(i)));
-			act(buf, FALSE, ch, NULL, i, TO_CHAR);
-		}
-		
-		if (!IS_NPC(i) && !IS_DISGUISED(i)) {
-			// basic description -- don't show if morphed
-			if (GET_LONG_DESC(i) && (IS_NPC(i) || GET_MORPH(i) == MORPH_NONE)) {
-				msg_to_char(ch, "%s&0", GET_LONG_DESC(i));
-			}
-
-			if (HAS_INFRA(i)) {
-				act("   You notice a distinct, red glint in $S eyes.", FALSE, ch, NULL, i, TO_CHAR);
-			}
-			if (AFF_FLAGGED(i, AFF_CLAWS)) {
-				act("   $N's hands are huge, distorted, and very sharp!", FALSE, ch, NULL, i, TO_CHAR);
-			}
-			if (AFF_FLAGGED(i, AFF_MAJESTY)) {
-				act("   $N has an aura of majesty about $M.", FALSE, ch, NULL, i, TO_CHAR);
-			}
-			if (AFF_FLAGGED(i, AFF_MUMMIFY)) {
-				act("   $E is mummified in a hard, dark substance!", FALSE, ch, NULL, i, TO_CHAR);
-			}
-			diag_char_to_char(i, ch);
-		}
-		else {
-			diag_char_to_char(i, ch);
+	if (GET_LOYALTY(i) && !disguise) {
+		sprintf(buf, "   $E is a member of %s.", EMPIRE_NAME(GET_LOYALTY(i)));
+		act(buf, FALSE, ch, NULL, i, TO_CHAR);
+	}
+	
+	if (!IS_NPC(i) && !disguise) {
+		// basic description -- don't show if morphed
+		if (GET_LONG_DESC(i) && !IS_MORPHED(i)) {
+			msg_to_char(ch, "%s&0", GET_LONG_DESC(i));
 		}
 
-		if (!show_eq) {
-			return;
+		if (HAS_INFRA(i)) {
+			act("   You notice a distinct, red glint in $S eyes.", FALSE, ch, NULL, i, TO_CHAR);
 		}
+		if (AFF_FLAGGED(i, AFF_CLAWS)) {
+			act("   $N's hands are huge, distorted, and very sharp!", FALSE, ch, NULL, i, TO_CHAR);
+		}
+		if (AFF_FLAGGED(i, AFF_MAJESTY)) {
+			act("   $N has an aura of majesty about $M.", FALSE, ch, NULL, i, TO_CHAR);
+		}
+		if (AFF_FLAGGED(i, AFF_MUMMIFY)) {
+			act("   $E is mummified in a hard, dark substance!", FALSE, ch, NULL, i, TO_CHAR);
+		}
+		diag_char_to_char(i, ch);
+	}
+	else {	// npc or disguised
+		diag_char_to_char(i, ch);
+	}
 
+	if (show_eq && !disguise) {
+		// check if there's eq to see
 		found = FALSE;
 		for (j = 0; !found && j < NUM_WEARS; j++) {
 			if (GET_EQ(i, j) && CAN_SEE_OBJ(ch, GET_EQ(i, j))) {
 				found = TRUE;
 			}
 		}
-
+	
+		// show eq
 		if (found) {
 			msg_to_char(ch, "\r\n");	/* act() does capitalization. */
 			act("$n is using:", FALSE, i, 0, ch, TO_VICT);
@@ -1023,21 +1017,18 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 				}
 			}
 		}
-	}
+	
+		// show inventory
+		if (ch != i && has_ability(ch, ABIL_APPRAISAL)) {
+			act("\r\nYou appraise $s inventory:", FALSE, i, 0, ch, TO_VICT);
+			list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
 
-	if (!show_eq) {
-		return;
-	}
-
-	if (ch != i && (IS_IMMORTAL(ch) || IS_NPC(i) || GET_MORPH(i) == MORPH_NONE || !MORPH_FLAGGED(i, MORPH_FLAG_ANIMAL)) && has_ability(ch, ABIL_APPRAISAL)) {
-		act("\r\nYou appraise $s inventory:", FALSE, i, 0, ch, TO_VICT);
-		list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
-
-		if (ch != i && i->carrying) {
-			if (can_gain_exp_from(ch, i)) {
-				gain_ability_exp(ch, ABIL_APPRAISAL, 5);
+			if (ch != i && i->carrying) {
+				if (can_gain_exp_from(ch, i)) {
+					gain_ability_exp(ch, ABIL_APPRAISAL, 5);
+				}
+				GET_WAIT_STATE(ch) = MAX(GET_WAIT_STATE(ch), 0.5 RL_SEC);
 			}
-			GET_WAIT_STATE(ch) = MAX(GET_WAIT_STATE(ch), 0.5 RL_SEC);
 		}
 	}
 }
@@ -1786,8 +1777,8 @@ ACMD(do_affects) {
 	}
 
 	/* Morph */
-	if (GET_MORPH(ch) != MORPH_NONE) {
-		msg_to_char(ch, "   You are in the form of %s!\r\n", morph_string(ch, MORPH_STRING_NAME));
+	if (IS_MORPHED(ch)) {
+		msg_to_char(ch, "   You are in the form of %s!\r\n", MORPH_SHORT_DESC(GET_MORPH(ch)));
 	}
 	else if (IS_DISGUISED(ch)) {
 		msg_to_char(ch, "   You are disguised as %s!\r\n", PERS(ch, ch, 0));
@@ -2402,11 +2393,13 @@ ACMD(do_score) {
 
 ACMD(do_survey) {
 	struct empire_city_data *city;
+	struct island_info *island;
 	
 	msg_to_char(ch, "You survey the area:\r\n");
 	
 	if (GET_ISLAND_ID(IN_ROOM(ch)) != NO_ISLAND) {
-		msg_to_char(ch, "Location: %s\r\n", get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE)->name);
+		island = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE);
+		msg_to_char(ch, "Location: %s%s\r\n", island->name, IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "");
 	}
 	
 	// empire

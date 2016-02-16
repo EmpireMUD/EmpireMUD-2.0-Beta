@@ -760,7 +760,7 @@ ACMD(do_disguise) {
 	else if (!can_use_ability(ch, ABIL_DISGUISE, NOTHING, 0, NOTHING)) {
 		// sends own message
 	}
-	else if (GET_MORPH(ch) != MORPH_NONE) {
+	else if (IS_MORPHED(ch)) {
 		msg_to_char(ch, "You can't disguise yourself while morphed.\r\n");
 	}
 	else if (!*arg) {
@@ -1777,5 +1777,31 @@ ACMD(do_terrify) {
 		if (can_gain_exp_from(ch, victim)) {
 			gain_ability_exp(ch, ABIL_TERRIFY, 15);
 		}
+	}
+}
+
+
+ACMD(do_whisperstride) {
+	struct affected_type *af;
+	int cost = 100;
+	int duration = 6; // 30 seconds
+	if (!can_use_ability(ch, ABIL_WHISPERSTRIDE, MOVE, cost, COOLDOWN_WHISPERSTRIDE)) {
+		return;
+	}
+	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_WHISPERSTRIDE)) {
+		return;
+	}
+	else if (IS_RIDING(ch)) {
+		msg_to_char(ch, "You can't use Whisperstride while mounted!\r\n");
+		return;
+	}
+	else {
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_WHISPERSTRIDE, 5 * SECS_PER_REAL_MIN, WAIT_ABILITY);
+		
+		msg_to_char(ch, "You cloak yourself with dark whispers, muffling your movement...\r\n");
+		act("$n is surrounded by dark whispers...", TRUE, ch, NULL, NULL, TO_ROOM);
+		
+		af = create_flag_aff(ATYPE_WHISPERSTRIDE, duration, AFF_SNEAK, ch);
+		affect_join(ch, af, 0);
 	}
 }

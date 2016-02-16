@@ -1515,6 +1515,104 @@ ACMD(do_milk) {
 }
 
 
+ACMD(do_morph) {
+	extern bool check_vampire_sun(char_data *ch, bool message);
+	extern morph_data *find_morph_by_name(char_data *ch, char *name);
+	void finish_morphing(char_data *ch, morph_data *morph);
+	extern bool morph_affinity_ok(room_data *location, morph_data *morph);
+	
+	morph_data *morph, *next_morph;
+	double multiplier;
+	obj_data *obj;
+	bool normal;
+	
+	// safety first: mobs must use %morph%
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "You can't morph.\r\n");
+		return;
+	}
+	
+	skip_spaces(&argument);
+	
+	if (!*argument) {
+		msg_to_char(ch, "You know the following morphs: normal");
+		
+		HASH_ITER(hh, morph_table, morph, next_morph) {
+			if (MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT | MORPHF_SCRIPT_ONLY)) {
+				continue;
+			}
+			if (MORPH_ABILITY(morph) != NO_ABIL && !has_ability(ch, MORPH_ABILITY(morph))) {
+				continue;
+			}
+			if (MORPH_REQUIRES_OBJ(morph) != NOTHING && !get_obj_in_list_vnum(MORPH_REQUIRES_OBJ(morph), ch->carrying)) {
+				continue;
+			}
+			
+			msg_to_char(ch, ", %s", skip_filler(MORPH_SHORT_DESC(morph)));
+		}
+		
+		msg_to_char(ch, "\r\n");
+		return;
+	} // end no-argument
+	
+	// initialize
+	morph = NULL;
+	normal = (!str_cmp(argument, "normal") | !str_cmp(argument, "norm"));
+	multiplier = (subcmd == SCMD_FASTMORPH || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) ? 3.0 : 1.0;
+	
+	if (normal && !IS_MORPHED(ch)) {
+		msg_to_char(ch, "You aren't morphed.\r\n");
+	}
+	else if (GET_ACTION(ch) != ACT_NONE) {
+		msg_to_char(ch, "You're too busy to morph now!\r\n");
+	}
+	else if (!normal && !(morph = find_morph_by_name(ch, argument))) {
+		msg_to_char(ch, "You don't know such a morph.\r\n");
+	}
+	else if (morph && MORPH_FLAGGED(morph, MORPHF_VAMPIRE_ONLY) && !check_vampire_sun(ch, TRUE)) {
+		// sends own sun message
+	}
+	else if (morph && morph == GET_MORPH(ch)) {
+		msg_to_char(ch, "You are already in that form.\r\n");
+	}
+	else if (!morph_affinity_ok(IN_ROOM(ch), morph)) {
+		msg_to_char(ch, "You can't morph into that here.\r\n");
+	}
+	else if (morph && !can_use_ability(ch, MORPH_ABILITY(morph), MORPH_COST_TYPE(morph), MORPH_COST(morph) * multiplier, NOTHING)) {
+		// sends own message
+	}
+	else if (morph && MORPH_COST_TYPE(morph) == BLOOD && MORPH_COST(morph) > 0 && !CAN_SPEND_BLOOD(ch)) {
+		msg_to_char(ch, "Your blood is inert, you can't do that!\r\n");
+	}
+	else if (morph && MORPH_ABILITY(morph) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, NULL, MORPH_ABILITY(morph))) {
+		return;
+	}
+	else if (morph && MORPH_FLAGGED(morph, MORPHF_VAMPIRE_ONLY) && !IS_VAMPIRE(ch)) {
+		msg_to_char(ch, "You must be a vampire to do that.\r\n");
+	}
+	else {
+		// charge costs
+		charge_ability_cost(ch, MORPH_COST_TYPE(morph), MORPH_COST(morph) * multiplier, NOTHING, 0, WAIT_ABILITY);
+		
+		// take the obj
+		if (morph && MORPH_REQUIRES_OBJ(morph) != NOTHING && MORPH_FLAGGED(morph, MORPHF_CONSUME_OBJ) && (obj = get_obj_in_list_vnum(MORPH_REQUIRES_OBJ(morph), ch->carrying))) {
+			extract_obj(obj);
+		}
+		
+		if (IS_NPC(ch) || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING || subcmd == SCMD_FASTMORPH) {
+			// insta-morph!
+			finish_morphing(ch, morph);
+			command_lag(ch, WAIT_OTHER);
+		}
+		else {
+			start_action(ch, ACT_MORPHING, config_get_int("morph_timer"));
+			GET_ACTION_VNUM(ch, 0) = morph ? MORPH_VNUM(morph) : NOTHING;
+			msg_to_char(ch, "You begin to transform!\r\n");
+		}
+	}
+}
+
+
 ACMD(do_mydescription) {
 	skip_spaces(&argument);
 	

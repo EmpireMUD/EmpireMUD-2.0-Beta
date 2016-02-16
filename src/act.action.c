@@ -53,6 +53,7 @@ void cancel_chipping(char_data *ch);
 void cancel_driving(char_data *ch);
 void cancel_gen_craft(char_data *ch);
 void cancel_minting(char_data *ch);
+void cancel_morphing(char_data *ch);
 void cancel_sawing(char_data *ch);
 void cancel_scraping(char_data *ch);
 void cancel_siring(char_data *ch);
@@ -120,7 +121,7 @@ const struct action_data_struct action_data[] = {
 	{ "excavating", "is excavating a trench.", ACTF_HASTE | ACTF_FAST_CHORES, process_excavating, NULL },	// ACT_EXCAVATING
 	{ "siring", "is hunched over.", NOBITS, process_siring, cancel_siring },	// ACT_SIRING
 	{ "picking", "is looking around at the ground.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_picking, NULL },	// ACT_PICKING
-	{ "morphing", "is morphing and changing shape!", ACTF_ANYWHERE, process_morphing, NULL },	// ACT_MORPHING
+	{ "morphing", "is morphing and changing shape!", ACTF_ANYWHERE, process_morphing, cancel_morphing },	// ACT_MORPHING
 	{ "scraping", "is scraping at a tree.", ACTF_HASTE | ACTF_FAST_CHORES, process_scraping, cancel_scraping },	// ACT_SCRAPING
 	{ "bathing", "is bathing in the water.", NOBITS, process_bathing, NULL },	// ACT_BATHING
 	{ "chanting", "is chanting a strange song.", NOBITS, perform_ritual, NULL },	// ACT_CHANTING
@@ -330,6 +331,7 @@ obj_data *has_shovel(char_data *ch) {
 */
 void cancel_chipping(char_data *ch) {
 	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
+	scale_item_to_level(obj, 1);	// minimum level
 	obj_to_char(obj, ch);
 	load_otrigger(obj);
 }
@@ -342,8 +344,27 @@ void cancel_chipping(char_data *ch) {
 */
 void cancel_minting(char_data *ch) {
 	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
+	scale_item_to_level(obj, 1);	// minimum level
 	obj_to_char(obj, ch);
 	load_otrigger(obj);
+}
+
+
+/**
+* Returns the morph item, if any.
+*
+* @param char_data *ch The morpher.
+*/
+void cancel_morphing(char_data *ch) {
+	morph_data *morph = morph_proto(GET_ACTION_VNUM(ch, 0));
+	obj_data *obj;
+	
+	if (MORPH_FLAGGED(morph, MORPHF_CONSUME_OBJ) && MORPH_REQUIRES_OBJ(morph) != NOTHING) {
+		obj = read_object(MORPH_REQUIRES_OBJ(morph), TRUE);
+		scale_item_to_level(obj, 1);	// minimum level
+		obj_to_char(obj, ch);
+		load_otrigger(obj);
+	}
 }
 
 
@@ -354,6 +375,7 @@ void cancel_minting(char_data *ch) {
 */
 void cancel_sawing(char_data *ch) {
 	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
+	scale_item_to_level(obj, 1);	// minimum level
 	obj_to_char(obj, ch);
 	load_otrigger(obj);
 }
@@ -366,6 +388,7 @@ void cancel_sawing(char_data *ch) {
 */
 void cancel_scraping(char_data *ch) {
 	obj_data *obj = read_object(o_TREE, TRUE);
+	scale_item_to_level(obj, 1);	// minimum level
 	obj_to_char(obj, ch);
 	load_otrigger(obj);
 }
@@ -390,6 +413,7 @@ void cancel_smelting(char_data *ch) {
 	if (type != NOTHING) {
 		for (iter = 0; iter < smelt_data[type].from_amt; ++iter) {
 			obj = read_object(smelt_data[type].from, TRUE);
+			scale_item_to_level(obj, 1);	// minimum level
 			obj_to_char(obj, ch);
 			load_otrigger(obj);
 		}
@@ -404,6 +428,7 @@ void cancel_smelting(char_data *ch) {
 */
 void cancel_tanning(char_data *ch) {
 	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
+	scale_item_to_level(obj, 1);	// minimum level
 	obj_to_char(obj, ch);
 	load_otrigger(obj);
 }
@@ -1479,12 +1504,12 @@ void process_minting(char_data *ch) {
 * @param char_data *ch The morpher.
 */
 void process_morphing(char_data *ch) {
-	void finish_morphing(char_data *ch, int morph_to);
+	void finish_morphing(char_data *ch, morph_data *morph);
 
 	GET_ACTION_TIMER(ch) -= 1;
 
 	if (GET_ACTION_TIMER(ch) <= 0) {
-		finish_morphing(ch, GET_ACTION_VNUM(ch, 0));
+		finish_morphing(ch, morph_proto(GET_ACTION_VNUM(ch, 0)));
 		GET_ACTION(ch) = ACT_NONE;
 	}
 	else {

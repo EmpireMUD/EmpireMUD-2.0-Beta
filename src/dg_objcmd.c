@@ -433,6 +433,33 @@ OCMD(do_otransform) {
 }
 
 
+OCMD(do_omorph) {
+	char tar_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH];
+	morph_data *morph = NULL;
+	char_data *vict;
+	bool normal;
+	
+	two_arguments(argument, tar_arg, num_arg);
+	normal = !str_cmp(num_arg, "normal");
+	
+	if (!*tar_arg || !*num_arg) {
+		obj_log(obj, "omorph: missing argument(s)");
+	}
+	else if (!(vict = get_char_by_obj(obj, tar_arg))) {
+		obj_log(obj, "omorph: invalid target '%s'", tar_arg);
+	}
+	else if (!normal && (!isdigit(*num_arg) || !(morph = morph_proto(atoi(num_arg))))) {
+		obj_log(obj, "omorph: invalid morph '%s'", num_arg);
+	}
+	else if (morph && MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT)) {
+		obj_log(obj, "omorph: morph %d set in-development", MORPH_VNUM(morph));
+	}
+	else {
+		perform_morph(vict, morph);
+	}
+}
+
+
 OCMD(do_oown) {
 	void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh);
 	
@@ -1401,6 +1428,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "oechoneither", do_oechoneither, NO_SCMD },
 	{ "oforce", do_oforce, NO_SCMD },
 	{ "oload", do_dgoload, NO_SCMD },
+	{ "omorph", do_omorph, NO_SCMD },
 	{ "oown", do_oown, NO_SCMD },
 	{ "opurge", do_opurge, NO_SCMD },
 	{ "oscale", do_oscale, NO_SCMD },

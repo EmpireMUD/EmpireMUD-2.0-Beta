@@ -83,9 +83,9 @@ room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
 }
 
 
-/* modify an affection on the target. affections can be of the AFF_x  */
-/* variety or APPLY_x type. APPLY_x's have an integer value for them  */
-/* while AFF_x's have boolean values. In any case, the duration MUST  */
+/* modify an affection on the target. affections can be of the AFF_  */
+/* variety or APPLY_ type. APPLY_'s have an integer value for them  */
+/* while AFF_'s have boolean values. In any case, the duration MUST  */
 /* be non-zero.                                                       */
 /* usage:  apply <target> <property> <value> <duration seconds>       */
 #define APPLY_TYPE	1

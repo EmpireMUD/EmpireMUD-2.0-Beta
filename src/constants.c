@@ -322,6 +322,7 @@ const char *extra_attribute_types[] = {
 	"Heal-Over-Time",
 	"Resist-Magical",	// 10
 	"Crafting-Bonus",
+	"Blood-Upkeep",
 	"\n"
 };
 
@@ -550,6 +551,7 @@ const char *syslog_types[] = {
 	"script",
 	"system",
 	"validation",
+	"empire",
 	"\n"
 };
 
@@ -1024,7 +1026,7 @@ const char *apply_type_names[] = {
 };
 
 
-/* APPLY_x (1/3) */
+/* APPLY_x (1/4) */
 const char *apply_types[] = {
 	"NONE",
 	"STRENGTH",
@@ -1052,11 +1054,12 @@ const char *apply_types[] = {
 	"BONUS-HEALING",
 	"RESIST-MAGICAL",
 	"CRAFTING",
+	"BLOOD-UPKEEP",
 	"\n"
 };
 
 
-// APPLY_x (2/3) -- for rate_item (amount multiplied by the apply modifier to make each of these equal to 1)
+// APPLY_x (2/4) -- for rate_item (amount multiplied by the apply modifier to make each of these equal to 1)
 const double apply_values[] = {
 	0.01,	// "NONE",
 	1,	// "STRENGTH",
@@ -1083,11 +1086,12 @@ const double apply_values[] = {
 	1,	// BONUS-MAGICAL
 	1,	// BONUS-HEALING
 	0.5,	// RESIST-MAGICAL
-	0.01	// CRAFTING
+	0.01,	// CRAFTING
+	1,	// BLOOD-UPKEEP
 };
 
 
-// APPLY_x (3/3) applies that are directly tied to attributes
+// APPLY_x (3/4) applies that are directly tied to attributes
 const int apply_attribute[] = {
 	NOTHING,
 	STRENGTH,
@@ -1114,7 +1118,40 @@ const int apply_attribute[] = {
 	NOTHING,	// bonus-mag
 	NOTHING,	// bonus-heal
 	NOTHING,	// resist-magical
-	NOTHING	// crafting
+	NOTHING,	// crafting
+	NOTHING	// blood-upkeep
+};
+
+
+// APPLY_x (4/4) if TRUE, this apply is not scaled (applied as-is)
+const bool apply_never_scales[] = {
+	FALSE,	// "NONE",
+	FALSE,	// "STRENGTH",
+	FALSE,	// "DEXTERITY",
+	FALSE,	// "HEALTH-REGEN",
+	FALSE,	// "CHARISMA",
+	TRUE,	// "GREATNESS",
+	FALSE,	// "MOVE-REGEN",
+	FALSE,	// "MANA-REGEN",
+	FALSE,	// "INTELLIGENCE",
+	FALSE,	// "WITS",
+	TRUE,	// "AGE",
+	FALSE,	// "MAX-MOVE",
+	FALSE,	// RESIST-PHYSICAL
+	FALSE,	// "BLOCK",
+	FALSE,	// "HEAL-OVER-TIME",
+	FALSE,	// "HEALTH",
+	FALSE,	// "MAX-MANA",
+	FALSE,	// "TO-HIT",
+	FALSE,	// "DODGE",
+	FALSE,	// "INVENTORY",
+	FALSE,	// "BLOOD",
+	FALSE,	// BONUS-PHYSICAL
+	FALSE,	// BONUS-MAGICAL
+	FALSE,	// BONUS-HEALING
+	FALSE,	// RESIST-MAGICAL
+	TRUE,	// CRAFTING
+	TRUE	// BLOOD-UPKEEP
 };
 
 
@@ -1407,6 +1444,13 @@ const char *mob_move_types[] = {
 	"skis",
 	"slides",
 	"soars",
+	"lumbers",
+	"floats",
+	"lopes",
+	"blows",
+	"drifts",
+	"bounces",
+	"flows",
 	"\n"
 };
 
@@ -1838,6 +1882,8 @@ const char *obj_custom_types[] = {
 	"craft-to-room",
 	"wear-to-char",
 	"wear-to-room",
+	"remove-to-char",
+	"remove-to-room",
 	"\n"
 };
 
@@ -1913,6 +1959,7 @@ const char *olc_flag_bits[] = {
 	"CLASSES",
 	"SKILLS",
 	"!VEHICLES",
+	"!MORPHS",
 	"\n"
 };
 
@@ -1937,6 +1984,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"class",
 	"skill",
 	"vehicle",
+	"morph",
 	"\n"
 };
 
@@ -2487,6 +2535,8 @@ const char *affect_types[] = {
 	"shadow jab",
 	"confer",	// 60
 	"conferred",
+	"morph",
+	"whisperstride",
 	"\n"
 	};
 
@@ -2555,6 +2605,8 @@ const char *affect_wear_off_msgs[] = {
 	"You are no longer weakened by the shadow jab.",
 	"The power you were conferred has faded.",	// 60
 	"Your conferred strength returns.",
+	"",	// morph stats -- no wear-off message
+	"Your whisperstride fades.",
 	"\n"
 };
 
@@ -2614,7 +2666,8 @@ const char *cooldown_types[] = {
 	"howl",	// 50
 	"diversion",
 	"rogue flag",
-	"portal sickness",	// 53
+	"portal sickness",
+	"whisperstride",	// 54
 	"\n"
 };
 
@@ -2977,6 +3030,8 @@ const char *interact_types[] = {
 	"LIGHT",
 	"PICKPOCKET",
 	"MINE",
+	"COMBINE",
+	"SEPARATE",
 	"\n"
 };
 
@@ -2996,7 +3051,9 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_ROOM,
 	TYPE_OBJ,	// light
 	TYPE_MOB,	// pickpocket
-	TYPE_MINE_DATA	// mine
+	TYPE_MINE_DATA,	// mine
+	TYPE_OBJ,	// combine
+	TYPE_OBJ,	// separate
 };
 
 
@@ -3015,7 +3072,26 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_MOB,	// encounter
 	TYPE_OBJ,
 	TYPE_OBJ,
-	TYPE_OBJ	// mine
+	TYPE_OBJ,	// mine
+	TYPE_OBJ,	// combine
+	TYPE_OBJ,	// separate
+};
+
+
+// MORPHF_x
+const char *morph_flags[] = {
+	"IN-DEVELOPMENT",
+	"SCRIPT-ONLY",
+	"ANIMAL",
+	"VAMPIRE-ONLY",
+	"TEMPERATE-AFFINITY",
+	"ARID-AFFINITY",	// 5
+	"TROPICAL-AFFINITY",
+	"CHECK-SOLO",
+	"!SLEEP",
+	"GENDER-NEUTRAL",
+	"CONSUME-OBJ",	// 10
+	"\n"
 };
 
 

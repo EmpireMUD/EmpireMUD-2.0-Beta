@@ -32,6 +32,7 @@
 *   Map Utils
 *   Memory Utils
 *   Mobile Utils
+*   Morph Utils
 *   Object Utils
 *   Objval Utils
 *   Player Utils
@@ -280,6 +281,7 @@
 #define GET_MOVE(ch)  GET_CURRENT_POOL(ch, MOVE)
 #define GET_MAX_MOVE(ch)  GET_MAX_POOL(ch, MOVE)
 #define GET_BLOOD(ch)  GET_CURRENT_POOL(ch, BLOOD)
+#define GET_BLOOD_UPKEEP(ch)  GET_EXTRA_ATT(ch, ATT_BLOOD_UPKEEP)
 extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max pools, and max_pools[BLOOD] is not used.
 #define GET_HEALTH_DEFICIT(ch)  GET_DEFICIT((ch), HEALTH)
 #define GET_MOVE_DEFICIT(ch)  GET_DEFICIT((ch), MOVE)
@@ -324,7 +326,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define CAN_CARRY_N(ch)  (25 + GET_BONUS_INVENTORY(ch) + (HAS_BONUS_TRAIT(ch, BONUS_INVENTORY) ? 5 : 0) + (GET_EQ((ch), WEAR_PACK) ? GET_PACK_CAPACITY(GET_EQ(ch, WEAR_PACK)) : 0))
 #define CAN_CARRY_OBJ(ch,obj)  (IS_COINS(obj) ? TRUE : ((IS_CARRYING_N(ch) + obj_carry_size(obj)) <= CAN_CARRY_N(ch)))
 #define CAN_GET_OBJ(ch, obj)  (CAN_WEAR((obj), ITEM_WEAR_TAKE) && CAN_CARRY_OBJ((ch),(obj)) && CAN_SEE_OBJ((ch),(obj)))
-#define CAN_RECOGNIZE(ch, vict)  (IS_IMMORTAL(ch) || (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM | AFF_HIDE) && !MORPH_FLAGGED(vict, MORPH_FLAG_ANIMAL) && !IS_DISGUISED(vict)))
+#define CAN_RECOGNIZE(ch, vict)  (IS_IMMORTAL(ch) || (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM | AFF_HIDE) && !CHAR_MORPH_FLAGGED(vict, MORPHF_ANIMAL) && !IS_DISGUISED(vict)))
 #define CAN_RIDE_FLYING_MOUNT(ch)  (has_ability((ch), ABIL_ALL_TERRAIN_RIDING) || has_ability((ch), ABIL_FLY) || has_ability((ch), ABIL_DRAGONRIDING))
 #define CAN_SEE_IN_DARK(ch)  (HAS_INFRA(ch) || (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_HOLYLIGHT)))
 #define CAN_SEE_IN_DARK_ROOM(ch, room)  ((WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room) || (room == IN_ROOM(ch) && (has_ability(ch, ABIL_BY_MOONLIGHT))) || CAN_SEE_IN_DARK(ch)) && (!MAGIC_DARKNESS(room) || CAN_SEE_IN_MAGIC_DARKNESS(ch)))
@@ -419,7 +421,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define STATE(d)  ((d)->connected)
 
 
-// olc
+// OLC_x: olc getters
 #define GET_OLC_TYPE(desc)  ((desc)->olc_type)
 #define GET_OLC_VNUM(desc)  ((desc)->olc_vnum)
 #define GET_OLC_STORAGE(desc)  ((desc)->olc_storage)
@@ -434,6 +436,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_CROP(desc)  ((desc)->olc_crop)
 #define GET_OLC_GLOBAL(desc)  ((desc)->olc_global)
 #define GET_OLC_MOBILE(desc)  ((desc)->olc_mobile)
+#define GET_OLC_MORPH(desc)  ((desc)->olc_morph)
 #define GET_OLC_OBJECT(desc)  ((desc)->olc_object)
 #define GET_OLC_ROOM_TEMPLATE(desc)  ((desc)->olc_room_template)
 #define GET_OLC_SECTOR(desc)  ((desc)->olc_sector)
@@ -608,6 +611,29 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define IS_MOB(ch)  (IS_NPC(ch) && GET_MOB_VNUM(ch) != NOTHING)
 #define IS_TAGGED_BY(mob, player)  (IS_NPC(mob) && !IS_NPC(player) && find_id_in_tag_list(GET_IDNUM(player), MOB_TAGGED_BY(mob)))
 #define MOB_FLAGGED(ch, flag)  (IS_NPC(ch) && IS_SET(MOB_FLAGS(ch), (flag)))
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MORPH UTILS /////////////////////////////////////////////////////////////
+
+#define MORPH_ABILITY(mph)  ((mph)->ability)
+#define MORPH_AFFECTS(mph)  ((mph)->affects)
+#define MORPH_APPLIES(mph)  ((mph)->applies)
+#define MORPH_ATTACK_TYPE(mph)  ((mph)->attack_type)
+#define MORPH_COST(mph)  ((mph)->cost)
+#define MORPH_COST_TYPE(mph)  ((mph)->cost_type)
+#define MORPH_FLAGS(mph)  ((mph)->flags)
+#define MORPH_KEYWORDS(mph)  ((mph)->keywords)
+#define MORPH_LONG_DESC(mph)  ((mph)->long_desc)
+#define MORPH_MAX_SCALE(mph)  ((mph)->max_scale)
+#define MORPH_MOVE_TYPE(mph)  ((mph)->move_type)
+#define MORPH_REQUIRES_OBJ(mph)  ((mph)->requires_obj)
+#define MORPH_SHORT_DESC(mph)  ((mph)->short_desc)
+#define MORPH_VNUM(mph)  ((mph)->vnum)
+
+// helpers
+#define MORPH_FLAGGED(mph, flg)  IS_SET(MORPH_FLAGS(mph), (flg))
+#define CHAR_MORPH_FLAGGED(ch, flg)  (IS_MORPHED(ch) ? MORPH_FLAGGED(GET_MORPH(ch), (flg)) : FALSE)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -793,6 +819,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define INJURY_FLAGS(ch)  ((ch)->char_specials.injuries)
 #define PLR_FLAGS(ch)  (REAL_CHAR(ch)->char_specials.act)
 #define SYSLOG_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->syslogs))
+#define GET_MORPH(ch)  ((ch)->char_specials.morph)
 
 // ch->player_specials: player_special_data
 #define CAN_GAIN_NEW_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->can_gain_new_skills))
@@ -846,7 +873,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_MAIL_PENDING(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mail_pending))
 #define GET_MAPSIZE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mapsize))
 #define GET_MARK_LOCATION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->marked_location))
-#define GET_MORPH(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->morph))
 #define GET_MOUNT_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mount_flags))
 #define GET_MOUNT_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mount_vnum))
 #define GET_OFFERS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->offers))
@@ -884,6 +910,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define HAS_BONUS_TRAIT(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_BONUS_TRAITS(ch), (flag)))
 #define IS_AFK(ch)  (!IS_NPC(ch) && (PRF_FLAGGED((ch), PRF_AFK) || ((ch)->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN) >= 10))
 #define IS_GRANTED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_GRANT_FLAGS(ch), (flag)))
+#define IS_MORPHED(ch)  (GET_MORPH(ch) != NULL)
 #define IS_PVP_FLAGGED(ch)  (!IS_NPC(ch) && (PRF_FLAGGED((ch), PRF_ALLOW_PVP) || get_cooldown_time((ch), COOLDOWN_PVP_FLAG) > 0))
 #define IS_WRITING(ch)  (PLR_FLAGGED(ch, PLR_WRITING))
 #define MOUNT_FLAGGED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_MOUNT_FLAGS(ch), (flag)))
@@ -1074,9 +1101,9 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
  //////////////////////////////////////////////////////////////////////////////
 //// STRING UTILS ////////////////////////////////////////////////////////////
 
-#define HSHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "their" : (GET_SEX(ch) ? (GET_SEX(ch) == SEX_MALE ? "his":"her") :"its"))
-#define HSSH(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "they" : (GET_SEX(ch) ? (GET_SEX(ch) == SEX_MALE ? "he" :"she") : "it"))
-#define HMHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "them" : (GET_SEX(ch) ? (GET_SEX(ch) == SEX_MALE ? "him":"her") : "it"))
+#define HSHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "their" : ((GET_SEX(ch) && !CHAR_MORPH_FLAGGED(ch, MORPHF_GENDER_NEUTRAL)) ? (GET_SEX(ch) == SEX_MALE ? "his":"her") :"its"))
+#define HSSH(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "they" : ((GET_SEX(ch) && !CHAR_MORPH_FLAGGED(ch, MORPHF_GENDER_NEUTRAL)) ? (GET_SEX(ch) == SEX_MALE ? "he" :"she") : "it"))
+#define HMHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "them" : ((GET_SEX(ch) && !CHAR_MORPH_FLAGGED(ch, MORPHF_GENDER_NEUTRAL)) ? (GET_SEX(ch) == SEX_MALE ? "him":"her") : "it"))
 
 #define AN(string)  (strchr("aeiouAEIOU", *string) ? "an" : "a")
 #define SANA(obj)  (strchr("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")
