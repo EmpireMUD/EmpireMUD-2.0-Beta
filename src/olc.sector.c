@@ -141,7 +141,8 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	room_data *room, *next_room;
 	descriptor_data *desc;
 	adv_data *adv, *next_adv;
-	int count;
+	struct map_data *map;
+	int count, x, y;
 	bool found;
 	
 	if (!(sect = sector_proto(vnum))) {
@@ -171,14 +172,41 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 		}
 	}
 	
-	// update world
+	// update world: map
 	count = 0;
-	HASH_ITER(hh, world_table, room, next_room) {
+	for (x = 0; x < MAP_WIDTH; ++x) {
+		for (y = 0; y < MAP_HEIGHT; ++y) {
+			map = &(world_map[x][y]);
+			room = NULL;
+			
+			if (map->sector_type == sect) {
+				if (!room) {
+					room = real_room(map->vnum);
+				}
+				map->sector_type = replace_sect;
+				SECT(room) = replace_sect;
+				++count;
+			}
+			if (map->base_sector == sect) {
+				if (!room) {
+					room = real_room(map->vnum);
+				}
+				change_base_sector(room, replace_sect);
+			}
+			if (map->natural_sector == sect) {
+				map->natural_sector = replace_sect;
+			}
+		}
+	}
+	
+	// update world: interior
+	LL_FOREACH2(interior_room_list, room, next_interior) {
 		if (SECT(room) == sect) {
 			// can't use change_terrain() here
 			SECT(room) = replace_sect;
 			++count;
 			
+			// this SHOULD already have been taken care of, but just in case...
 			if (GET_ROOM_VNUM(room) < MAP_SIZE) {
 				world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type = replace_sect;
 				world_map_needs_save = TRUE;

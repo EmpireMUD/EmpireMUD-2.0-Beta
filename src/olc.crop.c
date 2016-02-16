@@ -105,9 +105,10 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	void remove_crop_from_table(crop_data *crop);
 	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 	
-	room_data *room, *next_room;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
+	struct map_data *map;
+	room_data *room;
 	crop_data *crop;
 	sector_data *base = NULL;
 	int count;
@@ -134,8 +135,13 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	
 	// update world
 	count = 0;
-	HASH_ITER(hh, world_table, room, next_room) {
-		if (ROOM_CROP(room) == crop) {
+	LL_FOREACH(land_map, map) {
+		room = real_real_room(map->vnum);
+		
+		if (map->crop_type == crop || (room && ROOM_CROP(room) == crop)) {
+			if (!room) {
+				room = real_room(map->vnum);
+			}
 			set_crop_type(room, NULL);	// remove it explicitly
 			change_terrain(room, GET_SECT_VNUM(base));
 			++count;
