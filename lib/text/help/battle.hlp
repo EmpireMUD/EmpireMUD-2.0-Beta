@@ -95,7 +95,7 @@ Block Arrows (Battle ability)
 With training, you can learn to use shields to block incoming arrows, and
 take less damage before you've even gotten to your opponent.
 
-TODO: TRAINING INFO HERE
+Gains experience when you fail to dodge arrows.
 #
 "CUT DEEP" "DEEP CUTS"
 
@@ -369,8 +369,7 @@ from it.
 You must be holding a shield to block attacks, and you cannot normally block
 magical attacks.
 
-Gain experience whenever you are attacked with a blockable attack and have a
-shield equipped.
+Gain experience whenever you attempt a block.
 
 See also:  BLOCK, HOLD
 #
