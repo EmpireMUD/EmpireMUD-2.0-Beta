@@ -138,10 +138,10 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	extern bool world_map_needs_save;
 	
 	sector_data *sect, *sect_iter, *next_sect, *replace_sect;
-	room_data *room, *next_room;
 	descriptor_data *desc;
 	adv_data *adv, *next_adv;
 	struct map_data *map;
+	room_data *room;
 	int count, x, y;
 	bool found;
 	
