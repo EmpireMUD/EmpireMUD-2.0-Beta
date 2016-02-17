@@ -32,6 +32,8 @@ Cost:  10 blood
 Upkeep:  3 blood/hr
 
 This ability grants a vampire haste, at the cost of blood.
+
+Gains experience when you activate it and when you deal damage in combat.
 #
 "ANCIENT BLOOD"
 
@@ -55,6 +57,8 @@ Cost:  50 blood (100 in combat)
 Upkeep:  1 blood/hr
 
 A master vampire can turn into a tiny bat, capable of flight.
+
+Gains experience when you finish transforming into a bat.
 
 See also: MORPH
 #
@@ -110,6 +114,8 @@ red sword is only as powerful as the vampire who created it.
 
 When you activate this power, you will automatically wield the sword, and it
 will disappear when unequipped.
+
+Gains experience when you create the bloodsword.
 #
 BOOST
 
@@ -124,6 +130,8 @@ This ability allows a vampire to boost strength or dexterity by spending
 blood. At high skill levels, you may get a stronger boost at the same cost.
 
 You can end your boosts early by typing "boost end".
+
+Gains experience when you activate your boosts.
 #
 CLAWS
 
@@ -135,6 +143,8 @@ Upkeep:  2 blood/hr
 
 The vampire can turn his fingers into huge, deadly claws that do grievous
 melee damage.
+
+Claws gains experience when toggled on and when you attack with them.
 #
 COMMAND
 
@@ -150,6 +160,8 @@ in a sentence.
 
 This power only works on human NPCs, but won't work on hard/group mobs. It also
 won't work on mobs who are more powerful than you.
+
+Gains experience when you issue commands.
 #
 DAYWALKING DAYWALKER
 
@@ -160,6 +172,8 @@ in broad daylight without losing her unnatural powers. You can gain skill
 points from this ability by being outdoors in the sun.
 
 This power also protects the vampire against the Purify spell.
+
+Gains experience passively while you're outdoors during the day.
 
 See also: PURIFY
 #
@@ -172,7 +186,9 @@ Cost:  20 blood
 Upkeep:  1 blood/hr
 
 This ability puts the vampire into a deep sleep where it mimics the appearance
-of a corpse.
+of a corpse. Activate again to cancel.
+
+Gains experience when activated.
 #
 "DREAD BLOOD FORM"
 
@@ -224,6 +240,8 @@ sharks. Aggressive NPCs may still attack, but will be delayed.
 
 This power offers more protection to characters with higher Charisma. NPCs
 that are immune to Vampire debuffs are also immune to Majesty.
+
+Gains experience when a NPC would attack you, but not when initially activated.
 #
 "MIST FORM"
 
@@ -236,6 +254,8 @@ Upkeep:  1 blood/hr
 The vampire dissolves into mist, unable to be harmed. Many spells and abilities
 cannot be used while in this state, but you can use it in combat, and you can
 move around while transformed.
+
+Gains experience when you finish transforming into mist.
 
 See also: MORPH
 #
@@ -250,6 +270,10 @@ Upkeep:  1 blood/hr
 With this ability, a vampire can mummify itself in a hard casing, protecting
 it from all physical harm. You cannot, however, move while mummified, and you
 can't activate this ability in combat.
+
+Activate this ability again to cancel it.
+
+Mummify gains experience when you activate it.
 #
 "PREDATOR VISION"
 
@@ -266,7 +290,7 @@ REGENERATE
 Regenerate (Vampire ability)
 
 Usage:  regenerate [health | move | mana] [amount]
-Cost: 10 blood per 10/15/25 regenerated (see below)
+Cost:  10 blood per 10/15/25 regenerated (see below)
 
 Vampires have the ability to regenerate themselves using blood. This process
 heals them, but makes them hungrier. The command defaults to health, unless
@@ -276,12 +300,15 @@ You can specify an amount to heal.
 
 With Vampire up to level 50, this regenerates 1 per blood point. Up to 75,
 it regenerates 1.5. And higher than that, it regenerates 2.5.
+
+Gains experience whenever you use this ability.
 #
 "SANGUINE RESTORATION"
 
 Sanguine Restoration (Vampire ability)
 
 While drinking blood from a live victim, your rate of regeneration goes up 4x.
+
 You will gain experience with this ability when drinking blood.
 
 See also: BITE
@@ -308,6 +335,8 @@ Usage:  soulmask
 
 The soulmask protects the vampire from certain spells and abilities, such as
 Soulsight.
+
+Soulmask gains experience when you turn it on.
 
 See also: SOULSIGHT
 #
@@ -338,6 +367,8 @@ This ability summons up to (Charisma / 3, rounded up) unsuspecting humans from
 the surrounding area, using the vampire's unnatural charm. They have no
 allegiance to their summoner, though, and may soon wander off again.
 
+Gains experience when you try to summon humans.
+
 See also: COMMAND
 #
 "TASTE BLOOD"
@@ -349,6 +380,8 @@ Usage:  taste <person>
 Your target must be asleep or permitting for you to taste their blood. You can
 learn about the particular characteristics of their blood through a single
 drop.
+
+Gains experience when used.
 #
 "UNNATURAL THIRST"
 
@@ -357,7 +390,7 @@ Unnatural Thirst (Vampire ability)
 Some vampires learn to subsist on blood alone, instead of food or water. Such
 vampires are said to have an unnatural thirst.
 
-You can gain Vampire skill points from this ability while drinking blood.
+You can gain experience from this ability while drinking blood.
 
 See also: BITE
 #
@@ -372,6 +405,8 @@ enabling them to travel without a live blood supply sometimes for weeks.
 
 One point of blood will become one drink of blood, and vice versa.
 
+Gains experience when you store blood in this way.
+
 See also: DRINK
 #
 WEAKEN
@@ -385,6 +420,8 @@ Debuff type:  Vampire
 
 A vampire who is learned in the ways of blood can use her own blood to drain
 the strength of others for 75 seconds.
+
+Gains experience when you attempt to weaken someone.
 #
 "WOLF FORM"
 
@@ -400,6 +437,8 @@ this form, he is nearly indistinguishable from a wild animal.
 
 This also allows him to turn into coyotes and ocelots, which are useful more
 disguises in certain terrains.
+
+Gains experience when you transform into a wolf.
 
 See also: MORPH
 #
