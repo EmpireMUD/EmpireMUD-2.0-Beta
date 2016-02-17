@@ -344,7 +344,7 @@ void point_update_char(char_data *ch) {
 	}
 	
 	// bloody upkeep
-	if (IS_VAMPIRE(ch)) {
+	if (IS_VAMPIRE(ch) && !IS_IMMORTAL(ch)) {
 		GET_BLOOD(ch) -= MAX(0, GET_BLOOD_UPKEEP(ch));
 		
 		if (GET_BLOOD(ch) < 0) {
@@ -352,7 +352,7 @@ void point_update_char(char_data *ch) {
 			return;
 		}
 	}
-	else {	// not a vampire
+	else {	// not a vampire (or is imm)
 		// don't gain blood whilst being fed upon
 		if (GET_FED_ON_BY(ch) == NULL) {
 			GET_BLOOD(ch) = MIN(GET_BLOOD(ch) + 1, GET_MAX_BLOOD(ch));
@@ -808,7 +808,7 @@ void check_wars(void) {
 						rev->start_time = time(0);
 					}
 					
-					syslog(SYS_INFO, 0, TRUE, "WAR: The war between %s and %s has timed out", EMPIRE_NAME(emp), EMPIRE_NAME(enemy));
+					syslog(SYS_INFO, 0, TRUE, "DIPL: The war between %s and %s has timed out", EMPIRE_NAME(emp), EMPIRE_NAME(enemy));
 					log_to_empire(emp, ELOG_DIPLOMACY, "The war with %s is over", EMPIRE_NAME(enemy));
 					log_to_empire(enemy, ELOG_DIPLOMACY, "The war with %s is over", EMPIRE_NAME(emp));
 				}

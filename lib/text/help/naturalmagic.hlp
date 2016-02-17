@@ -45,7 +45,7 @@ See also: HEAL, REJUVENATE
 Animal Forms (Natural Magic ability)
 
 Usage:  morph <type>
-Cost:  25 mana (50 in combat)
+Cost:  25 mana (75 in combat)
 
 A skilled nature mage can take on the forms of different animals to disguise
 him- or herself. Each of these forms must be used in a different environment:
@@ -78,7 +78,7 @@ Astral Werewolf Form
 Class ability:  Werewolf, Shadow Wolf, Feral
 
 Usage:  morph astral werewolf
-Cost:  50 move (100 in combat)
+Cost:  50 move (150 in combat)
 
 The astral wolf form is a powerful and formidable caster.
 
@@ -667,7 +667,7 @@ Sage Werewolf Form
 Class ability:  Werewolf, Shadow Wolf, Feral
 
 Usage:  morph sage werewolf
-Cost:  50 move (100 in combat)
+Cost:  50 move (150 in combat)
 
 The sage wolf form is a strong healer.
 
@@ -693,7 +693,7 @@ Savage Werewolf Form
 Class ability:  Werewolf, Shadow Wolf
 
 Usage:  morph savage werewolf
-Cost:  50 move (100 in combat)
+Cost:  50 move (150 in combat)
 
 The savage wolf form is strong in melee combat.
 
@@ -817,9 +817,23 @@ Towering Werewolf Form
 Class ability:  Werewolf, Feral
 
 Usage:  morph towering werewolf
-Cost:  50 move (100 in combat)
+Cost:  50 move (150 in combat)
 
 The towering wolf form is best-suited for tanking.
+
+See also: MORPH
+#
+"WEREWOLF FORM"
+
+Werewolf Form
+Class ability:  Werewolf, Shadow Wolf, Feral
+
+Usage:  morph werewolf
+Cost:  50 move (150 in combat)
+
+The werewolf form is a light, quick morph that works well for solo and pvp
+players, as it doesn't have the penalties of the role-based forms (but its
+bonuses are also lower).
 
 See also: MORPH
 #

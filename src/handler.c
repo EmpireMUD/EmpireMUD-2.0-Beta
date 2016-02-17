@@ -1809,7 +1809,7 @@ double exchange_rate(empire_data *from, empire_data *to) {
 		modifier = 0.65;
 	}
 	else if (IS_SET(pol->type, DIPL_WAR)) {
-		modifier = 0;
+		modifier = 0.1;
 	}
 	else if (IS_SET(pol->type, DIPL_DISTRUST)) {
 		modifier = 0.25;
@@ -1824,7 +1824,7 @@ double exchange_rate(empire_data *from, empire_data *to) {
 		modifier += 0.25;
 	}
 
-	modifier = MAX(0.0, MIN(1.0, modifier));
+	modifier = MAX(0.1, MIN(1.0, modifier));
 	return modifier;
 }
 
@@ -2970,7 +2970,7 @@ void free_exclusion_data(struct interact_exclusion_data *list) {
 
 /**
 * @param struct interaction_item *list The list to check.
-* @param int type The INTERACT_x type to check for.
+* @param int type The INTERACT_ type to check for.
 * @return bool TRUE if at least one interaction of that type is in the list.
 */
 bool has_interaction(struct interaction_item *list, int type) {
@@ -2992,7 +2992,7 @@ bool has_interaction(struct interaction_item *list, int type) {
 *
 * @param char_data *ch The player who is interacting.
 * @param char_data *mob The NPC being interacted-with.
-* @param int type Any INTERACT_x const.
+* @param int type Any INTERACT_ const.
 * @param INTERACTION_FUNC(*func) A callback function to run for the interaction.
 */
 bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func)) {
@@ -3076,7 +3076,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 *
 * @param char_data *ch The actor.
 * @param struct interaction_item *run_list A pointer to the start of the list to run.
-* @param int type Any INTERACT_x const.
+* @param int type Any INTERACT_ const.
 * @param room_data *inter_room For room interactions, the room.
 * @param char_data *inter_mob For mob interactions, the mob.
 * @param obj_data *inter_item For item interactions, the item.
@@ -3108,7 +3108,7 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 *
 * @param char_data *ch The actor.
 * @param room_data *room The location to run on.
-* @param int type Any INTERACT_x const.
+* @param int type Any INTERACT_ const.
 * @param INTERACTION_FUNC(*func) A function pointer that runs each successful interaction (func returns TRUE if an interaction happens; FALSE if it aborts)
 * @return bool TRUE if any interactions ran successfully, FALSE if not.
 */

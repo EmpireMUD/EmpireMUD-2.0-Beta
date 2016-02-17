@@ -301,6 +301,14 @@ Usage:  cls
 CLS is short for "clear screen" and sends an instruction to your telnet client
 to clear the screen.
 #
+COMBINE
+
+Usage:  combine <item>
+
+Some items, like single fruits, can be combined into larger items.
+
+See also: SEPARATE
+#
 COMMANDS
 
 Usage:  commands
@@ -1407,6 +1415,15 @@ this command, you must type your password and then the word "CONFIRM". If your
 password contains a space, you should put it in "quotes" or (parentheses).
 
 This command cannot be abbreviated.
+#
+SEPARATE
+
+Usage:  separate <item>
+
+Some items, such as bunches of fruit, can be separated into multiple single
+items.
+
+See also: COMBINE
 #
 SHARE UNSHARE "SHARED ITEM"
 

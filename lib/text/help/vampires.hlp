@@ -53,7 +53,7 @@ victim is drained fatally.
 Bat Form (Vampire ability)
 
 Usage:  morph bat
-Cost:  50 blood (100 in combat)
+Cost:  50 blood (150 in combat)
 Upkeep:  1 blood/hr
 
 A master vampire can turn into a tiny bat, capable of flight.
@@ -121,13 +121,13 @@ BOOST
 
 Boost (Vampire ability)
 
-Usage:  boost <strength | dexterity>
+Usage:  boost <strength | charisma | intelligence>
         boost end
 Cost:  10 blood
 Upkeep:  1 blood/hr per boost
 
-This ability allows a vampire to boost strength or dexterity by spending
-blood. At high skill levels, you may get a stronger boost at the same cost.
+This ability allows a vampire to boost primary attributes by spending blood.
+At high skill levels, you may get a stronger boost at the same cost.
 
 You can end your boosts early by typing "boost end".
 
@@ -196,7 +196,7 @@ Dread Blood Form
 Class ability: Lich, Necromancer
 
 Usage:  morph dread blood
-Cost:  30 blood (60 in combat)
+Cost:  30 blood (90 in combat)
 
 The dread blood form is a liquid red terror with a shape that only vaguely
 resembles the man it once was. By channeling its full power through its
@@ -219,7 +219,7 @@ Horrid Form
 Class ability: Reaper, Shade, Wight
 
 Usage:  morph horrid
-Cost:  30 blood (60 in combat)
+Cost:  30 blood (90 in combat)
 
 The vampire takes on the horrid form, a twisted bestial monstrosity.
 
@@ -248,7 +248,7 @@ Gains experience when a NPC would attack you, but not when initially activated.
 Mist Form (Vampire ability)
 
 Usage:  morph mist
-Cost: 20 blood (40 in combat)
+Cost: 20 blood (60 in combat)
 Upkeep:  1 blood/hr
 
 The vampire dissolves into mist, unable to be harmed. Many spells and abilities
@@ -428,7 +428,7 @@ Gains experience when you attempt to weaken someone.
 Wolf Form (Vampire ability)
 
 Usage:  morph <type>
-Cost:  20 blood (40 in combat)
+Cost:  20 blood (60 in combat)
 Upkeep:  1 blood/hr
 Morph types:  wolf, coyote, ocelot
 

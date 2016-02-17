@@ -1558,7 +1558,7 @@ ACMD(do_morph) {
 	// initialize
 	morph = NULL;
 	normal = (!str_cmp(argument, "normal") | !str_cmp(argument, "norm"));
-	multiplier = (subcmd == SCMD_FASTMORPH || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) ? 2.0 : 1.0;
+	multiplier = (subcmd == SCMD_FASTMORPH || FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) ? 3.0 : 1.0;
 	
 	if (normal && !IS_MORPHED(ch)) {
 		msg_to_char(ch, "You aren't morphed.\r\n");
@@ -1592,9 +1592,7 @@ ACMD(do_morph) {
 	}
 	else {
 		// charge costs
-		if (morph && MORPH_COST(morph) > 0) {
-			GET_CURRENT_POOL(ch, MORPH_COST_TYPE(morph)) -= MORPH_COST(morph) * multiplier;
-		}
+		charge_ability_cost(ch, MORPH_COST_TYPE(morph), MORPH_COST(morph) * multiplier, NOTHING, 0, WAIT_ABILITY);
 		
 		// take the obj
 		if (morph && MORPH_REQUIRES_OBJ(morph) != NOTHING && MORPH_FLAGGED(morph, MORPHF_CONSUME_OBJ) && (obj = get_obj_in_list_vnum(MORPH_REQUIRES_OBJ(morph), ch->carrying))) {

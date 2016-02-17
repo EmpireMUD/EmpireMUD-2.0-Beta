@@ -306,7 +306,9 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_LIGHT  11
 #define INTERACT_PICKPOCKET  12
 #define INTERACT_MINE  13
-#define NUM_INTERACTS  14
+#define INTERACT_COMBINE  14
+#define INTERACT_SEPARATE  15
+#define NUM_INTERACTS  16
 
 
 // for object saving
@@ -1490,7 +1492,7 @@ typedef struct vehicle_data vehicle_data;
 #define SUMMON_ADVENTURE  1	// for adventure_summon()
 
 
-// syslog types
+// SYS_x: syslog types
 #define SYS_CONFIG  BIT(0)	// configs
 #define SYS_DEATH  BIT(1)	// death/respawn
 #define SYS_ERROR  BIT(2)	// syserrs
@@ -1502,6 +1504,7 @@ typedef struct vehicle_data vehicle_data;
 #define SYS_SCRIPT  BIT(8)	// script logs
 #define SYS_SYSTEM  BIT(9)	// system stuff
 #define SYS_VALID  BIT(10)	// validation logs
+#define SYS_EMPIRE  BIT(11)	// empire-related logs
 
 
 // Wait types for the command_lag() function.

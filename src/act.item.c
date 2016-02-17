@@ -91,6 +91,57 @@ bool can_take_obj(char_data *ch, obj_data *obj) {
 
 
 /**
+* Interaction func for "combine". This almost always extracts the original
+* item, so it should basically always return TRUE.
+*/
+INTERACTION_FUNC(combine_obj_interact) {
+	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
+	struct resource_data *res;
+	obj_data *new_obj;
+	
+	// how many they need
+	res = create_resource_list(GET_OBJ_VNUM(inter_item), interaction->quantity, NOTHING);
+	
+	if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE)) {
+		// error message sent by has_resources
+		free_resource_list(res);
+		return TRUE;
+	}
+	
+	snprintf(to_char, sizeof(to_char), "You combine %dx %s into $p!", interaction->quantity, skip_filler(GET_OBJ_SHORT_DESC(inter_item)));
+	snprintf(to_room, sizeof(to_room), "$n combines %dx %s into $p!", interaction->quantity, skip_filler(GET_OBJ_SHORT_DESC(inter_item)));
+	
+	new_obj = read_object(interaction->vnum, TRUE);
+	scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
+	
+	if (GET_OBJ_TIMER(new_obj) != UNLIMITED && GET_OBJ_TIMER(inter_item) != UNLIMITED) {
+		GET_OBJ_TIMER(new_obj) = MIN(GET_OBJ_TIMER(new_obj), GET_OBJ_TIMER(inter_item));
+	}
+	
+	extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY));
+	
+	// ownership
+	new_obj->last_owner_id = GET_IDNUM(ch);
+	new_obj->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
+	
+	// put it somewhere
+	if (CAN_WEAR(new_obj, ITEM_WEAR_TAKE)) {
+		obj_to_char(new_obj, ch);
+	}
+	else {
+		obj_to_room(new_obj, IN_ROOM(ch));
+	}
+	load_otrigger(new_obj);
+	
+	act(to_char, FALSE, ch, new_obj, NULL, TO_CHAR);
+	act(to_room, TRUE, ch, new_obj, NULL, TO_ROOM);
+	
+	free_resource_list(res);
+	return TRUE;
+}
+
+
+/**
 * @param room_data *room The room to check.
 * @return int Number of items in the room (large counts double).
 */
@@ -372,6 +423,12 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), climate_types[GET_CROP_CLIMATE(cp)]);
 	}
 	
+	if (has_interaction(obj->interactions, INTERACT_COMBINE)) {
+		msg_to_char(ch, "It can be combined.\r\n");
+	}
+	if (has_interaction(obj->interactions, INTERACT_SEPARATE)) {
+		msg_to_char(ch, "It can be separated.\r\n");
+	}
 	
 	*lbuf = '\0';
 	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
@@ -663,6 +720,47 @@ void remove_armor_by_type(char_data *ch, int armor_type) {
 			unequip_char_to_inventory(ch, iter);
 		}
 	}
+}
+
+
+/**
+* Interaction func for "separate". This always extracts the original
+* item, so it should basically always return TRUE.
+*/
+INTERACTION_FUNC(separate_obj_interact) {
+	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
+	obj_data *new_obj;
+	int iter;
+		
+	snprintf(to_char, sizeof(to_char), "You separate %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+	act(to_char, FALSE, ch, NULL, NULL, TO_CHAR);
+	snprintf(to_room, sizeof(to_room), "$n separates %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+	act(to_room, TRUE, ch, NULL, NULL, TO_ROOM);
+	
+	for (iter = 0; iter < interaction->quantity; ++iter) {
+		new_obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
+	
+		if (GET_OBJ_TIMER(new_obj) != UNLIMITED && GET_OBJ_TIMER(inter_item) != UNLIMITED) {
+			GET_OBJ_TIMER(new_obj) = MIN(GET_OBJ_TIMER(new_obj), GET_OBJ_TIMER(inter_item));
+		}
+		
+		// ownership
+		new_obj->last_owner_id = GET_IDNUM(ch);
+		new_obj->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
+	
+		// put it somewhere
+		if (CAN_WEAR(new_obj, ITEM_WEAR_TAKE)) {
+			obj_to_char(new_obj, ch);
+		}
+		else {
+			obj_to_room(new_obj, IN_ROOM(ch));
+		}
+		load_otrigger(new_obj);
+	}
+	
+	extract_obj(inter_item);
+	return TRUE;
 }
 
 
@@ -3200,6 +3298,31 @@ void warehouse_store(char_data *ch, char *argument) {
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
+ACMD(do_combine) {
+	char arg[MAX_INPUT_LENGTH];
+	obj_data *obj;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Combine what?\r\n");
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
+	}
+	else if (!has_interaction(obj->interactions, INTERACT_COMBINE)) {
+		msg_to_char(ch, "You can't combine that!\r\n");
+	}
+	else {		
+		// will extract no matter what happens here
+		if (!run_interactions(ch, obj->interactions, INTERACT_COMBINE, IN_ROOM(ch), NULL, obj, combine_obj_interact)) {
+			act("You fail to combine $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		command_lag(ch, WAIT_OTHER);
+	}
+}
+
+
 ACMD(do_draw) {
 	obj_data *obj = NULL;
 	int loc = 0;
@@ -4734,6 +4857,31 @@ ACMD(do_roadsign) {
 
 		gain_ability_exp(ch, ABIL_ROADS, 33.4);
 		extract_obj(sign);
+	}
+}
+
+
+ACMD(do_separate) {
+	char arg[MAX_INPUT_LENGTH];
+	obj_data *obj;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Separate what?\r\n");
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
+	}
+	else if (!has_interaction(obj->interactions, INTERACT_SEPARATE)) {
+		msg_to_char(ch, "You can't separate that!\r\n");
+	}
+	else {		
+		// will extract no matter what happens here
+		if (!run_interactions(ch, obj->interactions, INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, separate_obj_interact)) {
+			act("You fail to separate $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		command_lag(ch, WAIT_OTHER);
 	}
 }
 

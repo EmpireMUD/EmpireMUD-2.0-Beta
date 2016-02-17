@@ -130,7 +130,7 @@ struct file_lookup_struct file_lookup[] = {
 	{ "syserr", LVL_CIMPL, "../log/syserr" },
 	{ "level", LVL_CIMPL, "../log/levels" },
 	{ "olc", LVL_CIMPL, "../log/olc" },
-	{ "war", LVL_CIMPL, "../log/war" },
+	{ "diplomacy", LVL_CIMPL, "../log/diplomacy" },
 	{ "scripterr", LVL_CIMPL, "../log/scripterr" },
 
 	// last
@@ -1716,6 +1716,7 @@ void init_config_system(void) {
 	init_config(CONFIG_WAR, "death_release_minutes", CONFTYPE_INT, "minutes a person can sit without respawning");
 	init_config(CONFIG_WAR, "deaths_before_penalty", CONFTYPE_INT, "how many times you can die in a short period without being penalized");
 	init_config(CONFIG_WAR, "deaths_before_penalty_war", CONFTYPE_INT, "death limit while at war");
+	init_config(CONFIG_WAR, "mutual_war_only", CONFTYPE_BOOL, "allows 'battle' but not 'war' diplomacy");
 	init_config(CONFIG_WAR, "rogue_flag_time", CONFTYPE_INT, "in minutes, acts like hostile flag but for non-empire players");
 	init_config(CONFIG_WAR, "seconds_per_death", CONFTYPE_INT, "how long the penalty lasts per death over the limit");
 	init_config(CONFIG_WAR, "stun_immunity_time", CONFTYPE_INT, "seconds a person is immune to stuns after a stun wears off");

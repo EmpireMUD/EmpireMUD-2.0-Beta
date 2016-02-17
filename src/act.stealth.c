@@ -1780,6 +1780,7 @@ ACMD(do_terrify) {
 	}
 }
 
+
 ACMD(do_whisperstride) {
 	struct affected_type *af;
 	int cost = 100;
@@ -1795,13 +1796,12 @@ ACMD(do_whisperstride) {
 		return;
 	}
 	else {
-		charge_ability_cost(ch, MOVE, cost, COOLDOWN_WHISPERSTRIDE, 300, WAIT_ABILITY);
+		charge_ability_cost(ch, MOVE, cost, COOLDOWN_WHISPERSTRIDE, 5 * SECS_PER_REAL_MIN, WAIT_ABILITY);
 		
 		msg_to_char(ch, "You cloak yourself with dark whispers, muffling your movement...\r\n");
 		act("$n is surrounded by dark whispers...", TRUE, ch, NULL, NULL, TO_ROOM);
 		
 		af = create_flag_aff(ATYPE_WHISPERSTRIDE, duration, AFF_SNEAK, ch);
 		affect_join(ch, af, 0);
-
 	}
 }
