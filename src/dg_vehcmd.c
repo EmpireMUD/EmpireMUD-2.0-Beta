@@ -243,7 +243,7 @@ VCMD(do_vregionecho) {
 	else if (!isdigit(*radius_arg) && *radius_arg != '-') {
 		veh_log(veh, "vregionecho called with invalid radius");
 	}
-	else if (!(center = get_room(orm, arg))) {
+	else if (!(center = get_room(orm, room_number))) {
 		veh_log(veh, "vregionecho called with invalid target");
 	}
 	else {

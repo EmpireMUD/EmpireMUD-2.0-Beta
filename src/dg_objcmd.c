@@ -249,7 +249,7 @@ OCMD(do_oregionecho) {
 	else if (!isdigit(*radius_arg) && *radius_arg != '-') {
 		obj_log(obj, "oregionecho called with invalid radius");
 	}
-	else if (!(center = get_room(orm, arg))) {
+	else if (!(center = get_room(orm, room_number))) {
 		obj_log(obj, "oregionecho called with invalid target");
 	}
 	else {
