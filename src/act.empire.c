@@ -2856,7 +2856,7 @@ ACMD(do_diplomacy) {
 			ch_pol = create_relation(ch_emp, vict_emp);
 		}
 		if (!(vict_pol = find_relation(vict_emp, ch_emp))) {
-			ch_pol = create_relation(vict_emp, ch_emp);
+			vict_pol = create_relation(vict_emp, ch_emp);
 		}
 		
 		if (war_cost > 0) {
