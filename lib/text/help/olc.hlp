@@ -1315,6 +1315,7 @@ Available spawn flags:
 
 Example:
  > .spawns add 12499 3 NOCTURNAL UNCLAIMED
+ > .spawns copy sector 12
 
 See also: OLC BUILDINGS, OLC CROPS, OLC SECTORS, VNUM
 #d
