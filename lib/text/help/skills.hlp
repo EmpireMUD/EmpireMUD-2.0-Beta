@@ -70,6 +70,8 @@ entrance must lie directly across from the entrance. After that, you may
 choose any direction you like. Each building is limited on how many rooms it
 may have. You can only redesignate rooms once per 60 minutes.
 
+Designating rooms requires the 'build' empire privilege.
+
 Room types:
  baths - Identical to the free-standing building (castle only)
  bedroom - +1 citizen, and gives a boost to regeneration while sleeping
