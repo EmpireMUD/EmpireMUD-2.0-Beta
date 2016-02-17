@@ -382,3 +382,10 @@ void remove_from_lookup_table(int uid);
 extern char_data *find_char(int n);
 extern empire_data *find_empire_by_uid(int n);
 extern room_data *find_room(int n);
+
+// purge helpers
+extern int dg_owner_purged;
+extern char_data *dg_owner_mob;
+extern obj_data *dg_owner_obj;
+extern vehicle_data *dg_owner_veh;
+extern room_data *dg_owner_room;

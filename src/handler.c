@@ -959,6 +959,11 @@ void extract_char_final(char_data *ch) {
 void extract_char(char_data *ch) {
 	void despawn_charmies(char_data *ch);
 	
+	if (ch == dg_owner_mob) {
+		dg_owner_purged = 1;
+		dg_owner_mob = NULL;
+	}
+	
 	if (!EXTRACTED(ch)) {
 		if (IS_NPC(ch)) {
 			SET_BIT(MOB_FLAGS(ch), MOB_EXTRACTED);
@@ -3563,6 +3568,11 @@ void empty_obj_before_extract(obj_data *obj) {
 */
 void extract_obj(obj_data *obj) {
 	obj_data *proto = obj_proto(GET_OBJ_VNUM(obj));
+	
+	if (obj == dg_owner_obj) {
+		dg_owner_purged = 1;
+		dg_owner_obj = NULL;
+	}
 
 	// remove from anywhere
 	check_obj_in_void(obj);
@@ -6035,6 +6045,11 @@ void extract_vehicle(vehicle_data *veh) {
 	
 	struct vehicle_room_list *vrl, *next_vrl;
 	room_data *main_room;
+	
+	if (veh == dg_owner_veh) {
+		dg_owner_purged = 1;
+		dg_owner_veh = NULL;
+	}
 	
 	// delete interior
 	if ((main_room = VEH_INTERIOR_HOME_ROOM(veh)) || VEH_ROOM_LIST(veh)) {

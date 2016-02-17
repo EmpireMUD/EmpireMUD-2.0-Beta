@@ -54,7 +54,6 @@
 #include "vnums.h"
 
 // external vars
-extern int dg_owner_purged;
 extern const char *damage_types[];
 extern const char *dirs[];
 

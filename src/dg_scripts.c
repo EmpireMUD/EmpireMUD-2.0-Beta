@@ -32,7 +32,6 @@
 
 /* external vars from db.c */
 extern unsigned long pulse;
-extern int dg_owner_purged;
 
 /* other external vars */
 extern const char *action_bits[];
@@ -5407,25 +5406,36 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 	}
 
 	depth++;
+	
+	// update dg owners
+	dg_owner_purged = 0;
+	dg_owner_mob = NULL;
+	dg_owner_obj = NULL;
+	dg_owner_veh = NULL;
+	dg_owner_room = NULL;
 
 	switch (type) {
 		case MOB_TRIGGER:
 			go = sdd->c;
 			sc = SCRIPT((char_data*) go);
+			dg_owner_mob = (char_data*)go;
 			break;
 		case OBJ_TRIGGER:
 			go = sdd->o;
 			sc = SCRIPT((obj_data*) go);
+			dg_owner_obj = (obj_data*)go;
 			break;
 		case WLD_TRIGGER:
 		case RMT_TRIGGER:
 		case ADV_TRIGGER:
 			go = sdd->r;
 			sc = SCRIPT((room_data*) go);
+			dg_owner_room = (room_data*)go;
 			break;
 		case VEH_TRIGGER: {
 			go = sdd->v;
 			sc = SCRIPT((vehicle_data*) go);
+			dg_owner_veh = (vehicle_data*)go;
 			break;
 		}
 	}
@@ -5435,8 +5445,6 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 		GET_TRIG_LOOPS(trig) = 0;
 		sc->context = 0;
 	}
-
-	dg_owner_purged = 0;
 
 	for (cl = (mode == TRIG_NEW) ? trig->cmdlist : trig->curr_state; cl && GET_TRIG_DEPTH(trig); cl = cl ? cl->next : NULL) {
 		for (p = cl->cmd; *p && isspace(*p); p++);

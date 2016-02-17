@@ -35,7 +35,6 @@
 extern const char *damage_types[];
 extern const char *alt_dirs[];
 extern const char *dirs[];
-extern int dg_owner_purged;
 
 // external functions
 void die(char_data *ch, char_data *killer);

@@ -370,6 +370,11 @@ void delete_room(room_data *room, bool check_exits) {
 		return;
 	}
 	
+	if (room == dg_owner_room) {
+		dg_owner_purged = 1;
+		dg_owner_room = NULL;
+	}
+	
 	// delete any open instance here
 	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room, FALSE))) {
 		SET_BIT(inst->flags, INST_COMPLETED);

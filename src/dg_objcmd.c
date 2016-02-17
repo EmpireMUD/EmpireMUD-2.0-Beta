@@ -29,7 +29,6 @@
 extern const char *damage_types[];
 extern const char *dirs[];
 extern const char *alt_dirs[];
-extern int dg_owner_purged;
 
 // external functions
 void obj_command_interpreter(obj_data *obj, char *argument);
