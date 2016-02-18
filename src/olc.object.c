@@ -132,6 +132,10 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Look desc starting with 'Nothing.'");
 		problem = TRUE;
 	}
+	if (OBJ_FLAGGED(obj, OBJ_CREATABLE)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "CREATABLE");
+		problem = TRUE;
+	}
 	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && GET_OBJ_TIMER(obj) <= 0) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Infinite light");
 		problem = TRUE;
