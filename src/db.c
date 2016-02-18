@@ -1659,6 +1659,7 @@ const char *versions_list[] = {
 	"b3.8",
 	"b3.11",
 	"b3.12",
+	"b3.15",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -1960,6 +1961,42 @@ PLAYER_UPDATE_FUNC(b3_12_update_players) {
 }
 
 
+// respawns wild crops and converts 5% of jungle to crops
+void b3_15_crop_update(void) {
+	extern crop_data *get_potential_crop_for_location(room_data *location);
+	
+	struct map_data *map;
+	room_data *room;
+	
+	const int SECT_JUNGLE = 28;	// convert jungles at random
+	const int JUNGLE_PERCENT = 5;	// change to change jungle to crop
+	const int SECT_JUNGLE_FIELD = 15;	// sect to use for crop
+	
+	LL_FOREACH(land_map, map) {
+		if ((room = real_real_room(map->vnum))) {
+			if (ROOM_OWNER(room)) {
+				continue;	// skip owned tiles
+			}
+		}
+		
+		if (map->crop_type) {
+			// update crop
+			if (room || (room = real_room(map->vnum))) {
+				set_crop_type(room, get_potential_crop_for_location(room));
+			}
+		}
+		else if (map->sector_type->vnum == SECT_JUNGLE && !number(0, JUNGLE_PERCENT-1)) {
+			// transform jungle
+			if (room || (room = real_room(map->vnum))) {
+				change_terrain(room, SECT_JUNGLE_FIELD);	// picks own crop
+			}
+		}
+	}
+	
+	save_whole_world();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -2121,6 +2158,10 @@ void check_version(void) {
 		if (MATCH_VERSION("b3.12")) {
 			log("Applying b3.12 removal of stray affect flag...");
 			update_all_players(NULL, b3_12_update_players);
+		}
+		if (MATCH_VERSION("b3.15")) {
+			log("Spawning b3.15 crops...");
+			b3_15_crop_update();
 		}
 	}
 	
