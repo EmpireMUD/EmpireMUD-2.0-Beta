@@ -2628,6 +2628,31 @@ char *fname(const char *namelist) {
 
 
 /**
+* Determines if a keyword string contains at least one keyword from a list.
+*
+* @param char *string The string of keywords entered by a player.
+* @param const char *list[] A set of words, terminated by a "\n".
+* @param bool exact Does not allow abbrevs unless FALSE.
+* @return bool TRUE if at least one keyword from the list appears.
+*/
+bool has_keyword(char *string, const char *list[], bool exact) {
+	char word[MAX_INPUT_LENGTH], *ptr;
+	ptr = string;
+	int iter;
+	
+	while ((ptr = any_one_arg(ptr, word)) && *word) {
+		for (iter = 0; *list[iter] != '\n'; ++iter) {
+			if (!str_cmp(word, list[iter]) || (!exact && is_abbrev(word, list[iter]))) {
+				return TRUE;	// found 1
+			}
+		}
+	}
+	
+	return FALSE;
+}
+
+
+/**
 * Determines if str is an abbrev for any keyword in namelist.
 *
 * @param const char *str The search argument, e.g. "be"
