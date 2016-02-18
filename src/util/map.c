@@ -170,7 +170,8 @@ struct {
 #define TUNDRA          12
 #define LAKE			13
 #define DESERT_CROP		14
-#define NUM_MAP_SECTS	15	/* Total */
+#define JUNGLE_CROP		15
+#define NUM_MAP_SECTS	16	/* Total */
 
 // terrain data
 struct {
@@ -193,7 +194,8 @@ struct {
 	{ "e", "Swamp", 29, TRUE },
 	{ "h", "Tundra", 30, FALSE },
 	{ "i", "Lake", 32, TRUE },
-	{ "o", "Des. Crop", 12, TRUE }
+	{ "o", "Des. Crop", 12, TRUE },
+	{ "3", "Jung. Crop", 16, TRUE },
 };
 
 
@@ -1181,6 +1183,14 @@ void complete_map(void) {
 				}
 				
 				// most spaces remain desert
+				break;
+			}
+			case JUNGLE: {
+				if (number(1, 100) <= 5) {
+					change_grid(iter, JUNGLE_CROP);
+				}
+				
+				// most spaces remain jungle
 				break;
 			}
 		}
