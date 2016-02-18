@@ -1973,6 +1973,8 @@ void b3_15_crop_update(void) {
 	const int SECT_JUNGLE_FIELD = 15;	// sect to use for crop
 	
 	LL_FOREACH(land_map, map) {
+		room = NULL;
+		
 		if ((room = real_real_room(map->vnum))) {
 			if (ROOM_OWNER(room)) {
 				continue;	// skip owned tiles
@@ -1985,7 +1987,7 @@ void b3_15_crop_update(void) {
 				set_crop_type(room, get_potential_crop_for_location(room));
 			}
 		}
-		else if (map->sector_type->vnum == SECT_JUNGLE && !number(0, JUNGLE_PERCENT-1)) {
+		else if (map->sector_type->vnum == SECT_JUNGLE && number(1, 100) <= JUNGLE_PERCENT) {
 			// transform jungle
 			if (room || (room = real_room(map->vnum))) {
 				change_terrain(room, SECT_JUNGLE_FIELD);	// picks own crop
