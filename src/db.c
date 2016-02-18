@@ -1970,7 +1970,7 @@ void b3_15_crop_update(void) {
 	
 	const int SECT_JUNGLE = 28;	// convert jungles at random
 	const int JUNGLE_PERCENT = 5;	// change to change jungle to crop
-	const int SECT_JUNGLE_FIELD = 15;	// sect to use for crop
+	const int SECT_JUNGLE_FIELD = 16;	// sect to use for crop
 	
 	LL_FOREACH(land_map, map) {
 		room = NULL;
