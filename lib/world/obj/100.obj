@@ -446,30 +446,30 @@ A small skystone is lying here.~
    Skystones are used to buy things at the Tower Skycleave. You can type
 'combine skystone' to combine 5 of them into a greater skystone.
 ~
-3 l a 1
+3 l a 3
 0 0 0
 10 0
+I 14 10037 100.00 5 x  # COMBINE: a greater skystone
 R
 5184 a
 R
 5611 a
-T 10066
 S
 #10037
 skystone greater stone~
 a greater skystone~
 A greater skystone is sitting on the ground.~
-   Skystones are used to buy things at the Tower Skycleave. You can type 'split
-greater' to split it into smaller skystones.
+   Skystones are used to buy things at the Tower Skycleave. You can type
+'separate greater' to separate it into smaller skystones.  
 ~
-3 l a 1
+3 l a 3
 0 0 0
 10 0
+I 15 10036 100.00 5 x  # SEPARATE: a skystone
 R
 5184 a
 R
 5611 a
-T 10067
 S
 #10038
 belt skycleaver~

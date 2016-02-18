@@ -494,12 +494,193 @@ meat fillet roast~
 a fillet of roast meat~
 A fillet of roast meat is sitting on the ground here.~
    You're not sure what this is from, but it probably tastes fine. Or at least
-better than it would have raw.  
+better than it would have raw.
 ~
 6 0 a 2
 18 0 0
 7 96
 R
 5619 0
+S
+#3330
+pie banana~
+a banana pie~
+A warm banana pie is sitting out to cool.~
+It looks delicious!
+~
+6 0 a 2
+48 0 0
+7 336
+R
+5606 0
+S
+#3331
+bread banana loaf~
+a loaf of banana bread~
+A loaf of banana bread has been dropped on the ground.~
+Banana bread is a good portable food.
+~
+6 0 a 5
+60 0 0
+7 336
+R
+5606 0
+S
+#3332
+spray pepper vial glass~
+a vial of pepper spray~
+A glass vial of pepper spray has been left here.~
+This small glass vial is filled with a bright red fluid that sizzles slightly.
+~
+26 l a 8
+11 15 0
+8 0
+C
+0 100
+R
+5130 0
+R
+5618 0
+S
+#3333
+jerky spicy pouch~
+a pouch of spicy jerky~
+Someone has left a pouch of spicy jerky here.~
+This is a pouch of jerky with a picture of a pepper printed on the front.
+~
+6 0 a 5
+48 0 0
+7 336
+R
+5619 0
+S
+#3334
+pouch dried potato slices~
+a pouch of dried potato slices~
+A pouch of dried potato slices is on the ground.~
+This bag of potato slices looks like it would keep you full for much of a long
+adventure.
+~
+6 0 a 5
+48 0 0
+7 336
+R
+5606 0
+R
+5619 0
+S
+#3335
+prunes pouch~
+a pouch of prunes~
+A pouch of prunes has been left here.~
+This pouch of dried prunes is a must-have for the avid traveler.
+~
+6 0 a 5
+24 0 0
+7 336
+R
+5619 0
+R
+5606 0
+S
+#3336
+pie plum~
+a plum pie~
+A plum pie has been left here.~
+This plum pie looks delicious.
+~
+6 0 a 2
+48 0 0
+7 336
+R
+5606 0
+S
+#3337
+pie strawberry~
+a strawberry pie~
+A warm strawberry pie is sitting out to cool.~
+The pie looks delicious!
+~
+6 0 a 2
+48 0 0
+7 336
+R
+5606 0
+S
+#3338
+jam strawberry jar~
+a jar of strawberry jam~
+A jar of strawberry jam has been dropped here.~
+This glass jar has been filled with delicious strawberry jam.
+~
+6 0 a 5
+12 0 0
+7 336
+R
+5606 0
+R
+5619 0
+S
+#3339
+mango candied~
+a candied mango~
+A candied mango is stuck on the ground.~
+The candied mango looks delicious!
+~
+6 0 a 2
+24 0 0
+7 336
+R
+5606 0
+S
+#3340
+pie blueberry~
+a blueberry pie~
+A warm blueberry pie is sitting out to cool.~
+The pie looks delicious!
+~
+6 0 a 2
+48 0 0
+7 336
+R
+5606 0
+S
+#3341
+jam blueberry jar~
+a jar of blueberry jam~
+A jar of blueberry jam has been dropped on the ground.~
+A glass jar filled with delicious blueberry jam.
+~
+6 0 a 4
+12 0 0
+7 336
+R
+5619 0
+R
+5606 0
+S
+#3343
+oatmeal sack~
+a sack of oatmeal~
+A sack of oatmeal has been left on the ground.~
+Oatmeal can be baked into nourishing cakes.
+~
+3 0 a 4
+0 0 0
+7 0
+R
+5116 0
+S
+#3344
+cake oat flat~
+a flat oat cake~
+A flat oat cake is on the ground.~
+This flat oat cake looks like it would keep you well nourished.
+~
+6 0 a 3
+25 0 0
+7 336
+R
+5606 0
 S
 $
