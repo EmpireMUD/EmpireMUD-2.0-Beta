@@ -521,6 +521,13 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 			sort_exits(&COMPLEX_DATA(room_list[iter])->exits);
 		}
 	}
+	
+	// run load triggers
+	for (iter = 0; iter < inst->size; ++iter) {
+		if (room_list[iter]) {
+			load_wtrigger(room_list[iter]);
+		}
+	}
 }
 
 

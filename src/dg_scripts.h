@@ -104,6 +104,8 @@
 #define WTRIG_ENTER            BIT(6)	     /* character enters room      */
 #define WTRIG_DROP             BIT(7)      /* something dropped in room  */
 
+#define WTRIG_LOAD  BIT(13)	// called when the room/building loads
+#define WTRIG_COMPLETE  BIT(14)	// called when the building is complete
 #define WTRIG_ABILITY          BIT(15)     /* ability used in room */
 #define WTRIG_LEAVE            BIT(16)     /* character leaves the room */
 #define WTRIG_DOOR             BIT(17)     /* door manipulated in room  */
@@ -223,6 +225,8 @@ void fight_mtrigger(char_data *ch);
 void hitprcnt_mtrigger(char_data *ch);
 void bribe_mtrigger(char_data *ch, char_data *actor, int amount);
 
+void complete_wtrigger(room_data *room);
+
 void random_mtrigger(char_data *ch);
 void random_otrigger(obj_data *obj);
 void random_wtrigger(room_data *ch);
@@ -230,6 +234,7 @@ void reset_wtrigger(room_data *ch);
 
 void load_mtrigger(char_data *ch);
 void load_otrigger(obj_data *obj);
+void load_wtrigger(room_data *room);
 
 int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil);
 int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil);

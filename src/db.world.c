@@ -44,6 +44,7 @@ extern bool world_map_needs_save;
 
 // external funcs
 void add_room_to_world_tables(room_data *room);
+void complete_building(room_data *room);
 void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter);
 extern struct complex_room_data *init_complex_data();
 void free_complex_data(struct complex_room_data *bld);
@@ -1159,6 +1160,7 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 	if (!IS_CITY_CENTER(location)) {
 		construct_building(location, BUILDING_CITY_CENTER);
 		set_room_extra_data(location, ROOM_EXTRA_FOUND_TIME, time(0));
+		complete_building(location);
 	}
 	
 	// verify ownership
@@ -2105,6 +2107,9 @@ void ruin_one_building(room_data *room) {
 	if (ROOM_PEOPLE(room)) {
 		act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 	}
+	
+	// run completion on the ruins
+	complete_building(room);
 }
 
 

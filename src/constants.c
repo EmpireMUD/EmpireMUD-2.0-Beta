@@ -2898,7 +2898,7 @@ const bitvector_t vtrig_argument_types[] = {
 };
 
 
-/* wld trigger types */
+// WTRIG_x: wld trigger types
 const char *wtrig_types[] = {
 	"Global",
 	"Random",
@@ -2913,8 +2913,8 @@ const char *wtrig_types[] = {
 	"*",
 	"*",
 	"*",
-	"*",
-	"*",
+	"Load",
+	"Complete",
 	"Ability",
 	"Leave",
 	"Door",
@@ -2937,8 +2937,8 @@ const bitvector_t wtrig_argument_types[] = {
 	NOBITS,	// 
 	NOBITS,	// 
 	NOBITS,	// 
-	NOBITS,	// 
-	NOBITS,	// 
+	TRIG_ARG_PERCENT,	// load
+	TRIG_ARG_PERCENT,	// complete
 	TRIG_ARG_PERCENT,	// ability
 	TRIG_ARG_PERCENT,	// leave
 	TRIG_ARG_PERCENT,	// door

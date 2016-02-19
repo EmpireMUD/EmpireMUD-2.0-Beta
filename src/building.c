@@ -234,6 +234,8 @@ void complete_building(room_data *room) {
 		free(res);
 	}
 	
+	complete_wtrigger(room);
+	
 	// SPECIAL HANDLING for building completion
 	special_building_completion(room);
 	
@@ -282,6 +284,8 @@ void construct_building(room_data *room, bld_vnum type) {
 	
 	SET_BIT(ROOM_BASE_FLAGS(room), BLD_BASE_AFFECTS(room));
 	SET_BIT(ROOM_AFF_FLAGS(room), BLD_BASE_AFFECTS(room));
+	
+	load_wtrigger(room);
 }
 
 

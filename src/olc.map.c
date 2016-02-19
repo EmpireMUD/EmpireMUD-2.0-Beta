@@ -27,6 +27,10 @@
 *   Edit Modules
 */
 
+// external funcs
+void complete_building(room_data *room);
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
@@ -77,6 +81,7 @@ OLC_MODULE(mapedit_build) {
 		
 		construct_building(IN_ROOM(ch), GET_BLD_VNUM(bld));
 		special_building_setup(ch, IN_ROOM(ch));
+		complete_building(IN_ROOM(ch));
 		
 		if (dir != NO_DIR) {
 			create_exit(IN_ROOM(ch), SHIFT_DIR(IN_ROOM(ch), dir), dir, FALSE);
@@ -172,9 +177,7 @@ OLC_MODULE(mapedit_terrain) {
 }
 
 
-OLC_MODULE(mapedit_complete_room) {
-	void complete_building(room_data *room);
-	
+OLC_MODULE(mapedit_complete_room) {	
 	if (IS_DISMANTLING(IN_ROOM(ch))) {
 		msg_to_char(ch, "Use '.map terrain' instead.\r\n");
 		return;
