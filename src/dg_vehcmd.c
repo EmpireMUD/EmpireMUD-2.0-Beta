@@ -964,10 +964,10 @@ VCMD(do_dgvload) {
 		}
 		else {
 			// hope to inherit
-			scale_vehicle_to_level(veh, 0);
+			scale_vehicle_to_level(vehicle, 0);
 		}
 		
-		load_vtrigger(veh);
+		load_vtrigger(vehicle);
 	}
 	else {
 		veh_log(veh, "vload: bad type");
