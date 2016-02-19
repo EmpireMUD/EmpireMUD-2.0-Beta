@@ -179,6 +179,7 @@ void free_proto_script(void *thing, int type) {
 	room_data *room;
 	room_template *rmt;
 	adv_data *adv;
+	bld_data *bld;
 
 	switch (type) {
 		case MOB_TRIGGER:
@@ -200,6 +201,12 @@ void free_proto_script(void *thing, int type) {
 			rmt = (room_template*)thing;
 			proto = GET_RMT_SCRIPTS(rmt);
 			GET_RMT_SCRIPTS(rmt) = NULL;
+			break;
+		}
+		case BLD_TRIGGER: {
+			bld = (bld_data*)thing;
+			proto = GET_BLD_SCRIPTS(bld);
+			GET_BLD_SCRIPTS(bld) = NULL;
 			break;
 		}
 		case ADV_TRIGGER: {
@@ -264,6 +271,10 @@ void copy_proto_script(void *source, void *dest, int type) {
 			tp_src = ((room_template*)source)->proto_script;
 			break;
 		}
+		case BLD_TRIGGER: {
+			tp_src = ((bld_data*)source)->proto_script;
+			break;
+		}
 		case ADV_TRIGGER: {
 			tp_src = ((adv_data*)source)->proto_script;
 			break;
@@ -288,6 +299,10 @@ void copy_proto_script(void *source, void *dest, int type) {
 				break;
 			case RMT_TRIGGER: {
 				((room_template*)dest)->proto_script = tp_dst;
+				break;
+			}
+			case BLD_TRIGGER: {
+				((bld_data*)dest)->proto_script = tp_dst;
 				break;
 			}
 			case ADV_TRIGGER: {

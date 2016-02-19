@@ -22,6 +22,7 @@
 #define RMT_TRIGGER  3
 #define ADV_TRIGGER  4
 #define VEH_TRIGGER  5
+#define BLD_TRIGGER  6
 
 /* unless you change this, Puff casts all your dg spells */
 #define DG_CASTER_PROXY 1

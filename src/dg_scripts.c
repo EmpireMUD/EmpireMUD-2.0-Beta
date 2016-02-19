@@ -1055,7 +1055,7 @@ EVENTFUNC(trig_wait_event) {
 				}
 			}
 		}
-		else {	// WLD_TRIGGER, RMT_TRIGGER, ADV_TRIGGER
+		else {	// WLD_TRIGGER, RMT_TRIGGER, ADV_TRIGGER, BLD_TRIGGER
 			room_data *i, *next_i;
 			HASH_ITER(hh, world_table, i, next_i) {
 				if (i == (room_data*)go) {
@@ -1097,7 +1097,7 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 		len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Objects\r\n");
 		sprintbit(GET_TRIG_TYPE(trig), otrig_types, buf, TRUE);
 	}
-	else if (trig->attach_type == WLD_TRIGGER || trig->attach_type == RMT_TRIGGER || trig->attach_type == ADV_TRIGGER) {
+	else if (trig->attach_type == WLD_TRIGGER || trig->attach_type == RMT_TRIGGER || trig->attach_type == BLD_TRIGGER || trig->attach_type == ADV_TRIGGER) {
 		len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Rooms\r\n");
 		sprintbit(GET_TRIG_TYPE(trig), wtrig_types, buf, TRUE);
 	}
@@ -1169,7 +1169,7 @@ void script_stat (char_data *ch, struct script_data *sc) {
 			msg_to_char(ch, "  Trigger Intended Assignment: Objects\r\n");
 			sprintbit(GET_TRIG_TYPE(t), otrig_types, buf1, TRUE);
 		}
-		else if (t->attach_type == WLD_TRIGGER || t->attach_type == RMT_TRIGGER || t->attach_type == ADV_TRIGGER) {
+		else if (t->attach_type == WLD_TRIGGER || t->attach_type == RMT_TRIGGER || t->attach_type == BLD_TRIGGER || t->attach_type == ADV_TRIGGER) {
 			msg_to_char(ch, "  Trigger Intended Assignment: Rooms\r\n");
 			sprintbit(GET_TRIG_TYPE(t), wtrig_types, buf1, TRUE);
 		}
@@ -1978,8 +1978,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 	char *name;
 	int num, count;
 
-	// x_TRIGGER: mob, obj, world, rmt, adv, vehicle	
-	const char cmd_prefix[] = { 'm', 'o', 'w', 'w', 'w', 'v' };
+	// x_TRIGGER: mob, obj, world, rmt, adv, vehicle, bld
+	const char cmd_prefix[] = { 'm', 'o', 'w', 'w', 'w', 'v', 'w' };
 	
 	// commands that work with '%command%' syntax (will be replaced with 'mcommand', 'ocommand', etc)
 	const char *script_commands[] = {
@@ -2044,6 +2044,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						break;
 					case WLD_TRIGGER:
 					case RMT_TRIGGER:
+					case BLD_TRIGGER:
 					case ADV_TRIGGER:
 						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM((room_data*)go) + ROOM_ID_BASE);
 						break;
@@ -2145,6 +2146,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				case WLD_TRIGGER:
 				case RMT_TRIGGER:
+				case BLD_TRIGGER:
 				case ADV_TRIGGER:
 					room = (room_data*) go;
 
@@ -2192,6 +2194,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						break;
 					case WLD_TRIGGER:
 					case RMT_TRIGGER:
+					case BLD_TRIGGER:
 					case ADV_TRIGGER:
 						r = (room_data*) go;
 						c = NULL;
@@ -2247,6 +2250,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						break;
 					case WLD_TRIGGER:
 					case RMT_TRIGGER:
+					case BLD_TRIGGER:
 					case ADV_TRIGGER:
 						inst = find_instance_by_room((room_data*)go, FALSE);
 						break;
@@ -2346,7 +2350,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								count++;
 							}
 					}
-					else if (type == WLD_TRIGGER || type == RMT_TRIGGER || type == ADV_TRIGGER) {
+					else if (type == WLD_TRIGGER || type == RMT_TRIGGER || type == BLD_TRIGGER || type == ADV_TRIGGER) {
 						for (c = ((room_data*) go)->people; c; c = c->next_in_room)
 							if (valid_dg_target(c, DG_ALLOW_GODS)) {
 
@@ -4934,6 +4938,7 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 			switch (type) {
 				case WLD_TRIGGER:
 				case RMT_TRIGGER:
+				case BLD_TRIGGER:
 				case ADV_TRIGGER:
 					c = get_char_in_room((room_data*)go, name);
 					break;
@@ -4956,6 +4961,7 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 			switch (type) {
 				case WLD_TRIGGER:
 				case RMT_TRIGGER:
+				case BLD_TRIGGER:
 				case ADV_TRIGGER:
 					o = get_obj_in_room((room_data*)go, name);
 					break;
@@ -4979,6 +4985,7 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 			switch (type) {
 				case WLD_TRIGGER:
 				case RMT_TRIGGER:
+				case BLD_TRIGGER:
 				case ADV_TRIGGER:
 					r = (room_data*)go;
 					if (*name) {
@@ -5014,6 +5021,7 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 			switch (type) {
 				case WLD_TRIGGER:
 				case RMT_TRIGGER:
+				case BLD_TRIGGER:
 				case ADV_TRIGGER: {
 					v = get_vehicle_room((room_data*)go, name);
 					break;
@@ -5441,6 +5449,7 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 			break;
 		case WLD_TRIGGER:
 		case RMT_TRIGGER:
+		case BLD_TRIGGER:
 		case ADV_TRIGGER:
 			go = sdd->r;
 			sc = SCRIPT((room_data*) go);
@@ -5611,6 +5620,7 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 						break;
 					case WLD_TRIGGER:
 					case RMT_TRIGGER:
+					case BLD_TRIGGER:
 					case ADV_TRIGGER:
 						wld_command_interpreter((room_data*) go, cmd);
 						break;
@@ -5639,6 +5649,7 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 			break;
 		case WLD_TRIGGER:
 		case RMT_TRIGGER:
+		case BLD_TRIGGER:
 		case ADV_TRIGGER:
 			sc = SCRIPT((room_data*) go);
 			break;

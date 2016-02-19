@@ -403,6 +403,10 @@ void free_building(bld_data *bdg) {
 			free(interact);
 		}
 	}
+	
+	if (GET_BLD_SCRIPTS(bdg) && (!proto || GET_BLD_SCRIPTS(bdg) != GET_BLD_SCRIPTS(proto))) {
+		free_proto_script(bdg, BLD_TRIGGER);
+	}
 
 	free(bdg);
 }
@@ -542,6 +546,11 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				break;
 			}
 			
+			case 'T': {	// trigger
+				dg_read_trigger(line, bld, BLD_TRIGGER);
+				break;
+			}
+			
 			// upgrades to
 			case 'U': {
 				if (!get_line(fl, line) || sscanf(line, "%d", &int_in[0]) != 1) {
@@ -625,6 +634,9 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 		fprintf(fl, "M\n");
 		fprintf(fl, "%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
 	}
+	
+	// T: triggers
+	script_save_to_disk(fl, bld, BLD_TRIGGER);
 	
 	// U: upgrades_to
 	if (GET_BLD_UPGRADES_TO(bld) != NOTHING && building_proto(GET_BLD_UPGRADES_TO(bld))) {
@@ -5019,6 +5031,9 @@ void script_save_to_disk(FILE *fp, void *item, int type) {
 		t = ((room_data*)item)->proto_script;
 	else if (type == RMT_TRIGGER) {
 		t = ((room_template*)item)->proto_script;
+	}
+	else if (type == BLD_TRIGGER) {
+		t = ((bld_data*)item)->proto_script;
 	}
 	else if (type == ADV_TRIGGER) {
 		t = ((adv_data*)item)->proto_script;

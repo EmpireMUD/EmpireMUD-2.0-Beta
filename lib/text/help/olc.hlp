@@ -2537,7 +2537,7 @@ You're standing at the foot of a huge giant!
 
 See also: OLC MOBILES
 #d
-"ADVEDIT SCRIPTS" "MEDIT SCRIPTS" "OEDIT SCRIPTS" "REDIT SCRIPTS" "VEDIT SCRIPTS"
+"ADVEDIT SCRIPTS" "BEDIT SCRIPTS" "MEDIT SCRIPTS" "OEDIT SCRIPTS" "REDIT SCRIPTS" "VEDIT SCRIPTS"
 
 Usage:  .script add [position] <trigger vnum>
         .script copy <from type> <from vnum>
@@ -2553,7 +2553,7 @@ should get the updated script list right away.
 
 Note: Adventure scripts will only work if they are the Adventure Cleanup type.
 
-See also: OLC MOBILES, OLC OBJECTS, OLC TRIGGERS, VNUM
+See also: OLC BUILDINGS, OLC MOBILES, OLC OBJECTS, OLC TRIGGERS, VNUM
 #d
 "MEDIT SEX"
 

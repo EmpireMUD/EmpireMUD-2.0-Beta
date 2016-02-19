@@ -2954,6 +2954,7 @@ const char *trig_attach_types[] = {
 	"*RMT",	// rmt_trigger -- never set on an actual trigger
 	"*ADV",	// adv_trigger -- never set on an actual trigger
 	"Vehicle",
+	"*BDG",	// bdg_trigger -- actually just uses room triggers
 	"\n"
 };
 
@@ -2965,7 +2966,8 @@ const char **trig_attach_type_list[] = {
 	wtrig_types,
 	wtrig_types,	// RMT_TRIGGER (not really used)
 	wtrig_types,	// ADV_TRIGGER (not really used)
-	vtrig_types
+	vtrig_types,
+	wtrig_types,	// BLD_TRIGGER (not really used)
 };
 
 
@@ -2977,6 +2979,7 @@ const bitvector_t *trig_argument_type_list[] = {
 	wtrig_argument_types,	// RMT_TRIGGER (not really used)
 	wtrig_argument_types,	// ADV_TRIGGER (not really used)
 	vtrig_argument_types,	// VEH_TRIGGER
+	wtrig_argument_types,	// BLD_TRIGGER (not really used)
 };
 
 

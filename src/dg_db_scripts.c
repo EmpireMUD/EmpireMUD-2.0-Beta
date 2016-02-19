@@ -171,6 +171,7 @@ void dg_read_trigger(char *line, void *proto, int type) {
 	vehicle_data *veh;
 	obj_data *obj;
 	adv_data *adv;
+	bld_data *bld;
 	trig_data *trproto;
 	struct trig_proto_list *trg_proto, *new_trg;
 
@@ -191,10 +192,14 @@ void dg_read_trigger(char *line, void *proto, int type) {
 				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (room:%d)", vnum, GET_ROOM_VNUM(((room_data*)proto)));
 				break;
 			case RMT_TRIGGER:
-				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (room:%d)", vnum, ((room_template*)proto)->vnum);
+				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (rmt:%d)", vnum, ((room_template*)proto)->vnum);
 				break;
+			case BLD_TRIGGER: {
+				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (bld:%d)", vnum, ((bld_data*)proto)->vnum);
+				break;
+			}
 			case ADV_TRIGGER:
-				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (room:%d)", vnum, ((adv_data*)proto)->vnum);
+				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (adv:%d)", vnum, ((adv_data*)proto)->vnum);
 				break;
 			case VEH_TRIGGER:
 				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (veh:%d)", vnum, ((vehicle_data*)proto)->vnum);
@@ -268,6 +273,23 @@ void dg_read_trigger(char *line, void *proto, int type) {
 			trg_proto = GET_RMT_SCRIPTS(rmt);
 			if (!trg_proto) {
 				GET_RMT_SCRIPTS(rmt) = trg_proto = new_trg;
+			}
+			else {
+				while (trg_proto->next) {
+					trg_proto = trg_proto->next;
+				}
+				trg_proto->next = new_trg;
+			}
+			break;
+		}
+		case BLD_TRIGGER: {
+			CREATE(new_trg, struct trig_proto_list, 1);
+			new_trg->vnum = vnum;
+			new_trg->next = NULL;
+			bld = (bld_data*)proto;
+			trg_proto = GET_BLD_SCRIPTS(bld);
+			if (!trg_proto) {
+				GET_BLD_SCRIPTS(bld) = trg_proto = new_trg;
 			}
 			else {
 				while (trg_proto->next) {
@@ -401,6 +423,7 @@ void assign_triggers(void *i, int type) {
 		case WLD_TRIGGER:
 		case ADV_TRIGGER:
 		case RMT_TRIGGER:
+		case BLD_TRIGGER:
 			room = (room_data*)i;
 			trg_proto = room->proto_script;
 			while (trg_proto) {
