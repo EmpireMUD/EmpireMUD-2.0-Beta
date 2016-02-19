@@ -374,6 +374,12 @@ void disassociate_building(room_data *room) {
 
 	// free up the customs
 	decustomize_room(room);
+	
+	// clean up scripts
+	if (SCRIPT(room)) {
+		extract_script(room, WLD_TRIGGER);
+	}
+	free_proto_script(room, WLD_TRIGGER);
 
 	// restore sect: this does not use change_terrain()
 	SECT(room) = BASE_SECT(room);
