@@ -3451,7 +3451,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'c': {	// room.c*
-					if (!str_cmp(field, "contents")) {
+					if (!str_cmp(field, "complete")) {
+						snprintf(str, slen, "%d", IS_COMPLETE(r) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "contents")) {
 						if (subfield && *subfield) {
 							for (obj = ROOM_CONTENTS(r); obj; obj = obj->next_content) {
 								if (GET_OBJ_VNUM(obj) == atoi(subfield)) {
