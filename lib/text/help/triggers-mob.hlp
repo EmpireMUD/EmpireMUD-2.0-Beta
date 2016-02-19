@@ -303,6 +303,7 @@ When using field  - The variable returns:
    position, if any. The specified position may be either a position number
    (0-18) or the name of the location * checks all positions. &yHELP POSITIONS&0
 &cfighting&0 - The unique id of the mob fighting the actor.
+&cfirstname&0 - The actor's first name (or first keyword, for mobs).
 &cfollower(name)&0 - The follower of the actor (as an id) with name supplied.
 &cgain_skill(sk,amt)&0 - Gives the player points in a skill, or takes them.
 &cgive_coins(amt)&0 - Gives the actor a number of coins.
@@ -335,6 +336,7 @@ When using field  - The variable returns:
 &cis_npc&0 - True if the actor is NOT a player.
 &cis_pc&0 - Checks if the actor is a player. Useful when you want a trigger
    to fire on players and not mobs.
+&clastname&0 - The actor's last name (empty for mobs).
 &clevel&0 - The actor's computed level (or scaled level, for mobs).
 &cmana&0 - The current mana points of the actor.
 &cmana(amount)&0 - Add/subtract mana on the actor.

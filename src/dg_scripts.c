@@ -2720,7 +2720,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else 
 							*str = '\0';
 					}
-					if (!str_cmp(field, "follower")) {
+					else if (!str_cmp(field, "firstname")) {
+						if (IS_NPC(c)) {
+							char temp[MAX_STRING_LENGTH];
+							strcpy(temp, fname(GET_PC_NAME(c)));
+							snprintf(str, slen, "%s", CAP(temp));
+						}
+						else {
+							snprintf(str, slen, "%s", GET_PC_NAME(c));
+						}
+					}
+					else if (!str_cmp(field, "follower")) {
 						if (!c->followers || !c->followers->follower)
 							*str = '\0';
 						else
@@ -2917,8 +2927,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'l': {	// char.l*
-					if (!str_cmp(field, "level"))
+					if (!str_cmp(field, "lastname")) {
+						snprintf(str, slen, "%s", IS_NPC(c) ? "" : GET_LASTNAME(c)); 
+					}
+					else if (!str_cmp(field, "level")) {
 						snprintf(str, slen, "%d", get_approximate_level(c)); 
+					}
 					break;
 				}
 				case 'm': {	// char.m*
