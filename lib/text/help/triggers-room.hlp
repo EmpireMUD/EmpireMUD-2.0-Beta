@@ -25,6 +25,16 @@ Note: You won't have access to %instance% variable information anymore.
 Variables:
   &c%room%&0 - The room it was activated on.
 #d
+"COMPLETE TRIGGER" "RTRIG COMPLETE" TRIGEDIT-ROOM-COMPLETE TRIGEDIT-COMPLETE TRIG-COMPLETE
+
+Complete (trigger type)
+
+Argument type:  percent chance to execute
+
+This trigger happens when a building is completed.
+
+See also: RTRIG LOAD
+#d
 "RTRIG COMMANDS" "ROOM COMMANDS" TRIGEDIT-ROOM-COMMANDS
 
 The following commands are available in room triggers (see their individual
@@ -85,6 +95,8 @@ Rooms can trigger on the following events:
 &cZone Reset&0 - Triggers when the adventure zone resets.
 &cEnter&0 - Triggers when a person enters the room.
 &cDrop&0 - Triggers when a player drops an item in the room.
+&cLoad&0 - Called when the building or room template is loaded.
+&cComplete&0 - Called when the building is finished.
 &cAbility&0 - Triggers when an ability is used in the room.
 &cLeave&0 - Triggers when a person tries to leave.
 &cDoor&0 - Triggers when a player interacts with a door.
