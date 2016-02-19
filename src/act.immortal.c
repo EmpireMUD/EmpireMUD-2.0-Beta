@@ -2563,6 +2563,9 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 		msg_to_char(ch, "Storable items:\r\n%s%s%s", buf, line, (*line ? "\r\n" : ""));
 	}
 	
+	get_script_display(GET_BLD_SCRIPTS(bdg), line);
+	msg_to_char(ch, "Scripts:\r\n%s", line);
+	
 	show_spawn_summary_to_char(ch, GET_BLD_SPAWNS(bdg));
 }
 
