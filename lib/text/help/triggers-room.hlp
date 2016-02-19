@@ -112,6 +112,7 @@ When using field - The variable returns:
       %room.north(FLG)% - CLOSED LOCKED, etc.
       %room.north(room)% - room variable for room in direction
 &cid&0 - The unique id of the room.
+&cin_vehicle&0 - The vehicle the room is inside of, if any.
 &cname&0 - The name of the room.
 &cpeople&0 - The id of the first character in the room, or an empty return.
 &csector&0 - The sector type of the room.

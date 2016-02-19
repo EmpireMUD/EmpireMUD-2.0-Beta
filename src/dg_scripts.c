@@ -3570,6 +3570,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else
 							*str = '\0';
 					}
+					else if (!str_cmp(field, "in_vehicle")) {
+						if (GET_ROOM_VEHICLE(r)) {
+							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(GET_ROOM_VEHICLE(r)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
 					break;
 				}
 				case 'n': {	// room.n*
