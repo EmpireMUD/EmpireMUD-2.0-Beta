@@ -57,7 +57,7 @@ room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
 	new = create_room();
 	create_exit(from, new, dir, TRUE);
 	if (bld) {
-		attach_building_to_room(bld, new);
+		attach_building_to_room(bld, new, TRUE);
 	}
 
 	COMPLEX_DATA(new)->home_room = home;

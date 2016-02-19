@@ -3996,7 +3996,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				}
 				
 				if (t[0] != NOTHING) {
-					attach_building_to_room(building_proto(t[0]), room);
+					attach_building_to_room(building_proto(t[0]), room, FALSE);
 				}
 				if (t[1] != NOTHING) {
 					attach_template_to_room(room_template_proto(t[1]), room);

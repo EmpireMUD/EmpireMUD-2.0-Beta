@@ -402,7 +402,7 @@ OLC_MODULE(mapedit_exits) {
 	else {
 		if (new) {
 			to_room = create_room();
-			attach_building_to_room(building_proto(config_get_int("default_interior")), to_room);
+			attach_building_to_room(building_proto(config_get_int("default_interior")), to_room, TRUE);
 			
 			if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
 				++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(IN_ROOM(ch)));
@@ -460,7 +460,7 @@ OLC_MODULE(mapedit_roomtype) {
 		msg_to_char(ch, "What type of room would you like to set (use 'vnum b <name>' to search)?\r\n");
 	}
 	else {
-		attach_building_to_room(id, IN_ROOM(ch));
+		attach_building_to_room(id, IN_ROOM(ch), TRUE);
 		msg_to_char(ch, "This room is now %s %s.\r\n", AN(GET_BLD_NAME(id)), GET_BLD_NAME(id));
 	}
 }

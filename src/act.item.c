@@ -2042,7 +2042,7 @@ room_data *get_ship_pen(void) {
 	
 	// did not find -- make one
 	room = create_room();
-	attach_building_to_room(building_proto(RTYPE_SHIP_HOLDING_PEN), room);
+	attach_building_to_room(building_proto(RTYPE_SHIP_HOLDING_PEN), room, TRUE);
 	
 	return room;
 }
