@@ -110,6 +110,9 @@ Basic Crafts (Trade ability)
 
 Command:  craft [number] <item>
 
+All crafting abilities train when you complete recipes that require them.
+Unskilled crafts can train Trade up to 15.
+
 Unskilled crafts:
   handle  1 stick               stone axe  1 handaxe, 1 handle
   flint set  1 flint, 1 rock    stone hammer  1 rock, 1 handle
@@ -523,6 +526,8 @@ Master Farmer (Trade ability)
 
 Get better results from harvest, mill, and shear.
 
+Gains experience from any of these tasks.
+
 See also: HARVEST, MILL, SHEAR
 #
 "MASTER CRAFTSMAN"
@@ -717,6 +722,9 @@ Command:  manufacture <ship>
 
 Great ships can be created via the manufacture skill. This can only be done in
 a shipyard, and the vessel can be sailed to a dock when finished.
+
+You gain experience for the appropriate ability every time you add resources to
+a ship being manufactured.
 
 With basic Shipbuilding you can manufacture:
   Caravel
