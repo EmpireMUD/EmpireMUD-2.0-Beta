@@ -304,6 +304,7 @@ ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
 ADMIN_UTIL(util_redo_islands);
 ADMIN_UTIL(util_rescan);
+ADMIN_UTIL(util_resetbuildingtriggers);
 ADMIN_UTIL(util_strlen);
 ADMIN_UTIL(util_tool);
 
@@ -320,6 +321,7 @@ struct {
 	{ "randtest", LVL_CIMPL, util_randtest },
 	{ "redoislands", LVL_CIMPL, util_redo_islands },
 	{ "rescan", LVL_START_IMM, util_rescan },
+	{ "resetbuildingtriggers", LVL_CIMPL, util_resetbuildingtriggers },
 	{ "strlen", LVL_START_IMM, util_strlen },
 	{ "tool", LVL_IMPL, util_tool },
 
@@ -574,6 +576,50 @@ ADMIN_UTIL(util_rescan) {
 		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "Rescanning empire: %s", EMPIRE_NAME(emp));
 		reread_empire_tech(emp);
 		send_config_msg(ch, "ok_string");
+	}
+}
+
+
+ADMIN_UTIL(util_resetbuildingtriggers) {
+	bld_data *proto = NULL, *temp;
+	room_data *room, *next_room;
+	bool all = FALSE;
+	int count = 0;
+	
+	all = !str_cmp(argument, "all");
+	
+	if (!all && (!*argument || !isdigit(*argument))) {
+		msg_to_char(ch, "Usage: resetbuildingtriggers <vnum | all>\r\n");
+	}
+	else if (!all && !(proto = building_proto(atoi(argument)))) {
+		msg_to_char(ch, "Invalid building/room vnum '%s'.\r\n", argument);
+	}
+	else {
+		HASH_ITER(hh, world_table, room, next_room) {
+			if (!GET_BUILDING(room)) {
+				continue;
+			}
+			if (!all && GET_BUILDING(room) != proto) {
+				continue;
+			}
+			
+			// remove old triggers
+			if (SCRIPT(room)) {
+				extract_script(room, WLD_TRIGGER);
+			}
+			free_proto_script(room, WLD_TRIGGER);
+			
+			// add any triggers
+			CREATE(temp, bld_data, 1);
+			copy_proto_script(GET_BUILDING(room), temp, BLD_TRIGGER);
+			room->proto_script = temp->proto_script;
+			free(temp);
+			assign_triggers(room, WLD_TRIGGER);
+			
+			++count;
+		}
+		
+		msg_to_char(ch, "%d building%s/room%s updated.\r\n", count, PLURAL(count), PLURAL(count));
 	}
 }
 

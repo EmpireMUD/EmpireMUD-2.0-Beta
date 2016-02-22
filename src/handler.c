@@ -4936,11 +4936,13 @@ void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers)
 	COMPLEX_DATA(room)->bld_ptr = bld;
 
 	// copy proto script
-	CREATE(temp, bld_data, 1);
-	copy_proto_script(bld, temp, BLD_TRIGGER);
-	room->proto_script = temp->proto_script;
-	free(temp);
-	assign_triggers(room, WLD_TRIGGER);
+	if (with_triggers) {
+		CREATE(temp, bld_data, 1);
+		copy_proto_script(bld, temp, BLD_TRIGGER);
+		room->proto_script = temp->proto_script;
+		free(temp);
+		assign_triggers(room, WLD_TRIGGER);
+	}
 }
 
 
