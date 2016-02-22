@@ -359,7 +359,7 @@ void cancel_morphing(char_data *ch) {
 	morph_data *morph = morph_proto(GET_ACTION_VNUM(ch, 0));
 	obj_data *obj;
 	
-	if (MORPH_FLAGGED(morph, MORPHF_CONSUME_OBJ) && MORPH_REQUIRES_OBJ(morph) != NOTHING) {
+	if (morph && MORPH_FLAGGED(morph, MORPHF_CONSUME_OBJ) && MORPH_REQUIRES_OBJ(morph) != NOTHING) {
 		obj = read_object(MORPH_REQUIRES_OBJ(morph), TRUE);
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char(obj, ch);
