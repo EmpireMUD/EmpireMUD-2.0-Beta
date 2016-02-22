@@ -220,6 +220,8 @@ const char *book_name_list[] = {
 	"brochure",
 	"codex",
 	"compendium",
+	"diary",
+	"journal",
 	"magazine",
 	"manual",
 	"novel",

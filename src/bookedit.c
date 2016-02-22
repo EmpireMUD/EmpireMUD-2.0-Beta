@@ -547,7 +547,7 @@ OLC_MODULE(booked_item_name) {
 	else if (strlen(argument) > MAX_BOOK_ITEM_NAME) {
 		msg_to_char(ch, "Book item names may not be more than %d characters long.\r\n", MAX_BOOK_ITEM_NAME);
 	}
-	else if (!has_keyword(argument, book_name_list, TRUE)) {
+	else if (!IS_IMMORTAL(ch) && !has_keyword(argument, book_name_list, TRUE)) {
 		msg_to_char(ch, "Book item names must contain a word like 'book' or 'tome'. See HELP BOOKEDIT ITEM.\r\n");
 	}
 	else {
