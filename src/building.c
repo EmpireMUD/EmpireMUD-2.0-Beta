@@ -1672,6 +1672,13 @@ ACMD(do_designate) {
 			new = IN_ROOM(ch);
 			
 			remove_designate_objects(new);
+			
+			// remove any attached scripts
+			if (SCRIPT(new)) {
+				extract_script(new, WLD_TRIGGER);
+			}
+			free_proto_script(new, WLD_TRIGGER);
+			
 			attach_building_to_room(type, new, TRUE);
 		}
 		else {
