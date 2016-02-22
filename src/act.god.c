@@ -132,6 +132,12 @@ ACMD(do_create) {
 		return;
 	}
 	
+	// safety limit
+	if (num > 1000) {
+		msg_to_char(ch, "You can't create more than 1000 at once.\r\n");
+		return;
+	}
+	
 	// setup
 	count = 0;
 	cost = rate_item(proto) + 1;
