@@ -86,9 +86,14 @@ Cost:  10 iron ingots
 
 Barding allows you to put armor on your noble steeds. This makes them less
 vulnerable to attack, and more impressive to look upon. Most mounts can be
-barded. You can only barde mounts in a stable.
+barded. You can only barde mounts in a stable. You cannot remove barding from
+mounts.
 
 Barded mounts will not de-spawn like normal animals.
+
+Gain experience when you barde something.
+
+See also: RIDE, STABLE
 #
 BUILD BUILDING
 
@@ -105,6 +110,10 @@ with that empire.
 Until a building is completed, you can walk into and out of it freely, and you
 can't build any additional rooms inside. Once finished, nobody who is not
 loyal to your empire will be able to enter.
+
+All buildings give experience as you add materials to their construction: for
+abilities if they require them; otherwise only for Empire and only up to
+Empire 15.
 
 &g.&0()&g.&0 hut  20 sticks
 &y.&0()&y.&0 mudhut  10 sticks, 10 rocks
@@ -221,6 +230,8 @@ territory well lit.
 
 There is no advantage to more than 1 member of an empire purchasing this
 ability.
+
+Gain experience passively if you're online at night.
 #
 CLAIM
 
@@ -248,6 +259,8 @@ Commerce also allows you to build the mint building, and mint your own coins:
 
 [MM] mint  12 lumber, 4 nails, 12 blocks, 4 coin mills
 
+Gain experience by building mints, and passively over time.
+
 See also: BUILD, MINT, TERRITORY, WEALTH
 #
 "CUSTOMIZE BUILDING"
@@ -264,6 +277,8 @@ from your empire.
 When editing a custom description, you can use /fi to add linebreaks and indent
 the first line. Generally descriptions look best in the 3-9 line range. You can
 use /h to get more information on editor commands, and /s to save and exit.
+
+Gain experience by customizing buildings.
 
 See also: STRING EDITOR
 #
@@ -283,10 +298,14 @@ Deep Mines (Empire ability)
 Mines you dig or prospect will have roughly 50% more ore. You must be the first
 player to build a mine or prospect on a given mountain tile (at least, since
 the last mountain reset), otherwise your deep mines ability will have no effect.
+Mines will only display as 'deep' if, thanks to this bonus, they have more ore
+than the normal maximum.
 
 Once you have started a mine (or prospected) a given mountain tile, it will
 remain a deep mine unless the mountain is reset at the end of the year. For
 more information on mountain resets, see HELP MINE.
+
+Gain experience when a tile benefits from your ability.
 
 See also: MINE, PROSPECT, RARE METALS
 #
@@ -699,6 +718,8 @@ targets all players in the room except himself.
 This ability scales with the user's Greatness. If Greatness is too low, people
 may not feel inspired at all.
 
+Gain experience when you inspire someone, including yourself.
+
 Here are the ways you can inspire:
   Accuracy: to-hit
   Evasion: dodge
@@ -894,6 +915,8 @@ Prominent Empires also get a bonus city point.
 There is no benefit to more than 1 person in an empire purchasing this
 ability.
 
+Gain experience passively as long as you're in an empire.
+
 See also: EMPIRES, CITIES
 #
 PROSPECT
@@ -909,6 +932,8 @@ If you have Deep Mines or Rare Metals and are the first person to prospect a
 mountain tile (since the last mountain reset), that tile will benefit from your
 Deep Mines and/or Rare Metals until the next mountain reset. For more info on
 mountain resets, see HELP MINE.
+
+Gain experience when you finish prospecting a tile.
 
 See also: MINE, DEEP MINES, RARE METALS
 #
@@ -955,6 +980,8 @@ Particularly renowned leaders have a radiant aura about them that can be seen
 by all. Activate Radiance to gain +2 Greatness. Radiance remains active until
 you shut it off or die.
 
+Gain experience passively, as long as Radiance is active.
+
 See also: GREATNESS
 #
 "RAISE ARMIES" "RAISE ARMIES BUILDINGS"
@@ -985,6 +1012,8 @@ Once you have started a mine (or prospected) a given mountain tile, it will
 keep its current metal type unless the mountain is reset at the end of the
 year. For more information on mountain resets, see HELP MINE.
 
+Gain experience whenever you are the first to find a rare metal tile.
+
 See also: MINE, DEEP MINES, PROSPECT
 #
 RECLAIM
@@ -1010,6 +1039,12 @@ have Reward, they may both choose to reward the same member.
 Each Reward gives a member of your empire +5 bonus experience for the day.
 Just like regular bonus experience, it will expire at the end of the day if
 it isn't used.
+
+You cannot reward yourself or your alts.
+
+This ability gains experience when you reward someone.
+
+See also: BONUS EXPERIENCE POINTS
 #
 ROCKS
 
@@ -1074,6 +1109,8 @@ simple orders and will rescue you in battle.
 The bodyguard counts as a familiar, and can be removed with the "dismiss"
 command.
 
+Gains experience when you summon your bodyguard.
+
 See also: DISMISS, ORDER
 #
 "SUMMON GUARDS"
@@ -1087,6 +1124,8 @@ Cost:  25 move
 This ability summons up to (Charisma / 2, rounded down) guards. They aren't
 very strong, but they count as city guards and will attack intruders and
 hostile mobs. You can only use this in your empire's own territory.
+
+Using this ability will gain experience, even if you fail to summon any guards.
 #
 "SWAMP ENGINEERING"
 
@@ -1209,6 +1248,8 @@ of unique items.
 
 Trade Routes counts as a technology.
 
+Gain experience by building trading posts, not by trading.
+
 See also: DIPLOMACY, EXPORT, IMPORT, TECHNOLOGY, WAREHOUSE, TRADING POST
 #
 TRAITS "EMPIRE TRAITS" "CITY TRAITS" "FRONTIER TRAITS"
@@ -1247,6 +1288,9 @@ someone else's claimed land).
 The entrance and exit to the tunnel will be on the mountain tiles at the ends.
 
 Tunnels may be interlinked.
+
+Gain experience by using resources to build tunnels, not by beginning their
+construction.
 
 See also: DISMANTLE, INTERLINK
 #
@@ -1355,6 +1399,11 @@ Workforce types:
   &yrepair-vehicles&0: Will keep vehicles maintained.
   
 Items marked (skilled) require the Skilled Labor ability.
+
+The Workforce ability gains experience when most workforce chores are done
+(including skilled ones) while you are online.
+The Skilled Labor ability gains experience when skilled chores are done while
+you are online.
 
 See also: EXARCH CRAFTS
 #

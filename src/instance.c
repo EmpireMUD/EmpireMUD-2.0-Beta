@@ -398,7 +398,7 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 * @param room_template *rmt The room template to instantiate.
 * @return room_data* The new room.
 */
-static room_data *instantiate_one_room(struct instance_data *inst, room_template *rmt) {	
+static room_data *instantiate_one_room(struct instance_data *inst, room_template *rmt) {
 	extern room_data *create_room();
 	
 	const bitvector_t default_affs = ROOM_AFF_UNCLAIMABLE;
@@ -519,6 +519,13 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (room_list[iter]) {
 			sort_exits(&COMPLEX_DATA(room_list[iter])->exits);
+		}
+	}
+	
+	// run load triggers
+	for (iter = 0; iter < inst->size; ++iter) {
+		if (room_list[iter]) {
+			load_wtrigger(room_list[iter]);
 		}
 	}
 }

@@ -834,7 +834,9 @@ build things facing roads, and can usually build right over a road -- but the
 road underneath will be lost. Roads count as in-city territory as far away as
 3x a city's normal radius.
 
-See also: EMPIRE, ROADSIGN
+Gain experience when you lay a road, but not on mountains.
+
+See also: CHANT OF ILLUSIONS, EMPIRE, PATHFINDING, ROADSIGN
 #
 LOAD LOADVEHICLE "LOAD VEHICLE" BOATLOAD "BOAT LOAD"
 

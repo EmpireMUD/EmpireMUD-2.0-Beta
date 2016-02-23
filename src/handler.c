@@ -959,6 +959,11 @@ void extract_char_final(char_data *ch) {
 void extract_char(char_data *ch) {
 	void despawn_charmies(char_data *ch);
 	
+	if (ch == dg_owner_mob) {
+		dg_owner_purged = 1;
+		dg_owner_mob = NULL;
+	}
+	
 	if (!EXTRACTED(ch)) {
 		if (IS_NPC(ch)) {
 			SET_BIT(MOB_FLAGS(ch), MOB_EXTRACTED);
@@ -3563,6 +3568,11 @@ void empty_obj_before_extract(obj_data *obj) {
 */
 void extract_obj(obj_data *obj) {
 	obj_data *proto = obj_proto(GET_OBJ_VNUM(obj));
+	
+	if (obj == dg_owner_obj) {
+		dg_owner_purged = 1;
+		dg_owner_obj = NULL;
+	}
 
 	// remove from anywhere
 	check_obj_in_void(obj);
@@ -4905,12 +4915,17 @@ void remove_depletion(room_data *room, int type) {
 
 /**
 * Sets the building data on a room. If the room isn't already complex, this
-* will automatically add complex data.
+* will automatically add complex data. This should always be called with
+* triggers unless you're loading saved rooms from a file, or some other place
+* where triggers might have been detached.
 *
 * @param bld_data *bld The building prototype (from building_table).
 * @param room_data *room The world room to attach it to.
+* @param bool with_triggers If TRUE, attaches triggers too.
 */
-void attach_building_to_room(bld_data *bld, room_data *room) {
+void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers) {
+	bld_data *temp;
+	
 	if (!bld || !room) {
 		log("SYSERR: attach_building_to_room called without %s", bld ? "room" : "building");
 		return;
@@ -4919,6 +4934,15 @@ void attach_building_to_room(bld_data *bld, room_data *room) {
 		COMPLEX_DATA(room) = init_complex_data();
 	}
 	COMPLEX_DATA(room)->bld_ptr = bld;
+
+	// copy proto script
+	if (with_triggers) {
+		CREATE(temp, bld_data, 1);
+		copy_proto_script(bld, temp, BLD_TRIGGER);
+		room->proto_script = temp->proto_script;
+		free(temp);
+		assign_triggers(room, WLD_TRIGGER);
+	}
 }
 
 
@@ -6035,6 +6059,11 @@ void extract_vehicle(vehicle_data *veh) {
 	
 	struct vehicle_room_list *vrl, *next_vrl;
 	room_data *main_room;
+	
+	if (veh == dg_owner_veh) {
+		dg_owner_purged = 1;
+		dg_owner_veh = NULL;
+	}
 	
 	// delete interior
 	if ((main_room = VEH_INTERIOR_HOME_ROOM(veh)) || VEH_ROOM_LIST(veh)) {

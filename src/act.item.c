@@ -114,6 +114,10 @@ INTERACTION_FUNC(combine_obj_interact) {
 	new_obj = read_object(interaction->vnum, TRUE);
 	scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
 	
+	if (GET_OBJ_TIMER(new_obj) != UNLIMITED && GET_OBJ_TIMER(inter_item) != UNLIMITED) {
+		GET_OBJ_TIMER(new_obj) = MIN(GET_OBJ_TIMER(new_obj), GET_OBJ_TIMER(inter_item));
+	}
+	
 	extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY));
 	
 	// ownership
@@ -725,19 +729,37 @@ void remove_armor_by_type(char_data *ch, int armor_type) {
 */
 INTERACTION_FUNC(separate_obj_interact) {
 	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
-	struct resource_data *res;
-	
-	// how many they need
-	res = create_resource_list(interaction->vnum, interaction->quantity, NOTHING);
-	
+	obj_data *new_obj;
+	int iter;
+		
 	snprintf(to_char, sizeof(to_char), "You separate %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
 	act(to_char, FALSE, ch, NULL, NULL, TO_CHAR);
 	snprintf(to_room, sizeof(to_room), "$n separates %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
 	act(to_room, TRUE, ch, NULL, NULL, TO_ROOM);
 	
-	give_resources(ch, res, FALSE);
+	for (iter = 0; iter < interaction->quantity; ++iter) {
+		new_obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
+	
+		if (GET_OBJ_TIMER(new_obj) != UNLIMITED && GET_OBJ_TIMER(inter_item) != UNLIMITED) {
+			GET_OBJ_TIMER(new_obj) = MIN(GET_OBJ_TIMER(new_obj), GET_OBJ_TIMER(inter_item));
+		}
+		
+		// ownership
+		new_obj->last_owner_id = GET_IDNUM(ch);
+		new_obj->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
+	
+		// put it somewhere
+		if (CAN_WEAR(new_obj, ITEM_WEAR_TAKE)) {
+			obj_to_char(new_obj, ch);
+		}
+		else {
+			obj_to_room(new_obj, IN_ROOM(ch));
+		}
+		load_otrigger(new_obj);
+	}
+	
 	extract_obj(inter_item);
-	free_resource_list(res);
 	return TRUE;
 }
 
@@ -2020,7 +2042,7 @@ room_data *get_ship_pen(void) {
 	
 	// did not find -- make one
 	room = create_room();
-	attach_building_to_room(building_proto(RTYPE_SHIP_HOLDING_PEN), room);
+	attach_building_to_room(building_proto(RTYPE_SHIP_HOLDING_PEN), room, TRUE);
 	
 	return room;
 }

@@ -77,7 +77,7 @@ static void special_building_completion(room_data *room) {
 	switch (BUILDING_VNUM(room)) {
 		case BUILDING_TAVERN: {
 			new_room = create_room();
-			attach_building_to_room(building_proto(RTYPE_STEALTH_HIDEOUT), new_room);
+			attach_building_to_room(building_proto(RTYPE_STEALTH_HIDEOUT), new_room, TRUE);
 			COMPLEX_DATA(room)->inside_rooms++;
 			
 			ROOM_OWNER(new_room) = ROOM_OWNER(room);
@@ -97,7 +97,7 @@ static void special_building_completion(room_data *room) {
 		}
 		case BUILDING_SORCERER_TOWER: {
 			new_room = create_room();
-			attach_building_to_room(building_proto(RTYPE_SORCERER_TOWER), new_room);
+			attach_building_to_room(building_proto(RTYPE_SORCERER_TOWER), new_room, TRUE);
 			COMPLEX_DATA(room)->inside_rooms++;
 			
 			ROOM_OWNER(new_room) = ROOM_OWNER(room);
@@ -234,6 +234,8 @@ void complete_building(room_data *room) {
 		free(res);
 	}
 	
+	complete_wtrigger(room);
+	
 	// SPECIAL HANDLING for building completion
 	special_building_completion(room);
 	
@@ -278,10 +280,12 @@ void construct_building(room_data *room, bld_vnum type) {
 	change_base_sector(room, sect);
 	
 	// set actual data
-	attach_building_to_room(building_proto(type), room);
+	attach_building_to_room(building_proto(type), room, TRUE);
 	
 	SET_BIT(ROOM_BASE_FLAGS(room), BLD_BASE_AFFECTS(room));
 	SET_BIT(ROOM_AFF_FLAGS(room), BLD_BASE_AFFECTS(room));
+	
+	load_wtrigger(room);
 }
 
 
@@ -319,7 +323,7 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 	// now the length of the tunnel
 	for (iter = 0; iter < length; ++iter) {
 		new_room = create_room();
-		attach_building_to_room(building_proto(RTYPE_TUNNEL), new_room);
+		attach_building_to_room(building_proto(RTYPE_TUNNEL), new_room, TRUE);
 		ROOM_OWNER(new_room) = ROOM_OWNER((iter <= length/2) ? entrance : exit);
 		COMPLEX_DATA(new_room)->home_room = (iter <= length/2) ? entrance : exit;
 		setup_building_resources(new_room, resources, FALSE);
@@ -374,6 +378,12 @@ void disassociate_building(room_data *room) {
 
 	// free up the customs
 	decustomize_room(room);
+	
+	// clean up scripts
+	if (SCRIPT(room)) {
+		extract_script(room, WLD_TRIGGER);
+	}
+	free_proto_script(room, WLD_TRIGGER);
 
 	// restore sect: this does not use change_terrain()
 	SECT(room) = BASE_SECT(room);
@@ -1662,13 +1672,20 @@ ACMD(do_designate) {
 			new = IN_ROOM(ch);
 			
 			remove_designate_objects(new);
-			attach_building_to_room(type, new);
+			
+			// remove any attached scripts
+			if (SCRIPT(new)) {
+				extract_script(new, WLD_TRIGGER);
+			}
+			free_proto_script(new, WLD_TRIGGER);
+			
+			attach_building_to_room(type, new, TRUE);
 		}
 		else {
 			// create the new room
 			new = create_room();
 			create_exit(IN_ROOM(ch), new, dir, TRUE);
-			attach_building_to_room(type, new);
+			attach_building_to_room(type, new, TRUE);
 
 			COMPLEX_DATA(new)->home_room = home;
 			COMPLEX_DATA(home)->inside_rooms++;
@@ -2078,7 +2095,7 @@ ACMD(do_upgrade) {
 			// it's good!
 			start_action(ch, ACT_BUILDING, 0);
 
-			attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(type)), IN_ROOM(ch));
+			attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(type)), IN_ROOM(ch), TRUE);
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
 			setup_building_resources(IN_ROOM(ch), GET_CRAFT_RESOURCES(type), FALSE);
 

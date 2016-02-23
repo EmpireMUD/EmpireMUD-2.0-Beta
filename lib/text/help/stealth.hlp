@@ -40,6 +40,8 @@ ability.
 Backstab deals 2x weapon damage on a successful attack, and the opponent has
 no chance to dodge if the attack succeeds. A particularly skilled assassin
 deals 4x weapon damage instead.
+
+Gains experience when you use Backstab, even if it fails.
 #
 BLIND
 
@@ -54,13 +56,18 @@ You toss sand in your opponents' eyes, blinding them for 10 seconds. Being
 unable to see your foes inflicts a penalty of -50 to To-hit, Block and Dodge.
 
 If you're fighting, this will automatically target your opponent.
+
+Gains experience when you use Blind, even if it fails.
 #
 "CLING TO SHADOW"
 
 Cling to Shadow (Stealth ability)
 
 With Cling to Shadow, your chance of successfully hiding (with the "hide"
-command) becomes 100% and you cannot be found using the "search" ability.
+command) becomes 100% and you cannot be found using the "search" ability. You
+can still be found using the Sense Life and Detection rituals.
+
+Gains experience when you hide, and when people would find you using Search.
 
 See also: HIDE, SEARCH
 #
@@ -71,7 +78,7 @@ Cloak of Darkness (Stealth ability)
 This passive ability keeps you from being spotted at range on the map, and
 reduces the chance of guard towers seeing you.
 
-This ability gains skill points when you would be spotted on the map, or a
+This ability gains experience when you would be spotted on the map, or a
 tower would try to shoot you.
 #
 CONCEALMENT
@@ -100,11 +107,14 @@ Darkness (Stealth ability)
 
 Usage:  darkness
 Cooldown:  15 seconds
+Duration:  30 seconds
 Cost:  15 move
 
 Master the power of shadow to blanket an area in darkness. It becomes much
 harder to see anything at all, even where there should be daylight. This
 ability also grants the ability to see in the darkness it creates.
+
+Gains experience when you cast Darkness.
 
 See also: BLIND
 #
@@ -112,7 +122,9 @@ See also: BLIND
 
 Dagger Mastery (Stealth ability)
 
-Your dagger attacks deal 50% more damage.
+Your attacks with stabbing weapons (such as daggers) deal 50% more damage.
+
+Gains experience when it increases your damage.
 #
 DISGUISE
 
@@ -122,9 +134,14 @@ Usage:  disguise <person>
 
 A savvy rogue learns to blend into his surroundings. With this ability, you can
 look like any human NPC. If you behave like one as well, you might find you
-disappear into the crowd.
+disappear into the crowd. Disguising does not always succeed, but informs you if
+it fails.
+
+Disguised players do not appear on the map.
 
 Morphing will remove disguises.
+
+Gain experience by trying to disguise yourself.
 #
 DIVERSION
 
@@ -149,6 +166,8 @@ Time:  5 seconds
 
 Escape lets you run for the nearest window and quickly exit the building or
 ship you're in, making a quick getaway from even the most confusing castles.
+
+Gains experience when you escape.
 #
 HIDE HIDING
 
@@ -156,11 +175,13 @@ Hide (Stealth ability)
 
 Usage:  hide
 
-When you type hide there is a chance that you hide in the room. If hidden you
-can't be seen by other people. Hide is broken by pressing return, regardless
-of whether you typed a command or not.
+When you type hide there is a chance (based on your Stealth level) that you hide
+in the room. If hidden you can't be seen by other people. Hide is broken by
+pressing return, regardless of whether you typed a command or not.
 
-See also: SEARCH, SNEAK, SENSE LIFE RITUAL
+Gains experience when you try to hide.
+
+See also: CLING TO SHADOW, SEARCH, SNEAK, SENSE LIFE RITUAL
 #
 HOWL
 
@@ -209,6 +230,8 @@ will not be revealed.
 
 Note: Like many stealth actions, infiltrate cannot be used against an empire
 which has no members online.
+
+Both abilities gain experience when you try to infiltrate somewhere.
 #
 JAB
 
@@ -224,6 +247,8 @@ to 2 times.
 
 This ability requires a stabbing weapon.
 
+Gains experience when you use Jab, even if the attack misses.
+
 See also: CRUCIAL JAB, SHADOW JAB, STAGGER JAB
 #
 PICKPOCKET "PICK POCKET"
@@ -236,10 +261,15 @@ A skilled thief can lift small items from an unsuspecting victim.
 
 You can only pickpocket NPCs, and even then only human ones. This ability does
 not remove items you see in their inventories, only "pocket items". The result
-is largely random. Each NPC can only be pickpocketed once.
+is largely random but often includes coins. Each NPC can only be pickpocketed
+once.
+
+Pickpocketing citizens of another empire counts as an act of hostility.
 
 NPCs more than 50 levels above you will always catch you if you try to
 pickpocket them.
+
+Gains experience when you try to pickpocket someone.
 #
 POISON POISONS "DEADLY POISONS" MIX
 
@@ -259,6 +289,9 @@ be removed from your inventory.
 All vials have 15 charges. Deadly Poisons doubles the effects of most poisons.
 Poisons only work with sharp weapons. Poisons also count as Stealth debuffs,
 and some NPCs are immune.
+
+Both abilities gain experience any time you attempt to apply poison, even if it
+is resisted.
 
 Basic Poisons:
   searing  +5 damage  (30 bileberries)
@@ -291,6 +324,8 @@ you're not in combat. If your target can't see you, it won't even start
 combat.
 
 If you're fighting, it will automatically target your enemy.
+
+Gains experience when you prick someone.
 #
 SAP
 
@@ -307,6 +342,8 @@ yourself before starting combat.
 
 Only one person in the room may be sapped at a time. Using the ability on a
 second person will release the first one.
+
+Gains experience when you use Sap, even if it fails.
 #
 SEARCH
 
@@ -317,9 +354,12 @@ Cooldown:  10 seconds
 
 When you know where to look, it's easier to find hidden thieves and assassins.
 This ability reveals people who use the hide command, although it doesn't
-always find them on the first try.
+always find them on the first try, and it won't find anyone who has Cling to
+Shadow.
 
-See also: HIDE
+Gains experience when you search a room.
+
+See also: HIDE, SENSE LIFE RITUAL
 #
 "SECRET CACHE" SECRETCACHE
 
@@ -381,8 +421,13 @@ appear out of another. This ability takes you instantly to your target. It has
 a maximum range of 7 map tiles and requires Infiltrate if you don't have per-
 mission to enter your target's location.
 
+Players in the room you leave will not notice your departure, but players at
+your destination will notice your arrival.
+
 You cannot shadowstep to NPCs that belong to other empires, or that are on land
 that belongs to other empires.
+
+Gains experience when you use Shadowstep.
 
 See also: INFILTRATE
 #
@@ -395,6 +440,10 @@ Usage:  sneak <direction>
 Used for sneaking (moving in and out of rooms without anyone taking notice). 
 When you type sneak, there is no way to know if you're actually sneaking. It's
 based on your skill, and how well other people notice you.
+
+At a high enough Stealth level, this ability will always succeed.
+
+Gains experience when you try to sneak.
 
 See also: HIDE
 #
@@ -431,6 +480,8 @@ You can also steal stored resources. If you type "steal" in a storage room or
 building, it will list what you can steal there. Type "steal <item>" to take
 one.
 
+Gains experience when you steal something.
+
 See also: VAULTCRACKING
 #
 "SUMMON THUGS"
@@ -443,6 +494,8 @@ This ability summons up to (Charisma / 3, rounded up) thugs, who will follow
 you around. This is best combined with the Disguise ability, as you can mask
 yourself as a thug.
 
+Gains experience when you attempt to summon thugs.
+
 See also: DISGUISE
 #
 TERRIFY
@@ -451,12 +504,15 @@ Terrify (Stealth ability)
 
 Usage:  terrify [victim]
 Cooldown:  15 seconds
+Duration:  30 seconds
 Debuff type:  Stealth
 Cost:  15 move
 
 Use the power of the shadows to make your foes cower in fear, lowering the
 physical and magical damage they deal by an amount equal to your total level
-divided by 30.
+divided by 30. This ability has a chance of success based on your Stealth level.
+
+Gains experience when you try to terrify someone.
 #
 "UNSEEN PASSING"
 
@@ -465,7 +521,7 @@ Unseen Passing (Stealth ability)
 When in a city or indoors, Unseen Passing makes you immune to the "where" and
 "track" commands. It doesn't work in the wilderness.
 
-This ability gains skill points whenever it prevents you from being found with
+This ability gains experience whenever it prevents you from being found with
 "where", and whenever it prevents you from leaving tracks.
 
 See also: NO TRACE, WHERE, TRACK
@@ -475,6 +531,9 @@ VAULTCRACKING "VAULT CRACKING"
 Vaultcracking (Stealth ability)
 
 This ability allows you to use the "steal" command in vaults and secret caches.
+
+Gains experience when you steal something which requires the 'withdraw' empire
+privilege (generally from the vault or secret cache).
 
 See also: STEAL
 #

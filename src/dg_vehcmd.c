@@ -35,7 +35,6 @@
 extern const char *damage_types[];
 extern const char *alt_dirs[];
 extern const char *dirs[];
-extern int dg_owner_purged;
 
 // external functions
 void die(char_data *ch, char_data *killer);
@@ -243,7 +242,7 @@ VCMD(do_vregionecho) {
 	else if (!isdigit(*radius_arg) && *radius_arg != '-') {
 		veh_log(veh, "vregionecho called with invalid radius");
 	}
-	else if (!(center = get_room(orm, arg))) {
+	else if (!(center = get_room(orm, room_number))) {
 		veh_log(veh, "vregionecho called with invalid target");
 	}
 	else {
@@ -965,10 +964,10 @@ VCMD(do_dgvload) {
 		}
 		else {
 			// hope to inherit
-			scale_vehicle_to_level(veh, 0);
+			scale_vehicle_to_level(vehicle, 0);
 		}
 		
-		load_vtrigger(veh);
+		load_vtrigger(vehicle);
 	}
 	else {
 		veh_log(veh, "vload: bad type");

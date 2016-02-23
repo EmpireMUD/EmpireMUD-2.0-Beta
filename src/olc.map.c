@@ -27,6 +27,10 @@
 *   Edit Modules
 */
 
+// external funcs
+void complete_building(room_data *room);
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
@@ -77,6 +81,7 @@ OLC_MODULE(mapedit_build) {
 		
 		construct_building(IN_ROOM(ch), GET_BLD_VNUM(bld));
 		special_building_setup(ch, IN_ROOM(ch));
+		complete_building(IN_ROOM(ch));
 		
 		if (dir != NO_DIR) {
 			create_exit(IN_ROOM(ch), SHIFT_DIR(IN_ROOM(ch), dir), dir, FALSE);
@@ -172,9 +177,7 @@ OLC_MODULE(mapedit_terrain) {
 }
 
 
-OLC_MODULE(mapedit_complete_room) {
-	void complete_building(room_data *room);
-	
+OLC_MODULE(mapedit_complete_room) {	
 	if (IS_DISMANTLING(IN_ROOM(ch))) {
 		msg_to_char(ch, "Use '.map terrain' instead.\r\n");
 		return;
@@ -402,7 +405,7 @@ OLC_MODULE(mapedit_exits) {
 	else {
 		if (new) {
 			to_room = create_room();
-			attach_building_to_room(building_proto(config_get_int("default_interior")), to_room);
+			attach_building_to_room(building_proto(config_get_int("default_interior")), to_room, TRUE);
 			
 			if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
 				++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(IN_ROOM(ch)));
@@ -460,7 +463,7 @@ OLC_MODULE(mapedit_roomtype) {
 		msg_to_char(ch, "What type of room would you like to set (use 'vnum b <name>' to search)?\r\n");
 	}
 	else {
-		attach_building_to_room(id, IN_ROOM(ch));
+		attach_building_to_room(id, IN_ROOM(ch), TRUE);
 		msg_to_char(ch, "This room is now %s %s.\r\n", AN(GET_BLD_NAME(id)), GET_BLD_NAME(id));
 	}
 }

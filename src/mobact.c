@@ -60,7 +60,7 @@ void add_pursuit(char_data *ch, char_data *target) {
 	struct pursuit_data *purs;
 	
 	// only mobs pursue, and only pursue non-mobs
-	if (!IS_NPC(ch) || IS_NPC(target)) {
+	if (!IS_NPC(ch) || IS_NPC(target) || IS_IMMORTAL(target)) {
 		return;
 	}
 	
@@ -110,6 +110,7 @@ void end_pursuit(char_data *ch, char_data *target) {
 * @return bool TRUE if the mob moves back, FALSE otherwise.
 */
 bool return_to_pursuit_location(char_data *ch) {
+	struct pursuit_data *purs, *next_purs;
 	room_data *loc;
 	
 	if (!ch || ch->desc || !IS_NPC(ch) || FIGHTING(ch) || GET_POS(ch) < POS_STANDING || AFF_FLAGGED(ch, AFF_ENTANGLED) || MOB_PURSUIT_LEASH_LOC(ch) == NOWHERE) {
@@ -127,6 +128,13 @@ bool return_to_pursuit_location(char_data *ch) {
 	char_to_room(ch, loc);
 	act("$n returns to what $e was doing.", TRUE, ch, NULL, NULL, TO_ROOM);
 	MOB_PURSUIT_LEASH_LOC(ch) = NOWHERE;
+	
+	// reset pursue data to avoid loops
+	LL_FOREACH_SAFE(MOB_PURSUIT(ch), purs, next_purs) {
+		free(purs);
+	}
+	MOB_PURSUIT(ch) = NULL;
+	
 	return TRUE;
 }
 

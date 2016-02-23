@@ -132,6 +132,10 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Look desc starting with 'Nothing.'");
 		problem = TRUE;
 	}
+	if (OBJ_FLAGGED(obj, OBJ_CREATABLE)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "CREATABLE");
+		problem = TRUE;
+	}
 	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && GET_OBJ_TIMER(obj) <= 0) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Infinite light");
 		problem = TRUE;
@@ -564,6 +568,14 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// update objs
+	HASH_ITER(hh, object_table, obj_iter, next_obj) {
+		found = delete_from_interaction_list(&obj_iter->interactions, TYPE_OBJ, vnum);
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj_iter));
+		}
+	}
+	
 	// update room templates
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_OBJ, vnum);
@@ -675,8 +687,14 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				SET_BIT(MORPH_FLAGS(GET_OLC_MORPH(desc)), MORPHF_IN_DEVELOPMENT);
 				msg_to_char(desc->character, "The object required by the morph you're editing was deleted.\r\n");
 			}
-	
 		}
+		if (GET_OLC_OBJECT(desc)) {
+			found = delete_from_interaction_list(&GET_OLC_OBJECT(desc)->interactions, TYPE_OBJ, vnum);
+			if (found) {
+				msg_to_char(desc->character, "One of the objects in an interaction for the item you're editing was deleted.\r\n");
+			}
+		}
+		
 		if (GET_OLC_ROOM_TEMPLATE(desc)) {
 			if (delete_from_spawn_template_list(&GET_OLC_ROOM_TEMPLATE(desc)->spawns, ADV_SPAWN_OBJ, vnum)) {
 				msg_to_char(desc->character, "One of the objects that spawns in the room template you're editing was deleted.\r\n");

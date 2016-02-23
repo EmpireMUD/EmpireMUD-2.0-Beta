@@ -167,7 +167,7 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	
 	// otherwise, create the interior
 	room = create_room();
-	attach_building_to_room(bld, room);
+	attach_building_to_room(bld, room, TRUE);
 	ROOM_OWNER(room) = VEH_OWNER(veh);
 	COMPLEX_DATA(room)->home_room = NULL;
 	SET_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_IN_VEHICLE);

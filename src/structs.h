@@ -2371,6 +2371,7 @@ struct bld_data {
 	struct extra_descr_data *ex_description;	// extra descriptions
 	struct spawn_info *spawns;	// linked list of spawn data
 	struct interaction_item *interactions;	// interaction items
+	struct trig_proto_list *proto_script;	// list of default triggers
 	
 	UT_hash_handle hh;	// building_table hash handle
 };

@@ -189,6 +189,7 @@
 #define GET_BLD_CITIZENS(bld)  ((bld)->citizens)
 #define GET_BLD_MILITARY(bld)  ((bld)->military)
 #define GET_BLD_ARTISAN(bld)  ((bld)->artisan_vnum)
+#define GET_BLD_SCRIPTS(bld)  ((bld)->proto_script)
 #define GET_BLD_SPAWNS(bld)  ((bld)->spawns)
 #define GET_BLD_INTERACTIONS(bld)  ((bld)->interactions)
 
@@ -1268,6 +1269,7 @@ extern bitvector_t asciiflag_conv(char *flag);
 extern char *bitv_to_alpha(bitvector_t flags);
 extern char *delete_doubledollar(char *string);
 extern const char *double_percents(const char *string);
+extern bool has_keyword(char *string, const char *list[], bool exact);
 extern bool isname(const char *str, const char *namelist);
 extern char *level_range_string(int min, int max, int current);
 extern bool multi_isname(const char *arg, const char *namelist);

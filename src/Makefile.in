@@ -278,7 +278,7 @@ olc.adventure.o: olc.adventure.c conf.h sysdep.h structs.h uthash.h \
   utils.h interpreter.h db.h comm.h olc.h skills.h handler.h dg_scripts.h
 	$(CC) -c $(CFLAGS) olc.adventure.c
 olc.building.o: olc.building.c conf.h sysdep.h structs.h uthash.h utils.h \
-  interpreter.h db.h comm.h olc.h skills.h handler.h
+  interpreter.h db.h comm.h olc.h skills.h handler.h dg_scripts.h
 	$(CC) -c $(CFLAGS) olc.building.c
 olc.o: olc.c conf.h sysdep.h structs.h uthash.h utils.h interpreter.h \
   handler.h db.h comm.h olc.h dg_scripts.h

@@ -230,7 +230,7 @@ extern int get_depletion(room_data *room, int type);
 void remove_depletion(room_data *room, int type);
 
 // room handlers
-void attach_building_to_room(bld_data *bld, room_data *room);
+void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers);
 void attach_template_to_room(room_template *rmt, room_data *room);
 
 // room extra data handlers

@@ -119,8 +119,10 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	}
 	
 	// we always use the applies from the file, not from the proto
-	free_obj_apply_list(GET_OBJ_APPLIES(obj));
-	GET_OBJ_APPLIES(obj) = NULL;
+	if (obj) {
+		free_obj_apply_list(GET_OBJ_APPLIES(obj));
+		GET_OBJ_APPLIES(obj) = NULL;
+	}
 	
 	// for fread_string
 	sprintf(error, "Obj_load_from_file %d", vnum);

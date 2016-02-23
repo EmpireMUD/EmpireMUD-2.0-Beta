@@ -1063,6 +1063,57 @@ void adventure_cleanup_wtrigger(room_data *room) {
 	}
 }
 
+
+/**
+* Called when a building is completed.
+*
+* @param room_data *room The room.
+*/
+void complete_wtrigger(room_data *room) {
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t;
+
+	if (!SCRIPT_CHECK(room, WTRIG_COMPLETE))
+		return;
+
+	for (t = TRIGGERS(SCRIPT(room)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, WTRIG_COMPLETE) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			union script_driver_data_u sdd;
+			ADD_ROOM_UID_VAR(buf, t, room, "room", 0);
+			sdd.r = room;
+			if (script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW)) {
+				break;
+			}
+		}
+	}
+}
+
+
+/**
+* Called when a building first loads.
+*
+* @param room_data *room The room.
+*/
+void load_wtrigger(room_data *room) {
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t;
+
+	if (!SCRIPT_CHECK(room, WTRIG_LOAD))
+		return;
+
+	for (t = TRIGGERS(SCRIPT(room)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, WTRIG_LOAD) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			union script_driver_data_u sdd;
+			ADD_ROOM_UID_VAR(buf, t, room, "room", 0);
+			sdd.r = room;
+			if (script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW)) {
+				break;
+			}
+		}
+	}
+}
+
+
 void reset_wtrigger(room_data *room) {
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t;

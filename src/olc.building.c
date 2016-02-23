@@ -20,6 +20,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "dg_scripts.h"
 
 /**
 * Contents:
@@ -56,7 +57,9 @@ bool audit_building(bld_data *bld, char_data *ch) {
 	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
 	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
 	
+	struct trig_proto_list *tpl;
 	bool problem = FALSE;
+	trig_data *trig;
 	
 	if (!str_cmp(GET_BLD_NAME(bld), "Unnamed Building")) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Name not set");
@@ -93,6 +96,17 @@ bool audit_building(bld_data *bld, char_data *ch) {
 	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && IS_SET(GET_BLD_FLAGS(bld), BLD_SECONDARY_TERRITORY)) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "2ND-TERRITORY flag on a non-designated building");
 		problem = TRUE;
+	}
+	
+	// check scripts
+	for (tpl = GET_BLD_SCRIPTS(bld); tpl; tpl = tpl->next) {
+		if (!(trig = real_trigger(tpl->vnum))) {
+			continue;
+		}
+		if (trig->attach_type != WLD_TRIGGER) {
+			olc_audit_msg(ch, GET_BLD_VNUM(bld), "Incorrect trigger type (trg %d)", tpl->vnum);
+			problem = TRUE;
+		}
 	}
 	
 	problem |= audit_extra_descs(GET_BLD_VNUM(bld), GET_BLD_EX_DESCS(bld), ch);
@@ -368,6 +382,7 @@ void save_olc_building(descriptor_data *desc) {
 	bld_data *proto, *bdg = GET_OLC_BUILDING(desc);
 	bld_vnum vnum = GET_OLC_VNUM(desc);
 	struct interaction_item *interact;
+	struct trig_proto_list *trig;
 	struct spawn_info *spawn;
 	UT_hash_handle hh;
 	
@@ -400,6 +415,10 @@ void save_olc_building(descriptor_data *desc) {
 	while ((interact = GET_BLD_INTERACTIONS(proto))) {
 		GET_BLD_INTERACTIONS(proto) = interact->next;
 		free(interact);
+	}
+	while ((trig = GET_BLD_SCRIPTS(proto))) {
+		GET_BLD_SCRIPTS(proto) = trig->next;
+		free(trig);
 	}
 	
 	// sanity
@@ -473,6 +492,10 @@ bld_data *setup_olc_building(bld_data *input) {
 		
 		// copy interactions
 		GET_BLD_INTERACTIONS(new) = copy_interaction_list(GET_BLD_INTERACTIONS(input));
+		
+		// scripts
+		GET_BLD_SCRIPTS(new) = NULL;
+		copy_proto_script(input, new, BLD_TRIGGER);
 	}
 	else {
 		// brand new: some defaults
@@ -499,6 +522,7 @@ bld_data *setup_olc_building(bld_data *input) {
 void olc_show_building(char_data *ch) {
 	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
 	void get_interaction_display(struct interaction_item *list, char *save_buffer);
+	void get_script_display(struct trig_proto_list *list, char *save_buffer);
 	extern char *show_color_codes(char *string);
 	
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
@@ -557,6 +581,11 @@ void olc_show_building(char_data *ch) {
 	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
 	get_interaction_display(GET_BLD_INTERACTIONS(bdg), buf1);
 	strcat(buf, buf1);
+
+	// scripts
+	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
+	get_script_display(GET_BLD_SCRIPTS(bdg), lbuf);
+	strcat(buf, lbuf);
 	
 	sprintf(buf + strlen(buf), "<&yspawns&0> (add, remove, list)\r\n");
 	if (!GET_BLD_SPAWNS(bdg)) {
@@ -744,6 +773,12 @@ OLC_MODULE(bedit_name) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_BLD_NAME(bdg));
 	CAP(GET_BLD_NAME(bdg));
+}
+
+
+OLC_MODULE(bedit_script) {
+	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
+	olc_process_script(ch, argument, &(GET_BLD_SCRIPTS(bdg)), WLD_TRIGGER);
 }
 
 

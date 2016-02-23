@@ -615,8 +615,9 @@ ACMD(do_bite) {
 	one_argument(argument, arg);
 
 	if (GET_FEEDING_FROM(ch)) {
-		msg_to_char(ch, "You stop feeding.\r\n");
-		act("$n stops feeding from $N.", FALSE, ch, 0, GET_FEEDING_FROM(ch), TO_ROOM);
+		act("You stop feeding from $N.", FALSE, ch, NULL, GET_FEEDING_FROM(ch), TO_CHAR);
+		act("$n stops feeding from you.", FALSE, ch, NULL, GET_FEEDING_FROM(ch), TO_VICT);
+		act("$n stops feeding from $N.", FALSE, ch, NULL, GET_FEEDING_FROM(ch), TO_NOTVICT);
 		GET_FED_ON_BY(GET_FEEDING_FROM(ch)) = NULL;
 		GET_FEEDING_FROM(ch) = NULL;
 	}
