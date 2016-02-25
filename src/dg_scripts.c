@@ -3020,6 +3020,18 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "nohassle")) {
 						snprintf(str, slen,"%d", NOHASSLE(c) ? 1 : 0);
 					}
+					else if (!str_cmp(field, "noskill")) {
+						if (subfield && *subfield && !IS_NPC(c)) {
+							skill_data *sk;							
+							if ((sk = find_skill(subfield)) && !noskill_ok(c, SKILL_VNUM(sk))) {
+								snprintf(str, slen, "1");
+							}
+						}
+						// all other cases...
+						if (*str != '1') {							
+							snprintf(str, slen, "0");
+						}
+					}
 					break;
 				}
 				case 'p': {	// char.p*
