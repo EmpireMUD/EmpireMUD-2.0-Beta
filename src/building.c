@@ -323,6 +323,11 @@ void disassociate_building(room_data *room) {
 	decustomize_room(room);
 	
 	// clean up scripts
+	if (dg_owner_room == room) {
+		// no longer safe to run scripts if this is the room running it
+		dg_owner_purged = 1;
+		dg_owner_room = NULL;
+	}
 	if (SCRIPT(room)) {
 		extract_script(room, WLD_TRIGGER);
 	}
