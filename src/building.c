@@ -65,60 +65,6 @@ const char *interlink_codes[11] = { "AX", "RB",	"UN", "DD", "WZ", "FG", "VI", "Q
 //// SPECIAL HANDLING ////////////////////////////////////////////////////////
 
 /**
-* Any special handling that must run when a building is completed.
-*
-* @param room_data *room The building location.
-*/
-static void special_building_completion(room_data *room) {
-	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
-	struct room_direction_data *ex;
-	room_data *new_room;
-	
-	switch (BUILDING_VNUM(room)) {
-		case BUILDING_TAVERN: {
-			new_room = create_room();
-			attach_building_to_room(building_proto(RTYPE_STEALTH_HIDEOUT), new_room, TRUE);
-			COMPLEX_DATA(room)->inside_rooms++;
-			
-			ROOM_OWNER(new_room) = ROOM_OWNER(room);
-			COMPLEX_DATA(new_room)->home_room = room;
-	
-			if ((ex = create_exit(room, new_room, DOWN, TRUE))) {
-				SET_BIT(ex->exit_info, EX_ISDOOR | EX_CLOSED);
-				ex->keyword = str_dup("trapdoor");
-			}
-			
-			// back
-			if ((ex = find_exit(new_room, UP))) {
-				SET_BIT(ex->exit_info, EX_ISDOOR | EX_CLOSED);
-				ex->keyword = str_dup("trapdoor");
-			}
-			break;
-		}
-		case BUILDING_SORCERER_TOWER: {
-			new_room = create_room();
-			attach_building_to_room(building_proto(RTYPE_SORCERER_TOWER), new_room, TRUE);
-			COMPLEX_DATA(room)->inside_rooms++;
-			
-			ROOM_OWNER(new_room) = ROOM_OWNER(room);
-			COMPLEX_DATA(new_room)->home_room = room;
-	
-			create_exit(room, new_room, UP, TRUE);
-			break;
-		}
-		case BUILDING_SWAMP_PLATFORM: {
-			change_terrain(room, climate_default_sector[CLIMATE_TEMPERATE]);
-			break;
-		}
-		case BUILDING_OASIS_DRAINAGE: {
-			change_terrain(room, climate_default_sector[CLIMATE_ARID]);
-			break;
-		}
-	}
-}
-
-
-/**
 * Any special handling when a new building is set up (at start of build):
 *
 * @param char_data *ch The builder (OPTIONAL: for skill setup)
@@ -235,9 +181,6 @@ void complete_building(room_data *room) {
 	}
 	
 	complete_wtrigger(room);
-	
-	// SPECIAL HANDLING for building completion
-	special_building_completion(room);
 	
 	// check mounted people
 	if (!BLD_ALLOWS_MOUNTS(room)) {
