@@ -44,6 +44,7 @@ extern const char *extra_bits[];
 extern const char *item_types[];
 extern const char *genders[];
 extern const char *player_bits[];
+extern const int rev_dir[];
 extern const char *exit_bits[];
 extern const char *mob_move_types[];
 extern struct time_info_data time_info;
@@ -3497,7 +3498,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'd': {	// room.d*
 					if (!str_cmp(field, "direction")) {
-						extern const char *dirs[];
 						room_data *targ;
 						int dir;
 				
@@ -3556,6 +3556,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							strcpy(str, "");
+						}
+					}
+					else if (!str_cmp(field, "enter_dir")) {
+						if (BUILDING_ENTRANCE(r) != NO_DIR) {
+							sprinttype(BUILDING_ENTRANCE(r), dirs, str);
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "exit_dir")) {
+						if (BUILDING_ENTRANCE(r) != NO_DIR && rev_dir[BUILDING_ENTRANCE(r)] != NO_DIR) {
+							sprinttype(rev_dir[BUILDING_ENTRANCE(r)], dirs, str);
+						}
+						else {
+							*str = '\0';
 						}
 					}
 					break;
