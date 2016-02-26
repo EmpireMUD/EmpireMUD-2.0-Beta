@@ -38,6 +38,7 @@ extern const char *action_bits[];
 extern const char *affected_bits[];
 extern const char *affect_types[];
 extern const char *alt_dirs[];
+extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
 extern const char *drinks[];
 extern const char *extra_bits[];
@@ -3453,7 +3454,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'b': {	// room.b*
-					if (!str_cmp(field, "building")) {
+					if (!str_cmp(field, "bld_dir")) {
+						int dir;
+						if (subfield && *subfield && ((dir = search_block(subfield, dirs, FALSE)) != NO_DIR || (dir = search_block(subfield, alt_dirs, FALSE)) != NO_DIR)) {
+							room_data *home = HOME_ROOM(r);
+							if (GET_BUILDING(home) && BUILDING_ENTRANCE(home) != NO_DIR) {
+								// adjust for dir
+								dir = confused_dirs[rev_dir[BUILDING_ENTRANCE(home)]][0][dir];
+							}
+							snprintf(str, slen, "%s", dirs[dir]);
+						}
+						else {
+							// no dir or not a valid dir
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "building")) {
 						if (GET_BUILDING(r)) {
 							snprintf(str, slen, "%s", GET_BLD_NAME(GET_BUILDING(r)));
 						}

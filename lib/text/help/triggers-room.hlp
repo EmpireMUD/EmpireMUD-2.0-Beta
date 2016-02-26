@@ -108,6 +108,8 @@ For each type, there is a help file named &yRTRIG <type>&0.
 All room scripts provide the &c%room%&0 variable.
 
 When using field - The variable returns:
+&cbld_dir(dir)&0 - Rotates the given direction based on which way the building
+   is facing (compared to North). Returns the same dir if no building.
 &cbuilding&0 - The name of the building on the room, if any.
 &ccomplete&0 - True if the room/building is complete (finished building).
 &ccontents&0 - The id of the first obj in the room.
