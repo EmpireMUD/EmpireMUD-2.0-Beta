@@ -113,6 +113,7 @@ const char *adventure_flags[] = {
 	"CONFUSING-RANDOMS",
 	"!NEWBIE",
 	"NEWBIE-ONLY",
+	"NO-MOB-CLEANUP",
 	"\n"
 };
 

@@ -475,6 +475,7 @@ The following adventure flags are available:
  CONFUSING-RANDOMS - The instancer will not logically match random exits.
  !NEWBIE - Will not spawn on newbie islands.
  NEWBIE-ONLY - Only spawns on newbie islands.
+ NO-MOB-CLEANUP - Won't despawn mobs that got out of the instance on cleanup.
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
