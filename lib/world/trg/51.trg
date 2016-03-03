@@ -14,6 +14,7 @@ if !%room.down(room)%
     %door% %hideout% up name trapdoor
   end
 end
+detach 5138 %room.id%
 ~
 #5156
 Swamp Platform~
@@ -31,6 +32,7 @@ if !%room.up(room)%
   * Add Top of the Tower
   %door% %room% up add 5511
 end
+detach 5164 %room.id%
 ~
 #5186
 Haven Interior~
