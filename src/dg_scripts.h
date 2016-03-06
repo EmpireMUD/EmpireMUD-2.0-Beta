@@ -76,6 +76,7 @@
 #define OTRIG_LEAVE            BIT(16)    /* someone leaves room seen    */
 
 #define OTRIG_CONSUME          BIT(18)    /* char tries to eat/drink obj */
+#define OTRIG_FINISH           BIT(19)	// char finishes reading a book
 
 
 // VTRIG_x: vehicle trigger types
@@ -117,9 +118,10 @@
 #define OCMD_ROOM              BIT(2)	     /* obj must be in char's room  */
 
 /* obj consume trigger commands */
-#define OCMD_EAT    1
+#define OCMD_EAT  1
 #define OCMD_DRINK  2
 #define OCMD_QUAFF  3
+#define OCMD_READ  4
 
 #define TRIG_NEW                0	     /* trigger starts from top  */
 #define TRIG_RESTART            1	     /* trigger restarting       */
@@ -248,6 +250,8 @@ int door_mtrigger(char_data *actor, int subcmd, int dir);
 int door_wtrigger(char_data *actor, int subcmd, int dir);
 
 int consume_otrigger(obj_data *obj, char_data *actor, int cmd);
+
+int finish_otrigger(obj_data *obj, char_data *actor);
 
 int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode);
 int destroy_vtrigger(vehicle_data *veh);

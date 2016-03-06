@@ -2565,6 +2565,10 @@ ACMD(do_plant) {
 		set_crop_type(IN_ROOM(ch), cp);
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_SEED_TIME, planting_base_timer);
 		
+		// temporarily deplete seeded rooms
+		set_depletion(IN_ROOM(ch), DPLTN_FORAGE, config_get_int("short_depletion"));
+		set_depletion(IN_ROOM(ch), DPLTN_PICK, config_get_int("pick_depletion"));
+		
 		extract_obj(obj);
 		
 		start_action(ch, ACT_PLANTING, 4);

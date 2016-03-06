@@ -268,6 +268,11 @@ ACMD(do_forage) {
 		return;
 	}
 	
+	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You don't have permission to forage here.\r\n");
+		return;
+	}
+	
 	if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_FORAGE)) {
 		msg_to_char(ch, "There's nothing you can forage for here.\r\n");
 		return;

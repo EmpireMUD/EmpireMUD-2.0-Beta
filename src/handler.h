@@ -228,6 +228,7 @@ void remove_offers_by_type(char_data *ch, int type);
 void add_depletion(room_data *room, int type, bool multiple);
 extern int get_depletion(room_data *room, int type);
 void remove_depletion(room_data *room, int type);
+void set_depletion(room_data *room, int type, int value);
 
 // room handlers
 void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers);

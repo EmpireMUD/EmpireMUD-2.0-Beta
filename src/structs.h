@@ -359,6 +359,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_CONFUSING_RANDOMS  BIT(5)	// random exits do not need to match
 #define ADV_NO_NEWBIE  BIT(6)	// prevents spawning on newbie islands
 #define ADV_NEWBIE_ONLY  BIT(7)	// only spawns on newbie islands
+#define ADV_NO_MOB_CLEANUP  BIT(8)	// won't despawn mobs that escaped the instance
 
 
 // adventure link rule types

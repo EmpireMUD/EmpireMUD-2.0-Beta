@@ -38,12 +38,14 @@ extern const char *action_bits[];
 extern const char *affected_bits[];
 extern const char *affect_types[];
 extern const char *alt_dirs[];
+extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
 extern const char *drinks[];
 extern const char *extra_bits[];
 extern const char *item_types[];
 extern const char *genders[];
 extern const char *player_bits[];
+extern const int rev_dir[];
 extern const char *exit_bits[];
 extern const char *mob_move_types[];
 extern struct time_info_data time_info;
@@ -3019,6 +3021,18 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "nohassle")) {
 						snprintf(str, slen,"%d", NOHASSLE(c) ? 1 : 0);
 					}
+					else if (!str_cmp(field, "noskill")) {
+						if (subfield && *subfield && !IS_NPC(c)) {
+							skill_data *sk;							
+							if ((sk = find_skill(subfield)) && !noskill_ok(c, SKILL_VNUM(sk))) {
+								snprintf(str, slen, "1");
+							}
+						}
+						// all other cases...
+						if (*str != '1') {							
+							snprintf(str, slen, "0");
+						}
+					}
 					break;
 				}
 				case 'p': {	// char.p*
@@ -3440,7 +3454,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'b': {	// room.b*
-					if (!str_cmp(field, "building")) {
+					if (!str_cmp(field, "bld_dir")) {
+						int dir;
+						if (subfield && *subfield && ((dir = search_block(subfield, dirs, FALSE)) != NO_DIR || (dir = search_block(subfield, alt_dirs, FALSE)) != NO_DIR)) {
+							room_data *home = HOME_ROOM(r);
+							if (GET_BUILDING(home) && BUILDING_ENTRANCE(home) != NO_DIR) {
+								// adjust for dir
+								dir = confused_dirs[rev_dir[BUILDING_ENTRANCE(home)]][0][dir];
+							}
+							snprintf(str, slen, "%s", dirs[dir]);
+						}
+						else {
+							// no dir or not a valid dir
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "building")) {
 						if (GET_BUILDING(r)) {
 							snprintf(str, slen, "%s", GET_BLD_NAME(GET_BUILDING(r)));
 						}
@@ -3497,7 +3526,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'd': {	// room.d*
 					if (!str_cmp(field, "direction")) {
-						extern const char *dirs[];
 						room_data *targ;
 						int dir;
 				
@@ -3556,6 +3584,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							strcpy(str, "");
+						}
+					}
+					else if (!str_cmp(field, "enter_dir")) {
+						if (BUILDING_ENTRANCE(r) != NO_DIR) {
+							sprinttype(BUILDING_ENTRANCE(r), dirs, str);
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "exit_dir")) {
+						if (BUILDING_ENTRANCE(r) != NO_DIR && rev_dir[BUILDING_ENTRANCE(r)] != NO_DIR) {
+							sprinttype(rev_dir[BUILDING_ENTRANCE(r)], dirs, str);
+						}
+						else {
+							*str = '\0';
 						}
 					}
 					break;

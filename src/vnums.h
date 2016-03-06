@@ -39,8 +39,6 @@
 #define BUILDING_BRIDGE  5133
 #define BUILDING_CARPENTER  5134	// trade.c	-- TODO could be bld flag
 
-#define BUILDING_TAVERN  5138  // custom interior, drinking, etc
-
 #define BUILDING_STEPS  5140	// custom icons
 
 #define BUILDING_HENGE  5142	// spells.c
@@ -50,11 +48,8 @@
 #define BUILDING_SHIPYARD2  5154	// custom icon, ships.c
 
 #define BUILDING_SWAMPWALK  5155
-#define BUILDING_SWAMP_PLATFORM  5156	// custom completion
 
 #define BUILDING_TRAPPERS_POST  5161	// workforce.c
-
-#define BUILDING_SORCERER_TOWER  5164  // custom interior
 
 #define BUILDING_GUARD_TOWER  5167	// act.empire.c
 #define BUILDING_GUARD_TOWER2  5168	// act.empire.c
@@ -65,12 +60,9 @@
 
 #define BUILDING_RIVER_GATE  5176  // custom icons, rituals
 
-#define BUILDING_OASIS_DRAINAGE  5191	// custom completion
-
 
 // Room building vnums
 #define RTYPE_SHIP_HOLDING_PEN  5509	// for the shipping system's storage room
-#define RTYPE_STEALTH_HIDEOUT  5510
 #define RTYPE_SORCERER_TOWER  5511
 
 #define RTYPE_BEDROOM  5601
