@@ -921,7 +921,7 @@ void start_dismantle_building(room_data *loc) {
 		GET_BUILDING_RESOURCES(loc) = GET_BUILT_WITH(loc);
 		GET_BUILT_WITH(loc) = NULL;
 	}
-	else {
+	else if (IS_COMPLETE(loc)) {
 		// backwards-compatible: attempt to detect resources
 		composite_resources = copy_resource_list(GET_CRAFT_RESOURCES(type));
 		if (upgraded) {
@@ -940,7 +940,6 @@ void start_dismantle_building(room_data *loc) {
 		
 		// apply
 		GET_BUILDING_RESOURCES(loc) = composite_resources;
-		free_resource_list(composite_resources);
 	}
 	
 	// remove liquids, etc
