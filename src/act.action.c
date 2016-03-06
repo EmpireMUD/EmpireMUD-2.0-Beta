@@ -186,6 +186,10 @@ void start_action(char_data *ch, int type, int timer) {
 	GET_ACTION_VNUM(ch, 1) = 0;
 	GET_ACTION_VNUM(ch, 2) = 0;
 	GET_ACTION_ROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
+	
+	// ensure no resources already stored
+	free_resource_list(GET_ACTION_RESOURCES(ch));
+	GET_ACTION_RESOURCES(ch) = NULL;
 }
 
 
@@ -1825,8 +1829,9 @@ void process_quarrying(char_data *ch) {
 void process_repairing(char_data *ch) {
 	extern vehicle_data *find_vehicle(int n);
 
-	struct resource_data *res, *found_res = NULL;
-	obj_data *obj, *found_obj = NULL;
+	obj_data *found_obj = NULL;
+	struct resource_data *res;
+	bool found = FALSE;
 	vehicle_data *veh;
 	
 	// first attempt to re-find the vehicle
@@ -1840,50 +1845,10 @@ void process_repairing(char_data *ch) {
 	}
 	
 	// good to repair:
-	
-	// find a resource to process
-	LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
-		// check inventory
-		LL_FOREACH2(ch->carrying, obj, next_content) {
-			if (GET_OBJ_VNUM(obj) == res->vnum) {
-				found_res = res;
-				found_obj = obj;
-				break;
-			}
-		}
-
-		// check room
-		if (!found_obj && can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
-			LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
-				if (GET_OBJ_VNUM(obj) == res->vnum) {
-					found_res = res;
-					found_obj = obj;
-					break;
-				}
-			}
-		}
-		
-		if (found_obj && found_res) {
-			break;
-		}
-	}
-	
-	// found an item to add?
-	if (found_obj && found_res) {
-		found_res->amount -= 1;
-		
-		// check zero-res whether or not we found anything
-		if (found_res->amount <= 0) {
-			LL_DELETE(VEH_NEEDS_RESOURCES(veh), found_res);
-			free(found_res);
-		}
-		
-		// messaging
-		act("You use $p to repair $V.", FALSE, ch, found_obj, veh, TO_CHAR | TO_SPAMMY);
-		act("$n uses $p to repair $V.", FALSE, ch, found_obj, veh, TO_ROOM | TO_SPAMMY);
-		
-		// remove the resource
-		extract_obj(found_obj);
+	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), FALSE, &found_obj))) {
+		// take the item; possibly free the res
+		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_REPAIR, veh, NULL);
+		found = TRUE;
 	}
 	
 	// done?
@@ -1893,7 +1858,7 @@ void process_repairing(char_data *ch) {
 		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
 		act("$V is fully repaired!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
 	}
-	else if (!found_obj) {
+	else if (!found) {
 		GET_ACTION(ch) = ACT_NONE;
 		msg_to_char(ch, "You run out of resources and stop repairing.\r\n");
 		act("$n runs out of resources and stops.", FALSE, ch, NULL, NULL, TO_ROOM);

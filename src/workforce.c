@@ -964,7 +964,11 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 		// check resources...
 		has_res = TRUE;
 		for (res = GET_CRAFT_RESOURCES(craft); res && has_res; res = res->next) {
-			if (!(store = find_stored_resource(emp, GET_ISLAND_ID(room), res->vnum)) || store->amount < res->amount) {
+			if (res->type != RES_OBJECT) {
+				// can ONLY do crafts that use objects
+				has_res = FALSE;
+			}
+			else if (!(store = find_stored_resource(emp, GET_ISLAND_ID(room), res->vnum)) || store->amount < res->amount) {
 				has_res = FALSE;
 			}
 		}
@@ -1040,7 +1044,7 @@ void do_chore_building(empire_data *emp, room_data *room) {
 	void finish_building(char_data *ch, room_data *room);
 	
 	struct empire_storage_data *store = NULL;
-	struct building_resource_type *res = NULL, *temp;
+	struct resource_data *res = NULL;
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BUILDING].mob);
 	bool can_do = FALSE, found = FALSE;
 	
@@ -1048,7 +1052,8 @@ void do_chore_building(empire_data *emp, room_data *room) {
 		can_do = TRUE;
 	}
 	else if ((res = BUILDING_RESOURCES(room))) {
-		if ((store = find_stored_resource(emp, GET_ISLAND_ID(room), res->vnum)) && store->amount > 0) {
+		// can only process objects in this way
+		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, GET_ISLAND_ID(room), res->vnum)) && store->amount > 0) {
 			can_do = TRUE;
 		}
 	}
@@ -1062,7 +1067,7 @@ void do_chore_building(empire_data *emp, room_data *room) {
 			res->amount -= 1;			
 			// remove res?
 			if (res->amount <= 0) {
-				REMOVE_FROM_LIST(res, GET_BUILDING_RESOURCES(room), next);
+				LL_DELETE(GET_BUILDING_RESOURCES(room), res);
 				free(res);
 			}
 		}
@@ -1181,13 +1186,26 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 	void finish_dismantle(char_data *ch, room_data *room);
 	void finish_building(char_data *ch, room_data *room);
 	
-	struct building_resource_type *res, *next_res, *temp;
+	struct resource_data *res, *next_res;
+	bool can_do = FALSE, found = FALSE;
 	char_data *worker;
-	bool found = FALSE;
 	
-	if ((worker = find_chore_worker_in_room(room, chore_data[CHORE_BUILDING].mob))) {
+	// anything we can dismantle?
+	LL_FOREACH(BUILDING_RESOURCES(room), res) {
+		if (res->type == RES_OBJECT) {
+			can_do = TRUE;
+			break;
+		}
+	}
+	
+	if (can_do && (worker = find_chore_worker_in_room(room, chore_data[CHORE_BUILDING].mob))) {
 		for (res = BUILDING_RESOURCES(room); res && !found; res = next_res) {
 			next_res = res->next;
+			
+			// can only remove obj types
+			if (res->type != RES_OBJECT) {
+				continue;
+			}
 			
 			if (res->amount > 0) {
 				found = TRUE;
@@ -1198,7 +1216,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 			
 			// remove res?
 			if (res->amount <= 0) {
-				REMOVE_FROM_LIST(res, GET_BUILDING_RESOURCES(room), next);
+				LL_DELETE(GET_BUILDING_RESOURCES(room), res);
 				free(res);
 			}
 		}
@@ -1219,8 +1237,11 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 		}
 	}
-	else {
+	else if (can_do) {
 		worker = place_chore_worker(emp, CHORE_BUILDING, room);
+	}
+	else if (worker) {
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 }
 
@@ -1904,7 +1925,8 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 	bool can_do = FALSE;
 	
 	if ((res = VEH_NEEDS_RESOURCES(veh))) {
-		if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(veh)), res->vnum)) && store->amount > 0) {
+		// can ONLY do it if it requires an object
+		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(veh)), res->vnum)) && store->amount > 0) {
 			can_do = TRUE;
 		}
 	}

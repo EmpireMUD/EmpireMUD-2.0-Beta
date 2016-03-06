@@ -2453,14 +2453,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && *arg2 && (vnum = atoi(arg1)) > 0 && (amt = atoi(arg2)) != 0 && obj_proto(vnum)) {
-								res = create_resource_list(vnum, ABSOLUTE(amt), NOTHING);
+								add_to_resource_list(&res, RES_OBJECT, vnum, ABSOLUTE(amt), 0);
 								
 								// this sends an error message to c on failure
 								if (amt > 0) {
 									give_resources(c, res, FALSE);
 								}
 								else {
-									extract_resources(c, res, can_use_room(c, IN_ROOM(c), GUESTS_ALLOWED));
+									extract_resources(c, res, can_use_room(c, IN_ROOM(c), GUESTS_ALLOWED), NULL);
 								}
 								
 								free_resource_list(res);
@@ -2591,7 +2591,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "charge_coins")) {
 						if (subfield && isdigit(*subfield)) {
-							charge_coins(c, (type == MOB_TRIGGER) ? GET_LOYALTY((char_data*)go) : REAL_OTHER_COIN, atoi(subfield));
+							charge_coins(c, (type == MOB_TRIGGER) ? GET_LOYALTY((char_data*)go) : REAL_OTHER_COIN, atoi(subfield), NULL);
 							*str = '\0';
 						}
 					}
@@ -2800,7 +2800,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && *arg2 && (vnum = atoi(arg1)) > 0 && (amt = atoi(arg2)) > 0) {
-								res = create_resource_list(vnum, amt, NOTHING);
+								add_to_resource_list(&res, RES_OBJECT, vnum, amt, 0);
 								
 								if (has_resources(c, res, can_use_room(c, IN_ROOM(c), GUESTS_ALLOWED), FALSE)) {
 									snprintf(str, slen, "1");

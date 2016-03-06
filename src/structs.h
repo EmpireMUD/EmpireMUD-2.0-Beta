@@ -1024,6 +1024,48 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_TYPE_HONED  2	// Trade ability
 
 
+// CMP_x: component types
+#define CMP_NONE  0	// not a component
+#define CMP_ADHESIVE  1
+#define CMP_BONE  2
+#define CMP_BLOCK  3
+#define CMP_DYE  4
+#define CMP_FEATHERS  5
+#define CMP_FIBER  6
+#define CMP_FRUIT  7
+#define CMP_FUR  8
+#define CMP_GEM  9
+#define CMP_HANDLE  10
+#define CMP_LEATHER  11
+#define CMP_LUMBER  12
+#define CMP_MEAT  13
+#define CMP_METAL  14
+#define CMP_NAILS  15
+#define CMP_OIL  16
+#define CMP_PILLAR  17
+#define CMP_ROCK  18
+#define CMP_SKIN  19
+#define CMP_STICK  20
+#define CMP_TEXTILE  21
+#define CMP_VEGETABLE  22
+
+
+// CMPF_x: component flags
+#define CMPF_DESERT  BIT(0)
+#define CMPF_FINE  BIT(0)
+#define CMPF_HARD  BIT(0)
+#define CMPF_LARGE  BIT(0)
+#define CMPF_MAGIC  BIT(0)
+#define CMPF_POOR  BIT(0)
+#define CMPF_RARE  BIT(0)
+#define CMPF_RAW  BIT(0)
+#define CMPF_REFINED  BIT(0)
+#define CMPF_SMALL  BIT(0)
+#define CMPF_SOFT  BIT(0)
+#define CMPF_TEMPERATE  BIT(0)
+#define CMPF_TROPICAL  BIT(0)
+
+
 // Container flags -- limited to 31 because of int type in obj value
 #define CONT_CLOSEABLE  BIT(0)	// Container can be closed
 #define CONT_CLOSED  BIT(1)	// Container is closed
@@ -1170,6 +1212,14 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_CUSTOM_WEAR_TO_ROOM  9
 #define OBJ_CUSTOM_REMOVE_TO_CHAR  10
 #define OBJ_CUSTOM_REMOVE_TO_ROOM  11
+
+
+// RES_x: resource requirement types
+#define RES_OBJECT  0	// specific obj (vnum= obj vnum, misc= scale level [refunds only])
+#define RES_COMPONENT  1	// an obj of a given generic type (vnum= CMP_ type, misc= CMPF_ flags)
+#define RES_LIQUID  2	// a volume of a given liquid (vnum= LIQ_ type)
+#define RES_COINS  3	// an amount of coins (vnum= empire id of coins)
+#define RES_POOL  4	// health, mana, etc (vnum= HEALTH, etc)
 
 
 // storage flags (for obj storage locations)
@@ -2299,10 +2349,13 @@ struct augment_type_data {
 };
 
 
-// new resource-required data (for augments)
+// new resource-required data (for augments, crafts, etc)
 struct resource_data {
+	int type;	// RES_ type
 	obj_vnum vnum;	// which item
-	int amount;	// how mant
+	int amount;	// how many
+	int misc;	// various uses
+	
 	struct resource_data *next;	// linked list
 };
 
@@ -2747,6 +2800,7 @@ struct player_special_data {
 	int action_timer;	// ticks to completion (use varies)
 	room_vnum action_room;	// player location
 	int action_vnum[NUM_ACTION_VNUMS];	// slots for storing action data (use varies)
+	struct resource_data *action_resources;	// temporary list for resources stored during actions
 	
 	// locations and movement
 	room_vnum load_room;	// Which room to place char in
@@ -3422,6 +3476,9 @@ struct obj_flag_data {
 	bitvector_t bitvector;	// To set chars bits
 	int material;	// Material this is made out of
 	
+	int cmp_type;	// CMP_ component type (CMP_NONE if not a component)
+	int cmp_flags;	// CMPF_ component flags
+	
 	int current_scale_level;	// level the obj was scaled to, or -1 for not scaled
 	int min_scale_level;	// minimum level this obj may be scaled to
 	int max_scale_level;	// maximum level this obj may be scaled to
@@ -3685,20 +3742,12 @@ struct room_data {
 };
 
 
-// resources left to build/dismantle a room (in complex_room_data)
-struct building_resource_type {
-	obj_vnum vnum;
-	int amount;
-	
-	struct building_resource_type *next;
-};
-
-
 // data used only for rooms that are map buildings, interiors, or adventures
 struct complex_room_data {
 	struct room_direction_data *exits;  // directions
 	
-	struct building_resource_type *to_build;  // for incomplete/dismantled buildings
+	struct resource_data *to_build;  // for incomplete/dismantled buildings
+	struct resource_data *built_with;	// actual list of things used to build it
 	
 	// pointers to the room's building or room template data, IF ANY
 	bld_data *bld_ptr;	// point to building_table proto

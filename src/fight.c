@@ -2160,7 +2160,7 @@ bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
 	
 	// resources if it doesn't have its own
 	if (!default_res) {
-		default_res = create_resource_list(o_NAILS, 1, NOTHING);
+		add_to_resource_list(&default_res, RES_OBJECT, o_NAILS, 1, 0);
 	}
 	
 	// no effect

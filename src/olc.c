@@ -231,6 +231,8 @@ OLC_MODULE(oedit_book);
 OLC_MODULE(oedit_capacity);
 OLC_MODULE(oedit_charges);
 OLC_MODULE(oedit_coinamount);
+OLC_MODULE(oedit_compflags);
+OLC_MODULE(oedit_component);
 OLC_MODULE(oedit_containerflags);
 OLC_MODULE(oedit_contents);
 OLC_MODULE(oedit_custom);
@@ -330,11 +332,17 @@ OLC_MODULE(vedit_shortdescription);
 
 
 // externs
+extern const char *component_flags[];
+extern const char *component_types[];
+extern const char *drinks[];
+extern const char *drinknames[];
 extern const char *interact_types[];
 extern const int interact_attach_types[NUM_INTERACTS];
 extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *olc_flag_bits[];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
+extern const char *pool_types[];
+extern const char *resource_types[];
 
 // external functions
 void replace_question_color(char *input, char *color, char *output);
@@ -588,6 +596,8 @@ const struct olc_command_data olc_data[] = {
 	{ "capacity", oedit_capacity, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "charges", oedit_charges, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "coinamount", oedit_coinamount, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "component", oedit_component, OLC_OBJECT, OLC_CF_EDITOR },	// deliberately before "compflags"
+	{ "compflags", oedit_compflags, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "containerflags", oedit_containerflags, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "contents", oedit_contents, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "custom", oedit_custom, OLC_OBJECT, OLC_CF_EDITOR },
@@ -3026,16 +3036,55 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 * @param char *save_buffer A string to write the output to.
 */
 void get_resource_display(struct resource_data *list, char *save_buffer) {
-	char line[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	struct resource_data *res;
 	obj_data *obj;
 	int num;
 	
 	*save_buffer = '\0';
 	for (res = list, num = 1; res; res = res->next, ++num) {
-		obj = obj_proto(res->vnum);
-		sprintf(line, "%dx %s", res->amount, !obj ? "UNKNOWN" : skip_filler(GET_OBJ_SHORT_DESC(obj)));
-		sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s%s", num, res->vnum, line, (!(num % 2) ? "\r\n" : ""));
+		// RES_x: resource type determines display
+		switch (res->type) {
+			case RES_OBJECT: {
+				obj = obj_proto(res->vnum);
+				sprintf(line, "%dx %s", res->amount, !obj ? "UNKNOWN" : skip_filler(GET_OBJ_SHORT_DESC(obj)));
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s", num, res->vnum, line);
+				break;
+			}
+			case RES_COMPONENT: {
+				if (res->misc) {
+					prettier_sprintbit(res->misc, component_flags, lbuf);
+					strcat(lbuf, " ");
+				}
+				else {
+					*lbuf = '\0';
+				}
+				sprintf(line, "%dx (%s%s)", res->amount, lbuf, component_types[res->vnum]);
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
+				break;
+			}
+			case RES_LIQUID: {
+				sprintf(line, "%d units %s", res->amount, drinks[res->vnum]);
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
+				break;
+			}
+			case RES_COINS: {
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, money_amount(real_empire(res->vnum), res->amount));
+				break;
+			}
+			case RES_POOL: {
+				sprintf(line, "%d %s", res->amount, pool_types[res->vnum]);
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
+				break;
+			}
+			default: {
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, "???");
+			}
+		}
+		
+		if (!(num % 2)) {
+			strcat(save_buffer, "\r\n");
+		}
 	}
 	if (!*save_buffer) {
 		strcpy(save_buffer, "  none\r\n");
@@ -4620,12 +4669,14 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 * @param char *argument The arguments the player entered.
 * @param struct resource_data **list A pointer to a resource list to modify.
 */
-void olc_process_resources(char_data *ch, char *argument, struct resource_data **list) {
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
+void olc_process_resources(char_data *ch, char *argument, struct resource_data **list) {	
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+	char arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH], add_str[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	struct resource_data *res, *next_res, *prev_res, *prev_prev, *change, *temp;
-	obj_vnum vnum;
+	int num, type, misc;
+	any_vnum vnum;
 	bool found;
-	int num;
 	
 	// arg1 arg2 arg3
 	half_chop(argument, arg1, buf);
@@ -4663,37 +4714,112 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 		}
 	}
 	else if (is_abbrev(arg1, "add")) {
-		num = atoi(arg2);
-		vnum = atoi(arg3);
+		strcpy(buf, arg4);	// split out one more arg
+		half_chop(buf, arg4, arg5);
 		
-		if (!*arg2 || !*arg3 || !isdigit(*arg2)) {
-			msg_to_char(ch, "Usage: resource add <quantity> <vnum>\r\n");
+		// arg2 is "type"
+		num = atoi(arg3);
+		vnum = atoi(arg4);	// not necessarily a number though
+		// arg5 may be flags
+		
+		if (!*arg2 || !*arg3 || !isdigit(*arg3)) {
+			msg_to_char(ch, "Usage: resource add <type> <quantity> <vnum/name> [flags, for components only]\r\n");
 		}
-		else if (!obj_proto(vnum)) {
-			msg_to_char(ch, "There is no such object vnum %d.\r\n", vnum);
+		else if ((type = search_block(arg2, resource_types, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Unknown resource type '%s'.\r\n", arg2);
 		}
-		else if (num < 1 || num > 1000) {
-			msg_to_char(ch, "You must specify a quantity between 1 and 1000.\r\n");
+		else if (num < 1 || num > 10000) {
+			msg_to_char(ch, "You must specify a quantity between 1 and 10000, %d given.\r\n", num);
 		}
 		else {
-			found = FALSE;
+			*add_str = '\0';
+			misc = 0;
+			
+			// RES_x: validate arg4/arg5 based on type
+			switch (type) {
+				case RES_OBJECT: {
+					if (!*arg4) {
+						msg_to_char(ch, "Usage: resource add object <quantity> <vnum>\r\n");
+						return;
+					}
+					if (!obj_proto(vnum)) {
+						msg_to_char(ch, "There is no such object vnum %d.\r\n", vnum);
+						return;
+					}
+					
+					snprintf(add_str, sizeof(add_str), "%dx %s", num, skip_filler(get_obj_name_by_proto(vnum)));
+					break;
+				}
+				case RES_COMPONENT: {
+					if (!*arg4) {
+						msg_to_char(ch, "Usage: resource add component <quantity> <type> [flags]\r\n");
+						return;
+					}
+					if ((vnum = search_block(arg4, component_types, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown component type '%s'.\r\n", arg4);
+						return;
+					}
+					
+					if (*arg5) {
+						misc = olc_process_flag(ch, arg5, "component", "resource add component <quantity> <type>", component_flags, NOBITS);
+					}
+					
+					*lbuf = '\0';
+					if (misc) {
+						prettier_sprintbit(misc, component_flags, lbuf);
+						strcat(lbuf, " ");
+					}
+					snprintf(add_str, sizeof(add_str), "%dx (%s%s)", num, lbuf, component_types[vnum]);
+					break;
+				}
+				case RES_LIQUID: {
+					if (*arg5) {
+						// reattach the rest of the arg, for two-word liquids (arg5 isn't used)
+						sprintf(arg4 + strlen(arg4), " %s", arg5);
+					}
+					
+					if (!*arg4) {
+						msg_to_char(ch, "Usage: resource add liquid <units> <name>\r\n");
+						return;
+					}
+					if ((vnum = search_block(arg4, drinks, FALSE)) == NOTHING && (vnum = search_block(arg4, drinknames, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown liquid type '%s'.\r\n", arg4);
+						return;
+					}
+					
+					snprintf(add_str, sizeof(add_str), "%d unit%s of %s", num, PLURAL(num), drinks[vnum]);
+					break;
+				}
+				case RES_COINS: {
+					vnum = OTHER_COIN;
+					snprintf(add_str, sizeof(add_str), "%d misc coin%s", num, PLURAL(num));
+					break;
+				}
+				case RES_POOL: {
+					if (!*arg4) {
+						msg_to_char(ch, "Usage: resource add pool <amount> <type>\r\n");
+						return;
+					}
+					if ((vnum = search_block(arg4, pool_types, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown pool type '%s'.\r\n", arg4);
+						return;
+					}
+					
+					snprintf(add_str, sizeof(add_str), "%d %s point%s", num, pool_types[vnum], PLURAL(num));
+					break;
+				}
+			}
 			
 			CREATE(res, struct resource_data, 1);
+			res->type = type;
 			res->vnum = vnum;
 			res->amount = num;
+			res->misc = misc;
 			
 			// append to end
-			if ((temp = *list)) {
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = res;
-			}
-			else {
-				*list = res;
-			}
+			LL_APPEND(*list, res);
 			
-			msg_to_char(ch, "You add the %dx %s resource requirement.\r\n", num, skip_filler(get_obj_name_by_proto(vnum)));
+			msg_to_char(ch, "You add the %s resource requirement.\r\n", add_str);
 		}
 	}
 	else if (is_abbrev(arg1, "move")) {
@@ -4752,7 +4878,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					}
 					
 					if (found) {
-						msg_to_char(ch, "You move %dx %s %s.\r\n", res->amount, skip_filler(get_obj_name_by_proto(res->vnum)), (up ? "up" : "down"));
+						msg_to_char(ch, "You move resource %d %s.\r\n", atoi(arg2), (up ? "up" : "down"));
 					}
 				}
 				
@@ -4767,12 +4893,12 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 		}
 	}
 	else if (is_abbrev(arg1, "change")) {
-		if (!*arg2 || !*arg3 || !*arg4 || !isdigit(*arg2) || !isdigit(*arg4)) {
-			msg_to_char(ch, "Usage: resource change <number> <quantity | vnum> <value>\r\n");
+		if (!*arg2 || !*arg3 || !*arg4 || !isdigit(*arg2)) {
+			msg_to_char(ch, "Usage: resource change <number> <quantity | vnum | name | flags> <value>\r\n");
 			return;
 		}
 		
-		vnum = atoi(arg4);	// may be used as quantity instead
+		vnum = atoi(arg4);	// may be used as quantity or something else instead (if a number)
 		
 		// verify valid pos
 		num = atoi(arg2);
@@ -4787,16 +4913,19 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			msg_to_char(ch, "Invalid resource number.\r\n");
 		}
 		else if (is_abbrev(arg3, "quantity")) {
-			if (vnum < 1 || vnum > 1000) {
-				msg_to_char(ch, "You must specify a quantity between 1 and 1000.\r\n");
+			if (vnum < 1 || vnum > 10000) {
+				msg_to_char(ch, "You must specify a quantity between 1 and 10000.\r\n");
 			}
 			else {
 				change->amount = vnum;
-				msg_to_char(ch, "You change resource %d (%s)'s quantity to %d.\r\n", atoi(arg2), get_obj_name_by_proto(change->vnum), vnum);
+				msg_to_char(ch, "You change resource %d's quantity to %d.\r\n", atoi(arg2), vnum);
 			}
 		}
 		else if (is_abbrev(arg3, "vnum")) {
-			if (!obj_proto(vnum)) {
+			if (change->type != RES_OBJECT) {
+				msg_to_char(ch, "You can't change the vnum on a resource that isn't an object.\r\n");
+			}
+			else if (!obj_proto(vnum)) {
 				msg_to_char(ch, "There is no such object vnum %d.\r\n", vnum);
 			}
 			else {
@@ -4804,12 +4933,77 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 				msg_to_char(ch, "You change resource %d's vnum to [%d] %s.\r\n", atoi(arg2), vnum, get_obj_name_by_proto(vnum));
 			}
 		}
+		else if (is_abbrev(arg3, "name") || is_abbrev(arg3, "component") || is_abbrev(arg3, "liquid") || is_abbrev(arg3, "pool")) {
+			// RES_x: some resource types support "change name"
+			switch (change->type) {
+				case RES_COMPONENT: {
+					if ((vnum = search_block(arg4, component_types, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown component type '%s'.\r\n", arg4);
+						return;
+					}
+					
+					change->vnum = vnum;
+					
+					*lbuf = '\0';
+					if (change->misc) {
+						prettier_sprintbit(change->misc, component_flags, lbuf);
+						strcat(lbuf, " ");
+					}
+					msg_to_char(ch, "You change resource %d's component to %s%s.", atoi(arg2), lbuf, component_types[vnum]);
+					break;
+				}
+				case RES_LIQUID: {
+					if ((vnum = search_block(arg4, drinks, FALSE)) == NOTHING && (vnum = search_block(arg4, drinknames, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown liquid type '%s'.\r\n", arg4);
+						return;
+					}
+					
+					change->vnum = vnum;
+					msg_to_char(ch, "You change resource %d's liquid to %s.\r\n", atoi(arg2), drinks[vnum]);
+					break;
+				}
+				case RES_POOL: {
+					if ((vnum = search_block(arg4, pool_types, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown pool type '%s'.\r\n", arg4);
+						return;
+					}
+					
+					change->vnum = vnum;
+					msg_to_char(ch, "You change resource %d's pool to %s.\r\n", atoi(arg2), pool_types[vnum]);
+					break;
+				}
+				default: {
+					msg_to_char(ch, "You can't change the name on a %s resource.\r\n", resource_types[change->type]);
+					return;
+				}
+			}
+		}
+		else if (is_abbrev(arg3, "flags")) {
+			if (change->type != RES_COMPONENT) {
+				msg_to_char(ch, "You can't change the vnum on a resource that isn't a component.\r\n");
+			}
+			else {
+				misc = olc_process_flag(ch, arg4, "component", "resource change <number> flags <value>", component_flags, change->misc);
+				
+				// if there are no changes, they should have gotten an error message
+				if (misc != change->misc) {
+					change->misc = misc;
+					
+					*lbuf = '\0';
+					if (misc) {
+						prettier_sprintbit(change->misc, component_flags, lbuf);
+						strcat(lbuf, " ");
+					}
+					msg_to_char(ch, "You change resource %d's component to %s%s.", atoi(arg2), lbuf, component_types[change->vnum]);
+				}
+			}
+		}
 		else {
-			msg_to_char(ch, "Usage: resource change <number> <quantity | vnum> <value>\r\n");
+			msg_to_char(ch, "Usage: resource change <number> <quantity | vnum | name | flags> <value>\r\n");
 		}
 	}
 	else {
-		msg_to_char(ch, "Usage: resource add <quantity> <vnum>\r\n");
+		msg_to_char(ch, "Usage: resource add <type> <quantity> <vnum/name> [flags, for component only]\r\n");
 		msg_to_char(ch, "Usage: resource change <number> <quantity | vnum> <value>\r\n");
 		msg_to_char(ch, "Usage: resource remove <number | all>\r\n");
 		msg_to_char(ch, "Usage: resource move <number> <up | down>\r\n");

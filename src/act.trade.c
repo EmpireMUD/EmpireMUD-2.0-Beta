@@ -463,7 +463,10 @@ void cancel_gen_craft(char_data *ch) {
 	obj_data *obj;
 	
 	if (type && !CRAFT_FLAGGED(type, CRAFT_VEHICLE)) {
-		give_resources(ch, GET_CRAFT_RESOURCES(type), FALSE);
+		// refund the real resources they used
+		give_resources(ch, GET_ACTION_RESOURCES(ch), FALSE);
+		free_resource_list(GET_ACTION_RESOURCES(ch));
+		GET_ACTION_RESOURCES(ch) = NULL;
 
 		// load the drink container back
 		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
@@ -619,11 +622,11 @@ void finish_gen_craft(char_data *ch) {
 * @param craft_data *type The craft recipe.
 */
 void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
-	struct resource_data *res, *found_res = NULL;
-	obj_data *obj, *found_obj = NULL;
+	bool found = FALSE, any = FALSE;
 	char buf[MAX_STRING_LENGTH];
+	obj_data *found_obj = NULL;
+	struct resource_data *res;
 	vehicle_data *veh;
-	bool any = FALSE;
 	char_data *vict;
 	
 	// basic setup
@@ -632,63 +635,11 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		return;
 	}
 	
-	// find a resource to process
-	LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
-		// check inventory
-		LL_FOREACH2(ch->carrying, obj, next_content) {
-			if (GET_OBJ_VNUM(obj) == res->vnum) {
-				found_res = res;
-				found_obj = obj;
-				break;
-			}
-		}
-
-		// check room
-		if (!found_obj && can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
-			LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
-				if (GET_OBJ_VNUM(obj) == res->vnum) {
-					found_res = res;
-					found_obj = obj;
-					break;
-				}
-			}
-		}
+	// find and apply something
+	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), FALSE, &found_obj))) {
+		// take the item; possibly free the res
+		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_CRAFT, veh, NULL);
 		
-		if (found_obj && found_res) {
-			break;
-		}
-	}
-	
-	// found an item to add?
-	if (found_obj && found_res) {
-		found_res->amount -= 1;
-		
-		// check zero-res whether or not we found anything
-		if (found_res->amount <= 0) {
-			LL_DELETE(VEH_NEEDS_RESOURCES(veh), found_res);
-			free(found_res);
-		}
-		
-		// messaging
-		if (has_custom_message(found_obj, OBJ_CUSTOM_CRAFT_TO_CHAR)) {
-			act(get_custom_message(found_obj, OBJ_CUSTOM_CRAFT_TO_CHAR), FALSE, ch, found_obj, veh, TO_CHAR | TO_SPAMMY);
-		}
-		else {
-			snprintf(buf, sizeof(buf), "You %s $V with $p.", gen_craft_data[GET_CRAFT_TYPE(type)].command);
-			act(buf, FALSE, ch, found_obj, veh, TO_CHAR | TO_SPAMMY);
-		}
-		
-		if (has_custom_message(found_obj, OBJ_CUSTOM_CRAFT_TO_ROOM)) {
-			act(get_custom_message(found_obj, OBJ_CUSTOM_CRAFT_TO_ROOM), FALSE, ch, found_obj, veh, TO_ROOM | TO_SPAMMY);
-		}
-		else {
-			snprintf(buf, sizeof(buf), "$n %ss $V with $p.", gen_craft_data[GET_CRAFT_TYPE(type)].command);
-			act(buf, FALSE, ch, found_obj, veh, TO_ROOM | TO_SPAMMY);
-		}
-		
-		// remove the resource
-		extract_obj(found_obj);
-	
 		// experience per resource
 		if (GET_CRAFT_ABILITY(type) != NO_ABIL) {
 			gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 3);
@@ -698,6 +649,8 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 				gain_skill_exp(ch, SKILL_TRADE, 3);
 			}
 		}
+		
+		found = TRUE;
 	}
 	
 	// done?
@@ -715,7 +668,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		
 		load_vtrigger(veh);
 	}
-	else if (!found_obj) {
+	else if (!found) {
 		msg_to_char(ch, "You run out of resources and stop %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		snprintf(buf, sizeof(buf), "$n runs out of resources and stops %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
@@ -954,7 +907,7 @@ ACMD(do_gen_augment) {
 		return;
 	}
 	else {
-		extract_resources(ch, GET_AUG_RESOURCES(aug), FALSE);
+		extract_resources(ch, GET_AUG_RESOURCES(aug), FALSE, NULL);
 		
 		// determine scale cap
 		scale = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
@@ -1271,7 +1224,8 @@ ACMD(do_gen_craft) {
 			find_and_bind(ch, GET_CRAFT_REQUIRES_OBJ(type));
 		}
 		
-		extract_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
+		// must call this after start_action() because it stores resources
+		extract_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), &GET_ACTION_RESOURCES(ch));
 		
 		msg_to_char(ch, "You start %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		sprintf(buf, "$n starts %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
@@ -1322,7 +1276,10 @@ ACMD(do_recipes) {
 				uses_item = TRUE;
 			}
 			for (res = GET_CRAFT_RESOURCES(craft); !uses_item && res; res = res->next) {
-				if (res->vnum == GET_OBJ_VNUM(obj)) {
+				if (res->type == RES_OBJECT && res->vnum == GET_OBJ_VNUM(obj)) {
+					uses_item = TRUE;
+				}
+				else if (res->type == RES_COMPONENT && res->vnum == GET_OBJ_CMP_TYPE(obj) && (res->misc & GET_OBJ_CMP_FLAGS(obj)) == res->misc) {
 					uses_item = TRUE;
 				}
 			}
@@ -1365,7 +1322,10 @@ ACMD(do_recipes) {
 				uses_item = TRUE;
 			}
 			for (res = GET_AUG_RESOURCES(aug); !uses_item && res; res = res->next) {
-				if (res->vnum == GET_OBJ_VNUM(obj)) {
+				if (res->type == RES_OBJECT && res->vnum == GET_OBJ_VNUM(obj)) {
+					uses_item = TRUE;
+				}
+				else if (res->type == RES_COMPONENT && res->vnum == GET_OBJ_CMP_TYPE(obj) && (res->misc & GET_OBJ_CMP_FLAGS(obj)) == res->misc) {
 					uses_item = TRUE;
 				}
 			}
@@ -1457,7 +1417,7 @@ ACMD(do_reforge) {
 	}
 	else if (is_abbrev(arg2, "name")) {
 		// calculate gem cost based on the gear rating of the item
-		res = create_resource_list(o_IRIDESCENT_IRIS, MAX(1, rate_item(obj) / 3), NOTHING);
+		add_to_resource_list(&res, RES_OBJECT, o_IRIDESCENT_IRIS, MAX(1, rate_item(obj) / 3), 0);
 		
 		if (!validate_item_rename(ch, obj, argument)) {
 			// sends own message
@@ -1466,7 +1426,7 @@ ACMD(do_reforge) {
 			// sends own message
 		}
 		else {
-			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
+			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), NULL);
 			
 			// prepare
 			sprintf(buf1, "You name %s%s $p!", GET_OBJ_SHORT_DESC(obj), shared_by(obj, ch));
@@ -1507,7 +1467,7 @@ ACMD(do_reforge) {
 		proto = obj_proto(GET_OBJ_VNUM(obj));
 		
 		// calculate gem cost based on the gear rating of the original item
-		res = create_resource_list(o_BLOODSTONE, MAX(1, (proto ? rate_item(proto) : rate_item(obj)) / 3), NOTHING);
+		add_to_resource_list(&res, RES_OBJECT, o_BLOODSTONE, MAX(1, (proto ? rate_item(proto) : rate_item(obj)) / 3), 0);
 		
 		if (!proto) {
 			msg_to_char(ch, "You can't renew that.\r\n");
@@ -1516,7 +1476,7 @@ ACMD(do_reforge) {
 			// sends own message
 		}
 		else {
-			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
+			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), NULL);
 			
 			// actual reforging: just junk it and load a new one
 			old_stolen_time = obj->stolen_timer;
@@ -1558,7 +1518,7 @@ ACMD(do_reforge) {
 	}
 	else if (is_abbrev(arg2, "superior")) {
 		// calculate gem cost based on the gear rating of the item
-		res = create_resource_list(o_GLOWING_SEASHELL, MAX(1, rate_item(obj) / 3), NOTHING);
+		add_to_resource_list(&res, RES_OBJECT, o_GLOWING_SEASHELL, MAX(1, rate_item(obj) / 3), 0);
 		proto = obj_proto(GET_OBJ_VNUM(obj));
 		
 		if (OBJ_FLAGGED(obj, OBJ_SUPERIOR)) {
@@ -1574,7 +1534,7 @@ ACMD(do_reforge) {
 			// sends own message
 		}
 		else {
-			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
+			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), NULL);
 			
 			// actual reforging: just junk it and load a new one
 			old_stolen_time = obj->stolen_timer;

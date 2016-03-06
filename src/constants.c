@@ -1854,12 +1854,71 @@ const char *color_liquid[] = {
 };
 
 
+// CMP_x: component types
+const char *component_types[] = {
+	"none",
+	"adhesive",
+	"bone",
+	"block",
+	"dye",
+	"feathers",
+	"fiber",
+	"fruit",
+	"fur",
+	"gem",
+	"handle",
+	"leather",
+	"lumber",
+	"meat",
+	"metal",
+	"nails",
+	"oil",
+	"pillar",
+	"rock",
+	"skin",
+	"stick",
+	"textile",
+	"vegetable",
+	"\n"
+};
+
+
+// CMPF_x: component flags
+const char *component_flags[] = {
+	"desert",
+	"fine",
+	"hard",
+	"large",
+	"magic",
+	"poor",
+	"rare",
+	"raw",
+	"refined",
+	"small",
+	"soft",
+	"temperate",
+	"tropical",
+	"\n"
+};
+
+
 /* level of fullness for drink containers */
 const char *fullness[] = {
 	"less than half ",
 	"about half ",
 	"more than half ",
 	""
+};
+
+
+// RES_x: resource requirement types
+const char *resource_types[] = {
+	"object",
+	"component",
+	"liquid",
+	"coins",
+	"pool",
+	"\n"
 };
 
 

@@ -1537,8 +1537,9 @@ bool can_afford_coins(char_data *ch, empire_data *type, int amount) {
 * @param char_data *ch The player.
 * @param empire_data *type Empire who is charging the player (or OTHER_COIN for any coin type).
 * @param int amount How much to charge the player -- must be positive.
+* @param struct resource_data **build_used_list Optional: if not NULL, will build a resource list of the specifc coin types charged.
 */
-void charge_coins(char_data *ch, empire_data *type, int amount) {
+void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_data **build_used_list) {
 	struct coin_data *coin;
 	int this, this_amount;
 	double rate, inv;
@@ -1564,6 +1565,10 @@ void charge_coins(char_data *ch, empire_data *type, int amount) {
 		decrease_coins(ch, REAL_OTHER_COIN, this);
 		// we know it was at least one -- prevent never-hits-zero errors
 		amount -= MAX(1, round(this * rate));
+		
+		if (build_used_list) {
+			add_to_resource_list(build_used_list, RES_COINS, OTHER_COIN, this, 0);
+		}
 	}
 	
 	for (coin = GET_PLAYER_COINS(ch); coin && amount > 0; coin = coin->next) {
@@ -1576,6 +1581,10 @@ void charge_coins(char_data *ch, empire_data *type, int amount) {
 			decrease_coins(ch, emp, this);
 			// we know it was at least one -- prevent never-hits-zero errors
 			amount -= MAX(1, round(this * rate));
+			
+			if (build_used_list) {
+				add_to_resource_list(build_used_list, emp ? EMPIRE_VNUM(emp) : OTHER_COIN, OTHER_COIN, this, 0);
+			}
 		}
 	}
 

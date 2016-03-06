@@ -3065,6 +3065,8 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern const struct material_data materials[NUM_MATERIALS];
 	extern const char *wear_bits[];
 	extern const char *item_types[];
+	extern const char *component_flags[];
+	extern const char *component_types[];
 	extern const char *container_bits[];
 	extern const char *obj_custom_types[];
 	extern const char *storage_bits[];
@@ -3112,6 +3114,19 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		}
 		send_to_char(strcat(buf, "&0\r\n"), ch);
 	}
+	
+	// component info
+	if (GET_OBJ_CMP_TYPE(j) != CMP_NONE) {
+		if (GET_OBJ_CMP_FLAGS(j)) {
+			prettier_sprintbit(GET_OBJ_CMP_FLAGS(j), component_flags, buf);
+			strcat(buf, " ");
+		}
+		else {
+			*buf = '\0';
+		}
+		msg_to_char(ch, "Component type: &y%s%s&0\r\n", buf, component_types[GET_OBJ_CMP_TYPE(j)]);
+	}
+	
 	sprintbit(GET_OBJ_WEAR(j), wear_bits, buf, TRUE);
 	msg_to_char(ch, "Can be worn on: &g%s&0\r\n", buf);
 

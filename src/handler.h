@@ -99,7 +99,7 @@ extern char_data *get_char_world(char *name);
 
 // coin handlers
 extern bool can_afford_coins(char_data *ch, empire_data *type, int amount);
-void charge_coins(char_data *ch, empire_data *type, int amount);
+void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_data **build_used_list);
 void cleanup_all_coins();
 void cleanup_coins(char_data *ch);
 void coin_string(struct coin_data *list, char *storage);

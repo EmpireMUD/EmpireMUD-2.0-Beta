@@ -48,9 +48,14 @@
 */
 
 // external vars
+extern const char *component_flags[];
+extern const char *component_types[];
+extern const char *drinks[];
+extern const char *pool_types[];
 
 // external funcs
 void scale_item_to_level(obj_data *obj, int level);
+void send_char_pos(char_data *ch, int dam);
 
 // locals
 #define WHITESPACE " \t"	// used by some of the string functions
@@ -2227,6 +2232,228 @@ bool wake_and_stand(char_data *ch) {
 //// RESOURCE UTILS //////////////////////////////////////////////////////////
 
 /**
+* Combines some resource data into an existing resource list, combining if
+* possible.
+*
+* @param struct resource_data **list The list to add to.
+* @param int type The RES_ type.
+* @param any_vnum vnum The appropriate vnum for 'type'.
+* @param int amount How many/much of that thing.
+* @param int misc For types that use the misc field.
+*/
+void add_to_resource_list(struct resource_data **list, int type, any_vnum vnum, int amount, int misc) {
+	struct resource_data *res;
+	bool found = FALSE;
+	
+	// prefer to combine
+	LL_FOREACH(*list, res) {
+		if (res->type == type && res->vnum == vnum && res->misc == misc) {
+			SAFE_ADD(res->amount, amount, INT_MIN, INT_MAX, FALSE);
+			found = TRUE;
+		}
+	}
+	
+	// append if not found
+	if (!found) {
+		CREATE(res, struct resource_data, 1);
+		res->type = type;
+		res->vnum = vnum;
+		res->amount = amount;
+		res->misc = misc;
+		
+		LL_APPEND(*list, res);
+	}
+}
+
+
+/**
+* Applies a previously found resource_data (and sometimes matching obj) to a
+* building or other one-at-a-time craft. This is called using the resource and
+* found object from get_next_resource().
+*
+* @param char_data *ch The player doing the work.
+* @param struct resource_data *res The resource entry they are applying (may be freed!).
+* @param struct resource_data **list A pointer to the resource list they are working on (res may be removed from it).
+* @param obj_data *use_obj Optional: If an item was found, pass it here -- it will probably be extracted.
+* @param int msg_type APPLY_RES_BUILD, etc -- for how to message.
+* @param vehicle_data *crafting_veh Optional: used for APPLY_RES_CRAFT messages.
+* @param struct resource_data **build_used_list Optional: If you need to track the actual resources used, pass a pointer to that list.
+*/
+void apply_resource(char_data *ch, struct resource_data *res, struct resource_data **list, obj_data *use_obj, int msg_type, vehicle_data *crafting_veh, struct resource_data **build_used_list) {
+	bool messaged_char = FALSE, messaged_room = FALSE;
+	char buf[MAX_STRING_LENGTH];
+	int amt;
+	
+	if (!ch || !res) {
+		return;	// nothing to do
+	}
+	
+	// APPLPY_RES_x: send custom messages (only) now
+	if (use_obj) {
+		switch (msg_type) {
+			case APPLY_RES_BUILD: {
+				if (!messaged_char && has_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_CHAR)) {
+					act(get_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_CHAR), FALSE, ch, use_obj, NULL, TO_CHAR | TO_SPAMMY);
+					messaged_char = TRUE;
+				}		
+				if (!messaged_room && has_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_ROOM)) {
+					act(get_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_ROOM), FALSE, ch, use_obj, NULL, TO_ROOM | TO_SPAMMY);
+					messaged_room = TRUE;
+				}
+				break;
+			}
+			case APPLY_RES_CRAFT: {
+				if (!messaged_char && has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR)) {
+					act(get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR), FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+					messaged_char = TRUE;
+				}
+				if (!messaged_room && has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM)) {
+					act(get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM), FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+					messaged_room = TRUE;
+				}
+				break;
+			}
+			case APPLY_RES_REPAIR: {
+				if (!messaged_char) {
+					act("You use $p to repair $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+					messaged_char = TRUE;
+				}
+				if (!messaged_room) {
+					act("$n uses $p to repair $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+					messaged_room = TRUE;
+				}
+				break;
+			}
+		}
+	}
+	
+	// RES_x: Remove one resource based on type.
+	switch (res->type) {
+		case RES_OBJECT:	// obj/component are just simple objs
+		case RES_COMPONENT: {
+			// APPLY_RES_x: generic messaging if not previously sent
+			switch (msg_type) {
+				case APPLY_RES_BUILD: {
+					if (!messaged_char) {
+						act("You carefully place $p in the structure.", FALSE, ch, use_obj, NULL, TO_CHAR | TO_SPAMMY);
+					}
+					if (!messaged_room) {
+						act("$n places $p carefully in the structure.", FALSE, ch, use_obj, NULL, TO_ROOM | TO_SPAMMY);
+					}
+					break;
+				}
+				case APPLY_RES_CRAFT: {
+					if (!messaged_char) {
+						act("You place $p onto $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+					}
+					if (!messaged_room) {
+						act("$n places $p onto $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+					}
+					break;
+				}
+				// already messaged APPLY_RES_REPAIR for this type
+			}
+			
+			res->amount -= 1;
+			if (use_obj) {
+				if (build_used_list) {
+					add_to_resource_list(build_used_list, RES_OBJECT, GET_OBJ_VNUM(use_obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(use_obj));
+				}
+				extract_obj(use_obj);
+			}
+			break;
+		}
+		case RES_LIQUID: {
+			// APPLY_RES_x: generic messaging if not previously sent
+			switch (msg_type) {
+				case APPLY_RES_BUILD: {
+					if (!messaged_char) {
+						act("You carefully pour $p into structure.", FALSE, ch, use_obj, NULL, TO_CHAR | TO_SPAMMY);
+					}
+					if (!messaged_room) {
+						act("$n pours $p carefully into structure.", FALSE, ch, use_obj, NULL, TO_ROOM | TO_SPAMMY);
+					}
+					break;
+				}
+				case APPLY_RES_CRAFT: {
+					if (!messaged_char) {
+						act("You pour $p into $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+					}
+					if (!messaged_room) {
+						act("$n pours $p into $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+					}
+					break;
+				}
+				// already messaged APPLY_RES_REPAIR for this type
+			}
+			
+			if (use_obj) {
+				amt = GET_DRINK_CONTAINER_CONTENTS(use_obj);
+				amt = MIN(res->amount, amt);
+				
+				res->amount -= amt;
+				GET_OBJ_VAL(use_obj, VAL_DRINK_CONTAINER_CONTENTS) -= amt;
+				if (GET_DRINK_CONTAINER_CONTENTS(use_obj) == 0) {
+					GET_OBJ_VAL(use_obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+				}
+				
+				if (build_used_list) {
+					add_to_resource_list(build_used_list, RES_LIQUID, res->vnum, amt, 0);
+				}
+			}
+			break;
+		}
+		case RES_COINS: {
+			empire_data *coin_emp = real_empire(res->vnum);
+			
+			if (!messaged_char && msg_type != APPLY_RES_SILENT) {
+				snprintf(buf, sizeof(buf), "You spend %s.", money_amount(coin_emp, res->amount));
+				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+			}
+			if (!messaged_room && msg_type != APPLY_RES_SILENT) {
+				snprintf(buf, sizeof(buf), "$n spends %s.", money_amount(coin_emp, res->amount));
+				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+			}
+			
+			charge_coins(ch, coin_emp, res->amount, build_used_list);
+			break;
+		}
+		case RES_POOL: {
+			if (!messaged_char && msg_type != APPLY_RES_SILENT) {
+				snprintf(buf, sizeof(buf), "You spend %d %s point%s.", res->amount, pool_types[res->vnum], PLURAL(res->amount));
+				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+			}
+			if (!messaged_room && msg_type != APPLY_RES_SILENT) {
+				snprintf(buf, sizeof(buf), "$n spends %s %s point%s.", (res->amount != 1) ? "some" : "a", pool_types[res->vnum], PLURAL(res->amount));
+				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+			}
+			
+			if (build_used_list) {
+				add_to_resource_list(build_used_list, RES_POOL, res->vnum, res->amount, 0);
+			}
+			
+			GET_CURRENT_POOL(ch, res->vnum) -= res->amount;
+			GET_CURRENT_POOL(ch, res->vnum) = MAX(0, GET_CURRENT_POOL(ch, res->vnum));
+			
+			if (res->vnum == HEALTH) {
+				update_pos(ch);
+				send_char_pos(ch, 0);
+			}
+			break;
+		}
+	}
+	
+	// now possibly remove the resource, if it hit zero
+	if (res->amount <= 0) {
+		if (list) {
+			LL_DELETE(*list, res);
+		}
+		free(res);
+	}
+}
+
+
+/**
 * Extract resources from the list, hopefully having checked has_resources, as
 * this function does not error if it runs out -- it just keeps extracting
 * until it's out of items, or hits its required limit.
@@ -2236,34 +2463,198 @@ bool wake_and_stand(char_data *ch) {
 * @param char_data *ch The person whose resources to take.
 * @param struct resource_data *list Any resource list.
 * @param bool ground If TRUE, will also take resources off the ground.
+* @param struct resource_data **build_used_list Optional: if not NULL, will build a resource list of the specifc things extracted.
 */
-void extract_resources(char_data *ch, struct resource_data *list, bool ground) {
-	struct resource_data *res;
+void extract_resources(char_data *ch, struct resource_data *list, bool ground, struct resource_data **build_used_list) {
 	obj_data *obj, *next_obj;
-	int remaining;
+	int diff, liter, remaining;
+	struct resource_data *res;
 	
-	for (res = list; res; res = res->next) {
-		remaining = res->amount;
-
-		for (obj = ch->carrying; obj && remaining > 0; obj = next_obj) {
-			next_obj = obj->next_content;
-
-			if (GET_OBJ_VNUM(obj) == res->vnum) {
-				--remaining;
-				extract_obj(obj);
-			}
-		}
-		if (ground) {
-			for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj && remaining > 0; obj = next_obj) {
-				next_obj = obj->next_content;
-
-				if (GET_OBJ_VNUM(obj) == res->vnum) {
-					--remaining;
-					extract_obj(obj);
+	LL_FOREACH(list, res) {
+		// RES_x: extract resources by type
+		switch (res->type) {
+			case RES_OBJECT:
+			case RES_COMPONENT:
+			case RES_LIQUID: {	// these 3 types check objects
+				obj_data *search_list[2];
+				search_list[0] = ch->carrying;
+				search_list[1] = ground ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+				
+				remaining = res->amount;
+				
+				// up to two places to search
+				for (liter = 0; liter < 2 && remaining > 0; ++liter) {
+					LL_FOREACH_SAFE2(search_list[liter], obj, next_obj, next_content) {
+						// RES_x: just types that need objects
+						switch (res->type) {
+							case RES_OBJECT: {
+								if (GET_OBJ_VNUM(obj) == res->vnum) {
+									if (build_used_list) {
+										add_to_resource_list(build_used_list, RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+									}
+									
+									--remaining;
+									extract_obj(obj);
+								}
+								break;
+							}
+							case RES_COMPONENT: {
+								// require full match on cmp flags
+								if (GET_OBJ_CMP_TYPE(obj) == res->vnum && (GET_OBJ_CMP_FLAGS(obj) & res->misc) == res->misc) {
+									if (build_used_list) {
+										add_to_resource_list(build_used_list, RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+									}
+									
+									--remaining;
+									extract_obj(obj);
+								}
+								break;
+							}
+							case RES_LIQUID: {
+								if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == res->vnum) {
+									diff = MIN(remaining, GET_DRINK_CONTAINER_CONTENTS(obj));
+									remaining -= diff;
+									GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) -= diff;
+									
+									if (GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) == 0) {
+										GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+									}
+									
+									if (build_used_list) {
+										add_to_resource_list(build_used_list, RES_LIQUID, res->vnum, diff, 0);
+									}
+								}
+								break;
+							}
+						}
+						
+						// ok to break out early if we found enough
+						if (remaining <= 0) {
+							break;
+						}
+					}
 				}
+				break;
+			}
+			case RES_COINS: {
+				charge_coins(ch, real_empire(res->vnum), res->amount, build_used_list);
+				break;
+			}
+			case RES_POOL: {
+				if (build_used_list) {
+					add_to_resource_list(build_used_list, RES_POOL, res->vnum, res->amount, 0);
+				}
+				
+				GET_CURRENT_POOL(ch, res->vnum) -= res->amount;
+				GET_CURRENT_POOL(ch, res->vnum) = MAX(0, GET_CURRENT_POOL(ch, res->vnum));
+				
+				if (res->vnum == HEALTH) {
+					update_pos(ch);
+					send_char_pos(ch, 0);
+				}
+				break;
 			}
 		}
 	}
+}
+
+
+/**
+* Finds the next resource a character has available, from a list. This can be
+* used to get the next <thing> for any one-at-a-time building task, including
+* vehicles. This function returns the resource_data pointer, and will bind the
+* object it found (if applicable to the resource type), but it doesn't extract
+* or free anything.
+*
+* Apply the found resource using apply_resource().
+*
+* @param char_data *ch The person who is doing the building.
+* @param struct resource_data *list The resource list he's working on.
+* @param bool ground TRUE if the character can use items off the ground (in addition to inventory).
+* @param bool left2right If TRUE, requires the leftmost resource first (blocks progress).
+* @param obj_data **found_obj A variable to bind the matching item to, for resources that require items.
+*/
+struct resource_data *get_next_resource(char_data *ch, struct resource_data *list, bool ground, bool left2right, obj_data **found_obj) {
+	struct resource_data *res, *found_res;
+	int liter, amt;
+	obj_data *obj;
+	
+	*found_obj = NULL;
+	found_res = NULL;
+	
+	LL_FOREACH(list, res) {
+		// RES_x: find first resource by type
+		switch (res->type) {
+			case RES_OBJECT:
+			case RES_COMPONENT:
+			case RES_LIQUID: {	// these 3 types check objects
+				obj_data *search_list[2];
+				search_list[0] = ch->carrying;
+				search_list[1] = ground ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+				
+				// up to two places to search
+				for (liter = 0; liter < 2; ++liter) {
+					LL_FOREACH2(search_list[liter], obj, next_content) {
+						// RES_x: just types that need objects
+						switch (res->type) {
+							case RES_OBJECT: {
+								if (GET_OBJ_VNUM(obj) == res->vnum) {
+									// got one!
+									*found_obj = obj;
+									return res;
+								}
+								break;
+							}
+							case RES_COMPONENT: {
+								// require full match on cmp flags
+								if (GET_OBJ_CMP_TYPE(obj) == res->vnum && (GET_OBJ_CMP_FLAGS(obj) & res->misc) == res->misc) {
+									// got one!
+									*found_obj = obj;
+									return res;
+								}
+								break;
+							}
+							case RES_LIQUID: {
+								if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == res->vnum && GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
+									// got one!
+									*found_obj = obj;
+									return res;
+								}
+								break;
+							}
+						}
+					}
+				}
+				break;
+			}
+			case RES_COINS: {
+				if (can_afford_coins(ch, real_empire(res->vnum), res->amount)) {
+					// success!
+					return res;
+				}
+				break;
+			}
+			case RES_POOL: {
+				// special rule: require that blood or health costs not reduce player below 1
+				amt = res->amount + ((res->vnum == HEALTH || res->vnum == BLOOD) ? 1 : 0);
+	
+				// more player checks
+				if (GET_CURRENT_POOL(ch, res->vnum) >= amt) {
+					// success!
+					return res;
+				}
+				break;
+			}
+		}
+		
+		// if they requested left-to-right, we never pass the first resource in the list
+		if (left2right) {
+			break;
+		}
+	}
+	
+	// found nothing
+	return NULL;
 }
 
 
@@ -2275,27 +2666,101 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground) {
 * @param bool split If TRUE, gives back only half.
 */
 void give_resources(char_data *ch, struct resource_data *list, bool split) {
+	int diff, liter, remaining;
 	struct resource_data *res;
+	bool last = FALSE;
 	obj_data *obj;
-	int j, remaining;
 	
-	for (res = list; res; res = res->next) {
-		remaining = res->amount;
-
-		if (split) {
-			remaining /= 2;
-		}
-
-		if (obj_proto(res->vnum)) {
-			for (j = 0; j < remaining; ++j) {
-				obj = read_object(res->vnum, TRUE);
-				
-				// scale item to minimum level
-				scale_item_to_level(obj, 0);
-				
-				obj_to_char(obj, ch);
-				load_otrigger(obj);
+	LL_FOREACH(list, res) {
+		// RES_x: give resources by type
+		switch (res->type) {
+			case RES_COMPONENT: {
+				// nothing to do -- we can't refund a generic component
+				break;
 			}
+			case RES_OBJECT: {
+				for (remaining = res->amount; remaining > 0; --remaining) {
+					// skip every-other-thing
+					if (last && split) {
+						last = FALSE;
+						continue;
+					}
+					last = TRUE;
+					
+					// replace the obj
+					obj = read_object(res->vnum, TRUE);
+					
+					// scale item to "misc" level if applicable (will be 0/minimum if not)
+					scale_item_to_level(obj, res->misc);
+					
+					obj_to_char(obj, ch);
+					load_otrigger(obj);
+				}
+				break;
+			}
+			case RES_LIQUID: {
+				obj_data *search_list[2] = { ch->carrying, ROOM_CONTENTS(IN_ROOM(ch)) };
+				remaining = res->amount / (split ? 2 : 1);
+				last = FALSE;	// cause next obj to refund
+				
+				// up to two places to search for containers to fill
+				for (liter = 0; liter < 2 && remaining > 0; ++liter) {
+					LL_FOREACH2(search_list[liter], obj, next_content) {
+						if (IS_DRINK_CONTAINER(obj) && (GET_DRINK_CONTAINER_TYPE(obj) == res->vnum || GET_DRINK_CONTAINER_CONTENTS(obj) == 0)) {
+							diff = GET_DRINK_CONTAINER_CAPACITY(obj) - GET_DRINK_CONTAINER_CONTENTS(obj);
+							diff = MIN(remaining, diff);
+							remaining -= diff;
+							GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) += diff;
+							
+							// set type in case container was empty
+							if (GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
+								GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = res->vnum;
+							}
+						}
+						
+						// ok to break out early if we gave enough
+						if (remaining <= 0) {
+							break;
+						}
+					}
+				}
+				break;
+			}
+			case RES_COINS: {
+				increase_coins(ch, real_empire(res->vnum), res->amount / (split ? 2 : 1));
+				last = FALSE;	// cause next obj to refund
+				break;
+			}
+			case RES_POOL: {
+				GET_CURRENT_POOL(ch, res->vnum) += res->amount / (split ? 2 : 1);
+				GET_CURRENT_POOL(ch, res->vnum) = MIN(GET_MAX_POOL(ch, res->vnum), GET_CURRENT_POOL(ch, res->vnum));
+				if (GET_HEALTH(ch) > 0 && GET_POS(ch) <= POS_STUNNED) {
+					GET_POS(ch) = POS_RESTING;
+				}
+				last = FALSE;	// cause next obj to refund
+				break;
+			}
+		}
+	}
+}
+
+
+/**
+* Cuts a list of resources in half, for things that only return half. Empty
+* entries (half=0) will be removed.
+*
+* @param struct resource_data **list The list to halve.
+* @param bool remove_nonrefundables If TRUE, removes entries that cannot be refunded.
+*/
+void halve_resource_list(struct resource_data **list, bool remove_nonrefundables) {
+	struct resource_data *res, *next_res;
+	
+	LL_FOREACH_SAFE(*list, res, next_res) {
+		res->amount /= 2;
+		
+		if (res->amount == 0 || res->type == RES_COMPONENT) {
+			LL_DELETE(*list, res);
+			free(res);
 		}
 	}
 }
@@ -2309,45 +2774,177 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 * @param bool ground If TRUE, will also count resources on the ground.
 * @param bool send_msgs If TRUE, will alert the character as to what they need. FALSE runs silently.
 */
-bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs) {
+bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs) {	
+	char lbuf[MAX_STRING_LENGTH];
 	struct resource_data *res;
-	obj_data *obj, *proto;
+	int total, amt, liter;
 	bool ok = TRUE;
-	int total;
+	obj_data *obj;
 	
-	for (res = list, total = 0; res; res = res->next, total = 0) {
-		for (obj = ch->carrying; obj && total < res->amount; obj = obj->next_content) {
-			if (GET_OBJ_VNUM(obj) == res->vnum) {
-				// check full of water for drink containers
-				if (!IS_DRINK_CONTAINER(obj) || (GET_DRINK_CONTAINER_CONTENTS(obj) >= GET_DRINK_CONTAINER_CAPACITY(obj) && GET_DRINK_CONTAINER_TYPE(obj) == LIQ_WATER)) {
-					++total;
-				}
-			}
-		}
-		if (ground) {
-			for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj && total < res->amount; obj = obj->next_content) {
-				if (GET_OBJ_VNUM(obj) == res->vnum) {
-					// check full of water for drink containers
-					if (!IS_DRINK_CONTAINER(obj) || (GET_DRINK_CONTAINER_CONTENTS(obj) >= GET_DRINK_CONTAINER_CAPACITY(obj) && GET_DRINK_CONTAINER_TYPE(obj) == LIQ_WATER)) {
-						++total;
+	LL_FOREACH(list, res) {
+		total = 0;
+		
+		// RES_x: check resources by type
+		switch (res->type) {
+			case RES_OBJECT:
+			case RES_COMPONENT:
+			case RES_LIQUID: {	// these 3 types check objects
+				obj_data *search_list[2];
+				search_list[0] = ch->carrying;
+				search_list[1] = ground ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+				
+				// more than one place to search...
+				for (liter = 0; liter < 2 && total < res->amount; ++liter) {
+					LL_FOREACH2(search_list[liter], obj, next_content) {
+						// RES_x: just types that need objects
+						switch (res->type) {
+							case RES_OBJECT: {
+								if (GET_OBJ_VNUM(obj) == res->vnum) {
+									++total;
+								}
+								break;
+							}
+							case RES_COMPONENT: {
+								// require full match on cmp flags
+								if (GET_OBJ_CMP_TYPE(obj) == res->vnum && (GET_OBJ_CMP_FLAGS(obj) & res->misc) == res->misc) {
+									++total;
+								}
+								break;
+							}
+							case RES_LIQUID: {
+								if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == res->vnum) {
+									// add the volume of liquid
+									total += GET_DRINK_CONTAINER_CONTENTS(obj);
+								}
+								break;
+							}
+						}
+						
+						// ok to break out early if we found enough
+						if (total >= res->amount) {
+							break;
+						}
 					}
 				}
-			}
-		}
 
-		if (total < res->amount) {
-			if (send_msgs && (proto = obj_proto(res->vnum))) {
-				msg_to_char(ch, "%s %d more of %s%s", (ok ? "You need" : ","), res->amount - total, skip_filler(GET_OBJ_SHORT_DESC(proto)), IS_DRINK_CONTAINER(proto) ? " (full of water)" : "");
+				if (total < res->amount) {
+					if (send_msgs) {
+						// RES_x: just types that need objects
+						switch (res->type) {
+							case RES_OBJECT: {
+								msg_to_char(ch, "%s %d more of %s", (ok ? "You need" : ","), res->amount - total, skip_filler(get_obj_name_by_proto(res->vnum)));
+								break;
+							}
+							case RES_COMPONENT: {
+								if (res->misc) {
+									prettier_sprintbit(res->misc, component_flags, lbuf);
+									strcat(lbuf, " ");
+								}
+								else {
+									*lbuf = '\0';
+								}
+								msg_to_char(ch, "%s %d more (%s%s)", (ok ? "You need" : ","), res->amount - total, lbuf, component_types[res->vnum]);
+								break;
+							}
+							case RES_LIQUID: {
+								msg_to_char(ch, "%s %d more unit%s of %s", (ok ? "You need" : ","), res->amount - total, PLURAL(res->amount - total), drinks[res->vnum]);
+								break;
+							}
+						}
+					}
+					ok = FALSE;
+				}
+				break;
 			}
-			ok = FALSE;
+			case RES_COINS: {
+				empire_data *coin_emp = real_empire(res->vnum);
+				if (!can_afford_coins(ch, coin_emp, res->amount)) {
+					if (send_msgs) {
+						msg_to_char(ch, "%s %s", (ok ? "You need" : ","), money_amount(coin_emp, res->amount));
+					}
+					ok = FALSE;
+				}
+				break;
+			}
+			case RES_POOL: {
+				// special rule: require that blood or health costs not reduce player below 1
+				amt = res->amount + ((res->vnum == HEALTH || res->vnum == BLOOD) ? 1 : 0);
+	
+				// more player checks
+				if (amt >= 0 && GET_CURRENT_POOL(ch, res->vnum) < amt) {
+					if (send_msgs) {
+						msg_to_char(ch, "%s %d more %s point%s", (ok ? "You need" : ","), amt - GET_CURRENT_POOL(ch, res->vnum), pool_types[res->vnum], PLURAL(amt - GET_CURRENT_POOL(ch, res->vnum)));
+					}
+					ok = FALSE;
+				}
+				break;
+			}
 		}
 	}
 	
 	if (!ok && send_msgs) {
 		send_to_char(".\r\n", ch);
 	}
-
+	
 	return ok;
+}
+
+
+/**
+* Gets the resources-needed list for display to mortals.
+*
+* @param struct resource_data *list The list to show.
+* @param char *save_buffer A string to write the output to.
+*/
+void show_resource_list(struct resource_data *list, char *save_buffer) {
+	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	struct resource_data *res;
+	bool found = FALSE;
+	
+	*save_buffer = '\0';
+	
+	LL_FOREACH(list, res) {
+		*line = '\0';
+		// RES_x: resource type determines display
+		switch (res->type) {
+			case RES_OBJECT: {
+				sprintf(line, "%dx %s", res->amount, skip_filler(get_obj_name_by_proto(res->vnum)));
+				break;
+			}
+			case RES_COMPONENT: {
+				if (res->misc) {
+					prettier_sprintbit(res->misc, component_flags, lbuf);
+					strcat(lbuf, " ");
+				}
+				else {
+					*lbuf = '\0';
+				}
+				sprintf(line, "%dx (%s%s)", res->amount, lbuf, component_types[res->vnum]);
+				break;
+			}
+			case RES_LIQUID: {
+				sprintf(line, "%d unit%s of %s", res->amount, PLURAL(res->amount), drinks[res->vnum]);
+				break;
+			}
+			case RES_COINS: {
+				strcpy(line, money_amount(real_empire(res->vnum), res->amount));
+				break;
+			}
+			case RES_POOL: {
+				sprintf(line, "%d %s point%s", res->amount, pool_types[res->vnum], PLURAL(res->amount));
+				break;
+			}
+		}
+		
+		if (*line) {
+			sprintf(save_buffer + strlen(save_buffer), "%s%s", (found ? ", " : ""), line);
+			found = TRUE;
+		}
+	}
+	
+	if (!*save_buffer) {
+		strcpy(save_buffer, "nothing");
+	}
 }
 
 

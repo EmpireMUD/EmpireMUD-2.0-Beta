@@ -906,7 +906,8 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 		fprintf(fl, "Animal: %d %d %s %d\n", vam->mob, vam->scale_level, bitv_to_alpha(vam->flags), vam->empire);
 	}
 	LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
-		fprintf(fl, "Needs-res: %d %d\n", res->vnum, res->amount);
+		// arg order is backwards-compatible to pre-2.0b3.17
+		fprintf(fl, "Needs-res: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
 	}
 	
 	// scripts
@@ -937,7 +938,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH];
 	obj_data *load_obj, *obj2, *cont_row[MAX_BAG_ROWS];
 	struct vehicle_attached_mob *vam, *last_vam = NULL;
-	int length, iter, i_in[3], location = 0, timer;
+	int length, iter, i_in[4], location = 0, timer;
 	struct resource_data *res, *last_res = NULL;
 	vehicle_data *proto = vehicle_proto(vnum);
 	bool end = FALSE, seek_end = FALSE;
@@ -1160,20 +1161,33 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 			}
 			case 'N': {
 				if (OBJ_FILE_TAG(line, "Needs-res:", length)) {
-					if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
-						CREATE(res, struct resource_data, 1);
-						res->vnum = i_in[0];
-						res->amount = i_in[1];
-						
-						// append
-						if (last_res) {
-							last_res->next = res;
-						}
-						else {
-							VEH_NEEDS_RESOURCES(veh) = res;
-						}
-						last_res = res;
+					if (sscanf(line + length + 1, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
+						// all args present
 					}
+					else if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
+						// backwards-compatible to pre-2.0b3.17
+						i_in[2] = RES_OBJECT;
+						i_in[3] = 0;
+					}
+					else {
+						// unknown number of args?
+						break;
+					}
+					
+					CREATE(res, struct resource_data, 1);
+					res->vnum = i_in[0];
+					res->amount = i_in[1];
+					res->type = i_in[2];
+					res->misc = i_in[3];
+					
+					// append
+					if (last_res) {
+						last_res->next = res;
+					}
+					else {
+						VEH_NEEDS_RESOURCES(veh) = res;
+					}
+					last_res = res;
 				}
 				break;
 			}
@@ -1483,7 +1497,7 @@ void write_vehicle_index(FILE *fl) {
 */
 void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	void script_save_to_disk(FILE *fp, void *item, int type);
-	void write_resources_to_file(FILE *fl, struct resource_data *list);
+	void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
 	
 	char temp[MAX_STRING_LENGTH];
 	
@@ -1520,7 +1534,7 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	}
 	
 	// 'R': resources
-	write_resources_to_file(fl, VEH_YEARLY_MAINTENANCE(veh));
+	write_resources_to_file(fl, 'R', VEH_YEARLY_MAINTENANCE(veh));
 	
 	// T, V: triggers
 	script_save_to_disk(fl, veh, VEH_TRIGGER);
@@ -2146,6 +2160,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 * @param char_data *ch The person to show the output to.
 */
 void look_at_vehicle(vehicle_data *veh, char_data *ch) {
+	char lbuf[MAX_STRING_LENGTH];
 	vehicle_data *proto;
 	
 	if (!veh || !ch || !ch->desc) {
@@ -2170,26 +2185,13 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 	}
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {
-		struct resource_data *res;
-		bool found = FALSE;
+		show_resource_list(VEH_NEEDS_RESOURCES(veh), lbuf);
 		
 		if (VEH_IS_COMPLETE(veh)) {
-			msg_to_char(ch, "Maintenance needed: ");
+			msg_to_char(ch, "Maintenance needed: %s\r\n", lbuf);
 		}
 		else {
-			msg_to_char(ch, "Resources to completion: ");
-		}
-		
-		LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
-			msg_to_char(ch, "%s%s (x%d)", (found ? ", " : ""), skip_filler(get_obj_name_by_proto(res->vnum)), res->amount);
-			found = TRUE;
-		}
-		
-		if (found) {
-			msg_to_char(ch, "\r\n");
-		}
-		else {
-			msg_to_char(ch, "none\r\n");	// can we even get here?
+			msg_to_char(ch, "Resources to completion: %s\r\n", lbuf);
 		}
 	}
 }

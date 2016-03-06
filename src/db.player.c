@@ -794,6 +794,8 @@ void free_char(char_data *ch) {
 			free(GET_DISGUISED_NAME(ch));
 		}
 		
+		free_resource_list(GET_ACTION_RESOURCES(ch));
+		
 		for (loadslash = LOAD_SLASH_CHANNELS(ch); loadslash; loadslash = next_loadslash) {
 			next_loadslash = loadslash->next;
 			if (loadslash->name) {
@@ -966,6 +968,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct over_time_effect_type *dot, *last_dot = NULL;
 	struct offer_data *offer, *last_offer = NULL;
 	struct alias_data *alias, *last_alias = NULL;
+	struct resource_data *res, *last_res = NULL;
 	struct coin_data *coin, *last_coin = NULL;
 	struct mail_data *mail, *last_mail = NULL;
 	struct player_ability_data *abildata;
@@ -1008,6 +1011,13 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	if ((last_mail = GET_MAIL_PENDING(ch))) {
 		while (last_mail->next) {
 			last_mail = last_mail->next;
+		}
+	}
+	
+	// find end of resource list
+	if ((last_res = GET_ACTION_RESOURCES(ch))) {
+		while (last_res->next) {
+			last_res = last_res->next;
 		}
 	}
 	
@@ -1058,6 +1068,24 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						GET_ACTION_CYCLE(ch) = i_in[1];
 						GET_ACTION_TIMER(ch) = i_in[2];
 						GET_ACTION_ROOM(ch) = i_in[3];
+					}
+				}
+				else if (PFILE_TAG(line, "Action-res:", length)) {
+					if (sscanf(line + length + 1, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
+						// argument order is for consistency with other resource lists
+						CREATE(res, struct resource_data, 1);
+						res->vnum = i_in[0];
+						res->amount = i_in[1];
+						res->type = i_in[2];
+						res->misc = i_in[3];
+						
+						if (last_res) {
+							last_res->next = res;
+						}
+						else {
+							GET_ACTION_RESOURCES(ch) = res;
+						}
+						last_res = res;
 					}
 				}
 				else if (PFILE_TAG(line, "Action-vnum:", length)) {
@@ -1857,6 +1885,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	obj_data *char_eq[NUM_WEARS];
 	char temp[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
+	struct resource_data *res;
 	int iter;
 	
 	if (!fl || !ch) {
@@ -1955,6 +1984,10 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Action: %d %d %d %d\n", GET_ACTION(ch), GET_ACTION_CYCLE(ch), GET_ACTION_TIMER(ch), GET_ACTION_ROOM(ch));
 		for (iter = 0; iter < NUM_ACTION_VNUMS; ++iter) {
 			fprintf(fl, "Action-vnum: %d %d\n", iter, GET_ACTION_VNUM(ch, iter));
+		}
+		LL_FOREACH(GET_ACTION_RESOURCES(ch), res) {
+			// argument order is for consistency with other resource lists
+			fprintf(fl, "Action-res: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
 		}
 	}
 	if (GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) != NOWHERE) {

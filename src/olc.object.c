@@ -34,6 +34,8 @@ extern const char *affected_bits[];
 extern const char *apply_type_names[];
 extern const char *apply_types[];
 extern const char *armor_types[NUM_ARMOR_TYPES+1];
+extern const char *component_flags[];
+extern const char *component_types[];
 extern const char *container_bits[];
 extern const char *drinks[];
 extern const char *extra_bits[];
@@ -1390,6 +1392,12 @@ void olc_show_object(char_data *ch) {
 	sprintbit(GET_OBJ_EXTRA(obj), extra_bits, buf1, TRUE);
 	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", buf1);
 	
+	sprintf(buf + strlen(buf), "<&ycomponent&0> %s\r\n", component_types[GET_OBJ_CMP_TYPE(obj)]);
+	if (GET_OBJ_CMP_TYPE(obj) != CMP_NONE) {
+		sprintbit(GET_OBJ_CMP_FLAGS(obj), component_flags, buf1, TRUE);
+		sprintf(buf + strlen(buf), "<&ycompflags&0> %s\r\n", buf1);
+	}
+	
 	if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0) {
 		sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", GET_OBJ_MIN_SCALE_LEVEL(obj));
 	}
@@ -1760,6 +1768,31 @@ OLC_MODULE(oedit_coinamount) {
 	}
 	else {
 		GET_OBJ_VAL(obj, VAL_COINS_AMOUNT) = olc_process_number(ch, argument, "coin amount", "coinamount", 0, MAX_COIN, GET_OBJ_VAL(obj, VAL_COINS_AMOUNT));
+	}
+}
+
+
+OLC_MODULE(oedit_compflags) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	
+	if (GET_OBJ_CMP_TYPE(obj) == CMP_NONE) {
+		msg_to_char(ch, "You can only set component flags once you've set a component type.\r\n");
+	}
+	else {
+		GET_OBJ_CMP_FLAGS(obj) = olc_process_flag(ch, argument, "component", "compflags", component_flags, GET_OBJ_CMP_FLAGS(obj));
+	}
+}
+
+
+OLC_MODULE(oedit_component) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	int old = GET_OBJ_CMP_TYPE(obj);
+	
+	GET_OBJ_CMP_TYPE(obj) = olc_process_type(ch, argument, "component type", "component", component_types, GET_OBJ_CMP_TYPE(obj));
+	
+	// reset flags if going to/from none
+	if (old == CMP_NONE || GET_OBJ_CMP_TYPE(obj) == CMP_NONE) {
+		GET_OBJ_CMP_FLAGS(obj) = NOBITS;
 	}
 }
 
