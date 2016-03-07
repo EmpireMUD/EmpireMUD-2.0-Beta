@@ -606,6 +606,10 @@ void finish_gen_craft(char_data *ch) {
 	if (is_master && applied_master) {
 		gain_ability_exp(ch, ABIL_MASTERY_ABIL(cft_abil), 33.4);
 	}
+	
+	// free the stored action resources now -- we no longer risk refunding them
+	free_resource_list(GET_ACTION_RESOURCES(ch));
+	GET_ACTION_RESOURCES(ch) = NULL;
 
 	// repeat as desired
 	if (num > 1) {
