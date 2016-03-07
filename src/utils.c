@@ -2578,12 +2578,11 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 * @param obj_data **found_obj A variable to bind the matching item to, for resources that require items.
 */
 struct resource_data *get_next_resource(char_data *ch, struct resource_data *list, bool ground, bool left2right, obj_data **found_obj) {
-	struct resource_data *res, *found_res;
+	struct resource_data *res;
 	int liter, amt;
 	obj_data *obj;
 	
 	*found_obj = NULL;
-	found_res = NULL;
 	
 	LL_FOREACH(list, res) {
 		// RES_x: find first resource by type
