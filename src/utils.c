@@ -2354,7 +2354,7 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				// already messaged APPLY_RES_REPAIR for this type
 			}
 			
-			res->amount -= 1;
+			res->amount -= 1;	// only pay 1 at a time
 			if (use_obj) {
 				if (build_used_list) {
 					add_to_resource_list(build_used_list, RES_OBJECT, GET_OBJ_VNUM(use_obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(use_obj));
@@ -2391,7 +2391,7 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				amt = GET_DRINK_CONTAINER_CONTENTS(use_obj);
 				amt = MIN(res->amount, amt);
 				
-				res->amount -= amt;
+				res->amount -= amt;	// possible partial payment
 				GET_OBJ_VAL(use_obj, VAL_DRINK_CONTAINER_CONTENTS) -= amt;
 				if (GET_DRINK_CONTAINER_CONTENTS(use_obj) == 0) {
 					GET_OBJ_VAL(use_obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
@@ -2416,6 +2416,7 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 			}
 			
 			charge_coins(ch, coin_emp, res->amount, build_used_list);
+			res->amount = 0;	// cost paid in full
 			break;
 		}
 		case RES_POOL: {
@@ -2439,6 +2440,8 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				update_pos(ch);
 				send_char_pos(ch, 0);
 			}
+			
+			res->amount = 0;	// cost paid in full
 			break;
 		}
 	}
