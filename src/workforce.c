@@ -939,6 +939,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 	struct empire_storage_data *store = NULL;
 	char_data *worker = find_chore_worker_in_room(room, chore_data[chore].mob);
 	craft_data *craft, *next_craft, *do_craft = NULL;
+	int islid = GET_ISLAND_ID(room);
 	struct resource_data *res;
 	int crafts_found;
 	char buf[256];
@@ -964,11 +965,15 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 		// check resources...
 		has_res = TRUE;
 		for (res = GET_CRAFT_RESOURCES(craft); res && has_res; res = res->next) {
-			if (res->type != RES_OBJECT) {
-				// can ONLY do crafts that use objects
+			if (res->type != RES_OBJECT && res->type != RES_COMPONENT) {
+				// can ONLY do crafts that use objects/components
 				has_res = FALSE;
 			}
-			else if (!(store = find_stored_resource(emp, GET_ISLAND_ID(room), res->vnum)) || store->amount < res->amount) {
+			else if (res->type == RES_OBJECT && (!(store = find_stored_resource(emp, islid, res->vnum)) || store->amount < res->amount)) {
+				has_res = FALSE;
+			}
+			else if (res->type == RES_COMPONENT && !empire_can_afford_component(emp, islid, res->vnum, res->misc, res->amount)) {
+				// this actually requires all of the component be the same type -- it won't mix component types
 				has_res = FALSE;
 			}
 		}
@@ -985,13 +990,18 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 	// now attempt to do the chore
 	if (worker && do_craft) {
 		ewt_mark_resource_worker(emp, room, GET_CRAFT_OBJECT(do_craft));
-	
-		// charge resources (we pre-validated)
+		
+		// charge resources (we pre-validated res->type and availability)
 		for (res = GET_CRAFT_RESOURCES(do_craft); res; res = res->next) {
-			charge_stored_resource(emp, GET_ISLAND_ID(room), res->vnum, res->amount);
+			if (res->type == RES_OBJECT) {
+				charge_stored_resource(emp, islid, res->vnum, res->amount);
+			}
+			else if (res->type == RES_COMPONENT) {
+				charge_stored_component(emp, islid, res->vnum, res->misc, res->amount);
+			}
 		}
-
-		add_to_empire_storage(emp, GET_ISLAND_ID(room), GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));
+		
+		add_to_empire_storage(emp, islid, GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));
 		empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 		
 		// only send message if someone else is present (don't bother verifying it's a player)
@@ -1047,24 +1057,35 @@ void do_chore_building(empire_data *emp, room_data *room) {
 	struct resource_data *res = NULL;
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BUILDING].mob);
 	bool can_do = FALSE, found = FALSE;
+	int islid = GET_ISLAND_ID(room);
 	
 	if (IS_COMPLETE(room)) {
 		can_do = TRUE;
 	}
 	else if ((res = BUILDING_RESOURCES(room))) {
 		// can only process objects in this way
-		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, GET_ISLAND_ID(room), res->vnum)) && store->amount > 0) {
+		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && store->amount > 0) {
+			can_do = TRUE;
+		}
+		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, res->misc, 1)) {
 			can_do = TRUE;
 		}
 	}
 	
 	if (worker && can_do) {
-		if (store && res) {
+		if (res) {
 			found = TRUE;
 			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
-		
-			charge_stored_resource(emp, GET_ISLAND_ID(room), res->vnum, 1);
-			res->amount -= 1;			
+			
+			if (res->type == RES_OBJECT) {
+				charge_stored_resource(emp, islid, res->vnum, 1);
+			}
+			else if (res->type == RES_COMPONENT) {
+				charge_stored_component(emp, islid, res->vnum, res->misc, 1);
+			}
+			
+			res->amount -= 1;
+			
 			// remove res?
 			if (res->amount <= 0) {
 				LL_DELETE(GET_BUILDING_RESOURCES(room), res);
@@ -1921,22 +1942,33 @@ void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh) {
 void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 	char_data *worker = find_chore_worker_in_room(IN_ROOM(veh), chore_data[CHORE_REPAIR_VEHICLES].mob);
 	struct empire_storage_data *store = NULL;
+	int islid = GET_ISLAND_ID(IN_ROOM(veh));
 	struct resource_data *res;
 	bool can_do = FALSE;
 	
 	if ((res = VEH_NEEDS_RESOURCES(veh))) {
-		// can ONLY do it if it requires an object
-		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(veh)), res->vnum)) && store->amount > 0) {
+		// can ONLY do it if it requires an object or component
+		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && store->amount > 0) {
+			can_do = TRUE;
+		}
+		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, res->misc, 1)) {
 			can_do = TRUE;
 		}
 	}
 	
 	if (worker && can_do) {
-		if (store && res) {
+		if (res) {
 			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
-		
-			charge_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(veh)), res->vnum, 1);
+			
+			if (res->type == RES_OBJECT) {
+				charge_stored_resource(emp, islid, res->vnum, 1);
+			}
+			else if (res->type == RES_COMPONENT) {
+				charge_stored_component(emp, islid, res->vnum, res->misc, 1);
+			}
+			// apply it
 			res->amount -= 1;
+			
 			// remove res?
 			if (res->amount <= 0) {
 				LL_DELETE(VEH_NEEDS_RESOURCES(veh), res);

@@ -2488,6 +2488,11 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 				// up to two places to search
 				for (liter = 0; liter < 2 && remaining > 0; ++liter) {
 					LL_FOREACH_SAFE2(search_list[liter], obj, next_obj, next_content) {
+						// skip keeps
+						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+							continue;
+						}
+						
 						// RES_x: just types that need objects
 						switch (res->type) {
 							case RES_OBJECT: {
@@ -2597,6 +2602,11 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 				// up to two places to search
 				for (liter = 0; liter < 2; ++liter) {
 					LL_FOREACH2(search_list[liter], obj, next_content) {
+						// skip keeps
+						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+							continue;
+						}
+						
 						// RES_x: just types that need objects
 						switch (res->type) {
 							case RES_OBJECT: {
@@ -2864,6 +2874,11 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 				// more than one place to search...
 				for (liter = 0; liter < 2 && total < res->amount; ++liter) {
 					LL_FOREACH2(search_list[liter], obj, next_content) {
+						// skip keeps
+						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+							continue;
+						}
+						
 						// RES_x: just types that need objects
 						switch (res->type) {
 							case RES_OBJECT: {

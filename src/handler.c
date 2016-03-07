@@ -5447,6 +5447,61 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 
 
 /**
+* removes X stored components from an empire
+*
+* @param empire_data *emp
+* @param int island Which island to charge for storage, or ANY_ISLAND to take from any available storage
+* @param int cmp_type Which CMP_ type to charge
+* @param int cmp_flags Required CMPF_ flags to match on the component
+* @param int amount How much to charge
+* @return bool TRUE if it was able to charge enough, FALSE if not
+*/
+bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount) {
+	struct empire_storage_data *store, *next_store;
+	int this, found = 0;
+	obj_data *proto;
+	
+	// can't charge a negative amount
+	if (amount < 0) {
+		return TRUE;
+	}
+	
+	LL_FOREACH_SAFE(EMPIRE_STORAGE(emp), store, next_store) {
+		if (island != ANY_ISLAND && island != store->island) {
+			continue;
+		}
+		
+		// need obj
+		if (!(proto = obj_proto(store->vnum))) {
+			continue;
+		}
+		
+		// matching component?
+		if (GET_OBJ_CMP_TYPE(proto) != cmp_type || (GET_OBJ_CMP_FLAGS(proto) & cmp_flags) != cmp_flags) {
+			continue;
+		}
+		
+		// ok make it so
+		this = MIN(amount, store->amount);
+		found += this;
+		SAFE_ADD(store->amount, -this, 0, INT_MAX, FALSE);
+		
+		if (store->amount <= 0) {
+			LL_DELETE(EMPIRE_STORAGE(emp), store);
+			free(store);
+		}
+		
+		// done?
+		if (found >= amount) {
+			break;
+		}
+	}
+	
+	return (found >= amount);
+}
+
+
+/**
 * removes X stored resources from an empire
 *
 * @param empire_data *emp
@@ -5525,6 +5580,44 @@ bool delete_stored_resource(empire_data *emp, obj_vnum vnum) {
 	}
 	
 	return (deleted > 0) ? TRUE : FALSE;
+}
+
+
+/**
+* This finds a matching item's empire_storage_data object for a component type,
+* IF there is any match stored to the empire on that island.
+*
+* @param empire_data *emp The empire.
+* @param int island Which island to search.
+* @param int cmp_type Any CMP_ type.
+* @param int cmp_flags Any CMPF_ flags to match all of.
+* @param int amount The number that must be available.
+*/
+bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount) {
+	struct empire_storage_data *store;
+	obj_data *proto;
+	int found = 0;
+	
+	LL_FOREACH(EMPIRE_STORAGE(emp), store) {
+		if (store->island != island) {
+			continue;
+		}
+		
+		// need obj
+		if (!(proto = obj_proto(store->vnum))) {
+			continue;
+		}
+		
+		// is it a match, though?
+		if (GET_OBJ_CMP_TYPE(proto) == cmp_type && (GET_OBJ_CMP_FLAGS(proto) & cmp_flags) == cmp_flags) {
+			found += store->amount;
+			if (found >= amount) {
+				break;
+			}
+		}
+	}
+	
+	return (found >= amount);
 }
 
 
