@@ -1554,6 +1554,10 @@ void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_
 		this = MIN(coin->amount, amount);
 		decrease_coins(ch, type, this);
 		amount -= this;
+		
+		if (build_used_list) {
+			add_to_resource_list(build_used_list, RES_COINS, type ? EMPIRE_VNUM(type) : OTHER_COIN, this, 0);
+		}
 	}
 		
 	// then try the "other"
