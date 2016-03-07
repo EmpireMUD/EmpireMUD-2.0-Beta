@@ -131,7 +131,7 @@ Basic Crafts:
   violet dye  2 red berries, 1 bileberries, (glassblowing)
   orange dye  2 oranges, 1 magenta arrowfish, (glassblowing)
 
-See also: CRAFTING LEVEL, WOODWORKING
+See also: CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP
 #
 CARTS WAGONS CARRIAGES CARAVANS "LAND VEHICLES"
 
@@ -199,7 +199,7 @@ Without any skill or ability, you can always cook:
   peach pie  1 basket of peaches, 1 flour
   candied apple  1 apple, apiaries tech for honey
 
-See also: CRAFTING LEVEL, MILL, BAKERY
+See also: CRAFTING LEVEL, MILL, BAKERY, RESOURCES, KEEP
 #
 "DANGEROUS LEATHERS"
 
@@ -305,9 +305,9 @@ With the basic Forge skill, you can create:
   coin mill  24 iron ingots, 2 imperium ingots
   anchor  10 iron ingot -- used on ships
 
-See also: CRAFTING LEVEL, SMELT, WEAPONCRAFTING, ARMORSMITHING, JEWELRY,
-  MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS, DEADLY WEAPONS,
-  IMPERIAL ARMORS
+See also: CRAFTING LEVEL, RESOURCES, KEEP, SMELT, WEAPONCRAFTING,
+  ARMORSMITHING, JEWELRY, MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS,
+  DEADLY WEAPONS, IMPERIAL ARMORS
 #
 "GUILDSMAN CRAFTS"
 
@@ -691,7 +691,7 @@ With basic Sewing, you can make:
 Additional sewing items are available from other abilities in the Trade skill,
 as well as patterns and crafts hidden around the world.
 
-See also: CRAFTING LEVEL, LEATHERWORKING, RAWHIDE STITCHING, CLOTHING
+See also: CRAFTING LEVEL, RESOURCES, KEEP, LEATHERWORKING, RAWHIDE STITCHING
 #
 SHIP SHIPS 
 
@@ -745,7 +745,8 @@ With basic Shipbuilding you can manufacture:
     Health: 32
     Extra rooms: 1
 
-See also: ADVANCED SHIPS, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE
+See also: ADVANCED SHIPS, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE,
+   RESOURCES, KEEP
 #
 SIEGEWORKS "SIEGE WORKS"
 
@@ -871,7 +872,7 @@ Using the Sew ability:
   
 (Wool cloth and cotton cloth are used for the same things.)
 
-See also: SHEAR
+See also: SHEAR, RESOURCES, KEEP
 #
 WOODWORKING "WOOD WORKING"
 

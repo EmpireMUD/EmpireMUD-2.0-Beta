@@ -102,7 +102,8 @@ Usage:  build <building> [direction]
 
 This command is used to create buildings using raw materials. If you build a
 shrine or temple, you must specify a god to dedicate it to. Most other
-buildings require a direction that they'll face.
+buildings require a direction that they'll face. Resources are added from left
+to right in the requirements list (you can't add nails before lumber).
 
 You can't build on land that's inside another empire's city radius while at war
 with that empire.
@@ -142,9 +143,9 @@ vxvv gate  20 sticks, 1 copper ingot
 
 For more information on building your first house, see HELP HOUSING GUIDE.
 
-See also: EMPIRE, ARTISANS, LUXURY, MONUMENTS, GRAND MONUMENTS, SEAFARING,
-          HOUSING, LOCKSMITHING, RAISE ARMIES, ADVANCED TACTICS, ROADS, HAVENS,
-          SWAMP ENGINEERING, GREAT WALLS, DESIGNATE, DISMANTLE
+See also: RESOURCES, KEEP, EMPIRE, ARTISANS, LUXURY, MONUMENTS, SEAFARING,
+   GRAND MONUMENTS, HOUSING, LOCKSMITHING, RAISE ARMIES, ADVANCED TACTICS,
+   ROADS, HAVENS, SWAMP ENGINEERING, GREAT WALLS, DESIGNATE, DISMANTLE
 #
 CEDE
 
@@ -1368,7 +1369,8 @@ much less of that resource on each island.
 Workforce types:
   &ybuilding:&0 NPCs will build any building that has been started, or dismantle
             any building you've started to dismantle. They build using stored
-            empire resources, not items on the ground.
+            empire resources, not items on the ground. Workers can't finish
+            buildings that require resources other than items/components.
   &ychopping:&0 NPCs will chop down forests and desert groves (Not orchards - 
      use farming without replanting for that).
   &ydigging:&0 NPCs will dig for rocks in any quarry, or clay in any clay pit.

@@ -2919,7 +2919,7 @@ other than 0.
 
 See also: ITEM SCALING, OEDIT TYPE, OLC OBJECTS
 #d
-"OEDIT COMPONENT" "OEDIT COMP" COMPONENT
+"OEDIT COMPONENT" "OEDIT COMP"
 
 Usage:  .component <type>
 
