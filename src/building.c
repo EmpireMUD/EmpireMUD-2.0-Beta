@@ -856,11 +856,11 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 */
 void start_dismantle_building(room_data *loc) {
 	struct resource_data *composite_resources = NULL, *crcp, *res, *next_res;
-	bool deleted = FALSE, upgraded = FALSE;
 	room_data *room, *next_room;
 	char_data *targ, *next_targ;
 	craft_data *type, *up_type;
 	obj_data *obj, *next_obj;
+	bool deleted = FALSE;
 	bld_data *up_bldg;
 	bool complete = IS_COMPLETE(loc);	// store now -- this gets changed part way through
 	
@@ -869,17 +869,11 @@ void start_dismantle_building(room_data *loc) {
 		return;
 	}
 	
-	if (!(type = find_building_list_entry(loc, FIND_BUILD_NORMAL))) {
-		if ((type = find_building_list_entry(loc, FIND_BUILD_UPGRADE))) {
-			upgraded = TRUE;
-		}
-		else {
-			log("SYSERR: Attempting to dismantle non-dismantlable building at #%d", GET_ROOM_VNUM(loc));
-			return;
-		}
+	// find the entry
+	if (!(type = find_building_list_entry(loc, FIND_BUILD_NORMAL)) && !(type = find_building_list_entry(loc, FIND_BUILD_UPGRADE))) {
+		log("SYSERR: Attempting to dismantle non-dismantlable building at #%d", GET_ROOM_VNUM(loc));
+		return;
 	}
-	
-	log("debug: type %d, upgraded %d", type->vnum, upgraded);
 
 	// interior only
 	for (room = interior_room_list; room; room = next_room) {
@@ -931,12 +925,12 @@ void start_dismantle_building(room_data *loc) {
 	else if (complete) {
 		// backwards-compatible: attempt to detect resources
 		composite_resources = copy_resource_list(GET_CRAFT_RESOURCES(type));
-		if (upgraded) {
+		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_UPGRADE)) {
+			// for upgraded buildings, must work up the chain
 			up_bldg = find_upgraded_from(building_proto(GET_CRAFT_BUILD_TYPE(type)));
 			up_type = up_bldg ? find_build_craft(GET_BLD_VNUM(up_bldg)) : NULL;
 		
 			while (up_bldg && up_type) {
-				log("debug 2: up_bldg %d, up_type %d", GET_BLD_VNUM(up_bldg), GET_CRAFT_VNUM(up_type));
 				crcp = composite_resources;
 				composite_resources = combine_resources(crcp, GET_CRAFT_RESOURCES(up_type));
 				free_resource_list(crcp);
