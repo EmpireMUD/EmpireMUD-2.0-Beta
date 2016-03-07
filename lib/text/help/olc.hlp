@@ -2919,7 +2919,7 @@ other than 0.
 
 See also: ITEM SCALING, OEDIT TYPE, OLC OBJECTS
 #d
-"OEDIT COMPONENT" "OEDIT COMP"
+"OEDIT COMPONENT" "OEDIT COMP" COMPONENT
 
 Usage:  .component <type>
 
@@ -2930,7 +2930,7 @@ generic type.
 Once you choose a component type, you can also set the .compflags property
 to add modifiers to your component type.
 
-See also: OEDIT COMPONENT FLAGS
+See also: COMPONENT FLAGS
 #d
 "OEDIT COMPFLAGS" "OEDIT COMPONENT FLAGS" "COMPONENT FLAGS"
 
