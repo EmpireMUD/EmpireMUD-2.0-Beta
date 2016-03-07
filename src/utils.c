@@ -2807,11 +2807,26 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 */
 void halve_resource_list(struct resource_data **list, bool remove_nonrefundables) {
 	struct resource_data *res, *next_res;
+	bool odd = FALSE;
 	
 	LL_FOREACH_SAFE(*list, res, next_res) {
-		res->amount /= 2;
+		if (odd && (res->amount % 2) != 0) {
+			// a previous one was odd (round up this time)
+			res->amount = (res->amount + 1) / 2;
+			odd = FALSE;
+		}
+		else if (odd) {
+			// we have a stored odd but this one isn't odd too, so we keep the stored odd
+			res->amount /= 2;
+		}
+		else {
+			// no stored odd -- do a normal round-down divide
+			odd = (res->amount % 2);
+			res->amount /= 2;
+		}
 		
-		if (res->amount == 0 || res->type == RES_COMPONENT) {
+		// check for no remaining resource
+		if (res->amount <= 0) {
 			LL_DELETE(*list, res);
 			free(res);
 		}
