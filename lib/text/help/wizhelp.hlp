@@ -103,7 +103,7 @@ CREATE
 
 Usage:  create [number] <item>
 
-This command allows a God or Immortal to create one or more simple items
+This command allows a god or immortal to create one or more simple items
 instantly. Normally, only resources and simple tools can be created this way.
 In order to create items, you must have the correct resources available. You
 get resources when people sacrifice items to you. Resource counts can be seen

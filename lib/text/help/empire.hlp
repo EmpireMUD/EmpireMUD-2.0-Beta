@@ -101,7 +101,7 @@ Usage:  build <building> [direction]
         build <monument> <god>
 
 This command is used to create buildings using raw materials. If you build a
-shrine or temple, you must specify a God to dedicate it to. Most other
+shrine or temple, you must specify a god to dedicate it to. Most other
 buildings require a direction that they'll face.
 
 You can't build on land that's inside another empire's city radius while at war
@@ -152,7 +152,7 @@ Usage:  cede <person> (x, y)
 
 This is used to cede one acre of land to anyone else currently in the game. 
 If you do not include an (x, y) coordinate, it will cede the land you're on. 
-You can only cede land owned by your empire. Ceding land to a God or Immortal
+You can only cede land owned by your empire. Ceding land to a god or immortal
 so that you can claim more land may get you in trouble.
 
 You can't cede land to an empire that is at war.

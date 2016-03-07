@@ -112,7 +112,9 @@ DISMANTLE
 Usage:  dismantle
 
 This command allows you to tear down a building when you're done with it. You
-get back half of the resources you spent to build it.
+get back approximately half of the resources you spent to build it, although
+dismantle can only refund items that were used -- it can't refund any coins,
+mana, or liquids that were spent.
 
 You can use "nodismantle" to keep yourself from accidentally dismantling a
 building.

@@ -328,7 +328,7 @@ When using field  - The variable returns:
       eval test %%actor.is_ally(%char%)%%
       if %test% ...
 &cis_enemy(char)&0 - Returns true if the other character is a combat enemy.
-&cis_god&0 - Returns true if the actor is a God-level player.
+&cis_god&0 - Returns true if the actor is a god-level player.
 &cis_hostile(on/off)&0 - If the ()'s are omitted, return value is whether or
    not the actor is marked as a Hostile player.
 &cis_immortal&0 - Returns true if the actor is an immortal (admin).
