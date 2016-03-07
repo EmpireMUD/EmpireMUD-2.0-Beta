@@ -2368,10 +2368,10 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 			switch (msg_type) {
 				case APPLY_RES_BUILD: {
 					if (!messaged_char) {
-						act("You carefully pour $p into structure.", FALSE, ch, use_obj, NULL, TO_CHAR | TO_SPAMMY);
+						act("You carefully pour $p into the structure.", FALSE, ch, use_obj, NULL, TO_CHAR | TO_SPAMMY);
 					}
 					if (!messaged_room) {
-						act("$n pours $p carefully into structure.", FALSE, ch, use_obj, NULL, TO_ROOM | TO_SPAMMY);
+						act("$n pours $p carefully into the structure.", FALSE, ch, use_obj, NULL, TO_ROOM | TO_SPAMMY);
 					}
 					break;
 				}
