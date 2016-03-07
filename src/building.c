@@ -858,6 +858,7 @@ void start_dismantle_building(room_data *loc) {
 	craft_data *type, *up_type;
 	obj_data *obj, *next_obj;
 	bld_data *up_bldg;
+	bool complete = IS_COMPLETE(loc);	// store now -- this gets changed part way through
 	
 	if (!IS_MAP_BUILDING(loc)) {
 		log("SYSERR: Attempting to dismantle non-building room #%d", GET_ROOM_VNUM(loc));
@@ -921,7 +922,7 @@ void start_dismantle_building(room_data *loc) {
 		GET_BUILDING_RESOURCES(loc) = GET_BUILT_WITH(loc);
 		GET_BUILT_WITH(loc) = NULL;
 	}
-	else if (IS_COMPLETE(loc)) {
+	else if (complete) {
 		// backwards-compatible: attempt to detect resources
 		composite_resources = copy_resource_list(GET_CRAFT_RESOURCES(type));
 		if (upgraded) {
