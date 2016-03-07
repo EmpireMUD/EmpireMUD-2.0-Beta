@@ -439,6 +439,10 @@ craft_data *find_building_list_entry(room_data *room, byte type) {
 bld_data *find_upgraded_from(bld_data *bb) {
 	bld_data *iter, *next_iter;
 	
+	if (!bb) {	// occasionally
+		return NULL;
+	}
+	
 	HASH_ITER(hh, building_table, iter, next_iter) {
 		if (GET_BLD_UPGRADES_TO(iter) == GET_BLD_VNUM(bb)) {
 			return iter;
@@ -874,6 +878,8 @@ void start_dismantle_building(room_data *loc) {
 			return;
 		}
 	}
+	
+	log("debug: type %d, upgraded %d", type->vnum, upgraded);
 
 	// interior only
 	for (room = interior_room_list; room; room = next_room) {
@@ -927,15 +933,16 @@ void start_dismantle_building(room_data *loc) {
 		composite_resources = copy_resource_list(GET_CRAFT_RESOURCES(type));
 		if (upgraded) {
 			up_bldg = find_upgraded_from(building_proto(GET_CRAFT_BUILD_TYPE(type)));
-			up_type = find_build_craft(GET_BLD_VNUM(up_bldg));
+			up_type = up_bldg ? find_build_craft(GET_BLD_VNUM(up_bldg)) : NULL;
 		
 			while (up_bldg && up_type) {
+				log("debug 2: up_bldg %d, up_type %d", GET_BLD_VNUM(up_bldg), GET_CRAFT_VNUM(up_type));
 				crcp = composite_resources;
 				composite_resources = combine_resources(crcp, GET_CRAFT_RESOURCES(up_type));
 				free_resource_list(crcp);
 			
 				up_bldg = find_upgraded_from(up_bldg);
-				up_type = find_build_craft(GET_BLD_VNUM(up_bldg));
+				up_type = up_bldg ? find_build_craft(GET_BLD_VNUM(up_bldg)) : NULL;
 			}
 		}
 		
