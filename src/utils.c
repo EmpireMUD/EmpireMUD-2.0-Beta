@@ -2661,6 +2661,57 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 
 
 /**
+* Gets string output describing one "resource" entry, for use in lists.
+*
+* @param sturct resource_data *res The resource to display.
+* @return char* A short string including quantity and type.
+*/
+char *get_resource_name(struct resource_data *res) {
+	static char output[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
+	
+	*output = '\0';
+	
+	// RES_x: resource type determines display
+	switch (res->type) {
+		case RES_OBJECT: {
+			snprintf(output, sizeof(output), "%dx %s", res->amount, skip_filler(get_obj_name_by_proto(res->vnum)));
+			break;
+		}
+		case RES_COMPONENT: {
+			if (res->misc) {
+				prettier_sprintbit(res->misc, component_flags, lbuf);
+				strcat(lbuf, " ");
+			}
+			else {
+				*lbuf = '\0';
+			}
+			snprintf(output, sizeof(output), "%dx (%s%s)", res->amount, lbuf, component_types[res->vnum]);
+			break;
+		}
+		case RES_LIQUID: {
+			snprintf(output, sizeof(output), "%d unit%s of %s", res->amount, PLURAL(res->amount), drinks[res->vnum]);
+			break;
+		}
+		case RES_COINS: {
+			snprintf(output, sizeof(output), money_amount(real_empire(res->vnum), res->amount));
+			break;
+		}
+		case RES_POOL: {
+			snprintf(output, sizeof(output), "%d %s point%s", res->amount, pool_types[res->vnum], PLURAL(res->amount));
+			break;
+		}
+		default: {
+			snprintf(output, sizeof(output), "[unknown resource %d]", res->type);
+			break;
+		}
+	}
+	
+	return output;
+}
+
+
+/**
 * Give resources from a resource list to a player.
 *
 * @param char_data *ch The target player.
@@ -2899,49 +2950,14 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 * @param char *save_buffer A string to write the output to.
 */
 void show_resource_list(struct resource_data *list, char *save_buffer) {
-	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	struct resource_data *res;
 	bool found = FALSE;
 	
 	*save_buffer = '\0';
 	
 	LL_FOREACH(list, res) {
-		*line = '\0';
-		// RES_x: resource type determines display
-		switch (res->type) {
-			case RES_OBJECT: {
-				sprintf(line, "%dx %s", res->amount, skip_filler(get_obj_name_by_proto(res->vnum)));
-				break;
-			}
-			case RES_COMPONENT: {
-				if (res->misc) {
-					prettier_sprintbit(res->misc, component_flags, lbuf);
-					strcat(lbuf, " ");
-				}
-				else {
-					*lbuf = '\0';
-				}
-				sprintf(line, "%dx (%s%s)", res->amount, lbuf, component_types[res->vnum]);
-				break;
-			}
-			case RES_LIQUID: {
-				sprintf(line, "%d unit%s of %s", res->amount, PLURAL(res->amount), drinks[res->vnum]);
-				break;
-			}
-			case RES_COINS: {
-				strcpy(line, money_amount(real_empire(res->vnum), res->amount));
-				break;
-			}
-			case RES_POOL: {
-				sprintf(line, "%d %s point%s", res->amount, pool_types[res->vnum], PLURAL(res->amount));
-				break;
-			}
-		}
-		
-		if (*line) {
-			sprintf(save_buffer + strlen(save_buffer), "%s%s", (found ? ", " : ""), line);
-			found = TRUE;
-		}
+		sprintf(save_buffer + strlen(save_buffer), "%s%s", (found ? ", " : ""), get_resource_name(res));
+		found = TRUE;
 	}
 	
 	if (!*save_buffer) {

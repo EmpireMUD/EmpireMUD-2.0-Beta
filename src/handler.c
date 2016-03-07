@@ -1583,7 +1583,7 @@ void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_
 			amount -= MAX(1, round(this * rate));
 			
 			if (build_used_list) {
-				add_to_resource_list(build_used_list, emp ? EMPIRE_VNUM(emp) : OTHER_COIN, OTHER_COIN, this, 0);
+				add_to_resource_list(build_used_list, RES_COINS, emp ? EMPIRE_VNUM(emp) : OTHER_COIN, this, 0);
 			}
 		}
 	}

@@ -1269,6 +1269,7 @@ void add_to_resource_list(struct resource_data **list, int type, any_vnum vnum, 
 void apply_resource(char_data *ch, struct resource_data *res, struct resource_data **list, obj_data *use_obj, int msg_type, vehicle_data *crafting_veh, struct resource_data **build_used_list);
 void extract_resources(char_data *ch, struct resource_data *list, bool ground, struct resource_data **build_used_list);
 extern struct resource_data *get_next_resource(char_data *ch, struct resource_data *list, bool ground, bool left2right, obj_data **found_obj);
+extern char *get_resource_name(struct resource_data *res);
 void give_resources(char_data *ch, struct resource_data *list, bool split);
 void halve_resource_list(struct resource_data **list, bool remove_nonrefundables);
 extern bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs);

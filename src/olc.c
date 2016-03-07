@@ -4671,7 +4671,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 */
 void olc_process_resources(char_data *ch, char *argument, struct resource_data **list) {	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
-	char arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH], add_str[MAX_STRING_LENGTH];
+	char arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH];
 	char lbuf[MAX_STRING_LENGTH];
 	struct resource_data *res, *next_res, *prev_res, *prev_prev, *change, *temp;
 	int num, type, misc;
@@ -4702,7 +4702,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 				if (--num == 0) {
 					found = TRUE;
 					
-					msg_to_char(ch, "You remove the %dx %s.\r\n", res->amount, skip_filler(get_obj_name_by_proto(res->vnum)));
+					msg_to_char(ch, "You remove the %s.\r\n", get_resource_name(res));
 					REMOVE_FROM_LIST(res, *list, next);
 					free(res);
 				}
@@ -4732,7 +4732,6 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			msg_to_char(ch, "You must specify a quantity between 1 and 10000, %d given.\r\n", num);
 		}
 		else {
-			*add_str = '\0';
 			misc = 0;
 			
 			// RES_x: validate arg4/arg5 based on type
@@ -4746,8 +4745,6 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 						msg_to_char(ch, "There is no such object vnum %d.\r\n", vnum);
 						return;
 					}
-					
-					snprintf(add_str, sizeof(add_str), "%dx %s", num, skip_filler(get_obj_name_by_proto(vnum)));
 					break;
 				}
 				case RES_COMPONENT: {
@@ -4763,13 +4760,6 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					if (*arg5) {
 						misc = olc_process_flag(ch, arg5, "component", "resource add component <quantity> <type>", component_flags, NOBITS);
 					}
-					
-					*lbuf = '\0';
-					if (misc) {
-						prettier_sprintbit(misc, component_flags, lbuf);
-						strcat(lbuf, " ");
-					}
-					snprintf(add_str, sizeof(add_str), "%dx (%s%s)", num, lbuf, component_types[vnum]);
 					break;
 				}
 				case RES_LIQUID: {
@@ -4786,13 +4776,10 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 						msg_to_char(ch, "Unknown liquid type '%s'.\r\n", arg4);
 						return;
 					}
-					
-					snprintf(add_str, sizeof(add_str), "%d unit%s of %s", num, PLURAL(num), drinks[vnum]);
 					break;
 				}
 				case RES_COINS: {
 					vnum = OTHER_COIN;
-					snprintf(add_str, sizeof(add_str), "%d misc coin%s", num, PLURAL(num));
 					break;
 				}
 				case RES_POOL: {
@@ -4804,8 +4791,6 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 						msg_to_char(ch, "Unknown pool type '%s'.\r\n", arg4);
 						return;
 					}
-					
-					snprintf(add_str, sizeof(add_str), "%d %s point%s", num, pool_types[vnum], PLURAL(num));
 					break;
 				}
 			}
@@ -4819,7 +4804,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			// append to end
 			LL_APPEND(*list, res);
 			
-			msg_to_char(ch, "You add the %s resource requirement.\r\n", add_str);
+			msg_to_char(ch, "You add a %s resource requirement.\r\n", get_resource_name(res));
 		}
 	}
 	else if (is_abbrev(arg1, "move")) {
@@ -4878,7 +4863,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					}
 					
 					if (found) {
-						msg_to_char(ch, "You move resource %d %s.\r\n", atoi(arg2), (up ? "up" : "down"));
+						msg_to_char(ch, "You move resource %d (%s) %s.\r\n", atoi(arg2), get_resource_name(res), (up ? "up" : "down"));
 					}
 				}
 				
