@@ -131,6 +131,10 @@ Buildings (BEDIT):
 - If you change the triggers on a building/room, live copies are NOT auto-
   matically updated. You should use the "util resetbuildingtriggers" command if
   you want to reset triggers on live copies of the building.
+- If you use a completion trigger to set up a building's interior, you should
+  have the trigger detach itself upon finishing. It's an unnecessary use of
+  processing time and RAM to leave triggers attached if they are guaranteed to 
+  never run again.
 
 Classes (CLASSEDIT):
 - By convention, stock EmpireMUD has one class for every pair of level 100
@@ -475,6 +479,7 @@ The following adventure flags are available:
  CONFUSING-RANDOMS - The instancer will not logically match random exits.
  !NEWBIE - Will not spawn on newbie islands.
  NEWBIE-ONLY - Only spawns on newbie islands.
+ NO-MOB-CLEANUP - Won't despawn mobs that got out of the instance on cleanup.
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d

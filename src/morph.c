@@ -728,7 +728,6 @@ void write_morphs_index(FILE *fl) {
 */
 void write_morph_to_file(FILE *fl, morph_data *morph) {
 	void write_applies_to_file(FILE *fl, struct apply_data *list);
-	void write_resources_to_file(FILE *fl, struct resource_data *list);
 	
 	char temp[256], temp2[256];
 	

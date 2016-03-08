@@ -108,6 +108,8 @@ For each type, there is a help file named &yRTRIG <type>&0.
 All room scripts provide the &c%room%&0 variable.
 
 When using field - The variable returns:
+&cbld_dir(dir)&0 - Rotates the given direction based on which way the building
+   is facing (compared to North). Returns the same dir if no building.
 &cbuilding&0 - The name of the building on the room, if any.
 &ccomplete&0 - True if the room/building is complete (finished building).
 &ccontents&0 - The id of the first obj in the room.
@@ -119,6 +121,8 @@ When using field - The variable returns:
 &cempire_adjective&0 - The owner empire's adjective form, if any.
 &cempire_id&0 - The owner empire's id number, if any.
 &cempire_name&0 - The owner empire's name, if any.
+&center_dir&0 - For map buildings, the direction you go to enter them.
+&cexit_dir&0 - For map buildings, the direction to exit them.
 &c<dir>&0 - The list of flags affecting the exit in the specified direction: 
       north, south, up, down, fore, aft (etc). The result is either:
       %room.north(vnum)% - vnum of room in direction

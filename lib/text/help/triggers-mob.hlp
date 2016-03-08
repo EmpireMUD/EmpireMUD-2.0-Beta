@@ -353,6 +353,7 @@ When using field  - The variable returns:
 &cnext_in_room&0 - The next actor in the room as a variable (id) nice to use
    for loops, or an empty return.
 &cnohassle&0 - If TRUE, the player is an immortal with !HASSLE on.
+&cnoskill(Skill)&0 - TRUE if the player has 'noskilled' that skill.
 &cpc_name&0 - Player's name or mob's keyword list, rather than short desc
 &cplr_flagged(FLAG)&0 - Returns TRUE if the player has the given flag (VAMPIRE).
 &cpoison_immunity&0 - Returns TRUE if the player has Poison Immunity.

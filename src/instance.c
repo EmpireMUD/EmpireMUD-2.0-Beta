@@ -959,8 +959,14 @@ void delete_instance(struct instance_data *inst) {
 		next_mob = mob->next;
 		
 		if (IS_NPC(mob) && MOB_INSTANCE_ID(mob) == inst->id) {
-			act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
-			extract_char(mob);
+			if (ADVENTURE_FLAGGED(inst->adventure, ADV_NO_MOB_CLEANUP)) {
+				// just disassociate
+				MOB_INSTANCE_ID(mob) = NOTHING;
+			}
+			else {
+				act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
+				extract_char(mob);
+			}
 		}
 	}
 	extract_pending_chars();

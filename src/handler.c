@@ -4910,6 +4910,43 @@ void remove_depletion(room_data *room, int type) {
 }
 
 
+/**
+* Sets a room's depletion to a specific value.
+*
+* @param room_data *room The room to set depletion on.
+* @param int type DPLTN_ const
+* @param int value How much to set the depletion to.
+*/
+void set_depletion(room_data *room, int type, int value) {
+	struct depletion_data *dep;
+	bool found = FALSE;
+	
+	// shortcut
+	if (value <= 0) {
+		remove_depletion(room, type);
+		return;
+	}
+	
+	// existing?
+	LL_FOREACH(ROOM_DEPLETION(room), dep) {
+		if (dep->type == type) {
+			dep->count = value;
+			found = TRUE;
+			break;
+		}
+	}
+	
+	// add
+	if (!found) {
+		CREATE(dep, struct depletion_data, 1);
+		dep->type = type;
+		dep->count = value;
+		
+		LL_PREPEND(ROOM_DEPLETION(room), dep);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ROOM HANDLERS ///////////////////////////////////////////////////////////
 

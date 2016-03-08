@@ -113,6 +113,7 @@ const char *adventure_flags[] = {
 	"CONFUSING-RANDOMS",
 	"!NEWBIE",
 	"NEWBIE-ONLY",
+	"NO-MOB-CLEANUP",
 	"\n"
 };
 
@@ -2826,6 +2827,7 @@ const char *otrig_types[] = {
 	"Leave",
 	"*",
 	"Consume",
+	"Finish",
 	"\n"
 };
 
@@ -2849,7 +2851,8 @@ const bitvector_t otrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// ability
 	TRIG_ARG_PERCENT,	// leave
 	NOBITS,	// 
-	TRIG_ARG_PERCENT	// consume
+	TRIG_ARG_PERCENT,	// consume
+	TRIG_ARG_PERCENT,	// finish
 };
 
 

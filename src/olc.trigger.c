@@ -203,6 +203,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	char_data *mob, *next_mob;
 	descriptor_data *dsc;
 	obj_data *obj, *next_obj;
+	bld_data *bld, *next_bld;
 
 	if (!(trig = real_trigger(vnum))) {
 		msg_to_char(ch, "There is no such trigger %d.\r\n", vnum);
@@ -246,6 +247,13 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 		delete_from_proto_list_by_vnum(&(room->proto_script), vnum);
 	}
 	
+	// update building protos
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		if (delete_from_proto_list_by_vnum(&GET_BLD_SCRIPTS(bld), vnum)) {
+			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
+		}
+	}
+	
 	// update mob protos
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		if (delete_from_proto_list_by_vnum(&mob->proto_script, vnum)) {
@@ -276,6 +284,9 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	
 	// update olc editors
 	for (dsc = descriptor_list; dsc; dsc = dsc->next) {
+		if (GET_OLC_BUILDING(dsc) && delete_from_proto_list_by_vnum(&GET_BLD_SCRIPTS(GET_OLC_BUILDING(dsc)), vnum)) {
+			msg_to_char(dsc->character, "A trigger attached to the building you're editing was deleted.\r\n");
+		}
 		if (GET_OLC_OBJECT(dsc) && delete_from_proto_list_by_vnum(&GET_OLC_OBJECT(dsc)->proto_script, vnum)) {
 			msg_to_char(dsc->character, "A trigger attached to the object you're editing was deleted.\r\n");
 		}
@@ -315,6 +326,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 	vehicle_data *veh, *next_veh;
 	char_data *mob, *next_mob;
 	obj_data *obj, *next_obj;
+	bld_data *bld, *next_bld;
 	int size, found;
 	bool any;
 	
@@ -325,6 +337,18 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of trigger %d (%s):\r\n", vnum, GET_TRIG_NAME(proto));
+	
+	// buildings
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		any = FALSE;
+		for (trig = GET_BLD_SCRIPTS(bld); trig && !any; trig = trig->next) {
+			if (trig->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+			}
+		}
+	}
 	
 	// mobs
 	HASH_ITER(hh, mobile_table, mob, next_mob) {

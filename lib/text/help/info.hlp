@@ -12,14 +12,10 @@ These are the common map icons:
  &c~~~~&0  River               &b~~~~&0  Ocean               &c~~&g^&c~&0  Swamp
  &G^^^^&0  Jungle              &W,,,,&0  Arctic Tundra
 
- &Y^^&Go&Y^&0  Apples              &Y^o^^&0  Peaches             &Y^^&Ro&Y^&0  Cherries
- &Y::::&0  Barley              &g::::&0  Hops                ::::  Cotton
- &Y;;;;&0  Wheat               &giiii&0  Corn                &Y.&G^&yo&G.&0  Oranges
- &g,,,,&0  Rice                &Y.&G^o&G.&0  Olives              &G....&0  Peas
- &yoooo&0  Gourds
-
  --+-  Road                [--]  Building            \__/  Trench
  vvvv  Fence               vxxv  Gate                VVVV  Wall
+ 
+See HELP CROPS for the icons for various wild crops.
 
 You can find specific buildings in the HELP BUILDING information as well as
 the other help files listed in its "see also".
@@ -438,25 +434,34 @@ fire DoTs can be removed by dispel.
 
 See also: AFFECTS, CLEANSE, DISPEL, FIRSTAID, SCORE
 #
-FARMING CROPS ORCHARDS AGRICULTURE APPLES WHEAT CORN HOPS COTTON BARLEY PEACHES CHERRIES ORANGES RICE OLIVES PEAS GOURDS
+FARMING CROPS ORCHARDS AGRICULTURE APPLES WHEAT CORN HOPS COTTON BARLEY PEACHES CHERRIES ORANGES RICE OLIVES PEAS GOURDS PLANTAINS TOMATOES BANANAS COCONUTS GRAPES PEPPERS POTATOES PLUMS STRAWBERRIES MANGOES BLUEBERRIES COFFEE OATS WATERMELONS
 
 You can plant and manage crops in order to supply food and trade goods to your
 empire. The crops that grow in orchards can be picked; the rest are harvested.
 You can chop down orchards in order to remove them; other crops are removed
-when you harvest them.
+when you harvest them. The crops listed here grow wild on the map; there are
+more crops to be found in adventure zones.
 
- &Y^^&Go&Y^&0  Apples              &Y^o^^&0  Peaches             &Y^^&Ro&Y^&0  Cherries
- &Y::::&0  Barley              &g::::&0  Hops                ::::  Cotton
- &Y;;;;&0  Wheat               &giiii&0  Corn                &Y.&G^&yo&G.&0  Oranges
- &g,,,,&0  Rice                &Y.&G^o&G.&0  Olives              &G....&0  Peas
- &yoooo&0  Gourds
+Temperate crops (plains):
+ &Y^^&Go&Y^&0  Apples              &Y::::&0  Barley               &g%&Bo&g%%&0  Blueberries
+ &Y^^&Ro&Y^&0  Cherries            &Y^&to&Y^^&0  Coffee               &giiii&0  Corn
+ &gxgxx&0  Grapes              &g::::&0  Hops                 &Tiiii&0  Oats
+ &Y^o^^&0  Peaches             &G....&0  Peas                 &g^^&vo&g^&0  Plums
+ &gnnnn&0  Potatoes            &gn&Rv&gnn&0  Strawberries         &Ro&g88&Ro&0  Tomatoes
+ &Y;;;;&0  Wheat
 
-Cotton can be woven into cloth. The rest of the crops are used to make food
-and drink.
+Arid crops (desert):
+ &y.&g/&to&y.&0  Coconuts            &0::::&0  Cotton               &Y.&G^o&G.&0  Olives
+ &Y.&G^&yo&G.&0  Oranges             &gnn&Ri&gn&0  Peppers
 
-Rice and gourds must be planted on plains within 3 tiles of a river. Oranges,
-olives, and cotton only grow in the desert. The rest will grow in ordinary
-plains.
+Tropical crops (partially cleared jungle):
+ &Yd&G\/&Yb&0  Bananas             &G^&Oo&G^&Oo&0  Mangoes              &Gd&g\/&Gb&0  Plantains
+ &Gwwow&0  Watermelons
+
+River crops (plains near river):
+ &yoooo&0  Gourds              &g,,,,&0  Rice
+
+Most crops are used to make food and drink. Some, like cotton, have other uses.
 
 See also: CHOP, COOK, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE
 #

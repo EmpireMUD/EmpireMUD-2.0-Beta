@@ -12,16 +12,32 @@ See also:
 
 Consume (object trigger)
 
+Supported commands:  drink, eat, quaff, read
 Argument type:  percent chance to execute
 Return value:  return 0 to prevent the consumption
 
-Activated any time a character attempts to consume (eat, drink, or quaff) the
-object.
+Activated any time a character attempts to consume or use the object.
 
 Variables:
   &c%actor%&0 - The character attempting to consume the object.
   &c%self%&0 - The object being consumed.
-  &c%command%&0 - Either eat, drink, or quaff.
+  &c%command%&0 - Which consume command was used (e.g. drink).
+#d
+"FINISH TRIGGER" "OTRIG FINISH" TRIGEDIT-OBJ-FINISH
+
+Finish (object trigger)
+
+Supported actions:  read book
+Argument type:  percent chance to execute
+Return value:  return 0 to squelch the normal finish message, and prevent
+   further finish triggers from running
+
+Triggered when a person finishes an action with the object. In the case of
+books, this triggers after the last paragraph is read.
+
+Variables:
+  &c%actor%&0 - The character finishing the book.
+  &c%self%&0 - The object being finished.
 #d
 "GET TRIGGER" "OTRIG GET" TRIGEDIT-OBJ-GET
 
@@ -118,6 +134,7 @@ Objects can trigger on the following events:
 &cAbility&0 - Triggers when an ability targets the object.
 &cLeave&0 - Triggers when a player tries to leave.
 &cConsume&0 - Triggers when used in some way (quaffed, eaten, drank from).
+&cFinish&0 - Triggers when the object finishes being used (read).
 
 For each type, there is a help file named &yOTRIG <type>&0.
 #d

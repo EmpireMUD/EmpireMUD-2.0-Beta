@@ -613,6 +613,7 @@ M
 233 1.00 ce
 M
 232 1.00 ce
+T 5138
 S
 #5139
 Warehouse~
@@ -865,6 +866,7 @@ A Platform in the Swamp~
 ~&0__&?~~
 1 0 dp 0
 0 0 0 -1
+T 5156
 S
 #5157
 Swamp Hut~
@@ -1008,6 +1010,7 @@ is supporting the stairs.
 ~
 M
 237 20.00 ce
+T 5164
 S
 #5165
 Portcullis~
@@ -1313,6 +1316,7 @@ the house, though it looks very dark and uninviting.
 ~
 M
 235 10.00 c
+T 5186
 S
 #5187
 Strange Burrow~
@@ -1330,6 +1334,7 @@ hollow echo follows you through the passage.
 ~
 M
 235 10.00 c
+T 5187
 S
 #5188
 Old Pueblo~
@@ -1346,6 +1351,7 @@ uncomfortable.
 ~
 M
 235 10.00 c
+T 5186
 S
 #5189
 Obscure Cave~
@@ -1363,6 +1369,7 @@ breeze flows from inside, sending the hair on your neck to full attention.
 ~
 M
 235 10.00 c
+T 5187
 S
 #5190
 Astral Nexus~
@@ -1379,5 +1386,6 @@ A Draining Oasis~
 .&c__&?.~
 1 0 dp 0
 0 0 0 -1
+T 5191
 S
 $

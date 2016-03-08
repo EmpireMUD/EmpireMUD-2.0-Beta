@@ -741,6 +741,9 @@ void read_book(char_data *ch, obj_data *obj) {
 	else if (!(book = book_proto(GET_BOOK_ID(obj)))) {
 		msg_to_char(ch, "The book is old and badly damaged; you can't read it.\r\n");
 	}
+	else if (!consume_otrigger(obj, ch, OCMD_READ)) {
+		return;
+	}
 	else {
 		start_action(ch, ACT_READING, 0);
 		GET_ACTION_VNUM(ch, 0) = GET_BOOK_ID(obj);
@@ -759,7 +762,7 @@ void read_book(char_data *ch, obj_data *obj) {
 
 // action ticks for reading
 void process_reading(char_data *ch) {
-	obj_data *obj;
+	obj_data *obj, *found_obj = NULL;
 	bool found = FALSE;
 	book_data *book;
 	struct paragraph_data *para;
@@ -767,6 +770,7 @@ void process_reading(char_data *ch) {
 	
 	for (obj = ch->carrying; obj && !found; obj = obj->next_content) {
 		if (IS_BOOK(obj) && GET_BOOK_ID(obj) == GET_ACTION_VNUM(ch, 0)) {
+			found_obj = obj;	// save for later
 			found = TRUE;
 		}
 	}
@@ -798,8 +802,10 @@ void process_reading(char_data *ch) {
 		}
 		
 		if (!found) {
-			// book's done
-			msg_to_char(ch, "You close the book and put it away.\r\n");
+			// book's done -- fire finish triggers
+			if (!found_obj || finish_otrigger(found_obj, ch)) {
+				msg_to_char(ch, "You close the book.\r\n");
+			}
 			GET_ACTION(ch) = ACT_NONE;
 		}
 	}
