@@ -1861,28 +1861,29 @@ const char *component_types[] = {
 	"adhesive",
 	"bone",
 	"block",
-	"dye",
-	"feathers",		// 5
+	"clay",
+	"dye",		// 5
+	"feathers",
 	"fibers",
 	"flour",
 	"fruit",
-	"fur",
-	"gem",	// 10
+	"fur",	// 10
+	"gem",
 	"grain",
 	"handle",
 	"herb",
-	"leather",
-	"lumber",	// 15
+	"leather",	// 15
+	"lumber",
 	"meat",
 	"metal",
 	"nails",
-	"oil",
-	"pillar",	// 20
+	"oil",	// 20
+	"pillar",
 	"rock",
 	"seeds",
 	"skin",
-	"stick",
-	"textile",	// 25
+	"stick",	// 25
+	"textile",
 	"vegetable",
 	"\n"
 };
