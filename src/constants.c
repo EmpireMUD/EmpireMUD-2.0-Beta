@@ -1892,21 +1892,23 @@ const char *component_types[] = {
 // CMPF_x: component flags
 const char *component_flags[] = {
 	"animal",
+	"bunch",
 	"desert",
 	"fine",
 	"hard",
-	"large",
-	"magic",	// 5
+	"large",	// 5
+	"magic",
 	"mundane",
 	"plant",
 	"poor",
-	"rare",
-	"raw",	// 10
+	"rare",	// 10
+	"raw",
 	"refined",
+	"single",
 	"small",
-	"soft",
+	"soft",	// 15
 	"temperate",
-	"tropical",	// 15
+	"tropical",
 	"\n"
 };
 
