@@ -2947,6 +2947,7 @@ magical and a recipe could require the non-magical version.
 
 Available flags:
  &canimal&0 - From an animal (like animal fibers)
+ &cbunch&0 - A group of things
  &cdesert&0 - Comes from the desert (especially foods)
  &cfine&0 - High-quality
  &chard&0 - As opposed to soft
@@ -2958,6 +2959,7 @@ Available flags:
  &crare&0 - Hard to find or premium
  &craw&0 - Natural, unrefined, or uncooked
  &crefined&0 - As opposed to raw
+ &csingle&0 - An individual thing (not a group)
  &csmall&0 - As in small leather
  &csoft&0 - For things that can be soft or hard
  &ctemperate&0 - Comes from temperate areas (especially foods)
