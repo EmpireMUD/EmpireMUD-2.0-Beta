@@ -835,15 +835,14 @@ INTERACTION_FUNC(finish_scraping) {
 	}
 
 	if (interaction->quantity > 1) {
-		sprintf(buf, "You finish scraping off $p and manage to get $P (x%d).", interaction->quantity);
+		sprintf(buf, "You get $p (x%d).", interaction->quantity);
 	}
 	else {
-		strcpy(buf, "You finish scraping off $p and manage to get $P.");
+		strcpy(buf, "You get $p.");
 	}
 		
 	if (load) {
-		act(buf, FALSE, ch, inter_item, load, TO_CHAR);
-		act("$n finishes scraping off $p.", TRUE, ch, inter_item, NULL, TO_ROOM);
+		act(buf, FALSE, ch, load, NULL, TO_CHAR);
 	}
 	
 	return TRUE;
@@ -1937,6 +1936,9 @@ void process_scraping(char_data *ch) {
 		
 		// will extract no matter what happens here
 		if ((proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
+			act("You finish scraping off $p.", FALSE, ch, proto, NULL, TO_CHAR);
+			act("$n finishes scraping off $p.", TRUE, ch, proto, NULL, TO_ROOM);
+			
 			success = run_interactions(ch, proto->interactions, INTERACT_SCRAPE, IN_ROOM(ch), NULL, proto, finish_scraping);
 		}
 		
