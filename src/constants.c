@@ -1909,6 +1909,7 @@ const char *component_flags[] = {
 	"soft",	// 15
 	"temperate",
 	"tropical",
+	"common",
 	"\n"
 };
 
