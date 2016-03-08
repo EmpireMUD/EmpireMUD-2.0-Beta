@@ -1897,15 +1897,16 @@ const char *component_flags[] = {
 	"hard",
 	"large",
 	"magic",	// 5
+	"mundane",
 	"plant",
 	"poor",
 	"rare",
-	"raw",
-	"refined",	// 10
+	"raw",	// 10
+	"refined",
 	"small",
 	"soft",
 	"temperate",
-	"tropical",
+	"tropical",	// 15
 	"\n"
 };
 

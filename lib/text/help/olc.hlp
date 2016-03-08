@@ -2940,6 +2940,11 @@ Component flags are modifiers to the generic component type. When a recipe
 requires a component with certain flags, the object must have all those flags.
 These flags are interpreted loosely -- it's only important that they match.
 
+Don't over-assign flags. Only use these flags if there is a real distinction
+or reason to use them. Most of these flags come in pairs (magic/mundane) and
+you only need to assign the mundane flag if some versions of the resource are
+magical and a recipe could require the non-magical version.
+
 Available flags:
  &canimal&0 - From an animal (like animal fibers)
  &cdesert&0 - Comes from the desert (especially foods)
@@ -2947,6 +2952,7 @@ Available flags:
  &chard&0 - As opposed to soft
  &clarge&0 - For example, large leather vs small leather
  &cmagic&0 - Has magical properties
+ &cmundane&0 - Is very non-magical
  &cplant&0 - From a plant (like plant fibers)
  &cpoor&0 - Low-quality
  &crare&0 - Hard to find or premium
