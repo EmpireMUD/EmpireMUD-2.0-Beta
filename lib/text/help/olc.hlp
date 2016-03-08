@@ -2941,11 +2941,13 @@ requires a component with certain flags, the object must have all those flags.
 These flags are interpreted loosely -- it's only important that they match.
 
 Available flags:
+ &canimal&0 - From an animal (like animal fibers)
  &cdesert&0 - Comes from the desert (especially foods)
  &cfine&0 - High-quality
  &chard&0 - As opposed to soft
  &clarge&0 - For example, large leather vs small leather
  &cmagic&0 - Has magical properties
+ &cplant&0 - From a plant (like plant fibers)
  &cpoor&0 - Low-quality
  &crare&0 - Hard to find or premium
  &craw&0 - Natural, unrefined, or uncooked

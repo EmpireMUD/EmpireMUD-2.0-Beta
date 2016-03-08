@@ -1862,39 +1862,44 @@ const char *component_types[] = {
 	"bone",
 	"block",
 	"dye",
-	"feathers",
-	"fiber",
+	"feathers",		// 5
+	"fibers",
+	"flour",
 	"fruit",
 	"fur",
-	"gem",
+	"gem",	// 10
+	"grain",
 	"handle",
 	"leather",
 	"lumber",
-	"meat",
+	"meat",	// 15
 	"metal",
 	"nails",
 	"oil",
 	"pillar",
-	"rock",
+	"rock",	// 20
+	"seeds",
 	"skin",
 	"stick",
 	"textile",
-	"vegetable",
+	"vegetable",	// 25
 	"\n"
 };
 
 
 // CMPF_x: component flags
 const char *component_flags[] = {
+	"animal",
 	"desert",
 	"fine",
 	"hard",
 	"large",
-	"magic",
+	"magic",	// 5
+	"plant",
 	"poor",
 	"rare",
 	"raw",
-	"refined",
+	"refined",	// 10
 	"small",
 	"soft",
 	"temperate",

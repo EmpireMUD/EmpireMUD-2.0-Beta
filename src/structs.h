@@ -1032,39 +1032,44 @@ typedef struct vehicle_data vehicle_data;
 #define CMP_BLOCK  3
 #define CMP_DYE  4
 #define CMP_FEATHERS  5
-#define CMP_FIBER  6
-#define CMP_FRUIT  7
-#define CMP_FUR  8
-#define CMP_GEM  9
-#define CMP_HANDLE  10
-#define CMP_LEATHER  11
-#define CMP_LUMBER  12
-#define CMP_MEAT  13
-#define CMP_METAL  14
-#define CMP_NAILS  15
-#define CMP_OIL  16
-#define CMP_PILLAR  17
-#define CMP_ROCK  18
-#define CMP_SKIN  19
-#define CMP_STICK  20
-#define CMP_TEXTILE  21
-#define CMP_VEGETABLE  22
+#define CMP_FIBERS  6
+#define CMP_FLOUR  7
+#define CMP_FRUIT  8
+#define CMP_FUR  9
+#define CMP_GEM  10
+#define CMP_GRAIN  11
+#define CMP_HANDLE  12
+#define CMP_LEATHER  13
+#define CMP_LUMBER  14
+#define CMP_MEAT  15
+#define CMP_METAL  16
+#define CMP_NAILS  17
+#define CMP_OIL  18
+#define CMP_PILLAR  19
+#define CMP_ROCK  20
+#define CMP_SEEDS  21
+#define CMP_SKIN  22
+#define CMP_STICK  23
+#define CMP_TEXTILE  24
+#define CMP_VEGETABLE  25
 
 
 // CMPF_x: component flags
-#define CMPF_DESERT  BIT(0)
-#define CMPF_FINE  BIT(0)
-#define CMPF_HARD  BIT(0)
-#define CMPF_LARGE  BIT(0)
-#define CMPF_MAGIC  BIT(0)
-#define CMPF_POOR  BIT(0)
-#define CMPF_RARE  BIT(0)
-#define CMPF_RAW  BIT(0)
-#define CMPF_REFINED  BIT(0)
-#define CMPF_SMALL  BIT(0)
-#define CMPF_SOFT  BIT(0)
-#define CMPF_TEMPERATE  BIT(0)
-#define CMPF_TROPICAL  BIT(0)
+#define CMPF_ANIMAL  BIT(0)
+#define CMPF_DESERT  BIT(1)
+#define CMPF_FINE  BIT(2)
+#define CMPF_HARD  BIT(3)
+#define CMPF_LARGE  BIT(4)
+#define CMPF_MAGIC  BIT(5)
+#define CMPF_PLANT  BIT(6)
+#define CMPF_POOR  BIT(7)
+#define CMPF_RARE  BIT(8)
+#define CMPF_RAW  BIT(9)
+#define CMPF_REFINED  BIT(10)
+#define CMPF_SMALL  BIT(11)
+#define CMPF_SOFT  BIT(12)
+#define CMPF_TEMPERATE  BIT(13)
+#define CMPF_TROPICAL  BIT(14)
 
 
 // Container flags -- limited to 31 because of int type in obj value
