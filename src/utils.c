@@ -2756,7 +2756,13 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 					// scale item to "misc" level if applicable (will be 0/minimum if not)
 					scale_item_to_level(obj, res->misc);
 					
-					obj_to_char(obj, ch);
+					if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+						obj_to_char(obj, ch);
+					}
+					else {
+						obj_to_room(obj, IN_ROOM(ch));
+					}
+					
 					load_otrigger(obj);
 				}
 				break;

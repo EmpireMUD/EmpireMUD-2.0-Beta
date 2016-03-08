@@ -308,7 +308,8 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_MINE  13
 #define INTERACT_COMBINE  14
 #define INTERACT_SEPARATE  15
-#define NUM_INTERACTS  16
+#define INTERACT_SCRAPE  16
+#define NUM_INTERACTS  17
 
 
 // for object saving
@@ -1039,19 +1040,20 @@ typedef struct vehicle_data vehicle_data;
 #define CMP_GEM  10
 #define CMP_GRAIN  11
 #define CMP_HANDLE  12
-#define CMP_LEATHER  13
-#define CMP_LUMBER  14
-#define CMP_MEAT  15
-#define CMP_METAL  16
-#define CMP_NAILS  17
-#define CMP_OIL  18
-#define CMP_PILLAR  19
-#define CMP_ROCK  20
-#define CMP_SEEDS  21
-#define CMP_SKIN  22
-#define CMP_STICK  23
-#define CMP_TEXTILE  24
-#define CMP_VEGETABLE  25
+#define CMP_HERB  13
+#define CMP_LEATHER  14
+#define CMP_LUMBER  15
+#define CMP_MEAT  16
+#define CMP_METAL  17
+#define CMP_NAILS  18
+#define CMP_OIL  19
+#define CMP_PILLAR  20
+#define CMP_ROCK  21
+#define CMP_SEEDS  22
+#define CMP_SKIN  23
+#define CMP_STICK  24
+#define CMP_TEXTILE  25
+#define CMP_VEGETABLE  26
 
 
 // CMPF_x: component flags

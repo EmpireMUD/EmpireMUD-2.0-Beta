@@ -122,7 +122,7 @@ const struct action_data_struct action_data[] = {
 	{ "siring", "is hunched over.", NOBITS, process_siring, cancel_siring },	// ACT_SIRING
 	{ "picking", "is looking around at the ground.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_picking, NULL },	// ACT_PICKING
 	{ "morphing", "is morphing and changing shape!", ACTF_ANYWHERE, process_morphing, cancel_morphing },	// ACT_MORPHING
-	{ "scraping", "is scraping at a tree.", ACTF_HASTE | ACTF_FAST_CHORES, process_scraping, cancel_scraping },	// ACT_SCRAPING
+	{ "scraping", "is scraping something off.", ACTF_HASTE | ACTF_FAST_CHORES, process_scraping, cancel_scraping },	// ACT_SCRAPING
 	{ "bathing", "is bathing in the water.", NOBITS, process_bathing, NULL },	// ACT_BATHING
 	{ "chanting", "is chanting a strange song.", NOBITS, perform_ritual, NULL },	// ACT_CHANTING
 	{ "prospecting", "is prospecting.", NOBITS, process_prospecting, NULL },	// ACT_PROSPECTING
@@ -386,15 +386,14 @@ void cancel_sawing(char_data *ch) {
 
 
 /**
-* Returns a tree to the person who was scraping.
+* Returns the original resource(s) to the person who was scraping.
 *
 * @param char_data *ch The scraper
 */
 void cancel_scraping(char_data *ch) {
-	obj_data *obj = read_object(o_TREE, TRUE);
-	scale_item_to_level(obj, 1);	// minimum level
-	obj_to_char(obj, ch);
-	load_otrigger(obj);
+	give_resources(ch, GET_ACTION_RESOURCES(ch), FALSE);
+	free_resource_list(GET_ACTION_RESOURCES(ch));
+	GET_ACTION_RESOURCES(ch) = NULL;
 }
 
 
@@ -804,6 +803,47 @@ INTERACTION_FUNC(finish_picking_crop) {
 	// re-start
 	if (in_room == IN_ROOM(ch)) {
 		start_picking(ch);
+	}
+	
+	return TRUE;
+}
+
+
+INTERACTION_FUNC(finish_scraping) {
+	obj_vnum vnum = interaction->vnum;
+	char buf[MAX_STRING_LENGTH];
+	obj_data *load = NULL;
+	int num;
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		// load
+		load = read_object(vnum, TRUE);
+		scale_item_to_level(load, GET_ACTION_VNUM(ch, 1));
+		
+		// ownership
+		load->last_owner_id = GET_IDNUM(ch);
+		load->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
+		
+		// put it somewhere
+		if (CAN_WEAR(load, ITEM_WEAR_TAKE)) {
+			obj_to_char(load, ch);
+		}
+		else {
+			obj_to_room(load, IN_ROOM(ch));
+		}
+		load_otrigger(load);
+	}
+
+	if (interaction->quantity > 1) {
+		sprintf(buf, "You finish scraping off $p and manage to get $P (x%d).", interaction->quantity);
+	}
+	else {
+		strcpy(buf, "You finish scraping off $p and manage to get $P.");
+	}
+		
+	if (load) {
+		act(buf, FALSE, ch, inter_item, load, TO_CHAR);
+		act("$n finishes scraping off $p.", TRUE, ch, inter_item, NULL, TO_ROOM);
 	}
 	
 	return TRUE;
@@ -1874,47 +1914,46 @@ void process_repairing(char_data *ch) {
 void process_scraping(char_data *ch) {
 	ACMD(do_scrape);
 	
-	int count, total;
-	obj_data *obj, *stick = NULL;
-
-	if (!(obj = has_sharp_tool(ch))) {
+	char buf[MAX_STRING_LENGTH];
+	bool success = FALSE;
+	obj_data *proto;
+	
+	if (!has_sharp_tool(ch)) {
 		msg_to_char(ch, "You need to be using a sharp tool to scrape it.\r\n");
 		cancel_action(ch);
+		return;
 	}
-	else {
-		// skilled work
-		GET_ACTION_TIMER(ch) -= 1 + (skill_check(ch, ABIL_WOODWORKING, DIFF_EASY) ? 1 : 0);
 	
-		// messaging -- to player only
-		if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-			msg_to_char(ch, "You scrape at %s...\r\n", get_obj_name_by_proto(o_TREE));
+	// skilled work
+	GET_ACTION_TIMER(ch) -= 1 + (skill_check(ch, ABIL_WOODWORKING, DIFF_EASY) ? 1 : 0);
+	
+	// messaging -- to player only
+	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
+		msg_to_char(ch, "You scrape at %s...\r\n", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
+	}
+	
+	// done?
+	if (GET_ACTION_TIMER(ch) <= 0) {
+		
+		// will extract no matter what happens here
+		if ((proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
+			success = run_interactions(ch, proto->interactions, INTERACT_SCRAPE, IN_ROOM(ch), NULL, proto, finish_scraping);
 		}
-	
-		// done?
-		if (GET_ACTION_TIMER(ch) <= 0) {
-			GET_ACTION(ch) = ACT_NONE;
-			
-			obj_to_char_or_room((obj = read_object(o_LOG, TRUE)), ch);
-			
-			// sticks!
-			total = number(2, 5);
-			for (count = 0; count < total; ++count) {
-				stick = read_object(o_STICK, TRUE);
-				obj_to_char_or_room(stick, ch);
-				load_otrigger(stick);
-			}
-			
-			sprintf(buf, "You finish scraping off $p and manage to get $P (x%d)!", total);
-			act(buf, FALSE, ch, obj, stick, TO_CHAR);
-			act("$n finishes scraping off $p!", TRUE, ch, obj, 0, TO_ROOM);
-	
-			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-				gain_skill_exp(ch, SKILL_EMPIRE, 10);
-			}
-			load_otrigger(obj);
-			
+		
+		if (!success) {
+			snprintf(buf, sizeof(buf), "You finish scraping off %s but get nothing.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
+			act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
+			snprintf(buf, sizeof(buf), "$n finishes scraping off %s.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
+			act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
+		}
+		
+		GET_ACTION(ch) = ACT_NONE;
+		free_resource_list(GET_ACTION_RESOURCES(ch));
+		GET_ACTION_RESOURCES(ch) = NULL;
+		
+		if (success && proto) {
 			// lather, rinse, rescrape
-			do_scrape(ch, "tree", 0, 0);
+			do_scrape(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
 		}
 	}
 }
@@ -2692,10 +2731,10 @@ ACMD(do_saw) {
 
 
 ACMD(do_scrape) {
-	obj_data *obj, *weapon;
-
+	obj_data *obj;
+	
 	one_argument(argument, arg);
-
+	
 	if (GET_ACTION(ch) == ACT_SCRAPING) {
 		act("You stop scraping.", FALSE, ch, NULL, NULL, TO_CHAR);
 		cancel_action(ch);
@@ -2706,20 +2745,26 @@ ACMD(do_scrape) {
 	else if (!*arg) {
 		msg_to_char(ch, "Scrape what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))) {
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
-	else if (GET_OBJ_VNUM(obj) != o_TREE) {
+	else if (!has_interaction(obj->interactions, INTERACT_SCRAPE)) {
 		msg_to_char(ch, "You can't scrape that!\r\n");
 	}
-	else if (!(weapon = has_sharp_tool(ch))) {
+	else if (!has_sharp_tool(ch)) {
 		msg_to_char(ch, "You need to be using a sharp tool to scrape anything.\r\n");
 	}
 	else {
 		start_action(ch, ACT_SCRAPING, 6);
-
+		
+		// store the item that was used
+		add_to_resource_list(&GET_ACTION_RESOURCES(ch), RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+		GET_ACTION_VNUM(ch, 0) = GET_OBJ_VNUM(obj);
+		GET_ACTION_VNUM(ch, 1) = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
+		
 		act("You begin scraping $p.", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n begins scraping $p.", TRUE, ch, obj, 0, TO_ROOM);
+		
 		extract_obj(obj);
 	}
 }

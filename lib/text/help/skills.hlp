@@ -343,11 +343,11 @@ See also: TREES, LOGS, LUMBER
 #
 SCRAPE
 
-Usage:  scrape tree
+Usage:  scrape <item>
 
 This skill is used to process trees into logs.
 
-The Woodworking ability increases how fast you can scrape logs.
+The Woodworking ability increases how fast you can scrape.
 
 See also: TREES, SAW, WOODWORKING
 #

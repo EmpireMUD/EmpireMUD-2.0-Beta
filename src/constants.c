@@ -1870,19 +1870,20 @@ const char *component_types[] = {
 	"gem",	// 10
 	"grain",
 	"handle",
+	"herb",
 	"leather",
-	"lumber",
-	"meat",	// 15
+	"lumber",	// 15
+	"meat",
 	"metal",
 	"nails",
 	"oil",
-	"pillar",
-	"rock",	// 20
+	"pillar",	// 20
+	"rock",
 	"seeds",
 	"skin",
 	"stick",
-	"textile",
-	"vegetable",	// 25
+	"textile",	// 25
+	"vegetable",
 	"\n"
 };
 
@@ -3102,6 +3103,7 @@ const char *interact_types[] = {
 	"MINE",
 	"COMBINE",
 	"SEPARATE",
+	"SCRAPE",
 	"\n"
 };
 
@@ -3124,6 +3126,7 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_MINE_DATA,	// mine
 	TYPE_OBJ,	// combine
 	TYPE_OBJ,	// separate
+	TYPE_OBJ,	// scrape
 };
 
 
@@ -3145,6 +3148,7 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// mine
 	TYPE_OBJ,	// combine
 	TYPE_OBJ,	// separate
+	TYPE_OBJ,	// scrape
 };
 
 
