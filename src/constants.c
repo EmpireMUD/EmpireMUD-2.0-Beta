@@ -3104,6 +3104,7 @@ const char *interact_types[] = {
 	"COMBINE",
 	"SEPARATE",
 	"SCRAPE",
+	"SAW",
 	"\n"
 };
 
@@ -3127,6 +3128,7 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// combine
 	TYPE_OBJ,	// separate
 	TYPE_OBJ,	// scrape
+	TYPE_OBJ,	// saw
 };
 
 
@@ -3149,6 +3151,7 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// combine
 	TYPE_OBJ,	// separate
 	TYPE_OBJ,	// scrape
+	TYPE_OBJ,	// saw
 };
 
 

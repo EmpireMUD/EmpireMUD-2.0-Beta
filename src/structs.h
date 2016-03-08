@@ -309,7 +309,8 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_COMBINE  14
 #define INTERACT_SEPARATE  15
 #define INTERACT_SCRAPE  16
-#define NUM_INTERACTS  17
+#define INTERACT_SAW  17
+#define NUM_INTERACTS  18
 
 
 // for object saving
