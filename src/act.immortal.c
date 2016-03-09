@@ -3115,18 +3115,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		send_to_char(strcat(buf, "&0\r\n"), ch);
 	}
 	
-	// component info
-	if (GET_OBJ_CMP_TYPE(j) != CMP_NONE) {
-		if (GET_OBJ_CMP_FLAGS(j)) {
-			prettier_sprintbit(GET_OBJ_CMP_FLAGS(j), component_flags, buf);
-			strcat(buf, " ");
-		}
-		else {
-			*buf = '\0';
-		}
-		msg_to_char(ch, "Component type: &y%s%s&0\r\n", buf, component_types[GET_OBJ_CMP_TYPE(j)]);
-	}
-	
 	sprintbit(GET_OBJ_WEAR(j), wear_bits, buf, TRUE);
 	msg_to_char(ch, "Can be worn on: &g%s&0\r\n", buf);
 
@@ -3135,8 +3123,17 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 	sprintbit(GET_OBJ_EXTRA(j), extra_bits, buf, TRUE);
 	msg_to_char(ch, "Extra flags   : &g%s&0\r\n", buf);
+	
+	// component info
+	if (GET_OBJ_CMP_FLAGS(j)) {
+		prettier_sprintbit(GET_OBJ_CMP_FLAGS(j), component_flags, buf);
+		strcat(buf, " ");
+	}
+	else {
+		*buf = '\0';
+	}
 
-	msg_to_char(ch, "Timer: %d, Material: %s\r\n", GET_OBJ_TIMER(j), materials[GET_OBJ_MATERIAL(j)].name);
+	msg_to_char(ch, "Timer: &y%d&0, Material: &y%s&0, Component type: &y%s%s&0\r\n", GET_OBJ_TIMER(j), materials[GET_OBJ_MATERIAL(j)].name, buf, component_types[GET_OBJ_CMP_TYPE(j)]);
 
 	strcpy(buf, "In room: ");
 	if (!IN_ROOM(j))
