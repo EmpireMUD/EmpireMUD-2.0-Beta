@@ -458,18 +458,15 @@ void show_craft_info(char_data *ch, craft_data *craft) {
 	}
 	else if ((proto = obj_proto(GET_CRAFT_OBJECT(craft)))) {
 		// build info string
-		*buf = '\0';
-		if (GET_OBJ_TYPE(proto) != ITEM_OTHER) {
-			sprintf(buf, " (%s", item_types[(int) GET_OBJ_TYPE(proto)]);
-			LL_FOREACH(GET_OBJ_APPLIES(proto), apply) {
-				sprintf(buf + strlen(buf), ", %s", apply_types[(int) apply->location]);
-			}
-			if (GET_OBJ_AFF_FLAGS(proto)) {
-				prettier_sprintbit(GET_OBJ_AFF_FLAGS(proto), affected_bits, part);
-				sprintf(buf + strlen(buf), ", %s", part);
-			}
-			strcat(buf, ")");
+		sprintf(buf, " (%s", item_types[(int) GET_OBJ_TYPE(proto)]);
+		LL_FOREACH(GET_OBJ_APPLIES(proto), apply) {
+			sprintf(buf + strlen(buf), ", %s", apply_types[(int) apply->location]);
 		}
+		if (GET_OBJ_AFF_FLAGS(proto)) {
+			prettier_sprintbit(GET_OBJ_AFF_FLAGS(proto), affected_bits, part);
+			sprintf(buf + strlen(buf), ", %s", part);
+		}
+		strcat(buf, ")");
 		
 		if (GET_CRAFT_QUANTITY(craft) == 1) {
 			msg_to_char(ch, "Creates: %s%s\r\n", get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), buf);
