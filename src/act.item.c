@@ -277,16 +277,16 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		strcpy(location, " (in room)");
 	}
 	else if (obj->carried_by) {
-		snprintf(location, sizeof(location), ", carried by %s, ", PERS(obj->carried_by, obj->carried_by, FALSE));
+		snprintf(location, sizeof(location), ", carried by %s,", PERS(obj->carried_by, obj->carried_by, FALSE));
 	}
 	else if (obj->in_vehicle) {
-		snprintf(location, sizeof(location), ", in %s, ", get_vehicle_short_desc(obj->in_vehicle, ch));
+		snprintf(location, sizeof(location), ", in %s,", get_vehicle_short_desc(obj->in_vehicle, ch));
 	}
 	else if (obj->in_obj) {
-		snprintf(location, sizeof(location), ", in %s, ", GET_OBJ_DESC(obj->in_obj, ch, OBJ_DESC_SHORT));
+		snprintf(location, sizeof(location), ", in %s,", GET_OBJ_DESC(obj->in_obj, ch, OBJ_DESC_SHORT));
 	}
 	else if (obj->worn_by) {
-		snprintf(location, sizeof(location), ", worn by %s, ", PERS(obj->worn_by, obj->worn_by, FALSE));
+		snprintf(location, sizeof(location), ", worn by %s,", PERS(obj->worn_by, obj->worn_by, FALSE));
 	}
 	else {
 		*location = '\0';
