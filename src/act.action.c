@@ -2388,7 +2388,7 @@ ACMD(do_harvest) {
 		msg_to_char(ch, "You can't harvest here.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
-		msg_to_char(ch, "You already busy doing something else.\r\n");
+		msg_to_char(ch, "You are already busy doing something else.\r\n");
 	}
 	else if (!ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CROP)) {
 		msg_to_char(ch, "You can't harvest anything here!\r\n");
