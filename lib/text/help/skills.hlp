@@ -210,8 +210,6 @@ container to hold the milk. Cows can be milked once or twice per day.
 MILL MILLING
 
 Building:  (MM)  Mill  (no skill required)
-Resources:  10x (pillar), 2x (large, single block)
-Built on:  plains, desert
 Stored at the mill:  cornmeal, flour
 Command:  mill [number] <item>
           mill info <item>
@@ -228,8 +226,6 @@ See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP
 MINE MINES
 
 Building:  &y/&0[]&y\&0  Mine  (no skill required)
-Resources:  4 logs
-Built on:  mountain
 Command:  mine
 
 "Mine" is both a building type, and the command to work in that building. Mines
@@ -261,8 +257,6 @@ See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS
 MINT
 
 Building:  [MM]  Mint  (Commerce ability)
-Resources:  12 lumber, 4 nails, 12 blocks, 4 coin mills
-Built on:  plains, desert
 Fame:  5
 Command:  mint <object>
 
@@ -526,7 +520,6 @@ TENT TENTS
 
 ./\.  Tent  (Basic Crafts ability)
 
-Built on:  plains, desert
 Commands:  sew tent
            build tent <direction>
 

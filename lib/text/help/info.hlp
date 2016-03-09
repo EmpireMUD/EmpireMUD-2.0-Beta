@@ -549,9 +549,9 @@ See also: COOLDOWNS
 HUNGER THIRST HUNGRY THIRSTY STARVING STARVED STARVATION
 
 Over time, you will naturally become hungry and thirsty. This has no effect
-until 24 hours have passed since you were last fully sated, at which point your
-regeneration will be greatly slowed. Hunger and thirst penalties do not stack.
-You will continue to accumulate hunger and thirst (making it more difficult to
+until you accumulate 24 ingame hours' worth of hunger or thirst, at which point
+your regeneration will be greatly slowed. Hunger and thirst penalties do not
+stack. You will continue to accumulate hunger and thirst (making it harder to
 remove these penalties) until 50 hours have passed.
 
 Vampires with low blood pools suffer a starvation penalty identical to hunger
@@ -560,7 +560,7 @@ and thirst.
 All timed actions, such as crafting and chores, take twice as long while you
 are hungry, thirsty, or blood-starved.
 
-See also: BLOOD, EAT, UNNATURAL THIRST, SATED THIRST
+See also: BLOOD, EAT, UNNATURAL THIRST, SATED THIRST, TIME
 #
 INFRA INFRAVISION
 

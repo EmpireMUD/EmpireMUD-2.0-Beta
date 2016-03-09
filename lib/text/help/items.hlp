@@ -394,8 +394,6 @@ See also: CASTLE, DESIGNATE, PRIVILEGE, RETRIEVE, STORE, WAREHOUSE
 WAREHOUSE
 
 Building:  {WW}  Warehouse  (Artisans skill)
-Resources:  20 lumber, 8 nails
-Built on:  plains, desert
 
 Command:  warehouse inventory [item keywords]
           warehouse identify <item keywords>

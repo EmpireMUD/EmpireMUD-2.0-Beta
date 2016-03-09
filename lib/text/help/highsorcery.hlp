@@ -435,15 +435,15 @@ Staves are the signature weapon of High Sorcery, and this power lets you make
 them.
 
 Staffmaking:
-  staff  1 log, 5 fiveleaf
-  wanderer staff  1 log, 5 lightning stones  (move points)
-  sorcerer staff  1 log, 5 blue irises  (mana regen)
-  staff of wisdom  1 log, 5 glowing seashells  (intelligence)
+  staff
+  wanderer staff
+  sorcerer staff 
+  staff of wisdom
 
 Powerful Staves:
-  staff of lightning  1 log, 10 lightning stones, 5 nocturnium ingots  (wits)
-  burning staff  1 log, 10 blue irises, 5 nocturnium ingots  (mana)
-  staff of agony  1 log, 10 bloodstones, 5 nocturnium ingots  (to-hit)
+  staff of lightning
+  burning staff
+  staff of agony
 
 Gain skill by crafting staves.
 #
