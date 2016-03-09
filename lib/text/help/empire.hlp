@@ -99,11 +99,15 @@ BUILD BUILDING
 
 Usage:  build <building> [direction]
         build <monument> <god>
+        build info <building>
 
 This command is used to create buildings using raw materials. If you build a
 shrine or temple, you must specify a god to dedicate it to. Most other
 buildings require a direction that they'll face. Resources are added from left
 to right in the requirements list (you can't add nails before lumber).
+
+You can just get information on a building, like what it costs to build, by
+typing "build info <building>".
 
 You can't build on land that's inside another empire's city radius while at war
 with that empire.

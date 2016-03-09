@@ -101,6 +101,7 @@ See also: DEBUFF, FAMILIAR, FERAL CLASS
 BREW
 
 Usage:  brew [number] <potion>
+        brew info <potion>
 
 This command allows you to brew potions of various types, if you have the
 correct potions abilities from Natural Magic.

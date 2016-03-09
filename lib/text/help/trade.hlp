@@ -22,8 +22,9 @@ Advanced Ships (Trade ability)
 Building:  &b~&0[]&b~&0  Upgraded Shipyard (Seafaring ability)
 Resource:  30 blocks, 20 iron ingots
 Built on:  upgrade Shipyard
-Command:  manufacture <ship>
 Fame:  4
+Commands:  manufacture <ship>
+           manufacture info <ship>
 
 The upgraded shipyard allows you to manufacture bigger, more powerful ships.
 
@@ -109,6 +110,7 @@ See also: CRAFT
 Basic Crafts (Trade ability)
 
 Command:  craft [number] <item>
+          craft info <item>
 
 All crafting abilities train when you complete recipes that require them.
 Unskilled crafts can train Trade up to 15.
@@ -181,6 +183,7 @@ See also: SEWING
 COOK COOKING BAKE BAKING
 
 Command:  cook [number] <item>
+          cook info <item>
 
 The cook command (formerly "bake") allows you to make food from a variety of
 raw ingredients. To cook, you'll need a heat source: a cooking fire, a kitchen,
@@ -280,8 +283,9 @@ Forge (Trade ability)
 Building:  (FF)  Forge  (no skill required)
 Resources:  10 logs, 15 rocks, 10 iron ingots
 Built on:  plains, desert
-Command:  forge [number] <item>
 Tool:  hammer
+Commands:  forge [number] <item>
+           forge info <item>
 
 Forging is done in a forge using iron ingots. Almost all metallic armor and
 weapons are created at a forge, with varying levels of skill. Iron, silver,
@@ -674,6 +678,7 @@ SEW SEWING
 
 Sew (Trade ability)
 Command:  sew [number] <item>
+          sew info <item>
 
 The art of sewing is one of the oldest and simplest trade skills, but it also
 makes some of the finest clothing and the lightest armor. The only resource
@@ -718,7 +723,8 @@ Shipbuilding (Trade ability)
 Building:  &b~&0()&b~&0  Shipyard (Seafaring ability)
 Resource:  60 lumber, 24 nails
 Built on:  plains or desert, next to water
-Command:  manufacture <ship>
+Commands:  manufacture <ship>
+           manufacture info <ship>
 
 Great ships can be created via the manufacture skill. This can only be done in
 a shipyard, and the vessel can be sailed to a dock when finished.
@@ -862,6 +868,7 @@ See also: FORGE, IRON BLADES, DEADLY WEAPONS
 WEAVE
 
 Command:  weave [number] <item>
+          weave info <item>
 
 Weaving converts raw materials into cloth. You can weave anywhere, but it goes
 much faster at the tailor shop.

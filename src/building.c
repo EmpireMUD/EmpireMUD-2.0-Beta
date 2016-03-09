@@ -1072,6 +1072,7 @@ ACMD(do_build) {
 		/* Send output */
 		else {
 			msg_to_char(ch, "Usage: build <structure> [direction]\r\n");
+			msg_to_char(ch, "       build info <structure>\r\n");
 			msg_to_char(ch, "You know how to build:\r\n");
 			this_line = FALSE;
 			found_any = FALSE;

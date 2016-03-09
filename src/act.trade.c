@@ -432,11 +432,16 @@ bool obj_has_apply_type(obj_data *obj, int apply_type) {
 * @param craft_data *craft Which craft to show.
 */
 void show_craft_info(char_data *ch, craft_data *craft) {
+	extern const char *affected_bits[];
+	extern const char *apply_types[];
 	extern const char *bld_on_flags[];
 	extern const char *drinks[];
+	extern const char *item_types[];
 	
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	struct obj_apply *apply;
 	ability_data *abil;
+	obj_data *proto;
 	bld_data *bld;
 	
 	msg_to_char(ch, "Information for %s:\r\n", GET_CRAFT_NAME(craft));
@@ -451,12 +456,26 @@ void show_craft_info(char_data *ch, craft_data *craft) {
 	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {
 		msg_to_char(ch, "Creates liquid: %d unit%s of %s\r\n", GET_CRAFT_QUANTITY(craft), PLURAL(GET_CRAFT_QUANTITY(craft)), (GET_CRAFT_OBJECT(craft) == NOTHING ? "NOTHING" : drinks[GET_CRAFT_OBJECT(craft)]));
 	}
-	else {
+	else if ((proto = obj_proto(GET_CRAFT_OBJECT(craft)))) {
+		// build info string
+		*buf = '\0';
+		if (GET_OBJ_TYPE(proto) != ITEM_OTHER) {
+			sprintf(buf, " (%s", item_types[(int) GET_OBJ_TYPE(proto)]);
+			LL_FOREACH(GET_OBJ_APPLIES(proto), apply) {
+				sprintf(buf + strlen(buf), ", %s", apply_types[(int) apply->location]);
+			}
+			if (GET_OBJ_AFF_FLAGS(proto)) {
+				prettier_sprintbit(GET_OBJ_AFF_FLAGS(proto), affected_bits, part);
+				sprintf(buf + strlen(buf), ", %s", part);
+			}
+			strcat(buf, ")");
+		}
+		
 		if (GET_CRAFT_QUANTITY(craft) == 1) {
-			msg_to_char(ch, "Creates: %s\r\n", get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)));
+			msg_to_char(ch, "Creates: %s%s\r\n", get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), buf);
 		}
 		else {
-			msg_to_char(ch, "Creates: %dx %s\r\n", GET_CRAFT_QUANTITY(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)));
+			msg_to_char(ch, "Creates: %dx %s%s\r\n", GET_CRAFT_QUANTITY(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), buf);
 		}
 	}
 	

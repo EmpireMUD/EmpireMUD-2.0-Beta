@@ -214,6 +214,7 @@ Resources:  10x (pillar), 2x (large, single block)
 Built on:  plains, desert
 Stored at the mill:  cornmeal, flour
 Command:  mill [number] <item>
+          mill info <item>
 
 You can mill:
   wheat into 2 flour
@@ -526,8 +527,8 @@ TENT TENTS
 ./\.  Tent  (Basic Crafts ability)
 
 Built on:  plains, desert
-Commands: sew tent
-          build tent <direction>
+Commands:  sew tent
+           build tent <direction>
 
 Requires 8 large leather to sew.
 
