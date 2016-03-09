@@ -42,8 +42,8 @@ Advanced Tactics (Empire ability)
 
 The Advanced Tactics ability allows you to upgrade your guard towers.
 
-'TT' 1st upgrade  12 lumber, 3 nails
-"TT" 2nd upgrade  24 lumber, 6 nails
+'TT' 1st upgrade
+"TT" 2nd upgrade
 
 Guard towers may only be built or upgraded inside of cities.
 
@@ -55,17 +55,17 @@ Artisans (Empire ability)
 
 The Artisans ability unlocks additional buildings.
 
-(AA) alchemist  4 lumber, 2 nails, 12 bricks
-{BB} apiary  12 lumber, 4 nails, 8 beehives
-(BB) bakery  4 lumber, 2 nails, 12 bricks
-&c~&0--&c~&0 bridge  8x (large block), 12x (lumber), 4x (nails)
-(CC) carpenter  4 lumber, 2 nails, 12 bricks
-(GG) glassblower  4 lumber, 2 nails, 12 bricks
-[PP] pigeonpost  12 lumber, 4 nails
-(TT) tailor  4 lumber, 2 nails, 12 bricks
-[TT] tavern  10 lumber, 4 nails, 12 bricks, 20 hops, 20 barley
-{WW} warehouse  20 lumber, 8 nails
-.==. steps  8x (large block)
+(AA) alchemist
+{BB} apiary
+(BB) bakery
+&c~&0--&c~&0 bridge
+(CC) carpenter
+(GG) glassblower
+[PP] pigeonpost
+(TT) tailor
+[TT] tavern
+{WW} warehouse
+.==. steps
 
 See also: BUILD
 #
@@ -120,30 +120,30 @@ All buildings give experience as you add materials to their construction. If
 they require an ability they will give experience for that ability. Otherwise,
 they just give Empire experience and only up to Empire 15.
 
-&g.&0()&g.&0 hut  20 sticks
-&y.&0()&y.&0 mudhut  10 sticks, 10 rocks
-(--) cabin  6 logs
-(==) house  10 logs
-&y.&0[]&y.&0 pueblo  6 logs, 20 rocks
-&y[==]&0 cliffdwelling  10 logs, 20 rocks
-(&c~~&0) well  5 sticks, 1 log, 10 rocks
-&y/&0[]&y\&0 mine  4 logs
-(FF) forge  10 logs, 15 rocks, 10 iron ingots
-(MM) mill  10x (pillar), 2x (large, single block)
-(PP) potter  10x (pillar), 1x (large, single block)
-(SS) stable  20 logs, 8 pouches of nails
-vvvv fence  20 sticks
-vxvv gate  20 sticks, 1 copper ingot
-{CC} cannery  20 sticks -- store fruits
-{FF} foundry  20 sticks -- store metals
-{GG} granary  20 sticks -- store grains
-{PP} gravelpit  20 sticks -- store rocks
-{LL} lumberyard  20 sticks -- store lumber
-{SS} smokehouse  20 sticks -- store meats
-{TT} tannery  20 sticks -- store skins
-{UU} utilityshed  20 sticks -- store tools
-|__| quarry  4 logs, 20 sticks -- must be on flat land facing a mountain
-&y|__|&0 claypit  4 logs, 20 sticks -- must be on flat land facing water
+&g.&0()&g.&0 hut
+&y.&0()&y.&0 mudhut
+(--) cabin
+(==) house
+&y.&0[]&y.&0 pueblo
+&y[==]&0 cliffdwelling
+(&c~~&0) well
+&y/&0[]&y\&0 mine
+(FF) forge
+(MM) mill
+(PP) potter
+(SS) stable
+vvvv fence
+vxvv gate
+{CC} cannery -- store fruits
+{FF} foundry -- store metals
+{GG} granary -- store grains
+{PP} gravelpit -- store rocks
+{LL} lumberyard -- store lumber
+{SS} smokehouse -- store meats
+{TT} tannery -- store skins
+{UU} utilityshed -- store tools
+|__| quarry -- must be on flat land facing a mountain
+&y|__|&0 claypit -- must be on flat land facing water
 
 For more information on building your first house, see HELP HOUSING GUIDE.
 
@@ -262,7 +262,7 @@ having it.
 
 Commerce also allows you to build the mint building, and mint your own coins:
 
-[MM] mint  12 lumber, 4 nails, 12 blocks, 4 coin mills
+[MM] mint
 
 Gain experience by building mints, and passively over time.
 
@@ -651,9 +651,9 @@ Grand Monuments (Empire ability)
 
 The Grand Monuments ability allows you to build the largest monuments.
 
-[^^] library  100 lumber, 40 nails, 48 blocks
-[||] hightemple  24 lumber, 8 nails, 48 blocks
-&y/^^\&0 pyramid  100 lumber, 40 nails, 200 blocks
+[^^] library
+[||] hightemple
+&y/^^\&0 pyramid
 
 See also: BUILD, MONUMENTS
 #
@@ -663,10 +663,10 @@ Build Haven (Vampire ability)
 
 The Build Haven ability unlocks additional buildings.
 
-&g.&0[]&g.&0 househaven  8 lumber, 2 nails, 12 bricks
-&g^&0[]&g^&0 burrowhaven  12 lumber, 3 nails, 4 blocks (chameleon)
-&Y.&0[]&Y.&0 pueblohaven  4 lumber, 1 nails, 20 bricks
-&y/&0()&y\&0 cavehaven  30 lumber, 10 nails, 2 blocks  (chameleon)
+&g.&0[]&g.&0 househaven
+&g^&0[]&g^&0 burrowhaven  (chameleon)
+&Y.&0[]&Y.&0 pueblohaven
+&y/&0()&y\&0 cavehaven  (chameleon)
 
 See also: BUILD, VAMPIRE
 #
@@ -699,12 +699,12 @@ citizens than the smaller houses that don't require this ability. People will
 move into a house at a rate of one person per two game days, until the
 house is full.
 
-[--] stonehouse  6x (lumber), 6x (large, single block)
-[==] largehouse  4 lumber, 1 nails, 12 bricks
-&g^&0()&g^&0 treehouse  6 lumber, 2 nails  (chameleon)
-&g^&0[]&g^&0 treecomplex  20 lumber, 8 nails  (chameleon)
-&g.&0()&g.&0 undergroundcomplex  2x (large block), 20x (lumber), 8x (nails); [chameleon]
-&y/&0[]&y\&0 minecomplex  30 lumber, 12 nails
+[--] stonehouse
+[==] largehouse
+&g^&0()&g^&0 treehouse  (chameleon)
+&g^&0[]&g^&0 treecomplex  (chameleon)
+&g.&0()&g.&0 undergroundcomplex  (chameleon)
+&y/&0[]&y\&0 minecomplex
 
 See also: BUILD, HOME, WORKFORCE
 #
@@ -765,13 +765,13 @@ Luxury (Empire ability)
 
 The Luxury ability unlocks additional buildings.
 
-.... courtyard  20 rocks, 4 stone blocks (in-city only)
-&g^/\^&0 trapperspost  18 lumber, 4 nails, 8 large leather
-[&b~~&0] baths  4 blocks, 8 lumber, 2 nails, 12 bricks (in-city only)
-{&c~~&0} fountain  10 blocks (in-city only)
-&g.&b||&g.&0 sorcerytower  80 lumber, 40 stone blocks, 5 nocturnium ingots, 2 gold bars (in-city only)
-V[]V  portcullis  60 lumber, 14 nails, 60 bricks  (in-city only)
-[**]  greathall  60 lumber, 14 nails, 60 bricks  (in-city only)
+.... courtyard  (in-city only)
+&g^/\^&0 trapperspost
+[&b~~&0] baths  (in-city only)
+{&c~~&0} fountain  (in-city only)
+&g.&b||&g.&0 sorcerytower  (in-city only)
+V[]V  portcullis  (in-city only)
+[**]  greathall  (in-city only)
 
 See also: BUILD
 #
@@ -825,14 +825,14 @@ Monuments (Empire ability)
 
 The Monuments ability allows you to build monuments.
 
-&g.&0}{&g.&0 statue  6x (lumber), 2x (nails), 10x (large, single block)
-<<>> henge  120x (large, single block)
-&g.&0||&g.&0 megalith  40 stone blocks
-&g.&0i&g.&0i cemetery  8 stone blocks
-&g.^.&co&0 park  25 sticks, 4 blocks
-[oo] tomb  4 lumber, 2 nails, 10 blocks
-&g.&0{}&g.&0 shrine  4 lumber, 2 nails, 12 blocks
-[[]] temple  12 lumber, 4 nails, 24 blocks
+&g.&0}{&g.&0 statue
+<<>> henge
+&g.&0||&g.&0 megalith
+&g.&0i&g.&0i cemetery
+&g.^.&co&0 park
+[oo] tomb
+&g.&0{}&g.&0 shrine
+[[]] temple
 
 See also: BUILD, GRAND MONUMENTS
 #
@@ -959,8 +959,6 @@ QUARRY
 
 Command:  quarry
 Building:  |__|  Quarry  (no skill required)
-Resources:  4 logs, 20 sticks
-Built on:  plains or desert, facing mountain
 
 A quarry must be built on plains or desert, facing a mountain. Quarries are a
 good place to dig up rocks. You can also quarry stone here using the "quarry"
@@ -995,12 +993,12 @@ Raise Armies (Empire ability)
 
 The Raise Armies ability unlocks additional buildings.
 
-.TT. guardtower  12 lumber, 3 nails (may only be built in a city)
-&y.&0/\&y.&0 mountainoutpost  12 lumber, 3 nails
-[BB] barracks  40 lumber, 10 nails, 20 bricks
-[  ] trainingyard  40 lumber, 10 nails, 20 bricks
-VVVV wall  10 bricks
-V||V gatehouse  10 lumber, 4 nails, 10 bricks
+.TT. guardtower  (may only be built in a city)
+&y.&0/\&y.&0 mountainoutpost
+[BB] barracks
+[  ] trainingyard
+VVVV wall
+V||V gatehouse
  
 See also: BUILD, ADVANCED TACTICS, UPGRADE
 #
@@ -1076,9 +1074,9 @@ Seafaring (Empire ability)
 
 The Seafaring ability unlocks additional buildings.
 
-&b~&0==&g.&0 docks  20 lumber, 8 nails
-&b~&0()&b~&0 shipyard  60 lumber, 24 nails
-&b~&0[]&b~&0   upgraded  30 blocks, 20 iron ingots
+&b~&0==&g.&0 docks
+&b~&0()&b~&0 shipyard
+&b~&0[]&b~&0   upgraded shipyard
 
 See also: BUILD, MANUFACTURE, UPGRADE
 #
@@ -1138,11 +1136,11 @@ Swamp Engineering (Empire ability)
 
 The Swamp Engineering unlocks swamp walks (roads) and swamp buildings.
 
-&c~&0--&c~&0  swampwalk  4 lumber, 40 sticks  (road)
-&c~&0__&c~&0  swampplatform  12 lumber, 4 nails, 40 sticks
-&c~&0/\&c~&0  swamphut  20 lumber, 8 nails, 40 sticks
-&c~&0[]&c~&0  swampmanor  30 lumber, 12 nails, 60 sticks
-&c~&0()&c~&0  swampcomplex  40 lumber, 16 nails, 80 sticks (chameleon)
+&c~&0--&c~&0  swampwalk  (road)
+&c~&0__&c~&0  swampplatform  (creates plains)
+&c~&0/\&c~&0  swamphut
+&c~&0[]&c~&0  swampmanor
+&c~&0()&c~&0  swampcomplex  (chameleon)
 
 See also: BUILD, HOME, WORKFORCE
 #
@@ -1239,7 +1237,7 @@ See also: TERRITORY
 Trade Routes (Empire ability)
 
 Buildings:
- [$$] tradingpost  12 lumber, 4 nails
+ [$$] tradingpost
 
 Commands:  import, export, trade
 
@@ -1277,7 +1275,6 @@ TUNNEL
 
 &y/&0OO&y\&0  Tunnel  (Empire ability)
 
-Resources:  12 logs, 8 lumber, 4 nails (per tile)
 Command:  tunnel <direction>
 
 This command allows you to begin construction on a tunnel through a mountain

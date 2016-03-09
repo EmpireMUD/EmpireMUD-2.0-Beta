@@ -4012,7 +4012,6 @@ All rooms need a good description. The description should be at least 3 full
 lines, and should always be formatted with the /fi option in the string
 editor. Generally descriptions should not run more than about 6 lines.
 
-
 See also: OLC ROOM TEMPLATES, STRING EDITOR
 #d
 "REDIT EXITS"
