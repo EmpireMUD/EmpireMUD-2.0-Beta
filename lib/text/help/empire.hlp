@@ -58,14 +58,14 @@ The Artisans ability unlocks additional buildings.
 (AA) alchemist  4 lumber, 2 nails, 12 bricks
 {BB} apiary  12 lumber, 4 nails, 8 beehives
 (BB) bakery  4 lumber, 2 nails, 12 bricks
-&c~&0--&c~&0 bridge  8 blocks, 12 lumber, 4 nails
+&c~&0--&c~&0 bridge  8x (large block), 12x (lumber), 4x (nails)
 (CC) carpenter  4 lumber, 2 nails, 12 bricks
 (GG) glassblower  4 lumber, 2 nails, 12 bricks
 [PP] pigeonpost  12 lumber, 4 nails
 (TT) tailor  4 lumber, 2 nails, 12 bricks
 [TT] tavern  10 lumber, 4 nails, 12 bricks, 20 hops, 20 barley
 {WW} warehouse  20 lumber, 8 nails
-.==. steps  8 blocks
+.==. steps  8x (large block)
 
 See also: BUILD
 #
@@ -125,8 +125,8 @@ Empire 15.
 (&c~~&0) well  5 sticks, 1 log, 10 rocks
 &y/&0[]&y\&0 mine  4 logs
 (FF) forge  10 logs, 15 rocks, 10 iron ingots
-(MM) mill  10 logs, 2 stone blocks
-(PP) potter  10 logs, 1 stone block
+(MM) mill  10x (pillar), 2x (large, single block)
+(PP) potter  10x (pillar), 1x (large, single block)
 (SS) stable  20 logs, 8 pouches of nails
 vvvv fence  20 sticks
 vxvv gate  20 sticks, 1 copper ingot
@@ -695,11 +695,11 @@ citizens than the smaller houses that don't require this ability. People will
 move into a house at a rate of one person per two game days, until the
 house is full.
 
-[--] stonehouse  6 lumber, 6 blocks
+[--] stonehouse  6x (lumber), 6x (large, single block)
 [==] largehouse  4 lumber, 1 nails, 12 bricks
 &g^&0()&g^&0 treehouse  6 lumber, 2 nails  (chameleon)
 &g^&0[]&g^&0 treecomplex  20 lumber, 8 nails  (chameleon)
-&g.&0()&g.&0 undergroundcomplex  20 lumber, 2 blocks, 8 nails  (chameleon)
+&g.&0()&g.&0 undergroundcomplex  2x (large block), 20x (lumber), 8x (nails); [chameleon]
 &y/&0[]&y\&0 minecomplex  30 lumber, 12 nails
 
 See also: BUILD, HOME, WORKFORCE
@@ -821,8 +821,8 @@ Monuments (Empire ability)
 
 The Monuments ability allows you to build monuments.
 
-&g.&0}{&g.&0 statue  6 lumber, 2 nails, 10 blocks
-<<>> henge  120 stone blocks
+&g.&0}{&g.&0 statue  6x (lumber), 2x (nails), 10x (large, single block)
+<<>> henge  120x (large, single block)
 &g.&0||&g.&0 megalith  40 stone blocks
 &g.&0i&g.&0i cemetery  8 stone blocks
 &g.^.&co&0 park  25 sticks, 4 blocks

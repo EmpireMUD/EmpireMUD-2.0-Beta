@@ -210,7 +210,7 @@ container to hold the milk. Cows can be milked once or twice per day.
 MILL MILLING
 
 Building:  (MM)  Mill  (no skill required)
-Resources:  10 logs, 2 stone blocks
+Resources:  10x (pillar), 2x (large, single block)
 Built on:  plains, desert
 Stored at the mill:  cornmeal, flour
 Command:  mill [number] <item>

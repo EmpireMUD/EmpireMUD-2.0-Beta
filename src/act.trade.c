@@ -425,6 +425,67 @@ bool obj_has_apply_type(obj_data *obj, int apply_type) {
 }
 
 
+/**
+* This is like a mortal version of do_stat_craft().
+*
+* @param char_data *ch The person checking the craft info.
+* @param craft_data *craft Which craft to show.
+*/
+void show_craft_info(char_data *ch, craft_data *craft) {
+	extern const char *bld_on_flags[];
+	extern const char *drinks[];
+	
+	char buf[MAX_STRING_LENGTH];
+	ability_data *abil;
+	bld_data *bld;
+	
+	msg_to_char(ch, "Information for %s:\r\n", GET_CRAFT_NAME(craft));
+	
+	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+		bld = building_proto(GET_CRAFT_BUILD_TYPE(craft));
+		msg_to_char(ch, "Builds: %s\r\n", bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+	}
+	else if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+		msg_to_char(ch, "Creates vehicle: %s\r\n", get_vehicle_name_by_proto(GET_CRAFT_OBJECT(craft)));
+	}
+	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {
+		msg_to_char(ch, "Creates liquid: %d unit%s of %s\r\n", GET_CRAFT_QUANTITY(craft), PLURAL(GET_CRAFT_QUANTITY(craft)), (GET_CRAFT_OBJECT(craft) == NOTHING ? "NOTHING" : drinks[GET_CRAFT_OBJECT(craft)]));
+	}
+	else {
+		if (GET_CRAFT_QUANTITY(craft) == 1) {
+			msg_to_char(ch, "Creates: %s\r\n", get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)));
+		}
+		else {
+			msg_to_char(ch, "Creates: %dx %s\r\n", GET_CRAFT_QUANTITY(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)));
+		}
+	}
+	
+	if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING) {
+		msg_to_char(ch, "Requires: %s\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft)));
+	}
+	
+	if (GET_CRAFT_ABILITY(craft) != NO_ABIL) {
+		sprintf(buf, "%s", get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft)));
+		if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
+			sprintf(buf + strlen(buf), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+		}
+		msg_to_char(ch, "Requires: %s\r\n", buf);
+	}
+	
+	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+		prettier_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, buf);
+		msg_to_char(ch, "Build on: %s\r\n", buf);
+		if (GET_CRAFT_BUILD_FACING(craft)) {
+			prettier_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, buf);
+			msg_to_char(ch, "Build facing: %s\r\n", buf);
+		}
+	}
+	
+	show_resource_list(GET_CRAFT_RESOURCES(craft), buf);
+	msg_to_char(ch, "Resources: %s\r\n", buf);	
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// GENERIC CRAFT (craft, forge, sew, cook) /////////////////////////////////
 
@@ -1091,6 +1152,7 @@ ACMD(do_gen_craft) {
 	bool is_master;
 	obj_data *drinkcon = NULL;
 	ability_data *cft_abil;
+	bool info = FALSE;
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't craft.\r\n");
@@ -1098,6 +1160,12 @@ ACMD(do_gen_craft) {
 	}
 
 	skip_spaces(&argument);
+	
+	// optional leading info request
+	if (!strn_cmp(argument, "info ", 5)) {
+		argument = any_one_arg(argument, arg);
+		info = TRUE;
+	}
 
 	// optional leading number
 	if ((num = atoi(argument)) > 0) {
@@ -1169,6 +1237,10 @@ ACMD(do_gen_craft) {
 		else if (this_line) {
 			msg_to_char(ch, "%s\r\n", buf);
 		}
+	}
+	else if (info) {
+		// they only wanted info
+		show_craft_info(ch, type);
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy right now.\r\n");
