@@ -347,7 +347,8 @@ different types of resources:
    which are written in paretheses like "1x (lumber)". Some components have
    modifiers like "rare" or "large". An item must have all the correct set of
    modifiers to match the recipe (but it's okay if it has extra modifiers too).
-   You can see an item's component info with identify.
+   You can see an item's component info with identify, shown in parentheses
+   after the name.
 
 &cLiquids&0 - You need a drink container with the correct type of liquid, which
    is written like "2 units of milk". The drink container won't be used up by
