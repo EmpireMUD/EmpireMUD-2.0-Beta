@@ -111,9 +111,9 @@ Until a building is completed, you can walk into and out of it freely, and you
 can't build any additional rooms inside. Once finished, nobody who is not
 loyal to your empire will be able to enter.
 
-All buildings give experience as you add materials to their construction: for
-abilities if they require them; otherwise only for Empire and only up to
-Empire 15.
+All buildings give experience as you add materials to their construction. If
+they require an ability they will give experience for that ability. Otherwise,
+they just give Empire experience and only up to Empire 15.
 
 &g.&0()&g.&0 hut  20 sticks
 &y.&0()&y.&0 mudhut  10 sticks, 10 rocks
