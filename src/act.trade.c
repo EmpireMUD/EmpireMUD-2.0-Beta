@@ -1164,6 +1164,7 @@ ACMD(do_gen_craft) {
 	// optional leading info request
 	if (!strn_cmp(argument, "info ", 5)) {
 		argument = any_one_arg(argument, arg);
+		skip_spaces(&argument);
 		info = TRUE;
 	}
 
