@@ -46,6 +46,9 @@ const char *bookedit_license_display =
 // local protos
 void remove_book_from_table(book_data *book);
 
+// external consts
+extern const char *book_name_list[];
+
 // external funcs
 void add_book_author(int idnum);
 void save_author_books(int idnum);
@@ -543,6 +546,9 @@ OLC_MODULE(booked_item_name) {
 	}
 	else if (strlen(argument) > MAX_BOOK_ITEM_NAME) {
 		msg_to_char(ch, "Book item names may not be more than %d characters long.\r\n", MAX_BOOK_ITEM_NAME);
+	}
+	else if (!IS_IMMORTAL(ch) && !has_keyword(argument, book_name_list, TRUE)) {
+		msg_to_char(ch, "Book item names must contain a word like 'book' or 'tome'. See HELP BOOKEDIT ITEM.\r\n");
 	}
 	else {
 		olc_process_string(ch, argument, "item name", &(book->item_name));

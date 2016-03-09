@@ -2277,7 +2277,7 @@ ACMD(do_barde) {
 	int num;
 	
 	if (!res) {
-		res = create_resource_list(o_IRON_INGOT, 10, NOTHING);
+		add_to_resource_list(&res, RES_OBJECT, o_IRON_INGOT, 10, 0);
 	}
 	
 	one_argument(argument, arg);
@@ -2350,7 +2350,7 @@ ACMD(do_barde) {
 
 		if (found) {
 			if (!IS_NPC(ch)) {
-				extract_resources(ch, res, TRUE);
+				extract_resources(ch, res, TRUE, NULL);
 			}
 		}
 		else {

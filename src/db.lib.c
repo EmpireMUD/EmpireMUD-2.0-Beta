@@ -80,7 +80,7 @@ int sort_room_templates(room_template *a, room_template *b);
 void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list);
 void write_interactions_to_file(FILE *fl, struct interaction_item *list);
-void write_resources_to_file(FILE *fl, struct resource_data *list);
+void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -403,6 +403,10 @@ void free_building(bld_data *bdg) {
 			free(interact);
 		}
 	}
+	
+	if (GET_BLD_SCRIPTS(bdg) && (!proto || GET_BLD_SCRIPTS(bdg) != GET_BLD_SCRIPTS(proto))) {
+		free_proto_script(bdg, BLD_TRIGGER);
+	}
 
 	free(bdg);
 }
@@ -542,6 +546,11 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				break;
 			}
 			
+			case 'T': {	// trigger
+				dg_read_trigger(line, bld, BLD_TRIGGER);
+				break;
+			}
+			
 			// upgrades to
 			case 'U': {
 				if (!get_line(fl, line) || sscanf(line, "%d", &int_in[0]) != 1) {
@@ -625,6 +634,9 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 		fprintf(fl, "M\n");
 		fprintf(fl, "%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
 	}
+	
+	// T: triggers
+	script_save_to_disk(fl, bld, BLD_TRIGGER);
 	
 	// U: upgrades_to
 	if (GET_BLD_UPGRADES_TO(bld) != NOTHING && building_proto(GET_BLD_UPGRADES_TO(bld))) {
@@ -858,7 +870,7 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 	}
 	
 	// 'R': resources
-	write_resources_to_file(fl, GET_CRAFT_RESOURCES(craft));
+	write_resources_to_file(fl, 'R', GET_CRAFT_RESOURCES(craft));
 	
 	// end
 	fprintf(fl, "S\n");
@@ -3645,6 +3657,17 @@ void parse_object(FILE *obj_f, int nr) {
 				break;
 			}
 			
+			case 'O': {	// component info
+				if (!get_line(obj_f, line) || sscanf(line, "%d %s", t, f1) != 2) {
+					log("SYSERR: Format error in 'O' Field, %s", buf2);
+					exit(1);
+				}
+				
+				GET_OBJ_CMP_TYPE(obj) = t[0];
+				GET_OBJ_CMP_FLAGS(obj) = asciiflag_conv(f1);
+				break;
+			}
+			
 			case 'R': {
 				if (!get_line(obj_f, line) || sscanf(line, "%d %s", t, f1) != 2) {
 					log("SYSERR: Format error in 'R' Field, %s", buf2);
@@ -3753,6 +3776,12 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 		fprintf(fl, "%s~\n", ocm->msg);
 	}
 	
+	// O: component data
+	if (GET_OBJ_CMP_TYPE(obj) != CMP_NONE) {
+		fprintf(fl, "O\n");
+		fprintf(fl, "%d %s\n", GET_OBJ_CMP_TYPE(obj), bitv_to_alpha(GET_OBJ_CMP_FLAGS(obj)));
+	}
+	
 	// R: storage
 	for (store = obj->storage; store; store = store->next) {
 		fprintf(fl, "R\n");
@@ -3814,47 +3843,53 @@ void free_resource_list(struct resource_data *list) {
 
 
 /**
-* Parses an 'R' resource tag, written by write_resources_to_file(). This file
-* should have just read the 'R' line, and the next line to read is its data.
+* Parses a resource tag (usually 'R', written by write_resources_to_file().
+* This file should have just read the 'R' line, and the next line to read is its data.
 *
 * @param FILE *fl The file to read from.
 * @param struct resource_data **list The resource list to append to.
 * @param char *error_str An identifier to log if there is a problem.
 */
 void parse_resource(FILE *fl, struct resource_data **list, char *error_str) {
-	struct resource_data *new, *end;
+	int vnum, amount, type, misc;
+	struct resource_data *res;
 	char line[256];
-	int int_in[2];
 	
-	if (!fl || !list || !get_line(fl, line) || sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
-		log("SYSERR: format error in R line of %s", error_str ? error_str : "resource");
+	if (!fl || !list || !get_line(fl, line)) {
+		log("SYSERR: data error in resource line of %s", error_str ? error_str : "unknown resource");
 		exit(1);
 	}
 	
-	CREATE(new, struct resource_data, 1);
-	new->vnum = int_in[0];
-	new->amount = int_in[1];
-	
-	// append at the end
-	if ((end = *list)) {
-		while (end->next) {
-			end = end->next;
+	if (sscanf(line, "%d %d %d %d", &vnum, &amount, &type, &misc) != 4) {
+		// backwards-compatibility
+		if (sscanf(line, "%d %d", &vnum, &amount) == 2) {
+			type = RES_OBJECT;
+			misc = 0;
 		}
-		end->next = new;
+		else {
+			log("SYSERR: format error in resource line of %s", error_str ? error_str : "unknown resource");
+			exit(1);
+		}
 	}
-	else {
-		*list = new;
-	}
+	
+	CREATE(res, struct resource_data, 1);
+	res->type = type;
+	res->vnum = vnum;
+	res->amount = amount;
+	res->misc = misc;
+	
+	LL_APPEND(*list, res);
 }
 
 
 /**
-* Writes new-style resource_data to file as an 'R' tag.
+* Writes new-style resource_data to data file.
 *
 * @param FILE *fl The file, open for writing.
+* @param char letter The letter to write for the tag, usually 'R'.
 * @param struct resource_data *list The list of resources to write.
 */
-void write_resources_to_file(FILE *fl, struct resource_data *list) {
+void write_resources_to_file(FILE *fl, char letter, struct resource_data *list) {
 	struct resource_data *res;
 	
 	if (!fl || !list) {
@@ -3862,7 +3897,8 @@ void write_resources_to_file(FILE *fl, struct resource_data *list) {
 	}
 	
 	for (res = list; res; res = res->next) {
-		fprintf(fl, "R\n%d %d  # %dx %s\n", res->vnum, res->amount, res->amount, get_obj_name_by_proto(res->vnum));
+		// for historical reasons (pre-2.0b16 compatibility), vnum and amount come first
+		fprintf(fl, "%c\n%d %d %d %d\n", letter, res->vnum, res->amount, res->type, res->misc);
 	}
 }
 
@@ -3917,7 +3953,6 @@ void parse_room(FILE *fl, room_vnum vnum) {
 
 	char line[256], line2[256], error_buf[256], error_log[MAX_STRING_LENGTH], str1[256], str2[256];
 	int t[10];
-	struct building_resource_type *res, *rtemp;
 	struct depletion_data *dep;
 	struct reset_com *reset, *last_reset = NULL;
 	room_data *room, *find;
@@ -3984,7 +4019,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				}
 				
 				if (t[0] != NOTHING) {
-					attach_building_to_room(building_proto(t[0]), room);
+					attach_building_to_room(building_proto(t[0]), room, FALSE);
 				}
 				if (t[1] != NOTHING) {
 					attach_template_to_room(room_template_proto(t[1]), room);
@@ -4120,37 +4155,11 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				break;
 			}
 			case 'R': {	/* resources */
-				if (!get_line(fl, line2)) {
-					log("SYSERR: Unable to read resource line of room #%d", vnum);
-					exit(1);
-				}
-				if ((sscanf(line2, "%d %d", t, t+1)) != 2) {
-					log("SYSERR: Format in resource line of room #%d", vnum);
-					exit(1);
-				}
-				
-				if (!COMPLEX_DATA(room)) {
+				if (!COMPLEX_DATA(room)) {	// ensure complex data
 					COMPLEX_DATA(room) = init_complex_data();
 				}
 				
-				CREATE(res, struct building_resource_type, 1);
-				res->vnum = t[0];
-				res->amount = t[1];
-				res->next = NULL;
-				
-				if (GET_BUILDING_RESOURCES(room)) {
-					// append to end
-					rtemp = GET_BUILDING_RESOURCES(room);
-					while (rtemp->next) {
-						rtemp = rtemp->next;
-					}
-					
-					rtemp->next = res;
-				}
-				else {
-					GET_BUILDING_RESOURCES(room) = res;
-				}
-				
+				parse_resource(fl, &GET_BUILDING_RESOURCES(room), error_log);
 				break;
 			}
 			
@@ -4179,6 +4188,15 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				dep->next = ROOM_DEPLETION(room);
 				ROOM_DEPLETION(room) = dep;
 				
+				break;
+			}
+			
+			case 'W': {	// built-with resources
+				if (!COMPLEX_DATA(room)) {	// ensure complex data
+					COMPLEX_DATA(room) = init_complex_data();
+				}
+				
+				parse_resource(fl, &GET_BUILT_WITH(room), error_log);
 				break;
 			}
 			
@@ -4214,7 +4232,6 @@ void parse_room(FILE *fl, room_vnum vnum) {
 void write_room_to_file(FILE *fl, room_data *room) {
 	extern bool objpack_save_room(room_data *room);
 	
-	struct building_resource_type *res;
 	char temp[MAX_STRING_LENGTH];
 	struct room_extra_data *red, *next_red;
 	struct depletion_data *dep;
@@ -4325,9 +4342,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	
 	// R resource
 	if (COMPLEX_DATA(room) && BUILDING_RESOURCES(room)) {
-		for (res = BUILDING_RESOURCES(room); res; res = res->next) {
-			fprintf(fl, "R\n%d %d\n", res->vnum, res->amount);
-		}
+		write_resources_to_file(fl, 'R', BUILDING_RESOURCES(room));
 	}
 	
 	// X depletion
@@ -4353,6 +4368,11 @@ void write_room_to_file(FILE *fl, room_data *room) {
 
 	// NOTE: Prior to b2.11, this saved T as prototype triggers, but this is
 	// no longer used: script_save_to_disk(fl, room, WLD_TRIGGER);
+	
+	// W: built with
+	if (COMPLEX_DATA(room) && GET_BUILT_WITH(room)) {
+		write_resources_to_file(fl, 'W', GET_BUILT_WITH(room));
+	}
 	
 	// Z: extra data
 	HASH_ITER(hh, room->extra_data, red, next_red) {
@@ -5019,6 +5039,9 @@ void script_save_to_disk(FILE *fp, void *item, int type) {
 		t = ((room_data*)item)->proto_script;
 	else if (type == RMT_TRIGGER) {
 		t = ((room_template*)item)->proto_script;
+	}
+	else if (type == BLD_TRIGGER) {
+		t = ((bld_data*)item)->proto_script;
 	}
 	else if (type == ADV_TRIGGER) {
 		t = ((adv_data*)item)->proto_script;
@@ -6893,59 +6916,6 @@ struct obj_apply *copy_obj_apply_list(struct obj_apply *list) {
 
 
 /**
-* Generates a resource list from alternating (vnum, amount, vnum, amount,
-* vnum, amount, NOTHING) -- you MUST pass NOTHING as the last vnum
-*
-* @param ... You must pass alternating (vnum, amount, vnum, amount, NOTHING)
-* @return struct resource_data* The allocated list.
-*/
-struct resource_data *create_resource_list(int first_vnum, int first_amount, ...) {
-	struct resource_data *list, *res, *last;
-	va_list ap;
-	int last_vnum = NOTHING, val;
-	bool have_vnum;
-	
-	// shortcut
-	if (first_vnum == NOTHING || first_amount <= 0) {
-		return NULL;
-	}
-	
-	CREATE(res, struct resource_data, 1);
-	res->vnum = first_vnum;
-	res->amount = first_amount;
-	list = last = res;
-	
-	// alternating vnum, amt
-	va_start(ap, first_amount);
-	have_vnum = FALSE;
-	
-	while (TRUE) {
-		// get another int and break if it's a list terminator
-		if ((val = va_arg(ap, int)) == NOTHING) {
-			break;
-		}
-		
-		if (!have_vnum) {
-			last_vnum = val;
-			have_vnum = TRUE;
-		}
-		else {
-			CREATE(res, struct resource_data, 1);
-			res->vnum = last_vnum;
-			res->amount = val;
-			last->next = res;
-			last = res;
-			
-			have_vnum = FALSE;	// and get another vnum
-		}
-	}
-
-	va_end(ap);
-	return list;
-}
-
-
-/**
 * Frees a list of augment applies.
 *
 * @param struct apply_data *list The start of the list to free.
@@ -7004,7 +6974,6 @@ struct complex_room_data *init_complex_data() {
 * @param struct complex_room_data *data The building data to delete.
 */
 void free_complex_data(struct complex_room_data *data) {
-	struct building_resource_type *res, *next_res;
 	struct room_direction_data *ex;
 	
 	while ((ex = data->exits)) {
@@ -7018,10 +6987,8 @@ void free_complex_data(struct complex_room_data *data) {
 		free(ex);
 	}
 	
-	for (res = data->to_build; res; res = next_res) {
-		next_res = res->next;
-		free(res);
-	}
+	free_resource_list(data->to_build);
+	free_resource_list(data->built_with);
 	
 	free(data);
 }

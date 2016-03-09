@@ -304,6 +304,7 @@ ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
 ADMIN_UTIL(util_redo_islands);
 ADMIN_UTIL(util_rescan);
+ADMIN_UTIL(util_resetbuildingtriggers);
 ADMIN_UTIL(util_strlen);
 ADMIN_UTIL(util_tool);
 
@@ -320,6 +321,7 @@ struct {
 	{ "randtest", LVL_CIMPL, util_randtest },
 	{ "redoislands", LVL_CIMPL, util_redo_islands },
 	{ "rescan", LVL_START_IMM, util_rescan },
+	{ "resetbuildingtriggers", LVL_CIMPL, util_resetbuildingtriggers },
 	{ "strlen", LVL_START_IMM, util_strlen },
 	{ "tool", LVL_IMPL, util_tool },
 
@@ -574,6 +576,50 @@ ADMIN_UTIL(util_rescan) {
 		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "Rescanning empire: %s", EMPIRE_NAME(emp));
 		reread_empire_tech(emp);
 		send_config_msg(ch, "ok_string");
+	}
+}
+
+
+ADMIN_UTIL(util_resetbuildingtriggers) {
+	bld_data *proto = NULL, *temp;
+	room_data *room, *next_room;
+	bool all = FALSE;
+	int count = 0;
+	
+	all = !str_cmp(argument, "all");
+	
+	if (!all && (!*argument || !isdigit(*argument))) {
+		msg_to_char(ch, "Usage: resetbuildingtriggers <vnum | all>\r\n");
+	}
+	else if (!all && !(proto = building_proto(atoi(argument)))) {
+		msg_to_char(ch, "Invalid building/room vnum '%s'.\r\n", argument);
+	}
+	else {
+		HASH_ITER(hh, world_table, room, next_room) {
+			if (!GET_BUILDING(room)) {
+				continue;
+			}
+			if (!all && GET_BUILDING(room) != proto) {
+				continue;
+			}
+			
+			// remove old triggers
+			if (SCRIPT(room)) {
+				extract_script(room, WLD_TRIGGER);
+			}
+			free_proto_script(room, WLD_TRIGGER);
+			
+			// add any triggers
+			CREATE(temp, bld_data, 1);
+			copy_proto_script(GET_BUILDING(room), temp, BLD_TRIGGER);
+			room->proto_script = temp->proto_script;
+			free(temp);
+			assign_triggers(room, WLD_TRIGGER);
+			
+			++count;
+		}
+		
+		msg_to_char(ch, "%d building%s/room%s updated.\r\n", count, PLURAL(count), PLURAL(count));
 	}
 }
 
@@ -2563,6 +2609,9 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 		msg_to_char(ch, "Storable items:\r\n%s%s%s", buf, line, (*line ? "\r\n" : ""));
 	}
 	
+	get_script_display(GET_BLD_SCRIPTS(bdg), line);
+	msg_to_char(ch, "Scripts:\r\n%s", line);
+	
 	show_spawn_summary_to_char(ch, GET_BLD_SPAWNS(bdg));
 }
 
@@ -3016,6 +3065,8 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern const struct material_data materials[NUM_MATERIALS];
 	extern const char *wear_bits[];
 	extern const char *item_types[];
+	extern const char *component_flags[];
+	extern const char *component_types[];
 	extern const char *container_bits[];
 	extern const char *obj_custom_types[];
 	extern const char *storage_bits[];
@@ -3063,6 +3114,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		}
 		send_to_char(strcat(buf, "&0\r\n"), ch);
 	}
+	
 	sprintbit(GET_OBJ_WEAR(j), wear_bits, buf, TRUE);
 	msg_to_char(ch, "Can be worn on: &g%s&0\r\n", buf);
 
@@ -3071,8 +3123,17 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 	sprintbit(GET_OBJ_EXTRA(j), extra_bits, buf, TRUE);
 	msg_to_char(ch, "Extra flags   : &g%s&0\r\n", buf);
+	
+	// component info
+	if (GET_OBJ_CMP_FLAGS(j)) {
+		prettier_sprintbit(GET_OBJ_CMP_FLAGS(j), component_flags, buf);
+		strcat(buf, " ");
+	}
+	else {
+		*buf = '\0';
+	}
 
-	msg_to_char(ch, "Timer: %d, Material: %s\r\n", GET_OBJ_TIMER(j), materials[GET_OBJ_MATERIAL(j)].name);
+	msg_to_char(ch, "Timer: &y%d&0, Material: &y%s&0, Component type: &y%s%s&0\r\n", GET_OBJ_TIMER(j), materials[GET_OBJ_MATERIAL(j)].name, buf, component_types[GET_OBJ_CMP_TYPE(j)]);
 
 	strcpy(buf, "In room: ");
 	if (!IN_ROOM(j))

@@ -22,8 +22,9 @@ Advanced Ships (Trade ability)
 Building:  &b~&0[]&b~&0  Upgraded Shipyard (Seafaring ability)
 Resource:  30 blocks, 20 iron ingots
 Built on:  upgrade Shipyard
-Command:  manufacture <ship>
 Fame:  4
+Commands:  manufacture <ship>
+           manufacture info <ship>
 
 The upgraded shipyard allows you to manufacture bigger, more powerful ships.
 
@@ -109,6 +110,7 @@ See also: CRAFT
 Basic Crafts (Trade ability)
 
 Command:  craft [number] <item>
+          craft info <item>
 
 All crafting abilities train when you complete recipes that require them.
 Unskilled crafts can train Trade up to 15.
@@ -131,7 +133,7 @@ Basic Crafts:
   violet dye  2 red berries, 1 bileberries, (glassblowing)
   orange dye  2 oranges, 1 magenta arrowfish, (glassblowing)
 
-See also: CRAFTING LEVEL, WOODWORKING
+See also: CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP
 #
 CARTS WAGONS CARRIAGES CARAVANS "LAND VEHICLES"
 
@@ -181,6 +183,7 @@ See also: SEWING
 COOK COOKING BAKE BAKING
 
 Command:  cook [number] <item>
+          cook info <item>
 
 The cook command (formerly "bake") allows you to make food from a variety of
 raw ingredients. To cook, you'll need a heat source: a cooking fire, a kitchen,
@@ -199,7 +202,7 @@ Without any skill or ability, you can always cook:
   peach pie  1 basket of peaches, 1 flour
   candied apple  1 apple, apiaries tech for honey
 
-See also: CRAFTING LEVEL, MILL, BAKERY
+See also: CRAFTING LEVEL, MILL, BAKERY, RESOURCES, KEEP
 #
 "DANGEROUS LEATHERS"
 
@@ -280,8 +283,9 @@ Forge (Trade ability)
 Building:  (FF)  Forge  (no skill required)
 Resources:  10 logs, 15 rocks, 10 iron ingots
 Built on:  plains, desert
-Command:  forge [number] <item>
 Tool:  hammer
+Commands:  forge [number] <item>
+           forge info <item>
 
 Forging is done in a forge using iron ingots. Almost all metallic armor and
 weapons are created at a forge, with varying levels of skill. Iron, silver,
@@ -305,9 +309,9 @@ With the basic Forge skill, you can create:
   coin mill  24 iron ingots, 2 imperium ingots
   anchor  10 iron ingot -- used on ships
 
-See also: CRAFTING LEVEL, SMELT, WEAPONCRAFTING, ARMORSMITHING, JEWELRY,
-  MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS, DEADLY WEAPONS,
-  IMPERIAL ARMORS
+See also: CRAFTING LEVEL, RESOURCES, KEEP, SMELT, WEAPONCRAFTING,
+  ARMORSMITHING, JEWELRY, MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS,
+  DEADLY WEAPONS, IMPERIAL ARMORS
 #
 "GUILDSMAN CRAFTS"
 
@@ -558,8 +562,8 @@ POTTER POTTERY CLAY
 
 Pottery (Trade ability)
 
-Building:  (PP) potter  10 logs, 1 stone block
-Resources:  10 logs, 1 stone block
+Building:  (PP) potter
+Resources:  10x (pillar), 1x (large, single block)
 Command:  craft [number] <item>
 
 Clay is found by digging near water and can be stored at the Potter.
@@ -674,6 +678,7 @@ SEW SEWING
 
 Sew (Trade ability)
 Command:  sew [number] <item>
+          sew info <item>
 
 The art of sewing is one of the oldest and simplest trade skills, but it also
 makes some of the finest clothing and the lightest armor. The only resource
@@ -691,7 +696,7 @@ With basic Sewing, you can make:
 Additional sewing items are available from other abilities in the Trade skill,
 as well as patterns and crafts hidden around the world.
 
-See also: CRAFTING LEVEL, LEATHERWORKING, RAWHIDE STITCHING, CLOTHING
+See also: CRAFTING LEVEL, RESOURCES, KEEP, LEATHERWORKING, RAWHIDE STITCHING
 #
 SHIP SHIPS 
 
@@ -718,7 +723,8 @@ Shipbuilding (Trade ability)
 Building:  &b~&0()&b~&0  Shipyard (Seafaring ability)
 Resource:  60 lumber, 24 nails
 Built on:  plains or desert, next to water
-Command:  manufacture <ship>
+Commands:  manufacture <ship>
+           manufacture info <ship>
 
 Great ships can be created via the manufacture skill. This can only be done in
 a shipyard, and the vessel can be sailed to a dock when finished.
@@ -745,7 +751,8 @@ With basic Shipbuilding you can manufacture:
     Health: 32
     Extra rooms: 1
 
-See also: ADVANCED SHIPS, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE
+See also: ADVANCED SHIPS, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE,
+   RESOURCES, KEEP
 #
 SIEGEWORKS "SIEGE WORKS"
 
@@ -861,6 +868,7 @@ See also: FORGE, IRON BLADES, DEADLY WEAPONS
 WEAVE
 
 Command:  weave [number] <item>
+          weave info <item>
 
 Weaving converts raw materials into cloth. You can weave anywhere, but it goes
 much faster at the tailor shop.
@@ -871,7 +879,7 @@ Using the Sew ability:
   
 (Wool cloth and cotton cloth are used for the same things.)
 
-See also: SHEAR
+See also: SHEAR, RESOURCES, KEEP
 #
 WOODWORKING "WOOD WORKING"
 

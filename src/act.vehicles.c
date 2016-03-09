@@ -1702,7 +1702,7 @@ ACMD(do_fire) {
 	static struct resource_data *ammo = NULL;
 	
 	if (!ammo) {
-		ammo = create_resource_list(o_HEAVY_SHOT, 1, NOTHING);
+		add_to_resource_list(&ammo, RES_OBJECT, o_HEAVY_SHOT, 1, 0);
 	}
 	
 	two_arguments(argument, veh_arg, tar_arg);
@@ -1745,7 +1745,7 @@ ACMD(do_fire) {
 			appear(ch);
 		}
 		
-		extract_resources(ch, ammo, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
+		extract_resources(ch, ammo, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), NULL);
 		dam = VEH_SCALE_LEVEL(veh) * 8 / 100;	// 8 damage per 100 levels
 		dam = MAX(1, dam);	// minimum 1
 		

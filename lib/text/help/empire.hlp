@@ -58,14 +58,14 @@ The Artisans ability unlocks additional buildings.
 (AA) alchemist  4 lumber, 2 nails, 12 bricks
 {BB} apiary  12 lumber, 4 nails, 8 beehives
 (BB) bakery  4 lumber, 2 nails, 12 bricks
-&c~&0--&c~&0 bridge  8 blocks, 12 lumber, 4 nails
+&c~&0--&c~&0 bridge  8x (large block), 12x (lumber), 4x (nails)
 (CC) carpenter  4 lumber, 2 nails, 12 bricks
 (GG) glassblower  4 lumber, 2 nails, 12 bricks
 [PP] pigeonpost  12 lumber, 4 nails
 (TT) tailor  4 lumber, 2 nails, 12 bricks
 [TT] tavern  10 lumber, 4 nails, 12 bricks, 20 hops, 20 barley
 {WW} warehouse  20 lumber, 8 nails
-.==. steps  8 blocks
+.==. steps  8x (large block)
 
 See also: BUILD
 #
@@ -99,10 +99,15 @@ BUILD BUILDING
 
 Usage:  build <building> [direction]
         build <monument> <god>
+        build info <building>
 
 This command is used to create buildings using raw materials. If you build a
-shrine or temple, you must specify a God to dedicate it to. Most other
-buildings require a direction that they'll face.
+shrine or temple, you must specify a god to dedicate it to. Most other
+buildings require a direction that they'll face. Resources are added from left
+to right in the requirements list (you can't add nails before lumber).
+
+You can just get information on a building, like what it costs to build, by
+typing "build info <building>".
 
 You can't build on land that's inside another empire's city radius while at war
 with that empire.
@@ -124,8 +129,8 @@ they just give Empire experience and only up to Empire 15.
 (&c~~&0) well  5 sticks, 1 log, 10 rocks
 &y/&0[]&y\&0 mine  4 logs
 (FF) forge  10 logs, 15 rocks, 10 iron ingots
-(MM) mill  10 logs, 2 stone blocks
-(PP) potter  10 logs, 1 stone block
+(MM) mill  10x (pillar), 2x (large, single block)
+(PP) potter  10x (pillar), 1x (large, single block)
 (SS) stable  20 logs, 8 pouches of nails
 vvvv fence  20 sticks
 vxvv gate  20 sticks, 1 copper ingot
@@ -142,9 +147,9 @@ vxvv gate  20 sticks, 1 copper ingot
 
 For more information on building your first house, see HELP HOUSING GUIDE.
 
-See also: EMPIRE, ARTISANS, LUXURY, MONUMENTS, GRAND MONUMENTS, SEAFARING,
-          HOUSING, LOCKSMITHING, RAISE ARMIES, ADVANCED TACTICS, ROADS, HAVENS,
-          SWAMP ENGINEERING, GREAT WALLS, DESIGNATE, DISMANTLE
+See also: RESOURCES, KEEP, EMPIRE, ARTISANS, LUXURY, MONUMENTS, SEAFARING,
+   GRAND MONUMENTS, HOUSING, LOCKSMITHING, RAISE ARMIES, ADVANCED TACTICS,
+   ROADS, HAVENS, SWAMP ENGINEERING, GREAT WALLS, DESIGNATE, DISMANTLE
 #
 CEDE
 
@@ -152,7 +157,7 @@ Usage:  cede <person> (x, y)
 
 This is used to cede one acre of land to anyone else currently in the game. 
 If you do not include an (x, y) coordinate, it will cede the land you're on. 
-You can only cede land owned by your empire. Ceding land to a God or Immortal
+You can only cede land owned by your empire. Ceding land to a god or immortal
 so that you can claim more land may get you in trouble.
 
 You can't cede land to an empire that is at war.
@@ -694,11 +699,11 @@ citizens than the smaller houses that don't require this ability. People will
 move into a house at a rate of one person per two game days, until the
 house is full.
 
-[--] stonehouse  6 lumber, 6 blocks
+[--] stonehouse  6x (lumber), 6x (large, single block)
 [==] largehouse  4 lumber, 1 nails, 12 bricks
 &g^&0()&g^&0 treehouse  6 lumber, 2 nails  (chameleon)
 &g^&0[]&g^&0 treecomplex  20 lumber, 8 nails  (chameleon)
-&g.&0()&g.&0 undergroundcomplex  20 lumber, 2 blocks, 8 nails  (chameleon)
+&g.&0()&g.&0 undergroundcomplex  2x (large block), 20x (lumber), 8x (nails); [chameleon]
 &y/&0[]&y\&0 minecomplex  30 lumber, 12 nails
 
 See also: BUILD, HOME, WORKFORCE
@@ -820,8 +825,8 @@ Monuments (Empire ability)
 
 The Monuments ability allows you to build monuments.
 
-&g.&0}{&g.&0 statue  6 lumber, 2 nails, 10 blocks
-<<>> henge  120 stone blocks
+&g.&0}{&g.&0 statue  6x (lumber), 2x (nails), 10x (large, single block)
+<<>> henge  120x (large, single block)
 &g.&0||&g.&0 megalith  40 stone blocks
 &g.&0i&g.&0i cemetery  8 stone blocks
 &g.^.&co&0 park  25 sticks, 4 blocks
@@ -1368,7 +1373,8 @@ much less of that resource on each island.
 Workforce types:
   &ybuilding:&0 NPCs will build any building that has been started, or dismantle
             any building you've started to dismantle. They build using stored
-            empire resources, not items on the ground.
+            empire resources, not items on the ground. Workers can't finish
+            buildings that require resources other than items/components.
   &ychopping:&0 NPCs will chop down forests and desert groves (Not orchards - 
      use farming without replanting for that).
   &ydigging:&0 NPCs will dig for rocks in any quarry, or clay in any clay pit.

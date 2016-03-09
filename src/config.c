@@ -213,6 +213,28 @@ const int base_hit_chance = 50;
 const double hit_per_dex = 5.0;
 
 
+// Books must contain one of these terms (prevents abuse like naming the book "a gold bar")
+const char *book_name_list[] = {
+	"book",
+	"booklet",
+	"brochure",
+	"codex",
+	"compendium",
+	"diary",
+	"journal",
+	"magazine",
+	"manual",
+	"novel",
+	"pamphlet",
+	"paper",
+	"scroll",
+	"tablet",
+	"text",
+	"tome",
+	"\n"
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// WAR CONFIGS /////////////////////////////////////////////////////////////
 

@@ -1022,6 +1022,10 @@ int consume_otrigger(obj_data *obj, char_data *actor, int cmd) {
 				case OCMD_QUAFF:
 					add_var(&GET_TRIG_VARS(t), "command", "quaff", 0);
 					break;
+				case OCMD_READ: {
+					add_var(&GET_TRIG_VARS(t), "command", "read", 0);
+					break;
+				}
 			}
 			sdd.o = obj;
 			ret_val = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
@@ -1037,6 +1041,39 @@ int consume_otrigger(obj_data *obj, char_data *actor, int cmd) {
 	}
 
 	return 1;
+}
+
+
+/**
+* Called when a character is finished with an object, e.g. reading a book.
+*
+* @param obj_data *obj The object being finished.
+* @param char_data *actor The person finishing it.
+* @return int 1 to proceed, 0 if a script returned 0 or the obj was purged.
+*/
+int finish_otrigger(obj_data *obj, char_data *actor) {
+	char buf[MAX_INPUT_LENGTH];
+	int val = TRUE;
+	trig_data *t;
+
+	if (!SCRIPT_CHECK(obj, OTRIG_FINISH)) {
+		return 1;
+	}
+
+	for (t = TRIGGERS(SCRIPT(obj)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, OTRIG_FINISH) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			union script_driver_data_u sdd;
+			sdd.o = obj;
+			ADD_UID_VAR(buf, t, actor, "actor", 0);
+			val = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
+			obj = sdd.o;
+			if (!val || !obj) {
+				break;
+			}
+		}
+	}
+	
+	return (val && obj) ? 1 : 0;
 }
 
 
@@ -1062,6 +1099,57 @@ void adventure_cleanup_wtrigger(room_data *room) {
 		}
 	}
 }
+
+
+/**
+* Called when a building is completed.
+*
+* @param room_data *room The room.
+*/
+void complete_wtrigger(room_data *room) {
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t;
+
+	if (!SCRIPT_CHECK(room, WTRIG_COMPLETE))
+		return;
+
+	for (t = TRIGGERS(SCRIPT(room)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, WTRIG_COMPLETE) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			union script_driver_data_u sdd;
+			ADD_ROOM_UID_VAR(buf, t, room, "room", 0);
+			sdd.r = room;
+			if (script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW)) {
+				break;
+			}
+		}
+	}
+}
+
+
+/**
+* Called when a building first loads.
+*
+* @param room_data *room The room.
+*/
+void load_wtrigger(room_data *room) {
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t;
+
+	if (!SCRIPT_CHECK(room, WTRIG_LOAD))
+		return;
+
+	for (t = TRIGGERS(SCRIPT(room)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, WTRIG_LOAD) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			union script_driver_data_u sdd;
+			ADD_ROOM_UID_VAR(buf, t, room, "room", 0);
+			sdd.r = room;
+			if (script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW)) {
+				break;
+			}
+		}
+	}
+}
+
 
 void reset_wtrigger(room_data *room) {
 	char buf[MAX_INPUT_LENGTH];

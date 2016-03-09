@@ -22,6 +22,7 @@
 #define RMT_TRIGGER  3
 #define ADV_TRIGGER  4
 #define VEH_TRIGGER  5
+#define BLD_TRIGGER  6
 
 /* unless you change this, Puff casts all your dg spells */
 #define DG_CASTER_PROXY 1
@@ -75,6 +76,7 @@
 #define OTRIG_LEAVE            BIT(16)    /* someone leaves room seen    */
 
 #define OTRIG_CONSUME          BIT(18)    /* char tries to eat/drink obj */
+#define OTRIG_FINISH           BIT(19)	// char finishes reading a book
 
 
 // VTRIG_x: vehicle trigger types
@@ -103,6 +105,8 @@
 #define WTRIG_ENTER            BIT(6)	     /* character enters room      */
 #define WTRIG_DROP             BIT(7)      /* something dropped in room  */
 
+#define WTRIG_LOAD  BIT(13)	// called when the room/building loads
+#define WTRIG_COMPLETE  BIT(14)	// called when the building is complete
 #define WTRIG_ABILITY          BIT(15)     /* ability used in room */
 #define WTRIG_LEAVE            BIT(16)     /* character leaves the room */
 #define WTRIG_DOOR             BIT(17)     /* door manipulated in room  */
@@ -114,9 +118,10 @@
 #define OCMD_ROOM              BIT(2)	     /* obj must be in char's room  */
 
 /* obj consume trigger commands */
-#define OCMD_EAT    1
+#define OCMD_EAT  1
 #define OCMD_DRINK  2
 #define OCMD_QUAFF  3
+#define OCMD_READ  4
 
 #define TRIG_NEW                0	     /* trigger starts from top  */
 #define TRIG_RESTART            1	     /* trigger restarting       */
@@ -222,6 +227,8 @@ void fight_mtrigger(char_data *ch);
 void hitprcnt_mtrigger(char_data *ch);
 void bribe_mtrigger(char_data *ch, char_data *actor, int amount);
 
+void complete_wtrigger(room_data *room);
+
 void random_mtrigger(char_data *ch);
 void random_otrigger(obj_data *obj);
 void random_wtrigger(room_data *ch);
@@ -229,6 +236,7 @@ void reset_wtrigger(room_data *ch);
 
 void load_mtrigger(char_data *ch);
 void load_otrigger(obj_data *obj);
+void load_wtrigger(room_data *room);
 
 int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil);
 int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil);
@@ -242,6 +250,8 @@ int door_mtrigger(char_data *actor, int subcmd, int dir);
 int door_wtrigger(char_data *actor, int subcmd, int dir);
 
 int consume_otrigger(obj_data *obj, char_data *actor, int cmd);
+
+int finish_otrigger(obj_data *obj, char_data *actor);
 
 int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode);
 int destroy_vtrigger(vehicle_data *veh);
@@ -382,3 +392,10 @@ void remove_from_lookup_table(int uid);
 extern char_data *find_char(int n);
 extern empire_data *find_empire_by_uid(int n);
 extern room_data *find_room(int n);
+
+// purge helpers
+extern int dg_owner_purged;
+extern char_data *dg_owner_mob;
+extern obj_data *dg_owner_obj;
+extern vehicle_data *dg_owner_veh;
+extern room_data *dg_owner_room;

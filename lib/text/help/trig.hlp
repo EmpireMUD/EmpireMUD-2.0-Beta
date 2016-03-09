@@ -220,7 +220,7 @@ Variables:
   &c%actor%&0 - The character trying to leave the room.
   &c%direction%&0 - The direction the character is leaving to.
 #d
-"LOAD TRIGGER" "MTRIG LOAD" "OTRIG LOAD" "VTRIG LOAD" TRIGEDIT-MOB-LOAD TRIGEDIT-OBJ-LOAD TRIGEDIT-VEH-LOAD TRIGEDIT-LOAD TRIG-LOAD
+"LOAD TRIGGER" "MTRIG LOAD" "OTRIG LOAD" "RTRIG LOAD" "VTRIG LOAD" TRIGEDIT-MOB-LOAD TRIGEDIT-OBJ-LOAD TRIGEDIT-VEH-LOAD TRIGEDIT-ROOM-LOAD TRIGEDIT-LOAD TRIG-LOAD
 
 Load (trigger type)
 
@@ -232,6 +232,11 @@ until construction is complete.
 
 Certain actions like unharnessing a mob from a vehicle will load a new copy of
 the mob and set off its load triggers.
+
+Buildings call their load triggers when first constructed, even before they
+are complete.
+
+See also: RTRIG COMPLETE
 #d
 "MTRIG ENTRY" "VTRIG ENTRY" "MTRIG ENTER" "VTRIG ENTER" TRIGEDIT-MOB-ENTRY TRIGEDIT-VEH-ENTRY TRIGEDIT-ENTRY TRIGGER-ENTRY 
 

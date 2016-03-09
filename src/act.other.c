@@ -1592,7 +1592,12 @@ ACMD(do_morph) {
 	}
 	else {
 		// charge costs
-		charge_ability_cost(ch, MORPH_COST_TYPE(morph), MORPH_COST(morph) * multiplier, NOTHING, 0, WAIT_ABILITY);
+		if (morph) {
+			charge_ability_cost(ch, MORPH_COST_TYPE(morph), MORPH_COST(morph) * multiplier, NOTHING, 0, WAIT_ABILITY);
+		}
+		else {
+			command_lag(ch, WAIT_ABILITY);
+		}
 		
 		// take the obj
 		if (morph && MORPH_REQUIRES_OBJ(morph) != NOTHING && MORPH_FLAGGED(morph, MORPHF_CONSUME_OBJ) && (obj = get_obj_in_list_vnum(MORPH_REQUIRES_OBJ(morph), ch->carrying))) {

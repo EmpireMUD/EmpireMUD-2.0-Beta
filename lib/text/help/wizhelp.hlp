@@ -103,7 +103,7 @@ CREATE
 
 Usage:  create [number] <item>
 
-This command allows a God or Immortal to create one or more simple items
+This command allows a god or immortal to create one or more simple items
 instantly. Normally, only resources and simple tools can be created this way.
 In order to create items, you must have the correct resources available. You
 get resources when people sacrifice items to you. Resource counts can be seen
@@ -972,6 +972,8 @@ Available utilities:
  redoislands - Renumbers all the islands (requires confirmation; may rearrange
     empire inventories).
  rescan <empire | all> - Rereads territory and members, which can fix issues.
+ resetbuildingtriggers <vnum | all> - Reattaches triggers to buildings/rooms,
+    e.g. if you made a change in OLC and want live buildings updated.
  strlen - Give various measures of string length.
 #d
 VNUM

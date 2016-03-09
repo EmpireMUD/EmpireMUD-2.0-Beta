@@ -99,7 +99,7 @@ extern char_data *get_char_world(char *name);
 
 // coin handlers
 extern bool can_afford_coins(char_data *ch, empire_data *type, int amount);
-void charge_coins(char_data *ch, empire_data *type, int amount);
+void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_data **build_used_list);
 void cleanup_all_coins();
 void cleanup_coins(char_data *ch);
 void coin_string(struct coin_data *list, char *storage);
@@ -228,9 +228,10 @@ void remove_offers_by_type(char_data *ch, int type);
 void add_depletion(room_data *room, int type, bool multiple);
 extern int get_depletion(room_data *room, int type);
 void remove_depletion(room_data *room, int type);
+void set_depletion(room_data *room, int type, int value);
 
 // room handlers
-void attach_building_to_room(bld_data *bld, room_data *room);
+void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers);
 void attach_template_to_room(room_template *rmt, room_data *room);
 
 // room extra data handlers
@@ -252,8 +253,10 @@ sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_t
 
 // storage handlers
 void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount);
+extern bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount);
 extern bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount);
 extern bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
+extern bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount);
 extern struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords);
 extern int find_lowest_storage_loc(obj_data *obj);
 extern struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum);

@@ -87,7 +87,7 @@ BRIDGE
 
 &c~~&0|&c~&0  Bridge  (Artisans ability)
 
-Resources:  8 blocks, 12 lumber, 4 nails
+Resources:  8x (large block), 12x (lumber), 4x (nails)
 Built on:  river
 
 Once completed, a bridge allows you to cross river tiles without a boat. You
@@ -474,7 +474,7 @@ HENGE "STONE HENGE"
 
 <<>>  Henge (Monuments ability)
 
-Resources:  120 stone blocks
+Resources:  120x (large, single block)
 Built on:  desert, plains
 Fame:  4
 
@@ -875,7 +875,7 @@ STATUE
 
 .}{.  Statue  (Monuments ability)
 
-Resources:  6 lumber, 2 nails, 10 blocks
+Resources:  6x (lumber), 2x (nails), 10x (large, single block)
 Built on:  plains, desert
 Fame:  2
 
@@ -888,7 +888,7 @@ STEPS
 
 .==.  Steps  (Artisans ability)
 
-Resources:  8 blocks
+Resources:  8x (large block)
 Built on:  plains, desert
 
 Steps are similar to roads, but indicate rising terrain. These might be the
@@ -898,7 +898,7 @@ STONEHOUSE "STONE HOUSE"
 
 [--]  Stone House  (Housing ability)
 
-Resources:  6 lumber, 6 blocks
+Resources:  6x (lumber), 6x (large, single block)
 Built on:  plains, desert
 Extra rooms:  3
 Citizens:  2
@@ -1193,7 +1193,7 @@ UNDERGROUNDCOMPLEX "UNDERGROUND COMPLEX" "UNDERGROUND PASSAGE"
 
 &g.&0()&g.&0  Underground Complex  (Housing ability)
 
-Resources:  20 lumber, 2 blocks, 8 nails
+Resources:  2x (large block), 20x (lumber), 8x (nails)
 Built on:  plains, desert
 Extra rooms:  7, interlink
 Special rooms:  tunnel, no hallway

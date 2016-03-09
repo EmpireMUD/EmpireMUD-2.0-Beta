@@ -119,8 +119,10 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	}
 	
 	// we always use the applies from the file, not from the proto
-	free_obj_apply_list(GET_OBJ_APPLIES(obj));
-	GET_OBJ_APPLIES(obj) = NULL;
+	if (obj) {
+		free_obj_apply_list(GET_OBJ_APPLIES(obj));
+		GET_OBJ_APPLIES(obj) = NULL;
+	}
 	
 	// for fread_string
 	sprintf(error, "Obj_load_from_file %d", vnum);
@@ -216,7 +218,13 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				break;
 			}
 			case 'C': {
-				if (OBJ_FILE_TAG(line, "Current-scale:", length)) {
+				if (OBJ_FILE_TAG(line, "Component:", length)) {
+					if (sscanf(line + length + 1, "%d %s", &i_in[0], s_in) == 2) {
+						GET_OBJ_CMP_TYPE(obj) = i_in[0];
+						GET_OBJ_CMP_FLAGS(obj) = asciiflag_conv(s_in);
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Current-scale:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0])) {
 						GET_OBJ_CURRENT_SCALE_LEVEL(obj) = i_in[0];
 					}
@@ -500,6 +508,9 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	}
 	if (!proto || GET_OBJ_MATERIAL(obj) != GET_OBJ_MATERIAL(proto)) {
 		fprintf(fl, "Material: %d\n", GET_OBJ_MATERIAL(obj));
+	}
+	if (!proto || GET_OBJ_CMP_TYPE(obj) != GET_OBJ_CMP_TYPE(proto) || GET_OBJ_CMP_FLAGS(obj) != GET_OBJ_CMP_FLAGS(proto)) {
+		fprintf(fl, "Component: %d %s\n", GET_OBJ_CMP_TYPE(obj), bitv_to_alpha(GET_OBJ_CMP_FLAGS(obj)));
 	}
 	if (!proto || GET_OBJ_CURRENT_SCALE_LEVEL(obj) != GET_OBJ_CURRENT_SCALE_LEVEL(proto)) {
 		fprintf(fl, "Current-scale: %d\n", GET_OBJ_CURRENT_SCALE_LEVEL(obj));

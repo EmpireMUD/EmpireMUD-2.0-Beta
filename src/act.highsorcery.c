@@ -1404,7 +1404,8 @@ RITUAL_FINISH_FUNC(perform_chant_of_druids) {
 RITUAL_SETUP_FUNC(start_chant_of_illusions) {
 	static struct resource_data *illusion_res = NULL;
 	if (!illusion_res) {
-		illusion_res = create_resource_list(o_NOCTURNIUM_SPIKE, 1, o_IRIDESCENT_IRIS, 1, NOTHING);
+		add_to_resource_list(&illusion_res, RES_OBJECT, o_NOCTURNIUM_SPIKE, 1, 0);
+		add_to_resource_list(&illusion_res, RES_OBJECT, o_IRIDESCENT_IRIS, 1, 0);
 	}
 	
 	if (!IS_ROAD(IN_ROOM(ch)) || !IS_COMPLETE(IN_ROOM(ch))) {
@@ -1425,7 +1426,7 @@ RITUAL_SETUP_FUNC(start_chant_of_illusions) {
 	}
 	
 	// OK
-	extract_resources(ch, illusion_res, TRUE);
+	extract_resources(ch, illusion_res, TRUE, NULL);
 	start_ritual(ch, ritual);
 	return TRUE;
 }
@@ -1647,7 +1648,8 @@ RITUAL_SETUP_FUNC(start_ritual_of_defense) {
 	bool found = FALSE;
 	
 	if (!defense_res) {
-		defense_res = create_resource_list(o_IMPERIUM_SPIKE, 1, o_BLOODSTONE, 1, NOTHING);
+		add_to_resource_list(&defense_res, RES_OBJECT, o_IMPERIUM_SPIKE, 1, 0);
+		add_to_resource_list(&defense_res, RES_OBJECT, o_BLOODSTONE, 1, 0);
 	}
 	
 	// valid sects
@@ -1676,7 +1678,7 @@ RITUAL_SETUP_FUNC(start_ritual_of_defense) {
 	}
 	
 	// OK: take resources
-	extract_resources(ch, defense_res, TRUE);
+	extract_resources(ch, defense_res, TRUE, NULL);
 	start_ritual(ch, ritual);
 	return TRUE;
 }

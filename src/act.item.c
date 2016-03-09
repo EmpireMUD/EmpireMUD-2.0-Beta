@@ -96,11 +96,11 @@ bool can_take_obj(char_data *ch, obj_data *obj) {
 */
 INTERACTION_FUNC(combine_obj_interact) {
 	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
-	struct resource_data *res;
+	struct resource_data *res = NULL;
 	obj_data *new_obj;
 	
 	// how many they need
-	res = create_resource_list(GET_OBJ_VNUM(inter_item), interaction->quantity, NOTHING);
+	add_to_resource_list(&res, RES_OBJECT, GET_OBJ_VNUM(inter_item), interaction->quantity, 0);
 	
 	if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE)) {
 		// error message sent by has_resources
@@ -118,7 +118,7 @@ INTERACTION_FUNC(combine_obj_interact) {
 		GET_OBJ_TIMER(new_obj) = MIN(GET_OBJ_TIMER(new_obj), GET_OBJ_TIMER(inter_item));
 	}
 	
-	extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY));
+	extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), NULL);
 	
 	// ownership
 	new_obj->last_owner_id = GET_IDNUM(ch);
@@ -251,6 +251,8 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern const char *affected_bits[];
 	extern const char *apply_types[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
+	extern const char *component_flags[];
+	extern const char *component_types[];
 	extern const char *wear_bits[];
 
 	struct obj_storage_type *store;
@@ -275,23 +277,36 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		strcpy(location, " (in room)");
 	}
 	else if (obj->carried_by) {
-		snprintf(location, sizeof(location), " (carried by %s)", PERS(obj->carried_by, obj->carried_by, FALSE));
+		snprintf(location, sizeof(location), ", carried by %s,", PERS(obj->carried_by, obj->carried_by, FALSE));
 	}
 	else if (obj->in_vehicle) {
-		snprintf(location, sizeof(location), " (in %s)", get_vehicle_short_desc(obj->in_vehicle, ch));
+		snprintf(location, sizeof(location), ", in %s,", get_vehicle_short_desc(obj->in_vehicle, ch));
 	}
 	else if (obj->in_obj) {
-		snprintf(location, sizeof(location), " (in %s)", GET_OBJ_DESC(obj->in_obj, ch, OBJ_DESC_SHORT));
+		snprintf(location, sizeof(location), ", in %s,", GET_OBJ_DESC(obj->in_obj, ch, OBJ_DESC_SHORT));
 	}
 	else if (obj->worn_by) {
-		snprintf(location, sizeof(location), " (worn by %s)", PERS(obj->worn_by, obj->worn_by, FALSE));
+		snprintf(location, sizeof(location), ", worn by %s,", PERS(obj->worn_by, obj->worn_by, FALSE));
 	}
 	else {
 		*location = '\0';
 	}
 	
+	// component info
+	*part = '\0';
+	if (GET_OBJ_CMP_TYPE(obj) != CMP_NONE) {
+		if (GET_OBJ_CMP_FLAGS(obj)) {
+			prettier_sprintbit(GET_OBJ_CMP_FLAGS(obj), component_flags, lbuf);
+			strcat(lbuf, " ");
+		}
+		else {
+			*lbuf = '\0';
+		}
+		sprintf(part, " (%s%s)", lbuf, component_types[GET_OBJ_CMP_TYPE(obj)]);
+	}
+	
 	// basic info
-	snprintf(lbuf, sizeof(lbuf), "Your analysis of $p%s reveals:", location);
+	snprintf(lbuf, sizeof(lbuf), "Your analysis of $p%s%s reveals:", part, location);
 	act(lbuf, FALSE, ch, obj, NULL, TO_CHAR);
 	
 	// if it has any wear bits other than TAKE, show if they can't use it
@@ -2042,7 +2057,7 @@ room_data *get_ship_pen(void) {
 	
 	// did not find -- make one
 	room = create_room();
-	attach_building_to_room(building_proto(RTYPE_SHIP_HOLDING_PEN), room);
+	attach_building_to_room(building_proto(RTYPE_SHIP_HOLDING_PEN), room, TRUE);
 	
 	return room;
 }
@@ -2551,7 +2566,7 @@ void trade_buy(char_data *ch, char *argument) {
 		}
 		
 		// pay up
-		charge_coins(ch, coin_emp, tpd->buy_cost);
+		charge_coins(ch, coin_emp, tpd->buy_cost, NULL);
 		REMOVE_BIT(tpd->state, TPD_FOR_SALE);
 		SET_BIT(tpd->state, TPD_BOUGHT | TPD_COINS_PENDING);
 		
@@ -2832,7 +2847,7 @@ void trade_post(char_data *ch, char *argument) {
 		snprintf(buf, sizeof(buf), "$n posts $p for %s, for %d hour%s.", money_amount(GET_LOYALTY(ch), cost), length, PLURAL(length));
 		act(buf, FALSE, ch, obj, NULL, TO_ROOM | TO_SPAMMY);
 		
-		charge_coins(ch, GET_LOYALTY(ch), post_cost);
+		charge_coins(ch, GET_LOYALTY(ch), post_cost, NULL);
 		
 		CREATE(tpd, struct trading_post_data, 1);
 		tpd->next = NULL;

@@ -9,7 +9,7 @@ say Are you going to eat that?
 Hermit Food Exchange~
 0 j 100
 ~
-eval test %%self.varexists(gave%actor.name%)%%
+eval test %%self.varexists(gave%actor.id%)%%
 if %object.type% != FOOD || %test%
   %send% %actor% %self.name% doesn't want %object.shortdesc%!
   return 0
@@ -22,8 +22,8 @@ if %object.type% == FOOD
   give bag %actor.name%
   %echo% %self.name% gleefully eats %object.shortdesc%!
   mjunk %object.name%
-  eval gave%actor.name% 1
-  remote gave%actor.name% %self.id%
+  eval gave%actor.id% 1
+  remote gave%actor.id% %self.id%
 end
 ~
 #11102

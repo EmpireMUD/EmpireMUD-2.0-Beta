@@ -959,6 +959,11 @@ void extract_char_final(char_data *ch) {
 void extract_char(char_data *ch) {
 	void despawn_charmies(char_data *ch);
 	
+	if (ch == dg_owner_mob) {
+		dg_owner_purged = 1;
+		dg_owner_mob = NULL;
+	}
+	
 	if (!EXTRACTED(ch)) {
 		if (IS_NPC(ch)) {
 			SET_BIT(MOB_FLAGS(ch), MOB_EXTRACTED);
@@ -1532,8 +1537,9 @@ bool can_afford_coins(char_data *ch, empire_data *type, int amount) {
 * @param char_data *ch The player.
 * @param empire_data *type Empire who is charging the player (or OTHER_COIN for any coin type).
 * @param int amount How much to charge the player -- must be positive.
+* @param struct resource_data **build_used_list Optional: if not NULL, will build a resource list of the specifc coin types charged.
 */
-void charge_coins(char_data *ch, empire_data *type, int amount) {
+void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_data **build_used_list) {
 	struct coin_data *coin;
 	int this, this_amount;
 	double rate, inv;
@@ -1548,6 +1554,10 @@ void charge_coins(char_data *ch, empire_data *type, int amount) {
 		this = MIN(coin->amount, amount);
 		decrease_coins(ch, type, this);
 		amount -= this;
+		
+		if (build_used_list) {
+			add_to_resource_list(build_used_list, RES_COINS, type ? EMPIRE_VNUM(type) : OTHER_COIN, this, 0);
+		}
 	}
 		
 	// then try the "other"
@@ -1559,6 +1569,10 @@ void charge_coins(char_data *ch, empire_data *type, int amount) {
 		decrease_coins(ch, REAL_OTHER_COIN, this);
 		// we know it was at least one -- prevent never-hits-zero errors
 		amount -= MAX(1, round(this * rate));
+		
+		if (build_used_list) {
+			add_to_resource_list(build_used_list, RES_COINS, OTHER_COIN, this, 0);
+		}
 	}
 	
 	for (coin = GET_PLAYER_COINS(ch); coin && amount > 0; coin = coin->next) {
@@ -1571,6 +1585,10 @@ void charge_coins(char_data *ch, empire_data *type, int amount) {
 			decrease_coins(ch, emp, this);
 			// we know it was at least one -- prevent never-hits-zero errors
 			amount -= MAX(1, round(this * rate));
+			
+			if (build_used_list) {
+				add_to_resource_list(build_used_list, RES_COINS, emp ? EMPIRE_VNUM(emp) : OTHER_COIN, this, 0);
+			}
 		}
 	}
 
@@ -3563,6 +3581,11 @@ void empty_obj_before_extract(obj_data *obj) {
 */
 void extract_obj(obj_data *obj) {
 	obj_data *proto = obj_proto(GET_OBJ_VNUM(obj));
+	
+	if (obj == dg_owner_obj) {
+		dg_owner_purged = 1;
+		dg_owner_obj = NULL;
+	}
 
 	// remove from anywhere
 	check_obj_in_void(obj);
@@ -4900,17 +4923,59 @@ void remove_depletion(room_data *room, int type) {
 }
 
 
+/**
+* Sets a room's depletion to a specific value.
+*
+* @param room_data *room The room to set depletion on.
+* @param int type DPLTN_ const
+* @param int value How much to set the depletion to.
+*/
+void set_depletion(room_data *room, int type, int value) {
+	struct depletion_data *dep;
+	bool found = FALSE;
+	
+	// shortcut
+	if (value <= 0) {
+		remove_depletion(room, type);
+		return;
+	}
+	
+	// existing?
+	LL_FOREACH(ROOM_DEPLETION(room), dep) {
+		if (dep->type == type) {
+			dep->count = value;
+			found = TRUE;
+			break;
+		}
+	}
+	
+	// add
+	if (!found) {
+		CREATE(dep, struct depletion_data, 1);
+		dep->type = type;
+		dep->count = value;
+		
+		LL_PREPEND(ROOM_DEPLETION(room), dep);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ROOM HANDLERS ///////////////////////////////////////////////////////////
 
 /**
 * Sets the building data on a room. If the room isn't already complex, this
-* will automatically add complex data.
+* will automatically add complex data. This should always be called with
+* triggers unless you're loading saved rooms from a file, or some other place
+* where triggers might have been detached.
 *
 * @param bld_data *bld The building prototype (from building_table).
 * @param room_data *room The world room to attach it to.
+* @param bool with_triggers If TRUE, attaches triggers too.
 */
-void attach_building_to_room(bld_data *bld, room_data *room) {
+void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers) {
+	bld_data *temp;
+	
 	if (!bld || !room) {
 		log("SYSERR: attach_building_to_room called without %s", bld ? "room" : "building");
 		return;
@@ -4919,6 +4984,15 @@ void attach_building_to_room(bld_data *bld, room_data *room) {
 		COMPLEX_DATA(room) = init_complex_data();
 	}
 	COMPLEX_DATA(room)->bld_ptr = bld;
+
+	// copy proto script
+	if (with_triggers) {
+		CREATE(temp, bld_data, 1);
+		copy_proto_script(bld, temp, BLD_TRIGGER);
+		room->proto_script = temp->proto_script;
+		free(temp);
+		assign_triggers(room, WLD_TRIGGER);
+	}
 }
 
 
@@ -5373,6 +5447,61 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 
 
 /**
+* removes X stored components from an empire
+*
+* @param empire_data *emp
+* @param int island Which island to charge for storage, or ANY_ISLAND to take from any available storage
+* @param int cmp_type Which CMP_ type to charge
+* @param int cmp_flags Required CMPF_ flags to match on the component
+* @param int amount How much to charge
+* @return bool TRUE if it was able to charge enough, FALSE if not
+*/
+bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount) {
+	struct empire_storage_data *store, *next_store;
+	int this, found = 0;
+	obj_data *proto;
+	
+	// can't charge a negative amount
+	if (amount < 0) {
+		return TRUE;
+	}
+	
+	LL_FOREACH_SAFE(EMPIRE_STORAGE(emp), store, next_store) {
+		if (island != ANY_ISLAND && island != store->island) {
+			continue;
+		}
+		
+		// need obj
+		if (!(proto = obj_proto(store->vnum))) {
+			continue;
+		}
+		
+		// matching component?
+		if (GET_OBJ_CMP_TYPE(proto) != cmp_type || (GET_OBJ_CMP_FLAGS(proto) & cmp_flags) != cmp_flags) {
+			continue;
+		}
+		
+		// ok make it so
+		this = MIN(amount, store->amount);
+		found += this;
+		SAFE_ADD(store->amount, -this, 0, INT_MAX, FALSE);
+		
+		if (store->amount <= 0) {
+			LL_DELETE(EMPIRE_STORAGE(emp), store);
+			free(store);
+		}
+		
+		// done?
+		if (found >= amount) {
+			break;
+		}
+	}
+	
+	return (found >= amount);
+}
+
+
+/**
 * removes X stored resources from an empire
 *
 * @param empire_data *emp
@@ -5451,6 +5580,44 @@ bool delete_stored_resource(empire_data *emp, obj_vnum vnum) {
 	}
 	
 	return (deleted > 0) ? TRUE : FALSE;
+}
+
+
+/**
+* This finds a matching item's empire_storage_data object for a component type,
+* IF there is any match stored to the empire on that island.
+*
+* @param empire_data *emp The empire.
+* @param int island Which island to search.
+* @param int cmp_type Any CMP_ type.
+* @param int cmp_flags Any CMPF_ flags to match all of.
+* @param int amount The number that must be available.
+*/
+bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount) {
+	struct empire_storage_data *store;
+	obj_data *proto;
+	int found = 0;
+	
+	LL_FOREACH(EMPIRE_STORAGE(emp), store) {
+		if (store->island != island) {
+			continue;
+		}
+		
+		// need obj
+		if (!(proto = obj_proto(store->vnum))) {
+			continue;
+		}
+		
+		// is it a match, though?
+		if (GET_OBJ_CMP_TYPE(proto) == cmp_type && (GET_OBJ_CMP_FLAGS(proto) & cmp_flags) == cmp_flags) {
+			found += store->amount;
+			if (found >= amount) {
+				break;
+			}
+		}
+	}
+	
+	return (found >= amount);
 }
 
 
@@ -6035,6 +6202,11 @@ void extract_vehicle(vehicle_data *veh) {
 	
 	struct vehicle_room_list *vrl, *next_vrl;
 	room_data *main_room;
+	
+	if (veh == dg_owner_veh) {
+		dg_owner_purged = 1;
+		dg_owner_veh = NULL;
+	}
 	
 	// delete interior
 	if ((main_room = VEH_INTERIOR_HOME_ROOM(veh)) || VEH_ROOM_LIST(veh)) {

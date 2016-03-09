@@ -53,6 +53,7 @@ void init_craft(craft_data *craft);
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_craft(craft_data *craft, char_data *ch) {
+	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;
 	int count;
 
@@ -72,6 +73,14 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft not named");
 		problem = TRUE;
 	}
+	
+	strcpy(temp, GET_CRAFT_NAME(craft));
+	strtolower(temp);
+	if (strcmp(GET_CRAFT_NAME(craft), temp)) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Non-lowercase name");
+		problem = TRUE;
+	}
+	
 	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_ERROR) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft type not set");
 		problem = TRUE;
@@ -279,7 +288,7 @@ bool remove_obj_from_resource_list(struct resource_data **list, obj_vnum vnum) {
 	for (res = *list; res; res = next_res) {
 		next_res = res->next;
 		
-		if (res->vnum == vnum) {
+		if (res->type == RES_OBJECT && res->vnum == vnum) {
 			REMOVE_FROM_LIST(res, *list, next);
 			free(res);
 			++removed;

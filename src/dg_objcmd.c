@@ -29,7 +29,6 @@
 extern const char *damage_types[];
 extern const char *dirs[];
 extern const char *alt_dirs[];
-extern int dg_owner_purged;
 
 // external functions
 void obj_command_interpreter(obj_data *obj, char *argument);
@@ -249,7 +248,7 @@ OCMD(do_oregionecho) {
 	else if (!isdigit(*radius_arg) && *radius_arg != '-') {
 		obj_log(obj, "oregionecho called with invalid radius");
 	}
-	else if (!(center = get_room(orm, arg))) {
+	else if (!(center = get_room(orm, room_number))) {
 		obj_log(obj, "oregionecho called with invalid target");
 	}
 	else {

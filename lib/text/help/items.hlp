@@ -119,6 +119,12 @@ though you marked it keep.
 Items you 'keep' will have a (keep) tag next to their name. You can use
 'unkeep' to unprotect an item. You can also 'keep all' and 'unkeep all' on
 your inventory.
+
+'Keep' will also prevent items from being used for crafting or building. You
+can use this to avoid wasting more precious components when you have cheaper
+ones available.
+
+See also: COMPONENT
 #
 LARGE "LARGE ITEMS" "LARGE FLAG" (LARGE)
 

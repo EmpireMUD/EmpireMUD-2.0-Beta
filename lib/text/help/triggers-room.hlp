@@ -25,6 +25,16 @@ Note: You won't have access to %instance% variable information anymore.
 Variables:
   &c%room%&0 - The room it was activated on.
 #d
+"COMPLETE TRIGGER" "RTRIG COMPLETE" TRIGEDIT-ROOM-COMPLETE TRIGEDIT-COMPLETE TRIG-COMPLETE
+
+Complete (trigger type)
+
+Argument type:  percent chance to execute
+
+This trigger happens when a building is completed.
+
+See also: RTRIG LOAD
+#d
 "RTRIG COMMANDS" "ROOM COMMANDS" TRIGEDIT-ROOM-COMMANDS
 
 The following commands are available in room triggers (see their individual
@@ -85,6 +95,8 @@ Rooms can trigger on the following events:
 &cZone Reset&0 - Triggers when the adventure zone resets.
 &cEnter&0 - Triggers when a person enters the room.
 &cDrop&0 - Triggers when a player drops an item in the room.
+&cLoad&0 - Called when the building or room template is loaded.
+&cComplete&0 - Called when the building is finished.
 &cAbility&0 - Triggers when an ability is used in the room.
 &cLeave&0 - Triggers when a person tries to leave.
 &cDoor&0 - Triggers when a player interacts with a door.
@@ -96,7 +108,10 @@ For each type, there is a help file named &yRTRIG <type>&0.
 All room scripts provide the &c%room%&0 variable.
 
 When using field - The variable returns:
+&cbld_dir(dir)&0 - Rotates the given direction based on which way the building
+   is facing (compared to North). Returns the same dir if no building.
 &cbuilding&0 - The name of the building on the room, if any.
+&ccomplete&0 - True if the room/building is complete (finished building).
 &ccontents&0 - The id of the first obj in the room.
 &ccoords&0 - The (x, y) location of the room on the map.
 &ccrop&0 - The name of the crop on the map room, if any.
@@ -106,12 +121,15 @@ When using field - The variable returns:
 &cempire_adjective&0 - The owner empire's adjective form, if any.
 &cempire_id&0 - The owner empire's id number, if any.
 &cempire_name&0 - The owner empire's name, if any.
+&center_dir&0 - For map buildings, the direction you go to enter them.
+&cexit_dir&0 - For map buildings, the direction to exit them.
 &c<dir>&0 - The list of flags affecting the exit in the specified direction: 
       north, south, up, down, fore, aft (etc). The result is either:
       %room.north(vnum)% - vnum of room in direction
       %room.north(FLG)% - CLOSED LOCKED, etc.
       %room.north(room)% - room variable for room in direction
 &cid&0 - The unique id of the room.
+&cin_vehicle&0 - The vehicle the room is inside of, if any.
 &cname&0 - The name of the room.
 &cpeople&0 - The id of the first character in the room, or an empty return.
 &csector&0 - The sector type of the room.

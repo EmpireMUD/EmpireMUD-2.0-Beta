@@ -298,4 +298,272 @@ I 15 3024 100.00 4 x  # SEPARATE: an unripe plantain
 R
 5116 0
 S
+#3026
+tomatoes basket~
+a basket of tomatoes~
+There is a basket of tomatoes on the ground.~
+You can eat tomatoes, or plant them.
+~
+6 bl a 6
+24 3000 0
+7 168
+I 15 3027 100.00 4 e  # SEPARATE: a ripe tomato
+R
+5114 0
+S
+#3027
+tomato ripe~
+a ripe tomato~
+Someone dropped a ripe tomato here.~
+This is a bright red tomato, pleasantly ripe.
+~
+6 0 a 5
+6 0 0
+7 48
+I 14 3026 100.00 4 e  # COMBINE: a basket of tomatoes
+S
+#3028
+bananas bunch~
+a bunch of bananas~
+There is a bunch of bananas on the ground.~
+You can eat bananas, or plant them.
+~
+6 bl a 4
+24 3001 0
+7 168
+I 15 3029 100.00 4 e  # SEPARATE: a ripe yellow banana
+R
+5114 0
+S
+#3029
+banana ripe yellow~
+a ripe yellow banana~
+Someone has dropped a ripe yellow banana.~
+This ripe yellow banana looks scrumptious!
+~
+6 0 a 4
+6 0 0
+7 48
+I 14 3028 100.00 4 e  # COMBINE: a bunch of bananas
+S
+#3030
+coconuts bunch~
+a bunch of coconuts~
+There is a lovely bunch of coconuts, in a row.~
+You can eat coconuts, or plant them.
+~
+6 bl a 6
+24 3002 0
+7 168
+I 15 3031 100.00 4 e  # SEPARATE: a split coconut
+R
+5606 0
+R
+5610 0
+S
+#3031
+coconut split~
+a split coconut~
+A split coconut is sitting on the ground.~
+This ripe coconut looks as if it has just fallen from the tree.
+~
+5 k a 10
+6 6 5
+0 48
+S
+#3032
+grapes bunch~
+a bunch of grapes~
+There is a bunch of grapes on the ground.~
+You can eat grapes, or plant them.
+~
+6 bl a 6
+24 3003 0
+7 168
+I 15 3033 100.00 4 e  # SEPARATE: a few grapes
+R
+5114 0
+S
+#3033
+grapes few~
+a few grapes~
+Someone has dropped a few grapes.~
+These grapes are still attached to the severed stem.
+~
+6 0 a 5
+6 0 0
+7 48
+I 14 3032 100.00 4 e  # COMBINE: a bunch of grapes
+S
+#3034
+peppers basket~
+a basket of peppers~
+There is a basket of peppers on the ground.~
+You can plant peppers, cook food or brew them into poisons.
+~
+3 bl a 10
+0 3004 0
+7 168
+I 15 3035 100.00 4 e  # SEPARATE: a ripe pepper
+R
+5116 0
+S
+#3035
+pepper ripe~
+a ripe pepper~
+Someone dropped a ripe pepper here.~
+   This is just one ripe pepper, so it's not enough to plant, but it has a nice
+zing to it.  
+~
+6 0 a 3
+6 0 0
+7 48
+I 14 3034 100.00 4 e  # COMBINE: a basket of peppers
+S
+#3036
+potatoes sack~
+a sack of potatoes~
+There is a sack of potatoes on the ground.~
+You can plant potatoes, or use them to cook food.
+~
+3 bl a 6
+0 3005 0
+7 168
+R
+5116 0
+S
+#3037
+plums basket~
+a basket of plums~
+There is a basket of plums on the ground.~
+You can eat plums, or plant them.
+~
+6 bl a 5
+24 3006 0
+7 168
+I 15 3038 100.00 4 e  # SEPARATE: a ripe plum
+R
+5114 0
+S
+#3038
+plum ripe~
+a ripe plum~
+Someone dropped a ripe plum here.~
+This ripe plum looks like it has just been picked from the tree.
+~
+6 0 a 4
+6 0 0
+7 48
+I 14 3037 100.00 1 x  # COMBINE: a basket of plums
+S
+#3039
+strawberries basket~
+a basket of strawberries~
+A basket of ripe strawberries is on the ground.~
+You can eat strawberries, or plant them.
+~
+6 bl a 6
+24 3007 0
+7 168
+I 15 3040 100.00 4 e  # SEPARATE: a couple of strawberries
+R
+5114 0
+S
+#3040
+strawberries couple~
+a couple of strawberries~
+A couple of strawberries has been left here.~
+   This is just a couple of strawberries, so it's not enough to plant, but it
+tastes good.  
+~
+6 0 a 4
+6 0 0
+7 48
+I 14 3039 100.00 4 e  # COMBINE: a basket of strawberries
+S
+#3041
+mangoes mangos basket~
+a basket of mangoes~
+A basket of mangoes is on the ground.~
+You can eat mangoes, or plant them.
+~
+6 bl a 8
+24 3008 0
+7 168
+I 15 3042 100.00 4 e  # SEPARATE: a single ripe mango
+R
+5114 0
+S
+#3042
+mango ripe single~
+a single ripe mango~
+A single ripe mango has been dropped on the ground.~
+This is just one mango, so it's not enough to plant, but it tastes good.
+~
+6 0 a 4
+6 0 0
+7 48
+I 14 3041 100.00 4 e  # COMBINE: a basket of mangoes
+S
+#3043
+blueberries basket~
+a basket of blueberries~
+A basket of blueberries is on the ground.~
+You can eat blueberries, or plant them.
+~
+6 bl a 6
+24 3009 0
+7 168
+I 15 3044 100.00 4 e  # SEPARATE: a handful of blueberries
+R
+5114 0
+S
+#3044
+blueberries handful~
+a handful of blueberries~
+A handful of blueberries has been scattered on the ground.~
+This is just a handful of blueberries, so it's not enough to plant, but it
+tastes good.
+~
+6 0 a 3
+6 0 0
+7 48
+I 14 3043 100.00 4 e  # COMBINE: a basket of blueberries
+S
+#3045
+beans coffee sack~
+a sack of coffee beans~
+A sack of coffee beans is on the ground.~
+You can plant coffee beans, or cook them in water to make coffee.
+~
+3 bl a 6
+0 3011 0
+7 168
+R
+5116 0
+S
+#3046
+oats sack~
+a sack of oats~
+A sack of oats has been dropped on the ground.~
+Oats can be milled into oatmeal.
+~
+3 bl a 5
+0 3015 0
+7 168
+R
+5116 0
+S
+#3047
+watermelon ripe single~
+a single ripe watermelon~
+A large ripe watermelon is on the ground.~
+This large ripe watermelon looks like it would make a filling meal.
+~
+6 bl a 2
+24 3016 0
+7 336
+R
+5114 0
+S
 $
