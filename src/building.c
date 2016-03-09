@@ -992,6 +992,7 @@ char *vnum_to_interlink(room_vnum vnum) {
 ACMD(do_build) {
 	extern bool find_and_bind(char_data *ch, obj_vnum vnum);
 	extern int get_crafting_level(char_data *ch);
+	void show_craft_info(char_data *ch, craft_data *craft);
 	
 	room_data *to_room = NULL, *to_rev = NULL;
 	obj_data *found_obj = NULL;
@@ -999,7 +1000,7 @@ ACMD(do_build) {
 	int dir = NORTH;
 	craft_data *iter, *next_iter, *type = NULL, *abbrev_match = NULL;
 	bool found = FALSE, found_any, this_line, is_closed, needs_facing, needs_reverse;
-	bool junk, wait;
+	bool junk, wait, info = FALSE;
 	
 	// simple rules for ch building a given craft
 	#define CHAR_CAN_BUILD(ch, ttype)  (GET_CRAFT_TYPE((ttype)) == CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)) && (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || has_ability((ch), GET_CRAFT_ABILITY((ttype)))))
@@ -1011,6 +1012,13 @@ ACMD(do_build) {
 	
 	argument = any_one_word(argument, arg);
 	skip_spaces(&argument);
+	
+	// optional info arg
+	if (!str_cmp(arg, "info")) {
+		argument = any_one_word(argument, arg);
+		skip_spaces(&argument);
+		info = TRUE;
+	}
 	
 	// this figures out if the argument was a build recipe
 	if (*arg) {
@@ -1093,6 +1101,10 @@ ACMD(do_build) {
 				msg_to_char(ch, "%s\r\n", buf);
 			}
 		}
+	}
+	else if (info) {
+		// they only wanted info
+		show_craft_info(ch, type);
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already busy.\r\n");
