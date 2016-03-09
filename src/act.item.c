@@ -277,26 +277,23 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		strcpy(location, " (in room)");
 	}
 	else if (obj->carried_by) {
-		snprintf(location, sizeof(location), " (carried by %s)", PERS(obj->carried_by, obj->carried_by, FALSE));
+		snprintf(location, sizeof(location), ", carried by %s, ", PERS(obj->carried_by, obj->carried_by, FALSE));
 	}
 	else if (obj->in_vehicle) {
-		snprintf(location, sizeof(location), " (in %s)", get_vehicle_short_desc(obj->in_vehicle, ch));
+		snprintf(location, sizeof(location), ", in %s, ", get_vehicle_short_desc(obj->in_vehicle, ch));
 	}
 	else if (obj->in_obj) {
-		snprintf(location, sizeof(location), " (in %s)", GET_OBJ_DESC(obj->in_obj, ch, OBJ_DESC_SHORT));
+		snprintf(location, sizeof(location), ", in %s, ", GET_OBJ_DESC(obj->in_obj, ch, OBJ_DESC_SHORT));
 	}
 	else if (obj->worn_by) {
-		snprintf(location, sizeof(location), " (worn by %s)", PERS(obj->worn_by, obj->worn_by, FALSE));
+		snprintf(location, sizeof(location), ", worn by %s, ", PERS(obj->worn_by, obj->worn_by, FALSE));
 	}
 	else {
 		*location = '\0';
 	}
 	
-	// basic info
-	snprintf(lbuf, sizeof(lbuf), "Your analysis of $p%s reveals:", location);
-	act(lbuf, FALSE, ch, obj, NULL, TO_CHAR);
-	
 	// component info
+	*part = '\0';
 	if (GET_OBJ_CMP_TYPE(obj) != CMP_NONE) {
 		if (GET_OBJ_CMP_FLAGS(obj)) {
 			prettier_sprintbit(GET_OBJ_CMP_FLAGS(obj), component_flags, lbuf);
@@ -305,8 +302,12 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		else {
 			*lbuf = '\0';
 		}
-		msg_to_char(ch, "Component type: %s%s\r\n", lbuf, component_types[GET_OBJ_CMP_TYPE(obj)]);
+		sprintf(part, " (%s%s)", lbuf, component_types[GET_OBJ_CMP_TYPE(obj)]);
 	}
+	
+	// basic info
+	snprintf(lbuf, sizeof(lbuf), "Your analysis of $p%s%s reveals:", part, location);
+	act(lbuf, FALSE, ch, obj, NULL, TO_CHAR);
 	
 	// if it has any wear bits other than TAKE, show if they can't use it
 	if (CAN_WEAR(obj, ~ITEM_WEAR_TAKE)) {
