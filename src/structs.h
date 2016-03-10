@@ -1056,6 +1056,7 @@ typedef struct vehicle_data vehicle_data;
 #define CMP_STICK  25
 #define CMP_TEXTILE  26
 #define CMP_VEGETABLE  27
+#define CMP_ROPE  28
 
 
 // CMPF_x: component flags
