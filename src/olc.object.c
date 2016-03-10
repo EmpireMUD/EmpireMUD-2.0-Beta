@@ -369,6 +369,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	craft_data *craft, *next_craft;
 	morph_data *morph, *next_morph;
 	augment_data *aug, *next_aug;
+	vehicle_data *veh, *next_veh;
 	crop_data *crop, *next_crop;
 	empire_data *emp, *next_emp;
 	char_data *mob, *next_mob;
@@ -595,6 +596,14 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// update vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		found = remove_obj_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), vnum);
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
+		}
+	}
+	
 	// olc editor updates
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (GET_OLC_ADVENTURE(desc)) {
@@ -710,6 +719,9 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				msg_to_char(desc->character, "One of the objects in an interaction for the sector you're editing was deleted.\r\n");
 			}
 		}
+		if (GET_OLC_VEHICLE(desc)) {
+			found = remove_obj_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), vnum);
+		}
 	}
 	
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted object %d", GET_NAME(ch), vnum);
@@ -739,6 +751,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	augment_data *aug, *next_aug;
+	vehicle_data *veh, *next_veh;
 	struct archetype_gear *gear;
 	crop_data *crop, *next_crop;
 	char_data *mob, *next_mob;
@@ -914,6 +927,18 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+			}
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		any = FALSE;
+		for (res = VEH_YEARLY_MAINTENANCE(veh); res && !any; res = res->next) {
+			if (res->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			}
 		}
 	}
