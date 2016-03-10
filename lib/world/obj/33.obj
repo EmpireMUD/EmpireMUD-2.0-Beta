@@ -88,9 +88,11 @@ a sack of cornmeal~
 A sack of cornmeal is sitting here.~
 The cornmeal can be cooked into various foods.
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 7 168
+O
+8 0
 R
 5109 0
 R
@@ -138,9 +140,11 @@ a jar of olive oil~
 A jar of olive oil is sitting on the ground.~
 The olive oil looks rich.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 6 168
+O
+20 0
 R
 5134 0
 R
@@ -152,9 +156,11 @@ a sack of flour~
 A sack of flour is sitting on the ground.~
 Flour is used to bake bread.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 7 168
+O
+8 0
 R
 5109 0
 R
@@ -215,14 +221,14 @@ R
 5619 0
 S
 #3316
-chicken vegetables meal~
+chicken vegetables meal plate~
 a plate of chicken and vegetables~
 There is a full meal of chicken and vegetables just laying here.~
    Such a large chicken breast, surrounded by corn, peas and carrots garnished
 with a sprig of parsley. The smell wafting up from this plate is delicious and
 the chicken is nice and crispy.
 ~
-6 0 a 1
+6 0 a 3
 96 0 0
 7 336
 M

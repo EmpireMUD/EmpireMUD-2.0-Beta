@@ -4,7 +4,7 @@ a handful of whitegrass~
 A handful of picked whitegrass is on the ground.~
 Whitegrass is an herb used to make potions.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 0 0
 M
@@ -13,6 +13,8 @@ You plant some whitegrass in a bed of moss.~
 M
 1
 $n plants some whitegrass in a bed of moss.~
+O
+14 0
 R
 5130 0
 R
@@ -24,7 +26,7 @@ some fiveleaf~
 Some fiveleaf has been left here.~
 Fiveleaf is an herb used to make potions.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 0 0
 M
@@ -33,6 +35,8 @@ You plant some fiveleaf cuttings and tie them to stakes.~
 M
 1
 $n plants some fiveleaf cuttings and ties them to stakes.~
+O
+14 0
 R
 5130 0
 R
@@ -44,7 +48,7 @@ a twig of redthorn~
 A twig of redthorn has been dropped here.~
 Redthorn is an herb used to make potions.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 0 0
 M
@@ -53,6 +57,8 @@ You plant a twig of redthorn and pour some water around it.~
 M
 1
 $n plants a twig of redthorn and pours some water around it.~
+O
+14 0
 R
 5130 0
 R
@@ -64,7 +70,7 @@ some magewhisper sepals~
 A pile of magewhisper sepals sits on the ground.~
 Magewhisper is an herb used to make potions.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 0 0
 M
@@ -73,6 +79,8 @@ You sprinkle shredded magewhisper sepals over fertilizer and watch as stems inst
 M
 1
 $n sprinkles shredded magewhisper sepals over fertilizer. You watch as stems instantly begin to grow.~
+O
+14 0
 R
 5130 0
 R
@@ -84,7 +92,7 @@ a daggerbite frond~
 A daggerbite frond has been left here.~
 Daggerbite is an herb used to make potions.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 0 0
 M
@@ -93,6 +101,8 @@ You plant a frond of daggerbite in some sand.~
 M
 1
 $n plants a frond of daggerbite in some sand.~
+O
+14 0
 R
 5130 0
 R
@@ -104,7 +114,7 @@ some bileberries~
 Some noxious bileberries are lying on the ground.~
 Bileberries are an herb used to make potions.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 0 0
 M
@@ -113,6 +123,8 @@ You plant some bileberries on a raft of twigs.~
 M
 1
 $n plants some bileberries on a raft of twigs.~
+O
+14 0
 R
 5130 0
 R
@@ -124,9 +136,11 @@ an iridescent blue iris~
 An iridescent iris is growing here.~
 The iridescent flower can be used in certain crafts and enchantments.
 ~
-3 l a 1
+3 l a 3
 0 0 0
 0 0
+O
+11 g
 R
 5164 0
 R

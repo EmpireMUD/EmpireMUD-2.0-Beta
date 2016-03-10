@@ -4,9 +4,11 @@ a glowing green seashell~
 A glowing green seashell is sitting on the ground.~
 The seashell can be used in certain crafts and enchantments.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 1 0
+O
+11 g
 R
 5164 0
 R
@@ -18,9 +20,11 @@ a striped barbfish~
 The remains of a striped barbfish is rotting here.~
 You can eat the fish.
 ~
-6 kl a 1
+6 kl a 2
 24 0 0
 7 168
+O
+17 l
 R
 5119 0
 S
@@ -30,9 +34,11 @@ a giant linefish~
 The remains of a giant linefish is rotting here.~
 You can eat the fish.
 ~
-6 k a 1
+6 k a 2
 24 0 0
 7 168
+O
+17 l
 R
 5119 0
 S
@@ -42,9 +48,11 @@ a magenta arrowfish~
 The remains of a magenta arrowfish is rotting here.~
 You can eat the fish.
 ~
-6 k a 1
+6 k a 2
 24 0 0
 7 168
+O
+17 l
 R
 5119 0
 S
@@ -76,7 +84,7 @@ a pouch of nails~
 A pouch of nails is sitting here.~
 Nails are used for building.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 2 0
 M
@@ -91,6 +99,8 @@ You hammer nails into $V.~
 M
 7
 $n hammers nails into $V.~
+O
+19 0
 R
 5134 0
 R
@@ -107,9 +117,11 @@ hold it up to the light, you can see its true color is a deep, deep violet.
 This dye, made from a mix of wild berries, imbues a fabric with unusual
 properties.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 8 0
+O
+5 0
 R
 5137 0
 S
@@ -121,7 +133,7 @@ A vial of deep orange dye is sitting here.~
 pigment of a magenta arrowfish. It has an unusual glow in dim light, like it
 catches and amplifies every ray of light that hits it.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 8 0
 M
@@ -130,6 +142,8 @@ You paint $V orange.~
 M
 7
 $n paints $V orange.~
+O
+5 0
 R
 5137 0
 S
@@ -155,9 +169,11 @@ a small skin~
 A small pile of skin is stacked on the ground.~
 Skin can be tanned to make leather.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 7 0
+O
+24 o
 R
 5120 0
 S
@@ -167,9 +183,11 @@ a large skin~
 A large pile of skin is stacked on the ground.~
 Skin can be tanned to make leather.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 7 0
+O
+24 f
 R
 5120 0
 S
@@ -179,9 +197,11 @@ a luxurious fox fur~
 A fox fur is crumpled on the ground.~
 Fox fur is used in some types of clothing.
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 7 0
+O
+10 o
 R
 5120 0
 S
@@ -191,9 +211,11 @@ a big cat pelt~
 A big cat pelt is lying here.~
 This pelt, from a dangerous big cat, can be made into fancy clothing.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 7 0
+O
+10 f
 R
 5120 0
 S
@@ -203,7 +225,7 @@ a shark skin~
 A shark skin is drying on the ground.~
 The shark skin is smooth one way, rough the other.
 ~
-3 0 a 1
+3 0 a 3
 0 0 0
 7 0
 R
@@ -215,7 +237,7 @@ some snakeskin~
 Some snakeskin is crumpled on the ground.~
 The snakeskin can be used for certain crafts.
 ~
-3 l a 1
+3 l a 3
 0 0 0
 7 0
 R
@@ -227,9 +249,11 @@ a small piece of leather~
 A pile of small pieces of leather is sitting here.~
 Leather can be sewn into armor.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 7 0
+O
+15 o
 R
 5134 0
 R
@@ -241,9 +265,11 @@ a large piece of leather~
 A pile of large pieces of leather is sitting here.~
 Leather can be sewn into armor.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 7 0
+O
+15 f
 R
 5120 0
 S
@@ -253,19 +279,21 @@ some wool~
 Some wool is scattered on the ground.~
 You can weave the wool into cloth.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 7 0
+O
+7 a
 R
 5137 0
 S
 #1359
-cloth bolt~
-a bolt of cloth~
-A bolt of cloth is lying on the ground.~
+cloth cotton bolt~
+a bolt of cotton cloth~
+A bolt of cotton cloth is lying on the ground.~
 This simple cloth is used to sew clothing.
 ~
-3 l a 2
+3 l a 4
 0 0 0
 7 0
 M
@@ -274,6 +302,30 @@ You hang some cloth on $V.~
 M
 7
 $n hangs some cloth on $V.~
+O
+26 0
+R
+5137 0
+R
+5134 0
+S
+#1360
+cloth wool bolt~
+a bolt of wool cloth~
+A bolt of wool cloth is sitting here.~
+This simple cloth is used to sew clothing.
+~
+3 l a 5
+0 0 0
+7 0
+M
+6
+You hang some cloth on $V.~
+M
+7
+$n hangs some cloth on $V.~
+O
+26 0
 R
 5137 0
 R
