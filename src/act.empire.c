@@ -222,7 +222,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		{ DIPL_TRUCE, "a truce", "In a truce with", FALSE },
 		{ DIPL_DISTRUST, "distrust", "Distrustful of", FALSE },
 		{ DIPL_WAR, "battle", "At war with", FALSE },
-		{ DIPL_TRADE, "trade", "", TRUE },
+		{ DIPL_TRADE, "trade", "Trade relations with", TRUE },
 		
 		// goes last
 		{ NOTHING, "\n" }
@@ -342,6 +342,29 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 			}
 		}
 
+		// Show things that are marked offer_only but have no other relation
+		for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
+			if (!diplomacy_display[iter].offers_only) {
+				continue;
+			}
+			
+			found = FALSE;
+			for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
+				if (emp_pol->type == diplomacy_display[iter].type && (other = real_empire(emp_pol->id)) && !EMPIRE_IS_TIMED_OUT(other)) {
+					if (!found) {
+						msg_to_char(ch, "%s ", diplomacy_display[iter].text);
+					}
+			
+					msg_to_char(ch, "%s%s%s&0", (found ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other));
+					found = TRUE;
+				}
+			}
+		
+			if (found) {
+				msg_to_char(ch, ".\r\n");
+			}
+		}
+		
 		// now show any open offers
 		for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
 			found = FALSE;
@@ -1272,6 +1295,7 @@ void upgrade_city(char_data *ch, char *argument) {
 #define DIPF_UNILATERAL  BIT(1)	// No need to offer first.
 #define DIPF_WAR_COST  BIT(2)	// Empire must pay to do this.
 #define DIPF_NOT_MUTUAL_WAR  BIT(3)	// Won't work if mutual_war_only is set
+#define DIPF_ALLOW_FROM_NEUTRAL  BIT(4)	// Can be used if no relations at all
 
 struct diplomacy_type {
 	char *keywords;	// keyword list (first word is displayed to players, any word matches)
@@ -1281,16 +1305,16 @@ struct diplomacy_type {
 	bitvector_t flags;	// DIPF_ flags for do_diplomacy
 	char *desc;	// short explanation
 } diplo_option[] = {
-	{ "peace", DIPL_PEACE, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_WAR | DIPL_DISTRUST | DIPL_TRUCE, NOBITS, "end a war or state of distrust" },
+	{ "peace", DIPL_PEACE, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_WAR | DIPL_DISTRUST | DIPL_TRUCE, DIPF_ALLOW_FROM_NEUTRAL, "end a war or state of distrust" },
 	{ "truce", DIPL_TRUCE, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_WAR | DIPL_DISTRUST, NOBITS, "end a war without declaring peace" },
 	
 	{ "alliance ally", DIPL_ALLIED, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_NONAGGR, NOBITS, "propose or accept a full alliance" },
-	{ "nonaggression pact", DIPL_NONAGGR, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_TRUCE | DIPL_PEACE, NOBITS, "propose or accept a pact of non-aggression" },
-	{ "trade trading", DIPL_TRADE, NOBITS, NOBITS, NOBITS, "propose or accept a trade agreement" },
+	{ "nonaggression pact", DIPL_NONAGGR, ALL_DIPLS_EXCEPT(DIPL_TRADE), DIPL_TRUCE | DIPL_PEACE, DIPF_ALLOW_FROM_NEUTRAL, "propose or accept a pact of non-aggression" },
+	{ "trade trading", DIPL_TRADE, NOBITS, NOBITS, DIPF_ALLOW_FROM_NEUTRAL, "propose or accept a trade agreement" },
 	{ "distrust", DIPL_DISTRUST, ALL_DIPLS, NOBITS, DIPF_UNILATERAL, "declare that your empire distrusts, but is not at war with, another" },
 	
 	{ "war", DIPL_WAR, ALL_DIPLS, NOBITS, DIPF_UNILATERAL | DIPF_WAR_COST | DIPF_REQUIRE_PRESENCE | DIPF_NOT_MUTUAL_WAR, "declare war on an empire!" },
-	{ "battle", DIPL_WAR, ALL_DIPLS, NOBITS, DIPF_REQUIRE_PRESENCE, "suggest a friendly war" },
+	{ "battle", DIPL_WAR, ALL_DIPLS, NOBITS, DIPF_REQUIRE_PRESENCE | DIPF_ALLOW_FROM_NEUTRAL, "suggest a friendly war" },
 	
 	{ "\n", NOBITS, NOBITS, NOBITS, NOBITS }	// this goes last
 };
@@ -2837,7 +2861,7 @@ ACMD(do_diplomacy) {
 	else if (ch_pol && POL_FLAGGED(ch_pol, diplo_option[type].add_bits)) {
 		msg_to_char(ch, "You already have that relationship with %s.\r\n", EMPIRE_NAME(vict_emp));
 	}
-	else if (diplo_option[type].requires_bits && (!ch_pol || !IS_SET(ch_pol->type, diplo_option[type].requires_bits))) {
+	else if (diplo_option[type].requires_bits && (!IS_SET(diplo_option[type].flags, DIPF_ALLOW_FROM_NEUTRAL) || (ch_pol && IS_SET(ch_pol->type, CORE_DIPLS))) && (!ch_pol || !IS_SET(ch_pol->type, diplo_option[type].requires_bits))) {
 		msg_to_char(ch, "You can't do that with your current diplomatic relations.\r\n");
 	}
 	else if (IS_SET(diplo_option[type].flags, DIPF_REQUIRE_PRESENCE) && count_members_online(vict_emp) == 0) {
@@ -2856,7 +2880,7 @@ ACMD(do_diplomacy) {
 			ch_pol = create_relation(ch_emp, vict_emp);
 		}
 		if (!(vict_pol = find_relation(vict_emp, ch_emp))) {
-			ch_pol = create_relation(vict_emp, ch_emp);
+			vict_pol = create_relation(vict_emp, ch_emp);
 		}
 		
 		if (war_cost > 0) {
@@ -2870,9 +2894,9 @@ ACMD(do_diplomacy) {
 			// demand
 			ch_pol->start_time = vict_pol->start_time = time(0);
 			REMOVE_BIT(ch_pol->type, diplo_option[type].remove_bits);
-			REMOVE_BIT(ch_pol->offer, diplo_option[type].remove_bits);
+			REMOVE_BIT(ch_pol->offer, diplo_option[type].add_bits | diplo_option[type].remove_bits);
 			REMOVE_BIT(vict_pol->type, diplo_option[type].remove_bits);
-			REMOVE_BIT(vict_pol->offer, diplo_option[type].remove_bits);
+			REMOVE_BIT(vict_pol->offer, diplo_option[type].add_bits | diplo_option[type].remove_bits);
 			
 			SET_BIT(ch_pol->type, diplo_option[type].add_bits);
 			SET_BIT(vict_pol->type, diplo_option[type].add_bits);
@@ -2886,9 +2910,9 @@ ACMD(do_diplomacy) {
 			// accept
 			ch_pol->start_time = vict_pol->start_time = time(0);
 			REMOVE_BIT(ch_pol->type, diplo_option[type].remove_bits);
-			REMOVE_BIT(ch_pol->offer, diplo_option[type].remove_bits);
+			REMOVE_BIT(ch_pol->offer, diplo_option[type].add_bits | diplo_option[type].remove_bits);
 			REMOVE_BIT(vict_pol->type, diplo_option[type].remove_bits);
-			REMOVE_BIT(vict_pol->offer, diplo_option[type].remove_bits);
+			REMOVE_BIT(vict_pol->offer, diplo_option[type].add_bits | diplo_option[type].remove_bits);
 			
 			SET_BIT(ch_pol->type, diplo_option[type].add_bits);
 			SET_BIT(vict_pol->type, diplo_option[type].add_bits);

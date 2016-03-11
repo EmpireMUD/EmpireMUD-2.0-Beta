@@ -1885,6 +1885,7 @@ const char *component_types[] = {
 	"stick",	// 25
 	"textile",
 	"vegetable",
+	"rope",
 	"\n"
 };
 

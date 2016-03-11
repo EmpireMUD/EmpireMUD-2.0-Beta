@@ -1,48 +1,48 @@
 #800
 flask~
-800 1  # 1x a flask
+800 1
 2 198 d 8 -1
 S
 #801
 jar~
-801 1  # 1x a jar
+801 1
 2 198 d 8 -1
 S
 #803
 mirror~
-803 1  # 1x a tarnished mirror
+803 1
 1 51 c 4 -1
 R
-175 1  # 1x an iron ingot
+18 1 1 262144
 S
 #804
 lantern~
-804 1  # 1x a lantern
+804 1
 2 58 ce 4 -1
 R
-851 1  # 1x an unlit candle
+18 1 1 262144
 R
-175 1  # 1x an iron ingot
+851 1 0 0
 S
 #806
 silver mirror~
-806 1  # 1x a silver looking glass
+806 1
 1 54 c 4 -1
 R
-161 3  # 3x a silver nugget
+161 3 0 0
 S
 #807
 gold mirror~
-807 1  # 1x a gold looking glass
+807 1
 1 54 c 4 -1
 R
-161 1  # 1x a silver nugget
+161 1 0 0
 R
-162 2  # 2x a pile of gold dust
+162 2 0 0
 S
 #851
 candle~
-851 1  # 1x an unlit candle
+851 1
 2 198 b 2 -1
 S
 $

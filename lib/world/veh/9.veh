@@ -8,7 +8,7 @@ ride on the cart and drive it around.
 ~
 bfhio 22 10 200 1
 R
-1306 1  # 1x a pouch of nails
+19 1 1 0
 S
 #901
 carriage wooden~
@@ -24,7 +24,9 @@ bfhio 19 14 200 1
 D
 5521 0 0
 R
-1306 1  # 1x a pouch of nails
+19 1 1 0
+R
+20 1 1 0
 S
 #902
 wagon covered~
@@ -36,9 +38,9 @@ harness two horses to the wagon and then lead it, or ride in it and drive it.
 ~
 bfhio 19 20 400 2
 R
-1306 1  # 1x a pouch of nails
+19 1 1 0
 R
-1359 1  # 1x a bolt of cloth
+20 1 1 0
 S
 #903
 catapult~
@@ -52,9 +54,11 @@ bor 19 20 0 2
 C
 0 100
 R
-1306 1  # 1x a pouch of nails
+19 1 1 0
 R
-125 1  # 1x a stack of lumber
+16 1 1 0
+R
+20 1 1 0
 S
 #904
 chair wooden~
@@ -111,7 +115,7 @@ land.
 ~
 cfghln 3 10 0 0
 R
-1356 1  # 1x a small piece of leather
+15 1 1 16384
 S
 #921
 caravan brightly-painted painted wooden~
@@ -126,9 +130,11 @@ bfhio 19 25 100 4
 D
 5518 1 r
 R
-1306 1  # 1x a pouch of nails
+19 1 1 0
 R
-1359 1  # 1x a bolt of cloth
+26 1 1 0
+R
+20 1 1 0
 T 921
 S
 #952
@@ -143,11 +149,11 @@ chijkt 20 32 150 0
 D
 5501 2 o
 R
-125 1  # 1x a stack of lumber
+16 1 1 0
 R
-1306 1  # 1x a pouch of nails
+19 1 1 0
 R
-1359 1  # 1x a bolt of cloth
+26 1 1 0
 T 952
 S
 #953
@@ -163,11 +169,11 @@ cijt 20 32 450 0
 D
 5501 1 0
 R
-125 1  # 1x a stack of lumber
+16 1 1 0
 R
-1306 1  # 1x a pouch of nails
+19 1 1 0
 R
-1359 1  # 1x a bolt of cloth
+26 1 1 0
 T 953
 S
 #954
@@ -185,11 +191,11 @@ C
 D
 5501 2 o
 R
-125 1  # 1x a stack of lumber
+16 1 1 0
 R
-1306 1  # 1x a pouch of nails
+19 1 1 0
 R
-1359 1  # 1x a bolt of cloth
+26 1 1 0
 T 954
 S
 #955
@@ -207,11 +213,11 @@ C
 D
 5501 4 op
 R
-125 2  # 2x a stack of lumber
+16 2 1 0
 R
-1306 2  # 2x a pouch of nails
+19 2 1 0
 R
-1359 2  # 2x a bolt of cloth
+26 2 1 0
 T 955
 S
 #956
@@ -226,11 +232,11 @@ cijkt 20 96 400 0
 D
 5501 8 opq
 R
-125 2  # 2x a stack of lumber
+16 2 1 0
 R
-1306 2  # 2x a pouch of nails
+19 2 1 0
 R
-1359 2  # 2x a bolt of cloth
+26 2 1 0
 T 956
 S
 #957
@@ -245,11 +251,11 @@ cijkpqt 20 64 1000 0
 D
 5501 4 op
 R
-125 1  # 1x a stack of lumber
+16 1 1 0
 R
-1306 1  # 1x a pouch of nails
+19 1 1 0
 R
-1359 1  # 1x a bolt of cloth
+26 1 1 0
 T 957
 S
 $

@@ -4934,7 +4934,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 						prettier_sprintbit(change->misc, component_flags, lbuf);
 						strcat(lbuf, " ");
 					}
-					msg_to_char(ch, "You change resource %d's component to %s%s.", atoi(arg2), lbuf, component_types[vnum]);
+					msg_to_char(ch, "You change resource %d's component to %s%s.\r\n", atoi(arg2), lbuf, component_types[vnum]);
 					break;
 				}
 				case RES_LIQUID: {

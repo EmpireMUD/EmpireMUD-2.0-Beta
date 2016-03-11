@@ -1572,7 +1572,10 @@ void close_socket(descriptor_data *d) {
 	if (d->olc_trigger) {
 		free_trigger(d->olc_trigger);
 	}
-
+	if (d->olc_vehicle) {
+		free_vehicle(d->olc_vehicle);
+	}
+	
 	free(d);
 }
 

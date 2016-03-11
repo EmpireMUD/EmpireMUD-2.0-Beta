@@ -885,7 +885,7 @@ ACMD(do_alternate) {
 		command_lag(ch, WAIT_OTHER);
 	}
 	else if (ch->desc->str) {
-		msg_to_char(ch, "You can't alterante while editing text (use ,/save or ,/abort first).\r\n");
+		msg_to_char(ch, "You can't alternate while editing text (use ,/save or ,/abort first).\r\n");
 	}
 	else if (ch->desc->snooping) {
 		msg_to_char(ch, "You can't alternate while snooping.\r\n");
