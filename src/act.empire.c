@@ -2882,7 +2882,7 @@ ACMD(do_diplomacy) {
 			syslog(SYS_EMPIRE, 0, TRUE, "DIPL: %s (%s) has declared %s with %s", EMPIRE_NAME(ch_emp), GET_NAME(ch), fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
 			msg_to_char(ch, "You have declared %s with %s!\r\n", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
 		}
-		else if (POL_OFFERED(vict_pol, diplo_option[type].add_bits)) {
+		else if (vict_pol && POL_OFFERED(vict_pol, diplo_option[type].add_bits)) {
 			// accept
 			ch_pol->start_time = vict_pol->start_time = time(0);
 			REMOVE_BIT(ch_pol->type, diplo_option[type].remove_bits);
