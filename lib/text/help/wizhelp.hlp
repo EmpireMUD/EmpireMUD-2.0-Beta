@@ -804,6 +804,16 @@ account    Co-Impl  Shows all the alts associated with a given player.
 
 See also: STAT, STARTING LOCATION
 #e
+"SHOW COMPONENTS"
+
+Usage:  show components <type> [flags]
+
+This command allows you to look up objects that are a given component type.
+If you specify any flags, all those flags must match the output.
+
+For a list of component types, see: HELP COMPONENT TYPES
+For a list of component flags, see: HELP COMPONENT FLAGS
+#e
 SHUTDOWN
 
 Usage:  shutdown [now | timer] [die | pause]

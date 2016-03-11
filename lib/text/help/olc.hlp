@@ -2919,7 +2919,7 @@ other than 0.
 
 See also: ITEM SCALING, OEDIT TYPE, OLC OBJECTS
 #d
-"OEDIT COMPONENT" "OEDIT COMP"
+"OEDIT COMPONENT" "OEDIT COMP" "COMPONENT TYPES"
 
 Usage:  .component <type>
 
@@ -2961,7 +2961,7 @@ Available components (common flags listed in parentheses):
  &cvegetable&0 - for cooking
  &crope&0 - for construction and harnessing animals
 
-See also: COMPONENT FLAGS
+See also: COMPONENT FLAGS, SHOW COMPONENTS
 #d
 "OEDIT COMPFLAGS" "OEDIT COMPONENT FLAGS" "COMPONENT FLAGS"
 
