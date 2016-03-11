@@ -222,7 +222,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		{ DIPL_TRUCE, "a truce", "In a truce with", FALSE },
 		{ DIPL_DISTRUST, "distrust", "Distrustful of", FALSE },
 		{ DIPL_WAR, "battle", "At war with", FALSE },
-		{ DIPL_TRADE, "trade", "", TRUE },
+		{ DIPL_TRADE, "trade", "Trade relations with", TRUE },
 		
 		// goes last
 		{ NOTHING, "\n" }
@@ -342,6 +342,29 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 			}
 		}
 
+		// Show things that are marked offer_only but have no other relation
+		for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
+			if (!diplomacy_display[iter].offers_only) {
+				continue;
+			}
+			
+			found = FALSE;
+			for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
+				if (emp_pol->type == iter && (other = real_empire(emp_pol->id)) && !EMPIRE_IS_TIMED_OUT(other)) {
+					if (!found) {
+						msg_to_char(ch, "%s ", diplomacy_display[iter].text);
+					}
+			
+					msg_to_char(ch, "%s%s%s&0", (found ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other));
+					found = TRUE;
+				}
+			}
+		
+			if (found) {
+				msg_to_char(ch, ".\r\n");
+			}
+		}
+		
 		// now show any open offers
 		for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
 			found = FALSE;
