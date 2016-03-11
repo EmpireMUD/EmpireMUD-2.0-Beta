@@ -796,6 +796,7 @@ spawns     Immort   Shows where a mob spawns on the map, similar to ".mob search
 startlocs  Immort   Shows the location of all starting location tiles.
 storage    Immort   Shows items that can be stored in a given building/room type.
 terrain    Immort   Shows total counts for all terrain types.
+uses       Immort   Shows crafts (and vehicles, etc.) that use a component type.
 workforce  Immort   Shows you an empire's workforce setup.
 variables  Immort   Shows script variables on a player character.
 commons    Asst     Shows players currently connected from duplicate sites.
@@ -810,6 +811,17 @@ Usage:  show components <type> [flags]
 
 This command allows you to look up objects that are a given component type.
 If you specify any flags, all those flags must match the output.
+
+For a list of component types, see: HELP COMPONENT TYPES
+For a list of component flags, see: HELP COMPONENT FLAGS
+#e
+"SHOW USES"
+
+Usage:  show uses <type> [flags]
+
+This command looks up crafts, vehicles, and augments that require a given
+component type. If you specify any flags, all those flags must match the
+output.
 
 For a list of component types, see: HELP COMPONENT TYPES
 For a list of component flags, see: HELP COMPONENT FLAGS

@@ -2074,6 +2074,115 @@ SHOW(show_terrain) {
 }
 
 
+SHOW(show_uses) {
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	craft_data *craft, *next_craft;
+	augment_data *aug, *next_aug;
+	vehicle_data *veh, *next_veh;
+	struct resource_data *res;
+	bitvector_t flags;
+	size_t size;
+	int type;
+	
+	argument = any_one_word(argument, arg);	// component type
+	skip_spaces(&argument);	// optional flags
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show uses <type> [flags]\r\n");
+		msg_to_char(ch, "See: HELP COMPONENT TYPES, HELP COMPONENT FLAGS\r\n");
+	}
+	else if ((type = search_block(arg, component_types, FALSE)) == NOTHING) {
+		msg_to_char(ch, "Unknown component type '%s' (see HELP COMPONENT TYPES).\r\n", arg);
+	}
+	else {
+		flags = *argument ? olc_process_flag(ch, argument, "component", "flags", component_flags, NOBITS) : NOBITS;
+		
+		// preamble
+		if (flags) {
+			prettier_sprintbit(flags, component_flags, part);
+			strcat(part, " ");
+		}
+		else {
+			*part = '\0';
+		}
+		size = snprintf(buf, sizeof(buf), "Uses for %s%s:\r\n", part, component_types[type]);
+		
+		HASH_ITER(hh, augment_table, aug, next_aug) {
+			if (size >= sizeof(buf)) {
+				break;
+			}
+			
+			LL_FOREACH(GET_AUG_RESOURCES(aug), res) {
+				if (res->type != RES_COMPONENT || res->vnum != type) {
+					continue;
+				}
+				if (flags && (res->misc & flags) != flags) {
+					continue;
+				}
+				
+				if (res->misc) {
+					prettier_sprintbit(res->misc, component_flags, part);
+				}
+				else {
+					*part = '\0';
+				}
+				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s%s%s%s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), *part ? " (" : "", part, *part ? ")" : "");
+			}
+		}
+		
+		HASH_ITER(hh, craft_table, craft, next_craft) {
+			if (size >= sizeof(buf)) {
+				break;
+			}
+			
+			LL_FOREACH(GET_CRAFT_RESOURCES(craft), res) {
+				if (res->type != RES_COMPONENT || res->vnum != type) {
+					continue;
+				}
+				if (flags && (res->misc & flags) != flags) {
+					continue;
+				}
+				
+				if (res->misc) {
+					prettier_sprintbit(res->misc, component_flags, part);
+				}
+				else {
+					*part = '\0';
+				}
+				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s%s%s%s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), *part ? " (" : "", part, *part ? ")" : "");
+			}
+		}
+		
+		HASH_ITER(hh, vehicle_table, veh, next_veh) {
+			if (size >= sizeof(buf)) {
+				break;
+			}
+			
+			LL_FOREACH(VEH_YEARLY_MAINTENANCE(veh), res) {
+				if (res->type != RES_COMPONENT || res->vnum != type) {
+					continue;
+				}
+				if (flags && (res->misc & flags) != flags) {
+					continue;
+				}
+				
+				if (res->misc) {
+					prettier_sprintbit(res->misc, component_flags, part);
+				}
+				else {
+					*part = '\0';
+				}
+				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s%s%s%s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh), *part ? " (" : "", part, *part ? ")" : "");
+			}
+		}
+		
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+}
+
+
 SHOW(show_account) {
 	player_index_data *plr_index, *index, *next_index;
 	bool file = FALSE, loaded_file = FALSE;
@@ -5987,6 +6096,7 @@ ACMD(do_show) {
 		{ "islands", LVL_START_IMM, show_islands },
 		{ "variables", LVL_START_IMM, show_variables },
 		{ "components", LVL_START_IMM, show_components },
+		{ "uses", LVL_START_IMM, show_uses },
 
 		// last
 		{ "\n", 0, NULL }
