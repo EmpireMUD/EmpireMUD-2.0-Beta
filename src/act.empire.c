@@ -2870,9 +2870,9 @@ ACMD(do_diplomacy) {
 			// demand
 			ch_pol->start_time = vict_pol->start_time = time(0);
 			REMOVE_BIT(ch_pol->type, diplo_option[type].remove_bits);
-			REMOVE_BIT(ch_pol->offer, diplo_option[type].remove_bits);
+			REMOVE_BIT(ch_pol->offer, diplo_option[type].add_bits | diplo_option[type].remove_bits);
 			REMOVE_BIT(vict_pol->type, diplo_option[type].remove_bits);
-			REMOVE_BIT(vict_pol->offer, diplo_option[type].remove_bits);
+			REMOVE_BIT(vict_pol->offer, diplo_option[type].add_bits | diplo_option[type].remove_bits);
 			
 			SET_BIT(ch_pol->type, diplo_option[type].add_bits);
 			SET_BIT(vict_pol->type, diplo_option[type].add_bits);
@@ -2886,9 +2886,9 @@ ACMD(do_diplomacy) {
 			// accept
 			ch_pol->start_time = vict_pol->start_time = time(0);
 			REMOVE_BIT(ch_pol->type, diplo_option[type].remove_bits);
-			REMOVE_BIT(ch_pol->offer, diplo_option[type].remove_bits);
+			REMOVE_BIT(ch_pol->offer, diplo_option[type].add_bits | diplo_option[type].remove_bits);
 			REMOVE_BIT(vict_pol->type, diplo_option[type].remove_bits);
-			REMOVE_BIT(vict_pol->offer, diplo_option[type].remove_bits);
+			REMOVE_BIT(vict_pol->offer, diplo_option[type].add_bits | diplo_option[type].remove_bits);
 			
 			SET_BIT(ch_pol->type, diplo_option[type].add_bits);
 			SET_BIT(vict_pol->type, diplo_option[type].add_bits);
