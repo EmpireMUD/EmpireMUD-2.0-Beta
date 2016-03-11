@@ -784,6 +784,7 @@ Mode       Level    Description
 ------     ------   -------------
 stats      God      Shows game stats including prototypes.
 arrowtypes Immort   Shows the 'arrow type' setting for all bows and arrows.
+components Immort   Shows all items matching a component type (and flags).
 ignoring   Immort   Shows you who a player has on their ignore list.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
 notes      Immort   Show notes on a player.

@@ -45,6 +45,8 @@ extern const char *apply_types[];
 extern const char *bld_on_flags[];
 extern const char *bonus_bits[];
 extern const char *climate_types[];
+extern const char *component_flags[];
+extern const char *component_types[];
 extern const char *dirs[];
 extern const char *drinks[];
 extern const char *extra_bits[];
@@ -1615,6 +1617,63 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 #define SHOW(name)	void (name)(char_data *ch, char *argument)
 
 
+SHOW(show_components) {
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	obj_data *obj, *next_obj;
+	bitvector_t flags;
+	size_t size;
+	int type;
+	
+	argument = any_one_word(argument, arg);	// component type
+	skip_spaces(&argument);	// optional flags
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show components <type> [flags]\r\n");
+		msg_to_char(ch, "See: HELP COMPONENT TYPES, HELP COMPONENT FLAGS\r\n");
+	}
+	else if ((type = search_block(arg, component_types, FALSE)) == NOTHING) {
+		msg_to_char(ch, "Unknown component type '%s' (see HELP COMPONENT TYPES).\r\n", arg);
+	}
+	else {
+		flags = *argument ? olc_process_flag(ch, argument, "component", "flags", component_flags, NOBITS) : NOBITS;
+		
+		// preamble
+		if (flags) {
+			prettier_sprintbit(flags, component_flags, part);
+			strcat(part, " ");
+		}
+		else {
+			*part = '\0';
+		}
+		size = snprintf(buf, sizeof(buf), "Components for %s%s:\r\n", part, component_types[type]);
+		
+		HASH_ITER(hh, object_table, obj, next_obj) {
+			if (size >= sizeof(buf)) {
+				break;
+			}
+			if (GET_OBJ_CMP_TYPE(obj) != type) {
+				continue;
+			}
+			if (flags && (flags & GET_OBJ_CMP_FLAGS(obj)) != flags) {
+				continue;
+			}
+			
+			if (GET_OBJ_CMP_FLAGS(obj)) {
+				prettier_sprintbit(GET_OBJ_CMP_FLAGS(obj), component_flags, part);
+			}
+			else {
+				*part = '\0';
+			}
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s%s%s%s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), *part ? " (" : "", part, *part ? ")" : "");
+		}
+		
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+}
+
+
 // for show_islands	
 struct show_island_data {
 	int island;
@@ -3065,8 +3124,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern const struct material_data materials[NUM_MATERIALS];
 	extern const char *wear_bits[];
 	extern const char *item_types[];
-	extern const char *component_flags[];
-	extern const char *component_types[];
 	extern const char *container_bits[];
 	extern const char *obj_custom_types[];
 	extern const char *storage_bits[];
@@ -5929,6 +5986,7 @@ ACMD(do_show) {
 		{ "workforce", LVL_START_IMM, show_workforce },
 		{ "islands", LVL_START_IMM, show_islands },
 		{ "variables", LVL_START_IMM, show_variables },
+		{ "components", LVL_START_IMM, show_components },
 
 		// last
 		{ "\n", 0, NULL }

@@ -2925,10 +2925,41 @@ Usage:  .component <type>
 
 This sets the object to be a generic component. These are things used in
 craft recipes (and other resource lists) that can accept any item of a
-generic type.
+generic type. An item should only be a component if it could be used as a
+generic part of a crafting recipe.
 
 Once you choose a component type, you can also set the .compflags property
 to add modifiers to your component type.
+
+Available components (common flags listed in parentheses):
+ &cadhesive&0 - not currently used
+ &cbone&0 - not currently used
+ &cblock&0 - builing materials like bricks or blocks
+ &cclay&0 - moldable clay
+ &cdye&0 - any kind of dye
+ &cfeathers&0 - not currently used
+ &cfibers&0 - cotton, straw, etc.
+ &cflour&0 - ground up grains
+ &cfruit&0 - for cooking
+ &cfur&0 - animal furs for crafting
+ &cgem&0 - precious stones
+ &cgrain&0 - wheat, etc.
+ &chandle&0 - used for tools and weapons
+ &cherb&0 - used in potions and cooking
+ &cleather&0 - for armor and crafts
+ &clumber&0 - a core building material
+ &cmeat&0 - raw ingredients for cooking, don't set on cooked meat
+ &cmetal&0 - various useful or precious metals
+ &cnails&0 - a core building material
+ &coil&0 - for cooking or maintaining machinery
+ &cpillar&0 - for construction, like a log
+ &crock&0 - common stones dug up from the ground
+ &cseeds&0 - for planting or cooking
+ &cskin&0 - unprocessed animal skin or rawhide
+ &cstick&0 - a common building and crafting material
+ &ctextile&0 - cloth or fabric for crafting
+ &cvegetable&0 - for cooking
+ &crope&0 - for construction and harnessing animals
 
 See also: COMPONENT FLAGS
 #d
