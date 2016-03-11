@@ -126,10 +126,13 @@ See also: COMPONENT
 #
 FLOUR
 
-Flour (component)
+Flour (resource, component)
 
-Flour is a component type used in cooking. It consists of flour itself along
-with similar ingredients such as cornmeal.
+Used for:  cooking
+Stored in:  Mill, Kitchen
+
+Flour is a component type used in cooking. It consists of flour itself (made
+from wheat) along with similar ingredients such as cornmeal.
 
 See also: COMPONENT, MILL, CROPS
 #
@@ -158,7 +161,8 @@ GEMS
 
 Gem (component)
 
-Used for:  crafting
+Used for:  crafting, enchanting
+Stored in:  Tower of Sorcery
 
 Gems are a component type encompassing the four magical gems: red bloodstones,
 yellow lightning stones, iridescent blue irises, and glowing green seashells.
@@ -174,7 +178,7 @@ Stored in:  Tower of Sorcery
 
 This rare seashell can be found while fishing.
 
-See also: FISH
+See also: FISH, GEM
 #
 GRAIN
 
@@ -208,14 +212,6 @@ The herb component type covers all the herbs which can be found using the Find
 Herbs ability. Most recipes call for a specific herb, though.
 
 See also: COMPONENT, FIND HERBS, MIX, BREW
-#
-INGOTS
-
-Ingots (resources)
-
-Various types of ingots can be made by smelting metals in a forge or foundry.
-
-See also: SMELT, IRON, METAL
 #
 "IRIDESCENT BLUE IRIS" "IRIDESCENT IRIS" "BLUE IRIS" IRIS
 
@@ -288,11 +284,16 @@ usually fine.
 
 See also: COMPONENT, CHOP, SAW
 #
-METAL
+METALS INGOTS BARS
 
 Metal (component)
+Ingots (resources)
+Bars (resource)
 
 Used for: forging, crafting, building, sewing
+Stored in: Foundry (ore/ingots), Vault (dust/discs/bars)
+
+Various types of ingots can be made by smelting metals in a forge or foundry.
 
 Metal is a category of component that covers all refined metal ores. It is used
 for a huge variety of crafts, most of which call for either a specific metal or
@@ -300,11 +301,11 @@ one of the following metal categories:
 
 common:         copper or iron ingots
 rare:           imperium or nocturnium ingots
-refined, fine:  silver or gold dust
+refined, fine:  silver nuggets or gold dust
 refined, small: silver or gold discs
 refined, large: copper, silver or gold bars
 
-See also: COMPONENT, INGOTS, SMELT
+See also: COMPONENT, SMELT, IRON, COPPER, MINE
 #
 MEAT
 
