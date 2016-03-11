@@ -350,7 +350,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 			
 			found = FALSE;
 			for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
-				if (emp_pol->type == iter && (other = real_empire(emp_pol->id)) && !EMPIRE_IS_TIMED_OUT(other)) {
+				if (emp_pol->type == diplomacy_display[iter].type && (other = real_empire(emp_pol->id)) && !EMPIRE_IS_TIMED_OUT(other)) {
 					if (!found) {
 						msg_to_char(ch, "%s ", diplomacy_display[iter].text);
 					}
