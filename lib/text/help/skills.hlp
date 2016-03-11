@@ -311,7 +311,7 @@ Jungle: light jungle
 Light jungle is jungle which has been partially chopped, but not reduced to
 plains.
 
-See also: HARVEST, WHEAT, CORN, APPLES
+See also: CROPS, HARVEST, PICK
 #
 SACRIFICE 
 
@@ -467,7 +467,7 @@ Ingots are used for crafting.
 Gold and silver bars are worth more in the vault than their raw form. The bars
 can be smelted again to return them to the smaller raw version.
 
-See also: INGOTS, WEALTH
+See also: METAL, WEALTH
 #
 SPECIALIZE SPECIALTY
 

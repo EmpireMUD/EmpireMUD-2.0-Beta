@@ -592,10 +592,16 @@ Purify is used by Natural Magic casters to wipe away serious curses such as
 Vampirism. However, it doesn't work on daywalking vampires. You can cast this
 spell on those not affected by such curses, but it will have no effect.
 
+This spell cures vampirism and removes all vampiric abilities, but doesn't
+remove levels of the Vampire skill - use 'skill drop' for that. ('skill drop'
+cannot cure vampirism on its own.)
+
 Because this power could be used to harass other players, they must enable
 the "bother" toggle before you can use it on them. 
 
 If your target is in combat, you will join the combat upon using this ability.
+
+Gains experience when successfully cast, even if it doesn't cure anything.
 
 See also: DAYWALKING, TOGGLE
 #

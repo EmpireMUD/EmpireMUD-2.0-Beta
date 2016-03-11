@@ -99,7 +99,7 @@ Craft items:
 
 See also: CRAFT
 #
-"BASIC CRAFTS" DYE CRAFT CRAFTS
+"BASIC CRAFTS" CRAFT CRAFTS
 
 Basic Crafts (Trade ability)
 
@@ -110,17 +110,22 @@ All crafting abilities train when you complete recipes that require them.
 Unskilled crafts can train Trade up to 15.
 
 Unskilled crafts:
-  handle                        stone axe
-  flint set                     stone hammer
+  handle
+  stone axe
+  flint set
+  stone hammer
   spear
 
 With Archery, you can craft:
   arrows
 
 Basic Crafts:
-  bricks                        jar  (glassblower)
-  candle  (apiaries)            flask
-  rope                          shiv
+  bricks
+  jar  (glassblower)
+  candle  (apiaries)
+  flask
+  rope
+  shiv
   canoe
 
   saddle
@@ -311,18 +316,6 @@ Weave items:
 
 See also: WEAVE
 #
-HANDLE
-
-Used for: forge, craft
-Stored in:  Utility Shed, Storage room
-
-Create a handle using the craft command.
-
-Handles are used in forging and crafting to provide a grasping surface to a
-tool or weapon.
-
-See also: CRAFT, FORGE
-#
 HONE HONED
 
 Hone (Trade ability)
@@ -356,7 +349,7 @@ forging equipment, as well as manufacturing ships.
 
 You can learn about getting iron via HELP IRON GUIDE.
 
-See also: BUILD, FORGE, MINE, MANUFACTURE, SMELT
+See also: BUILD, FORGE, METALS, MINE, MANUFACTURE, SMELT
 #
 "IMPERIAL ARMORS" "IMPERIAL ARMORSMITHING"
 
@@ -415,8 +408,10 @@ Command:  forge [number] <item>
 Tool:  hammer
 
 The Jewelry ability is a forge specialization that can make:
-  silver ring                  silver mirror
-  silver earrings              gold mirror
+  silver ring
+  silver mirror
+  silver earrings
+  gold mirror
   silver bracelets
   gold ring
   gold earrings
@@ -540,14 +535,12 @@ can come out superior.
 See also: RAWHIDE STITCHING, LEATHERWORKING, DANGEROUS LEATHERS,
   MAGIC ATTIRE, MAGICAL VESTMENTS, SUPERIOR
 #
-POTTER POTTERY CLAY
+POTTER POTTERY
 
 Pottery (Trade ability)
 
 Building:  (PP) potter
 Command:  craft [number] <item>
-
-Clay is found by digging near water and can be stored at the Potter.
 
 A good potter can mold clay into many different useful items. You will need
 a fire, but the pottery goes much faster if you are in a Potter building.
@@ -559,7 +552,7 @@ With Pottery you can craft:
   clay shield  (shields)
   trinket of conveyance
 
-See also: DIG, FINE POTTERY, MASTER CRAFTSMAN
+See also: CLAY, DIG, FINE POTTERY, MASTER CRAFTSMAN
 #
 "RAWHIDE STITCHING"
 
@@ -742,17 +735,15 @@ Forge:
 
 See also: CRAFT, FORGE
 #
-SKIN SKINS
+"SKIN COMMAND"
 
 Usage:  skin <corpse>
-Used for:  sewing
-Stored in:  Tannery
 
 You can skin a fresh corpse to get usable material, which can later be turned
 into good equipment. Some corpses cannot be skinned, especially severely
 damaged and putrid ones.
 
-Types of skins and example animals:
+Possible results from skinning and example animals:
   small skin: rabbit, squirrel
   large skin: deer, buffalo
   shark skin: shark
@@ -760,9 +751,7 @@ Types of skins and example animals:
   fox fur: fox
   big cat pelt: tiger, jaguar
 
-You can tan some skins into leather at the Tannery.
-
-See also: SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN
+See also: SKINS, SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN
 #
 "SMUGGLER CRAFTS"
 
@@ -801,7 +790,7 @@ Armorsmithing -> Sturdy Armors -> Imperial Armors
 
 See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, IMPERIAL ARMORS
 #
-TAN TANNING LEATHER
+TAN TANNING
 
 Usage:  tan <skin>
 Stored in:  Tannery
@@ -809,7 +798,7 @@ Stored in:  Tannery
 You can tan skins into leather. This process will go faster at a tannery. Both
 skins and leathers are used in sewing and crafting.
 
-See also: SKIN
+See also: SKIN, LEATHER
 #
 "TINKER CRAFTS"
 
@@ -862,13 +851,20 @@ WOODWORKING "WOOD WORKING"
 Woodworking (Trade ability)
 
 With Woodworking you can craft:
-  flute                         shortbow
-  lyre                          longbow*
-  stake                         cart*
-  walking stick                 lantern*  (glassblowing)
-  wooden sword                  blank sign*
-  stool*                        bench*
-  chair*                        table*
+  flute
+  shortbow
+  lyre
+  longbow*
+  stake
+  cart*
+  walking stick
+  lantern*  (glassblowing)
+  wooden sword
+  blank sign*
+  stool*
+  bench*
+  chair*
+  table*
   throne*
 
 * Crafts marked with an asterisk require the Carpenter building.
