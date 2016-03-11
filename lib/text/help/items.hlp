@@ -2,7 +2,7 @@ ADHESIVE
 
 Adhesive (component)
 
-Used for:  nothing ()
+Used for:  nothing (yet)
 
 Adhesive is a component type used to stick things together without the use of
 nails. There are currently no objects which fill this type.
@@ -137,7 +137,7 @@ FRUIT
 
 Fruit (component)
 
-Used for: cooking
+Used for:  cooking
 
 Fruit is a component type used in cooking. This type is separated from the
 'vegetable' type based on culinary use rather than technical definition.
@@ -148,13 +148,17 @@ FUR
 
 Fur (component)
 
-Fur is a component type primarily used for clothing.
+Used for:  sewing
+
+Fur is a component type primarily used for clothing and mage armor.
 
 See also: COMPONENT
 #
 GEMS
 
 Gem (component)
+
+Used for:  crafting
 
 Gems are a component type encompassing the four magical gems: red bloodstones,
 yellow lightning stones, iridescent blue irises, and glowing green seashells.
@@ -203,7 +207,7 @@ Used for:  potions, poisons, crafting
 The herb component type covers all the herbs which can be found using the Find
 Herbs ability. Most recipes call for a specific herb, though.
 
-See also: BREW, COMPONENT, FIND HERBS, MIX
+See also: COMPONENT, FIND HERBS, MIX, BREW
 #
 INGOTS
 
@@ -211,7 +215,7 @@ Ingots (resources)
 
 Various types of ingots can be made by smelting metals in a forge or foundry.
 
-See also: SMELT, IRON
+See also: SMELT, IRON, METAL
 #
 "IRIDESCENT BLUE IRIS" "IRIDESCENT IRIS" "BLUE IRIS" IRIS
 
@@ -223,7 +227,7 @@ The iridescent blue iris is a rare herb found anywhere you could find herbs,
 and even if you don't have the Find Herbs ability. It is used in some spells
 and crafts.
 
-See also: PICK, FIND HERBS
+See also: GEM, PICK, FIND HERBS
 #
 KEEP UNKEEP
 
@@ -294,13 +298,13 @@ Metal is a category of component that covers all refined metal ores. It is used
 for a huge variety of crafts, most of which call for either a specific metal or
 one of the following metal categories:
 
-common: ingots of copper or iron
-rare: ingots of imperium or nocturnium
-refined, fine: silver or gold dust
-refined, small: discs of silver or gold
-refined, large: bars of copper, silver or gold
+common:         copper or iron ingots
+rare:           imperium or nocturnium ingots
+refined, fine:  silver or gold dust
+refined, small: silver or gold discs
+refined, large: copper, silver or gold bars
 
-See also: COMPONENT, INGOT, IRON ORE, COPPER
+See also: COMPONENT, INGOTS, SMELT
 #
 MEAT
 
@@ -478,6 +482,9 @@ The (superior) flag indicates that an item is a masterwork, crafted by a truly
 legendary artisan. Crafts that require tools, such as forge, will go faster
 if the tool you use is superior. Scaled items such as armor and weapons will
 be better in their superior form than without it, even at the same level.
+
+As long as you have the right mastery ability for the ability your recipe comes
+from, everything you make will be masterwork.
 
 Masterwork abilities:
   Sewing/Leatherworking - Master Tailor
