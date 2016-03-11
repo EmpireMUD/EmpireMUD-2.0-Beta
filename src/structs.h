@@ -762,6 +762,7 @@ typedef struct vehicle_data vehicle_data;
 // combo of all of them
 #define ALL_DIPLS  (DIPL_PEACE | DIPL_WAR | DIPL_ALLIED | DIPL_NONAGGR | DIPL_TRADE | DIPL_DISTRUST | DIPL_TRUCE)
 #define ALL_DIPLS_EXCEPT(flag)  (ALL_DIPLS & ~(flag))
+#define CORE_DIPLS  ALL_DIPLS_EXCEPT(DIPL_TRADE)
 
 
 // empire_log_data types
