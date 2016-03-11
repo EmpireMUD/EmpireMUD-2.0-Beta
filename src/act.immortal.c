@@ -6011,7 +6011,7 @@ ACMD(do_show) {
 		return;
 	}
 
-	strcpy(arg, two_arguments(argument, field, value));
+	half_chop(argument, field, value);
 
 	pos = NOTHING;
 	for (iter = 0; *(fields[iter].cmd) != '\n'; ++iter) {
