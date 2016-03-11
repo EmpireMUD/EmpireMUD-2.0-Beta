@@ -1,3 +1,24 @@
+ADHESIVE
+
+Adhesive (component)
+
+Used for:  nothing ()
+
+Adhesive is a component type used to stick things together without the use of
+nails. There are currently no objects which fill this type.
+
+See also: COMPONENT
+#
+BONE
+
+Bone (component)
+
+Used for:  nothing (yet)
+
+Bone is a component type.
+
+See also: COMPONENT
+#
 BLOODSTONE
 
 Bloodstone (resource)
@@ -8,17 +29,6 @@ Bloodstone is a rare stone with mystical properties, sometimes found while
 digging in the mountains.
 
 See also: DIG
-#
-BRICKS "CLAY BRICKS"
-
-Clay bricks (resource)
-
-Required ability:  Basic Crafts
-
-You can craft clay bricks from raw clay, so long as you have a fire. They will
-harden faster if you're at a Potter.
-
-See also: CLAY, CRAFT, POTTER
 #
 CANOE
 
@@ -32,13 +42,23 @@ and then sit in it. After that, use "sail" to move it.
 
 See also: SAIL, SWIMMING, SHIPBUILDING
 #
+CLAY
+
+Clay (component)
+Pile of clay (resource)
+
+Clay is a component used in pottery and brickmaking. Clay is found by digging
+near water and can be stored at the Potter.
+
+See also: COMPONENT, POTTER
+#
 CLOTH "COTTON CLOTH"
 
 Bolt of cloth (resource)
 
 You can weave cotton into cloth. It will go faster if you're at at Tailor.
 
-See also: WEAVE, COTTON, TAILOR
+See also: WEAVE, COTTON, TAILOR, TEXTILE
 #
 "CRAFTER ITEMS" "CRAFTING ITEMS" "CRAFT ITEMS" "CRAFTING LEVEL" "CRAFTER LEVEL" "CRAFT LEVEL"
 
@@ -72,17 +92,75 @@ eligible for these flags, and are indicated by a GENERIC-DROP flag.
 
 See also: CONSIDER, IDENTIFY
 #
-"IRIDESCENT BLUE IRIS" "IRIDESCENT IRIS" "BLUE IRIS" IRIS
+DYES
 
-Iridescent Blue Iris (resource)
+Dye (component)
 
-Stored in:  Tower of Sorcery
+Used for:  sewing, vehicles
 
-The iridescent blue iris is a rare herb found anywhere you could find herbs,
-and even if you don't have the Find Herbs ability. It is used in some spells
-and crafts.
+Dyes are a component type used primarily for clothing. Some recipes require a
+specific color of dye while others will accept any dye. The Glassblowing
+technology is required to make the vials used to store dyes.
 
-See also: PICK, FIND HERBS
+See also: BASIC CRAFTS, COMPONENT
+#
+FEATHERS
+
+Feather (component)
+
+Used for:  nothing (yet)
+
+Feathers are a component type.
+
+See also: COMPONENT
+#
+FIBERS
+
+Fibers (component)
+
+Used for:  nothing (yet)
+
+Fibers are a component type.
+
+See also: COMPONENT
+#
+FLOUR
+
+Flour (component)
+
+Flour is a component type used in cooking. It consists of flour itself along
+with similar ingredients such as cornmeal.
+
+See also: COMPONENT, MILL, CROPS
+#
+FRUIT
+
+Fruit (component)
+
+Used for: cooking
+
+Fruit is a component type used in cooking. This type is separated from the
+'vegetable' type based on culinary use rather than technical definition.
+
+See also: COMPONENT, COOK, CROPS
+#
+FUR
+
+Fur (component)
+
+Fur is a component type primarily used for clothing.
+
+See also: COMPONENT
+#
+GEMS
+
+Gem (component)
+
+Gems are a component type encompassing the four magical gems: red bloodstones,
+yellow lightning stones, iridescent blue irises, and glowing green seashells.
+Most recipes require a specific one of these, but a few accept any of them.
+
+See also: COMPONENT
 #
 "GLOWING GREEN SEASHELL" "GLOWING SEASHELL" "GREEN SEASHELL" SEASHELL
 
@@ -94,6 +172,39 @@ This rare seashell can be found while fishing.
 
 See also: FISH
 #
+GRAIN
+
+Grain (component)
+
+Grains are a component type. They currently have no usage in common.
+
+See also: COMPONENT
+#
+HANDLE
+
+Handle (component)
+
+Used for: forge, craft
+Stored in:  Utility Shed, Storage room
+
+Create a handle using the craft command.
+
+Handles are used in forging and crafting to provide a grasping surface to a
+tool or weapon. The most basic handles are made from sticks.
+
+See also: COMPONENT, CRAFT, FORGE
+#
+HERBS
+
+Herb (component)
+
+Used for:  potions, poisons, crafting
+
+The herb component type covers all the herbs which can be found using the Find
+Herbs ability. Most recipes call for a specific herb, though.
+
+See also: BREW, COMPONENT, FIND HERBS, MIX
+#
 INGOTS
 
 Ingots (resources)
@@ -101,6 +212,18 @@ Ingots (resources)
 Various types of ingots can be made by smelting metals in a forge or foundry.
 
 See also: SMELT, IRON
+#
+"IRIDESCENT BLUE IRIS" "IRIDESCENT IRIS" "BLUE IRIS" IRIS
+
+Iridescent Blue Iris (resource)
+
+Stored in:  Tower of Sorcery
+
+The iridescent blue iris is a rare herb found anywhere you could find herbs,
+and even if you don't have the Find Herbs ability. It is used in some spells
+and crafts.
+
+See also: PICK, FIND HERBS
 #
 KEEP UNKEEP
 
@@ -133,6 +256,14 @@ The (large) flag on items indicates that the item is over-sized and takes up
 
 All other items take up 1 inventory slot.
 #
+LEATHER
+
+Leather (component)
+
+Leather is a component type used in many sewing recipes.
+
+See also: COMPONENT, TAN, SKIN, SKIN
+#
 "LIGHTNING STONE" "YELLOW LIGHTNING STONE" "YELLOW STONE"
 
 Yellow Lightning Stone (resource)
@@ -143,21 +274,54 @@ This rare stone can be found in the desert where lightning has struck.
 #
 LUMBER
 
-Lumber (resource)
+Lumber (component)
 
-Lumber is created by sawing logs or trees at a lumber yard. It is used for
-many buildings.
+Used for:  building, crafting
 
-See also: CHOP, SAW
+Lumber is a component type created by sawing logs or trees at a lumber yard. It
+is used for many buildings. If a recipe calls for lumber, any type of lumber is
+usually fine.
+
+See also: COMPONENT, CHOP, SAW
+#
+METAL
+
+Metal (component)
+
+Used for: forging, crafting, building, sewing
+
+Metal is a category of component that covers all refined metal ores. It is used
+for a huge variety of crafts, most of which call for either a specific metal or
+one of the following metal categories:
+
+common: ingots of copper or iron
+rare: ingots of imperium or nocturnium
+refined, fine: silver or gold dust
+refined, small: discs of silver or gold
+refined, large: bars of copper, silver or gold
+
+See also: COMPONENT, INGOT, IRON ORE, COPPER
+#
+MEAT
+
+Meat (component)
+
+Used for:  cooking
+
+Meat is a component type mostly used in cooking. It is obtained by butchering
+animal corpses or fishing.
+
+See also: COMPONENT, BUTCHER, COOK, FISH
 #
 NAILS "POUCH OF NAILS"
 
-Nails (resource)
+Nails (resource/component)
 
-You can create nails at the forge, from iron ingots. Nails are used for many
-buildings.
+Used for: building
 
-See also: FORGE, MAINTAIN
+You can create these at the forge. Nails are used for many buildings.
+
+See also: COMPONENT, FORGE, MAINTAIN
 #
 "NEXUS CRYSTALS"
 
@@ -166,13 +330,25 @@ Nexus Crystal (resource)
 Nexus crystals are made from magical gems (such as the bloodstone). They are
 stored in Towers of Sorcery, and are used to build certain buildings.
 
-Craft (with Portal Magic and a fire):
- nexus crystal (x2)  1 bloodstone
- nexus crystal (x2)  1 lightning stone
- nexus crystal (x2)  1 blue iris
- nexus crystal (x2)  1 glowing seashell
-
 See also: EXARCH CRAFTS, PORTAL
+#
+OIL
+
+Oil (component)
+
+Used for: cooking
+
+See also: COMPONENT, COOK, MILL
+#
+PILLAR
+
+Pillar (component)
+
+Used for: building
+
+The most commonly used pillars are simple wooden logs.
+
+See also: COMPONENT, LOGS
 #
 RETRIEVE
 
@@ -192,6 +368,41 @@ on credit from their public (or allied) buildings, IF you have a trade pact.
 
 See also: STORE, INVENTORY, DIPLOMACY, WAREHOUSE
 #
+ROCKS
+
+Rock (component)
+
+Used for:  basic crafting and building
+Stored at:  Gravel Pit
+
+You can find rocks by digging in the ground. They can be used to create
+weapons and as part of some larger buildings. There are multiple types of rock,
+but in most cases where you need a rock, any rock will do.
+
+See also: BUILD, COMPONENT, DIG, CHIP, FLINT
+#
+SEEDS
+
+Seeds (component)
+
+Used for:  nothing
+#
+SKIN SKINS "SKIN COMPONENT"
+
+(Disambiguation: did you mean HELP SKIN COMMAND ?)
+
+Skin (component)
+
+Used for:  sewing
+Stored in:  Tannery
+
+While not as good as tanned leather, skins can be used to sew basic rawhide
+equipment. Not everything you can get from the skin command counts as a skin.
+
+You can tan some skins into leather at the Tannery.
+
+See also: SKIN COMMAND, SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN
+#
 SPLIT
 
 Usage:  split <amount> <type> coins
@@ -206,14 +417,35 @@ Example:
 
 See also: COINS
 #
-"STONE BLOCKS" BLOCKS
+STICKS
 
+Stick (component)
+
+Stored at: Lumber Yard
+
+Sticks are gathered in the forest, or scraped off some types of tree. They can
+be used for weapons, torches, and some buildings. Most recipes that need sticks
+will accept any kind of stick.
+
+See also: COMPONENT, GATHER, BUILD, CRAFT, SCRAPE
+#
+"STONE BLOCKS" BLOCKS BRICKS "CLAY BRICKS"
+
+Block (component)
 Huge Stone Block (resource)
+Clay bricks (resource)
+
+The Block component is the building block of most buildings, and consists of
+stone blocks and clay bricks. Some buildings require a specific one, while
+any that merely call for (block) allow the use of either.
 
 You can quarry stone blocks from the ground at a quarry. They are used in
 monumental architecture.
 
-See also: QUARRY
+You need the Basic Crafts ability to make bricks. You can craft them from raw
+clay, so long as you have a fire. They will harden faster if you're at a Potter.
+
+See also: CLAY, COMPONENT, CRAFT, POTTER, QUARRY
 #
 STORE STORAGE
 
@@ -255,6 +487,17 @@ Masterwork abilities:
   Healing Elixirs and Wrath of Nature Potions are masterworks if you have both
 
 See also: SCALABLE CRAFTS
+#
+TEXTILE
+
+Textile (component)
+
+Used for:  sewing, crafting, building, vehicles
+
+Different types of cloth are usually interchangeable, but some recipes may need
+a specific type.
+
+See also: COMPONENT, CLOTH, WEAVE
 #
 "TRADE COMMAND"
 
@@ -390,6 +633,17 @@ the "warehouse" command. Also note that treasure (like gold bars) must be
 stored in the vault using the regular "store" command, not "warehouse".
 
 See also: CASTLE, DESIGNATE, PRIVILEGE, RETRIEVE, STORE, WAREHOUSE
+#
+VEGETABLE
+
+Vegetable (component)
+
+Used for: cooking
+
+This type is separated from 'fruit' based more on culinary usage than technical
+definition.
+
+See also: COMPONENT, COOK, FRUIT
 #
 WAREHOUSE
 
