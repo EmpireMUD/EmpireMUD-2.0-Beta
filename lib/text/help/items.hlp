@@ -376,7 +376,7 @@ ROCKS
 
 Rock (component)
 
-Used for:  basic crafting and building
+Used for:  basic crafting, basic building
 Stored at:  Gravel Pit
 
 You can find rocks by digging in the ground. They can be used to create
@@ -426,6 +426,7 @@ STICKS
 Stick (component)
 
 Stored at: Lumber Yard
+Used for:  crafting, basic buildings
 
 Sticks are gathered in the forest, or scraped off some types of tree. They can
 be used for weapons, torches, and some buildings. Most recipes that need sticks
