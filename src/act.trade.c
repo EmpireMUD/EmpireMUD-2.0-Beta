@@ -477,9 +477,6 @@ void show_craft_info(char_data *ch, craft_data *craft) {
 		}
 	}
 	
-	prettier_sprintbit(GET_CRAFT_FLAGS(craft), craft_flag_for_info, part);
-	msg_to_char(ch, "Notes: %s\r\n", part);
-	
 	if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING) {
 		msg_to_char(ch, "Requires: %s\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft)));
 	}
@@ -491,6 +488,9 @@ void show_craft_info(char_data *ch, craft_data *craft) {
 		}
 		msg_to_char(ch, "Requires: %s\r\n", buf);
 	}
+	
+	prettier_sprintbit(GET_CRAFT_FLAGS(craft), craft_flag_for_info, part);
+	msg_to_char(ch, "Notes: %s\r\n", part);
 	
 	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
 		prettier_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, buf);
