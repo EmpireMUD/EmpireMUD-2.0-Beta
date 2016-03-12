@@ -439,7 +439,7 @@ void show_craft_info(char_data *ch, craft_data *craft) {
 	extern const char *drinks[];
 	extern const char *item_types[];
 	
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], range[MAX_STRING_LENGTH];
 	struct obj_apply *apply;
 	ability_data *abil;
 	obj_data *proto;
@@ -469,11 +469,18 @@ void show_craft_info(char_data *ch, craft_data *craft) {
 		}
 		strcat(buf, ")");
 		
-		if (GET_CRAFT_QUANTITY(craft) == 1) {
-			msg_to_char(ch, "Creates: %s%s\r\n", get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), buf);
+		if (GET_OBJ_MIN_SCALE_LEVEL(proto) > 0 || GET_OBJ_MAX_SCALE_LEVEL(proto) > 0) {
+			sprintf(range, " %s", level_range_string(GET_OBJ_MIN_SCALE_LEVEL(proto), GET_OBJ_MAX_SCALE_LEVEL(proto), 0));
 		}
 		else {
-			msg_to_char(ch, "Creates: %dx %s%s\r\n", GET_CRAFT_QUANTITY(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), buf);
+			*range = '\0';
+		}
+		
+		if (GET_CRAFT_QUANTITY(craft) == 1) {
+			msg_to_char(ch, "Creates: %s%s%s\r\n", get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), range, buf);
+		}
+		else {
+			msg_to_char(ch, "Creates: %dx %s%s%s\r\n", GET_CRAFT_QUANTITY(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), range, buf);
 		}
 	}
 	
@@ -487,6 +494,10 @@ void show_craft_info(char_data *ch, craft_data *craft) {
 			sprintf(buf + strlen(buf), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		}
 		msg_to_char(ch, "Requires: %s\r\n", buf);
+	}
+	
+	if (GET_CRAFT_MIN_LEVEL(craft) > 0) {
+		msg_to_char(ch, "Requires: crafting level %d\r\n", GET_CRAFT_MIN_LEVEL(craft));
 	}
 	
 	prettier_sprintbit(GET_CRAFT_FLAGS(craft), craft_flag_for_info, part);
