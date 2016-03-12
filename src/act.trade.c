@@ -435,6 +435,7 @@ void show_craft_info(char_data *ch, craft_data *craft) {
 	extern const char *affected_bits[];
 	extern const char *apply_types[];
 	extern const char *bld_on_flags[];
+	extern const char *craft_flag_for_info[];
 	extern const char *drinks[];
 	extern const char *item_types[];
 	
@@ -475,6 +476,9 @@ void show_craft_info(char_data *ch, craft_data *craft) {
 			msg_to_char(ch, "Creates: %dx %s%s\r\n", GET_CRAFT_QUANTITY(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), buf);
 		}
 	}
+	
+	prettier_sprintbit(GET_CRAFT_FLAGS(craft), craft_flag_for_info, part);
+	msg_to_char(ch, "Notes: %s\r\n", part);
 	
 	if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING) {
 		msg_to_char(ch, "Requires: %s\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft)));
