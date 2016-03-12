@@ -299,11 +299,12 @@ Metal is a category of component that covers all refined metal ores. It is used
 for a huge variety of crafts, most of which call for either a specific metal or
 one of the following metal categories:
 
-common:         copper or iron ingots
-rare:           imperium or nocturnium ingots
-refined, fine:  silver nuggets or gold dust
-refined, small: silver or gold discs
-refined, large: copper, silver or gold bars
+common:                copper and iron ingots
+rare:                  imperium and nocturnium ingots
+rare, fine:            silver nuggets and gold dust
+refined, fine, small:  silver and gold discs
+refined, large:        copper, silver and gold bars
+refined, fine, large:  silver and gold bars
 
 See also: COMPONENT, SMELT, IRON, COPPER, MINE
 #
