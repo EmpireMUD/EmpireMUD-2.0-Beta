@@ -348,11 +348,11 @@ a silver disc~
 A silver disc has been left on the ground.~
 Store the silver disc in your vault to gain wealth, or melt it again.
 ~
-15 l a 2
+15 l a 3
 5 0 0
 3 0
 O
-18 mo
+18 dmo
 R
 5184 a
 R
@@ -364,11 +364,11 @@ a gold disc~
 A gold disc is lying on the ground.~
 Store the gold disc in your vault to gain wealth, or melt it again.
 ~
-15 l a 3
+15 l a 4
 8 0 0
 4 0
 O
-18 mo
+18 dmo
 R
 5184 a
 R
@@ -380,11 +380,11 @@ a silver bar~
 A bar of silver has been left on the ground.~
 Store the silver bar in your vault to gain wealth.
 ~
-15 l a 2
+15 l a 3
 10 1 0
 3 0
 O
-18 fm
+18 dfm
 R
 5184 a
 R
@@ -396,11 +396,11 @@ a gold bar~
 A bar of gold is lying on the ground.~
 Store the gold bar in your vault to gain wealth.
 ~
-15 l a 2
+15 l a 3
 16 1 0
 4 0
 O
-18 fm
+18 dfm
 R
 5184 a
 R

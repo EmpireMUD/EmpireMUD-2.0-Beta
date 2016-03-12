@@ -23,7 +23,9 @@ house~
 B
 5102 b bdeklmno
 R
-21 10 1 0
+21 4 1 0
+R
+16 8 1 0
 S
 #5103
 mudhut~
@@ -102,9 +104,11 @@ mill~
 B
 5109 be bdeklmno
 R
-21 10 1 0
+21 4 1 0
 R
 3 2 1 8224
+R
+16 8 1 0
 S
 #5110
 potter~
@@ -113,9 +117,11 @@ potter~
 B
 5110 be bdeklmno
 R
-21 10 1 0
+21 4 1 0
 R
 3 1 1 8224
+R
+16 8 1 0
 S
 #5111
 stable~
@@ -124,9 +130,11 @@ stable~
 B
 5111 be bdeklmno
 R
-21 20 1 0
+21 8 1 0
 R
 19 8 1 0
+R
+16 16 1 0
 S
 #5112
 fence~

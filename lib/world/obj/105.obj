@@ -77,13 +77,12 @@ tooth dragon's dragons~
 a dragon's tooth~
 A dragon's tooth is lying here.~
    You can plant these magi-netically engineered dragons' teeth in a field to
-grow more, or use several of them to summon a skeletal guard for your empire.
+grow more, or use several of them to craft a magic sceptre that will allow you
+to summon skeletal guards for your empire.  
 
 Craft (Jewelry): dragonstooth sceptre
- 10x dragon's tooth
-  4x gold dust
 ~
-3 b a 7
+3 b a 8
 0 10502 0
 14 0
 R
@@ -132,9 +131,8 @@ A bundle of spadebrush is lying here.~
 of the Magiterranean to make handy spades for digging.
 
 Craft (requires Basic Crafts): spadebrush shovel
- 6x bundle of spadebrush
 ~
-3 k a 3
+3 k a 4
 0 0 0
 0 336
 R
@@ -178,9 +176,8 @@ modified! It could be milled into long-lasting ironflour, or crafted into
 bladegrass arrows!
 
 Craft (Archery): bladegrass arrows
-  1x bushel of bladegrass
 ~
-3 0 a 5
+3 0 a 6
 0 0 0
 2 0
 R
@@ -400,14 +397,9 @@ and need only be sharpened to make a suitable chopper. You can also plant it to
 start a new crop.
 
 Craft (Basic Crafts): axeroot chopper
- 1x axeroot
- 1x wooden handle
-
 Craft (Master Craftsman, level 150): spade-axe
- 1x axeroot
- 3x bundle of spadebrush
 ~
-3 be a 6
+3 be a 7
 0 10508 0
 2 168
 R
@@ -508,13 +500,9 @@ A pickthorn stalk seems planted here.~
 grow useful tools on unused farmland.
 
 Craft (Basic Crafts): thorn pick
-  3x pickthorn stalk
-
 Craft (Master Craftsman, level 150): pick-and-pan
- 2x pickthorn stalk
- 2x bushel of bladegrass
 ~
-3 0 a 6
+3 0 a 7
 0 0 0
 0 0
 R
