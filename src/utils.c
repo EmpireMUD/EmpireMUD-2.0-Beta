@@ -3346,6 +3346,9 @@ char *level_range_string(int min, int max, int current) {
 	if (current > 0) {
 		snprintf(output, sizeof(output), "%d", current);
 	}
+	else if (min == max) {	// could also be "0" here
+		snprintf(output, sizeof(output), "%d", min);
+	}
 	else if (min > 0 && max > 0) {
 		snprintf(output, sizeof(output), "%d-%d", min, max);
 	}
