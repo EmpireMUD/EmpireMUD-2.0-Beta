@@ -145,6 +145,10 @@ Used for:  cooking
 Fruit is a component type used in cooking. This type is separated from the
 'vegetable' type based on culinary use rather than technical definition.
 
+Fruit components are categorized as either 'bunch' (a large number of fruits,
+usually from pick or combine) or 'single' (a single fruit, usually from forage
+or split).
+
 See also: COMPONENT, COOK, CROPS
 #
 FUR
@@ -652,6 +656,10 @@ Used for: cooking
 
 This type is separated from 'fruit' based more on culinary usage than technical
 definition.
+
+Vegetable components are categorized as either 'bunch' (a large number of
+vegetables, usually from pick or combine) or 'single' (a single vegetable,
+usually from forage or split).
 
 See also: COMPONENT, COOK, FRUIT
 #
