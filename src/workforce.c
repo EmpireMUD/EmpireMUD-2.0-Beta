@@ -56,7 +56,6 @@ void do_chore_quarrying(empire_data *emp, room_data *room);
 void do_chore_shearing(empire_data *emp, room_data *room);
 void do_chore_smelting(empire_data *emp, room_data *room);
 void do_chore_trapping(empire_data *emp, room_data *room);
-void do_chore_tanning(empire_data *emp, room_data *room);
 
 void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh);
 void vehicle_chore_repair(empire_data *emp, vehicle_data *veh);
@@ -231,7 +230,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 			do_chore_trapping(emp, room);
 		}
 		if (BUILDING_VNUM(room) == BUILDING_TANNERY && CHORE_ACTIVE(CHORE_TANNING)) {
-			do_chore_tanning(emp, room);
+			do_chore_einv_interaction(emp, room, CHORE_TANNING, INTERACT_TAN);
 		}
 		if (ROOM_BLD_FLAGGED(room, BLD_STABLE) && CHORE_ACTIVE(CHORE_SHEARING)) {
 			do_chore_shearing(emp, room);
@@ -1888,49 +1887,6 @@ void do_chore_trapping(empire_data *emp, room_data *room) {
 		// place worker
 		if ((worker = place_chore_worker(emp, CHORE_TRAPPING, room))) {
 			ewt_mark_resource_worker(emp, room, vnum);
-		}
-	}
-	else if (worker) {
-		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-	}
-}
-
-
-void do_chore_tanning(empire_data *emp, room_data *room) {
-	extern const struct tanning_data_type tan_data[];
-	
-	struct empire_storage_data *store;
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_TANNING].mob);
-	obj_vnum vnum = NOTHING;
-	bool can_do = FALSE;
-	int iter;
-	
-	// find something we can tan
-	for (iter = 0; tan_data[iter].from != NOTHING; ++iter) {
-		vnum = tan_data[iter].to;
-		store = find_stored_resource(emp, GET_ISLAND_ID(room), tan_data[iter].from);
-		can_do = store && store->amount > 0 && can_gain_chore_resource(emp, room, CHORE_TANNING, vnum);
-		
-		if (can_do) {
-			break;
-		}
-	}
-	
-	if (worker && can_do) {
-		ewt_mark_resource_worker(emp, room, store->vnum);
-		
-		charge_stored_resource(emp, GET_ISLAND_ID(room), store->vnum, 1);
-		if (vnum != NOTHING) {
-			add_to_empire_storage(emp, GET_ISLAND_ID(room), vnum, 1);
-		}
-		
-		act("$n finishes tanning some skin.", FALSE, worker, NULL, NULL, TO_ROOM);
-		empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
-	}
-	else if (store && can_do) {
-		// place worker
-		if ((worker = place_chore_worker(emp, CHORE_TANNING, room))) {
-			ewt_mark_resource_worker(emp, room, store->vnum);
 		}
 	}
 	else if (worker) {

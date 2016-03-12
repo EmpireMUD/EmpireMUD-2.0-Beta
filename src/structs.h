@@ -3200,13 +3200,6 @@ struct smelt_data_type {
 };
 
 
-// tanning data
-struct tanning_data_type {
-	obj_vnum from;
-	obj_vnum to;
-};
-
-
 // for BREW_x
 struct tavern_data_type {
 	char *name;
