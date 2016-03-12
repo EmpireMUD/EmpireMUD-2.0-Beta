@@ -2444,6 +2444,9 @@ Object interaction types:
  SEPARATE** - Split this item into multiple other items.
  ** Both COMBINE and SEPARATE should be set exclusive, as they will extract
     the original item.
+ SCRAPE - Items you get when scraping this item (tree -> log).
+ SAW - Items you get when sawing this item (tree -> lumber).
+ TAN - Items you get when tanning this item (skin -> leather).
 
 Room interaction types:
  DIG - Items received when using the dig action.

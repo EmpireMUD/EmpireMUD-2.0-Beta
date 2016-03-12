@@ -230,9 +230,9 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 	int iter;
 	
 	if (!resources) {
-		add_to_resource_list(&resources, RES_OBJECT, o_LOG, 12, 0);
-		add_to_resource_list(&resources, RES_OBJECT, o_LUMBER, 8, 0);
-		add_to_resource_list(&resources, RES_OBJECT, o_NAILS, 4, 0);
+		add_to_resource_list(&resources, RES_COMPONENT, CMP_PILLAR, 12, 0);
+		add_to_resource_list(&resources, RES_COMPONENT, CMP_LUMBER, 8, 0);
+		add_to_resource_list(&resources, RES_COMPONENT, CMP_NAILS, 4, 0);
 	}
 
 	// entrance
@@ -1801,8 +1801,8 @@ ACMD(do_lay) {
 ACMD(do_maintain) {
 	struct resource_data *res = NULL;
 	
-	add_to_resource_list(&res, RES_OBJECT, o_LUMBER, BUILDING_DISREPAIR(IN_ROOM(ch)), 0);
-	add_to_resource_list(&res, RES_OBJECT, o_NAILS, BUILDING_DISREPAIR(IN_ROOM(ch)), 0);
+	add_to_resource_list(&res, RES_COMPONENT, CMP_LUMBER, BUILDING_DISREPAIR(IN_ROOM(ch)), 0);
+	add_to_resource_list(&res, RES_COMPONENT, CMP_NAILS, BUILDING_DISREPAIR(IN_ROOM(ch)), 0);
 	
 	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You can't perform maintenance here.\r\n");

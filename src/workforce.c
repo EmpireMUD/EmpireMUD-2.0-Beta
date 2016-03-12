@@ -1529,30 +1529,28 @@ void do_chore_gardening(empire_data *emp, room_data *room) {
 void do_chore_maintenance(empire_data *emp, room_data *room) {
 	void finish_building(char_data *ch, room_data *room);
 	
-	struct empire_storage_data *store;
 	char_data *worker = NULL;
 	bool ok = TRUE;
 	int amount = BUILDING_DISREPAIR(room);
+	int islid = GET_ISLAND_ID(room);
 	
 	if (amount <= 0) {
 		return;
 	}
 
 	// check resources	
-	if (!(store = find_stored_resource(emp, GET_ISLAND_ID(room), o_LUMBER)) || store->amount < amount) {
+	if (!empire_can_afford_component(emp, islid, CMP_LUMBER, NOBITS, amount)) {
 		ok = FALSE;
 	}
-	if (!(store = find_stored_resource(emp, GET_ISLAND_ID(room), o_NAILS)) || store->amount < amount) {
+	if (!empire_can_afford_component(emp, islid, CMP_NAILS, NOBITS, amount)) {
 		ok = FALSE;
 	}
 	
-	if ((worker = find_chore_worker_in_room(room, chore_data[CHORE_MAINTENANCE].mob)) && ok) {
-		if (ok) {
-			charge_stored_resource(emp, GET_ISLAND_ID(room), o_LUMBER, amount);
-			charge_stored_resource(emp, GET_ISLAND_ID(room), o_NAILS, amount);
-			COMPLEX_DATA(room)->disrepair = 0;
-			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
-		}
+	if (ok && (worker = find_chore_worker_in_room(room, chore_data[CHORE_MAINTENANCE].mob))) {
+		charge_stored_component(emp, islid, CMP_LUMBER, NOBITS, amount);
+		charge_stored_component(emp, islid, CMP_NAILS, NOBITS, amount);
+		COMPLEX_DATA(room)->disrepair = 0;
+		empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 		
 		// they don't stay long
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
@@ -1561,7 +1559,7 @@ void do_chore_maintenance(empire_data *emp, room_data *room) {
 		worker = place_chore_worker(emp, CHORE_MAINTENANCE, room);
 	}
 	else if (worker) {
-		// no need -- they are already flagged despawn
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 }
 

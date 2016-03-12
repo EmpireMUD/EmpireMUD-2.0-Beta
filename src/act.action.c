@@ -37,7 +37,6 @@
 
 // external vars
 extern const struct smelt_data_type smelt_data[];
-extern const struct tanning_data_type tan_data[];
 
 // external funcs
 extern double get_base_dps(obj_data *weapon);
@@ -429,10 +428,9 @@ void cancel_smelting(char_data *ch) {
 * @param char_data *ch Mr. Tanner
 */
 void cancel_tanning(char_data *ch) {
-	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
-	scale_item_to_level(obj, 1);	// minimum level
-	obj_to_char(obj, ch);
-	load_otrigger(obj);
+	give_resources(ch, GET_ACTION_RESOURCES(ch), FALSE);
+	free_resource_list(GET_ACTION_RESOURCES(ch));
+	GET_ACTION_RESOURCES(ch) = NULL;
 }
 
 
@@ -808,7 +806,7 @@ INTERACTION_FUNC(finish_picking_crop) {
 }
 
 
-// also used for sawing
+// also used for sawing, tanning
 INTERACTION_FUNC(finish_scraping) {
 	obj_vnum vnum = interaction->vnum;
 	char buf[MAX_STRING_LENGTH];
@@ -2053,67 +2051,62 @@ void process_smelting(char_data *ch) {
 */
 void process_tanning(char_data *ch) {
 	ACMD(do_tan);
-	obj_data *proto, *obj = NULL;
-	int iter, type = NOTHING;
-		
+	
+	obj_data *proto;
+	bool success;
+	
 	GET_ACTION_TIMER(ch) -= (BUILDING_VNUM(IN_ROOM(ch)) == BUILDING_TANNERY ? 4 : 1);
 	
+	// need the prototype
+	if (!(proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
+		cancel_action(ch);
+		return;
+	}
+	
 	if (GET_ACTION_TIMER(ch) <= 0) {
-		/* Find the entry in the table */
-		for (iter = 0; type == NOTHING && tan_data[iter].from != NOTHING; ++iter) {
-			if (tan_data[iter].from == GET_ACTION_VNUM(ch, 0)) {
-				type = iter;
-			}
-		}
-
-		if (type == NOTHING || tan_data[type].to == NOTHING) {
-			cancel_action(ch);
-			return;
-		}
-
-		obj_to_char_or_room((obj = read_object(tan_data[type].to, TRUE)), ch);
-
-		act("You finish tanning $p.", FALSE, ch, obj, 0, TO_CHAR);
-		act("$n finishes tanning $p.", TRUE, ch, obj, 0, TO_ROOM);
+		act("You finish tanning $p.", FALSE, ch, proto, NULL, TO_CHAR);
+		act("$n finishes tanning $p.", TRUE, ch, proto, NULL, TO_ROOM);
 
 		GET_ACTION(ch) = ACT_NONE;
+		
+		success = run_interactions(ch, proto->interactions, INTERACT_TAN, IN_ROOM(ch), NULL, proto, finish_scraping);
+		free_resource_list(GET_ACTION_RESOURCES(ch));
+		GET_ACTION_RESOURCES(ch) = NULL;
+		
+		if (success) {
+			if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
+				gain_skill_exp(ch, SKILL_TRADE, 20);
+			}
 	
-		if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
-			gain_skill_exp(ch, SKILL_TRADE, 20);
-		}
-		load_otrigger(obj);
-	
-		// repeat!
-		if ((proto = obj_proto(tan_data[type].from))) {
-			strcpy(buf, fname(GET_OBJ_KEYWORDS(proto)));
-			do_tan(ch, buf, 0, 0);
+			// repeat!
+			do_tan(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
 		}
 	}
 	else {
 		switch (GET_ACTION_TIMER(ch)) {
 			case 10: {	// non-tannery only
-				act("You soak the skin...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				act("$n soaks the skin...", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				act("You soak $p...", FALSE, ch, proto, NULL, TO_CHAR | TO_SPAMMY);
+				act("$n soaks $p...", FALSE, ch, proto, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
 			case 8: {	// all
-				act("You scrape the skin clean...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				act("$n scrapes the skin clean...", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				act("You scrape $p clean...", FALSE, ch, proto, NULL, TO_CHAR | TO_SPAMMY);
+				act("$n scrapes $p clean...", FALSE, ch, proto, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
 			case 6: {	// non-tannery only
-				act("You brush the skin...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				act("$n brushes the skin...", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				act("You brush $p...", FALSE, ch, proto, NULL, TO_CHAR | TO_SPAMMY);
+				act("$n brushes $p...", FALSE, ch, proto, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
 			case 4: {	// all
-				act("You knead the skin with a foul-smelling mixture...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				act("$n kneads the skin with a foul-smelling mixture...", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				act("You knead $p with a foul-smelling mixture...", FALSE, ch, proto, NULL, TO_CHAR | TO_SPAMMY);
+				act("$n kneads $p with a foul-smelling mixture...", FALSE, ch, proto, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
 			case 2: {	// non-tannery only
-				act("You stretch the raw leather...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				act("$n stretches the raw leather...", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				act("You stretch $p...", FALSE, ch, proto, NULL, TO_CHAR | TO_SPAMMY);
+				act("$n stretches $p...", FALSE, ch, proto, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
 		}
@@ -2892,7 +2885,6 @@ ACMD(do_stop) {
 
 ACMD(do_tan) {
 	obj_data *obj;
-	int iter, type;
 	
 	int tan_timer = config_get_int("tan_timer");
 
@@ -2910,26 +2902,22 @@ ACMD(do_tan) {
 	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You don't seem to have more to tan.\r\n");
 	}
+	else if (!has_interaction(obj->interactions, INTERACT_TAN)) {
+		msg_to_char(ch, "You can't tan that!\r\n");
+	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to tan here.\r\n");
 	}
 	else {
-		/* Make sure it's in the list */
-		for (iter = 0, type = NOTHING; type == NOTHING && tan_data[iter].from != NOTHING; ++iter) {
-			if (tan_data[iter].from == GET_OBJ_VNUM(obj)) {
-				type = iter;
-			}
-		}
-		
-		if (type == NOTHING) {
-			act("You can't tan $p.", FALSE, ch, obj, NULL, TO_CHAR);
-			return;
-		}
-
 		start_action(ch, ACT_TANNING, tan_timer);
+		
+		// store the obj
+		add_to_resource_list(&GET_ACTION_RESOURCES(ch), RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 		GET_ACTION_VNUM(ch, 0) = GET_OBJ_VNUM(obj);
-		act("You begin to tan $p.", FALSE, ch, obj, 0, TO_CHAR);
-		act("$n begins to tan $p.", FALSE, ch, obj, 0, TO_ROOM);
+		GET_ACTION_VNUM(ch, 1) = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
+		
+		act("You begin to tan $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$n begins to tan $p.", FALSE, ch, obj, NULL, TO_ROOM);
 
 		extract_obj(obj);
 	}

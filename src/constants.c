@@ -2836,17 +2836,6 @@ const struct smelt_data_type smelt_data[] = {
 };
 
 
-// for do_tan
-// TODO tanning could change to interaction
-const struct tanning_data_type tan_data[] = {
-	{ o_SMALL_SKIN, o_SMALL_LEATHER },
-	{ o_LARGE_SKIN, o_LARGE_LEATHER },
-	
-	// last
-	{ NOTHING, NOTHING }
-};
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// TRIGGER CONSTANTS ///////////////////////////////////////////////////////
 
@@ -3133,6 +3122,7 @@ const char *interact_types[] = {
 	"SEPARATE",
 	"SCRAPE",
 	"SAW",
+	"TAN",
 	"\n"
 };
 
@@ -3157,6 +3147,7 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// separate
 	TYPE_OBJ,	// scrape
 	TYPE_OBJ,	// saw
+	TYPE_OBJ,	// tan
 };
 
 
@@ -3180,6 +3171,7 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// separate
 	TYPE_OBJ,	// scrape
 	TYPE_OBJ,	// saw
+	TYPE_OBJ,	// tan
 };
 
 
