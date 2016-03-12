@@ -352,6 +352,7 @@ void delete_room(room_data *room, bool check_exits) {
 	void remove_room_from_vehicle(room_data *room, vehicle_data *veh);
 
 	struct room_direction_data *ex, *next_ex, *temp;
+	struct room_extra_data *room_ex, *next_room_ex;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_city_data *city, *next_city;
 	room_data *rm_iter, *next_rm, *home;
@@ -470,6 +471,10 @@ void delete_room(room_data *room, bool check_exits) {
 	while ((af = ROOM_AFFECTS(room))) {
 		ROOM_AFFECTS(room) = af->next;
 		free(af);
+	}
+	HASH_ITER(hh, room->extra_data, room_ex, next_room_ex) {
+		HASH_DEL(room->extra_data, room_ex);
+		free(room_ex);
 	}
 
 	if (check_exits) {

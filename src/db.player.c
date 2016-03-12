@@ -689,6 +689,7 @@ void check_delayed_load(char_data *ch) {
 
 /* release memory allocated for a char struct */
 void free_char(char_data *ch) {
+	void die_follower(char_data *ch);
 	void free_alias(struct alias_data *a);
 	void free_mail(struct mail_data *mail);
 
@@ -698,6 +699,7 @@ void free_char(char_data *ch) {
 	struct channel_history_data *history;
 	struct player_slash_channel *slash;
 	struct interaction_item *interact;
+	struct pursuit_data *purs;
 	struct offer_data *offer;
 	struct lore_data *lore;
 	struct coin_data *coin;
@@ -715,8 +717,16 @@ void free_char(char_data *ch) {
 	// clean up gear/items, if any
 	extract_all_items(ch);
 
+	if (ch->followers || ch->master) {
+		die_follower(ch);
+	}
+	
 	if (IS_NPC(ch)) {
 		free_mob_tags(&MOB_TAGGED_BY(ch));
+		while ((purs = MOB_PURSUIT(ch))) {
+			MOB_PURSUIT(ch) = purs->next;
+			free(purs);
+		}
 	}
 	
 	// remove all affects
@@ -737,8 +747,6 @@ void free_char(char_data *ch) {
 		extract_script(ch, MOB_TRIGGER);
 	}
 	
-	// TODO what about script memory (freed in extract_char_final for NPCs, but what about PCs?)
-	
 	// free lore
 	while ((lore = GET_LORE(ch))) {
 		GET_LORE(ch) = lore->next;
@@ -754,7 +762,7 @@ void free_char(char_data *ch) {
 		GET_EMPIRE_NPC_DATA(ch) = NULL;
 	}
 	
-	// extract objs
+	// extract objs: aren't these handled by extract_all_items
 	while ((obj = ch->carrying)) {
 		extract_obj(obj);
 	}
@@ -838,9 +846,11 @@ void free_char(char_data *ch) {
 		}
 		
 		HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
+			HASH_DEL(GET_SKILL_HASH(ch), skill);
 			free(skill);
 		}
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
+			HASH_DEL(GET_ABILITY_HASH(ch), abil);
 			free(abil);
 		}
 		
