@@ -48,16 +48,13 @@ void scale_item_to_level(obj_data *obj, int level);
 obj_data *has_shovel(char_data *ch);
 
 // cancel protos
-void cancel_chipping(char_data *ch);
+void cancel_resource_list(char_data *ch);
 void cancel_driving(char_data *ch);
 void cancel_gen_craft(char_data *ch);
 void cancel_minting(char_data *ch);
 void cancel_morphing(char_data *ch);
-void cancel_sawing(char_data *ch);
-void cancel_scraping(char_data *ch);
 void cancel_siring(char_data *ch);
 void cancel_smelting(char_data *ch);
-void cancel_tanning(char_data *ch);
 
 // process protos
 void process_chipping(char_data *ch);
@@ -114,14 +111,14 @@ const struct action_data_struct action_data[] = {
 	{ "fishing", "is fishing.", NOBITS, process_fishing, NULL },	// ACT_FISHING
 	{ "smelting", "is melting down ore.", ACTF_FAST_CHORES, process_smelting, cancel_smelting },	// ACT_MELTING
 	{ "repairing", "is doing some repairs.", ACTF_FAST_CHORES | ACTF_HASTE, process_repairing, NULL },	// ACT_REPAIRING
-	{ "chipping", "is chipping rocks.", ACTF_FAST_CHORES, process_chipping, cancel_chipping },	// ACT_CHIPPING
+	{ "chipping", "is chipping rocks.", ACTF_FAST_CHORES, process_chipping, cancel_resource_list },	// ACT_CHIPPING
 	{ "panning", "is panning for gold.", ACTF_FINDER, process_panning, NULL },	// ACT_PANNING
 	{ "music", "is playing soothing music.", ACTF_ANYWHERE | ACTF_HASTE, process_music, NULL },	// ACT_MUSIC
 	{ "excavating", "is excavating a trench.", ACTF_HASTE | ACTF_FAST_CHORES, process_excavating, NULL },	// ACT_EXCAVATING
 	{ "siring", "is hunched over.", NOBITS, process_siring, cancel_siring },	// ACT_SIRING
 	{ "picking", "is looking around at the ground.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_picking, NULL },	// ACT_PICKING
 	{ "morphing", "is morphing and changing shape!", ACTF_ANYWHERE, process_morphing, cancel_morphing },	// ACT_MORPHING
-	{ "scraping", "is scraping something off.", ACTF_HASTE | ACTF_FAST_CHORES, process_scraping, cancel_scraping },	// ACT_SCRAPING
+	{ "scraping", "is scraping something off.", ACTF_HASTE | ACTF_FAST_CHORES, process_scraping, cancel_resource_list },	// ACT_SCRAPING
 	{ "bathing", "is bathing in the water.", NOBITS, process_bathing, NULL },	// ACT_BATHING
 	{ "chanting", "is chanting a strange song.", NOBITS, perform_ritual, NULL },	// ACT_CHANTING
 	{ "prospecting", "is prospecting.", NOBITS, process_prospecting, NULL },	// ACT_PROSPECTING
@@ -130,10 +127,10 @@ const struct action_data_struct action_data[] = {
 	{ "escaping", "is running toward the window!", NOBITS, process_escaping, NULL },	// ACT_ESCAPING
 	{ "studying", "is reading a book.", NOBITS, perform_study, NULL },	// ACT_STUDYING
 	{ "ritual", "is performing an arcane ritual.", NOBITS, perform_ritual, NULL },	// ACT_RITUAL
-	{ "sawing", "is sawing something.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_sawing },	// ACT_SAWING
+	{ "sawing", "is sawing something.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_resource_list },	// ACT_SAWING
 	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_quarrying, NULL },	// ACT_QUARRYING
 	{ "driving", "is driving.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_DRIVING
-	{ "tanning", "is tanning leather.", ACTF_FAST_CHORES, process_tanning, cancel_tanning },	// ACT_TANNING
+	{ "tanning", "is tanning leather.", ACTF_FAST_CHORES, process_tanning, cancel_resource_list },	// ACT_TANNING
 	{ "reading", "is reading a book.", NOBITS, process_reading, NULL },	// ACT_READING
 	{ "copying", "is writing out a copy of a book.", NOBITS, process_copying_book, NULL },	// ACT_COPYING_BOOK
 	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT
@@ -328,11 +325,11 @@ obj_data *has_shovel(char_data *ch) {
 //// ACTION CANCELERS ////////////////////////////////////////////////////////
 
 /**
-* Returns a rock (or chipped rock) to the person who was chipping.
+* Returns a set of resources from the resource list (if any).
 *
-* @param char_data *ch The chipper chap
+* @param char_data *ch The person canceling the craft (or whatever).
 */
-void cancel_chipping(char_data *ch) {
+void cancel_resource_list(char_data *ch) {
 	give_resources(ch, GET_ACTION_RESOURCES(ch), FALSE);
 	free_resource_list(GET_ACTION_RESOURCES(ch));
 	GET_ACTION_RESOURCES(ch) = NULL;
@@ -371,30 +368,6 @@ void cancel_morphing(char_data *ch) {
 
 
 /**
-* Returns a log/tree to the person who was sawing.
-*
-* @param char_data *ch The sawyer
-*/
-void cancel_sawing(char_data *ch) {
-	give_resources(ch, GET_ACTION_RESOURCES(ch), FALSE);
-	free_resource_list(GET_ACTION_RESOURCES(ch));
-	GET_ACTION_RESOURCES(ch) = NULL;
-}
-
-
-/**
-* Returns the original resource(s) to the person who was scraping.
-*
-* @param char_data *ch The scraper
-*/
-void cancel_scraping(char_data *ch) {
-	give_resources(ch, GET_ACTION_RESOURCES(ch), FALSE);
-	free_resource_list(GET_ACTION_RESOURCES(ch));
-	GET_ACTION_RESOURCES(ch) = NULL;
-}
-
-
-/**
 * Return smelting resources on cancel.
 *
 * @param char_data *ch He who smelt it.
@@ -418,18 +391,6 @@ void cancel_smelting(char_data *ch) {
 			load_otrigger(obj);
 		}
 	}
-}
-
-
-/**
-* Return tanning materials.
-*
-* @param char_data *ch Mr. Tanner
-*/
-void cancel_tanning(char_data *ch) {
-	give_resources(ch, GET_ACTION_RESOURCES(ch), FALSE);
-	free_resource_list(GET_ACTION_RESOURCES(ch));
-	GET_ACTION_RESOURCES(ch) = NULL;
 }
 
 
