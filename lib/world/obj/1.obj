@@ -6,9 +6,10 @@ A rock is lying on the ground.~
 crafting component, or as catapult shot. They are also used to lay roads and
 build some buildings.
 ~
-1 il ano 3
+1 il ano 4
 0 2 5
 1 0
+I 19 180 100.00 1  # CHIP: a chipped rock
 O
 22 0
 R
@@ -512,9 +513,10 @@ a chipped rock~
 A chipped rock is lying on the ground.~
 Keep chipping the rock.
 ~
-1 ikl ano 2
+1 ikl ano 3
 0 2 5
 1 0
+I 19 181 100.00 1  # CHIP: a handaxe
 O
 22 0
 S
@@ -524,9 +526,10 @@ a handaxe~
 A handaxe has been left here.~
 A handaxe is a great multi-purpose tool, but you can also chip it down further.
 ~
-1 hl ano 1
+1 hl ano 2
 0 2 1
 1 0
+I 19 186 100.00 1  # CHIP: a stone spear head
 R
 5121 0
 R
