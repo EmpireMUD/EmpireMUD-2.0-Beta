@@ -928,8 +928,6 @@ void process_build_action(char_data *ch) {
 * @param char_data *ch The chipper one.
 */
 void process_chipping(char_data *ch) {
-	ACMD(do_chip);
-	
 	obj_data *proto;
 	bool success;
 	
@@ -964,8 +962,8 @@ void process_chipping(char_data *ch) {
 				gain_skill_exp(ch, SKILL_TRADE, 25);
 			}
 			
-			// repeat!
-			do_chip(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
+			// repeat! (no -paul) note: keyword-targeting is hard because "chipped rock" also has "rock" as an alias
+			// do_chip(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
 		}
 	}
 }
