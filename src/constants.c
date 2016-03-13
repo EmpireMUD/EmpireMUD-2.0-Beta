@@ -3123,6 +3123,7 @@ const char *interact_types[] = {
 	"SCRAPE",
 	"SAW",
 	"TAN",
+	"CHIP",
 	"\n"
 };
 
@@ -3148,6 +3149,7 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// scrape
 	TYPE_OBJ,	// saw
 	TYPE_OBJ,	// tan
+	TYPE_OBJ,	// chip
 };
 
 
@@ -3172,6 +3174,7 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// scrape
 	TYPE_OBJ,	// saw
 	TYPE_OBJ,	// tan
+	TYPE_OBJ,	// chip
 };
 
 

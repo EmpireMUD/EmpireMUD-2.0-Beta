@@ -106,10 +106,8 @@
 #define o_IMPERIUM_INGOT  177
 #define o_COPPER_INGOT  178
 #define o_COPPER_BAR  179
-#define o_CHIPPED  180
 #define o_HANDAXE  181
 #define o_FLINT_SET  183
-#define o_SPEARHEAD  186
 
 // brewing items
 #define o_APPLES  3002

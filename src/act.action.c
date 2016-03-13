@@ -333,10 +333,9 @@ obj_data *has_shovel(char_data *ch) {
 * @param char_data *ch The chipper chap
 */
 void cancel_chipping(char_data *ch) {
-	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
-	scale_item_to_level(obj, 1);	// minimum level
-	obj_to_char(obj, ch);
-	load_otrigger(obj);
+	give_resources(ch, GET_ACTION_RESOURCES(ch), FALSE);
+	free_resource_list(GET_ACTION_RESOURCES(ch));
+	GET_ACTION_RESOURCES(ch) = NULL;
 }
 
 
@@ -806,7 +805,7 @@ INTERACTION_FUNC(finish_picking_crop) {
 }
 
 
-// also used for sawing, tanning
+// also used for sawing, tanning, chipping
 INTERACTION_FUNC(finish_scraping) {
 	obj_vnum vnum = interaction->vnum;
 	char buf[MAX_STRING_LENGTH];
@@ -968,54 +967,44 @@ void process_build_action(char_data *ch) {
 * @param char_data *ch The chipper one.
 */
 void process_chipping(char_data *ch) {
-	obj_data *obj;
+	ACMD(do_chip);
+	
+	obj_data *proto;
+	bool success;
 	
 	if (!find_chip_weapon(ch)) {
 		msg_to_char(ch, "You need to be using some kind of hammer to chip it.\r\n");
 		cancel_action(ch);
+		return;
 	}
-	else {
-		GET_ACTION_TIMER(ch) -= 1;
-				
-		if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-			msg_to_char(ch, "You chip away at the piece of rock...\r\n");
-		}
-
-		if (GET_ACTION_TIMER(ch) <= 0) {
-			GET_ACTION(ch) = ACT_NONE;
+	if (!(proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
+		// obj deleted?
+		cancel_action(ch);
+		return;
+	}
+	
+	GET_ACTION_TIMER(ch) -= 1;
 			
-			switch (GET_ACTION_VNUM(ch, 0)) {
-				case o_ROCK: {
-					obj = read_object(o_CHIPPED, TRUE);
-					obj_to_char(obj, ch);
-					msg_to_char(ch, "It splits open!\r\n");
-					if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
-						gain_skill_exp(ch, SKILL_TRADE, 25);
-					}
-					load_otrigger(obj);
-					break;
-				}
-				case o_CHIPPED: {
-					obj = read_object(o_HANDAXE, TRUE);
-					obj_to_char(obj, ch);
-					act("You have crafted $p!", FALSE, ch, obj, 0, TO_CHAR);
-					if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
-						gain_skill_exp(ch, SKILL_TRADE, 25);
-					}
-					load_otrigger(obj);
-					break;
-				}
-				case o_HANDAXE: {
-					obj = read_object(o_SPEARHEAD, TRUE);
-					obj_to_char(obj, ch);
-					act("You have crafted $p!", FALSE, ch, obj, 0, TO_CHAR);
-					if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
-						gain_skill_exp(ch, SKILL_TRADE, 25);
-					}
-					load_otrigger(obj);
-					break;
-				}
+	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
+		act("You chip away at $p...", FALSE, ch, proto, NULL, TO_CHAR | TO_SPAMMY);
+	}
+
+	if (GET_ACTION_TIMER(ch) <= 0) {
+		act("$p splits open!", FALSE, ch, proto, NULL, TO_CHAR);
+		act("$p finishes chipping $p!", TRUE, ch, proto, NULL, TO_ROOM);
+		GET_ACTION(ch) = ACT_NONE;
+		
+		success = run_interactions(ch, proto->interactions, INTERACT_CHIP, IN_ROOM(ch), NULL, proto, finish_scraping);
+		free_resource_list(GET_ACTION_RESOURCES(ch));
+		GET_ACTION_RESOURCES(ch) = NULL;
+
+		if (success) {
+			if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
+				gain_skill_exp(ch, SKILL_TRADE, 25);
 			}
+			
+			// repeat!
+			do_chip(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
 		}
 	}
 }
@@ -2160,10 +2149,10 @@ ACMD(do_chip) {
 	else if (!*arg) {
 		msg_to_char(ch, "Chip what?\r\n");
 	}
-	else if (!(target = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
+	else if (!(target = get_obj_in_list_vis(ch, arg, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || !(target = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))) {
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
-	else if (GET_OBJ_VNUM(target) != o_ROCK && GET_OBJ_VNUM(target) != o_CHIPPED && GET_OBJ_VNUM(target) != o_HANDAXE) {
+	else if (!has_interaction(target->interactions, INTERACT_CHIP)) {
 		msg_to_char(ch, "You can't chip that!\r\n");
 	}
 	else if (!find_chip_weapon(ch)) {
@@ -2171,10 +2160,14 @@ ACMD(do_chip) {
 	}
 	else {
 		start_action(ch, ACT_CHIPPING, chip_timer);
-		GET_ACTION_VNUM(ch, 0) = GET_OBJ_VNUM(target);
 		
-		act("You begin to chip at $p.", FALSE, ch, target, 0, TO_CHAR);
-		act("$n begins to chip at $p.", TRUE, ch, target, 0, TO_ROOM);
+		// store the obj
+		add_to_resource_list(&GET_ACTION_RESOURCES(ch), RES_OBJECT, GET_OBJ_VNUM(target), 1, GET_OBJ_CURRENT_SCALE_LEVEL(target));
+		GET_ACTION_VNUM(ch, 0) = GET_OBJ_VNUM(target);
+		GET_ACTION_VNUM(ch, 1) = GET_OBJ_CURRENT_SCALE_LEVEL(target);
+		
+		act("You begin to chip at $p.", FALSE, ch, target, NULL, TO_CHAR);
+		act("$n begins to chip at $p.", TRUE, ch, target, NULL, TO_ROOM);
 		extract_obj(target);
 	}
 }
