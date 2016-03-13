@@ -137,7 +137,7 @@ struct b2_player_special_data_saved {
 	int rewarded_today[b2_MAX_REWARDS_PER_DAY];	// idnums, for ABIL_REWARD
 
 	// action info
-	int action;	// ACT_x
+	int action;	// ACT_
 	int action_cycle;	// time left before an action tick
 	int action_timer;	// ticks to completion (use varies)
 	room_vnum action_room;	// player location
@@ -382,7 +382,7 @@ struct b3_player_special_data_saved {
 	int rewarded_today[b3_MAX_REWARDS_PER_DAY];	// idnums, for ABIL_REWARD
 
 	// action info
-	int action;	// ACT_x
+	int action;	// ACT_
 	int action_cycle;	// time left before an action tick
 	int action_timer;	// ticks to completion (use varies)
 	room_vnum action_room;	// player location

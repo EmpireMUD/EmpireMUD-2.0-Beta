@@ -36,7 +36,6 @@
 */
 
 // external vars
-extern const struct smelt_data_type smelt_data[];
 
 // external funcs
 extern double get_base_dps(obj_data *weapon);
@@ -54,7 +53,6 @@ void cancel_gen_craft(char_data *ch);
 void cancel_minting(char_data *ch);
 void cancel_morphing(char_data *ch);
 void cancel_siring(char_data *ch);
-void cancel_smelting(char_data *ch);
 
 // process protos
 void process_chipping(char_data *ch);
@@ -89,7 +87,6 @@ void process_reclaim(char_data *ch);
 void process_repairing(char_data *ch);
 void process_scraping(char_data *ch);
 void process_siring(char_data *ch);
-void process_smelting(char_data *ch);
 void process_tanning(char_data *ch);
 
 
@@ -109,7 +106,7 @@ const struct action_data_struct action_data[] = {
 	{ "mining", "is mining at the walls.", ACTF_HASTE | ACTF_FAST_CHORES, process_mining, NULL },	// ACT_MINING
 	{ "minting", "is minting coins.", ACTF_FAST_CHORES, process_minting, cancel_minting },	// ACT_MINTING
 	{ "fishing", "is fishing.", NOBITS, process_fishing, NULL },	// ACT_FISHING
-	{ "smelting", "is melting down ore.", ACTF_FAST_CHORES, process_smelting, cancel_smelting },	// ACT_MELTING
+		{ "unknown", "is doing something.", NOBITS, NULL, NULL },	// unused
 	{ "repairing", "is doing some repairs.", ACTF_FAST_CHORES | ACTF_HASTE, process_repairing, NULL },	// ACT_REPAIRING
 	{ "chipping", "is chipping rocks.", ACTF_FAST_CHORES, process_chipping, cancel_resource_list },	// ACT_CHIPPING
 	{ "panning", "is panning for gold.", ACTF_FINDER, process_panning, NULL },	// ACT_PANNING
@@ -218,7 +215,11 @@ void stop_room_action(room_data *room, int action, int chore) {
 * This is the main processor for periodic actions (ACT_), once per second.
 */
 void update_actions(void) {
+	extern struct gen_craft_data_t gen_craft_data[];
+	
 	descriptor_data *desc;
+	bitvector_t act_flags;
+	craft_data *craft;
 	char_data *ch;
 	int speed;
 
@@ -231,8 +232,14 @@ void update_actions(void) {
 			continue;
 		}
 		
+		// compile action flags
+		act_flags = action_data[GET_ACTION(ch)].flags;
+		if (GET_ACTION(ch) == ACT_GEN_CRAFT && (craft = craft_proto(GET_ACTION_VNUM(ch, 0)))) {
+			act_flags |= gen_craft_data[GET_CRAFT_TYPE(craft)].actf_flags;
+		}
+		
 		// things which terminate actions
-		if (!IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ANYWHERE) && GET_ROOM_VNUM(IN_ROOM(ch)) != GET_ACTION_ROOM(ch)) {
+		if (!IS_SET(act_flags, ACTF_ANYWHERE) && GET_ROOM_VNUM(IN_ROOM(ch)) != GET_ACTION_ROOM(ch)) {
 			cancel_action(ch);
 			continue;
 		}
@@ -240,7 +247,7 @@ void update_actions(void) {
 			cancel_action(ch);
 			continue;
 		}
-		if (GET_POS(ch) < POS_SITTING || GET_POS(ch) == POS_FIGHTING || (!IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_SITTING) && GET_POS(ch) < POS_STANDING)) {
+		if (GET_POS(ch) < POS_SITTING || GET_POS(ch) == POS_FIGHTING || (!IS_SET(act_flags, ACTF_SITTING) && GET_POS(ch) < POS_STANDING)) {
 			cancel_action(ch);
 			continue;
 		}
@@ -253,20 +260,20 @@ void update_actions(void) {
 		speed = 2;	// default is 2 per second (allowing it to be slowed)
 		
 		// things that modify speed...
-		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ALWAYS_FAST)) {
+		if (IS_SET(act_flags, ACTF_ALWAYS_FAST)) {
 			speed += 2;
 		}
-		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_HASTE) && AFF_FLAGGED(ch, AFF_HASTE)) {
+		if (IS_SET(act_flags, ACTF_HASTE) && AFF_FLAGGED(ch, AFF_HASTE)) {
 			speed += 2;
 		}
-		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
+		if (IS_SET(act_flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
 			speed += 2;
 		}
-		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FINDER) && has_ability(ch, ABIL_FINDER)) {
+		if (IS_SET(act_flags, ACTF_FINDER) && has_ability(ch, ABIL_FINDER)) {
 			speed += 2;
 			gain_ability_exp(ch, ABIL_FINDER, 0.1);
 		}
-		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_SHOVEL) && has_shovel(ch)) {
+		if (IS_SET(act_flags, ACTF_SHOVEL) && has_shovel(ch)) {
 			speed += 2;
 		}
 		
@@ -363,33 +370,6 @@ void cancel_morphing(char_data *ch) {
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char(obj, ch);
 		load_otrigger(obj);
-	}
-}
-
-
-/**
-* Return smelting resources on cancel.
-*
-* @param char_data *ch He who smelt it.
-*/
-void cancel_smelting(char_data *ch) {
-	obj_data *obj;
-	int iter, type = NOTHING;
-
-	// Find the entry in the table
-	for (iter = 0; smelt_data[iter].from != NOTHING && type == NOTHING; ++iter) {
-		if (smelt_data[iter].from == GET_ACTION_VNUM(ch, 0)) {
-			type = iter;
-		}
-	}
-	
-	if (type != NOTHING) {
-		for (iter = 0; iter < smelt_data[type].from_amt; ++iter) {
-			obj = read_object(smelt_data[type].from, TRUE);
-			scale_item_to_level(obj, 1);	// minimum level
-			obj_to_char(obj, ch);
-			load_otrigger(obj);
-		}
 	}
 }
 
@@ -1933,66 +1913,6 @@ void process_siring(char_data *ch) {
 
 
 /**
-* Tick update for smelt action.
-*
-* @param char_data *ch The smelter.
-*/
-void process_smelting(char_data *ch) {
-	ACMD(do_smelt);
-	
-	obj_data *proto, *obj = NULL;
-	int iter, type = NOTHING;
-
-	// decrement
-	GET_ACTION_TIMER(ch) -= 1;
-	
-	if (GET_ACTION_TIMER(ch) > 0) {
-		if (!number(0, 2) && !PRF_FLAGGED(ch, PRF_NOSPAM)) {
-			msg_to_char(ch, "You watch as the metal forms in the fire.\r\n");
-		}
-	}
-	else {
-		// DONE!
-
-		// Find the entry in the table
-		for (iter = 0; smelt_data[iter].from != NOTHING && type == NOTHING; ++iter) {
-			if (smelt_data[iter].from == GET_ACTION_VNUM(ch, 0)) {
-				type = iter;
-			}
-		}
-
-		if (type == NOTHING) {
-			// ... somehow
-			cancel_action(ch);
-			msg_to_char(ch, "Something went wrong with your smelting (error 1).\r\n");
-		}
-		else {
-			for (iter = 0; iter < smelt_data[type].to_amt; ++iter) {
-				obj_to_char((obj = read_object(smelt_data[type].to, TRUE)), ch);
-				load_otrigger(obj);
-			}
-
-			sprintf(buf2, " (x%d)", smelt_data[type].to_amt);
-			
-			sprintf(buf, "You have successfully created $p%s!", smelt_data[type].to_amt > 1 ? buf2 : "");
-			sprintf(buf1, "$n has successfully created $p%s!", smelt_data[type].to_amt > 1 ? buf2 : "");
-
-			act(buf, FALSE, ch, obj, 0, TO_CHAR);
-			act(buf1, TRUE, ch, obj, 0, TO_ROOM);
-
-			GET_ACTION(ch) = ACT_NONE;
-	
-			// repeat!
-			if ((proto = obj_proto(smelt_data[type].from))) {
-				strcpy(buf, fname(GET_OBJ_KEYWORDS(proto)));
-				do_smelt(ch, buf, 0, 0);
-			}
-		}
-	}
-}
-
-
-/**
 * Ticker for tanners.
 *
 * @param char_data *ch The tanner.
@@ -2726,91 +2646,6 @@ ACMD(do_scrape) {
 		act("$n begins scraping $p.", TRUE, ch, obj, 0, TO_ROOM);
 		
 		extract_obj(obj);
-	}
-}
-
-
-ACMD(do_smelt) {
-	int smelt_timer = config_get_int("smelt_timer");
-	
-	obj_data *obj[8], *obj_iter;
-	int iter, type = NOTHING, num_found;
-	
-	for (iter = 0; iter < 8; ++iter) {
-		obj[iter] = NULL;
-	}
-
-	one_argument(argument, arg);
-
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "You can't smelt.\r\n");
-	}
-	else if (!*arg) {
-		msg_to_char(ch, "What would you like to smelt?\r\n");
-	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		msg_to_char(ch, "You're busy right now.\r\n");
-	}
-	else if (!(obj[0] = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have more to smelt.\r\n");
-	}
-	else if ((!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_FORGE) && BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_FOUNDRY) || !IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You need to be in a forge or foundry to do this.\r\n");
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to smelt here.\r\n");
-	}
-	else {
-		/* Make sure it's in the list */
-		for (iter = 0; smelt_data[iter].from != NOTHING && type == NOTHING; ++iter) {
-			if (smelt_data[iter].from == GET_OBJ_VNUM(obj[0])) {
-				type = iter;
-			}
-		}
-		
-		if (type == NOTHING) {
-			msg_to_char(ch, "You can't smelt that.\r\n");
-		}
-		else {
-			num_found = 1;
-			
-			// start at 1 to find some more of the "from" obj (we already have the first one)
-			for (iter = 1; iter < smelt_data[type].from_amt && obj[iter-1]; ++iter) {
-				for (obj_iter = obj[iter-1]->next_content; obj_iter && num_found <= iter; obj_iter = obj_iter->next_content) {
-					if (GET_OBJ_VNUM(obj_iter) == smelt_data[type].from) {
-						obj[iter] = obj_iter;
-						num_found = iter+1;
-					}
-				}
-			}
-
-			// got enough?
-			if (num_found < smelt_data[type].from_amt) {
-				msg_to_char(ch, "You'll need %d of them to smelt.\r\n", smelt_data[type].from_amt);
-			}
-			else {
-				start_action(ch, ACT_MELTING, smelt_timer);
-				GET_ACTION_VNUM(ch, 0) = smelt_data[type].from;
-				
-				sprintf(buf, "You begin to smelt $p");
-				if (num_found > 1) {
-					sprintf(buf + strlen(buf), " (x%d).", num_found);
-				}
-				else {
-					strcat(buf, ".");
-				}
-				
-				act(buf, FALSE, ch, obj[0], 0, TO_CHAR);
-				act("$n begins to smelt $p.", FALSE, ch, obj[0], 0, TO_ROOM);
-
-				// extract
-				for (iter = 0; iter < num_found; ++iter) {
-					if (obj[iter]) {
-						extract_obj(obj[iter]);
-					}
-				}
-			}
-		}
 	}
 }
 

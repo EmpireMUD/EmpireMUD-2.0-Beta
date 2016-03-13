@@ -456,16 +456,18 @@ See also: SKILL CAPS, SPECIALIZE, SKILLS
 #
 SMELT MELT
 
-Usage:  smelt <item>
+Usage:  smelt [number] <type of ingot/bar>
 
 Using a forge or foundry, you can melt down metals like iron, silver, and gold
 into ingots or bars. Smelting generally requires two of the base metal (e.g.
 iron ore) to create one of the processed version (iron ingot).
 
-Ingots are used for crafting.
+Ingots are used for crafting. Gold and silver bars are worth more in the vault
+than their raw form. The bars can be smelted again to return them to the
+smaller raw version.
 
-Gold and silver bars are worth more in the vault than their raw form. The bars
-can be smelted again to return them to the smaller raw version.
+Typing "smelt" by itself will list things you can smelt with the ore available
+in your inventory.
 
 See also: METAL, WEALTH
 #

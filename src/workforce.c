@@ -54,7 +54,6 @@ void do_chore_minting(empire_data *emp, room_data *room);
 void do_chore_nailmaking(empire_data *emp, room_data *room);
 void do_chore_quarrying(empire_data *emp, room_data *room);
 void do_chore_shearing(empire_data *emp, room_data *room);
-void do_chore_smelting(empire_data *emp, room_data *room);
 void do_chore_trapping(empire_data *emp, room_data *room);
 
 void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh);
@@ -71,6 +70,7 @@ void stop_room_action(room_data *room, int action, int chore);	// act.action.c
 #define CHORE_GEN_CRAFT_VALIDATOR(name)  bool (name)(empire_data *emp, room_data *room, int chore, craft_data *craft)
 CHORE_GEN_CRAFT_VALIDATOR(chore_nexus_crystals);
 CHORE_GEN_CRAFT_VALIDATOR(chore_milling);
+CHORE_GEN_CRAFT_VALIDATOR(chore_smelting);
 CHORE_GEN_CRAFT_VALIDATOR(chore_weaving);
 
 void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_CRAFT_VALIDATOR(*validator));
@@ -209,7 +209,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 			do_chore_brickmaking(emp, room);
 		}
 		if (BUILDING_VNUM(room) == BUILDING_FOUNDRY && CHORE_ACTIVE(CHORE_SMELTING)) {
-			do_chore_smelting(emp, room);
+			do_chore_gen_craft(emp, room, CHORE_SMELTING, chore_smelting);
 		}
 		if (ROOM_BLD_FLAGGED(room, BLD_TAILOR) && CHORE_ACTIVE(CHORE_WEAVING)) {
 			do_chore_gen_craft(emp, room, CHORE_WEAVING, chore_weaving);
@@ -871,6 +871,35 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_milling) {
 	}
 	if (GET_CRAFT_ABILITY(craft) != NO_ABIL) {
 		return FALSE;
+	}
+	// success
+	return TRUE;
+}
+
+
+/**
+* Function passed to do_chore_gen_craft()
+*
+* @param empire_data *emp The empire doing the chore.
+* @param room_data *room The room the chore is in.
+* @param int chore CHORE_ const for this chore.
+* @param craft_data *craft The craft to validate.
+* @return bool TRUE if this workforce chore can work this craft, FALSE if not
+*/
+CHORE_GEN_CRAFT_VALIDATOR(chore_smelting) {
+	ability_data *abil;
+	
+	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_SMELT) {
+		return FALSE;
+	}
+	// won't weave things that require classes or high skill
+	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) ) {
+		if (!ABIL_ASSIGNED_SKILL(abil)) {
+			return FALSE;	// class ability
+		}
+		else if (ABIL_SKILL_LEVEL(abil) > BASIC_SKILL_CAP) {
+			return FALSE;	// level too high
+		}
 	}
 	// success
 	return TRUE;
@@ -1821,46 +1850,6 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 	}
 	
 	free_exclusion_data(excl);
-}
-
-
-void do_chore_smelting(empire_data *emp, room_data *room) {
-	extern struct smelt_data_type smelt_data[];
-	
-	struct empire_storage_data *store;
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_SMELTING].mob);
-	int iter;
-	bool can_do, found = FALSE;
-	
-	for (iter = 0; !found && smelt_data[iter].from != NOTHING; ++iter) {
-		if (smelt_data[iter].workforce) {
-			store = find_stored_resource(emp, GET_ISLAND_ID(room), smelt_data[iter].from);
-			can_do = can_gain_chore_resource(emp, room, CHORE_SMELTING, smelt_data[iter].to);
-		
-			if (can_do && store && store->amount >= smelt_data[iter].from_amt) {
-				ewt_mark_resource_worker(emp, room, smelt_data[iter].to);
-				
-				if (worker) {
-					charge_stored_resource(emp, GET_ISLAND_ID(room), store->vnum, smelt_data[iter].from_amt);
-					add_to_empire_storage(emp, GET_ISLAND_ID(room), smelt_data[iter].to, smelt_data[iter].to_amt);
-			
-					sprintf(buf, "$n finishes smelting %s into %s.", get_obj_name_by_proto(smelt_data[iter].from), get_obj_name_by_proto(smelt_data[iter].to));
-					act(buf, FALSE, worker, NULL, NULL, TO_ROOM);
-					empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
-				}
-				else {
-					worker = place_chore_worker(emp, CHORE_SMELTING, room);
-				}
-			
-				// found either way
-				found = TRUE;
-			}
-		}
-	}
-	
-	if (worker && !found) {
-		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-	}
 }
 
 
