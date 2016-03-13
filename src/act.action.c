@@ -239,6 +239,11 @@ void update_actions(void) {
 		}
 		
 		// things which terminate actions
+		if (action_data[GET_ACTION(ch)].process_function == NULL) {
+			// no way to process this action
+			cancel_action(ch);
+			continue;
+		}
 		if (!IS_SET(act_flags, ACTF_ANYWHERE) && GET_ROOM_VNUM(IN_ROOM(ch)) != GET_ACTION_ROOM(ch)) {
 			cancel_action(ch);
 			continue;
