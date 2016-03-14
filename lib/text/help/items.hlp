@@ -294,8 +294,8 @@ Metal (component)
 Ingots (resources)
 Bars (resource)
 
-Used for: forging, crafting, building, sewing
-Stored in: Foundry (ore/ingots), Vault (dust/discs/bars)
+Used for:  forging, crafting, building, sewing
+Stored in:  Foundry (non-precious metals), Vault/Secret Cache (precious metals)
 
 Various types of ingots can be made by smelting metals in a forge or foundry.
 
@@ -303,12 +303,11 @@ Metal is a category of component that covers all refined metal ores. It is used
 for a huge variety of crafts, most of which call for either a specific metal or
 one of the following metal categories:
 
-common:                copper and iron ingots
-rare:                  imperium and nocturnium ingots
-rare, fine:            silver nuggets and gold dust
-refined, fine, small:  silver and gold discs
-refined, large:        copper, silver and gold bars
-refined, fine, large:  silver and gold bars
+common:         copper and iron ingots
+rare:           silver, gold, imperium and nocturnium ingots
+rare, fine:     silver and gold bars
+refined:        copper, silver and gold bars
+refined, fine:  silver and gold bars
 
 See also: COMPONENT, SMELT, IRON, COPPER, MINE
 #
