@@ -1419,7 +1419,7 @@ void olc_show_object(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "<&ycomponent&0> %s\r\n", component_types[GET_OBJ_CMP_TYPE(obj)]);
 	if (GET_OBJ_CMP_TYPE(obj) != CMP_NONE) {
-		sprintbit(GET_OBJ_CMP_FLAGS(obj), component_flags, buf1, TRUE);
+		prettier_sprintbit(GET_OBJ_CMP_FLAGS(obj), component_flags, buf1);
 		sprintf(buf + strlen(buf), "<&ycompflags&0> %s\r\n", buf1);
 	}
 	

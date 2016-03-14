@@ -3409,14 +3409,14 @@ void prettier_sprintbit(bitvector_t bitvector, const char *names[], char *result
 
 	for (nr = 0; bitvector; bitvector >>= 1) {
 		if (IS_SET(bitvector, 1)) {
-			if (*names[nr] != '\n') {
+			if (*names[nr] && *names[nr] != '\n') {
 				sprintf(result + strlen(result), "%s%s", (found ? ", " : ""), names[nr]);
+				found = TRUE;
 			}
-			else {
+			else if (*names[nr]) {
 				sprintf(result + strlen(result), "%sUNDEFINED", (found ? ", " : ""));
+				found = TRUE;
 			}
-			
-			found = TRUE;
 		}
 		if (*names[nr] != '\n') {
 			nr++;

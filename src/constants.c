@@ -1196,7 +1196,7 @@ const char *pool_abbrevs[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// CRAFT RECIPE CONSTANTS //////////////////////////////////////////////////
 
-// CRAFT_x
+// CRAFT_x (1/2): flag names
 const char *craft_flags[] = {
 	"POTTERY",
 	"APIARIES-TECH",
@@ -1214,6 +1214,28 @@ const char *craft_flags[] = {
 	"VEHICLE",
 	"SHIPYARD",
 	"BLD-UPGRADED",
+	"\n"
+};
+
+
+// CRAFT_x (2/2): how flags that show up on "craft info"
+const char *craft_flag_for_info[] = {
+	"pottery",
+	"requires apiaries",
+	"requires glassblowing",
+	"requires glassblower building",
+	"requires carpenter building",
+	"alchemy",
+	"requires sharp tool",
+	"requires fire",
+	"",	// soup
+	"",	// in-dev
+	"",	// upgrade
+	"",	// dismantle-only
+	"in-city only",
+	"",	// vehicle
+	"requires shipyard",
+	"requires upgrade",
 	"\n"
 };
 
