@@ -80,7 +80,7 @@
 #define BOARD_IMM  2
 
 // Natural resources
-#define o_ROCK  100
+#define o_ROCK  100	// TODO: rocks are special-cased for chipping
 #define o_CLAY  101	// TODO: remove clay-near-water override and make it a rare Plains result, and otherwise claypit-only
 #define o_LIGHTNING_STONE  103
 #define o_BLOODSTONE  104
