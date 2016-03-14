@@ -439,7 +439,7 @@ will accept any kind of stick.
 
 See also: COMPONENT, GATHER, BUILD, CRAFT, SCRAPE
 #
-"STONE BLOCKS" BLOCKS BRICKS "CLAY BRICKS"
+"BLOCK COMPONENT" "STONE BLOCKS" BLOCKS BRICKS "CLAY BRICKS"
 
 Block (component)
 Huge Stone Block (resource)

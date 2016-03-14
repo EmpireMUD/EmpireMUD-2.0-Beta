@@ -154,6 +154,8 @@ See also: TAGS, HOME
 #
 BLOCK "BLOCK CAP"
 
+(Disambiguation: Did you mean HELP BLOCK COMPONENT ?)
+
 Your block rating, shown on 'score', is your character's bonus chance to block
 attacks. You must have the Shield Block ability, and be holding a shield in
 your off hand. Block bonuses come from equipment or spell effect, but have no
