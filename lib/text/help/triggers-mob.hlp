@@ -64,6 +64,9 @@ This is useful for mobs that are designed as companions or familiars. Most
 adventure mobs shouldn't use triggers while charmed, though, because players
 may find a way to abuse them.
 
+Affected trigger types are: Fight, Random, Memory, Greet, Entry, Command,
+   Speech, Act, Hitprcnt, Receive, Death, Bribe, Ability, Leave, and Door.
+
 See also: MTRIG FIGHT, MTRIG RANDOM
 #d
 "DEATH TRIGGER" "MTRIG DEATH" TRIGEDIT-MOB-DEATH
