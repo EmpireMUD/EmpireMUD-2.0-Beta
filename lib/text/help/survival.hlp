@@ -260,6 +260,7 @@ PATHFINDING
 Pathfinding (Survival ability)
 
 Usage:  lay
+Cost:  20x (rock)
 
 With the Pathfinding ability, you can lay roads on mountains. This ability
 also lets you remove them with the same command. You do not need the Roads

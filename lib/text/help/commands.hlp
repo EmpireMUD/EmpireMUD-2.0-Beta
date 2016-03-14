@@ -818,8 +818,9 @@ Roads: ----  ..|.  ..+-  --+.  .--.
 
 Roads (Empire)
 Usage:  lay
+Cost:  20x (rock)
 
-You may use this ability to lay 20 rocks into the ground to form a cobblestone 
+You may use this ability to lay rocks into the ground to form a cobblestone 
 road. Roads eliminate the small movement lag that you normally get while
 walking. They can aid in tree and crop control -- nothing will grow over the
 roads, but they will eventually decay if left unclaimed.
@@ -1004,7 +1005,8 @@ See also: BANNER, TOGGLE
 #
 PORTAL PORTALS ENTER
 
-Building:  ~&b][&0~ portal  (High Sorcery ability)
+Building:  ~&b][&0~ portal  20 logs, 12 blocks, 20 nexus crystal  (High Sorcery ability)
+Built on:  plains, desert
 Fame:  1
 Commands:  portal [destination]
            portal -all
