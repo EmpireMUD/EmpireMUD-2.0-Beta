@@ -907,7 +907,7 @@ static void annual_update_map_tile(room_data *room) {
 			}
 		}
 	}
-	else if (COMPLEX_DATA(room) && !IS_CITY_CENTER(room) && HOME_ROOM(room) == room && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_HAS_INSTANCE)) {
+	else if (COMPLEX_DATA(room) && GET_BUILDING(room) && !IS_CITY_CENTER(room) && HOME_ROOM(room) == room && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_HAS_INSTANCE)) {
 		emp = ROOM_OWNER(room);
 
 		// decay only non-imm empires				
