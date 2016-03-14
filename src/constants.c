@@ -2833,7 +2833,7 @@ const char *trig_types[] = {
 	"Leave",
 	"Door",
 	"Leave-All",
-	"Fight-Charmed",
+	"Charmed",
 	"\n"
 };
 
