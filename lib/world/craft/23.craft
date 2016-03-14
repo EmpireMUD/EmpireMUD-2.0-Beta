@@ -447,7 +447,7 @@ clockwork lens array~
 2343 1
 2 243 c 12 -1
 R
-162 2 0 0
+171 1 0 0
 R
 175 4 0 0
 S
@@ -458,7 +458,7 @@ guild patterned cloth~
 R
 26 4 1 0
 R
-161 2 0 0
+170 2 0 0
 S
 #2345
 clips and buckles~
@@ -506,9 +506,9 @@ antique device parts~
 L
 200
 R
-161 8 0 0
+170 6 0 0
 R
-162 2 0 0
+171 1 0 0
 R
 18 4 1 262144
 S
@@ -564,7 +564,7 @@ L
 R
 2352 1 0 0
 R
-162 1 0 0
+171 1 0 0
 R
 18 2 1 262144
 S

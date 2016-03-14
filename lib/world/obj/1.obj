@@ -281,11 +281,9 @@ a silver nugget~
 A silver nugget has fallen to the ground.~
 Silver can be melted down for money.
 ~
-15 l a 3
+15 l a 4
 2 0 0
 3 0
-O
-18 dk
 R
 5184 a
 R
@@ -297,11 +295,9 @@ a pile of gold dust~
 Some sparkling gold dust is scattered across the ground.~
 Gold can be melted down for money.
 ~
-15 l a 3
+15 l a 4
 3 0 0
 4 0
-O
-18 dk
 R
 5184 a
 R
@@ -344,32 +340,34 @@ R
 5115 0
 S
 #170
-silverdisc disc silver~
-a silver disc~
-A silver disc has been left on the ground.~
-Store the silver disc in your vault to gain wealth, or melt it again.
+ingot silver~
+a silver ingot~
+A silver ingot is stacked here.~
+   Ingots are used in crafting, but aren't as valuable as the larger silver
+bars. They can be stored in your vault to add to your wealth.  
 ~
-15 l a 3
-5 0 0
+15 l a 6
+4 0 0
 3 0
 O
-18 dmo
+18 dk
 R
 5184 a
 R
 5611 a
 S
 #171
-golddisc disc gold~
-a gold disc~
-A gold disc is lying on the ground.~
-Store the gold disc in your vault to gain wealth, or melt it again.
+ingot gold~
+a gold ingot~
+A gold ingot is stacked here.~
+   Ingots are usually used in crafting, and aren't as valuable as larger bars
+of gold. They can be stored in the vault to add to your wealth.  
 ~
-15 l a 4
-8 0 0
+15 l a 7
+6 0 0
 4 0
 O
-18 dmo
+18 dk
 R
 5184 a
 R
@@ -379,13 +377,15 @@ S
 silverbar bar silver~
 a silver bar~
 A bar of silver has been left on the ground.~
-Store the silver bar in your vault to gain wealth.
+   Store the silver bar in your vault to gain wealth. You can also separate the
+bar back into ingots for crafting.  
 ~
-15 l a 3
+15 l a 5
 10 1 0
 3 0
+I 15 170 100.00 2 s  # SEPARATE: a silver ingot
 O
-18 dfm
+18 dm
 R
 5184 a
 R
@@ -395,13 +395,15 @@ S
 goldbar bar gold~
 a gold bar~
 A bar of gold is lying on the ground.~
-Store the gold bar in your vault to gain wealth.
+   Store the gold bar in your vault to gain wealth. You can also separate the
+bar back into ingots for crafting.  
 ~
-15 l a 3
+15 l a 5
 16 1 0
 4 0
+I 15 171 100.00 2 s  # SEPARATE: a gold ingot
 O
-18 dfm
+18 dm
 R
 5184 a
 R
@@ -495,11 +497,12 @@ a copper bar~
 A bar of copper has been left here.~
 Store the copper bar in your vault to gain wealth.
 ~
-15 l a 3
+15 l a 5
 1 1 0
 13 0
+I 15 178 100.00 2 s  # SEPARATE: a copper ingot
 O
-18 fm
+18 m
 R
 5115 a
 R
