@@ -230,9 +230,9 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 	int iter;
 	
 	if (!resources) {
-		add_to_resource_list(&resources, RES_OBJECT, o_LOG, 12, 0);
-		add_to_resource_list(&resources, RES_OBJECT, o_LUMBER, 8, 0);
-		add_to_resource_list(&resources, RES_OBJECT, o_NAILS, 4, 0);
+		add_to_resource_list(&resources, RES_COMPONENT, CMP_PILLAR, 12, 0);
+		add_to_resource_list(&resources, RES_COMPONENT, CMP_LUMBER, 8, 0);
+		add_to_resource_list(&resources, RES_COMPONENT, CMP_NAILS, 4, 0);
 	}
 
 	// entrance
@@ -1722,13 +1722,16 @@ ACMD(do_interlink) {
 
 
 ACMD(do_lay) {
+	extern struct complex_room_data *init_complex_data();
+	
 	static struct resource_data *cost = NULL;
 	sector_data *original_sect = SECT(IN_ROOM(ch));
 	sector_data *check_sect = (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_ROAD) ? BASE_SECT(IN_ROOM(ch)) : SECT(IN_ROOM(ch)));
 	sector_data *road_sect = find_first_matching_sector(SECTF_IS_ROAD, NOBITS);
+	struct resource_data *charged = NULL;
 	
 	if (!cost) {
-		add_to_resource_list(&cost, RES_OBJECT, o_ROCK, 20, 0);
+		add_to_resource_list(&cost, RES_COMPONENT, CMP_ROCK, 20, 0);
 	}
 
 	if (IS_NPC(ch)) {
@@ -1754,8 +1757,10 @@ ACMD(do_lay) {
 	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_ROAD)) {
 		// already a road -- attempt to un-lay it
-		give_resources(ch, cost, TRUE);
-
+		if (COMPLEX_DATA(IN_ROOM(ch)) && GET_BUILT_WITH(IN_ROOM(ch))) {
+			give_resources(ch, GET_BUILT_WITH(IN_ROOM(ch)), TRUE);
+		}
+		
 		msg_to_char(ch, "You pull up the road.\r\n");
 		act("$n pulls up the road.", FALSE, ch, 0, 0, TO_ROOM);
 		
@@ -1773,7 +1778,7 @@ ACMD(do_lay) {
 		// sends own messages
 	}
 	else {
-		extract_resources(ch, cost, TRUE, NULL);
+		extract_resources(ch, cost, TRUE, &charged);
 
 		msg_to_char(ch, "You lay a road here.\r\n");
 		act("$n lays a road here.", FALSE, ch, 0, 0, TO_ROOM);
@@ -1791,7 +1796,15 @@ ACMD(do_lay) {
 		
 		// preserve this for un-laying the road (disassociate_building)
 		change_base_sector(IN_ROOM(ch), original_sect);
-
+		
+		// log charged resources
+		if (charged) {
+			if (!COMPLEX_DATA(IN_ROOM(ch))) {
+				COMPLEX_DATA(IN_ROOM(ch)) = init_complex_data();
+			}
+			GET_BUILT_WITH(IN_ROOM(ch)) = charged;
+		}
+		
 		command_lag(ch, WAIT_OTHER);
 		check_lay_territory(ch, IN_ROOM(ch));
 	}
@@ -1801,8 +1814,8 @@ ACMD(do_lay) {
 ACMD(do_maintain) {
 	struct resource_data *res = NULL;
 	
-	add_to_resource_list(&res, RES_OBJECT, o_LUMBER, BUILDING_DISREPAIR(IN_ROOM(ch)), 0);
-	add_to_resource_list(&res, RES_OBJECT, o_NAILS, BUILDING_DISREPAIR(IN_ROOM(ch)), 0);
+	add_to_resource_list(&res, RES_COMPONENT, CMP_LUMBER, BUILDING_DISREPAIR(IN_ROOM(ch)), 0);
+	add_to_resource_list(&res, RES_COMPONENT, CMP_NAILS, BUILDING_DISREPAIR(IN_ROOM(ch)), 0);
 	
 	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You can't perform maintenance here.\r\n");

@@ -524,15 +524,10 @@ pattern spiked wooden breastplate~
 the spiked wooden breastplate pattern~
 The pattern for a spiked wooden breastplate is lying here.~
 This is the pattern for a spiked wooden breastplate.
-Craft (Advanced Woodworking):
-  a sharp tool
-  a Carpenter building
-  1x stack of lumber
-  2x stack of cactus pads
- 12x imperium spike
-  2x large leather
+
+Craft (Advanced Woodworking): spiked wooden breastplate
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -558,14 +553,10 @@ pattern sword cactus~
 the cactus sword pattern~
 The pattern for a cactus sword is lying here.~
 This is the recipe for the cactus sword.
-Craft (Advanced Woodworking):
-  a sharp tool
-  a Carpenter building
-  1x stack of lumber
-  6x stack of cactus pads
-  5x imperium ingot
+
+Craft (Advanced Woodworking): cactus sword
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -586,11 +577,10 @@ recipe aloe~
 an aloe recipe~
 An aloe recipe has been left here.~
 This is the recipe for the soothing aloe elixir.
-Brew (Healing Elixirs):
- 10x handful of whitegrass
-  4x thick aloe leaves
+
+Brew (Healing Elixirs): soothing aloe elixir
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -834,12 +824,8 @@ This pattern allows you to craft the primordial axe, a powerful weapon from
 the dawn of time.
 
 Forge (requires Deadly Weapons): primordial axe
-  6x thick dracosaur hide
-  8x serrated dracosaur tooth
-  2x huge dracosaur bone
-  5x imperium ingot
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -867,13 +853,8 @@ This pattern allows you to craft the dracosaur bone spear, a strong tanking
 weapon from the Primeval age.
 
 Forge (requires Deadly Weapons): dracosaur bone spear
-  4x thick dracosaur hide
- 10x serrated dracosaur tooth
-  1x huge dracosaur bone
-  1x essence of terror
-  5x imperium ingot
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -903,13 +884,8 @@ This pattern allows you to craft the jeweled bone staff, a great magical weapon
 from the prehistoric era.
 
 Craft (requires Powerful Staves): jeweled bone staff
- 10x thick dracosaur hide
-  4x serrated dracosaur tooth
-  1x huge dracosaur bone
-  1x stunning violet gem
-  5x ingot of nocturnium
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -940,12 +916,8 @@ This pattern allows you to sew the dracosaur scale robe, a powerful healing
 robe from the Primeval period.
 
 Sew (requires Magical Vestments): dracosaur scale robe
-  8x thick dracosaur hide
-  6x serrated dracosaur tooth
-  1x stunning violet gem
-  6x ingot of nocturnium
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -975,12 +947,8 @@ This pattern allows you to forge the dracosaur scale boots, medium armor well-
 suited to mucking through pre-history.
 
 Forge (requires Imperial Armors): dracosaur scale boots
-  8x thick dracosaur hide
-  6x serrated dracosaur tooth
-  1x essence of terror
-  6x imperium ingot
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -1012,12 +980,8 @@ This pattern allows you to forge the primordial boots, some of the best tanking
 boots in all of history.
 
 Forge (requires Imperial Armors): primordial boots
-  6x thick dracosaur hide
-  8x serrated dracosaur tooth
-  1x huge dracosaur bone
- 10x imperium ingot
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -1046,12 +1010,8 @@ This pattern allows you to sew the dracosaur scale gauntlets, dangerous leather
 gloves from beyond the Primeval portal.
 
 Sew (requires Dangerous Leathers): dracosaur scale gauntlets
- 12x thick dracosaur hide
-  2x serrated dracosaur tooth
-  1x essence of terror
-  5x imperium ingot
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -1082,12 +1042,8 @@ This pattern allows you to craft the tome of the primordium, a powerful magical
 relic from a bygone era.
 
 Craft (requires Master Craftsman): tome of the primordium
-  4x thick dracosaur hide
- 10x serrated dracosaur tooth
-  1x stunning violet gem
-  5x ingot of nocturnium
 ~
-3 0 a 2
+3 0 a 3
 0 0 0
 0 0
 S
@@ -1117,11 +1073,8 @@ This pattern allows you to craft the bone crown of the primeval, an ancient
 symbol of kings from a less civilized age.
 
 Craft (requires Jewelry): bone crown of the primeval
-  1x huge dracosaur bone
-  1x essence of terror
-  1x stunning violet gem
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S

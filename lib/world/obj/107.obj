@@ -48,11 +48,8 @@ recipe ham honey-cured cured~
 the honey-cured ham recipe~
 The honey-cured ham recipe is lying here.~
 You can cook: honey-cured ham
-  2x slab of pork
-  apiaries
-  fire
 ~
-3 p a 2
+3 p a 3
 0 0 0
 0 0
 S
@@ -76,13 +73,8 @@ recipe cake fruitcake~
 the fruitcake recipe~
 The fruitcake recipe is lying on the ground.~
 You can cook: fruitcake
-  2x sack of flour
-  1x bunch of apples
-  1x bag of cherries
-  apiaries
-  fire
 ~
-3 p a 3
+3 p a 4
 0 0 0
 0 0
 S
@@ -103,10 +95,8 @@ recipe roast goose~
 the roast goose recipe~
 The roast goose recipe is lying here.~
 You can cook: roast goose
-  2x cut of poultry
-  fire
 ~
-3 p a 3
+3 p a 4
 0 0 0
 0 0
 S
@@ -220,11 +210,8 @@ recipe cookie christmas~
 the Christmas cookie recipe~
 The Christmas cookie recipe is lying here.~
 You can cook: Christmas cookies
-  2x sack of flour
-  apiaries
-  fire
 ~
-3 p a 3
+3 p a 4
 0 0 0
 0 0
 S
@@ -233,13 +220,8 @@ schematic sleigh~
 the sleigh schematic~
 The sleigh schematic is lying on the ground.~
 You can craft (Advanced Woodworking): sleigh
-  24x stack of lumber
-  6x pouch of nails
-  4x bolt of cloth
-  sharp tool
-  carpenter
 ~
-3 p a 1
+3 p a 2
 0 0 0
 0 0
 S
@@ -557,7 +539,7 @@ meat spider~
 spider meat~
 Some spider meat is globbed on the ground.~
    This meat looks -- and smells -- awful. It might improve if you cooked it,
-or you could probably just sell it to the goblins.  
+or you could probably just sell it to the goblins.
 (Type 'sell meat' when you find Miner Meena.)
 ~
 6 0 a 3
@@ -570,7 +552,7 @@ meat spider cooked~
 cooked spider meat~
 Some spider meat is lying on the ground.~
    Spider meat actually improves significantly after you cook it. Now it just
-tastes like rancid chicken.  
+tastes like rancid chicken.
 ~
 6 0 a 3
 12 0 0
@@ -612,7 +594,7 @@ S
 ring rusty goblin~
 a rusty goblin ring~
 A rusty goblin ring is lying on the ground.~
-This iron ring pokes at your finger, and leaves your skin stained.  
+This iron ring pokes at your finger, and leaves your skin stained.
 ~
 2 mp ab 1
 0 0 0
@@ -625,7 +607,7 @@ idol goblin rusty~
 a rusty goblin idol~
 A rusty goblin idol is planted in the ground.~
    This old idol looks like it was once shaped like an animal, but you can't
-tell whether it was a warg or a cow.  
+tell whether it was a warg or a cow.
 ~
 2 mp ao 2
 0 0 0

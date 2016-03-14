@@ -168,6 +168,7 @@ Crafts (CEDIT):
 - Scalable objects should not be used as resources or required objects for
   craft recipes. These items aren't stored, so if they're refunded, they will
   scale to their minimum level and lose any modifications.
+- SMELT crafts usually have a timer of 4.
 
 Crops (CROPEDIT):
 - Crop names are always lowercase because they are used to build sentences.
@@ -2444,6 +2445,9 @@ Object interaction types:
  SEPARATE** - Split this item into multiple other items.
  ** Both COMBINE and SEPARATE should be set exclusive, as they will extract
     the original item.
+ SCRAPE - Items you get when scraping this item (tree -> log).
+ SAW - Items you get when sawing this item (tree -> lumber).
+ TAN - Items you get when tanning this item (skin -> leather).
 
 Room interaction types:
  DIG - Items received when using the dig action.

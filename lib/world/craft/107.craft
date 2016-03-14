@@ -3,49 +3,47 @@ honey-cured ham~
 10703 1
 3 -1 bh 2 10704
 R
-3201 2  # 2x a slab of pork
+3201 2 0 0
 S
 #10705
 fruitcake~
 10705 1
 3 -1 bh 2 10706
 R
-3312 2  # 2x a sack of flour
+8 2 1 0
 R
-3002 1  # 1x a bunch of apples
-R
-3008 1  # 1x a bag of cherries
+9 2 1 2
 S
 #10707
 roast goose~
 10707 1
 3 -1 gh 6 10708
 R
-3200 2  # 2x a cut of poultry
+3200 2 0 0
 S
 #10715
 sleigh~
 10715 1
-2 59 en 36 -1
+2 59 en 36 10718
 R
-125 24  # 24x a stack of lumber
+16 24 1 0
 R
-1306 6  # 6x a pouch of nails
+19 6 1 0
 R
-1359 4  # 4x a bolt of cloth
+26 4 1 0
 S
 #10716
 Christmas cookies~
 10716 1
 3 -1 bh 2 10717
 R
-3312 2  # 2x a sack of flour
+8 2 1 0
 S
 #10752
 spider meat~
 10752 1
 3 -1 h 2 10751
 R
-10751 1  # 1x spider meat
+10751 1 0 0
 S
 $

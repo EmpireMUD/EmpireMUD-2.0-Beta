@@ -659,10 +659,8 @@ An array of clockwork lenses is lying here.~
 These can be used by any craftsman to make a personal set of clockwork goggles.
 
 Craft (no skill required): clockwork goggles
-  1x clockwork lens array
-  2x copper ingot
 ~
-3 0 a 4
+3 0 a 5
 0 0 0
 8 0
 S
@@ -673,10 +671,8 @@ A sheet of guild-patterned cloth is lying here.~
 This can be used by any craftsman to make a personal guildmaster's tunic.
 
 Sew (no skill required): guildmaster tunic
-  1x guild-patterned cloth
-  2x bolt of cloth
 ~
-3 0 a 4
+3 0 a 5
 0 0 0
 11 0
 S
@@ -687,10 +683,8 @@ A pile of clips and buckles is lying here.~
 These can be used by any craftsman to make a personal utility belt.
 
 Sew (no skill required): utility belt
-  1x clips and buckles
-  4x large leather
 ~
-3 0 a 5
+3 0 a 6
 0 0 0
 2 0
 S
@@ -701,11 +695,8 @@ A set of tiny, delicate tools is lying here.~
 These can be used by any craftsman to make a personal artisan's multitool.
 
 Forge (no skill required): steel multitool
-  1x set of delicate tools
-  1x small leather
-  1x iron ingot
 ~
-3 0 a 6
+3 0 a 7
 0 0 0
 2 0
 S
@@ -713,15 +704,12 @@ S
 pattern filter alchemical~
 the alchemical filter pattern~
 The alchemical filter pattern is lying here.~
-An alchemist could use this pattern to create an alchemical filter, used in the
-creation of a chemist's cleansing cap, a level 200-300 crafting headpiece.
+   An alchemist could use this pattern to create an alchemical filter, used in
+the creation of a chemist's cleansing cap, a level 200-300 crafting headpiece.
 
 Craft (requires Alchemist Crafts and crafting 200): alchemical filter
-  2x nocturnium ingot
-  2x each of the 6 herbs:
-    whitegrass, fiveleaf, redthorn, magewhisper, daggerbite, bileberries
 ~
-3 0 a 7
+3 0 a 8
 0 0 0
 0 0
 S
@@ -729,15 +717,12 @@ S
 design device antiquated~
 the antiquated device design~
 The antiquated device design is lying here.~
-An antiquarian could use this design to create antique device parts, used to
-make antiquated arcane apparatus, a level 200-300 crafting offhand.
+   An antiquarian could use this design to create antique device parts, used to
+make an antiquated arcane apparatus, a level 200-300 crafting offhand.  
 
 Forge (requires Antiquarian Crafts and crafting 200): antique device parts
-  8x silver nugget
-  4x copper ingot
-  2x gold dust
 ~
-3 0 a 7
+3 0 a 8
 0 0 0
 0 0
 S
@@ -745,15 +730,12 @@ S
 pattern pouch concealed~
 the concealed pouch pattern~
 The concealed pouch pattern is lying here.~
-A smuggler could use this design to create concealed silk pouches, used in the
-creation of a superb smuggling sash, a level 200-300 crafting belt.
+   A smuggler could use this design to create concealed silk pouches, used in
+the creation of a superb smuggling sash, a level 200-300 crafting belt.  
 
 Sew (requires Smuggler Crafts and crafting 200): concealed silk pouches
-  6x bolt of cloth
-  1x each of the 4 gems:
-    lightning stone, bloodstone, blue iris, glowing seashell
 ~
-3 0 a 5
+3 0 a 6
 0 0 0
 0 0
 S
@@ -761,16 +743,12 @@ S
 pattern harness tinker's tinkers~
 the tinker's harness pattern~
 The tinker's harness pattern is lying here.~
-A tinker could use this pattern to create a tinker's harness, used to make
-traveling tinker's trappings, a set of level 200-300 crafting clothes.
+   A tinker could use this pattern to create a tinker's harness, used to make
+traveling tinker's trappings, a set of level 200-300 crafting clothes.  
 
 Forge (requires Tinker Crafts and crafting 200): tinker harness
-  8x iron ingot
-  2x imperium ingot
-  2x shark skin
-  2x snakeskin
 ~
-3 0 a 4
+3 0 a 5
 0 0 0
 0 0
 S
@@ -778,14 +756,13 @@ S
 filter alchemical~
 an alchemical filter~
 An alchemical filter is lying here.~
-This alchemically treated metal filter is used in the construction of a
-chemist's cleansing cap. It will bind to whoever crafts it.
+   This alchemically treated metal filter is used in the construction of a
+chemist's cleansing cap. It will bind to whoever crafts it.  
+
 
 Sew (requires crafting 200): chemists cleansing cap
-  1x alchemical filter
-  2x large leather
 ~
-3 0 a 4
+3 0 a 5
 0 0 0
 2 0
 S
@@ -793,15 +770,12 @@ S
 parts device antique pile~
 a pile of antique device parts~
 A pile of antique device parts is lying here.~
-This pile of strange little gears and rods can be used to assemble an
-antiquated arcane apparatus. It will bind to whoever crafts it.
+   This pile of strange little gears and rods can be used to assemble an
+antiquated arcane apparatus. It will bind to whoever crafts it.  
 
 Craft (requires crafting 200): antiquated arcane apparatus
-  1x antique device parts
-  1x gold dust
-  2x copper ingot
 ~
-3 0 a 5
+3 0 a 6
 0 0 0
 3 0
 S
@@ -809,14 +783,12 @@ S
 pouches silk thin concealed~
 some concealed silk pouches~
 Some thin silk pouches are lying here.~
-This set of enchanted hidden pouches, clearly crafted by a master smuggler,
+   This set of enchanted hidden pouches, clearly crafted by a master smuggler,
 could be sewn into a superb smuggling sash. It will bind to whoever crafts it.
 
 Sew (requires crafting 200): superb smuggling sash
-  1x concealed silk pouches
-  6x bolt of cloth
 ~
-3 0 a 7
+3 0 a 8
 0 0 0
 11 0
 S
@@ -824,15 +796,12 @@ S
 harness tinker's tinkers detached~
 a tinker's harness~
 A detached tinker's harness is piled up here.~
-This collection of straps, buckles and clamps can be used to create traveling
-tinker's trappings. They will bind to whoever crafts them.
+   This collection of straps, buckles and clamps can be used to create
+traveling tinker's trappings. They will bind to whoever crafts them.  
 
 Sew (requires crafting 200): traveling tinker's trappings
-  1x tinker's harness
-  4x bolt of cloth
-  2x large leather
 ~
-3 0 a 10
+3 0 a 11
 0 0 0
 2 0
 S

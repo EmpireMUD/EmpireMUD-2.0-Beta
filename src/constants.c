@@ -1254,6 +1254,7 @@ const char *craft_types[] = {
 	"WEAVE",
 	"WORKFORCE",
 	"MANUFACTURE",
+	"SMELT",
 	"\n"
 };
 
@@ -2808,45 +2809,6 @@ const struct fishing_data_type fishing_data[] = {
 };
 
 
-// for do_smelt
-const struct smelt_data_type smelt_data[] = {
-	// from, amt			to, amt					workforce?
-
-	// metals
-	{ o_IRON_ORE, 2,		o_IRON_INGOT, 1,		TRUE },
-	{ o_IMPERIUM_ORE, 2,	o_IMPERIUM_INGOT, 1,	TRUE },
-	{ o_NOCTURNIUM_ORE, 2,	o_NOCTURNIUM_INGOT, 1,	TRUE },
-	{ o_COPPER, 2,			o_COPPER_INGOT, 1,		TRUE },
-	
-	// preciouses
-	{ o_GOLD_SMALL, 8,		o_GOLD_DISC, 1,			TRUE },
-	{ o_SILVER, 2,			o_SILVER_DISC, 1,		TRUE },
-	{ o_GOLD, 2,			o_GOLD_DISC, 1,			TRUE },
-	{ o_SILVER_DISC, 2,		o_SILVER_BAR, 1,		TRUE },
-	{ o_GOLD_DISC, 2,		o_GOLD_BAR, 1,			TRUE },
-	{ o_COPPER_INGOT, 2,	o_COPPER_BAR, 1,		TRUE },
-
-	// melt-down versions
-	{ o_SILVER_BAR, 1,		o_SILVER, 4,			FALSE },
-	{ o_GOLD_BAR, 1,		o_GOLD, 4,				FALSE },
-	{ o_COPPER_BAR, 1,		o_COPPER_INGOT, 2,		FALSE },
-
-	// last
-	{ NOTHING, 0, NOTHING, 0, FALSE }
-};
-
-
-// for do_tan
-// TODO tanning could change to interaction
-const struct tanning_data_type tan_data[] = {
-	{ o_SMALL_SKIN, o_SMALL_LEATHER },
-	{ o_LARGE_SKIN, o_LARGE_LEATHER },
-	
-	// last
-	{ NOTHING, NOTHING }
-};
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// TRIGGER CONSTANTS ///////////////////////////////////////////////////////
 
@@ -3133,6 +3095,8 @@ const char *interact_types[] = {
 	"SEPARATE",
 	"SCRAPE",
 	"SAW",
+	"TAN",
+	"CHIP",
 	"\n"
 };
 
@@ -3157,6 +3121,8 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// separate
 	TYPE_OBJ,	// scrape
 	TYPE_OBJ,	// saw
+	TYPE_OBJ,	// tan
+	TYPE_OBJ,	// chip
 };
 
 
@@ -3180,6 +3146,8 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// separate
 	TYPE_OBJ,	// scrape
 	TYPE_OBJ,	// saw
+	TYPE_OBJ,	// tan
+	TYPE_OBJ,	// chip
 };
 
 

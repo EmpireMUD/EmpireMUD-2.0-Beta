@@ -1,397 +1,387 @@
 #3300
 fried meat pie~
 3300 1
-3 -1 gh 6 3012
+3 -1 gh 6 -1
 R
-3012 2  # 2x a fillet of raw meat
+17 2 1 0
 R
-3312 1  # 1x a sack of flour
+8 1 1 0
 S
 #3301
 apple pie~
 3301 1
-3 -1 gh 6 3002
+3 -1 gh 6 -1
 R
-3002 1  # 1x a bunch of apples
+3002 1 0 0
 R
-3312 1  # 1x a sack of flour
+8 1 1 0
 S
 #3302
 peach pie~
 3302 1
-3 -1 gh 6 3004
+3 -1 gh 6 -1
 R
-3004 1  # 1x a basket of peaches
+3004 1 0 0
 R
-3312 1  # 1x a sack of flour
+8 1 1 0
 S
 #3303
 cherry pie~
 3303 1
-3 -1 h 6 3008
+3 -1 h 6 -1
 R
-3008 1  # 1x a bag of cherries
+3008 1 0 0
 R
-3312 1  # 1x a sack of flour
+8 1 1 0
 S
 #3304
 candied apple~
 3304 1
-3 -1 bh 6 3001
+3 -1 bh 6 -1
 R
-3001 1  # 1x a green apple
+3001 1 0 0
 S
 #3305
 casserole~
 3305 1
-3 -1 gh 6 3012
+3 -1 gh 6 -1
 R
-3012 1  # 1x a fillet of raw meat
+17 1 1 0
 R
-3014 1  # 1x some dry beans
+8 1 1 0
 R
-3005 1  # 1x a bushel of corn
-R
-3312 1  # 1x a sack of flour
+27 2 1 2
 S
 #3306
 jerky~
 3306 1
-3 -1 bh 6 3012
+3 -1 bh 6 -1
 R
-3012 1  # 1x a fillet of raw meat
+3012 1 0 0
 S
 #3307
 cornmeal~
 3307 2
 5 -1 0 4 -1
 R
-3005 1  # 1x a bushel of corn
+3005 1 0 0
 S
 #3308
 tortilla~
 3308 1
-3 -1 h 6 3307
+3 -1 h 6 -1
 R
-3307 1  # 1x a sack of cornmeal
+3307 1 0 0
 S
 #3309
 burrito~
 3309 1
-3 -1 gh 6 3308
+3 -1 gh 6 -1
 R
-3014 1  # 1x some dry beans
+3014 1 0 0
 R
-3308 1  # 1x a tortilla
+3308 1 0 0
 S
 #3311
 olive oil~
 3311 1
 5 -1 0 6 -1
 R
-3019 2  # 2x a basket of olives
+3019 2 0 0
 S
 #3312
 flour~
 3312 2
 5 -1 0 4 -1
 R
-141 1  # 1x a bundle of wheat
+141 1 0 0
 S
 #3313
 bread~
 3313 1
-3 -1 h 6 3312
+3 -1 h 6 -1
 R
-3312 2  # 2x a sack of flour
+8 2 1 0
 S
 #3314
 fried rice~
 3314 1
-3 -1 h 6 3011
+3 -1 h 6 -1
 R
-3011 2  # 2x a sack of dried rice
+3011 2 0 0
 S
 #3315
 salt pork~
 3315 1
-3 -1 bh 5 3201
+3 -1 bh 5 -1
 R
-3201 1  # 1x a slab of pork
+3201 1 0 0
 S
 #3316
 chicken and vegetables~
 3316 1
-3 -1 h 10 3200
+3 -1 h 10 -1
 R
-3200 1  # 1x a cut of poultry
+3200 1 0 0
 R
-3005 1  # 1x a bushel of corn
-R
-3021 1  # 1x a basket of peas
-R
-11102 1  # 1x a bunch of carrots
+27 3 1 2
 S
 #3317
 ham and cheese sandwich~
 3317 4
-3 -1 0 5 3313
+3 -1 0 5 -1
 R
-3313 1  # 1x a loaf of bread
+3313 1 0 0
 R
-3201 2  # 2x a slab of pork
+3201 2 0 0
 S
 #3318
 fruit bowl~
 3318 1
-3 -1 0 4 3002
+3 -1 0 4 -1
 R
-3002 1  # 1x a bunch of apples
+3002 1 0 0
 R
-3004 1  # 1x a basket of peaches
+3004 1 0 0
 R
-3008 1  # 1x a bag of cherries
+3008 1 0 0
 R
-10226 1  # 1x a pineapple
+10226 1 0 0
 R
-11106 1  # 1x some juicy pears
+11106 1 0 0
 S
 #3319
 orange chicken and pears~
 3319 1
-3 -1 h 6 3200
+3 -1 h 6 -1
 R
-3200 1  # 1x a cut of poultry
+3200 1 0 0
 R
-11106 1  # 1x some juicy pears
+11106 1 0 0
 R
-3010 1  # 1x a sack of oranges
+3010 1 0 0
 S
 #3320
 sausage link~
 3320 1
-3 -1 h 4 3012
+3 -1 h 4 -1
 R
-3012 1  # 1x a fillet of raw meat
+3012 1 0 0
 R
-3201 1  # 1x a slab of pork
+3201 1 0 0
 S
 #3321
 road biscuit~
 3321 4
-3 -1 h 6 3312
+3 -1 h 6 -1
 R
-3012 1  # 1x a fillet of raw meat
+3005 1 0 0
 R
-3005 1  # 1x a bushel of corn
+3013 1 0 0
 R
-3312 1  # 1x a sack of flour
+17 1 1 0
 R
-3013 1  # 1x a handful of nuts
+8 1 1 0
 S
 #3322
 mushroom plate~
 3322 1
-3 -1 h 6 3310
+3 -1 h 6 -1
 R
-3312 1  # 1x a sack of flour
+3011 1 0 0
 R
-3011 1  # 1x a sack of dried rice
+3200 1 0 0
 R
-3200 1  # 1x a cut of poultry
+3310 1 0 0
 R
-3310 1  # 1x a wood ear mushroom
+8 1 1 0
 S
 #3323
 pumpkin pie~
 3323 1
-3 -1 h 6 3023
+3 -1 h 6 -1
 R
-3312 1  # 1x a sack of flour
+3023 1 0 0
 R
-3023 1  # 1x a basket of gourds
+8 1 1 0
 S
 #3324
 blackberry tart~
 3324 2
-3 -1 bh 5 11104
+3 -1 bh 5 -1
 R
-11104 1  # 1x a bunch of blackberries
+11104 1 0 0
 R
-3312 1  # 1x a sack of flour
+8 1 1 0
 S
 #3325
 nutty squash flatbread~
 3325 2
-3 -1 bh 6 3022
+3 -1 bh 6 -1
 R
-3022 1  # 1x a yellow squash
+3022 1 0 0
 R
-3311 1  # 1x a jar of olive oil
+3013 1 0 0
 R
-3307 1  # 1x a sack of cornmeal
+20 1 1 0
 R
-3013 1  # 1x a handful of nuts
+8 1 1 0
 S
 #3326
 roast plate~
 3326 1
-3 -1 h 6 3012
+3 -1 h 6 -1
 R
-3012 1  # 1x a fillet of raw meat
+17 1 1 0
 R
-3023 1  # 1x a basket of gourds
-R
-11102 1  # 1x a bunch of carrots
+27 2 1 2
 S
 #3327
 fish plate~
 3327 1
-3 -1 h 6 1302
+3 -1 h 6 -1
 R
-1302 1  # 1x a giant linefish
+1302 1 0 0
 R
-3011 1  # 1x a sack of dried rice
+3011 1 0 0
 R
-3021 1  # 1x a basket of peas
+27 1 1 2
 S
 #3328
 catfish plate~
 3328 1
 3 -1 h 6 11137
 R
-11137 1  # 1x a catfish fillet
+11137 1 0 0
 R
-3312 1  # 1x a sack of flour
-R
-3307 1  # 1x a sack of cornmeal
+8 2 1 0
 S
 #3329
 roast meat~
 3329 1
-3 -1 h 4 3012
+3 -1 h 4 -1
 R
-3012 1  # 1x a fillet of raw meat
+3012 1 0 0
 S
 #3330
 banana pie~
 3330 1
-3 -1 gh 6 3028
+3 -1 gh 6 -1
 R
-3028 1  # 1x a bunch of bananas
+3028 1 0 0
 R
-3312 1  # 1x a sack of flour
+8 1 1 0
 S
 #3331
 banana bread~
 3331 1
-3 -1 h 6 3028
+3 -1 h 6 -1
 R
-3312 2  # 2x a sack of flour
+3028 1 0 0
 R
-3028 1  # 1x a bunch of bananas
+8 2 1 0
 S
 #3332
 pepper spray~
 3332 1
-7 160 0 3 3034
+7 160 0 3 -1
 R
-3034 1  # 1x a basket of peppers
+3034 1 0 0
 S
 #3333
 spicy jerky~
 3333 1
-3 -1 bh 6 3012
+3 -1 bh 6 -1
 R
-3012 1  # 1x a fillet of raw meat
+3012 1 0 0
 R
-3034 1  # 1x a basket of peppers
+3034 1 0 0
 S
 #3334
 potato slices~
 3334 1
-3 -1 gh 4 3036
+3 -1 gh 4 -1
 R
-3036 1  # 1x a sack of potatoes
+3036 1 0 0
 S
 #3335
 prunes~
 3335 2
-3 -1 0 4 3037
+3 -1 0 4 -1
 R
-3037 1  # 1x a basket of plums
+3037 1 0 0
 S
 #3336
 plum pie~
 3336 1
-3 -1 gh 6 3037
+3 -1 gh 6 -1
 R
-3037 1  # 1x a basket of plums
+3037 1 0 0
 R
-3312 1  # 1x a sack of flour
+8 1 1 0
 S
 #3337
 strawberry pie~
 3337 1
-3 -1 gh 6 3039
+3 -1 gh 6 -1
 R
-3039 1  # 1x a basket of strawberries
+3039 1 0 0
 R
-3312 1  # 1x a sack of flour
+8 1 1 0
 S
 #3338
 strawberry jam~
 3338 1
-3 -1 bh 3 3039
+3 -1 bh 3 -1
 R
-3039 1  # 1x a basket of strawberries
+3039 1 0 0
 R
-801 1  # 1x a jar
+801 1 0 0
 S
 #3339
 candied mango~
 3339 1
-3 -1 bh 2 3042
+3 -1 bh 2 -1
 R
-3042 1  # 1x a single ripe mango
+3042 1 0 0
 S
 #3340
 blueberry pie~
 3340 1
-3 -1 gh 6 3043
+3 -1 gh 6 -1
 R
-3043 1  # 1x a basket of blueberries
+3043 1 0 0
 R
-3312 1  # 1x a sack of flour
+8 1 1 0
 S
 #3341
 blueberry jam~
 3341 1
-3 -1 bh 3 3043
+3 -1 bh 3 -1
 R
-3043 1  # 1x a basket of blueberries
+3043 1 0 0
 R
-801 1  # 1x a jar
+801 1 0 0
 S
 #3342
 coffee~
 9 50
-3 -1 hi 1 3045
+3 -1 hi 1 -1
 R
-3045 1  # 1x a sack of coffee beans
+3045 1 0 0
 S
 #3343
 oatmeal~
 3343 2
-5 -1 0 4 3046
+5 -1 0 4 -1
 R
-3046 1  # 1x a sack of oats
+3046 1 0 0
 S
 #3344
 oat cake~
 3344 2
-3 -1 h 5 3343
+3 -1 h 5 -1
 R
-3343 1  # 1x a sack of oatmeal
+3343 1 0 0
 S
 $

@@ -196,12 +196,8 @@ pattern leggings dragonscale~
 the dragonscale leggings pattern~
 The dragonscale leggings pattern is sitting here.~
 Sew (requires Magical Vestments and a fire): dragonscale leggings
-  3x dragon scale
-  4x large piece of leather
-  6x yellow lightning stone
-  6x ingot of nocturnium
 ~
-3 0 a 3
+3 0 a 4
 0 0 0
 0 0
 S
@@ -210,12 +206,8 @@ pattern stockings dragonweave~
 the dragonweave stockings pattern~
 The dragonweave stockings pattern is sitting here.~
 Sew (requires Magical Vestments and a fire): dragonweave stockings
-  3x dragon scale
-  4x large piece of leather
-  6x yellow lightning stone
-  6x ingot of nocturnium
 ~
-3 0 a 4
+3 0 a 5
 0 0 0
 0 0
 S
@@ -238,12 +230,8 @@ pattern dragonmail chaps~
 the dragonmail chaps pattern~
 The dragonmail chaps pattern is sitting here.~
 Craft (requires Dangerous Leathers and a fire): dragonmail chaps
-  3x dragon scale
-  4x large piece of leather
-  6x red bloodstone
-  8x imperium ingot
 ~
-3 0 a 6
+3 0 a 7
 0 0 0
 0 0
 S
@@ -385,12 +373,8 @@ pattern wristguard dragonscale~
 the dragonscale wristguard pattern~
 The dragonscale wristguard pattern is lying here.~
 Forge (Imperial Armors): dragonscale wristguard  [125-200]
-  3x dragon scale
-  2x small piece of leather
-  10x imperium ingot
-  6x red bloodstone
 ~
-3 0 a 2
+3 0 a 3
 0 0 0
 0 0
 S
@@ -418,11 +402,8 @@ pattern bangles dragonscale~
 the dragonscale bangles pattern~
 The dragonscale bangles pattern is here.~
 Craft (Magical Vestments): dragonscale bangles  [125-200]
-  3x dragon scale
-  10x ingot of nocturnium
-  8x yellow lightning stone
 ~
-3 0 a 3
+3 0 a 4
 0 0 0
 0 0
 S
@@ -450,12 +431,8 @@ pattern dragonscale bracers~
 the dragonscale bracers pattern~
 The dragonscale bracers pattern is here.~
 Sew (Dangerous Leathers): dragonscale bracers  [125-200]
-  3x dragon scale
-  2x small piece of leather
-  10x imperium ingot
-  6x red bloodstone
 ~
-3 0 a 4
+3 0 a 5
 0 0 0
 0 0
 S
@@ -480,11 +457,8 @@ pattern dragonscale saddle~
 the dragonscale saddle pattern~
 The dragonscale saddle pattern is here.~
 Sew (Dangerous Leathers): dragonscale saddle  [125-200]
-  2x dragon scale
-  8x large piece of leather
-  6x iridescent blue iris
 ~
-3 0 a 3
+3 0 a 4
 0 0 0
 0 0
 S

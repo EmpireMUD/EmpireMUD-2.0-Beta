@@ -75,6 +75,9 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !can_forge(ch)) {
 		// sends its own message
 	}
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT && ((!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_FORGE) && BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_FOUNDRY) || !IS_COMPLETE(IN_ROOM(ch)))) {
+		msg_to_char(ch, "You can't %s here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+	}
 	
 	// flag checks
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) && !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &room_wait)) {
@@ -439,7 +442,7 @@ void show_craft_info(char_data *ch, craft_data *craft) {
 	extern const char *drinks[];
 	extern const char *item_types[];
 	
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], range[MAX_STRING_LENGTH];
 	struct obj_apply *apply;
 	ability_data *abil;
 	obj_data *proto;
@@ -469,11 +472,18 @@ void show_craft_info(char_data *ch, craft_data *craft) {
 		}
 		strcat(buf, ")");
 		
-		if (GET_CRAFT_QUANTITY(craft) == 1) {
-			msg_to_char(ch, "Creates: %s%s\r\n", get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), buf);
+		if (GET_OBJ_MIN_SCALE_LEVEL(proto) > 0 || GET_OBJ_MAX_SCALE_LEVEL(proto) > 0) {
+			sprintf(range, " [%s]", level_range_string(GET_OBJ_MIN_SCALE_LEVEL(proto), GET_OBJ_MAX_SCALE_LEVEL(proto), 0));
 		}
 		else {
-			msg_to_char(ch, "Creates: %dx %s%s\r\n", GET_CRAFT_QUANTITY(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), buf);
+			*range = '\0';
+		}
+		
+		if (GET_CRAFT_QUANTITY(craft) == 1) {
+			msg_to_char(ch, "Creates: %s%s%s\r\n", get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), range, buf);
+		}
+		else {
+			msg_to_char(ch, "Creates: %dx %s%s%s\r\n", GET_CRAFT_QUANTITY(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), range, buf);
 		}
 	}
 	
@@ -487,6 +497,10 @@ void show_craft_info(char_data *ch, craft_data *craft) {
 			sprintf(buf + strlen(buf), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		}
 		msg_to_char(ch, "Requires: %s\r\n", buf);
+	}
+	
+	if (GET_CRAFT_MIN_LEVEL(craft) > 0) {
+		msg_to_char(ch, "Requires: crafting level %d\r\n", GET_CRAFT_MIN_LEVEL(craft));
 	}
 	
 	prettier_sprintbit(GET_CRAFT_FLAGS(craft), craft_flag_for_info, part);
@@ -519,23 +533,26 @@ void show_craft_info(char_data *ch, craft_data *craft) {
 
 // CRAFT_TYPE_x
 struct gen_craft_data_t gen_craft_data[] = {
-	{ "error", "erroring", { "", "" } },	// dummy to require scmd
+	{ "error", "erroring", NOBITS, { "", "" } },	// dummy to require scmd
 	
 	// Note: These correspond to CRAFT_TYPE_x so you cannot change the order.
-	{ "forge", "forging", { "You hit the %s on the anvil hard with $p!", "$n hits the %s on the anvil hard with $p!" } },
-	{ "craft", "crafting", { "You continue crafting the %s...", "$n continues crafting the %s..." } },
-	{ "cook", "cooking", { "You continue cooking the %s...", "$n continues cooking the %s..." } },
-	{ "sew", "sewing", { "You carefully sew the %s...", "$n carefully sews the %s..." } },
-	{ "mill", "milling", { "You grind the millstone, making %s...", "$n grinds the millstone, making %s..." } },
-	{ "brew", "brewing", { "You stir the potion and infuse it with mana...", "$n stirs the potion..." } },
-	{ "mix", "mixing", { "The poison bubbles as you stir it...", "$n stirs the bubbling poison..." } },
+	{ "forge", "forging", NOBITS, { "You hit the %s on the anvil hard with $p!", "$n hits the %s on the anvil hard with $p!" } },
+	{ "craft", "crafting", NOBITS, { "You continue crafting the %s...", "$n continues crafting the %s..." } },
+	{ "cook", "cooking", ACTF_FAST_CHORES, { "You continue cooking the %s...", "$n continues cooking the %s..." } },
+	{ "sew", "sewing", NOBITS, { "You carefully sew the %s...", "$n carefully sews the %s..." } },
+	{ "mill", "milling", NOBITS, { "You grind the millstone, making %s...", "$n grinds the millstone, making %s..." } },
+	{ "brew", "brewing", NOBITS, { "You stir the potion and infuse it with mana...", "$n stirs the potion..." } },
+	{ "mix", "mixing", NOBITS, { "The poison bubbles as you stir it...", "$n stirs the bubbling poison..." } },
 	
 	// build is special and doesn't use do_gen_craft, so doesn't really use this data
-	{ "build", "building", { "You work on the building...", "$n works on the building..." } },
+	{ "build", "building", NOBITS, { "You work on the building...", "$n works on the building..." } },
 	
-	{ "weave", "weaving", { "You carefully weave the %s...", "$n carefully weaves the %s..." } },
-	{ "workforce", "producing", { "You work on the %s...", "$n work on the %s..." } },	// not used by players
-	{ "manufacture", "manufacturing", { "You carefully manufacture the %s...", "$n carefully manufactures the %s..." } },
+	{ "weave", "weaving", NOBITS, { "You carefully weave the %s...", "$n carefully weaves the %s..." } },
+	
+	{ "workforce", "producing", NOBITS, { "You work on the %s...", "$n work on the %s..." } },	// not used by players
+	
+	{ "manufacture", "manufacturing", NOBITS, { "You carefully manufacture the %s...", "$n carefully manufactures the %s..." } },
+	{ "smelt", "smelting", ACTF_FAST_CHORES, { "You smelt the %s in the fire...", "$n smelts the %s in the fire..." } },
 };
 
 

@@ -310,7 +310,9 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_SEPARATE  15
 #define INTERACT_SCRAPE  16
 #define INTERACT_SAW  17
-#define NUM_INTERACTS  18
+#define INTERACT_TAN  18
+#define INTERACT_CHIP  19
+#define NUM_INTERACTS  20
 
 
 // for object saving
@@ -676,6 +678,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_TYPE_WEAVE  9
 #define CRAFT_TYPE_WORKFORCE  10
 #define CRAFT_TYPE_MANUFACTURE  11
+#define CRAFT_TYPE_SMELT  12
 
 
 // CRAFT_x: Craft Flags for do_gen_craft
@@ -913,7 +916,8 @@ typedef struct vehicle_data vehicle_data;
 
 
 // misc game configs
-#define ACTION_CYCLE_TIME  10	// seconds per action tick (before haste) -- TODO should this be a config?
+#define ACTION_CYCLE_TIME  5	// seconds per action tick (before haste) -- TODO should this be a config?
+#define ACTION_CYCLE_MULTIPLIER  2	// make action cycles longer so things can make them go faster
 #define HISTORY_SIZE  5	// Keep last 5 commands.
 
 
@@ -1300,7 +1304,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_MINING			8
 #define ACT_MINTING			9
 #define ACT_FISHING			10
-#define ACT_MELTING			11
+	#define ACT_UNUSED1  11
 #define ACT_REPAIRING		12
 #define ACT_CHIPPING		13
 #define ACT_PANNING			14
@@ -3073,6 +3077,7 @@ struct craft_data {
 struct gen_craft_data_t {
 	char *command;	// "forge"
 	char *verb;	// "forging"
+	bitvector_t actf_flags;	// additional ACTF_ flags
 	char *strings[2];	// periodic message { to char, to room }
 };
 
@@ -3184,25 +3189,6 @@ struct potion_data_type {
 	int apply;	// APPLY_
 	bitvector_t aff;
 	int spec;	// POTION_SPEC_
-};
-
-
-// skills.c
-struct smelt_data_type {
-	obj_vnum from;
-	int from_amt;
-	
-	obj_vnum to;
-	int to_amt;
-	
-	bool workforce;
-};
-
-
-// tanning data
-struct tanning_data_type {
-	obj_vnum from;
-	obj_vnum to;
 };
 
 

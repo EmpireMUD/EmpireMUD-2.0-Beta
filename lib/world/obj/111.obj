@@ -17,9 +17,8 @@ A colossal ribcage is lying here.~
    This could be made into a handy boat, but you'll have trouble picking it up
 again afterwards.
 Craft (no skill): rib-bone boat
-  1x colossal ribcage
 ~
-3 e a 5
+3 e a 6
 0 0 0
 14 0
 S
@@ -164,18 +163,16 @@ A faintly glowing green stone is sitting here.~
 You could make this into a beautiful necklace... But in what shape?
 
 Forge (Jewelry): cave viper sigil (mage neck)
- 1x serpent stone
- 2x silver nugget
 Forge (Jewelry): serpent pendant (melee neck)
- 1x serpent stone
- 2x silver nugget
 Forge (Jewelry): skink amulet (tank neck)
- 1x serpent stone
- 2x silver nugget
 ~
-3 0 a 3
+3 0 a 4
 0 0 0
 12 0
+R
+5164 0
+R
+5511 0
 S
 #11114
 cape scarlet-feathered feathered~
@@ -388,11 +385,10 @@ an opal carapace~
 A shard of opal carapace shines nearby.~
    The carapace -- tough as plate mail -- swirls in blends of gold, green, and
 blue against a midnight backdrop.
+
 Forge (Imperial Armors): opal carapace buckler
- 18x opal carapace
- 2x imperium ingot
 ~
-3 0 a 2
+3 0 a 3
 0 0 0
 14 0
 R
@@ -435,11 +431,10 @@ a catfish dorsal spine~
 The dorsal spine of a catfish floats nearby.~
    This bonified spike is heavy as a spearhead, and will inflict substantial
 puncture wounds.
+
 Craft (Deadly Weapons): dorsal spine mace
- 2x catfish dorsal spine
- 1x wooden handle
 ~
-1 mo an 1
+1 mo an 2
 0 1 3
 14 0
 A
@@ -567,17 +562,16 @@ stand out brightly against the thin-leafed tree and its swaddling ivy.
 0 0
 S
 #11145
-scales titanaconda~
+scales titanaconda's titanacondas~
 the titanaconda's scales~
 A length of titanaconda's scales float nearby.~
    A tough, flexible strip of the titanaconta's scales would make good
 protection.
-Sew (Imperial Armors): Titanaconda scale coat/trousers
- 2x titanaconda's scales
- 1x large leather
- 3x iron ingot
+
+Sew (Imperial Armors): titanaconda scale coat
+Sew (Imperial Armors): titanaconda scale trousers
 ~
-3 e a 1
+3 e a 2
 0 0 0
 7 0
 R

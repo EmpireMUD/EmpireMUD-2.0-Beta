@@ -169,9 +169,10 @@ a small skin~
 A small pile of skin is stacked on the ground.~
 Skin can be tanned to make leather.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 7 0
+I 18 1356 100.00 1  # TAN: a small piece of leather
 O
 24 o
 R
@@ -183,9 +184,10 @@ a large skin~
 A large pile of skin is stacked on the ground.~
 Skin can be tanned to make leather.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 7 0
+I 18 1357 100.00 1  # TAN: a large piece of leather
 O
 24 f
 R

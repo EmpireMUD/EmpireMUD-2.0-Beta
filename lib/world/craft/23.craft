@@ -447,7 +447,7 @@ clockwork lens array~
 2343 1
 2 243 c 12 -1
 R
-162 2 0 0
+171 1 0 0
 R
 175 4 0 0
 S
@@ -458,7 +458,7 @@ guild patterned cloth~
 R
 26 4 1 0
 R
-161 2 0 0
+170 2 0 0
 S
 #2345
 clips and buckles~
@@ -497,7 +497,7 @@ R
 R
 1205 2 0 0
 R
-176 2 0 0
+18 2 1 1024
 S
 #2352
 antique device parts~
@@ -506,11 +506,11 @@ antique device parts~
 L
 200
 R
-161 8 0 0
+170 6 0 0
 R
-162 2 0 0
+171 1 0 0
 R
-178 4 0 0
+18 4 1 262144
 S
 #2353
 concealed pouches~
@@ -536,9 +536,9 @@ tinker harness~
 L
 200
 R
-177 2 0 0
+18 2 1 1024
 R
-175 8 0 0
+18 8 1 262144
 R
 1354 2 0 0
 R
@@ -564,9 +564,9 @@ L
 R
 2352 1 0 0
 R
-162 1 0 0
+171 1 0 0
 R
-178 2 0 0
+18 2 1 262144
 S
 #2357
 superb smuggling sash~

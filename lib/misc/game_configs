@@ -45,7 +45,6 @@ pick_depletion 14
 planting_base_timer 120
 shear_growth_time 6
 short_depletion 25
-smelt_timer 4
 tan_timer 12
 tavern_brew_time 10
 tavern_timer 60
