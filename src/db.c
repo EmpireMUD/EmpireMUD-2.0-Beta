@@ -612,10 +612,12 @@ void check_for_bad_buildings(void) {
 			log(" unlinking instance entrance room %d for no association with an instance", GET_ROOM_VNUM(room));
 			unlink_instance_entrance(room);
 		}
+		/* This probably isn't necessary and having it here will cause roads to be pulled up as of b3.17 -paul
 		else if (COMPLEX_DATA(room) && !GET_BUILDING(room) && !GET_ROOM_TEMPLATE(room)) {
 			log(" removing complex data from %d for no building, no template data", GET_ROOM_VNUM(room));
 			disassociate_building(room);
 		}
+		*/
 	}
 	if (deleted) {
 		check_all_exits();
