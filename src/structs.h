@@ -916,7 +916,8 @@ typedef struct vehicle_data vehicle_data;
 
 
 // misc game configs
-#define ACTION_CYCLE_TIME  10	// seconds per action tick (before haste) -- TODO should this be a config?
+#define ACTION_CYCLE_TIME  5	// seconds per action tick (before haste) -- TODO should this be a config?
+#define ACTION_CYCLE_MULTIPLIER  2	// make action cycles longer so things can make them go faster
 #define HISTORY_SIZE  5	// Keep last 5 commands.
 
 

@@ -173,7 +173,7 @@ void start_action(char_data *ch, int type, int timer) {
 	}
 
 	GET_ACTION(ch) = type;
-	GET_ACTION_CYCLE(ch) = ACTION_CYCLE_TIME;
+	GET_ACTION_CYCLE(ch) = ACTION_CYCLE_TIME * ACTION_CYCLE_MULTIPLIER;
 	GET_ACTION_TIMER(ch) = timer;
 	GET_ACTION_VNUM(ch, 0) = 0;
 	GET_ACTION_VNUM(ch, 1) = 0;
@@ -262,24 +262,24 @@ void update_actions(void) {
 		}
 		
 		// action-cycle is time remaining -- compute how fast we go through it
-		speed = 2;	// default is 2 per second (allowing it to be slowed)
+		speed = ACTION_CYCLE_MULTIPLIER;	// makes it a full second
 		
 		// things that modify speed...
 		if (IS_SET(act_flags, ACTF_ALWAYS_FAST)) {
-			speed += 2;
+			speed += ACTION_CYCLE_MULTIPLIER;
 		}
 		if (IS_SET(act_flags, ACTF_HASTE) && AFF_FLAGGED(ch, AFF_HASTE)) {
-			speed += 2;
+			speed += ACTION_CYCLE_MULTIPLIER;
 		}
 		if (IS_SET(act_flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-			speed += 2;
+			speed += ACTION_CYCLE_MULTIPLIER;
 		}
 		if (IS_SET(act_flags, ACTF_FINDER) && has_ability(ch, ABIL_FINDER)) {
-			speed += 2;
+			speed += ACTION_CYCLE_MULTIPLIER;
 			gain_ability_exp(ch, ABIL_FINDER, 0.1);
 		}
 		if (IS_SET(act_flags, ACTF_SHOVEL) && has_shovel(ch)) {
-			speed += 2;
+			speed += ACTION_CYCLE_MULTIPLIER;
 		}
 		
 		// things that slow you down
@@ -292,7 +292,7 @@ void update_actions(void) {
 		
 		if (GET_ACTION_CYCLE(ch) <= 0) {
 			// reset cycle timer
-			GET_ACTION_CYCLE(ch) = ACTION_CYCLE_TIME;
+			GET_ACTION_CYCLE(ch) = ACTION_CYCLE_TIME * ACTION_CYCLE_MULTIPLIER;
 			
 			// end hide at this point, as if they had typed a command each tick
 			REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);

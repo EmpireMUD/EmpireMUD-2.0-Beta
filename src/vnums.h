@@ -90,22 +90,8 @@
 #define o_WHEAT  141
 #define o_HOPS  143
 #define o_BARLEY  145
-#define o_IRON_ORE  160
-#define o_SILVER  161
-#define o_GOLD  162
-#define o_NOCTURNIUM_ORE  163
-#define o_IMPERIUM_ORE  164
-#define o_COPPER  165
-#define o_SILVER_DISC  170
-#define o_GOLD_DISC  171
-#define o_SILVER_BAR  172
-#define o_GOLD_BAR  173
 #define o_GOLD_SMALL  174
 #define o_IRON_INGOT  175
-#define o_NOCTURNIUM_INGOT  176
-#define o_IMPERIUM_INGOT  177
-#define o_COPPER_INGOT  178
-#define o_COPPER_BAR  179
 #define o_HANDAXE  181
 #define o_FLINT_SET  183
 
