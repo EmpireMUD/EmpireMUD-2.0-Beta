@@ -130,10 +130,14 @@ void random_mtrigger(char_data *ch) {
 	* This trigger is only called if a char is in the zone without nohassle.
 	*/
 
-	if (!SCRIPT_CHECK(ch, MTRIG_RANDOM) || AFF_FLAGGED(ch, AFF_CHARM))
+	if (!SCRIPT_CHECK(ch, MTRIG_RANDOM)) {
 		return;
+	}
 
 	for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
+		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+			continue;
+		}
 		if (TRIGGER_CHECK(t, MTRIG_RANDOM) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 			sdd.c = ch;
@@ -155,8 +159,9 @@ void greet_memory_mtrigger(char_data *actor) {
 		return;
 
 	for (ch = ROOM_PEOPLE(IN_ROOM(actor)); ch; ch = ch->next_in_room) {
-		if (!SCRIPT_MEM(ch) || !AWAKE(ch) || FIGHTING(ch) || (ch == actor) || AFF_FLAGGED(ch, AFF_CHARM))
+		if (!SCRIPT_MEM(ch) || !AWAKE(ch) || FIGHTING(ch) || (ch == actor)) {
 			continue;
+		}
 		/* find memory line with command only */
 		for (mem = SCRIPT_MEM(ch); mem && SCRIPT_MEM(ch); mem=mem->next) {
 			if (GET_ID(actor)!=mem->id) continue;
@@ -168,6 +173,9 @@ void greet_memory_mtrigger(char_data *actor) {
 			/* if a command was not performed execute the memory script */
 			if (mem && !command_performed) {
 				for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
+					if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+						continue;
+					}
 					if (IS_SET(GET_TRIG_TYPE(t), MTRIG_MEMORY) && CAN_SEE(ch, actor) && !GET_TRIG_DEPTH(t) && number(1, 100) <= GET_TRIG_NARG(t)) {
 						union script_driver_data_u sdd;
 						ADD_UID_VAR(buf, t, actor, "actor", 0);
@@ -206,7 +214,7 @@ int greet_mtrigger(char_data *actor, int dir) {
 		return TRUE;
 
 	for (ch = ROOM_PEOPLE(IN_ROOM(actor)); ch; ch = ch->next_in_room) {
-		if (!SCRIPT_CHECK(ch, MTRIG_GREET | MTRIG_GREET_ALL) || (ch == actor) || AFF_FLAGGED(ch, AFF_CHARM)) {
+		if (!SCRIPT_CHECK(ch, MTRIG_GREET | MTRIG_GREET_ALL) || (ch == actor)) {
 			continue;
 		}
 		if (!SCRIPT_CHECK(ch, MTRIG_GREET_ALL) && (!AWAKE(ch) || FIGHTING(ch) || AFF_FLAGGED(actor, AFF_SNEAK))) {
@@ -214,6 +222,9 @@ int greet_mtrigger(char_data *actor, int dir) {
 		}
 
 		for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
+			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+				continue;
+			}
 			if (((IS_SET(GET_TRIG_TYPE(t), MTRIG_GREET) && CAN_SEE(ch, actor)) || IS_SET(GET_TRIG_TYPE(t), MTRIG_GREET_ALL)) && !GET_TRIG_DEPTH(t) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 				union script_driver_data_u sdd;
 				if (dir>=0 && dir < NUM_OF_DIRS)
@@ -239,7 +250,7 @@ void entry_memory_mtrigger(char_data *ch) {
 	struct script_memory *mem;
 	char buf[MAX_INPUT_LENGTH];
 
-	if (!SCRIPT_MEM(ch) || AFF_FLAGGED(ch, AFF_CHARM))
+	if (!SCRIPT_MEM(ch))
 		return;
 
 	for (actor = ROOM_PEOPLE(IN_ROOM(ch)); actor && SCRIPT_MEM(ch); actor = actor->next_in_room) {
@@ -280,10 +291,13 @@ void entry_memory_mtrigger(char_data *ch) {
 int entry_mtrigger(char_data *ch) {
 	trig_data *t;
 
-	if (!SCRIPT_CHECK(ch, MTRIG_ENTRY) || AFF_FLAGGED(ch, AFF_CHARM))
+	if (!SCRIPT_CHECK(ch, MTRIG_ENTRY))
 		return 1;
 
 	for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
+		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+			continue;
+		}
 		if (TRIGGER_CHECK(t, MTRIG_ENTRY) && (number(1, 100) <= GET_TRIG_NARG(t))){
 			union script_driver_data_u sdd;
 			sdd.c = ch;
@@ -317,8 +331,11 @@ int command_mtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 	for (ch = ROOM_PEOPLE(IN_ROOM(actor)); ch; ch = ch_next) {
 		ch_next = ch->next_in_room;
 
-		if (SCRIPT_CHECK(ch, MTRIG_COMMAND) && !AFF_FLAGGED(ch, AFF_CHARM) && (actor!=ch)) {
+		if (SCRIPT_CHECK(ch, MTRIG_COMMAND) && (actor!=ch)) {
 			for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
+				if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+					continue;
+				}
 				if (!TRIGGER_CHECK(t, MTRIG_COMMAND))
 					continue;
 
@@ -355,8 +372,11 @@ void speech_mtrigger(char_data *actor, char *str) {
 	for (ch = ROOM_PEOPLE(IN_ROOM(actor)); ch; ch = ch_next) {
 		ch_next = ch->next_in_room;
 
-		if (SCRIPT_CHECK(ch, MTRIG_SPEECH) && AWAKE(ch) && !AFF_FLAGGED(ch, AFF_CHARM) && (actor!=ch)) {
+		if (SCRIPT_CHECK(ch, MTRIG_SPEECH) && AWAKE(ch) && (actor!=ch)) {
 			for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
+				if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+					continue;
+				}
 				if (!TRIGGER_CHECK(t, MTRIG_SPEECH))
 					continue;
 
@@ -383,8 +403,11 @@ void act_mtrigger(const char_data *ch, char *str, char_data *actor, char_data *v
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
 
-	if (SCRIPT_CHECK(ch, MTRIG_ACT) && !AFF_FLAGGED(ch, AFF_CHARM) && (actor!=ch)) {
+	if (SCRIPT_CHECK(ch, MTRIG_ACT) && (actor!=ch)) {
 		for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next)  {
+			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+				continue;
+			}
 			if (!TRIGGER_CHECK(t, MTRIG_ACT))
 				continue;
 
@@ -426,14 +449,14 @@ void fight_mtrigger(char_data *ch) {
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
 
-	if (!SCRIPT_CHECK(ch, MTRIG_FIGHT | MTRIG_FIGHT_CHARMED) || !FIGHTING(ch))
+	if (!SCRIPT_CHECK(ch, MTRIG_FIGHT) || !FIGHTING(ch))
 		return;
 
 	for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
-		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_FIGHT_CHARMED)) {
+		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 			continue;
 		}
-		if (TRIGGER_CHECK(t, MTRIG_FIGHT | MTRIG_FIGHT_CHARMED) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+		if (TRIGGER_CHECK(t, MTRIG_FIGHT) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 
 			actor = FIGHTING(ch);
@@ -455,10 +478,13 @@ void hitprcnt_mtrigger(char_data *ch) {
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
 
-	if (!SCRIPT_CHECK(ch, MTRIG_HITPRCNT) || !FIGHTING(ch) || AFF_FLAGGED(ch, AFF_CHARM))
+	if (!SCRIPT_CHECK(ch, MTRIG_HITPRCNT) || !FIGHTING(ch))
 		return;
 
 	for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
+		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+			continue;
+		}
 		if (TRIGGER_CHECK(t, MTRIG_HITPRCNT) && GET_MAX_HEALTH(ch) && (((GET_HEALTH(ch) * 100) / MAX(1, GET_MAX_HEALTH(ch))) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 
@@ -477,10 +503,13 @@ int receive_mtrigger(char_data *ch, char_data *actor, obj_data *obj) {
 	char buf[MAX_INPUT_LENGTH];
 	int ret_val;
 
-	if (!SCRIPT_CHECK(ch, MTRIG_RECEIVE) || AFF_FLAGGED(ch, AFF_CHARM))
+	if (!SCRIPT_CHECK(ch, MTRIG_RECEIVE))
 		return 1;
 
 	for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
+		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+			continue;
+		}
 		if (TRIGGER_CHECK(t, MTRIG_RECEIVE) && (number(1, 100) <= GET_TRIG_NARG(t))){
 			union script_driver_data_u sdd;
 
@@ -503,10 +532,13 @@ int death_mtrigger(char_data *ch, char_data *actor) {
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
 
-	if (!SCRIPT_CHECK(ch, MTRIG_DEATH) || AFF_FLAGGED(ch, AFF_CHARM))
+	if (!SCRIPT_CHECK(ch, MTRIG_DEATH))
 	return 1;
 
 	for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
+		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+			continue;
+		}
 		if (TRIGGER_CHECK(t, MTRIG_DEATH) && (number(1, 100) <= GET_TRIG_NARG(t))){
 			union script_driver_data_u sdd;
 
@@ -524,10 +556,13 @@ void bribe_mtrigger(char_data *ch, char_data *actor, int amount) {
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
 
-	if (!SCRIPT_CHECK(ch, MTRIG_BRIBE) || AFF_FLAGGED(ch, AFF_CHARM))
+	if (!SCRIPT_CHECK(ch, MTRIG_BRIBE))
 		return;
 
 	for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
+		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+			continue;
+		}
 		if (TRIGGER_CHECK(t, MTRIG_BRIBE) && (amount >= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 			sdd.c = ch;
@@ -567,10 +602,13 @@ int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil) {
 		return 1;
 	}
 
-	if (!SCRIPT_CHECK(ch, MTRIG_ABILITY) || AFF_FLAGGED(ch, AFF_CHARM))
+	if (!SCRIPT_CHECK(ch, MTRIG_ABILITY))
 		return 1;
 
 	for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
+		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+			continue;
+		}
 		if (TRIGGER_CHECK(t, MTRIG_ABILITY) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 
@@ -593,7 +631,7 @@ int leave_mtrigger(char_data *actor, int dir) {
 	char buf[MAX_INPUT_LENGTH];
 
 	for (ch = ROOM_PEOPLE(IN_ROOM(actor)); ch; ch = ch->next_in_room) {
-		if (!SCRIPT_CHECK(ch, MTRIG_LEAVE | MTRIG_LEAVE_ALL) || (ch == actor) || AFF_FLAGGED(ch, AFF_CHARM)) {
+		if (!SCRIPT_CHECK(ch, MTRIG_LEAVE | MTRIG_LEAVE_ALL) || (ch == actor)) {
 			continue;
 		}
 		if (!SCRIPT_CHECK(ch, MTRIG_LEAVE_ALL) && (!AWAKE(ch) || FIGHTING(ch))) {
@@ -601,6 +639,9 @@ int leave_mtrigger(char_data *actor, int dir) {
 		}
 
 		for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
+			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+				continue;
+			}
 			if (((IS_SET(GET_TRIG_TYPE(t), MTRIG_LEAVE) && CAN_SEE(ch, actor)) || IS_SET(GET_TRIG_TYPE(t), MTRIG_LEAVE_ALL)) && !GET_TRIG_DEPTH(t) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 				union script_driver_data_u sdd;
 				if (dir>=0 && dir < NUM_OF_DIRS)
@@ -623,10 +664,13 @@ int door_mtrigger(char_data *actor, int subcmd, int dir) {
 	char buf[MAX_INPUT_LENGTH];
 
 	for (ch = ROOM_PEOPLE(IN_ROOM(actor)); ch; ch = ch->next_in_room) {
-		if (!SCRIPT_CHECK(ch, MTRIG_DOOR) || !AWAKE(ch) || FIGHTING(ch) || (ch == actor) || AFF_FLAGGED(ch, AFF_CHARM))
+		if (!SCRIPT_CHECK(ch, MTRIG_DOOR) || !AWAKE(ch) || FIGHTING(ch) || (ch == actor))
 			continue;
 
 		for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
+			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+				continue;
+			}
 			if (IS_SET(GET_TRIG_TYPE(t), MTRIG_DOOR) && CAN_SEE(ch, actor) && !GET_TRIG_DEPTH(t) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 				union script_driver_data_u sdd;
 				add_var(&GET_TRIG_VARS(t), "cmd", (char *)cmd_door[subcmd], 0);

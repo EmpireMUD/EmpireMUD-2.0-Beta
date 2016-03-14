@@ -55,7 +55,7 @@
 #define MTRIG_LEAVE            BIT(16)     /* someone leaves room seen   */
 #define MTRIG_DOOR             BIT(17)     /* door manipulated in room   */
 #define MTRIG_LEAVE_ALL        BIT(18)	// leave even if they can't see
-#define MTRIG_FIGHT_CHARMED    BIT(19)	// fight trigger that fires even while charmed
+#define MTRIG_CHARMED          BIT(19)	// fight/random triggers will fire even while charmed
 
 
 /* obj trigger types */

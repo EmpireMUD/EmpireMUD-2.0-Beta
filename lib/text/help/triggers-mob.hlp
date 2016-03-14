@@ -53,6 +53,19 @@ Variables:
 
 See also: MTRIG CHARMED
 #d
+"CHARMED TRIGGER" "MTRIG CHARMED" TRIGEDIT-MOB-CHARMED
+
+Charmed (mob trigger type)
+
+The 'Charmed' trigger type modifies other types like Fight and Random, to
+allow them to trigger even if the mob is charmed.
+
+This is useful for mobs that are designed as companions or familiars. Most
+adventure mobs shouldn't use triggers while charmed, though, because players
+may find a way to abuse them.
+
+See also: MTRIG FIGHT, MTRIG RANDOM
+#d
 "DEATH TRIGGER" "MTRIG DEATH" TRIGEDIT-MOB-DEATH
 
 Death (mob trigger)
@@ -70,7 +83,7 @@ Variables:
 
 See also: MTRIG CHARMED
 #d
-"FIGHT TRIGGER" "FIGHT-CHARMED TRIGGER" "MTRIG FIGHT" "MTRIG FIGHT-CHARMED" TRIGEDIT-MOB-FIGHT TRIGEDIT-MOB-FIGHT-CHARMED
+"FIGHT TRIGGER" "MTRIG FIGHT" TRIGEDIT-MOB-FIGHT
 
 Fight (mob trigger)
 
@@ -78,13 +91,13 @@ Argument type:  percent chance to execute
 
 Activated each round of fighting, after the mobile has had all of its attacks.
 
-Charmed mobs will not activate normal Fight triggers, but you can use the
-Fight-Charmed trigger instead. This is useful for mobs that are designed as
-companions or familiars. Most adventure mobs shouldn't use triggers while
-charmed, though, because players may find a way to abuse tehm.
+Charmed mobs will not activate normal Fight triggers, but you can use add the
+Charmed trigger type to allow this.
 
 Variables:
   &c%actor%&0 - The character this mobile is fighting.
+
+See also: MTRIG CHARMED
 #d
 "HITPRCNT TRIGGER" "HITPERCENT TRIGGER" "MTRIG HITPRCNT" "MTRIG HITPERCENT" TRIGEDIT-MOB-HITPERCENT TRIGEDIT-MOB-HITPRCNT 
 
