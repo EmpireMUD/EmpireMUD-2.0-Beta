@@ -78,7 +78,7 @@ a dragon's tooth~
 A dragon's tooth is lying here.~
    You can plant these magi-netically engineered dragons' teeth in a field to
 grow more, or use several of them to craft a magic sceptre that will allow you
-to summon skeletal guards for your empire.  
+to summon skeletal guards for your empire.
 
 Craft (Jewelry): dragonstooth sceptre
 ~
@@ -429,9 +429,11 @@ A spade-axe is sticking out of the ground.~
 to be good for both chopping and digging. It's no wonder the Magiterranean
 druids have been magi-netically engineering new plants. This is useful!
 ~
-1 emou an 4
+1 emou an 5
 0 1 2
 2 0
+C
+0 100
 S
 #10528
 chowberries crunchy~
