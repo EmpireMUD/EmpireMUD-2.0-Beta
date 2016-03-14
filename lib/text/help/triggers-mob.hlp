@@ -22,13 +22,17 @@ Note: Act triggers can only match things passed through the code's act()
    function, which includes MOST game text that gets sent to the room. If you
    find that you can't get a trigger to respond to action text, consult a
    programmer about looking into how that text is being sent.
- 
+Note: Act triggers attached to charmed mobs will not fire unless the trigger
+   also has the Charmed type.
+
 Variables:
   &c%actor%&0 - The character causing the trigger to activate.
   &c%victim%&0 - The character, if any, on the receiving end of the action.
   &c%object%&0 - The object, if any, used in the action.
   &c%target%&0 - The target object of the action, if any.
   &c%arg%&0 - The entire action phrase that was seen.
+
+See also: MTRIG CHARMED
 #d
 "BRIBE TRIGGER" "MTRIG BRIBE" TRIGEDIT-MOB-BRIBE
 
@@ -40,9 +44,14 @@ Bribe is triggered when a person gives coins to the mob. The type of coin is
 not considered, because all coinage is made by players and has different
 values. Only the number of coins matters.
 
+Note: Bribe triggers attached to charmed mobs will not fire unless the trigger
+   also has the Charmed type.
+
 Variables:
   &c%actor%&0 - The character providing coins to the mobile.
   &c%amount%&0 - Number of coins given.
+
+See also: MTRIG CHARMED
 #d
 "DEATH TRIGGER" "MTRIG DEATH" TRIGEDIT-MOB-DEATH
 
@@ -53,8 +62,13 @@ Return value:  return 0 to prevent the mob's death cry
 
 This type of trigger fires when the mob dies (but not when if it is purged).
 
+Note: Death triggers attached to charmed mobs will not fire unless the trigger
+   also has the Charmed type.
+
 Variables:
   &c%actor%&0 - The character killing this mob, if any.
+
+See also: MTRIG CHARMED
 #d
 "FIGHT TRIGGER" "FIGHT-CHARMED TRIGGER" "MTRIG FIGHT" "MTRIG FIGHT-CHARMED" TRIGEDIT-MOB-FIGHT TRIGEDIT-MOB-FIGHT-CHARMED
 
@@ -81,8 +95,13 @@ Argument type:  percentage of health points remaining
 Activated during combat when the mobile's hit point percentage drops below a 
 specified percentage.
 
+Note: HitPrcnt triggers attached to charmed mobs will not fire unless the
+   trigger also has the Charmed type.
+
 Variables:
   &c%actor%&0 - The character this mobile is fighting.
+
+See also: MTRIG CHARMED
 #d
 "MEMORY TRIGGER" "MTRIG MEMORY" TRIGEDIT-MOB-MEMORY
 
@@ -94,8 +113,13 @@ Activated when the mobile encounters a character in its memory (&yMREMEMBER&0)
 list, and there is no over-riding command. Any mobile making use of mremember 
 MUST have a memory script, even if it will never be called.
 
+Note: Memory triggers attached to charmed mobs will not fire unless the trigger
+   also has the Charmed type.
+
 Variables:
   &c%actor%&0 - The character being remembered.
+  
+See also: MTRIG CHARMED
 #d
 MFOLLOW %FOLLOW% TRIG-FOLLOW
 
@@ -397,8 +421,13 @@ Return value:  return 0 to prevent transferring the object to the mob
 
 Receive triggers fire whenever a mob receives an item from someone.
 
+Note: Receive triggers attached to charmed mobs will not fire unless the trigger
+   also has the Charmed type.
+
 Variables:
   &c%actor%&0 - The character handing the object to the mob.
   &c%object%&0 - The object being handed over.
+
+See also: MTRIG CHARMED
 #d
 $~
