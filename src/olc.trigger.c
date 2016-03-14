@@ -733,7 +733,7 @@ OLC_MODULE(tedit_types) {
 	
 	GET_TRIG_TYPE(trig) = olc_process_flag(ch, argument, "type", "types", trig_attach_type_list[trig->attach_type], GET_TRIG_TYPE(trig));
 	
-	diff = old & ~GET_TRIG_TYPE(trig);	// find changed bits
+	diff = (old & ~GET_TRIG_TYPE(trig)) | (~old & GET_TRIG_TYPE(trig));	// find changed bits
 	diff &= ~ignore_changes;	// filter out ones we don't care about
 	
 	// if we changed any relevant type, remove args
@@ -742,6 +742,7 @@ OLC_MODULE(tedit_types) {
 		if (trig->arglist) {
 			free(trig->arglist);
 			trig->arglist = NULL;
+			msg_to_char(ch, "Type changed. Arguments cleared.\r\n");
 		}
 	}
 }
