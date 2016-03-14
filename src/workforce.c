@@ -1733,26 +1733,20 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 
 
 void do_chore_nailmaking(empire_data *emp, room_data *room) {
-	struct empire_storage_data *store = find_stored_resource(emp, GET_ISLAND_ID(room), o_IRON_INGOT);
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_NAILMAKING].mob);
-	bool can_do = can_gain_chore_resource(emp, room, CHORE_NAILMAKING, o_NAILS);
+	int islid = GET_ISLAND_ID(room);
+	bool can_do = can_gain_chore_resource(emp, room, CHORE_NAILMAKING, o_NAILS) | empire_can_afford_component(emp, islid, CMP_METAL, CMPF_COMMON, 1);
 	
 	if (worker && can_do) {
 		ewt_mark_resource_worker(emp, room, o_NAILS);
 		
-		if (store && store->amount >= 1) {
-			charge_stored_resource(emp, GET_ISLAND_ID(room), store->vnum, 1);			
-			add_to_empire_storage(emp, GET_ISLAND_ID(room), o_NAILS, 4);
-			
-			act("$n finishes a pouch of nails.", FALSE, worker, NULL, NULL, TO_ROOM);
-			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
-		}
-		else {
-			// no trees remain: mark for despawn
-			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-		}
+		charge_stored_component(emp, islid, CMP_METAL, CMPF_COMMON, 1);
+		add_to_empire_storage(emp, islid, o_NAILS, 4);
+		
+		act("$n finishes a pouch of nails.", FALSE, worker, NULL, NULL, TO_ROOM);
+		empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 	}
-	else if (store && can_do) {
+	else if (can_do) {
 		// place worker
 		if ((worker = place_chore_worker(emp, CHORE_NAILMAKING, room))) {
 			ewt_mark_resource_worker(emp, room, o_NAILS);

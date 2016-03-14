@@ -2301,7 +2301,7 @@ ACMD(do_barde) {
 	int num;
 	
 	if (!res) {
-		add_to_resource_list(&res, RES_OBJECT, o_IRON_INGOT, 10, 0);
+		add_to_resource_list(&res, RES_COMPONENT, CMP_METAL, 10, CMPF_COMMON);
 	}
 	
 	one_argument(argument, arg);
