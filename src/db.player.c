@@ -689,6 +689,7 @@ void check_delayed_load(char_data *ch) {
 
 /* release memory allocated for a char struct */
 void free_char(char_data *ch) {
+	void die_follower(char_data *ch);
 	void free_alias(struct alias_data *a);
 	void free_mail(struct mail_data *mail);
 
@@ -698,6 +699,7 @@ void free_char(char_data *ch) {
 	struct channel_history_data *history;
 	struct player_slash_channel *slash;
 	struct interaction_item *interact;
+	struct pursuit_data *purs;
 	struct offer_data *offer;
 	struct lore_data *lore;
 	struct coin_data *coin;
@@ -715,8 +717,16 @@ void free_char(char_data *ch) {
 	// clean up gear/items, if any
 	extract_all_items(ch);
 
+	if (ch->followers || ch->master) {
+		die_follower(ch);
+	}
+	
 	if (IS_NPC(ch)) {
 		free_mob_tags(&MOB_TAGGED_BY(ch));
+		while ((purs = MOB_PURSUIT(ch))) {
+			MOB_PURSUIT(ch) = purs->next;
+			free(purs);
+		}
 	}
 	
 	// remove all affects
@@ -737,8 +747,6 @@ void free_char(char_data *ch) {
 		extract_script(ch, MOB_TRIGGER);
 	}
 	
-	// TODO what about script memory (freed in extract_char_final for NPCs, but what about PCs?)
-	
 	// free lore
 	while ((lore = GET_LORE(ch))) {
 		GET_LORE(ch) = lore->next;
@@ -754,7 +762,7 @@ void free_char(char_data *ch) {
 		GET_EMPIRE_NPC_DATA(ch) = NULL;
 	}
 	
-	// extract objs
+	// extract objs: aren't these handled by extract_all_items
 	while ((obj = ch->carrying)) {
 		extract_obj(obj);
 	}
@@ -793,6 +801,8 @@ void free_char(char_data *ch) {
 		if (GET_DISGUISED_NAME(ch)) {
 			free(GET_DISGUISED_NAME(ch));
 		}
+		
+		free_resource_list(GET_ACTION_RESOURCES(ch));
 		
 		for (loadslash = LOAD_SLASH_CHANNELS(ch); loadslash; loadslash = next_loadslash) {
 			next_loadslash = loadslash->next;
@@ -836,9 +846,11 @@ void free_char(char_data *ch) {
 		}
 		
 		HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
+			HASH_DEL(GET_SKILL_HASH(ch), skill);
 			free(skill);
 		}
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
+			HASH_DEL(GET_ABILITY_HASH(ch), abil);
 			free(abil);
 		}
 		
@@ -966,6 +978,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct over_time_effect_type *dot, *last_dot = NULL;
 	struct offer_data *offer, *last_offer = NULL;
 	struct alias_data *alias, *last_alias = NULL;
+	struct resource_data *res, *last_res = NULL;
 	struct coin_data *coin, *last_coin = NULL;
 	struct mail_data *mail, *last_mail = NULL;
 	struct player_ability_data *abildata;
@@ -1008,6 +1021,13 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	if ((last_mail = GET_MAIL_PENDING(ch))) {
 		while (last_mail->next) {
 			last_mail = last_mail->next;
+		}
+	}
+	
+	// find end of resource list
+	if ((last_res = GET_ACTION_RESOURCES(ch))) {
+		while (last_res->next) {
+			last_res = last_res->next;
 		}
 	}
 	
@@ -1058,6 +1078,24 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						GET_ACTION_CYCLE(ch) = i_in[1];
 						GET_ACTION_TIMER(ch) = i_in[2];
 						GET_ACTION_ROOM(ch) = i_in[3];
+					}
+				}
+				else if (PFILE_TAG(line, "Action-res:", length)) {
+					if (sscanf(line + length + 1, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
+						// argument order is for consistency with other resource lists
+						CREATE(res, struct resource_data, 1);
+						res->vnum = i_in[0];
+						res->amount = i_in[1];
+						res->type = i_in[2];
+						res->misc = i_in[3];
+						
+						if (last_res) {
+							last_res->next = res;
+						}
+						else {
+							GET_ACTION_RESOURCES(ch) = res;
+						}
+						last_res = res;
 					}
 				}
 				else if (PFILE_TAG(line, "Action-vnum:", length)) {
@@ -1857,6 +1895,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	obj_data *char_eq[NUM_WEARS];
 	char temp[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
+	struct resource_data *res;
 	int iter;
 	
 	if (!fl || !ch) {
@@ -1955,6 +1994,10 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Action: %d %d %d %d\n", GET_ACTION(ch), GET_ACTION_CYCLE(ch), GET_ACTION_TIMER(ch), GET_ACTION_ROOM(ch));
 		for (iter = 0; iter < NUM_ACTION_VNUMS; ++iter) {
 			fprintf(fl, "Action-vnum: %d %d\n", iter, GET_ACTION_VNUM(ch, iter));
+		}
+		LL_FOREACH(GET_ACTION_RESOURCES(ch), res) {
+			// argument order is for consistency with other resource lists
+			fprintf(fl, "Action-res: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
 		}
 	}
 	if (GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) != NOWHERE) {

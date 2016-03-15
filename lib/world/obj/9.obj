@@ -240,12 +240,14 @@ a wooden handle~
 A wooden handle has been dropped on the ground.~
 The handle can be attached to many things to build tools and weapons.
 ~
-1 l ano 2
+1 l ano 3
 0 3 5
 0 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: a torch
+O
+13 0
 R
 5121 0
 S

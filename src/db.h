@@ -374,7 +374,6 @@ room_data *real_room(room_vnum vnum);
 
 // misc
 extern struct obj_apply *copy_obj_apply_list(struct obj_apply *list);
-extern struct resource_data *create_resource_list(int first_vnum, int first_amount, ...);
 void free_resource_list(struct resource_data *list);
 
 // more frees

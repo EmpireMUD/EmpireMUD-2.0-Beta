@@ -159,39 +159,6 @@ R
 R
 5511 0
 S
-#1116
-&0~
-do not use~
-Leave this object blank, it's a placeholder to block a recipe slot.~
-Or, use this vnum for an item that is NOT made by a recipe.
-There are 4 recipes for item 1115.
-~
-0 0 0 1
-0 0 0
-0 0
-S
-#1117
-&0~
-do not use~
-Leave this object blank, it's a placeholder to block a recipe slot.~
-Or, use this vnum for an item that is NOT made by a recipe.
-There are 4 recipes for item 1115.
-~
-0 0 0 1
-0 0 0
-0 0
-S
-#1118
-&0~
-do not use~
-Leave this object blank, it's a placeholder to block a recipe slot.~
-Or, use this vnum for an item that is NOT made by a recipe.
-There are 4 recipes for item 1115.
-~
-0 0 0 1
-0 0 0
-0 0
-S
 #1119
 spike nocturnium~
 a nocturnium spike~

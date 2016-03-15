@@ -440,7 +440,7 @@ a length of rope~
 A rope is coiled on the ground.~
 Rope can be used to lead, tie, or harness an animal.
 ~
-3 l a 3
+3 l a 4
 0 0 0
 7 0
 M
@@ -449,6 +449,8 @@ You attach a rope to $V.~
 M
 7
 $n attaches a rope to $V.~
+O
+28 0
 R
 5121 0
 R
@@ -463,7 +465,7 @@ tent collapsed folded~
 a collapsed tent~
 A folded up tent has been left on the ground.~
    You can pitch this small leather tent with 'build tent <direction>'. You
-must have permission to build things on your current tile.  
+must have permission to build things on your current tile.
 ~
 3 0 a 2
 0 0 0

@@ -152,7 +152,9 @@ You cannot unbind items.
 
 See also: TAGS, HOME
 #
-BLOCK "BLOCK CAP"
+BLOCK "BLOCK CAP" "BLOCK STAT" "BLOCK RATING" BLOCKING
+
+(Disambiguation: Did you mean HELP BLOCK COMPONENT ?)
 
 Your block rating, shown on 'score', is your character's bonus chance to block
 attacks. You must have the Shield Block ability, and be holding a shield in
@@ -335,6 +337,47 @@ on claimed land, or disappear over time on unclaimed land.
 
 See also: DEPOSIT, EXCHANGE, MINT, SPLIT, WITHDRAW
 #
+COMPONENT COMPONENTS RESOURCE RESOURCES
+
+Crafts (including forge, sew, etc), recipes, and buildings can require
+different types of resources:
+
+&cSpecific items&0 - These items are referenced by name, and are listed like
+   "1x imperium ingot".
+
+&cGeneric components&0 - Different items can match the same component requirement,
+   which are written in parentheses like "1x (lumber)". Some components have
+   modifiers like "rare" or "large". An item must have all the correct set of
+   modifiers to match the recipe (but it's okay if it has extra modifiers too).
+   You can see an item's component info with identify, shown in parentheses
+   after the name.
+
+&cLiquids&0 - You need a drink container with the correct type of liquid, which
+   is written like "2 units of milk". The drink container won't be used up by
+   the craft, but its contents will be emptied. If you cancel a craft before
+   it's complete, you'll only get the liquid resources back if you still have
+   drink containers available for them to go into.
+
+&cCoins&0 - If a craft requires coins, they are almost always misc/simple coins
+   (ones that aren't tied to any empire). You will automatically use coins from
+   various empires if you don't have the misc coins to spend. If you cancel a
+   craft before it's complete, you'll get back the specific coins you spent.
+
+&cPools&0 - These include mana, move, and blood points (not to be confused with
+   the blood liquid, which comes from drink containers). In order to build or
+   craft, you must have the entire pool cost available at once. You can't spend
+   your last health or blood point in this way, but be warned: you can get
+   dangerously close to death if the resource requirement is health or blood.
+
+When you dismantle a building, you get back half of the resources you used to
+build it -- but only items (including generic components). Canceling a craft
+before it's finished will refund the entire cost including coins and pools.
+
+The 'keep' command can be used to prevent items in your inventory from being
+used for your craft and building commands.
+
+See also: BUILD, CRAFT, DISMANTLE, FORGE, IDENTIFY, KEEP
+#
 COOLDOWNS "COOL DOWNS" CD
 
 Usage:  cooldowns
@@ -508,9 +551,9 @@ See also: COOLDOWNS
 HUNGER THIRST HUNGRY THIRSTY STARVING STARVED STARVATION
 
 Over time, you will naturally become hungry and thirsty. This has no effect
-until 24 hours have passed since you were last fully sated, at which point your
-regeneration will be greatly slowed. Hunger and thirst penalties do not stack.
-You will continue to accumulate hunger and thirst (making it more difficult to
+until you accumulate 24 ingame hours' worth of hunger or thirst, at which point
+your regeneration will be greatly slowed. Hunger and thirst penalties do not
+stack. You will continue to accumulate hunger and thirst (making it harder to
 remove these penalties) until 50 hours have passed.
 
 Vampires with low blood pools suffer a starvation penalty identical to hunger
@@ -519,7 +562,7 @@ and thirst.
 All timed actions, such as crafting and chores, take twice as long while you
 are hungry, thirsty, or blood-starved.
 
-See also: BLOOD, EAT, UNNATURAL THIRST, SATED THIRST
+See also: BLOOD, EAT, UNNATURAL THIRST, SATED THIRST, TIME
 #
 INFRA INFRAVISION
 

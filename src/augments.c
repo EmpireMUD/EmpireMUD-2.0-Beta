@@ -503,7 +503,7 @@ void write_augments_index(FILE *fl) {
 */
 void write_augment_to_file(FILE *fl, augment_data *aug) {
 	void write_applies_to_file(FILE *fl, struct apply_data *list);
-	void write_resources_to_file(FILE *fl, struct resource_data *list);
+	void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
 	
 	char temp[256], temp2[256];
 	
@@ -526,7 +526,7 @@ void write_augment_to_file(FILE *fl, augment_data *aug) {
 	write_applies_to_file(fl, GET_AUG_APPLIES(aug));
 	
 	// 'R': resources
-	write_resources_to_file(fl, GET_AUG_RESOURCES(aug));
+	write_resources_to_file(fl, 'R', GET_AUG_RESOURCES(aug));
 	
 	// end
 	fprintf(fl, "S\n");

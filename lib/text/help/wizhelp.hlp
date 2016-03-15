@@ -103,7 +103,7 @@ CREATE
 
 Usage:  create [number] <item>
 
-This command allows a God or Immortal to create one or more simple items
+This command allows a god or immortal to create one or more simple items
 instantly. Normally, only resources and simple tools can be created this way.
 In order to create items, you must have the correct resources available. You
 get resources when people sacrifice items to you. Resource counts can be seen
@@ -778,30 +778,185 @@ SHOW
 Usage:  show <mode> [argument]
 
 The SHOW command displays information. Some modes of show require additional
-information, such as a player name. Valid Modes:
+information, such as a player name. 'show' without a mode gives a quick list of
+the options below. Valid Modes:
 
 Mode       Level    Description
 ------     ------   -------------
 stats      God      Shows game stats including prototypes.
 arrowtypes Immort   Shows the 'arrow type' setting for all bows and arrows.
+components Immort   Shows all items matching a component type (and flags).
 ignoring   Immort   Shows you who a player has on their ignore list.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
 notes      Immort   Show notes on a player.
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
-rent       Immort   Shows the filename and path to a player's inventory.
+rent       Immort   Shows a player's full equipment and inventory.
 skills     Immort   Shows skill levels and abilities for a player.
 spawns     Immort   Shows where a mob spawns on the map, similar to ".mob search".
 startlocs  Immort   Shows the location of all starting location tiles.
 storage    Immort   Shows items that can be stored in a given building/room type.
 terrain    Immort   Shows total counts for all terrain types.
+uses       Immort   Shows crafts (and vehicles, etc.) that use a component type.
 workforce  Immort   Shows you an empire's workforce setup.
 variables  Immort   Shows script variables on a player character.
 commons    Asst     Shows players currently connected from duplicate sites.
 site       Asst     Shows all players with a specific site segment.
 account    Co-Impl  Shows all the alts associated with a given player.
 
+Each of these commands has its own help file (for example, HELP SHOW STATS)
+
 See also: STAT, STARTING LOCATION
+#e
+"SHOW STATS"
+
+Usage:  show stats
+
+Shows some game statistics, similar to the ones you see when quitting, and
+including both instances in the world and prototypes.
+#e
+"SHOW ARROWTYPES"
+
+Usage:  show arrowtypes
+
+Lists all bows and arrows by arrowtype. Useful for figuring out what arrowtype
+to use for a new weapon/ammo.
+#e
+"SHOW COMPONENTS"
+
+Usage:  show components <type> [flags]
+
+This command allows you to look up objects that are a given component type.
+If you specify any flags, all those flags must match the output.
+
+For a list of component types, see: HELP COMPONENT TYPES
+For a list of component flags, see: HELP COMPONENT FLAGS
+#e
+"SHOW IGNORING"
+
+Usage:  show ignoring <player name>
+
+Shows you who a player is ignoring.
+
+See also: IGNORE, SHOW
+#e
+"SHOW ISLANDS"
+
+Usage:  show islands <empire name>
+
+The immortal version of the 'islands' command; useful for MOVEEINV. You can use
+an empire's leaderboard rank in place of its name, but not vnum.
+
+See also: ISLANDS, MOVEEINV
+#e
+"SHOW NOTES"
+
+Usage:  show notes <player name>
+
+Shows immortal notes for the target player's account.
+#e
+"SHOW PLAYER"
+
+Usage:  show player <player name>
+
+Shows some basic technical information about the target player. Not to be
+confused with SHOW PLAYERS.
+#e
+"SHOW PLAYERS"
+
+Usage:  show players
+
+Shows the names and current and max health, moves, mana and blood of all online
+players. Not to be confused with SHOW PLAYER.
+
+See also: USERS
+#e
+"SHOW RENT"
+
+Usage:  show rent <player name>
+
+Shows the target player's inventory and equipment. Used to show the binary file
+path to their inventory data, hence the name.
+#e
+"SHOW SKILLS"
+
+Usage:  show skills <player name>
+
+Shows the target player's skills and abilities.
+#e
+"SHOW SPAWNS"
+
+Usage:  show spawns <mob vnum>
+
+Shows what sectors/crops a mob spawns on, percentile chance for it to spawn, and
+what conditions it has. Takes a mob's virtual number, not a name.
+#e
+"SHOW STARTLOCS"
+
+Usage:  show startlocs
+
+Lists all possible starting locations, including name and coordinates.
+#e
+"SHOW STORAGE"
+
+Usage:  show storage [building name]
+
+Lists objects which store in the named building, or the current building if none
+is specified. Takes a name, not a virtual number.
+#e
+"SHOW TERRAIN"
+
+Usage:  show terrain
+
+Lists the total count of each sector and crop type in the world. Buildings are
+all listed together under 'Building'.
+#e
+"SHOW USES"
+
+Usage:  show uses <type> [flags]
+
+This command looks up crafts, vehicles, and augments that require a given
+component type. If you specify any flags, all those flags must match the
+output.
+
+For a list of component types, see: HELP COMPONENT TYPES
+For a list of component flags, see: HELP COMPONENT FLAGS
+#e
+"SHOW WORKFORCE"
+
+Usage:  show workforce <empire name>
+
+Shows you an empire's workforce setup exactly as it would appear to a members
+of that empire using the 'workforce' command.
+#e
+"SHOW VARIABLES"
+
+Usage:  show variables <player name>
+
+Shows you the names and values of all of the DG Scripts variables attached
+(using 'remote') to the target player. 'stat mob <target>' is used instead to
+see script variables for NPCs.
+#e
+"SHOW COMMONS"
+
+Usage:  show commons
+
+Shows the names of any characters connected from IPs they share with another
+character. By default, this isn't possible without a MULTI-IP flag.
+#e
+"SHOW SITE"
+
+Usage:  show site <string>
+
+Shows all players connected from a site containing the specified string (it can
+occur in the middle or at the end, not just at the beginning).
+#e
+"SHOW ACCOUNT"
+
+Usage:  show account <player name>
+
+Shows all characters associated with the target character's account (the target
+player's alternates).
 #e
 SHUTDOWN
 

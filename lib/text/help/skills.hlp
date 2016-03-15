@@ -112,7 +112,9 @@ DISMANTLE
 Usage:  dismantle
 
 This command allows you to tear down a building when you're done with it. You
-get back half of the resources you spent to build it.
+get back approximately half of the resources you spent to build it, although
+dismantle can only refund items that were used -- it can't refund any coins,
+mana, or liquids that were spent.
 
 You can use "nodismantle" to keep yourself from accidentally dismantling a
 building.
@@ -208,10 +210,9 @@ container to hold the milk. Cows can be milked once or twice per day.
 MILL MILLING
 
 Building:  (MM)  Mill  (no skill required)
-Resources:  10 logs, 2 stone blocks
-Built on:  plains, desert
 Stored at the mill:  cornmeal, flour
 Command:  mill [number] <item>
+          mill info <item>
 
 You can mill:
   wheat into 2 flour
@@ -220,13 +221,11 @@ You can mill:
 
 You must do this at a Mill building. Milling will gain Trade skill up to 15.
 
-See also: CRAFTING LEVEL, COOK
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP
 #
 MINE MINES
 
 Building:  &y/&0[]&y\&0  Mine  (no skill required)
-Resources:  4 logs
-Built on:  mountain
 Command:  mine
 
 "Mine" is both a building type, and the command to work in that building. Mines
@@ -258,8 +257,6 @@ See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS
 MINT
 
 Building:  [MM]  Mint  (Commerce ability)
-Resources:  12 lumber, 4 nails, 12 blocks, 4 coin mills
-Built on:  plains, desert
 Fame:  5
 Command:  mint <object>
 
@@ -314,7 +311,7 @@ Jungle: light jungle
 Light jungle is jungle which has been partially chopped, but not reduced to
 plains.
 
-See also: HARVEST, WHEAT, CORN, APPLES
+See also: CROPS, HARVEST, PICK
 #
 SACRIFICE 
 
@@ -332,7 +329,7 @@ Example:
 #
 SAW
 
-Usage:  saw <tree | log>
+Usage:  saw <item>
 
 You can saw trees and logs into lumber. You must be in a lumber yard. This
 will go faster if you have the Woodworking ability.
@@ -341,11 +338,11 @@ See also: TREES, LOGS, LUMBER
 #
 SCRAPE
 
-Usage:  scrape tree
+Usage:  scrape <item>
 
 This skill is used to process trees into logs.
 
-The Woodworking ability increases how fast you can scrape logs.
+The Woodworking ability increases how fast you can scrape.
 
 See also: TREES, SAW, WOODWORKING
 #
@@ -459,18 +456,20 @@ See also: SKILL CAPS, SPECIALIZE, SKILLS
 #
 SMELT MELT
 
-Usage:  smelt <item>
+Usage:  smelt [number] <type of ingot/bar>
 
 Using a forge or foundry, you can melt down metals like iron, silver, and gold
 into ingots or bars. Smelting generally requires two of the base metal (e.g.
 iron ore) to create one of the processed version (iron ingot).
 
-Ingots are used for crafting.
+Ingots are used for crafting. Gold and silver bars are worth more in the vault
+than their raw form. The bars can be smelted again to return them to the
+smaller raw version.
 
-Gold and silver bars are worth more in the vault than their raw form. The bars
-can be smelted again to return them to the smaller raw version.
+Typing "smelt" by itself will list things you can smelt with the ore available
+in your inventory.
 
-See also: INGOTS, WEALTH
+See also: METAL, WEALTH
 #
 SPECIALIZE SPECIALTY
 
@@ -523,9 +522,8 @@ TENT TENTS
 
 ./\.  Tent  (Basic Crafts ability)
 
-Built on:  plains, desert
-Commands: sew tent
-          build tent <direction>
+Commands:  sew tent
+           build tent <direction>
 
 Requires 8 large leather to sew.
 

@@ -1196,7 +1196,7 @@ const char *pool_abbrevs[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// CRAFT RECIPE CONSTANTS //////////////////////////////////////////////////
 
-// CRAFT_x
+// CRAFT_x (1/2): flag names
 const char *craft_flags[] = {
 	"POTTERY",
 	"APIARIES-TECH",
@@ -1218,6 +1218,28 @@ const char *craft_flags[] = {
 };
 
 
+// CRAFT_x (2/2): how flags that show up on "craft info"
+const char *craft_flag_for_info[] = {
+	"pottery",
+	"requires apiaries",
+	"requires glassblowing",
+	"requires glassblower building",
+	"requires carpenter building",
+	"alchemy",
+	"requires sharp tool",
+	"requires fire",
+	"",	// soup
+	"",	// in-dev
+	"",	// upgrade
+	"",	// dismantle-only
+	"in-city only",
+	"",	// vehicle
+	"requires shipyard",
+	"requires upgrade",
+	"\n"
+};
+
+
 // CRAFT_TYPE_x
 const char *craft_types[] = {
 	"UNDEFINED",
@@ -1232,6 +1254,7 @@ const char *craft_types[] = {
 	"WEAVE",
 	"WORKFORCE",
 	"MANUFACTURE",
+	"SMELT",
 	"\n"
 };
 
@@ -1855,12 +1878,83 @@ const char *color_liquid[] = {
 };
 
 
+// CMP_x: component types
+const char *component_types[] = {
+	"none",
+	"adhesive",
+	"bone",
+	"block",
+	"clay",
+	"dye",		// 5
+	"feathers",
+	"fibers",
+	"flour",
+	"fruit",
+	"fur",	// 10
+	"gem",
+	"grain",
+	"handle",
+	"herb",
+	"leather",	// 15
+	"lumber",
+	"meat",
+	"metal",
+	"nails",
+	"oil",	// 20
+	"pillar",
+	"rock",
+	"seeds",
+	"skin",
+	"stick",	// 25
+	"textile",
+	"vegetable",
+	"rope",
+	"\n"
+};
+
+
+// CMPF_x: component flags
+const char *component_flags[] = {
+	"animal",
+	"bunch",
+	"desert",
+	"fine",
+	"hard",
+	"large",	// 5
+	"magic",
+	"mundane",
+	"plant",
+	"poor",
+	"rare",	// 10
+	"raw",
+	"refined",
+	"single",
+	"small",
+	"soft",	// 15
+	"temperate",
+	"tropical",
+	"common",
+	"\n"
+};
+
+
 /* level of fullness for drink containers */
 const char *fullness[] = {
 	"less than half ",
 	"about half ",
 	"more than half ",
 	""
+};
+
+
+// RES_x: resource requirement types
+const char *resource_types[] = {
+	"object",
+	"component",
+	"liquid",
+	"coins",
+	"pool",
+	"\n"
 };
 
 
@@ -2715,45 +2809,6 @@ const struct fishing_data_type fishing_data[] = {
 };
 
 
-// for do_smelt
-const struct smelt_data_type smelt_data[] = {
-	// from, amt			to, amt					workforce?
-
-	// metals
-	{ o_IRON_ORE, 2,		o_IRON_INGOT, 1,		TRUE },
-	{ o_IMPERIUM_ORE, 2,	o_IMPERIUM_INGOT, 1,	TRUE },
-	{ o_NOCTURNIUM_ORE, 2,	o_NOCTURNIUM_INGOT, 1,	TRUE },
-	{ o_COPPER, 2,			o_COPPER_INGOT, 1,		TRUE },
-	
-	// preciouses
-	{ o_GOLD_SMALL, 8,		o_GOLD_DISC, 1,			TRUE },
-	{ o_SILVER, 2,			o_SILVER_DISC, 1,		TRUE },
-	{ o_GOLD, 2,			o_GOLD_DISC, 1,			TRUE },
-	{ o_SILVER_DISC, 2,		o_SILVER_BAR, 1,		TRUE },
-	{ o_GOLD_DISC, 2,		o_GOLD_BAR, 1,			TRUE },
-	{ o_COPPER_INGOT, 2,	o_COPPER_BAR, 1,		TRUE },
-
-	// melt-down versions
-	{ o_SILVER_BAR, 1,		o_SILVER, 4,			FALSE },
-	{ o_GOLD_BAR, 1,		o_GOLD, 4,				FALSE },
-	{ o_COPPER_BAR, 1,		o_COPPER_INGOT, 2,		FALSE },
-
-	// last
-	{ NOTHING, 0, NOTHING, 0, FALSE }
-};
-
-
-// for do_tan
-// TODO tanning could change to interaction
-const struct tanning_data_type tan_data[] = {
-	{ o_SMALL_SKIN, o_SMALL_LEATHER },
-	{ o_LARGE_SKIN, o_LARGE_LEATHER },
-	
-	// last
-	{ NOTHING, NOTHING }
-};
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// TRIGGER CONSTANTS ///////////////////////////////////////////////////////
 
@@ -2778,7 +2833,7 @@ const char *trig_types[] = {
 	"Leave",
 	"Door",
 	"Leave-All",
-	"Fight-Charmed",
+	"Charmed",
 	"\n"
 };
 
@@ -3038,6 +3093,10 @@ const char *interact_types[] = {
 	"MINE",
 	"COMBINE",
 	"SEPARATE",
+	"SCRAPE",
+	"SAW",
+	"TAN",
+	"CHIP",
 	"\n"
 };
 
@@ -3060,6 +3119,10 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_MINE_DATA,	// mine
 	TYPE_OBJ,	// combine
 	TYPE_OBJ,	// separate
+	TYPE_OBJ,	// scrape
+	TYPE_OBJ,	// saw
+	TYPE_OBJ,	// tan
+	TYPE_OBJ,	// chip
 };
 
 
@@ -3081,6 +3144,10 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// mine
 	TYPE_OBJ,	// combine
 	TYPE_OBJ,	// separate
+	TYPE_OBJ,	// scrape
+	TYPE_OBJ,	// saw
+	TYPE_OBJ,	// tan
+	TYPE_OBJ,	// chip
 };
 
 

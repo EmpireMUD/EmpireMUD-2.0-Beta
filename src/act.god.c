@@ -1,6 +1,6 @@
 /* ************************************************************************
 *   File: act.god.c                                       EmpireMUD 2.0b3 *
-*  Usage: Player-level God commands                                       *
+*  Usage: Player-level god commands                                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
 *  All rights reserved.  See license.doc for complete information.        *

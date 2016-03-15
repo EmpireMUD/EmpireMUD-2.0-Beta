@@ -722,7 +722,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 			}
 			else {
 				// player shows rank
-				msg_to_char(ch, "<%s&y> ", EMPIRE_RANK(GET_LOYALTY(i), GET_RANK(i)-1));
+				msg_to_char(ch, "<%s&0&y> ", EMPIRE_RANK(GET_LOYALTY(i), GET_RANK(i)-1));
 			}
 		}
 	}

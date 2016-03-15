@@ -36,8 +36,6 @@
 */
 
 // external vars
-extern const struct smelt_data_type smelt_data[];
-extern const struct tanning_data_type tan_data[];
 
 // external funcs
 extern double get_base_dps(obj_data *weapon);
@@ -49,16 +47,12 @@ void scale_item_to_level(obj_data *obj, int level);
 obj_data *has_shovel(char_data *ch);
 
 // cancel protos
-void cancel_chipping(char_data *ch);
+void cancel_resource_list(char_data *ch);
 void cancel_driving(char_data *ch);
 void cancel_gen_craft(char_data *ch);
 void cancel_minting(char_data *ch);
 void cancel_morphing(char_data *ch);
-void cancel_sawing(char_data *ch);
-void cancel_scraping(char_data *ch);
 void cancel_siring(char_data *ch);
-void cancel_smelting(char_data *ch);
-void cancel_tanning(char_data *ch);
 
 // process protos
 void process_chipping(char_data *ch);
@@ -93,7 +87,6 @@ void process_reclaim(char_data *ch);
 void process_repairing(char_data *ch);
 void process_scraping(char_data *ch);
 void process_siring(char_data *ch);
-void process_smelting(char_data *ch);
 void process_tanning(char_data *ch);
 
 
@@ -113,16 +106,16 @@ const struct action_data_struct action_data[] = {
 	{ "mining", "is mining at the walls.", ACTF_HASTE | ACTF_FAST_CHORES, process_mining, NULL },	// ACT_MINING
 	{ "minting", "is minting coins.", ACTF_FAST_CHORES, process_minting, cancel_minting },	// ACT_MINTING
 	{ "fishing", "is fishing.", NOBITS, process_fishing, NULL },	// ACT_FISHING
-	{ "smelting", "is melting down ore.", ACTF_FAST_CHORES, process_smelting, cancel_smelting },	// ACT_MELTING
+		{ "unknown", "is doing something.", NOBITS, NULL, NULL },	// unused
 	{ "repairing", "is doing some repairs.", ACTF_FAST_CHORES | ACTF_HASTE, process_repairing, NULL },	// ACT_REPAIRING
-	{ "chipping", "is chipping rocks.", ACTF_FAST_CHORES, process_chipping, cancel_chipping },	// ACT_CHIPPING
+	{ "chipping", "is chipping rocks.", ACTF_FAST_CHORES, process_chipping, cancel_resource_list },	// ACT_CHIPPING
 	{ "panning", "is panning for gold.", ACTF_FINDER, process_panning, NULL },	// ACT_PANNING
 	{ "music", "is playing soothing music.", ACTF_ANYWHERE | ACTF_HASTE, process_music, NULL },	// ACT_MUSIC
 	{ "excavating", "is excavating a trench.", ACTF_HASTE | ACTF_FAST_CHORES, process_excavating, NULL },	// ACT_EXCAVATING
 	{ "siring", "is hunched over.", NOBITS, process_siring, cancel_siring },	// ACT_SIRING
 	{ "picking", "is looking around at the ground.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_picking, NULL },	// ACT_PICKING
 	{ "morphing", "is morphing and changing shape!", ACTF_ANYWHERE, process_morphing, cancel_morphing },	// ACT_MORPHING
-	{ "scraping", "is scraping at a tree.", ACTF_HASTE | ACTF_FAST_CHORES, process_scraping, cancel_scraping },	// ACT_SCRAPING
+	{ "scraping", "is scraping something off.", ACTF_HASTE | ACTF_FAST_CHORES, process_scraping, cancel_resource_list },	// ACT_SCRAPING
 	{ "bathing", "is bathing in the water.", NOBITS, process_bathing, NULL },	// ACT_BATHING
 	{ "chanting", "is chanting a strange song.", NOBITS, perform_ritual, NULL },	// ACT_CHANTING
 	{ "prospecting", "is prospecting.", NOBITS, process_prospecting, NULL },	// ACT_PROSPECTING
@@ -131,10 +124,10 @@ const struct action_data_struct action_data[] = {
 	{ "escaping", "is running toward the window!", NOBITS, process_escaping, NULL },	// ACT_ESCAPING
 	{ "studying", "is reading a book.", NOBITS, perform_study, NULL },	// ACT_STUDYING
 	{ "ritual", "is performing an arcane ritual.", NOBITS, perform_ritual, NULL },	// ACT_RITUAL
-	{ "sawing", "is sawing lumber.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_sawing },	// ACT_SAWING
+	{ "sawing", "is sawing something.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_resource_list },	// ACT_SAWING
 	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_quarrying, NULL },	// ACT_QUARRYING
 	{ "driving", "is driving.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_DRIVING
-	{ "tanning", "is tanning leather.", ACTF_FAST_CHORES, process_tanning, cancel_tanning },	// ACT_TANNING
+	{ "tanning", "is tanning leather.", ACTF_FAST_CHORES, process_tanning, cancel_resource_list },	// ACT_TANNING
 	{ "reading", "is reading a book.", NOBITS, process_reading, NULL },	// ACT_READING
 	{ "copying", "is writing out a copy of a book.", NOBITS, process_copying_book, NULL },	// ACT_COPYING_BOOK
 	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT
@@ -180,12 +173,16 @@ void start_action(char_data *ch, int type, int timer) {
 	}
 
 	GET_ACTION(ch) = type;
-	GET_ACTION_CYCLE(ch) = ACTION_CYCLE_TIME;
+	GET_ACTION_CYCLE(ch) = ACTION_CYCLE_TIME * ACTION_CYCLE_MULTIPLIER;
 	GET_ACTION_TIMER(ch) = timer;
 	GET_ACTION_VNUM(ch, 0) = 0;
 	GET_ACTION_VNUM(ch, 1) = 0;
 	GET_ACTION_VNUM(ch, 2) = 0;
 	GET_ACTION_ROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
+	
+	// ensure no resources already stored
+	free_resource_list(GET_ACTION_RESOURCES(ch));
+	GET_ACTION_RESOURCES(ch) = NULL;
 }
 
 
@@ -218,7 +215,11 @@ void stop_room_action(room_data *room, int action, int chore) {
 * This is the main processor for periodic actions (ACT_), once per second.
 */
 void update_actions(void) {
+	extern struct gen_craft_data_t gen_craft_data[];
+	
 	descriptor_data *desc;
+	bitvector_t act_flags;
+	craft_data *craft;
 	char_data *ch;
 	int speed;
 
@@ -231,8 +232,19 @@ void update_actions(void) {
 			continue;
 		}
 		
+		// compile action flags
+		act_flags = action_data[GET_ACTION(ch)].flags;
+		if (GET_ACTION(ch) == ACT_GEN_CRAFT && (craft = craft_proto(GET_ACTION_VNUM(ch, 0)))) {
+			act_flags |= gen_craft_data[GET_CRAFT_TYPE(craft)].actf_flags;
+		}
+		
 		// things which terminate actions
-		if (!IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ANYWHERE) && GET_ROOM_VNUM(IN_ROOM(ch)) != GET_ACTION_ROOM(ch)) {
+		if (action_data[GET_ACTION(ch)].process_function == NULL) {
+			// no way to process this action
+			cancel_action(ch);
+			continue;
+		}
+		if (!IS_SET(act_flags, ACTF_ANYWHERE) && GET_ROOM_VNUM(IN_ROOM(ch)) != GET_ACTION_ROOM(ch)) {
 			cancel_action(ch);
 			continue;
 		}
@@ -240,7 +252,7 @@ void update_actions(void) {
 			cancel_action(ch);
 			continue;
 		}
-		if (GET_POS(ch) < POS_SITTING || GET_POS(ch) == POS_FIGHTING || (!IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_SITTING) && GET_POS(ch) < POS_STANDING)) {
+		if (GET_POS(ch) < POS_SITTING || GET_POS(ch) == POS_FIGHTING || (!IS_SET(act_flags, ACTF_SITTING) && GET_POS(ch) < POS_STANDING)) {
 			cancel_action(ch);
 			continue;
 		}
@@ -250,24 +262,24 @@ void update_actions(void) {
 		}
 		
 		// action-cycle is time remaining -- compute how fast we go through it
-		speed = 2;	// default is 2 per second (allowing it to be slowed)
+		speed = ACTION_CYCLE_MULTIPLIER;	// makes it a full second
 		
 		// things that modify speed...
-		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ALWAYS_FAST)) {
-			speed += 2;
+		if (IS_SET(act_flags, ACTF_ALWAYS_FAST)) {
+			speed += ACTION_CYCLE_MULTIPLIER;
 		}
-		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_HASTE) && AFF_FLAGGED(ch, AFF_HASTE)) {
-			speed += 2;
+		if (IS_SET(act_flags, ACTF_HASTE) && AFF_FLAGGED(ch, AFF_HASTE)) {
+			speed += ACTION_CYCLE_MULTIPLIER;
 		}
-		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-			speed += 2;
+		if (IS_SET(act_flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
+			speed += ACTION_CYCLE_MULTIPLIER;
 		}
-		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_FINDER) && has_ability(ch, ABIL_FINDER)) {
-			speed += 2;
+		if (IS_SET(act_flags, ACTF_FINDER) && has_ability(ch, ABIL_FINDER)) {
+			speed += ACTION_CYCLE_MULTIPLIER;
 			gain_ability_exp(ch, ABIL_FINDER, 0.1);
 		}
-		if (IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_SHOVEL) && has_shovel(ch)) {
-			speed += 2;
+		if (IS_SET(act_flags, ACTF_SHOVEL) && has_shovel(ch)) {
+			speed += ACTION_CYCLE_MULTIPLIER;
 		}
 		
 		// things that slow you down
@@ -280,7 +292,7 @@ void update_actions(void) {
 		
 		if (GET_ACTION_CYCLE(ch) <= 0) {
 			// reset cycle timer
-			GET_ACTION_CYCLE(ch) = ACTION_CYCLE_TIME;
+			GET_ACTION_CYCLE(ch) = ACTION_CYCLE_TIME * ACTION_CYCLE_MULTIPLIER;
 			
 			// end hide at this point, as if they had typed a command each tick
 			REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
@@ -325,15 +337,14 @@ obj_data *has_shovel(char_data *ch) {
 //// ACTION CANCELERS ////////////////////////////////////////////////////////
 
 /**
-* Returns a rock (or chipped rock) to the person who was chipping.
+* Returns a set of resources from the resource list (if any).
 *
-* @param char_data *ch The chipper chap
+* @param char_data *ch The person canceling the craft (or whatever).
 */
-void cancel_chipping(char_data *ch) {
-	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
-	scale_item_to_level(obj, 1);	// minimum level
-	obj_to_char(obj, ch);
-	load_otrigger(obj);
+void cancel_resource_list(char_data *ch) {
+	give_resources(ch, GET_ACTION_RESOURCES(ch), FALSE);
+	free_resource_list(GET_ACTION_RESOURCES(ch));
+	GET_ACTION_RESOURCES(ch) = NULL;
 }
 
 
@@ -365,72 +376,6 @@ void cancel_morphing(char_data *ch) {
 		obj_to_char(obj, ch);
 		load_otrigger(obj);
 	}
-}
-
-
-/**
-* Returns a log/tree to the person who was sawing.
-*
-* @param char_data *ch The sawyer
-*/
-void cancel_sawing(char_data *ch) {
-	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
-	scale_item_to_level(obj, 1);	// minimum level
-	obj_to_char(obj, ch);
-	load_otrigger(obj);
-}
-
-
-/**
-* Returns a tree to the person who was scraping.
-*
-* @param char_data *ch The scraper
-*/
-void cancel_scraping(char_data *ch) {
-	obj_data *obj = read_object(o_TREE, TRUE);
-	scale_item_to_level(obj, 1);	// minimum level
-	obj_to_char(obj, ch);
-	load_otrigger(obj);
-}
-
-
-/**
-* Return smelting resources on cancel.
-*
-* @param char_data *ch He who smelt it.
-*/
-void cancel_smelting(char_data *ch) {
-	obj_data *obj;
-	int iter, type = NOTHING;
-
-	// Find the entry in the table
-	for (iter = 0; smelt_data[iter].from != NOTHING && type == NOTHING; ++iter) {
-		if (smelt_data[iter].from == GET_ACTION_VNUM(ch, 0)) {
-			type = iter;
-		}
-	}
-	
-	if (type != NOTHING) {
-		for (iter = 0; iter < smelt_data[type].from_amt; ++iter) {
-			obj = read_object(smelt_data[type].from, TRUE);
-			scale_item_to_level(obj, 1);	// minimum level
-			obj_to_char(obj, ch);
-			load_otrigger(obj);
-		}
-	}
-}
-
-
-/**
-* Return tanning materials.
-*
-* @param char_data *ch Mr. Tanner
-*/
-void cancel_tanning(char_data *ch) {
-	obj_data *obj = read_object(GET_ACTION_VNUM(ch, 0), TRUE);
-	scale_item_to_level(obj, 1);	// minimum level
-	obj_to_char(obj, ch);
-	load_otrigger(obj);
 }
 
 
@@ -806,6 +751,47 @@ INTERACTION_FUNC(finish_picking_crop) {
 }
 
 
+// also used for sawing, tanning, chipping
+INTERACTION_FUNC(finish_scraping) {
+	obj_vnum vnum = interaction->vnum;
+	char buf[MAX_STRING_LENGTH];
+	obj_data *load = NULL;
+	int num;
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		// load
+		load = read_object(vnum, TRUE);
+		scale_item_to_level(load, GET_ACTION_VNUM(ch, 1));
+		
+		// ownership
+		load->last_owner_id = GET_IDNUM(ch);
+		load->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
+		
+		// put it somewhere
+		if (CAN_WEAR(load, ITEM_WEAR_TAKE)) {
+			obj_to_char(load, ch);
+		}
+		else {
+			obj_to_room(load, IN_ROOM(ch));
+		}
+		load_otrigger(load);
+	}
+
+	if (interaction->quantity > 1) {
+		sprintf(buf, "You get $p (x%d).", interaction->quantity);
+	}
+	else {
+		strcpy(buf, "You get $p.");
+	}
+		
+	if (load) {
+		act(buf, FALSE, ch, load, NULL, TO_CHAR);
+	}
+	
+	return TRUE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ACTION PROCESSES ////////////////////////////////////////////////////////
 
@@ -813,9 +799,9 @@ INTERACTION_FUNC(finish_picking_crop) {
 void perform_saw(char_data *ch) {
 	ACMD(do_saw);
 	
-	char tmp[50];
-	obj_data *obj, *proto;
-	int iter;
+	char buf[MAX_STRING_LENGTH];
+	bool success = FALSE;
+	obj_data *proto;
 	
 	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
 		msg_to_char(ch, "You saw %s...\r\n", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
@@ -829,24 +815,32 @@ void perform_saw(char_data *ch) {
 	}
 		
 	if (GET_ACTION_TIMER(ch) <= 0) {
-		GET_ACTION(ch) = ACT_NONE;
-		
-		// 2x lumber, always
-		for (iter = 0; iter < 2; ++iter) {
-			obj = read_object(o_LUMBER, TRUE);
-			obj_to_char_or_room(obj, ch);
-			load_otrigger(obj);
-		}
-
-		act("You finish sawing $p (x2).", FALSE, ch, obj, NULL, TO_CHAR);
-		act("$n finishes sawing $p.", TRUE, ch, obj, 0, TO_ROOM);
-		
-		if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-			gain_skill_exp(ch, SKILL_EMPIRE, 10);
-		}
+		// will extract no matter what happens here
 		if ((proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
-			strcpy(tmp, fname(GET_OBJ_KEYWORDS(proto)));
-			do_saw(ch, tmp, 0, 0);
+			act("You finish sawing $p.", FALSE, ch, proto, NULL, TO_CHAR);
+			act("$n finishes sawing $p.", TRUE, ch, proto, NULL, TO_ROOM);
+			
+			success = run_interactions(ch, proto->interactions, INTERACT_SAW, IN_ROOM(ch), NULL, proto, finish_scraping);
+		}
+		
+		if (!success && !proto) {
+			snprintf(buf, sizeof(buf), "You finish sawing %s but get nothing.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
+			act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
+			snprintf(buf, sizeof(buf), "$n finishes sawing off %s.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
+			act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
+		}
+		
+		GET_ACTION(ch) = ACT_NONE;
+		free_resource_list(GET_ACTION_RESOURCES(ch));
+		GET_ACTION_RESOURCES(ch) = NULL;
+		
+		if (success && proto) {
+			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+				gain_skill_exp(ch, SKILL_EMPIRE, 10);
+			}
+			
+			// lather, rinse, rescrape
+			do_saw(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
 		}
 	}
 }
@@ -919,54 +913,42 @@ void process_build_action(char_data *ch) {
 * @param char_data *ch The chipper one.
 */
 void process_chipping(char_data *ch) {
-	obj_data *obj;
+	obj_data *proto;
+	bool success;
 	
 	if (!find_chip_weapon(ch)) {
 		msg_to_char(ch, "You need to be using some kind of hammer to chip it.\r\n");
 		cancel_action(ch);
+		return;
 	}
-	else {
-		GET_ACTION_TIMER(ch) -= 1;
-				
-		if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-			msg_to_char(ch, "You chip away at the piece of rock...\r\n");
-		}
-
-		if (GET_ACTION_TIMER(ch) <= 0) {
-			GET_ACTION(ch) = ACT_NONE;
+	if (!(proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
+		// obj deleted?
+		cancel_action(ch);
+		return;
+	}
+	
+	GET_ACTION_TIMER(ch) -= 1;
 			
-			switch (GET_ACTION_VNUM(ch, 0)) {
-				case o_ROCK: {
-					obj = read_object(o_CHIPPED, TRUE);
-					obj_to_char(obj, ch);
-					msg_to_char(ch, "It splits open!\r\n");
-					if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
-						gain_skill_exp(ch, SKILL_TRADE, 25);
-					}
-					load_otrigger(obj);
-					break;
-				}
-				case o_CHIPPED: {
-					obj = read_object(o_HANDAXE, TRUE);
-					obj_to_char(obj, ch);
-					act("You have crafted $p!", FALSE, ch, obj, 0, TO_CHAR);
-					if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
-						gain_skill_exp(ch, SKILL_TRADE, 25);
-					}
-					load_otrigger(obj);
-					break;
-				}
-				case o_HANDAXE: {
-					obj = read_object(o_SPEARHEAD, TRUE);
-					obj_to_char(obj, ch);
-					act("You have crafted $p!", FALSE, ch, obj, 0, TO_CHAR);
-					if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
-						gain_skill_exp(ch, SKILL_TRADE, 25);
-					}
-					load_otrigger(obj);
-					break;
-				}
+	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
+		act("You chip away at $p...", FALSE, ch, proto, NULL, TO_CHAR | TO_SPAMMY);
+	}
+
+	if (GET_ACTION_TIMER(ch) <= 0) {
+		act("$p splits open!", FALSE, ch, proto, NULL, TO_CHAR);
+		act("$p finishes chipping $p!", TRUE, ch, proto, NULL, TO_ROOM);
+		GET_ACTION(ch) = ACT_NONE;
+		
+		success = run_interactions(ch, proto->interactions, INTERACT_CHIP, IN_ROOM(ch), NULL, proto, finish_scraping);
+		free_resource_list(GET_ACTION_RESOURCES(ch));
+		GET_ACTION_RESOURCES(ch) = NULL;
+
+		if (success) {
+			if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
+				gain_skill_exp(ch, SKILL_TRADE, 25);
 			}
+			
+			// repeat! (no -paul) note: keyword-targeting is hard because "chipped rock" also has "rock" as an alias
+			// do_chip(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
 		}
 	}
 }
@@ -1825,8 +1807,9 @@ void process_quarrying(char_data *ch) {
 void process_repairing(char_data *ch) {
 	extern vehicle_data *find_vehicle(int n);
 
-	struct resource_data *res, *found_res = NULL;
-	obj_data *obj, *found_obj = NULL;
+	obj_data *found_obj = NULL;
+	struct resource_data *res;
+	bool found = FALSE;
 	vehicle_data *veh;
 	
 	// first attempt to re-find the vehicle
@@ -1840,50 +1823,10 @@ void process_repairing(char_data *ch) {
 	}
 	
 	// good to repair:
-	
-	// find a resource to process
-	LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
-		// check inventory
-		LL_FOREACH2(ch->carrying, obj, next_content) {
-			if (GET_OBJ_VNUM(obj) == res->vnum) {
-				found_res = res;
-				found_obj = obj;
-				break;
-			}
-		}
-
-		// check room
-		if (!found_obj && can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
-			LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
-				if (GET_OBJ_VNUM(obj) == res->vnum) {
-					found_res = res;
-					found_obj = obj;
-					break;
-				}
-			}
-		}
-		
-		if (found_obj && found_res) {
-			break;
-		}
-	}
-	
-	// found an item to add?
-	if (found_obj && found_res) {
-		found_res->amount -= 1;
-		
-		// check zero-res whether or not we found anything
-		if (found_res->amount <= 0) {
-			LL_DELETE(VEH_NEEDS_RESOURCES(veh), found_res);
-			free(found_res);
-		}
-		
-		// messaging
-		act("You use $p to repair $V.", FALSE, ch, found_obj, veh, TO_CHAR | TO_SPAMMY);
-		act("$n uses $p to repair $V.", FALSE, ch, found_obj, veh, TO_ROOM | TO_SPAMMY);
-		
-		// remove the resource
-		extract_obj(found_obj);
+	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), FALSE, &found_obj))) {
+		// take the item; possibly free the res
+		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_REPAIR, veh, NULL);
+		found = TRUE;
 	}
 	
 	// done?
@@ -1893,7 +1836,7 @@ void process_repairing(char_data *ch) {
 		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
 		act("$V is fully repaired!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
 	}
-	else if (!found_obj) {
+	else if (!found) {
 		GET_ACTION(ch) = ACT_NONE;
 		msg_to_char(ch, "You run out of resources and stop repairing.\r\n");
 		act("$n runs out of resources and stops.", FALSE, ch, NULL, NULL, TO_ROOM);
@@ -1909,47 +1852,49 @@ void process_repairing(char_data *ch) {
 void process_scraping(char_data *ch) {
 	ACMD(do_scrape);
 	
-	int count, total;
-	obj_data *obj, *stick = NULL;
-
-	if (!(obj = has_sharp_tool(ch))) {
+	char buf[MAX_STRING_LENGTH];
+	bool success = FALSE;
+	obj_data *proto;
+	
+	if (!has_sharp_tool(ch)) {
 		msg_to_char(ch, "You need to be using a sharp tool to scrape it.\r\n");
 		cancel_action(ch);
+		return;
 	}
-	else {
-		// skilled work
-		GET_ACTION_TIMER(ch) -= 1 + (skill_check(ch, ABIL_WOODWORKING, DIFF_EASY) ? 1 : 0);
 	
-		// messaging -- to player only
-		if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-			msg_to_char(ch, "You scrape at %s...\r\n", get_obj_name_by_proto(o_TREE));
+	// skilled work
+	GET_ACTION_TIMER(ch) -= 1 + (skill_check(ch, ABIL_WOODWORKING, DIFF_EASY) ? 1 : 0);
+	
+	// messaging -- to player only
+	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
+		msg_to_char(ch, "You scrape at %s...\r\n", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
+	}
+	
+	// done?
+	if (GET_ACTION_TIMER(ch) <= 0) {
+		
+		// will extract no matter what happens here
+		if ((proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
+			act("You finish scraping off $p.", FALSE, ch, proto, NULL, TO_CHAR);
+			act("$n finishes scraping off $p.", TRUE, ch, proto, NULL, TO_ROOM);
+			
+			success = run_interactions(ch, proto->interactions, INTERACT_SCRAPE, IN_ROOM(ch), NULL, proto, finish_scraping);
 		}
-	
-		// done?
-		if (GET_ACTION_TIMER(ch) <= 0) {
-			GET_ACTION(ch) = ACT_NONE;
-			
-			obj_to_char_or_room((obj = read_object(o_LOG, TRUE)), ch);
-			
-			// sticks!
-			total = number(2, 5);
-			for (count = 0; count < total; ++count) {
-				stick = read_object(o_STICK, TRUE);
-				obj_to_char_or_room(stick, ch);
-				load_otrigger(stick);
-			}
-			
-			sprintf(buf, "You finish scraping off $p and manage to get $P (x%d)!", total);
-			act(buf, FALSE, ch, obj, stick, TO_CHAR);
-			act("$n finishes scraping off $p!", TRUE, ch, obj, 0, TO_ROOM);
-	
-			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-				gain_skill_exp(ch, SKILL_EMPIRE, 10);
-			}
-			load_otrigger(obj);
-			
+		
+		if (!success && !proto) {
+			snprintf(buf, sizeof(buf), "You finish scraping off %s but get nothing.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
+			act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
+			snprintf(buf, sizeof(buf), "$n finishes scraping off %s.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
+			act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
+		}
+		
+		GET_ACTION(ch) = ACT_NONE;
+		free_resource_list(GET_ACTION_RESOURCES(ch));
+		GET_ACTION_RESOURCES(ch) = NULL;
+		
+		if (success && proto) {
 			// lather, rinse, rescrape
-			do_scrape(ch, "tree", 0, 0);
+			do_scrape(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
 		}
 	}
 }
@@ -1973,133 +1918,68 @@ void process_siring(char_data *ch) {
 
 
 /**
-* Tick update for smelt action.
-*
-* @param char_data *ch The smelter.
-*/
-void process_smelting(char_data *ch) {
-	ACMD(do_smelt);
-	
-	obj_data *proto, *obj = NULL;
-	int iter, type = NOTHING;
-
-	// decrement
-	GET_ACTION_TIMER(ch) -= 1;
-	
-	if (GET_ACTION_TIMER(ch) > 0) {
-		if (!number(0, 2) && !PRF_FLAGGED(ch, PRF_NOSPAM)) {
-			msg_to_char(ch, "You watch as the metal forms in the fire.\r\n");
-		}
-	}
-	else {
-		// DONE!
-
-		// Find the entry in the table
-		for (iter = 0; smelt_data[iter].from != NOTHING && type == NOTHING; ++iter) {
-			if (smelt_data[iter].from == GET_ACTION_VNUM(ch, 0)) {
-				type = iter;
-			}
-		}
-
-		if (type == NOTHING) {
-			// ... somehow
-			cancel_action(ch);
-			msg_to_char(ch, "Something went wrong with your smelting (error 1).\r\n");
-		}
-		else {
-			for (iter = 0; iter < smelt_data[type].to_amt; ++iter) {
-				obj_to_char((obj = read_object(smelt_data[type].to, TRUE)), ch);
-				load_otrigger(obj);
-			}
-
-			sprintf(buf2, " (x%d)", smelt_data[type].to_amt);
-			
-			sprintf(buf, "You have successfully created $p%s!", smelt_data[type].to_amt > 1 ? buf2 : "");
-			sprintf(buf1, "$n has successfully created $p%s!", smelt_data[type].to_amt > 1 ? buf2 : "");
-
-			act(buf, FALSE, ch, obj, 0, TO_CHAR);
-			act(buf1, TRUE, ch, obj, 0, TO_ROOM);
-
-			GET_ACTION(ch) = ACT_NONE;
-	
-			// repeat!
-			if ((proto = obj_proto(smelt_data[type].from))) {
-				strcpy(buf, fname(GET_OBJ_KEYWORDS(proto)));
-				do_smelt(ch, buf, 0, 0);
-			}
-		}
-	}
-}
-
-
-/**
 * Ticker for tanners.
 *
 * @param char_data *ch The tanner.
 */
 void process_tanning(char_data *ch) {
 	ACMD(do_tan);
-	obj_data *proto, *obj = NULL;
-	int iter, type = NOTHING;
-		
+	
+	obj_data *proto;
+	bool success;
+	
 	GET_ACTION_TIMER(ch) -= (BUILDING_VNUM(IN_ROOM(ch)) == BUILDING_TANNERY ? 4 : 1);
 	
+	// need the prototype
+	if (!(proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
+		cancel_action(ch);
+		return;
+	}
+	
 	if (GET_ACTION_TIMER(ch) <= 0) {
-		/* Find the entry in the table */
-		for (iter = 0; type == NOTHING && tan_data[iter].from != NOTHING; ++iter) {
-			if (tan_data[iter].from == GET_ACTION_VNUM(ch, 0)) {
-				type = iter;
-			}
-		}
-
-		if (type == NOTHING || tan_data[type].to == NOTHING) {
-			cancel_action(ch);
-			return;
-		}
-
-		obj_to_char_or_room((obj = read_object(tan_data[type].to, TRUE)), ch);
-
-		act("You finish tanning $p.", FALSE, ch, obj, 0, TO_CHAR);
-		act("$n finishes tanning $p.", TRUE, ch, obj, 0, TO_ROOM);
+		act("You finish tanning $p.", FALSE, ch, proto, NULL, TO_CHAR);
+		act("$n finishes tanning $p.", TRUE, ch, proto, NULL, TO_ROOM);
 
 		GET_ACTION(ch) = ACT_NONE;
+		
+		success = run_interactions(ch, proto->interactions, INTERACT_TAN, IN_ROOM(ch), NULL, proto, finish_scraping);
+		free_resource_list(GET_ACTION_RESOURCES(ch));
+		GET_ACTION_RESOURCES(ch) = NULL;
+		
+		if (success) {
+			if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
+				gain_skill_exp(ch, SKILL_TRADE, 20);
+			}
 	
-		if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
-			gain_skill_exp(ch, SKILL_TRADE, 20);
-		}
-		load_otrigger(obj);
-	
-		// repeat!
-		if ((proto = obj_proto(tan_data[type].from))) {
-			strcpy(buf, fname(GET_OBJ_KEYWORDS(proto)));
-			do_tan(ch, buf, 0, 0);
+			// repeat!
+			do_tan(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
 		}
 	}
 	else {
 		switch (GET_ACTION_TIMER(ch)) {
 			case 10: {	// non-tannery only
-				act("You soak the skin...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				act("$n soaks the skin...", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				act("You soak $p...", FALSE, ch, proto, NULL, TO_CHAR | TO_SPAMMY);
+				act("$n soaks $p...", FALSE, ch, proto, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
 			case 8: {	// all
-				act("You scrape the skin clean...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				act("$n scrapes the skin clean...", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				act("You scrape $p clean...", FALSE, ch, proto, NULL, TO_CHAR | TO_SPAMMY);
+				act("$n scrapes $p clean...", FALSE, ch, proto, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
 			case 6: {	// non-tannery only
-				act("You brush the skin...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				act("$n brushes the skin...", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				act("You brush $p...", FALSE, ch, proto, NULL, TO_CHAR | TO_SPAMMY);
+				act("$n brushes $p...", FALSE, ch, proto, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
 			case 4: {	// all
-				act("You knead the skin with a foul-smelling mixture...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				act("$n kneads the skin with a foul-smelling mixture...", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				act("You knead $p with a foul-smelling mixture...", FALSE, ch, proto, NULL, TO_CHAR | TO_SPAMMY);
+				act("$n kneads $p with a foul-smelling mixture...", FALSE, ch, proto, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
 			case 2: {	// non-tannery only
-				act("You stretch the raw leather...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				act("$n stretches the raw leather...", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				act("You stretch $p...", FALSE, ch, proto, NULL, TO_CHAR | TO_SPAMMY);
+				act("$n stretches $p...", FALSE, ch, proto, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
 		}
@@ -2153,10 +2033,10 @@ ACMD(do_chip) {
 	else if (!*arg) {
 		msg_to_char(ch, "Chip what?\r\n");
 	}
-	else if (!(target = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
+	else if (!(target = get_obj_in_list_vis(ch, arg, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || !(target = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))) {
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
-	else if (GET_OBJ_VNUM(target) != o_ROCK && GET_OBJ_VNUM(target) != o_CHIPPED && GET_OBJ_VNUM(target) != o_HANDAXE) {
+	else if (!has_interaction(target->interactions, INTERACT_CHIP)) {
 		msg_to_char(ch, "You can't chip that!\r\n");
 	}
 	else if (!find_chip_weapon(ch)) {
@@ -2164,10 +2044,14 @@ ACMD(do_chip) {
 	}
 	else {
 		start_action(ch, ACT_CHIPPING, chip_timer);
-		GET_ACTION_VNUM(ch, 0) = GET_OBJ_VNUM(target);
 		
-		act("You begin to chip at $p.", FALSE, ch, target, 0, TO_CHAR);
-		act("$n begins to chip at $p.", TRUE, ch, target, 0, TO_ROOM);
+		// store the obj
+		add_to_resource_list(&GET_ACTION_RESOURCES(ch), RES_OBJECT, GET_OBJ_VNUM(target), 1, GET_OBJ_CURRENT_SCALE_LEVEL(target));
+		GET_ACTION_VNUM(ch, 0) = GET_OBJ_VNUM(target);
+		GET_ACTION_VNUM(ch, 1) = GET_OBJ_CURRENT_SCALE_LEVEL(target);
+		
+		act("You begin to chip at $p.", FALSE, ch, target, NULL, TO_CHAR);
+		act("$n begins to chip at $p.", TRUE, ch, target, NULL, TO_ROOM);
 		extract_obj(target);
 	}
 }
@@ -2374,7 +2258,7 @@ ACMD(do_harvest) {
 		msg_to_char(ch, "You can't harvest here.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
-		msg_to_char(ch, "You already busy doing something else.\r\n");
+		msg_to_char(ch, "You are already busy doing something else.\r\n");
 	}
 	else if (!ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CROP)) {
 		msg_to_char(ch, "You can't harvest anything here!\r\n");
@@ -2699,25 +2583,30 @@ ACMD(do_saw) {
 		cancel_action(ch);
 	}
 	else if (BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_LUMBER_YARD || !IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can only saw lumber in a lumber yard.\r\n");
+		msg_to_char(ch, "You can only saw in a lumber yard.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to saw lumber here.\r\n");
+		msg_to_char(ch, "You don't have permission to saw here.\r\n");
 	}
-	else if (GET_ACTION(ch) != ACT_NONE)
+	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already busy doing something else.\r\n");
+	}
 	else if (!*arg) {
 		msg_to_char(ch, "Saw what?\r\n");
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
-		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
-	else if (GET_OBJ_VNUM(obj) != o_TREE && GET_OBJ_VNUM(obj) != o_LOG) {
+	else if (!has_interaction(obj->interactions, INTERACT_SAW)) {
 		msg_to_char(ch, "You can't saw that!\r\n");
 	}
 	else {
 		start_action(ch, ACT_SAWING, 8);
+		
+		// store the item that was used
+		add_to_resource_list(&GET_ACTION_RESOURCES(ch), RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 		GET_ACTION_VNUM(ch, 0) = GET_OBJ_VNUM(obj);
+		GET_ACTION_VNUM(ch, 1) = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
 
 		act("You begin sawing $p.", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n begins sawing $p.", TRUE, ch, obj, 0, TO_ROOM);
@@ -2727,10 +2616,10 @@ ACMD(do_saw) {
 
 
 ACMD(do_scrape) {
-	obj_data *obj, *weapon;
-
+	obj_data *obj;
+	
 	one_argument(argument, arg);
-
+	
 	if (GET_ACTION(ch) == ACT_SCRAPING) {
 		act("You stop scraping.", FALSE, ch, NULL, NULL, TO_CHAR);
 		cancel_action(ch);
@@ -2741,106 +2630,27 @@ ACMD(do_scrape) {
 	else if (!*arg) {
 		msg_to_char(ch, "Scrape what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))) {
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
-	else if (GET_OBJ_VNUM(obj) != o_TREE) {
+	else if (!has_interaction(obj->interactions, INTERACT_SCRAPE)) {
 		msg_to_char(ch, "You can't scrape that!\r\n");
 	}
-	else if (!(weapon = has_sharp_tool(ch))) {
+	else if (!has_sharp_tool(ch)) {
 		msg_to_char(ch, "You need to be using a sharp tool to scrape anything.\r\n");
 	}
 	else {
 		start_action(ch, ACT_SCRAPING, 6);
-
+		
+		// store the item that was used
+		add_to_resource_list(&GET_ACTION_RESOURCES(ch), RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+		GET_ACTION_VNUM(ch, 0) = GET_OBJ_VNUM(obj);
+		GET_ACTION_VNUM(ch, 1) = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
+		
 		act("You begin scraping $p.", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n begins scraping $p.", TRUE, ch, obj, 0, TO_ROOM);
-		extract_obj(obj);
-	}
-}
-
-
-ACMD(do_smelt) {
-	int smelt_timer = config_get_int("smelt_timer");
-	
-	obj_data *obj[8], *obj_iter;
-	int iter, type = NOTHING, num_found;
-	
-	for (iter = 0; iter < 8; ++iter) {
-		obj[iter] = NULL;
-	}
-
-	one_argument(argument, arg);
-
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "You can't smelt.\r\n");
-	}
-	else if (!*arg) {
-		msg_to_char(ch, "What would you like to smelt?\r\n");
-	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		msg_to_char(ch, "You're busy right now.\r\n");
-	}
-	else if (!(obj[0] = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-		msg_to_char(ch, "You don't seem to have more to smelt.\r\n");
-	}
-	else if ((!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_FORGE) && BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_FOUNDRY) || !IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You need to be in a forge or foundry to do this.\r\n");
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to smelt here.\r\n");
-	}
-	else {
-		/* Make sure it's in the list */
-		for (iter = 0; smelt_data[iter].from != NOTHING && type == NOTHING; ++iter) {
-			if (smelt_data[iter].from == GET_OBJ_VNUM(obj[0])) {
-				type = iter;
-			}
-		}
 		
-		if (type == NOTHING) {
-			msg_to_char(ch, "You can't smelt that.\r\n");
-		}
-		else {
-			num_found = 1;
-			
-			// start at 1 to find some more of the "from" obj (we already have the first one)
-			for (iter = 1; iter < smelt_data[type].from_amt && obj[iter-1]; ++iter) {
-				for (obj_iter = obj[iter-1]->next_content; obj_iter && num_found <= iter; obj_iter = obj_iter->next_content) {
-					if (GET_OBJ_VNUM(obj_iter) == smelt_data[type].from) {
-						obj[iter] = obj_iter;
-						num_found = iter+1;
-					}
-				}
-			}
-
-			// got enough?
-			if (num_found < smelt_data[type].from_amt) {
-				msg_to_char(ch, "You'll need %d of them to smelt.\r\n", smelt_data[type].from_amt);
-			}
-			else {
-				start_action(ch, ACT_MELTING, smelt_timer);
-				GET_ACTION_VNUM(ch, 0) = smelt_data[type].from;
-				
-				sprintf(buf, "You begin to smelt $p");
-				if (num_found > 1) {
-					sprintf(buf + strlen(buf), " (x%d).", num_found);
-				}
-				else {
-					strcat(buf, ".");
-				}
-				
-				act(buf, FALSE, ch, obj[0], 0, TO_CHAR);
-				act("$n begins to smelt $p.", FALSE, ch, obj[0], 0, TO_ROOM);
-
-				// extract
-				for (iter = 0; iter < num_found; ++iter) {
-					if (obj[iter]) {
-						extract_obj(obj[iter]);
-					}
-				}
-			}
-		}
+		extract_obj(obj);
 	}
 }
 
@@ -2867,7 +2677,6 @@ ACMD(do_stop) {
 
 ACMD(do_tan) {
 	obj_data *obj;
-	int iter, type;
 	
 	int tan_timer = config_get_int("tan_timer");
 
@@ -2885,26 +2694,22 @@ ACMD(do_tan) {
 	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You don't seem to have more to tan.\r\n");
 	}
+	else if (!has_interaction(obj->interactions, INTERACT_TAN)) {
+		msg_to_char(ch, "You can't tan that!\r\n");
+	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to tan here.\r\n");
 	}
 	else {
-		/* Make sure it's in the list */
-		for (iter = 0, type = NOTHING; type == NOTHING && tan_data[iter].from != NOTHING; ++iter) {
-			if (tan_data[iter].from == GET_OBJ_VNUM(obj)) {
-				type = iter;
-			}
-		}
-		
-		if (type == NOTHING) {
-			act("You can't tan $p.", FALSE, ch, obj, NULL, TO_CHAR);
-			return;
-		}
-
 		start_action(ch, ACT_TANNING, tan_timer);
+		
+		// store the obj
+		add_to_resource_list(&GET_ACTION_RESOURCES(ch), RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 		GET_ACTION_VNUM(ch, 0) = GET_OBJ_VNUM(obj);
-		act("You begin to tan $p.", FALSE, ch, obj, 0, TO_CHAR);
-		act("$n begins to tan $p.", FALSE, ch, obj, 0, TO_ROOM);
+		GET_ACTION_VNUM(ch, 1) = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
+		
+		act("You begin to tan $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$n begins to tan $p.", FALSE, ch, obj, NULL, TO_ROOM);
 
 		extract_obj(obj);
 	}

@@ -612,10 +612,12 @@ void check_for_bad_buildings(void) {
 			log(" unlinking instance entrance room %d for no association with an instance", GET_ROOM_VNUM(room));
 			unlink_instance_entrance(room);
 		}
+		/* This probably isn't necessary and having it here will cause roads to be pulled up as of b3.17 -paul
 		else if (COMPLEX_DATA(room) && !GET_BUILDING(room) && !GET_ROOM_TEMPLATE(room)) {
 			log(" removing complex data from %d for no building, no template data", GET_ROOM_VNUM(room));
 			disassociate_building(room);
 		}
+		*/
 	}
 	if (deleted) {
 		check_all_exits();
@@ -1660,6 +1662,7 @@ const char *versions_list[] = {
 	"b3.11",
 	"b3.12",
 	"b3.15",
+	"b3.17",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -1999,6 +2002,38 @@ void b3_15_crop_update(void) {
 }
 
 
+// adds built-with resources to roads
+void b3_17_road_update(void) {
+	extern struct complex_room_data *init_complex_data();
+	
+	struct map_data *map;
+	room_data *room;
+	
+	obj_vnum rock_obj = 100;
+	
+	LL_FOREACH(land_map, map) {
+		if (!SECT_FLAGGED(map->sector_type, SECTF_IS_ROAD)) {
+			continue;
+		}
+		if (!(room = real_room(map->vnum))) {
+			continue;
+		}
+		
+		// ensure complex data
+		if (!COMPLEX_DATA(room)) {
+			COMPLEX_DATA(room) = init_complex_data();
+		}
+		
+		// add build cost in rocks if necessary
+		if (!GET_BUILT_WITH(room)) {
+			add_to_resource_list(&GET_BUILT_WITH(room), RES_OBJECT, rock_obj, 20, 0);
+		}
+	}
+	
+	save_whole_world();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -2164,6 +2199,10 @@ void check_version(void) {
 		if (MATCH_VERSION("b3.15")) {
 			log("Spawning b3.15 crops...");
 			b3_15_crop_update();
+		}
+		if (MATCH_VERSION("b3.17")) {
+			log("Adding b3.17 road data...");
+			b3_17_road_update();
 		}
 	}
 	

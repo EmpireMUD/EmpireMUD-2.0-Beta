@@ -28,6 +28,9 @@ replace, or prevent player abilities. Rooms will trigger on any ability
 performed in them, but mobs and objects only execute Ability triggers if they
 are the target of the ability.
 
+Note: Ability triggers attached to charmed mobs will not fire unless the trigger
+   also has the Charmed type.
+
 Variables: 
   &c%actor%&0 - The user of the ability.
   &c%ability%&0 - The vnum of the ability.
@@ -39,6 +42,8 @@ Room triggers also provide:
 
 Mob and object triggers also provide:
   &c%self%&0 - Ability triggers only execute when the target is self.
+
+See also: MTRIG CHARMED
 #d
 "COMMAND TRIGGER" "MTRIG COMMAND" "OTRIG COMMAND" "RTRIG COMMAND" "VTRIG COMMAND" TRIGEDIT-MOB-COMMAND TRIGEDIT-OBJ-COMMAND TRIGEDIT-ROOM-COMMAND TRIGEDIT-VEH-COMMAND
 
@@ -55,7 +60,10 @@ puzzle games. If your script determines that it shouldn't actually process the
 command that triggered it, return 0 and the player will see the normal result
 of their command.
 
-Note: Immortals can only use command triggers when the "hassle" toggle is on.
+Note: High level Immortals can only use command triggers when the "hassle"
+   toggle is on.
+Note: Command triggers attached to charmed mobs will not fire unless the trigger
+   also has the Charmed type.
 Note: If you trigger on a real game command, you should use the entire word
    (not an abbreviation); the trigger will also match abbreviations. If you are
    instead adding a new command, it will only work if the player types an exact
@@ -68,7 +76,7 @@ Variables:
   &c%cmd%&0 - The command (without arguments) as typed.
   &c%arg%&0 - The arguments typed with the command (if any).
 
-See also: TOGGLE
+See also: TOGGLE, MTRIG CHARMED
 #d
 "DOOR TRIGGER" "MTRIG DOOR" "RTRIG DOOR" TRIGEDIT-MOB-DOOR TRIGEDIT-ROOM-DOOR TRIGEDIT-DOOR
 
@@ -80,10 +88,15 @@ Return value:  return 0 to prevent the door command
 Activated when a player uses the door-specific commands: 'close, open' on a
 door (not on objects). This can be used to require keys or other restrictions.
 
+Note: Door triggers attached to charmed mobs will not fire unless the trigger
+   also has the Charmed type.
+
 Variables:
   &c%actor%&0 - The character using the command.
   &c%direction%&0 - The direction the command is used on.
   &c%cmd%&0 - The specific command activating the trigger.
+
+See also: MTRIG CHARMED
 #d
 "DROP TRIGGER" "OTRIG DROP" "RTRIG DROP" TRIGEDIT-OBJ-DROP TRIGEDIT-ROOM-DROP DROP-TRIGGER TRIG-OBJ-DROP TRIG-ROOM-DROP
 
@@ -195,6 +208,8 @@ returning 0 from the script.
 
 Note: Mobs can only Greet people they can see; use Greet All to also trigger on
    people the mob can't see. Vehicle triggers do not make this distinction.
+Note: Greet triggers attached to charmed mobs will not fire unless the trigger
+   also has the Charmed type.
 Note: Players entering magically (or via something other than a normal room
    exit) may not be prevented from entering. You can usually check this by
    seeing if the %direction% variable is empty.
@@ -202,6 +217,8 @@ Note: Players entering magically (or via something other than a normal room
 Variables:
   &c%actor%&0 - The character entering the room.
   &c%direction%&0 - The direction the character came from, if any.
+  
+See also: MTRIG CHARMED
 #d
 "LEAVE TRIGGER" "LEAVE-ALL TRIGGER" "MTRIG LEAVE" "OTRIG LEAVE" "RTRIG LEAVE" "VTRIG LEAVE" "MTRIG LEAVE ALL" TRIGEDIT-MOB-LEAVE TRIGEDIT-OBJ-LEAVE TRIGEDIT-ROOM-LEAVE TRIGEDIT-VEH-LEAVE TRIGEDIT-MOB-LEAVE-ALL
 
@@ -216,9 +233,14 @@ objects, and vehicles, it is the room they are currently in.
 Mobs can only execute Leave triggers on people they can see. You can use the
 Leave-All version to also stop sneaky or invisible people.
 
+Note: Leave triggers attached to charmed mobs will not fire unless the trigger
+   also has the Charmed type.
+
 Variables: 
   &c%actor%&0 - The character trying to leave the room.
   &c%direction%&0 - The direction the character is leaving to.
+
+See also: MTRIG LEAVE
 #d
 "LOAD TRIGGER" "MTRIG LOAD" "OTRIG LOAD" "RTRIG LOAD" "VTRIG LOAD" TRIGEDIT-MOB-LOAD TRIGEDIT-OBJ-LOAD TRIGEDIT-VEH-LOAD TRIGEDIT-ROOM-LOAD TRIGEDIT-LOAD TRIG-LOAD
 
@@ -250,7 +272,10 @@ You can return 0 if it shouldn't have gone there and should go back. If you
 want the mob to do something on arrival, you should consider using a short
 wait.
 
-See also: WAIT
+Note: Entry triggers attached to charmed mobs will not fire unless the trigger
+   also has the Charmed type.
+
+See also: WAIT, MTRIG CHARMED
 #d
 MUDCOMMAND CMD.MUDCOMMAND %CMD.MUDCOMMAND% %MUDCOMMAND%
 
@@ -285,6 +310,11 @@ You can set how often the trigger fires by setting the percent to:
 100% = 13 seconds
 
 (all times are approximate, except 100%)
+
+Note: Random triggers attached to charmed mobs will not fire unless the trigger
+   also has the Charmed type.
+
+See also: GLOBAL TRIGGER, MTRIG CHARMED
 #d
 "SCRIPT COMMANDS" "TRIGEDIT SCRIPT COMMANDS"
 
@@ -369,10 +399,14 @@ add riddle quests, to make doors activate on command ("open sesame"), or to
 add other types of interactions to the game.
 
 Note: Objects cannot have speech triggers, but mobs, rooms, and vehicles can.
+Note: Speech triggers attached to charmed mobs will not fire unless the trigger
+   also has the Charmed type.
 
 Variables:
   &c%actor%&0 - The character whose speech activated the trigger.
   &c%speech%&0 - The entire phrase spoken.
+
+See also: MTRIG CHARMED
 #d
 "TEXT VARIABLES" "TEXT VARS" TRIGEDIT-VARIABLES-TEXTS TEXT-VAR TRIGEDIT-TEXT-VAR
 

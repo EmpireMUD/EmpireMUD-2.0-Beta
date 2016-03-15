@@ -80,40 +80,19 @@
 #define BOARD_IMM  2
 
 // Natural resources
-#define o_ROCK  100
-#define o_CLAY  101
+#define o_ROCK  100	// TODO: rocks are special-cased for chipping
+#define o_CLAY  101	// TODO: remove clay-near-water override and make it a rare Plains result, and otherwise claypit-only
 #define o_LIGHTNING_STONE  103
 #define o_BLOODSTONE  104
-#define o_STONE_BLOCK  105
-#define o_TREE  120
-#define o_STICK  121
-#define o_FLOWER  123
-#define o_LOG  124
-#define o_LUMBER  125
+#define o_STONE_BLOCK  105	// TODO: change quarry to interaction
+#define o_TREE  120	// TODO: change chop to an interaction (+evo, like a combo)
+#define o_FLOWER  123	// TODO: find-herbs could be a global type and "flower" is the only one that requires no skill
 #define o_WHEAT  141
 #define o_HOPS  143
-#define o_COTTON  144
 #define o_BARLEY  145
-#define o_IRON_ORE  160
-#define o_SILVER  161
-#define o_GOLD  162
-#define o_NOCTURNIUM_ORE  163
-#define o_IMPERIUM_ORE  164
-#define o_COPPER  165
-#define o_SILVER_DISC  170
-#define o_GOLD_DISC  171
-#define o_SILVER_BAR  172
-#define o_GOLD_BAR  173
 #define o_GOLD_SMALL  174
-#define o_IRON_INGOT  175
-#define o_NOCTURNIUM_INGOT  176
-#define o_IMPERIUM_INGOT  177
-#define o_COPPER_INGOT  178
-#define o_COPPER_BAR  179
-#define o_CHIPPED  180
 #define o_HANDAXE  181
 #define o_FLINT_SET  183
-#define o_SPEARHEAD  186
 
 // brewing items
 #define o_APPLES  3002
@@ -121,9 +100,8 @@
 #define o_CORN  3005
 
 // clay
-#define o_BOWL  250
 #define o_HESTIAN_TRINKET  256
-#define o_BRICKS  257
+#define o_BRICKS  257	// TODO: create a workforce brickmaking ability/craft
 #define o_TRINKET_OF_CONVEYANCE  262
 
 // Sewn items
@@ -164,13 +142,11 @@
 #define o_NAILS  1306
 
 // skins
-#define o_SMALL_SKIN  1350
+#define o_SMALL_SKIN  1350	// TODO: trapper's post could use a room interaction like TRAPPING
 #define o_LARGE_SKIN  1351
-#define o_SMALL_LEATHER  1356
-#define o_LARGE_LEATHER  1357
 
 // for catapults/ships
-#define o_HEAVY_SHOT  2135
+#define o_HEAVY_SHOT  2135	// TODO: This could be a material or item type
 
 
  //////////////////////////////////////////////////////////////////////////////

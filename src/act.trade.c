@@ -75,6 +75,9 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !can_forge(ch)) {
 		// sends its own message
 	}
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT && ((!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_FORGE) && BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_FOUNDRY) || !IS_COMPLETE(IN_ROOM(ch)))) {
+		msg_to_char(ch, "You can't %s here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+	}
 	
 	// flag checks
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) && !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &room_wait)) {
@@ -425,6 +428,98 @@ bool obj_has_apply_type(obj_data *obj, int apply_type) {
 }
 
 
+/**
+* This is like a mortal version of do_stat_craft().
+*
+* @param char_data *ch The person checking the craft info.
+* @param craft_data *craft Which craft to show.
+*/
+void show_craft_info(char_data *ch, craft_data *craft) {
+	extern const char *affected_bits[];
+	extern const char *apply_types[];
+	extern const char *bld_on_flags[];
+	extern const char *craft_flag_for_info[];
+	extern const char *drinks[];
+	extern const char *item_types[];
+	
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], range[MAX_STRING_LENGTH];
+	struct obj_apply *apply;
+	ability_data *abil;
+	obj_data *proto;
+	bld_data *bld;
+	
+	msg_to_char(ch, "Information for %s:\r\n", GET_CRAFT_NAME(craft));
+	
+	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+		bld = building_proto(GET_CRAFT_BUILD_TYPE(craft));
+		msg_to_char(ch, "Builds: %s\r\n", bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+	}
+	else if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+		msg_to_char(ch, "Creates vehicle: %s\r\n", get_vehicle_name_by_proto(GET_CRAFT_OBJECT(craft)));
+	}
+	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {
+		msg_to_char(ch, "Creates liquid: %d unit%s of %s\r\n", GET_CRAFT_QUANTITY(craft), PLURAL(GET_CRAFT_QUANTITY(craft)), (GET_CRAFT_OBJECT(craft) == NOTHING ? "NOTHING" : drinks[GET_CRAFT_OBJECT(craft)]));
+	}
+	else if ((proto = obj_proto(GET_CRAFT_OBJECT(craft)))) {
+		// build info string
+		sprintf(buf, " (%s", item_types[(int) GET_OBJ_TYPE(proto)]);
+		LL_FOREACH(GET_OBJ_APPLIES(proto), apply) {
+			sprintf(buf + strlen(buf), ", %s", apply_types[(int) apply->location]);
+		}
+		if (GET_OBJ_AFF_FLAGS(proto)) {
+			prettier_sprintbit(GET_OBJ_AFF_FLAGS(proto), affected_bits, part);
+			sprintf(buf + strlen(buf), ", %s", part);
+		}
+		strcat(buf, ")");
+		
+		if (GET_OBJ_MIN_SCALE_LEVEL(proto) > 0 || GET_OBJ_MAX_SCALE_LEVEL(proto) > 0) {
+			sprintf(range, " [%s]", level_range_string(GET_OBJ_MIN_SCALE_LEVEL(proto), GET_OBJ_MAX_SCALE_LEVEL(proto), 0));
+		}
+		else {
+			*range = '\0';
+		}
+		
+		if (GET_CRAFT_QUANTITY(craft) == 1) {
+			msg_to_char(ch, "Creates: %s%s%s\r\n", get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), range, buf);
+		}
+		else {
+			msg_to_char(ch, "Creates: %dx %s%s%s\r\n", GET_CRAFT_QUANTITY(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)), range, buf);
+		}
+	}
+	
+	if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING) {
+		msg_to_char(ch, "Requires: %s\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft)));
+	}
+	
+	if (GET_CRAFT_ABILITY(craft) != NO_ABIL) {
+		sprintf(buf, "%s", get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft)));
+		if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
+			sprintf(buf + strlen(buf), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+		}
+		msg_to_char(ch, "Requires: %s\r\n", buf);
+	}
+	
+	if (GET_CRAFT_MIN_LEVEL(craft) > 0) {
+		msg_to_char(ch, "Requires: crafting level %d\r\n", GET_CRAFT_MIN_LEVEL(craft));
+	}
+	
+	prettier_sprintbit(GET_CRAFT_FLAGS(craft), craft_flag_for_info, part);
+	msg_to_char(ch, "Notes: %s\r\n", part);
+	
+	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+		prettier_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, buf);
+		msg_to_char(ch, "Build on: %s\r\n", buf);
+		if (GET_CRAFT_BUILD_FACING(craft)) {
+			prettier_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, buf);
+			msg_to_char(ch, "Build facing: %s\r\n", buf);
+		}
+	}
+	
+	show_resource_list(GET_CRAFT_RESOURCES(craft), buf);
+	msg_to_char(ch, "Resources: %s\r\n", buf);	
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// GENERIC CRAFT (craft, forge, sew, cook) /////////////////////////////////
 
@@ -438,23 +533,26 @@ bool obj_has_apply_type(obj_data *obj, int apply_type) {
 
 // CRAFT_TYPE_x
 struct gen_craft_data_t gen_craft_data[] = {
-	{ "error", "erroring", { "", "" } },	// dummy to require scmd
+	{ "error", "erroring", NOBITS, { "", "" } },	// dummy to require scmd
 	
 	// Note: These correspond to CRAFT_TYPE_x so you cannot change the order.
-	{ "forge", "forging", { "You hit the %s on the anvil hard with $p!", "$n hits the %s on the anvil hard with $p!" } },
-	{ "craft", "crafting", { "You continue crafting the %s...", "$n continues crafting the %s..." } },
-	{ "cook", "cooking", { "You continue cooking the %s...", "$n continues cooking the %s..." } },
-	{ "sew", "sewing", { "You carefully sew the %s...", "$n carefully sews the %s..." } },
-	{ "mill", "milling", { "You grind the millstone, making %s...", "$n grinds the millstone, making %s..." } },
-	{ "brew", "brewing", { "You stir the potion and infuse it with mana...", "$n stirs the potion..." } },
-	{ "mix", "mixing", { "The poison bubbles as you stir it...", "$n stirs the bubbling poison..." } },
+	{ "forge", "forging", NOBITS, { "You hit the %s on the anvil hard with $p!", "$n hits the %s on the anvil hard with $p!" } },
+	{ "craft", "crafting", NOBITS, { "You continue crafting the %s...", "$n continues crafting the %s..." } },
+	{ "cook", "cooking", ACTF_FAST_CHORES, { "You continue cooking the %s...", "$n continues cooking the %s..." } },
+	{ "sew", "sewing", NOBITS, { "You carefully sew the %s...", "$n carefully sews the %s..." } },
+	{ "mill", "milling", NOBITS, { "You grind the millstone, making %s...", "$n grinds the millstone, making %s..." } },
+	{ "brew", "brewing", NOBITS, { "You stir the potion and infuse it with mana...", "$n stirs the potion..." } },
+	{ "mix", "mixing", NOBITS, { "The poison bubbles as you stir it...", "$n stirs the bubbling poison..." } },
 	
 	// build is special and doesn't use do_gen_craft, so doesn't really use this data
-	{ "build", "building", { "You work on the building...", "$n works on the building..." } },
+	{ "build", "building", NOBITS, { "You work on the building...", "$n works on the building..." } },
 	
-	{ "weave", "weaving", { "You carefully weave the %s...", "$n carefully weaves the %s..." } },
-	{ "workforce", "producing", { "You work on the %s...", "$n work on the %s..." } },	// not used by players
-	{ "manufacture", "manufacturing", { "You carefully manufacture the %s...", "$n carefully manufactures the %s..." } },
+	{ "weave", "weaving", NOBITS, { "You carefully weave the %s...", "$n carefully weaves the %s..." } },
+	
+	{ "workforce", "producing", NOBITS, { "You work on the %s...", "$n work on the %s..." } },	// not used by players
+	
+	{ "manufacture", "manufacturing", NOBITS, { "You carefully manufacture the %s...", "$n carefully manufactures the %s..." } },
+	{ "smelt", "smelting", ACTF_FAST_CHORES, { "You smelt the %s in the fire...", "$n smelts the %s in the fire..." } },
 };
 
 
@@ -463,7 +561,10 @@ void cancel_gen_craft(char_data *ch) {
 	obj_data *obj;
 	
 	if (type && !CRAFT_FLAGGED(type, CRAFT_VEHICLE)) {
-		give_resources(ch, GET_CRAFT_RESOURCES(type), FALSE);
+		// refund the real resources they used
+		give_resources(ch, GET_ACTION_RESOURCES(ch), FALSE);
+		free_resource_list(GET_ACTION_RESOURCES(ch));
+		GET_ACTION_RESOURCES(ch) = NULL;
 
 		// load the drink container back
 		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
@@ -603,6 +704,10 @@ void finish_gen_craft(char_data *ch) {
 	if (is_master && applied_master) {
 		gain_ability_exp(ch, ABIL_MASTERY_ABIL(cft_abil), 33.4);
 	}
+	
+	// free the stored action resources now -- we no longer risk refunding them
+	free_resource_list(GET_ACTION_RESOURCES(ch));
+	GET_ACTION_RESOURCES(ch) = NULL;
 
 	// repeat as desired
 	if (num > 1) {
@@ -619,11 +724,11 @@ void finish_gen_craft(char_data *ch) {
 * @param craft_data *type The craft recipe.
 */
 void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
-	struct resource_data *res, *found_res = NULL;
-	obj_data *obj, *found_obj = NULL;
+	bool found = FALSE, any = FALSE;
 	char buf[MAX_STRING_LENGTH];
+	obj_data *found_obj = NULL;
+	struct resource_data *res;
 	vehicle_data *veh;
-	bool any = FALSE;
 	char_data *vict;
 	
 	// basic setup
@@ -632,63 +737,11 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		return;
 	}
 	
-	// find a resource to process
-	LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
-		// check inventory
-		LL_FOREACH2(ch->carrying, obj, next_content) {
-			if (GET_OBJ_VNUM(obj) == res->vnum) {
-				found_res = res;
-				found_obj = obj;
-				break;
-			}
-		}
-
-		// check room
-		if (!found_obj && can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
-			LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
-				if (GET_OBJ_VNUM(obj) == res->vnum) {
-					found_res = res;
-					found_obj = obj;
-					break;
-				}
-			}
-		}
+	// find and apply something
+	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), FALSE, &found_obj))) {
+		// take the item; possibly free the res
+		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_CRAFT, veh, NULL);
 		
-		if (found_obj && found_res) {
-			break;
-		}
-	}
-	
-	// found an item to add?
-	if (found_obj && found_res) {
-		found_res->amount -= 1;
-		
-		// check zero-res whether or not we found anything
-		if (found_res->amount <= 0) {
-			LL_DELETE(VEH_NEEDS_RESOURCES(veh), found_res);
-			free(found_res);
-		}
-		
-		// messaging
-		if (has_custom_message(found_obj, OBJ_CUSTOM_CRAFT_TO_CHAR)) {
-			act(get_custom_message(found_obj, OBJ_CUSTOM_CRAFT_TO_CHAR), FALSE, ch, found_obj, veh, TO_CHAR | TO_SPAMMY);
-		}
-		else {
-			snprintf(buf, sizeof(buf), "You %s $V with $p.", gen_craft_data[GET_CRAFT_TYPE(type)].command);
-			act(buf, FALSE, ch, found_obj, veh, TO_CHAR | TO_SPAMMY);
-		}
-		
-		if (has_custom_message(found_obj, OBJ_CUSTOM_CRAFT_TO_ROOM)) {
-			act(get_custom_message(found_obj, OBJ_CUSTOM_CRAFT_TO_ROOM), FALSE, ch, found_obj, veh, TO_ROOM | TO_SPAMMY);
-		}
-		else {
-			snprintf(buf, sizeof(buf), "$n %ss $V with $p.", gen_craft_data[GET_CRAFT_TYPE(type)].command);
-			act(buf, FALSE, ch, found_obj, veh, TO_ROOM | TO_SPAMMY);
-		}
-		
-		// remove the resource
-		extract_obj(found_obj);
-	
 		// experience per resource
 		if (GET_CRAFT_ABILITY(type) != NO_ABIL) {
 			gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 3);
@@ -698,6 +751,8 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 				gain_skill_exp(ch, SKILL_TRADE, 3);
 			}
 		}
+		
+		found = TRUE;
 	}
 	
 	// done?
@@ -715,7 +770,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		
 		load_vtrigger(veh);
 	}
-	else if (!found_obj) {
+	else if (!found) {
 		msg_to_char(ch, "You run out of resources and stop %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		snprintf(buf, sizeof(buf), "$n runs out of resources and stops %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
@@ -954,7 +1009,7 @@ ACMD(do_gen_augment) {
 		return;
 	}
 	else {
-		extract_resources(ch, GET_AUG_RESOURCES(aug), FALSE);
+		extract_resources(ch, GET_AUG_RESOURCES(aug), FALSE, NULL);
 		
 		// determine scale cap
 		scale = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
@@ -1134,6 +1189,7 @@ ACMD(do_gen_craft) {
 	bool is_master;
 	obj_data *drinkcon = NULL;
 	ability_data *cft_abil;
+	bool info = FALSE;
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't craft.\r\n");
@@ -1141,6 +1197,13 @@ ACMD(do_gen_craft) {
 	}
 
 	skip_spaces(&argument);
+	
+	// optional leading info request
+	if (!strn_cmp(argument, "info ", 5)) {
+		argument = any_one_arg(argument, arg);
+		skip_spaces(&argument);
+		info = TRUE;
+	}
 
 	// optional leading number
 	if ((num = atoi(argument)) > 0) {
@@ -1213,6 +1276,10 @@ ACMD(do_gen_craft) {
 			msg_to_char(ch, "%s\r\n", buf);
 		}
 	}
+	else if (info) {
+		// they only wanted info
+		show_craft_info(ch, type);
+	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy right now.\r\n");
 	}
@@ -1271,7 +1338,8 @@ ACMD(do_gen_craft) {
 			find_and_bind(ch, GET_CRAFT_REQUIRES_OBJ(type));
 		}
 		
-		extract_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
+		// must call this after start_action() because it stores resources
+		extract_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), &GET_ACTION_RESOURCES(ch));
 		
 		msg_to_char(ch, "You start %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		sprintf(buf, "$n starts %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
@@ -1322,7 +1390,10 @@ ACMD(do_recipes) {
 				uses_item = TRUE;
 			}
 			for (res = GET_CRAFT_RESOURCES(craft); !uses_item && res; res = res->next) {
-				if (res->vnum == GET_OBJ_VNUM(obj)) {
+				if (res->type == RES_OBJECT && res->vnum == GET_OBJ_VNUM(obj)) {
+					uses_item = TRUE;
+				}
+				else if (res->type == RES_COMPONENT && res->vnum == GET_OBJ_CMP_TYPE(obj) && (res->misc & GET_OBJ_CMP_FLAGS(obj)) == res->misc) {
 					uses_item = TRUE;
 				}
 			}
@@ -1365,7 +1436,10 @@ ACMD(do_recipes) {
 				uses_item = TRUE;
 			}
 			for (res = GET_AUG_RESOURCES(aug); !uses_item && res; res = res->next) {
-				if (res->vnum == GET_OBJ_VNUM(obj)) {
+				if (res->type == RES_OBJECT && res->vnum == GET_OBJ_VNUM(obj)) {
+					uses_item = TRUE;
+				}
+				else if (res->type == RES_COMPONENT && res->vnum == GET_OBJ_CMP_TYPE(obj) && (res->misc & GET_OBJ_CMP_FLAGS(obj)) == res->misc) {
 					uses_item = TRUE;
 				}
 			}
@@ -1457,7 +1531,7 @@ ACMD(do_reforge) {
 	}
 	else if (is_abbrev(arg2, "name")) {
 		// calculate gem cost based on the gear rating of the item
-		res = create_resource_list(o_IRIDESCENT_IRIS, MAX(1, rate_item(obj) / 3), NOTHING);
+		add_to_resource_list(&res, RES_OBJECT, o_IRIDESCENT_IRIS, MAX(1, rate_item(obj) / 3), 0);
 		
 		if (!validate_item_rename(ch, obj, argument)) {
 			// sends own message
@@ -1466,7 +1540,7 @@ ACMD(do_reforge) {
 			// sends own message
 		}
 		else {
-			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
+			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), NULL);
 			
 			// prepare
 			sprintf(buf1, "You name %s%s $p!", GET_OBJ_SHORT_DESC(obj), shared_by(obj, ch));
@@ -1507,7 +1581,7 @@ ACMD(do_reforge) {
 		proto = obj_proto(GET_OBJ_VNUM(obj));
 		
 		// calculate gem cost based on the gear rating of the original item
-		res = create_resource_list(o_BLOODSTONE, MAX(1, (proto ? rate_item(proto) : rate_item(obj)) / 3), NOTHING);
+		add_to_resource_list(&res, RES_OBJECT, o_BLOODSTONE, MAX(1, (proto ? rate_item(proto) : rate_item(obj)) / 3), 0);
 		
 		if (!proto) {
 			msg_to_char(ch, "You can't renew that.\r\n");
@@ -1516,7 +1590,7 @@ ACMD(do_reforge) {
 			// sends own message
 		}
 		else {
-			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
+			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), NULL);
 			
 			// actual reforging: just junk it and load a new one
 			old_stolen_time = obj->stolen_timer;
@@ -1558,7 +1632,7 @@ ACMD(do_reforge) {
 	}
 	else if (is_abbrev(arg2, "superior")) {
 		// calculate gem cost based on the gear rating of the item
-		res = create_resource_list(o_GLOWING_SEASHELL, MAX(1, rate_item(obj) / 3), NOTHING);
+		add_to_resource_list(&res, RES_OBJECT, o_GLOWING_SEASHELL, MAX(1, rate_item(obj) / 3), 0);
 		proto = obj_proto(GET_OBJ_VNUM(obj));
 		
 		if (OBJ_FLAGGED(obj, OBJ_SUPERIOR)) {
@@ -1574,7 +1648,7 @@ ACMD(do_reforge) {
 			// sends own message
 		}
 		else {
-			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
+			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), NULL);
 			
 			// actual reforging: just junk it and load a new one
 			old_stolen_time = obj->stolen_timer;

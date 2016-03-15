@@ -101,6 +101,7 @@ See also: DEBUFF, FAMILIAR, FERAL CLASS
 BREW
 
 Usage:  brew [number] <potion>
+        brew info <potion>
 
 This command allows you to brew potions of various types, if you have the
 correct potions abilities from Natural Magic.
@@ -110,7 +111,7 @@ To brew potions you will require:
  - glass: an alchemist shop, laboratory, or an empire that has glassblowing
  - herbs
 
-See also: CRAFTING LEVEL, HEALING POTIONS, NATURE POTIONS
+See also: CRAFTING LEVEL, RESOURCES, KEEP, HEALING POTIONS, NATURE POTIONS
 #
 CHANT
 
@@ -453,20 +454,20 @@ Usage:  brew <potion>
         quaff <potion>
 
 Healing Potions (Natural Magic ability)
-  healing potion - health  (6 whitegrass)
-  regeneration potion - health regen  (6 whitegrass + 3 fiveleaf)
-  stamina potion - move  (3 redthorn + 3 fiveleaf)
-  longrunning potion - move regen  (6 redthorn + 3 fiveleaf)
-  mana potion - mana  (3 magewhisper + 3 fiveleaf)
-  energy potion - mana regen  (6 magewhisper + 3 fiveleaf)
+  healing potion - health
+  regeneration potion - health regen
+  stamina potion - move
+  longrunning potion - move regen
+  mana potion - mana
+  energy potion - mana regen
 
 Healing Elixirs (Natural Magic ability)
-  healing elixir - health  (10 whitegrass)
-  regeneration elixir - health regen  (10 whitegrass + 5 fiveleaf)
-  stamina elixir - move  (5 redthorn + 5 fiveleaf)
-  longrunning elixir - move regen  (10 redthorn + 5 fiveleaf)
-  mana elixir - mana  (5 magewhisper + 5 fiveleaf)
-  energy elixir - mana regen  (10 magewhisper + 5 fiveleaf)
+  healing elixir - health
+  regeneration elixir - health regen
+  stamina elixir - move
+  longrunning elixir - move regen
+  mana elixir - mana
+  energy elixir - mana regen
   * If you also know Wrath of Nature Potions, elixirs will come out superior.
   
 See also: BREW, WRATH OF NATURE POTIONS, QUAFF
@@ -538,16 +539,16 @@ Usage:  brew <potion>
         quaff <potion>
 
 Nature Potions (Natural Magic ability)
-  strength potion - strength  (10 redthorn)
-  dexterity potion - dexterity  (6 redthorn + 4 whitegrass)
-  charisma potion - charisma  (4 redthorn + 6 whitegrass)
-  intelligence potion - intelligence  (4 redthorn + 6 magewhisper)
-  wits potion - wits  (10 fiveleaf)
+  strength potion - strength
+  dexterity potion - dexterity
+  charisma potion - charisma
+  intelligence potion - intelligence
+  wits potion - wits
 
 Wrath of Nature Potions (Natural Magic ability)
-  armor potion - armor  (20 redthorn)
-  haste potion - (20 magewhisper)
-  blocking potion - block chance  (10 redthorn + 10 fiveleaf)
+  armor potion - resistance
+  haste potion - haste
+  blocking potion - block chance
   * If you also know Healing Elixirs, wrath potions will come out superior.
 
 See also: BREW, HEALING ELIXIRS, QUAFF
@@ -591,10 +592,16 @@ Purify is used by Natural Magic casters to wipe away serious curses such as
 Vampirism. However, it doesn't work on daywalking vampires. You can cast this
 spell on those not affected by such curses, but it will have no effect.
 
+This spell cures vampirism and removes all vampiric abilities, but doesn't
+remove levels of the Vampire skill - use 'skill drop' for that. ('skill drop'
+cannot cure vampirism on its own.)
+
 Because this power could be used to harass other players, they must enable
 the "bother" toggle before you can use it on them. 
 
 If your target is in combat, you will join the combat upon using this ability.
+
+Gains experience when successfully cast, even if it doesn't cure anything.
 
 See also: DAYWALKING, TOGGLE
 #

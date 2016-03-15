@@ -352,6 +352,7 @@ void delete_room(room_data *room, bool check_exits) {
 	void remove_room_from_vehicle(room_data *room, vehicle_data *veh);
 
 	struct room_direction_data *ex, *next_ex, *temp;
+	struct room_extra_data *room_ex, *next_room_ex;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_city_data *city, *next_city;
 	room_data *rm_iter, *next_rm, *home;
@@ -470,6 +471,10 @@ void delete_room(room_data *room, bool check_exits) {
 	while ((af = ROOM_AFFECTS(room))) {
 		ROOM_AFFECTS(room) = af->next;
 		free(af);
+	}
+	HASH_ITER(hh, room->extra_data, room_ex, next_room_ex) {
+		HASH_DEL(room->extra_data, room_ex);
+		free(room_ex);
 	}
 
 	if (check_exits) {
@@ -902,7 +907,7 @@ static void annual_update_map_tile(room_data *room) {
 			}
 		}
 	}
-	else if (COMPLEX_DATA(room) && !IS_CITY_CENTER(room) && HOME_ROOM(room) == room && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_HAS_INSTANCE)) {
+	else if (COMPLEX_DATA(room) && GET_BUILDING(room) && !IS_CITY_CENTER(room) && HOME_ROOM(room) == room && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_HAS_INSTANCE)) {
 		emp = ROOM_OWNER(room);
 
 		// decay only non-imm empires				
@@ -979,7 +984,7 @@ void annual_update_vehicle(vehicle_data *veh) {
 	
 	// resources if it doesn't have its own
 	if (!default_res) {
-		default_res = create_resource_list(o_NAILS, 1, NOTHING);
+		add_to_resource_list(&default_res, RES_OBJECT, o_NAILS, 1, 0);
 	}
 	
 	// does not take annual damage (unless incomplete)

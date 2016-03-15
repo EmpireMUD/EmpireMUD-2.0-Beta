@@ -168,6 +168,7 @@ Crafts (CEDIT):
 - Scalable objects should not be used as resources or required objects for
   craft recipes. These items aren't stored, so if they're refunded, they will
   scale to their minimum level and lose any modifications.
+- SMELT crafts usually have a timer of 4.
 
 Crops (CROPEDIT):
 - Crop names are always lowercase because they are used to build sentences.
@@ -968,17 +969,16 @@ See also: OLC AUGMENTS, VNUM
 #d
 "AUGEDIT RESOURCES"
 
-Usage:  .resource add <amount> <vnum>
-        .resource change <number> <quantity | vnum> <value>
+Usage:  .resource add <type> <amount> <vnum/name> [flags, for components only]
+        .resource change <number> <quantity | vnum | name | flags> <value>
         .resource remove <number | all>
         .resource move <number> <up | down>
 
 This command sets the resources required to apply the augment to an item.
 
-Don't use SCALABLE items as a resource, because it won't be scaled back to
-the same level if it's refunded.
+See HELP OLC RESOURCES for more information.
 
-See also: OLC AUGMENTS, VNUM
+See also: OLC AUGMENTS
 #d
 "AUGEDIT TYPE" "AUGMENT TYPES"
 
@@ -1554,10 +1554,10 @@ it won't be scaled back to the same level if it's refunded.
 
 See also: OLC CRAFTS, VNUM
 #d
-"CEDIT RESOURCE"
+"CEDIT RESOURCES"
 
-Usage:  .resource add <amount> <vnum>
-        .resource change <number> <quantity | vnum> <value>
+Usage:  .resource add <type> <amount> <vnum/name> [flags, for components only]
+        .resource change <number> <quantity | vnum | name | flags> <value>
         .resource remove <number | all>
         .resource move <number> <up | down>
 
@@ -1567,10 +1567,9 @@ Building recipes will require the resources in the order given here; crafting
 recipes will use all resources at once. Dismantled buildings also return half
 of the used resources, rounded down.
 
-Don't use SCALABLE items as a resource, because it won't be scaled back to
-the same level if it's refunded.
+See HELP OLC RESOURCES for more information.
 
-See also: OLC CRAFTS, VNUM
+See also: OLC CRAFTS
 #d
 "CEDIT TIME"
 
@@ -1749,6 +1748,19 @@ player who has the ability from his/her class will also count as having spent
 an abilitiy point in the skill tree.
 
 See also: OLC CLASSES, VNUM
+#d
+COMPONENTS "RESOURCE COMPONENTS" "COMPONENT RESOURCES"
+
+Components are generic categories of objects. This allows recipes to require
+a type of object, rather than a specific object. Components can also have flags
+that indicate specific properties, like a rare log or a magic feather. An
+object should be set as a component if 
+
+If a resource list requires a component with certain flags, an objects must
+be of the matching component type and have ALL of those flags. (It's okay if
+the object also has additional flags.)
+
+See also: OEDIT COMPONENT, COMPONENT FLAGS
 #d
 "CRAFT VEHICLES" "VEHICLE CRAFTS"
 
@@ -2433,6 +2445,9 @@ Object interaction types:
  SEPARATE** - Split this item into multiple other items.
  ** Both COMBINE and SEPARATE should be set exclusive, as they will extract
     the original item.
+ SCRAPE - Items you get when scraping this item (tree -> log).
+ SAW - Items you get when sawing this item (tree -> lumber).
+ TAN - Items you get when tanning this item (skin -> leather).
 
 Room interaction types:
  DIG - Items received when using the dig action.
@@ -2908,6 +2923,86 @@ other than 0.
 
 See also: ITEM SCALING, OEDIT TYPE, OLC OBJECTS
 #d
+"OEDIT COMPONENT" "OEDIT COMP" "COMPONENT TYPES"
+
+Usage:  .component <type>
+
+This sets the object to be a generic component. These are things used in
+craft recipes (and other resource lists) that can accept any item of a
+generic type. An item should only be a component if it could be used as a
+generic part of a crafting recipe.
+
+Once you choose a component type, you can also set the .compflags property
+to add modifiers to your component type.
+
+Available components (common flags listed in parentheses):
+ &cadhesive&0 - not currently used
+ &cbone&0 - not currently used
+ &cblock&0 - builing materials like bricks or blocks
+ &cclay&0 - moldable clay
+ &cdye&0 - any kind of dye
+ &cfeathers&0 - not currently used
+ &cfibers&0 - cotton, straw, etc.
+ &cflour&0 - ground up grains
+ &cfruit&0 - for cooking
+ &cfur&0 - animal furs for crafting
+ &cgem&0 - precious stones
+ &cgrain&0 - wheat, etc.
+ &chandle&0 - used for tools and weapons
+ &cherb&0 - used in potions and cooking
+ &cleather&0 - for armor and crafts
+ &clumber&0 - a core building material
+ &cmeat&0 - raw ingredients for cooking, don't set on cooked meat
+ &cmetal&0 - various useful or precious metals
+ &cnails&0 - a core building material
+ &coil&0 - for cooking or maintaining machinery
+ &cpillar&0 - for construction, like a log
+ &crock&0 - common stones dug up from the ground
+ &cseeds&0 - for planting or cooking
+ &cskin&0 - unprocessed animal skin or rawhide
+ &cstick&0 - a common building and crafting material
+ &ctextile&0 - cloth or fabric for crafting
+ &cvegetable&0 - for cooking
+ &crope&0 - for construction and harnessing animals
+
+See also: COMPONENT FLAGS, SHOW COMPONENTS
+#d
+"OEDIT COMPFLAGS" "OEDIT COMPONENT FLAGS" "COMPONENT FLAGS"
+
+Usage:  .compflags [add | remove] <flags>
+
+Component flags are modifiers to the generic component type. When a recipe
+requires a component with certain flags, the object must have all those flags.
+These flags are interpreted loosely -- it's only important that they match.
+
+&rDon't over-assign flags.&0 Only use these flags if there is a real distinction
+or reason to use them. Most of these flags come in pairs (magic/mundane) and
+you only need to assign the mundane flag if some versions of the resource are
+magical and a recipe could require the non-magical version.
+
+Available flags:
+ &canimal&0 - From an animal (like animal fibers)
+ &cbunch&0 - A group of things
+ &cdesert&0 - Comes from the desert (especially foods)
+ &cfine&0 - High-quality
+ &chard&0 - As opposed to soft
+ &clarge&0 - For example, large leather vs small leather
+ &cmagic&0 - Has magical properties
+ &cmundane&0 - Is very non-magical
+ &cplant&0 - From a plant (like plant fibers)
+ &cpoor&0 - Low-quality
+ &crare&0 - Hard to find or premium
+ &craw&0 - Natural, unrefined, or uncooked
+ &crefined&0 - As opposed to raw
+ &csingle&0 - An individual thing (not a group)
+ &csmall&0 - As in small leather
+ &csoft&0 - For things that can be soft or hard
+ &ctemperate&0 - Comes from temperate areas (especially foods)
+ &ctropical&0 - Comes from tropical areas (especially foods)
+ &ccommon&0 - Opposite of rare
+
+See also: OEDIT COMPONENT
+#d
 "OEDIT CONTAINERFLAGS" "OEDIT CONTAINER FLAGS"
 
 Usage:  .containerflags [add | remove] <flags>
@@ -3097,6 +3192,22 @@ type of liquid.
 The name of the liquid is automatically appended to the name of the item, so
 when "a flask" is full of ale, it becomes "a flask of ale". Keep this in mind
 when naming your drink containers.
+
+Available liquids are:
+  water
+  lager
+  wheat beer
+  ale
+  cider
+  milk
+  blood
+  honey
+  bean soup
+  coffee
+  green tea
+  red wine
+  white wine
+  grog
 
 See also: OLC OBJECTS
 #d
@@ -3781,6 +3892,29 @@ The following types will have IN-DEVELOPMENT flags removed in the vnum range:
 
 See also: OLC CONTROLS, OLC ADVENTURES, ADVEDIT FLAGS, CEDIT FLAGS
 #d
+"OLC RESOURCES" "RESOURCE ADD" "RESOURCE CHANGE" "RESOURCE REMOVE" "RESOURCE MOVE"
+
+Usage:  .resource add <type> <amount> <vnum/name> [flags, for components only]
+        .resource change <number> <quantity | vnum | name | flags> <value>
+        .resource remove <number | all>
+        .resource move <number> <up | down>
+
+Resource lists are used for crafting requirements, maintenance, and other
+purposes. A resource list can contain objects, generic components, mana (and
+other pools), coins, and liquids.
+
+Specific syntaxes for adding:
+  .resource add object <quantity> <vnum>
+  .resource add component <quantity> <component type> [component flags]
+  .resource add liquid <number of units> <liquid name>
+  .resource add coins <amount>
+  .resource add pool <number of points> <pool type>
+
+Valid pools are: health, mana, move, blood.
+
+See also: COMPONENTS, COMPONENT FLAGS, OEDIT LIQUID
+See also: AUGEDIT RESOURCES, CEDIT RESOURCES, VEDIT RESOURCES
+#d
 "OLC ROOM TEMPLATES" "OLC ROOMTEMPLATES" "OLC ROOMS" REDIT
 
 Usage:  .r <command>
@@ -3912,7 +4046,6 @@ Usage:  .description
 All rooms need a good description. The description should be at least 3 full
 lines, and should always be formatted with the /fi option in the string
 editor. Generally descriptions should not run more than about 6 lines.
-
 
 See also: OLC ROOM TEMPLATES, STRING EDITOR
 #d
@@ -4851,8 +4984,8 @@ See also: OLC VEHICLES
 #d
 "VEDIT RESOURCES" "VEDIT YEARLY MAINTENANCE"
 
-Usage:  .resource add <amount> <vnum>
-        .resource change <number> <quantity | vnum> <value>
+Usage:  .resource add <type> <amount> <vnum/name> [flags, for components only]
+        .resource change <number> <quantity | vnum | name | flags> <value>
         .resource remove <number | all>
         .resource move <number> <up | down>
 
@@ -4870,6 +5003,8 @@ cost.
 
 Vehicles with only 1 hitpoint will never get their yearly maintenance cost, as
 even 1 year of decay will destroy them.
+
+See HELP OLC RESOURCES for more information.
 
 See also: VEDIT HITPOINTS, OLC VEHICLES, REPAIR
 #d

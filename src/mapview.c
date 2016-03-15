@@ -489,13 +489,12 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 
 	struct mappc_data_container *mappc = NULL;
 	struct mappc_data *pc, *next_pc;
-	struct building_resource_type *res;
 	struct empire_city_data *city;
 	char output[MAX_STRING_LENGTH], veh_buf[256], flagbuf[MAX_STRING_LENGTH], locbuf[128], partialbuf[MAX_STRING_LENGTH], tmpbuf[MAX_STRING_LENGTH];
 	int s, t, mapsize, iter, check_x, check_y;
 	int first_iter, second_iter, xx, yy, magnitude, north;
 	int first_start, first_end, second_start, second_end, temp;
-	bool y_first, invert_x, invert_y, found, comma;
+	bool y_first, invert_x, invert_y, comma;
 	player_index_data *index;
 	room_data *to_room;
 	empire_data *emp, *pcemp;
@@ -869,15 +868,8 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 
 	if (!IS_COMPLETE(room)) {
-		msg_to_char(ch, "Remaining to %s: ", (IS_DISMANTLING(room) ? "Dismantle" : "Completion"));
-		
-		found = FALSE;
-		for (res = BUILDING_RESOURCES(room); res; res = res->next) {
-			msg_to_char(ch, "%s%s (x%d)", (found ? ", " : ""), skip_filler(get_obj_name_by_proto(res->vnum)), res->amount);
-			found = TRUE;
-		}
-		
-		msg_to_char(ch, "\r\n");
+		show_resource_list(BUILDING_RESOURCES(room), partialbuf);
+		msg_to_char(ch, "Remaining to %s: %s\r\n", (IS_DISMANTLING(room) ? "Dismantle" : "Completion"), partialbuf);
 	}
 	
 	// mappc data

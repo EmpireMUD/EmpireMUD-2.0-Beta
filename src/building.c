@@ -34,7 +34,6 @@
 
 // locals
 void process_build(char_data *ch, room_data *room);
-void setup_building_resources(room_data *room, struct resource_data *list, bool half);
 void setup_tunnel_entrance(char_data *ch, room_data *room, int dir);
 
 // externs
@@ -124,29 +123,14 @@ void check_lay_territory(char_data *ch, room_data *room) {
 * @return struct resource_data* The copied/merged list.
 */
 struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b) {
-	struct resource_data *list, *two, *end, *iter, *next_iter, *el;
+	struct resource_data *list, *iter;
 	
+	// start with a copy of 'a'
 	list = copy_resource_list(combine_a);
-	two = copy_resource_list(combine_b);
 	
-	// attempt clean combine
-	LL_FOREACH_SAFE(two, iter, next_iter) {
-		LL_SEARCH_SCALAR(list, el, vnum, iter->vnum);
-		if (el) {
-			el->amount += iter->amount;
-			LL_DELETE(two, iter);
-			free(iter);
-		}
-	}
-	
-	if ((end = list)) {
-		while (end->next) {
-			end = end->next;
-		}
-		end->next = two;
-	}
-	else {
-		list = two;
+	// add in each entry from 'b' for a clean combine
+	LL_FOREACH(combine_b, iter) {
+		add_to_resource_list(&list, iter->type, iter->vnum, iter->amount, iter->misc);
 	}
 	
 	return list;
@@ -162,7 +146,6 @@ struct resource_data *combine_resources(struct resource_data *combine_a, struct 
 void complete_building(room_data *room) {
 	void herd_animals_out(room_data *location);
 	
-	struct building_resource_type *res, *temp;
 	char_data *ch;
 	empire_data *emp;
 	
@@ -175,10 +158,8 @@ void complete_building(room_data *room) {
 	stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
 	
 	// remove any remaining resource requirements
-	while ((res = BUILDING_RESOURCES(room))) {
-		REMOVE_FROM_LIST(res, GET_BUILDING_RESOURCES(room), next);
-		free(res);
-	}
+	free_resource_list(GET_BUILDING_RESOURCES(room));
+	GET_BUILDING_RESOURCES(room) = NULL;
 	
 	complete_wtrigger(room);
 	
@@ -249,17 +230,19 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 	int iter;
 	
 	if (!resources) {
-		resources = create_resource_list(o_LOG, 12, o_LUMBER, 8, o_NAILS, 4, NOTHING);
+		add_to_resource_list(&resources, RES_COMPONENT, CMP_PILLAR, 12, 0);
+		add_to_resource_list(&resources, RES_COMPONENT, CMP_LUMBER, 8, 0);
+		add_to_resource_list(&resources, RES_COMPONENT, CMP_NAILS, 4, 0);
 	}
 
 	// entrance
 	setup_tunnel_entrance(ch, entrance, dir);
-	setup_building_resources(entrance, resources, FALSE);
+	GET_BUILDING_RESOURCES(entrance) = copy_resource_list(resources);
 	create_exit(entrance, IN_ROOM(ch), rev_dir[dir], FALSE);
 
 	// exit
 	setup_tunnel_entrance(ch, exit, rev_dir[dir]);
-	setup_building_resources(exit, resources, FALSE);
+	GET_BUILDING_RESOURCES(exit) = copy_resource_list(resources);
 	to_room = real_shift(exit, shift_dir[dir][0], shift_dir[dir][1]);
 	create_exit(exit, to_room, dir, FALSE);
 
@@ -269,7 +252,7 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 		attach_building_to_room(building_proto(RTYPE_TUNNEL), new_room, TRUE);
 		ROOM_OWNER(new_room) = ROOM_OWNER((iter <= length/2) ? entrance : exit);
 		COMPLEX_DATA(new_room)->home_room = (iter <= length/2) ? entrance : exit;
-		setup_building_resources(new_room, resources, FALSE);
+		GET_BUILDING_RESOURCES(new_room) = copy_resource_list(resources);
 
 		create_exit(last_room, new_room, dir, TRUE);
 		
@@ -455,6 +438,10 @@ craft_data *find_building_list_entry(room_data *room, byte type) {
 */
 bld_data *find_upgraded_from(bld_data *bb) {
 	bld_data *iter, *next_iter;
+	
+	if (!bb) {	// occasionally
+		return NULL;
+	}
 	
 	HASH_ITER(hh, building_table, iter, next_iter) {
 		if (GET_BLD_UPGRADES_TO(iter) == GET_BLD_VNUM(bb)) {
@@ -668,82 +655,35 @@ bool is_entrance(room_data *room) {
 */
 void process_build(char_data *ch, room_data *room) {
 	craft_data *type = find_building_list_entry(room, FIND_BUILD_NORMAL);
-	obj_data *obj, *found_obj = NULL;
-	bool found = FALSE;
-	struct building_resource_type *res, *temp;
-
-	if ((res = BUILDING_RESOURCES(room))) {
-		// check inventory
-		for (obj = ch->carrying; obj && !found; obj = obj->next_content) {
-			if (GET_OBJ_VNUM(obj) == res->vnum) {
-				found = TRUE;
-				found_obj = obj;
-			}
-		}
-
-		// check room (if !found)
-		for (obj = ROOM_CONTENTS(room); obj && !found; obj = obj->next_content) {
-			if (GET_OBJ_VNUM(obj) == res->vnum) {
-				found = TRUE;
-				found_obj = obj;
-			}
-		}
+	obj_data *found_obj = NULL;
+	struct resource_data *res;
 		
-		// did we find one?
-		if (found) {
-			res->amount -= 1;
-		}
-		
-		// check zero-res whether or not we found anything
-		if (res->amount <= 0) {
-			// remove the resource entry entirely
-			REMOVE_FROM_LIST(res, GET_BUILDING_RESOURCES(room), next);
-			free(res);
-		}
-	}
-
-	// still working?
 	if (!IS_COMPLETE(room)) {
-		if (!found || !found_obj) {
+		if ((res = get_next_resource(ch, BUILDING_RESOURCES(room), can_use_room(ch, room, GUESTS_ALLOWED), TRUE, &found_obj))) {
+			// take the item; possibly free the res
+			apply_resource(ch, res, &GET_BUILDING_RESOURCES(room), found_obj, APPLY_RES_BUILD, NULL, &GET_BUILT_WITH(room));
+		
+			// reset disrepair and damage
+			COMPLEX_DATA(room)->disrepair = 0;
+			COMPLEX_DATA(room)->damage = 0;
+			
+			// skillups
+			if (type && GET_CRAFT_ABILITY(type) != NO_ABIL) {
+				gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 3);
+			}
+			else if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+				gain_skill_exp(ch, SKILL_EMPIRE, 3);
+			}
+		}
+		else {
+			// missing next resource
 			msg_to_char(ch, "You run out of resources and stop building.\r\n");
 			act("$n runs out of resources and stops building.", FALSE, ch, 0, 0, TO_ROOM);
 			GET_ACTION(ch) = ACT_NONE;
 			return;
 		}
-
-		// messaging
-		if (has_custom_message(found_obj, OBJ_CUSTOM_BUILD_TO_CHAR)) {
-			act(get_custom_message(found_obj, OBJ_CUSTOM_BUILD_TO_CHAR), FALSE, ch, found_obj, 0, TO_CHAR | TO_SPAMMY);
-		}
-		else {
-			act("You carefully place $p in the structure.", FALSE, ch, found_obj, 0, TO_CHAR | TO_SPAMMY);
-		}
-		
-		if (has_custom_message(found_obj, OBJ_CUSTOM_BUILD_TO_ROOM)) {
-			act(get_custom_message(found_obj, OBJ_CUSTOM_BUILD_TO_ROOM), FALSE, ch, found_obj, 0, TO_ROOM | TO_SPAMMY);
-		}
-		else {
-			act("$n places $p carefully in the structure.", FALSE, ch, found_obj, 0, TO_ROOM | TO_SPAMMY);
-		}
-		
-		// reset disrepair and damage
-		COMPLEX_DATA(room)->disrepair = 0;
-		COMPLEX_DATA(room)->damage = 0;
-		
-		// skillups
-		if (type && GET_CRAFT_ABILITY(type) != NO_ABIL) {
-			gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 3);
-		}
-		else if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-			gain_skill_exp(ch, SKILL_EMPIRE, 3);
-		}			
 	}
-
-	// extract either way
-	if (found && found_obj) {
-		extract_obj(found_obj);
-	}
-
+	
 	// now finished?
 	if (IS_COMPLETE(room)) {
 		finish_building(ch, room);
@@ -758,40 +698,89 @@ void process_build(char_data *ch, room_data *room) {
 * @param room_data *room The location being dismantled.
 */
 void process_dismantling(char_data *ch, room_data *room) {
-	obj_data *obj = NULL;
-	struct building_resource_type *res, *temp;
+	extern const char *drinks[];
+	extern const char *pool_types[];
+	
+	struct resource_data *res, *find_res, *next_res, *copy;
+	char buf[MAX_STRING_LENGTH];
 	empire_data *emp;
 
 	// sometimes zeroes end up in here ... just clear them
-	while (BUILDING_RESOURCES(room) && !obj) {
-		// find last entry, remove first
-		res = BUILDING_RESOURCES(room);
-		while (res->next) {
-			res = res->next;
+	res = NULL;
+	LL_FOREACH_SAFE(BUILDING_RESOURCES(room), find_res, next_res) {
+		// things we can't refund
+		if (find_res->amount <= 0 || find_res->type == RES_COMPONENT) {
+			LL_DELETE(GET_BUILDING_RESOURCES(room), find_res);
+			free(find_res);
+			continue;
 		}
 		
-		if (res->amount > 0) {
-			obj = read_object(res->vnum, TRUE);
+		// we actually only want the last valid thing, so save res now (and overwrite it on the next loop)
+		res = find_res;
+	}
+	
+	// did we find something to refund?
+	if (res) {
+		// RES_x: messaging
+		switch (res->type) {
+			// RES_COMPONENT isn't possible here
+			case RES_OBJECT: {
+				snprintf(buf, sizeof(buf), "You carefully remove %s from the structure.", get_obj_name_by_proto(res->vnum));
+				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+				snprintf(buf, sizeof(buf), "$n removes %s from the structure.", get_obj_name_by_proto(res->vnum));
+				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				break;
+			}
+			case RES_LIQUID: {
+				snprintf(buf, sizeof(buf), "You carefully retrieve %d unit%s of %s from the structure.", res->amount, PLURAL(res->amount), drinks[res->vnum]);
+				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+				snprintf(buf, sizeof(buf), "$n retrieves some %s from the structure.", drinks[res->vnum]);
+				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				break;
+			}
+			case RES_COINS: {
+				snprintf(buf, sizeof(buf), "You retrieve %s from the structure.", money_amount(real_empire(res->vnum), res->amount));
+				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+				snprintf(buf, sizeof(buf), "$n retrieves %s from the structure.", res->amount == 1 ? "a coin" : "some coins");
+				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				break;
+			}
+			case RES_POOL: {
+				snprintf(buf, sizeof(buf), "You regain %d %s point%s from the structure.", res->amount, pool_types[res->vnum], PLURAL(res->amount));
+				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+				snprintf(buf, sizeof(buf), "$n retrieves %s from the structure.", pool_types[res->vnum]);
+				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				break;
+			}
+		}
+		
+		// make a copy to pass to give_resources
+		CREATE(copy, struct resource_data, 1);
+		*copy = *res;
+		copy->next = NULL;
+		
+		if (copy->type == RES_OBJECT) {
+			// for items, refund 1 at a time
+			copy->amount = MIN(1, copy->amount);
 			res->amount -= 1;
 		}
-			
+		else {
+			// all other types refund the whole thing
+			res->amount = 0;
+		}
+		
+		// give the thing(s)
+		give_resources(ch, copy, FALSE);
+		free(copy);
+		
 		if (res->amount <= 0) {
-			// remove the resource entry entirely
-			REMOVE_FROM_LIST(res, GET_BUILDING_RESOURCES(room), next);
+			LL_DELETE(GET_BUILDING_RESOURCES(room), res);
+			free(res);
 		}
 	}
-
-	if (obj) {
-		// scale item to minimum level
-		scale_item_to_level(obj, 0);
-		obj_to_char_or_room(obj, ch);
-		
-		act("$n removes $p from the structure.", FALSE, ch, obj, 0, TO_ROOM | TO_SPAMMY);
-		act("You carefully remove $p from the structure.", FALSE, ch, obj, 0, TO_CHAR | TO_SPAMMY);
-		load_otrigger(obj);
-	}
-
-	if (IS_COMPLETE(room)) {
+	
+	// done?
+	if (!BUILDING_RESOURCES(room)) {
 		finish_dismantle(ch, room);
 		
 		if ((emp = ROOM_OWNER(room))) {
@@ -834,44 +823,6 @@ void remove_designate_objects(room_data *room) {
 
 
 /**
-* This attaches the resources to a room, which puts it in an incomplete
-* state.
-*
-* @param room_data *room The location.
-* @param struct resource_data *list of standard resources
-* @param bool half if TRUE cuts amount in half (e.g. dismantle)
-*/
-void setup_building_resources(room_data *room, struct resource_data *list, bool half) {
-	struct building_resource_type *res, *end;
-	struct resource_data *iter;
-	int div = (half ? 2 : 1);
-	
-	end = GET_BUILDING_RESOURCES(room);
-	while (end && end->next) {
-		end = end->next;
-	}
-	
-	for (iter = list; iter; iter = iter->next) {
-		if (iter->amount/div > 0) {
-			CREATE(res, struct building_resource_type, 1);
-			res->vnum = iter->vnum;
-			res->amount = iter->amount/div;
-			
-			// apply to end
-			if (end) {
-				end->next = res;
-				end = res;
-			}
-			else {
-				GET_BUILDING_RESOURCES(room) = res;
-				end = res;
-			}
-		}
-	}
-}
-
-
-/**
 * Helper function for construct_tunnel: sets up either entrance
 *
 * @param char_data *ch the builder
@@ -904,28 +855,24 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 * @param room_data *loc The location to dismantle.
 */
 void start_dismantle_building(room_data *loc) {
-	struct resource_data *composite_resources = NULL, *crcp, *iter;
-	struct building_resource_type *res, *next_res, *findres, *temp;
-	bool deleted = FALSE, found, upgraded = FALSE;
+	struct resource_data *composite_resources = NULL, *crcp, *res, *next_res;
 	room_data *room, *next_room;
 	char_data *targ, *next_targ;
 	craft_data *type, *up_type;
 	obj_data *obj, *next_obj;
+	bool deleted = FALSE;
 	bld_data *up_bldg;
+	bool complete = IS_COMPLETE(loc);	// store now -- this gets changed part way through
 	
 	if (!IS_MAP_BUILDING(loc)) {
 		log("SYSERR: Attempting to dismantle non-building room #%d", GET_ROOM_VNUM(loc));
 		return;
 	}
 	
-	if (!(type = find_building_list_entry(loc, FIND_BUILD_NORMAL))) {
-		if ((type = find_building_list_entry(loc, FIND_BUILD_UPGRADE))) {
-			upgraded = TRUE;
-		}
-		else {
-			log("SYSERR: Attempting to dismantle non-dismantlable building at #%d", GET_ROOM_VNUM(loc));
-			return;
-		}
+	// find the entry
+	if (!(type = find_building_list_entry(loc, FIND_BUILD_NORMAL)) && !(type = find_building_list_entry(loc, FIND_BUILD_UPGRADE))) {
+		log("SYSERR: Attempting to dismantle non-dismantlable building at #%d", GET_ROOM_VNUM(loc));
+		return;
 	}
 
 	// interior only
@@ -963,70 +910,55 @@ void start_dismantle_building(room_data *loc) {
 		COMPLEX_DATA(loc)->private_owner = NOBODY;
 	}
 	
-	// prepare resources:
-	composite_resources = copy_resource_list(GET_CRAFT_RESOURCES(type));
-	if (upgraded) {
-		up_bldg = find_upgraded_from(building_proto(GET_CRAFT_BUILD_TYPE(type)));
-		up_type = find_build_craft(GET_BLD_VNUM(up_bldg));
-		
-		while (up_bldg && up_type) {
-			crcp = composite_resources;
-			composite_resources = combine_resources(crcp, GET_CRAFT_RESOURCES(up_type));
-			free_resource_list(crcp);
-			
-			up_bldg = find_upgraded_from(up_bldg);
-			up_type = find_build_craft(GET_BLD_VNUM(up_bldg));
-		}
+	// remove any existing resources remaining
+	if (GET_BUILDING_RESOURCES(loc)) {
+		free_resource_list(GET_BUILDING_RESOURCES(loc));
+		GET_BUILDING_RESOURCES(loc) = NULL;
 	}
-
-	if (!IS_COMPLETE(loc)) {
-		// room was already started, so dismantle is more complicated
 	
-		// iterate over all building resources
-		for (iter = composite_resources; iter; iter = iter->next) {		
-			// find out if there's already an entry for this resource
-			found = FALSE;
-			for (findres = BUILDING_RESOURCES(loc); findres; findres = findres->next) {
-				if (findres->vnum == iter->vnum) {
-					found = TRUE;
-					// new amount is the difference between the original and the remaining, divided by 2
-					findres->amount = MAX(0, (iter->amount - findres->amount) / 2);
-				}
-			}
+	// set up resources
+	if (GET_BUILT_WITH(loc)) {
+		// normal setup: use the actual materials that built this building
+		GET_BUILDING_RESOURCES(loc) = GET_BUILT_WITH(loc);
+		GET_BUILT_WITH(loc) = NULL;
+	}
+	else if (complete) {
+		// backwards-compatible: attempt to detect resources
+		composite_resources = copy_resource_list(GET_CRAFT_RESOURCES(type));
+		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_UPGRADE)) {
+			// for upgraded buildings, must work up the chain
+			up_bldg = find_upgraded_from(building_proto(GET_CRAFT_BUILD_TYPE(type)));
+			up_type = up_bldg ? find_build_craft(GET_BLD_VNUM(up_bldg)) : NULL;
+		
+			while (up_bldg && up_type) {
+				crcp = composite_resources;
+				composite_resources = combine_resources(crcp, GET_CRAFT_RESOURCES(up_type));
+				free_resource_list(crcp);
 			
-			// didn't find, so they already built that entire resource -- add it at half
-			if (!found && iter->amount/2 > 0) {
-				CREATE(res, struct building_resource_type, 1);
-				res->vnum = iter->vnum;
-				res->amount = iter->amount / 2;
-				
-				res->next = GET_BUILDING_RESOURCES(loc);
-				GET_BUILDING_RESOURCES(loc) = res;
+				up_bldg = find_upgraded_from(up_bldg);
+				up_type = up_bldg ? find_build_craft(GET_BLD_VNUM(up_bldg)) : NULL;
 			}
 		}
 		
-		// check for things that now require 0 and remove them
-		for (res = GET_BUILDING_RESOURCES(loc); res; res = next_res) {
-			next_res = res->next;
-			
-			if (res->amount <= 0) {
-				REMOVE_FROM_LIST(res, GET_BUILDING_RESOURCES(loc), next);
-				free(res);
-			}
+		// apply
+		GET_BUILDING_RESOURCES(loc) = composite_resources;
+	}
+	
+	// remove liquids, etc
+	LL_FOREACH_SAFE(GET_BUILDING_RESOURCES(loc), res, next_res) {
+		// RES_x: types not refundable by dismantle
+		if (res->type == RES_COMPONENT || res->type == RES_LIQUID || res->type == RES_COINS || res->type == RES_POOL) {
+			LL_DELETE(GET_BUILDING_RESOURCES(loc), res);
+			free(res);
 		}
 	}
-	else {
-		// simple setup
-		setup_building_resources(loc, composite_resources, TRUE);
-	}
+	
+	// cut resources in half: they only get that much back
+	halve_resource_list(&GET_BUILDING_RESOURCES(loc), TRUE);
 
 	SET_BIT(ROOM_AFF_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	delete_room_npcs(loc, NULL);
-	
-	if (composite_resources) {
-		free_resource_list(composite_resources);
-	}
 }
 
 
@@ -1060,6 +992,7 @@ char *vnum_to_interlink(room_vnum vnum) {
 ACMD(do_build) {
 	extern bool find_and_bind(char_data *ch, obj_vnum vnum);
 	extern int get_crafting_level(char_data *ch);
+	void show_craft_info(char_data *ch, craft_data *craft);
 	
 	room_data *to_room = NULL, *to_rev = NULL;
 	obj_data *found_obj = NULL;
@@ -1067,7 +1000,7 @@ ACMD(do_build) {
 	int dir = NORTH;
 	craft_data *iter, *next_iter, *type = NULL, *abbrev_match = NULL;
 	bool found = FALSE, found_any, this_line, is_closed, needs_facing, needs_reverse;
-	bool junk, wait;
+	bool junk, wait, info = FALSE;
 	
 	// simple rules for ch building a given craft
 	#define CHAR_CAN_BUILD(ch, ttype)  (GET_CRAFT_TYPE((ttype)) == CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)) && (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || has_ability((ch), GET_CRAFT_ABILITY((ttype)))))
@@ -1079,6 +1012,13 @@ ACMD(do_build) {
 	
 	argument = any_one_word(argument, arg);
 	skip_spaces(&argument);
+	
+	// optional info arg
+	if (!str_cmp(arg, "info")) {
+		argument = any_one_word(argument, arg);
+		skip_spaces(&argument);
+		info = TRUE;
+	}
 	
 	// this figures out if the argument was a build recipe
 	if (*arg) {
@@ -1132,6 +1072,7 @@ ACMD(do_build) {
 		/* Send output */
 		else {
 			msg_to_char(ch, "Usage: build <structure> [direction]\r\n");
+			msg_to_char(ch, "       build info <structure>\r\n");
 			msg_to_char(ch, "You know how to build:\r\n");
 			this_line = FALSE;
 			found_any = FALSE;
@@ -1161,6 +1102,10 @@ ACMD(do_build) {
 				msg_to_char(ch, "%s\r\n", buf);
 			}
 		}
+	}
+	else if (info) {
+		// they only wanted info
+		show_craft_info(ch, type);
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already busy.\r\n");
@@ -1253,9 +1198,9 @@ ACMD(do_build) {
 	// begin setup
 	construct_building(IN_ROOM(ch), GET_CRAFT_BUILD_TYPE(type));
 	set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
-
+	
+	GET_BUILDING_RESOURCES(IN_ROOM(ch)) = copy_resource_list(GET_CRAFT_RESOURCES(type));
 	special_building_setup(ch, IN_ROOM(ch));
-	setup_building_resources(IN_ROOM(ch), GET_CRAFT_RESOURCES(type), FALSE);
 	
 	// can_claim checks total available land, but the outside is check done within this block
 	if (can_claim(ch) && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
@@ -1777,13 +1722,16 @@ ACMD(do_interlink) {
 
 
 ACMD(do_lay) {
+	extern struct complex_room_data *init_complex_data();
+	
 	static struct resource_data *cost = NULL;
 	sector_data *original_sect = SECT(IN_ROOM(ch));
 	sector_data *check_sect = (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_ROAD) ? BASE_SECT(IN_ROOM(ch)) : SECT(IN_ROOM(ch)));
 	sector_data *road_sect = find_first_matching_sector(SECTF_IS_ROAD, NOBITS);
+	struct resource_data *charged = NULL;
 	
 	if (!cost) {
-		cost = create_resource_list(o_ROCK, 20, NOTHING);
+		add_to_resource_list(&cost, RES_COMPONENT, CMP_ROCK, 20, 0);
 	}
 
 	if (IS_NPC(ch)) {
@@ -1809,8 +1757,10 @@ ACMD(do_lay) {
 	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_ROAD)) {
 		// already a road -- attempt to un-lay it
-		give_resources(ch, cost, TRUE);
-
+		if (COMPLEX_DATA(IN_ROOM(ch)) && GET_BUILT_WITH(IN_ROOM(ch))) {
+			give_resources(ch, GET_BUILT_WITH(IN_ROOM(ch)), TRUE);
+		}
+		
 		msg_to_char(ch, "You pull up the road.\r\n");
 		act("$n pulls up the road.", FALSE, ch, 0, 0, TO_ROOM);
 		
@@ -1828,7 +1778,7 @@ ACMD(do_lay) {
 		// sends own messages
 	}
 	else {
-		extract_resources(ch, cost, TRUE);
+		extract_resources(ch, cost, TRUE, &charged);
 
 		msg_to_char(ch, "You lay a road here.\r\n");
 		act("$n lays a road here.", FALSE, ch, 0, 0, TO_ROOM);
@@ -1846,7 +1796,15 @@ ACMD(do_lay) {
 		
 		// preserve this for un-laying the road (disassociate_building)
 		change_base_sector(IN_ROOM(ch), original_sect);
-
+		
+		// log charged resources
+		if (charged) {
+			if (!COMPLEX_DATA(IN_ROOM(ch))) {
+				COMPLEX_DATA(IN_ROOM(ch)) = init_complex_data();
+			}
+			GET_BUILT_WITH(IN_ROOM(ch)) = charged;
+		}
+		
 		command_lag(ch, WAIT_OTHER);
 		check_lay_territory(ch, IN_ROOM(ch));
 	}
@@ -1854,7 +1812,10 @@ ACMD(do_lay) {
 
 
 ACMD(do_maintain) {
-	struct resource_data *res = create_resource_list(o_LUMBER, BUILDING_DISREPAIR(IN_ROOM(ch)), o_NAILS, BUILDING_DISREPAIR(IN_ROOM(ch)), NOTHING);
+	struct resource_data *res = NULL;
+	
+	add_to_resource_list(&res, RES_COMPONENT, CMP_LUMBER, BUILDING_DISREPAIR(IN_ROOM(ch)), 0);
+	add_to_resource_list(&res, RES_COMPONENT, CMP_NAILS, BUILDING_DISREPAIR(IN_ROOM(ch)), 0);
 	
 	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You can't perform maintenance here.\r\n");
@@ -1866,7 +1827,7 @@ ACMD(do_maintain) {
 		// sends own messages
 	}
 	else {
-		extract_resources(ch, res, TRUE);
+		extract_resources(ch, res, TRUE, NULL);
 		COMPLEX_DATA(IN_ROOM(ch))->disrepair = 0;
 		msg_to_char(ch, "You perform some quick maintenance on the building.\r\n");
 		act("$n performs some quick maintenance on the building.", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -2045,7 +2006,7 @@ ACMD(do_upgrade) {
 
 			attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(type)), IN_ROOM(ch), TRUE);
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
-			setup_building_resources(IN_ROOM(ch), GET_CRAFT_RESOURCES(type), FALSE);
+			GET_BUILDING_RESOURCES(IN_ROOM(ch)) = copy_resource_list(GET_CRAFT_RESOURCES(type));
 
 			msg_to_char(ch, "You begin to upgrade the building.\r\n");
 			act("$n starts upgrading the building.", FALSE, ch, 0, 0, TO_ROOM);

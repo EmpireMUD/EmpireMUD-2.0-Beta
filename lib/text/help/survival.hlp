@@ -44,7 +44,7 @@ Gains experience passively when you're standing in a dark room.
 
 See also: NIGHTSIGHT
 #
-"FIND HERBS" HERBS
+"FIND HERBS"
 
 Find Herbs (Survival ability)
 
@@ -63,7 +63,7 @@ Herbs you can find:
  daggerbite - deserts
  bileberries - near rivers
 
-See also: HERB GARDENS, PICK
+See also: HERBS, HERB GARDENS, PICK
 #
 "FIND SHELTER" SHELTERS
 
@@ -142,11 +142,11 @@ The various herb gardens allow you to farm more herbs than can normally be
 picked in one spot, and if your empire has Skilled Labor, your workforce can
 use the gardens as well.
 
-&y/&r##&y\&0 terracedgarden (mountain)  12 lumber, 4 nails, 60 rocks, 30 redthorn
-&c~&b##&c~&0 raftgarden (river)  12 lumber, 4 nails, 60 sticks, 30 bileberries
-&G^&C##&G^&0 oasisgarden (oasis)  12 lumber, 4 nails, 60 rocks, 15 daggerbite, 15 magewhisper
-&b~&0##&b~&0 estuarygarden (river facing ocean)  12 lumber, 4 nails, 60 sticks, 30 whitegrass
-&g|&y##&g|&0 shadygarden (plains or forest)  12 lumber, 4 nails, 60 sticks, 30 fiveleaf
+&y/&r##&y\&0 terracedgarden (mountain)
+&c~&b##&c~&0 raftgarden (river)
+&G^&C##&G^&0 oasisgarden (oasis)
+&b~&0##&b~&0 estuarygarden (river facing ocean)
+&g|&y##&g|&0 shadygarden (plains or forest)
 
 Only the estuarygarden requires a direction.
 
@@ -260,6 +260,7 @@ PATHFINDING
 Pathfinding (Survival ability)
 
 Usage:  lay
+Cost:  20x (rock)
 
 With the Pathfinding ability, you can lay roads on mountains. This ability
 also lets you remove them with the same command. You do not need the Roads

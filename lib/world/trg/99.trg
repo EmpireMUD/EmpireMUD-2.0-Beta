@@ -65,7 +65,7 @@ end
 ~
 #9901
 Dismissable~
-0 c 0
+0 ct 0
 dismiss~
 eval test %%self.is_name(%arg%)%%
 if !%test%
@@ -83,7 +83,7 @@ end
 ~
 #9902
 Lonely Despawn~
-0 ab 5
+0 abt 5
 ~
 eval count 0
 eval room_var %self.room%

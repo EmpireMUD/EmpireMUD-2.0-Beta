@@ -83,42 +83,6 @@ switch %random.4%
   break
 done
 ~
-#10305
-Dismissable~
-0 c 0
-dismiss~
-eval test %%self.is_name(%arg%)%%
-if !%test%
-  return 0
-  halt
-end
-if (%self.master% && %self.master% == %actor%)
-  %send% %actor% You dismiss %self.name%.
-  %echoaround %actor% %actor.name% dismisses %self.name%.
-  %purge% %self%
-else
-  * ordinary dismiss error
-  return 0
-end
-~
-#10306
-Lonely Despawn~
-0 ab 5
-~
-eval count 0
-eval room_var %self.room%
-eval target_char %room_var.people%
-while %target_char%
-  if (%target_char.is_pc%)
-    eval count %count% + 1
-  end
-  eval target_char %target_char.next_in_room%
-done
-* Despawn if no players present
-if %count% < 1
-  %purge% %self%
-end
-~
 #10307
 Flame dragon despawn timer~
 1 f 0

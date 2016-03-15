@@ -4,7 +4,7 @@ a clay bowl~
 A clay bowl is lying here, slightly cracked.~
 The bowl looks like it would be good for holding water.
 ~
-5 0 a
+5 0 a 1
 12 0 0
 6 0
 S
@@ -14,7 +14,7 @@ a clay pot~
 A clay pot is lying here, slightly cracked.~
 You can carry water in the pot.
 ~
-5 0 a
+5 0 a 1
 24 0 0
 6 0
 R
@@ -26,7 +26,7 @@ a clay vessel~
 A clay vessel has been left here.~
 The vessel looks like it would hold a lot of water.
 ~
-5 0 a
+5 0 a 1
 56 0 0
 6 0
 R
@@ -41,7 +41,7 @@ A hestian trinket is sitting on the ground.~
    You can use the trinket to teleport home. Use the home command to set your
 home.
 ~
-3 0 a
+3 0 a 1
 0 0 0
 6 0
 R
@@ -56,7 +56,7 @@ a pile of clay bricks~
 Some clay bricks are piled on the ground.~
 You can use the bricks for building.
 ~
-3 el a
+3 el a 2
 0 0 0
 6 0
 M
@@ -65,6 +65,8 @@ You put down a layer of bricks.~
 M
 1
 $n puts down a layer of bricks.~
+O
+3 bf
 R
 5117 0
 S
@@ -75,7 +77,7 @@ A piece pipe is lying on the ground.~
    This pipe is a symbol of peace, and smoking it is considered sacred. It
 looks like you could type 'smoke' to use it.
 ~
-3 0 a
+3 0 a 1
 0 0 0
 6 0
 R
@@ -88,17 +90,15 @@ a tethyan focus~
 Someone has left a tethyan focus here.~
 You can hold this item in your off-hand.
 ~
-3 mo ao
+3 mo ao 1
 0 0 0
 6 0
 A
-7 1
+7 1 0
 A
-8 1
+8 1 0
 A
-9 2
-C
-0 0
+9 2 0
 S
 #260
 charm areios~
@@ -106,17 +106,15 @@ an areios charm~
 An areios charm is sitting on the ground.~
 You can hold this item in your off-hand.
 ~
-3 mo ao
+3 mo ao 1
 0 0 0
 6 0
 A
-6 1
+6 1 0
 A
-1 1
+1 1 0
 A
-9 2
-C
-0 0
+9 2 0
 S
 #261
 effigy gaian~
@@ -124,15 +122,13 @@ a gaian effigy~
 A gaian effigy is sticking up out of the ground.~
 You can hold this item in your off-hand.
 ~
-3 mo ao
+3 mo ao 1
 0 0 0
 6 0
 A
-7 2
+7 2 0
 A
-16 1
-C
-0 0
+16 1 0
 S
 #262
 trinket conveyance~
@@ -140,7 +136,7 @@ a trinket of conveyance~
 A trinket of conveyance seems to have been dropped here.~
 You can use this trinket to teleport to a random starting location.
 ~
-3 0 a
+3 0 a 1
 0 0 0
 6 0
 R
@@ -155,9 +151,9 @@ a letheian icon~
 A clay letheian icon is lying on the ground.~
    This icon grants a free skill reset. Once you use it, you can choose a
 different set of abilities for that skill tree. Type 'use icon Skill Name' to
-gain the reset, then 'skill reset Skill Name' to use it.  
+gain the reset, then 'skill reset Skill Name' to use it.
 ~
-3 0 a
+3 0 a 1
 0 0 0
 0 0
 T 263

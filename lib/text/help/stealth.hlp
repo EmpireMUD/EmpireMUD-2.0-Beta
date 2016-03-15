@@ -276,6 +276,7 @@ POISON POISONS "DEADLY POISONS" MIX
 Poisons, Deadly Poisons (Stealth abilities)
 
 Command:  mix [number] <poison>
+          mix info <poison>
           use <poison>
 
 You can mix poisons with the "mix" command in an alchemist shop, or anywhere
@@ -294,22 +295,22 @@ Both abilities gain experience any time you attempt to apply poison, even if it
 is resisted.
 
 Basic Poisons:
-  searing  +5 damage  (30 bileberries)
-  weakness  -25 health  (15 bileberries, 15 daggerbite)
-  exhaustion  -25 move  (30 bileberries)
-  braindrain  -25 mana  (15 magewhisper, 15 daggerbite)
-  strength  -1 strength  (15 daggerbite, 15 redthorn)
-  dexterity  -1 dexterity  (15 daggerbite, 15 redthorn)
-  charisma  -1 charisma  (15 bileberries, 15 redthorn)
-  intelligence  -1 intelligence  (15 magewhisper, 15 bileberries)
-  wits  -2 wits  (15 redthorn, 15 bileberries)
+  searing  +5 damage
+  weakness  -25 health
+  exhaustion  -25 move
+  braindrain  -25 mana
+  strength  -1 strength
+  dexterity  -1 dexterity
+  charisma  -1 charisma
+  intelligence  -1 intelligence
+  wits  -2 wits
 
 Deadly Poisons:
-  pain  4 damage-over-time  (45 daggerbite)
-  slow  slower combat rate  (30 daggerbite, 15 redthorn)
-  heartstop  vampires can't spend blood  (30 daggerbite, 15 redthorn)
+  pain  4 damage-over-time
+  slow  slower combat rate
+  heartstop  vampires can't spend blood
 
-See also: CRAFTING LEVEL, RESIST POISON
+See also: CRAFTING LEVEL, RESIST POISON, RESOURCES, KEEP
 #
 PRICK
 
@@ -365,8 +366,6 @@ See also: HIDE, SENSE LIFE RITUAL
 
 .{}.  Secret Cache  (Stealth ability)
 
-Resources:  20 lumber, 6 nails, 20 blocks, 5 imperium ingots
-Built on:  plains, desert
 Chameleon:  &g....&0 or &Y....&0
 
 This ability allows you to build the secret cache, a place to store your

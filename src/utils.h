@@ -646,6 +646,8 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OBJ_ACTION_DESC(obj)  ((obj)->action_description)
 #define GET_OBJ_AFF_FLAGS(obj)  ((obj)->obj_flags.bitvector)
 #define GET_OBJ_CARRYING_N(obj)  ((obj)->obj_flags.carrying_n)
+#define GET_OBJ_CMP_TYPE(obj)  ((obj)->obj_flags.cmp_type)
+#define GET_OBJ_CMP_FLAGS(obj)  ((obj)->obj_flags.cmp_flags)
 #define GET_OBJ_CURRENT_SCALE_LEVEL(obj)  ((obj)->obj_flags.current_scale_level)
 #define GET_OBJ_EXTRA(obj)  ((obj)->obj_flags.extra_flags)
 #define GET_OBJ_KEYWORDS(obj)  ((obj)->name)
@@ -672,6 +674,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // helpers
 #define OBJ_FLAGGED(obj, flag)  (IS_SET(GET_OBJ_EXTRA(obj), (flag)))
+#define OBJ_CMP_FLAGGED(obj, flg)  IS_SET(GET_OBJ_CMP_FLAGS(obj), (flg))
 #define OBJS(obj, vict)  (CAN_SEE_OBJ((vict), (obj)) ? GET_OBJ_DESC((obj), vict, 1) : "something")
 #define OBJVAL_FLAGGED(obj, flag)  (IS_SET(GET_OBJ_VAL((obj), 1), (flag)))
 #define CAN_WEAR(obj, part)  (IS_SET(GET_OBJ_WEAR(obj), (part)))
@@ -833,6 +836,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_ACTION_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_room))
 #define GET_ACTION_TIMER(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_timer))
 #define GET_ACTION_VNUM(ch, n)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_vnum[(n)]))
+#define GET_ACTION_RESOURCES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action_resources))
 #define GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->adventure_summon_return_location))
 #define GET_ADVENTURE_SUMMON_RETURN_MAP(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->adventure_summon_return_map))
 #define GET_ALIASES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->aliases))
@@ -971,6 +975,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define BUILDING_RESOURCES(room)  (COMPLEX_DATA(room) ? GET_BUILDING_RESOURCES(room) : NULL)
 #define GET_ROOM_VEHICLE(room)  (COMPLEX_DATA(HOME_ROOM(room)) ? COMPLEX_DATA(HOME_ROOM(room))->vehicle : NULL)
 #define GET_BUILDING_RESOURCES(room)  (COMPLEX_DATA(room)->to_build)
+#define GET_BUILT_WITH(room)  (COMPLEX_DATA(room)->built_with)
 #define GET_INSIDE_ROOMS(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->inside_rooms : 0)
 #define HOME_ROOM(room)  ((COMPLEX_DATA(room) && COMPLEX_DATA(room)->home_room) ? COMPLEX_DATA(room)->home_room : (room))
 #define IS_COMPLETE(room)  (!BUILDING_RESOURCES(room))
@@ -1260,9 +1265,15 @@ void determine_gear_level(char_data *ch);
 extern bool wake_and_stand(char_data *ch);
 
 // resource functions from utils.c
-void extract_resources(char_data *ch, struct resource_data *list, bool ground);
+void add_to_resource_list(struct resource_data **list, int type, any_vnum vnum, int amount, int misc);
+void apply_resource(char_data *ch, struct resource_data *res, struct resource_data **list, obj_data *use_obj, int msg_type, vehicle_data *crafting_veh, struct resource_data **build_used_list);
+void extract_resources(char_data *ch, struct resource_data *list, bool ground, struct resource_data **build_used_list);
+extern struct resource_data *get_next_resource(char_data *ch, struct resource_data *list, bool ground, bool left2right, obj_data **found_obj);
+extern char *get_resource_name(struct resource_data *res);
 void give_resources(char_data *ch, struct resource_data *list, bool split);
+void halve_resource_list(struct resource_data **list, bool remove_nonrefundables);
 extern bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs);
+void show_resource_list(struct resource_data *list, char *save_buffer);
 
 // string functions from utils.c
 extern bitvector_t asciiflag_conv(char *flag);
@@ -1420,3 +1431,10 @@ extern char *get_vehicle_name_by_proto(obj_vnum vnum);
 // get_filename()
 #define PLR_FILE  0
 #define DELAYED_FILE  1
+
+
+// APPLY_RES_x: messaging for the apply_resource() function
+#define APPLY_RES_SILENT  0	// send no messages
+#define APPLY_RES_BUILD  1	// send build message
+#define APPLY_RES_CRAFT  2	// send craft message
+#define APPLY_RES_REPAIR  3	// vehicle repairing
