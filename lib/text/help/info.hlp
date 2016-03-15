@@ -152,7 +152,7 @@ You cannot unbind items.
 
 See also: TAGS, HOME
 #
-BLOCK "BLOCK CAP"
+BLOCK "BLOCK CAP" "BLOCK STAT" "BLOCK RATING" BLOCKING
 
 (Disambiguation: Did you mean HELP BLOCK COMPONENT ?)
 
