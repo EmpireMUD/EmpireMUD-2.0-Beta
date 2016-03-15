@@ -2286,8 +2286,8 @@ void check_auto_assist(char_data *ch) {
 			continue;
 		}
 		
-		// things which stop normal auto-assist but not champion
-		if (MOB_FLAGGED(ch_iter, MOB_NO_ATTACK)) {
+		// things which stop normal auto-assist but not champion or follower
+		if (MOB_FLAGGED(ch_iter, MOB_NO_ATTACK) && iter_master != ch) {
 			continue;
 		}
 		

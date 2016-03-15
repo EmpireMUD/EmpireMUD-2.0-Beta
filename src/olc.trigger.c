@@ -722,15 +722,27 @@ OLC_MODULE(tedit_string) {
 
 OLC_MODULE(tedit_types) {
 	trig_data *trig = GET_OLC_TRIGGER(ch->desc);	
-	bitvector_t old = GET_TRIG_TYPE(trig);
+	bitvector_t old = GET_TRIG_TYPE(trig), diff;
+	
+	bitvector_t ignore_changes = MTRIG_GLOBAL;	// all types ignore global changes
+	
+	// mobs also ignore changes to the charmed flag
+	if (trig->attach_type == MOB_TRIGGER) {
+		ignore_changes |= MTRIG_CHARMED;
+	}
 	
 	GET_TRIG_TYPE(trig) = olc_process_flag(ch, argument, "type", "types", trig_attach_type_list[trig->attach_type], GET_TRIG_TYPE(trig));
 	
-	if (old != GET_TRIG_TYPE(trig)) {
+	diff = (old & ~GET_TRIG_TYPE(trig)) | (~old & GET_TRIG_TYPE(trig));	// find changed bits
+	diff &= ~ignore_changes;	// filter out ones we don't care about
+	
+	// if we changed any relevant type, remove args
+	if (diff != NOBITS) {
 		trig->narg = 0;
 		if (trig->arglist) {
 			free(trig->arglist);
 			trig->arglist = NULL;
+			msg_to_char(ch, "Type changed. Arguments cleared.\r\n");
 		}
 	}
 }
