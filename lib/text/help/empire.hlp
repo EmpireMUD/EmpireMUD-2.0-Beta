@@ -164,33 +164,11 @@ You can't cede land to an empire that is at war.
 
 See also: CLAIM, POLICY, PRIVILEGE, ABANDON
 #
-CITY CITIES
+CITY
 
-Usage:  city <command> [city name]
-
-Empires are made up of cities. An empire gets 1 city point per 2 members and
-can use a city point to found a new city, or to upgrade an existing one. As
-you upgrade a city, its radius grows. 80% of an empire's territory must be
-inside its cities. If you lose members in your empire, you won't lose any of
-your existing cities, but you won't get back city points for abandoning those
-extra cities if you no longer have enough members for them.
-
-The boundaries of the city only show how far its influence reaches. You must
-still claim the territory within the borders if you want it to be part of your
-empire. Other empires can also claim land inside your city boundary, if you
-don't claim it yourself.
-
-There is a 60-minute waiting period between when you found a city, and when it
-counts as a city for things like City Teleportation, certain buildings such as
-the Great Hall, for guard towers, and for some other game rules.
-
-You can get additional city points from accruing at least 4000 wealth, for
-achieving Prominence, and for having at least 10 technologies.
-
-EmpireMUD periodically checks if cities are completely empty and, if so,
-will remove the city center and refund the city point. This helps keep the map
-clean, and you can prevent it by making sure there is at least one building in
-your city.
+(Disambiguation: Did you mean HELP CITY INFORMATION or HELP CITY COMMANDS ?)
+#
+"CITY COMMANDS"
 
 - &ccity list&0: This lists the cities already established in the empire, as well
     as how many city points are available to spend. Immortals can specify an
@@ -218,13 +196,43 @@ your city.
 
 - &ccity traits <name> [add | remove] <trait(s)>&0: Change city traits.
 
+See also: CITY INFORMATION, CITY TRAITS, CLAIM
+#
+"CITY INFORMATION" CITIES
+
+Usage:  city <command> [city name]
+
+Empires are made up of cities. An empire gets 1 city point per 2 members and
+can use a city point to found a new city, or to upgrade an existing one. As
+you upgrade a city, its radius grows. 80% of an empire's territory must be
+inside its cities. If you lose members in your empire, you won't lose any of
+your existing cities, but you won't get back city points for abandoning those
+extra cities if you no longer have enough members for them.
+
+The boundaries of the city only show how far its influence reaches. You must
+still claim the territory within the borders if you want it to be part of your
+empire. Other empires can also claim land inside your city boundary, if you
+don't claim it yourself.
+
+There is a 60-minute waiting period between when you found a city, and when it
+counts as a city for things like City Teleportation, certain buildings such as
+the Great Hall, for guard towers, and for some other game rules.
+
+You can get additional city points from accruing at least 4000 wealth, for
+achieving Prominence, and for having at least 10 technologies.
+
+EmpireMUD periodically checks if cities are completely empty and, if so,
+will remove the city center and refund the city point. This helps keep the map
+clean, and you can prevent it by making sure there is at least one building in
+your city.
+
 Types of cities:
  -C1-  Outpost (5)
  -C2-  Village (10)
  -C3-  City (15)
  -C4-  Capital (25)
 
-See also: CITY TRAITS, PROMINENCE, TECHNOLOGY, TERRITORY, CLAIM, WEALTH
+See also: CITY COMMANDS, CITY TRAITS, PROMINENCE, TECHNOLOGY, TERRITORY, WEALTH
 #
 "CITY LIGHTS"
 
@@ -1078,15 +1086,6 @@ ore. They are used as currency in many empires for trade and exchange. Some
 empires, however, prefer to use material goods instead.
 
 See also: RARE METALS, SMELT
-#
-STICKS
-
-Stored at: Lumber Yard
-
-Sticks are gathered in the forest. They can be used for weapons, torches, and
-some buildings.
-
-See also: GATHER, BUILD, CRAFT
 #
 "SUMMON BODYGUARD"
 
