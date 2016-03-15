@@ -246,11 +246,13 @@ gemfruits sparkling basket~
 a basket of sparkling gemfruits~
 A basket of sparkling gemfruits is lying here.~
    This beautiful fruit will eventually decay if not stored or eaten, leaving
-behind a magical crystal. It can also be planted to grow more gemfruit.
+behind a magical crystal. It can also be planted to grow more gemfruit. Some
+gemfuits will fail to produce gems, and you must be holding them in your
+inventory when they decay to get any gems at all.  
 ~
-6 b a 11
+6 b a 13
 48 10504 0
-12 168
+12 240
 T 10514
 S
 #10515
@@ -470,14 +472,14 @@ R
 T 10506
 S
 #10530
-arrows bladegrass metallic quiver~
+arrows bladegrass quiver~
 a quiver of bladegrass arrows~
-A quiver of metallic bladegrass arrows is lying here.~
+A quiver of bladegrass arrows is lying here.~
    The tips and fletching of these razor-sharp arrows use leaves of
 magi-netically engineered bladegrass, while the shaft is made from a piece of
 stalk. They look rather vicious.
 ~
-21 m a 1
+21 m a 2
 10 2 0
 2 0
 C
@@ -543,11 +545,11 @@ S
 #10535
 vines vigilant bundle~
 a bundle of vigilant vines~
-A bundle of guardian vines is piled up here.~
+A bundle of vigilant vines is piled up here.~
    These vicious magi-netically engineered vines can be planted in your cities,
 and will grow carnivorous flora to attack invaders.
 ~
-3 b a 9
+3 b a 10
 0 10511 0
 7 168
 R

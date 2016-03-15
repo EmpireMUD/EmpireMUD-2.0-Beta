@@ -278,6 +278,9 @@ return 1
 Gemfruit decay~
 1 f 0
 ~
+if !%self.carried_by% || %random.4% == 1
+  halt
+end
 eval object nothing
 switch %random.4%
   case 1
@@ -299,6 +302,9 @@ switch %random.4%
     * lightning stone
     eval object a yellow lightning stone
     %load% o 103 %self.carried_by%
+  break
+  default
+    * failure - do nothing
   break
 done
 if %self.carried_by%
