@@ -1,4 +1,4 @@
-ADHESIVE
+ADHESIVE "ADHESIVE COMPONENT"
 
 Adhesive (component)
 
@@ -9,7 +9,7 @@ nails. There are currently no objects which fill this type.
 
 See also: COMPONENT
 #
-BONE
+BONES "BONE COMPONENT"
 
 Bone (component)
 
@@ -60,7 +60,7 @@ and then sit in it. After that, use "sail" to move it.
 
 See also: SAIL, SWIMMING, SHIPBUILDING
 #
-CLAY
+CLAY "CLAY COMPONENT"
 
 Clay (component)
 Pile of clay (resource)
@@ -110,7 +110,7 @@ eligible for these flags, and are indicated by a GENERIC-DROP flag.
 
 See also: CONSIDER, IDENTIFY
 #
-DYES
+DYES "DYE COMPONENT"
 
 Dye (component)
 
@@ -122,9 +122,9 @@ technology is required to make the vials used to store dyes.
 
 See also: BASIC CRAFTS, COMPONENT
 #
-FEATHERS
+FEATHERS "FEATHERS COMPONENT" "FEATHER COMPONENT"
 
-Feather (component)
+Feathers (component)
 
 Used for:  nothing (yet)
 
@@ -132,7 +132,7 @@ Feathers are a component type.
 
 See also: COMPONENT
 #
-FIBERS
+FIBERS "FIBERS COMPONENT" "FIBER COMPONENT"
 
 Fibers (component)
 
@@ -142,7 +142,7 @@ Fibers are a component type.
 
 See also: COMPONENT
 #
-FLOUR
+FLOUR "FLOUR COMPONENT"
 
 Flour (resource, component)
 
@@ -154,7 +154,7 @@ from wheat) along with similar ingredients such as cornmeal.
 
 See also: COMPONENT, MILL, CROPS
 #
-FRUIT
+FRUITS "FRUIT COMPONENT"
 
 Fruit (component)
 
@@ -169,7 +169,7 @@ or split).
 
 See also: COMPONENT, COOK, CROPS
 #
-FUR
+FURS "FUR COMPONENT"
 
 Fur (component)
 
@@ -177,9 +177,9 @@ Used for:  sewing
 
 Fur is a component type primarily used for clothing and mage armor.
 
-See also: COMPONENT
+See also: COMPONENT, SEW, SKIN COMMAND
 #
-GEMS
+GEMS "GEM COMPONENT"
 
 Gem (component)
 
@@ -202,7 +202,7 @@ This rare seashell can be found while fishing.
 
 See also: FISH, GEM
 #
-GRAIN
+GRAINS "GRAIN COMPONENT"
 
 Grain (component)
 
@@ -210,7 +210,7 @@ Grains are a component type. They currently have no usage in common.
 
 See also: COMPONENT
 #
-HANDLE
+HANDLE "HANDLE COMPONENT"
 
 Handle (component)
 
@@ -224,7 +224,7 @@ tool or weapon. The most basic handles are made from sticks.
 
 See also: COMPONENT, CRAFT, FORGE
 #
-HERBS
+HERB HERBS "HERB COMPONENT"
 
 Herb (component)
 
@@ -278,13 +278,13 @@ The (large) flag on items indicates that the item is over-sized and takes up
 
 All other items take up 1 inventory slot.
 #
-LEATHER
+LEATHER "LEATHER COMPONENT"
 
 Leather (component)
 
 Leather is a component type used in many sewing recipes.
 
-See also: COMPONENT, TAN, SKIN, SKIN
+See also: COMPONENT, TAN, SKIN
 #
 "LIGHTNING STONE" "YELLOW LIGHTNING STONE" "YELLOW STONE"
 
@@ -294,7 +294,7 @@ Stored in:  Tower of Sorcery
 
 This rare stone can be found in the desert where lightning has struck.
 #
-LUMBER
+LUMBER "LUMBER COMPONENT"
 
 Lumber (component)
 
@@ -306,7 +306,7 @@ usually fine.
 
 See also: COMPONENT, CHOP, SAW
 #
-METALS INGOTS BARS
+METALS INGOTS BARS "METAL COMPONENT"
 
 Metal (component)
 Ingots (resources)
@@ -329,7 +329,7 @@ refined, fine:  silver and gold bars
 
 See also: COMPONENT, SMELT, IRON, COPPER, MINE
 #
-MEAT
+MEAT "MEAT COMPONENT"
 
 Meat (component)
 
@@ -359,7 +359,7 @@ stored in Towers of Sorcery, and are used to build certain buildings.
 
 See also: EXARCH CRAFTS, PORTAL
 #
-OIL
+OIL "OIL COMPONENT"
 
 Oil (component)
 
@@ -367,7 +367,7 @@ Used for: cooking
 
 See also: COMPONENT, COOK, MILL
 #
-PILLAR
+PILLARS "PILLAR COMPONENT"
 
 Pillar (component)
 
@@ -395,7 +395,7 @@ on credit from their public (or allied) buildings, IF you have a trade pact.
 
 See also: STORE, INVENTORY, DIPLOMACY, WAREHOUSE
 #
-ROCKS
+ROCKS "ROCK COMPONENT"
 
 Rock (component)
 
@@ -408,7 +408,7 @@ but in most cases where you need a rock, any rock will do.
 
 See also: BUILD, COMPONENT, DIG, CHIP, FLINT
 #
-SEEDS
+SEEDS "SEED COMPONENT" "SEEDS COMPONENT"
 
 Seeds (component)
 
@@ -444,7 +444,7 @@ Example:
 
 See also: COINS
 #
-STICKS
+STICKS "STICK COMPONENT"
 
 Stick (component)
 
@@ -457,7 +457,7 @@ will accept any kind of stick.
 
 See also: COMPONENT, GATHER, BUILD, CRAFT, SCRAPE
 #
-ROPE ROPES
+ROPE ROPES "ROPE COMPONENT"
 
 Rope (component)
 
@@ -516,7 +516,7 @@ Masterwork abilities:
 
 See also: SCALABLE CRAFTS
 #
-TEXTILE
+TEXTILES "TEXTILE COMPONENT" "CLOTH COMPONENT"
 
 Textile (component)
 
@@ -662,7 +662,7 @@ stored in the vault using the regular "store" command, not "warehouse".
 
 See also: CASTLE, DESIGNATE, PRIVILEGE, RETRIEVE, STORE, WAREHOUSE
 #
-VEGETABLE
+VEGETABLES "VEGETABLE COMPONENT"
 
 Vegetable (component)
 
