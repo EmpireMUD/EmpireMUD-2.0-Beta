@@ -346,7 +346,7 @@ different types of resources:
    "1x imperium ingot".
 
 &cGeneric components&0 - Different items can match the same component requirement,
-   which are written in paretheses like "1x (lumber)". Some components have
+   which are written in parentheses like "1x (lumber)". Some components have
    modifiers like "rare" or "large". An item must have all the correct set of
    modifiers to match the recipe (but it's okay if it has extra modifiers too).
    You can see an item's component info with identify, shown in parentheses
