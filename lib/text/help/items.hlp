@@ -19,6 +19,24 @@ Bone is a component type.
 
 See also: COMPONENT
 #
+"BLOCK COMPONENT" "STONE BLOCKS" BLOCKS BRICKS "CLAY BRICKS"
+
+Block (component)
+Huge Stone Block (resource)
+Clay bricks (resource)
+
+The Block component is the building block of most buildings, and consists of
+stone blocks and clay bricks. Some buildings require a specific one, while
+any that merely call for (block) allow the use of either.
+
+You can quarry stone blocks from the ground at a quarry. They are used in
+monumental architecture.
+
+You need the Basic Crafts ability to make bricks. You can craft them from raw
+clay, so long as you have a fire. They will harden faster if you're at a Potter.
+
+See also: CLAY, COMPONENT, CRAFT, POTTER, QUARRY
+#
 BLOODSTONE
 
 Bloodstone (resource)
@@ -430,7 +448,7 @@ STICKS
 
 Stick (component)
 
-Stored at: Lumber Yard
+Stored at:  Lumber Yard
 Used for:  crafting, basic buildings
 
 Sticks are gathered in the forest, or scraped off some types of tree. They can
@@ -439,23 +457,20 @@ will accept any kind of stick.
 
 See also: COMPONENT, GATHER, BUILD, CRAFT, SCRAPE
 #
-"BLOCK COMPONENT" "STONE BLOCKS" BLOCKS BRICKS "CLAY BRICKS"
+ROPE ROPES
 
-Block (component)
-Huge Stone Block (resource)
-Clay bricks (resource)
+Rope (component)
 
-The Block component is the building block of most buildings, and consists of
-stone blocks and clay bricks. Some buildings require a specific one, while
-any that merely call for (block) allow the use of either.
+Stored at:  Utility Shed, Store Room, Shipyard
+Used for:  manufacturing
 
-You can quarry stone blocks from the ground at a quarry. They are used in
-monumental architecture.
+Ropes are used to tie mounts to land vehicles to pull them, and to control the
+sails of ships. They will be consumed when you manufuacture the vehicles - no
+more ropes are needed afterwards.
 
-You need the Basic Crafts ability to make bricks. You can craft them from raw
-clay, so long as you have a fire. They will harden faster if you're at a Potter.
+You can craft basic ropes from small pieces of leather.
 
-See also: CLAY, COMPONENT, CRAFT, POTTER, QUARRY
+See also: COMPONENT, CRAFT, MANUFACTURE
 #
 STORE STORAGE
 
