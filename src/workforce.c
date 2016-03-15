@@ -1735,7 +1735,7 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 void do_chore_nailmaking(empire_data *emp, room_data *room) {
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_NAILMAKING].mob);
 	int islid = GET_ISLAND_ID(room);
-	bool can_do = can_gain_chore_resource(emp, room, CHORE_NAILMAKING, o_NAILS) | empire_can_afford_component(emp, islid, CMP_METAL, CMPF_COMMON, 1);
+	bool can_do = can_gain_chore_resource(emp, room, CHORE_NAILMAKING, o_NAILS) && empire_can_afford_component(emp, islid, CMP_METAL, CMPF_COMMON, 1);
 	
 	if (worker && can_do) {
 		ewt_mark_resource_worker(emp, room, o_NAILS);
