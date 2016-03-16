@@ -1015,7 +1015,6 @@ ACMD(do_build) {
 	
 	// optional info arg
 	if (!str_cmp(arg, "info")) {
-		argument = any_one_word(argument, arg);
 		show_craft_info(ch, argument, CRAFT_TYPE_BUILD);
 		return;
 	}
