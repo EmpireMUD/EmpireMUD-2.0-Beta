@@ -496,6 +496,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_SECONDARY_TERRITORY  BIT(44)	// similar to a ship -- counts as territory off the map
 #define BLD_SHIPYARD  BIT(45)	// for building ships
 #define BLD_UPGRADED  BIT(46)	// combines with SHIPYARD, etc. to create upgraded versions of buildings
+#define BLD_PRESS  BIT(47)	// can use the 'press' craft command
 
 
 // Terrain flags for do_build -- these match up with build_on flags for building crafts
@@ -679,6 +680,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_TYPE_WORKFORCE  10
 #define CRAFT_TYPE_MANUFACTURE  11
 #define CRAFT_TYPE_SMELT  12
+#define CRAFT_TYPE_PRESS  13
 
 
 // CRAFT_x: Craft Flags for do_gen_craft

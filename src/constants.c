@@ -1255,6 +1255,7 @@ const char *craft_types[] = {
 	"WORKFORCE",
 	"MANUFACTURE",
 	"SMELT",
+	"PRESS",
 	"\n"
 };
 
@@ -2157,6 +2158,7 @@ const char *bld_flags[] = {
 	"2ND-TERRITORY",
 	"SHIPYARD",
 	"UPGRADED",
+	"PRESS",
 	"\n"
 };
 

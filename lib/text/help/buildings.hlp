@@ -569,6 +569,16 @@ You can pick more herbs than normal before the tile is depleted.
 
 See also: PICK
 #
+OILMAKER "OIL MAKER"
+
+(OO)  Oilmaker  (Artisans ability)
+
+Stored here:  oil
+
+The oilmaker is used to press olives and other resources into oil.
+
+See also: PRESS, STORAGE
+#
 PARK
 
 &g.^.&co&0  Park  (Monuments ability)

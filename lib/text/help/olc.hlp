@@ -1207,6 +1207,7 @@ Available flags:
  2ND-TERRITORY - counts as territory off the map (e.g. in a ship)
  SHIPYARD - used to build ships
  UPGRADED - modifies other building types like SHIPYARD
+ PRESS - can use the 'press' craft
 
 * Note: If you change the LARGE-CITY-RADIUS flag on existing buildings,
         territory counts will not update right away. Any empire can force a
