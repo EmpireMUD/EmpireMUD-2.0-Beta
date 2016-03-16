@@ -807,8 +807,8 @@ empire this way.
 
 When more than one character on an account is in the same empire, they all
 count as just 1 member. Only the highest Greatness and playtime among those
-alts is contributed to the empire. This means prevents players from having an
-unfair advantage from having many alts in the same empire.
+alts is contributed to the empire. This prevents players from having an unfair
+advantage from having many alts in the same empire.
 
 The roster command shows a list of all players in the empire. Members high-
 lighted in red have timed out, and are no longer contributing abilities, tech-
