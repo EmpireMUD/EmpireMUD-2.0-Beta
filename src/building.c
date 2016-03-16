@@ -862,7 +862,7 @@ void start_dismantle_building(room_data *loc) {
 	obj_data *obj, *next_obj;
 	bool deleted = FALSE;
 	bld_data *up_bldg;
-	bool complete = IS_COMPLETE(loc);	// store now -- this gets changed part way through
+	bool complete = !BUILDING_RESOURCES(loc);	// store now -- this gets changed part way through
 	
 	if (!IS_MAP_BUILDING(loc)) {
 		log("SYSERR: Attempting to dismantle non-building room #%d", GET_ROOM_VNUM(loc));
@@ -992,7 +992,7 @@ char *vnum_to_interlink(room_vnum vnum) {
 ACMD(do_build) {
 	extern bool find_and_bind(char_data *ch, obj_vnum vnum);
 	extern int get_crafting_level(char_data *ch);
-	void show_craft_info(char_data *ch, craft_data *craft);
+	void show_craft_info(char_data *ch, char *argument, int craft_types);
 	
 	room_data *to_room = NULL, *to_rev = NULL;
 	obj_data *found_obj = NULL;
@@ -1000,7 +1000,7 @@ ACMD(do_build) {
 	int dir = NORTH;
 	craft_data *iter, *next_iter, *type = NULL, *abbrev_match = NULL;
 	bool found = FALSE, found_any, this_line, is_closed, needs_facing, needs_reverse;
-	bool junk, wait, info = FALSE;
+	bool junk, wait;
 	
 	// simple rules for ch building a given craft
 	#define CHAR_CAN_BUILD(ch, ttype)  (GET_CRAFT_TYPE((ttype)) == CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)) && (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || has_ability((ch), GET_CRAFT_ABILITY((ttype)))))
@@ -1016,8 +1016,8 @@ ACMD(do_build) {
 	// optional info arg
 	if (!str_cmp(arg, "info")) {
 		argument = any_one_word(argument, arg);
-		skip_spaces(&argument);
-		info = TRUE;
+		show_craft_info(ch, argument, CRAFT_TYPE_BUILD);
+		return;
 	}
 	
 	// this figures out if the argument was a build recipe
@@ -1102,10 +1102,6 @@ ACMD(do_build) {
 				msg_to_char(ch, "%s\r\n", buf);
 			}
 		}
-	}
-	else if (info) {
-		// they only wanted info
-		show_craft_info(ch, type);
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already busy.\r\n");
