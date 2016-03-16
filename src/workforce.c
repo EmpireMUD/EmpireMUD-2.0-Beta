@@ -1253,7 +1253,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 		}
 		
 		// check for completion
-		if (IS_COMPLETE(room)) {
+		if (!BUILDING_RESOURCES(room)) {
 			finish_dismantle(worker, room);
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 			if (empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_DISMANTLED)) {
@@ -1286,7 +1286,7 @@ void do_chore_dismantle_mines(empire_data *emp, room_data *room) {
 	if (worker && can_do) {
 		start_dismantle_building(room);
 		add_chore_tracker(emp);
-		act("$n begins to dismantle the building.\r\n", FALSE, worker, NULL, NULL, TO_ROOM);
+		act("$n begins to dismantle the building.", FALSE, worker, NULL, NULL, TO_ROOM);
 		
 		// if they have the building chore on, we'll keep using the mob
 		if (!empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_BUILDING)) {

@@ -862,7 +862,7 @@ void start_dismantle_building(room_data *loc) {
 	obj_data *obj, *next_obj;
 	bool deleted = FALSE;
 	bld_data *up_bldg;
-	bool complete = IS_COMPLETE(loc);	// store now -- this gets changed part way through
+	bool complete = !BUILDING_RESOURCES(loc);	// store now -- this gets changed part way through
 	
 	if (!IS_MAP_BUILDING(loc)) {
 		log("SYSERR: Attempting to dismantle non-building room #%d", GET_ROOM_VNUM(loc));
