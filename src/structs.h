@@ -752,7 +752,8 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_NEXUS_CRYSTALS  24
 #define CHORE_MILLING  25
 #define CHORE_REPAIR_VEHICLES  26
-#define NUM_CHORES  27		// total
+#define CHORE_OILMAKING  27
+#define NUM_CHORES  28		// total
 
 
 /* Diplomacy types */

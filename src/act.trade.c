@@ -72,6 +72,9 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MILL) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need to be in a mill to do that.\r\n");
 	}
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_PRESS) || !IS_COMPLETE(IN_ROOM(ch)))) {
+		msg_to_char(ch, "You need a press to do that.\r\n");
+	}
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !can_forge(ch)) {
 		// sends its own message
 	}

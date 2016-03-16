@@ -70,6 +70,7 @@ void stop_room_action(room_data *room, int action, int chore);	// act.action.c
 #define CHORE_GEN_CRAFT_VALIDATOR(name)  bool (name)(empire_data *emp, room_data *room, int chore, craft_data *craft)
 CHORE_GEN_CRAFT_VALIDATOR(chore_nexus_crystals);
 CHORE_GEN_CRAFT_VALIDATOR(chore_milling);
+CHORE_GEN_CRAFT_VALIDATOR(chore_pressing);
 CHORE_GEN_CRAFT_VALIDATOR(chore_smelting);
 CHORE_GEN_CRAFT_VALIDATOR(chore_weaving);
 
@@ -111,6 +112,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "nexus crystals", APPRENTICE_EXARCH },
 	{ "milling", MILL_WORKER },
 	{ "repair-vehicles", VEHICLE_REPAIRMAN },
+	{ "oilmaking", PRESS_WORKER },
 };
 
 
@@ -243,6 +245,9 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		}
 		if (ROOM_BLD_FLAGGED(room, BLD_MILL) && CHORE_ACTIVE(CHORE_MILLING)) {
 			do_chore_gen_craft(emp, room, CHORE_MILLING, chore_milling);
+		}
+		if (ROOM_BLD_FLAGGED(room, BLD_PRESS) && CHORE_ACTIVE(CHORE_OILMAKING)) {
+			do_chore_gen_craft(emp, room, CHORE_OILMAKING, chore_pressing);
 		}
 		if (BUILDING_VNUM(room) == RTYPE_SORCERER_TOWER && CHORE_ACTIVE(CHORE_NEXUS_CRYSTALS) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && EMPIRE_HAS_TECH(emp, TECH_EXARCH_CRAFTS)) {
 			do_chore_gen_craft(emp, room, CHORE_NEXUS_CRYSTALS, chore_nexus_crystals);
@@ -867,6 +872,27 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_nexus_crystals) {
 */
 CHORE_GEN_CRAFT_VALIDATOR(chore_milling) {
 	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_MILL) {
+		return FALSE;
+	}
+	if (GET_CRAFT_ABILITY(craft) != NO_ABIL) {
+		return FALSE;
+	}
+	// success
+	return TRUE;
+}
+
+
+/**
+* Function passed to do_chore_gen_craft()
+*
+* @param empire_data *emp The empire doing the chore.
+* @param room_data *room The room the chore is in.
+* @param int chore CHORE_ const for this chore.
+* @param craft_data *craft The craft to validate.
+* @return bool TRUE if this workforce chore can work this craft, FALSE if not
+*/
+CHORE_GEN_CRAFT_VALIDATOR(chore_pressing) {
+	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_PRESS) {
 		return FALSE;
 	}
 	if (GET_CRAFT_ABILITY(craft) != NO_ABIL) {
