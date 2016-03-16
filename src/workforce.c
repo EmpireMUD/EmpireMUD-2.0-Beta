@@ -1222,10 +1222,15 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 	char_data *worker;
 	
 	// anything we can dismantle?
-	LL_FOREACH(BUILDING_RESOURCES(room), res) {
-		if (res->type == RES_OBJECT) {
-			can_do = TRUE;
-			break;
+	if (!BUILDING_RESOURCES(room)) {
+		can_do = TRUE;
+	}
+	else {
+		LL_FOREACH(BUILDING_RESOURCES(room), res) {
+			if (res->type == RES_OBJECT) {
+				can_do = TRUE;
+				break;
+			}
 		}
 	}
 	
@@ -1264,7 +1269,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 		}
 
 		if (!found) {
-			// no trees remain: mark for despawn
+			// no work remains: mark for despawn
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 		}
 	}
