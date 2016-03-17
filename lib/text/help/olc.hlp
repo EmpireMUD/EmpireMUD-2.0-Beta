@@ -4207,8 +4207,8 @@ Evolutions are automatically sorted by type and by percentage. Only one will
 be called at a time -- the first one whose percentage check passes.
 
 Available types ([value] isn't used unless specified):
- CHOPPED-DOWN - Sector to become when chopped by a player; value is the number
-    of trees you receive.
+ CHOPPED-DOWN - Sector to become when chopped by a player; you should also add
+    chop interactions.
  CROP-GROWS - Sector to become when the crop finishes growing (Seeded -> Crop).
  ADJACENT-ONE - Called when this sector is next to a certain other sector
     (value is the sector vnum that it's adjacent to).
