@@ -177,6 +177,8 @@ Crops (CROPEDIT):
 - The map region only matters if the crop grows in the wild (no !WILD flag).
 - Crops should have a FORAGE interaction for a small single food item.
 - Crops should have a HARVEST interaction for a plantable large item.
+- Orchard crops need a CHOP interaction if they will give trees. Orchards are
+  still choppable without this, though.
 
 Globals (GEDIT):
 - All global tables must be approved by the head builder, because they apply
