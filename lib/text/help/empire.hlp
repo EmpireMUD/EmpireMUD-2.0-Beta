@@ -848,10 +848,11 @@ See also: BUILD, GRAND MONUMENTS
 #
 PAN
 
-Usage:  pan
+Usage:  pan [direction]
 
 Using a simple metal pan, you can pan for gold flakes next to the river. It's
-rare to find anything, but it's something to do.
+rare to find anything, but it's something to do. You can pan an adjacent map
+tile, or the one you're standing in.
 
 See also: DEPLETION, FORGE
 #

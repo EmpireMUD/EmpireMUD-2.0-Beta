@@ -38,6 +38,7 @@
 // external vars
 
 // external funcs
+extern room_data *dir_to_room(room_data *room, int dir);
 extern double get_base_dps(obj_data *weapon);
 extern obj_data *find_chip_weapon(char_data *ch);
 extern obj_data *has_sharp_tool(char_data *ch);
@@ -466,15 +467,17 @@ void start_mining(char_data *ch) {
 * Begins panning.
 *
 * @param char_data *ch The panner.
+* @param int dir Which direction the character is panning (or NO_DIR for same-tile).
 */
-void start_panning(char_data *ch) {
+void start_panning(char_data *ch, int dir) {
 	int panning_timer = config_get_int("panning_timer");
 	
 	if (find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, 1)) {
 		start_action(ch, ACT_PANNING, panning_timer);
+		GET_ACTION_VNUM(ch, 0) = dir;
 		
-		msg_to_char(ch, "You kneel down and begin panning at the shore.\r\n");
-		act("$n kneels down and begins panning at the shore.", TRUE, ch, 0, 0, TO_ROOM);
+		msg_to_char(ch, "You kneel down and begin panning.\r\n");
+		act("$n kneels down and begins panning.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 
@@ -690,6 +693,35 @@ INTERACTION_FUNC(finish_mining) {
 	}
 	
 	return any;
+}
+
+
+INTERACTION_FUNC(finish_panning) {
+	char buf[MAX_STRING_LENGTH];
+	obj_data *obj = NULL;
+	int num;
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(obj, 1);	// minimum level
+		obj_to_char(obj, ch);
+		load_otrigger(obj);
+	}
+	
+	// messaging
+	if (obj) {
+		if (interaction->quantity > 1) {
+			sprintf(buf, "You find $p (x%d)!", interaction->quantity);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		else {
+			act("You find $p!", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		
+		act("$n finds $p!", FALSE, ch, obj, NULL, TO_ROOM);
+	}
+	
+	return TRUE;
 }
 
 
@@ -1565,46 +1597,43 @@ void process_music(char_data *ch) {
 *
 * @param char_data *ch The panner.
 */
-void process_panning(char_data *ch) {	
-	room_data *in_room;
-	obj_data *obj;
+void process_panning(char_data *ch) {
+	bool success = FALSE;
+	room_data *room;
+	int dir;
 	
-	int short_depletion = config_get_int("short_depletion");
+	dir = GET_ACTION_VNUM(ch, 0);
+	room = (dir == NO_DIR) ? IN_ROOM(ch) : dir_to_room(IN_ROOM(ch), dir);
 
 	if ((!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_PAN)) && (!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_PAN))) {
 		msg_to_char(ch, "You need to be holding a pan to do that.\r\n");
 		cancel_action(ch);
 	}
-	else if (!find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, 1)) {
-		msg_to_char(ch, "You can no longer pan here.\r\n");
+	else if (!room || !CAN_INTERACT_ROOM(room, INTERACT_PAN) || !can_use_room(ch, room, MEMBERS_ONLY)) {
+		msg_to_char(ch, "You can no longer pan %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
 		cancel_action(ch);
 	}
 	else {
 		GET_ACTION_TIMER(ch) -= 1;
-
-		if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-			msg_to_char(ch, "You sift through the sand and pebbles, looking for gold...\r\n");
-		}
-		act("$n sifts through the sand, looking for gold...", TRUE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
-
+		
+		act("You sift through the sand and pebbles, looking for gold...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+		act("$n sifts through the sand, looking for gold...", TRUE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+		
 		if (GET_ACTION_TIMER(ch) <= 0) {
 			GET_ACTION(ch) = ACT_NONE;
 			
-			if (!number(0, 19) && get_depletion(IN_ROOM(ch), DPLTN_PAN) <= short_depletion) {
-				in_room = IN_ROOM(ch);
-				obj_to_char((obj = read_object(o_GOLD_SMALL, TRUE)), ch);
-				act("You find $p!", FALSE, ch, obj, 0, TO_CHAR);
-				add_depletion(IN_ROOM(ch), DPLTN_PAN, TRUE);
-				load_otrigger(obj);
-				
-				if (in_room == IN_ROOM(ch)) {
-					start_panning(ch);
-				}
+			// pan will silently fail if depleted
+			if (get_depletion(room, DPLTN_PAN) <= config_get_int("short_depletion")) {
+				add_depletion(room, DPLTN_PAN, TRUE);
+				success = run_room_interactions(ch, room, INTERACT_PAN, finish_panning);
 			}
-			else {
+			
+			// error message
+			if (!success) {
 				msg_to_char(ch, "You find nothing of value.\r\n");
-				start_panning(ch);
 			}
+			
+			start_panning(ch, dir);
 		}
 	}
 }
@@ -2406,24 +2435,38 @@ ACMD(do_mint) {
 
 
 ACMD(do_pan) {
+	room_data *room = IN_ROOM(ch);
+	int dir = NO_DIR;
+	
+	any_one_arg(argument, arg);
+	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else if (GET_ACTION(ch) == ACT_PANNING) {
-		msg_to_char(ch, "You stop panning for gold.\r\n");
+		msg_to_char(ch, "You stop panning.\r\n");
 		cancel_action(ch);
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're a bit busy right now.\r\n");
 	}
-	else if (!find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, 1)) {
-		msg_to_char(ch, "You need to be near fresh water to pan for gold.\r\n");
+	else if (*arg && (dir = parse_direction(ch, arg)) == NO_DIR) {
+		msg_to_char(ch, "Pan what direction?\r\n");
+	}
+	else if (dir != NO_DIR && !(room = dir_to_room(IN_ROOM(ch), dir))) {
+		msg_to_char(ch, "You can't pan in that direction.\r\n");
+	}
+	else if (!CAN_INTERACT_ROOM(room, INTERACT_PAN)) {
+		msg_to_char(ch, "You can't pan for anything %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
+	}
+	else if (!can_use_room(ch, room, MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to pan %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
 	}
 	else if ((!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_PAN)) && (!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_PAN))) {
 		msg_to_char(ch, "You need to be holding a pan to do that.\r\n");
 	}
 	else {
-		start_panning(ch);
+		start_panning(ch, dir);
 	}
 }
 

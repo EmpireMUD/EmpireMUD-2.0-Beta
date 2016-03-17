@@ -2451,6 +2451,7 @@ Object interaction types:
  SCRAPE - Items you get when scraping this item (tree -> log).
  SAW - Items you get when sawing this item (tree -> lumber).
  TAN - Items you get when tanning this item (skin -> leather).
+ CHIP - What you get for chipping at the item.
 
 Room interaction types:
  DIG - Items received when using the dig action.
@@ -2459,6 +2460,9 @@ Room interaction types:
  HARVEST - Items received when harvesting a crop, OR when picking in an ORCHARD crop.
  GATHER - Items received from the gather action.
  ENCOUNTER - Hostile mob loaded when a random encounter triggers.
+ CHOP - Things that can be found when chopping here.
+ FISH - Things that can be found by fishing here.
+ PAN - Things that can be found by panning here.
 
 The percent may be anywhere from 0.01 to 100.00 and if the quantity is greater
 than 1, the percent is only checked once for the entire quantity. If you want
