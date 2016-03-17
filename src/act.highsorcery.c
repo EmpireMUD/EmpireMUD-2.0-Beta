@@ -331,13 +331,6 @@ INTERACTION_FUNC(devastate_crop) {
 		load_otrigger(newobj);
 	}
 	
-	// additional tree if orchard
-	if (ROOM_CROP_FLAGGED(inter_room, CROPF_IS_ORCHARD)) {
-		obj_to_char_or_room((newobj = read_object(o_TREE, TRUE)), ch);
-		scale_item_to_level(newobj, 1);	// minimum level
-		load_otrigger(newobj);
-	}
-	
 	return TRUE;
 }
 
@@ -1966,12 +1959,9 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 	
 	// SUCCESS: distribute resources
 	if (to_room) {
-		if (CAN_CHOP_ROOM(to_room) && get_depletion(to_room, DPLTN_CHOP) < config_get_int("chop_depletion")) {
-			run_room_interactions(ch, to_room, INTERACT_CHOP, devastate_trees);
-			change_chop_territory(to_room);
-		}
-		else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room)) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
+		if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room)) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
 			run_room_interactions(ch, to_room, INTERACT_HARVEST, devastate_crop);
+			run_room_interactions(ch, to_room, INTERACT_CHOP, devastate_trees);
 			
 			// check for original sect, which may have been stored
 			if (BASE_SECT(to_room) != SECT(to_room)) {
@@ -1981,6 +1971,10 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 				// fallback sect
 				change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
 			}
+		}
+		else if (CAN_CHOP_ROOM(to_room) && get_depletion(to_room, DPLTN_CHOP) < config_get_int("chop_depletion")) {
+			run_room_interactions(ch, to_room, INTERACT_CHOP, devastate_trees);
+			change_chop_territory(to_room);
 		}
 		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(to_room))) {
 			msg_to_char(ch, "You devastate the seeded field!\r\n");
