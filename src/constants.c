@@ -2240,7 +2240,7 @@ const char *evo_types[] = {
 
 // EVO_x -- what type of data the evolution.value uses
 const int evo_val_types[NUM_EVOS] = {
-	EVO_VAL_NUMBER,	// chopped-down
+	EVO_VAL_NONE,	// chopped-down
 	EVO_VAL_NONE,	// crop-grows
 	EVO_VAL_SECTOR,	// adjacent-one
 	EVO_VAL_SECTOR,	// adjacent-many

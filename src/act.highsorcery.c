@@ -1936,7 +1936,7 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 	int dist, iter;
 	int x, y;
 	
-	#define CAN_DEVASTATE(room)  ((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) || CAN_CHOP_ROOM(room)) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE))
+	#define CAN_DEVASTATE(room)  ((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) || (CAN_CHOP_ROOM(room) && get_depletion((room), DPLTN_CHOP) < config_get_int("chop_depletion"))) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE))
 	#define DEVASTATE_RANGE  3	// tiles
 
 	// check this room
@@ -1966,7 +1966,7 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 	
 	// SUCCESS: distribute resources
 	if (to_room) {
-		if (has_evolution_type(SECT(to_room), EVO_CHOPPED_DOWN)) {
+		if (CAN_CHOP_ROOM(to_room) && get_depletion(to_room, DPLTN_CHOP) < config_get_int("chop_depletion")) {
 			run_room_interactions(ch, to_room, INTERACT_CHOP, devastate_trees);
 			change_chop_territory(to_room);
 		}
