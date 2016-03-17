@@ -1624,12 +1624,13 @@ void process_panning(char_data *ch) {
 			
 			// pan will silently fail if depleted
 			if (get_depletion(room, DPLTN_PAN) <= config_get_int("short_depletion")) {
-				add_depletion(room, DPLTN_PAN, TRUE);
 				success = run_room_interactions(ch, room, INTERACT_PAN, finish_panning);
 			}
 			
-			// error message
-			if (!success) {
+			if (success) {
+				add_depletion(room, DPLTN_PAN, TRUE);
+			}
+			else {
 				msg_to_char(ch, "You find nothing of value.\r\n");
 			}
 			
