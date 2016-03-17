@@ -1360,6 +1360,7 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int
 	struct empire_storage_data *store, *found_store = NULL;
 	obj_data *proto, *found_proto = NULL;
 	int islid = GET_ISLAND_ID(room);
+	int most_found = -1;
 	
 	// look for something to process
 	LL_FOREACH(EMPIRE_STORAGE(emp), store) {
@@ -1377,9 +1378,11 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int
 		}
 		
 		// found!
-		found_proto = proto;
-		found_store = store;
-		break;
+		if (store->amount > most_found) {
+			found_proto = proto;
+			found_store = store;
+			most_found = store->amount;
+		}
 	}
 	
 	if (found_proto && worker) {
