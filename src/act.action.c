@@ -590,6 +590,35 @@ INTERACTION_FUNC(finish_digging) {
 }
 
 
+INTERACTION_FUNC(finish_fishing) {
+	char buf[MAX_STRING_LENGTH];
+	obj_data *obj = NULL;
+	int num;
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(obj, 1);	// minimum level
+		obj_to_char(obj, ch);
+		load_otrigger(obj);
+	}
+	
+	// messaging
+	if (obj) {
+		if (interaction->quantity > 1) {
+			sprintf(buf, "You jab your spear into the water and when you extract it you find $p (x%d) on the end!", interaction->quantity);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		else {
+			act("You jab your spear into the water and when you extract it you find $p on the end!", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		
+		act("$n jabs $s spear into the water and when $e draws it out, it has $p on the end!", TRUE, ch, obj, NULL, TO_ROOM);
+	}
+	
+	return TRUE;
+}
+
+
 INTERACTION_FUNC(finish_gathering) {
 	obj_data *obj = NULL;
 	int iter;
@@ -1265,20 +1294,24 @@ void process_fillin(char_data *ch) {
 * @param char_data *ch The fisher (Bobby?)
 */
 void process_fishing(char_data *ch) {
-	extern const struct fishing_data_type fishing_data[];
+	bool success = FALSE;
+	room_data *room;
+	int dir;
 	
-	obj_data *obj;
-	int prc, iter, rand;
-	obj_vnum vnum = NOTHING;
-	
-	int fishing_timer = config_get_int("fishing_timer");
+	dir = GET_ACTION_VNUM(ch, 0);
+	room = (dir == NO_DIR) ? IN_ROOM(ch) : dir_to_room(IN_ROOM(ch), dir);
 	
 	if (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) != ITEM_WEAPON || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_JAB) {
 		msg_to_char(ch, "You'll need a spear to fish.\r\n");
 		cancel_action(ch);
 		return;
 	}
-
+	if (!room || !CAN_INTERACT_ROOM(room, INTERACT_FISH) || !can_use_room(ch, room, MEMBERS_ONLY)) {
+		msg_to_char(ch, "You can no longer fish %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
+		cancel_action(ch);
+		return;
+	}
+	
 	GET_ACTION_TIMER(ch) -= GET_CHARISMA(ch) + (skill_check(ch, ABIL_FISH, DIFF_MEDIUM) ? 2 : 0);
 	
 	if (GET_ACTION_TIMER(ch) > 0) {
@@ -1303,37 +1336,25 @@ void process_fishing(char_data *ch) {
 			}
 		}
 	}
-	else if (get_depletion(IN_ROOM(ch), DPLTN_FISH) >= DEPLETION_LIMIT(IN_ROOM(ch))) {
+	else if (get_depletion(room, DPLTN_FISH) >= DEPLETION_LIMIT(room)) {
 		msg_to_char(ch, "You just don't seem to be able to catch anything here.\r\n");
 		GET_ACTION(ch) = ACT_NONE;
 	}
 	else {
-		// restart action first
-		start_action(ch, ACT_FISHING, fishing_timer / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1));
-
-		// find loot
-		prc = 0;
-		rand = number(1, 10000);
-		for (iter = 0; (iter == 0 || fishing_data[iter - 1].chance < 100) && vnum == NOTHING; ++iter) {
-			prc += fishing_data[iter].chance * 100;
-			if (rand < prc) {
-				vnum = fishing_data[iter].vnum;
-			}
-		}
-
-		// dole loot
-		if (vnum != NOTHING) {
-			obj = read_object(vnum, TRUE);
-			obj_to_char_or_room(obj, ch);
-			
-			add_depletion(IN_ROOM(ch), DPLTN_FISH, TRUE);
+		// SUCCESS
+		msg_to_char(ch, "A fish darts past you...\r\n");
+		success = run_room_interactions(ch, room, INTERACT_FISH, finish_fishing);
 		
-			msg_to_char(ch, "A fish darts past you...\r\n");
-			act("You jab your spear into the water and when you extract it you find $p on the end!", FALSE, ch, obj, 0, TO_CHAR);
-			act("$n jabs $s spear into the water and when $e draws it out, it has $p on the end!", TRUE, ch, obj, 0, TO_ROOM);
-			gain_ability_exp(ch, ABIL_FISH, 10);
-			load_otrigger(obj);
+		if (success) {
+			add_depletion(room, DPLTN_FISH, TRUE);
 		}
+		else {
+			msg_to_char(ch, "You can't seem to catch anything.\r\n");
+		}
+		
+		// restart action
+		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1));
+		GET_ACTION_VNUM(ch, 0) = dir;
 	}
 }
 

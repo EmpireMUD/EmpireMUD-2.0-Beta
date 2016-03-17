@@ -100,11 +100,12 @@ FISH FISHING
 
 Fish (Survival ability)
 
-Usage:  fish
+Usage:  fish [direction]
 Tool:  spear
 
 Learn to live at the water's edge through spear-fishing. As your skill
-improves, you will find yourself catching fish faster.
+improves, you will find yourself catching fish faster. You can fish the map
+location you're standing in, or any adjacent tile.
 
 To make a spear, craft a handle and chip a rock until it is a spearhead, then
 craft the spear from the handle and spearhead.
