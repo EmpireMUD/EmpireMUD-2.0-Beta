@@ -3153,13 +3153,6 @@ struct empire_chore_type {
 };
 
 
-// for do_fish
-struct fishing_data_type {
-	int vnum;
-	double chance;
-};
-
-
 // MAT_x
 struct material_data {
 	char *name;

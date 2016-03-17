@@ -2797,21 +2797,6 @@ const char *skill_flags[] = {
 };
 
 
-// for do_fish
-const struct fishing_data_type fishing_data[] = {
-	{ o_GLOWING_SEASHELL, 20 },	// formerly 12	// formerly 8.5
-	{ o_WORN_STATUETTE, 0.25 },
-	{ o_HESTIAN_TRINKET, 0.25 },
-	{ o_TRINKET_OF_CONVEYANCE, 0.25 },
-	{ o_SEA_JUNK, 5 },
-	{ o_LINEFISH, 25 },
-	{ o_ARROWFISH, 25 },
-
-	// must come last -- any catch-all with 100% to grab the overflow
-	{ o_BARBFISH, 100 }
-};
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// TRIGGER CONSTANTS ///////////////////////////////////////////////////////
 

@@ -98,9 +98,7 @@
 #define o_CORN  3005
 
 // clay
-#define o_HESTIAN_TRINKET  256
 #define o_BRICKS  257	// TODO: create a workforce brickmaking ability/craft
-#define o_TRINKET_OF_CONVEYANCE  262
 
 // Sewn items
 #define o_ROPE  2035
@@ -132,11 +130,6 @@
 
 // misc stuff
 #define o_GLOWING_SEASHELL  1300
-#define o_BARBFISH  1301
-#define o_LINEFISH  1302
-#define o_ARROWFISH  1303
-#define o_SEA_JUNK  1304
-#define o_WORN_STATUETTE  1305
 #define o_NAILS  1306
 
 // skins
