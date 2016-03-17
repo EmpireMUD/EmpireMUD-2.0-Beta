@@ -5394,7 +5394,7 @@ void sort_evolutions(sector_data *sect) {
 *
 * @param empire_data *emp The empire vnum
 * @param int island Which island to store it on
-* @param obj_vnum vnum o_ROCK &c
+* @param obj_vnum vnum Any object to store.
 * @param int amount How much to add
 */
 void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount) {

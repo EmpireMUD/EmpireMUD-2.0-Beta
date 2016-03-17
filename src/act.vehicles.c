@@ -1244,7 +1244,7 @@ ACMD(do_disembark) {
 			}
 			look_at_room(k->follower);
 			
-			act("$n disembarks from $p.", TRUE, k->follower, NULL, veh, TO_ROOM);
+			act("$n disembarks from $V.", TRUE, k->follower, NULL, veh, TO_ROOM);
 			
 			enter_wtrigger(IN_ROOM(k->follower), k->follower, NO_DIR);
 			entry_memory_mtrigger(k->follower);
