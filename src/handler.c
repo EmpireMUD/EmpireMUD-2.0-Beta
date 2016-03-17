@@ -4860,7 +4860,7 @@ void remove_offers_by_type(char_data *ch, int type) {
 * Add to the room's depletion counter
 *
 * @param room_data *room which location e.g. IN_ROOM(ch)
-* @param int type DPLTN_x
+* @param int type DPLTN_
 * @param bool multiple if TRUE, chance to add more than 1
 */
 void add_depletion(room_data *room, int type, bool multiple) {
@@ -4887,7 +4887,7 @@ void add_depletion(room_data *room, int type, bool multiple) {
 
 /**
 * @param room_data *room which location e.g. IN_ROOM(ch)
-* @param int type DPLTN_x
+* @param int type DPLTN_
 * @return int The depletion counter on that resource in that room.
 */
 int get_depletion(room_data *room, int type) {
@@ -4908,7 +4908,7 @@ int get_depletion(room_data *room, int type) {
 * Removes all depletion data for a certain type from the room.
 *
 * @param room_data *room where
-* @param int type DPLTN_x
+* @param int type DPLTN_
 */
 void remove_depletion(room_data *room, int type) {
 	struct depletion_data *dep, *next_dep, *temp;

@@ -156,7 +156,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	}
 	
 	// All choppables
-	if (has_evolution_type(SECT(room), EVO_CHOPPED_DOWN) && CHORE_ACTIVE(CHORE_CHOPPING)) {
+	if (CHORE_ACTIVE(CHORE_CHOPPING) && (has_evolution_type(SECT(room), EVO_CHOPPED_DOWN) || CAN_INTERACT_ROOM((room), INTERACT_CHOP))) {
 		do_chore_chopping(emp, room);
 		return;
 	}
@@ -1149,18 +1149,28 @@ void do_chore_building(empire_data *emp, room_data *room) {
 }
 
 
+INTERACTION_FUNC(one_chop_chore) {
+	empire_data *emp = ROOM_OWNER(inter_room);
+	
+	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_CHOPPING, interaction->vnum)) {
+		ewt_mark_resource_worker(emp, inter_room, interaction->vnum);
+		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+
 void do_chore_chopping(empire_data *emp, room_data *room) {
-	extern int change_chop_territory(room_data *room);
+	extern void change_chop_territory(room_data *room);
 	
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_CHOPPING].mob);
-	bool can_do = can_gain_chore_resource(emp, room, CHORE_CHOPPING, o_TREE);
-	int num;
+	bool can_do = (get_depletion(room, DPLTN_CHOP) < config_get_int("chop_depletion")) && can_gain_chore_resource_from_interaction(emp, room, CHORE_CHOPPING, INTERACT_CHOP);
 	
 	int chop_timer = config_get_int("chop_timer");
 	
 	if (worker && can_do) {
-		ewt_mark_resource_worker(emp, room, o_TREE);
-		
 		if (get_room_extra_data(room, ROOM_EXTRA_CHOP_PROGRESS) <= 0) {
 			set_room_extra_data(room, ROOM_EXTRA_CHOP_PROGRESS, chop_timer);
 		}
@@ -1168,33 +1178,29 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 			add_to_room_extra_data(room, ROOM_EXTRA_CHOP_PROGRESS, -1);
 			if (get_room_extra_data(room, ROOM_EXTRA_CHOP_PROGRESS) == 0) {
 				// finished!
-				num = change_chop_territory(room);
-				add_to_empire_storage(emp, GET_ISLAND_ID(room), o_TREE, num);
+				run_room_interactions(worker, room, INTERACT_CHOP, one_chop_chore);
+				add_depletion(room, DPLTN_CHOP, FALSE);
+				change_chop_territory(room);
 				empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 				
-				act("$n finishes chopping down a tree, which falls to the ground with a THUD! and is carried away by workers.", FALSE, worker, NULL, NULL, TO_ROOM);
-				
-				if (has_evolution_type(SECT(room), EVO_CHOPPED_DOWN)) {
+				if (CAN_CHOP_ROOM(room)) {
 					set_room_extra_data(room, ROOM_EXTRA_CHOP_PROGRESS, chop_timer);
 				}
 				else {
 					// done: mark for de-spawn
 					SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 					stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
-			
+					
 					if (empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_CHOPPED)) {
 						abandon_room(room);
 						add_chore_tracker(emp);
-					}		
+					}
 				}
 			}
 		}
 	}
 	else if (can_do) {
-		// place worker
-		if ((worker = place_chore_worker(emp, CHORE_CHOPPING, room))) {
-			ewt_mark_resource_worker(emp, room, o_TREE);
-		}
+		place_chore_worker(emp, CHORE_CHOPPING, room);
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);

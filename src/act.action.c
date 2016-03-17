@@ -388,24 +388,34 @@ void cancel_morphing(char_data *ch) {
 * @param char_data *ch The player to start chopping.
 */
 void start_chopping(char_data *ch) {
-	int chop_timer = config_get_int("chop_timer");
+	char buf[MAX_STRING_LENGTH], weapon[MAX_STRING_LENGTH];
 	
 	if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to chop here.\r\n");
 	}
-	else if (!CAN_CHOP_ROOM(IN_ROOM(ch))) {
+	else if (!CAN_CHOP_ROOM(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_CHOP) >= config_get_int("chop_depletion")) {
 		msg_to_char(ch, "There's nothing left here to chop.\r\n");
 	}
 	else {
 		start_action(ch, ACT_CHOPPING, 0);
-
+		
 		// ensure progress data is set up
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS) <= 0) {
-			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, chop_timer);
+			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, config_get_int("chop_timer"));
 		}
 		
-		send_to_char("You swing back your axe and prepare to chop...\r\n", ch);
-		act("$n swings $s axe over $s shoulder.", TRUE, ch, 0, 0, TO_ROOM);
+		if (GET_EQ(ch, WEAR_WIELD)) {
+			strcpy(weapon, skip_filler(GET_OBJ_SHORT_DESC(GET_EQ(ch, WEAR_WIELD))));
+		}
+		else {
+			strcpy(weapon, "axe");
+		}
+		
+		snprintf(buf, sizeof(buf), "You swing back your %s and prepare to chop...", weapon);
+		act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
+		
+		snprintf(buf, sizeof(buf), "$n swings $s %s over $s shoulder.", weapon);
+		act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 
@@ -503,6 +513,35 @@ void start_quarrying(char_data *ch) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// ACTION FINISHERS ////////////////////////////////////////////////////////
+
+INTERACTION_FUNC(finish_chopping) {
+	char buf[MAX_STRING_LENGTH];
+	obj_data *obj = NULL;
+	int num;
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(obj, 1);	// minimum level
+		obj_to_char(obj, ch);
+		load_otrigger(obj);
+	}
+	
+	// messaging
+	if (obj) {
+		if (interaction->quantity > 1) {
+			sprintf(buf, "With a loud crack, $p (x%d) falls!", interaction->quantity);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		else {
+			act("With a loud crack, $p falls!", FALSE, ch, obj, NULL, TO_CHAR);
+		}		
+		
+		act("$n collects $p.", FALSE, ch, obj, NULL, TO_ROOM);
+	}
+	
+	return TRUE;
+}
+
 
 INTERACTION_FUNC(finish_digging) {	
 	obj_vnum vnum = interaction->vnum;
@@ -962,60 +1001,54 @@ void process_chipping(char_data *ch) {
 void process_chop(char_data *ch) {
 	extern int change_chop_territory(room_data *room);
 	
+	bool got_any = FALSE;
 	char_data *ch_iter;
-	int count, total, trees = 1;
-	obj_data *obj;
 	
-	total = 1;	// number of times to chop (add things that speed up chop)
-	for (count = 0; count < total && GET_ACTION(ch) == ACT_CHOPPING; ++count) {
-		if (!GET_EQ(ch, WEAR_WIELD) || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE) {
-			send_to_char("You need to be wielding an axe to chop.\r\n", ch);
-			cancel_action(ch);
-			break;
-		}
+	if (!GET_EQ(ch, WEAR_WIELD) || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE) {
+		send_to_char("You need to be wielding an axe to chop.\r\n", ch);
+		cancel_action(ch);
+		return;
+	}
 
-		add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * (GET_STRENGTH(ch) + 2 * get_base_dps(GET_EQ(ch, WEAR_WIELD))));
-		act("You swing $p hard into the tree!", FALSE, ch, GET_EQ(ch, WEAR_WIELD), 0, TO_CHAR | TO_SPAMMY);
-		act("$n swings $p hard into the tree!", FALSE, ch, GET_EQ(ch, WEAR_WIELD), 0, TO_ROOM | TO_SPAMMY);
-
-		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS) <= 0) {
-			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS);
-			trees = change_chop_territory(IN_ROOM(ch));
-
-			if (trees > 1) {
-				sprintf(buf1, " (x%d)", trees);
-			}
-			else {
-				*buf1 = '\0';
-			}
-			
-			sprintf(buf, "With a loud crack, the tree falls%s!", buf1);
-			act(buf, FALSE, ch, 0, 0, TO_CHAR | TO_ROOM);
-			
-			// give a tree
-			while (trees-- > 0) {
-				obj = read_object(o_TREE, TRUE);
-				obj_to_char_or_room(obj, ch);
-				load_otrigger(obj);
-			}
+	add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * (GET_STRENGTH(ch) + 2 * get_base_dps(GET_EQ(ch, WEAR_WIELD))));
+	act("You swing $p hard!", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR | TO_SPAMMY);
+	act("$n swings $p hard!", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_ROOM | TO_SPAMMY);
+	
+	// complete?
+	if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS) <= 0) {
+		remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS);
 		
-			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-				gain_skill_exp(ch, SKILL_EMPIRE, 15);
-			}
-			
-			// stoppin choppin -- don't use stop_room_action because we also restart them
-			// (this includes ch)
-			for (ch_iter = ROOM_PEOPLE(IN_ROOM(ch)); ch_iter; ch_iter = ch_iter->next_in_room) {
-				if (!IS_NPC(ch_iter) && GET_ACTION(ch_iter) == ACT_CHOPPING) {
-					cancel_action(ch_iter);
-					start_chopping(ch_iter);
-				}
-			}
-			// but stop npc choppers
-			stop_room_action(IN_ROOM(ch), NOTHING, CHORE_CHOPPING);
-			// and harvesters
-			stop_room_action(IN_ROOM(ch), NOTHING, CHORE_FARMING);
+		// run interacts for items only if not depleted
+		if (get_depletion(IN_ROOM(ch), DPLTN_CHOP) < config_get_int("chop_depletion")) {
+			got_any = run_room_interactions(ch, IN_ROOM(ch), INTERACT_CHOP, finish_chopping);
+			add_depletion(IN_ROOM(ch), DPLTN_CHOP, FALSE);
 		}
+		
+		if (!got_any) {
+			// likely didn't get a completion message
+			act("You finish chopping.", FALSE, ch, NULL, NULL, TO_CHAR);
+			act("$n finishes chopping.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
+		
+		// attempt to change terrain
+		change_chop_territory(IN_ROOM(ch));
+		
+		if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+			gain_skill_exp(ch, SKILL_EMPIRE, 15);
+		}
+		
+		// stoppin choppin -- don't use stop_room_action because we also restart them
+		// (this includes ch)
+		for (ch_iter = ROOM_PEOPLE(IN_ROOM(ch)); ch_iter; ch_iter = ch_iter->next_in_room) {
+			if (!IS_NPC(ch_iter) && GET_ACTION(ch_iter) == ACT_CHOPPING) {
+				cancel_action(ch_iter);
+				start_chopping(ch_iter);
+			}
+		}
+		// but stop npc choppers
+		stop_room_action(IN_ROOM(ch), NOTHING, CHORE_CHOPPING);
+		// and harvesters
+		stop_room_action(IN_ROOM(ch), NOTHING, CHORE_FARMING);
 	}
 }
 
@@ -2059,18 +2092,18 @@ ACMD(do_chip) {
 
 ACMD(do_chop) {
 	if (GET_ACTION(ch) == ACT_CHOPPING) {
-		send_to_char("You stop chopping the tree.\r\n", ch);
-		act("$n stops chopping at the tree.", FALSE, ch, 0, 0, TO_ROOM);
+		send_to_char("You stop chopping.\r\n", ch);
+		act("$n stops chopping.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
 	else if (!CAN_CHOP_ROOM(IN_ROOM(ch))) {
-		send_to_char("You can't really chop down trees unless you're in the forest.\r\n", ch);
+		send_to_char("You can't really chop anything down here.\r\n", ch);
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
-		msg_to_char(ch, "You can't chop here.\r\n");
+		msg_to_char(ch, "You can't chop here right now.\r\n");
 	}
 	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to chop down trees here.\r\n");
@@ -2078,10 +2111,7 @@ ACMD(do_chop) {
 	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !has_permission(ch, PRIV_CHOP)) {
 		msg_to_char(ch, "You don't have permission to chop down trees in the empire.\r\n");
 	}
-	else if (!GET_EQ(ch, WEAR_WIELD)) {
-		send_to_char("You need to be wielding some kind of axe to chop.\r\n", ch);
-	}
-	else if (GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE) {
+	else if (!GET_EQ(ch, WEAR_WIELD) || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE) {
 		send_to_char("You need to be wielding some kind of axe to chop.\r\n", ch);
 	}
 	else {

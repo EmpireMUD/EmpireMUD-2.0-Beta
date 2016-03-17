@@ -312,7 +312,8 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_SAW  17
 #define INTERACT_TAN  18
 #define INTERACT_CHIP  19
-#define NUM_INTERACTS  20
+#define INTERACT_CHOP  20
+#define NUM_INTERACTS  21
 
 
 // for object saving
@@ -1705,7 +1706,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_CLIMATES  4 // total
 
 
-// depletion types
+// DPLTN_x: depletion types
 #define DPLTN_DIG  0
 #define DPLTN_FORAGE  1
 #define DPLTN_GATHER  2
@@ -1714,7 +1715,8 @@ typedef struct vehicle_data vehicle_data;
 #define DPLTN_QUARRY  5
 #define DPLTN_PAN  6
 #define DPLTN_TRAPPING  7
-#define NUM_DEPLETION_TYPES  8	// total
+#define DPLTN_CHOP  8
+#define NUM_DEPLETION_TYPES  9	// total
 
 
 // world evolutions

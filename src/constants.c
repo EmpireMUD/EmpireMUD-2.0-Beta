@@ -2191,7 +2191,8 @@ const char *depletion_type[NUM_DEPLETION_TYPES] = {
 	"fish",
 	"quarry",
 	"pan",
-	"trapping"
+	"trapping",
+	"chop"
 };
 
 
@@ -3099,6 +3100,7 @@ const char *interact_types[] = {
 	"SAW",
 	"TAN",
 	"CHIP",
+	"CHOP",
 	"\n"
 };
 
@@ -3125,6 +3127,7 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// saw
 	TYPE_OBJ,	// tan
 	TYPE_OBJ,	// chip
+	TYPE_ROOM,	// chop
 };
 
 
@@ -3150,6 +3153,7 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// saw
 	TYPE_OBJ,	// tan
 	TYPE_OBJ,	// chip
+	TYPE_OBJ,	// chop
 };
 
 
