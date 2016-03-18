@@ -66,9 +66,10 @@ Clay (component)
 Pile of clay (resource)
 
 Clay is a component used in pottery and brickmaking. Clay is found by digging
-near water and can be stored at the Potter.
+in plains, forests, and well-irrigated areas. You can also build a clay pit to
+dig up more clay. It can be stored at the Potter.
 
-See also: COMPONENT, POTTER
+See also: CLAY PIT, COMPONENT, POTTER
 #
 CLOTH "COTTON CLOTH"
 

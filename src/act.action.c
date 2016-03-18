@@ -551,13 +551,6 @@ INTERACTION_FUNC(finish_digging) {
 	obj_data *obj = NULL;
 	int num;
 	
-	// vnum override: clay happens near water tiles when NOT on rough terrain or in a building
-	if (!ROOM_SECT_FLAGGED(inter_room, SECTF_ROUGH) && !GET_BUILDING(inter_room) && find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER | SECTF_OCEAN, NOBITS, 1)) {
-		if (number(0, 4)) {
-			vnum = o_CLAY;
-		}
-	}
-	
 	// depleted? (uses rock for all types except clay)
 	if (get_depletion(inter_room, DPLTN_DIG) >= DEPLETION_LIMIT(inter_room)) {
 		msg_to_char(ch, "The ground is too hard and there doesn't seem to be anything useful to dig up here.\r\n");

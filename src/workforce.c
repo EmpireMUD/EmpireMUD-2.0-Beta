@@ -1062,19 +1062,20 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 //// CHORE FUNCTIONS ////////////////////////////////////////////////////////
 
 void do_chore_brickmaking(empire_data *emp, room_data *room) {
-	struct empire_storage_data *store = find_stored_resource(emp, GET_ISLAND_ID(room), o_CLAY);
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BRICKMAKING].mob);
-	bool can_do = (can_gain_chore_resource(emp, room, CHORE_BRICKMAKING, o_BRICKS) && store && store->amount >= 2);
+	int islid = GET_ISLAND_ID(room);
+	bool can_do = can_gain_chore_resource(emp, room, CHORE_BRICKMAKING, o_BRICKS) && empire_can_afford_component(emp, islid, CMP_CLAY, NOBITS, 2);
 	
 	if (worker && can_do) {
 		ewt_mark_resource_worker(emp, room, o_BRICKS);
-		charge_stored_resource(emp, GET_ISLAND_ID(room), store->vnum, 2);
-		add_to_empire_storage(emp, GET_ISLAND_ID(room), o_BRICKS, 1);
+		
+		charge_stored_component(emp, islid, CMP_CLAY, NOBITS, 2);
+		add_to_empire_storage(emp, islid, o_BRICKS, 1);
 		
 		act("$n finishes a pile of bricks.", FALSE, worker, NULL, NULL, TO_ROOM);
 		empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 	}
-	else if (store && can_do) {
+	else if (can_do) {
 		// place worker
 		if ((worker = place_chore_worker(emp, CHORE_BRICKMAKING, room))) {
 			ewt_mark_resource_worker(emp, room, o_BRICKS);
