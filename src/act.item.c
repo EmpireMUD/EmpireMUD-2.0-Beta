@@ -1535,10 +1535,6 @@ void scale_item_to_level(obj_data *obj, int level) {
 			SHARE_OR_BONUS(GET_DRINK_CONTAINER_CAPACITY(obj));
 			break;
 		}
-		case ITEM_FOOD: {
-			SHARE_OR_BONUS(GET_FOOD_HOURS_OF_FULLNESS(obj));
-			break;
-		}
 		case ITEM_COINS: {
 			SHARE_OR_BONUS(GET_COINS_AMOUNT(obj));
 			break;
@@ -1618,15 +1614,6 @@ void scale_item_to_level(obj_data *obj, int level) {
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CAPACITY) = amt;
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = amt;
 			// negatives aren't even possible here
-			break;
-		}
-		case ITEM_FOOD: {
-			amt = (int)round(this_share * GET_FOOD_HOURS_OF_FULLNESS(obj) * config_get_double("scale_food_fullness"));
-			if (amt > 0) {
-				points_to_give -= round(this_share * GET_FOOD_HOURS_OF_FULLNESS(obj));
-			}
-			GET_OBJ_VAL(obj, VAL_FOOD_HOURS_OF_FULLNESS) = amt;
-			// negatives aren't possible here
 			break;
 		}
 		case ITEM_COINS: {

@@ -2028,10 +2028,6 @@ double rate_item(obj_data *obj) {
 			score += GET_DRINK_CONTAINER_CAPACITY(obj) / config_get_double("scale_drink_capacity");
 			break;
 		}
-		case ITEM_FOOD: {
-			score += GET_FOOD_HOURS_OF_FULLNESS(obj) / config_get_double("scale_food_fullness");
-			break;
-		}
 		case ITEM_COINS: {
 			score += GET_COINS_AMOUNT(obj) / config_get_double("scale_coin_amount");
 			break;

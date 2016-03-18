@@ -2109,7 +2109,6 @@ the same weight as an apply of 1. If your item ONLY has one property to set
 Scaling based on item types:
  weapon - the "damage" value
  drink container - the "capacity" value
- food - the "fullness" value
  coins - the "coinamount" value
  missile weapons - the "damage" value
  arrow - the "damage" value
@@ -3162,10 +3161,7 @@ Examples of good fullness numbers:
 Foods should also have a decay timer set. Traditionally, more-prepared foods
 take longer to decay, rather than basic it strictly on realism.
 
-For SCALABLE objects, thus number is a scalable value if it is set to a number
-other than 0.
-
-See also: ITEM SCALING, OEDIT DECAY, OLC OBJECTS
+See also: OEDIT DECAY, OLC OBJECTS
 #d
 "OEDIT KEYWORDS"
 
