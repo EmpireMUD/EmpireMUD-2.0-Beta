@@ -575,23 +575,26 @@ void olc_show_building(char_data *ch) {
 
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <&yextra&0>\r\n");
-	get_extra_desc_display(GET_BLD_EX_DESCS(bdg), buf1);
-	strcat(buf, buf1);
+	if (GET_BLD_EX_DESCS(bdg)) {
+		get_extra_desc_display(GET_BLD_EX_DESCS(bdg), buf1);
+		strcat(buf, buf1);
+	}
 
 	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
-	get_interaction_display(GET_BLD_INTERACTIONS(bdg), buf1);
-	strcat(buf, buf1);
+	if (GET_BLD_INTERACTIONS(bdg)) {
+		get_interaction_display(GET_BLD_INTERACTIONS(bdg), buf1);
+		strcat(buf, buf1);
+	}
 
 	// scripts
 	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
-	get_script_display(GET_BLD_SCRIPTS(bdg), lbuf);
-	strcat(buf, lbuf);
+	if (GET_BLD_SCRIPTS(bdg)) {
+		get_script_display(GET_BLD_SCRIPTS(bdg), lbuf);
+		strcat(buf, lbuf);
+	}
 	
 	sprintf(buf + strlen(buf), "<&yspawns&0> (add, remove, list)\r\n");
-	if (!GET_BLD_SPAWNS(bdg)) {
-		sprintf(buf + strlen(buf), " nothing\r\n");
-	}
-	else {
+	if (GET_BLD_SPAWNS(bdg)) {
 		count = 0;
 		for (spawn = GET_BLD_SPAWNS(bdg); spawn; spawn = spawn->next) {
 			++count;

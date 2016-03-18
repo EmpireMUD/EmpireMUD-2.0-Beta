@@ -403,8 +403,10 @@ void olc_show_global(char_data *ch) {
 			sprintf(buf + strlen(buf), "<&ymobexclude&0> %s\r\n", lbuf);
 
 			sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
-			get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf1);
-			strcat(buf, buf1);
+			if (GET_GLOBAL_INTERACTIONS(glb)) {
+				get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf1);
+				strcat(buf, buf1);
+			}
 			break;
 		}
 		case GLOBAL_MINE_DATA: {
@@ -415,14 +417,16 @@ void olc_show_global(char_data *ch) {
 			sprintf(buf + strlen(buf), "<&ycapacity&0> %d ore (%d-%d normal, %d-%d deep)\r\n", GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)/2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2.0 * 1.5), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) * 1.5));
 	
 			sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
-			get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf1);
-			strcat(buf, buf1);
+			if (GET_GLOBAL_INTERACTIONS(glb)) {
+				get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf1);
+				strcat(buf, buf1);
+			}
 			break;
 		}
 		case GLOBAL_NEWBIE_GEAR: {			
 			void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
 			get_archetype_gear_display(GET_GLOBAL_GEAR(glb), lbuf);
-			sprintf(buf + strlen(buf), "Gear: <\tygear\t0>\r\n%s", lbuf);
+			sprintf(buf + strlen(buf), "Gear: <\tygear\t0>\r\n%s", GET_GLOBAL_GEAR(glb) ? lbuf : "");
 			break;
 		}
 	}

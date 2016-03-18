@@ -764,12 +764,16 @@ void olc_show_mobile(char_data *ch) {
 	sprintf(buf + strlen(buf), "<&ynameset&0> %s\r\n", name_sets[MOB_NAME_SET(mob)]);
 
 	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
-	get_interaction_display(mob->interactions, buf1);
-	strcat(buf, buf1);
+	if (mob->interactions) {
+		get_interaction_display(mob->interactions, buf1);
+		strcat(buf, buf1);
+	}
 	
 	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
-	get_script_display(mob->proto_script, buf1);
-	strcat(buf, buf1);
+	if (mob->proto_script) {
+		get_script_display(mob->proto_script, buf1);
+		strcat(buf, buf1);
+	}
 	
 	page_string(ch->desc, buf, TRUE);
 }

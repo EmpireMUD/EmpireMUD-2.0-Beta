@@ -444,20 +444,17 @@ void olc_show_crop(char_data *ch) {
 	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", lbuf);
 	
 	sprintf(buf + strlen(buf), "Map region (percent of map size):\r\n");
-	sprintf(buf + strlen(buf), " <&yxmin&0> %d%%\r\n", GET_CROP_X_MIN(cp));
-	sprintf(buf + strlen(buf), " <&yxmax&0> %d%%\r\n", GET_CROP_X_MAX(cp));
-	sprintf(buf + strlen(buf), " <&yymin&0> %d%%\r\n", GET_CROP_Y_MIN(cp));
-	sprintf(buf + strlen(buf), " <&yymax&0> %d%%\r\n", GET_CROP_Y_MAX(cp));
+	sprintf(buf + strlen(buf), " <&yxmin&0> %3d%%, <&yxmax&0> %3d%%\r\n", GET_CROP_X_MIN(cp), GET_CROP_X_MAX(cp));
+	sprintf(buf + strlen(buf), " <&yymin&0> %3d%%, <&yymax&0> %3d%%\r\n", GET_CROP_Y_MIN(cp), GET_CROP_Y_MAX(cp));
 
 	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
-	get_interaction_display(GET_CROP_INTERACTIONS(cp), buf1);
-	strcat(buf, buf1);
+	if (GET_CROP_INTERACTIONS(cp)) {
+		get_interaction_display(GET_CROP_INTERACTIONS(cp), buf1);
+		strcat(buf, buf1);
+	}
 
 	sprintf(buf + strlen(buf), "<&yspawns&0> (add, remove, list)\r\n");
-	if (!GET_CROP_SPAWNS(cp)) {
-		sprintf(buf + strlen(buf), " nothing\r\n");
-	}
-	else {
+	if (GET_CROP_SPAWNS(cp)) {
 		count = 0;
 		for (spawn = GET_CROP_SPAWNS(cp); spawn; spawn = spawn->next) {
 			++count;

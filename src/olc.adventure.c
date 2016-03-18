@@ -703,13 +703,17 @@ void olc_show_adventure(char_data *ch) {
 	sprintf(buf + strlen(buf), "<&yreset&0> %d minutes%s\r\n", GET_ADV_RESET_TIME(adv), lbuf);
 
 	sprintf(buf + strlen(buf), "Linking rules: <&ylinking&0>\r\n");
-	get_adventure_linking_display(GET_ADV_LINKING(adv), lbuf);
-	strcat(buf, lbuf);
+	if (GET_ADV_LINKING(adv)) {
+		get_adventure_linking_display(GET_ADV_LINKING(adv), lbuf);
+		strcat(buf, lbuf);
+	}
 	
 	// scripts
 	sprintf(buf + strlen(buf), "Adventure Cleanup Scripts: <&yscript&0>\r\n");
-	get_script_display(GET_ADV_SCRIPTS(adv), lbuf);
-	strcat(buf, lbuf);
+	if (GET_ADV_SCRIPTS(adv)) {
+		get_script_display(GET_ADV_SCRIPTS(adv), lbuf);
+		strcat(buf, lbuf);
+	}
 		
 	page_string(ch->desc, buf, TRUE);
 }
