@@ -1050,9 +1050,6 @@ void olc_show_morph(char_data *ch) {
 	for (app = MORPH_APPLIES(morph), num = 1; app; app = app->next, ++num) {
 		sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", num, app->weight, apply_types[app->location]);
 	}
-	if (!MORPH_APPLIES(morph)) {
-		strcat(buf, "  none\r\n");
-	}
 	
 	page_string(ch->desc, buf, TRUE);
 }
