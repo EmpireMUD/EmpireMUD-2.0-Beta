@@ -199,6 +199,8 @@ D0
 &y~
 I 6 3031 100.00 1  # FORAGE: a split coconut
 I 8 3030 100.00 1  # HARVEST: a bunch of coconuts
+I 20 122 50.00 1 c  # CHOP: some rough wood
+I 20 122 50.00 2 c  # CHOP: some rough wood
 M
 250 0.10 ad
 M
@@ -487,6 +489,7 @@ D0
 &g~
 I 6 3038 100.00 1  # FORAGE: a ripe plum
 I 8 3037 100.00 1  # HARVEST: a basket of plums
+I 20 120 100.00 1  # CHOP: a large tree
 M
 9145 5.00 adh
 M
@@ -682,6 +685,7 @@ D0
 &G~
 I 6 3042 100.00 1  # FORAGE: a single ripe mango
 I 8 3041 100.00 1  # HARVEST: a basket of mangoes
+I 20 128 100.00 1  # CHOP: a massive jungle tree
 M
 9061 0.01 d
 M

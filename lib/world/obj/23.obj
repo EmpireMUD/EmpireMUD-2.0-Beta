@@ -640,11 +640,11 @@ S
 #2342
 multitool folding steel~
 a steel multitool~
-An folding steel multitool is lying here.~
+A folding steel multitool is lying here.~
    This amazing multi-purpose folding tool has attachments for almost every
 conceivable purpose. It even has a corkscrew!
 ~
-3 p ao 7
+3 p ao 8
 0 0 0
 2 0
 A
@@ -718,7 +718,7 @@ design device antiquated~
 the antiquated device design~
 The antiquated device design is lying here.~
    An antiquarian could use this design to create antique device parts, used to
-make an antiquated arcane apparatus, a level 200-300 crafting offhand.  
+make an antiquated arcane apparatus, a level 200-300 crafting offhand.
 
 Forge (requires Antiquarian Crafts and crafting 200): antique device parts
 ~
@@ -731,7 +731,7 @@ pattern pouch concealed~
 the concealed pouch pattern~
 The concealed pouch pattern is lying here.~
    A smuggler could use this design to create concealed silk pouches, used in
-the creation of a superb smuggling sash, a level 200-300 crafting belt.  
+the creation of a superb smuggling sash, a level 200-300 crafting belt.
 
 Sew (requires Smuggler Crafts and crafting 200): concealed silk pouches
 ~
@@ -744,7 +744,7 @@ pattern harness tinker's tinkers~
 the tinker's harness pattern~
 The tinker's harness pattern is lying here.~
    A tinker could use this pattern to create a tinker's harness, used to make
-traveling tinker's trappings, a set of level 200-300 crafting clothes.  
+traveling tinker's trappings, a set of level 200-300 crafting clothes.
 
 Forge (requires Tinker Crafts and crafting 200): tinker harness
 ~
@@ -757,7 +757,7 @@ filter alchemical~
 an alchemical filter~
 An alchemical filter is lying here.~
    This alchemically treated metal filter is used in the construction of a
-chemist's cleansing cap. It will bind to whoever crafts it.  
+chemist's cleansing cap. It will bind to whoever crafts it.
 
 
 Sew (requires crafting 200): chemists cleansing cap
@@ -771,7 +771,7 @@ parts device antique pile~
 a pile of antique device parts~
 A pile of antique device parts is lying here.~
    This pile of strange little gears and rods can be used to assemble an
-antiquated arcane apparatus. It will bind to whoever crafts it.  
+antiquated arcane apparatus. It will bind to whoever crafts it.
 
 Craft (requires crafting 200): antiquated arcane apparatus
 ~
@@ -797,7 +797,7 @@ harness tinker's tinkers detached~
 a tinker's harness~
 A detached tinker's harness is piled up here.~
    This collection of straps, buckles and clamps can be used to create
-traveling tinker's trappings. They will bind to whoever crafts them.  
+traveling tinker's trappings. They will bind to whoever crafts them.
 
 Sew (requires crafting 200): traveling tinker's trappings
 ~
