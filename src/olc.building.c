@@ -179,11 +179,14 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 	void remove_building_from_table(bld_data *bld);
 	
-	descriptor_data *desc;
-	room_data *room, *next_room;
+	struct obj_storage_type *store, *next_store;
+	bld_data *bld, *biter, *next_biter;
 	craft_data *craft, *next_craft;
+	vehicle_data *veh, *next_veh;
+	room_data *room, *next_room;
 	adv_data *adv, *next_adv;
-	bld_data *bld;
+	obj_data *obj, *next_obj;
+	descriptor_data *desc;
 	int count;
 	bool found, deleted = FALSE;
 	
@@ -236,6 +239,15 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 			save_library_file_for_vnum(DB_BOOT_ADV, GET_ADV_VNUM(adv));
 		}
 	}
+	
+	// buildings
+	HASH_ITER(hh, building_table, biter, next_biter) {
+		if (GET_BLD_UPGRADES_TO(biter) == vnum) {
+			GET_BLD_UPGRADES_TO(biter) = NOTHING;
+			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(biter));
+		}
+	}
+	
 	// crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD && GET_CRAFT_BUILD_TYPE(craft) == vnum) {
@@ -245,6 +257,25 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		}
 	}
 	
+	// obj storage
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		LL_FOREACH_SAFE(obj->storage, store, next_store) {
+			if (store->building_type == vnum) {
+				LL_DELETE(obj->storage, store);
+				free(store);
+				save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
+			}
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		if (VEH_INTERIOR_ROOM_VNUM(veh) == vnum) {
+			VEH_INTERIOR_ROOM_VNUM(veh) = NOTHING;
+			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
+		}
+	}
+
 	// olc editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (GET_OLC_ADVENTURE(desc)) {
@@ -257,11 +288,36 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 				msg_to_desc(desc, "One or more linking rules have been removed from the adventure you are editing.\r\n");
 			}
 		}
+		if (GET_OLC_BUILDING(desc)) {
+			if (GET_BLD_UPGRADES_TO(GET_OLC_BUILDING(desc)) == vnum) {
+				GET_BLD_UPGRADES_TO(GET_OLC_BUILDING(desc)) = NOTHING;
+				msg_to_desc(desc, "The upgrades-to building for the building you're editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_CRAFT(desc)) {
 			if (GET_OLC_CRAFT(desc)->type == CRAFT_TYPE_BUILD && GET_OLC_CRAFT(desc)->build_type == vnum) {
 				GET_OLC_CRAFT(desc)->build_type = NOTHING;
 				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
 				msg_to_desc(desc, "The building built by the craft you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_OBJECT(desc)) {
+			found = FALSE;
+			LL_FOREACH_SAFE(GET_OLC_OBJECT(desc)->storage, store, next_store) {
+				if (store->building_type == vnum) {
+					LL_DELETE(GET_OLC_OBJECT(desc)->storage, store);
+					free(store);
+					if (!found) {
+						msg_to_desc(desc, "A storage location for the the object you're editing was deleted.\r\n");
+						found = TRUE;
+					}
+				}
+			}
+		}
+		if (GET_OLC_VEHICLE(desc)) {
+			if (VEH_INTERIOR_ROOM_VNUM(GET_OLC_VEHICLE(desc)) == vnum) {
+				VEH_INTERIOR_ROOM_VNUM(GET_OLC_VEHICLE(desc)) = NOTHING;
+				msg_to_desc(desc, "The interior home room building for the the vehicle you're editing was deleted.\r\n");
 			}
 		}
 	}
@@ -292,6 +348,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	struct adventure_link_rule *link;
 	struct obj_storage_type *store;
 	craft_data *craft, *next_craft;
+	vehicle_data *veh, *next_veh;
 	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
@@ -357,6 +414,14 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			}
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		if (VEH_INTERIOR_ROOM_VNUM(veh) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 		}
 	}
 	
