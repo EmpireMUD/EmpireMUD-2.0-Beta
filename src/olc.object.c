@@ -1444,26 +1444,26 @@ void olc_show_object(char_data *ch) {
 	
 	// applies / affected[]
 	count = 0;
-	sprintf(buf + strlen(buf), "Attribute Applies: <&yapply&0>%s\r\n", (GET_OBJ_APPLIES(obj) ? "" : " none"));
+	sprintf(buf + strlen(buf), "Attribute Applies: <&yapply&0>\r\n");
 	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
 		sprintf(buf + strlen(buf), " &y%2d&0. %+d to %s (%s)\r\n", ++count, apply->modifier, apply_types[(int) apply->location], apply_type_names[(int)apply->apply_type]);
 	}
 	
 	// exdesc
-	sprintf(buf + strlen(buf), "Extra descriptions: <&yextra&0>%s\r\n", (obj->ex_description ? "" : " none"));
+	sprintf(buf + strlen(buf), "Extra descriptions: <&yextra&0>\r\n");
 	if (obj->ex_description) {
 		get_extra_desc_display(obj->ex_description, buf1);
 		strcat(buf, buf1);
 	}
 
-	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>%s\r\n", (obj->interactions ? "" : " none"));
+	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
 	if (obj->interactions) {
 		get_interaction_display(obj->interactions, buf1);
 		strcat(buf, buf1);
 	}
 	
 	// storage
-	sprintf(buf + strlen(buf), "Storage: <&ystorage&0>%s\r\n", (obj->storage ? "" : " none"));
+	sprintf(buf + strlen(buf), "Storage: <&ystorage&0>\r\n");
 	count = 0;
 	for (store = obj->storage; store; store = store->next) {
 		sprintbit(store->flags, storage_bits, buf2, TRUE);
@@ -1471,14 +1471,14 @@ void olc_show_object(char_data *ch) {
 	}
 	
 	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <&ycustom&0>%s\r\n", (obj->custom_msgs ? "" : " none"));
+	sprintf(buf + strlen(buf), "Custom messages: <&ycustom&0>\r\n");
 	count = 0;
 	for (ocm = obj->custom_msgs; ocm; ocm = ocm->next) {
 		sprintf(buf + strlen(buf), " &y%d&0. [%s] %s\r\n", ++count, obj_custom_types[ocm->type], ocm->msg);
 	}
 	
 	// scripts
-	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>%s\r\n", (obj->proto_script ? "" : " none"));
+	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
 	if (obj->proto_script) {
 		get_script_display(obj->proto_script, buf1);
 		strcat(buf, buf1);
