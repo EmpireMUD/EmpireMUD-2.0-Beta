@@ -3687,17 +3687,18 @@ ACMD(do_eat) {
 	extern bool check_vampire_sun(char_data *ch, bool message);
 	void taste_blood(char_data *ch, char_data *vict);
 	
+	bool extract = FALSE, will_buff = FALSE;
 	char buf[MAX_STRING_LENGTH];
-	char_data *vict;
+	struct affected_type *af;
+	struct obj_apply *apply;
 	obj_data *food;
-	int amount;
-	bool extract = FALSE;
+	int eat_hours;
 
 	one_argument(argument, arg);
-
+	
+	// 1. basic validation
 	if (REAL_NPC(ch))		/* Cannot use GET_COND() on mobs. */
 		return;
-
 	if (!*arg) {
 		send_to_char("Eat what?\r\n", ch);
 		return;
@@ -3705,6 +3706,7 @@ ACMD(do_eat) {
 	if (!(food = get_obj_in_list_vis(ch, arg, ch->carrying))) {
 		if (!(food = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
 			// special case: Taste Blood
+			char_data *vict;
 			if (subcmd == SCMD_TASTE && IS_VAMPIRE(ch) && has_ability(ch, ABIL_TASTE_BLOOD) && (vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 				if (check_vampire_sun(ch, TRUE) && !ABILITY_TRIGGERS(ch, vict, NULL, ABIL_TASTE_BLOOD)) {
 					taste_blood(ch, vict);
@@ -3726,34 +3728,51 @@ ACMD(do_eat) {
 		send_to_char("You can't eat THAT!\r\n", ch);
 		return;
 	}
-	if (GET_COND(ch, FULL) < 75 && GET_COND(ch, FULL) != UNLIMITED) {	/* Stomach full */
-		send_to_char("You are too full to eat more!\r\n", ch);
+	if (!bind_ok(food, ch)) {
+		msg_to_char(ch, "You can't eat something that's bound to someone else.\r\n");
 		return;
+	}
+	
+	// 2. determine how much they would eat and whether or not there's a buff
+	if (subcmd == SCMD_EAT) {
+		will_buff = (GET_OBJ_APPLIES(food) || GET_OBJ_AFF_FLAGS(food));
+		eat_hours = GET_FOOD_HOURS_OF_FULLNESS(food);
+	}
+	else {	// just tasting
+		eat_hours = 1;
+		will_buff = FALSE;
 	}
 
 	/* check trigger */
 	if (!consume_otrigger(food, ch, OCMD_EAT)) {
 		return;
 	}
-
-	// go
-	amount = (subcmd == SCMD_EAT ? (GET_FOOD_HOURS_OF_FULLNESS(food) * REAL_UPDATES_PER_MUD_HOUR) : REAL_UPDATES_PER_MUD_HOUR);
-	amount = MAX(0, MIN(GET_COND(ch, FULL), amount));
-
-	gain_condition(ch, FULL, -1 * amount);
 	
-	// subtract values first
+	// 3. apply caps
+	if (will_buff) {
+		// limit to 24 hours at once (1 day)
+		eat_hours = MIN(eat_hours, 24);
+	}
+	else {
+		// limit to how hungry they are
+		eat_hours = MIN(eat_hours, (GET_COND(ch, FULL) / REAL_UPDATES_PER_MUD_HOUR));
+	}
+	eat_hours = MAX(eat_hours, 0);
+	
+	// stomach full: only if we're not using it for a buff effect
+	if (eat_hours == 0 && GET_COND(ch, FULL) != UNLIMITED && !will_buff) {
+		send_to_char("You are too full to eat more!\r\n", ch);
+		return;
+	}
+	
+	// 4. ready to eat
+	gain_condition(ch, FULL, -1 * eat_hours * REAL_UPDATES_PER_MUD_HOUR);
 	if (IS_FOOD(food)) {
-		GET_OBJ_VAL(food, VAL_FOOD_HOURS_OF_FULLNESS) -= amount / REAL_UPDATES_PER_MUD_HOUR;
-	}
-
-	// prepare for messaging
-	if (IS_FOOD(food) && GET_FOOD_HOURS_OF_FULLNESS(food) <= 0) {
-		// end of the food
-		extract = TRUE;
+		GET_OBJ_VAL(food, VAL_FOOD_HOURS_OF_FULLNESS) -= eat_hours;
+		extract = (GET_FOOD_HOURS_OF_FULLNESS(food) <= 0);
 	}
 	
-	// messaging
+	// 5. messaging
 	if (extract || subcmd == SCMD_EAT) {
 		// message to char
 		if (has_custom_message(food, OBJ_CUSTOM_EAT_TO_CHAR)) {
@@ -3778,12 +3797,36 @@ ACMD(do_eat) {
 		act("You nibble a little bit of $p.", FALSE, ch, food, 0, TO_CHAR);
 		act("$n tastes a little bit of $p.", TRUE, ch, food, 0, TO_ROOM);
 	}
+	
+	// 6. apply buffs
+	if (will_buff && eat_hours > 0) {
+		// ensure scaled
+		if (OBJ_FLAGGED(food, OBJ_SCALABLE)) {
+			scale_item_to_level(food, 1);	// minimum level
+		}
+		
+		// remove any old buffs
+		affect_from_char(ch, ATYPE_WELL_FED);
+		
+		if (GET_OBJ_AFF_FLAGS(food)) {
+			af = create_flag_aff(ATYPE_WELL_FED, eat_hours, GET_OBJ_AFF_FLAGS(food), ch);
+			affect_to_char(ch, af);
+			free(af);
+		}
 
-	// additional messages
-	if (GET_COND(ch, FULL) < 75) {
+		LL_FOREACH(GET_OBJ_APPLIES(food), apply) {
+			af = create_mod_aff(ATYPE_WELL_FED, eat_hours, apply->location, apply->modifier, ch);
+			affect_to_char(ch, af);
+			free(af);
+		}
+		
+		msg_to_char(ch, "You feel well fed.\r\n");
+	}
+	else if (GET_COND(ch, FULL) < 75) {	// additional messages
 		send_to_char("You are full.\r\n", ch);
 	}
-
+	
+	// 7. cleanup
 	if (extract) {
 		extract_obj(food);
 	}

@@ -1837,6 +1837,11 @@ void gain_condition(char_data *ch, int condition, int value) {
 
 	GET_COND(ch, condition) = MAX(0, GET_COND(ch, condition));
 	GET_COND(ch, condition) = MIN(MAX_CONDITION, GET_COND(ch, condition));
+	
+	// prevent well-fed if hungry
+	if (IS_HUNGRY(ch) && value > 0) {
+		affect_from_char(ch, ATYPE_WELL_FED);
+	}
 
 	if (PLR_FLAGGED(ch, PLR_WRITING) || !gain_cond_messsage) {
 		return;
