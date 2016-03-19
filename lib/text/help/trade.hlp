@@ -335,8 +335,9 @@ Usage:  cook [number] <recipe>
 Requirements:  cooking fire, sharp tool
 
 You can create lavish buff foods -- foods that give you an effect for a while
-after you eat them. These recipes are meant to share, so bring them for your
-whole adventuring party!
+after you eat them. These recipes are meant to share, so bring ingredients for
+your whole adventuring party! Each recipe provides food for 4 people but cannot
+be moved once prepared.
 
 You can make the following gourmet recipes:
   extravagant dessert platter (general)
