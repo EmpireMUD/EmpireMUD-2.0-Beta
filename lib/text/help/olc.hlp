@@ -3006,6 +3006,7 @@ Available flags:
  &ctemperate&0 - Comes from temperate areas (especially foods)
  &ctropical&0 - Comes from tropical areas (especially foods)
  &ccommon&0 - Opposite of rare
+ &caquatic&0 - Comes from the water
 
 See also: OEDIT COMPONENT
 #d

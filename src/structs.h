@@ -1090,6 +1090,7 @@ typedef struct vehicle_data vehicle_data;
 #define CMPF_TEMPERATE  BIT(16)
 #define CMPF_TROPICAL  BIT(17)
 #define CMPF_COMMON  BIT(18)
+#define CMPF_AQUATIC  BIT(19)
 
 
 // Container flags -- limited to 31 because of int type in obj value

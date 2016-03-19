@@ -1935,6 +1935,7 @@ const char *component_flags[] = {
 	"temperate",
 	"tropical",
 	"common",
+	"aquatic",
 	"\n"
 };
 
