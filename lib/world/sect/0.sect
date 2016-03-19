@@ -659,9 +659,9 @@ I 21 1305 0.25 1 f  # FISH: a worn old statuette
 I 21 256 0.25 1 f  # FISH: a hestian trinket
 I 21 262 0.25 1 f  # FISH: a trinket of conveyance
 I 21 1304 5.00 1 f  # FISH: some sea junk
-I 21 1302 25.00 1 f  # FISH: a giant linefish
-I 21 1303 25.00 1 f  # FISH: a magenta arrowfish
-I 21 1301 100.00 1 f  # FISH: a striped barbfish
+I 21 1311 25.00 1 f  # FISH: a spotted eel
+I 21 1313 25.00 1 f  # FISH: a bright red leaping fish
+I 21 1312 100.00 1 f  # FISH: a speckled trout
 I 22 174 0.05 1  # PAN: a small flake of gold
 M
 9025 5.00 d
@@ -2043,6 +2043,14 @@ E
 11 5 1.00 27
 I 6 3310 100.00 1  # FORAGE: a wood ear mushroom
 I 10 9114 1.00 1  # ENCOUNTER: a massive crocodile
+I 21 1300 20.00 1 f  # FISH: a glowing green seashell
+I 21 1305 0.25 1 f  # FISH: a worn old statuette
+I 21 256 0.25 1 f  # FISH: a hestian trinket
+I 21 262 0.25 1 f  # FISH: a trinket of conveyance
+I 21 1304 5.00 1 f  # FISH: some sea junk
+I 21 1311 25.00 1 f  # FISH: a spotted eel
+I 21 1316 25.00 1 f  # FISH: a small gator
+I 21 1314 100.00 1 f  # FISH: a fat catfish
 M
 9061 0.01 d
 M
@@ -2148,6 +2156,14 @@ A Lake~
 D0
 ~~~~~
 &c~
+I 21 1300 20.00 1 f  # FISH: a glowing green seashell
+I 21 1305 0.25 1 f  # FISH: a worn old statuette
+I 21 256 0.25 1 f  # FISH: a hestian trinket
+I 21 262 0.25 1 f  # FISH: a trinket of conveyance
+I 21 1304 5.00 1 f  # FISH: some sea junk
+I 21 1314 25.00 1 f  # FISH: a fat catfish
+I 21 1315 25.00 1 f  # FISH: a yellow perch
+I 21 1312 100.00 1 f  # FISH: a speckled trout
 M
 9025 5.00 d
 S
