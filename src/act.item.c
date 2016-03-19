@@ -3830,6 +3830,12 @@ ACMD(do_eat) {
 	if (extract) {
 		extract_obj(food);
 	}
+	else {
+		if (!IS_NPC(ch) && OBJ_FLAGGED(food, OBJ_BIND_FLAGS)) {
+			bind_obj_to_player(food, ch);
+			reduce_obj_binding(food, ch);
+		}
+	}
 }
 
 
