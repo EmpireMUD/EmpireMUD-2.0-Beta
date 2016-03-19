@@ -492,4 +492,49 @@ R
 R
 12 1 1 2
 S
+#3357
+roast turkey feast~
+3357 1
+3 271 gh 6 -1
+R
+3200 2 0 0
+R
+27 1 1 2
+S
+#3358
+mixed vegetable board~
+3358 1
+3 271 gh 6 -1
+R
+27 2 1 2
+R
+12 1 1 2
+S
+#3359
+seafood feast~
+3359 1
+3 271 gh 6 -1
+R
+17 2 1 524288
+R
+27 1 1 2
+S
+#3360
+roast meat platter~
+3360 1
+3 271 gh 6 -1
+R
+17 2 1 0
+R
+8 1 1 0
+S
+#3361
+extravagant dessert platter~
+3361 1
+3 271 gh 6 -1
+R
+9 2 1 2
+R
+8 1 1 0
+S
 $

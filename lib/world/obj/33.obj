@@ -730,7 +730,7 @@ fish chips plate~
 fish and chips~
 A plate of fish and chips is sitting here.~
    These fish and chips remind you of your time at the seaside, and those salty
-memories will boost your charisma.  
+memories will boost your charisma.
 ~
 6 mp a 3
 48 0 0
@@ -782,7 +782,7 @@ sausage black~
 a black sausage~
 A black sausage is sitting here on the ground.~
    This sausage isn't made from the best parts of the animal, but it will boost
-your ability to hit things.  
+your ability to hit things.
 ~
 6 mp a 3
 48 0 0
@@ -896,5 +896,109 @@ C
 M
 4
 You savor the subtle flavor of the vegetables.~
+S
+#3357
+feast turkey roast~
+the roast turkey feast~
+Someone has set up a roast turkey feast!~
+   There is a banquet of turkey and trimmings. It's enough to feed the whole
+party! This feast will boost melee fighters.  
+~
+6 m 0 3
+96 0 0
+7 336
+A
+17 1 0
+A
+9 1 0
+A
+21 1 0
+M
+4
+You fill yourself on turkey and stuffing.~
+S
+#3358
+board vegetables mixed~
+the mixed vegetable board~
+Someone has set up a mixed vegetable board!~
+   The board is covered with all manner of roast vegetables, in every color. 
+It's enough to feed the whole party! This feast will boost healers.  
+~
+6 m 0 4
+96 0 0
+7 336
+A
+7 1 0
+A
+9 1 0
+A
+23 1 0
+M
+4
+You fill yourself on roast vegetables.~
+S
+#3359
+feast seafood~
+the seafood feast~
+Someone has set up a seafood feast!~
+   This overflowing feast of seafood is enough to feed the whole party! This
+feast will boost casters.  
+~
+6 m 0 4
+96 0 0
+7 336
+A
+17 1 0
+A
+9 1 0
+A
+22 1 0
+M
+4
+You fill yourself on the bountiful seafood.~
+S
+#3360
+platter roast meat~
+the roast meat platter~
+Someone has set up a roast meat platter!~
+   This feast of roast meats is enough to feed the whole party! It will boost
+tanks in particular.  
+~
+6 m 0 4
+96 0 0
+7 336
+A
+18 1 0
+A
+13 1 0
+A
+24 1 0
+A
+12 1 0
+M
+4
+You fill yourself on roast meats.~
+S
+#3361
+platter dessert extravagant~
+the extravagant dessert platter~
+Someone has set up an extravagant dessert platter!~
+   This buffet of desserts would make the baker blush. It looks like it's just
+the thing to boost your party members!  
+~
+6 m 0 4
+96 0 0
+7 336
+A
+9 1 0
+A
+17 1 0
+A
+18 1 0
+A
+2 1 0
+M
+4
+You fill yourself on fancy desserts.~
 S
 $
