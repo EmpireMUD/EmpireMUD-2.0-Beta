@@ -3820,7 +3820,7 @@ ACMD(do_eat) {
 			free(af);
 		}
 		
-		msg_to_char(ch, "You feel well fed.\r\n");
+		msg_to_char(ch, "You feel well-fed.\r\n");
 	}
 	else if (GET_COND(ch, FULL) < 75) {	// additional messages
 		send_to_char("You are full.\r\n", ch);

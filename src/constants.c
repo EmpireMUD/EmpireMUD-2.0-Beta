@@ -2636,7 +2636,7 @@ const char *affect_types[] = {
 	"conferred",
 	"morph",
 	"whisperstride",
-	"well fed",
+	"well-fed",
 	"\n"
 	};
 
@@ -2707,7 +2707,7 @@ const char *affect_wear_off_msgs[] = {
 	"Your conferred strength returns.",
 	"",	// morph stats -- no wear-off message
 	"Your whisperstride fades.",
-	"You no longer feel well fed.",
+	"You no longer feel well-fed.",
 	"\n"
 };
 
