@@ -258,6 +258,27 @@ With Exquisite Woodworking you can craft:
 
 See also: CRAFT, LAND VEHICLES
 #
+"FAMILY RECIPES"
+
+Family Recipes (Trade ability)
+
+Usage:  cook [number] <recipe>
+Requirements:  cooking fire, sharp tool
+
+You can use old family recipes to create buff foods -- foods that give you an
+effect for a while after you eat them. These foods are bind-on-pickup, so only
+the person who makes them can eat them.
+
+You can make the following family recipes:
+  berry cobbler (wits)                     hearty meatloaf (strength)
+  biscuits and gravy (move-regen)          jellied eels (dodge)
+  black sausage (to-hit)                   mom's pie (max-mana)
+  chicken and dumplings (intelligence)     pot roast (max-health)
+  chili (max-moves)                        shepherd's pie (dexterity)
+  fish and chips (charisma)                stewed vegetables (mana-regen)
+
+See also: BUFF FOOD, BOP, COOKING FIRE
+#
 "FINE POTTERY"
 
 Fine Pottery (Trade ability)
@@ -305,6 +326,22 @@ With the basic Forge skill, you can create:
 See also: CRAFTING LEVEL, RESOURCES, KEEP, SMELT, WEAPONCRAFTING,
   ARMORSMITHING, JEWELRY, MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS,
   DEADLY WEAPONS, IMPERIAL ARMORS
+#
+"GOURMET CHEF"
+
+Gourmet Chef (Trade ability)
+
+Usage:  cook [number] <recipe>
+Requirements:  cooking fire, sharp tool
+
+You can create lavish buff foods -- foods that give you an effect for a while
+after you eat them. These recipes are meant to share, so bring them for your
+whole adventuring party!
+
+You can make the following gourmet recipes:
+  --
+
+See also: BUFF FOOD, COOKING FIRE
 #
 "GUILDSMAN CRAFTS"
 

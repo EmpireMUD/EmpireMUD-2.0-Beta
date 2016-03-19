@@ -48,6 +48,20 @@ digging in the mountains.
 
 See also: DIG
 #
+"BUFF FOOD" "BUFF FOODS" "WELL FED"
+
+Buff foods are foods that give you a bonus when you eat them. Unlike normal
+foods, you can eat buff foods even if you're full -- but they will replace any
+existing "well fed" buff you already have.
+
+You can only eat 24 hours' worth of a buff food at once, giving you a full day
+(30 real minutes) of taht food's effect. If less than 24 hours of food is left,
+you will get a shorter effect instead.
+
+If you become hungry, you'll lose your well fed effect early.
+
+See also: EAT, FAMILY RECIPES
+#
 CANOE
 
 Canoe (vehicle)
