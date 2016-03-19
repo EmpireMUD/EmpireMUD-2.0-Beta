@@ -370,8 +370,11 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 				else if (psr < SPECIALTY_SKILL_CAP) {
 					level = MIN(SPECIALTY_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
 				}
-				else {
+				else if (psr < CLASS_SKILL_CAP) {
 					level = MIN(CLASS_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
+				}
+				else {	// is a skill ability but >= class skill level (100) -- don't restrict
+					level = get_crafting_level(ch);
 				}
 			}
 			else {
