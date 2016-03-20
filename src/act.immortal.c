@@ -2726,6 +2726,7 @@ void do_stat_book(char_data *ch, book_data *book) {
 void do_stat_building(char_data *ch, bld_data *bdg) {
 	extern const char *bld_flags[];
 	extern const char *designate_flags[];
+	extern const char *function_flags[];
 	
 	struct obj_storage_type *store;
 	char line[MAX_STRING_LENGTH];
@@ -2759,7 +2760,10 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	}
 	
 	sprintbit(GET_BLD_FLAGS(bdg), bld_flags, buf, TRUE);
-	msg_to_char(ch, "Building flags: &g%s&0\r\n", buf);
+	msg_to_char(ch, "Building flags: &c%s&0\r\n", buf);
+	
+	sprintbit(GET_BLD_FUNCTIONS(bdg), function_flags, buf, TRUE);
+	msg_to_char(ch, "Functions: &g%s&0\r\n", buf);
 	
 	sprintbit(GET_BLD_DESIGNATE_FLAGS(bdg), designate_flags, buf, TRUE);
 	msg_to_char(ch, "Designate flags: &c%s&0\r\n", buf);
