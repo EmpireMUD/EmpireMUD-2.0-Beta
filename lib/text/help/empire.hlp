@@ -1380,7 +1380,7 @@ Workforce types:
   &ynailmaking:&0 NPCs will forge pouches of nails at the forge.
   &ybrickmaking:&0 NPCs will make bricks at the potter.
   &yabandon-dismantled:&0 NPCS will abandon a tile when they finish dismantling.
-  &cherb gardening (skilled):&0 NPCS will gather herbs in gardens.
+  &cherb-gardening (skilled):&0 NPCS will gather herbs in gardens.
   &yfire brigade:&0 NPCs will put out fires.
   &ctrapping (skilled):&0 NPCs will gather skins at trapper's posts.
   &ytanning:&0 NPCs will tan skins into leather.
