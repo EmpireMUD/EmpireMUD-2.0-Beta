@@ -1173,49 +1173,67 @@ Available flags:
  DRINK - has a water source, like a well or fountain
  !NPC - mobs won't enter this building
  BARRIER - can only go back the way you came, unless flying
- TAVERN - functions as a tavern (don't set this on the same building as DRINK)
  LARGE-CITY-RADIUS - counts as in-city much further away than normal
- MINE - can be mined for ore resources
  ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
  BURNABLE - will catch fire if a fire is placed inside by a hostile empire
- FORGE - can use the forge and reforge commands here
  COOKING-FIRE - can cook, brew, and other tasks that require a fire
- ALCHEMIST - can brew and mix here
- STABLE - can shear, milk, and barde animals here; animals in this building don't despawn
- LIBRARY - can write and store books here
- APIARY - grants the Apiaries tech to the empire
- GLASSBLOWER - grants the Glassblowing tech to the empire
- DOCKS - grants the seaport tech to the empire; counts as a dock for ships
- PIGEON-POST - players can send mail here
- MILL - can use the mill command here
- POTTER - pottery craft time is reduced here
- TAILOR - counts as tailor; can use refashion here
- BATHS - can use the bathe command here
  SAIL - can enter this building with a boat
- TOMB - players can re-spawn here after dying
- MINT-COINS - functions as a mint
- VAULT - stores coins, can use the warehouse command for privileged storage
  ITEM-LIMIT - only a certain number of items can be dropped here
  LONG-AUTOSTORE - autostore takes 72 hours instead of 3 here
- WAREHOUSE - can use the warehouse command and store unique items
- TRADE - access to global trade, e.g. a trading post
  HIGH-DEPLETION - has more resources than a normal tile
- PORTAL - functions as a portal building
- BEDROOM - boosts regen while sleeping
  !DELETE - will not be deleted for not having a homeroom
- SUMMON-PLAYER - allows the summon player command
  NEED-BOAT - requires a boat, flying, or swimming to enter
  LOOK-OUT - can see the map using "look out"
  2ND-TERRITORY - counts as territory off the map (e.g. in a ship)
- SHIPYARD - used to build ships
  UPGRADED - modifies other building types like SHIPYARD
- PRESS - can use the 'press' craft
 
 * Note: If you change the LARGE-CITY-RADIUS flag on existing buildings,
         territory counts will not update right away. Any empire can force a
         re-count by claiming or abandoning any tile.
 
 See also: INTERLINK, OLC BUILDINGS
+#d
+"BEDIT FUNCTIONS" "FUNCTION FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The function flags determine what chores, actions, and other tasks happen at
+that building.
+
+Available functions:
+ ALCHEMIST - can brew and mix here
+ APIARY - grants the Apiaries tech to the empire
+ BATHS - can use the bathe command here
+ BEDROOM - boosts regen while sleeping
+ CARPENTER - required by some crafts
+ DIGGING - triggers the workforce digging chore (also need interaction)
+ DOCKS - grants the seaport tech to the empire; counts as a dock for ships
+ FORGE - can use the forge and reforge commands here
+ GLASSBLOWER - grants the Glassblowing tech to the empire
+ GUARD-TOWER - hostile toward enemy players, at range
+ HENGE - allows Chant of Druids
+ LIBRARY - can write and store books here
+ MAIL - players can send mail here
+ MILL - can use the mill command here
+ MINE - can be mined for ore resources
+ MINT - functions as a mint
+ PORTAL - functions as a portal building
+ POTTER - pottery craft time is reduced here
+ PRESS - can use the 'press' craft
+ SAW - allows sawing here
+ SHIPYARD - used to build ships
+ SMELT - allows smelting here
+ STABLE - can shear, milk, and barde animals here; animals in this building don't despawn
+ SUMMON-PLAYER - allows the summon player command
+ TAILOR - counts as tailor; can use refashion here
+ TANNERY - allows tanning here
+ TAVERN - functions as a tavern (don't set this on the same building as DRINK)
+ TOMB - players can re-spawn here after dying
+ TRADING-POST - access to global trade, e.g. a trading post
+ VAULT - stores coins, can use the warehouse command for privileged storage
+ WAREHOUSE - can use the warehouse command and store unique items
+
+See also: OLC BUILDINGS
 #d
 "BEDIT HITPOINTS"
 

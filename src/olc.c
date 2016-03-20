@@ -107,6 +107,7 @@ OLC_MODULE(bedit_extra_desc);
 OLC_MODULE(bedit_extrarooms);
 OLC_MODULE(bedit_fame);
 OLC_MODULE(bedit_flags);
+OLC_MODULE(bedit_functions);
 OLC_MODULE(bedit_hitpoints);
 OLC_MODULE(bedit_icon);
 OLC_MODULE(bedit_interaction);
@@ -472,6 +473,7 @@ const struct olc_command_data olc_data[] = {
 	{ "extra", bedit_extra_desc, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "fame", bedit_fame, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "flags", bedit_flags, OLC_BUILDING, OLC_CF_EDITOR },
+	{ "functions", bedit_functions, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "hitpoints", bedit_hitpoints, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "icon", bedit_icon, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "interaction", bedit_interaction, OLC_BUILDING, OLC_CF_EDITOR },

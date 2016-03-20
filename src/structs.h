@@ -550,6 +550,40 @@ typedef struct vehicle_data vehicle_data;
 #define DES_LAND_VEHICLE	BIT(17)
 
 
+// FNC_x: function flags (for buildings)
+#define FNC_ALCHEMIST  BIT(0)	// can brew and mix here
+#define FNC_APIARY  BIT(1)	// grants the Apiaries tech to the empire
+#define FNC_BATHS  BIT(2)	// can use the bathe command here
+#define FNC_BEDROOM  BIT(3)	// boosts regen while sleeping
+#define FNC_CARPENTER  BIT(4)	// required by some crafts
+#define FNC_DIGGING  BIT(5)	// triggers the workforce digging chore (also need interact
+#define FNC_DOCKS  BIT(6)	// grants the seaport tech to the empire; counts as a dock fo
+#define FNC_FORGE  BIT(7)	// can use the forge and reforge commands here
+#define FNC_GLASSBLOWER  BIT(8)	// grants the Glassblowing tech to the empire
+#define FNC_GUARD_TOWER  BIT(9)	// hostile toward enemy players, at range
+#define FNC_HENGE  BIT(10)	// allows Chant of Druids
+#define FNC_LIBRARY  BIT(11)	// can write and store books here
+#define FNC_MAIL  BIT(12)	// players can send mail here
+#define FNC_MILL  BIT(13)	// can use the mill command here
+#define FNC_MINE  BIT(14)	// can be mined for ore resources
+#define FNC_MINT  BIT(15)	// functions as a mint
+#define FNC_PORTAL  BIT(16)	// functions as a portal building
+#define FNC_POTTER  BIT(17)	// pottery craft time is reduced here
+#define FNC_PRESS  BIT(18)	// can use the 'press' craft
+#define FNC_SAW  BIT(19)	//allows sawing here
+#define FNC_SHIPYARD  BIT(20)	// used to build ships
+#define FNC_SMELT  BIT(21)	// allows smelting here
+#define FNC_STABLE  BIT(22)	// can shear, milk, and barde animals here; animals in this 
+#define FNC_SUMMON_PLAYER  BIT(23)	// allows the summon player command
+#define FNC_TAILOR  BIT(24)	// counts as tailor; can use refashion here
+#define FNC_TANNERY  BIT(25)	// allows tanning here
+#define FNC_TAVERN  BIT(26)	// functions as a tavern (don't set this on the same buildin
+#define FNC_TOMB  BIT(27)	// players can re-spawn here after dying
+#define FNC_TRADING_POST  BIT(28)	// access to global trade, e.g. a trading post
+#define FNC_VAULT  BIT(29)	// stores coins, can use the warehouse command for privileged
+#define FNC_WAREHOUSE  BIT(30)	// can use the warehouse command and store unique items
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// CHARACTER DEFINES ///////////////////////////////////////////////////////
 
@@ -2439,6 +2473,7 @@ struct bld_data {
 	int max_damage;
 	int fame;	// how much is added to empire fame
 	bitvector_t flags;	// BLD_
+	bitvector_t functions;	// FNC_
 	bld_vnum upgrades_to;	// the vnum of any building
 	
 	int extra_rooms;	// how many rooms it can have

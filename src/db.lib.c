@@ -515,6 +515,16 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				break;
 			}
 			
+			case 'F': {	// functions
+				if (!get_line(fl, line)) {
+					log("SYSERR: format error in F line of %s", buf2);
+					exit(1);
+				}
+				
+				GET_BLD_FUNCTIONS(bld) = asciiflag_conv(line);
+				break;	
+			}
+			
 			case 'I': {	// interaction item
 				parse_interaction(line, &GET_BLD_INTERACTIONS(bld), buf2);
 				break;
@@ -625,6 +635,12 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	
 	// E: extra descriptions
 	write_extra_descs_to_file(fl, GET_BLD_EX_DESCS(bld));
+	
+	// F: functions
+	if (GET_BLD_FUNCTIONS(bld)) {
+		fprintf(fl, "F\n");
+		fprintf(fl, "%s\n", bitv_to_alpha(GET_BLD_FUNCTIONS(bld)));
+	}
 	
 	// I: interactions
 	write_interactions_to_file(fl, GET_BLD_INTERACTIONS(bld));

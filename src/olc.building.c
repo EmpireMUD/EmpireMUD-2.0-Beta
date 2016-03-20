@@ -32,6 +32,7 @@
 // external consts
 extern const char *bld_flags[];
 extern const char *designate_flags[];
+extern const char *function_flags[];
 extern const char *interact_types[];
 extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *room_aff_bits[];
@@ -628,6 +629,9 @@ void olc_show_building(char_data *ch) {
 	sprintbit(GET_BLD_FLAGS(bdg), bld_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", lbuf);
 	
+	sprintbit(GET_BLD_FUNCTIONS(bdg), function_flags, lbuf, TRUE);
+	sprintf(buf + strlen(buf), "<&yfunctions&0> %s\r\n", lbuf);
+	
 	sprintbit(GET_BLD_DESIGNATE_FLAGS(bdg), designate_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<&ydesignate&0> %s\r\n", lbuf);
 	
@@ -785,6 +789,12 @@ OLC_MODULE(bedit_fame) {
 OLC_MODULE(bedit_flags) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	GET_BLD_FLAGS(bdg) = olc_process_flag(ch, argument, "building", "flags", bld_flags, GET_BLD_FLAGS(bdg));
+}
+
+
+OLC_MODULE(bedit_functions) {
+	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
+	GET_BLD_FUNCTIONS(bdg) = olc_process_flag(ch, argument, "function", "flags", function_flags, GET_BLD_FUNCTIONS(bdg));
 }
 
 

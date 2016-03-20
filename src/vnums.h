@@ -43,10 +43,6 @@
 
 #define BUILDING_HENGE  5142	// spells.c
 
-#define BUILDING_DOCKS  5152	// tech, custom icons, ships.c	-- TODO replace with BLD_DOCKS
-#define BUILDING_SHIPYARD  5153	// custom icon, ships.c	-- TODO could be a bld flag
-#define BUILDING_SHIPYARD2  5154	// custom icon, ships.c
-
 #define BUILDING_SWAMPWALK  5155
 
 #define BUILDING_TRAPPERS_POST  5161	// workforce.c
@@ -57,8 +53,6 @@
 
 #define BUILDING_GATEHOUSE  5173	// custom icons, rituals
 #define BUILDING_WALL  5174
-
-#define BUILDING_RIVER_GATE  5176  // custom icons, rituals
 
 
 // Room building vnums

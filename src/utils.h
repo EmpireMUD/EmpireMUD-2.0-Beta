@@ -181,6 +181,7 @@
 #define GET_BLD_MAX_DAMAGE(bld)  ((bld)->max_damage)
 #define GET_BLD_FAME(bld)  ((bld)->fame)
 #define GET_BLD_FLAGS(bld)  ((bld)->flags)
+#define GET_BLD_FUNCTIONS(bld)  ((bld)->functions)
 #define GET_BLD_UPGRADES_TO(bld)  ((bld)->upgrades_to)
 #define GET_BLD_EX_DESCS(bld)  ((bld)->ex_description)
 #define GET_BLD_EXTRA_ROOMS(bld)  ((bld)->extra_rooms)
@@ -1025,6 +1026,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // helpers
 #define BLD_DESIGNATE_FLAGGED(room, flag)  (GET_BUILDING(HOME_ROOM(room)) && IS_SET(GET_BLD_DESIGNATE_FLAGS(GET_BUILDING(HOME_ROOM(room))), (flag)))
+#define HAS_FUNCTION(room, flag)  (GET_BUILDING(room) && IS_SET(GET_BLD_FUNCTIONS(GET_BUILDING(room)), (flag)))
 #define RMT_FLAGGED(room, flag)  (GET_ROOM_TEMPLATE(room) && IS_SET(GET_RMT_FLAGS(GET_ROOM_TEMPLATE(room)), (flag)))
 #define ROOM_AFF_FLAGGED(r, flag)  (IS_SET(ROOM_AFF_FLAGS(r), (flag)))
 #define ROOM_BLD_FLAGGED(room, flag)  (GET_BUILDING(room) && IS_SET(GET_BLD_FLAGS(GET_BUILDING(room)), (flag)))

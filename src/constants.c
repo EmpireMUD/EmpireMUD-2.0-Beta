@@ -2256,6 +2256,43 @@ const int evo_val_types[NUM_EVOS] = {
 };
 
 
+// FNC_x: function flags (for buildings)
+const char *function_flags[] = {
+	"ALCHEMIST",
+	"APIARY",
+	"BATHS",
+	"BEDROOM",
+	"CARPENTER",
+	"DIGGING",	// 5
+	"DOCKS",
+	"FORGE",
+	"GLASSBLOWER",
+	"GUARD-TOWER",
+	"HENGE",	// 10
+	"LIBRARY",
+	"MAIL",
+	"MILL",
+	"MINE",
+	"MINT",	// 15
+	"PORTAL",
+	"POTTER",
+	"PRESS",
+	"SAW",
+	"SHIPYARD",	// 20
+	"SMELT",
+	"STABLE",
+	"SUMMON-PLAYER",
+	"TAILOR",
+	"TANNERY",	// 25
+	"TAVERN",
+	"TOMB",
+	"TRADING-POST",
+	"VAULT",
+	"WAREHOUSE",	// 30
+	"\n"
+};
+
+
 // ISLE_x -- island flags
 const char *island_bits[] = {
 	"NEWBIE",
