@@ -221,7 +221,7 @@ GRAINS "GRAIN COMPONENT"
 
 Grain (component)
 
-Grains are a component type. They currently have no usage in common.
+Used for:  cooking
 
 See also: COMPONENT
 #
@@ -380,7 +380,7 @@ Oil (component)
 
 Used for: cooking
 
-See also: COMPONENT, COOK, MILL
+See also: COMPONENT, COOK, PRESS
 #
 PILLARS "PILLAR COMPONENT"
 
