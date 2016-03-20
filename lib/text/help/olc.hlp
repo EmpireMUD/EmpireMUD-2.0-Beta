@@ -177,6 +177,8 @@ Crops (CROPEDIT):
 - The map region only matters if the crop grows in the wild (no !WILD flag).
 - Crops should have a FORAGE interaction for a small single food item.
 - Crops should have a HARVEST interaction for a plantable large item.
+- Orchard crops need a CHOP interaction if they will give trees. Orchards are
+  still choppable without this, though.
 
 Globals (GEDIT):
 - All global tables must be approved by the head builder, because they apply
@@ -1207,6 +1209,7 @@ Available flags:
  2ND-TERRITORY - counts as territory off the map (e.g. in a ship)
  SHIPYARD - used to build ships
  UPGRADED - modifies other building types like SHIPYARD
+ PRESS - can use the 'press' craft
 
 * Note: If you change the LARGE-CITY-RADIUS flag on existing buildings,
         territory counts will not update right away. Any empire can force a
@@ -2106,7 +2109,6 @@ the same weight as an apply of 1. If your item ONLY has one property to set
 Scaling based on item types:
  weapon - the "damage" value
  drink container - the "capacity" value
- food - the "fullness" value
  coins - the "coinamount" value
  missile weapons - the "damage" value
  arrow - the "damage" value
@@ -2448,6 +2450,7 @@ Object interaction types:
  SCRAPE - Items you get when scraping this item (tree -> log).
  SAW - Items you get when sawing this item (tree -> lumber).
  TAN - Items you get when tanning this item (skin -> leather).
+ CHIP - What you get for chipping at the item.
 
 Room interaction types:
  DIG - Items received when using the dig action.
@@ -2456,6 +2459,9 @@ Room interaction types:
  HARVEST - Items received when harvesting a crop, OR when picking in an ORCHARD crop.
  GATHER - Items received from the gather action.
  ENCOUNTER - Hostile mob loaded when a random encounter triggers.
+ CHOP - Things that can be found when chopping here.
+ FISH - Things that can be found by fishing here.
+ PAN - Things that can be found by panning here.
 
 The percent may be anywhere from 0.01 to 100.00 and if the quantity is greater
 than 1, the percent is only checked once for the entire quantity. If you want
@@ -3000,6 +3006,7 @@ Available flags:
  &ctemperate&0 - Comes from temperate areas (especially foods)
  &ctropical&0 - Comes from tropical areas (especially foods)
  &ccommon&0 - Opposite of rare
+ &caquatic&0 - Comes from the water
 
 See also: OEDIT COMPONENT
 #d
@@ -3155,10 +3162,7 @@ Examples of good fullness numbers:
 Foods should also have a decay timer set. Traditionally, more-prepared foods
 take longer to decay, rather than basic it strictly on realism.
 
-For SCALABLE objects, thus number is a scalable value if it is set to a number
-other than 0.
-
-See also: ITEM SCALING, OEDIT DECAY, OLC OBJECTS
+See also: OEDIT DECAY, OLC OBJECTS
 #d
 "OEDIT KEYWORDS"
 
@@ -4206,8 +4210,8 @@ Evolutions are automatically sorted by type and by percentage. Only one will
 be called at a time -- the first one whose percentage check passes.
 
 Available types ([value] isn't used unless specified):
- CHOPPED-DOWN - Sector to become when chopped by a player; value is the number
-    of trees you receive.
+ CHOPPED-DOWN - Sector to become when chopped by a player; you should also add
+    chop interactions.
  CROP-GROWS - Sector to become when the crop finishes growing (Seeded -> Crop).
  ADJACENT-ONE - Called when this sector is next to a certain other sector
     (value is the sector vnum that it's adjacent to).

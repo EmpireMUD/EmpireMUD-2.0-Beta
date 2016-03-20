@@ -503,18 +503,19 @@ void olc_show_sector(char_data *ch) {
 	sprintf(buf + strlen(buf), "<&ybuildflags&0> %s\r\n", lbuf);
 	
 	sprintf(buf + strlen(buf), "<&yevolution&0>\r\n");
-	get_evolution_display(st->evolution, buf1);
-	strcat(buf, buf1);
+	if (st->evolution) {
+		get_evolution_display(st->evolution, buf1);
+		strcat(buf, buf1);
+	}
 
 	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
-	get_interaction_display(GET_SECT_INTERACTIONS(st), buf1);
-	strcat(buf, buf1);
+	if (GET_SECT_INTERACTIONS(st)) {
+		get_interaction_display(GET_SECT_INTERACTIONS(st), buf1);
+		strcat(buf, buf1);
+	}
 	
 	sprintf(buf + strlen(buf), "<&yspawns&0> (add, remove, list)\r\n");
-	if (!GET_SECT_SPAWNS(st)) {
-		sprintf(buf + strlen(buf), " nothing\r\n");
-	}
-	else {
+	if (GET_SECT_SPAWNS(st)) {
 		count = 0;
 		for (spawn = GET_SECT_SPAWNS(st); spawn; spawn = spawn->next) {
 			++count;

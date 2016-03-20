@@ -215,9 +215,8 @@ Command:  mill [number] <item>
           mill info <item>
 
 You can mill:
-  wheat into 2 flour
-  corn into 2 cornmeal
-  2 olives into olive oil
+  wheat into flour
+  corn into cornmeal
 
 You must do this at a Mill building. Milling will gain Trade skill up to 15.
 
@@ -312,6 +311,19 @@ Light jungle is jungle which has been partially chopped, but not reduced to
 plains.
 
 See also: CROPS, HARVEST, PICK
+#
+PRESS PRESSING OILMAKING "OIL MAKING"
+
+Command:  press [number] <item>
+          press info <item>
+
+You can press:
+  olives into olive oil
+
+You must do this at an Oilmaker building. Pressing oil will gain Trade skill up
+to 15.
+
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP
 #
 SACRIFICE 
 

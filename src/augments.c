@@ -782,14 +782,13 @@ void olc_show_augment(char_data *ch) {
 	for (app = GET_AUG_APPLIES(aug), num = 1; app; app = app->next, ++num) {
 		sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", num, app->weight, apply_types[app->location]);
 	}
-	if (!GET_AUG_APPLIES(aug)) {
-		strcat(buf, "  none\r\n");
-	}
 	
 	// resources
 	sprintf(buf + strlen(buf), "Resources required: <\tyresource\t0>\r\n");
-	get_resource_display(GET_AUG_RESOURCES(aug), lbuf);
-	strcat(buf, lbuf);
+	if (GET_AUG_RESOURCES(aug)) {
+		get_resource_display(GET_AUG_RESOURCES(aug), lbuf);
+		strcat(buf, lbuf);
+	}
 	
 	page_string(ch->desc, buf, TRUE);
 }

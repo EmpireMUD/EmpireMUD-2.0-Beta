@@ -81,18 +81,15 @@
 
 // Natural resources
 #define o_ROCK  100	// TODO: rocks are special-cased for chipping
-#define o_CLAY  101	// TODO: remove clay-near-water override and make it a rare Plains result, and otherwise claypit-only
 #define o_LIGHTNING_STONE  103
 #define o_BLOODSTONE  104
 #define o_STONE_BLOCK  105	// TODO: change quarry to interaction
-#define o_TREE  120	// TODO: change chop to an interaction (+evo, like a combo)
 #define o_FLOWER  123	// TODO: find-herbs could be a global type and "flower" is the only one that requires no skill
 #define o_WHEAT  141
 #define o_HOPS  143
 #define o_BARLEY  145
-#define o_GOLD_SMALL  174
-#define o_HANDAXE  181
-#define o_FLINT_SET  183
+#define o_HANDAXE  181	// TODO: this is special-cased for mining
+#define o_FLINT_SET  183	// TODO: this is special-cased for lighting fires
 
 // brewing items
 #define o_APPLES  3002
@@ -100,9 +97,7 @@
 #define o_CORN  3005
 
 // clay
-#define o_HESTIAN_TRINKET  256
 #define o_BRICKS  257	// TODO: create a workforce brickmaking ability/craft
-#define o_TRINKET_OF_CONVEYANCE  262
 
 // Sewn items
 #define o_ROPE  2035
@@ -134,11 +129,6 @@
 
 // misc stuff
 #define o_GLOWING_SEASHELL  1300
-#define o_BARBFISH  1301
-#define o_LINEFISH  1302
-#define o_ARROWFISH  1303
-#define o_SEA_JUNK  1304
-#define o_WORN_STATUETTE  1305
 #define o_NAILS  1306
 
 // skins
@@ -222,3 +212,4 @@
 #define MILL_WORKER  272
 #define VEHICLE_REPAIRMAN  273
 #define OVERSEER  274
+#define PRESS_WORKER  276

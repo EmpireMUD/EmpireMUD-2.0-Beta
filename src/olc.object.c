@@ -1448,44 +1448,41 @@ void olc_show_object(char_data *ch) {
 	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
 		sprintf(buf + strlen(buf), " &y%2d&0. %+d to %s (%s)\r\n", ++count, apply->modifier, apply_types[(int) apply->location], apply_type_names[(int)apply->apply_type]);
 	}
-	if (count == 0) {
-		strcat(buf, " none\r\n");
-	}
 	
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <&yextra&0>\r\n");
-	get_extra_desc_display(obj->ex_description, buf1);
-	strcat(buf, buf1);
+	if (obj->ex_description) {
+		get_extra_desc_display(obj->ex_description, buf1);
+		strcat(buf, buf1);
+	}
 
 	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
-	get_interaction_display(obj->interactions, buf1);
-	strcat(buf, buf1);
+	if (obj->interactions) {
+		get_interaction_display(obj->interactions, buf1);
+		strcat(buf, buf1);
+	}
 	
 	// storage
-	strcat(buf, "Storage: <&ystorage&0>\r\n");
+	sprintf(buf + strlen(buf), "Storage: <&ystorage&0>\r\n");
 	count = 0;
 	for (store = obj->storage; store; store = store->next) {
 		sprintbit(store->flags, storage_bits, buf2, TRUE);
 		sprintf(buf + strlen(buf), " &y%d&0. %s ( %s)\r\n", ++count, GET_BLD_NAME(building_proto(store->building_type)), buf2);
 	}
-	if (count == 0) {
-		strcat(buf, " none\r\n");
-	}
 	
 	// custom messages
-	strcat(buf, "Custom messages: <&ycustom&0>\r\n");
+	sprintf(buf + strlen(buf), "Custom messages: <&ycustom&0>\r\n");
 	count = 0;
 	for (ocm = obj->custom_msgs; ocm; ocm = ocm->next) {
 		sprintf(buf + strlen(buf), " &y%d&0. [%s] %s\r\n", ++count, obj_custom_types[ocm->type], ocm->msg);
 	}
-	if (count == 0) {
-		strcat(buf, " none\r\n");
-	}
 	
 	// scripts
 	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
-	get_script_display(obj->proto_script, buf1);
-	strcat(buf, buf1);
+	if (obj->proto_script) {
+		get_script_display(obj->proto_script, buf1);
+		strcat(buf, buf1);
+	}
 	
 	page_string(ch->desc, buf, TRUE);
 }

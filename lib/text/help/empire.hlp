@@ -62,6 +62,7 @@ The Artisans ability unlocks additional buildings.
 (CC) carpenter
 (GG) glassblower
 [PP] pigeonpost
+(OO) oilmaker
 (TT) tailor
 [TT] tavern
 {WW} warehouse
@@ -773,6 +774,7 @@ Luxury (Empire ability)
 
 The Luxury ability unlocks additional buildings.
 
+[CC] cabinetofcuriosities  (rare item storage)
 .... courtyard  (in-city only)
 &g^/\^&0 trapperspost
 [&b~~&0] baths  (in-city only)
@@ -846,10 +848,11 @@ See also: BUILD, GRAND MONUMENTS
 #
 PAN
 
-Usage:  pan
+Usage:  pan [direction]
 
 Using a simple metal pan, you can pan for gold flakes next to the river. It's
-rare to find anything, but it's something to do.
+rare to find anything, but it's something to do. You can pan an adjacent map
+tile, or the one you're standing in.
 
 See also: DEPLETION, FORGE
 #
@@ -1390,6 +1393,7 @@ Workforce types:
      requires both Exarch Crafts and Skilled Labor.
   &ymilling:&0 Will mill grains into flour.
   &yrepair-vehicles&0: Will keep vehicles maintained.
+  &yoilmaking:&0 Will press oil.
   
 Items marked (skilled) require the Skilled Labor ability.
 

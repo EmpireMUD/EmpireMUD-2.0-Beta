@@ -613,13 +613,13 @@ surprisingly light-weight. Although it might be difficult to craft anything
 useful from it, it looks like you woul be able to make some items using
 patterns purchased from the Portal to the Primeval adventure.
 ~
-3 e a 1
+3 e a 2
 0 0 0
 14 0
 R
-5511 0
+5621 0
 R
-5164 0
+5193 0
 S
 #10253
 bottle essence terror~
@@ -628,13 +628,13 @@ The essence of terror is lying here in a bottle.~
    This tiny glass bottle contains the essence of pure terror, harvested from
 the dawn of time from a flying creature who truly embodies the concept.
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 8 0
 R
-5164 0
+5193 0
 R
-5511 0
+5621 0
 S
 #10254
 gem stunning violet~
@@ -643,13 +643,13 @@ A violet gem has been discarded here.~
    This stunning gem looks like it must contain some arcane power. Perhaps it
 can be used in some kind of crafting recipe.
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 10 0
 R
-5164 0
+5621 0
 R
-5511 0
+5193 0
 S
 #10255
 bracelet dracosaur bone~
@@ -778,11 +778,15 @@ A thick piece of dracosaur hide has been left on the ground.~
 to work into anything useful. This hide can be used to craft items using
 patterns from the Portal to the Primeval adventure.
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 7 0
 R
 5120 0
+R
+5193 0
+R
+5621 0
 S
 #10267
 tooth dracosaur serrated~
@@ -792,11 +796,15 @@ A serrated dracosaur tooth is lying here.~
 huge dracosaur. It looks like you might be able to make something useful from
 this, if you bought the patterns from the Portal to the Primeval adventure.
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 14 0
 R
 5120 0
+R
+5193 0
+R
+5621 0
 S
 #10268
 axe bone primordial~

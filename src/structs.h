@@ -312,7 +312,10 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_SAW  17
 #define INTERACT_TAN  18
 #define INTERACT_CHIP  19
-#define NUM_INTERACTS  20
+#define INTERACT_CHOP  20
+#define INTERACT_FISH  21
+#define INTERACT_PAN  22
+#define NUM_INTERACTS  23
 
 
 // for object saving
@@ -496,6 +499,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_SECONDARY_TERRITORY  BIT(44)	// similar to a ship -- counts as territory off the map
 #define BLD_SHIPYARD  BIT(45)	// for building ships
 #define BLD_UPGRADED  BIT(46)	// combines with SHIPYARD, etc. to create upgraded versions of buildings
+#define BLD_PRESS  BIT(47)	// can use the 'press' craft command
 
 
 // Terrain flags for do_build -- these match up with build_on flags for building crafts
@@ -679,6 +683,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_TYPE_WORKFORCE  10
 #define CRAFT_TYPE_MANUFACTURE  11
 #define CRAFT_TYPE_SMELT  12
+#define CRAFT_TYPE_PRESS  13
 
 
 // CRAFT_x: Craft Flags for do_gen_craft
@@ -750,7 +755,8 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_NEXUS_CRYSTALS  24
 #define CHORE_MILLING  25
 #define CHORE_REPAIR_VEHICLES  26
-#define NUM_CHORES  27		// total
+#define CHORE_OILMAKING  27
+#define NUM_CHORES  28		// total
 
 
 /* Diplomacy types */
@@ -1084,6 +1090,7 @@ typedef struct vehicle_data vehicle_data;
 #define CMPF_TEMPERATE  BIT(16)
 #define CMPF_TROPICAL  BIT(17)
 #define CMPF_COMMON  BIT(18)
+#define CMPF_AQUATIC  BIT(19)
 
 
 // Container flags -- limited to 31 because of int type in obj value
@@ -1702,7 +1709,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_CLIMATES  4 // total
 
 
-// depletion types
+// DPLTN_x: depletion types
 #define DPLTN_DIG  0
 #define DPLTN_FORAGE  1
 #define DPLTN_GATHER  2
@@ -1711,7 +1718,8 @@ typedef struct vehicle_data vehicle_data;
 #define DPLTN_QUARRY  5
 #define DPLTN_PAN  6
 #define DPLTN_TRAPPING  7
-#define NUM_DEPLETION_TYPES  8	// total
+#define DPLTN_CHOP  8
+#define NUM_DEPLETION_TYPES  9	// total
 
 
 // world evolutions
@@ -3143,13 +3151,6 @@ struct city_metadata_type {
 struct empire_chore_type {
 	char *name;
 	mob_vnum mob;
-};
-
-
-// for do_fish
-struct fishing_data_type {
-	int vnum;
-	double chance;
 };
 
 

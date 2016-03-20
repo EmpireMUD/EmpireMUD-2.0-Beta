@@ -98,6 +98,14 @@ Citizens:  2
 
 A cabin is slightly larger than a hut, but still contains just one room.
 #
+"CABINET OF CURIOSITIES" CABINETOFCURIOSITIES CURIOS
+
+[CC]  Cabinet of Curiosities  (Luxury ability)
+
+This building stores the rare items that are found in various adventures.
+
+See also:  LUXURY, STORAGE, TROPHY ROOM
+#
 CANNERY
 
 {CC}  Cannery  (no skill required)
@@ -569,6 +577,16 @@ You can pick more herbs than normal before the tile is depleted.
 
 See also: PICK
 #
+OILMAKER "OIL MAKER"
+
+(OO)  Oilmaker  (Artisans ability)
+
+Stored here:  oil
+
+The oilmaker is used to press olives and other resources into oil.
+
+See also: PRESS, STORAGE
+#
 PARK
 
 &g.^.&co&0  Park  (Monuments ability)
@@ -1004,6 +1022,13 @@ You can quickly build a shelter to protect yourself from nasty surprises
 while you sleep.
 
 When you're done with the shelter, be sure to dismantle and abandon it.
+#
+"TROPHY ROOM"
+
+The trophy room can be added to any building that can have a great hall. It
+stores items that are found on various adventures.
+
+See also: CABINET OF CURIOSITIES, STORAGE
 #
 UNDERGROUNDCOMPLEX "UNDERGROUND COMPLEX" "UNDERGROUND PASSAGE"
 

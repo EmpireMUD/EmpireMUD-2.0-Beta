@@ -1255,6 +1255,7 @@ const char *craft_types[] = {
 	"WORKFORCE",
 	"MANUFACTURE",
 	"SMELT",
+	"PRESS",
 	"\n"
 };
 
@@ -1934,6 +1935,7 @@ const char *component_flags[] = {
 	"temperate",
 	"tropical",
 	"common",
+	"aquatic",
 	"\n"
 };
 
@@ -2157,6 +2159,7 @@ const char *bld_flags[] = {
 	"2ND-TERRITORY",
 	"SHIPYARD",
 	"UPGRADED",
+	"PRESS",
 	"\n"
 };
 
@@ -2189,7 +2192,8 @@ const char *depletion_type[NUM_DEPLETION_TYPES] = {
 	"fish",
 	"quarry",
 	"pan",
-	"trapping"
+	"trapping",
+	"chop"
 };
 
 
@@ -2237,7 +2241,7 @@ const char *evo_types[] = {
 
 // EVO_x -- what type of data the evolution.value uses
 const int evo_val_types[NUM_EVOS] = {
-	EVO_VAL_NUMBER,	// chopped-down
+	EVO_VAL_NONE,	// chopped-down
 	EVO_VAL_NONE,	// crop-grows
 	EVO_VAL_SECTOR,	// adjacent-one
 	EVO_VAL_SECTOR,	// adjacent-many
@@ -2632,6 +2636,7 @@ const char *affect_types[] = {
 	"conferred",
 	"morph",
 	"whisperstride",
+	"well-fed",
 	"\n"
 	};
 
@@ -2702,6 +2707,7 @@ const char *affect_wear_off_msgs[] = {
 	"Your conferred strength returns.",
 	"",	// morph stats -- no wear-off message
 	"Your whisperstride fades.",
+	"You no longer feel well-fed.",
 	"\n"
 };
 
@@ -2791,21 +2797,6 @@ double skill_check_difficulty_modifier[NUM_DIFF_TYPES] = {
 const char *skill_flags[] = {
 	"IN-DEVELOPMENT",
 	"\n"
-};
-
-
-// for do_fish
-const struct fishing_data_type fishing_data[] = {
-	{ o_GLOWING_SEASHELL, 20 },	// formerly 12	// formerly 8.5
-	{ o_WORN_STATUETTE, 0.25 },
-	{ o_HESTIAN_TRINKET, 0.25 },
-	{ o_TRINKET_OF_CONVEYANCE, 0.25 },
-	{ o_SEA_JUNK, 5 },
-	{ o_LINEFISH, 25 },
-	{ o_ARROWFISH, 25 },
-
-	// must come last -- any catch-all with 100% to grab the overflow
-	{ o_BARBFISH, 100 }
 };
 
 
@@ -3097,6 +3088,9 @@ const char *interact_types[] = {
 	"SAW",
 	"TAN",
 	"CHIP",
+	"CHOP",
+	"FISH",
+	"PAN",
 	"\n"
 };
 
@@ -3123,6 +3117,9 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// saw
 	TYPE_OBJ,	// tan
 	TYPE_OBJ,	// chip
+	TYPE_ROOM,	// chop
+	TYPE_ROOM,	// fish
+	TYPE_ROOM,	// pan
 };
 
 
@@ -3148,6 +3145,9 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// saw
 	TYPE_OBJ,	// tan
 	TYPE_OBJ,	// chip
+	TYPE_OBJ,	// chop
+	TYPE_OBJ,	// fish
+	TYPE_OBJ,	// pan
 };
 
 

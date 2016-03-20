@@ -160,10 +160,9 @@ The Mill~
 C
 inventory, mill, retrieve, store~
 D
-   This small building is wind-powered and has two sets of large grinding
-stones. The first is used to grind wheat or other dry grains, and many millers
-dedicate their lives to perfecting their flour. The second set is used to
-grind olives or other fruits into oil.
+   This small building is wind-powered and has a large set of grinding stones,
+used to grind wheat and dry grains into flour. Many millers dedicate their
+lives to developing the finest product.
 ~
 M
 234 10.00 ce
@@ -365,7 +364,6 @@ A Clay Pit~
 0 0 0 -1
 C
 dig~
-I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 9.00 1 X  # DIG: a rock
 I 5 101 100.00 1 X  # DIG: a pile of clay
 S
@@ -1387,5 +1385,35 @@ A Draining Oasis~
 1 0 dp 0
 0 0 0 -1
 T 5191
+S
+#5192
+Oilmaker~
+The Oilmaker~
+&0(OO)~
+15 0 pRV 0
+0 0 0 275
+C
+inventory, press, restrieve, store~
+D
+   The oilmaker would be a spacious building if not for the barrels stored
+here. A small mill in the corner is used to grind olives and seeds, while a
+heavy stone press in the other corner extracts the precious oil.
+~
+S
+#5193
+Cabinet of Curiosities~
+A Cabinet of Curiosities~
+&0[CC]~
+15 0 pR 0
+0 0 0 -1
+C
+inventory, retrieve, store~
+D
+   Musty shelves covered in strange baubles, cracked hides, and the bones of
+unknown creatures line every free inch of this old museum. Despite the name,
+this room is fairly large -- at least, before the shelves. It appears to be a
+collection of the spoils of many an adventure, though you can barely see it as
+the dusty air blocks what little light sneaks in between the relics.
+~
 S
 $

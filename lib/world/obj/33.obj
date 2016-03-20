@@ -140,7 +140,7 @@ a jar of olive oil~
 A jar of olive oil is sitting on the ground.~
 The olive oil looks rich.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 6 168
 O
@@ -149,6 +149,8 @@ R
 5134 0
 R
 5606 0
+R
+5192 0
 S
 #3312
 flour sack~
@@ -688,5 +690,315 @@ This flat oat cake looks like it would keep you well nourished.
 7 336
 R
 5606 0
+S
+#3345
+meatloaf loaf hearty~
+a hearty meatloaf~
+A hearty meatloaf is sitting on the ground.~
+This hearty meatloaf will make you strong.
+~
+6 mp a 2
+48 0 0
+7 336
+A
+1 1 0
+C
+0 100
+M
+4
+You savor the hearty meatloaf.~
+S
+#3346
+pie shepherd's shepherds~
+a shepherd's pie~
+A shepherd's pie is sitting on the ground.~
+This old family recipe will boost your dexterity.
+~
+6 mp a 3
+48 0 0
+7 336
+A
+2 1 0
+C
+0 100
+M
+4
+You eat a big portion of the savory shepherd's pie.~
+S
+#3347
+fish chips plate~
+fish and chips~
+A plate of fish and chips is sitting here.~
+   These fish and chips remind you of your time at the seaside, and those salty
+memories will boost your charisma.
+~
+6 mp a 3
+48 0 0
+7 336
+A
+4 1 0
+C
+0 100
+M
+4
+You eat the perfectly crispy fish and chips.~
+S
+#3348
+chicken dumplings plate~
+chicken and dumplings~
+A plate of chicken and dumplings is sitting here.~
+This old cottage recipe will boost your intelligence.
+~
+6 mp a 3
+48 0 0
+7 336
+A
+8 1 0
+C
+0 100
+M
+4
+You enjoy the chicken and dumplings -- just like mother used to make.~
+S
+#3349
+cobbler berry rich~
+a rich berry cobbler~
+A rich berry cobbler is lying on the ground.~
+This old-fashioned desert is exactly what you need to boost your wits.
+~
+6 mp a 3
+48 0 0
+7 336
+A
+9 1 0
+C
+0 100
+M
+4
+You eat the warm berry cobbler, and think fondly of home.~
+S
+#3350
+sausage black~
+a black sausage~
+A black sausage is sitting here on the ground.~
+   This sausage isn't made from the best parts of the animal, but it will boost
+your ability to hit things.
+~
+6 mp a 3
+48 0 0
+7 336
+A
+17 1 0
+C
+0 100
+M
+4
+You choke down some of the black sausage.~
+S
+#3351
+eels jellied~
+jellied eels~
+A plate of jellied eels is sitting here.~
+This old-fashioned dish will make you slippery and boost your dodge.
+~
+6 mp a 3
+48 0 0
+7 336
+A
+18 1 0
+C
+0 100
+M
+4
+You eat some of the jellied eels, which taste better than they sound.~
+S
+#3352
+roast pot~
+a pot roast~
+A pot roast is sitting here.~
+The savory pot roast will boost your health.
+~
+6 mp a 3
+48 0 0
+7 336
+A
+15 1 0
+C
+0 100
+M
+4
+You eat the meaty pot roast.~
+S
+#3353
+chili bowl~
+a bowl of chili~
+A bowl of chili is sitting here.~
+This spicy chili will warm your bones and boost your stamina.
+~
+6 mp a 3
+48 0 0
+7 336
+A
+11 1 0
+C
+0 100
+M
+4
+You savor the spicy chili as you eat it.~
+S
+#3354
+pie mom's moms fruit~
+mom's fruit pie~
+Mom's fruit pie is sitting here.~
+This old-fashioned pie is sure to boost your mana.
+~
+6 mp a 3
+48 0 0
+7 336
+A
+16 1 0
+C
+0 100
+M
+4
+Every bite of the fruit pie reminds you of home.~
+S
+#3355
+biscuits gravy~
+biscuits and gravy~
+Some biscuits and gravy are sitting here.~
+This homestyle favorite will boost your move regeneration.
+~
+6 mp a 3
+48 0 0
+7 336
+A
+6 1 0
+C
+0 100
+M
+4
+The biscuits and gravy tastes like a warm fireside meal.~
+S
+#3356
+vegetables stewed~
+stewed vegetables~
+Some stewed vegetables are sitting here.~
+These stewed vegetables will fill you up and boost your mana regeneration.
+~
+6 mp a 3
+48 0 0
+7 336
+A
+7 1 0
+C
+0 100
+M
+4
+You savor the subtle flavor of the vegetables.~
+S
+#3357
+feast turkey roast~
+the roast turkey feast~
+Someone has set up a roast turkey feast!~
+   There is a banquet of turkey and trimmings. It's enough to feed the whole
+party! This feast will boost melee fighters.  
+~
+6 m 0 3
+96 0 0
+7 336
+A
+17 1 0
+A
+9 1 0
+A
+21 1 0
+M
+4
+You fill yourself on turkey and stuffing.~
+S
+#3358
+board vegetables mixed~
+the mixed vegetable board~
+Someone has set up a mixed vegetable board!~
+   The board is covered with all manner of roast vegetables, in every color. 
+It's enough to feed the whole party! This feast will boost healers.  
+~
+6 m 0 4
+96 0 0
+7 336
+A
+7 1 0
+A
+9 1 0
+A
+23 1 0
+M
+4
+You fill yourself on roast vegetables.~
+S
+#3359
+feast seafood~
+the seafood feast~
+Someone has set up a seafood feast!~
+   This overflowing feast of seafood is enough to feed the whole party! This
+feast will boost casters.  
+~
+6 m 0 4
+96 0 0
+7 336
+A
+17 1 0
+A
+9 1 0
+A
+22 1 0
+M
+4
+You fill yourself on the bountiful seafood.~
+S
+#3360
+platter roast meat~
+the roast meat platter~
+Someone has set up a roast meat platter!~
+   This feast of roast meats is enough to feed the whole party! It will boost
+tanks in particular.  
+~
+6 m 0 4
+96 0 0
+7 336
+A
+18 1 0
+A
+13 1 0
+A
+24 1 0
+A
+12 1 0
+M
+4
+You fill yourself on roast meats.~
+S
+#3361
+platter dessert extravagant~
+the extravagant dessert platter~
+Someone has set up an extravagant dessert platter!~
+   This buffet of desserts would make the baker blush. It looks like it's just
+the thing to boost your party members!  
+~
+6 m 0 4
+96 0 0
+7 336
+A
+9 1 0
+A
+17 1 0
+A
+18 1 0
+A
+2 1 0
+M
+4
+You fill yourself on fancy desserts.~
 S
 $

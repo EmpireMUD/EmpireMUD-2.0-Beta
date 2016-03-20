@@ -945,7 +945,7 @@ char *get_skill_abilities_display(char_data *ch, skill_data *skill, any_vnum pre
 		else if (skab->level < SPECIALTY_SKILL_CAP) {
 			max_skill = SPECIALTY_SKILL_CAP;
 		}
-		else if (skab->level < CLASS_SKILL_CAP) {
+		else if (skab->level <= CLASS_SKILL_CAP) {
 			max_skill = CLASS_SKILL_CAP;
 		}
 		

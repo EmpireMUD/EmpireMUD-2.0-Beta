@@ -96,19 +96,17 @@ void change_base_sector(room_data *room, sector_data *sect) {
 
 
 /**
-* This changes the territory when a chop finishes, and returns the number of
-* trees.
+* This changes the territory when a chop finishes, if there's an evolution for
+* it. (No effect on rooms without the evolution.)
 *
 * @param room_data *room The room.
-* @return int the number of trees received
 */
-int change_chop_territory(room_data *room) {	
+void change_chop_territory(room_data *room) {
 	struct evolution_data *evo;
-	int trees = 1;
 	crop_data *cp;
 	
 	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD) && (cp = ROOM_CROP(room))) {
-		trees = 1;
+		// TODO: This is a special case for orchards
 		
 		// check if original sect was stored to the crop
 		if (BASE_SECT(room) != SECT(room)) {
@@ -120,15 +118,12 @@ int change_chop_territory(room_data *room) {
 		}
 	}
 	else if ((evo = get_evolution_by_type(SECT(room), EVO_CHOPPED_DOWN))) {
-		trees = evo->value;
+		// normal case
 		change_terrain(room, evo->becomes);
 	}
 	else {
-		trees = 0;
-		log("SYSERR: change_chop_terrain called on room %d, sect vnum %d, but no valid chop rules found", GET_ROOM_VNUM(room), GET_SECT_VNUM(SECT(room)));
+		// it's actually okay to call this on an unchoppable room.
 	}
-
-	return trees;
 }
 
 
@@ -187,6 +182,9 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	remove_room_extra_data(room, ROOM_EXTRA_HARVEST_PROGRESS);
 	remove_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS);
 	remove_room_extra_data(room, ROOM_EXTRA_SEED_TIME);
+	
+	// always reset some depletions
+	remove_depletion(room, DPLTN_CHOP);
 	
 	// if we picked a crop type, 
 	if (new_crop) {

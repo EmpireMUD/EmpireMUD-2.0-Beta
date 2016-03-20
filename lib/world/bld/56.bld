@@ -422,4 +422,22 @@ M
 M
 9199 2.00 0
 S
+#5621
+Trophy Room~
+The Trophy Room~
+~
+0 0 a i
+0 0 0 -1
+C
+inventory, retrieve, store~
+D
+   The room is lined with shelves of neatly arranged trinkets, relics, and
+gems. This collection has surely been amassed by a great adventurer and, from
+the cleanliness, you surmise the owner is very proud.  
+~
+M
+9190 2.00 0
+M
+9198 2.00 0
+S
 $

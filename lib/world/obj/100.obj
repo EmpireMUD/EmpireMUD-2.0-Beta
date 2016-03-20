@@ -97,13 +97,17 @@ a dragon scale~
 A dragon scale is lying on the ground.~
 The dragon scale looks like you could use it to craft something impressive.
 ~
-15 el a 1
+15 el a 3
 1 0 0
 7 0
 R
-5611 a
-R
 5184 a
+R
+5621 a
+R
+5193 a
+R
+5611 a
 S
 #10007
 shield dragonscale scale~
@@ -441,35 +445,35 @@ reflection you see, but rather the entrance to the tower.
 S
 #10036
 skystone stone small~
-a skystone~
+a small skystone~
 A small skystone is lying here.~
    Skystones are used to buy things at the Tower Skycleave. You can type
-'combine skystone' to combine 5 of them into a greater skystone.
+'combine small' to combine 5 of them into a greater skystone.  
 ~
-3 l a 3
+3 l a 5
 0 0 0
 10 0
 I 14 10037 100.00 5 x  # COMBINE: a greater skystone
 R
-5184 a
+5193 0
 R
-5611 a
+5621 0
 S
 #10037
 skystone greater stone~
 a greater skystone~
 A greater skystone is sitting on the ground.~
    Skystones are used to buy things at the Tower Skycleave. You can type
-'separate greater' to separate it into smaller skystones.  
+'separate greater' to separate it into smaller skystones.
 ~
-3 l a 3
+3 l a 4
 0 0 0
 10 0
-I 15 10036 100.00 5 x  # SEPARATE: a skystone
+I 15 10036 100.00 5 x  # SEPARATE: a small skystone
 R
-5184 a
+5193 0
 R
-5611 a
+5621 0
 S
 #10038
 belt skycleaver~

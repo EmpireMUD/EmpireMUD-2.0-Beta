@@ -38,6 +38,7 @@
 // external vars
 
 // external funcs
+void scale_item_to_level(obj_data *obj, int level);
 extern bool trigger_counterspell(char_data *ch);	// spells.c
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 
@@ -313,9 +314,7 @@ bool can_use_ritual(char_data *ch, int ritual) {
 
 
 // for devastation_ritual
-INTERACTION_FUNC(devastate_crop) {
-	void scale_item_to_level(obj_data *obj, int level);
-	
+INTERACTION_FUNC(devastate_crop) {	
 	crop_data *cp = ROOM_CROP(inter_room);
 	obj_data *newobj;
 	int num;
@@ -332,9 +331,32 @@ INTERACTION_FUNC(devastate_crop) {
 		load_otrigger(newobj);
 	}
 	
-	// additional tree if orchard
-	if (ROOM_CROP_FLAGGED(inter_room, CROPF_IS_ORCHARD)) {
-		obj_to_char_or_room((newobj = read_object(o_TREE, TRUE)), ch);
+	return TRUE;
+}
+
+
+// for devastation_ritual
+INTERACTION_FUNC(devastate_trees) {
+	char buf[MAX_STRING_LENGTH], type[MAX_STRING_LENGTH];
+	obj_data *newobj;
+	int num;
+	
+	snprintf(type, sizeof(type), GET_SECT_NAME(SECT(inter_room)));
+	strtolower(type);
+	
+	if (interaction->quantity != 1) {
+		snprintf(buf, sizeof(buf), "You devastate the %s and collect %s (x%d)!", type, get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+	}
+	else {
+		snprintf(buf, sizeof(buf), "You devastate the %s and collect %s!", type, get_obj_name_by_proto(interaction->vnum));
+	}
+	act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
+	
+	snprintf(buf, sizeof(buf), "$n's powerful ritual devastates the %s!", type);
+	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
 		scale_item_to_level(newobj, 1);	// minimum level
 		load_otrigger(newobj);
 	}
@@ -1899,16 +1921,15 @@ RITUAL_SETUP_FUNC(start_devastation_ritual) {
 
 
 RITUAL_FINISH_FUNC(perform_devastation_ritual) {
-	extern int change_chop_territory(room_data *room);
+	extern void change_chop_territory(room_data *room);
 	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 	
 	room_data *rand_room, *to_room = NULL;
-	obj_data *newobj;
 	crop_data *cp;
 	int dist, iter;
-	int x, y, num;
+	int x, y;
 	
-	#define CAN_DEVASTATE(room)  ((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) || CAN_CHOP_ROOM(room)) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE))
+	#define CAN_DEVASTATE(room)  ((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) || (CAN_CHOP_ROOM(room) && get_depletion((room), DPLTN_CHOP) < config_get_int("chop_depletion"))) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE))
 	#define DEVASTATE_RANGE  3	// tiles
 
 	// check this room
@@ -1938,19 +1959,9 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 	
 	// SUCCESS: distribute resources
 	if (to_room) {
-		if (has_evolution_type(SECT(to_room), EVO_CHOPPED_DOWN)) {
-			num = change_chop_territory(to_room);
-			
-			msg_to_char(ch, "You devastate the forest and collect %s tree%s!\r\n", num > 1 ? "some" : "a", num > 1 ? "s" : "");
-			act("$n's powerful ritual devastates the forest!", FALSE, ch, NULL, NULL, TO_ROOM);
-			
-			while (num-- > 0) {
-				obj_to_char_or_room((newobj = read_object(o_TREE, TRUE)), ch);
-				load_otrigger(newobj);
-			}
-		}
-		else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room)) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
+		if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room)) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
 			run_room_interactions(ch, to_room, INTERACT_HARVEST, devastate_crop);
+			run_room_interactions(ch, to_room, INTERACT_CHOP, devastate_trees);
 			
 			// check for original sect, which may have been stored
 			if (BASE_SECT(to_room) != SECT(to_room)) {
@@ -1960,6 +1971,10 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 				// fallback sect
 				change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
 			}
+		}
+		else if (CAN_CHOP_ROOM(to_room) && get_depletion(to_room, DPLTN_CHOP) < config_get_int("chop_depletion")) {
+			run_room_interactions(ch, to_room, INTERACT_CHOP, devastate_trees);
+			change_chop_territory(to_room);
 		}
 		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(to_room))) {
 			msg_to_char(ch, "You devastate the seeded field!\r\n");

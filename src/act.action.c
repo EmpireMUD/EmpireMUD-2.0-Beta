@@ -38,6 +38,7 @@
 // external vars
 
 // external funcs
+extern room_data *dir_to_room(room_data *room, int dir);
 extern double get_base_dps(obj_data *weapon);
 extern obj_data *find_chip_weapon(char_data *ch);
 extern obj_data *has_sharp_tool(char_data *ch);
@@ -388,24 +389,34 @@ void cancel_morphing(char_data *ch) {
 * @param char_data *ch The player to start chopping.
 */
 void start_chopping(char_data *ch) {
-	int chop_timer = config_get_int("chop_timer");
+	char buf[MAX_STRING_LENGTH], weapon[MAX_STRING_LENGTH];
 	
 	if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to chop here.\r\n");
 	}
-	else if (!CAN_CHOP_ROOM(IN_ROOM(ch))) {
+	else if (!CAN_CHOP_ROOM(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_CHOP) >= config_get_int("chop_depletion")) {
 		msg_to_char(ch, "There's nothing left here to chop.\r\n");
 	}
 	else {
 		start_action(ch, ACT_CHOPPING, 0);
-
+		
 		// ensure progress data is set up
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS) <= 0) {
-			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, chop_timer);
+			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, config_get_int("chop_timer"));
 		}
 		
-		send_to_char("You swing back your axe and prepare to chop...\r\n", ch);
-		act("$n swings $s axe over $s shoulder.", TRUE, ch, 0, 0, TO_ROOM);
+		if (GET_EQ(ch, WEAR_WIELD)) {
+			strcpy(weapon, skip_filler(GET_OBJ_SHORT_DESC(GET_EQ(ch, WEAR_WIELD))));
+		}
+		else {
+			strcpy(weapon, "axe");
+		}
+		
+		snprintf(buf, sizeof(buf), "You swing back your %s and prepare to chop...", weapon);
+		act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
+		
+		snprintf(buf, sizeof(buf), "$n swings $s %s over $s shoulder.", weapon);
+		act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 
@@ -456,15 +467,17 @@ void start_mining(char_data *ch) {
 * Begins panning.
 *
 * @param char_data *ch The panner.
+* @param int dir Which direction the character is panning (or NO_DIR for same-tile).
 */
-void start_panning(char_data *ch) {
+void start_panning(char_data *ch, int dir) {
 	int panning_timer = config_get_int("panning_timer");
 	
 	if (find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, 1)) {
 		start_action(ch, ACT_PANNING, panning_timer);
+		GET_ACTION_VNUM(ch, 0) = dir;
 		
-		msg_to_char(ch, "You kneel down and begin panning at the shore.\r\n");
-		act("$n kneels down and begins panning at the shore.", TRUE, ch, 0, 0, TO_ROOM);
+		msg_to_char(ch, "You kneel down and begin panning.\r\n");
+		act("$n kneels down and begins panning.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 
@@ -504,17 +517,39 @@ void start_quarrying(char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// ACTION FINISHERS ////////////////////////////////////////////////////////
 
+INTERACTION_FUNC(finish_chopping) {
+	char buf[MAX_STRING_LENGTH];
+	obj_data *obj = NULL;
+	int num;
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(obj, 1);	// minimum level
+		obj_to_char(obj, ch);
+		load_otrigger(obj);
+	}
+	
+	// messaging
+	if (obj) {
+		if (interaction->quantity > 1) {
+			sprintf(buf, "With a loud crack, $p (x%d) falls!", interaction->quantity);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		else {
+			act("With a loud crack, $p falls!", FALSE, ch, obj, NULL, TO_CHAR);
+		}		
+		
+		act("$n collects $p.", FALSE, ch, obj, NULL, TO_ROOM);
+	}
+	
+	return TRUE;
+}
+
+
 INTERACTION_FUNC(finish_digging) {	
 	obj_vnum vnum = interaction->vnum;
 	obj_data *obj = NULL;
 	int num;
-	
-	// vnum override: clay happens near water tiles when NOT on rough terrain or in a building
-	if (!ROOM_SECT_FLAGGED(inter_room, SECTF_ROUGH) && !GET_BUILDING(inter_room) && find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER | SECTF_OCEAN, NOBITS, 1)) {
-		if (number(0, 4)) {
-			vnum = o_CLAY;
-		}
-	}
 	
 	// depleted? (uses rock for all types except clay)
 	if (get_depletion(inter_room, DPLTN_DIG) >= DEPLETION_LIMIT(inter_room)) {
@@ -542,6 +577,35 @@ INTERACTION_FUNC(finish_digging) {
 			act(buf1, FALSE, ch, obj, 0, TO_CHAR);
 			act("$n pulls $p from the ground!", FALSE, ch, obj, 0, TO_ROOM);
 		}
+	}
+	
+	return TRUE;
+}
+
+
+INTERACTION_FUNC(finish_fishing) {
+	char buf[MAX_STRING_LENGTH];
+	obj_data *obj = NULL;
+	int num;
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(obj, 1);	// minimum level
+		obj_to_char(obj, ch);
+		load_otrigger(obj);
+	}
+	
+	// messaging
+	if (obj) {
+		if (interaction->quantity > 1) {
+			sprintf(buf, "You jab your spear into the water and when you extract it you find $p (x%d) on the end!", interaction->quantity);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		else {
+			act("You jab your spear into the water and when you extract it you find $p on the end!", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		
+		act("$n jabs $s spear into the water and when $e draws it out, it has $p on the end!", TRUE, ch, obj, NULL, TO_ROOM);
 	}
 	
 	return TRUE;
@@ -651,6 +715,35 @@ INTERACTION_FUNC(finish_mining) {
 	}
 	
 	return any;
+}
+
+
+INTERACTION_FUNC(finish_panning) {
+	char buf[MAX_STRING_LENGTH];
+	obj_data *obj = NULL;
+	int num;
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(obj, 1);	// minimum level
+		obj_to_char(obj, ch);
+		load_otrigger(obj);
+	}
+	
+	// messaging
+	if (obj) {
+		if (interaction->quantity > 1) {
+			sprintf(buf, "You find $p (x%d)!", interaction->quantity);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		else {
+			act("You find $p!", FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		
+		act("$n finds $p!", FALSE, ch, obj, NULL, TO_ROOM);
+	}
+	
+	return TRUE;
 }
 
 
@@ -962,60 +1055,54 @@ void process_chipping(char_data *ch) {
 void process_chop(char_data *ch) {
 	extern int change_chop_territory(room_data *room);
 	
+	bool got_any = FALSE;
 	char_data *ch_iter;
-	int count, total, trees = 1;
-	obj_data *obj;
 	
-	total = 1;	// number of times to chop (add things that speed up chop)
-	for (count = 0; count < total && GET_ACTION(ch) == ACT_CHOPPING; ++count) {
-		if (!GET_EQ(ch, WEAR_WIELD) || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE) {
-			send_to_char("You need to be wielding an axe to chop.\r\n", ch);
-			cancel_action(ch);
-			break;
-		}
+	if (!GET_EQ(ch, WEAR_WIELD) || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE) {
+		send_to_char("You need to be wielding an axe to chop.\r\n", ch);
+		cancel_action(ch);
+		return;
+	}
 
-		add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * (GET_STRENGTH(ch) + 2 * get_base_dps(GET_EQ(ch, WEAR_WIELD))));
-		act("You swing $p hard into the tree!", FALSE, ch, GET_EQ(ch, WEAR_WIELD), 0, TO_CHAR | TO_SPAMMY);
-		act("$n swings $p hard into the tree!", FALSE, ch, GET_EQ(ch, WEAR_WIELD), 0, TO_ROOM | TO_SPAMMY);
-
-		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS) <= 0) {
-			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS);
-			trees = change_chop_territory(IN_ROOM(ch));
-
-			if (trees > 1) {
-				sprintf(buf1, " (x%d)", trees);
-			}
-			else {
-				*buf1 = '\0';
-			}
-			
-			sprintf(buf, "With a loud crack, the tree falls%s!", buf1);
-			act(buf, FALSE, ch, 0, 0, TO_CHAR | TO_ROOM);
-			
-			// give a tree
-			while (trees-- > 0) {
-				obj = read_object(o_TREE, TRUE);
-				obj_to_char_or_room(obj, ch);
-				load_otrigger(obj);
-			}
+	add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS, -1 * (GET_STRENGTH(ch) + 2 * get_base_dps(GET_EQ(ch, WEAR_WIELD))));
+	act("You swing $p hard!", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR | TO_SPAMMY);
+	act("$n swings $p hard!", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_ROOM | TO_SPAMMY);
+	
+	// complete?
+	if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS) <= 0) {
+		remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS);
 		
-			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-				gain_skill_exp(ch, SKILL_EMPIRE, 15);
-			}
-			
-			// stoppin choppin -- don't use stop_room_action because we also restart them
-			// (this includes ch)
-			for (ch_iter = ROOM_PEOPLE(IN_ROOM(ch)); ch_iter; ch_iter = ch_iter->next_in_room) {
-				if (!IS_NPC(ch_iter) && GET_ACTION(ch_iter) == ACT_CHOPPING) {
-					cancel_action(ch_iter);
-					start_chopping(ch_iter);
-				}
-			}
-			// but stop npc choppers
-			stop_room_action(IN_ROOM(ch), NOTHING, CHORE_CHOPPING);
-			// and harvesters
-			stop_room_action(IN_ROOM(ch), NOTHING, CHORE_FARMING);
+		// run interacts for items only if not depleted
+		if (get_depletion(IN_ROOM(ch), DPLTN_CHOP) < config_get_int("chop_depletion")) {
+			got_any = run_room_interactions(ch, IN_ROOM(ch), INTERACT_CHOP, finish_chopping);
+			add_depletion(IN_ROOM(ch), DPLTN_CHOP, FALSE);
 		}
+		
+		if (!got_any) {
+			// likely didn't get a completion message
+			act("You finish chopping.", FALSE, ch, NULL, NULL, TO_CHAR);
+			act("$n finishes chopping.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
+		
+		// attempt to change terrain
+		change_chop_territory(IN_ROOM(ch));
+		
+		if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+			gain_skill_exp(ch, SKILL_EMPIRE, 15);
+		}
+		
+		// stoppin choppin -- don't use stop_room_action because we also restart them
+		// (this includes ch)
+		for (ch_iter = ROOM_PEOPLE(IN_ROOM(ch)); ch_iter; ch_iter = ch_iter->next_in_room) {
+			if (!IS_NPC(ch_iter) && GET_ACTION(ch_iter) == ACT_CHOPPING) {
+				cancel_action(ch_iter);
+				start_chopping(ch_iter);
+			}
+		}
+		// but stop npc choppers
+		stop_room_action(IN_ROOM(ch), NOTHING, CHORE_CHOPPING);
+		// and harvesters
+		stop_room_action(IN_ROOM(ch), NOTHING, CHORE_FARMING);
 	}
 }
 
@@ -1200,20 +1287,24 @@ void process_fillin(char_data *ch) {
 * @param char_data *ch The fisher (Bobby?)
 */
 void process_fishing(char_data *ch) {
-	extern const struct fishing_data_type fishing_data[];
+	bool success = FALSE;
+	room_data *room;
+	int dir;
 	
-	obj_data *obj;
-	int prc, iter, rand;
-	obj_vnum vnum = NOTHING;
-	
-	int fishing_timer = config_get_int("fishing_timer");
+	dir = GET_ACTION_VNUM(ch, 0);
+	room = (dir == NO_DIR) ? IN_ROOM(ch) : dir_to_room(IN_ROOM(ch), dir);
 	
 	if (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) != ITEM_WEAPON || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_JAB) {
 		msg_to_char(ch, "You'll need a spear to fish.\r\n");
 		cancel_action(ch);
 		return;
 	}
-
+	if (!room || !CAN_INTERACT_ROOM(room, INTERACT_FISH) || !can_use_room(ch, room, MEMBERS_ONLY)) {
+		msg_to_char(ch, "You can no longer fish %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
+		cancel_action(ch);
+		return;
+	}
+	
 	GET_ACTION_TIMER(ch) -= GET_CHARISMA(ch) + (skill_check(ch, ABIL_FISH, DIFF_MEDIUM) ? 2 : 0);
 	
 	if (GET_ACTION_TIMER(ch) > 0) {
@@ -1238,37 +1329,25 @@ void process_fishing(char_data *ch) {
 			}
 		}
 	}
-	else if (get_depletion(IN_ROOM(ch), DPLTN_FISH) >= DEPLETION_LIMIT(IN_ROOM(ch))) {
+	else if (get_depletion(room, DPLTN_FISH) >= DEPLETION_LIMIT(room)) {
 		msg_to_char(ch, "You just don't seem to be able to catch anything here.\r\n");
 		GET_ACTION(ch) = ACT_NONE;
 	}
 	else {
-		// restart action first
-		start_action(ch, ACT_FISHING, fishing_timer / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1));
-
-		// find loot
-		prc = 0;
-		rand = number(1, 10000);
-		for (iter = 0; (iter == 0 || fishing_data[iter - 1].chance < 100) && vnum == NOTHING; ++iter) {
-			prc += fishing_data[iter].chance * 100;
-			if (rand < prc) {
-				vnum = fishing_data[iter].vnum;
-			}
-		}
-
-		// dole loot
-		if (vnum != NOTHING) {
-			obj = read_object(vnum, TRUE);
-			obj_to_char_or_room(obj, ch);
-			
-			add_depletion(IN_ROOM(ch), DPLTN_FISH, TRUE);
+		// SUCCESS
+		msg_to_char(ch, "A fish darts past you...\r\n");
+		success = run_room_interactions(ch, room, INTERACT_FISH, finish_fishing);
 		
-			msg_to_char(ch, "A fish darts past you...\r\n");
-			act("You jab your spear into the water and when you extract it you find $p on the end!", FALSE, ch, obj, 0, TO_CHAR);
-			act("$n jabs $s spear into the water and when $e draws it out, it has $p on the end!", TRUE, ch, obj, 0, TO_ROOM);
-			gain_ability_exp(ch, ABIL_FISH, 10);
-			load_otrigger(obj);
+		if (success) {
+			add_depletion(room, DPLTN_FISH, TRUE);
 		}
+		else {
+			msg_to_char(ch, "You can't seem to catch anything.\r\n");
+		}
+		
+		// restart action
+		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1));
+		GET_ACTION_VNUM(ch, 0) = dir;
 	}
 }
 
@@ -1532,46 +1611,44 @@ void process_music(char_data *ch) {
 *
 * @param char_data *ch The panner.
 */
-void process_panning(char_data *ch) {	
-	room_data *in_room;
-	obj_data *obj;
+void process_panning(char_data *ch) {
+	bool success = FALSE;
+	room_data *room;
+	int dir;
 	
-	int short_depletion = config_get_int("short_depletion");
+	dir = GET_ACTION_VNUM(ch, 0);
+	room = (dir == NO_DIR) ? IN_ROOM(ch) : dir_to_room(IN_ROOM(ch), dir);
 
 	if ((!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_PAN)) && (!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_PAN))) {
 		msg_to_char(ch, "You need to be holding a pan to do that.\r\n");
 		cancel_action(ch);
 	}
-	else if (!find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, 1)) {
-		msg_to_char(ch, "You can no longer pan here.\r\n");
+	else if (!room || !CAN_INTERACT_ROOM(room, INTERACT_PAN) || !can_use_room(ch, room, MEMBERS_ONLY)) {
+		msg_to_char(ch, "You can no longer pan %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
 		cancel_action(ch);
 	}
 	else {
 		GET_ACTION_TIMER(ch) -= 1;
-
-		if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-			msg_to_char(ch, "You sift through the sand and pebbles, looking for gold...\r\n");
-		}
-		act("$n sifts through the sand, looking for gold...", TRUE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
-
+		
+		act("You sift through the sand and pebbles, looking for gold...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+		act("$n sifts through the sand, looking for gold...", TRUE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+		
 		if (GET_ACTION_TIMER(ch) <= 0) {
 			GET_ACTION(ch) = ACT_NONE;
 			
-			if (!number(0, 19) && get_depletion(IN_ROOM(ch), DPLTN_PAN) <= short_depletion) {
-				in_room = IN_ROOM(ch);
-				obj_to_char((obj = read_object(o_GOLD_SMALL, TRUE)), ch);
-				act("You find $p!", FALSE, ch, obj, 0, TO_CHAR);
-				add_depletion(IN_ROOM(ch), DPLTN_PAN, TRUE);
-				load_otrigger(obj);
-				
-				if (in_room == IN_ROOM(ch)) {
-					start_panning(ch);
-				}
+			// pan will silently fail if depleted
+			if (get_depletion(room, DPLTN_PAN) <= config_get_int("short_depletion")) {
+				success = run_room_interactions(ch, room, INTERACT_PAN, finish_panning);
+			}
+			
+			if (success) {
+				add_depletion(room, DPLTN_PAN, TRUE);
 			}
 			else {
 				msg_to_char(ch, "You find nothing of value.\r\n");
-				start_panning(ch);
 			}
+			
+			start_panning(ch, dir);
 		}
 	}
 }
@@ -2059,18 +2136,18 @@ ACMD(do_chip) {
 
 ACMD(do_chop) {
 	if (GET_ACTION(ch) == ACT_CHOPPING) {
-		send_to_char("You stop chopping the tree.\r\n", ch);
-		act("$n stops chopping at the tree.", FALSE, ch, 0, 0, TO_ROOM);
+		send_to_char("You stop chopping.\r\n", ch);
+		act("$n stops chopping.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
 	else if (!CAN_CHOP_ROOM(IN_ROOM(ch))) {
-		send_to_char("You can't really chop down trees unless you're in the forest.\r\n", ch);
+		send_to_char("You can't really chop anything down here.\r\n", ch);
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
-		msg_to_char(ch, "You can't chop here.\r\n");
+		msg_to_char(ch, "You can't chop here right now.\r\n");
 	}
 	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to chop down trees here.\r\n");
@@ -2078,10 +2155,7 @@ ACMD(do_chop) {
 	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !has_permission(ch, PRIV_CHOP)) {
 		msg_to_char(ch, "You don't have permission to chop down trees in the empire.\r\n");
 	}
-	else if (!GET_EQ(ch, WEAR_WIELD)) {
-		send_to_char("You need to be wielding some kind of axe to chop.\r\n", ch);
-	}
-	else if (GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE) {
+	else if (!GET_EQ(ch, WEAR_WIELD) || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE) {
 		send_to_char("You need to be wielding some kind of axe to chop.\r\n", ch);
 	}
 	else {
@@ -2376,24 +2450,38 @@ ACMD(do_mint) {
 
 
 ACMD(do_pan) {
+	room_data *room = IN_ROOM(ch);
+	int dir = NO_DIR;
+	
+	any_one_arg(argument, arg);
+	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else if (GET_ACTION(ch) == ACT_PANNING) {
-		msg_to_char(ch, "You stop panning for gold.\r\n");
+		msg_to_char(ch, "You stop panning.\r\n");
 		cancel_action(ch);
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're a bit busy right now.\r\n");
 	}
-	else if (!find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, 1)) {
-		msg_to_char(ch, "You need to be near fresh water to pan for gold.\r\n");
+	else if (*arg && (dir = parse_direction(ch, arg)) == NO_DIR) {
+		msg_to_char(ch, "Pan what direction?\r\n");
+	}
+	else if (dir != NO_DIR && !(room = dir_to_room(IN_ROOM(ch), dir))) {
+		msg_to_char(ch, "You can't pan in that direction.\r\n");
+	}
+	else if (!CAN_INTERACT_ROOM(room, INTERACT_PAN)) {
+		msg_to_char(ch, "You can't pan for anything %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
+	}
+	else if (!can_use_room(ch, room, MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to pan %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
 	}
 	else if ((!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_PAN)) && (!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_PAN))) {
 		msg_to_char(ch, "You need to be holding a pan to do that.\r\n");
 	}
 	else {
-		start_panning(ch);
+		start_panning(ch, dir);
 	}
 }
 
