@@ -221,7 +221,7 @@ GRAINS "GRAIN COMPONENT"
 
 Grain (component)
 
-Grains are a component type. They currently have no usage in common.
+Used for:  cooking
 
 See also: COMPONENT
 #
@@ -380,7 +380,7 @@ Oil (component)
 
 Used for: cooking
 
-See also: COMPONENT, COOK, MILL
+See also: COMPONENT, COOK, PRESS
 #
 PILLARS "PILLAR COMPONENT"
 
@@ -480,7 +480,7 @@ Stored at:  Utility Shed, Store Room, Shipyard
 Used for:  manufacturing
 
 Ropes are used to tie mounts to land vehicles to pull them, and to control the
-sails of ships. They will be consumed when you manufuacture the vehicles - no
+sails of ships. They will be consumed when you manufacture the vehicles - no
 more ropes are needed afterwards.
 
 You can craft basic ropes from small pieces of leather.

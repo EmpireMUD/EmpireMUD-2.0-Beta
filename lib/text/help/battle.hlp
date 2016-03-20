@@ -11,6 +11,8 @@ Sparring branch: Learn to hit faster and harder, and finish the fight.
 Big Game Hunter branch: Take on the world's monsters with no fear.
 Archery branch: Strike from afar.
 
+You can train Battle up to level 15 just by fighting.
+
 See also: REFLEXES, SPARRING, BIG GAME HUNTER, ARCHERY, FIRSTAID, FLEET
 #
 AOE "AREA OF EFFECT" "AREA EFFECT" "AREA-OF-EFFECT"
@@ -166,9 +168,11 @@ FINESSE
 
 Finesse (Battle ability)
 
-With finesse, your melee attacks happen faster, leading to more damage overall.
-As a basic ability, attacks are 10% faster. As a specialty ability, they are
-15% faster. As a class ability, they are 20% faster.
+With finesse, your close-combat (non-Archery) automatic attacks happen faster,
+leading to more damage overall. As a basic ability, attacks are 10% faster. As a
+specialty ability, they are 15% faster. As a class ability, they are 20% faster.
+
+The ranged (Archery) version of this ability is Quick Draw.
 
 Gain experience when you hit a combat opponent.
 
@@ -304,6 +308,8 @@ Quick Draw (Battle ability)
 Shoot more arrows before your enemies reach you by learning to draw more
 quickly, leading to more damage per second. This improves your ranged combat
 speed by 25% (or 35% as a class ability).
+
+The close-combat version of this ability is Finesse.
 
 Gain experience when you successfully hit with an arrow.
 
