@@ -1182,7 +1182,9 @@ ACMD(do_disembark) {
 		msg_to_char(ch, "You can't disembark here while riding.\r\n");
 	}
 	else {
-		act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
+			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
 		msg_to_char(ch, "You disembark.\r\n");
 		
 		char_to_room(ch, to_room);
@@ -1191,7 +1193,9 @@ ACMD(do_disembark) {
 		}
 		look_at_room(ch);
 		
-		act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
+			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
 		
 		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 		entry_memory_mtrigger(ch);
@@ -1208,7 +1212,9 @@ ACMD(do_disembark) {
 			}
 			look_at_room(GET_LEADING_MOB(ch));
 			
-			act("$n disembarks from $V.", TRUE, GET_LEADING_MOB(ch), NULL, veh, TO_ROOM);
+			if (!AFF_FLAGGED(GET_LEADING_MOB(ch), AFF_SNEAK)) {
+				act("$n disembarks from $V.", TRUE, GET_LEADING_MOB(ch), NULL, veh, TO_ROOM);
+			}
 			
 			enter_wtrigger(IN_ROOM(GET_LEADING_MOB(ch)), GET_LEADING_MOB(ch), NO_DIR);
 			entry_memory_mtrigger(GET_LEADING_MOB(ch));
@@ -1236,7 +1242,9 @@ ACMD(do_disembark) {
 			}
 		
 			act("You follow $N.\r\n", FALSE, k->follower, NULL, ch, TO_CHAR);
-			act("$n disembarks from $V.", TRUE, k->follower, NULL, veh, TO_ROOM);
+			if (!AFF_FLAGGED(k->follower, AFF_SNEAK)) {
+				act("$n disembarks from $V.", TRUE, k->follower, NULL, veh, TO_ROOM);
+			}
 
 			char_to_room(k->follower, to_room);
 			if (!IS_NPC(k->follower)) {
@@ -1244,7 +1252,9 @@ ACMD(do_disembark) {
 			}
 			look_at_room(k->follower);
 			
-			act("$n disembarks from $V.", TRUE, k->follower, NULL, veh, TO_ROOM);
+			if (!AFF_FLAGGED(k->follower, AFF_SNEAK)) {
+				act("$n disembarks from $V.", TRUE, k->follower, NULL, veh, TO_ROOM);
+			}
 			
 			enter_wtrigger(IN_ROOM(k->follower), k->follower, NO_DIR);
 			entry_memory_mtrigger(k->follower);
