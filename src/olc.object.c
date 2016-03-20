@@ -350,6 +350,7 @@ char *list_one_object(obj_data *obj, bool detail) {
 * @param obj_vnum vnum The vnum to delete.
 */
 void olc_delete_object(char_data *ch, obj_vnum vnum) {
+	void complete_building(room_data *room);
 	extern bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
 	extern bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum portal_vnum);
@@ -371,6 +372,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
 	crop_data *crop, *next_crop;
+	room_data *room, *next_room;
 	empire_data *emp, *next_emp;
 	char_data *mob, *next_mob;
 	adv_data *adv, *next_adv;
@@ -406,6 +408,45 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			}
 			
 			extract_obj(obj_iter);
+		}
+	}
+	
+	// remove from live resource lists: room resources
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (!COMPLEX_DATA(room)) {
+			continue;
+		}
+		
+		if (GET_BUILT_WITH(room)) {
+			remove_obj_from_resource_list(&GET_BUILT_WITH(room), vnum);
+		}
+		if (GET_BUILDING_RESOURCES(room)) {
+			remove_obj_from_resource_list(&GET_BUILDING_RESOURCES(room), vnum);
+			
+			if (!GET_BUILDING_RESOURCES(room)) {
+				// removing this resource finished the building
+				if (IS_DISMANTLING(room)) {
+					disassociate_building(room);
+				}
+				else {
+					complete_building(room);
+				}
+			}
+		}
+	}
+	
+	// remove from live resource lists: vehicle maintenance
+	LL_FOREACH(vehicle_list, veh) {
+		if (VEH_NEEDS_RESOURCES(veh)) {
+			remove_obj_from_resource_list(&VEH_NEEDS_RESOURCES(veh), vnum);
+			
+			if (!VEH_NEEDS_RESOURCES(veh)) {
+				// removing the resource finished the vehicle
+				if (VEH_FLAGGED(veh, VEH_INCOMPLETE)) {
+					REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
+					load_vtrigger(veh);
+				}
+			}
 		}
 	}
 	
@@ -606,6 +647,10 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	
 	// olc editor updates
 	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (desc->character && !IS_NPC(desc->character) && GET_ACTION_RESOURCES(desc->character)) {
+			remove_obj_from_resource_list(&GET_ACTION_RESOURCES(desc->character), vnum);
+		}
+		
 		if (GET_OLC_ADVENTURE(desc)) {
 			found = FALSE;
 			found |= delete_link_rule_by_portal(&(GET_OLC_ADVENTURE(desc)->linking), vnum);
