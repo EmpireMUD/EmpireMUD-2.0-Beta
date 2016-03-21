@@ -2483,6 +2483,7 @@ Room interaction types:
  CHOP - Things that can be found when chopping here.
  FISH - Things that can be found by fishing here.
  PAN - Things that can be found by panning here.
+ QUARRY - Things you can find by quarrying here.
 
 The percent may be anywhere from 0.01 to 100.00 and if the quantity is greater
 than 1, the percent is only checked once for the entire quantity. If you want

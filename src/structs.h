@@ -315,7 +315,8 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_CHOP  20
 #define INTERACT_FISH  21
 #define INTERACT_PAN  22
-#define NUM_INTERACTS  23
+#define INTERACT_QUARRY  23
+#define NUM_INTERACTS  24
 
 
 // for object saving

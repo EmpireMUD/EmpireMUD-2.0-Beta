@@ -501,14 +501,14 @@ void start_picking(char_data *ch) {
 * @param char_data *ch The player who is to quarry.
 */
 void start_quarrying(char_data *ch) {	
-	if (BUILDING_VNUM(IN_ROOM(ch)) == BUILDING_QUARRY) {
+	if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY)) {
 		if (get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
-			msg_to_char(ch, "There's not enough stone left to cut here.\r\n");
+			msg_to_char(ch, "There's not enough left to quarry here.\r\n");
 		}
 		else {
 			start_action(ch, ACT_QUARRYING, 12);
-			send_to_char("You begin to quarry the stone.\r\n", ch);
-			act("$n begins to quarry the stone.", TRUE, ch, 0, 0, TO_ROOM);
+			send_to_char("You begin to work the quarry.\r\n", ch);
+			act("$n begins to work the quarry.", TRUE, ch, 0, 0, TO_ROOM);
 		}
 	}
 }
@@ -838,6 +838,39 @@ INTERACTION_FUNC(finish_picking_crop) {
 	// re-start
 	if (in_room == IN_ROOM(ch)) {
 		start_picking(ch);
+	}
+	
+	return TRUE;
+}
+
+
+INTERACTION_FUNC(finish_quarrying) {
+	char buf[MAX_STRING_LENGTH];
+	obj_data *obj = NULL;
+	int num;
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(obj, 1);	// minimum level
+		obj_to_char_or_room(obj, ch);
+		load_otrigger(obj);
+		
+		// add to depletion and 1/4 chance of adding a second one, to mix up the depletion values
+		add_depletion(inter_room, DPLTN_QUARRY, TRUE);
+	}
+		act("You give the plug drill one final swing and pry loose $p!", FALSE, ch, obj, 0, TO_CHAR);
+		act("$n hits the plug drill hard with a hammer and pries loose $p!", FALSE, ch, obj, 0, TO_ROOM);
+
+	if (interaction->quantity > 1) {
+		sprintf(buf, "You give the plug drill one final swing and pry loose $p (x%d)!", interaction->quantity);
+	}
+	else {
+		strcpy(buf, "You give the plug drill one final swing and pry loose $p!");
+	}
+	
+	if (obj) {
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+		act("$n hits the plug drill hard with a hammer and pries loose $p!", FALSE, ch, obj, NULL, TO_ROOM);
 	}
 	
 	return TRUE;
@@ -1811,11 +1844,9 @@ void process_prospecting(char_data *ch) {
 * @param char_data *ch The quarrior.
 */
 void process_quarrying(char_data *ch) {
-	obj_vnum vnum = NOTHING;
 	room_data *in_room;
-	obj_data *obj;
 	
-	if (BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_QUARRY || get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
+	if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY) || get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
 		msg_to_char(ch, "You can't quarry anything here.\r\n");
 		cancel_action(ch);
 		return;
@@ -1849,28 +1880,24 @@ void process_quarrying(char_data *ch) {
 			}
 		}
 	}
-	else {
+	else {	// done
 		in_room = IN_ROOM(ch);
 		GET_ACTION(ch) = ACT_NONE;
 		
-		// possibly others later
-		vnum = o_STONE_BLOCK;
+		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_QUARRY, finish_quarrying)) {
+			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+				gain_skill_exp(ch, SKILL_EMPIRE, 25);
+			}
 		
-		add_depletion(IN_ROOM(ch), DPLTN_QUARRY, TRUE);
-		
-		obj = read_object(vnum, TRUE);
-		obj_to_char_or_room(obj, ch);
-		act("You give the plug drill one final swing and pry loose $p!", FALSE, ch, obj, 0, TO_CHAR);
-		act("$n hits the plug drill hard with a hammer and pries loose $p!", FALSE, ch, obj, 0, TO_ROOM);
-	
-		if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-			gain_skill_exp(ch, SKILL_EMPIRE, 25);
+			add_depletion(IN_ROOM(ch), DPLTN_QUARRY, TRUE);
+			
+			// character is still there?
+			if (IN_ROOM(ch) == in_room && GET_ACTION(ch) == ACT_NONE) {
+				start_quarrying(ch);
+			}
 		}
-		load_otrigger(obj);
-		
-		// still there?
-		if (in_room == IN_ROOM(ch)) {
-			start_quarrying(ch);
+		else {
+			msg_to_char(ch, "You don't seem to find anything of use.\r\n");
 		}
 	}
 }
@@ -2653,7 +2680,7 @@ ACMD(do_quarry) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
-	else if (BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_QUARRY) {
+	else if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY)) {
 		send_to_char("You can't quarry here.\r\n", ch);
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {

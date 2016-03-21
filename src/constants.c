@@ -3130,6 +3130,7 @@ const char *interact_types[] = {
 	"CHOP",
 	"FISH",
 	"PAN",
+	"QUARRY",
 	"\n"
 };
 
@@ -3159,6 +3160,7 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_ROOM,	// chop
 	TYPE_ROOM,	// fish
 	TYPE_ROOM,	// pan
+	TYPE_ROOM,	// quarry
 };
 
 
@@ -3187,6 +3189,7 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// chop
 	TYPE_OBJ,	// fish
 	TYPE_OBJ,	// pan
+	TYPE_OBJ,	// quarry
 };
 
 
