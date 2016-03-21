@@ -525,7 +525,7 @@ INTERACTION_FUNC(finish_chopping) {
 	for (num = 0; num < interaction->quantity; ++num) {
 		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// minimum level
-		obj_to_char(obj, ch);
+		obj_to_char_or_room(obj, ch);
 		load_otrigger(obj);
 	}
 	
