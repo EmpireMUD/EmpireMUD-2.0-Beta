@@ -63,7 +63,6 @@
 #define o_ROCK  100	// TODO: rocks are special-cased for chipping
 #define o_LIGHTNING_STONE  103
 #define o_BLOODSTONE  104
-#define o_STONE_BLOCK  105	// TODO: change quarry to interaction
 #define o_FLOWER  123	// TODO: find-herbs could be a global type and "flower" is the only one that requires no skill
 #define o_WHEAT  141
 #define o_HOPS  143

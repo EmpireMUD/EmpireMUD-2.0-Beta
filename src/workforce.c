@@ -237,7 +237,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		if (HAS_FUNCTION(room, FNC_STABLE) && CHORE_ACTIVE(CHORE_SHEARING)) {
 			do_chore_shearing(emp, room);
 		}
-		if (BUILDING_VNUM(room) == BUILDING_QUARRY && CHORE_ACTIVE(CHORE_QUARRYING)) {
+		if (CHORE_ACTIVE(CHORE_QUARRYING) && CAN_INTERACT_ROOM(room, INTERACT_QUARRY)) {
 			do_chore_quarrying(emp, room);
 		}
 		if (!HAS_FUNCTION(room, FNC_SAW) && CHORE_ACTIVE(CHORE_SAWING)) {
@@ -1794,32 +1794,44 @@ void do_chore_nailmaking(empire_data *emp, room_data *room) {
 }
 
 
+INTERACTION_FUNC(one_quarry_chore) {
+	empire_data *emp = ROOM_OWNER(inter_room);
+	
+	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_QUARRYING, interaction->vnum)) {
+		ewt_mark_resource_worker(emp, inter_room, interaction->vnum);
+		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+
 void do_chore_quarrying(empire_data *emp, room_data *room) {
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_QUARRYING].mob);
 	bool depleted = (get_depletion(room, DPLTN_QUARRY) >= config_get_int("common_depletion")) ? TRUE : FALSE;
-	bool can_do = !depleted && can_gain_chore_resource(emp, room, CHORE_QUARRYING, o_STONE_BLOCK);
+	bool can_do = !depleted && can_gain_chore_resource_from_interaction(emp, room, CHORE_QUARRYING, INTERACT_QUARRY);
 	
 	if (worker && can_do) {
-		ewt_mark_resource_worker(emp, room, o_STONE_BLOCK);
-		
 		if (get_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS) <= 0) {
 			set_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS, 24);
 		}
 		else {
 			add_to_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS, -1);
 			if (get_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS) == 0) {
-				add_to_empire_storage(emp, GET_ISLAND_ID(room), o_STONE_BLOCK, 1);
-				act("$n finishes quarrying a large stone block.", FALSE, worker, NULL, NULL, TO_ROOM);
-				empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
-				add_depletion(room, DPLTN_QUARRY, TRUE);
+				if (run_room_interactions(worker, room, INTERACT_QUARRY, one_quarry_chore)) {
+					add_depletion(room, DPLTN_QUARRY, TRUE);
+					empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
+				}
+				else {
+					SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+				}
 			}
 		}
 	}
 	else if (can_do) {
 		// place worker
-		if ((worker = place_chore_worker(emp, CHORE_QUARRYING, room))) {
-			ewt_mark_resource_worker(emp, room, o_STONE_BLOCK);
-		}
+		worker = place_chore_worker(emp, CHORE_QUARRYING, room);
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
