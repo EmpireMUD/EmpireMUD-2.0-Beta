@@ -27,9 +27,7 @@
 #define BUILDING_FENCE  5112
 #define BUILDING_GATE  5113
 
-#define BUILDING_QUARRY  5122	// actions
-
-#define BUILDING_BRIDGE  5133
+#define BUILDING_BRIDGE  5133	// TODO: this is only used to indicate use-road-icon
 
 #define BUILDING_STEPS  5140	// custom icons
 
