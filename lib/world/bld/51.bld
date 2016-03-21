@@ -377,6 +377,7 @@ F
 f
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
+I 23 105 100.00 1  # QUARRY: a huge stone block
 S
 #5123
 Clay Pit~
