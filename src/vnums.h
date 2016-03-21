@@ -27,21 +27,11 @@
 #define BUILDING_FENCE  5112
 #define BUILDING_GATE  5113
 
-#define BUILDING_FOUNDRY  5115	// actions
-
-#define BUILDING_LUMBER_YARD  5118	// actions
-
-#define BUILDING_TANNERY  5120	// actions -- TODO should be a bld flag
-
 #define BUILDING_QUARRY  5122	// actions
-#define BUILDING_CLAY_PIT  5123	// actions
 
 #define BUILDING_BRIDGE  5133
-#define BUILDING_CARPENTER  5134	// trade.c	-- TODO could be bld flag
 
 #define BUILDING_STEPS  5140	// custom icons
-
-#define BUILDING_HENGE  5142	// spells.c
 
 #define BUILDING_SWAMPWALK  5155
 

@@ -5939,10 +5939,10 @@ struct empire_unique_storage *find_eus_entry(obj_data *obj, empire_data *emp, ro
 		if (location && GET_ISLAND_ID(location) != iter->island) {
 			continue;
 		}
-		if (location && ROOM_BLD_FLAGGED(location, BLD_VAULT) && !IS_SET(iter->flags, EUS_VAULT)) {
+		if (location && HAS_FUNCTION(location, FNC_VAULT) && !IS_SET(iter->flags, EUS_VAULT)) {
 			continue;
 		}
-		if (location && !ROOM_BLD_FLAGGED(location, BLD_VAULT) && IS_SET(iter->flags, EUS_VAULT)) {
+		if (location && !HAS_FUNCTION(location, FNC_VAULT) && IS_SET(iter->flags, EUS_VAULT)) {
 			continue;
 		}
 		
@@ -6027,7 +6027,7 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 		if (eus->island == NO_ISLAND) {
 			eus->island = get_main_island(emp);
 		}
-		if (room && ROOM_BLD_FLAGGED(room, BLD_VAULT)) {
+		if (room && HAS_FUNCTION(room, FNC_VAULT)) {
 			eus->flags = EUS_VAULT;
 		}
 			

@@ -1156,6 +1156,9 @@ When set on a building, these flags affect all interior rooms, too. When set
 on a designate-able room (a building where the ROOM flag is set), they only
 affect players in that room.
 
+(Some former building flags were moved to the 'functions' list, and their
+former building flags still show up in the editor as DEPRECATED.)
+
 Available flags:
  ROOM - this is a room that can be added with the designate command if it has
     matching designate flags with a building
@@ -1170,13 +1173,11 @@ Available flags:
  HERD - mobs can be herded into this building
  DEDICATE - can be dedicated to a patron god or player, which adds "of Name"
     to the room title
- DRINK - has a water source, like a well or fountain
  !NPC - mobs won't enter this building
  BARRIER - can only go back the way you came, unless flying
  LARGE-CITY-RADIUS - counts as in-city much further away than normal
  ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
  BURNABLE - will catch fire if a fire is placed inside by a hostile empire
- COOKING-FIRE - can cook, brew, and other tasks that require a fire
  SAIL - can enter this building with a boat
  ITEM-LIMIT - only a certain number of items can be dropped here
  LONG-AUTOSTORE - autostore takes 72 hours instead of 3 here
@@ -1191,7 +1192,7 @@ Available flags:
         territory counts will not update right away. Any empire can force a
         re-count by claiming or abandoning any tile.
 
-See also: INTERLINK, OLC BUILDINGS
+See also: BEDIT FUNCTIONS, INTERLINK, OLC BUILDINGS
 #d
 "BEDIT FUNCTIONS" "FUNCTION FLAGS"
 
@@ -1232,6 +1233,8 @@ Available functions:
  TRADING-POST - access to global trade, e.g. a trading post
  VAULT - stores coins, can use the warehouse command for privileged storage
  WAREHOUSE - can use the warehouse command and store unique items
+ DRINK-WATER - can get water here, like a well
+ COOKING-FIRE - can cook, brew, and other tasks that require a fire
 
 See also: OLC BUILDINGS
 #d

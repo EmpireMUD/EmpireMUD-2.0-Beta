@@ -4195,7 +4195,7 @@ room_data *find_load_room(char_data *ch) {
 	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch)))) {
 		// does not require last room but if there is one, it must be the same island
 		rl_last_room = real_room(GET_LAST_ROOM(ch));
-		if (ROOM_BLD_FLAGGED(rl, BLD_TOMB) && (!rl_last_room || GET_ISLAND_ID(rl) == GET_ISLAND_ID(rl_last_room)) && can_use_room(ch, rl, GUESTS_ALLOWED)) {
+		if (HAS_FUNCTION(rl, FNC_TOMB) && (!rl_last_room || GET_ISLAND_ID(rl) == GET_ISLAND_ID(rl_last_room)) && can_use_room(ch, rl, GUESTS_ALLOWED)) {
 			return rl;
 		}
 	}
@@ -4204,7 +4204,7 @@ room_data *find_load_room(char_data *ch) {
 	if (!IS_NPC(ch) && (rl = real_room(GET_LAST_ROOM(ch))) && GET_LOYALTY(ch)) {
 		island = GET_ISLAND_ID(rl);
 		for (ter = EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)); ter; ter = ter->next) {
-			if (ROOM_BLD_FLAGGED(ter->room, BLD_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island) {
+			if (HAS_FUNCTION(ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = ter->room;

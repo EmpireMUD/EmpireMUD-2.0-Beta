@@ -1397,7 +1397,7 @@ ACMD(do_vigor) {
 //// CHANTS ///////////////////////////////////////////////////////////////////
 
 RITUAL_SETUP_FUNC(start_chant_of_druids) {
-	if (BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_HENGE) {
+	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_HENGE)) {
 		msg_to_char(ch, "You can't perform the chant of druids unless you are at a henge.\r\n");
 		return FALSE;
 	}
@@ -1412,7 +1412,7 @@ RITUAL_SETUP_FUNC(start_chant_of_druids) {
 }
 
 RITUAL_FINISH_FUNC(perform_chant_of_druids) {
-	if (CAN_GAIN_NEW_SKILLS(ch) && get_skill_level(ch, SKILL_NATURAL_MAGIC) == 0 && noskill_ok(ch, SKILL_NATURAL_MAGIC) && BUILDING_VNUM(IN_ROOM(ch)) == BUILDING_HENGE && IS_COMPLETE(IN_ROOM(ch))) {
+	if (CAN_GAIN_NEW_SKILLS(ch) && get_skill_level(ch, SKILL_NATURAL_MAGIC) == 0 && noskill_ok(ch, SKILL_NATURAL_MAGIC) && HAS_FUNCTION(IN_ROOM(ch), FNC_HENGE) && IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "&gAs you finish the chant, you begin to see the weave of mana through nature...&0\r\n");
 		set_skill(ch, SKILL_NATURAL_MAGIC, 1);
 		SAVE_CHAR(ch);

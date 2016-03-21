@@ -870,7 +870,7 @@ void update_world(void) {
 			}
 			
 			// type-specific updates
-			if (ROOM_BLD_FLAGGED(iter, BLD_TAVERN) && IS_COMPLETE(iter)) {
+			if (HAS_FUNCTION(iter, FNC_TAVERN) && IS_COMPLETE(iter)) {
 				update_tavern(iter);
 			}
 			if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && get_room_extra_data(iter, ROOM_EXTRA_SEED_TIME)) {
@@ -943,7 +943,7 @@ static void annual_update_map_tile(room_data *room) {
 	}
 
 	// clean mine data from anything that's not currently a mine
-	if (!ROOM_BLD_FLAGGED(room, BLD_MINE)) {
+	if (!HAS_FUNCTION(room, FNC_MINE)) {
 		remove_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM);
 		remove_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT);
 	}
@@ -1346,19 +1346,19 @@ void check_building_tech(empire_data *emp, room_data *room) {
 		return;
 	}
 	
-	if (ROOM_BLD_FLAGGED(room, BLD_APIARY)) {
+	if (HAS_FUNCTION(room, FNC_APIARY)) {
 		EMPIRE_TECH(emp, TECH_APIARIES) += 1;
 		if (isle || (isle = get_empire_island(emp, island))) {
 			isle->tech[TECH_APIARIES] += 1;
 		}
 	}
-	if (ROOM_BLD_FLAGGED(room, BLD_GLASSBLOWER)) {
+	if (HAS_FUNCTION(room, FNC_GLASSBLOWER)) {
 		EMPIRE_TECH(emp, TECH_GLASSBLOWING) += 1;
 		if (isle || (isle = get_empire_island(emp, island))) {
 			isle->tech[TECH_GLASSBLOWING] += 1;
 		}
 	}
-	if (ROOM_BLD_FLAGGED(room, BLD_DOCKS)) {
+	if (HAS_FUNCTION(room, FNC_DOCKS)) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += 1;
 		if (isle || (isle = get_empire_island(emp, island))) {
 			isle->tech[TECH_SEAPORT] += 1;

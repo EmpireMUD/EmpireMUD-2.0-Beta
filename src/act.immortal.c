@@ -352,7 +352,7 @@ ADMIN_UTIL(util_b318_buildings) {
 	bitvector_t bad_flags = BIT(11) | BIT(13) | BIT(16) | BIT(18) | BIT(19) |
 		BIT(20) | BIT(21) | BIT(22) | BIT(23) | BIT(24) | BIT(25) | BIT(26) |
 		BIT(27) | BIT(28) | BIT(30) | BIT(31) | BIT(32) | BIT(35) | BIT(36) |
-		BIT(38) | BIT(39) | BIT(41) | BIT(45) | BIT(47);
+		BIT(38) | BIT(39) | BIT(41) | BIT(45) | BIT(47) | BIT(8) | BIT(17);
 	
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		if (IS_SET(GET_BLD_FLAGS(bld), bad_flags)) {
@@ -3609,7 +3609,7 @@ void do_stat_room(char_data *ch) {
 		msg_to_char(ch, "Burning: %d, Damage: %d, Disrepair: %d year%s\r\n", BUILDING_BURNING(home), BUILDING_DAMAGE(home), BUILDING_DISREPAIR(home), BUILDING_DISREPAIR(home) != 1 ? "s" : "");
 	}
 
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MINE)) {
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || HAS_FUNCTION(IN_ROOM(ch), FNC_MINE)) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) <= 0 || !(glb = global_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM))) || GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
 			msg_to_char(ch, "This area is unmined.\r\n");
 		}

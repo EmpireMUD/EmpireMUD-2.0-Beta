@@ -446,7 +446,7 @@ static void start_digging(char_data *ch) {
 void start_mining(char_data *ch) {
 	int mining_timer = config_get_int("mining_timer");
 	
-	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MINE) && IS_COMPLETE(IN_ROOM(ch))) {
+	if (HAS_FUNCTION(IN_ROOM(ch), FNC_MINE) && IS_COMPLETE(IN_ROOM(ch))) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) > 0) {
 			start_action(ch, ACT_MINING, mining_timer);
 			
@@ -1466,7 +1466,7 @@ void process_mining(char_data *ch) {
 			cancel_action(ch);
 			break;
 		}
-		if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MINE) || !IS_COMPLETE(IN_ROOM(ch)) || get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0) {
+		if (!HAS_FUNCTION(IN_ROOM(ch), FNC_MINE) || !IS_COMPLETE(IN_ROOM(ch)) || get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0) {
 			msg_to_char(ch, "You can't mine here.\r\n");
 			cancel_action(ch);
 			break;
@@ -2009,7 +2009,7 @@ void process_tanning(char_data *ch) {
 	obj_data *proto;
 	bool success;
 	
-	GET_ACTION_TIMER(ch) -= (BUILDING_VNUM(IN_ROOM(ch)) == BUILDING_TANNERY ? 4 : 1);
+	GET_ACTION_TIMER(ch) -= (HAS_FUNCTION(IN_ROOM(ch), FNC_TANNERY) ? 4 : 1);
 	
 	// need the prototype
 	if (!(proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
@@ -2082,7 +2082,7 @@ ACMD(do_bathe) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're a bit busy right now.\r\n");
 	}
-	else if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BATHS) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_SHALLOW_WATER)) {
+	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_BATHS) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_SHALLOW_WATER)) {
 		msg_to_char(ch, "You can't bathe here!\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -2379,7 +2379,7 @@ ACMD(do_mine) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
 	}
-	else if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MINE)) {
+	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_MINE)) {
 		msg_to_char(ch, "This isn't a mine.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -2417,7 +2417,7 @@ ACMD(do_mint) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
 	}
-	else if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MINT)) {
+	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_MINT)) {
 		msg_to_char(ch, "You can't mint anything here.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -2674,7 +2674,7 @@ ACMD(do_saw) {
 		act("You stop sawing.", FALSE, ch, NULL, NULL, TO_CHAR);
 		cancel_action(ch);
 	}
-	else if (BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_LUMBER_YARD || !IS_COMPLETE(IN_ROOM(ch))) {
+	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_SAW) || !IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can only saw in a lumber yard.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {

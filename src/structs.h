@@ -460,46 +460,46 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_INTERLINK  BIT(5)	// can be interlinked
 #define BLD_HERD  BIT(6)	// can herd
 #define BLD_DEDICATE  BIT(7)	// can be dedicated to a player
-#define BLD_DRINK  BIT(8)	// can be used to drink/fill water
+// #define BLD_UNUSED1  BIT(8)
 #define BLD_NO_NPC  BIT(9)	// mobs won't walk in
 #define BLD_BARRIER  BIT(10)	// can only go back the direction you came
-#define BLD_TAVERN  BIT(11)	// building functions as a tavern
+// #define BLD_UNUSED2  BIT(11)
 #define BLD_LARGE_CITY_RADIUS  BIT(12)	// counts as in-city further than normal
-#define BLD_MINE  BIT(13)	// building is minable
+// #define BLD_UNUSED3  BIT(13)
 #define BLD_ATTACH_ROAD  BIT(14)	// building connects to roads on the map
 #define BLD_BURNABLE  BIT(15)	// fire! fire!
-#define BLD_FORGE  BIT(16)	// can forge here
-#define BLD_COOKING_FIRE  BIT(17)	// allows cook
-#define BLD_ALCHEMIST  BIT(18)	// provides alchemy tools
-#define BLD_STABLE  BIT(19)	// mobs don't despawn; can shear, barde, etc
-#define BLD_LIBRARY  BIT(20)	// can use library and bookedit commands
-#define BLD_APIARY  BIT(21)	// provides Apiaries tech
-#define BLD_GLASSBLOWER  BIT(22)	// provides Glassblowing tech
-#define BLD_DOCKS  BIT(23)	// provides Seaport tech
-#define BLD_PIGEON_POST  BIT(24)	// can use mail
-#define BLD_MILL  BIT(25)	// can use the mill command
-#define BLD_POTTER  BIT(26)	// pottery crafts go faster
-#define BLD_TAILOR  BIT(27)	// can use tailoring abilities here
-#define BLD_BATHS  BIT(28)	// can bathe here
+// #define BLD_UNUSED4  BIT(16)
+// #define BLD_UNUSED5  BIT(17)
+// #define BLD_UNUSED6  BIT(18)
+// #define BLD_UNUSED7  BIT(19)
+// #define BLD_UNUSED8  BIT(20)
+// #define BLD_UNUSED9  BIT(21)
+// #define BLD_UNUSED10  BIT(22)
+// #define BLD_UNUSED11  BIT(23)
+// #define BLD_UNUSED12  BIT(24)
+// #define BLD_UNUSED13  BIT(25)
+// #define BLD_UNUSED14  BIT(26)
+// #define BLD_UNUSED15  BIT(27)
+// #define BLD_UNUSED16  BIT(28)
 #define BLD_SAIL  BIT(29)	// ships can pass through building
-#define BLD_TOMB  BIT(30)	// can set as a tomb
-#define BLD_MINT  BIT(31)	// can mint coins
-#define BLD_VAULT  BIT(32)	// for various vault functions
+// #define BLD_UNUSED17  BIT(30)
+// #define BLD_UNUSED18  BIT(31)
+// #define BLD_UNUSED19  BIT(32)
 #define BLD_ITEM_LIMIT  BIT(33)	// room does not hold unlimited items
 #define BLD_LONG_AUTOSTORE  BIT(34)	// autostore takes a long time here
-#define BLD_WAREHOUSE  BIT(35)	// warehouse command
-#define BLD_TRADE  BIT(36)	// trading post / trade command
+// #define BLD_UNUSED20  BIT(35)
+// #define BLD_UNUSED21  BIT(36)
 #define BLD_HIGH_DEPLETION  BIT(37)	// allows more resource farming here
-#define BLD_PORTAL  BIT(38)	// functions as a portal building
-#define BLD_BEDROOM  BIT(39)	// boosts regen when sleeping
+// #define BLD_UNUSED22  BIT(38)
+// #define BLD_UNUSED23  BIT(39)
 #define BLD_NO_DELETE  BIT(40)	// will not be deleted for not having a homeroom
-#define BLD_SUMMON_PLAYER  BIT(41)	// can use the summon player command
+// #define BLD_UNUSED24  BIT(41)
 #define BLD_NEED_BOAT  BIT(42)	// requires a boat to enter
 #define BLD_LOOK_OUT  BIT(43)	// can see the map using "look out"
 #define BLD_SECONDARY_TERRITORY  BIT(44)	// similar to a ship -- counts as territory off the map
-#define BLD_SHIPYARD  BIT(45)	// for building ships
+// #define BLD_UNUSED25  BIT(45)
 #define BLD_UPGRADED  BIT(46)	// combines with SHIPYARD, etc. to create upgraded versions of buildings
-#define BLD_PRESS  BIT(47)	// can use the 'press' craft command
+// #define BLD_UNUSED26  BIT(47)
 
 
 // Terrain flags for do_build -- these match up with build_on flags for building crafts
@@ -582,6 +582,8 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_TRADING_POST  BIT(28)	// access to global trade, e.g. a trading post
 #define FNC_VAULT  BIT(29)	// stores coins, can use the warehouse command for privileged
 #define FNC_WAREHOUSE  BIT(30)	// can use the warehouse command and store unique items
+#define FNC_DRINK_WATER  BIT(31)	// can drink here
+#define FNC_COOKING_FIRE  BIT(32)	// can cook here
 
 
  //////////////////////////////////////////////////////////////////////////////
