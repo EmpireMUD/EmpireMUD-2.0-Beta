@@ -80,10 +80,12 @@ S
 Well~
 A Well~
 &0(&c~~&0)~
-10 0 di 0
+10 0 d 0
 0 0 0 -1
 C
 drink, fill~
+F
+F
 M
 9039 5.00 cg
 M
@@ -119,7 +121,7 @@ S
 Mine~
 A Mine Shaft~
 /&0[]&?\~
-60 0 bemn 0
+60 0 bem 0
 0 0 0 -1
 C
 mine~
@@ -129,6 +131,8 @@ mountain, allowing you to mine the natural resources which lie within. Mines
 are commonly useful for digging up iron to make armor, or other precious
 metals to make jewelry.
 ~
+F
+o
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 M
@@ -138,7 +142,7 @@ S
 Forge~
 A Hot Forge~
 &0(FF)~
-20 0 pqR 0
+20 0 pR 0
 0 0 0 212
 C
 forge, smelt~
@@ -148,6 +152,8 @@ bearable temperature. A large oven against the wall is used to heat metal to
 a controlled temperature so that a master craftsman can hammer it into a
 useful shape. The metal is then cooled in water.
 ~
+F
+hv
 M
 241 15.00 ce
 S
@@ -155,7 +161,7 @@ S
 Mill~
 The Mill~
 &0(MM)~
-15 0 pzR 0
+15 0 pR 0
 0 0 0 210
 C
 inventory, mill, retrieve, store~
@@ -164,6 +170,8 @@ D
 used to grind wheat and dry grains into flour. Many millers dedicate their
 lives to developing the finest product.
 ~
+F
+n
 M
 234 10.00 ce
 S
@@ -171,7 +179,7 @@ S
 Potter~
 A Potter's Hut~
 &0(PP)~
-15 0 prAR 0
+15 0 pR 0
 0 0 0 211
 C
 craft, retrieve, store, inventory~
@@ -181,6 +189,8 @@ clay. There are also other resources here which are used by potters to create
 better pots and sculptures from their clay. The clay used here is dug from
 riversides and then sculpted and heated in the furnace.
 ~
+F
+rG
 M
 241 15.00 ce
 S
@@ -188,7 +198,7 @@ S
 Stable~
 A Noisy Stable~
 &0(SS)~
-15 0 bgptR 0
+15 0 bgpR 0
 0 0 0 213
 C
 harness, herd, inventory, milk, mount, retrieve, shear, store~
@@ -198,6 +208,8 @@ and feed, almost enough to make you flee out through the door. There are many
 stalls along the walls, and against the wall there is a shearing facility for
 managing woolen animals.
 ~
+F
+w
 M
 233 10.00 ce
 M
@@ -247,6 +259,8 @@ D
 into easily-stored iron. You nearly trip over some of it as you wade through
 the storage. The foundry helps empires to clean up their untidy land.
 ~
+F
+v
 S
 #5116
 Granary~
@@ -297,12 +311,14 @@ storing wood are positioned along the back wall and one of the side walls. A
 worn out axe is leaning against one of the walls and a few chips of wood are
 scattered around your feet.
 ~
+F
+t
 S
 #5119
 Smokehouse~
 The Smokehouse~
 &0{SS}~
-15 0 brR 0
+15 0 bR 0
 0 0 0 -1
 C
 retrieve, store~
@@ -313,6 +329,8 @@ although this bounty will not be done smoking for some time. Chests set into
 the cool ground store preserved meats, sometimes for months, until you are
 ready to cook with them.
 ~
+F
+G
 S
 #5120
 Tannery~
@@ -327,6 +345,8 @@ D
 not a pleasant leather smell, but a disgusting leather smell. All around you
 there are skins being stretched and dried, and piles of prepared skins.
 ~
+F
+z
 M
 241 15.00 ce
 S
@@ -353,6 +373,8 @@ A Quarry~
 0 0 0 -1
 C
 dig, quarry~
+F
+f
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 S
@@ -364,6 +386,8 @@ A Clay Pit~
 0 0 0 -1
 C
 dig~
+F
+f
 I 5 100 9.00 1 X  # DIG: a rock
 I 5 101 100.00 1 X  # DIG: a pile of clay
 S
@@ -454,7 +478,7 @@ S
 Alchemist~
 The Alchemist~
 &0(AA)~
-15 0 prsR 0
+15 0 pR 0
 0 0 0 231
 C
 brew, mix, retrieve, store~
@@ -465,6 +489,8 @@ all kinds line the shelves. Bins labeled for all manner of herbs sit in the
 corners of the shop, and there are stacks of books strewn haphazardly on the
 tables.
 ~
+F
+aG
 M
 241 15.00 ce
 S
@@ -472,13 +498,15 @@ S
 Apiary~
 An Apiary~
 &0{BB}~
-15 0 pvR 0
+15 0 pR 0
 0 0 0 218
 D
    The room is hot and you begin sweating as soon as you enter. Bees swarm
 around you, and the scents of pollen and sweet honey permeate the air.
 Several unused hives have been dismantled, and are resting against the wall.
 ~
+F
+b
 M
 241 15.00 ce
 S
@@ -486,7 +514,7 @@ S
 Bakery~
 The Bakery~
 &0(BB)~
-15 0 prR 0
+15 0 pR 0
 0 0 0 214
 C
 cook~
@@ -496,6 +524,8 @@ items can be made simultaneously. You can smell the rich pies and delicious
 meats that have been cooked in these ovens since their construction, and it
 makes your mouth water with envy of the person who ate them.
 ~
+F
+G
 M
 241 15.00 ce
 S
@@ -520,12 +550,14 @@ agents. All around you are incomplete objects which are waiting to be
 finished. On the craft tables are the plans for several useful pieces of
 furniture, as well as other things.
 ~
+F
+e
 S
 #5135
 Glass Blower~
 The Glass Blower~
 &0(GG)~
-15 0 pwR 0
+15 0 pR 0
 0 0 0 215
 C
 craft~
@@ -535,6 +567,8 @@ can be melted into molten glass here and then used to blow pots or panes for
 various uses. A huge furnace against the wall is used for heating, and the
 glass is air-cooled. Using water would shatter it.
 ~
+F
+i
 M
 241 15.00 ce
 S
@@ -542,7 +576,7 @@ S
 Pigeon Post~
 The Pigeon Post~
 &0[PP]~
-15 0 pyR 0
+15 0 pR 0
 0 0 0 263
 C
 mail check, mail receive, mail send~
@@ -552,6 +586,8 @@ only other piece of furniture is an old-fashioned writing desk and its wooden
 stool, both stained with ink. The smell is surprisingly tolerable despite the
 number of pigeons -- a clear indication the post is well-tended.
 ~
+F
+m
 M
 9193 5.00 c
 M
@@ -561,7 +597,7 @@ S
 Tailor~
 The Tailor~
 &0(TT)~
-15 0 pBR 0
+15 0 pR 0
 0 0 0 219
 C
 retrieve, sew, store~
@@ -571,6 +607,8 @@ colors are strewn about the tables and in the corners. On a table in the back,
 some of the scraps have been pieced into blocks and it looks like someone has
 started quilting them into a blanket.
 ~
+F
+y
 M
 241 15.00 ce
 S
@@ -578,7 +616,7 @@ S
 Tavern~
 The Tavern~
 &0[TT]~
-15 0 lpR 0
+15 0 pR 0
 0 0 0 220
 C
 fill, tavern~
@@ -589,6 +627,8 @@ surfaces are stained from spilled beer and blood. There appears to be a small
 trapdoor in a dark corner, but it's hard to tell in this light. The whole place
 has the scent of home, and you feel the urge to have a seat and join in.
 ~
+F
+A
 M
 242 20.00 ce
 M
@@ -617,7 +657,7 @@ S
 Warehouse~
 A Warehouse~
 &0{WW}~
-15 0 bpJR 0
+15 0 bpR 0
 0 0 0 -1
 C
 warehouse~
@@ -628,6 +668,8 @@ the items from the top shelf -- but you can't see the far walls to get a sense
 for how large the warehouse actually is. As you wander the aisles, you find
 many different and curious items.
 ~
+F
+E
 S
 #5140
 Steps~
@@ -653,6 +695,8 @@ A Stone Henge~
 0 0 0 -1
 C
 chant~
+F
+k
 M
 243 30.00 c
 S
@@ -667,10 +711,12 @@ S
 Cemetery~
 A Gloomy Cemetery~
 .&0i&?.&0i~
-20 0 dE 0
+20 0 d 0
 0 0 0 -1
 C
 tomb~
+F
+B
 M
 9189 2.00 0
 M
@@ -693,7 +739,7 @@ S
 Tomb~
 A Large Tomb~
 &0[oo]~
-25 1 eE 0
+25 1 e 0
 0 0 0 -1
 C
 tomb~
@@ -703,6 +749,8 @@ is made of large rocks which are loose and allow some light to peek through.
 The tomb itself is elaborate. The person buried here must have been very
 influential, or else very popular.
 ~
+F
+B
 M
 9189 2.00 0
 M
@@ -750,7 +798,7 @@ S
 Library~
 A Grand Library~
 &0[^^]~
-25 10 uR 0
+25 10 R 0
 0 0 0 -1
 C
 library, bookedit~
@@ -761,6 +809,8 @@ and dwarfed themselves by vaulted ceilings. This library is surely among the
 most incredible monuments in the world, and you are overcome with awe each time
 you gaze up its towering shelves.
 ~
+F
+l
 M
 9198 2.00 0
 S
@@ -785,7 +835,7 @@ S
 Pyramid~
 The Great Pyramid~
 &y/^^\~
-60 15 hE 0
+60 15 h 0
 0 0 0 -1
 C
 dedicate, tomb~
@@ -796,6 +846,8 @@ because you're twenty feet underground, standing in front of a large door.
 Writings on the walls warn you of traps and an unending fate for anyone who
 breaks the seal on the door.
 ~
+F
+B
 M
 9191 2.00 0
 M
@@ -809,7 +861,7 @@ S
 Docks~
 The Docks~
 @w&0==@e~
-20 0 bdpxD 0
+20 0 bdpD 0
 0 0 0 -1
 C
 board, load, unload~
@@ -818,12 +870,14 @@ D
 be docked here for easy storage. In addition, the facility allows the loading
 of larger pieces of equipment into the ship's hold.
 ~
+F
+g
 S
 #5153
 Shipyard~
 The Shipyard~
 @w&0()@e~
-40 0 bdpT 0
+40 0 bdp 0
 0 0 0 216
 C
 board, manufacture, upgrade~
@@ -833,6 +887,8 @@ great ships right into the water. Ships built here may be boarded by
 passengers, but the shipyard lacks the facilities to load heavy equipment or
 animals. Ships may also not be brought back in once they leave.
 ~
+F
+u
 U
 5154
 S
@@ -840,7 +896,7 @@ S
 Great Shipyard~
 A Great Shipyard~
 @w&0[]@e~
-40 4 bdTU 0
+40 4 bdU 0
 0 0 0 216
 C
 board, manufacture~
@@ -850,6 +906,8 @@ great ships right into the water. Ships built here may be boarded by
 passengers, but the shipyard lacks the facilities to load heavy equipment or
 animals. Ships may also not be brought back in once they leave.
 ~
+F
+u
 S
 #5155
 Swamp Walk~
@@ -936,7 +994,7 @@ S
 Baths~
 The Baths~
 &0[&b~~&0]~
-20 0 iCR 0
+20 0 R 0
 0 0 0 -1
 C
 bathe~
@@ -946,6 +1004,8 @@ pools consume much of the floor space, and fires burn at their sides to heat
 the water. This is a place of cleanliness, so attendants regularly add fresh
 water to the bathing pools.
 ~
+F
+cF
 M
 236 10.00 ce
 M
@@ -955,10 +1015,12 @@ S
 Fountain~
 A Flowing Fountain~
 &0{&c~~&0}~
-10 0 dio 0
+10 0 do 0
 0 0 0 -1
 C
 drink, fill~
+F
+F
 M
 9039 5.00 cg
 M
@@ -1055,6 +1117,8 @@ trespassers it sees. The tower is made from wood, so it is not well protected
 against invasion. Hopefully, it will be enough defense. The tower may be
 upgraded by typing upgrade here.
 ~
+F
+j
 M
 251 5.00 ce
 U
@@ -1064,7 +1128,7 @@ S
 Advanced Guard Tower~
 An Advanced Guard Tower~
 &0'TT'~
-15 0 bpR 0
+15 0 bpRU 0
 0 0 0 -1
 C
 upgrade~
@@ -1075,6 +1139,8 @@ trespassers it sees. The tower is made from wood, so it is not well protected
 against invasion. Hopefully, it will be enough defense. The tower may be
 upgraded by typing upgrade here again.
 ~
+F
+j
 M
 251 5.00 ce
 U
@@ -1084,7 +1150,7 @@ S
 Superior Guard Tower~
 A Superior Guard Tower~
 &0"TT"~
-20 0 bR 0
+20 0 bRU 0
 0 0 0 -1
 D
    This is a well-constructed guard tower. It is tall, allowing it to see
@@ -1092,6 +1158,8 @@ over most buildings and structures. The tower shoots at any unescorted
 trespassers it sees. The tower is made from wood, so it is not well protected
 against invasion. Hopefully, it will be enough defense.
 ~
+F
+j
 M
 251 5.00 ce
 S
@@ -1235,7 +1303,7 @@ S
 Mint~
 The Mint~
 &0[MM]~
-20 5 FR 0
+20 5 R 0
 0 0 0 -1
 C
 exchange, mint~
@@ -1245,6 +1313,8 @@ after coin and provides the empire with currency. The mint is always as well-
 guarded as it is well-staffed, to ensure none of the king's treasure goes
 missing. The mills are quite worn, but they still churn out coins by the pound.
 ~
+F
+p
 M
 254 100.00 e
 M
@@ -1254,7 +1324,7 @@ S
 Trading Post~
 The Trading Post~
 &0[$$]~
-15 0 pKR 0
+15 0 pR 0
 0 0 0 -1
 C
 trade <check | list | buy | cancel | collect | identify | post>~
@@ -1265,12 +1335,14 @@ new and old, are stacked on every shelf, hung from every rack, and piled in
 every corner. Prices are affixed to every item, and a large sign on the wall
 reads 'No Bartering'.
 ~
+F
+C
 S
 #5184
 Secret Cache~
 A Secret Cache~
 .&0{}&?.~
-60 0 G 0
+60 0 0 0
 0 0 0 -1
 A
 d
@@ -1282,6 +1354,8 @@ found it if you didn't know what you were looking for. The building is small,
 and entirely underground. Its main feature is a vault with room to hold gold
 and silver of all shapes and sizes.
 ~
+F
+D
 M
 254 33.00 c
 S
@@ -1289,7 +1363,7 @@ S
 Portal~
 A Mystical Portal~
 ~&b][&?~~
-20 1 bdpM 0
+20 1 bdp 0
 0 0 0 -1
 C
 collapse, enter, portal~
@@ -1299,6 +1373,8 @@ that they look like could fall at any moment. Each stone is inscribed with a
 strange symbol, and the stones are warm to the touch. You can almost feel the
 power that flows through this place.
 ~
+F
+q
 S
 #5186
 Rickety House~
@@ -1373,10 +1449,12 @@ S
 Astral Nexus~
 An Astral Nexus~
 ..&C*&?.~
-5 0 bdpP 0
+5 0 bdp 0
 0 0 0 -1
 C
 summon player <name>~
+F
+x
 S
 #5191
 Draining Oasis~
@@ -1390,7 +1468,7 @@ S
 Oilmaker~
 The Oilmaker~
 &0(OO)~
-15 0 pRV 0
+15 0 pR 0
 0 0 0 275
 C
 inventory, press, restrieve, store~
@@ -1399,6 +1477,8 @@ D
 here. A small mill in the corner is used to grind olives and seeds, while a
 heavy stone press in the other corner extracts the precious oil.
 ~
+F
+s
 S
 #5193
 Cabinet of Curiosities~

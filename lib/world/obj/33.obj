@@ -764,9 +764,9 @@ S
 cobbler berry rich~
 a rich berry cobbler~
 A rich berry cobbler is lying on the ground.~
-This old-fashioned desert is exactly what you need to boost your wits.
+This old-fashioned dessert is exactly what you need to boost your wits.
 ~
-6 mp a 3
+6 mp a 4
 48 0 0
 7 336
 A
@@ -902,7 +902,7 @@ feast turkey roast~
 the roast turkey feast~
 Someone has set up a roast turkey feast!~
    There is a banquet of turkey and trimmings. It's enough to feed the whole
-party! This feast will boost melee fighters.  
+party! This feast will boost melee fighters.
 ~
 6 m 0 3
 96 0 0
@@ -921,8 +921,8 @@ S
 board vegetables mixed~
 the mixed vegetable board~
 Someone has set up a mixed vegetable board!~
-   The board is covered with all manner of roast vegetables, in every color. 
-It's enough to feed the whole party! This feast will boost healers.  
+   The board is covered with all manner of roast vegetables, in every color.
+It's enough to feed the whole party! This feast will boost healers.
 ~
 6 m 0 4
 96 0 0
@@ -942,7 +942,7 @@ feast seafood~
 the seafood feast~
 Someone has set up a seafood feast!~
    This overflowing feast of seafood is enough to feed the whole party! This
-feast will boost casters.  
+feast will boost casters.
 ~
 6 m 0 4
 96 0 0
@@ -962,7 +962,7 @@ platter roast meat~
 the roast meat platter~
 Someone has set up a roast meat platter!~
    This feast of roast meats is enough to feed the whole party! It will boost
-tanks in particular.  
+tanks in particular.
 ~
 6 m 0 4
 96 0 0
@@ -984,7 +984,7 @@ platter dessert extravagant~
 the extravagant dessert platter~
 Someone has set up an extravagant dessert platter!~
    This buffet of desserts would make the baker blush. It looks like it's just
-the thing to boost your party members!  
+the thing to boost your party members!
 ~
 6 m 0 4
 96 0 0
