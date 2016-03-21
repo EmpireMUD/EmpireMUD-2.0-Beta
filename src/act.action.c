@@ -858,9 +858,7 @@ INTERACTION_FUNC(finish_quarrying) {
 		// add to depletion and 1/4 chance of adding a second one, to mix up the depletion values
 		add_depletion(inter_room, DPLTN_QUARRY, TRUE);
 	}
-		act("You give the plug drill one final swing and pry loose $p!", FALSE, ch, obj, 0, TO_CHAR);
-		act("$n hits the plug drill hard with a hammer and pries loose $p!", FALSE, ch, obj, 0, TO_ROOM);
-
+	
 	if (interaction->quantity > 1) {
 		sprintf(buf, "You give the plug drill one final swing and pry loose $p (x%d)!", interaction->quantity);
 	}
