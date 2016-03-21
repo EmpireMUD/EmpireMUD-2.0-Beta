@@ -854,9 +854,6 @@ INTERACTION_FUNC(finish_quarrying) {
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
 		load_otrigger(obj);
-		
-		// add to depletion and 1/4 chance of adding a second one, to mix up the depletion values
-		add_depletion(inter_room, DPLTN_QUARRY, TRUE);
 	}
 	
 	if (interaction->quantity > 1) {
