@@ -37,10 +37,6 @@
 
 #define BUILDING_TRAPPERS_POST  5161	// workforce.c
 
-#define BUILDING_GUARD_TOWER  5167	// act.empire.c
-#define BUILDING_GUARD_TOWER2  5168	// act.empire.c
-#define BUILDING_GUARD_TOWER3  5169	// act.empire.c
-
 #define BUILDING_GATEHOUSE  5173	// custom icons, rituals
 #define BUILDING_WALL  5174
 
