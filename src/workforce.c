@@ -390,6 +390,50 @@ static void ewt_mark_resource_worker(empire_data *emp, room_data *loc, obj_vnum 
 }
 
 
+/**
+* Marks a worker on all resources for an interaction. This is used when a
+* worker is spawned and the system isn't sure which items the worker might
+* get from the interactions; it should prevent over-spawning workers.
+*
+* This function is called on interaction lists.
+* 
+* @param empire_data *emp The empire whose workers we'll mark.
+* @param room_data *location The place we'll mark workers.
+* @param struct interaction_item *list The list of interactions to check.
+* @param int interaction_type Any INTERACT_ types.
+*/
+static void ewt_mark_for_interaction_list(empire_data *emp, room_data *location, struct interaction_item *list, int interaction_type) {
+	struct interaction_item *interact;
+	LL_FOREACH(list, interact) {
+		if (interact->type == interaction_type) {
+			ewt_mark_resource_worker(emp, location, interact->vnum);
+		}
+	}
+}
+
+
+/**
+* Marks a worker on all resources for an interaction. This is used when a
+* worker is spawned and the system isn't sure which items the worker might
+* get from the interactions; it should prevent over-spawning workers.
+*
+* This function can be called on the whole room.
+*
+* @param empire_data *emp The empire whose workers we'll mark.
+* @param room_data *room The room whose interactions we'll check.
+* @param int interaction_type Any INTERACT_ type.
+*/
+static void ewt_mark_for_interactions(empire_data *emp, room_data *room, int interaction_type) {
+	ewt_mark_for_interaction_list(emp, room, GET_SECT_INTERACTIONS(SECT(room)), interaction_type);
+	if (ROOM_CROP(room)) {
+		ewt_mark_for_interaction_list(emp, room, GET_CROP_INTERACTIONS(ROOM_CROP(room)), interaction_type);
+	}
+	if (GET_BUILDING(room)) {
+		ewt_mark_for_interaction_list(emp, room, GET_BLD_INTERACTIONS(GET_BUILDING(room)), interaction_type);
+	}
+}
+
+
  /////////////////////////////////////////////////////////////////////////////
 //// HELPERS ////////////////////////////////////////////////////////////////
 
@@ -1174,6 +1218,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 	if (worker && can_do) {
 		if (get_room_extra_data(room, ROOM_EXTRA_CHOP_PROGRESS) <= 0) {
 			set_room_extra_data(room, ROOM_EXTRA_CHOP_PROGRESS, chop_timer);
+			ewt_mark_for_interactions(emp, room, INTERACT_CHOP);
 		}
 		else {
 			add_to_room_extra_data(room, ROOM_EXTRA_CHOP_PROGRESS, -1);
@@ -1198,10 +1243,15 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 					}
 				}
 			}
+			else {
+				ewt_mark_for_interactions(emp, room, INTERACT_CHOP);
+			}
 		}
 	}
 	else if (can_do) {
-		place_chore_worker(emp, CHORE_CHOPPING, room);
+		if ((worker = place_chore_worker(emp, CHORE_CHOPPING, room))) {
+			ewt_mark_for_interactions(emp, room, INTERACT_CHOP);
+		}
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
@@ -1237,7 +1287,9 @@ void do_chore_digging(empire_data *emp, room_data *room) {
 			}
 		}
 		else {
-			worker = place_chore_worker(emp, CHORE_DIGGING, room);
+			if ((worker = place_chore_worker(emp, CHORE_DIGGING, room))) {
+				ewt_mark_for_interactions(emp, room, INTERACT_DIG);
+			}
 		}
 	}
 	else if (worker) {
@@ -1410,7 +1462,9 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int
 		}
 	}
 	else if (found_proto) {
-		worker = place_chore_worker(emp, chore, room);
+		if ((worker = place_chore_worker(emp, chore, room))) {
+			ewt_mark_for_interaction_list(emp, room, found_proto->interactions, interact_type);
+		}
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
@@ -1516,7 +1570,9 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 			}
 		}
 		else {
-			worker = place_chore_worker(emp, CHORE_FARMING, room);
+			if ((worker = place_chore_worker(emp, CHORE_FARMING, room))) {
+				ewt_mark_for_interactions(emp, room, INTERACT_HARVEST);
+			}
 		}
 	}
 	else if (worker) {
@@ -1586,7 +1642,9 @@ void do_chore_gardening(empire_data *emp, room_data *room) {
 			}
 		}
 		else {
-			worker = place_chore_worker(emp, CHORE_HERB_GARDENING, room);
+			if ((worker = place_chore_worker(emp, CHORE_HERB_GARDENING, room))) {
+				ewt_mark_for_interactions(emp, room, INTERACT_FIND_HERB);
+			}
 		}
 	}
 	else if (worker) {
@@ -1694,7 +1752,9 @@ void do_chore_mining(empire_data *emp, room_data *room) {
 			}
 		}
 		else {
-			worker = place_chore_worker(emp, CHORE_MINING, room);
+			if ((worker = place_chore_worker(emp, CHORE_MINING, room))) {
+				ewt_mark_for_interaction_list(emp, room, GET_GLOBAL_INTERACTIONS(mine), INTERACT_MINE);
+			}
 		}
 	}
 	else if (worker) {
@@ -1820,6 +1880,7 @@ void do_chore_quarrying(empire_data *emp, room_data *room) {
 	if (worker && can_do) {
 		if (get_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS) <= 0) {
 			set_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS, 24);
+			ewt_mark_for_interactions(emp, room, INTERACT_QUARRY);
 		}
 		else {
 			add_to_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS, -1);
@@ -1832,11 +1893,16 @@ void do_chore_quarrying(empire_data *emp, room_data *room) {
 					SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 				}
 			}
+			else {
+				ewt_mark_for_interactions(emp, room, INTERACT_QUARRY);
+			}
 		}
 	}
 	else if (can_do) {
 		// place worker
-		worker = place_chore_worker(emp, CHORE_QUARRYING, room);
+		if ((worker = place_chore_worker(emp, CHORE_QUARRYING, room))) {
+			ewt_mark_for_interactions(emp, room, INTERACT_QUARRY);
+		}
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
