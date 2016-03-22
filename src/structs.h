@@ -312,7 +312,11 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_SAW  17
 #define INTERACT_TAN  18
 #define INTERACT_CHIP  19
-#define NUM_INTERACTS  20
+#define INTERACT_CHOP  20
+#define INTERACT_FISH  21
+#define INTERACT_PAN  22
+#define INTERACT_QUARRY  23
+#define NUM_INTERACTS  24
 
 
 // for object saving
@@ -457,45 +461,46 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_INTERLINK  BIT(5)	// can be interlinked
 #define BLD_HERD  BIT(6)	// can herd
 #define BLD_DEDICATE  BIT(7)	// can be dedicated to a player
-#define BLD_DRINK  BIT(8)	// can be used to drink/fill water
+// #define BLD_UNUSED1  BIT(8)
 #define BLD_NO_NPC  BIT(9)	// mobs won't walk in
 #define BLD_BARRIER  BIT(10)	// can only go back the direction you came
-#define BLD_TAVERN  BIT(11)	// building functions as a tavern
+// #define BLD_UNUSED2  BIT(11)
 #define BLD_LARGE_CITY_RADIUS  BIT(12)	// counts as in-city further than normal
-#define BLD_MINE  BIT(13)	// building is minable
+// #define BLD_UNUSED3  BIT(13)
 #define BLD_ATTACH_ROAD  BIT(14)	// building connects to roads on the map
 #define BLD_BURNABLE  BIT(15)	// fire! fire!
-#define BLD_FORGE  BIT(16)	// can forge here
-#define BLD_COOKING_FIRE  BIT(17)	// allows cook
-#define BLD_ALCHEMIST  BIT(18)	// provides alchemy tools
-#define BLD_STABLE  BIT(19)	// mobs don't despawn; can shear, barde, etc
-#define BLD_LIBRARY  BIT(20)	// can use library and bookedit commands
-#define BLD_APIARY  BIT(21)	// provides Apiaries tech
-#define BLD_GLASSBLOWER  BIT(22)	// provides Glassblowing tech
-#define BLD_DOCKS  BIT(23)	// provides Seaport tech
-#define BLD_PIGEON_POST  BIT(24)	// can use mail
-#define BLD_MILL  BIT(25)	// can use the mill command
-#define BLD_POTTER  BIT(26)	// pottery crafts go faster
-#define BLD_TAILOR  BIT(27)	// can use tailoring abilities here
-#define BLD_BATHS  BIT(28)	// can bathe here
+// #define BLD_UNUSED4  BIT(16)
+// #define BLD_UNUSED5  BIT(17)
+// #define BLD_UNUSED6  BIT(18)
+// #define BLD_UNUSED7  BIT(19)
+// #define BLD_UNUSED8  BIT(20)
+// #define BLD_UNUSED9  BIT(21)
+// #define BLD_UNUSED10  BIT(22)
+// #define BLD_UNUSED11  BIT(23)
+// #define BLD_UNUSED12  BIT(24)
+// #define BLD_UNUSED13  BIT(25)
+// #define BLD_UNUSED14  BIT(26)
+// #define BLD_UNUSED15  BIT(27)
+// #define BLD_UNUSED16  BIT(28)
 #define BLD_SAIL  BIT(29)	// ships can pass through building
-#define BLD_TOMB  BIT(30)	// can set as a tomb
-#define BLD_MINT  BIT(31)	// can mint coins
-#define BLD_VAULT  BIT(32)	// for various vault functions
+// #define BLD_UNUSED17  BIT(30)
+// #define BLD_UNUSED18  BIT(31)
+// #define BLD_UNUSED19  BIT(32)
 #define BLD_ITEM_LIMIT  BIT(33)	// room does not hold unlimited items
 #define BLD_LONG_AUTOSTORE  BIT(34)	// autostore takes a long time here
-#define BLD_WAREHOUSE  BIT(35)	// warehouse command
-#define BLD_TRADE  BIT(36)	// trading post / trade command
+// #define BLD_UNUSED20  BIT(35)
+// #define BLD_UNUSED21  BIT(36)
 #define BLD_HIGH_DEPLETION  BIT(37)	// allows more resource farming here
-#define BLD_PORTAL  BIT(38)	// functions as a portal building
-#define BLD_BEDROOM  BIT(39)	// boosts regen when sleeping
+// #define BLD_UNUSED22  BIT(38)
+// #define BLD_UNUSED23  BIT(39)
 #define BLD_NO_DELETE  BIT(40)	// will not be deleted for not having a homeroom
-#define BLD_SUMMON_PLAYER  BIT(41)	// can use the summon player command
+// #define BLD_UNUSED24  BIT(41)
 #define BLD_NEED_BOAT  BIT(42)	// requires a boat to enter
 #define BLD_LOOK_OUT  BIT(43)	// can see the map using "look out"
 #define BLD_SECONDARY_TERRITORY  BIT(44)	// similar to a ship -- counts as territory off the map
-#define BLD_SHIPYARD  BIT(45)	// for building ships
+// #define BLD_UNUSED25  BIT(45)
 #define BLD_UPGRADED  BIT(46)	// combines with SHIPYARD, etc. to create upgraded versions of buildings
+// #define BLD_UNUSED26  BIT(47)
 
 
 // Terrain flags for do_build -- these match up with build_on flags for building crafts
@@ -544,6 +549,42 @@ typedef struct vehicle_data vehicle_data;
 #define DES_SHIP_LARGE		BIT(15)
 #define DES_SHIP_EXTRA		BIT(16)
 #define DES_LAND_VEHICLE	BIT(17)
+
+
+// FNC_x: function flags (for buildings)
+#define FNC_ALCHEMIST  BIT(0)	// can brew and mix here
+#define FNC_APIARY  BIT(1)	// grants the Apiaries tech to the empire
+#define FNC_BATHS  BIT(2)	// can use the bathe command here
+#define FNC_BEDROOM  BIT(3)	// boosts regen while sleeping
+#define FNC_CARPENTER  BIT(4)	// required by some crafts
+#define FNC_DIGGING  BIT(5)	// triggers the workforce digging chore (also need interact
+#define FNC_DOCKS  BIT(6)	// grants the seaport tech to the empire; counts as a dock fo
+#define FNC_FORGE  BIT(7)	// can use the forge and reforge commands here
+#define FNC_GLASSBLOWER  BIT(8)	// grants the Glassblowing tech to the empire
+#define FNC_GUARD_TOWER  BIT(9)	// hostile toward enemy players, at range
+#define FNC_HENGE  BIT(10)	// allows Chant of Druids
+#define FNC_LIBRARY  BIT(11)	// can write and store books here
+#define FNC_MAIL  BIT(12)	// players can send mail here
+#define FNC_MILL  BIT(13)	// can use the mill command here
+#define FNC_MINE  BIT(14)	// can be mined for ore resources
+#define FNC_MINT  BIT(15)	// functions as a mint
+#define FNC_PORTAL  BIT(16)	// functions as a portal building
+#define FNC_POTTER  BIT(17)	// pottery craft time is reduced here
+#define FNC_PRESS  BIT(18)	// can use the 'press' craft
+#define FNC_SAW  BIT(19)	//allows sawing here
+#define FNC_SHIPYARD  BIT(20)	// used to build ships
+#define FNC_SMELT  BIT(21)	// allows smelting here
+#define FNC_STABLE  BIT(22)	// can shear, milk, and barde animals here; animals in this 
+#define FNC_SUMMON_PLAYER  BIT(23)	// allows the summon player command
+#define FNC_TAILOR  BIT(24)	// counts as tailor; can use refashion here
+#define FNC_TANNERY  BIT(25)	// allows tanning here
+#define FNC_TAVERN  BIT(26)	// functions as a tavern (don't set this on the same buildin
+#define FNC_TOMB  BIT(27)	// players can re-spawn here after dying
+#define FNC_TRADING_POST  BIT(28)	// access to global trade, e.g. a trading post
+#define FNC_VAULT  BIT(29)	// stores coins, can use the warehouse command for privileged
+#define FNC_WAREHOUSE  BIT(30)	// can use the warehouse command and store unique items
+#define FNC_DRINK_WATER  BIT(31)	// can drink here
+#define FNC_COOKING_FIRE  BIT(32)	// can cook here
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -679,6 +720,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_TYPE_WORKFORCE  10
 #define CRAFT_TYPE_MANUFACTURE  11
 #define CRAFT_TYPE_SMELT  12
+#define CRAFT_TYPE_PRESS  13
 
 
 // CRAFT_x: Craft Flags for do_gen_craft
@@ -750,7 +792,8 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_NEXUS_CRYSTALS  24
 #define CHORE_MILLING  25
 #define CHORE_REPAIR_VEHICLES  26
-#define NUM_CHORES  27		// total
+#define CHORE_OILMAKING  27
+#define NUM_CHORES  28		// total
 
 
 /* Diplomacy types */
@@ -1084,6 +1127,7 @@ typedef struct vehicle_data vehicle_data;
 #define CMPF_TEMPERATE  BIT(16)
 #define CMPF_TROPICAL  BIT(17)
 #define CMPF_COMMON  BIT(18)
+#define CMPF_AQUATIC  BIT(19)
 
 
 // Container flags -- limited to 31 because of int type in obj value
@@ -1702,7 +1746,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_CLIMATES  4 // total
 
 
-// depletion types
+// DPLTN_x: depletion types
 #define DPLTN_DIG  0
 #define DPLTN_FORAGE  1
 #define DPLTN_GATHER  2
@@ -1711,7 +1755,8 @@ typedef struct vehicle_data vehicle_data;
 #define DPLTN_QUARRY  5
 #define DPLTN_PAN  6
 #define DPLTN_TRAPPING  7
-#define NUM_DEPLETION_TYPES  8	// total
+#define DPLTN_CHOP  8
+#define NUM_DEPLETION_TYPES  9	// total
 
 
 // world evolutions
@@ -2431,6 +2476,7 @@ struct bld_data {
 	int max_damage;
 	int fame;	// how much is added to empire fame
 	bitvector_t flags;	// BLD_
+	bitvector_t functions;	// FNC_
 	bld_vnum upgrades_to;	// the vnum of any building
 	
 	int extra_rooms;	// how many rooms it can have
@@ -3143,13 +3189,6 @@ struct city_metadata_type {
 struct empire_chore_type {
 	char *name;
 	mob_vnum mob;
-};
-
-
-// for do_fish
-struct fishing_data_type {
-	int vnum;
-	double chance;
 };
 
 

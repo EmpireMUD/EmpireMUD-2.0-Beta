@@ -35,6 +35,7 @@ E
 E
 9 0 50.00 1
 I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3013 100.00 1  # FORAGE: a handful of nuts
 I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
@@ -180,10 +181,12 @@ E
 E
 9 0 50.00 2
 I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
 I 9 121 100.00 1  # GATHER: a stick
+I 20 120 100.00 1  # CHOP: a large tree
 M
 9140 1.00 dh
 M
@@ -320,10 +323,12 @@ E
 E
 9 0 50.00 3
 I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
 I 9 121 100.00 1  # GATHER: a stick
+I 20 120 100.00 1  # CHOP: a large tree
 M
 9109 10.00 dh
 M
@@ -432,10 +437,12 @@ E
 E
 9 0 50.00 4
 I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
 I 9 121 100.00 1  # GATHER: a stick
+I 20 120 100.00 1  # CHOP: a large tree
 M
 9109 10.00 dh
 M
@@ -552,10 +559,12 @@ E
 E
 3 29 0.20 29
 I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
 I 9 121 100.00 1  # GATHER: a stick
+I 20 120 100.00 1  # CHOP: a large tree
 M
 9040 0.01 d
 M
@@ -645,6 +654,15 @@ D3
 D4
 ~~~~~
 &c~
+I 21 1300 20.00 1 f  # FISH: a glowing green seashell
+I 21 1305 0.25 1 f  # FISH: a worn old statuette
+I 21 256 0.25 1 f  # FISH: a hestian trinket
+I 21 262 0.25 1 f  # FISH: a trinket of conveyance
+I 21 1304 5.00 1 f  # FISH: some sea junk
+I 21 1311 25.00 1 f  # FISH: a spotted eel
+I 21 1313 25.00 1 f  # FISH: a bright red leaping fish
+I 21 1312 100.00 1 f  # FISH: a speckled trout
+I 22 174 0.05 1  # PAN: a small flake of gold
 M
 9025 5.00 d
 M
@@ -732,6 +750,14 @@ D0
 ~~~~~
 &B~
 I 10 9019 5.00 1  # ENCOUNTER: a shark
+I 21 1300 20.00 1 f  # FISH: a glowing green seashell
+I 21 1305 0.25 1 f  # FISH: a worn old statuette
+I 21 256 0.25 1 f  # FISH: a hestian trinket
+I 21 262 0.25 1 f  # FISH: a trinket of conveyance
+I 21 1304 5.00 1 f  # FISH: some sea junk
+I 21 1302 25.00 1 f  # FISH: a giant linefish
+I 21 1303 25.00 1 f  # FISH: a magenta arrowfish
+I 21 1301 100.00 1 f  # FISH: a striped barbfish
 M
 9063 0.08 d
 M
@@ -776,6 +802,7 @@ D4
 ????~
 &y~
 I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 M
 9039 5.00 cg
@@ -1420,6 +1447,7 @@ D4
 E
 6 0 100.00 5
 I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
 S
 #18
@@ -1713,10 +1741,6 @@ D0
 &g^^&?..~
 &y~
 E
-0 3 5.00 20
-E
-0 2 40.00 20
-E
 0 1 100.00 20
 E
 7 5 0.20 71
@@ -1726,6 +1750,10 @@ I 5 100 100.00 1 X  # DIG: a rock
 I 6 3016 100.00 1  # FORAGE: a handful of dates
 I 7 1204 100.00 1  # FIND-HERB: a daggerbite frond
 I 9 121 100.00 1  # GATHER: a stick
+I 20 122 5.00 4 c  # CHOP: some rough wood
+I 20 122 10.00 3 c  # CHOP: some rough wood
+I 20 122 50.00 2 c  # CHOP: some rough wood
+I 20 122 35.00 1 c  # CHOP: some rough wood
 M
 9040 0.01 d
 M
@@ -1827,6 +1855,7 @@ E
 9 0 50.00 28
 I 6 3017 100.00 1  # FORAGE: a plump fig
 I 9 121 100.00 1  # GATHER: a stick
+I 20 128 100.00 1  # CHOP: a massive jungle tree
 M
 9061 0.01 d
 M
@@ -1922,6 +1951,7 @@ E
 7 5 0.50 29
 I 6 3017 100.00 1  # FORAGE: a plump fig
 I 9 121 100.00 1  # GATHER: a stick
+I 20 128 100.00 1  # CHOP: a massive jungle tree
 M
 9061 0.01 d
 M
@@ -2013,6 +2043,14 @@ E
 11 5 1.00 27
 I 6 3310 100.00 1  # FORAGE: a wood ear mushroom
 I 10 9114 1.00 1  # ENCOUNTER: a massive crocodile
+I 21 1300 20.00 1 f  # FISH: a glowing green seashell
+I 21 1305 0.25 1 f  # FISH: a worn old statuette
+I 21 256 0.25 1 f  # FISH: a hestian trinket
+I 21 262 0.25 1 f  # FISH: a trinket of conveyance
+I 21 1304 5.00 1 f  # FISH: some sea junk
+I 21 1311 25.00 1 f  # FISH: a spotted eel
+I 21 1316 25.00 1 f  # FISH: a small gator
+I 21 1314 100.00 1 f  # FISH: a fat catfish
 M
 9061 0.01 d
 M
@@ -2118,6 +2156,14 @@ A Lake~
 D0
 ~~~~~
 &c~
+I 21 1300 20.00 1 f  # FISH: a glowing green seashell
+I 21 1305 0.25 1 f  # FISH: a worn old statuette
+I 21 256 0.25 1 f  # FISH: a hestian trinket
+I 21 262 0.25 1 f  # FISH: a trinket of conveyance
+I 21 1304 5.00 1 f  # FISH: some sea junk
+I 21 1314 25.00 1 f  # FISH: a fat catfish
+I 21 1315 25.00 1 f  # FISH: a yellow perch
+I 21 1312 100.00 1 f  # FISH: a speckled trout
 M
 9025 5.00 d
 S
@@ -2158,8 +2204,9 @@ E
 E
 11 5 1.00 20
 I 5 102 9.00 1 X  # DIG: a flint stone
-I 5 100 100.00 1 X  # DIG: a rock
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
+I 5 101 15.00 1 X  # DIG: a pile of clay
+I 5 100 100.00 1 X  # DIG: a rock
 I 6 3014 100.00 1  # FORAGE: some dry beans
 I 7 1201 50.00 1 a  # FIND-HERB: some fiveleaf
 I 7 1204 50.00 1 a  # FIND-HERB: a daggerbite frond
@@ -2277,17 +2324,19 @@ D4
 .Y.Y~
 &0~
 E
-0 2 50.00 70
-E
 0 1 100.00 70
 E
 11 5 1.00 26
 I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 101 15.00 1 X  # DIG: a pile of clay
+I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3014 100.00 1  # FORAGE: some dry beans
 I 7 1201 50.00 1 a  # FIND-HERB: some fiveleaf
 I 7 1204 50.00 1 a  # FIND-HERB: a daggerbite frond
 I 9 121 100.00 1  # GATHER: a stick
+I 20 120 50.00 2 c  # CHOP: a large tree
+I 20 120 50.00 1 c  # CHOP: a large tree
 M
 9040 0.01 d
 M
@@ -2390,6 +2439,8 @@ E
 E
 11 5 1.00 26
 I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 101 15.00 1 X  # DIG: a pile of clay
+I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3014 100.00 1  # FORAGE: some dry beans
 I 7 1201 50.00 1 a  # FIND-HERB: some fiveleaf

@@ -398,6 +398,7 @@ o^^^~
 I 6 3006 100.00 1  # FORAGE: a plump peach
 I 8 3004 100.00 1  # HARVEST: a basket of peaches
 I 9 121 100.00 1  # GATHER: a stick
+I 20 120 100.00 1  # CHOP: a large tree
 M
 9145 5.00 adh
 M
@@ -513,6 +514,7 @@ D0
 I 6 3007 100.00 1  # FORAGE: a couple red cherries
 I 8 3008 100.00 1  # HARVEST: a bag of cherries
 I 9 121 100.00 1  # GATHER: a stick
+I 20 120 100.00 1  # CHOP: a large tree
 M
 9145 5.00 adh
 M
@@ -610,6 +612,8 @@ D0
 I 6 3009 100.00 1  # FORAGE: an orange
 I 8 3010 100.00 1  # HARVEST: a sack of oranges
 I 9 121 100.00 1  # GATHER: a stick
+I 20 122 50.00 1 c  # CHOP: some rough wood
+I 20 122 50.00 2 c  # CHOP: some rough wood
 M
 250 0.10 ad
 M
@@ -744,6 +748,8 @@ D0
 I 6 3018 100.00 1  # FORAGE: a couple of olives
 I 8 3019 100.00 1  # HARVEST: a basket of olives
 I 9 121 100.00 1  # GATHER: a stick
+I 20 122 50.00 1 c  # CHOP: some rough wood
+I 20 122 50.00 2 c  # CHOP: some rough wood
 M
 250 0.10 ad
 M
@@ -973,6 +979,7 @@ D0
 I 6 3001 100.00 1  # FORAGE: a green apple
 I 8 3002 100.00 1  # HARVEST: a bunch of apples
 I 9 121 100.00 1  # GATHER: a stick
+I 20 120 100.00 1  # CHOP: a large tree
 M
 9145 5.00 adh
 M

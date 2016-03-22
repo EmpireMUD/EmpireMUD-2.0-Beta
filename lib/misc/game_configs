@@ -25,6 +25,7 @@ welcome_message Welcome to your EmpireMUD! Prepare to face your destiny!
 *
 * Actions configs
 chip_timer 4
+chop_depletion 4
 chop_timer 30
 chore_distance 20
 common_depletion 125

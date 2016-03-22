@@ -1181,7 +1181,7 @@ bool inventory_store_building(char_data *ch, room_data *room, empire_data *emp) 
 		return found;
 	}
 	
-	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_VAULT)) {
+	if (HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT)) {
 		msg_to_char(ch, "\r\nVault: %d coin%s, %d treasure (%d total)\r\n", EMPIRE_COINS(emp), (EMPIRE_COINS(emp) != 1 ? "s" : ""), EMPIRE_WEALTH(emp), GET_TOTAL_WEALTH(emp));
 	}
 

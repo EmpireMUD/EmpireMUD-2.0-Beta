@@ -31,6 +31,7 @@
 // external vars
 
 // external funcs
+extern room_data *dir_to_room(room_data *room, int dir);
 void scale_item_to_level(obj_data *obj, int level);
 
 
@@ -222,7 +223,10 @@ ACMD(do_dismount) {
 
 
 ACMD(do_fish) {
-	int fishing_timer = config_get_int("fishing_timer");
+	room_data *room = IN_ROOM(ch);
+	int dir = NO_DIR;
+	
+	any_one_arg(argument, arg);
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't fish.\r\n");
@@ -238,11 +242,17 @@ ACMD(do_fish) {
 	else if (GET_ACTION(ch)) {
 		msg_to_char(ch, "You're really too busy to do that.\r\n");
 	}
-	else if (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !IS_OUTDOORS(ch)) {
-		msg_to_char(ch, "You can't fish in here!\r\n");
+	else if (*arg && (dir = parse_direction(ch, arg)) == NO_DIR) {
+		msg_to_char(ch, "Fish in what direction?\r\n");
 	}
-	else if (!find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER | SECTF_OCEAN, NOBITS, 1)) {
-		msg_to_char(ch, "Unless you're fishing for worms in puddles, there's really nothing to catch here.\r\n");
+	else if (dir != NO_DIR && !(room = dir_to_room(IN_ROOM(ch), dir))) {
+		msg_to_char(ch, "You can't fish in that direction.\r\n");
+	}
+	else if (!CAN_INTERACT_ROOM(room, INTERACT_FISH)) {
+		msg_to_char(ch, "You can't fish for anything %s!\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
+	}
+	else if (!can_use_room(ch, room, MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to fish %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
 	}
 	else if (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) != ITEM_WEAPON || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_JAB) {
 		msg_to_char(ch, "You'll need a spear to fish.\r\n");
@@ -251,10 +261,11 @@ ACMD(do_fish) {
 		return;
 	}
 	else {
-		start_action(ch, ACT_FISHING, fishing_timer / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1));
+		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1));
+		GET_ACTION_VNUM(ch, 0) = dir;
 		
 		msg_to_char(ch, "You begin looking for fish...\r\n");
-		act("$n begins looking for fish.", TRUE, ch, 0, 0, TO_ROOM);
+		act("$n begins looking for fish.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 

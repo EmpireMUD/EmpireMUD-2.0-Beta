@@ -945,7 +945,7 @@ char *get_skill_abilities_display(char_data *ch, skill_data *skill, any_vnum pre
 		else if (skab->level < SPECIALTY_SKILL_CAP) {
 			max_skill = SPECIALTY_SKILL_CAP;
 		}
-		else if (skab->level < CLASS_SKILL_CAP) {
+		else if (skab->level <= CLASS_SKILL_CAP) {
 			max_skill = CLASS_SKILL_CAP;
 		}
 		
@@ -1827,7 +1827,7 @@ bool has_cooking_fire(char_data *ch) {
 		return TRUE;
 	}
 
-	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_COOKING_FIRE)) {	
+	if (HAS_FUNCTION(IN_ROOM(ch), FNC_COOKING_FIRE)) {	
 		return TRUE;
 	}
 	if (RMT_FLAGGED(IN_ROOM(ch), RMT_COOKING_FIRE)) {	

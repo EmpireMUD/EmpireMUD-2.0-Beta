@@ -62,6 +62,7 @@ The Artisans ability unlocks additional buildings.
 (CC) carpenter
 (GG) glassblower
 [PP] pigeonpost
+(OO) oilmaker
 (TT) tailor
 [TT] tavern
 {WW} warehouse
@@ -773,6 +774,7 @@ Luxury (Empire ability)
 
 The Luxury ability unlocks additional buildings.
 
+[CC] cabinetofcuriosities  (rare item storage)
 .... courtyard  (in-city only)
 &g^/\^&0 trapperspost
 [&b~~&0] baths  (in-city only)
@@ -807,8 +809,8 @@ empire this way.
 
 When more than one character on an account is in the same empire, they all
 count as just 1 member. Only the highest Greatness and playtime among those
-alts is contributed to the empire. This means prevents players from having an
-unfair advantage from having many alts in the same empire.
+alts is contributed to the empire. This prevents players from having an unfair
+advantage from having many alts in the same empire.
 
 The roster command shows a list of all players in the empire. Members high-
 lighted in red have timed out, and are no longer contributing abilities, tech-
@@ -846,10 +848,11 @@ See also: BUILD, GRAND MONUMENTS
 #
 PAN
 
-Usage:  pan
+Usage:  pan [direction]
 
 Using a simple metal pan, you can pan for gold flakes next to the river. It's
-rare to find anything, but it's something to do.
+rare to find anything, but it's something to do. You can pan an adjacent map
+tile, or the one you're standing in.
 
 See also: DEPLETION, FORGE
 #
@@ -1377,7 +1380,7 @@ Workforce types:
   &ynailmaking:&0 NPCs will forge pouches of nails at the forge.
   &ybrickmaking:&0 NPCs will make bricks at the potter.
   &yabandon-dismantled:&0 NPCS will abandon a tile when they finish dismantling.
-  &cherb gardening (skilled):&0 NPCS will gather herbs in gardens.
+  &cherb-gardening (skilled):&0 NPCS will gather herbs in gardens.
   &yfire brigade:&0 NPCs will put out fires.
   &ctrapping (skilled):&0 NPCs will gather skins at trapper's posts.
   &ytanning:&0 NPCs will tan skins into leather.
@@ -1390,6 +1393,7 @@ Workforce types:
      requires both Exarch Crafts and Skilled Labor.
   &ymilling:&0 Will mill grains into flour.
   &yrepair-vehicles&0: Will keep vehicles maintained.
+  &yoilmaking:&0 Will press oil.
   
 Items marked (skilled) require the Skilled Labor ability.
 

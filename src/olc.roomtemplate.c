@@ -683,41 +683,51 @@ void olc_show_room_template(char_data *ch) {
 	}
 	
 	*buf = '\0';
-
+	
 	sprintf(buf + strlen(buf), "[&c%d&0] &c%s&0\r\n", GET_OLC_VNUM(ch->desc), !room_template_proto(GET_RMT_VNUM(rmt)) ? "new room template" : GET_RMT_TITLE(room_template_proto(GET_RMT_VNUM(rmt))));
 	sprintf(buf + strlen(buf), "Adventure: %d &c%s&0\r\n", adv ? GET_ADV_VNUM(adv) : NOTHING, adv ? GET_ADV_NAME(adv) : "none");
 	sprintf(buf + strlen(buf), "<&ytitle&0> %s\r\n", NULLSAFE(GET_RMT_TITLE(rmt)));
 	sprintf(buf + strlen(buf), "<&ydescription&0>\r\n%s", NULLSAFE(GET_RMT_DESC(rmt)));
-
+	
 	sprintbit(GET_RMT_FLAGS(rmt), room_template_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", lbuf);
-
+	
 	sprintbit(GET_RMT_BASE_AFFECTS(rmt), room_aff_bits, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<&yaffects&0> %s\r\n", lbuf);
-
+	
 	// exits
 	sprintf(buf + strlen(buf), "Exits: <&yexit&0>, <&ymatchexits&0>\r\n");
-	get_exit_template_display(GET_RMT_EXITS(rmt), lbuf);
-	strcat(buf, lbuf);
-
+	if (GET_RMT_EXITS(rmt)) {
+		get_exit_template_display(GET_RMT_EXITS(rmt), lbuf);
+		strcat(buf, lbuf);
+	}
+	
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <&yextra&0>\r\n");
-	get_extra_desc_display(GET_RMT_EX_DESCS(rmt), buf1);
-	strcat(buf, buf1);
-
+	if (GET_RMT_EX_DESCS(rmt)) {
+		get_extra_desc_display(GET_RMT_EX_DESCS(rmt), buf1);
+		strcat(buf, buf1);
+	}
+	
 	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
-	get_interaction_display(GET_RMT_INTERACTIONS(rmt), buf1);
-	strcat(buf, buf1);
+	if (GET_RMT_INTERACTIONS(rmt)) {
+		get_interaction_display(GET_RMT_INTERACTIONS(rmt), buf1);
+		strcat(buf, buf1);
+	}
 	
 	// spawns
 	sprintf(buf + strlen(buf), "Spawns: <&yspawns&0>\r\n");
-	get_template_spawns_display(GET_RMT_SPAWNS(rmt), lbuf);
-	strcat(buf, lbuf);
-
+	if (GET_RMT_SPAWNS(rmt)) {
+		get_template_spawns_display(GET_RMT_SPAWNS(rmt), lbuf);
+		strcat(buf, lbuf);
+	}
+	
 	// scripts
 	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
-	get_script_display(GET_RMT_SCRIPTS(rmt), lbuf);
-	strcat(buf, lbuf);
+	if (GET_RMT_SCRIPTS(rmt)) {
+		get_script_display(GET_RMT_SCRIPTS(rmt), lbuf);
+		strcat(buf, lbuf);
+	}
 	
 	page_string(ch->desc, buf, TRUE);
 }

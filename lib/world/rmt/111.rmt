@@ -91,7 +91,7 @@ An Underground Lakeshore~
 above a basin-shaped floor. The thunderous rumble of a waterfall can be heard
 to the east, on the farthest side of an underground lake. The water is brisk
 and deep, rimmed with detritus common to fluctuating shorelines. A few old
-boats lie among the debris.  
+boats lie among the debris.
 ~
 b 0
 D8
@@ -130,7 +130,7 @@ A Downward Slide~
 and ochre along the walls show that this was once an underground stream, long
 dry from lack of replenishment. Now all that remains is a seeping trickle
 meandering its way toward a more distinct sound of falling water. You could
-slide down to the lakeshore below, but climbing back up looks impossible.  
+slide down to the lakeshore below, but climbing back up looks impossible.
 ~
 b 0
 D4
@@ -160,7 +160,7 @@ An Underground Lake~
    You paddle out onto the water in your boat, found among the wrecks on the
 lakeshore. The water is so deep, it appears impervious to light. A slight
 current ripples from the east, the result of tons of water cascading from
-somewhere in the darkness above.  
+somewhere in the darkness above.
 ~
 b 0
 D3
@@ -202,7 +202,7 @@ half-moon just wide enough at the base for one occupant, and tall enough to
 brush the shoulder of an average height. Given the open space on the other
 side, it's likely the groove was created from backs pressed against it for
 balance. A few old boats are lying on the path ahead, probably used to cross
-the lake below.  
+the lake below.
 ~
 0 0
 D9
@@ -234,7 +234,7 @@ radiating outward from the lake and rushing to break against the distant walls,
 their paths split by small thickets of overgrown carrot tops, blackberry
 shrubs, and pear trees.
 ~
-ade 0
+adeg 0
 D8
 ~
 0 11114
@@ -253,9 +253,9 @@ S
 An Inclining Seam~
    The split rises gradually, and narrows only slightly, but the grass quickly
 gives way to scrub and then stone as the slope steepens dramatically. If you
-continue on, you will not be able to return the same way.  
+continue on, you will not be able to return the same way.
 ~
-0 0
+g 0
 D9
 ~
 0 11113
@@ -274,7 +274,7 @@ fog into the darkness between the falls and the distant shore. Yet the sheer
 amount of water that rushes recklessly toward its breakover is equally
 impressive. The primary origin appears to be through a wide opening to the
 north, but it is greatly reinforced by several jets erupting from fissures in
-the walls.  
+the walls.
 ~
 b 0
 D9

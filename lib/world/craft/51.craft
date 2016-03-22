@@ -1102,4 +1102,32 @@ R
 R
 25 40 1 0
 S
+#5192
+oilmaker~
+-1 1
+8 39 0 1 -1
+B
+5192 be bdeklmno
+R
+21 4 1 0
+R
+3 2 1 8224
+R
+16 8 1 0
+R
+19 4 1 0
+S
+#5193
+cabinetofcuriosities~
+-1 1
+8 42 0 1 -1
+B
+5193 be bdeklmno
+R
+16 4 1 0
+R
+19 2 1 0
+R
+3 12 1 34
+S
 $

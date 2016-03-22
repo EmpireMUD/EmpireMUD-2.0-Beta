@@ -48,6 +48,20 @@ digging in the mountains.
 
 See also: DIG
 #
+"BUFF FOOD" "BUFF FOODS" "WELL FED" WELL-FED
+
+Buff foods are foods that give you a bonus when you eat them. Unlike normal
+foods, you can eat buff foods even if you're full -- but they will replace any
+existing "well-fed" buff you already have.
+
+You can only eat 24 hours' worth of a buff food at once, giving you a full day
+(30 real minutes) of that food's effect. If less than 24 hours of food is left,
+you will get a shorter effect instead.
+
+If you become hungry, you'll lose your well-fed effect early.
+
+See also: EAT, FAMILY RECIPES
+#
 CANOE
 
 Canoe (vehicle)
@@ -66,9 +80,10 @@ Clay (component)
 Pile of clay (resource)
 
 Clay is a component used in pottery and brickmaking. Clay is found by digging
-near water and can be stored at the Potter.
+in plains, forests, and well-irrigated areas. You can also build a clay pit to
+dig up more clay. It can be stored at the Potter.
 
-See also: COMPONENT, POTTER
+See also: CLAY PIT, COMPONENT, POTTER
 #
 CLOTH "COTTON CLOTH"
 
@@ -206,7 +221,7 @@ GRAINS "GRAIN COMPONENT"
 
 Grain (component)
 
-Grains are a component type. They currently have no usage in common.
+Used for:  cooking
 
 See also: COMPONENT
 #
@@ -350,7 +365,7 @@ You can create these at the forge. Nails are used for many buildings.
 
 See also: COMPONENT, FORGE, MAINTAIN
 #
-"NEXUS CRYSTALS"
+"NEXUS CRYSTALS" NEXUS-CRYSTALS
 
 Nexus Crystal (resource)
 
@@ -365,7 +380,7 @@ Oil (component)
 
 Used for: cooking
 
-See also: COMPONENT, COOK, MILL
+See also: COMPONENT, COOK, PRESS
 #
 PILLARS "PILLAR COMPONENT"
 
@@ -465,7 +480,7 @@ Stored at:  Utility Shed, Store Room, Shipyard
 Used for:  manufacturing
 
 Ropes are used to tie mounts to land vehicles to pull them, and to control the
-sails of ships. They will be consumed when you manufuacture the vehicles - no
+sails of ships. They will be consumed when you manufacture the vehicles - no
 more ropes are needed afterwards.
 
 You can craft basic ropes from small pieces of leather.

@@ -177,6 +177,8 @@ Crops (CROPEDIT):
 - The map region only matters if the crop grows in the wild (no !WILD flag).
 - Crops should have a FORAGE interaction for a small single food item.
 - Crops should have a HARVEST interaction for a plantable large item.
+- Orchard crops need a CHOP interaction if they will give trees. Orchards are
+  still choppable without this, though.
 
 Globals (GEDIT):
 - All global tables must be approved by the head builder, because they apply
@@ -1154,6 +1156,9 @@ When set on a building, these flags affect all interior rooms, too. When set
 on a designate-able room (a building where the ROOM flag is set), they only
 affect players in that room.
 
+(Some former building flags were moved to the 'functions' list, and their
+former building flags still show up in the editor as DEPRECATED.)
+
 Available flags:
  ROOM - this is a room that can be added with the designate command if it has
     matching designate flags with a building
@@ -1168,51 +1173,70 @@ Available flags:
  HERD - mobs can be herded into this building
  DEDICATE - can be dedicated to a patron god or player, which adds "of Name"
     to the room title
- DRINK - has a water source, like a well or fountain
  !NPC - mobs won't enter this building
  BARRIER - can only go back the way you came, unless flying
- TAVERN - functions as a tavern (don't set this on the same building as DRINK)
  LARGE-CITY-RADIUS - counts as in-city much further away than normal
- MINE - can be mined for ore resources
  ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
  BURNABLE - will catch fire if a fire is placed inside by a hostile empire
- FORGE - can use the forge and reforge commands here
- COOKING-FIRE - can cook, brew, and other tasks that require a fire
- ALCHEMIST - can brew and mix here
- STABLE - can shear, milk, and barde animals here; animals in this building don't despawn
- LIBRARY - can write and store books here
- APIARY - grants the Apiaries tech to the empire
- GLASSBLOWER - grants the Glassblowing tech to the empire
- DOCKS - grants the seaport tech to the empire; counts as a dock for ships
- PIGEON-POST - players can send mail here
- MILL - can use the mill command here
- POTTER - pottery craft time is reduced here
- TAILOR - counts as tailor; can use refashion here
- BATHS - can use the bathe command here
  SAIL - can enter this building with a boat
- TOMB - players can re-spawn here after dying
- MINT-COINS - functions as a mint
- VAULT - stores coins, can use the warehouse command for privileged storage
  ITEM-LIMIT - only a certain number of items can be dropped here
  LONG-AUTOSTORE - autostore takes 72 hours instead of 3 here
- WAREHOUSE - can use the warehouse command and store unique items
- TRADE - access to global trade, e.g. a trading post
  HIGH-DEPLETION - has more resources than a normal tile
- PORTAL - functions as a portal building
- BEDROOM - boosts regen while sleeping
  !DELETE - will not be deleted for not having a homeroom
- SUMMON-PLAYER - allows the summon player command
  NEED-BOAT - requires a boat, flying, or swimming to enter
  LOOK-OUT - can see the map using "look out"
  2ND-TERRITORY - counts as territory off the map (e.g. in a ship)
- SHIPYARD - used to build ships
  UPGRADED - modifies other building types like SHIPYARD
 
 * Note: If you change the LARGE-CITY-RADIUS flag on existing buildings,
         territory counts will not update right away. Any empire can force a
         re-count by claiming or abandoning any tile.
 
-See also: INTERLINK, OLC BUILDINGS
+See also: BEDIT FUNCTIONS, INTERLINK, OLC BUILDINGS
+#d
+"BEDIT FUNCTIONS" "FUNCTION FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The function flags determine what chores, actions, and other tasks happen at
+that building.
+
+Available functions:
+ ALCHEMIST - can brew and mix here
+ APIARY - grants the Apiaries tech to the empire
+ BATHS - can use the bathe command here
+ BEDROOM - boosts regen while sleeping
+ CARPENTER - required by some crafts
+ DIGGING - triggers the workforce digging chore (also need interaction)
+ DOCKS - grants the seaport tech to the empire; counts as a dock for ships
+ FORGE - can use the forge and reforge commands here
+ GLASSBLOWER - grants the Glassblowing tech to the empire
+ GUARD-TOWER - hostile toward enemy players, at range
+ HENGE - allows Chant of Druids
+ LIBRARY - can write and store books here
+ MAIL - players can send mail here
+ MILL - can use the mill command here
+ MINE - can be mined for ore resources
+ MINT - functions as a mint
+ PORTAL - functions as a portal building
+ POTTER - pottery craft time is reduced here
+ PRESS - can use the 'press' craft
+ SAW - allows sawing here
+ SHIPYARD - used to build ships
+ SMELT - allows smelting here
+ STABLE - can shear, milk, and barde animals here; animals in this building don't despawn
+ SUMMON-PLAYER - allows the summon player command
+ TAILOR - counts as tailor; can use refashion here
+ TANNERY - allows tanning here
+ TAVERN - functions as a tavern (don't set this on the same building as DRINK)
+ TOMB - players can re-spawn here after dying
+ TRADING-POST - access to global trade, e.g. a trading post
+ VAULT - stores coins, can use the warehouse command for privileged storage
+ WAREHOUSE - can use the warehouse command and store unique items
+ DRINK-WATER - can get water here, like a well
+ COOKING-FIRE - can cook, brew, and other tasks that require a fire
+
+See also: OLC BUILDINGS
 #d
 "BEDIT HITPOINTS"
 
@@ -2106,7 +2130,6 @@ the same weight as an apply of 1. If your item ONLY has one property to set
 Scaling based on item types:
  weapon - the "damage" value
  drink container - the "capacity" value
- food - the "fullness" value
  coins - the "coinamount" value
  missile weapons - the "damage" value
  arrow - the "damage" value
@@ -2448,6 +2471,7 @@ Object interaction types:
  SCRAPE - Items you get when scraping this item (tree -> log).
  SAW - Items you get when sawing this item (tree -> lumber).
  TAN - Items you get when tanning this item (skin -> leather).
+ CHIP - What you get for chipping at the item.
 
 Room interaction types:
  DIG - Items received when using the dig action.
@@ -2456,6 +2480,10 @@ Room interaction types:
  HARVEST - Items received when harvesting a crop, OR when picking in an ORCHARD crop.
  GATHER - Items received from the gather action.
  ENCOUNTER - Hostile mob loaded when a random encounter triggers.
+ CHOP - Things that can be found when chopping here.
+ FISH - Things that can be found by fishing here.
+ PAN - Things that can be found by panning here.
+ QUARRY - Things you can find by quarrying here.
 
 The percent may be anywhere from 0.01 to 100.00 and if the quantity is greater
 than 1, the percent is only checked once for the entire quantity. If you want
@@ -3000,6 +3028,7 @@ Available flags:
  &ctemperate&0 - Comes from temperate areas (especially foods)
  &ctropical&0 - Comes from tropical areas (especially foods)
  &ccommon&0 - Opposite of rare
+ &caquatic&0 - Comes from the water
 
 See also: OEDIT COMPONENT
 #d
@@ -3155,10 +3184,7 @@ Examples of good fullness numbers:
 Foods should also have a decay timer set. Traditionally, more-prepared foods
 take longer to decay, rather than basic it strictly on realism.
 
-For SCALABLE objects, thus number is a scalable value if it is set to a number
-other than 0.
-
-See also: ITEM SCALING, OEDIT DECAY, OLC OBJECTS
+See also: OEDIT DECAY, OLC OBJECTS
 #d
 "OEDIT KEYWORDS"
 
@@ -4206,8 +4232,8 @@ Evolutions are automatically sorted by type and by percentage. Only one will
 be called at a time -- the first one whose percentage check passes.
 
 Available types ([value] isn't used unless specified):
- CHOPPED-DOWN - Sector to become when chopped by a player; value is the number
-    of trees you receive.
+ CHOPPED-DOWN - Sector to become when chopped by a player; you should also add
+    chop interactions.
  CROP-GROWS - Sector to become when the crop finishes growing (Seeded -> Crop).
  ADJACENT-ONE - Called when this sector is next to a certain other sector
     (value is the sector vnum that it's adjacent to).

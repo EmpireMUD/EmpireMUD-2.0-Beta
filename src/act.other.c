@@ -461,7 +461,7 @@ void summon_player(char_data *ch, char *argument) {
 	
 	one_argument(argument, arg);
 	
-	if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_SUMMON_PLAYER)) {
+	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_SUMMON_PLAYER)) {
 		msg_to_char(ch, "You can't summon players here.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -1480,7 +1480,7 @@ ACMD(do_milk) {
 
 	two_arguments(argument, arg, buf);
 
-	if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_STABLE))
+	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE))
 		msg_to_char(ch, "You can't milk animals here!\r\n");
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to finish building the stable before you can milk anything.\r\n");
@@ -1904,7 +1904,7 @@ ACMD(do_shear) {
 
 	one_argument(argument, arg);
 
-	if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_STABLE) || !IS_COMPLETE(IN_ROOM(ch))) {
+	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to be in a stable to shear anything.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {

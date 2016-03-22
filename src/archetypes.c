@@ -1551,8 +1551,10 @@ void olc_show_archetype(char_data *ch) {
 	
 	// gear
 	sprintf(buf + strlen(buf), "Gear: <\tygear\t0>\r\n");
-	get_archetype_gear_display(GET_ARCH_GEAR(arch), lbuf);
-	strcat(buf, lbuf);
+	if (GET_ARCH_GEAR(arch)) {
+		get_archetype_gear_display(GET_ARCH_GEAR(arch), lbuf);
+		strcat(buf, lbuf);
+	}
 	
 	page_string(ch->desc, buf, TRUE);
 }

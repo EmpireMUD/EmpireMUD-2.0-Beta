@@ -1128,7 +1128,7 @@ buy~
 command: buy
 eval vnum 10066
 eval cost 5
-eval named a formfitting backpack
+eval named a form-fitting backpack
 eval keyw backpack
 if (!%arg%)
   %send% %actor% %self.name% sells %named% for %cost% greater skystones.
@@ -1146,8 +1146,8 @@ end
 eval charge %%actor.add_resources(10037,-%cost%)%%
 nop %charge%
 %load% obj %vnum% %actor% inv %actor.level%
-%send% %actor% You buy a %named% for %cost% greater skystones.
-%echoaround% %actor% %actor.name% buys a %named%.
+%send% %actor% You buy %named% for %cost% greater skystones.
+%echoaround% %actor% %actor.name% buys %named%.
 ~
 #10058
 Barrosh passive~
@@ -1241,8 +1241,8 @@ end
 eval charge %%actor.add_resources(10037,-%cost%)%%
 nop %charge%
 %load% obj %vnum% %actor% inv %actor.level%
-%send% %actor% You buy a %named% for %cost% greater skystones.
-%echoaround% %actor% %actor.name% buys a %named%.
+%send% %actor% You buy %named% for %cost% greater skystones.
+%echoaround% %actor% %actor.name% buys %named%.
 ~
 #10061
 Knezz passive~
@@ -1343,8 +1343,8 @@ end
 eval charge %%actor.add_resources(10037,-%cost%)%%
 nop %charge%
 %load% obj %vnum% %actor% inv %actor.level%
-%send% %actor% You buy a %named% for %cost% greater skystones.
-%echoaround% %actor% %actor.name% buys a %named%.
+%send% %actor% You buy %named% for %cost% greater skystones.
+%echoaround% %actor% %actor.name% buys %named%.
 ~
 #10064
 Escaped experiment passive~

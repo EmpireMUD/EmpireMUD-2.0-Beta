@@ -69,13 +69,16 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	bool wait, room_wait;
 	
 	// type checks
-	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MILL) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && (!HAS_FUNCTION(IN_ROOM(ch), FNC_MILL) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need to be in a mill to do that.\r\n");
+	}
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS && (!HAS_FUNCTION(IN_ROOM(ch), FNC_PRESS) || !IS_COMPLETE(IN_ROOM(ch)))) {
+		msg_to_char(ch, "You need a press to do that.\r\n");
 	}
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !can_forge(ch)) {
 		// sends its own message
 	}
-	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT && ((!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_FORGE) && BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_FOUNDRY) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT && (!HAS_FUNCTION(IN_ROOM(ch), FNC_SMELT) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can't %s here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 	
@@ -98,22 +101,22 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_FIRE | CRAFT_ALCHEMY) && !has_cooking_fire(ch)) {
 		msg_to_char(ch, "You need a good fire to do that.\r\n");
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER) && (BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_CARPENTER || !IS_COMPLETE(IN_ROOM(ch)))) {
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER) && (!HAS_FUNCTION(IN_ROOM(ch), FNC_CARPENTER) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need to %s that at the carpenter!\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHIPYARD) && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_SHIPYARD) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHIPYARD) && (!HAS_FUNCTION(IN_ROOM(ch), FNC_SHIPYARD) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need to %s that at the shipyard!\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_BLD_UPGRADED) && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_UPGRADED) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "The building needs to be upgraded to %s that!\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_GLASSBLOWER) && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_GLASSBLOWER) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_GLASSBLOWER) && (!HAS_FUNCTION(IN_ROOM(ch), FNC_GLASSBLOWER) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need to %s that at the glassblower!\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP) && !find_water_container(ch, ch->carrying) && !find_water_container(ch, ROOM_CONTENTS(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need a container of water to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_ALCHEMY) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ALCHEMIST) && !has_tech_available(ch, TECH_GLASSBLOWING)) {
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_ALCHEMY) && !HAS_FUNCTION(IN_ROOM(ch), FNC_ALCHEMIST) && !has_tech_available(ch, TECH_GLASSBLOWING)) {
 		// sends its own messages -- needs glassblowing unless in alchemist room
 	}
 	// end flag checks
@@ -137,7 +140,7 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 bool can_forge(char_data *ch) {
 	bool ok = FALSE;
 	
-	if (!IS_IMMORTAL(ch) && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_FORGE) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (!IS_IMMORTAL(ch) && (!HAS_FUNCTION(IN_ROOM(ch), FNC_FORGE) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need to be in a forge to do that.\r\n");
 	}
 	else if (!has_hammer(ch)) {
@@ -194,6 +197,59 @@ bool find_and_bind(char_data *ch, obj_vnum vnum) {
 	else {
 		return FALSE;	// found no matching item
 	}
+}
+
+
+/**
+* Looks for a craft the player knows, and falls back to ones they don't. It
+* always prefers an exact match over anything. Immortals can also hit in-dev
+* recipes.
+*
+* @param char_data *ch The person looking for a craft.
+* @param char *argument The typed-in name.
+* @param int craft_type Any CRAFT_TYPE_ to look up.
+* @return craft_data* The matching craft, if any.
+*/
+craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_type) {
+	craft_data *unknown_abbrev = NULL;
+	craft_data *known_abbrev = NULL;
+	craft_data *craft, *next_craft;
+	
+	skip_spaces(&argument);
+	
+	HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
+		if (GET_CRAFT_TYPE(craft) != craft_type) {
+			continue;
+		}
+		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+			continue;
+		}
+		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(craft), ch->carrying)) {
+			continue;
+		}
+		
+		if (!str_cmp(argument, GET_CRAFT_NAME(craft))) {
+			// exact match!
+			return craft;
+		}
+		else if (!known_abbrev && is_abbrev(argument, GET_CRAFT_NAME(craft))) {
+			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT)) {
+				// only imms hit this block
+				if (!unknown_abbrev) {
+					unknown_abbrev = craft;
+				}
+			}
+			else if (GET_CRAFT_ABILITY(craft) == NO_ABIL || has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+				known_abbrev = craft;
+			}
+			else if (!unknown_abbrev) {
+				unknown_abbrev = craft;
+			}
+		}
+	}
+	
+	// if we got this far, it didn't return an exact match
+	return known_abbrev ? known_abbrev : unknown_abbrev;
 }
 
 
@@ -314,8 +370,11 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 				else if (psr < SPECIALTY_SKILL_CAP) {
 					level = MIN(SPECIALTY_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
 				}
-				else {
+				else if (psr < CLASS_SKILL_CAP) {
 					level = MIN(CLASS_SKILL_CAP, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
+				}
+				else {	// is a skill ability but >= class skill level (100) -- don't restrict
+					level = get_crafting_level(ch);
 				}
 			}
 			else {
@@ -433,8 +492,9 @@ bool obj_has_apply_type(obj_data *obj, int apply_type) {
 *
 * @param char_data *ch The person checking the craft info.
 * @param craft_data *craft Which craft to show.
+* @param int craft_type Whichever CRAFT_TYPE_ the player is using.
 */
-void show_craft_info(char_data *ch, craft_data *craft) {
+void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	extern const char *affected_bits[];
 	extern const char *apply_types[];
 	extern const char *bld_on_flags[];
@@ -445,8 +505,18 @@ void show_craft_info(char_data *ch, craft_data *craft) {
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], range[MAX_STRING_LENGTH];
 	struct obj_apply *apply;
 	ability_data *abil;
+	craft_data *craft;
 	obj_data *proto;
 	bld_data *bld;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Get %s info on what?\r\n", gen_craft_data[craft_type].command);
+		return;
+	}
+	if (!(craft = find_best_craft_by_name(ch, argument, craft_type))) {
+		msg_to_char(ch, "You don't know any such %s recipe.\r\n", gen_craft_data[craft_type].command);
+		return;
+	}
 	
 	msg_to_char(ch, "Information for %s:\r\n", GET_CRAFT_NAME(craft));
 	
@@ -553,6 +623,7 @@ struct gen_craft_data_t gen_craft_data[] = {
 	
 	{ "manufacture", "manufacturing", NOBITS, { "You carefully manufacture the %s...", "$n carefully manufactures the %s..." } },
 	{ "smelt", "smelting", ACTF_FAST_CHORES, { "You smelt the %s in the fire...", "$n smelts the %s in the fire..." } },
+	{ "press", "pressing", NOBITS, { "You press the %s...", "$n presses the %d..." } },
 };
 
 
@@ -817,7 +888,7 @@ void process_gen_craft(char_data *ch) {
 		}
 		
 		// tailor bonus for weave
-		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAILOR) && IS_COMPLETE(IN_ROOM(ch))) {
+		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && HAS_FUNCTION(IN_ROOM(ch), FNC_TAILOR) && IS_COMPLETE(IN_ROOM(ch))) {
 			GET_ACTION_TIMER(ch) -= 3;
 		}
 
@@ -872,7 +943,7 @@ const struct {
 bool can_refashion(char_data *ch) {
 	bool ok = FALSE;
 	
-	if (!IS_IMMORTAL(ch) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAILOR)) {
+	if (!IS_IMMORTAL(ch) && !HAS_FUNCTION(IN_ROOM(ch), FNC_TAILOR)) {
 		msg_to_char(ch, "You need to be at the tailor to do that.\r\n");
 	}
 	else {
@@ -1189,22 +1260,21 @@ ACMD(do_gen_craft) {
 	bool is_master;
 	obj_data *drinkcon = NULL;
 	ability_data *cft_abil;
-	bool info = FALSE;
-
+	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't craft.\r\n");
 		return;
 	}
-
+	
 	skip_spaces(&argument);
 	
 	// optional leading info request
 	if (!strn_cmp(argument, "info ", 5)) {
 		argument = any_one_arg(argument, arg);
-		skip_spaces(&argument);
-		info = TRUE;
+		show_craft_info(ch, argument, subcmd);
+		return;
 	}
-
+	
 	// optional leading number
 	if ((num = atoi(argument)) > 0) {
 		half_chop(argument, buf, arg);
@@ -1214,7 +1284,7 @@ ACMD(do_gen_craft) {
 		num = 1;
 		strcpy(arg, argument);
 	}
-
+	
 	// if there was an arg, find a matching craft_table entry (type)
 	if (*arg) {
 		HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
@@ -1276,10 +1346,6 @@ ACMD(do_gen_craft) {
 			msg_to_char(ch, "%s\r\n", buf);
 		}
 	}
-	else if (info) {
-		// they only wanted info
-		show_craft_info(ch, type);
-	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy right now.\r\n");
 	}
@@ -1313,7 +1379,7 @@ ACMD(do_gen_craft) {
 		timer = GET_CRAFT_TIME(type);
 		
 		// potter building bonus	
-		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_POTTERY) && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_POTTER) && IS_COMPLETE(IN_ROOM(ch))) {
+		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_POTTERY) && HAS_FUNCTION(IN_ROOM(ch), FNC_POTTER) && IS_COMPLETE(IN_ROOM(ch))) {
 			timer /= 4;
 		}
 		

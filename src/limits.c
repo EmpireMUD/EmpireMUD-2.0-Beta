@@ -334,7 +334,7 @@ void point_update_char(char_data *ch) {
 	}
 	
 	// check spawned
-	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && (!MOB_FLAGGED(ch, MOB_ANIMAL) || !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_STABLE)) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN)) {
+	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && (!MOB_FLAGGED(ch, MOB_ANIMAL) || !HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE)) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN)) {
 		if (!GET_LED_BY(ch) && !GET_LEADING_MOB(ch) && !GET_LEADING_VEHICLE(ch) && !MOB_FLAGGED(ch, MOB_TIED)) {
 			if (distance_to_nearest_player(IN_ROOM(ch)) > config_get_int("mob_despawn_radius")) {
 				despawn_mob(ch);
@@ -1555,7 +1555,7 @@ void point_update_room(room_data *room) {
 	}
 	
 	// check mob crowding
-	if (ROOM_BLD_FLAGGED(room, BLD_STABLE)) {
+	if (HAS_FUNCTION(room, FNC_STABLE)) {
 		for (ch = ROOM_PEOPLE(room); ch; ch = next_ch) {
 			next_ch = ch->next_in_room;
 			
@@ -1837,6 +1837,11 @@ void gain_condition(char_data *ch, int condition, int value) {
 
 	GET_COND(ch, condition) = MAX(0, GET_COND(ch, condition));
 	GET_COND(ch, condition) = MIN(MAX_CONDITION, GET_COND(ch, condition));
+	
+	// prevent well-fed if hungry
+	if (IS_HUNGRY(ch) && value > 0) {
+		affect_from_char(ch, ATYPE_WELL_FED);
+	}
 
 	if (PLR_FLAGGED(ch, PLR_WRITING) || !gain_cond_messsage) {
 		return;
@@ -1888,7 +1893,7 @@ int health_gain(char_data *ch, bool info_only) {
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_HEALTH_REGEN(ch);
 
-		if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BEDROOM)) {
+		if (HAS_FUNCTION(IN_ROOM(ch), FNC_BEDROOM)) {
 			gain *= 1.5;
 		}
 		
@@ -1901,7 +1906,7 @@ int health_gain(char_data *ch, bool info_only) {
 		}
 		
 		if (GET_POS(ch) == POS_SLEEPING) {
-			min = round((double) GET_MAX_HEALTH(ch) / ((double) config_get_int("max_sleeping_regen_time") / (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			min = round((double) GET_MAX_HEALTH(ch) / ((double) config_get_int("max_sleeping_regen_time") / (HAS_FUNCTION(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 		
@@ -1949,7 +1954,7 @@ int mana_gain(char_data *ch, bool info_only) {
 			}
 		}
 
-		if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BEDROOM))
+		if (HAS_FUNCTION(IN_ROOM(ch), FNC_BEDROOM))
 			gain *= 1.5;
 		
 		if (HAS_BONUS_TRAIT(ch, BONUS_MANA_REGEN)) {
@@ -1960,7 +1965,7 @@ int mana_gain(char_data *ch, bool info_only) {
 		}
 		
 		if (GET_POS(ch) == POS_SLEEPING) {
-			min = round((double) GET_MAX_MANA(ch) / ((double) config_get_int("max_sleeping_regen_time") / (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			min = round((double) GET_MAX_MANA(ch) / ((double) config_get_int("max_sleeping_regen_time") / (HAS_FUNCTION(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 		
@@ -2004,7 +2009,7 @@ int move_gain(char_data *ch, bool info_only) {
 			}
 		}
 
-		if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BEDROOM))
+		if (HAS_FUNCTION(IN_ROOM(ch), FNC_BEDROOM))
 			gain *= 1.5;
 		
 		if (HAS_BONUS_TRAIT(ch, BONUS_MOVE_REGEN)) {
@@ -2015,7 +2020,7 @@ int move_gain(char_data *ch, bool info_only) {
 		}
 		
 		if (GET_POS(ch) == POS_SLEEPING) {
-			min = round((double) GET_MAX_MOVE(ch) / ((double) config_get_int("max_sleeping_regen_time") / (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			min = round((double) GET_MAX_MOVE(ch) / ((double) config_get_int("max_sleeping_regen_time") / (HAS_FUNCTION(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 

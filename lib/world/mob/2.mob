@@ -654,4 +654,20 @@ Overseer #n is standing here.
 20 50 bdqv 0
 1 0 0 1
 S
+#275
+#n oiler~
+#n Oiler~
+#n Oiler is turning the press.
+~
+20 50 bdqv 0
+1 0 0 15
+S
+#276
+#n apprentice~
+#n~
+#n is working as the oilmaker's apprentice.
+~
+20 50 bdqv 0
+1 0 0 6
+S
 $

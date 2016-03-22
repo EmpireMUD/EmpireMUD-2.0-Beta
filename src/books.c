@@ -705,7 +705,7 @@ ACMD(do_library) {
 		if (pos == NOTHING) {
 			msg_to_char(ch, "Invalid %s command.\r\n", types[subcmd]);
 		}
-		else if (IS_SET(library_command[pos].flags, LIBR_REQ_LIBRARY) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LIBRARY)) {
+		else if (IS_SET(library_command[pos].flags, LIBR_REQ_LIBRARY) && !HAS_FUNCTION(IN_ROOM(ch), FNC_LIBRARY)) {
 			msg_to_char(ch, "You must be inside a library to do this.\r\n");
 		}
 		else if (IS_SET(library_command[pos].flags, LIBR_REQ_LIBRARY) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {

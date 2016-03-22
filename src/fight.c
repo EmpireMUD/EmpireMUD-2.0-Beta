@@ -1318,7 +1318,7 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 
 	/* Now we're sure we can hit this person: gets worse with dex */
 	if (!AWAKE(ch) || !number(0, MAX(0, (GET_DEXTERITY(ch)/2) - 1))) {
-		dam = 15 + (BUILDING_VNUM(from_room) == BUILDING_GUARD_TOWER2 ? 5 : 0) + (BUILDING_VNUM(from_room) == BUILDING_GUARD_TOWER3 ? 5 : 0);
+		dam = 15 + (ROOM_BLD_FLAGGED(from_room, BLD_UPGRADED) ? 5 : 0);
 	}
 	else {
 		dam = 0;
@@ -1363,7 +1363,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	}
 	
 	// basic guard tower only shoots 2
-	if (distance > 2 && BUILDING_VNUM(from_room) == BUILDING_GUARD_TOWER) {
+	if (distance > 2 && !ROOM_BLD_FLAGGED(from_room, BLD_UPGRADED)) {
 		return FALSE;
 	}
 	
@@ -1549,8 +1549,8 @@ void update_guard_towers(void) {
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
 			tower = ter->room;
-			// TODO this could be a flag... guard towers need some work
-			if (BUILDING_VNUM(tower) == BUILDING_GUARD_TOWER || BUILDING_VNUM(tower) == BUILDING_GUARD_TOWER2 || BUILDING_VNUM(tower) == BUILDING_GUARD_TOWER3) {
+			
+			if (HAS_FUNCTION(tower, FNC_GUARD_TOWER) && IS_COMPLETE(tower)) {
 				process_tower(tower);
 			}
 		}

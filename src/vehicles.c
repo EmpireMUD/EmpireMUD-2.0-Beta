@@ -2251,13 +2251,17 @@ void olc_show_vehicle(char_data *ch) {
 	
 	// maintenance resources
 	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <\tyresource\t0>\r\n");
-	get_resource_display(VEH_YEARLY_MAINTENANCE(veh), lbuf);
-	strcat(buf, lbuf);
+	if (VEH_YEARLY_MAINTENANCE(veh)) {
+		get_resource_display(VEH_YEARLY_MAINTENANCE(veh), lbuf);
+		strcat(buf, lbuf);
+	}
 	
 	// scripts
 	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
-	get_script_display(veh->proto_script, lbuf);
-	strcat(buf, lbuf);
+	if (veh->proto_script) {
+		get_script_display(veh->proto_script, lbuf);
+		strcat(buf, lbuf);
+	}
 	
 	page_string(ch->desc, buf, TRUE);
 }

@@ -1255,6 +1255,7 @@ const char *craft_types[] = {
 	"WORKFORCE",
 	"MANUFACTURE",
 	"SMELT",
+	"PRESS",
 	"\n"
 };
 
@@ -1934,6 +1935,7 @@ const char *component_flags[] = {
 	"temperate",
 	"tropical",
 	"common",
+	"aquatic",
 	"\n"
 };
 
@@ -2108,55 +2110,56 @@ const char *bld_on_flags[] = {
 };
 
 
-// BLD_x
+// BLD_x -- feel free to re-use the *DEPRECATED flags, as they should no longer appear on anything
 const char *bld_flags[] = {
-	"ROOM",
+	"ROOM",	// 0
 	"ALLOW-MOUNTS",
 	"TWO-ENTRANCES",
 	"OPEN",
 	"CLOSED",
-	"INTERLINK",
+	"INTERLINK",	// 5
 	"HERD",
 	"DEDICATE",
-	"DRINK",
+	"*DRINK-DEPRECATED",
 	"!NPC",
-	"BARRIER",
-	"TAVERN",
+	"BARRIER",	// 10
+	"*TAVERN-DEPRECATED",
 	"LARGE-CITY-RADIUS",
-	"MINE",
+	"*MINE-DEPRECATED",
 	"ATTACH-ROAD",
-	"BURNABLE",
-	"FORGE",
-	"COOKING-FIRE",
-	"ALCHEMIST",
-	"STABLE",
-	"LIBRARY",
-	"APIARY",
-	"GLASSBLOWER",
-	"DOCKS",
-	"PIGEON-POST",
-	"MILL",
-	"POTTER",
-	"TAILOR",
-	"BATHS",
+	"BURNABLE",	// 15
+	"*FORGE-DEPRECATED",
+	"*COOKING-FIRE-DEPRECATED",
+	"*ALCHEMIST-DEPRECATED",
+	"*STABLE-DEPRECATED",
+	"*LIBRARY-DEPRECATED",	// 20
+	"*APIARY-DEPRECATED",
+	"*GLASSBLOWER-DEPRECATED",
+	"*DOCKS-DEPRECATED",
+	"*MAIL-DEPRECATED",
+	"*MILL-DEPRECATED",	// 25
+	"*POTTER-DEPRECATED",
+	"*TAILOR-DEPRECATED",
+	"*BATHS-DEPRECATED",
 	"SAIL",
-	"TOMB",
-	"MINT-COINS",
-	"VAULT",
+	"*TOMB-DEPRECATED",	// 30
+	"*MINT-DEPRECATED",
+	"*VAULT-DEPRECATED",
 	"ITEM-LIMIT",
 	"LONG-AUTOSTORE",
-	"WAREHOUSE",
-	"TRADE",
+	"*WAREHOUSE-DEPRECATED",	// 35
+	"*TRADING-POST-DEPRECATED",
 	"HIGH-DEPLETION",
-	"PORTAL",
-	"BEDROOM",
-	"!DELETE",
-	"SUMMON-PLAYER",
+	"*PORTAL-DEPRECATED",
+	"*BEDROOM-DEPRECATED",
+	"!DELETE",	// 40
+	"*SUMMON-DEPRECATED",
 	"NEED-BOAT",
 	"LOOK-OUT",
 	"2ND-TERRITORY",
-	"SHIPYARD",
+	"*SHIPYARD-DEPRECATED",	// 45
 	"UPGRADED",
+	"*PRESS-DEPRECATED",
 	"\n"
 };
 
@@ -2189,7 +2192,8 @@ const char *depletion_type[NUM_DEPLETION_TYPES] = {
 	"fish",
 	"quarry",
 	"pan",
-	"trapping"
+	"trapping",
+	"chop"
 };
 
 
@@ -2237,7 +2241,7 @@ const char *evo_types[] = {
 
 // EVO_x -- what type of data the evolution.value uses
 const int evo_val_types[NUM_EVOS] = {
-	EVO_VAL_NUMBER,	// chopped-down
+	EVO_VAL_NONE,	// chopped-down
 	EVO_VAL_NONE,	// crop-grows
 	EVO_VAL_SECTOR,	// adjacent-one
 	EVO_VAL_SECTOR,	// adjacent-many
@@ -2249,6 +2253,45 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NONE,	// magic-growth
 	EVO_VAL_SECTOR,	// not-adjacent
 	EVO_VAL_SECTOR,	// not-near-sector
+};
+
+
+// FNC_x: function flags (for buildings)
+const char *function_flags[] = {
+	"ALCHEMIST",
+	"APIARY",
+	"BATHS",
+	"BEDROOM",
+	"CARPENTER",
+	"DIGGING",	// 5
+	"DOCKS",
+	"FORGE",
+	"GLASSBLOWER",
+	"GUARD-TOWER",
+	"HENGE",	// 10
+	"LIBRARY",
+	"MAIL",
+	"MILL",
+	"MINE",
+	"MINT",	// 15
+	"PORTAL",
+	"POTTER",
+	"PRESS",
+	"SAW",
+	"SHIPYARD",	// 20
+	"SMELT",
+	"STABLE",
+	"SUMMON-PLAYER",
+	"TAILOR",
+	"TANNERY",	// 25
+	"TAVERN",
+	"TOMB",
+	"TRADING-POST",
+	"VAULT",
+	"WAREHOUSE",	// 30
+	"DRINK-WATER",
+	"COOKING-FIRE",
+	"\n"
 };
 
 
@@ -2632,6 +2675,7 @@ const char *affect_types[] = {
 	"conferred",
 	"morph",
 	"whisperstride",
+	"well-fed",
 	"\n"
 	};
 
@@ -2702,6 +2746,7 @@ const char *affect_wear_off_msgs[] = {
 	"Your conferred strength returns.",
 	"",	// morph stats -- no wear-off message
 	"Your whisperstride fades.",
+	"You no longer feel well-fed.",
 	"\n"
 };
 
@@ -2791,21 +2836,6 @@ double skill_check_difficulty_modifier[NUM_DIFF_TYPES] = {
 const char *skill_flags[] = {
 	"IN-DEVELOPMENT",
 	"\n"
-};
-
-
-// for do_fish
-const struct fishing_data_type fishing_data[] = {
-	{ o_GLOWING_SEASHELL, 20 },	// formerly 12	// formerly 8.5
-	{ o_WORN_STATUETTE, 0.25 },
-	{ o_HESTIAN_TRINKET, 0.25 },
-	{ o_TRINKET_OF_CONVEYANCE, 0.25 },
-	{ o_SEA_JUNK, 5 },
-	{ o_LINEFISH, 25 },
-	{ o_ARROWFISH, 25 },
-
-	// must come last -- any catch-all with 100% to grab the overflow
-	{ o_BARBFISH, 100 }
 };
 
 
@@ -3097,6 +3127,10 @@ const char *interact_types[] = {
 	"SAW",
 	"TAN",
 	"CHIP",
+	"CHOP",
+	"FISH",
+	"PAN",
+	"QUARRY",
 	"\n"
 };
 
@@ -3123,6 +3157,10 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// saw
 	TYPE_OBJ,	// tan
 	TYPE_OBJ,	// chip
+	TYPE_ROOM,	// chop
+	TYPE_ROOM,	// fish
+	TYPE_ROOM,	// pan
+	TYPE_ROOM,	// quarry
 };
 
 
@@ -3148,6 +3186,10 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// saw
 	TYPE_OBJ,	// tan
 	TYPE_OBJ,	// chip
+	TYPE_OBJ,	// chop
+	TYPE_OBJ,	// fish
+	TYPE_OBJ,	// pan
+	TYPE_OBJ,	// quarry
 };
 
 

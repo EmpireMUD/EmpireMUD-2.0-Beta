@@ -50,8 +50,6 @@ void free_trigger(trig_data *trig) {
 		free(trig->name);
 		trig->name = NULL;
 	}
-	
-	// TODO should this free the cmd list? Not sure.
 
 	if (trig->arglist) {
 		free(trig->arglist);

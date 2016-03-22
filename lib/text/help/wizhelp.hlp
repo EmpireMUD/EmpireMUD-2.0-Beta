@@ -1116,6 +1116,7 @@ This is a generic command that houses several simple utilities for immortals.
 They generally have no game effect, but can help with testing.
 
 Available utilities:
+ b318buildings - Finds buildings using flags that were deprecated in 2.0b3.18.
  clearroles - Clears the class roles and class abilities of all players.
  diminish <number> <scale> - Applies the game's diminishing returns formula,
     and returns the result.

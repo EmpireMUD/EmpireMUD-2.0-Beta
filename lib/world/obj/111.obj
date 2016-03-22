@@ -166,13 +166,13 @@ Forge (Jewelry): cave viper sigil (mage neck)
 Forge (Jewelry): serpent pendant (melee neck)
 Forge (Jewelry): skink amulet (tank neck)
 ~
-3 0 a 4
+3 0 a 5
 0 0 0
 12 0
 R
-5164 0
+5193 0
 R
-5511 0
+5621 0
 S
 #11114
 cape scarlet-feathered feathered~
@@ -388,11 +388,13 @@ blue against a midnight backdrop.
 
 Forge (Imperial Armors): opal carapace buckler
 ~
-3 0 a 3
+3 0 a 4
 0 0 0
 14 0
 R
-5164 0
+5621 0
+R
+5193 0
 S
 #11134
 hunk jeweled slag~
@@ -571,11 +573,15 @@ protection.
 Sew (Imperial Armors): titanaconda scale coat
 Sew (Imperial Armors): titanaconda scale trousers
 ~
-3 e a 2
+3 e a 3
 0 0 0
 7 0
 R
 5120 0
+R
+5193 0
+R
+5621 0
 S
 #11146
 titanaconda coat~

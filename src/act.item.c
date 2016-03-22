@@ -1358,7 +1358,7 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 	int liquid = LIQ_WATER;
 	int timer = UNLIMITED;
 
-	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAVERN)) {
+	if (HAS_FUNCTION(IN_ROOM(ch), FNC_TAVERN)) {
 		liquid = tavern_data[get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE)].liquid;
 	}
 	
@@ -1372,7 +1372,7 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 		return;
 	}
 	
-	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DRINK)) {
+	if (HAS_FUNCTION(IN_ROOM(ch), FNC_DRINK_WATER)) {
 		if (!IS_COMPLETE(IN_ROOM(ch))) {
 			msg_to_char(ch, "You can't fill your water until it's finished being built.\r\n");
 			return;
@@ -1380,7 +1380,7 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 		act("You gently fill $p with water.", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n gently fills $p with water.", TRUE, ch, obj, 0, TO_ROOM);
 	}
-	else if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAVERN)) {
+	else if (HAS_FUNCTION(IN_ROOM(ch), FNC_TAVERN)) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE) == 0 || !IS_COMPLETE(IN_ROOM(ch))) {
 			msg_to_char(ch, "This tavern has nothing on tap.\r\n");
 			return;
@@ -1535,10 +1535,6 @@ void scale_item_to_level(obj_data *obj, int level) {
 			SHARE_OR_BONUS(GET_DRINK_CONTAINER_CAPACITY(obj));
 			break;
 		}
-		case ITEM_FOOD: {
-			SHARE_OR_BONUS(GET_FOOD_HOURS_OF_FULLNESS(obj));
-			break;
-		}
 		case ITEM_COINS: {
 			SHARE_OR_BONUS(GET_COINS_AMOUNT(obj));
 			break;
@@ -1618,15 +1614,6 @@ void scale_item_to_level(obj_data *obj, int level) {
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CAPACITY) = amt;
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = amt;
 			// negatives aren't even possible here
-			break;
-		}
-		case ITEM_FOOD: {
-			amt = (int)round(this_share * GET_FOOD_HOURS_OF_FULLNESS(obj) * config_get_double("scale_food_fullness"));
-			if (amt > 0) {
-				points_to_give -= round(this_share * GET_FOOD_HOURS_OF_FULLNESS(obj));
-			}
-			GET_OBJ_VAL(obj, VAL_FOOD_HOURS_OF_FULLNESS) = amt;
-			// negatives aren't possible here
 			break;
 		}
 		case ITEM_COINS: {
@@ -1897,7 +1884,7 @@ room_data *find_docks(empire_data *emp, int island_id) {
 		if (GET_ISLAND_ID(ter->room) != island_id) {
 			continue;
 		}
-		if (!ROOM_BLD_FLAGGED(ter->room, BLD_DOCKS) || !IS_COMPLETE(ter->room)) {
+		if (!HAS_FUNCTION(ter->room, FNC_DOCKS) || !IS_COMPLETE(ter->room)) {
 			continue;
 		}
 		if (ROOM_AFF_FLAGGED(ter->room, ROOM_AFF_NO_WORK)) {
@@ -1933,7 +1920,7 @@ vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 		if (GET_ISLAND_ID(ter->room) != shipd->from_island) {
 			continue;
 		}
-		if (!ROOM_BLD_FLAGGED(ter->room, BLD_DOCKS) || !IS_COMPLETE(ter->room)) {
+		if (!HAS_FUNCTION(ter->room, FNC_DOCKS) || !IS_COMPLETE(ter->room)) {
 			continue;
 		}
 		if (ROOM_AFF_FLAGGED(ter->room, ROOM_AFF_NO_WORK)) {
@@ -2994,7 +2981,7 @@ void warehouse_identify(char_data *ch, char *argument) {
 	}
 	
 	// access permission
-	if (!imm_access && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_WAREHOUSE | BLD_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (!imm_access && (!HAS_FUNCTION(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can't do that here.\r\n");
 		return;
 	}
@@ -3066,7 +3053,7 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 	}
 	
 	// access permission
-	if (!imm_access && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_WAREHOUSE | BLD_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (!imm_access && (!HAS_FUNCTION(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can't do that here.\r\n");
 		return;
 	}
@@ -3074,11 +3061,11 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to do that here.\r\n");
 		return;
 	}
-	if (!imm_access && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_VAULT) && !has_permission(ch, PRIV_WITHDRAW)) {
+	if (!imm_access && HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW)) {
 		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
 		return;
 	}
-	if (!imm_access && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_WAREHOUSE) && !has_permission(ch, PRIV_WAREHOUSE)) {
+	if (!imm_access && HAS_FUNCTION(IN_ROOM(ch), FNC_WAREHOUSE) && !has_permission(ch, PRIV_WAREHOUSE)) {
 		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
 		return;
 	}
@@ -3136,7 +3123,7 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		}
 		
 		// vault permission was pre-validated, but they have to be in one to use it
-		if (IS_SET(iter->flags, EUS_VAULT) && !imm_access && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_VAULT)) {
+		if (IS_SET(iter->flags, EUS_VAULT) && !imm_access && !HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT)) {
 			msg_to_char(ch, "You need to be in a vault to retrieve %s.\r\n", GET_OBJ_SHORT_DESC(iter->obj));
 			return;
 		}
@@ -3211,7 +3198,7 @@ void warehouse_store(char_data *ch, char *argument) {
 	}
 	
 	// access permission
-	if (!imm_access && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_WAREHOUSE | BLD_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (!imm_access && (!HAS_FUNCTION(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can't do that here.\r\n");
 		return;
 	}
@@ -3219,7 +3206,7 @@ void warehouse_store(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to do that here.\r\n");
 		return;
 	}
-	if (!imm_access && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_VAULT) && !has_permission(ch, PRIV_WITHDRAW)) {
+	if (!imm_access && HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW)) {
 		msg_to_char(ch, "You don't have permission to store items here.\r\n");
 		return;
 	}
@@ -3395,7 +3382,7 @@ ACMD(do_drink) {
 	if (!*arg) {
 		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK))
 			type = drink_ROOM;
-		else if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DRINK)) {
+		else if (HAS_FUNCTION(IN_ROOM(ch), FNC_DRINK_WATER)) {
 			if (!can_drink_from_room(ch, (type = drink_ROOM))) {
 				return;
 			}
@@ -3410,7 +3397,7 @@ ACMD(do_drink) {
 	}
 
 	if (type == NOTHING && !(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-		if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DRINK) && (is_abbrev(arg, "water") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)))) {
+		if (HAS_FUNCTION(IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(arg, "water") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)))) {
 			if (!can_drink_from_room(ch, (type = drink_ROOM))) {
 				return;
 			}
@@ -3700,17 +3687,18 @@ ACMD(do_eat) {
 	extern bool check_vampire_sun(char_data *ch, bool message);
 	void taste_blood(char_data *ch, char_data *vict);
 	
+	bool extract = FALSE, will_buff = FALSE;
 	char buf[MAX_STRING_LENGTH];
-	char_data *vict;
+	struct affected_type *af;
+	struct obj_apply *apply;
 	obj_data *food;
-	int amount;
-	bool extract = FALSE;
+	int eat_hours;
 
 	one_argument(argument, arg);
-
+	
+	// 1. basic validation
 	if (REAL_NPC(ch))		/* Cannot use GET_COND() on mobs. */
 		return;
-
 	if (!*arg) {
 		send_to_char("Eat what?\r\n", ch);
 		return;
@@ -3718,6 +3706,7 @@ ACMD(do_eat) {
 	if (!(food = get_obj_in_list_vis(ch, arg, ch->carrying))) {
 		if (!(food = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
 			// special case: Taste Blood
+			char_data *vict;
 			if (subcmd == SCMD_TASTE && IS_VAMPIRE(ch) && has_ability(ch, ABIL_TASTE_BLOOD) && (vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 				if (check_vampire_sun(ch, TRUE) && !ABILITY_TRIGGERS(ch, vict, NULL, ABIL_TASTE_BLOOD)) {
 					taste_blood(ch, vict);
@@ -3739,34 +3728,51 @@ ACMD(do_eat) {
 		send_to_char("You can't eat THAT!\r\n", ch);
 		return;
 	}
-	if (GET_COND(ch, FULL) < 75 && GET_COND(ch, FULL) != UNLIMITED) {	/* Stomach full */
-		send_to_char("You are too full to eat more!\r\n", ch);
+	if (!bind_ok(food, ch)) {
+		msg_to_char(ch, "You can't eat something that's bound to someone else.\r\n");
 		return;
+	}
+	
+	// 2. determine how much they would eat and whether or not there's a buff
+	if (subcmd == SCMD_EAT) {
+		will_buff = (GET_OBJ_APPLIES(food) || GET_OBJ_AFF_FLAGS(food));
+		eat_hours = GET_FOOD_HOURS_OF_FULLNESS(food);
+	}
+	else {	// just tasting
+		eat_hours = 1;
+		will_buff = FALSE;
 	}
 
 	/* check trigger */
 	if (!consume_otrigger(food, ch, OCMD_EAT)) {
 		return;
 	}
-
-	// go
-	amount = (subcmd == SCMD_EAT ? (GET_FOOD_HOURS_OF_FULLNESS(food) * REAL_UPDATES_PER_MUD_HOUR) : REAL_UPDATES_PER_MUD_HOUR);
-	amount = MAX(0, MIN(GET_COND(ch, FULL), amount));
-
-	gain_condition(ch, FULL, -1 * amount);
 	
-	// subtract values first
+	// 3. apply caps
+	if (will_buff) {
+		// limit to 24 hours at once (1 day)
+		eat_hours = MIN(eat_hours, 24);
+	}
+	else {
+		// limit to how hungry they are
+		eat_hours = MIN(eat_hours, (GET_COND(ch, FULL) / REAL_UPDATES_PER_MUD_HOUR));
+	}
+	eat_hours = MAX(eat_hours, 0);
+	
+	// stomach full: only if we're not using it for a buff effect
+	if (eat_hours == 0 && GET_COND(ch, FULL) != UNLIMITED && !will_buff) {
+		send_to_char("You are too full to eat more!\r\n", ch);
+		return;
+	}
+	
+	// 4. ready to eat
+	gain_condition(ch, FULL, -1 * eat_hours * REAL_UPDATES_PER_MUD_HOUR);
 	if (IS_FOOD(food)) {
-		GET_OBJ_VAL(food, VAL_FOOD_HOURS_OF_FULLNESS) -= amount / REAL_UPDATES_PER_MUD_HOUR;
-	}
-
-	// prepare for messaging
-	if (IS_FOOD(food) && GET_FOOD_HOURS_OF_FULLNESS(food) <= 0) {
-		// end of the food
-		extract = TRUE;
+		GET_OBJ_VAL(food, VAL_FOOD_HOURS_OF_FULLNESS) -= eat_hours;
+		extract = (GET_FOOD_HOURS_OF_FULLNESS(food) <= 0);
 	}
 	
-	// messaging
+	// 5. messaging
 	if (extract || subcmd == SCMD_EAT) {
 		// message to char
 		if (has_custom_message(food, OBJ_CUSTOM_EAT_TO_CHAR)) {
@@ -3791,14 +3797,44 @@ ACMD(do_eat) {
 		act("You nibble a little bit of $p.", FALSE, ch, food, 0, TO_CHAR);
 		act("$n tastes a little bit of $p.", TRUE, ch, food, 0, TO_ROOM);
 	}
+	
+	// 6. apply buffs
+	if (will_buff && eat_hours > 0) {
+		// ensure scaled
+		if (OBJ_FLAGGED(food, OBJ_SCALABLE)) {
+			scale_item_to_level(food, 1);	// minimum level
+		}
+		
+		// remove any old buffs
+		affect_from_char(ch, ATYPE_WELL_FED);
+		
+		if (GET_OBJ_AFF_FLAGS(food)) {
+			af = create_flag_aff(ATYPE_WELL_FED, eat_hours MUD_HOURS, GET_OBJ_AFF_FLAGS(food), ch);
+			affect_to_char(ch, af);
+			free(af);
+		}
 
-	// additional messages
-	if (GET_COND(ch, FULL) < 75) {
+		LL_FOREACH(GET_OBJ_APPLIES(food), apply) {
+			af = create_mod_aff(ATYPE_WELL_FED, eat_hours MUD_HOURS, apply->location, apply->modifier, ch);
+			affect_to_char(ch, af);
+			free(af);
+		}
+		
+		msg_to_char(ch, "You feel well-fed.\r\n");
+	}
+	else if (GET_COND(ch, FULL) < 75) {	// additional messages
 		send_to_char("You are full.\r\n", ch);
 	}
-
+	
+	// 7. cleanup
 	if (extract) {
 		extract_obj(food);
+	}
+	else {
+		if (!IS_NPC(ch) && OBJ_FLAGGED(food, OBJ_BIND_FLAGS)) {
+			bind_obj_to_player(food, ch);
+			reduce_obj_binding(food, ch);
+		}
 	}
 }
 
@@ -3817,7 +3853,7 @@ ACMD(do_exchange) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't exchange anything.\r\n");
 	}
-	else if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MINT | BLD_VAULT)) {
+	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_MINT | FNC_VAULT)) {
 		msg_to_char(ch, "You can't exchange treasure for coins here.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -4364,7 +4400,7 @@ ACMD(do_pour) {
 			return;
 		}
 		if (!*arg2) {		/* no 2nd argument */
-			if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK) || find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1) || (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DRINK | BLD_TAVERN) && IS_COMPLETE(IN_ROOM(ch)))) {
+			if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK) || find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1) || (HAS_FUNCTION(IN_ROOM(ch), FNC_DRINK_WATER | FNC_TAVERN) && IS_COMPLETE(IN_ROOM(ch)))) {
 				fill_from_room(ch, to_obj);
 				return;
 			}
@@ -4386,7 +4422,7 @@ ACMD(do_pour) {
 				return;
 			}
 		}
-		if (is_abbrev(arg2, "water") && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DRINK)) {
+		if (is_abbrev(arg2, "water") && HAS_FUNCTION(IN_ROOM(ch), FNC_DRINK_WATER)) {
 			fill_from_room(ch, to_obj);
 			return;
 		}
@@ -5327,7 +5363,7 @@ ACMD(do_trade) {
 	else if (is_abbrev(command, "check")) {
 		trade_check(ch, argument);
 	}
-	else if ((!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TRADE) || !IS_COMPLETE(IN_ROOM(ch))) && !IS_IMMORTAL(ch)) {
+	else if ((!HAS_FUNCTION(IN_ROOM(ch), FNC_TRADING_POST) || !IS_COMPLETE(IN_ROOM(ch))) && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't trade here.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) && !IS_IMMORTAL(ch)) {

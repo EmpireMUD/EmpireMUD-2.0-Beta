@@ -1904,7 +1904,7 @@ void show_tavern_status(char_data *ch) {
 	msg_to_char(ch, "Your taverns:\r\n");
 	
 	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
-		if (ROOM_BLD_FLAGGED(ter->room, BLD_TAVERN)) {
+		if (HAS_FUNCTION(ter->room, FNC_TAVERN)) {
 			found = TRUE;
 			
 			if (has_ability(ch, ABIL_NAVIGATION)) {
@@ -2309,7 +2309,7 @@ ACMD(do_barde) {
 	if (!can_use_ability(ch, ABIL_BARDE, NOTHING, 0, NOTHING)) {
 		// nope
 	}
-	else if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_STABLE) || !IS_COMPLETE(IN_ROOM(ch)))
+	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch)))
 		msg_to_char(ch, "You must barde animals in the stable.\r\n");
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED))
 		msg_to_char(ch, "You don't have permission to barde animals here.\r\n");
@@ -2743,7 +2743,7 @@ ACMD(do_deposit) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't deposit anything.\r\n");
 	}
-	else if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_VAULT)) {
+	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT)) {
 		msg_to_char(ch, "You can only deposit coins in a vault.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -4108,7 +4108,7 @@ ACMD(do_tavern) {
 		}
 	}
 	
-	if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAVERN) || !IS_COMPLETE(IN_ROOM(ch))) {
+	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_TAVERN) || !IS_COMPLETE(IN_ROOM(ch))) {
 		show_tavern_status(ch);
 		msg_to_char(ch, "You can only change what's being brewed while actually in the tavern.\r\n");
 	}
@@ -4176,7 +4176,7 @@ ACMD(do_tomb) {
 		if (tomb && !can_use_room(ch, tomb, GUESTS_ALLOWED)) {
 			msg_to_char(ch, "You no longer have access to that tomb because it's owned by %s.\r\n", ROOM_OWNER(tomb) ? EMPIRE_NAME(ROOM_OWNER(tomb)) : "someone else");
 		}
-		if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TOMB) && IS_COMPLETE(IN_ROOM(ch))) {
+		if (HAS_FUNCTION(IN_ROOM(ch), FNC_TOMB) && IS_COMPLETE(IN_ROOM(ch))) {
 			msg_to_char(ch, "Use 'tomb set' to change your tomb to this room.\r\n");
 		}
 	}
@@ -4193,7 +4193,7 @@ ACMD(do_tomb) {
 		else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 			msg_to_char(ch, "You need to own a building to make it your tomb.\r\n");
 		}
-		else if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TOMB) || !IS_COMPLETE(IN_ROOM(ch))) {
+		else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_TOMB) || !IS_COMPLETE(IN_ROOM(ch))) {
 			msg_to_char(ch, "You can't make this place your tomb!\r\n");
 		}
 		else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE) || ROOM_AFF_FLAGGED(real, ROOM_AFF_HAS_INSTANCE)) {
@@ -5049,7 +5049,7 @@ ACMD(do_withdraw) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't withdraw anything.\r\n");
 	}
-	else if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_VAULT)) {
+	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT)) {
 		msg_to_char(ch, "You can only withdraw coins in a vault.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
