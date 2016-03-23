@@ -1452,7 +1452,7 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 			}
 			
 			case 'T': {	// trigger
-				dg_read_trigger(line, veh, VEH_TRIGGER);
+				parse_trig_proto(line, &(veh->proto_script), error);
 				break;
 			}
 			
@@ -1496,8 +1496,8 @@ void write_vehicle_index(FILE *fl) {
 * @param vehicle_data *veh The thing to save.
 */
 void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
-	void script_save_to_disk(FILE *fp, void *item, int type);
 	void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
+	void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 	
 	char temp[MAX_STRING_LENGTH];
 	
@@ -1537,7 +1537,7 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	write_resources_to_file(fl, 'R', VEH_YEARLY_MAINTENANCE(veh));
 	
 	// T, V: triggers
-	script_save_to_disk(fl, veh, VEH_TRIGGER);
+	write_trig_protos_to_file(fl, 'T', veh->proto_script);
 	
 	// end
 	fprintf(fl, "S\n");

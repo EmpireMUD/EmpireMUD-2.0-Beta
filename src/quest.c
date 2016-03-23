@@ -64,10 +64,7 @@ extern const char *quest_flags[];
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_quest(quest_data *quest, char_data *ch) {
-	char temp[MAX_STRING_LENGTH];
-	struct apply_data *app;
 	bool problem = FALSE;
-	obj_data *obj = NULL;
 	
 	if (QUEST_FLAGGED(quest, QST_IN_DEVELOPMENT)) {
 		olc_audit_msg(ch, QUEST_VNUM(quest), "IN-DEVELOPMENT");
@@ -357,16 +354,117 @@ void free_quest(quest_data *quest) {
 
 
 /**
+* Parses a quest giver, saved as:
+*
+* A
+* 1 123
+*
+* @param FILE *fl The file, having just read the letter tag.
+* @param struct quest_giver **list The list to append to.
+* @param char *error_str How to report if there is an error.
+*/
+void parse_quest_giver(FILE *fl, struct quest_giver **list, char *error_str) {
+	struct quest_giver *giver;
+	char line[256];
+	any_vnum vnum;
+	int type;
+	
+	if (!fl || !list || !get_line(fl, line)) {
+		log("SYSERR: data error in quest giver line of %s", error_str ? error_str : "UNKNOWN");
+		exit(1);
+	}
+	if (sscanf(line, "%d %d", &type, &vnum) != 2) {
+		log("SYSERR: format error in quest giver line of %s", error_str ? error_str : "UNKNOWN");
+		exit(1);
+	}
+	
+	CREATE(giver, struct quest_giver, 1);
+	giver->type = type;
+	giver->vnum = vnum;
+	
+	LL_APPEND(*list, giver);
+}
+
+
+/**
+* Parses a quest reward, saved as:
+*
+* A
+* 1 123 2
+*
+* @param FILE *fl The file, having just read the letter tag.
+* @param struct quest_reward **list The list to append to.
+* @param char *error_str How to report if there is an error.
+*/
+void parse_quest_reward(FILE *fl, struct quest_reward **list, char *error_str) {
+	struct quest_reward *reward;
+	int type, amount;
+	char line[256];
+	any_vnum vnum;
+	
+	if (!fl || !list || !get_line(fl, line)) {
+		log("SYSERR: data error in quest reward line of %s", error_str ? error_str : "UNKNOWN");
+		exit(1);
+	}
+	if (sscanf(line, "%d %d %d", &type, &vnum, &amount) != 3) {
+		log("SYSERR: format error in quest reward line of %s", error_str ? error_str : "UNKNOWN");
+		exit(1);
+	}
+	
+	CREATE(reward, struct quest_reward, 1);
+	reward->type = type;
+	reward->vnum = vnum;
+	reward->amount = amount;
+	
+	LL_APPEND(*list, reward);
+}
+
+
+/**
+* Parses a quest task, saved as:
+*
+* A
+* 1 123 123456 10
+*
+* @param FILE *fl The file, having just read the letter tag.
+* @param struct quest_task **list The list to append to.
+* @param char *error_str How to report if there is an error.
+*/
+void parse_quest_task(FILE *fl, struct quest_task **list, char *error_str) {
+	struct quest_task *task;
+	int type, needed;
+	bitvector_t misc;
+	char line[256];
+	any_vnum vnum;
+	
+	if (!fl || !list || !get_line(fl, line)) {
+		log("SYSERR: data error in quest task line of %s", error_str ? error_str : "UNKNOWN");
+		exit(1);
+	}
+	if (sscanf(line, "%d %d %llu %d", &type, &vnum, &misc, &needed) != 4) {
+		log("SYSERR: format error in quest task line of %s", error_str ? error_str : "UNKNOWN");
+		exit(1);
+	}
+	
+	CREATE(task, struct quest_task, 1);
+	task->type = type;
+	task->vnum = vnum;
+	task->misc = misc;
+	task->needed = needed;
+	task->current = 0;
+	
+	LL_APPEND(*list, task);
+}
+
+
+/**
 * Read one quest from file.
 *
 * @param FILE *fl The open .qst file
 * @param any_vnum vnum The quest vnum
 */
 void parse_quest(FILE *fl, any_vnum vnum) {
-	void parse_apply(FILE *fl, struct apply_data **list, char *error_str);
-	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
-
-	char line[256], error[256], str_in[256], str_in2[256];
+	char line[256], error[256], str_in[256];
 	quest_data *quest, *find;
 	int int_in[4];
 	
@@ -384,36 +482,21 @@ void parse_quest(FILE *fl, any_vnum vnum) {
 	// for error messages
 	sprintf(error, "quest vnum %d", vnum);
 	
-	// lines 1-3
-	/*
-	MORPH_KEYWORDS(morph) = fread_string(fl, error);
-	MORPH_SHORT_DESC(morph) = fread_string(fl, error);
-	MORPH_LONG_DESC(morph) = fread_string(fl, error);
+	// lines 1-3: strings
+	QUEST_NAME(quest) = fread_string(fl, error);
+	QUEST_DESCRIPTION(quest) = fread_string(fl, error);
+	QUEST_COMPLETE_MSG(quest) = fread_string(fl, error);
 	
-	// 4. flags attack-type move-type max-level affects
-	if (!get_line(fl, line) || sscanf(line, "%s %d %d %d %s", str_in, &int_in[0], &int_in[1], &int_in[2], str_in2) != 5) {
+	// 4. flags min max
+	if (!get_line(fl, line) || sscanf(line, "%s %d %d", str_in, &int_in[0], &int_in[1]) != 3) {
 		log("SYSERR: Format error in line 4 of %s", error);
 		exit(1);
 	}
 	
-	MORPH_FLAGS(morph) = asciiflag_conv(str_in);
-	MORPH_ATTACK_TYPE(morph) = int_in[0];
-	MORPH_MOVE_TYPE(morph) = int_in[1];
-	MORPH_MAX_SCALE(morph) = int_in[2];
-	MORPH_AFFECTS(morph) = asciiflag_conv(str_in2);
+	QUEST_FLAGS(quest) = asciiflag_conv(str_in);
+	QUEST_MIN_LEVEL(quest) = int_in[0];
+	QUEST_MAX_LEVEL(quest) = int_in[1];
 	
-	// 5. cost-type cost-amount ability requires-obj
-	if (!get_line(fl, line) || sscanf(line, "%d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
-		log("SYSERR: Format error in line 5 of %s", error);
-		exit(1);
-	}
-	
-	MORPH_COST_TYPE(morph) = int_in[0];
-	MORPH_COST(morph) = int_in[1];
-	MORPH_ABILITY(morph) = int_in[2];
-	MORPH_REQUIRES_OBJ(morph) = int_in[3];
-	*/
-		
 	// optionals
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -421,7 +504,31 @@ void parse_quest(FILE *fl, any_vnum vnum) {
 			exit(1);
 		}
 		switch (*line) {
-						
+			case 'A': {	// starts at
+				parse_quest_giver(fl, &QUEST_STARTS_AT(quest), error);
+				break;
+			}
+			case 'P': {	// preq-requisites
+				parse_quest_task(fl, &QUEST_PREREQS(quest), error);
+				break;
+			}
+			case 'R': {	// rewards
+				parse_quest_reward(fl, &QUEST_REWARDS(quest), error);
+				break;
+			}
+			case 'T': {	// triggers
+				parse_trig_proto(line, &QUEST_SCRIPTS(quest), error);
+				break;
+			}
+			case 'W': {	// tasks / work
+				parse_quest_task(fl, &QUEST_TASKS(quest), error);
+				break;
+			}
+			case 'Z': {	// ends at
+				parse_quest_giver(fl, &QUEST_ENDS_AT(quest), error);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -455,6 +562,52 @@ void write_quests_index(FILE *fl) {
 
 
 /**
+* Writes a list of 'quest_giver' to a data file.
+*
+* @param FILE *fl The file, open for writing.
+* @param char letter The tag letter.
+* @param struct quest_giver *list The list to write.
+*/
+void write_quest_givers_to_file(FILE *fl, char letter, struct quest_giver *list) {
+	struct quest_giver *iter;
+	LL_FOREACH(list, iter) {
+		fprintf(fl, "%c\n%d %d\n", letter, iter->type, iter->vnum);
+	}
+}
+
+
+/**
+* Writes a list of 'quest_reward' to a data file.
+*
+* @param FILE *fl The file, open for writing.
+* @param char letter The tag letter.
+* @param struct quest_reward *list The list to write.
+*/
+void write_quest_rewards_to_file(FILE *fl, char letter, struct quest_reward *list) {
+	struct quest_reward *iter;
+	LL_FOREACH(list, iter) {
+		fprintf(fl, "%c\n%d %d %d\n", letter, iter->type, iter->vnum, iter->amount);
+	}
+}
+
+
+/**
+* Writes a list of 'quest_task' to a data file.
+*
+* @param FILE *fl The file, open for writing.
+* @param char letter The tag letter.
+* @param struct quest_task *list The list to write.
+*/
+void write_quest_tasks_to_file(FILE *fl, char letter, struct quest_task *list) {
+	struct quest_task *iter;
+	LL_FOREACH(list, iter) {
+		// NOTE: iter->current is NOT written to file
+		fprintf(fl, "%c\n%d %d %llu %d\n", letter, iter->type, iter->vnum, iter->misc, iter->needed);
+	}
+}
+
+
+/**
 * Outputs one quest item in the db file format, starting with a #VNUM and
 * ending with an S.
 *
@@ -462,9 +615,9 @@ void write_quests_index(FILE *fl) {
 * @param quest_data *quest The thing to save.
 */
 void write_quest_to_file(FILE *fl, quest_data *quest) {
-	void write_applies_to_file(FILE *fl, struct apply_data *list);
+	void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 	
-	char temp[256], temp2[256];
+	char temp[MAX_STRING_LENGTH];
 	
 	if (!fl || !quest) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_quest_to_file called without %s", !fl ? "file" : "quest");
@@ -473,21 +626,39 @@ void write_quest_to_file(FILE *fl, quest_data *quest) {
 	
 	fprintf(fl, "#%d\n", QUEST_VNUM(quest));
 	
-	// 1-3. strings
-	/*
-	fprintf(fl, "%s~\n", NULLSAFE(MORPH_KEYWORDS(morph)));
-	fprintf(fl, "%s~\n", NULLSAFE(MORPH_SHORT_DESC(morph)));
-	fprintf(fl, "%s~\n", NULLSAFE(MORPH_LONG_DESC(morph)));
+	// 1. name
+	fprintf(fl, "%s~\n", NULLSAFE(QUEST_NAME(quest)));
 	
-	// 4. flags attack-type move-type max-level affs
-	strcpy(temp, bitv_to_alpha(MORPH_FLAGS(morph)));
-	strcpy(temp2, bitv_to_alpha(MORPH_AFFECTS(morph)));
-	fprintf(fl, "%s %d %d %d %s\n", temp, MORPH_ATTACK_TYPE(morph), MORPH_MOVE_TYPE(morph), MORPH_MAX_SCALE(morph), temp2);
+	// 2. desc
+	strcpy(temp, NULLSAFE(QUEST_DESCRIPTION(quest)));
+	strip_crlf(temp);
+	fprintf(fl, "%s~\n", temp);
 	
-	// 5. cost-type cost-amount ability requires-obj
-	fprintf(fl, "%d %d %d %d\n", MORPH_COST_TYPE(morph), MORPH_COST(morph), MORPH_ABILITY(morph), MORPH_REQUIRES_OBJ(morph));
+	// 3. complete msg
+	strcpy(temp, NULLSAFE(QUEST_COMPLETE_MSG(quest)));
+	strip_crlf(temp);
+	fprintf(fl, "%s~\n", temp);
 	
-	*/
+	// 4. flags min max
+	fprintf(fl, "%s %d %d\n", bitv_to_alpha(QUEST_FLAGS(quest)), QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest));
+		
+	// A. starts at
+	write_quest_givers_to_file(fl, 'A', QUEST_STARTS_AT(quest));
+	
+	// P. pre-requisites
+	write_quest_tasks_to_file(fl, 'P', QUEST_PREREQS(quest));
+	
+	// R. rewards
+	write_quest_rewards_to_file(fl, 'R', QUEST_REWARDS(quest));
+	
+	// T. triggers
+	write_trig_protos_to_file(fl, 'T', QUEST_SCRIPTS(quest));
+	
+	// W. tasks (work)
+	write_quest_tasks_to_file(fl, 'W', QUEST_TASKS(quest));
+	
+	// Z. ends at
+	write_quest_givers_to_file(fl, 'Z', QUEST_ENDS_AT(quest));
 	
 	// end
 	fprintf(fl, "S\n");
@@ -537,7 +708,6 @@ quest_data *create_quest_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_quest(char_data *ch, any_vnum vnum) {
-	char_data *chiter, *next_ch;
 	quest_data *quest;
 	
 	if (!(quest = quest_proto(vnum))) {
@@ -546,7 +716,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	}
 	
 	// look for live copies of the quest
-	TODO
+	// TODO
 	
 	// remove it from the hash table first
 	remove_quest_from_table(quest);
@@ -610,7 +780,7 @@ void save_olc_quest(descriptor_data *desc) {
 		if (QUEST_COMPLETE_MSG(quest)) {
 			free(QUEST_COMPLETE_MSG(quest));
 		}
-		QUEST_COMPLETE_MSG(quest) = str_dup(default_quest_completemsg);
+		QUEST_COMPLETE_MSG(quest) = str_dup(default_quest_complete_msg);
 	}
 	
 	// save data back over the proto-type
@@ -653,9 +823,6 @@ quest_data *setup_olc_quest(quest_data *input) {
 		QUEST_REWARDS(new) = copy_quest_rewards(QUEST_REWARDS(input));
 		QUEST_PREREQS(new) = copy_quest_tasks(QUEST_PREREQS(input));
 		QUEST_SCRIPTS(new) = copy_trig_protos(QUEST_SCRIPTS(input));
-	
-	struct trig_proto_list *proto_script;	// quest triggers
-
 	}
 	else {
 		// brand new: some defaults
@@ -680,9 +847,8 @@ quest_data *setup_olc_quest(quest_data *input) {
 * @param quest_data *quest The quest to display.
 */
 void do_stat_quest(char_data *ch, quest_data *quest) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH];//, part[MAX_STRING_LENGTH];
 	size_t size;
-	int num;
 	
 	if (!quest) {
 		return;
@@ -734,8 +900,7 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 */
 void olc_show_quest(char_data *ch) {
 	quest_data *quest = GET_OLC_QUEST(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
-	int num;
+	char buf[MAX_STRING_LENGTH];// lbuf[MAX_STRING_LENGTH];
 	
 	if (!quest) {
 		return;

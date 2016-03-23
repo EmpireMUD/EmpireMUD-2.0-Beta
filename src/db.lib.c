@@ -74,13 +74,13 @@ void parse_generic_name_file(FILE *fl, char *err_str);
 void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part);
 void parse_interaction(char *line, struct interaction_item **list, char *error_part);
 void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
-void script_save_to_disk(FILE *fp, void *item, int type);
 int sort_empires(empire_data *a, empire_data *b);
 int sort_room_templates(room_template *a, room_template *b);
 void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list);
 void write_interactions_to_file(FILE *fl, struct interaction_item *list);
 void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
+void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -273,7 +273,7 @@ void parse_adventure(FILE *fl, adv_vnum vnum) {
 			}
 			
 			case 'T': {	// trigger
-				dg_read_trigger(line, adv, ADV_TRIGGER);
+				parse_trig_proto(line, &GET_ADV_SCRIPTS(adv), buf2);
 				break;
 			}
 			
@@ -326,7 +326,7 @@ void write_adventure_to_file(FILE *fl, adv_data *adv) {
 	}
 	
 	// T: triggers
-	script_save_to_disk(fl, adv, ADV_TRIGGER);
+	write_trig_protos_to_file(fl, 'T', GET_ADV_SCRIPTS(adv));
 	
 	// end
 	fprintf(fl, "S\n");
@@ -557,7 +557,7 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 			}
 			
 			case 'T': {	// trigger
-				dg_read_trigger(line, bld, BLD_TRIGGER);
+				parse_trig_proto(line, &GET_BLD_SCRIPTS(bld), buf2);
 				break;
 			}
 			
@@ -652,7 +652,7 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	}
 	
 	// T: triggers
-	script_save_to_disk(fl, bld, BLD_TRIGGER);
+	write_trig_protos_to_file(fl, 'T', GET_BLD_SCRIPTS(bld));
 	
 	// U: upgrades_to
 	if (GET_BLD_UPGRADES_TO(bld) != NOTHING && building_proto(GET_BLD_UPGRADES_TO(bld))) {
@@ -3314,7 +3314,7 @@ void parse_mobile(FILE *mob_f, int nr) {
 			}
 			
 			case 'T': {	// trigger
-				dg_read_trigger(line, mob, MOB_TRIGGER);
+				parse_trig_proto(line, &(mob->proto_script), buf2);
 				break;
 			}
 
@@ -3367,7 +3367,7 @@ void write_mob_to_file(FILE *fl, char_data *mob) {
 	write_interactions_to_file(fl, mob->interactions);
 	
 	// T, V: triggers
-	script_save_to_disk(fl, mob, MOB_TRIGGER);
+	write_trig_protos_to_file(fl, 'T', mob->proto_script);
 		
 	// END
 	fprintf(fl, "S\n");
@@ -3805,7 +3805,7 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	}
 	
 	// T, V: triggers
-	script_save_to_disk(fl, obj, OBJ_TRIGGER);
+	write_trig_protos_to_file(fl, 'T', obj->proto_script);
 
 	// END
 	fprintf(fl, "S\n");
@@ -4184,7 +4184,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				// this way they are no longer saved this way at all, but this
 				// must be left in to be backwards-compatbile. If your mud has
 				// been up since b2.11, you can safely remove this block.
-				dg_read_trigger(line, room, WLD_TRIGGER);
+				parse_trig_proto(line, &(room->proto_script), error_log);
 				break;
 			}
 			
@@ -4383,7 +4383,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	}
 
 	// NOTE: Prior to b2.11, this saved T as prototype triggers, but this is
-	// no longer used: script_save_to_disk(fl, room, WLD_TRIGGER);
+	// no longer used: write_trig_protos_to_file(fl, 'T', room->proto_scripts);
 	
 	// W: built with
 	if (COMPLEX_DATA(room) && GET_BUILT_WITH(room)) {
@@ -4646,7 +4646,7 @@ void parse_room_template(FILE *fl, rmt_vnum vnum) {
 				break;
 			}
 			case 'T': {	// trigger
-				dg_read_trigger(line, rmt, RMT_TRIGGER);
+				parse_trig_proto(line, &GET_RMT_SCRIPTS(rmt), buf2);
 				break;
 			}
 
@@ -4712,7 +4712,7 @@ void write_room_template_to_file(FILE *fl, room_template *rmt) {
 	}
 	
 	// T: triggers
-	script_save_to_disk(fl, rmt, RMT_TRIGGER);
+	write_trig_protos_to_file(fl, 'T', GET_RMT_SCRIPTS(rmt));
 	
 	// end
 	fprintf(fl, "S\n");
@@ -5041,38 +5041,17 @@ void remove_trigger_from_table(trig_data *trig) {
 
 
 /**
-* called when a mob or object is being saved to disk, so its script can
-* be saved
+* Writes a trigger proto list to a data file.
+*
+* @param FILE *fl The file open for writing.
+* @param char letter The file tag (almost always 'T' for triggers).
+* @param struct trig_proto_list *list The list to write to the file.
 */
-void script_save_to_disk(FILE *fp, void *item, int type) {
-	struct trig_proto_list *t;
-
-	if (type == MOB_TRIGGER)
-		t = ((char_data*)item)->proto_script;
-	else if (type == OBJ_TRIGGER)
-		t = ((obj_data*)item)->proto_script;
-	else if (type == WLD_TRIGGER)
-		t = ((room_data*)item)->proto_script;
-	else if (type == RMT_TRIGGER) {
-		t = ((room_template*)item)->proto_script;
-	}
-	else if (type == BLD_TRIGGER) {
-		t = ((bld_data*)item)->proto_script;
-	}
-	else if (type == ADV_TRIGGER) {
-		t = ((adv_data*)item)->proto_script;
-	}
-	else if (type == VEH_TRIGGER) {
-		t = ((vehicle_data*)item)->proto_script;
-	}
-	else {
-		log("SYSERR: Invalid type passed to script_save_to_disk()");
-		return;
-	}
-
-	while (t) {
-		fprintf(fp,"T %d\n", t->vnum);
-		t = t->next;
+void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list) {
+	struct trig_proto_list *iter;
+	
+	LL_FOREACH(list, iter) {
+		fprintf(fl, "%c %d\n", letter, iter->vnum);
 	}
 }
 

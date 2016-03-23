@@ -280,10 +280,10 @@ void script_log(const char *format, ...) __attribute__ ((format (printf, 1, 2)))
 void mob_log(char_data *mob, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
 void obj_log(obj_data *obj, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
 void wld_log(room_data *room, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
-void dg_read_trigger(char *line, void *proto, int type);
 void dg_obj_trigger(char *line, obj_data *obj);
 void assign_triggers(void *i, int type);
 void parse_trigger(FILE *trig_f, int nr);
+void parse_trig_proto(char *line, struct trig_proto_list **list, char *error_str);
 extern trig_data *real_trigger(trig_vnum vnum);
 void extract_script(void *thing, int type);
 void extract_script_mem(struct script_memory *sc);
