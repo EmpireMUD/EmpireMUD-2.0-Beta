@@ -544,7 +544,7 @@ void parse_quest(FILE *fl, any_vnum vnum) {
 
 
 // writes entries in the quest index
-void write_quests_index(FILE *fl) {
+void write_quest_index(FILE *fl) {
 	quest_data *quest, *next_quest;
 	int this, last;
 	

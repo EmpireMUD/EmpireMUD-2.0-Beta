@@ -613,8 +613,8 @@ ADMIN_UTIL(util_rescan) {
 
 
 ADMIN_UTIL(util_resetbuildingtriggers) {
-	bld_data *proto = NULL, *temp;
 	room_data *room, *next_room;
+	bld_data *proto = NULL;
 	bool all = FALSE;
 	int count = 0;
 	
@@ -639,13 +639,10 @@ ADMIN_UTIL(util_resetbuildingtriggers) {
 			if (SCRIPT(room)) {
 				extract_script(room, WLD_TRIGGER);
 			}
-			free_proto_script(room, WLD_TRIGGER);
+			free_proto_scripts(room->proto_script);
 			
 			// add any triggers
-			CREATE(temp, bld_data, 1);
-			copy_proto_script(GET_BUILDING(room), temp, BLD_TRIGGER);
-			room->proto_script = temp->proto_script;
-			free(temp);
+			room->proto_script = copy_trig_protos(GET_BLD_SCRIPTS(GET_BUILDING(room)));
 			assign_triggers(room, WLD_TRIGGER);
 			
 			++count;

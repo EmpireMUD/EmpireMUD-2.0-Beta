@@ -403,7 +403,6 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 	
 	const bitvector_t default_affs = ROOM_AFF_UNCLAIMABLE;
 	
-	room_template *temp;
 	room_data *room;
 	
 	if (!rmt) {
@@ -417,10 +416,7 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 	SET_BIT(ROOM_AFF_FLAGS(room), GET_RMT_BASE_AFFECTS(rmt) | default_affs);
 	
 	// copy proto script
-	CREATE(temp, room_template, 1);
-	copy_proto_script(rmt, temp, RMT_TRIGGER);
-	room->proto_script = temp->proto_script;
-	free(temp);
+	room->proto_script = copy_trig_protos(GET_RMT_SCRIPTS(rmt));
 	assign_triggers(room, WLD_TRIGGER);
 	
 	COMPLEX_DATA(room)->instance = inst;
@@ -1208,7 +1204,8 @@ void prune_instances(void) {
 * @param room_data *room The map (or interior) location that was the anchor for an instance.
 */
 void unlink_instance_entrance(room_data *room) {
-	adv_data *adv = NULL, *temp;
+	struct trig_proto_list *tpl;
+	adv_data *adv = NULL;
 	
 	// detect adventure
 	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
@@ -1232,10 +1229,8 @@ void unlink_instance_entrance(room_data *room) {
 	
 	// check for scripts
 	if (adv && GET_ADV_SCRIPTS(adv)) {
-		CREATE(temp, adv_data, 1);
-		copy_proto_script(adv, temp, ADV_TRIGGER);
-		room->proto_script = temp->proto_script;
-		free(temp);
+		tpl = copy_trig_protos(GET_ADV_SCRIPTS(adv));
+		LL_APPEND(room->proto_script, tpl);
 		assign_triggers(room, WLD_TRIGGER);
 		adventure_cleanup_wtrigger(room);
 		

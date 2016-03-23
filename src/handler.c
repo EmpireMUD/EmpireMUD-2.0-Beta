@@ -3602,7 +3602,7 @@ void extract_obj(obj_data *obj) {
 	}
 
 	if (!proto || obj->proto_script != proto->proto_script) {
-		free_proto_script(obj, OBJ_TRIGGER);
+		free_proto_scripts(obj->proto_script);
 	}
 
 	free_obj(obj);
@@ -4974,8 +4974,6 @@ void set_depletion(room_data *room, int type, int value) {
 * @param bool with_triggers If TRUE, attaches triggers too.
 */
 void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers) {
-	bld_data *temp;
-	
 	if (!bld || !room) {
 		log("SYSERR: attach_building_to_room called without %s", bld ? "room" : "building");
 		return;
@@ -4987,10 +4985,9 @@ void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers)
 
 	// copy proto script
 	if (with_triggers) {
-		CREATE(temp, bld_data, 1);
-		copy_proto_script(bld, temp, BLD_TRIGGER);
-		room->proto_script = temp->proto_script;
-		free(temp);
+		struct trig_proto_list *temp;
+		temp = copy_trig_protos(GET_BLD_SCRIPTS(bld));
+		LL_APPEND(room->proto_script, temp);
 		assign_triggers(room, WLD_TRIGGER);
 	}
 }

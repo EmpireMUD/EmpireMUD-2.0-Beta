@@ -540,8 +540,7 @@ adv_data *setup_olc_adventure(adv_data *input) {
 		}
 		
 		// scripts
-		GET_ADV_SCRIPTS(new) = NULL;
-		copy_proto_script(input, new, ADV_TRIGGER);
+		GET_ADV_SCRIPTS(new) = copy_trig_protos(GET_ADV_SCRIPTS(input));
 	}
 	else {
 		// brand new: some defaults

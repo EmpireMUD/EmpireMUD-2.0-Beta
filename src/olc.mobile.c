@@ -626,11 +626,11 @@ void save_olc_mobile(descriptor_data *desc) {
 				extract_script(mob_iter, MOB_TRIGGER);
 			}
 			if (mob_iter->proto_script && mob_iter->proto_script != proto->proto_script) {
-				free_proto_script(mob_iter, MOB_TRIGGER);
+				free_proto_scripts(mob_iter->proto_script);
 			}
 			
 			// attach new scripts
-			copy_proto_script(mob, mob_iter, MOB_TRIGGER);
+			mob_iter->proto_script = copy_trig_protos(mob->proto_script);
 			assign_triggers(mob_iter, MOB_TRIGGER);
 		}
 	}
@@ -652,7 +652,7 @@ void save_olc_mobile(descriptor_data *desc) {
 	}
 
 	if (proto->proto_script) {
-		free_proto_script(proto, MOB_TRIGGER);
+		free_proto_scripts(proto->proto_script);
 	}
 	
 	// save data back over the proto-type
@@ -689,8 +689,7 @@ char_data *setup_olc_mobile(char_data *input) {
 
 		// copy scripts
 		SCRIPT(new) = NULL;
-		new->proto_script = NULL;
-		copy_proto_script(input, new, MOB_TRIGGER);
+		new->proto_script = copy_trig_protos(input->proto_script);
 		
 		// copy interactions
 		new->interactions = copy_interaction_list(input->interactions);

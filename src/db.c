@@ -1554,7 +1554,7 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 	add_to_lookup_table(GET_ID(mob), (void *)mob);
 
 	if (with_triggers) {
-		copy_proto_script(proto, mob, MOB_TRIGGER);
+		mob->proto_script = copy_trig_protos(proto->proto_script);
 		assign_triggers(mob, MOB_TRIGGER);
 	}
 	else {
@@ -1639,7 +1639,7 @@ obj_data *read_object(obj_vnum nr, bool with_triggers) {
 	add_to_lookup_table(GET_ID(obj), (void *)obj);
 	
 	if (with_triggers) {
-		copy_proto_script(proto, obj, OBJ_TRIGGER);
+		obj->proto_script = copy_trig_protos(proto->proto_script);
 		assign_triggers(obj, OBJ_TRIGGER);
 	}
 	else {
@@ -1740,7 +1740,7 @@ PLAYER_UPDATE_FUNC(b2_11_update_players) {
 	// inventory
 	for (obj = ch->carrying; obj; obj = obj->next_content) {
 		if ((proto = obj_proto(GET_OBJ_VNUM(obj)))) {
-			copy_proto_script(proto, obj, OBJ_TRIGGER);
+			obj->proto_script = copy_trig_protos(proto->proto_script);
 			assign_triggers(obj, OBJ_TRIGGER);
 		}
 	}
@@ -1748,7 +1748,7 @@ PLAYER_UPDATE_FUNC(b2_11_update_players) {
 	// eq
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (GET_EQ(ch, iter) && (proto = obj_proto(GET_OBJ_VNUM(GET_EQ(ch, iter))))) {
-			copy_proto_script(proto, GET_EQ(ch, iter), OBJ_TRIGGER);
+			GET_EQ(ch, iter)->proto_script = copy_trig_protos(proto->proto_script);
 			assign_triggers(GET_EQ(ch, iter), OBJ_TRIGGER);
 		}
 	}
@@ -2116,7 +2116,7 @@ void check_version(void) {
 			log(" - assigning mob triggers...");
 			for (mob = character_list; mob; mob = mob->next) {
 				if (IS_NPC(mob) && (mobpr = mob_proto(GET_MOB_VNUM(mob)))) {
-					copy_proto_script(mobpr, mob, MOB_TRIGGER);
+					mob->proto_script = copy_trig_protos(mobpr->proto_script);
 					assign_triggers(mob, MOB_TRIGGER);
 				}
 			}
@@ -2124,7 +2124,7 @@ void check_version(void) {
 			log(" - assigning triggers to object list...");
 			for (obj = object_list; obj; obj = obj->next) {
 				if ((objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
-					copy_proto_script(objpr, obj, OBJ_TRIGGER);
+					obj->proto_script = copy_trig_protos(objpr->proto_script);
 					assign_triggers(obj, OBJ_TRIGGER);
 				}
 			}
@@ -2133,7 +2133,7 @@ void check_version(void) {
 			HASH_ITER(hh, empire_table, emp, next_emp) {
 				for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
 					if (eus->obj && (objpr = obj_proto(GET_OBJ_VNUM(eus->obj)))) {
-						copy_proto_script(objpr, eus->obj, OBJ_TRIGGER);
+						eus->obj->proto_script = copy_trig_protos(objpr->proto_script);
 						assign_triggers(eus->obj, OBJ_TRIGGER);
 					}
 				}
@@ -2142,7 +2142,7 @@ void check_version(void) {
 			log(" - assigning triggers to trading post objects...");
 			for (tpd = trading_list; tpd; tpd = tpd->next) {
 				if (tpd->obj && (objpr = obj_proto(GET_OBJ_VNUM(tpd->obj)))) {
-					copy_proto_script(objpr, tpd->obj, OBJ_TRIGGER);
+					tpd->obj->proto_script = copy_trig_protos(objpr->proto_script);
 					assign_triggers(tpd->obj, OBJ_TRIGGER);
 				}
 			}

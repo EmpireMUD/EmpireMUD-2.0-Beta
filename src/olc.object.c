@@ -1041,11 +1041,11 @@ void update_live_obj_from_olc(obj_data *to_update, obj_data *old_proto, obj_data
 		extract_script(to_update, OBJ_TRIGGER);
 	}
 	if (to_update->proto_script && to_update->proto_script != old_proto->proto_script) {
-		free_proto_script(to_update, OBJ_TRIGGER);
+		free_proto_scripts(to_update->proto_script);
 	}
 	
 	// re-attach scripts
-	copy_proto_script(new_proto, to_update, OBJ_TRIGGER);
+	to_update->proto_script = copy_trig_protos(new_proto->proto_script);
 	assign_triggers(to_update, OBJ_TRIGGER);
 }
 
@@ -1133,7 +1133,7 @@ void save_olc_object(descriptor_data *desc) {
 	
 	// free old script?
 	if (proto->proto_script) {
-		free_proto_script(proto, OBJ_TRIGGER);
+		free_proto_scripts(proto->proto_script);
 	}
 	
 	// timer must be converted
@@ -1275,8 +1275,7 @@ obj_data *setup_olc_object(obj_data *input) {
 		
 		// copy scripts
 		SCRIPT(new) = NULL;
-		new->proto_script = NULL;
-		copy_proto_script(input, new, OBJ_TRIGGER);
+		new->proto_script = copy_trig_protos(input->proto_script);
 		
 		// update version number
 		OBJ_VERSION(new) += 1;

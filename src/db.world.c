@@ -455,7 +455,9 @@ void delete_room(room_data *room, bool check_exits) {
 	if (SCRIPT(room)) {
 		extract_script(room, WLD_TRIGGER);
 	}
-	free_proto_script(room, WLD_TRIGGER);
+	free_proto_scripts(room->proto_script);
+	room->proto_script = NULL;
+	
 	while ((reset = room->reset_commands)) {
 		room->reset_commands = reset->next;
 		if (reset->sarg1) {

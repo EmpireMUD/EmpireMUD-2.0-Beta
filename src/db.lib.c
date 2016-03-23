@@ -144,7 +144,7 @@ void free_adventure(adv_data *adv) {
 		}
 	}
 	if (GET_ADV_SCRIPTS(adv) && (!proto || GET_ADV_SCRIPTS(adv) != GET_ADV_SCRIPTS(proto))) {
-		free_proto_script(adv, ADV_TRIGGER);
+		free_proto_scripts(GET_ADV_SCRIPTS(adv));
 	}
 	
 	free(adv);
@@ -405,7 +405,7 @@ void free_building(bld_data *bdg) {
 	}
 	
 	if (GET_BLD_SCRIPTS(bdg) && (!proto || GET_BLD_SCRIPTS(bdg) != GET_BLD_SCRIPTS(proto))) {
-		free_proto_script(bdg, BLD_TRIGGER);
+		free_proto_scripts(GET_BLD_SCRIPTS(bdg));
 	}
 
 	free(bdg);
@@ -3446,7 +3446,7 @@ void free_obj(obj_data *obj) {
 		free_extra_descs(&obj->ex_description);
 	}
 	if (obj->proto_script && (!proto || obj->proto_script != proto->proto_script)) {
-		free_proto_script(obj, OBJ_TRIGGER);
+		free_proto_scripts(obj->proto_script);
 	}
 
 	if (obj->interactions && (!proto || obj->interactions != proto->interactions)) {
@@ -4523,7 +4523,7 @@ void free_room_template(room_template *rmt) {
 	}
 	
 	if (GET_RMT_SCRIPTS(rmt) && (!proto || GET_RMT_SCRIPTS(rmt) != GET_RMT_SCRIPTS(proto))) {
-		free_proto_script(rmt, RMT_TRIGGER);
+		free_proto_scripts(GET_RMT_SCRIPTS(rmt));
 	}
 	
 	free(rmt);

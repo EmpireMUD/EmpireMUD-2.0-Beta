@@ -560,8 +560,7 @@ bld_data *setup_olc_building(bld_data *input) {
 		GET_BLD_INTERACTIONS(new) = copy_interaction_list(GET_BLD_INTERACTIONS(input));
 		
 		// scripts
-		GET_BLD_SCRIPTS(new) = NULL;
-		copy_proto_script(input, new, BLD_TRIGGER);
+		GET_BLD_SCRIPTS(new) = copy_trig_protos(GET_BLD_SCRIPTS(input));
 	}
 	else {
 		// brand new: some defaults

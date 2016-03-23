@@ -797,7 +797,7 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	add_to_lookup_table(GET_ID(veh), (void *)veh);
 	
 	if (with_triggers) {
-		copy_proto_script(proto, veh, VEH_TRIGGER);
+		veh->proto_script = copy_trig_protos(proto->proto_script);
 		assign_triggers(veh, VEH_TRIGGER);
 	}
 	else {
@@ -1355,7 +1355,7 @@ void free_vehicle(vehicle_data *veh) {
 		extract_script(veh, VEH_TRIGGER);
 	}
 	if (veh->proto_script && (!proto || veh->proto_script != proto->proto_script)) {
-		free_proto_script(veh, VEH_TRIGGER);
+		free_proto_scripts(veh->proto_script);
 	}
 	
 	// attributes
@@ -1950,11 +1950,11 @@ void save_olc_vehicle(descriptor_data *desc) {
 			extract_script(iter, VEH_TRIGGER);
 		}
 		if (iter->proto_script && iter->proto_script != proto->proto_script) {
-			free_proto_script(iter, VEH_TRIGGER);
+			free_proto_scripts(iter->proto_script);
 		}
 		
 		// re-attach scripts
-		copy_proto_script(veh, iter, VEH_TRIGGER);
+		iter->proto_script = copy_trig_protos(veh->proto_script);
 		assign_triggers(iter, VEH_TRIGGER);
 		
 		// sanity checks
@@ -1986,7 +1986,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 	
 	// free old script?
 	if (proto->proto_script) {
-		free_proto_script(proto, VEH_TRIGGER);
+		free_proto_scripts(proto->proto_script);
 	}
 	
 	// save data back over the proto-type
@@ -2032,8 +2032,7 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 		
 		// copy scripts
 		SCRIPT(new) = NULL;
-		new->proto_script = NULL;
-		copy_proto_script(input, new, VEH_TRIGGER);
+		new->proto_script = copy_trig_protos(input->proto_script);
 	}
 	else {
 		// brand new: some defaults

@@ -532,8 +532,7 @@ room_template *setup_olc_room_template(room_template *input) {
 		GET_RMT_INTERACTIONS(new) = copy_interaction_list(GET_RMT_INTERACTIONS(input));
 		
 		// scripts
-		GET_RMT_SCRIPTS(new) = NULL;
-		copy_proto_script(input, new, RMT_TRIGGER);
+		GET_RMT_SCRIPTS(new) = copy_trig_protos(GET_RMT_SCRIPTS(input));
 	}
 	else {
 		// brand new: some defaults
