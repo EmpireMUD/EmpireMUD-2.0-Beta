@@ -2796,7 +2796,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.has_resources(vnum, number)%
 							char arg1[256], arg2[256];
-							struct resource_data *res;
+							struct resource_data *res = NULL;
 							obj_vnum vnum;
 							int amt;
 						
