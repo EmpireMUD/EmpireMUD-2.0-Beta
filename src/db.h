@@ -33,7 +33,8 @@
 #define DB_BOOT_SKILL  19
 #define DB_BOOT_VEH  20
 #define DB_BOOT_MORPH  21
-#define NUM_DB_BOOT_TYPES  22	// total
+#define DB_BOOT_QST  22
+#define NUM_DB_BOOT_TYPES  23	// total
 
 
 // library sub-dirs
@@ -81,6 +82,7 @@
 #define MORPH_PREFIX  LIB_WORLD"morph/"	// morphs
 #define NAMES_PREFIX  LIB_TEXT"names/"	// mob namelists
 #define OBJ_PREFIX  LIB_WORLD"obj/"	// object prototypes
+#define QST_PREFIX  LIB_WORLD"qst/"	// quests
 #define RMT_PREFIX  LIB_WORLD"rmt/"	// room templates
 #define SECTOR_PREFIX  LIB_WORLD"sect/"	// sect definitions
 #define SKILL_PREFIX  LIB_WORLD"skill/"	// player skills
@@ -107,6 +109,7 @@
 #define MOB_SUFFIX  ".mob"	// mob suffix for file saves
 #define MORPH_SUFFIX  ".morph"	// morph file suffix
 #define OBJ_SUFFIX  ".obj"	// obj suffix for file saves
+#define QST_SUFFIX  ".qst"	// quest file
 #define RMT_SUFFIX  ".rmt"	// room template suffix
 #define SECTOR_SUFFIX  ".sect"	// sector file suffix
 #define SKILL_SUFFIX  ".skill"	// player skills
@@ -329,6 +332,11 @@ obj_data *read_object(obj_vnum nr, bool with_triggers);
 extern struct group_data *group_list;
 extern char_data *is_at_menu(int id);
 extern char_data *is_playing(int id);
+
+// quests
+extern struct quest_data *quest_table;
+extern quest_data *quest_proto(any_vnum vnum);
+void free_quest(quest_data *quest);
 
 // room templates
 extern room_template *room_template_table;

@@ -36,6 +36,7 @@
 *   Object Utils
 *   Objval Utils
 *   Player Utils
+*   Quest Utils
 *   Room Utils
 *   Room Template Utils
 *   Sector Utils
@@ -440,6 +441,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_MOBILE(desc)  ((desc)->olc_mobile)
 #define GET_OLC_MORPH(desc)  ((desc)->olc_morph)
 #define GET_OLC_OBJECT(desc)  ((desc)->olc_object)
+#define GET_OLC_QUEST(desc)  ((desc)->olc_quest)
 #define GET_OLC_ROOM_TEMPLATE(desc)  ((desc)->olc_room_template)
 #define GET_OLC_SECTOR(desc)  ((desc)->olc_sector)
 #define GET_OLC_SKILL(desc)  ((desc)->olc_skill)
@@ -940,6 +942,26 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // for act() and act-like things (requires to_sleeping and is_spammy set to true/false)
 #define SENDOK(ch)  (((ch)->desc || SCRIPT_CHECK((ch), MTRIG_ACT)) && (to_sleeping || AWAKE(ch)) && (IS_NPC(ch) || !PRF_FLAGGED(ch, PRF_NOSPAM) || !is_spammy) && (IS_NPC(ch) || !PLR_FLAGGED((ch), PLR_WRITING)))
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// QUEST UTILS /////////////////////////////////////////////////////////////
+
+#define QUEST_VNUM(quest)  ((quest)->vnum)
+#define QUEST_COMPLETE_MSG(quest)  ((quest)->complete_msg)
+#define QUEST_DESCRIPTION(quest)  ((quest)->description)
+#define QUEST_ENDS_AT(quest)  ((quest)->ends_at)
+#define QUEST_FLAGS(quest)  ((quest)->flags)
+#define QUEST_MAX_LEVEL(quest)  ((quest)->max_level)
+#define QUEST_MIN_LEVEL(quest)  ((quest)->min_level)
+#define QUEST_NAME(quest)  ((quest)->name)
+#define QUEST_PREREQS(quest)  ((quest)->prereqs)
+#define QUEST_REWARDS(quest)  ((quest)->rewards)
+#define QUEST_SCRIPTS(quest)  ((quest)->proto_script)
+#define QUEST_STARTS_AT(quest)  ((quest)->starts_at)
+#define QUEST_TASKS(quest)  ((quest)->tasks)
+
+#define QUEST_FLAGGED(quest, flg)  IS_SET(QUEST_FLAGS(quest), (flg))
 
 
  //////////////////////////////////////////////////////////////////////////////

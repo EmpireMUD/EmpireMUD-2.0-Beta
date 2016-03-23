@@ -30,6 +30,7 @@
 *     Mobile Defines
 *     Object Defines
 *     Player Defines
+*     Quest Defines
 *     Sector Defines
 *     Vehicle Defines
 *     Weather and Season Defines
@@ -53,6 +54,7 @@
 *     Fight Structs
 *     Game Structs
 *     Object Structs
+*     Quest Structs
 *     Sector Structs
 *     Trigger Structs
 *     Vehicle Structs
@@ -219,6 +221,7 @@ typedef struct index_data index_data;
 typedef struct morph_data morph_data;
 typedef struct obj_data obj_data;
 typedef struct player_index_data player_index_data;
+typedef struct quest_data quest_data;
 typedef struct room_data room_data;
 typedef struct room_template room_template;
 typedef struct sector_data sector_data;
@@ -1632,6 +1635,41 @@ typedef struct vehicle_data vehicle_data;
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// QUEST DEFINES ///////////////////////////////////////////////////////////
+
+// QST_x: quest flags
+#define QST_IN_DEVELOPMENT  BIT(0)	// not an active quest
+#define QST_REPEATABLE  BIT(1)	// ? or a repeats-after field
+
+
+// QR_x: quest reward types
+#define QR_OBJECT  0
+#define QR_BONUS_EXP  1
+#define QR_SKILL_EXP  2
+#define QR_SKILL_LEVEL  3
+#define QR_SET_SKILL  4
+#define QR_COINS  5
+
+
+// QT_x: quest tracker types (conditions and pre-reqs)
+#define QT_GET_OBJECT  0
+#define QT_KILL_MOB  1
+#define QT_GET_COMPONENT  2
+#define QT_KILL_MOB_FLAGGED  3
+#define QT_OWN_BUILDING  4
+#define QT_OWN_VEHICLE  5
+#define QT_SKILL_LEVEL  5
+#define QT_COMPLETED_QUEST  6
+#define QT_NOT_COMPLETED_QUEST  7
+#define QT_VISIT_SECTOR  8
+#define QT_VISIT_BUILDING  9
+#define QT_VISIT_ROOM_TEMPLATE  10
+#define QT_TRIGGERED  11	// completed by a script
+#define QT_BRING_VEHICLE  12	// vehicle must be present
+#define QT_NOT_ON_QUEST  13
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// SECTOR DEFINES //////////////////////////////////////////////////////////
 
 // sector flags -- see constants.world.c
@@ -2740,6 +2778,7 @@ struct descriptor_data {
 	bld_data *olc_building;	// building being edited
 	crop_data *olc_crop;	// crop being edited
 	struct global_data *olc_global;	// global being edited
+	quest_data *olc_quest;	// quest being edited
 	room_template *olc_room_template;	// rmt being edited
 	struct sector_data *olc_sector;	// sector being edited
 	skill_data *olc_skill;	// skill being edited
@@ -3586,6 +3625,65 @@ struct obj_storage_type {
 	int flags;	// STORAGE_x
 	
 	struct obj_storage_type *next;
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// QUEST STRUCTS ///////////////////////////////////////////////////////////
+
+struct quest_data {
+	any_vnum vnum;
+	
+	char *name;
+	char *description;	// is this also the start-quest message?
+	char *complete_msg;	// text shown on completion
+	
+	bitvector_t flags;	// QST_ flags
+	struct quest_giver *starts_at;	// people/things that start the quest
+	struct quest_giver *ends_at;	// people/things where you can turn it in
+	struct quest_task *tasks;	// list of objectives
+	struct quest_reward *rewards;	// linked list
+	
+	// constraints
+	int min_level;	// or 0 for no min
+	int max_level;	// or 0 for no max
+	struct quest_task *prereqs;	// linked list of prerequisites
+	
+	struct trig_proto_list *proto_script;	// quest triggers
+	
+	UT_hash_handle hh;	// hash handle for quest_table
+};
+
+
+// for start, finish
+struct quest_giver {
+	int type;	// mob, obj, etc
+	any_vnum vnum;	// what mob
+	
+	struct quest_giver *next;	// may have more than one
+};
+
+
+// the spoils
+struct quest_reward {
+	int type;	// QR_ type
+	any_vnum vnum;	// which one of type
+	int amount;	// how many items, how much exp
+	
+	struct quest_reward *next;
+};
+
+
+// a pre-requisite or requirement for a quest
+struct quest_task {
+	int type;	// QT_ type
+	any_vnum vnum;
+	bitvector_t misc;	// stores flags for some types
+	
+	int needed;	// how many the player needs
+	int current;	// how many the player has
+	
+	struct quest_task *next;
 };
 
 

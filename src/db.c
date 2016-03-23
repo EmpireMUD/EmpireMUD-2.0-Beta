@@ -150,6 +150,9 @@ int top_idnum = 0;	// highest idnum in use
 int top_account_id = 0;  // highest account number in use, determined during startup
 struct group_data *group_list = NULL;	// global LL of groups
 
+// quests
+struct quest_data *quest_table = NULL;
+
 // room templates
 room_template *room_template_table = NULL;	// hash table of room templates
 
@@ -229,6 +232,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ SKILL_PREFIX, SKILL_SUFFIX },	// DB_BOOT_SKILL
 	{ VEH_PREFIX, VEH_SUFFIX },	// DB_BOOT_SKILL
 	{ MORPH_PREFIX, MORPH_SUFFIX },	// DB_BOOT_MORPH
+	{ QST_PREFIX, QST_SUFFIX },	// DB_BOOT_QST
 };
 
 
@@ -456,6 +460,9 @@ void boot_world(void) {
 	
 	log("Loading craft recipes.");
 	index_boot(DB_BOOT_CRAFT);
+	
+	log("Loading quests.");
+	index_boot(DB_BOOT_QST);
 	
 	log("Loading books into libraries.");
 	index_boot(DB_BOOT_BOOKS);

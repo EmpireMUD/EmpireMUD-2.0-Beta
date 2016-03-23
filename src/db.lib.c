@@ -5135,6 +5135,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	void parse_book(FILE *fl, int book_id);
 	void parse_class(FILE *fl, any_vnum vnum);
 	void parse_morph(FILE *fl, any_vnum vnum);
+	void parse_quest(FILE *fl, any_vnum vnum);
 	void parse_skill(FILE *fl, any_vnum vnum);
 	void parse_vehicle(FILE *fl, any_vnum vnum);
 	
@@ -5142,7 +5143,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	char line[256];
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph" };
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -5223,6 +5224,10 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 					break;
 				case DB_BOOT_BOOKS: {
 					parse_book(fl, nr);
+					break;
+				}
+				case DB_BOOT_QST: {
+					parse_quest(fl, nr);
 					break;
 				}
 				case DB_BOOT_RMT: {
@@ -5308,7 +5313,7 @@ void index_boot(int mode) {
 
 	if (!rec_count) {
 		// DB_BOOT_x: some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL || mode == DB_BOOT_VEH || mode == DB_BOOT_MORPH) {
+		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL || mode == DB_BOOT_VEH || mode == DB_BOOT_MORPH || mode == DB_BOOT_QST) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -5401,6 +5406,11 @@ void index_boot(int mode) {
 			size[0] = sizeof(obj_data) * rec_count;
 			log("   %d objs, %d bytes in prototypes.", rec_count, size[0]);
 			break;
+		case DB_BOOT_QST: {
+   			size[0] = sizeof(quest_data) * rec_count;
+			log("   %d quests, %d bytes in prototypes.", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_EMP: {
 			size[0] = sizeof(empire_data) * rec_count;
 			log("   %d empires, %d bytes.", rec_count, size[0]);
@@ -5457,6 +5467,7 @@ void index_boot(int mode) {
 			case DB_BOOT_MORPH:
 			case DB_BOOT_EMP:
 			case DB_BOOT_BOOKS:
+			case DB_BOOT_QST:
 			case DB_BOOT_RMT:
 			case DB_BOOT_SECTOR:
 			case DB_BOOT_SKILL:
@@ -5635,6 +5646,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, object_table, obj, next_obj) {
 				if (GET_OBJ_VNUM(obj) >= (zone * 100) && GET_OBJ_VNUM(obj) <= (zone * 100 + 99)) {
 					write_obj_to_file(fl, obj);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_QST: {
+			void write_quest_to_file(FILE *fl, quest_data *quest);
+			quest_data *qst, *next_qst;
+			HASH_ITER(hh, quest_table, qst, next_qst) {
+				if (QUEST_VNUM(qst) >= (zone * 100) && QUEST_VNUM(qst) <= (zone * 100 + 99)) {
+					write_quest_to_file(fl, qst);
 				}
 			}
 			break;
@@ -5972,6 +5993,11 @@ void save_index(int type) {
 		}
 		case DB_BOOT_OBJ: {
 			write_object_index(fl);
+			break;
+		}
+		case DB_BOOT_QST: {
+			void write_quest_index(FILE *fl);
+			write_quest_index(fl);
 			break;
 		}
 		case DB_BOOT_RMT: {

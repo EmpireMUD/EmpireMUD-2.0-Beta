@@ -35,6 +35,7 @@
 *   Mob Constants
 *   Item Contants
 *   OLC Constants
+*   Quest Constants
 *   Room/World Constants
 *   Skill Constants
 *   Trigger Constants
@@ -2082,6 +2083,17 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"skill",
 	"vehicle",
 	"morph",
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// QUEST CONSTANTS /////////////////////////////////////////////////////////
+
+// QST_x: quest flags
+const char *quest_flags[] = {
+	"IN-DEVELOPMENT",
+	"REPEATABLE",
 	"\n"
 };
 

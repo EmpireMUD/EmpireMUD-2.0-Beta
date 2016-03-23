@@ -252,6 +252,20 @@ void free_proto_script(void *thing, int type) {
 }
 
 
+/**
+* A version of free_proto_script that doesn't require a type -- only takes
+* a list.
+*
+* @param struct trig_proto_list *list The list to free.
+*/
+void free_proto_scripts(struct trig_proto_list *list) {
+	struct trig_proto_list *iter, *next_iter;
+	LL_FOREACH_SAFE(list, iter, next_iter) {
+		free(iter);
+	}
+}
+
+
 void copy_proto_script(void *source, void *dest, int type) {
 	struct trig_proto_list *tp_src = NULL, *tp_dst = NULL;
 
@@ -321,6 +335,33 @@ void copy_proto_script(void *source, void *dest, int type) {
 			tp_dst = tp_dst->next;
 		}
 	}
+}
+
+
+/**
+* A version of copy_proto_script that only needs the list, not a type.
+*
+* @param struct trig_proto_list *from The list to copy.
+* @return struct trig_proto_list* The copied list.
+*/
+struct trig_proto_list *copy_trig_protos(struct trig_proto_list *from) {
+	struct trig_proto_list *el, *iter, *list = NULL, *end = NULL;
+	
+	LL_FOREACH(from, iter) {
+		CREATE(el, struct trig_proto_list, 1);
+		*el = *iter;
+		el->next = NULL;
+		
+		if (end) {
+			end->next = el;
+		}
+		else {
+			list = el;
+		}
+		end = el;
+	}
+	
+	return list;
 }
 
 
