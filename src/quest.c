@@ -1098,23 +1098,23 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 	size += snprintf(buf + size, sizeof(buf) - size, "Level limits: [\tc%s\t0], Repatable: [\tc%s\t0]\r\n", level_range_string(QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest), 0), part);
 		
 	get_quest_task_display(QUEST_PREREQS(quest), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Pre-requisites:\r\n%s", *part ? part : "none\r\n");
+	size += snprintf(buf + size, sizeof(buf) - size, "Pre-requisites:\r\n%s", *part ? part : " none\r\n");
 	
 	get_quest_giver_display(QUEST_STARTS_AT(quest), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Starts at:\r\n%s", *part ? part : "nowhere\r\n");
+	size += snprintf(buf + size, sizeof(buf) - size, "Starts at:\r\n%s", *part ? part : " nowhere\r\n");
 	
 	get_quest_giver_display(QUEST_ENDS_AT(quest), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Ends at:\r\n%s", *part ? part : "nowhere\r\n");
+	size += snprintf(buf + size, sizeof(buf) - size, "Ends at:\r\n%s", *part ? part : " nowhere\r\n");
 	
 	get_quest_task_display(QUEST_TASKS(quest), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Tasks:\r\n%s", *part ? part : "none\r\n");
+	size += snprintf(buf + size, sizeof(buf) - size, "Tasks:\r\n%s", *part ? part : " none\r\n");
 	
 	get_quest_reward_display(QUEST_REWARDS(quest), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Rewards: <\tyrewards\t0>\r\n%s", *part ? part : "none\r\n");
+	size += snprintf(buf + size, sizeof(buf) - size, "Rewards:\r\n%s", *part ? part : " none\r\n");
 	
 	// scripts
 	get_script_display(QUEST_SCRIPTS(quest), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Scripts:\r\n%s", QUEST_SCRIPTS(quest) ? part : "none\r\n");
+	size += snprintf(buf + size, sizeof(buf) - size, "Scripts:\r\n%s", QUEST_SCRIPTS(quest) ? part : " none\r\n");
 	
 	page_string(ch->desc, buf, TRUE);
 }
@@ -1217,6 +1217,31 @@ int vnum_quest(char *searchname, char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// OLC MODULES /////////////////////////////////////////////////////////////
 
+OLC_MODULE(qedit_completemessage) {
+	quest_data *quest = GET_OLC_QUEST(ch->desc);
+	
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "completion message for %s", QUEST_NAME(quest));
+		start_string_editor(ch->desc, buf, &QUEST_COMPLETE_MSG(quest), MAX_ITEM_DESCRIPTION);
+	}
+}
+
+OLC_MODULE(qedit_description) {
+	quest_data *quest = GET_OLC_QUEST(ch->desc);
+	
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "description for %s", QUEST_NAME(quest));
+		start_string_editor(ch->desc, buf, &QUEST_DESCRIPTION(quest), MAX_ITEM_DESCRIPTION);
+	}
+}
+
+
 OLC_MODULE(qedit_flags) {
 	quest_data *quest = GET_OLC_QUEST(ch->desc);
 	bool had_indev = IS_SET(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT) ? TRUE : FALSE;
@@ -1246,4 +1271,28 @@ OLC_MODULE(qedit_maxlevel) {
 OLC_MODULE(qedit_minlevel) {
 	quest_data *quest = GET_OLC_QUEST(ch->desc);
 	QUEST_MIN_LEVEL(quest) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, QUEST_MIN_LEVEL(quest));
+}
+
+
+OLC_MODULE(qedit_repeat) {
+	quest_data *quest = GET_OLC_QUEST(ch->desc);
+	
+	if (is_abbrev(argument, "never") || is_abbrev(argument, "none")) {
+		QUEST_REPEATABLE_AFTER(quest) = NOT_REPEATABLE;
+		msg_to_char(ch, "It is now non-repeatable.\r\n");
+	}
+	else if (is_abbrev(argument, "immediately")) {
+		QUEST_REPEATABLE_AFTER(quest) = 0;
+		msg_to_char(ch, "It is now immediately repeatable.\r\n");
+	}
+	else {
+		QUEST_REPEATABLE_AFTER(quest) = olc_process_number(ch, argument, "repeatable after", "repeat", 0, MAX_INT, QUEST_REPEATABLE_AFTER(quest));
+		msg_to_char(ch, "It now repeats after %d minutes (%d:%02d:%02d).\r\n", QUEST_REPEATABLE_AFTER(quest), (QUEST_REPEATABLE_AFTER(quest) / (60 * 24)), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) / 60), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) % 60));
+	}
+}
+
+
+OLC_MODULE(qedit_script) {
+	quest_data *quest = GET_OLC_QUEST(ch->desc);
+	olc_process_script(ch, argument, &QUEST_SCRIPTS(quest), WLD_TRIGGER);
 }

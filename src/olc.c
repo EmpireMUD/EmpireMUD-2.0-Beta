@@ -267,6 +267,16 @@ OLC_MODULE(oedit_wealth);
 OLC_MODULE(oedit_weapontype);
 OLC_MODULE(oedit_wear);
 
+// quests
+OLC_MODULE(qedit_completemessage);
+OLC_MODULE(qedit_description);
+OLC_MODULE(qedit_flags);
+OLC_MODULE(qedit_name);
+OLC_MODULE(qedit_maxlevel);
+OLC_MODULE(qedit_minlevel);
+OLC_MODULE(qedit_repeat);
+OLC_MODULE(qedit_script);
+
 // room template
 OLC_MODULE(rmedit_affects);
 OLC_MODULE(rmedit_description);
@@ -636,7 +646,17 @@ const struct olc_command_data olc_data[] = {
 	{ "wealth", oedit_wealth, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "weapontype", oedit_weapontype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "wear", oedit_wear, OLC_OBJECT, OLC_CF_EDITOR },
-
+	
+	// quest commands
+	{ "completemessage", qedit_completemessage, OLC_QUEST, OLC_CF_EDITOR },
+	{ "description", qedit_description, OLC_QUEST, OLC_CF_EDITOR },
+	{ "flags", qedit_flags, OLC_QUEST, OLC_CF_EDITOR },
+	{ "name", qedit_name, OLC_QUEST, OLC_CF_EDITOR },
+	{ "maxlevel", qedit_maxlevel, OLC_QUEST, OLC_CF_EDITOR },
+	{ "minlevel", qedit_minlevel, OLC_QUEST, OLC_CF_EDITOR },
+	{ "repeat", qedit_repeat, OLC_QUEST, OLC_CF_EDITOR },
+	{ "script", qedit_script, OLC_QUEST, OLC_CF_EDITOR },
+	
 	// room template commands
 	{ "affects", rmedit_affects, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "description", rmedit_description, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
