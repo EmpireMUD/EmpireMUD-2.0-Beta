@@ -1260,7 +1260,7 @@ void get_quest_reward_display(struct quest_reward *list, char *save_buffer) {
 		// QR_x
 		switch (reward->type) {
 			case QR_BONUS_EXP: {
-				strcpy(buf, "%d exp");
+				sprintf(buf, "%d exp", reward->amount);
 				break;
 			}
 			case QR_COINS: {
