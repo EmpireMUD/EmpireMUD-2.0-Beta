@@ -1677,6 +1677,10 @@ typedef struct vehicle_data vehicle_data;
 #define QT_VISIT_SECTOR  14
 
 
+// indicates empire (rather than misc) coins for a reward
+#define REWARD_EMPIRE_COIN  0
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// SECTOR DEFINES //////////////////////////////////////////////////////////
 

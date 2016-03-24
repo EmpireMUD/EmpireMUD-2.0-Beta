@@ -276,6 +276,7 @@ OLC_MODULE(qedit_name);
 OLC_MODULE(qedit_maxlevel);
 OLC_MODULE(qedit_minlevel);
 OLC_MODULE(qedit_repeat);
+OLC_MODULE(qedit_rewards);
 OLC_MODULE(qedit_script);
 OLC_MODULE(qedit_starts);
 
@@ -658,6 +659,7 @@ const struct olc_command_data olc_data[] = {
 	{ "maxlevel", qedit_maxlevel, OLC_QUEST, OLC_CF_EDITOR },
 	{ "minlevel", qedit_minlevel, OLC_QUEST, OLC_CF_EDITOR },
 	{ "repeat", qedit_repeat, OLC_QUEST, OLC_CF_EDITOR },
+	{ "rewards", qedit_rewards, OLC_QUEST, OLC_CF_EDITOR },
 	{ "script", qedit_script, OLC_QUEST, OLC_CF_EDITOR },
 	{ "starts", qedit_starts, OLC_QUEST, OLC_CF_EDITOR },
 	

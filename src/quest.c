@@ -105,6 +105,39 @@ void smart_copy_quest_givers(struct quest_giver **to_list, struct quest_giver *f
 }
 
 
+/**
+* Copies entries from one list into another, only if they are not already in
+* the to_list.
+*
+* @param struct quest_reward **to_list A pointer to the destination list.
+* @param struct quest_reward *from_list The list to copy from.
+*/
+void smart_copy_quest_rewards(struct quest_reward **to_list, struct quest_reward *from_list) {
+	struct quest_reward *iter, *search, *reward;
+	bool found;
+	
+	LL_FOREACH(from_list, iter) {
+		// ensure not already in list
+		found = FALSE;
+		LL_FOREACH(*to_list, search) {
+			if (search->type == iter->type && search->amount == iter->amount && search->vnum == iter->vnum) {
+				found = TRUE;
+				break;
+			}
+		}
+		
+		// add it
+		if (!found) {
+			CREATE(reward, struct quest_reward, 1);
+			reward->type = iter->type;
+			reward->amount = iter->amount;
+			reward->vnum = iter->vnum;
+			LL_APPEND(*to_list, reward);
+		}
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 
@@ -299,7 +332,7 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
 		}
 		else if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-			msg_to_char(ch, "Invalid vnum '%s'.\r\n", num_arg);
+			msg_to_char(ch, "Invalid vnum '%s'.\r\n", vnum_arg);
 		}
 		else {
 			// validate vnum, and set buf to the name
@@ -354,7 +387,7 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 			giver->vnum = vnum;
 			
 			LL_APPEND(*list, giver);
-			msg_to_char(ch, "You add '%s': %s %d: %s.\r\n", command, quest_giver_types[type], vnum, buf);
+			msg_to_char(ch, "You add '%s': %s %d, %s.\r\n", command, quest_giver_types[type], vnum, buf);
 		}
 	}	// end 'add'
 	else if (is_abbrev(cmd_arg, "change")) {
@@ -1599,6 +1632,284 @@ OLC_MODULE(qedit_repeat) {
 	}
 	else {
 		msg_to_char(ch, "Invalid repeat interval.\r\n");
+	}
+}
+
+
+OLC_MODULE(qedit_rewards) {
+	quest_data *quest = GET_OLC_QUEST(ch->desc);
+	char cmd_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];
+	char vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	struct quest_reward *reward, *iter, *change, *copyfrom;
+	struct quest_reward **list = &QUEST_REWARDS(quest);
+	int findtype, num, stype;
+	any_vnum vnum;
+	bool found;
+	
+	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
+	
+	if (is_abbrev(cmd_arg, "copy")) {
+		// usage: rewards copy <from type> <from vnum>
+		argument = any_one_arg(argument, type_arg);	// just "quest" for now
+		argument = any_one_arg(argument, vnum_arg);	// any vnum for that type
+		
+		if (!*type_arg || !*vnum_arg) {
+			msg_to_char(ch, "Usage: rewards copy <from type> <from vnum>\r\n");
+		}
+		else if ((findtype = find_olc_type(type_arg)) == 0) {
+			msg_to_char(ch, "Unknown olc type '%s'.\r\n", type_arg);
+		}
+		else if (!isdigit(*vnum_arg)) {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			msg_to_char(ch, "Copy from which %s?\r\n", buf);
+		}
+		else if ((vnum = atoi(vnum_arg)) < 0) {
+			msg_to_char(ch, "Invalid vnum.\r\n");
+		}
+		else {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			copyfrom = NULL;
+			
+			switch (findtype) {
+				case OLC_QUEST: {
+					quest_data *from_qst = quest_proto(vnum);
+					if (from_qst) {
+						copyfrom = QUEST_REWARDS(from_qst);
+					}
+					break;
+				}
+				default: {
+					msg_to_char(ch, "You can't copy rewards from %ss.\r\n", buf);
+					return;
+				}
+			}
+			
+			if (!copyfrom) {
+				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, vnum_arg);
+			}
+			else {
+				smart_copy_quest_rewards(list, copyfrom);
+				msg_to_char(ch, "Copied rewards from %s %d.\r\n", buf, vnum);
+			}
+		}
+	}	// end 'copy'
+	else if (is_abbrev(cmd_arg, "remove")) {
+		// usage: rewards remove <number | all>
+		skip_spaces(&argument);	// only arg is number
+		
+		if (!*argument) {
+			msg_to_char(ch, "Remove which reward (number)?\r\n");
+		}
+		else if (!str_cmp(argument, "all")) {
+			free_quest_rewards(*list);
+			*list = NULL;
+			msg_to_char(ch, "You remove all the rewards.\r\n");
+		}
+		else if (!isdigit(*argument) || (num = atoi(argument)) < 1) {
+			msg_to_char(ch, "Invalid reward number.\r\n");
+		}
+		else {
+			found = FALSE;
+			LL_FOREACH(*list, iter) {
+				if (--num == 0) {
+					found = TRUE;
+					
+					msg_to_char(ch, "You remove the reward for %dx %s %d.\r\n", iter->amount, quest_reward_types[iter->type], iter->vnum);
+					LL_DELETE(*list, iter);
+					free(iter);
+					break;
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid reward number.\r\n");
+			}
+		}
+	}	// end 'remove'
+	else if (is_abbrev(cmd_arg, "add")) {
+		// usage: rewards add <type> <amount> <vnum/type>
+		argument = any_one_arg(argument, type_arg);
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, vnum_arg);
+		
+		if (!*type_arg || !*num_arg || !isdigit(*num_arg)) {
+			msg_to_char(ch, "Usage: rewards add <type> <amount> <vnum/type>\r\n");
+		}
+		else if ((stype = search_block(type_arg, quest_reward_types, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
+		}
+		else if ((num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid amount '%s'.\r\n", num_arg);
+		}
+		else {		
+			// validate vnum, and set buf to the name
+			*buf = '\0';
+			switch (stype) {
+				case QR_BONUS_EXP: {
+					// vnum not required
+					vnum = 0;
+					strcpy(buf, "experience");
+					break;
+				}
+				case QR_COINS: {
+					if (is_abbrev(vnum_arg, "miscellaneous") || is_abbrev(vnum_arg, "simple") || is_abbrev(vnum_arg, "other")) {
+						vnum = OTHER_COIN;
+						strcpy(buf, "misc");
+					}
+					else if (is_abbrev(vnum_arg, "empire")) {
+						vnum = REWARD_EMPIRE_COIN;
+						strcpy(buf, "empire");
+					}
+					else {
+						msg_to_char(ch, "You must choose misc or empire coins.\r\n");
+						return;
+					}
+					break;	
+				}
+				case QR_OBJECT: {
+					obj_data *obj;
+					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+						msg_to_char(ch, "Invalid obj vnum '%s'.\r\n", vnum_arg);
+						return;
+					}
+					if ((obj = obj_proto(vnum))) {
+						strcpy(buf, GET_OBJ_SHORT_DESC(obj));
+					}
+					break;
+				}
+				case QR_SET_SKILL:
+				case QR_SKILL_EXP:
+				case QR_SKILL_LEVELS: {
+					skill_data *skl;
+					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+						msg_to_char(ch, "Invalid skill vnum '%s'.\r\n", vnum_arg);
+						return;
+					}
+					if ((skl = find_skill_by_vnum(vnum))) {
+						strcpy(buf, SKILL_NAME(skl));
+					}
+					break;
+				}
+			}
+			
+			// did we find one? if so, buf is set
+			if (!*buf) {
+				msg_to_char(ch, "Unable to find %s %d.\r\n", quest_reward_types[stype], vnum);
+				return;
+			}
+			
+			// success
+			CREATE(reward, struct quest_reward, 1);
+			reward->type = stype;
+			reward->amount = num;
+			reward->vnum = vnum;
+			
+			LL_APPEND(*list, reward);
+			msg_to_char(ch, "You add a %s reward: %dx %s.\r\n", quest_reward_types[stype], num, buf);
+		}
+	}	// end 'add'
+	else if (is_abbrev(cmd_arg, "change")) {
+		// usage: rewards change <number> <amount | vnum> <value>
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, field_arg);
+		argument = any_one_arg(argument, vnum_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*field_arg || !*vnum_arg) {
+			msg_to_char(ch, "Usage: rewards change <number> <amount | vnum> <value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		LL_FOREACH(*list, iter) {
+			if (--num == 0) {
+				change = iter;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid reward number.\r\n");
+		}
+		else if (is_abbrev(field_arg, "amount")) {
+			if (!isdigit(*vnum_arg) || (num = atoi(num_arg)) < 0) {
+				msg_to_char(ch, "Invalid amount '%s'.\r\n", num_arg);
+				return;
+			}
+			else {
+				change->amount = num;
+				msg_to_char(ch, "You change reward %d's amount to %d.\r\n", atoi(num_arg), num);
+			}
+		}
+		else if (is_abbrev(field_arg, "vnum")) {
+			// validate vnum, and set buf to the name
+			*buf = '\0';
+			switch (change->type) {
+				case QR_BONUS_EXP: {
+					msg_to_char(ch, "You can't change the vnum on that.\r\n");
+					break;
+				}
+				case QR_COINS: {
+					if (is_abbrev(vnum_arg, "miscellaneous") || is_abbrev(vnum_arg, "simple") || is_abbrev(vnum_arg, "other")) {
+						vnum = OTHER_COIN;
+						strcpy(buf, "misc");
+					}
+					else if (is_abbrev(vnum_arg, "empire")) {
+						vnum = REWARD_EMPIRE_COIN;
+						strcpy(buf, "empire");
+					}
+					else {
+						msg_to_char(ch, "You must choose misc or empire coins.\r\n");
+						return;
+					}
+					break;	
+				}
+				case QR_OBJECT: {
+					obj_data *obj;
+					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+						msg_to_char(ch, "Invalid obj vnum '%s'.\r\n", vnum_arg);
+						return;
+					}
+					if ((obj = obj_proto(vnum))) {
+						strcpy(buf, GET_OBJ_SHORT_DESC(obj));
+					}
+					break;
+				}
+				case QR_SET_SKILL:
+				case QR_SKILL_EXP:
+				case QR_SKILL_LEVELS: {
+					skill_data *skl;
+					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+						msg_to_char(ch, "Invalid skill vnum '%s'.\r\n", vnum_arg);
+						return;
+					}
+					if ((skl = find_skill_by_vnum(vnum))) {
+						strcpy(buf, SKILL_NAME(skl));
+					}
+					break;
+				}
+			}
+			
+			// did we find one? if so, buf is set
+			if (!*buf) {
+				msg_to_char(ch, "Unable to find %s %d.\r\n", quest_giver_types[change->type], vnum);
+				return;
+			}
+			
+			change->vnum = vnum;
+			msg_to_char(ch, "Changed reward %d's vnum to %d (%s).\r\n", atoi(num_arg), vnum, buf);
+		}
+		else {
+			msg_to_char(ch, "You can only change the amount or vnum.\r\n");
+		}
+	}	// end 'change'
+	else {
+		msg_to_char(ch, "Usage: rewards add <type> <amount> <vnum/type>\r\n");
+		msg_to_char(ch, "Usage: rewards change <number> vnum <value>\r\n");
+		msg_to_char(ch, "Usage: rewards copy <from type> <from vnum>\r\n");
+		msg_to_char(ch, "Usage: rewards remove <number | all>\r\n");
 	}
 }
 
