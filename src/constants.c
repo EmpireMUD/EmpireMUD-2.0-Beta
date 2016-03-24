@@ -2095,8 +2095,51 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 // QST_x: quest flags
 const char *quest_flags[] = {
 	"IN-DEVELOPMENT",
-	"REPEATABLE",
 	"\n"
+};
+
+
+// QG_x: quest giver types
+const char *quest_giver_types[] = {
+	"BUILDING",	// 0
+	"MOBILE",
+	"OBJECT",
+	"ROOM-TEMPLATE",
+	"TRIGGER",	// 4
+	"\n"
+};
+
+
+// QR_x: quest reward types
+const char *quest_reward_types[] = {
+	"BONUS-EXP",	// 0
+	"COINS",
+	"OBJECT",
+	"SET-SKILL",
+	"SKILL-EXP",
+	"SKILL-LEVELS",	// 5
+	"\n",
+};
+
+
+// QT_x: quest tracker types
+const char *quest_tracker_types[] = {
+	"COMPLETED-QUEST",	// 0
+	"GET-COMPONENT",
+	"GET-OBJECT",
+	"KILL-MOB",
+	"KILL-MOB-FLAGGED",
+	"NOT-COMPLETED-QUEST",	// 5
+	"NOT-ON-QUEST",
+	"OWN-BUILDING",
+	"OWN-VEHICLE",
+	"SKILL-LEVEL-OVER",
+	"SKILL-LEVEL-UNDER",	// 10
+	"TRIGGERED",
+	"VISIT-BUILDING",
+	"VISIT-ROOM-TEMPLATE",
+	"VISIT-SECTOR",	// 14
+	"\n",
 };
 
 

@@ -956,6 +956,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define QUEST_MIN_LEVEL(quest)  ((quest)->min_level)
 #define QUEST_NAME(quest)  ((quest)->name)
 #define QUEST_PREREQS(quest)  ((quest)->prereqs)
+#define QUEST_REPEATABLE_AFTER(quest)  ((quest)->repeatable_after)
 #define QUEST_REWARDS(quest)  ((quest)->rewards)
 #define QUEST_SCRIPTS(quest)  ((quest)->proto_script)
 #define QUEST_STARTS_AT(quest)  ((quest)->starts_at)
@@ -1372,6 +1373,9 @@ void gain_condition(char_data *ch, int condition, int value);
 extern bool adjacent_room_is_light(room_data *room);
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 #define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
+
+// utils from quest.c
+extern char *get_quest_name_by_proto(any_vnum vnum);
 
 // utils from vehicles.c
 extern char *get_vehicle_name_by_proto(obj_vnum vnum);

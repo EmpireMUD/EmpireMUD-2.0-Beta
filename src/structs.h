@@ -154,6 +154,7 @@
 #define NO_ABIL  NO_SKILL	// things that don't require an ability
 #define NO_FLAGS  0
 #define NO_SKILL  -1	// things that don't require a skill
+#define NOT_REPEATABLE  -1	// quest's repeatable_after
 #define OTHER_COIN  NOTHING	// use the NOTHING value to store the "other" coin type (which stores by empire id)
 #define REAL_OTHER_COIN  NULL	// for when other-coin type is an empire pointer
 #define UNLIMITED  -1	// unlimited duration/timer
@@ -1639,34 +1640,41 @@ typedef struct vehicle_data vehicle_data;
 
 // QST_x: quest flags
 #define QST_IN_DEVELOPMENT  BIT(0)	// not an active quest
-#define QST_REPEATABLE  BIT(1)	// ? or a repeats-after field
+
+
+// QG_x: quest giver types
+#define QG_BUILDING  0
+#define QG_MOBILE  1
+#define QG_OBJECT  2
+#define QG_ROOM_TEMPLATE  3
+#define QG_TRIGGER  4
 
 
 // QR_x: quest reward types
-#define QR_OBJECT  0
-#define QR_BONUS_EXP  1
-#define QR_SKILL_EXP  2
-#define QR_SKILL_LEVEL  3
-#define QR_SET_SKILL  4
-#define QR_COINS  5
+#define QR_BONUS_EXP  0
+#define QR_COINS  1
+#define QR_OBJECT  2
+#define QR_SET_SKILL  3
+#define QR_SKILL_EXP  4
+#define QR_SKILL_LEVELS  5
 
 
 // QT_x: quest tracker types (conditions and pre-reqs)
-#define QT_GET_OBJECT  0
-#define QT_KILL_MOB  1
-#define QT_GET_COMPONENT  2
-#define QT_KILL_MOB_FLAGGED  3
-#define QT_OWN_BUILDING  4
-#define QT_OWN_VEHICLE  5
-#define QT_SKILL_LEVEL  5
-#define QT_COMPLETED_QUEST  6
-#define QT_NOT_COMPLETED_QUEST  7
-#define QT_VISIT_SECTOR  8
-#define QT_VISIT_BUILDING  9
-#define QT_VISIT_ROOM_TEMPLATE  10
+#define QT_COMPLETED_QUEST  0
+#define QT_GET_COMPONENT  1
+#define QT_GET_OBJECT  2
+#define QT_KILL_MOB  3
+#define QT_KILL_MOB_FLAGGED  4
+#define QT_NOT_COMPLETED_QUEST  5
+#define QT_NOT_ON_QUEST  6
+#define QT_OWN_BUILDING  7
+#define QT_OWN_VEHICLE  8
+#define QT_SKILL_LEVEL_OVER  9
+#define QT_SKILL_LEVEL_UNDER  10
 #define QT_TRIGGERED  11	// completed by a script
-#define QT_BRING_VEHICLE  12	// vehicle must be present
-#define QT_NOT_ON_QUEST  13
+#define QT_VISIT_BUILDING  12
+#define QT_VISIT_ROOM_TEMPLATE  13
+#define QT_VISIT_SECTOR  14
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -3648,6 +3656,7 @@ struct quest_data {
 	int min_level;	// or 0 for no min
 	int max_level;	// or 0 for no max
 	struct quest_task *prereqs;	// linked list of prerequisites
+	int repeatable_after;	// minutes to repeat; NOT_REPEATABLE for none
 	
 	struct trig_proto_list *proto_script;	// quest triggers
 	

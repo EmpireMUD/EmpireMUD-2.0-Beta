@@ -42,7 +42,13 @@ const char *default_quest_description = "This quest has no description.\r\n";
 const char *default_quest_complete_msg = "You have completed the quest.\r\n";
 
 // external consts
+extern const char *action_bits[];
+extern const char *component_flags[];
+extern const char *component_types[];
 extern const char *quest_flags[];
+extern const char *quest_giver_types[];
+extern const char *quest_reward_types[];
+extern const char *quest_tracker_types[];
 
 // external funcs
 
@@ -51,6 +57,17 @@ extern const char *quest_flags[];
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Quick way to turn a vnum into a name, safely.
+*
+* @param any_vnum vnum The quest vnum to look up.
+* @return char* A name for the vnum, or "UNKNOWN".
+*/
+char *get_quest_name_by_proto(any_vnum vnum) {
+	quest_data *proto = quest_proto(vnum);
+	return proto ? QUEST_NAME(proto) : "UNKNOWN";
+}
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -197,6 +214,7 @@ void clear_quest(quest_data *quest) {
 	memset((char *) quest, 0, sizeof(quest_data));
 	
 	QUEST_VNUM(quest) = NOTHING;
+	QUEST_REPEATABLE_AFTER(quest) = NOT_REPEATABLE;
 }
 
 
@@ -487,8 +505,8 @@ void parse_quest(FILE *fl, any_vnum vnum) {
 	QUEST_DESCRIPTION(quest) = fread_string(fl, error);
 	QUEST_COMPLETE_MSG(quest) = fread_string(fl, error);
 	
-	// 4. flags min max
-	if (!get_line(fl, line) || sscanf(line, "%s %d %d", str_in, &int_in[0], &int_in[1]) != 3) {
+	// 4. flags min max repeatable-after
+	if (!get_line(fl, line) || sscanf(line, "%s %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2]) != 4) {
 		log("SYSERR: Format error in line 4 of %s", error);
 		exit(1);
 	}
@@ -496,6 +514,7 @@ void parse_quest(FILE *fl, any_vnum vnum) {
 	QUEST_FLAGS(quest) = asciiflag_conv(str_in);
 	QUEST_MIN_LEVEL(quest) = int_in[0];
 	QUEST_MAX_LEVEL(quest) = int_in[1];
+	QUEST_REPEATABLE_AFTER(quest) = int_in[2];
 	
 	// optionals
 	for (;;) {
@@ -639,8 +658,8 @@ void write_quest_to_file(FILE *fl, quest_data *quest) {
 	strip_crlf(temp);
 	fprintf(fl, "%s~\n", temp);
 	
-	// 4. flags min max
-	fprintf(fl, "%s %d %d\n", bitv_to_alpha(QUEST_FLAGS(quest)), QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest));
+	// 4. flags min max repeatable-after
+	fprintf(fl, "%s %d %d %d\n", bitv_to_alpha(QUEST_FLAGS(quest)), QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest), QUEST_REPEATABLE_AFTER(quest));
 		
 	// A. starts at
 	write_quest_givers_to_file(fl, 'A', QUEST_STARTS_AT(quest));
@@ -841,6 +860,208 @@ quest_data *setup_olc_quest(quest_data *input) {
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
 /**
+* Gets the display for a set of quest givers.
+*
+* @param struct quest_giver *list Pointer to the start of a list of quest givers.
+* @param char *save_buffer A buffer to store the result to.
+*/
+void get_quest_giver_display(struct quest_giver *list, char *save_buffer) {
+	char buf[MAX_STRING_LENGTH];
+	struct quest_giver *giver;
+	int count = 0;
+	
+	*save_buffer = '\0';
+	LL_FOREACH(list, giver) {
+		// QG_x
+		switch (giver->type) {
+			case QG_BUILDING: {
+				bld_data *bld = building_proto(giver->vnum);
+				strcpy(buf, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+				break;
+			}
+			case QG_MOBILE: {
+				strcpy(buf, get_mob_name_by_proto(giver->vnum));
+				break;
+			}
+			case QG_OBJECT: {
+				strcpy(buf, get_obj_name_by_proto(giver->vnum));
+				break;
+			}
+			case QG_ROOM_TEMPLATE: {
+				room_template *rmt = room_template_proto(giver->vnum);
+				strcpy(buf, rmt ? GET_RMT_TITLE(rmt) : "UNKNOWN");
+				break;
+			}
+			case QG_TRIGGER: {
+				trig_data *trig = real_trigger(giver->vnum);
+				strcpy(buf, trig ? GET_TRIG_NAME(trig) : "UNKNOWN");
+				break;
+			}
+			default: {
+				strcpy(buf, "UNKNOWN");
+				break;
+			}
+		}
+		
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s [%d] %s\r\n", ++count, quest_giver_types[giver->type], giver->vnum, buf);
+	}
+	
+	// empty list not shown
+}
+
+
+/**
+* Gets the display for a set of quest rewards.
+*
+* @param struct quest_reward *list Pointer to the start of a list of quest rewards.
+* @param char *save_buffer A buffer to store the result to.
+*/
+void get_quest_reward_display(struct quest_reward *list, char *save_buffer) {
+	char buf[MAX_STRING_LENGTH];
+	struct quest_reward *reward;
+	int count = 0;
+	
+	*save_buffer = '\0';
+	LL_FOREACH(list, reward) {
+		// QR_x
+		switch (reward->type) {
+			case QR_BONUS_EXP: {
+				strcpy(buf, "%d exp");
+				break;
+			}
+			case QR_COINS: {
+				sprintf(buf, "%d %s coin%s", reward->amount, reward->vnum == OTHER_COIN ? "misc" : "empire", PLURAL(reward->amount));
+				break;
+			}
+			case QR_OBJECT: {
+				sprintf(buf, "[%d] %dx %s", reward->vnum, reward->amount, get_obj_name_by_proto(reward->vnum));
+				break;
+			}
+			case QR_SET_SKILL: {
+				sprintf(buf, "[%d] %d %s", reward->vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
+				break;
+			}
+			case QR_SKILL_EXP: {
+				sprintf(buf, "[%d] %d%% %s", reward->vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
+				break;
+			}
+			case QR_SKILL_LEVELS: {
+				sprintf(buf, "[%d] %dx %s", reward->vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
+				break;
+			}
+			default: {
+				sprintf(buf, "%dx UNKNOWN", reward->amount);
+				break;
+			}
+		}
+		
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s\r\n", ++count, quest_reward_types[reward->type], buf);
+	}
+	
+	// empty list not shown
+}
+
+
+/**
+* Gets the display for a set of quest tasks.
+*
+* @param struct quest_task *list Pointer to the start of a list of quest tasks.
+* @param char *save_buffer A buffer to store the result to.
+*/
+void get_quest_task_display(struct quest_task *list, char *save_buffer) {
+	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	struct quest_task *task;
+	int count = 0;
+	
+	*save_buffer = '\0';
+	LL_FOREACH(list, task) {
+		// QT_x
+		switch (task->type) {
+			case QT_COMPLETED_QUEST: {
+				sprintf(buf, "[%d] %s", task->vnum, get_quest_name_by_proto(task->vnum));
+				break;
+			}
+			case QT_GET_COMPONENT: {
+				if (task->misc) {
+					prettier_sprintbit(task->misc, component_flags, lbuf);
+					strcat(lbuf, " ");
+				}
+				else {
+					*lbuf = '\0';
+				}
+				sprintf(buf, "%dx (%s%s)", task->needed, lbuf, component_types[task->vnum]);
+				break;
+			}
+			case QT_GET_OBJECT: {
+				sprintf(buf, "[%d] %dx %s", task->vnum, task->needed, get_obj_name_by_proto(task->vnum));
+				break;
+			}
+			case QT_KILL_MOB: {
+				sprintf(buf, "[%d] %dx %s", task->vnum, task->needed, get_mob_name_by_proto(task->vnum));
+				break;
+			}
+			case QT_KILL_MOB_FLAGGED: {
+				sprintbit(task->misc, action_bits, lbuf, TRUE);
+				sprintf(buf, "%dx %s", task->vnum, lbuf);
+				break;
+			}
+			case QT_NOT_COMPLETED_QUEST: {
+				sprintf(buf, "[%d] %s", task->vnum, get_quest_name_by_proto(task->vnum));
+				break;
+			}
+			case QT_NOT_ON_QUEST: {
+				sprintf(buf, "[%d] %s", task->vnum, get_quest_name_by_proto(task->vnum));
+				break;
+			}
+			case QT_OWN_BUILDING: {
+				bld_data *bld = building_proto(task->vnum);
+				sprintf(buf, "[%d] %dx %s", task->vnum, task->needed, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+				break;
+			}
+			case QT_OWN_VEHICLE: {
+				sprintf(buf, "[%d] %dx %s", task->vnum, task->needed, get_vehicle_name_by_proto(task->vnum));
+				break;
+			}
+			case QT_SKILL_LEVEL_OVER: {
+				sprintf(buf, "[%d] >= %d %s", task->vnum, task->needed, get_skill_name_by_vnum(task->vnum));
+				break;
+			}
+			case QT_SKILL_LEVEL_UNDER: {
+				sprintf(buf, "[%d] <= %d %s", task->vnum, task->needed, get_skill_name_by_vnum(task->vnum));
+				break;
+			}
+			case QT_TRIGGERED: {
+				strcpy(buf, "unknown");
+				break;
+			}
+			case QT_VISIT_BUILDING: {
+				bld_data *bld = building_proto(task->vnum);
+				sprintf(buf, "[%d] %s", task->vnum, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+				break;
+			}
+			case QT_VISIT_ROOM_TEMPLATE: {
+				room_template *rmt = room_template_proto(task->vnum);
+				sprintf(buf, "[%d] %s", task->vnum, rmt ? GET_RMT_TITLE(rmt) : "UNKNOWN");
+				break;
+			}
+			case QT_VISIT_SECTOR: {
+				sector_data *sect = sector_proto(task->vnum);
+				sprintf(buf, "[%d] %s", task->vnum, sect ? GET_SECT_NAME(sect) : "UNKNOWN");
+				break;
+			}
+			default: {
+				sprintf(buf, "UNKNOWN");
+				break;
+			}
+		}
+		
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s\r\n", ++count, quest_tracker_types[task->type], buf);
+	}
+	
+	// empty list not shown
+}
+
+/**
 * For vstat.
 *
 * @param char_data *ch The player requesting stats.
@@ -899,8 +1120,10 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 * @param char_data *ch The person who is editing a quest and will see its display.
 */
 void olc_show_quest(char_data *ch) {
+	void get_script_display(struct trig_proto_list *list, char *save_buffer);
+	
 	quest_data *quest = GET_OLC_QUEST(ch->desc);
-	char buf[MAX_STRING_LENGTH];// lbuf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	
 	if (!quest) {
 		return;
@@ -908,32 +1131,55 @@ void olc_show_quest(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !quest_proto(QUEST_VNUM(quest)) ? "new quest" : QUEST_NAME(quest_proto(QUEST_VNUM(quest))));
+	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !quest_proto(QUEST_VNUM(quest)) ? "new quest" : get_quest_name_by_proto(QUEST_VNUM(quest)));
 	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(QUEST_NAME(quest)));
-	/*
-	sprintf(buf + strlen(buf), "<\tyshortdescription\t0> %s\r\n", NULLSAFE(MORPH_SHORT_DESC(morph)));
-	sprintf(buf + strlen(buf), "<\tylongdescription\t0> %s\r\n", NULLSAFE(MORPH_LONG_DESC(morph)));
+	sprintf(buf + strlen(buf), "<&\tydescription\t0>\r\n%s", NULLSAFE(QUEST_DESCRIPTION(quest)));
+	sprintf(buf + strlen(buf), "<&\tycompletemessage\t0>\r\n%s", NULLSAFE(QUEST_COMPLETE_MSG(quest)));
 	
-	sprintbit(MORPH_FLAGS(morph), morph_flags, lbuf, TRUE);
+	sprintbit(QUEST_FLAGS(quest), quest_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
 	
-	sprintf(buf + strlen(buf), "<\tyattack\t0> %s\r\n", attack_hit_info[MORPH_ATTACK_TYPE(morph)].name);
-	sprintf(buf + strlen(buf), "<\tymovetype\t0> %s\r\n", mob_move_types[MORPH_MOVE_TYPE(morph)]);
-
-	sprintbit(MORPH_AFFECTS(morph), affected_bits, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<\tyaffects\t0> %s\r\n", lbuf);
-	
-	if (MORPH_MAX_SCALE(morph) > 0) {
-		sprintf(buf + strlen(buf), "<\tymaxlevel\t0> %d\r\n", MORPH_MAX_SCALE(morph));
+	if (QUEST_MIN_LEVEL(quest) > 0) {
+		sprintf(buf + strlen(buf), "<\tyminlevel\t0> %d\r\n", QUEST_MIN_LEVEL(quest));
+	}
+	else {
+		sprintf(buf + strlen(buf), "<\tyminlevel\t0> none\r\n");
+	}
+	if (QUEST_MAX_LEVEL(quest) > 0) {
+		sprintf(buf + strlen(buf), "<\tymaxlevel\t0> %d\r\n", QUEST_MAX_LEVEL(quest));
 	}
 	else {
 		sprintf(buf + strlen(buf), "<\tymaxlevel\t0> none\r\n");
 	}
 	
-	sprintf(buf + strlen(buf), "<\tycost\t0> %d\r\n", MORPH_COST(morph));
-	sprintf(buf + strlen(buf), "<\tycosttype\t0> %s\r\n", pool_types[MORPH_COST_TYPE(morph)]);
+	get_quest_task_display(QUEST_PREREQS(quest), lbuf);
+	sprintf(buf + strlen(buf), "Pre-requisites: <\typrereqs\t0>\r\n%s", lbuf);
 	
-	*/
+	if (QUEST_REPEATABLE_AFTER(quest) > 0) {
+		sprintf(buf + strlen(buf), "<\tyrepeat\t0> %d minutes (%d:%02d:%02d)", QUEST_REPEATABLE_AFTER(quest), (QUEST_REPEATABLE_AFTER(quest) / (60 * 24)), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) / 60), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) % 60));
+	}
+	else {
+		sprintf(buf + strlen(buf), "<\tyrepeat\t0> never\r\n");
+	}
+	
+	get_quest_giver_display(QUEST_STARTS_AT(quest), lbuf);
+	sprintf(buf + strlen(buf), "Starts at: <\tystarts\t0>\r\n%s", lbuf);
+	
+	get_quest_giver_display(QUEST_ENDS_AT(quest), lbuf);
+	sprintf(buf + strlen(buf), "Ends at: <\tyends\t0>\r\n%s", lbuf);
+	
+	get_quest_task_display(QUEST_TASKS(quest), lbuf);
+	sprintf(buf + strlen(buf), "Tasks: <\tytasks\t0>\r\n%s", lbuf);
+	
+	get_quest_reward_display(QUEST_REWARDS(quest), lbuf);
+	sprintf(buf + strlen(buf), "Rewards: <\tyrewards\t0>\r\n%s", lbuf);
+	
+	// scripts
+	sprintf(buf + strlen(buf), "Scripts: <\tyscript\t0>\r\n");
+	if (QUEST_SCRIPTS(quest)) {
+		get_script_display(QUEST_SCRIPTS(quest), lbuf);
+		strcat(buf, lbuf);
+	}
 	
 	page_string(ch->desc, buf, TRUE);
 }
