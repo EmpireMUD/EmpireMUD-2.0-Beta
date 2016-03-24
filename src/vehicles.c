@@ -1355,7 +1355,7 @@ void free_vehicle(vehicle_data *veh) {
 		extract_script(veh, VEH_TRIGGER);
 	}
 	if (veh->proto_script && (!proto || veh->proto_script != proto->proto_script)) {
-		free_proto_scripts(veh->proto_script);
+		free_proto_scripts(&veh->proto_script);
 	}
 	
 	// attributes
@@ -1950,7 +1950,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 			extract_script(iter, VEH_TRIGGER);
 		}
 		if (iter->proto_script && iter->proto_script != proto->proto_script) {
-			free_proto_scripts(iter->proto_script);
+			free_proto_scripts(&iter->proto_script);
 		}
 		
 		// re-attach scripts
@@ -1986,7 +1986,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 	
 	// free old script?
 	if (proto->proto_script) {
-		free_proto_scripts(proto->proto_script);
+		free_proto_scripts(&proto->proto_script);
 	}
 	
 	// save data back over the proto-type

@@ -51,6 +51,7 @@ extern const char *quest_reward_types[];
 extern const char *quest_tracker_types[];
 
 // external funcs
+void get_script_display(struct trig_proto_list *list, char *save_buffer);
 
 // local protos
 
@@ -364,7 +365,7 @@ void free_quest(quest_data *quest) {
 		free_quest_tasks(QUEST_PREREQS(quest));
 	}
 	if (QUEST_SCRIPTS(quest) && (!proto || QUEST_SCRIPTS(quest) != QUEST_SCRIPTS(proto))) {
-		free_proto_scripts(QUEST_SCRIPTS(quest));
+		free_proto_scripts(&QUEST_SCRIPTS(quest));
 	}
 	
 	free(quest);
@@ -781,6 +782,7 @@ void save_olc_quest(descriptor_data *desc) {
 	free_quest_tasks(QUEST_TASKS(proto));
 	free_quest_rewards(QUEST_REWARDS(proto));
 	free_quest_tasks(QUEST_PREREQS(proto));
+	free_proto_scripts(&QUEST_SCRIPTS(proto));
 	
 	// sanity
 	if (!QUEST_NAME(quest) || !*QUEST_NAME(quest)) {
@@ -1068,7 +1070,7 @@ void get_quest_task_display(struct quest_task *list, char *save_buffer) {
 * @param quest_data *quest The quest to display.
 */
 void do_stat_quest(char_data *ch, quest_data *quest) {
-	char buf[MAX_STRING_LENGTH];//, part[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	size_t size;
 	
 	if (!quest) {
@@ -1077,23 +1079,17 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 	
 	// first line
 	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
-	/*
-	size += snprintf(buf + size, sizeof(buf) - size, "L-Desc: \ty%s\t0\r\n", MORPH_LONG_DESC(morph));
+	size += snprintf(buf + size, sizeof(buf) - size, "%s", QUEST_DESCRIPTION(quest));
+	size += snprintf(buf + size, sizeof(buf) - size, "-------------------------------------------------\r\n");
+	size += snprintf(buf + size, sizeof(buf) - size, "%s", QUEST_COMPLETE_MSG(quest));
 	
-	snprintf(part, sizeof(part), "%s", (MORPH_ABILITY(morph) == NO_ABIL ? "none" : get_ability_name_by_vnum(MORPH_ABILITY(morph))));
-	if ((abil = find_ability_by_vnum(MORPH_ABILITY(morph))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
-		snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
-	}
-	size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\ty%d %s\t0], Max Level: [\ty%d%s\t0], Requires Ability: [\ty%s\t0]\r\n", MORPH_COST(morph), MORPH_COST(morph) > 0 ? pool_types[MORPH_COST_TYPE(morph)] : "/ none", MORPH_MAX_SCALE(morph), (MORPH_MAX_SCALE(morph) == 0 ? " none" : ""), part);
-	
-	if (MORPH_REQUIRES_OBJ(morph) != NOTHING) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Requires item: [%d] \tg%s\t0\r\n", MORPH_REQUIRES_OBJ(morph), skip_filler(get_obj_name_by_proto(MORPH_REQUIRES_OBJ(morph))));
-	}
-	
-	size += snprintf(buf + size, sizeof(buf) - size, "Attack type: \ty%s\t0, Move type: \ty%s\t0\r\n", attack_hit_info[MORPH_ATTACK_TYPE(morph)].name, mob_move_types[MORPH_MOVE_TYPE(morph)]);
-	
-	sprintbit(MORPH_FLAGS(morph), morph_flags, part, TRUE);
+	sprintbit(QUEST_FLAGS(quest), quest_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	
+	if (QUEST_REPEATABLE_AFTER(quest) > 0) {
+	}
+	/*
+	size += snprintf(buf + size, sizeof(buf) - size, "Level limits: [\tc%s\t0], Repatable: [\tc%s\t0]\r\n", level_range_string(QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest), 0), part);
 	
 	sprintbit(MORPH_AFFECTS(morph), affected_bits, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Affects: \tc%s\t0\r\n", part);
@@ -1107,7 +1103,48 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 		size += snprintf(buf + size, sizeof(buf) - size, "none");
 	}
 	size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+
+	quest_data *quest = GET_OLC_QUEST(ch->desc);
+	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	
+	if (!quest) {
+		return;
+	}
+	
+	
+	
+	get_quest_task_display(QUEST_PREREQS(quest), lbuf);
+	sprintf(buf + strlen(buf), "Pre-requisites: <\typrereqs\t0>\r\n%s", lbuf);
+	
+	if (QUEST_REPEATABLE_AFTER(quest) > 0) {
+		sprintf(buf + strlen(buf), "<\tyrepeat\t0> %d minutes (%d:%02d:%02d)", QUEST_REPEATABLE_AFTER(quest), (QUEST_REPEATABLE_AFTER(quest) / (60 * 24)), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) / 60), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) % 60));
+	}
+	else {
+		sprintf(buf + strlen(buf), "<\tyrepeat\t0> never\r\n");
+	}
+	
+	get_quest_giver_display(QUEST_STARTS_AT(quest), lbuf);
+	sprintf(buf + strlen(buf), "Starts at: <\tystarts\t0>\r\n%s", lbuf);
+	
+	get_quest_giver_display(QUEST_ENDS_AT(quest), lbuf);
+	sprintf(buf + strlen(buf), "Ends at: <\tyends\t0>\r\n%s", lbuf);
+	
+	get_quest_task_display(QUEST_TASKS(quest), lbuf);
+	sprintf(buf + strlen(buf), "Tasks: <\tytasks\t0>\r\n%s", lbuf);
+	
+	get_quest_reward_display(QUEST_REWARDS(quest), lbuf);
+	sprintf(buf + strlen(buf), "Rewards: <\tyrewards\t0>\r\n%s", lbuf);
+	
+	// scripts
+	sprintf(buf + strlen(buf), "Scripts: <\tyscript\t0>\r\n");
+	if (QUEST_SCRIPTS(quest)) {
+		get_script_display(QUEST_SCRIPTS(quest), lbuf);
+		strcat(buf, lbuf);
+	}
+	
+	page_string(ch->desc, buf, TRUE);
 	*/
+
 		
 	page_string(ch->desc, buf, TRUE);
 }
@@ -1120,8 +1157,6 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 * @param char_data *ch The person who is editing a quest and will see its display.
 */
 void olc_show_quest(char_data *ch) {
-	void get_script_display(struct trig_proto_list *list, char *save_buffer);
-	
 	quest_data *quest = GET_OLC_QUEST(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	
@@ -1155,11 +1190,14 @@ void olc_show_quest(char_data *ch) {
 	get_quest_task_display(QUEST_PREREQS(quest), lbuf);
 	sprintf(buf + strlen(buf), "Pre-requisites: <\typrereqs\t0>\r\n%s", lbuf);
 	
-	if (QUEST_REPEATABLE_AFTER(quest) > 0) {
+	if (QUEST_REPEATABLE_AFTER(quest) == NOT_REPEATABLE) {
+		sprintf(buf + strlen(buf), "<\tyrepeat\t0> never\r\n");
+	}
+	else if (QUEST_REPEATABLE_AFTER(quest) > 0) {
 		sprintf(buf + strlen(buf), "<\tyrepeat\t0> %d minutes (%d:%02d:%02d)", QUEST_REPEATABLE_AFTER(quest), (QUEST_REPEATABLE_AFTER(quest) / (60 * 24)), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) / 60), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) % 60));
 	}
-	else {
-		sprintf(buf + strlen(buf), "<\tyrepeat\t0> never\r\n");
+	else if (QUEST_REPEATABLE_AFTER(quest) == 0) {
+		sprintf(buf + strlen(buf), "<\tyrepeat\t0> immediately\r\n");
 	}
 	
 	get_quest_giver_display(QUEST_STARTS_AT(quest), lbuf);

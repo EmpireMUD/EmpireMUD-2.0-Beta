@@ -879,7 +879,7 @@ void free_char(char_data *ch) {
 		free(ch->player.long_descr);
 	}
 	if (ch->proto_script && (!proto || ch->proto_script != proto->proto_script)) {
-		free_proto_scripts(ch->proto_script);
+		free_proto_scripts(&ch->proto_script);
 	}
 	if (ch->interactions && (!proto || ch->interactions != proto->interactions)) {
 		while ((interact = ch->interactions)) {

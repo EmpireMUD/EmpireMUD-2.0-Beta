@@ -287,7 +287,7 @@ void parse_trig_proto(char *line, struct trig_proto_list **list, char *error_str
 extern trig_data *real_trigger(trig_vnum vnum);
 void extract_script(void *thing, int type);
 void extract_script_mem(struct script_memory *sc);
-void free_proto_scripts(struct trig_proto_list *list);
+void free_proto_scripts(struct trig_proto_list **list);
 void free_script(void *thing, int type);
 void free_trigger(trig_data *trig);
 extern struct trig_proto_list *copy_trig_protos(struct trig_proto_list *list);

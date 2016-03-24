@@ -639,7 +639,7 @@ ADMIN_UTIL(util_resetbuildingtriggers) {
 			if (SCRIPT(room)) {
 				extract_script(room, WLD_TRIGGER);
 			}
-			free_proto_scripts(room->proto_script);
+			free_proto_scripts(&room->proto_script);
 			
 			// add any triggers
 			room->proto_script = copy_trig_protos(GET_BLD_SCRIPTS(GET_BUILDING(room)));

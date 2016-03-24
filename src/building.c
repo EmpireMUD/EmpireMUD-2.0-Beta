@@ -314,8 +314,7 @@ void disassociate_building(room_data *room) {
 	if (SCRIPT(room)) {
 		extract_script(room, WLD_TRIGGER);
 	}
-	free_proto_scripts(room->proto_script);
-	room->proto_script = NULL;
+	free_proto_scripts(&room->proto_script);
 
 	// restore sect: this does not use change_terrain()
 	SECT(room) = BASE_SECT(room);
@@ -1566,8 +1565,7 @@ ACMD(do_designate) {
 			if (SCRIPT(new)) {
 				extract_script(new, WLD_TRIGGER);
 			}
-			free_proto_scripts(new->proto_script);
-			new->proto_script = NULL;
+			free_proto_scripts(&new->proto_script);
 			
 			attach_building_to_room(type, new, TRUE);
 		}

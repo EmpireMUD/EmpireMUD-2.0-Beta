@@ -172,13 +172,14 @@ void extract_script_mem(struct script_memory *sc) {
 /**
 * Frees a whole list of proto scripts.
 *
-* @param struct trig_proto_list *list The list to free.
+* @param struct trig_proto_list **list A pointer to list to free.
 */
-void free_proto_scripts(struct trig_proto_list *list) {
+void free_proto_scripts(struct trig_proto_list **list) {
 	struct trig_proto_list *iter, *next_iter;
-	LL_FOREACH_SAFE(list, iter, next_iter) {
+	LL_FOREACH_SAFE(*list, iter, next_iter) {
 		free(iter);
 	}
+	*list = NULL;
 }
 
 

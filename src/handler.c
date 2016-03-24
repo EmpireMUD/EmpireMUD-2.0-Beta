@@ -3602,7 +3602,7 @@ void extract_obj(obj_data *obj) {
 	}
 
 	if (!proto || obj->proto_script != proto->proto_script) {
-		free_proto_scripts(obj->proto_script);
+		free_proto_scripts(&obj->proto_script);
 	}
 
 	free_obj(obj);
