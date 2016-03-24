@@ -6794,6 +6794,12 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No morphs by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "quest")) {
+		extern int vnum_quest(char *searchname, char_data *ch);
+		if (!vnum_quest(buf2, ch)) {
+			msg_to_char(ch, "No quests by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "roomtemplate")) {
 		if (!vnum_room_template(buf2, ch)) {
 			msg_to_char(ch, "No room templates by that name.\r\n");
@@ -6955,6 +6961,15 @@ ACMD(do_vstat) {
 		obj = read_object(number, TRUE);
 		do_stat_object(ch, obj);
 		extract_obj(obj);
+	}
+	else if (is_abbrev(buf, "quest")) {
+		void do_stat_quest(char_data *ch, quest_data *quest);
+		quest_data *quest = quest_proto(number);
+		if (!quest) {
+			msg_to_char(ch, "There is no quest with that number.\r\n");
+			return;
+		}
+		do_stat_quest(ch, quest);
 	}
 	else if (is_abbrev(buf, "roomtemplate")) {
 		room_template *rmt = room_template_proto(number);
