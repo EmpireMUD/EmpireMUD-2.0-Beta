@@ -4986,8 +4986,9 @@ void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers)
 	// copy proto script
 	if (with_triggers) {
 		struct trig_proto_list *temp;
-		temp = copy_trig_protos(GET_BLD_SCRIPTS(bld));
-		LL_APPEND(room->proto_script, temp);
+		if ((temp = copy_trig_protos(GET_BLD_SCRIPTS(bld)))) {
+			LL_APPEND(room->proto_script, temp);
+		}
 		assign_triggers(room, WLD_TRIGGER);
 	}
 }

@@ -1229,8 +1229,9 @@ void unlink_instance_entrance(room_data *room) {
 	
 	// check for scripts
 	if (adv && GET_ADV_SCRIPTS(adv)) {
-		tpl = copy_trig_protos(GET_ADV_SCRIPTS(adv));
-		LL_APPEND(room->proto_script, tpl);
+		if ((tpl = copy_trig_protos(GET_ADV_SCRIPTS(adv)))) {
+			LL_APPEND(room->proto_script, tpl);
+		}
 		assign_triggers(room, WLD_TRIGGER);
 		adventure_cleanup_wtrigger(room);
 		
