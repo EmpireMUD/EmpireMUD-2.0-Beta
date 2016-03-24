@@ -240,7 +240,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		if (CHORE_ACTIVE(CHORE_QUARRYING) && CAN_INTERACT_ROOM(room, INTERACT_QUARRY)) {
 			do_chore_quarrying(emp, room);
 		}
-		if (!HAS_FUNCTION(room, FNC_SAW) && CHORE_ACTIVE(CHORE_SAWING)) {
+		if (HAS_FUNCTION(room, FNC_SAW) && CHORE_ACTIVE(CHORE_SAWING)) {
 			do_chore_einv_interaction(emp, room, CHORE_SAWING, INTERACT_SAW);
 		}
 		if (HAS_FUNCTION(room, FNC_MILL) && CHORE_ACTIVE(CHORE_MILLING)) {
