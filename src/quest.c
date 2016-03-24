@@ -1277,7 +1277,10 @@ OLC_MODULE(qedit_minlevel) {
 OLC_MODULE(qedit_repeat) {
 	quest_data *quest = GET_OLC_QUEST(ch->desc);
 	
-	if (is_abbrev(argument, "never") || is_abbrev(argument, "none")) {
+	if (!*argument) {
+		msg_to_char(ch, "Set the repeat interval to how many minutes (or immediately/never)?\r\n");
+	}
+	else if (is_abbrev(argument, "never") || is_abbrev(argument, "none")) {
 		QUEST_REPEATABLE_AFTER(quest) = NOT_REPEATABLE;
 		msg_to_char(ch, "It is now non-repeatable.\r\n");
 	}
@@ -1285,9 +1288,12 @@ OLC_MODULE(qedit_repeat) {
 		QUEST_REPEATABLE_AFTER(quest) = 0;
 		msg_to_char(ch, "It is now immediately repeatable.\r\n");
 	}
-	else {
+	else if (isdigit(*argument)) {
 		QUEST_REPEATABLE_AFTER(quest) = olc_process_number(ch, argument, "repeatable after", "repeat", 0, MAX_INT, QUEST_REPEATABLE_AFTER(quest));
 		msg_to_char(ch, "It now repeats after %d minutes (%d:%02d:%02d).\r\n", QUEST_REPEATABLE_AFTER(quest), (QUEST_REPEATABLE_AFTER(quest) / (60 * 24)), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) / 60), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) % 60));
+	}
+	else {
+		msg_to_char(ch, "Invalid repeat interval.\r\n");
 	}
 }
 
