@@ -1164,7 +1164,7 @@ void olc_show_quest(char_data *ch) {
 		sprintf(buf + strlen(buf), "<\tyrepeat\t0> never\r\n");
 	}
 	else if (QUEST_REPEATABLE_AFTER(quest) > 0) {
-		sprintf(buf + strlen(buf), "<\tyrepeat\t0> %d minutes (%d:%02d:%02d)", QUEST_REPEATABLE_AFTER(quest), (QUEST_REPEATABLE_AFTER(quest) / (60 * 24)), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) / 60), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) % 60));
+		sprintf(buf + strlen(buf), "<\tyrepeat\t0> %d minutes (%d:%02d:%02d)\r\n", QUEST_REPEATABLE_AFTER(quest), (QUEST_REPEATABLE_AFTER(quest) / (60 * 24)), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) / 60), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) % 60));
 	}
 	else if (QUEST_REPEATABLE_AFTER(quest) == 0) {
 		sprintf(buf + strlen(buf), "<\tyrepeat\t0> immediately\r\n");
