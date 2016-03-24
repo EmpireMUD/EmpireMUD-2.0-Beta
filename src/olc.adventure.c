@@ -165,6 +165,8 @@ bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
 		olc_audit(ch, OLC_CROP, buf);
 		msg_to_char(ch, "Sectors:\r\n");
 		olc_audit(ch, OLC_SECTOR, buf);
+		msg_to_char(ch, "Quests:\r\n");
+		olc_audit(ch, OLC_QUEST, buf);
 		msg_to_char(ch, "Room Templates:\r\n");
 		olc_audit(ch, OLC_ROOM_TEMPLATE, buf);
 		msg_to_char(ch, "Archetypes:\r\n");

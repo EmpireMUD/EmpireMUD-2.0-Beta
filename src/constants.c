@@ -2058,6 +2058,7 @@ const char *olc_flag_bits[] = {
 	"SKILLS",
 	"!VEHICLES",
 	"!MORPHS",
+	"!QUESTS",
 	"\n"
 };
 
@@ -2083,6 +2084,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"skill",
 	"vehicle",
 	"morph",
+	"quest",
 	"\n"
 };
 
