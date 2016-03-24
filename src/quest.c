@@ -1133,8 +1133,8 @@ void olc_show_quest(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !quest_proto(QUEST_VNUM(quest)) ? "new quest" : get_quest_name_by_proto(QUEST_VNUM(quest)));
 	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(QUEST_NAME(quest)));
-	sprintf(buf + strlen(buf), "<&\tydescription\t0>\r\n%s", NULLSAFE(QUEST_DESCRIPTION(quest)));
-	sprintf(buf + strlen(buf), "<&\tycompletemessage\t0>\r\n%s", NULLSAFE(QUEST_COMPLETE_MSG(quest)));
+	sprintf(buf + strlen(buf), "<\tydescription\t0>\r\n%s", NULLSAFE(QUEST_DESCRIPTION(quest)));
+	sprintf(buf + strlen(buf), "<\tycompletemessage\t0>\r\n%s", NULLSAFE(QUEST_COMPLETE_MSG(quest)));
 	
 	sprintbit(QUEST_FLAGS(quest), quest_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
