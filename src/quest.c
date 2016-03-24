@@ -49,11 +49,13 @@ extern const char *quest_flags[];
 extern const char *quest_giver_types[];
 extern const char *quest_reward_types[];
 extern const char *quest_tracker_types[];
+extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
 // external funcs
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 
 // local protos
+void free_quest_givers(struct quest_giver *list);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -68,6 +70,38 @@ void get_script_display(struct trig_proto_list *list, char *save_buffer);
 char *get_quest_name_by_proto(any_vnum vnum) {
 	quest_data *proto = quest_proto(vnum);
 	return proto ? QUEST_NAME(proto) : "UNKNOWN";
+}
+
+
+/**
+* Copies entries from one list into another, only if they are not already in
+* the to_list.
+*
+* @param struct quest_giver **to_list A pointer to the destination list.
+* @param struct quest_giver *from_list The list to copy from.
+*/
+void smart_copy_quest_givers(struct quest_giver **to_list, struct quest_giver *from_list) {
+	struct quest_giver *iter, *search, *giver;
+	bool found;
+	
+	LL_FOREACH(from_list, iter) {
+		// ensure not already in list
+		found = FALSE;
+		LL_FOREACH(*to_list, search) {
+			if (search->type == iter->type && search->vnum == iter->vnum) {
+				found = TRUE;
+				break;
+			}
+		}
+		
+		// add it
+		if (!found) {
+			CREATE(giver, struct quest_giver, 1);
+			giver->type = iter->type;
+			giver->vnum = iter->vnum;
+			LL_APPEND(*to_list, giver);
+		}
+	}
 }
 
 
@@ -147,6 +181,271 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 	}
 	
 	page_string(ch->desc, buf, TRUE);
+}
+
+
+/**
+* Processing for quest-givers (starts at, ends at).
+*
+* @param char_data *ch The player using OLC.
+* @param char *argument The full argument after the command.
+* @param struct quest_giver **list A pointer to the list we're adding/changing.
+* @param char *command The command used by the player (starts, ends).
+*/
+void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_giver **list, char *command) {
+	char cmd_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];
+	char vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	struct quest_giver *giver, *iter, *change, *copyfrom;
+	int findtype, num, type;
+	any_vnum vnum;
+	bool found;
+	
+	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
+	
+	if (is_abbrev(cmd_arg, "copy")) {
+		// usage: qedit starts/ends copy <from type> <from vnum> <starts/ends>
+		argument = any_one_arg(argument, type_arg);	// just "quest" for now
+		argument = any_one_arg(argument, vnum_arg);	// any vnum for that type
+		argument = any_one_arg(argument, field_arg);	// starts/ends
+		
+		if (!*type_arg || !*vnum_arg) {
+			msg_to_char(ch, "Usage: %s copy <from type> <from vnum> [starts | ends]\r\n", command);
+		}
+		else if ((findtype = find_olc_type(type_arg)) == 0) {
+			msg_to_char(ch, "Unknown olc type '%s'.\r\n", type_arg);
+		}
+		else if (!isdigit(*vnum_arg)) {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			msg_to_char(ch, "Copy from which %s?\r\n", buf);
+		}
+		else if ((vnum = atoi(vnum_arg)) < 0) {
+			msg_to_char(ch, "Invalid vnum.\r\n");
+		}
+		else {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			copyfrom = NULL;
+			
+			switch (findtype) {
+				case OLC_QUEST: {
+					// requires starts/ends
+					if (!*field_arg || (!is_abbrev(field_arg, "starts") && !is_abbrev(field_arg, "ends"))) {
+						msg_to_char(ch, "Copy from the 'starts' or 'ends' list?\r\n");
+						return;
+					}
+					quest_data *from_qst = quest_proto(vnum);
+					if (from_qst) {
+						copyfrom = (is_abbrev(field_arg, "starts") ? QUEST_STARTS_AT(from_qst) : QUEST_ENDS_AT(from_qst));
+					}
+					break;
+				}
+				default: {
+					msg_to_char(ch, "You can't copy '%s' from %ss.\r\n", command, buf);
+					return;
+				}
+			}
+			
+			if (!copyfrom) {
+				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, vnum_arg);
+			}
+			else {
+				smart_copy_quest_givers(list, copyfrom);
+				msg_to_char(ch, "Copied '%s' from %s %d.\r\n", command, buf, vnum);
+			}
+		}
+	}	// end 'copy'
+	else if (is_abbrev(cmd_arg, "remove")) {
+		// usage: qedit starts|ends remove <number | all>
+		skip_spaces(&argument);	// only arg is number
+		
+		if (!*argument) {
+			msg_to_char(ch, "Remove which '%s' (number)?\r\n", command);
+		}
+		else if (!str_cmp(argument, "all")) {
+			free_quest_givers(*list);
+			*list = NULL;
+			msg_to_char(ch, "You remove all the '%s'.\r\n", command);
+		}
+		else if (!isdigit(*argument) || (num = atoi(argument)) < 1) {
+			msg_to_char(ch, "Invalid '%s' number.\r\n", command);
+		}
+		else {
+			found = FALSE;
+			LL_FOREACH(*list, iter) {
+				if (--num == 0) {
+					found = TRUE;
+					
+					msg_to_char(ch, "You remove the '%s' info for %s %d.\r\n", command, quest_giver_types[iter->type], iter->vnum);
+					LL_DELETE(*list, iter);
+					free(iter);
+					break;
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid '%s' number.\r\n", command);
+			}
+		}
+	}	// end 'remove'
+	else if (is_abbrev(cmd_arg, "add")) {
+		// usage: qedit starts|ends add <type> <vnum>
+		argument = any_one_arg(argument, type_arg);
+		argument = any_one_arg(argument, vnum_arg);
+		
+		if (!*type_arg || !*vnum_arg) {
+			msg_to_char(ch, "Usage: %s add <type> <vnum>\r\n", command);
+		}
+		else if ((type = search_block(type_arg, quest_giver_types, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
+		}
+		else if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+			msg_to_char(ch, "Invalid vnum '%s'.\r\n", num_arg);
+		}
+		else {
+			// validate vnum, and set buf to the name
+			*buf = '\0';
+			switch (type) {
+				case QG_BUILDING: {
+					bld_data *bld = building_proto(vnum);
+					if (bld) {
+						strcpy(buf, GET_BLD_NAME(bld));
+					}
+					break;
+				}
+				case QG_MOBILE: {
+					char_data *mob = mob_proto(vnum);
+					if (mob) {
+						strcpy(buf, GET_SHORT_DESC(mob));
+					}
+					break;
+				}
+				case QG_OBJECT: {
+					obj_data *obj = obj_proto(vnum);
+					if (obj) {
+						strcpy(buf, GET_OBJ_SHORT_DESC(obj));
+					}
+					break;
+				}
+				case QG_ROOM_TEMPLATE: {
+					room_template *rmt = room_template_proto(vnum);
+					if (rmt) {
+						strcpy(buf, GET_RMT_TITLE(rmt));
+					}
+					break;
+				}
+				case QG_TRIGGER: {
+					trig_data *trig = real_trigger(vnum);
+					if (trig) {
+						strcpy(buf, GET_TRIG_NAME(trig));
+					}
+					break;
+				}
+			}
+			
+			// did we find one? if so, buf is set
+			if (!*buf) {
+				msg_to_char(ch, "Unable to find %s %d.\r\n", quest_giver_types[type], vnum);
+				return;
+			}
+			
+			// success
+			CREATE(giver, struct quest_giver, 1);
+			giver->type = type;
+			giver->vnum = vnum;
+			
+			LL_APPEND(*list, giver);
+			msg_to_char(ch, "You add '%s': %s %d: %s.\r\n", command, quest_giver_types[type], vnum, buf);
+		}
+	}	// end 'add'
+	else if (is_abbrev(cmd_arg, "change")) {
+		// usage: qedit starts|ends change <number> vnum <number>
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, field_arg);
+		argument = any_one_arg(argument, vnum_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*field_arg || !*vnum_arg) {
+			msg_to_char(ch, "Usage: %s change <number> vnum <value>\r\n", command);
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		LL_FOREACH(*list, iter) {
+			if (--num == 0) {
+				change = iter;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid '%s' number.\r\n", command);
+		}
+		else if (is_abbrev(field_arg, "vnum")) {
+			if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+				msg_to_char(ch, "Invalid vnum '%s'.\r\n", vnum_arg);
+				return;
+			}
+			
+			// validate vnum, and set buf to the name
+			*buf = '\0';
+			switch (change->type) {
+				case QG_BUILDING: {
+					bld_data *bld = building_proto(vnum);
+					if (bld) {
+						strcpy(buf, GET_BLD_NAME(bld));
+					}
+					break;
+				}
+				case QG_MOBILE: {
+					char_data *mob = mob_proto(vnum);
+					if (mob) {
+						strcpy(buf, GET_SHORT_DESC(mob));
+					}
+					break;
+				}
+				case QG_OBJECT: {
+					obj_data *obj = obj_proto(vnum);
+					if (obj) {
+						strcpy(buf, GET_OBJ_SHORT_DESC(obj));
+					}
+					break;
+				}
+				case QG_ROOM_TEMPLATE: {
+					room_template *rmt = room_template_proto(vnum);
+					if (rmt) {
+						strcpy(buf, GET_RMT_TITLE(rmt));
+					}
+					break;
+				}
+				case QG_TRIGGER: {
+					trig_data *trig = real_trigger(vnum);
+					if (trig) {
+						strcpy(buf, GET_TRIG_NAME(trig));
+					}
+					break;
+				}
+			}
+			
+			// did we find one? if so, buf is set
+			if (!*buf) {
+				msg_to_char(ch, "Unable to find %s %d.\r\n", quest_giver_types[change->type], vnum);
+				return;
+			}
+			
+			change->vnum = vnum;
+			msg_to_char(ch, "Changed '%s' %d's vnum to %d (%s).\r\n", command, atoi(num_arg), vnum, buf);
+		}
+		else {
+			msg_to_char(ch, "You can only change the vnum.\r\n");
+		}
+	}	// end 'change'
+	else {
+		msg_to_char(ch, "Usage: %s add <type> <vnum>\r\n", command);
+		msg_to_char(ch, "Usage: %s change <number> vnum <value>\r\n", command);
+		msg_to_char(ch, "Usage: %s copy <from type> <from vnum> [starts/ends]\r\n", command);
+		msg_to_char(ch, "Usage: %s remove <number | all>\r\n", command);
+	}
 }
 
 
@@ -1242,6 +1541,12 @@ OLC_MODULE(qedit_description) {
 }
 
 
+OLC_MODULE(qedit_ends) {
+	quest_data *quest = GET_OLC_QUEST(ch->desc);
+	qedit_process_quest_givers(ch, argument, &QUEST_ENDS_AT(quest), "ends");
+}
+
+
 OLC_MODULE(qedit_flags) {
 	quest_data *quest = GET_OLC_QUEST(ch->desc);
 	bool had_indev = IS_SET(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT) ? TRUE : FALSE;
@@ -1301,4 +1606,10 @@ OLC_MODULE(qedit_repeat) {
 OLC_MODULE(qedit_script) {
 	quest_data *quest = GET_OLC_QUEST(ch->desc);
 	olc_process_script(ch, argument, &QUEST_SCRIPTS(quest), WLD_TRIGGER);
+}
+
+
+OLC_MODULE(qedit_starts) {
+	quest_data *quest = GET_OLC_QUEST(ch->desc);
+	qedit_process_quest_givers(ch, argument, &QUEST_STARTS_AT(quest), "starts");
 }

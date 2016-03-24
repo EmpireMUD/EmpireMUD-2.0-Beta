@@ -270,12 +270,14 @@ OLC_MODULE(oedit_wear);
 // quests
 OLC_MODULE(qedit_completemessage);
 OLC_MODULE(qedit_description);
+OLC_MODULE(qedit_ends);
 OLC_MODULE(qedit_flags);
 OLC_MODULE(qedit_name);
 OLC_MODULE(qedit_maxlevel);
 OLC_MODULE(qedit_minlevel);
 OLC_MODULE(qedit_repeat);
 OLC_MODULE(qedit_script);
+OLC_MODULE(qedit_starts);
 
 // room template
 OLC_MODULE(rmedit_affects);
@@ -650,12 +652,14 @@ const struct olc_command_data olc_data[] = {
 	// quest commands
 	{ "completemessage", qedit_completemessage, OLC_QUEST, OLC_CF_EDITOR },
 	{ "description", qedit_description, OLC_QUEST, OLC_CF_EDITOR },
+	{ "ends", qedit_ends, OLC_QUEST, OLC_CF_EDITOR },
 	{ "flags", qedit_flags, OLC_QUEST, OLC_CF_EDITOR },
 	{ "name", qedit_name, OLC_QUEST, OLC_CF_EDITOR },
 	{ "maxlevel", qedit_maxlevel, OLC_QUEST, OLC_CF_EDITOR },
 	{ "minlevel", qedit_minlevel, OLC_QUEST, OLC_CF_EDITOR },
 	{ "repeat", qedit_repeat, OLC_QUEST, OLC_CF_EDITOR },
 	{ "script", qedit_script, OLC_QUEST, OLC_CF_EDITOR },
+	{ "starts", qedit_starts, OLC_QUEST, OLC_CF_EDITOR },
 	
 	// room template commands
 	{ "affects", rmedit_affects, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
