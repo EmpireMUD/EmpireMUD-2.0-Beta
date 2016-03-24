@@ -1745,6 +1745,7 @@ OLC_MODULE(qedit_rewards) {
 		else {		
 			// validate vnum, and set buf to the name
 			*buf = '\0';
+			vnum = 0;
 			switch (stype) {
 				case QR_BONUS_EXP: {
 					// vnum not required
@@ -1846,6 +1847,7 @@ OLC_MODULE(qedit_rewards) {
 		else if (is_abbrev(field_arg, "vnum")) {
 			// validate vnum, and set buf to the name
 			*buf = '\0';
+			vnum = 0;
 			switch (change->type) {
 				case QR_BONUS_EXP: {
 					msg_to_char(ch, "You can't change the vnum on that.\r\n");
