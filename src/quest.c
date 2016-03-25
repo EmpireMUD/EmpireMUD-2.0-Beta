@@ -74,6 +74,67 @@ char *get_quest_name_by_proto(any_vnum vnum) {
 
 
 /**
+* Gets standard string display like "4x lumber" for a quest reward.
+*
+* @param struct quest_reward *reward The reward to show.
+* @param bool show_vnums If TRUE, adds [1234] at the start of the string.
+* @return char* The string display.
+*/
+char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
+	static char output[256];
+	char vnum[256];
+	
+	*output = '\0';
+	if (!reward) {
+		return output;
+	}
+	
+	if (show_vnums) {
+		snprintf(vnum, sizeof(vnum), "[%d] ", reward->vnum);
+	}
+	else {
+		*vnum = '\0';
+	}
+	
+	// QR_x
+	switch (reward->type) {
+		case QR_BONUS_EXP: {
+			// has no vnum
+			snprintf(output, sizeof(output), "%d bonus exp", reward->amount);
+			break;
+		}
+		case QR_COINS: {
+			// vnum not relevant
+			snprintf(output, sizeof(output), "%d %s coin%s", reward->amount, reward->vnum == OTHER_COIN ? "misc" : "empire", PLURAL(reward->amount));
+			break;
+		}
+		case QR_OBJECT: {
+			snprintf(output, sizeof(output), "%s%dx %s", vnum, reward->amount, skip_filler(get_obj_name_by_proto(reward->vnum)));
+			break;
+		}
+		case QR_SET_SKILL: {
+			snprintf(output, sizeof(output), "%s%d %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
+			break;
+		}
+		case QR_SKILL_EXP: {
+			snprintf(output, sizeof(output), "%s%d%% %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
+			break;
+		}
+		case QR_SKILL_LEVELS: {
+			snprintf(output, sizeof(output), "%s%dx %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
+			break;
+		}
+		default: {
+			snprintf(output, sizeof(output), "%s%dx UNKNOWN", vnum, reward->amount);
+			break;
+		}
+	}
+	
+	return output;
+}
+
+
+/**
 * Copies entries from one list into another, only if they are not already in
 * the to_list.
 *
@@ -1251,45 +1312,12 @@ void get_quest_giver_display(struct quest_giver *list, char *save_buffer) {
 * @param char *save_buffer A buffer to store the result to.
 */
 void get_quest_reward_display(struct quest_reward *list, char *save_buffer) {
-	char buf[MAX_STRING_LENGTH];
 	struct quest_reward *reward;
 	int count = 0;
 	
 	*save_buffer = '\0';
-	LL_FOREACH(list, reward) {
-		// QR_x
-		switch (reward->type) {
-			case QR_BONUS_EXP: {
-				sprintf(buf, "%d exp", reward->amount);
-				break;
-			}
-			case QR_COINS: {
-				sprintf(buf, "%d %s coin%s", reward->amount, reward->vnum == OTHER_COIN ? "misc" : "empire", PLURAL(reward->amount));
-				break;
-			}
-			case QR_OBJECT: {
-				sprintf(buf, "[%d] %dx %s", reward->vnum, reward->amount, get_obj_name_by_proto(reward->vnum));
-				break;
-			}
-			case QR_SET_SKILL: {
-				sprintf(buf, "[%d] %d %s", reward->vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
-				break;
-			}
-			case QR_SKILL_EXP: {
-				sprintf(buf, "[%d] %d%% %s", reward->vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
-				break;
-			}
-			case QR_SKILL_LEVELS: {
-				sprintf(buf, "[%d] %dx %s", reward->vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
-				break;
-			}
-			default: {
-				sprintf(buf, "%dx UNKNOWN", reward->amount);
-				break;
-			}
-		}
-		
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s\r\n", ++count, quest_reward_types[reward->type], buf);
+	LL_FOREACH(list, reward) {		
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s\r\n", ++count, quest_reward_types[reward->type], quest_reward_string(reward, TRUE));
 	}
 	
 	// empty list not shown
@@ -1644,8 +1672,8 @@ OLC_MODULE(qedit_rewards) {
 	struct quest_reward *reward, *iter, *change, *copyfrom;
 	struct quest_reward **list = &QUEST_REWARDS(quest);
 	int findtype, num, stype;
+	bool found, ok;
 	any_vnum vnum;
-	bool found;
 	
 	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
 	
@@ -1743,24 +1771,23 @@ OLC_MODULE(qedit_rewards) {
 			msg_to_char(ch, "Invalid amount '%s'.\r\n", num_arg);
 		}
 		else {		
-			// validate vnum, and set buf to the name
-			*buf = '\0';
+			// QR_x: validate vnum
 			vnum = 0;
+			ok = FALSE;
 			switch (stype) {
 				case QR_BONUS_EXP: {
 					// vnum not required
-					vnum = 0;
-					strcpy(buf, "experience");
+					ok = TRUE;
 					break;
 				}
 				case QR_COINS: {
 					if (is_abbrev(vnum_arg, "miscellaneous") || is_abbrev(vnum_arg, "simple") || is_abbrev(vnum_arg, "other")) {
 						vnum = OTHER_COIN;
-						strcpy(buf, "misc");
+						ok = TRUE;
 					}
 					else if (is_abbrev(vnum_arg, "empire")) {
 						vnum = REWARD_EMPIRE_COIN;
-						strcpy(buf, "empire");
+						ok = TRUE;
 					}
 					else {
 						msg_to_char(ch, "You must choose misc or empire coins.\r\n");
@@ -1769,33 +1796,31 @@ OLC_MODULE(qedit_rewards) {
 					break;	
 				}
 				case QR_OBJECT: {
-					obj_data *obj;
 					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
 						msg_to_char(ch, "Invalid obj vnum '%s'.\r\n", vnum_arg);
 						return;
 					}
-					if ((obj = obj_proto(vnum))) {
-						strcpy(buf, GET_OBJ_SHORT_DESC(obj));
+					if (obj_proto(vnum)) {
+						ok = TRUE;
 					}
 					break;
 				}
 				case QR_SET_SKILL:
 				case QR_SKILL_EXP:
 				case QR_SKILL_LEVELS: {
-					skill_data *skl;
 					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
 						msg_to_char(ch, "Invalid skill vnum '%s'.\r\n", vnum_arg);
 						return;
 					}
-					if ((skl = find_skill_by_vnum(vnum))) {
-						strcpy(buf, SKILL_NAME(skl));
+					if (find_skill_by_vnum(vnum)) {
+						ok = TRUE;
 					}
 					break;
 				}
 			}
 			
-			// did we find one? if so, buf is set
-			if (!*buf) {
+			// did we find one?
+			if (!ok) {
 				msg_to_char(ch, "Unable to find %s %d.\r\n", quest_reward_types[stype], vnum);
 				return;
 			}
@@ -1807,7 +1832,7 @@ OLC_MODULE(qedit_rewards) {
 			reward->vnum = vnum;
 			
 			LL_APPEND(*list, reward);
-			msg_to_char(ch, "You add a %s reward: %dx %s.\r\n", quest_reward_types[stype], num, buf);
+			msg_to_char(ch, "You add a %s reward: %s\r\n", quest_reward_types[stype], quest_reward_string(reward, TRUE));
 		}
 	}	// end 'add'
 	else if (is_abbrev(cmd_arg, "change")) {
@@ -1841,13 +1866,13 @@ OLC_MODULE(qedit_rewards) {
 			}
 			else {
 				change->amount = num;
-				msg_to_char(ch, "You change reward %d's amount to %d.\r\n", atoi(num_arg), num);
+				msg_to_char(ch, "You change reward %d to: %s\r\n", atoi(num_arg), quest_reward_string(change, TRUE));
 			}
 		}
 		else if (is_abbrev(field_arg, "vnum")) {
-			// validate vnum, and set buf to the name
-			*buf = '\0';
+			// QR_x: validate vnum
 			vnum = 0;
+			ok = FALSE;
 			switch (change->type) {
 				case QR_BONUS_EXP: {
 					msg_to_char(ch, "You can't change the vnum on that.\r\n");
@@ -1856,11 +1881,11 @@ OLC_MODULE(qedit_rewards) {
 				case QR_COINS: {
 					if (is_abbrev(vnum_arg, "miscellaneous") || is_abbrev(vnum_arg, "simple") || is_abbrev(vnum_arg, "other")) {
 						vnum = OTHER_COIN;
-						strcpy(buf, "misc");
+						ok = TRUE;
 					}
 					else if (is_abbrev(vnum_arg, "empire")) {
 						vnum = REWARD_EMPIRE_COIN;
-						strcpy(buf, "empire");
+						ok = TRUE;
 					}
 					else {
 						msg_to_char(ch, "You must choose misc or empire coins.\r\n");
@@ -1869,39 +1894,37 @@ OLC_MODULE(qedit_rewards) {
 					break;	
 				}
 				case QR_OBJECT: {
-					obj_data *obj;
 					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
 						msg_to_char(ch, "Invalid obj vnum '%s'.\r\n", vnum_arg);
 						return;
 					}
-					if ((obj = obj_proto(vnum))) {
-						strcpy(buf, GET_OBJ_SHORT_DESC(obj));
+					if (obj_proto(vnum)) {
+						ok = TRUE;
 					}
 					break;
 				}
 				case QR_SET_SKILL:
 				case QR_SKILL_EXP:
 				case QR_SKILL_LEVELS: {
-					skill_data *skl;
 					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
 						msg_to_char(ch, "Invalid skill vnum '%s'.\r\n", vnum_arg);
 						return;
 					}
-					if ((skl = find_skill_by_vnum(vnum))) {
-						strcpy(buf, SKILL_NAME(skl));
+					if (find_skill_by_vnum(vnum)) {
+						ok = TRUE;
 					}
 					break;
 				}
 			}
 			
-			// did we find one? if so, buf is set
-			if (!*buf) {
+			// did we find one?
+			if (!ok) {
 				msg_to_char(ch, "Unable to find %s %d.\r\n", quest_giver_types[change->type], vnum);
 				return;
 			}
 			
 			change->vnum = vnum;
-			msg_to_char(ch, "Changed reward %d's vnum to %d (%s).\r\n", atoi(num_arg), vnum, buf);
+			msg_to_char(ch, "Changed reward %d to: %s\r\n", atoi(num_arg), quest_reward_string(change, TRUE));
 		}
 		else {
 			msg_to_char(ch, "You can only change the amount or vnum.\r\n");
