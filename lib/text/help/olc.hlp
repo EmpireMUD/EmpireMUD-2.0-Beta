@@ -4235,23 +4235,24 @@ Available tasks:
  COMPLETED-QUEST - Must complete a certain quest.
  GET-COMPONENT - Must have components.
  GET-OBJECT - Must have items.
- KILL-MOB - Must kill a certain mob.
- KILL-MOB-FLAGGED - Must kill mobs with certain flags.
+ KILL-MOB &r*&0 - Must kill a certain mob.
+ KILL-MOB-FLAGGED &r*&0 - Must kill mobs with certain flags.
  NOT-COMPLETED-QUEST - Has not completed a certain quest.
  NOT-ON-QUEST - Is not currently on a certain quest.
  OWN-BUILDING - Empire has a certain building.
  OWN-VEHICLE - Empire has a certain vehicle.
  SKILL-LEVEL-OVER - Player has a certain skill at least this high.
  SKILL-LEVEL-UNDER - Player has a certain skill no higher than this.
- TRIGGERED - Activated by a %quest% command in a trigger.
- VISIT-BUILDING - Player must go to a certain building/room.
- VISIT-ROOM-TEMPLATE - Player must go to a certain room template.
- VISIT-SECTOR - Player must go to a certain terrain.
+ TRIGGERED &r*&0 - Activated by a %quest% command in a trigger.
+ VISIT-BUILDING &r*&0 - Player must go to a certain building/room.
+ VISIT-ROOM-TEMPLATE &r*&0 - Player must go to a certain room template.
+ VISIT-SECTOR &r*&0 - Player must go to a certain terrain.
+
+&r*&0 Some types cannot be used as prereqs, only as tasks.
 
 Note: Repeatable quests are removed from a player's completion list when their
 repeat timers expire, after which they can't be used for completed/not-
 completed tasks.
-Note: The VISIT-* types do not work as prereqs; only as tasks.
 
 See also: COMPONENT FLAGS, MEDIT FLAG, %QUEST%, OLC QUESTS
 #d
