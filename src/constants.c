@@ -2095,6 +2095,8 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 // QST_x: quest flags
 const char *quest_flags[] = {
 	"IN-DEVELOPMENT",
+	"REPEAT-PER-INSTANCE",
+	"EXPIRES-AFTER-INSTANCE",
 	"\n"
 };
 

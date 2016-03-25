@@ -746,7 +746,7 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 			}
 			
 			// did we find one? if so, buf is set
-			if (ok) {
+			if (!ok) {
 				msg_to_char(ch, "Unable to find %s %d.\r\n", quest_giver_types[type], vnum);
 				return;
 			}

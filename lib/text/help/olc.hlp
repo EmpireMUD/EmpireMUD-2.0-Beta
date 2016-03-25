@@ -4122,6 +4122,8 @@ Usage:  .flags [add | remove] <flags>
 
 The following quest flags are available:
  IN-DEVELOPMENT - Mortals cannot see or get the quest.
+ REPEAT-PER-INSTANCE - Clears completion when the instance closes.
+ EXPIRES-AFTER-INSTANCE - Fails the quest when the instance closes.
 
 See also: OLC QUESTS
 #d
@@ -4219,7 +4221,7 @@ See also: %QUEST%, OLC QUESTS
 #d
 "QEDIT TASKS" "QEDIT PREREQS" "QEDIT PREREQUISITES" "QEDIT PRE-REQS" "QEDIT PRE-REQUISITES"
 
-Usage:  .<prereqs/tasks> add <type> <vnum>\r\n
+Usage:  .<prereqs/tasks> add <type> <vnum>
         .<prereqs/tasks> change <number> vnum <value>
         .<prereqs/tasks> copy <from type> <from vnum> [tasks/prereqs]
         .<prereqs/tasks> remove <number | all>

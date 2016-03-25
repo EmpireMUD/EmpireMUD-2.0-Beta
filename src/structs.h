@@ -1640,6 +1640,8 @@ typedef struct vehicle_data vehicle_data;
 
 // QST_x: quest flags
 #define QST_IN_DEVELOPMENT  BIT(0)	// not an active quest
+#define QST_REPEAT_PER_INSTANCE  BIT(1)	// clears completion when instance closes
+#define QST_EXPIRES_AFTER_INSTANCE  BIT(2)	// fails if instance closes
 
 
 // QG_x: quest giver types
