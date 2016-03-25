@@ -29,6 +29,7 @@
 /**
 * Contents:
 *   Helpers
+*   Lookup Handlers
 *   Utilities
 *   Database
 *   OLC Handlers
@@ -53,8 +54,12 @@ extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 
 // local protos
+void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void free_quest_givers(struct quest_giver *list);
 void free_quest_tasks(struct quest_task *list);
+bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
+void update_mob_quest_lookups(mob_vnum vnum);
+void update_obj_quest_lookups(obj_vnum vnum);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -385,6 +390,199 @@ void smart_copy_quest_tasks(struct quest_task **to_list, struct quest_task *from
 			*task = *iter;
 			task->next = NULL;
 			LL_APPEND(*to_list, task);
+		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// LOOKUP HANDLERS /////////////////////////////////////////////////////////
+
+
+/**
+* Processes all the quest givers into lookup hint tables.
+*
+* @param quest_data *quest The quest to update givers for.
+* @param bool add If TRUE, adds quest lookup hints. If FALSE, removes them.
+*/
+void add_or_remove_all_quest_lookups_for(quest_data *quest, bool add) {
+	struct quest_giver *list[2], *giver;
+	room_template *rmt;
+	char_data *mob;
+	bld_data *bld;
+	obj_data *obj;
+	int iter;
+	
+	if (!quest) {	// somehow
+		return;
+	}
+	
+	// work on 2 lists
+	list[0] = QUEST_STARTS_AT(quest);
+	list[1] = QUEST_ENDS_AT(quest);
+	
+	for (iter = 0; iter < 2; ++iter) {
+		LL_FOREACH(list[iter], giver) {
+			// QG_x
+			switch (giver->type) {
+				case QG_BUILDING: {
+					if ((bld = building_proto(giver->vnum))) {
+						if (add) {
+							add_quest_lookup(&GET_BLD_QUEST_LOOKUPS(bld), quest);
+						}
+						else {
+							remove_quest_lookup(&GET_BLD_QUEST_LOOKUPS(bld), quest);
+						}
+						// does not require live update
+					}
+					break;
+				}
+				case QG_MOBILE: {
+					if ((mob = mob_proto(giver->vnum))) {
+						if (add) {
+							add_quest_lookup(&MOB_QUEST_LOOKUPS(mob), quest);
+						}
+						else {
+							remove_quest_lookup(&MOB_QUEST_LOOKUPS(mob), quest);
+						}
+						update_mob_quest_lookups(GET_MOB_VNUM(mob));
+					}
+					break;
+				}
+				case QG_OBJECT: {
+					if ((obj = obj_proto(giver->vnum))) {
+						if (add) {
+							add_quest_lookup(&GET_OBJ_QUEST_LOOKUPS(obj), quest);
+						}
+						else {
+							remove_quest_lookup(&GET_OBJ_QUEST_LOOKUPS(obj), quest);
+						}
+						update_obj_quest_lookups(GET_OBJ_VNUM(obj));
+					}
+					break;
+				}
+				case QG_ROOM_TEMPLATE: {
+					if ((rmt = room_template_proto(giver->vnum))) {
+						if (add) {
+							add_quest_lookup(&GET_RMT_QUEST_LOOKUPS(rmt), quest);
+						}
+						else {
+							remove_quest_lookup(&GET_RMT_QUEST_LOOKUPS(rmt), quest);
+						}
+						// does not require live update
+					}
+					break;
+				}
+			}
+		}
+	}
+}
+
+
+/**
+* Adds a quest lookup hint to a list (e.g. on a mob).
+*
+* Note: For mob/obj quests, run update_mob_quest_lookups() or
+* update_obj_quest_lookups() after this.
+*
+* @param struct quest_lookup **list A pointer to the list to add to.
+* @param quest_data *quest The quest to add.
+*/
+void add_quest_lookup(struct quest_lookup **list, quest_data *quest) {
+	struct quest_lookup *ql;
+	bool found = FALSE;
+	
+	if (list && quest) {
+		// no dupes
+		LL_FOREACH(*list, ql) {
+			if (ql->quest == quest) {
+				found = TRUE;
+			}
+		}
+		
+		if (!found) {
+			CREATE(ql, struct quest_lookup, 1);
+			ql->quest = quest;
+			LL_PREPEND(*list, ql);
+		}
+	}
+}
+
+
+/**
+* Builds all the quest lookup tables on startup.
+*/
+void build_all_quest_lookups(void) {
+	quest_data *quest, *next_quest;
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		add_or_remove_all_quest_lookups_for(quest, TRUE);
+	}
+}
+
+
+/**
+* Adds a quest lookup hint to a list (e.g. on a mob).
+*
+* Note: For mob/obj quests, run update_mob_quest_lookups() or
+* update_obj_quest_lookups() after this.
+*
+* @param struct quest_lookup **list A pointer to the list to add to.
+* @param quest_data *quest The quest to add.
+* @return bool TRUE if it removed an entry, FALSE for no matches.
+*/
+bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest) {
+	struct quest_lookup *ql, *next_ql;
+	bool any = FALSE;
+	
+	if (list && *list && quest) {
+		LL_FOREACH_SAFE(*list, ql, next_ql) {
+			if (ql->quest == quest) {
+				LL_DELETE(*list, ql);
+				free(ql);
+				any = TRUE;
+			}
+		}
+	}
+	
+	return any;
+}
+
+
+/**
+* Fixes quest lookup pointers on live copies of mobs -- this should ALWAYS
+* point to the proto.
+*/
+void update_mob_quest_lookups(mob_vnum vnum) {
+	char_data *proto, *mob;
+	
+	if (!(proto = mob_proto(vnum))) {
+		return;
+	}
+	
+	LL_FOREACH(character_list, mob) {
+		if (IS_NPC(mob) && GET_MOB_VNUM(mob) == vnum) {
+			// re-set the pointer
+			MOB_QUEST_LOOKUPS(mob) = MOB_QUEST_LOOKUPS(proto);
+		}
+	}
+}
+
+
+/**
+* Fixes quest lookup pointers on live copies of objs -- this should ALWAYS
+* point to the proto.
+*/
+void update_obj_quest_lookups(obj_vnum vnum) {
+	obj_data *proto, *obj;
+	
+	if (!(proto = obj_proto(vnum))) {
+		return;
+	}
+	
+	LL_FOREACH(object_list, obj) {
+		if (GET_OBJ_VNUM(obj) == vnum) {
+			// re-set the pointer
+			GET_OBJ_QUEST_LOOKUPS(obj) = GET_OBJ_QUEST_LOOKUPS(proto);
 		}
 	}
 }
@@ -1825,6 +2023,9 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_QST);
 	save_library_file_for_vnum(DB_BOOT_QST, vnum);
 	
+	// delete from lookups
+	add_or_remove_all_quest_lookups_for(quest, FALSE);
+	
 	// update other quests
 	HASH_ITER(hh, quest_table, qiter, next_qiter) {
 		found = delete_quest_task_from_list(&QUEST_TASKS(qiter), QT_COMPLETED_QUEST, vnum);
@@ -1916,11 +2117,17 @@ void save_olc_quest(descriptor_data *desc) {
 		QUEST_COMPLETE_MSG(quest) = str_dup(default_quest_complete_msg);
 	}
 	
+	// delete from lookups
+	add_or_remove_all_quest_lookups_for(proto, FALSE);
+	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
 	*proto = *quest;	// copy over all data
 	proto->vnum = vnum;	// ensure correct vnum
 	proto->hh = hh;	// restore old hash handle
+	
+	// re-add lookups
+	add_or_remove_all_quest_lookups_for(proto, TRUE);
 		
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_QST, vnum);

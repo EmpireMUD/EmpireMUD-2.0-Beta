@@ -194,6 +194,7 @@
 #define GET_BLD_SCRIPTS(bld)  ((bld)->proto_script)
 #define GET_BLD_SPAWNS(bld)  ((bld)->spawns)
 #define GET_BLD_INTERACTIONS(bld)  ((bld)->interactions)
+#define GET_BLD_QUEST_LOOKUPS(bld)  ((bld)->quest_lookups)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -610,6 +611,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define MOB_SPAWN_TIME(ch)  ((ch)->mob_specials.spawn_time)
 #define MOB_TO_DODGE(ch)  ((ch)->mob_specials.to_dodge)
 #define MOB_TO_HIT(ch)  ((ch)->mob_specials.to_hit)
+#define MOB_QUEST_LOOKUPS(ch)  ((ch)->quest_lookups)
 
 // helpers
 #define IS_MOB(ch)  (IS_NPC(ch) && GET_MOB_VNUM(ch) != NOTHING)
@@ -658,6 +660,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OBJ_MATERIAL(obj)  ((obj)->obj_flags.material)
 #define GET_OBJ_MAX_SCALE_LEVEL(obj)  ((obj)->obj_flags.max_scale_level)
 #define GET_OBJ_MIN_SCALE_LEVEL(obj)  ((obj)->obj_flags.min_scale_level)
+#define GET_OBJ_QUEST_LOOKUPS(obj)  ((obj)->quest_lookups)
 #define GET_OBJ_SHORT_DESC(obj)  ((obj)->short_description)
 #define GET_OBJ_TIMER(obj)  ((obj)->obj_flags.timer)
 #define GET_OBJ_TYPE(obj)  ((obj)->obj_flags.type_flag)
@@ -1089,6 +1092,7 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 #define GET_RMT_EX_DESCS(rmt)  ((rmt)->ex_description)
 #define GET_RMT_EXITS(rmt)  ((rmt)->exits)
 #define GET_RMT_INTERACTIONS(rmt)  ((rmt)->interactions)
+#define GET_RMT_QUEST_LOOKUPS(rmt)  ((rmt)->quest_lookups)
 #define GET_RMT_SCRIPTS(rmt)  ((rmt)->proto_script)
 
 

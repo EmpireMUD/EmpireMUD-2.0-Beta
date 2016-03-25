@@ -1116,6 +1116,7 @@ void save_olc_object(descriptor_data *desc) {
 	struct obj_custom_message *ocm;
 	struct trading_post_data *tpd;
 	empire_data *emp, *next_emp;
+	struct quest_lookup *ql;
 	UT_hash_handle hh;
 	
 	// have a place to save it?
@@ -1194,9 +1195,13 @@ void save_olc_object(descriptor_data *desc) {
 
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
+	ql = proto->quest_lookups;	// save lookups
+	
 	*proto = *obj;
 	proto->vnum = vnum;	// ensure correct vnum
+	
 	proto->hh = hh;	// restore hash handle
+	proto->quest_lookups = ql;	// restore lookups
 	
 	// remove the reference to this so it won't be free'd
 	GET_OBJ_APPLIES(obj) = NULL;

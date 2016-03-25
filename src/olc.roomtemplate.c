@@ -459,6 +459,7 @@ void save_olc_room_template(descriptor_data *desc) {
 	struct adventure_spawn *spawn;
 	struct trig_proto_list *trig;
 	struct exit_template *ex;
+	struct quest_lookup *ql;
 	UT_hash_handle hh;
 	
 	// have a place to save it?
@@ -508,9 +509,13 @@ void save_olc_room_template(descriptor_data *desc) {
 
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
+	ql = proto->quest_lookups;	// save lookups
+	
 	*proto = *rmt;	// copy over all data
 	proto->vnum = vnum;	// ensure correct vnum
+	
 	proto->hh = hh;	// restore old hash handle
+	proto->quest_lookups = ql;	// restore lookups
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_RMT, vnum);

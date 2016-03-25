@@ -247,6 +247,7 @@ void boot_db(void) {
 	void Read_Invalid_List();
 	void boot_social_messages();
 	void boot_world();
+	void build_all_quest_lookups();
 	void build_player_index();
 	void check_ruined_cities();
 	void check_version();
@@ -355,6 +356,9 @@ void boot_db(void) {
 	
 	log("Linking and checking vehicles.");
 	link_and_check_vehicles();
+	
+	log("Building quest lookup hints.");
+	build_all_quest_lookups();
 	
 	// END
 	log("Boot db -- DONE.");

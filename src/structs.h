@@ -2393,6 +2393,9 @@ struct room_template {
 	struct interaction_item *interactions;	// interaction items
 	struct trig_proto_list *proto_script;	// list of default triggers
 	
+	// live data (not saved, not freed)
+	struct quest_lookup *quest_lookups;
+	
 	UT_hash_handle hh;	// room_template_table hash
 };
 
@@ -2544,6 +2547,9 @@ struct bld_data {
 	struct spawn_info *spawns;	// linked list of spawn data
 	struct interaction_item *interactions;	// interaction items
 	struct trig_proto_list *proto_script;	// list of default triggers
+	
+	// live data (not saved, not freed)
+	struct quest_lookup *quest_lookups;
 	
 	UT_hash_handle hh;	// building_table hash handle
 };
@@ -3098,6 +3104,9 @@ struct char_data {
 	char *prev_host;	// Previous host (they're Trills)
 	time_t prev_logon;	// Time (in secs) of prev logon
 	
+	// live data (not saved, not freed)
+	struct quest_lookup *quest_lookups;
+	
 	UT_hash_handle hh;	// mobile_table
 };
 
@@ -3621,6 +3630,9 @@ struct obj_data {
 	obj_data *next_content;	// For 'contains' lists
 	obj_data *next;	// For the object list
 	
+	// live data (not saved, not freed)
+	struct quest_lookup *quest_lookups;
+	
 	UT_hash_handle hh;	// object_table hash
 };
 
@@ -3677,6 +3689,13 @@ struct quest_giver {
 	any_vnum vnum;	// what mob
 	
 	struct quest_giver *next;	// may have more than one
+};
+
+
+// reverse-lookups for quest givers
+struct quest_lookup {
+	quest_data *quest;
+	struct quest_lookup *next;
 };
 
 
