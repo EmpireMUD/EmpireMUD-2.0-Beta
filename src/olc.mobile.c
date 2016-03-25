@@ -281,13 +281,18 @@ char *list_one_mobile(char_data *mob, bool detail) {
 * @param char_data *ch The person doing the deleting.
 * @param mob_vnum vnum The vnum to delete.
 */
-void olc_delete_mobile(char_data *ch, mob_vnum vnum) {	
+void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
+	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
+	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
+	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
+	
 	void extract_pending_chars();
 	void remove_mobile_from_table(char_data *mob);
 	
 	char_data *proto, *mob_iter, *next_mob;
 	descriptor_data *desc;
 	struct global_data *glb, *next_glb;
+	quest_data *quest, *next_quest;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
@@ -359,6 +364,19 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		}
 	}
 	
+	// update quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_MOBILE, vnum);
+		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_MOBILE, vnum);
+		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_KILL_MOB, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_KILL_MOB, vnum);
+		
+		if (found) {
+			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
 	// update room templates
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_MOB, vnum);
@@ -400,6 +418,17 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 				msg_to_char(desc->character, "One of the mobs in an interaction for the mob you're editing was deleted.\r\n");
 			}
 		}
+		if (GET_OLC_QUEST(desc)) {
+			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_MOBILE, vnum);
+			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_MOBILE, vnum);
+			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_KILL_MOB, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_KILL_MOB, vnum);
+			
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A mobile used by the quest you are editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_ROOM_TEMPLATE(desc)) {
 			if (delete_from_spawn_template_list(&GET_OLC_ROOM_TEMPLATE(desc)->spawns, ADV_SPAWN_MOB, vnum)) {
 				msg_to_char(desc->character, "One of the mobs that spawns in the room template you're editing was deleted.\r\n");
@@ -432,12 +461,17 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_mob(char_data *ch, mob_vnum vnum) {
+	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
+	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
+	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	
 	char_data *proto, *mob, *next_mob;
 	char buf[MAX_STRING_LENGTH];
 	struct spawn_info *spawn;
 	struct adventure_spawn *asp;
 	struct interaction_item *inter;
 	struct global_data *glb, *next_glb;
+	quest_data *quest, *next_quest;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
@@ -512,6 +546,17 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 			}
+		}
+	}
+	
+	// quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		if (size > sizeof(buf)) {
+			break;
+		}
+		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_MOBILE, vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_MOBILE, vnum) || find_quest_task_in_list(QUEST_TASKS(quest), QT_KILL_MOB, vnum) || find_quest_task_in_list(QUEST_PREREQS(quest), QT_KILL_MOB, vnum)) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	

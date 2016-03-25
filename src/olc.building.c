@@ -282,6 +282,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_VISIT_BUILDING, vnum);
 		
 		if (found) {
+			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 		}
 	}
@@ -341,6 +342,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_VISIT_BUILDING, vnum);
 		
 			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A building used by the quest you are editing was deleted.\r\n");
 			}
 		}

@@ -194,9 +194,11 @@ bool delete_from_proto_list_by_vnum(struct trig_proto_list **list, trig_vnum vnu
 * @param trig_vnum vnum The vnum to delete.
 */
 void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
+	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	void remove_trigger_from_table(trig_data *trig);
 	
 	trig_data *trig;
+	quest_data *quest, *next_quest;
 	room_template *rmt, *next_rmt;
 	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
@@ -204,6 +206,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	descriptor_data *dsc;
 	obj_data *obj, *next_obj;
 	bld_data *bld, *next_bld;
+	bool found;
 
 	if (!(trig = real_trigger(vnum))) {
 		msg_to_char(ch, "There is no such trigger %d.\r\n", vnum);
@@ -268,6 +271,17 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 		}
 	}
 	
+	// update quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_TRIGGER, vnum);
+		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_TRIGGER, vnum);
+		
+		if (found) {
+			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
 	// room templates
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 		if (delete_from_proto_list_by_vnum(&GET_RMT_SCRIPTS(rmt), vnum)) {
@@ -292,6 +306,15 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 		}
 		if (GET_OLC_MOBILE(dsc) && delete_from_proto_list_by_vnum(&GET_OLC_MOBILE(dsc)->proto_script, vnum)) {
 			msg_to_char(dsc->character, "A trigger attached to the mobile you're editing was deleted.\r\n");
+		}
+		if (GET_OLC_QUEST(dsc)) {
+			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(dsc)), QG_TRIGGER, vnum);
+			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(dsc)), QG_TRIGGER, vnum);
+			
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(dsc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(dsc, "A trigger used by the quest you are editing was deleted.\r\n");
+			}
 		}
 		if (GET_OLC_ROOM_TEMPLATE(dsc) && delete_from_proto_list_by_vnum(&GET_OLC_ROOM_TEMPLATE(dsc)->proto_script, vnum)) {
 			msg_to_char(dsc->character, "A trigger attached to the room template you're editing was deleted.\r\n");
@@ -319,8 +342,11 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_trigger(char_data *ch, trig_vnum vnum) {
+	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
+	
 	char buf[MAX_STRING_LENGTH];
 	trig_data *proto = real_trigger(vnum);
+	quest_data *quest, *next_quest;
 	struct trig_proto_list *trig;
 	room_template *rmt, *next_rmt;
 	vehicle_data *veh, *next_veh;
@@ -371,6 +397,20 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			}
+		}
+	}
+	
+	// quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		if (size > sizeof(buf)) {
+			break;
+		}
+		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_TRIGGER, vnum);
+		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_TRIGGER, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
