@@ -401,7 +401,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	
 	// adventure rules
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
-		if (size > sizeof(buf)) {
+		if (size >= sizeof(buf)) {
 			break;
 		}
 		for (link = GET_ADV_LINKING(adv); link; link = link->next) {
@@ -418,7 +418,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	
 	// buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
-		if (size > sizeof(buf)) {
+		if (size >= sizeof(buf)) {
 			break;
 		}
 		if (GET_BLD_UPGRADES_TO(bld) == vnum) {
@@ -429,7 +429,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	
 	// craft builds
 	HASH_ITER(hh, craft_table, craft, next_craft) {
-		if (size > sizeof(buf)) {
+		if (size >= sizeof(buf)) {
 			break;
 		}
 		if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD && GET_CRAFT_BUILD_TYPE(craft) == vnum) {
@@ -440,7 +440,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	
 	// obj storage
 	HASH_ITER(hh, object_table, obj, next_obj) {
-		if (size > sizeof(buf)) {
+		if (size >= sizeof(buf)) {
 			break;
 		}
 		any = FALSE;
@@ -455,7 +455,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size > sizeof(buf)) {
+		if (size >= sizeof(buf)) {
 			break;
 		}
 		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_BUILDING, vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_BUILDING, vnum) || find_quest_task_in_list(QUEST_TASKS(quest), QT_OWN_BUILDING, vnum) || find_quest_task_in_list(QUEST_PREREQS(quest), QT_OWN_BUILDING, vnum) || find_quest_task_in_list(QUEST_TASKS(quest), QT_VISIT_BUILDING, vnum) || find_quest_task_in_list(QUEST_PREREQS(quest), QT_VISIT_BUILDING, vnum)) {

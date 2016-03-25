@@ -408,7 +408,7 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size > sizeof(buf)) {
+		if (size >= sizeof(buf)) {
 			break;
 		}
 		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_ROOM_TEMPLATE, vnum);

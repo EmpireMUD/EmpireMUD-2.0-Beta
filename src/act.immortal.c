@@ -2095,14 +2095,18 @@ SHOW(show_terrain) {
 
 
 SHOW(show_uses) {
+	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	craft_data *craft, *next_craft;
+	quest_data *quest, *next_quest;
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
 	struct resource_data *res;
 	bitvector_t flags;
 	size_t size;
 	int type;
+	bool any;
 	
 	argument = any_one_word(argument, arg);	// component type
 	skip_spaces(&argument);	// optional flags
@@ -2163,6 +2167,18 @@ SHOW(show_uses) {
 					*part = '\0';
 				}
 				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s%s%s%s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), *part ? " (" : "", part, *part ? ")" : "");
+			}
+		}
+		
+		HASH_ITER(hh, quest_table, quest, next_quest) {
+			if (size >= sizeof(buf)) {
+				break;
+			}
+			any = find_quest_task_in_list(QUEST_TASKS(quest), QT_GET_COMPONENT, type);
+			any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_GET_COMPONENT, type);
+		
+			if (any) {
+				size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
 			}
 		}
 		

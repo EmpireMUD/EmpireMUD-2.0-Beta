@@ -569,7 +569,9 @@ char *list_one_quest(quest_data *quest, bool detail) {
 void olc_search_quest(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	quest_data *quest = quest_proto(vnum);
+	quest_data *qiter, *next_qiter;
 	int size, found;
+	bool any;
 	
 	if (!quest) {
 		msg_to_char(ch, "There is no quest %d.\r\n", vnum);
@@ -579,7 +581,23 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of quest %d (%s):\r\n", vnum, QUEST_NAME(quest));
 	
-	// quests are not actually used anywhere else
+	// on other quests
+	HASH_ITER(hh, quest_table, qiter, next_qiter) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_quest_task_in_list(QUEST_TASKS(qiter), QT_COMPLETED_QUEST, vnum);
+		any |= find_quest_task_in_list(QUEST_PREREQS(qiter), QT_COMPLETED_QUEST, vnum);
+		any |= find_quest_task_in_list(QUEST_TASKS(qiter), QT_NOT_COMPLETED_QUEST, vnum);
+		any |= find_quest_task_in_list(QUEST_PREREQS(qiter), QT_NOT_COMPLETED_QUEST, vnum);
+		any |= find_quest_task_in_list(QUEST_TASKS(qiter), QT_NOT_ON_QUEST, vnum);
+		any |= find_quest_task_in_list(QUEST_PREREQS(qiter), QT_NOT_ON_QUEST, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+		}
+	}
 	
 	if (found > 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
@@ -1788,7 +1806,9 @@ quest_data *create_quest_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_quest(char_data *ch, any_vnum vnum) {
-	quest_data *quest;
+	quest_data *quest, *qiter, *next_qiter;
+	descriptor_data *desc;
+	bool found;
 	
 	if (!(quest = quest_proto(vnum))) {
 		msg_to_char(ch, "There is no such quest %d.\r\n", vnum);
@@ -1804,6 +1824,38 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	// save index and quest file now
 	save_index(DB_BOOT_QST);
 	save_library_file_for_vnum(DB_BOOT_QST, vnum);
+	
+	// update other quests
+	HASH_ITER(hh, quest_table, qiter, next_qiter) {
+		found = delete_quest_task_from_list(&QUEST_TASKS(qiter), QT_COMPLETED_QUEST, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(qiter), QT_COMPLETED_QUEST, vnum);
+		found |= delete_quest_task_from_list(&QUEST_TASKS(qiter), QT_NOT_COMPLETED_QUEST, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(qiter), QT_NOT_COMPLETED_QUEST, vnum);
+		found |= delete_quest_task_from_list(&QUEST_TASKS(qiter), QT_NOT_ON_QUEST, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(qiter), QT_NOT_ON_QUEST, vnum);
+		
+		if (found) {
+			SET_BIT(QUEST_FLAGS(qiter), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(qiter));
+		}
+	}
+	
+	// remove from from active editors
+	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (GET_OLC_QUEST(desc)) {
+			found = delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_COMPLETED_QUEST, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_COMPLETED_QUEST, vnum);
+			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_NOT_COMPLETED_QUEST, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_NOT_COMPLETED_QUEST, vnum);
+			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_NOT_ON_QUEST, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_NOT_ON_QUEST, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(desc, "Another quest used by the quest you are editing was deleted.\r\n");
+			}
+		}
+	}
 	
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted quest %d", GET_NAME(ch), vnum);
 	msg_to_char(ch, "Quest %d deleted.\r\n", vnum);

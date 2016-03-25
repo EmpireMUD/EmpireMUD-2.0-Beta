@@ -551,7 +551,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size > sizeof(buf)) {
+		if (size >= sizeof(buf)) {
 			break;
 		}
 		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_MOBILE, vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_MOBILE, vnum) || find_quest_task_in_list(QUEST_TASKS(quest), QT_KILL_MOB, vnum) || find_quest_task_in_list(QUEST_PREREQS(quest), QT_KILL_MOB, vnum)) {

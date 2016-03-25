@@ -711,12 +711,16 @@ char *list_one_vehicle(vehicle_data *veh, bool detail) {
 * @param any_vnum vnum The vehicle vnum.
 */
 void olc_search_vehicle(char_data *ch, any_vnum vnum) {
+	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh = vehicle_proto(vnum);
 	craft_data *craft, *next_craft;
+	quest_data *quest, *next_quest;
 	room_template *rmt, *next_rmt;
 	struct adventure_spawn *asp;
 	int size, found;
+	bool any;
 	
 	if (!veh) {
 		msg_to_char(ch, "There is no vehicle %d.\r\n", vnum);
@@ -731,6 +735,20 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 		if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		}
+	}
+	
+	// quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_quest_task_in_list(QUEST_TASKS(quest), QT_OWN_VEHICLE, vnum);
+		any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_OWN_VEHICLE, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -1798,9 +1816,11 @@ vehicle_data *create_vehicle_table_entry(any_vnum vnum) {
 */
 void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
+	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
 	
 	vehicle_data *veh, *iter, *next_iter;
 	craft_data *craft, *next_craft;
+	quest_data *quest, *next_quest;
 	room_template *rmt, *next_rmt;
 	descriptor_data *desc;
 	bool found;
@@ -1843,6 +1863,17 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		found = delete_quest_task_from_list(&QUEST_TASKS(quest), QT_OWN_VEHICLE, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_OWN_VEHICLE, vnum);
+		
+		if (found) {
+			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
 	// update room templates
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_VEH, vnum);
@@ -1863,6 +1894,15 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
 				msg_to_char(desc->character, "The vehicle made by the craft you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_QUEST(desc)) {
+			found = delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_OWN_VEHICLE, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_OWN_VEHICLE, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A vehicle used by the quest you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_ROOM_TEMPLATE(desc)) {
