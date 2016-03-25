@@ -222,7 +222,7 @@ char *quest_task_string(struct quest_task *task, bool show_vnums) {
 			break;
 		}
 		case QT_GET_COMPONENT: {
-			snprintf(output, sizeof(output), "Get component: %s%s", vnum, component_string(task->vnum, task->misc));
+			snprintf(output, sizeof(output), "Get component%s: %dx %s%s", PLURAL(task->needed), task->needed, vnum, component_string(task->vnum, task->misc));
 			break;
 		}
 		case QT_GET_OBJECT: {
@@ -265,7 +265,7 @@ char *quest_task_string(struct quest_task *task, bool show_vnums) {
 			break;
 		}
 		case QT_TRIGGERED: {
-			strcpy(buf, "Triggered condition");
+			strcpy(output, "Scripted condition");
 			break;
 		}
 		case QT_VISIT_BUILDING: {
