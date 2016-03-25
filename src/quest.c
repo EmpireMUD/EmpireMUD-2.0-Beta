@@ -74,6 +74,65 @@ char *get_quest_name_by_proto(any_vnum vnum) {
 
 
 /**
+* Gets standard string display like "4x lumber" for a quest giver (starts/ends
+* at).
+*
+* @param struct quest_giver *giver The quest giver to show.
+* @param bool show_vnums If TRUE, adds [1234] at the start of the string.
+* @return char* The string display.
+*/
+char *quest_giver_string(struct quest_giver *giver, bool show_vnums) {
+	static char output[256];
+	char vnum[256];
+	
+	*output = '\0';
+	if (!giver) {
+		return output;
+	}
+	
+	if (show_vnums) {
+		snprintf(vnum, sizeof(vnum), "[%d] ", giver->vnum);
+	}
+	else {
+		*vnum = '\0';
+	}
+	
+	// QG_x
+	switch (giver->type) {
+		case QG_BUILDING: {
+			bld_data *bld = building_proto(giver->vnum);
+			snprintf(output, sizeof(output), "%s %s", quest_giver_types[giver->type], bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+			break;
+		}
+		case QG_MOBILE: {
+			snprintf(output, sizeof(output), "%s %s", quest_giver_types[giver->type], skip_filler(get_mob_name_by_proto(giver->vnum)));
+			break;
+		}
+		case QG_OBJECT: {
+			snprintf(output, sizeof(output), "%s %s", quest_giver_types[giver->type], skip_filler(get_obj_name_by_proto(giver->vnum)));
+			break;
+		}
+		case QG_ROOM_TEMPLATE: {
+			room_template *rmt = room_template_proto(giver->vnum);
+			snprintf(output, sizeof(output), "%s %s", quest_giver_types[giver->type], rmt ? skip_filler(GET_RMT_TITLE(rmt)) : "UNKNOWN");
+			break;
+		}
+		case QG_TRIGGER: {
+			trig_data *trig = real_trigger(giver->vnum);
+			snprintf(output, sizeof(output), "%s %s", quest_giver_types[giver->type], trig ? skip_filler(GET_TRIG_NAME(trig)) : "UNKNOWN");
+			break;
+		}
+		default: {
+			strcpy(output, "UNKNOWN");
+			break;
+		}
+	}
+	
+	return output;
+}
+
+
+/**
 * Gets standard string display like "4x lumber" for a quest reward.
 *
 * @param struct quest_reward *reward The reward to show.
@@ -292,8 +351,8 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 	char vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct quest_giver *giver, *iter, *change, *copyfrom;
 	int findtype, num, type;
+	bool found, ok;
 	any_vnum vnum;
-	bool found;
 	
 	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
 	
@@ -396,48 +455,43 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 			msg_to_char(ch, "Invalid vnum '%s'.\r\n", vnum_arg);
 		}
 		else {
-			// validate vnum, and set buf to the name
-			*buf = '\0';
+			// QG_x: validate vnum
+			ok = FALSE;
 			switch (type) {
 				case QG_BUILDING: {
-					bld_data *bld = building_proto(vnum);
-					if (bld) {
-						strcpy(buf, GET_BLD_NAME(bld));
+					if (building_proto(vnum)) {
+						ok = TRUE;
 					}
 					break;
 				}
 				case QG_MOBILE: {
-					char_data *mob = mob_proto(vnum);
-					if (mob) {
-						strcpy(buf, GET_SHORT_DESC(mob));
+					if (mob_proto(vnum)) {
+						ok = TRUE;
 					}
 					break;
 				}
 				case QG_OBJECT: {
-					obj_data *obj = obj_proto(vnum);
-					if (obj) {
-						strcpy(buf, GET_OBJ_SHORT_DESC(obj));
+					if (obj_proto(vnum)) {
+						ok = TRUE;
 					}
 					break;
 				}
 				case QG_ROOM_TEMPLATE: {
-					room_template *rmt = room_template_proto(vnum);
-					if (rmt) {
-						strcpy(buf, GET_RMT_TITLE(rmt));
+					if (room_template_proto(vnum)) {
+						ok = TRUE;
 					}
 					break;
 				}
 				case QG_TRIGGER: {
-					trig_data *trig = real_trigger(vnum);
-					if (trig) {
-						strcpy(buf, GET_TRIG_NAME(trig));
+					if (real_trigger(vnum)) {
+						ok = TRUE;
 					}
 					break;
 				}
 			}
 			
 			// did we find one? if so, buf is set
-			if (!*buf) {
+			if (ok) {
 				msg_to_char(ch, "Unable to find %s %d.\r\n", quest_giver_types[type], vnum);
 				return;
 			}
@@ -448,7 +502,7 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 			giver->vnum = vnum;
 			
 			LL_APPEND(*list, giver);
-			msg_to_char(ch, "You add '%s': %s %d, %s.\r\n", command, quest_giver_types[type], vnum, buf);
+			msg_to_char(ch, "You add '%s': %s\r\n", command, quest_giver_string(giver, TRUE));
 		}
 	}	// end 'add'
 	else if (is_abbrev(cmd_arg, "change")) {
@@ -481,54 +535,49 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 				return;
 			}
 			
-			// validate vnum, and set buf to the name
-			*buf = '\0';
+			// QG_x: validate vnum
+			ok = FALSE;
 			switch (change->type) {
 				case QG_BUILDING: {
-					bld_data *bld = building_proto(vnum);
-					if (bld) {
-						strcpy(buf, GET_BLD_NAME(bld));
+					if (building_proto(vnum)) {
+						ok = TRUE;
 					}
 					break;
 				}
 				case QG_MOBILE: {
-					char_data *mob = mob_proto(vnum);
-					if (mob) {
-						strcpy(buf, GET_SHORT_DESC(mob));
+					if (mob_proto(vnum)) {
+						ok = TRUE;
 					}
 					break;
 				}
 				case QG_OBJECT: {
-					obj_data *obj = obj_proto(vnum);
-					if (obj) {
-						strcpy(buf, GET_OBJ_SHORT_DESC(obj));
+					if (obj_proto(vnum)) {
+						ok = TRUE;
 					}
 					break;
 				}
 				case QG_ROOM_TEMPLATE: {
-					room_template *rmt = room_template_proto(vnum);
-					if (rmt) {
-						strcpy(buf, GET_RMT_TITLE(rmt));
+					if (room_template_proto(vnum)) {
+						ok = TRUE;
 					}
 					break;
 				}
 				case QG_TRIGGER: {
-					trig_data *trig = real_trigger(vnum);
-					if (trig) {
-						strcpy(buf, GET_TRIG_NAME(trig));
+					if (real_trigger(vnum)) {
+						ok = TRUE;
 					}
 					break;
 				}
 			}
 			
 			// did we find one? if so, buf is set
-			if (!*buf) {
+			if (!ok) {
 				msg_to_char(ch, "Unable to find %s %d.\r\n", quest_giver_types[change->type], vnum);
 				return;
 			}
 			
 			change->vnum = vnum;
-			msg_to_char(ch, "Changed '%s' %d's vnum to %d (%s).\r\n", command, atoi(num_arg), vnum, buf);
+			msg_to_char(ch, "Changed '%s' %d to: %s\r\n", command, atoi(num_arg), quest_giver_string(change, TRUE));
 		}
 		else {
 			msg_to_char(ch, "You can only change the vnum.\r\n");
@@ -1261,44 +1310,12 @@ quest_data *setup_olc_quest(quest_data *input) {
 * @param char *save_buffer A buffer to store the result to.
 */
 void get_quest_giver_display(struct quest_giver *list, char *save_buffer) {
-	char buf[MAX_STRING_LENGTH];
 	struct quest_giver *giver;
 	int count = 0;
 	
 	*save_buffer = '\0';
-	LL_FOREACH(list, giver) {
-		// QG_x
-		switch (giver->type) {
-			case QG_BUILDING: {
-				bld_data *bld = building_proto(giver->vnum);
-				strcpy(buf, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
-				break;
-			}
-			case QG_MOBILE: {
-				strcpy(buf, get_mob_name_by_proto(giver->vnum));
-				break;
-			}
-			case QG_OBJECT: {
-				strcpy(buf, get_obj_name_by_proto(giver->vnum));
-				break;
-			}
-			case QG_ROOM_TEMPLATE: {
-				room_template *rmt = room_template_proto(giver->vnum);
-				strcpy(buf, rmt ? GET_RMT_TITLE(rmt) : "UNKNOWN");
-				break;
-			}
-			case QG_TRIGGER: {
-				trig_data *trig = real_trigger(giver->vnum);
-				strcpy(buf, trig ? GET_TRIG_NAME(trig) : "UNKNOWN");
-				break;
-			}
-			default: {
-				strcpy(buf, "UNKNOWN");
-				break;
-			}
-		}
-		
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s [%d] %s\r\n", ++count, quest_giver_types[giver->type], giver->vnum, buf);
+	LL_FOREACH(list, giver) {		
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s\r\n", ++count, quest_giver_string(giver, TRUE));
 	}
 	
 	// empty list not shown
