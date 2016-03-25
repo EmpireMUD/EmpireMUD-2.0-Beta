@@ -279,6 +279,7 @@ Quests (QEDIT):
 - If a quest is repeatable, it will be removed from players' completion lists
   when the repeat timer expires. Use caution with prereqs and tasks that check
   repeatable quests.
+- The VISIT-* task types do not work as prereqs; only as tasks.
 
 Room Templates (REDIT):
 - Don't confuse room templates with the designated rooms that players can add
@@ -4248,6 +4249,7 @@ Available tasks:
 Note: Repeatable quests are removed from a player's completion list when their
 repeat timers expire, after which they can't be used for completed/not-
 completed tasks.
+Note: The VISIT-* types do not work as prereqs; only as tasks.
 
 See also: COMPONENT FLAGS, MEDIT FLAG, %QUEST%, OLC QUESTS
 #d

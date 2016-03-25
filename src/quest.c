@@ -417,6 +417,129 @@ bool audit_quest(quest_data *quest, char_data *ch) {
 
 
 /**
+* Deletes entries by type+vnum.
+*
+* @param struct quest_giver **list A pointer to the list to delete from.
+* @param int type QG_ type.
+* @param any_vnum vnum The vnum to remove.
+* @return bool TRUE if the type+vnum was removed from the list. FALSE if not.
+*/
+bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum) {
+	struct quest_giver *iter, *next_iter;
+	bool any = FALSE;
+	
+	LL_FOREACH_SAFE(*list, iter, next_iter) {
+		if (iter->type == type && iter->vnum == vnum) {
+			any = TRUE;
+			LL_DELETE(*list, iter);
+			free(iter);
+		}
+	}
+	
+	return any;
+}
+
+
+/**
+* Deletes entries by type+vnum.
+*
+* @param struct quest_reward **list A pointer to the list to delete from.
+* @param int type QG_ type.
+* @param any_vnum vnum The vnum to remove.
+* @return bool TRUE if the type+vnum was removed from the list. FALSE if not.
+*/
+bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum) {
+	struct quest_reward *iter, *next_iter;
+	bool any = FALSE;
+	
+	LL_FOREACH_SAFE(*list, iter, next_iter) {
+		if (iter->type == type && iter->vnum == vnum) {
+			any = TRUE;
+			LL_DELETE(*list, iter);
+			free(iter);
+		}
+	}
+	
+	return any;
+}
+
+
+/**
+* Deletes entries by type+vnum.
+*
+* @param struct quest_task **list A pointer to the list to delete from.
+* @param int type QG_ type.
+* @param any_vnum vnum The vnum to remove.
+* @return bool TRUE if the type+vnum was removed from the list. FALSE if not.
+*/
+bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum) {
+	struct quest_task *iter, *next_iter;
+	bool any = FALSE;
+	
+	LL_FOREACH_SAFE(*list, iter, next_iter) {
+		if (iter->type == type && iter->vnum == vnum) {
+			any = TRUE;
+			LL_DELETE(*list, iter);
+			free(iter);
+		}
+	}
+	
+	return any;
+}
+
+
+/**
+* @param struct quest_giver *list A list to search.
+* @param int type QG_ type.
+* @param any_vnum vnum The vnum to look for.
+* @return bool TRUE if the type+vnum is in the list. FALSE if not.
+*/
+bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum) {
+	struct quest_giver *iter;
+	LL_FOREACH(list, iter) {
+		if (iter->type == type && iter->vnum == vnum) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+
+/**
+* @param struct quest_reward *list A list to search.
+* @param int type QT_ type.
+* @param any_vnum vnum The vnum to look for.
+* @return bool TRUE if the type+vnum is in the list. FALSE if not.
+*/
+bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum) {
+	struct quest_reward *iter;
+	LL_FOREACH(list, iter) {
+		if (iter->type == type && iter->vnum == vnum) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+
+/**
+* @param struct quest_task *list A list to search.
+* @param int type QT_ type.
+* @param any_vnum vnum The vnum to look for.
+* @return bool TRUE if the type+vnum is in the list. FALSE if not.
+*/
+bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum) {
+	struct quest_task *iter;
+	LL_FOREACH(list, iter) {
+		if (iter->type == type && iter->vnum == vnum) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+
+/**
 * For the .list command.
 *
 * @param quest_data *quest The thing to list.

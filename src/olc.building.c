@@ -178,11 +178,14 @@ char *list_one_building(bld_data *bld, bool detail) {
 void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	void check_for_bad_buildings();
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
+	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
+	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
 	void remove_building_from_table(bld_data *bld);
 	
 	struct obj_storage_type *store, *next_store;
 	bld_data *bld, *biter, *next_biter;
 	craft_data *craft, *next_craft;
+	quest_data *quest, *next_quest;
 	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
 	adv_data *adv, *next_adv;
@@ -269,6 +272,20 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		}
 	}
 	
+	// quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_BUILDING, vnum);
+		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_BUILDING, vnum);
+		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_OWN_BUILDING, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_OWN_BUILDING, vnum);
+		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_VISIT_BUILDING, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_VISIT_BUILDING, vnum);
+		
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
 	// vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		if (VEH_INTERIOR_ROOM_VNUM(veh) == vnum) {
@@ -315,6 +332,18 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 				}
 			}
 		}
+		if (GET_OLC_QUEST(desc)) {
+			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_BUILDING, vnum);
+			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_BUILDING, vnum);
+			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_OWN_BUILDING, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_OWN_BUILDING, vnum);
+			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_VISIT_BUILDING, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_VISIT_BUILDING, vnum);
+		
+			if (found) {
+				msg_to_desc(desc, "A building used by the quest you are editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_VEHICLE(desc)) {
 			if (VEH_INTERIOR_ROOM_VNUM(GET_OLC_VEHICLE(desc)) == vnum) {
 				VEH_INTERIOR_ROOM_VNUM(GET_OLC_VEHICLE(desc)) = NOTHING;
@@ -344,11 +373,15 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 * @param bld_vnum vnum The building vnum.
 */
 void olc_search_building(char_data *ch, bld_vnum vnum) {
+	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
+	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	
 	char buf[MAX_STRING_LENGTH];
 	bld_data *proto = building_proto(vnum);
 	struct adventure_link_rule *link;
 	struct obj_storage_type *store;
 	craft_data *craft, *next_craft;
+	quest_data *quest, *next_quest;
 	vehicle_data *veh, *next_veh;
 	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
@@ -415,6 +448,17 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			}
+		}
+	}
+	
+	// quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		if (size > sizeof(buf)) {
+			break;
+		}
+		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_BUILDING, vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_BUILDING, vnum) || find_quest_task_in_list(QUEST_TASKS(quest), QT_OWN_BUILDING, vnum) || find_quest_task_in_list(QUEST_PREREQS(quest), QT_OWN_BUILDING, vnum) || find_quest_task_in_list(QUEST_TASKS(quest), QT_VISIT_BUILDING, vnum) || find_quest_task_in_list(QUEST_PREREQS(quest), QT_VISIT_BUILDING, vnum)) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
