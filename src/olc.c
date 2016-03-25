@@ -275,10 +275,12 @@ OLC_MODULE(qedit_flags);
 OLC_MODULE(qedit_name);
 OLC_MODULE(qedit_maxlevel);
 OLC_MODULE(qedit_minlevel);
+OLC_MODULE(qedit_prereqs);
 OLC_MODULE(qedit_repeat);
 OLC_MODULE(qedit_rewards);
 OLC_MODULE(qedit_script);
 OLC_MODULE(qedit_starts);
+OLC_MODULE(qedit_tasks);
 
 // room template
 OLC_MODULE(rmedit_affects);
@@ -658,10 +660,12 @@ const struct olc_command_data olc_data[] = {
 	{ "name", qedit_name, OLC_QUEST, OLC_CF_EDITOR },
 	{ "maxlevel", qedit_maxlevel, OLC_QUEST, OLC_CF_EDITOR },
 	{ "minlevel", qedit_minlevel, OLC_QUEST, OLC_CF_EDITOR },
+	{ "prereqs", qedit_prereqs, OLC_QUEST, OLC_CF_EDITOR },
 	{ "repeat", qedit_repeat, OLC_QUEST, OLC_CF_EDITOR },
 	{ "rewards", qedit_rewards, OLC_QUEST, OLC_CF_EDITOR },
 	{ "script", qedit_script, OLC_QUEST, OLC_CF_EDITOR },
 	{ "starts", qedit_starts, OLC_QUEST, OLC_CF_EDITOR },
+	{ "tasks", qedit_tasks, OLC_QUEST, OLC_CF_EDITOR },
 	
 	// room template commands
 	{ "affects", rmedit_affects, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
@@ -3157,7 +3161,7 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 * @param char *save_buffer A string to write the output to.
 */
 void get_resource_display(struct resource_data *list, char *save_buffer) {
-	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH];
 	struct resource_data *res;
 	obj_data *obj;
 	int num;
@@ -3173,14 +3177,7 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 				break;
 			}
 			case RES_COMPONENT: {
-				if (res->misc) {
-					prettier_sprintbit(res->misc, component_flags, lbuf);
-					strcat(lbuf, " ");
-				}
-				else {
-					*lbuf = '\0';
-				}
-				sprintf(line, "%dx (%s%s)", res->amount, lbuf, component_types[res->vnum]);
+				sprintf(line, "%dx (%s)", res->amount, component_string(res->vnum, res->misc));
 				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
 				break;
 			}
@@ -4796,7 +4793,6 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 void olc_process_resources(char_data *ch, char *argument, struct resource_data **list) {	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	char arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH];
-	char lbuf[MAX_STRING_LENGTH];
 	struct resource_data *res, *next_res, *prev_res, *prev_prev, *change, *temp;
 	int num, type, misc;
 	any_vnum vnum;
@@ -5053,12 +5049,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					
 					change->vnum = vnum;
 					
-					*lbuf = '\0';
-					if (change->misc) {
-						prettier_sprintbit(change->misc, component_flags, lbuf);
-						strcat(lbuf, " ");
-					}
-					msg_to_char(ch, "You change resource %d's component to %s%s.\r\n", atoi(arg2), lbuf, component_types[vnum]);
+					msg_to_char(ch, "You change resource %d's component to %s.\r\n", atoi(arg2), component_string(vnum, change->misc));
 					break;
 				}
 				case RES_LIQUID: {
@@ -5097,13 +5088,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 				// if there are no changes, they should have gotten an error message
 				if (misc != change->misc) {
 					change->misc = misc;
-					
-					*lbuf = '\0';
-					if (misc) {
-						prettier_sprintbit(change->misc, component_flags, lbuf);
-						strcat(lbuf, " ");
-					}
-					msg_to_char(ch, "You change resource %d's component to %s%s.", atoi(arg2), lbuf, component_types[change->vnum]);
+					msg_to_char(ch, "You change resource %d's component to %s.", atoi(arg2), component_string(change->vnum, misc));
 				}
 			}
 		}

@@ -251,8 +251,6 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern const char *affected_bits[];
 	extern const char *apply_types[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
-	extern const char *component_flags[];
-	extern const char *component_types[];
 	extern const char *wear_bits[];
 
 	struct obj_storage_type *store;
@@ -295,14 +293,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	// component info
 	*part = '\0';
 	if (GET_OBJ_CMP_TYPE(obj) != CMP_NONE) {
-		if (GET_OBJ_CMP_FLAGS(obj)) {
-			prettier_sprintbit(GET_OBJ_CMP_FLAGS(obj), component_flags, lbuf);
-			strcat(lbuf, " ");
-		}
-		else {
-			*lbuf = '\0';
-		}
-		sprintf(part, " (%s%s)", lbuf, component_types[GET_OBJ_CMP_TYPE(obj)]);
+		sprintf(part, " (%s)", component_string(GET_OBJ_CMP_TYPE(obj), GET_OBJ_CMP_FLAGS(obj)));
 	}
 	
 	// basic info

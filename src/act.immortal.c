@@ -1665,14 +1665,7 @@ SHOW(show_components) {
 		flags = *argument ? olc_process_flag(ch, argument, "component", "flags", component_flags, NOBITS) : NOBITS;
 		
 		// preamble
-		if (flags) {
-			prettier_sprintbit(flags, component_flags, part);
-			strcat(part, " ");
-		}
-		else {
-			*part = '\0';
-		}
-		size = snprintf(buf, sizeof(buf), "Components for %s%s:\r\n", part, component_types[type]);
+		size = snprintf(buf, sizeof(buf), "Components for %s:\r\n", component_string(type, flags));
 		
 		HASH_ITER(hh, object_table, obj, next_obj) {
 			if (size >= sizeof(buf)) {
@@ -2125,14 +2118,7 @@ SHOW(show_uses) {
 		flags = *argument ? olc_process_flag(ch, argument, "component", "flags", component_flags, NOBITS) : NOBITS;
 		
 		// preamble
-		if (flags) {
-			prettier_sprintbit(flags, component_flags, part);
-			strcat(part, " ");
-		}
-		else {
-			*part = '\0';
-		}
-		size = snprintf(buf, sizeof(buf), "Uses for %s%s:\r\n", part, component_types[type]);
+		size = snprintf(buf, sizeof(buf), "Uses for %s:\r\n", component_string(type, flags));
 		
 		HASH_ITER(hh, augment_table, aug, next_aug) {
 			if (size >= sizeof(buf)) {
@@ -3321,16 +3307,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	sprintbit(GET_OBJ_EXTRA(j), extra_bits, buf, TRUE);
 	msg_to_char(ch, "Extra flags   : &g%s&0\r\n", buf);
 	
-	// component info
-	if (GET_OBJ_CMP_FLAGS(j)) {
-		prettier_sprintbit(GET_OBJ_CMP_FLAGS(j), component_flags, buf);
-		strcat(buf, " ");
-	}
-	else {
-		*buf = '\0';
-	}
-
-	msg_to_char(ch, "Timer: &y%d&0, Material: &y%s&0, Component type: &y%s%s&0\r\n", GET_OBJ_TIMER(j), materials[GET_OBJ_MATERIAL(j)].name, buf, component_types[GET_OBJ_CMP_TYPE(j)]);
+	msg_to_char(ch, "Timer: &y%d&0, Material: &y%s&0, Component type: &y%s&0\r\n", GET_OBJ_TIMER(j), materials[GET_OBJ_MATERIAL(j)].name, component_string(GET_OBJ_CMP_TYPE(j), GET_OBJ_CMP_FLAGS(j)));
 
 	strcpy(buf, "In room: ");
 	if (!IN_ROOM(j))
