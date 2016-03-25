@@ -4124,6 +4124,7 @@ The following quest flags are available:
  IN-DEVELOPMENT - Mortals cannot see or get the quest.
  REPEAT-PER-INSTANCE - Clears completion when the instance closes.
  EXPIRES-AFTER-INSTANCE - Fails the quest when the instance closes.
+ EXTRACT-TASK-OBJECTS - Items and components required for tasks will be lost.
 
 See also: OLC QUESTS
 #d

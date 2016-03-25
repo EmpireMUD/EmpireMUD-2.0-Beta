@@ -2097,6 +2097,7 @@ const char *quest_flags[] = {
 	"IN-DEVELOPMENT",
 	"REPEAT-PER-INSTANCE",
 	"EXPIRES-AFTER-INSTANCE",
+	"EXTRACT-TASK-OBJECTS",
 	"\n"
 };
 
