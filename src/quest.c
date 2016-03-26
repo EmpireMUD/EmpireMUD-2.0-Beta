@@ -675,7 +675,7 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_lis
 	struct quest_lookup *ql;
 	bool any = FALSE;
 	
-	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob)) {
+	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob) || !CAN_SEE(ch, mob)) {
 		return FALSE;
 	}
 	
@@ -724,7 +724,7 @@ bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list
 	bool any = FALSE;
 	room_data *room;
 	
-	if (IS_NPC(ch) || !GET_OBJ_QUEST_LOOKUPS(obj) || !bind_ok(obj, ch)) {
+	if (IS_NPC(ch) || !GET_OBJ_QUEST_LOOKUPS(obj) || !CAN_SEE_OBJ(ch, obj) || !bind_ok(obj, ch)) {
 		return FALSE;
 	}
 	
