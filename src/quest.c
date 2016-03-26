@@ -54,15 +54,17 @@ extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 // external funcs
 extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 
 // local protos
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
-bool char_meets_prereqs(char_data *ch, quest_data *quest);
+bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
 bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 void free_quest_givers(struct quest_giver *list);
 void free_quest_tasks(struct quest_task *list);
-bool has_completed_quest(char_data *ch, any_vnum quest);
+struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest);
 bool is_on_quest(char_data *ch, any_vnum quest);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void update_mob_quest_lookups(mob_vnum vnum);
@@ -666,6 +668,7 @@ void update_obj_quest_lookups(obj_vnum vnum) {
 * @return bool TRUE if the mob has a quest the character can get; FALSE otherwise.
 */
 bool can_get_quest_from_mob(char_data *ch, char_data *mob) {
+	struct instance_data *inst;
 	struct quest_lookup *ql;
 	
 	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob)) {
@@ -681,8 +684,12 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob) {
 		if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
 			continue;
 		}
+		
+		// success
+		inst = (MOB_INSTANCE_ID(mob) != NOTHING ? get_instance_by_id(MOB_INSTANCE_ID(mob)) : NULL);
+		
 		// pre-reqs?
-		if (char_meets_prereqs(ch, ql->quest)) {
+		if (char_meets_prereqs(ch, ql->quest, inst)) {
 			return TRUE;
 		}
 	}
@@ -698,7 +705,11 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob) {
 * @return bool TRUE if the obj has a quest the character can get; FALSE otherwise.
 */
 bool can_get_quest_from_obj(char_data *ch, obj_data *obj) {
+	extern room_data *obj_room(obj_data *obj);
+	
+	struct instance_data *inst;
 	struct quest_lookup *ql;
+	room_data *room;
 	
 	if (IS_NPC(ch) || !GET_OBJ_QUEST_LOOKUPS(obj)) {
 		return FALSE;
@@ -713,8 +724,13 @@ bool can_get_quest_from_obj(char_data *ch, obj_data *obj) {
 		if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
 			continue;
 		}
+		
+		// success
+		room = obj_room(obj);
+		inst = (room ? find_instance_by_room(room, FALSE) : NULL);
+		
 		// pre-reqs?
-		if (char_meets_prereqs(ch, ql->quest)) {
+		if (char_meets_prereqs(ch, ql->quest, inst)) {
 			return TRUE;
 		}
 	}
@@ -731,6 +747,7 @@ bool can_get_quest_from_obj(char_data *ch, obj_data *obj) {
 */
 bool can_get_quest_from_room(char_data *ch, room_data *room) {
 	struct quest_lookup *ql, *list[2];
+	struct instance_data *inst;
 	int iter;
 	
 	if (IS_NPC(ch)) {
@@ -754,8 +771,12 @@ bool can_get_quest_from_room(char_data *ch, room_data *room) {
 			if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
 				continue;
 			}
+			
+			// success
+			inst = (room ? find_instance_by_room(room, FALSE) : NULL);
+			
 			// pre-reqs?
-			if (char_meets_prereqs(ch, ql->quest)) {
+			if (char_meets_prereqs(ch, ql->quest, inst)) {
 				return TRUE;
 			}
 		}
@@ -769,9 +790,11 @@ bool can_get_quest_from_room(char_data *ch, room_data *room) {
 /**
 * @param char_data *ch Any player.
 * @param quest_data *quest The quest to check.
+* @param struct instance_data *instance Optional; If the quest is offered in/from an instance.
 * @return bool TRUE if the player can get the quest.
 */
-bool char_meets_prereqs(char_data *ch, quest_data *quest) {
+bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance) {
+	struct player_completed_quest *completed;
 	struct quest_task *task;
 	bool ok = TRUE;
 	// needs to know instance/adventure
@@ -779,6 +802,25 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest) {
 	// sanitation
 	if (!ch || !quest || IS_NPC(ch)) {
 		return FALSE;
+	}
+	
+	// only immortals see in-dev quests
+	if (QUEST_FLAGGED(quest, QST_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+		return FALSE;
+	}
+	
+	// check repeatability
+	if ((completed = has_completed_quest(ch, QUEST_VNUM(quest)))) {
+		if (completed->last_completed + (QUEST_REPEATABLE_AFTER(quest) * SECS_PER_REAL_MIN) < time(0)) {
+			// repeat time: ok
+		}
+		else if (QUEST_FLAGGED(quest, QST_REPEAT_PER_INSTANCE) && (completed->last_adventure != (instance ? GET_ADV_VNUM(instance->adventure) : NOTHING) || completed->last_instance_id != (instance ? instance->id : NOTHING))) {
+			// repeat per instance: ok (different instance)
+		}
+		else {
+			// not repeatable
+			ok = FALSE;
+		}
 	}
 	
 	// check prereqs
@@ -871,9 +913,9 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest) {
 /**
 * @param char_data *ch Any player.
 * @param quest_vnum quest The quest to check.
-* @return bool TRUE if the player has completed the quest.
+* @return struct player_completed_quest* Returns completion data (TRUE) if the player has completed the quest; NULL (FALSE) otherwise.
 */
-bool has_completed_quest(char_data *ch, any_vnum quest) {
+struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest) {
 	struct player_completed_quest *pcq;
 	
 	if (IS_NPC(ch)) {
@@ -881,7 +923,7 @@ bool has_completed_quest(char_data *ch, any_vnum quest) {
 	}
 	
 	HASH_FIND_INT(GET_COMPLETED_QUESTS(ch), &quest, pcq);
-	return pcq ? TRUE : FALSE;
+	return pcq;
 }
 
 
