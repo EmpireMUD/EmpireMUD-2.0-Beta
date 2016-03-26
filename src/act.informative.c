@@ -1307,7 +1307,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_LONG) {
 		sprintbit(GET_OBJ_EXTRA(obj), extra_bits_inv_flags, flags, TRUE);
 		if (strncmp(flags, "NOBITS", 6)) {
-			sprintf(buf + strlen(buf), " %*s", ((int)strlen(flags)-1), flags);	// remove trailing space
+			sprintf(buf + strlen(buf), " %*s", ((int)strlen(flags)-2), flags);	// remove trailing space
 		}
 		
 		if (IS_STOLEN(obj)) {
