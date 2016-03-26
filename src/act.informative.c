@@ -810,7 +810,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	}
 	
 	if (can_get_quest_from_mob(ch, i, NULL)) {
-		act("...$e has a quest for you! (type 'quest check')", FALSE, i, NULL, ch, TO_VICT);
+		act("...$e has a quest for you!", FALSE, i, NULL, ch, TO_VICT);
 	}
 	if (affected_by_spell(i, ATYPE_FLY)) {
 		act("...$e is flying with gossamer mana wings!", FALSE, i, 0, ch, TO_VICT);
@@ -1363,7 +1363,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	
 	if (mode == OBJ_DESC_LONG && !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 		if (can_get_quest_from_obj(ch, obj, NULL)) {
-			strcat(buf, "...it has a quest for you! (type 'quest check')\r\n");
+			strcat(buf, "...it has a quest for you!\r\n");
 		}
 	}
 	

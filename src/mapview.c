@@ -874,7 +874,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 	
 	if (can_get_quest_from_room(ch, room, NULL)) {
-		msg_to_char(ch, "There is a quest here for you! (type 'quest check')\r\n");
+		msg_to_char(ch, "There is a quest here for you!\r\n");
 	}
 	
 	// mappc data
