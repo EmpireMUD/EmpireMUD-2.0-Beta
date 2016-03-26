@@ -60,10 +60,12 @@ void get_script_display(struct trig_proto_list *list, char *save_buffer);
 
 // local protos
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
+void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest);
 bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
 bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 void free_quest_givers(struct quest_giver *list);
 void free_quest_tasks(struct quest_task *list);
+void free_quest_temp_list(struct quest_temp_list *list);
 struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest);
 bool is_on_quest(char_data *ch, any_vnum quest);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
@@ -665,11 +667,13 @@ void update_obj_quest_lookups(obj_vnum vnum) {
 /**
 * @param char_data *ch Any player playing.
 * @param char_data *mob Any mob.
+* @param struct quest_temp_list **build_list Optional: Builds a temp list of quests available.
 * @return bool TRUE if the mob has a quest the character can get; FALSE otherwise.
 */
-bool can_get_quest_from_mob(char_data *ch, char_data *mob) {
+bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list) {
 	struct instance_data *inst;
 	struct quest_lookup *ql;
+	bool any = FALSE;
 	
 	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob)) {
 		return FALSE;
@@ -690,25 +694,34 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob) {
 		
 		// pre-reqs?
 		if (char_meets_prereqs(ch, ql->quest, inst)) {
-			return TRUE;
+			if (build_list) {
+				any = TRUE;
+				add_to_quest_temp_list(build_list, ql->quest);
+			}
+			else {
+				// only need 1
+				return TRUE;
+			}
 		}
 	}
 	
 	// nope
-	return FALSE;
+	return any;
 }
 
 
 /**
 * @param char_data *ch Any player playing.
 * @param obj_data *obj Any obj.
+* @param struct quest_temp_list **build_list Optional: Builds a temp list of quests available.
 * @return bool TRUE if the obj has a quest the character can get; FALSE otherwise.
 */
-bool can_get_quest_from_obj(char_data *ch, obj_data *obj) {
+bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list) {
 	extern room_data *obj_room(obj_data *obj);
 	
 	struct instance_data *inst;
 	struct quest_lookup *ql;
+	bool any = FALSE;
 	room_data *room;
 	
 	if (IS_NPC(ch) || !GET_OBJ_QUEST_LOOKUPS(obj)) {
@@ -731,23 +744,32 @@ bool can_get_quest_from_obj(char_data *ch, obj_data *obj) {
 		
 		// pre-reqs?
 		if (char_meets_prereqs(ch, ql->quest, inst)) {
-			return TRUE;
+			if (build_list) {
+				any = TRUE;
+				add_to_quest_temp_list(build_list, ql->quest);
+			}
+			else {
+				// only need 1
+				return TRUE;
+			}
 		}
 	}
 	
 	// nope
-	return FALSE;
+	return any;
 }
 
 
 /**
 * @param char_data *ch Any player playing.
 * @param room_data *room Any room.
+* @param struct quest_temp_list **build_list Optional: Builds a temp list of quests available.
 * @return bool TRUE if the room has a quest the character can get; FALSE otherwise.
 */
-bool can_get_quest_from_room(char_data *ch, room_data *room) {
+bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_list **build_list) {
 	struct quest_lookup *ql, *list[2];
 	struct instance_data *inst;
+	bool any = FALSE;
 	int iter;
 	
 	if (IS_NPC(ch)) {
@@ -777,13 +799,20 @@ bool can_get_quest_from_room(char_data *ch, room_data *room) {
 			
 			// pre-reqs?
 			if (char_meets_prereqs(ch, ql->quest, inst)) {
-				return TRUE;
+				if (build_list) {
+					any = TRUE;
+					add_to_quest_temp_list(build_list, ql->quest);
+				}
+				else {
+					// only need 1
+					return TRUE;
+				}
 			}
 		}
 	}
 	
 	// nope
-	return FALSE;
+	return any;
 }
 
 
@@ -1838,6 +1867,31 @@ void remove_quest_from_table(quest_data *quest) {
 
 
 /**
+* Adds a quest to a temporary list, if it's not already there.
+*
+* @param struct quest_temp_list **list A pointer to the temporary list to add to.
+* @param quest_data *quest The quest to add.
+*/
+void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest) {
+	struct quest_temp_list *qtl;
+	bool found = FALSE;
+	
+	LL_FOREACH(*list, qtl) {
+		if (qtl->quest == quest) {
+			found = TRUE;
+			break;
+		}
+	}
+	
+	if (!found) {
+		CREATE(qtl, struct quest_temp_list, 1);
+		qtl->quest = quest;
+		LL_PREPEND(*list, qtl);
+	}
+}
+
+
+/**
 * Initializes a new quest. This clears all memory for it, so set the vnum
 * AFTER.
 *
@@ -1955,6 +2009,19 @@ void free_quest_tasks(struct quest_task *list) {
 	struct quest_task *iter, *next_iter;
 	LL_FOREACH_SAFE(list, iter, next_iter) {
 		free(iter);
+	}
+}
+
+
+/**
+* Frees a temporary quest list.
+*
+* @param struct quest_temp_list *list The list to free.
+*/
+void free_quest_temp_list(struct quest_temp_list *list) {
+	struct quest_temp_list *qtl, *next_qtl;
+	LL_FOREACH_SAFE(list, qtl, next_qtl) {
+		free(qtl);
 	}
 }
 

@@ -3726,6 +3726,13 @@ struct quest_task {
 };
 
 
+// used for building a linked list of available quests
+struct quest_temp_list {
+	quest_data *quest;
+	struct quest_temp_list *next;
+};
+
+
 // for tracking player quest completion
 struct player_completed_quest {
 	any_vnum vnum;	// which quest
