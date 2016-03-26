@@ -30,6 +30,7 @@
 * Contents:
 *   Helpers
 *   Lookup Handlers
+*   Quest Handlers
 *   Utilities
 *   Database
 *   OLC Handlers
@@ -51,12 +52,18 @@ extern const char *quest_tracker_types[];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
 // external funcs
+extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
+extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 
 // local protos
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
+bool char_meets_prereqs(char_data *ch, quest_data *quest);
+bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 void free_quest_givers(struct quest_giver *list);
 void free_quest_tasks(struct quest_task *list);
+bool has_completed_quest(char_data *ch, any_vnum quest);
+bool is_on_quest(char_data *ch, any_vnum quest);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void update_mob_quest_lookups(mob_vnum vnum);
 void update_obj_quest_lookups(obj_vnum vnum);
@@ -64,6 +71,68 @@ void update_obj_quest_lookups(obj_vnum vnum);
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Number of buildings owned by an empire.
+*
+* @param empire_data *emp Any empire.
+* @param bld_vnum vnum The building to search for.
+* @return int The number of completed buildings with that vnum, owned by emp.
+*/
+int count_owned_buildings(empire_data *emp, bld_vnum vnum) {
+	struct empire_territory_data *ter;
+	int count = 0;	// ah ah ah
+	
+	if (!emp || vnum == NOTHING) {
+		return count;
+	}
+	
+	LL_FOREACH(EMPIRE_TERRITORY_LIST(emp), ter) {
+		if (!IS_COMPLETE(ter->room) || !GET_BUILDING(ter->room)) {
+			continue;
+		}
+		if (GET_BLD_VNUM(GET_BUILDING(ter->room)) != vnum) {
+			continue;
+		}
+		
+		// found
+		++count;
+	}
+	
+	return count;
+}
+
+
+/**
+* Number of vehicles owned by an empire.
+*
+* @param empire_data *emp Any empire.
+* @param any_vnum vnum The vehicle to search for.
+* @return int The number of completed vehicles with that vnum, owned by emp.
+*/
+int count_owned_vehicles(empire_data *emp, any_vnum vnum) {
+	vehicle_data *veh;
+	int count = 0;
+	
+	if (!emp || vnum == NOTHING) {
+		return count;
+	}
+	
+	LL_FOREACH(vehicle_list, veh) {
+		if (!VEH_IS_COMPLETE(veh) || VEH_OWNER(veh) != emp) {
+			continue;
+		}
+		if (VEH_VNUM(veh) != vnum) {
+			continue;
+		}
+		
+		// found
+		++count;
+	}
+	
+	return count;
+}
+
 
 /**
 * Quick way to turn a vnum into a name, safely.
@@ -585,6 +654,251 @@ void update_obj_quest_lookups(obj_vnum vnum) {
 			GET_OBJ_QUEST_LOOKUPS(obj) = GET_OBJ_QUEST_LOOKUPS(proto);
 		}
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// QUEST HANDLERS //////////////////////////////////////////////////////////
+
+/**
+* @param char_data *ch Any player playing.
+* @param char_data *mob Any mob.
+* @return bool TRUE if the mob has a quest the character can get; FALSE otherwise.
+*/
+bool can_get_quest_from_mob(char_data *ch, char_data *mob) {
+	struct quest_lookup *ql;
+	
+	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob)) {
+		return FALSE;
+	}
+	
+	LL_FOREACH(MOB_QUEST_LOOKUPS(mob), ql) {
+		// make sure they're a giver
+		if (!find_quest_giver_in_list(QUEST_STARTS_AT(ql->quest), QG_MOBILE, GET_MOB_VNUM(mob))) {
+			continue;
+		}
+		// already on quest?
+		if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
+			continue;
+		}
+		// pre-reqs?
+		if (char_meets_prereqs(ch, ql->quest)) {
+			return TRUE;
+		}
+	}
+	
+	// nope
+	return FALSE;
+}
+
+
+/**
+* @param char_data *ch Any player playing.
+* @param obj_data *obj Any obj.
+* @return bool TRUE if the obj has a quest the character can get; FALSE otherwise.
+*/
+bool can_get_quest_from_obj(char_data *ch, obj_data *obj) {
+	struct quest_lookup *ql;
+	
+	if (IS_NPC(ch) || !GET_OBJ_QUEST_LOOKUPS(obj)) {
+		return FALSE;
+	}
+	
+	LL_FOREACH(GET_OBJ_QUEST_LOOKUPS(obj), ql) {
+		// make sure they're a giver
+		if (!find_quest_giver_in_list(QUEST_STARTS_AT(ql->quest), QG_OBJECT, GET_OBJ_VNUM(obj))) {
+			continue;
+		}
+		// already on quest?
+		if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
+			continue;
+		}
+		// pre-reqs?
+		if (char_meets_prereqs(ch, ql->quest)) {
+			return TRUE;
+		}
+	}
+	
+	// nope
+	return FALSE;
+}
+
+
+/**
+* @param char_data *ch Any player playing.
+* @param room_data *room Any room.
+* @return bool TRUE if the room has a quest the character can get; FALSE otherwise.
+*/
+bool can_get_quest_from_room(char_data *ch, room_data *room) {
+	struct quest_lookup *ql, *list[2];
+	int iter;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	// two places to look
+	list[0] = GET_BUILDING(room) ? GET_BLD_QUEST_LOOKUPS(GET_BUILDING(room)) : NULL;
+	list[1] = GET_ROOM_TEMPLATE(room) ? GET_RMT_QUEST_LOOKUPS(GET_ROOM_TEMPLATE(room)) : NULL;
+	
+	for (iter = 0; iter < 2; ++iter) {
+		LL_FOREACH(list[iter], ql) {
+			// make sure they're a giver
+			if (iter == 0 && !find_quest_giver_in_list(QUEST_STARTS_AT(ql->quest), QG_BUILDING, GET_BLD_VNUM(GET_BUILDING(room)))) {
+				continue;
+			}
+			if (iter == 1 && !find_quest_giver_in_list(QUEST_STARTS_AT(ql->quest), QG_ROOM_TEMPLATE, GET_RMT_VNUM(GET_ROOM_TEMPLATE(room)))) {
+				continue;
+			}
+			// already on quest?
+			if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
+				continue;
+			}
+			// pre-reqs?
+			if (char_meets_prereqs(ch, ql->quest)) {
+				return TRUE;
+			}
+		}
+	}
+	
+	// nope
+	return FALSE;
+}
+
+
+/**
+* @param char_data *ch Any player.
+* @param quest_data *quest The quest to check.
+* @return bool TRUE if the player can get the quest.
+*/
+bool char_meets_prereqs(char_data *ch, quest_data *quest) {
+	struct quest_task *task;
+	bool ok = TRUE;
+	// needs to know instance/adventure
+	
+	// sanitation
+	if (!ch || !quest || IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	// check prereqs
+	LL_FOREACH(QUEST_PREREQS(quest), task) {
+		// early exit
+		if (!ok) {
+			break;
+		}
+		
+		// QT_x: only tasks that can be prereqs
+		switch(task->type) {
+			case QT_COMPLETED_QUEST: {
+				if (!has_completed_quest(ch, task->vnum)) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case QT_GET_COMPONENT: {
+				struct resource_data *res = NULL;
+				add_to_resource_list(&res, RES_COMPONENT, task->vnum, task->needed, task->misc);
+				if (!has_resources(ch, res, FALSE, FALSE)) {
+					ok = FALSE;
+				}
+				free_resource_list(res);
+				break;
+			}
+			case QT_GET_OBJECT: {
+				struct resource_data *res = NULL;
+				add_to_resource_list(&res, RES_OBJECT, task->vnum, task->needed, 0);
+				if (!has_resources(ch, res, FALSE, FALSE)) {
+					ok = FALSE;
+				}
+				free_resource_list(res);
+				break;
+			}
+			case QT_NOT_COMPLETED_QUEST: {
+				if (has_completed_quest(ch, task->vnum)) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case QT_NOT_ON_QUEST: {
+				if (is_on_quest(ch, task->vnum)) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case QT_OWN_BUILDING: {
+				if (!GET_LOYALTY(ch) || count_owned_buildings(GET_LOYALTY(ch), task->vnum) < task->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case QT_OWN_VEHICLE: {
+				if (!GET_LOYALTY(ch) || count_owned_vehicles(GET_LOYALTY(ch), task->vnum) < task->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case QT_SKILL_LEVEL_OVER: {
+				if (get_skill_level(ch, task->vnum) < task->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case QT_SKILL_LEVEL_UNDER: {
+				if (get_skill_level(ch, task->vnum) > task->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			
+			// some types do not support pre-reqs
+			case QT_KILL_MOB:
+			case QT_KILL_MOB_FLAGGED:
+			case QT_TRIGGERED:
+			case QT_VISIT_BUILDING:
+			case QT_VISIT_ROOM_TEMPLATE:
+			case QT_VISIT_SECTOR:
+			default: {
+				break;
+			}
+		}
+	}
+	
+	return ok;
+}
+
+
+/**
+* @param char_data *ch Any player.
+* @param quest_vnum quest The quest to check.
+* @return bool TRUE if the player has completed the quest.
+*/
+bool has_completed_quest(char_data *ch, any_vnum quest) {
+	struct player_completed_quest *pcq;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	HASH_FIND_INT(GET_COMPLETED_QUESTS(ch), &quest, pcq);
+	return pcq ? TRUE : FALSE;
+}
+
+
+/**
+* @param char_data *ch Any player.
+* @param quest_vnum quest The quest to check.
+* @return bool TRUE if the player has is on the quest now.
+*/
+bool is_on_quest(char_data *ch, any_vnum quest) {
+	struct player_quest *pq;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	LL_SEARCH_SCALAR(GET_QUESTS(ch), pq, vnum, quest);
+	return pq ? TRUE : FALSE;
 }
 
 

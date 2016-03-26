@@ -2899,6 +2899,10 @@ struct player_special_data {
 	byte mapsize;	// how big the player likes the map
 	char custom_colors[NUM_CUSTOM_COLORS];	// for custom channel coloring, storing the letter part of the & code ('r' for &r)
 	
+	// quests
+	struct player_quest *quests;	// quests the player is on (player_quest->next)
+	struct player_completed_quest *completed_quests;	// hash table (hh)
+	
 	// empire
 	empire_vnum pledge;	// Empire he's applying to
 	byte rank;	// Rank in the empire
@@ -3719,6 +3723,32 @@ struct quest_task {
 	int current;	// how many the player has
 	
 	struct quest_task *next;
+};
+
+
+// for tracking player quest completion
+struct player_completed_quest {
+	any_vnum vnum;	// which quest
+	time_t last_completed;	// when
+	
+	any_vnum last_instance_id;	// where last completed one was acquired
+	any_vnum last_adventure;	// which adventure it was acquired in
+	
+	UT_hash_handle hh;	// stored in player's hash table
+};
+
+
+// quests the player is on
+struct player_quest {
+	any_vnum vnum;	// which quest
+	time_t start_time;	// when started
+	
+	struct quest_task *tracker;	// quest tasks to track
+	
+	any_vnum last_instance_id;	// where it was acquired (if anywhere)
+	any_vnum last_adventure;	// which adventure it was acquired in
+	
+	struct player_quest *next;	// linked list
 };
 
 

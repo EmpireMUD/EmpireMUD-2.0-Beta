@@ -670,6 +670,7 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 * @param int num If mob-stacking is on, number of copies of this i to show.
 */
 void list_one_char(char_data *i, char_data *ch, int num) {
+	extern bool can_get_quest_from_mob(char_data *ch, char_data *mob);
 	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern struct action_data_struct action_data[];
 	
@@ -807,7 +808,10 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 
 		msg_to_char(ch, "%s\r\n", buf);
 	}
-
+	
+	if (can_get_quest_from_mob(ch, i)) {
+		act("...$e has a quest for you! (type 'quest check')", FALSE, i, NULL, ch, TO_VICT);
+	}
 	if (affected_by_spell(i, ATYPE_FLY)) {
 		act("...$e is flying with gossamer mana wings!", FALSE, i, 0, ch, TO_VICT);
 	}
@@ -1277,6 +1281,7 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
 void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	extern int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board);
 	extern int board_loaded;
+	extern bool can_get_quest_from_obj(char_data *ch, obj_data *obj);
 	void init_boards(void);
 	extern int find_board(char_data *ch);
 	extern const char *extra_bits_inv_flags[];
@@ -1307,6 +1312,12 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 		
 		if (IS_STOLEN(obj)) {
 			strcat(buf, " (STOLEN)");
+		}
+	}
+	
+	if (mode == OBJ_DESC_INVENTORY || (mode == OBJ_DESC_LONG && CAN_WEAR(obj, ITEM_WEAR_TAKE))) {
+		if (can_get_quest_from_obj(ch, obj)) {
+			strcat(buf, " (quest available)");
 		}
 	}
 	
@@ -1345,8 +1356,15 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 		}
 	}
 	
+	// CRLF IS HERE
 	if (buf[strlen(buf)-1] != '\n') {
 		strcat(buf, "\r\n");
+	}
+	
+	if (mode == OBJ_DESC_LONG && !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+		if (can_get_quest_from_obj(ch, obj)) {
+			strcat(buf, "...it has a quest for you! (type 'quest check')\r\n");
+		}
 	}
 	
 	page_string(ch->desc, buf, TRUE);

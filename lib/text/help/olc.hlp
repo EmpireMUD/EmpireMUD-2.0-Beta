@@ -276,9 +276,6 @@ Objects (OEDIT):
 
 Quests (QEDIT):
 - You can create more complex quests by chaining simple quests.
-- If a quest is repeatable, it will be removed from players' completion lists
-  when the repeat timer expires. Use caution with prereqs and tasks that check
-  repeatable quests.
 - The VISIT-* task types do not work as prereqs; only as tasks.
 
 Room Templates (REDIT):
@@ -4165,9 +4162,6 @@ You can set quests to be repeatable after a certain amount of time. This will
 remove the quest from players' completion list, allowing them to pick up the
 quest again.
 
-Note: If a quest is repeatable, you may not be able to detect it for a
-"has completed quest" or "has not completed quest" task or prerequisite.
-
 See also: QEDIT PREREQS, QEDIT TASKS, OLC QUESTS
 #d
 "QEDIT REWARDS"
@@ -4250,10 +4244,6 @@ Available tasks:
  VISIT-SECTOR &r*&0 - Player must go to a certain terrain.
 
 &r*&0 Some types cannot be used as prereqs, only as tasks.
-
-Note: Repeatable quests are removed from a player's completion list when their
-repeat timers expire, after which they can't be used for completed/not-
-completed tasks.
 
 See also: COMPONENT FLAGS, MEDIT FLAG, %QUEST%, OLC QUESTS
 #d

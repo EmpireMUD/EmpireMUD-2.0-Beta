@@ -474,6 +474,7 @@ bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container
 * @param bitvector_t options LRR_x flags.
 */
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
+	extern bool can_get_quest_from_room(char_data *ch, room_data *room);
 	void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options);
 	void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
 	void list_char_to_char(char_data *list, char_data *ch);
@@ -870,6 +871,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (!IS_COMPLETE(room)) {
 		show_resource_list(BUILDING_RESOURCES(room), partialbuf);
 		msg_to_char(ch, "Remaining to %s: %s\r\n", (IS_DISMANTLING(room) ? "Dismantle" : "Completion"), partialbuf);
+	}
+	
+	if (can_get_quest_from_room(ch, room)) {
+		msg_to_char(ch, "There is a quest here for you! (type 'quest check')\r\n");
 	}
 	
 	// mappc data
