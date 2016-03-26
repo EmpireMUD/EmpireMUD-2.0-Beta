@@ -296,7 +296,10 @@ const struct {
 	int min_pos;
 } quest_cmd[] = {
 	{ "check", qcmd_check, POS_RESTING },
-	{ "list", qcmd_check, POS_DEAD },
+	// drop
+	// finish
+	// info
+	{ "list", qcmd_list, POS_DEAD },
 	{ "start", qcmd_start, POS_STANDING },
 	
 	// this goes last
