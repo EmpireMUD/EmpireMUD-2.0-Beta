@@ -4,5 +4,33 @@ Usage:  quest <command> <...>
 
 The following quest commands are available:
  &cquest check&0 - See what quests are available here.
+ &cquest list&0 - Show your quests and progress.
+ &cquest start&0 - Begin a quest.
+
+See also: QUEST CHECK, QUEST LIST, QUEST START
+#
+"QUEST CHECK"
+
+Usage:  quest check
+
+This command shows all the quests available at your location.
+
+See also: QUEST
+#
+"QUEST LIST"
+
+Usage:  quest list
+
+This command shows all the quests you're on, and their progress.
+
+See also: QUEST
+#
+"QUEST START"
+
+Usage:  quest start <name | all>
+
+This command starts a quest (or all quests) available at your location.
+
+See also: QUEST
 #
 $
