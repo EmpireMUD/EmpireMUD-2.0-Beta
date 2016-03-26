@@ -63,6 +63,11 @@ QCMD(qcmd_check) {
 		can_get_quest_from_obj(ch, obj, &quest_list);
 	}
 	
+	// objs in room
+	LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+		can_get_quest_from_obj(ch, obj, &quest_list);
+	}
+	
 	// search mobs in room
 	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
 		if (IS_NPC(mob)) {
@@ -88,13 +93,10 @@ QCMD(qcmd_check) {
 			*buf = '\0';
 		}
 		
-		msg_to_char(ch, " %s%s\r\n", QUEST_NAME(qtl->quest), buf);
+		msg_to_char(ch, "  %s%s\r\n", QUEST_NAME(qtl->quest), buf);
 	}
 	
-	if (any) {
-		msg_to_char(ch, "Use 'quest start <name>' to begin a quest.\r\n");
-	}
-	else {
+	if (!any) {
 		msg_to_char(ch, "There are no quests available here.\r\n");
 	}
 	

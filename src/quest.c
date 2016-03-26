@@ -724,7 +724,7 @@ bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list
 	bool any = FALSE;
 	room_data *room;
 	
-	if (IS_NPC(ch) || !GET_OBJ_QUEST_LOOKUPS(obj)) {
+	if (IS_NPC(ch) || !GET_OBJ_QUEST_LOOKUPS(obj) || !bind_ok(obj, ch)) {
 		return FALSE;
 	}
 	
