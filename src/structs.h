@@ -3729,6 +3729,7 @@ struct quest_task {
 // used for building a linked list of available quests
 struct quest_temp_list {
 	quest_data *quest;
+	struct instance_data *instance;
 	struct quest_temp_list *next;
 };
 
@@ -3752,8 +3753,8 @@ struct player_quest {
 	
 	struct quest_task *tracker;	// quest tasks to track
 	
-	any_vnum last_instance_id;	// where it was acquired (if anywhere)
-	any_vnum last_adventure;	// which adventure it was acquired in
+	any_vnum instance_id;	// where it was acquired (if anywhere)
+	any_vnum adventure;	// which adventure it was acquired in
 	
 	struct player_quest *next;	// linked list
 };

@@ -60,7 +60,7 @@ void get_script_display(struct trig_proto_list *list, char *save_buffer);
 
 // local protos
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
-void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest);
+void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest, struct instance_data *instance);
 bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
 bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 void free_quest_givers(struct quest_giver *list);
@@ -131,6 +131,64 @@ int count_owned_vehicles(empire_data *emp, any_vnum vnum) {
 		}
 		
 		// found
+		++count;
+	}
+	
+	return count;
+}
+
+
+/**
+* Counts how many components a player has available for a quest.
+*
+* @param char_data *ch The player.
+* @param int type CMP_ type
+* @param bitvector_t flags CMPF_ flags to match
+* @param bool skip_keep If TRUE, skips items marked (keep) because they can't be taken.
+* @return int The number of matching component items.
+*/
+int count_quest_components(char_data *ch, int type, bitvector_t flags, bool skip_keep) {
+	obj_data *obj;
+	int count = 0;
+	
+	LL_FOREACH2(ch->carrying, obj, next_content) {
+		if (GET_OBJ_CMP_TYPE(obj) != type) {
+			continue;
+		}
+		if ((GET_OBJ_CMP_FLAGS(obj) & flags) != flags) {
+			continue;
+		}
+		if (skip_keep && OBJ_FLAGGED(obj, OBJ_KEEP)) {
+			continue;
+		}
+		
+		++count;
+	}
+	
+	return count;
+}
+
+
+/**
+* Counts how many items a player has available for a quest.
+*
+* @param char_data *ch The player.
+* @param obj_vnum vnum The vnum of the item to look for.
+* @param bool skip_keep If TRUE, skips items marked (keep) because they can't be taken.
+* @return int The number of matching items.
+*/
+int count_quest_objects(char_data *ch, obj_vnum vnum, bool skip_keep) {
+	obj_data *obj;
+	int count = 0;
+	
+	LL_FOREACH2(ch->carrying, obj, next_content) {
+		if (GET_OBJ_VNUM(obj) != vnum) {
+			continue;
+		}
+		if (skip_keep && OBJ_FLAGGED(obj, OBJ_KEEP)) {
+			continue;
+		}
+		
 		++count;
 	}
 	
@@ -368,6 +426,94 @@ char *quest_task_string(struct quest_task *task, bool show_vnums) {
 	}
 	
 	return output;
+}
+
+
+/**
+* Redetects counts for any quest task type that CAN be redetected.
+* (Some, like mob kills, cannot).
+*
+* @param char_data *ch The player.
+* @param struct player_quest *pq The player's quest to refresh.
+*/
+void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
+	quest_data *quest = quest_proto(pq->vnum);
+	struct quest_task *task;
+	
+	LL_FOREACH(pq->tracker, task) {
+		// QT_x: refreshable types only
+		switch (task->type) {
+			case QT_COMPLETED_QUEST: {
+				task->current = has_completed_quest(ch, task->vnum) ? task->needed : 0;
+				break;
+			}
+			case QT_GET_COMPONENT: {
+				task->current = count_quest_components(ch, task->vnum, task->misc, QUEST_FLAGGED(quest, QST_EXTRACT_TASK_OBJECTS));
+				task->current = MIN(task->current, task->needed);
+				break;
+			}
+			case QT_GET_OBJECT: {
+				task->current = count_quest_objects(ch, task->vnum, QUEST_FLAGGED(quest, QST_EXTRACT_TASK_OBJECTS));
+				task->current = MIN(task->current, task->needed);
+				break;
+			}
+			case QT_NOT_COMPLETED_QUEST: {
+				task->current = has_completed_quest(ch, task->vnum) ? 0 : task->needed;
+				break;
+			}
+			case QT_NOT_ON_QUEST: {
+				task->current = is_on_quest(ch, task->vnum) ? 0 : task->needed;
+				break;
+			}
+			case QT_OWN_BUILDING: {
+				task->current = count_owned_buildings(GET_LOYALTY(ch), task->vnum);
+				break;
+			}
+			case QT_OWN_VEHICLE: {
+				task->current = count_owned_vehicles(GET_LOYALTY(ch), task->vnum);
+				break;
+			}
+			case QT_SKILL_LEVEL_OVER: {
+				if (get_skill_level(ch, task->vnum) >= task->needed) {
+					task->current = task->needed;	// full
+				}
+				else {
+					task->current = 0;
+				}
+				break;
+			}
+			case QT_SKILL_LEVEL_UNDER: {
+				if (get_skill_level(ch, task->vnum) <= task->needed) {
+					task->current = task->needed;	// full
+				}
+				else {
+					task->current = 0;
+				}
+				break;
+			}
+			case QT_VISIT_BUILDING: {
+				if (GET_BUILDING(IN_ROOM(ch)) && GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))) == task->vnum) {
+					task->current = task->needed;	// full
+				}
+				// else can't detect this
+				break;
+			}
+			case QT_VISIT_ROOM_TEMPLATE: {
+				if (GET_ROOM_TEMPLATE(IN_ROOM(ch)) && GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))) == task->vnum) {
+					task->current = task->needed;	// full
+				}
+				// else can't detect this
+				break;
+			}
+			case QT_VISIT_SECTOR: {
+				if (GET_SECT_VNUM(SECT(IN_ROOM(ch))) == task->vnum) {
+					task->current = task->needed;	// full
+				}
+				// else can't detect this
+				break;
+			}
+		}
+	}
 }
 
 
@@ -696,7 +842,7 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_lis
 		if (char_meets_prereqs(ch, ql->quest, inst)) {
 			if (build_list) {
 				any = TRUE;
-				add_to_quest_temp_list(build_list, ql->quest);
+				add_to_quest_temp_list(build_list, ql->quest, inst);
 			}
 			else {
 				// only need 1
@@ -746,7 +892,7 @@ bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list
 		if (char_meets_prereqs(ch, ql->quest, inst)) {
 			if (build_list) {
 				any = TRUE;
-				add_to_quest_temp_list(build_list, ql->quest);
+				add_to_quest_temp_list(build_list, ql->quest, inst);
 			}
 			else {
 				// only need 1
@@ -801,7 +947,7 @@ bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_l
 			if (char_meets_prereqs(ch, ql->quest, inst)) {
 				if (build_list) {
 					any = TRUE;
-					add_to_quest_temp_list(build_list, ql->quest);
+					add_to_quest_temp_list(build_list, ql->quest, inst);
 				}
 				else {
 					// only need 1
@@ -1871,8 +2017,9 @@ void remove_quest_from_table(quest_data *quest) {
 *
 * @param struct quest_temp_list **list A pointer to the temporary list to add to.
 * @param quest_data *quest The quest to add.
+* @param struct instance_data *inst The associated instance for the quest (may be NULL).
 */
-void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest) {
+void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest, struct instance_data *inst) {
 	struct quest_temp_list *qtl;
 	bool found = FALSE;
 	
@@ -1886,6 +2033,7 @@ void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest) {
 	if (!found) {
 		CREATE(qtl, struct quest_temp_list, 1);
 		qtl->quest = quest;
+		qtl->instance = inst;
 		LL_PREPEND(*list, qtl);
 	}
 }
