@@ -1362,7 +1362,7 @@ void qt_change_skill_level(char_data *ch, any_vnum skl) {
 	struct player_quest *pq;
 	struct quest_task *task;
 	
-	if (!IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
@@ -1391,7 +1391,7 @@ void qt_drop_obj(char_data *ch, obj_data *obj) {
 	struct player_quest *pq;
 	struct quest_task *task;
 	
-	if (!IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
@@ -1451,7 +1451,7 @@ void qt_gain_building(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct quest_task *task;
 	
-	if (!IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
@@ -1475,7 +1475,7 @@ void qt_gain_vehicle(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct quest_task *task;
 	
-	if (!IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
@@ -1499,7 +1499,7 @@ void qt_get_obj(char_data *ch, obj_data *obj) {
 	struct player_quest *pq;
 	struct quest_task *task;
 	
-	if (!IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
@@ -1526,7 +1526,7 @@ void qt_kill_mob(char_data *ch, char_data *mob) {
 	struct player_quest *pq;
 	struct quest_task *task;
 	
-	if (!IS_NPC(ch) || !IS_NPC(mob)) {
+	if (IS_NPC(ch) || !IS_NPC(mob)) {
 		return;
 	}
 	
@@ -1553,7 +1553,7 @@ void qt_lose_building(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct quest_task *task;
 	
-	if (!IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
@@ -1580,7 +1580,7 @@ void qt_lose_quest(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct quest_task *task;
 	
-	if (!IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
@@ -1604,7 +1604,7 @@ void qt_lose_vehicle(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct quest_task *task;
 	
-	if (!IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
@@ -1631,7 +1631,7 @@ void qt_quest_completed(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct quest_task *task;
 	
-	if (!IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
@@ -1658,7 +1658,7 @@ void qt_start_quest(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct quest_task *task;
 	
-	if (!IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
@@ -1682,7 +1682,7 @@ void qt_triggered_task(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct quest_task *task;
 	
-	if (!IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
@@ -1708,7 +1708,7 @@ void qt_visit_building(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct quest_task *task;
 	
-	if (!IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
@@ -1732,7 +1732,7 @@ void qt_visit_room_template(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct quest_task *task;
 	
-	if (!IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
@@ -1756,7 +1756,7 @@ void qt_visit_sector(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct quest_task *task;
 	
-	if (!IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
@@ -1777,6 +1777,10 @@ void qt_visit_sector(char_data *ch, any_vnum vnum) {
 * @param any_vnum vnum The sector vnum.
 */
 void qt_visit_room(char_data *ch, room_data *room) {
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
 	qt_visit_sector(ch, GET_SECT_VNUM(SECT(room)));
 	if (GET_BUILDING(room)) {
 		qt_visit_building(ch, GET_BLD_VNUM(GET_BUILDING(room)));
