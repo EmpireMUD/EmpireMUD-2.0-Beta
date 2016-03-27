@@ -296,6 +296,42 @@ int count_quest_objects(char_data *ch, obj_vnum vnum, bool skip_keep) {
 
 
 /**
+* Ends all quests that are marked QST_EXPIRES_AFTER_INSTANCE.
+*
+* @param struct instance_data *inst The instance to check quests for.
+*/
+void expire_instance_quests(struct instance_data *inst) {
+	void drop_quest(char_data *ch, struct player_quest *pq);
+	
+	struct player_quest *pq, *next_pq;
+	descriptor_data *desc;
+	quest_data *quest;
+	char_data *ch;
+	
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) != CON_PLAYING || !(ch = desc->character) || IS_NPC(ch)) {
+			continue;
+		}
+		
+		LL_FOREACH_SAFE(GET_QUESTS(ch), pq, next_pq) {
+			if (pq->instance_id != inst->id || pq->adventure != GET_ADV_VNUM(inst->adventure)) {
+				continue;
+			}
+			if (!(quest = quest_proto(pq->vnum))) {
+				continue;
+			}
+			if (!QUEST_FLAGGED(quest, QST_EXPIRES_AFTER_INSTANCE)) {
+				continue;
+			}
+			
+			msg_to_char(ch, "You fail %s because the adventure instance ended.\r\n", QUEST_NAME(quest));
+			drop_quest(ch, pq);
+		}
+	}
+}
+
+
+/**
 * Quick way to turn a vnum into a name, safely.
 *
 * @param any_vnum vnum The quest vnum to look up.

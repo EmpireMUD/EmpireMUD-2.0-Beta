@@ -925,6 +925,7 @@ void generate_adventure_instances(void) {
 * @param struct instance_data *inst The instance to delete.
 */
 void delete_instance(struct instance_data *inst) {
+	void expire_instance_quests(struct instance_data *inst);
 	void extract_pending_chars();
 	void relocate_players(room_data *room, room_data *to_room);
 	
@@ -935,6 +936,8 @@ void delete_instance(struct instance_data *inst) {
 	
 	// disable instance saving
 	instance_save_wait = TRUE;
+	
+	expire_instance_quests(inst);
 	
 	if ((room = inst->location) != NULL) {
 		// remove any players inside
