@@ -181,6 +181,27 @@ evaluated from left to right. Parenthesis can be used to group.
 |   !    | negation              | !() = 1; !0 = 1; !dog = 0;| 
 --------------------------------------------------------------
 #d
+"FINISH QUEST TRIGGER" "MTRIG FINISH QUEST" "OTRIG FINISH QUEST" "RTRIG FINISH QUEST" "VTRIG FINISH QUEST" TRIGEDIT-MOB-FINISH-QUEST TRIGEDIT-OBJ-FINISH-QUEST TRIGEDIT-ROOM-FINISH-QUEST TRIGEDIT-VEH-FINISH-QUEST
+
+Finish Quest (trigger)
+
+Argument type:  percent chance to execute
+Return value:  return 0 to block the quest turn-in
+
+When a character attempts to turn in a finished quest, it executes all the
+Finish Quest triggers in the room. It will also run Finish Quest triggers
+attached to the quest itself.
+
+The quest's triggers always run LAST, allowing them to be sure that no other
+trigger already prevented the quest turn-in.
+
+Variables:
+  &c%actor%&0 - The character finishing the quest.
+  &c%quest%&0 - The vnum of the quest to end.
+  &c%questname%&0 - The name of the quest to end.
+
+See also: START QUEST TRIGGER
+#d
 "GLOBAL TRIGGER" "GLOBAL RANDOM TRIGGER" "MTRIG GLOBAL" "OTRIG GLOBAL" "RTRIG GLOBAL" "VTRIG GLOBAL" TRIGEDIT-MOB-GLOBAL TRIGEDIT-OBJ-GLOBAL TRIGEDIT-ROOM-GLOBAL TRIGEDIT-VEH-GLOBAL
 
 Global (trigger)
@@ -407,6 +428,27 @@ Variables:
   &c%speech%&0 - The entire phrase spoken.
 
 See also: MTRIG CHARMED
+#d
+"START QUEST TRIGGER" "MTRIG START QUEST" "OTRIG START QUEST" "RTRIG START QUEST" "VTRIG START QUEST" TRIGEDIT-MOB-START-QUEST TRIGEDIT-OBJ-START-QUEST TRIGEDIT-ROOM-START-QUEST TRIGEDIT-VEH-START-QUEST
+
+Start Quest (trigger)
+
+Argument type:  percent chance to execute
+Return value:  return 0 to block the quest start
+
+When a character attempts to start a new quest, it executes all the Start Quest
+triggers in the room. It will also run Start Quest triggers attached to the
+quest itself.
+
+The quest's triggers always run LAST, allowing them to be sure that no other
+trigger already prevented the quest start.
+
+Variables:
+  &c%actor%&0 - The character trying to get the quest.
+  &c%quest%&0 - The vnum of the quest to start.
+  &c%questname%&0 - The name of the quest to start.
+
+See also: FINISH QUEST TRIGGER
 #d
 "TEXT VARIABLES" "TEXT VARS" TRIGEDIT-VARIABLES-TEXTS TEXT-VAR TRIGEDIT-TEXT-VAR
 
