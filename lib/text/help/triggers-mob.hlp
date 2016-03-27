@@ -295,6 +295,8 @@ Mobs can trigger on the following events:
 &cLeave-All&0 - Triggers when ANY person tries to leave.
 &cDoor&0 - Triggers when a player interacts with a door in the room.
 &cFight-Charmed&0 - Triggers during combat rounds even when charmed.
+&cStart-Quest&0 - Triggers when a player tries to start a quest.
+&cFinish-Quest&0 - Triggers when a player tries to turn in a quest.
 
 For each type, there is a help file named &yMTRIG <type>&0.
 #d

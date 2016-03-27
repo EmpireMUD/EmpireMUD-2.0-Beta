@@ -101,6 +101,8 @@ Rooms can trigger on the following events:
 &cAbility&0 - Triggers when an ability is used in the room.
 &cLeave&0 - Triggers when a person tries to leave.
 &cDoor&0 - Triggers when a player interacts with a door.
+&cStart-Quest&0 - Triggers when a player tries to start a quest.
+&cFinish-Quest&0 - Triggers when a player tries to turn in a quest.
 
 For each type, there is a help file named &yRTRIG <type>&0.
 #d

@@ -65,6 +65,8 @@ Vehicles can trigger on the following events:
 &cEntry&0 - Triggers when the vehicle moves into a new room.
 &cLoad&0 - Triggers when the vehicle loads (or is finished being crafted).
 &cLeave&0 - Triggers when a person tries to leave.
+&cStart-Quest&0 - Triggers when a player tries to start a quest.
+&cFinish-Quest&0 - Triggers when a player tries to turn in a quest.
 
 For each type, there is a help file named &yVTRIG <type>&0.
 #d
