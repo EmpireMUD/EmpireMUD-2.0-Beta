@@ -46,6 +46,7 @@ extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 extern char *quest_task_string(struct quest_task *task, bool show_vnums);
 void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq);
+void remove_quest_items_by_quest(char_data *ch, any_vnum vnum);
 void scale_item_to_level(obj_data *obj, int level);
 
 // local prototypes
@@ -244,7 +245,7 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 		}
 	}
 	
-	// TODO remove quest items}
+	remove_quest_items_by_quest(ch, QUEST_VNUM(quest));
 }
 
 
@@ -342,12 +343,11 @@ void drop_quest(char_data *ch, struct player_quest *pq) {
 	}
 	
 	qt_lose_quest(ch, pq->vnum);
+	remove_quest_items_by_quest(ch, pq->vnum);
 	
 	LL_DELETE(GET_QUESTS(ch), pq);
 	pq->next = NULL;
 	free_player_quests(pq);
-	
-	// TODO remove quest items
 }
 
 

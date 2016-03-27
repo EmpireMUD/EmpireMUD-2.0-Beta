@@ -691,6 +691,59 @@ void refresh_all_quests(char_data *ch) {
 
 
 /**
+* Checks a character and removes all items for quests they're not on.
+*
+* @param char_data *ch The player.
+*/
+void remove_quest_items(char_data *ch) {
+	obj_data *obj, *next_obj;
+	int iter;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if ((obj = GET_EQ(ch, iter)) && GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
+			act("You lose $p because you are not on the right quest.", FALSE, ch, obj, NULL, TO_CHAR);
+			extract_obj(obj);
+		}
+	}
+	
+	LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+		if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
+			act("You lose $p because you are not on the right quest.", FALSE, ch, obj, NULL, TO_CHAR);
+			extract_obj(obj);
+		}
+	}
+}
+
+
+/**
+* Silently removes all items related to the quest.
+*
+* @param char_data *ch The player to take items from.
+* @param any_vnum vnum The quest to remove items for.
+*/
+void remove_quest_items_by_quest(char_data *ch, any_vnum vnum) {
+	obj_data *obj, *next_obj;
+	int iter;
+	
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if ((obj = GET_EQ(ch, iter)) && GET_OBJ_REQUIRES_QUEST(obj) == vnum) {
+			extract_obj(obj);
+		}
+	}
+	
+	LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+		if (GET_OBJ_REQUIRES_QUEST(obj) == vnum) {
+			extract_obj(obj);
+		}
+	}
+}
+
+
+/**
 * Copies entries from one list into another, only if they are not already in
 * the to_list.
 *
