@@ -692,6 +692,8 @@ void free_char(char_data *ch) {
 	void die_follower(char_data *ch);
 	void free_alias(struct alias_data *a);
 	void free_mail(struct mail_data *mail);
+	void free_player_completed_quests(struct player_completed_quest **hash);
+	void free_player_quests(struct player_quest *list);
 
 	struct slash_channel *loadslash, *next_loadslash;
 	struct player_ability_data *abil, *next_abil;
@@ -853,6 +855,9 @@ void free_char(char_data *ch) {
 			HASH_DEL(GET_ABILITY_HASH(ch), abil);
 			free(abil);
 		}
+		
+		free_player_completed_quests(&GET_COMPLETED_QUESTS(ch));
+		free_player_quests(GET_QUESTS(ch));
 		
 		free(ch->player_specials);
 		if (IS_NPC(ch)) {
@@ -2939,6 +2944,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// place character
 	char_to_room(ch, load_room);
+	qt_visit_room(ch, IN_ROOM(ch));
 	ch->prev_logon = ch->player.time.logon;	// and update prev_logon now
 	
 	// verify morph stats

@@ -2241,11 +2241,18 @@ void claim_room(room_data *room, empire_data *emp) {
 	ROOM_OWNER(room) = emp;
 	remove_room_extra_data(room, ROOM_EXTRA_CEDED);	// not ceded if just claimed
 	
+	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
+		qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
+	}
+	
 	for (iter = interior_room_list; iter; iter = next_iter) {
 		next_iter = iter->next_interior;
 		
 		if (HOME_ROOM(iter) == home) {
 			ROOM_OWNER(iter) = emp;
+			if (GET_BUILDING(iter) && IS_COMPLETE(iter)) {
+				qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(iter)));
+			}
 			remove_room_extra_data(iter, ROOM_EXTRA_CEDED);	// not ceded if just claimed
 		}
 	}
@@ -2397,9 +2404,11 @@ int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, in
 void perform_abandon_room(room_data *room) {
 	void deactivate_workforce_room(empire_data *emp, room_data *room);
 	
+	empire_data *emp = ROOM_OWNER(room);
+	
 	// ensure workforce is shut off
-	if (ROOM_OWNER(room)) {
-		deactivate_workforce_room(ROOM_OWNER(room), room);
+	if (emp) {
+		deactivate_workforce_room(emp, room);
 	}
 	
 	ROOM_OWNER(room) = NULL;
@@ -2414,6 +2423,10 @@ void perform_abandon_room(room_data *room) {
 	// if a city center is abandoned, destroy it
 	if (IS_CITY_CENTER(room)) {
 		disassociate_building(room);
+	}
+	
+	if (emp && GET_BUILDING(room) && IS_COMPLETE(room)) {
+		qt_empire_players(emp, qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
 	}
 }
 

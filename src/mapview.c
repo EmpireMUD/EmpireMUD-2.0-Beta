@@ -475,6 +475,7 @@ bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container
 */
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	extern bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_list **build_list);
+	extern bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp_list **build_list);
 	void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options);
 	void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
 	void list_char_to_char(char_data *list, char_data *ch);
@@ -875,6 +876,9 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	
 	if (can_get_quest_from_room(ch, room, NULL)) {
 		msg_to_char(ch, "There is a quest here for you!\r\n");
+	}
+	if (can_turn_quest_in_to_room(ch, room, NULL)) {
+		msg_to_char(ch, "You can turn in a quest here!\r\n");
 	}
 	
 	// mappc data

@@ -831,6 +831,9 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
 		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
 		act("$V is finished!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
+		if (VEH_OWNER(veh)) {
+			qt_empire_players(VEH_OWNER(veh), qt_gain_vehicle, VEH_VNUM(veh));
+		}
 		
 		// stop all actors on this type
 		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {

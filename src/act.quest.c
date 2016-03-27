@@ -180,6 +180,8 @@ void drop_quest(char_data *ch, struct player_quest *pq) {
 		return;
 	}
 	
+	qt_lose_quest(ch, pq->vnum);
+	
 	LL_DELETE(GET_QUESTS(ch), pq);
 	pq->next = NULL;
 	free_player_quests(pq);
@@ -242,6 +244,8 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
 	
 	LL_PREPEND(GET_QUESTS(ch), pq);
 	refresh_one_quest_tracker(ch, pq);
+	
+	qt_start_quest(ch, QUEST_VNUM(qst));
 }
 
 
@@ -308,7 +312,7 @@ QCMD(qcmd_drop) {
 * @param struct player_quest *pq The quest to attempt to finish.
 * @param bool show_errors If FALSE, runs silently (e.g. trying to turn in all).
 */
-bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {	
+bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 	extern bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empire_data **giver_emp);
 	void clear_char_abilities(char_data *ch, any_vnum skill);
 	
@@ -351,6 +355,8 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 	}
 	
 	// SUCCESS
+	qt_quest_completed(ch, pq->vnum);
+	qt_lose_quest(ch, pq->vnum);
 	
 	msg_to_char(ch, "You have finished %s!\r\n%s", QUEST_NAME(quest), NULLSAFE(QUEST_COMPLETE_MSG(quest)));
 	act("$n has finished $t!", TRUE, ch, QUEST_NAME(quest), NULL, TO_ROOM);

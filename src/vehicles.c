@@ -112,6 +112,7 @@ void fully_empty_vehicle(vehicle_data *veh) {
 					char_to_room(ch, IN_ROOM(veh));
 					look_at_room(ch);
 					act("$n is ejected from $V!", TRUE, ch, NULL, veh, TO_ROOM);
+					qt_visit_room(ch, IN_ROOM(ch));
 				}
 				else {
 					extract_char(ch);

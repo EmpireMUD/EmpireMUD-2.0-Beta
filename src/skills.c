@@ -1162,6 +1162,8 @@ void set_skill(char_data *ch, any_vnum skill, int level) {
 		if (!gain) {
 			reset_skill_gain_tracker_on_abilities_above_level(ch, skill);
 		}
+		
+		qt_change_skill_level(ch, skill);
 	}
 }
 

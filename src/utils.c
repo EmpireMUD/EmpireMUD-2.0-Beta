@@ -4617,6 +4617,7 @@ void relocate_players(room_data *room, room_data *to_room) {
 			look_at_room(ch);
 			act("$n appears in the middle of the room!", TRUE, ch, NULL, NULL, TO_ROOM);
 			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+			qt_visit_room(ch, IN_ROOM(ch));
 		}
 	}
 }

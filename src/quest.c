@@ -1334,6 +1334,495 @@ struct player_quest *is_on_quest(char_data *ch, any_vnum quest) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// QUEST TRACKERS //////////////////////////////////////////////////////////
+
+/**
+* Quest Tracker: ch gains or loses skill
+*
+* @param char_data *ch The player.
+* @param any_vnum skl The skill vnum.
+*/
+void qt_change_skill_level(char_data *ch, any_vnum skl) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	
+	if (!IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == QT_SKILL_LEVEL_OVER && task->vnum == skl) {
+				task->current = (get_skill_level(ch, skl) >= task->needed ? task->needed : 0);
+			}
+			else if (task->type == QT_SKILL_LEVEL_UNDER && task->vnum == skl) {
+				task->current = (get_skill_level(ch, skl) <= task->needed ? task->needed : 0);
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: ch drops (or otherwise loses) an item
+*
+* Note: Call this AFTER taking the obj away.
+*
+* @param char_data *ch The player.
+* @param obj_data *obj The item.
+*/
+void qt_drop_obj(char_data *ch, obj_data *obj) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	bool refresh, full;
+	
+	if (!IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		refresh = FALSE;
+		LL_FOREACH(pq->tracker, task) {
+			full = (task->current >= task->needed);
+			
+			if (task->type == QT_GET_COMPONENT && GET_OBJ_CMP_TYPE(obj) == task->vnum && (GET_OBJ_CMP_FLAGS(obj) & task->misc) == task->misc) {
+				--task->current;
+			}
+			else if (task->type == QT_GET_OBJECT && GET_OBJ_VNUM(obj) == task->vnum) {
+				--task->current;
+			}
+			
+			// check min
+			task->current = MAX(task->current, 0);
+			
+			// if it was full, they might still have more.. must check
+			if (full && task->current < task->needed) {
+				refresh = TRUE;
+			}
+		}
+		
+		if (refresh) {
+			refresh_one_quest_tracker(ch, pq);
+		}
+	}
+}
+
+
+/**
+* This can be used to call several different qt functions on all members of
+* an empire online.
+*
+* @param empire_data *emp The empire to call the function on.
+* @param void (*func)(char_data *ch, any_vnum vnum) The function to call.
+* @param any_vnum vnum The vnum to pass to the function.
+*/
+void qt_empire_players(empire_data *emp, void (*func)(char_data *ch, any_vnum vnum), any_vnum vnum) {
+	descriptor_data *desc;
+	char_data *ch;
+	
+	if (!emp || !func || vnum == NOTHING) {
+		return;
+	}
+	
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) != CON_PLAYING || !(ch = desc->character)) {
+			continue;
+		}
+		if (GET_LOYALTY(ch) != emp) {
+			continue;
+		}
+		
+		// call it
+		(func)(ch, vnum);
+	}
+}
+
+
+/**
+* Quest Tracker: ch gets a building
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The building vnum.
+*/
+void qt_gain_building(char_data *ch, any_vnum vnum) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	
+	if (!IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == QT_OWN_BUILDING && task->vnum == vnum) {
+				++task->current;
+		
+				// check max
+				task->current = MIN(task->current, task->needed);
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: ch gets a vehicle
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The vehicle vnum.
+*/
+void qt_gain_vehicle(char_data *ch, any_vnum vnum) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	
+	if (!IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == QT_OWN_VEHICLE && task->vnum == vnum) {
+				++task->current;
+		
+				// check max
+				task->current = MIN(task->current, task->needed);
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: ch obtains an item
+*
+* @param char_data *ch The player.
+* @param obj_data *obj The item.
+*/
+void qt_get_obj(char_data *ch, obj_data *obj) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	
+	if (!IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == QT_GET_COMPONENT && GET_OBJ_CMP_TYPE(obj) == task->vnum && (GET_OBJ_CMP_FLAGS(obj) & task->misc) == task->misc) {
+				++task->current;
+			}
+			else if (task->type == QT_GET_OBJECT && GET_OBJ_VNUM(obj) == task->vnum) {
+				++task->current;
+			}
+		}
+		
+		// check max
+		task->current = MIN(task->current, task->needed);
+	}
+}
+
+
+/**
+* Quest Tracker: ch kills a mob
+*
+* @param char_data *ch The player.
+* @param char_data *mob The mob killed.
+*/
+void qt_kill_mob(char_data *ch, char_data *mob) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	
+	if (!IS_NPC(ch) || !IS_NPC(mob)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == QT_KILL_MOB_FLAGGED && (MOB_FLAGS(mob) & task->misc) == task->misc) {
+				++task->current;
+			}
+			else if (task->type == QT_KILL_MOB && GET_MOB_VNUM(mob) == task->vnum) {
+				++task->current;
+			}
+		}
+		
+		// check max
+		task->current = MIN(task->current, task->needed);
+	}
+}
+
+
+/**
+* Quest Tracker: ch loses/dismantles a building
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The building vnum.
+*/
+void qt_lose_building(char_data *ch, any_vnum vnum) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	bool refresh, full;
+	
+	if (!IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		refresh = FALSE;
+		LL_FOREACH(pq->tracker, task) {
+			full = (task->current >= task->needed);
+			
+			if (task->type == QT_OWN_BUILDING && task->vnum == vnum) {
+				--task->current;
+			}
+			
+			// check min
+			task->current = MAX(task->current, 0);
+			
+			// if it was full, they might still have more.. must check
+			if (full && task->current < task->needed) {
+				refresh = TRUE;
+			}
+		}
+		
+		if (refresh) {
+			refresh_one_quest_tracker(ch, pq);
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: ch drops/finishes a quest
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The quest vnum.
+*/
+void qt_lose_quest(char_data *ch, any_vnum vnum) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	
+	if (!IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == QT_NOT_ON_QUEST && task->vnum == vnum) {
+				task->current = task->needed;
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: ch loses a vehicle
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The vehicle vnum.
+*/
+void qt_lose_vehicle(char_data *ch, any_vnum vnum) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	bool refresh, full;
+	
+	if (!IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		refresh = FALSE;
+		LL_FOREACH(pq->tracker, task) {
+			full = (task->current >= task->needed);
+			
+			if (task->type == QT_OWN_VEHICLE && task->vnum == vnum) {
+				--task->current;
+			}
+			
+			// check min
+			task->current = MAX(task->current, 0);
+			
+			// if it was full, they might still have more.. must check
+			if (full && task->current < task->needed) {
+				refresh = TRUE;
+			}
+		}
+		
+		if (refresh) {
+			refresh_one_quest_tracker(ch, pq);
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: ch completes a quest
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The quest vnum.
+*/
+void qt_quest_completed(char_data *ch, any_vnum vnum) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	
+	if (!IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == QT_COMPLETED_QUEST && task->vnum == vnum) {
+				task->current = task->needed;
+			}
+			else if (task->type == QT_NOT_COMPLETED_QUEST && task->vnum == vnum) {
+				task->current = 0;
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: ch starts a quest
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The quest vnum.
+*/
+void qt_start_quest(char_data *ch, any_vnum vnum) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	
+	if (!IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == QT_NOT_ON_QUEST && task->vnum == vnum) {
+				task->current = 0;
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: mark a triggered condition for 1 quest
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The quest to mark.
+*/
+void qt_triggered_task(char_data *ch, any_vnum vnum) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	
+	if (!IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		if (pq->vnum == vnum) {
+			LL_FOREACH(pq->tracker, task) {
+				if (task->type == QT_TRIGGERED) {
+					task->current = task->needed;
+				}
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: ch visits a building
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The building vnum.
+*/
+void qt_visit_building(char_data *ch, any_vnum vnum) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	
+	if (!IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == QT_VISIT_BUILDING && task->vnum == vnum) {
+				task->current = task->needed;
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: ch visits a room template
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The rmt vnum.
+*/
+void qt_visit_room_template(char_data *ch, any_vnum vnum) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	
+	if (!IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == QT_VISIT_ROOM_TEMPLATE && task->vnum == vnum) {
+				task->current = task->needed;
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: ch visits a sector
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The sector vnum.
+*/
+void qt_visit_sector(char_data *ch, any_vnum vnum) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	
+	if (!IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == QT_VISIT_SECTOR && task->vnum == vnum) {
+				task->current = task->needed;
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: run all 'visit' types on the room.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The sector vnum.
+*/
+void qt_visit_room(char_data *ch, room_data *room) {
+	qt_visit_sector(ch, GET_SECT_VNUM(SECT(room)));
+	if (GET_BUILDING(room)) {
+		qt_visit_building(ch, GET_BLD_VNUM(GET_BUILDING(room)));
+	}
+	if (GET_ROOM_TEMPLATE(room)) {
+		qt_visit_room_template(ch, GET_RMT_VNUM(GET_ROOM_TEMPLATE(room)));
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 
 /**
@@ -2333,6 +2822,20 @@ struct quest_task *copy_quest_tasks(struct quest_task *from) {
 	}
 	
 	return list;
+}
+
+
+/**
+* Frees a player completed-quests hash.
+*
+* @param struct player_completed_quest **hash A pointer to the hash to free.
+*/
+void free_player_completed_quests(struct player_completed_quest **hash) {
+	struct player_completed_quest *pcq, *next_pcq;
+	HASH_ITER(hh, *hash, pcq, next_pcq) {
+		free(pcq);
+	}
+	*hash = NULL;
 }
 
 

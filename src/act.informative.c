@@ -671,6 +671,7 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 */
 void list_one_char(char_data *i, char_data *ch, int num) {
 	extern bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
+	extern bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
 	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern struct action_data_struct action_data[];
 	
@@ -811,6 +812,9 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	
 	if (can_get_quest_from_mob(ch, i, NULL)) {
 		act("...$e has a quest for you!", FALSE, i, NULL, ch, TO_VICT);
+	}
+	if (can_turn_quest_in_to_mob(ch, i, NULL)) {
+		act("...you can finish a quest here!", FALSE, i, NULL, ch, TO_VICT);
 	}
 	if (affected_by_spell(i, ATYPE_FLY)) {
 		act("...$e is flying with gossamer mana wings!", FALSE, i, 0, ch, TO_VICT);
@@ -1282,6 +1286,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	extern int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board);
 	extern int board_loaded;
 	extern bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list);
+	extern bool can_turn_quest_in_to_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list);
 	void init_boards(void);
 	extern int find_board(char_data *ch);
 	extern const char *extra_bits_inv_flags[];
@@ -1318,6 +1323,9 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	if (mode == OBJ_DESC_INVENTORY || (mode == OBJ_DESC_LONG && CAN_WEAR(obj, ITEM_WEAR_TAKE))) {
 		if (can_get_quest_from_obj(ch, obj, NULL)) {
 			strcat(buf, " (quest available)");
+		}
+		if (can_turn_quest_in_to_obj(ch, obj, NULL)) {
+			strcat(buf, " (finished quest)");
 		}
 	}
 	
@@ -1364,6 +1372,9 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	if (mode == OBJ_DESC_LONG && !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 		if (can_get_quest_from_obj(ch, obj, NULL)) {
 			strcat(buf, "...it has a quest for you!\r\n");
+		}
+		if (can_turn_quest_in_to_obj(ch, obj, NULL)) {
+			strcat(buf, "...you can turn in a quest here!\r\n");
 		}
 	}
 	

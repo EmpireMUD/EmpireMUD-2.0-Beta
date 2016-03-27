@@ -215,6 +215,7 @@ void perform_escape(char_data *ch) {
 		look_at_room(ch);
 		
 		GET_LAST_DIR(ch) = NO_DIR;
+		qt_visit_room(ch, IN_ROOM(ch));
 		
 		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 		entry_memory_mtrigger(ch);
@@ -1057,6 +1058,8 @@ ACMD(do_infiltrate) {
 			greet_mtrigger(ch, NO_DIR);
 			greet_memory_mtrigger(ch);
 			greet_vtrigger(ch, NO_DIR);
+			
+			qt_visit_room(ch, IN_ROOM(ch));
 		}
 
 		// chance to log
@@ -1556,6 +1559,8 @@ ACMD(do_shadowstep) {
 			greet_mtrigger(ch, NO_DIR);
 			greet_memory_mtrigger(ch);
 			greet_vtrigger(ch, NO_DIR);
+			
+			qt_visit_room(ch, IN_ROOM(ch));
 		}
 
 		// chance to log

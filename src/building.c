@@ -179,6 +179,10 @@ void complete_building(room_data *room) {
 	// lastly
 	if ((emp = ROOM_OWNER(room))) {
 		read_empire_territory(emp);
+		
+		if (GET_BUILDING(room)) {
+			qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
+		}
 	}
 }
 
@@ -288,6 +292,10 @@ void disassociate_building(room_data *room) {
 	room_data *iter, *next_iter;
 	struct instance_data *inst;
 	bool deleted = FALSE;
+	
+	if (ROOM_OWNER(room) && GET_BUILDING(room) && IS_COMPLETE(room)) {
+		qt_empire_players(ROOM_OWNER(room), qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
+	}
 	
 	// delete any open instance here
 	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room, FALSE))) {
@@ -959,6 +967,10 @@ void start_dismantle_building(room_data *loc) {
 	SET_BIT(ROOM_AFF_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	delete_room_npcs(loc, NULL);
+	
+	if (loc && ROOM_OWNER(loc) && GET_BUILDING(loc) && complete) {
+		qt_empire_players(ROOM_OWNER(loc), qt_lose_building, GET_BLD_VNUM(GET_BUILDING(loc)));
+	}
 }
 
 

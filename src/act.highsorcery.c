@@ -1627,6 +1627,8 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 		// reset this in case they teleport onto a wall.
 		GET_LAST_DIR(ch) = NO_DIR;
 		
+		qt_visit_room(ch, IN_ROOM(ch));
+		
 		// any existing adventure summon location is no longer valid after a voluntary teleport
 		if (!random) {	// except random teleport
 			cancel_adventure_summon(ch);

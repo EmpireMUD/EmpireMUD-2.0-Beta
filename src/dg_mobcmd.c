@@ -962,6 +962,7 @@ ACMD(do_mteleport) {
 				char_from_room(vict);
 				char_to_room(vict, target);
 				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR);
+				qt_visit_room(vict, IN_ROOM(vict));
 			}
 		}
 	}
@@ -990,6 +991,7 @@ ACMD(do_mteleport) {
 							GET_LAST_DIR(vict) = NO_DIR;
 						}
 						enter_wtrigger(IN_ROOM(vict), ch, NO_DIR);
+						qt_visit_room(vict, IN_ROOM(vict));
 					}
 				}
 			}
@@ -1004,6 +1006,7 @@ ACMD(do_mteleport) {
 				char_from_room(vict);
 				char_to_room(vict, target);
 				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR);
+				qt_visit_room(vict, IN_ROOM(vict));
 			}
 		}
 		else if ((*arg1 == UID_CHAR && (veh = get_vehicle(arg1))) || (veh = get_vehicle_in_room_vis(ch, arg1))) {

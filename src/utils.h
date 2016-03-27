@@ -1383,6 +1383,20 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 
 // utils from quest.c
 extern char *get_quest_name_by_proto(any_vnum vnum);
+void qt_change_skill_level(char_data *ch, any_vnum skl);
+void qt_drop_obj(char_data *ch, obj_data *obj);
+void qt_empire_players(empire_data *emp, void (*func)(char_data *ch, any_vnum vnum), any_vnum vnum);
+void qt_gain_building(char_data *ch, any_vnum vnum);
+void qt_gain_vehicle(char_data *ch, any_vnum vnum);
+void qt_get_obj(char_data *ch, obj_data *obj);
+void qt_kill_mob(char_data *ch, char_data *mob);
+void qt_lose_building(char_data *ch, any_vnum vnum);
+void qt_lose_quest(char_data *ch, any_vnum vnum);
+void qt_lose_vehicle(char_data *ch, any_vnum vnum);
+void qt_quest_completed(char_data *ch, any_vnum vnum);
+void qt_start_quest(char_data *ch, any_vnum vnum);
+void qt_triggered_task(char_data *ch, any_vnum vnum);
+void qt_visit_room(char_data *ch, room_data *room);
 
 // utils from vehicles.c
 extern char *get_vehicle_name_by_proto(obj_vnum vnum);

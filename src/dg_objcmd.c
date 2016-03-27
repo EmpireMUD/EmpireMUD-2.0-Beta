@@ -756,6 +756,7 @@ OCMD(do_oteleport) {
 				GET_LAST_DIR(ch) = NO_DIR;
 			}
 			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+			qt_visit_room(ch, IN_ROOM(ch));
 		}
 	}
 	else if (!str_cmp(arg1, "adventure")) {
@@ -783,6 +784,7 @@ OCMD(do_oteleport) {
 							GET_LAST_DIR(ch) = NO_DIR;
 						}
 						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+						qt_visit_room(ch, IN_ROOM(ch));
 					}
 				}
 			}
@@ -797,6 +799,7 @@ OCMD(do_oteleport) {
 					GET_LAST_DIR(ch) = NO_DIR;
 				}
 				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+				qt_visit_room(ch, IN_ROOM(ch));
 			}
 		}
 		else if ((veh = get_vehicle_near_obj(obj, arg1))) {
