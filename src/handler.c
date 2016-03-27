@@ -4237,7 +4237,7 @@ void obj_to_char_if_okay(obj_data *obj, char_data *ch) {
 	if (!bind_ok(obj, ch)) {
 		ok = FALSE;
 	}
-	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch) && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
 		ok = FALSE;
 	}
 	

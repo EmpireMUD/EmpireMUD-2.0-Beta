@@ -693,13 +693,15 @@ void refresh_all_quests(char_data *ch) {
 /**
 * Checks a character and removes all items for quests they're not on.
 *
+* Does not affect immortals.
+*
 * @param char_data *ch The player.
 */
 void remove_quest_items(char_data *ch) {
 	obj_data *obj, *next_obj;
 	int iter;
 	
-	if (IS_NPC(ch)) {
+	if (IS_NPC(ch) || IS_IMMORTAL(ch)) {
 		return;
 	}
 	
@@ -721,6 +723,9 @@ void remove_quest_items(char_data *ch) {
 
 /**
 * Silently removes all items related to the quest.
+*
+* Unlike the all-quest-items version, this one DOES apply to immortals because
+* they ended the quest.
 *
 * @param char_data *ch The player to take items from.
 * @param any_vnum vnum The quest to remove items for.

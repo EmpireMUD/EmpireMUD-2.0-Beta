@@ -603,7 +603,7 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 		msg_to_char(ch, "You can't put bound items in items here.\r\n");
 		return 0;
 	}
-	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch)) {
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
 		act("$p: you can't drop quest items.", FALSE, ch, obj, NULL, TO_CHAR);
 		return 0;
 	}
@@ -830,7 +830,7 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 		return 0;	// don't break a drop-all
 	}
 	
-	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch)) {
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
 		act("$p: you can't drop quest items.", FALSE, ch, obj, NULL, TO_CHAR);
 		return 0;
 	}
@@ -953,7 +953,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR);
 		return TRUE;	// don't break loop
 	}
-	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch) && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
 		act("$p: you must be on the quest to get this.", FALSE, ch, obj, NULL, TO_CHAR);
 		return TRUE;
 	}
@@ -1095,7 +1095,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 			return FALSE;
 		}
 	}
-	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch) && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
 		act("$p: you must be on the quest to get this.", FALSE, ch, obj, NULL, TO_CHAR);
 		return TRUE;
 	}
