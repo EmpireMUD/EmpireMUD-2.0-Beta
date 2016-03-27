@@ -50,6 +50,7 @@ extern bool can_steal(char_data *ch, empire_data *emp);
 extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 void expire_trading_post_item(struct trading_post_data *tpd);
 extern char *get_room_name(room_data *room, bool color);
+extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 void read_vault(empire_data *emp);
 void save_trading_post();
 void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
@@ -602,6 +603,10 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 		msg_to_char(ch, "You can't put bound items in items here.\r\n");
 		return 0;
 	}
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch)) {
+		act("$p: you can't drop quest items.", FALSE, ch, obj, NULL, TO_CHAR);
+		return 0;
+	}
 	
 	if (GET_OBJ_CARRYING_N(cont) + obj_carry_size(obj) > GET_MAX_CONTAINER_CONTENTS(cont)) {
 		act("$p won't fit in $P.", FALSE, ch, obj, cont, TO_CHAR);
@@ -825,6 +830,11 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 		return 0;	// don't break a drop-all
 	}
 	
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch)) {
+		act("$p: you can't drop quest items.", FALSE, ch, obj, NULL, TO_CHAR);
+		return 0;
+	}
+	
 	// count items
 	if (mode != SCMD_JUNK && need_capacity) {
 		size = (OBJ_FLAGGED(obj, OBJ_LARGE) ? 2 : 1);
@@ -942,6 +952,10 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 	if (!bind_ok(obj, ch)) {
 		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR);
 		return TRUE;	// don't break loop
+	}
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
+		act("$p: you must be on the quest to get this.", FALSE, ch, obj, NULL, TO_CHAR);
+		return TRUE;
 	}
 	if (IN_ROOM(cont) && LAST_OWNER_ID(cont) != idnum && LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		stealing = TRUE;
@@ -1080,6 +1094,10 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 			msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
 			return FALSE;
 		}
+	}
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
+		act("$p: you must be on the quest to get this.", FALSE, ch, obj, NULL, TO_CHAR);
+		return TRUE;
 	}
 	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
 		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);

@@ -5753,6 +5753,11 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping)
 bool obj_can_be_stored(obj_data *obj, room_data *loc) {
 	struct obj_storage_type *store;
 	
+	// quest items don't store
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+		return FALSE;
+	}
+	
 	for (store = obj->storage; store; store = store->next) {
 		if (BUILDING_VNUM(loc) != NOTHING && store->building_type == BUILDING_VNUM(loc)) {
 			return TRUE;

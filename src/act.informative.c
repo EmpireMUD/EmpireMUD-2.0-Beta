@@ -1315,6 +1315,10 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 			sprintf(buf + strlen(buf), " %.*s", ((int)strlen(flags)-1), flags);	// remove trailing space
 		}
 		
+		if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+			strcat(buf, " (quest)");
+		}
+		
 		if (IS_STOLEN(obj)) {
 			strcat(buf, " (STOLEN)");
 		}
