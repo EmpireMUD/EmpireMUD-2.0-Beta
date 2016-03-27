@@ -4084,6 +4084,8 @@ void obj_from_char(obj_data *object) {
 		if (IN_ROOM(object->carried_by) && OBJ_FLAGGED(object, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(object->carried_by))--;
 		}
+		
+		qt_drop_obj(object->carried_by, object);
 
 		object->carried_by = NULL;
 	}
@@ -4211,6 +4213,8 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		if (IN_ROOM(ch) && OBJ_FLAGGED(object, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(ch))++;
 		}
+		
+		qt_get_obj(ch, object);
 	}
 	else {
 		log("SYSERR: NULL obj (%p) or char (%p) passed to obj_to_char.", object, ch);

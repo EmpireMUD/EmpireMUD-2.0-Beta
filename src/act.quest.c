@@ -204,7 +204,7 @@ void show_quest_tracker(char_data *ch, struct player_quest *pq) {
 	
 	LL_FOREACH(pq->tracker, task) {
 		if (quest_tracker_has_amount[task->type]) {
-			sprintf(buf, " (%d/%d)", task->current, task->needed);
+			sprintf(buf, " (%d/%d)", MIN(task->current, task->needed), task->needed);
 		}
 		else {
 			*buf = '\0';

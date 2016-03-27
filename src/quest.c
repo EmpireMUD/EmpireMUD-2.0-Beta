@@ -516,12 +516,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 			}
 			case QT_GET_COMPONENT: {
 				task->current = count_quest_components(ch, task->vnum, task->misc, QUEST_FLAGGED(quest, QST_EXTRACT_TASK_OBJECTS));
-				task->current = MIN(task->current, task->needed);
 				break;
 			}
 			case QT_GET_OBJECT: {
 				task->current = count_quest_objects(ch, task->vnum, QUEST_FLAGGED(quest, QST_EXTRACT_TASK_OBJECTS));
-				task->current = MIN(task->current, task->needed);
 				break;
 			}
 			case QT_NOT_COMPLETED_QUEST: {
@@ -580,6 +578,24 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				break;
 			}
 		}
+	}
+}
+
+
+/**
+* Makes sure all of a player's quest objectives are current.
+*
+* @param char_data *ch The player to check.
+*/
+void refresh_all_quests(char_data *ch) {
+	struct player_quest *pq;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		refresh_one_quest_tracker(ch, pq);
 	}
 }
 
@@ -1374,17 +1390,13 @@ void qt_change_skill_level(char_data *ch, any_vnum skl) {
 void qt_drop_obj(char_data *ch, obj_data *obj) {
 	struct player_quest *pq;
 	struct quest_task *task;
-	bool refresh, full;
 	
 	if (!IS_NPC(ch)) {
 		return;
 	}
 	
 	LL_FOREACH(GET_QUESTS(ch), pq) {
-		refresh = FALSE;
 		LL_FOREACH(pq->tracker, task) {
-			full = (task->current >= task->needed);
-			
 			if (task->type == QT_GET_COMPONENT && GET_OBJ_CMP_TYPE(obj) == task->vnum && (GET_OBJ_CMP_FLAGS(obj) & task->misc) == task->misc) {
 				--task->current;
 			}
@@ -1394,15 +1406,6 @@ void qt_drop_obj(char_data *ch, obj_data *obj) {
 			
 			// check min
 			task->current = MAX(task->current, 0);
-			
-			// if it was full, they might still have more.. must check
-			if (full && task->current < task->needed) {
-				refresh = TRUE;
-			}
-		}
-		
-		if (refresh) {
-			refresh_one_quest_tracker(ch, pq);
 		}
 	}
 }
@@ -1456,9 +1459,6 @@ void qt_gain_building(char_data *ch, any_vnum vnum) {
 		LL_FOREACH(pq->tracker, task) {
 			if (task->type == QT_OWN_BUILDING && task->vnum == vnum) {
 				++task->current;
-		
-				// check max
-				task->current = MIN(task->current, task->needed);
 			}
 		}
 	}
@@ -1483,9 +1483,6 @@ void qt_gain_vehicle(char_data *ch, any_vnum vnum) {
 		LL_FOREACH(pq->tracker, task) {
 			if (task->type == QT_OWN_VEHICLE && task->vnum == vnum) {
 				++task->current;
-		
-				// check max
-				task->current = MIN(task->current, task->needed);
 			}
 		}
 	}
@@ -1515,9 +1512,6 @@ void qt_get_obj(char_data *ch, obj_data *obj) {
 				++task->current;
 			}
 		}
-		
-		// check max
-		task->current = MIN(task->current, task->needed);
 	}
 }
 
@@ -1545,9 +1539,6 @@ void qt_kill_mob(char_data *ch, char_data *mob) {
 				++task->current;
 			}
 		}
-		
-		// check max
-		task->current = MIN(task->current, task->needed);
 	}
 }
 
@@ -1561,32 +1552,19 @@ void qt_kill_mob(char_data *ch, char_data *mob) {
 void qt_lose_building(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct quest_task *task;
-	bool refresh, full;
 	
 	if (!IS_NPC(ch)) {
 		return;
 	}
 	
 	LL_FOREACH(GET_QUESTS(ch), pq) {
-		refresh = FALSE;
 		LL_FOREACH(pq->tracker, task) {
-			full = (task->current >= task->needed);
-			
 			if (task->type == QT_OWN_BUILDING && task->vnum == vnum) {
 				--task->current;
 			}
 			
 			// check min
 			task->current = MAX(task->current, 0);
-			
-			// if it was full, they might still have more.. must check
-			if (full && task->current < task->needed) {
-				refresh = TRUE;
-			}
-		}
-		
-		if (refresh) {
-			refresh_one_quest_tracker(ch, pq);
 		}
 	}
 }
@@ -1625,32 +1603,19 @@ void qt_lose_quest(char_data *ch, any_vnum vnum) {
 void qt_lose_vehicle(char_data *ch, any_vnum vnum) {
 	struct player_quest *pq;
 	struct quest_task *task;
-	bool refresh, full;
 	
 	if (!IS_NPC(ch)) {
 		return;
 	}
 	
 	LL_FOREACH(GET_QUESTS(ch), pq) {
-		refresh = FALSE;
 		LL_FOREACH(pq->tracker, task) {
-			full = (task->current >= task->needed);
-			
 			if (task->type == QT_OWN_VEHICLE && task->vnum == vnum) {
 				--task->current;
 			}
 			
 			// check min
 			task->current = MAX(task->current, 0);
-			
-			// if it was full, they might still have more.. must check
-			if (full && task->current < task->needed) {
-				refresh = TRUE;
-			}
-		}
-		
-		if (refresh) {
-			refresh_one_quest_tracker(ch, pq);
 		}
 	}
 }

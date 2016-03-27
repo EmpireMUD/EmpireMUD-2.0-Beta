@@ -1908,6 +1908,8 @@ void send_login_motd(descriptor_data *desc, int bad_pws) {
  *      into person returns.  This function seems a bit over-extended too.
  */
 int perform_dupe_check(descriptor_data *d) {
+	void refresh_all_quests(char_data *ch);
+	
 	descriptor_data *k, *next_k;
 	char_data *target = NULL, *ch, *next_ch;
 	int mode = 0;
@@ -2029,6 +2031,7 @@ int perform_dupe_check(descriptor_data *d) {
 			break;
 	}
 	
+	refresh_all_quests(d->character);
 	MXPSendTag(d, "<VERSION>");
 	
 	// guarantee echo is on -- no, this could lead to an echo loop
