@@ -237,6 +237,7 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
 	// set up data
 	CREATE(pq, struct player_quest, 1);
 	pq->vnum = QUEST_VNUM(qst);
+	pq->version = QUEST_VERSION(qst);
 	pq->start_time = time(0);
 	pq->instance_id = inst ? inst->id : NOTHING;
 	pq->adventure = inst ? GET_ADV_VNUM(inst->adventure) : NOTHING;

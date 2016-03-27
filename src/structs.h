@@ -3664,6 +3664,7 @@ struct obj_storage_type {
 
 struct quest_data {
 	any_vnum vnum;
+	ush_int version;	// for auto-updating
 	
 	char *name;
 	char *description;	// is this also the start-quest message?
@@ -3749,6 +3750,7 @@ struct player_completed_quest {
 // quests the player is on
 struct player_quest {
 	any_vnum vnum;	// which quest
+	ush_int version;	// for auto-updating
 	time_t start_time;	// when started
 	
 	struct quest_task *tracker;	// quest tasks to track

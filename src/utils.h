@@ -966,6 +966,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define QUEST_SCRIPTS(quest)  ((quest)->proto_script)
 #define QUEST_STARTS_AT(quest)  ((quest)->starts_at)
 #define QUEST_TASKS(quest)  ((quest)->tasks)
+#define QUEST_VERSION(quest)  ((quest)->version)
 
 #define QUEST_FLAGGED(quest, flg)  IS_SET(QUEST_FLAGS(quest), (flg))
 

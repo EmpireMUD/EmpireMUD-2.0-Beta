@@ -3048,16 +3048,17 @@ void parse_quest(FILE *fl, any_vnum vnum) {
 	QUEST_DESCRIPTION(quest) = fread_string(fl, error);
 	QUEST_COMPLETE_MSG(quest) = fread_string(fl, error);
 	
-	// 4. flags min max repeatable-after
-	if (!get_line(fl, line) || sscanf(line, "%s %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2]) != 4) {
+	// 4. version flags min max repeatable-after
+	if (!get_line(fl, line) || sscanf(line, "%d %s %d %d %d", &int_in[0], str_in, &int_in[1], &int_in[2], &int_in[3]) != 5) {
 		log("SYSERR: Format error in line 4 of %s", error);
 		exit(1);
 	}
 	
+	QUEST_VERSION(quest) = int_in[0];
 	QUEST_FLAGS(quest) = asciiflag_conv(str_in);
-	QUEST_MIN_LEVEL(quest) = int_in[0];
-	QUEST_MAX_LEVEL(quest) = int_in[1];
-	QUEST_REPEATABLE_AFTER(quest) = int_in[2];
+	QUEST_MIN_LEVEL(quest) = int_in[1];
+	QUEST_MAX_LEVEL(quest) = int_in[2];
+	QUEST_REPEATABLE_AFTER(quest) = int_in[3];
 	
 	// optionals
 	for (;;) {
@@ -3201,8 +3202,8 @@ void write_quest_to_file(FILE *fl, quest_data *quest) {
 	strip_crlf(temp);
 	fprintf(fl, "%s~\n", temp);
 	
-	// 4. flags min max repeatable-after
-	fprintf(fl, "%s %d %d %d\n", bitv_to_alpha(QUEST_FLAGS(quest)), QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest), QUEST_REPEATABLE_AFTER(quest));
+	// 4. version flags min max repeatable-after
+	fprintf(fl, "%d %s %d %d %d\n", QUEST_VERSION(quest), bitv_to_alpha(QUEST_FLAGS(quest)), QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest), QUEST_REPEATABLE_AFTER(quest));
 		
 	// A. starts at
 	write_quest_givers_to_file(fl, 'A', QUEST_STARTS_AT(quest));
@@ -3429,6 +3430,9 @@ quest_data *setup_olc_quest(quest_data *input) {
 		QUEST_REWARDS(new) = copy_quest_rewards(QUEST_REWARDS(input));
 		QUEST_PREREQS(new) = copy_quest_tasks(QUEST_PREREQS(input));
 		QUEST_SCRIPTS(new) = copy_trig_protos(QUEST_SCRIPTS(input));
+		
+		// update version number
+		QUEST_VERSION(new) += 1;
 	}
 	else {
 		// brand new: some defaults
@@ -3436,6 +3440,7 @@ quest_data *setup_olc_quest(quest_data *input) {
 		QUEST_DESCRIPTION(new) = str_dup(default_quest_description);
 		QUEST_COMPLETE_MSG(new) = str_dup(default_quest_complete_msg);
 		QUEST_FLAGS(new) = QST_IN_DEVELOPMENT;
+		QUEST_VERSION(new) = 1;
 	}
 	
 	// done
