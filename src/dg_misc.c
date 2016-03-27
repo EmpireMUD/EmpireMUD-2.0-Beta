@@ -239,7 +239,6 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 	char vict_arg[MAX_INPUT_LENGTH], cmd_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH];
 	struct instance_data *inst = NULL;
 	struct player_quest *pq;
-	struct quest_task *task;
 	empire_data *emp = NULL;
 	room_data *room = NULL;
 	char_data *vict = NULL;
@@ -344,13 +343,7 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 		}
 	}
 	else if (is_abbrev(cmd_arg, "trigger")) {
-		if ((pq = is_on_quest(vict, QUEST_VNUM(quest)))) {
-			LL_FOREACH(pq->tracker, task) {
-				if (task->type == QT_TRIGGERED) {
-					task->current = task->needed;
-				}
-			}
-		}
+		qt_triggered_task(vict, QUEST_VNUM(quest));
 	}
 	else {
 		script_log_by_type(go_type, go, "dg_quest: invalid command '%s'", cmd_arg);
