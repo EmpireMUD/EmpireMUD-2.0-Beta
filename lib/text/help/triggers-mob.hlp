@@ -311,6 +311,7 @@ When using field  - The variable returns:
    This is the name that shows on your affects/score command when using active.
 &cblock&0 - Player's block rating.
 &cblood(amt)&0 - Returns current blood, or adds/removes blood if amt is set.
+&cbonus_exp(amt)&0 - Returns the player's bonus exp (adds to it if amt given)
 &cbonus_healing&0 - Character's Bonus-Healing trait.
 &cbonus_magical&0 - Character's Bonus-Magical damage trait.
 &cbonus_physical&0 - Character's Bonus-Physical damage trait.
@@ -331,6 +332,8 @@ When using field  - The variable returns:
    (defaults to current room).
 &ccha&0 - The actor's Charisma.
 &cclass&0 - The actor's class, as a string.
+&ccompleted_quest(vnum)% - Whether or not the player has completed and
+   turned in that quest vnum.
 &ccrafting_level&0 - The actor's crafting level.
 &cdex&0 - The actor's Dexterity.
 &cdir(name)&0 - Gives the name of the character's perceived direction
@@ -394,10 +397,15 @@ When using field  - The variable returns:
    for loops, or an empty return.
 &cnohassle&0 - If TRUE, the player is an immortal with !HASSLE on.
 &cnoskill(Skill)&0 - TRUE if the player has 'noskilled' that skill.
+&con_quest(vnum)&0 - TRUE if the player is currently on that quest.
 &cpc_name&0 - Player's name or mob's keyword list, rather than short desc
 &cplr_flagged(FLAG)&0 - Returns TRUE if the player has the given flag (VAMPIRE).
 &cpoison_immunity&0 - Returns TRUE if the player has Poison Immunity.
 &cposition&0 - Returns Standing, Sitting, Fighting, etc.
+&cquest_finished(vnum)&0 - TRUE if the player is on that quest and has all
+   tasks completed.
+&cquest_triggered(vnum)&0 - TRUE if the player is on the quest and that quest
+   has a 'triggered' task that has already been completed.
 &cremove_mob_flag(FLG)&0 - Removes a mob flag from the mob. Also, add_mob_flag().
 &cresist_magical&0 - Returns the amount of magic resistance the player has.
 &cresist_physical&0 - Returns the amount of physical resistance the player has.
