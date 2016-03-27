@@ -981,18 +981,22 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	int account_id = NOTHING, ignore_pos = 0, reward_pos = 0;
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	struct over_time_effect_type *dot, *last_dot = NULL;
+	struct player_quest *plrq, *last_plrq = NULL;
 	struct offer_data *offer, *last_offer = NULL;
 	struct alias_data *alias, *last_alias = NULL;
 	struct resource_data *res, *last_res = NULL;
 	struct coin_data *coin, *last_coin = NULL;
 	struct mail_data *mail, *last_mail = NULL;
+	struct player_completed_quest *plrcom;
 	struct player_ability_data *abildata;
 	struct player_skill_data *skdata;
 	int length, i_in[7], iter, num;
 	struct slash_channel *slash;
 	struct cooldown_data *cool;
 	struct affected_type *af;
+	struct quest_task *task;
 	account_data *acct;
+	bitvector_t bit_in;
 	bool end = FALSE;
 	obj_data *obj;
 	double dbl_in;
@@ -1015,24 +1019,25 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		CREATE(SCRIPT(ch), struct script_data, 1);
 	}
 	
-	// some parts may already be added, so find the end of aliases:
+	// some parts may already be added, so find the end of lists:
 	if ((last_alias = GET_ALIASES(ch))) {
 		while (last_alias->next) {
 			last_alias = last_alias->next;
 		}
 	}
-	
-	// find end of mailing list
 	if ((last_mail = GET_MAIL_PENDING(ch))) {
 		while (last_mail->next) {
 			last_mail = last_mail->next;
 		}
 	}
-	
-	// find end of resource list
 	if ((last_res = GET_ACTION_RESOURCES(ch))) {
 		while (last_res->next) {
 			last_res = last_res->next;
+		}
+	}
+	if ((last_plrq = GET_QUESTS(ch))) {
+		while (last_plrq->next) {
+			last_plrq = last_plrq->next;
 		}
 	}
 	
@@ -1552,6 +1557,55 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						free(GET_PROMPT(ch));
 					}
 					GET_PROMPT(ch) = str_dup(line + length + 1);	// do not trim
+				}
+				BAD_TAG_WARNING(line);
+				break;
+			}
+			case 'Q': {
+				if (PFILE_TAG(line, "Quest:", length)) {
+					if (sscanf(line + length + 1, "%d %d %ld %d %d", &i_in[0], &i_in[1], &l_in[0], &i_in[2], &i_in[3]) == 5) {
+						CREATE(plrq, struct player_quest, 1);
+						plrq->vnum = i_in[0];
+						plrq->version = i_in[1];
+						plrq->start_time = l_in[0];
+						plrq->instance_id = i_in[2];
+						plrq->adventure = i_in[3];
+						
+						if (last_plrq) {
+							last_plrq->next = plrq;
+						}
+						else {
+							GET_QUESTS(ch) = plrq;
+						}
+						last_plrq = plrq;
+					}
+				}
+				else if (PFILE_TAG(line, "Quest-cmp:", length)) {
+					if (sscanf(line + length + 1, "%d %ld %d %d", &i_in[0], &l_in[0], &i_in[1], &i_in[2]) == 4) {
+						HASH_FIND_INT(GET_COMPLETED_QUESTS(ch), &i_in[0], plrcom);
+						// ensure not already in table
+						if (!plrcom) {
+							CREATE(plrcom, struct player_completed_quest, 1);
+							plrcom->vnum = i_in[0];
+							plrcom->last_completed = l_in[0];
+							plrcom->last_instance_id = i_in[1];
+							plrcom->last_adventure = i_in[2];
+						
+							HASH_ADD_INT(GET_COMPLETED_QUESTS(ch), vnum, plrcom);
+						}
+					}
+				}
+				else if (PFILE_TAG(line, "Quest-task:", length)) {
+					if (last_plrq && sscanf(line + length + 1, "%d %d %lld %d %d", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3]) == 5) {
+						CREATE(task, struct quest_task, 1);
+						task->type = i_in[0];
+						task->vnum = i_in[1];
+						task->misc = l_in[0];
+						task->needed = i_in[2];
+						task->current = i_in[3];
+						
+						LL_APPEND(last_plrq->tracker, task);
+					}
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -2269,9 +2323,12 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	extern struct slash_channel *find_slash_channel_by_id(int id);
 	void write_mail_to_file(FILE *fl, char_data *ch);
 	
+	struct player_completed_quest *plrcom, *next_plrcom;
 	struct trig_var_data *vars;
+	struct player_quest *plrq;
 	struct alias_data *alias;
 	struct offer_data *offer;
+	struct quest_task *task;
 	struct coin_data *coin;
 	struct lore_data *lore;
 	int iter;
@@ -2310,6 +2367,17 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	// 'O'
 	for (offer = GET_OFFERS(ch); offer; offer = offer->next) {
 		fprintf(fl, "Offer: %d %d %d %ld %d\n", offer->from, offer->type, offer->location, offer->time, offer->data);
+	}
+	
+	// 'Q'
+	LL_FOREACH(GET_QUESTS(ch), plrq) {
+		fprintf(fl, "Quest: %d %d %ld %d %d\n", plrq->vnum, plrq->version, plrq->start_time, plrq->instance_id, plrq->adventure);
+		LL_FOREACH(plrq->tracker, task) {
+			fprintf(fl, "Quest-task: %d %d %lld %d %d\n", task->type, task->vnum, task->misc, task->needed, task->current);
+		}
+	}
+	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), plrcom, next_plrcom) {
+		fprintf(fl, "Quest-cmp: %d %ld %d %d\n", plrcom->vnum, plrcom->last_completed, plrcom->last_instance_id, plrcom->last_adventure);
 	}
 	
 	// 'S'
