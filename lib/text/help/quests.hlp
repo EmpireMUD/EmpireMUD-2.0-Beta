@@ -4,6 +4,7 @@ Usage:  quest <command> <...>
 
 The following quest commands are available:
  &cquest check&0 - See what quests are available here.
+ &cquest completed&0 - List quests you have finished.
  &cquest drop&0 - Cancel a quest you're on.
  &cquest finish&0 - Turn in one or more quests.
  &cquest info&0 - See details on a quest you're on or one available here.

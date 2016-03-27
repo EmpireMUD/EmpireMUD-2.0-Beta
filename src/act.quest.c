@@ -287,6 +287,27 @@ QCMD(qcmd_check) {
 }
 
 
+QCMD(qcmd_completed) {
+	char buf[MAX_STRING_LENGTH];
+	struct player_completed_quest *pcq, *next_pcq;
+	size_t size;
+	
+	if (!GET_QUESTS(ch)) {
+		msg_to_char(ch, "You aren't on any quests.\r\n");
+		return;
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Your quests:\r\n");
+	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), pcq, next_pcq) {
+		size += snprintf(buf + size, sizeof(buf) - size, "  %s\r\n", get_quest_name_by_proto(pcq->vnum));
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
 QCMD(qcmd_drop) {
 	struct instance_data *inst;
 	struct player_quest *pq;
@@ -654,6 +675,7 @@ QCMD(qcmd_tracker) {
 const struct { char *command; QCMD(*func); int min_pos; } quest_cmd[] = {
 	// command, function, min pos
 	{ "check", qcmd_check, POS_RESTING },
+	{ "completed", qcmd_completed, POS_DEAD },
 	{ "drop", qcmd_drop, POS_DEAD },
 	{ "finish", qcmd_finish, POS_STANDING },
 	{ "info", qcmd_info, POS_DEAD },
