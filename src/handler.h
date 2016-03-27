@@ -195,6 +195,7 @@ void obj_from_room(obj_data *object);
 void obj_from_vehicle(obj_data *obj);
 void object_list_no_owner(obj_data *list);
 void obj_to_char(obj_data *object, char_data *ch);
+void obj_to_char_if_okay(obj_data *obj, char_data *ch);
 void obj_to_char_or_room(obj_data *obj, char_data *ch);
 void obj_to_obj(obj_data *obj, obj_data *obj_to);
 void obj_to_room(obj_data *object, room_data *room);

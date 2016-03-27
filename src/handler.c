@@ -3567,11 +3567,11 @@ void empty_obj_before_extract(obj_data *obj) {
 			obj_to_obj(jj, obj->in_obj);
 		}
 		else if (obj->carried_by) {
-			obj_to_char(jj, obj->carried_by);
+			obj_to_char_if_okay(jj, obj->carried_by);
 			get_check_money(obj->carried_by, jj);
 		}
 		else if (obj->worn_by) {
-			obj_to_char(jj, obj->worn_by);
+			obj_to_char_if_okay(jj, obj->worn_by);
 			get_check_money(obj->worn_by, jj);
 		}
 		else if (obj->in_vehicle) {
@@ -4218,6 +4218,49 @@ void obj_to_char(obj_data *object, char_data *ch) {
 	}
 	else {
 		log("SYSERR: NULL obj (%p) or char (%p) passed to obj_to_char.", object, ch);
+	}
+}
+
+
+/**
+* Validates bind and quest before allowing an obj to go to a char. Sends to
+* the room as a backup.
+*
+* @param obj_data *obj The item.
+* @param char_data *ch The person you're trying to give it to.
+*/
+void obj_to_char_if_okay(obj_data *obj, char_data *ch) {
+	bool ok = TRUE;
+	
+	if (!bind_ok(obj, ch)) {
+		ok = FALSE;
+	}
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
+		ok = FALSE;
+	}
+	
+	if (ok || !IN_ROOM(ch)) {
+		obj_to_char(obj, ch);
+	}
+	else {
+		// unmark uncollected loot if it was meant to go to a person
+		if (!IS_NPC(ch)) {
+			REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_UNCOLLECTED_LOOT);
+		}
+		
+		// set ownership as if they got it -- if not stolen
+		if (!IS_STOLEN(obj)) {
+			if (IS_NPC(ch)) {
+				obj->last_owner_id = NOBODY;
+				obj->last_empire_id = NOTHING;
+			}
+			else {
+				obj->last_owner_id = GET_IDNUM(ch);
+				obj->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
+			}
+		}
+		
+		obj_to_room(obj, IN_ROOM(ch));
 	}
 }
 
