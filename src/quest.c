@@ -621,6 +621,7 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 */
 void refresh_all_quests(char_data *ch) {
 	struct player_quest *pq, *next_pq;
+	struct instance_data *inst;
 	struct quest_task *old;
 	quest_data *quest;
 	
@@ -631,6 +632,13 @@ void refresh_all_quests(char_data *ch) {
 	LL_FOREACH_SAFE(GET_QUESTS(ch), pq, next_pq) {
 		// remove entirely
 		if (!(quest = quest_proto(pq->vnum)) || (QUEST_FLAGGED(quest, QST_IN_DEVELOPMENT) && !IS_IMMORTAL(ch))) {
+			LL_DELETE(GET_QUESTS(ch), pq);
+			pq->next = NULL;
+			free_player_quests(pq);
+			continue;
+		}
+		// check instance expiry
+		if (QUEST_FLAGGED(quest, QST_EXPIRES_AFTER_INSTANCE) && (!(inst = get_instance_by_id(pq->instance_id)) || GET_ADV_VNUM(inst->adventure) != pq->adventure)) {
 			LL_DELETE(GET_QUESTS(ch), pq);
 			pq->next = NULL;
 			free_player_quests(pq);
@@ -3331,12 +3339,20 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	// look for live copies of the quest
-	// TODO
-	
 	// remove it from the hash table first
 	remove_quest_from_table(quest);
-
+	
+	// look for people on the quest and force a refresh
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) != CON_PLAYING || !desc->character) {
+			continue;
+		}
+		if (!is_on_quest(desc->character, vnum)) {
+			continue;
+		}
+		refresh_all_quests(desc->character);
+	}
+	
 	// save index and quest file now
 	save_index(DB_BOOT_QST);
 	save_library_file_for_vnum(DB_BOOT_QST, vnum);
@@ -3391,6 +3407,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 void save_olc_quest(descriptor_data *desc) {	
 	quest_data *proto, *quest = GET_OLC_QUEST(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
+	descriptor_data *iter;
 	UT_hash_handle hh;
 
 	// have a place to save it?
@@ -3446,9 +3463,20 @@ void save_olc_quest(descriptor_data *desc) {
 	
 	// re-add lookups
 	add_or_remove_all_quest_lookups_for(proto, TRUE);
-		
+	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_QST, vnum);
+	
+	// look for players on the quest and update them
+	LL_FOREACH(descriptor_list, iter) {
+		if (STATE(iter) != CON_PLAYING || !iter->character) {
+			continue;
+		}
+		if (!is_on_quest(iter->character, vnum)) {
+			continue;
+		}
+		refresh_all_quests(iter->character);
+	}
 }
 
 
