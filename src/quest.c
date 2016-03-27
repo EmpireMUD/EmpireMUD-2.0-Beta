@@ -55,6 +55,7 @@ extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 void count_quest_tasks(struct player_quest *pq, int *complete, int *total);
+void drop_quest(char_data *ch, struct player_quest *pq);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
@@ -301,8 +302,6 @@ int count_quest_objects(char_data *ch, obj_vnum vnum, bool skip_keep) {
 * @param struct instance_data *inst The instance to check quests for.
 */
 void expire_instance_quests(struct instance_data *inst) {
-	void drop_quest(char_data *ch, struct player_quest *pq);
-	
 	struct player_quest *pq, *next_pq;
 	descriptor_data *desc;
 	quest_data *quest;
@@ -668,16 +667,12 @@ void refresh_all_quests(char_data *ch) {
 	LL_FOREACH_SAFE(GET_QUESTS(ch), pq, next_pq) {
 		// remove entirely
 		if (!(quest = quest_proto(pq->vnum)) || (QUEST_FLAGGED(quest, QST_IN_DEVELOPMENT) && !IS_IMMORTAL(ch))) {
-			LL_DELETE(GET_QUESTS(ch), pq);
-			pq->next = NULL;
-			free_player_quests(pq);
+			drop_quest(ch, pq);
 			continue;
 		}
 		// check instance expiry
 		if (QUEST_FLAGGED(quest, QST_EXPIRES_AFTER_INSTANCE) && (!(inst = get_instance_by_id(pq->instance_id)) || GET_ADV_VNUM(inst->adventure) != pq->adventure)) {
-			LL_DELETE(GET_QUESTS(ch), pq);
-			pq->next = NULL;
-			free_player_quests(pq);
+			drop_quest(ch, pq);
 			continue;
 		}
 		
