@@ -1609,9 +1609,10 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_amount, int *amount, any_vnum *vnum, bitvector_t *misc) {
 	extern const char *component_flags[];
 	extern const char *component_types[];
+	extern const bool quest_tracker_has_amount[];
 	
 	char arg[MAX_INPUT_LENGTH]; 
-	bool need_amount = FALSE, need_bld = FALSE, need_component = FALSE;
+	bool need_bld = FALSE, need_component = FALSE;
 	bool need_mob = FALSE, need_obj = FALSE, need_quest = FALSE;
 	bool need_rmt = FALSE, need_sect = FALSE, need_skill = FALSE;
 	bool need_veh = FALSE, need_mob_flags = FALSE;
@@ -1629,39 +1630,32 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 			break;
 		}
 		case QT_GET_COMPONENT: {
-			need_amount = TRUE;
 			need_component = TRUE;
 			break;
 		}
 		case QT_GET_OBJECT: {
-			need_amount = TRUE;
 			need_obj = TRUE;
 			break;
 		}
 		case QT_KILL_MOB: {
-			need_amount = TRUE;
 			need_mob = TRUE;
 			break;
 		}
 		case QT_KILL_MOB_FLAGGED: {
-			need_amount = TRUE;
 			need_mob_flags = TRUE;
 			break;
 		} {
 		}
 		case QT_OWN_BUILDING: {
-			need_amount = TRUE;
 			need_bld = TRUE;
 			break;
 		}
 		case QT_OWN_VEHICLE: {
-			need_amount = TRUE;
 			need_veh = TRUE;
 			break;
 		}
 		case QT_SKILL_LEVEL_OVER:
 		case QT_SKILL_LEVEL_UNDER: {
-			need_amount = TRUE;
 			need_skill = TRUE;
 			break;
 		}
@@ -1683,7 +1677,7 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 	}
 	
 	// possible args
-	if (need_amount && find_amount) {
+	if (quest_tracker_has_amount[type] && find_amount) {
 		argument = any_one_arg(argument, arg);
 		if (!*arg || !isdigit(*arg) || (*amount = atoi(arg)) < 0) {
 			msg_to_char(ch, "You must provide an amount.\r\n");
@@ -2125,6 +2119,21 @@ struct quest_task *copy_quest_tasks(struct quest_task *from) {
 	}
 	
 	return list;
+}
+
+
+/**
+* Frees a player quest list.
+*
+* @param struct player_quest *list The list of player quests to free.
+*/
+void free_player_quests(struct player_quest *list) {
+	struct player_quest *pq;
+	while ((pq = list)) {
+		list = pq->next;
+		free_quest_tasks(pq->tracker);
+		free(pq);
+	}
 }
 
 

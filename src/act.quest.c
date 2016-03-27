@@ -40,9 +40,11 @@ extern bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_te
 extern bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
 extern bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
 extern struct quest_task *copy_quest_tasks(struct quest_task *from);
+void free_player_quests(struct player_quest *list);
 void free_quest_temp_list(struct quest_temp_list *list);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
+extern char *quest_task_string(struct quest_task *task, bool show_vnums);
 
 // local prototypes
 
@@ -80,6 +82,24 @@ struct quest_temp_list *build_available_quest_list(char_data *ch) {
 	}
 	
 	return quest_list;
+}
+
+
+/**
+* @param struct player_quest *pq The player-quest entry to count.
+* @param int *complete A variable to store the # of complete tasks.
+* @param int *total A vartiable to store the total # of tasks.
+*/
+void count_quest_tasks(struct player_quest *pq, int *complete, int *total) {
+	struct quest_task *task;
+	
+	*complete = *total = 0;
+	LL_FOREACH(pq->tracker, task) {
+		++*total;
+		if (task->current >= task->needed) {
+			++*complete;
+		}
+	}
 }
 
 
@@ -144,6 +164,49 @@ quest_data *find_local_quest_by_name(char_data *ch, char *argument, bool check_c
 	// no exact matches
 	*find_inst = abbrev_inst;
 	return abbrev;	// if any
+}
+
+
+/**
+* Takes a character off of a quest.
+*
+* @param char_data *ch The player.
+* @param sturct player_quest *pq The player's quest entry to drop.
+*/
+void drop_quest(char_data *ch, struct player_quest *pq) {
+	if (IS_NPC(ch) || !pq) {
+		return;
+	}
+	
+	LL_DELETE(GET_QUESTS(ch), pq);
+	pq->next = NULL;
+	free_player_quests(pq);
+	
+	// TODO remove quest items
+}
+
+
+/**
+* @param char_data *ch The person to show to.
+* @param struct player_quest *pq The quest to show the tracker for.
+*/
+void show_quest_tracker(char_data *ch, struct player_quest *pq) {
+	extern const bool quest_tracker_has_amount[];
+	
+	char buf[MAX_STRING_LENGTH];
+	struct quest_task *task;
+	
+	msg_to_char(ch, "Quest Tracker:\r\n");
+	
+	LL_FOREACH(pq->tracker, task) {
+		if (quest_tracker_has_amount[task->type]) {
+			sprintf(buf, " (%d/%d)", task->current, task->needed);
+		}
+		else {
+			*buf = '\0';
+		}
+		msg_to_char(ch, "  %s%s\r\n", quest_task_string(task, FALSE), buf);
+	}
 }
 
 
@@ -219,10 +282,62 @@ QCMD(qcmd_check) {
 }
 
 
+QCMD(qcmd_drop) {
+	struct instance_data *inst;
+	struct player_quest *pq;
+	quest_data *qst;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Drop which quest?\r\n");
+	}
+	else if (!(qst = find_local_quest_by_name(ch, argument, TRUE, FALSE, &inst)) || !(pq = is_on_quest(ch, QUEST_VNUM(qst)))) {
+		msg_to_char(ch, "You don't seem to be on a quest called '%s'.\r\n", argument);
+	}
+	else {
+		msg_to_char(ch, "You drop %s.\r\n", QUEST_NAME(qst));
+		drop_quest(ch, pq);
+		SAVE_CHAR(ch);
+	}
+}
+
+
+QCMD(qcmd_info) {
+	struct instance_data *inst;
+	struct player_quest *pq;
+	int complete, total;
+	quest_data *qst;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Get info on which quest?\r\n");
+	}
+	else if (!(qst = find_local_quest_by_name(ch, argument, TRUE, TRUE, &inst))) {
+		msg_to_char(ch, "You don't see a quest called '%s' here.\r\n", argument);
+	}
+	else {
+		pq = is_on_quest(ch, QUEST_VNUM(qst));
+		
+		// title
+		if (pq) {
+			count_quest_tasks(pq, &complete, &total);
+			msg_to_char(ch, "%s (%d/%d)\r\n", QUEST_NAME(qst), complete, total);
+		}
+		else {
+			msg_to_char(ch, "%s (not on quest)\r\n", QUEST_NAME(qst));
+		}
+		
+		send_to_char(NULLSAFE(QUEST_DESCRIPTION(qst)), ch);
+		
+		// tracker
+		if (pq) {
+			show_quest_tracker(ch, pq);
+		}
+	}
+}
+
+
 QCMD(qcmd_list) {
 	char buf[MAX_STRING_LENGTH];
 	struct player_quest *pq;
-	struct quest_task *task;
 	int count, total;
 	size_t size;
 	
@@ -233,16 +348,7 @@ QCMD(qcmd_list) {
 	
 	size = snprintf(buf, sizeof(buf), "Your quests:\r\n");
 	LL_FOREACH(GET_QUESTS(ch), pq) {
-		// count completion
-		count = total = 0;
-		LL_FOREACH(pq->tracker, task) {
-			++total;
-			if (task->current >= task->needed) {
-				++count;
-			}
-		}
-		
-		// display
+		count_quest_tasks(pq, &count, &total);
 		size += snprintf(buf + size, sizeof(buf) - size, "  %s (%d/%d)\r\n", get_quest_name_by_proto(pq->vnum), count, total);
 	}
 	
@@ -290,25 +396,41 @@ QCMD(qcmd_start) {
 }
 
 
-const struct {
-	char *command;
-	QCMD(*func);
-	int min_pos;
-} quest_cmd[] = {
+QCMD(qcmd_tracker) {
+	struct instance_data *inst;
+	struct player_quest *pq;
+	quest_data *qst;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Show the tracker for which quest?\r\n");
+	}
+	else if (!(qst = find_local_quest_by_name(ch, argument, TRUE, FALSE, &inst)) || !(pq = is_on_quest(ch, QUEST_VNUM(qst)))) {
+		msg_to_char(ch, "You don't seem to be on a quest called '%s' here.\r\n", argument);
+	}
+	else {
+		show_quest_tracker(ch, pq);
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// QUEST COMMAND ///////////////////////////////////////////////////////////
+
+// quest command configs:
+const struct { char *command; QCMD(*func); int min_pos; } quest_cmd[] = {
+	// command, function, min pos
 	{ "check", qcmd_check, POS_RESTING },
-	// drop
+	{ "drop", qcmd_check, POS_DEAD },
 	// finish
-	// info
+	{ "info", qcmd_info, POS_DEAD },
 	{ "list", qcmd_list, POS_DEAD },
 	{ "start", qcmd_start, POS_STANDING },
+	{ "tracker", qcmd_tracker, POS_DEAD },
 	
 	// this goes last
 	{ "\n", NULL, POS_DEAD }
 };
 
-
- //////////////////////////////////////////////////////////////////////////////
-//// QUEST COMMANDS //////////////////////////////////////////////////////////
 
 ACMD(do_quest) {
 	extern const char *position_types[];

@@ -4,16 +4,41 @@ Usage:  quest <command> <...>
 
 The following quest commands are available:
  &cquest check&0 - See what quests are available here.
+ &cquest drop&0 - Cancel a quest you're on.
+ &cquest info&0 - See details on a quest you're on or one available here.
  &cquest list&0 - Show your quests and progress.
  &cquest start&0 - Begin a quest.
+ &cquest tracker&0 - Show the quest tracker for one quest you're on.
 
-See also: QUEST CHECK, QUEST LIST, QUEST START
+For more information on each, see HELP QUEST <command>.
 #
 "QUEST CHECK"
 
 Usage:  quest check
 
 This command shows all the quests available at your location.
+
+See also: QUEST
+#
+"QUEST DROP"
+
+Usage:  quest drop <name>
+
+You can drop quests to cancel them and remove them from your quest list. Be
+warned that this cannot be undone; you must find the quest giver again if you
+change your mind.
+
+See also: QUEST
+#
+"QUEST INFO"
+
+Usage:  quest info <quest>
+
+This displays additional information about a quest, including the quest's full
+description. It works on both quests you're on, and ones available at your
+location.
+
+When you use it on a quest you're on, you will also see the quest tracker.
 
 See also: QUEST
 #
@@ -30,6 +55,14 @@ See also: QUEST
 Usage:  quest start <name | all>
 
 This command starts a quest (or all quests) available at your location.
+
+See also: QUEST
+#
+"QUEST TRACKER"
+
+Usage:  quest tracker <name>
+
+This shows the quest tracker for a quest you're on.
 
 See also: QUEST
 #

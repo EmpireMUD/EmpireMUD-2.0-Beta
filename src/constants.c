@@ -2125,7 +2125,7 @@ const char *quest_reward_types[] = {
 };
 
 
-// QT_x: quest tracker types
+// QT_x (1/2): quest tracker types
 const char *quest_tracker_types[] = {
 	"COMPLETED-QUEST",	// 0
 	"GET-COMPONENT",
@@ -2143,6 +2143,26 @@ const char *quest_tracker_types[] = {
 	"VISIT-ROOM-TEMPLATE",
 	"VISIT-SECTOR",	// 14
 	"\n",
+};
+
+
+// QT_x (2/2): quest tracker types that take a numeric arg (vs yes/no)
+const bool quest_tracker_has_amount[] = {
+	FALSE,	// completed quest
+	TRUE,	// get component
+	TRUE,	// get object
+	TRUE,	// kill mob
+	TRUE,	// kill mob flagged
+	FALSE,	// not completed quest
+	FALSE,	// not on quest
+	TRUE,	// own building
+	TRUE,	// own vehicle
+	FALSE,	// skill over
+	FALSE,	// skill under
+	FALSE,	// triggered
+	FALSE,	// visit building
+	FALSE,	// visit rmt
+	FALSE,	// visit sect
 };
 
 
