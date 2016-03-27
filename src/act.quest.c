@@ -292,11 +292,6 @@ QCMD(qcmd_completed) {
 	struct player_completed_quest *pcq, *next_pcq;
 	size_t size;
 	
-	if (!GET_QUESTS(ch)) {
-		msg_to_char(ch, "You aren't on any quests.\r\n");
-		return;
-	}
-	
 	size = snprintf(buf, sizeof(buf), "Your quests:\r\n");
 	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), pcq, next_pcq) {
 		size += snprintf(buf + size, sizeof(buf) - size, "  %s\r\n", get_quest_name_by_proto(pcq->vnum));
