@@ -1880,7 +1880,7 @@ int start_quest_otrigger(char_data *actor, quest_data *quest) {
 		return 1;
 
 	for (i = 0; i < NUM_WEARS; i++)
-		if (!start_quest_otrigger_one(GET_EQ(actor, i), actor, quest))
+		if (GET_EQ(actor, i) && !start_quest_otrigger_one(GET_EQ(actor, i), actor, quest))
 			return 0;
 
 	for (obj = actor->carrying; obj; obj = obj->next_content)
@@ -2128,7 +2128,7 @@ int finish_quest_otrigger(char_data *actor, quest_data *quest) {
 		return 1;
 
 	for (i = 0; i < NUM_WEARS; i++)
-		if (!finish_quest_otrigger_one(GET_EQ(actor, i), actor, quest))
+		if (GET_EQ(actor, i) && !finish_quest_otrigger_one(GET_EQ(actor, i), actor, quest))
 			return 0;
 
 	for (obj = actor->carrying; obj; obj = obj->next_content)
