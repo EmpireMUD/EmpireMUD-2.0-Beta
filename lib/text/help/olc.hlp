@@ -277,6 +277,8 @@ Objects (OEDIT):
 Quests (QEDIT):
 - You can create more complex quests by chaining simple quests.
 - The VISIT-* task types do not work as prereqs; only as tasks.
+- For low-level quests, reward order may matter. Give skill exp/levels BEFORE
+  reward items, as the scale level may go up.
 
 Room Templates (REDIT):
 - Don't confuse room templates with the designated rooms that players can add

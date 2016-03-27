@@ -5,6 +5,7 @@ Usage:  quest <command> <...>
 The following quest commands are available:
  &cquest check&0 - See what quests are available here.
  &cquest drop&0 - Cancel a quest you're on.
+ &cquest finish&0 - Turn in one or more quests.
  &cquest info&0 - See details on a quest you're on or one available here.
  &cquest list&0 - Show your quests and progress.
  &cquest start&0 - Begin a quest.
@@ -27,6 +28,16 @@ Usage:  quest drop <name>
 You can drop quests to cancel them and remove them from your quest list. Be
 warned that this cannot be undone; you must find the quest giver again if you
 change your mind.
+
+See also: QUEST
+#
+"QUEST FINISH"
+
+Usage:  quest finish <name | all>
+
+Turn in one or more quests. You must find the correct location, person, or item
+to turn in each quest. There will be an indication if you have a quest to turn
+in somewhere.
 
 See also: QUEST
 #
@@ -54,9 +65,10 @@ See also: QUEST
 
 Usage:  quest start <name | all>
 
-This command starts a quest (or all quests) available at your location.
+This command starts a quest (or all quests) available at your location. There
+will be an indicator on any person, place, or thing that starts a quest.
 
-See also: QUEST
+See also: QUEST, QUEST CHECK
 #
 "QUEST TRACKER"
 

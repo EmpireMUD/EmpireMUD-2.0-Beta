@@ -54,6 +54,7 @@ extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 // external funcs
 extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
+void count_quest_tasks(struct player_quest *pq, int *complete, int *total);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
@@ -75,6 +76,72 @@ void update_obj_quest_lookups(obj_vnum vnum);
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Searches for a quest giver at a particular location. This does NOT guarantee
+* the quest is complete or completable.
+*
+* @param char_data *ch The person looking.
+* @param room_data *loc The location to check.
+* @param quest_data *quest The quest to check.
+* @param empire_data **giver_emp Somewhere to store the loyalty of the quest-giver.
+* @return bool TRUE if ch can turn it in there; FALASE if not.
+*/
+bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empire_data **giver_emp) {
+	struct quest_giver *giver;
+	char_data *mob;
+	obj_data *obj;
+	
+	*giver_emp = NULL;
+	
+	LL_FOREACH(QUEST_ENDS_AT(quest), giver) {
+		// QG_x: find quest giver here
+		switch (giver->type) {
+			case QG_BUILDING: {
+				if (GET_BUILDING(loc) && GET_BLD_VNUM(GET_BUILDING(loc)) == giver->vnum) {
+					*giver_emp = ROOM_OWNER(loc);
+					return TRUE;
+				}
+				break;
+			}
+			case QG_MOBILE: {
+				LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
+					if (IS_NPC(mob) && GET_MOB_VNUM(mob) == giver->vnum && CAN_SEE(ch, mob)) {
+						*giver_emp = GET_LOYALTY(mob);
+						return TRUE;
+					}
+				}
+				break;
+			}
+			case QG_OBJECT: {
+				LL_FOREACH2(ch->carrying, obj, next_content) {
+					if (GET_OBJ_VNUM(obj) == giver->vnum && CAN_SEE_OBJ(ch, obj)) {
+						*giver_emp = GET_LOYALTY(ch);
+						return TRUE;
+					}
+				}
+				LL_FOREACH2(ROOM_CONTENTS(loc), obj, next_content) {
+					if (GET_OBJ_VNUM(obj) == giver->vnum && CAN_SEE_OBJ(ch, obj)) {
+						*giver_emp = CAN_WEAR(obj, ITEM_WEAR_TAKE) ? GET_LOYALTY(ch) : ROOM_OWNER(loc);
+						return TRUE;
+					}
+				}
+			}
+			case QG_ROOM_TEMPLATE: {
+				if (GET_ROOM_TEMPLATE(loc) && GET_RMT_VNUM(GET_ROOM_TEMPLATE(loc)) == giver->vnum) {
+					*giver_emp = ROOM_OWNER(loc);
+					return TRUE;
+				}
+				break;
+			}
+			// case QG_TRIGGER: never local
+		}
+	}
+	
+	// nope
+	return FALSE;
+}
+
 
 /**
 * Number of buildings owned by an empire.
@@ -953,6 +1020,153 @@ bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_l
 					// only need 1
 					return TRUE;
 				}
+			}
+		}
+	}
+	
+	// nope
+	return any;
+}
+
+
+/**
+* @param char_data *ch Any player playing.
+* @param char_data *mob Any mob.
+* @param struct quest_temp_list **build_list Optional: Builds a temp list of quests available.
+* @return bool TRUE if the player has finished a quest that the mob accepts; FALSE otherwise.
+*/
+bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list) {
+	struct player_quest *pq;
+	struct quest_lookup *ql;
+	int complete, total;
+	bool any = FALSE;
+	
+	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob) || !CAN_SEE(ch, mob)) {
+		return FALSE;
+	}
+	
+	LL_FOREACH(MOB_QUEST_LOOKUPS(mob), ql) {
+		// make sure they're a giver
+		if (!find_quest_giver_in_list(QUEST_ENDS_AT(ql->quest), QG_MOBILE, GET_MOB_VNUM(mob))) {
+			continue;
+		}
+		// are they on quest?
+		if (!(pq = is_on_quest(ch, QUEST_VNUM(ql->quest)))) {
+			continue;
+		}
+		
+		count_quest_tasks(pq, &complete, &total);
+		if (complete < total) {
+			continue;
+		}
+		
+		// success!
+		if (build_list) {
+			any = TRUE;
+			add_to_quest_temp_list(build_list, ql->quest, NULL);
+		}
+		else {
+			return TRUE;
+		}
+	}
+	
+	// nope
+	return any;
+}
+
+
+/**
+* @param char_data *ch Any player playing.
+* @param obj_data *obj Any obj.
+* @param struct quest_temp_list **build_list Optional: Builds a temp list of quests available.
+* @return bool TRUE if the player has a quest complete that the obj ends; FALSE otherwise.
+*/
+bool can_turn_quest_in_to_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list) {
+	struct player_quest *pq;
+	struct quest_lookup *ql;
+	int complete, total;
+	bool any = FALSE;
+	
+	if (IS_NPC(ch) || !GET_OBJ_QUEST_LOOKUPS(obj) || !CAN_SEE_OBJ(ch, obj) || !bind_ok(obj, ch)) {
+		return FALSE;
+	}
+	
+	LL_FOREACH(GET_OBJ_QUEST_LOOKUPS(obj), ql) {
+		// make sure they're a giver
+		if (!find_quest_giver_in_list(QUEST_ENDS_AT(ql->quest), QG_OBJECT, GET_OBJ_VNUM(obj))) {
+			continue;
+		}
+		// are they on quest?
+		if (!(pq = is_on_quest(ch, QUEST_VNUM(ql->quest)))) {
+			continue;
+		}
+		
+		count_quest_tasks(pq, &complete, &total);
+		if (complete < total) {
+			continue;
+		}
+		
+		// success!
+		if (build_list) {
+			any = TRUE;
+			add_to_quest_temp_list(build_list, ql->quest, NULL);
+		}
+		else {
+			return TRUE;
+		}
+	}
+	
+	// nope
+	return any;
+}
+
+
+/**
+* @param char_data *ch Any player playing.
+* @param room_data *room Any room.
+* @param struct quest_temp_list **build_list Optional: Builds a temp list of quests available.
+* @return bool TRUE if the player has finished a quest that the room ends; FALSE otherwise.
+*/
+bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp_list **build_list) {
+	struct quest_lookup *ql, *list[2];
+	int iter, complete, total;
+	struct player_quest *pq;
+	bool any = FALSE;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	// two places to look
+	list[0] = GET_BUILDING(room) ? GET_BLD_QUEST_LOOKUPS(GET_BUILDING(room)) : NULL;
+	list[1] = GET_ROOM_TEMPLATE(room) ? GET_RMT_QUEST_LOOKUPS(GET_ROOM_TEMPLATE(room)) : NULL;
+	
+	for (iter = 0; iter < 2; ++iter) {
+		LL_FOREACH(list[iter], ql) {
+			// make sure they're a giver
+			if (iter == 0 && !find_quest_giver_in_list(QUEST_ENDS_AT(ql->quest), QG_BUILDING, GET_BLD_VNUM(GET_BUILDING(room)))) {
+				continue;
+			}
+			if (iter == 1 && !find_quest_giver_in_list(QUEST_ENDS_AT(ql->quest), QG_ROOM_TEMPLATE, GET_RMT_VNUM(GET_ROOM_TEMPLATE(room)))) {
+				continue;
+			}
+			// are they on quest?
+			if (!(pq = is_on_quest(ch, QUEST_VNUM(ql->quest)))) {
+				continue;
+			}
+		
+			count_quest_tasks(pq, &complete, &total);
+			if (complete < total) {
+				continue;
+			}
+		
+			// success!
+			if (build_list) {
+				any = TRUE;
+				add_to_quest_temp_list(build_list, ql->quest, NULL);
+			}
+			else {
+				return TRUE;
 			}
 		}
 	}
