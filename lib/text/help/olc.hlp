@@ -3331,6 +3331,18 @@ lower number means a faster weapon. In that way, the name is backwards.
 
 See also: OLC OBJECTS
 #d
+"OEDIT REQUIRESQUEST" "OEDIT REQUIRES QUEST" "OEDIT REQUIRE QUEST" "OEDIT QUEST"
+
+Usage:  .requiresquest <vnum | none>
+
+Items can be set to require the player to be on a quest. The player cannot get
+an object for a quest they're not on, and can't lose an object for a quest they
+are on.
+
+Requires objects will be lost when the quest ends.
+
+See also: OLC OBJECTS
+#d
 "OEDIT STORAGE"
 
 Usage:  .storage add <building vnum> [flags]

@@ -1580,6 +1580,8 @@ void clear_object(obj_data *obj) {
 	IN_ROOM(obj) = NULL;
 	obj->worn_on = NO_WEAR;
 	
+	GET_OBJ_REQUIRES_QUEST(obj) = NOTHING;
+	
 	obj->last_owner_id = NOBODY;
 	obj->last_empire_id = NOTHING;
 }

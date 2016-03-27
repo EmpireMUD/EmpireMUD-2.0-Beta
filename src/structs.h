@@ -3590,6 +3590,8 @@ struct obj_flag_data {
 	int current_scale_level;	// level the obj was scaled to, or -1 for not scaled
 	int min_scale_level;	// minimum level this obj may be scaled to
 	int max_scale_level;	// maximum level this obj may be scaled to
+	
+	any_vnum requires_quest;	// can only have obj whilst on quest
 };
 
 

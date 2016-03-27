@@ -3325,7 +3325,11 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	msg_to_char(ch, "Extra flags   : &g%s&0\r\n", buf);
 	
 	msg_to_char(ch, "Timer: &y%d&0, Material: &y%s&0, Component type: &y%s&0\r\n", GET_OBJ_TIMER(j), materials[GET_OBJ_MATERIAL(j)].name, component_string(GET_OBJ_CMP_TYPE(j), GET_OBJ_CMP_FLAGS(j)));
-
+	
+	if (GET_OBJ_REQUIRES_QUEST(j) != NOTHING) {
+		msg_to_char(ch, "Requires quest: [%d] &c%s&0\r\n", GET_OBJ_REQUIRES_QUEST(j), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(j)));
+	}
+	
 	strcpy(buf, "In room: ");
 	if (!IN_ROOM(j))
 		strcat(buf, "Nowhere");

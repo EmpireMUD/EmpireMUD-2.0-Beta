@@ -3684,6 +3684,13 @@ void parse_object(FILE *obj_f, int nr) {
 				break;
 			}
 			
+			case 'Q': {	// requires quest
+				if (sscanf(line, "Q %d", &t[0]) == 1) {
+					GET_OBJ_REQUIRES_QUEST(obj) = t[0];
+				}
+				break;
+			}
+			
 			case 'R': {
 				if (!get_line(obj_f, line) || sscanf(line, "%d %s", t, f1) != 2) {
 					log("SYSERR: Format error in 'R' Field, %s", buf2);
@@ -3796,6 +3803,11 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	if (GET_OBJ_CMP_TYPE(obj) != CMP_NONE) {
 		fprintf(fl, "O\n");
 		fprintf(fl, "%d %s\n", GET_OBJ_CMP_TYPE(obj), bitv_to_alpha(GET_OBJ_CMP_FLAGS(obj)));
+	}
+	
+	// Q: requires quest
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+		fprintf(fl, "Q %d\n", GET_OBJ_REQUIRES_QUEST(obj));
 	}
 	
 	// R: storage

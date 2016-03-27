@@ -300,6 +300,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	snprintf(lbuf, sizeof(lbuf), "Your analysis of $p%s%s reveals:", part, location);
 	act(lbuf, FALSE, ch, obj, NULL, TO_CHAR);
 	
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+		msg_to_char(ch, "Quest: %s\r\n", get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(obj)));
+	}
+	
 	// if it has any wear bits other than TAKE, show if they can't use it
 	if (CAN_WEAR(obj, ~ITEM_WEAR_TAKE)) {
 		// the TRUE causes it to send a message if unusable

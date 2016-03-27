@@ -1535,6 +1535,13 @@ void olc_show_object(char_data *ch) {
 		sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
 	}
 	
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+		sprintf(buf + strlen(buf), "<&yrequiresquest&0> [%d] %s\r\n", GET_OBJ_REQUIRES_QUEST(obj), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(obj)));
+	}
+	else {
+		sprintf(buf + strlen(buf), "<&yrequiresquest&0> none\r\n");
+	}
+	
 	olc_get_values_display(ch, buf1);
 	strcat(buf, buf1);
 
@@ -2341,6 +2348,32 @@ OLC_MODULE(oedit_quantity) {
 	}
 	else {
 		GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY) = olc_process_number(ch, argument, "quantity", "quantity", 0, 100, GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY));
+	}
+}
+
+
+OLC_MODULE(oedit_requiresquest) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	obj_vnum old = GET_OBJ_REQUIRES_QUEST(obj);
+	
+	if (!str_cmp(argument, "none") || atoi(argument) == NOTHING) {
+		GET_OBJ_REQUIRES_QUEST(obj) = NOTHING;
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It no longer requires a quest.\r\n");
+		}
+	}
+	else {
+		GET_OBJ_REQUIRES_QUEST(obj) = olc_process_number(ch, argument, "quest vnum", "requiresquest", 0, MAX_VNUM, GET_OBJ_REQUIRES_QUEST(obj));
+		if (!quest_proto(GET_OBJ_REQUIRES_QUEST(obj))) {
+			GET_OBJ_REQUIRES_QUEST(obj) = old;
+			msg_to_char(ch, "There is no quest with that vnum. Old value restored.\r\n");
+		}
+		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			msg_to_char(ch, "It now requires %s.\r\n", get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(obj)));
+		}
 	}
 }
 
