@@ -434,10 +434,10 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 				}
 				
 				if (reward->amount > 0) {
-					snprintf(buf, sizeof(buf), "You receive $p (x%d)!\r\n", reward->amount);
+					snprintf(buf, sizeof(buf), "You receive $p (x%d)!", reward->amount);
 				}
 				else {
-					snprintf(buf, sizeof(buf), "You receive $p!\r\n");
+					snprintf(buf, sizeof(buf), "You receive $p!");
 				}
 				
 				if (obj) {
