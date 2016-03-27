@@ -42,7 +42,7 @@ extern bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance
 extern struct quest_task *copy_quest_tasks(struct quest_task *from);
 void free_quest_temp_list(struct quest_temp_list *list);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
-extern bool is_on_quest(char_data *ch, any_vnum quest);
+extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 
 // local prototypes
 

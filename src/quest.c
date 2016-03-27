@@ -67,7 +67,7 @@ void free_quest_givers(struct quest_giver *list);
 void free_quest_tasks(struct quest_task *list);
 void free_quest_temp_list(struct quest_temp_list *list);
 struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest);
-bool is_on_quest(char_data *ch, any_vnum quest);
+struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void update_mob_quest_lookups(mob_vnum vnum);
 void update_obj_quest_lookups(obj_vnum vnum);
@@ -1105,17 +1105,17 @@ struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest
 /**
 * @param char_data *ch Any player.
 * @param quest_vnum quest The quest to check.
-* @return bool TRUE if the player has is on the quest now.
+* @return struct player_quest *The player's quest data (TRUE) if on the quest, NULL (FALSE) if not.
 */
-bool is_on_quest(char_data *ch, any_vnum quest) {
+struct player_quest *is_on_quest(char_data *ch, any_vnum quest) {
 	struct player_quest *pq;
 	
 	if (IS_NPC(ch)) {
-		return FALSE;
+		return NULL;
 	}
 	
 	LL_SEARCH_SCALAR(GET_QUESTS(ch), pq, vnum, quest);
-	return pq ? TRUE : FALSE;
+	return pq;
 }
 
 
