@@ -277,6 +277,7 @@ void do_sstat_character(char_data *ch, char_data *k);
 
 void script_vlog(const char *format, va_list args);
 void script_log(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
+void script_log_by_type(int go_type, void *go, const char *format, ...) __attribute__ ((format (printf, 3, 4)));
 void mob_log(char_data *mob, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
 void obj_log(obj_data *obj, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
 void wld_log(room_data *room, const char *format, ...) __attribute__ ((format (printf, 2, 3)));

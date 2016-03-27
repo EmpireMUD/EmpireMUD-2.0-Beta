@@ -56,6 +56,7 @@ help files for more info):
 &c%morph%&0 - Causes a person to morph.
 &c%own%&0 - Changes ownership on something.
 &c%purge%&0 - Purges a mob, object, etc.
+&c%quest%&0 - Modifies a player's quests.
 &c%regionecho%&0 - Sends a message to everyone in a given map radius.
 &c%scale%&0 - Changes the scale level of a target.
 &c%send%&0 - Send a message to one person.

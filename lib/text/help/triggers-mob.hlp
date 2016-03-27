@@ -251,6 +251,7 @@ are player-only), in addition to some special commands:
 &c%morph%&0 - Causes a person to morph.
 &c%own%&0 - Changes ownership on something.
 &c%purge%&0 - Purges a mob, object, etc.
+&c%quest%&0 - Modifies a player's quests.
 &c%regionecho%&0 - Sends a message to a whole map region.
 &c%scale%&0 - Re-scales the target to a different level.
 &c%send%&0 - Sends a message to one person.

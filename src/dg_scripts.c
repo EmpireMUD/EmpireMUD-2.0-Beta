@@ -1844,6 +1844,64 @@ void script_log(const char *format, ...) {
 	va_end(args);
 }
 
+
+/**
+* Does a script log by ambiguous type.
+*
+* @param int go_type Any _TRIGGER type.
+* @param void *go The thing the trigger is attached to.
+* @param const char *format... The sprintf format.
+*/
+void script_log_by_type(int go_type, void *go, const char *format, ...) {
+	char output[MAX_STRING_LENGTH], name[MAX_STRING_LENGTH], type[MAX_STRING_LENGTH];
+	any_vnum vnum;
+	va_list args;
+	
+	// x_TRIGGER
+	switch (go_type) {
+		case MOB_TRIGGER: {
+			strcpy(type, "Mob");
+			strcpy(name, GET_SHORT((char_data*)go));
+			vnum = GET_MOB_VNUM((char_data*)go);
+			break;
+		}
+		case OBJ_TRIGGER: {
+			strcpy(type, "Obj");
+			strcpy(name, GET_OBJ_SHORT_DESC((obj_data*)go));
+			vnum = GET_OBJ_VNUM((obj_data*)go);
+			break;
+		}
+		case WLD_TRIGGER:
+		case RMT_TRIGGER:
+		case ADV_TRIGGER:
+		case BLD_TRIGGER: {
+			strcpy(type, "Wld");
+			strcpy(name, "Room");
+			vnum = GET_ROOM_VNUM((room_data*)go);
+			break;
+		}
+		case VEH_TRIGGER: {
+			strcpy(type, "Veh");
+			strcpy(name, VEH_SHORT_DESC((vehicle_data*)go));
+			vnum = VEH_VNUM((vehicle_data*)go);
+			break;
+		}
+		default: {
+			strcpy(type, "???");
+			strcpy(name, "???");
+			vnum = NOTHING;
+			break;
+		}
+	}
+
+	snprintf(output, sizeof(output), "%s (%s, VNum %d):: %s", type, name, vnum, format);
+
+	va_start(args, format);
+	script_vlog(output, args);
+	va_end(args);
+}
+
+
 int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *str, size_t slen) {
 	char *p, *p2;
 	char tmpvar[MAX_STRING_LENGTH];

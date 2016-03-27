@@ -927,6 +927,13 @@ WCMD(do_wpurge) {
 }
 
 
+// quest commands
+WCMD(do_wquest) {
+	void do_dg_quest(int go_type, void *go, char *argument);	
+	do_dg_quest(WLD_TRIGGER, room, argument);
+}
+
+
 /* loads a mobile or object into the room */
 WCMD(do_wload) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
@@ -1301,6 +1308,7 @@ const struct wld_command_info wld_cmd_info[] = {
 	{ "wload", do_wload, NO_SCMD },
 	{ "wmorph", do_wmorph, NO_SCMD },
 	{ "wpurge", do_wpurge, NO_SCMD },
+	{ "wquest", do_wquest, NO_SCMD },
 	{ "wscale", do_wscale, NO_SCMD },
 	{ "wsend", do_wsend, SCMD_WSEND },
 	{ "wsiege", do_wsiege, NO_SCMD },

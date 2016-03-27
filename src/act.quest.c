@@ -49,6 +49,7 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq);
 void scale_item_to_level(obj_data *obj, int level);
 
 // local prototypes
+void drop_quest(char_data *ch, struct player_quest *pq);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -84,6 +85,166 @@ struct quest_temp_list *build_available_quest_list(char_data *ch) {
 	}
 	
 	return quest_list;
+}
+
+
+/**
+* Completes the quest, messages the player, gives rewards.
+*
+* @param char_data *ch The player.
+* @param struct player_quest *pq The quest to turn in.
+* @param empire_data *giver_emp The empire of the quest-giver, if any.
+*/
+void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_emp) {
+	void clear_char_abilities(char_data *ch, any_vnum skill);
+	
+	quest_data *quest = quest_proto(pq->vnum);
+	struct player_completed_quest *pcq;
+	char buf[MAX_STRING_LENGTH];
+	struct quest_reward *reward;
+	any_vnum vnum;
+	int level;
+	
+	if (!quest) {
+		// somehow
+		drop_quest(ch, pq);
+		return;
+	}
+	
+	qt_quest_completed(ch, pq->vnum);
+	qt_lose_quest(ch, pq->vnum);
+	
+	msg_to_char(ch, "You have finished %s!\r\n%s", QUEST_NAME(quest), NULLSAFE(QUEST_COMPLETE_MSG(quest)));
+	act("$n has finished $t!", TRUE, ch, QUEST_NAME(quest), NULL, TO_ROOM);
+	
+	// take objs if necessary
+	if (QUEST_FLAGGED(quest, QST_EXTRACT_TASK_OBJECTS)) {
+		struct resource_data *res = NULL;
+		struct quest_task *task;
+		
+		LL_FOREACH(pq->tracker, task) {
+			// QT_x: types that are extractable
+			switch (task->type) {
+				case QT_GET_COMPONENT: {
+					add_to_resource_list(&res, RES_COMPONENT, task->vnum, task->needed, task->misc);
+					break;
+				}
+				case QT_GET_OBJECT: {
+					add_to_resource_list(&res, RES_OBJECT, task->vnum, task->needed, 0);
+					break;
+				}
+			}
+		}
+		
+		if (res) {
+			extract_resources(ch, res, FALSE, NULL);
+			free_resource_list(res);
+		}
+	}
+	
+	// add quest completion
+	vnum = pq->vnum;
+	HASH_FIND_INT(GET_COMPLETED_QUESTS(ch), &vnum, pcq);
+	if (!pcq) {
+		CREATE(pcq, struct player_completed_quest, 1);
+		pcq->vnum = pq->vnum;
+		HASH_ADD_INT(GET_COMPLETED_QUESTS(ch), vnum, pcq);
+	}
+	pcq->last_completed = time(0);
+	pcq->last_instance_id = pq->instance_id;
+	pcq->last_adventure = pq->adventure;
+	
+	// remove from player's tracker
+	LL_DELETE(GET_QUESTS(ch), pq);
+	pq->next = NULL;
+	free_player_quests(pq);
+	
+	// determine scale level
+	level = get_approximate_level(ch);
+	if (QUEST_MIN_LEVEL(quest) > 0) {
+		level = MAX(level, QUEST_MIN_LEVEL(quest));
+	}
+	if (QUEST_MAX_LEVEL(quest) > 0) {
+		level = MIN(level, QUEST_MAX_LEVEL(quest));
+	}
+	
+	// give rewards
+	LL_FOREACH(QUEST_REWARDS(quest), reward) {
+		// QR_x: reward the rewards
+		switch (reward->type) {
+			case QR_BONUS_EXP: {
+				msg_to_char(ch, "You gain %d bonus experience point%s!\r\n", reward->amount, PLURAL(reward->amount));
+				SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(ch), reward->amount, 0, UCHAR_MAX, FALSE);
+				break;
+			}
+			case QR_COINS: {
+				empire_data *coin_emp = (reward->vnum == OTHER_COIN ? NULL : giver_emp);
+				msg_to_char(ch, "You receive %s!\r\n", money_amount(coin_emp, reward->amount));
+				increase_coins(ch, coin_emp, reward->amount);
+				break;
+			}
+			case QR_OBJECT: {
+				obj_data *obj = NULL;
+				int iter;
+				for (iter = 0; iter < reward->amount; ++iter) {
+					obj = read_object(reward->vnum, TRUE);
+					scale_item_to_level(obj, level);
+					obj_to_char(obj, ch);
+					load_otrigger(obj);
+				}
+				
+				if (reward->amount > 0) {
+					snprintf(buf, sizeof(buf), "You receive $p (x%d)!", reward->amount);
+				}
+				else {
+					snprintf(buf, sizeof(buf), "You receive $p!");
+				}
+				
+				if (obj) {
+					act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+				}
+				break;
+			}
+			case QR_SET_SKILL: {
+				int val = MAX(0, MIN(CLASS_SKILL_CAP, reward->amount));
+				bool loss;
+				
+				loss = (val < get_skill_level(ch, reward->vnum));
+				set_skill(ch, reward->vnum, val);
+				
+				msg_to_char(ch, "Your %s is now level %d!\r\n", get_skill_name_by_vnum(reward->vnum), val);
+				
+				if (loss) {
+					clear_char_abilities(ch, reward->vnum);
+				}
+				
+				break;
+			}
+			case QR_SKILL_EXP: {
+				msg_to_char(ch, "You gain %s skill experience!\r\n", get_skill_name_by_vnum(reward->vnum));
+				gain_skill_exp(ch, reward->vnum, reward->amount);
+				break;
+			}
+			case QR_SKILL_LEVELS: {
+				int val;
+				bool loss;
+				
+				val = get_skill_level(ch, reward->vnum) + reward->amount;
+				val = MAX(0, MIN(CLASS_SKILL_CAP, val));
+				loss = (val < get_skill_level(ch, reward->vnum));
+				set_skill(ch, reward->vnum, val);
+				
+				msg_to_char(ch, "Your %s is now level %d!\r\n", get_skill_name_by_vnum(reward->vnum), val);
+				
+				if (loss) {
+					clear_char_abilities(ch, reward->vnum);
+				}
+				break;
+			}
+		}
+	}
+	
+	// TODO remove quest items}
 }
 
 
@@ -331,13 +492,10 @@ QCMD(qcmd_drop) {
 */
 bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 	extern bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empire_data **giver_emp);
-	void clear_char_abilities(char_data *ch, any_vnum skill);
 	
 	quest_data *quest = quest_proto(pq->vnum);
-	char buf[MAX_STRING_LENGTH];
-	struct quest_reward *reward;
-	int complete, total, level;
-	empire_data *giver_emp;
+	empire_data *giver_emp = NULL;
+	int complete, total;
 	
 	if (!quest) {
 		if (show_errors) {
@@ -372,142 +530,7 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 	}
 	
 	// SUCCESS
-	qt_quest_completed(ch, pq->vnum);
-	qt_lose_quest(ch, pq->vnum);
-	
-	msg_to_char(ch, "You have finished %s!\r\n%s", QUEST_NAME(quest), NULLSAFE(QUEST_COMPLETE_MSG(quest)));
-	act("$n has finished $t!", TRUE, ch, QUEST_NAME(quest), NULL, TO_ROOM);
-	
-	// take objs if necessary
-	if (QUEST_FLAGGED(quest, QST_EXTRACT_TASK_OBJECTS)) {
-		struct resource_data *res = NULL;
-		struct quest_task *task;
-		
-		LL_FOREACH(pq->tracker, task) {
-			// QT_x: types that are extractable
-			switch (task->type) {
-				case QT_GET_COMPONENT: {
-					add_to_resource_list(&res, RES_COMPONENT, task->vnum, task->needed, task->misc);
-					break;
-				}
-				case QT_GET_OBJECT: {
-					add_to_resource_list(&res, RES_OBJECT, task->vnum, task->needed, 0);
-					break;
-				}
-			}
-		}
-		
-		if (res) {
-			extract_resources(ch, res, FALSE, NULL);
-			free_resource_list(res);
-		}
-	}
-	
-	// add quest completion
-	struct player_completed_quest *pcq;
-	any_vnum vnum;
-	vnum = pq->vnum;
-	HASH_FIND_INT(GET_COMPLETED_QUESTS(ch), &vnum, pcq);
-	if (!pcq) {
-		CREATE(pcq, struct player_completed_quest, 1);
-		pcq->vnum = pq->vnum;
-		HASH_ADD_INT(GET_COMPLETED_QUESTS(ch), vnum, pcq);
-	}
-	pcq->last_completed = time(0);
-	pcq->last_instance_id = pq->instance_id;
-	pcq->last_adventure = pq->adventure;
-	
-	// remove from player's tracker
-	LL_DELETE(GET_QUESTS(ch), pq);
-	pq->next = NULL;
-	free_player_quests(pq);
-	
-	// determine scale level
-	level = get_approximate_level(ch);
-	if (QUEST_MIN_LEVEL(quest) > 0) {
-		level = MAX(level, QUEST_MIN_LEVEL(quest));
-	}
-	if (QUEST_MAX_LEVEL(quest) > 0) {
-		level = MIN(level, QUEST_MAX_LEVEL(quest));
-	}
-	
-	// give rewards
-	LL_FOREACH(QUEST_REWARDS(quest), reward) {
-		// QR_x: reward the rewards
-		switch (reward->type) {
-			case QR_BONUS_EXP: {
-				msg_to_char(ch, "You gain %d bonus experience point%s!\r\n", reward->amount, PLURAL(reward->amount));
-				SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(ch), reward->amount, 0, UCHAR_MAX, FALSE);
-				break;
-			}
-			case QR_COINS: {
-				empire_data *coin_emp = (reward->vnum == OTHER_COIN ? NULL : giver_emp);
-				msg_to_char(ch, "You receive %s!\r\n", money_amount(coin_emp, reward->amount));
-				increase_coins(ch, coin_emp, reward->amount);
-				break;
-			}
-			case QR_OBJECT: {
-				obj_data *obj = NULL;
-				int iter;
-				for (iter = 0; iter < reward->amount; ++iter) {
-					obj = read_object(reward->vnum, TRUE);
-					scale_item_to_level(obj, level);
-					obj_to_char(obj, ch);
-					load_otrigger(obj);
-				}
-				
-				if (reward->amount > 0) {
-					snprintf(buf, sizeof(buf), "You receive $p (x%d)!", reward->amount);
-				}
-				else {
-					snprintf(buf, sizeof(buf), "You receive $p!");
-				}
-				
-				if (obj) {
-					act(buf, FALSE, ch, obj, NULL, TO_CHAR);
-				}
-				break;
-			}
-			case QR_SET_SKILL: {
-				int val = MAX(0, MIN(CLASS_SKILL_CAP, reward->amount));
-				bool loss;
-				
-				loss = (val < get_skill_level(ch, reward->vnum));
-				set_skill(ch, reward->vnum, val);
-				
-				msg_to_char(ch, "Your %s is now level %d!\r\n", get_skill_name_by_vnum(reward->vnum), val);
-				
-				if (loss) {
-					clear_char_abilities(ch, reward->vnum);
-				}
-				
-				break;
-			}
-			case QR_SKILL_EXP: {
-				msg_to_char(ch, "You gain %s skill experience!\r\n", get_skill_name_by_vnum(reward->vnum));
-				gain_skill_exp(ch, reward->vnum, reward->amount);
-				break;
-			}
-			case QR_SKILL_LEVELS: {
-				int val;
-				bool loss;
-				
-				val = get_skill_level(ch, reward->vnum) + reward->amount;
-				val = MAX(0, MIN(CLASS_SKILL_CAP, val));
-				loss = (val < get_skill_level(ch, reward->vnum));
-				set_skill(ch, reward->vnum, val);
-				
-				msg_to_char(ch, "Your %s is now level %d!\r\n", get_skill_name_by_vnum(reward->vnum), val);
-				
-				if (loss) {
-					clear_char_abilities(ch, reward->vnum);
-				}
-				break;
-			}
-		}
-	}
-	
-	// TODO remove quest items
+	complete_quest(ch, pq, giver_emp);
 	return TRUE;
 }
 
