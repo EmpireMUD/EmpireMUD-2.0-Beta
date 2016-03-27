@@ -63,7 +63,9 @@ void get_script_display(struct trig_proto_list *list, char *save_buffer);
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest, struct instance_data *instance);
 bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
+struct quest_task *copy_quest_tasks(struct quest_task *from);
 bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
+void free_player_quests(struct player_quest *list);
 void free_quest_givers(struct quest_giver *list);
 void free_quest_tasks(struct quest_task *list);
 void free_quest_temp_list(struct quest_temp_list *list);
@@ -140,6 +142,36 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 	
 	// nope
 	return FALSE;
+}
+
+
+/**
+* Copies progress from one list to another list, if they have any common
+* entries. This is useful is tasks are changed on a quest, but players are
+* already on the quest.
+*
+* @param struct quest_task *to_list List to copy progress TO.
+* @param struct quest_task *from_list List to copy progress FROM.
+*/
+void copy_quest_progress(struct quest_task *to_list, struct quest_task *from_list) {
+	struct quest_task *to_iter, *from_iter;
+	
+	LL_FOREACH(to_list, to_iter) {
+		LL_FOREACH(from_list, from_iter) {
+			if (to_iter->type != from_iter->type) {
+				continue;
+			}
+			if (to_iter->vnum != from_iter->vnum) {
+				continue;
+			}
+			if (to_iter->misc != from_iter->misc) {
+				continue;
+			}
+			
+			// seems to be the same
+			to_iter->current = MAX(to_iter->current, from_iter->current);
+		}
+	}
 }
 
 
@@ -588,13 +620,32 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 * @param char_data *ch The player to check.
 */
 void refresh_all_quests(char_data *ch) {
-	struct player_quest *pq;
+	struct player_quest *pq, *next_pq;
+	struct quest_task *old;
+	quest_data *quest;
 	
 	if (IS_NPC(ch)) {
 		return;
 	}
 	
-	LL_FOREACH(GET_QUESTS(ch), pq) {
+	LL_FOREACH_SAFE(GET_QUESTS(ch), pq, next_pq) {
+		// remove entirely
+		if (!(quest = quest_proto(pq->vnum)) || (QUEST_FLAGGED(quest, QST_IN_DEVELOPMENT) && !IS_IMMORTAL(ch))) {
+			LL_DELETE(GET_QUESTS(ch), pq);
+			pq->next = NULL;
+			free_player_quests(pq);
+			continue;
+		}
+		
+		// reload objectives
+		if (pq->version < QUEST_VERSION(quest)) {
+			old = pq->tracker;
+			pq->tracker = copy_quest_tasks(QUEST_TASKS(quest));
+			copy_quest_progress(pq->tracker, old);
+			free_quest_tasks(old);
+		}
+		
+		// check tracker tasks now
 		refresh_one_quest_tracker(ch, pq);
 	}
 }

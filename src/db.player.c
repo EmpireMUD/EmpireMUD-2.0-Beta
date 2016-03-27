@@ -2838,6 +2838,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void clean_lore(char_data *ch);
 	extern room_data *find_home(char_data *ch);
 	extern room_data *find_load_room(char_data *ch);
+	void refresh_all_quests(char_data *ch);
 	
 	extern bool global_mute_slash_channel_joins;
 
@@ -3061,6 +3062,9 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// update the index in case any of this changed
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
 	update_player_index(index, ch);
+	
+	// ensure quests are up-to-date
+	refresh_all_quests(ch);
 	
 	// now is a good time to save and be sure we have a good save file
 	SAVE_CHAR(ch);
