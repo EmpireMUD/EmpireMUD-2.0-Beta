@@ -2944,6 +2944,8 @@ const char *trig_types[] = {
 	"Door",
 	"Leave-All",
 	"Charmed",
+	"Start-Quest",	// 20
+	"Finish-Quest",	// 21
 	"\n"
 };
 
@@ -2967,32 +2969,37 @@ const bitvector_t mtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// ability
 	TRIG_ARG_PERCENT,	// leave
 	TRIG_ARG_PERCENT,	// door
-	TRIG_ARG_PERCENT	// leave-all
+	TRIG_ARG_PERCENT,	// leave-all
+	NOBITS,	// charmed modifier
+	TRIG_ARG_PERCENT,	// start-quest
+	TRIG_ARG_PERCENT,	// finish-quest
 };
 
 
 // OTRIG_x -- obj trigger types
 const char *otrig_types[] = {
-	"Global",
+	"Global",	// 0
 	"Random",
 	"Command",
 	"*",
 	"*",
-	"Timer",
+	"Timer",	// 5
 	"Get",
 	"Drop",
 	"Give",
 	"Wear",
-	"*",
+	"*",	// 10
 	"Remove",
 	"*",
 	"Load",
 	"*",
-	"Ability",
+	"Ability",	// 15
 	"Leave",
 	"*",
 	"Consume",
 	"Finish",
+	"Start-Quest",	// 20
+	"Finish-Quest",	// 21
 	"\n"
 };
 
@@ -3018,6 +3025,8 @@ const bitvector_t otrig_argument_types[] = {
 	NOBITS,	// 
 	TRIG_ARG_PERCENT,	// consume
 	TRIG_ARG_PERCENT,	// finish
+	TRIG_ARG_PERCENT,	// start-quest
+	TRIG_ARG_PERCENT,	// finish-quest
 };
 
 
@@ -3040,6 +3049,11 @@ const char *vtrig_types[] = {
 	"*",	// 14
 	"*",	// 15
 	"Leave",
+	"*",	// 17
+	"*",	// 18
+	"*",	// 19
+	"Start-Quest",	// 20
+	"Finish-Quest",	// 21
 	"\n"
 };
 
@@ -3063,30 +3077,38 @@ const bitvector_t vtrig_argument_types[] = {
 	NOBITS,	// 14
 	NOBITS,	// 15
 	TRIG_ARG_PERCENT,	// leave
+	NOBITS,	// 17
+	NOBITS,	// 18
+	NOBITS,	// 19
+	TRIG_ARG_PERCENT,	// start-quest
+	TRIG_ARG_PERCENT,	// finish-quest
 };
 
 
 // WTRIG_x: wld trigger types
 const char *wtrig_types[] = {
-	"Global",
+	"Global",	// 0
 	"Random",
 	"Command",
 	"Speech",
 	"Adventure Cleanup",
-	"Zone Reset",
+	"Zone Reset",	// 5
 	"Enter",
 	"Drop",
 	"*",
 	"*",
-	"*",
+	"*",	// 10
 	"*",
 	"*",
 	"Load",
 	"Complete",
-	"Ability",
+	"Ability",	// 15
 	"Leave",
 	"Door",
 	"*",
+	"*",
+	"Start-Quest",	// 20
+	"Finish-Quest",	// 21
 	"\n"
 };
 
@@ -3110,7 +3132,10 @@ const bitvector_t wtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// ability
 	TRIG_ARG_PERCENT,	// leave
 	TRIG_ARG_PERCENT,	// door
-	NOBITS,	// 
+	NOBITS,	// 18
+	NOBITS,	// 19
+	TRIG_ARG_PERCENT,	// start-quest
+	TRIG_ARG_PERCENT,	// finish-quest
 };
 
 

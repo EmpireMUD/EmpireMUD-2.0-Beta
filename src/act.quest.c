@@ -383,10 +383,17 @@ void show_quest_tracker(char_data *ch, struct player_quest *pq) {
 * @param struct instance_data *inst The associated instance, if any.
 */
 void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
+	extern int check_start_quest_trigger(char_data *actor, quest_data *quest);
+	
 	char buf[MAX_STRING_LENGTH];
 	struct player_quest *pq;
 	
 	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	// triggers
+	if (!check_start_quest_trigger(ch, qst)) {
 		return;
 	}
 	
@@ -492,6 +499,7 @@ QCMD(qcmd_drop) {
 */
 bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 	extern bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empire_data **giver_emp);
+	extern int check_finish_quest_trigger(char_data *actor, quest_data *quest);
 	
 	quest_data *quest = quest_proto(pq->vnum);
 	empire_data *giver_emp = NULL;
@@ -510,6 +518,7 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 		return FALSE;
 	}
 	
+	
 	// preliminary completeness check
 	count_quest_tasks(pq, &complete, &total);
 	if (complete < total) {
@@ -526,6 +535,11 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 		if (show_errors) {
 			msg_to_char(ch, "That quest is not complete.\r\n");
 		}
+		return FALSE;
+	}
+	
+	// triggers?
+	if (!check_finish_quest_trigger(ch, quest)) {
 		return FALSE;
 	}
 	

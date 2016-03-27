@@ -56,6 +56,8 @@
 #define MTRIG_DOOR             BIT(17)     /* door manipulated in room   */
 #define MTRIG_LEAVE_ALL        BIT(18)	// leave even if they can't see
 #define MTRIG_CHARMED          BIT(19)	// fight/random triggers will fire even while charmed
+#define MTRIG_START_QUEST      BIT(20)	// player tries to start a quest
+#define MTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 
 
 /* obj trigger types */
@@ -77,6 +79,8 @@
 
 #define OTRIG_CONSUME          BIT(18)    /* char tries to eat/drink obj */
 #define OTRIG_FINISH           BIT(19)	// char finishes reading a book
+#define OTRIG_START_QUEST      BIT(20)	// player tries to start a quest
+#define OTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 
 
 // VTRIG_x: vehicle trigger types
@@ -93,6 +97,9 @@
 #define VTRIG_LOAD  BIT(13)	// vehicle is loaded
 // unused BIT(14), BIT(15)
 #define VTRIG_LEAVE  BIT(16)	// someone leaves the room
+// unuused: 17-19
+#define VTRIG_START_QUEST      BIT(20)	// player tries to start a quest
+#define VTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 
 
 /* wld trigger types */
@@ -110,6 +117,9 @@
 #define WTRIG_ABILITY          BIT(15)     /* ability used in room */
 #define WTRIG_LEAVE            BIT(16)     /* character leaves the room */
 #define WTRIG_DOOR             BIT(17)     /* door manipulated in room  */
+// unused: 18, 19
+#define WTRIG_START_QUEST      BIT(20)	// player tries to start a quest
+#define WTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 
 
 /* obj command trigger types */
