@@ -63,6 +63,7 @@ extern const char *syslog_types[];
 // external functions
 extern struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);	// instance.c
 void check_autowiz(char_data *ch);
+void check_delayed_load(char_data *ch);
 void clear_char_abilities(char_data *ch, any_vnum skill);
 void delete_instance(struct instance_data *inst);	// instance.c
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
@@ -1828,6 +1829,93 @@ SHOW(show_player) {
 }
 
 
+SHOW(show_quests) {
+	void count_quest_tasks(struct player_quest *pq, int *complete, int *total);
+	void show_quest_tracker(char_data *ch, struct player_quest *pq);
+	
+	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH];
+	struct player_completed_quest *pcq, *next_pcq;
+	bool file = FALSE, found = FALSE;
+	struct player_quest *pq;
+	int count, total;
+	quest_data *qst;
+	char_data *vict;
+	size_t size;
+	
+	arg2 = any_one_arg(argument, name);
+	skip_spaces(&arg2);
+	
+	if (!(vict = find_or_load_player(name, &file))) {
+		msg_to_char(ch, "No player by that name.\r\n");
+	}
+	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else if (!*arg2 || is_abbrev(arg2, "active")) {
+		// active quest list
+		check_delayed_load(vict);
+		if (IS_NPC(vict) || !GET_QUESTS(vict)) {
+			msg_to_char(ch, "%s is not on any quests.\r\n", GET_NAME(vict));
+			return;
+		}
+		
+		size = snprintf(buf, sizeof(buf), "%s's quests:\r\n", GET_NAME(vict));
+		LL_FOREACH(GET_QUESTS(vict), pq) {
+			count_quest_tasks(pq, &count, &total);
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d)\r\n", pq->vnum, get_quest_name_by_proto(pq->vnum), count, total);
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}	// end "active"
+	else if (is_abbrev(arg2, "completed")) {
+		// completed quest list
+		check_delayed_load(vict);
+		if (IS_NPC(vict) || !GET_COMPLETED_QUESTS(vict)) {
+			msg_to_char(ch, "%s has not completed any quests.\r\n", GET_NAME(vict));
+			return;
+		}
+		
+		size = snprintf(buf, sizeof(buf), "%s's completed quests:\r\n", GET_NAME(vict));
+		HASH_ITER(hh, GET_COMPLETED_QUESTS(vict), pcq, next_pcq) {
+			if (size >= sizeof(buf)) {
+				break;
+			}
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", pcq->vnum, get_quest_name_by_proto(pcq->vnum));
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+	else {
+		// show one active quest's tracker
+		check_delayed_load(vict);
+		LL_FOREACH(GET_QUESTS(vict), pq) {
+			if (!(qst = quest_proto(pq->vnum))) {
+				continue;
+			}
+			
+			if (is_multiword_abbrev(arg2, QUEST_NAME(qst))) {
+				msg_to_char(ch, "%s ", QUEST_NAME(qst));	// followed by "Quest Tracker:"
+				show_quest_tracker(ch, pq);
+				found = TRUE;
+				break;	// show just one
+			}
+		}
+		
+		if (!found) {
+			msg_to_char(ch, "%s is not on a quest called '%s'.\r\n", GET_NAME(vict), arg2);
+		}
+	}
+	
+	if (file) {
+		free_char(vict);
+	}
+}
+
+
 SHOW(show_rent) {
 	void Crash_listrent(char_data *ch, char *name);
 	
@@ -2820,7 +2908,6 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 
 /* Sends ch information on the character or animal k */
 void do_stat_character(char_data *ch, char_data *k) {
-	void check_delayed_load(char_data *ch);
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
 	extern int total_bonus_healing(char_data *ch);
@@ -6125,6 +6212,7 @@ ACMD(do_show) {
 		{ "islands", LVL_START_IMM, show_islands },
 		{ "variables", LVL_START_IMM, show_variables },
 		{ "components", LVL_START_IMM, show_components },
+		{ "quests", LVL_START_IMM, show_quests },
 		{ "uses", LVL_START_IMM, show_uses },
 
 		// last
