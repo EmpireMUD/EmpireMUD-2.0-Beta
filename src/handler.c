@@ -4230,6 +4230,8 @@ void obj_to_char(obj_data *object, char_data *ch) {
 * @param char_data *ch The person you're trying to give it to.
 */
 void obj_to_char_if_okay(obj_data *obj, char_data *ch) {
+	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
+	
 	bool ok = TRUE;
 	
 	if (!bind_ok(obj, ch)) {
