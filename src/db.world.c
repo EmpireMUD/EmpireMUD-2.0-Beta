@@ -1192,6 +1192,7 @@ void reset_one_room(room_data *room) {
 	struct reset_com *reset;
 	char_data *tmob = NULL; /* for trigger assignment */
 	char_data *mob = NULL;
+	trig_data *trig;
 	
 	// shortcut
 	if (!room->reset_commands) {
@@ -1263,13 +1264,17 @@ void reset_one_room(room_data *room) {
 					if (!SCRIPT(tmob)) {
 						CREATE(SCRIPT(tmob), struct script_data, 1);
 					}
-					add_trigger(SCRIPT(tmob), read_trigger(reset->arg2), -1);
+					if ((trig = read_trigger(reset->arg2))) {
+						add_trigger(SCRIPT(tmob), trig, -1);
+					}
 				}
 				else if (reset->arg1 == WLD_TRIGGER) {
 					if (!room->script) {
 						CREATE(room->script, struct script_data, 1);
 					}
-					add_trigger(room->script, read_trigger(reset->arg2), -1);
+					if ((trig = read_trigger(reset->arg2))) {
+						add_trigger(room->script, trig, -1);
+					}
 				}
 				break;
 			}
