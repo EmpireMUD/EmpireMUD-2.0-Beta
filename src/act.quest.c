@@ -174,7 +174,7 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 		// QR_x: reward the rewards
 		switch (reward->type) {
 			case QR_BONUS_EXP: {
-				msg_to_char(ch, "You gain %d bonus experience point%s!\r\n", reward->amount, PLURAL(reward->amount));
+				msg_to_char(ch, "You gain %d bonus experience point%s! (Bonus exp expires at the end of the day.)\r\n", reward->amount, PLURAL(reward->amount));
 				SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(ch), reward->amount, 0, UCHAR_MAX, FALSE);
 				break;
 			}
