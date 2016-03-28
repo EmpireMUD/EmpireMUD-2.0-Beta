@@ -616,10 +616,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 			}
 			case QT_SKILL_LEVEL_UNDER: {
 				if (get_skill_level(ch, task->vnum) <= task->needed) {
-					task->current = task->needed;	// full
+					task->current = MAX(0, task->needed);	// full
 				}
 				else {
-					task->current = 0;
+					task->current = -1;	// must set below 0 because 0 is a valid "needed"
 				}
 				break;
 			}
@@ -1520,7 +1520,7 @@ void qt_change_skill_level(char_data *ch, any_vnum skl) {
 				task->current = (get_skill_level(ch, skl) >= task->needed ? task->needed : 0);
 			}
 			else if (task->type == QT_SKILL_LEVEL_UNDER && task->vnum == skl) {
-				task->current = (get_skill_level(ch, skl) <= task->needed ? task->needed : 0);
+				task->current = (get_skill_level(ch, skl) <= task->needed ? task->needed : -1);	// must set below 0 because 0 is a valid needed
 			}
 		}
 	}

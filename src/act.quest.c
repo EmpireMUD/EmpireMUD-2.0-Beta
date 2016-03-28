@@ -360,12 +360,16 @@ void show_quest_tracker(char_data *ch, struct player_quest *pq) {
 	
 	char buf[MAX_STRING_LENGTH];
 	struct quest_task *task;
+	int lefthand;
 	
 	msg_to_char(ch, "Quest Tracker:\r\n");
 	
 	LL_FOREACH(pq->tracker, task) {
 		if (quest_tracker_has_amount[task->type]) {
-			sprintf(buf, " (%d/%d)", MIN(task->current, task->needed), task->needed);
+			lefthand = task->current;
+			lefthand = MIN(lefthand, task->needed);	// may be above the amount needed
+			lefthand = MAX(0, lefthand);	// in some cases, current may be negative
+			sprintf(buf, " (%d/%d)", lefthand, task->needed);
 		}
 		else {
 			*buf = '\0';
