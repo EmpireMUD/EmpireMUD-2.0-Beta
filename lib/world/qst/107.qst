@@ -1,0 +1,248 @@
+#10730
+Hey Diddle Diddle~
+   Hey diddle diddle, it seems the cat has lost its fiddle. Find the fiddle and
+return it to the cat in exchange for a starry cloak.
+~
+   You give the cat his fiddle. He seems so grateful that he immediately plays
+you a little tune:
+ Hey diddle diddle,
+ The cat and the fiddle,
+ The cow jumped over the moon.
+ The little dog laughed,
+ To see such sport,
+ And the dish ran away with the spoon.
+~
+3 d 0 25 0
+A
+2 10730
+A
+1 10730
+R
+2 10731 1
+W
+2 10730 0 1
+Z
+1 10730
+S
+#10732
+To Fetch a Pail of Water~
+   Jack and his sister are trying to fetch a pail of water, but it seems they
+lost their pail. Return the pail to Jack and receive a fetching pair of
+trousers.  
+~
+You give Jack the pail. In exchange, he sings you a little rhyme:
+Jack and Jill went up the hill
+To fetch a pail of water.
+Jack fell down and broke his crown,
+And Jill came tumbling after.
+~
+2 d 1 25 0
+A
+1 10732
+A
+2 10732
+R
+2 10733 1
+W
+2 10732 0 1
+Z
+1 10732
+S
+#10733
+Jill Came Tumbling After~
+   Jill and her brother are trying to fetch a pail of water, but it seems they
+lost their pail. Return the pail to Jill and receive a fetching skirt.  
+~
+You give Jack the pail. In exchange, she sings you a little rhyme:
+Jack and Jill went up the hill
+To fetch a pail of water.
+Jack fell down and broke his crown,
+And Jill came tumbling after.
+~
+3 d 1 25 0
+A
+1 10733
+A
+2 10732
+R
+2 10745 1
+W
+2 10732 0 1
+Z
+1 10733
+S
+#10734
+Jack Be Nimble (unlit candlestick)~
+   Jack is a real daredevil, but there's nothing to jump around here but the
+creek. If you could bring Jack his candlestick, perhaps he'd share his best
+jumping shoes.  
+~
+   You hand Jack his candlestick, which he lights and proceeds to jump over. 
+He looks no worse for the wear, other than his singed shoes. He chants a little
+rhyme as he jumps:
+Jack be nimble,
+Jack be quick,
+Jack jump over
+The candlestick.
+~
+4 d 0 25 0
+A
+2 10734
+A
+1 10734
+R
+2 10736 1
+W
+2 10734 0 1
+Z
+1 10734
+S
+#10735
+Jack Be Nimble (lit candlestick)~
+   Jack is a real daredevil, but there's nothing to jump around here but the
+creek. If you could bring Jack his candlestick, perhaps he'd share his best
+jumping shoes.  
+~
+   You hand Jack his candlestick, which he immediately jumps over. He
+looks no worse for the wear, other than his singed shoes. He chants a little
+rhyme as he jumps:
+Jack be nimble,
+Jack be quick,
+Jack jump over
+The candlestick.
+~
+5 d 0 25 0
+A
+2 10735
+A
+1 10734
+R
+2 10736 1
+W
+2 10735 0 1
+Z
+1 10734
+S
+#10737
+Jack Sprat Could Eat No Fat~
+   Jack Sprat is looking for the fatty ham which he was to share with his wife.
+Jack is all skin and bones, and looks like he needs the ham more than you do.
+Perhaps if you return it to him, he'll give you his old belt.  
+~
+You give Jack the fatty ham, and he sings you a little tune:
+Jack Spart could eat no far.
+His wife could eat no lean.
+And so between them both, you see,
+They licked the platter clean.
+~
+5 d 0 25 0
+A
+2 10737
+A
+1 10737
+R
+2 10738 1
+W
+2 10737 0 1
+Z
+1 10737
+S
+#10739
+Little Jack Horner Sat In The Corner~
+   Little Jack Horner is looking for his Christmas pie. If you find it and
+return it, Jack might give you his old gloves.  
+~
+You hand Jack his pie, which he takes eagerly and sings:
+Little Jack Horner
+Sat in the corner,
+Eating a Christmas pie;
+He put in his thumb,
+And pulled out a plum,
+And said 'What a good boy am I!'
+~
+6 d 0 25 0
+A
+2 10739
+A
+1 10739
+R
+2 10740 1
+W
+2 10739 0 1
+Z
+1 10739
+S
+#10741
+Eating Her Curds And Whey~
+   Little Miss Muffet has lost her curds and whey. If you could find her lunch,
+she would happily give you a nice earring in exchange.  
+~
+   Miss Muffet quickly snatches the meal and sits down to eat, while a voice
+nearby sings:
+Little Miss Muffet
+Sat on a tuffet,
+Eating her curds and whey;
+Along came a spider
+Who sat down beside her
+And frightened Miss Muffet away.
+~
+7 d 0 25 0
+A
+2 10741
+A
+1 10741
+R
+2 10742 1
+W
+2 10741 0 1
+Z
+1 10741
+S
+#10743
+Its Fleece Was White As Snow~
+   Mary has lost her little lamb. Or, more importantly, the bell that calls the
+lamb. Return it to her in exchange for a warm reward.  
+~
+Mary takes the bell and gives it a jingle while singing:
+Mary had a little lamb,
+His fleece was white as snow,
+And everwhere that Mary went,
+The lamb was sure to go.
+~
+8 d 0 25 0
+A
+2 10744
+A
+1 10743
+R
+2 10743 1
+W
+2 10744 0 1
+Z
+1 10743
+S
+#10746
+Some Broth Without Any Bread~
+   The old woman in the giant shoe has lost the only thing she had to feed her
+children: her broth. If you could find it and return it to her, she might be
+able to spare a shoelace as reward.  
+~
+You give the soup to the old woman, who sings as she ladles:
+There was an old woman who lived in a shoe.
+She had so many children, she didn't know what to do;
+So she gave them some broth without any bread;
+And she whipped them all soundly and sent them to bed.
+~
+8 d 0 25 0
+A
+2 10746
+A
+1 10746
+R
+2 10747 1
+W
+2 10746 0 1
+Z
+1 10746
+S
+$

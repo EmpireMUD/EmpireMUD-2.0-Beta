@@ -237,18 +237,10 @@ switch %random.3%
 done
 ~
 #10731
-Cat/Fiddle~
+Give rejection~
 0 j 100
 ~
-if %object.vnum% != 10730
-  %send% %actor% %self.name% does not want that.
-  return 0
-  halt
-end
-%load% obj 10731 %actor% inv 25
-%send% %actor% %self.name% gives you a starry cloak in exchange for the fiddle!
-%echoaround% %actor% %self.name% gives %actor.name% a starry cloak in exchange for a fiddle!
-%purge% %object%
+%send% %actor% %self.name% does not want that.
 return 0
 ~
 #10732
@@ -267,21 +259,6 @@ switch %random.3%
   break
 done
 ~
-#10733
-Jack/Pail~
-0 j 100
-~
-if %object.vnum% != 10732
-  %send% %actor% %self.name% does not want that.
-  return 0
-  halt
-end
-%load% obj 10733 %actor% inv 25
-%send% %actor% %self.name% gives you a pair of fetching trousers in exchange for the pail!
-%echoaround% %actor% %self.name% gives %actor.name% a pair of fetching trousers in exchange for a pail!
-%purge% %object%
-return 0
-~
 #10734
 Jack Be Nimble~
 0 b 10
@@ -297,21 +274,6 @@ switch %random.3%
     %echo% plants a regular stick in the ground and jumps over it, but it's just not the same.
   break
 done
-~
-#10735
-Jack/Candlestick~
-0 j 100
-~
-if (%object.vnum% != 10734 && %object.vnum% != 10735)
-  %send% %actor% %self.name% does not want that.
-  return 0
-  halt
-end
-%load% obj 10736 %actor% inv 25
-%send% %actor% %self.name% gives you a pair of burnt shoes in exchange for the candlestick!
-%echoaround% %actor% %self.name% gives %actor.name% a pair of burnt shoes in exchange for a candlestick!
-%purge% %object%
-return 0
 ~
 #10736
 Jill~
@@ -344,21 +306,6 @@ switch %random.3%
     %echo% %self.name% could eat no fat. His wife could eat no lean.
   break
 ~
-#10738
-Jack/Ham~
-0 j 100
-~
-if %object.vnum% != 10737
-  %send% %actor% %self.name% does not want that.
-  return 0
-  halt
-end
-%load% obj 10738 %actor% inv 25
-%send% %actor% %self.name% gives you a lean belt in exchange for the fatty ham!
-%echoaround% %actor% %self.name% gives %actor.name% a lean belt in exchange for a fatty ham!
-%purge% %object%
-return 0
-~
 #10739
 Jack Horner~
 0 b 10
@@ -374,21 +321,6 @@ switch %random.3%
     %echo% %self.name% licks his lips and looks around for his pie.
   break
 done
-~
-#10740
-Jack/Pie~
-0 j 100
-~
-if %object.vnum% != 10739
-  %send% %actor% %self.name% does not want that.
-  return 0
-  halt
-end
-%load% obj 10740 %actor% inv 25
-%send% %actor% %self.name% gives you a pair of plum-stained gloves in exchange for the Christmas pie!
-%echoaround% %actor% %self.name% gives %actor.name% a pair of plum-stained gloves in exchange for a Christmas pie!
-%purge% %object%
-return 0
 ~
 #10741
 Miss Muffet~
@@ -406,21 +338,6 @@ switch %random.3%
   break
 done
 ~
-#10742
-Muffet/Curds~
-0 j 100
-~
-if %object.vnum% != 10741
-  %send% %actor% %self.name% does not want that.
-  return 0
-  halt
-end
-%load% obj 10742 %actor% inv 25
-%send% %actor% %self.name% gives you a spider in exchange for the curds and whey!
-%echoaround% %actor% %self.name% gives %actor.name% a spider in exchange for some curds and whey!
-%purge% %object%
-return 0
-~
 #10743
 Mary~
 0 b 10
@@ -437,36 +354,6 @@ switch %random.3%
   break
 done
 ~
-#10744
-Mary/Lamb~
-0 j 100
-~
-if %object.vnum% != 10744
-  %send% %actor% %self.name% does not want that.
-  return 0
-  halt
-end
-%load% obj 10743 %actor% inv 25
-%send% %actor% %self.name% gives you some warm fleece in exchange for the bell!
-%echoaround% %actor% %self.name% gives %actor.name% some warm fleece in exchange for a bell and ribbon!
-%purge% %object%
-return 0
-~
-#10745
-Jill/Pail~
-0 j 100
-~
-if %object.vnum% != 10732
-  %send% %actor% %self.name% does not want that.
-  return 0
-  halt
-end
-%load% obj 10745 %actor% inv 25
-%send% %actor% %self.name% gives you a fetching skirt in exchange for the pail!
-%echoaround% %actor% %self.name% gives %actor.name% a fetching skirt in exchange for a pail!
-%purge% %object%
-return 0
-~
 #10746
 Old Woman who lived in a shoe~
 0 b 10
@@ -482,21 +369,6 @@ switch %random.3%
     %echo% %self.name% seems to have lost her broth.
   break
 done
-~
-#10747
-Woman/Broth~
-0 j 100
-~
-if %object.vnum% != 10746
-  %send% %actor% %self.name% does not want that.
-  return 0
-  halt
-end
-%load% obj 10747 %actor% inv 25
-%send% %actor% %self.name% gives you a spare shoestring in exchange for the broth!
-%echoaround% %actor% %self.name% gives %actor.name% a spare shoestring in exchange for a leathery broth!
-%purge% %object%
-return 0
 ~
 #10748
 Mother Goose spawn~

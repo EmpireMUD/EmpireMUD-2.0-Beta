@@ -12,14 +12,17 @@ Hermit Food Exchange~
 eval test %%self.varexists(gave%actor.id%)%%
 if %object.type% != FOOD || %test%
   %send% %actor% %self.name% doesn't want %object.shortdesc%!
+  %send% %actor% (You have already completed this quest in this instance.)
   return 0
   halt
 end
 wait 1 sec
 if %object.type% == FOOD
   say My thanks to you, %actor.name%!
-  %load% o 11100
-  give bag %actor.name%
+  * We used to actually load it and then give it but it was not being given to players with full inventories
+  %send% %actor% %self.name% gives you a snakeskin bag.
+  %echoaround% %actor% %self.name% gives %actor.name% a snakeskin bag.
+  %load% o 11100 %actor% inventory
   %echo% %self.name% gleefully eats %object.shortdesc%!
   mjunk %object.name%
   eval gave%actor.id% 1
