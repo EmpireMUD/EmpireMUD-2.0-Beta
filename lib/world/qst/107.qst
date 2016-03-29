@@ -28,7 +28,7 @@ S
 To Fetch a Pail of Water~
    Jack and his sister are trying to fetch a pail of water, but it seems they
 lost their pail. Return the pail to Jack and receive a fetching pair of
-trousers.  
+trousers.
 ~
 You give Jack the pail. In exchange, he sings you a little rhyme:
 Jack and Jill went up the hill
@@ -51,7 +51,7 @@ S
 #10733
 Jill Came Tumbling After~
    Jill and her brother are trying to fetch a pail of water, but it seems they
-lost their pail. Return the pail to Jill and receive a fetching skirt.  
+lost their pail. Return the pail to Jill and receive a fetching skirt.
 ~
 You give Jack the pail. In exchange, she sings you a little rhyme:
 Jack and Jill went up the hill
@@ -75,9 +75,9 @@ S
 Jack Be Nimble (unlit candlestick)~
    Jack is a real daredevil, but there's nothing to jump around here but the
 creek. If you could bring Jack his candlestick, perhaps he'd share his best
-jumping shoes.  
+jumping shoes.
 ~
-   You hand Jack his candlestick, which he lights and proceeds to jump over. 
+   You hand Jack his candlestick, which he lights and proceeds to jump over.
 He looks no worse for the wear, other than his singed shoes. He chants a little
 rhyme as he jumps:
 Jack be nimble,
@@ -101,7 +101,7 @@ S
 Jack Be Nimble (lit candlestick)~
    Jack is a real daredevil, but there's nothing to jump around here but the
 creek. If you could bring Jack his candlestick, perhaps he'd share his best
-jumping shoes.  
+jumping shoes.
 ~
    You hand Jack his candlestick, which he immediately jumps over. He
 looks no worse for the wear, other than his singed shoes. He chants a little
@@ -111,13 +111,12 @@ Jack be quick,
 Jack jump over
 The candlestick.
 ~
-5 d 0 25 0
+7 d 0 25 0
 A
 2 10735
-A
-1 10734
 R
 2 10736 1
+T 10735
 W
 2 10735 0 1
 Z
@@ -127,15 +126,15 @@ S
 Jack Sprat Could Eat No Fat~
    Jack Sprat is looking for the fatty ham which he was to share with his wife.
 Jack is all skin and bones, and looks like he needs the ham more than you do.
-Perhaps if you return it to him, he'll give you his old belt.  
+Perhaps if you return it to him, he'll give you his old belt.
 ~
 You give Jack the fatty ham, and he sings you a little tune:
-Jack Spart could eat no far.
+Jack Spart could eat no fat.
 His wife could eat no lean.
 And so between them both, you see,
 They licked the platter clean.
 ~
-5 d 0 25 0
+6 d 0 25 0
 A
 2 10737
 A
@@ -150,7 +149,7 @@ S
 #10739
 Little Jack Horner Sat In The Corner~
    Little Jack Horner is looking for his Christmas pie. If you find it and
-return it, Jack might give you his old gloves.  
+return it, Jack might give you his old gloves.
 ~
 You hand Jack his pie, which he takes eagerly and sings:
 Little Jack Horner
@@ -175,7 +174,7 @@ S
 #10741
 Eating Her Curds And Whey~
    Little Miss Muffet has lost her curds and whey. If you could find her lunch,
-she would happily give you a nice earring in exchange.  
+she would happily give you a nice earring in exchange.
 ~
    Miss Muffet quickly snatches the meal and sits down to eat, while a voice
 nearby sings:
@@ -201,7 +200,7 @@ S
 #10743
 Its Fleece Was White As Snow~
    Mary has lost her little lamb. Or, more importantly, the bell that calls the
-lamb. Return it to her in exchange for a warm reward.  
+lamb. Return it to her in exchange for a warm reward.
 ~
 Mary takes the bell and gives it a jingle while singing:
 Mary had a little lamb,
@@ -225,7 +224,7 @@ S
 Some Broth Without Any Bread~
    The old woman in the giant shoe has lost the only thing she had to feed her
 children: her broth. If you could find it and return it to her, she might be
-able to spare a shoelace as reward.  
+able to spare a shoelace as reward.
 ~
 You give the soup to the old woman, who sings as she ladles:
 There was an old woman who lived in a shoe.
