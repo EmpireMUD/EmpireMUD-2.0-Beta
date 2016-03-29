@@ -197,7 +197,7 @@ trigger already prevented the quest turn-in.
 
 Variables:
   &c%actor%&0 - The character finishing the quest.
-  &c%quest%&0 - The vnum of the quest to end.
+  &c%questvnum%&0 - The vnum of the quest to end.
   &c%questname%&0 - The name of the quest to end.
 
 See also: START QUEST TRIGGER
@@ -445,7 +445,7 @@ trigger already prevented the quest start.
 
 Variables:
   &c%actor%&0 - The character trying to get the quest.
-  &c%quest%&0 - The vnum of the quest to start.
+  &c%questvnum%&0 - The vnum of the quest to start.
   &c%questname%&0 - The name of the quest to start.
 
 See also: FINISH QUEST TRIGGER

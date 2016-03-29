@@ -190,7 +190,19 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 				for (iter = 0; iter < reward->amount; ++iter) {
 					obj = read_object(reward->vnum, TRUE);
 					scale_item_to_level(obj, level);
-					obj_to_char(obj, ch);
+					if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+						obj_to_char(obj, ch);
+					}
+					else {
+						obj_to_room(obj, IN_ROOM(ch));
+					}
+					
+					// ensure binding
+					if (!IS_NPC(ch) && OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
+						bind_obj_to_player(obj, ch);
+						reduce_obj_binding(obj, ch);
+					}
+					
 					load_otrigger(obj);
 				}
 				

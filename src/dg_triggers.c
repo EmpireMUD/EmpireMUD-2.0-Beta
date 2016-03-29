@@ -1737,11 +1737,11 @@ int start_quest_mtrigger(char_data *actor, quest_data *quest) {
 				union script_driver_data_u sdd;
 				if (quest) {
 					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
-					add_var(&GET_TRIG_VARS(t), "quest", buf, 0);
+					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
 					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
 				}
 				else {	// no quest?
-					add_var(&GET_TRIG_VARS(t), "quest", "0", 0);
+					add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
 					add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
 				}
 				ADD_UID_VAR(buf, t, actor, "actor", 0);
@@ -1771,11 +1771,11 @@ int start_quest_otrigger_one(obj_data *obj, char_data *actor, quest_data *quest)
 			union script_driver_data_u sdd;
 			if (quest) {
 				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
-				add_var(&GET_TRIG_VARS(t), "quest", buf, 0);
+				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
 				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
 			}
 			else {	// no quest?
-				add_var(&GET_TRIG_VARS(t), "quest", "0", 0);
+				add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
 				add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
 			}
 			ADD_UID_VAR(buf, t, actor, "actor", 0);
@@ -1812,11 +1812,11 @@ int start_quest_vtrigger(char_data *actor, quest_data *quest) {
 				union script_driver_data_u sdd;
 				if (quest) {
 					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
-					add_var(&GET_TRIG_VARS(t), "quest", buf, 0);
+					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
 					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
 				}
 				else {	// no quest?
-					add_var(&GET_TRIG_VARS(t), "quest", "0", 0);
+					add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
 					add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
 				}
 				ADD_UID_VAR(buf, t, actor, "actor", 0);
@@ -1845,11 +1845,11 @@ int start_quest_wtrigger(room_data *room, char_data *actor, quest_data *quest) {
 			ADD_ROOM_UID_VAR(buf, t, room, "room", 0);
 			if (quest) {
 				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
-				add_var(&GET_TRIG_VARS(t), "quest", buf, 0);
+				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
 				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
 			}
 			else {	// no quest?
-				add_var(&GET_TRIG_VARS(t), "quest", "0", 0);
+				add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
 				add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
 			}
 			ADD_UID_VAR(buf, t, actor, "actor", 0);
@@ -1985,11 +1985,11 @@ int finish_quest_mtrigger(char_data *actor, quest_data *quest) {
 				union script_driver_data_u sdd;
 				if (quest) {
 					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
-					add_var(&GET_TRIG_VARS(t), "quest", buf, 0);
+					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
 					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
 				}
 				else {	// no quest?
-					add_var(&GET_TRIG_VARS(t), "quest", "0", 0);
+					add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
 					add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
 				}
 				ADD_UID_VAR(buf, t, actor, "actor", 0);
@@ -2019,11 +2019,11 @@ int finish_quest_otrigger_one(obj_data *obj, char_data *actor, quest_data *quest
 			union script_driver_data_u sdd;
 			if (quest) {
 				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
-				add_var(&GET_TRIG_VARS(t), "quest", buf, 0);
+				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
 				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
 			}
 			else {	// no quest?
-				add_var(&GET_TRIG_VARS(t), "quest", "0", 0);
+				add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
 				add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
 			}
 			ADD_UID_VAR(buf, t, actor, "actor", 0);
@@ -2060,11 +2060,11 @@ int finish_quest_vtrigger(char_data *actor, quest_data *quest) {
 				union script_driver_data_u sdd;
 				if (quest) {
 					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
-					add_var(&GET_TRIG_VARS(t), "quest", buf, 0);
+					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
 					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
 				}
 				else {	// no quest?
-					add_var(&GET_TRIG_VARS(t), "quest", "0", 0);
+					add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
 					add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
 				}
 				ADD_UID_VAR(buf, t, actor, "actor", 0);
@@ -2093,11 +2093,11 @@ int finish_quest_wtrigger(room_data *room, char_data *actor, quest_data *quest) 
 			ADD_ROOM_UID_VAR(buf, t, room, "room", 0);
 			if (quest) {
 				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
-				add_var(&GET_TRIG_VARS(t), "quest", buf, 0);
+				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
 				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
 			}
 			else {	// no quest?
-				add_var(&GET_TRIG_VARS(t), "quest", "0", 0);
+				add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
 				add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
 			}
 			ADD_UID_VAR(buf, t, actor, "actor", 0);
