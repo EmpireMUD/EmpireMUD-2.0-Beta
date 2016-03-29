@@ -226,6 +226,132 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 
 
 /**
+* Processes the %quest% command.
+*
+* @param int go_type _TRIGGER type for 'go'
+* @param void *go A pointer to the thing the trigger is running on.
+* @param char *argument The typed-in arg.
+*/
+void do_dg_quest(int go_type, void *go, char *argument) {
+	extern struct instance_data *get_instance_by_id(any_vnum instance_id);
+	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
+	
+	char vict_arg[MAX_INPUT_LENGTH], cmd_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH];
+	struct instance_data *inst = NULL;
+	struct player_quest *pq;
+	empire_data *emp = NULL;
+	room_data *room = NULL;
+	char_data *vict = NULL;
+	quest_data *quest;
+	any_vnum vnum;
+	
+	argument = any_one_arg(argument, vict_arg);
+	argument = any_one_arg(argument, cmd_arg);
+	argument = any_one_arg(argument, vnum_arg);
+	
+	if (!*vict_arg || !*cmd_arg || !*vnum_arg) {
+		script_log_by_type(go_type, go, "dg_quest: too few args");
+		return;
+	}
+	if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0 || !(quest = quest_proto(vnum))) {
+		script_log_by_type(go_type, go, "dg_quest: invalid vnum '%s'", vnum_arg);
+		return;
+	}
+	
+	// find vict by uid?
+	if (*vict_arg == UID_CHAR) {
+		vict = get_char(vict_arg);
+	}
+	
+	// x_TRIGGER: set up basics
+	switch (go_type) {
+		case MOB_TRIGGER: {
+			char_data *mob = (char_data*)go;
+			room = IN_ROOM(mob);
+			emp = GET_LOYALTY(mob);
+			inst = get_instance_by_id(MOB_INSTANCE_ID(mob));
+			if (!vict) {
+				vict = get_char_room_vis(mob, vict_arg);
+			}
+			break;
+		}
+		case OBJ_TRIGGER: {
+			extern room_data *obj_room(obj_data *obj);
+			
+			obj_data *obj = (obj_data*)go;
+			room = obj_room(obj);
+			if (!vict) {
+				vict = get_char_near_obj(obj, vict_arg);
+			}
+			emp = (obj->carried_by ? GET_LOYALTY(obj->carried_by) : ((!CAN_WEAR(obj, ITEM_WEAR_TAKE) || !vict) ? ROOM_OWNER(room) : (vict ? GET_LOYALTY(vict) : NULL)));
+			break;
+		}
+		case WLD_TRIGGER:
+		case RMT_TRIGGER:
+		case ADV_TRIGGER:
+		case BLD_TRIGGER: {
+			extern char_data *get_char_in_room(room_data *room, char *name);
+			
+			room = (room_data*)go;
+			emp = ROOM_OWNER(room);
+			if (!vict) {
+				vict = get_char_in_room(room, vict_arg);
+			}
+			break;
+		}
+		case VEH_TRIGGER: {
+			vehicle_data *veh = (vehicle_data*)go;
+			room = IN_ROOM(veh);
+			emp = VEH_OWNER(veh);
+			if (!vict) {
+				vict = get_char_near_vehicle(veh, vict_arg);
+			}
+			break;
+		}
+		default: {
+			script_log_by_type(go_type, go, "dg_quest: unknown type %d", go_type);
+			return;
+		}
+	}
+	
+	// should have detected a victim
+	if (!vict) {
+		script_log_by_type(go_type, go, "dg_quest: unable to find target '%s'", vict_arg);
+		return;
+	}
+	
+	// ready for commands
+	if (is_abbrev(cmd_arg, "drop")) {
+		if ((pq = is_on_quest(vict, QUEST_VNUM(quest)))) {
+			void drop_quest(char_data *ch, struct player_quest *pq);
+			drop_quest(vict, pq);
+		}
+	}
+	else if (is_abbrev(cmd_arg, "finish")) {
+		if ((pq = is_on_quest(vict, QUEST_VNUM(quest)))) {
+			void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_emp);
+			complete_quest(vict, pq, emp);
+		}
+	}
+	else if (is_abbrev(cmd_arg, "start")) {
+		if (!is_on_quest(vict, QUEST_VNUM(quest))) {
+			void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
+			if (!inst && room && COMPLEX_DATA(room)) {
+				inst = COMPLEX_DATA(room)->instance;
+			}
+			start_quest(vict, quest, inst);
+		}
+	}
+	else if (is_abbrev(cmd_arg, "trigger")) {
+		qt_triggered_task(vict, QUEST_VNUM(quest));
+	}
+	else {
+		script_log_by_type(go_type, go, "dg_quest: invalid command '%s'", cmd_arg);
+	}
+}
+
+
+/**
 * Do the actual work for the %terracrop% commands, once everything has been
 * validated.
 *

@@ -2239,7 +2239,9 @@ void do_abandon_room(char_data *ch, room_data *room) {
 * @param vehicle_data *veh The vehicle to abandon.
 */
 void do_abandon_vehicle(char_data *ch, vehicle_data *veh) {
-	if (!VEH_OWNER(veh) || VEH_OWNER(veh) != GET_LOYALTY(ch)) {
+	empire_data *emp = VEH_OWNER(veh);
+	
+	if (!emp || VEH_OWNER(veh) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You don't even own that.\r\n");
 	}
 	else {
@@ -2249,6 +2251,10 @@ void do_abandon_vehicle(char_data *ch, vehicle_data *veh) {
 		
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
 			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
+		}
+		
+		if (VEH_IS_COMPLETE(veh)) {
+			qt_empire_players(emp, qt_lose_vehicle, VEH_VNUM(veh));
 		}
 	}
 }
@@ -2582,6 +2588,10 @@ void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
 				abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
 			}
 			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
+		}
+		
+		if (VEH_IS_COMPLETE(veh)) {
+			qt_empire_players(emp, qt_gain_vehicle, VEH_VNUM(veh));
 		}
 	}
 }

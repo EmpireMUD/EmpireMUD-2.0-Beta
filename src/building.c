@@ -179,6 +179,10 @@ void complete_building(room_data *room) {
 	// lastly
 	if ((emp = ROOM_OWNER(room))) {
 		read_empire_territory(emp);
+		
+		if (GET_BUILDING(room)) {
+			qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
+		}
 	}
 }
 
@@ -289,6 +293,10 @@ void disassociate_building(room_data *room) {
 	struct instance_data *inst;
 	bool deleted = FALSE;
 	
+	if (ROOM_OWNER(room) && GET_BUILDING(room) && IS_COMPLETE(room)) {
+		qt_empire_players(ROOM_OWNER(room), qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
+	}
+	
 	// delete any open instance here
 	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room, FALSE))) {
 		SET_BIT(inst->flags, INST_COMPLETED);
@@ -314,7 +322,7 @@ void disassociate_building(room_data *room) {
 	if (SCRIPT(room)) {
 		extract_script(room, WLD_TRIGGER);
 	}
-	free_proto_script(room, WLD_TRIGGER);
+	free_proto_scripts(&room->proto_script);
 
 	// restore sect: this does not use change_terrain()
 	SECT(room) = BASE_SECT(room);
@@ -959,6 +967,10 @@ void start_dismantle_building(room_data *loc) {
 	SET_BIT(ROOM_AFF_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	delete_room_npcs(loc, NULL);
+	
+	if (loc && ROOM_OWNER(loc) && GET_BUILDING(loc) && complete) {
+		qt_empire_players(ROOM_OWNER(loc), qt_lose_building, GET_BLD_VNUM(GET_BUILDING(loc)));
+	}
 }
 
 
@@ -1565,7 +1577,7 @@ ACMD(do_designate) {
 			if (SCRIPT(new)) {
 				extract_script(new, WLD_TRIGGER);
 			}
-			free_proto_script(new, WLD_TRIGGER);
+			free_proto_scripts(&new->proto_script);
 			
 			attach_building_to_room(type, new, TRUE);
 		}

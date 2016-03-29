@@ -824,6 +824,19 @@ ACMD(do_mpurge) {
 }
 
 
+// quest commands
+ACMD(do_mquest) {
+	void do_dg_quest(int go_type, void *go, char *argument);
+		
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	
+	do_dg_quest(MOB_TRIGGER, ch, argument);
+}
+
+
 /* lets the mobile goto any location it wishes that is not private */
 ACMD(do_mgoto) {
 	char arg[MAX_INPUT_LENGTH];
@@ -962,6 +975,7 @@ ACMD(do_mteleport) {
 				char_from_room(vict);
 				char_to_room(vict, target);
 				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR);
+				qt_visit_room(vict, IN_ROOM(vict));
 			}
 		}
 	}
@@ -990,6 +1004,7 @@ ACMD(do_mteleport) {
 							GET_LAST_DIR(vict) = NO_DIR;
 						}
 						enter_wtrigger(IN_ROOM(vict), ch, NO_DIR);
+						qt_visit_room(vict, IN_ROOM(vict));
 					}
 				}
 			}
@@ -1004,6 +1019,7 @@ ACMD(do_mteleport) {
 				char_from_room(vict);
 				char_to_room(vict, target);
 				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR);
+				qt_visit_room(vict, IN_ROOM(vict));
 			}
 		}
 		else if ((*arg1 == UID_CHAR && (veh = get_vehicle(arg1))) || (veh = get_vehicle_in_room_vis(ch, arg1))) {

@@ -165,6 +165,8 @@ bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
 		olc_audit(ch, OLC_CROP, buf);
 		msg_to_char(ch, "Sectors:\r\n");
 		olc_audit(ch, OLC_SECTOR, buf);
+		msg_to_char(ch, "Quests:\r\n");
+		olc_audit(ch, OLC_QUEST, buf);
 		msg_to_char(ch, "Room Templates:\r\n");
 		olc_audit(ch, OLC_ROOM_TEMPLATE, buf);
 		msg_to_char(ch, "Archetypes:\r\n");
@@ -540,8 +542,7 @@ adv_data *setup_olc_adventure(adv_data *input) {
 		}
 		
 		// scripts
-		GET_ADV_SCRIPTS(new) = NULL;
-		copy_proto_script(input, new, ADV_TRIGGER);
+		GET_ADV_SCRIPTS(new) = copy_trig_protos(GET_ADV_SCRIPTS(input));
 	}
 	else {
 		// brand new: some defaults

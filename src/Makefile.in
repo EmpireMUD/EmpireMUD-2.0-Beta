@@ -26,31 +26,33 @@ LIBS = @LIBS@ @CRYPTLIB@ @NETLIB@ -lm
 
 OBJFILES = abilities.o act.action.o act.battle.o act.comm.o act.empire.o \
 	act.fight.o act.god.o act.highsorcery.o act.immortal.o act.informative.o \
-	act.item.o act.movement.o act.naturalmagic.o act.other.o act.social.o \
-	act.stealth.o act.survival.o act.trade.o act.vampire.o act.vehicles.o \
-	archetypes.o augments.o ban.o boards.o bookedit.o books.o building.o \
-	class.o comm.o config.o constants.o db.o db.lib.o db.player.o db.world.o \
-	dg_comm.o dg_db_scripts.o dg_event.o dg_handler.o dg_misc.o dg_mobcmd.o \
-	dg_objcmd.o dg_scripts.o dg_triggers.o dg_vehcmd.o dg_wldcmd.o eedit.o \
-	fight.o handler.o instance.o interpreter.o limits.o mail.o mapview.o \
-	mobact.o modify.o morph.o objsave.o olc.adventure.o olc.building.o olc.o \
-	olc.craft.o olc.crop.o olc.global.o olc.map.o olc.mobile.o olc.object.o \
-	olc.roomtemplate.o olc.sector.o olc.trigger.o protocol.o random.o \
-	skills.o spells.o statistics.o utils.o vehicles.o weather.o workforce.o
+	act.item.o act.movement.o act.naturalmagic.o act.other.o act.quest.o \
+	act.social.o act.stealth.o act.survival.o act.trade.o act.vampire.o \
+	act.vehicles.o archetypes.o augments.o ban.o boards.o bookedit.o books.o \
+	building.o class.o comm.o config.o constants.o db.o db.lib.o db.player.o \
+	db.world.o dg_comm.o dg_db_scripts.o dg_event.o dg_handler.o dg_misc.o \
+	dg_mobcmd.o dg_objcmd.o dg_scripts.o dg_triggers.o dg_vehcmd.o \
+	dg_wldcmd.o eedit.o fight.o handler.o instance.o interpreter.o limits.o \
+	mail.o mapview.o mobact.o modify.o morph.o objsave.o olc.adventure.o \
+	olc.building.o olc.o olc.craft.o olc.crop.o olc.global.o olc.map.o \
+	olc.mobile.o olc.object.o olc.roomtemplate.o olc.sector.o olc.trigger.o \
+	protocol.o quest.o random.o skills.o spells.o statistics.o utils.o \
+	vehicles.o weather.o workforce.o
 
 CXREF_FILES = abilities.c act.action.c act.battle.c act.comm.c act.empire.c \
 	act.fight.c act.god.c act.highsorcery.c act.immortal.c act.informative.c \
-	act.item.c act.movement.c act.naturalmagic.c act.other.c act.social.c \
-	act.stealth.c act.survival.c act.trade.c act.vampire.c act.vehicles.c \
-	archetypes.c augments.c ban.c boards.c bookedit.c books.c building.c \
-	class.c comm.c config.c constants.c db.c db.lib.c db.player.c db.world.c \
-	dg_comm.c dg_db_scripts.c dg_event.c dg_handler.c dg_misc.c dg_mobcmd.c \
-	dg_objcmd.c dg_scripts.c dg_triggers.c dg_vehcmd.c dg_wldcmd.c eedit.c \
-	fight.c handler.c instance.c interpreter.c limits.c mail.c mapview.c \
-	mobact.c modify.c morph.c objsave.c olc.adventure.c olc.building.c olc.c \
-	olc.craft.c olc.crop.c olc.global.c olc.map.c olc.mobile.c olc.object.c \
-	olc.roomtemplate.c olc.sector.c olc.trigger.c protocol.c random.c \
-	skills.c spells.c statistics.c utils.c vehicles.c weather.c workforce.c
+	act.item.c act.movement.c act.naturalmagic.c act.other.c act.quest.c \
+	act.social.c act.stealth.c act.survival.c act.trade.c act.vampire.c \
+	act.vehicles.c archetypes.c augments.c ban.c boards.c bookedit.c books.c \
+	building.c class.c comm.c config.c constants.c db.c db.lib.c db.player.c \
+	db.world.c dg_comm.c dg_db_scripts.c dg_event.c dg_handler.c dg_misc.c \
+	dg_mobcmd.c dg_objcmd.c dg_scripts.c dg_triggers.c dg_vehcmd.c \
+	dg_wldcmd.c eedit.c fight.c handler.c instance.c interpreter.c limits.c \
+	mail.c mapview.c mobact.c modify.c morph.c objsave.c olc.adventure.c \
+	olc.building.c olc.c olc.craft.c olc.crop.c olc.global.c olc.map.c \
+	olc.mobile.c olc.object.c olc.roomtemplate.c olc.sector.c olc.trigger.c \
+	protocol.c quest.c random.c skills.c spells.c statistics.c utils.c \
+	vehicles.c weather.c workforce.c
 
 default: all
 
@@ -140,6 +142,9 @@ act.naturalmagic.o: act.naturalmagic.c conf.h sysdep.h structs.h uthash.h \
 act.other.o: act.other.c conf.h sysdep.h structs.h uthash.h utils.h \
   comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
 	$(CC) -c $(CFLAGS) act.other.c
+act.quest.o: act.quest.c conf.h sysdep.h structs.h uthash.h utils.h \
+  db.h comm.h handler.h interpreter.h skills.h dg_scripts.h
+	$(CC) -c $(CFLAGS) act.quest.c
 act.social.o: act.social.c conf.h sysdep.h structs.h uthash.h utils.h \
   comm.h interpreter.h handler.h db.h skills.h
 	$(CC) -c $(CFLAGS) act.social.c
@@ -313,6 +318,9 @@ olc.trigger.o: olc.trigger.c conf.h sysdep.h structs.h uthash.h utils.h \
 protocol.o: protocol.c conf.h sysdep.h comm.h protocol.h structs.h utils.h \
   handler.h db.h skills.h dg_scripts.h
 	$(CC) -c $(CFLAGS) protocol.c
+quest.o: quest.c conf.h sysdep.h structs.h uthash.h utils.h comm.h db.h \
+  skills.h handler.h interpreter.h dg_scripts.h vnums.h
+	$(CC) -c $(CFLAGS) quest.c
 random.o: random.c
 	$(CC) -c $(CFLAGS) random.c
 skills.o: skills.c conf.h sysdep.h structs.h uthash.h utils.h comm.h olc.h \

@@ -58,8 +58,10 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 /* external functions */
 extern int count_harnessed_animals(vehicle_data *veh);
 void free_varlist(struct trig_var_data *vd);
+extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
+extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);	// quest.c
 extern int is_substring(char *sub, char *string);
 extern room_data *obj_room(obj_data *obj);
 trig_data *read_trigger(trig_vnum vnum);
@@ -1842,6 +1844,64 @@ void script_log(const char *format, ...) {
 	va_end(args);
 }
 
+
+/**
+* Does a script log by ambiguous type.
+*
+* @param int go_type Any _TRIGGER type.
+* @param void *go The thing the trigger is attached to.
+* @param const char *format... The sprintf format.
+*/
+void script_log_by_type(int go_type, void *go, const char *format, ...) {
+	char output[MAX_STRING_LENGTH], name[MAX_STRING_LENGTH], type[MAX_STRING_LENGTH];
+	any_vnum vnum;
+	va_list args;
+	
+	// x_TRIGGER
+	switch (go_type) {
+		case MOB_TRIGGER: {
+			strcpy(type, "Mob");
+			strcpy(name, GET_SHORT((char_data*)go));
+			vnum = GET_MOB_VNUM((char_data*)go);
+			break;
+		}
+		case OBJ_TRIGGER: {
+			strcpy(type, "Obj");
+			strcpy(name, GET_OBJ_SHORT_DESC((obj_data*)go));
+			vnum = GET_OBJ_VNUM((obj_data*)go);
+			break;
+		}
+		case WLD_TRIGGER:
+		case RMT_TRIGGER:
+		case ADV_TRIGGER:
+		case BLD_TRIGGER: {
+			strcpy(type, "Wld");
+			strcpy(name, "Room");
+			vnum = GET_ROOM_VNUM((room_data*)go);
+			break;
+		}
+		case VEH_TRIGGER: {
+			strcpy(type, "Veh");
+			strcpy(name, VEH_SHORT_DESC((vehicle_data*)go));
+			vnum = VEH_VNUM((vehicle_data*)go);
+			break;
+		}
+		default: {
+			strcpy(type, "???");
+			strcpy(name, "???");
+			vnum = NOTHING;
+			break;
+		}
+	}
+
+	snprintf(output, sizeof(output), "%s (%s, VNum %d):: %s", type, name, vnum, format);
+
+	va_start(args, format);
+	script_vlog(output, args);
+	va_end(args);
+}
+
+
 int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *str, size_t slen) {
 	char *p, *p2;
 	char tmpvar[MAX_STRING_LENGTH];
@@ -2001,6 +2061,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		"morph",
 		"own",
 		"purge",
+		"quest",
 		"regionecho",
 		"scale",
 		"send",
@@ -2543,6 +2604,18 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "%d", GET_BLOOD(c));
 						}
 					}
+					else if (!str_cmp(field, "bonus_exp")) {
+						if (!IS_NPC(c)) {
+							int amt;
+							if (subfield && *subfield && (amt = atoi(subfield)) != 0) {
+								SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(ch), amt, 0, UCHAR_MAX, FALSE);
+							}
+							snprintf(str, slen, "%d", GET_DAILY_BONUS_EXPERIENCE(ch));
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
 					else if (!str_cmp(field, "bonus_healing")) {
 						extern int total_bonus_healing(char_data *ch);
 						snprintf(str, slen, "%d", total_bonus_healing(c));
@@ -2629,6 +2702,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "cha") || !str_cmp(field, "charisma")) {
 						snprintf(str, slen, "%d", GET_CHARISMA(c));
+					}
+					else if (!str_cmp(field, "completed_quest")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							any_vnum vnum = atoi(subfield);
+							if (!IS_NPC(c) && has_completed_quest(c, vnum)) {
+								strcpy(str, "1");
+							}
+							else {
+								strcpy(str, "0");
+							}
+						}
 					}
 					else if (!str_cmp(field, "crafting_level")) {
 						extern int get_crafting_level(char_data *ch);
@@ -3035,6 +3119,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					break;
 				}
+				case 'o': {	// char.o*
+					if (!str_cmp(field, "on_quest")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							any_vnum vnum = atoi(subfield);
+							if (!IS_NPC(c) && is_on_quest(c, vnum)) {
+								strcpy(str, "1");
+							}
+							else {
+								strcpy(str, "0");
+							}
+						}
+					}
+					break;
+				}
 				case 'p': {	// char.p*
 					if (!str_cmp(field, "pc_name")) {
 						snprintf(str, slen, "%s", GET_PC_NAME(c));
@@ -3066,6 +3164,55 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%s", position_types[(int) GET_POS(c)]);
 					}
 					
+					break;
+				}
+				case 'q': {	// char.q*
+					if (!str_cmp(field, "quest_finished")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							void count_quest_tasks(struct player_quest *pq, int *complete, int *total);
+							any_vnum vnum = atoi(subfield);
+							struct player_quest *pq;
+							int complete, total;
+							if (!IS_NPC(c) && (pq = is_on_quest(c, vnum))) {
+								count_quest_tasks(pq, &complete, &total);
+								if (complete >= total) {
+									strcpy(str, "1");
+								}
+								else {
+									strcpy(str, "0");
+								}
+							}
+							else {
+								strcpy(str, "0");
+							}
+						}
+					}
+					else if (!str_cmp(field, "quest_triggered")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							void count_quest_tasks(struct player_quest *pq, int *complete, int *total);
+							any_vnum vnum = atoi(subfield);
+							struct player_quest *pq;
+							struct quest_task *task;
+							bool any = FALSE;
+							
+							if (!IS_NPC(c) && (pq = is_on_quest(c, vnum))) {
+								LL_FOREACH(pq->tracker, task) {
+									if (task->type == QT_TRIGGERED) {
+										any |= (task->current >= task->needed);
+									}
+								}
+								if (any) {
+									strcpy(str, "1");
+								}
+								else {
+									strcpy(str, "0");
+								}
+							}
+							else {
+								strcpy(str, "0");
+							}
+						}
+					}
 					break;
 				}
 				case 'r': {	// char.r*

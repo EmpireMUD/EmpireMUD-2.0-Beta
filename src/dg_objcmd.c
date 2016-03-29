@@ -658,6 +658,13 @@ OCMD(do_opurge) {
 }
 
 
+// quest commands
+OCMD(do_oquest) {
+	void do_dg_quest(int go_type, void *go, char *argument);	
+	do_dg_quest(OBJ_TRIGGER, obj, argument);
+}
+
+
 OCMD(do_osiege) {
 	void besiege_room(room_data *to_room, int damage);
 	extern bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
@@ -756,6 +763,7 @@ OCMD(do_oteleport) {
 				GET_LAST_DIR(ch) = NO_DIR;
 			}
 			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+			qt_visit_room(ch, IN_ROOM(ch));
 		}
 	}
 	else if (!str_cmp(arg1, "adventure")) {
@@ -783,6 +791,7 @@ OCMD(do_oteleport) {
 							GET_LAST_DIR(ch) = NO_DIR;
 						}
 						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+						qt_visit_room(ch, IN_ROOM(ch));
 					}
 				}
 			}
@@ -797,6 +806,7 @@ OCMD(do_oteleport) {
 					GET_LAST_DIR(ch) = NO_DIR;
 				}
 				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+				qt_visit_room(ch, IN_ROOM(ch));
 			}
 		}
 		else if ((veh = get_vehicle_near_obj(obj, arg1))) {
@@ -1430,6 +1440,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "omorph", do_omorph, NO_SCMD },
 	{ "oown", do_oown, NO_SCMD },
 	{ "opurge", do_opurge, NO_SCMD },
+	{ "oquest", do_oquest, NO_SCMD },
 	{ "oscale", do_oscale, NO_SCMD },
 	{ "osend", do_osend, SCMD_OSEND },
 	{ "osetval", do_osetval, NO_SCMD },

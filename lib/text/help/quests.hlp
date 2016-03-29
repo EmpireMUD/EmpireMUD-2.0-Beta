@@ -1,0 +1,82 @@
+QUEST QUESTS
+
+Usage:  quest <command> <...>
+
+The following quest commands are available:
+ &cquest check&0 - See what quests are available here.
+ &cquest completed&0 - List quests you have finished.
+ &cquest drop&0 - Cancel a quest you're on.
+ &cquest finish&0 - Turn in one or more quests.
+ &cquest info&0 - See details on a quest you're on or one available here.
+ &cquest list&0 - Show your quests and progress.
+ &cquest start&0 - Begin a quest.
+ &cquest tracker&0 - Show the quest tracker for one quest you're on.
+
+For more information on each, see HELP QUEST <command>.
+#
+"QUEST CHECK"
+
+Usage:  quest check
+
+This command shows all the quests available at your location.
+
+See also: QUEST
+#
+"QUEST DROP"
+
+Usage:  quest drop <name>
+
+You can drop quests to cancel them and remove them from your quest list. Be
+warned that this cannot be undone; you must find the quest giver again if you
+change your mind.
+
+See also: QUEST
+#
+"QUEST FINISH"
+
+Usage:  quest finish <name | all>
+
+Turn in one or more quests. You must find the correct location, person, or item
+to turn in each quest. There will be an indication if you have a quest to turn
+in somewhere.
+
+See also: QUEST
+#
+"QUEST INFO"
+
+Usage:  quest info <quest>
+
+This displays additional information about a quest, including the quest's full
+description. It works on both quests you're on, and ones available at your
+location.
+
+When you use it on a quest you're on, you will also see the quest tracker.
+
+See also: QUEST
+#
+"QUEST LIST"
+
+Usage:  quest list
+
+This command shows all the quests you're on, and their progress.
+
+See also: QUEST
+#
+"QUEST START"
+
+Usage:  quest start <name | all>
+
+This command starts a quest (or all quests) available at your location. There
+will be an indicator on any person, place, or thing that starts a quest.
+
+See also: QUEST, QUEST CHECK
+#
+"QUEST TRACKER"
+
+Usage:  quest tracker <name>
+
+This shows the quest tracker for a quest you're on.
+
+See also: QUEST
+#
+$

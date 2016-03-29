@@ -36,6 +36,7 @@
 *   Object Utils
 *   Objval Utils
 *   Player Utils
+*   Quest Utils
 *   Room Utils
 *   Room Template Utils
 *   Sector Utils
@@ -193,6 +194,7 @@
 #define GET_BLD_SCRIPTS(bld)  ((bld)->proto_script)
 #define GET_BLD_SPAWNS(bld)  ((bld)->spawns)
 #define GET_BLD_INTERACTIONS(bld)  ((bld)->interactions)
+#define GET_BLD_QUEST_LOOKUPS(bld)  ((bld)->quest_lookups)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -440,6 +442,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_MOBILE(desc)  ((desc)->olc_mobile)
 #define GET_OLC_MORPH(desc)  ((desc)->olc_morph)
 #define GET_OLC_OBJECT(desc)  ((desc)->olc_object)
+#define GET_OLC_QUEST(desc)  ((desc)->olc_quest)
 #define GET_OLC_ROOM_TEMPLATE(desc)  ((desc)->olc_room_template)
 #define GET_OLC_SECTOR(desc)  ((desc)->olc_sector)
 #define GET_OLC_SKILL(desc)  ((desc)->olc_skill)
@@ -608,6 +611,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define MOB_SPAWN_TIME(ch)  ((ch)->mob_specials.spawn_time)
 #define MOB_TO_DODGE(ch)  ((ch)->mob_specials.to_dodge)
 #define MOB_TO_HIT(ch)  ((ch)->mob_specials.to_hit)
+#define MOB_QUEST_LOOKUPS(ch)  ((ch)->quest_lookups)
 
 // helpers
 #define IS_MOB(ch)  (IS_NPC(ch) && GET_MOB_VNUM(ch) != NOTHING)
@@ -656,6 +660,8 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OBJ_MATERIAL(obj)  ((obj)->obj_flags.material)
 #define GET_OBJ_MAX_SCALE_LEVEL(obj)  ((obj)->obj_flags.max_scale_level)
 #define GET_OBJ_MIN_SCALE_LEVEL(obj)  ((obj)->obj_flags.min_scale_level)
+#define GET_OBJ_QUEST_LOOKUPS(obj)  ((obj)->quest_lookups)
+#define GET_OBJ_REQUIRES_QUEST(obj)  ((obj)->obj_flags.requires_quest)
 #define GET_OBJ_SHORT_DESC(obj)  ((obj)->short_description)
 #define GET_OBJ_TIMER(obj)  ((obj)->obj_flags.timer)
 #define GET_OBJ_TYPE(obj)  ((obj)->obj_flags.type_flag)
@@ -683,7 +689,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 // for stacking, sotring, etc
 #define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !OBJ_FLAGGED((obj), OBJ_ENCHANTED) && !IS_ARROW(obj))
 #define OBJ_CAN_STORE(obj)  ((obj)->storage && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_SUPERIOR | OBJ_ENCHANTED))
-#define UNIQUE_OBJ_CAN_STORE(obj)  (!OBJ_BOUND_TO(obj) && !OBJ_CAN_STORE(obj) && !OBJ_FLAGGED((obj), OBJ_JUNK) && (!OBJ_FLAGGED((obj), OBJ_LIGHT) || GET_OBJ_TIMER(obj) == UNLIMITED) && !IS_STOLEN(obj))
+#define UNIQUE_OBJ_CAN_STORE(obj)  (!OBJ_BOUND_TO(obj) && !OBJ_CAN_STORE(obj) && !OBJ_FLAGGED((obj), OBJ_JUNK) && (!OBJ_FLAGGED((obj), OBJ_LIGHT) || GET_OBJ_TIMER(obj) == UNLIMITED) && !IS_STOLEN(obj) && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING)
 #define OBJ_STACK_FLAGS  (OBJ_SUPERIOR | OBJ_KEEP)
 #define OBJS_ARE_SAME(o1, o2)  (GET_OBJ_VNUM(o1) == GET_OBJ_VNUM(o2) && ((GET_OBJ_EXTRA(o1) & OBJ_STACK_FLAGS) == (GET_OBJ_EXTRA(o2) & OBJ_STACK_FLAGS)) && (!IS_DRINK_CONTAINER(o1) || GET_DRINK_CONTAINER_TYPE(o1) == GET_DRINK_CONTAINER_TYPE(o2)))
 
@@ -847,6 +853,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_CLASS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->character_class))
 #define GET_CLASS_PROGRESSION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->class_progression))
 #define GET_CLASS_ROLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->class_role))
+#define GET_COMPLETED_QUESTS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->completed_quests))
 #define GET_COMPUTED_LEVEL(ch)  (GET_SKILL_LEVEL(ch) + GET_GEAR_LEVEL(ch))
 #define GET_COND(ch, i)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->conditions[(i)]))
 #define GET_CONFUSED_DIR(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->confused_dir))
@@ -889,6 +896,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_PLEDGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->pledge))
 #define GET_PROMO_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->promo_id))
 #define GET_PROMPT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->prompt))
+#define GET_QUESTS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->quests))
 #define GET_RANK(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->rank))
 #define GET_RECENT_DEATH_COUNT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->recent_death_count))
 #define GET_REFERRED_BY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->referred_by))
@@ -940,6 +948,28 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // for act() and act-like things (requires to_sleeping and is_spammy set to true/false)
 #define SENDOK(ch)  (((ch)->desc || SCRIPT_CHECK((ch), MTRIG_ACT)) && (to_sleeping || AWAKE(ch)) && (IS_NPC(ch) || !PRF_FLAGGED(ch, PRF_NOSPAM) || !is_spammy) && (IS_NPC(ch) || !PLR_FLAGGED((ch), PLR_WRITING)))
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// QUEST UTILS /////////////////////////////////////////////////////////////
+
+#define QUEST_VNUM(quest)  ((quest)->vnum)
+#define QUEST_COMPLETE_MSG(quest)  ((quest)->complete_msg)
+#define QUEST_DESCRIPTION(quest)  ((quest)->description)
+#define QUEST_ENDS_AT(quest)  ((quest)->ends_at)
+#define QUEST_FLAGS(quest)  ((quest)->flags)
+#define QUEST_MAX_LEVEL(quest)  ((quest)->max_level)
+#define QUEST_MIN_LEVEL(quest)  ((quest)->min_level)
+#define QUEST_NAME(quest)  ((quest)->name)
+#define QUEST_PREREQS(quest)  ((quest)->prereqs)
+#define QUEST_REPEATABLE_AFTER(quest)  ((quest)->repeatable_after)
+#define QUEST_REWARDS(quest)  ((quest)->rewards)
+#define QUEST_SCRIPTS(quest)  ((quest)->proto_script)
+#define QUEST_STARTS_AT(quest)  ((quest)->starts_at)
+#define QUEST_TASKS(quest)  ((quest)->tasks)
+#define QUEST_VERSION(quest)  ((quest)->version)
+
+#define QUEST_FLAGGED(quest, flg)  IS_SET(QUEST_FLAGS(quest), (flg))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1066,6 +1096,7 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 #define GET_RMT_EX_DESCS(rmt)  ((rmt)->ex_description)
 #define GET_RMT_EXITS(rmt)  ((rmt)->exits)
 #define GET_RMT_INTERACTIONS(rmt)  ((rmt)->interactions)
+#define GET_RMT_QUEST_LOOKUPS(rmt)  ((rmt)->quest_lookups)
 #define GET_RMT_SCRIPTS(rmt)  ((rmt)->proto_script)
 
 
@@ -1269,6 +1300,7 @@ extern bool wake_and_stand(char_data *ch);
 // resource functions from utils.c
 void add_to_resource_list(struct resource_data **list, int type, any_vnum vnum, int amount, int misc);
 void apply_resource(char_data *ch, struct resource_data *res, struct resource_data **list, obj_data *use_obj, int msg_type, vehicle_data *crafting_veh, struct resource_data **build_used_list);
+extern char *component_string(int type, bitvector_t flags);
 void extract_resources(char_data *ch, struct resource_data *list, bool ground, struct resource_data **build_used_list);
 extern struct resource_data *get_next_resource(char_data *ch, struct resource_data *list, bool ground, bool left2right, obj_data **found_obj);
 extern char *get_resource_name(struct resource_data *res);
@@ -1350,6 +1382,23 @@ void gain_condition(char_data *ch, int condition, int value);
 extern bool adjacent_room_is_light(room_data *room);
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 #define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
+
+// utils from quest.c
+extern char *get_quest_name_by_proto(any_vnum vnum);
+void qt_change_skill_level(char_data *ch, any_vnum skl);
+void qt_drop_obj(char_data *ch, obj_data *obj);
+void qt_empire_players(empire_data *emp, void (*func)(char_data *ch, any_vnum vnum), any_vnum vnum);
+void qt_gain_building(char_data *ch, any_vnum vnum);
+void qt_gain_vehicle(char_data *ch, any_vnum vnum);
+void qt_get_obj(char_data *ch, obj_data *obj);
+void qt_kill_mob(char_data *ch, char_data *mob);
+void qt_lose_building(char_data *ch, any_vnum vnum);
+void qt_lose_quest(char_data *ch, any_vnum vnum);
+void qt_lose_vehicle(char_data *ch, any_vnum vnum);
+void qt_quest_completed(char_data *ch, any_vnum vnum);
+void qt_start_quest(char_data *ch, any_vnum vnum);
+void qt_triggered_task(char_data *ch, any_vnum vnum);
+void qt_visit_room(char_data *ch, room_data *room);
 
 // utils from vehicles.c
 extern char *get_vehicle_name_by_proto(obj_vnum vnum);

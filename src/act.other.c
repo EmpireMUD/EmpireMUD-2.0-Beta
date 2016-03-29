@@ -154,6 +154,7 @@ void adventure_unsummon(char_data *ch) {
 	
 	act("$n appears in a burst of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
 	GET_LAST_DIR(ch) = NO_DIR;
+	qt_visit_room(ch, IN_ROOM(ch));
 	
 	look_at_room(ch);
 	msg_to_char(ch, "\r\nYou have been returned to your original location after leaving the adventure.\r\n");
@@ -638,6 +639,7 @@ OFFER_FINISH(ofin_summon) {
 	act("$n vanishes in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
 	char_to_room(ch, loc);
 	GET_LAST_DIR(ch) = NO_DIR;
+	qt_visit_room(ch, IN_ROOM(ch));
 	look_at_room(ch);
 	act("$n appears in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
 	

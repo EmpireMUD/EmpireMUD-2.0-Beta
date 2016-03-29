@@ -785,6 +785,19 @@ flag will remain active for 5 minutes after you shut it off.
 
 See also: TOGGLE
 #
+"QUEST ITEM" "QUEST OBJECT" "QUEST FLAG"
+
+Items marked (quest) are used only when you are on the quest to which they
+belong. You can't pick up a quest item if you're not on the quest, and you
+can never drop a quest item while you're on the quest.
+
+Dropping or finishing a quest will automatically remove quets items from your
+inventory and gear.
+
+You can identify items to see which quest they belong to.
+
+See also: IDENTIFY
+#
 RESIST-MAGICAL "RESIST MAGICAL" "MAGICAL RESISTANCE"
 
 Your magic resistance is a measure of how much damage your character can ignore

@@ -287,6 +287,7 @@ int limit_crowd_control(char_data *victim, int atype) {
 */
 void point_update_char(char_data *ch) {
 	void despawn_mob(char_data *ch);
+	void remove_quest_items(char_data *ch);
 	
 	struct cooldown_data *cool, *next_cool;
 	empire_data *emp;
@@ -295,6 +296,9 @@ void point_update_char(char_data *ch) {
 	
 	if (!IS_NPC(ch)) {
 		emp = GET_LOYALTY(ch);
+		
+		// check bad quest items
+		remove_quest_items(ch);
 		
 		if (IS_BLOOD_STARVED(ch)) {
 			msg_to_char(ch, "You are starving!\r\n");

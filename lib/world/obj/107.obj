@@ -233,7 +233,7 @@ A fiddle is lying here.~
 you can find the cat who has lost the fiddle, surely he will reward you. You
 can also play it as an instrument.
 ~
-22 p ao 3
+22 p ao 5
 0 0 0
 0 0
 M
@@ -339,9 +339,11 @@ A large ham is lying in the dirt.~
 Jack Sprat and he must be going hungry without it. Perhaps he would reward you
 if you returned it.
 ~
-6 p a 4
+6 p a 5
 72 0 0
 7 336
+A
+2 1 0
 M
 4
 You eat the ham, carefully making sure you eat no fat.~
@@ -495,9 +497,11 @@ A bowl of leathery broth is sitting here.~
    This broth is hearty enough to chew! Surely it belongs to the woman who
 lives in the shoe. If you returned it, she might reward you.
 ~
-6 p a 6
+6 p a 7
 72 0 0
 7 336
+A
+2 1 0
 M
 4
 You chew the leathery broth for a bit, but it doesn't taste too bad.~

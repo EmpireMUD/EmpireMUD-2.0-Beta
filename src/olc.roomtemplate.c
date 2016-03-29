@@ -290,10 +290,15 @@ bool match_one_exit(char_data *ch, room_template *add_exit_to, room_template *or
 * @param rmt_vnum vnum The vnum to delete.
 */
 void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
+	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
+	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
 	void remove_room_template_from_table(room_template *rmt);
 	
+	quest_data *quest, *next_quest;
 	room_data *room, *next_room;
+	descriptor_data *desc;
 	room_template *rmt;
+	bool found;
 	int count;
 	
 	if (!(rmt = room_template_proto(vnum))) {
@@ -313,6 +318,19 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	save_index(DB_BOOT_RMT);
 	save_library_file_for_vnum(DB_BOOT_RMT, vnum);
 	
+	// update quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_ROOM_TEMPLATE, vnum);
+		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_ROOM_TEMPLATE, vnum);
+		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_VISIT_ROOM_TEMPLATE, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_VISIT_ROOM_TEMPLATE, vnum);
+		
+		if (found) {
+			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
 	// update world
 	count = 0;
 	for (room = interior_room_list; room; room = next_room) {
@@ -326,6 +344,21 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	
 	if (count > 0) {
 		check_all_exits();
+	}
+	
+	// remove templates from active editors
+	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (GET_OLC_QUEST(desc)) {
+			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_ROOM_TEMPLATE, vnum);
+			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_ROOM_TEMPLATE, vnum);
+			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_VISIT_ROOM_TEMPLATE, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_VISIT_ROOM_TEMPLATE, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A room template used by the quest you are editing was deleted.\r\n");
+			}
+		}
 	}
 		
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted room template %d", GET_NAME(ch), vnum);
@@ -346,8 +379,12 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
+	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
+	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	
 	char buf[MAX_STRING_LENGTH];
 	room_template *rmt = room_template_proto(vnum), *iter, *next_iter;
+	quest_data *quest, *next_quest;
 	struct exit_template *ex;
 	obj_data *obj, *next_obj;
 	int size, found;
@@ -366,6 +403,22 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 		if (IS_PORTAL(obj) && GET_PORTAL_TARGET_VNUM(obj) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		}
+	}
+	
+	// quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_ROOM_TEMPLATE, vnum);
+		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_ROOM_TEMPLATE, vnum);
+		any |= find_quest_task_in_list(QUEST_TASKS(quest), QT_VISIT_ROOM_TEMPLATE, vnum);
+		any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_VISIT_ROOM_TEMPLATE, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 
@@ -406,6 +459,7 @@ void save_olc_room_template(descriptor_data *desc) {
 	struct adventure_spawn *spawn;
 	struct trig_proto_list *trig;
 	struct exit_template *ex;
+	struct quest_lookup *ql;
 	UT_hash_handle hh;
 	
 	// have a place to save it?
@@ -455,9 +509,13 @@ void save_olc_room_template(descriptor_data *desc) {
 
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
+	ql = proto->quest_lookups;	// save lookups
+	
 	*proto = *rmt;	// copy over all data
 	proto->vnum = vnum;	// ensure correct vnum
+	
 	proto->hh = hh;	// restore old hash handle
+	proto->quest_lookups = ql;	// restore lookups
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_RMT, vnum);
@@ -532,8 +590,7 @@ room_template *setup_olc_room_template(room_template *input) {
 		GET_RMT_INTERACTIONS(new) = copy_interaction_list(GET_RMT_INTERACTIONS(input));
 		
 		// scripts
-		GET_RMT_SCRIPTS(new) = NULL;
-		copy_proto_script(input, new, RMT_TRIGGER);
+		GET_RMT_SCRIPTS(new) = copy_trig_protos(GET_RMT_SCRIPTS(input));
 	}
 	else {
 		// brand new: some defaults

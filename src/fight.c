@@ -863,8 +863,9 @@ obj_data *die(char_data *ch, char_data *killer) {
 	void despawn_charmies(char_data *ch);
 	void kill_empire_npc(char_data *ch);
 	
-	char_data *ch_iter;
+	char_data *ch_iter, *player;
 	obj_data *corpse = NULL;
+	struct mob_tag *tag;
 	
 	// no need to repeat
 	if (EXTRACTED(ch)) {
@@ -942,6 +943,13 @@ obj_data *die(char_data *ch, char_data *killer) {
 	
 	// expand tags, if there are any
 	expand_mob_tags(ch);
+	
+	// mark killed
+	LL_FOREACH(MOB_TAGGED_BY(ch), tag) {
+		if ((player = is_playing(tag->idnum))) {
+			qt_kill_mob(player, ch);
+		}
+	}
 
 	drop_loot(ch, killer);
 	if (MOB_FLAGGED(ch, MOB_UNDEAD)) {
@@ -1177,6 +1185,7 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 	
 	// move character
 	char_to_room(ch, loc);
+	qt_visit_room(ch, IN_ROOM(ch));
 	
 	// take care of the corpse
 	if ((corpse = find_obj(GET_LAST_CORPSE_ID(ch))) && IS_CORPSE(corpse)) {
@@ -2241,6 +2250,11 @@ bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
 		
 		vehicle_from_room(veh);	// remove from room first to destroy anything inside
 		fully_empty_vehicle(veh);
+		
+		if (VEH_OWNER(veh) && VEH_IS_COMPLETE(veh)) {
+			qt_empire_players(VEH_OWNER(veh), qt_lose_vehicle, VEH_VNUM(veh));
+		}
+		
 		extract_vehicle(veh);
 		return FALSE;
 	}

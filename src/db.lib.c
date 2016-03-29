@@ -74,13 +74,13 @@ void parse_generic_name_file(FILE *fl, char *err_str);
 void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part);
 void parse_interaction(char *line, struct interaction_item **list, char *error_part);
 void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
-void script_save_to_disk(FILE *fp, void *item, int type);
 int sort_empires(empire_data *a, empire_data *b);
 int sort_room_templates(room_template *a, room_template *b);
 void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list);
 void write_interactions_to_file(FILE *fl, struct interaction_item *list);
 void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
+void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -144,7 +144,7 @@ void free_adventure(adv_data *adv) {
 		}
 	}
 	if (GET_ADV_SCRIPTS(adv) && (!proto || GET_ADV_SCRIPTS(adv) != GET_ADV_SCRIPTS(proto))) {
-		free_proto_script(adv, ADV_TRIGGER);
+		free_proto_scripts(&GET_ADV_SCRIPTS(adv));
 	}
 	
 	free(adv);
@@ -273,7 +273,7 @@ void parse_adventure(FILE *fl, adv_vnum vnum) {
 			}
 			
 			case 'T': {	// trigger
-				dg_read_trigger(line, adv, ADV_TRIGGER);
+				parse_trig_proto(line, &GET_ADV_SCRIPTS(adv), buf2);
 				break;
 			}
 			
@@ -326,7 +326,7 @@ void write_adventure_to_file(FILE *fl, adv_data *adv) {
 	}
 	
 	// T: triggers
-	script_save_to_disk(fl, adv, ADV_TRIGGER);
+	write_trig_protos_to_file(fl, 'T', GET_ADV_SCRIPTS(adv));
 	
 	// end
 	fprintf(fl, "S\n");
@@ -405,7 +405,7 @@ void free_building(bld_data *bdg) {
 	}
 	
 	if (GET_BLD_SCRIPTS(bdg) && (!proto || GET_BLD_SCRIPTS(bdg) != GET_BLD_SCRIPTS(proto))) {
-		free_proto_script(bdg, BLD_TRIGGER);
+		free_proto_scripts(&GET_BLD_SCRIPTS(bdg));
 	}
 
 	free(bdg);
@@ -557,7 +557,7 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 			}
 			
 			case 'T': {	// trigger
-				dg_read_trigger(line, bld, BLD_TRIGGER);
+				parse_trig_proto(line, &GET_BLD_SCRIPTS(bld), buf2);
 				break;
 			}
 			
@@ -652,7 +652,7 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	}
 	
 	// T: triggers
-	script_save_to_disk(fl, bld, BLD_TRIGGER);
+	write_trig_protos_to_file(fl, 'T', GET_BLD_SCRIPTS(bld));
 	
 	// U: upgrades_to
 	if (GET_BLD_UPGRADES_TO(bld) != NOTHING && building_proto(GET_BLD_UPGRADES_TO(bld))) {
@@ -3314,7 +3314,7 @@ void parse_mobile(FILE *mob_f, int nr) {
 			}
 			
 			case 'T': {	// trigger
-				dg_read_trigger(line, mob, MOB_TRIGGER);
+				parse_trig_proto(line, &(mob->proto_script), buf2);
 				break;
 			}
 
@@ -3367,7 +3367,7 @@ void write_mob_to_file(FILE *fl, char_data *mob) {
 	write_interactions_to_file(fl, mob->interactions);
 	
 	// T, V: triggers
-	script_save_to_disk(fl, mob, MOB_TRIGGER);
+	write_trig_protos_to_file(fl, 'T', mob->proto_script);
 		
 	// END
 	fprintf(fl, "S\n");
@@ -3446,7 +3446,7 @@ void free_obj(obj_data *obj) {
 		free_extra_descs(&obj->ex_description);
 	}
 	if (obj->proto_script && (!proto || obj->proto_script != proto->proto_script)) {
-		free_proto_script(obj, OBJ_TRIGGER);
+		free_proto_scripts(&obj->proto_script);
 	}
 
 	if (obj->interactions && (!proto || obj->interactions != proto->interactions)) {
@@ -3684,6 +3684,13 @@ void parse_object(FILE *obj_f, int nr) {
 				break;
 			}
 			
+			case 'Q': {	// requires quest
+				if (sscanf(line, "Q %d", &t[0]) == 1) {
+					GET_OBJ_REQUIRES_QUEST(obj) = t[0];
+				}
+				break;
+			}
+			
 			case 'R': {
 				if (!get_line(obj_f, line) || sscanf(line, "%d %s", t, f1) != 2) {
 					log("SYSERR: Format error in 'R' Field, %s", buf2);
@@ -3798,6 +3805,11 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 		fprintf(fl, "%d %s\n", GET_OBJ_CMP_TYPE(obj), bitv_to_alpha(GET_OBJ_CMP_FLAGS(obj)));
 	}
 	
+	// Q: requires quest
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+		fprintf(fl, "Q %d\n", GET_OBJ_REQUIRES_QUEST(obj));
+	}
+	
 	// R: storage
 	for (store = obj->storage; store; store = store->next) {
 		fprintf(fl, "R\n");
@@ -3805,7 +3817,7 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	}
 	
 	// T, V: triggers
-	script_save_to_disk(fl, obj, OBJ_TRIGGER);
+	write_trig_protos_to_file(fl, 'T', obj->proto_script);
 
 	// END
 	fprintf(fl, "S\n");
@@ -4184,7 +4196,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				// this way they are no longer saved this way at all, but this
 				// must be left in to be backwards-compatbile. If your mud has
 				// been up since b2.11, you can safely remove this block.
-				dg_read_trigger(line, room, WLD_TRIGGER);
+				parse_trig_proto(line, &(room->proto_script), error_log);
 				break;
 			}
 			
@@ -4383,7 +4395,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	}
 
 	// NOTE: Prior to b2.11, this saved T as prototype triggers, but this is
-	// no longer used: script_save_to_disk(fl, room, WLD_TRIGGER);
+	// no longer used: write_trig_protos_to_file(fl, 'T', room->proto_scripts);
 	
 	// W: built with
 	if (COMPLEX_DATA(room) && GET_BUILT_WITH(room)) {
@@ -4523,7 +4535,7 @@ void free_room_template(room_template *rmt) {
 	}
 	
 	if (GET_RMT_SCRIPTS(rmt) && (!proto || GET_RMT_SCRIPTS(rmt) != GET_RMT_SCRIPTS(proto))) {
-		free_proto_script(rmt, RMT_TRIGGER);
+		free_proto_scripts(&GET_RMT_SCRIPTS(rmt));
 	}
 	
 	free(rmt);
@@ -4646,7 +4658,7 @@ void parse_room_template(FILE *fl, rmt_vnum vnum) {
 				break;
 			}
 			case 'T': {	// trigger
-				dg_read_trigger(line, rmt, RMT_TRIGGER);
+				parse_trig_proto(line, &GET_RMT_SCRIPTS(rmt), buf2);
 				break;
 			}
 
@@ -4712,7 +4724,7 @@ void write_room_template_to_file(FILE *fl, room_template *rmt) {
 	}
 	
 	// T: triggers
-	script_save_to_disk(fl, rmt, RMT_TRIGGER);
+	write_trig_protos_to_file(fl, 'T', GET_RMT_SCRIPTS(rmt));
 	
 	// end
 	fprintf(fl, "S\n");
@@ -5041,38 +5053,17 @@ void remove_trigger_from_table(trig_data *trig) {
 
 
 /**
-* called when a mob or object is being saved to disk, so its script can
-* be saved
+* Writes a trigger proto list to a data file.
+*
+* @param FILE *fl The file open for writing.
+* @param char letter The file tag (almost always 'T' for triggers).
+* @param struct trig_proto_list *list The list to write to the file.
 */
-void script_save_to_disk(FILE *fp, void *item, int type) {
-	struct trig_proto_list *t;
-
-	if (type == MOB_TRIGGER)
-		t = ((char_data*)item)->proto_script;
-	else if (type == OBJ_TRIGGER)
-		t = ((obj_data*)item)->proto_script;
-	else if (type == WLD_TRIGGER)
-		t = ((room_data*)item)->proto_script;
-	else if (type == RMT_TRIGGER) {
-		t = ((room_template*)item)->proto_script;
-	}
-	else if (type == BLD_TRIGGER) {
-		t = ((bld_data*)item)->proto_script;
-	}
-	else if (type == ADV_TRIGGER) {
-		t = ((adv_data*)item)->proto_script;
-	}
-	else if (type == VEH_TRIGGER) {
-		t = ((vehicle_data*)item)->proto_script;
-	}
-	else {
-		log("SYSERR: Invalid type passed to script_save_to_disk()");
-		return;
-	}
-
-	while (t) {
-		fprintf(fp,"T %d\n", t->vnum);
-		t = t->next;
+void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list) {
+	struct trig_proto_list *iter;
+	
+	LL_FOREACH(list, iter) {
+		fprintf(fl, "%c %d\n", letter, iter->vnum);
 	}
 }
 
@@ -5135,6 +5126,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	void parse_book(FILE *fl, int book_id);
 	void parse_class(FILE *fl, any_vnum vnum);
 	void parse_morph(FILE *fl, any_vnum vnum);
+	void parse_quest(FILE *fl, any_vnum vnum);
 	void parse_skill(FILE *fl, any_vnum vnum);
 	void parse_vehicle(FILE *fl, any_vnum vnum);
 	
@@ -5142,7 +5134,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	char line[256];
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph" };
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -5223,6 +5215,10 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 					break;
 				case DB_BOOT_BOOKS: {
 					parse_book(fl, nr);
+					break;
+				}
+				case DB_BOOT_QST: {
+					parse_quest(fl, nr);
 					break;
 				}
 				case DB_BOOT_RMT: {
@@ -5308,7 +5304,7 @@ void index_boot(int mode) {
 
 	if (!rec_count) {
 		// DB_BOOT_x: some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL || mode == DB_BOOT_VEH || mode == DB_BOOT_MORPH) {
+		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL || mode == DB_BOOT_VEH || mode == DB_BOOT_MORPH || mode == DB_BOOT_QST) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -5401,6 +5397,11 @@ void index_boot(int mode) {
 			size[0] = sizeof(obj_data) * rec_count;
 			log("   %d objs, %d bytes in prototypes.", rec_count, size[0]);
 			break;
+		case DB_BOOT_QST: {
+   			size[0] = sizeof(quest_data) * rec_count;
+			log("   %d quests, %d bytes in prototypes.", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_EMP: {
 			size[0] = sizeof(empire_data) * rec_count;
 			log("   %d empires, %d bytes.", rec_count, size[0]);
@@ -5457,6 +5458,7 @@ void index_boot(int mode) {
 			case DB_BOOT_MORPH:
 			case DB_BOOT_EMP:
 			case DB_BOOT_BOOKS:
+			case DB_BOOT_QST:
 			case DB_BOOT_RMT:
 			case DB_BOOT_SECTOR:
 			case DB_BOOT_SKILL:
@@ -5635,6 +5637,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, object_table, obj, next_obj) {
 				if (GET_OBJ_VNUM(obj) >= (zone * 100) && GET_OBJ_VNUM(obj) <= (zone * 100 + 99)) {
 					write_obj_to_file(fl, obj);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_QST: {
+			void write_quest_to_file(FILE *fl, quest_data *quest);
+			quest_data *qst, *next_qst;
+			HASH_ITER(hh, quest_table, qst, next_qst) {
+				if (QUEST_VNUM(qst) >= (zone * 100) && QUEST_VNUM(qst) <= (zone * 100 + 99)) {
+					write_quest_to_file(fl, qst);
 				}
 			}
 			break;
@@ -5972,6 +5984,11 @@ void save_index(int type) {
 		}
 		case DB_BOOT_OBJ: {
 			write_object_index(fl);
+			break;
+		}
+		case DB_BOOT_QST: {
+			void write_quest_index(FILE *fl);
+			write_quest_index(fl);
 			break;
 		}
 		case DB_BOOT_RMT: {

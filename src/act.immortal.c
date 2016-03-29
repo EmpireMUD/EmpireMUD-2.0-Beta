@@ -63,6 +63,7 @@ extern const char *syslog_types[];
 // external functions
 extern struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);	// instance.c
 void check_autowiz(char_data *ch);
+void check_delayed_load(char_data *ch);
 void clear_char_abilities(char_data *ch, any_vnum skill);
 void delete_instance(struct instance_data *inst);	// instance.c
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
@@ -167,6 +168,7 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	
 	look_at_room(ch);
 	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+	qt_visit_room(ch, IN_ROOM(ch));
 }
 
 
@@ -613,8 +615,8 @@ ADMIN_UTIL(util_rescan) {
 
 
 ADMIN_UTIL(util_resetbuildingtriggers) {
-	bld_data *proto = NULL, *temp;
 	room_data *room, *next_room;
+	bld_data *proto = NULL;
 	bool all = FALSE;
 	int count = 0;
 	
@@ -639,13 +641,10 @@ ADMIN_UTIL(util_resetbuildingtriggers) {
 			if (SCRIPT(room)) {
 				extract_script(room, WLD_TRIGGER);
 			}
-			free_proto_script(room, WLD_TRIGGER);
+			free_proto_scripts(&room->proto_script);
 			
 			// add any triggers
-			CREATE(temp, bld_data, 1);
-			copy_proto_script(GET_BUILDING(room), temp, BLD_TRIGGER);
-			room->proto_script = temp->proto_script;
-			free(temp);
+			room->proto_script = copy_trig_protos(GET_BLD_SCRIPTS(GET_BUILDING(room)));
 			assign_triggers(room, WLD_TRIGGER);
 			
 			++count;
@@ -1668,14 +1667,7 @@ SHOW(show_components) {
 		flags = *argument ? olc_process_flag(ch, argument, "component", "flags", component_flags, NOBITS) : NOBITS;
 		
 		// preamble
-		if (flags) {
-			prettier_sprintbit(flags, component_flags, part);
-			strcat(part, " ");
-		}
-		else {
-			*part = '\0';
-		}
-		size = snprintf(buf, sizeof(buf), "Components for %s%s:\r\n", part, component_types[type]);
+		size = snprintf(buf, sizeof(buf), "Components for %s:\r\n", component_string(type, flags));
 		
 		HASH_ITER(hh, object_table, obj, next_obj) {
 			if (size >= sizeof(buf)) {
@@ -1833,6 +1825,93 @@ SHOW(show_player) {
 	
 	if (file) {
 		free_char(plr);
+	}
+}
+
+
+SHOW(show_quests) {
+	void count_quest_tasks(struct player_quest *pq, int *complete, int *total);
+	void show_quest_tracker(char_data *ch, struct player_quest *pq);
+	
+	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH];
+	struct player_completed_quest *pcq, *next_pcq;
+	bool file = FALSE, found = FALSE;
+	struct player_quest *pq;
+	int count, total;
+	quest_data *qst;
+	char_data *vict;
+	size_t size;
+	
+	arg2 = any_one_arg(argument, name);
+	skip_spaces(&arg2);
+	
+	if (!(vict = find_or_load_player(name, &file))) {
+		msg_to_char(ch, "No player by that name.\r\n");
+	}
+	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else if (!*arg2 || is_abbrev(arg2, "active")) {
+		// active quest list
+		check_delayed_load(vict);
+		if (IS_NPC(vict) || !GET_QUESTS(vict)) {
+			msg_to_char(ch, "%s is not on any quests.\r\n", GET_NAME(vict));
+			return;
+		}
+		
+		size = snprintf(buf, sizeof(buf), "%s's quests:\r\n", GET_NAME(vict));
+		LL_FOREACH(GET_QUESTS(vict), pq) {
+			count_quest_tasks(pq, &count, &total);
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d)\r\n", pq->vnum, get_quest_name_by_proto(pq->vnum), count, total);
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}	// end "active"
+	else if (is_abbrev(arg2, "completed")) {
+		// completed quest list
+		check_delayed_load(vict);
+		if (IS_NPC(vict) || !GET_COMPLETED_QUESTS(vict)) {
+			msg_to_char(ch, "%s has not completed any quests.\r\n", GET_NAME(vict));
+			return;
+		}
+		
+		size = snprintf(buf, sizeof(buf), "%s's completed quests:\r\n", GET_NAME(vict));
+		HASH_ITER(hh, GET_COMPLETED_QUESTS(vict), pcq, next_pcq) {
+			if (size >= sizeof(buf)) {
+				break;
+			}
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", pcq->vnum, get_quest_name_by_proto(pcq->vnum));
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+	else {
+		// show one active quest's tracker
+		check_delayed_load(vict);
+		LL_FOREACH(GET_QUESTS(vict), pq) {
+			if (!(qst = quest_proto(pq->vnum))) {
+				continue;
+			}
+			
+			if (is_multiword_abbrev(arg2, QUEST_NAME(qst))) {
+				msg_to_char(ch, "%s ", QUEST_NAME(qst));	// followed by "Quest Tracker:"
+				show_quest_tracker(ch, pq);
+				found = TRUE;
+				break;	// show just one
+			}
+		}
+		
+		if (!found) {
+			msg_to_char(ch, "%s is not on a quest called '%s'.\r\n", GET_NAME(vict), arg2);
+		}
+	}
+	
+	if (file) {
+		free_char(vict);
 	}
 }
 
@@ -2105,14 +2184,18 @@ SHOW(show_terrain) {
 
 
 SHOW(show_uses) {
+	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	craft_data *craft, *next_craft;
+	quest_data *quest, *next_quest;
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
 	struct resource_data *res;
 	bitvector_t flags;
 	size_t size;
 	int type;
+	bool any;
 	
 	argument = any_one_word(argument, arg);	// component type
 	skip_spaces(&argument);	// optional flags
@@ -2128,14 +2211,7 @@ SHOW(show_uses) {
 		flags = *argument ? olc_process_flag(ch, argument, "component", "flags", component_flags, NOBITS) : NOBITS;
 		
 		// preamble
-		if (flags) {
-			prettier_sprintbit(flags, component_flags, part);
-			strcat(part, " ");
-		}
-		else {
-			*part = '\0';
-		}
-		size = snprintf(buf, sizeof(buf), "Uses for %s%s:\r\n", part, component_types[type]);
+		size = snprintf(buf, sizeof(buf), "Uses for %s:\r\n", component_string(type, flags));
 		
 		HASH_ITER(hh, augment_table, aug, next_aug) {
 			if (size >= sizeof(buf)) {
@@ -2180,6 +2256,18 @@ SHOW(show_uses) {
 					*part = '\0';
 				}
 				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s%s%s%s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), *part ? " (" : "", part, *part ? ")" : "");
+			}
+		}
+		
+		HASH_ITER(hh, quest_table, quest, next_quest) {
+			if (size >= sizeof(buf)) {
+				break;
+			}
+			any = find_quest_task_in_list(QUEST_TASKS(quest), QT_GET_COMPONENT, type);
+			any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_GET_COMPONENT, type);
+		
+			if (any) {
+				size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
 			}
 		}
 		
@@ -2820,7 +2908,6 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 
 /* Sends ch information on the character or animal k */
 void do_stat_character(char_data *ch, char_data *k) {
-	void check_delayed_load(char_data *ch);
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
 	extern int total_bonus_healing(char_data *ch);
@@ -3324,17 +3411,12 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	sprintbit(GET_OBJ_EXTRA(j), extra_bits, buf, TRUE);
 	msg_to_char(ch, "Extra flags   : &g%s&0\r\n", buf);
 	
-	// component info
-	if (GET_OBJ_CMP_FLAGS(j)) {
-		prettier_sprintbit(GET_OBJ_CMP_FLAGS(j), component_flags, buf);
-		strcat(buf, " ");
+	msg_to_char(ch, "Timer: &y%d&0, Material: &y%s&0, Component type: &y%s&0\r\n", GET_OBJ_TIMER(j), materials[GET_OBJ_MATERIAL(j)].name, component_string(GET_OBJ_CMP_TYPE(j), GET_OBJ_CMP_FLAGS(j)));
+	
+	if (GET_OBJ_REQUIRES_QUEST(j) != NOTHING) {
+		msg_to_char(ch, "Requires quest: [%d] &c%s&0\r\n", GET_OBJ_REQUIRES_QUEST(j), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(j)));
 	}
-	else {
-		*buf = '\0';
-	}
-
-	msg_to_char(ch, "Timer: &y%d&0, Material: &y%s&0, Component type: &y%s%s&0\r\n", GET_OBJ_TIMER(j), materials[GET_OBJ_MATERIAL(j)].name, buf, component_types[GET_OBJ_CMP_TYPE(j)]);
-
+	
 	strcpy(buf, "In room: ");
 	if (!IN_ROOM(j))
 		strcat(buf, "Nowhere");
@@ -6130,6 +6212,7 @@ ACMD(do_show) {
 		{ "islands", LVL_START_IMM, show_islands },
 		{ "variables", LVL_START_IMM, show_variables },
 		{ "components", LVL_START_IMM, show_components },
+		{ "quests", LVL_START_IMM, show_quests },
 		{ "uses", LVL_START_IMM, show_uses },
 
 		// last
@@ -6555,6 +6638,7 @@ ACMD(do_trans) {
 				act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT);
 				look_at_room(victim);
 				enter_wtrigger(IN_ROOM(victim), victim, NO_DIR);
+				qt_visit_room(victim, IN_ROOM(victim));
 			}
 		}
 		
@@ -6583,6 +6667,7 @@ ACMD(do_trans) {
 			act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT);
 			look_at_room(victim);
 			enter_wtrigger(IN_ROOM(victim), victim, NO_DIR);
+			qt_visit_room(victim, IN_ROOM(victim));
 			send_config_msg(ch, "ok_string");
 		}
 	}
@@ -6797,6 +6882,12 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No morphs by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "quest")) {
+		extern int vnum_quest(char *searchname, char_data *ch);
+		if (!vnum_quest(buf2, ch)) {
+			msg_to_char(ch, "No quests by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "roomtemplate")) {
 		if (!vnum_room_template(buf2, ch)) {
 			msg_to_char(ch, "No room templates by that name.\r\n");
@@ -6958,6 +7049,15 @@ ACMD(do_vstat) {
 		obj = read_object(number, TRUE);
 		do_stat_object(ch, obj);
 		extract_obj(obj);
+	}
+	else if (is_abbrev(buf, "quest")) {
+		void do_stat_quest(char_data *ch, quest_data *quest);
+		quest_data *quest = quest_proto(number);
+		if (!quest) {
+			msg_to_char(ch, "There is no quest with that number.\r\n");
+			return;
+		}
+		do_stat_quest(ch, quest);
 	}
 	else if (is_abbrev(buf, "roomtemplate")) {
 		room_template *rmt = room_template_proto(number);
