@@ -40,19 +40,21 @@ Note: Bonus healing does not add to the cost of healing spells.
 
 See also: HEAL, REJUVENATE
 #
-"ANIMAL FORMS" "DEER FORM" "OSTRICH FORM" "TAPIR FORM"
+"ANIMAL FORMS"
 
 Animal Forms (Natural Magic ability)
 
-Usage:  morph <deer | ostrich | tapir>
-Cost:  25 mana (50 in combat)
+Usage:  morph <type>
+Cost:  25 mana (75 in combat)
 
 A skilled nature mage can take on the forms of different animals to disguise
 him- or herself. Each of these forms must be used in a different environment:
 
-deer: plains or forest
-ostrich: desert, grove, or oasis
-tapir: jungle or swamp
+plains/forest: deer, raccoon, forest turtle
+desert/grove: ostrich, bobcat, sidewinder
+jungle/swamp: tapir, monkey, muskrat
+
+This ability gains experience when you finish morphing into one of these forms.
 
 See also: MORPH
 #
@@ -69,6 +71,18 @@ The banshee familiar will use the following abilities in combat:
 - Blood-curdling wail: Magical DoT on enemies (30 sec)
 
 See also: DEBUFF, FAMILIAR, NECROMANCER CLASS
+#
+"ASTRAL WEREWOLF FORM"
+
+Astral Werewolf Form
+Class ability:  Werewolf, Shadow Wolf, Feral
+
+Usage:  morph astral werewolf
+Cost:  50 move (150 in combat)
+
+The astral wolf form is a powerful and formidable caster.
+
+See also: CASTER, MORPH
 #
 "BASILISK FAMILIAR"
 
@@ -87,6 +101,7 @@ See also: DEBUFF, FAMILIAR, FERAL CLASS
 BREW
 
 Usage:  brew [number] <potion>
+        brew info <potion>
 
 This command allows you to brew potions of various types, if you have the
 correct potions abilities from Natural Magic.
@@ -96,7 +111,7 @@ To brew potions you will require:
  - glass: an alchemist shop, laboratory, or an empire that has glassblowing
  - herbs
 
-See also: CRAFTING LEVEL, HEALING POTIONS, NATURE POTIONS
+See also: CRAFTING LEVEL, RESOURCES, KEEP, HEALING POTIONS, NATURE POTIONS
 #
 CHANT
 
@@ -111,6 +126,20 @@ if any, happens at random as you chant.
 
 See also: help for individual chants, like HELP CHANT OF NATURE
 #
+"CHANT OF ILLUSIONS"
+
+Chant of Illusions
+
+Usage:  chant illusions
+Class ability:  Luminary
+Cost:  1 nocturnium spike and 1 iridescent iris per road
+
+This chant allows you to hide a road tile behind an illusion, making it more
+difficult to see from a distance. You will not get your resources back if you
+cancel the chant; they are spent immediately.
+
+See also: CHANT, FORGE, LAY
+#
 "CHANT OF NATURE"
 
 Chant of Nature (Natural Magic)
@@ -121,6 +150,9 @@ Locations:  plains, desert, forest, seeded field, swamp
 The ancient druidic chant of nature brings the earthly mana of a place into
 a single vertical stream, pulling it up through the ground and growing the
 tiniest seed into a majestic tree in mere moments. It can also grow crops.
+
+Gains a small amount of experience each time you finish the chant, and much more
+if you successfully grow something with it.
 
 See also: CHANT
 #
@@ -176,6 +208,8 @@ If you cleanse without a target, it will automatically target yourself.
 
 If your target is in combat, you will join the combat upon using this ability.
 
+Gains experience when cast.
+
 See also: DISPEL
 #
 CONFER
@@ -204,16 +238,19 @@ Counterspell (Natural Magic ability)
 
 Usage:  counterspell
 Duration:  75 seconds
+Cost:  15 mana
 
 A clever nature mage can set up counterspell magic to deflect the next hostile
-spell cast against him or her. Each counterspell lasts one game hour, or
-until it deflects a spell.
+spell cast against him or her. Each counterspell lasts one game hour, or until
+it deflects a spell. You can only have one counterspell active at a time.
+
+This ability gains experience when your counterspell is triggered.
 #
 "DIRE WOLF FAMILIAR"
 
 Dire Wolf
-Class ability:  Werewolf (melee)
-Familiar type:  melee
+Class ability:  Werewolf
+Familiar type:  damage
 
 The dire wolf will assist you in combat, adding to the damage against your
 enemy.
@@ -232,6 +269,8 @@ coating of earth, protecting them from some damage. It adds an amount of
 physical damage resistance equal to the caster's Natural Magic level divided by
 14, with a bonus based on Intelligence.
 
+Gains experience when you cast this spell.
+
 See also: RESIST-PHYSICAL
 #
 EARTHMELD "EARTH MELD"
@@ -246,6 +285,8 @@ This command lets you sink into the earth, or rise again, using the power of
 Natural Magic. You can do nothing while interred within the earth, but it is
 a safe place -- nothing can hurt you.
 
+Gains experience when you sink into the ground.
+
 See also: WORM
 #
 ENTANGLE
@@ -254,6 +295,7 @@ Entangle (Natural Magic ability)
 
 Usage:  entangle [target]
 Cooldown:  30 seconds
+Duration:  30 seconds
 Cost:  20 mana
 Debuff type:  Natural Magic
 
@@ -265,6 +307,8 @@ fighting.
 
 Only one person in the room may be entangled at a time. Using the ability on a
 second person will release the first one.
+
+Gain experience when you cast this spell.
 #
 FAMILIAR
 
@@ -280,10 +324,12 @@ a familiar, it appears, follows you, and prepares to take orders.
 The power and abilities of the familiar are based on your prowess in Natural
 Magic.
 
+This ability gains experience when you summon these familiars.
+
 Available familiars:
   cat - A low-level familiar for novice mages.
-  saber-toothed cat - A larger cat with a bigger bite. (requires 50)
-  sphinx - A familiar that will tank for you in combat. (requires 75)
+  saber-toothed cat - A larger cat with a bigger bite. (requires 51)
+  sphinx - A familiar that will tank for you in combat. (requires 76)
   giant tortoise - A stronger tank who deals no damage, but protects better.
     (requires 100)
 
@@ -320,6 +366,9 @@ ability, you can use flying mounts.
 
 Type "fly" again to land.
 
+Gains experience as you fly around, as long as you're not mounted. Also gains
+experience when you take off.
+
 See also: RIDE
 #
 "GIFT OF NATURE"
@@ -329,6 +378,10 @@ Gift of Nature (Natural Magic ability)
 Nature mages blessed with the Gift of Nature have 35% more mana than those
 without it. This modifies your total mana, so anything else that increases
 your mana pool will be modified by Gift of Nature.
+
+Gift of Nature gains experience passively over time.
+
+See also: ARCANE POWER
 #
 "GRIFFIN FAMILIAR"
 
@@ -346,12 +399,16 @@ HASTEN HASTE
 Hasten (Natural Magic ability)
 
 Usage:  hasten [target]
+Duration:  30 minutes
+Cost:  15 mana
 
 This powerful Natural Magic spell lets its user speed up herself or her allies,
 making them attack faster in combat, and allowing them to do ordinary chores
 at incredible speed.
 
 If your target is in combat, you will join the combat upon using this ability.
+
+Gains experience when you cast the spell.
 #
 HEAL "HEAL FRIEND" "HEAL PARTY"
 
@@ -367,12 +424,29 @@ entire party at once.
 If you cast this spell with no target, it will heal yourself. Self-heals cost
 25% less. Healing the whole party costs 50% more.
 
-The size of your heals, and their cost, rises with your level, with your
-Natural Magic level, and with your Intelligence. The Bonus-Healing trait,
-shown as "Healing [+X]" on your score, adds directly to the amount healed, but
-does not increase the cost.
+The size of your heals, and their cost, with your Natural Magic level and with
+your Intelligence. The Bonus-Healing trait, shown as "Healing [+X]" on your
+score, adds directly to the amount healed, but does not increase the cost. The
+Healer class role allows your character's total level to increase the amount
+healed, and it also lowers the mana cost per point healed.
 
 If your target is in combat, you will join the combat upon using this ability.
+
+Each ability will only gain experience when you heal the target it allows you
+to heal (self, ally or party).
+
+See also: HEALER
+#
+"HEALING BOOST"
+
+Healing Boost
+Class ability: various
+
+This ability increases the amount healed by abilities such as Heal and
+Rejuvenate, making the user more effective at healing. This ability is
+automatic.
+
+See also: HEAL, HEALER, REJUVENATE
 #
 "HEALING POTIONS" "HEALING ELIXIRS"
 
@@ -380,20 +454,20 @@ Usage:  brew <potion>
         quaff <potion>
 
 Healing Potions (Natural Magic ability)
-  healing potion - health  (6 whitegrass)
-  regeneration potion - health regen  (6 whitegrass + 3 fiveleaf)
-  stamina potion - move  (3 redthorn + 3 fiveleaf)
-  longrunning potion - move regen  (6 redthorn + 3 fiveleaf)
-  mana potion - mana  (3 magewhisper + 3 fiveleaf)
-  energy potion - mana regen  (6 magewhisper + 3 fiveleaf)
+  healing potion - health
+  regeneration potion - health regen
+  stamina potion - move
+  longrunning potion - move regen
+  mana potion - mana
+  energy potion - mana regen
 
 Healing Elixirs (Natural Magic ability)
-  healing elixir - health  (10 whitegrass)
-  regeneration elixir - health regen  (10 whitegrass + 5 fiveleaf)
-  stamina elixir - move  (5 redthorn + 5 fiveleaf)
-  longrunning elixir - move regen  (10 redthorn + 5 fiveleaf)
-  mana elixir - mana  (5 magewhisper + 5 fiveleaf)
-  energy elixir - mana regen  (10 magewhisper + 5 fiveleaf)
+  healing elixir - health
+  regeneration elixir - health regen
+  stamina elixir - move
+  longrunning elixir - move regen
+  mana elixir - mana
+  energy elixir - mana regen
   * If you also know Wrath of Nature Potions, elixirs will come out superior.
   
 See also: BREW, WRATH OF NATURE POTIONS, QUAFF
@@ -404,6 +478,8 @@ Lightningbolt (Natural Magic ability)
 
 Usage:  lightningbolt [target]
 Cooldown:  9 seconds
+DoT Duration:  15 seconds
+Cost:  25 mana
 Debuff type:  Natural Magic
 
 A powerful nature mage can shoot bolts of lightning from her fingertips,
@@ -412,6 +488,8 @@ tinue to take damage for several seconds.
 
 If you cast this spell without a target, it will hit the person you are
 fighting.
+
+Gains experience when you cast this spell.
 #
 "MANTICORE FAMILIAR"
 
@@ -461,16 +539,16 @@ Usage:  brew <potion>
         quaff <potion>
 
 Nature Potions (Natural Magic ability)
-  strength potion - strength  (10 redthorn)
-  dexterity potion - dexterity  (6 redthorn + 4 whitegrass)
-  charisma potion - charisma  (4 redthorn + 6 whitegrass)
-  intelligence potion - intelligence  (4 redthorn + 6 magewhisper)
-  wits potion - wits  (10 fiveleaf)
+  strength potion - strength
+  dexterity potion - dexterity
+  charisma potion - charisma
+  intelligence potion - intelligence
+  wits potion - wits
 
 Wrath of Nature Potions (Natural Magic ability)
-  armor potion - armor  (20 redthorn)
-  haste potion - (20 magewhisper)
-  blocking potion - block chance  (10 redthorn + 10 fiveleaf)
+  armor potion - resistance
+  haste potion - haste
+  blocking potion - block chance
   * If you also know Healing Elixirs, wrath potions will come out superior.
 
 See also: BREW, HEALING ELIXIRS, QUAFF
@@ -511,12 +589,19 @@ Usage:  purify <person>
 Cost:  50 mana
 
 Purify is used by Natural Magic casters to wipe away serious curses such as
-Vampirism. However, it doesn't work on daywalking vampires.
+Vampirism. However, it doesn't work on daywalking vampires. You can cast this
+spell on those not affected by such curses, but it will have no effect.
+
+This spell cures vampirism and removes all vampiric abilities, but doesn't
+remove levels of the Vampire skill - use 'skill drop' for that. ('skill drop'
+cannot cure vampirism on its own.)
 
 Because this power could be used to harass other players, they must enable
-the "bother" toggle before you can use it on them.
+the "bother" toggle before you can use it on them. 
 
 If your target is in combat, you will join the combat upon using this ability.
+
+Gains experience when successfully cast, even if it doesn't cure anything.
 
 See also: DAYWALKING, TOGGLE
 #
@@ -540,6 +625,8 @@ weapon and replaces your normal combat attacks with fireballs.
 
 If you wish to stop using fireballs, you can type "remove fireball" just like
 you would with a weapon.
+
+Gains experience when you ready fireballs, and when you attack with them.
 #
 REJUVENATE
 
@@ -547,17 +634,25 @@ Rejuvenate (Natural Magic ability)
 
 Usage:  rejuvenate [target]
 Cooldown:  15 seconds
-Cost:  25 mana
+Cost:  25+ mana (based on amount healed)
 
 By blessing a person with rejuvenation, a nature mage can cause that person's
 wounds to heal themselves over time. This spell heals the target every 5
-seconds until it expires. The amount rejuvenated depends on your total level,
-your Natural Magic level, and your Intelligence. The cost depends upon the
-amount healed.
+seconds until it expires. The amount rejuvenated depends on your your Natural
+Magic level and your Intelligence. The cost depends upon the amount healed.
+The Bonus-Healing attribute will also add to the amount healed, but won't
+raise the cost.
+
+The Healer class role allows your character's total level to increase the
+amount healed, and it also lowers the mana cost per point healed.
 
 If you cast this spell without a target, it will target yourself.
 
 If your target is in combat, you will join the combat upon using this ability.
+
+Gains experience when you cast this spell.
+
+See also: HEALER
 #
 RESURRECT RESURRECTION
 
@@ -576,10 +671,10 @@ See also: ACCEPT, MOONRISE, RESPAWN
 "SAGE WEREWOLF FORM"
 
 Sage Werewolf Form
-Class ability: Werewolf
+Class ability:  Werewolf, Shadow Wolf, Feral
 
 Usage:  morph sage werewolf
-Cost:  50 move (100 in combat)
+Cost:  50 move (150 in combat)
 
 The sage wolf form is a strong healer.
 
@@ -602,10 +697,10 @@ See also: BUFF, FAMILIAR, ALCHEMIST CLASS
 "SAVAGE WEREWOLF FORM"
 
 Savage Werewolf Form
-Class ability: Werewolf
+Class ability:  Werewolf, Shadow Wolf
 
 Usage:  morph savage werewolf
-Cost:  50 move (100 in combat)
+Cost:  50 move (150 in combat)
 
 The savage wolf form is strong in melee combat.
 
@@ -650,6 +745,8 @@ damage for several seconds. This ability stacks up to 3 times.
 
 If you cast this spell with no target, it will target the person you are
 fighting.
+
+Gains experience when you cast this spell.
 #
 "SOLAR POWER"
 
@@ -659,6 +756,8 @@ Nature mages can learn to draw mana from the sunlight, as plants do. With this
 ability, mana regeneration doubles as long as it's sunny. This ability scales
 with your Natural Magic skill, and as a class skill it works even without the
 sun.
+
+Solar Power gains experience every time you benefit from its effect.
 #
 SOULSIGHT "SOUL SIGHT"
 
@@ -670,7 +769,10 @@ Cost:  5 mana
 By looking into a person's soul, a nature mage can learn more about them. This
 will reveal if the target has any spells affecting him.
 
-Soulsight can be blocked by Soulmask.
+Soulsight can be blocked by Soulmask. In this case, it will not show affects,
+or whether the target is a vampire.
+
+Gains experience when you use it on someone.
 
 See also: SOULMASK
 #
@@ -700,6 +802,8 @@ This ability allows you to summon up to (Wits / 3, rounded up) animals from
 the surrounding area. These animals will follow you as their leader, and will
 take simple orders.
 
+Summon Animals gains experience when you use it, even if no animals appear.
+
 See also: ORDER
 #
 "TOUCH OF FLAME"
@@ -709,17 +813,34 @@ Touch of Flame (Natural Magic ability)
 This ability lets you light things without a flint set. It also allows you to
 brew potions, mix poisons, and cook foods without needing a fire or stove.
 
+This ability gains experience when you use it to light things, but not when you
+cook things with it. It will be used in preference to a flint set.
+
 See also: LIGHT
 #
 "TOWERING WEREWOLF FORM"
 
 Towering Werewolf Form
-Class ability: Werewolf
+Class ability:  Werewolf, Feral
 
 Usage:  morph towering werewolf
-Cost:  50 move (100 in combat)
+Cost:  50 move (150 in combat)
 
 The towering wolf form is best-suited for tanking.
+
+See also: MORPH
+#
+"WEREWOLF FORM"
+
+Werewolf Form
+Class ability:  Werewolf, Shadow Wolf, Feral
+
+Usage:  morph werewolf
+Cost:  50 move (150 in combat)
+
+The werewolf form is a light, quick morph that works well for solo and pvp
+players, as it doesn't have the penalties of the role-based forms (but its
+bonuses are also lower).
 
 See also: MORPH
 #
@@ -731,7 +852,10 @@ Usage:  worm <direction>
         worm look
 
 Particularly powerful nature mages can move while earthmelded, worming their
-way through the ground. You cannot worm through water tiles.
+way through the ground. You cannot worm through water tiles, and you cannot
+emerge in buildings.
+
+Gains experience as you move around underground.
 
 See also: EARTHMELD
 #

@@ -137,7 +137,7 @@ struct b2_player_special_data_saved {
 	int rewarded_today[b2_MAX_REWARDS_PER_DAY];	// idnums, for ABIL_REWARD
 
 	// action info
-	int action;	// ACT_x
+	int action;	// ACT_
 	int action_cycle;	// time left before an action tick
 	int action_timer;	// ticks to completion (use varies)
 	room_vnum action_room;	// player location
@@ -232,8 +232,8 @@ struct b2_affected_type {
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// For how long its effects will last
 	int modifier;	// This is added to apropriate ability
-	byte location;	// Tells which ability to change - APPLY_x
-	bitvector_t bitvector;	// Tells which bits to set - AFF_x
+	byte location;	// Tells which ability to change - APPLY_
+	bitvector_t bitvector;	// Tells which bits to set - AFF_
 
 	struct b2_affected_type *next;
 };
@@ -243,11 +243,11 @@ struct b2_char_point_data {
 	int max_pools[b2_NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	int deficit[b2_NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	
-	int extra_attributes[b2_TOTAL_EXTRA_ATTRIBUTES];	// ATT_x (dodge, etc)
+	int extra_attributes[b2_TOTAL_EXTRA_ATTRIBUTES];	// ATT_ (dodge, etc)
 };
 
 struct b2_over_time_effect_type {
-	sh_int type;	// ATYPE_x
+	sh_int type;	// ATYPE_
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// time in 5-second real-updates
 	sh_int damage_type;	// DAM_x type
@@ -382,7 +382,7 @@ struct b3_player_special_data_saved {
 	int rewarded_today[b3_MAX_REWARDS_PER_DAY];	// idnums, for ABIL_REWARD
 
 	// action info
-	int action;	// ACT_x
+	int action;	// ACT_
 	int action_cycle;	// time left before an action tick
 	int action_timer;	// ticks to completion (use varies)
 	room_vnum action_room;	// player location
@@ -479,8 +479,8 @@ struct b3_affected_type {
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// For how long its effects will last
 	int modifier;	// This is added to apropriate ability
-	byte location;	// Tells which ability to change - APPLY_x
-	bitvector_t bitvector;	// Tells which bits to set - AFF_x
+	byte location;	// Tells which ability to change - APPLY_
+	bitvector_t bitvector;	// Tells which bits to set - AFF_
 
 	struct b3_affected_type *next;
 };
@@ -490,14 +490,14 @@ struct b3_char_point_data {
 	int max_pools[b3_NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	int deficit[b3_NUM_POOLS];	// HEALTH, MOVE, MANA, BLOOD
 	
-	int extra_attributes[b3_TOTAL_EXTRA_ATTRIBUTES];	// ATT_x (dodge, etc)
+	int extra_attributes[b3_TOTAL_EXTRA_ATTRIBUTES];	// ATT_ (dodge, etc)
 };
 
 struct b3_over_time_effect_type {
-	sh_int type;	// ATYPE_x
+	sh_int type;	// ATYPE_
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// time in 5-second real-updates
-	sh_int damage_type;	// DAM_x type
+	sh_int damage_type;	// DAM_ type
 	sh_int damage;	// amount
 	sh_int stack;	// damage is multiplied by this
 	sh_int max_stack;	// how high it's allowed to stack
@@ -579,8 +579,8 @@ void convert_char_file_u(struct b3_char_file_u *to, struct b2_char_file_u *from)
 	// player_special_data_saved
 	to->player_specials_saved.account_id = from->player_specials_saved.account_id;
 	PLRCONV_STRCPY(to->player_specials_saved.creation_host, from->player_specials_saved.creation_host, b3_MAX_HOST_LENGTH+1);
-	PLRCONV_STRCPY(to->player_specials_saved.referred_by, from->player_specials_saved.referred_by, MAX_REFERRED_BY_LENGTH);
-	PLRCONV_STRCPY(to->player_specials_saved.admin_notes, from->player_specials_saved.admin_notes, MAX_ADMIN_NOTES_LENGTH);
+	PLRCONV_STRCPY(to->player_specials_saved.referred_by, from->player_specials_saved.referred_by, b3_MAX_REFERRED_BY_LENGTH);
+	PLRCONV_STRCPY(to->player_specials_saved.admin_notes, from->player_specials_saved.admin_notes, b3_MAX_ADMIN_NOTES_LENGTH);
 	to->player_specials_saved.invis_level = from->player_specials_saved.invis_level;
 	to->player_specials_saved.immortal_level = from->player_specials_saved.immortal_level;
 	to->player_specials_saved.grants = from->player_specials_saved.grants;
@@ -674,7 +674,7 @@ void convert_char_file_u(struct b3_char_file_u *to, struct b2_char_file_u *from)
 	to->player_specials_saved.class_role = from->player_specials_saved.class_role;
 	to->player_specials_saved.character_class = from->player_specials_saved.character_class;
 	to->player_specials_saved.confused_dir = from->player_specials_saved.confused_dir;
-	PLRCONV_STRCPY(to->player_specials_saved.disguised_name, from->player_specials_saved.disguised_name, MAX_DISGUISED_NAME_LENGTH);
+	PLRCONV_STRCPY(to->player_specials_saved.disguised_name, from->player_specials_saved.disguised_name, b3_MAX_DISGUISED_NAME_LENGTH);
 	to->player_specials_saved.disguised_sex = from->player_specials_saved.disguised_sex;
 	to->player_specials_saved.morph = from->player_specials_saved.morph;
 	to->player_specials_saved.mount_flags = from->player_specials_saved.mount_flags;

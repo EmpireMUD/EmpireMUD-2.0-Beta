@@ -1,0 +1,13 @@
+#0
+buggy broken-down~
+a broken-down buggy~
+A broken-down buggy is crashed here.~
+   It looks like something went wrong and this buggy crashed. If you know how
+it got here, consider reporting it with the "bug" command.
+~
+~
+a 19 1 0 0
+R
+0 1  # 1x a bug
+S
+$

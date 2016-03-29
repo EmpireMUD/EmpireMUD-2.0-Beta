@@ -1,0 +1,349 @@
+TRIGEDIT-ADVANCED
+
+WARNING: long and verbose (wordy)
+
+To add life to the worlds circlemud uses something called scripts (or triggers). 
+There are three major types of game objects which can use scripts. These are 
+mobiles (mobs), objects, and rooms (world objects). Examples of scripts in the 
+game are: 
+
+Cityguards screaming 'PROTECT THE INNOCENT! BANZAI! CHARGE!', (a mob script).
+A portal that teleports players when they enter it (an object script).
+A room that creates a new exit when a player pulls a lever (a room script).
+
+Each game item (room, mobile, or object) can have a script. A script is composed
+of one or more triggers, which work in collaboration to define complex actions 
+of the game object. A trigger is a definition of an event that the script watches 
+for, and list of commands to execute when that event occurs. 
+
+There are several different types of triggers. Each trigger type determines
+when the trigger will be checked. For example, a mob speech trigger is checked
+every time a character who is in the same room as the mob with the trigger uses
+the 'say' command. A room enter trigger is checked every time a character
+enters the room. There are two parts of the trigger used to determine if the
+trigger's commands are executed when it is checked, the argument and numerical
+argument (NArg). Some triggers use both; some may use only one of the two; and
+some may use neither. The interpretation of these two fields is dependant on
+the type, and is described in more detail on the webpage and in the help files.
+
+When an event in the game occurs, each script in the room where the event 
+occurred is checked to see if there are any triggers which are supposed to
+react to that event. A trigger currently running (such as from a 'wait'
+command) is skipped. Only one trigger of each script will be run by a single
+event. For example, if there are two triggers on a script, and both are the
+same type with the same arguments, the second trigger will only be run if the
+first one is already running. 
+
+Triggers can be of more than one type. For example, to simulate a cursed item,
+a trigger on the object could be of types drop, give, and remove. A more common
+combined trigger would have both random and global types, so the random trigger
+would be checked even when the zone was empty. Combined triggers must have the
+same argument and numerical argument. 
+
+The other component of a trigger is the command list. This is a series of
+commands that are executed when the trigger is run. Commands are chosen from
+two groups of commands, script specific commands and game commands. Script
+specific commands are those commands that only the script interpreter can
+recognize. These include flow control commands (such as if, elseif, else, end,
+halt, wait, and return), and commands to manipulate variables (such as set,
+eval, unset, and global). Game commands are those commands that a player could
+issue from their command line as well as special commands added for mobiles,
+objects, and rooms.
+#d
+TRIGEDIT-ADVANCED-TUTORIAL
+
+This section is a step by step tutorial to explain the writing of scripts 
+(triggers). It goes through the script creation process developing a practical
+script. 
+
+Decide what you want the script to do. 
+   Consider how your mob, item, or room should behave. Doing this before
+worrying what can be done prevents you from limiting yourself to what you have
+seen other scripts do, and allows you to produce a more interesting script. 
+  
+For example, I want to create a gate guard for a small walled town. The ruler
+of the town has decided that each group of people will be charged ten coins to
+enter his domain. The gate guard must notify travelers of the cost to enter,
+collect the money, allow people who have payed to enter the city, and close the
+gate after them. This will be a mob script. 
+  
+Decide what trigger types you need.
+   Look through the section on triggers to see the currently available trigger
+types. New trigger types can be added by one of the implementors if needed. All
+types are listed in the help files HELP TRIGEDIT-TYPE.
+  
+Our gate guard needs to react to five different events: 
+
+1. A character entering the room from the south, the road leading away from the
+   town, needs to be informed of the price for entrance. This will be a greet
+   trigger. 
+2. When the guard is given ten or more coins, the guard must open the gate. This
+   is done by a bribe trigger. 
+3. If the guard is given less than ten coins, the guard needs to inform the
+   character that it is insufficient. This is also a bribe trigger. 
+4. When someone passes through the gate into the city, the guard must close the
+   gate behind them. This is done with an act trigger. 
+5. When the gate is opened from the other side, the guard must eventually close
+   it. This will be another act trigger. 
+
+Determine the argument and the numerical argument of the triggers. Read the 
+specifications on trigger types, and decide what the values for argument and 
+Numeric Arg must be for the trigger to react appropriately to the events.
+  
+HELP TRIGEDIT-MOB-GREET
+Argument    : not used 
+Numeric Arg : the percent chance that the trigger is run when checked. Since I 
+              want it run every time someone enters the room, it should be 100. 
+
+HELP TRIGEDIT-MOB-BRIBE
+Argument    : not used
+Numeric Arg . minimum number of misc coins required to activate this trigger.
+              The guard should only open the gate when given 10 coins, so it
+              should be 10. 
+
+For the second bribe trigger, the guard must respond whenever someone gives 
+him 1 or more coins, so Numeric Arg should be 1. 
+
+HELP TRIGEDIT-MOB-ACT
+Argument    : the text the mob should react to. Since I want the guard to 
+              react to a character going north, argument should be "leaves 
+              north." 
+Numeric Arg : Since argument is a phrase, NArg should be 0. 
+
+The second act trigger should trigger on text "The gate is opened from the other
+side", so it is triggered whenever someone opens the gate from inside the town.
+Again, Numeric Arg should be 0 for a phrase. 
+  
+Write the list of commands for the trigger.
+This is the most complex and time consuming part of a trigger to write. The
+valid commands are explained in the help files and on the webpage. Variables 
+and expressions are also used in the commands list.
+
+For the greet trigger, I want the guard to inform anyone entering from the
+south how to get into the city. First, I must check if the character is
+entering from the south. If they are entering from that direction, the guard
+should tell the character the cost of entry. The command list for this trigger
+will be as follows: 
+  
+if (%direction% == south) 
+ wait 1 sec
+ emote snaps to attention as you approach. 
+ wait 1 sec
+ say Admittance to the city is 10 coins. 
+end 
+ 
+Checking the specifications of the greet trigger, we see that the variable
+"direction" is set to the direction that the character entered. The percent
+sign surrounding direction means it is a variable. The two equal signs together
+compare the value of the variable to the word "south". If these are equal, the
+statements between this line and the line "end" will be executed. The "wait 1 sec"
+pauses briefly while the character finishes his move. (The greet trigger is
+actually checked before the character enters the room, so if we did not have
+this line, he or she would never see the guard snap to attention.) After
+another brief pause, the guard announces the cost to enter the town. The
+indentations are not needed, but make it easier to read. 
+
+The guard must open the gate if ten or more coins were given to him. The
+command list looks like this: 
+  
+wait 1 sec
+unlock gate 
+open gate 
+wait 10 sec 
+close gate 
+lock gate 
+  
+After a brief wait (so everything doesn't happen at once), the guard unlocks
+the gate and opens it. The guard will close the gate after 10 seconds, even if
+no one passes through it. 
+
+The guard must inform the character that his payment was not enough, and
+return the money. The commands list will be: 
+  
+wait 1 sec
+say This is not enough! 
+give %amount% coins %actor.name% 
+  
+For the line "give %amount% coins %actor.name%", the variables amount and actor,
+both set when the bribe trigger is called, are substituted into the line before
+the guard performs the command. The gate guard returns the number of coins he
+was given. 
+
+For the first act trigger, I want the guard to close and lock the gate after
+someone passes through the gate. The guard should wait briefly so he isn't
+shutting the gate on the character's back, and close and lock the gate. The
+command list will be: 
+
+wait 1 sec
+close gate 
+lock gate 
+  
+For the last act trigger we want the guard to close and lock the gate when it 
+is opened from the other side. The commands will look like: 
+  
+wait 5 sec 
+close gate 
+lock gate 
+  
+The "wait 5 sec" gives time for someone on the other side to get through the gate. 
+Decide the order of the triggers. The triggers are checked from first to last.
+If there are two triggers of the same type, the first one run will be the only
+one run. 
+
+There are two sets of triggers which are the same type, the bribe triggers and
+the act triggers. If the bribe trigger with the Numeric Arg of 1 is first, the 
+other trigger would never be run, since ten or more coins is still one or more. 
+In order for my triggers to work right, the trigger with Numeric Arg of 10 must 
+be before the trigger with the NArg of 1 in the list. The other possible 
+conflict is with the act triggers. Since both have arguments that will not 
+occur together, the order does not matter. 
+
+Create the trigger file.
+Simply use trigedit to create your triggers and they will be saved for you
+when you exit the editor. 
+
+Put the triggers into the game.
+In the OasisOLC medit / redit / oedit menus, use menu option S to enter the
+script editor. Then select the triggers that will be part of your script. Note,
+that order is important! If there are two possible triggers that could both be
+executed at the same time, only the first one found in the list will be
+activated. In this example, it means place the bribe trigger for 10 or more
+coins BEFORE the bribe trigger for 1 coin. 
+
+Test the script.
+You should see how the script actually works in the game, and watch other
+people interact with it. Often you will see ways you can improve it. 
+
+GOTO 1310 and work your way north to test these out. Triggers 4-8.
+#d
+TRIGEDIT-MOB-TUTORIAL TRIGEDIT-TUTORIAL
+
+Mob trigger tutorial
+This mini-quest is setup in TBA as an example. GOTO 1310 and work your way north
+with nohassle off.
+ 
+The following 7 steps should give you a general idea about what to do, and how to go 
+about making small quests in the dg scripting language. This example is concentrated 
+on quests involving mobs. 
+
+The process can be broken down to the following:  
+   1. Decide what you want the script to do.
+   2. Make corresponding objects and mobs.
+   3. Split up the quest.
+   4. Find corresponding trigger types.
+   5. write the scripts for the triggers.
+   6. Attach the scripts - permanently
+   7. Done ? 
+   
+1. Decide what you want the script to do.  
+   In this example, we want to make a small mini quest in an area. The quest 
+will work like this: When you enter the room, where the first mob is, it will 
+start to tell a tale. In this tale, you are instructed to perform a task, in 
+this case, kill an evil ogre, that lives in a nearby forest. As proof of the 
+kill, you must bring back the ogre's apprehension to the questgiving mob. 
+
+2. Make corresponding objects and mobs.  
+   Ingredients for this quest:
+      1 Questgiver mob - I've chosen 'the questmaster' - vnum 1310
+      1 Target mob - In this case 'an apprehensive Ogre' - vnum 1311
+      1 Quest object - 'some apprehension' - trash object, vnum 1300 
+
+3. Split up the quest.  
+   Next thing to do is look at the different steps involved with the quest. In 
+this example, we have three steps: 
+   Player entering room -> tell story 
+   Player finds ogre -> load object (Do not just want the mob to carry it) 
+   Player gives questmaster apprehension -> reward player 
+
+4. Find corresponding trigger types.  
+   Having split the quest up also means we reasonably easy can decide what 
+kinds of triggers we need - in this case: 
+   mob GREET trigger (attached to questmaster) 
+   mob DEATH trigger (attached to ogre) 
+   mob RECEIVE trigger (attached to questmaster) 
+ 
+5. write the scripts for the triggers.  
+    Up to this point, neither trigedit or the script editors have been used. 
+All the info needed is in the help files and on the webpages. Notice most of
+the work required is PLANNING! You must know exactly what you want to do before
+you do it. Now is the time to fire up trigedit and start editing the triggers. 
+Let's give the first one vnum 0, and edit it to look like the script below: 
+
+* we don't want him to tell this to mobs. vnum -1 is reserved for players.
+if %actor.vnum% == -1
+  * only greet players coming from the south.
+  if %direction% == south
+    *wait 1 second, always give the player time before you start sending text.
+    wait 1 sec
+    say Can you help me, %actor.name%?
+    wait 1 sec
+    say An apprehensive ogre has something of mine.
+    wait 1 sec
+    say If you slay him I'll give you all the coins I can spare.
+    wait 1 sec
+    say Please, bring me the apprehension he has stolen.
+  end
+end
+
+The script above will be executed every time anyone enters the room. If the 
+person entering is a mobile, the if check at the beginning will stop the 
+execution. Note, that I've named the trigger as I did above. ALWAYS include
+the VNUM of where you plan on attaching the trigger. Also, give it a name so 
+it is easy to see what part of the quest this trigger handles. The second 
+script is very simple.
+
+say you got the best of me %actor.name%.
+* load some apprehension
+%load% obj 1300
+* reload the mob for the next questor
+%load% mob 1311
+
+The above script will be executed when the mob is killed - just before the 
+death cry. The last script just needs to check if the object handed over is 
+the correct one. Let's see it, here with vnum 2: 
+
+* check if this was indeed the right object
+if %object.vnum% == 1300
+  wait 1 sec
+  say Thank you, %actor.name%
+  %send% %actor% %self.name% gives you a gold piece.
+  %echoaround% %actor% %actor.name% is rewarded for his valor.
+  nop %actor.give_coins(1)%
+  wait 5 sec
+  %purge% obj 1300
+else
+  * this wasn't the right object - don't accept it
+  say I don't want that - bring me back my apprehension.
+  return 0
+end
+
+The script above is pretty self explanatory, but to clarify a bit: First check 
+if the object is the correct vnum, then give the reward, and send messages to 
+the player and others in the room. If it wasn't the object, reject it, and use 
+the return value of the script to prevent the object being passed over. Lastly, 
+and very importantly, 'end' ends the if. 
+
+6. Attach the scripts - permanently  
+   Proceed and add the scripts to the two mobiles. And add the trigger vnum
+   3 to the ogre in a similar manner. 
+
+7. Done ?  
+   The scripts are now attached to the correct mobs, and the players of your 
+mud can now take the quest whenever they wish. This is a great time for 
+considering improvements to the little quest: 
+
+Balance issues: 
+   Should players get a smaller reward if they perform the quest many times ? 
+   Should it be limited to 1 quest per player or 1 per reboot ? 
+Gameplay issues: 
+   Perhaps other mobs in town should tell the player to go see the old man ? 
+   Should the ogre always load the object, or only when people know he has it ? 
+   Are there other mobs who would like to pay for that object ? 
+
+The above list is just a few examples. All of them could be implemented, but 
+it is beyond the scope of this tutorial. 
+
+12DEC01 - mob tutorial by Welcor
+04OCT02 - updated/modified by Rumble
+#d
+$~

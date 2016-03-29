@@ -1,194 +1,194 @@
 #2200
 studded whip~
-2200 1  # 1x a studded whip
+2200 1
 4 56 g 16 -1
 R
-1357 4  # 4x a large piece of leather
+15 4 1 32
 R
-175 1  # 1x an iron ingot
+18 1 1 262144
 S
 #2201
 razor whip~
-2201 1  # 1x a razor-studded whip
+2201 1
 4 182 g 24 -1
 R
-1357 6  # 6x a large piece of leather
+15 6 1 32
 R
-175 4  # 4x an iron ingot
+177 6 0 0
 S
 #2202
 arming sword~
-2202 1  # 1x an arming sword
+2202 1
 1 221 0 16 -1
 R
-175 3  # 3x an iron ingot
+175 3 0 0
 R
-1356 1  # 1x a small piece of leather
+15 1 1 16384
 S
 #2203
 falchion~
-2203 1  # 1x a falchion
+2203 1
 1 196 0 32 -1
 R
-175 6  # 6x an iron ingot
+18 6 1 262144
 R
-177 5  # 5x an imperium ingot
+177 5 0 0
 R
-1356 1  # 1x a small piece of leather
+15 1 1 16384
 S
 #2204
 battle axe~
-2204 1  # 1x a battle axe
+2204 1
 1 221 0 16 -1
 R
-175 3  # 3x an iron ingot
+175 3 0 0
 R
-919 1  # 1x a wooden handle
+13 1 1 0
 S
 #2205
 great axe~
-2205 1  # 1x a great axe
+2205 1
 1 196 0 32 -1
 R
-175 6  # 6x an iron ingot
+18 6 1 262144
 R
-177 5  # 5x an imperium ingot
+177 5 0 0
 R
-919 1  # 1x a wooden handle
+13 1 1 0
 S
 #2206
 pike~
-2206 1  # 1x a pike
+2206 1
 1 221 0 16 -1
 R
-175 3  # 3x an iron ingot
+175 3 0 0
 R
-919 1  # 1x a wooden handle
+13 1 1 0
 S
 #2207
 glaive~
-2207 1  # 1x a glaive
+2207 1
 1 196 0 32 -1
 R
-175 6  # 6x an iron ingot
+18 6 1 262144
 R
-177 5  # 5x an imperium ingot
+177 5 0 0
 R
-919 1  # 1x a wooden handle
+13 1 1 0
 S
 #2208
 dagger~
-2208 1  # 1x a dagger
+2208 1
 1 221 0 16 -1
 R
-175 3  # 3x an iron ingot
+175 3 0 0
 S
 #2209
 kris~
-2209 1  # 1x a deadly kris
+2209 1
 1 196 0 32 -1
 R
-175 6  # 6x an iron ingot
+18 6 1 262144
 R
-177 5  # 5x an imperium ingot
+177 5 0 0
 S
 #2210
 mace~
-2210 1  # 1x a mace
+2210 1
 1 221 0 16 -1
 R
-175 3  # 3x an iron ingot
+175 3 0 0
 R
-919 1  # 1x a wooden handle
+13 1 1 0
 S
 #2211
 maul~
-2211 1  # 1x a brutal maul
+2211 1
 1 196 0 32 -1
 R
-175 6  # 6x an iron ingot
+18 6 1 262144
 R
-177 5  # 5x an imperium ingot
+175 5 0 0
 R
-919 1  # 1x a wooden handle
+13 1 1 0
 S
 #2212
 pickaxe~
-2212 1  # 1x a pickaxe
+2212 1
 1 221 0 16 -1
 R
-175 3  # 3x an iron ingot
+175 3 0 0
 R
-919 1  # 1x a wooden handle
+13 1 1 0
 S
 #2213
 horsemans pick~
-2213 1  # 1x a horseman's pick
+2213 1
 1 196 0 32 -1
 R
-175 6  # 6x an iron ingot
+18 6 1 262144
 R
-177 5  # 5x an imperium ingot
+177 5 0 0
 R
-919 1  # 1x a wooden handle
+13 1 1 0
 S
 #2214
 copper spear~
-2214 1  # 1x a copper spear
+2214 1
 1 52 0 16 -1
 R
-178 3  # 3x a copper ingot
+178 3 0 0
 R
-919 1  # 1x a wooden handle
+13 1 1 0
 S
 #2215
 copper knife~
-2215 1  # 1x a copper knife
+2215 1
 1 52 0 16 -1
 R
-178 3  # 3x a copper ingot
+178 3 0 0
 S
 #2216
 copper mace~
-2216 1  # 1x a copper mace
+2216 1
 1 52 0 16 -1
 R
-178 3  # 3x a copper ingot
+178 3 0 0
 R
-919 1  # 1x a wooden handle
+13 1 1 0
 S
 #2217
 copper axe~
-2217 1  # 1x a copper axe
+2217 1
 1 52 0 16 -1
 R
-178 3  # 3x a copper ingot
+178 3 0 0
 R
-919 1  # 1x a wooden handle
+13 1 1 0
 S
 #2218
 rawhide whip~
-2218 1  # 1x a rawhide whip
+2218 1
 4 223 g 16 -1
 R
-1351 4  # 4x a large skin
+24 4 1 32
 S
 #2219
 iron hammer~
-2219 1  # 1x an iron hammer
+2219 1
 1 221 0 10 -1
 R
-919 1  # 1x a wooden handle
+175 2 0 0
 R
-175 2  # 2x an iron ingot
+13 1 1 0
 S
 #2220
 iron shovel~
-2220 1  # 1x an iron shovel
+2220 1
 1 221 0 10 -1
 R
-919 1  # 1x a wooden handle
+175 2 0 0
 R
-175 2  # 2x an iron ingot
+13 1 1 0
 S
 $

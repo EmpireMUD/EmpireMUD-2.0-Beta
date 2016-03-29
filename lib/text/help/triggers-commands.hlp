@@ -1,0 +1,853 @@
+%ADVENTURECOMPLETE% ADVENTURECOMPLETE MADVENTURECOMPLETE OADVENTURECOMPLETE VADVENTURECOMPLETE WADVENTURECOMPLETE
+
+Usage:  %adventurecomplete%
+
+This script command triggers completion on the adventure instance, which will
+clean it up (delete the instance) next time it's empty. Only mobs can use this
+when physically outside the instance. The other types will only work if still
+inside.
+#d
+%AOE% OAOE MAOE VAOE WAOE
+
+%aoe% [modifier] [damage type]
+
+This does AoE -- Area-of-Effect -- damage to every enemy in the room. The mob
+version only counts combat enemies. The other versions call any player (as well
+as their followers) an enemy. Like %damage%, the damage is scaled, and a
+negative modifier causes healing instead.
+
+You can optionally specify a damage type (physical, magical, fire, poison,
+direct).
+
+Examples:
+  %aoe% 100  - group damage
+  %aoe% -20    - group healing
+
+See also: DEATH, %DAMAGE%, %DOT%
+#d
+%ASOUND% ASOUND OASOUND MASOUND VASOUND WASOUND
+
+%asound% <message>
+   
+The message is sent to all surrounding rooms.
+
+Example:
+  %asound% You hear a blood chilling howl from nearby.
+
+See also: %ECHO%, %REGIONECHO%
+#d
+%AT% MAT OAT VAT WAT
+
+%at% <target> <command>
+
+Using %at% will perform the command in the room where target is found, as if
+the script were firing there. Note that in some cases, such as objects, it
+actually loads a duplicate there temporarily, rather than moving the original
+object.
+#d
+ATTACH "ATTACH COMMAND" TRIG-ATTACH
+
+Disambiguation: This is the scripting command 'attach'. The immortal version
+of this command is &yTATTACH&0.
+
+Usage:  attach <vnum> <id>
+
+This command allows a script to attach a trigger (referenced by vnum) to
+anything capable of receiving triggers, by id number. (%self.id%, %object.id%,
+and %actor.id% are examples of id numbers, for use with this command.)
+
+Example:
+  * This small trigger will attach a trigger to the carrier (this can, for
+  * instance, be used if you want the mob to change attitude by adding another
+  * trigger, i.e. mob was mad - mob got apple - mob gets a 'nicer' trigger
+  * attached).
+  attach 3001 %self.id%
+
+See also: DETACH, TATTACH, TDETACH
+#d
+%BUILDINGECHO% %ECHO% %ECHOAROUND% %ECHONEITHER% %VEHICLEECHO% %SEND% BUILDINGECHO VEHICLEECHO %ZECHOAROUND% ECHOAROUND TRIG-SEND
+
+&c%echo% <message>&0
+   Message is sent to all non-sleeping characters in the same room that this 
+   script is executing in.
+
+&c%echoaround% <victim> <message>&0
+   Message will be sent to all characters in the room with victim, except for 
+   the victim.
+
+&c%echoneither% <person> <person> <message>&0
+   Message will be sent to all characters in the room EXCEPT the two people.
+
+&c%send% <victim> <message>&0
+   Message will be sent to the victim only.
+  
+&c%buildingecho% <room vnum> <message>&0
+   Buildingecho echoes message to the entire building. room vnum should be any
+   vnum in the building you wish to echo around.
+
+&c%vehicleecho% <vehicle> <message>&0
+   Sends a message to everyone on/in the target vehicle.
+
+NOTE: When used with mobs make sure the mobs can see the players and vehicles,
+i.e not blind, set INFRA.
+
+See also: %ASOUND%, %REGIONECHO%
+#d
+COMMENT * "TRIGEDIT COMMENT"
+
+* This is an example of a comment in a script. Because of the *s, the lines 
+* are not parsed, so the script still works even if it has a lot of 
+* explanations built in. All triggers should be have enough comments to help
+* future developers know what's going on.
+
+* The below line sends the text 'Trigger firing' to the room.
+%echo% Trigger firing.
+
+NOTE: Some flags are named * or start with a *; these are flags that cannot be
+set by builders. They are used for internal functions only, or not used at all.
+#d
+CONTEXT
+
+Usage:  context <number>
+
+Changes the "context" of a script to this value. When first run, a script's 
+context is 0. When a variable is made global, it is given the current context. 
+When a variable is accessed, if it must be searched for globally, a "found" 
+variable must either have context 0 or the current context. The net result of 
+this is you may have many global variables in a single script, with the same 
+name, differing only by context. Players may have variables; this mostly 
+removes the need for variable context.
+
+Example:
+* This little script will make sure one %has_said_hello% exist for each player.
+context %actor.id%
+set has_said_hello 1
+global has_said_hello
+* now only scripts running with context = %actor.id% can access this particular 
+* variable. however - it's a better idea to use vars set on players: help remote.
+
+See also: REMOTE
+#d
+%DAMAGE% ODAMAGE MDAMAGE WDAMAGE VDAMAGE
+
+%damage% <victim> [modifier] [damage type]
+
+Cause amount points of damage to victim. Damage is automatically scaled based
+on the mob or adventure level. Modifier is a percent of the scaled damage,
+where 100 is the normal level. If modifier is negative, the player will be
+healed.
+
+You can optionally specify a damage type (physical, magical, fire, poison,
+direct).
+
+Examples:
+  %damage% %actor% -100  - cause scaled healing
+  %damage% %actor% 20  - cause 20% scaled damage
+  %damage% %actor% %random.100%  - cause 1-100% scaled damage randomly
+
+See also: DEATH, %AOE%, %DOT%, %SIEGE%
+#d
+DETACH "DETACH COMMAND" TRIG-DETACH
+
+Disambiguation: This is the scripting command 'detach'. The immortal version
+of this command is &yTDETACH&0.
+
+Usage:  detach <vnum | all> id
+
+The opposite of attach, this removes triggers from the specified target.
+
+Example:
+  * if we - as described in the attach example, want our mob/obj/room to behave
+  * differently, it's not always enough to just add another trigger with attach.
+  * it might be necessary to remove some old ones :
+  detach 3000 %self.id%
+  * or
+  detach all %self.id%
+
+See also: TATTACH, TDETACH, TRIG-ATTACH
+#d
+DG_AFFECT DG_AFFECTS
+
+Usage:  dg_affect <target> <property> <value> <duration>
+
+Puts an affection or apply on the target. Durations must be non-zero. You can
+use -1 for infinite duration ONLY if the target is an NPC.
+
+Examples:
+  dg_affect %actor% HASTE on 20  -- Sets haste on actor for 20 seconds.
+  dg_affect %actor% DODGE 100 20  -- Sets dodge on actor +100 for 20 seconds.
+
+See also: APPLIES, AFFECTS
+#d
+DG_CAST
+
+EmpireMUD does not use the "dg_cast" command because it doesn't have CircleMUD-
+style spells. Instead, mobs can use most player abilities directly at no cost.
+#d
+%DOOR% MDOOR ODOOR VDOOR WDOOR TRIGEDIT-EXIT TRIG-EXIT 
+
+%door% <vnum> <direction> <field> [value]
+
+Used for adding, deleting, and modifying doors in room #vnum. Direction 
+determines which door is being changed, and can be any full direction name.
+If the door does not exist first, a new door will be created. Field is what
+property of the door is being changed. Valid fields are:
+
+&cpurge&0 - Remove the exit in the direction specified - no value needed.
+&cflags&0 - value will be the new door flags bitvector as defined here:
+   a - Exit is a door that can be opened and closed. Default is open.
+   b - The door is closed.
+&cname&0- Value is the name of the door in the specified direction.
+&croom&0- Value is the vnum of the room this direction leads to.
+&cadd <room building vnum>&0 - Add an exit (two-way) to a new room in this
+   direction, using the building vnum provided (must be flagged ROOM). This
+   only works in map buildings and vehicles, never in adventure zones or on
+   the map itself.
+#d
+%DOT% MDOT ODOT VDOT WDOT
+
+%dot% <victim> <modifier> <duration> [damage type] [max stacks]
+
+Adds a scaled DoT -- Damage-Over-Time -- effect to the target.
+
+You can optionally specify a damage type (physical, magical, fire, poison,
+direct).
+
+You can also optionally specify a maximum number of stacks. If a %dot% hits
+again while the victim already has that dot, it will add its damage and stack,
+resetting the duration on the existing effect. If it has hit its maximum, it
+will only refresh the time on the whole stack. If you don't specify, it will
+not stack (max 1).
+
+NOTE: If you want to use max stacks, you must also provide the damage type.
+
+See also: %DAMAGE%, %AOE%, %SIEGE%
+#d
+EVAL
+
+Usage:  eval <variable> <expression>
+
+The eval command is used to set (or create) the specified variable equal to 
+the result of the immediate evaluation of the provided expression. There also 
+exists a "set" command, with the same syntax. Set differs in that the expression
+is not evaluated until each time the variable is accessed.
+
+Example:
+* this example immediately evaluates the expression below and stores the result
+* in %result%:
+eval result %self.health% * 100 / %self.maxhealth% 
+say My hitpoint percentage is %result%.
+* this result will not change after the evaluation even if %self.health% changes.
+
+See also: TRIG-SET
+#d
+EXTRACT
+
+Usage:  extract <to variable> <word number> <from text>
+
+Place a specific word from the 'from-text' into a new or existing variable. Do
+not enclose the name of the to-variable in %'s.
+
+Example:
+* could be used to do strange things to what people say:
+extract testvar1 1 %speech%
+extract testvar2 2 %speech%
+extract testvar3 3 %speech%
+extract testvar4 4 %speech%
+say do you mean %testvar4% %testvar3% %testvar2% %testvar1% ?
+#d
+%FORCE% MFORCE OFORCE VFORCE WFORCE TRIGEDIT-FORCE TRIG-FORCE
+
+%force% <victim> <command>
+
+Force the victim to perform a particular command. Cannot be made to force 
+immortals.
+
+This little script teleports the actor to another place when he enters the
+room, then makes him look to see the description:
+  wait 1 s
+  %echo% A powerful force drags you down.
+  %teleport% %actor% 3001
+  %force% %actor% look
+#d
+"GLOBAL VARIABLES" GLOBALS GLOBAL-VARIABLES GLOBAL-VARS GVARS
+
+Usage:  global <variablename>
+
+Used to change a variable from local to global. If a global variable is 
+modified, this command must be used to update the global contents as well.
+Global variables aren't quite as global as they sound; they are stored to the
+room in which the script is executing, where they are available to other
+scripts running in the same room.
+
+Example:
+* To make a variable 'reachable' from other scripts it has to be made 'global'. 
+* In this case I make a local known var %has_bribed_guard% and make it global. 
+* It's a good idea to use this in conjunction with context.
+global has_bribed_guard
+
+See also: VARIABLES, CONTEXT
+#d
+HALT
+
+Usage:  halt
+
+Halt terminates the trigger execution. early.
+
+Example:
+* This script attacks players of level 20 and above. The reason for the use of 
+* halt and return 0 is to make sure other scripts are checked too.
+if %actor.level% < 20
+  return 0
+  halt
+end
+%echo% %self.name% yells a Battlecry and throws himself at you.
+mkill %actor%
+#d
+IF ELSEIF END "ELSE IF" ELSIF
+
+if (expression)
+  ...
+elseif (expression)
+  ...
+else
+  ...
+end
+
+An 'if' must occur before any elseif or else. If expression evaluates to true 
+(&yHELP EXPRESSIONS&0), the statements between the if statement and the next 
+elseif, else, or end are executed. If it stopped at an elseif or else, it scans 
+for the next end, and continues execution at that point. If the expression 
+evaluated to false, it searches for the next elseif, else, or end. If it finds 
+an elseif, it checks that expression. If it is true, it executes the statements 
+between the elseif and the next elseif, else, or end, and then finds the end of
+the block. If it is false, it continues searching in the same pattern, until a 
+true elseif is found, an else is found, or an end is found. There may be at
+most 1 else statement but as many elseif statements as you like in the block.
+
+*** EVERY IF NEEDS AN END; 2 IFs NEED 2 ENDs ***
+
+Example:
+if (%actor.is_pc%) 
+  %echo% You are a player
+else 
+  %echo% You are a mob.
+end
+
+See also: EXPRESSIONS, NESTED-IFS
+#d
+%LOAD% MLOAD OLOAD VLOAD WLOAD
+
+%load% obj <vnum> [name <position>] [scale level]
+%load% mob <vnum> [ally] [scale level]
+%load% veh <vnum> [scale level]
+
+This command loads a mob, object, or vehicle into the game. No-take objects
+loaded to a mob will load to the room. Mobs loading other mobs may specify
+"ally" to set the loaded mob as a follower, which assists combat scripts in
+determining whose side they are on.
+
+The %load% command will automatically scale things to the same level as the
+thing that does the loading (when it can). However, you can specify a
+different scale level if you like. For object loading, you MUST also include
+the target to load to AND the load position before the scale level.
+
+Load an object the room:  %load% obj 1300
+Load a scaled mob to room:  %load% mob 1300 %actor.level%
+Load obj to player inv:  %load% obj 1300 %actor% inv
+Equip obj to player:  %load% obj 1300 %actor% waist
+
+Valid wear positions are: head, ears, neck1, neck2, clothes, armor, about,
+arms, wrists, hands, rfinger, lfinger, waist, legs, feet, pack, saddle,
+sheath1, sheath2, wield, ranged, hold, shared
+#d
+MAKEUID
+
+Usage:  makeuid <variable> <id>
+        makeuid <variable> room [room location]
+        makeuid <variable> mob <target>
+        makeuid <variable> obj <target>
+        makeuid <variable> vehicle <target>
+        makeuid <variable> empire <name>
+
+Creates a new variable with the name given, whose contents shall be suitable 
+for referring to a character, object, or room whose id is provided.
+
+Example:
+  * We have one mob giving a quest. This mob sets the targets id as a global on 
+  * the player via the 'remote' command, like this:
+  eval quest_object %obj.id%
+  remote quest_object %actor.id%
+  * We then have another mob receiving the quest object, with the following script.
+  if !(%actor.varexists(quest_object)%)
+    return 0
+    halt
+  end
+  * now we know the player has a quest_object variable
+  makeuid obj %actor.quest_object%
+  say Have you brought me %obj.shortdesc%, %actor.name% ?
+  say You must bring it to me to complete your quest, you know.
+#d
+NESTED-IFS NESTING
+
+A "nested if" is an if statement contained within another if or if/else 
+statement. Nested if's allow the creation of a decision tree or flow chart
+of events with multiple conclusions. 
+
+Always use /f to format and indent your trigger. This will warn you if you do
+not have the correct number of ifs to ends. WARNING: Running scripts with
+multiple unmatched if/ends could cause serious side effects. Make sure
+everything lines up with /f before you test.
+#d
+NOP
+
+Usage:  nop <anything>
+
+Almost a no-operation. Certain variable/subfield combinations for characters 
+change some attribute about the character. Nop allows those changes to be used 
+legally on lines that do not need to process the result.
+
+Examples:
+  * this will award the actor with 10 coins
+  nop %actor.give_coins(10)%
+
+Here is a workaround to use a variable:
+  *nop workaround
+  eval making %%self.give_coins(%coins%)%%
+  nop %making%
+#d
+%MORPH% MMORPH OMORPH VMORPH WMORPH
+
+Usage:  %morph% <person> <vnum | normal>
+
+This causes a player or mob to morph, similar to the normal morph abilities.
+This morph is instantaneous and sends no messages.
+
+Examples:
+  %morph% %self% 441
+  %morph% %actor% normal
+
+See also: MORPH, MORPHEDIT
+#d
+%OWN% MOWN OOWN VOWN WOWN
+
+Usage:  %own% [type] <target> <empire>
+
+This command changes empire ownership of a thing (mob, obj, vehicle, or room).
+Be very careful using this command in scripts, as it wields a great deal of
+power.
+
+Examples:
+  %own% room %actor.empire%
+  %own% %self% %empire%
+  %own% veh cart %empire%
+
+See also: EMPIRE VARS
+#d
+%PURGE% MPURGE OPURGE VPURGE WPURGE
+
+Usage:  %purge% <victim | obj | vehicle>
+
+Purge removes objects, mobs, or vehicles from the game. If no argument is
+given, then all objects and mobs (but not vehicles) in the room will be
+removed. If there is an argument, only that thing will be  purged. Players
+cannot be purged.
+
+Examples: 
+  %purge% %self%
+  %purge% %actor.inventory(1300)%   
+  %purge% %actor.eq(hold)%
+
+See also: POSITIONS
+#d
+%QUEST% MQUEST OQUEST VQUEST WQUEST
+
+Usage:  %quest% <person> <command> <quest vnum>
+
+This command lets you modify the quests a player is on.
+
+Quest commands:
+  &cdrop&0 - The person will drop that quest, if they are on it. You can check
+    %char.on_quest(vnum)% first to be sure.
+  &cfinish&0 - Will turn in the quest and complete it, whether or not the
+    person meets the requirements -- check %char.quest_finished(vnum)% first.
+  &cstart&0 - Will give the player the quest, whether or not they meet the
+    prerequisites, if they are not already on it. Consider checking
+    %char.completed_quest(vnum)% first.
+  &ctrigger&0 - Activate any 'triggered' quest task, if the player is on that
+    quest. You can check %char.quest_triggered(vnum)% to see if the condition
+    is already triggered.
+
+See also: QUEST
+#d
+RDELETE
+
+Usage:  rdelete <variable> <id>
+
+Delete a remote variable from the script referred to by the id of its owner.
+
+Example:
+  * This is used to remove a variable
+  say Thank you, %actor.name% - your quest is completed.
+  rdelete quest_object %actor.id%
+
+See also: VDELETE, REMOTE
+#d
+%REGIONECHO% MREGIONECHO OREGIONECHO WREGIONECHO
+
+%regionecho% <location> <radius> <message>
+
+Sends a message to the entire map region around a location, up to a distance
+given by the radius. You can specify a real map location, a building, or an
+adventure zone and it will find the map location associated with it.
+
+If you use a negative radius, it will only echo to people outdoors. Otherwise,
+all players in range will see the echo.
+
+Examples:
+  %regionecho% %self.room% 100 The fair has come to town!
+  %regionecho% %self.room% -50 A pegasus flies overhead.
+
+See also: %ECHO%
+#d
+REMOTE
+
+Usage:  remote <variable> <id>
+
+Remoting a variable saves that variable to the player file for future access.
+The variable must first exist in the script (but don't put % signs around its
+name in this command). This is used heavily for quests to limit a player to
+only performing it once.
+
+You can see if a person has a remote variable using %actor.varexists(varname)%
+and access it using %actor.varname%.
+
+Example:
+  * setting the variable to 1 means completed.
+  set solved_example_quest_zone_14 1
+  remote solved_example_quest_zone_14 %actor.id%
+
+See also: CONTEXT, MTRIG VARS, RDELETE, VDELETE, TRIG-SET
+#d
+"RETURN STATEMENT" TRIG-RETURN
+ 
+Usage:  return 0
+ 
+Return sets the return value of the trigger. Normally, a script will return
+1, unless return 0 is specified. Unlike most computer languages, the return
+command does NOT end the trigger's execution. The value is returned after all
+the commands have been executed, or a wait or halt command is called.
+
+The help files for individual trigger types will explain what happens when the
+script returns 0, if anything.
+
+See also: HALT, WAIT
+#d
+%SCALE% MSCALE OSCALE VSCALE WSCALE
+
+%scale% <victim/object/vehicle> [level]
+
+This scales (or re-scales) a target NPC, object, or vehicle to a given level.
+If no level is provided, the script will attempt to use the scale of the
+character, object, or instance that called the scale command. If no valid level
+is detected, it will send an error.
+
+Normal scaling limits apply, including limits set on objects, mobs, or
+adventures.
+
+If you scale an item that is already scaled, a fresh copy will be loaded and
+scaled. This would result in the original item being purged.
+
+Examples: 
+  %scale% bag 100
+  %scale% sword %actor.level%
+#d
+"SET VARIABLE" TRIG-SET "TRIGGER SET" "SCRIPT SET"
+
+Usage:  set <variable> <value>
+
+The set command is used to set (or create) the specified variable equal to 
+the provided expression, which will be evaluated when the variable is accessed. 
+There also exists an "eval" command, with the same syntax. Eval differs in that 
+the expression is evaluated immediately.
+
+Example:
+* this example sets the value of result to '%self.health% * 100 / %self.maxhealth%'
+set result %self.health% * 100 / %self.maxhealth% 
+* The %result% var now works as a 'function' every time it's accessed.
+say My hitpoint percentage is %result%.
+%damage% %self% 30
+say My hitpoint percentage is %result%.
+
+See also: EVAL
+#d
+%SIEGE% MSIEGE OSIEGE VSIEGE WSIEGE
+
+Usage:  %siege% <target> [scale level]
+
+This deals siege damage to a vehicle or room. Either can be targeted using
+%vars%; vehicles can also be targeted by name while rooms can be targeted by
+direction. Note that this will fail on certain rooms, such as starting
+locations.
+
+You can specify a scale level, or inherit it from the user.
+
+The siege damage is done silently, but there may be a message if the target
+is destroyed.
+
+Examples:
+  %siege% %veh%
+  %siege% north 100
+#d
+"SWITCH STATEMENT" "CASE STATEMENT" "BREAK STATEMENT" "DEFAULT STATEMENT" CASE DEFAULT BREAK TRIG-SWITCH TRIGEDIT-SWITCH
+
+Switch statements let you compare once variable to several outcomes. A switch
+always ends with a break statement. Inside, it contains pairs of case/break
+section, and may have a default/break section.
+
+Example:
+  switch %random.4%
+    case 1
+      emote sings a merry song about someone named Fulbert and Beatrice.
+    break
+    case 2
+      emote booms out loudly, 'Heigh Ho! Heigh Ho! It's home from work we go!'
+    break
+    case 3
+      emote tries to sing falsetto, but his voice doesn't agree.
+    break
+    default
+      sing
+    break
+  done
+
+Switch evaluates an expression and looks for a match amongst the case
+statements that follow. If none of the following case statements are a match,
+and a default statement exists, the default statement is considered a match.
+If a match is found, the commands that follow it, up until a break or done
+command, are executed. 
+
+&cbreak&0 - Used to terminate cases in a switch.
+&ccase&0 - Used to begin a new conditional group in a switch block.
+&cdefault&0 - Similar to case but matches any condition not met.
+&cdone&0 - Used to terminate a switch (or while) block.
+#d
+TATTACH
+
+Usage:  attach mob <trigger vnum> <mob name> [location]
+        attach obj <trigger vnum> <obj name> [location]
+        attach room <trigger vnum> <room vnum> [location]
+        attach vehicle <trigger vnum> <vehicle name> [location]
+
+The tattach command allows you to attach a trigger to a single live copy of
+a mob (or object, etc) -- rather than attach it to the prototype. This is good
+for testing, as well as for creating single-use content. These triggers will
+almost always save through a reboot or logoff (rare exceptions include things
+like harnessing or mounting a mob, which will later load a fresh copy).
+
+It's a good idea to attach a trigger manually to test it before adding it to
+the prototype in OLC. You require OLC edit permissions to attach triggers to
+things.
+
+The 'location' is what number in the triggerlist the trigger will assume.
+
+Examples:
+  tattach room 14500 14520 - Attaches room trigger 14500 to room 14520.
+  tattach mob 1332 santa   - Attaches mob trigger 1332 to mob 1308 (santa).
+  tattach obj 1480 sword   - Attaches obj trigger 1480 to a sword. 
+  tattach veh 952 %boat%   - Attach trigger 952 to the %boat% vehicle.
+
+See also: TDETACH, TRIG-ATTACH, TRIG-DETACH, OLC, TRIGEDIT, STAT
+#d
+TDETACH
+
+Usage:  tdetach [mob|obj|vehicle] <target name> <trigger name/vnum | all>
+        tdetach room <target vnum | .> <trigger name/vnum | all>
+
+Detach removes a script to one instance of a mob (or obj, etc), for testing or 
+other purposes. This removal doesn't affect the prototype, so new copies of the
+thing will still have their scripts. However, in most cases the script will
+remain detached from the thing even through a reboot.
+
+Use the optional argument mob/obj/vehicle to differentiate if more entities
+with the same alias are in the room.
+
+Examples:
+  tdetach room 14500 14520 - remove trigger 14500 from room 14520.
+  tdetach room all         - removes all triggers from a room.
+  tdetach santa 1332       - detach trigger 1332 from mob 1308 (santa).
+  tdetach mob santa all    - detach all triggers from Santa.
+  tdetach santa all        - Same as above.
+  tdetach sword 1300       - detach trigger 1300 from sword.
+  tdetach obj sword 1300   - You guessed it - same as above.
+  tdetach sword all        - detach all triggers from the sword.
+
+See also: TATTACH, TRIG-DETACH, TRIG-ATTACH, OLC, TRIGEDIT, STAT
+#d
+%TELEPORT% MTELEPORT OTELEPORT VTELEPORT WTELEPORT
+
+%teleport% <victim | vehicle> <location>
+%teleport% all <location>
+%teleport% adventure <location>
+
+Teleport moves the victim to the target. The victim does not need to be in 
+the same room as the user. If the victim is 'all', all the characters in the 
+room will be teleported to the target room. No messages are generated by this 
+command. Teleport can also move vehicles.
+
+If you target 'adventure', all players in the entire adventure zone instance,
+plus their NPC followers, will be teleported to the target.
+
+You can use i### to target a room in the current adventure instance by its
+room template vnum instead of live room number (if used in an instanced zone).
+
+Examples:
+  %teleport% all i17401
+  %teleport% %actor% %actor.home%
+#d
+%TERRACROP% MTERRACROP OTERRACROP VTERRACROP WTERRACROP
+
+%terracrop% [location] <crop vnum>
+
+This command allows you to make changes to the map, one tile at a time. It is
+usually a bad idea to terracrop tiles by coordinates. It's almost always
+safest to do this on the map tile the script is running in.
+
+Some sectors cannot be terracropped.
+
+Example:
+  if (%room.sector% ~= Forest)
+    %terracrop% %room% 4900
+  end
+
+See also: %TERRAFORM%
+#d
+%TERRAFORM% MTERRAFORM OTERRAFORM VTERRAFORM WTERRAFORM
+
+%terraform% [location] <sector vnum>
+
+This command allows you to make changes to the map, one tile at a time. It is
+usually a bad idea to terraform tiles by coordinates. It's almost always
+safest to do this on the map tile the script is running in.
+
+Some sectors cannot be terraformed.
+
+Example:
+  if (%room.sector% ~= Forest)
+    %terraform% %room% 4412
+  end
+
+See also: %TERRACROP%
+#d
+%TRANSFORM% TRANSFORM MTRANSFORM OTRANSFORM
+
+&rNOTE: This functionality is disabled and not currently supported by EmpireMUD.
+If you have a use for it, send a request for it to be implemented.&0
+
+%transform% <vnum|-vnum>
+
+This command causes the executing mob or object to transform into another 
+mob or object, based on the vnum argument supplied. The transformation is 
+permanent, though additional transformations may be performed. No message 
+regarding the transformation is sent to the room. The new mob or object will 
+have the same script as the original, rather than any script normally assigned 
+to the new, and no load trigger will be executed.
+
+Mobs - The hit points, max hit points, and position will remain those of the
+original mob but all other statistics and descriptions will be those of the new
+mob. (The new mob can be made to have all of its normal statistics by using a
+negative vnum.) Only mobiles may use this command (naturally).
+
+Objects - Based on the vnum argument supplied. The three basic values will 
+remain those of the original obj but all other statistics and descriptions will 
+be those of the new object. The transformation is permanent, additional 
+transformations may be performed. No message regarding the transformation is 
+sent to the room. The new object will have the same script as the originating 
+object, rather than any script normally assigned to the new object, and no 
+load trigger will be executed.
+#d
+UNSET
+
+Usage:  unset <variable>
+
+Remove the variable from the global variables of this script, or if not 
+found there, from the script.
+Example:
+* in this example we have a var %testvar% we no longer need:
+set testvar hops happily along
+%echo% %self.name% %testvar%
+unset testvar
+* please note - if we had made the var global, that would be gone instead.
+
+See also: TRIG-SET, EVAL
+#d
+VDELETE
+
+Usage:  vdelete <variablename> <id>
+
+Use this to remove a variable from either mob, room, obj, or player.
+
+Examples:
+  vdelete has_solved_quest 5351
+
+To determine the player ID, stat player:
+  > stat file test
+  male PC 'Test'  IDNum: [ 3531], In room [    0]
+
+See also: REMOTE, RDELETE
+#d
+WAIT WAITUNTIL WAIT-UNTIL PAUSE TRIGEDIT-TIMING TIMING
+
+Usage:  wait <time> [s]
+        wait until <mudtime>
+
+The wait statement is used to 'pause' the script execution for a period of 
+time. When a script is being executed it will attempt to execute all commands 
+right away. To get small breaks in, and perhaps give the players time to adjust, 
+use the wait command.
+
+Note: A trigger won't fire again while it's still in a 'wait', so be careful
+using this on Greet triggers.
+
+Examples:
+  say GET OUT! NOW!
+  wait 10 s
+  mkill %actor%
+
+  * If you want to synchronise your script, you can use the 'wait until'
+  * feature. This script wakes the mob at dawn, and puts him to sleep at night.
+  wait until 8:00
+  wake
+  * wait # without seconds following it will wait 10 ticks, which is very quick
+  wait 10 
+  yawn
+  wait 10
+  stand
+  * This one uses wait 10 seconds. Recommend you always use seconds
+  wait 10 sec
+  emote looks sleepy.
+  wait until 21:00
+  yawn
+  wait 10 s
+  rest
+  wait 10 s
+  sleep
+#d
+WHILE DONE
+
+Usage:  while <expression>
+        done
+
+The "while" command starts a loop, running until the expression becomes zero 
+or negative. This can make infinite loops - be careful. There is a limit on
+how many times a loop can execute in one trigger, to prevent that.
+
+The "done" command is used to terminate a switch or while.
+
+while %something%
+  ...
+done
+
+See also: SWITCH
+#d
+$~

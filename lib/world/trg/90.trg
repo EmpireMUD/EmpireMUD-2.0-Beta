@@ -118,7 +118,7 @@ switch (%random.4%)
   break
   default
     * Bock bock...
-    %echo% %self.name% clucks with contentment as %self.heshe% prunes %self.hisher% feathers.
+    %echo% %self.name% clucks with contentment as %self.heshe% preens %self.himher%self.
   break
 done
 ~

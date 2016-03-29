@@ -48,10 +48,12 @@
 */
 
 // external vars
-extern const struct mine_data_type mine_data[];
+extern const char *drinks[];
+extern const char *pool_types[];
 
 // external funcs
 void scale_item_to_level(obj_data *obj, int level);
+void send_char_pos(char_data *ch, int dam);
 
 // locals
 #define WHITESPACE " \t"	// used by some of the string functions
@@ -331,16 +333,14 @@ struct time_info_data *mud_time_passed(time_t t2, time_t t1) {
 * @param bool real If TRUE, uses real name instead of disguise/morph.
 */
 char *PERS(char_data *ch, char_data *vict, bool real) {
-	extern char *morph_string(char_data *ch, byte type);
-	
 	static char output[MAX_INPUT_LENGTH];
 
 	if (!CAN_SEE(vict, ch)) {
 		return "someone";
 	}
 
-	if (!IS_NPC(ch) && GET_MORPH(ch) && !real) {
-		return morph_string(ch, MORPH_STRING_NAME);
+	if (IS_MORPHED(ch) && !real) {
+		return MORPH_SHORT_DESC(GET_MORPH(ch));
 	}
 	
 	if (!real && IS_DISGUISED(ch)) {
@@ -1065,6 +1065,10 @@ bool can_use_room(char_data *ch, room_data *room, int mode) {
 			return TRUE;
 		}
 	}
+	// public + guest + hostile + no-empire exclusion
+	if (ROOM_AFF_FLAGGED(homeroom, ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED && !GET_LOYALTY(ch) && IS_HOSTILE(ch)) {
+		return FALSE;
+	}
 	
 	// otherwise it's just whether ch's empire can use it
 	return emp_can_use_room(GET_LOYALTY(ch), room, mode);
@@ -1091,8 +1095,8 @@ bool emp_can_use_room(empire_data *emp, room_data *room, int mode) {
 	if (!ROOM_OWNER(homeroom)) {
 		return TRUE;
 	}
-	// public + guests
-	if (ROOM_AFF_FLAGGED(homeroom, ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED) {
+	// public + guests (not at war or hostile)
+	if (ROOM_AFF_FLAGGED(homeroom, ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED && !has_relationship(emp, ROOM_OWNER(homeroom), DIPL_WAR)) {
 		return TRUE;
 	}
 	// empire ownership
@@ -1101,6 +1105,39 @@ bool emp_can_use_room(empire_data *emp, room_data *room, int mode) {
 	}
 	// check allies if not a private room
 	if (mode != MEMBERS_ONLY && ROOM_PRIVATE_OWNER(homeroom) == NOBODY && has_relationship(ROOM_OWNER(homeroom), emp, DIPL_ALLIED)) {
+		return TRUE;
+	}
+	
+	// newp
+	return FALSE;
+}
+
+
+/**
+* Determines if an empire can use a vehicle.
+*
+* @param empire_data *emp The empire trying to use it -- MAY be null.
+* @param vehicle_data *veh The vehicle it's trying to use.
+* @param int mode -- GUESTS_ALLOWED, MEMBERS_AND_ALLIES, MEMBERS_ONLY
+* @return bool TRUE if emp can use veh, FALSE otherwise
+*/
+bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
+	room_data *interior = VEH_INTERIOR_HOME_ROOM(veh);	// if any
+	
+	// no owner?
+	if (!VEH_OWNER(veh)) {
+		return TRUE;
+	}
+	// empire ownership
+	if (VEH_OWNER(veh) == emp) {
+		return TRUE;
+	}
+	// public + guests
+	if (interior && ROOM_AFF_FLAGGED(interior, ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED) {
+		return TRUE;
+	}
+	// check allies
+	if (mode != MEMBERS_ONLY && emp && has_relationship(VEH_OWNER(veh), emp, DIPL_ALLIED)) {
 		return TRUE;
 	}
 	
@@ -1165,7 +1202,7 @@ bool has_tech_available(char_data *ch, int tech) {
 * It takes the location into account, not just the tech flags.
 *
 * @param room_data *room The location to check.
-* @param int tech TECH_x id
+* @param int tech TECH_ id
 * @return TRUE if successful, FALSE if not (and sends its own error message to ch)
 */
 bool has_tech_available_room(room_data *room, int tech) {
@@ -1173,7 +1210,12 @@ bool has_tech_available_room(room_data *room, int tech) {
 	
 	empire_data *emp = ROOM_OWNER(room);
 	bool requires_island = FALSE;
-	int iter;
+	struct empire_island *isle;
+	int id, iter;
+	
+	if (!emp) {
+		return FALSE;
+	}
 	
 	// see if it requires island
 	for (iter = 0; techs_requiring_same_island[iter] != NOTHING; ++iter) {
@@ -1182,16 +1224,20 @@ bool has_tech_available_room(room_data *room, int tech) {
 			break;
 		}
 	}
-
-	if (!emp) {
-		return FALSE;
-	}
-	else if (!(requires_island ? EMPIRE_HAS_TECH_ON_ISLAND(emp, GET_ISLAND_ID(room), tech) : EMPIRE_HAS_TECH(emp, tech))) {
-		return FALSE;
-	}
-	else {
+	
+	// easy way out
+	if (!requires_island && EMPIRE_HAS_TECH(emp, tech)) {
 		return TRUE;
 	}
+	
+	// check the island
+	id = GET_ISLAND_ID(room);
+	if (id != NO_ISLAND && (isle = get_empire_island(emp, id))) {
+		return (isle->tech[tech] > 0);
+	}
+	
+	// nope
+	return FALSE;
 }
 
 
@@ -1233,31 +1279,10 @@ int land_can_claim(empire_data *emp, bool outside_only) {
 //// FILE UTILS //////////////////////////////////////////////////////////////
 
 /**
-* This initiates the autowiz program, which writes fresh wizlist files.
-*
-* TODO like many player-reading systems, this could be done internally
-* instead of with an external call.
-*
-* @param char_data *ch The player to check. Only runs autowiz if the player is a god.
-*/
-void check_autowiz(char_data *ch) {
-	if (GET_ACCESS_LEVEL(ch) >= LVL_GOD && config_get_bool("use_autowiz")) {
-		char buf[128];
-
-		sprintf(buf, "nice ../bin/autowiz %d %s %d %s %d &", LVL_START_IMM, WIZLIST_FILE, LVL_GOD, GODLIST_FILE, (int) getpid());
-
-		syslog(SYS_INFO, 0, TRUE, "Initiating autowiz.");
-		system(buf);
-	}
-}
-
-
-/**
 * Gets the filename/path for various name-divided file directories.
 *
 * @param char *orig_name The player name.
 * @param char *filename A variable to write the filename to.
-* @param int mode CRASH_FILE, ALIAS_FILE, etc.
 * @return int 1=success, 0=fail
 */
 int get_filename(char *orig_name, char *filename, int mode) {
@@ -1270,28 +1295,19 @@ int get_filename(char *orig_name, char *filename, int mode) {
 	}
 
 	switch (mode) {
-		case CRASH_FILE:
-			prefix = LIB_PLROBJS;
-			suffix = SUF_OBJS;
+		case PLR_FILE: {
+			prefix = LIB_PLAYERS;
+			suffix = SUF_PLR;
 			break;
-		case ALIAS_FILE:
-			prefix = LIB_PLRALIAS;
-			suffix = SUF_ALIAS;
+		}
+		case DELAYED_FILE: {
+			prefix = LIB_PLAYERS;
+			suffix = SUF_DELAY;
 			break;
-		case ETEXT_FILE:
-			prefix = LIB_PLRTEXT;
-			suffix = SUF_TEXT;
-			break;
-		case LORE_FILE:
-			prefix = LIB_PLRLORE;
-			suffix = SUF_LORE;
-			break;
-		case SCRIPT_VARS_FILE:
-			prefix = LIB_PLRVARS;
-			suffix = SUF_MEM;
-			break;
-		default:
+		}
+		default: {
 			return (0);
+		}
 	}
 
 	strcpy(name, orig_name);
@@ -1516,7 +1532,7 @@ char *room_log_identifier(room_data *room) {
 * This is the main syslog function (mudlog in CircleMUD). It logs to all
 * immortals who are listening.
 *
-* @param bitvector_t type Any SYS_x type
+* @param bitvector_t type Any SYS_ type
 * @param int level The minimum level to see the log.
 * @param bool file If TRUE, also outputs to the mud's log file.
 * @param const char *str The log string.
@@ -1992,12 +2008,12 @@ double rate_item(obj_data *obj) {
 	extern double get_base_dps(obj_data *weapon);
 	extern const double apply_values[];
 	
+	struct obj_apply *apply;
 	double score = 0;
-	int iter;
 	
 	// basic apply score
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		score += obj->affected[iter].modifier * apply_values[(int) obj->affected[iter].location];
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+		score += apply->modifier * apply_values[(int) apply->location];
 	}
 	
 	// score based on type
@@ -2008,10 +2024,6 @@ double rate_item(obj_data *obj) {
 		}
 		case ITEM_DRINKCON: {
 			score += GET_DRINK_CONTAINER_CAPACITY(obj) / config_get_double("scale_drink_capacity");
-			break;
-		}
-		case ITEM_FOOD: {
-			score += GET_FOOD_HOURS_OF_FULLNESS(obj) / config_get_double("scale_food_fullness");
 			break;
 		}
 		case ITEM_COINS: {
@@ -2061,7 +2073,7 @@ void command_lag(char_data *ch, int wait_type) {
 	
 	switch (wait_type) {
 		case WAIT_SPELL: {	// spells (but not combat spells)
-			if (HAS_ABILITY(ch, ABIL_FASTCASTING)) {
+			if (has_ability(ch, ABIL_FASTCASTING)) {
 				val = 0.3333 * GET_WITS(ch);
 				wait -= MAX(0, val) RL_SEC;
 				
@@ -2147,12 +2159,37 @@ void determine_gear_level(char_data *ch) {
 
 
 /**
+* Finds an attribute by name, preferring exact matches to partial matches.
+*
+* @param char *name The name to look up.
+* @return int An attribute constant (STRENGTH) or -1 for no-match.
+*/
+int get_attribute_by_name(char *name) {
+	extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
+	int iter, partial = -1;
+	
+	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+		if (!str_cmp(name, attributes[iter].name)) {
+			return iter;	// exact matcg;
+		}
+		else if (is_abbrev(name, attributes[iter].name)) {
+			partial = iter;
+		}
+	}
+	
+	// didn't find exact...
+	return partial;
+}
+
+
+/**
 * Raises a person from sleeping+ to standing (or fighting) if possible.
 * 
 * @param char_data *ch The person to try to wake/stand.
 * @return bool TRUE if the character ended up standing (>= fighting), FALSE if not.
 */
 bool wake_and_stand(char_data *ch) {
+	void do_unseat_from_vehicle(char_data *ch);
 	char buf[MAX_STRING_LENGTH];
 	bool was_sleeping = FALSE;
 	
@@ -2163,6 +2200,7 @@ bool wake_and_stand(char_data *ch) {
 		}
 		case POS_RESTING:
 		case POS_SITTING: {
+			do_unseat_from_vehicle(ch);
 			GET_POS(ch) = POS_STANDING;
 			msg_to_char(ch, "You %sget up.\r\n", (was_sleeping ? "awaken and " : ""));
 			snprintf(buf, sizeof(buf), "$n %sgets up.", (was_sleeping ? "awakens and " : ""));
@@ -2188,6 +2226,256 @@ bool wake_and_stand(char_data *ch) {
 //// RESOURCE UTILS //////////////////////////////////////////////////////////
 
 /**
+* Combines some resource data into an existing resource list, combining if
+* possible.
+*
+* @param struct resource_data **list The list to add to.
+* @param int type The RES_ type.
+* @param any_vnum vnum The appropriate vnum for 'type'.
+* @param int amount How many/much of that thing.
+* @param int misc For types that use the misc field.
+*/
+void add_to_resource_list(struct resource_data **list, int type, any_vnum vnum, int amount, int misc) {
+	struct resource_data *res;
+	bool found = FALSE;
+	
+	// prefer to combine
+	LL_FOREACH(*list, res) {
+		if (res->type == type && res->vnum == vnum && res->misc == misc) {
+			SAFE_ADD(res->amount, amount, INT_MIN, INT_MAX, FALSE);
+			found = TRUE;
+		}
+	}
+	
+	// append if not found
+	if (!found) {
+		CREATE(res, struct resource_data, 1);
+		res->type = type;
+		res->vnum = vnum;
+		res->amount = amount;
+		res->misc = misc;
+		
+		LL_APPEND(*list, res);
+	}
+}
+
+
+/**
+* Applies a previously found resource_data (and sometimes matching obj) to a
+* building or other one-at-a-time craft. This is called using the resource and
+* found object from get_next_resource().
+*
+* @param char_data *ch The player doing the work.
+* @param struct resource_data *res The resource entry they are applying (may be freed!).
+* @param struct resource_data **list A pointer to the resource list they are working on (res may be removed from it).
+* @param obj_data *use_obj Optional: If an item was found, pass it here -- it will probably be extracted.
+* @param int msg_type APPLY_RES_BUILD, etc -- for how to message.
+* @param vehicle_data *crafting_veh Optional: used for APPLY_RES_CRAFT messages.
+* @param struct resource_data **build_used_list Optional: If you need to track the actual resources used, pass a pointer to that list.
+*/
+void apply_resource(char_data *ch, struct resource_data *res, struct resource_data **list, obj_data *use_obj, int msg_type, vehicle_data *crafting_veh, struct resource_data **build_used_list) {
+	bool messaged_char = FALSE, messaged_room = FALSE;
+	char buf[MAX_STRING_LENGTH];
+	int amt;
+	
+	if (!ch || !res) {
+		return;	// nothing to do
+	}
+	
+	// APPLPY_RES_x: send custom messages (only) now
+	if (use_obj) {
+		switch (msg_type) {
+			case APPLY_RES_BUILD: {
+				if (!messaged_char && has_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_CHAR)) {
+					act(get_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_CHAR), FALSE, ch, use_obj, NULL, TO_CHAR | TO_SPAMMY);
+					messaged_char = TRUE;
+				}		
+				if (!messaged_room && has_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_ROOM)) {
+					act(get_custom_message(use_obj, OBJ_CUSTOM_BUILD_TO_ROOM), FALSE, ch, use_obj, NULL, TO_ROOM | TO_SPAMMY);
+					messaged_room = TRUE;
+				}
+				break;
+			}
+			case APPLY_RES_CRAFT: {
+				if (!messaged_char && has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR)) {
+					act(get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR), FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+					messaged_char = TRUE;
+				}
+				if (!messaged_room && has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM)) {
+					act(get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM), FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+					messaged_room = TRUE;
+				}
+				break;
+			}
+			case APPLY_RES_REPAIR: {
+				if (!messaged_char) {
+					act("You use $p to repair $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+					messaged_char = TRUE;
+				}
+				if (!messaged_room) {
+					act("$n uses $p to repair $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+					messaged_room = TRUE;
+				}
+				break;
+			}
+		}
+	}
+	
+	// RES_x: Remove one resource based on type.
+	switch (res->type) {
+		case RES_OBJECT:	// obj/component are just simple objs
+		case RES_COMPONENT: {
+			// APPLY_RES_x: generic messaging if not previously sent
+			switch (msg_type) {
+				case APPLY_RES_BUILD: {
+					if (!messaged_char) {
+						act("You carefully place $p in the structure.", FALSE, ch, use_obj, NULL, TO_CHAR | TO_SPAMMY);
+					}
+					if (!messaged_room) {
+						act("$n places $p carefully in the structure.", FALSE, ch, use_obj, NULL, TO_ROOM | TO_SPAMMY);
+					}
+					break;
+				}
+				case APPLY_RES_CRAFT: {
+					if (!messaged_char) {
+						act("You place $p onto $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+					}
+					if (!messaged_room) {
+						act("$n places $p onto $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+					}
+					break;
+				}
+				// already messaged APPLY_RES_REPAIR for this type
+			}
+			
+			res->amount -= 1;	// only pay 1 at a time
+			if (use_obj) {
+				if (build_used_list) {
+					add_to_resource_list(build_used_list, RES_OBJECT, GET_OBJ_VNUM(use_obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(use_obj));
+				}
+				extract_obj(use_obj);
+			}
+			break;
+		}
+		case RES_LIQUID: {
+			// APPLY_RES_x: generic messaging if not previously sent
+			switch (msg_type) {
+				case APPLY_RES_BUILD: {
+					if (!messaged_char) {
+						act("You carefully pour $p into the structure.", FALSE, ch, use_obj, NULL, TO_CHAR | TO_SPAMMY);
+					}
+					if (!messaged_room) {
+						act("$n pours $p carefully into the structure.", FALSE, ch, use_obj, NULL, TO_ROOM | TO_SPAMMY);
+					}
+					break;
+				}
+				case APPLY_RES_CRAFT: {
+					if (!messaged_char) {
+						act("You pour $p into $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+					}
+					if (!messaged_room) {
+						act("$n pours $p into $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+					}
+					break;
+				}
+				// already messaged APPLY_RES_REPAIR for this type
+			}
+			
+			if (use_obj) {
+				amt = GET_DRINK_CONTAINER_CONTENTS(use_obj);
+				amt = MIN(res->amount, amt);
+				
+				res->amount -= amt;	// possible partial payment
+				GET_OBJ_VAL(use_obj, VAL_DRINK_CONTAINER_CONTENTS) -= amt;
+				if (GET_DRINK_CONTAINER_CONTENTS(use_obj) == 0) {
+					GET_OBJ_VAL(use_obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+				}
+				
+				if (build_used_list) {
+					add_to_resource_list(build_used_list, RES_LIQUID, res->vnum, amt, 0);
+				}
+			}
+			break;
+		}
+		case RES_COINS: {
+			empire_data *coin_emp = real_empire(res->vnum);
+			
+			if (!messaged_char && msg_type != APPLY_RES_SILENT) {
+				snprintf(buf, sizeof(buf), "You spend %s.", money_amount(coin_emp, res->amount));
+				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+			}
+			if (!messaged_room && msg_type != APPLY_RES_SILENT) {
+				snprintf(buf, sizeof(buf), "$n spends %s.", money_amount(coin_emp, res->amount));
+				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+			}
+			
+			charge_coins(ch, coin_emp, res->amount, build_used_list);
+			res->amount = 0;	// cost paid in full
+			break;
+		}
+		case RES_POOL: {
+			if (!messaged_char && msg_type != APPLY_RES_SILENT) {
+				snprintf(buf, sizeof(buf), "You spend %d %s point%s.", res->amount, pool_types[res->vnum], PLURAL(res->amount));
+				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+			}
+			if (!messaged_room && msg_type != APPLY_RES_SILENT) {
+				snprintf(buf, sizeof(buf), "$n spends %s %s point%s.", (res->amount != 1) ? "some" : "a", pool_types[res->vnum], PLURAL(res->amount));
+				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+			}
+			
+			if (build_used_list) {
+				add_to_resource_list(build_used_list, RES_POOL, res->vnum, res->amount, 0);
+			}
+			
+			GET_CURRENT_POOL(ch, res->vnum) -= res->amount;
+			GET_CURRENT_POOL(ch, res->vnum) = MAX(0, GET_CURRENT_POOL(ch, res->vnum));
+			
+			if (res->vnum == HEALTH) {
+				update_pos(ch);
+				send_char_pos(ch, 0);
+			}
+			
+			res->amount = 0;	// cost paid in full
+			break;
+		}
+	}
+	
+	// now possibly remove the resource, if it hit zero
+	if (res->amount <= 0) {
+		if (list) {
+			LL_DELETE(*list, res);
+		}
+		free(res);
+	}
+}
+
+
+/**
+* The name of a component with its flags.
+*
+* @param int type CMP_ component type.
+* @param bitvector_t flags CMPF_ component flags.
+*/
+char *component_string(int type, bitvector_t flags) {
+	extern const char *component_flags[];
+	extern const char *component_types[];
+	
+	char mods[MAX_STRING_LENGTH];
+	static char output[256];
+	
+	if (flags) {
+		prettier_sprintbit(flags, component_flags, mods);
+		strcat(mods, " ");
+	}
+	else {
+		*mods = '\0';
+	}
+	snprintf(output, sizeof(output), "%s%s", mods, component_types[type]);
+	return output;
+}
+
+
+/**
 * Extract resources from the list, hopefully having checked has_resources, as
 * this function does not error if it runs out -- it just keeps extracting
 * until it's out of items, or hits its required limit.
@@ -2195,32 +2483,103 @@ bool wake_and_stand(char_data *ch) {
 * This function always takes from inventory first, and ground second.
 *
 * @param char_data *ch The person whose resources to take.
-* @param Resource list[] Any resource list.
+* @param struct resource_data *list Any resource list.
 * @param bool ground If TRUE, will also take resources off the ground.
+* @param struct resource_data **build_used_list Optional: if not NULL, will build a resource list of the specifc things extracted.
 */
-void extract_resources(char_data *ch, Resource list[], bool ground) {
+void extract_resources(char_data *ch, struct resource_data *list, bool ground, struct resource_data **build_used_list) {
 	obj_data *obj, *next_obj;
-	int i, remaining;
-
-	for (i = 0; list[i].vnum != NOTHING; i++) {
-		remaining = list[i].amount;
-
-		for (obj = ch->carrying; obj && remaining > 0; obj = next_obj) {
-			next_obj = obj->next_content;
-
-			if (GET_OBJ_VNUM(obj) == list[i].vnum) {
-				--remaining;
-				extract_obj(obj);
-			}
-		}
-		if (ground) {
-			for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj && remaining > 0; obj = next_obj) {
-				next_obj = obj->next_content;
-
-				if (GET_OBJ_VNUM(obj) == list[i].vnum) {
-					--remaining;
-					extract_obj(obj);
+	int diff, liter, remaining;
+	struct resource_data *res;
+	
+	LL_FOREACH(list, res) {
+		// RES_x: extract resources by type
+		switch (res->type) {
+			case RES_OBJECT:
+			case RES_COMPONENT:
+			case RES_LIQUID: {	// these 3 types check objects
+				obj_data *search_list[2];
+				search_list[0] = ch->carrying;
+				search_list[1] = ground ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+				
+				remaining = res->amount;
+				
+				// up to two places to search
+				for (liter = 0; liter < 2 && remaining > 0; ++liter) {
+					LL_FOREACH_SAFE2(search_list[liter], obj, next_obj, next_content) {
+						// skip keeps
+						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+							continue;
+						}
+						
+						// RES_x: just types that need objects
+						switch (res->type) {
+							case RES_OBJECT: {
+								if (GET_OBJ_VNUM(obj) == res->vnum) {
+									if (build_used_list) {
+										add_to_resource_list(build_used_list, RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+									}
+									
+									--remaining;
+									extract_obj(obj);
+								}
+								break;
+							}
+							case RES_COMPONENT: {
+								// require full match on cmp flags
+								if (GET_OBJ_CMP_TYPE(obj) == res->vnum && (GET_OBJ_CMP_FLAGS(obj) & res->misc) == res->misc) {
+									if (build_used_list) {
+										add_to_resource_list(build_used_list, RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+									}
+									
+									--remaining;
+									extract_obj(obj);
+								}
+								break;
+							}
+							case RES_LIQUID: {
+								if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == res->vnum) {
+									diff = MIN(remaining, GET_DRINK_CONTAINER_CONTENTS(obj));
+									remaining -= diff;
+									GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) -= diff;
+									
+									if (GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) == 0) {
+										GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+									}
+									
+									if (build_used_list) {
+										add_to_resource_list(build_used_list, RES_LIQUID, res->vnum, diff, 0);
+									}
+								}
+								break;
+							}
+						}
+						
+						// ok to break out early if we found enough
+						if (remaining <= 0) {
+							break;
+						}
+					}
 				}
+				break;
+			}
+			case RES_COINS: {
+				charge_coins(ch, real_empire(res->vnum), res->amount, build_used_list);
+				break;
+			}
+			case RES_POOL: {
+				if (build_used_list) {
+					add_to_resource_list(build_used_list, RES_POOL, res->vnum, res->amount, 0);
+				}
+				
+				GET_CURRENT_POOL(ch, res->vnum) -= res->amount;
+				GET_CURRENT_POOL(ch, res->vnum) = MAX(0, GET_CURRENT_POOL(ch, res->vnum));
+				
+				if (res->vnum == HEALTH) {
+					update_pos(ch);
+					send_char_pos(ch, 0);
+				}
+				break;
 			}
 		}
 	}
@@ -2228,33 +2587,275 @@ void extract_resources(char_data *ch, Resource list[], bool ground) {
 
 
 /**
+* Finds the next resource a character has available, from a list. This can be
+* used to get the next <thing> for any one-at-a-time building task, including
+* vehicles. This function returns the resource_data pointer, and will bind the
+* object it found (if applicable to the resource type), but it doesn't extract
+* or free anything.
+*
+* Apply the found resource using apply_resource().
+*
+* @param char_data *ch The person who is doing the building.
+* @param struct resource_data *list The resource list he's working on.
+* @param bool ground TRUE if the character can use items off the ground (in addition to inventory).
+* @param bool left2right If TRUE, requires the leftmost resource first (blocks progress).
+* @param obj_data **found_obj A variable to bind the matching item to, for resources that require items.
+*/
+struct resource_data *get_next_resource(char_data *ch, struct resource_data *list, bool ground, bool left2right, obj_data **found_obj) {
+	struct resource_data *res;
+	int liter, amt;
+	obj_data *obj;
+	
+	*found_obj = NULL;
+	
+	LL_FOREACH(list, res) {
+		// RES_x: find first resource by type
+		switch (res->type) {
+			case RES_OBJECT:
+			case RES_COMPONENT:
+			case RES_LIQUID: {	// these 3 types check objects
+				obj_data *search_list[2];
+				search_list[0] = ch->carrying;
+				search_list[1] = ground ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+				
+				// up to two places to search
+				for (liter = 0; liter < 2; ++liter) {
+					LL_FOREACH2(search_list[liter], obj, next_content) {
+						// skip keeps
+						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+							continue;
+						}
+						
+						// RES_x: just types that need objects
+						switch (res->type) {
+							case RES_OBJECT: {
+								if (GET_OBJ_VNUM(obj) == res->vnum) {
+									// got one!
+									*found_obj = obj;
+									return res;
+								}
+								break;
+							}
+							case RES_COMPONENT: {
+								// require full match on cmp flags
+								if (GET_OBJ_CMP_TYPE(obj) == res->vnum && (GET_OBJ_CMP_FLAGS(obj) & res->misc) == res->misc) {
+									// got one!
+									*found_obj = obj;
+									return res;
+								}
+								break;
+							}
+							case RES_LIQUID: {
+								if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == res->vnum && GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
+									// got one!
+									*found_obj = obj;
+									return res;
+								}
+								break;
+							}
+						}
+					}
+				}
+				break;
+			}
+			case RES_COINS: {
+				if (can_afford_coins(ch, real_empire(res->vnum), res->amount)) {
+					// success!
+					return res;
+				}
+				break;
+			}
+			case RES_POOL: {
+				// special rule: require that blood or health costs not reduce player below 1
+				amt = res->amount + ((res->vnum == HEALTH || res->vnum == BLOOD) ? 1 : 0);
+	
+				// more player checks
+				if (GET_CURRENT_POOL(ch, res->vnum) >= amt) {
+					// success!
+					return res;
+				}
+				break;
+			}
+		}
+		
+		// if they requested left-to-right, we never pass the first resource in the list
+		if (left2right) {
+			break;
+		}
+	}
+	
+	// found nothing
+	return NULL;
+}
+
+
+/**
+* Gets string output describing one "resource" entry, for use in lists.
+*
+* @param sturct resource_data *res The resource to display.
+* @return char* A short string including quantity and type.
+*/
+char *get_resource_name(struct resource_data *res) {
+	static char output[MAX_STRING_LENGTH];
+	
+	*output = '\0';
+	
+	// RES_x: resource type determines display
+	switch (res->type) {
+		case RES_OBJECT: {
+			snprintf(output, sizeof(output), "%dx %s", res->amount, skip_filler(get_obj_name_by_proto(res->vnum)));
+			break;
+		}
+		case RES_COMPONENT: {
+			snprintf(output, sizeof(output), "%dx (%s)", res->amount, component_string(res->vnum, res->misc));
+			break;
+		}
+		case RES_LIQUID: {
+			snprintf(output, sizeof(output), "%d unit%s of %s", res->amount, PLURAL(res->amount), drinks[res->vnum]);
+			break;
+		}
+		case RES_COINS: {
+			snprintf(output, sizeof(output), money_amount(real_empire(res->vnum), res->amount));
+			break;
+		}
+		case RES_POOL: {
+			snprintf(output, sizeof(output), "%d %s point%s", res->amount, pool_types[res->vnum], PLURAL(res->amount));
+			break;
+		}
+		default: {
+			snprintf(output, sizeof(output), "[unknown resource %d]", res->type);
+			break;
+		}
+	}
+	
+	return output;
+}
+
+
+/**
 * Give resources from a resource list to a player.
 *
 * @param char_data *ch The target player.
-* @param Resource list[] Any resource list.
+* @param struct resource_data *list Any resource list.
 * @param bool split If TRUE, gives back only half.
 */
-void give_resources(char_data *ch, Resource list[], bool split) {
+void give_resources(char_data *ch, struct resource_data *list, bool split) {
+	int diff, liter, remaining;
+	struct resource_data *res;
+	bool last = FALSE;
 	obj_data *obj;
-	int i, j, remaining;
-
-	for (i = 0; list[i].vnum != NOTHING; i++) {
-		remaining = list[i].amount;
-
-		if (split) {
-			remaining /= 2;
-		}
-
-		for (j = 0; j < remaining; j++) {
-			if (obj_proto(list[i].vnum)) {
-				obj = read_object(list[i].vnum, TRUE);
-				
-				// scale item to minimum level
-				scale_item_to_level(obj, 0);
-				
-				obj_to_char_or_room(obj, ch);
-				load_otrigger(obj);
+	
+	LL_FOREACH(list, res) {
+		// RES_x: give resources by type
+		switch (res->type) {
+			case RES_COMPONENT: {
+				// nothing to do -- we can't refund a generic component
+				break;
 			}
+			case RES_OBJECT: {
+				for (remaining = res->amount; remaining > 0; --remaining) {
+					// skip every-other-thing
+					if (last && split) {
+						last = FALSE;
+						continue;
+					}
+					last = TRUE;
+					
+					// replace the obj
+					obj = read_object(res->vnum, TRUE);
+					
+					// scale item to "misc" level if applicable (will be 0/minimum if not)
+					scale_item_to_level(obj, res->misc);
+					
+					if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+						obj_to_char(obj, ch);
+					}
+					else {
+						obj_to_room(obj, IN_ROOM(ch));
+					}
+					
+					load_otrigger(obj);
+				}
+				break;
+			}
+			case RES_LIQUID: {
+				obj_data *search_list[2] = { ch->carrying, ROOM_CONTENTS(IN_ROOM(ch)) };
+				remaining = res->amount / (split ? 2 : 1);
+				last = FALSE;	// cause next obj to refund
+				
+				// up to two places to search for containers to fill
+				for (liter = 0; liter < 2 && remaining > 0; ++liter) {
+					LL_FOREACH2(search_list[liter], obj, next_content) {
+						if (IS_DRINK_CONTAINER(obj) && (GET_DRINK_CONTAINER_TYPE(obj) == res->vnum || GET_DRINK_CONTAINER_CONTENTS(obj) == 0)) {
+							diff = GET_DRINK_CONTAINER_CAPACITY(obj) - GET_DRINK_CONTAINER_CONTENTS(obj);
+							diff = MIN(remaining, diff);
+							remaining -= diff;
+							GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) += diff;
+							
+							// set type in case container was empty
+							if (GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
+								GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = res->vnum;
+							}
+						}
+						
+						// ok to break out early if we gave enough
+						if (remaining <= 0) {
+							break;
+						}
+					}
+				}
+				break;
+			}
+			case RES_COINS: {
+				increase_coins(ch, real_empire(res->vnum), res->amount / (split ? 2 : 1));
+				last = FALSE;	// cause next obj to refund
+				break;
+			}
+			case RES_POOL: {
+				GET_CURRENT_POOL(ch, res->vnum) += res->amount / (split ? 2 : 1);
+				GET_CURRENT_POOL(ch, res->vnum) = MIN(GET_MAX_POOL(ch, res->vnum), GET_CURRENT_POOL(ch, res->vnum));
+				if (GET_HEALTH(ch) > 0 && GET_POS(ch) <= POS_STUNNED) {
+					GET_POS(ch) = POS_RESTING;
+				}
+				last = FALSE;	// cause next obj to refund
+				break;
+			}
+		}
+	}
+}
+
+
+/**
+* Cuts a list of resources in half, for things that only return half. Empty
+* entries (half=0) will be removed.
+*
+* @param struct resource_data **list The list to halve.
+* @param bool remove_nonrefundables If TRUE, removes entries that cannot be refunded.
+*/
+void halve_resource_list(struct resource_data **list, bool remove_nonrefundables) {
+	struct resource_data *res, *next_res;
+	bool odd = FALSE;
+	
+	LL_FOREACH_SAFE(*list, res, next_res) {
+		if (odd && (res->amount % 2) != 0) {
+			// a previous one was odd (round up this time)
+			res->amount = (res->amount + 1) / 2;
+			odd = FALSE;
+		}
+		else if (odd) {
+			// we have a stored odd but this one isn't odd too, so we keep the stored odd
+			res->amount /= 2;
+		}
+		else {
+			// no stored odd -- do a normal round-down divide
+			odd = (res->amount % 2);
+			res->amount /= 2;
+		}
+		
+		// check for no remaining resource
+		if (res->amount <= 0) {
+			LL_DELETE(*list, res);
+			free(res);
 		}
 	}
 }
@@ -2264,48 +2865,143 @@ void give_resources(char_data *ch, Resource list[], bool split) {
 * Find out if a person has resources available.
 *
 * @param char_data *ch The person whose resources to check.
-* @param Resource list[] Any resource list.
+* @param struct resource_data *list Any resource list.
 * @param bool ground If TRUE, will also count resources on the ground.
 * @param bool send_msgs If TRUE, will alert the character as to what they need. FALSE runs silently.
 */
-bool has_resources(char_data *ch, Resource list[], bool ground, bool send_msgs) {
-	obj_data *obj, *proto;
-	int i, total = 0;
+bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs) {	
+	struct resource_data *res;
+	int total, amt, liter;
 	bool ok = TRUE;
-
-	for (i = 0; list[i].vnum != NOTHING; i++, total = 0) {
-		for (obj = ch->carrying; obj; obj = obj->next_content) {
-			if (GET_OBJ_VNUM(obj) == list[i].vnum) {
-				// check full of water for drink containers
-				if (!IS_DRINK_CONTAINER(obj) || (GET_DRINK_CONTAINER_CONTENTS(obj) >= GET_DRINK_CONTAINER_CAPACITY(obj) && GET_DRINK_CONTAINER_TYPE(obj) == LIQ_WATER)) {
-					++total;
-				}
-			}
-		}
-		if (ground) {
-			for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = obj->next_content) {
-				if (GET_OBJ_VNUM(obj) == list[i].vnum) {
-					// check full of water for drink containers
-					if (!IS_DRINK_CONTAINER(obj) || (GET_DRINK_CONTAINER_CONTENTS(obj) >= GET_DRINK_CONTAINER_CAPACITY(obj) && GET_DRINK_CONTAINER_TYPE(obj) == LIQ_WATER)) {
-						++total;
+	obj_data *obj;
+	
+	LL_FOREACH(list, res) {
+		total = 0;
+		
+		// RES_x: check resources by type
+		switch (res->type) {
+			case RES_OBJECT:
+			case RES_COMPONENT:
+			case RES_LIQUID: {	// these 3 types check objects
+				obj_data *search_list[2];
+				search_list[0] = ch->carrying;
+				search_list[1] = ground ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+				
+				// more than one place to search...
+				for (liter = 0; liter < 2 && total < res->amount; ++liter) {
+					LL_FOREACH2(search_list[liter], obj, next_content) {
+						// skip keeps
+						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+							continue;
+						}
+						
+						// RES_x: just types that need objects
+						switch (res->type) {
+							case RES_OBJECT: {
+								if (GET_OBJ_VNUM(obj) == res->vnum) {
+									++total;
+								}
+								break;
+							}
+							case RES_COMPONENT: {
+								// require full match on cmp flags
+								if (GET_OBJ_CMP_TYPE(obj) == res->vnum && (GET_OBJ_CMP_FLAGS(obj) & res->misc) == res->misc) {
+									++total;
+								}
+								break;
+							}
+							case RES_LIQUID: {
+								if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == res->vnum) {
+									// add the volume of liquid
+									total += GET_DRINK_CONTAINER_CONTENTS(obj);
+								}
+								break;
+							}
+						}
+						
+						// ok to break out early if we found enough
+						if (total >= res->amount) {
+							break;
+						}
 					}
 				}
-			}
-		}
 
-		if (total < list[i].amount) {
-			if (send_msgs && (proto = obj_proto(list[i].vnum))) {
-				msg_to_char(ch, "%s %d more of %s%s", (ok ? "You need" : ","), list[i].amount - total, skip_filler(GET_OBJ_SHORT_DESC(proto)), IS_DRINK_CONTAINER(proto) ? " (full of water)" : "");
+				if (total < res->amount) {
+					if (send_msgs) {
+						// RES_x: just types that need objects
+						switch (res->type) {
+							case RES_OBJECT: {
+								msg_to_char(ch, "%s %d more of %s", (ok ? "You need" : ","), res->amount - total, skip_filler(get_obj_name_by_proto(res->vnum)));
+								break;
+							}
+							case RES_COMPONENT: {
+								msg_to_char(ch, "%s %d more (%s)", (ok ? "You need" : ","), res->amount - total, component_string(res->vnum, res->misc));
+								break;
+							}
+							case RES_LIQUID: {
+								msg_to_char(ch, "%s %d more unit%s of %s", (ok ? "You need" : ","), res->amount - total, PLURAL(res->amount - total), drinks[res->vnum]);
+								break;
+							}
+						}
+					}
+					ok = FALSE;
+				}
+				break;
 			}
-			ok = FALSE;
+			case RES_COINS: {
+				empire_data *coin_emp = real_empire(res->vnum);
+				if (!can_afford_coins(ch, coin_emp, res->amount)) {
+					if (send_msgs) {
+						msg_to_char(ch, "%s %s", (ok ? "You need" : ","), money_amount(coin_emp, res->amount));
+					}
+					ok = FALSE;
+				}
+				break;
+			}
+			case RES_POOL: {
+				// special rule: require that blood or health costs not reduce player below 1
+				amt = res->amount + ((res->vnum == HEALTH || res->vnum == BLOOD) ? 1 : 0);
+	
+				// more player checks
+				if (amt >= 0 && GET_CURRENT_POOL(ch, res->vnum) < amt) {
+					if (send_msgs) {
+						msg_to_char(ch, "%s %d more %s point%s", (ok ? "You need" : ","), amt - GET_CURRENT_POOL(ch, res->vnum), pool_types[res->vnum], PLURAL(amt - GET_CURRENT_POOL(ch, res->vnum)));
+					}
+					ok = FALSE;
+				}
+				break;
+			}
 		}
 	}
 	
 	if (!ok && send_msgs) {
 		send_to_char(".\r\n", ch);
 	}
-
+	
 	return ok;
+}
+
+
+/**
+* Gets the resources-needed list for display to mortals.
+*
+* @param struct resource_data *list The list to show.
+* @param char *save_buffer A string to write the output to.
+*/
+void show_resource_list(struct resource_data *list, char *save_buffer) {
+	struct resource_data *res;
+	bool found = FALSE;
+	
+	*save_buffer = '\0';
+	
+	LL_FOREACH(list, res) {
+		sprintf(save_buffer + strlen(save_buffer), "%s%s", (found ? ", " : ""), get_resource_name(res));
+		found = TRUE;
+	}
+	
+	if (!*save_buffer) {
+		strcpy(save_buffer, "nothing");
+	}
 }
 
 
@@ -2340,26 +3036,40 @@ sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t with
 * This converts data file entries into bitvectors, where they may be written
 * as "abdo" in the file, or as a number.
 *
+* - a-z are bits 1-26
+* - A-Z are bits 27-52
+* - !"#$%&'()*=, are bits 53-64
+*
 * @param char *flag The input string.
 * @return bitvector_t The bitvector.
 */
 bitvector_t asciiflag_conv(char *flag) {
 	bitvector_t flags = 0;
-	int is_number = 1;
-	register char *p;
+	bool is_number = TRUE;
+	char *p;
 
-	for (p = flag; *p; p++) {
-		if (islower(*p))
+	for (p = flag; *p; ++p) {
+		// skip numbers
+		if (isdigit(*p)) {
+			continue;
+		}
+		
+		is_number = FALSE;
+		
+		if (islower(*p)) {
 			flags |= BIT(*p - 'a');
-		else if (isupper(*p))
+		}
+		else if (isupper(*p)) {
 			flags |= BIT(26 + (*p - 'A'));
-
-		if (!isdigit(*p))
-			is_number = 0;
+		}
+		else {
+			flags |= BIT(52 + (*p - '!'));
+		}
 	}
 
-	if (is_number)
-		flags = strtoull(flag, NULL, 10); //atol(flag);
+	if (is_number) {
+		flags = strtoull(flag, NULL, 10);
+	}
 
 	return (flags);
 }
@@ -2402,6 +3112,10 @@ char *delete_doubledollar(char *string) {
 * files, e.g. "adoO", where each letter represents a bit starting with a=1.
 * If there are no bits, it returns the string "0".
 *
+* - bits 1-26 are lowercase a-z
+* - bits 27-52 are uppercase A-Z
+* - bits 53-64 are !"#$%&'()*=,
+*
 * @param bitvector_t flags The bitmask to convert to alpha.
 * @return char* The resulting string.
 */
@@ -2410,9 +3124,17 @@ char *bitv_to_alpha(bitvector_t flags) {
 	int iter, pos;
 	
 	pos = 0;
-	for (iter = 0; flags && iter <= 64; ++iter) {
+	for (iter = 0; flags && iter < 64; ++iter) {
 		if (IS_SET(flags, BIT(iter))) {
-			output[pos++] = (iter < 26) ? ('a' + iter) : ('A' + iter - 26);
+			if (iter < 26) {
+				output[pos++] = ('a' + iter);
+			}
+			else if (iter < 52) {
+				output[pos++] = ('A' + (iter - 26));
+			}
+			else if (iter < 64) {
+				output[pos++] = ('!' + (iter - 52));
+			}
 		}
 		
 		// remove so we exhaust flags
@@ -2438,53 +3160,59 @@ char *CAP(char *txt) {
 
 
 /**
-* @param char *string String to count color codes in
-* @return int the number of &0-style color codes in the string
+* Counts the number of chars in a string that are color codes and will be
+* invisible to the player.
+*
+* @param const char *str The string to count.
+* @return int The length of color codes.
 */
-int count_color_codes(char *string) {
-	int iter, count = 0, len = strlen(string);
-	for (iter = 0; iter < len - 1; ++iter) {
-		if (string[iter] == '\t' && string[iter+1] == '\t') {
-			++iter;	// advance past the \t\t (not a color code)
+int color_code_length(const char *str) {
+	const char *ptr;
+	int len = 0;
+	
+	for (ptr = str; *ptr; ++ptr) {
+		if (*ptr == '\t') {
+			if (*(ptr+1) == '\t' || *(ptr+1) == COLOUR_CHAR) {	// && = &
+				++ptr;
+				++len;	// only 1 char counts as a color code
+			}
+			else if (*(ptr+1) == '[') {
+				++len;	// 1 for the &
+				if (UPPER(*(ptr+2)) != 'U') {
+					++len;	// we skip 1 len if there is a U because 1 char will be visible
+				}
+				for (++ptr; *ptr != ']'; ++ptr) {	// count chars in *[..]
+					++len;
+				}
+			}
+			else {	// assume 2-wide color char
+				++ptr;
+				len += 2;
+			}
 		}
-		else if (string[iter] == '\t' && string[iter+1] == '&') {
-			++iter;	// advance past the \t& (not a color code)
+		else if (*ptr == COLOUR_CHAR) {
+			if (*(ptr+1) == COLOUR_CHAR) {	// && = &
+				++ptr;
+				++len;	// only 1 char counts as a color code, the other is removed
+			}
+			else if (*(ptr+1) == '[' && config_get_bool("allow_extended_color_codes")) {
+				++len;	// 1 for the &
+				if (UPPER(*(ptr+2)) != 'U') {
+					++len;	// we skip 1 len if there is a U because 1 char will be visible
+				}
+				for (++ptr; *ptr != ']'; ++ptr) {	// count chars in &[..]
+					++len;
+				}
+			}
+			else {	// assume 2-wide color char
+				++ptr;
+				len += 2;
+			}
 		}
-		else if (string[iter] == '&' && string[iter+1] == '&') {
-			++iter;	// advance past the && (not a color code)
-		}
-		else if (string[iter] == '&' || string[iter] == '\t') {
-			++count;
-			++iter;	// advance past the color code
-		}
+		// else not a color code
 	}
 	
-	return count;
-}
-
-
-/**
-* @param char *string The string to count && in.
-* @return int The number of occurrances of && in the string.
-*/
-int count_double_ampersands(char *string) {
-	int iter, count = 0, len = strlen(string);
-	for (iter = 0; iter < len - 1; ++iter) {
-		if (string[iter] == '&' && string[iter+1] == '&') {
-			++count;
-			++iter;	// advance past the second &
-		}
-		else if (string[iter] == '\t' && string[iter+1] == '&') {
-			++count;
-			++iter;	// advance past the & in \t&
-		}
-		else if (string[iter] == '\t' && string[iter+1] == '\t') {
-			++count;
-			++iter;	// advance past the second \t in \t\t (similar to an &&)
-		}
-	}
-	
-	return count;
+	return len;
 }
 
 
@@ -2554,6 +3282,31 @@ char *fname(const char *namelist) {
 
 
 /**
+* Determines if a keyword string contains at least one keyword from a list.
+*
+* @param char *string The string of keywords entered by a player.
+* @param const char *list[] A set of words, terminated by a "\n".
+* @param bool exact Does not allow abbrevs unless FALSE.
+* @return bool TRUE if at least one keyword from the list appears.
+*/
+bool has_keyword(char *string, const char *list[], bool exact) {
+	char word[MAX_INPUT_LENGTH], *ptr;
+	ptr = string;
+	int iter;
+	
+	while ((ptr = any_one_arg(ptr, word)) && *word) {
+		for (iter = 0; *list[iter] != '\n'; ++iter) {
+			if (!str_cmp(word, list[iter]) || (!exact && is_abbrev(word, list[iter]))) {
+				return TRUE;	// found 1
+			}
+		}
+	}
+	
+	return FALSE;
+}
+
+
+/**
 * Determines if str is an abbrev for any keyword in namelist.
 *
 * @param const char *str The search argument, e.g. "be"
@@ -2595,6 +3348,9 @@ char *level_range_string(int min, int max, int current) {
 	
 	if (current > 0) {
 		snprintf(output, sizeof(output), "%d", current);
+	}
+	else if (min == max) {	// could also be "0" here
+		snprintf(output, sizeof(output), "%d", min);
 	}
 	else if (min > 0 && max > 0) {
 		snprintf(output, sizeof(output), "%d-%d", min, max);
@@ -2659,14 +3415,14 @@ void prettier_sprintbit(bitvector_t bitvector, const char *names[], char *result
 
 	for (nr = 0; bitvector; bitvector >>= 1) {
 		if (IS_SET(bitvector, 1)) {
-			if (*names[nr] != '\n') {
+			if (*names[nr] && *names[nr] != '\n') {
 				sprintf(result + strlen(result), "%s%s", (found ? ", " : ""), names[nr]);
+				found = TRUE;
 			}
-			else {
+			else if (*names[nr]) {
 				sprintf(result + strlen(result), "%sUNDEFINED", (found ? ", " : ""));
+				found = TRUE;
 			}
-			
-			found = TRUE;
 		}
 		if (*names[nr] != '\n') {
 			nr++;
@@ -2753,7 +3509,7 @@ char *show_color_codes(char *string) {
 	static char value[MAX_STRING_LENGTH];
 	char *ptr;
 	
-	ptr = str_replace("&", "&&", string);
+	ptr = str_replace("&", "\t&", string);
 	strncpy(value, ptr, MAX_STRING_LENGTH);
 	value[MAX_STRING_LENGTH-1] = '\0';	// safety
 	free(ptr);
@@ -2906,6 +3662,22 @@ char *str_dup(const char *source) {
 
 	CREATE(new_z, char, strlen(source) + 1);
 	return (strcpy(new_z, source));
+}
+
+
+/**
+* Capitalizes the first letter of each word.
+*
+* @param char *string The string to ucwords on.
+*/
+void ucwords(char *string) {
+	int iter, len = strlen(string);
+	
+	for (iter = 0; iter < len; ++iter) {
+		if (iter == 0 || string[iter-1] == ' ') {
+			string[iter] = UPPER(string[iter]);
+		}
+	}
 }
 
 
@@ -3111,6 +3883,35 @@ char *str_str(char *cs, char *ct) {
 }
 
 
+/**
+* Removes spaces (' ') from the end of a string, and returns a pointer to the
+* first non-space character.
+*
+* @param char *string The string to trim (will lose spaces at the end).
+* @return char* A pointer to the first non-space character in the string.
+*/
+char *trim(char *string) {
+	char *ptr = string;
+	int len;
+	
+	if (!string) {
+		return NULL;
+	}
+	
+	// trim start
+	while (*ptr == ' ') {
+		++ptr;
+	}
+	
+	// trim end
+	while ((len = strlen(ptr)) > 0 && ptr[len-1] == ' ') {
+		ptr[len-1] = '\0';
+	}
+	
+	return ptr;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// TYPE UTILS //////////////////////////////////////////////////////////////
 
@@ -3192,21 +3993,21 @@ bool check_sunny(room_data *room) {
 
 
 /**
-* Gets linear distance between two rooms.
+* Gets linear distance between two map locations (accounting for wrapping).
 *
-* @param room_data *from Origin room
-* @param room_data *to Target room
+* @param int x1 first
+* @param int y1  coordinate
+* @param int x2 second
+* @param int y2  coordinate
 * @return int distance
 */
-int compute_distance(room_data *from, room_data *to) {
-	int x1 = X_COORD(from), y1 = Y_COORD(from);
-	int x2 = X_COORD(to), y2 = Y_COORD(to);
+int compute_map_distance(int x1, int y1, int x2, int y2) {
 	int dx = x1 - x2;
 	int dy = y1 - y2;
 	int dist;
 	
 	// short circuit on same-room
-	if (from == to || HOME_ROOM(from) == HOME_ROOM(to)) {
+	if (x1 == x2 && y1 == y2) {
 		return 0;
 	}
 	
@@ -3245,7 +4046,7 @@ int compute_distance(room_data *from, room_data *to) {
 *
 * @param room_data *room The location to check.
 * @param sector_vnum The sector vnum to find.
-* @param bool count_original_sect If TRUE, also checks ROOM_ORIGINAL_SECT
+* @param bool count_original_sect If TRUE, also checks BASE_SECT
 * @return int The number of matching adjacent tiles.
 */
 int count_adjacent_sectors(room_data *room, sector_vnum sect, bool count_original_sect) {
@@ -3259,7 +4060,7 @@ int count_adjacent_sectors(room_data *room, sector_vnum sect, bool count_origina
 	for (iter = 0; iter < NUM_2D_DIRS; ++iter) {
 		to_room = real_shift(room, shift_dir[iter][0], shift_dir[iter][1]);
 		
-		if (to_room && (SECT(to_room) == rl_sect || (count_original_sect && ROOM_ORIGINAL_SECT(to_room) == rl_sect))) {
+		if (to_room && (SECT(to_room) == rl_sect || (count_original_sect && BASE_SECT(to_room) == rl_sect))) {
 			++count;
 		}
 	}
@@ -3290,7 +4091,7 @@ int count_flagged_sect_between(bitvector_t sectf_bits, room_data *start, room_da
 	dist = compute_distance(start, end);	// for safety-checking
 	
 	for (iter = 1, room = straight_line(start, end, iter); iter <= dist && room && room != end; ++iter, room = straight_line(start, end, iter)) {
-		if (SECT_FLAGGED(SECT(room), sectf_bits) || (check_base_sect && SECT_FLAGGED(ROOM_ORIGINAL_SECT(room), sectf_bits))) {
+		if (SECT_FLAGGED(SECT(room), sectf_bits) || (check_base_sect && SECT_FLAGGED(BASE_SECT(room), sectf_bits))) {
 			++count;
 		}
 	}
@@ -3331,8 +4132,8 @@ int distance_to_nearest_player(room_data *room) {
 * @return room_data* A location on the map, or NULL if there is no map location.
 */
 room_data *get_map_location_for(room_data *room) {
-	room_data *working = room, *last;
-	obj_data *boat;
+	room_data *working, *last;
+	vehicle_data *veh;
 	
 	if (!room) {
 		return NULL;
@@ -3341,15 +4142,12 @@ room_data *get_map_location_for(room_data *room) {
 		// shortcut
 		return room;
 	}
-	else if (GET_ROOM_VNUM(HOME_ROOM(room)) >= MAP_SIZE && BOAT_ROOM(room) == room && !IS_ADVENTURE_ROOM(HOME_ROOM(room))) {
-		// no home room on the map and not in a boat?
-		return NULL;
-	}
-	else if (GET_BOAT(room) && GET_ROOM_VNUM(BOAT_ROOM(room)) >= MAP_SIZE) {
-		// in a boat but it's not on the map?
+	else if (GET_ROOM_VNUM(HOME_ROOM(room)) >= MAP_SIZE && IN_VEHICLE_IN_ROOM(room) == room && !IS_ADVENTURE_ROOM(HOME_ROOM(room))) {
+		// no home room on the map and not in a vehicle?
 		return NULL;
 	}
 	
+	working = room;
 	do {
 		last = working;
 		
@@ -3361,13 +4159,13 @@ room_data *get_map_location_for(room_data *room) {
 			}
 		} while (last != working);
 		
-		// boat resolution: find top boat->in_room: this is similar to GET_BOAT()/BOAT_ROOM()
+		// vehicle resolution: find top vehicle->in_room: this is similar to GET_ROOM_VEHICLE()/IN_VEHICLE_IN_ROOM()
 		do {
 			last = working;
-			boat = (COMPLEX_DATA(working) ? COMPLEX_DATA(working)->boat : NULL);
+			veh = (COMPLEX_DATA(working) ? COMPLEX_DATA(working)->vehicle : NULL);
 		
-			if (boat && IN_ROOM(boat)) {
-				working = IN_ROOM(boat);
+			if (veh && IN_ROOM(veh)) {
+				working = IN_ROOM(veh);
 			}
 		} while (last != working);
 		
@@ -3377,7 +4175,12 @@ room_data *get_map_location_for(room_data *room) {
 		}
 	} while (COMPLEX_DATA(working) && GET_ROOM_VNUM(working) >= MAP_SIZE && last != working);
 	
-	return working;
+	if (GET_ROOM_VNUM(working) < MAP_SIZE) {
+		return working;
+	}
+	else {
+		return NULL;	// found a location not on the map
+	}
 }
 
 
@@ -3399,7 +4202,7 @@ room_data *find_load_room(char_data *ch) {
 	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch)))) {
 		// does not require last room but if there is one, it must be the same island
 		rl_last_room = real_room(GET_LAST_ROOM(ch));
-		if (ROOM_BLD_FLAGGED(rl, BLD_TOMB) && (!rl_last_room || GET_ISLAND_ID(rl) == GET_ISLAND_ID(rl_last_room)) && can_use_room(ch, rl, GUESTS_ALLOWED)) {
+		if (HAS_FUNCTION(rl, FNC_TOMB) && (!rl_last_room || GET_ISLAND_ID(rl) == GET_ISLAND_ID(rl_last_room)) && can_use_room(ch, rl, GUESTS_ALLOWED)) {
 			return rl;
 		}
 	}
@@ -3408,7 +4211,7 @@ room_data *find_load_room(char_data *ch) {
 	if (!IS_NPC(ch) && (rl = real_room(GET_LAST_ROOM(ch))) && GET_LOYALTY(ch)) {
 		island = GET_ISLAND_ID(rl);
 		for (ter = EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)); ter; ter = ter->next) {
-			if (ROOM_BLD_FLAGGED(ter->room, BLD_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island) {
+			if (HAS_FUNCTION(ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = ter->room;
@@ -3423,34 +4226,6 @@ room_data *find_load_room(char_data *ch) {
 	
 	// still here?
 	return find_starting_location();
-}
-
-
-/**
-* @param int type MINE_x
-* @return int position in mine_data[] or NOTHING
-*/
-int find_mine_type(int type) {
-	int iter, found = NOTHING;
-	
-	for (iter = 0; mine_data[iter].type != NOTHING && found == NOTHING; ++iter) {
-		if (mine_data[iter].type == type) {
-			found = iter;
-		}
-	}
-	
-	return found;
-}
-
-
-/**
-* @param int type a mine type
-* @return obj_vnum mine production vnum
-*/
-obj_vnum find_mine_vnum_by_type(int type) {
-	int t = find_mine_type(type);
-	obj_vnum vnum = (t != NOTHING ? mine_data[t].vnum : o_IRON_ORE);
-	return vnum;
 }
 
 
@@ -3576,6 +4351,74 @@ room_data *find_starting_location() {
 
 
 /**
+* This function takes a set of coordinates and finds another location in
+* relation to them. It checks the wrapping boundaries of the map in the
+* process.
+*
+* @param int start_x The initial X coordinate.
+* @param int start_y The initial Y coordinate.
+* @param int x_shift How much to shift X by (+/-).
+* @param int y_shift How much to shift Y by (+/-).
+* @param int *new_x A variable to bind the new X coord to.
+* @param int *new_y A variable to bind the new Y coord to.
+* @return bool TRUE if a valid location was found; FALSE if it's off the map.
+*/
+bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y) {
+	// clear these
+	*new_x = -1;
+	*new_y = -1;
+	
+	if (start_x < 0 || start_x >= MAP_WIDTH || start_y < 0 || start_y >= MAP_HEIGHT) {
+		// bad location
+		return FALSE;
+	}
+	
+	// process x
+	start_x += x_shift;
+	if (start_x < 0) {
+		if (WRAP_X) {
+			start_x += MAP_WIDTH;
+		}
+		else {
+			return FALSE;	// off the map
+		}
+	}
+	else if (start_x >= MAP_WIDTH) {
+		if (WRAP_X) {
+			start_x -= MAP_WIDTH;
+		}
+		else {
+			return FALSE;	// off the map
+		}
+	}
+	
+	// process y
+	start_y += y_shift;
+	if (start_y < 0) {
+		if (WRAP_Y) {
+			start_y += MAP_HEIGHT;
+		}
+		else {
+			return FALSE;	// off the map
+		}
+	}
+	else if (start_y >= MAP_HEIGHT) {
+		if (WRAP_Y) {
+			start_y -= MAP_HEIGHT;
+		}
+		else {
+			return FALSE;	// off the map
+		}
+	}
+	
+	// found a valid location
+	*new_x = start_x;
+	*new_y = start_y;
+	return TRUE;
+}
+
+
+/**
 * This function determines the approximate direction between two points on the
 * map.
 *
@@ -3646,11 +4489,27 @@ int get_direction_to(room_data *from, room_data *to) {
 int GET_ISLAND_ID(room_data *room) {
 	room_data *map = get_map_location_for(room);
 	
-	if (map) {
-		return map->island;
+	if (map && GET_ROOM_VNUM(map) < MAP_SIZE) {
+		return world_map[FLAT_X_COORD(map)][FLAT_Y_COORD(map)].island;
 	}
 	else {
 		return NO_ISLAND;
+	}
+}
+
+
+/**
+* Changes the island id of a room.
+*
+* @param room_data *room The room to change the island on.
+* @param int island The island ID to set it to.
+*/
+void SET_ISLAND_ID(room_data *room, int island) {
+	extern bool world_map_needs_save;
+	
+	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+		world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].island = island;
+		world_map_needs_save = TRUE;
 	}
 }
 
@@ -3660,7 +4519,8 @@ int GET_ISLAND_ID(room_data *room) {
 * @return TRUE if the room has a deep mine set up
 */
 bool is_deep_mine(room_data *room) {
-	return (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > mine_data[find_mine_type(get_room_extra_data(room, ROOM_EXTRA_MINE_TYPE))].max_amount);
+	struct global_data *glb = global_proto(get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM));	
+	return glb ? (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)) : FALSE;
 }
 
 
@@ -3702,9 +4562,8 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 * @return room_data* The new location on the map, or NULL if the location would be off the map
 */
 room_data *real_shift(room_data *origin, int x_shift, int y_shift) {
-	room_data *map;
 	int x_coord, y_coord;
-	room_vnum loc;
+	room_data *map;
 	
 	// sanity?
 	if (!origin) {
@@ -3714,65 +4573,14 @@ room_data *real_shift(room_data *origin, int x_shift, int y_shift) {
 	map = get_map_location_for(origin);
 	
 	// are we somehow not on the map? if not, don't shift
-	if (!map || (loc = GET_ROOM_VNUM(map)) >= MAP_SIZE) {
+	if (!map || GET_ROOM_VNUM(map) >= MAP_SIZE) {
 		return NULL;
 	}
 	
-	x_coord = FLAT_X_COORD(map);
-	y_coord = FLAT_Y_COORD(map);
-	
-	// check map bounds on x coordinate, and shift positions
-	if (x_coord + x_shift < 0) {
-		if (WRAP_X) {
-			loc += x_shift + MAP_WIDTH;
-		}
-		else {
-			// off the left side
-			return NULL;
-		}
+	if (get_coord_shift(FLAT_X_COORD(map), FLAT_Y_COORD(map), x_shift, y_shift, &x_coord, &y_coord)) {
+		return real_room((y_coord * MAP_WIDTH) + x_coord);
 	}
-	else if (x_coord + x_shift >= MAP_WIDTH) {
-		if (WRAP_X) {
-			loc += x_shift - MAP_WIDTH;
-		}
-		else {
-			// off the right side
-			return NULL;
-		}
-	}
-	else {
-		loc += x_shift;
-	}
-	
-	if (y_coord + y_shift < 0) {
-		if (WRAP_Y) {
-			loc += (y_shift * MAP_WIDTH) + MAP_SIZE;
-		}
-		else {
-			// off the bottom
-			return NULL;
-		}
-	}
-	else if (y_coord + y_shift >= MAP_HEIGHT) {
-		if (WRAP_Y) {
-			loc += (y_shift * MAP_WIDTH) - MAP_SIZE;
-		}
-		else {
-			// off the top
-			return NULL;
-		}
-	}
-	else {
-		loc += (y_shift * MAP_WIDTH);
-	}
-	
-	// again, we can ONLY return map locations
-	if (loc >= 0 && loc < MAP_SIZE) {
-		return real_room(loc);
-	}
-	else {
-		return NULL;
-	}
+	return NULL;
 }
 
 
@@ -3809,6 +4617,7 @@ void relocate_players(room_data *room, room_data *to_room) {
 			look_at_room(ch);
 			act("$n appears in the middle of the room!", TRUE, ch, NULL, NULL, TO_ROOM);
 			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+			qt_visit_room(ch, IN_ROOM(ch));
 		}
 	}
 }
@@ -3912,6 +4721,26 @@ int Y_COORD(room_data *room) {
 //// MISC UTILS //////////////////////////////////////////////////////////////
 
 /**
+* Gets a string fragment if an obj is shared (by someone other than ch). This
+* is used by enchanting and some other commands, in their success strings. It
+* has an $N in the string, so pass obj->worn_by as the 2nd char in your act()
+* message.
+*
+* @param obj_data *obj The obj that might be shared.
+* @param char_data *ch The person using the ablitiy, who will be ignored for this message.
+* @return char* Either an empty string, or " (shared by $N)".
+*/
+char *shared_by(obj_data *obj, char_data *ch) {
+	if (obj->worn_on == WEAR_SHARE && obj->worn_by && (!ch || obj->worn_by != ch)) {
+		return " (shared by $N)";
+	}
+	else {
+		return "";
+	}
+}
+
+
+/**
 * @return unsigned long long The current timestamp as microtime (1 million per second)
 */
 unsigned long long microtime(void) {
@@ -3934,10 +4763,9 @@ unsigned long long microtime(void) {
 * @param PLAYER_UPDATE_FUNC(*func)  A function pointer for the function to run on each player.
 */
 void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
-	struct char_file_u chdata;
+	player_index_data *index, *next_index;
 	descriptor_data *desc;
 	char_data *ch;
-	int pos;
 	bool is_file;
 	
 	// verify there are no characters at menus
@@ -3971,13 +4799,8 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 	}
 
 	// ok, ready to roll
-	for (pos = 0; pos <= top_of_p_table; ++pos) {
-		// need chdata either way; check deleted here
-		if (load_char(player_table[pos].name, &chdata) <= NOBODY || IS_SET(chdata.char_specials_saved.act, PLR_DELETED)) {
-			continue;
-		}
-		
-		if (!(ch = find_or_load_player(player_table[pos].name, &is_file))) {
+	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+		if (!(ch = find_or_load_player(index->name, &is_file))) {
 			continue;
 		}
 		

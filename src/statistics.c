@@ -41,8 +41,11 @@ struct stats_data_struct {
 
 // stats globals
 struct stats_data_struct *global_sector_count = NULL;	// hash table of sector counts
+int global_sector_size = 0;
 struct stats_data_struct *global_crop_count = NULL;	// hash table count of crops
+int global_crop_size = 0;
 struct stats_data_struct *global_building_count = NULL;	// hash table of building counts
+int global_building_size = 0;
 
 time_t last_world_count = 0;	// timestamp of last sector/crop/building tally
 time_t last_account_count = 0;	// timestamp of last time accounts were read
@@ -73,11 +76,11 @@ void update_world_count();
 * @param char_data *ch The person to show stats to.
 */
 void display_statistics_to_char(char_data *ch) {
-	extern int top_of_p_table;
 	extern time_t boot_time;
 
 	char populous_str[MAX_STRING_LENGTH], wealthiest_str[MAX_STRING_LENGTH], famous_str[MAX_STRING_LENGTH], greatest_str[MAX_STRING_LENGTH];
 	int populous_empire = NOTHING, wealthiest_empire = NOTHING, famous_empire = NOTHING, greatest_empire = NOTHING;
+	vehicle_data *veh;
 	char_data *vict;
 	obj_data *obj;
 	empire_data *emp, *next_emp;
@@ -172,8 +175,8 @@ void display_statistics_to_char(char_data *ch) {
 		military += EMPIRE_MILITARY(emp);
 	}
 
-	msg_to_char(ch, "Total Empires:	    %3d     Claimed Area:       %d\r\n", HASH_COUNT(empire_table), territory);
-	msg_to_char(ch, "Total Players:    %5d     Players in Empires: %d\r\n", top_of_p_table + 1, members);
+	msg_to_char(ch, "Total Empires:    %5d     Claimed Area:       %d\r\n", HASH_COUNT(empire_table), territory);
+	msg_to_char(ch, "Total Players:    %5d     Players in Empires: %d\r\n", HASH_CNT(idnum_hh, player_table_by_idnum), members);
 	msg_to_char(ch, "Total Citizens:   %5d     Total Military:     %d\r\n", citizens, military);
 
 	// creatures
@@ -186,11 +189,12 @@ void display_statistics_to_char(char_data *ch) {
 	msg_to_char(ch, "Unique Creatures:   %3d     Total Mobs:         %d\r\n", HASH_COUNT(mobile_table), count);
 
 	// objs
-	count = 0;
-	for (obj = object_list; obj; obj = obj->next) {
-		++count;
-	}
+	LL_COUNT(object_list, obj, count);
 	msg_to_char(ch, "Unique Objects:     %3d     Total Objects:      %d\r\n", HASH_COUNT(object_table), count);
+	
+	// vehicles
+	LL_COUNT(vehicle_list, veh, count);
+	msg_to_char(ch, "Unique Vehicles:    %3d     Total Vehicles:     %d\r\n", HASH_COUNT(vehicle_table), count);
 }
 
 
@@ -230,7 +234,7 @@ int stats_get_building_count(bld_data *bdg) {
 		return 0;
 	}
 	
-	if (HASH_COUNT(global_building_count) != HASH_COUNT(building_table) || last_world_count + rescan_world_after < time(0)) {
+	if (HASH_COUNT(global_building_count) != global_building_size || last_world_count + rescan_world_after < time(0)) {
 		update_world_count();
 	}
 	
@@ -252,7 +256,7 @@ int stats_get_crop_count(crop_data *cp) {
 		return 0;
 	}
 	
-	if (HASH_COUNT(global_crop_count) != HASH_COUNT(crop_table) || last_world_count + rescan_world_after < time(0)) {
+	if (HASH_COUNT(global_crop_count) != global_crop_size || last_world_count + rescan_world_after < time(0)) {
 		update_world_count();
 	}
 	
@@ -275,7 +279,7 @@ int stats_get_sector_count(sector_data *sect) {
 		return 0;
 	}
 	
-	if (HASH_COUNT(global_sector_count) != HASH_COUNT(sector_table) || last_world_count + rescan_world_after < time(0)) {
+	if (HASH_COUNT(global_sector_count) != global_sector_size || last_world_count + rescan_world_after < time(0)) {
 		update_world_count();
 	}
 	
@@ -296,7 +300,7 @@ int stats_get_sector_count(sector_data *sect) {
 *  active_accounts_week (at least one character this week)
 */
 void update_account_stats(void) {
-	extern bool member_is_timed_out_cfu(struct char_file_u *chdata);
+	extern bool member_is_timed_out_index(player_index_data *index);
 
 	// helper type
 	struct uniq_acct_t {
@@ -307,8 +311,8 @@ void update_account_stats(void) {
 	};
 
 	struct uniq_acct_t *acct, *next_acct, *acct_list = NULL;
-	struct char_file_u chdata;
-	int pos, id;
+	player_index_data *index, *next_index;
+	int id;
 	
 	// rate-limit this, as it scans the whole playerfile
 	if (last_account_count + rescan_world_after > time(0)) {
@@ -316,14 +320,8 @@ void update_account_stats(void) {
 	}
 	
 	// build list
-	for (pos = 0; pos <= top_of_p_table; ++pos) {
-		// need chdata either way; check deleted here
-		if (load_char(player_table[pos].name, &chdata) <= NOBODY || IS_SET(chdata.char_specials_saved.act, PLR_DELETED)) {
-			continue;
-		}
-		
-		// see if we have data
-		id = chdata.player_specials_saved.account_id > 0 ? chdata.player_specials_saved.account_id : (-1 * chdata.char_specials_saved.idnum);
+	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+		id = index->account_id;
 		HASH_FIND_INT(acct_list, &id, acct);
 		if (!acct) {
 			CREATE(acct, struct uniq_acct_t, 1);
@@ -333,9 +331,9 @@ void update_account_stats(void) {
 		}
 		
 		// update
-		acct->active_week |= ((time(0) - chdata.last_logon) < SECS_PER_REAL_WEEK);
+		acct->active_week |= ((time(0) - index->last_logon) < SECS_PER_REAL_WEEK);
 		if (!acct->active_timeout) {
-			acct->active_timeout = !member_is_timed_out_cfu(&chdata);
+			acct->active_timeout = !member_is_timed_out_index(index);
 		}
 	}
 
@@ -398,8 +396,9 @@ void update_players_online_stats(void) {
 */
 void update_world_count(void) {
 	struct stats_data_struct *sect_inf = NULL, *crop_inf = NULL, *bld_inf = NULL, *data, *next_data;
-	room_data *iter, *next_iter;
 	any_vnum vnum, last_bld_vnum = NOTHING, last_crop_vnum = NOTHING, last_sect_vnum = NOTHING;
+	struct map_data *map;
+	room_data *room;
 	
 	// free and recreate counts
 	HASH_ITER(hh, global_sector_count, data, next_data) {
@@ -416,10 +415,10 @@ void update_world_count(void) {
 	}
 	
 	// scan world
-	HASH_ITER(world_hh, world_table, iter, next_iter) {
+	for (map = land_map; map; map = map->next) {
 		// sector
-		vnum = GET_SECT_VNUM(SECT(iter));
-		if (vnum != last_sect_vnum) {
+		vnum = GET_SECT_VNUM(map->sector_type);
+		if (vnum != last_sect_vnum || !sect_inf) {
 			HASH_FIND_INT(global_sector_count, &vnum, sect_inf);
 			if (!sect_inf) {
 				CREATE(sect_inf, struct stats_data_struct, 1);
@@ -430,10 +429,11 @@ void update_world_count(void) {
 		}
 		++sect_inf->count;
 		
-		// crop?
-		vnum = ROOM_CROP_TYPE(iter);
-		if (vnum != NOTHING) {
-			if (vnum != last_crop_vnum) {
+		// crop
+		if (map->crop_type) {
+			vnum = GET_CROP_VNUM(map->crop_type);
+			
+			if (vnum != last_crop_vnum || !crop_inf) {
 				HASH_FIND_INT(global_crop_count, &vnum, crop_inf);
 				if (!crop_inf) {
 					CREATE(crop_inf, struct stats_data_struct, 1);
@@ -446,8 +446,13 @@ void update_world_count(void) {
 			++crop_inf->count;
 		}
 		
+		// any further data?
+		if (!(room = real_real_room(map->vnum))) {
+			continue;
+		}
+		
 		// building?
-		vnum = BUILDING_VNUM(iter);
+		vnum = BUILDING_VNUM(room);
 		if (vnum != NOTHING) {
 			if (vnum != last_bld_vnum) {
 				HASH_FIND_INT(global_building_count, &vnum, bld_inf);
@@ -464,4 +469,7 @@ void update_world_count(void) {
 	}
 	
 	last_world_count = time(0);
+	global_sector_size = HASH_COUNT(global_sector_count);
+	global_crop_size = HASH_COUNT(global_crop_count);
+	global_building_size = HASH_COUNT(global_building_count);
 }

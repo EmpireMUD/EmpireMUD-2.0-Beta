@@ -1,0 +1,49 @@
+#10700
+Wintery Forest~
+A Wintery Forest~
+&W^^^^~
+1000 0 d 0
+0 0 0 -1
+E
+trees snow~
+The trees are covered in snow that has blown out of the portal!
+~
+S
+#10701
+Wintery Grove~
+A Wintery Desert Grove~
+&W..^.~
+1000 0 d 0
+0 0 0 -1
+E
+trees snow~
+The trees are covered in snow that has blown out of the portal!
+~
+S
+#10730
+Giant Shoe~
+A Giant Shoe~
+&0&u| `n&0~
+1000 0 d 0
+0 0 0 -1
+C
+adventure~
+E
+shoe giant house~
+It looks like some poor old woman is living in this giant shoe!
+~
+S
+#10750
+Goblin Mine~
+A Goblin Mine Shaft~
+/&0[]&?\~
+1000 0 beR 0
+0 0 0 -1
+D
+   The small entrance to the mine shaft is poorly made and looks like it's held
+up by cobwebs as much as it is by nails. It looks like the goblins left this
+place in a hurry, but there's no sign of what they were fleeing from. A ladder
+descends into the darkness below.  
+~
+S
+$

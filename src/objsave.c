@@ -2,6 +2,9 @@
 *   File: objsave.c                                       EmpireMUD 2.0b3 *
 *  Usage: loading/saving player objects for rent and crash-save           *
 *                                                                         *
+*  Note: ITEM_CART is deprecated but this will still put items inside of  *
+*  one so that the 2.0 b3.8 auto-converter will move them to vehicles.    *
+*                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
@@ -32,14 +35,9 @@
 *   Basic Object Loading
 *   Basic Object Saving
 *   Player Object Loading
-*   Player Object Saving
 *   World Object Saving
 *   Object Utils
 */
-
-#define LOC_INVENTORY	0
-#define MAX_BAG_ROWS	5
-
 
 // externs
 extern const struct wear_data_type wear_data[NUM_WEARS];
@@ -91,10 +89,10 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH];
 	obj_data *proto = obj_proto(vnum);
 	struct extra_descr_data *ex;
+	struct obj_apply *apply, *last_apply = NULL;
 	obj_data *obj, *new;
 	bool end = FALSE;
 	int length, i_in[3];
-	int l_in;
 	bool seek_end = FALSE;
 	
 	// up-front
@@ -120,6 +118,12 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 		OBJ_VERSION(obj) = 0;
 	}
 	
+	// we always use the applies from the file, not from the proto
+	if (obj) {
+		free_obj_apply_list(GET_OBJ_APPLIES(obj));
+		GET_OBJ_APPLIES(obj) = NULL;
+	}
+	
 	// for fread_string
 	sprintf(error, "Obj_load_from_file %d", vnum);
 	
@@ -134,165 +138,249 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 		
 		if (OBJ_FILE_TAG(line, "End", length)) {
 			end = TRUE;
+			continue;
 		}
 		else if (seek_end) {
 			// are we looking for the end of the object? ignore this line
 			// WARNING: don't put any ifs that require "obj" above seek_end; obj is not guaranteed
 			continue;
 		}
-		else if (OBJ_FILE_TAG(line, "Version:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				OBJ_VERSION(obj) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Location:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
-				*location = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Keywords:", length)) {
-			if (GET_OBJ_KEYWORDS(obj) && (!proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto))) {
-				free(GET_OBJ_KEYWORDS(obj));
-			}
-			GET_OBJ_KEYWORDS(obj) = fread_string(fl, error);
-		}
-		else if (OBJ_FILE_TAG(line, "Short-desc:", length)) {
-			if (GET_OBJ_SHORT_DESC(obj) && (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
-				free(GET_OBJ_SHORT_DESC(obj));
-			}
-			GET_OBJ_SHORT_DESC(obj) = fread_string(fl, error);
-		}
-		else if (OBJ_FILE_TAG(line, "Long-desc:", length)) {
-			if (GET_OBJ_LONG_DESC(obj) && (!proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto))) {
-				free(GET_OBJ_LONG_DESC(obj));
-			}
-			GET_OBJ_LONG_DESC(obj) = fread_string(fl, error);
-		}
-		else if (OBJ_FILE_TAG(line, "Action-desc:", length)) {
-			if (GET_OBJ_ACTION_DESC(obj) && (!proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(proto))) {
-				free(GET_OBJ_ACTION_DESC(obj));
-			}
-			GET_OBJ_ACTION_DESC(obj) = fread_string(fl, error);
-		}
-		else if (OBJ_FILE_TAG(line, "Extra-desc:", length)) {
-			if (proto && obj->ex_description == proto->ex_description) {
-				obj->ex_description = NULL;
-			}
-			
-			CREATE(ex, struct extra_descr_data, 1);
-			ex->next = obj->ex_description;
-			obj->ex_description = ex;
-			
-			ex->keyword = fread_string(fl, error);
-			ex->description = fread_string(fl, error);
-		}
-		else if (OBJ_FILE_TAG(line, "Val-0:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_VAL(obj, 0) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Val-1:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_VAL(obj, 1) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Val-2:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_VAL(obj, 2) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Type:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_TYPE(obj) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Wear:", length)) {
-			if (sscanf(line + length + 1, "%s", s_in)) {
-				GET_OBJ_WEAR(obj) = asciiflag_conv(s_in);
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Flags:", length)) {
-			if (sscanf(line + length + 1, "%s", s_in)) {
-				GET_OBJ_EXTRA(obj) = asciiflag_conv(s_in);
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Affects:", length)) {
-			if (sscanf(line + length + 1, "%s", s_in)) {
-				obj->obj_flags.bitvector = asciiflag_conv(s_in);
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Timer:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_TIMER(obj) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Current-scale:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_CURRENT_SCALE_LEVEL(obj) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Min-scale:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_MIN_SCALE_LEVEL(obj) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Max-scale:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_MAX_SCALE_LEVEL(obj) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Material:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_OBJ_MATERIAL(obj) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Last-empire:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				obj->last_empire_id = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Last-owner:", length)) {
-			if (sscanf(line + length + 1, "%d", &l_in)) {
-				obj->last_owner_id = l_in;
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Stolen-timer:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				obj->stolen_timer = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Autostore-timer:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				GET_AUTOSTORE_TIMER(obj) = i_in[0];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Apply:", length)) {
-			if (sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2])) {
-				obj->affected[i_in[0]].location = i_in[1];
-				obj->affected[i_in[0]].modifier = i_in[2];
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Bound-to:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0])) {
-				struct obj_binding *bind;
-				CREATE(bind, struct obj_binding, 1);
-				bind->idnum = i_in[0];
-				bind->next = OBJ_BOUND_TO(obj);
-				OBJ_BOUND_TO(obj) = bind;
-			}
-		}
-		else if (OBJ_FILE_TAG(line, "Trigger:", length)) {
-			if (sscanf(line + length + 1, "%d", &i_in[0]) && real_trigger(i_in[0])) {
-				if (!SCRIPT(obj)) {
-					CREATE(SCRIPT(obj), struct script_data, 1);
-				}
-				add_trigger(SCRIPT(obj), read_trigger(i_in[0]), -1);
-			}
-		}
 		
-		// ignore anything else
-		else {
-			// just discard line as junk
+		// normal tags by letter
+		switch (UPPER(*line)) {
+			case 'A': {
+				if (OBJ_FILE_TAG(line, "Action-desc:", length)) {
+					if (GET_OBJ_ACTION_DESC(obj) && (!proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(proto))) {
+						free(GET_OBJ_ACTION_DESC(obj));
+					}
+					GET_OBJ_ACTION_DESC(obj) = fread_string(fl, error);
+				}
+				else if (OBJ_FILE_TAG(line, "Affects:", length)) {
+					if (sscanf(line + length + 1, "%s", s_in)) {
+						obj->obj_flags.bitvector = asciiflag_conv(s_in);
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Applies:", length)) {
+					// this is the CURRENT version of the "Apply" tag
+					if (sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2])) {
+						CREATE(apply, struct obj_apply, 1);
+						apply->location = i_in[0];
+						apply->modifier = i_in[1];
+						apply->apply_type = i_in[2];
+						
+						// append to end
+						if (last_apply) {
+							last_apply->next = apply;
+						}
+						else {
+							GET_OBJ_APPLIES(obj) = apply;
+						}
+						last_apply = apply;
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Apply:", length)) {
+					// this is an OLD version of the tag that has a different set of params
+					if (sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2])) {
+						if (i_in[1] != APPLY_NONE && i_in[2] != 0) {
+							CREATE(apply, struct obj_apply, 1);
+							apply->location = i_in[1];
+							apply->modifier = i_in[2];
+							apply->apply_type = APPLY_TYPE_NATURAL;
+						
+							// append to end
+							if (last_apply) {
+								last_apply->next = apply;
+							}
+							else {
+								GET_OBJ_APPLIES(obj) = apply;
+							}
+							last_apply = apply;
+						}
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Autostore-timer:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_AUTOSTORE_TIMER(obj) = i_in[0];
+					}
+				}
+				break;
+			}
+			case 'B': {
+				if (OBJ_FILE_TAG(line, "Bound-to:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						struct obj_binding *bind;
+						CREATE(bind, struct obj_binding, 1);
+						bind->idnum = i_in[0];
+						bind->next = OBJ_BOUND_TO(obj);
+						OBJ_BOUND_TO(obj) = bind;
+					}
+				}
+				break;
+			}
+			case 'C': {
+				if (OBJ_FILE_TAG(line, "Component:", length)) {
+					if (sscanf(line + length + 1, "%d %s", &i_in[0], s_in) == 2) {
+						GET_OBJ_CMP_TYPE(obj) = i_in[0];
+						GET_OBJ_CMP_FLAGS(obj) = asciiflag_conv(s_in);
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Current-scale:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_CURRENT_SCALE_LEVEL(obj) = i_in[0];
+					}
+				}
+				break;
+			}
+			case 'E': {
+				if (OBJ_FILE_TAG(line, "Extra-desc:", length)) {
+					if (proto && obj->ex_description == proto->ex_description) {
+						obj->ex_description = NULL;
+					}
+			
+					CREATE(ex, struct extra_descr_data, 1);
+					ex->next = obj->ex_description;
+					obj->ex_description = ex;
+			
+					ex->keyword = fread_string(fl, error);
+					ex->description = fread_string(fl, error);
+				}
+				break;
+			}
+			case 'F': {
+				if (OBJ_FILE_TAG(line, "Flags:", length)) {
+					if (sscanf(line + length + 1, "%s", s_in)) {
+						GET_OBJ_EXTRA(obj) = asciiflag_conv(s_in);
+					}
+				}
+				break;
+			}
+			case 'K': {
+				if (OBJ_FILE_TAG(line, "Keywords:", length)) {
+					if (GET_OBJ_KEYWORDS(obj) && (!proto || GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto))) {
+						free(GET_OBJ_KEYWORDS(obj));
+					}
+					GET_OBJ_KEYWORDS(obj) = fread_string(fl, error);
+				}
+				break;
+			}
+			case 'L': {
+				if (OBJ_FILE_TAG(line, "Last-empire:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						obj->last_empire_id = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Last-owner:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						obj->last_owner_id = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Location:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
+						*location = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Long-desc:", length)) {
+					if (GET_OBJ_LONG_DESC(obj) && (!proto || GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto))) {
+						free(GET_OBJ_LONG_DESC(obj));
+					}
+					GET_OBJ_LONG_DESC(obj) = fread_string(fl, error);
+				}
+				break;
+			}
+			case 'M': {
+				if (OBJ_FILE_TAG(line, "Max-scale:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_MAX_SCALE_LEVEL(obj) = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Material:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_MATERIAL(obj) = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Min-scale:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_MIN_SCALE_LEVEL(obj) = i_in[0];
+					}
+				}
+				break;
+			}
+			case 'Q': {
+				if (OBJ_FILE_TAG(line, "Quest:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_REQUIRES_QUEST(obj) = i_in[0];
+					}
+				}
+				break;
+			}
+			case 'S': {
+				if (OBJ_FILE_TAG(line, "Short-desc:", length)) {
+					if (GET_OBJ_SHORT_DESC(obj) && (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
+						free(GET_OBJ_SHORT_DESC(obj));
+					}
+					GET_OBJ_SHORT_DESC(obj) = fread_string(fl, error);
+				}
+				else if (OBJ_FILE_TAG(line, "Stolen-timer:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						obj->stolen_timer = i_in[0];
+					}
+				}
+				break;
+			}
+			case 'T': {
+				if (OBJ_FILE_TAG(line, "Timer:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_TIMER(obj) = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Trigger:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0]) && real_trigger(i_in[0])) {
+						if (!SCRIPT(obj)) {
+							CREATE(SCRIPT(obj), struct script_data, 1);
+						}
+						add_trigger(SCRIPT(obj), read_trigger(i_in[0]), -1);
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Type:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_TYPE(obj) = i_in[0];
+					}
+				}
+				break;
+			}
+			case 'V': {
+				if (OBJ_FILE_TAG(line, "Val-0:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_VAL(obj, 0) = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Val-1:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_VAL(obj, 1) = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Val-2:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_VAL(obj, 2) = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Version:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						OBJ_VERSION(obj) = i_in[0];
+					}
+				}
+				break;
+			}
+			case 'W': {
+				if (OBJ_FILE_TAG(line, "Wear:", length)) {
+					if (sscanf(line + length + 1, "%s", s_in)) {
+						GET_OBJ_WEAR(obj) = asciiflag_conv(s_in);
+					}
+				}
+				break;
+			}
+			
+			// ignore anything else and move on
 		}
 	}
 	
@@ -316,265 +404,8 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 }
 
 
-/**
-* Return values:
-*  0 - successful load (RENT_RENTED)
-*  1 - load failure or load of crash items -- (this is normal)
-*
-* @param char_data *ch The player whose objects we're loading
-* @param bool dolog If TRUE, syslogs the player.
-*/
-int Objload_char(char_data *ch, int dolog) {
-	void auto_equip(char_data *ch, obj_data *obj, int *location);
-
-	char fname[MAX_STRING_LENGTH], line[MAX_INPUT_LENGTH];
-	int rent_code = RENT_CRASH, iter;
-	struct coin_data *coin, *last_coin = NULL;
-	obj_data *obj, *obj2, *cont_row[MAX_BAG_ROWS];
-	int location, int_in[2];
-	obj_vnum vnum;
-	long long_in;
-	FILE *fl;
-
-	/* Empty all of the container lists (you never know ...) */
-	for (iter = 0; iter < MAX_BAG_ROWS; ++iter) {
-		cont_row[iter] = NULL;
-	}
-
-	if (!get_filename(GET_NAME(ch), fname, CRASH_FILE)) {
-		return (1);
-	}
-	if (!(fl = fopen(fname, "r"))) {
-		if (errno != ENOENT) {	/* if it fails, NOT because of no file */
-			log("SYSERR: READING OBJECT FILE %s (5): %s", fname, strerror(errno));
-			send_to_char("\r\n********************* NOTICE *********************\r\n"
-						 "There was a problem loading your objects from disk.\r\n"
-						 "Contact an immortal for assistance.\r\n", ch);
-		}
-		if (dolog) {
-			syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s entering game with no equipment.", GET_NAME(ch));
-			if (GET_INVIS_LEV(ch) == 0) {
-				if (config_get_bool("public_logins")) {
-					mortlog("%s has entered the game", PERS(ch, ch, TRUE));
-				}
-				else if (GET_LOYALTY(ch)) {
-					log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has entered the game", PERS(ch, ch, TRUE));
-				}
-			}
-		}
-		return (1);
-	}
-	
-	// iterate over file
-	for (;;) {
-		if (!get_line(fl, line)) {
-			log("SYSERR: Format error in crash file for %s", GET_NAME(ch));
-			fclose(fl);
-			return (1);
-		}
-		
-		if (*line == '$') {
-			break;
-		}
-		else if (*line == '#') {
-			if (sscanf(line, "#%d", &vnum) < 1) {
-				log("SYSERR: Format error in vnum line of crash file for %s", GET_NAME(ch));
-				fclose(fl);
-				return (1);
-			}
-			
-			if ((obj = Obj_load_from_file(fl, vnum, &location, ch))) {
-				// Obj_load_from_file may return a NULL for deleted objs
-				
-				auto_equip(ch, obj, &location);
-				/*
-				 * What to do with a new loaded item:
-				 *
-				 * If there's a list with location less than 1 below this, then its
-				 * container has disappeared from the file so we put the list back into
-				 * the character's inventory. (Equipped items are 0 here.)
-				 *
-				 * If there's a list of contents with location of 1 below this, then we
-				 * check if it is a container:
-				 *   - Yes: Get it from the character, fill it, and give it back so we
-				 *          have the correct weight.
-				 *   -  No: The container is missing so we put everything back into the
-				 *          character's inventory.
-				 *
-				 * For items with negative location, we check if there is already a list
-				 * of contents with the same location.  If so, we put it there and if not,
-				 * we start a new list.
-				 *
-				 * Since location for contents is < 0, the list indices are switched to
-				 * non-negative.
-				 *
-				 * This looks ugly, but it works.
-				 */
-				if (location > 0) {		/* Equipped */
-					for (iter = MAX_BAG_ROWS - 1; iter > 0; --iter) {
-						if (cont_row[iter]) {	/* No container, back to inventory. */
-							for (; cont_row[iter]; cont_row[iter] = obj2) {
-								obj2 = cont_row[iter]->next_content;
-								obj_to_char(cont_row[iter], ch);
-							}
-							cont_row[iter] = NULL;
-						}
-					}
-					if (cont_row[0]) {	/* Content list existing. */
-						if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER || GET_OBJ_TYPE(obj) == ITEM_CART || IS_CORPSE(obj)) {
-							/* Remove object, fill it, equip again. */
-							obj = unequip_char(ch, location - 1);
-							obj->contains = NULL;	/* Should be NULL anyway, but just in case. */
-							for (; cont_row[0]; cont_row[0] = obj2) {
-								obj2 = cont_row[0]->next_content;
-								obj_to_obj(cont_row[0], obj);
-							}
-							equip_char(ch, obj, location - 1);
-						}
-						else {			/* Object isn't container, empty the list. */
-							for (; cont_row[0]; cont_row[0] = obj2) {
-								obj2 = cont_row[0]->next_content;
-								obj_to_char(cont_row[0], ch);
-							}
-							cont_row[0] = NULL;
-						}
-					}
-				}
-				else {	/* location <= 0 */
-					for (iter = MAX_BAG_ROWS - 1; iter > -location; --iter) {
-						if (cont_row[iter]) {	/* No container, back to inventory. */
-							for (; cont_row[iter]; cont_row[iter] = obj2) {
-								obj2 = cont_row[iter]->next_content;
-								obj_to_char(cont_row[iter], ch);
-							}
-							cont_row[iter] = NULL;
-						}
-					}
-					if (iter == -location && cont_row[iter]) {	/* Content list exists. */
-						if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER || GET_OBJ_TYPE(obj) == ITEM_CART || IS_CORPSE(obj)) {
-							/* Take the item, fill it, and give it back. */
-							obj_from_char(obj);
-							obj->contains = NULL;
-							for (; cont_row[iter]; cont_row[iter] = obj2) {
-								obj2 = cont_row[iter]->next_content;
-								obj_to_obj(cont_row[iter], obj);
-							}
-							obj_to_char(obj, ch);	/* Add to inventory first. */
-						}
-						else {	/* Object isn't container, empty content list. */
-							for (; cont_row[iter]; cont_row[iter] = obj2) {
-								obj2 = cont_row[iter]->next_content;
-								obj_to_char(cont_row[iter], ch);
-							}
-							cont_row[iter] = NULL;
-						}
-					}
-					if (location < 0 && location >= -MAX_BAG_ROWS) {
-						/*
-						 * Let the object be part of the content list but put it at the
-						 * list's end.  Thus having the items in the same order as before
-						 * the character rented.
-						 */
-						obj_from_char(obj);
-						if ((obj2 = cont_row[-location - 1]) != NULL) {
-							while (obj2->next_content) {
-								obj2 = obj2->next_content;
-							}
-							obj2->next_content = obj;
-						}
-						else {
-							cont_row[-location - 1] = obj;
-						}
-					}
-				}
-			}
-			else {
-				// No obj returned: it was probably just deleted...
-				
-				/*
-				log("SYSERR: Got back non-object while loading vnum %d for %s", vnum, GET_NAME(ch));
-				fclose(fl);
-				return (1);
-				*/
-			}
-		}
-		else if (!strn_cmp(line, "Rent-time:", 10)) {
-			// don't care about the time
-		}
-		else if (!strn_cmp(line, "Rent-code:", 10)) {
-			if (sscanf(line + 11, "%d", &rent_code) < 1) {
-				log("SYSERR: Format error in Rent-code line of crash file for %s", GET_NAME(ch));
-				fclose(fl);
-				return (1);
-			}
-		}
-		else if (!strn_cmp(line, "Coin:", 5)) {
-			if (sscanf(line + 6, "%d %d %ld", &int_in[0], &int_in[1], &long_in) != 3) {
-				log("SYSERR: Format in Coin line of crash file for %s", GET_NAME(ch));
-				fclose(fl);
-				return(1);
-			}
-			
-			CREATE(coin, struct coin_data, 1);
-			coin->amount = int_in[0];
-			coin->empire_id = int_in[1];
-			coin->last_acquired = (time_t)long_in;
-			coin->next = NULL;
-			
-			// add to end
-			if (last_coin) {
-				last_coin->next = coin;
-			}
-			else {
-				GET_PLAYER_COINS(ch) = coin;
-			}
-			last_coin = coin;
-		}
-		else {
-			log("SYSERR: Format error in crash file for %s: %s", GET_NAME(ch), line);
-			fclose(fl);
-			return (1);
-		}
-	}
-	
-	// syslog
-	switch (rent_code) {
-		case RENT_RENTED: {
-			if (dolog) {
-				syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s un-renting and entering game.", GET_NAME(ch));
-			}
-			break;
-		}
-		case RENT_CRASH: {
-			if (dolog) {
-				syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s retrieving crash-saved items and entering game.", GET_NAME(ch));
-			}
-			break;
-		}
-		default: {
-			syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "SYSERR: %s entering game with undefined rent code %d.", GET_NAME(ch), rent_code);
-			break;
-		}
-	}
-	
-	// mortlog
-	if (dolog && GET_INVIS_LEV(ch) == 0) {
-		if (config_get_bool("public_logins")) {
-			mortlog("%s has entered the game", PERS(ch, ch, TRUE));
-		}
-		else if (GET_LOYALTY(ch)) {
-			log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has entered the game", PERS(ch, ch, TRUE));
-		}
-	}
-
-	fclose(fl);
-	return (rent_code == RENT_RENTED) ? 0 : 1;
-}
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// BASIC OBJECT SAVING /////////////////////////////////////////////////////
-
 
 /**
 * Extracts an object, its contents, and the next content in whatever list it's
@@ -621,6 +452,7 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	char temp[MAX_STRING_LENGTH];
 	struct extra_descr_data *ex;
 	struct obj_binding *bind;
+	struct obj_apply *apply;
 	obj_data *proto;
 	int iter;
 	
@@ -685,6 +517,9 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	if (!proto || GET_OBJ_MATERIAL(obj) != GET_OBJ_MATERIAL(proto)) {
 		fprintf(fl, "Material: %d\n", GET_OBJ_MATERIAL(obj));
 	}
+	if (!proto || GET_OBJ_CMP_TYPE(obj) != GET_OBJ_CMP_TYPE(proto) || GET_OBJ_CMP_FLAGS(obj) != GET_OBJ_CMP_FLAGS(proto)) {
+		fprintf(fl, "Component: %d %s\n", GET_OBJ_CMP_TYPE(obj), bitv_to_alpha(GET_OBJ_CMP_FLAGS(obj)));
+	}
 	if (!proto || GET_OBJ_CURRENT_SCALE_LEVEL(obj) != GET_OBJ_CURRENT_SCALE_LEVEL(proto)) {
 		fprintf(fl, "Current-scale: %d\n", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 	}
@@ -693,6 +528,9 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	}
 	if (!proto || GET_OBJ_MAX_SCALE_LEVEL(obj) != GET_OBJ_MAX_SCALE_LEVEL(proto)) {
 		fprintf(fl, "Max-scale: %d\n", GET_OBJ_MAX_SCALE_LEVEL(obj));
+	}
+	if (!proto || GET_OBJ_REQUIRES_QUEST(obj) != GET_OBJ_REQUIRES_QUEST(proto)) {
+		fprintf(fl, "Quest: %d\n", GET_OBJ_REQUIRES_QUEST(obj));
 	}
 
 	if (obj->last_empire_id != NOTHING) {
@@ -709,8 +547,8 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	}
 	
 	// always save applies
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		fprintf(fl, "Apply: %d %d %d\n", iter, obj->affected[iter].location, obj->affected[iter].modifier);
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+		fprintf(fl, "Applies: %d %d %d\n", apply->location, apply->modifier, apply->apply_type);
 	}
 	
 	// who it's bound to
@@ -730,6 +568,25 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	}
 	
 	fprintf(fl, "End\n");
+}
+
+
+/**
+* Removes all of a character's items before they leave the game (otherwise,
+* extracting the character would drop the items on the ground).
+*
+* @param char_data *ch The player whose inventory/equipment must go.
+*/
+void extract_all_items(char_data *ch) {
+	int iter;
+	
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (GET_EQ(ch, iter)) {
+			Crash_extract_objs(GET_EQ(ch, iter));
+		}
+	}
+	
+	Crash_extract_objs(ch->carrying);
 }
 
 
@@ -776,82 +633,126 @@ void auto_equip(char_data *ch, obj_data *obj, int *location) {
 }
 
 
- //////////////////////////////////////////////////////////////////////////////
-//// PLAYER OBJECT SAVING ////////////////////////////////////////////////////
-
 /**
-* This crash-saves all players in the game.
-*/
-void Crash_save_all(void) {
-	void Objsave_char(char_data *ch, int rent_code);
-	void write_aliases(char_data *ch);
-
-	descriptor_data *d;
-
-	for (d = descriptor_list; d; d = d->next) {
-		if ((STATE(d) == CON_PLAYING) && !IS_NPC(d->character)) {
-			Objsave_char(d->character, RENT_CRASH);
-			write_aliases(d->character);
-			SAVE_CHAR(d->character);
-		}
-	}
-}
-
-
-/**
-* Objsave_char() saves a player's equipment and inventory to file. It can be
-* called with two modes:
-*    RENT_RENTED - for players leaving the game, extracts their gear
-*    RENT_CRASH - for players still in the game, does not extact gear
+* Applies a loaded object to a character, during login/player-read.
 *
-* @param char_data *ch The player whose inventory we're saving.
-* @param int rent_code RENT_RENTED or RENT_CRASH.
+* @param obj_data *obj The object.
+* @param char_data *ch The person to give/equip it to.
+* @param int location Where it should be equipped.
 */
-void Objsave_char(char_data *ch, int rent_code) {
-	char filename[MAX_INPUT_LENGTH], tempfile[MAX_INPUT_LENGTH];
-	struct coin_data *coin;
+void loaded_obj_to_char(obj_data *obj, char_data *ch, int location) {
+	obj_data *obj2, *cont_row[MAX_BAG_ROWS];
 	int iter;
-	FILE *fp;
-
-	if (IS_NPC(ch) || !get_filename(GET_NAME(ch), filename, CRASH_FILE)) {
+	
+	if (!obj || !ch) {
 		return;
 	}
 	
-	strcpy(tempfile, filename);
-	strcat(tempfile, TEMP_SUFFIX);
-	
-	if (!(fp = fopen(tempfile, "w"))) {
-		log("SYSERR: Unable to save rent file for %s", GET_NAME(ch));
-		return;
+	for (iter = 0; iter < MAX_BAG_ROWS; ++iter) {
+		cont_row[iter] = NULL;
 	}
 	
-	fprintf(fp, "Rent-time: %d\n", (int) time(0));
-	fprintf(fp, "Rent-code: %d\n", rent_code);
-	
-	for (coin = GET_PLAYER_COINS(ch); coin; coin = coin->next) {
-		fprintf(fp, "Coin: %d %d %ld\n", coin->amount, coin->empire_id, coin->last_acquired);
-	}
-
-	for (iter = 0; iter < NUM_WEARS; iter++) {
-		if (GET_EQ(ch, iter)) {
-			// save at iter+1 because 0 == LOC_INVENTORY
-			Crash_save(GET_EQ(ch,iter), fp, iter + 1);
-			
-			if (rent_code == RENT_RENTED) {
-				Crash_extract_objs(GET_EQ(ch, iter));
+	auto_equip(ch, obj, &location);
+	/*
+	 * What to do with a new loaded item:
+	 *
+	 * If there's a list with location less than 1 below this, then its
+	 * container has disappeared from the file so we put the list back into
+	 * the character's inventory. (Equipped items are 0 here.)
+	 *
+	 * If there's a list of contents with location of 1 below this, then we
+	 * check if it is a container:
+	 *   - Yes: Get it from the character, fill it, and give it back so we
+	 *          have the correct weight.
+	 *   -  No: The container is missing so we put everything back into the
+	 *          character's inventory.
+	 *
+	 * For items with negative location, we check if there is already a list
+	 * of contents with the same location.  If so, we put it there and if not,
+	 * we start a new list.
+	 *
+	 * Since location for contents is < 0, the list indices are switched to
+	 * non-negative.
+	 *
+	 * This looks ugly, but it works.
+	 */
+	if (location > 0) {		/* Equipped */
+		for (iter = MAX_BAG_ROWS - 1; iter > 0; --iter) {
+			if (cont_row[iter]) {	/* No container, back to inventory. */
+				for (; cont_row[iter]; cont_row[iter] = obj2) {
+					obj2 = cont_row[iter]->next_content;
+					obj_to_char(cont_row[iter], ch);
+				}
+				cont_row[iter] = NULL;
+			}
+		}
+		if (cont_row[0]) {	/* Content list existing. */
+			if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER || GET_OBJ_TYPE(obj) == ITEM_CART || IS_CORPSE(obj)) {
+				/* Remove object, fill it, equip again. */
+				obj = unequip_char(ch, location - 1);
+				obj->contains = NULL;	/* Should be NULL anyway, but just in case. */
+				for (; cont_row[0]; cont_row[0] = obj2) {
+					obj2 = cont_row[0]->next_content;
+					obj_to_obj(cont_row[0], obj);
+				}
+				equip_char(ch, obj, location - 1);
+			}
+			else {			/* Object isn't container, empty the list. */
+				for (; cont_row[0]; cont_row[0] = obj2) {
+					obj2 = cont_row[0]->next_content;
+					obj_to_char(cont_row[0], ch);
+				}
+				cont_row[0] = NULL;
 			}
 		}
 	}
-	
-	Crash_save(ch->carrying, fp, LOC_INVENTORY);
-	if (rent_code == RENT_RENTED) {
-		Crash_extract_objs(ch->carrying);
+	else {	/* location <= 0 */
+		for (iter = MAX_BAG_ROWS - 1; iter > -location; --iter) {
+			if (cont_row[iter]) {	/* No container, back to inventory. */
+				for (; cont_row[iter]; cont_row[iter] = obj2) {
+					obj2 = cont_row[iter]->next_content;
+					obj_to_char(cont_row[iter], ch);
+				}
+				cont_row[iter] = NULL;
+			}
+		}
+		if (iter == -location && cont_row[iter]) {	/* Content list exists. */
+			if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER || GET_OBJ_TYPE(obj) == ITEM_CART || IS_CORPSE(obj)) {
+				/* Take the item, fill it, and give it back. */
+				obj_from_char(obj);
+				obj->contains = NULL;
+				for (; cont_row[iter]; cont_row[iter] = obj2) {
+					obj2 = cont_row[iter]->next_content;
+					obj_to_obj(cont_row[iter], obj);
+				}
+				obj_to_char(obj, ch);	/* Add to inventory first. */
+			}
+			else {	/* Object isn't container, empty content list. */
+				for (; cont_row[iter]; cont_row[iter] = obj2) {
+					obj2 = cont_row[iter]->next_content;
+					obj_to_char(cont_row[iter], ch);
+				}
+				cont_row[iter] = NULL;
+			}
+		}
+		if (location < 0 && location >= -MAX_BAG_ROWS) {
+			/*
+			 * Let the object be part of the content list but put it at the
+			 * list's end.  Thus having the items in the same order as before
+			 * the character rented.
+			 */
+			obj_from_char(obj);
+			if ((obj2 = cont_row[-location - 1]) != NULL) {
+				while (obj2->next_content) {
+					obj2 = obj2->next_content;
+				}
+				obj2->next_content = obj;
+			}
+			else {
+				cont_row[-location - 1] = obj;
+			}
+		}
 	}
-	
-	fprintf(fp, "$\n");
-	
-	fclose(fp);
-	rename(tempfile, filename);
 }
 
 
@@ -867,10 +768,12 @@ void Objsave_char(char_data *ch, int rent_code) {
 * @param room_data *room The world location whose objects we are saving.
 */
 bool objpack_save_room(room_data *room) {
+	void Crash_save_vehicles(vehicle_data *room_list, FILE *fl);
+	
 	char filename[MAX_INPUT_LENGTH], tempname[MAX_INPUT_LENGTH];
 	FILE *fp;
 
-	if (!ROOM_CONTENTS(room)) {
+	if (!ROOM_CONTENTS(room) && !ROOM_VEHICLES(room)) {
 		return FALSE;
 	}
 
@@ -882,11 +785,9 @@ bool objpack_save_room(room_data *room) {
 	if (!(fp = fopen(tempname, "w"))) {
 		return FALSE;
 	}
-
-	fprintf(fp, "Rent-time: %d\n", (int) time(0));
-	fprintf(fp, "Rent-code: %d\n", RENT_CRASH);
-
+	
 	Crash_save(ROOM_CONTENTS(room), fp, LOC_INVENTORY);
+	Crash_save_vehicles(ROOM_VEHICLES(room), fp);
 
 	fprintf(fp, "$\n");
 
@@ -903,9 +804,12 @@ bool objpack_save_room(room_data *room) {
 * @param room_data *room The room.
 */
 void objpack_load_room(room_data *room) {
+	extern vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum);
+
 	obj_data *obj, *obj2, *cont_row[MAX_BAG_ROWS];
 	char fname[MAX_STRING_LENGTH], line[MAX_INPUT_LENGTH];
-	int iter, location, rent_code = 0;
+	int iter, location;
+	vehicle_data *veh;
 	obj_vnum vnum;
 	time_t timer;
 	FILE *fl;
@@ -1012,15 +916,22 @@ void objpack_load_room(room_data *room) {
 				*/
 			}
 		}
-		else if (!strn_cmp(line, "Rent-time:", 10)) {
-			// don't care about the time
-		}
-		else if (!strn_cmp(line, "Rent-code:", 10)) {
-			if (sscanf(line + 11, "%d", &rent_code) < 1) {
-				log("SYSERR: Format error in Rent-code line of pack file %s", fname);
+		else if (*line == '%') {	// vehicle entry
+			if (sscanf(line, "%%%d", &vnum) < 1) {
+				log("SYSERR: Format error in vehicle vnum line of pack file %s", fname);
 				fclose(fl);
 				return;
 			}
+			
+			if ((veh = unstore_vehicle_from_file(fl, vnum))) {
+				vehicle_to_room(veh, room);
+			}
+		}
+		else if (!strn_cmp(line, "Rent-time:", 10)) {
+			// no longer used (may still be in file)
+		}
+		else if (!strn_cmp(line, "Rent-code:", 10)) {
+			// no longer used (may still be in file)
 		}
 		else {
 			log("SYSERR: Format error in pack file %s: %s", fname, line);
@@ -1037,168 +948,40 @@ void objpack_load_room(room_data *room) {
 //// OBJECT UTILS ////////////////////////////////////////////////////////////
 
 /**
-* This function checks how old a player's crash file is and deletes it if
-* necessary. This is called automatically at startup if quickstart is off.
-*
-* @param char *name The character name to check and delete.
-*/
-void Crash_clean_file(char *name) {
-	void Crash_delete_file(char *name);
-	
-	char fname[MAX_STRING_LENGTH], line[MAX_INPUT_LENGTH], filetype[20];
-	int rent_time, rent_code;
-	FILE *fl;
-
-	if (!get_filename(name, fname, CRASH_FILE))
-		return;
-
-	if (!(fl = fopen(fname, "r"))) {
-		if (errno != ENOENT) {
-			/* if it fails, NOT because of no file */
-			log("SYSERR: OPENING OBJECT FILE %s (4): %s", fname, strerror(errno));
-		}
-		return;
-	}
-	
-	// TODO these rely on these coming in order -- should change this to iterate to find them
-	if (!get_line(fl, line) || sscanf(line, "Rent-time: %d", &rent_time) < 1) {
-		log("SYSERR: Error getting Rent-time from file %s", fname);
-		return;
-	}
-	if (!get_line(fl, line) || sscanf(line, "Rent-code: %d", &rent_code) < 1) {
-		log("SYSERR: Error getting Rent-code from file %s", fname);
-		return;
-	}
-	
-	// don't need the rest of the file
-	fclose(fl);
-
-	if (rent_time < time(0) - (config_get_int("obj_file_timeout") * SECS_PER_REAL_DAY)) {
-		Crash_delete_file(name);
-		
-		switch (rent_code) {
-			case RENT_CRASH: {
-				strcpy(filetype, "crash");
-				break;
-			}
-			case RENT_RENTED: {
-				strcpy(filetype, "rent");
-				break;
-			}
-			default: {
-				strcpy(filetype, "UNKNOWN!");
-				break;
-			}
-		}
-		log("    Deleting %s's %s file.", name, filetype);
-	}
-}
-
-
-/**
-* This deletes the inventory "crash" file for a player.
-*
-* @param char *name The name of the player.
-*/
-void Crash_delete_file(char *name) {
-	char filename[50];
-	FILE *fl;
-
-	if (get_filename(name, filename, CRASH_FILE)) {
-		if (!(fl = fopen(filename, "r"))) {
-			if (errno != ENOENT) {
-				/* if it fails but NOT because of no file */
-				log("SYSERR: deleting crash file %s (1): %s", filename, strerror(errno));
-			}
-		}
-		else {
-			fclose(fl);
-
-			/* if it fails, NOT because of no file */
-			if (remove(filename) < 0 && errno != ENOENT) {
-				log("SYSERR: deleting crash file %s (2): %s", filename, strerror(errno));
-			}
-		}
-	}
-}
-
-
-/**
-* This function lists a given character's rent (inventory/gear) file to the
+* This function lists a given character's inventory/gear information to the
 * player who requested it. This is mainly used by "show rent".
 *
 * @param char_data *ch The person who's looking up the information.
 * @param char *name The name of the person whose rent file to show.
 */
 void Crash_listrent(char_data *ch, char *name) {
-	FILE *fl;
-	char fname[MAX_INPUT_LENGTH], line[MAX_INPUT_LENGTH], error[MAX_INPUT_LENGTH];
-	char *tmp;
-	obj_vnum last_vnum = NOTHING;
-	bool last_sent = TRUE;
-	int amount, eid;
-	int junk;
-
-	if (!get_filename(name, fname, CRASH_FILE) || !(fl = fopen(fname, "r"))) {
-		msg_to_char(ch, "Unable to load rent file for %s.\r\n", name);
+	void check_delayed_load(char_data *ch);
+	void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
+	void show_obj_to_char(obj_data *obj, char_data *ch, int mode);
+	
+	char_data *victim;
+	bool file = FALSE;
+	int iter;
+	
+	if (!(victim = find_or_load_player(name, &file))) {
+		msg_to_char(ch, "Unable to find player %s.\r\n", name);
 		return;
 	}
 	
-	// in case of fread_string error
-	sprintf(error, "rent file %s", fname);
+	check_delayed_load(victim);
 	
-	// start output queue
-	sprintf(buf, "%s\r\n", fname);
-	
-	// TODO this whole thing needs length-checking to prevent overruns
-	while (get_line(fl, line)) {
-		if (*line == '$') {
-			break;
-		}
-		else if (*line == '#') {
-			if (!last_sent) {
-				sprintf(buf + strlen(buf), " [%5d] %s\r\n", last_vnum, get_obj_name_by_proto(last_vnum));
-			}
-			sscanf(line, "#%d", &last_vnum);
-			last_sent = FALSE;
-		}
-		else if (!strn_cmp(line, "Short-desc:", 11)) {
-			if (last_vnum != NOTHING) {
-				tmp = fread_string(fl, error);
-				sprintf(buf + strlen(buf), " [%5d] %s\r\n", last_vnum, tmp);
-				free(tmp);
-				last_sent = TRUE;
-			}
-		}
-		else if (!strn_cmp(line, "Coin:", 5)) {
-			if (sscanf(line + 6, "%d %d %d", &amount, &eid, &junk) == 3) {
-				sprintf(buf + strlen(buf), " [%5d] %s\r\n", NOTHING, money_amount(real_empire(eid), amount));
-			}
-		}
-		else {
-			// ignore! we only care about those properties above
+	msg_to_char(ch, "%s is using:\r\n", GET_NAME(victim));
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (GET_EQ(victim, iter)) {
+			msg_to_char(ch, wear_data[iter].eq_prompt);
+			show_obj_to_char(GET_EQ(victim, iter), ch, OBJ_DESC_EQUIPMENT);
 		}
 	}
 	
-	if (!last_sent) {
-		sprintf(buf + strlen(buf), " [%5d] %s\r\n", last_vnum, get_obj_name_by_proto(last_vnum));
-	}
+	msg_to_char(ch, "Inventory:\r\n");
+	list_obj_to_char(victim->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
 	
-	send_to_char(buf, ch);
-	fclose(fl);
-}
-
-
-/**
-* This is run at startup if the mud is not run in quick-start mode. It runs
-* the obj-file cleaner on all players.
-*/
-void update_obj_file(void) {
-	int iter;
-
-	for (iter = 0; iter <= top_of_p_table; ++iter) {
-		if (*player_table[iter].name) {
-			Crash_clean_file(player_table[iter].name);
-		}
+	if (file) {
+		free_char(victim);
 	}
 }

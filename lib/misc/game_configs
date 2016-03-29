@@ -25,6 +25,7 @@ welcome_message Welcome to your EmpireMUD! Prepare to face your destiny!
 *
 * Actions configs
 chip_timer 4
+chop_depletion 4
 chop_timer 30
 chore_distance 20
 common_depletion 125
@@ -45,7 +46,6 @@ pick_depletion 14
 planting_base_timer 120
 shear_growth_time 6
 short_depletion 25
-smelt_timer 4
 tan_timer 12
 tavern_brew_time 10
 tavern_timer 60
@@ -92,7 +92,7 @@ auto_update_items 1
 autostore_time 180
 bound_item_junk_time 10080
 long_autostore_time 720
-room_item_limit 404
+room_item_limit 5
 scale_coin_amount 10.000000
 scale_drink_capacity 9.800000
 scale_food_fullness 6.000000
@@ -116,15 +116,20 @@ test_config 0
 *
 * Players configs
 blood_starvation_level 20
+default_class_abbrev Advn
+default_class_name Adventurer
 default_map_size 7
+delete_inactive_players_after 0
+delete_invalid_players_after 30
+exp_level_difference 50
 idle_linkdead_rent_time 5
 idle_rent_time 20
 max_capitals_in_name 2
 max_map_size 12
 max_player_attribute 15
+max_sleeping_regen_time 60
 num_bonus_trait_daily_skills 5
 num_daily_skill_points 15
-obj_file_timeout 365
 offer_time 75
 pool_bonus_amount 15
 remove_lore_after_years 2
@@ -161,11 +166,13 @@ deaths_before_penalty 5
 deaths_before_penalty_war 0
 fire_extinguish_value 120
 hostile_flag_time 60
+mutual_war_only 0
 rogue_flag_time 1440
 pvp_timer 5
 seconds_per_death 30
 stolen_object_timer 30
 stun_immunity_time 5
+vehicle_siege_time 30
 war_cost_max 50000
 war_cost_min 5000
 war_login_delay 30

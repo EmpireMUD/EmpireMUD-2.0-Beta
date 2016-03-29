@@ -34,8 +34,11 @@ extern const char *global_flags[];
 extern const char *global_types[];
 extern const char *interact_types[];
 extern const byte interact_vnum_types[NUM_INTERACTS];
+extern const char *sector_flags[];
 
 // external funcs
+extern struct archetype_gear *copy_archetype_gear(struct archetype_gear *input);
+void free_archetype_gear(struct archetype_gear *list);
 void sort_interactions(struct interaction_item **list);
 
 
@@ -67,10 +70,21 @@ bool audit_global(struct global_data *glb, char_data *ch) {
 	}
 	
 	for (interact = GET_GLOBAL_INTERACTIONS(glb); interact; interact = interact->next) {
-		if (GET_GLOBAL_TYPE(glb) == GLOBAL_MOB_INTERACTIONS) {
-			if (interact->type != INTERACT_SHEAR && interact->type != INTERACT_LOOT && interact->type != INTERACT_PICKPOCKET) {
-				olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Unsupported interaction type");
-				problem = TRUE;
+		// GLOBAL_x
+		switch (GET_GLOBAL_TYPE(glb)) {
+			case GLOBAL_MOB_INTERACTIONS: {
+				if (interact->type != INTERACT_SHEAR && interact->type != INTERACT_LOOT && interact->type != INTERACT_PICKPOCKET) {
+					olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Unsupported interaction type");
+					problem = TRUE;
+				}
+				break;
+			}
+			case GLOBAL_MINE_DATA: {
+				if (interact->type != INTERACT_MINE) {
+					olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Unsupported interaction type");
+					problem = TRUE;
+				}
+				break;
 			}
 		}
 	}
@@ -119,13 +133,37 @@ char *list_one_global(struct global_data *glb, bool detail) {
 	extern const char *action_bits[];
 	
 	static char output[MAX_STRING_LENGTH];
-	char flags[MAX_STRING_LENGTH];
-
+	char abil[MAX_STRING_LENGTH], flags[MAX_STRING_LENGTH];
+	ability_data *ab;
+	
+	// ability required
+	if (!(ab = find_ability_by_vnum(GET_GLOBAL_ABILITY(glb)))) {
+		*abil = '\0';
+	}
+	else {
+		sprintf(abil, " (%s", ABIL_NAME(ab));
+		if (ABIL_ASSIGNED_SKILL(ab)) {
+			sprintf(abil + strlen(abil), " - %s %d", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(ab)), ABIL_SKILL_LEVEL(ab));
+		}
+		strcat(abil, ")");
+	}
+	
+	// GLOBAL_x
 	switch (GET_GLOBAL_TYPE(glb)) {
 		case GLOBAL_MOB_INTERACTIONS: {
 			if (detail) {
 				sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, flags, TRUE);
-				snprintf(output, sizeof(output), "[%5d] %s (%s) %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), flags);
+				snprintf(output, sizeof(output), "[%5d] %s (%s)%s %.2f%%%s %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "", flags);
+			}
+			else {
+				snprintf(output, sizeof(output), "[%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+			}
+			break;
+		}
+		case GLOBAL_MINE_DATA: {
+			if (detail) {
+				sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), sector_flags, flags, TRUE);
+				snprintf(output, sizeof(output), "[%5d] %s%s %.2f%%%s %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "", flags);
 			}
 			else {
 				snprintf(output, sizeof(output), "[%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
@@ -134,7 +172,7 @@ char *list_one_global(struct global_data *glb, bool detail) {
 		}
 		default: {
 			if (detail) {
-				snprintf(output, sizeof(output), "[%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+				snprintf(output, sizeof(output), "[%5d] %s%s %.2f%%%s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "");
 			}
 			else {
 				snprintf(output, sizeof(output), "[%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
@@ -238,6 +276,7 @@ void save_olc_global(descriptor_data *desc) {
 		GET_GLOBAL_INTERACTIONS(proto) = interact->next;
 		free(interact);
 	}
+	free_archetype_gear(GET_GLOBAL_GEAR(proto));
 	
 	// sanity
 	if (!GET_GLOBAL_NAME(glb) || !*GET_GLOBAL_NAME(glb)) {
@@ -265,9 +304,12 @@ void save_olc_global(descriptor_data *desc) {
 * @return struct global_data* The copied global.
 */
 struct global_data *setup_olc_global(struct global_data *input) {
+	void clear_global(struct global_data *glb);
+
 	struct global_data *new;
 	
 	CREATE(new, struct global_data, 1);
+	clear_global(new);
 	
 	if (input) {
 		// copy normal data
@@ -276,8 +318,9 @@ struct global_data *setup_olc_global(struct global_data *input) {
 		// copy things that are pointers
 		GET_GLOBAL_NAME(new) = GET_GLOBAL_NAME(input) ? str_dup(GET_GLOBAL_NAME(input)) : NULL;
 		
-		// copy interactions
+		// copy pointers
 		GET_GLOBAL_INTERACTIONS(new) = copy_interaction_list(GET_GLOBAL_INTERACTIONS(input));
+		GET_GLOBAL_GEAR(new) = copy_archetype_gear(GET_GLOBAL_GEAR(input));
 	}
 	else {
 		// brand new: some defaults
@@ -305,6 +348,7 @@ void olc_show_global(char_data *ch) {
 	
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	ability_data *abil;
 	
 	if (!glb) {
 		return;
@@ -320,34 +364,72 @@ void olc_show_global(char_data *ch) {
 	sprintbit(GET_GLOBAL_FLAGS(glb), global_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", lbuf);
 	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR) {
 	if (GET_GLOBAL_MIN_LEVEL(glb) == 0) {
-		sprintf(buf + strlen(buf), "<&yminlevel&0> none\r\n");
-	}
-	else {
-		sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", GET_GLOBAL_MIN_LEVEL(glb));
+			sprintf(buf + strlen(buf), "<&yminlevel&0> none\r\n");
+		}
+		else {
+			sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", GET_GLOBAL_MIN_LEVEL(glb));
+		}
+	
+		if (GET_GLOBAL_MAX_LEVEL(glb) == 0) {
+			sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
+		}
+		else {
+			sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", GET_GLOBAL_MAX_LEVEL(glb));
+		}
+	
+		// ability required
+		if (!(abil = find_ability_by_vnum(GET_GLOBAL_ABILITY(glb)))) {
+			strcpy(buf1, "none");
+		}
+		else {
+			sprintf(buf1, "%s", ABIL_NAME(abil));
+			if (ABIL_ASSIGNED_SKILL(abil)) {
+				sprintf(buf1 + strlen(buf1), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+			}
+		}
+		sprintf(buf + strlen(buf), "<&yrequiresability&0> %s\r\n", buf1);
 	}
 	
-	if (GET_GLOBAL_MAX_LEVEL(glb) == 0) {
-		sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
-	}
-	else {
-		sprintf(buf + strlen(buf), "<&ymaxlevel&0> %d\r\n", GET_GLOBAL_MAX_LEVEL(glb));
-	}
-
-	// type-based data
+	sprintf(buf + strlen(buf), "<&ypercent&0> %.2f%%\r\n", GET_GLOBAL_PERCENT(glb));
+	
+	// GLOBAL_x: type-based data
 	switch (GET_GLOBAL_TYPE(glb)) {
 		case GLOBAL_MOB_INTERACTIONS: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, lbuf, TRUE);
 			sprintf(buf + strlen(buf), "<&ymobflags&0> %s\r\n", lbuf);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), action_bits, lbuf, TRUE);
 			sprintf(buf + strlen(buf), "<&ymobexclude&0> %s\r\n", lbuf);
+
+			sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
+			if (GET_GLOBAL_INTERACTIONS(glb)) {
+				get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf1);
+				strcat(buf, buf1);
+			}
+			break;
+		}
+		case GLOBAL_MINE_DATA: {
+			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), sector_flags, lbuf, TRUE);
+			sprintf(buf + strlen(buf), "<&ysectorflags&0> %s\r\n", lbuf);
+			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), sector_flags, lbuf, TRUE);
+			sprintf(buf + strlen(buf), "<&ysectorexclude&0> %s\r\n", lbuf);
+			sprintf(buf + strlen(buf), "<&ycapacity&0> %d ore (%d-%d normal, %d-%d deep)\r\n", GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)/2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2.0 * 1.5), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) * 1.5));
+	
+			sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
+			if (GET_GLOBAL_INTERACTIONS(glb)) {
+				get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf1);
+				strcat(buf, buf1);
+			}
+			break;
+		}
+		case GLOBAL_NEWBIE_GEAR: {			
+			void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
+			get_archetype_gear_display(GET_GLOBAL_GEAR(glb), lbuf);
+			sprintf(buf + strlen(buf), "Gear: <\tygear\t0>\r\n%s", GET_GLOBAL_GEAR(glb) ? lbuf : "");
 			break;
 		}
 	}
-	
-	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
-	get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf1);
-	strcat(buf, buf1);
 		
 	page_string(ch->desc, buf, TRUE);
 }
@@ -355,6 +437,50 @@ void olc_show_global(char_data *ch) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// EDIT MODULES ////////////////////////////////////////////////////////////
+
+OLC_MODULE(gedit_ability) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	ability_data *abil;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Require what ability (or 'none')?\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		GET_GLOBAL_ABILITY(glb) = NO_ABIL;
+		
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It will require no ability.\r\n");
+		}
+	}
+	else if (!(abil = find_ability(argument))) {
+		msg_to_char(ch, "Invalid ability '%s'.\r\n", argument);
+	}
+	else {
+		GET_GLOBAL_ABILITY(glb) = ABIL_VNUM(abil);
+		
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It now requires the %s ability.\r\n", ABIL_NAME(abil));
+		}
+	}
+}
+
+
+OLC_MODULE(gedit_capacity) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
+		msg_to_char(ch, "You can't set mine capacity on this type.\r\n");
+	}
+	else {
+		GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) = olc_process_number(ch, argument, "mine capacity", "capacity", 1, 1000, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE));
+	}
+}
 
 
 OLC_MODULE(gedit_flags) {
@@ -371,9 +497,40 @@ OLC_MODULE(gedit_flags) {
 }
 
 
+OLC_MODULE(gedit_gear) {
+	void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear **list);
+	
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR) {
+		msg_to_char(ch, "You can't set gear on this type.\r\n");
+	}
+	else {
+		archedit_process_gear(ch, argument, &GET_GLOBAL_GEAR(glb));
+	}
+}
+
+
 OLC_MODULE(gedit_interaction) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
-	olc_process_interactions(ch, argument, &GET_GLOBAL_INTERACTIONS(glb), TYPE_MOB);
+	int itype = TYPE_MOB;
+	
+	switch (GET_GLOBAL_TYPE(glb)) {
+		case GLOBAL_MOB_INTERACTIONS: {
+			itype = TYPE_MOB;
+			break;
+		}
+		case GLOBAL_MINE_DATA: {
+			itype = TYPE_MINE_DATA;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can't set interactions on this type.\r\n");
+			return;
+		}
+	}
+	
+	olc_process_interactions(ch, argument, &GET_GLOBAL_INTERACTIONS(glb), itype);
 }
 
 
@@ -419,7 +576,48 @@ OLC_MODULE(gedit_name) {
 }
 
 
+OLC_MODULE(gedit_percent) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	GET_GLOBAL_PERCENT(glb) = olc_process_double(ch, argument, "percent", "percent", 0.01, 100.00, GET_GLOBAL_PERCENT(glb));
+}
+
+
+OLC_MODULE(gedit_sectorexclude) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
+		msg_to_char(ch, "You can't set sectorexclude on this type.\r\n");
+	}
+	else {
+		GET_GLOBAL_TYPE_EXCLUDE(glb) = olc_process_flag(ch, argument, "sector", "sectorexclude", sector_flags, GET_GLOBAL_TYPE_EXCLUDE(glb));
+	}
+}
+
+
+OLC_MODULE(gedit_sectorflags) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
+		msg_to_char(ch, "You can't set sectorflags on this type.\r\n");
+	}
+	else {
+		GET_GLOBAL_TYPE_FLAGS(glb) = olc_process_flag(ch, argument, "sector", "sectorflags", sector_flags, GET_GLOBAL_TYPE_FLAGS(glb));
+	}
+}
+
+
 OLC_MODULE(gedit_type) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	int iter, old = GET_GLOBAL_TYPE(glb);
+	
 	GET_GLOBAL_TYPE(glb) = olc_process_type(ch, argument, "type", "type", global_types, GET_GLOBAL_TYPE(glb));
+	
+	// reset excludes/vals if type changes
+	if (GET_GLOBAL_TYPE(glb) != old) {
+		GET_GLOBAL_TYPE_FLAGS(glb) = NOBITS;
+		GET_GLOBAL_TYPE_EXCLUDE(glb) = NOBITS;
+		for (iter = 0; iter < NUM_GLB_VAL_POSITIONS; ++iter) {
+			GET_GLOBAL_VAL(glb, iter) = 0;
+		}
+	}
 }

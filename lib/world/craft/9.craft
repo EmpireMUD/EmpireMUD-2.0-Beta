@@ -1,171 +1,300 @@
 #900
 cart~
-900 1  # 1x a rickety cart
-2 58 eg 40 -1
+900 1
+2 58 en 40 -1
 R
-125 16  # 16x a stack of lumber
+16 16 1 0
 R
-1306 4  # 4x a pouch of nails
+19 4 1 0
+R
+28 1 1 0
 S
 #901
 carriage~
-901 1  # 1x a carriage
-2 59 eg 48 -1
+901 1
+2 59 en 48 -1
 R
-125 24  # 24x a stack of lumber
+16 24 1 0
 R
-1306 6  # 6x a pouch of nails
+19 6 1 0
+R
+28 2 1 0
 S
 #902
 wagon~
-902 1  # 1x a covered wagon
-2 59 eg 52 -1
+902 1
+2 59 en 52 -1
 R
-125 32  # 32x a stack of lumber
+16 32 1 0
 R
-1306 8  # 8x a pouch of nails
+19 8 1 0
 R
-1359 12  # 12x a bolt of cloth
+26 12 1 0
+R
+28 2 1 0
 S
 #903
 catapult~
-903 1  # 1x a catapult
-2 60 eg 80 -1
+903 1
+2 60 en 80 -1
 R
-125 48  # 48x a stack of lumber
+16 48 1 0
 R
-1306 12  # 12x a pouch of nails
+19 12 1 0
+R
+28 4 1 0
 S
 #904
 chair~
-904 1  # 1x a chair
-2 58 eg 10 -1
+904 1
+2 58 en 10 -1
 R
-125 2  # 2x a stack of lumber
+16 2 1 0
 R
-1306 1  # 1x a pouch of nails
+19 1 1 0
 S
 #905
 bench~
-905 1  # 1x a wooden bench
-2 58 eg 10 -1
+905 1
+2 58 en 10 -1
 R
-125 4  # 4x a stack of lumber
+16 4 1 0
 R
-1306 1  # 1x a pouch of nails
+19 1 1 0
 S
 #906
 table~
-906 1  # 1x a long table
-2 58 eg 10 -1
+906 1
+2 58 en 10 -1
 R
-125 4  # 4x a stack of lumber
+16 4 1 0
 R
-1306 1  # 1x a pouch of nails
+19 1 1 0
 S
 #907
 stool~
-907 1  # 1x a stool
-2 58 eg 10 -1
+907 1
+2 58 en 10 -1
 R
-125 2  # 2x a stack of lumber
+16 2 1 0
 R
-1306 1  # 1x a pouch of nails
+19 1 1 0
 S
 #908
 arrows~
-908 1  # 1x a quiver of arrows
+908 1
 2 101 g 4 -1
 R
-125 1  # 1x a stack of lumber
+16 1 1 0
 S
 #909
 shortbow~
-909 1  # 1x a short bow
+909 1
 2 58 g 8 -1
 R
-125 1  # 1x a stack of lumber
+16 1 1 0
 R
-1356 1  # 1x a small piece of leather
+15 1 1 16384
 S
 #910
 longbow~
-910 1  # 1x a long bow
+910 1
 2 58 eg 8 -1
 R
-125 1  # 1x a stack of lumber
+16 1 1 0
 R
-1356 1  # 1x a small piece of leather
+15 1 1 16384
 S
 #912
 lyre~
-912 1  # 1x a lyre
+912 1
 2 58 g 4 -1
 R
-125 1  # 1x a stack of lumber
+16 1 1 0
 S
 #913
 flute~
-913 1  # 1x a wooden flute
+913 1
 2 58 g 4 -1
 R
-125 1  # 1x a stack of lumber
+16 1 1 0
 S
 #914
 walking stick~
-914 1  # 1x a walking stick
+914 1
 2 58 g 6 -1
 R
-121 1  # 1x a stick
+25 1 1 0
 S
 #915
 stake~
-915 1  # 1x a wooden stake
+915 1
 2 58 g 4 -1
 R
-121 1  # 1x a stick
+25 1 1 0
 S
 #916
 beehive~
-916 1  # 1x a large beehive
+916 1
 2 59 eg 24 -1
 R
-125 8  # 8x a stack of lumber
+16 8 1 0
 R
-1306 2  # 2x a pouch of nails
+19 2 1 0
 S
 #917
 throne~
-917 1  # 1x the throne
-2 58 eg 10 -1
+917 1
+2 58 en 10 -1
 R
-125 8  # 8x a stack of lumber
+16 8 1 0
 R
-1306 1  # 1x a pouch of nails
+19 1 1 0
 R
-1359 2  # 2x a bolt of cloth
+26 2 1 0
 S
 #918
 blank sign~
-918 1  # 1x a blank sign
+918 1
 2 58 eg 6 -1
 R
-125 1  # 1x a stack of lumber
+16 1 1 0
 R
-1306 1  # 1x a pouch of nails
+19 1 1 0
 S
 #919
 handle~
-919 1  # 1x a wooden handle
+919 1
 2 -1 g 2 -1
 R
-121 1  # 1x a stick
+25 1 1 0
 S
 #920
 canoe~
-920 1  # 1x a wooden canoe
-2 198 g 10 -1
+920 1
+2 198 n 10 -1
 R
-120 1  # 1x a large tree
+120 1 0 0
+S
+#921
+caravan~
+921 1
+2 264 en 1 -1
+R
+16 40 1 0
+R
+19 10 1 0
+R
+26 20 1 0
+R
+28 4 1 0
+R
+5 4 1 0
+S
+#952
+caravel~
+952 1
+11 61 no 1 -1
+R
+16 35 1 0
+R
+19 70 1 0
+R
+21 2 1 0
+R
+2037 6 0 0
+R
+28 12 1 0
+R
+2133 1 0 0
+S
+#953
+cog~
+953 1
+11 61 no 1 -1
+R
+16 30 1 0
+R
+19 60 1 0
+R
+21 1 1 0
+R
+2037 2 0 0
+R
+28 4 1 0
+R
+2133 1 0 0
+S
+#954
+longship~
+954 1
+11 61 no 1 -1
+R
+16 40 1 0
+R
+19 80 1 0
+R
+21 1 1 0
+R
+2037 4 0 0
+R
+28 8 1 0
+R
+2133 1 0 0
+R
+2134 2 0 0
+S
+#955
+brigantine~
+955 1
+11 50 kno 1 -1
+R
+16 60 1 0
+R
+19 120 1 0
+R
+21 3 1 0
+R
+2037 10 0 0
+R
+28 20 1 0
+R
+2133 2 0 0
+R
+2134 10 0 0
+S
+#956
+carrack~
+956 1
+11 50 kno 1 -1
+R
+16 50 1 0
+R
+19 100 1 0
+R
+21 4 1 0
+R
+2037 12 0 0
+R
+28 24 1 0
+R
+2133 2 0 0
+S
+#957
+hulk~
+957 1
+11 50 kno 1 -1
+R
+16 50 1 0
+R
+19 100 1 0
+R
+21 3 1 0
+R
+2037 6 0 0
+R
+28 12 1 0
+R
+2133 1 0 0
 S
 $

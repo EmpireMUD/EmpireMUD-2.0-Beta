@@ -32,7 +32,6 @@
 extern const char *dirs[];
 
 // external functions
-void besiege_room(room_data *to_room, int damage);
 void death_log(char_data *ch, char_data *killer, int type);
 extern obj_data *die(char_data *ch, char_data *killer);
 extern int determine_best_scale_level(char_data *ch, bool check_group);	// mobact.c
@@ -83,81 +82,6 @@ ACMD(do_assist) {
 		else {
 			act("You can't attack $N!", FALSE, ch, 0, opponent, TO_CHAR);
 		}
-	}
-}
-
-
-ACMD(do_catapult) {
-	struct empire_political_data *emp_pol = NULL;
-	obj_data *catapult;
-	char_data *vict;
-	int dir;
-	empire_data *e;
-	Resource rocks[2] = { {o_ROCK, 12}, END_RESOURCE_LIST };
-	room_data *to_room;
-
-	/* Find a 'pult */
-	for (catapult = ROOM_CONTENTS(IN_ROOM(ch)); catapult; catapult = catapult->next_content)
-		if (GET_OBJ_TYPE(catapult) == ITEM_CART && CART_CAN_FIRE(catapult))
-			break;
-
-	skip_spaces(&argument);
-
-	if (!catapult)
-		msg_to_char(ch, "You don't even have a catapult.\r\n");
-	else if (!*argument)
-		msg_to_char(ch, "Which direction would you like to shoot?\r\n");
-	else if (!has_resources(ch, rocks, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE))
-		{ /* This line intentionally left blank */ }
-	else if ((dir = parse_direction(ch, argument)) == NO_DIR)
-		msg_to_char(ch, "Which direction is that?\r\n");
-	else if (dir >= NUM_2D_DIRS || !(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1])) || to_room == IN_ROOM(ch))
-		msg_to_char(ch, "You can't shoot that way.\r\n");
-	else if (GET_OBJ_VAL(catapult, VAL_CART_FIRING_DATA) > 1)
-		msg_to_char(ch, "You must wait before shooting the catapult again.\r\n");
-	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH))
-		msg_to_char(ch, "You can't shoot from here!\r\n");
-	else if (ROOM_IS_CLOSED(IN_ROOM(ch)))
-		msg_to_char(ch, "You can't shoot from indoors.\r\n");
-	else if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER))
-		msg_to_char(ch, "You can't shoot from this close to the barrier.\r\n");
-	else if (IS_CITY_CENTER(to_room)) {
-		msg_to_char(ch, "You can't shoot at a city center.\r\n");
-	}
-	else if (ROOM_SECT_FLAGGED(to_room, SECTF_START_LOCATION)) {
-		msg_to_char(ch, "You can't besiege a starting location.\r\n");
-	}
-	else {
-		if ((e = ROOM_OWNER(to_room)))
-			emp_pol = find_relation(GET_LOYALTY(ch), e);
-		if (e && (!emp_pol || !IS_SET(emp_pol->type, DIPL_WAR))) {
-			msg_to_char(ch, "You can't attack that acre!\r\n");
-			return;
-		}
-		extract_resources(ch, rocks, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED));
-		sprintf(buf, "You shoot $p %s!", dirs[get_direction_for_char(ch, dir)]);
-		act(buf, FALSE, ch, catapult, 0, TO_CHAR);
-		
-		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
-			if (vict != ch && vict->desc) {
-				sprintf(buf, "$n shoots $p %s!", dirs[get_direction_for_char(vict, dir)]);
-				act(buf, FALSE, ch, catapult, vict, TO_VICT);
-			}
-		}
-		
-		GET_OBJ_VAL(catapult, VAL_CART_FIRING_DATA) = 2;	/* shot timer, 1 = ready to shoot */
-		
-		if (SHOULD_APPEAR(ch)) {
-			appear(ch);
-		}
-
-		if (e && GET_LOYALTY(ch) != e) {
-			trigger_distrust_from_hostile(ch, e);
-		}
-		
-		// fire!
-		besiege_room(to_room, 8);
-		GET_WAIT_STATE(ch) = 5 RL_SEC;
 	}
 }
 
@@ -277,9 +201,9 @@ ACMD(do_flee) {
 	}
 
 	// try more times if FLEET
-	for (i = 0; i < NUM_2D_DIRS * ((!IS_NPC(ch) && HAS_ABILITY(ch, ABIL_FLEET)) ? 2 : 1); i++) {
+	for (i = 0; i < NUM_2D_DIRS * ((!IS_NPC(ch) && has_ability(ch, ABIL_FLEET)) ? 2 : 1); i++) {
 		// chance to fail if not FLEET
-		if ((IS_NPC(ch) || !HAS_ABILITY(ch, ABIL_FLEET)) && number(0, 2) == 0) {
+		if ((IS_NPC(ch) || !has_ability(ch, ABIL_FLEET)) && number(0, 2) == 0) {
 			continue;
 		}
 
@@ -308,7 +232,7 @@ ACMD(do_flee) {
 			was_fighting = FIGHTING(ch);
 			if (perform_move(ch, attempt, TRUE, 0)) {
 				send_to_char("You flee head over heels.\r\n", ch);
-				if (was_fighting) {
+				if (was_fighting && can_gain_exp_from(ch, was_fighting)) {
 					gain_ability_exp(ch, ABIL_FLEET, 5);
 				}
 				GET_WAIT_STATE(ch) = 2 RL_SEC;
@@ -353,7 +277,7 @@ ACMD(do_hit) {
 		}
 	}
 	else if (can_fight(ch, vict)) {
-		if (AFF_FLAGGED(ch, AFF_CHARM) && !IS_NPC(ch->master) && !IS_NPC(vict))
+		if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && !IS_NPC(ch->master) && !IS_NPC(vict))
 			return;
 
 		if (FIGHTING(ch) == vict) {
@@ -370,6 +294,12 @@ ACMD(do_hit) {
 			if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && FIGHTING(ch) && FIGHTING(ch) != vict) {
 				FIGHTING(ch) = vict;
 			}
+			
+			// cancel combat if auto-execute is off and the mob is unconscious after the hit
+			if (FIGHTING(ch) == vict && GET_HEALTH(vict) <= 0 && !WOULD_EXECUTE(ch, vict)) {
+				stop_fighting(ch);
+			}
+			
 			command_lag(ch, WAIT_OTHER);
 		}
 	}
@@ -399,6 +329,7 @@ ACMD(do_respawn) {
 		player_death(ch);
 		char_to_room(ch, find_load_room(ch));
 		GET_LAST_DIR(ch) = NO_DIR;
+		qt_visit_room(ch, IN_ROOM(ch));
 		
 		syslog(SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "%s has respawned at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 		act("$n rises from the dead!", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -408,6 +339,7 @@ ACMD(do_respawn) {
 		SAVE_CHAR(ch);
 		greet_mtrigger(ch, NO_DIR);
 		greet_memory_mtrigger(ch);
+		greet_vtrigger(ch, NO_DIR);
 	}
 }
 
@@ -430,7 +362,7 @@ ACMD(do_shoot) {
 	else if (FIGHTING(ch))
 		msg_to_char(ch, "You're already fighting for your life!\r\n");
 	else if (can_fight(ch, vict)) {
-		if (AFF_FLAGGED(ch, AFF_CHARM) && !IS_NPC(ch->master) && !IS_NPC(vict))
+		if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && !IS_NPC(ch->master) && !IS_NPC(vict))
 			return;
 
 		msg_to_char(ch, "You take aim.\r\n");
@@ -475,7 +407,7 @@ ACMD(do_stake) {
 		if (GET_HEALTH(victim) > 0)
 			GET_POS(victim) = POS_RESTING;
 		REMOVE_BIT(INJURY_FLAGS(victim), INJ_STAKED);
-		obj_to_char_or_room((stake = read_object(o_STAKE, TRUE)), ch);
+		obj_to_char((stake = read_object(o_STAKE, TRUE)), ch);
 		scale_item_to_level(stake, 1);	// min scale
 		load_otrigger(stake);
 	}
@@ -506,8 +438,8 @@ ACMD(do_stake) {
 		if (!IS_VAMPIRE(victim)) {
 			if (!IS_NPC(victim)) {
 				death_log(victim, ch, ATTACK_EXECUTE);
-				add_lore(ch, LORE_PLAYER_KILL, GET_IDNUM(victim));
-				add_lore(victim, LORE_PLAYER_DEATH, GET_IDNUM(ch));
+				add_lore(ch, LORE_PLAYER_KILL, "Killed %s in battle", PERS(victim, victim, TRUE));
+				add_lore(victim, LORE_PLAYER_DEATH, "Slain by %s in battle", PERS(ch, ch, TRUE));
 			}
 			die(victim, ch);	// returns a corpse but we don't need it
 		}

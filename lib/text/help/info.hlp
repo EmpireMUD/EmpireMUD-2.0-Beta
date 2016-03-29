@@ -12,14 +12,10 @@ These are the common map icons:
  &c~~~~&0  River               &b~~~~&0  Ocean               &c~~&g^&c~&0  Swamp
  &G^^^^&0  Jungle              &W,,,,&0  Arctic Tundra
 
- &Y^^&Go&Y^&0  Apples              &Y^o^^&0  Peaches             &Y^^&Ro&Y^&0  Cherries
- &Y::::&0  Barley              &g::::&0  Hops                ::::  Cotton
- &Y;;;;&0  Wheat               &giiii&0  Corn                &Y.&G^&yo&G.&0  Oranges
- &g,,,,&0  Rice                &Y.&G^o&G.&0  Olives              &G....&0  Peas
- &yoooo&0  Gourds
-
  --+-  Road                [--]  Building            \__/  Trench
  vvvv  Fence               vxxv  Gate                VVVV  Wall
+ 
+See HELP CROPS for the icons for various wild crops.
 
 You can find specific buildings in the HELP BUILDING information as well as
 the other help files listed in its "see also".
@@ -149,11 +145,16 @@ in territory claimed by other empires. Bound items will disappear from the
 ground if left on unclaimed land, like normal. They are safe to leave longer on
 claimed land (although not forever) or in your private chest (no time limit).
 
+Bind-on-equip items bind when equipped (gear), consumed (drink containers),
+or used (books, patterns, and recipes).
+
 You cannot unbind items.
 
 See also: TAGS, HOME
 #
-BLOCK "BLOCK CAP"
+BLOCK "BLOCK CAP" "BLOCK STAT" "BLOCK RATING" BLOCKING
+
+(Disambiguation: Did you mean HELP BLOCK COMPONENT ?)
 
 Your block rating, shown on 'score', is your character's bonus chance to block
 attacks. You must have the Shield Block ability, and be holding a shield in
@@ -187,7 +188,7 @@ When a vampire is low on blood, they will not be able to regenerate health
 as quickly (just like being hungry). If a player runs out of blood, he or she
 will die.
 
-See also: ANCIENT BLOOD
+See also: ANCIENT BLOOD, HUNGER
 #
 BOARDS READ WRITE RESPOND
 
@@ -256,7 +257,7 @@ It is added to damage in the same way as Strength.
 
 See also: SCORE
 #
-FIRE "CAMPING FIRE" "COOKING FIRE" "CAMP FIRE"
+"CAMPING FIRE" "COOKING FIRE" "CAMP FIRE"
 
 You can create a cooking fire by lighting a tree or log, using a flint set.
 This will let you cook food, brew potions, or craft pottery.
@@ -336,6 +337,47 @@ on claimed land, or disappear over time on unclaimed land.
 
 See also: DEPOSIT, EXCHANGE, MINT, SPLIT, WITHDRAW
 #
+COMPONENT COMPONENTS RESOURCE RESOURCES
+
+Crafts (including forge, sew, etc), recipes, and buildings can require
+different types of resources:
+
+&cSpecific items&0 - These items are referenced by name, and are listed like
+   "1x imperium ingot".
+
+&cGeneric components&0 - Different items can match the same component requirement,
+   which are written in parentheses like "1x (lumber)". Some components have
+   modifiers like "rare" or "large". An item must have all the correct set of
+   modifiers to match the recipe (but it's okay if it has extra modifiers too).
+   You can see an item's component info with identify, shown in parentheses
+   after the name.
+
+&cLiquids&0 - You need a drink container with the correct type of liquid, which
+   is written like "2 units of milk". The drink container won't be used up by
+   the craft, but its contents will be emptied. If you cancel a craft before
+   it's complete, you'll only get the liquid resources back if you still have
+   drink containers available for them to go into.
+
+&cCoins&0 - If a craft requires coins, they are almost always misc/simple coins
+   (ones that aren't tied to any empire). You will automatically use coins from
+   various empires if you don't have the misc coins to spend. If you cancel a
+   craft before it's complete, you'll get back the specific coins you spent.
+
+&cPools&0 - These include mana, move, and blood points (not to be confused with
+   the blood liquid, which comes from drink containers). In order to build or
+   craft, you must have the entire pool cost available at once. You can't spend
+   your last health or blood point in this way, but be warned: you can get
+   dangerously close to death if the resource requirement is health or blood.
+
+When you dismantle a building, you get back half of the resources you used to
+build it -- but only items (including generic components). Canceling a craft
+before it's finished will refund the entire cost including coins and pools.
+
+The 'keep' command can be used to prevent items in your inventory from being
+used for your craft and building commands.
+
+See also: BUILD, CRAFT, DISMANTLE, FORGE, IDENTIFY, KEEP
+#
 COOLDOWNS "COOL DOWNS" CD
 
 Usage:  cooldowns
@@ -370,8 +412,9 @@ banks will eventually run out. For most resources, you will receive a message
 telling you the area is depleted. For example, digging might tell you the
 ground is too hard and there are no good rocks left.
 
-Most depletions recover over time, at the rate of 1/2 per game year. However,
-mines will never replenish unless you dismantle them completely.
+Most depleted resources recover over time. In each tile, half of the depleted
+resources (not the total resources) will return. However, mines will never
+replenish unless you dismantle them completely.
 
 Forests will spread at their edges over time, creating more trees to chop.
 Desert Groves re-grow on their own, at random.
@@ -399,8 +442,8 @@ See also: ALIAS, PROMPT
 #
 DODGE "DODGE CAP"
 
-Your Dodge rating, shown on 'score', is subtracted from your opponent's To-Hit
-score; the result is their chance to hit you as a percent.
+Your Dodge rating, shown on 'score', determines how much To-Hit your opponent
+needs in order to hit you.
 
 For fighting NPCs, the highest possible dodge chance is 75%. Against players,
 it's 95%. Players' chance of hitting you is based on their to-hit score, but
@@ -425,33 +468,43 @@ come from spells, abilities, scripts, and other sources. They deal damage every
 five seconds until they expire.
 
 Some DoT effects can stack multiple times. The damage shown on your score or
-affects command is the total damage per 5 seconds (base x stacks), and the number at the end
-like (1/5) is the number and maximum number of stacks.
+affects command is the total damage per 5 seconds (base multiplied by stacks),
+and the number at the end (example: 1/5) is the current and maximum number of
+stacks.
 
-Physical DoTs can be removed by firstaid. Magical and poison DoTs can be
-removed by cleanse.
+Physical and poison DoTs can be removed by firstaid and cleanse. Magical and
+fire DoTs can be removed by dispel.
 
 See also: AFFECTS, CLEANSE, DISPEL, FIRSTAID, SCORE
 #
-FARMING CROPS ORCHARDS AGRICULTURE APPLES WHEAT CORN HOPS COTTON BARLEY PEACHES CHERRIES ORANGES RICE OLIVES PEAS GOURDS
+FARMING CROPS ORCHARDS AGRICULTURE APPLES WHEAT CORN HOPS COTTON BARLEY PEACHES CHERRIES ORANGES RICE OLIVES PEAS GOURDS PLANTAINS TOMATOES BANANAS COCONUTS GRAPES PEPPERS POTATOES PLUMS STRAWBERRIES MANGOES BLUEBERRIES COFFEE OATS WATERMELONS
 
 You can plant and manage crops in order to supply food and trade goods to your
 empire. The crops that grow in orchards can be picked; the rest are harvested.
 You can chop down orchards in order to remove them; other crops are removed
-when you harvest them.
+when you harvest them. The crops listed here grow wild on the map; there are
+more crops to be found in adventure zones.
 
- &Y^^&Go&Y^&0  Apples              &Y^o^^&0  Peaches             &Y^^&Ro&Y^&0  Cherries
- &Y::::&0  Barley              &g::::&0  Hops                ::::  Cotton
- &Y;;;;&0  Wheat               &giiii&0  Corn                &Y.&G^&yo&G.&0  Oranges
- &g,,,,&0  Rice                &Y.&G^o&G.&0  Olives              &G....&0  Peas
- &yoooo&0  Gourds
+Temperate crops (plains):
+ &Y^^&Go&Y^&0  Apples              &Y::::&0  Barley               &g%&Bo&g%%&0  Blueberries
+ &Y^^&Ro&Y^&0  Cherries            &Y^&to&Y^^&0  Coffee               &giiii&0  Corn
+ &gxgxx&0  Grapes              &g::::&0  Hops                 &Tiiii&0  Oats
+ &Y^o^^&0  Peaches             &G....&0  Peas                 &g^^&vo&g^&0  Plums
+ &gnnnn&0  Potatoes            &gn&Rv&gnn&0  Strawberries         &Ro&g88&Ro&0  Tomatoes
+ &Y;;;;&0  Wheat
 
-Cotton can be woven into cloth. The rest of the crops are used to make food
-and drink.
+Arid crops (desert):
+ &y.&g/&to&y.&0  Coconuts            &0::::&0  Cotton               &Y.&G^o&G.&0  Olives
+ &Y.&G^&yo&G.&0  Oranges             &gnn&Ri&gn&0  Peppers
 
-Rice and gourds must be planted on plains within 3 tiles of a river. Oranges,
-olives, and cotton only grow in the desert. The rest will grow in ordinary
-plains.
+Tropical crops (partially cleared jungle):
+ &Yd&G\/&Yb&0  Bananas             &G^&Oo&G^&Oo&0  Mangoes              &Gd&g\/&Gb&0  Plantains
+ &Gwwow&0  Watermelons
+
+River crops (plains near river):
+ &yoooo&0  Gourds              &g,,,,&0  Rice
+
+Most crops are used to make food and drink. Some, like cotton, have other uses.
 
 See also: CHOP, COOK, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE
 #
@@ -494,6 +547,22 @@ You can see how long your hostile/rogue flag has left by checking your
 cooldowns.
 
 See also: COOLDOWNS
+#
+HUNGER THIRST HUNGRY THIRSTY STARVING STARVED STARVATION
+
+Over time, you will naturally become hungry and thirsty. This has no effect
+until you accumulate 24 ingame hours' worth of hunger or thirst, at which point
+your regeneration will be greatly slowed. Hunger and thirst penalties do not
+stack. You will continue to accumulate hunger and thirst (making it harder to
+remove these penalties) until 50 hours have passed.
+
+Vampires with low blood pools suffer a starvation penalty identical to hunger
+and thirst.
+
+All timed actions, such as crafting and chores, take twice as long while you
+are hungry, thirsty, or blood-starved.
+
+See also: BLOOD, EAT, UNNATURAL THIRST, SATED THIRST, TIME
 #
 INFRA INFRAVISION
 
@@ -541,9 +610,11 @@ Composite level: This is the sum of your skill and gear levels. It is the
    number used for scaling mobs to fight you. This is the level shown on your
    "score".
 
-Note: You can't use gear that's more than 25 levels above you (50 for BoP
-   items). Your highest recent level is used, so you should still be able to
-   remove all your gear and re-equip it.
+Note: Until level 100, you must be in the same level range as an item
+   (1-50, 50-75, 75-100, or 101+) or higher to equip it. After level 100, you
+   can't use gear that's more than 25 levels above you (50 for BoP items). Your
+   highest recent level is used, so you should still be able to remove all your
+   gear and re-equip it.
 
 See also: CLASS, SCALING
 #
@@ -559,10 +630,10 @@ Do not try to get out of a fight by breaking link. You will likely still die.
 MANA "MANA POINTS" "MANA POOL" "MAGIC POINTS"
 
 The mana pool is the amount of magical energy you can channel before you must
-stop to recover some. All players begin with 50 mana points and start to rise
-around level 80. Your base mana at level 100 is based on your class.
+stop to recover some. All players begin with 50 mana points and start to gain
+more around level 75. Your base mana at level 100 is based on your class.
 
-See also: CLASS, GIFT OF NATURE
+See also: ARCANE POWER, CLASS, GIFT OF NATURE, SOLAR POWER
 #
 MOVE MOVES "MOVE POINTS" "MOVEMENT POINTS"
 
@@ -570,10 +641,12 @@ Move points are the basic energy pool for physical effort. It takes move points
 to walk around, and it takes move points to use many physical abilities like
 Kick or Shadowstep.
 
-All players begin with 100 move points and start to rise around level 80. Your
-base move points at level 100 is based on your class. The easiest ways to get
-more move points at any level are to make a walking stick or a good pair of
+All players begin with 100 move points and start to gain more around level 75.
+Your base move points at level 100 is based on your class. The easiest ways to
+get more move points at any level are to make a walking stick or a good pair of
 shoes.
+
+See also: FLY, RIDE, STAMINA, VIGOR
 #
 MSDP "MUD SERVER DATA PROTOCOL" "MSDP VARIABLES" "MSDP VARS"
 
@@ -712,6 +785,19 @@ flag will remain active for 5 minutes after you shut it off.
 
 See also: TOGGLE
 #
+"QUEST ITEM" "QUEST OBJECT" "QUEST FLAG"
+
+Items marked (quest) are used only when you are on the quest to which they
+belong. You can't pick up a quest item if you're not on the quest, and you
+can never drop a quest item while you're on the quest.
+
+Dropping or finishing a quest will automatically remove quets items from your
+inventory and gear.
+
+You can identify items to see which quest they belong to.
+
+See also: IDENTIFY
+#
 RESIST-MAGICAL "RESIST MAGICAL" "MAGICAL RESISTANCE"
 
 Your magic resistance is a measure of how much damage your character can ignore
@@ -768,20 +854,51 @@ See also: CONSIDER, LEVELS, SCALABLE CRAFTS
 SCAN
 
 Usage:  scan <direction>
-        scan <tile name>
+        scan <tile/vehicle name>
 
 This command shows you the same information as the screen-reader map display,
 but in only one direction. The distance you see on a scan is based on your
 mapsize.
 
-You can also scan for nearby tiles matching a given keyword, such as a building
-or crop name. It will scan a distance up to your mapsize.
+You can also scan for nearby tiles matching a given keyword, such as a crop,
+building, or vehicle name. It will scan a distance up to your mapsize.
 
 Example:
  > scan southwest
  southwest: River, River, River, Swamp, Overgrown Forest, Road, Overgrown Forest, Jungle, Jungle
 
 See also: MAPSIZE, SCREEN-READERS
+#
+"SHIP ROOMS" "SHIP DESIGNATE" "DESIGNATE ON SHIPS"
+
+Usage:  designate <direction> <room>
+        redesignate <room>
+
+You can designate rooms on some ships. These have their own list of available
+rooms and can only be designated in shipboard directions (fore, aft, starboard,
+port, up, and down). Some ships come with pre-designated rooms, and you can't
+always redesignate those.
+
+Some ship rooms are above-deck and show you the map above their description;
+others are indoors and don't show this.
+
+Ship designate types:
+ Aftercastle
+ Below Deck
+ Bilge
+ Bow (outdoors)
+ Bunk Room - bedroom
+ Captain's Cabin - bedroom
+ Cargo Hold (outdoors)
+ Crow's Nest (outdoors)
+ Forecastle (outdoors)
+ Helm (outdoors)
+ On Deck (outdoors)
+ Quarterdeck (outdoors)
+ Stern (outdoors)
+ The Galley - cooking fire
+
+See also: DESIGNATE
 #
 SHOVEL
 
@@ -853,10 +970,10 @@ a base to-hit of 50 with no gear, representing a 50% chance to hit a level 1
 mob.
 
 Players always have a minimum of 5% final chance to hit (mobs have 25%), so
-long as they're within 50 levels of the target. Your opponent's Dodge rating
-is subtracted from your to-hit to determine your final chance to-hit. You can
-compute the "hit cap" -- the point at which you'll hit 100% of the time --
-based on the level of the mob you're fighting.
+long as they're within 50 levels of the target. Your actual chance to hit is
+based on your opponent's Dodge rating. You can compute the "hit cap" -- the
+point at which you'll hit 100% of the time -- based on the level of the mob
+you're fighting.
 
 Hit cap:
 - Start with the mob's level, minus 50 (not less than 0)
@@ -883,6 +1000,18 @@ around the world. These types of transportation require harnessed animals to
 lead them, but can store far more than you can carry alone.
 
 See also: WOODWORKING, RIDE, HARNESS, PUT, GET
+#
+VEHICLE VEH
+
+A vehicle (sometimes abbreviated "veh", especially in the code) is a type of
+"thing" that includes canoes, carts, ships, and even furniture. Vehicles can
+have many different properties -- some can be lead, dragged, boarded, or burnt.
+
+Vehicles appear in the room when you look, colored &wgray&0, between objects and
+people.
+
+See also: BOARD, CUSTOMIZE, DESIGNATE, DISEMBARK, DRAG, DRIVE, HARNESS,
+LAND VEHICLES, LEAD, LIGHT, REPAIR, SCRAP, SHIPS, SIT
 #
 WHEREAMI "WHERE AM I"
 

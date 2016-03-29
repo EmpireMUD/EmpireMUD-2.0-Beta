@@ -1,0 +1,213 @@
+OTRIG "OBJECT TRIGGERS" "OBJ TRIGGERS" "TRIGEDIT OBJECTS" OBJECT-TRIGGERS TRIGEDIT-OBJECTS OBJ-TRIGGERS
+
+Objects are fully scriptable in EmpireMUD, and are able to fire triggers,
+can execute commands, and can be stored as variables.
+
+See also:
+- List of variables: &yOTRIG VARS&0
+- List of triggers: &yOTRIG TYPES&0
+- List of commands: &yOTRIG COMMANDS&0
+#d
+"CONSUME TRIGGER" "OTRIG CONSUME" TRIGEDIT-OBJ-CONSUME
+
+Consume (object trigger)
+
+Supported commands:  drink, eat, quaff, read
+Argument type:  percent chance to execute
+Return value:  return 0 to prevent the consumption
+
+Activated any time a character attempts to consume or use the object.
+
+Variables:
+  &c%actor%&0 - The character attempting to consume the object.
+  &c%self%&0 - The object being consumed.
+  &c%command%&0 - Which consume command was used (e.g. drink).
+#d
+"FINISH TRIGGER" "OTRIG FINISH" TRIGEDIT-OBJ-FINISH
+
+Finish (object trigger)
+
+Supported actions:  read book
+Argument type:  percent chance to execute
+Return value:  return 0 to squelch the normal finish message, and prevent
+   further finish triggers from running
+
+Triggered when a person finishes an action with the object. In the case of
+books, this triggers after the last paragraph is read.
+
+Variables:
+  &c%actor%&0 - The character finishing the book.
+  &c%self%&0 - The object being finished.
+#d
+"GET TRIGGER" "OTRIG GET" TRIGEDIT-OBJ-GET
+
+Get (object trigger)
+
+Argument type:  percent chance to execute
+Return value:  return 0 to cancel getting the object
+
+Activated any time a character attempts to pick up the object.
+
+Variables:
+  &c%actor%&0 - The character trying to get the object.
+#d
+"GIVE TRIGGER" "OTRIG GIVE" TRIGEDIT-OBJ-GIVE
+
+Give (object trigger)
+
+Argument type:  percent chance to execute
+Return value:  return 0 to prevent giving the item
+
+Activated when a player attempts to give this object to another character.
+
+Variables:
+  &c%actor%&0 - The character giving away the object.
+  &c%victim%&0 - The potential recipient of the object.
+#d
+OSETVAL %SETVAL%
+
+Usage:  osetval <position> <value>
+
+Osetval lets you alter the three numeric object values (of the object running
+the script). The meaning of the values depends on the object type.
+
+Value position numbers are: 0, 1, 2
+
+Note: You must use "osetval" (not "%setval%") for this.
+
+See also: OBJECT VALUES
+#d
+OTIMER %TIMER% 
+
+Usage:  otimer <value>
+
+Set the decay timer of this object to value. Useful for objects with timer
+triggers. Setting the timer to -1 makes it never decay.
+
+Note: You must use "otimer" (not "%timer%") for this.
+#d
+"OTRIG COMMANDS" "OBJECT COMMANDS" TRIGEDIT-OBJ-COMMANDS
+
+The following commands are available in object triggers (see their individual
+help files for more info):
+
+&c%adventurecomplete%&0 - Triggers completion of the adventure it's in.
+&c%aoe%&0 - Deals scaled damage to all people in the room.
+&c%at%&0 - Performs a command as if it's at that location.
+&c%buildingecho%&0 - Sends a message to everyone at a certain map location.
+&c%damage%&0 - Deals scaled damage to a person.
+&c%door%&0 - Various functions for changing doors and exits.
+&c%dot%&0 - Adds a damage-over-time effect to a person.
+&c%echo%&0 - Sends a message to the whole room.
+&c%echoaround%&0 - Sends a message to all but one target.
+&c%echoneither%&0 - Sends a message to all but two people.
+&c%force%&0 - Forces a person to execute a command.
+&c%load%&0 - Loads a mob, object, etc.
+&c%morph%&0 - Causes a person to morph.
+&c%own%&0 - Changes ownership on something.
+&c%purge%&0 - Purges a mob, object, etc.
+&c%quest%&0 - Modifies a player's quests.
+&c%regionecho%&0 - Sends a message to everyone in a given map radius.
+&c%scale%&0 - Changes the scale level of a target.
+&c%send%&0 - Send a message to one person.
+&c%siege%&0 - Deals siege damage to a vehicle or room.
+&c%teleport%&0 - Moves people to another location.
+&c%terracrop%&0 - Changes the terrain to a certain crop type.
+&c%terraform%&0 - Changes the terrain to a certain sector type.
+&c%transform%&0 - NOT CURRENTLY IMPLEMENTED.
+&c%vehicleecho%&0 - Sends a message to everyone in/on a vehicle.
+&cosetval&0 - Change any of the object's 3 values.
+&cotimer&0 - Change the object's timer.
+#d
+"OTRIG TYPES" TRIGEDIT-OBJ-TYPES "OBJ TRIGGER TYPES" "OBJECT TRIGGER TYPES"
+
+Objects can trigger on the following events:
+&cGlobal&0 - Can happen even without players present (combine with Random).
+&cRandom&0 - Triggers randomly when players are around.
+&cCommand&0 - Responds to a player command.
+&cTimer&0 - Triggers when the object's timer expires.
+&cGet&0 - Triggers when picked up.
+&cDrop&0 - Triggers when dropped/put.
+&cGive&0 - Triggers when given to someone.
+&cWear&0 - Triggers when worn.
+&cRemove&0 - Triggers when removed.
+&cLoad&0 - Triggers when the object loads.
+&cAbility&0 - Triggers when an ability targets the object.
+&cLeave&0 - Triggers when a player tries to leave.
+&cConsume&0 - Triggers when used in some way (quaffed, eaten, drank from).
+&cFinish&0 - Triggers when the object finishes being used (read).
+&cStart-Quest&0 - Triggers when a player tries to start a quest.
+&cFinish-Quest&0 - Triggers when a player tries to turn in a quest.
+
+For each type, there is a help file named &yOTRIG <type>&0.
+#d
+"OTRIG VARS" "OTRIG VARIABLES" OBJ-VARS TRIGEDIT-OBJ-VAR TRIGEDIT-VARIABLES-OBJECTS
+
+All object scripts provide the &c%self%&0 variable.
+
+When using field  - The variable returns:
+&ccarried_by&0 - The id of the character carrying the object, or an empty return.
+&ccontents&0 - Gives the first object in a container.
+&ccount(str)&0 - Number of matching items (name/vnum) inside it.
+&cempire&0 - The last empire that controlled the object, if any.
+&cflag(FLAG)&0 - Togglesthe flag then returns whether or not the flag is on.
+&chas_in(str)&0 - Has an object (name/vnum) inside it.
+&cid&0 - The unique id of the object.
+&cis_flagged(FLAG)&0 - Returns whether or not the flag is on.
+&cis_inroom&0 - Returns true if object is in room.
+&cis_name(str)&0 - Returns true if str contains names for the object.
+&cmaterial&0 - Name of what the object is made out of, e.g. GOLD.
+&cname&0 - The list of key words of the object.
+&cnext_in_list&0 - The id of the next object in the characters inventory, or an
+   empty return
+&croom&0 - Returns the room id the object is in.
+&cshortdesc&0 - The name of the object that players see.
+&csize&0 - Inventory size of the object.
+&ctimer&0 - The timer of the object.
+&ctype&0 - The type of object, such as WAND, ARMOR, or KEY.
+&cval0&0 - Returns the current value 0 of the object, defined here.
+&cval1&0 - Returns the current value 1 of the object, defined here.
+&cval2&0 - Returns the current value 2 of the object, defined here.
+&cvnum&0 - The virtual number of the object.
+&cworn_by&0 - The id of the character wearing the object, or an empty return.
+
+See also: EMPIRE VARS, OEDIT FLAGS
+#d
+"REMOVE TRIGGER" "OTRIG REMOVE" TRIGEDIT-OBJ-REMOVE
+
+Disambiguation: See &yDETACH&0 and &yTDETACH&0 for removing triggers.
+
+Remove (object trigger)
+
+Return value:  return 0 to prevent removing the item
+
+Activated each time a character is wearing this object and tries to remove it.
+
+Variables:
+  &c%actor%&0 - The character attempting to remove the object.
+#d
+"TIMER TRIGGER" "OTRIG TIMER" TRIGEDIT-OBJ-TIMER
+
+Timer (object trigger)
+
+Return value:  return 0 to prevent the object from decaying normally
+
+Timer triggers occur when an object's timer expires, right before the object
+would be extracted. If you want to prevent the object's extraction, you should
+use the "otimer" command to change its timer to -1 (infinite) or to a new
+positive value, then return 0 from the script.
+
+See also: OTIMER
+#d
+"WEAR TRIGGER" "OTRIG WEAR" TRIGEDIT-OBJ-WEAR
+
+Wear (object trigger)
+
+Return value:  return 0 to prevent wearing the item
+
+Activated each time a character attempts to wear the object.
+
+Variables:
+  &c%actor%&0 - The character attempting to wear the object.
+#d
+$~

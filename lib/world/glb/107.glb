@@ -1,0 +1,31 @@
+#10735
+Misplaced Mother Goose~
+0 0 0 0 0-4
+E
+-1 100.00
+0 0 0
+I 4 10730 6.00 1 a  # LOOT: a fiddle
+I 4 10732 6.00 1 a  # LOOT: a pail
+I 4 10734 6.00 1 a  # LOOT: a candlestick
+I 4 10737 6.00 1 a  # LOOT: a fatty ham
+I 4 10739 6.00 1 a  # LOOT: a Christmas pie
+I 4 10741 6.00 1 a  # LOOT: curds and whey
+I 4 10744 6.00 1 a  # LOOT: a bell on a blue ribbon
+I 4 10746 6.00 1 a  # LOOT: a leathery broth
+S
+#10736
+Misplaced Mother Goose~
+0 0 0 0 5-25
+E
+-1 100.00
+0 0 0
+I 4 10730 0.60 1 a  # LOOT: a fiddle
+I 4 10732 0.60 1 a  # LOOT: a pail
+I 4 10734 0.60 1 a  # LOOT: a candlestick
+I 4 10737 0.60 1 a  # LOOT: a fatty ham
+I 4 10739 0.60 1 a  # LOOT: a Christmas pie
+I 4 10741 0.60 1 a  # LOOT: curds and whey
+I 4 10744 0.60 1 a  # LOOT: a bell on a blue ribbon
+I 4 10746 0.60 1 a  # LOOT: a leathery broth
+S
+$

@@ -1,49 +1,60 @@
 #1306
 nails~
-1306 4  # 4x a pouch of nails
+1306 4
 1 51 0 2 -1
 R
-175 1  # 1x an iron ingot
+18 1 1 262144
 S
 #1307
 violet dye~
-1307 1  # 1x deadly violet dye
+1307 1
 2 198 c 4 -1
 R
-3015 2  # 2x some red berries
+3015 2 0 0
 R
-1205 1  # 1x some bileberries
+1205 1 0 0
 S
 #1308
 orange dye~
-1308 1  # 1x deep orange dye
+1308 1
 2 198 c 4 -1
 R
-3009 2  # 2x an orange
+3009 2 0 0
 R
-1303 1  # 1x a magenta arrowfish
+1303 1 0 0
 S
 #1309
 coin mill~
-1309 1  # 1x a heavy coin mill
+1309 1
 1 51 0 24 -1
 R
-175 24  # 24x an iron ingot
+175 24 0 0
 R
-177 2  # 2x an imperium ingot
+177 2 0 0
 S
-#1358
-wool cloth~
-1359 1  # 1x a bolt of cloth
-9 55 0 12 -1
+#1310
+lucky statuette~
+1310 1
+2 202 a 6 1305
 R
-1358 2  # 2x some wool
+1305 1 0 0
+R
+1300 1 0 0
+R
+4 1 1 0
 S
 #1359
 cloth~
-1359 1  # 1x a bolt of cloth
+1359 1
 9 55 0 12 -1
 R
-144 2  # 2x a basket of cotton
+144 2 0 0
+S
+#1360
+wool cloth~
+1360 1
+9 55 0 12 -1
+R
+1358 2 0 0
 S
 $

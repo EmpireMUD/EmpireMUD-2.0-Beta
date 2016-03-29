@@ -1,0 +1,223 @@
+#500
+werewolf savage~
+a savage werewolf~
+A savage werewolf stands over you, snarling and baring its teeth.~
+h 10 28 0 0
+1 50 212 -1
+A
+21 2
+A
+17 1
+A
+11 1
+A
+18 -2
+A
+16 -1
+S
+#501
+werewolf towering~
+a towering werewolf~
+A towering werewolf looms over you, covered with terrible scars.~
+h 10 28 0 0
+1 50 213 -1
+A
+15 3
+A
+18 2
+A
+14 1
+A
+16 -2
+A
+7 -2
+A
+9 -2
+S
+#502
+werewolf sage~
+a sage werewolf~
+A sage werewolf stands in serene contemplation.~
+h 28 28 0 0
+1 50 214 -1
+A
+23 3
+A
+7 2
+A
+1 1
+A
+22 -2
+A
+18 -2
+A
+17 -2
+S
+#503
+deer white-tailed tailed~
+a deer~
+A white-tailed deer is grazing here.~
+cej 9 0 100 0
+2 25 215 -1
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+S
+#504
+raccoon~
+a raccoon~
+A raccoon is cleaning its paws.~
+cej 9 0 100 0
+2 25 215 -1
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+S
+#505
+turtle forest~
+a forest turtle~
+A forest turtle is munching on something.~
+cej 9 0 100 0
+2 25 215 -1
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+S
+#506
+ostrich~
+an ostrich~
+An ostrich ruffles its feathers and backs away from you.~
+cfj 11 0 100 0
+2 25 215 -1
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+S
+#507
+bobcat cat curious~
+a bobcat~
+A curious bobcat is sitting here, waiting.~
+cfj 10 0 100 0
+2 25 215 -1
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+S
+#508
+rattlesnake snake sidewinder~
+a sidewinder~
+A sidewinder rattlesnake is coiled and rattling.~
+cfj 9 5 100 0
+2 25 215 -1
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+S
+#509
+tapir~
+a tapir~
+A tapir is rooting around a bush.~
+cgj 9 0 100 0
+2 25 215 -1
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+S
+#510
+monkey brown little~
+a monkey~
+A little brown monkey is walking along a low branch.~
+cgj 9 0 100 0
+2 25 215 -1
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+S
+#511
+muskrat~
+a muskrat~
+A muskrat is digging around.~
+cgj 9 0 100 0
+2 25 215 -1
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+S
+#512
+werewolf astral~
+an astral werewolf~
+An astral werewolf stands here, head held high.~
+h 28 28 0 0
+1 50 267 -1
+A
+22 3
+A
+17 2
+A
+9 1
+A
+23 -2
+A
+18 -2
+A
+12 -2
+S
+#513
+werewolf~
+a werewolf~
+A werewolf hunches low, warily eyeing you.~
+0 10 28 0 0
+1 50 269 -1
+A
+15 1
+A
+17 1
+A
+18 1
+S
+$

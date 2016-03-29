@@ -96,9 +96,9 @@ These earrings look like they were quite nice once, and give you a rustic look.
 0 0 0
 3 0
 A
-4 2
+4 2 0
 A
-9 1
+9 1 0
 S
 #10409
 chain steel~
@@ -110,9 +110,9 @@ The chain looks just long enough to wear around your neck.
 0 0 0
 2 0
 A
-17 3
+17 3 0
 A
-9 1
+9 1 0
 S
 #10410
 bracers ringmail pair~
@@ -125,9 +125,9 @@ well-maintained.
 0 0 0
 2 0
 A
-18 3
+18 3 0
 A
-13 1
+13 1 0
 S
 #10411
 ring pearls~
@@ -139,9 +139,9 @@ This shimmering ring seems to be made from fused pearls.
 0 0 0
 14 0
 A
-23 2
+23 2 0
 A
-7 1
+7 1 0
 S
 #10412
 dress village fine~
@@ -153,7 +153,7 @@ The dress is certainly rural, but has its own sort of charm.
 0 0 0
 11 0
 A
-4 1
+4 1 0
 S
 #10413
 suit village handsome~
@@ -166,7 +166,7 @@ rustic, rural charm that is not soon forgotten.
 0 0 0
 11 0
 A
-4 1
+4 1 0
 S
 #10414
 band imperium wedding~
@@ -178,11 +178,11 @@ Though the ring looks old, it has not rusted.
 0 0 0
 2 0
 A
-15 2
+15 2 0
 A
-18 1
+18 1 0
 A
-13 1
+13 1 0
 S
 #10415
 necklace cloth heirloom~
@@ -195,11 +195,11 @@ has the same gorgeous quality as the day it was made.
 0 0 0
 2 0
 A
-8 1
+8 1 0
 A
-7 1
+7 1 0
 A
-16 1
+16 1 0
 S
 #10416
 mace bone giant~
@@ -211,9 +211,9 @@ It looks like the mace's handle is made from the bone of a giant!
 0 1 5
 14 0
 A
-15 3
+15 3 0
 A
-13 1
+13 1 0
 S
 #10417
 cloak tattered manasilk~
@@ -225,11 +225,11 @@ This cloak was once made of fine manasilk. Now, it's in tatters.
 0 0 0
 11 0
 A
-8 1
+8 1 0
 A
-23 2
+23 2 0
 A
-7 1
+7 1 0
 S
 #10418
 whip horse skeletal~
@@ -252,11 +252,11 @@ The boots seem to be made for walkin'.
 0 0 0
 11 0
 A
-7 1
+7 1 0
 A
-16 3
+16 3 0
 A
-22 1
+22 1 0
 S
 #10420
 crop mammoth skeletal~
@@ -279,9 +279,9 @@ This spear looks like it could be used to take down a mammoth!
 0 3 3
 0 0
 A
-17 1
+17 1 0
 A
-9 1
+9 1 0
 S
 #10422
 cloak imperium-weave weave~
@@ -294,11 +294,11 @@ over war mammoths.
 3 0 0
 2 0
 A
-9 -1
+9 -1 0
 A
-18 3
+18 3 0
 A
-12 1
+12 1 0
 S
 #10423
 shackles undead~
@@ -310,11 +310,11 @@ These shackles look like they could be used to bind a ghost!
 0 0 0
 11 0
 A
-16 2
+16 2 0
 A
-7 2
+7 2 0
 A
-23 1
+23 1 0
 S
 #10424
 leg necrofiend disjointed~
@@ -327,9 +327,9 @@ sort of whip!
 0 4 7
 7 0
 A
-17 1
+17 1 0
 A
-1 1
+1 1 0
 S
 #10425
 shield studded bone~
@@ -342,9 +342,9 @@ imperium. You'd hate to have been the raw materials for one of these.
 0 0 0
 14 0
 A
-13 4
+13 4 0
 A
-1 1
+1 1 0
 S
 #10426
 majesty necrofiend's aura strange~
@@ -356,13 +356,13 @@ It has all the majesty of a hideous necrofiend.
 0 0 0
 10 0
 A
-7 1
+7 1 0
 A
-8 1
+8 1 0
 A
-23 1
+23 1 0
 A
-16 1
+16 1 0
 S
 #10427
 flame infernomancer's magical~
@@ -374,11 +374,11 @@ This glinting magical flame has the potential to do a lot of damage.
 0 1 16
 10 0
 A
-8 1
+8 1 0
 A
-16 1
+16 1 0
 A
-22 1
+22 1 0
 S
 #10428
 flame purifying white glinting~
@@ -390,9 +390,9 @@ This beautiful fire looks like it could heal as much as it could damage.
 0 0 0
 10 0
 A
-23 3
+23 3 0
 A
-7 1
+7 1 0
 S
 #10429
 mask terrifying leather~
@@ -404,13 +404,13 @@ The mask is stained in blood, and has fangs carved from its mouth.
 1 0 0
 0 0
 A
-17 1
+17 1 0
 A
-2 1
+2 1 0
 A
-21 1
+21 1 0
 A
-1 1
+1 1 0
 S
 #10430
 staff twisted necromancer's~
@@ -422,7 +422,7 @@ This twisted old staff is crawling with maggots!
 0 4 19
 0 0
 A
-17 1
+17 1 0
 S
 #10431
 gauntlets pair ghoulsbane~
@@ -435,11 +435,11 @@ against ghouls of all sorts.
 1 0 0
 7 0
 A
-17 1
+17 1 0
 A
-1 1
+1 1 0
 A
-21 2
+21 2 0
 S
 #10432
 skirt mail necrotic~
@@ -453,13 +453,13 @@ stronger.
 3 0 0
 2 0
 A
-21 -3
+21 -3 0
 A
-13 2
+13 2 0
 A
-15 2
+15 2 0
 A
-18 2
+18 2 0
 S
 #10433
 weapon fiendclaw claw vicious~
@@ -471,11 +471,11 @@ This huge claw would fit right over your hand!
 0 1 10
 0 0
 A
-15 2
+15 2 0
 A
-13 2
+13 2 0
 A
-18 1
+18 1 0
 S
 #10434
 gloves lace deathlace pair~
@@ -488,11 +488,11 @@ receiving end of their wrath.
 0 0 0
 11 0
 A
-16 1
+16 1 0
 A
-22 2
+22 2 0
 A
-17 2
+17 2 0
 S
 #10435
 hand hanged man's~
@@ -504,11 +504,11 @@ This hand, though slightly rotted, looks as fresh as the day it was hanged.
 0 0 0
 7 0
 A
-17 2
+17 2 0
 A
-21 1
+21 1 0
 A
-9 1
+9 1 0
 S
 #10450
 grate sewer~
@@ -542,9 +542,9 @@ The ring is made of copper, but it shines like gold.
 0 0 0
 13 0
 A
-8 1
+8 1 0
 A
-9 1
+9 1 0
 S
 #10453
 necklace charm bone~
@@ -556,9 +556,9 @@ The necklace looks to be made mostly from chicken bones.
 0 0 0
 14 0
 A
-7 2
+7 2 0
 A
-16 1
+16 1 0
 S
 #10454
 wand chicken-bone bone~
@@ -571,7 +571,7 @@ arcs between the tips of the wand, enough to make your hair stand up on end.
 0 3 21
 14 0
 A
-7 1
+7 1 0
 S
 #10455
 tome goblinward ward~
@@ -583,11 +583,11 @@ This tome is written in goblinese, and barely legible at that.
 0 0 0
 7 0
 A
-8 1
+8 1 0
 A
-9 1
+9 1 0
 A
-16 1
+16 1 0
 S
 #10456
 shawl leopard violet~
@@ -599,9 +599,9 @@ This goblincraft shawl may be the height of fashion somewhere, but not here.
 0 0 0
 7 0
 A
-7 2
+7 2 0
 A
-16 1
+16 1 0
 C
 0 100
 S
@@ -616,11 +616,11 @@ wildfire.
 0 0 0
 7 0
 A
-9 2
+9 2 0
 A
-8 1
+8 1 0
 A
-16 1
+16 1 0
 C
 0 100
 S
@@ -634,9 +634,9 @@ This ring hides a tiny compartment for a bit of poison.
 0 0 0
 13 0
 A
-1 1
+1 1 0
 A
-17 2
+17 2 0
 S
 #10459
 chain copper gaudy~
@@ -648,11 +648,11 @@ This goblincraft chain appears to spell out "BLING" in goblinese.
 0 0 0
 13 0
 A
-2 1
+2 1 0
 A
-17 1
+17 1 0
 A
-21 1
+21 1 0
 S
 #10460
 axe someone else's elses~
@@ -664,7 +664,7 @@ This axe looks too nice to have been made by the goblin you got it from.
 0 3 2
 2 0
 A
-1 1
+1 1 0
 S
 #10461
 dagger giant~
@@ -676,7 +676,7 @@ This is a giant dagger -- or perhaps a goblin longsword.
 0 2 4
 2 0
 A
-9 2
+9 2 0
 S
 #10462
 cloak rat-fur fur~
@@ -688,9 +688,9 @@ This goblincraft cloak looks to be sewn from a dozen rats.
 1 0 0
 7 0
 A
-2 1
+2 1 0
 A
-17 2
+17 2 0
 C
 0 100
 S
@@ -704,11 +704,11 @@ These gauntlets are unmistakably goblincraft, and smell of pine.
 1 0 0
 0 0
 A
-1 1
+1 1 0
 A
-6 1
+6 1 0
 A
-17 1
+17 1 0
 C
 0 100
 S
@@ -722,9 +722,9 @@ This ring is made from volcanic glass. Luckily, it's made for a large goblin.
 0 0 0
 8 0
 A
-2 1
+2 1 0
 A
-18 1
+18 1 0
 S
 #10465
 charm blacksmiths blacksmith's~
@@ -736,9 +736,9 @@ This charm appears to have been made by a goblin, but you're not sure how.
 0 0 0
 2 0
 A
-13 1
+13 1 0
 A
-12 1
+12 1 0
 S
 #10466
 hammer goblinsmiths goblinsmith's~
@@ -750,11 +750,11 @@ This hammer has made many a goblincraft weapon.
 0 1 6
 2 0
 A
-2 1
+2 1 0
 A
-12 1
+12 1 0
 A
-24 1
+24 1 0
 S
 #10467
 shield skull wargskull~
@@ -766,9 +766,9 @@ This shield is made from a warg skull, coated in imperium!
 0 0 0
 2 0
 A
-13 2
+13 2 0
 A
-15 1
+15 1 0
 S
 #10468
 cloak mesh~
@@ -781,9 +781,9 @@ tongue like a goblin, you can't say that five times fast.
 3 0 0
 2 0
 A
-12 1
+12 1 0
 A
-24 1
+24 1 0
 C
 0 100
 S
@@ -797,9 +797,9 @@ These goblincraft gauntlets are lined with coarse rat fur.
 3 0 0
 2 0
 A
-18 1
+18 1 0
 A
-13 1
+13 1 0
 C
 0 100
 S
@@ -814,9 +814,9 @@ obsession with rat fur is.
 0 0 0
 7 0
 A
-6 1
+6 1 0
 A
-3 1
+3 1 0
 S
 #10471
 bag goblin go-bag~
@@ -867,13 +867,8 @@ pattern violet leopard shawl~
 the violet leopard shawl pattern~
 The violet leopard shawl pattern is lying here.~
 Sew (Magical Vestments): violet leopard shawl
-  6x big cat pelt
-  3x deadly violet dye
-  6x rat skin
-  4x ingot of nocturnium
-  4x yellow lightning stone
 ~
-3 0 a 2
+3 0 a 3
 0 0 0
 0 0
 S
@@ -882,13 +877,8 @@ pattern wildfire gloves~
 the wildfire gloves pattern~
 The wildfire gloves pattern is lying here.~
 Sew (Magical Vestments): wildfire gloves
-  6x rat skin
-  2x deadly violet dye
-  1x wild fire
-  4x ingot of nocturnium
-  4x yellow lightning stone
 ~
-3 0 a 3
+3 0 a 4
 0 0 0
 0 0
 S
@@ -897,12 +887,8 @@ pattern cloak rat-fur fur~
 the rat-fur cloak pattern~
 The rat-fur cloak pattern is lying here.~
 Sew (Dangerous Leathers): rat-fur cloak
-  6x large piece of leather
-  6x rat skin
-  4x imperium ingot
-  4x red bloodstone
 ~
-3 0 a 3
+3 0 a 4
 0 0 0
 0 0
 S
@@ -911,12 +897,8 @@ pattern wooden gauntlets~
 the wooden gauntlets pattern~
 The wooden gauntlets pattern is lying here.~
 Craft (Dangerous Leathers): wooden gauntlets
-  2x stack of lumber
-  6x rat skin
-  4x imperium ingot
-  4x red bloodstone
 ~
-3 0 a 3
+3 0 a 4
 0 0 0
 0 0
 S
@@ -925,12 +907,8 @@ pattern cloak mesh~
 the mesh cloak pattern~
 The mesh cloak pattern is lying here.~
 Forge (Imperial Armors): mesh cloak
-  8x iron ingot
-  4x imperium ingot
-  6x rat skin
-  4x red bloodstone
 ~
-3 0 a 3
+3 0 a 4
 0 0 0
 0 0
 S
@@ -939,12 +917,8 @@ pattern heavy goblin gauntlets~
 the heavy goblin gauntlets pattern~
 The heavy goblin gauntlets pattern is lying here.~
 Forge (Imperial Armors): heavy goblin gauntlets
-  8x iron ingot
-  4x imperium ingot
-  6x rat skin
-  4x red bloodstone
 ~
-3 0 a 3
+3 0 a 4
 0 0 0
 0 0
 S
@@ -957,17 +931,12 @@ The tent can be taken down and set up again, but will require some additional
 materials each time.
 
 Usage: build goblinwartent <direction>
-Builds on: plains or desert
 Designatable rooms: forge, bedroom, store room, kitchen
 Rooms: 2
 Citizens: 1
 Features: cooking fire
-Resources required:
-  8x stack of lumber
-  2x pouch of nails
-  8x iron ingot
 ~
-3 e a 3
+3 e a 5
 0 0 0
 7 0
 S
@@ -981,12 +950,9 @@ field. Whereas more sensible people would use pigeons, the goblins seem to
 prefer birds of prey.
 
 Usage: build goblinmessagepost
-Builds on: plains, desert, forest, grove
 Features: can send and receive mail
-Resources required:
-  1x cut of poultry
 ~
-3 e a 4
+3 e a 6
 0 0 0
 0 0
 S
@@ -999,13 +965,9 @@ lumber and nails to set up each time. Goblins often make use of portable build-
 ings, as they hate to settle down for long periods of time.
 
 Usage: build goblinlabtent <direction>
-Builds on: plains or desert
 Features: cooking fire, alchemy
-Resources required:
-  4x stack of lumber
-  1x pouch of nails
 ~
-3 e a 2
+3 e a 4
 0 0 0
 7 0
 S
@@ -1018,13 +980,9 @@ bury their dead in dolmen mounds. But they soon forget about their ancestors
 and will remove the valuable dolmen stones to use for building new tombs.
 
 Usage: build goblindolmen <direction>
-Builds on: plains or desert
 Features: tomb
-Resources required:
-  3x huge stone block
-  10x rock
 ~
-3 e a 2
+3 e a 3
 0 0 0
 1 0
 S

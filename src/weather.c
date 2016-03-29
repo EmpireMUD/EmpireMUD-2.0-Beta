@@ -308,7 +308,7 @@ byte distance_can_see(char_data *ch) {
 	p = a + b;
 	p = MIN(5, p);
 
-	if (HAS_ABILITY(ch, ABIL_BY_MOONLIGHT)) {
+	if (has_ability(ch, ABIL_BY_MOONLIGHT)) {
 		p += 2;
 	}
 

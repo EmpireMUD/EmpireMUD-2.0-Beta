@@ -150,11 +150,22 @@ usually start with "a", "an", or "the". Only proper nouns are capitalized.
 
 The name should usually be short, and should not contain color codes.
 
+You MUST use one of the following terms in the item name: book, booklet,
+brochure, codex, compendium, diary, journal, magazine, manual, novel, pamphlet,
+paper, scroll, tablet, text, tome.
+
 See also: BOOKEDIT
 #
 "BOOKEDIT LICENSE"
 
-
+You are using EmpireMUD's book editor under these terms:
+- All text you write here must be original and written by you. You may not
+  enter copyrighted text or any text written by another person. You assume
+  full liability for any text you enter.
+- All text you write is the property of you, the author.
+- You grant EmpireMUD a license to use this text free-of-charge for the purpose
+  of displaying this text in the EmpireMUD game.
+- EmpireMUD will never use this text for any other purpose.
 
 See also: BOOKEDIT
 #
@@ -259,7 +270,6 @@ See also: BOOKEDIT, LIBRARY
 LIBRARY
 
 Building:  [^^]  Library  (Grand Monuments)
-Resources:  100 lumber, 40 nails, 48 blocks
 Command:  library browse  -- see books shelved here
           library checkout <book>  -- grab a copy of a book
           library shelve <item>  -- put a book away on the shelves
@@ -268,7 +278,7 @@ Command:  library browse  -- see books shelved here
 You can collect books and put them into your own library, which is a Grand
 Monument in the Empire skill tree. Once you shelve a book in your library, you
 can take as many copies of it as you want. The only way to permanently remove
-it form your collection is to use the 'library burn' command.
+it from your collection is to use the 'library burn' command.
 
 The 'checkout' and 'burn' commands target books in the library's collection,
 not items in your inventory. You can pick these books by name or by number.

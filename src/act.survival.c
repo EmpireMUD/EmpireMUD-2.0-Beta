@@ -31,6 +31,7 @@
 // external vars
 
 // external funcs
+extern room_data *dir_to_room(room_data *room, int dir);
 void scale_item_to_level(obj_data *obj, int level);
 
 
@@ -48,7 +49,7 @@ INTERACTION_FUNC(butcher_interact) {
 	for (num = 0; num < interaction->quantity; ++num) {
 		fillet = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(fillet, 1);	// minimum level
-		obj_to_char_or_room(fillet, ch);
+		obj_to_char(fillet, ch);
 		load_otrigger(fillet);
 	}
 	
@@ -198,11 +199,11 @@ ACMD(do_butcher) {
 
 
 ACMD(do_dismount) {
+	void do_unseat_from_vehicle(char_data *ch);
+	
 	char_data *mount;
 	
-	if (!IS_RIDING(ch))
-		msg_to_char(ch, "You're not riding anything right now.\r\n");
-	else {
+	if (IS_RIDING(ch)) {
 		mount = mob_proto(GET_MOUNT_VNUM(ch));
 		
 		msg_to_char(ch, "You jump down off of %s.\r\n", mount ? GET_SHORT_DESC(mount) : "your mount");
@@ -212,11 +213,20 @@ ACMD(do_dismount) {
 		
 		perform_dismount(ch);
 	}
+	else if (GET_SITTING_ON(ch)) {
+		do_unseat_from_vehicle(ch);
+	}
+	else {
+		msg_to_char(ch, "You're not riding anything right now.\r\n");
+	}
 }
 
 
 ACMD(do_fish) {
-	int fishing_timer = config_get_int("fishing_timer");
+	room_data *room = IN_ROOM(ch);
+	int dir = NO_DIR;
+	
+	any_one_arg(argument, arg);
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't fish.\r\n");
@@ -232,11 +242,17 @@ ACMD(do_fish) {
 	else if (GET_ACTION(ch)) {
 		msg_to_char(ch, "You're really too busy to do that.\r\n");
 	}
-	else if (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !IS_OUTDOORS(ch)) {
-		msg_to_char(ch, "You can't fish in here!\r\n");
+	else if (*arg && (dir = parse_direction(ch, arg)) == NO_DIR) {
+		msg_to_char(ch, "Fish in what direction?\r\n");
 	}
-	else if (!find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER | SECTF_OCEAN, NOBITS, 1)) {
-		msg_to_char(ch, "Unless you're fishing for worms in puddles, there's really nothing to catch here.\r\n");
+	else if (dir != NO_DIR && !(room = dir_to_room(IN_ROOM(ch), dir))) {
+		msg_to_char(ch, "You can't fish in that direction.\r\n");
+	}
+	else if (!CAN_INTERACT_ROOM(room, INTERACT_FISH)) {
+		msg_to_char(ch, "You can't fish for anything %s!\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
+	}
+	else if (!can_use_room(ch, room, MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to fish %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
 	}
 	else if (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) != ITEM_WEAPON || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_JAB) {
 		msg_to_char(ch, "You'll need a spear to fish.\r\n");
@@ -245,10 +261,11 @@ ACMD(do_fish) {
 		return;
 	}
 	else {
-		start_action(ch, ACT_FISHING, fishing_timer / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1));
+		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1));
+		GET_ACTION_VNUM(ch, 0) = dir;
 		
 		msg_to_char(ch, "You begin looking for fish...\r\n");
-		act("$n begins looking for fish.", TRUE, ch, 0, 0, TO_ROOM);
+		act("$n begins looking for fish.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 
@@ -259,6 +276,11 @@ ACMD(do_forage) {
 	int short_depletion = config_get_int("short_depletion");
 	
 	if (!can_use_ability(ch, ABIL_FORAGE, MOVE, cost, NOTHING)) {
+		return;
+	}
+	
+	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You don't have permission to forage here.\r\n");
 		return;
 	}
 	
@@ -300,7 +322,7 @@ ACMD(do_mount) {
 	else if (!can_use_ability(ch, ABIL_RIDE, NOTHING, 0, NOTHING)) {
 		// sends own msgs
 	}
-	else if (GET_MORPH(ch) != MORPH_NONE) {
+	else if (IS_MORPHED(ch)) {
 		msg_to_char(ch, "You can't ride anything in this form.\r\n");
 	}
 	else if (AFF_FLAGGED(ch, AFF_FLY)) {
@@ -313,11 +335,24 @@ ACMD(do_mount) {
 		msg_to_char(ch, "What did you want to mount?\r\n");
 	}
 	else if (*arg && !(mob = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
-		send_config_msg(ch, "no_person");
+		// special case: mount/ride a vehicle
+		if (get_vehicle_in_room_vis(ch, arg)) {
+			void do_sit_on_vehicle(char_data *ch, char *argument);
+			do_sit_on_vehicle(ch, arg);
+		}
+		else {
+			send_config_msg(ch, "no_person");
+		}
+	}
+	else if (AFF_FLAGGED(ch, AFF_SNEAK)) {
+		msg_to_char(ch, "You can't mount while sneaking.\r\n");
 	}
 	else if (!mob && IS_COMPLETE(IN_ROOM(ch)) && !BLD_ALLOWS_MOUNTS(IN_ROOM(ch))) {
 		// only check this if they didn't target a mob -- still need to be able to pick up new mounts indoors
 		msg_to_char(ch, "You can't mount here.\r\n");
+	}
+	else if (GET_SITTING_ON(ch)) {
+		msg_to_char(ch, "You're already sitting %s something.\r\n", IN_OR_ON(GET_SITTING_ON(ch)));
 	}
 	else if (mob && ch == mob) {
 		msg_to_char(ch, "You can't mount yourself.\r\n");
@@ -341,9 +376,6 @@ ACMD(do_mount) {
 	}
 	else if (mob && GET_LED_BY(mob)) {
 		msg_to_char(ch, "You can't ride someone's who's being led around.\r\n");
-	}
-	else if (mob && GET_PULLING(mob)) {
-		msg_to_char(ch, "You can't ride a harnessed mob.\r\n");
 	}
 	else if (mob && GET_POS(mob) < POS_STANDING) {
 		act("You can't mount $N right now.", FALSE, ch, NULL, mob, TO_CHAR);

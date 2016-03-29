@@ -28,7 +28,7 @@ The goblin shoes are in disrepair.
 0 0 0
 11 0
 A
-11 1
+11 1 0
 S
 #10203
 coins goblin pile tarnished~
@@ -50,7 +50,7 @@ The saddle appears to be in good condition!
 0 0 0
 7 0
 A
-6 1
+6 1 0
 S
 #10205
 necklace tarnished~
@@ -62,9 +62,9 @@ The necklace appears to be goblincraft.
 0 0 0
 2 0
 A
-4 -1
+4 -1 0
 A
-11 1
+11 1 0
 S
 #10206
 timepiece goblin strange~
@@ -76,9 +76,9 @@ It seems to be a wristband that tells time, but you can't read it.
 0 0 0
 0 0
 A
-4 2
+4 2 0
 A
-9 1
+9 1 0
 S
 #10207
 gloves open-fingered fingered pair~
@@ -90,9 +90,9 @@ The gloves appear to be goblincraft.
 0 0 0
 11 0
 A
-21 2
+21 2 0
 A
-17 1
+17 1 0
 S
 #10208
 collar goblin~
@@ -104,7 +104,7 @@ The collar looks strong enough to protect the neck.
 3 0 0
 2 0
 A
-15 1
+15 1 0
 S
 #10209
 earring warg-bone bone strange~
@@ -112,13 +112,13 @@ a warg-bone earring~
 A strange bone earring is lying here.~
 The earring appears to be goblincraft.
 ~
-2 jmoy am 1
+2 jmoy am 2
 0 0 0
 14 0
 A
-22 2
+22 2 1
 A
-17 1
+17 1 0
 S
 #10210
 club bone zelkab's~
@@ -130,9 +130,9 @@ This goblincraft club looks to be primarily warg bone.
 0 3 5
 14 0
 A
-12 -1
+12 -1 0
 A
-17 1
+17 1 0
 S
 #10211
 gauntlets armored zelkab's pair~
@@ -144,9 +144,9 @@ The gauntlets appear to be goblincraft.
 1 0 0
 7 0
 A
-21 1
+21 1 0
 A
-17 1
+17 1 0
 S
 #10212
 staff bone glowing garlgarl's~
@@ -158,9 +158,9 @@ The staff appears to be goblincraft, and made from warg bone.
 0 1 19
 14 0
 A
-4 -1
+4 -1 0
 A
-23 3
+23 3 0
 S
 #10213
 belt herbs garlgarl's~
@@ -172,9 +172,9 @@ The belt appears to be goblincraft, and crude.
 0 0 0
 0 0
 A
-23 1
+23 1 0
 A
-7 1
+7 1 0
 S
 #10214
 bow firebranded branded filks's~
@@ -186,7 +186,7 @@ The bow appears to be goblincraft.
 2 1 0
 0 0
 A
-17 1
+17 1 0
 S
 #10215
 arrows bundle goblin~
@@ -194,8 +194,8 @@ a bundle of goblin arrows~
 A bundle of goblin arrows is lying here.~
 The goblincraft arrows seem strong, but small.
 ~
-21 m a 1
-0 1 0
+21 m a 4
+30 1 0
 0 0
 S
 #10216
@@ -208,11 +208,11 @@ The leggings are goblincraft, for sure.
 1 0 0
 7 0
 A
-21 2
+21 2 0
 A
-17 1
+17 1 0
 A
-9 1
+9 1 0
 S
 #10217
 belt heavy walts's~
@@ -224,13 +224,13 @@ The belt appears to be goblincraft.
 1 0 0
 7 0
 A
-21 1
+21 1 0
 A
-9 1
+9 1 0
 A
-17 1
+17 1 0
 A
-6 1
+6 1 0
 S
 #10218
 waistband band armored nilbog's~
@@ -242,11 +242,11 @@ It is a goblincraft waistband.
 3 0 0
 0 0
 A
-12 1
+12 1 0
 A
-9 -1
+9 -1 0
 A
-18 2
+18 2 0
 S
 #10219
 helm wargskull skull Nilbog's~
@@ -258,13 +258,13 @@ The skull is goblincraft, with signature leather and beading.
 3 0 0
 14 0
 A
-4 -1
+4 -1 0
 A
-15 1
+15 1 0
 A
-18 1
+18 1 0
 A
-13 1
+13 1 0
 S
 #10220
 wristbands flaming pair furl's~
@@ -272,17 +272,17 @@ Furl's flaming wristbands~
 A pair of flaming wristbands are lying here.~
 The wristbands appear to be goblincraft, and are on fire.
 ~
-27 jmp aj 1
+27 mp aj 2
 0 0 0
 0 0
 A
-12 -1
+12 -1 0
 A
-22 1
+22 1 0
 A
-9 1
+9 1 0
 A
-17 1
+17 1 0
 B
 c
 S
@@ -292,17 +292,17 @@ Furl's armored wristbands~
 A pair of armored wristbands are lying here.~
 The wristbands appear to be goblincraft, made from enchanted wood.
 ~
-27 jmp aj 1
+27 mp aj 2
 2 0 0
 0 0
 A
-4 -1
+4 -1 0
 A
-17 1
+17 1 0
 A
-18 1
+18 1 0
 A
-6 1
+6 1 0
 S
 #10225
 hole~
@@ -509,13 +509,13 @@ for evasion than for taking damage.
 3 0 0
 0 0
 A
-9 -1
+9 -1 0
 A
-18 2
+18 2 0
 A
-15 1
+15 1 0
 A
-1 -1
+1 -1 0
 C
 0 100
 S
@@ -524,15 +524,10 @@ pattern spiked wooden breastplate~
 the spiked wooden breastplate pattern~
 The pattern for a spiked wooden breastplate is lying here.~
 This is the pattern for a spiked wooden breastplate.
-Craft (Advanced Woodworking):
-  a sharp tool
-  a Carpenter building
-  1x stack of lumber
-  2x stack of cactus pads
- 12x imperium spike
-  2x large leather
+
+Craft (Advanced Woodworking): spiked wooden breastplate
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -547,9 +542,9 @@ needles, and edged with imperium.
 0 1 1
 0 0
 A
-21 3
+21 3 0
 A
-17 1
+17 1 0
 C
 0 100
 S
@@ -558,14 +553,10 @@ pattern sword cactus~
 the cactus sword pattern~
 The pattern for a cactus sword is lying here.~
 This is the recipe for the cactus sword.
-Craft (Advanced Woodworking):
-  a sharp tool
-  a Carpenter building
-  1x stack of lumber
-  6x stack of cactus pads
-  5x imperium ingot
+
+Craft (Advanced Woodworking): cactus sword
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -586,11 +577,10 @@ recipe aloe~
 an aloe recipe~
 An aloe recipe has been left here.~
 This is the recipe for the soothing aloe elixir.
-Brew (Healing Elixirs):
- 10x handful of whitegrass
-  4x thick aloe leaves
+
+Brew (Healing Elixirs): soothing aloe elixir
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -623,13 +613,13 @@ surprisingly light-weight. Although it might be difficult to craft anything
 useful from it, it looks like you woul be able to make some items using
 patterns purchased from the Portal to the Primeval adventure.
 ~
-3 e a 1
+3 e a 2
 0 0 0
 14 0
 R
-5511 0
+5621 0
 R
-5164 0
+5193 0
 S
 #10253
 bottle essence terror~
@@ -638,13 +628,13 @@ The essence of terror is lying here in a bottle.~
    This tiny glass bottle contains the essence of pure terror, harvested from
 the dawn of time from a flying creature who truly embodies the concept.
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 8 0
 R
-5164 0
+5193 0
 R
-5511 0
+5621 0
 S
 #10254
 gem stunning violet~
@@ -653,13 +643,13 @@ A violet gem has been discarded here.~
    This stunning gem looks like it must contain some arcane power. Perhaps it
 can be used in some kind of crafting recipe.
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 10 0
 R
-5164 0
+5621 0
 R
-5511 0
+5193 0
 S
 #10255
 bracelet dracosaur bone~
@@ -671,9 +661,9 @@ This bracelet is made from small dracosaur bones.
 0 0 0
 14 0
 A
-17 1
+17 1 0
 A
-21 1
+21 1 0
 S
 #10256
 wristband dracosaur scale~
@@ -685,9 +675,9 @@ The wristband is made from braided dracosaur leather.
 0 0 0
 7 0
 A
-16 1
+16 1 0
 A
-22 1
+22 1 0
 S
 #10257
 spawner miniboss dracosaur~
@@ -710,9 +700,9 @@ The bracelet is made from black volcanic glass, and radiates with energy.
 0 0 0
 8 0
 A
-23 1
+23 1 0
 A
-7 1
+7 1 0
 S
 #10259
 satchel primitive~
@@ -724,7 +714,7 @@ This small satchel is made from dracosaur leather, and is quite durable.
 3 0 0
 7 0
 A
-15 1
+15 1 0
 S
 #10260
 spawner trash dracosaur~
@@ -788,11 +778,15 @@ A thick piece of dracosaur hide has been left on the ground.~
 to work into anything useful. This hide can be used to craft items using
 patterns from the Portal to the Primeval adventure.
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 7 0
 R
 5120 0
+R
+5193 0
+R
+5621 0
 S
 #10267
 tooth dracosaur serrated~
@@ -802,11 +796,15 @@ A serrated dracosaur tooth is lying here.~
 huge dracosaur. It looks like you might be able to make something useful from
 this, if you bought the patterns from the Portal to the Primeval adventure.
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 14 0
 R
 5120 0
+R
+5193 0
+R
+5621 0
 S
 #10268
 axe bone primordial~
@@ -820,9 +818,9 @@ leather. It looks like you'd need to use both hands to wield it.
 0 3 2
 14 0
 A
-1 1
+1 1 0
 A
-17 1
+17 1 0
 C
 0 125
 S
@@ -834,12 +832,8 @@ This pattern allows you to craft the primordial axe, a powerful weapon from
 the dawn of time.
 
 Forge (requires Deadly Weapons): primordial axe
-  6x thick dracosaur hide
-  8x serrated dracosaur tooth
-  2x huge dracosaur bone
-  5x imperium ingot
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -853,9 +847,9 @@ This huge spear looks like it was made from the massive legbone of a dracosaur!
 0 1 3
 14 0
 A
-13 1
+13 1 0
 A
-18 1
+18 1 0
 C
 0 125
 S
@@ -867,13 +861,8 @@ This pattern allows you to craft the dracosaur bone spear, a strong tanking
 weapon from the Primeval age.
 
 Forge (requires Deadly Weapons): dracosaur bone spear
-  4x thick dracosaur hide
- 10x serrated dracosaur tooth
-  1x huge dracosaur bone
-  1x essence of terror
-  5x imperium ingot
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -889,9 +878,9 @@ shaft.
 0 1 18
 14 0
 A
-9 1
+9 1 0
 A
-8 2
+8 2 0
 C
 0 125
 S
@@ -903,13 +892,8 @@ This pattern allows you to craft the jeweled bone staff, a great magical weapon
 from the prehistoric era.
 
 Craft (requires Powerful Staves): jeweled bone staff
- 10x thick dracosaur hide
-  4x serrated dracosaur tooth
-  1x huge dracosaur bone
-  1x stunning violet gem
-  5x ingot of nocturnium
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -924,11 +908,11 @@ dragons from the primeval age. The craftsmanship, however, is very modern.
 0 0 0
 7 0
 A
-12 -1
+12 -1 0
 A
-23 3
+23 3 0
 A
-16 1
+16 1 0
 C
 0 125
 S
@@ -940,12 +924,8 @@ This pattern allows you to sew the dracosaur scale robe, a powerful healing
 robe from the Primeval period.
 
 Sew (requires Magical Vestments): dracosaur scale robe
-  8x thick dracosaur hide
-  6x serrated dracosaur tooth
-  1x stunning violet gem
-  6x ingot of nocturnium
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -959,11 +939,11 @@ The boots look to be made from hardened dracosaur scales, and edged in imperium.
 2 0 0
 7 0
 A
-17 1
+17 1 0
 A
-2 1
+2 1 0
 A
-18 1
+18 1 0
 C
 0 125
 S
@@ -975,12 +955,8 @@ This pattern allows you to forge the dracosaur scale boots, medium armor well-
 suited to mucking through pre-history.
 
 Forge (requires Imperial Armors): dracosaur scale boots
-  8x thick dracosaur hide
-  6x serrated dracosaur tooth
-  1x essence of terror
-  6x imperium ingot
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -994,13 +970,13 @@ The boots are made from shaped dracosaur bone, laced with imperium.
 3 0 0
 14 0
 A
-9 -2
+9 -2 0
 A
-2 1
+2 1 0
 A
-15 2
+15 2 0
 A
-1 -1
+1 -1 0
 C
 0 125
 S
@@ -1012,12 +988,8 @@ This pattern allows you to forge the primordial boots, some of the best tanking
 boots in all of history.
 
 Forge (requires Imperial Armors): primordial boots
-  6x thick dracosaur hide
-  8x serrated dracosaur tooth
-  1x huge dracosaur bone
- 10x imperium ingot
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -1032,9 +1004,9 @@ they pack quite the punch.
 1 0 0
 7 0
 A
-17 2
+17 2 0
 A
-21 1
+21 1 0
 C
 0 125
 S
@@ -1046,12 +1018,8 @@ This pattern allows you to sew the dracosaur scale gauntlets, dangerous leather
 gloves from beyond the Primeval portal.
 
 Sew (requires Dangerous Leathers): dracosaur scale gauntlets
- 12x thick dracosaur hide
-  2x serrated dracosaur tooth
-  1x essence of terror
-  5x imperium ingot
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S
@@ -1066,11 +1034,11 @@ set into its cover, and the whole thing reeks of ancient mana.
 0 0 0
 7 0
 A
-12 -1
+12 -1 0
 A
-22 2
+22 2 0
 A
-17 1
+17 1 0
 C
 0 125
 S
@@ -1081,13 +1049,9 @@ The schematic for the Tome of the Primordium is lying here.~
 This pattern allows you to craft the tome of the primordium, a powerful magical
 relic from a bygone era.
 
-Sew (requires Master Craftsman): tome of the primordium
-  4x thick dracosaur hide
- 10x serrated dracosaur tooth
-  1x stunning violet gem
-  5x ingot of nocturnium
+Craft (requires Master Craftsman): tome of the primordium
 ~
-3 0 a 1
+3 0 a 3
 0 0 0
 0 0
 S
@@ -1103,9 +1067,9 @@ conquered that lost age would dare wear this.
 0 0 0
 14 0
 A
-5 3
+5 3 0
 A
-4 1
+4 1 0
 C
 0 125
 S
@@ -1117,11 +1081,8 @@ This pattern allows you to craft the bone crown of the primeval, an ancient
 symbol of kings from a less civilized age.
 
 Craft (requires Jewelry): bone crown of the primeval
-  1x huge dracosaur bone
-  1x essence of terror
-  1x stunning violet gem
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 0 0
 S

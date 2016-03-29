@@ -1,0 +1,27 @@
+#200
+Newbie Food~
+2 0 0 0 0-0
+E
+-1 100.00
+0 0 0
+G
+-1 3313  # a loaf of bread
+G
+-1 3313  # a loaf of bread
+G
+-1 2112  # a clay bottle
+S
+#210
+Newbie Accessories~
+2 0 0 0 0-0
+E
+-1 100.00
+0 0 0
+G
+-1 262  # a trinket of conveyance
+G
+-1 262  # a trinket of conveyance
+G
+-1 2117  # a grave marker
+S
+$

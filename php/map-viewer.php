@@ -20,7 +20,26 @@ $normalMap = 'map.png';
 $politicalMap = 'map-political.png';
 $mapWidth = 1800;
 $mapHeight = 1000;
+$minRadiusToName = 10;	// cities below this size won't show name/owner
 
+// Where to load city data:
+$pathToData = '/path/to/empireMUD/data/';	// your path, ending in 'data/'
+
+$cityList = array();
+if (file_exists($pathToData . 'map-cities.txt')) {
+	$cityInput = file_get_contents($pathToData . 'map-cities.txt');
+	foreach (explode("\n", $cityInput) as $line) {
+		if (preg_match('/^(\d+)\s+(\d+)\s+(\d+)\s+"([^"]+)"\s+"([^"]+)"$/', $line, $match)) {
+			$cityList[] = array(
+				'x' => $match[1],
+				'y' => $match[2],
+				'radius' => $match[3],
+				'city' => $match[4],
+				'empire' => $match[5],
+			);
+		}
+	}
+}
 
 // the rest of this generates the page
 $defaultWidth = $mapWidth;
@@ -116,6 +135,15 @@ body {
 	margin-right: 30px;
 }
 
+.city {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	border: 1px outset gray;
+	display: none;
+	cursor: default;
+}
+
 </style>
 </head>
 <body>
@@ -123,12 +151,20 @@ body {
 <div id="prefs">
 	<div title="Press 'p' to toggle the political map."><input type="checkbox" id="pol" name="pol" /> <label for="pol">Political Map</label></div>
 	<div title="Press 'g' to toggle the grid."><input type="checkbox" id="grid" name="grid" /> <label for="grid">Grid</label></div>
+	<div title="Press 'c' to toggle cities."><input type="checkbox" id="cities" name="cities" /> <label for="cities">Cities</label></div>
 	<div style="clear: both;"></div>
 </div>
 <div id="coords"></div>
 <div id="map">
 <img src="" class="wld" />
 <?php
+// city overlays
+foreach ($cityList as $city) {
+	?>
+	<div class="city" style="top: <?= (($height - $city['y'] - $city['radius']) * $scale) - 1.5 ?>px; left: <?= (($city['x'] - $city['radius']) * $scale) - 0.75 ?>px; width: <?= $city['radius'] * 2 * $scale ?>px; height: <?= $city['radius'] * 2 * $scale ?>px; border-radius: <?= $city['radius'] * $scale ?>px;" title="<?= ($city['radius'] >= $minRadiusToName) ? ($city['city'] . ' (' . $city['empire'] . ')') : 'Outpost' ?>">&nbsp;</div>
+	<?php
+}
+
 // show grid: verticals
 for ($iter = 1; $iter < $width / 100 / $scale; ++$iter) {
 	if ($iter % 2) {
@@ -164,10 +200,19 @@ function checkmap() {
 		$(".wld").attr("src", "map.png");
 	}
 }
+function checkcities() {
+	if ($("#cities").prop("checked")) {
+		$(".city").show();
+	}
+	else {
+		$(".city").hide();
+	}
+}
 
 $(document).ready(function() {
 	checkmap();
 	checkgrid();
+	checkcities();
 
 	$("#pol").click(function() {
 		checkmap();
@@ -177,6 +222,10 @@ $(document).ready(function() {
 		checkgrid();
 	});
 	
+	$("#cities").click(function() {
+		checkcities();
+	});
+	
 	$(document).keypress(function(e) {
 		var c = String.fromCharCode(e.which);
 		if (c == 'p' || c == 'P') {
@@ -184,6 +233,9 @@ $(document).ready(function() {
 		}
 		else if (c == 'g' || c == 'G') {
 			$("#grid").click();
+		}
+		else if (c == 'c' || c == 'C') {
+			$("#cities").click();
 		}
 	});
 

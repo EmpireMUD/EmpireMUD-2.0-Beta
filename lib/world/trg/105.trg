@@ -129,6 +129,11 @@ end
 Dragontooth Sceptre Summon~
 1 c 1
 use~
+eval test %%self.is_name(%arg%)%%
+if !%test%
+  return 0
+  halt
+end
 eval varname summon%target%
 eval test %%actor.varexists(%varname%)%%
 * Change this if trigger vnum != mob vnum
@@ -137,14 +142,15 @@ eval target %self.vnum%
 if %test%
   eval tt %%actor.%varname%%%
   if (%timestamp% - %tt%) < 1800
-    %send% %actor% You have used %self.shortdesc% too recently.
+    eval diff (%tt% - %timestamp%) + 1800
+    eval diff2 %diff%/60
+    eval diff %diff%//60
+    if %diff%<10
+      set diff 0%diff%
+    end
+    %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc% again.
     halt
   end
-end
-eval test %%self.is_name(%arg%)%%
-if !%test%
-  return 0
-  halt
 end
 if (%actor.position% != Standing)
   %send% %actor% You can't do that right now.
@@ -154,6 +160,7 @@ end
 eval room_var %self.room%
 eval mob %room_var.people%
 if (%mob% && %mob.vnum% == %target%)
+  %own% %mob% %actor.empire%
   %send% %actor% You use %self.shortdesc% and %mob.name% appears!
   %echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
   eval %varname% %timestamp%
@@ -255,10 +262,25 @@ end
 %terracrop% %room% %vnum%
 %echo% As the whirlwind fades away, crops burst from the soil here!
 ~
+#10508
+Dragonstooth sceptre equip first~
+1 c 2
+use~
+eval test %%self.is_name(%arg%)%%
+if !%test%
+  return 0
+  halt
+end
+%send% %actor% You must wield %self.shortdesc% to use it.
+return 1
+~
 #10514
 Gemfruit decay~
 1 f 0
 ~
+if !%self.carried_by% || %random.4% == 1
+  halt
+end
 eval object nothing
 switch %random.4%
   case 1
@@ -280,6 +302,9 @@ switch %random.4%
     * lightning stone
     eval object a yellow lightning stone
     %load% o 103 %self.carried_by%
+  break
+  default
+    * failure - do nothing
   break
 done
 if %self.carried_by%

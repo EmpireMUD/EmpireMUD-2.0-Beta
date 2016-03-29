@@ -222,9 +222,10 @@ See also: FOLLOW
 #
 BOARD
 
-Usage:  board <ship>
+Usage:  board <vehicle>
 
-This command is used to board a ship in the same room.
+This command is used to board a ship or other vehicle in the same room. Not
+all vehicles can be boarded.
 
 See also: DISEMBARK, SAIL, MANUFACTURE, LOAD, SHIPS
 #
@@ -300,6 +301,14 @@ Usage:  cls
 CLS is short for "clear screen" and sends an instruction to your telnet client
 to clear the screen.
 #
+COMBINE
+
+Usage:  combine <item>
+
+Some items, like single fruits, can be combined into larger items.
+
+See also: SEPARATE
+#
 COMMANDS
 
 Usage:  commands
@@ -354,6 +363,25 @@ tailor.
 
 See also: TAILOR, WEAVE
 #
+CUSTOMIZE "CUSTOMIZE VEHICLE"
+
+Usage:  customize <type> [target] <field> <value | none>
+
+This command allows you to customize the names (and other text) of your 
+buildings and vehicles. You must have the correct privilege in your empire to
+customize its things.
+
+Valid types:
+- building (requires the Customize Building ability)
+- vehicle
+
+Valid fields:
+- name
+- longdesc: the text shown in the room (doesn't work on buildings)
+- description: will open a text editor
+
+See also: CUSTOMIZE BUILDING, TEXT EDITOR
+#
 DIAGNOSE
 
 Usage:  diagnose [character]
@@ -383,9 +411,8 @@ DISEMBARK
 
 Usage:  disembark
 
-From the entry room of a ship (the room you're placed in when you board it),
-you may disembark. This can be done even in the ocean, though you may need a
-smaller vessel unless you disembark very close to the shore.
+You can get out of vehicles (such as ships) with the disembark command. In some
+cases, you must do this from the same part of the vehicle where you entered.
 
 See also: BOARD, SAIL, UNLOAD, SHIPS
 #
@@ -397,9 +424,23 @@ This command causes your familiar to leave. You can target the familiar by
 name if it's in the room with you, or else can type 'dismiss familiar' to
 dismiss it anywhere in the world.
 #
+DISPATCH
+
+Usage:  dispatch <ship> <island>
+
+You can use the shipping system to move empty ships between islands. This
+requires the same permissions as the "ship" command, and it requires an
+available worker (citizen) at the location you want to dispatch the ship from.
+
+You can dispatch ships from your current location, or from any docks on the
+same island. (This command always prefers ships in your current room.) The
+destination island must have docks to receive the ship.
+
+See also: SHIPPING
+#
 DOUSE BURNING "PUT OUT FIRE" "FIRE BRIGADE"
 
-Usage:  douse
+Usage:  douse [vehicle]
 
 In the event of a fire, you may douse it with water from any portable source. 
 It may take a lot of water to douse the fire, and you may have to leave and 
@@ -411,6 +452,16 @@ you. They will always succeed if left alone. However, they do so very slowly
 and are easy targets for enemy players at war.
 
 See also: WORKFORCE
+#
+DRAG
+
+Usage:  drag <vehicle> <direction | portal>
+
+You can drag some vehicles, such as canoes, from room to room. Unlike "lead",
+you must use the drag command for each movement. You can only drag vehicles on
+land, never into the water.
+
+See also: BOARD, LEAD
 #
 DRAW
 
@@ -458,7 +509,7 @@ wells, fountains, and the edge of nearby rivers, too.
   
 Some vampires can also taste the blood of others.
 
-See also: FILL, POUR, TASTE BLOOD
+See also: FILL, HUNGER, POUR, TASTE BLOOD
 #
 EMOTE :
 
@@ -554,11 +605,13 @@ GET TAKE
 
 Usage:  get <object>
         take all [object]
-        take all all.<object>
-        get all.<object> all.<object>
+        take all all.<container>
+        get all.<object> all.<container>
 
 If you find something interesting on the ground, you may use 'get' to pick
-it up. 'get' can also be used to extract items from containers.
+it up. 'get' can also be used to extract items from containers. Some vehicles
+also act as containers, such as carts and ships. You can get items from a
+ship's cargo hold while inside the ship.
 
 Examples:
 
@@ -566,6 +619,7 @@ Examples:
   > get all corpse
   > get all all.bag
   > get all.bread all.bag
+  > get all caravel
 
 See also: DROP, KEEP, PUT
 #
@@ -660,9 +714,12 @@ See also: HELP
 #
 IDENTIFY
 
-Usage:  identify <item>
+Usage:  identify <item | vehicle>
 
-This command provides detailed information about an item.
+This command provides detailed information about an item or vehicle.
+
+Tip: When trying to identify an item in your inventory that has the same name
+as something you are wearing, try using "1.name".
 #
 INFORMATIVE "TOGGLE INFORMATIVE"
 
@@ -677,8 +734,9 @@ Informative map mode shows you details about your buildings.
   &g/[]\&0  mine with ore
   &r/[]\&0  depleted mine
   &y^()^&0  chameleon building (immortal only)
+  &B^^^^&0  no-work
 
-See also: TOGGLES, MAINTAIN
+See also: TOGGLES, MAINTAIN, WORKFORCE
 #
 IGNORE IGNORING
 
@@ -760,11 +818,12 @@ Roads: ----  ..|.  ..+-  --+.  .--.
 
 Roads (Empire)
 Usage:  lay
+Cost:  20x (rock)
 
-You may use this ability to lay 20 rocks into the ground to form a cobblestone 
+You may use this ability to lay rocks into the ground to form a cobblestone 
 road. Roads eliminate the small movement lag that you normally get while
 walking. They can aid in tree and crop control -- nothing will grow over the
-roads.
+roads, but they will eventually decay if left unclaimed.
 
 The lay command is also used to pull up a road and retrieve half its rocks.
 
@@ -776,20 +835,20 @@ build things facing roads, and can usually build right over a road -- but the
 road underneath will be lost. Roads count as in-city territory as far away as
 3x a city's normal radius.
 
-See also: EMPIRE, ROADSIGN
+Gain experience when you lay a road, but not on mountains.
+
+See also: CHANT OF ILLUSIONS, EMPIRE, PATHFINDING, ROADSIGN
 #
-LOAD BOATLOAD "BOAT LOAD"
+LOAD LOADVEHICLE "LOAD VEHICLE" BOATLOAD "BOAT LOAD"
 
-Usage:  load <ship> <item>
+Usage:  load <mob | vehicle | all> <onto vehicle>
 
-This command allows you to load items onto a ship. You can only do this at the
-docks.
+This command allows you to load animals and vehicles onto other vehicles, such
+as ships. To store items in vehicles, use "put <item> <vehicle>" instead.
 
-You can load items from your inventory or from the room. Only the Galleon can
-hold items like carts and catapults (or any item that won't fit in your
-inventory).
+This command was formerly called "boatload".
 
-See also: UNLOAD, BOARD, SAIL, SHIPS
+See also: UNLOAD, BOARD, PUT, SAIL, SHIPS
 #
 LOOK EXAMINE
 
@@ -798,7 +857,8 @@ Usage:  look
         look <direction>
         look out
 
-For studying your surroundings. Examine and look do the same thing.
+For studying your surroundings. Examine will look at an object and, if it's a
+container, also show you its contents.
 
 Examples:
 
@@ -810,7 +870,7 @@ Examples:
 Note that if you LOOK AT CORPSE you will not see its inventory.
 To see what's inside a container (i.e. a corpse) use LOOK IN <object>.
 
-See also: EXAMINE, GET, READ, TAKE
+See also: GET, READ, TAKE, SURVEY
 #
 MAPSIZE "MAP SIZE"
 
@@ -851,7 +911,7 @@ Examples:
   > mail receive 1
   > mail receive
 
-See also: PIGEON POST
+See also: PIGEON POST, TEXT EDITOR
 #
 MARK
 
@@ -1076,7 +1136,10 @@ Usage:  put <item> [in] <container>
         put all.<item> [in] <container>
         put all <container>
 
-For putting items into containers.
+For putting items into containers. This also works on some vehicles, like
+carts. Certain vehicles (like ships) also allow you to put items into them
+while inside the vehicle yourself -- like a container you can access from any
+room.
 
 Examples:
 
@@ -1131,6 +1194,18 @@ Examples:
   > remove all.bronze
 
 See also: GRAB, HOLD, WEAR, WIELD, SHEATH, DRAW, SWAP
+#
+REPAIR
+
+Usage:  repair <vehicle>
+
+This command allows you to repair vehicles that have decayed or been damaged.
+Like building, repair happens one item at a time using materials in your
+inventory or in the room with you.
+
+Fully repairing a vehicle will restore it to full health.
+
+See also: STOP, WORKFORCE
 #
 REPLY
 
@@ -1194,23 +1269,27 @@ tag next to your name on the "who" list.
 
 See also: TOGGLE
 #
-SAIL
+SAIL DRIVE PILOT SAILING DRIVING PILOTING
 
-Usage:  sail <direction> [distance]
+Usage:  sail <direction | portal> [distance]
+        drive <direction | portal> [distance]
+        pilot <direction | portal> [distance]
 
-You can sail the ship from any location inside, for your convenience. Ships
-can travel on oceans and rivers, through river gates, and under bridges. 
-Though this is fairly slow, it is one of the most efficient means of 
-transoceanic travel.
+These three commands are used to control ships, carriages, and other vehicles.
+Which command you use depends upon the type of vehicle. Travel in this manner
+is usually slow, but does not require movement points. You need to either be
+sitting on the vehicle, or inside of it and able to see out, to do this.
 
-If you specify a distance, you will only sail that many tiles.
+Many vehicles cannot move through portals.
 
-Once you've started sailing, the ship will move every few seconds in that
-direction, for as long as you're sailing it. You can type 'sail' again to
-stop, or to change directions. If you don't like seeing the messages each time
-the ship moves, you can 'toggle action-spam'.
+If you specify a distance, you will only travel that many tiles. If not, you
+will continue to move until you hit an obstacle.
 
-See also: BOARD, DISEMBARK, SHIPBUILDING, SHIPS, STOP, TOGGLE
+You can use 'stop' to cancel travel at any time. If you don't like seeing the
+messages each time the ship moves, you can 'toggle action-spam'.
+
+See also: BOARD, DISEMBARK, DRAG, LAND VEHICLES, LEAD, SHIPBUILDING, SHIPS,
+STOP, TOGGLE
 #
 SAVE
 
@@ -1263,14 +1342,14 @@ Your class is determined by your top two skills, and you first receive a class
 when both of these skills are past 75. The level shown on score is your total
 level, with your skill level shown in parentheses.
 
-Conditions are displayed as:  Health: &g50&0/&g100&0+&g15&0/hr
-The first number (50) is your current health, the 100 is your maximum health,
-and the final number (15/hr) is your rate of regeneration. One hour in the MUD
-is 75 seconds. Your actual regeneration happens every 5 seconds.
+Conditions are displayed as:  Health: &g50&0/&g100&0+&g15&0/5s
+The first number (50) is your current health, the second (100) is your maximum
+health, and the final number (15/5s) is your rate of regeneration. Your
+regeneration happens every 5 seconds.
 
-Attributes are rated from 0 to 10. They are shown in green if you have a spell
-or piece of gear enhancing the attribute, or red if there is one subtracting
-from it.
+Attributes are rated from 0 to 15. They are shown in green if your current
+rating is higher than your base (starting) rating, or red if they are reduced
+below your base (by spells or pieces of gear).
 
 You can get more information on most of the traits on the score from their own
 help files (e.g. HELP DODGE). The 'Resist' trait is split into two parts: the
@@ -1283,6 +1362,15 @@ and (1) represents the number of ability points you have to spend.
 Score also shows things which are affecting you.
 
 See also: SHIELD BLOCK, AFFECTS, SKILL LEVEL, CLASS, GEAR LEVEL
+#
+SCRAP
+
+Usage:  scrap <vehicle>
+
+This command is used to cancel a partially-built vehicle. No materials will be
+refunded.
+
+See also: MANUFACTURE
 #
 "SCREEN READERS" SCREENREADERS SCREEN-READERS
 
@@ -1329,6 +1417,30 @@ password contains a space, you should put it in "quotes" or (parentheses).
 
 This command cannot be abbreviated.
 #
+SEPARATE
+
+Usage:  separate <item>
+
+Some items, such as bunches of fruit, can be separated into multiple single
+items.
+
+See also: COMBINE
+#
+SHARE UNSHARE "SHARED ITEM"
+
+Usage:  share <item>
+        unshare
+
+You can "share" any item from your inventory. This allows it to be targeted
+by other players' enchantments (and other abilities). This way, another player
+can enchant an item that is bound to you. Items in the shared slot don't count
+toward your stats your gear level.
+
+To use an ability like "enchant" on another player's shared slot, type the
+player's name as the target of the enchantment.
+
+See also: ENCHANT
+#
 SHEATH SHEATHE
 
 Usage:  sheathe
@@ -1369,7 +1481,7 @@ shipping system. You can also set this option on individual ships. (Workforce
 is not required to use the shipping system, but 'workforce no-work' is still
 used to prevent shipping.)
 
-See also: DOCKS, EINVENTORY, SHIPBUILDING, SHIPS, WORKFORCE
+See also: DISPATCH, DOCKS, EINVENTORY, ISLANDS, SHIPBUILDING, SHIPS, WORKFORCE
 #
 SLEEP
 
@@ -1560,7 +1672,7 @@ Toggles:
   tell - the tell channel
   shout - the local shout channel
   political - shows empire colors instead of terrain colors
-  mortlog - see logs when people log in, log out, and die
+  mortlog - see logs when people create characters and die
   scrolling - scroll long text instead of paginating
   brief - see smaller maps and no room descriptions
   compact - no extra newlines
@@ -1587,11 +1699,15 @@ Immortal toggles:
   incognito - if on, the immortal does not appear on 'who' to mortals
   wizhide - if on, the immortal can't be seen in rooms but is not invisible
 #
-UNLOAD BOATUNLOAD
+UNLOAD UNLOADVEHICLE BOATUNLOAD
 
-Usage:  unload <ship>
+Usage:  unload <mob | vehicle | all>
 
-This command allows you to unload cargo from a ship at the docks.
+This command unloads a mob or vehicle from the vehicle you are in. You must
+be inside a vehicle, and targeting a mob or vehicle (or "all") in the room
+with you.
+
+This command was previously also called boatunload.
 
 See also: LOAD, BOARD, SAIL, SHIPS
 #
@@ -1616,6 +1732,9 @@ For changing your position. If you feel weary, it's probably a good idea to
 sit and rest for a while, or maybe even take a nap.
 
 Wake can also be used to wake up other players.
+
+Sit can also target certain vehicles and furniture, allowing you to sit on
+them.
 
 See also: SLEEP
 #

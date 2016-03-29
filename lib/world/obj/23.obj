@@ -4,13 +4,15 @@ a leather breastplate~
 A leather breastplate is lying on the ground.~
 This simple piece of hardened leather is light weight and offers good mobility.
 ~
-27 emo aq 1
+27 emo aq 4
 1 0 0
 7 0
 A
-17 1
+17 1 0
 A
-2 1
+2 1 0
+C
+0 75
 S
 #2301
 helm leather~
@@ -18,13 +20,15 @@ a leather helm~
 An empty leather helm is lying here.~
 The hardened leather helm looks like it might be from the militia.
 ~
-27 mo ae 1
+27 mo ae 4
 1 0 0
 7 0
 A
-17 1
+17 1 0
 A
-9 1
+9 1 0
+C
+0 75
 S
 #2302
 vambraces leather pair~
@@ -32,13 +36,13 @@ leather vambraces~
 A pair of leather vambraces are lying on the ground.~
 These vambraces are meant to protect the arms in combat..
 ~
-27 mo ai 1
+27 mo ai 2
 1 0 0
 7 0
 A
-17 1
+17 1 0
 A
-1 1
+1 1 0
 C
 0 75
 S
@@ -54,9 +58,9 @@ free movement.
 1 0 0
 7 0
 A
-17 1
+17 1 0
 A
-2 1
+2 1 0
 S
 #2304
 helm viper~
@@ -69,9 +73,9 @@ shape that gives the whole helmet a snake-like appearance.
 1 0 0
 7 0
 A
-17 1
+17 1 0
 A
-9 1
+9 1 0
 S
 #2305
 vambraces shark skin pair~
@@ -84,9 +88,9 @@ used to catch a weapon, or deflect it.
 1 0 0
 7 0
 A
-17 1
+17 1 0
 A
-1 1
+1 1 0
 S
 #2306
 shoes leather pair~
@@ -95,11 +99,13 @@ A pair of leather shoes is standing here.~
    These shoes look like they're masterfully tailored for comfort and
 durability, as if you could walk twice as far in them.
 ~
-2 mo ag 1
+2 mo ag 2
 0 0 0
 7 0
 A
-11 1
+11 1 0
+C
+0 75
 S
 #2307
 boots leather pair~
@@ -111,9 +117,9 @@ These boots look extremely comfortable.
 0 0 0
 7 0
 A
-11 1
+11 1 0
 A
-17 1
+17 1 0
 S
 #2308
 hauberk mail~
@@ -126,9 +132,9 @@ heavy, but you would regret not wearing one.
 2 0 0
 2 0
 A
-18 1
+18 1 0
 A
-17 1
+17 1 0
 S
 #2309
 coif mail~
@@ -137,15 +143,17 @@ A mail coif is lying here.~
    The coif is a reinforced head covering meant to stop the impact of cutting
 weapons against your precious skull.
 ~
-27 mo ae 1
+27 mo ae 2
 2 0 0
 2 0
 A
-18 1
+18 1 0
 A
-17 1
+17 1 0
 A
-2 1
+2 1 0
+C
+0 75
 S
 #2310
 vambraces pair splint~
@@ -158,11 +166,11 @@ your forearms from enemy weaponry.
 2 0 0
 2 0
 A
-18 1
+18 1 0
 A
-17 1
+17 1 0
 A
-2 1
+2 1 0
 C
 0 75
 S
@@ -177,9 +185,9 @@ combat. Its smooth finish helps deflect the damage from any attack.
 2 0 0
 2 0
 A
-18 1
+18 1 0
 A
-17 1
+17 1 0
 S
 #2312
 helm eagle eagle-shaped~
@@ -193,11 +201,11 @@ beak strikes fear in your enemies.
 2 0 0
 2 0
 A
-2 1
+2 1 0
 A
-17 1
+17 1 0
 A
-18 1
+18 1 0
 S
 #2313
 vambraces spiked pair~
@@ -210,11 +218,11 @@ sword. Some of the spikes are already broken -- ablated off in battle, perhaps.
 2 0 0
 2 0
 A
-2 1
+2 1 0
 A
-18 1
+18 1 0
 A
-17 1
+17 1 0
 S
 #2314
 buckler leather~
@@ -228,7 +236,7 @@ shield.
 0 0 0
 7 0
 A
-13 1
+13 1 0
 S
 #2315
 shield kite~
@@ -240,7 +248,7 @@ The kite shield is as common as the miller's daughter.
 0 0 0
 2 0
 A
-13 1
+13 1 0
 C
 0 75
 S
@@ -254,7 +262,7 @@ This shield is strong, sturdy, and molded to look like a ram's head.
 0 0 0
 2 0
 A
-13 1
+13 1 0
 S
 #2317
 plate armor suit~
@@ -269,15 +277,15 @@ inside it.
 3 0 0
 2 0
 A
-9 -2
+9 -2 0
 A
-1 -1
+1 -1 0
 A
-18 1
+18 1 0
 A
-13 1
+13 1 0
 A
-15 2
+15 2 0
 S
 #2318
 helm great~
@@ -291,13 +299,13 @@ know who to swear vengeance against.
 3 0 0
 2 0
 A
-9 -2
+9 -2 0
 A
-2 1
+2 1 0
 A
-12 1
+12 1 0
 A
-15 2
+15 2 0
 S
 #2319
 cannons lower pair~
@@ -310,13 +318,13 @@ guards are unmatched in the land.
 3 0 0
 2 0
 A
-9 -2
+9 -2 0
 A
-13 2
+13 2 0
 A
-12 1
+12 1 0
 A
-15 2
+15 2 0
 S
 #2320
 shield clay~
@@ -330,7 +338,7 @@ inevitable cracks.
 0 0 0
 6 0
 A
-13 1
+13 1 0
 S
 #2321
 robe sorcerer's sorcerers~
@@ -344,11 +352,11 @@ color, as a warning to those who would cross them.
 0 0 0
 7 0
 A
-16 2
+16 2 0
 A
-8 1
+8 1 0
 A
-12 -1
+12 -1 0
 S
 #2322
 hat wizard's wizards~
@@ -362,11 +370,11 @@ but when you wear it you begin to see things in a whole new way.
 0 0 0
 7 0
 A
-7 1
+7 1 0
 A
-16 1
+16 1 0
 A
-12 -1
+12 -1 0
 S
 #2323
 armbands power unusual pair~
@@ -379,11 +387,11 @@ strange, peaceful feeling as you touch them.
 0 0 0
 7 0
 A
-16 1
+16 1 0
 A
-17 1
+17 1 0
 A
-12 -1
+12 -1 0
 S
 #2324
 breastplate copper~
@@ -395,9 +403,9 @@ The copper breastplate has molded abs!
 2 0 0
 13 0
 A
-18 1
+18 1 0
 A
-17 1
+17 1 0
 S
 #2325
 mask copper~
@@ -409,9 +417,9 @@ The mask looks like it would protect the face from blows.
 2 0 0
 13 0
 A
-17 1
+17 1 0
 A
-18 1
+18 1 0
 S
 #2326
 vambraces pair copper~
@@ -424,9 +432,9 @@ your forearms from enemy weaponry.
 2 0 0
 13 0
 A
-18 1
+18 1 0
 A
-17 1
+17 1 0
 S
 #2327
 buckler copper~
@@ -438,7 +446,7 @@ The copper buckler is quite common around here.
 0 0 0
 13 0
 A
-13 1
+13 1 0
 S
 #2328
 breastplate rawhide~
@@ -450,9 +458,9 @@ This simple piece of hardened rawhide is light weight and offers good mobility.
 1 0 0
 7 0
 A
-17 1
+17 1 0
 A
-2 1
+2 1 0
 S
 #2329
 skullcap cap rawhide~
@@ -464,9 +472,9 @@ The skullcap is made from fine rawhide.
 1 0 0
 7 0
 A
-17 1
+17 1 0
 A
-9 1
+9 1 0
 S
 #2330
 bracers rawhide pair~
@@ -478,9 +486,9 @@ These bracers should protect your arms in combat.
 1 0 0
 7 0
 A
-17 1
+17 1 0
 A
-1 1
+1 1 0
 S
 #2331
 boots rawhide pair~
@@ -492,7 +500,7 @@ These boots look sturdy, but not terribly strong.
 0 0 0
 7 0
 A
-11 1
+11 1 0
 S
 #2332
 knapsack napsack sack rawhide~
@@ -516,7 +524,7 @@ but when you wear it you begin to see things in a whole new way.
 0 0 0
 7 0
 A
-16 1
+16 1 0
 S
 #2334
 sleeves furrowed~
@@ -528,7 +536,7 @@ These sleeves are made from fur, furrowed into rows.
 0 0 0
 7 0
 A
-16 1
+16 1 0
 S
 #2335
 shoes apprentice pair~
@@ -540,9 +548,9 @@ These shoes have all the whispers of magic.
 0 0 0
 7 0
 A
-16 1
+16 1 0
 A
-17 1
+17 1 0
 S
 #2336
 sandals earth-hewn hewn earthhewn~
@@ -554,9 +562,9 @@ These sandals are infused with the power of the earth.
 0 0 0
 7 0
 A
-8 1
+8 1 0
 A
-16 2
+16 2 0
 S
 #2337
 pouch magewhisper~
@@ -568,7 +576,7 @@ Equip the pouch to increase your carrying capacity.
 2 0 0
 7 0
 A
-7 1
+7 1 0
 S
 #2338
 shield viper~
@@ -582,7 +590,7 @@ shield.
 0 0 0
 7 0
 A
-13 1
+13 1 0
 S
 #2339
 goggles clockwork pair~
@@ -595,7 +603,7 @@ goggles make precision craftsmanship much easier. And protect your eyes.
 0 0 0
 8 0
 A
-25 25
+25 25 0
 C
 100 100
 S
@@ -610,7 +618,7 @@ the front. It is also fireproof, and resists stains.
 0 0 0
 11 0
 A
-25 25
+25 25 0
 C
 100 100
 S
@@ -625,22 +633,22 @@ weight in tools within your reach while keeping both hands free.
 0 0 0
 7 0
 A
-25 25
+25 25 0
 C
 100 100
 S
 #2342
 multitool folding steel~
 a steel multitool~
-An folding steel multitool is lying here.~
+A folding steel multitool is lying here.~
    This amazing multi-purpose folding tool has attachments for almost every
 conceivable purpose. It even has a corkscrew!
 ~
-3 p ao 7
+3 p ao 8
 0 0 0
 2 0
 A
-25 25
+25 25 0
 C
 100 100
 S
@@ -651,10 +659,8 @@ An array of clockwork lenses is lying here.~
 These can be used by any craftsman to make a personal set of clockwork goggles.
 
 Craft (no skill required): clockwork goggles
-  1x clockwork lens array
-  2x copper ingot
 ~
-3 0 a 4
+3 0 a 5
 0 0 0
 8 0
 S
@@ -665,10 +671,8 @@ A sheet of guild-patterned cloth is lying here.~
 This can be used by any craftsman to make a personal guildmaster's tunic.
 
 Sew (no skill required): guildmaster tunic
-  1x guild-patterned cloth
-  2x bolt of cloth
 ~
-3 0 a 4
+3 0 a 5
 0 0 0
 11 0
 S
@@ -679,10 +683,8 @@ A pile of clips and buckles is lying here.~
 These can be used by any craftsman to make a personal utility belt.
 
 Sew (no skill required): utility belt
-  1x clips and buckles
-  4x large leather
 ~
-3 0 a 5
+3 0 a 6
 0 0 0
 2 0
 S
@@ -693,11 +695,8 @@ A set of tiny, delicate tools is lying here.~
 These can be used by any craftsman to make a personal artisan's multitool.
 
 Forge (no skill required): steel multitool
-  1x set of delicate tools
-  1x small leather
-  1x iron ingot
 ~
-3 0 a 6
+3 0 a 7
 0 0 0
 2 0
 S
@@ -705,15 +704,12 @@ S
 pattern filter alchemical~
 the alchemical filter pattern~
 The alchemical filter pattern is lying here.~
-An alchemist could use this pattern to create an alchemical filter, used in the
-creation of a chemist's cleansing cap, a level 200-300 crafting headpiece.
+   An alchemist could use this pattern to create an alchemical filter, used in
+the creation of a chemist's cleansing cap, a level 200-300 crafting headpiece.
 
 Craft (requires Alchemist Crafts and crafting 200): alchemical filter
-  2x nocturnium ingot
-  2x each of the 6 herbs:
-    whitegrass, fiveleaf, redthorn, magewhisper, daggerbite, bileberries
 ~
-3 0 a 7
+3 0 a 8
 0 0 0
 0 0
 S
@@ -721,15 +717,12 @@ S
 design device antiquated~
 the antiquated device design~
 The antiquated device design is lying here.~
-An an antiquarian could use this design to create antique device parts, used to
-make antiquated arcane apparatus, a level 200-300 crafting offhand.
+   An antiquarian could use this design to create antique device parts, used to
+make an antiquated arcane apparatus, a level 200-300 crafting offhand.
 
 Forge (requires Antiquarian Crafts and crafting 200): antique device parts
-  8x silver nugget
-  4x copper ingot
-  2x gold dust
 ~
-3 0 a 6
+3 0 a 8
 0 0 0
 0 0
 S
@@ -737,15 +730,12 @@ S
 pattern pouch concealed~
 the concealed pouch pattern~
 The concealed pouch pattern is lying here.~
-A smuggler could use this design to create concealed silk pouches, used in the
-creation of a superb smuggling sash, a level 200-300 crafting belt.
+   A smuggler could use this design to create concealed silk pouches, used in
+the creation of a superb smuggling sash, a level 200-300 crafting belt.
 
 Sew (requires Smuggler Crafts and crafting 200): concealed silk pouches
-  6x bolt of cloth
-  1x each of the 4 gems:
-    lightning stone, bloodstone, blue iris, glowing seashell
 ~
-3 0 a 5
+3 0 a 6
 0 0 0
 0 0
 S
@@ -753,16 +743,12 @@ S
 pattern harness tinker's tinkers~
 the tinker's harness pattern~
 The tinker's harness pattern is lying here.~
-A tinker could use this pattern to create a tinker's harness, used to make
+   A tinker could use this pattern to create a tinker's harness, used to make
 traveling tinker's trappings, a set of level 200-300 crafting clothes.
 
 Forge (requires Tinker Crafts and crafting 200): tinker harness
-  8x iron ingot
-  2x imperium ingot
-  2x shark skin
-  2x snakeskin
 ~
-3 0 a 4
+3 0 a 5
 0 0 0
 0 0
 S
@@ -770,14 +756,13 @@ S
 filter alchemical~
 an alchemical filter~
 An alchemical filter is lying here.~
-This alchemically treated metal filter is used in the construction of a
+   This alchemically treated metal filter is used in the construction of a
 chemist's cleansing cap. It will bind to whoever crafts it.
 
+
 Sew (requires crafting 200): chemists cleansing cap
-  1x alchemical filter
-  2x large leather
 ~
-3 0 a 4
+3 0 a 5
 0 0 0
 2 0
 S
@@ -785,30 +770,25 @@ S
 parts device antique pile~
 a pile of antique device parts~
 A pile of antique device parts is lying here.~
-This pile of strange little gears and rods can be used to assemble an
+   This pile of strange little gears and rods can be used to assemble an
 antiquated arcane apparatus. It will bind to whoever crafts it.
 
 Craft (requires crafting 200): antiquated arcane apparatus
-  1x antique device parts
-  1x gold dust
-  2x copper ingot
 ~
-3 0 a 5
+3 0 a 6
 0 0 0
 3 0
 S
 #2353
-pouches silk thing concealed~
+pouches silk thin concealed~
 some concealed silk pouches~
 Some thin silk pouches are lying here.~
-This set of enchanted hidden pouches, clearly crafted by a master smuggler,
+   This set of enchanted hidden pouches, clearly crafted by a master smuggler,
 could be sewn into a superb smuggling sash. It will bind to whoever crafts it.
 
 Sew (requires crafting 200): superb smuggling sash
-  1x concealed silk pouches
-  6x bolt of cloth
 ~
-3 0 a 6
+3 0 a 8
 0 0 0
 11 0
 S
@@ -816,15 +796,12 @@ S
 harness tinker's tinkers detached~
 a tinker's harness~
 A detached tinker's harness is piled up here.~
-This collection of straps, buckles and clamps can be used to create traveling
-tinker's trappings. They will bind to whoever crafts them.
+   This collection of straps, buckles and clamps can be used to create
+traveling tinker's trappings. They will bind to whoever crafts them.
 
 Sew (requires crafting 200): traveling tinker's trappings
-  1x tinker's harness
-  4x bolt of cloth
-  2x large leather
 ~
-3 0 a 10
+3 0 a 11
 0 0 0
 2 0
 S
@@ -839,7 +816,7 @@ purifier to protect you from noxious alchemical fumes!
 0 0 0
 7 0
 A
-25 50
+25 50 0
 C
 150 150
 S
@@ -854,7 +831,7 @@ movements while crafting.
 0 0 0
 3 0
 A
-25 50
+25 50 0
 C
 150 150
 S
@@ -869,7 +846,7 @@ sewn into the inside of the fabric!
 0 0 0
 11 0
 A
-25 50
+25 50 0
 C
 150 150
 S
@@ -885,7 +862,7 @@ on the move if you knew how to use it.
 0 0 0
 2 0
 A
-25 50
+25 50 0
 C
 150 150
 S

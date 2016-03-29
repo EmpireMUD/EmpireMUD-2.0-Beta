@@ -4,8 +4,6 @@ ALCHEMIST
 
 (AA)  Alchemist  (Artisans ability)
 
-Resources:  4 lumber, 2 nails, 12 bricks
-Built on:  plains, desert
 Stored here:  herbs, poisons
 
 The alchemist is a specialty building that allows you to store and process many
@@ -17,9 +15,6 @@ See also: BREW, LABORATORY, MIX, STORAGE
 APIARY APIARIES
 
 {BB}  Apiary  (Artisans ability)
-
-Resources:  12 lumber, 4 nails, 8 beehives
-Built on:  plains, desert
 
 Apiaries are used as hives for raising domestic bees. They produce honey and
 wax for the empire. Some crafts require that the empire have access to these
@@ -34,9 +29,6 @@ See also: ADVANCED WOODWORKING
 
 ..&C*&0.  Astral Nexus  (Exarch Crafts ability)
 
-Resources:  20 logs, 12 blocks, 12 nocturnium, 20 nexus crystals
-Built on:  plains, desert (in city only)
-
 The astral nexus allows you to summon other players if you have a second player
 present to help you. This only works in cities.
 
@@ -45,9 +37,6 @@ See also: SUMMON PLAYER
 BAKERY
 
 (BB)  Bakery  (Artisans ability)
-
-Resources:  4 lumber, 2 nails, 12 bricks
-Built on:  plains, desert
 
 The bakery is a warm, pleasant building that always smells of fresh breads.
 You can use its oven to cook all manner of foods.
@@ -58,9 +47,8 @@ BARRACKS FORT
 
 [BB]  Barracks (Raise Armies ability)
 
-Resources:  40 lumber, 10 nails, 20 bricks
-Built on:  plains, desert
 Extra rooms:  10, interlink
+Military:  20
 
 The barracks are one of the main parts of forts and outposts. It provides
 military to the city, and can be interlinked with other buildings.
@@ -70,9 +58,6 @@ See also: DESIGNATE, INTERLINK
 BATH BATHS
 
 [&b~~&0]  Baths  (Luxury ability)
-
-Resources:  4 blocks, 8 lumber, 2 nails, 12 bricks
-Built on:  plains, desert
 
 The most opulent empires construct bath houses for their citizens. These
 luxuries serve as meeting places and relaxation houses for persons of dist-
@@ -86,9 +71,6 @@ BRIDGE
 
 &c~~&0|&c~&0  Bridge  (Artisans ability)
 
-Resources:  8 blocks, 12 lumber, 4 nails
-Built on:  river
-
 Once completed, a bridge allows you to cross river tiles without a boat. You
 can also sail ships under the bridges. Nobody knows how.
 
@@ -98,10 +80,8 @@ BURROWHAVEN "BURROW HAVEN" "STRANGE BURROW"
 
 &g^[]^&0  Burrow Haven  (Build Haven skill)
 
-Resources:  12 lumber, 3 nails, 4 blocks
-Built on:  forest
 Extra rooms:  6
-Special rooms:  tunnel, no hallway
+Special rooms:  crypt, tunnel, no hallway
 Citizens:  1
 Chameleon:  &g^^^^&0
 
@@ -114,18 +94,22 @@ CABIN
 
 (--)  Cabin  (no skill required)
 
-Resources:  6 logs
-Built on:  plains only
 Citizens:  2
 
 A cabin is slightly larger than a hut, but still contains just one room.
+#
+"CABINET OF CURIOSITIES" CABINETOFCURIOSITIES CURIOS
+
+[CC]  Cabinet of Curiosities  (Luxury ability)
+
+This building stores the rare items that are found in various adventures.
+
+See also:  LUXURY, STORAGE, TROPHY ROOM
 #
 CANNERY
 
 {CC}  Cannery  (no skill required)
 
-Resources:  20 sticks
-Built on:  plains, desert
 Stored here:  fruits
 
 A cannery is a location for preserving and storing fruits. Like all storage
@@ -138,9 +122,6 @@ CARPENTER
 
 (CC)  Carpenter  (Artisans ability)
 
-Resources:  4 lumber, 2 nails, 12 bricks
-Built on:  plains, desert
-
 The carpenter is a workshop for all manner of crafts. Certain craft items,
 such as wagons, require a carpenter shop for you to build them in.
 
@@ -150,10 +131,8 @@ CAVEHAVEN "CAVE HAVEN" "OBSCURE CAVE"
 
 &y/&0()&y\&0  Cave Haven  (Build Haven skill)
 
-Resources:  30 lumber, 10 nails, 2 blocks
-Built on:  mountain
 Extra rooms:  6
-Special rooms:  tunnel, no hallway
+Special rooms:  crypt, tunnel, no hallway
 Citizens:  1
 Chameleon:  &y/\/\&0
 
@@ -166,8 +145,6 @@ CAVESHELTER "CAVE SHELTER"
 
 &y^&0O&y/\&0  Cave Shelter  (Find Shelter ability)
 
-Resources:  none
-Built on:  mountain
 Chameleon:  &y/\/\&0
 
 You can quickly build a shelter to protect yourself from nasty surprises
@@ -179,9 +156,6 @@ CEMETERY
 
 .i.i  Cemetery  (Monuments ability)
 
-Resources:  8 stone blocks
-Built on:  plains, desert
-
 Cemeteries are a traditional place to bury the dead. When your character dies,
 you can re-spawn at a cemetery if your empire owns one on the same continent
 (otherwise, you'll re-spawn at a starting location).
@@ -192,13 +166,10 @@ CLAYPIT "CLAY PIT"
 
 &y|__|&0  Clay Pit  (no skill required)
 
-Resources:  4 logs, 20 sticks
-Built on: plains or desert, facing water
-
 Clay pits are reinforced areas where fresh clay can be dug deeper, safer than
 digging on unprepared ground. You can dig more clay from them before depletion.
 
-Clay pits Mines count as in-city territory as far away as 3x a city's normal
+Clay pits count as in-city territory as far away as 3x a city's normal
 radius.
 
 See also: DIG
@@ -207,8 +178,6 @@ CLIFFDWELLING "CLIFF DWELLING"
 
 &y[==]&0  Cliff Dwelling  (no skill required)
 
-Resources:  10 logs, 20 rocks
-Built on:  mountain
 Extra rooms:  3, interlink
 Citizens:  2
 
@@ -222,9 +191,6 @@ COURTYARD "COURT YARD"
 
 ....  Courtyard  (Luxury ability)
 
-Resources:  20 rocks, 4 stone blocks
-Built on:  desert, plains
-
 The courtyard is a well-appointed open space, well-planted and with fine
 paving stones. It is well-maintained and forests will not grow upon it.
 
@@ -234,20 +200,25 @@ DOCK DOCKS
 
 &b~&0==&g.&0  Docks  (Seafaring ability)
 
-Resources:  20 lumber, 8 nails
-Built on:  plains or desert, next to water
+The docks allow you a safe place to moor your ships, and are required for the
+shipping system.
 
-The docks allow you a safe place to moor your ships. You can also load and
-unload boats at the docks.
+See also:  BOARD, LOAD, SHIPPING, UNLOAD
+#
+DRAINAGE "OASIS DRAINAGE" "DRAINED OASIS" "DRAIN OASIS" "DRAINING OASIS"
 
-See also:  BOARD, LOAD, UNLOAD
+&y.&c__&y.&0  Draining Oasis  (Elder Crafts ability)
+
+By building drainage for an oasis, it can be converted into a normal desert.
+If the oasis was created using the 'excavate' command, you can alternatively use
+'fillin' instead.
+
+See also: EXCAVATE
 #
 ESTUARYGARDEN "ESTUARY GARDEN"
 
 &b~&0##&b~&0  Estuary Garden  (Herb Gardens ability)
 
-Resources:  12 lumber, 4 nails, 60 sticks, 30 whitegrass
-Built on: river, facing ocean
 Grows:  whitegrass
 
 By gardening in the fertile area where the river meets the sea, it is possible
@@ -257,16 +228,26 @@ You can pick more herbs than normal before the tile is depleted.
 
 See also: PICK
 #
+"ELDER CRAFTS"
+
+Elder Crafts
+Class ability:  Elder
+
+This ability allows you to build the following buildings:
+  &y.&c__&y.&0 drainage  (built on oasis)
+
+See also: BUILD, ELDER CLASS
+#
 "EXARCH CRAFTS"
 
 Exarch Crafts
 Class ability:  Exarch
 
 This ability allows you to build the following buildings:
-  ..&C*&0. astralnexus  20 logs, 12 blocks, 12 nocturnium, 20 nexus crystals
+  ..&C*&0. astralnexus
 
 Allows the following workforce options:
-  nexus crystals - Also requires Skilled Labor
+  nexus-crystals - Also requires Skilled Labor
 
 See also: BUILD, EXARCH CLASS, SKILLED LABOR
 #
@@ -285,8 +266,6 @@ See also: BUILD, MONUMENTS, TOMB
 
 [**]  Great Hall (Luxury ability)
 
-Resources:  60 lumber, 14 nails, 60 bricks
-Built on:  plains, desert
 Extra rooms:  30, interlink
 Special rooms:  greathall, crypt, throne, vault, baths, laboratory
 
@@ -303,9 +282,6 @@ FENCE
 
 vvvv  Fence  (no skill required)
 
-Resources:  20 sticks
-Built on:  plains, desert
-
 Fences will block the movement of NPCs, but not players. They count as in-city
 territory as far away as 3x a city's normal radius.
 
@@ -315,8 +291,6 @@ FOUNDRY
 
 {FF}  Foundry  (no skill required)
 
-Resources:  20 sticks
-Built on:  plains, desert
 Stored here:  metals
 
 A foundry is a place for smelting and storing the empire's metal. Like all
@@ -329,9 +303,6 @@ FOUNTAIN
 
 {&c~~&0}  Fountain  (Luxury ability)
 
-Resources:  10 blocks
-Built on:  plains, desert
-
 Fountains provide water, like a well.
 
 This building can only be built in a city.
@@ -342,9 +313,6 @@ GATE
 
 .xx.  vxxv  Gate  (no skill required)
 
-Resources:  20 sticks, 1 copper ingot
-Built on:  plains, desert
-
 A gate is an entrance for a fence. Since players are not blocked by fences,
 the gate is purely decorative.
 
@@ -353,9 +321,6 @@ See also: FENCE
 GATEHOUSE "GATE HOUSE"
 
 -==-  V||V  V\\V  Gatehouse  (Raise Armies ability)
-
-Resources:  10 lumber, 4 nails, 10 bricks
-Built on:  plains, desert
 
 The gatehouse creates a secure way through your walls. Only players who can
 infiltrate will make it through the gatehouse, and many of those will be
@@ -369,9 +334,6 @@ GLASSBLOWER "GLASS BLOWER"
 
 (GG)  Glass Blower  (Artisans ability)
 
-Resources:  4 lumber, 2 nails, 12 bricks
-Built on:  plains, desert
-
 The glass blower is an artisan shop that creates flasks, vials, panes, and
 many other glass items for the empire. This building's function is passive --
 you don't blow the glass yourself. Instead, you simply need to be in the
@@ -381,8 +343,6 @@ GRANARY
 
 {GG}  Granary  (no skill required)
 
-Resources:  20 sticks
-Built on:  plains, desert
 Stored here:  grains
 
 A granary is a silo used to store the empire's grains. Like all storage
@@ -395,8 +355,6 @@ GRAVELPIT "GRAVEL PIT"
 
 {PP}  Gravel Pit  (no skill required)
 
-Resources:  20 sticks
-Built on:  plains, desert
 Stored here:  rocks and stone
 
 A gravel pit is a storage facility for the empire's stone. Like all storage
@@ -409,20 +367,15 @@ See also: STORAGE
 
 &y^&0VV&y^&0  Great Wall  (Great Walls ability)
 
-Resources:  10 bricks, 5 iron ingots
-Built on:  mountain, plains, desert
-
 Great Walls function like ordinary walls, but can be built on mountains.
 
 See also: RIVERGATE
 #
 GUARDTOWER "GUARD TOWERS" "ADVANCED GUARD TOWER" "UPGRADED GUARD TOWER" "SUPERIOR GUARD TOWER"
 
-.TT.  Guard Tower  12 lumber, 3 nails  (Raise Armies ability)
-'TT'  Advanced Tower  +12 lumber, +3 nails  (Advanced Tactics ability)
-"TT"  Superior Tower  +24 lumber, +6 nails (Advanced Tactics ability)
-
-Built on:  plains, desert
+.TT.  Guard Tower  (Raise Armies ability)
+'TT'  Advanced Tower  (Advanced Tactics ability)
+"TT"  Superior Tower (Advanced Tactics ability)
 
 Guard towers are defensive structures that automatically shoot at foes within
 range. These are often an empire's first line of defense against intruders.
@@ -432,9 +385,9 @@ If your empire's disposition is set to "Friendly", towers will only shoot at
 people you distrust or are at war with. If your disposition is "Distrustful",
 they will shoot at anyone you're not at peace (or better) with.
 
-Guard towers periodically shoot at any hostile player, as well as any animal
-that is leading a catapult. Advanced and Superior towers do increasingly larger
-amounts of damage.
+Guard towers periodically shoot at any hostile player, as well as hostile
+vehicles. Advanced and Superior towers do increasingly larger amounts of
+damage.
 
 Regular guard towers have a range of 2 tiles. All other guard towers have a
 range of 3 tiles. Towers can fire over walls and buildings, but won't fire
@@ -450,8 +403,6 @@ HENGE "STONE HENGE"
 
 <<>>  Henge (Monuments ability)
 
-Resources:  120 stone blocks
-Built on:  desert, plains
 Fame:  4
 
 The henge is a great, circular monument made of massive stones. It is used in
@@ -465,8 +416,6 @@ HIGHTEMPLE "HIGH TEMPLE"
 
 [||]  High Temple  (Grand Monuments ability)
 
-Resources:  24 lumber, 8 nails, 48 blocks
-Built on:  plains, desert
 Extra rooms: 5, interlink
 Fame:  10
 
@@ -479,8 +428,6 @@ HOUSE "SMALL HOUSE"
 
 (==)  House  (no skill required)
 
-Resources:  10 logs
-Built on:  plains only
 Extra rooms:  2
 Citizens:  2
 
@@ -494,9 +441,8 @@ HOUSEHAVEN "HOUSE HAVEN" "RICKETY OLD HOUSE"
 
 .[].  House Haven  (Build Haven skill)
 
-Resources:  8 lumber, 2 nails, 12 bricks
-Built on:  plains
 Extra rooms:  6
+Special rooms:  crypt
 Citizens:  1
 
 Havens are houses specifically for vampires. They provide increased protection
@@ -508,8 +454,6 @@ HUT "SMALL HUT"
 
 &g.&0()&g.&0  Hut  (no skill required)
 
-Resources:  20 sticks
-Built on:  plains only
 Citizens:  1
 
 Huts are the simplest permanent living structures. They are built only on
@@ -538,8 +482,6 @@ JUNGLESHELTER "JUNGLE SHELTER"
 
 &G^c^^&0  Jungle Shelter  (Find Shelter ability)
 
-Resources:  none
-Built on:  jungle
 Chameleon:  &G^^^^&0
 
 You can quickly build a shelter to protect yourself from nasty surprises
@@ -551,8 +493,6 @@ LARGEHOUSE "LARGE HOUSE"
 
 [==]  Large House  (Housing ability)
 
-Resources:  4 lumber, 1 nails, 12 bricks
-Built on:  plains, desert
 Extra rooms:  5
 Citizens:  4
 
@@ -564,8 +504,6 @@ LUMBERYARD "LUMBER YARD"
 
 {LL}  Lumber Yard  (no skill required)
 
-Resources:  20 sticks
-Built on:  plains, desert
 Stored here:  trees and wood
 
 Each lumber yard is a storage facility for the empire's wood. Like all of the
@@ -578,8 +516,6 @@ MEGALITH
 
 &g.&0||&g.&0  Megalith  (Monuments ability)
 
-Resources:  40 stone blocks
-Built on:  desert, plains
 Fame:  1
 
 A megalith is a giant stone which inspires reverence and awe.
@@ -588,8 +524,6 @@ MINECOMPLEX "MINE COMPLEX"
 
 &y/&0[]&y\&0  Mine Complex  (Housing ability)
 
-Resources:  30 lumber, 12 nails
-Built on:  mountain
 Extra rooms:  7, interlink
 Special rooms:  tunnel, no hallway
 Citizens:  4
@@ -603,9 +537,6 @@ MOUNTAINOUTPOST "MOUNTAIN OUTPOST"
 
 &y.&0/\&y.&0  Mountain Outpost  (Raise Armies ability)
 
-Resources:  12 lumber, 3 nails
-Built on:  mountain
-
 A mountain outpost is a safe place constructed in the middle of the mountains.
 It has no other purpose.
 #
@@ -613,8 +544,6 @@ MUDHUT "MUD HUT"
 
 &y.&0()&y.&0  Mud Hut  (no skill required)
 
-Resources:  10 sticks, 10 rocks
-Built on:  desert
 Citizens:  1
 
 A mud hut is a small, simple house which is built in the desert using any
@@ -639,8 +568,6 @@ OASISGARDEN "OASIS GARDEN"
 
 &G^&C##&G^&0  Oasis Garden  (Herb Gardens ability)
 
-Resources:  12 lumber, 4 nails, 60 rocks, 15 daggerbite, 15 magewhisper
-Built on:  oasis
 Grows:  daggerbite, magewhisper
 
 The best gardeners have learned to farm both daggerbite and magewhisper -- two
@@ -650,21 +577,25 @@ You can pick more herbs than normal before the tile is depleted.
 
 See also: PICK
 #
+OILMAKER "OIL MAKER"
+
+(OO)  Oilmaker  (Artisans ability)
+
+Stored here:  oil
+
+The oilmaker is used to press olives and other resources into oil.
+
+See also: PRESS, STORAGE
+#
 PARK
 
 &g.^.&co&0  Park  (Monuments ability)
-
-Resources:  25 sticks, 4 blocks
-Built on:  plains
 
 Parks are a pleasant place to spend the day.
 #
 PIGEONPOST "PIGEON POST"
 
 [PP]  Pigeon Post  (Artisans ability)
-
-Resources:  12 lumber, 4 nails
-Built on:  plains, desert
 
 The Pigeon Post is a service that uses highly-trained birds to send mail across
 the world. You can receive mail anywhere, but must send it from the Post.
@@ -675,8 +606,6 @@ PORTCULLIS "CASTLE PORTCULLIS" CASTLE PALACE
 
 V[]V  Portcullis (Luxury ability)
 
-Resources:  60 lumber, 14 nails, 60 bricks
-Built on:  plains, desert
 Extra rooms:  30, interlink
 Special rooms:  greathall, crypt, throne, vault, baths, laboratory
 
@@ -691,8 +620,6 @@ PUEBLO
 
 &y.&0[]&y.&0  Pueblo  (no skill required)
 
-Resources:  6 logs, 20 rocks
-Built on:  desert
 Citizens:  2
 Extra rooms:  2
 
@@ -707,9 +634,8 @@ PUEBLOHAVEN "PUEBLO HAVEN" "OLD PUEBLO"
 
 &y.&0[]&y.&0  Pueblo Haven  (Build Haven skill)
 
-Resources:  4 lumber, 1 nails, 20 bricks
-Built on:  desert
 Extra rooms:  6
+Special rooms:  crypt
 Citizens:  1
 
 Havens are houses specifically for vampires. They provide increased protection
@@ -721,8 +647,6 @@ PYRAMID
 
 &y/^^\&0  Pyramid  (Grand Monuments)
 
-Resources:  100 lumber, 40 nails, 200 blocks
-Built on:  desert
 Fame:  15
 
 Pyramids are grand monuments to the dead, but have no other purpose yet. You
@@ -734,8 +658,6 @@ RAFTGARDEN "RAFT GARDEN"
 
 &c~&b##&c~&0  Raft Garden  (Herb Gardens ability)
 
-Resources:  12 lumber, 4 nails, 60 sticks, 30 bileberries
-Built on:  river
 Grows:  bileberries
 
 The raft garden uses mats of sticks tied to the banks of rivers to grow the
@@ -749,9 +671,6 @@ RIVERGATE "RIVER GATE"
 
 V&c||&0V  River Gate  (Great Walls ability)
 
-Resources:  20 lumber, 8 nails, 10 blocks, 40 rocks
-Built on:  river
-
 River Gates are like gatehouses that can be built on rivers, and allow only
 friendly ships and canoes through.
 #
@@ -759,8 +678,6 @@ ROCKSHELTER "ROCK SHELTER"
 
 .c..  Rock Shelter  (Find Shelter ability)
 
-Resources:  none
-Built on:  plains, desert
 Chameleon:  &g....&0 or &Y....&0
 
 You can quickly build a shelter to protect yourself from nasty surprises
@@ -774,7 +691,6 @@ RUINS "DECAYING RUINS"
 
 Decaying Ruins
 
-Resources:  none
 Fame:  -1
 
 When you fail to perform upkeep on your buildings, they eventually collapse
@@ -790,8 +706,6 @@ SHADYGARDEN "SHADY GARDEN"
 
 &g|&y##&g|&0  Shady Garden  (Herb Gardens ability)
 
-Resources:  12 lumber, 4 nails, 60 sticks, 30 fiveleaf
-Built on:  plains or forest
 Grows:  fiveleaf
 
 It is possible to grow the rare fiveleaf plant, if the soil is right and the
@@ -805,8 +719,6 @@ SHRINE
 
 .{}.  Shrine  (Monuments ability)
 
-Resources:  4 lumber, 2 nails, 12 blocks
-Built on:  plains, desert
 Fame:  1
 
 Shrines are small buildings dedicated to a particular patron. You can dedicate
@@ -818,8 +730,6 @@ SMOKEHOUSE "SMOKE HOUSE"
 
 {SS}  Smoke House  (no skill required)
 
-Resources:  20 sticks
-Built on:  plains, desert
 Features: cooking fire
 Stored here:  meats
 
@@ -833,13 +743,12 @@ STABLE
 
 (SS)  Stable  (no skill required)
 
-Resources:  20 logs, 8 pouches of nails
-Built on:  plains, desert
-
 Stables are a safe place to keep your animals. You can also use them as a place
 to milk cows or shear sheep. This is also where you can barde horses.
 
-Most animals will not de-spawn if left in a stable.
+Most animals will not despawn if left in a stable, but there is a limit on the
+number of duplicate animals in each stable, after which any extras will despawn
+normally. (By default, this limit is 2.)
 
 See also: BARDE, MILK, SHEAR
 #
@@ -847,8 +756,6 @@ STATUE
 
 .}{.  Statue  (Monuments ability)
 
-Resources:  6 lumber, 2 nails, 10 blocks
-Built on:  plains, desert
 Fame:  2
 
 Statues are monuments in the shape of gods and heroes. You can dedicate them
@@ -860,9 +767,6 @@ STEPS
 
 .==.  Steps  (Artisans ability)
 
-Resources:  8 blocks
-Built on:  plains, desert
-
 Steps are similar to roads, but indicate rising terrain. These might be the
 steps to a great monument, or merely the main street of a town on a hillside.
 #
@@ -870,8 +774,6 @@ STONEHOUSE "STONE HOUSE"
 
 [--]  Stone House  (Housing ability)
 
-Resources:  6 lumber, 6 blocks
-Built on:  plains, desert
 Extra rooms:  3
 Citizens:  2
 
@@ -884,9 +786,6 @@ SWAMPWALK "SWAMP WALK"
 
 &c~&0--&c~&0  Swamp Walk  (Swamp Engineering ability)
 
-Resources:  4 lumber, 40 sticks
-Built on:  swamp
-
 The swamp walk, though never very stable, makes travel through the swamp
 much easier. Swamp animals may still harass you, but you will avoid random
 attacks by crocodilians.
@@ -897,8 +796,6 @@ SWAMPHUT "SWAMP HUT"
 
 &c~&0/\&c~&0  Swamp Hut  (Swamp Engineering ability)
 
-Resources:  20 lumber, 8 nails, 40 sticks
-Built on:  swamp
 Extra rooms:  3
 Citizens:  2
 
@@ -910,8 +807,6 @@ SWAMPMANOR "SWAMP MANOR"
 
 &c~&0[]&c~&0  Swamp Manor  (Swamp Engineering ability)
 
-Resources:  30 lumber, 12 nails, 60 sticks
-Built on:  swamp
 Extra rooms:  5
 Citizens:  4
 
@@ -924,8 +819,6 @@ SWAMPCOMPLEX "SWAMP COMPLEX"
 
 &c~&0()&c~&0  Swamp Complex  (Swamp Engineering ability)
 
-Resources:  40 lumber, 16 nails, 80 sticks
-Built on:  swamp
 Extra rooms:  7, interlink
 Citizens:  2
 Chameleon: &c~~~~&0
@@ -939,9 +832,6 @@ SWAMPPLATFORM "SWAMP PLATFORM"
 
 &c~&0__&c~&0  Swamp Platform  (Swamp Engineering ability)
 
-Resources:  12 lumber, 4 nails, 40 sticks
-Built on: swamp
-
 By building a sturdy platform on top of swampland, you can effectively build
 "plains-only" buildings in the swamp. Once complete, the platform becomes an
 ordinary plains. If you don't build on it soon, though, the swamp will re-claim
@@ -951,8 +841,6 @@ TAILOR
 
 (TT)  Tailor  (Artisans ability)
 
-Resources:  4 lumber, 2 nails, 12 bricks
-Built on:  plains, desert
 Stored here:  cotton, wool, cloth
 Command:  weave
 
@@ -967,8 +855,6 @@ TANNERY
 
 {TT}  Tannery  (no skill required)
 
-Resources:  20 sticks
-Built on:  plains, desert
 Stored here:  skins, furs, and leathers
 Command:  tan
 
@@ -984,9 +870,7 @@ TAVERN
 
 Tavern building (Artisans skill)
 
-Resources:  10 lumber, 4 nails, 12 bricks, 20 hops, 20 barley
 Building:  [TT]  Tavern
-Built on:  plains, desert
 Command:  tavern [type]
 
 You can use this command to change what a Tavern is brewing. It will charge
@@ -1008,8 +892,6 @@ TEMPLE
 
 [[]]  Temple  (Monuments ability)
 
-Resources:  12 lumber, 4 nails, 24 blocks
-Built on:  plains, desert
 Fame:  4
 
 Temples are larger than shrines, but serve the same purpose: religious worship
@@ -1021,8 +903,6 @@ TERRACEDGARDEN "TERRACED GARDEN"
 
 &y/&r##&y\&0  Terraced Garden  (Herb Gardens ability)
 
-Resources:  12 lumber, 4 nails, 60 rocks, 30 redthorn
-Built on:  mountain
 Grows:  redthorn
 
 Terraced gardens are a beautiful sight on the side of a mountain. By collecting
@@ -1037,8 +917,6 @@ TOMB
 
 [oo]  Tomb  (Monuments ability)
 
-Resources:  4 lumber, 2 nails, 10 blocks
-Built on:  plains, desert
 Fame:  1
 
 Command:  tomb [set | unset]
@@ -1057,8 +935,6 @@ See also: CEMETERY, STARTING LOCATION
 
 &g.&b||&g.&0  Tower of Sorcery  (Luxury ability)
 
-Resources:  80 lumber, 40 stone blocks, 5 nocturnium ingots, 2 gold bars
-Built on:  plains, desert
 Extra rooms:  1
 Special rooms: sorcery tower, skybridge
 Citizens:  1
@@ -1080,9 +956,6 @@ TRADINGPOST "TRADING POST"
 
 [$$]  Trading Post  (Trade Routes ability)
 
-Resources:  12 lumber, 4 nails
-Built on:  plains, desert
-
 The trading post allows you to buy and sell unique items (including crafted
 gear and things from adventure zones) on the global market.
 
@@ -1092,9 +965,8 @@ See also: TRADE ROUTES, TRADE COMMAND
 
 [  ]  Training Yard (Raise Armies ability)
 
-Resources:  40 lumber, 10 nails, 20 bricks
-Built on:  plains, desert
 Extra rooms:  10, interlink
+Military:  20
 
 The training yard serves as an entrance to various fort facilities and as such,
 you can designate extra rooms and interlink with other buildings.
@@ -1104,9 +976,6 @@ See also: DESIGNATE, INTERLINK
 TRAPPERSPOST "TRAPPERS POST" "TRAPPING POST" "TRAPPER'S POST"
 
 &g^/\^&0  Trapper's Post  (Luxury ability)
-
-Resources:  18 lumber, 4 nails, 8 large leather
-Built on:  forest, desert, grove
 
 The trapper's post is a place where trappers come to trade their skins. This
 building is required in order for your workforce to gather skin. Trapper's
@@ -1118,8 +987,6 @@ TREECOMPLEX "TREE COMPLEX"
 
 &g^[]^&0  Tree Complex  (Housing ability)
 
-Resources:  20 lumber, 8 nails
-Built on:  forest
 Extra rooms:  7, interlink
 Special rooms:  skybridge
 Citizens:  4
@@ -1135,8 +1002,6 @@ TREEHOUSE "TREE HOUSE"
 
 &g^()^&0  Tree House  (Housing ability)
 
-Resources:  6 lumber, 2 nails
-Built on:  forest
 Extra rooms:  3
 Special rooms:  skybridge
 Citizens:  2
@@ -1151,8 +1016,6 @@ TREESHELTER "TREE SHELTER"
 
 &g^&0T&g^^&0  Tree Shelter  (Find Shelter ability)
 
-Resources:  none
-Built on:  forest
 Chameleon:  &g^^^^&0
 
 You can quickly build a shelter to protect yourself from nasty surprises
@@ -1160,12 +1023,17 @@ while you sleep.
 
 When you're done with the shelter, be sure to dismantle and abandon it.
 #
+"TROPHY ROOM"
+
+The trophy room can be added to any building that can have a great hall. It
+stores items that are found on various adventures.
+
+See also: CABINET OF CURIOSITIES, STORAGE
+#
 UNDERGROUNDCOMPLEX "UNDERGROUND COMPLEX" "UNDERGROUND PASSAGE"
 
 &g.&0()&g.&0  Underground Complex  (Housing ability)
 
-Resources:  20 lumber, 2 blocks, 8 nails
-Built on:  plains, desert
 Extra rooms:  7, interlink
 Special rooms:  tunnel, no hallway
 Citizens:  4
@@ -1180,8 +1048,6 @@ UTILITYSHED "UTILITY SHED" TOOLSHED "TOOL SHED"
 
 {UU}  Utility Shed  (no skill required)
 
-Resources:  20 sticks
-Built on:  plains, desert
 Stored here:  tools
 
 Each utility shed stores tools and miscellaneous items for the empire. Like all
@@ -1194,9 +1060,6 @@ WALL WALLS
 
 VVVV  Wall  (Raise Armies skill)
 
-Resources:  10 bricks
-Built on:  plains, desert
-
 Walls will keep most people out, so long as they are continuous. You can also
 alternate between buildings and walls and still keep people from using circle
 to get in.
@@ -1208,9 +1071,6 @@ See also: CIRCLE, GATEHOUSE, GREAT WALLS, RITUAL OF DEFENSE
 WELL
 
 (&c~~&0)  Well  (no skill required)
-
-Resources:  5 sticks, 1 log, 10 rocks
-Built on:  plains
 
 Wells provide water for your little settlement.
 

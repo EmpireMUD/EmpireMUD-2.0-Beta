@@ -34,123 +34,58 @@ extern const char *apply_types[];
 extern const char *affected_bits[];
 
 
-
-/* cast a spell; can be called by mobiles, objects and rooms, and no   */
-/* level check is required. Note that mobs should generally use the    */
-/* normal 'cast' command (which must be patched to allow mobs to cast  */
-/* spells) as the spell system is designed to have a character caster, */
-/* and this cast routine may overlook certain issues.                  */
-/* LIMITATION: a target MUST exist for the spell unless the spell is   */
-/* set to TAR_IGNORE. Also, group spells are not permitted             */
-/* code borrowed from do_cast() */
-void do_dg_cast(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd) {
-/*
-	char_data *caster = NULL, tch = NULL;
-	obj_data *tobj = NULL;
-	room_data *caster_room = NULL;
-	char *s, *t;
-	int spellnum, target = 0;
-	char buf2[MAX_STRING_LENGTH], orig_cmd[MAX_INPUT_LENGTH];
-
-	// need to get the caster or the room of the temporary caster
-	switch (type) {
-		case MOB_TRIGGER:
-			caster = (char_data*)go;
-			break;
-		case WLD_TRIGGER:
-			caster_room = (room_data*)go;
-			break;
-		case OBJ_TRIGGER:
-			caster_room = dg_room_of_obj((obj_data*)go);
-			if (!caster_room) {
-				script_log("dg_do_cast: unknown room for object-caster!");
-				return;
-			}
-			break;
-		default:
-			script_log("dg_do_cast: unknown trigger type!");
-			return;
+/**
+* Creates a room and adds it to the current ship/building.
+*
+* WARNING: This cannot currently be used for adventure rooms. That would take
+* an upgrade.
+*
+* @param room_data *from The room we're attaching a new one to.
+* @param int dir Which direction to add it.
+* @param bld_data *bld A building prototype to attach, if desired (technically optional here but you do need to attach one at some point).
+* @return room_data* The created room.
+*/
+room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
+	void add_room_to_vehicle(room_data *room, vehicle_data *veh);
+	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
+	extern room_data *create_room();
+	void sort_world_table();
+	
+	room_data *home = HOME_ROOM(from), *new;
+	
+	// create the new room
+	new = create_room();
+	create_exit(from, new, dir, TRUE);
+	if (bld) {
+		attach_building_to_room(bld, new, TRUE);
 	}
 
-	strcpy(orig_cmd, cmd);
-	// get: blank, spell name, target name
-	s = strtok(cmd, "'");
-	if (s == NULL) {
-		script_log("Trigger: %s, VNum %d. dg_cast needs spell name.", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
-		return;
+	COMPLEX_DATA(new)->home_room = home;
+	COMPLEX_DATA(home)->inside_rooms++;
+	ROOM_OWNER(new) = ROOM_OWNER(home);
+	
+	if (GET_ROOM_VEHICLE(from)) {
+		++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(from));
+		COMPLEX_DATA(new)->vehicle = GET_ROOM_VEHICLE(from);
+		add_room_to_vehicle(new, GET_ROOM_VEHICLE(from));
+		SET_BIT(ROOM_AFF_FLAGS(new), ROOM_AFF_IN_VEHICLE);
+		SET_BIT(ROOM_BASE_FLAGS(new), ROOM_AFF_IN_VEHICLE);
 	}
-	s = strtok(NULL, "'");
-	if (s == NULL) {
-		script_log("Trigger: %s, VNum %d. dg_cast needs spell name in `'s.", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
-		return;
+	
+	if (ROOM_OWNER(new)) {
+		create_territory_entry(ROOM_OWNER(new), new);
 	}
-	t = strtok(NULL, "\0");
-
-	// spellnum = search_block(s, spells, 0);
-	spellnum = find_skill_num(s);
-	if ((spellnum < 1) || (spellnum > MAX_SPELLS)) {
-		script_log("Trigger: %s, VNum %d. dg_cast: invalid spell name (%s)",
-		GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), orig_cmd);
-		return;
-	}
-
-	// Find the target
-	if (t != NULL) {
-		one_argument(strcpy(buf2, t), t);
-		skip_spaces(&t);
-	}
-	if (IS_SET(SINFO.targets, TAR_IGNORE)) {
-		target = TRUE;
-	}
-	else if (t != NULL && *t) {
-		if (!target && (IS_SET(SINFO.targets, TAR_CHAR_ROOM) || IS_SET(SINFO.targets, TAR_CHAR_WORLD))) {
-			if ((tch = get_char(t)) != NULL)
-				target = TRUE; 
-		}
-
-		if (!target && (IS_SET(SINFO.targets, TAR_OBJ_INV) || IS_SET(SINFO.targets, TAR_OBJ_EQUIP) || IS_SET(SINFO.targets, TAR_OBJ_ROOM) || IS_SET(SINFO.targets, TAR_OBJ_WORLD))) {
-			if ((tobj = get_obj(t)) != NULL)
-				target = TRUE; 
-		}
-
-		if (!target) {
-			script_log("Trigger: %s, VNum %d. dg_cast: target not found (%s)", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), orig_cmd);
-			return;
-		}
-	}
-
-	if (IS_SET(SINFO.routines, MAG_GROUPS)) {
-		script_log("Trigger: %s, VNum %d. dg_cast: group spells not permitted (%s)", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), orig_cmd);
-		return;
-	}
-
-	if (!caster) {
-		caster = read_mobile(DG_CASTER_PROXY, TRUE);
-		if (!caster) {
-			script_log("dg_cast: Cannot load the caster mob!");
-			return;
-		}
-		// set the caster's name to that of the object, or the gods....
-		if (type == OBJ_TRIGGER)
-			caster->player.short_descr = strdup(GET_OBJ_SHORT_DESC((obj_data*)go));
-		else if (type == WLD_TRIGGER)
-			caster->player.short_descr = strdup("The gods");
-		caster->next_in_room = caster_room->people;
-		caster_room->people = caster;
-		IN_ROOM(caster) = caster_room;
-		//call_magic(caster, tch, tobj, spellnum, DG_SPELL_LEVEL, CAST_SPELL);
-		extract_char(caster);
-	}
-	else {
-		//call_magic(caster, tch, tobj, spellnum, GET_ACCESS_LEVEL(caster), CAST_SPELL);
-	}
-	*/
+	
+	// sort now just in case
+	sort_world_table();
+	
+	return new;
 }
 
 
-/* modify an affection on the target. affections can be of the AFF_x  */
-/* variety or APPLY_x type. APPLY_x's have an integer value for them  */
-/* while AFF_x's have boolean values. In any case, the duration MUST  */
+/* modify an affection on the target. affections can be of the AFF_  */
+/* variety or APPLY_ type. APPLY_'s have an integer value for them  */
+/* while AFF_'s have boolean values. In any case, the duration MUST  */
 /* be non-zero.                                                       */
 /* usage:  apply <target> <property> <value> <duration seconds>       */
 #define APPLY_TYPE	1
@@ -177,7 +112,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 
 	value = atoi(value_p);
 	duration = atoi(duration_p);
-	if (duration <= 0) {
+	if (duration == 0 || duration < -1) {
 		script_log("Trigger: %s, VNum %d. dg_affect: need positive duration!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		script_log("Line was: dg_affect %s %s %s %s (%d)", charname, property, value_p, duration_p, duration);
 		return;
@@ -205,6 +140,11 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 		script_log("Trigger: %s, VNum %d. dg_affect: cannot locate target!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		return;
 	}
+	
+	if (duration == -1 && !IS_NPC(ch)) {
+		script_log("Trigger: %s, VNum %d. dg_affect: cannot use infinite duration on player target", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+		return;
+	}
 
 	if (!str_cmp(value_p, "off")) {
 		if (type == APPLY_TYPE) {
@@ -218,8 +158,8 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 
 	/* add the affect */
 	af.type = ATYPE_DG_AFFECT;
-	af.cast_by = 0;	// TODO implement this
-	af.duration = ceil((double)duration / SECS_PER_REAL_UPDATE);
+	af.cast_by = (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
+	af.duration = (duration == -1 ? UNLIMITED : ceil((double)duration / SECS_PER_REAL_UPDATE));
 	af.modifier = value;
 
 	if (type == APPLY_TYPE) {
@@ -232,6 +172,182 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	}
 
 	affect_to_char(ch, &af);
+}
+
+
+/**
+* Performs a script-caused ownership change on one (or more) things.
+*
+* @param empire_data *emp The empire to change ownership to (may be NULL for none).
+* @param char_data *vict Optional: A mob whose ownership to change.
+* @param obj_data *obj Optional: An object whose ownership to change.
+* @param room_data *room Optional: A room whose ownership to change.
+* @param vehicle_data *veh Optional: A vehicle whose ownership to change.
+*/
+void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh) {
+	void kill_empire_npc(char_data *ch);
+	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
+	
+	if (vict && IS_NPC(vict)) {
+		if (GET_LOYALTY(vict) && emp != GET_LOYALTY(vict) && GET_EMPIRE_NPC_DATA(vict)) {
+			// resets the population timer on their house
+			kill_empire_npc(vict);
+		}
+		GET_LOYALTY(vict) = emp;
+		setup_generic_npc(vict, emp, MOB_DYNAMIC_NAME(vict), MOB_DYNAMIC_SEX(vict));
+	}
+	if (obj) {
+		obj->last_empire_id = emp ? EMPIRE_VNUM(emp) : NOTHING;
+	}
+	if (veh) {
+		if (VEH_OWNER(veh) && emp != VEH_OWNER(veh) ) {
+			VEH_SHIPPING_ID(veh) = -1;
+			if (VEH_INTERIOR_HOME_ROOM(veh)) {
+				abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
+			}
+		}
+		VEH_OWNER(veh) = emp;
+		if (emp && VEH_INTERIOR_HOME_ROOM(veh)) {
+			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
+		}
+	}
+	if (room) {
+		if (ROOM_OWNER(room) && emp != ROOM_OWNER(room)) {
+			abandon_room(room);
+		}
+		if (emp) {
+			claim_room(room, emp);
+		}
+		if (GET_ROOM_VEHICLE(room)) {
+			VEH_OWNER(GET_ROOM_VEHICLE(room)) = emp;
+		}
+	}
+}
+
+
+/**
+* Processes the %quest% command.
+*
+* @param int go_type _TRIGGER type for 'go'
+* @param void *go A pointer to the thing the trigger is running on.
+* @param char *argument The typed-in arg.
+*/
+void do_dg_quest(int go_type, void *go, char *argument) {
+	extern struct instance_data *get_instance_by_id(any_vnum instance_id);
+	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
+	
+	char vict_arg[MAX_INPUT_LENGTH], cmd_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH];
+	struct instance_data *inst = NULL;
+	struct player_quest *pq;
+	empire_data *emp = NULL;
+	room_data *room = NULL;
+	char_data *vict = NULL;
+	quest_data *quest;
+	any_vnum vnum;
+	
+	argument = any_one_arg(argument, vict_arg);
+	argument = any_one_arg(argument, cmd_arg);
+	argument = any_one_arg(argument, vnum_arg);
+	
+	if (!*vict_arg || !*cmd_arg || !*vnum_arg) {
+		script_log_by_type(go_type, go, "dg_quest: too few args");
+		return;
+	}
+	if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0 || !(quest = quest_proto(vnum))) {
+		script_log_by_type(go_type, go, "dg_quest: invalid vnum '%s'", vnum_arg);
+		return;
+	}
+	
+	// find vict by uid?
+	if (*vict_arg == UID_CHAR) {
+		vict = get_char(vict_arg);
+	}
+	
+	// x_TRIGGER: set up basics
+	switch (go_type) {
+		case MOB_TRIGGER: {
+			char_data *mob = (char_data*)go;
+			room = IN_ROOM(mob);
+			emp = GET_LOYALTY(mob);
+			inst = get_instance_by_id(MOB_INSTANCE_ID(mob));
+			if (!vict) {
+				vict = get_char_room_vis(mob, vict_arg);
+			}
+			break;
+		}
+		case OBJ_TRIGGER: {
+			extern room_data *obj_room(obj_data *obj);
+			
+			obj_data *obj = (obj_data*)go;
+			room = obj_room(obj);
+			if (!vict) {
+				vict = get_char_near_obj(obj, vict_arg);
+			}
+			emp = (obj->carried_by ? GET_LOYALTY(obj->carried_by) : ((!CAN_WEAR(obj, ITEM_WEAR_TAKE) || !vict) ? ROOM_OWNER(room) : (vict ? GET_LOYALTY(vict) : NULL)));
+			break;
+		}
+		case WLD_TRIGGER:
+		case RMT_TRIGGER:
+		case ADV_TRIGGER:
+		case BLD_TRIGGER: {
+			extern char_data *get_char_in_room(room_data *room, char *name);
+			
+			room = (room_data*)go;
+			emp = ROOM_OWNER(room);
+			if (!vict) {
+				vict = get_char_in_room(room, vict_arg);
+			}
+			break;
+		}
+		case VEH_TRIGGER: {
+			vehicle_data *veh = (vehicle_data*)go;
+			room = IN_ROOM(veh);
+			emp = VEH_OWNER(veh);
+			if (!vict) {
+				vict = get_char_near_vehicle(veh, vict_arg);
+			}
+			break;
+		}
+		default: {
+			script_log_by_type(go_type, go, "dg_quest: unknown type %d", go_type);
+			return;
+		}
+	}
+	
+	// should have detected a victim
+	if (!vict) {
+		script_log_by_type(go_type, go, "dg_quest: unable to find target '%s'", vict_arg);
+		return;
+	}
+	
+	// ready for commands
+	if (is_abbrev(cmd_arg, "drop")) {
+		if ((pq = is_on_quest(vict, QUEST_VNUM(quest)))) {
+			void drop_quest(char_data *ch, struct player_quest *pq);
+			drop_quest(vict, pq);
+		}
+	}
+	else if (is_abbrev(cmd_arg, "finish")) {
+		if ((pq = is_on_quest(vict, QUEST_VNUM(quest)))) {
+			void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_emp);
+			complete_quest(vict, pq, emp);
+		}
+	}
+	else if (is_abbrev(cmd_arg, "start")) {
+		if (!is_on_quest(vict, QUEST_VNUM(quest))) {
+			void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
+			if (!inst && room && COMPLEX_DATA(room)) {
+				inst = COMPLEX_DATA(room)->instance;
+			}
+			start_quest(vict, quest, inst);
+		}
+	}
+	else if (is_abbrev(cmd_arg, "trigger")) {
+		qt_triggered_task(vict, QUEST_VNUM(quest));
+	}
+	else {
+		script_log_by_type(go_type, go, "dg_quest: invalid command '%s'", cmd_arg);
+	}
 }
 
 
@@ -258,13 +374,12 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 	}
 	else {
 		change_terrain(target, GET_SECT_VNUM(sect));
-		set_room_extra_data(target, ROOM_EXTRA_CROP_TYPE, GET_CROP_VNUM(cp));
+		set_crop_type(target, cp);
+		
+		remove_depletion(target, DPLTN_PICK);
+		remove_depletion(target, DPLTN_FORAGE);
 	}
 	
-	// clear these if set
-	REMOVE_BIT(ROOM_AFF_FLAGS(target), ROOM_AFF_PLAYER_MADE);
-	REMOVE_BIT(ROOM_BASE_FLAGS(target), ROOM_AFF_PLAYER_MADE);
-
 	if (emp) {
 		read_empire_territory(emp);
 	}
@@ -286,18 +401,14 @@ void do_dg_terraform(room_data *target, sector_data *sect) {
 		return;
 	}
 	
-	old_sect = ROOM_ORIGINAL_SECT(target);
+	old_sect = BASE_SECT(target);
 	emp = ROOM_OWNER(target);
 	
 	change_terrain(target, GET_SECT_VNUM(sect));
-
-	// clear these if set
-	REMOVE_BIT(ROOM_AFF_FLAGS(target), ROOM_AFF_PLAYER_MADE);
-	REMOVE_BIT(ROOM_BASE_FLAGS(target), ROOM_AFF_PLAYER_MADE);
-			
+	
 	// preserve old original sect for roads -- TODO this is a special-case
 	if (IS_ROAD(target)) {
-		ROOM_ORIGINAL_SECT(target) = old_sect;
+		change_base_sector(target, old_sect);
 	}
 
 	if (emp) {
