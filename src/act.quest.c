@@ -604,6 +604,57 @@ QCMD(qcmd_finish) {
 }
 
 
+QCMD(qcmd_group) {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct group_member_data *mem;
+	struct player_quest *pq, *fq;
+	char_data *friend;
+	int count, total;
+	bool any, have;
+	size_t size;
+	
+	if (!GROUP(ch)) {
+		msg_to_char(ch, "You are not in a group.\r\n");
+		return;
+	}
+	if (!GET_QUESTS(ch)) {
+		msg_to_char(ch, "You aren't on any quests.\r\n");
+		return;
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Quests in common with your group:\r\n");
+	have = FALSE;
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		any = FALSE;
+		*line = '\0';
+		
+		// find group members on quest
+		for (mem = GROUP(ch)->members; mem; mem = mem->next) {
+			friend = mem->member;
+			
+			if (!IS_NPC(friend) && friend != ch && (fq = is_on_quest(friend, pq->vnum))) {
+				count_quest_tasks(fq, &count, &total);
+				snprintf(line + strlen(line), sizeof(line) - strlen(line), "%s%s (%d/%d)", (any ? ", " : ""), GET_NAME(friend), count, total);
+				any = TRUE;
+			}
+		}
+		
+		if (any && *line) {
+			have = TRUE;
+			size += snprintf(buf + size, sizeof(buf) - size, "  %s: %s\r\n", get_quest_name_by_proto(pq->vnum), line);
+		}
+	}
+	
+	if (!have) {
+		size += snprintf(buf + size, sizeof(buf) - size, "  none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
 QCMD(qcmd_info) {
 	struct instance_data *inst;
 	struct player_quest *pq;
@@ -725,6 +776,7 @@ const struct { char *command; QCMD(*func); int min_pos; } quest_cmd[] = {
 	{ "check", qcmd_check, POS_RESTING },
 	{ "completed", qcmd_completed, POS_DEAD },
 	{ "drop", qcmd_drop, POS_DEAD },
+	{ "group", qcmd_group, POS_DEAD },
 	{ "finish", qcmd_finish, POS_STANDING },
 	{ "info", qcmd_info, POS_DEAD },
 	{ "list", qcmd_list, POS_DEAD },

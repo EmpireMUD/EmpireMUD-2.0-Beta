@@ -7,6 +7,7 @@ The following quest commands are available:
  &cquest completed&0 - List quests you have finished.
  &cquest drop&0 - Cancel a quest you're on.
  &cquest finish&0 - Turn in one or more quests.
+ &cquest group&0 - See which quests you share with group members.
  &cquest info&0 - See details on a quest you're on or one available here.
  &cquest list&0 - Show your quests and progress.
  &cquest start&0 - Begin a quest.
@@ -39,6 +40,15 @@ Usage:  quest finish <name | all>
 Turn in one or more quests. You must find the correct location, person, or item
 to turn in each quest. There will be an indication if you have a quest to turn
 in somewhere.
+
+See also: QUEST
+#
+"QUEST GROUP"
+
+Usage:  quest group
+
+See which quests you have in common with your groupmates, and what their
+progress is on those quests.
 
 See also: QUEST
 #
