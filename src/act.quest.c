@@ -771,7 +771,7 @@ QCMD(qcmd_share) {
 	// look up instance (re-use the 'inst' var, which was junk above)
 	// we need the same instance for the other players here
 	inst = get_instance_by_id(pq->instance_id);
-	if (GET_ADV_VNUM(inst->adventure) != pq->adventure) {
+	if (inst && GET_ADV_VNUM(inst->adventure) != pq->adventure) {
 		inst = NULL;
 	}
 	
