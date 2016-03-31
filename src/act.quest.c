@@ -794,8 +794,8 @@ QCMD(qcmd_share) {
 		
 		any = TRUE;
 		add_offer(friend, ch, OFFER_QUEST, pq->vnum);
-		act("You offer to share '%s' with $N.", FALSE, ch, NULL, friend, TO_CHAR);
-		act("$O offers to share the quest '%s' with you (use 'accept/reject quest').", FALSE, ch, NULL, friend, TO_VICT);
+		act("You offer to share '$t' with $N.", FALSE, ch, QUEST_NAME(qst), friend, TO_CHAR);
+		act("$O offers to share the quest '$t' with you (use 'accept/reject quest').", FALSE, ch, QUEST_NAME(qst), friend, TO_VICT);
 	}
 	
 	if (!any && same_room) {
