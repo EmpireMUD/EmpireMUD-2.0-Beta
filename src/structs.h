@@ -1548,6 +1548,7 @@ typedef struct vehicle_data vehicle_data;
 // OFFER_x - types for the do_accept/offer_data system
 #define OFFER_RESURRECTION  0
 #define OFFER_SUMMON  1
+#define OFFER_QUEST  2
 
 
 // PLR_x: Player flags: used by char_data.char_specials.act

@@ -10,6 +10,7 @@ The following quest commands are available:
  &cquest group&0 - See which quests you share with group members.
  &cquest info&0 - See details on a quest you're on or one available here.
  &cquest list&0 - Show your quests and progress.
+ &cquest share&0 - Offer a quest to members of your group.
  &cquest start&0 - Begin a quest.
  &cquest tracker&0 - Show the quest tracker for one quest you're on.
 
@@ -71,6 +72,19 @@ Usage:  quest list
 This command shows all the quests you're on, and their progress.
 
 See also: QUEST
+#
+"QUEST SHARE"
+
+Usage:  quest share <quest>
+
+This command allows you to share a quest with other members of your group who
+are in the same room as you. Those group members must still meet any
+prerequisites for the quest.
+
+You can only offer one quest at a time. Wait for them to accept it before
+offering another one.
+
+See also: ACCEPT, REJECT
 #
 "QUEST START"
 

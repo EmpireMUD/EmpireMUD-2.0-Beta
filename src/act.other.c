@@ -38,6 +38,7 @@
 // external prototypes
 extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 extern bool check_scaling(char_data *mob, char_data *attacker);
+extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
 extern char *get_room_name(room_data *room, bool color);
 extern char_data *has_familiar(char_data *ch);
 void scale_item_to_level(obj_data *obj, int level);
@@ -552,6 +553,44 @@ void summon_player(char_data *ch, char *argument) {
 #define OFFER_FINISH(name)  bool (name)(char_data *ch, struct offer_data *offer)
 
 
+OFFER_VALIDATE(oval_quest) {
+	extern bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
+	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
+	
+	struct instance_data *inst = find_matching_instance_for_shared_quest(ch, offer->data);
+	quest_data *qst = quest_proto(offer->data);
+	
+	if (!qst) {
+		msg_to_char(ch, "Unable to find a quest to accept.\r\n");
+		return FALSE;
+	}
+	if (is_on_quest(ch, offer->data)) {
+		msg_to_char(ch, "You are already on that quest.\r\n");
+		return FALSE;
+	}
+	if (!char_meets_prereqs(ch, qst, inst)) {
+		msg_to_char(ch, "You don't meet the prerequisites for that quest.\r\n");
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+
+OFFER_FINISH(ofin_quest) {
+	void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
+	
+	struct instance_data *inst = find_matching_instance_for_shared_quest(ch, offer->data);
+	quest_data *qst = quest_proto(offer->data);
+	
+	if (qst) {
+		start_quest(ch, qst, inst);
+	}
+	
+	return TRUE;
+}
+
+
 OFFER_VALIDATE(oval_rez) {
 	extern obj_data *find_obj(int n);
 	extern room_data *obj_room(obj_data *obj);
@@ -583,7 +622,7 @@ OFFER_FINISH(ofin_rez) {
 	void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability);
 	room_data *loc = real_room(offer->location);	// pre-validated
 	perform_resurrection(ch, is_playing(offer->from), loc, offer->data);
-	return FALSE;
+	return FALSE;	// prevent deletion because perform_res deletes the offer
 }
 
 
@@ -726,7 +765,8 @@ ACMD(do_accept) {
 	} offer_types[] = {
 		{ "resurrection", POS_DEAD, oval_rez, ofin_rez },	// OFFER_RESURRECTION: uses offer->data for ability
 		{ "summon", POS_STANDING, oval_summon, ofin_summon },	// OFFER_SUMMON: uses offer->data for SUMMON_x
-	
+		{ "quest", POS_RESTING, oval_quest, ofin_quest},	// OFFER_QUEST: uses offer->data for quest vnum
+		
 		// end
 		{ "\n", POS_DEAD, NULL, NULL }
 	};

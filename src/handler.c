@@ -4831,7 +4831,7 @@ obj_data *get_obj_world(char *name) {
 *
 * @param char_data *ch The person who is getting an offer.
 * @param char_data *from The person sending the offer.
-* @param int type Any OFFER_x type.
+* @param int type Any OFFER_ type.
 * @param int data A misc integer that may be passed based on type (use 0 for none).
 * @return struct offer_data* A pointer to the attached new offer, if it succeeds.
 */
@@ -4894,7 +4894,7 @@ void clean_offers(char_data *ch) {
 * Removes all offers of a given type.
 *
 * @param char_data *ch The person whose offers to remove.
-* @param int type Any OFFER_x type.
+* @param int type Any OFFER_ type.
 */
 void remove_offers_by_type(char_data *ch, int type) {
 	struct offer_data *offer, *next_offer, *temp;
