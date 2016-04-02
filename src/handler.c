@@ -1476,7 +1476,7 @@ char_data *get_char_world(char *name) {
 
 	for (ch = character_list; ch && (pos <= number) && !found; ch = ch->next) {
 		if ((!IS_NPC(ch) || !pc_only) && MATCH_CHAR_NAME(tmp, ch)) {
-			if (++pos == number) {
+			if (++pos == number || pc_only) {	// pc_only messes up pos
 				found = ch;
 			}
 		}
