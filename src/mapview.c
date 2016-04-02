@@ -759,15 +759,28 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		}
 	}
 	
+	// mappc data
+	if (mappc->data) {
+		send_to_char("People you can see on the map: ", ch);
+		
+		comma = FALSE;
+		for (pc = mappc->data; pc; pc = next_pc) {
+			next_pc = pc->next;
+			
+			pcemp = GET_LOYALTY(pc->character);
+			msg_to_char(ch, "%s%s%s&0", comma ? ", " : "", pcemp ? EMPIRE_BANNER(pcemp) : "", PERS(pc->character, ch, 0));
+			comma = TRUE;
+			
+			// free as we go
+			free(pc);
+		}
+		
+		send_to_char("\r\n", ch);
+	}
+	free(mappc);
+	
 	// ship-partial ends here
 	if (ship_partial) {
-		if (mappc) {
-			while ((pc = mappc->data)) {
-				mappc->data = pc->next;
-				free(pc);
-			}
-			free(mappc);
-		}		
 		return;
 	}
 	
@@ -885,26 +898,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (can_turn_quest_in_to_room(ch, room, NULL)) {
 		msg_to_char(ch, "You can turn in a quest here!\r\n");
 	}
-	
-	// mappc data
-	if (mappc->data) {
-		send_to_char("People you can see on the map: ", ch);
-		
-		comma = FALSE;
-		for (pc = mappc->data; pc; pc = next_pc) {
-			next_pc = pc->next;
-			
-			pcemp = GET_LOYALTY(pc->character);
-			msg_to_char(ch, "%s%s%s&0", comma ? ", " : "", pcemp ? EMPIRE_BANNER(pcemp) : "", PERS(pc->character, ch, 0));
-			comma = TRUE;
-			
-			// free as we go
-			free(pc);
-		}
-		
-		send_to_char("\r\n", ch);
-	}
-	free(mappc);
 	
 	if (BUILDING_BURNING(room)) {
 		msg_to_char(ch, "%sThe building is on fire!&0\r\n", BACKGROUND_RED);
@@ -1587,7 +1580,6 @@ char *get_screenreader_room_name(room_data *from_room, room_data *to_room) {
 
 void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	extern byte distance_can_see(char_data *ch);
-	extern bool can_see_player_in_other_room(char_data *ch, char_data *vict);
 	
 	char buf[MAX_STRING_LENGTH], roombuf[MAX_INPUT_LENGTH], lastroom[MAX_INPUT_LENGTH], dirbuf[MAX_STRING_LENGTH], plrbuf[MAX_INPUT_LENGTH], infobuf[MAX_INPUT_LENGTH];
 	char_data *vict;

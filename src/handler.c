@@ -2614,7 +2614,7 @@ void add_follower(char_data *ch, char_data *leader, bool msg) {
 
 	if (msg) {
 		act("You now follow $N.", FALSE, ch, 0, leader, TO_CHAR);
-		if (CAN_SEE(leader, ch)) {
+		if (CAN_SEE(leader, ch) && WIZHIDE_OK(leader, ch)) {
 			act("$n starts following you.", TRUE, ch, 0, leader, TO_VICT);
 		}
 		act("$n starts to follow $N.", TRUE, ch, 0, leader, TO_NOTVICT);
@@ -2656,7 +2656,7 @@ void stop_follower(char_data *ch) {
 
 	act("You stop following $N.", FALSE, ch, 0, ch->master, TO_CHAR);
 	act("$n stops following $N.", TRUE, ch, 0, ch->master, TO_NOTVICT);
-	if (CAN_SEE(ch->master, ch)) {
+	if (CAN_SEE(ch->master, ch) && WIZHIDE_OK(ch->master, ch)) {
 		act("$n stops following you.", TRUE, ch, 0, ch->master, TO_VICT);
 	}
 
