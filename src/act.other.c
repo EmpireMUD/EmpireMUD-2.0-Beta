@@ -1826,7 +1826,7 @@ ACMD(do_quit) {
 		msg_to_char(ch, "You can't quit with fangs in your neck!\r\n");
 	else if (GET_FEEDING_FROM(ch))
 		msg_to_char(ch, "You can't quit while drinking blood!\r\n");
-	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))) {
+	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch)) && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't quit in hostile territory.\r\n");
 	}
 	else {
