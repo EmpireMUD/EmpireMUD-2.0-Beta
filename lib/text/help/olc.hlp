@@ -270,9 +270,9 @@ Objects (OEDIT):
   for build-to-char and build-to-room.
 - All lights must have a timer. If you want a player to activate a light before
   it starts timing down, make an unlit version with a LIGHT interaction.
-- The COMBINE and SEPARATE interactions should always use 1 exclusion set, as
-  they will extract the original item if their interaction succeeds, and it's
-  not safe to run additional interactions.
+- The COMBINE interaction should always use 1 exclusion set, as it will extract
+  the original item if the interaction succeeds, and it's usually not safe to
+  run additional interactions.
 
 Quests (QEDIT):
 - You can create more complex quests by chaining simple quests.
