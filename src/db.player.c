@@ -96,7 +96,7 @@ char_data *find_or_load_player(char *name, bool *is_file) {
 		sprintf(buf, "0.%s", name);	// add 0. to force player match
 		ch = get_char_world(buf);
 		*is_file = FALSE;
-		if (IS_NPC(ch)) {
+		if (ch && IS_NPC(ch)) {
 			ch = NULL;	// verify player only
 		}
 	}
