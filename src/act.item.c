@@ -888,6 +888,7 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byte mode) {
 	struct coin_data *coin;
 	char buf[MAX_STRING_LENGTH];
+	char_data *iter;
 	obj_data *obj;
 
 	if (amount <= 0)
@@ -912,6 +913,16 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 			obj_to_room(obj, IN_ROOM(ch));
 			act("You drop $p.", FALSE, ch, obj, NULL, TO_CHAR);
 			act("$n drops $p.", FALSE, ch, obj, NULL, TO_ROOM);
+			
+			// log dropping items in front of mortals
+			if (IS_IMMORTAL(ch)) {
+				for (iter = ROOM_PEOPLE(IN_ROOM(ch)); iter; iter = iter->next_in_room) {
+					if (iter != ch && !IS_NPC(iter) && !IS_IMMORTAL(iter)) {
+						syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s drops %s with mortal present (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_NAME(iter), room_log_identifier(IN_ROOM(ch)));
+						break;
+					}
+				}
+			}
 		}
 		else {
 			snprintf(buf, sizeof(buf), "$n drops %s which disappear%s in a puff of smoke!", money_desc(type, amount), (amount == 1 ? "s" : ""));
@@ -1308,6 +1319,10 @@ static void perform_give_coins(char_data *ch, char_data *vict, empire_data *type
 		snprintf(buf, sizeof(buf), "$n gives you %s.", money_amount(type, amount));
 		act(buf, FALSE, ch, NULL, vict, TO_VICT);
 		// to-room/char messages below
+	}
+	
+	if (IS_IMMORTAL(ch) && !IS_IMMORTAL(vict)) {
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s gives %s to %s", GET_NAME(ch), money_desc(type, amount), PERS(vict, vict, TRUE));
 	}
 	
 	// msg to char
