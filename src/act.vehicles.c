@@ -1080,8 +1080,10 @@ ACMD(do_board) {
 		// move ch: out-message
 		snprintf(buf, sizeof(buf), "You %s $V.", command);
 		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
-		snprintf(buf, sizeof(buf), "$n %ss $V.", command);
-		act(buf, TRUE, ch, NULL, veh, TO_ROOM);
+		if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
+			snprintf(buf, sizeof(buf), "$n %ss $V.", command);
+			act(buf, TRUE, ch, NULL, veh, TO_ROOM);
+		}
 		
 		// move ch
 		char_to_room(ch, to_room);
@@ -1091,8 +1093,10 @@ ACMD(do_board) {
 		look_at_room(ch);
 		
 		// move ch: in-message
-		snprintf(buf, sizeof(buf), "$n %ss.", command);
-		act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
+		if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
+			snprintf(buf, sizeof(buf), "$n %ss.", command);
+			act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
+		}
 		
 		// move ch: triggers
 		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
@@ -1105,7 +1109,9 @@ ACMD(do_board) {
 		
 		// leading-mob
 		if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
-			act("$n follows $M.", TRUE, GET_LEADING_MOB(ch), NULL, ch, TO_NOTVICT);
+			if (!AFF_FLAGGED(GET_LEADING_MOB(ch), AFF_SNEAK)) {
+				act("$n follows $N.", TRUE, GET_LEADING_MOB(ch), NULL, ch, TO_NOTVICT);
+			}
 			
 			char_to_room(GET_LEADING_MOB(ch), to_room);
 			if (!IS_NPC(GET_LEADING_MOB(ch))) {
@@ -1113,8 +1119,10 @@ ACMD(do_board) {
 			}
 			look_at_room(GET_LEADING_MOB(ch));
 			
-			snprintf(buf, sizeof(buf), "$n %ss.", command);
-			act(buf, TRUE, GET_LEADING_MOB(ch), NULL, NULL, TO_ROOM);
+			if (!AFF_FLAGGED(GET_LEADING_MOB(ch), AFF_SNEAK)) {
+				snprintf(buf, sizeof(buf), "$n %ss.", command);
+				act(buf, TRUE, GET_LEADING_MOB(ch), NULL, NULL, TO_ROOM);
+			}
 			
 			enter_wtrigger(IN_ROOM(GET_LEADING_MOB(ch)), GET_LEADING_MOB(ch), NO_DIR);
 			entry_memory_mtrigger(GET_LEADING_MOB(ch));
