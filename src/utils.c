@@ -1061,8 +1061,8 @@ bool can_use_room(char_data *ch, room_data *room, int mode) {
 	// empire ownership
 	if (ROOM_OWNER(homeroom) == GET_LOYALTY(ch)) {
 		// private room?
-		if (ROOM_PRIVATE_OWNER(homeroom) == NOBODY || ROOM_PRIVATE_OWNER(homeroom) == GET_IDNUM(ch) || GET_RANK(ch) == EMPIRE_NUM_RANKS(ROOM_OWNER(homeroom))) {
-			return TRUE;
+		if (ROOM_PRIVATE_OWNER(homeroom) != NOBODY && ROOM_PRIVATE_OWNER(homeroom) != GET_IDNUM(ch) && GET_RANK(ch) < EMPIRE_NUM_RANKS(ROOM_OWNER(homeroom))) {
+			return FALSE;
 		}
 	}
 	// public + guest + hostile + no-empire exclusion
