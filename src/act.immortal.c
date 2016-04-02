@@ -6031,6 +6031,14 @@ ACMD(do_restore) {
 				adjust_abilities_to_empire(vict, emp, TRUE);
 			}
 		}
+		else if (!IS_NPC(vict)) {
+			for (i = 0; i < NUM_CONDS; i++) {
+				if (GET_COND(vict, i) != UNLIMITED) {
+					GET_COND(vict, i) = 0;
+				}
+			}
+		}
+		
 		update_pos(vict);
 		if (ch != vict) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has restored %s", GET_REAL_NAME(ch), GET_REAL_NAME(vict));
