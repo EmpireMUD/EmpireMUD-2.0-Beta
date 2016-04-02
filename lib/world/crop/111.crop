@@ -222,6 +222,7 @@ D0
 I 6 11107 100.00 1  # FORAGE: a juicy pear
 I 8 11106 100.00 1  # HARVEST: some juicy pears
 I 9 121 100.00 1  # GATHER: a stick
+I 20 120 100.00 1  # CHOP: a large tree
 M
 9145 5.00 adh
 M
