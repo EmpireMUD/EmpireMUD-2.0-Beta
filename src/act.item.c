@@ -3341,7 +3341,7 @@ ACMD(do_combine) {
 	else if (!has_interaction(obj->interactions, INTERACT_COMBINE)) {
 		msg_to_char(ch, "You can't combine that!\r\n");
 	}
-	else {		
+	else {
 		// will extract no matter what happens here
 		if (!run_interactions(ch, obj->interactions, INTERACT_COMBINE, IN_ROOM(ch), NULL, obj, combine_obj_interact)) {
 			act("You fail to combine $p.", FALSE, ch, obj, NULL, TO_CHAR);
