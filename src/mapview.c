@@ -1199,7 +1199,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	}
 
 	/* Hidden buildings */
-	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && (!map_loc || !map_to_room || distance(FLAT_X_COORD(map_loc), FLAT_Y_COORD(map_loc), FLAT_X_COORD(map_to_room), FLAT_Y_COORD(map_to_room)) > 2)) {
+	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(to_room) && (!map_loc || !map_to_room || distance(FLAT_X_COORD(map_loc), FLAT_Y_COORD(map_loc), FLAT_X_COORD(map_to_room), FLAT_Y_COORD(map_to_room)) > 2)) {
 		strcat(buf, base_icon->icon);
 		hidden = TRUE;
 	}
@@ -1437,7 +1437,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			}
 		}
 		else if (PRF_FLAGGED(ch, PRF_INFORMATIVE) && !show_dark) {
-			if (IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && distance(FLAT_X_COORD(map_loc), FLAT_Y_COORD(map_loc), FLAT_X_COORD(map_to_room), FLAT_Y_COORD(map_to_room)) > 2) {
+			if (IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(to_room) && distance(FLAT_X_COORD(map_loc), FLAT_Y_COORD(map_loc), FLAT_X_COORD(map_to_room), FLAT_Y_COORD(map_to_room)) > 2) {
 				strcpy(buf2, "&y");
 			}
 			else if (IS_DISMANTLING(to_room)) {
@@ -1544,7 +1544,7 @@ char *get_screenreader_room_name(room_data *from_room, room_data *to_room) {
 	
 	strcpy(lbuf, "*");
 	
-	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && compute_distance(from_room, to_room) >= 2) {
+	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(to_room) && compute_distance(from_room, to_room) >= 2) {
 		strcpy(lbuf, GET_SECT_NAME(BASE_SECT(to_room)));
 	}
 	else if (ROOM_CUSTOM_NAME(to_room)) {
@@ -1677,7 +1677,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 				if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_WORK)) {
 					sprintf(infobuf + strlen(infobuf), "%sno-work", *infobuf ? ", " :"");
 				}
-				if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_IMMORTAL(ch)) {
+				if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(to_room) && IS_IMMORTAL(ch)) {
 					sprintf(infobuf + strlen(infobuf), "%schameleon", *infobuf ? ", " :"");
 				}
 			
