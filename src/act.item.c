@@ -739,8 +739,7 @@ void remove_armor_by_type(char_data *ch, int armor_type) {
 
 
 /**
-* Interaction func for "separate". This always extracts the original
-* item, so it should basically always return TRUE.
+* Interaction func for "separate".
 */
 INTERACTION_FUNC(separate_obj_interact) {
 	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
@@ -774,7 +773,6 @@ INTERACTION_FUNC(separate_obj_interact) {
 		load_otrigger(new_obj);
 	}
 	
-	extract_obj(inter_item);
 	return TRUE;
 }
 
@@ -4956,8 +4954,10 @@ ACMD(do_separate) {
 		msg_to_char(ch, "You can't separate that!\r\n");
 	}
 	else {		
-		// will extract no matter what happens here
-		if (!run_interactions(ch, obj->interactions, INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, separate_obj_interact)) {
+		if (run_interactions(ch, obj->interactions, INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, separate_obj_interact)) {
+			extract_obj(obj);
+		}
+		else {
 			act("You fail to separate $p.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		command_lag(ch, WAIT_OTHER);
