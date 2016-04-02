@@ -1461,6 +1461,11 @@ int door_wtrigger(char_data *actor, int subcmd, int dir) {
 */
 bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode) {
 	int cont = 0;
+	
+	// never override the toggle command for immortals
+	if (IS_IMMORTAL(actor) && is_abbrev(cmd, "toggle")) {
+		return cont;
+	}
 
 	cont = command_wtrigger(actor, cmd, argument, mode);	// world trigs
 	if (!cont) {
