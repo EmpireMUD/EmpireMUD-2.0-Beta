@@ -144,14 +144,14 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	
 	#define CHORE_ACTIVE(chore)  (empire_chore_limit(emp, island, (chore)) != 0)
 	
-	// wait wait don't work here
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) {
-		return;
-	}
-	
 	// fire!
 	if (BUILDING_BURNING(room) > 0 && CHORE_ACTIVE(CHORE_FIRE_BRIGADE)) {
 		do_chore_fire_brigade(emp, room);
+		return;
+	}
+	
+	// wait wait don't work here
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK | ROOM_AFF_HAS_INSTANCE)) {
 		return;
 	}
 	
