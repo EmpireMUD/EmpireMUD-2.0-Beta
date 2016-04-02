@@ -1638,6 +1638,8 @@ ACMD(do_designate) {
 			// sort now just in case
 			sort_world_table();
 		}
+		
+		complete_wtrigger(new);
 	}
 }
 
