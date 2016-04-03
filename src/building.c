@@ -1841,6 +1841,7 @@ ACMD(do_maintain) {
 		msg_to_char(ch, "You perform some quick maintenance on the building.\r\n");
 		act("$n performs some quick maintenance on the building.", TRUE, ch, NULL, NULL, TO_ROOM);
 		command_lag(ch, WAIT_OTHER);
+		stop_room_action(IN_ROOM(ch), NOTHING, CHORE_MAINTENANCE);
 	}
 	
 	free_resource_list(res);
