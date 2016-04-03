@@ -3293,7 +3293,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	}
 
 	// resources
-	msg_to_char(ch, "Resources required: ");
+	msg_to_char(ch, "Resources required:\r\n");
 	get_resource_display(GET_CRAFT_RESOURCES(craft), buf);
 	send_to_char(buf, ch);
 }
