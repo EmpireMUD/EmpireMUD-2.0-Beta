@@ -381,6 +381,7 @@ void boot_world(void) {
 	void check_for_bad_buildings();
 	void check_for_bad_sectors();
 	void check_newbie_islands();
+	void check_triggers();
 	void clean_empire_logs();
 	void index_boot_world();
 	void load_empire_storage();
@@ -498,6 +499,7 @@ void boot_world(void) {
 	check_for_bad_buildings();
 	check_for_bad_sectors();
 	read_ability_requirements();
+	check_triggers();
 	
 	log("Sorting data.");
 	HASH_SRT(sorted_hh, sorted_abilities, sort_abilities_by_data);
@@ -712,6 +714,86 @@ void check_for_bad_sectors(void) {
 			if (!sector_proto(evo->becomes)) {
 				REMOVE_FROM_LIST(evo, GET_SECT_EVOS(sect), next);
 				free(evo);
+			}
+		}
+	}
+}
+
+
+/**
+* Ensures there are no non-existent triggers attached to anything.
+*/
+void check_triggers(void) {
+	struct trig_proto_list *tpl, *next_tpl;
+	quest_data *quest, *next_quest;
+	room_template *rmt, *next_rmt;
+	vehicle_data *veh, *next_veh;
+	char_data *mob, *next_mob;
+	obj_data *obj, *next_obj;
+	bld_data *bld, *next_bld;
+	
+	// check building protos
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		LL_FOREACH_SAFE(GET_BLD_SCRIPTS(bld), tpl, next_tpl) {
+			if (!real_trigger(tpl->vnum)) {
+				log("SYSERR: Removing missing trigger %d from building %d.", tpl->vnum, GET_BLD_VNUM(bld));
+				LL_DELETE(GET_BLD_SCRIPTS(bld), tpl);
+				free(tpl);
+			}
+		}
+	}
+	
+	// check mob protos
+	HASH_ITER(hh, mobile_table, mob, next_mob) {
+		LL_FOREACH_SAFE(mob->proto_script, tpl, next_tpl) {
+			if (!real_trigger(tpl->vnum)) {
+				log("SYSERR: Removing missing trigger %d from mobile %d.", tpl->vnum, GET_MOB_VNUM(mob));
+				LL_DELETE(mob->proto_script, tpl);
+				free(tpl);
+			}
+		}
+	}
+	
+	// update obj protos
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		LL_FOREACH_SAFE(obj->proto_script, tpl, next_tpl) {
+			if (!real_trigger(tpl->vnum)) {
+				log("SYSERR: Removing missing trigger %d from object %d.", tpl->vnum, GET_OBJ_VNUM(obj));
+				LL_DELETE(obj->proto_script, tpl);
+				free(tpl);
+			}
+		}
+	}
+	
+	// update quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		LL_FOREACH_SAFE(QUEST_SCRIPTS(quest), tpl, next_tpl) {
+			if (!real_trigger(tpl->vnum)) {
+				log("SYSERR: Removing missing trigger %d from quest %d.", tpl->vnum, QUEST_VNUM(quest));
+				LL_DELETE(QUEST_SCRIPTS(quest), tpl);
+				free(tpl);
+			}
+		}
+	}
+	
+	// room templates
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		LL_FOREACH_SAFE(GET_RMT_SCRIPTS(rmt), tpl, next_tpl) {
+			if (!real_trigger(tpl->vnum)) {
+				log("SYSERR: Removing missing trigger %d from room template %d.", tpl->vnum, GET_RMT_VNUM(rmt));
+				LL_DELETE(GET_RMT_SCRIPTS(rmt), tpl);
+				free(tpl);
+			}
+		}
+	}
+	
+	// update vehicle protos
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		LL_FOREACH_SAFE(veh->proto_script, tpl, next_tpl) {
+			if (!real_trigger(tpl->vnum)) {
+				log("SYSERR: Removing missing trigger %d from vehicle %d.", tpl->vnum, VEH_VNUM(veh));
+				LL_DELETE(veh->proto_script, tpl);
+				free(tpl);
 			}
 		}
 	}
