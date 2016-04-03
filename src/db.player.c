@@ -2791,6 +2791,7 @@ void clear_player(char_data *ch) {
 	
 	// some nowheres/nothings
 	GET_LOADROOM(ch) = NOWHERE;
+	GET_MARK_LOCATION(ch) = NOWHERE;
 	GET_MOUNT_VNUM(ch) = NOTHING;
 	GET_PLEDGE(ch) = NOTHING;
 	GET_TOMB_ROOM(ch) = NOWHERE;
@@ -3047,9 +3048,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	determine_gear_level(ch);
 	
 	SAVE_CHAR(ch);
-	
-	// clear some player special data
-	GET_MARK_LOCATION(ch) = NOWHERE;
 
 	// re-join slash-channels
 	global_mute_slash_channel_joins = TRUE;
