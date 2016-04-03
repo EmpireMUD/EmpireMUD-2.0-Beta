@@ -2947,6 +2947,7 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 /* Sends ch information on the character or animal k */
 void do_stat_character(char_data *ch, char_data *k) {
 	extern double get_combat_speed(char_data *ch, int pos);
+	extern int get_crafting_level(char_data *ch);
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
 	extern int total_bonus_healing(char_data *ch);
 	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
@@ -3055,8 +3056,9 @@ void do_stat_character(char_data *ch, char_data *k) {
 		val = get_to_hit(k, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(k));;
 		sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, base_hit_chance), val);
 		sprintf(lbuf2, "Speed  [%.2f]", get_combat_speed(k, WEAR_WIELD));
-		msg_to_char(ch, "  %-28.28s %-28.28s\r\n", lbuf, lbuf2);
-
+		sprintf(lbuf3, "Crafting  [%s%d&0]", HAPPY_COLOR(get_crafting_level(k), GET_SKILL_LEVEL(k)), get_crafting_level(k));
+		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
+		
 		if (IS_NPC(k)) {
 			msg_to_char(ch, "NPC Bare Hand Dam: %d\r\n", MOB_DAMAGE(k));
 		}
