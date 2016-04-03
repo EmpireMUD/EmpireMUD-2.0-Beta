@@ -1822,7 +1822,12 @@ void process_prospecting(char_data *ch) {
 				msg_to_char(ch, "This area has already been mined for all it's worth.\r\n");
 			}
 			else {
-				msg_to_char(ch, "You discover that this area %s %s.\r\n", (is_deep_mine(IN_ROOM(ch)) ? "is a deep" : "is a"), get_mine_type_name(IN_ROOM(ch)));
+				if (is_deep_mine(IN_ROOM(ch))) {
+					msg_to_char(ch, "You discover that this area is a deep %s.\r\n", get_mine_type_name(IN_ROOM(ch)));
+				}
+				else {
+					msg_to_char(ch, "You discover that this area is %s %s.\r\n", AN(get_mine_type_name(IN_ROOM(ch))), get_mine_type_name(IN_ROOM(ch)));
+				}
 				act("$n finishes prospecting.", TRUE, ch, NULL, NULL, TO_ROOM);
 			}
 			
