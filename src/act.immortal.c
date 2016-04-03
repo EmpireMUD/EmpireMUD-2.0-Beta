@@ -3411,6 +3411,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	struct obj_storage_type *store;
 	struct obj_custom_message *ocm;
 	player_index_data *index;
+	crop_data *cp;
 
 	msg_to_char(ch, "Name: '&y%s&0', Aliases: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
 
@@ -3525,8 +3526,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			break;
 		case ITEM_FOOD:
 			msg_to_char(ch, "Fills for: %d hours\r\n", GET_FOOD_HOURS_OF_FULLNESS(j));
-			if (IS_PLANTABLE_FOOD(j))
-				msg_to_char(ch, "Plants: %s\r\n", GET_CROP_NAME(crop_proto(GET_FOOD_CROP_TYPE(j))));
 			break;
 		case ITEM_CORPSE:
 			msg_to_char(ch, "Corpse of: ");
@@ -3591,6 +3590,11 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		default:
 			msg_to_char(ch, "Values 0-2: [&g%d&0] [&g%d&0] [&g%d&0]\r\n", GET_OBJ_VAL(j, 0), GET_OBJ_VAL(j, 1), GET_OBJ_VAL(j, 2));
 			break;
+	}
+	
+	// data that isn't type-based:
+	if (OBJ_FLAGGED(j, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE)))) {
+		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), climate_types[GET_CROP_CLIMATE(cp)]);
 	}
 
 	/*
