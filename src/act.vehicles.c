@@ -80,7 +80,7 @@ void cancel_driving(char_data *ch) {
 		return;
 	}
 	
-	snprintf(buf, sizeof(buf), "%s stops %s.\r\n", VEH_SHORT_DESC(veh), drive_data[GET_ACTION_VNUM(ch, 2)].verb);
+	snprintf(buf, sizeof(buf), "%s stops moving.\r\n", VEH_SHORT_DESC(veh));
 	CAP(buf);
 	msg_to_vehicle(veh, FALSE, buf);
 	
