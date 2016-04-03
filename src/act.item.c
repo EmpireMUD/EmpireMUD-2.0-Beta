@@ -3128,7 +3128,7 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		return;
 	}
 	if (!*argument) {
-		msg_to_char(ch, "Retreive %swhat?\r\n", all ? "all of " : "");
+		msg_to_char(ch, "Retrieve %swhat?\r\n", all ? "all of " : "");
 		return;
 	}
 	
