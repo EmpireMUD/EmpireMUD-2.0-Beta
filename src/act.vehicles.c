@@ -1577,6 +1577,11 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 			act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(veh)), find_back_portal(to_room, was_in, portal), veh, TO_CHAR | TO_ROOM);
 		}
 		
+		if (VEH_SITTING_ON(veh)) {
+			char_to_room(VEH_SITTING_ON(veh), to_room);
+			look_at_room(VEH_SITTING_ON(veh));
+		}
+		
 		// stop driving after
 		if (GET_ACTION(ch) == drive_data[subcmd].action) {
 			cancel_action(ch);
