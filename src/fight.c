@@ -3294,7 +3294,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	
 	if (success && AWAKE(FIGHTING(ch)) && has_ability(FIGHTING(ch), ABIL_BLOCK_ARROWS)) {
 		block = check_block(FIGHTING(ch), ch, TRUE);
-		if (can_gain_exp_from(FIGHTING(ch), ch)) {
+		if (GET_EQ(FIGHTING(ch), WEAR_HOLD) && IS_SHIELD(GET_EQ(FIGHTING(ch), WEAR_HOLD)) && can_gain_exp_from(FIGHTING(ch), ch)) {
 			gain_ability_exp(FIGHTING(ch), ABIL_BLOCK_ARROWS, 2);
 		}
 	}
