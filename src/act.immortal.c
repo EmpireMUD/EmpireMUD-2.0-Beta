@@ -821,6 +821,38 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 }
 
 
+// shows by adventure
+void do_instance_list_all(char_data *ch) {
+	extern int count_instances(adv_data *adv);
+	
+	char buf[MAX_STRING_LENGTH];
+	adv_data *adv, *next_adv;
+	int count = 0;
+	size_t size;
+	
+	size = snprintf(buf, sizeof(buf), "Instances by adventure:\r\n");
+	
+	// list by adventure
+	HASH_ITER(hh, adventure_table, adv, next_adv) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		
+		// skip adventures with no count
+		if (!(count = count_instances(adv))) {
+			continue;
+		}
+		
+		size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d)\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), count, GET_ADV_MAX_INSTANCES(adv));
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+// list by name
 void do_instance_list(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct instance_data *inst;
@@ -829,6 +861,12 @@ void do_instance_list(char_data *ch, char *argument) {
 	int num = 0, count = 0;
 	
 	if (!ch->desc) {
+		return;
+	}
+	
+	// new in b3.20: no-arg shows a different list entirely
+	if (!*argument) {
+		do_instance_list_all(ch);
 		return;
 	}
 	
