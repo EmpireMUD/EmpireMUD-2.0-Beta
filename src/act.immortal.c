@@ -1430,7 +1430,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			if (GET_LASTNAME(vict) != NULL)
 				free(GET_LASTNAME(vict));
 			GET_LASTNAME(vict) = NULL;
-    		sprintf(output, "%s's no longer has a last name", GET_NAME(vict));
+    		sprintf(output, "%s no longer has a last name", GET_NAME(vict));
 		}
     	else {
 			if (GET_LASTNAME(vict) != NULL)
