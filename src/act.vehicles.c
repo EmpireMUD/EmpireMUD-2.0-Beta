@@ -1660,7 +1660,7 @@ ACMD(do_drive) {
 		msg_to_char(ch, "Which direction would you like to %s?\r\n", drive_data[subcmd].command);
 	}
 	else if ((dir = parse_direction(ch, dir_arg)) == NO_DIR) {
-		if ((portal = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
+		if ((portal = get_obj_in_list_vis(ch, dir_arg, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
 			do_drive_through_portal(ch, veh, portal, subcmd);
 		}
 		else {
