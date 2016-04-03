@@ -2808,8 +2808,8 @@ void do_stat_book(char_data *ch, book_data *book) {
 	char *ptr, *txt;
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)\r\n", book->vnum, (index = find_player_index_by_idnum(book->author)) ? index->fullname : "nobody", book->author);
-	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\r\n", book->title);
-	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\r\n", book->byline);
+	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\t0\r\n", book->title);
+	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\t0\r\n", book->byline);
 	size += snprintf(buf + size, sizeof(buf) - size, "Item: [%s]\r\n", book->item_name);
 	size += snprintf(buf + size, sizeof(buf) - size, "%s", book->item_description);	// desc has its own crlf
 	
