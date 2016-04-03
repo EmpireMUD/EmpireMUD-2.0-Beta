@@ -1849,7 +1849,7 @@ ACMD(do_quit) {
 				log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has left the game", PERS(ch, ch, TRUE));
 			}
 		}
-		send_to_char("Goodbye, friend.. Come back soon!\r\n", ch);
+		send_to_char("Goodbye, friend... Come back soon!\r\n", ch);
 
 		/*
 		 * kill off all sockets connected to the same player as the one who is
