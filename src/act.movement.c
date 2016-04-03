@@ -1791,7 +1791,7 @@ ACMD(do_sleep) {
 				msg_to_char(ch, "You climb down from your mount.\r\n");
 				perform_dismount(ch);
 			}
-			send_to_char("You lay down and go to sleep.\r\n", ch);
+			send_to_char("You lie down and go to sleep.\r\n", ch);
 			act("$n lies down and falls asleep.", TRUE, ch, 0, 0, TO_ROOM);
 			GET_POS(ch) = POS_SLEEPING;
 			break;
