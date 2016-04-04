@@ -888,11 +888,17 @@ ACMD(do_accept) {
 
 ACMD(do_alternate) {
 	extern int isbanned(char *hostname);
+	extern bool member_is_timed_out_ch(char_data *ch);
+	extern const char *class_role[];
+	extern const char *class_role_color[];
 
-	char arg[MAX_INPUT_LENGTH];
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct account_player *plr;
 	player_index_data *index;
-	char_data *newch;
+	char_data *newch, *alt;
+	bool is_file = FALSE, timed_out;
+	int days, hours;
+	size_t size;
 	
 	any_one_arg(argument, arg);
 	
@@ -907,23 +913,52 @@ ACMD(do_alternate) {
 		msg_to_char(ch, "Usage: alternate <character name>\r\n");
 	}
 	else if (!str_cmp(arg, "list")) {
-		msg_to_char(ch, "Account characters:\r\n");
+		size = snprintf(buf, sizeof(buf), "Account characters:\r\n");
 		
 		for (plr = GET_ACCOUNT(ch)->players; plr; plr = plr->next) {
 			if (!plr->player) {
 				continue;
 			}
-			
-			if (plr->player->idnum == GET_IDNUM(ch)) {
-				// self
-				msg_to_char(ch, " &c%s&0\r\n", PERS(ch, ch, TRUE));
+					
+			// load alt
+			alt = find_or_load_player(plr->name, &is_file);
+			if (!alt) {
+				continue;
 			}
-			else {
-				msg_to_char(ch, " %s\r\n", plr->player->fullname);
+		
+			// display:
+			timed_out = member_is_timed_out_ch(alt);
+			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s %s] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), SHOW_CLASS_NAME(alt), class_role[GET_CLASS_ROLE(alt)], (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
+			}
+			else {	// not screenreader
+				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s%s\t0] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), class_role_color[GET_CLASS_ROLE(alt)], SHOW_CLASS_NAME(alt), (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
+			}
+						
+			// online/not
+			if (!is_file) {
+				size += snprintf(buf + size, sizeof(buf) - size, "  - &conline&0%s", IS_AFK(alt) ? " - &rafk&0" : "");
+			}
+			else if ((time(0) - alt->prev_logon) < SECS_PER_REAL_DAY) {
+				hours = (time(0) - alt->prev_logon) / SECS_PER_REAL_HOUR;
+				size += snprintf(buf + size, sizeof(buf) - size, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
+			}
+			else {	// more than a day
+				days = (time(0) - alt->prev_logon) / SECS_PER_REAL_DAY;
+				size += snprintf(buf + size, sizeof(buf) - size, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
+			}
+		
+			size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+		
+			if (alt && is_file) {
+				free_char(alt);
 			}
 		}
 		
 		// prevent rapid-use
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
 		command_lag(ch, WAIT_OTHER);
 	}
 	else if (ch->desc->str) {
