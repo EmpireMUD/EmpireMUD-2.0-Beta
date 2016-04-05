@@ -1061,8 +1061,8 @@ bool can_use_room(char_data *ch, room_data *room, int mode) {
 	// empire ownership
 	if (ROOM_OWNER(homeroom) == GET_LOYALTY(ch)) {
 		// private room?
-		if (ROOM_PRIVATE_OWNER(homeroom) == NOBODY || ROOM_PRIVATE_OWNER(homeroom) == GET_IDNUM(ch) || GET_RANK(ch) == EMPIRE_NUM_RANKS(ROOM_OWNER(homeroom))) {
-			return TRUE;
+		if (ROOM_PRIVATE_OWNER(homeroom) != NOBODY && ROOM_PRIVATE_OWNER(homeroom) != GET_IDNUM(ch) && GET_RANK(ch) < EMPIRE_NUM_RANKS(ROOM_OWNER(homeroom))) {
+			return FALSE;
 		}
 	}
 	// public + guest + hostile + no-empire exclusion
@@ -2511,6 +2511,9 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 							continue;
 						}
+						if (!CAN_SEE_OBJ(ch, obj)) {
+							continue;
+						}
 						
 						// RES_x: just types that need objects
 						switch (res->type) {
@@ -2623,6 +2626,9 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 					LL_FOREACH2(search_list[liter], obj, next_content) {
 						// skip keeps
 						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+							continue;
+						}
+						if (!CAN_SEE_OBJ(ch, obj)) {
 							continue;
 						}
 						
@@ -2892,6 +2898,9 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 					LL_FOREACH2(search_list[liter], obj, next_content) {
 						// skip keeps
 						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+							continue;
+						}
+						if (!CAN_SEE_OBJ(ch, obj)) {
 							continue;
 						}
 						

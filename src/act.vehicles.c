@@ -80,7 +80,7 @@ void cancel_driving(char_data *ch) {
 		return;
 	}
 	
-	snprintf(buf, sizeof(buf), "%s stops %s.\r\n", VEH_SHORT_DESC(veh), drive_data[GET_ACTION_VNUM(ch, 2)].verb);
+	snprintf(buf, sizeof(buf), "%s stops moving.\r\n", VEH_SHORT_DESC(veh));
 	CAP(buf);
 	msg_to_vehicle(veh, FALSE, buf);
 	
@@ -1080,8 +1080,10 @@ ACMD(do_board) {
 		// move ch: out-message
 		snprintf(buf, sizeof(buf), "You %s $V.", command);
 		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
-		snprintf(buf, sizeof(buf), "$n %ss $V.", command);
-		act(buf, TRUE, ch, NULL, veh, TO_ROOM);
+		if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
+			snprintf(buf, sizeof(buf), "$n %ss $V.", command);
+			act(buf, TRUE, ch, NULL, veh, TO_ROOM);
+		}
 		
 		// move ch
 		char_to_room(ch, to_room);
@@ -1091,8 +1093,10 @@ ACMD(do_board) {
 		look_at_room(ch);
 		
 		// move ch: in-message
-		snprintf(buf, sizeof(buf), "$n %ss.", command);
-		act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
+		if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
+			snprintf(buf, sizeof(buf), "$n %ss.", command);
+			act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
+		}
 		
 		// move ch: triggers
 		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
@@ -1105,7 +1109,9 @@ ACMD(do_board) {
 		
 		// leading-mob
 		if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
-			act("$n follows $M.", TRUE, GET_LEADING_MOB(ch), NULL, ch, TO_NOTVICT);
+			if (!AFF_FLAGGED(GET_LEADING_MOB(ch), AFF_SNEAK)) {
+				act("$n follows $N.", TRUE, GET_LEADING_MOB(ch), NULL, ch, TO_NOTVICT);
+			}
 			
 			char_to_room(GET_LEADING_MOB(ch), to_room);
 			if (!IS_NPC(GET_LEADING_MOB(ch))) {
@@ -1113,8 +1119,10 @@ ACMD(do_board) {
 			}
 			look_at_room(GET_LEADING_MOB(ch));
 			
-			snprintf(buf, sizeof(buf), "$n %ss.", command);
-			act(buf, TRUE, GET_LEADING_MOB(ch), NULL, NULL, TO_ROOM);
+			if (!AFF_FLAGGED(GET_LEADING_MOB(ch), AFF_SNEAK)) {
+				snprintf(buf, sizeof(buf), "$n %ss.", command);
+				act(buf, TRUE, GET_LEADING_MOB(ch), NULL, NULL, TO_ROOM);
+			}
 			
 			enter_wtrigger(IN_ROOM(GET_LEADING_MOB(ch)), GET_LEADING_MOB(ch), NO_DIR);
 			entry_memory_mtrigger(GET_LEADING_MOB(ch));
@@ -1569,6 +1577,11 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 			act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(veh)), find_back_portal(to_room, was_in, portal), veh, TO_CHAR | TO_ROOM);
 		}
 		
+		if (VEH_SITTING_ON(veh)) {
+			char_to_room(VEH_SITTING_ON(veh), to_room);
+			look_at_room(VEH_SITTING_ON(veh));
+		}
+		
 		// stop driving after
 		if (GET_ACTION(ch) == drive_data[subcmd].action) {
 			cancel_action(ch);
@@ -1652,7 +1665,7 @@ ACMD(do_drive) {
 		msg_to_char(ch, "Which direction would you like to %s?\r\n", drive_data[subcmd].command);
 	}
 	else if ((dir = parse_direction(ch, dir_arg)) == NO_DIR) {
-		if ((portal = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
+		if ((portal = get_obj_in_list_vis(ch, dir_arg, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
 			do_drive_through_portal(ch, veh, portal, subcmd);
 		}
 		else {

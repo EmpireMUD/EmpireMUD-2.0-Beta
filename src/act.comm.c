@@ -685,7 +685,7 @@ ACMD(do_slash_channel) {
 	struct slash_channel *chan;
 	struct channel_history_data *hist;
 	struct player_slash_channel *slash, *temp;
-	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	descriptor_data *desc;
 	char_data *vict;
 	int iter;
@@ -694,6 +694,11 @@ ACMD(do_slash_channel) {
 	char *invalid_channel_names[] = { "/", "join", "leave", "who", "hist", "history", "list", "\n" };
 	
 	half_chop(argument, arg, arg2);
+	// remove leading / if present
+	while (*arg2 == '/') {
+		strcpy(buf, arg2 + 1);
+		strcpy(arg2, buf);
+	}
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "No NPCs on slash channels.\r\n");

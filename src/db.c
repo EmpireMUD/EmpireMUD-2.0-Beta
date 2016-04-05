@@ -381,6 +381,7 @@ void boot_world(void) {
 	void check_for_bad_buildings();
 	void check_for_bad_sectors();
 	void check_newbie_islands();
+	void check_triggers();
 	void clean_empire_logs();
 	void index_boot_world();
 	void load_empire_storage();
@@ -498,6 +499,7 @@ void boot_world(void) {
 	check_for_bad_buildings();
 	check_for_bad_sectors();
 	read_ability_requirements();
+	check_triggers();
 	
 	log("Sorting data.");
 	HASH_SRT(sorted_hh, sorted_abilities, sort_abilities_by_data);

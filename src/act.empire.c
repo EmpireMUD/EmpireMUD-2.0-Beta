@@ -2475,7 +2475,7 @@ ACMD(do_city) {
 	half_chop(argument, arg, arg1);
 	
 	if (!*arg) {
-		msg_to_char(ch, "Usage: city <list | found | upgrade | downgrade | claim | abandon | rename>\r\n");
+		msg_to_char(ch, "Usage: city <list | found | upgrade | downgrade | claim | abandon | rename | traits>\r\n");
 	}
 	else if (is_abbrev(arg, "list")) {
 		list_cities(ch, arg1);
@@ -2502,7 +2502,7 @@ ACMD(do_city) {
 		city_traits(ch, arg1);
 	}
 	else {
-		msg_to_char(ch, "Usage: city <list | found | upgrade | claim | abandon | rename | traits>\r\n");
+		msg_to_char(ch, "Usage: city <list | found | upgrade | downgrade | claim | abandon | rename | traits>\r\n");
 	}
 }
 

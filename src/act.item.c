@@ -739,8 +739,7 @@ void remove_armor_by_type(char_data *ch, int armor_type) {
 
 
 /**
-* Interaction func for "separate". This always extracts the original
-* item, so it should basically always return TRUE.
+* Interaction func for "separate".
 */
 INTERACTION_FUNC(separate_obj_interact) {
 	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
@@ -774,7 +773,6 @@ INTERACTION_FUNC(separate_obj_interact) {
 		load_otrigger(new_obj);
 	}
 	
-	extract_obj(inter_item);
 	return TRUE;
 }
 
@@ -888,6 +886,7 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byte mode) {
 	struct coin_data *coin;
 	char buf[MAX_STRING_LENGTH];
+	char_data *iter;
 	obj_data *obj;
 
 	if (amount <= 0)
@@ -912,6 +911,16 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 			obj_to_room(obj, IN_ROOM(ch));
 			act("You drop $p.", FALSE, ch, obj, NULL, TO_CHAR);
 			act("$n drops $p.", FALSE, ch, obj, NULL, TO_ROOM);
+			
+			// log dropping items in front of mortals
+			if (IS_IMMORTAL(ch)) {
+				for (iter = ROOM_PEOPLE(IN_ROOM(ch)); iter; iter = iter->next_in_room) {
+					if (iter != ch && !IS_NPC(iter) && !IS_IMMORTAL(iter)) {
+						syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s drops %s with mortal present (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_NAME(iter), room_log_identifier(IN_ROOM(ch)));
+						break;
+					}
+				}
+			}
 		}
 		else {
 			snprintf(buf, sizeof(buf), "$n drops %s which disappear%s in a puff of smoke!", money_desc(type, amount), (amount == 1 ? "s" : ""));
@@ -1308,6 +1317,10 @@ static void perform_give_coins(char_data *ch, char_data *vict, empire_data *type
 		snprintf(buf, sizeof(buf), "$n gives you %s.", money_amount(type, amount));
 		act(buf, FALSE, ch, NULL, vict, TO_VICT);
 		// to-room/char messages below
+	}
+	
+	if (IS_IMMORTAL(ch) && !IS_IMMORTAL(vict)) {
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s gives %s to %s", GET_NAME(ch), money_desc(type, amount), PERS(vict, vict, TRUE));
 	}
 	
 	// msg to char
@@ -3115,7 +3128,7 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		return;
 	}
 	if (!*argument) {
-		msg_to_char(ch, "Retreive %swhat?\r\n", all ? "all of " : "");
+		msg_to_char(ch, "Retrieve %swhat?\r\n", all ? "all of " : "");
 		return;
 	}
 	
@@ -3328,7 +3341,7 @@ ACMD(do_combine) {
 	else if (!has_interaction(obj->interactions, INTERACT_COMBINE)) {
 		msg_to_char(ch, "You can't combine that!\r\n");
 	}
-	else {		
+	else {
 		// will extract no matter what happens here
 		if (!run_interactions(ch, obj->interactions, INTERACT_COMBINE, IN_ROOM(ch), NULL, obj, combine_obj_interact)) {
 			act("You fail to combine $p.", FALSE, ch, obj, NULL, TO_CHAR);
@@ -4941,8 +4954,10 @@ ACMD(do_separate) {
 		msg_to_char(ch, "You can't separate that!\r\n");
 	}
 	else {		
-		// will extract no matter what happens here
-		if (!run_interactions(ch, obj->interactions, INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, separate_obj_interact)) {
+		if (run_interactions(ch, obj->interactions, INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, separate_obj_interact)) {
+			extract_obj(obj);
+		}
+		else {
 			act("You fail to separate $p.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		command_lag(ch, WAIT_OTHER);

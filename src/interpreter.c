@@ -942,7 +942,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "thaw", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_FREEZE, SCMD_THAW, CTYPE_IMMORTAL, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "tie", POS_STANDING, do_tie, NO_MIN, CTYPE_COMBAT, FALSE ),
 	SIMPLE_CMD( "time", POS_DEAD, do_time, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "tip", POS_DEAD, do_tip, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "tips", POS_DEAD, do_tip, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "title", POS_DEAD, do_title, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "toggles", POS_DEAD, do_toggle, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "tomb", POS_DEAD, do_tomb, LVL_APPROVED, CTYPE_UTIL ),

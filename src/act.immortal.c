@@ -821,6 +821,38 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 }
 
 
+// shows by adventure
+void do_instance_list_all(char_data *ch) {
+	extern int count_instances(adv_data *adv);
+	
+	char buf[MAX_STRING_LENGTH];
+	adv_data *adv, *next_adv;
+	int count = 0;
+	size_t size;
+	
+	size = snprintf(buf, sizeof(buf), "Instances by adventure:\r\n");
+	
+	// list by adventure
+	HASH_ITER(hh, adventure_table, adv, next_adv) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		
+		// skip adventures with no count
+		if (!(count = count_instances(adv))) {
+			continue;
+		}
+		
+		size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d)\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), count, GET_ADV_MAX_INSTANCES(adv));
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+// list by name
 void do_instance_list(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct instance_data *inst;
@@ -829,6 +861,12 @@ void do_instance_list(char_data *ch, char *argument) {
 	int num = 0, count = 0;
 	
 	if (!ch->desc) {
+		return;
+	}
+	
+	// new in b3.20: no-arg shows a different list entirely
+	if (!*argument) {
+		do_instance_list_all(ch);
 		return;
 	}
 	
@@ -1392,7 +1430,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			if (GET_LASTNAME(vict) != NULL)
 				free(GET_LASTNAME(vict));
 			GET_LASTNAME(vict) = NULL;
-    		sprintf(output, "%s's no longer has a last name", GET_NAME(vict));
+    		sprintf(output, "%s no longer has a last name", GET_NAME(vict));
 		}
     	else {
 			if (GET_LASTNAME(vict) != NULL)
@@ -2770,8 +2808,8 @@ void do_stat_book(char_data *ch, book_data *book) {
 	char *ptr, *txt;
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)\r\n", book->vnum, (index = find_player_index_by_idnum(book->author)) ? index->fullname : "nobody", book->author);
-	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\r\n", book->title);
-	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\r\n", book->byline);
+	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\t0\r\n", book->title);
+	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\t0\r\n", book->byline);
 	size += snprintf(buf + size, sizeof(buf) - size, "Item: [%s]\r\n", book->item_name);
 	size += snprintf(buf + size, sizeof(buf) - size, "%s", book->item_description);	// desc has its own crlf
 	
@@ -2909,6 +2947,7 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 /* Sends ch information on the character or animal k */
 void do_stat_character(char_data *ch, char_data *k) {
 	extern double get_combat_speed(char_data *ch, int pos);
+	extern int get_crafting_level(char_data *ch);
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
 	extern int total_bonus_healing(char_data *ch);
 	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
@@ -3016,9 +3055,10 @@ void do_stat_character(char_data *ch, char_data *k) {
 		// dex is removed from to-hit to make it easier to compare to caps
 		val = get_to_hit(k, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(k));;
 		sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, base_hit_chance), val);
-		sprintf(lbuf2, "Speed  [%.2f]", get_combat_speed(k, WEAR_WIELD));
-		msg_to_char(ch, "  %-28.28s %-28.28s\r\n", lbuf, lbuf2);
-
+		sprintf(lbuf2, "Speed  [&0%.2f&0]", get_combat_speed(k, WEAR_WIELD));
+		sprintf(lbuf3, "Crafting  [%s%d&0]", HAPPY_COLOR(get_crafting_level(k), GET_SKILL_LEVEL(k)), get_crafting_level(k));
+		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
+		
 		if (IS_NPC(k)) {
 			msg_to_char(ch, "NPC Bare Hand Dam: %d\r\n", MOB_DAMAGE(k));
 		}
@@ -3253,7 +3293,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	}
 
 	// resources
-	msg_to_char(ch, "Resources required: ");
+	msg_to_char(ch, "Resources required:\r\n");
 	get_resource_display(GET_CRAFT_RESOURCES(craft), buf);
 	send_to_char(buf, ch);
 }
@@ -3371,6 +3411,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	struct obj_storage_type *store;
 	struct obj_custom_message *ocm;
 	player_index_data *index;
+	crop_data *cp;
 
 	msg_to_char(ch, "Name: '&y%s&0', Aliases: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
 
@@ -3485,8 +3526,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			break;
 		case ITEM_FOOD:
 			msg_to_char(ch, "Fills for: %d hours\r\n", GET_FOOD_HOURS_OF_FULLNESS(j));
-			if (IS_PLANTABLE_FOOD(j))
-				msg_to_char(ch, "Plants: %s\r\n", GET_CROP_NAME(crop_proto(GET_FOOD_CROP_TYPE(j))));
 			break;
 		case ITEM_CORPSE:
 			msg_to_char(ch, "Corpse of: ");
@@ -3551,6 +3590,11 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		default:
 			msg_to_char(ch, "Values 0-2: [&g%d&0] [&g%d&0] [&g%d&0]\r\n", GET_OBJ_VAL(j, 0), GET_OBJ_VAL(j, 1), GET_OBJ_VAL(j, 2));
 			break;
+	}
+	
+	// data that isn't type-based:
+	if (OBJ_FLAGGED(j, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE)))) {
+		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), climate_types[GET_CROP_CLIMATE(cp)]);
 	}
 
 	/*
@@ -6031,6 +6075,14 @@ ACMD(do_restore) {
 				adjust_abilities_to_empire(vict, emp, TRUE);
 			}
 		}
+		else if (!IS_NPC(vict)) {
+			for (i = 0; i < NUM_CONDS; i++) {
+				if (GET_COND(vict, i) != UNLIMITED) {
+					GET_COND(vict, i) = 0;
+				}
+			}
+		}
+		
 		update_pos(vict);
 		if (ch != vict) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has restored %s", GET_REAL_NAME(ch), GET_REAL_NAME(vict));

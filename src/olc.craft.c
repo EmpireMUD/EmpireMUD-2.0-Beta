@@ -743,6 +743,6 @@ OLC_MODULE(cedit_volume) {
 		msg_to_char(ch, "You can only set the drink volume on a soup.\r\n");
 	}
 	else {
-		GET_CRAFT_QUANTITY(craft) = olc_process_number(ch, argument, "drink volume", "volume", 0, (MAX_CONDITION / REAL_UPDATES_PER_MUD_HOUR), GET_CRAFT_QUANTITY(craft));
+		GET_CRAFT_QUANTITY(craft) = olc_process_number(ch, argument, "drink volume", "volume", 0, 1000, GET_CRAFT_QUANTITY(craft));
 	}
 }

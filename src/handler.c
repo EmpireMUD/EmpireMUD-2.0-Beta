@@ -1476,7 +1476,7 @@ char_data *get_char_world(char *name) {
 
 	for (ch = character_list; ch && (pos <= number) && !found; ch = ch->next) {
 		if ((!IS_NPC(ch) || !pc_only) && MATCH_CHAR_NAME(tmp, ch)) {
-			if (++pos == number) {
+			if (++pos == number || pc_only) {	// pc_only messes up pos
 				found = ch;
 			}
 		}
@@ -2614,7 +2614,7 @@ void add_follower(char_data *ch, char_data *leader, bool msg) {
 
 	if (msg) {
 		act("You now follow $N.", FALSE, ch, 0, leader, TO_CHAR);
-		if (CAN_SEE(leader, ch)) {
+		if (CAN_SEE(leader, ch) && WIZHIDE_OK(leader, ch)) {
 			act("$n starts following you.", TRUE, ch, 0, leader, TO_VICT);
 		}
 		act("$n starts to follow $N.", TRUE, ch, 0, leader, TO_NOTVICT);
@@ -2656,7 +2656,7 @@ void stop_follower(char_data *ch) {
 
 	act("You stop following $N.", FALSE, ch, 0, ch->master, TO_CHAR);
 	act("$n stops following $N.", TRUE, ch, 0, ch->master, TO_NOTVICT);
-	if (CAN_SEE(ch->master, ch)) {
+	if (CAN_SEE(ch->master, ch) && WIZHIDE_OK(ch->master, ch)) {
 		act("$n stops following you.", TRUE, ch, 0, ch->master, TO_VICT);
 	}
 
@@ -4831,7 +4831,7 @@ obj_data *get_obj_world(char *name) {
 *
 * @param char_data *ch The person who is getting an offer.
 * @param char_data *from The person sending the offer.
-* @param int type Any OFFER_x type.
+* @param int type Any OFFER_ type.
 * @param int data A misc integer that may be passed based on type (use 0 for none).
 * @return struct offer_data* A pointer to the attached new offer, if it succeeds.
 */
@@ -4894,7 +4894,7 @@ void clean_offers(char_data *ch) {
 * Removes all offers of a given type.
 *
 * @param char_data *ch The person whose offers to remove.
-* @param int type Any OFFER_x type.
+* @param int type Any OFFER_ type.
 */
 void remove_offers_by_type(char_data *ch, int type) {
 	struct offer_data *offer, *next_offer, *temp;

@@ -38,6 +38,7 @@
 // external prototypes
 extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 extern bool check_scaling(char_data *mob, char_data *attacker);
+extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
 extern char *get_room_name(room_data *room, bool color);
 extern char_data *has_familiar(char_data *ch);
 void scale_item_to_level(obj_data *obj, int level);
@@ -552,6 +553,44 @@ void summon_player(char_data *ch, char *argument) {
 #define OFFER_FINISH(name)  bool (name)(char_data *ch, struct offer_data *offer)
 
 
+OFFER_VALIDATE(oval_quest) {
+	extern bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
+	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
+	
+	struct instance_data *inst = find_matching_instance_for_shared_quest(ch, offer->data);
+	quest_data *qst = quest_proto(offer->data);
+	
+	if (!qst) {
+		msg_to_char(ch, "Unable to find a quest to accept.\r\n");
+		return FALSE;
+	}
+	if (is_on_quest(ch, offer->data)) {
+		msg_to_char(ch, "You are already on that quest.\r\n");
+		return FALSE;
+	}
+	if (!char_meets_prereqs(ch, qst, inst)) {
+		msg_to_char(ch, "You don't meet the prerequisites for that quest.\r\n");
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+
+OFFER_FINISH(ofin_quest) {
+	void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
+	
+	struct instance_data *inst = find_matching_instance_for_shared_quest(ch, offer->data);
+	quest_data *qst = quest_proto(offer->data);
+	
+	if (qst) {
+		start_quest(ch, qst, inst);
+	}
+	
+	return TRUE;
+}
+
+
 OFFER_VALIDATE(oval_rez) {
 	extern obj_data *find_obj(int n);
 	extern room_data *obj_room(obj_data *obj);
@@ -583,7 +622,7 @@ OFFER_FINISH(ofin_rez) {
 	void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability);
 	room_data *loc = real_room(offer->location);	// pre-validated
 	perform_resurrection(ch, is_playing(offer->from), loc, offer->data);
-	return FALSE;
+	return FALSE;	// prevent deletion because perform_res deletes the offer
 }
 
 
@@ -726,7 +765,8 @@ ACMD(do_accept) {
 	} offer_types[] = {
 		{ "resurrection", POS_DEAD, oval_rez, ofin_rez },	// OFFER_RESURRECTION: uses offer->data for ability
 		{ "summon", POS_STANDING, oval_summon, ofin_summon },	// OFFER_SUMMON: uses offer->data for SUMMON_x
-	
+		{ "quest", POS_RESTING, oval_quest, ofin_quest},	// OFFER_QUEST: uses offer->data for quest vnum
+		
 		// end
 		{ "\n", POS_DEAD, NULL, NULL }
 	};
@@ -848,11 +888,17 @@ ACMD(do_accept) {
 
 ACMD(do_alternate) {
 	extern int isbanned(char *hostname);
+	extern bool member_is_timed_out_ch(char_data *ch);
+	extern const char *class_role[];
+	extern const char *class_role_color[];
 
-	char arg[MAX_INPUT_LENGTH];
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct account_player *plr;
 	player_index_data *index;
-	char_data *newch;
+	char_data *newch, *alt;
+	bool is_file = FALSE, timed_out;
+	int days, hours;
+	size_t size;
 	
 	any_one_arg(argument, arg);
 	
@@ -867,23 +913,52 @@ ACMD(do_alternate) {
 		msg_to_char(ch, "Usage: alternate <character name>\r\n");
 	}
 	else if (!str_cmp(arg, "list")) {
-		msg_to_char(ch, "Account characters:\r\n");
+		size = snprintf(buf, sizeof(buf), "Account characters:\r\n");
 		
 		for (plr = GET_ACCOUNT(ch)->players; plr; plr = plr->next) {
 			if (!plr->player) {
 				continue;
 			}
-			
-			if (plr->player->idnum == GET_IDNUM(ch)) {
-				// self
-				msg_to_char(ch, " &c%s&0\r\n", PERS(ch, ch, TRUE));
+					
+			// load alt
+			alt = find_or_load_player(plr->name, &is_file);
+			if (!alt) {
+				continue;
 			}
-			else {
-				msg_to_char(ch, " %s\r\n", plr->player->fullname);
+		
+			// display:
+			timed_out = member_is_timed_out_ch(alt);
+			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s %s] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), SHOW_CLASS_NAME(alt), class_role[GET_CLASS_ROLE(alt)], (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
+			}
+			else {	// not screenreader
+				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s%s\t0] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), class_role_color[GET_CLASS_ROLE(alt)], SHOW_CLASS_NAME(alt), (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
+			}
+						
+			// online/not
+			if (!is_file) {
+				size += snprintf(buf + size, sizeof(buf) - size, "  - &conline&0%s", IS_AFK(alt) ? " - &rafk&0" : "");
+			}
+			else if ((time(0) - alt->prev_logon) < SECS_PER_REAL_DAY) {
+				hours = (time(0) - alt->prev_logon) / SECS_PER_REAL_HOUR;
+				size += snprintf(buf + size, sizeof(buf) - size, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
+			}
+			else {	// more than a day
+				days = (time(0) - alt->prev_logon) / SECS_PER_REAL_DAY;
+				size += snprintf(buf + size, sizeof(buf) - size, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
+			}
+		
+			size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+		
+			if (alt && is_file) {
+				free_char(alt);
 			}
 		}
 		
 		// prevent rapid-use
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
 		command_lag(ch, WAIT_OTHER);
 	}
 	else if (ch->desc->str) {
@@ -1786,7 +1861,7 @@ ACMD(do_quit) {
 		msg_to_char(ch, "You can't quit with fangs in your neck!\r\n");
 	else if (GET_FEEDING_FROM(ch))
 		msg_to_char(ch, "You can't quit while drinking blood!\r\n");
-	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))) {
+	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch)) && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't quit in hostile territory.\r\n");
 	}
 	else {
@@ -1809,7 +1884,7 @@ ACMD(do_quit) {
 				log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has left the game", PERS(ch, ch, TRUE));
 			}
 		}
-		send_to_char("Goodbye, friend.. Come back soon!\r\n", ch);
+		send_to_char("Goodbye, friend... Come back soon!\r\n", ch);
 
 		/*
 		 * kill off all sockets connected to the same player as the one who is

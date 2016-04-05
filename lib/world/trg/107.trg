@@ -275,6 +275,14 @@ switch %random.3%
   break
 done
 ~
+#10735
+Drop Other Candle Quest~
+2 u 100
+~
+if %actor%
+  %quest% %actor% drop 10734
+end
+~
 #10736
 Jill~
 0 b 10

@@ -106,7 +106,7 @@ Argument type:  percent chance to trigger
 Return value:  return 0 to prevent the drop
 
 As an object trigger, this is activated any time a character attempts to drop
-the object. As a room trigger, it happens when an objectd is dropped in the
+the object. As a room trigger, it happens when an object is dropped in the
 room.
 
 The object trigger includes putting the object into a container or vehicle.

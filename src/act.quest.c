@@ -344,6 +344,43 @@ quest_data *find_local_quest_by_name(char_data *ch, char *argument, bool check_c
 
 
 /**
+* Attempts to find an instance id to match a shared quest. This is not 100%
+* reliable but should be good enough.
+*
+* @param char_data *ch The player who needs to match the instance.
+* @param any_vnum quest_vnum Which quest to find an instance for.
+* @return struct instance_data* The found instance, if any (or NULL).
+*/
+struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum) {
+	struct instance_data *inst = NULL;
+	struct group_member_data *mem;
+	struct player_quest *pq;
+	
+	if (IS_NPC(ch) || !GROUP(ch)) {
+		return NULL;
+	}
+	
+	LL_FOREACH(GROUP(ch)->members, mem) {
+		if (!(pq = is_on_quest(mem->member, quest_vnum))) {
+			continue;	// not on the quest
+		}
+		if (pq->instance_id == NOTHING) {
+			continue;	// no instance
+		}
+		
+		inst = get_instance_by_id(pq->instance_id);
+		
+		// found one?
+		if (inst) {
+			return inst;
+		}
+	}
+	
+	return inst;
+}
+
+
+/**
 * Takes a character off of a quest.
 *
 * @param char_data *ch The player.
@@ -604,6 +641,57 @@ QCMD(qcmd_finish) {
 }
 
 
+QCMD(qcmd_group) {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct group_member_data *mem;
+	struct player_quest *pq, *fq;
+	char_data *friend;
+	int count, total;
+	bool any, have;
+	size_t size;
+	
+	if (!GROUP(ch)) {
+		msg_to_char(ch, "You are not in a group.\r\n");
+		return;
+	}
+	if (!GET_QUESTS(ch)) {
+		msg_to_char(ch, "You aren't on any quests.\r\n");
+		return;
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Quests in common with your group:\r\n");
+	have = FALSE;
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		any = FALSE;
+		*line = '\0';
+		
+		// find group members on quest
+		LL_FOREACH(GROUP(ch)->members, mem) {
+			friend = mem->member;
+			
+			if (!IS_NPC(friend) && friend != ch && (fq = is_on_quest(friend, pq->vnum))) {
+				count_quest_tasks(fq, &count, &total);
+				snprintf(line + strlen(line), sizeof(line) - strlen(line), "%s%s (%d/%d)", (any ? ", " : ""), GET_NAME(friend), count, total);
+				any = TRUE;
+			}
+		}
+		
+		if (any && *line) {
+			have = TRUE;
+			size += snprintf(buf + size, sizeof(buf) - size, "  %s: %s\r\n", get_quest_name_by_proto(pq->vnum), line);
+		}
+	}
+	
+	if (!have) {
+		size += snprintf(buf + size, sizeof(buf) - size, "  none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
 QCMD(qcmd_info) {
 	struct instance_data *inst;
 	struct player_quest *pq;
@@ -657,6 +745,64 @@ QCMD(qcmd_list) {
 	
 	if (ch->desc) {
 		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+QCMD(qcmd_share) {
+	struct group_member_data *mem;
+	struct instance_data *inst;
+	struct player_quest *pq;
+	bool any, same_room;
+	char_data *friend;
+	quest_data *qst;
+	
+	skip_spaces(&argument);
+	
+	if (!GROUP(ch)) {
+		msg_to_char(ch, "You must be in a group to share quests.\r\n");
+		return;
+	}
+	if (!(qst = find_local_quest_by_name(ch, argument, TRUE, FALSE, &inst)) || !(pq = is_on_quest(ch, QUEST_VNUM(qst)))) {
+		msg_to_char(ch, "You don't seem to be on a quest called '%s'.\r\n", argument);
+		return;
+	}
+	
+	// look up instance (re-use the 'inst' var, which was junk above)
+	// we need the same instance for the other players here
+	inst = get_instance_by_id(pq->instance_id);
+	if (inst && GET_ADV_VNUM(inst->adventure) != pq->adventure) {
+		inst = NULL;
+	}
+	
+	// try to share it
+	any = same_room = FALSE;
+	LL_FOREACH(GROUP(ch)->members, mem) {
+		friend = mem->member;
+		if (IS_NPC(friend) || is_on_quest(friend, QUEST_VNUM(qst))) {
+			continue;
+		}
+		if (!char_meets_prereqs(friend, qst, inst)) {
+			continue;
+		}
+		
+		// character qualifies... but are they in the same room?
+		if (IN_ROOM(ch) != IN_ROOM(friend)) {
+			same_room = TRUE;
+			continue;
+		}
+		
+		any = TRUE;
+		add_offer(friend, ch, OFFER_QUEST, pq->vnum);
+		act("You offer to share '$t' with $N.", FALSE, ch, QUEST_NAME(qst), friend, TO_CHAR);
+		act("$o offers to share the quest '$t' with you (use 'accept/reject quest').", FALSE, ch, QUEST_NAME(qst), friend, TO_VICT);
+	}
+	
+	if (!any && same_room) {
+		msg_to_char(ch, "You can only share quests with group members in the same room as you.\r\n");
+	}
+	else if (!any) {
+		msg_to_char(ch, "Nobody in your group can accept that quest.\r\n");
 	}
 }
 
@@ -725,10 +871,11 @@ const struct { char *command; QCMD(*func); int min_pos; } quest_cmd[] = {
 	{ "check", qcmd_check, POS_RESTING },
 	{ "completed", qcmd_completed, POS_DEAD },
 	{ "drop", qcmd_drop, POS_DEAD },
+	{ "group", qcmd_group, POS_DEAD },
 	{ "finish", qcmd_finish, POS_STANDING },
 	{ "info", qcmd_info, POS_DEAD },
 	{ "list", qcmd_list, POS_DEAD },
-	// { "share", qcmd_share, POS_DEAD },
+	{ "share", qcmd_share, POS_DEAD },
 	{ "start", qcmd_start, POS_STANDING },
 	{ "tracker", qcmd_tracker, POS_DEAD },
 	

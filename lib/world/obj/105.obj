@@ -248,7 +248,7 @@ A basket of sparkling gemfruits is lying here.~
    This beautiful fruit will eventually decay if not stored or eaten, leaving
 behind a magical crystal. It can also be planted to grow more gemfruit. Some
 gemfuits will fail to produce gems, and you must be holding them in your
-inventory when they decay to get any gems at all.  
+inventory when they decay to get any gems at all.
 ~
 6 b a 13
 48 10504 0
@@ -564,5 +564,20 @@ You find only ash, suitable for feeding no one.
 3 k a 1
 0 0 0
 14 6
+S
+#10537
+beanstalk stalk giant~
+a giant beanstalk~
+A giant beanstalk has been felled here.~
+Beanstalks work as pillars in place of logs.
+~
+3 e a 4
+0 0 0
+0 0
+I 11 1002 100.00 1  # LIGHT: a roaring fire
+O
+21 0
+R
+5118 0
 S
 $

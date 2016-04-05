@@ -76,6 +76,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch);
 * @return char_data *ch or NULL
 */
 char_data *find_or_load_player(char *name, bool *is_file) {
+	char buf[MAX_INPUT_LENGTH+2];
 	player_index_data *index;
 	char_data *ch = NULL;
 	
@@ -89,7 +90,17 @@ char_data *find_or_load_player(char *name, bool *is_file) {
 			}
 		}
 	}
-
+	
+	// not able to find -- look for a player partial match?
+	if (!ch) {
+		sprintf(buf, "0.%s", name);	// add 0. to force player match
+		ch = get_char_world(buf);
+		*is_file = FALSE;
+		if (ch && IS_NPC(ch)) {
+			ch = NULL;	// verify player only
+		}
+	}
+	
 	return ch;
 }
 
@@ -2780,6 +2791,7 @@ void clear_player(char_data *ch) {
 	
 	// some nowheres/nothings
 	GET_LOADROOM(ch) = NOWHERE;
+	GET_MARK_LOCATION(ch) = NOWHERE;
 	GET_MOUNT_VNUM(ch) = NOTHING;
 	GET_PLEDGE(ch) = NOTHING;
 	GET_TOMB_ROOM(ch) = NOWHERE;
@@ -3036,9 +3048,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	determine_gear_level(ch);
 	
 	SAVE_CHAR(ch);
-	
-	// clear some player special data
-	GET_MARK_LOCATION(ch) = NOWHERE;
 
 	// re-join slash-channels
 	global_mute_slash_channel_joins = TRUE;

@@ -144,14 +144,14 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	
 	#define CHORE_ACTIVE(chore)  (empire_chore_limit(emp, island, (chore)) != 0)
 	
-	// wait wait don't work here
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) {
-		return;
-	}
-	
 	// fire!
 	if (BUILDING_BURNING(room) > 0 && CHORE_ACTIVE(CHORE_FIRE_BRIGADE)) {
 		do_chore_fire_brigade(emp, room);
+		return;
+	}
+	
+	// wait wait don't work here
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK | ROOM_AFF_HAS_INSTANCE)) {
 		return;
 	}
 	
@@ -542,19 +542,29 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore,
 bool can_gain_chore_resource_from_interaction_list(empire_data *emp, room_data *location, int chore, struct interaction_item *list, int interaction_type, bool highest_only) {
 	struct interaction_item *interact, *found = NULL;
 	double best_percent = 0.0;
+	obj_data *proto;
 	
 	for (interact = list; interact; interact = interact->next) {
-		if (interact->type == interaction_type) {
-			if (highest_only) {
-				if (!found || interact->percent > best_percent) {
-					best_percent = interact->percent;
-					found = interact;
-				}
+		if (interact->type != interaction_type) {
+			continue;
+		}
+		if (!(proto = obj_proto(interact->vnum))) {
+			continue;
+		}
+		if (!proto->storage) {
+			continue;	// MUST be storable
+		}
+		
+		// found
+		if (highest_only) {
+			if (!found || interact->percent > best_percent) {
+				best_percent = interact->percent;
+				found = interact;
 			}
-			else if (can_gain_chore_resource(emp, location, chore, interact->vnum)) {
-				// any 1 is fine
-				return TRUE;
-			}
+		}
+		else if (can_gain_chore_resource(emp, location, chore, interact->vnum)) {
+			// any 1 is fine
+			return TRUE;
 		}
 	}
 	

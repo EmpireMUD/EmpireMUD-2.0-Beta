@@ -1950,6 +1950,9 @@ void qt_visit_room(char_data *ch, room_data *room) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_quest(quest_data *quest, char_data *ch) {
+	struct trig_proto_list *tpl;
+	struct quest_task *task;
+	trig_data *trig;
 	bool problem = FALSE;
 	
 	if (QUEST_FLAGGED(quest, QST_IN_DEVELOPMENT)) {
@@ -1959,6 +1962,61 @@ bool audit_quest(quest_data *quest, char_data *ch) {
 	if (!QUEST_NAME(quest) || !*QUEST_NAME(quest) || !str_cmp(QUEST_NAME(quest), default_quest_name)) {
 		olc_audit_msg(ch, QUEST_VNUM(quest), "Name not set");
 		problem = TRUE;
+	}
+	if (!isupper(*QUEST_NAME(quest))) {
+		olc_audit_msg(ch, QUEST_VNUM(quest), "Name not capitalized");
+		problem = TRUE;
+	}
+	if (!QUEST_DESCRIPTION(quest) || !*QUEST_DESCRIPTION(quest) || !str_cmp(QUEST_DESCRIPTION(quest), default_quest_description)) {
+		olc_audit_msg(ch, QUEST_VNUM(quest), "Description not set");
+		problem = TRUE;
+	}
+	if (!QUEST_COMPLETE_MSG(quest) || !*QUEST_COMPLETE_MSG(quest) || !str_cmp(QUEST_COMPLETE_MSG(quest), default_quest_complete_msg)) {
+		olc_audit_msg(ch, QUEST_VNUM(quest), "Complete message not set");
+		problem = TRUE;
+	}
+	
+	if (QUEST_MIN_LEVEL(quest) > QUEST_MAX_LEVEL(quest) && QUEST_MAX_LEVEL(quest) != 0) {
+		olc_audit_msg(ch, QUEST_VNUM(quest), "Min level higher than max level");
+		problem = TRUE;
+	}
+
+	// check scripts
+	LL_FOREACH(QUEST_SCRIPTS(quest), tpl) {
+		if (!(trig = real_trigger(tpl->vnum))) {
+			olc_audit_msg(ch, QUEST_VNUM(quest), "Non-existent trigger %d", tpl->vnum);
+			problem = TRUE;
+			continue;
+		}
+		if (trig->attach_type != WLD_TRIGGER) {
+			olc_audit_msg(ch, QUEST_VNUM(quest), "Incorrect trigger type (trg %d)", tpl->vnum);
+			problem = TRUE;
+		}
+	}
+	
+	if (!QUEST_STARTS_AT(quest)) {
+		olc_audit_msg(ch, QUEST_VNUM(quest), "No start locations");
+		problem = TRUE;
+	}
+	if (!QUEST_ENDS_AT(quest)) {
+		olc_audit_msg(ch, QUEST_VNUM(quest), "No end locations");
+		problem = TRUE;
+	}
+	
+	LL_FOREACH(QUEST_PREREQS(quest), task) {
+		// QT_x: types that can't be used as prereqs
+		switch (task->type) {
+			case QT_KILL_MOB:
+			case QT_KILL_MOB_FLAGGED:
+			case QT_TRIGGERED:
+			case QT_VISIT_BUILDING:
+			case QT_VISIT_ROOM_TEMPLATE:
+			case QT_VISIT_SECTOR: {
+				olc_audit_msg(ch, QUEST_VNUM(quest), "Invalid prereq type %s", quest_tracker_types[task->type]);
+				problem = TRUE;
+				break;
+			}
+		}
 	}
 	
 	return problem;
