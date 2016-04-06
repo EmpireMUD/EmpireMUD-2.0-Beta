@@ -166,9 +166,9 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 		act(buf, TRUE, ch, 0, t, TO_VICT);
 	}
 	
+	qt_visit_room(ch, IN_ROOM(ch));
 	look_at_room(ch);
 	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
-	qt_visit_room(ch, IN_ROOM(ch));
 }
 
 
@@ -6688,9 +6688,9 @@ ACMD(do_trans) {
 				}
 				act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM);
 				act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT);
+				qt_visit_room(victim, IN_ROOM(victim));
 				look_at_room(victim);
 				enter_wtrigger(IN_ROOM(victim), victim, NO_DIR);
-				qt_visit_room(victim, IN_ROOM(victim));
 			}
 		}
 		
@@ -6717,9 +6717,9 @@ ACMD(do_trans) {
 			}
 			act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM);
 			act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT);
+			qt_visit_room(victim, IN_ROOM(victim));
 			look_at_room(victim);
 			enter_wtrigger(IN_ROOM(victim), victim, NO_DIR);
-			qt_visit_room(victim, IN_ROOM(victim));
 			send_config_msg(ch, "ok_string");
 		}
 	}

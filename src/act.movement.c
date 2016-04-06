@@ -411,11 +411,11 @@ void perform_transport(char_data *ch, room_data *to_room) {
 	act("$n dematerializes and vanishes!", TRUE, ch, 0, 0, TO_ROOM);
 
 	char_to_room(ch, to_room);
+	qt_visit_room(ch, to_room);
 	look_at_room(ch);
 	if (!IS_NPC(ch)) {
 		GET_LAST_DIR(ch) = NO_DIR;
 	}
-	qt_visit_room(ch, to_room);
 
 	act("$n materializes in front of you!", TRUE, ch, 0, 0, TO_ROOM);
 	
@@ -664,10 +664,10 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	// ch first
 	char_from_room(ch);
 	char_to_room(ch, to_room);
+	qt_visit_room(ch, to_room);
 	if (!IS_NPC(ch)) {
 		GET_LAST_DIR(ch) = NO_DIR;
 	}
-	qt_visit_room(ch, to_room);
 	
 	// see if there's a different portal on the other end
 	use_portal = find_back_portal(to_room, was_in, portal);
@@ -982,6 +982,8 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 			}
 		}
 	}
+	
+	qt_visit_room(ch, IN_ROOM(ch));
 
 	if (ch->desc != NULL) {
 		look_at_room(ch);
@@ -1024,9 +1026,6 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 		greet_memory_mtrigger(ch);
 	}
 	
-	// staying -- mark visit
-	qt_visit_room(ch, IN_ROOM(ch));
-
 	return TRUE;
 }
 
@@ -1307,6 +1306,7 @@ ACMD(do_circle) {
 	}
 	char_from_room(ch);
 	char_to_room(ch, found_room);
+	qt_visit_room(ch, IN_ROOM(ch));
 	
 	if (!IS_NPC(ch)) {
 		GET_LAST_DIR(ch) = dir;
@@ -1348,8 +1348,6 @@ ACMD(do_circle) {
 			do_circle(fol->follower, buf, 0, 0);
 		}
 	}
-	
-	qt_visit_room(ch, IN_ROOM(ch));
 }
 
 

@@ -1621,13 +1621,12 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 	else {
 		act("$n vanishes in a brilliant flash of light!", FALSE, ch, NULL, NULL, TO_ROOM);
 		char_to_room(ch, to_room);
+		qt_visit_room(ch, IN_ROOM(ch));
 		look_at_room_by_loc(ch, IN_ROOM(ch), NOBITS);
 		act("$n appears with a brilliant flash of light!", FALSE, ch, NULL, NULL, TO_ROOM);
 	
 		// reset this in case they teleport onto a wall.
 		GET_LAST_DIR(ch) = NO_DIR;
-		
-		qt_visit_room(ch, IN_ROOM(ch));
 		
 		// any existing adventure summon location is no longer valid after a voluntary teleport
 		if (!random) {	// except random teleport

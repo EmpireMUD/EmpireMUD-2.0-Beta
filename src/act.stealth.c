@@ -212,10 +212,10 @@ void perform_escape(char_data *ch) {
 	}
 	else {
 		char_to_room(ch, to_room);
+		qt_visit_room(ch, IN_ROOM(ch));
 		look_at_room(ch);
 		
 		GET_LAST_DIR(ch) = NO_DIR;
-		qt_visit_room(ch, IN_ROOM(ch));
 		
 		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 		entry_memory_mtrigger(ch);
@@ -1048,6 +1048,7 @@ ACMD(do_infiltrate) {
 		else {
 			char_from_room(ch);
 			char_to_room(ch, to_room);
+			qt_visit_room(ch, IN_ROOM(ch));
 			look_at_room(ch);
 			msg_to_char(ch, "\r\nInfiltration successful.\r\n");
 			
@@ -1058,8 +1059,6 @@ ACMD(do_infiltrate) {
 			greet_mtrigger(ch, NO_DIR);
 			greet_memory_mtrigger(ch);
 			greet_vtrigger(ch, NO_DIR);
-			
-			qt_visit_room(ch, IN_ROOM(ch));
 		}
 
 		// chance to log
@@ -1549,6 +1548,7 @@ ACMD(do_shadowstep) {
 			act("You shadowstep to $N!", FALSE, ch, NULL, vict, TO_CHAR);
 			char_from_room(ch);
 			char_to_room(ch, IN_ROOM(vict));
+			qt_visit_room(ch, IN_ROOM(ch));
 			look_at_room(ch);
 			act("$n steps out of the shadows!", TRUE, ch, NULL, NULL, TO_ROOM);
 			
@@ -1559,8 +1559,6 @@ ACMD(do_shadowstep) {
 			greet_mtrigger(ch, NO_DIR);
 			greet_memory_mtrigger(ch);
 			greet_vtrigger(ch, NO_DIR);
-			
-			qt_visit_room(ch, IN_ROOM(ch));
 		}
 
 		// chance to log

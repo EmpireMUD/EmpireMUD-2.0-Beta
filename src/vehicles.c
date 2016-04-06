@@ -110,9 +110,9 @@ void fully_empty_vehicle(vehicle_data *veh) {
 				act("You are ejected from $V!", FALSE, ch, NULL, veh, TO_CHAR);
 				if (IN_ROOM(veh)) {
 					char_to_room(ch, IN_ROOM(veh));
+					qt_visit_room(ch, IN_ROOM(ch));
 					look_at_room(ch);
 					act("$n is ejected from $V!", TRUE, ch, NULL, veh, TO_ROOM);
-					qt_visit_room(ch, IN_ROOM(ch));
 				}
 				else {
 					extract_char(ch);
