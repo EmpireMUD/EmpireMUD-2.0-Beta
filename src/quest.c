@@ -2625,7 +2625,7 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 	}
 	if (need_skill) {
 		argument = any_one_arg(argument, arg);
-		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !get_skill_name_by_vnum(*vnum)) {
+		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !find_skill_by_vnum(*vnum)) {
 			msg_to_char(ch, "Invalid skill vnum '%s'.\r\n", arg);
 			return FALSE;
 		}

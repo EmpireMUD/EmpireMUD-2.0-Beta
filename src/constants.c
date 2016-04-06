@@ -2157,8 +2157,8 @@ const bool quest_tracker_has_amount[] = {
 	FALSE,	// not on quest
 	TRUE,	// own building
 	TRUE,	// own vehicle
-	FALSE,	// skill over
-	FALSE,	// skill under
+	TRUE,	// skill over
+	TRUE,	// skill under
 	FALSE,	// triggered
 	FALSE,	// visit building
 	FALSE,	// visit rmt
