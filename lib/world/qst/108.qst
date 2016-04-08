@@ -1,10 +1,12 @@
 #10800
 See Hugo For Advice~
-Go see Royal Adviser Hugo for some free advice on empire management.
+   Go see Royal Adviser Hugo for some free advice on empire management. You can
+only complete this quest if your Empire skill is under 15. If you still have
+the quest after that, type 'quest drop See Hugo' to get rid of it.  
 ~
 Hugo gives you some empire advice.
 ~
-7 0 0 25 0
+8 0 0 25 0
 P
 10 1 0 14
 R
@@ -25,11 +27,15 @@ reward Empire skill levels and bonus experience.
 ~
 You have found Ranger Clara!
 ~
-8 0 0 25 -1
+9 0 0 25 -1
 A
 1 10800
 P
 10 1 0 49
+P
+5 10802 0 1
+P
+6 10802 0 1
 R
 6 10800 1
 R
@@ -53,20 +59,19 @@ Steps to get trees:
     desert or jungle wood for this quest.
  2. Wield your axe.
  3. Type 'chop'.
+ 4. Once you have 6 trees, return to Ranger Clara.
 ~
    Clara is impressed with how quickly you chopped those trees. She doesn't
 want them for herself, though, so you can keep them for the next part of the
 tutorial.
 ~
-11 0 0 25 -1
+14 0 0 25 -1
 A
 1 10801
 P
-0 10801 0 1
-P
 10 1 0 49
 R
-0 0 2
+0 0 1
 R
 1 -1 25
 R
@@ -88,7 +93,7 @@ done, take them to Rosemary in the planning office.
 ~
 Rosemary examines the logs you've scraped off, and gives you a nod of approval.
 ~
-10 0 0 25 -1
+12 0 0 25 -1
 A
 1 10801
 P
@@ -98,7 +103,7 @@ P
 P
 10 1 0 49
 R
-0 0 2
+0 0 1
 R
 1 -1 25
 R
@@ -114,16 +119,21 @@ Z
 S
 #10804
 Build Your Cabin~
-   Rosemary wants you to take those logs and build a cabin. You may need to
-clear some forest to make room. The cabin has to be build on plains or open
-desert. Once you find a spot you like, figure out which way you want the cabin
-to face. It will need to face a map tile you can walk out onto. Figure out
-which direction that is, and type 'build cabin north" -- or whichever direction
-you chose.
+Rosemary wants you to take those logs and build a cabin.
+ 1. Find a good spot to put your cabin. You need a tile to build it on, and
+      a tile for it to open onto.
+ 2. Chop down trees if you need to clear plains or desert to build on.
+ 3. Stand on the map tile where you want the cabin to be, and type:
+    'build cabin north' (or whichever direction you want it to face.
+ 4. If you have to stop building for any reason, you can just type 'build' to
+    start again.
+ 5. When you've put up all 6 logs, the cabin is complete!
+ 6. Return to the City Planner's office.
+(Hint: You can type 'build info cabin' to see the requirements.)
 ~
 Rosemary seems pleased with your cabin.
 ~
-11 0 0 25 -1
+15 0 0 25 -1
 A
 1 10802
 P
@@ -133,7 +143,7 @@ P
 P
 10 1 0 49
 R
-0 0 2
+0 0 1
 R
 1 -1 25
 R
@@ -152,9 +162,11 @@ Collect 20 Sticks~
    Rosemary wants you to collect some sticks. You can either gather them in the
 forest, or get them by scraping trees.
 ~
-Rosemary seems pleased with your cabin.
+   Rosemary stifles a laugh at how you've filled your pack with sticks, and
+wonders aloud whether you'll be able to carry enough of them for the next part
+of the tutorial.  
 ~
-12 0 0 25 -1
+14 0 0 25 -1
 A
 1 10802
 P
@@ -164,7 +176,7 @@ P
 P
 10 1 0 49
 R
-0 0 2
+0 0 1
 R
 1 -1 25
 R
@@ -180,16 +192,18 @@ Z
 S
 #10806
 Build Storage Buildings~
-   Rosemary knows you'll need a place to store resouces for your burgeoning
+   Rosemary knows you'll need a place to store resources for your burgeoning
 empire. These buildings are easy to build, and you'll need to make several:
  1. A lumberyard to store your trees and lumber.
  2. A gravelpit to store your rocks and stone.
  3. A foundry to store and smelt ore.
  4. A quarry to get stone blocks.
+Return to the City Planner's office when you're done.
+(Hint: You can type 'build info lumberyard' to see what's required.)
 ~
 Rosemary is proud of you for finishing so many buildings.
 ~
-13 0 0 25 -1
+16 0 0 25 -1
 A
 1 10802
 P
@@ -199,7 +213,7 @@ P
 P
 10 1 0 49
 R
-0 0 2
+0 0 1
 R
 1 -1 25
 R
@@ -226,11 +240,12 @@ mountains to build a mine. You'll need mines in order to find ore. It doesn't
 matter which mountain tile you build the mine on, but be sure to build it
 facing off the mountain and onto flat land. If you learn Mountain Climbing
 later, you'll be able to build deeper in the mountain ranges and face your
-mines toward other Mountain tiles.
+mines toward other Mountain tiles. Return to Rosemary's office when you're
+done.  
 ~
 Rosemary is pleased with your progress.
 ~
-14 0 0 25 -1
+16 0 0 25 -1
 A
 1 10802
 P
@@ -240,7 +255,7 @@ P
 P
 10 1 0 49
 R
-0 0 2
+0 0 1
 R
 1 -1 25
 R
@@ -259,15 +274,16 @@ Mine Some Iron~
    In order to make your empire great, you must learn to work with metal. Mine
 some iron and smelt it into ingots, and then return to Rosemary.
  1. Build mines until you find one with iron ore.
- 2. Use a handaxe or pick to mine (chip rocks to make a handaxe if
+ 2. Wield a handaxe or pick to mine (chip rocks to make a handaxe if
     you need one).
  3. Mine 20 iron ore.
  4. Go back to your Foundry.
  5. Smelt 10 iron ingots.
+ 6. Return to the City Planner's office.
 ~
 Rosemary is impressed that you got the iron so fast.
 ~
-15 0 0 25 -1
+18 0 0 25 -1
 A
 1 10802
 P
@@ -277,7 +293,7 @@ P
 P
 10 1 0 49
 R
-0 0 2
+0 0 1
 R
 1 -1 25
 R
@@ -296,11 +312,13 @@ Collect More Materials~
    Rosemary wants you to build a forge, which you'll need in order for your
 empire to really work metal. In addition to the iron ingots you already made,
 you also need to dig up some rocks and saw some lumber. You can saw the lumber
-at your lumberyard, from trees or logs.
+at your lumberyard, from trees or logs. After you have these materials, come
+back to the City Planner's office and Rosemary will tell you what you'll need
+to build the whole forge.  
 ~
 Rosemary inspects your building materials, and approves.
 ~
-16 0 0 25 -1
+19 0 0 25 -1
 A
 1 10802
 P
@@ -310,7 +328,7 @@ P
 P
 10 1 0 49
 R
-0 0 2
+0 0 1
 R
 1 -1 25
 R
@@ -330,13 +348,14 @@ S
 Build A Forge~
    Now that you know how to gather wood, rocks, and iron, it's time to build a
 forge. You need a forge to make nails, as well as weapons and armor. Collect
-the rest of the materials for the forge and then build it in your city.
+the rest of the materials for the forge and then build it in your city. Return
+to Rosemary in the City Planning office when it's built.  
 (Hint: Type 'build info forge' to see a list of resources required.)
 ~
    Rosemary congratulates you on building your forge. This is the end of the
 Empire tutorial. Now go forth, and rule the world!
 ~
-16 0 0 25 -1
+19 0 0 25 -1
 A
 1 10802
 P

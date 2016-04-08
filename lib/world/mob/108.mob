@@ -6,6 +6,7 @@ The adviser's pageboy is standing here.
 0 25 dv nD
 1 0 0 15
 T 10800
+T 10802
 S
 #10801
 Clara forest ranger~
@@ -14,6 +15,7 @@ Clara, the Forest Ranger, is adjusting her boot.
 ~
 0 0 bdv nD
 2 0 0 15
+T 10801
 S
 #10802
 Rosemary planner city~
@@ -22,6 +24,7 @@ Rosemary, the City Planner, is reviewing a scroll.
 ~
 0 0 bdv nD
 2 0 0 15
+T 10801
 S
 #10803
 Hugo adviser royal~
@@ -30,5 +33,6 @@ Hugo, the Royal Adviser, sits behind his desk.
 ~
 0 0 bdv nD
 1 0 0 15
+T 10801
 S
 $
