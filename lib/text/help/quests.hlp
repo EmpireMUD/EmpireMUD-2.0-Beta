@@ -14,6 +14,9 @@ The following quest commands are available:
  &cquest start&0 - Begin a quest.
  &cquest tracker&0 - Show the quest tracker for one quest you're on.
 
+Hint: You can abbreviate "q t", or even alias these commands if you use them
+a lot.
+
 For more information on each, see HELP QUEST <command>.
 #
 "QUEST CHECK"
