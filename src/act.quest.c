@@ -437,6 +437,7 @@ void show_quest_tracker(char_data *ch, struct player_quest *pq) {
 				else {
 					*buf = '\0';
 				}
+				break;
 			}
 			default: {
 				*buf = '\0';
