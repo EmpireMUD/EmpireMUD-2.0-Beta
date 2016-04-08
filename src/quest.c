@@ -2800,8 +2800,8 @@ void qedit_process_quest_tasks(char_data *ch, char *argument, struct quest_task 
 			msg_to_char(ch, "Invalid %s number.\r\n", command);
 		}
 		else if (is_abbrev(field_arg, "amount")) {
-			if (!isdigit(*vnum_arg) || (num = atoi(vnum_arg)) < 0) {
-				msg_to_char(ch, "Invalid amount '%s'.\r\n", vnum_arg);
+			if (!isdigit(*argument) || (num = atoi(argument)) < 0) {
+				msg_to_char(ch, "Invalid amount '%s'.\r\n", argument);
 				return;
 			}
 			else {
