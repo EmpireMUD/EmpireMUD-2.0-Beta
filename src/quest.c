@@ -452,6 +452,10 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 			snprintf(output, sizeof(output), "%s%dx %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
 			break;
 		}
+		case QR_QUEST_CHAIN: {
+			snprintf(output, sizeof(output), "%s %s", vnum, get_quest_name_by_proto(reward->vnum));
+			break;
+		}
 		default: {
 			snprintf(output, sizeof(output), "%s%dx UNKNOWN", vnum, reward->amount);
 			break;
@@ -2487,7 +2491,7 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_amount, int *amount, any_vnum *vnum, bitvector_t *misc) {
 	extern const char *component_flags[];
 	extern const char *component_types[];
-	extern const bool quest_tracker_has_amount[];
+	extern const bool quest_tracker_amt_type[];
 	
 	char arg[MAX_INPUT_LENGTH]; 
 	bool need_bld = FALSE, need_component = FALSE;
@@ -2555,7 +2559,7 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 	}
 	
 	// possible args
-	if (quest_tracker_has_amount[type] && find_amount) {
+	if (quest_tracker_amt_type[type] != QT_AMT_NONE && find_amount) {
 		argument = any_one_arg(argument, arg);
 		if (!*arg || !isdigit(*arg) || (*amount = atoi(arg)) < 0) {
 			msg_to_char(ch, "You must provide an amount.\r\n");
@@ -4133,6 +4137,16 @@ OLC_MODULE(qedit_rewards) {
 					}
 					break;
 				}
+				case QR_QUEST_CHAIN: {
+					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+						msg_to_char(ch, "Invalid quest vnum '%s'.\r\n", vnum_arg);
+						return;
+					}
+					if (quest_proto(vnum)) {
+						ok = TRUE;
+					}
+					break;
+				}
 			}
 			
 			// did we find one?
@@ -4227,6 +4241,16 @@ OLC_MODULE(qedit_rewards) {
 						return;
 					}
 					if (find_skill_by_vnum(vnum)) {
+						ok = TRUE;
+					}
+					break;
+				}
+				case QR_QUEST_CHAIN: {
+					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+						msg_to_char(ch, "Invalid quest vnum '%s'.\r\n", vnum_arg);
+						return;
+					}
+					if (quest_proto(vnum)) {
 						ok = TRUE;
 					}
 					break;

@@ -4197,6 +4197,9 @@ Available reward types:
     100). You should use prereqs to be sure what the player's skill is first.
  SKILL-EXP - Give the player some skill experience and a chance for skill gain.
  SKILL-LEVELS - Raise the player's skill level, if possible.
+ QUEST-CHAIN - Starts a player on another quest, if they meet the pre-reqs and
+    are not already on it. Note: You must still specify the <amount> arg for
+    this reward, but it doesn't do anything.
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.

@@ -51,6 +51,7 @@ void scale_item_to_level(obj_data *obj, int level);
 
 // local prototypes
 void drop_quest(char_data *ch, struct player_quest *pq);
+void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -254,6 +255,17 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 				}
 				break;
 			}
+			case QR_QUEST_CHAIN: {
+				quest_data *start = quest_proto(reward->vnum);
+				struct instance_data *inst = get_instance_by_id(pcq->last_instance_id);
+				
+				// shows nothing if the player doesn't qualify
+				if (start && !is_on_quest(ch, reward->vnum) && char_meets_prereqs(ch, start, inst)) {
+					start_quest(ch, start, inst);
+				}
+				
+				break;
+			}
 		}
 	}
 	
@@ -405,7 +417,7 @@ void drop_quest(char_data *ch, struct player_quest *pq) {
 * @param struct player_quest *pq The quest to show the tracker for.
 */
 void show_quest_tracker(char_data *ch, struct player_quest *pq) {
-	extern const bool quest_tracker_has_amount[];
+	extern const bool quest_tracker_amt_type[];
 	
 	char buf[MAX_STRING_LENGTH];
 	struct quest_task *task;
@@ -414,14 +426,28 @@ void show_quest_tracker(char_data *ch, struct player_quest *pq) {
 	msg_to_char(ch, "Quest Tracker:\r\n");
 	
 	LL_FOREACH(pq->tracker, task) {
-		if (quest_tracker_has_amount[task->type]) {
-			lefthand = task->current;
-			lefthand = MIN(lefthand, task->needed);	// may be above the amount needed
-			lefthand = MAX(0, lefthand);	// in some cases, current may be negative
-			sprintf(buf, " (%d/%d)", lefthand, task->needed);
-		}
-		else {
-			*buf = '\0';
+		// QT_AMT_x: display based on amount type
+		switch (quest_tracker_amt_type[task->type]) {
+			case QT_AMT_NUMBER: {
+				lefthand = task->current;
+				lefthand = MIN(lefthand, task->needed);	// may be above the amount needed
+				lefthand = MAX(0, lefthand);	// in some cases, current may be negative
+				sprintf(buf, " (%d/%d)", lefthand, task->needed);
+				break;
+			}
+			case QT_AMT_THRESHOLD:
+			case QT_AMT_NONE: {
+				if (task->current >= task->needed) {
+					strcpy(buf, " (complete)");
+				}
+				else {
+					*buf = '\0';
+				}
+			}
+			default: {
+				*buf = '\0';
+				break;
+			}
 		}
 		msg_to_char(ch, "  %s%s\r\n", quest_task_string(task, FALSE), buf);
 	}
@@ -835,6 +861,8 @@ QCMD(qcmd_start) {
 		if (!any) {
 			msg_to_char(ch, "There are no quests you can start here.\r\n");
 		}
+		
+		free_quest_temp_list(quest_list);
 	}
 	else if (!(qst = find_local_quest_by_name(ch, argument, FALSE, TRUE, &inst))) {
 		msg_to_char(ch, "You don't see that quest here.\r\n");
