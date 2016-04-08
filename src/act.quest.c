@@ -57,6 +57,9 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
+#define QUEST_LEVEL_COLOR(ch, quest)  color_by_difficulty((ch), pick_level_from_range(GET_COMPUTED_LEVEL(ch), QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest)))
+
+
 /**
 * Finds all available quests at a character's location. You should use
 * free_quest_temp_list() when you're done with this list.
@@ -91,6 +94,37 @@ struct quest_temp_list *build_available_quest_list(char_data *ch) {
 
 
 /**
+* Colors by level difference between the player and the quest or area.
+*
+* @param char_data *ch The player.
+* @param int The level to compare her to.
+*/
+const char *color_by_difficulty(char_data *ch, int level) {
+	int diff, iter;
+	
+	const struct { int level; const char *color; } pairs[] = {
+		// { level diff, color } order highest (hardest) to lowest (easiest)
+		{ 30, "\tr" },
+		{ 10, "\ty" },
+		{ -25, "\tg" },
+		{ -75, "\tc" },
+		{ INT_MIN, "\tw" }	// put this last
+	};
+	
+	diff = level;
+	SAFE_ADD(diff, -get_approximate_level(ch), INT_MIN, INT_MAX, TRUE);
+	for (iter = 0; /* safely terminates itself */; ++iter) {
+		if (diff >= pairs[iter].level) {
+			return pairs[iter].color;
+		}
+	}
+	
+	// count never really get here
+	return "\t0";
+}
+
+
+/**
 * Completes the quest, messages the player, gives rewards.
 *
 * @param char_data *ch The player.
@@ -116,7 +150,7 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	qt_quest_completed(ch, pq->vnum);
 	qt_lose_quest(ch, pq->vnum);
 	
-	msg_to_char(ch, "You have finished %s!\r\n%s", QUEST_NAME(quest), NULLSAFE(QUEST_COMPLETE_MSG(quest)));
+	msg_to_char(ch, "You have finished %s%s\t0!\r\n%s", QUEST_LEVEL_COLOR(ch, quest), QUEST_NAME(quest), NULLSAFE(QUEST_COMPLETE_MSG(quest)));
 	act("$n has finished $t!", TRUE, ch, QUEST_NAME(quest), NULL, TO_ROOM);
 	
 	// take objs if necessary
@@ -461,6 +495,7 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
 	
 	char buf[MAX_STRING_LENGTH];
 	struct player_quest *pq;
+	int count, total;
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -472,7 +507,7 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
 	}
 	
 	// pre-reqs are already checked for us
-	msg_to_char(ch, "You start %s:\r\n%s", QUEST_NAME(qst), NULLSAFE(QUEST_DESCRIPTION(qst)));
+	msg_to_char(ch, "You start %s%s\t0:\r\n%s", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), NULLSAFE(QUEST_DESCRIPTION(qst)));
 	snprintf(buf, sizeof(buf), "$n starts %s.", QUEST_NAME(qst));
 	act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 	
@@ -487,8 +522,12 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
 	
 	LL_PREPEND(GET_QUESTS(ch), pq);
 	refresh_one_quest_tracker(ch, pq);
-	
 	qt_start_quest(ch, QUEST_VNUM(qst));
+	
+	count_quest_tasks(pq, &count, &total);
+	if (count == total) {
+		msg_to_char(ch, "You already meet the requirements for %s%s\t0.\r\n", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
+	}
 }
 
 
@@ -518,7 +557,7 @@ QCMD(qcmd_check) {
 			*buf = '\0';
 		}
 		
-		msg_to_char(ch, "  %s%s\r\n", QUEST_NAME(qtl->quest), buf);
+		msg_to_char(ch, "  %s%s%s\t0\r\n", QUEST_LEVEL_COLOR(ch, qtl->quest), QUEST_NAME(qtl->quest), buf);
 	}
 	
 	if (!any) {
@@ -557,7 +596,7 @@ QCMD(qcmd_drop) {
 		msg_to_char(ch, "You don't seem to be on a quest called '%s'.\r\n", argument);
 	}
 	else {
-		msg_to_char(ch, "You drop %s.\r\n", QUEST_NAME(qst));
+		msg_to_char(ch, "You drop %s%s\t0.\r\n", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
 		drop_quest(ch, pq);
 		SAVE_CHAR(ch);
 	}
@@ -666,6 +705,7 @@ QCMD(qcmd_group) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct group_member_data *mem;
 	struct player_quest *pq, *fq;
+	quest_data *proto;
 	char_data *friend;
 	int count, total;
 	bool any, have;
@@ -699,7 +739,9 @@ QCMD(qcmd_group) {
 		
 		if (any && *line) {
 			have = TRUE;
-			size += snprintf(buf + size, sizeof(buf) - size, "  %s: %s\r\n", get_quest_name_by_proto(pq->vnum), line);
+			if ((proto = quest_proto(pq->vnum))) {
+				size += snprintf(buf + size, sizeof(buf) - size, "  %s%s\t0: %s\r\n", QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), line);
+			}
 		}
 	}
 	
@@ -731,10 +773,10 @@ QCMD(qcmd_info) {
 		// title
 		if (pq) {
 			count_quest_tasks(pq, &complete, &total);
-			msg_to_char(ch, "%s (%d/%d)\r\n", QUEST_NAME(qst), complete, total);
+			msg_to_char(ch, "%s%s\t0 (%d/%d tasks)\r\n", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), complete, total);
 		}
 		else {
-			msg_to_char(ch, "%s (not on quest)\r\n", QUEST_NAME(qst));
+			msg_to_char(ch, "%s%s\t0 (not on quest)\r\n", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
 		}
 		
 		send_to_char(NULLSAFE(QUEST_DESCRIPTION(qst)), ch);
@@ -750,6 +792,7 @@ QCMD(qcmd_info) {
 QCMD(qcmd_list) {
 	char buf[MAX_STRING_LENGTH];
 	struct player_quest *pq;
+	quest_data *proto;
 	int count, total;
 	size_t size;
 	
@@ -761,7 +804,9 @@ QCMD(qcmd_list) {
 	size = snprintf(buf, sizeof(buf), "Your quests:\r\n");
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		count_quest_tasks(pq, &count, &total);
-		size += snprintf(buf + size, sizeof(buf) - size, "  %s (%d/%d)\r\n", get_quest_name_by_proto(pq->vnum), count, total);
+		if ((proto = quest_proto(pq->vnum))) {
+			size += snprintf(buf + size, sizeof(buf) - size, "  %s%s\t0 (%d/%d)\r\n", QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), count, total);
+		}
 	}
 	
 	if (ch->desc) {
@@ -772,6 +817,7 @@ QCMD(qcmd_list) {
 
 QCMD(qcmd_share) {
 	struct group_member_data *mem;
+	char buf[MAX_STRING_LENGTH];
 	struct instance_data *inst;
 	struct player_quest *pq;
 	bool any, same_room;
@@ -816,7 +862,8 @@ QCMD(qcmd_share) {
 		any = TRUE;
 		add_offer(friend, ch, OFFER_QUEST, pq->vnum);
 		act("You offer to share '$t' with $N.", FALSE, ch, QUEST_NAME(qst), friend, TO_CHAR);
-		act("$o offers to share the quest '$t' with you (use 'accept/reject quest').", FALSE, ch, QUEST_NAME(qst), friend, TO_VICT);
+		snprintf(buf, sizeof(buf), "$o offers to share the quest %s%s\t0 with you (use 'accept/reject quest').", QUEST_LEVEL_COLOR(friend, qst), QUEST_NAME(qst));
+		act(buf, FALSE, ch, QUEST_NAME(qst), friend, TO_VICT);
 	}
 	
 	if (!any && same_room) {

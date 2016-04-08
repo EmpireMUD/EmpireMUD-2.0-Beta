@@ -1295,6 +1295,7 @@ extern double rate_item(obj_data *obj);
 // player functions from utils.c
 void command_lag(char_data *ch, int wait_type);
 void determine_gear_level(char_data *ch);
+extern int pick_level_from_range(int level, int min, int max);
 extern bool wake_and_stand(char_data *ch);
 
 // resource functions from utils.c
