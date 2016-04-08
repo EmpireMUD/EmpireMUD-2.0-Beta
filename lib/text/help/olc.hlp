@@ -279,6 +279,8 @@ Quests (QEDIT):
 - The VISIT-* task types do not work as prereqs; only as tasks.
 - For low-level quests, reward order may matter. Give skill exp/levels BEFORE
   reward items, as the scale level may go up.
+- If you use the QUEST-CHAIN reward type, put it last. It will look better
+  at the end.
 
 Room Templates (REDIT):
 - Don't confuse room templates with the designated rooms that players can add

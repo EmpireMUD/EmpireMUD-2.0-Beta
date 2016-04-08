@@ -261,6 +261,9 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 				
 				// shows nothing if the player doesn't qualify
 				if (start && !is_on_quest(ch, reward->vnum) && char_meets_prereqs(ch, start, inst)) {
+					if (!PRF_FLAGGED(ch, PRF_COMPACT)) {
+						msg_to_char(ch, "\r\n");	// add some spacing
+					}
 					start_quest(ch, start, inst);
 				}
 				
