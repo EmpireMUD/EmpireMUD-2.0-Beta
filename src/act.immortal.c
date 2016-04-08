@@ -1900,7 +1900,7 @@ SHOW(show_quests) {
 		size = snprintf(buf, sizeof(buf), "%s's quests:\r\n", GET_NAME(vict));
 		LL_FOREACH(GET_QUESTS(vict), pq) {
 			count_quest_tasks(pq, &count, &total);
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d)\r\n", pq->vnum, get_quest_name_by_proto(pq->vnum), count, total);
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d tasks)\r\n", pq->vnum, get_quest_name_by_proto(pq->vnum), count, total);
 		}
 	
 		if (ch->desc) {

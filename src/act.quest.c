@@ -819,7 +819,7 @@ QCMD(qcmd_list) {
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		count_quest_tasks(pq, &count, &total);
 		if ((proto = quest_proto(pq->vnum))) {
-			size += snprintf(buf + size, sizeof(buf) - size, "  %s%s\t0 (%d/%d)\r\n", QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), count, total);
+			size += snprintf(buf + size, sizeof(buf) - size, "  %s%s\t0 (%d/%d tasks)\r\n", QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), count, total);
 		}
 	}
 	
