@@ -4186,6 +4186,7 @@ Usage:  .rewards add <type> <amount> <vnum/type>
         .rewards change <number> vnum <value>
         .rewards copy <from type> <from vnum>
         .rewards remove <number | all>
+        .rewards move <number> <up | down>
 
 Quest rewards are given to the player upon completion. You can add as many or
 as few rewards as possible, and you can also use quest scripts to give more

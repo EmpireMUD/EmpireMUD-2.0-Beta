@@ -4276,11 +4276,81 @@ OLC_MODULE(qedit_rewards) {
 			msg_to_char(ch, "You can only change the amount or vnum.\r\n");
 		}
 	}	// end 'change'
+	else if (is_abbrev(cmd_arg, "move")) {
+		struct quest_reward *to_move, *prev, *a, *b, *a_next, *b_next, iitem;
+		bool up;
+		
+		// usage: rewards move <number> <up | down>
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, field_arg);
+		up = is_abbrev(field_arg, "up");
+		
+		if (!*num_arg || !*field_arg) {
+			msg_to_char(ch, "Usage: rewards move <number> <up | down>\r\n");
+		}
+		else if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid reward number.\r\n");
+		}
+		else if (!is_abbrev(field_arg, "up") && !is_abbrev(field_arg, "down")) {
+			msg_to_char(ch, "You must specify whether you're moving it up or down in the list.\r\n");
+		}
+		else if (up && num == 1) {
+			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
+		}
+		else {
+			// find the one to move
+			to_move = prev = NULL;
+			for (reward = *list; reward && !to_move; reward = reward->next) {
+				if (--num == 0) {
+					to_move = reward;
+				}
+				else {
+					// store for next iteration
+					prev = reward;
+				}
+			}
+			
+			if (!to_move) {
+				msg_to_char(ch, "Invalid reward number.\r\n");
+			}
+			else if (!up && !to_move->next) {
+				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
+			}
+			else {
+				// SUCCESS: "move" them by swapping data
+				if (up) {
+					a = prev;
+					b = to_move;
+				}
+				else {
+					a = to_move;
+					b = to_move->next;
+				}
+				
+				// store next pointers
+				a_next = a->next;
+				b_next = b->next;
+				
+				// swap data
+				iitem = *a;
+				*a = *b;
+				*b = iitem;
+				
+				// restore next pointers
+				a->next = a_next;
+				b->next = b_next;
+				
+				// message: re-atoi(num_arg) because we destroyed num finding our target
+				msg_to_char(ch, "You move reward %d %s.\r\n", atoi(num_arg), (up ? "up" : "down"));
+			}
+		}
+	}	// end 'move'
 	else {
 		msg_to_char(ch, "Usage: rewards add <type> <amount> <vnum/type>\r\n");
 		msg_to_char(ch, "Usage: rewards change <number> vnum <value>\r\n");
 		msg_to_char(ch, "Usage: rewards copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "Usage: rewards remove <number | all>\r\n");
+		msg_to_char(ch, "Usage: rewards move <number> <up | down>\r\n");
 	}
 }
 
