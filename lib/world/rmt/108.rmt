@@ -1,0 +1,73 @@
+#10800
+The Grand Foyer~
+   The planning office is small, but the foyer is furnished with seating for a
+dozen people while they wait to see one of the royal officials who office here.
+A sign on the wall reads 'Ye Olde Empire Tutorial'.
+~
+cdh 0
+D2
+~
+0 10803
+D3
+~
+0 10801
+D1
+~
+0 10802
+E
+sign wall tutorial~
+The sign says you should see Forest Ranger.
+~
+M 0 10800 100.00 1
+S
+#10801
+The Forestry Office~
+   This office is made from wood so fresh that it's still dripping sap. It
+looks like the ranger has used some of this sap to hold papers to the wall. 
+Two deer heads adorn the far wall, but these appear to be held up with nails.
+~
+cdh 0
+D1
+~
+0 10800
+E
+walls sap~
+The walls are made from fresh wood, still dripping.
+~
+E
+papers~
+   The papers are held up with sticky sap that has leaked through and made some
+of them illegible. The rest appear to be hunting permits.  
+~
+M 0 10801 100.00 1
+S
+#10802
+The City Planner~
+   The planning office is superbly tidy, with shelf upon shelf of neatly
+labeled books. One wall has a map of the island with tiny flags pinned in
+various places. Another wall has a painting of a woman.  
+~
+cdh 0
+D3
+~
+0 10800
+E
+painting~
+   Upon closer inspection, the painting appears to be Rosemary, the City
+Planner.  
+~
+M 0 10802 100.00 1
+S
+#10803
+The Adviser's Office~
+   This office is decked in richly stained wood and trimmed in gold leaf. Deep
+purple curtains and an oversized, fur-lined chair suggest the office is
+well-supplied by the crown. That, or the adviser is ostentatiously pretentious.
+~
+cdh 0
+D0
+~
+0 10800
+M 0 10803 100.00 1
+S
+$
