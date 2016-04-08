@@ -756,7 +756,10 @@ QCMD(qcmd_group) {
 
 
 QCMD(qcmd_info) {
+	extern char *quest_giver_string(struct quest_giver *giver, bool show_vnums);
+	char buf[MAX_STRING_LENGTH];
 	struct instance_data *inst;
+	struct quest_giver *giver;
 	struct player_quest *pq;
 	int complete, total;
 	quest_data *qst;
@@ -784,6 +787,17 @@ QCMD(qcmd_info) {
 		// tracker
 		if (pq) {
 			show_quest_tracker(ch, pq);
+		}
+		
+		// show quest giver
+		*buf = '\0';
+		LL_FOREACH(QUEST_ENDS_AT(qst), giver) {
+			if (giver->type != QG_TRIGGER) {
+				sprintf(buf + strlen(buf), "%s%s", (*buf ? ", " : ""), quest_giver_string(giver, FALSE));
+			}
+		}
+		if (*buf) {
+			msg_to_char(ch, "Turn in at: %s.\r\n", buf);
 		}
 	}
 }
