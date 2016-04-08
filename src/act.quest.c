@@ -240,18 +240,9 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 				break;
 			}
 			case QR_SKILL_LEVELS: {
-				int val;
-				bool loss;
-				
-				val = get_skill_level(ch, reward->vnum) + reward->amount;
-				val = MAX(0, MIN(CLASS_SKILL_CAP, val));
-				loss = (val < get_skill_level(ch, reward->vnum));
-				set_skill(ch, reward->vnum, val);
-				
-				msg_to_char(ch, "Your %s is now level %d!\r\n", get_skill_name_by_vnum(reward->vnum), val);
-				
-				if (loss) {
-					clear_char_abilities(ch, reward->vnum);
+				if (gain_skill(ch, find_skill_by_vnum(reward->vnum), reward->amount)) {
+					// sends its own message
+					// msg_to_char(ch, "Your %s is now level %d!\r\n", get_skill_name_by_vnum(reward->vnum), get_skill_level(ch, reward->vnum));
 				}
 				break;
 			}
