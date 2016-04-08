@@ -453,7 +453,7 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 			break;
 		}
 		case QR_QUEST_CHAIN: {
-			snprintf(output, sizeof(output), "%s %s", vnum, get_quest_name_by_proto(reward->vnum));
+			snprintf(output, sizeof(output), "%s%s", vnum, get_quest_name_by_proto(reward->vnum));
 			break;
 		}
 		default: {
@@ -4138,6 +4138,9 @@ OLC_MODULE(qedit_rewards) {
 					break;
 				}
 				case QR_QUEST_CHAIN: {
+					if (!*vnum_arg) {
+						strcpy(vnum_arg, num_arg);	// they may have omitted amount
+					}
 					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
 						msg_to_char(ch, "Invalid quest vnum '%s'.\r\n", vnum_arg);
 						return;
