@@ -369,6 +369,7 @@ const char *grant_bits[] = {
 	"island",	// 35
 	"oset",
 	"playerdelete",
+	"unquest",
 	"\n"
 };
 

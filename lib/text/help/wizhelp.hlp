@@ -1090,6 +1090,15 @@ command is grantable.
 
 See also: BINDING, GRANT
 #d
+UNQUEST
+
+Usage:  unquest <player> <quest vnum>
+
+This command removes a quest from a player's current- and completed-quests
+lists. The player receives no message. This command is grantable.
+
+See also: GRANT
+#d
 UPTIME
 
 Usage:  uptime

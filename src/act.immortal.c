@@ -6766,6 +6766,73 @@ ACMD(do_unbind) {
 }
 
 
+ACMD(do_unquest) {
+	void drop_quest(char_data *ch, struct player_quest *pq);
+	
+	struct player_completed_quest *pcq, *next_pcq;
+	struct player_quest *pq, *next_pq;
+	char arg[MAX_INPUT_LENGTH];
+	quest_data *quest;
+	char_data *vict;
+	bool found;
+	
+	argument = one_argument(argument, arg);
+	skip_spaces(&argument);	// vnum
+	
+	if (!*arg || !*argument || !isdigit(*argument)) {
+		msg_to_char(ch, "Usage: unquest <target> <quest vnum>\r\n");
+	}
+	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD)) || IS_NPC(vict)) {
+		send_config_msg(ch, "no_person");
+	}
+	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You simply can't do that.\r\n");
+	}
+	else if (!(quest = quest_proto(atoi(argument)))) {
+		msg_to_char(ch, "Invalid quest vnum.\r\n");
+	}
+	else {
+		found = FALSE;
+		
+		// remove from active quests
+		LL_FOREACH_SAFE(GET_QUESTS(vict), pq, next_pq) {
+			if (pq->vnum == QUEST_VNUM(quest)) {
+				drop_quest(vict, pq);
+				found = TRUE;
+			}
+		}
+		
+		// remove from completed quests
+		HASH_ITER(hh, GET_COMPLETED_QUESTS(vict), pcq, next_pcq) {
+			if (pcq->vnum == QUEST_VNUM(quest)) {
+				HASH_DEL(GET_COMPLETED_QUESTS(vict), pcq);
+				free(pcq);
+				found = TRUE;
+			}
+		}
+		
+		if (ch == vict) {
+			if (found) {
+				// no need to syslog for self
+				msg_to_char(ch, "You remove [%d] %s from your quest lists.\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			}
+			else {
+				msg_to_char(ch, "You are not on that quest.\r\n");
+			}
+		}
+		else {	// ch != vict
+			if (found) {
+				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has removed [%d] %s from %s's quest lists.", GET_NAME(ch), QUEST_VNUM(quest), QUEST_NAME(quest), GET_NAME(vict));
+				msg_to_char(ch, "You remove [%d] %s from %s's quest lists.\r\n", QUEST_VNUM(quest), QUEST_NAME(quest), PERS(vict, ch, TRUE));
+			}
+			else {
+				msg_to_char(ch, "%s is not on that quest.\r\n", PERS(vict, ch, TRUE));
+			}
+		}
+	}
+}
+
+
 ACMD(do_users) {
 	char mode;
 	char name_search[MAX_INPUT_LENGTH], host_search[MAX_INPUT_LENGTH];

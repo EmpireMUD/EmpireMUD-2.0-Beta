@@ -407,6 +407,7 @@ ACMD(do_unbind);
 ACMD(do_unharness);
 ACMD(do_unload_vehicle);
 ACMD(do_unpublicize);
+ACMD(do_unquest);
 ACMD(do_unshare);
 ACMD(do_upgrade);
 ACMD(do_use);
@@ -958,6 +959,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "unkeep", POS_DEAD, do_keep, NO_MIN, CTYPE_UTIL, SCMD_UNKEEP ),
 	STANDARD_CMD( "unload", POS_STANDING, do_unload_vehicle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "unloadvehicle", POS_STANDING, do_unload_vehicle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
+	GRANT_CMD( "unquest", POS_SLEEPING, do_unquest, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_UNQUEST ),
 	SCMD_CMD( "unstake", POS_STANDING, do_stake, NO_MIN, CTYPE_COMBAT, TRUE ),
 	STANDARD_CMD( "untie", POS_STANDING, do_tie, NO_MIN, NO_GRANTS, TRUE, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "unban", POS_DEAD, do_unban, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_BAN ),

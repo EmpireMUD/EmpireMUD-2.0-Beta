@@ -1507,6 +1507,7 @@ typedef struct vehicle_data vehicle_data;
 #define GRANT_ISLAND  BIT(35)
 #define GRANT_OSET  BIT(36)
 #define GRANT_PLAYERDELETE  BIT(37)
+#define GRANT_UNQUEST  BIT(38)
 
 
 // Lore types
