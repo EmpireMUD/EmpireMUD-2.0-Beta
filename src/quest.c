@@ -2780,6 +2780,7 @@ void qedit_process_quest_tasks(char_data *ch, char *argument, struct quest_task 
 		// usage: qedit * change <number> vnum <number>
 		argument = any_one_arg(argument, num_arg);
 		argument = any_one_arg(argument, field_arg);
+		skip_spaces(&argument);
 		
 		if (!*num_arg || !isdigit(*num_arg) || !*field_arg) {
 			msg_to_char(ch, "Usage: %ss change <number> <amount | vnum> <value>\r\n", command);
