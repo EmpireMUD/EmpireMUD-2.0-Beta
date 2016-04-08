@@ -209,13 +209,13 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 		// QR_x: reward the rewards
 		switch (reward->type) {
 			case QR_BONUS_EXP: {
-				msg_to_char(ch, "You gain %d bonus experience point%s! (Bonus exp expires at the end of the day.)\r\n", reward->amount, PLURAL(reward->amount));
+				msg_to_char(ch, "\tyYou gain %d bonus experience point%s! (Bonus exp expires at the end of the day.)\t0\r\n", reward->amount, PLURAL(reward->amount));
 				SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(ch), reward->amount, 0, UCHAR_MAX, FALSE);
 				break;
 			}
 			case QR_COINS: {
 				empire_data *coin_emp = (reward->vnum == OTHER_COIN ? NULL : giver_emp);
-				msg_to_char(ch, "You receive %s!\r\n", money_amount(coin_emp, reward->amount));
+				msg_to_char(ch, "\tyYou receive %s!\t0\r\n", money_amount(coin_emp, reward->amount));
 				increase_coins(ch, coin_emp, reward->amount);
 				break;
 			}
@@ -242,10 +242,10 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 				}
 				
 				if (reward->amount > 0) {
-					snprintf(buf, sizeof(buf), "You receive $p (x%d)!", reward->amount);
+					snprintf(buf, sizeof(buf), "\tyYou receive $p (x%d)!\t0", reward->amount);
 				}
 				else {
-					snprintf(buf, sizeof(buf), "You receive $p!");
+					snprintf(buf, sizeof(buf), "\tyYou receive $p!\t0");
 				}
 				
 				if (obj) {
@@ -260,7 +260,7 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 				loss = (val < get_skill_level(ch, reward->vnum));
 				set_skill(ch, reward->vnum, val);
 				
-				msg_to_char(ch, "Your %s is now level %d!\r\n", get_skill_name_by_vnum(reward->vnum), val);
+				msg_to_char(ch, "\tyYour %s is now level %d!\t0\r\n", get_skill_name_by_vnum(reward->vnum), val);
 				
 				if (loss) {
 					clear_char_abilities(ch, reward->vnum);
@@ -269,7 +269,7 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 				break;
 			}
 			case QR_SKILL_EXP: {
-				msg_to_char(ch, "You gain %s skill experience!\r\n", get_skill_name_by_vnum(reward->vnum));
+				msg_to_char(ch, "\tyYou gain %s skill experience!\t0\r\n", get_skill_name_by_vnum(reward->vnum));
 				gain_skill_exp(ch, reward->vnum, reward->amount);
 				break;
 			}
