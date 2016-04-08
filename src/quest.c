@@ -1368,7 +1368,7 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *
 	
 	// check repeatability
 	if ((completed = has_completed_quest(ch, QUEST_VNUM(quest)))) {
-		if (completed->last_completed + (QUEST_REPEATABLE_AFTER(quest) * SECS_PER_REAL_MIN) < time(0)) {
+		if (QUEST_REPEATABLE_AFTER(quest) >= 0 && completed->last_completed + (QUEST_REPEATABLE_AFTER(quest) * SECS_PER_REAL_MIN) < time(0)) {
 			// repeat time: ok
 		}
 		else if (QUEST_FLAGGED(quest, QST_REPEAT_PER_INSTANCE) && (completed->last_adventure != (instance ? GET_ADV_VNUM(instance->adventure) : NOTHING) || completed->last_instance_id != (instance ? instance->id : NOTHING))) {
