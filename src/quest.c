@@ -4148,6 +4148,8 @@ OLC_MODULE(qedit_rewards) {
 					if (quest_proto(vnum)) {
 						ok = TRUE;
 					}
+					// amount is not used here
+					num = 1;
 					break;
 				}
 			}
