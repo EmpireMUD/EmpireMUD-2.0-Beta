@@ -2,7 +2,7 @@
 See Hugo For Advice~
    Go see Royal Adviser Hugo for some free advice on empire management. You can
 only complete this quest if your Empire skill is under 15. If you still have
-the quest after that, type 'quest drop See Hugo' to get rid of it.  
+the quest after that, type 'quest drop See Hugo' to get rid of it.
 ~
 Hugo gives you some empire advice.
 ~
@@ -65,7 +65,7 @@ Steps to get trees:
 want them for herself, though, so you can keep them for the next part of the
 tutorial.
 ~
-14 0 0 25 -1
+15 0 0 25 -1
 A
 1 10801
 P
@@ -76,6 +76,8 @@ R
 1 -1 25
 R
 6 10800 1
+R
+6 10811 1
 R
 6 10803 1
 W
@@ -164,7 +166,7 @@ forest, or get them by scraping trees.
 ~
    Rosemary stifles a laugh at how you've filled your pack with sticks, and
 wonders aloud whether you'll be able to carry enough of them for the next part
-of the tutorial.  
+of the tutorial.
 ~
 14 0 0 25 -1
 A
@@ -241,7 +243,7 @@ matter which mountain tile you build the mine on, but be sure to build it
 facing off the mountain and onto flat land. If you learn Mountain Climbing
 later, you'll be able to build deeper in the mountain ranges and face your
 mines toward other Mountain tiles. Return to Rosemary's office when you're
-done.  
+done.
 ~
 Rosemary is pleased with your progress.
 ~
@@ -314,7 +316,7 @@ empire to really work metal. In addition to the iron ingots you already made,
 you also need to dig up some rocks and saw some lumber. You can saw the lumber
 at your lumberyard, from trees or logs. After you have these materials, come
 back to the City Planner's office and Rosemary will tell you what you'll need
-to build the whole forge.  
+to build the whole forge.
 ~
 Rosemary inspects your building materials, and approves.
 ~
@@ -349,7 +351,7 @@ Build A Forge~
    Now that you know how to gather wood, rocks, and iron, it's time to build a
 forge. You need a forge to make nails, as well as weapons and armor. Collect
 the rest of the materials for the forge and then build it in your city. Return
-to Rosemary in the City Planning office when it's built.  
+to Rosemary in the City Planning office when it's built.
 (Hint: Type 'build info forge' to see a list of resources required.)
 ~
    Rosemary congratulates you on building your forge. This is the end of the
@@ -372,5 +374,506 @@ W
 7 5108 0 1
 Z
 1 10802
+S
+#10811
+A King's Quest~
+   The path to greatness is a long one, and your journey is only just
+beginning. For now, you should keep working on the tasks assigned by the Royal
+Planning Office. But if you choose to pursue the great calling of ruling your
+own empire, Royal Adviser Hugo will want to give you a small gift to help you
+on your way.  
+~
+Royal Advisor Hugo congratulates you on your progress toward greatness.
+~
+1 0 0 50 -1
+A
+1 10801
+P
+0 10802 0 1
+R
+2 10800 1
+R
+1 -1 100
+R
+0 0 3
+W
+9 1 0 51
+Z
+1 10803
+S
+#10825
+The Perfect Rock~
+   Horation is looking for just the right rock to represent the Stone Age. It
+needs to be slightly gray or brown, between the size of a pea and the size of
+your fist, and either smooth or rough. Basically, any rock will do. You never
+know which one it will be.  
+~
+   Horation looks at the rock you've brought him. He measures it with fine
+brass calipers, weighs it on the scale, and even tastes the top of it. But,
+this just isn't the right rock, so he tells you to keep it.  
+~
+10 0 0 25 0
+P
+10 6 0 14
+R
+5 6 1
+W
+10 6 0 14
+W
+1 22 0 1
+Z
+1 10826
+S
+#10826
+Start the Trade Tutorial~
+   Find the cave where Curator Horation is trying to find artifacts to set up
+his Museum of Early Man &y/()\&0. This short tutorial will help you get started and
+teach you to gather crafting materials and make some basic items. These quests
+reward Trade skill levels and bonus experience.  
+~
+You've found Horation and the Museum of Early Man!
+~
+11 0 0 25 -1
+A
+1 10825
+P
+10 6 0 49
+P
+5 10827 0 1
+P
+6 10827 0 1
+R
+6 10825 1
+R
+6 10827 1
+W
+13 10825 0 1
+Z
+1 10826
+S
+#10827
+Collect Basic Resources~
+   Horation explains that he is trying to open a museum to show off the
+accomplishments of Early Man that led to the first empires and the dawn of
+civilization. The real problem is that nobody will fund an archaeological dig
+to get artifacts for the museum. Horation is willing to pay you to craft some
+authentic artifacts for his displays.  
+   Horation would like you to collect a few basic resources:
+ 1. Collect rocks by digging in plains, forest, or deserts. For this
+    quest, you need 7 ordinary rocks.
+ 2. Collect sticks by gathering in any forest or grove. You need 4.
+ 3. Return to Horation in the museum.
+~
+Horation looks over each of the rocks and sticks, and seems to approve.
+~
+18 0 0 25 -1
+A
+1 10826
+P
+10 6 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10825 1
+R
+6 10836 1
+R
+6 10828 1
+W
+6 10825 0 1
+W
+2 100 0 7
+W
+1 25 0 4
+Z
+1 10826
+S
+#10828
+Make Stone Tools~
+The curator needs you to make some basic stone tools for the museum.
+Craft 3 handaxes and 3 spear heads:
+ 1. Wield one of your rocks and then use it by typing 'chip rock'.
+ 2. Continue chipping rocks until all 6 of your remaining rocks
+   have been chipped into handaxes.
+ 3. Chip 3 of the handaxes into smaller spear heads. Keep the
+    other 3 handaxes.
+Craft 4 handles:
+ 1. Wield one of handaxes.
+ 2. Type 'craft 4 handle'.
+ 3. Remove the handaxe (you will need it to finish the quest).
+(Hint: Type 'craft info handle' to see more about the craft.)
+Return to Horation when you have it all.
+~
+   Horation looks thrilled at the quality of the authentic stone tools you have
+crafted, but he wants you to do a little bit more work on them before he puts
+them in the displays.  
+~
+21 0 0 25 -1
+A
+1 10826
+P
+0 10827 0 1
+P
+9 6 0 1
+P
+10 6 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10825 1
+R
+6 10829 1
+W
+6 10825 0 1
+W
+2 181 0 3
+W
+2 186 0 3
+W
+2 919 0 4
+Z
+1 10826
+S
+#10829
+Make Axes and Spears~
+The curator needs more tools for the exhibit.
+Craft 2 stone axes:
+ 1. You should still have handaxes and handles from the previous quest. If
+    not, chip rocks until you have 2 handaxes, and craft 2 handles from sticks.
+ 2. Type 'craft 2 stone axe'.
+Craft 2 spears:
+ 1. You should still have spear heads and handles from the previous quest.
+ 2. Type 'craft 2 spear'.
+You also still need one more handaxe and spear head for the exhibit.
+Return to Horation when you have the items.
+~
+Horation thanks you profusely and takes the stone tools from you.
+~
+21 d 0 25 -1
+A
+1 10826
+P
+0 10828 0 1
+P
+9 6 0 1
+P
+10 6 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10825 1
+R
+6 10830 1
+W
+6 10825 0 1
+W
+2 181 0 1
+W
+2 186 0 1
+W
+2 2100 0 2
+W
+2 2129 0 2
+Z
+1 10826
+S
+#10830
+Collect More Materials~
+The curator wants you to collect some more advanced resources.
+Get 2 small leather:
+ 1. Kill small animals like squirrels, meerkats, or rabbits.
+ 2. Skin the corpses using a sharp weapon.
+ 3. Tan the small skins.
+Get 2 piles of clay:
+ 1. Dig in temperate terrain (fields and forests), or
+ 2. Build a claypit and dig there.
+    (hint: build info claypit)
+Get 1 stack of lumber:
+ 1. Build a lumberyard (hint: build info lumberyard).
+ 2. Saw a tree or log into lumber.
+Return to Horation when you have all the items.
+~
+   Horation examines the materials you collected, and determines them to be
+correct.  
+~
+22 0 0 25 -1
+A
+1 10826
+P
+0 10829 0 1
+P
+9 6 0 1
+P
+10 6 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10825 1
+R
+6 10831 1
+W
+6 10825 0 1
+W
+1 15 16384 2
+W
+1 4 0 2
+W
+1 16 0 1
+W
+1 25 0 6
+Z
+1 10826
+S
+#10831
+Create Early Building Materials~
+   The curator would like you to create some of early man's best building
+materials using the supplies you collected. This will require the
+Basic Crafts ability. You can type 'skill trade' to see it.
+Make 2 ropes:
+ 1. If you haven't already, type 'skill buy basic crafts'.
+ 2. You should still have 2 small leather.
+ 3. Type 'craft 2 rope'.
+Make a pile of bricks:
+ 1. You need 2 clay and a fire. You can make a fire by lighting a tree.
+ 2. Type 'craft bricks'.
+Make a bound column:
+ 1. You need 1 lumber and 6 sticks.
+ 2. Type 'craft bound column'.
+Return to Horation when you've made the items.
+~
+Horation is impressed with your crafting skills.
+~
+23 d 0 25 -1
+A
+1 10826
+P
+0 10830 0 1
+P
+9 6 0 1
+P
+10 6 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10825 1
+R
+6 10832 1
+W
+6 10825 0 1
+W
+2 257 0 1
+W
+2 127 0 1
+W
+2 2035 0 2
+Z
+1 10826
+S
+#10832
+Examples of Early Sewing~
+The curator needs some examples of early sewn crafts.
+Steps:
+ 1. You need at least level 5 Trade skill.
+ 2. Type 'skill buy sew'.
+ 3. Type 'sew info whip' and 'sew info tent' to see what's needed.
+ 4. Collect the 10 large leather (tan large skins) and 2 sticks.
+ 5. Type 'sew whip' and 'sew tent' to make these items, one at a time.
+ 6. Return to Horation at the museum.
+~
+Horation is impressed with your crafting skills.
+~
+24 d 0 25 -1
+A
+1 10826
+P
+0 10831 0 1
+P
+9 6 0 1
+P
+10 6 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10825 1
+R
+6 10833 1
+W
+6 10825 0 1
+W
+2 2108 0 1
+W
+2 2036 0 1
+Z
+1 10826
+S
+#10833
+Examples of Early Pottery~
+The curator needs some examples of early pottery.
+Steps:
+ 1. You need at least level 10 Trade skill.
+ 2. Type 'skill by pottery'.
+ 3. Use 'craft info' to figure out what you need for a pot, vessel,
+    and clay shield.
+ 4. Collect the 18 clay, 6 sticks, and 1 small leather.
+ 5. Craft each of the pottery items on the list.
+ 6. Return to Horation.
+~
+Horation is impressed with your crafting skills.
+~
+24 d 0 25 -1
+A
+1 10826
+P
+0 10832 0 1
+P
+9 6 0 1
+P
+10 6 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10825 1
+R
+6 10834 1
+W
+6 10825 0 1
+W
+2 251 0 1
+W
+2 254 0 1
+W
+2 2320 0 1
+Z
+1 10826
+S
+#10834
+Examples of Early Woodworking~
+The curator wants you to make some examples of early woodworking.
+Steps:
+ 1. You need at least 15 Trade skill.
+ 2. Type 'skill buy woodworking'.
+ 3. Use 'craft info' to see what is required for a walking stick,
+    a flute, and a lyre.
+ 4. Collect the stick and 2 lumber.
+ 5. Craft each of those items.
+ 6. Return to Horation.
+~
+Horation is impressed with your crafting skills.
+~
+24 d 0 25 -1
+A
+1 10826
+P
+0 10833 0 1
+P
+9 6 0 1
+P
+10 6 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10825 1
+R
+6 10835 1
+W
+6 10825 0 1
+W
+2 914 0 1
+W
+2 913 0 1
+W
+2 912 0 1
+Z
+1 10826
+S
+#10835
+Examples of Smithed Tools~
+The curator would like you to forge some metal tools.
+Steps:
+ 1. Type 'skill buy forge'.
+ 2. You will also need a Forge building. If you haven't already,
+    it's a good time to do the Empire tutorial quests at the
+    Royal Planning Office. Or, type 'build info forge'.
+ 3. You need a hammer to forge with. You can craft a stone
+    hammer from a rock and handle, if you need one.
+ 4. Use 'forge info' to see what's needed to make a hammer,
+    nails, and a pick. You will need to make a metal hammer
+    to complete the quest; that stone one isn't good enough
+    for Horation.
+ 5. Collect 4 common metal ingots (copper or iron) and 2
+    handles.
+ 6. Forge the items on the list.
+ 7. Return to Horation.
+~
+   Horation congratulates you for bringing him everything he needs to set up
+his Museum of Early Man. He begins hastily arranging items on the shelves, ever
+so careful not to disturb the authentic dust already there. This is the end of
+the tutorial.  
+~
+25 d 0 25 -1
+A
+1 10826
+P
+0 10834 0 1
+P
+9 6 0 1
+P
+10 6 0 49
+R
+0 0 2
+R
+1 -1 50
+W
+2 2105 0 1
+W
+2 1306 0 1
+W
+2 2110 0 1
+Z
+1 10826
+S
+#10836
+A Master's Journey~
+   The journey to becoming a master craftsman is long and difficult, and this
+is only the beginning. For now, help Horation build his Museum of Early Man. 
+But if you choose to seek out mastery of your craft, return to Horation's
+museum for a small gift to help you on your way.  
+~
+   Curator Horation congratulates you on the progress you've made on your
+journey to becoming a master craftsman.  
+~
+2 0 0 50 -1
+A
+1 10826
+P
+0 10827 0 1
+R
+2 10825 1
+R
+1 -1 100
+R
+0 0 3
+W
+9 6 0 51
+Z
+1 10826
+Z
+1 10827
 S
 $

@@ -1,0 +1,42 @@
+#10800
+ring royal~
+a royal ring~
+A royal ring is sitting on the ground.~
+   This ring has been in your family for, well, just the one generation. But
+this is only the beginning of your epic and storied family line.  
+~
+2 p ab 1
+0 0 0
+4 0
+A
+5 1 0
+C
+0 50
+M
+8
+You slide $p proudly onto your finger.~
+M
+9
+$n slides $p proudly onto $s finger.~
+S
+#10825
+chisel imperium~
+an imperium chisel~
+An imperium chisel pokes out of the ground.~
+This imperium chisel surely belongs to a master craftsman.
+~
+2 p ao 2
+0 0 0
+2 0
+A
+25 15 0
+C
+0 50
+M
+8
+You grab $p and hold it proudly in the air.~
+M
+9
+$n grabs $p and holds it proudly in the air.~
+S
+$

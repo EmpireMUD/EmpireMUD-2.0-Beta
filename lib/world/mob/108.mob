@@ -35,4 +35,34 @@ Hugo, the Royal Adviser, sits behind his desk.
 1 0 0 15
 T 10801
 S
+#10825
+crier museum~
+the museum crier~
+The museum crier is standing here.
+~
+0 25 dv nD
+1 0 0 15
+T 10825
+T 10827
+S
+#10826
+Horation curator~
+Curator Horation~
+The curator is dusting the shelves.
+~
+0 0 bdv nD
+1 0 0 15
+T 10826
+T 10828
+S
+#10827
+Horation curator~
+Curator Horation~
+Curator Horation stands proudly next to the exhibit.
+~
+0 0 bdv nD
+1 0 0 15
+T 10826
+T 10828
+S
 $
