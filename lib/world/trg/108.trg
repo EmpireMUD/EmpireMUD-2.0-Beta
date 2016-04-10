@@ -51,7 +51,7 @@ Crier Shout~
 0 ab 1
 ~
 if %random.3% == 3
-  %regionecho% %self.room% 20 %self.name shouts, 'Learn the Trade skill at the &y/()\&0 The Museum of Early Man!'
+  %regionecho% %self.room% 20 %self.name% shouts, 'Learn the Trade skill at the &y/()\&0 Museum of Early Man!'
 end
 ~
 #10828
@@ -88,11 +88,15 @@ detach 10829 %room.id%
 ~
 #10830
 Cave Phase 2 Teleporter~
-2 g 0
+2 g 100
 ~
-if %actor.completed_quest(10835)%
+if (%actor.is_pc% && %actor.completed_quest(10835)%)
   %teleport% %actor% i10826
-  %echoaround% %actor% %actor.name% walks up from the %direction%.
+  halt
+end
+eval boss %actor.master%
+if (%actor.is_npc% && %boss%)
+  %teleport% %actor% %boss.room%
 end
 ~
 $
