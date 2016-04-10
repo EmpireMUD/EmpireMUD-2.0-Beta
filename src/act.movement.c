@@ -951,7 +951,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 				act("You lead $n behind you.", TRUE, ch, 0, GET_LED_BY(ch), TO_VICT);
 				break;
 			case MOVE_FOLLOW:
-				act("$N follows $m.", TRUE, ch->master, 0, ch, TO_NOTVICT);
+				act("$n follows $N.", TRUE, ch, NULL, ch->master, TO_NOTVICT);
 				act("$n follows you.", TRUE, ch, 0, ch->master, TO_VICT);
 				break;
 			case MOVE_EARTHMELD:
