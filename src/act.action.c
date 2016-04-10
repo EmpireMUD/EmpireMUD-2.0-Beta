@@ -1056,7 +1056,7 @@ void process_chipping(char_data *ch) {
 
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		act("$p splits open!", FALSE, ch, proto, NULL, TO_CHAR);
-		act("$p finishes chipping $p!", TRUE, ch, proto, NULL, TO_ROOM);
+		act("$n finishes chipping $p!", TRUE, ch, proto, NULL, TO_ROOM);
 		GET_ACTION(ch) = ACT_NONE;
 		
 		success = run_interactions(ch, proto->interactions, INTERACT_CHIP, IN_ROOM(ch), NULL, proto, finish_scraping);
