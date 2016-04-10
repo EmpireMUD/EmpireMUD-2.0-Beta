@@ -2571,7 +2571,11 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 	
 	if (need_bld) {
 		argument = any_one_arg(argument, arg);
-		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !building_proto(*vnum)) {
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a building vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !building_proto(*vnum)) {
 			msg_to_char(ch, "Invalid building vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
@@ -2579,6 +2583,10 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 	if (need_component) {
 		argument = any_one_arg(argument, arg);
 		skip_spaces(&argument);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a component type.\r\n");
+			return FALSE;
+		}
 		if ((*vnum = search_block(arg, component_types, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Invalid component type '%s'.\r\n", arg);
 			return FALSE;
@@ -2589,7 +2597,11 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 	}
 	if (need_mob) {
 		argument = any_one_arg(argument, arg);
-		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !mob_proto(*vnum)) {
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a mob vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !mob_proto(*vnum)) {
 			msg_to_char(ch, "Invalid mobile vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
@@ -2603,42 +2615,66 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 	}
 	if (need_obj) {
 		argument = any_one_arg(argument, arg);
-		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !obj_proto(*vnum)) {
+		if (!*arg) {
+			msg_to_char(ch, "You must provide an object vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !obj_proto(*vnum)) {
 			msg_to_char(ch, "Invalid object vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
 	}
 	if (need_quest) {
 		argument = any_one_arg(argument, arg);
-		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !quest_proto(*vnum)) {
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a quest vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !quest_proto(*vnum)) {
 			msg_to_char(ch, "Invalid quest vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
 	}
 	if (need_rmt) {
 		argument = any_one_arg(argument, arg);
-		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !room_template_proto(*vnum)) {
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a room template vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !room_template_proto(*vnum)) {
 			msg_to_char(ch, "Invalid room template vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
 	}
 	if (need_sect) {
 		argument = any_one_arg(argument, arg);
-		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !sector_proto(*vnum)) {
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a sector vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !sector_proto(*vnum)) {
 			msg_to_char(ch, "Invalid sector vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
 	}
 	if (need_skill) {
 		argument = any_one_arg(argument, arg);
-		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !find_skill_by_vnum(*vnum)) {
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a skill vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !find_skill_by_vnum(*vnum)) {
 			msg_to_char(ch, "Invalid skill vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
 	}
 	if (need_veh) {
 		argument = any_one_arg(argument, arg);
-		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !vehicle_proto(*vnum)) {
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a vehicle vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !vehicle_proto(*vnum)) {
 			msg_to_char(ch, "Invalid vehicle vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
@@ -2827,11 +2863,81 @@ void qedit_process_quest_tasks(char_data *ch, char *argument, struct quest_task 
 			msg_to_char(ch, "You can only change the amount or vnum.\r\n");
 		}
 	}	// end 'change'
+	else if (is_abbrev(cmd_arg, "move")) {
+		struct quest_task *to_move, *prev, *a, *b, *a_next, *b_next, iitem;
+		bool up;
+		
+		// usage: tasks move <number> <up | down>
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, field_arg);
+		up = is_abbrev(field_arg, "up");
+		
+		if (!*num_arg || !*field_arg) {
+			msg_to_char(ch, "Usage: %ss move <number> <up | down>\r\n", command);
+		}
+		else if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid %s number.\r\n", command);
+		}
+		else if (!is_abbrev(field_arg, "up") && !is_abbrev(field_arg, "down")) {
+			msg_to_char(ch, "You must specify whether you're moving it up or down in the list.\r\n");
+		}
+		else if (up && num == 1) {
+			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
+		}
+		else {
+			// find the one to move
+			to_move = prev = NULL;
+			for (task = *list; task && !to_move; task = task->next) {
+				if (--num == 0) {
+					to_move = task;
+				}
+				else {
+					// store for next iteration
+					prev = task;
+				}
+			}
+			
+			if (!to_move) {
+				msg_to_char(ch, "Invalid %s number.\r\n", command);
+			}
+			else if (!up && !to_move->next) {
+				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
+			}
+			else {
+				// SUCCESS: "move" them by swapping data
+				if (up) {
+					a = prev;
+					b = to_move;
+				}
+				else {
+					a = to_move;
+					b = to_move->next;
+				}
+				
+				// store next pointers
+				a_next = a->next;
+				b_next = b->next;
+				
+				// swap data
+				iitem = *a;
+				*a = *b;
+				*b = iitem;
+				
+				// restore next pointers
+				a->next = a_next;
+				b->next = b_next;
+				
+				// message: re-atoi(num_arg) because we destroyed num finding our target
+				msg_to_char(ch, "You move %s %d %s.\r\n", command, atoi(num_arg), (up ? "up" : "down"));
+			}
+		}
+	}	// end 'move'
 	else {
 		msg_to_char(ch, "Usage: %ss add <type> <vnum>\r\n", command);
 		msg_to_char(ch, "Usage: %ss change <number> vnum <value>\r\n", command);
 		msg_to_char(ch, "Usage: %ss copy <from type> <from vnum> [tasks/prereqs]\r\n", command);
 		msg_to_char(ch, "Usage: %ss remove <number | all>\r\n", command);
+		msg_to_char(ch, "Usage: %ss move <number> <up | down>\r\n", command);
 	}
 }
 
