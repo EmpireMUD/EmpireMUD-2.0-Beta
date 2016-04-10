@@ -4123,7 +4123,11 @@ OLC_MODULE(qedit_rewards) {
 					break;	
 				}
 				case QR_OBJECT: {
-					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+					if (!*vnum_arg) {
+						msg_to_char(ch, "Usage: rewards add object <amount> <object vnum>\r\n");
+						return;
+					}
+					if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
 						msg_to_char(ch, "Invalid obj vnum '%s'.\r\n", vnum_arg);
 						return;
 					}
@@ -4135,7 +4139,11 @@ OLC_MODULE(qedit_rewards) {
 				case QR_SET_SKILL:
 				case QR_SKILL_EXP:
 				case QR_SKILL_LEVELS: {
-					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+					if (!*vnum_arg) {
+						msg_to_char(ch, "Usage: rewards add <set-skill | skill-exp | skill-levels> <level> <skill vnum>\r\n");
+						return;
+					}
+					if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
 						msg_to_char(ch, "Invalid skill vnum '%s'.\r\n", vnum_arg);
 						return;
 					}
