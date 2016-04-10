@@ -3,10 +3,11 @@ See Hugo For Advice~
    Go see Royal Adviser Hugo for some free advice on empire management. You can
 only complete this quest if your Empire skill is under 15. If you still have
 the quest after that, type 'quest drop See Hugo' to get rid of it.
+   Note: Make sure you don't have Empire noskilled.
 ~
 Hugo gives you some empire advice.
 ~
-8 0 0 25 0
+9 0 0 25 0
 P
 10 1 0 14
 R
@@ -24,10 +25,11 @@ Start the Empire Tutorial~
 chopping trees and building your Empire skill. This short tutorial will help
 you get started and teach you to make your first few buildings. These quests
 reward Empire skill levels and bonus experience.
+   Note: Make sure you don't have Empire noskilled.
 ~
 You have found Ranger Clara!
 ~
-9 0 0 25 -1
+10 0 0 25 -1
 A
 1 10800
 P
@@ -60,12 +62,13 @@ Steps to get trees:
  2. Wield your axe.
  3. Type 'chop'.
  4. Once you have 6 trees, return to Ranger Clara.
+Note: Make sure you don't have Empire noskilled.
 ~
    Clara is impressed with how quickly you chopped those trees. She doesn't
 want them for herself, though, so you can keep them for the next part of the
 tutorial.
 ~
-15 0 0 25 -1
+16 0 0 25 -1
 A
 1 10801
 P
@@ -407,12 +410,13 @@ The Perfect Rock~
 needs to be slightly gray or brown, between the size of a pea and the size of
 your fist, and either smooth or rough. Basically, any rock will do. You never
 know which one it will be.  
+   Note: Make sure you don't have Trade noskilled.
 ~
    Horation looks at the rock you've brought him. He measures it with fine
 brass calipers, weighs it on the scale, and even tastes the top of it. But,
 this just isn't the right rock, so he tells you to keep it.  
 ~
-10 0 0 25 0
+11 0 0 25 0
 P
 10 6 0 14
 R
@@ -430,10 +434,11 @@ Start the Trade Tutorial~
 his Museum of Early Man &y/()\&0. This short tutorial will help you get started and
 teach you to gather crafting materials and make some basic items. These quests
 reward Trade skill levels and bonus experience.  
+   Note: Make sure you don't have Trade noskilled.
 ~
 You've found Horation and the Museum of Early Man!
 ~
-11 0 0 25 -1
+12 0 0 25 -1
 A
 1 10825
 P
@@ -463,10 +468,11 @@ authentic artifacts for his displays.
     quest, you need 7 ordinary rocks.
  2. Collect sticks by gathering in any forest or grove. You need 4.
  3. Return to Horation in the museum.
+Note: Make sure you don't have Trade noskilled.
 ~
 Horation looks over each of the rocks and sticks, and seems to approve.
 ~
-18 0 0 25 -1
+19 0 0 25 -1
 A
 1 10826
 P
@@ -597,12 +603,14 @@ Get 2 piles of clay:
 Get 1 stack of lumber:
  1. Build a lumberyard (hint: build info lumberyard).
  2. Saw a tree or log into lumber.
+Get 6 sticks:
+ 1. Gather in a forest or grove.
 Return to Horation when you have all the items.
 ~
    Horation examines the materials you collected, and determines them to be
 correct.  
 ~
-22 0 0 25 -1
+23 0 0 25 -1
 A
 1 10826
 P
@@ -858,9 +866,11 @@ museum for a small gift to help you on your way.
    Curator Horation congratulates you on the progress you've made on your
 journey to becoming a master craftsman.  
 ~
-2 0 0 50 -1
+3 0 0 50 -1
 A
 1 10826
+A
+1 10827
 P
 0 10827 0 1
 R
