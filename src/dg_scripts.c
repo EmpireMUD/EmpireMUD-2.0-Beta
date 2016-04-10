@@ -511,6 +511,7 @@ obj_data *get_obj(char *name)  {
 * @return room_data* The found room, or NULL if none.
 */
 room_data *get_room(room_data *ref, char *name) {
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 
 	room_data *nr;
@@ -519,7 +520,7 @@ room_data *get_room(room_data *ref, char *name) {
 		return find_room(atoi(name + 1));
 	else if (*name == 'i' && isdigit(*(name+1)) && ref && COMPLEX_DATA(ref) && COMPLEX_DATA(ref)->instance) {
 		// instance lookup
-		nr = find_room_template_in_instance(COMPLEX_DATA(ref)->instance, atoi(name+1));
+		nr = find_room_template_in_instance(find_instance_by_room(ref, FALSE), atoi(name+1));
 		if (nr) {
 			return nr;
 		}
