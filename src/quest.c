@@ -360,7 +360,7 @@ char *quest_giver_string(struct quest_giver *giver, bool show_vnums) {
 	}
 	
 	if (show_vnums) {
-		snprintf(vnum, sizeof(vnum), "[%d] ", giver->vnum);
+		snprintf(vnum, sizeof(vnum), "%s [%d] ", quest_giver_types[giver->type], giver->vnum);
 	}
 	else {
 		*vnum = '\0';
@@ -370,25 +370,25 @@ char *quest_giver_string(struct quest_giver *giver, bool show_vnums) {
 	switch (giver->type) {
 		case QG_BUILDING: {
 			bld_data *bld = building_proto(giver->vnum);
-			snprintf(output, sizeof(output), "%s %s%s", quest_giver_types[giver->type], vnum, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+			snprintf(output, sizeof(output), "%s%s", vnum, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 			break;
 		}
 		case QG_MOBILE: {
-			snprintf(output, sizeof(output), "%s %s%s", quest_giver_types[giver->type], vnum, skip_filler(get_mob_name_by_proto(giver->vnum)));
+			snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_mob_name_by_proto(giver->vnum)));
 			break;
 		}
 		case QG_OBJECT: {
-			snprintf(output, sizeof(output), "%s %s%s", quest_giver_types[giver->type], vnum, skip_filler(get_obj_name_by_proto(giver->vnum)));
+			snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_obj_name_by_proto(giver->vnum)));
 			break;
 		}
 		case QG_ROOM_TEMPLATE: {
 			room_template *rmt = room_template_proto(giver->vnum);
-			snprintf(output, sizeof(output), "%s %s%s", quest_giver_types[giver->type], vnum, rmt ? skip_filler(GET_RMT_TITLE(rmt)) : "UNKNOWN");
+			snprintf(output, sizeof(output), "%s%s", vnum, rmt ? skip_filler(GET_RMT_TITLE(rmt)) : "UNKNOWN");
 			break;
 		}
 		case QG_TRIGGER: {
 			trig_data *trig = real_trigger(giver->vnum);
-			snprintf(output, sizeof(output), "%s %s%s", quest_giver_types[giver->type], vnum, trig ? skip_filler(GET_TRIG_NAME(trig)) : "UNKNOWN");
+			snprintf(output, sizeof(output), "%s%s", vnum, trig ? skip_filler(GET_TRIG_NAME(trig)) : "UNKNOWN");
 			break;
 		}
 		default: {
