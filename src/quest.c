@@ -557,6 +557,10 @@ char *quest_task_string(struct quest_task *task, bool show_vnums) {
 			snprintf(output, sizeof(output), "Visit terrain: %s%s", vnum, sect ? GET_SECT_NAME(sect) : "UNKNOWN");
 			break;
 		}
+		case QT_HAVE_ABILITY: {
+			snprintf(output, sizeof(output), "Have ability: %s%s", vnum, get_ability_name_by_vnum(task->vnum));
+			break;
+		}
 		default: {
 			sprintf(buf, "Unknown condition");
 			break;
@@ -646,6 +650,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 					task->current = task->needed;	// full
 				}
 				// else can't detect this
+				break;
+			}
+			case QT_HAVE_ABILITY: {
+				task->current = has_ability(ch, task->vnum) ? task->needed : 0;	// full
 				break;
 			}
 		}
@@ -1449,6 +1457,12 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *
 				}
 				break;
 			}
+			case QT_HAVE_ABILITY: {
+				if (!has_ability(ch, task->vnum)) {
+					ok = FALSE;
+				}
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case QT_KILL_MOB:
@@ -1503,6 +1517,30 @@ struct player_quest *is_on_quest(char_data *ch, any_vnum quest) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// QUEST TRACKERS //////////////////////////////////////////////////////////
+
+/**
+* Quest Tracker: ch gains or loses ability
+*
+* @param char_data *ch The player.
+* @param any_vnum abil The ability vnum.
+*/
+void qt_change_ability(char_data *ch, any_vnum abil) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == QT_HAVE_ABILITY && task->vnum == abil) {
+				task->current = (has_ability(ch, abil) ? task->needed : 0);
+			}
+		}
+	}
+}
+
 
 /**
 * Quest Tracker: ch gains or loses skill
@@ -2496,7 +2534,7 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 	extern const bool quest_tracker_amt_type[];
 	
 	char arg[MAX_INPUT_LENGTH]; 
-	bool need_bld = FALSE, need_component = FALSE;
+	bool need_abil = FALSE, need_bld = FALSE, need_component = FALSE;
 	bool need_mob = FALSE, need_obj = FALSE, need_quest = FALSE;
 	bool need_rmt = FALSE, need_sect = FALSE, need_skill = FALSE;
 	bool need_veh = FALSE, need_mob_flags = FALSE;
@@ -2558,6 +2596,10 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 			need_sect = TRUE;
 			break;
 		}
+		case QT_HAVE_ABILITY: {
+			need_abil = TRUE;
+			break;
+		}
 	}
 	
 	// possible args
@@ -2565,6 +2607,18 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 		argument = any_one_arg(argument, arg);
 		if (!*arg || !isdigit(*arg) || (*amount = atoi(arg)) < 0) {
 			msg_to_char(ch, "You must provide an amount.\r\n");
+			return FALSE;
+		}
+	}
+	
+	if (need_abil) {
+		argument = any_one_arg(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide an ability vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !find_ability_by_vnum(*vnum)) {
+			msg_to_char(ch, "Invalid ability vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
 	}

@@ -1538,10 +1538,10 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		// victory
 		old_level = get_skill_level(vict, SKILL_VNUM(skill));
 		set_skill(vict, SKILL_VNUM(skill), level);
-		if (old_level > level) {
+		update_class(vict);
+		if (old_level > get_skill_level(vict, SKILL_VNUM(skill))) {
 			clear_char_abilities(vict, SKILL_VNUM(skill));
 		}
-		update_class(vict);
 		sprintf(output, "%s's %s set to %d", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
 

@@ -2143,7 +2143,8 @@ const char *quest_tracker_types[] = {
 	"TRIGGERED",
 	"VISIT-BUILDING",
 	"VISIT-ROOM-TEMPLATE",
-	"VISIT-SECTOR",	// 14
+	"VISIT-SECTOR",
+	"HAVE-ABILITY",	// 15
 	"\n",
 };
 
@@ -2165,6 +2166,7 @@ const bool quest_tracker_amt_type[] = {
 	QT_AMT_NONE,	// visit building
 	QT_AMT_NONE,	// visit rmt
 	QT_AMT_NONE,	// visit sect
+	QT_AMT_NONE,	// have ability
 };
 
 

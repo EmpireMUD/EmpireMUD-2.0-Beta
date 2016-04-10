@@ -4261,6 +4261,7 @@ Available tasks:
  VISIT-BUILDING &r*&0 - Player must go to a certain building/room.
  VISIT-ROOM-TEMPLATE &r*&0 - Player must go to a certain room template.
  VISIT-SECTOR &r*&0 - Player must go to a certain terrain.
+ HAVE-ABILITY - Player must have a certain ability.
 
 &r*&0 Some types cannot be used as prereqs, only as tasks.
 

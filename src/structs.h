@@ -1681,6 +1681,7 @@ typedef struct vehicle_data vehicle_data;
 #define QT_VISIT_BUILDING  12
 #define QT_VISIT_ROOM_TEMPLATE  13
 #define QT_VISIT_SECTOR  14
+#define QT_HAVE_ABILITY  15
 
 
 // QT_AMT_x: How quest trackers are displayed for different QT_ types
