@@ -2197,12 +2197,14 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		if (size >= sizeof(buf)) {
 			break;
 		}
+		// QR_x, QT_x: quest types
 		any = find_quest_task_in_list(QUEST_TASKS(qiter), QT_COMPLETED_QUEST, vnum);
 		any |= find_quest_task_in_list(QUEST_PREREQS(qiter), QT_COMPLETED_QUEST, vnum);
 		any |= find_quest_task_in_list(QUEST_TASKS(qiter), QT_NOT_COMPLETED_QUEST, vnum);
 		any |= find_quest_task_in_list(QUEST_PREREQS(qiter), QT_NOT_COMPLETED_QUEST, vnum);
 		any |= find_quest_task_in_list(QUEST_TASKS(qiter), QT_NOT_ON_QUEST, vnum);
 		any |= find_quest_task_in_list(QUEST_PREREQS(qiter), QT_NOT_ON_QUEST, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(qiter), QR_QUEST_CHAIN, vnum);
 		
 		if (any) {
 			++found;
@@ -3514,12 +3516,14 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	
 	// update other quests
 	HASH_ITER(hh, quest_table, qiter, next_qiter) {
+		// QT_x, QR_x: quest types
 		found = delete_quest_task_from_list(&QUEST_TASKS(qiter), QT_COMPLETED_QUEST, vnum);
 		found |= delete_quest_task_from_list(&QUEST_PREREQS(qiter), QT_COMPLETED_QUEST, vnum);
 		found |= delete_quest_task_from_list(&QUEST_TASKS(qiter), QT_NOT_COMPLETED_QUEST, vnum);
 		found |= delete_quest_task_from_list(&QUEST_PREREQS(qiter), QT_NOT_COMPLETED_QUEST, vnum);
 		found |= delete_quest_task_from_list(&QUEST_TASKS(qiter), QT_NOT_ON_QUEST, vnum);
 		found |= delete_quest_task_from_list(&QUEST_PREREQS(qiter), QT_NOT_ON_QUEST, vnum);
+		found |= delete_quest_reward_from_list(&QUEST_REWARDS(qiter), QR_QUEST_CHAIN, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(qiter), QST_IN_DEVELOPMENT);
@@ -3530,12 +3534,14 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	// remove from from active editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (GET_OLC_QUEST(desc)) {
+			// QT_x, QR_x: quest types
 			found = delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_COMPLETED_QUEST, vnum);
 			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_COMPLETED_QUEST, vnum);
 			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_NOT_COMPLETED_QUEST, vnum);
 			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_NOT_COMPLETED_QUEST, vnum);
 			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_NOT_ON_QUEST, vnum);
 			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_NOT_ON_QUEST, vnum);
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_QUEST_CHAIN, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
