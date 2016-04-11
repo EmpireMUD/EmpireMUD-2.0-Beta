@@ -384,7 +384,7 @@ A King's Quest~
 beginning. For now, you should keep working on the tasks assigned by the Royal
 Planning Office. But if you choose to pursue the great calling of ruling your
 own empire, Royal Adviser Hugo will want to give you a small gift to help you
-on your way.  
+on your way.
 ~
 Royal Advisor Hugo congratulates you on your progress toward greatness.
 ~
@@ -414,7 +414,7 @@ know which one it will be.
 ~
    Horation looks at the rock you've brought him. He measures it with fine
 brass calipers, weighs it on the scale, and even tastes the top of it. But,
-this just isn't the right rock, so he tells you to keep it.  
+this just isn't the right rock, so he tells you to keep it.
 ~
 11 0 0 25 0
 P
@@ -433,7 +433,7 @@ Start the Trade Tutorial~
    Find the cave where Curator Horation is trying to find artifacts to set up
 his Museum of Early Man &y/()\&0. This short tutorial will help you get started and
 teach you to gather crafting materials and make some basic items. These quests
-reward Trade skill levels and bonus experience.  
+reward Trade skill levels and bonus experience.
    Note: Make sure you don't have Trade noskilled.
 ~
 You've found Horation and the Museum of Early Man!
@@ -462,7 +462,7 @@ Collect Basic Resources~
 accomplishments of Early Man that led to the first empires and the dawn of
 civilization. The real problem is that nobody will fund an archaeological dig
 to get artifacts for the museum. Horation is willing to pay you to craft some
-authentic artifacts for his displays.  
+authentic artifacts for his displays.
    Horation would like you to collect a few basic resources:
  1. Collect rocks by digging in plains, forest, or deserts. For this
     quest, you need 7 ordinary rocks.
@@ -506,7 +506,7 @@ Craft 3 handaxes and 3 spear heads:
  3. Chip 3 of the handaxes into smaller spear heads. Keep the
     other 3 handaxes.
 Craft 4 handles:
- 1. Wield one of handaxes.
+ 1. Wield a handaxe.
  2. Type 'craft 4 handle'.
  3. Remove the handaxe (you will need it to finish the quest).
 (Hint: Type 'craft info handle' to see more about the craft.)
@@ -514,9 +514,9 @@ Return to Horation when you have it all.
 ~
    Horation looks thrilled at the quality of the authentic stone tools you have
 crafted, but he wants you to do a little bit more work on them before he puts
-them in the displays.  
+them in the displays.
 ~
-21 0 0 25 -1
+22 0 0 25 -1
 A
 1 10826
 P
@@ -608,7 +608,7 @@ Get 6 sticks:
 Return to Horation when you have all the items.
 ~
    Horation examines the materials you collected, and determines them to be
-correct.  
+correct.
 ~
 23 0 0 25 -1
 A
@@ -652,14 +652,14 @@ Make 2 ropes:
 Make a pile of bricks:
  1. You need 2 clay and a fire. You can make a fire by lighting a tree.
  2. Type 'craft bricks'.
-Make a bound column:
+Make a bound wooden column:
  1. You need 1 lumber and 6 sticks.
- 2. Type 'craft bound column'.
+ 2. Type 'craft bound wooden column'.
 Return to Horation when you've made the items.
 ~
 Horation is impressed with your crafting skills.
 ~
-23 d 0 25 -1
+24 d 0 25 -1
 A
 1 10826
 P
@@ -731,7 +731,7 @@ Examples of Early Pottery~
 The curator needs some examples of early pottery.
 Steps:
  1. You need at least level 10 Trade skill.
- 2. Type 'skill by pottery'.
+ 2. Type 'skill buy pottery'.
  3. Use 'craft info' to figure out what you need for a pot, vessel,
     and clay shield.
  4. Collect the 18 clay, 6 sticks, and 1 small leather.
@@ -740,7 +740,7 @@ Steps:
 ~
 Horation is impressed with your crafting skills.
 ~
-24 d 0 25 -1
+25 d 0 25 -1
 A
 1 10826
 P
@@ -832,7 +832,7 @@ Steps:
    Horation congratulates you for bringing him everything he needs to set up
 his Museum of Early Man. He begins hastily arranging items on the shelves, ever
 so careful not to disturb the authentic dust already there. This is the end of
-the tutorial.  
+the tutorial.
 ~
 25 d 0 25 -1
 A
@@ -859,12 +859,12 @@ S
 #10836
 A Master's Journey~
    The journey to becoming a master craftsman is long and difficult, and this
-is only the beginning. For now, help Horation build his Museum of Early Man. 
+is only the beginning. For now, help Horation build his Museum of Early Man.
 But if you choose to seek out mastery of your craft, return to Horation's
-museum for a small gift to help you on your way.  
+museum for a small gift to help you on your way.
 ~
    Curator Horation congratulates you on the progress you've made on your
-journey to becoming a master craftsman.  
+journey to becoming a master craftsman.
 ~
 3 0 0 50 -1
 A
