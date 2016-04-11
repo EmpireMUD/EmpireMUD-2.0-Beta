@@ -1103,7 +1103,6 @@ void process_chop(char_data *ch) {
 		// run interacts for items only if not depleted
 		if (get_depletion(IN_ROOM(ch), DPLTN_CHOP) < config_get_int("chop_depletion")) {
 			got_any = run_room_interactions(ch, IN_ROOM(ch), INTERACT_CHOP, finish_chopping);
-			add_depletion(IN_ROOM(ch), DPLTN_CHOP, FALSE);
 		}
 		
 		if (!got_any) {

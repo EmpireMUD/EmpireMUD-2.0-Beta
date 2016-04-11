@@ -1236,7 +1236,6 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 			if (get_room_extra_data(room, ROOM_EXTRA_CHOP_PROGRESS) == 0) {
 				// finished!
 				run_room_interactions(worker, room, INTERACT_CHOP, one_chop_chore);
-				add_depletion(room, DPLTN_CHOP, FALSE);
 				change_chop_territory(room);
 				empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 				
