@@ -1087,7 +1087,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 				charge_stored_resource(emp, islid, res->vnum, res->amount);
 			}
 			else if (res->type == RES_COMPONENT) {
-				charge_stored_component(emp, islid, res->vnum, res->misc, res->amount);
+				charge_stored_component(emp, islid, res->vnum, res->misc, res->amount, NULL);
 			}
 		}
 		
@@ -1123,7 +1123,7 @@ void do_chore_brickmaking(empire_data *emp, room_data *room) {
 	if (worker && can_do) {
 		ewt_mark_resource_worker(emp, room, o_BRICKS);
 		
-		charge_stored_component(emp, islid, CMP_CLAY, NOBITS, 2);
+		charge_stored_component(emp, islid, CMP_CLAY, NOBITS, 2, NULL);
 		add_to_empire_storage(emp, islid, o_BRICKS, 1);
 		
 		act("$n finishes a pile of bricks.", FALSE, worker, NULL, NULL, TO_ROOM);
@@ -1169,10 +1169,11 @@ void do_chore_building(empire_data *emp, room_data *room) {
 			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 			
 			if (res->type == RES_OBJECT) {
+				add_to_resource_list(&GET_BUILT_WITH(room), RES_OBJECT, res->vnum, 1, 0);
 				charge_stored_resource(emp, islid, res->vnum, 1);
 			}
 			else if (res->type == RES_COMPONENT) {
-				charge_stored_component(emp, islid, res->vnum, res->misc, 1);
+				charge_stored_component(emp, islid, res->vnum, res->misc, 1, &GET_BUILT_WITH(room));
 			}
 			
 			res->amount -= 1;
@@ -1684,8 +1685,8 @@ void do_chore_maintenance(empire_data *emp, room_data *room) {
 	}
 	
 	if (ok && (worker = find_chore_worker_in_room(room, chore_data[CHORE_MAINTENANCE].mob))) {
-		charge_stored_component(emp, islid, CMP_LUMBER, NOBITS, amount);
-		charge_stored_component(emp, islid, CMP_NAILS, NOBITS, amount);
+		charge_stored_component(emp, islid, CMP_LUMBER, NOBITS, amount, NULL);
+		charge_stored_component(emp, islid, CMP_NAILS, NOBITS, amount, NULL);
 		COMPLEX_DATA(room)->disrepair = 0;
 		empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 		
@@ -1851,7 +1852,7 @@ void do_chore_nailmaking(empire_data *emp, room_data *room) {
 	if (worker && can_do) {
 		ewt_mark_resource_worker(emp, room, o_NAILS);
 		
-		charge_stored_component(emp, islid, CMP_METAL, CMPF_COMMON, 1);
+		charge_stored_component(emp, islid, CMP_METAL, CMPF_COMMON, 1, NULL);
 		add_to_empire_storage(emp, islid, o_NAILS, 4);
 		
 		act("$n finishes a pouch of nails.", FALSE, worker, NULL, NULL, TO_ROOM);
@@ -2053,7 +2054,7 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 				charge_stored_resource(emp, islid, res->vnum, 1);
 			}
 			else if (res->type == RES_COMPONENT) {
-				charge_stored_component(emp, islid, res->vnum, res->misc, 1);
+				charge_stored_component(emp, islid, res->vnum, res->misc, 1, NULL);
 			}
 			// apply it
 			res->amount -= 1;

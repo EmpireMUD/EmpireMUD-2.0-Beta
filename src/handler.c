@@ -5513,10 +5513,11 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 * @param int island Which island to charge for storage, or ANY_ISLAND to take from any available storage
 * @param int cmp_type Which CMP_ type to charge
 * @param int cmp_flags Required CMPF_ flags to match on the component
-* @param int amount How much to charge
+* @param int amount How much to charge*
+* @param struct resource_data **build_used_list Optional: A place to store the exact item used, e.g. for later dismantling. (NULL if none)
 * @return bool TRUE if it was able to charge enough, FALSE if not
 */
-bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount) {
+bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, struct resource_data **build_used_list) {
 	struct empire_storage_data *store, *next_store;
 	int this, found = 0;
 	obj_data *proto;
@@ -5545,6 +5546,10 @@ bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp
 		this = MIN(amount, store->amount);
 		found += this;
 		SAFE_ADD(store->amount, -this, 0, INT_MAX, FALSE);
+		
+		if (build_used_list) {
+			add_to_resource_list(build_used_list, RES_OBJECT, store->vnum, this, 0);
+		}
 		
 		if (store->amount <= 0) {
 			LL_DELETE(EMPIRE_STORAGE(emp), store);
