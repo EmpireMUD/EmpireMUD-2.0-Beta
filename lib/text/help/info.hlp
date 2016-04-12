@@ -36,6 +36,21 @@ Full multiplaying rules are found by typing POLICY.
 
 See also: ALTERNATE
 #
+ACTION ACTIONS CHORE CHORES "TIMED ACTION"
+
+EmpireMUD uses timed actions for most chores. These are things that happen
+over time until complete. Some of them will also automatically repeat when
+finished, if there is still something left to chop/mine/dig. You can cancel
+any timed action by typing 'stop'.
+
+The following things will speed up various chores:
+- Faster chores (bonus): dig, gather, chop, build, dismantle, harvest, plant,
+   mine, mint, repair, chip, excavate, pick, scrape, fillin, saw, quarry, tan
+- Finder: dig, gather, pan, pick
+- Haste: dig, gather, chop, build, dismantle, harvest, plant, mine, repair,
+   play (music), excavate, pick, scrape, fillin, saw, quarry
+- Shovel: dig
+#
 ADVENTURE "ADVENTURE ZONE" ZONE "ADVENTURE SUMMON"
 
 Usage:  adventure
