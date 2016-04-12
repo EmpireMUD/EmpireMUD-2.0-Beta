@@ -404,11 +404,12 @@ Cost:  15 mana
 
 This powerful Natural Magic spell lets its user speed up herself or her allies,
 making them attack faster in combat, and allowing them to do ordinary chores
-at incredible speed.
+at incredible speed. Gains experience when you cast the spell.
 
 If your target is in combat, you will join the combat upon using this ability.
 
-Gains experience when you cast the spell.
+There is also a haste potion available. It has the same effect and does not
+stack with the hasten ability.
 #
 HEAL "HEAL FRIEND" "HEAL PARTY"
 
