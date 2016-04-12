@@ -2183,6 +2183,25 @@ int get_attribute_by_name(char *name) {
 
 
 /**
+* Picks a level based on a min/max and base.
+*
+* @param int level The base level (usually player's level).
+* @param int min Optional: A minimum level to pick (0 for no-minimum).
+* @param int max Optional: A maximum level to pick (0 for no-maximum).
+* @return int The selected level.
+*/
+int pick_level_from_range(int level, int min, int max) {
+	if (min > 0) {
+		level = MAX(level, min);
+	}
+	if (max > 0) {
+		level = MIN(level, max);
+	}
+	return level;
+}
+
+
+/**
 * Raises a person from sleeping+ to standing (or fighting) if possible.
 * 
 * @param char_data *ch The person to try to wake/stand.
@@ -4622,11 +4641,11 @@ void relocate_players(room_data *room, room_data *to_room) {
 			}
 			
 			char_to_room(ch, target);
+			qt_visit_room(ch, IN_ROOM(ch));
 			GET_LAST_DIR(ch) = NO_DIR;
 			look_at_room(ch);
 			act("$n appears in the middle of the room!", TRUE, ch, NULL, NULL, TO_ROOM);
 			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
-			qt_visit_room(ch, IN_ROOM(ch));
 		}
 	}
 }

@@ -122,7 +122,8 @@ void change_chop_territory(room_data *room) {
 		change_terrain(room, evo->becomes);
 	}
 	else {
-		// it's actually okay to call this on an unchoppable room.
+		// it's actually okay to call this on an unchoppable room... just mark it more depleted
+		add_depletion(room, DPLTN_CHOP, FALSE);
 	}
 }
 

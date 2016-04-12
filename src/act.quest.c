@@ -51,10 +51,14 @@ void scale_item_to_level(obj_data *obj, int level);
 
 // local prototypes
 void drop_quest(char_data *ch, struct player_quest *pq);
+void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+#define QUEST_LEVEL_COLOR(ch, quest)  color_by_difficulty((ch), pick_level_from_range(GET_COMPUTED_LEVEL(ch), QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest)))
+
 
 /**
 * Finds all available quests at a character's location. You should use
@@ -90,6 +94,37 @@ struct quest_temp_list *build_available_quest_list(char_data *ch) {
 
 
 /**
+* Colors by level difference between the player and the quest or area.
+*
+* @param char_data *ch The player.
+* @param int The level to compare her to.
+*/
+const char *color_by_difficulty(char_data *ch, int level) {
+	int diff, iter;
+	
+	const struct { int level; const char *color; } pairs[] = {
+		// { level diff, color } order highest (hardest) to lowest (easiest)
+		{ 30, "\tr" },
+		{ 10, "\ty" },
+		{ -25, "\tg" },
+		{ -75, "\tc" },
+		{ INT_MIN, "\tw" }	// put this last
+	};
+	
+	diff = level;
+	SAFE_ADD(diff, -get_approximate_level(ch), INT_MIN, INT_MAX, TRUE);
+	for (iter = 0; /* safely terminates itself */; ++iter) {
+		if (diff >= pairs[iter].level) {
+			return pairs[iter].color;
+		}
+	}
+	
+	// count never really get here
+	return "\t0";
+}
+
+
+/**
 * Completes the quest, messages the player, gives rewards.
 *
 * @param char_data *ch The player.
@@ -115,7 +150,7 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	qt_quest_completed(ch, pq->vnum);
 	qt_lose_quest(ch, pq->vnum);
 	
-	msg_to_char(ch, "You have finished %s!\r\n%s", QUEST_NAME(quest), NULLSAFE(QUEST_COMPLETE_MSG(quest)));
+	msg_to_char(ch, "You have finished %s%s\t0!\r\n%s", QUEST_LEVEL_COLOR(ch, quest), QUEST_NAME(quest), NULLSAFE(QUEST_COMPLETE_MSG(quest)));
 	act("$n has finished $t!", TRUE, ch, QUEST_NAME(quest), NULL, TO_ROOM);
 	
 	// take objs if necessary
@@ -174,13 +209,13 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 		// QR_x: reward the rewards
 		switch (reward->type) {
 			case QR_BONUS_EXP: {
-				msg_to_char(ch, "You gain %d bonus experience point%s! (Bonus exp expires at the end of the day.)\r\n", reward->amount, PLURAL(reward->amount));
+				msg_to_char(ch, "\tyYou gain %d bonus experience point%s! (Bonus exp expires at the end of the day.)\t0\r\n", reward->amount, PLURAL(reward->amount));
 				SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(ch), reward->amount, 0, UCHAR_MAX, FALSE);
 				break;
 			}
 			case QR_COINS: {
 				empire_data *coin_emp = (reward->vnum == OTHER_COIN ? NULL : giver_emp);
-				msg_to_char(ch, "You receive %s!\r\n", money_amount(coin_emp, reward->amount));
+				msg_to_char(ch, "\tyYou receive %s!\t0\r\n", money_amount(coin_emp, reward->amount));
 				increase_coins(ch, coin_emp, reward->amount);
 				break;
 			}
@@ -207,10 +242,10 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 				}
 				
 				if (reward->amount > 0) {
-					snprintf(buf, sizeof(buf), "You receive $p (x%d)!", reward->amount);
+					snprintf(buf, sizeof(buf), "\tyYou receive $p (x%d)!\t0", reward->amount);
 				}
 				else {
-					snprintf(buf, sizeof(buf), "You receive $p!");
+					snprintf(buf, sizeof(buf), "\tyYou receive $p!\t0");
 				}
 				
 				if (obj) {
@@ -225,7 +260,7 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 				loss = (val < get_skill_level(ch, reward->vnum));
 				set_skill(ch, reward->vnum, val);
 				
-				msg_to_char(ch, "Your %s is now level %d!\r\n", get_skill_name_by_vnum(reward->vnum), val);
+				msg_to_char(ch, "\tyYour %s is now level %d!\t0\r\n", get_skill_name_by_vnum(reward->vnum), val);
 				
 				if (loss) {
 					clear_char_abilities(ch, reward->vnum);
@@ -234,24 +269,29 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 				break;
 			}
 			case QR_SKILL_EXP: {
-				msg_to_char(ch, "You gain %s skill experience!\r\n", get_skill_name_by_vnum(reward->vnum));
+				msg_to_char(ch, "\tyYou gain %s skill experience!\t0\r\n", get_skill_name_by_vnum(reward->vnum));
 				gain_skill_exp(ch, reward->vnum, reward->amount);
 				break;
 			}
 			case QR_SKILL_LEVELS: {
-				int val;
-				bool loss;
-				
-				val = get_skill_level(ch, reward->vnum) + reward->amount;
-				val = MAX(0, MIN(CLASS_SKILL_CAP, val));
-				loss = (val < get_skill_level(ch, reward->vnum));
-				set_skill(ch, reward->vnum, val);
-				
-				msg_to_char(ch, "Your %s is now level %d!\r\n", get_skill_name_by_vnum(reward->vnum), val);
-				
-				if (loss) {
-					clear_char_abilities(ch, reward->vnum);
+				if (gain_skill(ch, find_skill_by_vnum(reward->vnum), reward->amount)) {
+					// sends its own message
+					// msg_to_char(ch, "Your %s is now level %d!\r\n", get_skill_name_by_vnum(reward->vnum), get_skill_level(ch, reward->vnum));
 				}
+				break;
+			}
+			case QR_QUEST_CHAIN: {
+				quest_data *start = quest_proto(reward->vnum);
+				struct instance_data *inst = get_instance_by_id(pcq->last_instance_id);
+				
+				// shows nothing if the player doesn't qualify
+				if (start && !is_on_quest(ch, reward->vnum) && char_meets_prereqs(ch, start, inst)) {
+					if (!PRF_FLAGGED(ch, PRF_COMPACT)) {
+						msg_to_char(ch, "\r\n");	// add some spacing
+					}
+					start_quest(ch, start, inst);
+				}
+				
 				break;
 			}
 		}
@@ -405,7 +445,7 @@ void drop_quest(char_data *ch, struct player_quest *pq) {
 * @param struct player_quest *pq The quest to show the tracker for.
 */
 void show_quest_tracker(char_data *ch, struct player_quest *pq) {
-	extern const bool quest_tracker_has_amount[];
+	extern const bool quest_tracker_amt_type[];
 	
 	char buf[MAX_STRING_LENGTH];
 	struct quest_task *task;
@@ -414,14 +454,29 @@ void show_quest_tracker(char_data *ch, struct player_quest *pq) {
 	msg_to_char(ch, "Quest Tracker:\r\n");
 	
 	LL_FOREACH(pq->tracker, task) {
-		if (quest_tracker_has_amount[task->type]) {
-			lefthand = task->current;
-			lefthand = MIN(lefthand, task->needed);	// may be above the amount needed
-			lefthand = MAX(0, lefthand);	// in some cases, current may be negative
-			sprintf(buf, " (%d/%d)", lefthand, task->needed);
-		}
-		else {
-			*buf = '\0';
+		// QT_AMT_x: display based on amount type
+		switch (quest_tracker_amt_type[task->type]) {
+			case QT_AMT_NUMBER: {
+				lefthand = task->current;
+				lefthand = MIN(lefthand, task->needed);	// may be above the amount needed
+				lefthand = MAX(0, lefthand);	// in some cases, current may be negative
+				sprintf(buf, " (%d/%d)", lefthand, task->needed);
+				break;
+			}
+			case QT_AMT_THRESHOLD:
+			case QT_AMT_NONE: {
+				if (task->current >= task->needed) {
+					strcpy(buf, " (complete)");
+				}
+				else {
+					*buf = '\0';
+				}
+				break;
+			}
+			default: {
+				*buf = '\0';
+				break;
+			}
 		}
 		msg_to_char(ch, "  %s%s\r\n", quest_task_string(task, FALSE), buf);
 	}
@@ -440,6 +495,7 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
 	
 	char buf[MAX_STRING_LENGTH];
 	struct player_quest *pq;
+	int count, total;
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -451,7 +507,7 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
 	}
 	
 	// pre-reqs are already checked for us
-	msg_to_char(ch, "You start %s:\r\n%s", QUEST_NAME(qst), NULLSAFE(QUEST_DESCRIPTION(qst)));
+	msg_to_char(ch, "You start %s%s\t0:\r\n%s", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), NULLSAFE(QUEST_DESCRIPTION(qst)));
 	snprintf(buf, sizeof(buf), "$n starts %s.", QUEST_NAME(qst));
 	act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 	
@@ -466,8 +522,12 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
 	
 	LL_PREPEND(GET_QUESTS(ch), pq);
 	refresh_one_quest_tracker(ch, pq);
-	
 	qt_start_quest(ch, QUEST_VNUM(qst));
+	
+	count_quest_tasks(pq, &count, &total);
+	if (count == total) {
+		msg_to_char(ch, "You already meet the requirements for %s%s\t0.\r\n", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
+	}
 }
 
 
@@ -497,7 +557,7 @@ QCMD(qcmd_check) {
 			*buf = '\0';
 		}
 		
-		msg_to_char(ch, "  %s%s\r\n", QUEST_NAME(qtl->quest), buf);
+		msg_to_char(ch, "  %s%s%s\t0\r\n", QUEST_LEVEL_COLOR(ch, qtl->quest), QUEST_NAME(qtl->quest), buf);
 	}
 	
 	if (!any) {
@@ -536,7 +596,7 @@ QCMD(qcmd_drop) {
 		msg_to_char(ch, "You don't seem to be on a quest called '%s'.\r\n", argument);
 	}
 	else {
-		msg_to_char(ch, "You drop %s.\r\n", QUEST_NAME(qst));
+		msg_to_char(ch, "You drop %s%s\t0.\r\n", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
 		drop_quest(ch, pq);
 		SAVE_CHAR(ch);
 	}
@@ -645,6 +705,7 @@ QCMD(qcmd_group) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct group_member_data *mem;
 	struct player_quest *pq, *fq;
+	quest_data *proto;
 	char_data *friend;
 	int count, total;
 	bool any, have;
@@ -678,7 +739,9 @@ QCMD(qcmd_group) {
 		
 		if (any && *line) {
 			have = TRUE;
-			size += snprintf(buf + size, sizeof(buf) - size, "  %s: %s\r\n", get_quest_name_by_proto(pq->vnum), line);
+			if ((proto = quest_proto(pq->vnum))) {
+				size += snprintf(buf + size, sizeof(buf) - size, "  %s%s\t0: %s\r\n", QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), line);
+			}
 		}
 	}
 	
@@ -693,7 +756,10 @@ QCMD(qcmd_group) {
 
 
 QCMD(qcmd_info) {
+	extern char *quest_giver_string(struct quest_giver *giver, bool show_vnums);
+	char buf[MAX_STRING_LENGTH];
 	struct instance_data *inst;
+	struct quest_giver *giver;
 	struct player_quest *pq;
 	int complete, total;
 	quest_data *qst;
@@ -710,10 +776,10 @@ QCMD(qcmd_info) {
 		// title
 		if (pq) {
 			count_quest_tasks(pq, &complete, &total);
-			msg_to_char(ch, "%s (%d/%d)\r\n", QUEST_NAME(qst), complete, total);
+			msg_to_char(ch, "%s%s\t0 (%d/%d tasks)\r\n", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), complete, total);
 		}
 		else {
-			msg_to_char(ch, "%s (not on quest)\r\n", QUEST_NAME(qst));
+			msg_to_char(ch, "%s%s\t0 (not on quest)\r\n", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
 		}
 		
 		send_to_char(NULLSAFE(QUEST_DESCRIPTION(qst)), ch);
@@ -722,6 +788,17 @@ QCMD(qcmd_info) {
 		if (pq) {
 			show_quest_tracker(ch, pq);
 		}
+		
+		// show quest giver
+		*buf = '\0';
+		LL_FOREACH(QUEST_ENDS_AT(qst), giver) {
+			if (giver->type != QG_TRIGGER) {
+				sprintf(buf + strlen(buf), "%s%s", (*buf ? ", " : ""), quest_giver_string(giver, FALSE));
+			}
+		}
+		if (*buf) {
+			msg_to_char(ch, "Turn in at: %s.\r\n", buf);
+		}
 	}
 }
 
@@ -729,6 +806,7 @@ QCMD(qcmd_info) {
 QCMD(qcmd_list) {
 	char buf[MAX_STRING_LENGTH];
 	struct player_quest *pq;
+	quest_data *proto;
 	int count, total;
 	size_t size;
 	
@@ -740,7 +818,9 @@ QCMD(qcmd_list) {
 	size = snprintf(buf, sizeof(buf), "Your quests:\r\n");
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		count_quest_tasks(pq, &count, &total);
-		size += snprintf(buf + size, sizeof(buf) - size, "  %s (%d/%d)\r\n", get_quest_name_by_proto(pq->vnum), count, total);
+		if ((proto = quest_proto(pq->vnum))) {
+			size += snprintf(buf + size, sizeof(buf) - size, "  %s%s\t0 (%d/%d tasks)\r\n", QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), count, total);
+		}
 	}
 	
 	if (ch->desc) {
@@ -751,6 +831,7 @@ QCMD(qcmd_list) {
 
 QCMD(qcmd_share) {
 	struct group_member_data *mem;
+	char buf[MAX_STRING_LENGTH];
 	struct instance_data *inst;
 	struct player_quest *pq;
 	bool any, same_room;
@@ -795,7 +876,8 @@ QCMD(qcmd_share) {
 		any = TRUE;
 		add_offer(friend, ch, OFFER_QUEST, pq->vnum);
 		act("You offer to share '$t' with $N.", FALSE, ch, QUEST_NAME(qst), friend, TO_CHAR);
-		act("$o offers to share the quest '$t' with you (use 'accept/reject quest').", FALSE, ch, QUEST_NAME(qst), friend, TO_VICT);
+		snprintf(buf, sizeof(buf), "$o offers to share the quest %s%s\t0 with you (use 'accept/reject quest').", QUEST_LEVEL_COLOR(friend, qst), QUEST_NAME(qst));
+		act(buf, FALSE, ch, QUEST_NAME(qst), friend, TO_VICT);
 	}
 	
 	if (!any && same_room) {
@@ -835,6 +917,8 @@ QCMD(qcmd_start) {
 		if (!any) {
 			msg_to_char(ch, "There are no quests you can start here.\r\n");
 		}
+		
+		free_quest_temp_list(quest_list);
 	}
 	else if (!(qst = find_local_quest_by_name(ch, argument, FALSE, TRUE, &inst))) {
 		msg_to_char(ch, "You don't see that quest here.\r\n");

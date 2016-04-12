@@ -1507,6 +1507,7 @@ typedef struct vehicle_data vehicle_data;
 #define GRANT_ISLAND  BIT(35)
 #define GRANT_OSET  BIT(36)
 #define GRANT_PLAYERDELETE  BIT(37)
+#define GRANT_UNQUEST  BIT(38)
 
 
 // Lore types
@@ -1661,6 +1662,7 @@ typedef struct vehicle_data vehicle_data;
 #define QR_SET_SKILL  3
 #define QR_SKILL_EXP  4
 #define QR_SKILL_LEVELS  5
+#define QR_QUEST_CHAIN  6
 
 
 // QT_x: quest tracker types (conditions and pre-reqs)
@@ -1679,6 +1681,13 @@ typedef struct vehicle_data vehicle_data;
 #define QT_VISIT_BUILDING  12
 #define QT_VISIT_ROOM_TEMPLATE  13
 #define QT_VISIT_SECTOR  14
+#define QT_HAVE_ABILITY  15
+
+
+// QT_AMT_x: How quest trackers are displayed for different QT_ types
+#define QT_AMT_NONE  0	// show as "completed"
+#define QT_AMT_NUMBER  1  // show as x/X
+#define QT_AMT_THRESHOLD  2	// needs a numeric arg but shows as a threshold
 
 
 // indicates empire (rather than misc) coins for a reward

@@ -166,9 +166,9 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 		act(buf, TRUE, ch, 0, t, TO_VICT);
 	}
 	
+	qt_visit_room(ch, IN_ROOM(ch));
 	look_at_room(ch);
 	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
-	qt_visit_room(ch, IN_ROOM(ch));
 }
 
 
@@ -1538,10 +1538,10 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		// victory
 		old_level = get_skill_level(vict, SKILL_VNUM(skill));
 		set_skill(vict, SKILL_VNUM(skill), level);
-		if (old_level > level) {
+		update_class(vict);
+		if (old_level > get_skill_level(vict, SKILL_VNUM(skill))) {
 			clear_char_abilities(vict, SKILL_VNUM(skill));
 		}
-		update_class(vict);
 		sprintf(output, "%s's %s set to %d", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
 
@@ -1900,7 +1900,7 @@ SHOW(show_quests) {
 		size = snprintf(buf, sizeof(buf), "%s's quests:\r\n", GET_NAME(vict));
 		LL_FOREACH(GET_QUESTS(vict), pq) {
 			count_quest_tasks(pq, &count, &total);
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d)\r\n", pq->vnum, get_quest_name_by_proto(pq->vnum), count, total);
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d tasks)\r\n", pq->vnum, get_quest_name_by_proto(pq->vnum), count, total);
 		}
 	
 		if (ch->desc) {
@@ -6688,9 +6688,9 @@ ACMD(do_trans) {
 				}
 				act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM);
 				act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT);
+				qt_visit_room(victim, IN_ROOM(victim));
 				look_at_room(victim);
 				enter_wtrigger(IN_ROOM(victim), victim, NO_DIR);
-				qt_visit_room(victim, IN_ROOM(victim));
 			}
 		}
 		
@@ -6717,9 +6717,9 @@ ACMD(do_trans) {
 			}
 			act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM);
 			act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT);
+			qt_visit_room(victim, IN_ROOM(victim));
 			look_at_room(victim);
 			enter_wtrigger(IN_ROOM(victim), victim, NO_DIR);
-			qt_visit_room(victim, IN_ROOM(victim));
 			send_config_msg(ch, "ok_string");
 		}
 	}
@@ -6762,6 +6762,73 @@ ACMD(do_unbind) {
 		free_obj_binding(&OBJ_BOUND_TO(obj));
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s used unbind on %s", GET_REAL_NAME(ch), GET_OBJ_SHORT_DESC(obj));
 		act("You unbind $p.", FALSE, ch, obj, NULL, TO_CHAR);
+	}
+}
+
+
+ACMD(do_unquest) {
+	void drop_quest(char_data *ch, struct player_quest *pq);
+	
+	struct player_completed_quest *pcq, *next_pcq;
+	struct player_quest *pq, *next_pq;
+	char arg[MAX_INPUT_LENGTH];
+	quest_data *quest;
+	char_data *vict;
+	bool found;
+	
+	argument = one_argument(argument, arg);
+	skip_spaces(&argument);	// vnum
+	
+	if (!*arg || !*argument || !isdigit(*argument)) {
+		msg_to_char(ch, "Usage: unquest <target> <quest vnum>\r\n");
+	}
+	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD)) || IS_NPC(vict)) {
+		send_config_msg(ch, "no_person");
+	}
+	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You simply can't do that.\r\n");
+	}
+	else if (!(quest = quest_proto(atoi(argument)))) {
+		msg_to_char(ch, "Invalid quest vnum.\r\n");
+	}
+	else {
+		found = FALSE;
+		
+		// remove from active quests
+		LL_FOREACH_SAFE(GET_QUESTS(vict), pq, next_pq) {
+			if (pq->vnum == QUEST_VNUM(quest)) {
+				drop_quest(vict, pq);
+				found = TRUE;
+			}
+		}
+		
+		// remove from completed quests
+		HASH_ITER(hh, GET_COMPLETED_QUESTS(vict), pcq, next_pcq) {
+			if (pcq->vnum == QUEST_VNUM(quest)) {
+				HASH_DEL(GET_COMPLETED_QUESTS(vict), pcq);
+				free(pcq);
+				found = TRUE;
+			}
+		}
+		
+		if (ch == vict) {
+			if (found) {
+				// no need to syslog for self
+				msg_to_char(ch, "You remove [%d] %s from your quest lists.\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			}
+			else {
+				msg_to_char(ch, "You are not on that quest.\r\n");
+			}
+		}
+		else {	// ch != vict
+			if (found) {
+				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has removed [%d] %s from %s's quest lists.", GET_NAME(ch), QUEST_VNUM(quest), QUEST_NAME(quest), GET_NAME(vict));
+				msg_to_char(ch, "You remove [%d] %s from %s's quest lists.\r\n", QUEST_VNUM(quest), QUEST_NAME(quest), PERS(vict, ch, TRUE));
+			}
+			else {
+				msg_to_char(ch, "%s is not on that quest.\r\n", PERS(vict, ch, TRUE));
+			}
+		}
 	}
 }
 

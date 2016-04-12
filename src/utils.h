@@ -1045,7 +1045,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // interaction checks (leading up to CAN_INTERACT_ROOM)
 #define BLD_CAN_INTERACT_ROOM(room, type)  (GET_BUILDING(room) && has_interaction(GET_BLD_INTERACTIONS(GET_BUILDING(room)), (type)))
-#define CROP_CAN_INTERACT_ROOM(room, type)  (ROOM_CROP(room) && has_interaction(GET_CROP_INTERACTIONS(ROOM_CROP(room)), (type)))
+#define CROP_CAN_INTERACT_ROOM(room, type)  (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP(room) && has_interaction(GET_CROP_INTERACTIONS(ROOM_CROP(room)), (type)))
 #define RMT_CAN_INTERACT_ROOM(room, type)  (GET_ROOM_TEMPLATE(room) && has_interaction(GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), (type)))
 #define SECT_CAN_INTERACT_ROOM(room, type)  has_interaction(GET_SECT_INTERACTIONS(SECT(room)), (type))
 #define CAN_INTERACT_ROOM(room, type)  (SECT_CAN_INTERACT_ROOM((room), (type)) || BLD_CAN_INTERACT_ROOM((room), (type)) || RMT_CAN_INTERACT_ROOM((room), (type)) || CROP_CAN_INTERACT_ROOM((room), (type)))
@@ -1295,6 +1295,7 @@ extern double rate_item(obj_data *obj);
 // player functions from utils.c
 void command_lag(char_data *ch, int wait_type);
 void determine_gear_level(char_data *ch);
+extern int pick_level_from_range(int level, int min, int max);
 extern bool wake_and_stand(char_data *ch);
 
 // resource functions from utils.c
@@ -1385,6 +1386,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 
 // utils from quest.c
 extern char *get_quest_name_by_proto(any_vnum vnum);
+void qt_change_ability(char_data *ch, any_vnum abil);
 void qt_change_skill_level(char_data *ch, any_vnum skl);
 void qt_drop_obj(char_data *ch, obj_data *obj);
 void qt_empire_players(empire_data *emp, void (*func)(char_data *ch, any_vnum vnum), any_vnum vnum);

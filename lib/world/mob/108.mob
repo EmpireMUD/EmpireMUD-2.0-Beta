@@ -1,0 +1,68 @@
+#10800
+pageboy boy adviser's~
+the pageboy~
+The adviser's pageboy is standing here.
+~
+0 25 dv nD
+1 0 0 15
+T 10800
+T 10802
+S
+#10801
+Clara forest ranger~
+Ranger Clara~
+Clara, the Forest Ranger, is adjusting her boot.
+~
+0 0 bdv nD
+2 0 0 15
+T 10801
+S
+#10802
+Rosemary planner city~
+Rosemary the City Planner~
+Rosemary, the City Planner, is reviewing a scroll.
+~
+0 0 bdv nD
+2 0 0 15
+T 10801
+S
+#10803
+Hugo adviser royal~
+Royal Adviser Hugo~
+Hugo, the Royal Adviser, sits behind his desk.
+~
+0 0 bdv nD
+1 0 0 15
+T 10801
+S
+#10825
+crier museum~
+the museum crier~
+The museum crier is standing here.
+~
+0 25 dv nD
+1 0 0 15
+T 10825
+T 10827
+S
+#10826
+Horation curator~
+Curator Horation~
+The curator is dusting the shelves.
+~
+0 0 bdv nD
+1 0 0 15
+T 10826
+T 10828
+S
+#10827
+Horation curator~
+Curator Horation~
+Curator Horation stands proudly next to the exhibit.
+~
+0 0 bdv nD
+1 0 0 15
+T 10826
+T 10828
+S
+$

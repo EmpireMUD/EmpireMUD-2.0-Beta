@@ -369,6 +369,7 @@ const char *grant_bits[] = {
 	"island",	// 35
 	"oset",
 	"playerdelete",
+	"unquest",
 	"\n"
 };
 
@@ -2121,6 +2122,7 @@ const char *quest_reward_types[] = {
 	"SET-SKILL",
 	"SKILL-EXP",
 	"SKILL-LEVELS",	// 5
+	"QUEST-CHAIN",
 	"\n",
 };
 
@@ -2141,28 +2143,30 @@ const char *quest_tracker_types[] = {
 	"TRIGGERED",
 	"VISIT-BUILDING",
 	"VISIT-ROOM-TEMPLATE",
-	"VISIT-SECTOR",	// 14
+	"VISIT-SECTOR",
+	"HAVE-ABILITY",	// 15
 	"\n",
 };
 
 
-// QT_x (2/2): quest tracker types that take a numeric arg (vs yes/no)
-const bool quest_tracker_has_amount[] = {
-	FALSE,	// completed quest
-	TRUE,	// get component
-	TRUE,	// get object
-	TRUE,	// kill mob
-	TRUE,	// kill mob flagged
-	FALSE,	// not completed quest
-	FALSE,	// not on quest
-	TRUE,	// own building
-	TRUE,	// own vehicle
-	FALSE,	// skill over
-	FALSE,	// skill under
-	FALSE,	// triggered
-	FALSE,	// visit building
-	FALSE,	// visit rmt
-	FALSE,	// visit sect
+// QT_x (2/2): quest tracker types that take a numeric arg
+const bool quest_tracker_amt_type[] = {
+	QT_AMT_NONE,	// completed quest
+	QT_AMT_NUMBER,	// get component
+	QT_AMT_NUMBER,	// get object
+	QT_AMT_NUMBER,	// kill mob
+	QT_AMT_NUMBER,	// kill mob flagged
+	QT_AMT_NONE,	// not completed quest
+	QT_AMT_NONE,	// not on quest
+	QT_AMT_NUMBER,	// own building
+	QT_AMT_NUMBER,	// own vehicle
+	QT_AMT_THRESHOLD,	// skill over
+	QT_AMT_THRESHOLD,	// skill under
+	QT_AMT_NONE,	// triggered
+	QT_AMT_NONE,	// visit building
+	QT_AMT_NONE,	// visit rmt
+	QT_AMT_NONE,	// visit sect
+	QT_AMT_NONE,	// have ability
 };
 
 

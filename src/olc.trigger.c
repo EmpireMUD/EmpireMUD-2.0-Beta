@@ -355,6 +355,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	HASH_ITER(hh, quest_table, quest, next_quest) {
 		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_TRIGGER, vnum);
 		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_TRIGGER, vnum);
+		found |= delete_from_proto_list_by_vnum(&QUEST_SCRIPTS(quest), vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
@@ -390,6 +391,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 		if (GET_OLC_QUEST(dsc)) {
 			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(dsc)), QG_TRIGGER, vnum);
 			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(dsc)), QG_TRIGGER, vnum);
+			found |= delete_from_proto_list_by_vnum(&QUEST_SCRIPTS(GET_OLC_QUEST(dsc)), vnum);
 			
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(dsc)), QST_IN_DEVELOPMENT);
@@ -487,6 +489,14 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 		}
 		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_TRIGGER, vnum);
 		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_TRIGGER, vnum);
+		if (!any) {
+			LL_FOREACH(QUEST_SCRIPTS(quest), trig) {
+				if (trig->vnum == vnum) {
+					any = TRUE;
+					break;
+				}
+			}
+		}
 		
 		if (any) {
 			++found;

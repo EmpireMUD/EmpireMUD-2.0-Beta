@@ -277,18 +277,22 @@ char *list_one_ability(ability_data *abil, bool detail) {
 * @param any_vnum vnum The ability vnum.
 */
 void olc_search_ability(char_data *ch, any_vnum vnum) {
+	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	
 	char buf[MAX_STRING_LENGTH];
 	ability_data *abil = find_ability_by_vnum(vnum);
 	struct global_data *glb, *next_glb;
 	ability_data *abiter, *next_abiter;
 	craft_data *craft, *next_craft;
 	morph_data *morph, *next_morph;
+	quest_data *quest, *next_quest;
 	skill_data *skill, *next_skill;
 	augment_data *aug, *next_aug;
 	class_data *cls, *next_cls;
 	struct class_ability *clab;
 	struct skill_ability *skab;
 	int size, found;
+	bool any;
 	
 	if (!abil) {
 		msg_to_char(ch, "There is no ability %d.\r\n", vnum);
@@ -346,6 +350,21 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		if (MORPH_ABILITY(morph) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "MPH [%5d] %s\r\n", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
+		}
+	}
+	
+	// quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// QR_x, QT_x: quest types
+		any = find_quest_task_in_list(QUEST_TASKS(quest), QT_HAVE_ABILITY, vnum);
+		any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_HAVE_ABILITY, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -629,6 +648,7 @@ ability_data *create_ability_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_ability(char_data *ch, any_vnum vnum) {
+	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
 	extern bool remove_vnum_from_class_abilities(struct class_ability **list, any_vnum vnum);
 	extern bool remove_vnum_from_skill_abilities(struct skill_ability **list, any_vnum vnum);
 	
@@ -637,6 +657,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	struct global_data *glb, *next_glb;
 	craft_data *craft, *next_craft;
 	morph_data *morph, *next_morph;
+	quest_data *quest, *next_quest;
 	skill_data *skill, *next_skill;
 	augment_data *aug, *next_aug;
 	class_data *cls, *next_cls;
@@ -704,6 +725,17 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		found = delete_quest_task_from_list(&QUEST_TASKS(quest), QT_HAVE_ABILITY, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_HAVE_ABILITY, vnum);
+		
+		if (found) {
+			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
 	// update skills
 	HASH_ITER(hh, skill_table, skill, next_skill) {
 		found = remove_vnum_from_skill_abilities(&SKILL_ABILITIES(skill), vnum);
@@ -764,6 +796,15 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			if (MORPH_ABILITY(GET_OLC_MORPH(desc)) == vnum) {
 				MORPH_ABILITY(GET_OLC_MORPH(desc)) = NOTHING;
 				msg_to_desc(desc, "The required ability has been deleted from the morph you're editing.\r\n");
+			}
+		}
+		if (GET_OLC_QUEST(desc)) {
+			found = delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_HAVE_ABILITY, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_HAVE_ABILITY, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(desc, "An ability has been deleted from the quest you're editing.\r\n");
 			}
 		}
 		if (GET_OLC_SKILL(desc)) {

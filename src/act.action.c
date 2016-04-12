@@ -1056,7 +1056,7 @@ void process_chipping(char_data *ch) {
 
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		act("$p splits open!", FALSE, ch, proto, NULL, TO_CHAR);
-		act("$p finishes chipping $p!", TRUE, ch, proto, NULL, TO_ROOM);
+		act("$n finishes chipping $p!", TRUE, ch, proto, NULL, TO_ROOM);
 		GET_ACTION(ch) = ACT_NONE;
 		
 		success = run_interactions(ch, proto->interactions, INTERACT_CHIP, IN_ROOM(ch), NULL, proto, finish_scraping);
@@ -1103,7 +1103,6 @@ void process_chop(char_data *ch) {
 		// run interacts for items only if not depleted
 		if (get_depletion(IN_ROOM(ch), DPLTN_CHOP) < config_get_int("chop_depletion")) {
 			got_any = run_room_interactions(ch, IN_ROOM(ch), INTERACT_CHOP, finish_chopping);
-			add_depletion(IN_ROOM(ch), DPLTN_CHOP, FALSE);
 		}
 		
 		if (!got_any) {

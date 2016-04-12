@@ -360,7 +360,7 @@ char *quest_giver_string(struct quest_giver *giver, bool show_vnums) {
 	}
 	
 	if (show_vnums) {
-		snprintf(vnum, sizeof(vnum), "[%d] ", giver->vnum);
+		snprintf(vnum, sizeof(vnum), "%s [%d] ", quest_giver_types[giver->type], giver->vnum);
 	}
 	else {
 		*vnum = '\0';
@@ -370,25 +370,25 @@ char *quest_giver_string(struct quest_giver *giver, bool show_vnums) {
 	switch (giver->type) {
 		case QG_BUILDING: {
 			bld_data *bld = building_proto(giver->vnum);
-			snprintf(output, sizeof(output), "%s %s%s", quest_giver_types[giver->type], vnum, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+			snprintf(output, sizeof(output), "%s%s", vnum, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 			break;
 		}
 		case QG_MOBILE: {
-			snprintf(output, sizeof(output), "%s %s%s", quest_giver_types[giver->type], vnum, skip_filler(get_mob_name_by_proto(giver->vnum)));
+			snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_mob_name_by_proto(giver->vnum)));
 			break;
 		}
 		case QG_OBJECT: {
-			snprintf(output, sizeof(output), "%s %s%s", quest_giver_types[giver->type], vnum, skip_filler(get_obj_name_by_proto(giver->vnum)));
+			snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_obj_name_by_proto(giver->vnum)));
 			break;
 		}
 		case QG_ROOM_TEMPLATE: {
 			room_template *rmt = room_template_proto(giver->vnum);
-			snprintf(output, sizeof(output), "%s %s%s", quest_giver_types[giver->type], vnum, rmt ? skip_filler(GET_RMT_TITLE(rmt)) : "UNKNOWN");
+			snprintf(output, sizeof(output), "%s%s", vnum, rmt ? skip_filler(GET_RMT_TITLE(rmt)) : "UNKNOWN");
 			break;
 		}
 		case QG_TRIGGER: {
 			trig_data *trig = real_trigger(giver->vnum);
-			snprintf(output, sizeof(output), "%s %s%s", quest_giver_types[giver->type], vnum, trig ? skip_filler(GET_TRIG_NAME(trig)) : "UNKNOWN");
+			snprintf(output, sizeof(output), "%s%s", vnum, trig ? skip_filler(GET_TRIG_NAME(trig)) : "UNKNOWN");
 			break;
 		}
 		default: {
@@ -450,6 +450,10 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 		}
 		case QR_SKILL_LEVELS: {
 			snprintf(output, sizeof(output), "%s%dx %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
+			break;
+		}
+		case QR_QUEST_CHAIN: {
+			snprintf(output, sizeof(output), "%s%s", vnum, get_quest_name_by_proto(reward->vnum));
 			break;
 		}
 		default: {
@@ -553,6 +557,10 @@ char *quest_task_string(struct quest_task *task, bool show_vnums) {
 			snprintf(output, sizeof(output), "Visit terrain: %s%s", vnum, sect ? GET_SECT_NAME(sect) : "UNKNOWN");
 			break;
 		}
+		case QT_HAVE_ABILITY: {
+			snprintf(output, sizeof(output), "Have ability: %s%s", vnum, get_ability_name_by_vnum(task->vnum));
+			break;
+		}
 		default: {
 			sprintf(buf, "Unknown condition");
 			break;
@@ -642,6 +650,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 					task->current = task->needed;	// full
 				}
 				// else can't detect this
+				break;
+			}
+			case QT_HAVE_ABILITY: {
+				task->current = has_ability(ch, task->vnum) ? task->needed : 0;	// full
 				break;
 			}
 		}
@@ -1364,7 +1376,7 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *
 	
 	// check repeatability
 	if ((completed = has_completed_quest(ch, QUEST_VNUM(quest)))) {
-		if (completed->last_completed + (QUEST_REPEATABLE_AFTER(quest) * SECS_PER_REAL_MIN) < time(0)) {
+		if (QUEST_REPEATABLE_AFTER(quest) >= 0 && completed->last_completed + (QUEST_REPEATABLE_AFTER(quest) * SECS_PER_REAL_MIN) <= time(0)) {
 			// repeat time: ok
 		}
 		else if (QUEST_FLAGGED(quest, QST_REPEAT_PER_INSTANCE) && (completed->last_adventure != (instance ? GET_ADV_VNUM(instance->adventure) : NOTHING) || completed->last_instance_id != (instance ? instance->id : NOTHING))) {
@@ -1445,6 +1457,12 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *
 				}
 				break;
 			}
+			case QT_HAVE_ABILITY: {
+				if (!has_ability(ch, task->vnum)) {
+					ok = FALSE;
+				}
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case QT_KILL_MOB:
@@ -1499,6 +1517,30 @@ struct player_quest *is_on_quest(char_data *ch, any_vnum quest) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// QUEST TRACKERS //////////////////////////////////////////////////////////
+
+/**
+* Quest Tracker: ch gains or loses ability
+*
+* @param char_data *ch The player.
+* @param any_vnum abil The ability vnum.
+*/
+void qt_change_ability(char_data *ch, any_vnum abil) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == QT_HAVE_ABILITY && task->vnum == abil) {
+				task->current = (has_ability(ch, abil) ? task->needed : 0);
+			}
+		}
+	}
+}
+
 
 /**
 * Quest Tracker: ch gains or loses skill
@@ -2193,12 +2235,14 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		if (size >= sizeof(buf)) {
 			break;
 		}
+		// QR_x, QT_x: quest types
 		any = find_quest_task_in_list(QUEST_TASKS(qiter), QT_COMPLETED_QUEST, vnum);
 		any |= find_quest_task_in_list(QUEST_PREREQS(qiter), QT_COMPLETED_QUEST, vnum);
 		any |= find_quest_task_in_list(QUEST_TASKS(qiter), QT_NOT_COMPLETED_QUEST, vnum);
 		any |= find_quest_task_in_list(QUEST_PREREQS(qiter), QT_NOT_COMPLETED_QUEST, vnum);
 		any |= find_quest_task_in_list(QUEST_TASKS(qiter), QT_NOT_ON_QUEST, vnum);
 		any |= find_quest_task_in_list(QUEST_PREREQS(qiter), QT_NOT_ON_QUEST, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(qiter), QR_QUEST_CHAIN, vnum);
 		
 		if (any) {
 			++found;
@@ -2487,10 +2531,10 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_amount, int *amount, any_vnum *vnum, bitvector_t *misc) {
 	extern const char *component_flags[];
 	extern const char *component_types[];
-	extern const bool quest_tracker_has_amount[];
+	extern const bool quest_tracker_amt_type[];
 	
 	char arg[MAX_INPUT_LENGTH]; 
-	bool need_bld = FALSE, need_component = FALSE;
+	bool need_abil = FALSE, need_bld = FALSE, need_component = FALSE;
 	bool need_mob = FALSE, need_obj = FALSE, need_quest = FALSE;
 	bool need_rmt = FALSE, need_sect = FALSE, need_skill = FALSE;
 	bool need_veh = FALSE, need_mob_flags = FALSE;
@@ -2552,10 +2596,14 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 			need_sect = TRUE;
 			break;
 		}
+		case QT_HAVE_ABILITY: {
+			need_abil = TRUE;
+			break;
+		}
 	}
 	
 	// possible args
-	if (quest_tracker_has_amount[type] && find_amount) {
+	if (quest_tracker_amt_type[type] != QT_AMT_NONE && find_amount) {
 		argument = any_one_arg(argument, arg);
 		if (!*arg || !isdigit(*arg) || (*amount = atoi(arg)) < 0) {
 			msg_to_char(ch, "You must provide an amount.\r\n");
@@ -2563,9 +2611,25 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 		}
 	}
 	
+	if (need_abil) {
+		argument = any_one_arg(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide an ability vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !find_ability_by_vnum(*vnum)) {
+			msg_to_char(ch, "Invalid ability vnum '%s'.\r\n", arg);
+			return FALSE;
+		}
+	}
+	
 	if (need_bld) {
 		argument = any_one_arg(argument, arg);
-		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !building_proto(*vnum)) {
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a building vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !building_proto(*vnum)) {
 			msg_to_char(ch, "Invalid building vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
@@ -2573,6 +2637,10 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 	if (need_component) {
 		argument = any_one_arg(argument, arg);
 		skip_spaces(&argument);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a component type.\r\n");
+			return FALSE;
+		}
 		if ((*vnum = search_block(arg, component_types, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Invalid component type '%s'.\r\n", arg);
 			return FALSE;
@@ -2583,7 +2651,11 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 	}
 	if (need_mob) {
 		argument = any_one_arg(argument, arg);
-		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !mob_proto(*vnum)) {
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a mob vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !mob_proto(*vnum)) {
 			msg_to_char(ch, "Invalid mobile vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
@@ -2597,42 +2669,66 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 	}
 	if (need_obj) {
 		argument = any_one_arg(argument, arg);
-		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !obj_proto(*vnum)) {
+		if (!*arg) {
+			msg_to_char(ch, "You must provide an object vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !obj_proto(*vnum)) {
 			msg_to_char(ch, "Invalid object vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
 	}
 	if (need_quest) {
 		argument = any_one_arg(argument, arg);
-		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !quest_proto(*vnum)) {
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a quest vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !quest_proto(*vnum)) {
 			msg_to_char(ch, "Invalid quest vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
 	}
 	if (need_rmt) {
 		argument = any_one_arg(argument, arg);
-		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !room_template_proto(*vnum)) {
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a room template vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !room_template_proto(*vnum)) {
 			msg_to_char(ch, "Invalid room template vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
 	}
 	if (need_sect) {
 		argument = any_one_arg(argument, arg);
-		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !sector_proto(*vnum)) {
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a sector vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !sector_proto(*vnum)) {
 			msg_to_char(ch, "Invalid sector vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
 	}
 	if (need_skill) {
 		argument = any_one_arg(argument, arg);
-		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !get_skill_name_by_vnum(*vnum)) {
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a skill vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !find_skill_by_vnum(*vnum)) {
 			msg_to_char(ch, "Invalid skill vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
 	}
 	if (need_veh) {
 		argument = any_one_arg(argument, arg);
-		if (!*arg || !isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !vehicle_proto(*vnum)) {
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a vehicle vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !vehicle_proto(*vnum)) {
 			msg_to_char(ch, "Invalid vehicle vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
@@ -2776,6 +2872,7 @@ void qedit_process_quest_tasks(char_data *ch, char *argument, struct quest_task 
 		// usage: qedit * change <number> vnum <number>
 		argument = any_one_arg(argument, num_arg);
 		argument = any_one_arg(argument, field_arg);
+		skip_spaces(&argument);
 		
 		if (!*num_arg || !isdigit(*num_arg) || !*field_arg) {
 			msg_to_char(ch, "Usage: %ss change <number> <amount | vnum> <value>\r\n", command);
@@ -2796,8 +2893,8 @@ void qedit_process_quest_tasks(char_data *ch, char *argument, struct quest_task 
 			msg_to_char(ch, "Invalid %s number.\r\n", command);
 		}
 		else if (is_abbrev(field_arg, "amount")) {
-			if (!isdigit(*vnum_arg) || (num = atoi(num_arg)) < 0) {
-				msg_to_char(ch, "Invalid amount '%s'.\r\n", num_arg);
+			if (!isdigit(*argument) || (num = atoi(argument)) < 0) {
+				msg_to_char(ch, "Invalid amount '%s'.\r\n", argument);
 				return;
 			}
 			else {
@@ -2820,11 +2917,81 @@ void qedit_process_quest_tasks(char_data *ch, char *argument, struct quest_task 
 			msg_to_char(ch, "You can only change the amount or vnum.\r\n");
 		}
 	}	// end 'change'
+	else if (is_abbrev(cmd_arg, "move")) {
+		struct quest_task *to_move, *prev, *a, *b, *a_next, *b_next, iitem;
+		bool up;
+		
+		// usage: tasks move <number> <up | down>
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, field_arg);
+		up = is_abbrev(field_arg, "up");
+		
+		if (!*num_arg || !*field_arg) {
+			msg_to_char(ch, "Usage: %ss move <number> <up | down>\r\n", command);
+		}
+		else if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid %s number.\r\n", command);
+		}
+		else if (!is_abbrev(field_arg, "up") && !is_abbrev(field_arg, "down")) {
+			msg_to_char(ch, "You must specify whether you're moving it up or down in the list.\r\n");
+		}
+		else if (up && num == 1) {
+			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
+		}
+		else {
+			// find the one to move
+			to_move = prev = NULL;
+			for (task = *list; task && !to_move; task = task->next) {
+				if (--num == 0) {
+					to_move = task;
+				}
+				else {
+					// store for next iteration
+					prev = task;
+				}
+			}
+			
+			if (!to_move) {
+				msg_to_char(ch, "Invalid %s number.\r\n", command);
+			}
+			else if (!up && !to_move->next) {
+				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
+			}
+			else {
+				// SUCCESS: "move" them by swapping data
+				if (up) {
+					a = prev;
+					b = to_move;
+				}
+				else {
+					a = to_move;
+					b = to_move->next;
+				}
+				
+				// store next pointers
+				a_next = a->next;
+				b_next = b->next;
+				
+				// swap data
+				iitem = *a;
+				*a = *b;
+				*b = iitem;
+				
+				// restore next pointers
+				a->next = a_next;
+				b->next = b_next;
+				
+				// message: re-atoi(num_arg) because we destroyed num finding our target
+				msg_to_char(ch, "You move %s %d %s.\r\n", command, atoi(num_arg), (up ? "up" : "down"));
+			}
+		}
+	}	// end 'move'
 	else {
 		msg_to_char(ch, "Usage: %ss add <type> <vnum>\r\n", command);
 		msg_to_char(ch, "Usage: %ss change <number> vnum <value>\r\n", command);
 		msg_to_char(ch, "Usage: %ss copy <from type> <from vnum> [tasks/prereqs]\r\n", command);
 		msg_to_char(ch, "Usage: %ss remove <number | all>\r\n", command);
+		msg_to_char(ch, "Usage: %ss move <number> <up | down>\r\n", command);
 	}
 }
 
@@ -3509,12 +3676,14 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	
 	// update other quests
 	HASH_ITER(hh, quest_table, qiter, next_qiter) {
+		// QT_x, QR_x: quest types
 		found = delete_quest_task_from_list(&QUEST_TASKS(qiter), QT_COMPLETED_QUEST, vnum);
 		found |= delete_quest_task_from_list(&QUEST_PREREQS(qiter), QT_COMPLETED_QUEST, vnum);
 		found |= delete_quest_task_from_list(&QUEST_TASKS(qiter), QT_NOT_COMPLETED_QUEST, vnum);
 		found |= delete_quest_task_from_list(&QUEST_PREREQS(qiter), QT_NOT_COMPLETED_QUEST, vnum);
 		found |= delete_quest_task_from_list(&QUEST_TASKS(qiter), QT_NOT_ON_QUEST, vnum);
 		found |= delete_quest_task_from_list(&QUEST_PREREQS(qiter), QT_NOT_ON_QUEST, vnum);
+		found |= delete_quest_reward_from_list(&QUEST_REWARDS(qiter), QR_QUEST_CHAIN, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(qiter), QST_IN_DEVELOPMENT);
@@ -3525,12 +3694,14 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	// remove from from active editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (GET_OLC_QUEST(desc)) {
+			// QT_x, QR_x: quest types
 			found = delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_COMPLETED_QUEST, vnum);
 			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_COMPLETED_QUEST, vnum);
 			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_NOT_COMPLETED_QUEST, vnum);
 			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_NOT_COMPLETED_QUEST, vnum);
 			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_NOT_ON_QUEST, vnum);
 			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_NOT_ON_QUEST, vnum);
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_QUEST_CHAIN, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
@@ -4112,7 +4283,11 @@ OLC_MODULE(qedit_rewards) {
 					break;	
 				}
 				case QR_OBJECT: {
-					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+					if (!*vnum_arg) {
+						msg_to_char(ch, "Usage: rewards add object <amount> <object vnum>\r\n");
+						return;
+					}
+					if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
 						msg_to_char(ch, "Invalid obj vnum '%s'.\r\n", vnum_arg);
 						return;
 					}
@@ -4124,13 +4299,32 @@ OLC_MODULE(qedit_rewards) {
 				case QR_SET_SKILL:
 				case QR_SKILL_EXP:
 				case QR_SKILL_LEVELS: {
-					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+					if (!*vnum_arg) {
+						msg_to_char(ch, "Usage: rewards add <set-skill | skill-exp | skill-levels> <level> <skill vnum>\r\n");
+						return;
+					}
+					if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
 						msg_to_char(ch, "Invalid skill vnum '%s'.\r\n", vnum_arg);
 						return;
 					}
 					if (find_skill_by_vnum(vnum)) {
 						ok = TRUE;
 					}
+					break;
+				}
+				case QR_QUEST_CHAIN: {
+					if (!*vnum_arg) {
+						strcpy(vnum_arg, num_arg);	// they may have omitted amount
+					}
+					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+						msg_to_char(ch, "Invalid quest vnum '%s'.\r\n", vnum_arg);
+						return;
+					}
+					if (quest_proto(vnum)) {
+						ok = TRUE;
+					}
+					// amount is not used here
+					num = 1;
 					break;
 				}
 			}
@@ -4231,6 +4425,16 @@ OLC_MODULE(qedit_rewards) {
 					}
 					break;
 				}
+				case QR_QUEST_CHAIN: {
+					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+						msg_to_char(ch, "Invalid quest vnum '%s'.\r\n", vnum_arg);
+						return;
+					}
+					if (quest_proto(vnum)) {
+						ok = TRUE;
+					}
+					break;
+				}
 			}
 			
 			// did we find one?
@@ -4246,11 +4450,81 @@ OLC_MODULE(qedit_rewards) {
 			msg_to_char(ch, "You can only change the amount or vnum.\r\n");
 		}
 	}	// end 'change'
+	else if (is_abbrev(cmd_arg, "move")) {
+		struct quest_reward *to_move, *prev, *a, *b, *a_next, *b_next, iitem;
+		bool up;
+		
+		// usage: rewards move <number> <up | down>
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, field_arg);
+		up = is_abbrev(field_arg, "up");
+		
+		if (!*num_arg || !*field_arg) {
+			msg_to_char(ch, "Usage: rewards move <number> <up | down>\r\n");
+		}
+		else if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid reward number.\r\n");
+		}
+		else if (!is_abbrev(field_arg, "up") && !is_abbrev(field_arg, "down")) {
+			msg_to_char(ch, "You must specify whether you're moving it up or down in the list.\r\n");
+		}
+		else if (up && num == 1) {
+			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
+		}
+		else {
+			// find the one to move
+			to_move = prev = NULL;
+			for (reward = *list; reward && !to_move; reward = reward->next) {
+				if (--num == 0) {
+					to_move = reward;
+				}
+				else {
+					// store for next iteration
+					prev = reward;
+				}
+			}
+			
+			if (!to_move) {
+				msg_to_char(ch, "Invalid reward number.\r\n");
+			}
+			else if (!up && !to_move->next) {
+				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
+			}
+			else {
+				// SUCCESS: "move" them by swapping data
+				if (up) {
+					a = prev;
+					b = to_move;
+				}
+				else {
+					a = to_move;
+					b = to_move->next;
+				}
+				
+				// store next pointers
+				a_next = a->next;
+				b_next = b->next;
+				
+				// swap data
+				iitem = *a;
+				*a = *b;
+				*b = iitem;
+				
+				// restore next pointers
+				a->next = a_next;
+				b->next = b_next;
+				
+				// message: re-atoi(num_arg) because we destroyed num finding our target
+				msg_to_char(ch, "You move reward %d %s.\r\n", atoi(num_arg), (up ? "up" : "down"));
+			}
+		}
+	}	// end 'move'
 	else {
 		msg_to_char(ch, "Usage: rewards add <type> <amount> <vnum/type>\r\n");
 		msg_to_char(ch, "Usage: rewards change <number> vnum <value>\r\n");
 		msg_to_char(ch, "Usage: rewards copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "Usage: rewards remove <number | all>\r\n");
+		msg_to_char(ch, "Usage: rewards move <number> <up | down>\r\n");
 	}
 }
 

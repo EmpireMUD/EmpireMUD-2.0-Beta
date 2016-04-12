@@ -361,6 +361,7 @@ void add_ability(char_data *ch, ability_data *abil, bool reset_levels) {
 		if (reset_levels) {
 			data->levels_gained = 0;
 		}
+		qt_change_ability(ch, ABIL_VNUM(abil));
 	}
 }
 
@@ -1122,6 +1123,8 @@ void remove_ability(char_data *ch, ability_data *abil, bool reset_levels) {
 			HASH_DEL(GET_ABILITY_HASH(ch), data);
 			free(data);
 		}
+		
+		qt_change_ability(ch, ABIL_VNUM(abil));
 	}
 }
 
