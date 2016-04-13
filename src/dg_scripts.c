@@ -2610,9 +2610,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (!IS_NPC(c)) {
 							int amt;
 							if (subfield && *subfield && (amt = atoi(subfield)) != 0) {
-								SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(ch), amt, 0, UCHAR_MAX, FALSE);
+								SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(c), amt, 0, UCHAR_MAX, FALSE);
 							}
-							snprintf(str, slen, "%d", GET_DAILY_BONUS_EXPERIENCE(ch));
+							snprintf(str, slen, "%d", GET_DAILY_BONUS_EXPERIENCE(c));
 						}
 						else {
 							strcpy(str, "0");
@@ -2699,7 +2699,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 						else {
-							snprintf(str, slen, "%s", SHOW_CLASS_NAME(ch));
+							snprintf(str, slen, "%s", SHOW_CLASS_NAME(c));
 						}
 					}
 					else if (!str_cmp(field, "cha") || !str_cmp(field, "charisma")) {
@@ -2758,7 +2758,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "dodge")) {
 						extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
-						snprintf(str, slen, "%d", get_dodge_modifier(ch, NULL, FALSE));
+						snprintf(str, slen, "%d", get_dodge_modifier(c, NULL, FALSE));
 					}
 					break;
 				}
