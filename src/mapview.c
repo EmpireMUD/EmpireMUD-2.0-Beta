@@ -902,13 +902,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		msg_to_char(ch, "Remaining to %s: %s\r\n", (IS_DISMANTLING(room) ? "Dismantle" : "Completion"), partialbuf);
 	}
 	
-	if (can_get_quest_from_room(ch, room, NULL)) {
-		msg_to_char(ch, "There is a quest here for you!\r\n");
-	}
-	if (can_turn_quest_in_to_room(ch, room, NULL)) {
-		msg_to_char(ch, "You can turn in a quest here!\r\n");
-	}
-	
 	if (BUILDING_BURNING(room)) {
 		msg_to_char(ch, "%sThe building is on fire!&0\r\n", BACKGROUND_RED);
 	}
@@ -917,6 +910,13 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 
 	if (!AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+		if (can_get_quest_from_room(ch, room, NULL)) {
+			msg_to_char(ch, "...there is a quest here for you!\r\n");
+		}
+		if (can_turn_quest_in_to_room(ch, room, NULL)) {
+			msg_to_char(ch, "...you can turn in a quest here!\r\n");
+		}
+	
 		/* now list characters & objects */
 		send_to_char("&g", ch);
 		list_obj_to_char(ROOM_CONTENTS(room), ch, OBJ_DESC_LONG, FALSE);
