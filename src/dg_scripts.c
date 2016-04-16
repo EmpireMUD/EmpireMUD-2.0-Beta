@@ -2996,10 +2996,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 
 					else if (!str_cmp(field, "is_hostile")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
-							if (!str_cmp("on", subfield)) {
+							if (!str_cmp("on", subfield) || *subfield == '1') {
 								add_cooldown(c, COOLDOWN_HOSTILE_FLAG, config_get_int("hostile_flag_time") * SECS_PER_REAL_MIN);
 							}
-							else if (!str_cmp("off", subfield)) {
+							else if (!str_cmp("off", subfield) || *subfield == '0') {
 								remove_cooldown_by_type(c, COOLDOWN_HOSTILE_FLAG);
 							}
 						}
@@ -3313,7 +3313,31 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'v': {	// char.v*
-					if (!str_cmp(field, "vnum")) {
+					if (!str_cmp(field, "vampire")) {
+						// subfield can change vampire status
+						if (subfield && *subfield) {
+							if ((!str_cmp("on", subfield) || *subfield == '1') && !IS_VAMPIRE(c)) {
+								if (!IS_NPC(c)) {
+									void make_vampire(char_data *ch, bool lore);
+									make_vampire(c, TRUE);
+								}
+								else {
+									SET_BIT(MOB_FLAGS(c), MOB_VAMPIRE);
+								}
+							}
+							else if ((!str_cmp("off", subfield) || *subfield == '0') && IS_VAMPIRE(c)) {
+								if (!IS_NPC(c)) {
+									REMOVE_BIT(PLR_FLAGS(c), PLR_VAMPIRE);
+								}
+								else {
+									REMOVE_BIT(MOB_FLAGS(c), MOB_VAMPIRE);
+								}
+							}
+						}
+						// echo whether or not they are a vampire
+						snprintf(str, slen, "%d", IS_VAMPIRE(c) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "vnum")) {
 						if (IS_NPC(c))
 							snprintf(str, slen, "%d", GET_MOB_VNUM(c));
 						else

@@ -425,6 +425,8 @@ When using field  - The variable returns:
    so, or returns 0 if there was no counterspell.
 &cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
    Useful when dealing with remote vars on players.
+&cvampire(on/off)&0 - Can change whether a player/mob is a vampire if on/off
+   provided; without those, just returns whether they are one or not.
 &cvnum&0 - The actor's virtual number.  
 &cwits&0 - The actor's Wits.
 &c<global>&0 - If the specified field is not a recognized one, the 
