@@ -2694,6 +2694,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
 						snprintf(str, slen, "%d", (troom && can_teleport_to(c, troom, TRUE)) ? 1 : 0);
 					}
+					else if (!str_cmp(field, "carrying")) {
+						snprintf(str, slen, "%d", IS_CARRYING_N(c));
+					}
 					else if (!str_cmp(field, "class")) {
 						if (IS_NPC(c) || !GET_CLASS(c)) {
 							*str = '\0';
@@ -3028,7 +3031,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'm': {	// char.m*
-					if (!str_cmp(field, "maxhitp") || !str_cmp(field, "maxhealth"))
+					if (!str_cmp(field, "maxcarrying")) {
+						snprintf(str, slen, "%d", CAN_CARRY_N(c));
+					}
+					else if (!str_cmp(field, "maxhitp") || !str_cmp(field, "maxhealth"))
 						snprintf(str, slen, "%d", GET_MAX_HEALTH(c));
 
 					else if (!str_cmp(field, "maxblood"))
