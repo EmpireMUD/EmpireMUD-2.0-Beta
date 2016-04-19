@@ -333,6 +333,7 @@ When using field  - The variable returns:
    defaults to current room).
 &ccan_teleport_room(room)&0 - Character can legally teleport in/out of the room
    (defaults to current room).
+&ccarrying&0 - Size of character's inventory (items carried).
 &ccha&0 - The actor's Charisma.
 &cclass&0 - The actor's class, as a string.
 &ccompleted_quest(vnum)% - Whether or not the player has completed and
@@ -388,6 +389,7 @@ When using field  - The variable returns:
 &cmana(amount)&0 - Add/subtract mana on the actor.
 &cmaster&0 - The master of the actor (as an id), or an empty return.
 &cmaxblood&0 - The maximum blood points of the actor.
+&cmaxcarrying&0 - Inventory size limit (total they can carry).
 &cmaxhealth&0 - The maximum hit points of the actor.
 &cmaxmana&0 - The maximum mana points of the actor.
 &cmaxmove&0 - The maximum movement points of the actor.
@@ -425,6 +427,8 @@ When using field  - The variable returns:
    so, or returns 0 if there was no counterspell.
 &cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
    Useful when dealing with remote vars on players.
+&cvampire(on/off)&0 - Can change whether a player/mob is a vampire if on/off
+   provided; without those, just returns whether they are one or not.
 &cvnum&0 - The actor's virtual number.  
 &cwits&0 - The actor's Wits.
 &c<global>&0 - If the specified field is not a recognized one, the 

@@ -1421,7 +1421,7 @@ extern char *get_vehicle_name_by_proto(obj_vnum vnum);
 #define SELF(sub, obj)  ((sub) == (obj))
 
 // this is sort of a config
-#define HAPPY_COLOR(cur, base)  (cur < base ? "&r" : (cur > base ? "&g" : "&0"))
+#define HAPPY_COLOR(cur, base)  ((cur) < (base) ? "&r" : ((cur) > (base) ? "&g" : "&0"))
 
 
 // supplementary math

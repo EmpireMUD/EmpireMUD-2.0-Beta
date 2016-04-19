@@ -41,9 +41,9 @@ A fluffy sheep is frolicking around.
 0 0 0 9
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
-I 2 1358 100.00 1  # SHEAR: some wool
-I 2 1358 50.00 1  # SHEAR: some wool
-I 2 1358 5.00 1  # SHEAR: some wool
+I 2 1358 100.00 1  # SHEAR: a bag of wool
+I 2 1358 50.00 1  # SHEAR: a bag of wool
+I 2 1358 5.00 1  # SHEAR: a bag of wool
 S
 #9005
 goat mountain~
@@ -437,11 +437,11 @@ A massive green dragon is here!
 0 0 0 9
 I 0 3012 100.00 10  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 4  # SKIN: a large skin
-I 4 171 50.00 1  # LOOT: a gold disc
-I 4 171 50.00 1  # LOOT: a gold disc
-I 4 171 50.00 1  # LOOT: a gold disc
-I 4 171 50.00 1  # LOOT: a gold disc
-I 4 171 50.00 1  # LOOT: a gold disc
+I 4 171 50.00 1  # LOOT: a gold ingot
+I 4 171 50.00 1  # LOOT: a gold ingot
+I 4 171 50.00 1  # LOOT: a gold ingot
+I 4 171 50.00 1  # LOOT: a gold ingot
+I 4 171 50.00 1  # LOOT: a gold ingot
 S
 #9061
 toad hypnotoad~
@@ -459,11 +459,11 @@ A mermaid swims along beside you!
 ~
 75 100 djlox 0
 0 0 6 16
-I 4 171 50.00 1  # LOOT: a gold disc
-I 4 171 50.00 1  # LOOT: a gold disc
-I 4 171 50.00 1  # LOOT: a gold disc
-I 4 171 50.00 1  # LOOT: a gold disc
-I 4 171 50.00 1  # LOOT: a gold disc
+I 4 171 50.00 1  # LOOT: a gold ingot
+I 4 171 50.00 1  # LOOT: a gold ingot
+I 4 171 50.00 1  # LOOT: a gold ingot
+I 4 171 50.00 1  # LOOT: a gold ingot
+I 4 171 50.00 1  # LOOT: a gold ingot
 S
 #9063
 sea turtle green~
@@ -473,5 +473,22 @@ A green sea turtle swims up for a breath of air.
 10 20 dejlo 0
 0 0 6 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+S
+#9064
+#n wanderer~
+#n the wanderer~
+#n is standing here.
+~
+30 50 dovw c
+0 0 0 15
+T 9064
+S
+#9065
+vampire feral starving~
+a feral vampire~
+A starving, feral vampire stalks through the shadows nearby.
+~
+75 100 cduvw c
+1 0 0 10
 S
 $

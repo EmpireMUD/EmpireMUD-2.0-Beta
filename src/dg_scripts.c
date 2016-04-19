@@ -2610,9 +2610,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (!IS_NPC(c)) {
 							int amt;
 							if (subfield && *subfield && (amt = atoi(subfield)) != 0) {
-								SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(ch), amt, 0, UCHAR_MAX, FALSE);
+								SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(c), amt, 0, UCHAR_MAX, FALSE);
 							}
-							snprintf(str, slen, "%d", GET_DAILY_BONUS_EXPERIENCE(ch));
+							snprintf(str, slen, "%d", GET_DAILY_BONUS_EXPERIENCE(c));
 						}
 						else {
 							strcpy(str, "0");
@@ -2694,12 +2694,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
 						snprintf(str, slen, "%d", (troom && can_teleport_to(c, troom, TRUE)) ? 1 : 0);
 					}
+					else if (!str_cmp(field, "carrying")) {
+						snprintf(str, slen, "%d", IS_CARRYING_N(c));
+					}
 					else if (!str_cmp(field, "class")) {
 						if (IS_NPC(c) || !GET_CLASS(c)) {
 							*str = '\0';
 						}
 						else {
-							snprintf(str, slen, "%s", SHOW_CLASS_NAME(ch));
+							snprintf(str, slen, "%s", SHOW_CLASS_NAME(c));
 						}
 					}
 					else if (!str_cmp(field, "cha") || !str_cmp(field, "charisma")) {
@@ -2758,7 +2761,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "dodge")) {
 						extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
-						snprintf(str, slen, "%d", get_dodge_modifier(ch, NULL, FALSE));
+						snprintf(str, slen, "%d", get_dodge_modifier(c, NULL, FALSE));
 					}
 					break;
 				}
@@ -2996,10 +2999,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 
 					else if (!str_cmp(field, "is_hostile")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
-							if (!str_cmp("on", subfield)) {
+							if (!str_cmp("on", subfield) || *subfield == '1') {
 								add_cooldown(c, COOLDOWN_HOSTILE_FLAG, config_get_int("hostile_flag_time") * SECS_PER_REAL_MIN);
 							}
-							else if (!str_cmp("off", subfield)) {
+							else if (!str_cmp("off", subfield) || *subfield == '0') {
 								remove_cooldown_by_type(c, COOLDOWN_HOSTILE_FLAG);
 							}
 						}
@@ -3028,7 +3031,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'm': {	// char.m*
-					if (!str_cmp(field, "maxhitp") || !str_cmp(field, "maxhealth"))
+					if (!str_cmp(field, "maxcarrying")) {
+						snprintf(str, slen, "%d", CAN_CARRY_N(c));
+					}
+					else if (!str_cmp(field, "maxhitp") || !str_cmp(field, "maxhealth"))
 						snprintf(str, slen, "%d", GET_MAX_HEALTH(c));
 
 					else if (!str_cmp(field, "maxblood"))
@@ -3313,7 +3319,31 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'v': {	// char.v*
-					if (!str_cmp(field, "vnum")) {
+					if (!str_cmp(field, "vampire")) {
+						// subfield can change vampire status
+						if (subfield && *subfield) {
+							if ((!str_cmp("on", subfield) || *subfield == '1') && !IS_VAMPIRE(c)) {
+								if (!IS_NPC(c)) {
+									void make_vampire(char_data *ch, bool lore);
+									make_vampire(c, TRUE);
+								}
+								else {
+									SET_BIT(MOB_FLAGS(c), MOB_VAMPIRE);
+								}
+							}
+							else if ((!str_cmp("off", subfield) || *subfield == '0') && IS_VAMPIRE(c)) {
+								if (!IS_NPC(c)) {
+									REMOVE_BIT(PLR_FLAGS(c), PLR_VAMPIRE);
+								}
+								else {
+									REMOVE_BIT(MOB_FLAGS(c), MOB_VAMPIRE);
+								}
+							}
+						}
+						// echo whether or not they are a vampire
+						snprintf(str, slen, "%d", IS_VAMPIRE(c) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "vnum")) {
 						if (IS_NPC(c))
 							snprintf(str, slen, "%d", GET_MOB_VNUM(c));
 						else
