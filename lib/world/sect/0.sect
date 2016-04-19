@@ -153,6 +153,8 @@ M
 9035 5.00 g
 M
 9039 5.00 g
+M
+9064 0.90 ad
 S
 #1
 Light Forest~
@@ -295,6 +297,8 @@ M
 9036 5.00 ch
 M
 9034 5.00 c
+M
+9064 0.90 ad
 S
 #2
 Forest~
@@ -409,6 +413,8 @@ M
 9036 5.00 ch
 M
 9034 5.00 c
+M
+9064 0.90 ad
 S
 #3
 Shady Forest~
@@ -511,6 +517,8 @@ M
 9036 5.00 ch
 M
 9034 5.00 c
+M
+9064 0.90 ad
 S
 #4
 Overgrown Forest~
@@ -637,6 +645,8 @@ M
 9036 5.00 ch
 M
 9034 5.00 c
+M
+9064 0.90 ad
 S
 #5
 River~
@@ -838,6 +848,8 @@ M
 201 5.00 bce
 M
 237 5.00 ce
+M
+9064 0.90 ad
 S
 #8
 Mountain~
@@ -957,6 +969,8 @@ M
 201 5.00 bce
 M
 237 5.00 ce
+M
+9064 0.90 ad
 S
 #10
 Building~
@@ -1095,6 +1109,8 @@ M
 201 5.00 bce
 M
 237 5.00 ce
+M
+9064 0.90 ad
 S
 #13
 Seeded Field~
@@ -1258,6 +1274,8 @@ M
 201 5.00 bce
 M
 237 5.00 ce
+M
+9064 0.90 ad
 S
 #15
 Jungle Field~
@@ -1588,6 +1606,8 @@ M
 201 5.00 bce
 M
 237 5.00 ce
+M
+9064 0.90 ad
 S
 #21
 Oasis~
@@ -1700,6 +1720,8 @@ M
 201 5.00 bce
 M
 237 5.00 ce
+M
+9064 0.90 ad
 S
 #22
 Sandy Trench~
@@ -1822,6 +1844,8 @@ M
 9036 5.00 ch
 M
 9034 5.00 c
+M
+9064 0.90 ad
 S
 #27
 Light Jungle~
@@ -2292,6 +2316,8 @@ M
 201 5.00 bce
 M
 237 5.00 ce
+M
+9064 0.90 ad
 S
 #71
 Irrigated Forest~
@@ -2419,6 +2445,8 @@ M
 201 5.00 bce
 M
 237 5.00 ce
+M
+9064 0.90 ad
 S
 #72
 Irrigated Jungle~
