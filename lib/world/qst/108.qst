@@ -171,7 +171,7 @@ forest, or get them by scraping trees.
 wonders aloud whether you'll be able to carry enough of them for the next part
 of the tutorial.
 ~
-14 0 0 25 -1
+15 0 0 25 -1
 A
 1 10802
 P
@@ -313,7 +313,7 @@ Z
 1 10802
 S
 #10809
-Collect More Materials~
+Collect Building Materials~
    Rosemary wants you to build a forge, which you'll need in order for your
 empire to really work metal. In addition to the iron ingots you already made,
 you also need to dig up some rocks and saw some lumber. You can saw the lumber
@@ -323,7 +323,7 @@ to build the whole forge.
 ~
 Rosemary inspects your building materials, and approves.
 ~
-19 0 0 25 -1
+21 0 0 25 -1
 A
 1 10802
 P
@@ -409,14 +409,14 @@ The Perfect Rock~
    Horation is looking for just the right rock to represent the Stone Age. It
 needs to be slightly gray or brown, between the size of a pea and the size of
 your fist, and either smooth or rough. Basically, any rock will do. You never
-know which one it will be.  
+know which one it will be.
    Note: Make sure you don't have Trade noskilled.
 ~
    Horation looks at the rock you've brought him. He measures it with fine
 brass calipers, weighs it on the scale, and even tastes the top of it. But,
 this just isn't the right rock, so he tells you to keep it.
 ~
-11 0 0 25 0
+12 0 0 25 0
 P
 10 6 0 14
 R
@@ -472,7 +472,7 @@ Note: Make sure you don't have Trade noskilled.
 ~
 Horation looks over each of the rocks and sticks, and seems to approve.
 ~
-19 0 0 25 -1
+20 0 0 25 -1
 A
 1 10826
 P
@@ -610,7 +610,7 @@ Return to Horation when you have all the items.
    Horation examines the materials you collected, and determines them to be
 correct.
 ~
-23 0 0 25 -1
+24 0 0 25 -1
 A
 1 10826
 P
@@ -885,5 +885,254 @@ Z
 1 10826
 Z
 1 10827
+S
+#10850
+Enter the Soulstream~
+   Enter the Soulstream and begin the EmpireMUD basic tutorial! This area will
+teach you the basics of EmpireMUD including how to find and complete quests.
+Use the following commands:
+ 1. quest start Enter the Soulstream
+ 2. enter soulstream
+ 3. quest track Enter the Soulstream
+ 4. quest finish Enter the Soulstream
+(You can abbreviate both commands and quest names.)
+~
+   Congratulations on completing the first tutorial quest. You found your way
+into the Soulstream! Look around to see who else has quests for you in here --
+different tutorials might be available based on which skills you started with.
+Don't worry, you can always learn new skills, too.
+~
+2 0 0 25 -1
+A
+2 10850
+R
+0 0 1
+W
+13 10850 0 1
+Z
+3 10850
+Z
+3 10851
+Z
+3 10852
+Z
+3 10853
+Z
+3 10854
+S
+#10851
+High Sorcery: Cast A Ritual~
+   The Spirit of Order wants you to practice your High Sorcery. This type of
+magic, which has been developed over the centuries by studious sorcerers,
+involves complex rituals and highly ordered magicks. For this tutorial, you
+need to learn the Ritual of Burdens.  
+ 1. Purchase the ability with 'skill buy Ritual of Burdens'.
+ 2. Cast the ritual inside the Soulstream with 'ritual burdens'.
+ 3. Wait for the ritual to complete.
+ 4. Return to the Spirit of Order.
+~
+You have performed a ritual and satisfied the Spirit of Order!
+~
+7 0 0 25 -1
+A
+1 10851
+P
+0 10850 0 1
+P
+10 2 0 49
+P
+9 2 0 1
+R
+5 2 1
+R
+0 0 1
+R
+2 10852 1
+R
+6 10859 1
+W
+10 2 0 49
+W
+11 0 0 1
+Z
+1 10851
+S
+#10852
+Survival: Dig Some Rocks~
+   The Spirit of the Wild would like you to dig up a rock and a flint stone.
+These basic items will be useful for making tools, and you can dig them up in
+most locations on the map. Find a suitable spot, type 'dig', and see what you
+can find. When you have a rock and a flint, return to the Spirit of the Wild.
+~
+   You have satisfied the Spirit of the Wild! Digging and gathering are good
+ways to learn low-level Survival. When you reach Survival 5, use 'skill buy
+Navigation' to improve your map.
+~
+5 d 0 25 -1
+A
+1 10852
+P
+0 10850 0 1
+P
+10 5 0 49
+P
+9 5 0 1
+R
+5 5 1
+R
+0 0 1
+R
+2 10852 1
+R
+6 10859 1
+W
+10 5 0 49
+W
+2 100 0 1
+W
+2 102 0 1
+Z
+1 10852
+S
+#10853
+Battle: Slay A Beast~
+   The Spirit of the Hunt wants you to practice your Battle skill by killing a
+wild animal. Exit the Soulstream and find an animal to hunt. You should pick a
+small one like a squirrel or prairie dog, as you might find larger animals to
+be too much trouble. Use the 'kill' command to attack the animal; you will
+continue to hit it until one of you defeats the other. When you have killed a
+small animal, skin it and bring its skin back to the Spirit of the Hunt. You
+may have to kill several animals to find a good skin.
+   You receive a stone skinning knife for this quest. Look at it to learn
+how to use it.
+~
+You have satisfied the Spirit of the Hunt!
+~
+4 d 0 25 -1
+A
+1 10853
+P
+0 10850 0 1
+P
+10 0 0 49
+P
+9 0 0 1
+R
+5 0 1
+R
+0 0 1
+R
+2 10852 1
+R
+6 10859 1
+T 10853
+W
+10 0 0 49
+W
+4 0 512 1
+W
+2 1350 0 1
+Z
+1 10853
+S
+#10855
+Stealth: Sneaking Silently~
+   The Spirit of Darkness will teach you to move unseen. The Sneak ability
+allows you to do this, although it isn't a guaranteed success at low levels. 
+You can't really tell whether or not you were successful at sneaking. But don't
+worry, you'll get better at it as you level up.  
+ 1. Purchase the ability with 'skill buy sneak'.
+ 2. Find the Spirit of Darkness again.
+ 3. Go to another room in the Soulstream.
+ 4. Move toward the Spirit of Darkness with 'sneak <direction>'.
+    (e.g. 'sneak west')
+ 5. If you were successful, this quest's tracker will show complete.
+ 6. Type 'quest track Stealth' to check.
+ 7. Repeatedly try to sneak up on the Spirit of Darkness until successful.
+ 8. When you succeed, turn in the quest using 'quest finish Stealth'.
+~
+You have satisfied the Spirit of Darkness with your stealth.
+~
+9 0 0 25 -1
+A
+1 10855
+P
+0 10850 0 1
+P
+10 4 0 49
+P
+9 4 0 1
+R
+5 4 1
+R
+0 0 1
+R
+2 10852 1
+R
+6 10859 1
+W
+10 4 0 49
+W
+11 0 0 1
+Z
+1 10855
+S
+#10856
+Empire: Early Harvest~
+   The Spirit of Progress wants to teach you to harvest crops, an essential
+step in building your empire. Harvesting is a good way to gain Empire skill at
+low levels, and will provide you with food or raw materials. You are provided a
+stone scythe for this quest, but most sharp weapons can be used to harvest.  
+ 1. Go out onto the map and find a crop tile like a wheat field or
+    a patch of vegetables. Orchards won't work for this, since they
+    use 'pick' instead of 'harvest'.
+ 2. Wield your scythe or other sharp weapon.
+ 3. Type 'harvest'. It will take a minute to finish.
+ 4. Return to the Spirit of Progress when you've harvested a crop.
+~
+You have satisfied the Spirit of Progress.
+~
+8 0 0 25 -1
+A
+1 10856
+P
+0 10850 0 1
+P
+10 1 0 49
+P
+9 1 0 1
+R
+5 1 1
+R
+0 0 1
+R
+2 10852 1
+R
+6 10859 1
+T 10852
+W
+10 1 0 49
+W
+11 0 0 1
+Z
+1 10856
+S
+#10859
+Complete More Tutorials~
+   Complete more of the tutorials in the Soulstream in order to earn enough
+spirit tokens for a special reward. Once you have four of the tokens, you can
+finish this quest anywhere.
+~
+   Congratulations! You've completed enough Soulstream tutorials to earn a
+special companion! Take this spirit bell, and use it any time you want to
+summon your non-combat minipet.
+~
+3 0 0 25 -1
+R
+2 10859 1
+W
+2 10852 0 4
+Z
+2 10852
 S
 $

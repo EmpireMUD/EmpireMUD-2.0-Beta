@@ -1611,7 +1611,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						CREATE(task, struct quest_task, 1);
 						task->type = i_in[0];
 						task->vnum = i_in[1];
-						task->misc = l_in[0];
+						task->misc = bit_in;
 						task->needed = i_in[2];
 						task->current = i_in[3];
 						

@@ -54,4 +54,26 @@ L
 10825 -1 -1
 9 c ekln
 S
+#52
+Tutorial Quests~
+Paul Clarke~
+   Learn the basics of EmpireMUD including its quests and skills. This short
+tutorial will help you find your way in the world, and will also lead you to
+some other tutorials.
+
+Instructions for EmpireMUD administrators:
+- Increase the instance limit to the number of Towers of Souls (starting
+locations) in your game.
+~
+10850 10899 0-50
+1 0 a 0
+L
+5 0
+43200 -1 -1
+-1 0 0
+L
+2 0
+18 10850 10851
+-1 0 0
+S
 $
