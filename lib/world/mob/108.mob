@@ -65,4 +65,79 @@ Curator Horation stands proudly next to the exhibit.
 T 10826
 T 10828
 S
+#10851
+spirit order~
+the Spirit of Order~
+The Spirit of Order picks and knits at the clouds.
+~
+0 0 d n
+0 0 27 15
+S
+#10852
+spirit wild~
+the Spirit of the Wild~
+The Spirit of the Wild comes screaming through the veil of clouds.
+~
+0 0 d n
+0 0 27 15
+S
+#10853
+spirit hunt~
+the Spirit of the Hunt~
+The Spirit of the Hunt is perched high above you.
+~
+0 0 d n
+0 0 27 15
+S
+#10854
+spirit mana~
+the Spirit of Mana~
+The Spirit of Mana takes the form of the clouds themselves.
+~
+0 0 d n
+0 0 27 15
+S
+#10855
+spirit darkness~
+the Spirit of Darkness~
+The Spirit of Darkness looms beyond the clouds.
+~
+0 0 d n
+0 0 27 15
+T 10855
+S
+#10856
+spirit progress~
+the Spirit of Progress~
+The Spirit of Progress marches through the stream.
+~
+0 0 d n
+0 0 27 15
+S
+#10857
+spirit blood~
+the Spirit of Blood~
+The Spirit of Blood pools beneath you.
+~
+0 0 d n
+0 0 27 15
+S
+#10858
+spirit innovation~
+the Spirit of Innovation~
+The Spirit of Innovation flows forth from the Soulstream.
+~
+0 0 d n
+0 0 27 15
+S
+#10859
+spirit companion friendly~
+a companion spirit~
+A friendly spirit is floating nearby.
+~
+1 1 bdoD n
+0 0 27 9
+T 9901
+T 9902
+S
 $

@@ -332,7 +332,7 @@ if (%healthprct% < 50) && (!%actor.vampire()% && !%actor.nohassle%)
   %send% %actor% &rSuddenly, a warm sensation touches your lips and a stream of blood flows down your throat...&0
   %send% %actor% &rAs the blood fills you, a strange sensation covers your body... The light in the distance turns blood-red and a hunger builds within you!&0
   nop %actor.vampire(on)%
-  dg_affect %self% STUN on 5
+  dg_affect %self% STUNNED on 5
 else
   %damage% %actor% 25
 end
