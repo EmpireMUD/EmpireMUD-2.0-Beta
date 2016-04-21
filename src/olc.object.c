@@ -350,9 +350,13 @@ char *list_one_object(obj_data *obj, bool detail) {
 * @param obj_vnum vnum The vnum to delete.
 */
 void olc_delete_object(char_data *ch, obj_vnum vnum) {
+	void complete_building(room_data *room);
 	extern bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
 	extern bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum portal_vnum);
+	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
+	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
+	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
 	void expire_trading_post_item(struct trading_post_data *tpd);
 	extern bool remove_obj_from_resource_list(struct resource_data **list, obj_vnum vnum);
 	void remove_object_from_table(obj_data *obj);
@@ -368,9 +372,11 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	sector_data *sect, *next_sect;
 	craft_data *craft, *next_craft;
 	morph_data *morph, *next_morph;
+	quest_data *quest, *next_quest;
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
 	crop_data *crop, *next_crop;
+	room_data *room, *next_room;
 	empire_data *emp, *next_emp;
 	char_data *mob, *next_mob;
 	adv_data *adv, *next_adv;
@@ -406,6 +412,45 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			}
 			
 			extract_obj(obj_iter);
+		}
+	}
+	
+	// remove from live resource lists: room resources
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (!COMPLEX_DATA(room)) {
+			continue;
+		}
+		
+		if (GET_BUILT_WITH(room)) {
+			remove_obj_from_resource_list(&GET_BUILT_WITH(room), vnum);
+		}
+		if (GET_BUILDING_RESOURCES(room)) {
+			remove_obj_from_resource_list(&GET_BUILDING_RESOURCES(room), vnum);
+			
+			if (!GET_BUILDING_RESOURCES(room)) {
+				// removing this resource finished the building
+				if (IS_DISMANTLING(room)) {
+					disassociate_building(room);
+				}
+				else {
+					complete_building(room);
+				}
+			}
+		}
+	}
+	
+	// remove from live resource lists: vehicle maintenance
+	LL_FOREACH(vehicle_list, veh) {
+		if (VEH_NEEDS_RESOURCES(veh)) {
+			remove_obj_from_resource_list(&VEH_NEEDS_RESOURCES(veh), vnum);
+			
+			if (!VEH_NEEDS_RESOURCES(veh)) {
+				// removing the resource finished the vehicle
+				if (VEH_FLAGGED(veh, VEH_INCOMPLETE)) {
+					REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
+					load_vtrigger(veh);
+				}
+			}
 		}
 	}
 	
@@ -579,6 +624,20 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// update quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_OBJECT, vnum);
+		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_OBJECT, vnum);
+		found |= delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_OBJECT, vnum);
+		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_GET_OBJECT, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_GET_OBJECT, vnum);
+		
+		if (found) {
+			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
 	// update room templates
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_OBJ, vnum);
@@ -606,6 +665,10 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	
 	// olc editor updates
 	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (desc->character && !IS_NPC(desc->character) && GET_ACTION_RESOURCES(desc->character)) {
+			remove_obj_from_resource_list(&GET_ACTION_RESOURCES(desc->character), vnum);
+		}
+		
 		if (GET_OLC_ADVENTURE(desc)) {
 			found = FALSE;
 			found |= delete_link_rule_by_portal(&(GET_OLC_ADVENTURE(desc)->linking), vnum);
@@ -705,7 +768,18 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				msg_to_char(desc->character, "One of the objects in an interaction for the item you're editing was deleted.\r\n");
 			}
 		}
+		if (GET_OLC_QUEST(desc)) {
+			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_OBJECT, vnum);
+			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_OBJECT, vnum);
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_OBJECT, vnum);
+			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_GET_OBJECT, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_GET_OBJECT, vnum);
 		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(desc, "An object used by the quest you are editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_ROOM_TEMPLATE(desc)) {
 			if (delete_from_spawn_template_list(&GET_OLC_ROOM_TEMPLATE(desc)->spawns, ADV_SPAWN_OBJ, vnum)) {
 				msg_to_char(desc->character, "One of the objects that spawns in the room template you're editing was deleted.\r\n");
@@ -738,6 +812,9 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_obj(char_data *ch, obj_vnum vnum) {
+	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
+	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
+	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
 	extern const byte interact_vnum_types[NUM_INTERACTS];
 	
 	char buf[MAX_STRING_LENGTH];
@@ -748,6 +825,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	archetype_data *arch, *next_arch;
 	craft_data *craft, *next_craft;
 	morph_data *morph, *next_morph;
+	quest_data *quest, *next_quest;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	augment_data *aug, *next_aug;
@@ -900,6 +978,23 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_OBJECT, vnum);
+		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_OBJECT, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_OBJECT, vnum);
+		any |= find_quest_task_in_list(QUEST_TASKS(quest), QT_GET_OBJECT, vnum);
+		any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_GET_OBJECT, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+		}
+	}
+	
 	// room templates
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 		any = FALSE;
@@ -996,11 +1091,11 @@ void update_live_obj_from_olc(obj_data *to_update, obj_data *old_proto, obj_data
 		extract_script(to_update, OBJ_TRIGGER);
 	}
 	if (to_update->proto_script && to_update->proto_script != old_proto->proto_script) {
-		free_proto_script(to_update, OBJ_TRIGGER);
+		free_proto_scripts(&to_update->proto_script);
 	}
 	
 	// re-attach scripts
-	copy_proto_script(new_proto, to_update, OBJ_TRIGGER);
+	to_update->proto_script = copy_trig_protos(new_proto->proto_script);
 	assign_triggers(to_update, OBJ_TRIGGER);
 }
 
@@ -1021,6 +1116,7 @@ void save_olc_object(descriptor_data *desc) {
 	struct obj_custom_message *ocm;
 	struct trading_post_data *tpd;
 	empire_data *emp, *next_emp;
+	struct quest_lookup *ql;
 	UT_hash_handle hh;
 	
 	// have a place to save it?
@@ -1088,7 +1184,7 @@ void save_olc_object(descriptor_data *desc) {
 	
 	// free old script?
 	if (proto->proto_script) {
-		free_proto_script(proto, OBJ_TRIGGER);
+		free_proto_scripts(&proto->proto_script);
 	}
 	
 	// timer must be converted
@@ -1099,9 +1195,13 @@ void save_olc_object(descriptor_data *desc) {
 
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
+	ql = proto->quest_lookups;	// save lookups
+	
 	*proto = *obj;
 	proto->vnum = vnum;	// ensure correct vnum
+	
 	proto->hh = hh;	// restore hash handle
+	proto->quest_lookups = ql;	// restore lookups
 	
 	// remove the reference to this so it won't be free'd
 	GET_OBJ_APPLIES(obj) = NULL;
@@ -1230,8 +1330,7 @@ obj_data *setup_olc_object(obj_data *input) {
 		
 		// copy scripts
 		SCRIPT(new) = NULL;
-		new->proto_script = NULL;
-		copy_proto_script(input, new, OBJ_TRIGGER);
+		new->proto_script = copy_trig_protos(input->proto_script);
 		
 		// update version number
 		OBJ_VERSION(new) += 1;
@@ -1434,6 +1533,13 @@ void olc_show_object(char_data *ch) {
 	}
 	else {
 		sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
+	}
+	
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+		sprintf(buf + strlen(buf), "<&yrequiresquest&0> [%d] %s\r\n", GET_OBJ_REQUIRES_QUEST(obj), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(obj)));
+	}
+	else {
+		sprintf(buf + strlen(buf), "<&yrequiresquest&0> none\r\n");
 	}
 	
 	olc_get_values_display(ch, buf1);
@@ -2242,6 +2348,32 @@ OLC_MODULE(oedit_quantity) {
 	}
 	else {
 		GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY) = olc_process_number(ch, argument, "quantity", "quantity", 0, 100, GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY));
+	}
+}
+
+
+OLC_MODULE(oedit_requiresquest) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	obj_vnum old = GET_OBJ_REQUIRES_QUEST(obj);
+	
+	if (!str_cmp(argument, "none") || atoi(argument) == NOTHING) {
+		GET_OBJ_REQUIRES_QUEST(obj) = NOTHING;
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It no longer requires a quest.\r\n");
+		}
+	}
+	else {
+		GET_OBJ_REQUIRES_QUEST(obj) = olc_process_number(ch, argument, "quest vnum", "requiresquest", 0, MAX_VNUM, GET_OBJ_REQUIRES_QUEST(obj));
+		if (!quest_proto(GET_OBJ_REQUIRES_QUEST(obj))) {
+			GET_OBJ_REQUIRES_QUEST(obj) = old;
+			msg_to_char(ch, "There is no quest with that vnum. Old value restored.\r\n");
+		}
+		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			msg_to_char(ch, "It now requires %s.\r\n", get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(obj)));
+		}
 	}
 }
 

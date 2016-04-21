@@ -1,0 +1,1138 @@
+#10800
+See Hugo For Advice~
+   Go see Royal Adviser Hugo for some free advice on empire management. You can
+only complete this quest if your Empire skill is under 15. If you still have
+the quest after that, type 'quest drop See Hugo' to get rid of it.
+   Note: Make sure you don't have Empire noskilled.
+~
+Hugo gives you some empire advice.
+~
+9 0 0 25 0
+P
+10 1 0 14
+R
+5 1 1
+W
+13 10803 0 1
+W
+10 1 0 14
+Z
+1 10803
+S
+#10801
+Start the Empire Tutorial~
+   Go find Ranger Clara at the Royal Planning Office (^^) and get started on
+chopping trees and building your Empire skill. This short tutorial will help
+you get started and teach you to make your first few buildings. These quests
+reward Empire skill levels and bonus experience.
+   Note: Make sure you don't have Empire noskilled.
+~
+You have found Ranger Clara!
+~
+10 0 0 25 -1
+A
+1 10800
+P
+10 1 0 49
+P
+5 10802 0 1
+P
+6 10802 0 1
+R
+6 10800 1
+R
+6 10802 1
+W
+13 10801 0 1
+Z
+1 10801
+S
+#10802
+Fell Some Trees~
+   Ranger Clara wants you to go out and chop 6 trees, and bring them back.
+If you don't have an axe:
+ 1. Dig up 2 rocks and gather 1 stick.
+ 2. Wield one rock and then 'chip rock' on the other until it is a
+    handaxe.
+ 3. Wield the handaxe and then 'craft handle'.
+ 4. Remove the handaxe and 'craft stone axe'.
+Steps to get trees:
+ 1. Find a Forest tile. Any temperate forest will do, but you can't use
+    desert or jungle wood for this quest.
+ 2. Wield your axe.
+ 3. Type 'chop'.
+ 4. Once you have 6 trees, return to Ranger Clara.
+Note: Make sure you don't have Empire noskilled.
+~
+   Clara is impressed with how quickly you chopped those trees. She doesn't
+want them for herself, though, so you can keep them for the next part of the
+tutorial.
+~
+16 0 0 25 -1
+A
+1 10801
+P
+10 1 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10800 1
+R
+6 10811 1
+R
+6 10803 1
+W
+6 10800 0 1
+W
+2 120 0 6
+Z
+1 10801
+S
+#10803
+Scrape The Trees~
+   Ranger Clara wants you to scrape off the trees so they can be used in
+construction. Use the scrape command to turn the trees into logs. When you're
+done, take them to Rosemary in the planning office.
+~
+Rosemary examines the logs you've scraped off, and gives you a nod of approval.
+~
+12 0 0 25 -1
+A
+1 10801
+P
+0 10802 0 1
+P
+9 1 0 1
+P
+10 1 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10800 1
+R
+6 10804 1
+W
+6 10800 0 1
+W
+2 124 0 6
+Z
+1 10802
+S
+#10804
+Build Your Cabin~
+Rosemary wants you to take those logs and build a cabin.
+ 1. Find a good spot to put your cabin. You need a tile to build it on, and
+      a tile for it to open onto.
+ 2. Chop down trees if you need to clear plains or desert to build on.
+ 3. Stand on the map tile where you want the cabin to be, and type:
+    'build cabin north' (or whichever direction you want it to face.
+ 4. If you have to stop building for any reason, you can just type 'build' to
+    start again.
+ 5. When you've put up all 6 logs, the cabin is complete!
+ 6. Return to the City Planner's office.
+(Hint: You can type 'build info cabin' to see the requirements.)
+~
+Rosemary seems pleased with your cabin.
+~
+15 0 0 25 -1
+A
+1 10802
+P
+0 10803 0 1
+P
+9 1 0 1
+P
+10 1 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10800 1
+R
+6 10805 1
+W
+6 10800 0 1
+W
+7 5101 0 1
+Z
+1 10802
+S
+#10805
+Collect 20 Sticks~
+   Rosemary wants you to collect some sticks. You can either gather them in the
+forest, or get them by scraping trees.
+~
+   Rosemary stifles a laugh at how you've filled your pack with sticks, and
+wonders aloud whether you'll be able to carry enough of them for the next part
+of the tutorial.
+~
+15 0 0 25 -1
+A
+1 10802
+P
+0 10804 0 1
+P
+9 1 0 1
+P
+10 1 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10800 1
+R
+6 10806 1
+W
+6 10800 0 1
+W
+1 25 0 20
+Z
+1 10802
+S
+#10806
+Build Storage Buildings~
+   Rosemary knows you'll need a place to store resources for your burgeoning
+empire. These buildings are easy to build, and you'll need to make several:
+ 1. A lumberyard to store your trees and lumber.
+ 2. A gravelpit to store your rocks and stone.
+ 3. A foundry to store and smelt ore.
+ 4. A quarry to get stone blocks.
+Return to the City Planner's office when you're done.
+(Hint: You can type 'build info lumberyard' to see what's required.)
+~
+Rosemary is proud of you for finishing so many buildings.
+~
+16 0 0 25 -1
+A
+1 10802
+P
+0 10805 0 1
+P
+9 1 0 1
+P
+10 1 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10800 1
+R
+6 10807 1
+W
+6 10800 0 1
+W
+7 5118 0 1
+W
+7 5117 0 1
+W
+7 5115 0 1
+W
+7 5122 0 1
+Z
+1 10802
+S
+#10807
+Build A Mine~
+   Rosemary wants you to scrape a few more trees and then head into the
+mountains to build a mine. You'll need mines in order to find ore. It doesn't
+matter which mountain tile you build the mine on, but be sure to build it
+facing off the mountain and onto flat land. If you learn Mountain Climbing
+later, you'll be able to build deeper in the mountain ranges and face your
+mines toward other Mountain tiles. Return to Rosemary's office when you're
+done.
+~
+Rosemary is pleased with your progress.
+~
+16 0 0 25 -1
+A
+1 10802
+P
+0 10806 0 1
+P
+9 1 0 1
+P
+10 1 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10800 1
+R
+6 10808 1
+W
+6 10800 0 1
+W
+7 5107 0 1
+Z
+1 10802
+S
+#10808
+Mine Some Iron~
+   In order to make your empire great, you must learn to work with metal. Mine
+some iron and smelt it into ingots, and then return to Rosemary.
+ 1. Build mines until you find one with iron ore.
+ 2. Wield a handaxe or pick to mine (chip rocks to make a handaxe if
+    you need one).
+ 3. Mine 20 iron ore.
+ 4. Go back to your Foundry.
+ 5. Smelt 10 iron ingots.
+ 6. Return to the City Planner's office.
+~
+Rosemary is impressed that you got the iron so fast.
+~
+18 0 0 25 -1
+A
+1 10802
+P
+0 10807 0 1
+P
+9 1 0 1
+P
+10 1 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10800 1
+R
+6 10809 1
+W
+6 10800 0 1
+W
+2 175 0 10
+Z
+1 10802
+S
+#10809
+Collect Building Materials~
+   Rosemary wants you to build a forge, which you'll need in order for your
+empire to really work metal. In addition to the iron ingots you already made,
+you also need to dig up some rocks and saw some lumber. You can saw the lumber
+at your lumberyard, from trees or logs. After you have these materials, come
+back to the City Planner's office and Rosemary will tell you what you'll need
+to build the whole forge.
+~
+Rosemary inspects your building materials, and approves.
+~
+21 0 0 25 -1
+A
+1 10802
+P
+0 10808 0 1
+P
+9 1 0 1
+P
+10 1 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10800 1
+R
+6 10810 1
+W
+6 10800 0 1
+W
+1 16 0 6
+W
+1 22 0 10
+Z
+1 10802
+S
+#10810
+Build A Forge~
+   Now that you know how to gather wood, rocks, and iron, it's time to build a
+forge. You need a forge to make nails, as well as weapons and armor. Collect
+the rest of the materials for the forge and then build it in your city. Return
+to Rosemary in the City Planning office when it's built.
+(Hint: Type 'build info forge' to see a list of resources required.)
+~
+   Rosemary congratulates you on building your forge. This is the end of the
+Empire tutorial. Now go forth, and rule the world!
+~
+19 0 0 25 -1
+A
+1 10802
+P
+0 10809 0 1
+P
+9 1 0 1
+P
+10 1 0 49
+R
+0 0 2
+R
+1 -1 50
+W
+7 5108 0 1
+Z
+1 10802
+S
+#10811
+A King's Quest~
+   The path to greatness is a long one, and your journey is only just
+beginning. For now, you should keep working on the tasks assigned by the Royal
+Planning Office. But if you choose to pursue the great calling of ruling your
+own empire, Royal Adviser Hugo will want to give you a small gift to help you
+on your way.
+~
+Royal Advisor Hugo congratulates you on your progress toward greatness.
+~
+1 0 0 50 -1
+A
+1 10801
+P
+0 10802 0 1
+R
+2 10800 1
+R
+1 -1 100
+R
+0 0 3
+W
+9 1 0 51
+Z
+1 10803
+S
+#10825
+The Perfect Rock~
+   Horation is looking for just the right rock to represent the Stone Age. It
+needs to be slightly gray or brown, between the size of a pea and the size of
+your fist, and either smooth or rough. Basically, any rock will do. You never
+know which one it will be.
+   Note: Make sure you don't have Trade noskilled.
+~
+   Horation looks at the rock you've brought him. He measures it with fine
+brass calipers, weighs it on the scale, and even tastes the top of it. But,
+this just isn't the right rock, so he tells you to keep it.
+~
+12 0 0 25 0
+P
+10 6 0 14
+R
+5 6 1
+W
+10 6 0 14
+W
+1 22 0 1
+Z
+1 10826
+S
+#10826
+Start the Trade Tutorial~
+   Find the cave where Curator Horation is trying to find artifacts to set up
+his Museum of Early Man &y/()\&0. This short tutorial will help you get started and
+teach you to gather crafting materials and make some basic items. These quests
+reward Trade skill levels and bonus experience.
+   Note: Make sure you don't have Trade noskilled.
+~
+You've found Horation and the Museum of Early Man!
+~
+12 0 0 25 -1
+A
+1 10825
+P
+10 6 0 49
+P
+5 10827 0 1
+P
+6 10827 0 1
+R
+6 10825 1
+R
+6 10827 1
+W
+13 10825 0 1
+Z
+1 10826
+S
+#10827
+Collect Basic Resources~
+   Horation explains that he is trying to open a museum to show off the
+accomplishments of Early Man that led to the first empires and the dawn of
+civilization. The real problem is that nobody will fund an archaeological dig
+to get artifacts for the museum. Horation is willing to pay you to craft some
+authentic artifacts for his displays.
+   Horation would like you to collect a few basic resources:
+ 1. Collect rocks by digging in plains, forest, or deserts. For this
+    quest, you need 7 ordinary rocks.
+ 2. Collect sticks by gathering in any forest or grove. You need 4.
+ 3. Return to Horation in the museum.
+Note: Make sure you don't have Trade noskilled.
+~
+Horation looks over each of the rocks and sticks, and seems to approve.
+~
+20 0 0 25 -1
+A
+1 10826
+P
+10 6 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10825 1
+R
+6 10836 1
+R
+6 10828 1
+W
+6 10825 0 1
+W
+2 100 0 7
+W
+1 25 0 4
+Z
+1 10826
+S
+#10828
+Make Stone Tools~
+The curator needs you to make some basic stone tools for the museum.
+Craft 3 handaxes and 3 spear heads:
+ 1. Wield one of your rocks and then use it by typing 'chip rock'.
+ 2. Continue chipping rocks until all 6 of your remaining rocks
+   have been chipped into handaxes.
+ 3. Chip 3 of the handaxes into smaller spear heads. Keep the
+    other 3 handaxes.
+Craft 4 handles:
+ 1. Wield a handaxe.
+ 2. Type 'craft 4 handle'.
+ 3. Remove the handaxe (you will need it to finish the quest).
+(Hint: Type 'craft info handle' to see more about the craft.)
+Return to Horation when you have it all.
+~
+   Horation looks thrilled at the quality of the authentic stone tools you have
+crafted, but he wants you to do a little bit more work on them before he puts
+them in the displays.
+~
+22 0 0 25 -1
+A
+1 10826
+P
+0 10827 0 1
+P
+9 6 0 1
+P
+10 6 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10825 1
+R
+6 10829 1
+W
+6 10825 0 1
+W
+2 181 0 3
+W
+2 186 0 3
+W
+2 919 0 4
+Z
+1 10826
+S
+#10829
+Make Axes and Spears~
+The curator needs more tools for the exhibit.
+Craft 2 stone axes:
+ 1. You should still have handaxes and handles from the previous quest. If
+    not, chip rocks until you have 2 handaxes, and craft 2 handles from sticks.
+ 2. Type 'craft 2 stone axe'.
+Craft 2 spears:
+ 1. You should still have spear heads and handles from the previous quest.
+ 2. Type 'craft 2 spear'.
+You also still need one more handaxe and spear head for the exhibit.
+Return to Horation when you have the items.
+~
+Horation thanks you profusely and takes the stone tools from you.
+~
+21 d 0 25 -1
+A
+1 10826
+P
+0 10828 0 1
+P
+9 6 0 1
+P
+10 6 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10825 1
+R
+6 10830 1
+W
+6 10825 0 1
+W
+2 181 0 1
+W
+2 186 0 1
+W
+2 2100 0 2
+W
+2 2129 0 2
+Z
+1 10826
+S
+#10830
+Collect More Materials~
+The curator wants you to collect some more advanced resources.
+Get 2 small leather:
+ 1. Kill small animals like squirrels, meerkats, or rabbits.
+ 2. Skin the corpses using a sharp weapon.
+ 3. Tan the small skins.
+Get 2 piles of clay:
+ 1. Dig in temperate terrain (fields and forests), or
+ 2. Build a claypit and dig there.
+    (hint: build info claypit)
+Get 1 stack of lumber:
+ 1. Build a lumberyard (hint: build info lumberyard).
+ 2. Saw a tree or log into lumber.
+Get 6 sticks:
+ 1. Gather in a forest or grove.
+Return to Horation when you have all the items.
+~
+   Horation examines the materials you collected, and determines them to be
+correct.
+~
+24 0 0 25 -1
+A
+1 10826
+P
+0 10829 0 1
+P
+9 6 0 1
+P
+10 6 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10825 1
+R
+6 10831 1
+W
+6 10825 0 1
+W
+1 15 16384 2
+W
+1 4 0 2
+W
+1 16 0 1
+W
+1 25 0 6
+Z
+1 10826
+S
+#10831
+Create Early Building Materials~
+   The curator would like you to create some of early man's best building
+materials using the supplies you collected. This will require the
+Basic Crafts ability. You can type 'skill trade' to see it.
+Make 2 ropes:
+ 1. If you haven't already, type 'skill buy basic crafts'.
+ 2. You should still have 2 small leather.
+ 3. Type 'craft 2 rope'.
+Make a pile of bricks:
+ 1. You need 2 clay and a fire. You can make a fire by lighting a tree.
+ 2. Type 'craft bricks'.
+Make a bound wooden column:
+ 1. You need 1 lumber and 6 sticks.
+ 2. Type 'craft bound wooden column'.
+Return to Horation when you've made the items.
+~
+Horation is impressed with your crafting skills.
+~
+24 d 0 25 -1
+A
+1 10826
+P
+0 10830 0 1
+P
+9 6 0 1
+P
+10 6 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10825 1
+R
+6 10832 1
+W
+6 10825 0 1
+W
+2 257 0 1
+W
+2 127 0 1
+W
+2 2035 0 2
+Z
+1 10826
+S
+#10832
+Examples of Early Sewing~
+The curator needs some examples of early sewn crafts.
+Steps:
+ 1. You need at least level 5 Trade skill.
+ 2. Type 'skill buy sew'.
+ 3. Type 'sew info whip' and 'sew info tent' to see what's needed.
+ 4. Collect the 10 large leather (tan large skins) and 2 sticks.
+ 5. Type 'sew whip' and 'sew tent' to make these items, one at a time.
+ 6. Return to Horation at the museum.
+~
+Horation is impressed with your crafting skills.
+~
+24 d 0 25 -1
+A
+1 10826
+P
+0 10831 0 1
+P
+9 6 0 1
+P
+10 6 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10825 1
+R
+6 10833 1
+W
+6 10825 0 1
+W
+2 2108 0 1
+W
+2 2036 0 1
+Z
+1 10826
+S
+#10833
+Examples of Early Pottery~
+The curator needs some examples of early pottery.
+Steps:
+ 1. You need at least level 10 Trade skill.
+ 2. Type 'skill buy pottery'.
+ 3. Use 'craft info' to figure out what you need for a pot, vessel,
+    and clay shield.
+ 4. Collect the 18 clay, 6 sticks, and 1 small leather.
+ 5. Craft each of the pottery items on the list.
+ 6. Return to Horation.
+~
+Horation is impressed with your crafting skills.
+~
+25 d 0 25 -1
+A
+1 10826
+P
+0 10832 0 1
+P
+9 6 0 1
+P
+10 6 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10825 1
+R
+6 10834 1
+W
+6 10825 0 1
+W
+2 251 0 1
+W
+2 254 0 1
+W
+2 2320 0 1
+Z
+1 10826
+S
+#10834
+Examples of Early Woodworking~
+The curator wants you to make some examples of early woodworking.
+Steps:
+ 1. You need at least 15 Trade skill.
+ 2. Type 'skill buy woodworking'.
+ 3. Use 'craft info' to see what is required for a walking stick,
+    a flute, and a lyre.
+ 4. Collect the stick and 2 lumber.
+ 5. Craft each of those items.
+ 6. Return to Horation.
+~
+Horation is impressed with your crafting skills.
+~
+24 d 0 25 -1
+A
+1 10826
+P
+0 10833 0 1
+P
+9 6 0 1
+P
+10 6 0 49
+R
+0 0 1
+R
+1 -1 25
+R
+6 10825 1
+R
+6 10835 1
+W
+6 10825 0 1
+W
+2 914 0 1
+W
+2 913 0 1
+W
+2 912 0 1
+Z
+1 10826
+S
+#10835
+Examples of Smithed Tools~
+The curator would like you to forge some metal tools.
+Steps:
+ 1. Type 'skill buy forge'.
+ 2. You will also need a Forge building. If you haven't already,
+    it's a good time to do the Empire tutorial quests at the
+    Royal Planning Office. Or, type 'build info forge'.
+ 3. You need a hammer to forge with. You can craft a stone
+    hammer from a rock and handle, if you need one.
+ 4. Use 'forge info' to see what's needed to make a hammer,
+    nails, and a pick. You will need to make a metal hammer
+    to complete the quest; that stone one isn't good enough
+    for Horation.
+ 5. Collect 4 common metal ingots (copper or iron) and 2
+    handles.
+ 6. Forge the items on the list.
+ 7. Return to Horation.
+~
+   Horation congratulates you for bringing him everything he needs to set up
+his Museum of Early Man. He begins hastily arranging items on the shelves, ever
+so careful not to disturb the authentic dust already there. This is the end of
+the tutorial.
+~
+25 d 0 25 -1
+A
+1 10826
+P
+0 10834 0 1
+P
+9 6 0 1
+P
+10 6 0 49
+R
+0 0 2
+R
+1 -1 50
+W
+2 2105 0 1
+W
+2 1306 0 1
+W
+2 2110 0 1
+Z
+1 10826
+S
+#10836
+A Master's Journey~
+   The journey to becoming a master craftsman is long and difficult, and this
+is only the beginning. For now, help Horation build his Museum of Early Man.
+But if you choose to seek out mastery of your craft, return to Horation's
+museum for a small gift to help you on your way.
+~
+   Curator Horation congratulates you on the progress you've made on your
+journey to becoming a master craftsman.
+~
+3 0 0 50 -1
+A
+1 10826
+A
+1 10827
+P
+0 10827 0 1
+R
+2 10825 1
+R
+1 -1 100
+R
+0 0 3
+W
+9 6 0 51
+Z
+1 10826
+Z
+1 10827
+S
+#10850
+Enter the Soulstream~
+   Enter the Soulstream and begin the EmpireMUD basic tutorial! This area will
+teach you the basics of EmpireMUD including how to find and complete quests.
+Use the following commands:
+ 1. quest start Enter the Soulstream
+ 2. enter soulstream
+ 3. quest track Enter the Soulstream
+ 4. quest finish Enter the Soulstream
+(You can abbreviate both commands and quest names.)
+~
+   Congratulations on completing the first tutorial quest. You found your way
+into the Soulstream! Look around to see who else has quests for you in here --
+different tutorials might be available based on which skills you started with.
+Don't worry, you can always learn new skills, too.
+~
+2 0 0 25 -1
+A
+2 10850
+R
+0 0 1
+W
+13 10850 0 1
+Z
+3 10850
+Z
+3 10851
+Z
+3 10852
+Z
+3 10853
+Z
+3 10854
+S
+#10851
+High Sorcery: Cast A Ritual~
+   The Spirit of Order wants you to practice your High Sorcery. This type of
+magic, which has been developed over the centuries by studious sorcerers,
+involves complex rituals and highly ordered magicks. For this tutorial, you
+need to learn the Ritual of Burdens.  
+ 1. Purchase the ability with 'skill buy Ritual of Burdens'.
+ 2. Cast the ritual inside the Soulstream with 'ritual burdens'.
+ 3. Wait for the ritual to complete.
+ 4. Return to the Spirit of Order.
+~
+You have performed a ritual and satisfied the Spirit of Order!
+~
+7 0 0 25 -1
+A
+1 10851
+P
+0 10850 0 1
+P
+10 2 0 49
+P
+9 2 0 1
+R
+5 2 1
+R
+0 0 1
+R
+2 10852 1
+R
+6 10859 1
+W
+10 2 0 49
+W
+11 0 0 1
+Z
+1 10851
+S
+#10852
+Survival: Dig Some Rocks~
+   The Spirit of the Wild would like you to dig up a rock and a flint stone.
+These basic items will be useful for making tools, and you can dig them up in
+most locations on the map. Find a suitable spot, type 'dig', and see what you
+can find. When you have a rock and a flint, return to the Spirit of the Wild.
+~
+   You have satisfied the Spirit of the Wild! Digging and gathering are good
+ways to learn low-level Survival. When you reach Survival 5, use 'skill buy
+Navigation' to improve your map.
+~
+5 d 0 25 -1
+A
+1 10852
+P
+0 10850 0 1
+P
+10 5 0 49
+P
+9 5 0 1
+R
+5 5 1
+R
+0 0 1
+R
+2 10852 1
+R
+6 10859 1
+W
+10 5 0 49
+W
+2 100 0 1
+W
+2 102 0 1
+Z
+1 10852
+S
+#10853
+Battle: Slay A Beast~
+   The Spirit of the Hunt wants you to practice your Battle skill by killing a
+wild animal. Exit the Soulstream and find an animal to hunt. You should pick a
+small one like a squirrel or prairie dog, as you might find larger animals to
+be too much trouble. Use the 'kill' command to attack the animal; you will
+continue to hit it until one of you defeats the other. When you have killed a
+small animal, skin it and bring its skin back to the Spirit of the Hunt. You
+may have to kill several animals to find a good skin.
+   You receive a stone skinning knife for this quest. Look at it to learn
+how to use it.
+~
+You have satisfied the Spirit of the Hunt!
+~
+4 d 0 25 -1
+A
+1 10853
+P
+0 10850 0 1
+P
+10 0 0 49
+P
+9 0 0 1
+R
+5 0 1
+R
+0 0 1
+R
+2 10852 1
+R
+6 10859 1
+T 10853
+W
+10 0 0 49
+W
+4 0 512 1
+W
+2 1350 0 1
+Z
+1 10853
+S
+#10855
+Stealth: Sneaking Silently~
+   The Spirit of Darkness will teach you to move unseen. The Sneak ability
+allows you to do this, although it isn't a guaranteed success at low levels. 
+You can't really tell whether or not you were successful at sneaking. But don't
+worry, you'll get better at it as you level up.  
+ 1. Purchase the ability with 'skill buy sneak'.
+ 2. Find the Spirit of Darkness again.
+ 3. Go to another room in the Soulstream.
+ 4. Move toward the Spirit of Darkness with 'sneak <direction>'.
+    (e.g. 'sneak west')
+ 5. If you were successful, this quest's tracker will show complete.
+ 6. Type 'quest track Stealth' to check.
+ 7. Repeatedly try to sneak up on the Spirit of Darkness until successful.
+ 8. When you succeed, turn in the quest using 'quest finish Stealth'.
+~
+You have satisfied the Spirit of Darkness with your stealth.
+~
+9 0 0 25 -1
+A
+1 10855
+P
+0 10850 0 1
+P
+10 4 0 49
+P
+9 4 0 1
+R
+5 4 1
+R
+0 0 1
+R
+2 10852 1
+R
+6 10859 1
+W
+10 4 0 49
+W
+11 0 0 1
+Z
+1 10855
+S
+#10856
+Empire: Early Harvest~
+   The Spirit of Progress wants to teach you to harvest crops, an essential
+step in building your empire. Harvesting is a good way to gain Empire skill at
+low levels, and will provide you with food or raw materials. You are provided a
+stone scythe for this quest, but most sharp weapons can be used to harvest.  
+ 1. Go out onto the map and find a crop tile like a wheat field or
+    a patch of vegetables. Orchards won't work for this, since they
+    use 'pick' instead of 'harvest'.
+ 2. Wield your scythe or other sharp weapon.
+ 3. Type 'harvest'. It will take a minute to finish.
+ 4. Return to the Spirit of Progress when you've harvested a crop.
+~
+You have satisfied the Spirit of Progress.
+~
+8 0 0 25 -1
+A
+1 10856
+P
+0 10850 0 1
+P
+10 1 0 49
+P
+9 1 0 1
+R
+5 1 1
+R
+0 0 1
+R
+2 10852 1
+R
+6 10859 1
+T 10852
+W
+10 1 0 49
+W
+11 0 0 1
+Z
+1 10856
+S
+#10859
+Complete More Tutorials~
+   Complete more of the tutorials in the Soulstream in order to earn enough
+spirit tokens for a special reward. Once you have four of the tokens, you can
+finish this quest anywhere.
+~
+   Congratulations! You've completed enough Soulstream tutorials to earn a
+special companion! Take this spirit bell, and use it any time you want to
+summon your non-combat minipet.
+~
+3 0 0 25 -1
+R
+2 10859 1
+W
+2 10852 0 4
+Z
+2 10852
+S
+$

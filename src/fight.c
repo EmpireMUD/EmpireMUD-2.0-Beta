@@ -863,8 +863,9 @@ obj_data *die(char_data *ch, char_data *killer) {
 	void despawn_charmies(char_data *ch);
 	void kill_empire_npc(char_data *ch);
 	
-	char_data *ch_iter;
+	char_data *ch_iter, *player;
 	obj_data *corpse = NULL;
+	struct mob_tag *tag;
 	
 	// no need to repeat
 	if (EXTRACTED(ch)) {
@@ -942,6 +943,13 @@ obj_data *die(char_data *ch, char_data *killer) {
 	
 	// expand tags, if there are any
 	expand_mob_tags(ch);
+	
+	// mark killed
+	LL_FOREACH(MOB_TAGGED_BY(ch), tag) {
+		if ((player = is_playing(tag->idnum))) {
+			qt_kill_mob(player, ch);
+		}
+	}
 
 	drop_loot(ch, killer);
 	if (MOB_FLAGGED(ch, MOB_UNDEAD)) {
@@ -1177,6 +1185,7 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 	
 	// move character
 	char_to_room(ch, loc);
+	qt_visit_room(ch, IN_ROOM(ch));
 	
 	// take care of the corpse
 	if ((corpse = find_obj(GET_LAST_CORPSE_ID(ch))) && IS_CORPSE(corpse)) {
@@ -1318,7 +1327,7 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 
 	/* Now we're sure we can hit this person: gets worse with dex */
 	if (!AWAKE(ch) || !number(0, MAX(0, (GET_DEXTERITY(ch)/2) - 1))) {
-		dam = 15 + (BUILDING_VNUM(from_room) == BUILDING_GUARD_TOWER2 ? 5 : 0) + (BUILDING_VNUM(from_room) == BUILDING_GUARD_TOWER3 ? 5 : 0);
+		dam = 15 + (ROOM_BLD_FLAGGED(from_room, BLD_UPGRADED) ? 5 : 0);
 	}
 	else {
 		dam = 0;
@@ -1363,7 +1372,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	}
 	
 	// basic guard tower only shoots 2
-	if (distance > 2 && BUILDING_VNUM(from_room) == BUILDING_GUARD_TOWER) {
+	if (distance > 2 && !ROOM_BLD_FLAGGED(from_room, BLD_UPGRADED)) {
 		return FALSE;
 	}
 	
@@ -1549,8 +1558,8 @@ void update_guard_towers(void) {
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
 			tower = ter->room;
-			// TODO this could be a flag... guard towers need some work
-			if (BUILDING_VNUM(tower) == BUILDING_GUARD_TOWER || BUILDING_VNUM(tower) == BUILDING_GUARD_TOWER2 || BUILDING_VNUM(tower) == BUILDING_GUARD_TOWER3) {
+			
+			if (HAS_FUNCTION(tower, FNC_GUARD_TOWER) && IS_COMPLETE(tower)) {
 				process_tower(tower);
 			}
 		}
@@ -2241,6 +2250,11 @@ bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
 		
 		vehicle_from_room(veh);	// remove from room first to destroy anything inside
 		fully_empty_vehicle(veh);
+		
+		if (VEH_OWNER(veh) && VEH_IS_COMPLETE(veh)) {
+			qt_empire_players(VEH_OWNER(veh), qt_lose_vehicle, VEH_VNUM(veh));
+		}
+		
 		extract_vehicle(veh);
 		return FALSE;
 	}
@@ -3280,7 +3294,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	
 	if (success && AWAKE(FIGHTING(ch)) && has_ability(FIGHTING(ch), ABIL_BLOCK_ARROWS)) {
 		block = check_block(FIGHTING(ch), ch, TRUE);
-		if (can_gain_exp_from(FIGHTING(ch), ch)) {
+		if (GET_EQ(FIGHTING(ch), WEAR_HOLD) && IS_SHIELD(GET_EQ(FIGHTING(ch), WEAR_HOLD)) && can_gain_exp_from(FIGHTING(ch), ch)) {
 			gain_ability_exp(FIGHTING(ch), ABIL_BLOCK_ARROWS, 2);
 		}
 	}

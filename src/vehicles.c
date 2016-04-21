@@ -110,6 +110,7 @@ void fully_empty_vehicle(vehicle_data *veh) {
 				act("You are ejected from $V!", FALSE, ch, NULL, veh, TO_CHAR);
 				if (IN_ROOM(veh)) {
 					char_to_room(ch, IN_ROOM(veh));
+					qt_visit_room(ch, IN_ROOM(ch));
 					look_at_room(ch);
 					act("$n is ejected from $V!", TRUE, ch, NULL, veh, TO_ROOM);
 				}
@@ -711,12 +712,16 @@ char *list_one_vehicle(vehicle_data *veh, bool detail) {
 * @param any_vnum vnum The vehicle vnum.
 */
 void olc_search_vehicle(char_data *ch, any_vnum vnum) {
+	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh = vehicle_proto(vnum);
 	craft_data *craft, *next_craft;
+	quest_data *quest, *next_quest;
 	room_template *rmt, *next_rmt;
 	struct adventure_spawn *asp;
 	int size, found;
+	bool any;
 	
 	if (!veh) {
 		msg_to_char(ch, "There is no vehicle %d.\r\n", vnum);
@@ -731,6 +736,20 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 		if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		}
+	}
+	
+	// quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_quest_task_in_list(QUEST_TASKS(quest), QT_OWN_VEHICLE, vnum);
+		any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_OWN_VEHICLE, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -797,7 +816,7 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	add_to_lookup_table(GET_ID(veh), (void *)veh);
 	
 	if (with_triggers) {
-		copy_proto_script(proto, veh, VEH_TRIGGER);
+		veh->proto_script = copy_trig_protos(proto->proto_script);
 		assign_triggers(veh, VEH_TRIGGER);
 	}
 	else {
@@ -1355,7 +1374,7 @@ void free_vehicle(vehicle_data *veh) {
 		extract_script(veh, VEH_TRIGGER);
 	}
 	if (veh->proto_script && (!proto || veh->proto_script != proto->proto_script)) {
-		free_proto_script(veh, VEH_TRIGGER);
+		free_proto_scripts(&veh->proto_script);
 	}
 	
 	// attributes
@@ -1452,7 +1471,7 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 			}
 			
 			case 'T': {	// trigger
-				dg_read_trigger(line, veh, VEH_TRIGGER);
+				parse_trig_proto(line, &(veh->proto_script), error);
 				break;
 			}
 			
@@ -1496,8 +1515,8 @@ void write_vehicle_index(FILE *fl) {
 * @param vehicle_data *veh The thing to save.
 */
 void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
-	void script_save_to_disk(FILE *fp, void *item, int type);
 	void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
+	void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 	
 	char temp[MAX_STRING_LENGTH];
 	
@@ -1537,7 +1556,7 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	write_resources_to_file(fl, 'R', VEH_YEARLY_MAINTENANCE(veh));
 	
 	// T, V: triggers
-	script_save_to_disk(fl, veh, VEH_TRIGGER);
+	write_trig_protos_to_file(fl, 'T', veh->proto_script);
 	
 	// end
 	fprintf(fl, "S\n");
@@ -1798,9 +1817,11 @@ vehicle_data *create_vehicle_table_entry(any_vnum vnum) {
 */
 void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
+	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
 	
 	vehicle_data *veh, *iter, *next_iter;
 	craft_data *craft, *next_craft;
+	quest_data *quest, *next_quest;
 	room_template *rmt, *next_rmt;
 	descriptor_data *desc;
 	bool found;
@@ -1843,6 +1864,17 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		found = delete_quest_task_from_list(&QUEST_TASKS(quest), QT_OWN_VEHICLE, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_OWN_VEHICLE, vnum);
+		
+		if (found) {
+			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
 	// update room templates
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_VEH, vnum);
@@ -1863,6 +1895,15 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
 				msg_to_char(desc->character, "The vehicle made by the craft you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_QUEST(desc)) {
+			found = delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_OWN_VEHICLE, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_OWN_VEHICLE, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A vehicle used by the quest you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_ROOM_TEMPLATE(desc)) {
@@ -1950,11 +1991,11 @@ void save_olc_vehicle(descriptor_data *desc) {
 			extract_script(iter, VEH_TRIGGER);
 		}
 		if (iter->proto_script && iter->proto_script != proto->proto_script) {
-			free_proto_script(iter, VEH_TRIGGER);
+			free_proto_scripts(&iter->proto_script);
 		}
 		
 		// re-attach scripts
-		copy_proto_script(veh, iter, VEH_TRIGGER);
+		iter->proto_script = copy_trig_protos(veh->proto_script);
 		assign_triggers(iter, VEH_TRIGGER);
 		
 		// sanity checks
@@ -1986,7 +2027,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 	
 	// free old script?
 	if (proto->proto_script) {
-		free_proto_script(proto, VEH_TRIGGER);
+		free_proto_scripts(&proto->proto_script);
 	}
 	
 	// save data back over the proto-type
@@ -2032,8 +2073,7 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 		
 		// copy scripts
 		SCRIPT(new) = NULL;
-		new->proto_script = NULL;
-		copy_proto_script(input, new, VEH_TRIGGER);
+		new->proto_script = copy_trig_protos(input->proto_script);
 	}
 	else {
 		// brand new: some defaults

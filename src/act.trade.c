@@ -69,16 +69,16 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	bool wait, room_wait;
 	
 	// type checks
-	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MILL) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && (!HAS_FUNCTION(IN_ROOM(ch), FNC_MILL) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need to be in a mill to do that.\r\n");
 	}
-	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_PRESS) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS && (!HAS_FUNCTION(IN_ROOM(ch), FNC_PRESS) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need a press to do that.\r\n");
 	}
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !can_forge(ch)) {
 		// sends its own message
 	}
-	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT && ((!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_FORGE) && BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_FOUNDRY) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT && (!HAS_FUNCTION(IN_ROOM(ch), FNC_SMELT) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can't %s here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 	
@@ -101,22 +101,22 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_FIRE | CRAFT_ALCHEMY) && !has_cooking_fire(ch)) {
 		msg_to_char(ch, "You need a good fire to do that.\r\n");
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER) && (BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_CARPENTER || !IS_COMPLETE(IN_ROOM(ch)))) {
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER) && (!HAS_FUNCTION(IN_ROOM(ch), FNC_CARPENTER) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need to %s that at the carpenter!\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHIPYARD) && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_SHIPYARD) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHIPYARD) && (!HAS_FUNCTION(IN_ROOM(ch), FNC_SHIPYARD) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need to %s that at the shipyard!\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_BLD_UPGRADED) && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_UPGRADED) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "The building needs to be upgraded to %s that!\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_GLASSBLOWER) && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_GLASSBLOWER) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_GLASSBLOWER) && (!HAS_FUNCTION(IN_ROOM(ch), FNC_GLASSBLOWER) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need to %s that at the glassblower!\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP) && !find_water_container(ch, ch->carrying) && !find_water_container(ch, ROOM_CONTENTS(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need a container of water to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_ALCHEMY) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ALCHEMIST) && !has_tech_available(ch, TECH_GLASSBLOWING)) {
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_ALCHEMY) && !HAS_FUNCTION(IN_ROOM(ch), FNC_ALCHEMIST) && !has_tech_available(ch, TECH_GLASSBLOWING)) {
 		// sends its own messages -- needs glassblowing unless in alchemist room
 	}
 	// end flag checks
@@ -140,7 +140,7 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 bool can_forge(char_data *ch) {
 	bool ok = FALSE;
 	
-	if (!IS_IMMORTAL(ch) && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_FORGE) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (!IS_IMMORTAL(ch) && (!HAS_FUNCTION(IN_ROOM(ch), FNC_FORGE) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need to be in a forge to do that.\r\n");
 	}
 	else if (!has_hammer(ch)) {
@@ -831,6 +831,9 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
 		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
 		act("$V is finished!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
+		if (VEH_OWNER(veh)) {
+			qt_empire_players(VEH_OWNER(veh), qt_gain_vehicle, VEH_VNUM(veh));
+		}
 		
 		// stop all actors on this type
 		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
@@ -888,7 +891,7 @@ void process_gen_craft(char_data *ch) {
 		}
 		
 		// tailor bonus for weave
-		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAILOR) && IS_COMPLETE(IN_ROOM(ch))) {
+		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && HAS_FUNCTION(IN_ROOM(ch), FNC_TAILOR) && IS_COMPLETE(IN_ROOM(ch))) {
 			GET_ACTION_TIMER(ch) -= 3;
 		}
 
@@ -943,7 +946,7 @@ const struct {
 bool can_refashion(char_data *ch) {
 	bool ok = FALSE;
 	
-	if (!IS_IMMORTAL(ch) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAILOR)) {
+	if (!IS_IMMORTAL(ch) && !HAS_FUNCTION(IN_ROOM(ch), FNC_TAILOR)) {
 		msg_to_char(ch, "You need to be at the tailor to do that.\r\n");
 	}
 	else {
@@ -1379,7 +1382,7 @@ ACMD(do_gen_craft) {
 		timer = GET_CRAFT_TIME(type);
 		
 		// potter building bonus	
-		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_POTTERY) && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_POTTER) && IS_COMPLETE(IN_ROOM(ch))) {
+		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_POTTERY) && HAS_FUNCTION(IN_ROOM(ch), FNC_POTTER) && IS_COMPLETE(IN_ROOM(ch))) {
 			timer /= 4;
 		}
 		

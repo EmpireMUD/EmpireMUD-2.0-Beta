@@ -305,6 +305,14 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				}
 				break;
 			}
+			case 'Q': {
+				if (OBJ_FILE_TAG(line, "Quest:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						GET_OBJ_REQUIRES_QUEST(obj) = i_in[0];
+					}
+				}
+				break;
+			}
 			case 'S': {
 				if (OBJ_FILE_TAG(line, "Short-desc:", length)) {
 					if (GET_OBJ_SHORT_DESC(obj) && (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
@@ -520,6 +528,9 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	}
 	if (!proto || GET_OBJ_MAX_SCALE_LEVEL(obj) != GET_OBJ_MAX_SCALE_LEVEL(proto)) {
 		fprintf(fl, "Max-scale: %d\n", GET_OBJ_MAX_SCALE_LEVEL(obj));
+	}
+	if (!proto || GET_OBJ_REQUIRES_QUEST(obj) != GET_OBJ_REQUIRES_QUEST(proto)) {
+		fprintf(fl, "Quest: %d\n", GET_OBJ_REQUIRES_QUEST(obj));
 	}
 
 	if (obj->last_empire_id != NOTHING) {

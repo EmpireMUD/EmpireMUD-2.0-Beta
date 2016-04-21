@@ -27,38 +27,16 @@
 #define BUILDING_FENCE  5112
 #define BUILDING_GATE  5113
 
-#define BUILDING_FOUNDRY  5115	// actions
-
-#define BUILDING_LUMBER_YARD  5118	// actions
-
-#define BUILDING_TANNERY  5120	// actions -- TODO should be a bld flag
-
-#define BUILDING_QUARRY  5122	// actions
-#define BUILDING_CLAY_PIT  5123	// actions
-
-#define BUILDING_BRIDGE  5133
-#define BUILDING_CARPENTER  5134	// trade.c	-- TODO could be bld flag
+#define BUILDING_BRIDGE  5133	// TODO: this is only used to indicate use-road-icon
 
 #define BUILDING_STEPS  5140	// custom icons
-
-#define BUILDING_HENGE  5142	// spells.c
-
-#define BUILDING_DOCKS  5152	// tech, custom icons, ships.c	-- TODO replace with BLD_DOCKS
-#define BUILDING_SHIPYARD  5153	// custom icon, ships.c	-- TODO could be a bld flag
-#define BUILDING_SHIPYARD2  5154	// custom icon, ships.c
 
 #define BUILDING_SWAMPWALK  5155
 
 #define BUILDING_TRAPPERS_POST  5161	// workforce.c
 
-#define BUILDING_GUARD_TOWER  5167	// act.empire.c
-#define BUILDING_GUARD_TOWER2  5168	// act.empire.c
-#define BUILDING_GUARD_TOWER3  5169	// act.empire.c
-
 #define BUILDING_GATEHOUSE  5173	// custom icons, rituals
 #define BUILDING_WALL  5174
-
-#define BUILDING_RIVER_GATE  5176  // custom icons, rituals
 
 
 // Room building vnums
@@ -83,7 +61,6 @@
 #define o_ROCK  100	// TODO: rocks are special-cased for chipping
 #define o_LIGHTNING_STONE  103
 #define o_BLOODSTONE  104
-#define o_STONE_BLOCK  105	// TODO: change quarry to interaction
 #define o_FLOWER  123	// TODO: find-herbs could be a global type and "flower" is the only one that requires no skill
 #define o_WHEAT  141
 #define o_HOPS  143

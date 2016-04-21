@@ -50,6 +50,7 @@ extern bool can_steal(char_data *ch, empire_data *emp);
 extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 void expire_trading_post_item(struct trading_post_data *tpd);
 extern char *get_room_name(room_data *room, bool color);
+extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 void read_vault(empire_data *emp);
 void save_trading_post();
 void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
@@ -251,8 +252,6 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern const char *affected_bits[];
 	extern const char *apply_types[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
-	extern const char *component_flags[];
-	extern const char *component_types[];
 	extern const char *wear_bits[];
 
 	struct obj_storage_type *store;
@@ -295,19 +294,16 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	// component info
 	*part = '\0';
 	if (GET_OBJ_CMP_TYPE(obj) != CMP_NONE) {
-		if (GET_OBJ_CMP_FLAGS(obj)) {
-			prettier_sprintbit(GET_OBJ_CMP_FLAGS(obj), component_flags, lbuf);
-			strcat(lbuf, " ");
-		}
-		else {
-			*lbuf = '\0';
-		}
-		sprintf(part, " (%s%s)", lbuf, component_types[GET_OBJ_CMP_TYPE(obj)]);
+		sprintf(part, " (%s)", component_string(GET_OBJ_CMP_TYPE(obj), GET_OBJ_CMP_FLAGS(obj)));
 	}
 	
 	// basic info
 	snprintf(lbuf, sizeof(lbuf), "Your analysis of $p%s%s reveals:", part, location);
 	act(lbuf, FALSE, ch, obj, NULL, TO_CHAR);
+	
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+		msg_to_char(ch, "Quest: %s\r\n", get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(obj)));
+	}
 	
 	// if it has any wear bits other than TAKE, show if they can't use it
 	if (CAN_WEAR(obj, ~ITEM_WEAR_TAKE)) {
@@ -607,6 +603,10 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 		msg_to_char(ch, "You can't put bound items in items here.\r\n");
 		return 0;
 	}
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
+		act("$p: you can't drop quest items.", FALSE, ch, obj, NULL, TO_CHAR);
+		return 0;
+	}
 	
 	if (GET_OBJ_CARRYING_N(cont) + obj_carry_size(obj) > GET_MAX_CONTAINER_CONTENTS(cont)) {
 		act("$p won't fit in $P.", FALSE, ch, obj, cont, TO_CHAR);
@@ -739,8 +739,7 @@ void remove_armor_by_type(char_data *ch, int armor_type) {
 
 
 /**
-* Interaction func for "separate". This always extracts the original
-* item, so it should basically always return TRUE.
+* Interaction func for "separate".
 */
 INTERACTION_FUNC(separate_obj_interact) {
 	char to_char[MAX_STRING_LENGTH], to_room[MAX_STRING_LENGTH];
@@ -774,7 +773,6 @@ INTERACTION_FUNC(separate_obj_interact) {
 		load_otrigger(new_obj);
 	}
 	
-	extract_obj(inter_item);
 	return TRUE;
 }
 
@@ -830,6 +828,11 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 		return 0;	// don't break a drop-all
 	}
 	
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
+		act("$p: you can't drop quest items.", FALSE, ch, obj, NULL, TO_CHAR);
+		return 0;
+	}
+	
 	// count items
 	if (mode != SCMD_JUNK && need_capacity) {
 		size = (OBJ_FLAGGED(obj, OBJ_LARGE) ? 2 : 1);
@@ -883,6 +886,7 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byte mode) {
 	struct coin_data *coin;
 	char buf[MAX_STRING_LENGTH];
+	char_data *iter;
 	obj_data *obj;
 
 	if (amount <= 0)
@@ -907,6 +911,16 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 			obj_to_room(obj, IN_ROOM(ch));
 			act("You drop $p.", FALSE, ch, obj, NULL, TO_CHAR);
 			act("$n drops $p.", FALSE, ch, obj, NULL, TO_ROOM);
+			
+			// log dropping items in front of mortals
+			if (IS_IMMORTAL(ch)) {
+				for (iter = ROOM_PEOPLE(IN_ROOM(ch)); iter; iter = iter->next_in_room) {
+					if (iter != ch && !IS_NPC(iter) && !IS_IMMORTAL(iter)) {
+						syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s drops %s with mortal present (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_NAME(iter), room_log_identifier(IN_ROOM(ch)));
+						break;
+					}
+				}
+			}
 		}
 		else {
 			snprintf(buf, sizeof(buf), "$n drops %s which disappear%s in a puff of smoke!", money_desc(type, amount), (amount == 1 ? "s" : ""));
@@ -947,6 +961,10 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 	if (!bind_ok(obj, ch)) {
 		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR);
 		return TRUE;	// don't break loop
+	}
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch) && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
+		act("$p: you must be on the quest to get this.", FALSE, ch, obj, NULL, TO_CHAR);
+		return TRUE;
 	}
 	if (IN_ROOM(cont) && LAST_OWNER_ID(cont) != idnum && LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		stealing = TRUE;
@@ -1085,6 +1103,10 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 			msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
 			return FALSE;
 		}
+	}
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch) && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
+		act("$p: you must be on the quest to get this.", FALSE, ch, obj, NULL, TO_CHAR);
+		return TRUE;
 	}
 	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)) {
 		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
@@ -1297,6 +1319,10 @@ static void perform_give_coins(char_data *ch, char_data *vict, empire_data *type
 		// to-room/char messages below
 	}
 	
+	if (IS_IMMORTAL(ch) && !IS_IMMORTAL(vict)) {
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s gives %s to %s", GET_NAME(ch), money_desc(type, amount), PERS(vict, vict, TRUE));
+	}
+	
 	// msg to char
 	snprintf(buf, sizeof(buf), "You give %s to $N.", money_desc(type, amount));
 	act(buf, FALSE, ch, NULL, vict, TO_CHAR);
@@ -1358,7 +1384,7 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 	int liquid = LIQ_WATER;
 	int timer = UNLIMITED;
 
-	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAVERN)) {
+	if (HAS_FUNCTION(IN_ROOM(ch), FNC_TAVERN)) {
 		liquid = tavern_data[get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE)].liquid;
 	}
 	
@@ -1372,7 +1398,7 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 		return;
 	}
 	
-	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DRINK)) {
+	if (HAS_FUNCTION(IN_ROOM(ch), FNC_DRINK_WATER)) {
 		if (!IS_COMPLETE(IN_ROOM(ch))) {
 			msg_to_char(ch, "You can't fill your water until it's finished being built.\r\n");
 			return;
@@ -1380,7 +1406,7 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 		act("You gently fill $p with water.", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n gently fills $p with water.", TRUE, ch, obj, 0, TO_ROOM);
 	}
-	else if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TAVERN)) {
+	else if (HAS_FUNCTION(IN_ROOM(ch), FNC_TAVERN)) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE) == 0 || !IS_COMPLETE(IN_ROOM(ch))) {
 			msg_to_char(ch, "This tavern has nothing on tap.\r\n");
 			return;
@@ -1884,7 +1910,7 @@ room_data *find_docks(empire_data *emp, int island_id) {
 		if (GET_ISLAND_ID(ter->room) != island_id) {
 			continue;
 		}
-		if (!ROOM_BLD_FLAGGED(ter->room, BLD_DOCKS) || !IS_COMPLETE(ter->room)) {
+		if (!HAS_FUNCTION(ter->room, FNC_DOCKS) || !IS_COMPLETE(ter->room)) {
 			continue;
 		}
 		if (ROOM_AFF_FLAGGED(ter->room, ROOM_AFF_NO_WORK)) {
@@ -1920,7 +1946,7 @@ vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 		if (GET_ISLAND_ID(ter->room) != shipd->from_island) {
 			continue;
 		}
-		if (!ROOM_BLD_FLAGGED(ter->room, BLD_DOCKS) || !IS_COMPLETE(ter->room)) {
+		if (!HAS_FUNCTION(ter->room, FNC_DOCKS) || !IS_COMPLETE(ter->room)) {
 			continue;
 		}
 		if (ROOM_AFF_FLAGGED(ter->room, ROOM_AFF_NO_WORK)) {
@@ -2981,7 +3007,7 @@ void warehouse_identify(char_data *ch, char *argument) {
 	}
 	
 	// access permission
-	if (!imm_access && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_WAREHOUSE | BLD_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (!imm_access && (!HAS_FUNCTION(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can't do that here.\r\n");
 		return;
 	}
@@ -3053,7 +3079,7 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 	}
 	
 	// access permission
-	if (!imm_access && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_WAREHOUSE | BLD_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (!imm_access && (!HAS_FUNCTION(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can't do that here.\r\n");
 		return;
 	}
@@ -3061,11 +3087,11 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to do that here.\r\n");
 		return;
 	}
-	if (!imm_access && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_VAULT) && !has_permission(ch, PRIV_WITHDRAW)) {
+	if (!imm_access && HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW)) {
 		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
 		return;
 	}
-	if (!imm_access && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_WAREHOUSE) && !has_permission(ch, PRIV_WAREHOUSE)) {
+	if (!imm_access && HAS_FUNCTION(IN_ROOM(ch), FNC_WAREHOUSE) && !has_permission(ch, PRIV_WAREHOUSE)) {
 		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
 		return;
 	}
@@ -3102,7 +3128,7 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		return;
 	}
 	if (!*argument) {
-		msg_to_char(ch, "Retreive %swhat?\r\n", all ? "all of " : "");
+		msg_to_char(ch, "Retrieve %swhat?\r\n", all ? "all of " : "");
 		return;
 	}
 	
@@ -3123,7 +3149,7 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		}
 		
 		// vault permission was pre-validated, but they have to be in one to use it
-		if (IS_SET(iter->flags, EUS_VAULT) && !imm_access && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_VAULT)) {
+		if (IS_SET(iter->flags, EUS_VAULT) && !imm_access && !HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT)) {
 			msg_to_char(ch, "You need to be in a vault to retrieve %s.\r\n", GET_OBJ_SHORT_DESC(iter->obj));
 			return;
 		}
@@ -3198,7 +3224,7 @@ void warehouse_store(char_data *ch, char *argument) {
 	}
 	
 	// access permission
-	if (!imm_access && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_WAREHOUSE | BLD_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (!imm_access && (!HAS_FUNCTION(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can't do that here.\r\n");
 		return;
 	}
@@ -3206,7 +3232,7 @@ void warehouse_store(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to do that here.\r\n");
 		return;
 	}
-	if (!imm_access && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_VAULT) && !has_permission(ch, PRIV_WITHDRAW)) {
+	if (!imm_access && HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW)) {
 		msg_to_char(ch, "You don't have permission to store items here.\r\n");
 		return;
 	}
@@ -3315,7 +3341,7 @@ ACMD(do_combine) {
 	else if (!has_interaction(obj->interactions, INTERACT_COMBINE)) {
 		msg_to_char(ch, "You can't combine that!\r\n");
 	}
-	else {		
+	else {
 		// will extract no matter what happens here
 		if (!run_interactions(ch, obj->interactions, INTERACT_COMBINE, IN_ROOM(ch), NULL, obj, combine_obj_interact)) {
 			act("You fail to combine $p.", FALSE, ch, obj, NULL, TO_CHAR);
@@ -3382,7 +3408,7 @@ ACMD(do_drink) {
 	if (!*arg) {
 		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK))
 			type = drink_ROOM;
-		else if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DRINK)) {
+		else if (HAS_FUNCTION(IN_ROOM(ch), FNC_DRINK_WATER)) {
 			if (!can_drink_from_room(ch, (type = drink_ROOM))) {
 				return;
 			}
@@ -3397,7 +3423,7 @@ ACMD(do_drink) {
 	}
 
 	if (type == NOTHING && !(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-		if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DRINK) && (is_abbrev(arg, "water") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)))) {
+		if (HAS_FUNCTION(IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(arg, "water") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)))) {
 			if (!can_drink_from_room(ch, (type = drink_ROOM))) {
 				return;
 			}
@@ -3853,7 +3879,7 @@ ACMD(do_exchange) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't exchange anything.\r\n");
 	}
-	else if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MINT | BLD_VAULT)) {
+	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_MINT | FNC_VAULT)) {
 		msg_to_char(ch, "You can't exchange treasure for coins here.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -4400,7 +4426,7 @@ ACMD(do_pour) {
 			return;
 		}
 		if (!*arg2) {		/* no 2nd argument */
-			if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK) || find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1) || (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DRINK | BLD_TAVERN) && IS_COMPLETE(IN_ROOM(ch)))) {
+			if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK) || find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1) || (HAS_FUNCTION(IN_ROOM(ch), FNC_DRINK_WATER | FNC_TAVERN) && IS_COMPLETE(IN_ROOM(ch)))) {
 				fill_from_room(ch, to_obj);
 				return;
 			}
@@ -4422,7 +4448,7 @@ ACMD(do_pour) {
 				return;
 			}
 		}
-		if (is_abbrev(arg2, "water") && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DRINK)) {
+		if (is_abbrev(arg2, "water") && HAS_FUNCTION(IN_ROOM(ch), FNC_DRINK_WATER)) {
 			fill_from_room(ch, to_obj);
 			return;
 		}
@@ -4928,8 +4954,10 @@ ACMD(do_separate) {
 		msg_to_char(ch, "You can't separate that!\r\n");
 	}
 	else {		
-		// will extract no matter what happens here
-		if (!run_interactions(ch, obj->interactions, INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, separate_obj_interact)) {
+		if (run_interactions(ch, obj->interactions, INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, separate_obj_interact)) {
+			extract_obj(obj);
+		}
+		else {
 			act("You fail to separate $p.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		command_lag(ch, WAIT_OTHER);
@@ -5363,7 +5391,7 @@ ACMD(do_trade) {
 	else if (is_abbrev(command, "check")) {
 		trade_check(ch, argument);
 	}
-	else if ((!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_TRADE) || !IS_COMPLETE(IN_ROOM(ch))) && !IS_IMMORTAL(ch)) {
+	else if ((!HAS_FUNCTION(IN_ROOM(ch), FNC_TRADING_POST) || !IS_COMPLETE(IN_ROOM(ch))) && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't trade here.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) && !IS_IMMORTAL(ch)) {

@@ -150,6 +150,9 @@ int top_idnum = 0;	// highest idnum in use
 int top_account_id = 0;  // highest account number in use, determined during startup
 struct group_data *group_list = NULL;	// global LL of groups
 
+// quests
+struct quest_data *quest_table = NULL;
+
 // room templates
 room_template *room_template_table = NULL;	// hash table of room templates
 
@@ -229,6 +232,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ SKILL_PREFIX, SKILL_SUFFIX },	// DB_BOOT_SKILL
 	{ VEH_PREFIX, VEH_SUFFIX },	// DB_BOOT_SKILL
 	{ MORPH_PREFIX, MORPH_SUFFIX },	// DB_BOOT_MORPH
+	{ QST_PREFIX, QST_SUFFIX },	// DB_BOOT_QST
 };
 
 
@@ -243,6 +247,7 @@ void boot_db(void) {
 	void Read_Invalid_List();
 	void boot_social_messages();
 	void boot_world();
+	void build_all_quest_lookups();
 	void build_player_index();
 	void check_ruined_cities();
 	void check_version();
@@ -352,6 +357,9 @@ void boot_db(void) {
 	log("Linking and checking vehicles.");
 	link_and_check_vehicles();
 	
+	log("Building quest lookup hints.");
+	build_all_quest_lookups();
+	
 	// END
 	log("Boot db -- DONE.");
 	boot_time = time(0);
@@ -373,6 +381,7 @@ void boot_world(void) {
 	void check_for_bad_buildings();
 	void check_for_bad_sectors();
 	void check_newbie_islands();
+	void check_triggers();
 	void clean_empire_logs();
 	void index_boot_world();
 	void load_empire_storage();
@@ -457,6 +466,9 @@ void boot_world(void) {
 	log("Loading craft recipes.");
 	index_boot(DB_BOOT_CRAFT);
 	
+	log("Loading quests.");
+	index_boot(DB_BOOT_QST);
+	
 	log("Loading books into libraries.");
 	index_boot(DB_BOOT_BOOKS);
 	
@@ -487,6 +499,7 @@ void boot_world(void) {
 	check_for_bad_buildings();
 	check_for_bad_sectors();
 	read_ability_requirements();
+	check_triggers();
 	
 	log("Sorting data.");
 	HASH_SRT(sorted_hh, sorted_abilities, sort_abilities_by_data);
@@ -1547,7 +1560,7 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 	add_to_lookup_table(GET_ID(mob), (void *)mob);
 
 	if (with_triggers) {
-		copy_proto_script(proto, mob, MOB_TRIGGER);
+		mob->proto_script = copy_trig_protos(proto->proto_script);
 		assign_triggers(mob, MOB_TRIGGER);
 	}
 	else {
@@ -1568,6 +1581,8 @@ void clear_object(obj_data *obj) {
 	obj->vnum = NOTHING;
 	IN_ROOM(obj) = NULL;
 	obj->worn_on = NO_WEAR;
+	
+	GET_OBJ_REQUIRES_QUEST(obj) = NOTHING;
 	
 	obj->last_owner_id = NOBODY;
 	obj->last_empire_id = NOTHING;
@@ -1632,7 +1647,7 @@ obj_data *read_object(obj_vnum nr, bool with_triggers) {
 	add_to_lookup_table(GET_ID(obj), (void *)obj);
 	
 	if (with_triggers) {
-		copy_proto_script(proto, obj, OBJ_TRIGGER);
+		obj->proto_script = copy_trig_protos(proto->proto_script);
 		assign_triggers(obj, OBJ_TRIGGER);
 	}
 	else {
@@ -1733,7 +1748,7 @@ PLAYER_UPDATE_FUNC(b2_11_update_players) {
 	// inventory
 	for (obj = ch->carrying; obj; obj = obj->next_content) {
 		if ((proto = obj_proto(GET_OBJ_VNUM(obj)))) {
-			copy_proto_script(proto, obj, OBJ_TRIGGER);
+			obj->proto_script = copy_trig_protos(proto->proto_script);
 			assign_triggers(obj, OBJ_TRIGGER);
 		}
 	}
@@ -1741,7 +1756,7 @@ PLAYER_UPDATE_FUNC(b2_11_update_players) {
 	// eq
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (GET_EQ(ch, iter) && (proto = obj_proto(GET_OBJ_VNUM(GET_EQ(ch, iter))))) {
-			copy_proto_script(proto, GET_EQ(ch, iter), OBJ_TRIGGER);
+			GET_EQ(ch, iter)->proto_script = copy_trig_protos(proto->proto_script);
 			assign_triggers(GET_EQ(ch, iter), OBJ_TRIGGER);
 		}
 	}
@@ -2109,7 +2124,7 @@ void check_version(void) {
 			log(" - assigning mob triggers...");
 			for (mob = character_list; mob; mob = mob->next) {
 				if (IS_NPC(mob) && (mobpr = mob_proto(GET_MOB_VNUM(mob)))) {
-					copy_proto_script(mobpr, mob, MOB_TRIGGER);
+					mob->proto_script = copy_trig_protos(mobpr->proto_script);
 					assign_triggers(mob, MOB_TRIGGER);
 				}
 			}
@@ -2117,7 +2132,7 @@ void check_version(void) {
 			log(" - assigning triggers to object list...");
 			for (obj = object_list; obj; obj = obj->next) {
 				if ((objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
-					copy_proto_script(objpr, obj, OBJ_TRIGGER);
+					obj->proto_script = copy_trig_protos(objpr->proto_script);
 					assign_triggers(obj, OBJ_TRIGGER);
 				}
 			}
@@ -2126,7 +2141,7 @@ void check_version(void) {
 			HASH_ITER(hh, empire_table, emp, next_emp) {
 				for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
 					if (eus->obj && (objpr = obj_proto(GET_OBJ_VNUM(eus->obj)))) {
-						copy_proto_script(objpr, eus->obj, OBJ_TRIGGER);
+						eus->obj->proto_script = copy_trig_protos(objpr->proto_script);
 						assign_triggers(eus->obj, OBJ_TRIGGER);
 					}
 				}
@@ -2135,7 +2150,7 @@ void check_version(void) {
 			log(" - assigning triggers to trading post objects...");
 			for (tpd = trading_list; tpd; tpd = tpd->next) {
 				if (tpd->obj && (objpr = obj_proto(GET_OBJ_VNUM(tpd->obj)))) {
-					copy_proto_script(objpr, tpd->obj, OBJ_TRIGGER);
+					tpd->obj->proto_script = copy_trig_protos(objpr->proto_script);
 					assign_triggers(tpd->obj, OBJ_TRIGGER);
 				}
 			}

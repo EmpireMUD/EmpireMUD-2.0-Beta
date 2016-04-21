@@ -212,6 +212,7 @@ void perform_escape(char_data *ch) {
 	}
 	else {
 		char_to_room(ch, to_room);
+		qt_visit_room(ch, IN_ROOM(ch));
 		look_at_room(ch);
 		
 		GET_LAST_DIR(ch) = NO_DIR;
@@ -1047,6 +1048,7 @@ ACMD(do_infiltrate) {
 		else {
 			char_from_room(ch);
 			char_to_room(ch, to_room);
+			qt_visit_room(ch, IN_ROOM(ch));
 			look_at_room(ch);
 			msg_to_char(ch, "\r\nInfiltration successful.\r\n");
 			
@@ -1546,6 +1548,7 @@ ACMD(do_shadowstep) {
 			act("You shadowstep to $N!", FALSE, ch, NULL, vict, TO_CHAR);
 			char_from_room(ch);
 			char_to_room(ch, IN_ROOM(vict));
+			qt_visit_room(ch, IN_ROOM(ch));
 			look_at_room(ch);
 			act("$n steps out of the shadows!", TRUE, ch, NULL, NULL, TO_ROOM);
 			

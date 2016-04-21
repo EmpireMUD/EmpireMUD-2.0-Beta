@@ -1,0 +1,118 @@
+#10800
+ring royal~
+a royal ring~
+A royal ring is sitting on the ground.~
+   This ring has been in your family for, well, just the one generation. But
+this is only the beginning of your epic and storied family line.
+~
+2 p ab 1
+0 0 0
+4 0
+A
+5 1 0
+C
+0 50
+M
+8
+You slide $p proudly onto your finger.~
+M
+9
+$n slides $p proudly onto $s finger.~
+S
+#10825
+chisel imperium~
+an imperium chisel~
+An imperium chisel pokes out of the ground.~
+This imperium chisel surely belongs to a master craftsman.
+~
+2 p ao 2
+0 0 0
+2 0
+A
+25 15 0
+C
+0 50
+M
+8
+You grab $p and hold it proudly in the air.~
+M
+9
+$n grabs $p and holds it proudly in the air.~
+S
+#10850
+portal vibrantly colored soulstream stream~
+the Soulstream~
+A vibrantly colored portal draws light down from the sky!~
+The portal whips and churns as it spills light in every color of the rainbow.
+~
+8 0 0 1
+-1 0 0
+10 0
+S
+#10851
+portal bright exit soulstream stream~
+the portal to the real world~
+The bright colors of the Soulstream are escaping through a portal!~
+The portal whips and churns as it spills light in every color of the rainbow.
+~
+8 0 0 2
+-1 0 0
+10 0
+S
+#10852
+token spirit~
+a spirit token~
+A spirit token is lying here.~
+   This token was rewarded for completing a tutorial in the Soulstream.
+Collect enough tokens and receive a reward. You can find the portal to the
+Soulstream at the Tower of Souls. If you're having trouble getting back there,
+try using a trinket of conveyance.
+~
+3 p a 2
+0 0 0
+14 0
+Q 10859
+S
+#10853
+knife stone skinning~
+a stone skinning knife~
+A stone skinning knife is lying on the ground.~
+   This flaked stone knife doesn't look like it will last too long. You can use
+it to skin the corpses of animals. First wield or hold the knife, then type
+'skin corpse'. You can even use it from your sheath.
+~
+1 0 ano 1
+0 1 1
+1 0
+C
+0 1
+Q 10853
+S
+#10856
+scythe stone~
+a stone scythe~
+A stone scythe is lying on the ground.~
+   This flaked stone scythe looks like it won't last very long, but it should
+be good for at least one harvest. Wield the scythe and type 'harvest' on a crop
+tile.  
+~
+1 0 an 3
+0 1 1
+1 0
+C
+0 1
+Q 10856
+T 10856
+S
+#10859
+bell spirit~
+a spirit bell~
+A spirit bell is lying here.~
+Type 'use bell' to summon a companion spirit!
+~
+3 p a 4
+10859 0 0
+2 0
+T 9900
+S
+$

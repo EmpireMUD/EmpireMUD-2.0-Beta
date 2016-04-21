@@ -791,6 +791,7 @@ islands    Immort   Shows you which island ids have empire storage (for MOVEEINV
 notes      Immort   Show notes on a player.
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
+quests     Immort   Shows quests and quest trackers for players.
 rent       Immort   Shows a player's full equipment and inventory.
 skills     Immort   Shows skill levels and abilities for a player.
 spawns     Immort   Shows where a mob spawns on the map, similar to ".mob search".
@@ -958,6 +959,13 @@ Usage:  show account <player name>
 Shows all characters associated with the target character's account (the target
 player's alternates).
 #e
+"SHOW QUESTS"
+
+Usage:  show quests <player> [active | completed | quest name]
+
+This option allows you to see what quests players are on, and their progress.
+If you don't specify an option, you will see their list of active quests.
+#e
 SHUTDOWN
 
 Usage:  shutdown [now | timer] [die | pause]
@@ -1082,6 +1090,15 @@ command is grantable.
 
 See also: BINDING, GRANT
 #d
+UNQUEST
+
+Usage:  unquest <player> <quest vnum>
+
+This command removes a quest from a player's current- and completed-quests
+lists. The player receives no message. This command is grantable.
+
+See also: GRANT
+#d
 UPTIME
 
 Usage:  uptime
@@ -1116,6 +1133,7 @@ This is a generic command that houses several simple utilities for immortals.
 They generally have no game effect, but can help with testing.
 
 Available utilities:
+ b318buildings - Finds buildings using flags that were deprecated in 2.0b3.18.
  clearroles - Clears the class roles and class abilities of all players.
  diminish <number> <scale> - Applies the game's diminishing returns formula,
     and returns the result.
@@ -1140,8 +1158,8 @@ specified name. If you specify more than one keyword, it will find things
 that match ALL of those keywords.
 
 Valid types are: adventure, ability, archetype, augment, book, building, craft,
-                 class, crop, global, obj, mob, morph, roomtemplate, sector,
-                 skill, vehicle
+                 class, crop, global, mob, morph, obj, quest, roomtemplate,
+                 sector, skill, vehicle
 
 Examples:
 
@@ -1162,8 +1180,8 @@ Usage:  vstat <type> <vnum>
 Used to stat a prototypical object by virtual number.
 
 Valid types are: adventure, ability, archetype, augment, building, book, craft,
-                 class, crop, global, obj, mob, morph, roomtemplate, sector,
-                 skill, vehicle
+                 class, crop, global, mob, morph, obj, quest, roomtemplate,
+                 sector, skill, vehicle
 
 Examples:
 

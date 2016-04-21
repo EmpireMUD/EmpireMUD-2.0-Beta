@@ -581,6 +581,13 @@ VCMD(do_vpurge) {
 }
 
 
+// quest commands
+VCMD(do_vquest) {
+	void do_dg_quest(int go_type, void *go, char *argument);	
+	do_dg_quest(VEH_TRIGGER, veh, argument);
+}
+
+
 VCMD(do_vsiege) {
 	void besiege_room(room_data *to_room, int damage);
 	extern bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
@@ -686,6 +693,7 @@ VCMD(do_vteleport) {
 				GET_LAST_DIR(ch) = NO_DIR;
 			}
 			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+			qt_visit_room(ch, IN_ROOM(ch));
 		}
 	}
 	else if (!str_cmp(arg1, "adventure")) {
@@ -713,6 +721,7 @@ VCMD(do_vteleport) {
 							GET_LAST_DIR(ch) = NO_DIR;
 						}
 						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+						qt_visit_room(ch, IN_ROOM(ch));
 					}
 				}
 			}
@@ -727,6 +736,7 @@ VCMD(do_vteleport) {
 					GET_LAST_DIR(ch) = NO_DIR;
 				}
 				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+				qt_visit_room(ch, IN_ROOM(ch));
 			}
 		}
 		else if ((v = get_vehicle_near_vehicle(veh, arg1))) {
@@ -1355,6 +1365,7 @@ const struct vehicle_command_info veh_cmd_info[] = {
 	{ "vload", do_dgvload, NO_SCMD },
 	{ "vmorph", do_vmorph, NO_SCMD },
 	{ "vpurge", do_vpurge, NO_SCMD },
+	{ "vquest", do_vquest, NO_SCMD },
 	{ "vscale", do_vscale, NO_SCMD },
 	{ "vsend", do_vsend, SCMD_VSEND },
 	{ "vsiege", do_vsiege, NO_SCMD },

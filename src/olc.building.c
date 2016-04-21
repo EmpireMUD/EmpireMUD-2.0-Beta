@@ -32,6 +32,7 @@
 // external consts
 extern const char *bld_flags[];
 extern const char *designate_flags[];
+extern const char *function_flags[];
 extern const char *interact_types[];
 extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *room_aff_bits[];
@@ -177,11 +178,14 @@ char *list_one_building(bld_data *bld, bool detail) {
 void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	void check_for_bad_buildings();
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
+	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
+	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
 	void remove_building_from_table(bld_data *bld);
 	
 	struct obj_storage_type *store, *next_store;
 	bld_data *bld, *biter, *next_biter;
 	craft_data *craft, *next_craft;
+	quest_data *quest, *next_quest;
 	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
 	adv_data *adv, *next_adv;
@@ -268,6 +272,21 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		}
 	}
 	
+	// quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_BUILDING, vnum);
+		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_BUILDING, vnum);
+		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_OWN_BUILDING, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_OWN_BUILDING, vnum);
+		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_VISIT_BUILDING, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_VISIT_BUILDING, vnum);
+		
+		if (found) {
+			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
 	// vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		if (VEH_INTERIOR_ROOM_VNUM(veh) == vnum) {
@@ -314,6 +333,19 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 				}
 			}
 		}
+		if (GET_OLC_QUEST(desc)) {
+			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_BUILDING, vnum);
+			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_BUILDING, vnum);
+			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_OWN_BUILDING, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_OWN_BUILDING, vnum);
+			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_VISIT_BUILDING, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_VISIT_BUILDING, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A building used by the quest you are editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_VEHICLE(desc)) {
 			if (VEH_INTERIOR_ROOM_VNUM(GET_OLC_VEHICLE(desc)) == vnum) {
 				VEH_INTERIOR_ROOM_VNUM(GET_OLC_VEHICLE(desc)) = NOTHING;
@@ -343,11 +375,15 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 * @param bld_vnum vnum The building vnum.
 */
 void olc_search_building(char_data *ch, bld_vnum vnum) {
+	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
+	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	
 	char buf[MAX_STRING_LENGTH];
 	bld_data *proto = building_proto(vnum);
 	struct adventure_link_rule *link;
 	struct obj_storage_type *store;
 	craft_data *craft, *next_craft;
+	quest_data *quest, *next_quest;
 	vehicle_data *veh, *next_veh;
 	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
@@ -365,7 +401,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	
 	// adventure rules
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
-		if (size > sizeof(buf)) {
+		if (size >= sizeof(buf)) {
 			break;
 		}
 		for (link = GET_ADV_LINKING(adv); link; link = link->next) {
@@ -382,7 +418,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	
 	// buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
-		if (size > sizeof(buf)) {
+		if (size >= sizeof(buf)) {
 			break;
 		}
 		if (GET_BLD_UPGRADES_TO(bld) == vnum) {
@@ -393,7 +429,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	
 	// craft builds
 	HASH_ITER(hh, craft_table, craft, next_craft) {
-		if (size > sizeof(buf)) {
+		if (size >= sizeof(buf)) {
 			break;
 		}
 		if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD && GET_CRAFT_BUILD_TYPE(craft) == vnum) {
@@ -404,7 +440,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	
 	// obj storage
 	HASH_ITER(hh, object_table, obj, next_obj) {
-		if (size > sizeof(buf)) {
+		if (size >= sizeof(buf)) {
 			break;
 		}
 		any = FALSE;
@@ -414,6 +450,17 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			}
+		}
+	}
+	
+	// quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_BUILDING, vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_BUILDING, vnum) || find_quest_task_in_list(QUEST_TASKS(quest), QT_OWN_BUILDING, vnum) || find_quest_task_in_list(QUEST_PREREQS(quest), QT_OWN_BUILDING, vnum) || find_quest_task_in_list(QUEST_TASKS(quest), QT_VISIT_BUILDING, vnum) || find_quest_task_in_list(QUEST_PREREQS(quest), QT_VISIT_BUILDING, vnum)) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -449,6 +496,7 @@ void save_olc_building(descriptor_data *desc) {
 	struct interaction_item *interact;
 	struct trig_proto_list *trig;
 	struct spawn_info *spawn;
+	struct quest_lookup *ql;
 	UT_hash_handle hh;
 	
 	// have a place to save it?
@@ -515,9 +563,13 @@ void save_olc_building(descriptor_data *desc) {
 	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
+	ql = proto->quest_lookups;	// save lookups
+	
 	*proto = *bdg;	// copy
 	proto->vnum = vnum;	// ensure correct vnum
+	
 	proto->hh = hh;	// restore hash handle
+	proto->quest_lookups = ql;	// restore lookups
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_BLD, vnum);
@@ -559,8 +611,7 @@ bld_data *setup_olc_building(bld_data *input) {
 		GET_BLD_INTERACTIONS(new) = copy_interaction_list(GET_BLD_INTERACTIONS(input));
 		
 		// scripts
-		GET_BLD_SCRIPTS(new) = NULL;
-		copy_proto_script(input, new, BLD_TRIGGER);
+		GET_BLD_SCRIPTS(new) = copy_trig_protos(GET_BLD_SCRIPTS(input));
 	}
 	else {
 		// brand new: some defaults
@@ -627,6 +678,9 @@ void olc_show_building(char_data *ch) {
 	
 	sprintbit(GET_BLD_FLAGS(bdg), bld_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", lbuf);
+	
+	sprintbit(GET_BLD_FUNCTIONS(bdg), function_flags, lbuf, TRUE);
+	sprintf(buf + strlen(buf), "<&yfunctions&0> %s\r\n", lbuf);
 	
 	sprintbit(GET_BLD_DESIGNATE_FLAGS(bdg), designate_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<&ydesignate&0> %s\r\n", lbuf);
@@ -785,6 +839,12 @@ OLC_MODULE(bedit_fame) {
 OLC_MODULE(bedit_flags) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	GET_BLD_FLAGS(bdg) = olc_process_flag(ch, argument, "building", "flags", bld_flags, GET_BLD_FLAGS(bdg));
+}
+
+
+OLC_MODULE(bedit_functions) {
+	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
+	GET_BLD_FUNCTIONS(bdg) = olc_process_flag(ch, argument, "function", "flags", function_flags, GET_BLD_FUNCTIONS(bdg));
 }
 
 

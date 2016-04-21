@@ -76,6 +76,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch);
 * @return char_data *ch or NULL
 */
 char_data *find_or_load_player(char *name, bool *is_file) {
+	char buf[MAX_INPUT_LENGTH+2];
 	player_index_data *index;
 	char_data *ch = NULL;
 	
@@ -89,7 +90,17 @@ char_data *find_or_load_player(char *name, bool *is_file) {
 			}
 		}
 	}
-
+	
+	// not able to find -- look for a player partial match?
+	if (!ch) {
+		sprintf(buf, "0.%s", name);	// add 0. to force player match
+		ch = get_char_world(buf);
+		*is_file = FALSE;
+		if (ch && IS_NPC(ch)) {
+			ch = NULL;	// verify player only
+		}
+	}
+	
 	return ch;
 }
 
@@ -692,6 +703,8 @@ void free_char(char_data *ch) {
 	void die_follower(char_data *ch);
 	void free_alias(struct alias_data *a);
 	void free_mail(struct mail_data *mail);
+	void free_player_completed_quests(struct player_completed_quest **hash);
+	void free_player_quests(struct player_quest *list);
 
 	struct slash_channel *loadslash, *next_loadslash;
 	struct player_ability_data *abil, *next_abil;
@@ -854,6 +867,9 @@ void free_char(char_data *ch) {
 			free(abil);
 		}
 		
+		free_player_completed_quests(&GET_COMPLETED_QUESTS(ch));
+		free_player_quests(GET_QUESTS(ch));
+		
 		free(ch->player_specials);
 		if (IS_NPC(ch)) {
 			log("SYSERR: Mob %s (#%d) had player_specials allocated!", GET_NAME(ch), GET_MOB_VNUM(ch));
@@ -879,7 +895,7 @@ void free_char(char_data *ch) {
 		free(ch->player.long_descr);
 	}
 	if (ch->proto_script && (!proto || ch->proto_script != proto->proto_script)) {
-		free_proto_script(ch, MOB_TRIGGER);
+		free_proto_scripts(&ch->proto_script);
 	}
 	if (ch->interactions && (!proto || ch->interactions != proto->interactions)) {
 		while ((interact = ch->interactions)) {
@@ -976,18 +992,22 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	int account_id = NOTHING, ignore_pos = 0, reward_pos = 0;
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	struct over_time_effect_type *dot, *last_dot = NULL;
+	struct player_quest *plrq, *last_plrq = NULL;
 	struct offer_data *offer, *last_offer = NULL;
 	struct alias_data *alias, *last_alias = NULL;
 	struct resource_data *res, *last_res = NULL;
 	struct coin_data *coin, *last_coin = NULL;
 	struct mail_data *mail, *last_mail = NULL;
+	struct player_completed_quest *plrcom;
 	struct player_ability_data *abildata;
 	struct player_skill_data *skdata;
 	int length, i_in[7], iter, num;
 	struct slash_channel *slash;
 	struct cooldown_data *cool;
 	struct affected_type *af;
+	struct quest_task *task;
 	account_data *acct;
+	bitvector_t bit_in;
 	bool end = FALSE;
 	obj_data *obj;
 	double dbl_in;
@@ -1010,24 +1030,25 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		CREATE(SCRIPT(ch), struct script_data, 1);
 	}
 	
-	// some parts may already be added, so find the end of aliases:
+	// some parts may already be added, so find the end of lists:
 	if ((last_alias = GET_ALIASES(ch))) {
 		while (last_alias->next) {
 			last_alias = last_alias->next;
 		}
 	}
-	
-	// find end of mailing list
 	if ((last_mail = GET_MAIL_PENDING(ch))) {
 		while (last_mail->next) {
 			last_mail = last_mail->next;
 		}
 	}
-	
-	// find end of resource list
 	if ((last_res = GET_ACTION_RESOURCES(ch))) {
 		while (last_res->next) {
 			last_res = last_res->next;
+		}
+	}
+	if ((last_plrq = GET_QUESTS(ch))) {
+		while (last_plrq->next) {
+			last_plrq = last_plrq->next;
 		}
 	}
 	
@@ -1547,6 +1568,55 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						free(GET_PROMPT(ch));
 					}
 					GET_PROMPT(ch) = str_dup(line + length + 1);	// do not trim
+				}
+				BAD_TAG_WARNING(line);
+				break;
+			}
+			case 'Q': {
+				if (PFILE_TAG(line, "Quest:", length)) {
+					if (sscanf(line + length + 1, "%d %d %ld %d %d", &i_in[0], &i_in[1], &l_in[0], &i_in[2], &i_in[3]) == 5) {
+						CREATE(plrq, struct player_quest, 1);
+						plrq->vnum = i_in[0];
+						plrq->version = i_in[1];
+						plrq->start_time = l_in[0];
+						plrq->instance_id = i_in[2];
+						plrq->adventure = i_in[3];
+						
+						if (last_plrq) {
+							last_plrq->next = plrq;
+						}
+						else {
+							GET_QUESTS(ch) = plrq;
+						}
+						last_plrq = plrq;
+					}
+				}
+				else if (PFILE_TAG(line, "Quest-cmp:", length)) {
+					if (sscanf(line + length + 1, "%d %ld %d %d", &i_in[0], &l_in[0], &i_in[1], &i_in[2]) == 4) {
+						HASH_FIND_INT(GET_COMPLETED_QUESTS(ch), &i_in[0], plrcom);
+						// ensure not already in table
+						if (!plrcom) {
+							CREATE(plrcom, struct player_completed_quest, 1);
+							plrcom->vnum = i_in[0];
+							plrcom->last_completed = l_in[0];
+							plrcom->last_instance_id = i_in[1];
+							plrcom->last_adventure = i_in[2];
+						
+							HASH_ADD_INT(GET_COMPLETED_QUESTS(ch), vnum, plrcom);
+						}
+					}
+				}
+				else if (PFILE_TAG(line, "Quest-task:", length)) {
+					if (last_plrq && sscanf(line + length + 1, "%d %d %lld %d %d", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3]) == 5) {
+						CREATE(task, struct quest_task, 1);
+						task->type = i_in[0];
+						task->vnum = i_in[1];
+						task->misc = bit_in;
+						task->needed = i_in[2];
+						task->current = i_in[3];
+						
+						LL_APPEND(last_plrq->tracker, task);
+					}
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -2264,9 +2334,12 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	extern struct slash_channel *find_slash_channel_by_id(int id);
 	void write_mail_to_file(FILE *fl, char_data *ch);
 	
+	struct player_completed_quest *plrcom, *next_plrcom;
 	struct trig_var_data *vars;
+	struct player_quest *plrq;
 	struct alias_data *alias;
 	struct offer_data *offer;
+	struct quest_task *task;
 	struct coin_data *coin;
 	struct lore_data *lore;
 	int iter;
@@ -2305,6 +2378,17 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	// 'O'
 	for (offer = GET_OFFERS(ch); offer; offer = offer->next) {
 		fprintf(fl, "Offer: %d %d %d %ld %d\n", offer->from, offer->type, offer->location, offer->time, offer->data);
+	}
+	
+	// 'Q'
+	LL_FOREACH(GET_QUESTS(ch), plrq) {
+		fprintf(fl, "Quest: %d %d %ld %d %d\n", plrq->vnum, plrq->version, plrq->start_time, plrq->instance_id, plrq->adventure);
+		LL_FOREACH(plrq->tracker, task) {
+			fprintf(fl, "Quest-task: %d %d %lld %d %d\n", task->type, task->vnum, task->misc, task->needed, task->current);
+		}
+	}
+	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), plrcom, next_plrcom) {
+		fprintf(fl, "Quest-cmp: %d %ld %d %d\n", plrcom->vnum, plrcom->last_completed, plrcom->last_instance_id, plrcom->last_adventure);
 	}
 	
 	// 'S'
@@ -2707,6 +2791,7 @@ void clear_player(char_data *ch) {
 	
 	// some nowheres/nothings
 	GET_LOADROOM(ch) = NOWHERE;
+	GET_MARK_LOCATION(ch) = NOWHERE;
 	GET_MOUNT_VNUM(ch) = NOTHING;
 	GET_PLEDGE(ch) = NOTHING;
 	GET_TOMB_ROOM(ch) = NOWHERE;
@@ -2833,6 +2918,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void clean_lore(char_data *ch);
 	extern room_data *find_home(char_data *ch);
 	extern room_data *find_load_room(char_data *ch);
+	void refresh_all_quests(char_data *ch);
 	
 	extern bool global_mute_slash_channel_joins;
 
@@ -2939,6 +3025,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// place character
 	char_to_room(ch, load_room);
+	qt_visit_room(ch, IN_ROOM(ch));
 	ch->prev_logon = ch->player.time.logon;	// and update prev_logon now
 	
 	// verify morph stats
@@ -2961,9 +3048,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	determine_gear_level(ch);
 	
 	SAVE_CHAR(ch);
-	
-	// clear some player special data
-	GET_MARK_LOCATION(ch) = NOWHERE;
 
 	// re-join slash-channels
 	global_mute_slash_channel_joins = TRUE;
@@ -3055,6 +3139,9 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// update the index in case any of this changed
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
 	update_player_index(index, ch);
+	
+	// ensure quests are up-to-date
+	refresh_all_quests(ch);
 	
 	// now is a good time to save and be sure we have a good save file
 	SAVE_CHAR(ch);

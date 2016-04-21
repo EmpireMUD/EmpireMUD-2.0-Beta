@@ -48,8 +48,6 @@
 */
 
 // external vars
-extern const char *component_flags[];
-extern const char *component_types[];
 extern const char *drinks[];
 extern const char *pool_types[];
 
@@ -1063,8 +1061,8 @@ bool can_use_room(char_data *ch, room_data *room, int mode) {
 	// empire ownership
 	if (ROOM_OWNER(homeroom) == GET_LOYALTY(ch)) {
 		// private room?
-		if (ROOM_PRIVATE_OWNER(homeroom) == NOBODY || ROOM_PRIVATE_OWNER(homeroom) == GET_IDNUM(ch) || GET_RANK(ch) == EMPIRE_NUM_RANKS(ROOM_OWNER(homeroom))) {
-			return TRUE;
+		if (ROOM_PRIVATE_OWNER(homeroom) != NOBODY && ROOM_PRIVATE_OWNER(homeroom) != GET_IDNUM(ch) && GET_RANK(ch) < EMPIRE_NUM_RANKS(ROOM_OWNER(homeroom))) {
+			return FALSE;
 		}
 	}
 	// public + guest + hostile + no-empire exclusion
@@ -2185,6 +2183,25 @@ int get_attribute_by_name(char *name) {
 
 
 /**
+* Picks a level based on a min/max and base.
+*
+* @param int level The base level (usually player's level).
+* @param int min Optional: A minimum level to pick (0 for no-minimum).
+* @param int max Optional: A maximum level to pick (0 for no-maximum).
+* @return int The selected level.
+*/
+int pick_level_from_range(int level, int min, int max) {
+	if (min > 0) {
+		level = MAX(level, min);
+	}
+	if (max > 0) {
+		level = MIN(level, max);
+	}
+	return level;
+}
+
+
+/**
 * Raises a person from sleeping+ to standing (or fighting) if possible.
 * 
 * @param char_data *ch The person to try to wake/stand.
@@ -2453,6 +2470,31 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 
 
 /**
+* The name of a component with its flags.
+*
+* @param int type CMP_ component type.
+* @param bitvector_t flags CMPF_ component flags.
+*/
+char *component_string(int type, bitvector_t flags) {
+	extern const char *component_flags[];
+	extern const char *component_types[];
+	
+	char mods[MAX_STRING_LENGTH];
+	static char output[256];
+	
+	if (flags) {
+		prettier_sprintbit(flags, component_flags, mods);
+		strcat(mods, " ");
+	}
+	else {
+		*mods = '\0';
+	}
+	snprintf(output, sizeof(output), "%s%s", mods, component_types[type]);
+	return output;
+}
+
+
+/**
 * Extract resources from the list, hopefully having checked has_resources, as
 * this function does not error if it runs out -- it just keeps extracting
 * until it's out of items, or hits its required limit.
@@ -2486,6 +2528,9 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 					LL_FOREACH_SAFE2(search_list[liter], obj, next_obj, next_content) {
 						// skip keeps
 						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+							continue;
+						}
+						if (!CAN_SEE_OBJ(ch, obj)) {
 							continue;
 						}
 						
@@ -2602,6 +2647,9 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 							continue;
 						}
+						if (!CAN_SEE_OBJ(ch, obj)) {
+							continue;
+						}
 						
 						// RES_x: just types that need objects
 						switch (res->type) {
@@ -2674,7 +2722,6 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 */
 char *get_resource_name(struct resource_data *res) {
 	static char output[MAX_STRING_LENGTH];
-	char lbuf[MAX_STRING_LENGTH];
 	
 	*output = '\0';
 	
@@ -2685,14 +2732,7 @@ char *get_resource_name(struct resource_data *res) {
 			break;
 		}
 		case RES_COMPONENT: {
-			if (res->misc) {
-				prettier_sprintbit(res->misc, component_flags, lbuf);
-				strcat(lbuf, " ");
-			}
-			else {
-				*lbuf = '\0';
-			}
-			snprintf(output, sizeof(output), "%dx (%s%s)", res->amount, lbuf, component_types[res->vnum]);
+			snprintf(output, sizeof(output), "%dx (%s)", res->amount, component_string(res->vnum, res->misc));
 			break;
 		}
 		case RES_LIQUID: {
@@ -2855,7 +2895,6 @@ void halve_resource_list(struct resource_data **list, bool remove_nonrefundables
 * @param bool send_msgs If TRUE, will alert the character as to what they need. FALSE runs silently.
 */
 bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs) {	
-	char lbuf[MAX_STRING_LENGTH];
 	struct resource_data *res;
 	int total, amt, liter;
 	bool ok = TRUE;
@@ -2878,6 +2917,9 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 					LL_FOREACH2(search_list[liter], obj, next_content) {
 						// skip keeps
 						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+							continue;
+						}
+						if (!CAN_SEE_OBJ(ch, obj)) {
 							continue;
 						}
 						
@@ -2921,14 +2963,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 								break;
 							}
 							case RES_COMPONENT: {
-								if (res->misc) {
-									prettier_sprintbit(res->misc, component_flags, lbuf);
-									strcat(lbuf, " ");
-								}
-								else {
-									*lbuf = '\0';
-								}
-								msg_to_char(ch, "%s %d more (%s%s)", (ok ? "You need" : ","), res->amount - total, lbuf, component_types[res->vnum]);
+								msg_to_char(ch, "%s %d more (%s)", (ok ? "You need" : ","), res->amount - total, component_string(res->vnum, res->misc));
 								break;
 							}
 							case RES_LIQUID: {
@@ -4195,7 +4230,7 @@ room_data *find_load_room(char_data *ch) {
 	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch)))) {
 		// does not require last room but if there is one, it must be the same island
 		rl_last_room = real_room(GET_LAST_ROOM(ch));
-		if (ROOM_BLD_FLAGGED(rl, BLD_TOMB) && (!rl_last_room || GET_ISLAND_ID(rl) == GET_ISLAND_ID(rl_last_room)) && can_use_room(ch, rl, GUESTS_ALLOWED)) {
+		if (HAS_FUNCTION(rl, FNC_TOMB) && (!rl_last_room || GET_ISLAND_ID(rl) == GET_ISLAND_ID(rl_last_room)) && can_use_room(ch, rl, GUESTS_ALLOWED)) {
 			return rl;
 		}
 	}
@@ -4204,7 +4239,7 @@ room_data *find_load_room(char_data *ch) {
 	if (!IS_NPC(ch) && (rl = real_room(GET_LAST_ROOM(ch))) && GET_LOYALTY(ch)) {
 		island = GET_ISLAND_ID(rl);
 		for (ter = EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)); ter; ter = ter->next) {
-			if (ROOM_BLD_FLAGGED(ter->room, BLD_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island) {
+			if (HAS_FUNCTION(ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = ter->room;
@@ -4606,6 +4641,7 @@ void relocate_players(room_data *room, room_data *to_room) {
 			}
 			
 			char_to_room(ch, target);
+			qt_visit_room(ch, IN_ROOM(ch));
 			GET_LAST_DIR(ch) = NO_DIR;
 			look_at_room(ch);
 			act("$n appears in the middle of the room!", TRUE, ch, NULL, NULL, TO_ROOM);

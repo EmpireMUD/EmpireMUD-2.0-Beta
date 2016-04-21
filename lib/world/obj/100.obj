@@ -364,8 +364,10 @@ S
 armor dragonwing wings dragon's piece~
 dragonwing armor~
 A piece of armor made from dragon's wings is folded on the ground.~
+   This armor looks like it was stitched together from baby dragon wings. 
+Scaly, creepy baby dragon wings.  
 ~
-27 mo aq 1
+27 mo aq 2
 2 0 0
 7 0
 A
@@ -448,7 +450,7 @@ skystone stone small~
 a small skystone~
 A small skystone is lying here.~
    Skystones are used to buy things at the Tower Skycleave. You can type
-'combine small' to combine 5 of them into a greater skystone.  
+'combine small' to combine 5 of them into a greater skystone.
 ~
 3 l a 5
 0 0 0

@@ -522,7 +522,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	val = get_to_hit(ch, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(ch));
 	sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, base_hit_chance), val);
 	sprintf(lbuf2, "Speed  [%.2f]", get_combat_speed(ch, WEAR_WIELD));
-	sprintf(lbuf3, "Crafting [%s%d&0]", HAPPY_COLOR(get_crafting_level(ch), GET_SKILL_LEVEL(ch)), get_crafting_level(ch));
+	sprintf(lbuf3, "Crafting  [%s%d&0]", HAPPY_COLOR(get_crafting_level(ch), GET_SKILL_LEVEL(ch)), get_crafting_level(ch));
 	// note: the "%-24.24s" for speed is lower because it contains no color codes
 	msg_to_char(to, "  %-28.28s %-24.24s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 
@@ -670,6 +670,8 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 * @param int num If mob-stacking is on, number of copies of this i to show.
 */
 void list_one_char(char_data *i, char_data *ch, int num) {
+	extern bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
+	extern bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
 	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern struct action_data_struct action_data[];
 	
@@ -807,7 +809,13 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 
 		msg_to_char(ch, "%s\r\n", buf);
 	}
-
+	
+	if (can_get_quest_from_mob(ch, i, NULL)) {
+		act("...$e has a quest for you!", FALSE, i, NULL, ch, TO_VICT);
+	}
+	if (can_turn_quest_in_to_mob(ch, i, NULL)) {
+		act("...you can finish a quest here!", FALSE, i, NULL, ch, TO_VICT);
+	}
 	if (affected_by_spell(i, ATYPE_FLY)) {
 		act("...$e is flying with gossamer mana wings!", FALSE, i, 0, ch, TO_VICT);
 	}
@@ -1181,7 +1189,7 @@ bool inventory_store_building(char_data *ch, room_data *room, empire_data *emp) 
 		return found;
 	}
 	
-	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_VAULT)) {
+	if (HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT)) {
 		msg_to_char(ch, "\r\nVault: %d coin%s, %d treasure (%d total)\r\n", EMPIRE_COINS(emp), (EMPIRE_COINS(emp) != 1 ? "s" : ""), EMPIRE_WEALTH(emp), GET_TOTAL_WEALTH(emp));
 	}
 
@@ -1277,6 +1285,8 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
 void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	extern int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board);
 	extern int board_loaded;
+	extern bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list);
+	extern bool can_turn_quest_in_to_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list);
 	void init_boards(void);
 	extern int find_board(char_data *ch);
 	extern const char *extra_bits_inv_flags[];
@@ -1302,11 +1312,24 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_LONG) {
 		sprintbit(GET_OBJ_EXTRA(obj), extra_bits_inv_flags, flags, TRUE);
 		if (strncmp(flags, "NOBITS", 6)) {
-			sprintf(buf + strlen(buf), " %*s", ((int)strlen(flags)-1), flags);	// remove trailing space
+			sprintf(buf + strlen(buf), " %.*s", ((int)strlen(flags)-1), flags);	// remove trailing space
+		}
+		
+		if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+			strcat(buf, " (quest)");
 		}
 		
 		if (IS_STOLEN(obj)) {
 			strcat(buf, " (STOLEN)");
+		}
+	}
+	
+	if (mode == OBJ_DESC_INVENTORY || (mode == OBJ_DESC_LONG && CAN_WEAR(obj, ITEM_WEAR_TAKE))) {
+		if (can_get_quest_from_obj(ch, obj, NULL)) {
+			strcat(buf, " (quest available)");
+		}
+		if (can_turn_quest_in_to_obj(ch, obj, NULL)) {
+			strcat(buf, " (finished quest)");
 		}
 	}
 	
@@ -1328,7 +1351,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 		else if (IS_PORTAL(obj)) {
 			room = real_room(GET_PORTAL_TARGET_VNUM(obj));
 			if (room) {
-				sprintf(buf, "%sYou peer into %s and see: %s", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), get_room_name(room, TRUE));
+				sprintf(buf, "%sYou peer into %s and see: %s\t0", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), get_room_name(room, TRUE));
 			}
 			else {
 				sprintf(buf, "%sIt's a portal, but it doesn't seem to lead anywhere.", NULLSAFE(GET_OBJ_ACTION_DESC(obj)));
@@ -1345,8 +1368,18 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 		}
 	}
 	
+	// CRLF IS HERE
 	if (buf[strlen(buf)-1] != '\n') {
 		strcat(buf, "\r\n");
+	}
+	
+	if (mode == OBJ_DESC_LONG && !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+		if (can_get_quest_from_obj(ch, obj, NULL)) {
+			strcat(buf, "...it has a quest for you!\r\n");
+		}
+		if (can_turn_quest_in_to_obj(ch, obj, NULL)) {
+			strcat(buf, "...you can turn in a quest here!\r\n");
+		}
 	}
 	
 	page_string(ch->desc, buf, TRUE);

@@ -446,7 +446,7 @@ static void start_digging(char_data *ch) {
 void start_mining(char_data *ch) {
 	int mining_timer = config_get_int("mining_timer");
 	
-	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MINE) && IS_COMPLETE(IN_ROOM(ch))) {
+	if (HAS_FUNCTION(IN_ROOM(ch), FNC_MINE) && IS_COMPLETE(IN_ROOM(ch))) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) > 0) {
 			start_action(ch, ACT_MINING, mining_timer);
 			
@@ -501,14 +501,14 @@ void start_picking(char_data *ch) {
 * @param char_data *ch The player who is to quarry.
 */
 void start_quarrying(char_data *ch) {	
-	if (BUILDING_VNUM(IN_ROOM(ch)) == BUILDING_QUARRY) {
+	if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY)) {
 		if (get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
-			msg_to_char(ch, "There's not enough stone left to cut here.\r\n");
+			msg_to_char(ch, "There's not enough left to quarry here.\r\n");
 		}
 		else {
 			start_action(ch, ACT_QUARRYING, 12);
-			send_to_char("You begin to quarry the stone.\r\n", ch);
-			act("$n begins to quarry the stone.", TRUE, ch, 0, 0, TO_ROOM);
+			send_to_char("You begin to work the quarry.\r\n", ch);
+			act("$n begins to work the quarry.", TRUE, ch, 0, 0, TO_ROOM);
 		}
 	}
 }
@@ -525,7 +525,7 @@ INTERACTION_FUNC(finish_chopping) {
 	for (num = 0; num < interaction->quantity; ++num) {
 		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// minimum level
-		obj_to_char(obj, ch);
+		obj_to_char_or_room(obj, ch);
 		load_otrigger(obj);
 	}
 	
@@ -844,6 +844,34 @@ INTERACTION_FUNC(finish_picking_crop) {
 }
 
 
+INTERACTION_FUNC(finish_quarrying) {
+	char buf[MAX_STRING_LENGTH];
+	obj_data *obj = NULL;
+	int num;
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(obj, 1);	// minimum level
+		obj_to_char_or_room(obj, ch);
+		load_otrigger(obj);
+	}
+	
+	if (interaction->quantity > 1) {
+		sprintf(buf, "You give the plug drill one final swing and pry loose $p (x%d)!", interaction->quantity);
+	}
+	else {
+		strcpy(buf, "You give the plug drill one final swing and pry loose $p!");
+	}
+	
+	if (obj) {
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+		act("$n hits the plug drill hard with a hammer and pries loose $p!", FALSE, ch, obj, NULL, TO_ROOM);
+	}
+	
+	return TRUE;
+}
+
+
 // also used for sawing, tanning, chipping
 INTERACTION_FUNC(finish_scraping) {
 	obj_vnum vnum = interaction->vnum;
@@ -1028,7 +1056,7 @@ void process_chipping(char_data *ch) {
 
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		act("$p splits open!", FALSE, ch, proto, NULL, TO_CHAR);
-		act("$p finishes chipping $p!", TRUE, ch, proto, NULL, TO_ROOM);
+		act("$n finishes chipping $p!", TRUE, ch, proto, NULL, TO_ROOM);
 		GET_ACTION(ch) = ACT_NONE;
 		
 		success = run_interactions(ch, proto->interactions, INTERACT_CHIP, IN_ROOM(ch), NULL, proto, finish_scraping);
@@ -1075,7 +1103,6 @@ void process_chop(char_data *ch) {
 		// run interacts for items only if not depleted
 		if (get_depletion(IN_ROOM(ch), DPLTN_CHOP) < config_get_int("chop_depletion")) {
 			got_any = run_room_interactions(ch, IN_ROOM(ch), INTERACT_CHOP, finish_chopping);
-			add_depletion(IN_ROOM(ch), DPLTN_CHOP, FALSE);
 		}
 		
 		if (!got_any) {
@@ -1466,7 +1493,7 @@ void process_mining(char_data *ch) {
 			cancel_action(ch);
 			break;
 		}
-		if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MINE) || !IS_COMPLETE(IN_ROOM(ch)) || get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0) {
+		if (!HAS_FUNCTION(IN_ROOM(ch), FNC_MINE) || !IS_COMPLETE(IN_ROOM(ch)) || get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0) {
 			msg_to_char(ch, "You can't mine here.\r\n");
 			cancel_action(ch);
 			break;
@@ -1794,7 +1821,12 @@ void process_prospecting(char_data *ch) {
 				msg_to_char(ch, "This area has already been mined for all it's worth.\r\n");
 			}
 			else {
-				msg_to_char(ch, "You discover that this area %s %s.\r\n", (is_deep_mine(IN_ROOM(ch)) ? "is a deep" : "is a"), get_mine_type_name(IN_ROOM(ch)));
+				if (is_deep_mine(IN_ROOM(ch))) {
+					msg_to_char(ch, "You discover that this area is a deep %s.\r\n", get_mine_type_name(IN_ROOM(ch)));
+				}
+				else {
+					msg_to_char(ch, "You discover that this area is %s %s.\r\n", AN(get_mine_type_name(IN_ROOM(ch))), get_mine_type_name(IN_ROOM(ch)));
+				}
 				act("$n finishes prospecting.", TRUE, ch, NULL, NULL, TO_ROOM);
 			}
 			
@@ -1811,11 +1843,9 @@ void process_prospecting(char_data *ch) {
 * @param char_data *ch The quarrior.
 */
 void process_quarrying(char_data *ch) {
-	obj_vnum vnum = NOTHING;
 	room_data *in_room;
-	obj_data *obj;
 	
-	if (BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_QUARRY || get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
+	if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY) || get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
 		msg_to_char(ch, "You can't quarry anything here.\r\n");
 		cancel_action(ch);
 		return;
@@ -1849,28 +1879,24 @@ void process_quarrying(char_data *ch) {
 			}
 		}
 	}
-	else {
+	else {	// done
 		in_room = IN_ROOM(ch);
 		GET_ACTION(ch) = ACT_NONE;
 		
-		// possibly others later
-		vnum = o_STONE_BLOCK;
+		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_QUARRY, finish_quarrying)) {
+			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+				gain_skill_exp(ch, SKILL_EMPIRE, 25);
+			}
 		
-		add_depletion(IN_ROOM(ch), DPLTN_QUARRY, TRUE);
-		
-		obj = read_object(vnum, TRUE);
-		obj_to_char_or_room(obj, ch);
-		act("You give the plug drill one final swing and pry loose $p!", FALSE, ch, obj, 0, TO_CHAR);
-		act("$n hits the plug drill hard with a hammer and pries loose $p!", FALSE, ch, obj, 0, TO_ROOM);
-	
-		if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-			gain_skill_exp(ch, SKILL_EMPIRE, 25);
+			add_depletion(IN_ROOM(ch), DPLTN_QUARRY, TRUE);
+			
+			// character is still there?
+			if (IN_ROOM(ch) == in_room && GET_ACTION(ch) == ACT_NONE) {
+				start_quarrying(ch);
+			}
 		}
-		load_otrigger(obj);
-		
-		// still there?
-		if (in_room == IN_ROOM(ch)) {
-			start_quarrying(ch);
+		else {
+			msg_to_char(ch, "You don't seem to find anything of use.\r\n");
 		}
 	}
 }
@@ -1970,6 +1996,10 @@ void process_scraping(char_data *ch) {
 		GET_ACTION_RESOURCES(ch) = NULL;
 		
 		if (success && proto) {
+			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
+				gain_skill_exp(ch, SKILL_EMPIRE, 10);
+			}
+			
 			// lather, rinse, rescrape
 			do_scrape(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
 		}
@@ -2005,7 +2035,7 @@ void process_tanning(char_data *ch) {
 	obj_data *proto;
 	bool success;
 	
-	GET_ACTION_TIMER(ch) -= (BUILDING_VNUM(IN_ROOM(ch)) == BUILDING_TANNERY ? 4 : 1);
+	GET_ACTION_TIMER(ch) -= (HAS_FUNCTION(IN_ROOM(ch), FNC_TANNERY) ? 4 : 1);
 	
 	// need the prototype
 	if (!(proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
@@ -2078,7 +2108,7 @@ ACMD(do_bathe) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're a bit busy right now.\r\n");
 	}
-	else if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BATHS) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_SHALLOW_WATER)) {
+	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_BATHS) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_SHALLOW_WATER)) {
 		msg_to_char(ch, "You can't bathe here!\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -2375,7 +2405,7 @@ ACMD(do_mine) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
 	}
-	else if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MINE)) {
+	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_MINE)) {
 		msg_to_char(ch, "This isn't a mine.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -2413,7 +2443,7 @@ ACMD(do_mint) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
 	}
-	else if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_MINT)) {
+	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_MINT)) {
 		msg_to_char(ch, "You can't mint anything here.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -2649,7 +2679,7 @@ ACMD(do_quarry) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
-	else if (BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_QUARRY) {
+	else if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY)) {
 		send_to_char("You can't quarry here.\r\n", ch);
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
@@ -2670,7 +2700,7 @@ ACMD(do_saw) {
 		act("You stop sawing.", FALSE, ch, NULL, NULL, TO_CHAR);
 		cancel_action(ch);
 	}
-	else if (BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_LUMBER_YARD || !IS_COMPLETE(IN_ROOM(ch))) {
+	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_SAW) || !IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can only saw in a lumber yard.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {

@@ -446,7 +446,7 @@ See also: EMPIRE VARS
 #d
 %PURGE% MPURGE OPURGE VPURGE WPURGE
 
-%purge% <victim | obj | vehicle>
+Usage:  %purge% <victim | obj | vehicle>
 
 Purge removes objects, mobs, or vehicles from the game. If no argument is
 given, then all objects and mobs (but not vehicles) in the room will be
@@ -459,6 +459,26 @@ Examples:
   %purge% %actor.eq(hold)%
 
 See also: POSITIONS
+#d
+%QUEST% MQUEST OQUEST VQUEST WQUEST
+
+Usage:  %quest% <person> <command> <quest vnum>
+
+This command lets you modify the quests a player is on.
+
+Quest commands:
+  &cdrop&0 - The person will drop that quest, if they are on it. You can check
+    %char.on_quest(vnum)% first to be sure.
+  &cfinish&0 - Will turn in the quest and complete it, whether or not the
+    person meets the requirements -- check %char.quest_finished(vnum)% first.
+  &cstart&0 - Will give the player the quest, whether or not they meet the
+    prerequisites, if they are not already on it. Consider checking
+    %char.completed_quest(vnum)% first.
+  &ctrigger&0 - Activate any 'triggered' quest task, if the player is on that
+    quest. You can check %char.quest_triggered(vnum)% to see if the condition
+    is already triggered.
+
+See also: QUEST
 #d
 RDELETE
 

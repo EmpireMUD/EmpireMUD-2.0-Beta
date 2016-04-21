@@ -73,7 +73,7 @@ void special_building_setup(char_data *ch, room_data *room) {
 	void init_mine(room_data *room, char_data *ch);
 		
 	// mine data
-	if (ROOM_BLD_FLAGGED(room, BLD_MINE)) {
+	if (HAS_FUNCTION(room, FNC_MINE)) {
 		init_mine(room, ch);
 	}
 }
@@ -179,6 +179,10 @@ void complete_building(room_data *room) {
 	// lastly
 	if ((emp = ROOM_OWNER(room))) {
 		read_empire_territory(emp);
+		
+		if (GET_BUILDING(room)) {
+			qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
+		}
 	}
 }
 
@@ -289,6 +293,10 @@ void disassociate_building(room_data *room) {
 	struct instance_data *inst;
 	bool deleted = FALSE;
 	
+	if (ROOM_OWNER(room) && GET_BUILDING(room) && IS_COMPLETE(room)) {
+		qt_empire_players(ROOM_OWNER(room), qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
+	}
+	
 	// delete any open instance here
 	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room, FALSE))) {
 		SET_BIT(inst->flags, INST_COMPLETED);
@@ -314,7 +322,7 @@ void disassociate_building(room_data *room) {
 	if (SCRIPT(room)) {
 		extract_script(room, WLD_TRIGGER);
 	}
-	free_proto_script(room, WLD_TRIGGER);
+	free_proto_scripts(&room->proto_script);
 
 	// restore sect: this does not use change_terrain()
 	SECT(room) = BASE_SECT(room);
@@ -959,6 +967,10 @@ void start_dismantle_building(room_data *loc) {
 	SET_BIT(ROOM_AFF_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	delete_room_npcs(loc, NULL);
+	
+	if (loc && ROOM_OWNER(loc) && GET_BUILDING(loc) && complete) {
+		qt_empire_players(ROOM_OWNER(loc), qt_lose_building, GET_BLD_VNUM(GET_BUILDING(loc)));
+	}
 }
 
 
@@ -1565,7 +1577,7 @@ ACMD(do_designate) {
 			if (SCRIPT(new)) {
 				extract_script(new, WLD_TRIGGER);
 			}
-			free_proto_script(new, WLD_TRIGGER);
+			free_proto_scripts(&new->proto_script);
 			
 			attach_building_to_room(type, new, TRUE);
 		}
@@ -1626,6 +1638,8 @@ ACMD(do_designate) {
 			// sort now just in case
 			sort_world_table();
 		}
+		
+		complete_wtrigger(new);
 	}
 }
 
@@ -1827,6 +1841,7 @@ ACMD(do_maintain) {
 		msg_to_char(ch, "You perform some quick maintenance on the building.\r\n");
 		act("$n performs some quick maintenance on the building.", TRUE, ch, NULL, NULL, TO_ROOM);
 		command_lag(ch, WAIT_OTHER);
+		stop_room_action(IN_ROOM(ch), NOTHING, CHORE_MAINTENANCE);
 	}
 	
 	free_resource_list(res);

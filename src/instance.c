@@ -403,7 +403,6 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 	
 	const bitvector_t default_affs = ROOM_AFF_UNCLAIMABLE;
 	
-	room_template *temp;
 	room_data *room;
 	
 	if (!rmt) {
@@ -417,10 +416,7 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 	SET_BIT(ROOM_AFF_FLAGS(room), GET_RMT_BASE_AFFECTS(rmt) | default_affs);
 	
 	// copy proto script
-	CREATE(temp, room_template, 1);
-	copy_proto_script(rmt, temp, RMT_TRIGGER);
-	room->proto_script = temp->proto_script;
-	free(temp);
+	room->proto_script = copy_trig_protos(GET_RMT_SCRIPTS(rmt));
 	assign_triggers(room, WLD_TRIGGER);
 	
 	COMPLEX_DATA(room)->instance = inst;
@@ -929,6 +925,7 @@ void generate_adventure_instances(void) {
 * @param struct instance_data *inst The instance to delete.
 */
 void delete_instance(struct instance_data *inst) {
+	void expire_instance_quests(struct instance_data *inst);
 	void extract_pending_chars();
 	void relocate_players(room_data *room, room_data *to_room);
 	
@@ -939,6 +936,8 @@ void delete_instance(struct instance_data *inst) {
 	
 	// disable instance saving
 	instance_save_wait = TRUE;
+	
+	expire_instance_quests(inst);
 	
 	if ((room = inst->location) != NULL) {
 		// remove any players inside
@@ -1208,7 +1207,11 @@ void prune_instances(void) {
 * @param room_data *room The map (or interior) location that was the anchor for an instance.
 */
 void unlink_instance_entrance(room_data *room) {
-	adv_data *adv = NULL, *temp;
+	extern bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum);
+	
+	struct trig_proto_list *tpl;
+	trig_data *proto, *trig;
+	adv_data *adv = NULL;
 	
 	// detect adventure
 	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
@@ -1232,15 +1235,42 @@ void unlink_instance_entrance(room_data *room) {
 	
 	// check for scripts
 	if (adv && GET_ADV_SCRIPTS(adv)) {
-		CREATE(temp, adv_data, 1);
-		copy_proto_script(adv, temp, ADV_TRIGGER);
-		room->proto_script = temp->proto_script;
-		free(temp);
-		assign_triggers(room, WLD_TRIGGER);
+		// add scripts
+		LL_FOREACH(GET_ADV_SCRIPTS(adv), tpl) {
+			if (!(proto = real_trigger(tpl->vnum))) {
+				continue;
+			}
+			if (!IS_SET(GET_TRIG_TYPE(proto), WTRIG_ADVENTURE_CLEANUP)) {
+				continue;
+			}
+			
+			// attach this trigger
+			if (!(trig = read_trigger(tpl->vnum))) {
+				continue;
+			}
+			if (!SCRIPT(room)) {
+				CREATE(SCRIPT(room), struct script_data, 1);
+			}
+			add_trigger(SCRIPT(room), trig, -1);
+		}
+		
+		// run scripts
 		adventure_cleanup_wtrigger(room);
 		
-		// TODO this may over-remove scripts if we ever add additional scripts to rooms
-		extract_script(room, WLD_TRIGGER);
+		// now remove those triggers again
+		LL_FOREACH(GET_ADV_SCRIPTS(adv), tpl) {
+			if (!(proto = real_trigger(tpl->vnum))) {
+				continue;
+			}
+			if (!IS_SET(GET_TRIG_TYPE(proto), WTRIG_ADVENTURE_CLEANUP)) {
+				continue;
+			}
+			
+			// find and remove
+			if (SCRIPT(room)) {
+				remove_live_script_by_vnum(SCRIPT(room), tpl->vnum);
+			}
+		}
 	}
 }
 

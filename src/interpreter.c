@@ -294,6 +294,7 @@ ACMD(do_put);
 
 ACMD(do_quaff);
 ACMD(do_quarry);
+ACMD(do_quest);
 ACMD(do_quit);
 
 ACMD(do_radiance);
@@ -406,6 +407,7 @@ ACMD(do_unbind);
 ACMD(do_unharness);
 ACMD(do_unload_vehicle);
 ACMD(do_unpublicize);
+ACMD(do_unquest);
 ACMD(do_unshare);
 ACMD(do_upgrade);
 ACMD(do_use);
@@ -451,6 +453,7 @@ ACMD(do_mload);
 ACMD(do_mmorph);
 ACMD(do_mmove);
 ACMD(do_mpurge);
+ACMD(do_mquest);
 ACMD(do_mgoto);
 ACMD(do_maoe);
 ACMD(do_mat);
@@ -824,6 +827,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "psay", POS_DEAD, do_gsay, NO_MIN, CTYPE_COMM ),
 	SIMPLE_CMD( "ptell", POS_DEAD, do_gsay, NO_MIN, CTYPE_COMM ),
 
+	SIMPLE_CMD( "quests", POS_DEAD, do_quest, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "quaff", POS_RESTING, do_quaff, NO_MIN, CTYPE_MOVE ),
 	STANDARD_CMD( "quarry", POS_STANDING, do_quarry, LVL_APPROVED, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "quit", POS_DEAD, do_quit, NO_MIN, NO_GRANTS, SCMD_QUIT, CTYPE_UTIL, CMD_NOT_RP | CMD_NO_ABBREV, NO_ABIL ),
@@ -939,7 +943,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "thaw", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_FREEZE, SCMD_THAW, CTYPE_IMMORTAL, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "tie", POS_STANDING, do_tie, NO_MIN, CTYPE_COMBAT, FALSE ),
 	SIMPLE_CMD( "time", POS_DEAD, do_time, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "tip", POS_DEAD, do_tip, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "tips", POS_DEAD, do_tip, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "title", POS_DEAD, do_title, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "toggles", POS_DEAD, do_toggle, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "tomb", POS_DEAD, do_tomb, LVL_APPROVED, CTYPE_UTIL ),
@@ -955,6 +959,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "unkeep", POS_DEAD, do_keep, NO_MIN, CTYPE_UTIL, SCMD_UNKEEP ),
 	STANDARD_CMD( "unload", POS_STANDING, do_unload_vehicle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "unloadvehicle", POS_STANDING, do_unload_vehicle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
+	GRANT_CMD( "unquest", POS_SLEEPING, do_unquest, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_UNQUEST ),
 	SCMD_CMD( "unstake", POS_STANDING, do_stake, NO_MIN, CTYPE_COMBAT, TRUE ),
 	STANDARD_CMD( "untie", POS_STANDING, do_tie, NO_MIN, NO_GRANTS, TRUE, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "unban", POS_DEAD, do_unban, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_BAN ),
@@ -1018,6 +1023,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "mmorph", POS_DEAD, do_mmorph, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mmove", POS_STANDING, do_mmove, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mpurge", POS_DEAD, do_mpurge, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
+	STANDARD_CMD( "mquest", POS_DEAD, do_mquest, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mgoto", POS_DEAD, do_mgoto, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mat", POS_DEAD, do_mat, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
 	STANDARD_CMD( "mown", POS_DEAD, do_mown, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
@@ -1906,6 +1912,8 @@ void send_login_motd(descriptor_data *desc, int bad_pws) {
  *      into person returns.  This function seems a bit over-extended too.
  */
 int perform_dupe_check(descriptor_data *d) {
+	void refresh_all_quests(char_data *ch);
+	
 	descriptor_data *k, *next_k;
 	char_data *target = NULL, *ch, *next_ch;
 	int mode = 0;
@@ -2027,6 +2035,7 @@ int perform_dupe_check(descriptor_data *d) {
 			break;
 	}
 	
+	refresh_all_quests(d->character);
 	MXPSendTag(d, "<VERSION>");
 	
 	// guarantee echo is on -- no, this could lead to an echo loop

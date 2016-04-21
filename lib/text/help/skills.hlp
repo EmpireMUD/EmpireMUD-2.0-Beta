@@ -478,12 +478,12 @@ into ingots or bars. Smelting generally requires two of the base metal (e.g.
 iron ore) to create one of the processed version (iron ingot).
 
 Ingots are used for crafting. Gold and silver bars are worth more in the vault
-than their raw form. To return them to their ingot form, use 'separate'.
+than their raw form. To return bars to their ingot form, use 'separate'.
 
 Typing "smelt" by itself will list things you can smelt with the ore available
 in your inventory.
 
-See also: METAL, WEALTH, SEPARATE
+See also: METAL, SEPARATE, WEALTH
 #
 SPECIALIZE SPECIALTY
 

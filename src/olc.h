@@ -46,7 +46,8 @@
 #define OLC_SKILL  BIT(16)
 #define OLC_VEHICLE  BIT(17)
 #define OLC_MORPH  BIT(18)
-#define NUM_OLC_TYPES  19
+#define OLC_QUEST  BIT(19)
+#define NUM_OLC_TYPES  20
 
 
 // olc command flags
@@ -76,6 +77,7 @@
 #define OLC_FLAG_SKILLS  BIT(17)	// CAN edit skills
 #define OLC_FLAG_NO_VEHICLES  BIT(18)	// cannot edit vehicles
 #define OLC_FLAG_NO_MORPHS  BIT(19)	// cannot edit morphs
+#define OLC_FLAG_NO_QUESTS  BIT(19)	// cannot edit quests
 
 
 // for trigger editing

@@ -270,9 +270,17 @@ Objects (OEDIT):
   for build-to-char and build-to-room.
 - All lights must have a timer. If you want a player to activate a light before
   it starts timing down, make an unlit version with a LIGHT interaction.
-- The COMBINE and SEPARATE interactions should always use 1 exclusion set, as
-  they will extract the original item if their interaction succeeds, and it's
-  not safe to run additional interactions.
+- The COMBINE interaction should always use 1 exclusion set, as it will extract
+  the original item if the interaction succeeds, and it's usually not safe to
+  run additional interactions.
+
+Quests (QEDIT):
+- You can create more complex quests by chaining simple quests.
+- The VISIT-* task types do not work as prereqs; only as tasks.
+- For low-level quests, reward order may matter. Give skill exp/levels BEFORE
+  reward items, as the scale level may go up.
+- If you use the QUEST-CHAIN reward type, put it last. It will look better
+  at the end.
 
 Room Templates (REDIT):
 - Don't confuse room templates with the designated rooms that players can add
@@ -1156,6 +1164,9 @@ When set on a building, these flags affect all interior rooms, too. When set
 on a designate-able room (a building where the ROOM flag is set), they only
 affect players in that room.
 
+(Some former building flags were moved to the 'functions' list, and their
+former building flags still show up in the editor as DEPRECATED.)
+
 Available flags:
  ROOM - this is a room that can be added with the designate command if it has
     matching designate flags with a building
@@ -1170,52 +1181,70 @@ Available flags:
  HERD - mobs can be herded into this building
  DEDICATE - can be dedicated to a patron god or player, which adds "of Name"
     to the room title
- DRINK - has a water source, like a well or fountain
  !NPC - mobs won't enter this building
  BARRIER - can only go back the way you came, unless flying
- TAVERN - functions as a tavern (don't set this on the same building as DRINK)
  LARGE-CITY-RADIUS - counts as in-city much further away than normal
- MINE - can be mined for ore resources
  ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
  BURNABLE - will catch fire if a fire is placed inside by a hostile empire
- FORGE - can use the forge and reforge commands here
- COOKING-FIRE - can cook, brew, and other tasks that require a fire
- ALCHEMIST - can brew and mix here
- STABLE - can shear, milk, and barde animals here; animals in this building don't despawn
- LIBRARY - can write and store books here
- APIARY - grants the Apiaries tech to the empire
- GLASSBLOWER - grants the Glassblowing tech to the empire
- DOCKS - grants the seaport tech to the empire; counts as a dock for ships
- PIGEON-POST - players can send mail here
- MILL - can use the mill command here
- POTTER - pottery craft time is reduced here
- TAILOR - counts as tailor; can use refashion here
- BATHS - can use the bathe command here
  SAIL - can enter this building with a boat
- TOMB - players can re-spawn here after dying
- MINT-COINS - functions as a mint
- VAULT - stores coins, can use the warehouse command for privileged storage
  ITEM-LIMIT - only a certain number of items can be dropped here
  LONG-AUTOSTORE - autostore takes 72 hours instead of 3 here
- WAREHOUSE - can use the warehouse command and store unique items
- TRADE - access to global trade, e.g. a trading post
  HIGH-DEPLETION - has more resources than a normal tile
- PORTAL - functions as a portal building
- BEDROOM - boosts regen while sleeping
  !DELETE - will not be deleted for not having a homeroom
- SUMMON-PLAYER - allows the summon player command
  NEED-BOAT - requires a boat, flying, or swimming to enter
  LOOK-OUT - can see the map using "look out"
  2ND-TERRITORY - counts as territory off the map (e.g. in a ship)
- SHIPYARD - used to build ships
  UPGRADED - modifies other building types like SHIPYARD
- PRESS - can use the 'press' craft
 
 * Note: If you change the LARGE-CITY-RADIUS flag on existing buildings,
         territory counts will not update right away. Any empire can force a
         re-count by claiming or abandoning any tile.
 
-See also: INTERLINK, OLC BUILDINGS
+See also: BEDIT FUNCTIONS, INTERLINK, OLC BUILDINGS
+#d
+"BEDIT FUNCTIONS" "FUNCTION FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The function flags determine what chores, actions, and other tasks happen at
+that building.
+
+Available functions:
+ ALCHEMIST - can brew and mix here
+ APIARY - grants the Apiaries tech to the empire
+ BATHS - can use the bathe command here
+ BEDROOM - boosts regen while sleeping
+ CARPENTER - required by some crafts
+ DIGGING - triggers the workforce digging chore (also need interaction)
+ DOCKS - grants the seaport tech to the empire; counts as a dock for ships
+ FORGE - can use the forge and reforge commands here
+ GLASSBLOWER - grants the Glassblowing tech to the empire
+ GUARD-TOWER - hostile toward enemy players, at range
+ HENGE - allows Chant of Druids
+ LIBRARY - can write and store books here
+ MAIL - players can send mail here
+ MILL - can use the mill command here
+ MINE - can be mined for ore resources
+ MINT - functions as a mint
+ PORTAL - functions as a portal building
+ POTTER - pottery craft time is reduced here
+ PRESS - can use the 'press' craft
+ SAW - allows sawing here
+ SHIPYARD - used to build ships
+ SMELT - allows smelting here
+ STABLE - can shear, milk, and barde animals here; animals in this building don't despawn
+ SUMMON-PLAYER - allows the summon player command
+ TAILOR - counts as tailor; can use refashion here
+ TANNERY - allows tanning here
+ TAVERN - functions as a tavern (don't set this on the same building as DRINK)
+ TOMB - players can re-spawn here after dying
+ TRADING-POST - access to global trade, e.g. a trading post
+ VAULT - stores coins, can use the warehouse command for privileged storage
+ WAREHOUSE - can use the warehouse command and store unique items
+ DRINK-WATER - can get water here, like a well
+ COOKING-FIRE - can cook, brew, and other tasks that require a fire
+
+See also: OLC BUILDINGS
 #d
 "BEDIT HITPOINTS"
 
@@ -2462,6 +2491,7 @@ Room interaction types:
  CHOP - Things that can be found when chopping here.
  FISH - Things that can be found by fishing here.
  PAN - Things that can be found by panning here.
+ QUARRY - Things you can find by quarrying here.
 
 The percent may be anywhere from 0.01 to 100.00 and if the quantity is greater
 than 1, the percent is only checked once for the entire quantity. If you want
@@ -2567,7 +2597,7 @@ You're standing at the foot of a huge giant!
 
 See also: OLC MOBILES
 #d
-"ADVEDIT SCRIPTS" "BEDIT SCRIPTS" "MEDIT SCRIPTS" "OEDIT SCRIPTS" "REDIT SCRIPTS" "VEDIT SCRIPTS"
+"ADVEDIT SCRIPTS" "BEDIT SCRIPTS" "MEDIT SCRIPTS" "OEDIT SCRIPTS" "QEDIT SCRIPTS" "REDIT SCRIPTS" "VEDIT SCRIPTS"
 
 Usage:  .script add [position] <trigger vnum>
         .script copy <from type> <from vnum>
@@ -2582,8 +2612,10 @@ When you save your olc editor, all live copies of the thing you were editing
 should get the updated script list right away.
 
 Note: Adventure scripts will only work if they are the Adventure Cleanup type.
+Note: Only room triggers can be added to quests.
 
-See also: OLC BUILDINGS, OLC MOBILES, OLC OBJECTS, OLC TRIGGERS, VNUM
+See also: OLC BUILDINGS, OLC MOBILES, OLC OBJECTS, OLC QUESTS, OLC TRIGGERS,
+   OLC VEHICLES, VNUM
 #d
 "MEDIT SEX"
 
@@ -3301,6 +3333,18 @@ lower number means a faster weapon. In that way, the name is backwards.
 
 See also: OLC OBJECTS
 #d
+"OEDIT REQUIRESQUEST" "OEDIT REQUIRES QUEST" "OEDIT REQUIRE QUEST" "OEDIT QUEST"
+
+Usage:  .requiresquest <vnum | none>
+
+Items can be set to require the player to be on a quest. The player cannot get
+an object for a quest they're not on, and can't lose an object for a quest they
+are on.
+
+Requires objects will be lost when the quest ends.
+
+See also: OLC OBJECTS
+#d
 "OEDIT STORAGE"
 
 Usage:  .storage add <building vnum> [flags]
@@ -3876,6 +3920,23 @@ For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
+"OLC QUESTS" QEDIT
+
+Usage:  .q <command>
+        .<command>
+
+The .olc quest editor lets you build quests, both simple and complex. It
+provides an in-game menu for controlling every detail of the quest.
+
+All of the .olc commands are highlighted in yellow and placed inside <angle
+braces>. You can get help on any of these by typing &yHELP QEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
 "OLC REMOVEINDEVELOPMENT" REMOVEINDEV "OLC REMOVE IN-DEVELOPMENT"
 
 Usage:  .removeindev <adventure vnum>
@@ -4019,7 +4080,7 @@ For notes on the mud's building rules, see HELP BUILDING GUIDE.
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 See also: TRIGEDIT-TYPES
 #d
-"OLC VEHICLES"
+"OLC VEHICLES" VEDIT
 
 Usage:  .v <command>
         .<command>
@@ -4042,6 +4103,169 @@ Example vehicle settings:
  catapult: LEADABLE SIEGE-WEAPONS, animals required: 2
 
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"QEDIT COMPLETEMESSAGE" "QEDIT COMPLETE MESSAGE"
+
+Usage:  .completemessage
+
+The complete message is shown to players when they turn in the quest. The
+player types the command to turn in the completed quest and sees only this
+message.
+
+The message is set in the string editor. You should use /fi to format it
+with indent inside the string editor if it's longer than one line (80 chars).
+
+See also: OLC QUESTS, STRING EDITOR
+#d
+"QEDIT DESCRIPTION"
+
+Usage:  .description
+
+The quest's description is shown to players when they start the quest, and on
+request while they are on the quest. It should describe the quest briefly.
+
+The message is set in the string editor. You should use /fi to format it
+with indent inside the string editor if it's longer than one line (80 chars).
+
+See also: OLC QUESTS, STRING EDITOR
+#d
+"QEDIT FLAGS" "QUEST FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The following quest flags are available:
+ IN-DEVELOPMENT - Mortals cannot see or get the quest.
+ REPEAT-PER-INSTANCE - Clears completion when the instance closes.
+ EXPIRES-AFTER-INSTANCE - Fails the quest when the instance closes.
+ EXTRACT-TASK-OBJECTS - Items and components required for tasks will be lost.
+
+See also: OLC QUESTS
+#d
+"QEDIT MAXLEVEL" "QEDIT MAX LEVEL"
+
+Usage:  .maxlevel <level>
+
+This controls how high quest rewards can scale. Players can still complete
+quests below their level.
+
+See also: OLC QUESTS
+#d
+"QEDIT MINLEVEL" "QEDIT MIN LEVEL"
+
+Usage:  .minlevel <level>
+
+This controls what level a player must attain before being able to get this
+quest.
+
+See also: OLC QUESTS
+#d
+"QEDIT NAME"
+
+Usage:  .name <name>
+
+The quest's name should be distinctive, but reasonably short. As a general
+rule, it shouldn't be longer than about 40 characters.
+
+See also: OLC QUESTS
+#d
+"QEDIT REPEAT"
+
+Usage:  .repeat <minutes>
+        .repeat never
+        .repeat immediately
+
+You can set quests to be repeatable after a certain amount of time. This will
+remove the quest from players' completion list, allowing them to pick up the
+quest again.
+
+See also: QEDIT PREREQS, QEDIT TASKS, OLC QUESTS
+#d
+"QEDIT REWARDS"
+
+Usage:  .rewards add <type> <amount> <vnum/type>
+        .rewards change <number> vnum <value>
+        .rewards copy <from type> <from vnum>
+        .rewards remove <number | all>
+        .rewards move <number> <up | down>
+
+Quest rewards are given to the player upon completion. You can add as many or
+as few rewards as possible, and you can also use quest scripts to give more
+complicated rewards instead.
+
+Available reward types:
+ BONUS-EXP - Give the player additional bonus exp (expires at end of day).
+ COINS - Give the player some coins (empire or misc).
+ OBJECT - Give the player items.
+ SET-SKILL - Set the player's skill to a specific level (usually 0, 50, 75,
+    100). You should use prereqs to be sure what the player's skill is first.
+ SKILL-EXP - Give the player some skill experience and a chance for skill gain.
+ SKILL-LEVELS - Raise the player's skill level, if possible.
+ QUEST-CHAIN - Starts a player on another quest, if they meet the pre-reqs and
+    are not already on it.
+
+Note: If you set empire coins as the reward, but the mob is not part of an
+empire, the player will receive misc coins instead.
+
+See also: QEDIT PREREQS, QEDIT SCRIPTS, OLC QUESTS
+#d
+"QEDIT STARTS AT" "QEDIT ENDS AT"
+
+Usage:  .<starts/ends> add <type> <vnum>
+        .<starts/ends> change <number> vnum <value>
+        .<starts/ends> copy <from type> <from vnum> [starts/ends]
+        .<starts/ends> remove <number | all>
+
+You can set the quest givers -- the people/places/things it starts and ends at.
+Players can pick up the quest from any of the listed starts, and can turn it in
+at any of the listed ends.
+
+Available quest giver types:
+ BUILDING - Quest starts in a building/room.
+ MOBILE - Quest starts at a given mob.
+ OBJECT - Quest starts at a given object (if not bound to someone else).
+ ROOM-TEMPLATE - Quest starts at a given room template.
+ TRIGGER - Quest is given by a trigger.
+
+NOTE: The "trigger" type is only used for tracking purposes. Unlike the other
+types, it won't cause the trigger to automatically offer the quest. Instead,
+this indicates that you will use the %quest% command to give or complete the
+quest in that trigger.
+
+See also: %QUEST%, OLC QUESTS
+#d
+"QEDIT TASKS" "QEDIT PREREQS" "QEDIT PREREQUISITES" "QEDIT PRE-REQS" "QEDIT PRE-REQUISITES"
+
+Usage:  .<prereqs/tasks> add <type> <vnum>
+        .<prereqs/tasks> change <number> vnum <value>
+        .<prereqs/tasks> copy <from type> <from vnum> [tasks/prereqs]
+        .<prereqs/tasks> remove <number | all>
+
+You can set certain requirements for a task to be obtained or completed. The
+prereqs are things required before the player can obtain the quest. The tasks
+are requirements to complete the quest and turn it in. All requirements must
+be met.
+
+Available tasks:
+ COMPLETED-QUEST - Must complete a certain quest.
+ GET-COMPONENT - Must have components.
+ GET-OBJECT - Must have items.
+ KILL-MOB &r*&0 - Must kill a certain mob.
+ KILL-MOB-FLAGGED &r*&0 - Must kill mobs with certain flags.
+ NOT-COMPLETED-QUEST - Has not completed a certain quest.
+ NOT-ON-QUEST - Is not currently on a certain quest.
+ OWN-BUILDING - Empire has a certain building.
+ OWN-VEHICLE - Empire has a certain vehicle.
+ SKILL-LEVEL-OVER - Player has a certain skill at least this high.
+ SKILL-LEVEL-UNDER - Player has a certain skill no higher than this.
+ TRIGGERED &r*&0 - Activated by a %quest% command in a trigger.
+ VISIT-BUILDING &r*&0 - Player must go to a certain building/room.
+ VISIT-ROOM-TEMPLATE &r*&0 - Player must go to a certain room template.
+ VISIT-SECTOR &r*&0 - Player must go to a certain terrain.
+ HAVE-ABILITY - Player must have a certain ability.
+
+&r*&0 Some types cannot be used as prereqs, only as tasks.
+
+See also: COMPONENT FLAGS, MEDIT FLAG, %QUEST%, OLC QUESTS
 #d
 "REDIT DESCRIPTION"
 

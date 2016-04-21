@@ -161,189 +161,37 @@ void trig_data_copy(trig_data *this_data, const trig_data *trg) {
 		this_data->arglist = strdup(trg->arglist);
 }
 
-/* for mobs and rooms: */
-void dg_read_trigger(char *line, void *proto, int type) {
-	char junk[8];
-	int vnum, count;
-	char_data *mob;
-	room_data *room;
-	room_template *rmt;
-	vehicle_data *veh;
-	obj_data *obj;
-	adv_data *adv;
-	bld_data *bld;
-	trig_data *trproto;
-	struct trig_proto_list *trg_proto, *new_trg;
 
-	count = sscanf(line, "%s %d", junk, &vnum);
-
-	if (count != 2) {
-		syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: Error assigning trigger! - Line was\n  %s", line);
-		return;
+/**
+* Parses a trigger proto from a line already read from a file. These genrally
+* appear as:
+*
+* T 12345
+*
+* @param char *line The line already read from the file.
+* @param struct trig_proto_list **list The list to append to.
+* @param char *error_str How to report if there is an error.
+*/
+void parse_trig_proto(char *line, struct trig_proto_list **list, char *error_str) {
+	struct trig_proto_list *trig;
+	any_vnum vnum;
+	char junk;
+	
+	if (!line || !list) {
+		log("SYSERR: parse_trig_proto called without %s, from %s", line ? "list" : "line", error_str ? error_str : "UNKNOWN");
+		exit(1);
 	}
-
-	trproto = real_trigger(vnum);
-	if (!trproto) {
-		switch(type) {
-			case MOB_TRIGGER:
-				syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (mob: %s - %d)", vnum, GET_NAME((char_data*)proto), GET_MOB_VNUM((char_data*)proto));
-				break;
-			case WLD_TRIGGER:
-				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (room:%d)", vnum, GET_ROOM_VNUM(((room_data*)proto)));
-				break;
-			case RMT_TRIGGER:
-				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (rmt:%d)", vnum, ((room_template*)proto)->vnum);
-				break;
-			case BLD_TRIGGER: {
-				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (bld:%d)", vnum, ((bld_data*)proto)->vnum);
-				break;
-			}
-			case ADV_TRIGGER:
-				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (adv:%d)", vnum, ((adv_data*)proto)->vnum);
-				break;
-			case VEH_TRIGGER:
-				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (veh:%d)", vnum, ((vehicle_data*)proto)->vnum);
-				break;
-			case OBJ_TRIGGER:
-				syslog(SYS_ERROR, LVL_BUILDER, TRUE,  "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (obj:%d)", vnum, ((obj_data*)proto)->vnum);
-				break;
-			default:
-				syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: dg_read_trigger: Trigger vnum #%d asked for but non-existant! (?)", vnum);
-				break;
-		}
-		return;
+	if (sscanf(line, "%c %d", &junk, &vnum) != 2) {
+		log("SYSERR: format error in trigger line of %s", error_str ? error_str : "UNKNOWN");
+		exit(1);
 	}
-
-	switch(type) {
-		case ADV_TRIGGER: {
-			CREATE(new_trg, struct trig_proto_list, 1);
-			new_trg->vnum = vnum;
-			new_trg->next = NULL;
-			adv = (adv_data*)proto;
-			trg_proto = GET_ADV_SCRIPTS(adv);
-			if (!trg_proto) {
-				GET_ADV_SCRIPTS(adv) = trg_proto = new_trg;
-			}
-			else {
-				while (trg_proto->next) {
-					trg_proto = trg_proto->next;
-				}
-				trg_proto->next = new_trg;
-			}
-			break;
-		}
-		case MOB_TRIGGER:
-			CREATE(new_trg, struct trig_proto_list, 1);
-			new_trg->vnum = vnum;
-			new_trg->next = NULL;
-
-			mob = (char_data*)proto;
-			trg_proto = mob->proto_script;
-			if (!trg_proto) {
-				mob->proto_script = trg_proto = new_trg;
-			}
-			else {
-				while (trg_proto->next) 
-					trg_proto = trg_proto->next;
-				trg_proto->next = new_trg;
-			}
-			break;
-		case OBJ_TRIGGER: {
-			CREATE(new_trg, struct trig_proto_list, 1);
-			new_trg->vnum = vnum;
-			new_trg->next = NULL;
-
-			obj = (obj_data*)proto;
-			trg_proto = obj->proto_script;
-			if (!trg_proto) {
-				obj->proto_script = trg_proto = new_trg;
-			}
-			else {
-				while (trg_proto->next) 
-					trg_proto = trg_proto->next;
-				trg_proto->next = new_trg;
-			}
-			break;
-		}
-		case RMT_TRIGGER: {
-			CREATE(new_trg, struct trig_proto_list, 1);
-			new_trg->vnum = vnum;
-			new_trg->next = NULL;
-			rmt = (room_template*)proto;
-			trg_proto = GET_RMT_SCRIPTS(rmt);
-			if (!trg_proto) {
-				GET_RMT_SCRIPTS(rmt) = trg_proto = new_trg;
-			}
-			else {
-				while (trg_proto->next) {
-					trg_proto = trg_proto->next;
-				}
-				trg_proto->next = new_trg;
-			}
-			break;
-		}
-		case BLD_TRIGGER: {
-			CREATE(new_trg, struct trig_proto_list, 1);
-			new_trg->vnum = vnum;
-			new_trg->next = NULL;
-			bld = (bld_data*)proto;
-			trg_proto = GET_BLD_SCRIPTS(bld);
-			if (!trg_proto) {
-				GET_BLD_SCRIPTS(bld) = trg_proto = new_trg;
-			}
-			else {
-				while (trg_proto->next) {
-					trg_proto = trg_proto->next;
-				}
-				trg_proto->next = new_trg;
-			}
-			break;
-		}
-		case WLD_TRIGGER:
-			CREATE(new_trg, struct trig_proto_list, 1);
-			new_trg->vnum = vnum;
-			new_trg->next = NULL;
-			room = (room_data*)proto;
-			trg_proto = room->proto_script;
-			if (!trg_proto) {
-				room->proto_script = trg_proto = new_trg;
-			}
-			else {
-				while (trg_proto->next)
-					trg_proto = trg_proto->next;
-				trg_proto->next = new_trg;
-			}
-
-			if (trproto) {
-				if (!(room->script))
-					CREATE(room->script, struct script_data, 1);
-				add_trigger(SCRIPT(room), read_trigger(vnum), -1);
-			}
-			else {
-				syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: non-existant trigger #%d assigned to room #%d", vnum, GET_ROOM_VNUM(room));
-			}
-			break;
-		case VEH_TRIGGER: {
-			CREATE(new_trg, struct trig_proto_list, 1);
-			new_trg->vnum = vnum;
-			new_trg->next = NULL;
-
-			veh = (vehicle_data*)proto;
-			trg_proto = veh->proto_script;
-			if (!trg_proto) {
-				veh->proto_script = trg_proto = new_trg;
-			}
-			else {
-				while (trg_proto->next) 
-					trg_proto = trg_proto->next;
-				trg_proto->next = new_trg;
-			}
-			break;
-		}
-		default:
-			syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: Trigger vnum #%d assigned to non-mob/obj/room", vnum);
-	}
+	
+	CREATE(trig, struct trig_proto_list, 1);
+	trig->vnum = vnum;
+	
+	LL_APPEND(*list, trig);
 }
+
 
 void dg_obj_trigger(char *line, obj_data *obj) {
 	char junk[8];

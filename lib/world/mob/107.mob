@@ -82,8 +82,8 @@ A cat stands on his hind legs, looking for his fiddle.
 0 25 d n
 1 0 0 15
 T 10748
-T 10731
 T 10730
+T 10731
 S
 #10732
 jack~
@@ -93,8 +93,8 @@ Jack is looking for a pail to fetch some water.
 0 25 d n
 1 0 0 15
 T 10748
-T 10733
 T 10732
+T 10731
 S
 #10733
 jill~
@@ -104,7 +104,7 @@ Jill seems to be looking for something.
 0 25 d n
 2 0 0 15
 T 10736
-T 10745
+T 10731
 S
 #10734
 jack nimble~
@@ -114,8 +114,8 @@ Jack B. Nimble is looking for something to leap over.
 0 25 d n
 1 0 0 15
 T 10748
-T 10735
 T 10734
+T 10731
 S
 #10737
 jack sprat~
@@ -125,8 +125,8 @@ Jack Sprat holds his belly as it rumbles for food.
 0 25 d n
 1 0 0 15
 T 10748
-T 10738
 T 10737
+T 10731
 S
 #10739
 jack horner~
@@ -136,8 +136,8 @@ Jack Horner is sitting in the corner.
 0 25 d n
 1 0 0 15
 T 10748
-T 10740
 T 10739
+T 10731
 S
 #10741
 muffet miss little~
@@ -147,8 +147,8 @@ Little Miss Muffet is sitting here, hungry.
 0 25 d n
 2 0 0 15
 T 10748
-T 10742
 T 10741
+T 10731
 S
 #10743
 mary~
@@ -158,8 +158,8 @@ Mary is looking frantically for her lamb.
 0 25 d n
 2 0 0 15
 T 10748
-T 10744
 T 10743
+T 10731
 S
 #10744
 lamb little~
@@ -179,8 +179,8 @@ An old woman sits in a rocking chair by the giant shoe.
 0 25 bd n
 2 0 0 15
 T 10748
-T 10747
 T 10746
+T 10731
 S
 #10750
 spider hairy giant~

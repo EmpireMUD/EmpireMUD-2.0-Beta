@@ -30,6 +30,7 @@
 *     Mobile Defines
 *     Object Defines
 *     Player Defines
+*     Quest Defines
 *     Sector Defines
 *     Vehicle Defines
 *     Weather and Season Defines
@@ -53,6 +54,7 @@
 *     Fight Structs
 *     Game Structs
 *     Object Structs
+*     Quest Structs
 *     Sector Structs
 *     Trigger Structs
 *     Vehicle Structs
@@ -152,6 +154,7 @@
 #define NO_ABIL  NO_SKILL	// things that don't require an ability
 #define NO_FLAGS  0
 #define NO_SKILL  -1	// things that don't require a skill
+#define NOT_REPEATABLE  -1	// quest's repeatable_after
 #define OTHER_COIN  NOTHING	// use the NOTHING value to store the "other" coin type (which stores by empire id)
 #define REAL_OTHER_COIN  NULL	// for when other-coin type is an empire pointer
 #define UNLIMITED  -1	// unlimited duration/timer
@@ -219,6 +222,7 @@ typedef struct index_data index_data;
 typedef struct morph_data morph_data;
 typedef struct obj_data obj_data;
 typedef struct player_index_data player_index_data;
+typedef struct quest_data quest_data;
 typedef struct room_data room_data;
 typedef struct room_template room_template;
 typedef struct sector_data sector_data;
@@ -315,7 +319,8 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_CHOP  20
 #define INTERACT_FISH  21
 #define INTERACT_PAN  22
-#define NUM_INTERACTS  23
+#define INTERACT_QUARRY  23
+#define NUM_INTERACTS  24
 
 
 // for object saving
@@ -460,46 +465,46 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_INTERLINK  BIT(5)	// can be interlinked
 #define BLD_HERD  BIT(6)	// can herd
 #define BLD_DEDICATE  BIT(7)	// can be dedicated to a player
-#define BLD_DRINK  BIT(8)	// can be used to drink/fill water
+// #define BLD_UNUSED1  BIT(8)
 #define BLD_NO_NPC  BIT(9)	// mobs won't walk in
 #define BLD_BARRIER  BIT(10)	// can only go back the direction you came
-#define BLD_TAVERN  BIT(11)	// building functions as a tavern
+// #define BLD_UNUSED2  BIT(11)
 #define BLD_LARGE_CITY_RADIUS  BIT(12)	// counts as in-city further than normal
-#define BLD_MINE  BIT(13)	// building is minable
+// #define BLD_UNUSED3  BIT(13)
 #define BLD_ATTACH_ROAD  BIT(14)	// building connects to roads on the map
 #define BLD_BURNABLE  BIT(15)	// fire! fire!
-#define BLD_FORGE  BIT(16)	// can forge here
-#define BLD_COOKING_FIRE  BIT(17)	// allows cook
-#define BLD_ALCHEMIST  BIT(18)	// provides alchemy tools
-#define BLD_STABLE  BIT(19)	// mobs don't despawn; can shear, barde, etc
-#define BLD_LIBRARY  BIT(20)	// can use library and bookedit commands
-#define BLD_APIARY  BIT(21)	// provides Apiaries tech
-#define BLD_GLASSBLOWER  BIT(22)	// provides Glassblowing tech
-#define BLD_DOCKS  BIT(23)	// provides Seaport tech
-#define BLD_PIGEON_POST  BIT(24)	// can use mail
-#define BLD_MILL  BIT(25)	// can use the mill command
-#define BLD_POTTER  BIT(26)	// pottery crafts go faster
-#define BLD_TAILOR  BIT(27)	// can use tailoring abilities here
-#define BLD_BATHS  BIT(28)	// can bathe here
+// #define BLD_UNUSED4  BIT(16)
+// #define BLD_UNUSED5  BIT(17)
+// #define BLD_UNUSED6  BIT(18)
+// #define BLD_UNUSED7  BIT(19)
+// #define BLD_UNUSED8  BIT(20)
+// #define BLD_UNUSED9  BIT(21)
+// #define BLD_UNUSED10  BIT(22)
+// #define BLD_UNUSED11  BIT(23)
+// #define BLD_UNUSED12  BIT(24)
+// #define BLD_UNUSED13  BIT(25)
+// #define BLD_UNUSED14  BIT(26)
+// #define BLD_UNUSED15  BIT(27)
+// #define BLD_UNUSED16  BIT(28)
 #define BLD_SAIL  BIT(29)	// ships can pass through building
-#define BLD_TOMB  BIT(30)	// can set as a tomb
-#define BLD_MINT  BIT(31)	// can mint coins
-#define BLD_VAULT  BIT(32)	// for various vault functions
+// #define BLD_UNUSED17  BIT(30)
+// #define BLD_UNUSED18  BIT(31)
+// #define BLD_UNUSED19  BIT(32)
 #define BLD_ITEM_LIMIT  BIT(33)	// room does not hold unlimited items
 #define BLD_LONG_AUTOSTORE  BIT(34)	// autostore takes a long time here
-#define BLD_WAREHOUSE  BIT(35)	// warehouse command
-#define BLD_TRADE  BIT(36)	// trading post / trade command
+// #define BLD_UNUSED20  BIT(35)
+// #define BLD_UNUSED21  BIT(36)
 #define BLD_HIGH_DEPLETION  BIT(37)	// allows more resource farming here
-#define BLD_PORTAL  BIT(38)	// functions as a portal building
-#define BLD_BEDROOM  BIT(39)	// boosts regen when sleeping
+// #define BLD_UNUSED22  BIT(38)
+// #define BLD_UNUSED23  BIT(39)
 #define BLD_NO_DELETE  BIT(40)	// will not be deleted for not having a homeroom
-#define BLD_SUMMON_PLAYER  BIT(41)	// can use the summon player command
+// #define BLD_UNUSED24  BIT(41)
 #define BLD_NEED_BOAT  BIT(42)	// requires a boat to enter
 #define BLD_LOOK_OUT  BIT(43)	// can see the map using "look out"
 #define BLD_SECONDARY_TERRITORY  BIT(44)	// similar to a ship -- counts as territory off the map
-#define BLD_SHIPYARD  BIT(45)	// for building ships
+// #define BLD_UNUSED25  BIT(45)
 #define BLD_UPGRADED  BIT(46)	// combines with SHIPYARD, etc. to create upgraded versions of buildings
-#define BLD_PRESS  BIT(47)	// can use the 'press' craft command
+// #define BLD_UNUSED26  BIT(47)
 
 
 // Terrain flags for do_build -- these match up with build_on flags for building crafts
@@ -548,6 +553,42 @@ typedef struct vehicle_data vehicle_data;
 #define DES_SHIP_LARGE		BIT(15)
 #define DES_SHIP_EXTRA		BIT(16)
 #define DES_LAND_VEHICLE	BIT(17)
+
+
+// FNC_x: function flags (for buildings)
+#define FNC_ALCHEMIST  BIT(0)	// can brew and mix here
+#define FNC_APIARY  BIT(1)	// grants the Apiaries tech to the empire
+#define FNC_BATHS  BIT(2)	// can use the bathe command here
+#define FNC_BEDROOM  BIT(3)	// boosts regen while sleeping
+#define FNC_CARPENTER  BIT(4)	// required by some crafts
+#define FNC_DIGGING  BIT(5)	// triggers the workforce digging chore (also need interact
+#define FNC_DOCKS  BIT(6)	// grants the seaport tech to the empire; counts as a dock fo
+#define FNC_FORGE  BIT(7)	// can use the forge and reforge commands here
+#define FNC_GLASSBLOWER  BIT(8)	// grants the Glassblowing tech to the empire
+#define FNC_GUARD_TOWER  BIT(9)	// hostile toward enemy players, at range
+#define FNC_HENGE  BIT(10)	// allows Chant of Druids
+#define FNC_LIBRARY  BIT(11)	// can write and store books here
+#define FNC_MAIL  BIT(12)	// players can send mail here
+#define FNC_MILL  BIT(13)	// can use the mill command here
+#define FNC_MINE  BIT(14)	// can be mined for ore resources
+#define FNC_MINT  BIT(15)	// functions as a mint
+#define FNC_PORTAL  BIT(16)	// functions as a portal building
+#define FNC_POTTER  BIT(17)	// pottery craft time is reduced here
+#define FNC_PRESS  BIT(18)	// can use the 'press' craft
+#define FNC_SAW  BIT(19)	//allows sawing here
+#define FNC_SHIPYARD  BIT(20)	// used to build ships
+#define FNC_SMELT  BIT(21)	// allows smelting here
+#define FNC_STABLE  BIT(22)	// can shear, milk, and barde animals here; animals in this 
+#define FNC_SUMMON_PLAYER  BIT(23)	// allows the summon player command
+#define FNC_TAILOR  BIT(24)	// counts as tailor; can use refashion here
+#define FNC_TANNERY  BIT(25)	// allows tanning here
+#define FNC_TAVERN  BIT(26)	// functions as a tavern (don't set this on the same buildin
+#define FNC_TOMB  BIT(27)	// players can re-spawn here after dying
+#define FNC_TRADING_POST  BIT(28)	// access to global trade, e.g. a trading post
+#define FNC_VAULT  BIT(29)	// stores coins, can use the warehouse command for privileged
+#define FNC_WAREHOUSE  BIT(30)	// can use the warehouse command and store unique items
+#define FNC_DRINK_WATER  BIT(31)	// can drink here
+#define FNC_COOKING_FIRE  BIT(32)	// can cook here
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1466,6 +1507,7 @@ typedef struct vehicle_data vehicle_data;
 #define GRANT_ISLAND  BIT(35)
 #define GRANT_OSET  BIT(36)
 #define GRANT_PLAYERDELETE  BIT(37)
+#define GRANT_UNQUEST  BIT(38)
 
 
 // Lore types
@@ -1507,6 +1549,7 @@ typedef struct vehicle_data vehicle_data;
 // OFFER_x - types for the do_accept/offer_data system
 #define OFFER_RESURRECTION  0
 #define OFFER_SUMMON  1
+#define OFFER_QUEST  2
 
 
 // PLR_x: Player flags: used by char_data.char_specials.act
@@ -1592,6 +1635,63 @@ typedef struct vehicle_data vehicle_data;
 #define WAIT_MOVEMENT  3	// normal move lag
 #define WAIT_SPELL  4	// general spells
 #define WAIT_OTHER  5	// not covered by other categories
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// QUEST DEFINES ///////////////////////////////////////////////////////////
+
+// QST_x: quest flags
+#define QST_IN_DEVELOPMENT  BIT(0)	// not an active quest
+#define QST_REPEAT_PER_INSTANCE  BIT(1)	// clears completion when instance closes
+#define QST_EXPIRES_AFTER_INSTANCE  BIT(2)	// fails if instance closes
+#define QST_EXTRACT_TASK_OBJECTS  BIT(3)	// takes away items required by the task
+
+
+// QG_x: quest giver types
+#define QG_BUILDING  0
+#define QG_MOBILE  1
+#define QG_OBJECT  2
+#define QG_ROOM_TEMPLATE  3
+#define QG_TRIGGER  4
+
+
+// QR_x: quest reward types
+#define QR_BONUS_EXP  0
+#define QR_COINS  1
+#define QR_OBJECT  2
+#define QR_SET_SKILL  3
+#define QR_SKILL_EXP  4
+#define QR_SKILL_LEVELS  5
+#define QR_QUEST_CHAIN  6
+
+
+// QT_x: quest tracker types (conditions and pre-reqs)
+#define QT_COMPLETED_QUEST  0
+#define QT_GET_COMPONENT  1
+#define QT_GET_OBJECT  2
+#define QT_KILL_MOB  3
+#define QT_KILL_MOB_FLAGGED  4
+#define QT_NOT_COMPLETED_QUEST  5
+#define QT_NOT_ON_QUEST  6
+#define QT_OWN_BUILDING  7
+#define QT_OWN_VEHICLE  8
+#define QT_SKILL_LEVEL_OVER  9
+#define QT_SKILL_LEVEL_UNDER  10
+#define QT_TRIGGERED  11	// completed by a script
+#define QT_VISIT_BUILDING  12
+#define QT_VISIT_ROOM_TEMPLATE  13
+#define QT_VISIT_SECTOR  14
+#define QT_HAVE_ABILITY  15
+
+
+// QT_AMT_x: How quest trackers are displayed for different QT_ types
+#define QT_AMT_NONE  0	// show as "completed"
+#define QT_AMT_NUMBER  1  // show as x/X
+#define QT_AMT_THRESHOLD  2	// needs a numeric arg but shows as a threshold
+
+
+// indicates empire (rather than misc) coins for a reward
+#define REWARD_EMPIRE_COIN  0
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2303,6 +2403,9 @@ struct room_template {
 	struct interaction_item *interactions;	// interaction items
 	struct trig_proto_list *proto_script;	// list of default triggers
 	
+	// live data (not saved, not freed)
+	struct quest_lookup *quest_lookups;
+	
 	UT_hash_handle hh;	// room_template_table hash
 };
 
@@ -2439,6 +2542,7 @@ struct bld_data {
 	int max_damage;
 	int fame;	// how much is added to empire fame
 	bitvector_t flags;	// BLD_
+	bitvector_t functions;	// FNC_
 	bld_vnum upgrades_to;	// the vnum of any building
 	
 	int extra_rooms;	// how many rooms it can have
@@ -2453,6 +2557,9 @@ struct bld_data {
 	struct spawn_info *spawns;	// linked list of spawn data
 	struct interaction_item *interactions;	// interaction items
 	struct trig_proto_list *proto_script;	// list of default triggers
+	
+	// live data (not saved, not freed)
+	struct quest_lookup *quest_lookups;
 	
 	UT_hash_handle hh;	// building_table hash handle
 };
@@ -2702,6 +2809,7 @@ struct descriptor_data {
 	bld_data *olc_building;	// building being edited
 	crop_data *olc_crop;	// crop being edited
 	struct global_data *olc_global;	// global being edited
+	quest_data *olc_quest;	// quest being edited
 	room_template *olc_room_template;	// rmt being edited
 	struct sector_data *olc_sector;	// sector being edited
 	skill_data *olc_skill;	// skill being edited
@@ -2800,6 +2908,10 @@ struct player_special_data {
 	int last_tip;	// for display_tip_to_character
 	byte mapsize;	// how big the player likes the map
 	char custom_colors[NUM_CUSTOM_COLORS];	// for custom channel coloring, storing the letter part of the & code ('r' for &r)
+	
+	// quests
+	struct player_quest *quests;	// quests the player is on (player_quest->next)
+	struct player_completed_quest *completed_quests;	// hash table (hh)
 	
 	// empire
 	empire_vnum pledge;	// Empire he's applying to
@@ -3005,6 +3117,9 @@ struct char_data {
 
 	char *prev_host;	// Previous host (they're Trills)
 	time_t prev_logon;	// Time (in secs) of prev logon
+	
+	// live data (not saved, not freed)
+	struct quest_lookup *quest_lookups;
 	
 	UT_hash_handle hh;	// mobile_table
 };
@@ -3485,6 +3600,8 @@ struct obj_flag_data {
 	int current_scale_level;	// level the obj was scaled to, or -1 for not scaled
 	int min_scale_level;	// minimum level this obj may be scaled to
 	int max_scale_level;	// maximum level this obj may be scaled to
+	
+	any_vnum requires_quest;	// can only have obj whilst on quest
 };
 
 
@@ -3529,6 +3646,9 @@ struct obj_data {
 	obj_data *next_content;	// For 'contains' lists
 	obj_data *next;	// For the object list
 	
+	// live data (not saved, not freed)
+	struct quest_lookup *quest_lookups;
+	
 	UT_hash_handle hh;	// object_table hash
 };
 
@@ -3548,6 +3668,109 @@ struct obj_storage_type {
 	int flags;	// STORAGE_x
 	
 	struct obj_storage_type *next;
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// QUEST STRUCTS ///////////////////////////////////////////////////////////
+
+struct quest_data {
+	any_vnum vnum;
+	ush_int version;	// for auto-updating
+	
+	char *name;
+	char *description;	// is this also the start-quest message?
+	char *complete_msg;	// text shown on completion
+	
+	bitvector_t flags;	// QST_ flags
+	struct quest_giver *starts_at;	// people/things that start the quest
+	struct quest_giver *ends_at;	// people/things where you can turn it in
+	struct quest_task *tasks;	// list of objectives
+	struct quest_reward *rewards;	// linked list
+	
+	// constraints
+	int min_level;	// or 0 for no min
+	int max_level;	// or 0 for no max
+	struct quest_task *prereqs;	// linked list of prerequisites
+	int repeatable_after;	// minutes to repeat; NOT_REPEATABLE for none
+	
+	struct trig_proto_list *proto_script;	// quest triggers
+	
+	UT_hash_handle hh;	// hash handle for quest_table
+};
+
+
+// for start, finish
+struct quest_giver {
+	int type;	// mob, obj, etc
+	any_vnum vnum;	// what mob
+	
+	struct quest_giver *next;	// may have more than one
+};
+
+
+// reverse-lookups for quest givers
+struct quest_lookup {
+	quest_data *quest;
+	struct quest_lookup *next;
+};
+
+
+// the spoils
+struct quest_reward {
+	int type;	// QR_ type
+	any_vnum vnum;	// which one of type
+	int amount;	// how many items, how much exp
+	
+	struct quest_reward *next;
+};
+
+
+// a pre-requisite or requirement for a quest
+struct quest_task {
+	int type;	// QT_ type
+	any_vnum vnum;
+	bitvector_t misc;	// stores flags for some types
+	
+	int needed;	// how many the player needs
+	int current;	// how many the player has
+	
+	struct quest_task *next;
+};
+
+
+// used for building a linked list of available quests
+struct quest_temp_list {
+	quest_data *quest;
+	struct instance_data *instance;
+	struct quest_temp_list *next;
+};
+
+
+// for tracking player quest completion
+struct player_completed_quest {
+	any_vnum vnum;	// which quest
+	time_t last_completed;	// when
+	
+	any_vnum last_instance_id;	// where last completed one was acquired
+	any_vnum last_adventure;	// which adventure it was acquired in
+	
+	UT_hash_handle hh;	// stored in player's hash table
+};
+
+
+// quests the player is on
+struct player_quest {
+	any_vnum vnum;	// which quest
+	ush_int version;	// for auto-updating
+	time_t start_time;	// when started
+	
+	struct quest_task *tracker;	// quest tasks to track
+	
+	any_vnum instance_id;	// where it was acquired (if anywhere)
+	any_vnum adventure;	// which adventure it was acquired in
+	
+	struct player_quest *next;	// linked list
 };
 
 

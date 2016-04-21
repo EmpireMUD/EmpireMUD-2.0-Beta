@@ -107,6 +107,7 @@ OLC_MODULE(bedit_extra_desc);
 OLC_MODULE(bedit_extrarooms);
 OLC_MODULE(bedit_fame);
 OLC_MODULE(bedit_flags);
+OLC_MODULE(bedit_functions);
 OLC_MODULE(bedit_hitpoints);
 OLC_MODULE(bedit_icon);
 OLC_MODULE(bedit_interaction);
@@ -253,6 +254,7 @@ OLC_MODULE(oedit_poison);
 OLC_MODULE(oedit_potion);
 OLC_MODULE(oedit_potionscale);
 OLC_MODULE(oedit_quantity);
+OLC_MODULE(oedit_requiresquest);
 OLC_MODULE(oedit_roomvnum);
 OLC_MODULE(oedit_script);
 OLC_MODULE(oedit_short_description);
@@ -265,6 +267,21 @@ OLC_MODULE(oedit_value3);
 OLC_MODULE(oedit_wealth);
 OLC_MODULE(oedit_weapontype);
 OLC_MODULE(oedit_wear);
+
+// quests
+OLC_MODULE(qedit_completemessage);
+OLC_MODULE(qedit_description);
+OLC_MODULE(qedit_ends);
+OLC_MODULE(qedit_flags);
+OLC_MODULE(qedit_name);
+OLC_MODULE(qedit_maxlevel);
+OLC_MODULE(qedit_minlevel);
+OLC_MODULE(qedit_prereqs);
+OLC_MODULE(qedit_repeat);
+OLC_MODULE(qedit_rewards);
+OLC_MODULE(qedit_script);
+OLC_MODULE(qedit_starts);
+OLC_MODULE(qedit_tasks);
 
 // room template
 OLC_MODULE(rmedit_affects);
@@ -365,6 +382,7 @@ void olc_show_global(char_data *ch);
 void olc_show_mobile(char_data *ch);
 void olc_show_morph(char_data *ch);
 void olc_show_object(char_data *ch);
+void olc_show_quest(char_data *ch);
 void olc_show_room_template(char_data *ch);
 void olc_show_sector(char_data *ch);
 void olc_show_skill(char_data *ch);
@@ -383,6 +401,7 @@ extern struct global_data *setup_olc_global(struct global_data *input);
 extern char_data *setup_olc_mobile(char_data *input);
 extern morph_data *setup_olc_morph(morph_data *input);
 extern obj_data *setup_olc_object(obj_data *input);
+extern quest_data *setup_olc_quest(quest_data *input);
 extern room_template *setup_olc_room_template(room_template *input);
 extern sector_data *setup_olc_sector(sector_data *input);
 extern skill_data *setup_olc_skill(skill_data *input);
@@ -394,16 +413,16 @@ extern bool validate_icon(char *icon);
 // master olc command structure
 const struct olc_command_data olc_data[] = {
 	// OLC_x: main commands
-	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_ROOM_TEMPLATE | OLC_SKILL | OLC_VEHICLE, NOBITS },
-	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
+	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SKILL | OLC_VEHICLE, NOBITS },
+	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
-	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	
 	// admin
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
@@ -472,6 +491,7 @@ const struct olc_command_data olc_data[] = {
 	{ "extra", bedit_extra_desc, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "fame", bedit_fame, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "flags", bedit_flags, OLC_BUILDING, OLC_CF_EDITOR },
+	{ "functions", bedit_functions, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "hitpoints", bedit_hitpoints, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "icon", bedit_icon, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "interaction", bedit_interaction, OLC_BUILDING, OLC_CF_EDITOR },
@@ -619,6 +639,7 @@ const struct olc_command_data olc_data[] = {
 	{ "potion", oedit_potion, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "potionscale", oedit_potionscale, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "quantity", oedit_quantity, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "requiresquest", oedit_requiresquest, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "roomvnum", oedit_roomvnum, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "script", oedit_script, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "shortdescription", oedit_short_description, OLC_OBJECT, OLC_CF_EDITOR },
@@ -632,7 +653,22 @@ const struct olc_command_data olc_data[] = {
 	{ "wealth", oedit_wealth, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "weapontype", oedit_weapontype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "wear", oedit_wear, OLC_OBJECT, OLC_CF_EDITOR },
-
+	
+	// quest commands
+	{ "completemessage", qedit_completemessage, OLC_QUEST, OLC_CF_EDITOR },
+	{ "description", qedit_description, OLC_QUEST, OLC_CF_EDITOR },
+	{ "ends", qedit_ends, OLC_QUEST, OLC_CF_EDITOR },
+	{ "flags", qedit_flags, OLC_QUEST, OLC_CF_EDITOR },
+	{ "name", qedit_name, OLC_QUEST, OLC_CF_EDITOR },
+	{ "maxlevel", qedit_maxlevel, OLC_QUEST, OLC_CF_EDITOR },
+	{ "minlevel", qedit_minlevel, OLC_QUEST, OLC_CF_EDITOR },
+	{ "prereqs", qedit_prereqs, OLC_QUEST, OLC_CF_EDITOR },
+	{ "repeat", qedit_repeat, OLC_QUEST, OLC_CF_EDITOR },
+	{ "rewards", qedit_rewards, OLC_QUEST, OLC_CF_EDITOR },
+	{ "script", qedit_script, OLC_QUEST, OLC_CF_EDITOR },
+	{ "starts", qedit_starts, OLC_QUEST, OLC_CF_EDITOR },
+	{ "tasks", qedit_tasks, OLC_QUEST, OLC_CF_EDITOR },
+	
 	// room template commands
 	{ "affects", rmedit_affects, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "description", rmedit_description, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
@@ -873,6 +909,11 @@ OLC_MODULE(olc_abort) {
 				GET_OLC_OBJECT(ch->desc) = NULL;
 				break;
 			}
+			case OLC_QUEST: {
+				free_quest(GET_OLC_QUEST(ch->desc));
+				GET_OLC_QUEST(ch->desc) = NULL;
+				break;
+			}
 			case OLC_ROOM_TEMPLATE: {
 				free_room_template(GET_OLC_ROOM_TEMPLATE(ch->desc));
 				GET_OLC_ROOM_TEMPLATE(ch->desc) = NULL;
@@ -1063,6 +1104,16 @@ OLC_MODULE(olc_audit) {
 				}
 				break;
 			}
+			case OLC_QUEST: {
+				extern bool audit_quest(quest_data *quest, char_data *ch);
+				quest_data *quest, *next_quest;
+				HASH_ITER(hh, quest_table, quest, next_quest) {
+					if (QUEST_VNUM(quest) >= from_vnum && QUEST_VNUM(quest) <= to_vnum) {
+						found |= audit_quest(quest, ch);
+					}
+				}
+				break;
+			}
 			case OLC_ROOM_TEMPLATE: {
 				extern bool audit_room_template(room_template *rmt, char_data *ch);
 				room_template *rmt, *next_rmt;
@@ -1235,6 +1286,11 @@ OLC_MODULE(olc_copy) {
 			exists = (obj_proto(from_vnum) != NULL);
 			break;
 		}
+		case OLC_QUEST: {
+			found = (quest_proto(vnum) != NULL);
+			exists = (quest_proto(from_vnum) != NULL);
+			break;
+		}
 		case OLC_ROOM_TEMPLATE: {
 			found = (room_template_proto(vnum) != NULL);
 			exists = (room_template_proto(from_vnum) != NULL);
@@ -1392,6 +1448,13 @@ OLC_MODULE(olc_copy) {
 			olc_show_object(ch);
 			break;
 		}
+		case OLC_QUEST: {
+			GET_OLC_QUEST(ch->desc) = setup_olc_quest(quest_proto(from_vnum));
+			GET_OLC_QUEST(ch->desc)->vnum = vnum;
+			SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(ch->desc)), QST_IN_DEVELOPMENT);	// ensure flag
+			olc_show_quest(ch);
+			break;
+		}
 		case OLC_ROOM_TEMPLATE: {
 			GET_OLC_ROOM_TEMPLATE(ch->desc) = setup_olc_room_template(room_template_proto(from_vnum));
 			GET_OLC_ROOM_TEMPLATE(ch->desc)->vnum = vnum;			
@@ -1545,6 +1608,11 @@ OLC_MODULE(olc_delete) {
 			olc_delete_object(ch, vnum);
 			break;
 		}
+		case OLC_QUEST: {
+			void olc_delete_quest(char_data *ch, any_vnum vnum);
+			olc_delete_quest(ch, vnum);
+			break;
+		}
 		case OLC_ROOM_TEMPLATE: {
 			olc_delete_room_template(ch, vnum);
 			break;
@@ -1626,6 +1694,10 @@ OLC_MODULE(olc_display) {
 		}
 		case OLC_OBJECT: {
 			olc_show_object(ch);
+			break;
+		}
+		case OLC_QUEST: {
+			olc_show_quest(ch);
 			break;
 		}
 		case OLC_ROOM_TEMPLATE: {
@@ -1805,6 +1877,13 @@ OLC_MODULE(olc_edit) {
 			olc_show_object(ch);
 			break;
 		}
+		case OLC_QUEST: {
+			// this will set up from existing OR new automatically
+			GET_OLC_QUEST(ch->desc) = setup_olc_quest(quest_proto(vnum));
+			GET_OLC_QUEST(ch->desc)->vnum = vnum;			
+			olc_show_quest(ch);
+			break;
+		}
 		case OLC_ROOM_TEMPLATE: {
 			// this will set up from existing OR new automatically
 			GET_OLC_ROOM_TEMPLATE(ch->desc) = setup_olc_room_template(room_template_proto(vnum));
@@ -1934,6 +2013,10 @@ OLC_MODULE(olc_free) {
 				}
 				case OLC_OBJECT: {
 					free = (obj_proto(iter) == NULL);
+					break;
+				}
+				case OLC_QUEST: {
+					free = (quest_proto(iter) == NULL);
 					break;
 				}
 				case OLC_ROOM_TEMPLATE: {
@@ -2228,6 +2311,20 @@ OLC_MODULE(olc_list) {
 				}
 				break;
 			}
+			case OLC_QUEST: {
+				extern char *list_one_quest(quest_data *quest, bool detail);
+				quest_data *quest, *next_quest;
+				HASH_ITER(hh, quest_table, quest, next_quest) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (QUEST_VNUM(quest) >= from_vnum && QUEST_VNUM(quest) <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_quest(quest, show_details));
+					}
+				}
+				break;
+			}
 			case OLC_ROOM_TEMPLATE: {
 				extern char *list_one_room_template(room_template *rmt, bool detail);
 				room_template *rmt, *next_rmt;
@@ -2320,6 +2417,7 @@ OLC_MODULE(olc_removeindev) {
 	archetype_data *arch, *next_arch;
 	morph_data *morph, *next_morph;
 	craft_data *craft, *next_craft;
+	quest_data *quest, *next_quest;
 	skill_data *skill, *next_skill;
 	augment_data *aug, *next_aug;
 	class_data *cls, *next_cls;
@@ -2476,6 +2574,23 @@ OLC_MODULE(olc_removeindev) {
 			any = TRUE;
 		}
 		
+		HASH_ITER(hh, quest_table, quest, next_quest) {
+			if (QUEST_VNUM(quest) < from || QUEST_VNUM(quest) > to) {
+				continue;
+			}
+			if (!QUEST_FLAGGED(quest, QST_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (!player_can_olc_edit(ch, OLC_QUEST, QUEST_VNUM(quest))) {
+				continue;
+			}
+			
+			REMOVE_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+			msg_to_char(ch, "Removed IN-DEV flag from quest [%d] %s.\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			any = TRUE;
+		}
+		
 		HASH_ITER(hh, skill_table, skill, next_skill) {
 			if (SKILL_VNUM(skill) < from || SKILL_VNUM(skill) > to) {
 				continue;
@@ -2619,6 +2734,13 @@ OLC_MODULE(olc_save) {
 				GET_OLC_OBJECT(ch->desc) = NULL;
 				break;
 			}
+			case OLC_QUEST: {
+				void save_olc_quest(descriptor_data *desc);
+				save_olc_quest(ch->desc);
+				free_quest(GET_OLC_QUEST(ch->desc));
+				GET_OLC_QUEST(ch->desc) = NULL;
+				break;
+			}
 			case OLC_ROOM_TEMPLATE: {
 				save_olc_room_template(ch->desc);
 				free_room_template(GET_OLC_ROOM_TEMPLATE(ch->desc));
@@ -2742,6 +2864,11 @@ OLC_MODULE(olc_search) {
 			}
 			case OLC_OBJECT: {
 				olc_search_obj(ch, vnum);
+				break;
+			}
+			case OLC_QUEST: {
+				void olc_search_quest(char_data *ch, any_vnum vnum);
+				olc_search_quest(ch, vnum);
 				break;
 			}
 			case OLC_ROOM_TEMPLATE: {
@@ -3036,7 +3163,7 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 * @param char *save_buffer A string to write the output to.
 */
 void get_resource_display(struct resource_data *list, char *save_buffer) {
-	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH];
 	struct resource_data *res;
 	obj_data *obj;
 	int num;
@@ -3052,14 +3179,7 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 				break;
 			}
 			case RES_COMPONENT: {
-				if (res->misc) {
-					prettier_sprintbit(res->misc, component_flags, lbuf);
-					strcat(lbuf, " ");
-				}
-				else {
-					*lbuf = '\0';
-				}
-				sprintf(line, "%dx (%s%s)", res->amount, lbuf, component_types[res->vnum]);
+				sprintf(line, "%dx (%s)", res->amount, component_string(res->vnum, res->misc));
 				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
 				break;
 			}
@@ -3472,6 +3592,9 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_OBJECT) && !OLC_FLAGGED(ch, OLC_FLAG_NO_OBJECT)) {
+			return TRUE;
+		}
+		else if (IS_SET(type, OLC_QUEST) && !OLC_FLAGGED(ch, OLC_FLAG_NO_QUESTS)) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_ROOM_TEMPLATE) && !OLC_FLAGGED(ch, OLC_FLAG_NO_ROOM_TEMPLATE)) {
@@ -4672,7 +4795,6 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 void olc_process_resources(char_data *ch, char *argument, struct resource_data **list) {	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	char arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH];
-	char lbuf[MAX_STRING_LENGTH];
 	struct resource_data *res, *next_res, *prev_res, *prev_prev, *change, *temp;
 	int num, type, misc;
 	any_vnum vnum;
@@ -4929,12 +5051,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					
 					change->vnum = vnum;
 					
-					*lbuf = '\0';
-					if (change->misc) {
-						prettier_sprintbit(change->misc, component_flags, lbuf);
-						strcat(lbuf, " ");
-					}
-					msg_to_char(ch, "You change resource %d's component to %s%s.\r\n", atoi(arg2), lbuf, component_types[vnum]);
+					msg_to_char(ch, "You change resource %d's component to %s.\r\n", atoi(arg2), component_string(vnum, change->misc));
 					break;
 				}
 				case RES_LIQUID: {
@@ -4973,13 +5090,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 				// if there are no changes, they should have gotten an error message
 				if (misc != change->misc) {
 					change->misc = misc;
-					
-					*lbuf = '\0';
-					if (misc) {
-						prettier_sprintbit(change->misc, component_flags, lbuf);
-						strcat(lbuf, " ");
-					}
-					msg_to_char(ch, "You change resource %d's component to %s%s.", atoi(arg2), lbuf, component_types[change->vnum]);
+					msg_to_char(ch, "You change resource %d's component to %s.", atoi(arg2), component_string(change->vnum, misc));
 				}
 			}
 		}

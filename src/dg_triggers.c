@@ -32,6 +32,7 @@ extern const char *cmd_door[];
 const char *skill_name(int num);
 void add_var(struct trig_var_data **var_list, char *name, char *value, int id);
 char *matching_quote(char *p);
+bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum);
 char *str_str(char *cs, char *ct);
 
 // external vars
@@ -1460,6 +1461,11 @@ int door_wtrigger(char_data *actor, int subcmd, int dir) {
 */
 bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode) {
 	int cont = 0;
+	
+	// never override the toggle command for immortals
+	if (IS_IMMORTAL(actor) && is_abbrev(cmd, "toggle")) {
+		return cont;
+	}
 
 	cont = command_wtrigger(actor, cmd, argument, mode);	// world trigs
 	if (!cont) {
@@ -1709,3 +1715,498 @@ void speech_vtrigger(char_data *actor, char *str) {
 	}
 }
 
+
+ //////////////////////////////////////////////////////////////////////////////
+//// START QUEST TRIGGERS ////////////////////////////////////////////////////
+
+// 1 = continue; 0 = cancel
+int start_quest_mtrigger(char_data *actor, quest_data *quest) {
+	char buf[MAX_INPUT_LENGTH];
+	char_data *ch;
+	trig_data *t;
+	
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return TRUE;
+	}
+	
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
+		if (!SCRIPT_CHECK(ch, MTRIG_START_QUEST) || (ch == actor)) {
+			continue;
+		}
+		
+		LL_FOREACH(TRIGGERS(SCRIPT(ch)), t) {
+			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+				continue;
+			}
+			if (IS_SET(GET_TRIG_TYPE(t), MTRIG_START_QUEST) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+				union script_driver_data_u sdd;
+				if (quest) {
+					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
+					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
+				}
+				else {	// no quest?
+					add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
+					add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
+				}
+				ADD_UID_VAR(buf, t, actor, "actor", 0);
+				sdd.c = ch;
+				if (!script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW)) {
+					return FALSE;
+				}
+			}
+		}
+	}
+	return TRUE;
+}
+
+
+// 1 = continue; 0 = cancel
+int start_quest_otrigger_one(obj_data *obj, char_data *actor, quest_data *quest) {
+	char buf[MAX_INPUT_LENGTH];
+	int ret_val = TRUE;
+	trig_data *t;
+	
+	if (!SCRIPT_CHECK(obj, OTRIG_START_QUEST)) {
+		return TRUE;
+	}
+
+	for (t = TRIGGERS(SCRIPT(obj)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, OTRIG_START_QUEST) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			union script_driver_data_u sdd;
+			if (quest) {
+				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
+				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
+			}
+			else {	// no quest?
+				add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
+				add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
+			}
+			ADD_UID_VAR(buf, t, actor, "actor", 0);
+			sdd.o = obj;
+			ret_val = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
+			obj = sdd.o;
+			if (!ret_val) {
+				break;
+			}
+		}
+	}
+
+	return ret_val;
+}
+
+
+// 1 = continue, 0 = stop
+int start_quest_vtrigger(char_data *actor, quest_data *quest) {
+	vehicle_data *veh, *next_veh;
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t;
+
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return TRUE;
+	}
+	
+	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
+		if (!SCRIPT_CHECK(veh, VTRIG_START_QUEST)) {
+			continue;
+		}
+
+		for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
+			if (IS_SET(GET_TRIG_TYPE(t), VTRIG_START_QUEST) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+				union script_driver_data_u sdd;
+				if (quest) {
+					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
+					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
+				}
+				else {	// no quest?
+					add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
+					add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
+				}
+				ADD_UID_VAR(buf, t, actor, "actor", 0);
+				sdd.v = veh;
+				if (!script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW)) {
+					return FALSE;
+				}
+			}
+		}
+	}
+	return TRUE;
+}
+
+
+// 0 = stop, 1 = continue
+int start_quest_wtrigger(room_data *room, char_data *actor, quest_data *quest) {
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t;
+
+	if (!SCRIPT_CHECK(room, WTRIG_START_QUEST))
+		return 1;
+
+	for (t = TRIGGERS(SCRIPT(room)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, WTRIG_START_QUEST) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			union script_driver_data_u sdd;
+			ADD_ROOM_UID_VAR(buf, t, room, "room", 0);
+			if (quest) {
+				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
+				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
+			}
+			else {	// no quest?
+				add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
+				add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
+			}
+			ADD_UID_VAR(buf, t, actor, "actor", 0);
+			sdd.r = room;
+			if (!script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW)) {
+				return FALSE;
+			}
+		}
+	}
+
+	return TRUE;
+}
+
+
+/**
+* Start quest trigger (obj).
+*
+* @param char_data *actor The person trying to get a quest.
+* @param quest_data *quest The quest to try to start
+* @return int 0/FALSE to stop the quest, 1/TRUE to allow it to continue.
+*/
+int start_quest_otrigger(char_data *actor, quest_data *quest) {
+	obj_data *obj;
+	int i;
+
+	/* prevent people we like from becoming trapped :P */
+	if (!valid_dg_target(actor, DG_ALLOW_GODS))
+		return 1;
+
+	for (i = 0; i < NUM_WEARS; i++)
+		if (GET_EQ(actor, i) && !start_quest_otrigger_one(GET_EQ(actor, i), actor, quest))
+			return 0;
+
+	for (obj = actor->carrying; obj; obj = obj->next_content)
+		if (!start_quest_otrigger_one(obj, actor, quest))
+			return 0;
+
+	for (obj = ROOM_CONTENTS(IN_ROOM(actor)); obj; obj = obj->next_content)
+		if (!start_quest_otrigger_one(obj, actor, quest))
+			return 0;
+
+	return 1;
+}
+
+
+/**
+* Checks all quest triggers
+*
+* @param char_data *actor The person trying to start a quest.
+* @param quest_data *quest The quest.
+* @return int 0 means stop execution (block quest), 1 means continue
+*/
+int check_start_quest_trigger(char_data *actor, quest_data *quest) {
+	room_data *room = IN_ROOM(actor);
+	struct trig_proto_list *tpl;
+	trig_data *proto, *trig;
+	int val = 1;
+
+	if (val) {
+		val = start_quest_mtrigger(actor, quest);	// mob trigs
+	}
+	if (val) {
+		val = start_quest_otrigger(actor, quest);	// obj trigs
+	}
+	if (val) {
+		val = start_quest_vtrigger(actor, quest);	// vehicles
+	}
+	if (val) {
+		// still here? world triggers require additional work because we add
+		// the trigs from the quest itself
+		LL_FOREACH(QUEST_SCRIPTS(quest), tpl) {
+			if (!(proto = real_trigger(tpl->vnum))) {
+				continue;
+			}
+			if (!IS_SET(GET_TRIG_TYPE(proto), WTRIG_START_QUEST)) {
+				continue;
+			}
+			
+			// attach this trigger
+			if (!(trig = read_trigger(tpl->vnum))) {
+				continue;
+			}
+			if (!SCRIPT(room)) {
+				CREATE(SCRIPT(room), struct script_data, 1);
+			}
+			add_trigger(SCRIPT(room), trig, -1);
+		}
+		
+		val = start_quest_wtrigger(room, actor, quest);	// world trigs
+		
+		// now remove those triggers again
+		LL_FOREACH(QUEST_SCRIPTS(quest), tpl) {
+			if (!(proto = real_trigger(tpl->vnum))) {
+				continue;
+			}
+			if (!IS_SET(GET_TRIG_TYPE(proto), WTRIG_START_QUEST)) {
+				continue;
+			}
+			
+			// find and remove
+			if (SCRIPT(room)) {
+				remove_live_script_by_vnum(SCRIPT(room), tpl->vnum);
+			}
+		}
+	}
+	return val;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// FINISH QUEST TRIGGERS ///////////////////////////////////////////////////
+
+// 1 = continue; 0 = cancel
+int finish_quest_mtrigger(char_data *actor, quest_data *quest) {
+	char buf[MAX_INPUT_LENGTH];
+	char_data *ch;
+	trig_data *t;
+	
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return TRUE;
+	}
+	
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
+		if (!SCRIPT_CHECK(ch, MTRIG_FINISH_QUEST) || (ch == actor)) {
+			continue;
+		}
+		
+		LL_FOREACH(TRIGGERS(SCRIPT(ch)), t) {
+			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
+				continue;
+			}
+			if (IS_SET(GET_TRIG_TYPE(t), MTRIG_FINISH_QUEST) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+				union script_driver_data_u sdd;
+				if (quest) {
+					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
+					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
+				}
+				else {	// no quest?
+					add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
+					add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
+				}
+				ADD_UID_VAR(buf, t, actor, "actor", 0);
+				sdd.c = ch;
+				if (!script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW)) {
+					return FALSE;
+				}
+			}
+		}
+	}
+	return TRUE;
+}
+
+
+// 1 = continue; 0 = cancel
+int finish_quest_otrigger_one(obj_data *obj, char_data *actor, quest_data *quest) {
+	char buf[MAX_INPUT_LENGTH];
+	int ret_val = TRUE;
+	trig_data *t;
+	
+	if (!SCRIPT_CHECK(obj, OTRIG_FINISH_QUEST)) {
+		return TRUE;
+	}
+
+	for (t = TRIGGERS(SCRIPT(obj)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, OTRIG_FINISH_QUEST) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			union script_driver_data_u sdd;
+			if (quest) {
+				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
+				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
+			}
+			else {	// no quest?
+				add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
+				add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
+			}
+			ADD_UID_VAR(buf, t, actor, "actor", 0);
+			sdd.o = obj;
+			ret_val = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
+			obj = sdd.o;
+			if (!ret_val) {
+				break;
+			}
+		}
+	}
+
+	return ret_val;
+}
+
+
+// 1 = continue, 0 = stop
+int finish_quest_vtrigger(char_data *actor, quest_data *quest) {
+	vehicle_data *veh, *next_veh;
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t;
+
+	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
+		return TRUE;
+	}
+	
+	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
+		if (!SCRIPT_CHECK(veh, VTRIG_FINISH_QUEST)) {
+			continue;
+		}
+
+		for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
+			if (IS_SET(GET_TRIG_TYPE(t), VTRIG_FINISH_QUEST) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+				union script_driver_data_u sdd;
+				if (quest) {
+					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
+					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
+				}
+				else {	// no quest?
+					add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
+					add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
+				}
+				ADD_UID_VAR(buf, t, actor, "actor", 0);
+				sdd.v = veh;
+				if (!script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW)) {
+					return FALSE;
+				}
+			}
+		}
+	}
+	return TRUE;
+}
+
+
+// 0 = stop, 1 = continue
+int finish_quest_wtrigger(room_data *room, char_data *actor, quest_data *quest) {
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t;
+
+	if (!SCRIPT_CHECK(room, WTRIG_FINISH_QUEST))
+		return 1;
+
+	for (t = TRIGGERS(SCRIPT(room)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, WTRIG_FINISH_QUEST) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			union script_driver_data_u sdd;
+			ADD_ROOM_UID_VAR(buf, t, room, "room", 0);
+			if (quest) {
+				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
+				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
+			}
+			else {	// no quest?
+				add_var(&GET_TRIG_VARS(t), "questvnum", "0", 0);
+				add_var(&GET_TRIG_VARS(t), "questname", "Unknown", 0);
+			}
+			ADD_UID_VAR(buf, t, actor, "actor", 0);
+			sdd.r = room;
+			if (!script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW)) {
+				return FALSE;
+			}
+		}
+	}
+
+	return TRUE;
+}
+
+
+/**
+* Finish quest trigger (obj).
+*
+* @param char_data *actor The person trying to get a quest.
+* @param quest_data *quest The quest to try to finish
+* @return int 0/FALSE to stop the quest, 1/TRUE to allow it to continue.
+*/
+int finish_quest_otrigger(char_data *actor, quest_data *quest) {
+	obj_data *obj;
+	int i;
+
+	/* prevent people we like from becoming trapped :P */
+	if (!valid_dg_target(actor, DG_ALLOW_GODS))
+		return 1;
+
+	for (i = 0; i < NUM_WEARS; i++)
+		if (GET_EQ(actor, i) && !finish_quest_otrigger_one(GET_EQ(actor, i), actor, quest))
+			return 0;
+
+	for (obj = actor->carrying; obj; obj = obj->next_content)
+		if (!finish_quest_otrigger_one(obj, actor, quest))
+			return 0;
+
+	for (obj = ROOM_CONTENTS(IN_ROOM(actor)); obj; obj = obj->next_content)
+		if (!finish_quest_otrigger_one(obj, actor, quest))
+			return 0;
+
+	return 1;
+}
+
+
+/**
+* Checks all quest triggers
+*
+* @param char_data *actor The person trying to finish a quest.
+* @param quest_data *quest The quest.
+* @return int 0 means stop execution (block quest), 1 means continue
+*/
+int check_finish_quest_trigger(char_data *actor, quest_data *quest) {
+	room_data *room = IN_ROOM(actor);
+	struct trig_proto_list *tpl;
+	trig_data *proto, *trig;
+	int val = 1;
+
+	if (val) {
+		val = finish_quest_mtrigger(actor, quest);	// mob trigs
+	}
+	if (val) {
+		val = finish_quest_otrigger(actor, quest);	// obj trigs
+	}
+	if (val) {
+		val = finish_quest_vtrigger(actor, quest);	// vehicles
+	}
+	if (val) {
+		// still here? world triggers require additional work because we add
+		// the trigs from the quest itself
+		LL_FOREACH(QUEST_SCRIPTS(quest), tpl) {
+			if (!(proto = real_trigger(tpl->vnum))) {
+				continue;
+			}
+			if (!IS_SET(GET_TRIG_TYPE(proto), WTRIG_FINISH_QUEST)) {
+				continue;
+			}
+			
+			// attach this trigger
+			if (!(trig = read_trigger(tpl->vnum))) {
+				continue;
+			}
+			if (!SCRIPT(room)) {
+				CREATE(SCRIPT(room), struct script_data, 1);
+			}
+			add_trigger(SCRIPT(room), trig, -1);
+		}
+		
+		val = finish_quest_wtrigger(room, actor, quest);	// world trigs
+		
+		// now remove those triggers again
+		LL_FOREACH(QUEST_SCRIPTS(quest), tpl) {
+			if (!(proto = real_trigger(tpl->vnum))) {
+				continue;
+			}
+			if (!IS_SET(GET_TRIG_TYPE(proto), WTRIG_FINISH_QUEST)) {
+				continue;
+			}
+			
+			// find and remove
+			if (SCRIPT(room)) {
+				remove_live_script_by_vnum(SCRIPT(room), tpl->vnum);
+			}
+		}
+	}
+	return val;
+}

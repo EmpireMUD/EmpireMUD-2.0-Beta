@@ -56,6 +56,8 @@
 #define MTRIG_DOOR             BIT(17)     /* door manipulated in room   */
 #define MTRIG_LEAVE_ALL        BIT(18)	// leave even if they can't see
 #define MTRIG_CHARMED          BIT(19)	// fight/random triggers will fire even while charmed
+#define MTRIG_START_QUEST      BIT(20)	// player tries to start a quest
+#define MTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 
 
 /* obj trigger types */
@@ -77,6 +79,8 @@
 
 #define OTRIG_CONSUME          BIT(18)    /* char tries to eat/drink obj */
 #define OTRIG_FINISH           BIT(19)	// char finishes reading a book
+#define OTRIG_START_QUEST      BIT(20)	// player tries to start a quest
+#define OTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 
 
 // VTRIG_x: vehicle trigger types
@@ -93,6 +97,9 @@
 #define VTRIG_LOAD  BIT(13)	// vehicle is loaded
 // unused BIT(14), BIT(15)
 #define VTRIG_LEAVE  BIT(16)	// someone leaves the room
+// unuused: 17-19
+#define VTRIG_START_QUEST      BIT(20)	// player tries to start a quest
+#define VTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 
 
 /* wld trigger types */
@@ -110,6 +117,9 @@
 #define WTRIG_ABILITY          BIT(15)     /* ability used in room */
 #define WTRIG_LEAVE            BIT(16)     /* character leaves the room */
 #define WTRIG_DOOR             BIT(17)     /* door manipulated in room  */
+// unused: 18, 19
+#define WTRIG_START_QUEST      BIT(20)	// player tries to start a quest
+#define WTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 
 
 /* obj command trigger types */
@@ -277,20 +287,21 @@ void do_sstat_character(char_data *ch, char_data *k);
 
 void script_vlog(const char *format, va_list args);
 void script_log(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
+void script_log_by_type(int go_type, void *go, const char *format, ...) __attribute__ ((format (printf, 3, 4)));
 void mob_log(char_data *mob, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
 void obj_log(obj_data *obj, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
 void wld_log(room_data *room, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
-void dg_read_trigger(char *line, void *proto, int type);
 void dg_obj_trigger(char *line, obj_data *obj);
 void assign_triggers(void *i, int type);
 void parse_trigger(FILE *trig_f, int nr);
+void parse_trig_proto(char *line, struct trig_proto_list **list, char *error_str);
 extern trig_data *real_trigger(trig_vnum vnum);
 void extract_script(void *thing, int type);
 void extract_script_mem(struct script_memory *sc);
-void free_proto_script(void *thing, int type);
+void free_proto_scripts(struct trig_proto_list **list);
 void free_script(void *thing, int type);
 void free_trigger(trig_data *trig);
-void copy_proto_script(void *source, void *dest, int type);
+extern struct trig_proto_list *copy_trig_protos(struct trig_proto_list *list);
 void copy_script(void *source, void *dest, int type);
 void trig_data_copy(trig_data *this_data, const trig_data *trg);
 

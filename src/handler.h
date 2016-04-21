@@ -195,6 +195,7 @@ void obj_from_room(obj_data *object);
 void obj_from_vehicle(obj_data *obj);
 void object_list_no_owner(obj_data *list);
 void obj_to_char(obj_data *object, char_data *ch);
+void obj_to_char_if_okay(obj_data *obj, char_data *ch);
 void obj_to_char_or_room(obj_data *obj, char_data *ch);
 void obj_to_obj(obj_data *obj, obj_data *obj_to);
 void obj_to_room(obj_data *object, room_data *room);
@@ -253,7 +254,7 @@ sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_t
 
 // storage handlers
 void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount);
-extern bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount);
+extern bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, struct resource_data **build_used_list);
 extern bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount);
 extern bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
 extern bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount);

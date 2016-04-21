@@ -1476,7 +1476,7 @@ char_data *get_char_world(char *name) {
 
 	for (ch = character_list; ch && (pos <= number) && !found; ch = ch->next) {
 		if ((!IS_NPC(ch) || !pc_only) && MATCH_CHAR_NAME(tmp, ch)) {
-			if (++pos == number) {
+			if (++pos == number || pc_only) {	// pc_only messes up pos
 				found = ch;
 			}
 		}
@@ -2241,11 +2241,18 @@ void claim_room(room_data *room, empire_data *emp) {
 	ROOM_OWNER(room) = emp;
 	remove_room_extra_data(room, ROOM_EXTRA_CEDED);	// not ceded if just claimed
 	
+	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
+		qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
+	}
+	
 	for (iter = interior_room_list; iter; iter = next_iter) {
 		next_iter = iter->next_interior;
 		
 		if (HOME_ROOM(iter) == home) {
 			ROOM_OWNER(iter) = emp;
+			if (GET_BUILDING(iter) && IS_COMPLETE(iter)) {
+				qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(iter)));
+			}
 			remove_room_extra_data(iter, ROOM_EXTRA_CEDED);	// not ceded if just claimed
 		}
 	}
@@ -2397,9 +2404,11 @@ int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, in
 void perform_abandon_room(room_data *room) {
 	void deactivate_workforce_room(empire_data *emp, room_data *room);
 	
+	empire_data *emp = ROOM_OWNER(room);
+	
 	// ensure workforce is shut off
-	if (ROOM_OWNER(room)) {
-		deactivate_workforce_room(ROOM_OWNER(room), room);
+	if (emp) {
+		deactivate_workforce_room(emp, room);
 	}
 	
 	ROOM_OWNER(room) = NULL;
@@ -2414,6 +2423,10 @@ void perform_abandon_room(room_data *room) {
 	// if a city center is abandoned, destroy it
 	if (IS_CITY_CENTER(room)) {
 		disassociate_building(room);
+	}
+	
+	if (emp && GET_BUILDING(room) && IS_COMPLETE(room)) {
+		qt_empire_players(emp, qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
 	}
 }
 
@@ -2601,7 +2614,7 @@ void add_follower(char_data *ch, char_data *leader, bool msg) {
 
 	if (msg) {
 		act("You now follow $N.", FALSE, ch, 0, leader, TO_CHAR);
-		if (CAN_SEE(leader, ch)) {
+		if (CAN_SEE(leader, ch) && WIZHIDE_OK(leader, ch)) {
 			act("$n starts following you.", TRUE, ch, 0, leader, TO_VICT);
 		}
 		act("$n starts to follow $N.", TRUE, ch, 0, leader, TO_NOTVICT);
@@ -2643,7 +2656,7 @@ void stop_follower(char_data *ch) {
 
 	act("You stop following $N.", FALSE, ch, 0, ch->master, TO_CHAR);
 	act("$n stops following $N.", TRUE, ch, 0, ch->master, TO_NOTVICT);
-	if (CAN_SEE(ch->master, ch)) {
+	if (CAN_SEE(ch->master, ch) && WIZHIDE_OK(ch->master, ch)) {
 		act("$n stops following you.", TRUE, ch, 0, ch->master, TO_VICT);
 	}
 
@@ -3554,11 +3567,11 @@ void empty_obj_before_extract(obj_data *obj) {
 			obj_to_obj(jj, obj->in_obj);
 		}
 		else if (obj->carried_by) {
-			obj_to_char(jj, obj->carried_by);
+			obj_to_char_if_okay(jj, obj->carried_by);
 			get_check_money(obj->carried_by, jj);
 		}
 		else if (obj->worn_by) {
-			obj_to_char(jj, obj->worn_by);
+			obj_to_char_if_okay(jj, obj->worn_by);
 			get_check_money(obj->worn_by, jj);
 		}
 		else if (obj->in_vehicle) {
@@ -3602,7 +3615,7 @@ void extract_obj(obj_data *obj) {
 	}
 
 	if (!proto || obj->proto_script != proto->proto_script) {
-		free_proto_script(obj, OBJ_TRIGGER);
+		free_proto_scripts(&obj->proto_script);
 	}
 
 	free_obj(obj);
@@ -4071,6 +4084,8 @@ void obj_from_char(obj_data *object) {
 		if (IN_ROOM(object->carried_by) && OBJ_FLAGGED(object, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(object->carried_by))--;
 		}
+		
+		qt_drop_obj(object->carried_by, object);
 
 		object->carried_by = NULL;
 	}
@@ -4198,9 +4213,56 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		if (IN_ROOM(ch) && OBJ_FLAGGED(object, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(ch))++;
 		}
+		
+		qt_get_obj(ch, object);
 	}
 	else {
 		log("SYSERR: NULL obj (%p) or char (%p) passed to obj_to_char.", object, ch);
+	}
+}
+
+
+/**
+* Validates bind and quest before allowing an obj to go to a char. Sends to
+* the room as a backup.
+*
+* @param obj_data *obj The item.
+* @param char_data *ch The person you're trying to give it to.
+*/
+void obj_to_char_if_okay(obj_data *obj, char_data *ch) {
+	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
+	
+	bool ok = TRUE;
+	
+	if (!bind_ok(obj, ch)) {
+		ok = FALSE;
+	}
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch) && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
+		ok = FALSE;
+	}
+	
+	if (ok || !IN_ROOM(ch)) {
+		obj_to_char(obj, ch);
+	}
+	else {
+		// unmark uncollected loot if it was meant to go to a person
+		if (!IS_NPC(ch)) {
+			REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_UNCOLLECTED_LOOT);
+		}
+		
+		// set ownership as if they got it -- if not stolen
+		if (!IS_STOLEN(obj)) {
+			if (IS_NPC(ch)) {
+				obj->last_owner_id = NOBODY;
+				obj->last_empire_id = NOTHING;
+			}
+			else {
+				obj->last_owner_id = GET_IDNUM(ch);
+				obj->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
+			}
+		}
+		
+		obj_to_room(obj, IN_ROOM(ch));
 	}
 }
 
@@ -4769,7 +4831,7 @@ obj_data *get_obj_world(char *name) {
 *
 * @param char_data *ch The person who is getting an offer.
 * @param char_data *from The person sending the offer.
-* @param int type Any OFFER_x type.
+* @param int type Any OFFER_ type.
 * @param int data A misc integer that may be passed based on type (use 0 for none).
 * @return struct offer_data* A pointer to the attached new offer, if it succeeds.
 */
@@ -4832,7 +4894,7 @@ void clean_offers(char_data *ch) {
 * Removes all offers of a given type.
 *
 * @param char_data *ch The person whose offers to remove.
-* @param int type Any OFFER_x type.
+* @param int type Any OFFER_ type.
 */
 void remove_offers_by_type(char_data *ch, int type) {
 	struct offer_data *offer, *next_offer, *temp;
@@ -4974,8 +5036,6 @@ void set_depletion(room_data *room, int type, int value) {
 * @param bool with_triggers If TRUE, attaches triggers too.
 */
 void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers) {
-	bld_data *temp;
-	
 	if (!bld || !room) {
 		log("SYSERR: attach_building_to_room called without %s", bld ? "room" : "building");
 		return;
@@ -4987,10 +5047,10 @@ void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers)
 
 	// copy proto script
 	if (with_triggers) {
-		CREATE(temp, bld_data, 1);
-		copy_proto_script(bld, temp, BLD_TRIGGER);
-		room->proto_script = temp->proto_script;
-		free(temp);
+		struct trig_proto_list *temp;
+		if ((temp = copy_trig_protos(GET_BLD_SCRIPTS(bld)))) {
+			LL_APPEND(room->proto_script, temp);
+		}
 		assign_triggers(room, WLD_TRIGGER);
 	}
 }
@@ -5453,10 +5513,11 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 * @param int island Which island to charge for storage, or ANY_ISLAND to take from any available storage
 * @param int cmp_type Which CMP_ type to charge
 * @param int cmp_flags Required CMPF_ flags to match on the component
-* @param int amount How much to charge
+* @param int amount How much to charge*
+* @param struct resource_data **build_used_list Optional: A place to store the exact item used, e.g. for later dismantling. (NULL if none)
 * @return bool TRUE if it was able to charge enough, FALSE if not
 */
-bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount) {
+bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, struct resource_data **build_used_list) {
 	struct empire_storage_data *store, *next_store;
 	int this, found = 0;
 	obj_data *proto;
@@ -5485,6 +5546,10 @@ bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp
 		this = MIN(amount, store->amount);
 		found += this;
 		SAFE_ADD(store->amount, -this, 0, INT_MAX, FALSE);
+		
+		if (build_used_list) {
+			add_to_resource_list(build_used_list, RES_OBJECT, store->vnum, this, 0);
+		}
 		
 		if (store->amount <= 0) {
 			LL_DELETE(EMPIRE_STORAGE(emp), store);
@@ -5738,6 +5803,11 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping)
 bool obj_can_be_stored(obj_data *obj, room_data *loc) {
 	struct obj_storage_type *store;
 	
+	// quest items don't store
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+		return FALSE;
+	}
+	
 	for (store = obj->storage; store; store = store->next) {
 		if (BUILDING_VNUM(loc) != NOTHING && store->building_type == BUILDING_VNUM(loc)) {
 			return TRUE;
@@ -5939,10 +6009,10 @@ struct empire_unique_storage *find_eus_entry(obj_data *obj, empire_data *emp, ro
 		if (location && GET_ISLAND_ID(location) != iter->island) {
 			continue;
 		}
-		if (location && ROOM_BLD_FLAGGED(location, BLD_VAULT) && !IS_SET(iter->flags, EUS_VAULT)) {
+		if (location && HAS_FUNCTION(location, FNC_VAULT) && !IS_SET(iter->flags, EUS_VAULT)) {
 			continue;
 		}
-		if (location && !ROOM_BLD_FLAGGED(location, BLD_VAULT) && IS_SET(iter->flags, EUS_VAULT)) {
+		if (location && !HAS_FUNCTION(location, FNC_VAULT) && IS_SET(iter->flags, EUS_VAULT)) {
 			continue;
 		}
 		
@@ -6027,7 +6097,7 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 		if (eus->island == NO_ISLAND) {
 			eus->island = get_main_island(emp);
 		}
-		if (room && ROOM_BLD_FLAGGED(room, BLD_VAULT)) {
+		if (room && HAS_FUNCTION(room, FNC_VAULT)) {
 			eus->flags = EUS_VAULT;
 		}
 			

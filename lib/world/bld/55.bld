@@ -225,13 +225,15 @@ S
 Bunk Room~
 The Bunk Room~
 ~
-0 0 aHN o
+0 0 aH o
 0 0 0 -1
 D
    You have found the crew's bunk, lined floor to ceiling with hammocks. In one
 corner, locked trunks hold personal goods belonging to the sailors. The room
 has taken on a foul odor, perhaps because there isn't a bath.
 ~
+F
+d
 M
 255 20.00 c
 S
@@ -239,13 +241,15 @@ S
 Captain's Cabin~
 The Bunk Room~
 ~
-0 0 aHN q
+0 0 aH q
 0 0 0 -1
 D
    With rich mahogany walls and bronze accents, you can be sure this is the
 captain's cabin. Unlike much of the ship, which has been beaten by the
 elements, everything in this cabin is clean and pristine.
 ~
+F
+d
 M
 255 20.00 c
 S
@@ -253,13 +257,15 @@ S
 The Galley~
 The Galley~
 ~
-0 0 airH q
+0 0 aH q
 0 0 0 -1
 D
    The ship's galley is piled high with dry goods. A small cooking fire in the
 corner sits below a well-ventilated hood, and there's a jug of fresh water
 sitting on the counter. Tables run the length of the room.
 ~
+F
+FG
 M
 255 20.00 c
 S
@@ -274,14 +280,14 @@ disembark~
 D
    The base of the wagon is made of sturdy wood, though it rumbles as it rolls
 along the prairie. The cloth covering is supported by tall wooden arches,
-giving you enough room to stand comfortably and move about the vehicle.  
+giving you enough room to stand comfortably and move about the vehicle.
 ~
 S
 #5519
 Wagon Sleeping Area~
 Inside the Wagon~
 &0[  ]~
-1 0 aN r
+1 0 a r
 0 0 0 -1
 C
 disembark, sleep~
@@ -289,14 +295,16 @@ D
    This part of the wagon is cozy, almost cramped, due to the upholstered
 furniture and plush bed. Everything is firmly attached to the wooden base of
 the wagon so that it doesn't shift in transit, but you can't imagine trying to
-sleep while it's rattling over the open plains.  
+sleep while it's rattling over the open plains.
 ~
+F
+d
 S
 #5520
 Wagon Cooking Area~
 In the Wagon~
 &0[  ]~
-1 0 ar r
+1 0 a r
 0 0 0 -1
 C
 cook, disembark~
@@ -304,8 +312,10 @@ D
    This tiny corner of the wagon has been fashioned into something of a
 kitchen, with a little iron stove that vents out the back. The cloth canopy
 above the stove is a little scorched. A table has been bolted to the floor, but
-it has only pillows for chairs.  
+it has only pillows for chairs.
 ~
+F
+G
 S
 #5521
 Carriage~
@@ -318,7 +328,7 @@ disembark~
 D
    The inside of the carriage is a little cramped, but the upholstered seats
 are made to sit four. The windows are covered in dark curtains to grant you a
-little privacy while the driver steers from a seat on the outside.  
+little privacy while the driver steers from a seat on the outside.
 ~
 E
 windows out~

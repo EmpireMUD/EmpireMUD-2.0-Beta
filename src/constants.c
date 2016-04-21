@@ -35,6 +35,7 @@
 *   Mob Constants
 *   Item Contants
 *   OLC Constants
+*   Quest Constants
 *   Room/World Constants
 *   Skill Constants
 *   Trigger Constants
@@ -368,6 +369,7 @@ const char *grant_bits[] = {
 	"island",	// 35
 	"oset",
 	"playerdelete",
+	"unquest",
 	"\n"
 };
 
@@ -2057,6 +2059,7 @@ const char *olc_flag_bits[] = {
 	"SKILLS",
 	"!VEHICLES",
 	"!MORPHS",
+	"!QUESTS",
 	"\n"
 };
 
@@ -2082,7 +2085,88 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"skill",
 	"vehicle",
 	"morph",
+	"quest",
 	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// QUEST CONSTANTS /////////////////////////////////////////////////////////
+
+// QST_x: quest flags
+const char *quest_flags[] = {
+	"IN-DEVELOPMENT",
+	"REPEAT-PER-INSTANCE",
+	"EXPIRES-AFTER-INSTANCE",
+	"EXTRACT-TASK-OBJECTS",
+	"\n"
+};
+
+
+// QG_x: quest giver types
+const char *quest_giver_types[] = {
+	"BUILDING",	// 0
+	"MOBILE",
+	"OBJECT",
+	"ROOM-TEMPLATE",
+	"TRIGGER",	// 4
+	"\n"
+};
+
+
+// QR_x: quest reward types
+const char *quest_reward_types[] = {
+	"BONUS-EXP",	// 0
+	"COINS",
+	"OBJECT",
+	"SET-SKILL",
+	"SKILL-EXP",
+	"SKILL-LEVELS",	// 5
+	"QUEST-CHAIN",
+	"\n",
+};
+
+
+// QT_x (1/2): quest tracker types
+const char *quest_tracker_types[] = {
+	"COMPLETED-QUEST",	// 0
+	"GET-COMPONENT",
+	"GET-OBJECT",
+	"KILL-MOB",
+	"KILL-MOB-FLAGGED",
+	"NOT-COMPLETED-QUEST",	// 5
+	"NOT-ON-QUEST",
+	"OWN-BUILDING",
+	"OWN-VEHICLE",
+	"SKILL-LEVEL-OVER",
+	"SKILL-LEVEL-UNDER",	// 10
+	"TRIGGERED",
+	"VISIT-BUILDING",
+	"VISIT-ROOM-TEMPLATE",
+	"VISIT-SECTOR",
+	"HAVE-ABILITY",	// 15
+	"\n",
+};
+
+
+// QT_x (2/2): quest tracker types that take a numeric arg
+const bool quest_tracker_amt_type[] = {
+	QT_AMT_NONE,	// completed quest
+	QT_AMT_NUMBER,	// get component
+	QT_AMT_NUMBER,	// get object
+	QT_AMT_NUMBER,	// kill mob
+	QT_AMT_NUMBER,	// kill mob flagged
+	QT_AMT_NONE,	// not completed quest
+	QT_AMT_NONE,	// not on quest
+	QT_AMT_NUMBER,	// own building
+	QT_AMT_NUMBER,	// own vehicle
+	QT_AMT_THRESHOLD,	// skill over
+	QT_AMT_THRESHOLD,	// skill under
+	QT_AMT_NONE,	// triggered
+	QT_AMT_NONE,	// visit building
+	QT_AMT_NONE,	// visit rmt
+	QT_AMT_NONE,	// visit sect
+	QT_AMT_NONE,	// have ability
 };
 
 
@@ -2110,56 +2194,56 @@ const char *bld_on_flags[] = {
 };
 
 
-// BLD_x
+// BLD_x -- feel free to re-use the *DEPRECATED flags, as they should no longer appear on anything
 const char *bld_flags[] = {
-	"ROOM",
+	"ROOM",	// 0
 	"ALLOW-MOUNTS",
 	"TWO-ENTRANCES",
 	"OPEN",
 	"CLOSED",
-	"INTERLINK",
+	"INTERLINK",	// 5
 	"HERD",
 	"DEDICATE",
-	"DRINK",
+	"*DRINK-DEPRECATED",
 	"!NPC",
-	"BARRIER",
-	"TAVERN",
+	"BARRIER",	// 10
+	"*TAVERN-DEPRECATED",
 	"LARGE-CITY-RADIUS",
-	"MINE",
+	"*MINE-DEPRECATED",
 	"ATTACH-ROAD",
-	"BURNABLE",
-	"FORGE",
-	"COOKING-FIRE",
-	"ALCHEMIST",
-	"STABLE",
-	"LIBRARY",
-	"APIARY",
-	"GLASSBLOWER",
-	"DOCKS",
-	"PIGEON-POST",
-	"MILL",
-	"POTTER",
-	"TAILOR",
-	"BATHS",
+	"BURNABLE",	// 15
+	"*FORGE-DEPRECATED",
+	"*COOKING-FIRE-DEPRECATED",
+	"*ALCHEMIST-DEPRECATED",
+	"*STABLE-DEPRECATED",
+	"*LIBRARY-DEPRECATED",	// 20
+	"*APIARY-DEPRECATED",
+	"*GLASSBLOWER-DEPRECATED",
+	"*DOCKS-DEPRECATED",
+	"*MAIL-DEPRECATED",
+	"*MILL-DEPRECATED",	// 25
+	"*POTTER-DEPRECATED",
+	"*TAILOR-DEPRECATED",
+	"*BATHS-DEPRECATED",
 	"SAIL",
-	"TOMB",
-	"MINT-COINS",
-	"VAULT",
+	"*TOMB-DEPRECATED",	// 30
+	"*MINT-DEPRECATED",
+	"*VAULT-DEPRECATED",
 	"ITEM-LIMIT",
 	"LONG-AUTOSTORE",
-	"WAREHOUSE",
-	"TRADE",
+	"*WAREHOUSE-DEPRECATED",	// 35
+	"*TRADING-POST-DEPRECATED",
 	"HIGH-DEPLETION",
-	"PORTAL",
-	"BEDROOM",
-	"!DELETE",
-	"SUMMON-PLAYER",
+	"*PORTAL-DEPRECATED",
+	"*BEDROOM-DEPRECATED",
+	"!DELETE",	// 40
+	"*SUMMON-DEPRECATED",
 	"NEED-BOAT",
 	"LOOK-OUT",
 	"2ND-TERRITORY",
-	"SHIPYARD",
+	"*SHIPYARD-DEPRECATED",	// 45
 	"UPGRADED",
-	"PRESS",
+	"*PRESS-DEPRECATED",
 	"\n"
 };
 
@@ -2253,6 +2337,45 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NONE,	// magic-growth
 	EVO_VAL_SECTOR,	// not-adjacent
 	EVO_VAL_SECTOR,	// not-near-sector
+};
+
+
+// FNC_x: function flags (for buildings)
+const char *function_flags[] = {
+	"ALCHEMIST",
+	"APIARY",
+	"BATHS",
+	"BEDROOM",
+	"CARPENTER",
+	"DIGGING",	// 5
+	"DOCKS",
+	"FORGE",
+	"GLASSBLOWER",
+	"GUARD-TOWER",
+	"HENGE",	// 10
+	"LIBRARY",
+	"MAIL",
+	"MILL",
+	"MINE",
+	"MINT",	// 15
+	"PORTAL",
+	"POTTER",
+	"PRESS",
+	"SAW",
+	"SHIPYARD",	// 20
+	"SMELT",
+	"STABLE",
+	"SUMMON-PLAYER",
+	"TAILOR",
+	"TANNERY",	// 25
+	"TAVERN",
+	"TOMB",
+	"TRADING-POST",
+	"VAULT",
+	"WAREHOUSE",	// 30
+	"DRINK-WATER",
+	"COOKING-FIRE",
+	"\n"
 };
 
 
@@ -2825,6 +2948,8 @@ const char *trig_types[] = {
 	"Door",
 	"Leave-All",
 	"Charmed",
+	"Start-Quest",	// 20
+	"Finish-Quest",	// 21
 	"\n"
 };
 
@@ -2848,32 +2973,37 @@ const bitvector_t mtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// ability
 	TRIG_ARG_PERCENT,	// leave
 	TRIG_ARG_PERCENT,	// door
-	TRIG_ARG_PERCENT	// leave-all
+	TRIG_ARG_PERCENT,	// leave-all
+	NOBITS,	// charmed modifier
+	TRIG_ARG_PERCENT,	// start-quest
+	TRIG_ARG_PERCENT,	// finish-quest
 };
 
 
 // OTRIG_x -- obj trigger types
 const char *otrig_types[] = {
-	"Global",
+	"Global",	// 0
 	"Random",
 	"Command",
 	"*",
 	"*",
-	"Timer",
+	"Timer",	// 5
 	"Get",
 	"Drop",
 	"Give",
 	"Wear",
-	"*",
+	"*",	// 10
 	"Remove",
 	"*",
 	"Load",
 	"*",
-	"Ability",
+	"Ability",	// 15
 	"Leave",
 	"*",
 	"Consume",
 	"Finish",
+	"Start-Quest",	// 20
+	"Finish-Quest",	// 21
 	"\n"
 };
 
@@ -2899,6 +3029,8 @@ const bitvector_t otrig_argument_types[] = {
 	NOBITS,	// 
 	TRIG_ARG_PERCENT,	// consume
 	TRIG_ARG_PERCENT,	// finish
+	TRIG_ARG_PERCENT,	// start-quest
+	TRIG_ARG_PERCENT,	// finish-quest
 };
 
 
@@ -2921,6 +3053,11 @@ const char *vtrig_types[] = {
 	"*",	// 14
 	"*",	// 15
 	"Leave",
+	"*",	// 17
+	"*",	// 18
+	"*",	// 19
+	"Start-Quest",	// 20
+	"Finish-Quest",	// 21
 	"\n"
 };
 
@@ -2944,30 +3081,38 @@ const bitvector_t vtrig_argument_types[] = {
 	NOBITS,	// 14
 	NOBITS,	// 15
 	TRIG_ARG_PERCENT,	// leave
+	NOBITS,	// 17
+	NOBITS,	// 18
+	NOBITS,	// 19
+	TRIG_ARG_PERCENT,	// start-quest
+	TRIG_ARG_PERCENT,	// finish-quest
 };
 
 
 // WTRIG_x: wld trigger types
 const char *wtrig_types[] = {
-	"Global",
+	"Global",	// 0
 	"Random",
 	"Command",
 	"Speech",
 	"Adventure Cleanup",
-	"Zone Reset",
+	"Zone Reset",	// 5
 	"Enter",
 	"Drop",
 	"*",
 	"*",
-	"*",
+	"*",	// 10
 	"*",
 	"*",
 	"Load",
 	"Complete",
-	"Ability",
+	"Ability",	// 15
 	"Leave",
 	"Door",
 	"*",
+	"*",
+	"Start-Quest",	// 20
+	"Finish-Quest",	// 21
 	"\n"
 };
 
@@ -2991,7 +3136,10 @@ const bitvector_t wtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// ability
 	TRIG_ARG_PERCENT,	// leave
 	TRIG_ARG_PERCENT,	// door
-	NOBITS,	// 
+	NOBITS,	// 18
+	NOBITS,	// 19
+	TRIG_ARG_PERCENT,	// start-quest
+	TRIG_ARG_PERCENT,	// finish-quest
 };
 
 
@@ -3091,6 +3239,7 @@ const char *interact_types[] = {
 	"CHOP",
 	"FISH",
 	"PAN",
+	"QUARRY",
 	"\n"
 };
 
@@ -3120,6 +3269,7 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_ROOM,	// chop
 	TYPE_ROOM,	// fish
 	TYPE_ROOM,	// pan
+	TYPE_ROOM,	// quarry
 };
 
 
@@ -3148,6 +3298,7 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// chop
 	TYPE_OBJ,	// fish
 	TYPE_OBJ,	// pan
+	TYPE_OBJ,	// quarry
 };
 
 

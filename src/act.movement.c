@@ -411,6 +411,7 @@ void perform_transport(char_data *ch, room_data *to_room) {
 	act("$n dematerializes and vanishes!", TRUE, ch, 0, 0, TO_ROOM);
 
 	char_to_room(ch, to_room);
+	qt_visit_room(ch, to_room);
 	look_at_room(ch);
 	if (!IS_NPC(ch)) {
 		GET_LAST_DIR(ch) = NO_DIR;
@@ -663,6 +664,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	// ch first
 	char_from_room(ch);
 	char_to_room(ch, to_room);
+	qt_visit_room(ch, to_room);
 	if (!IS_NPC(ch)) {
 		GET_LAST_DIR(ch) = NO_DIR;
 	}
@@ -949,7 +951,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 				act("You lead $n behind you.", TRUE, ch, 0, GET_LED_BY(ch), TO_VICT);
 				break;
 			case MOVE_FOLLOW:
-				act("$N follows $m.", TRUE, ch->master, 0, ch, TO_NOTVICT);
+				act("$n follows $N.", TRUE, ch, NULL, ch->master, TO_NOTVICT);
 				act("$n follows you.", TRUE, ch, 0, ch->master, TO_VICT);
 				break;
 			case MOVE_EARTHMELD:
@@ -980,6 +982,8 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 			}
 		}
 	}
+	
+	qt_visit_room(ch, IN_ROOM(ch));
 
 	if (ch->desc != NULL) {
 		look_at_room(ch);
@@ -1021,7 +1025,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	else {
 		greet_memory_mtrigger(ch);
 	}
-
+	
 	return TRUE;
 }
 
@@ -1302,6 +1306,7 @@ ACMD(do_circle) {
 	}
 	char_from_room(ch);
 	char_to_room(ch, found_room);
+	qt_visit_room(ch, IN_ROOM(ch));
 	
 	if (!IS_NPC(ch)) {
 		GET_LAST_DIR(ch) = dir;
@@ -1560,7 +1565,7 @@ ACMD(do_portal) {
 			dist = compute_distance(IN_ROOM(ch), room);
 			there_in_city = is_in_city_for_empire(room, ROOM_OWNER(room), TRUE, &wait_there);
 			
-			if (ROOM_OWNER(room) && ROOM_BLD_FLAGGED(room, BLD_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, all ? GUESTS_ALLOWED : MEMBERS_AND_ALLIES) && (!all || (dist <= max_out_of_city_portal || (ch_in_city && there_in_city)))) {
+			if (ROOM_OWNER(room) && HAS_FUNCTION(room, FNC_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, all ? GUESTS_ALLOWED : MEMBERS_AND_ALLIES) && (!all || (dist <= max_out_of_city_portal || (ch_in_city && there_in_city)))) {
 				// only shows owned portals the character can use
 				++count;
 				*line = '\0';
@@ -1595,7 +1600,7 @@ ACMD(do_portal) {
 	// targeting: by list number (only targets member/ally portals
 	if (is_number(arg) && (num = atoi(arg)) >= 1 && GET_LOYALTY(ch)) {
 		HASH_ITER(hh, world_table, room, next_room) {
-			if (ROOM_OWNER(room) && ROOM_BLD_FLAGGED(room, BLD_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, MEMBERS_AND_ALLIES)) {
+			if (ROOM_OWNER(room) && HAS_FUNCTION(room, FNC_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, MEMBERS_AND_ALLIES)) {
 				if (--num <= 0) {
 					target = room;
 					break;
@@ -1623,7 +1628,7 @@ ACMD(do_portal) {
 		msg_to_char(ch, "You don't have permission to open portals here.\r\n");
 		return;
 	}
-	if (!all_access && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_PORTAL) || !ROOM_BLD_FLAGGED(target, BLD_PORTAL) || !IS_COMPLETE(target) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (!all_access && (!HAS_FUNCTION(IN_ROOM(ch), FNC_PORTAL) || !HAS_FUNCTION(target, FNC_PORTAL) || !IS_COMPLETE(target) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can only open portals between portal buildings.\r\n");
 		return;
 	}
@@ -1784,7 +1789,7 @@ ACMD(do_sleep) {
 				msg_to_char(ch, "You climb down from your mount.\r\n");
 				perform_dismount(ch);
 			}
-			send_to_char("You lay down and go to sleep.\r\n", ch);
+			send_to_char("You lie down and go to sleep.\r\n", ch);
 			act("$n lies down and falls asleep.", TRUE, ch, 0, 0, TO_ROOM);
 			GET_POS(ch) = POS_SLEEPING;
 			break;

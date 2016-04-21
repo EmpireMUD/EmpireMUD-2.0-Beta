@@ -36,6 +36,27 @@ Full multiplaying rules are found by typing POLICY.
 
 See also: ALTERNATE
 #
+ACTION ACTIONS CHORE CHORES "TIMED ACTION"
+
+EmpireMUD uses timed actions for most chores. These are things that happen
+over time until complete. Some of them will also automatically repeat when
+finished, if there is still something left to chop/mine/dig. You can cancel
+any timed action by typing 'stop'.
+
+Many of these chores give periodic update messages while you perform them. You
+can shut off these messages with 'toggle action-spam'. You'll still see the
+messages for starting and stopping the action, plus any resources you get.
+
+The following things will speed up various chores:
+- Faster chores (bonus): dig, gather, chop, build, dismantle, harvest, plant,
+   mine, mint, repair, chip, excavate, pick, scrape, fillin, saw, quarry, tan
+- Finder: dig, gather, pan, pick
+- Haste: dig, gather, chop, build, dismantle, harvest, plant, mine, repair,
+   play (music), excavate, pick, scrape, fillin, saw, quarry
+- Shovel: dig
+
+See also: BONUS TRAITS, FINDER, SHOVEL, TOGGLE
+#
 ADVENTURE "ADVENTURE ZONE" ZONE "ADVENTURE SUMMON"
 
 Usage:  adventure
@@ -228,6 +249,8 @@ Available traits:
  Extra daily bonus experience - 5 extra daily bonus experience points
  Larger inventory - Carry 5 more small items (or 2 more large items)
  Faster walking - Half the lag from normal walking
+
+See also: CHORES
 #
 BONUS-HEALING "BONUS HEALING" "HEALING ATTRIBUTE" "HEALING TRAIT"
 
@@ -784,6 +807,19 @@ If you want free and open PVP, you can turn this on with "toggle pvp". This
 flag will remain active for 5 minutes after you shut it off.
 
 See also: TOGGLE
+#
+"QUEST ITEM" "QUEST OBJECT" "QUEST FLAG"
+
+Items marked (quest) are used only when you are on the quest to which they
+belong. You can't pick up a quest item if you're not on the quest, and you
+can never drop a quest item while you're on the quest.
+
+Dropping or finishing a quest will automatically remove quets items from your
+inventory and gear.
+
+You can identify items to see which quest they belong to.
+
+See also: IDENTIFY
 #
 RESIST-MAGICAL "RESIST MAGICAL" "MAGICAL RESISTANCE"
 

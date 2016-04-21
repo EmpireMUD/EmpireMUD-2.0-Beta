@@ -12,6 +12,7 @@ glb - Global data
 mob - Mobiles/NPCs
 morph - Morphs
 obj - Objects
+qst - Quests
 rmt - Room templates (for adventures)
 sect - Sectors (map terrain types)
 skill - Player skills
