@@ -126,7 +126,10 @@ FLINT "FLINT SET"
 Flint can be combined with rocks (using CRAFT) to create a flint set, which
 can then be used to light torches.
 
-See also: DIG, LIGHT
+Flint can be found by digging almost anywhere you could find rocks. It is
+somewhat less common than generic rocks, and counts as a rock component.
+
+See also: DIG, LIGHT, ROCK COMPONENT
 #
 GATHER
 
@@ -475,7 +478,7 @@ into ingots or bars. Smelting generally requires two of the base metal (e.g.
 iron ore) to create one of the processed version (iron ingot).
 
 Ingots are used for crafting. Gold and silver bars are worth more in the vault
-than their raw form. You can separate bars into the ingot form if needed.
+than their raw form. To return bars to their ingot form, use 'separate'.
 
 Typing "smelt" by itself will list things you can smelt with the ore available
 in your inventory.

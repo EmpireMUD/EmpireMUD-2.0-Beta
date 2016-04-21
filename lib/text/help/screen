@@ -9,6 +9,7 @@ Objects:                           | Information:
 GET DROP GIVE PUT JUNK SACRIFICE   | INFO HELP HELPSEARCH SCORE WHO ADVENTURE
 WIELD HOLD WEAR REMOVE EAT DRINK   | WHERE WIZLIST GODLIST PROMPT LOOK TIME
 INVENTORY EQUIPMENT FILL POUR      | WHOIS WEATHER AFFECTS COOLDOWNS TIP
+SHEATHE DRAW SHARE IDENTIFY        |
 -----------------------------------+-------------------------------------------
 Empire:                            | Resources and Crafts:
 EMPIRES PLEDGE ENROLL DEFECT ESAY  | DIG GATHER CHOP PICK MINE LEAD BUILD

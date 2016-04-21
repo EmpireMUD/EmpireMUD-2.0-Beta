@@ -26,8 +26,11 @@ Huge Stone Block (resource)
 Clay bricks (resource)
 
 The Block component is the building block of most buildings, and consists of
-stone blocks and clay bricks. Some buildings require a specific one, while
-any that merely call for (block) allow the use of either.
+stone blocks and clay bricks. Any recipes that merely call for (block) allow the
+use of either, whileSome buildings require a specific one:
+
+bunch:  clay bricks
+single:  stone block
 
 You can quarry stone blocks from the ground at a quarry. They are used in
 monumental architecture.
@@ -229,7 +232,7 @@ HANDLE "HANDLE COMPONENT"
 
 Handle (component)
 
-Used for: forge, craft
+Used for:  forge, craft
 Stored in:  Utility Shed, Storage room
 
 Create a handle using the craft command.
@@ -330,7 +333,9 @@ Bars (resource)
 Used for:  forging, crafting, building, sewing
 Stored in:  Foundry (non-precious metals), Vault/Secret Cache (precious metals)
 
-Various types of ingots can be made by smelting metals in a forge or foundry.
+Various types of ingots (and bars) can be made by smelting metals in a forge or
+foundry. Precious metal ingots can be smelted into bars, while bars can be
+separated into ingots.
 
 Metal is a category of component that covers all refined metal ores. It is used
 for a huge variety of crafts, most of which call for either a specific metal or
@@ -342,7 +347,7 @@ rare, fine:     silver and gold ingots
 refined:        copper, silver and gold bars
 refined, fine:  silver and gold bars
 
-See also: COMPONENT, SMELT, IRON, COPPER, MINE
+See also: COMPONENT, SMELT, SEPARATE, IRON, COPPER, MINE
 #
 MEAT "MEAT COMPONENT"
 
@@ -359,7 +364,7 @@ NAILS "POUCH OF NAILS"
 
 Nails (resource/component)
 
-Used for: building
+Used for:  building
 
 You can create these at the forge. Nails are used for many buildings.
 
@@ -378,19 +383,21 @@ OIL "OIL COMPONENT"
 
 Oil (component)
 
-Used for: cooking
+Used for:  cooking
 
 See also: COMPONENT, COOK, PRESS
 #
-PILLARS "PILLAR COMPONENT"
+PILLARS "PILLAR COMPONENT" COLUMN "BOUND WOODEN COLUMN"
 
 Pillar (component)
 
-Used for: building
+Used for:  building
 
-The most commonly used pillars are simple wooden logs.
+The most commonly used pillars are simple wooden logs. You can also craft bound
+wooden columns from sticks and lumber if you have Basic Crafts. This may be
+useful if you're unable to get logs (for example, rough wood cannot be scraped).
 
-See also: COMPONENT, LOGS
+See also: BASIC CRAFTS, COMPONENT, LOGS
 #
 RETRIEVE
 
