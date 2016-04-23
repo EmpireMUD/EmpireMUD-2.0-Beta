@@ -138,6 +138,7 @@ A bolt of brilliant white light shoots past you!
 ~
 M 0 10851 100.00 1
 T 10851
+T 10858
 S
 #10851
 The Soulstream~
@@ -160,6 +161,7 @@ It looks as if you're in a tornado made from rainbows.
 M 0 10852 100.00 1
 M 0 10853 100.00 1
 T 10851
+T 10858
 S
 #10852
 The Soulstream~
@@ -188,6 +190,7 @@ It looks as if you're in a tornado made from rainbows.
 M 0 10854 100.00 1
 M 0 10855 100.00 1
 T 10851
+T 10858
 S
 #10853
 The Soulstream~
@@ -210,6 +213,7 @@ The galaxy looks larger than ever!
 M 0 10856 100.00 1
 M 0 10857 100.00 1
 T 10851
+T 10858
 S
 #10854
 The Soulstream~
@@ -231,5 +235,6 @@ It looks like a volcano coming from the sky.
 ~
 M 0 10858 100.00 1
 T 10851
+T 10858
 S
 $

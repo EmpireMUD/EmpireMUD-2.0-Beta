@@ -925,7 +925,7 @@ High Sorcery: Cast A Ritual~
    The Spirit of Order wants you to practice your High Sorcery. This type of
 magic, which has been developed over the centuries by studious sorcerers,
 involves complex rituals and highly ordered magicks. For this tutorial, you
-need to learn the Ritual of Burdens.  
+need to learn the Ritual of Burdens.
  1. Purchase the ability with 'skill buy Ritual of Burdens'.
  2. Cast the ritual inside the Soulstream with 'ritual burdens'.
  3. Wait for the ritual to complete.
@@ -1035,12 +1035,47 @@ W
 Z
 1 10853
 S
+#10854
+Natural Magic: Heal The Spirits~
+   The Spirit of Mana seems to be fading, and needs you to heal it. Purchase
+the healing ability using 'skill buy heal', and then heal the Spirit of Mana
+using 'heal mana'. The heal ability can usually only be used on yourself (until
+you learn Heal Friend), but the Spirit of Mana can be healed with the basic
+Heal.  
+~
+   You have restored the Spirit of Mana! You can heal yourself after combat to
+raise your Natural Magic skill further.  
+~
+11 0 0 25 -1
+A
+1 10854
+P
+0 10850 0 1
+P
+10 3 0 49
+P
+9 3 0 1
+R
+5 3 1
+R
+0 0 1
+R
+2 10852 1
+R
+6 10859 1
+W
+10 3 0 49
+W
+11 0 0 1
+Z
+1 10854
+S
 #10855
 Stealth: Sneaking Silently~
    The Spirit of Darkness will teach you to move unseen. The Sneak ability
-allows you to do this, although it isn't a guaranteed success at low levels. 
+allows you to do this, although it isn't a guaranteed success at low levels.
 You can't really tell whether or not you were successful at sneaking. But don't
-worry, you'll get better at it as you level up.  
+worry, you'll get better at it as you level up.
  1. Purchase the ability with 'skill buy sneak'.
  2. Find the Spirit of Darkness again.
  3. Go to another room in the Soulstream.
@@ -1082,7 +1117,7 @@ Empire: Early Harvest~
    The Spirit of Progress wants to teach you to harvest crops, an essential
 step in building your empire. Harvesting is a good way to gain Empire skill at
 low levels, and will provide you with food or raw materials. You are provided a
-stone scythe for this quest, but most sharp weapons can be used to harvest.  
+stone scythe for this quest, but most sharp weapons can be used to harvest.
  1. Go out onto the map and find a crop tile like a wheat field or
     a patch of vegetables. Orchards won't work for this, since they
     use 'pick' instead of 'harvest'.
@@ -1116,6 +1151,82 @@ W
 11 0 0 1
 Z
 1 10856
+S
+#10857
+Vampire: Feed On Blood~
+   The Spirit of Blood wants you to feed on a living creature to refill your
+blood. Leave the Soulstream and find something with a beating heart to feast
+from. Knock out your victim in combat ('toggle autokill' will make you stop
+combat before killing your victim), then 'bite' them and drain some blood. 
+When you have done this, return to the Spirit of Blood.  
+~
+   You have satisfied the Spirit of Blood! Drinking the blood of live creatures
+is enough to gain Vampire skill up to level 15. After that, buy and use Vampire
+abilities to become a sanguine master.  
+~
+8 0 0 25 -1
+A
+1 10857
+P
+0 10850 0 1
+P
+10 7 0 49
+P
+9 7 0 1
+R
+5 7 1
+R
+0 0 1
+R
+2 10852 1
+R
+6 10859 1
+T 10857
+W
+10 7 0 49
+W
+11 0 0 1
+Z
+1 10857
+S
+#10858
+Trade: Craft A Flint Set~
+   The Spirit of Innovation would like you to craft a simple flint set, which
+can be used to start fires or light torches. Flint sets are handy to carry with
+you, because you never know when you'll want to cook food or brew a potion.  
+ 1. Leave the Soulstream by entering the exit portal.
+ 2. Find a suitable place and type 'dig'.
+ 3. Dig until you find a rock and a flint stone.
+ 4. Type 'craft flint set' to combine those items.
+ 5. Return to the Spirit of Innovation with your flint set.
+~
+   You have satisfied the Spirit of Innovation! That flint set can be used to
+make a torch by typing 'light stick', or to make a cooking fire with 'light
+tree'.  
+~
+6 0 0 25 -1
+A
+1 10858
+P
+0 10850 0 1
+P
+10 6 0 49
+P
+9 6 0 1
+R
+5 6 1
+R
+0 0 1
+R
+2 10852 1
+R
+6 10859 1
+W
+10 6 0 49
+W
+2 183 0 1
+Z
+1 10858
 S
 #10859
 Complete More Tutorials~

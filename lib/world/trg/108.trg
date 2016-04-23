@@ -126,6 +126,20 @@ Give Skinning Knife~
 ~
 %load% obj 10853 %actor%
 ~
+#10854
+Detect Heal~
+0 c 0
+heal~
+eval test %%self.is_name(%arg%)%%
+if (!%test% || !%actor.ability(Heal)% || !%actor.on_quest(10854)%)
+  return 0
+  halt
+end
+%send% %actor% Your mana pulses and waves over %self.name%, healing %self.hisher% spirit.
+%echoaround% %actor% %actor.name%'s mana pulses and waves over %self.name%, healing %self.hisher% spirit.
+%quest% %actor% trigger 10854
+return 1
+~
 #10855
 Detect Sneak~
 0 h 100
@@ -145,5 +159,28 @@ if %room.crop%
   %quest% %actor% trigger 10856
 end
 return 0
+~
+#10857
+Start Blood Tutorial~
+2 u 100
+~
+if (%actor.blood% >= (%actor.maxblood% - 5))
+  * Ensure not at full blood by taking a little
+  nop %actor.blood(-5)%
+end
+eval bloodamt %actor.blood%
+remote bloodamt %actor.id%
+~
+#10858
+Detect Full Blood~
+2 g 100
+~
+if !%actor.on_quest(10857)%
+  halt
+end
+if %actor.blood% > %actor.bloodamt%
+  %quest% %actor% trigger 10857
+  rdelete bloodamt %actor.id%
+end
 ~
 $

@@ -318,6 +318,9 @@ done
 Wandering Vampire combat~
 0 k 25
 ~
+if !%self.mob_flagged(VAMPIRE)%
+  halt
+end
 if %time.hour%>=7 && %time.hour%<=19
   halt
 end
