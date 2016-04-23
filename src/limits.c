@@ -293,7 +293,6 @@ void point_update_char(char_data *ch) {
 	empire_data *emp;
 	char_data *c;
 	bool found;
-	int amt;
 	
 	if (!IS_NPC(ch)) {
 		emp = GET_LOYALTY(ch);
@@ -350,8 +349,7 @@ void point_update_char(char_data *ch) {
 	
 	// bloody upkeep
 	if (IS_VAMPIRE(ch) && !IS_IMMORTAL(ch)) {
-		amt = GET_BLOOD_UPKEEP(ch) + (get_skill_level(ch, SKILL_VAMPIRE) <= 15 ? 1 : 0);
-		GET_BLOOD(ch) -= MAX(0, amt);
+		GET_BLOOD(ch) -= MAX(0, GET_BLOOD_UPKEEP(ch));
 		
 		if (GET_BLOOD(ch) < 0) {
 			out_of_blood(ch);

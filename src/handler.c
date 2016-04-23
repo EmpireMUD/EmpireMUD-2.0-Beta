@@ -411,7 +411,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			break;
 		}
 		case APPLY_BLOOD_UPKEEP: {
-			SAFE_ADD(GET_BLOOD_UPKEEP(ch), mod, INT_MIN, INT_MAX, TRUE);
+			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_BLOOD_UPKEEP), mod, INT_MIN, INT_MAX, TRUE);
 			break;
 		}
 		default:
