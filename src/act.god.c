@@ -45,7 +45,12 @@
 static int perform_sacrifice(char_data *ch, char_data *god, obj_data *obj, bool message) {
 	double bonus = 1.0;
 	int num = 1;
-
+	
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
+		act("$p: you can't sacrifice quest items.", FALSE, ch, obj, NULL, TO_CHAR);
+		return 0;
+	}
+	
 	/* Determine monument bonus */
 	if (ROOM_PATRON(IN_ROOM(ch)) == GET_IDNUM(god)) {
 		bonus = 1.50;
