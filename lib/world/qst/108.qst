@@ -1039,14 +1039,22 @@ S
 Natural Magic: Heal The Spirits~
    The Spirit of Mana seems to be fading, and needs you to heal it. Purchase
 the healing ability using 'skill buy heal', and then heal the Spirit of Mana
+<<<<<<< Updated upstream
 using 'heal mana'. The heal ability can usually only be used on yourself (until
+=======
+using 'heal mana'. The Heal ability can usually only be used on yourself (until
+>>>>>>> Stashed changes
 you learn Heal Friend), but the Spirit of Mana can be healed with the basic
 Heal.  
 ~
    You have restored the Spirit of Mana! You can heal yourself after combat to
 raise your Natural Magic skill further.  
 ~
+<<<<<<< Updated upstream
 11 0 0 25 -1
+=======
+12 0 0 25 -1
+>>>>>>> Stashed changes
 A
 1 10854
 P
@@ -1232,13 +1240,14 @@ S
 Complete More Tutorials~
    Complete more of the tutorials in the Soulstream in order to earn enough
 spirit tokens for a special reward. Once you have four of the tokens, you can
-finish this quest anywhere.
+finish this quest anywhere. You can find tutorials for each skill tree, so long
+as you're between levels 1 and 49 in that tree.  
 ~
    Congratulations! You've completed enough Soulstream tutorials to earn a
 special companion! Take this spirit bell, and use it any time you want to
 summon your non-combat minipet.
 ~
-3 0 0 25 -1
+5 0 0 25 -1
 R
 2 10859 1
 W

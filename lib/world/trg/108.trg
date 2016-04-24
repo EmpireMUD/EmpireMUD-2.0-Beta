@@ -144,10 +144,15 @@ return 1
 Detect Sneak~
 0 h 100
 ~
-if (%actor.aff_flagged(SNEAK)% && %actor.on_quest(10855)%)
-  %quest% %actor% trigger 10855
-  wait 1
-  %send% %actor% You have successfully sneaked up on %self.name%!
+if %actor.on_quest(10855)%
+  if %actor.aff_flagged(SNEAK)%
+    %quest% %actor% trigger 10855
+    wait 1
+    %send% %actor% You have successfully sneaked up on %self.name%!
+  else
+    wait 1
+    %send% %actor% You weren't sneaky enough.
+  end
 end
 ~
 #10856
