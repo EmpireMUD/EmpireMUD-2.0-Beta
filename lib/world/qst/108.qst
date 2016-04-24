@@ -1039,22 +1039,14 @@ S
 Natural Magic: Heal The Spirits~
    The Spirit of Mana seems to be fading, and needs you to heal it. Purchase
 the healing ability using 'skill buy heal', and then heal the Spirit of Mana
-<<<<<<< Updated upstream
-using 'heal mana'. The heal ability can usually only be used on yourself (until
-=======
 using 'heal mana'. The Heal ability can usually only be used on yourself (until
->>>>>>> Stashed changes
 you learn Heal Friend), but the Spirit of Mana can be healed with the basic
 Heal.  
 ~
    You have restored the Spirit of Mana! You can heal yourself after combat to
 raise your Natural Magic skill further.  
 ~
-<<<<<<< Updated upstream
 11 0 0 25 -1
-=======
-12 0 0 25 -1
->>>>>>> Stashed changes
 A
 1 10854
 P
