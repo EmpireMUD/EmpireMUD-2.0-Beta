@@ -1,9 +1,8 @@
 -----------------------------------+-------------------------------------------
 Movement:                          | Communication:
 NORTH SOUTH EAST WEST NE NW SE SW  | SAY OOCSAY ESAY SHOUT SLASH-CHANNELS
-UP DOWN TRANSPORT ENTER OPEN CLOSE | HISTORY SAYHISTORY TELLHISTORY EHISTORY
-HERD SLEEP WAKE REST STAND SIT     | MAIL GSAY RECOLOR
-CIRCLE                             |
+UP DOWN ENTER OPEN CLOSE HERD      | HISTORY SAYHISTORY TELLHISTORY EHISTORY
+SLEEP WAKE REST STAND SIT CIRCLE   | MAIL GSAY RECOLOR
 -----------------------------------+-------------------------------------------
 Objects:                           | Information: 
 GET DROP GIVE PUT JUNK SACRIFICE   | INFO HELP HELPSEARCH SCORE WHO ADVENTURE
