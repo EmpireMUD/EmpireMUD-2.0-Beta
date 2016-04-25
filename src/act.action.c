@@ -1372,6 +1372,8 @@ void process_fishing(char_data *ch) {
 			msg_to_char(ch, "You can't seem to catch anything.\r\n");
 		}
 		
+		gain_ability_exp(ch, ABIL_FISH, 15);
+		
 		// restart action
 		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1));
 		GET_ACTION_VNUM(ch, 0) = dir;
