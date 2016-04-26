@@ -808,9 +808,10 @@ as you to do this, so you can add other characters on your account to the
 empire this way.
 
 When more than one character on an account is in the same empire, they all
-count as just 1 member. Only the highest Greatness and playtime among those
-alts is contributed to the empire. This prevents players from having an unfair
-advantage from having many alts in the same empire.
+count as just 1 member. Only the highest Greatness among those alts is
+contributed to the empire, but all alts contribute playtime. This prevents
+players from having an unfair advantage from having many alts in the same
+empire.
 
 The roster command shows a list of all players in the empire. Members high-
 lighted in red have timed out, and are no longer contributing abilities, tech-
@@ -1088,7 +1089,7 @@ Copper, silver, and gold are found in mines, although more rarely than iron
 ore. They are used as currency in many empires for trade and exchange. Some
 empires, however, prefer to use material goods instead.
 
-See also: RARE METALS, SMELT
+See also: RARE METALS, SMELT, SEPARATE
 #
 "SUMMON BODYGUARD"
 
@@ -1182,7 +1183,7 @@ gives coordinates.
 
 See also: CITIES, NAVIGATION, TERRITORY
 #
-TREES LOGS
+TREE TREES LOGS
 
 Stored at: Lumber Yard
 

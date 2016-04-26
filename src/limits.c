@@ -1896,10 +1896,6 @@ int health_gain(char_data *ch, bool info_only) {
 	else {
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_HEALTH_REGEN(ch);
-
-		if (HAS_FUNCTION(IN_ROOM(ch), FNC_BEDROOM)) {
-			gain *= 1.5;
-		}
 		
 		if (HAS_BONUS_TRAIT(ch, BONUS_HEALTH_REGEN)) {
 			gain += 1;
@@ -1957,9 +1953,6 @@ int mana_gain(char_data *ch, bool info_only) {
 				}
 			}
 		}
-
-		if (HAS_FUNCTION(IN_ROOM(ch), FNC_BEDROOM))
-			gain *= 1.5;
 		
 		if (HAS_BONUS_TRAIT(ch, BONUS_MANA_REGEN)) {
 			gain += 1;
@@ -2012,9 +2005,6 @@ int move_gain(char_data *ch, bool info_only) {
 				gain_ability_exp(ch, ABIL_STAMINA, 1);
 			}
 		}
-
-		if (HAS_FUNCTION(IN_ROOM(ch), FNC_BEDROOM))
-			gain *= 1.5;
 		
 		if (HAS_BONUS_TRAIT(ch, BONUS_MOVE_REGEN)) {
 			gain += 1;

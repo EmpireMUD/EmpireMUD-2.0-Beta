@@ -1216,8 +1216,14 @@ ACMD(do_purify) {
 	else if (!IS_NPC(vict) && has_ability(vict, ABIL_DAYWALKING)) {
 		msg_to_char(ch, "The light of your purify spell has no effect on daywalkers.\r\n");
 	}
+	else if (ch != vict && IS_NPC(vict) && IS_VAMPIRE(vict) && MOB_FLAGGED(vict, MOB_HARD | MOB_GROUP)) {
+		msg_to_char(ch, "You cannot purify so powerful a vampire.\r\n");
+	}
 	else if (vict != ch && !IS_NPC(vict) && !PRF_FLAGGED(vict, PRF_BOTHERABLE)) {
 		act("You can't purify someone without permission (ask $M to type NOBOTHER).", FALSE, ch, NULL, vict, TO_CHAR);
+	}
+	else if (ch != vict && AFF_FLAGGED(vict, AFF_IMMUNE_NATURAL_MAGIC)) {
+		msg_to_char(ch, "Your victim is immune to that spell.\r\n");
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_PURIFY)) {
 		return;
@@ -1235,9 +1241,14 @@ ACMD(do_purify) {
 			act("$n holds out $s hands and $s mana washes over $N, purifying $M.", FALSE, ch, NULL, vict, TO_NOTVICT);
 		}
 		
-		if (!IS_NPC(vict) && IS_VAMPIRE(vict)) {
-			un_vampire(vict);
+		if (IS_VAMPIRE(vict)) {
 			msg_to_char(vict, "You feel the power of your blood fade and your vampiric powers vanish.\r\n");
+			if (IS_NPC(vict)) {
+				REMOVE_BIT(MOB_FLAGS(vict), MOB_VAMPIRE);
+			}
+			else {
+				un_vampire(vict);
+			}
 		}
 		
 		if (can_gain_exp_from(ch, vict)) {

@@ -245,7 +245,7 @@ void make_vampire(char_data *ch, bool lore) {
 		SET_BIT(PLR_FLAGS(ch), PLR_VAMPIRE);
 	
 		if (get_skill_level(ch, SKILL_VAMPIRE) < 1) {
-			set_skill(ch, SKILL_VAMPIRE, 1);
+			gain_skill(ch, find_skill_by_vnum(SKILL_VAMPIRE), 1);
 		}
 
 		GET_BLOOD(ch) = 30;

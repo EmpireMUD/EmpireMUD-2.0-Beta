@@ -820,7 +820,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		act("...$e is flying with gossamer mana wings!", FALSE, i, 0, ch, TO_VICT);
 	}
 	if (IS_RIDING(i)) {
-		sprintf(buf, "...$E is mounted upon %s.", get_mob_name_by_proto(GET_MOUNT_VNUM(i)));
+		sprintf(buf, "...$E is %s upon %s.", (MOUNT_FLAGGED(i, MOUNT_FLYING) ? "flying" : "mounted"), get_mob_name_by_proto(GET_MOUNT_VNUM(i)));
 		act(buf, FALSE, ch, 0, i, TO_CHAR);
 	}
 	if (GET_LED_BY(i)) {
