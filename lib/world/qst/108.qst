@@ -1046,7 +1046,7 @@ Heal.
    You have restored the Spirit of Mana! You can heal yourself after combat to
 raise your Natural Magic skill further.  
 ~
-11 0 0 25 -1
+12 0 0 25 -1
 A
 1 10854
 P
@@ -1127,7 +1127,7 @@ stone scythe for this quest, but most sharp weapons can be used to harvest.
 ~
 You have satisfied the Spirit of Progress.
 ~
-8 0 0 25 -1
+9 0 0 25 -1
 A
 1 10856
 P
@@ -1144,6 +1144,8 @@ R
 2 10852 1
 R
 6 10859 1
+R
+6 10860 1
 T 10852
 W
 10 1 0 49
@@ -1204,7 +1206,7 @@ you, because you never know when you'll want to cook food or brew a potion.
 make a torch by typing 'light stick', or to make a cooking fire with 'light
 tree'.  
 ~
-6 0 0 25 -1
+7 0 0 25 -1
 A
 1 10858
 P
@@ -1221,6 +1223,8 @@ R
 2 10852 1
 R
 6 10859 1
+R
+6 10861 1
 W
 10 6 0 49
 W
@@ -1246,5 +1250,61 @@ W
 2 10852 0 4
 Z
 2 10852
+S
+#10860
+Empire: Find The Pageboy~
+   Now that you've done the basic Empire skill tutorial, you have the option to
+do a longer Empire skill tutorial. Seek out the pageboy on the newbie island
+and he will get you started. Try using 'where pageboy' to find him.  
+~
+You've found the pageboy...
+~
+1 0 0 25 -1
+A
+1 10856
+P
+10 1 0 49
+P
+5 10801 0 1
+P
+5 10802 0 1
+P
+6 10801 0 1
+P
+6 10802 0 1
+R
+6 10801 1
+W
+10 1 0 49
+Z
+1 10800
+S
+#10861
+Trade: Find The Crier~
+   Now that you've done the basic Trade skil ltutorial, you have the option to
+do a longer Trade skill tutorial. Seek out the museum crier on the newbie
+island and he will get you started. Try using 'where crier' to find him.  
+~
+You've found the museum crier...
+~
+2 0 0 25 -1
+A
+1 10858
+P
+10 6 0 49
+P
+5 10826 0 1
+P
+5 10827 0 1
+P
+6 10826 0 1
+P
+6 10827 0 1
+R
+6 10826 1
+W
+10 6 0 49
+Z
+1 10825
 S
 $

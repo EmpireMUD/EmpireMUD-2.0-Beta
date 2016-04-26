@@ -180,7 +180,7 @@ remote bloodamt %actor.id%
 Detect Full Blood~
 2 g 100
 ~
-if !%actor.on_quest(10857)%
+if (!%actor.on_quest(10857)% || !%actor.varexists(bloodamt)%)
   halt
 end
 if %actor.blood% > %actor.bloodamt%
