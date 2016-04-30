@@ -959,8 +959,8 @@ const struct { char *command; QCMD(*func); int min_pos; } quest_cmd[] = {
 	{ "finish", qcmd_finish, POS_STANDING },
 	{ "info", qcmd_info, POS_DEAD },
 	{ "list", qcmd_list, POS_DEAD },
-	{ "share", qcmd_share, POS_DEAD },
 	{ "start", qcmd_start, POS_STANDING },
+	{ "share", qcmd_share, POS_DEAD },
 	{ "tracker", qcmd_tracker, POS_DEAD },
 	
 	// this goes last
