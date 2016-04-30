@@ -26,8 +26,8 @@ Huge Stone Block (resource)
 Clay bricks (resource)
 
 The Block component is the building block of most buildings, and consists of
-stone blocks and clay bricks. Any recipes that merely call for (block) allow the
-use of either, whileSome buildings require a specific one:
+stone blocks and clay bricks. Any recipes that call for (large block) allow
+the use of either, while some buildings require a specific one:
 
 bunch:  clay bricks
 single:  stone block
