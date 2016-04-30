@@ -309,10 +309,10 @@ channels on and off using the "toggle" command.
 The following channels are available on EmpireMUD:
 
 Global channels:
-&y/ooc&0 - General chat
+&Y/ooc&0 - General chat
 &g/newbie&0 - Newbie channel
-&g/recruit&0 - Empire recruitment channel
-&r/trade&0 - Global trade channel
+&R/recruit&0 - Empire recruitment channel
+&o/trade&0 - Global trade channel
 &yshout&0 - an in-character channel limited to 50 map tiles distance
 &rtell&0 - this is a private channel that is generally considered OOC
 
