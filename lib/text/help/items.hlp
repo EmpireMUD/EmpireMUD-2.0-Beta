@@ -88,14 +88,6 @@ dig up more clay. It can be stored at the Potter.
 
 See also: CLAY PIT, COMPONENT, POTTER
 #
-CLOTH "COTTON CLOTH"
-
-Bolt of cloth (resource)
-
-You can weave cotton into cloth. It will go faster if you're at at Tailor.
-
-See also: WEAVE, COTTON, TAILOR, TEXTILE
-#
 "CRAFTER ITEMS" "CRAFTING ITEMS" "CRAFT ITEMS" "CRAFTING LEVEL" "CRAFTER LEVEL" "CRAFT LEVEL"
 
 A character's crafts (forge, sew, craft, etc.) are scaled up to the character's
@@ -538,16 +530,18 @@ Masterwork abilities:
 
 See also: SCALABLE CRAFTS
 #
-TEXTILES "TEXTILE COMPONENT" "CLOTH COMPONENT"
+TEXTILES "TEXTILE COMPONENT" "CLOTH COMPONENT" CLOTH "COTTON CLOTH" "WOOL CLOTH"
 
 Textile (component)
+Bolt of cloth (resource)
 
 Used for:  sewing, crafting, building, vehicles
+Stored in:  Tailor, Carpenter
 
-Different types of cloth are usually interchangeable, but some recipes may need
-a specific type.
+You can weave cotton or wool into cloth. It will go faster if you're at a Tailor.
 
-See also: COMPONENT, CLOTH, WEAVE
+
+See also: COMPONENT, CLOTH, WEAVE, COTTON, WOOL, TAILOR
 #
 "TRADE COMMAND"
 
