@@ -20,10 +20,15 @@
 *  2. run ./map
 *  2a. you may have to "chmod u+x map" to run it
 *  2b. you may need to raise the stack size limit: ulimit -s <limit>
+*  2c. this will generate new .wld files and a new index -- you must to delete
+*      your lib/world/base_map file or it will combine with your new .wld files
 *  3. make sure the stats output looks good
 *  4. you can use the map.txt data file with your map.php image generator to
 *     see if the world looks good to you
 *  5. when you're happy with it, start up the mud
+*
+*  NOTE: A new version of the map generator which creates the base_map file
+*  itself is planned for EmpireMUD 2.0b4.
 *
 * Bonus feature: shift an existing map east/west
 *  1. generate a new map (do NOT use this on a live game map)
