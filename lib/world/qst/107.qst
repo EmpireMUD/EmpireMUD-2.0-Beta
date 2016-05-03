@@ -1,7 +1,7 @@
 #10730
 Hey Diddle Diddle~
    Hey diddle diddle, it seems the cat has lost its fiddle. Find the fiddle and
-return it to the cat in exchange for a starry cloak.
+return it to the musical cat in exchange for a starry cloak.  
 ~
    You give the cat his fiddle. He seems so grateful that he immediately plays
 you a little tune:
@@ -12,7 +12,7 @@ you a little tune:
  To see such sport,
  And the dish ran away with the spoon.
 ~
-3 d 0 25 0
+4 d 0 25 0
 A
 2 10730
 A
