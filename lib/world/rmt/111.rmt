@@ -220,7 +220,7 @@ An Underground Rapids~
 violently downward into a winding, whitewater rapids! Be prepared to type LEFT,
 RIGHT, or DUCK.
 ~
-bdf 0
+bd 0
 T 11109
 S
 #11113
@@ -307,10 +307,10 @@ M 0 11102 80.00 10
 S
 #11117
 A Sloping Gully~
-   The walls here are jagged and multi-tired. The terrain is dotted with
-scrubby trees and succulants, but offers little else by way of cover.
-Mountain goats have left evidence of their frequent passage, as have the
-mountain cats that hunt them.
+   The walls here are jagged and multi-tiered. The terrain is dotted with
+scrubby trees and succulants, but offers little else by way of cover. Mountain
+goats have left evidence of their frequent passage, as have the mountain cats
+that hunt them.
 ~
 a 0
 D9

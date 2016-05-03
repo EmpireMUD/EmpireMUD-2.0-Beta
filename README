@@ -134,6 +134,9 @@ Compiling and Running EmpireMUD
        like the map it created for you. EmpireMUD comes with a program called
        map.php that generates a PNG image from a map.txt file.
     e. You can re-run "./map" until you get one you like.
+    
+    NOTE: If you want to re-generate a map for an existing EmpireMUD, read the
+          notes at the top of src/util/map.c
 
 
 6)  Go back to Empire's root directory (by typing "cd ../../..") and run the

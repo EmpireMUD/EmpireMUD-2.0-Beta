@@ -994,6 +994,16 @@ Examples:
   > order puppy eat bread
   > order cityguard sleep
 #
+PLAY INSTRUMENTS MUSIC
+
+You can play musical instruments with the "play" command. You must first "hold"
+the instrument. Different instruments will give different messages, but music
+currently has no effect on gameplay.
+
+Instruments will be played faster while hasted.
+
+See also: HOLD, TIMED ACTION
+#
 POLITICAL "POLITICAL VIEW"
 
 Usage:  toggle political
