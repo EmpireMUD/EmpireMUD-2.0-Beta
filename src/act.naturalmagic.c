@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.naturalmagic.c                              EmpireMUD 2.0b3 *
+*   File: act.naturalmagic.c                              EmpireMUD 2.0b4 *
 *  Usage: implementation for natural magic abilities                      *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

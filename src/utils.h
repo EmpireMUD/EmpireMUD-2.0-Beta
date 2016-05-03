@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: utils.h                                         EmpireMUD 2.0b3 *
+*   File: utils.h                                         EmpireMUD 2.0b4 *
 *  Usage: header file: utility macros and prototypes of utility funcs     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

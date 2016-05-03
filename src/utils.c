@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: utils.c                                         EmpireMUD 2.0b3 *
+*   File: utils.c                                         EmpireMUD 2.0b4 *
 *  Usage: various internal functions of a utility nature                  *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

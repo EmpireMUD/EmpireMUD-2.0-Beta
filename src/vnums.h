@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: vnums.h                                         EmpireMUD 2.0b3 *
+*   File: vnums.h                                         EmpireMUD 2.0b4 *
 *  Usage: stores commonly-used virtual numbers                            *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

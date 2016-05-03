@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: constants.c                                     EmpireMUD 2.0b3 *
+*   File: constants.c                                     EmpireMUD 2.0b4 *
 *  Usage: Numeric and string contants used by the MUD                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

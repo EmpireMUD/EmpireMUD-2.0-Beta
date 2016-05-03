@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: plrconv-20b3-to-ascii.c                         EmpireMUD 2.0b3 *
+*   File: plrconv-20b3-to-ascii.c                         EmpireMUD 2.0b4 *
 *  Usage: convert player file to the ascii version                        *
 *                                                                         *
 *  This converter updates playerfiles which were running 2.0b3 to the     *

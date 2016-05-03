@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: morph.c                                         EmpireMUD 2.0b3 *
+*   File: morph.c                                         EmpireMUD 2.0b4 *
 *  Usage: morph loading, saving, and OLC                                  *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

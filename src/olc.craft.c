@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.craft.c                                     EmpireMUD 2.0b3 *
+*   File: olc.craft.c                                     EmpireMUD 2.0b4 *
 *  Usage: OLC for craft recipes                                           *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

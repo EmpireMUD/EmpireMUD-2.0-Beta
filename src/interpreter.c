@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: interpreter.c                                   EmpireMUD 2.0b3 *
+*   File: interpreter.c                                   EmpireMUD 2.0b4 *
 *  Usage: parse user commands, search for specials, call ACMD functions   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

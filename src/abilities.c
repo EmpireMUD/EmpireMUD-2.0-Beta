@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: abilities.c                                     EmpireMUD 2.0b3 *
+*   File: abilities.c                                     EmpireMUD 2.0b4 *
 *  Usage: DB and OLC for ability data                                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

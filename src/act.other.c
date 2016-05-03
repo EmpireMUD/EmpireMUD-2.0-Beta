@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.other.c                                     EmpireMUD 2.0b3 *
+*   File: act.other.c                                     EmpireMUD 2.0b4 *
 *  Usage: Miscellaneous player-level commands                             *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

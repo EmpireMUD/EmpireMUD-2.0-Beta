@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: protocol.c                                      EmpireMUD 2.0b3 *
+*   File: protocol.c                                      EmpireMUD 2.0b4 *
 *  Usage: KaVir's protocol snippet                                        *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
