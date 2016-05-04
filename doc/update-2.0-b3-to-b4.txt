@@ -1,0 +1,117 @@
+=======================================
+Updating EmpireMUD from 2.0b3 to 2.0b4:
+=======================================
+
+ABILITIES, SKILLS, and CLASSES:
+
+This patch moves ability, skill, and class definitions from compiled code to
+data that can be edited with in-game OLC, and is stored in data files in the
+lib/world/ directory. If you added or changed any ability, skill, or class,
+your code will conflict with the patch. I assume if you were able to add new
+features in the first place, you'll be able to update it for this patch. But
+always feel free to contact me for help or information (see the bottom of this
+file).
+
+If your mud doesn't have players, you can safely boot up without new skill,
+ability, and class definitions, then add them in-game. However, if you have
+live players, consider creating a copy of your entire mud directory and running
+it on a different port so that you can use OLC to create the new files you'll
+need.
+
+
+BUILDINGS:
+
+This patch splits the "building flags" (BLD_x) field into two different bit sets. The
+reason for this is that there were so many building flags, we were at risk for
+running out of bits in a 64-bit field. Flags related to things you can do at
+a building (like sawing) were moved to "function flags" (FNC_x).
+
+If you added buildings (or designate-able rooms) of your own, you'll probably
+need to update their flags in the OLC editor.
+
+The command 'util b318buildings' will find buildings that are using old flags.
+
+You should also run the following commands to attach new triggers to existing
+buildings:
+
+   util resetbuildingtriggers 5191
+   util resetbuildingtriggers 5156
+   util resetbuildingtriggers 5138
+   util resetbuildingtriggers 5164
+
+
+CRAFTING RECIPES AND COMPONENTS:
+
+This patch changes how resource lists, such as craft requirements, are handled.
+Objects now have optional "component type" and "component flags" fields, and
+resource lists can ask for components by type (in addition to requiring
+specific items).
+
+Use 'show components' and 'show uses' to figure out how component types/flags
+are assigned. This will help you assign them to your own content.
+
+If you are running a live EmpireMUD, previously-constructed buildings will not
+have data that's now needed to refund materials when those buildings are
+dismantled. Dismantling buildings that were finished before this patch will
+result in getting no materials back.
+
+
+CROPS:
+
+Existing EmpireMUDs will get an automatic update to unclaimed crop and jungle
+tiles to spawn new wild crops. If you don't want this update, disabled the
+b3_15_crop_update() function. After your mud boots up 2.0b4 for the first time,
+you should immediately perform a reboot. This will eliminate lag caused by
+loading more of the map than normal for the update.
+
+
+EQUIPMENT:
+
+Due to changes in enchantments (now a type of Augment), all players' gear,
+inventories, and warehouses will automatically reload items to remove existing
+enchantments.
+
+
+PLAYER FILES:
+
+2.0b4 includes a major update to playerfiles, converting them from a binary
+file to tagged ascii files. If you used any of the "spare" variables in your
+player_special_data_saved struct, you need to update the playerfile converter
+to preserve your spares. If you haven't made any code changes, that step isn't
+necessary.
+
+Step by step instructions:
+
+1. Shut down your EmpireMUD using "shutdown die".
+
+2. Create a backup of your MUD.
+
+3. Update your code to 2.0b4 using git, or by creating a patch on the GitHub
+site. (Usually you should "git stash", "git pull", then "git stash apply").
+
+4. You will need to re-create your Makefile by running the ./configure script
+again.
+
+   NOTE: If you made changes to the Makefile yourself, running configure again
+   will lose your changes. Instead of running configure again, you can copy
+   the information for new files from Makefile.in. You'll also need to do this
+   for the src/util/ directory, which has its own Makefile.
+
+5. Compile your MUD using "make all". This will also compile the new playerfile
+converter.
+
+6. Use the playerfile converter to update your playerfile:
+
+  6a. Change directory into your room empiremud directory (not a sub-dir).
+
+  6b. Run the converter from here:
+  
+    ./bin/plrconv-20b3-to-ascii
+
+7. Start up your MUD.
+
+
+For help with this update, contact us:
+
+  Email: paul@empiremud.net
+  Forums: http://empiremud.net/forums/
