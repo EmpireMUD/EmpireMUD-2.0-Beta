@@ -5,9 +5,8 @@ effects.
                            EmpireMUD README File
                            ---------------------
 
-This is the preliminary release of EmpireMUD, 1.0.  It is based on CircleMUD
-3.0 and thus most of the CircleMUD README file has been maintained within this
-document.
+This is a beta release of EmpireMUD 2.0. It is based on CircleMUD 3.0 and thus
+most of the CircleMUD README file has been maintained within this document.
 
 Information about CircleMUD can be found at its home page:
 http://www.circlemud.org
@@ -34,6 +33,19 @@ jelson@circlemud.org
 
 ----------------------------------------------------------------------------
 
+What Does "Beta" Mean?
+----------------------
+
+EmpireMUD 2.0 is in the beta phase, and the majority of ongoing work is related
+to content and game balancing. EmpireMUD receives updates every week, but these
+weekly builds come with no guarantee of stability.
+
+The GitHub project is organized into 3 branches:
+   master - contains only stable code and is updated just a few times per year
+   beta-dev - weekly builds that are usually stable but not bug-free
+   bX.X - the working branch with day-to-day changes; NEVER a stable branch
+
+
 Downloading EmpireMUD
 ---------------------
 
@@ -46,7 +58,6 @@ The source code and game files are available on GitHub at:
 You may also get EmpireMUD as an archive. Once you download the archive,
 you must decompress it.  To unpack the archive on a UNIX system, type:
   tar xzf empiremudXXX.tar.gz
-
 
 
 Compiling and Running EmpireMUD
