@@ -53,7 +53,7 @@ void tog_political(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 3";
+const char *version = "EmpireMUD 2.0 beta 4";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
