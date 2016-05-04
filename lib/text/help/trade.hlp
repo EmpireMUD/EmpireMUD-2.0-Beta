@@ -44,6 +44,23 @@ With Advanced Ships you can manufacture:
 
 See also: SHIPBUILDING, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE
 #
+"ADVENTURE CRAFTS" "CRAFTING PATTERNS"
+
+Some items - often found in adventures - can teach you new crafting recipes
+for as long as you own them. These recipes behave slightly differently from
+other recipes; you cannot get crafting information on them unless you have
+the item, and they can scale higher than level 100. They often also require a
+specific ability, and sometimes a minimum Crafting level.
+
+These factors limit the level of the resulting item:
+  The level range of the item itself.
+  Your Crafting level.
+  
+You can see the scaling level range of the item a recipe creates on its 'info'
+(for example, 'forge info ring').
+
+See also: SCALABLE CRAFTS
+#
 "ADVANCED WOODWORKING"
 
 Advanced Woodworking (Trade ability)
@@ -667,29 +684,16 @@ Many craftable items (including things made with brew, craft, forge, and sew)
 are scalable, which means they change in power and attributes based on the
 level and skills of the person.
 
-For recipes which come from abilities, these factors limit the level of the
-resulting item:
-  The level range of the item itself, if any.
-  The max level of the ability the recipe needs.
-  Your Trade skill or your Crafting level, whichever is lower.
-
-For recipes which come from crafting patterns (generally found in adventures),
-these factors limit the level of the resulting item:
-  The level range of the item itself.
+For most recipes, the level of the resulting item will be the lowest of:
+  The upper end of the level range of the ability that gives the recipe.
+  Your level in the ability's skill (usually Trade).
   Your Crafting level.
 
-All constraints are listed in descending order of priority - for example, the
-level range of the item will always restrict its final level, even if its
-minimum level is higher than your Crafting level. You can see if an item has its
-own level range (set by the builder, and usually only on items from patterns)
-on the recipe's info display.
+For example, the arming sword from Iron Blades cannot be higher than level 75,
+since this ability has a level range of 55-75.
 
-As a practical example, the arming sword made by Iron Blades can only be as high
-as level 75, since the level range of Iron Blades is 55-75. However, even if you
-have a Crafting level of 100, if your Trade skill is only level 58, the arming
-sword itself will only be level 58. Similarly, if you have a Trade skill of 100
-but your Crafting level is only 28, any arming swords you make will only be
-level 28.
+Recipes which come from crafting patterns follow slightly different rules - see
+HELP CRAFTING PATTERNS for more information.
 
 If a craftable item is made superior, it will scale higher even at the same
 level.
@@ -697,7 +701,7 @@ level.
 The identify command will help you determine if two crafted items are different
 in power, even if they have the same name.
 
-See also: CRAFTING LEVEL, IDENTIFY, SUPERIOR
+See also: CRAFTING PATTERNS, CRAFTING LEVEL, IDENTIFY, SUPERIOR
 #
 SEW SEWING
 
