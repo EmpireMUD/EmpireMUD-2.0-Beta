@@ -3,12 +3,17 @@ viper cave~
 a cave viper~
 A cave viper coils to strike nearby!
 ~
-0 0 cdjA cq
+0 0 bdjB c
 0 0 5 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1355 100.00 1  # SKIN: some snakeskin
 I 4 11111 50.00 1  # LOOT: a pouch of viper venom
+I 4 11113 10.00 1 x  # LOOT: a serpent stone
+I 4 11115 10.00 1 x  # LOOT: a skinkskin bracer
+I 4 11117 15.00 1 x  # LOOT: torn adventurer's leggings
+I 4 11118 1.00 1 x  # LOOT: a skink whistle
 T 11104
+T 10405
 S
 #11101
 hermit~
@@ -25,24 +30,34 @@ shiny yellow skink venomous~
 a venomous skink~
 A shiny yellow skink scurries up a nearby rock.
 ~
-0 0 cdjB cq
+0 0 bdjB c
 0 0 7 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 2  # SKIN: a large skin
 I 4 11112 50.00 1  # LOOT: a pouch of skink saliva
+I 4 11113 10.00 1 x  # LOOT: a serpent stone
+I 4 11115 20.00 1 x  # LOOT: a skinkskin bracer
+I 4 11117 20.00 1 x  # LOOT: torn adventurer's leggings
+I 4 11118 1.00 1 x  # LOOT: a skink whistle
 T 11105
+T 10405
 S
 #11103
 colossus collossus loch shadow massive~
 a loch colossus~
 The massive shadow of a loch colossus circles menacingly beneath the water's surface.
 ~
-0 0 bcdlAB cd
+0 0 bdAB c
 0 0 6 15
 I 0 3012 100.00 10  # BUTCHER: a fillet of raw meat
-I 0 11101 20.00 1  # BUTCHER: a rib-bone boat
 I 1 1351 100.00 6  # SKIN: a large skin
-I 4 11110 50.00 1  # LOOT: a colossal tooth club
+I 4 11101 25.00 1 x  # LOOT: a colossal ribcage
+I 4 11110 25.00 1 x  # LOOT: a colossal tooth club
+I 4 11116 25.00 1 x  # LOOT: a colossal skullcap
+I 4 11122 25.00 1 x  # LOOT: a colossal bone staff
+T 11114
+T 10405
+T 11116
 S
 #11104
 pegasus majestic white pristine~
@@ -59,11 +74,15 @@ scarlet-hooded hooded raptor shadow ominous screech~
 a scarlet-hooded raptor~
 An ominous shadow passes over, accompanied by a raspy screech.
 ~
-0 0 bcdjuAB mq
+0 0 bdAB cm
 0 0 2 10
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-I 4 11108 20.00 1 X  # LOOT: a scarlet-feathered hood
-I 4 11109 30.00 1 X  # LOOT: a raptor claw dagger
+I 4 11109 25.00 1 x  # LOOT: a raptor claw dagger
+I 4 11108 25.00 1 x  # LOOT: a scarlet-feathered hood
+I 4 11114 25.00 1 x  # LOOT: a scarlet-feathered cape
+I 4 11123 25.00 1 x  # LOOT: scarlet feather earrings
+T 11113
+T 10405
 S
 #11106
 pegasus majestic white pristine~
@@ -82,6 +101,64 @@ An armoured pegasus strikes a statuesque pose nearby.
 0 100 bdej cim
 0 0 2 11
 T 11103
+S
+#11108
+lizard horned~
+a horned lizard~
+A horned lizard is digging at the ground.
+~
+1 3 dj 0
+0 0 0 10
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+S
+#11109
+rabbit white~
+a rabbit~
+A white rabbit hops around.
+~
+1 3 dj 0
+0 0 15 9
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1350 100.00 1  # SKIN: a small skin
+S
+#11110
+goat mountain~
+a mountain goat~
+A mountain goat is prancing about.
+~
+10 20 djk 0
+0 0 0 11
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 1  # SKIN: a large skin
+S
+#11111
+woodpecker pecker bird~
+a woodpecker~
+A woodpecker is hammering away at a tree.
+~
+1 5 djo m
+0 0 2 10
+I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+S
+#11112
+jackrabbit rabbit~
+a jackrabbit~
+A jackrabbit sits with its ears raised.
+~
+1 3 dj 0
+0 0 15 9
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1350 100.00 1  # SKIN: a small skin
+S
+#11113
+skink colorful sneaky~
+a sneaky skink~
+A colorful skink is sneaking around here.
+~
+1 1 bdoD dn
+0 0 7 9
+T 9901
+T 9902
 S
 #11130
 sleeping ivy~
@@ -104,7 +181,7 @@ S
 #11132
 lulling songbird bird blue purple grey~
 a lulling songbird~
-A small songbird, blue and purple shimmering irridescent over its otherwise grey plumage, trills from above.
+A small songbird, blue and purple shimmering iridescent over its otherwise grey plumage, trills from above.
 ~
 0 0 adgj 0
 0 0 2 26

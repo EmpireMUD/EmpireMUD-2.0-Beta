@@ -492,6 +492,7 @@ I 6 10521 1.00 1 a  # FORAGE: a fig leaf
 I 6 10518 100.00 1 a  # FORAGE: an unripe fig
 I 8 10519 100.00 1  # HARVEST: a basket of pudding figs
 I 9 121 100.00 1  # GATHER: a stick
+I 20 120 100.00 1  # CHOP: a large tree
 M
 9145 5.00 adh
 M
@@ -578,7 +579,7 @@ D0
 &?.&g||&?.~
 &g~
 I 6 10523 100.00 1  # FORAGE: a handful of magic beans
-I 8 120 100.00 1  # HARVEST: a large tree
+I 8 10537 100.00 1  # HARVEST: a giant beanstalk
 M
 9145 5.00 adh
 M

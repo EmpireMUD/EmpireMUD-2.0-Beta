@@ -4,7 +4,7 @@ a bug~
 This object is BAD!  If you see it, there must be a bug in the game.  Please
 report it immediately using the BUG command.~
 ~
-3 k 0
+3 k 0 1
 0 0 0
 0 24
 S
@@ -14,7 +14,7 @@ the board~
 A board is hanging on the wall.~
 Nothing.
 ~
-9 0 0
+9 0 0 1
 0 0 0
 0 0
 S
@@ -23,7 +23,7 @@ board immortal~
 the immortal board~
 The immortal board is hovering against the wall.~
 ~
-9 0 0
+9 0 0 1
 0 0 0
 0 0
 S

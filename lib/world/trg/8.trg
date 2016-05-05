@@ -1,9 +1,9 @@
 #803
 Tarnished mirror look~
 1 c 3
-*~
+look~
 eval test %%self.is_name(%arg%)%%
-if !(look /= %cmd% && %test%)
+if !%test%
   return 0
   halt
 end
@@ -13,9 +13,9 @@ end
 #806
 Looking Glass reflection~
 1 c 3
-*~
+look~
 eval test %%self.is_name(%arg%)%%
-if !(look /= %cmd% && %test%)
+if !%test%
   return 0
   halt
 end

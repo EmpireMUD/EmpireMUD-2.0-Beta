@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.informative.c                               EmpireMUD 2.0b3 *
+*   File: act.informative.c                               EmpireMUD 2.0b4 *
 *  Usage: Player-level commands of an informative nature                  *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -35,8 +35,8 @@
 
 // extern variables
 extern struct city_metadata_type city_type[];
-extern const char *class_role[NUM_ROLES];
-extern const char *class_role_color[NUM_ROLES];
+extern const char *class_role[];
+extern const char *class_role_color[];
 extern const char *dirs[];
 extern struct help_index_element *help_table;
 extern int top_of_helpt;
@@ -46,7 +46,8 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 // external functions
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 extern char *get_room_name(room_data *room, bool color);
-extern char *morph_string(char_data *ch, byte type);
+extern char *list_harnessed_mobs(vehicle_data *veh);
+void look_at_vehicle(vehicle_data *veh, char_data *ch);
 
 // local protos
 ACMD(do_affects);
@@ -164,6 +165,7 @@ void look_at_target(char_data *ch, char *arg) {
 	int bits, found = FALSE, j, fnum, i = 0;
 	char_data *found_char = NULL;
 	obj_data *obj, *found_obj = NULL;
+	vehicle_data *found_veh = NULL;
 	char *desc;
 
 	if (!ch->desc)
@@ -174,7 +176,7 @@ void look_at_target(char_data *ch, char *arg) {
 		return;
 		}
 
-	bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM, ch, &found_char, &found_obj);
+	bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM | FIND_VEHICLE_ROOM, ch, &found_char, &found_obj, &found_veh);
 
 	/* Is the target a character? */
 	if (found_char != NULL) {
@@ -185,6 +187,13 @@ void look_at_target(char_data *ch, char *arg) {
 			}
 			act("$n looks at $N.", TRUE, ch, 0, found_char, TO_NOTVICT);
 		}
+		return;
+	}
+	
+	// was the target a vehicle?
+	if (found_veh != NULL) {
+		look_at_vehicle(found_veh, ch);
+		act("$n looks at $V.", TRUE, ch, NULL, found_veh, TO_ROOM);
 		return;
 	}
 
@@ -237,7 +246,13 @@ void look_at_target(char_data *ch, char *arg) {
 			found = TRUE;
 		}
 	}
-
+	
+	// look at vehicle they're in
+	if (!found && GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
+		look_at_vehicle(GET_ROOM_VEHICLE(IN_ROOM(ch)), ch);
+		found = TRUE;
+	}
+	
 	/* If an object was found back in generic_find */
 	if (bits) {
 		if (!found) {
@@ -260,21 +275,33 @@ void look_at_target(char_data *ch, char *arg) {
 void look_in_obj(char_data *ch, char *arg) {
 	extern const char *color_liquid[];
 	extern const char *fullness[];
+	vehicle_data *veh = NULL;
 	obj_data *obj = NULL;
 	char_data *dummy = NULL;
 	int amt, bits;
 
 	if (!*arg)
 		send_to_char("Look in what?\r\n", ch);
-	else if (!(bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &dummy, &obj))) {
+	else if (!(bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &dummy, &obj, &veh))) {
 		sprintf(buf, "There doesn't seem to be %s %s here.\r\n", AN(arg), arg);
 		send_to_char(buf, ch);
 	}
-	else if ((GET_OBJ_TYPE(obj) != ITEM_DRINKCON) && (GET_OBJ_TYPE(obj) != ITEM_CORPSE) && (GET_OBJ_TYPE(obj) != ITEM_CONTAINER) && (GET_OBJ_TYPE(obj) != ITEM_CART))
+	else if (veh || (!obj && (veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && isname(arg, VEH_KEYWORDS(veh)))) {
+		// vehicle section
+		if (!VEH_FLAGGED(veh, VEH_CONTAINER)) {
+			act("$V isn't a container.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
+		else {
+			act("$V (here):", FALSE, ch, NULL, veh, TO_CHAR);
+			list_obj_to_char(VEH_CONTAINS(veh), ch, OBJ_DESC_CONTENTS, TRUE);
+		}
+	}
+	// the rest is objects:
+	else if ((GET_OBJ_TYPE(obj) != ITEM_DRINKCON) && (GET_OBJ_TYPE(obj) != ITEM_CORPSE) && (GET_OBJ_TYPE(obj) != ITEM_CONTAINER))
 		send_to_char("There's nothing inside that!\r\n", ch);
 	else {
-		if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER || GET_OBJ_TYPE(obj) == ITEM_CORPSE || GET_OBJ_TYPE(obj) == ITEM_CART) {
-			if (OBJVAL_FLAGGED(obj, CONT_CLOSED) && GET_OBJ_TYPE(obj) != ITEM_CORPSE && GET_OBJ_TYPE(obj) != ITEM_CART)
+		if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER || GET_OBJ_TYPE(obj) == ITEM_CORPSE) {
+			if (OBJVAL_FLAGGED(obj, CONT_CLOSED) && GET_OBJ_TYPE(obj) != ITEM_CORPSE)
 				send_to_char("It is closed.\r\n", ch);
 			else {
 				send_to_char(fname(GET_OBJ_KEYWORDS(obj)), ch);
@@ -344,13 +371,26 @@ void diag_char_to_char(char_data *i, char_data *ch) {
 * @param char_data *to The person to show them to.
 */
 void display_attributes(char_data *ch, char_data *to) {
+	extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
+	extern int attribute_display_order[NUM_ATTRIBUTES];
+	
+	char buf[MAX_STRING_LENGTH];
+	int iter, pos;
+
 	if (!ch || !to || !to->desc) {
 		return;
 	}
 	
 	msg_to_char(to, "        Physical                   Social                      Mental\r\n");
-	msg_to_char(to, "  Strength  [%s%2d&0]           Charisma  [%s%2d&0]           Intelligence  [%s%2d&0]\r\n", HAPPY_COLOR(GET_STRENGTH(ch), ch->real_attributes[STRENGTH]), GET_STRENGTH(ch), HAPPY_COLOR(GET_CHARISMA(ch), ch->real_attributes[CHARISMA]), GET_CHARISMA(ch), HAPPY_COLOR(GET_INTELLIGENCE(ch), ch->real_attributes[INTELLIGENCE]), GET_INTELLIGENCE(ch));
-	msg_to_char(to, "  Dexterity  [%s%2d&0]          Greatness  [%s%2d&0]          Wits  [%s%2d&0]\r\n", HAPPY_COLOR(GET_DEXTERITY(ch), ch->real_attributes[DEXTERITY]), GET_DEXTERITY(ch), HAPPY_COLOR(GET_GREATNESS(ch), ch->real_attributes[GREATNESS]), GET_GREATNESS(ch), HAPPY_COLOR(GET_WITS(ch), ch->real_attributes[WITS]), GET_WITS(ch));
+	
+	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+		pos = attribute_display_order[iter];
+		snprintf(buf, sizeof(buf), "%s  [%s%2d\t0]", attributes[pos].name, HAPPY_COLOR(GET_ATT(ch, pos), GET_REAL_ATT(ch, pos)), GET_ATT(ch, pos));
+		msg_to_char(to, "  %-*.*s%s", 23 + color_code_length(buf), 23 + color_code_length(buf), buf, !((iter + 1) % 3) ? "\r\n" : "");
+	}
+	if (iter % 3) {
+		msg_to_char(to, "\r\n");
+	}
 }
 
 
@@ -365,7 +405,6 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	void show_character_affects(char_data *ch, char_data *to);
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
-	extern int get_blood_upkeep_cost(char_data *ch);
 	extern int get_crafting_level(char_data *ch);
 	extern int total_bonus_healing(char_data *ch);
 	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
@@ -373,25 +412,25 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	extern int health_gain(char_data *ch, bool info_only);
 	extern int move_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
-	extern int get_ability_points_available_for_char(char_data *ch, int skill);
+	extern int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
 	extern const struct material_data materials[NUM_MATERIALS];
-	extern int skill_sort[NUM_SKILLS];
 	extern const int base_hit_chance;
 	extern const double hit_per_dex;
 
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
-	int i, j, count, iter, sk, pts, cols, val;
+	struct player_skill_data *skdata, *next_skill;
+	int i, j, count, pts, cols, val;
 	empire_data *emp;
 	struct time_info_data playing_time;
 
 
-	msg_to_char(to, " +----------------------------- EmpireMUD 2.0b3 -----------------------------+\r\n");
+	msg_to_char(to, " +----------------------------- EmpireMUD 2.0b4 -----------------------------+\r\n");
 	
 	// row 1 col 1: name
 	msg_to_char(to, "  Name: %-18.18s", PERS(ch, ch, 1));
 
 	// row 1 col 2: class
-	msg_to_char(to, " Class: %-17.17s", IS_IMMORTAL(ch) ? "Immortal" : class_data[GET_CLASS(ch)].name);
+	msg_to_char(to, " Class: %-17.17s", SHOW_CLASS_NAME(ch));
 	msg_to_char(to, " Level: %d (%d)\r\n", GET_COMPUTED_LEVEL(ch), GET_SKILL_LEVEL(ch));
 
 	// row 1 col 3: levels
@@ -447,12 +486,11 @@ void display_score_to_char(char_data *ch, char_data *to) {
 		strcpy(lbuf, "&gnone&0");
 	}
 	// gotta count the color codes to determine width
-	count = 37 + (2 * count_color_codes(lbuf));
-	sprintf(lbuf2, "  Conditions: %%-%d.%ds", count, count);
-	msg_to_char(to, lbuf2, lbuf);
+	count = 37 + color_code_length(lbuf);
+	msg_to_char(to, "  Conditions: %-*.*s", count, count, lbuf);
 	
 	if (IS_VAMPIRE(ch)) {
-		msg_to_char(to, " Blood: &r%d&0/&r%d&0-&r%d&0/hr\r\n", GET_BLOOD(ch), GET_MAX_BLOOD(ch), get_blood_upkeep_cost(ch));
+		msg_to_char(to, " Blood: &r%d&0/&r%d&0-&r%d&0/hr\r\n", GET_BLOOD(ch), GET_MAX_BLOOD(ch), MAX(0, GET_BLOOD_UPKEEP(ch)));
 	}
 	else {
 		msg_to_char(to, "\r\n");
@@ -484,25 +522,23 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	val = get_to_hit(ch, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(ch));
 	sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, base_hit_chance), val);
 	sprintf(lbuf2, "Speed  [%.2f]", get_combat_speed(ch, WEAR_WIELD));
-	sprintf(lbuf3, "Crafting [%s%d&0]", HAPPY_COLOR(get_crafting_level(ch), GET_SKILL_LEVEL(ch)), get_crafting_level(ch));
+	sprintf(lbuf3, "Crafting  [%s%d&0]", HAPPY_COLOR(get_crafting_level(ch), GET_SKILL_LEVEL(ch)), get_crafting_level(ch));
 	// note: the "%-24.24s" for speed is lower because it contains no color codes
 	msg_to_char(to, "  %-28.28s %-24.24s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 
 	msg_to_char(to, " +--------------------------------- Skills ----------------------------------+\r\n ");
 
 	count = 0;
-	for (iter = 0; iter < NUM_SKILLS; ++iter) {
-		sk = skill_sort[iter];
-		if (GET_SKILL(ch, sk) > 0) {
-			sprintf(lbuf, " %s: %s%d", skill_data[sk].name, IS_ANY_SKILL_CAP(ch, sk) ? "&g" : "&y", GET_SKILL(ch, sk));
-			pts = get_ability_points_available_for_char(ch, sk);
+	HASH_ITER(hh, GET_SKILL_HASH(ch), skdata, next_skill) {
+		if (skdata->level > 0) {
+			sprintf(lbuf, " %s: %s%d", SKILL_NAME(skdata->ptr), IS_ANY_SKILL_CAP(ch, skdata->vnum) ? "&g" : "&y", skdata->level);
+			pts = get_ability_points_available_for_char(ch, skdata->vnum);
 			if (pts > 0) {
 				sprintf(lbuf + strlen(lbuf), " &g(%d)", pts);
 			}
 			
-			cols = 25 + (2 * count_color_codes(lbuf));
-			sprintf(lbuf2, "%%-%d.%ds&0", cols, cols);
-			msg_to_char(to, lbuf2, lbuf);
+			cols = 25 + color_code_length(lbuf);
+			msg_to_char(to, "%-*.*s&0", cols, cols, lbuf);
 			
 			if (++count == 3) {
 				msg_to_char(to, "&0\r\n ");
@@ -554,7 +590,7 @@ void list_char_to_char(char_data *list, char_data *ch) {
 	int c = 1;
 	
 	bool use_mob_stacking = config_get_bool("use_mob_stacking");
-	#define MOB_CAN_STACK(ch)  (use_mob_stacking && !GET_LED_BY(ch) && !GET_PULLING(ch) && GET_POS(ch) != POS_FIGHTING && !MOB_FLAGGED((ch), MOB_EMPIRE | MOB_TIED | MOB_MOUNTABLE | MOB_FAMILIAR))
+	#define MOB_CAN_STACK(ch)  (use_mob_stacking && !GET_LED_BY(ch) && GET_POS(ch) != POS_FIGHTING && !MOB_FLAGGED((ch), MOB_EMPIRE | MOB_TIED | MOB_MOUNTABLE | MOB_FAMILIAR))
 	
 	// no work
 	if (!list || !ch || !ch->desc) {
@@ -602,13 +638,11 @@ void list_char_to_char(char_data *list, char_data *ch) {
 * @param char_data *to The person to show it to.
 */
 void list_lore_to_char(char_data *ch, char_data *to) {
-	extern char *get_name_by_id(int id);
 	extern long load_time();
 
 	struct lore_data *lore;
 	char daystring[MAX_INPUT_LENGTH];
 	struct time_info_data t;
-	empire_data *e;
 	long beginning_of_time = load_time();
 
 	msg_to_char(to, "%s's lore:\r\n", PERS(ch, ch, 1));
@@ -622,53 +656,8 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 		else
 			strcpy(buf1, buf);
 
-		sprintf(daystring, "%d %s, Year %d", t.day + 1, buf1, t.year);
-
-		switch (lore->type) {
-			case LORE_FOUND_EMPIRE:
-				if ((e = real_empire(lore->value)))
-					msg_to_char(to, " Proudly founded %s%s&0 on %s.\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), daystring);
-				break;
-			case LORE_JOIN_EMPIRE:
-				if ((e = real_empire(lore->value)))
-					msg_to_char(to, " Honorably accepted into %s%s&0 on %s.\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), daystring);
-				break;
-			case LORE_DEFECT_EMPIRE:
-				if ((e = real_empire(lore->value)))
-					msg_to_char(to, " Defected from %s%s&0 on %s.\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), daystring);
-				break;
-			case LORE_KICKED_EMPIRE:
-				if ((e = real_empire(lore->value)))
-					msg_to_char(to, " Dishonorably discharged from %s%s&0 on %s.\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e), daystring);
-				break;
-			case LORE_PLAYER_KILL:
-				msg_to_char(to, " Killed %s in battle on %s.\r\n", get_name_by_id(lore->value) ? CAP(get_name_by_id(lore->value)) : "an unknown foe", daystring);
-				break;
-			case LORE_PLAYER_DEATH:
-				msg_to_char(to, " Slain by %s in battle on %s.\r\n", get_name_by_id(lore->value) ? CAP(get_name_by_id(lore->value)) : "an unknown foe", daystring);
-				break;
-			case LORE_TOWER_DEATH:
-				msg_to_char(to, " Killed by a guard tower on %s.\r\n", daystring);
-				break;
-			case LORE_DEATH:
-				msg_to_char(to, " Died on %s.\r\n", daystring);
-				break;
-			case LORE_START_VAMPIRE:
-				if (IS_VAMPIRE(to))
-					msg_to_char(to, " Sired prior to %s.\r\n", daystring);
-				break;
-			case LORE_PURIFY:
-				msg_to_char(to, " Purified on %s.\r\n", daystring);
-				break;
-			case LORE_SIRE_VAMPIRE:
-				if (IS_VAMPIRE(to))
-					msg_to_char(to, " Sired by %s on %s.\r\n", get_name_by_id(lore->value) ? CAP(get_name_by_id(lore->value)) : "an unknown Cainite", daystring);
-				break;
-			case LORE_MAKE_VAMPIRE:
-				if (IS_VAMPIRE(to))
-					msg_to_char(to, " Sired %s on %s.\r\n", get_name_by_id(lore->value) ? CAP(get_name_by_id(lore->value)) : "an unknown Cainite", daystring);
-				break;
-		}
+		snprintf(daystring, sizeof(daystring), "%d %s, Year %d", t.day + 1, buf1, t.year);
+		msg_to_char(to, " %s on %s.\r\n", NULLSAFE(lore->text), daystring);
 	}
 }
 
@@ -681,6 +670,9 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 * @param int num If mob-stacking is on, number of copies of this i to show.
 */
 void list_one_char(char_data *i, char_data *ch, int num) {
+	extern bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
+	extern bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
+	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern struct action_data_struct action_data[];
 	
 	// POS_x
@@ -718,7 +710,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	}
 	
 	// empire prefixing
-	if (!MORPH_FLAGGED(i, MORPH_FLAG_ANIMAL)) {
+	if (!CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)) {
 		if (IS_DISGUISED(i)) {
 			if (ROOM_OWNER(IN_ROOM(i))) {
 				// disguised player shows loyalty of the area you're in -- players can't tell you're not an npc
@@ -732,7 +724,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 			}
 			else {
 				// player shows rank
-				msg_to_char(ch, "<%s&y> ", EMPIRE_RANK(GET_LOYALTY(i), GET_RANK(i)-1));
+				msg_to_char(ch, "<%s&0&y> ", EMPIRE_RANK(GET_LOYALTY(i), GET_RANK(i)-1));
 			}
 		}
 	}
@@ -740,17 +732,22 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS) && IS_NPC(i)) {
 		msg_to_char(ch, "[%d] %s", GET_MOB_VNUM(i), SCRIPT(i) ? "[TRIG] " : "");
 	}
-
-	if (IS_NPC(i) && GET_LONG_DESC(i) && GET_POS(i) == POS_STANDING) {
+	
+	if (IS_MORPHED(i) && GET_POS(i) == POS_STANDING) {
 		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
 			msg_to_char(ch, "*");
 		}
-
+		msg_to_char(ch, "%s\r\n", MORPH_LONG_DESC(GET_MORPH(i)));
+	}
+	else if (IS_NPC(i) && GET_LONG_DESC(i) && GET_POS(i) == POS_STANDING) {
+		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
+			msg_to_char(ch, "*");
+		}
 		msg_to_char(ch, GET_LONG_DESC(i));
 	}
 	else {
 		if (IS_NPC(i)) {
-			strcpy(buf, GET_SHORT_DESC(i));
+			strcpy(buf, PERS(i, ch, FALSE));
 			CAP(buf);
 		}
 		else {
@@ -777,8 +774,8 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 			strcat(buf, " (writing)");
 
 		if (GET_POS(i) != POS_FIGHTING) {
-			if (ON_CHAIR(i) && !IS_DEAD(i)) {
-				sprintf(buf + strlen(buf), " is sitting on %s.", CAN_SEE_OBJ(ch, ON_CHAIR(i)) ? GET_OBJ_DESC(ON_CHAIR(i), ch, OBJ_DESC_SHORT) : "something");			
+			if (GET_SITTING_ON(i)) {
+				sprintf(buf + strlen(buf), " is sitting %s %s%s%s.", IN_OR_ON(GET_SITTING_ON(i)), get_vehicle_short_desc(GET_SITTING_ON(i), ch), (VEH_ANIMALS(GET_SITTING_ON(i)) ? ", being pulled by " : ""), (VEH_ANIMALS(GET_SITTING_ON(i)) ? list_harnessed_mobs(GET_SITTING_ON(i)) : ""));
 			}
 			else if (!IS_NPC(i) && GET_ACTION(i) != ACT_NONE) {
 				sprintf(buf + strlen(buf), " %s", action_data[GET_ACTION(i)].long_desc);
@@ -812,20 +809,23 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 
 		msg_to_char(ch, "%s\r\n", buf);
 	}
-
+	
+	if (can_get_quest_from_mob(ch, i, NULL)) {
+		act("...$e has a quest for you!", FALSE, i, NULL, ch, TO_VICT);
+	}
+	if (can_turn_quest_in_to_mob(ch, i, NULL)) {
+		act("...you can finish a quest here!", FALSE, i, NULL, ch, TO_VICT);
+	}
 	if (affected_by_spell(i, ATYPE_FLY)) {
 		act("...$e is flying with gossamer mana wings!", FALSE, i, 0, ch, TO_VICT);
 	}
 	if (IS_RIDING(i)) {
-		sprintf(buf, "...$E is mounted upon %s.", get_mob_name_by_proto(GET_MOUNT_VNUM(i)));
+		sprintf(buf, "...$E is %s upon %s.", (MOUNT_FLAGGED(i, MOUNT_FLYING) ? "flying" : "mounted"), get_mob_name_by_proto(GET_MOUNT_VNUM(i)));
 		act(buf, FALSE, ch, 0, i, TO_CHAR);
 	}
 	if (GET_LED_BY(i)) {
 		sprintf(buf, "...%s is being led by %s.", HSSH(i), GET_LED_BY(i) == ch ? "you" : "$N");
 		act(buf, FALSE, ch, 0, GET_LED_BY(i), TO_CHAR);
-	}
-	if (GET_PULLING(i)) {
-		act("...$e is pulling $p.", FALSE, i, GET_PULLING(i), ch, TO_VICT);
 	}
 	if (MOB_FLAGGED(i, MOB_TIED))
 		act("...$e is tied up here.", FALSE, i, 0, ch, TO_VICT);
@@ -854,10 +854,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		}
 	if (!IS_NPC(i) && GET_ACTION(i) == ACT_MORPHING)
 		act("...$e is undergoing a hideous transformation!", FALSE, i, 0, ch, TO_VICT);
-	if (IS_IMMORTAL(ch) && !IS_NPC(i) && GET_MORPH(i) != MORPH_NONE)
-		act("...this appears to be $o.", FALSE, i, 0, ch, TO_VICT);
-	
-	if (IS_IMMORTAL(ch) && !IS_NPC(i) && IS_DISGUISED(i)) {
+	if (IS_IMMORTAL(ch) && (IS_MORPHED(i) || IS_DISGUISED(i))) {
 		act("...this appears to be $o.", FALSE, i, 0, ch, TO_VICT);
 	}
 	
@@ -874,6 +871,86 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 
 
 /**
+* Shows one vehicle as in-the-room.
+*
+* @param vehicle_data *veh The vehicle to show.
+* @param char_data *ch The person to send the output to.
+*/
+void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
+	char buf[MAX_STRING_LENGTH];
+	size_t size = 0;
+	
+	if (VEH_OWNER(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "<%s> ", EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
+	}
+	if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "[%d] %s", VEH_VNUM(veh), SCRIPT(veh) ? "[TRIG] " : "");
+	}
+	size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", VEH_LONG_DESC(veh));
+	
+	// additional descriptions like what's attached:
+	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...it is ON FIRE!\r\n");
+	}
+	if (!VEH_IS_COMPLETE(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...it is unfinished.\r\n");
+	}
+	else if (VEH_NEEDS_RESOURCES(veh) || VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...it is in need of repair.\r\n");
+	}
+	
+	if (VEH_SITTING_ON(veh) == ch) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...you are sitting %s it.\r\n", IN_OR_ON(veh));
+	}
+	else if (VEH_SITTING_ON(veh)) {
+		// this is PROBABLY not shown to players
+		size += snprintf(buf + size, sizeof(buf) - size, "...%s is sitting %s it.\r\n", PERS(VEH_SITTING_ON(veh), ch, FALSE), IN_OR_ON(veh));
+	}
+	
+	if (VEH_LED_BY(veh) == ch) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...you are leading it.\r\n");
+	}
+	else if (VEH_LED_BY(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...it is being led by %s.\r\n", PERS(VEH_LED_BY(veh), ch, FALSE));
+	}
+	
+	if (VEH_ANIMALS(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "...it is being pulled by %s.\r\n", list_harnessed_mobs(veh));
+	}
+
+	send_to_char(buf, ch);
+}
+
+
+/**
+* Shows a list of vehicles in the room.
+*
+* @param vehicle_data *list Pointer to the start of the list of vehicles.
+* @param vehicle_data *ch Person to send the output to.
+*/
+void list_vehicles_to_char(vehicle_data *list, char_data *ch) {
+	vehicle_data *veh;
+	
+	// no work
+	if (!list || !ch || !ch->desc) {
+		return;
+	}
+	
+	LL_FOREACH2(list, veh, next_in_room) {
+		// conditions to show
+		if (!CAN_SEE_VEHICLE(ch, veh)) {
+			continue;	// should we show a "something" ?
+		}
+		if (VEH_SITTING_ON(veh) && VEH_SITTING_ON(veh) != ch) {
+			continue;	// don't show vehicles someone else is sitting on
+		}
+		
+		list_one_vehicle_to_char(veh, ch);
+	}
+}
+
+
+/**
 * Perform a look-at-person.
 *
 * @param char_data *i The person being looked at.
@@ -882,68 +959,62 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 */
 void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	char buf[MAX_STRING_LENGTH];
+	bool disguise;
 	int j, found;
-
+	
 	if (!i || !ch || !ch->desc)
 		return;
 	
-	if (show_eq && ch != i && !IS_IMMORTAL(ch) && !IS_NPC(i) && HAS_ABILITY(i, ABIL_CONCEALMENT)) {
+	disguise = !IS_IMMORTAL(ch) && (IS_DISGUISED(i) || (IS_MORPHED(i) && CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)));
+	
+	if (show_eq && ch != i && !IS_IMMORTAL(ch) && !IS_NPC(i) && has_ability(i, ABIL_CONCEALMENT)) {
 		show_eq = FALSE;
 		gain_ability_exp(i, ABIL_CONCEALMENT, 5);
 	}
 
 	if (ch != i) {
-		act("You look at $N.", FALSE, ch, 0, i, TO_CHAR);
-	}
-
-	// For morphs, we show a description
-	if (!IS_NPC(i) && GET_MORPH(i) != MORPH_NONE) {
-		act(morph_string(i, MORPH_STRING_DESC), FALSE, ch, 0, i, TO_CHAR);
+		act("You look at $N.", FALSE, ch, FALSE, i, TO_CHAR);
 	}
 	
-	// only show this block if the person is not morphed, or the morph is not an npc disguise
-	if (IS_NPC(i) || IS_IMMORTAL(ch) || GET_MORPH(i) == MORPH_NONE || !MORPH_FLAGGED(i, MORPH_FLAG_ANIMAL)) {
-		
-		if (GET_LOYALTY(i) && !IS_DISGUISED(i) && !MORPH_FLAGGED(i, MORPH_FLAG_ANIMAL)) {
-			sprintf(buf, "   $E is a member of %s.", EMPIRE_NAME(GET_LOYALTY(i)));
-			act(buf, FALSE, ch, NULL, i, TO_CHAR);
-		}
-		
-		if (!IS_NPC(i) && !IS_DISGUISED(i)) {
-			// basic description -- don't show if morphed
-			if (GET_LONG_DESC(i) && (IS_NPC(i) || GET_MORPH(i) == MORPH_NONE)) {
-				msg_to_char(ch, "%s&0", GET_LONG_DESC(i));
-			}
-
-			if (HAS_INFRA(i)) {
-				act("   You notice a distinct, red glint in $S eyes.", FALSE, ch, NULL, i, TO_CHAR);
-			}
-			if (AFF_FLAGGED(i, AFF_CLAWS)) {
-				act("   $N's hands are huge, distorted, and very sharp!", FALSE, ch, NULL, i, TO_CHAR);
-			}
-			if (AFF_FLAGGED(i, AFF_MAJESTY)) {
-				act("   $N has an aura of majesty about $M.", FALSE, ch, NULL, i, TO_CHAR);
-			}
-			if (AFF_FLAGGED(i, AFF_MUMMIFY)) {
-				act("   $E is mummified in a hard, dark substance!", FALSE, ch, NULL, i, TO_CHAR);
-			}
-			diag_char_to_char(i, ch);
-		}
-		else {
-			diag_char_to_char(i, ch);
+	if (GET_LOYALTY(i) && !disguise) {
+		sprintf(buf, "   $E is a member of %s.", EMPIRE_NAME(GET_LOYALTY(i)));
+		act(buf, FALSE, ch, NULL, i, TO_CHAR);
+	}
+	
+	if (!IS_NPC(i) && !disguise) {
+		// basic description -- don't show if morphed
+		if (GET_LONG_DESC(i) && !IS_MORPHED(i)) {
+			msg_to_char(ch, "%s&0", GET_LONG_DESC(i));
 		}
 
-		if (!show_eq) {
-			return;
+		if (HAS_INFRA(i)) {
+			act("   You notice a distinct, red glint in $S eyes.", FALSE, ch, NULL, i, TO_CHAR);
 		}
+		if (AFF_FLAGGED(i, AFF_CLAWS)) {
+			act("   $N's hands are huge, distorted, and very sharp!", FALSE, ch, NULL, i, TO_CHAR);
+		}
+		if (AFF_FLAGGED(i, AFF_MAJESTY)) {
+			act("   $N has an aura of majesty about $M.", FALSE, ch, NULL, i, TO_CHAR);
+		}
+		if (AFF_FLAGGED(i, AFF_MUMMIFY)) {
+			act("   $E is mummified in a hard, dark substance!", FALSE, ch, NULL, i, TO_CHAR);
+		}
+		diag_char_to_char(i, ch);
+	}
+	else {	// npc or disguised
+		diag_char_to_char(i, ch);
+	}
 
+	if (show_eq && !disguise) {
+		// check if there's eq to see
 		found = FALSE;
 		for (j = 0; !found && j < NUM_WEARS; j++) {
 			if (GET_EQ(i, j) && CAN_SEE_OBJ(ch, GET_EQ(i, j))) {
 				found = TRUE;
 			}
 		}
-
+	
+		// show eq
 		if (found) {
 			msg_to_char(ch, "\r\n");	/* act() does capitalization. */
 			act("$n is using:", FALSE, i, 0, ch, TO_VICT);
@@ -954,19 +1025,18 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 				}
 			}
 		}
-	}
+	
+		// show inventory
+		if (ch != i && has_ability(ch, ABIL_APPRAISAL)) {
+			act("\r\nYou appraise $s inventory:", FALSE, i, 0, ch, TO_VICT);
+			list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
 
-	if (!show_eq) {
-		return;
-	}
-
-	if (ch != i && (IS_IMMORTAL(ch) || IS_NPC(i) || GET_MORPH(i) == MORPH_NONE || !MORPH_FLAGGED(i, MORPH_FLAG_ANIMAL)) && HAS_ABILITY(ch, ABIL_APPRAISAL)) {
-		act("\r\nYou appraise $s inventory:", FALSE, i, 0, ch, TO_VICT);
-		list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
-
-		if (ch != i && i->carrying) {
-			gain_ability_exp(ch, ABIL_APPRAISAL, 5);
-			GET_WAIT_STATE(ch) = MAX(GET_WAIT_STATE(ch), 0.5 RL_SEC);
+			if (ch != i && i->carrying) {
+				if (can_gain_exp_from(ch, i)) {
+					gain_ability_exp(ch, ABIL_APPRAISAL, 5);
+				}
+				GET_WAIT_STATE(ch) = MAX(GET_WAIT_STATE(ch), 0.5 RL_SEC);
+			}
 		}
 	}
 }
@@ -1119,7 +1189,7 @@ bool inventory_store_building(char_data *ch, room_data *room, empire_data *emp) 
 		return found;
 	}
 	
-	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_VAULT)) {
+	if (HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT)) {
 		msg_to_char(ch, "\r\nVault: %d coin%s, %d treasure (%d total)\r\n", EMPIRE_COINS(emp), (EMPIRE_COINS(emp) != 1 ? "s" : ""), EMPIRE_WEALTH(emp), GET_TOTAL_WEALTH(emp));
 	}
 
@@ -1192,7 +1262,7 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
 			}
 		}
 
-		if (CAN_SEE_OBJ(ch, i) && (!IN_CHAIR(i) || ch == IN_CHAIR(i))) {
+		if (CAN_SEE_OBJ(ch, i)) {
 			if (mode == OBJ_DESC_LONG) {
 				send_to_char("&g", ch);
 			}
@@ -1215,6 +1285,8 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
 void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	extern int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board);
 	extern int board_loaded;
+	extern bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list);
+	extern bool can_turn_quest_in_to_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list);
 	void init_boards(void);
 	extern int find_board(char_data *ch);
 	extern const char *extra_bits_inv_flags[];
@@ -1230,10 +1302,6 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	else {
 		strcpy(buf, GET_OBJ_DESC(obj, ch, mode));
 	}
-	
-	if (mode == OBJ_DESC_LONG && IN_CHAIR(obj) == ch) {
-		strcat(buf, "...you are sitting on it.");
-	}
 
 	if (mode == OBJ_DESC_EQUIPMENT) {
 		if (obj->worn_by && AFF_FLAGGED(obj->worn_by, AFF_DISARM) && (obj->worn_on == WEAR_WIELD || obj->worn_on == WEAR_RANGED || obj->worn_on == WEAR_HOLD)) {
@@ -1244,11 +1312,24 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_LONG) {
 		sprintbit(GET_OBJ_EXTRA(obj), extra_bits_inv_flags, flags, TRUE);
 		if (strncmp(flags, "NOBITS", 6)) {
-			sprintf(buf + strlen(buf), " %*s", ((int)strlen(flags)-1), flags);	// remove trailing space
+			sprintf(buf + strlen(buf), " %.*s", ((int)strlen(flags)-1), flags);	// remove trailing space
+		}
+		
+		if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+			strcat(buf, " (quest)");
 		}
 		
 		if (IS_STOLEN(obj)) {
 			strcat(buf, " (STOLEN)");
+		}
+	}
+	
+	if (mode == OBJ_DESC_INVENTORY || (mode == OBJ_DESC_LONG && CAN_WEAR(obj, ITEM_WEAR_TAKE))) {
+		if (can_get_quest_from_obj(ch, obj, NULL)) {
+			strcat(buf, " (quest available)");
+		}
+		if (can_turn_quest_in_to_obj(ch, obj, NULL)) {
+			strcat(buf, " (finished quest)");
 		}
 	}
 	
@@ -1270,7 +1351,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 		else if (IS_PORTAL(obj)) {
 			room = real_room(GET_PORTAL_TARGET_VNUM(obj));
 			if (room) {
-				sprintf(buf, "%sYou peer into %s and see: %s", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), get_room_name(room, TRUE));
+				sprintf(buf, "%sYou peer into %s and see: %s\t0", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), get_room_name(room, TRUE));
 			}
 			else {
 				sprintf(buf, "%sIt's a portal, but it doesn't seem to lead anywhere.", NULLSAFE(GET_OBJ_ACTION_DESC(obj)));
@@ -1287,8 +1368,18 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 		}
 	}
 	
+	// CRLF IS HERE
 	if (buf[strlen(buf)-1] != '\n') {
 		strcat(buf, "\r\n");
+	}
+	
+	if (mode == OBJ_DESC_LONG && !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+		if (can_get_quest_from_obj(ch, obj, NULL)) {
+			strcat(buf, "...it has a quest for you!\r\n");
+		}
+		if (can_turn_quest_in_to_obj(ch, obj, NULL)) {
+			strcat(buf, "...you can turn in a quest here!\r\n");
+		}
 	}
 	
 	page_string(ch->desc, buf, TRUE);
@@ -1438,11 +1529,8 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 		if (shortlist) {
 			size += snprintf(out + size, sizeof(out) - size, "[%s%3d%s] ", screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], GET_COMPUTED_LEVEL(ch), screenreader ? "" : "\t0");
 		}
-		else if (GET_CLASS(ch) != CLASS_NONE) {
-			size += snprintf(out + size, sizeof(out) - size, "[%3d %s%s%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], screenreader ? class_data[GET_CLASS(ch)].name : class_data[GET_CLASS(ch)].abbrev, screenreader ? show_role : "\t0");
-		}
-		else {	// classless
-			size += snprintf(out + size, sizeof(out) - size, "[%3d %sAdvn%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], screenreader ? show_role : "\t0");
+		else {
+			size += snprintf(out + size, sizeof(out) - size, "[%3d %s%s%s] ", GET_COMPUTED_LEVEL(ch), screenreader ? "" : class_role_color[GET_CLASS_ROLE(ch)], screenreader ? SHOW_CLASS_NAME(ch) : SHOW_CLASS_ABBREV(ch), screenreader ? show_role : "\t0");
 		}
 	}
 	
@@ -1456,8 +1544,8 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	
 	// shortlist ends here
 	if (shortlist) {
-		num = count_color_codes(out);
-		sprintf(buf, "%%-%d.%ds", 35 + 2 * num, 35 + 2 * num);
+		num = color_code_length(out);
+		sprintf(buf, "%%-%d.%ds", 35 + num, 35 + num);
 		strcpy(buf1, out);
 		
 		size = snprintf(out, sizeof(out), buf, buf1);
@@ -1471,7 +1559,7 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	}
 	
 	// title
-	size += snprintf(out + size, sizeof(out) - size, "%s&0", GET_TITLE(ch));
+	size += snprintf(out + size, sizeof(out) - size, "%s&0", NULLSAFE(GET_TITLE(ch)));
 	
 	// tags
 	if (IS_AFK(ch)) {
@@ -1554,7 +1642,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 		else if (!(tch = d->character))
 			continue;
 
-		if (*name_search && !is_abbrev(name_search, PERS(tch, tch, 1)) && !strstr(GET_TITLE(tch), name_search))
+		if (*name_search && !is_abbrev(name_search, PERS(tch, tch, 1)) && !strstr(NULLSAFE(GET_TITLE(tch)), name_search))
 			continue;
 		if (!CAN_SEE_GLOBAL(ch, tch)) {
 			continue;
@@ -1717,13 +1805,13 @@ ACMD(do_affects) {
 	if (IS_RIDING(ch)) {
 		msg_to_char(ch, "   You are riding %s.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
 	}
-	else if (HAS_ABILITY(ch, ABIL_RIDE) && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
+	else if (has_ability(ch, ABIL_RIDE) && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
 		msg_to_char(ch, "   You have %s. Type 'mount' to ride it.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
 	}
 
 	/* Morph */
-	if (GET_MORPH(ch) != MORPH_NONE) {
-		msg_to_char(ch, "   You are in the form of %s!\r\n", morph_string(ch, MORPH_STRING_NAME));
+	if (IS_MORPHED(ch)) {
+		msg_to_char(ch, "   You are in the form of %s!\r\n", MORPH_SHORT_DESC(GET_MORPH(ch)));
 	}
 	else if (IS_DISGUISED(ch)) {
 		msg_to_char(ch, "   You are disguised as %s!\r\n", PERS(ch, ch, 0));
@@ -1846,6 +1934,7 @@ ACMD(do_equipment) {
 
 
 ACMD(do_examine) {
+	vehicle_data *tmp_veh = NULL;
 	char_data *tmp_char;
 	obj_data *tmp_object;
 
@@ -1857,13 +1946,17 @@ ACMD(do_examine) {
 	}
 	look_at_target(ch, arg);
 
-	generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object);
+	generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &tmp_object, &tmp_veh);
 
 	if (tmp_object) {
-		if ((GET_OBJ_TYPE(tmp_object) == ITEM_DRINKCON) || (GET_OBJ_TYPE(tmp_object) == ITEM_CONTAINER) || (GET_OBJ_TYPE(tmp_object) == ITEM_CORPSE) || (GET_OBJ_TYPE(tmp_object) == ITEM_CART)) {
+		if ((GET_OBJ_TYPE(tmp_object) == ITEM_DRINKCON) || (GET_OBJ_TYPE(tmp_object) == ITEM_CONTAINER) || (GET_OBJ_TYPE(tmp_object) == ITEM_CORPSE)) {
 			send_to_char("When you look inside, you see:\r\n", ch);
 			look_in_obj(ch, arg);
 		}
+	}
+	if (tmp_veh && VEH_FLAGGED(tmp_veh, VEH_CONTAINER)) {
+		msg_to_char(ch, "When you look inside, you see:\r\n");
+		look_in_obj(ch, arg);
 	}
 }
 
@@ -2140,7 +2233,7 @@ ACMD(do_mark) {
 				dist = compute_distance(mark, IN_ROOM(ch));
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), mark));
 				
-				if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+				if (has_ability(ch, ABIL_NAVIGATION)) {
 					msg_to_char(ch, "Your mark at (%d, %d) is %d map tile%s %s.\r\n", X_COORD(mark), Y_COORD(mark), dist, (dist == 1 ? "" : "s"), (dir == NO_DIR ? "away" : dirs[dir]));
 				}
 				else {
@@ -2232,7 +2325,7 @@ ACMD(do_nearby) {
 
 			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 			
-			if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+			if (has_ability(ch, ABIL_NAVIGATION)) {
 				snprintf(line, sizeof(line), " %d tile%s %s: %s (%d, %d)\r\n", dist, (dist != 1 ? "s" : ""), (dir == NO_DIR ? "away" : dirs[dir]), get_room_name(loc, FALSE), X_COORD(loc), Y_COORD(loc));
 			}
 			else {
@@ -2254,7 +2347,7 @@ ACMD(do_nearby) {
 				
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 
-				if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+				if (has_ability(ch, ABIL_NAVIGATION)) {
 					snprintf(line, sizeof(line), " %d tile%s %s: the %s of %s (%d, %d) / %s%s&0\r\n", dist, (dist != 1 ? "s" : ""), (dir == NO_DIR ? "away" : dirs[dir]), city_type[city->type].name, city->name, X_COORD(loc), Y_COORD(loc), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 				}
 				else {
@@ -2284,14 +2377,19 @@ ACMD(do_nearby) {
 		// show instance
 		found = TRUE;
 		dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), inst->location));
-		if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
-			snprintf(line, sizeof(line), " %d tile%s %s: %s (%d, %d) / %s\r\n", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), GET_ADV_NAME(inst->adventure), X_COORD(loc), Y_COORD(loc), instance_level_string(inst));
+		if (has_ability(ch, ABIL_NAVIGATION)) {
+			snprintf(line, sizeof(line), " %d tile%s %s: %s (%d, %d) / %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), GET_ADV_NAME(inst->adventure), X_COORD(loc), Y_COORD(loc), instance_level_string(inst));
 		}
 		else {
-			snprintf(line, sizeof(line), " %d tile%s %s: %s / %s\r\n", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), GET_ADV_NAME(inst->adventure), instance_level_string(inst));
+			snprintf(line, sizeof(line), " %d tile%s %s: %s / %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), GET_ADV_NAME(inst->adventure), instance_level_string(inst));
 		}
 		
-		size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+		if (ROOM_OWNER(loc)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s / %s%s&0\r\n", line,  EMPIRE_BANNER(ROOM_OWNER(loc)), EMPIRE_NAME(ROOM_OWNER(loc)));
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
+		}
 	}
 	
 	if (!found) {
@@ -2328,11 +2426,13 @@ ACMD(do_score) {
 
 ACMD(do_survey) {
 	struct empire_city_data *city;
+	struct island_info *island;
 	
 	msg_to_char(ch, "You survey the area:\r\n");
 	
 	if (GET_ISLAND_ID(IN_ROOM(ch)) != NO_ISLAND) {
-		msg_to_char(ch, "Location: %s\r\n", get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE)->name);
+		island = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE);
+		msg_to_char(ch, "Location: %s%s\r\n", island->name, IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "");
 	}
 	
 	// empire
@@ -2433,7 +2533,7 @@ ACMD(do_weather) {
 
 
 ACMD(do_whereami) {	
-	if (HAS_ABILITY(ch, ABIL_NAVIGATION)) {
+	if (has_ability(ch, ABIL_NAVIGATION)) {
 		msg_to_char(ch, "You are at: %s (%d, %d)\r\n", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 	}
 	else {
@@ -2543,7 +2643,7 @@ ACMD(do_who) {
 
 
 ACMD(do_whois) {
-	void read_lore(char_data *ch);
+	void check_delayed_load(char_data *ch);
 	extern const char *level_names[][2];
 	
 	char_data *victim = NULL;
@@ -2560,26 +2660,19 @@ ACMD(do_whois) {
 		send_to_char("There is no such player.\r\n", ch);
 		return;
 	}
-
-	// ready
-	if (file) {
-		read_lore(victim);
-	}
+	
+	// load remaining data
+	check_delayed_load(victim);
 	
 	// basic info
-	msg_to_char(ch, "%s%s&0\r\n", PERS(victim, victim, TRUE), GET_TITLE(victim));
+	msg_to_char(ch, "%s%s&0\r\n", PERS(victim, victim, TRUE), NULLSAFE(GET_TITLE(victim)));
 	msg_to_char(ch, "Status: %s\r\n", level_names[(int) GET_ACCESS_LEVEL(victim)][1]);
 
 	// show class (but don't bother for immortals, as they generally have all skills
 	if (!IS_GOD(victim) && !IS_IMMORTAL(victim)) {
 		level = file ? GET_LAST_KNOWN_LEVEL(victim) : GET_COMPUTED_LEVEL(victim);
 		
-		if (GET_CLASS(victim) != CLASS_NONE) {
-			msg_to_char(ch, "Class: %d %s (%s%s\t0)\r\n", level, class_data[GET_PC_CLASS(victim)].name, class_role_color[GET_CLASS_ROLE(victim)], class_role[GET_CLASS_ROLE(victim)]);
-		}
-		else {
-			msg_to_char(ch, "Level: %d\r\n", level);
-		}
+		msg_to_char(ch, "Class: %d %s (%s%s\t0)\r\n", level, SHOW_CLASS_NAME(victim), class_role_color[GET_CLASS_ROLE(victim)], class_role[GET_CLASS_ROLE(victim)]);
 	}
 
 	if (GET_LOYALTY(victim)) {

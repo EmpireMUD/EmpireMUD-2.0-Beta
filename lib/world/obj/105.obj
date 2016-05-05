@@ -6,9 +6,10 @@ Someone has dropped a glowing vegetable.~
 appears to be a magi-netically modified crop from the deranged druids of the
 Magiterranean.
 ~
-6 0 a 5
+6 0 a 6
 6 0 0
 7 48
+I 14 10501 100.00 4 x  # COMBINE: a handful of glowkra pods
 M
 5
 $n pops a glowing seedpod into $s mouth.~
@@ -25,9 +26,10 @@ You've heard they glow brighter when pickled. You also have a good recipe for
 seafood glowkra gumbo that just needs some magenta arrowfish and some rice.
 This strange crop is surely the work of the mad druids of the Magiterranean.
 ~
-6 b a 5
+6 b a 6
 24 10500 0
 7 168
+I 15 10500 100.00 4 x  # SEPARATE: a glowkra pod
 R
 5114 0
 S
@@ -75,13 +77,12 @@ tooth dragon's dragons~
 a dragon's tooth~
 A dragon's tooth is lying here.~
    You can plant these magi-netically engineered dragons' teeth in a field to
-grow more, or use several of them to summon a skeletal guard for your empire.
+grow more, or use several of them to craft a magic sceptre that will allow you
+to summon skeletal guards for your empire.
 
 Craft (Jewelry): dragonstooth sceptre
- 10x dragon's tooth
-  4x gold dust
 ~
-3 b a 7
+3 b a 8
 0 10502 0
 14 0
 R
@@ -97,12 +98,15 @@ A dragonstooth sceptre is lying here.~
 with 'use sceptre' when wielded to summon skeleton minions to guard your
 empire!
 ~
-1 ho an 3
+1 ho an 5
 0 2 5
 14 0
 A
-5 1
+5 1 0
+C
+0 150
 T 10505
+T 10508
 S
 #10506
 seeds spadebrush handful~
@@ -127,9 +131,8 @@ A bundle of spadebrush is lying here.~
 of the Magiterranean to make handy spades for digging.
 
 Craft (requires Basic Crafts): spadebrush shovel
- 6x bundle of spadebrush
 ~
-3 k a 3
+3 k a 4
 0 0 0
 0 336
 R
@@ -173,9 +176,8 @@ modified! It could be milled into long-lasting ironflour, or crafted into
 bladegrass arrows!
 
 Craft (Archery): bladegrass arrows
-  1x bushel of bladegrass
 ~
-3 0 a 5
+3 0 a 6
 0 0 0
 2 0
 R
@@ -185,13 +187,14 @@ S
 ironflour sack~
 a sack of ironflour~
 A sack of ironflour is sitting on the ground.~
-   This sack of ground, magi-netically engineered bladegrass can be cooked
-(forged?) into long-lasting iron rations.
+   This sack of "flour" resembles iron filings in appearance and texture. It
+can be cooked (though perhaps forged would be a better term) into long-lasting
+iron rations.
 
 Cook (no skill required): ironbread
   2x sack of ironflour
 ~
-3 0 a 5
+3 0 a 6
 0 0 0
 2 0
 R
@@ -204,10 +207,10 @@ ration ironbread~
 an ironbread ration~
 An ironbread ration has been dropped here.~
    This hard bread is cooked, or perhaps forged, from magi-netically engineered
-bladegrass, using the ancient techniques of the Dwarves! It keeps for months
-and is rich in iron. Actually, it might even be made of iron.
+ironflour, using the ancient cooking techniques of the Dwarves! It keeps for
+months and is rich in iron. Actually, it might even be made of iron.
 ~
-6 0 a 6
+6 0 a 7
 120 0 0
 2 0
 M
@@ -243,11 +246,13 @@ gemfruits sparkling basket~
 a basket of sparkling gemfruits~
 A basket of sparkling gemfruits is lying here.~
    This beautiful fruit will eventually decay if not stored or eaten, leaving
-behind a magical crystal. It can also be planted to grow more gemfruit.
+behind a magical crystal. It can also be planted to grow more gemfruit. Some
+gemfuits will fail to produce gems, and you must be holding them in your
+inventory when they decay to get any gems at all.
 ~
-6 b a 11
+6 b a 13
 48 10504 0
-12 168
+12 240
 T 10514
 S
 #10515
@@ -256,9 +261,10 @@ a magic mushroom~
 A magic mushroom is lying here.~
 You trip while looking at the mushroom.
 ~
-6 0 a 4
+6 0 a 5
 1 0 0
 7 48
+I 14 10516 100.00 4 x  # COMBINE: a basket of magic mushrooms
 M
 4
 You chew $p until your mouth is dry, and suddenly you don't feel so good...~
@@ -275,9 +281,10 @@ Brew (Healing Elixirs): magic mushroom potion
   4x basket of magic mushrooms
   6x magewhisper sepals
 ~
-6 b a 6
+6 b a 7
 24 10505 0
 7 168
+I 15 10515 100.00 4 x  # SEPARATE: a magic mushroom
 M
 4
 You chew $p until your mouth is dry, and suddenly you don't feel so good...~
@@ -392,14 +399,9 @@ and need only be sharpened to make a suitable chopper. You can also plant it to
 start a new crop.
 
 Craft (Basic Crafts): axeroot chopper
- 1x axeroot
- 1x wooden handle
-
 Craft (Master Craftsman, level 150): spade-axe
- 1x axeroot
- 3x bundle of spadebrush
 ~
-3 be a 6
+3 be a 7
 0 10508 0
 2 168
 R
@@ -429,9 +431,11 @@ A spade-axe is sticking out of the ground.~
 to be good for both chopping and digging. It's no wonder the Magiterranean
 druids have been magi-netically engineering new plants. This is useful!
 ~
-1 emou an 4
+1 emou an 5
 0 1 2
 2 0
+C
+0 100
 S
 #10528
 chowberries crunchy~
@@ -468,14 +472,14 @@ R
 T 10506
 S
 #10530
-arrows bladegrass metallic quiver~
+arrows bladegrass quiver~
 a quiver of bladegrass arrows~
-A quiver of metallic bladegrass arrows is lying here.~
+A quiver of bladegrass arrows is lying here.~
    The tips and fletching of these razor-sharp arrows use leaves of
 magi-netically engineered bladegrass, while the shaft is made from a piece of
 stalk. They look rather vicious.
 ~
-21 m a 1
+21 m a 2
 10 2 0
 2 0
 C
@@ -500,13 +504,9 @@ A pickthorn stalk seems planted here.~
 grow useful tools on unused farmland.
 
 Craft (Basic Crafts): thorn pick
-  3x pickthorn stalk
-
 Craft (Master Craftsman, level 150): pick-and-pan
- 2x pickthorn stalk
- 2x bushel of bladegrass
 ~
-3 0 a 6
+3 0 a 7
 0 0 0
 0 0
 R
@@ -520,9 +520,11 @@ A thorn pick is stuck into the ground.~
 modified from a woody desert plant into a temperate tool. What will those
 Magiterranean druids come up with next?
 ~
-1 0 an 3
+1 0 an 4
 0 3 8
 2 0
+C
+50 50
 R
 5121 0
 R
@@ -543,11 +545,11 @@ S
 #10535
 vines vigilant bundle~
 a bundle of vigilant vines~
-A bundle of guardian vines is piled up here.~
+A bundle of vigilant vines is piled up here.~
    These vicious magi-netically engineered vines can be planted in your cities,
 and will grow carnivorous flora to attack invaders.
 ~
-3 b a 9
+3 b a 10
 0 10511 0
 7 168
 R
@@ -562,5 +564,20 @@ You find only ash, suitable for feeding no one.
 3 k a 1
 0 0 0
 14 6
+S
+#10537
+beanstalk stalk giant~
+a giant beanstalk~
+A giant beanstalk has been felled here.~
+Beanstalks work as pillars in place of logs.
+~
+3 e a 4
+0 0 0
+0 0
+I 11 1002 100.00 1  # LIGHT: a roaring fire
+O
+21 0
+R
+5118 0
 S
 $

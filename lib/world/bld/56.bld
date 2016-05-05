@@ -17,7 +17,7 @@ S
 Bedroom~
 A Bedroom~
 ~
-0 0 aHINR m
+0 0 aHIR m
 0 1 0 -1
 C
 sleep~
@@ -27,6 +27,8 @@ bedroom. It's roomier than you would expect, even for a structure like this,
 and it makes you feel at home as you bask in the warm glow of the wood. The
 scent of fresh pine still emanates from the walls.
 ~
+F
+d
 M
 234 0.05 ce
 S
@@ -61,7 +63,7 @@ S
 Forge~
 The Forge~
 ~
-0 0 aq c
+0 0 a c
 0 0 0 212
 C
 forge, smelt~
@@ -71,6 +73,8 @@ temperature. A large oven against the wall is used to heat metal to a
 controlled temperature so that a master craftsman can hammer it into a useful
 shape. The metal is then cooled in water.
 ~
+F
+hv
 M
 241 20.00 ce
 S
@@ -111,16 +115,18 @@ S
 Kitchen~
 The Kitchen~
 ~
-0 0 arR m
+0 0 aR m
 0 0 0 214
 C
-cook~
+cook, retrieve, store~
 D
    You are standing in the kitchen, a sweaty room where food is prepared and
 cooked. A large iron stove rests against the wall. It is the latest
 innovation in cooking technology, replacing the open fire which has caused so
 many houses to burn to the ground.
 ~
+F
+G
 M
 9188 2.00 0
 M
@@ -229,7 +235,7 @@ S
 Vault~
 The Vault~
 ~
-0 0 aG b
+0 0 a b
 0 0 0 -1
 C
 deposit, exchange, inventory, retrieve, store, warehouse, withdraw~
@@ -240,6 +246,8 @@ claim they've managed the daring task. An empire's wealth is determined by
 the money in its vaults.
 Note: &yVault contents determine empire wealth&0
 ~
+F
+D
 M
 254 50.00 c
 S
@@ -294,7 +302,7 @@ S
 Baths~
 The Baths~
 ~
-0 0 aC j
+0 0 a j
 0 0 0 -1
 C
 bathe~
@@ -304,6 +312,8 @@ pools consume much of the floor space, and fires burn at their sides to heat
 the water. This is a place of cleanliness, so attendants regularly add fresh
 water to the bathing pools.
 ~
+F
+c
 M
 236 20.00 ce
 M
@@ -358,7 +368,7 @@ S
 Laboratory~
 The Laboratory~
 ~
-0 0 ars k
+0 0 a k
 0 0 0 231
 C
 brew, mix, retrieve, store~
@@ -368,6 +378,8 @@ looks as if someone has dozens of experiments running, each with its own
 strange aroma and color. There are shelves of multi-color potions along the
 walls, each one carefully labeled.
 ~
+F
+aG
 M
 241 20.00 ce
 S
@@ -400,7 +412,7 @@ S
 Crypt~
 A Musty Crypt~
 &0[  ]~
-1 0 aE a
+1 0 a a
 0 0 0 -1
 C
 tomb~
@@ -411,6 +423,8 @@ to pay respects. The shadows cast by the oil lamps dance over stone tombs, with
 the stray flicker that fools your mind into seeing life in the shadows of
 death.
 ~
+F
+B
 M
 9188 2.00 0
 M
@@ -421,5 +435,23 @@ M
 9198 2.00 0
 M
 9199 2.00 0
+S
+#5621
+Trophy Room~
+The Trophy Room~
+~
+0 0 a i
+0 0 0 -1
+C
+inventory, retrieve, store~
+D
+   The room is lined with shelves of neatly arranged trinkets, relics, and
+gems. This collection has surely been amassed by a great adventurer and, from
+the cleanliness, you surmise the owner is very proud.
+~
+M
+9190 2.00 0
+M
+9198 2.00 0
 S
 $

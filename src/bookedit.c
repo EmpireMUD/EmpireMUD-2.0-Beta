@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: bookedit.c                                      EmpireMUD 2.0b3 *
+*   File: bookedit.c                                      EmpireMUD 2.0b4 *
 *  Usage: the book editor functionality                                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -45,6 +45,9 @@ const char *bookedit_license_display =
 
 // local protos
 void remove_book_from_table(book_data *book);
+
+// external consts
+extern const char *book_name_list[];
 
 // external funcs
 void add_book_author(int idnum);
@@ -433,6 +436,7 @@ void olc_show_book(char_data *ch) {
 	char buf[MAX_STRING_LENGTH];
 	struct paragraph_data *para;
 	bool imm = IS_IMMORTAL(ch);
+	player_index_data *index;
 	int count;
 	
 	if (!book) {
@@ -460,7 +464,7 @@ void olc_show_book(char_data *ch) {
 	sprintf(buf + strlen(buf), "<\typaragraphs\t0> %d (list, edit, new, delete)\r\n", count);
 	
 	if (imm) {
-		sprintf(buf + strlen(buf), "<\tyauthor\t0> %s\r\n", (book->author != 0 && get_name_by_id(book->author)) ? CAP(get_name_by_id(book->author)) : "nobody");
+		sprintf(buf + strlen(buf), "<\tyauthor\t0> %s\r\n", (book->author != 0 && (index = find_player_index_by_idnum(book->author))) ? index->fullname : "nobody");
 	}
 	else {
 		sprintf(buf + strlen(buf), "<\tylicense\t0>, <\tysave\t0>, <\tyabort\t0>\r\n");
@@ -475,6 +479,7 @@ void olc_show_book(char_data *ch) {
 
 OLC_MODULE(booked_author) {
 	book_data *book = GET_OLC_BOOK(ch->desc);
+	player_index_data *index = NULL;
 	int id;
 	
 	if (!IS_IMMORTAL(ch)) {
@@ -488,20 +493,20 @@ OLC_MODULE(booked_author) {
 		msg_to_char(ch, "You set the book's author to nobody.\r\n");
 	}
 	else if (is_number(argument) && (id = atoi(argument)) >= 0) {
-		if (id != 0 && !get_name_by_id(id)) {
+		if (id != 0 && !(index = find_player_index_by_idnum(id))) {
 			msg_to_char(ch, "No such player id.\r\n");
 		}
 		else {
 			book->author = id;
-			msg_to_char(ch, "You set the book's author id to %d (%s).\r\n", id, (id == 0 || !get_name_by_id(id)) ? "nobody" : CAP(get_name_by_id(id)));
+			msg_to_char(ch, "You set the book's author id to %d (%s).\r\n", id, (id == 0 || !index) ? "nobody" : index->fullname);
 		}
 	}
-	else if ((id = get_id_by_name(argument)) <= 0) {
+	else if (!(index = find_player_index_by_name(argument))) {
 		msg_to_char(ch, "Unable to find character '%s'.\r\n", argument);
 	}
 	else {
-		book->author = id;
-		msg_to_char(ch, "You set the book's author id to %s (%d).\r\n", (id == 0 || !get_name_by_id(id)) ? "nobody" : CAP(get_name_by_id(id)), id);
+		book->author = index->idnum;
+		msg_to_char(ch, "You set the book's author id to %s (%d).\r\n", (index->idnum <= 0 || !index->fullname) ? "nobody" : index->fullname, index->idnum);
 	}
 }
 
@@ -509,7 +514,7 @@ OLC_MODULE(booked_author) {
 OLC_MODULE(booked_byline) {
 	book_data *book = GET_OLC_BOOK(ch->desc);
 
-	if (strlen(argument) - (2 * count_color_codes(argument)) > MAX_BOOK_BYLINE) {
+	if (color_strlen(argument) > MAX_BOOK_BYLINE) {
 		msg_to_char(ch, "Book bylines may not be more than %d characters long.\r\n", MAX_BOOK_TITLE);
 	}
 	else {
@@ -533,7 +538,7 @@ OLC_MODULE(booked_item_description) {
 OLC_MODULE(booked_item_name) {
 	book_data *book = GET_OLC_BOOK(ch->desc);
 
-	if (count_color_codes(argument) > 0) {
+	if (color_code_length(argument) > 0) {
 		msg_to_char(ch, "Book item names may not contain color codes.\r\n");
 	}
 	else if (strchrstr(argument, "%()[]\\")) {
@@ -541,6 +546,9 @@ OLC_MODULE(booked_item_name) {
 	}
 	else if (strlen(argument) > MAX_BOOK_ITEM_NAME) {
 		msg_to_char(ch, "Book item names may not be more than %d characters long.\r\n", MAX_BOOK_ITEM_NAME);
+	}
+	else if (!IS_IMMORTAL(ch) && !has_keyword(argument, book_name_list, TRUE)) {
+		msg_to_char(ch, "Book item names must contain a word like 'book' or 'tome'. See HELP BOOKEDIT ITEM.\r\n");
 	}
 	else {
 		olc_process_string(ch, argument, "item name", &(book->item_name));
@@ -713,7 +721,7 @@ OLC_MODULE(booked_paragraphs) {
 OLC_MODULE(booked_title) {
 	book_data *book = GET_OLC_BOOK(ch->desc);
 	
-	if (strlen(argument) - (2 * count_color_codes(argument)) > MAX_BOOK_TITLE) {
+	if (color_strlen(argument) > MAX_BOOK_TITLE) {
 		msg_to_char(ch, "Book titles may not be more than %d characters long.\r\n", MAX_BOOK_TITLE);
 	}
 	else {

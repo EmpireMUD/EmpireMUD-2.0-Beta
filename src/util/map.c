@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: map.c                                           EmpireMUD 2.0b3 *
+*   File: map.c                                           EmpireMUD 2.0b4 *
 *  Usage: procedural map generator for EmpireMUD                          *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -20,10 +20,15 @@
 *  2. run ./map
 *  2a. you may have to "chmod u+x map" to run it
 *  2b. you may need to raise the stack size limit: ulimit -s <limit>
+*  2c. this will generate new .wld files and a new index -- you must to delete
+*      your lib/world/base_map file or it will combine with your new .wld files
 *  3. make sure the stats output looks good
 *  4. you can use the map.txt data file with your map.php image generator to
 *     see if the world looks good to you
 *  5. when you're happy with it, start up the mud
+*
+*  NOTE: A new version of the map generator which creates the base_map file
+*  itself is planned for EmpireMUD 2.0b4.
 *
 * Bonus feature: shift an existing map east/west
 *  1. generate a new map (do NOT use this on a live game map)
@@ -170,7 +175,8 @@ struct {
 #define TUNDRA          12
 #define LAKE			13
 #define DESERT_CROP		14
-#define NUM_MAP_SECTS	15	/* Total */
+#define JUNGLE_CROP		15
+#define NUM_MAP_SECTS	16	/* Total */
 
 // terrain data
 struct {
@@ -193,7 +199,8 @@ struct {
 	{ "e", "Swamp", 29, TRUE },
 	{ "h", "Tundra", 30, FALSE },
 	{ "i", "Lake", 32, TRUE },
-	{ "o", "Des. Crop", 12, TRUE }
+	{ "o", "Des. Crop", 12, TRUE },
+	{ "3", "Jung. Crop", 16, TRUE },
 };
 
 
@@ -1181,6 +1188,14 @@ void complete_map(void) {
 				}
 				
 				// most spaces remain desert
+				break;
+			}
+			case JUNGLE: {
+				if (number(1, 100) <= 5) {
+					change_grid(iter, JUNGLE_CROP);
+				}
+				
+				// most spaces remain jungle
 				break;
 			}
 		}

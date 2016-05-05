@@ -1,0 +1,79 @@
+#50
+Tutorial: Royal Planning Office~
+Paul Clarke~
+   This tutorial has quests for people who have the Empire skill under level
+50. If you don't have Empire at all, look for the wandering pageboy and start
+his intro quest.
+
+Instructions for EmpireMUD administrators:
+ 1. If you don't have a newbie island, you should deactivate this quest
+    entirely, or remove its NEWBIE-ONLY FLAG.
+ 2. You can safely raise the number of instances to equal the number of
+    temperate newbie islands on your mud.
+~
+10800 10824 0-50
+1 0 h 0
+L
+1 0
+10800 -1 -1
+2 bd bkn
+L
+6 0
+100 -1 -1
+-1 0 0
+L
+5 0
+43200 -1 -1
+-1 0 0
+S
+#51
+Tutorial: Museum of Early Man~
+Paul Clarke~
+   This tutorial has quests for people who have the Trade skill under level 50.
+If you don't have Trade at all, look for the wandering museum crier and start
+his intro quest.
+
+Instructions for EmpireMUD Administrators:
+ 1. If you don't have a newbie island, you should deactivate this adventure
+    entirely, or remove its NEWBIE-ONLY flag.
+ 2. You can safely raise the number of instances to equal the number of
+    newbie islands with mountains on them.
+~
+10825 10849 0-50
+1 0 h 0
+L
+6 0
+100 -1 -1
+-1 0 0
+L
+5 0
+43200 -1 -1
+-1 0 0
+L
+1 0
+10825 -1 -1
+9 c ekln
+S
+#52
+Tutorial Quests~
+Paul Clarke~
+   Learn the basics of EmpireMUD including its quests and skills. This short
+tutorial will help you find your way in the world, and will also lead you to
+some other tutorials.
+
+Instructions for EmpireMUD administrators:
+- Increase the instance limit to the number of Towers of Souls (starting
+locations) in your game.
+~
+10850 10899 0-50
+1 0 0 0
+L
+5 0
+43200 -1 -1
+-1 0 0
+L
+2 0
+18 10850 10851
+-1 0 0
+S
+$

@@ -1,0 +1,240 @@
+#10800
+The Grand Foyer~
+   The planning office is small, but the foyer is furnished with seating for a
+dozen people while they wait to see one of the royal officials who office here.
+A sign on the wall reads 'Ye Olde Empire Tutorial'.
+~
+cdh 0
+D2
+~
+0 10803
+D3
+~
+0 10801
+D1
+~
+0 10802
+E
+sign wall tutorial~
+The sign says you should see Forest Ranger.
+~
+M 0 10800 100.00 1
+S
+#10801
+The Forestry Office~
+   This office is made from wood so fresh that it's still dripping sap. It
+looks like the ranger has used some of this sap to hold papers to the wall.
+Two deer heads adorn the far wall, but these appear to be held up with nails.
+~
+cdh 0
+D1
+~
+0 10800
+E
+walls sap~
+The walls are made from fresh wood, still dripping.
+~
+E
+papers~
+   The papers are held up with sticky sap that has leaked through and made some
+of them illegible. The rest appear to be hunting permits.
+~
+M 0 10801 100.00 1
+S
+#10802
+The City Planner~
+   The planning office is superbly tidy, with shelf upon shelf of neatly
+labeled books. One wall has a map of the island with tiny flags pinned in
+various places. Another wall has a painting of a woman.
+~
+cdh 0
+D3
+~
+0 10800
+E
+painting~
+   Upon closer inspection, the painting appears to be Rosemary, the City
+Planner.
+~
+M 0 10802 100.00 1
+S
+#10803
+The Adviser's Office~
+   This office is decked in richly stained wood and trimmed in gold leaf. Deep
+purple curtains and an oversized, fur-lined chair suggest the office is
+well-supplied by the crown. That, or the adviser is ostentatiously pretentious.
+~
+cdh 0
+D0
+~
+0 10800
+M 0 10803 100.00 1
+S
+#10825
+The Museum of Early Man~
+   The cave opens into a single, large room. Rickety shelves line the walls,
+though the shelves sit empty. It looks as if the proprieter is trying to set up
+a museum, but doesn't have any authentic artifacts.
+~
+cdg 0
+M 0 10825 100.00 1
+M 0 10826 100.00 1
+S
+#10826
+A Bright Cave in the Mountainside~
+   This small cave would be easy to miss from a distance, if not for the light
+spilling out of it. The floor has a walkway made from wooden planks, and it
+looks like someone has been building a shop in the back.
+~
+cdgh 0
+D9
+~
+0 10827
+T 10829
+S
+#10827
+The Museum of Early Man~
+   The cave opens into a large, single room. Shelves of artifacts line the
+walls, from stone tools to pottery and even musical instruments. It looks like
+Horation has gone to a lot of trouble to exhibit the simple tools that mankind
+used in its rise from humble apes to great empires.
+~
+cdg 0
+D8
+~
+0 10826
+E
+shelf shelves stone tools~
+   The stone tools look very finely crafted, as if they were made by a modern
+artisan rather than a primitive, brutish man.
+~
+E
+pots pottery~
+   The pots are finely made and relatively undecorated. One is broken, although
+it looks like it was struck open by a chisel.
+~
+M 0 10827 100.00 1
+S
+#10850
+The Soulstream~
+   You find yourself in a whirling maelstrom, as if the very fabric of reality
+is spinning around you. Vividly colorful clouds and blinding beams of light
+whoosh past you, through the portal, and out into the real world.
+~
+cgh 0
+D14
+~
+0 10851
+D14
+~
+0 10852
+E
+clouds colors~
+The clouds come in every hue, from blood red to inky blue.
+~
+E
+light beams~
+A bolt of brilliant white light shoots past you!
+~
+M 0 10851 100.00 1
+T 10851
+T 10858
+S
+#10851
+The Soulstream~
+   The wild, colorful swirls of the Soulstream whip around you, sometimes
+clinging to your feet as you step over them. There's no physical substance here
+to stand on, but you have no trouble moving from place to place.
+~
+cgh 0
+D14
+~
+0 10850
+E
+clouds colors~
+The clouds come in every hue, from blood red to inky blue.
+~
+E
+colors swirls soulstream~
+It looks as if you're in a tornado made from rainbows.
+~
+M 0 10852 100.00 1
+M 0 10853 100.00 1
+T 10851
+T 10858
+S
+#10852
+The Soulstream~
+   You slide along the Soulstream, moving effortlessly from whirling cloud to
+whirling cloud. You can no longer see the portal to the real world from here,
+but if you focus, you can still look out over the world.
+~
+cgh 0
+D14
+~
+0 10850
+D14
+~
+0 10853
+D14
+~
+0 10854
+E
+clouds colors~
+The clouds come in every hue, from blood red to inky blue.
+~
+E
+colors swirls soulstream~
+It looks as if you're in a tornado made from rainbows.
+~
+M 0 10854 100.00 1
+M 0 10855 100.00 1
+T 10851
+T 10858
+S
+#10853
+The Soulstream~
+   The twisting, vibrant clouds break open to reveal an endless, starry sky.
+The glowing arc of the Milky Way fills the sky above you, shimmering from one
+edge of your view to the other.
+~
+cgh 0
+D14
+~
+0 10852
+E
+clouds twisting vibrant~
+The clouds swirl and eddy around you.
+~
+E
+glowing milky way galaxy sky up~
+The galaxy looks larger than ever!
+~
+M 0 10856 100.00 1
+M 0 10857 100.00 1
+T 10851
+T 10858
+S
+#10854
+The Soulstream~
+   The twisting, raging clouds have become overpowering, as if you've reached
+the limits of the Soulstream. The roaring, smoky clouds seem to be coming from
+an ethereal volcano, after which you can go no further.
+~
+cgh 0
+D14
+~
+0 10852
+E
+clouds twisting raging smoke~
+The clouds have lost their vibrant colors here, and look more like hot smoke.
+~
+E
+smoky volcano ethereal~
+It looks like a volcano coming from the sky.
+~
+M 0 10858 100.00 1
+T 10851
+T 10858
+S
+$

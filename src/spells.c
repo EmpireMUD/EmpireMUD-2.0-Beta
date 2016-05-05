@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: spells.c                                        EmpireMUD 2.0b3 *
+*   File: spells.c                                        EmpireMUD 2.0b4 *
 *  Usage: implementation for spells                                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -62,21 +62,21 @@ bool trigger_counterspell(char_data *ch) {
 //// DAMAGE SPELLS ///////////////////////////////////////////////////////////
 
 struct damage_spell_type {
-	int ability;	// ABIL_x
+	any_vnum ability;	// ABIL_ type
 	int cost;	// mana
 	int attack_type;	// ATTACK_x
 	double damage_mod;	// 1.0 = normal damage, balance based on affects
 	bitvector_t aff_immunity;	// AFF_x flag making person immune
 	
 	// affect group: all this only matters if aff_type != -1
-	int aff_type;	// ATYPE_x, -1 for none
+	int aff_type;	// ATYPE_, -1 for none
 	int duration;	// time for the affect
-	int apply;	// APPLY_x, 0 for none
+	int apply;	// APPLY_, 0 for none
 	int modifier;	// +/- value, if apply != 0
 	bitvector_t aff_flag;	// AFF_x, 0 for none
 	
 	// dot affect
-	int dot_type;	// ATYPE_x, -1 for none
+	int dot_type;	// ATYPE_, -1 for none
 	int dot_duration;	// time for the dot
 	int dot_damage_type;	// DAM_x for the dot
 	int dot_damage;	// damage for the dot
@@ -196,217 +196,9 @@ ACMD(do_damage_spell) {
 		damage(ch, vict, 0, damage_spell[type].attack_type, DAM_MAGICAL);
 	}
 	
-	gain_ability_exp(ch, subcmd, 15);
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// CHANTS //////////////////////////////////////////////////////////////////
-
-// **** for do_chant ****
-
-#define CHANT_HENGE  BIT(0)
-
-struct chant_data_type {
-	char *name;
-	int ability;
-	bitvector_t flags;
-} chant_data[] = {
-	{ "druids", NO_ABIL, CHANT_HENGE },	// 0
-	{ "nature", ABIL_CHANT_OF_NATURE, NOBITS },	// 1
-	
-	{ "\n", NO_ABIL, NOBITS },
-};
-
-
-bool can_use_chant(char_data *ch, int chant) {
-	bool ok = TRUE;
-	
-	if (chant_data[chant].ability != NO_ABIL && !HAS_ABILITY(ch, chant_data[chant].ability)) {
-		ok = FALSE;
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, subcmd, 15);
 	}
-	
-	if (IS_SET(chant_data[chant].flags, CHANT_HENGE) && (!IS_COMPLETE(IN_ROOM(ch)) || BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_HENGE)) {
-		ok = FALSE;
-	}
-	
-	return ok;
-}
-
-
-void perform_chant(char_data *ch) {
-	void set_skill(char_data *ch, int skill, int level);
-	char lbuf[MAX_STRING_LENGTH];
-	struct evolution_data *evo;
-	int chant = GET_ACTION_VNUM(ch, 0);
-	sector_data *new_sect, *preserve;
-	crop_vnum cropv;
-	
-	// some chants could be timed...
-	if (GET_ACTION_TIMER(ch) > 0) {
-		GET_ACTION_TIMER(ch) -= 1;
-	}
-	
-	if (GET_ACTION_TIMER(ch) == 0) {
-		cancel_action(ch);
-	}
-	
-	// messages at random
-	switch (number(0, 8)) {
-		case 0: {
-			if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-				msg_to_char(ch, "You call out the chorus of the chant of %s.\r\n", chant_data[chant].name);
-			}
-			sprintf(lbuf, "$n calls out the chorus of the chant of %s.", chant_data[chant].name);
-			act(lbuf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
-			break;
-		}
-		case 1: {
-			if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-				msg_to_char(ch, "You hum the melody to the chant of %s.\r\n", chant_data[chant].name);
-			}
-			sprintf(lbuf, "$n hums the melody to the chant of %s.", chant_data[chant].name);
-			act(lbuf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
-			break;
-		}
-		case 2: {
-			if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-				msg_to_char(ch, "You sing the chant of %s.\r\n", chant_data[chant].name);
-			}
-			sprintf(lbuf, "$n sings the chant of %s.", chant_data[chant].name);
-			act(lbuf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
-			break;
-		}
-	}
-	
-	// effects?
-	switch (chant) {
-		case 0: {	// druids
-			if (CAN_GAIN_NEW_SKILLS(ch) && GET_SKILL(ch, SKILL_NATURAL_MAGIC) == 0 && number(0, 99) == 0 && !NOSKILL_BLOCKED(ch, SKILL_NATURAL_MAGIC)) {
-				msg_to_char(ch, "&gAs you chant, you begin to see the weave of mana through nature...&0\r\n");
-				set_skill(ch, SKILL_NATURAL_MAGIC, 1);
-				SAVE_CHAR(ch);
-			}
-			break;
-		} // end druids
-		case 1: {	// nature
-			// percentage is checked in the evolution data
-			if ((evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_MAGIC_GROWTH))) {
-				new_sect = sector_proto(evo->becomes);
-				cropv = ROOM_CROP_TYPE(IN_ROOM(ch));
-				preserve = (ROOM_ORIGINAL_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) ? ROOM_ORIGINAL_SECT(IN_ROOM(ch)) : NULL;
-				
-				// messaging based on whether or not it's choppable
-				if (new_sect && has_evolution_type(new_sect, EVO_CHOPPED_DOWN)) {
-					msg_to_char(ch, "As you chant, a mighty tree springs from the ground!\r\n");
-					act("As $n chants, a mighty tree springs from the ground!", FALSE, ch, NULL, NULL, TO_ROOM);
-				}
-				else {
-					msg_to_char(ch, "As you chant, the plants around you grow with amazing speed!\r\n");
-					act("As $n chants, the plants around $m grow with amazing speed!", FALSE, ch, NULL, NULL, TO_ROOM);
-				}
-				
-				change_terrain(IN_ROOM(ch), evo->becomes);
-				if (cropv != NOTHING) {
-					set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CROP_TYPE, cropv);
-				}
-				if (preserve) {
-					ROOM_ORIGINAL_SECT(IN_ROOM(ch)) = preserve;
-				}
-				
-				gain_ability_exp(ch, ABIL_CHANT_OF_NATURE, 20);
-			}
-			else {
-				gain_ability_exp(ch, ABIL_CHANT_OF_NATURE, 0.5);
-			}
-			break;
-		} // end nature
-	}
-}
-
-
-ACMD(do_chant) {
-	char lbuf[MAX_STRING_LENGTH];
-	int iter, chant;
-	bool found;
-	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs can't chant.\r\n");
-		return;
-	}
-	
-	one_argument(argument, arg);
-	
-	// just ending
-	if (GET_ACTION(ch) == ACT_CHANTING) {
-		msg_to_char(ch, "You end the chant.\r\n");
-		act("$n ends the chant.", FALSE, ch, NULL, NULL, TO_ROOM);
-		cancel_action(ch);
-		return;
-	}
-	
-	// list chants
-	if (!*arg) {
-		msg_to_char(ch, "You can do the following chants here:");
-		
-		found = FALSE;
-		for (iter = 0; *chant_data[iter].name != '\n'; ++iter) {
-			if (can_use_chant(ch, iter)) {
-				msg_to_char(ch, "%s%s", (found ? ", " : " "), chant_data[iter].name);
-				found = TRUE;
-			}
-		}
-		
-		if (found) {
-			msg_to_char(ch, "\r\n");
-		}
-		else {
-			msg_to_char(ch, " none\r\n");
-		}
-		return;
-	}
-	
-	if (GET_ACTION(ch) != ACT_NONE) {
-		msg_to_char(ch, "You're already busy doing something else.\r\n");
-		return;
-	}
-	
-	// find chant
-	found = FALSE;
-	for (iter = 0; *chant_data[iter].name != '\n'; ++iter) {
-		if (can_use_chant(ch, iter) && is_abbrev(arg, chant_data[iter].name)) {
-			found = TRUE;
-			chant = iter;
-			break;
-		}
-	}
-	
-	if (!found) {
-		msg_to_char(ch, "You don't know that chant.\r\n");
-		return;
-	}
-	
-	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to chant here.\r\n");
-		return;
-	}
-	
-	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
-		msg_to_char(ch, "You can't do that here.\r\n");
-		return;
-	}
-	
-	if (chant_data[chant].ability  != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, NULL, chant_data[chant].ability)) {
-		return;
-	}
-	
-	// do chant
-	msg_to_char(ch, "You begin the chant of %s.\r\n", chant_data[chant].name);
-	sprintf(lbuf, "$n begins the chant of %s.", chant_data[chant].name);
-	act(lbuf, FALSE, ch, NULL, NULL, TO_ROOM);
-	
-	start_action(ch, ACT_CHANTING, -1);
-	GET_ACTION_VNUM(ch, 0) = chant;
 }
 
 
@@ -417,7 +209,7 @@ ACMD(do_chant) {
 struct ready_magic_weapon_type {
 	char *name;
 	int mana;
-	int ability;
+	any_vnum ability;
 	obj_vnum vnum;
 	double min_dps;	// the lowest the DPS should ever go (or close to it)
 	double target_dps;	// DPS at level 100 -- will get as close to this as possible without going over
@@ -445,7 +237,7 @@ ACMD(do_ready) {
 		
 		found = FALSE;
 		for (iter = 0; *ready_magic_weapon[iter].name != '\n'; ++iter) {
-			if (ready_magic_weapon[iter].ability == NO_ABIL || HAS_ABILITY(ch, ready_magic_weapon[iter].ability)) {
+			if (ready_magic_weapon[iter].ability == NO_ABIL || has_ability(ch, ready_magic_weapon[iter].ability)) {
 				msg_to_char(ch, "%s%s", (found ? ", " : ""), ready_magic_weapon[iter].name);
 				found = TRUE;
 			}
@@ -457,7 +249,7 @@ ACMD(do_ready) {
 
 	found = FALSE;
 	for (iter = 0; *ready_magic_weapon[iter].name != '\n' && !found; ++iter) {
-		if (is_abbrev(arg, ready_magic_weapon[iter].name) && (ready_magic_weapon[iter].ability == NO_ABIL || HAS_ABILITY(ch, ready_magic_weapon[iter].ability))) {
+		if (is_abbrev(arg, ready_magic_weapon[iter].name) && (ready_magic_weapon[iter].ability == NO_ABIL || has_ability(ch, ready_magic_weapon[iter].ability))) {
 			type = iter;
 			found = TRUE;
 		}

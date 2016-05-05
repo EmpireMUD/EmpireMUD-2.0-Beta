@@ -1,589 +1,595 @@
 #2300
 leather breastplate~
-2300 1  # 1x a leather breastplate
+2300 1
 4 56 g 16 -1
 R
-1357 12  # 12x a large piece of leather
+15 12 1 32
 S
 #2301
 leather helm~
-2301 1  # 1x a leather helm
+2301 1
 4 56 g 16 -1
 R
-1357 4  # 4x a large piece of leather
+15 4 1 32
 S
 #2302
 leather vambraces~
-2302 1  # 1x leather vambraces
+2302 1
 4 56 g 16 -1
 R
-1357 6  # 6x a large piece of leather
+15 6 1 32
 S
 #2303
 scale armor~
-2303 1  # 1x scale armor
+2303 1
 4 182 g 24 -1
 R
-1357 20  # 20x a large piece of leather
+15 20 1 32
+R
+177 6 0 0
 S
 #2304
 viper helm~
-2304 1  # 1x a viper helm
+2304 1
 4 182 g 24 -1
 R
-1357 12  # 12x a large piece of leather
+15 12 1 32
 R
-1355 4  # 4x some snakeskin
+1355 4 0 0
+R
+177 6 0 0
 S
 #2305
 shark skin vambraces~
-2305 1  # 1x shark skin vambraces
+2305 1
 4 182 g 24 -1
 R
-1357 10  # 10x a large piece of leather
+15 10 1 32
 R
-1354 10  # 10x a shark skin
+1354 10 0 0
+R
+177 6 0 0
 S
 #2306
 shoes~
-2306 1  # 1x leather shoes
+2306 1
 4 56 g 16 -1
 R
-1357 2  # 2x a large piece of leather
+15 2 1 32
 S
 #2307
 leather boots~
-2307 1  # 1x leather boots
+2307 1
 4 182 g 24 -1
 R
-1357 4  # 4x a large piece of leather
+15 4 1 32
 S
 #2308
 hauberk~
-2308 1  # 1x a mail hauberk
+2308 1
 1 222 0 24 -1
 R
-175 12  # 12x an iron ingot
+175 12 0 0
 R
-1357 2  # 2x a large piece of leather
+15 2 1 32
 R
-1359 2  # 2x a bolt of cloth
+26 2 1 0
 S
 #2309
 mail coif~
-2309 1  # 1x a mail coif
+2309 1
 1 222 0 24 -1
 R
-175 4  # 4x an iron ingot
+175 4 0 0
 R
-1356 1  # 1x a small piece of leather
+15 1 1 16384
 R
-1359 1  # 1x a bolt of cloth
+26 1 1 0
 S
 #2310
 splint vambraces~
-2310 1  # 1x splint vambraces
+2310 1
 1 222 0 24 -1
 R
-175 8  # 8x an iron ingot
+175 8 0 0
 R
-1357 2  # 2x a large piece of leather
+15 2 1 32
 S
 #2311
 cuirass~
-2311 1  # 1x a fine cuirass
+2311 1
 1 197 0 32 -1
 R
-175 20  # 20x an iron ingot
+18 20 1 262144
 R
-177 6  # 6x an imperium ingot
+177 6 0 0
 R
-1357 2  # 2x a large piece of leather
+15 2 1 32
 R
-1359 2  # 2x a bolt of cloth
+26 2 1 0
 S
 #2312
 eagle helm~
-2312 1  # 1x an eagle helm
+2312 1
 1 197 0 32 -1
 R
-175 10  # 10x an iron ingot
+18 10 1 262144
 R
-177 6  # 6x an imperium ingot
+177 6 0 0
 R
-1356 1  # 1x a small piece of leather
+15 1 1 16384
 R
-1359 1  # 1x a bolt of cloth
+26 1 1 0
 S
 #2313
 spiked vambraces~
-2313 1  # 1x spiked vambraces
+2313 1
 1 197 0 32 -1
 R
-175 14  # 14x an iron ingot
+18 14 1 262144
 R
-177 6  # 6x an imperium ingot
+177 6 0 0
 R
-1357 2  # 2x a large piece of leather
+15 2 1 32
 S
 #2314
 leather buckler~
-2314 1  # 1x a leather buckler
+2314 1
 4 56 g 16 -1
 R
-1357 10  # 10x a large piece of leather
+15 10 1 32
 R
-175 2  # 2x an iron ingot
+18 2 1 262144
 S
 #2315
 kite shield~
-2315 1  # 1x a kite shield
+2315 1
 1 222 0 24 -1
 R
-175 6  # 6x an iron ingot
+175 6 0 0
 R
-1356 2  # 2x a small piece of leather
+15 2 1 16384
 S
 #2316
 ram shield~
-2316 1  # 1x a ram shield
+2316 1
 1 197 0 24 -1
 R
-175 12  # 12x an iron ingot
+18 12 1 262144
 R
-177 6  # 6x an imperium ingot
+177 6 0 0
 R
-1356 2  # 2x a small piece of leather
+15 2 1 16384
 S
 #2317
 plate armor~
-2317 1  # 1x a suit of plate armor
+2317 1
 1 197 0 42 -1
 R
-175 20  # 20x an iron ingot
+18 20 1 262144
 R
-177 10  # 10x an imperium ingot
+177 10 0 0
 R
-1357 4  # 4x a large piece of leather
+15 4 1 32
 R
-1359 4  # 4x a bolt of cloth
+26 4 1 0
 S
 #2318
 great helm~
-2318 1  # 1x a great helm
+2318 1
 1 197 0 42 -1
 R
-175 14  # 14x an iron ingot
+18 14 1 262144
 R
-177 10  # 10x an imperium ingot
+177 10 0 0
 R
-1356 1  # 1x a small piece of leather
+15 1 1 16384
 R
-1359 1  # 1x a bolt of cloth
+26 1 1 0
 S
 #2319
 lower cannons~
-2319 1  # 1x lower cannons
+2319 1
 1 197 0 42 -1
 R
-175 18  # 18x an iron ingot
+18 18 1 262144
 R
-177 10  # 10x an imperium ingot
+177 10 0 0
 R
-1357 2  # 2x a large piece of leather
+15 2 1 32
 S
 #2320
 clay shield~
-2320 1  # 1x a clay shield
+2320 1
 2 57 ag 32 -1
 R
-101 6  # 6x a pile of clay
+4 6 1 0
 R
-121 6  # 6x a stick
+25 6 1 0
 R
-1356 1  # 1x a small piece of leather
+15 1 1 16384
 S
 #2321
 sorcerers robe~
-2321 1  # 1x a sorcerer's robe
+2321 1
 4 199 g 24 -1
 R
-1359 12  # 12x a bolt of cloth
+26 12 1 0
 R
-1357 4  # 4x a large piece of leather
+15 4 1 32
 R
-1308 6  # 6x deep orange dye
+1308 6 0 0
 R
-103 6  # 6x a yellow lightning stone
+103 6 0 0
 R
-176 6  # 6x an ingot of nocturnium
+176 6 0 0
 S
 #2322
 wizards hat~
-2322 1  # 1x a wizard's hat
+2322 1
 4 199 g 25 -1
 R
-1359 6  # 6x a bolt of cloth
+26 6 1 0
 R
-1357 1  # 1x a large piece of leather
+15 1 1 32
 R
-1307 3  # 3x deadly violet dye
+1307 3 0 0
 R
-103 6  # 6x a yellow lightning stone
+103 6 0 0
 R
-176 6  # 6x an ingot of nocturnium
+176 6 0 0
 S
 #2323
 armbands of power~
-2323 1  # 1x armbands of power
+2323 1
 4 199 g 24 -1
 R
-1359 8  # 8x a bolt of cloth
+26 8 1 0
 R
-1357 2  # 2x a large piece of leather
+15 2 1 32
 R
-1308 4  # 4x deep orange dye
+1308 4 0 0
 R
-103 6  # 6x a yellow lightning stone
+103 6 0 0
 R
-176 6  # 6x an ingot of nocturnium
+176 6 0 0
 S
 #2324
 copper breastplate~
-2324 1  # 1x a copper breastplate
+2324 1
 1 53 0 24 -1
 R
-178 10  # 10x a copper ingot
+178 10 0 0
 R
-1356 2  # 2x a small piece of leather
+15 2 1 16384
 S
 #2325
 copper mask~
-2325 1  # 1x a copper mask
+2325 1
 1 53 0 24 -1
 R
-1359 1  # 1x a bolt of cloth
+26 1 1 0
 R
-178 4  # 4x a copper ingot
+178 4 0 0
 S
 #2326
 copper vambraces~
-2326 1  # 1x copper vambraces
+2326 1
 1 53 0 24 -1
 R
-178 8  # 8x a copper ingot
+178 8 0 0
 R
-1356 2  # 2x a small piece of leather
+15 2 1 16384
 S
 #2327
 copper buckler~
-2327 1  # 1x a copper buckler
+2327 1
 1 53 0 24 -1
 R
-178 6  # 6x a copper ingot
+178 6 0 0
 R
-1356 1  # 1x a small piece of leather
+15 1 1 16384
 R
-125 1  # 1x a stack of lumber
+16 1 1 0
 S
 #2328
 rawhide breastplate~
-2328 1  # 1x a rawhide breastplate
+2328 1
 4 223 g 16 -1
 R
-1351 10  # 10x a large skin
+24 10 1 32
 S
 #2329
 rawhide skullcap~
-2329 1  # 1x a rawhide skullcap
+2329 1
 4 223 g 16 -1
 R
-1351 4  # 4x a large skin
+24 4 1 32
 R
-1350 1  # 1x a small skin
+24 1 1 16384
 S
 #2330
 rawhide bracers~
-2330 1  # 1x rawhide bracers
+2330 1
 4 223 g 16 -1
 R
-1350 8  # 8x a small skin
+24 8 1 16384
 S
 #2331
 rawhide boots~
-2331 1  # 1x rawhide boots
+2331 1
 4 223 g 16 -1
 R
-1351 2  # 2x a large skin
+24 2 1 32
 R
-1350 2  # 2x a small skin
+24 2 1 16384
 S
 #2332
 rawhide knapsack~
-2332 1  # 1x a rawhide knapsack
+2332 1
 4 223 g 8 -1
 R
-1351 4  # 4x a large skin
+24 4 1 32
 R
-1350 2  # 2x a small skin
+24 2 1 16384
 S
 #2333
 conical hat~
-2333 1  # 1x a conical hat
+2333 1
 4 224 g 25 -1
 R
-1357 1  # 1x a large piece of leather
+15 1 1 32
 R
-1307 1  # 1x deadly violet dye
+1307 1 0 0
 R
-1359 4  # 4x a bolt of cloth
+26 4 1 0
 R
-103 4  # 4x a yellow lightning stone
+103 4 0 0
 S
 #2334
 furrowed sleeves~
-2334 1  # 1x furrowed sleeves
+2334 1
 4 224 g 24 -1
 R
-1359 4  # 4x a bolt of cloth
+26 4 1 0
 R
-1308 1  # 1x deep orange dye
+1308 1 0 0
 R
-103 4  # 4x a yellow lightning stone
+103 4 0 0
 R
-1352 2  # 2x a luxurious fox fur
+10 2 1 0
 S
 #2335
 apprentice shoes~
-2335 1  # 1x apprentice shoes
+2335 1
 4 224 g 24 -1
 R
-1359 4  # 4x a bolt of cloth
+26 4 1 0
 R
-1356 2  # 2x a small piece of leather
+15 2 1 16384
 R
-103 2  # 2x a yellow lightning stone
+103 2 0 0
 S
 #2336
 earth-hewn sandals~
-2336 1  # 1x earth-hewn sandals
+2336 1
 4 199 g 24 -1
 R
-176 2  # 2x an ingot of nocturnium
+176 2 0 0
 R
-103 8  # 8x a yellow lightning stone
+103 8 0 0
 R
-1356 4  # 4x a small piece of leather
+15 4 1 16384
 S
 #2337
 magewhisper pouch~
-2337 1  # 1x a magewhisper pouch
+2337 1
 4 199 g 25 -1
 R
-1357 1  # 1x a large piece of leather
+15 1 1 32
 R
-1307 3  # 3x deadly violet dye
+1307 3 0 0
 R
-1203 10  # 10x some magewhisper sepals
+1203 10 0 0
 R
-103 12  # 12x a yellow lightning stone
+103 12 0 0
 R
-1359 10  # 10x a bolt of cloth
+26 10 1 0
 S
 #2339
 clockwork goggles~
-2339 1  # 1x clockwork goggles
+2339 1
 2 -1 0 12 2343
 L
 100
 R
-2343 1  # 1x a clockwork lens array
+2343 1 0 0
 R
-178 2  # 2x a copper ingot
+178 2 0 0
 S
 #2340
 guildmaster tunic~
-2340 1  # 1x a guildmaster's tunic
+2340 1
 4 -1 g 12 2344
 L
 100
 R
-2344 1  # 1x guild-patterned cloth
+2344 1 0 0
 R
-1359 2  # 2x a bolt of cloth
+26 2 1 0
 S
 #2341
 utility belt~
-2341 1  # 1x a utility belt
+2341 1
 4 -1 g 12 2345
 L
 100
 R
-2345 1  # 1x some clips and buckles
+2345 1 0 0
 R
-1357 4  # 4x a large piece of leather
+15 4 1 32
 S
 #2342
 steel multitool~
-2342 1  # 1x a steel multitool
+2342 1
 1 -1 0 12 2346
 L
 100
 R
-2346 1  # 1x a set of delicate tools
+2346 1 0 0
 R
-1356 1  # 1x a small piece of leather
+15 1 1 16384
 R
-175 1  # 1x an iron ingot
+175 1 0 0
 S
 #2343
 clockwork lens array~
-2343 1  # 1x a clockwork lens array
+2343 1
 2 243 c 12 -1
 R
-162 2  # 2x a pile of gold dust
+171 1 0 0
 R
-175 4  # 4x an iron ingot
+175 4 0 0
 S
 #2344
 guild patterned cloth~
-2344 1  # 1x guild-patterned cloth
+2344 1
 9 242 g 12 -1
 R
-1359 4  # 4x a bolt of cloth
+26 4 1 0
 R
-161 2  # 2x a silver nugget
+170 2 0 0
 S
 #2345
 clips and buckles~
-2345 1  # 1x some clips and buckles
+2345 1
 1 246 0 12 -1
 R
-177 2  # 2x an imperium ingot
+177 2 0 0
 R
-175 4  # 4x an iron ingot
+175 4 0 0
 S
 #2346
 delicate tools~
-2346 1  # 1x a set of delicate tools
+2346 1
 1 241 0 12 -1
 R
-175 4  # 4x an iron ingot
+175 4 0 0
 R
-176 2  # 2x an ingot of nocturnium
+176 2 0 0
 S
 #2351
 alchemical filter~
-2351 1  # 1x an alchemical filter
+2351 1
 2 244 0 24 2347
 L
 200
 R
-1200 2  # 2x a handful of whitegrass
+1200 2 0 0
 R
-1201 2  # 2x some fiveleaf
+1201 2 0 0
 R
-1202 2  # 2x a twig of redthorn
+1202 2 0 0
 R
-1203 2  # 2x some magewhisper sepals
+1203 2 0 0
 R
-1204 2  # 2x a daggerbite frond
+1204 2 0 0
 R
-1205 2  # 2x some bileberries
+1205 2 0 0
 R
-176 2  # 2x an ingot of nocturnium
+18 2 1 1024
 S
 #2352
 antique device parts~
-2352 1  # 1x a pile of antique device parts
+2352 1
 1 247 0 24 2348
 L
 200
 R
-161 8  # 8x a silver nugget
+170 6 0 0
 R
-162 2  # 2x a pile of gold dust
+171 1 0 0
 R
-178 4  # 4x a copper ingot
+18 4 1 262144
 S
 #2353
 concealed pouches~
-2353 1  # 1x some concealed silk pouches
+2353 1
 4 245 0 24 2349
 L
 200
 R
-103 1  # 1x a yellow lightning stone
+103 1 0 0
 R
-104 1  # 1x a red bloodstone
+104 1 0 0
 R
-1206 1  # 1x an iridescent blue iris
+1206 1 0 0
 R
-1300 1  # 1x a glowing green seashell
+1300 1 0 0
 R
-1359 6  # 6x a bolt of cloth
+26 6 1 0
 S
 #2354
 tinker harness~
-2354 1  # 1x a tinker's harness
+2354 1
 1 246 0 24 2350
 L
 200
 R
-177 2  # 2x an imperium ingot
+18 2 1 1024
 R
-175 8  # 8x an iron ingot
+18 8 1 262144
 R
-1354 2  # 2x a shark skin
+1354 2 0 0
 R
-1355 2  # 2x some snakeskin
+1355 2 0 0
 S
 #2355
 chemists cleansing cap~
-2355 1  # 1x a chemist's cleansing cap
+2355 1
 4 -1 g 24 2351
 L
 200
 R
-2351 1  # 1x an alchemical filter
+2351 1 0 0
 R
-1357 2  # 2x a large piece of leather
+15 2 1 32
 S
 #2356
 antiquated arcane apparatus~
-2356 1  # 1x an antiquated arcane apparatus
+2356 1
 2 -1 h 24 2352
 L
 200
 R
-2352 1  # 1x a pile of antique device parts
+2352 1 0 0
 R
-162 1  # 1x a pile of gold dust
+171 1 0 0
 R
-178 2  # 2x a copper ingot
+18 2 1 262144
 S
 #2357
 superb smuggling sash~
-2357 1  # 1x a superb smuggling sash
+2357 1
 4 -1 g 24 2353
 L
 200
 R
-2353 1  # 1x some concealed silk pouches
+2353 1 0 0
 R
-1359 6  # 6x a bolt of cloth
+26 6 1 0
 S
 #2358
 traveling tinker's trappings~
-2358 1  # 1x a traveling tinker's trappings
+2358 1
 4 -1 g 24 2354
 L
 200
 R
-2354 1  # 1x a tinker's harness
+2354 1 0 0
 R
-1359 4  # 4x a bolt of cloth
+26 4 1 0
 R
-1357 2  # 2x a large piece of leather
+15 2 1 32
 S
 $

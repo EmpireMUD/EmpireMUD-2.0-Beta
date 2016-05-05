@@ -66,6 +66,10 @@ remote logs %self.id%
 Lumberjack drop logs~
 0 f 100
 ~
+if !%self.varexists(logs)%
+  eval logs 1
+  remote logs %self.id%
+end
 eval loot 124
 eval i 0
 eval logs %self.logs%
@@ -76,6 +80,9 @@ while %i% < %logs%
   eval i %i% + 1
   %load% obj %loot%
 done
+if !%instance%
+  halt
+end
 * Load the goblin retreat timer item
 %at% i18100 %load% obj 18106
 ~
@@ -99,6 +106,7 @@ done
 Goblin lumberjack environmental~
 0 b 50
 ~
+* This mob is only flagged SENTINEL when it's chopping
 if (%self.mob_flagged(SENTINEL)% && !%self.fighting%)
   switch %random.3%
     case 1
@@ -113,6 +121,13 @@ if (%self.mob_flagged(SENTINEL)% && !%self.fighting%)
   done
 end
 return 0
+~
+#18104
+Goblin camp cleanup~
+2 e 100
+~
+* Replace the camp with plains
+%terraform% %room% 0
 ~
 #18106
 Goblin camp despawn timer~

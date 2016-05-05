@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.crop.c                                      EmpireMUD 2.0b3 *
+*   File: olc.crop.c                                      EmpireMUD 2.0b4 *
 *  Usage: OLC for crop prototypes                                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -43,6 +43,93 @@ void sort_interactions(struct interaction_item **list);
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Checks for common crop problems and reports them to ch.
+*
+* @param crop_data *cp The item to audit.
+* @param char_data *ch The person to report to.
+* @return bool TRUE if any problems were reported; FALSE if all good.
+*/
+bool audit_crop(crop_data *cp, char_data *ch) {
+	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
+	extern struct icon_data *get_icon_from_set(struct icon_data *set, int type);
+	extern const char *icon_types[];
+	
+	struct interaction_item *inter;
+	char temp[MAX_STRING_LENGTH];
+	bool problem = FALSE;
+	bool harv, forage;
+	adv_data *adv;
+	int iter;
+	
+	adv = get_adventure_for_vnum(GET_CROP_VNUM(cp));
+	
+	if (!GET_CROP_NAME(cp) || !*GET_CROP_NAME(cp) || !str_cmp(GET_CROP_NAME(cp), "Unnamed Crop")) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "No name set");
+		problem = TRUE;
+	}
+	
+	strcpy(temp, GET_CROP_NAME(cp));
+	strtolower(temp);
+	if (strcmp(GET_CROP_NAME(cp), temp)) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "Non-lowercase name");
+		problem = TRUE;
+	}
+	
+	if (!GET_CROP_TITLE(cp) || !*GET_CROP_TITLE(cp) || !str_cmp(GET_CROP_TITLE(cp), "An Unnamed Crop")) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "No title set");
+		problem = TRUE;
+	}
+	
+	if (adv && !CROP_FLAGGED(cp, CROPF_NOT_WILD)) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "Missing !WILD flag in adventure crop");
+		problem = TRUE;
+	}
+	if (!adv && CROP_FLAGGED(cp, CROPF_NOT_WILD)) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "!WILD flag on non-adventure crop");
+		problem = TRUE;
+	}
+	if (GET_CROP_MAPOUT(cp) == 0) {	// slightly magic-numbered
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "Mapout color not set");
+		problem = TRUE;
+	}
+	for (iter = 0; iter < NUM_TILESETS; ++iter) {
+		if (!get_icon_from_set(GET_CROP_ICONS(cp), iter)) {
+			olc_audit_msg(ch, GET_CROP_VNUM(cp), "No icon for '%s' tileset", icon_types[iter]);
+			problem = TRUE;
+		}
+	}
+	if (GET_CROP_CLIMATE(cp) == CLIMATE_NONE) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "Climate not set");
+		problem = TRUE;
+	}
+	if (!GET_CROP_SPAWNS(cp)) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "No spawns set");
+		problem = TRUE;
+	}
+	
+	harv = forage = FALSE;
+	LL_FOREACH(GET_CROP_INTERACTIONS(cp), inter) {
+		if (inter->type == INTERACT_HARVEST) {
+			harv = TRUE;
+		}
+		else if (inter->type == INTERACT_FORAGE) {
+			forage = TRUE;
+		}
+	}
+	if (!harv) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "No HARVEST");
+		problem = TRUE;
+	}
+	if (!forage) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "No FORAGE");
+		problem = TRUE;
+	}
+	
+	return problem;
+}
+
 
 /**
 * Creates a new crop entry.
@@ -105,9 +192,10 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	void remove_crop_from_table(crop_data *crop);
 	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 	
-	room_data *room, *next_room;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
+	struct map_data *map;
+	room_data *room;
 	crop_data *crop;
 	sector_data *base = NULL;
 	int count;
@@ -134,8 +222,14 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	
 	// update world
 	count = 0;
-	HASH_ITER(world_hh, world_table, room, next_room) {
-		if (get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE) == vnum) {
+	LL_FOREACH(land_map, map) {
+		room = real_real_room(map->vnum);
+		
+		if (map->crop_type == crop || (room && ROOM_CROP(room) == crop)) {
+			if (!room) {
+				room = real_room(map->vnum);
+			}
+			set_crop_type(room, NULL);	// remove it explicitly
 			change_terrain(room, GET_SECT_VNUM(base));
 			++count;
 		}
@@ -350,20 +444,17 @@ void olc_show_crop(char_data *ch) {
 	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", lbuf);
 	
 	sprintf(buf + strlen(buf), "Map region (percent of map size):\r\n");
-	sprintf(buf + strlen(buf), " <&yxmin&0> %d%%\r\n", GET_CROP_X_MIN(cp));
-	sprintf(buf + strlen(buf), " <&yxmax&0> %d%%\r\n", GET_CROP_X_MAX(cp));
-	sprintf(buf + strlen(buf), " <&yymin&0> %d%%\r\n", GET_CROP_Y_MIN(cp));
-	sprintf(buf + strlen(buf), " <&yymax&0> %d%%\r\n", GET_CROP_Y_MAX(cp));
+	sprintf(buf + strlen(buf), " <&yxmin&0> %3d%%, <&yxmax&0> %3d%%\r\n", GET_CROP_X_MIN(cp), GET_CROP_X_MAX(cp));
+	sprintf(buf + strlen(buf), " <&yymin&0> %3d%%, <&yymax&0> %3d%%\r\n", GET_CROP_Y_MIN(cp), GET_CROP_Y_MAX(cp));
 
 	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
-	get_interaction_display(GET_CROP_INTERACTIONS(cp), buf1);
-	strcat(buf, buf1);
+	if (GET_CROP_INTERACTIONS(cp)) {
+		get_interaction_display(GET_CROP_INTERACTIONS(cp), buf1);
+		strcat(buf, buf1);
+	}
 
 	sprintf(buf + strlen(buf), "<&yspawns&0> (add, remove, list)\r\n");
-	if (!GET_CROP_SPAWNS(cp)) {
-		sprintf(buf + strlen(buf), " nothing\r\n");
-	}
-	else {
+	if (GET_CROP_SPAWNS(cp)) {
 		count = 0;
 		for (spawn = GET_CROP_SPAWNS(cp); spawn; spawn = spawn->next) {
 			++count;

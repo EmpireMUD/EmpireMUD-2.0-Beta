@@ -3,8 +3,8 @@ ADVANCE
 Usage:  advance <victim> <access level>
 
 ADVANCE moves a player to a new access level. If used to promote a player to an
-immortal level, and if you have the autowiz program installed, the wizlist and
-godlist will automatically be recreated. This command is grantable.
+immortal or god level, the wizlist and godlist will automatically be recreated.
+This command is grantable.
 
 Don't confuse access levels with skill/gear levels.
 
@@ -50,7 +50,7 @@ AUTOWIZ
 
 Usage:  autowiz
 
-Regenerates the wizlist.
+Regenerates the wizlist and godlist.
 #d
 BAN UNBAN
 
@@ -103,7 +103,7 @@ CREATE
 
 Usage:  create [number] <item>
 
-This command allows a God or Immortal to create one or more simple items
+This command allows a god or immortal to create one or more simple items
 instantly. Normally, only resources and simple tools can be created this way.
 In order to create items, you must have the correct resources available. You
 get resources when people sacrifice items to you. Resource counts can be seen
@@ -266,15 +266,15 @@ See also: GHISTORY
 GOTO TRANSFER
 
 Usage:  goto <location>
-        trans <victim> [location]
+        transfer <victim|vehicle> [location]
 
 These commands are used to transports yourself and others to different rooms.
-GOTO allows you to go to other rooms; TRANS transports a person from wherever
-they are to the room you're in, or another location. The transfer command is
-grantable.
+GOTO allows you to go to other rooms; TRANS transports a person (or vehicle)
+from wherever they are to the room you're in, or another location. The transfer
+command is grantable.
 
 For both GOTO and TRANS, the location specifier can be either a virtual room
-number, or the name of a character or object.
+number, coordinates, or the name of a character, object, or vehicle.
 
 Examples:
 
@@ -453,11 +453,13 @@ See also: STAT
 #d
 LOAD
 
-Usage:  load <mob | obj> <virtual number>
+Usage:  load <type> <virtual number>
 
-LOAD is used to create mobiles and objects. The first argument specifies if
-you are trying to load a mobile or an object; the second is the virtual
+LOAD is used to create instances of mobs, objects, and vehicles. The first
+argument specifies what type you are trying to load; the second is the virtual
 number. This command is grantable.
+
+You can load: mob, obj, vehicle
 
 Example:
 
@@ -500,6 +502,9 @@ Usage:  notitle <vicitim>
 Prevent players from being able to set their own titles; i.e., if the player
 consistently has an offensive title. The definition of offensive is left as
 an exercise for the reader.
+
+Notitle also prevents the player from changing their empire name, empire
+adjective, and the names of empire ranks.
 
 See also: TITLE
 #d
@@ -547,6 +552,19 @@ Do not abuse this command.
 
 See also: GRANT
 #d
+PLAYERDELETE "PLAYER DELETE" "DELETE PLAYER"
+
+Usage:  playerdelete <name> CONFIRM
+
+This command deletes a player completely. It cannot be used on players with
+the !DEL flag set. There is no way to undo this command (unless your EmpireMUD
+keeps backups of mud files). You must type the word 'CONFIRM' as the second
+argument, in all capital letters. This command also cannot be abbreviated.
+
+This command is grantable.
+
+See also: GRANT, SELFDELETE
+#d
 POOFIN POOFOUT
 
 Usage:  poofin <message | none>
@@ -575,14 +593,17 @@ PURGE
 Usage:  purge [name]
 
 Purge destroys things. If used with no arguments, it will clear a room of all
-mobiles and objects, but will not harm players. If the argument is an object,
-that object (and all of its contents, if any) will be destroyed. If the
-argument is a mobile, the mobile will be destroyed, leaving its inventory and
-equipment lying on the ground. This command is grantable.
+mobiles and objects, but will not harm players or vehicles. If the argument is
+an object, that object (and all of its contents, if any) will be destroyed. If
+the argument is a mobile, the mobile will be destroyed, leaving its inventory
+and equipment lying on the ground. This command is grantable.
 
 If the argument is the name of a player, the player's inventory and equipment
 will drop on the ground and the player will lose his/her connection. For this
 reason, PURGE should only be used on players in disciplinary situations.
+
+You can also purge vehicles this way, but the no-argument room purge will
+ignore them. Anything inside a purged vehicle will be lost.
 
 Examples:
 
@@ -640,11 +661,11 @@ See also: GRANT
 #d
 RESCALE
 
-Usage:  rescale <mob/item> <level>
+Usage:  rescale <thing> <level>
 
-This command allows you to rescale a mob or item. It checks for a matching mob
-in the room first, then an item in your inventory, then an item on the ground.
-This command is grantable.
+This command allows you to rescale a mob, item, or vehicle. It checks for a
+matching mob in the room first, then a vehicle, then an item in your inventory,
+then an item on the ground. This command is grantable.
 
 The level you choose will still be constrained by the mob/item's minimum and
 maximum scale value.
@@ -704,7 +725,8 @@ Field          Who     Value Type   Description
 ----------------------------------------------------------------
 account        PC      NAME         Sets account to match another character
 age            BOTH    NUMBER       Player age
-bonus          PC      MISC         Set bonus traits for player
+bonustrait     PC      MISC         Set bonus traits for player
+bonusexp       PC      NUMBER       Set daily bonus exp for the player
 coins          PC      MISC         Sets coins on-hand for player
 grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
@@ -734,11 +756,11 @@ drunk          BOTH    MISC         Drunkenness
 hunger         BOTH    MISC         Hunger level
 thirst         BOTH    MISC         Thirst level
 
-deleted        PC      BINARY       Player deleted
 frozen         PC      BINARY       Player is frozen
 incognito      PC      BINARY       Turns on/off incognito mode (imms only)
 ipmask         PC      BINARY       IP address is hidden
-multiok        PC      BINARY       Can multi-play
+multi-ip       PC      BINARY       Can log in more than 1 account per IP
+multi-char     PC      BINARY       Can log in more than 1 char per account
 muted          PC      BINARY       Player is muted
 nodelete       PC      BINARY       Can't be deleted
 noidleout      PC      BINARY       Won't idle out
@@ -756,29 +778,193 @@ SHOW
 Usage:  show <mode> [argument]
 
 The SHOW command displays information. Some modes of show require additional
-information, such as a player name. Valid Modes:
+information, such as a player name. 'show' without a mode gives a quick list of
+the options below. Valid Modes:
 
 Mode       Level    Description
 ------     ------   -------------
 stats      God      Shows game stats including prototypes.
 arrowtypes Immort   Shows the 'arrow type' setting for all bows and arrows.
+components Immort   Shows all items matching a component type (and flags).
 ignoring   Immort   Shows you who a player has on their ignore list.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
 notes      Immort   Show notes on a player.
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
-rent       Immort   Shows the filename and path to a player's inventory.
+quests     Immort   Shows quests and quest trackers for players.
+rent       Immort   Shows a player's full equipment and inventory.
 skills     Immort   Shows skill levels and abilities for a player.
 spawns     Immort   Shows where a mob spawns on the map, similar to ".mob search".
 startlocs  Immort   Shows the location of all starting location tiles.
 storage    Immort   Shows items that can be stored in a given building/room type.
 terrain    Immort   Shows total counts for all terrain types.
+uses       Immort   Shows crafts (and vehicles, etc.) that use a component type.
 workforce  Immort   Shows you an empire's workforce setup.
+variables  Immort   Shows script variables on a player character.
 commons    Asst     Shows players currently connected from duplicate sites.
 site       Asst     Shows all players with a specific site segment.
 account    Co-Impl  Shows all the alts associated with a given player.
 
+Each of these commands has its own help file (for example, HELP SHOW STATS)
+
 See also: STAT, STARTING LOCATION
+#e
+"SHOW STATS"
+
+Usage:  show stats
+
+Shows some game statistics, similar to the ones you see when quitting, and
+including both instances in the world and prototypes.
+#e
+"SHOW ARROWTYPES"
+
+Usage:  show arrowtypes
+
+Lists all bows and arrows by arrowtype. Useful for figuring out what arrowtype
+to use for a new weapon/ammo.
+#e
+"SHOW COMPONENTS"
+
+Usage:  show components <type> [flags]
+
+This command allows you to look up objects that are a given component type.
+If you specify any flags, all those flags must match the output.
+
+For a list of component types, see: HELP COMPONENT TYPES
+For a list of component flags, see: HELP COMPONENT FLAGS
+#e
+"SHOW IGNORING"
+
+Usage:  show ignoring <player name>
+
+Shows you who a player is ignoring.
+
+See also: IGNORE, SHOW
+#e
+"SHOW ISLANDS"
+
+Usage:  show islands <empire name>
+
+The immortal version of the 'islands' command; useful for MOVEEINV. You can use
+an empire's leaderboard rank in place of its name, but not vnum.
+
+See also: ISLANDS, MOVEEINV
+#e
+"SHOW NOTES"
+
+Usage:  show notes <player name>
+
+Shows immortal notes for the target player's account.
+#e
+"SHOW PLAYER"
+
+Usage:  show player <player name>
+
+Shows some basic technical information about the target player. Not to be
+confused with SHOW PLAYERS.
+#e
+"SHOW PLAYERS"
+
+Usage:  show players
+
+Shows the names and current and max health, moves, mana and blood of all online
+players. Not to be confused with SHOW PLAYER.
+
+See also: USERS
+#e
+"SHOW RENT"
+
+Usage:  show rent <player name>
+
+Shows the target player's inventory and equipment. Used to show the binary file
+path to their inventory data, hence the name.
+#e
+"SHOW SKILLS"
+
+Usage:  show skills <player name>
+
+Shows the target player's skills and abilities.
+#e
+"SHOW SPAWNS"
+
+Usage:  show spawns <mob vnum>
+
+Shows what sectors/crops a mob spawns on, percentile chance for it to spawn, and
+what conditions it has. Takes a mob's virtual number, not a name.
+#e
+"SHOW STARTLOCS"
+
+Usage:  show startlocs
+
+Lists all possible starting locations, including name and coordinates.
+#e
+"SHOW STORAGE"
+
+Usage:  show storage [building name]
+
+Lists objects which store in the named building, or the current building if none
+is specified. Takes a name, not a virtual number.
+#e
+"SHOW TERRAIN"
+
+Usage:  show terrain
+
+Lists the total count of each sector and crop type in the world. Buildings are
+all listed together under 'Building'.
+#e
+"SHOW USES"
+
+Usage:  show uses <type> [flags]
+
+This command looks up crafts, vehicles, and augments that require a given
+component type. If you specify any flags, all those flags must match the
+output.
+
+For a list of component types, see: HELP COMPONENT TYPES
+For a list of component flags, see: HELP COMPONENT FLAGS
+#e
+"SHOW WORKFORCE"
+
+Usage:  show workforce <empire name>
+
+Shows you an empire's workforce setup exactly as it would appear to a members
+of that empire using the 'workforce' command.
+#e
+"SHOW VARIABLES"
+
+Usage:  show variables <player name>
+
+Shows you the names and values of all of the DG Scripts variables attached
+(using 'remote') to the target player. 'stat mob <target>' is used instead to
+see script variables for NPCs.
+#e
+"SHOW COMMONS"
+
+Usage:  show commons
+
+Shows the names of any characters connected from IPs they share with another
+character. By default, this isn't possible without a MULTI-IP flag.
+#e
+"SHOW SITE"
+
+Usage:  show site <string>
+
+Shows all players connected from a site containing the specified string (it can
+occur in the middle or at the end, not just at the beginning).
+#e
+"SHOW ACCOUNT"
+
+Usage:  show account <player name>
+
+Shows all characters associated with the target character's account (the target
+player's alternates).
+#e
+"SHOW QUESTS"
+
+Usage:  show quests <player> [active | completed | quest name]
+
+This option allows you to see what quests players are on, and their progress.
+If you don't specify an option, you will see their list of active quests.
 #e
 SHUTDOWN
 
@@ -828,7 +1014,7 @@ See also: GRANT
 #d
 STAT
 
-Usage:  stat [adventure | building | player | object | mobile | room | template | file] [name]
+Usage:  stat [type] [name]
 
 Gives information about players, animals, and objects in the game. The type
 argument is optional.
@@ -904,6 +1090,15 @@ command is grantable.
 
 See also: BINDING, GRANT
 #d
+UNQUEST
+
+Usage:  unquest <player> <quest vnum>
+
+This command removes a quest from a player's current- and completed-quests
+lists. The player receives no message. This command is grantable.
+
+See also: GRANT
+#d
 UPTIME
 
 Usage:  uptime
@@ -938,6 +1133,7 @@ This is a generic command that houses several simple utilities for immortals.
 They generally have no game effect, but can help with testing.
 
 Available utilities:
+ b318buildings - Finds buildings using flags that were deprecated in 2.0b3.18.
  clearroles - Clears the class roles and class abilities of all players.
  diminish <number> <scale> - Applies the game's diminishing returns formula,
     and returns the result.
@@ -948,6 +1144,10 @@ Available utilities:
     reports the results.
  redoislands - Renumbers all the islands (requires confirmation; may rearrange
     empire inventories).
+ rescan <empire | all> - Rereads territory and members, which can fix issues.
+ resetbuildingtriggers <vnum | all> - Reattaches triggers to buildings/rooms,
+    e.g. if you made a change in OLC and want live buildings updated.
+ strlen - Give various measures of string length.
 #d
 VNUM
 
@@ -957,8 +1157,9 @@ Gives a list of the virtual numbers of objects or mobiles which have the
 specified name. If you specify more than one keyword, it will find things
 that match ALL of those keywords.
 
-Valid types are: adventure, book, building, craft, crop, global, obj, mob, 
-                 roomtemplate, sector
+Valid types are: adventure, ability, archetype, augment, book, building, craft,
+                 class, crop, global, mob, morph, obj, quest, roomtemplate,
+                 sector, skill, vehicle
 
 Examples:
 
@@ -978,8 +1179,9 @@ Usage:  vstat <type> <vnum>
 
 Used to stat a prototypical object by virtual number.
 
-Valid types are: adventure, building, book, craft, crop, global, obj, mob,
-                 roomtemplate, sector
+Valid types are: adventure, ability, archetype, augment, building, book, craft,
+                 class, crop, global, mob, morph, obj, quest, roomtemplate,
+                 sector, skill, vehicle
 
 Examples:
 

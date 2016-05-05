@@ -67,10 +67,13 @@ end
 if %phase%==2
   switch %random.3%
     case 1
+      eval room %self.room%
       %echo% %self.name% whistles with a sound like escaping steam...
-      %load% mob 18077 ally %self.level%
-      %load% mob 18077 ally %self.level%
       %echo% A pair of fire elementals appear!
+      %load% mob 18077 ally %self.level%
+      %force% %room.people% mkill %actor%
+      %load% mob 18077 ally %self.level%
+      %force% %room.people% mkill %actor%
       %echo% %self.name% looks exhausted!
       *Ensure that no other abilities are used while the elementals are up:
       dg_affect %self% STUNNED on 30
@@ -137,6 +140,10 @@ if %phase%==3
     break
     case 2
       eval target %random.enemy%
+      * Unable to find a target = return self
+      if !%target% || target == %self%
+        halt
+      end
       %send% %target% %self.name% makes a heretical gesture at you!
       %echoaround% %target% %self.name% makes a heretical gesture at %target.name%!
       wait 5 sec

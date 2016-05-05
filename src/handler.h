@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: handler.h                                       EmpireMUD 2.0b3 *
+*   File: handler.h                                       EmpireMUD 2.0b4 *
 *  Usage: header file: prototypes of handling and utility functions       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -34,6 +34,7 @@
 #define FIND_OBJ_WORLD		BIT(4)
 #define FIND_OBJ_EQUIP		BIT(5)
 #define FIND_NO_DARK		BIT(6)
+#define FIND_VEHICLE_ROOM	BIT(7)
 
 
 // for the interaction handlers (returns TRUE if the character performs the interaction; FALSE if it aborts)
@@ -44,7 +45,7 @@
 //// HANDLER MACROS //////////////////////////////////////////////////////////
 
 #define MATCH_ITEM_NAME(str, obj)  (isname((str), GET_OBJ_KEYWORDS(obj)) || (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0 && isname((str), drinks[GET_DRINK_CONTAINER_TYPE(obj)])))
-#define MATCH_CHAR_DISGUISED_NAME(str, ch)  (isname((str), PERS((ch),(ch),FALSE)))
+#define MATCH_CHAR_DISGUISED_NAME(str, ch)  ((IS_MORPHED(ch) && isname((str), MORPH_KEYWORDS(GET_MORPH(ch)))) || (IS_DISGUISED(ch) && isname((str), GET_DISGUISED_NAME(ch))))
 #define MATCH_CHAR_NAME(str, ch)  ((!IS_NPC(ch) && GET_LASTNAME(ch) && isname((str), GET_LASTNAME(ch))) || isname((str), GET_PC_NAME(ch)) || MATCH_CHAR_DISGUISED_NAME(str, ch))
 #define MATCH_CHAR_NAME_ROOM(viewer, str, target)  ((IS_DISGUISED(target) && !IS_IMMORTAL(viewer) && !SAME_EMPIRE(viewer, target)) ? MATCH_CHAR_DISGUISED_NAME(str, target) : MATCH_CHAR_NAME(str, target))
 
@@ -77,8 +78,6 @@ extern bool room_affected_by_spell(room_data *room, int type);
 #define create_mod_aff(type, duration, loc, mod, cast_by)  create_aff((type), (duration), (loc), (mod), 0, (cast_by))
 
 // character handlers
-extern bool char_from_chair(char_data *ch);
-extern bool char_to_chair(char_data *ch, obj_data *chair);
 void extract_char(char_data *ch);
 void extract_char_final(char_data *ch);
 void perform_dismount(char_data *ch);
@@ -100,7 +99,7 @@ extern char_data *get_char_world(char *name);
 
 // coin handlers
 extern bool can_afford_coins(char_data *ch, empire_data *type, int amount);
-void charge_coins(char_data *ch, empire_data *type, int amount);
+void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_data **build_used_list);
 void cleanup_all_coins();
 void cleanup_coins(char_data *ch);
 void coin_string(struct coin_data *list, char *storage);
@@ -162,8 +161,8 @@ extern bool run_interactions(char_data *ch, struct interaction_item *run_list, i
 extern bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func));
 
 // lore handlers
-void add_lore(char_data *ch, int type, int value);
-void remove_lore(char_data *ch, int type, int value);
+void add_lore(char_data *ch, int type, const char *str, ...) __attribute__((format(printf, 3, 4)));
+void remove_lore(char_data *ch, int type);
 
 // mob tagging handlers
 extern bool find_id_in_tag_list(int id, struct mob_tag *list);
@@ -193,11 +192,14 @@ void equip_char(char_data *ch, obj_data *obj, int pos);
 void obj_from_char(obj_data *object);
 void obj_from_obj(obj_data *obj);
 void obj_from_room(obj_data *object);
+void obj_from_vehicle(obj_data *obj);
 void object_list_no_owner(obj_data *list);
 void obj_to_char(obj_data *object, char_data *ch);
+void obj_to_char_if_okay(obj_data *obj, char_data *ch);
 void obj_to_char_or_room(obj_data *obj, char_data *ch);
 void obj_to_obj(obj_data *obj, obj_data *obj_to);
 void obj_to_room(obj_data *object, room_data *room);
+void obj_to_vehicle(obj_data *object, vehicle_data *veh);
 void swap_obj_for_obj(obj_data *old, obj_data *new);
 extern obj_data *unequip_char(char_data *ch, int pos);
 void unequip_char_to_inventory(char_data *ch, int pos);
@@ -208,12 +210,13 @@ extern char *get_custom_message(obj_data *obj, int type);
 extern bool has_custom_message(obj_data *obj, int type);
 
 // object targeting handlers
+extern obj_data *get_obj_by_char_share(char_data *ch, char *arg);
 extern obj_data *get_obj_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[]);
 extern obj_data *get_obj_in_list_num(int num, obj_data *list);
 extern obj_data *get_obj_in_list_vnum(obj_vnum vnum, obj_data *list);
 extern obj_data *get_obj_in_list_vis(char_data *ch, char *name, obj_data *list);
 extern int get_obj_pos_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[]);
-extern obj_vnum get_obj_vnum_by_name(char *name);
+extern obj_vnum get_obj_vnum_by_name(char *name, bool storable_only);
 extern obj_data *get_obj_vis(char_data *ch, char *name);
 extern obj_data *get_object_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[], int *pos);
 extern obj_data *get_obj_world(char *name);
@@ -226,9 +229,10 @@ void remove_offers_by_type(char_data *ch, int type);
 void add_depletion(room_data *room, int type, bool multiple);
 extern int get_depletion(room_data *room, int type);
 void remove_depletion(room_data *room, int type);
+void set_depletion(room_data *room, int type, int value);
 
 // room handlers
-void attach_building_to_room(bld_data *bld, room_data *room);
+void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers);
 void attach_template_to_room(room_template *rmt, room_data *room);
 
 // room extra data handlers
@@ -250,8 +254,10 @@ sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_t
 
 // storage handlers
 void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount);
+extern bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, struct resource_data **build_used_list);
 extern bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount);
 extern bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
+extern bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount);
 extern struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords);
 extern int find_lowest_storage_loc(obj_data *obj);
 extern struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum);
@@ -263,7 +269,7 @@ extern bool stored_item_requires_withdraw(obj_data *obj);
 
 // targeting handlers
 extern int find_all_dots(char *arg);
-extern int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj);
+extern int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh);
 extern int get_number(char **name);
 
 // unique storage handlers
@@ -272,6 +278,20 @@ extern bool delete_unique_storage_by_vnum(empire_data *emp, obj_vnum vnum);
 extern struct empire_unique_storage *find_eus_entry(obj_data *obj, empire_data *emp, room_data *location);
 void remove_eus_entry(struct empire_unique_storage *eus, empire_data *emp);
 void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data *room, bool *full);
+
+// vehicle handlers
+void extract_vehicle(vehicle_data *veh);
+void sit_on_vehicle(char_data *ch, vehicle_data *veh);
+void unseat_char_from_vehicle(char_data *ch);
+void vehicle_from_room(vehicle_data *veh);
+void vehicle_to_room(vehicle_data *veh, room_data *room);
+
+// vehicle targeting handlers
+vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, char *name);
+#define get_vehicle_in_room_vis(ch, name)  get_vehicle_in_target_room_vis((ch), IN_ROOM(ch), (name))
+extern vehicle_data *get_vehicle_vis(char_data *ch, char *name);
+extern vehicle_data *get_vehicle_room(room_data *room, char *name);
+extern vehicle_data *get_vehicle_world(char *name);
 
 // world handlers
 extern struct room_direction_data *find_exit(room_data *room, int dir);
@@ -314,6 +334,11 @@ void update_pos(char_data *victim);
 extern int limit_crowd_control(char_data *victim, int atype);
 
 // morph.c
-extern int get_morph_attack_type(char_data *ch);
-extern bool MORPH_FLAGGED(char_data *ch, bitvector_t flag);
-void perform_morph(char_data *ch, ubyte form);
+void perform_morph(char_data *ch, morph_data *morph);
+
+// objsave.c
+
+/**
+* This crash-saves all players in the game.
+*/
+void extract_all_items(char_data *ch);

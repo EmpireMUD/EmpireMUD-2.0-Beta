@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_scripts.h                                    EmpireMUD 2.0b3 *
+*   File: dg_scripts.h                                    EmpireMUD 2.0b4 *
 *  Usage: header file for script structures and contstants, and           *
 *         function prototypes for dg_scripts.c                            *
 *                                                                         *
@@ -13,7 +13,7 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
-#define DG_SCRIPT_VERSION "DG Scripts 1.0.12 e1"
+#define DG_SCRIPT_VERSION "DG Scripts 1.0.12 e2"
 
 // look for 'x_TRIGGER' for things related to this (I know that's backwards)
 #define MOB_TRIGGER  0
@@ -21,6 +21,8 @@
 #define WLD_TRIGGER  2
 #define RMT_TRIGGER  3
 #define ADV_TRIGGER  4
+#define VEH_TRIGGER  5
+#define BLD_TRIGGER  6
 
 /* unless you change this, Puff casts all your dg spells */
 #define DG_CASTER_PROXY 1
@@ -53,7 +55,10 @@
 #define MTRIG_LEAVE            BIT(16)     /* someone leaves room seen   */
 #define MTRIG_DOOR             BIT(17)     /* door manipulated in room   */
 #define MTRIG_LEAVE_ALL        BIT(18)	// leave even if they can't see
-#define MTRIG_FIGHT_CHARMED    BIT(19)	// fight trigger that fires even while charmed
+#define MTRIG_CHARMED          BIT(19)	// fight/random triggers will fire even while charmed
+#define MTRIG_START_QUEST      BIT(20)	// player tries to start a quest
+#define MTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
+
 
 /* obj trigger types */
 #define OTRIG_GLOBAL           BIT(0)	     /* unused                     */
@@ -73,6 +78,29 @@
 #define OTRIG_LEAVE            BIT(16)    /* someone leaves room seen    */
 
 #define OTRIG_CONSUME          BIT(18)    /* char tries to eat/drink obj */
+#define OTRIG_FINISH           BIT(19)	// char finishes reading a book
+#define OTRIG_START_QUEST      BIT(20)	// player tries to start a quest
+#define OTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
+
+
+// VTRIG_x: vehicle trigger types
+#define VTRIG_GLOBAL  BIT(0)	// checked even if zone empty
+#define VTRIG_RANDOM  BIT(1)	// checked randomly when people nearby
+#define VTRIG_COMMAND  BIT(2)	// character types a command
+#define VTRIG_SPEECH  BIT(3)	// character speaks a word or phrase
+// unused BIT(4)
+#define VTRIG_DESTROY  BIT(5)	// called before destruction
+#define VTRIG_GREET  BIT(6)	// character enters the room
+// unused BIT(7)
+#define VTRIG_ENTRY  BIT(8)	// vehicle enters a room
+// unused BIT(9), BIT(10), BIT(11), BIT(12)
+#define VTRIG_LOAD  BIT(13)	// vehicle is loaded
+// unused BIT(14), BIT(15)
+#define VTRIG_LEAVE  BIT(16)	// someone leaves the room
+// unuused: 17-19
+#define VTRIG_START_QUEST      BIT(20)	// player tries to start a quest
+#define VTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
+
 
 /* wld trigger types */
 #define WTRIG_GLOBAL           BIT(0)      /* check even if zone empty   */
@@ -84,9 +112,15 @@
 #define WTRIG_ENTER            BIT(6)	     /* character enters room      */
 #define WTRIG_DROP             BIT(7)      /* something dropped in room  */
 
+#define WTRIG_LOAD  BIT(13)	// called when the room/building loads
+#define WTRIG_COMPLETE  BIT(14)	// called when the building is complete
 #define WTRIG_ABILITY          BIT(15)     /* ability used in room */
 #define WTRIG_LEAVE            BIT(16)     /* character leaves the room */
 #define WTRIG_DOOR             BIT(17)     /* door manipulated in room  */
+// unused: 18, 19
+#define WTRIG_START_QUEST      BIT(20)	// player tries to start a quest
+#define WTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
+
 
 /* obj command trigger types */
 #define OCMD_EQUIP             BIT(0)	     /* obj must be in char's equip */
@@ -94,9 +128,10 @@
 #define OCMD_ROOM              BIT(2)	     /* obj must be in char's room  */
 
 /* obj consume trigger commands */
-#define OCMD_EAT    1
+#define OCMD_EAT  1
 #define OCMD_DRINK  2
 #define OCMD_QUAFF  3
+#define OCMD_READ  4
 
 #define TRIG_NEW                0	     /* trigger starts from top  */
 #define TRIG_RESTART            1	     /* trigger restarting       */
@@ -202,6 +237,8 @@ void fight_mtrigger(char_data *ch);
 void hitprcnt_mtrigger(char_data *ch);
 void bribe_mtrigger(char_data *ch, char_data *actor, int amount);
 
+void complete_wtrigger(room_data *room);
+
 void random_mtrigger(char_data *ch);
 void random_otrigger(obj_data *obj);
 void random_wtrigger(room_data *ch);
@@ -209,10 +246,11 @@ void reset_wtrigger(room_data *ch);
 
 void load_mtrigger(char_data *ch);
 void load_otrigger(obj_data *obj);
+void load_wtrigger(room_data *room);
 
-int ability_mtrigger(char_data *actor, char_data *ch, int abil);
-int ability_otrigger(char_data *actor, obj_data *obj, int abil);
-int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, int abil);
+int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil);
+int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil);
+int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, any_vnum abil);
 
 int leave_mtrigger(char_data *actor, int dir);
 int leave_wtrigger(room_data *room, char_data *actor, int dir);
@@ -223,11 +261,23 @@ int door_wtrigger(char_data *actor, int subcmd, int dir);
 
 int consume_otrigger(obj_data *obj, char_data *actor, int cmd);
 
+int finish_otrigger(obj_data *obj, char_data *actor);
+
+int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode);
+int destroy_vtrigger(vehicle_data *veh);
+int entry_vtrigger(vehicle_data *veh);
+int leave_vtrigger(char_data *actor, int dir);
+void load_vtrigger(vehicle_data *veh);
+int greet_vtrigger(char_data *actor, int dir);
+void random_vtrigger(vehicle_data *veh);
+void speech_vtrigger(char_data *actor, char *str);
+
 /* function prototypes from scripts.c */
 void script_trigger_check(void);
 void add_trigger(struct script_data *sc, trig_data *t, int loc);
 char_data *get_char(char *name);
 char_data *get_char_by_obj(obj_data *obj, char *name);
+empire_data *get_empire(char *name);
 obj_data *get_obj(char *name);
 
 void do_stat_trigger(char_data *ch, trig_data *trig);
@@ -237,28 +287,28 @@ void do_sstat_character(char_data *ch, char_data *k);
 
 void script_vlog(const char *format, va_list args);
 void script_log(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
+void script_log_by_type(int go_type, void *go, const char *format, ...) __attribute__ ((format (printf, 3, 4)));
 void mob_log(char_data *mob, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
 void obj_log(obj_data *obj, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
 void wld_log(room_data *room, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
-void dg_read_trigger(char *line, void *proto, int type);
 void dg_obj_trigger(char *line, obj_data *obj);
 void assign_triggers(void *i, int type);
 void parse_trigger(FILE *trig_f, int nr);
+void parse_trig_proto(char *line, struct trig_proto_list **list, char *error_str);
 extern trig_data *real_trigger(trig_vnum vnum);
 void extract_script(void *thing, int type);
 void extract_script_mem(struct script_memory *sc);
-void free_proto_script(void *thing, int type);
+void free_proto_scripts(struct trig_proto_list **list);
 void free_script(void *thing, int type);
 void free_trigger(trig_data *trig);
-void copy_proto_script(void *source, void *dest, int type);
+extern struct trig_proto_list *copy_trig_protos(struct trig_proto_list *list);
 void copy_script(void *source, void *dest, int type);
 void trig_data_copy(trig_data *this_data, const trig_data *trg);
-void delete_variables(const char *charname);
 
 trig_data *read_trigger(int nr);
 void add_var(struct trig_var_data **var_list, char *name, char *value, int id);
 room_data *dg_room_of_obj(obj_data *obj);
-void do_dg_cast(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
+room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld);
 void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
 void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier);
 void script_damage_over_time(char_data *vict, int level, int dam_type, double modifier, int dur_seconds, int max_stacks, char_data *cast_by);
@@ -270,6 +320,7 @@ union script_driver_data_u {
 	char_data *c;
 	room_data *r;
 	obj_data *o;
+	vehicle_data *v;
 };
 int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, int mode);
 //int script_driver(void *go, trig_data *trig, int type, int mode);
@@ -280,6 +331,8 @@ struct cmdlist_element * find_case(trig_data *trig, struct cmdlist_element *cl, 
 int find_eq_pos_script(char *arg);
 char_data *get_char_near_obj(obj_data *obj, char *name);
 obj_data *get_obj_near_obj(obj_data *obj, char *name);
+char_data *get_char_near_vehicle(vehicle_data *veh, char *name);
+obj_data *get_obj_near_vehicle(vehicle_data *veh, char *name);
 
 
 /* defines for valid_dg_target */
@@ -302,12 +355,15 @@ int valid_dg_target(char_data *ch, int bitvector);
 #define GET_TRIG_LOOPS(t)         ((t)->loops)
 
 /* player id's: 0 to MOB_ID_BASE - 1            */
-/* mob id's: MOB_ID_BASE to ROOM_ID_BASE - 1      */
+/* mob id's: MOB_ID_BASE to EMPIRE_ID_BASE - 1      */
+// empire ids: EMPIRE_ID_BASE to ROOM_ID_BASE - 1
 /* room id's: ROOM_ID_BASE to OBJ_ID_BASE - 1    */
 /* object id's: OBJ_ID_BASE and higher           */
 #define MOB_ID_BASE	  10000000  /* 10000000 player IDNUMS should suffice */
-#define ROOM_ID_BASE    (10000000 + MOB_ID_BASE) /* 10000000 Mobs */
-#define OBJ_ID_BASE     ((MAP_SIZE * 5) + ROOM_ID_BASE) /* Lots o' Rooms */
+#define EMPIRE_ID_BASE  (10000000 + MOB_ID_BASE) /* 10000000 Mobs */
+#define ROOM_ID_BASE    (10000000 + EMPIRE_ID_BASE)	// 10000000 empire id limit?
+#define VEHICLE_ID_BASE  ((MAP_SIZE * 5) + ROOM_ID_BASE)	// Lots o' Rooms
+#define OBJ_ID_BASE  (1000000 + VEHICLE_ID_BASE)	// Plenty o' Vehicles
 
 #define SCRIPT(o)		  ((o)->script)
 #define SCRIPT_MEM(c)             ((c)->memory)
@@ -339,9 +395,18 @@ int can_wear_on_pos(obj_data *obj, int pos);
 void init_lookup_table(void);
 char_data *find_char_by_uid_in_lookup_table(int uid);
 obj_data *find_obj_by_uid_in_lookup_table(int uid);
+vehicle_data *find_vehicle_by_uid_in_lookup_table(int uid);
 void add_to_lookup_table(int uid, void *c);
 void remove_from_lookup_table(int uid);
 
 // find helpers
 extern char_data *find_char(int n);
+extern empire_data *find_empire_by_uid(int n);
 extern room_data *find_room(int n);
+
+// purge helpers
+extern int dg_owner_purged;
+extern char_data *dg_owner_mob;
+extern obj_data *dg_owner_obj;
+extern vehicle_data *dg_owner_veh;
+extern room_data *dg_owner_room;

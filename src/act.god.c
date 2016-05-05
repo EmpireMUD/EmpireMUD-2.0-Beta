@@ -1,6 +1,6 @@
 /* ************************************************************************
-*   File: act.god.c                                       EmpireMUD 2.0b3 *
-*  Usage: Player-level God commands                                       *
+*   File: act.god.c                                       EmpireMUD 2.0b4 *
+*  Usage: Player-level god commands                                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
 *  All rights reserved.  See license.doc for complete information.        *
@@ -45,7 +45,12 @@
 static int perform_sacrifice(char_data *ch, char_data *god, obj_data *obj, bool message) {
 	double bonus = 1.0;
 	int num = 1;
-
+	
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
+		act("$p: you can't sacrifice quest items.", FALSE, ch, obj, NULL, TO_CHAR);
+		return 0;
+	}
+	
 	/* Determine monument bonus */
 	if (ROOM_PATRON(IN_ROOM(ch)) == GET_IDNUM(god)) {
 		bonus = 1.50;
@@ -132,6 +137,12 @@ ACMD(do_create) {
 		return;
 	}
 	
+	// safety limit
+	if (num > 1000) {
+		msg_to_char(ch, "You can't create more than 1000 at once.\r\n");
+		return;
+	}
+	
 	// setup
 	count = 0;
 	cost = rate_item(proto) + 1;
@@ -150,7 +161,7 @@ ACMD(do_create) {
 				obj_to_room(obj, IN_ROOM(ch));
 			}
 			else {
-				obj_to_char_or_room(obj, ch);
+				obj_to_char(obj, ch);
 			}
 			
 			scale_item_to_level(obj, 1);	// minimum level
@@ -185,14 +196,10 @@ ACMD(do_create) {
 
 
 ACMD(do_sacrifice) {
-	extern FILE *player_fl;
-
 	obj_data *obj, *next_obj;
-	char_data *god = NULL, *cbuf = NULL;
-	descriptor_data *d;
-	int amount = 0, dotmode, player_i = 0;
+	char_data *god = NULL;
+	int amount = 0, dotmode;
 	bool file = FALSE, any = FALSE;
-	struct char_file_u tmp_store;
 
 	two_arguments(argument, arg, buf);
 
@@ -200,36 +207,17 @@ ACMD(do_sacrifice) {
 		msg_to_char(ch, "What do you wish to sacrifice, and to whom?\r\n");
 		return;
 	}
-
-	/* Do this in-file */
-	for (d = descriptor_list; d; d = d->next) {
-		if (STATE(d) != CON_PLAYING || !d->character)
-			continue;
-		if (!isname(buf, GET_NAME(d->character)))
-			continue;
-		god = d->character;
-		break;
+	
+	if (!(god = find_or_load_player(buf, &file))) {
+		send_to_char("There is no such god.\r\n", ch);
+		return;
 	}
-	if (!god) {
-		CREATE(cbuf, char_data, 1);
-		clear_char(cbuf);
-		if ((player_i = load_char(buf, &tmp_store)) > NOBODY) {
-			store_to_char(&tmp_store, cbuf);
-			god = cbuf;
-			SET_BIT(PLR_FLAGS(god), PLR_KEEP_LAST_LOGIN_INFO);
-			file = TRUE;
-		}
-		else {
-			free(cbuf);
-			send_to_char("There is no such god.\r\n", ch);
-			return;
-		}
-	}
-
+	
 	if (!IS_GOD(god) && !IS_IMMORTAL(god)) {
 		msg_to_char(ch, "You can only sacrifice to gods.\r\n");
-		if (file)
-			free_char(cbuf);
+		if (file) {
+			free_char(god);
+		}
 		return;
 	}
 
@@ -271,11 +259,17 @@ ACMD(do_sacrifice) {
 	else if (dotmode == FIND_ALLDOT) {
 		if (!*arg) {
 			msg_to_char(ch, "What do you want to sacrifice all of?\r\n");
+			if (god && file) {
+				free_char(god);
+			}
 			return;
 		}
 		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
 			if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
 				msg_to_char(ch, "You don't seem to have any %ss to sacrifice.\r\n", arg);
+				if (god && file) {
+					free_char(god);
+				}
 				return;
 			}
 		}
@@ -310,15 +304,9 @@ ACMD(do_sacrifice) {
 			amount += perform_sacrifice(ch, god, obj, TRUE);
 		}
 	}
-
-	if (!file)
-		SAVE_CHAR(god);
-	if (file) {
-		char_to_store(god, &tmp_store);
-		fseek(player_fl, (player_i) * sizeof(struct char_file_u), SEEK_SET);
-		fwrite(&tmp_store, sizeof(struct char_file_u), 1, player_fl);
+	
+	if (god && file) {
+		store_loaded_char(god);
+		file = FALSE;
 	}
-
-	if (file)
-		free_char(cbuf);
 }

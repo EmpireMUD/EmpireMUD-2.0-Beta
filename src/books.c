@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: books.c                                         EmpireMUD 2.0b3 *
+*   File: books.c                                         EmpireMUD 2.0b4 *
 *  Usage: data and functions for libraries and books                      *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -639,8 +639,8 @@ struct {
 } library_command[] = {
 	{ SCMD_LIBRARY, "browse", 0, LIBR_REQ_LIBRARY, library_browse },
 	{ SCMD_LIBRARY, "checkout", 0, LIBR_REQ_LIBRARY, library_checkout },
-	{ SCMD_LIBRARY, "shelve", LIBR_REQ_LIBRARY, LVL_APPROVED, library_shelve },
-	{ SCMD_LIBRARY, "burn", LIBR_REQ_LIBRARY, LVL_APPROVED, library_burn },
+	{ SCMD_LIBRARY, "shelve", LVL_APPROVED, LIBR_REQ_LIBRARY, library_shelve },
+	{ SCMD_LIBRARY, "burn", LVL_APPROVED, LIBR_REQ_LIBRARY, library_burn },
 	
 	{ SCMD_BOOKEDIT, "list", LVL_APPROVED, LIBR_REQ_LIBRARY, bookedit_list },
 	{ SCMD_BOOKEDIT, "copy", LVL_APPROVED, LIBR_REQ_LIBRARY, bookedit_copy },
@@ -705,7 +705,7 @@ ACMD(do_library) {
 		if (pos == NOTHING) {
 			msg_to_char(ch, "Invalid %s command.\r\n", types[subcmd]);
 		}
-		else if (IS_SET(library_command[pos].flags, LIBR_REQ_LIBRARY) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LIBRARY)) {
+		else if (IS_SET(library_command[pos].flags, LIBR_REQ_LIBRARY) && !HAS_FUNCTION(IN_ROOM(ch), FNC_LIBRARY)) {
 			msg_to_char(ch, "You must be inside a library to do this.\r\n");
 		}
 		else if (IS_SET(library_command[pos].flags, LIBR_REQ_LIBRARY) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
@@ -741,19 +741,28 @@ void read_book(char_data *ch, obj_data *obj) {
 	else if (!(book = book_proto(GET_BOOK_ID(obj)))) {
 		msg_to_char(ch, "The book is old and badly damaged; you can't read it.\r\n");
 	}
+	else if (!consume_otrigger(obj, ch, OCMD_READ)) {
+		return;
+	}
 	else {
 		start_action(ch, ACT_READING, 0);
 		GET_ACTION_VNUM(ch, 0) = GET_BOOK_ID(obj);
 		
 		msg_to_char(ch, "You start to read '%s', by %s.\r\n", book->title, book->byline);
 		act("$n begins to read $p.", TRUE, ch, obj, NULL, TO_ROOM);
+		
+		// ensure binding
+		if (!IS_NPC(ch) && OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
+			bind_obj_to_player(obj, ch);
+			reduce_obj_binding(obj, ch);
+		}
 	}
 }
 
 
 // action ticks for reading
 void process_reading(char_data *ch) {
-	obj_data *obj;
+	obj_data *obj, *found_obj = NULL;
 	bool found = FALSE;
 	book_data *book;
 	struct paragraph_data *para;
@@ -761,6 +770,7 @@ void process_reading(char_data *ch) {
 	
 	for (obj = ch->carrying; obj && !found; obj = obj->next_content) {
 		if (IS_BOOK(obj) && GET_BOOK_ID(obj) == GET_ACTION_VNUM(ch, 0)) {
+			found_obj = obj;	// save for later
 			found = TRUE;
 		}
 	}
@@ -792,8 +802,10 @@ void process_reading(char_data *ch) {
 		}
 		
 		if (!found) {
-			// book's done
-			msg_to_char(ch, "You close the book and put it away.\r\n");
+			// book's done -- fire finish triggers
+			if (!found_obj || finish_otrigger(found_obj, ch)) {
+				msg_to_char(ch, "You close the book.\r\n");
+			}
 			GET_ACTION(ch) = ACT_NONE;
 		}
 	}

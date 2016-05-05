@@ -22,18 +22,6 @@ Bathe is used to begin cleaning yourself in either a bath house or a river.
 You must bathe regularly to keep clean. If you bathe in a bath house you will
 get cleaner faster than if you were to bathe in a river.
 #
-CATAPULT 
-
-Usage:  catapult <direction> 
-
-Catapult is used to launch your catapult in the direction that you want. You
-must have 12 rocks and a catapult to use this. It can only shoot at an
-adjacent room.
-
-Example:  
-
-  > catapult north 
-#
 CHIP
 
 Usage:  chip <item>
@@ -41,7 +29,8 @@ Usage:  chip <item>
 This lets you chip a rock down to a sharper, more refined tool. You need to be
 wielding a rock or other hammer to do this.
 
-If you keep chipping, you can make a handaxe.
+If you keep chipping, you can make a handaxe. You can chip this again to make
+a spear head.
 
 See also: CRAFT
 #
@@ -81,6 +70,8 @@ entrance must lie directly across from the entrance. After that, you may
 choose any direction you like. Each building is limited on how many rooms it
 may have. You can only redesignate rooms once per 60 minutes.
 
+Designating rooms requires the 'build' empire privilege.
+
 Room types:
  baths - Identical to the free-standing building (castle only)
  bedroom - +1 citizen, and gives a boost to regeneration while sleeping
@@ -99,6 +90,8 @@ Room types:
  tunnel - Underground hallways used in some buildings
  vault - Holds gold and silver, and sets your wealth (castle)
  crypt - Can be set as a tomb (castle)
+
+For more, see SHIP ROOMS.
 
 See also: BUILD, STORAGE
 #
@@ -119,7 +112,9 @@ DISMANTLE
 Usage:  dismantle
 
 This command allows you to tear down a building when you're done with it. You
-get back half of the resources you spent to build it.
+get back approximately half of the resources you spent to build it, although
+dismantle can only refund items that were used -- it can't refund any coins,
+mana, or liquids that were spent.
 
 You can use "nodismantle" to keep yourself from accidentally dismantling a
 building.
@@ -131,7 +126,10 @@ FLINT "FLINT SET"
 Flint can be combined with rocks (using CRAFT) to create a flint set, which
 can then be used to light torches.
 
-See also: DIG, LIGHT
+Flint can be found by digging almost anywhere you could find rocks. It is
+somewhat less common than generic rocks, and counts as a rock component.
+
+See also: DIG, LIGHT, ROCK COMPONENT
 #
 GATHER
 
@@ -146,24 +144,30 @@ See also: DEPLETION, STICKS, APPLES, ORCHARD, FOREST
 #
 HARNESS UNHARNESS
 
-Usage:  harness <animal> <object to harness them to> 
-        unharness <animal>
+Usage:  harness <animal> <vehicle> 
+        unharness [animal] <vehicle>
 
 Harness is used to tie one or more beasts of burden to some type of wagon in
-order to pull it. You must have the animals and the wagon in the same room,
-and have some rope in your inventory. After you have harnessed enough animals
-to the wagon you will be able to lead the animals and the wagon will follow. 
+order to pull it. You must have the animals and the wagon in the same room.
+After you have harnessed enough animals to the vehicle, you will be able to
+lead that vehicle around.
+
+Harnessed animals can no longer be targeted by most commands, similar to a
+mount.
 
 Example:  
+  > harness horse wagon
+  > unharness wagon
 
-  > harness horse wagon 
+See also: DRAG, LEAD
 #
 HARVEST HARVESTING
 
 Usage:  harvest
 
 Allows you to harvest a crop. Be careful that you also replant some,
-otherwise you'll run out of that crop quickly.
+otherwise you'll run out of that crop quickly. You must be wielding a slashing
+or slicing weapon (sword or axe) to harvest crops.
 
 See also: PLANT
 #
@@ -175,25 +179,29 @@ This command is useful in herding animals into stables and fenced-in areas.
 #
 LEAD 
 
-Usage:  lead <animal> 
+Usage:  lead [vehicle]
 
-Lead is used to lead animals. Once you begin leading an animal it will follow
-you where you walk. This can be used to pull carts and wagons. You usually
-can't lead animals indoors.
+The lead command is used to move vehicles around. Once you are leading a
+vehicle, it will move with you until type "lead" again to stop. Some vehicles
+need you to harness animals to them before they can move.
+
+Some vehicles can't be led.
 
 Example:  
   > lead horse 
 
-See also: TIE, HARNESS
+See also: BOARD, DRAG, HARNESS
 #
 LIGHT TORCH
 
-Usage:  light <item>
+Usage:  light <item | vehicle>
 
 To light something, you must have a flint set. You may light sticks to create
 torches. You can also light trees or logs to make camp fires.
 
-See also: COOKING FIRE
+You can also burn down some vehicles with this command.
+
+See also: COOKING FIRE, DOUSE
 #
 MILK
 
@@ -205,25 +213,21 @@ container to hold the milk. Cows can be milked once or twice per day.
 MILL MILLING
 
 Building:  (MM)  Mill  (no skill required)
-Resources:  10 logs, 2 stone blocks
-Built on:  plains, desert
 Stored at the mill:  cornmeal, flour
 Command:  mill [number] <item>
+          mill info <item>
 
 You can mill:
-  wheat into 2 flour
-  corn into 2 cornmeal
-  2 olives into olive oil
+  wheat into flour
+  corn into cornmeal
 
 You must do this at a Mill building. Milling will gain Trade skill up to 15.
 
-See also: CRAFTING LEVEL, COOK
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP
 #
 MINE MINES
 
 Building:  &y/&0[]&y\&0  Mine  (no skill required)
-Resources:  4 logs
-Built on:  mountain
 Command:  mine
 
 "Mine" is both a building type, and the command to work in that building. Mines
@@ -255,8 +259,6 @@ See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS
 MINT
 
 Building:  [MM]  Mint  (Commerce ability)
-Resources:  12 lumber, 4 nails, 12 blocks, 4 coin mills
-Built on:  plains, desert
 Fame:  5
 Command:  mint <object>
 
@@ -266,14 +268,15 @@ repeat; stopping the action will give you back the item you were minting.
 
 See also: COINS, COMMERCE, STOP
 #
-MORPH MORPHING SHAPESHIFTING
+MORPH MORPHING SHAPESHIFTING FASTMORPH
 
 Usage:  morph <form>
         morph normal
+        fastmorph <form | normal>
 
 Some powers allow you to change shape, using the morph command. Morphing takes
-a few seconds, but if you're in combat you can morph instantly at a higher
-cost than normal.
+a few seconds, but if you're in combat you can morph instantly at a 3x higher
+cost than normal (you can also morph instantly using 'fastmorph').
 
 Morphing will remove your disguise, if you have one.
 
@@ -302,7 +305,28 @@ time. If you immediately stop planting, your character just scatters the seeds
 and the crop will grow eventually. If you take care to plant neat rows, and
 water them (let the planting action finish), the crop will grow very quickly.
 
-See also: HARVEST, WHEAT, CORN, APPLES
+Crops must be planted on the following tiles:
+Temperate: plains
+Arid: desert
+Jungle: light jungle
+
+Light jungle is jungle which has been partially chopped, but not reduced to
+plains.
+
+See also: CROPS, HARVEST, PICK
+#
+PRESS PRESSING OILMAKING "OIL MAKING"
+
+Command:  press [number] <item>
+          press info <item>
+
+You can press:
+  olives into olive oil
+
+You must do this at an Oilmaker building. Pressing oil will gain Trade skill up
+to 15.
+
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL
 #
 SACRIFICE 
 
@@ -320,7 +344,7 @@ Example:
 #
 SAW
 
-Usage:  saw <tree | log>
+Usage:  saw <item>
 
 You can saw trees and logs into lumber. You must be in a lumber yard. This
 will go faster if you have the Woodworking ability.
@@ -329,11 +353,11 @@ See also: TREES, LOGS, LUMBER
 #
 SCRAPE
 
-Usage:  scrape tree
+Usage:  scrape <item>
 
 This skill is used to process trees into logs.
 
-The Woodworking ability increases how fast you can scrape logs.
+The Woodworking ability increases how fast you can scrape.
 
 See also: TREES, SAW, WOODWORKING
 #
@@ -440,24 +464,26 @@ chance is checked any time you use an ability. You don't need to get the
 experience all the way to 100%.
 
 When your skills hit level 50 or 75, you will not be able to gain additional
-levels in the skill unless you specialize into it.
+levels in the skill unless you specialize into it. You won't gain skill from
+using abilities on mobs and players who are more than 50 levels below you.
 
 See also: SKILL CAPS, SPECIALIZE, SKILLS
 #
 SMELT MELT
 
-Usage:  smelt <item>
+Usage:  smelt [number] <type of ingot/bar>
 
 Using a forge or foundry, you can melt down metals like iron, silver, and gold
 into ingots or bars. Smelting generally requires two of the base metal (e.g.
 iron ore) to create one of the processed version (iron ingot).
 
-Ingots are used for crafting.
+Ingots are used for crafting. Gold and silver bars are worth more in the vault
+than their raw form. To return bars to their ingot form, use 'separate'.
 
-Gold and silver bars are worth more in the vault than their raw form. The bars
-can be smelted again to return them to the smaller raw version.
+Typing "smelt" by itself will list things you can smelt with the ore available
+in your inventory.
 
-See also: INGOTS, WEALTH
+See also: METAL, SEPARATE, WEALTH
 #
 SPECIALIZE SPECIALTY
 
@@ -510,15 +536,15 @@ TENT TENTS
 
 ./\.  Tent  (Basic Crafts ability)
 
-Built on:  plains, desert
-Commands: sew tent
-          build tent <direction>
+Commands:  sew tent
+           build tent <direction>
 
 Requires 8 large leather to sew.
 
 Once you have sewn a tent, you can carry it with you in your inventory and set
-it up or take it down using build and dismantle. The tent requires no add-
-itional resources each time you set it up.
+it up or take it down using build and dismantle. The basic tent requires no
+additional resources each time you set it up. The interior provides the same
+increased regeneration rate while resting as a bedroom.
 
 Building the tent will claim the land, just like any building command. When
 you dismantle it later, be sure to abandon the claim.

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.naturalmagic.c                              EmpireMUD 2.0b3 *
+*   File: act.naturalmagic.c                              EmpireMUD 2.0b4 *
 *  Usage: implementation for natural magic abilities                      *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -38,7 +38,7 @@
 extern obj_data *find_obj(int n);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
-void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability);
+void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_vnum ability);
 extern bool trigger_counterspell(char_data *ch);	// spells.c
 
 // locals
@@ -59,7 +59,7 @@ void un_earthmeld(char_data *ch);
 int ancestral_healing(char_data *ch) {
 	double mod, amt;
 	
-	if (!HAS_ABILITY(ch, ABIL_ANCESTRAL_HEALING)) {
+	if (!has_ability(ch, ABIL_ANCESTRAL_HEALING) || !check_solo_role(ch)) {
 		return 0;
 	}
 	
@@ -352,7 +352,9 @@ ACMD(do_cleanse) {
 			gain_condition(vict, DRUNK, -1 * GET_COND(vict, DRUNK));
 		}
 		
-		gain_ability_exp(ch, ABIL_CLEANSE, 33.4);
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_CLEANSE, 33.4);
+		}
 
 		if (FIGHTING(vict) && !FIGHTING(ch)) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
@@ -615,7 +617,7 @@ ACMD(do_earthmeld) {
 
 	if (AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 		// only check sector on rise if the person has earth mastery, otherwise they are trapped
-		if (HAS_ABILITY(ch, ABIL_WORM) && IS_ANY_BUILDING(IN_ROOM(ch))) {
+		if (has_ability(ch, ABIL_WORM) && IS_ANY_BUILDING(IN_ROOM(ch))) {
 			msg_to_char(ch, "You can't rise from the earth here!\r\n");
 		}
 		else {
@@ -631,7 +633,7 @@ ACMD(do_earthmeld) {
 		return;
 	}
 	
-	if (SECT_FLAGGED(ROOM_ORIGINAL_SECT(IN_ROOM(ch)), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER | SECTF_MAP_BUILDING | SECTF_INSIDE)) {
+	if (SECT_FLAGGED(BASE_SECT(IN_ROOM(ch)), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER | SECTF_MAP_BUILDING | SECTF_INSIDE)) {
 		msg_to_char(ch, "You can't earthmeld without solid ground below you!\r\n");
 		return;
 	}
@@ -729,8 +731,10 @@ ACMD(do_entangle) {
 		// release other entangleds here
 		limit_crowd_control(vict, ATYPE_ENTANGLE);
 	}
-
-	gain_ability_exp(ch, ABIL_ENTANGLE, 15);
+	
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_ENTANGLE, 15);
+	}
 }
 
 
@@ -738,13 +742,14 @@ ACMD(do_familiar) {
 	void scale_mob_as_familiar(char_data *mob, char_data *master);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
+	ability_data *abil = NULL;
 	char_data *mob;
 	int iter, type;
 	bool any;
 	
 	struct {
 		char *name;
-		int ability;
+		any_vnum ability;
 		int level;	// natural magic level required
 		mob_vnum vnum;
 		int cost;
@@ -784,13 +789,14 @@ ACMD(do_familiar) {
 		msg_to_char(ch, "Summon which familiar:");
 		any = FALSE;
 		for (iter = 0; *familiars[iter].name != '\n'; ++iter) {
-			if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !HAS_ABILITY(ch, familiars[iter].ability)) {
+			if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !has_ability(ch, familiars[iter].ability)) {
 				continue;
 			}
-			if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && GET_SKILL(ch, ability_data[familiars[iter].ability].parent_skill) < familiars[iter].level) {
+			abil = find_ability_by_vnum(familiars[iter].ability);
+			if (abil && ABIL_ASSIGNED_SKILL(abil) != NULL && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < familiars[iter].level) {
 				continue;
 			}
-			if (familiars[iter].ability == NO_ABIL && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
+			if (!abil && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
 				continue;
 			}
 			
@@ -809,13 +815,14 @@ ACMD(do_familiar) {
 	// find which one they wanted
 	type = -1;
 	for (iter = 0; *familiars[iter].name != '\n'; ++iter) {
-		if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !HAS_ABILITY(ch, familiars[iter].ability)) {
+		if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !has_ability(ch, familiars[iter].ability)) {
 			continue;
 		}
-		if (familiars[iter].ability != NO_ABIL && ability_data[familiars[iter].ability].parent_skill != NO_SKILL && GET_SKILL(ch, ability_data[familiars[iter].ability].parent_skill) < familiars[iter].level) {
+		abil = find_ability_by_vnum(familiars[iter].ability);
+		if (abil && ABIL_ASSIGNED_SKILL(abil) != NULL && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < familiars[iter].level) {
 			continue;
 		}
-		if (familiars[iter].ability == NO_ABIL && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
+		if (!abil && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
 			continue;
 		}
 		if (is_abbrev(argument, familiars[iter].name)) {
@@ -839,6 +846,7 @@ ACMD(do_familiar) {
 	
 	charge_ability_cost(ch, MANA, familiars[type].cost, NOTHING, 0, WAIT_SPELL);
 	mob = read_mobile(familiars[type].vnum, TRUE);
+	SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE);
 	if (IS_NPC(ch)) {
 		MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
 	}
@@ -935,7 +943,9 @@ ACMD(do_hasten) {
 		af = create_flag_aff(ATYPE_HASTEN, CHOOSE_BY_ABILITY_LEVEL(durations, ch, ABIL_HASTEN), AFF_HASTE, ch);
 		affect_join(vict, af, 0);
 		
-		gain_ability_exp(ch, ABIL_HASTEN, 15);
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_HASTEN, 15);
+		}
 
 		if (FIGHTING(vict) && !FIGHTING(ch)) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
@@ -951,15 +961,18 @@ ACMD(do_hasten) {
 */
 ACMD(do_heal) {
 	char_data *vict = ch, *ch_iter, *next_ch;
-	bool party = FALSE;
+	bool party = FALSE, will_gain = FALSE;
 	int cost, abil = NO_ABIL, gain = 15, amount, bonus;
 	
 	int heal_levels[] = { 15, 25, 35 };
 	double intel_bonus[] = { 0.5, 1.5, 2.0 };
-	double level_bonus[] = { 0.5, 1.0, 1.5 };
-	double cost_ratio[] = { 0.75, 0.5, 0.25 };	// multiplied by amount healed
+	double base_cost_ratio = 0.75;	// multiplied by amount healed
 	double party_cost = 1.25;
 	double self_cost = 0.75;
+	
+	// Healer ability features
+	double healer_cost_ratio[] = { 0.75, 0.5, 0.25 };	// multiplied by amount healed
+	double healer_level_bonus[] = { 0.5, 1.0, 1.5 };	// times levels over 100
 	
 	one_argument(argument, arg);
 	
@@ -995,6 +1008,10 @@ ACMD(do_heal) {
 		msg_to_char(ch, "Unfortunately you can't heal on someone who is already dead.\r\n");
 		return;
 	}
+	if (!party && is_fight_enemy(ch, vict)) {
+		msg_to_char(ch, "You can't heal an enemy like that.\r\n");
+		return;
+	}
 	
 	// determine cost
 	if (party) {
@@ -1010,7 +1027,10 @@ ACMD(do_heal) {
 	}
 
 	// amount to heal will determine the cost
-	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, abil) + (GET_INTELLIGENCE(ch) * CHOOSE_BY_ABILITY_LEVEL(intel_bonus, ch, abil)) + (MAX(0, get_approximate_level(ch) - 100) * CHOOSE_BY_ABILITY_LEVEL(level_bonus, ch, abil));
+	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, abil) + (GET_INTELLIGENCE(ch) * CHOOSE_BY_ABILITY_LEVEL(intel_bonus, ch, abil));
+	if (has_ability(ch, ABIL_HEALING_BOOST) && check_solo_role(ch)) {
+		amount += (MAX(0, get_approximate_level(ch) - 100) * CHOOSE_BY_ABILITY_LEVEL(healer_level_bonus, ch, abil));
+	}
 	bonus = total_bonus_healing(ch);
 	
 	if (vict && !party) {
@@ -1019,7 +1039,12 @@ ACMD(do_heal) {
 		amount = MAX(1, amount);
 	}
 	
-	cost = amount * CHOOSE_BY_ABILITY_LEVEL(cost_ratio, ch, abil);
+	if (has_ability(ch, ABIL_HEALING_BOOST) && check_solo_role(ch)) {
+		cost = amount * CHOOSE_BY_ABILITY_LEVEL(healer_cost_ratio, ch, abil);
+	}
+	else {
+		cost = amount * base_cost_ratio;
+	}
 	
 	// bonus healing does not add to cost
 	amount += bonus;
@@ -1064,6 +1089,8 @@ ACMD(do_heal) {
 				}
 				
 				report_healing(ch_iter, amount * 0.75, ch);
+				
+				will_gain |= can_gain_exp_from(ch, ch_iter);
 			}
 		}
 	}
@@ -1086,9 +1113,11 @@ ACMD(do_heal) {
 		}
 		
 		report_healing(vict, amount, ch);
+		
+		will_gain = can_gain_exp_from(ch, vict);
 	}
 	
-	if (abil != NO_ABIL) {
+	if (abil != NO_ABIL && will_gain) {
 		gain_ability_exp(ch, abil, gain);
 	}
 }
@@ -1116,6 +1145,9 @@ ACMD(do_moonrise) {
 		else if (IS_NPC(vict)) {
 			msg_to_char(ch, "You can only resurrect players, not NPCs.\r\n");
 		}
+		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
+			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
+		}
 		else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_MOONRISE)) {
 			return;
 		}
@@ -1141,6 +1173,9 @@ ACMD(do_moonrise) {
 		}
 		else if (vict == ch) {
 			msg_to_char(ch, "You can't resurrect your own corpse, that's just silly.\r\n");
+		}
+		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
+			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
 		}
 		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict)) || !IS_CORPSE(corpse)) {
 			// victim has died AGAIN
@@ -1178,11 +1213,17 @@ ACMD(do_purify) {
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (!IS_NPC(vict) && HAS_ABILITY(vict, ABIL_DAYWALKING)) {
+	else if (!IS_NPC(vict) && has_ability(vict, ABIL_DAYWALKING)) {
 		msg_to_char(ch, "The light of your purify spell has no effect on daywalkers.\r\n");
+	}
+	else if (ch != vict && IS_NPC(vict) && IS_VAMPIRE(vict) && MOB_FLAGGED(vict, MOB_HARD | MOB_GROUP)) {
+		msg_to_char(ch, "You cannot purify so powerful a vampire.\r\n");
 	}
 	else if (vict != ch && !IS_NPC(vict) && !PRF_FLAGGED(vict, PRF_BOTHERABLE)) {
 		act("You can't purify someone without permission (ask $M to type NOBOTHER).", FALSE, ch, NULL, vict, TO_CHAR);
+	}
+	else if (ch != vict && AFF_FLAGGED(vict, AFF_IMMUNE_NATURAL_MAGIC)) {
+		msg_to_char(ch, "Your victim is immune to that spell.\r\n");
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_PURIFY)) {
 		return;
@@ -1200,12 +1241,19 @@ ACMD(do_purify) {
 			act("$n holds out $s hands and $s mana washes over $N, purifying $M.", FALSE, ch, NULL, vict, TO_NOTVICT);
 		}
 		
-		if (!IS_NPC(vict) && IS_VAMPIRE(vict)) {
-			un_vampire(vict);
+		if (IS_VAMPIRE(vict)) {
 			msg_to_char(vict, "You feel the power of your blood fade and your vampiric powers vanish.\r\n");
+			if (IS_NPC(vict)) {
+				REMOVE_BIT(MOB_FLAGS(vict), MOB_VAMPIRE);
+			}
+			else {
+				un_vampire(vict);
+			}
 		}
 		
-		gain_ability_exp(ch, ABIL_PURIFY, 50);
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_PURIFY, 50);
+		}
 
 		if (FIGHTING(vict) && !FIGHTING(ch)) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
@@ -1249,9 +1297,12 @@ ACMD(do_rejuvenate) {
 	
 	int heal_levels[] = { 4, 6, 8 };	// x6 ticks (24, 36, 42)
 	double int_mod = 0.3333;
-	double over_level_mod = 1.0/4.0;
 	double bonus_heal_mod = 1.0/4.0;
-	double cost_mod[] = { 2.0, 1.5, 1.1 };
+	double base_cost_mod = 2.0;
+	
+	// healer ability mods
+	double over_level_mod = 1.0/4.0;
+	double healer_cost_mod[] = { 2.0, 1.5, 1.1 };
 	
 	one_argument(argument, arg);
 	
@@ -1265,10 +1316,15 @@ ACMD(do_rejuvenate) {
 	
 	// amount determines cost
 	amount = CHOOSE_BY_ABILITY_LEVEL(heal_levels, ch, ABIL_REJUVENATE);
-	amount += round(MAX(0, get_approximate_level(ch) - 100) * over_level_mod);
 	amount += round(GET_INTELLIGENCE(ch) * int_mod);
+	if (has_ability(ch, ABIL_HEALING_BOOST) && check_solo_role(ch)) {
+		amount += round(MAX(0, get_approximate_level(ch) - 100) * over_level_mod);
+		cost = round(amount * CHOOSE_BY_ABILITY_LEVEL(healer_cost_mod, ch, ABIL_REJUVENATE));
+	}
+	else {
+		cost = round(amount * base_cost_mod);
+	}
 	
-	cost = round(amount * CHOOSE_BY_ABILITY_LEVEL(cost_mod, ch, ABIL_REJUVENATE));
 	cost = MAX(1, cost);
 	
 	// does not affect the cost
@@ -1300,7 +1356,9 @@ ACMD(do_rejuvenate) {
 	af = create_mod_aff(ATYPE_REJUVENATE, 6, APPLY_HEAL_OVER_TIME, amount, ch);
 	affect_join(vict, af, 0);
 	
-	gain_ability_exp(ch, ABIL_REJUVENATE, 15);
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_REJUVENATE, 15);
+	}
 
 	if (FIGHTING(vict) && !FIGHTING(ch)) {
 		engage_combat(ch, FIGHTING(vict), FALSE);
@@ -1331,6 +1389,9 @@ ACMD(do_resurrect) {
 		else if (IS_NPC(vict)) {
 			msg_to_char(ch, "You can only resurrect players, not NPCs.\r\n");
 		}
+		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
+			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
+		}
 		else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_RESURRECT)) {
 			return;
 		}
@@ -1356,6 +1417,9 @@ ACMD(do_resurrect) {
 		}
 		else if (vict == ch) {
 			msg_to_char(ch, "You can't resurrect your own corpse, that's just silly.\r\n");
+		}
+		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
+			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
 		}
 		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict)) || !IS_CORPSE(corpse)) {
 			// victim has died AGAIN
@@ -1430,8 +1494,10 @@ ACMD(do_skybrand) {
 		apply_dot_effect(vict, ATYPE_SKYBRAND, 6, DAM_MAGICAL, get_ability_level(ch, ABIL_SKYBRAND) / 24, 3, ch);
 		engage_combat(ch, vict, FALSE);
 	}
-
-	gain_ability_exp(ch, ABIL_SKYBRAND, 15);
+	
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_SKYBRAND, 15);
+	}
 }
 
 
@@ -1471,7 +1537,9 @@ ACMD(do_soulsight) {
 			
 			show_character_affects(vict, ch);
 		}
-
-		gain_ability_exp(ch, ABIL_SOULSIGHT, 33.4);
+		
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_SOULSIGHT, 33.4);
+		}
 	}
 }

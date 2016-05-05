@@ -4,9 +4,11 @@ a cut of poultry~
 There is a cut of poultry sitting on the ground.~
 You can eat the poultry raw... or cook it.
 ~
-6 0 a
+6 0 a 2
 6 0 0
 7 24
+O
+17 l
 R
 5119 0
 S
@@ -16,9 +18,11 @@ a slab of pork~
 There is a slab of pork sitting on the ground.~
 You can eat the pork raw... or cook it.
 ~
-6 0 a
+6 0 a 2
 6 0 0
 7 24
+O
+17 l
 R
 5119 0
 S

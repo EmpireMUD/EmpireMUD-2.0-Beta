@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.highsorcery.c                               EmpireMUD 2.0b3 *
+*   File: act.highsorcery.c                               EmpireMUD 2.0b4 *
 *  Usage: implementation for high sorcery abilities                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -30,6 +30,7 @@
 *   Data
 *   Helpers
 *   Commands
+*   Chants
 *   Rituals
 *   Study Stuff
 */
@@ -37,6 +38,7 @@
 // external vars
 
 // external funcs
+void scale_item_to_level(obj_data *obj, int level);
 extern bool trigger_counterspell(char_data *ch);	// spells.c
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 
@@ -63,81 +65,6 @@ const struct {
 
 	// this must go last
 	{ NOTHING, 0.0 }
-};
-
-
-// for enchantments:
-#define ENCHANT_LINE_BREAK  { "\t", 0, NO_ABIL,  APPLY_NONE, APPLY_NONE,  { END_RESOURCE_LIST } }
-
-// enchantment flags
-#define ENCH_WEAPON  BIT(0)
-#define ENCH_ARMOR  BIT(1)
-#define ENCH_SHIELD  BIT(2)
-#define ENCH_PACK  BIT(3)
-#define ENCH_OFFHAND  BIT(4)
-
-
-// master enchantment data
-// TODO this could be moved to live data; will need a whole enchantment editor suite -pc
-struct {
-	char *name;
-	bitvector_t flags;
-	int ability;
-	
-	int first_bonus;	// APPLY_x
-	int second_bonus;	// APPLY_x
-		
-	Resource resources[5];
-} enchant_data[] = {
-
-	// weapons
-	{ "striking", ENCH_WEAPON, ABIL_ENCHANT_WEAPONS, APPLY_STRENGTH, APPLY_TO_HIT, { { o_BLOODSTONE, 5 }, END_RESOURCE_LIST } },
-	{ "parry", ENCH_WEAPON, ABIL_ENCHANT_WEAPONS, APPLY_DEXTERITY, APPLY_NONE, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
-	{ "wisdom", ENCH_WEAPON, ABIL_ENCHANT_WEAPONS, APPLY_INTELLIGENCE, APPLY_MANA_REGEN, { { o_GLOWING_SEASHELL, 5 }, END_RESOURCE_LIST } },
-	{ "accuracy", ENCH_WEAPON, ABIL_ENCHANT_WEAPONS, APPLY_TO_HIT, APPLY_NONE, { { o_BLOODSTONE, 5 }, END_RESOURCE_LIST } },
-	{ "awareness", ENCH_WEAPON, ABIL_ENCHANT_WEAPONS, APPLY_WITS, APPLY_TO_HIT, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
-	{ "deflection", ENCH_WEAPON, ABIL_ENCHANT_WEAPONS, APPLY_DODGE, APPLY_BLOCK, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
-
-	
-	ENCHANT_LINE_BREAK,
-	
-	// offhand
-	{ "manaspring", ENCH_OFFHAND, ABIL_ENCHANT_WEAPONS, APPLY_MANA_REGEN, APPLY_MANA, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
-	{ "healing", ENCH_OFFHAND, ABIL_ENCHANT_WEAPONS, APPLY_BONUS_HEALING, APPLY_MANA_REGEN, { { o_GLOWING_SEASHELL, 5 }, END_RESOURCE_LIST } },
-	{ "fury", ENCH_OFFHAND, ABIL_ENCHANT_WEAPONS, APPLY_BONUS_MAGICAL, APPLY_MANA_REGEN, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
-	{ "venom", ENCH_OFFHAND, ABIL_ENCHANT_WEAPONS, APPLY_BONUS_PHYSICAL, APPLY_MOVE_REGEN, { { o_BLOODSTONE, 5 }, END_RESOURCE_LIST } },
-	
-	ENCHANT_LINE_BREAK,
-	
-	// armor
-	{ "health", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_HEALTH, APPLY_NONE, { { o_BLOODSTONE, 5 }, END_RESOURCE_LIST } },
-	{ "mana", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_MANA, APPLY_NONE, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
-	{ "stamina", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_MOVE, APPLY_NONE, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
-	{ "regeneration", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_HEALTH_REGEN, APPLY_NONE, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
-	{ "longrunning", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_MOVE_REGEN, APPLY_NONE, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
-	{ "energy", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_MANA_REGEN, APPLY_NONE, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
-	{ "protection", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_RESIST_PHYSICAL, APPLY_NONE, { { o_GLOWING_SEASHELL, 5 }, END_RESOURCE_LIST } },
-	{ "evasion", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_DODGE, APPLY_NONE, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
-	
-	ENCHANT_LINE_BREAK,
-	
-	{ "rage", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_STRENGTH, APPLY_NONE, { { o_BLOODSTONE, 5 }, END_RESOURCE_LIST } },
-	{ "power", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_INTELLIGENCE, APPLY_NONE, { { o_GLOWING_SEASHELL, 5 }, END_RESOURCE_LIST } },
-	{ "spellwarding", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_RESIST_MAGICAL, APPLY_NONE, { { o_IRIDESCENT_IRIS, 5 }, END_RESOURCE_LIST } },
-	{ "focus", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_TO_HIT, APPLY_NONE, { { o_BLOODSTONE, 5 }, END_RESOURCE_LIST } },
-	{ "acrobatics", ENCH_ARMOR, ABIL_ENCHANT_ARMOR, APPLY_DEXTERITY, APPLY_NONE, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
-	
-	ENCHANT_LINE_BREAK,
-	
-	// shields
-	{ "blocking", ENCH_SHIELD, ABIL_ENCHANT_ARMOR, APPLY_BLOCK, APPLY_NONE, { { o_LIGHTNING_STONE, 5 }, END_RESOURCE_LIST } },
-	
-	ENCHANT_LINE_BREAK,
-	
-	{ "embiggening", ENCH_PACK, ABIL_ENCHANT_TOOLS, APPLY_INVENTORY, APPLY_NONE, { { o_IRIDESCENT_IRIS, 1 }, { o_GLOWING_SEASHELL, 1 }, { o_BLOODSTONE, 1 }, { o_LIGHTNING_STONE, 1 }, END_RESOURCE_LIST } },
-	
-	// END
-	{ "\n", 0, NO_ABIL,  APPLY_NONE, APPLY_NONE,  { END_RESOURCE_LIST } }
 };
 
 
@@ -192,20 +119,33 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation);
 RITUAL_SETUP_FUNC(start_siege_ritual);
 RITUAL_SETUP_FUNC(start_simple_ritual);
 
+// chant prototypes
+RITUAL_FINISH_FUNC(perform_chant_of_druids);
+RITUAL_FINISH_FUNC(perform_chant_of_illusions);
+RITUAL_FINISH_FUNC(perform_chant_of_nature);
+RITUAL_SETUP_FUNC(start_chant_of_druids);
+RITUAL_SETUP_FUNC(start_chant_of_illusions);
+
+
+// SCMD_RITUAL, SCMD_CHANT
+const char *ritual_scmd[] = { "ritual", "chant" };
+const int ritual_action[] = { ACT_RITUAL, ACT_CHANTING };
+
 
 // Ritual data
 // TODO this could all be moved to live data, but would need a lot of support and a custom editor
 struct ritual_data_type {
 	char *name;
 	int cost;
-	int ability;
+	any_vnum ability;
 	bitvector_t flags;
+	int subcmd;
 	RITUAL_SETUP_FUNC(*begin);	// function pointer
 	RITUAL_FINISH_FUNC(*perform);	// function pointer
 	struct ritual_strings strings[24];	// one sent per tick, terminate with MESSAGE_END
 } ritual_data[] = {
 	// 0: ritual of burdens
-	{ "burdens", 5, ABIL_RITUAL_OF_BURDENS, 0,
+	{ "burdens", 5, ABIL_RITUAL_OF_BURDENS, 0, SCMD_RITUAL,
 		start_simple_ritual,
 		perform_ritual_of_burdens,
 		{{ "You whisper your burdens into the air...", "$n whispers $s burdens into the air..." },
@@ -213,7 +153,7 @@ struct ritual_data_type {
 	}},
 	
 	// 1: ritual of teleportation
-	{ "teleportation", 25, ABIL_RITUAL_OF_TELEPORTATION, 0,
+	{ "teleportation", 25, ABIL_RITUAL_OF_TELEPORTATION, 0, SCMD_RITUAL,
 		start_ritual_of_teleportation,
 		perform_ritual_of_teleportation,
 		{{ "You wrap yourself up and begin chanting...", "$n wraps $mself up and begins chanting..." },
@@ -222,7 +162,7 @@ struct ritual_data_type {
 	}},
 	
 	// 2: phoenix rite
-	{ "phoenix", 25, ABIL_PHOENIX_RITE, 0,
+	{ "phoenix", 25, ABIL_PHOENIX_RITE, 0, SCMD_RITUAL,
 		start_simple_ritual,
 		perform_phoenix_rite,
 		{{ "You light some candles and begin the Phoenix Rite.", "$n lights some candles." },
@@ -235,7 +175,7 @@ struct ritual_data_type {
 	}},
 	
 	// 3: ritual of defense
-	{ "defense", 15, ABIL_RITUAL_OF_DEFENSE, 0,
+	{ "defense", 15, ABIL_RITUAL_OF_DEFENSE, 0, SCMD_RITUAL,
 		start_ritual_of_defense,
 		perform_ritual_of_defense,
 		{{ "You begin the incantation for the Ritual of Defense.", "\t" },
@@ -247,7 +187,7 @@ struct ritual_data_type {
 	}},
 	
 	// 4: sense life ritual
-	{ "senselife", 15, ABIL_SENSE_LIFE_RITUAL, 0,
+	{ "senselife", 15, ABIL_SENSE_LIFE_RITUAL, 0, SCMD_RITUAL,
 		start_simple_ritual,
 		perform_sense_life_ritual,
 		{{ "You murmur the words to the Sense Life Ritual...", "$n murmurs some arcane words..." },
@@ -255,7 +195,7 @@ struct ritual_data_type {
 	}},
 	
 	// 5: ritual of detection
-	{ "detection", 15, ABIL_RITUAL_OF_DETECTION, 0,
+	{ "detection", 15, ABIL_RITUAL_OF_DETECTION, 0, SCMD_RITUAL,
 		start_ritual_of_detection,
 		perform_ritual_of_detection,
 		{{ "You pull a piece of chalk from your pocket and begin drawing circles on the ground.", "$n pulls out a piece of chalk and begins drawing circles on the ground." },
@@ -267,22 +207,22 @@ struct ritual_data_type {
 	}},
 	
 	// 6: siege ritual
-	{ "siege", 30, ABIL_SIEGE_RITUAL, 0,
+	{ "siege", 30, ABIL_SIEGE_RITUAL, 0, SCMD_RITUAL,
 		start_siege_ritual,
 		perform_siege_ritual,
-		{{ "You summon the full force of your magic...", "$n begins drawing mana to $mself..." },
+		{{ "You draw mana to yourself...", "$n begins drawing mana to $mself..." },
 		NO_MESSAGE,
-		{ "You shoot a fireball at the building...", "$n shoots a fireball at the building..." },
+		{ "You concentrate your power into a ball of fire...", "$n concentrates $s power into a fireball..." },
 		NO_MESSAGE,
-		{ "You draw more mana...", "$n draws more mana..." },
+		{ "You summon the full force of your magic...", "$n draws more mana..." },
 		NO_MESSAGE,
-		{ "You shoot a fireball at the building...", "$n shoots a fireball at the building..." },
+		{ "You twist and grow the ball of fire in your hands...", "$n twists and grows the ball of fire in $s hands..." },
 		NO_MESSAGE,
 		MESSAGE_END
 	}},
 	
 	// 7: devastation ritual
-	{ "devastation", 15, ABIL_DEVASTATION_RITUAL, 0,
+	{ "devastation", 15, ABIL_DEVASTATION_RITUAL, 0, SCMD_RITUAL,
 		start_devastation_ritual,
 		perform_devastation_ritual,
 		{{ "You plant your staff hard into the ground and begin focusing mana...", "$n plants $s staff hard into the ground and begins drawing mana toward $mself..." },
@@ -292,43 +232,70 @@ struct ritual_data_type {
 		MESSAGE_END
 	}},
 	
-	{ "\n", 0, NO_ABIL, 0, NULL, NULL, { MESSAGE_END } },
+	// 8: chant of druids
+	{ "druids", 0, NO_ABIL, 0, SCMD_CHANT,
+		start_chant_of_druids,
+		perform_chant_of_druids,
+		{{ "You start the chant of druids...", "$n starts the chant of druids..." },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+		MESSAGE_END
+	}},
+	
+	// 9: chant of nature
+	{ "nature", 0, ABIL_CHANT_OF_NATURE, 0, SCMD_CHANT,
+		start_simple_ritual,
+		perform_chant_of_nature,
+		{{ "You start the chant of nature...", "$n starts the chant of nature..." },
+		{ "You chant, 'Chant of nature placeholder text.'", "$n chants, 'Chant of nature placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of nature placeholder text.'", "$n chants, 'Chant of nature placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of nature placeholder text.'", "$n chants, 'Chant of nature placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of nature placeholder text.'", "$n chants, 'Chant of nature placeholder text.'" },
+		NO_MESSAGE,
+		MESSAGE_END
+	}},
+	
+	// 10: chant of illusions
+	{ "illusions", 0, ABIL_CHANT_OF_ILLUSIONS, 0, SCMD_CHANT,
+		start_chant_of_illusions,
+		perform_chant_of_illusions,
+		{{ "You start the chant of illusions...", "$n starts the chant of illusions..." },
+		{ "You chant, 'Chant of illusions placeholder text.'", "$n chants, 'Chant of illusions placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of illusions placeholder text.'", "$n chants, 'Chant of illusions placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of illusions placeholder text.'", "$n chants, 'Chant of illusions placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of illusions placeholder text.'", "$n chants, 'Chant of illusions placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of illusions placeholder text.'", "$n chants, 'Chant of illusions placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of illusions placeholder text.'", "$n chants, 'Chant of illusions placeholder text.'" },
+		NO_MESSAGE,
+		{ "You chant, 'Chant of illusions placeholder text.'", "$n chants, 'Chant of illusions placeholder text.'" },
+		NO_MESSAGE,
+		MESSAGE_END
+	}},
+	
+	{ "\n", 0, NO_ABIL, 0, 0, NULL, NULL, { MESSAGE_END } },
 };
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
-
-/**
-* @param obj_data *obj
-* @param int type enchant_data pos
-* @return TRUE if the enchantment could apply to the object
-*/
-bool can_be_enchanted(obj_data *obj, int type) {
-	if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) <= 0) {
-		// unscaled items cannot be enchanted
-		return FALSE;
-	}
-	if (IS_SET(enchant_data[type].flags, ENCH_WEAPON) && IS_WEAPON(obj)) {
-		return TRUE;
-	}
-	if (IS_SET(enchant_data[type].flags, ENCH_ARMOR) && IS_ARMOR(obj) && CAN_WEAR(obj, ITEM_WEAR_ARMOR)) {
-		return TRUE;
-	}
-	if (IS_SET(enchant_data[type].flags, ENCH_SHIELD) && IS_SHIELD(obj)) {
-		return TRUE;
-	}
-	if (IS_SET(enchant_data[type].flags, ENCH_PACK) && IS_PACK(obj)) {
-		return TRUE;
-	}
-	if (IS_SET(enchant_data[type].flags, ENCH_OFFHAND) && CAN_WEAR(obj, ITEM_WEAR_HOLD)) {
-		return TRUE;
-	}
-	
-	// Nope.
-	return FALSE;
-}
-
 
 /**
 * @param char_data *ch The player trying to perform a ritual.
@@ -338,23 +305,17 @@ bool can_use_ritual(char_data *ch, int ritual) {
 	if (IS_NPC(ch)) {
 		return FALSE;
 	}
-	if (ritual_data[ritual].ability != NO_ABIL && !HAS_ABILITY(ch, ritual_data[ritual].ability)) {
+	if (ritual_data[ritual].ability != NO_ABIL && !has_ability(ch, ritual_data[ritual].ability)) {
 		return FALSE;
 	}
-	
-//	if (IS_SET(ritual_data[ritual].flags, RIT_HENGE) && (!IS_COMPLETE(IN_ROOM(ch)) || BUILDING_VNUM(IN_ROOM(ch)) != BUILDING_HENGE)) {
-//		return FALSE;
-//	}
-	
+		
 	return TRUE;
 }
 
 
 // for devastation_ritual
-INTERACTION_FUNC(devastate_crop) {
-	void scale_item_to_level(obj_data *obj, int level);
-	
-	crop_data *cp = crop_proto(ROOM_CROP_TYPE(inter_room));
+INTERACTION_FUNC(devastate_crop) {	
+	crop_data *cp = ROOM_CROP(inter_room);
 	obj_data *newobj;
 	int num;
 
@@ -370,9 +331,32 @@ INTERACTION_FUNC(devastate_crop) {
 		load_otrigger(newobj);
 	}
 	
-	// additional tree if orchard
-	if (ROOM_CROP_FLAGGED(inter_room, CROPF_IS_ORCHARD)) {
-		obj_to_char_or_room((newobj = read_object(o_TREE, TRUE)), ch);
+	return TRUE;
+}
+
+
+// for devastation_ritual
+INTERACTION_FUNC(devastate_trees) {
+	char buf[MAX_STRING_LENGTH], type[MAX_STRING_LENGTH];
+	obj_data *newobj;
+	int num;
+	
+	snprintf(type, sizeof(type), GET_SECT_NAME(SECT(inter_room)));
+	strtolower(type);
+	
+	if (interaction->quantity != 1) {
+		snprintf(buf, sizeof(buf), "You devastate the %s and collect %s (x%d)!", type, get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+	}
+	else {
+		snprintf(buf, sizeof(buf), "You devastate the %s and collect %s!", type, get_obj_name_by_proto(interaction->vnum));
+	}
+	act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
+	
+	snprintf(buf, sizeof(buf), "$n's powerful ritual devastates the %s!", type);
+	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
+	
+	for (num = 0; num < interaction->quantity; ++num) {
+		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
 		scale_item_to_level(newobj, 1);	// minimum level
 		load_otrigger(newobj);
 	}
@@ -382,31 +366,23 @@ INTERACTION_FUNC(devastate_crop) {
 
 
 /**
-* Name matching for enchantments, preferring exact matches first.
-*
-* @param char_data *ch the player, to check abilities
-* @param char *name enchantment name to find
-* @return int enchant_data position, or NOTHING for not found
+* @param char_data *ch The enchanter.
+* @param int max_scale Optional: The highest scale level it will use (0 = no max)
+* @return double The number of scale points available for an enchantment at that level.
 */
-int find_enchant_by_name(char_data *ch, char *name) {
-	int iter, exact = NOTHING, partial = NOTHING;
+double get_enchant_scale_for_char(char_data *ch, int max_scale) {
+	extern int get_crafting_level(char_data *ch);
 	
-	for (iter = 0; *enchant_data[iter].name != '\n' && exact == NOTHING; ++iter) {
-		if ((enchant_data[iter].ability == NO_ABIL || HAS_ABILITY(ch, enchant_data[iter].ability))) {
-			if (!str_cmp(name, enchant_data[iter].name)) {
-				exact = iter;
-			}
-			else if (is_abbrev(name, enchant_data[iter].name)) {
-				partial = iter;
-			}
-		}
+	double points_available;
+	int level;
+
+	// enchant scale level is whichever is less: obj scale level, or player crafting level
+	level = MAX(get_crafting_level(ch), get_approximate_level(ch));
+	if (max_scale > 0) {
+		level = MIN(max_scale, level);
 	}
-	
-	if (exact == NOTHING) {
-		exact = partial;
-	}
-	
-	return exact;
+	points_available = level / 100.0 * config_get_double("enchant_points_at_100");
+	return MAX(points_available, 1.0);
 }
 
 
@@ -470,7 +446,7 @@ void start_ritual(char_data *ch, int ritual) {
 	// first message
 	send_ritual_messages(ch, ritual, 0);
 	
-	start_action(ch, ACT_RITUAL, 0);
+	start_action(ch, ritual_action[ritual_data[ritual].subcmd], 0);
 	GET_ACTION_VNUM(ch, 0) = ritual;
 }
 
@@ -720,13 +696,16 @@ ACMD(do_colorburst) {
 
 		engage_combat(ch, vict, FALSE);
 	}
-
-	gain_ability_exp(ch, ABIL_COLORBURST, 15);
+	
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_COLORBURST, 15);
+	}
 }
 
 
 ACMD(do_disenchant) {
-	obj_data *obj, *reward, *proto;
+	struct obj_apply *apply, *next_apply, *temp;
+	obj_data *obj, *reward;
 	int iter, prc, rnd;
 	obj_vnum vnum = NOTHING;
 	int cost = 5;
@@ -754,18 +733,12 @@ ACMD(do_disenchant) {
 	else {
 		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
 		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_ENCHANTED | OBJ_SUPERIOR);
-		proto = obj_proto(GET_OBJ_VNUM(obj));
 		
-		for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-			if (!proto || OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
-				// if the protype is enchanted, remove them all
-				obj->affected[iter].location = 0;
-				obj->affected[iter].modifier = 0;
-			}
-			else {
-				// otherwise just match the proto
-				obj->affected[iter].location = proto->affected[iter].location;
-				obj->affected[iter].modifier = proto->affected[iter].modifier;
+		for (apply = GET_OBJ_APPLIES(obj); apply; apply = next_apply) {
+			next_apply = apply->next;
+			if (apply->apply_type == APPLY_TYPE_ENCHANTMENT) {
+				REMOVE_FROM_LIST(apply, GET_OBJ_APPLIES(obj), next);
+				free(apply);
 			}
 		}
 		
@@ -786,7 +759,7 @@ ACMD(do_disenchant) {
 		
 			if (vnum != NOTHING) {
 				reward = read_object(vnum, TRUE);
-				obj_to_char_or_room(reward, ch);
+				obj_to_char(reward, ch);
 				act("You manage to weave the freed mana into $p!", FALSE, ch, reward, NULL, TO_CHAR);
 				act("$n weaves the freed mana into $p!", TRUE, ch, reward, NULL, TO_ROOM);
 				load_otrigger(reward);
@@ -853,144 +826,13 @@ ACMD(do_dispel) {
 			}
 		}
 		
-		gain_ability_exp(ch, ABIL_DISPEL, 33.4);
+		if (can_gain_exp_from(ch, vict)) {
+			gain_ability_exp(ch, ABIL_DISPEL, 33.4);
+		}
 
 		if (FIGHTING(vict) && !FIGHTING(ch)) {
 			engage_combat(ch, FIGHTING(vict), FALSE);
 		}
-	}
-}
-
-
-ACMD(do_enchant) {
-	extern int get_crafting_level(char_data *ch);
-	extern const double apply_values[];
-	
-	char arg2[MAX_INPUT_LENGTH];
-	obj_data *obj;
-	int iter, type, scale, charlevel;
-	bool found, line, first;		
-	double points_available, first_points = 0.0, second_points = 0.0;
-
-	double enchant_points_at_100 = config_get_double("enchant_points_at_100");
-	
-	two_arguments(argument, arg, arg2);
-	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs can't enchant.\r\n");
-	}
-	else if (!*arg || !*arg2) {
-		msg_to_char(ch, "Usage: enchant <item> <type>\r\nYou know how to enchant:\r\n");
-		
-		line = FALSE;
-		for (iter = 0; *enchant_data[iter].name != '\n'; ++iter) {			
-			if (*enchant_data[iter].name == '\t') {
-				if (line) {
-					msg_to_char(ch, "\r\n");
-					line = FALSE;
-				}
-			}
-			else if (enchant_data[iter].ability == NO_ABIL || HAS_ABILITY(ch, enchant_data[iter].ability)) {
-				msg_to_char(ch, "%s%s", line ? ", " : "  ", enchant_data[iter].name);
-				found = line = TRUE;
-			}
-		}
-		
-		if (line) {
-			msg_to_char(ch, "\r\n");
-		}
-		if (!found) {
-			msg_to_char(ch, "  nothing\r\n");
-		}
-		// end !*arg
-	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
-		msg_to_char(ch, "You don't seem to have any %s.\r\n", arg);
-	}
-	else if ((type = find_enchant_by_name(ch, arg2)) == NOTHING) {
-		msg_to_char(ch, "You don't know that enchantment.\r\n");
-	}
-	else if (enchant_data[type].ability != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, obj, enchant_data[type].ability)) {
-		return;
-	}
-	else if (OBJ_FLAGGED(obj, OBJ_ENCHANTED)) {
-		msg_to_char(ch, "You cannot enchant an item that has already been enchanted.\r\n");
-	}
-	else if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) <= 0) {
-		// always forbidden
-		msg_to_char(ch, "That item cannot be enchanted.\r\n");
-	}
-	else if (!can_be_enchanted(obj, type)) {
-		msg_to_char(ch, "You can't place that enchantment on that object.\r\n");
-	}
-	else if (!has_resources(ch, enchant_data[type].resources, FALSE, TRUE)) {
-		// sends its own messages
-	}
-	else {
-		extract_resources(ch, enchant_data[type].resources, FALSE);
-		
-		// enchant scale level is whichever is less: obj scale level, or player crafting level
-		charlevel = MAX(get_crafting_level(ch), get_approximate_level(ch));
-		scale = MIN(GET_OBJ_CURRENT_SCALE_LEVEL(obj), charlevel);
-		points_available = MAX(1.0, scale / 100.0 * enchant_points_at_100);
-		
-		if (HAS_ABILITY(ch, ABIL_GREATER_ENCHANTMENTS)) {
-			points_available *= config_get_double("greater_enchantments_bonus");
-		}
-		
-		// split the points
-		if (enchant_data[type].second_bonus != APPLY_NONE) {
-			first_points = points_available * 0.6666;
-			second_points = points_available * 0.3333;
-		}
-		else {
-			// only one apply
-			first_points = points_available;
-			second_points = 0.0;
-		}
-
-		first = TRUE;
-		
-		// find free applies to use
-		for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-			if (obj->affected[iter].location == APPLY_NONE) {
-				if (first) {
-					// always get at least 1 from first bonus
-					int value = MAX(1, round(first_points * (1.0 / apply_values[enchant_data[type].first_bonus])));
-					
-					obj->affected[iter].location = enchant_data[type].first_bonus;
-					obj->affected[iter].modifier = value;
-					first = FALSE;
-				}
-				else if (enchant_data[type].second_bonus != APPLY_NONE) {
-					int value = round(second_points * (1.0 / apply_values[enchant_data[type].second_bonus]));
-					
-					// only bother if any points to give
-					if (value > 0) {
-						obj->affected[iter].location = enchant_data[type].second_bonus;
-						obj->affected[iter].modifier = value;
-					}
-					// second apply done
-					break;
-				}
-			}
-		}
-		
-		// set enchanted bit
-		SET_BIT(GET_OBJ_EXTRA(obj), OBJ_ENCHANTED);
-
-		sprintf(buf, "You infuse $p with the %s enchantment.", enchant_data[type].name);
-		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
-		
-		sprintf(buf, "$n infuses $p with the %s enchantment.", enchant_data[type].name);
-		act(buf, FALSE, ch, obj, NULL, TO_ROOM);
-				
-		if (enchant_data[type].ability != NO_ABIL) {
-			gain_ability_exp(ch, enchant_data[type].ability, 50);
-		}
-		gain_ability_exp(ch, ABIL_GREATER_ENCHANTMENTS, 50);
-		
-		command_lag(ch, WAIT_ABILITY);
 	}
 }
 
@@ -1057,8 +899,10 @@ ACMD(do_enervate) {
 
 		engage_combat(ch, vict, FALSE);
 	}
-
-	gain_ability_exp(ch, ABIL_ENERVATE, 15);
+	
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_ENERVATE, 15);
+	}
 }
 
 
@@ -1240,21 +1084,22 @@ ACMD(do_mirrorimage) {
 
 
 ACMD(do_ritual) {
-	char arg2[MAX_INPUT_LENGTH];
+	char arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	int iter, rit = NOTHING;
 	bool found, result = FALSE;
 	
 	half_chop(argument, arg, arg2);
 	
 	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot perform rituals.\r\n");
+		msg_to_char(ch, "NPCs cannot perform %ss.\r\n", ritual_scmd[subcmd]);
 		return;
 	}
 	
 	// just ending
-	if (GET_ACTION(ch) == ACT_RITUAL) {
-		msg_to_char(ch, "You stop the ritual.\r\n");
-		act("$n stops the ritual.", FALSE, ch, NULL, NULL, TO_ROOM);
+	if (GET_ACTION(ch) == ACT_RITUAL || GET_ACTION(ch) == ACT_CHANTING) {
+		msg_to_char(ch, "You stop the %s.\r\n", ritual_scmd[subcmd]);
+		sprintf(buf, "$n stops the %s.", ritual_scmd[subcmd]);
+		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		cancel_action(ch);
 		return;
 	}
@@ -1265,11 +1110,11 @@ ACMD(do_ritual) {
 	
 	// list rituals
 	if (!*arg) {
-		msg_to_char(ch, "You can perform the following rituals:");
+		msg_to_char(ch, "You can perform the following %ss:", ritual_scmd[subcmd]);
 		
 		found = FALSE;
 		for (iter = 0; *ritual_data[iter].name != '\n'; ++iter) {
-			if (can_use_ritual(ch, iter)) {
+			if (ritual_data[iter].subcmd == subcmd && can_use_ritual(ch, iter)) {
 				msg_to_char(ch, "%s%s", (found ? ", " : " "), ritual_data[iter].name);
 				found = TRUE;
 			}
@@ -1287,14 +1132,14 @@ ACMD(do_ritual) {
 	// find ritual
 	found = FALSE;
 	for (iter = 0; *ritual_data[iter].name != '\n' && rit == NOTHING; ++iter) {
-		if (can_use_ritual(ch, iter) && is_abbrev(arg, ritual_data[iter].name)) {
+		if (ritual_data[iter].subcmd == subcmd && can_use_ritual(ch, iter) && is_abbrev(arg, ritual_data[iter].name)) {
 			found = TRUE;
 			rit = iter;
 		}
 	}
 	
 	if (!found) {
-		msg_to_char(ch, "You don't know that ritual.\r\n");
+		msg_to_char(ch, "You don't know that %s.\r\n", ritual_scmd[subcmd]);
 		return;
 	}
 	
@@ -1304,7 +1149,7 @@ ACMD(do_ritual) {
 	}
 	
 	if (GET_MANA(ch) < ritual_data[rit].cost) {
-		msg_to_char(ch, "You need %d mana to perform that ritual.\r\n", ritual_data[rit].cost);
+		msg_to_char(ch, "You need %d mana to perform that %s.\r\n", ritual_data[rit].cost, ritual_scmd[subcmd]);
 		return;
 	}
 	
@@ -1312,7 +1157,7 @@ ACMD(do_ritual) {
 		result = (ritual_data[rit].begin)(ch, arg2, rit);
 	}
 	else {
-		msg_to_char(ch, "That ritual is not implemented.\r\n");
+		msg_to_char(ch, "That %s is not implemented.\r\n", ritual_scmd[subcmd]);
 	}
 	
 	if (result) {
@@ -1393,8 +1238,10 @@ ACMD(do_siphon) {
 
 		engage_combat(ch, vict, FALSE);
 	}
-
-	gain_ability_exp(ch, ABIL_SIPHON, 15);
+	
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_SIPHON, 15);
+	}
 }
 
 
@@ -1458,8 +1305,10 @@ ACMD(do_slow) {
 
 		engage_combat(ch, vict, FALSE);
 	}
-
-	gain_ability_exp(ch, ABIL_SLOW, 15);
+	
+	if (can_gain_exp_from(ch, vict)) {
+		gain_ability_exp(ch, ABIL_SLOW, 15);
+	}
 }
 
 
@@ -1545,6 +1394,116 @@ ACMD(do_vigor) {
 
 
  ///////////////////////////////////////////////////////////////////////////////
+//// CHANTS ///////////////////////////////////////////////////////////////////
+
+RITUAL_SETUP_FUNC(start_chant_of_druids) {
+	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_HENGE)) {
+		msg_to_char(ch, "You can't perform the chant of druids unless you are at a henge.\r\n");
+		return FALSE;
+	}
+	if (!IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "You need to finish it before you can perform the chant of druids.\r\n");
+		return FALSE;
+	}
+	
+	// OK
+	start_ritual(ch, ritual);
+	return TRUE;
+}
+
+RITUAL_FINISH_FUNC(perform_chant_of_druids) {
+	if (CAN_GAIN_NEW_SKILLS(ch) && get_skill_level(ch, SKILL_NATURAL_MAGIC) == 0 && noskill_ok(ch, SKILL_NATURAL_MAGIC) && HAS_FUNCTION(IN_ROOM(ch), FNC_HENGE) && IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "&gAs you finish the chant, you begin to see the weave of mana through nature...&0\r\n");
+		set_skill(ch, SKILL_NATURAL_MAGIC, 1);
+		SAVE_CHAR(ch);
+	}
+	else {
+		msg_to_char(ch, "You have finished the chant.\r\n");
+	}
+}
+
+
+RITUAL_SETUP_FUNC(start_chant_of_illusions) {
+	static struct resource_data *illusion_res = NULL;
+	if (!illusion_res) {
+		add_to_resource_list(&illusion_res, RES_OBJECT, o_NOCTURNIUM_SPIKE, 1, 0);
+		add_to_resource_list(&illusion_res, RES_OBJECT, o_IRIDESCENT_IRIS, 1, 0);
+	}
+	
+	if (!IS_ROAD(IN_ROOM(ch)) || !IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't perform the chant of illusions here.\r\n");
+		return FALSE;
+	}
+	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
+		msg_to_char(ch, "You don't have permission to perform that chant here.\r\n");
+		return FALSE;
+	}
+	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_CHAMELEON)) {
+		msg_to_char(ch, "This road is already cloaked in illusion.\r\n");
+		return FALSE;
+	}
+	if (!has_resources(ch, illusion_res, TRUE, TRUE)) {
+		// message sent by has_resources
+		return FALSE;
+	}
+	
+	// OK
+	extract_resources(ch, illusion_res, TRUE, NULL);
+	start_ritual(ch, ritual);
+	return TRUE;
+}
+
+RITUAL_FINISH_FUNC(perform_chant_of_illusions) {
+	if (!IS_ROAD(IN_ROOM(ch)) || !IS_COMPLETE(IN_ROOM(ch)) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
+		msg_to_char(ch, "You finish the chant, but it has no effect.\r\n");
+		return;
+	}
+	
+	SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_CHAMELEON);
+	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_CHAMELEON);
+	msg_to_char(ch, "As you finish the chant, the road is cloaked in illusion!\r\n");
+}
+
+
+RITUAL_FINISH_FUNC(perform_chant_of_nature) {
+	sector_data *new_sect, *preserve;
+	struct evolution_data *evo;
+	
+	// percentage is checked in the evolution data
+	if ((evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_MAGIC_GROWTH))) {
+		new_sect = sector_proto(evo->becomes);
+		preserve = (BASE_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) ? BASE_SECT(IN_ROOM(ch)) : NULL;
+		
+		// messaging based on whether or not it's choppable
+		if (new_sect && has_evolution_type(new_sect, EVO_CHOPPED_DOWN)) {
+			msg_to_char(ch, "As you chant, a mighty tree springs from the ground!\r\n");
+			act("As $n chants, a mighty tree springs from the ground!", FALSE, ch, NULL, NULL, TO_ROOM);
+		}
+		else {
+			msg_to_char(ch, "As you chant, the plants around you grow with amazing speed!\r\n");
+			act("As $n chants, the plants around $m grow with amazing speed!", FALSE, ch, NULL, NULL, TO_ROOM);
+		}
+		
+		change_terrain(IN_ROOM(ch), evo->becomes);
+		if (preserve) {
+			change_base_sector(IN_ROOM(ch), preserve);
+		}
+		
+		remove_depletion(IN_ROOM(ch), DPLTN_PICK);
+		remove_depletion(IN_ROOM(ch), DPLTN_FORAGE);
+		
+		gain_ability_exp(ch, ABIL_CHANT_OF_NATURE, 20);
+	}
+	else {
+		gain_ability_exp(ch, ABIL_CHANT_OF_NATURE, 0.5);
+	}
+	
+	// restart it automatically
+	start_ritual(ch, ritual);
+}
+
+
+ ///////////////////////////////////////////////////////////////////////////////
 //// RITUALS //////////////////////////////////////////////////////////////////
 
 
@@ -1586,7 +1545,7 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 		subtype = NOWHERE;
 	}
 	else if (!str_cmp(argument, "home")) {
-		HASH_ITER(world_hh, world_table, room, next_room) {
+		HASH_ITER(hh, world_table, room, next_room) {
 			if (ROOM_PRIVATE_OWNER(room) == GET_IDNUM(ch)) {
 				to_room = room;
 				break;
@@ -1609,7 +1568,7 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 			subtype = GET_ROOM_VNUM(to_room);
 		}
 	}
-	else if (HAS_ABILITY(ch, ABIL_CITY_TELEPORTATION) && (city = find_city_by_name(GET_LOYALTY(ch), argument))) {
+	else if (has_ability(ch, ABIL_CITY_TELEPORTATION) && (city = find_city_by_name(GET_LOYALTY(ch), argument))) {
 		subtype = GET_ROOM_VNUM(city->location);
 		
 		if (get_cooldown_time(ch, COOLDOWN_TELEPORT_CITY) > 0) {
@@ -1662,6 +1621,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 	else {
 		act("$n vanishes in a brilliant flash of light!", FALSE, ch, NULL, NULL, TO_ROOM);
 		char_to_room(ch, to_room);
+		qt_visit_room(ch, IN_ROOM(ch));
 		look_at_room_by_loc(ch, IN_ROOM(ch), NOBITS);
 		act("$n appears with a brilliant flash of light!", FALSE, ch, NULL, NULL, TO_ROOM);
 	
@@ -1678,6 +1638,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 		entry_memory_mtrigger(ch);
 		greet_mtrigger(ch, NO_DIR);
 		greet_memory_mtrigger(ch);
+		greet_vtrigger(ch, NO_DIR);
 	
 		gain_ability_exp(ch, ABIL_RITUAL_OF_TELEPORTATION, 50);
 	
@@ -1706,8 +1667,13 @@ RITUAL_FINISH_FUNC(perform_phoenix_rite) {
 
 
 RITUAL_SETUP_FUNC(start_ritual_of_defense) {
-	Resource defense_res[3] = { { o_IMPERIUM_SPIKE, 1 }, { o_BLOODSTONE, 1 }, END_RESOURCE_LIST };
+	static struct resource_data *defense_res = NULL;
 	bool found = FALSE;
+	
+	if (!defense_res) {
+		add_to_resource_list(&defense_res, RES_OBJECT, o_IMPERIUM_SPIKE, 1, 0);
+		add_to_resource_list(&defense_res, RES_OBJECT, o_BLOODSTONE, 1, 0);
+	}
 	
 	// valid sects
 	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER)) {
@@ -1724,13 +1690,18 @@ RITUAL_SETUP_FUNC(start_ritual_of_defense) {
 		return FALSE;
 	}
 	
+	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_FLY)) {
+		msg_to_char(ch, "The ritual has already been performed here.\r\n");
+		return FALSE;
+	}
+	
 	if (!has_resources(ch, defense_res, TRUE, TRUE)) {
 		// message sent by has_resources
 		return FALSE;
 	}
 	
 	// OK: take resources
-	extract_resources(ch, defense_res, TRUE);
+	extract_resources(ch, defense_res, TRUE, NULL);
 	start_ritual(ch, ritual);
 	return TRUE;
 }
@@ -1831,95 +1802,105 @@ RITUAL_FINISH_FUNC(perform_ritual_of_detection) {
 
 
 RITUAL_SETUP_FUNC(start_siege_ritual) {
-	struct empire_political_data *emp_pol = NULL;
-	room_data *to_room;
-	empire_data *enemy;
+	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
+	
+	vehicle_data *veh_targ;
+	room_data *room_targ;
 	int dir;
 	
 	if (!*argument) {
-		msg_to_char(ch, "Besiege which direction?\r\n");
-		return FALSE;
+		msg_to_char(ch, "Besiege which direction or vehicle?\r\n");
 	}
-	if ((dir = parse_direction(ch, argument)) == NO_DIR) {
-		msg_to_char(ch, "Which direction is that?\r\n");
-		return FALSE;
+	else if (!find_siege_target_for_vehicle(ch, NULL, argument, &room_targ, &dir, &veh_targ)) {
+		// sends own messages
 	}
-	if (ROOM_IS_CLOSED(IN_ROOM(ch))) {
-		msg_to_char(ch, "You must be outdoors to do this.\r\n");
-		return FALSE;
-	}
-	
-	to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]);
-	if (dir >= NUM_2D_DIRS || !to_room || to_room == IN_ROOM(ch)) {
-		msg_to_char(ch, "You can't besiege that direction.\r\n");
-		return FALSE;
-	}
-	if (!ROOM_IS_CLOSED(to_room) && !IS_MAP_BUILDING(to_room)) {
-		msg_to_char(ch, "The Siege Ritual can only be used to destroy completed buildings.\r\n");
-		return FALSE;
-	}
-	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER)) {
-		msg_to_char(ch, "You can't perform the ritual this close to the barrier.\r\n");
-		return FALSE;
-	}
-	if (IS_CITY_CENTER(to_room)) {
-		msg_to_char(ch, "You can't besiege at a city center.\r\n");
-		return FALSE;
-	}
-	if (ROOM_SECT_FLAGGED(to_room, SECTF_START_LOCATION)) {
-		msg_to_char(ch, "You can't besiege a starting location.\r\n");
-		return FALSE;
-	}
-	
-	if ((enemy = ROOM_OWNER(to_room))) {
-		emp_pol = find_relation(GET_LOYALTY(ch), enemy);
-	}
-	if (enemy && (!emp_pol || !IS_SET(emp_pol->type, DIPL_WAR))) {
-		msg_to_char(ch, "You can't besiege that tile!\r\n");
-		return FALSE;
-	}
+	else {
+		// ready:
 
-	// ready:
-
-	// trigger hostile immediately so they are attackable
-	if (enemy && GET_LOYALTY(ch) != enemy) {
-		trigger_distrust_from_hostile(ch, enemy);
+		// trigger hostile immediately so they are attackable
+		if (room_targ && ROOM_OWNER(room_targ) && ROOM_OWNER(room_targ) != GET_LOYALTY(ch)) {
+			trigger_distrust_from_hostile(ch, ROOM_OWNER(room_targ));
+		}
+		if (veh_targ && VEH_OWNER(veh_targ) && VEH_OWNER(veh_targ) != GET_LOYALTY(ch)) {
+			trigger_distrust_from_hostile(ch, VEH_OWNER(veh_targ));
+		}
+	
+		start_ritual(ch, ritual);
+		// action 0 is ritual #
+		GET_ACTION_VNUM(ch, 1) = room_targ ? GET_ROOM_VNUM(room_targ) : NOTHING;
+		GET_ACTION_VNUM(ch, 2) = veh_targ ? GET_ID(veh_targ) : NOTHING;
+		return TRUE;
 	}
 	
-	start_ritual(ch, ritual);
-	GET_ACTION_VNUM(ch, 1) = GET_ROOM_VNUM(to_room);	// action 0 is ritual #
-	return TRUE;
+	return FALSE;
 }
 
 
 RITUAL_FINISH_FUNC(perform_siege_ritual) {
 	void besiege_room(room_data *to_room, int damage);
+	bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
+	extern vehicle_data *find_vehicle(int n);
+	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
+	extern bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *target);
 	
+	vehicle_data *veh_targ = NULL;
+	room_data *room_targ = NULL;
 	sector_data *secttype;
-	room_data *to_room = real_room(GET_ACTION_VNUM(ch, 1));
+	int dam;
 	
-	if (!to_room) {
+	// get the target back
+	if (GET_ACTION_VNUM(ch, 1) != NOTHING) {
+		room_targ = real_room(GET_ACTION_VNUM(ch, 1));
+	}
+	else if (GET_ACTION_VNUM(ch, 2) != NOTHING) {
+		veh_targ = find_vehicle(GET_ACTION_VNUM(ch, 2));
+		if (veh_targ && IN_ROOM(veh_targ) != IN_ROOM(ch)) {
+			// must not really be valid
+			veh_targ = NULL;
+		}
+	}
+	
+	if (!room_targ && !veh_targ) {
 		msg_to_char(ch, "You don't seem to have a valid target, and the ritual fails.\r\n");
+	}
+	else if (room_targ && !validate_siege_target_room(ch, NULL, room_targ)) {
+		// sends own message
+	}
+	else if (veh_targ && !validate_siege_target_vehicle(ch, NULL, veh_targ)) {
+		// sends own message
 	}
 	else {
 		if (SHOULD_APPEAR(ch)) {
 			appear(ch);
 		}
 		
-		secttype = SECT(to_room);
-		msg_to_char(ch, "You fire one last powerful fireball...\r\n");
-		act("$n fires one last powerful fireball...", FALSE, ch, NULL, NULL, TO_ROOM);
-
-		if (ROOM_OWNER(to_room) && GET_LOYALTY(ch) != ROOM_OWNER(to_room)) {
-			trigger_distrust_from_hostile(ch, ROOM_OWNER(to_room));
+		dam = 1 + GET_INTELLIGENCE(ch);
+		
+		msg_to_char(ch, "You shoot one powerful fireball...\r\n");
+		act("$n shoots one powerful fireball...", FALSE, ch, NULL, NULL, TO_ROOM);
+		
+		if (room_targ) {
+			secttype = SECT(room_targ);
+			
+			if (ROOM_OWNER(room_targ) && GET_LOYALTY(ch) != ROOM_OWNER(room_targ)) {
+				trigger_distrust_from_hostile(ch, ROOM_OWNER(room_targ));
+			}
+			
+			besiege_room(room_targ, dam);
+			
+			if (SECT(room_targ) != secttype) {
+				msg_to_char(ch, "It is destroyed!\r\n");
+				act("$n's target is destroyed!", FALSE, ch, NULL, NULL, TO_ROOM);
+			}
 		}
-		besiege_room(to_room, 1 + GET_INTELLIGENCE(ch));
-
-		if (SECT(to_room) != secttype) {
-			msg_to_char(ch, "It is destroyed!\r\n");
-			act("$n's target is destroyed!", FALSE, ch, NULL, NULL, TO_ROOM);
+		else if (veh_targ) {
+			if (VEH_OWNER(veh_targ) && GET_LOYALTY(ch) != VEH_OWNER(veh_targ)) {
+				trigger_distrust_from_hostile(ch, VEH_OWNER(veh_targ));
+			}
+			
+			besiege_vehicle(veh_targ, dam, SIEGE_MAGICAL);
 		}
-
+		
 		gain_ability_exp(ch, ABIL_SIEGE_RITUAL, 33.4);
 	}
 }
@@ -1941,16 +1922,15 @@ RITUAL_SETUP_FUNC(start_devastation_ritual) {
 
 
 RITUAL_FINISH_FUNC(perform_devastation_ritual) {
-	extern int change_chop_territory(room_data *room);
+	extern void change_chop_territory(room_data *room);
 	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 	
 	room_data *rand_room, *to_room = NULL;
-	obj_data *newobj;
 	crop_data *cp;
 	int dist, iter;
-	int x, y, num;
+	int x, y;
 	
-	#define CAN_DEVASTATE(room)  ((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) || CAN_CHOP_ROOM(room)) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE))
+	#define CAN_DEVASTATE(room)  ((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) || (CAN_CHOP_ROOM(room) && get_depletion((room), DPLTN_CHOP) < config_get_int("chop_depletion"))) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE))
 	#define DEVASTATE_RANGE  3	// tiles
 
 	// check this room
@@ -1980,36 +1960,30 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 	
 	// SUCCESS: distribute resources
 	if (to_room) {
-		if (has_evolution_type(SECT(to_room), EVO_CHOPPED_DOWN)) {
-			num = change_chop_territory(to_room);
-			
-			msg_to_char(ch, "You devastate the forest and collect %s tree%s!\r\n", num > 1 ? "some" : "a", num > 1 ? "s" : "");
-			act("$n's powerful ritual devastates the forest!", FALSE, ch, NULL, NULL, TO_ROOM);
-			
-			while (num-- > 0) {
-				obj_to_char_or_room((newobj = read_object(o_TREE, TRUE)), ch);
-				load_otrigger(newobj);
-			}
-		}
-		else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = crop_proto(ROOM_CROP_TYPE(to_room))) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
+		if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room)) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
 			run_room_interactions(ch, to_room, INTERACT_HARVEST, devastate_crop);
+			run_room_interactions(ch, to_room, INTERACT_CHOP, devastate_trees);
 			
 			// check for original sect, which may have been stored
-			if (ROOM_ORIGINAL_SECT(to_room) != SECT(to_room)) {
-				change_terrain(to_room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(to_room)));
+			if (BASE_SECT(to_room) != SECT(to_room)) {
+				change_terrain(to_room, GET_SECT_VNUM(BASE_SECT(to_room)));
 			}
 			else {
 				// fallback sect
 				change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
 			}
 		}
-		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = crop_proto(ROOM_CROP_TYPE(to_room)))) {
+		else if (CAN_CHOP_ROOM(to_room) && get_depletion(to_room, DPLTN_CHOP) < config_get_int("chop_depletion")) {
+			run_room_interactions(ch, to_room, INTERACT_CHOP, devastate_trees);
+			change_chop_territory(to_room);
+		}
+		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(to_room))) {
 			msg_to_char(ch, "You devastate the seeded field!\r\n");
 			act("$n's powerful ritual devastates the seeded field!", FALSE, ch, NULL, NULL, TO_ROOM);
 			
 			// check for original sect, which may have been stored
-			if (ROOM_ORIGINAL_SECT(to_room) != SECT(to_room)) {
-				change_terrain(to_room, GET_SECT_VNUM(ROOM_ORIGINAL_SECT(to_room)));
+			if (BASE_SECT(to_room) != SECT(to_room)) {
+				change_terrain(to_room, GET_SECT_VNUM(BASE_SECT(to_room)));
 			}
 			else {
 				// fallback sect
@@ -2131,7 +2105,7 @@ const char *study_strings[] = {
 
 // **** for do_study ****
 void perform_study(char_data *ch) {
-	void set_skill(char_data *ch, int skill, int level);
+	void set_skill(char_data *ch, any_vnum skill, int level);
 	int pos;
 	
 	GET_ACTION_TIMER(ch) += 1;
@@ -2145,7 +2119,7 @@ void perform_study(char_data *ch) {
 	
 	if (*study_strings[pos] == '\n') {
 		// DONE!
-		if (CAN_GAIN_NEW_SKILLS(ch) && GET_SKILL(ch, SKILL_HIGH_SORCERY) == 0 && !NOSKILL_BLOCKED(ch, SKILL_HIGH_SORCERY)) {
+		if (CAN_GAIN_NEW_SKILLS(ch) && get_skill_level(ch, SKILL_HIGH_SORCERY) == 0 && noskill_ok(ch, SKILL_HIGH_SORCERY)) {
 			msg_to_char(ch, "&mYour mind begins to open to the ways of High Sorcery, and you are now an apprentice to this school.&0\r\n");
 			set_skill(ch, SKILL_HIGH_SORCERY, 1);
 			SAVE_CHAR(ch);

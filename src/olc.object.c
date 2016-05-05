@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.object.c                                    EmpireMUD 2.0b3 *
+*   File: olc.object.c                                    EmpireMUD 2.0b4 *
 *  Usage: OLC for items                                                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -31,8 +31,11 @@
 
 // externs
 extern const char *affected_bits[];
+extern const char *apply_type_names[];
 extern const char *apply_types[];
 extern const char *armor_types[NUM_ARMOR_TYPES+1];
+extern const char *component_flags[];
+extern const char *component_types[];
 extern const char *container_bits[];
 extern const char *drinks[];
 extern const char *extra_bits[];
@@ -131,6 +134,10 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Look desc starting with 'Nothing.'");
 		problem = TRUE;
 	}
+	if (OBJ_FLAGGED(obj, OBJ_CREATABLE)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "CREATABLE");
+		problem = TRUE;
+	}
 	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && GET_OBJ_TIMER(obj) <= 0) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Infinite light");
 		problem = TRUE;
@@ -196,17 +203,6 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		case ITEM_FOOD: {
 			if (GET_FOOD_HOURS_OF_FULLNESS(obj) == 0) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Food fullness not set");
-				problem = TRUE;
-			}
-			break;
-		}
-		case ITEM_CART: {
-			if (GET_MAX_CART_CONTENTS(obj) == 0) {
-				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Cart capacity not set");
-				problem = TRUE;
-			}
-			if (GET_CART_ANIMALS_REQUIRED(obj) == 0) {
-				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Cart animals not set");
 				problem = TRUE;
 			}
 			break;
@@ -354,22 +350,33 @@ char *list_one_object(obj_data *obj, bool detail) {
 * @param obj_vnum vnum The vnum to delete.
 */
 void olc_delete_object(char_data *ch, obj_vnum vnum) {
+	void complete_building(room_data *room);
 	extern bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
 	extern bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum portal_vnum);
+	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
+	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
+	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
 	void expire_trading_post_item(struct trading_post_data *tpd);
-	extern bool remove_obj_from_resource_list(struct resource_data_struct **list, obj_vnum vnum);
+	extern bool remove_obj_from_resource_list(struct resource_data **list, obj_vnum vnum);
 	void remove_object_from_table(obj_data *obj);
 	void save_trading_post();
 
-	struct empire_trade_data *trade, *next_trade, *temp;
+	struct empire_trade_data *trade, *next_trade;
 	struct trading_post_data *tpd, *next_tpd;
+	struct archetype_gear *gear, *next_gear;
 	obj_data *proto, *obj_iter, *next_obj;
 	struct global_data *glb, *next_glb;
+	archetype_data *arch, *next_arch;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	craft_data *craft, *next_craft;
+	morph_data *morph, *next_morph;
+	quest_data *quest, *next_quest;
+	augment_data *aug, *next_aug;
+	vehicle_data *veh, *next_veh;
 	crop_data *crop, *next_crop;
+	room_data *room, *next_room;
 	empire_data *emp, *next_emp;
 	char_data *mob, *next_mob;
 	adv_data *adv, *next_adv;
@@ -408,6 +415,45 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// remove from live resource lists: room resources
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (!COMPLEX_DATA(room)) {
+			continue;
+		}
+		
+		if (GET_BUILT_WITH(room)) {
+			remove_obj_from_resource_list(&GET_BUILT_WITH(room), vnum);
+		}
+		if (GET_BUILDING_RESOURCES(room)) {
+			remove_obj_from_resource_list(&GET_BUILDING_RESOURCES(room), vnum);
+			
+			if (!GET_BUILDING_RESOURCES(room)) {
+				// removing this resource finished the building
+				if (IS_DISMANTLING(room)) {
+					disassociate_building(room);
+				}
+				else {
+					complete_building(room);
+				}
+			}
+		}
+	}
+	
+	// remove from live resource lists: vehicle maintenance
+	LL_FOREACH(vehicle_list, veh) {
+		if (VEH_NEEDS_RESOURCES(veh)) {
+			remove_obj_from_resource_list(&VEH_NEEDS_RESOURCES(veh), vnum);
+			
+			if (!VEH_NEEDS_RESOURCES(veh)) {
+				// removing the resource finished the vehicle
+				if (VEH_FLAGGED(veh, VEH_INCOMPLETE)) {
+					REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
+					load_vtrigger(veh);
+				}
+			}
+		}
+	}
+	
 	// remove from empire inventories and trade -- DO THIS BEFORE REMOVING FROM OBJ TABLE
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		save = FALSE;
@@ -423,6 +469,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		for (trade = EMPIRE_TRADE(emp); trade; trade = next_trade) {
 			next_trade = trade->next;
 			if (trade->vnum == vnum) {
+				struct empire_trade_data *temp;
 				REMOVE_FROM_LIST(trade, EMPIRE_TRADE(emp), next);
 				free(trade);	// certified
 				save = TRUE;
@@ -466,6 +513,41 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// update archetypes
+	HASH_ITER(hh, archetype_table, arch, next_arch) {
+		found = FALSE;
+		for (gear = GET_ARCH_GEAR(arch); gear; gear = next_gear) {
+			next_gear = gear->next;
+			if (gear->vnum == vnum) {
+				struct archetype_gear *temp;
+				REMOVE_FROM_LIST(gear, GET_ARCH_GEAR(arch), next);
+				free(gear);
+				found = TRUE;
+			}
+		}
+		
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_ARCH, GET_ARCH_VNUM(arch));
+		}
+	}
+	
+	// update augments
+	HASH_ITER(hh, augment_table, aug, next_aug) {
+		found = FALSE;
+		
+		if (GET_AUG_REQUIRES_OBJ(aug) == vnum) {
+			GET_AUG_REQUIRES_OBJ(aug) = NOTHING;
+			found = TRUE;
+		}
+		
+		found |= remove_obj_from_resource_list(&GET_AUG_RESOURCES(aug), vnum);
+		
+		if (found) {
+			SET_BIT(GET_AUG_FLAGS(aug), AUG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_AUG, GET_AUG_VNUM(aug));
+		}
+	}
+	
 	// update buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(bld), TYPE_OBJ, vnum);
@@ -477,8 +559,13 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		found = FALSE;
-		if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP) && GET_CRAFT_OBJECT(craft) == vnum) {
+		if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP | CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
 			GET_CRAFT_OBJECT(craft) = NOTHING;
+			found = TRUE;
+		}
+		
+		if (GET_CRAFT_REQUIRES_OBJ(craft) == vnum) {
+			GET_CRAFT_REQUIRES_OBJ(craft) = NOTHING;
 			found = TRUE;
 		}
 		
@@ -514,6 +601,43 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// update morphs
+	HASH_ITER(hh, morph_table, morph, next_morph) {
+		found = FALSE;
+		
+		if (MORPH_REQUIRES_OBJ(morph) == vnum) {
+			MORPH_REQUIRES_OBJ(morph) = NOTHING;
+			found = TRUE;
+		}
+		
+		if (found) {
+			SET_BIT(MORPH_FLAGS(morph), MORPHF_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_MORPH, MORPH_VNUM(morph));
+		}
+	}
+	
+	// update objs
+	HASH_ITER(hh, object_table, obj_iter, next_obj) {
+		found = delete_from_interaction_list(&obj_iter->interactions, TYPE_OBJ, vnum);
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj_iter));
+		}
+	}
+	
+	// update quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_OBJECT, vnum);
+		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_OBJECT, vnum);
+		found |= delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_OBJECT, vnum);
+		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_GET_OBJECT, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_GET_OBJECT, vnum);
+		
+		if (found) {
+			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
 	// update room templates
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_OBJ, vnum);
@@ -531,8 +655,20 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// update vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		found = remove_obj_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), vnum);
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
+		}
+	}
+	
 	// olc editor updates
-	for (desc = descriptor_list; desc; desc = desc->next) {		
+	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (desc->character && !IS_NPC(desc->character) && GET_ACTION_RESOURCES(desc->character)) {
+			remove_obj_from_resource_list(&GET_ACTION_RESOURCES(desc->character), vnum);
+		}
+		
 		if (GET_OLC_ADVENTURE(desc)) {
 			found = FALSE;
 			found |= delete_link_rule_by_portal(&(GET_OLC_ADVENTURE(desc)->linking), vnum);
@@ -541,6 +677,38 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				msg_to_desc(desc, "One or more linking rules have been removed from the adventure you are editing.\r\n");
 			}
 		}
+		if (GET_OLC_ARCHETYPE(desc)) {
+			found = FALSE;
+			for (gear = GET_ARCH_GEAR(GET_OLC_ARCHETYPE(desc)); gear; gear = next_gear) {
+				next_gear = gear->next;
+				if (gear->vnum == vnum) {
+					struct archetype_gear *temp;
+					REMOVE_FROM_LIST(gear, GET_ARCH_GEAR(GET_OLC_ARCHETYPE(desc)), next);
+					free(gear);
+					found = TRUE;
+				}
+			}
+		
+			if (found) {
+				msg_to_char(desc->character, "One of the objects used in the archetype you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_AUGMENT(desc)) {
+			found = FALSE;
+			
+			if (GET_AUG_REQUIRES_OBJ(GET_OLC_AUGMENT(desc)) == vnum) {
+				GET_AUG_REQUIRES_OBJ(GET_OLC_AUGMENT(desc)) = NOTHING;
+				found = TRUE;
+			}
+			
+			found |= remove_obj_from_resource_list(&GET_AUG_RESOURCES(GET_OLC_AUGMENT(desc)), vnum);
+			
+			if (found) {
+				SET_BIT(GET_AUG_FLAGS(GET_OLC_AUGMENT(desc)), AUG_IN_DEVELOPMENT);
+				msg_to_char(desc->character, "One of the objects used in the augment you're editing was deleted.\r\n");
+			}
+	
+		}
 		if (GET_OLC_BUILDING(desc)) {
 			if (delete_from_interaction_list(&GET_OLC_BUILDING(desc)->interactions, TYPE_OBJ, vnum)) {
 				msg_to_char(desc->character, "One of the objects in an interaction for the building you're editing was deleted.\r\n");
@@ -548,11 +716,16 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		if (GET_OLC_CRAFT(desc)) {
 			found = FALSE;
-			if (GET_OLC_CRAFT(desc)->type != CRAFT_TYPE_BUILD && !IS_SET(GET_OLC_CRAFT(desc)->flags, CRAFT_SOUP) && GET_OLC_CRAFT(desc)->object == vnum) {
+			if (GET_OLC_CRAFT(desc)->type != CRAFT_TYPE_BUILD && !IS_SET(GET_OLC_CRAFT(desc)->flags, CRAFT_SOUP | CRAFT_VEHICLE) && GET_OLC_CRAFT(desc)->object == vnum) {
 				GET_OLC_CRAFT(desc)->object = NOTHING;
 				found = TRUE;
 			}
-		
+			
+			if (GET_CRAFT_REQUIRES_OBJ(GET_OLC_CRAFT(desc)) == vnum) {
+				GET_CRAFT_REQUIRES_OBJ(GET_OLC_CRAFT(desc)) = NOTHING;
+				found = TRUE;
+			}
+			
 			found |= remove_obj_from_resource_list(&GET_OLC_CRAFT(desc)->resources, vnum);
 		
 			if (found) {
@@ -565,9 +738,46 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				msg_to_char(desc->character, "One of the objects in an interaction for the crop you're editing was deleted.\r\n");
 			}
 		}
+		if (GET_OLC_GLOBAL(desc)) {
+			found = delete_from_interaction_list(&GET_GLOBAL_INTERACTIONS(GET_OLC_GLOBAL(desc)), TYPE_OBJ, vnum);
+			if (found) {
+				msg_to_char(desc->character, "One of the objects in an interaction for the global you're editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_MOBILE(desc)) {
 			if (delete_from_interaction_list(&GET_OLC_MOBILE(desc)->interactions, TYPE_OBJ, vnum)) {
 				msg_to_char(desc->character, "One of the objects in an interaction for the mob you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_MORPH(desc)) {
+			found = FALSE;
+			
+			if (MORPH_REQUIRES_OBJ(GET_OLC_MORPH(desc)) == vnum) {
+				MORPH_REQUIRES_OBJ(GET_OLC_MORPH(desc)) = NOTHING;
+				found = TRUE;
+			}
+			
+			if (found) {
+				SET_BIT(MORPH_FLAGS(GET_OLC_MORPH(desc)), MORPHF_IN_DEVELOPMENT);
+				msg_to_char(desc->character, "The object required by the morph you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_OBJECT(desc)) {
+			found = delete_from_interaction_list(&GET_OLC_OBJECT(desc)->interactions, TYPE_OBJ, vnum);
+			if (found) {
+				msg_to_char(desc->character, "One of the objects in an interaction for the item you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_QUEST(desc)) {
+			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_OBJECT, vnum);
+			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_OBJECT, vnum);
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_OBJECT, vnum);
+			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_GET_OBJECT, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_GET_OBJECT, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(desc, "An object used by the quest you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_ROOM_TEMPLATE(desc)) {
@@ -582,6 +792,9 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			if (delete_from_interaction_list(&GET_OLC_SECTOR(desc)->interactions, TYPE_OBJ, vnum)) {
 				msg_to_char(desc->character, "One of the objects in an interaction for the sector you're editing was deleted.\r\n");
 			}
+		}
+		if (GET_OLC_VEHICLE(desc)) {
+			found = remove_obj_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), vnum);
 		}
 	}
 	
@@ -599,6 +812,9 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_obj(char_data *ch, obj_vnum vnum) {
+	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
+	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
+	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
 	extern const byte interact_vnum_types[NUM_INTERACTS];
 	
 	char buf[MAX_STRING_LENGTH];
@@ -606,15 +822,22 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	struct interaction_item *inter;
 	struct adventure_link_rule *link;
 	struct global_data *glb, *next_glb;
+	archetype_data *arch, *next_arch;
 	craft_data *craft, *next_craft;
+	morph_data *morph, *next_morph;
+	quest_data *quest, *next_quest;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
+	augment_data *aug, *next_aug;
+	vehicle_data *veh, *next_veh;
+	struct archetype_gear *gear;
 	crop_data *crop, *next_crop;
 	char_data *mob, *next_mob;
 	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
 	obj_data *proto, *obj, *next_obj;
-	int size, sub, found;
+	struct resource_data *res;
+	int size, found;
 	bool any;
 	
 	if (!(proto = obj_proto(vnum))) {
@@ -624,14 +847,43 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of object %d (%s):\r\n", vnum, GET_OBJ_SHORT_DESC(proto));
-
-	// update adventure zones
+	
+	// adventure zones
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
 		for (link = GET_ADV_LINKING(adv); link; link = link->next) {
 			if (link->portal_in == vnum || link->portal_out == vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "ADV [%5d] %s\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 				break;	// only need 1
+			}
+		}
+	}
+	
+	// archetypes
+	HASH_ITER(hh, archetype_table, arch, next_arch) {
+		any = FALSE;
+		for (gear = GET_ARCH_GEAR(arch); gear && !any; gear = gear->next) {
+			if (gear->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "ARCH [%5d] %s\r\n", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+			}
+		}
+	}
+	
+	// augments
+	HASH_ITER(hh, augment_table, aug, next_aug) {
+		any = FALSE;
+		if (!any && GET_AUG_REQUIRES_OBJ(aug) == vnum) {
+			any = TRUE;
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
+		}
+		for (res = GET_AUG_RESOURCES(aug); res && !any; res = res->next) {
+			if (res->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 			}
 		}
 	}
@@ -651,7 +903,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	// crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		any = FALSE;
-		if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP) && GET_CRAFT_OBJECT(craft) == vnum) {
+		if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP | CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
 			any = TRUE;
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
@@ -661,8 +913,8 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		}
-		for (sub = 0; !any && sub < MAX_RESOURCES_REQUIRED && GET_CRAFT_RESOURCES(craft)[sub].vnum != NOTHING; ++sub) {
-			if (GET_CRAFT_RESOURCES(craft)[sub].vnum == vnum) {
+		for (res = GET_CRAFT_RESOURCES(craft); res && !any; res = res->next) {
+			if (res->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
@@ -706,6 +958,14 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// morphs
+	HASH_ITER(hh, morph_table, morph, next_morph) {
+		if (MORPH_REQUIRES_OBJ(morph) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "MPH [%5d] %s\r\n", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
+		}
+	}
+	
 	// obj interactions
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		any = FALSE;
@@ -715,6 +975,23 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			}
+		}
+	}
+	
+	// quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_OBJECT, vnum);
+		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_OBJECT, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_OBJECT, vnum);
+		any |= find_quest_task_in_list(QUEST_TASKS(quest), QT_GET_OBJECT, vnum);
+		any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_GET_OBJECT, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -745,6 +1022,18 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+			}
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		any = FALSE;
+		for (res = VEH_YEARLY_MAINTENANCE(veh); res && !any; res = res->next) {
+			if (res->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			}
 		}
 	}
@@ -801,10 +1090,12 @@ void update_live_obj_from_olc(obj_data *to_update, obj_data *old_proto, obj_data
 	if (SCRIPT(to_update)) {
 		extract_script(to_update, OBJ_TRIGGER);
 	}
-	free_proto_script(to_update, OBJ_TRIGGER);
+	if (to_update->proto_script && to_update->proto_script != old_proto->proto_script) {
+		free_proto_scripts(&to_update->proto_script);
+	}
 	
 	// re-attach scripts
-	copy_proto_script(new_proto, to_update, OBJ_TRIGGER);
+	to_update->proto_script = copy_trig_protos(new_proto->proto_script);
 	assign_triggers(to_update, OBJ_TRIGGER);
 }
 
@@ -825,6 +1116,7 @@ void save_olc_object(descriptor_data *desc) {
 	struct obj_custom_message *ocm;
 	struct trading_post_data *tpd;
 	empire_data *emp, *next_emp;
+	struct quest_lookup *ql;
 	UT_hash_handle hh;
 	
 	// have a place to save it?
@@ -886,9 +1178,13 @@ void save_olc_object(descriptor_data *desc) {
 		free(ocm);
 	}
 	
+	// old applies
+	free_obj_apply_list(GET_OBJ_APPLIES(proto));
+	GET_OBJ_APPLIES(proto) = NULL;
+	
 	// free old script?
 	if (proto->proto_script) {
-		free_proto_script(proto, OBJ_TRIGGER);
+		free_proto_scripts(&proto->proto_script);
 	}
 	
 	// timer must be converted
@@ -899,9 +1195,16 @@ void save_olc_object(descriptor_data *desc) {
 
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
+	ql = proto->quest_lookups;	// save lookups
+	
 	*proto = *obj;
 	proto->vnum = vnum;	// ensure correct vnum
+	
 	proto->hh = hh;	// restore hash handle
+	proto->quest_lookups = ql;	// restore lookups
+	
+	// remove the reference to this so it won't be free'd
+	GET_OBJ_APPLIES(obj) = NULL;
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_OBJ, vnum);
@@ -1021,11 +1324,13 @@ obj_data *setup_olc_object(obj_data *input) {
 			}
 			last_ocm = new_ocm;
 		}
-
+		
+		// copy applies
+		GET_OBJ_APPLIES(new) = copy_obj_apply_list(GET_OBJ_APPLIES(input));
+		
 		// copy scripts
 		SCRIPT(new) = NULL;
-		new->proto_script = NULL;
-		copy_proto_script(input, new, OBJ_TRIGGER);
+		new->proto_script = copy_trig_protos(input->proto_script);
 		
 		// update version number
 		OBJ_VERSION(new) += 1;
@@ -1096,12 +1401,6 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			sprintf(storage + strlen(storage), "<&yroomvnum&0> %d\r\n", GET_PORTAL_TARGET_VNUM(obj));
 			break;
 		}
-		case ITEM_CART: {
-			sprintf(storage + strlen(storage), "<&ycapacity&0> %d object%s\r\n", GET_MAX_CART_CONTENTS(obj), PLURAL(GET_MAX_CART_CONTENTS(obj)));
-			sprintf(storage + strlen(storage), "<&yanimalsrequired&0> %d\r\n", GET_CART_ANIMALS_REQUIRED(obj));
-			sprintf(storage + strlen(storage), "<&ycatapult&0> %s\r\n", CART_CAN_FIRE(obj) ? "yes" : "no");
-			break;
-		}
 		case ITEM_MISSILE_WEAPON: {
 			sprintf(storage + strlen(storage), "<&ymissilespeed&0> %.2f\r\n", missile_weapon_speed[GET_MISSILE_WEAPON_SPEED(obj)]);
 			sprintf(storage + strlen(storage), "<&ydamage&0> %d (speed %.2f, %.2f base dps)\r\n", GET_MISSILE_WEAPON_DAMAGE(obj), get_weapon_speed(obj), get_base_dps(obj));
@@ -1144,11 +1443,11 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		}
 		
 		// types with no vals
-		case ITEM_BOAT:
 		case ITEM_BOARD:
 		case ITEM_MAIL:
 		case ITEM_SHIELD:
 		case ITEM_SHIP:
+		case ITEM_CART:
 		case ITEM_WORN: {
 			break;
 		}
@@ -1188,7 +1487,8 @@ void olc_show_object(char_data *ch) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	struct obj_storage_type *store;
 	struct obj_custom_message *ocm;
-	int iter, count, minutes;
+	struct obj_apply *apply;
+	int count, minutes;
 	
 	if (!obj) {
 		return;
@@ -1216,6 +1516,12 @@ void olc_show_object(char_data *ch) {
 	sprintbit(GET_OBJ_EXTRA(obj), extra_bits, buf1, TRUE);
 	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", buf1);
 	
+	sprintf(buf + strlen(buf), "<&ycomponent&0> %s\r\n", component_types[GET_OBJ_CMP_TYPE(obj)]);
+	if (GET_OBJ_CMP_TYPE(obj) != CMP_NONE) {
+		prettier_sprintbit(GET_OBJ_CMP_FLAGS(obj), component_flags, buf1);
+		sprintf(buf + strlen(buf), "<&ycompflags&0> %s\r\n", buf1);
+	}
+	
 	if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0) {
 		sprintf(buf + strlen(buf), "<&yminlevel&0> %d\r\n", GET_OBJ_MIN_SCALE_LEVEL(obj));
 	}
@@ -1229,6 +1535,13 @@ void olc_show_object(char_data *ch) {
 		sprintf(buf + strlen(buf), "<&ymaxlevel&0> none\r\n");
 	}
 	
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+		sprintf(buf + strlen(buf), "<&yrequiresquest&0> [%d] %s\r\n", GET_OBJ_REQUIRES_QUEST(obj), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(obj)));
+	}
+	else {
+		sprintf(buf + strlen(buf), "<&yrequiresquest&0> none\r\n");
+	}
+	
 	olc_get_values_display(ch, buf1);
 	strcat(buf, buf1);
 
@@ -1238,54 +1551,44 @@ void olc_show_object(char_data *ch) {
 	// applies / affected[]
 	count = 0;
 	sprintf(buf + strlen(buf), "Attribute Applies: <&yapply&0>\r\n");
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		if (obj->affected[iter].location != APPLY_NONE) {
-			sprintf(buf1, "%+d to %s", obj->affected[iter].modifier, apply_types[(int) obj->affected[iter].location]);
-			sprintf(buf + strlen(buf), " &y%2d&0. %-25.25s%s", count + 1, buf1, ((count % 2) ? "\r\n" : ""));
-			++count;
-		}
+	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+		sprintf(buf + strlen(buf), " &y%2d&0. %+d to %s (%s)\r\n", ++count, apply->modifier, apply_types[(int) apply->location], apply_type_names[(int)apply->apply_type]);
 	}
-	if (count == 0) {
-		strcat(buf, " none\r\n");
-	}
-	else if ((count % 2) != 0) {
-		strcat(buf, "\r\n");
-	}
-
+	
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <&yextra&0>\r\n");
-	get_extra_desc_display(obj->ex_description, buf1);
-	strcat(buf, buf1);
+	if (obj->ex_description) {
+		get_extra_desc_display(obj->ex_description, buf1);
+		strcat(buf, buf1);
+	}
 
 	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
-	get_interaction_display(obj->interactions, buf1);
-	strcat(buf, buf1);
+	if (obj->interactions) {
+		get_interaction_display(obj->interactions, buf1);
+		strcat(buf, buf1);
+	}
 	
 	// storage
-	strcat(buf, "Storage: <&ystorage&0>\r\n");
+	sprintf(buf + strlen(buf), "Storage: <&ystorage&0>\r\n");
 	count = 0;
 	for (store = obj->storage; store; store = store->next) {
 		sprintbit(store->flags, storage_bits, buf2, TRUE);
 		sprintf(buf + strlen(buf), " &y%d&0. %s ( %s)\r\n", ++count, GET_BLD_NAME(building_proto(store->building_type)), buf2);
 	}
-	if (count == 0) {
-		strcat(buf, " none\r\n");
-	}
 	
 	// custom messages
-	strcat(buf, "Custom messages: <&ycustom&0>\r\n");
+	sprintf(buf + strlen(buf), "Custom messages: <&ycustom&0>\r\n");
 	count = 0;
 	for (ocm = obj->custom_msgs; ocm; ocm = ocm->next) {
 		sprintf(buf + strlen(buf), " &y%d&0. [%s] %s\r\n", ++count, obj_custom_types[ocm->type], ocm->msg);
 	}
-	if (count == 0) {
-		strcat(buf, " none\r\n");
-	}
 	
 	// scripts
 	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
-	get_script_display(obj->proto_script, buf1);
-	strcat(buf, buf1);
+	if (obj->proto_script) {
+		get_script_display(obj->proto_script, buf1);
+		strcat(buf, buf1);
+	}
 	
 	page_string(ch->desc, buf, TRUE);
 }
@@ -1313,25 +1616,12 @@ OLC_MODULE(oedit_affects) {
 }
 
 
-OLC_MODULE(oedit_animalsrequired) {
-	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	
-	if (!IS_CART(obj)) {
-		msg_to_char(ch, "You can only set animalsrequired on a cart.\r\n");
-	}
-	else {
-		GET_OBJ_VAL(obj, VAL_CART_ANIMALS_REQUIRED) = olc_process_number(ch, argument, "animals required", "animalsrequired", 0, 2, GET_OBJ_VAL(obj, VAL_CART_ANIMALS_REQUIRED));
-	}
-}
-
-
-// usage: apply add <value> <type>
-// usage: apply remove <number | all>
 OLC_MODULE(oedit_apply) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	int loc, num, iter, change;
+	int loc, num, iter, apply_type;
+	struct obj_apply *apply, *change, *temp;
 	bool found;
 	
 	// arg1 arg2 arg3
@@ -1343,9 +1633,8 @@ OLC_MODULE(oedit_apply) {
 			msg_to_char(ch, "Remove which apply (number)?\r\n");
 		}
 		else if (!str_cmp(arg2, "all")) {
-			for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-				obj->affected[iter].location = APPLY_NONE;
-			}
+			free_obj_apply_list(GET_OBJ_APPLIES(obj));
+			GET_OBJ_APPLIES(obj) = NULL;
 			msg_to_char(ch, "You remove all the applies.\r\n");
 		}
 		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
@@ -1353,13 +1642,13 @@ OLC_MODULE(oedit_apply) {
 		}
 		else {
 			found = FALSE;
-			for (iter = 0; iter < MAX_OBJ_AFFECT && !found; ++iter) {
-				if (obj->affected[iter].location != APPLY_NONE && --num == 0) {
+			for (apply = GET_OBJ_APPLIES(obj); apply && !found; apply = apply->next) {
+				if (--num == 0) {
 					found = TRUE;
 					
-					msg_to_char(ch, "You remove the %+d to %s.\r\n", obj->affected[iter].modifier, apply_types[(int) obj->affected[iter].location]);
-					obj->affected[iter].location = APPLY_NONE;
-					obj->affected[iter].modifier = 0;
+					msg_to_char(ch, "You remove the %+d to %s (%s).\r\n", apply->modifier, apply_types[(int)apply->location], apply_type_names[(int)apply->apply_type]);
+					REMOVE_FROM_LIST(apply, GET_OBJ_APPLIES(obj), next);
+					free(apply);
 				}
 			}
 			
@@ -1369,31 +1658,39 @@ OLC_MODULE(oedit_apply) {
 		}
 	}
 	else if (is_abbrev(arg1, "add")) {
+		strcpy(arg1, arg3);
+		half_chop(arg1, arg3, arg4);
+		
 		num = atoi(arg2);
+		apply_type = APPLY_TYPE_NATURAL;	// default
 		
 		if (!*arg2 || !*arg3 || (!isdigit(*arg2) && *arg2 != '-')) {
-			msg_to_char(ch, "Usage: apply add <value> <type>\r\n");
+			msg_to_char(ch, "Usage: apply add <value> <apply> [type]\r\n");
 		}
 		else if ((loc = search_block(arg3, apply_types, FALSE)) == NOTHING) {
-			msg_to_char(ch, "Invalid type.\r\n");
+			msg_to_char(ch, "Invalid apply.\r\n");
+		}
+		else if (*arg4 && (apply_type = search_block(arg4, apply_type_names, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid apply type.\r\n");
 		}
 		else {
-			found = FALSE;
-			for (iter = 0; iter < MAX_OBJ_AFFECT && !found; ++iter) {
-				if (obj->affected[iter].location == APPLY_NONE) {
-					found = TRUE;
-					
-					obj->affected[iter].location = loc;
-					obj->affected[iter].modifier = num;
-				}
-			}
+			CREATE(apply, struct obj_apply, 1);
+			apply->location = loc;
+			apply->modifier = num;
+			apply->apply_type = apply_type;
 			
-			if (found) {
-				msg_to_char(ch, "You add %+d to %s.\r\n", num, apply_types[loc]);
+			// append to end
+			if ((temp = GET_OBJ_APPLIES(obj))) {
+				while (temp->next) {
+					temp = temp->next;
+				}
+				temp->next = apply;
 			}
 			else {
-				msg_to_char(ch, "There is no room for more applies.\r\n");
+				GET_OBJ_APPLIES(obj) = apply;
 			}
+			
+			msg_to_char(ch, "You add %+d to %s (%s).\r\n", num, apply_types[loc], apply_type_names[apply_type]);
 		}
 	}
 	else if (is_abbrev(arg1, "change")) {
@@ -1401,21 +1698,23 @@ OLC_MODULE(oedit_apply) {
 		half_chop(arg3, type_arg, val_arg);
 		
 		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
-			msg_to_char(ch, "Usage: apply change <number> <value | type> <new value>\r\n");
+			msg_to_char(ch, "Usage: apply change <number> <value | apply | type> <new value>\r\n");
 			return;
 		}
 		
 		// find which one to change
-		num = atoi(num_arg);
-		change = -1;
-		for (iter = 0; iter < MAX_OBJ_AFFECT && change == -1; ++iter) {
-			if (obj->affected[iter].location != APPLY_NONE && --num == 0) {
-				change = iter;
+		if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid apply number.\r\n");
+			return;
+		}
+		change = NULL;
+		for (apply = GET_OBJ_APPLIES(obj); apply && !change; apply = apply->next) {
+			if (--num == 0) {
+				change = apply;
 				break;
 			}
 		}
-		
-		if (change == -1) {
+		if (!change) {
 			msg_to_char(ch, "Invalid apply number.\r\n");
 		}
 		else if (is_abbrev(type_arg, "value")) {
@@ -1424,31 +1723,48 @@ OLC_MODULE(oedit_apply) {
 				msg_to_char(ch, "Invalid value '%s'.\r\n", val_arg);
 			}
 			else {
-				obj->affected[change].modifier = num;
+				change->modifier = num;
 				msg_to_char(ch, "Apply %d changed to value %+d.\r\n", atoi(num_arg), num);
 			}
 		}
-		else if (is_abbrev(type_arg, "type")) {
+		else if (is_abbrev(type_arg, "apply")) {
 			if ((loc = search_block(val_arg, apply_types, FALSE)) == NOTHING) {
-				msg_to_char(ch, "Invalid type.\r\n");
+				msg_to_char(ch, "Invalid apply.\r\n");
 			}
 			else {
-				obj->affected[change].location = loc;
-				msg_to_char(ch, "Apply %d changed to type %s.\r\n", atoi(num_arg), apply_types[loc]);
+				change->location = loc;
+				msg_to_char(ch, "Apply %d changed to %s.\r\n", atoi(num_arg), apply_types[loc]);
+			}
+		}
+		else if (is_abbrev(type_arg, "type")) {
+			if ((loc = search_block(val_arg, apply_type_names, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid apply type.\r\n");
+			}
+			else {
+				change->apply_type = loc;
+				msg_to_char(ch, "Apply %d changed to %s.\r\n", atoi(num_arg), apply_type_names[loc]);
 			}
 		}
 		else {
-			msg_to_char(ch, "You can only change the value or type.\r\n");
+			msg_to_char(ch, "You can only change the value, apply, or type.\r\n");
 		}
 	}
 	else {
-		msg_to_char(ch, "Usage: apply add <value> <type>\r\n");
-		msg_to_char(ch, "Usage: apply change <number> <value | type> <new value>\r\n");
+		msg_to_char(ch, "Usage: apply add <value> <apply> [type]\r\n");
+		msg_to_char(ch, "Usage: apply change <number> <value | apply | type> <new value>\r\n");
 		msg_to_char(ch, "Usage: apply remove <number | all>\r\n");
-		msg_to_char(ch, "Available types:\r\n");
 		
+		msg_to_char(ch, "Available applies:\r\n");
 		for (iter = 0; *apply_types[iter] != '\n'; ++iter) {
 			msg_to_char(ch, " %-24.24s%s", apply_types[iter], ((iter % 2) ? "\r\n" : ""));
+		}
+		if ((iter % 2) != 0) {
+			msg_to_char(ch, "\r\n");
+		}
+		
+		msg_to_char(ch, "Available types:\r\n");
+		for (iter = 0; *apply_type_names[iter] != '\n'; ++iter) {
+			msg_to_char(ch, " %-24.24s%s", apply_type_names[iter], ((iter % 2) ? "\r\n" : ""));
 		}
 		if ((iter % 2) != 0) {
 			msg_to_char(ch, "\r\n");
@@ -1545,10 +1861,6 @@ OLC_MODULE(oedit_capacity) {
 			slot = VAL_DRINK_CONTAINER_CAPACITY;
 			break;
 		}
-		case ITEM_CART: {
-			slot = VAL_CART_MAX_CONTENTS;
-			break;
-		}
 		case ITEM_PACK: {
 			slot = VAL_PACK_CAPACITY;
 			break;
@@ -1560,25 +1872,6 @@ OLC_MODULE(oedit_capacity) {
 	}
 	else {
 		GET_OBJ_VAL(obj, slot) = olc_process_number(ch, argument, "capacity", "capacity", 0, MAX_INT, GET_OBJ_VAL(obj, slot));
-	}
-}
-
-
-OLC_MODULE(oedit_catapult) {
-	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	
-	if (!IS_CART(obj)) {
-		msg_to_char(ch, "You can only toggle 'catapult' on a cart.\r\n");
-	}
-	else {
-		if (GET_OBJ_VAL(obj, VAL_CART_FIRING_DATA) > 0) {
-			GET_OBJ_VAL(obj, VAL_CART_FIRING_DATA) = 0;
-			msg_to_char(ch, "You toggle 'catapult' off.\r\n");
-		}
-		else {
-			GET_OBJ_VAL(obj, VAL_CART_FIRING_DATA) = 1;
-			msg_to_char(ch, "You toggle 'catapult' on.\r\n");
-		}
 	}
 }
 
@@ -1603,6 +1896,31 @@ OLC_MODULE(oedit_coinamount) {
 	}
 	else {
 		GET_OBJ_VAL(obj, VAL_COINS_AMOUNT) = olc_process_number(ch, argument, "coin amount", "coinamount", 0, MAX_COIN, GET_OBJ_VAL(obj, VAL_COINS_AMOUNT));
+	}
+}
+
+
+OLC_MODULE(oedit_compflags) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	
+	if (GET_OBJ_CMP_TYPE(obj) == CMP_NONE) {
+		msg_to_char(ch, "You can only set component flags once you've set a component type.\r\n");
+	}
+	else {
+		GET_OBJ_CMP_FLAGS(obj) = olc_process_flag(ch, argument, "component", "compflags", component_flags, GET_OBJ_CMP_FLAGS(obj));
+	}
+}
+
+
+OLC_MODULE(oedit_component) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	int old = GET_OBJ_CMP_TYPE(obj);
+	
+	GET_OBJ_CMP_TYPE(obj) = olc_process_type(ch, argument, "component type", "component", component_types, GET_OBJ_CMP_TYPE(obj));
+	
+	// reset flags if going to/from none
+	if (old == CMP_NONE || GET_OBJ_CMP_TYPE(obj) == CMP_NONE) {
+		GET_OBJ_CMP_FLAGS(obj) = NOBITS;
 	}
 }
 
@@ -2030,6 +2348,32 @@ OLC_MODULE(oedit_quantity) {
 	}
 	else {
 		GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY) = olc_process_number(ch, argument, "quantity", "quantity", 0, 100, GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY));
+	}
+}
+
+
+OLC_MODULE(oedit_requiresquest) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	obj_vnum old = GET_OBJ_REQUIRES_QUEST(obj);
+	
+	if (!str_cmp(argument, "none") || atoi(argument) == NOTHING) {
+		GET_OBJ_REQUIRES_QUEST(obj) = NOTHING;
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It no longer requires a quest.\r\n");
+		}
+	}
+	else {
+		GET_OBJ_REQUIRES_QUEST(obj) = olc_process_number(ch, argument, "quest vnum", "requiresquest", 0, MAX_VNUM, GET_OBJ_REQUIRES_QUEST(obj));
+		if (!quest_proto(GET_OBJ_REQUIRES_QUEST(obj))) {
+			GET_OBJ_REQUIRES_QUEST(obj) = old;
+			msg_to_char(ch, "There is no quest with that vnum. Old value restored.\r\n");
+		}
+		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			msg_to_char(ch, "It now requires %s.\r\n", get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(obj)));
+		}
 	}
 }
 

@@ -3,7 +3,7 @@ leopard~
 a leopard~
 A leopard is waiting to strike!
 ~
-95 120 cdgjoz c
+75 100 cdgjoz c
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -14,7 +14,7 @@ elephant jungle towering~
 a jungle elephant~
 A towering jungle elephant is rummaging around.
 ~
-80 100 dejoy 0
+20 40 dejoy 0
 0 0 0 27
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -32,7 +32,7 @@ jaguar spotted~
 a jaguar~
 A spotted jaguar is stalking you!
 ~
-75 90 cdgjoz c
+75 100 cdgjoz c
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -43,8 +43,8 @@ tapir~
 a tapir~
 A tapir is rooting around a bush.
 ~
-60 80 djo 0
-0 0 0 11
+75 100 djo 0
+0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
@@ -54,7 +54,7 @@ anaconda giant~
 a giant anaconda~
 A giant anaconda is draping from the tree!
 ~
-80 100 cdjo c
+75 100 cdjo c
 0 0 5 5
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -66,7 +66,7 @@ snake green treesnake~
 a green treesnake~
 A green treesnake is dangling toward you.
 ~
-80 100 cdjo c
+40 60 cdjo c
 0 0 5 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1355 100.00 1  # SKIN: some snakeskin
@@ -76,7 +76,7 @@ macaw brightly colored bird~
 a macaw~
 A brightly colored macaw flies past you.
 ~
-10 15 djo m
+10 20 djo m
 0 0 2 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 T 9106
@@ -87,7 +87,7 @@ parrot bird grey~
 a grey parrot~
 A grey parrot is pecking at some fruit.
 ~
-10 15 djo m
+10 20 djo m
 0 0 2 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 T 9106
@@ -98,7 +98,7 @@ mamba black snake~
 a black mamba~
 A black mamba is coiled up on the ground.
 ~
-80 100 cdjo c
+40 60 cdjo c
 0 0 5 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1355 100.00 1  # SKIN: some snakeskin
@@ -108,7 +108,7 @@ monkey brown little~
 a monkey~
 A little brown monkey is walking along a low branch.
 ~
-60 80 djo c
+40 60 djo c
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -118,7 +118,7 @@ chimpanzee hairy~
 a chimpanzee~
 A hairy chimpanzee eyes you cautiously.
 ~
-80 100 doA 0
+75 100 doA 0
 1 0 0 15
 S
 #9111
@@ -126,7 +126,7 @@ gorilla huge~
 a gorilla~
 A huge gorilla pounds its chest at you.
 ~
-90 110 doA 0
+75 100 doA 0
 1 0 0 15
 S
 #9112
@@ -134,7 +134,7 @@ baboon~
 a baboon~
 A baboon is sitting here and staring at you.
 ~
-80 100 djoA 0
+75 100 djoA 0
 1 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -144,7 +144,7 @@ ocelot~
 an ocelot~
 An ocelot is cleaning its paws.
 ~
-80 100 djo c
+40 60 djo c
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -154,7 +154,7 @@ crocodile massive~
 a massive crocodile~
 A massive crocodile is lurking here.
 ~
-100 125 cdgjo c
+75 100 cdgjo c
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -166,7 +166,7 @@ bat flying fox~
 a flying fox~
 A flying fox is flapping around above you.
 ~
-5 15 djo m
+10 20 djo m
 0 0 2 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -176,7 +176,7 @@ bat black~
 a black bat~
 A black bat is flying here.
 ~
-1 10 djo m
+1 5 djo m
 0 0 2 9
 S
 #9117
@@ -184,7 +184,7 @@ jackrabbit rabbit~
 a jackrabbit~
 A jackrabbit sits with its ears raised.
 ~
-1 3 djo 0
+1 5 djo 0
 0 0 15 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -194,7 +194,7 @@ cougar puma~
 a cougar~
 A cougar is crouched low and watching you.
 ~
-60 80 dgjko c
+20 40 dgjko c
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -205,7 +205,7 @@ bobcat cat curious~
 a bobcat~
 A curious bobcat is sitting here, waiting.
 ~
-20 35 djo c
+10 20 djo c
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -215,7 +215,7 @@ coyote lanky~
 a coyote~
 A lanky coyote dashes past you.
 ~
-20 40 dgjo c
+10 20 dgjo c
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
@@ -225,7 +225,7 @@ deer mule~
 a mule deer~
 A mule deer is alerted.
 ~
-20 40 djo 0
+10 20 djo 0
 0 0 0 27
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -237,7 +237,7 @@ squirrel ground small~
 a ground squirrel~
 A small ground squirrel dashes behind a shrub.
 ~
-1 3 djo c
+1 5 djo c
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -247,7 +247,7 @@ roadrunner runner bird~
 a roadrunner~
 A roadrunner dashes past you!
 ~
-1 3 dgjo c
+1 5 dgjo c
 0 0 0 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 S
@@ -256,8 +256,8 @@ ostrich~
 an ostrich~
 An ostrich ruffles its feathers and backs away from you.
 ~
-20 30 djo c
-0 0 0 10
+10 20 djo c
+0 0 0 11
 I 0 3200 100.00 2  # BUTCHER: a cut of poultry
 I 1 1351 100.00 1  # SKIN: a large skin
 S
@@ -266,7 +266,7 @@ meerkat kat~
 a meerkat~
 A meerkat is standing on its hind legs, watching you.
 ~
-1 10 djo 0
+1 5 djo 0
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -276,7 +276,7 @@ lizard horned~
 a horned lizard~
 A horned lizard is digging at the ground.
 ~
-1 3 djo 0
+1 5 djo 0
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
@@ -285,7 +285,7 @@ tortoise desert~
 a desert tortoise~
 A desert tortoise slowly wanders by.
 ~
-10 20 djoy 0
+5 15 djoy 0
 0 0 0 9
 S
 #9128
@@ -293,7 +293,7 @@ pronghorn musky~
 a pronghorn~
 A musky pronghorn stops to watch you.
 ~
-20 40 djo 0
+10 20 djo 0
 0 0 0 11
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -315,7 +315,7 @@ rattlesnake snake sidewinder~
 a sidewinder~
 A sidewinder rattlesnake is coiled and rattling.
 ~
-20 30 djo 0
+5 15 djo 0
 0 0 5 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1355 100.00 1  # SKIN: some snakeskin
@@ -325,7 +325,7 @@ scorpion giant~
 a giant scorpion~
 A giant scorpion skitters toward cover.
 ~
-10 25 djoz 0
+5 15 djoz 0
 0 0 8 3
 S
 #9132
@@ -333,7 +333,7 @@ bison heavy buffalo~
 a bison~
 A heavy bison is roaming around.
 ~
-40 60 dfjoy 0
+10 20 dfjoy 0
 0 0 0 11
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -355,7 +355,7 @@ peccary collared javelina~
 a collared peccary~
 A collared peccary stands perfectly still, watching you.
 ~
-30 45 dgjo c
+5 15 dgjo c
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
@@ -365,7 +365,7 @@ anteater giant~
 a giant anteater~
 A giant anteater is lumbering about.
 ~
-1 10 djo c
+10 20 djo c
 0 0 0 15
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -376,7 +376,7 @@ moose~
 a moose~
 A moose is standing here.
 ~
-40 60 djo 0
+20 40 djo 0
 0 0 0 11
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -388,7 +388,7 @@ elk~
 an elk~
 An elk is grazing here.
 ~
-40 60 djo 0
+20 40 djo 0
 0 0 0 11
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -400,7 +400,7 @@ giraffe tall~
 a giraffe~
 A tall giraffe is grazing here.
 ~
-20 40 djo 0
+10 20 djo 0
 0 0 0 11
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -412,7 +412,7 @@ rhinoceros white~
 a white rhino~
 A white rhinoceros stomps around.
 ~
-60 80 djoA 0
+20 40 djoA 0
 0 0 0 27
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -426,7 +426,7 @@ elephant massive~
 a massive elephant~
 A massive elephant lumbers past you.
 ~
-80 100 dejoy 0
+20 40 dejoy 0
 0 0 0 27
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -444,7 +444,7 @@ fox red~
 a red fox~
 A red fox is playing here.
 ~
-10 30 djo c
+5 15 djo c
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1352 100.00 1  # SKIN: a luxurious fox fur
@@ -454,7 +454,7 @@ llama~
 a llama~
 A llama is looking at you.
 ~
-5 15 dfjko 0
+10 20 dfjko 0
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -465,17 +465,17 @@ leopard snow~
 a snow leopard~
 A snow leopard is waiting to strike!
 ~
-35 50 dgjko c
+20 40 dgjko c
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
 S
 #9144
-raccoon coon~
+raccoon~
 a raccoon~
 A raccoon is cleaning its paws.
 ~
-1 10 djo c
+5 15 djo c
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -485,7 +485,7 @@ opossum possum~
 an opossum~
 There is an opossum on the ground, but it looks dead.
 ~
-1 5 djo c
+5 15 djo c
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -495,7 +495,7 @@ badger~
 a badger~
 A badger is digging furiously at the ground.
 ~
-60 80 djoz c
+20 40 djoz c
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -505,7 +505,7 @@ turtle forest~
 a forest turtle~
 A forest turtle is munching on something.
 ~
-1 10 djo 0
+1 5 djo 0
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
@@ -514,7 +514,7 @@ bluebird bird~
 a bluebird~
 A bluebird is pecking at the ground.
 ~
-1 3 djo m
+1 5 djo m
 0 0 2 10
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 S
@@ -523,7 +523,7 @@ finch bird small~
 a small finch~
 A small finch is perched here.
 ~
-1 3 djo m
+1 5 djo m
 0 0 2 10
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 S
@@ -541,7 +541,7 @@ bird paradise~
 a bird of paradise~
 A bird of paradise is displaying its feathers.
 ~
-1 3 djo m
+10 20 djo m
 0 0 2 10
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 S
@@ -550,7 +550,7 @@ bull~
 a bull~
 A bull is grazing here.
 ~
-40 60 djo 0
+20 40 djo 0
 0 0 0 27
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -563,7 +563,7 @@ ox~
 an ox~
 An ox is standing here.
 ~
-20 40 dejo 0
+10 20 dejo 0
 0 0 0 11
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -575,7 +575,7 @@ pig~
 a pig~
 A pig is rooting around.
 ~
-10 30 djo 0
+5 15 djo 0
 0 0 0 9
 I 0 3201 100.00 2  # BUTCHER: a slab of pork
 S
@@ -584,7 +584,7 @@ muskrat~
 a muskrat~
 A muskrat is digging around.
 ~
-20 40 djo 0
+40 60 djo 0
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
@@ -594,7 +594,7 @@ beaver~
 a beaver~
 A beaver rests back on its hind legs and looks at you.
 ~
-60 80 djo 0
+40 60 djo 0
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -605,7 +605,7 @@ crab giant swamp~
 a swamp crab~
 A giant swamp crab pokes its claw up out of the water.
 ~
-60 80 cdjo c
+40 60 cdjo c
 0 0 0 10
 S
 #9158
@@ -613,7 +613,7 @@ turtle snapping~
 a snapping turtle~
 A snapping turtle pokes its head up.
 ~
-60 80 cdjo c
+40 60 cdjo c
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
@@ -622,7 +622,7 @@ heron great~
 a great heron~
 A great heron is poking around for food.
 ~
-10 15 djo m
+40 60 djo m
 0 0 2 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 S
@@ -631,7 +631,7 @@ will wisp glowing~
 Will o' the Wisp~
 A glowing wisp floats along the swamp.
 ~
-125 150 cdjoux c
+100 125 cdjoux c
 1 0 0 16
 I 4 2104 50.00 1  # LOOT: a torch
 S
@@ -640,7 +640,7 @@ witch swamp~
 the swamp witch~
 The swamp witch lurches about.
 ~
-125 150 cdovx c
+75 100 cdovx c
 2 0 0 19
 I 4 1206 20.00 1  # LOOT: an iridescent blue iris
 I 4 103 20.00 1  # LOOT: a yellow lightning stone
@@ -652,7 +652,7 @@ bandit swamp someone~
 a swamp bandit~
 Someone is lurking behind a tree!
 ~
-125 150 cdov c
+75 100 cdov c
 1 0 0 4
 I 4 170 20.00 1  # LOOT: a silver disc
 S
@@ -661,7 +661,7 @@ manatee~
 a manatee~
 A manatee is bobbing near the surface.
 ~
-1 15 djlo 0
+30 50 djlo 0
 0 0 6 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -676,7 +676,7 @@ dolphin common~
 a dolphin~
 A common dolphin is swimming along side you.
 ~
-20 30 djlo 0
+30 50 djlo 0
 0 0 6 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -688,7 +688,7 @@ otter sea~
 a sea otter~
 A sea otter glides past you.
 ~
-10 20 djlo 0
+30 50 djlo 0
 0 0 6 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -699,7 +699,7 @@ whale right huge~
 the right whale~
 A huge right whale surfaces nearby!
 ~
-70 80 djloy 0
+30 50 djloy 0
 0 0 6 5
 I 0 3012 100.00 6  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 6  # SKIN: a large skin
@@ -709,7 +709,7 @@ whale fin gigantic~
 the fin whale~
 A gigantic fin whale swims up alongside you!
 ~
-70 80 djloy 0
+30 50 djloy 0
 0 0 6 5
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -729,7 +729,7 @@ shark whale huge spotted~
 the whale shark~
 A huge, spotted whale shark swims just below the surface.
 ~
-70 80 djloy 0
+30 50 djloy 0
 0 0 6 5
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -753,7 +753,7 @@ shark basking~
 the basking shark~
 A basking shark swims slowly, with its mouth wide open.
 ~
-70 80 djloy 0
+30 50 djloy 0
 0 0 6 5
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -777,7 +777,7 @@ gannet bird~
 a gannet~
 A gannet dives out of the air and into the water.
 ~
-1 10 djo m
+1 5 djo m
 0 0 2 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 S
@@ -786,7 +786,7 @@ albatross bird~
 an albatross~
 An albatross is floating peacefully in the water.
 ~
-1 10 djo m
+1 5 djo m
 0 0 2 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 S
@@ -795,7 +795,7 @@ fox arctic~
 an arctic fox~
 An arctic fox is playing here.
 ~
-25 50 djo c
+30 50 djo c
 0 0 14 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1352 100.00 1  # SKIN: a luxurious fox fur
@@ -805,7 +805,7 @@ dire fox arctic~
 a dire arctic fox~
 A dire arctic fox rolls nearby.
 ~
-75 125 djo c
+75 100 djo c
 0 0 14 9
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
@@ -816,7 +816,7 @@ hare arctic~
 an arctic hare~
 An arctic hare sits upright, staring.
 ~
-25 50 djo 0
+10 20 djo 0
 0 0 15 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -826,7 +826,7 @@ deer reindeer~
 a reindeer~
 A reindeer raises its head from grazing.
 ~
-30 70 dejo 0
+50 75 dejo 0
 0 0 14 27
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -840,7 +840,7 @@ reindeer barded~
 a barded reindeer~
 A barded reindeer waits regally nearby.
 ~
-50 90 bdej 0
+50 75 bdej 0
 0 0 14 27
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -859,7 +859,7 @@ bear polar~
 a polar bear~
 A polar bear scratches at the ground.
 ~
-80 100 dgjkoy c
+75 100 dgjkoy c
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -868,10 +868,10 @@ I 1 9177 100.00 1  # SKIN: a polar bear fur
 S
 #9178
 narwhal narwal huge~
-narwhal~
+a narwhal~
 A huge narwhal breaks the surface of the water.
 ~
-100 125 djloy 0
+50 75 djloy 0
 0 0 6 5
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -896,7 +896,7 @@ walrus huge~
 a huge walrus~
 A huge walrus bellows nearby.
 ~
-40 60 djoA 0
+75 100 djoA 0
 0 0 13 27
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -912,7 +912,7 @@ wolverine bristling~
 a bristling wolverine~
 A bristling wolverine watches you menacingly.
 ~
-70 90 cdjo c
+75 100 cdjo c
 0 0 7 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -924,7 +924,7 @@ puffin rainbow~
 a rainbow-billed puffin~
 A rainbow-billed puffin preens its feathers nearby.
 ~
-40 50 dgjlo 0
+10 20 dgjlo 0
 0 0 16 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 S
@@ -933,7 +933,7 @@ penguin~
 a penguin~
 A penguin pops out of the ice.
 ~
-40 50 djo 0
+30 50 djo 0
 0 0 16 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 T 9183
@@ -943,7 +943,7 @@ penguin emperor~
 an emperor penguin~
 An emperor penguin slides across the ice nearby.
 ~
-60 70 dgjlo 0
+50 75 dgjlo 0
 0 0 16 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 T 9183
@@ -953,7 +953,7 @@ seal elephant~
 a large elephant seal~
 A large elephant seal bellows nearby.
 ~
-40 60 djoA 0
+75 100 djoA 0
 0 0 13 5
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
@@ -966,7 +966,7 @@ seal~
 a seal~
 A seal slides across the ice.
 ~
-40 50 dgjlo 0
+30 50 dgjlo 0
 0 0 16 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -985,7 +985,7 @@ mouse~
 a mouse~
 A mouse scurries by.
 ~
-1 3 bdjo c
+1 5 bdjo c
 0 0 8 9
 T 9188
 S
@@ -994,7 +994,7 @@ rat~
 a rat~
 A rat scurries by.
 ~
-1 10 bdjo c
+1 5 bdjo c
 0 0 8 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
@@ -1005,7 +1005,7 @@ spider~
 a spider~
 A spider scurries by.
 ~
-1 3 bdjo c
+1 5 bdjo c
 0 0 7 9
 T 9188
 S
@@ -1014,7 +1014,7 @@ spider large~
 a large spider~
 A large spider creeps by.
 ~
-1 10 djo c
+1 5 djo c
 0 0 9 9
 T 9188
 S
@@ -1023,7 +1023,7 @@ cat tabby~
 a tabby cat~
 A tabby cat purrs nearby.
 ~
-10 30 djoz c
+5 15 djoz c
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
@@ -1032,7 +1032,7 @@ cat tabby~
 a tabby cat~
 A tabby cat arches and hisses at you.
 ~
-10 30 djoz c
+5 15 djoz c
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
@@ -1041,7 +1041,7 @@ hound dog~
 a hunting hound~
 A hunting hound watches you, tail wagging.
 ~
-20 40 djoz c
+5 15 djoz c
 0 0 14 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
@@ -1050,7 +1050,7 @@ hound dog~
 a hunting hound~
 A hunting hound growls and bristles at you.
 ~
-20 40 djoz c
+5 15 djoz c
 0 0 14 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 S
@@ -1059,7 +1059,7 @@ frog treefrog~
 a tree frog~
 A tree frog blinks each eye at you.
 ~
-1 3 bdjo c
+1 5 bdjo c
 0 0 1 9
 S
 #9197
@@ -1067,7 +1067,7 @@ gecko~
 a gecko~
 A gecko flicks its tongue nearby.
 ~
-1 3 bdjko c
+1 5 bdjko c
 0 0 1 9
 T 9188
 S
@@ -1076,7 +1076,7 @@ moth~
 a moth~
 A moth flutters nearby.
 ~
-1 1 bdjo c
+1 5 bdjo c
 0 0 2 15
 T 9198
 S
@@ -1085,7 +1085,7 @@ beetle~
 a beetle~
 A beetle skitters for cover nearby.
 ~
-1 1 bdjo c
+1 5 bdjo c
 0 0 8 9
 T 9188
 S

@@ -1,0 +1,117 @@
+VTRIG "VEHICLE TRIGGERS" "VEH TRIGGERS" "TRIGEDIT VEHICLES" VEHICLE-TRIGGERS TRIGEDIT-VEHICLES VEH-TRIGGERS
+
+Vehicles are fully scriptable in EmpireMUD, and are able to fire triggers,
+can execute commands, and can be stored as variables.
+
+See also:
+- List of variables: &yVTRIG VARS&0
+- List of triggers: &yVTRIG TYPES&0
+- List of commands: &yVTRIG COMMANDS&0
+#d
+"DESTROY TRIGGER" "VTRIG DESTROY" TRIGEDIT-VEH-DESTROY
+
+Argument type:  percent chance to execute
+Return value:  return 0 to prevent the vehicle's destruction
+
+The Destroy trigger is called when a vehicle would be destroyed by siege
+damage, burning, or lack of maintenance. You can prevent this destruction by
+returning 0 from the script (which will restore 1 health point and put out any
+fire).
+
+Use the "return 0" option cautiously, as this may make the vehicle
+indestructible.
+#d
+"VTRIG COMMANDS" "VEHICLE COMMANDS" TRIGEDIT-VEH-COMMANDS
+
+The following commands are available in vehicle triggers (see their individual
+help files for more info):
+
+&cnorth, up, down, etc&0 - Vehicles can move normally.
+&c%adventurecomplete%&0 - Triggers completion of the adventure it's in.
+&c%aoe%&0 - Deals scaled damage to all people in the room.
+&c%at%&0 - Performs a command as if it's at that location.
+&c%buildingecho%&0 - Sends a message to everyone at a certain map location.
+&c%damage%&0 - Deals scaled damage to a person.
+&c%door%&0 - Various functions for changing doors and exits.
+&c%dot%&0 - Adds a damage-over-time effect to a person.
+&c%echo%&0 - Sends a message to the whole room.
+&c%echoaround%&0 - Sends a message to all but one target.
+&c%echoneither%&0 - Sends a message to all but two people.
+&c%force%&0 - Forces a person to execute a command.
+&c%load%&0 - Loads a mob, object, etc.
+&c%morph%&0 - Causes a person to morph.
+&c%own%&0 - Changes ownership on something.
+&c%purge%&0 - Purges a mob, object, etc.
+&c%quest%&0 - Modifies a player's quests.
+&c%regionecho%&0 - Sends a message to everyone in a given map radius.
+&c%scale%&0 - Changes the scale level of a target.
+&c%send%&0 - Send a message to one person.
+&c%siege%&0 - Deals siege damage to a vehicle or room.
+&c%teleport%&0 - Moves people to another location.
+&c%terracrop%&0 - Changes the terrain to a certain crop type.
+&c%terraform%&0 - Changes the terrain to a certain sector type.
+&c%vehicleecho%&0 - Sends a message to everyone in/on a vehicle.
+#d
+"VTRIG TYPES" TRIGEDIT-VEH-TYPES "VEH TRIGGER TYPES" "VEHICLE TRIGGER TYPES"
+
+Vehicles can trigger on the following events:
+
+&cGlobal&0 - Can happen even without players present (combine with Random).
+&cRandom&0 - Triggers randomly when players are around.
+&cCommand&0 - Responds to a player command.
+&cSpeech&0 - Responds to player speech.
+&cDestroy&0 - Triggers when the vehicle would be destroyed.
+&cGreet&0 - Triggers when a person enters the room.
+&cEntry&0 - Triggers when the vehicle moves into a new room.
+&cLoad&0 - Triggers when the vehicle loads (or is finished being crafted).
+&cLeave&0 - Triggers when a person tries to leave.
+&cStart-Quest&0 - Triggers when a player tries to start a quest.
+&cFinish-Quest&0 - Triggers when a player tries to turn in a quest.
+
+For each type, there is a help file named &yVTRIG <type>&0.
+#d
+"VTRIG VARS" "VTRIG VARIABLES" VEH-VARS TRIGEDIT-VEH-VAR TRIGEDIT-VARIABLES-VEHICLES
+
+All vehicle scripts provide the &c%self%&0 variable.
+
+When using field  - The variable returns:
+&canimals_harnessed&0 - Number of animals harnessed to the vehicle.
+&canimals_required&0 - Number of animals needed for the vehicle to move.
+&cburn&0 - Ignites the vehicle, if possible.
+&ccan_fire&0 - Currently capable of using siege weapons.
+&ccomplete&0 - True if the vehicle is complete.
+&ccontents&0 - The first item inside the vehicle (if a container).
+&ccount(str)&0 - Number of matching items inside (name/vnum).
+&cdriver&0 - The person driving/sailing the vehicle, if any.
+&cdump&0 - Empties everything out of the vehicle, including people.
+&cdump_objects&0 - Empties just the contents, if the vehicle is a container.
+&cempire&0 - The empire that owns the vehicle, if any.
+&cempire_id&0 - ID of the empire that owns the vehicle, if any.
+&cempire_name&0 - The name of the empire that owns the vehicle, if any.
+&cextinguish&0 - If the vehicle is on fire, puts it out.
+&charness(mob)&0 - Harnesses a mob to the vehicle (or loads and harnesses one if
+   you give a vnum instead of a mob).
+&chas_in(str)&0 - True if an object with a given name/vnum is inside.
+&chealth&0 - Current health of the vehicle.
+&cid&0 - The id number of the vehicle.
+&cin_on&0 - "in" or "on" depending on how characters sit in/on the vehicle.
+&cinterior&0 - The base inside room (where you'd board to, if it has one).
+&cis_flagged(FLAG)&0 - True if the vehicle has the flag.
+&ckeywords&0 - The vehicle's keyword list.
+&cled_by&0 - The person leading the vehicle, if any.
+&clevel&0 - What level the vehicle is scaled to.
+&cmaxhealth&0 - Maximum health of the vehicle.
+&cmaxrooms&0 - Maximum added rooms (not counting the base interior room).
+&cmovetype&0 - The verb for the vehicle's movement (like "sails").
+&cneedsrepair&0 - The vehicle needs yearly maintenance or took damage.
+&cnext_in_room&0 - The next vehicle in the room (list of %room.vehicles%).
+&croom&0 - The room the vehicle is in.
+&crooms&0 - The number of added rooms (not counting the base interior room).
+&cshortdesc&0 - The vehicle's short description (the name the players see).
+&csitting_in&0 - The person who's sitting in/on the vehicle, if any.
+&cunharness&0 - Detaches all mobs that were harnessed to it.
+&cvnum&0 - The vehicle's vnum.
+
+See also: EMPIRE VARS, VEDIT FLAGS
+#d
+$~

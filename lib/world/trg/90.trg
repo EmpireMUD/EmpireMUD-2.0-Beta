@@ -118,7 +118,7 @@ switch (%random.4%)
   break
   default
     * Bock bock...
-    %echo% %self.name% clucks with contentment as %self.heshe% prunes %self.hisher% feathers.
+    %echo% %self.name% clucks with contentment as %self.heshe% preens %self.himher%self.
   break
 done
 ~
@@ -313,5 +313,31 @@ switch (%random.3%)
     %echo% %self.name%'s ears prick forward as though listening for danger...
   break
 done
+~
+#9064
+Wandering Vampire combat~
+0 k 25
+~
+if !%self.mob_flagged(VAMPIRE)%
+  halt
+end
+if %time.hour%>=7 && %time.hour%<=19
+  halt
+end
+%send% %actor% %self.name% lunges forward and sinks %self.hisher% teeth into your shoulder!
+%echoaround% %actor% %self.name% lunges forward and sinks %self.hisher% teeth into %actor.name%'s shoulder!
+eval healthprct %actor.health% * 100 / %actor.maxhealth%
+if (%healthprct% < 50) && (!%actor.vampire()% && !%actor.nohassle%)
+  * Strings copied from sire_char
+  %send% %actor% You fall limply to the ground. In the distance, you think you see a light...
+  %echoaround% %actor% %actor.name% drops limply from %self.name%'s fangs...
+  %echoaround% %actor% %self.name% tears open %self.hisher% wrist with %self.hisher% teeth and drips blood into %actor.name%'s mouth!
+  %send% %actor% &rSuddenly, a warm sensation touches your lips and a stream of blood flows down your throat...&0
+  %send% %actor% &rAs the blood fills you, a strange sensation covers your body... The light in the distance turns blood-red and a hunger builds within you!&0
+  nop %actor.vampire(on)%
+  dg_affect %self% STUNNED on 5
+else
+  %damage% %actor% 25
+end
 ~
 $

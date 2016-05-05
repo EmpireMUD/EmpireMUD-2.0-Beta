@@ -2,7 +2,7 @@
 Helm~
 The Helm~
 ~
-0 0 amHIRS 0
+0 0 aHR o
 0 0 0 -1
 C
 disembark, sail~
@@ -16,7 +16,7 @@ S
 On Deck~
 On Deck~
 ~
-0 0 amHIRS 0
+0 0 aHR 0
 0 0 0 -1
 C
 disembark, sail~
@@ -28,14 +28,18 @@ M
 S
 #5502
 Cargo Hold~
-In the Cargo Hold~
+The Cargo Hold~
 ~
-0 0 amHIRS 0
+0 0 aH p
 0 0 0 -1
-C
-disembark, sail, unload~
 D
-You are in the cargo hold of the ship.
+   You are in the ship's cargo hold, where boxes of various shapes and sizes
+have been stacked against the walls. The ship tips and sways, but everything is
+wedged firmly into place.
+~
+E
+boxes crates stacks~
+The boxes come in all shapes and sizes, and are marked with their destinations.
 ~
 M
 255 20.00 c
@@ -44,12 +48,82 @@ S
 Below Deck~
 Below Deck~
 ~
-0 0 amHIRS 0
+0 0 aH o
+0 0 0 -1
+D
+   It takes your eyes a moment to adjust to the darkness below deck. The
+ceiling is low here, forcing you to stoop. The ship tilts and sways, making you
+all the more nauseous as you can't see the water from here.
+~
+M
+255 20.00 c
+S
+#5504
+Forecastle~
+On The Forecastle~
+&0[  ]~
+1 0 aHR q
 0 0 0 -1
 C
-disembark, sail, unload~
+disembark, sail~
 D
-You are below deck of the ship, where the constant rocking makes you ill.
+You are standing on the ship's forecastle, overlooking the sea.
+~
+M
+255 20.00 c
+S
+#5505
+Bilge~
+The Bilge~
+~
+0 0 aH o
+0 0 0 -1
+D
+   You are in the bilge, the lowest part of the ship. A small amount of dark
+water has pooled at the bottom, which is not as worrisome as the grime just
+above that water line, where waste has built up as water leaks in.
+~
+M
+255 20.00 c
+S
+#5506
+Bow~
+On The Bow~
+&0[  ]~
+1 0 aHR o
+0 0 0 -1
+C
+disembark, sail~
+D
+You are standing at the bow of the ship.
+~
+M
+255 20.00 c
+S
+#5507
+Crow's Nest~
+In The Crow's Nest~
+&0[  ]~
+1 0 aHR p
+0 0 0 -1
+C
+sail~
+D
+You are up in the crow's nest, high above the ship.
+~
+M
+255 20.00 c
+S
+#5508
+On Deck~
+On Deck~
+~
+0 0 aHR 0
+0 0 0 -1
+C
+disembark, sail~
+D
+You're standing on deck, looking out over this side of the ship.
 ~
 M
 255 20.00 c
@@ -99,5 +173,166 @@ powerful occupants, and a winding staircase leads back to the ground floor.
 ~
 M
 237 20.00 ce
+S
+#5512
+Aftercastle~
+Inside The Aftercastle~
+~
+0 0 aH p
+0 0 0 -1
+D
+   You are in the main room of the aftercastle, a building unto itself on the
+back of the ship. There are several rooms here, each decorated lavishly by the
+ship's captain. Many windows bring in light from the sides of the room.
+~
+E
+windows out~
+The windows need to be cleaned, as you can't see through the scum.
+~
+M
+255 20.00 c
+S
+#5513
+Quarterdeck~
+On The Quarterdeck~
+&0[  ]~
+1 0 aHR q
+0 0 0 -1
+C
+disembark, sail~
+D
+You are standing on the raised quarterdeck.
+~
+M
+255 20.00 c
+S
+#5514
+Stern~
+At The Stern~
+&0[  ]~
+1 0 aHR o
+0 0 0 -1
+C
+disembark, sail~
+D
+You are standing on the raised quarterdeck.
+You are standing at the stern, looking off the back of the ship.
+~
+M
+255 20.00 c
+S
+#5515
+Bunk Room~
+The Bunk Room~
+~
+0 0 aH o
+0 0 0 -1
+D
+   You have found the crew's bunk, lined floor to ceiling with hammocks. In one
+corner, locked trunks hold personal goods belonging to the sailors. The room
+has taken on a foul odor, perhaps because there isn't a bath.
+~
+F
+d
+M
+255 20.00 c
+S
+#5516
+Captain's Cabin~
+The Bunk Room~
+~
+0 0 aH q
+0 0 0 -1
+D
+   With rich mahogany walls and bronze accents, you can be sure this is the
+captain's cabin. Unlike much of the ship, which has been beaten by the
+elements, everything in this cabin is clean and pristine.
+~
+F
+d
+M
+255 20.00 c
+S
+#5517
+The Galley~
+The Galley~
+~
+0 0 aH q
+0 0 0 -1
+D
+   The ship's galley is piled high with dry goods. A small cooking fire in the
+corner sits below a well-ventilated hood, and there's a jug of fresh water
+sitting on the counter. Tables run the length of the room.
+~
+F
+FG
+M
+255 20.00 c
+S
+#5518
+Inside Wagon~
+Inside the Wagon~
+&0[  ]~
+1 0 a r
+0 0 0 -1
+C
+disembark~
+D
+   The base of the wagon is made of sturdy wood, though it rumbles as it rolls
+along the prairie. The cloth covering is supported by tall wooden arches,
+giving you enough room to stand comfortably and move about the vehicle.
+~
+S
+#5519
+Wagon Sleeping Area~
+Inside the Wagon~
+&0[  ]~
+1 0 a r
+0 0 0 -1
+C
+disembark, sleep~
+D
+   This part of the wagon is cozy, almost cramped, due to the upholstered
+furniture and plush bed. Everything is firmly attached to the wooden base of
+the wagon so that it doesn't shift in transit, but you can't imagine trying to
+sleep while it's rattling over the open plains.
+~
+F
+d
+S
+#5520
+Wagon Cooking Area~
+In the Wagon~
+&0[  ]~
+1 0 a r
+0 0 0 -1
+C
+cook, disembark~
+D
+   This tiny corner of the wagon has been fashioned into something of a
+kitchen, with a little iron stove that vents out the back. The cloth canopy
+above the stove is a little scorched. A table has been bolted to the floor, but
+it has only pillows for chairs.
+~
+F
+G
+S
+#5521
+Carriage~
+In the Carriage~
+&0[  ]~
+1 0 a 0
+0 0 0 -1
+C
+disembark~
+D
+   The inside of the carriage is a little cramped, but the upholstered seats
+are made to sit four. The windows are covered in dark curtains to grant you a
+little privacy while the driver steers from a seat on the outside.
+~
+E
+windows out~
+The windows are too dirty to see much.
+~
 S
 $

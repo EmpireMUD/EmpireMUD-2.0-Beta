@@ -4,9 +4,10 @@ a collapsed cabin tent~
 A collapsed cabin tent is folded on the ground.~
    A patchwork of large animal hides, sewn together into several long side
 pieces, and one large roof. Stacked between the folds are several weathered
-tusks, to be used as uprights.
+tusks, to be used as uprights. You can set this tent up using 'build
+cabintent'.  
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 7 0
 S
@@ -16,13 +17,14 @@ a reindeer's antlers~
 A rack of reindeer antlers rest nearby.~
    The root of the antler is as thick as a man's wrist and gnarled with boney
 warts before branching smoothly into a half-dozen, widely-spaced prongs.
+
 Forge (Deadly Weapons): reindeer antler dagger
- 1x reindeer's antler
- 2x imperium ingot
 ~
-3 e a 1
+3 e a 3
 0 0 0
 14 0
+O
+2 0
 R
 5120 0
 S
@@ -38,9 +40,9 @@ produced it.
 0 1 4
 14 0
 A
-2 1
+2 1 0
 A
-17 1
+17 1 0
 C
 1 100
 S
@@ -50,13 +52,14 @@ a polar bear fur~
 A polar bear's fur is heaped on the ice.~
    The polar bear fur is thick and warm. It could be sewn into garments for
 added protection from the winter elements.
+
 Sew (Dangerous Leathers): polar bear cloak
- 1x polar bear fur
- 1x large leather
 ~
-3 e a 1
+3 e a 3
 0 0 0
 7 0
+O
+10 f
 R
 5120 0
 S
@@ -71,9 +74,9 @@ mesmerizing spiral around its core, and glistens with permanent cold.
 0 1 20
 14 0
 A
-5 1
+5 1 0
 A
-7 1
+7 1 0
 C
 100 150
 S
@@ -83,11 +86,10 @@ a walrus tusk~
 A tusk from a walrus sticks out of the ice nearby.~
    The tusk forms a curve from massive root to blunted tip, easily the length
 of an adult man's arm.
+
 Sew (Dangerous Leathers): cabin tent
- 16x walrus tusks
- 32x large leather
 ~
-3 e a 1
+3 e a 2
 0 0 0
 14 0
 R
@@ -100,13 +102,14 @@ A wolverine fur is piled on the ice.~
    The thick, slightly oily wolverine fur is a bristling mess of tawny-tipped
 hairs over a dense, mocha-coloured undercoat. It could be sewn into garments
 for added protection against the cold.
+
 Sew (Dangerous Leathers): wolverine fur cap
- 1x wolverine fur
- 1x small leather
 ~
-3 0 a 1
+3 0 a 3
 0 0 0
 7 0
+O
+10 o
 R
 5120 0
 S
@@ -122,7 +125,7 @@ over the ears for added warmth.
 0 0 0
 7 0
 A
-3 1
+3 1 0
 C
 75 100
 S
@@ -137,9 +140,9 @@ from harsh winter elements.
 0 0 0
 7 0
 A
-5 1
+5 1 0
 A
-1 1
+1 1 0
 C
 100 150
 S
@@ -150,13 +153,14 @@ A sealskin is piled on the ice.~
    The skin of the elephant seal is beaded with melted snow, which runs off due
 to the pelt's natural oils. It could be sewn into garments for added protection
 against the wet and cold.
+
 Sew (Dangerous Leathers): sealskin leggings
- 1x large sealskin
- 1x large leather
 ~
-3 e a 2
+3 e a 4
 0 0 0
 7 0
+O
+24 fk
 R
 5120 0
 S
@@ -171,11 +175,11 @@ natural oils, forming a protective barrier against wet or wintery weather.
 2 0 0
 7 0
 A
-18 1
+18 1 0
 A
-11 1
+11 1 0
 A
-17 1
+17 1 0
 C
 100 150
 S
@@ -189,7 +193,7 @@ The aura is a pale blue pulse in the air, warmer than the current around it.
 0 0 0
 10 0
 A
-15 1
+15 1 0
 C
 150 150
 S

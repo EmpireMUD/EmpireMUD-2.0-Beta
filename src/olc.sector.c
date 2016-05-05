@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.sector.c                                    EmpireMUD 2.0b3 *
+*   File: olc.sector.c                                    EmpireMUD 2.0b4 *
 *  Usage: OLC for sector prototypes                                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -133,14 +133,18 @@ char *list_one_sector(sector_data *sect, bool detail) {
 */
 void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
+	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
 	void remove_sector_from_table(sector_data *sect);
 	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+	extern bool world_map_needs_save;
 	
 	sector_data *sect, *sect_iter, *next_sect, *replace_sect;
-	room_data *room, *next_room;
+	quest_data *quest, *next_quest;
 	descriptor_data *desc;
 	adv_data *adv, *next_adv;
-	int count;
+	struct map_data *map;
+	room_data *room;
+	int count, x, y;
 	bool found;
 	
 	if (!(sect = sector_proto(vnum))) {
@@ -170,15 +174,48 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 		}
 	}
 	
-	// update world
+	// update world: map
 	count = 0;
-	HASH_ITER(world_hh, world_table, room, next_room) {
+	for (x = 0; x < MAP_WIDTH; ++x) {
+		for (y = 0; y < MAP_HEIGHT; ++y) {
+			map = &(world_map[x][y]);
+			room = NULL;
+			
+			if (map->sector_type == sect) {
+				if (!room) {
+					room = real_room(map->vnum);
+				}
+				map->sector_type = replace_sect;
+				SECT(room) = replace_sect;
+				++count;
+			}
+			if (map->base_sector == sect) {
+				if (!room) {
+					room = real_room(map->vnum);
+				}
+				change_base_sector(room, replace_sect);
+			}
+			if (map->natural_sector == sect) {
+				map->natural_sector = replace_sect;
+			}
+		}
+	}
+	
+	// update world: interior
+	LL_FOREACH2(interior_room_list, room, next_interior) {
 		if (SECT(room) == sect) {
+			// can't use change_terrain() here
 			SECT(room) = replace_sect;
 			++count;
+			
+			// this SHOULD already have been taken care of, but just in case...
+			if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+				world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type = replace_sect;
+				world_map_needs_save = TRUE;
+			}
 		}
-		if (ROOM_ORIGINAL_SECT(room) == sect) {
-			ROOM_ORIGINAL_SECT(room) = replace_sect;
+		if (BASE_SECT(room) == sect) {
+			change_base_sector(room, replace_sect);
 		}
 	}
 	
@@ -198,6 +235,17 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 		}
 	}
 	
+	// update quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		found = delete_quest_task_from_list(&QUEST_TASKS(quest), QT_VISIT_SECTOR, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_VISIT_SECTOR, vnum);
+		
+		if (found) {
+			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
 	// olc editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		// update evolutions in olc editors
@@ -212,6 +260,15 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	
 			if (found) {
 				msg_to_desc(desc, "One or more linking rules have been removed from the adventure you are editing.\r\n");
+			}
+		}
+		if (GET_OLC_QUEST(desc)) {
+			found = delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_VISIT_SECTOR, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_VISIT_SECTOR, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A sector used by the quest you are editing was deleted.\r\n");
 			}
 		}
 	}
@@ -235,12 +292,16 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_sector(char_data *ch, sector_vnum vnum) {
+	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	
 	char buf[MAX_STRING_LENGTH];
 	struct adventure_link_rule *link;
 	struct evolution_data *evo;
 	sector_data *real, *sect, *next_sect;
+	quest_data *quest, *next_quest;
 	adv_data *adv, *next_adv;
 	int size, found;
+	bool any;
 	
 	real = sector_proto(vnum);
 	if (!real) {
@@ -265,6 +326,20 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 					break;
 				}
 			}
+		}
+	}
+	
+	// quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_quest_task_in_list(QUEST_TASKS(quest), QT_VISIT_SECTOR, vnum);
+		any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_VISIT_SECTOR, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -468,18 +543,19 @@ void olc_show_sector(char_data *ch) {
 	sprintf(buf + strlen(buf), "<&ybuildflags&0> %s\r\n", lbuf);
 	
 	sprintf(buf + strlen(buf), "<&yevolution&0>\r\n");
-	get_evolution_display(st->evolution, buf1);
-	strcat(buf, buf1);
+	if (st->evolution) {
+		get_evolution_display(st->evolution, buf1);
+		strcat(buf, buf1);
+	}
 
 	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
-	get_interaction_display(GET_SECT_INTERACTIONS(st), buf1);
-	strcat(buf, buf1);
+	if (GET_SECT_INTERACTIONS(st)) {
+		get_interaction_display(GET_SECT_INTERACTIONS(st), buf1);
+		strcat(buf, buf1);
+	}
 	
 	sprintf(buf + strlen(buf), "<&yspawns&0> (add, remove, list)\r\n");
-	if (!GET_SECT_SPAWNS(st)) {
-		sprintf(buf + strlen(buf), " nothing\r\n");
-	}
-	else {
+	if (GET_SECT_SPAWNS(st)) {
 		count = 0;
 		for (spawn = GET_SECT_SPAWNS(st); spawn; spawn = spawn->next) {
 			++count;

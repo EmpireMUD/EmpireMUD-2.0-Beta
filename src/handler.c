@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: handler.c                                       EmpireMUD 2.0b3 *
+*   File: handler.c                                       EmpireMUD 2.0b4 *
 *  Usage: internal funcs: moving and finding chars/objs                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -56,6 +56,8 @@
 *   Storage Handlers
 *   Targeting Handlers
 *   Unique Storage Handlers
+*   Vehicle Handlers
+*   Vehicle Targeting Handlers
 *   World Handlers
 *   Miscellaneous Handlers
 */
@@ -65,7 +67,6 @@ extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
 extern const char *drinks[];
 extern int get_north_for_char(char_data *ch);
 extern struct complex_room_data *init_complex_data();
-void write_lore(char_data *ch);
 const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
@@ -86,7 +87,7 @@ static int extractions_pending = 0;
 * Call affect_remove with every af of "type"
 *
 * @param char_data *ch The person to remove affects from.
-* @param int type Any ATYPE_x const
+* @param int type Any ATYPE_ const
 */
 void affect_from_char(char_data *ch, int type) {
 	struct over_time_effect_type *dot, *next_dot;
@@ -113,8 +114,8 @@ void affect_from_char(char_data *ch, int type) {
 * Calls affect_remove on every affect of type "type" with location "apply".
 *
 * @param char_data *ch The person to remove affects from.
-* @param int type Any ATYPE_x const to match.
-* @param int apply Any APPLY_x const to match.
+* @param int type Any ATYPE_ const to match.
+* @param int apply Any APPLY_ const to match.
 */
 void affect_from_char_by_apply(char_data *ch, int type, int apply) {
 	struct affected_type *aff, *next_aff;
@@ -132,8 +133,8 @@ void affect_from_char_by_apply(char_data *ch, int type, int apply) {
 * Calls affect_remove on every affect of type "type" that sets AFF flag "bits".
 *
 * @param char_data *ch The person to remove affects from.
-* @param int type Any ATYPE_x const to match.
-* @param bitvector_t bits Any AFF_x bit(s) to match.
+* @param int type Any ATYPE_ const to match.
+* @param bitvector_t bits Any AFF_ bit(s) to match.
 */
 void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits) {
 	struct affected_type *aff, *next_aff;
@@ -172,7 +173,7 @@ void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag) {
 * Call affect_remove_room to remove all effects of "type"
 *
 * @param room_data *room The location to remove affects from.
-* @param int type Any ATYPE_X const
+* @param int type Any ATYPE_ const
 */
 void affect_from_room(room_data *room, int type) {
 	struct affected_type *hjp, *next;
@@ -235,10 +236,10 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 * This is the core function used by various affects and equipment to apply or
 * remove things to a player.
 *
-* This is where APPLY_x consts are mapped to their effects.
+* This is where APPLY_ consts are mapped to their effects.
 *
 * @param char_data *ch The person to apply to
-* @param byte loc APPLY_x const
+* @param byte loc APPLY_ const
 * @param sh_int mod The modifier amount for the apply
 * @param bitvector_t bitv AFF_x bits
 * @param bool add if TRUE, applies this effect; if FALSE, removes it
@@ -254,7 +255,8 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		REMOVE_BIT(AFF_FLAGS(ch), bitv);
 		mod = -mod;
 	}
-
+	
+	// APPLY_x:
 	switch (loc) {
 		case APPLY_NONE:
 			break;
@@ -408,6 +410,10 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_CRAFTING_BONUS(ch), mod, INT_MIN, INT_MAX, TRUE);
 			break;
 		}
+		case APPLY_BLOOD_UPKEEP: {
+			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_BLOOD_UPKEEP), mod, INT_MIN, INT_MAX, TRUE);
+			break;
+		}
 		default:
 			log("SYSERR: Unknown apply adjust %d attempt (%s, affect_modify).", loc, __FILE__);
 			break;
@@ -468,7 +474,7 @@ void affect_remove_room(room_data *room, struct affected_type *af) {
 * Insert an affect_type in a char_data structure
 *  Automatically sets apropriate bits and apply's
 *
-* Caution: this duplicates af (because of how it loads from the pfile)
+* Caution: this duplicates af (because of how it used to load from the pfile)
 *
 * @param char_data *ch The person to add the affect to
 * @param struct affected_type *af The affect to add.
@@ -517,11 +523,11 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 */
 void affect_total(char_data *ch) {
 	extern const int base_player_pools[NUM_POOLS];
-	void update_morph_stats(char_data *ch, bool add);
 
 	struct affected_type *af;
-	int i, j, iter;
+	int i, iter;
 	empire_data *emp = GET_LOYALTY(ch);
+	struct obj_apply *apply;
 	int health, move, mana;
 	
 	int pool_bonus_amount = config_get_int("pool_bonus_amount");
@@ -538,13 +544,11 @@ void affect_total(char_data *ch) {
 
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
-			for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-				affect_modify(ch, GET_EQ(ch, i)->affected[j].location, GET_EQ(ch, i)->affected[j].modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), FALSE);
+			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, i)); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), FALSE);
 			}
 		}
 	}
-
-	update_morph_stats(ch, FALSE);
 	
 	// abilities
 	if (!IS_NPC(ch)) {
@@ -565,22 +569,20 @@ void affect_total(char_data *ch) {
 		GET_MAX_MOVE(ch) = base_player_pools[MOVE];
 		GET_MAX_MANA(ch) = base_player_pools[MANA];
 		
-		if (GET_CLASS(ch) != CLASS_NONE) {
-			GET_MAX_HEALTH(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (class_data[GET_CLASS(ch)].max_pools[HEALTH] - base_player_pools[HEALTH]) / 100);
-			GET_MAX_MOVE(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (class_data[GET_CLASS(ch)].max_pools[MOVE] - base_player_pools[MOVE]) / 100);
-			GET_MAX_MANA(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (class_data[GET_CLASS(ch)].max_pools[MANA] - base_player_pools[MANA]) / 100);
+		if (GET_CLASS(ch)) {
+			GET_MAX_HEALTH(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (CLASS_POOL(GET_CLASS(ch), HEALTH) - base_player_pools[HEALTH]) / 100);
+			GET_MAX_MOVE(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (CLASS_POOL(GET_CLASS(ch), MOVE) - base_player_pools[MOVE]) / 100);
+			GET_MAX_MANA(ch) += MAX(0, GET_CLASS_PROGRESSION(ch) * (CLASS_POOL(GET_CLASS(ch), MANA) - base_player_pools[MANA]) / 100);
 		}
 	}
 
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
-			for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-				affect_modify(ch, GET_EQ(ch, i)->affected[j].location, GET_EQ(ch, i)->affected[j].modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), TRUE);
+			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, i)); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), TRUE);
 			}
 		}
 	}
-
-	update_morph_stats(ch, TRUE);
 
 	for (af = ch->affected; af; af = af->next) {
 		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
@@ -598,13 +600,13 @@ void affect_total(char_data *ch) {
 
 	// ability-based modifiers
 	if (!IS_NPC(ch)) {
-		if (HAS_ABILITY(ch, ABIL_ENDURANCE)) {
+		if (has_ability(ch, ABIL_ENDURANCE)) {
 			GET_MAX_HEALTH(ch) = MIN(GET_MAX_HEALTH(ch), 1000) * 2.0 + MAX(GET_MAX_HEALTH(ch) - 1000, 0) * 1.25;
 		}
-		if (HAS_ABILITY(ch, ABIL_GIFT_OF_NATURE)) {
+		if (has_ability(ch, ABIL_GIFT_OF_NATURE)) {
 			GET_MAX_MANA(ch) *= 1.35;
 		}
-		if (HAS_ABILITY(ch, ABIL_ARCANE_POWER)) {
+		if (has_ability(ch, ABIL_ARCANE_POWER)) {
 			GET_MAX_MANA(ch) *= 1.35;
 		}
 	}
@@ -619,6 +621,9 @@ void affect_total(char_data *ch) {
 		EMPIRE_GREATNESS(emp) += GET_GREATNESS(ch);
 	}
 	
+	// limit this
+	GET_MAX_HEALTH(ch) = MAX(1, GET_MAX_HEALTH(ch));
+	
 	// restore these because in some cases, they mess up during an affect_total
 	GET_HEALTH(ch) = health;
 	GET_MOVE(ch) = move;
@@ -631,7 +636,7 @@ void affect_total(char_data *ch) {
 
 /**
 * @param char_data *ch The person to check
-* @param int type Any ATYPE_x const
+* @param int type Any ATYPE_ const
 * @return bool TRUE if ch is affected by anything with matching type
 */
 bool affected_by_spell(char_data *ch, int type) {
@@ -657,11 +662,11 @@ bool affected_by_spell(char_data *ch, int type) {
 
 
 /**
-* Matches both an ATYPE_x and an APPLY_x on an effect.
+* Matches both an ATYPE_ and an APPLY_ on an effect.
 *
 * @param char_data *ch The character to check
-* @param int type the ATYPE_x flag
-* @param int apply the APPLY_x flag
+* @param int type the ATYPE_ flag
+* @param int apply the APPLY_ flag
 * @return bool TRUE if an effect matches both conditions
 */
 bool affected_by_spell_and_apply(char_data *ch, int type, int apply) {
@@ -681,11 +686,11 @@ bool affected_by_spell_and_apply(char_data *ch, int type, int apply) {
 /**
 * Create an affect that modifies a trait.
 *
-* @param int type ATYPE_x
+* @param int type ATYPE_
 * @param int duration in 5-second ticks
-* @param int location APPLY_x
+* @param int location APPLY_
 * @param int modifier +/- amount
-* @param bitvector_t bitvector AFF_x
+* @param bitvector_t bitvector AFF_
 * @param char_data *cast_by The caster who made the effect (may be NULL; use the person themselves for penalty effects as those won't cleanse).
 * @return struct affected_type* The created af
 */
@@ -706,9 +711,9 @@ struct affected_type *create_aff(int type, int duration, int location, int modif
 
 /**
 * @param char_data *ch Person receiving the DoT.
-* @param sh_int type ATYPE_x spell that caused it.
+* @param sh_int type ATYPE_ spell that caused it.
 * @param sh_int duration Affect time, in 5-second intervals.
-* @param sh_int damage_type DAM_x type.
+* @param sh_int damage_type DAM_ type.
 * @param sh_int damage How much damage to do per 5-seconds.
 * @param sh_int max_stack Number of times this can stack when re-applied before it expires.
 * @param sh_int char_data *cast_by The caster.
@@ -762,7 +767,7 @@ void dot_remove(char_data *ch, struct over_time_effect_type *dot) {
 
 /**
 * @param room_data *room The room to check
-* @param int type Any ATYPE_x const
+* @param int type Any ATYPE_ const
 * @return bool TRUE if the room is affected by the spell
 */
 bool room_affected_by_spell(room_data *room, int type) {
@@ -781,47 +786,6 @@ bool room_affected_by_spell(room_data *room, int type) {
 
 //////////////////////////////////////////////////////////////////////////////
 //// CHARACTER HANDLERS /////////////////////////////////////////////////////
-
-
-/**
-* Removes a person from the chair he was sitting in.
-*
-* @param char_data *ch The character to remove from a chair.
-* @return bool TRUE if a character was removed from a chair, FALSE if not
-*/
-bool char_from_chair(char_data *ch) {
-	obj_data *chair;
-	bool result = FALSE;
-
-	if ((chair = ON_CHAIR(ch))) {
-		ON_CHAIR(ch) = NULL;
-		IN_CHAIR(chair) = NULL;
-		result = TRUE;
-	}
-	
-	return result;
-}
-
-
-/**
-* Puts a character in a chair, if possible.
-*
-* @param char_data *ch The sitter.
-* @param obj_data *chair The sittee.
-* @return bool TRUE if successful, otherwise FALSE
-*/
-bool char_to_chair(char_data *ch, obj_data *chair) {
-	bool result = FALSE;
-	
-	if (ch && chair && !IN_CHAIR(chair) && !ON_CHAIR(ch)) {
-		IN_CHAIR(chair) = ch;
-		ON_CHAIR(ch) = chair;
-		result = TRUE;
-	}
-
-	return result;
-}
-
 
 /* Extract a ch completely from the world, and leave his stuff behind */
 void extract_char_final(char_data *ch) {
@@ -872,24 +836,26 @@ void extract_char_final(char_data *ch) {
 		GET_FED_ON_BY(GET_FEEDING_FROM(ch)) = NULL;
 		GET_FEEDING_FROM(ch) = NULL;
 	}
-	if (GET_LEADING(ch)) {
-		GET_LED_BY(GET_LEADING(ch)) = NULL;
-		GET_LEADING(ch) = NULL;
+	if (GET_LEADING_MOB(ch)) {
+		GET_LED_BY(GET_LEADING_MOB(ch)) = NULL;
+		GET_LEADING_MOB(ch) = NULL;
 	}
 	if (GET_LED_BY(ch)) {
-		GET_LEADING(GET_LED_BY(ch)) = NULL;
+		GET_LEADING_MOB(GET_LED_BY(ch)) = NULL;
 		GET_LED_BY(ch) = NULL;
 	}
-	if (GET_PULLING(ch)) {
-		if (GET_PULLED_BY(GET_PULLING(ch), 0) == ch) {
-			GET_PULLING(ch)->pulled_by1 = NULL;	// old macro here was causing "invalid lvalue assignment" error
-		}
-		if (GET_PULLED_BY(GET_PULLING(ch), 1) == ch) {
-			GET_PULLING(ch)->pulled_by2 = NULL;	// old macro here was causing "invalid lvalue assignment" error
-		}
-		GET_PULLING(ch) = NULL;
+	if (GET_LEADING_VEHICLE(ch)) {
+		VEH_LED_BY(GET_LEADING_VEHICLE(ch)) = NULL;
+		GET_LEADING_VEHICLE(ch) = NULL;
 	}
-
+	if (GET_SITTING_ON(ch)) {
+		unseat_char_from_vehicle(ch);
+	}
+	if (GET_DRIVING(ch)) {
+		VEH_DRIVER(GET_DRIVING(ch)) = NULL;
+		GET_DRIVING(ch) = NULL;
+	}
+	
 	// npc-only frees	
 	if (IS_NPC(ch)) {
 		// free up pursuit
@@ -993,14 +959,21 @@ void extract_char_final(char_data *ch) {
 void extract_char(char_data *ch) {
 	void despawn_charmies(char_data *ch);
 	
-	if (IS_NPC(ch)) {
-		SET_BIT(MOB_FLAGS(ch), MOB_EXTRACTED);
+	if (ch == dg_owner_mob) {
+		dg_owner_purged = 1;
+		dg_owner_mob = NULL;
 	}
-	else {
-		SET_BIT(PLR_FLAGS(ch), PLR_EXTRACTED);
+	
+	if (!EXTRACTED(ch)) {
+		if (IS_NPC(ch)) {
+			SET_BIT(MOB_FLAGS(ch), MOB_EXTRACTED);
+		}
+		else {
+			SET_BIT(PLR_FLAGS(ch), PLR_EXTRACTED);
+		}
+		++extractions_pending;
 	}
 
-	extractions_pending++;
 	
 	// get rid of friends now (extracts them as well)
 	despawn_charmies(ch);
@@ -1092,7 +1065,6 @@ void perform_dismount(char_data *ch) {
 * @param char_data *ch The player to idle out.
 */
 void perform_idle_out(char_data *ch) {
-	void Objsave_char(char_data *ch, int rent_code);
 	extern obj_data *player_death(char_data *ch);
 	
 	empire_data *emp = NULL;
@@ -1124,11 +1096,11 @@ void perform_idle_out(char_data *ch) {
 	else {
 		act("$n is idle too long, and vanishes.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
-
-	Objsave_char(ch, RENT_RENTED);
+	
 	save_char(ch, died ? NULL : IN_ROOM(ch));
 	
 	syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s force-rented and extracted (idle).", GET_NAME(ch));
+	extract_all_items(ch);
 	extract_char(ch);
 	
 	if (emp) {
@@ -1185,11 +1157,7 @@ void char_from_room(char_data *ch) {
 		log("SYSERR: NULL character or no location in %s, char_from_room", __FILE__);
 		exit(1);
 	}
-
-	if (ON_CHAIR(ch)) {
-		char_from_chair(ch);
-	}
-
+	
 	if (FIGHTING(ch) != NULL) {
 		stop_fighting(ch);
 	}
@@ -1508,7 +1476,7 @@ char_data *get_char_world(char *name) {
 
 	for (ch = character_list; ch && (pos <= number) && !found; ch = ch->next) {
 		if ((!IS_NPC(ch) || !pc_only) && MATCH_CHAR_NAME(tmp, ch)) {
-			if (++pos == number) {
+			if (++pos == number || pc_only) {	// pc_only messes up pos
 				found = ch;
 			}
 		}
@@ -1569,8 +1537,9 @@ bool can_afford_coins(char_data *ch, empire_data *type, int amount) {
 * @param char_data *ch The player.
 * @param empire_data *type Empire who is charging the player (or OTHER_COIN for any coin type).
 * @param int amount How much to charge the player -- must be positive.
+* @param struct resource_data **build_used_list Optional: if not NULL, will build a resource list of the specifc coin types charged.
 */
-void charge_coins(char_data *ch, empire_data *type, int amount) {
+void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_data **build_used_list) {
 	struct coin_data *coin;
 	int this, this_amount;
 	double rate, inv;
@@ -1585,6 +1554,10 @@ void charge_coins(char_data *ch, empire_data *type, int amount) {
 		this = MIN(coin->amount, amount);
 		decrease_coins(ch, type, this);
 		amount -= this;
+		
+		if (build_used_list) {
+			add_to_resource_list(build_used_list, RES_COINS, type ? EMPIRE_VNUM(type) : OTHER_COIN, this, 0);
+		}
 	}
 		
 	// then try the "other"
@@ -1596,6 +1569,10 @@ void charge_coins(char_data *ch, empire_data *type, int amount) {
 		decrease_coins(ch, REAL_OTHER_COIN, this);
 		// we know it was at least one -- prevent never-hits-zero errors
 		amount -= MAX(1, round(this * rate));
+		
+		if (build_used_list) {
+			add_to_resource_list(build_used_list, RES_COINS, OTHER_COIN, this, 0);
+		}
 	}
 	
 	for (coin = GET_PLAYER_COINS(ch); coin && amount > 0; coin = coin->next) {
@@ -1608,6 +1585,10 @@ void charge_coins(char_data *ch, empire_data *type, int amount) {
 			decrease_coins(ch, emp, this);
 			// we know it was at least one -- prevent never-hits-zero errors
 			amount -= MAX(1, round(this * rate));
+			
+			if (build_used_list) {
+				add_to_resource_list(build_used_list, RES_COINS, emp ? EMPIRE_VNUM(emp) : OTHER_COIN, this, 0);
+			}
 		}
 	}
 
@@ -1846,7 +1827,7 @@ double exchange_rate(empire_data *from, empire_data *to) {
 		modifier = 0.65;
 	}
 	else if (IS_SET(pol->type, DIPL_WAR)) {
-		modifier = 0;
+		modifier = 0.1;
 	}
 	else if (IS_SET(pol->type, DIPL_DISTRUST)) {
 		modifier = 0.25;
@@ -1861,7 +1842,7 @@ double exchange_rate(empire_data *from, empire_data *to) {
 		modifier += 0.25;
 	}
 
-	modifier = MAX(0.0, MIN(1.0, modifier));
+	modifier = MAX(0.1, MIN(1.0, modifier));
 	return modifier;
 }
 
@@ -2234,7 +2215,9 @@ void abandon_room(room_data *room) {
 	perform_abandon_room(room);
 
 	// inside
-	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+	for (iter = interior_room_list; iter; iter = next_iter) {
+		next_iter = iter->next_interior;
+		
 		if (HOME_ROOM(iter) == home) {
 			perform_abandon_room(iter);
 		}
@@ -2257,10 +2240,19 @@ void claim_room(room_data *room, empire_data *emp) {
 	
 	ROOM_OWNER(room) = emp;
 	remove_room_extra_data(room, ROOM_EXTRA_CEDED);	// not ceded if just claimed
-
-	HASH_ITER(interior_hh, interior_world_table, iter, next_iter) {
+	
+	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
+		qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
+	}
+	
+	for (iter = interior_room_list; iter; iter = next_iter) {
+		next_iter = iter->next_interior;
+		
 		if (HOME_ROOM(iter) == home) {
 			ROOM_OWNER(iter) = emp;
+			if (GET_BUILDING(iter) && IS_COMPLETE(iter)) {
+				qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(iter)));
+			}
 			remove_room_extra_data(iter, ROOM_EXTRA_CEDED);	// not ceded if just claimed
 		}
 	}
@@ -2412,9 +2404,11 @@ int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, in
 void perform_abandon_room(room_data *room) {
 	void deactivate_workforce_room(empire_data *emp, room_data *room);
 	
+	empire_data *emp = ROOM_OWNER(room);
+	
 	// ensure workforce is shut off
-	if (ROOM_OWNER(room)) {
-		deactivate_workforce_room(ROOM_OWNER(room), room);
+	if (emp) {
+		deactivate_workforce_room(emp, room);
 	}
 	
 	ROOM_OWNER(room) = NULL;
@@ -2429,6 +2423,10 @@ void perform_abandon_room(room_data *room) {
 	// if a city center is abandoned, destroy it
 	if (IS_CITY_CENTER(room)) {
 		disassociate_building(room);
+	}
+	
+	if (emp && GET_BUILDING(room) && IS_COMPLETE(room)) {
+		qt_empire_players(emp, qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
 	}
 }
 
@@ -2616,7 +2614,7 @@ void add_follower(char_data *ch, char_data *leader, bool msg) {
 
 	if (msg) {
 		act("You now follow $N.", FALSE, ch, 0, leader, TO_CHAR);
-		if (CAN_SEE(leader, ch)) {
+		if (CAN_SEE(leader, ch) && WIZHIDE_OK(leader, ch)) {
 			act("$n starts following you.", TRUE, ch, 0, leader, TO_VICT);
 		}
 		act("$n starts to follow $N.", TRUE, ch, 0, leader, TO_NOTVICT);
@@ -2658,7 +2656,7 @@ void stop_follower(char_data *ch) {
 
 	act("You stop following $N.", FALSE, ch, 0, ch->master, TO_CHAR);
 	act("$n stops following $N.", TRUE, ch, 0, ch->master, TO_NOTVICT);
-	if (CAN_SEE(ch->master, ch)) {
+	if (CAN_SEE(ch->master, ch) && WIZHIDE_OK(ch->master, ch)) {
 		act("$n stops following you.", TRUE, ch, 0, ch->master, TO_VICT);
 	}
 
@@ -3003,7 +3001,7 @@ void free_exclusion_data(struct interact_exclusion_data *list) {
 
 /**
 * @param struct interaction_item *list The list to check.
-* @param int type The INTERACT_x type to check for.
+* @param int type The INTERACT_ type to check for.
 * @return bool TRUE if at least one interaction of that type is in the list.
 */
 bool has_interaction(struct interaction_item *list, int type) {
@@ -3025,14 +3023,15 @@ bool has_interaction(struct interaction_item *list, int type) {
 *
 * @param char_data *ch The player who is interacting.
 * @param char_data *mob The NPC being interacted-with.
-* @param int type Any INTERACT_x const.
+* @param int type Any INTERACT_ const.
 * @param INTERACTION_FUNC(*func) A callback function to run for the interaction.
 */
 bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func)) {
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
+	bool any = FALSE, done_cumulative = FALSE;
 	struct global_data *glb, *next_glb;
-	bool any = FALSE;
+	int cumulative_prc;
 	adv_data *adv;
 	
 	// no work
@@ -3041,12 +3040,16 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 	}
 	
 	adv = get_adventure_for_vnum(GET_MOB_VNUM(mob));
+	cumulative_prc = number(1, 10000);
 
 	HASH_ITER(hh, globals_table, glb, next_glb) {
 		if (GET_GLOBAL_TYPE(glb) != GLOBAL_MOB_INTERACTIONS) {
 			continue;
 		}
 		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !has_ability(ch, GET_GLOBAL_ABILITY(glb))) {
 			continue;
 		}
 		
@@ -3072,6 +3075,24 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 			continue;
 		}
 		
+		// percent checks last
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT)) {
+			if (done_cumulative) {
+				continue;
+			}
+			cumulative_prc -= (int)(GET_GLOBAL_PERCENT(glb) * 100);
+			if (cumulative_prc <= 0) {
+				done_cumulative = TRUE;
+			}
+			else {
+				continue;	// not this time
+			}
+		}
+		else if (number(1, 10000) > (int)(GET_GLOBAL_PERCENT(glb) * 100)) {
+			// normal not-cumulative percent
+			continue;
+		}
+		
 		// we have a match!
 		any |= run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), type, IN_ROOM(ch), mob, NULL, func);
 	}
@@ -3086,7 +3107,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 *
 * @param char_data *ch The actor.
 * @param struct interaction_item *run_list A pointer to the start of the list to run.
-* @param int type Any INTERACT_x const.
+* @param int type Any INTERACT_ const.
 * @param room_data *inter_room For room interactions, the room.
 * @param char_data *inter_mob For mob interactions, the mob.
 * @param obj_data *inter_item For item interactions, the item.
@@ -3118,7 +3139,7 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 *
 * @param char_data *ch The actor.
 * @param room_data *room The location to run on.
-* @param int type Any INTERACT_x const.
+* @param int type Any INTERACT_ const.
 * @param INTERACTION_FUNC(*func) A function pointer that runs each successful interaction (func returns TRUE if an interaction happens; FALSE if it aborts)
 * @return bool TRUE if any interactions ran successfully, FALSE if not.
 */
@@ -3134,7 +3155,7 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	}
 	
 	// crop second
-	if (!success && ROOM_CROP_TYPE(room) != NOTHING && (crop = crop_proto(ROOM_CROP_TYPE(room)))) {
+	if (!success && (crop = ROOM_CROP(room))) {
 		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, func);
 	}
 	
@@ -3155,70 +3176,52 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
  //////////////////////////////////////////////////////////////////////////////
 //// LORE HANDLERS ///////////////////////////////////////////////////////////
 
-
 /**
 * Add lore to a character's list
 *
 * @param char_data *ch The person receiving the lore.
 * @param int type LORE_x const
-* @param int value Some lores require a value, e.g. empire id
+* @param const char *str String formatting.
+* @param ... printf-style args for str.
 */
-void add_lore(char_data *ch, int type, int value) {
+void add_lore(char_data *ch, int type, const char *str, ...) {
+	void check_delayed_load(char_data *ch);
+	
 	struct lore_data *new, *lore;
+	char text[MAX_STRING_LENGTH];
+	va_list tArgList;
 
-	if (IS_NPC(ch))
+	if (!ch || IS_NPC(ch) || !str)
 		return;
-
-	/* Clean old records automatically */
-	switch (type) {
-		case LORE_PURIFY: {
-			remove_lore(ch, LORE_PURIFY, -1);
-			break;
-		}
-		case LORE_START_VAMPIRE:
-		case LORE_SIRE_VAMPIRE: {
-			remove_lore(ch, LORE_START_VAMPIRE, -1);
-			remove_lore(ch, LORE_SIRE_VAMPIRE, -1);
-			break;
-		}
-		case LORE_JOIN_EMPIRE: {
-			remove_lore(ch, LORE_DEFECT_EMPIRE, -1);
-			remove_lore(ch, LORE_KICKED_EMPIRE, -1);
-			remove_lore(ch, LORE_FOUND_EMPIRE, -1);
-			break;
-		}
-		case LORE_DEFECT_EMPIRE:
-		case LORE_KICKED_EMPIRE: {
-			remove_lore(ch, LORE_JOIN_EMPIRE, -1);
-			remove_lore(ch, LORE_FOUND_EMPIRE, -1);
-			break;
-		}
-		case LORE_FOUND_EMPIRE: {
-			remove_lore(ch, LORE_FOUND_EMPIRE, -1);
-			remove_lore(ch, LORE_JOIN_EMPIRE, -1);
-			remove_lore(ch, LORE_KICKED_EMPIRE, -1);
-			remove_lore(ch, LORE_DEFECT_EMPIRE, -1);
-			break;
+	
+	// need the old lore, in case the player is offline
+	check_delayed_load(ch);
+	
+	// find end
+	if ((lore = GET_LORE(ch))) {
+		while (lore->next) {
+			lore = lore->next;
 		}
 	}
-
-	/* Find the last entry in ch's lore */
-	for (lore = GET_LORE(ch); lore && lore->next; lore = lore->next);
-
+	
+	va_start(tArgList, str);
+	vsprintf(text, str, tArgList);
+	
 	CREATE(new, struct lore_data, 1);
 	new->type = type;
-	new->value = value;
 	new->date = (long) time(0);
+	new->text = str_dup(text);
 	new->next = NULL;
 
-	/* If they have lore, append this to the end.  Elsewise it becomes their lore */
-	if (lore)
+	// append to end
+	if (lore) {
 		lore->next = new;
-	else
+	}
+	else {
 		GET_LORE(ch) = new;
-
-	/* And last but not least, save it */
-	write_lore(ch);
+	}
+	
+	va_end(tArgList);
 }
 
 
@@ -3259,19 +3262,16 @@ void clean_lore(char_data *ch) {
 			}
 		}
 	}
-
-	write_lore(ch);
 }
 
 
 /**
-* Remove all lore of a given type
+* Remove all lore of a given type.
 *
 * @param char_data *ch The person whose lore to remove
 * @param int type The LORE_x type to remove
-* @param int value -1 for all, otherwise it checks to only remove lore with matching value
 */
-void remove_lore(char_data *ch, int type, int value) {
+void remove_lore(char_data *ch, int type) {
 	struct lore_data *lore, *next_lore;
 
 	if (IS_NPC(ch))
@@ -3281,13 +3281,9 @@ void remove_lore(char_data *ch, int type, int value) {
 		next_lore = lore->next;
 
 		if (lore->type == type) {
-			if (value == -1 || value == lore->value) {
-				remove_lore_record(ch, lore);
-			}
+			remove_lore_record(ch, lore);
 		}
 	}
-
-	write_lore(ch);
 }
 
 
@@ -3299,6 +3295,9 @@ void remove_lore_record(char_data *ch, struct lore_data *lore) {
 		return;
 
 	REMOVE_FROM_LIST(lore, GET_LORE(ch), next);
+	if (lore->text) {
+		free(lore->text);
+	}
 	free(lore);
 }
 
@@ -3441,10 +3440,15 @@ void tag_mob(char_data *mob, char_data *player) {
 				continue;
 			}
 			
+			// never tag for someone with no descriptor
+			if (!mem->member->desc) {
+				continue;
+			}
+			
 			add_mob_tag(GET_IDNUM(mem->member), &MOB_TAGGED_BY(mob));
 		}
 	}
-	else {
+	else if (player->desc) { // never tag for someone with no descriptor
 		// just tag for player
 		add_mob_tag(GET_IDNUM(player), &MOB_TAGGED_BY(mob));
 	}
@@ -3539,10 +3543,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
 		GET_OBJ_VAL(obj, iter) = GET_OBJ_VAL(input, iter);
 	}
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		obj->affected[iter].location = input->affected[iter].location;
-		obj->affected[iter].modifier = input->affected[iter].modifier;
-	}
+	GET_OBJ_APPLIES(obj) = copy_obj_apply_list(GET_OBJ_APPLIES(input));
 	
 	return obj;
 }
@@ -3566,12 +3567,15 @@ void empty_obj_before_extract(obj_data *obj) {
 			obj_to_obj(jj, obj->in_obj);
 		}
 		else if (obj->carried_by) {
-			obj_to_char(jj, obj->carried_by);
+			obj_to_char_if_okay(jj, obj->carried_by);
 			get_check_money(obj->carried_by, jj);
 		}
 		else if (obj->worn_by) {
-			obj_to_char(jj, obj->worn_by);
+			obj_to_char_if_okay(jj, obj->worn_by);
 			get_check_money(obj->worn_by, jj);
+		}
+		else if (obj->in_vehicle) {
+			obj_to_vehicle(jj, obj->in_vehicle);
 		}
 		else if (IN_ROOM(obj)) {
 			obj_to_room(jj, IN_ROOM(obj));
@@ -3590,6 +3594,11 @@ void empty_obj_before_extract(obj_data *obj) {
 */
 void extract_obj(obj_data *obj) {
 	obj_data *proto = obj_proto(GET_OBJ_VNUM(obj));
+	
+	if (obj == dg_owner_obj) {
+		dg_owner_purged = 1;
+		dg_owner_obj = NULL;
+	}
 
 	// remove from anywhere
 	check_obj_in_void(obj);
@@ -3598,17 +3607,7 @@ void extract_obj(obj_data *obj) {
 	while (obj->contains) {
 		extract_obj(obj->contains);
 	}
-
-	// cancel anybody pulling the object
-	if (GET_PULLED_BY(obj, 0)) {
-		GET_PULLING(GET_PULLED_BY(obj, 0)) = NULL;
-		obj->pulled_by1 = NULL;
-	}
-	if (GET_PULLED_BY(obj, 1)) {
-		GET_PULLING(GET_PULLED_BY(obj, 1)) = NULL;
-		obj->pulled_by2 = NULL;
-	}
-
+	
 	remove_from_object_list(obj);
 
 	if (SCRIPT(obj)) {
@@ -3616,7 +3615,7 @@ void extract_obj(obj_data *obj) {
 	}
 
 	if (!proto || obj->proto_script != proto->proto_script) {
-		free_proto_script(obj, OBJ_TRIGGER);
+		free_proto_scripts(&obj->proto_script);
 	}
 
 	free_obj(obj);
@@ -3636,6 +3635,7 @@ void extract_obj(obj_data *obj) {
 obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	struct obj_binding *bind;
 	obj_data *proto, *new;
+	int iter;
 	
 	if (!obj || !(proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 		// get a normal 'bug' object
@@ -3699,8 +3699,10 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 			break;
 		}
 		case ITEM_SHIP: {
-			GET_OBJ_VAL(new, VAL_SHIP_RESOURCES_REMAINING) = GET_OBJ_VAL(obj, VAL_SHIP_RESOURCES_REMAINING);
-			GET_OBJ_VAL(new, VAL_SHIP_MAIN_ROOM) = GET_OBJ_VAL(obj, VAL_SHIP_MAIN_ROOM);
+			// copy these blind
+			for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
+				GET_OBJ_VAL(new, iter) = GET_OBJ_VAL(obj, iter);
+			}
 			break;
 		}
 	}
@@ -3722,6 +3724,8 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 * @return bool TRUE if the two items are functionally identical.
 */
 bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
+	struct obj_apply *a_apply, *b_list, *b_apply, *temp;
+	bool found;
 	int iter;
 	
 	if (GET_OBJ_VNUM(obj_a) != GET_OBJ_VNUM(obj_b)) {
@@ -3753,11 +3757,6 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 			return FALSE;
 		}
 	}
-	for (iter = 0; iter < MAX_OBJ_AFFECT; ++iter) {
-		if (obj_a->affected[iter].location != obj_b->affected[iter].location || obj_a->affected[iter].modifier != obj_b->affected[iter].modifier) {
-			return FALSE;
-		}
-	}
 	if (GET_OBJ_KEYWORDS(obj_a) != GET_OBJ_KEYWORDS(obj_b) && !str_cmp(GET_OBJ_KEYWORDS(obj_a), GET_OBJ_KEYWORDS(obj_b))) {
 		return FALSE;
 	}
@@ -3771,6 +3770,29 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 		return FALSE;
 	}
 	if (obj_a->ex_description != obj_b->ex_description) {
+		return FALSE;
+	}
+	
+	// to compare applies, we're going to copy and delete as we find them
+	b_list = copy_obj_apply_list(GET_OBJ_APPLIES(obj_b));
+	for (a_apply = GET_OBJ_APPLIES(obj_a); a_apply; a_apply = a_apply->next) {
+		found = FALSE;
+		for (b_apply = b_list; b_apply; b_apply = b_apply->next) {
+			if (a_apply->location == b_apply->location && a_apply->modifier == b_apply->modifier && a_apply->apply_type == b_apply->apply_type) {
+				found = TRUE;
+				REMOVE_FROM_LIST(b_apply, b_list, next);
+				free(b_apply);
+				break;	// only need one, plus we freed it
+			}
+		}
+		
+		if (!found) {
+			free_obj_apply_list(b_list);
+			return FALSE;
+		}
+	}
+	if (b_list) {	// more things in b_list than a
+		free_obj_apply_list(b_list);
 		return FALSE;
 	}
 	
@@ -3864,7 +3886,9 @@ void bind_obj_to_player(obj_data *obj, char_data *ch) {
 * @param struct mob_tag *list The list of mob tags.
 */
 void bind_obj_to_tag_list(obj_data *obj, struct mob_tag *list) {
+	bool at_least_one = FALSE;
 	struct mob_tag *tag;
+	char_data *plr;
 	
 	// sanity
 	if (!obj || !list || !OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
@@ -3877,7 +3901,22 @@ void bind_obj_to_tag_list(obj_data *obj, struct mob_tag *list) {
 	}
 	
 	for (tag = list; tag; tag = tag->next) {
+		if (!(plr = is_playing(tag->idnum))) {
+			continue;	// don't bind to missing players
+		}
+		if (!plr->desc) {
+			continue;	// don't bind to linkdead players
+		}
 		add_obj_binding(tag->idnum, &OBJ_BOUND_TO(obj));
+		at_least_one = TRUE;
+	}
+	
+	// guarantee we bound to at least 1 -- if not, we'll have to bind to at least one anyway
+	if (list && !at_least_one) {
+		for (tag = list; tag; tag = tag->next) {
+			add_obj_binding(tag->idnum, &OBJ_BOUND_TO(obj));
+			break;
+		}
 	}
 }
 
@@ -3962,6 +4001,9 @@ void check_obj_in_void(obj_data *obj) {
 		if (obj->carried_by) {
 			obj_from_char(obj);
 		}
+		if (obj->in_vehicle) {
+			obj_from_vehicle(obj);
+		}
 		if (obj->worn_by) {
 			if (unequip_char(obj->worn_by, obj->worn_on) != obj) {
 				log("SYSERR: Inconsistent worn_by and worn_on pointers!!");
@@ -3979,7 +4021,7 @@ void check_obj_in_void(obj_data *obj) {
 * @param int pos the WEAR_x spot to it
 */
 void equip_char(char_data *ch, obj_data *obj, int pos) {
-	int j;
+	struct obj_apply *apply;
 
 	if (pos < 0 || pos >= NUM_WEARS) {
 		log("SYSERR: Trying to equip gear to invalid position: %d", pos);
@@ -4011,8 +4053,8 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 		}
 
 		if (wear_data[pos].count_stats) {
-			for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-				affect_modify(ch, obj->affected[j].location, obj->affected[j].modifier, GET_OBJ_AFF_FLAGS(obj), TRUE);
+			for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(obj), TRUE);
 			}
 		}
 
@@ -4036,12 +4078,14 @@ void obj_from_char(obj_data *object) {
 		REMOVE_FROM_LIST(object, object->carried_by->carrying, next_content);
 		object->next_content = NULL;
 
-		IS_CARRYING_N(object->carried_by) -= GET_OBJ_INVENTORY_SIZE(object);
+		IS_CARRYING_N(object->carried_by) -= obj_carry_size(object);
 
 		// check lights
 		if (IN_ROOM(object->carried_by) && OBJ_FLAGGED(object, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(object->carried_by))--;
 		}
+		
+		qt_drop_obj(object->carried_by, object);
 
 		object->carried_by = NULL;
 	}
@@ -4063,7 +4107,7 @@ void obj_from_obj(obj_data *obj) {
 		obj_from = obj->in_obj;
 		REMOVE_FROM_LIST(obj, obj_from->contains, next_content);
 
-		GET_OBJ_CARRYING_N(obj_from) -= GET_OBJ_INVENTORY_SIZE(obj);
+		GET_OBJ_CARRYING_N(obj_from) -= obj_carry_size(obj);
 
 		obj->in_obj = NULL;
 		obj->next_content = NULL;
@@ -4083,10 +4127,6 @@ void obj_from_room(obj_data *object) {
 		log("SYSERR: NULL object (%p) or obj not in a room (%p) passed to obj_from_room", object, IN_ROOM(object));
 	}
 	else {
-		if (IN_CHAIR(object)) {
-			char_from_chair(IN_CHAIR(object));
-		}
-
 		// update lights
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(object))--;
@@ -4094,6 +4134,22 @@ void obj_from_room(obj_data *object) {
 
 		REMOVE_FROM_LIST(object, ROOM_CONTENTS(IN_ROOM(object)), next_content);
 		IN_ROOM(object) = NULL;
+		object->next_content = NULL;
+	}
+}
+
+
+/**
+* @param obj_data *object The item to remove from whatever vehicle it's in.
+*/
+void obj_from_vehicle(obj_data *object) {
+	if (!object || !object->in_vehicle) {
+		log("SYSERR: NULL object (%p) or obj not in a vehicle (%p) passed to obj_from_vehicle", object, object->in_vehicle);
+	}
+	else {
+		VEH_CARRYING_N(object->in_vehicle) -= obj_carry_size(object);
+		LL_DELETE2(VEH_CONTAINS(object->in_vehicle), object, next_content);
+		object->in_vehicle = NULL;
 		object->next_content = NULL;
 	}
 }
@@ -4126,7 +4182,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		object->next_content = ch->carrying;
 		ch->carrying = object;
 		object->carried_by = ch;
-		IS_CARRYING_N(ch) += GET_OBJ_INVENTORY_SIZE(object);
+		IS_CARRYING_N(ch) += obj_carry_size(object);
 		
 		// binding
 		if (OBJ_FLAGGED(object, OBJ_BIND_ON_PICKUP)) {
@@ -4157,9 +4213,56 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		if (IN_ROOM(ch) && OBJ_FLAGGED(object, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(ch))++;
 		}
+		
+		qt_get_obj(ch, object);
 	}
 	else {
 		log("SYSERR: NULL obj (%p) or char (%p) passed to obj_to_char.", object, ch);
+	}
+}
+
+
+/**
+* Validates bind and quest before allowing an obj to go to a char. Sends to
+* the room as a backup.
+*
+* @param obj_data *obj The item.
+* @param char_data *ch The person you're trying to give it to.
+*/
+void obj_to_char_if_okay(obj_data *obj, char_data *ch) {
+	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
+	
+	bool ok = TRUE;
+	
+	if (!bind_ok(obj, ch)) {
+		ok = FALSE;
+	}
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch) && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
+		ok = FALSE;
+	}
+	
+	if (ok || !IN_ROOM(ch)) {
+		obj_to_char(obj, ch);
+	}
+	else {
+		// unmark uncollected loot if it was meant to go to a person
+		if (!IS_NPC(ch)) {
+			REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_UNCOLLECTED_LOOT);
+		}
+		
+		// set ownership as if they got it -- if not stolen
+		if (!IS_STOLEN(obj)) {
+			if (IS_NPC(ch)) {
+				obj->last_owner_id = NOBODY;
+				obj->last_empire_id = NOTHING;
+			}
+			else {
+				obj->last_owner_id = GET_IDNUM(ch);
+				obj->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
+			}
+		}
+		
+		obj_to_room(obj, IN_ROOM(ch));
 	}
 }
 
@@ -4172,7 +4275,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 * @param char_data *ch The person to try to give it to.
 */
 void obj_to_char_or_room(obj_data *obj, char_data *ch) {
-	if (!IS_NPC(ch) && IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(obj) > CAN_CARRY_N(ch) && IN_ROOM(ch)) {
+	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj) && IN_ROOM(ch)) {
 		// bind it to the player anyway, as if they received it, if it's BoP
 		if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP)) {
 			bind_obj_to_player(obj, ch);
@@ -4216,7 +4319,7 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 	else {
 		check_obj_in_void(obj);
 	
-		GET_OBJ_CARRYING_N(obj_to) += GET_OBJ_INVENTORY_SIZE(obj);
+		GET_OBJ_CARRYING_N(obj_to) += obj_carry_size(obj);
 
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(obj) = time(0);
@@ -4238,12 +4341,11 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 * @param room_data *room Where to place it.
 */
 void obj_to_room(obj_data *object, room_data *room) {
-	check_obj_in_void(object);
-
 	if (!object || !room) {
 		log("SYSERR: Illegal value(s) passed to obj_to_room. (Room %p, obj %p)", room, object);
 	}
 	else {
+		check_obj_in_void(object);
 		object->next_content = ROOM_CONTENTS(room);
 		ROOM_CONTENTS(room) = object;
 		IN_ROOM(object) = room;
@@ -4257,6 +4359,32 @@ void obj_to_room(obj_data *object, room_data *room) {
 		// clear keep now
 		REMOVE_BIT(GET_OBJ_EXTRA(object), OBJ_KEEP);
 
+		// set the timer here; actual rules for it are in limits.c
+		GET_AUTOSTORE_TIMER(object) = time(0);
+	}
+}
+
+
+/**
+* Put an object into a vehicle.
+*
+* @param obj_data *object The object.
+* @param vehicle_data *veh The vehicle to put it in.
+*/
+void obj_to_vehicle(obj_data *object, vehicle_data *veh) {
+	if (!object || !veh) {
+		log("SYSERR: Illegal value(s) passed to obj_to_vehicle. (Vehicle %p, obj %p)", veh, object);
+	}
+	else {
+		check_obj_in_void(object);
+		
+		LL_PREPEND2(VEH_CONTAINS(veh), object, next_content);
+		object->in_vehicle = veh;
+		VEH_CARRYING_N(veh) += obj_carry_size(object);
+		
+		// clear keep now
+		REMOVE_BIT(GET_OBJ_EXTRA(object), OBJ_KEEP);
+		
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(object) = time(0);
 	}
@@ -4280,6 +4408,9 @@ void swap_obj_for_obj(obj_data *old, obj_data *new) {
 	
 	if (old->carried_by) {
 		obj_to_char(new, old->carried_by);
+	}
+	else if (old->in_vehicle) {
+		obj_to_vehicle(new, old->in_vehicle);
 	}
 	else if (IN_ROOM(old)) {
 		obj_to_room(new, IN_ROOM(old));
@@ -4312,7 +4443,7 @@ void swap_obj_for_obj(obj_data *old, obj_data *new) {
 * @return obj_data *The removed item, or NULL if there was none.
 */
 obj_data *unequip_char(char_data *ch, int pos) {	
-	int j;
+	struct obj_apply *apply;
 	obj_data *obj = NULL;
 
 	if ((pos >= 0 && pos < NUM_WEARS) && GET_EQ(ch, pos) != NULL) {
@@ -4330,8 +4461,8 @@ obj_data *unequip_char(char_data *ch, int pos) {
 
 		// un-apply affects
 		if (wear_data[pos].count_stats) {
-			for (j = 0; j < MAX_OBJ_AFFECT; j++) {
-				affect_modify(ch, obj->affected[j].location, obj->affected[j].modifier, GET_OBJ_AFF_FLAGS(obj), FALSE);
+			for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(obj), FALSE);
 			}
 		}
 
@@ -4431,6 +4562,24 @@ bool has_custom_message(obj_data *obj, int type) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// OBJECT TARGETING HANDLERS ///////////////////////////////////////////////
+
+/**
+* Find an object in another person's share slot, by character name.
+*
+* @param char_data *ch The person looking for a shared obj.
+* @param char *arg The potential name of a PLAYER.
+*/
+obj_data *get_obj_by_char_share(char_data *ch, char *arg) {
+	char_data *targ;
+	
+	// find person by name
+	if (!(targ = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+		return NULL;
+	}
+	
+	return GET_EQ(targ, WEAR_SHARE);
+}
+
 
 /**
 * Finds a matching object in a character's equipment.
@@ -4557,15 +4706,22 @@ int get_obj_pos_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[]) {
 * Uses multi_isname to match any number of name args.
 *
 * @param char *name The search name.
+* @param bool storable_only If TRUE, only storable items will be found.
 * @return obj_vnum A matching object, or NOTHING.
 */
-obj_vnum get_obj_vnum_by_name(char *name) {
+obj_vnum get_obj_vnum_by_name(char *name, bool storable_only) {
 	obj_data *obj, *next_obj;
 	
 	HASH_ITER(hh, object_table, obj, next_obj) {
-		if (multi_isname(name, GET_OBJ_KEYWORDS(obj))) {
-			return GET_OBJ_VNUM(obj);
+		if (storable_only && !obj->storage) {
+			continue;
 		}
+		if (!multi_isname(name, GET_OBJ_KEYWORDS(obj))) {
+			continue;
+		}
+		
+		// found!
+		return GET_OBJ_VNUM(obj);
 	}
 	
 	return NOTHING;
@@ -4675,7 +4831,7 @@ obj_data *get_obj_world(char *name) {
 *
 * @param char_data *ch The person who is getting an offer.
 * @param char_data *from The person sending the offer.
-* @param int type Any OFFER_x type.
+* @param int type Any OFFER_ type.
 * @param int data A misc integer that may be passed based on type (use 0 for none).
 * @return struct offer_data* A pointer to the attached new offer, if it succeeds.
 */
@@ -4738,7 +4894,7 @@ void clean_offers(char_data *ch) {
 * Removes all offers of a given type.
 *
 * @param char_data *ch The person whose offers to remove.
-* @param int type Any OFFER_x type.
+* @param int type Any OFFER_ type.
 */
 void remove_offers_by_type(char_data *ch, int type) {
 	struct offer_data *offer, *next_offer, *temp;
@@ -4766,7 +4922,7 @@ void remove_offers_by_type(char_data *ch, int type) {
 * Add to the room's depletion counter
 *
 * @param room_data *room which location e.g. IN_ROOM(ch)
-* @param int type DPLTN_x
+* @param int type DPLTN_
 * @param bool multiple if TRUE, chance to add more than 1
 */
 void add_depletion(room_data *room, int type, bool multiple) {
@@ -4793,7 +4949,7 @@ void add_depletion(room_data *room, int type, bool multiple) {
 
 /**
 * @param room_data *room which location e.g. IN_ROOM(ch)
-* @param int type DPLTN_x
+* @param int type DPLTN_
 * @return int The depletion counter on that resource in that room.
 */
 int get_depletion(room_data *room, int type) {
@@ -4814,7 +4970,7 @@ int get_depletion(room_data *room, int type) {
 * Removes all depletion data for a certain type from the room.
 *
 * @param room_data *room where
-* @param int type DPLTN_x
+* @param int type DPLTN_
 */
 void remove_depletion(room_data *room, int type) {
 	struct depletion_data *dep, *next_dep, *temp;
@@ -4829,24 +4985,74 @@ void remove_depletion(room_data *room, int type) {
 }
 
 
+/**
+* Sets a room's depletion to a specific value.
+*
+* @param room_data *room The room to set depletion on.
+* @param int type DPLTN_ const
+* @param int value How much to set the depletion to.
+*/
+void set_depletion(room_data *room, int type, int value) {
+	struct depletion_data *dep;
+	bool found = FALSE;
+	
+	// shortcut
+	if (value <= 0) {
+		remove_depletion(room, type);
+		return;
+	}
+	
+	// existing?
+	LL_FOREACH(ROOM_DEPLETION(room), dep) {
+		if (dep->type == type) {
+			dep->count = value;
+			found = TRUE;
+			break;
+		}
+	}
+	
+	// add
+	if (!found) {
+		CREATE(dep, struct depletion_data, 1);
+		dep->type = type;
+		dep->count = value;
+		
+		LL_PREPEND(ROOM_DEPLETION(room), dep);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ROOM HANDLERS ///////////////////////////////////////////////////////////
 
 /**
 * Sets the building data on a room. If the room isn't already complex, this
-* will automatically add complex data.
+* will automatically add complex data. This should always be called with
+* triggers unless you're loading saved rooms from a file, or some other place
+* where triggers might have been detached.
 *
 * @param bld_data *bld The building prototype (from building_table).
 * @param room_data *room The world room to attach it to.
+* @param bool with_triggers If TRUE, attaches triggers too.
 */
-void attach_building_to_room(bld_data *bld, room_data *room) {
+void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers) {
 	if (!bld || !room) {
+		log("SYSERR: attach_building_to_room called without %s", bld ? "room" : "building");
 		return;
 	}
 	if (!COMPLEX_DATA(room)) {
 		COMPLEX_DATA(room) = init_complex_data();
 	}
 	COMPLEX_DATA(room)->bld_ptr = bld;
+
+	// copy proto script
+	if (with_triggers) {
+		struct trig_proto_list *temp;
+		if ((temp = copy_trig_protos(GET_BLD_SCRIPTS(bld)))) {
+			LL_APPEND(room->proto_script, temp);
+		}
+		assign_triggers(room, WLD_TRIGGER);
+	}
 }
 
 
@@ -4882,7 +5088,7 @@ void add_to_room_extra_data(room_data *room, int type, int add_value) {
 	struct room_extra_data *red;
 	
 	if ((red = find_room_extra_data(room, type))) {
-		red->value += add_value;
+		SAFE_ADD(red->value, add_value, INT_MIN, INT_MAX, TRUE);
 		
 		// delete zeroes for cleanliness
 		if (red->value == 0) {
@@ -4903,16 +5109,11 @@ void add_to_room_extra_data(room_data *room, int type, int add_value) {
 * @return struct room_extra_data* The matching entry, or NULL.
 */
 struct room_extra_data *find_room_extra_data(room_data *room, int type) {
-	struct room_extra_data *iter, *found = NULL;
-	
-	for (iter = room->extra_data; iter && !found; iter = iter->next) {
-		if (iter->type == type) {
-			found = iter;
-		}
-	}
-	
-	return found;
+	struct room_extra_data *red;
+	HASH_FIND_INT(room->extra_data, &type, red);
+	return red;
 }
+
 
 /**
 * Gets the value of an extra data type for a room; defaults to 0 if none is set.
@@ -4925,6 +5126,7 @@ int get_room_extra_data(room_data *room, int type) {
 	struct room_extra_data *red = find_room_extra_data(room, type);
 	return (red ? red->value : 0);
 }
+
 
 /**
 * Multiplies an existing room extra data value by a number.
@@ -4955,10 +5157,9 @@ void multiply_room_extra_data(room_data *room, int type, double multiplier) {
 * @param int type The ROOM_EXTRA_x type to remove.
 */
 void remove_room_extra_data(room_data *room, int type) {
-	struct room_extra_data *red, *temp;
-	
-	while ((red = find_room_extra_data(room, type))) {
-		REMOVE_FROM_LIST(red, room->extra_data, next);
+	struct room_extra_data *red = find_room_extra_data(room, type);
+	if (red) {
+		HASH_DEL(room->extra_data, red);
 		free(red);
 	}
 }
@@ -4972,21 +5173,16 @@ void remove_room_extra_data(room_data *room, int type) {
 * @param int value The value to set it to.
 */
 void set_room_extra_data(room_data *room, int type, int value) {
-	struct room_extra_data *red;
+	struct room_extra_data *red = find_room_extra_data(room, type);
 	
-	// remove any old one first
-	remove_room_extra_data(room, type);
-	
-	// only bother if non-zero -- no need to store a zero
-	if (value != 0) {
+	// create if needed
+	if (!red) {
 		CREATE(red, struct room_extra_data, 1);
 		red->type = type;
-		red->value = value;
-	
-		// add
-		red->next = room->extra_data;
-		room->extra_data = red;
+		HASH_ADD_INT(room->extra_data, type, red);
 	}
+	
+	red->value = value;
 }
 
 
@@ -5003,12 +5199,15 @@ void set_room_extra_data(room_data *room, int type, int value) {
 * @return room_data* The matching room, or NULL if none.
 */
 room_data *find_target_room(char_data *ch, char *rawroomstr) {
+	extern vehicle_data *get_vehicle(char *name);
+	extern room_data *obj_room(obj_data *obj);
 	extern struct instance_data *real_instance(any_vnum instance_id);
 	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 	
 	struct instance_data *inst;
 	room_vnum tmp;
 	room_data *location = NULL;
+	vehicle_data *target_veh;
 	char_data *target_mob;
 	obj_data *target_obj;
 	char roomstr[MAX_INPUT_LENGTH];
@@ -5027,6 +5226,16 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 	else if (*roomstr == UID_CHAR) {
 		// maybe
 		location = find_room(atoi(roomstr + 1));
+		
+		if (!location && (target_mob = get_char(roomstr))) {
+			location = IN_ROOM(target_mob);
+		}
+		if (!location && (target_veh = get_vehicle(roomstr))) {
+			location = IN_ROOM(target_veh);
+		}
+		if (!location && (target_obj = get_obj(roomstr))) {
+			location = obj_room(target_obj);
+		}
 	}
 	else if (*roomstr == 'i' && isdigit(*(roomstr+1)) && ch && IS_NPC(ch) && (inst = real_instance(MOB_INSTANCE_ID(ch))) != NULL) {
 		// find room in instance by template vnum
@@ -5057,6 +5266,17 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 		location = IN_ROOM(target_mob);
 	else if (!ch && (target_mob = get_char_world(roomstr)) != NULL) {
 		location = IN_ROOM(target_mob);
+	}
+	else if ((ch && (target_veh = get_vehicle_vis(ch, roomstr))) || (!ch && (target_veh = get_vehicle_world(roomstr)))) {
+		if (IN_ROOM(target_veh)) {
+			location = IN_ROOM(target_veh);
+		}
+		else {
+			if (ch) {
+				msg_to_char(ch, "That vehicle is not available.\r\n");
+			}
+			location = NULL;
+		}
 	}
 	else if ((ch && (target_obj = get_obj_vis(ch, roomstr)) != NULL) || (!ch && (target_obj = get_obj_world(roomstr)) != NULL)) {
 		if (IN_ROOM(target_obj))
@@ -5234,7 +5454,7 @@ void sort_evolutions(sector_data *sect) {
 *
 * @param empire_data *emp The empire vnum
 * @param int island Which island to store it on
-* @param obj_vnum vnum o_ROCK &c
+* @param obj_vnum vnum Any object to store.
 * @param int amount How much to add
 */
 void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount) {
@@ -5283,6 +5503,66 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 		REMOVE_FROM_LIST(store, EMPIRE_STORAGE(emp), next);
 		free(store);
 	}
+}
+
+
+/**
+* removes X stored components from an empire
+*
+* @param empire_data *emp
+* @param int island Which island to charge for storage, or ANY_ISLAND to take from any available storage
+* @param int cmp_type Which CMP_ type to charge
+* @param int cmp_flags Required CMPF_ flags to match on the component
+* @param int amount How much to charge*
+* @param struct resource_data **build_used_list Optional: A place to store the exact item used, e.g. for later dismantling. (NULL if none)
+* @return bool TRUE if it was able to charge enough, FALSE if not
+*/
+bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, struct resource_data **build_used_list) {
+	struct empire_storage_data *store, *next_store;
+	int this, found = 0;
+	obj_data *proto;
+	
+	// can't charge a negative amount
+	if (amount < 0) {
+		return TRUE;
+	}
+	
+	LL_FOREACH_SAFE(EMPIRE_STORAGE(emp), store, next_store) {
+		if (island != ANY_ISLAND && island != store->island) {
+			continue;
+		}
+		
+		// need obj
+		if (!(proto = obj_proto(store->vnum))) {
+			continue;
+		}
+		
+		// matching component?
+		if (GET_OBJ_CMP_TYPE(proto) != cmp_type || (GET_OBJ_CMP_FLAGS(proto) & cmp_flags) != cmp_flags) {
+			continue;
+		}
+		
+		// ok make it so
+		this = MIN(amount, store->amount);
+		found += this;
+		SAFE_ADD(store->amount, -this, 0, INT_MAX, FALSE);
+		
+		if (build_used_list) {
+			add_to_resource_list(build_used_list, RES_OBJECT, store->vnum, this, 0);
+		}
+		
+		if (store->amount <= 0) {
+			LL_DELETE(EMPIRE_STORAGE(emp), store);
+			free(store);
+		}
+		
+		// done?
+		if (found >= amount) {
+			break;
+		}
+	}
+	
+	return (found >= amount);
 }
 
 
@@ -5365,6 +5645,44 @@ bool delete_stored_resource(empire_data *emp, obj_vnum vnum) {
 	}
 	
 	return (deleted > 0) ? TRUE : FALSE;
+}
+
+
+/**
+* This finds a matching item's empire_storage_data object for a component type,
+* IF there is any match stored to the empire on that island.
+*
+* @param empire_data *emp The empire.
+* @param int island Which island to search.
+* @param int cmp_type Any CMP_ type.
+* @param int cmp_flags Any CMPF_ flags to match all of.
+* @param int amount The number that must be available.
+*/
+bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount) {
+	struct empire_storage_data *store;
+	obj_data *proto;
+	int found = 0;
+	
+	LL_FOREACH(EMPIRE_STORAGE(emp), store) {
+		if (store->island != island) {
+			continue;
+		}
+		
+		// need obj
+		if (!(proto = obj_proto(store->vnum))) {
+			continue;
+		}
+		
+		// is it a match, though?
+		if (GET_OBJ_CMP_TYPE(proto) == cmp_type && (GET_OBJ_CMP_FLAGS(proto) & cmp_flags) == cmp_flags) {
+			found += store->amount;
+			if (found >= amount) {
+				break;
+			}
+		}
+	}
+	
+	return (found >= amount);
 }
 
 
@@ -5485,6 +5803,11 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping)
 bool obj_can_be_stored(obj_data *obj, room_data *loc) {
 	struct obj_storage_type *store;
 	
+	// quest items don't store
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+		return FALSE;
+	}
+	
 	for (store = obj->storage; store; store = store->next) {
 		if (BUILDING_VNUM(loc) != NOTHING && store->building_type == BUILDING_VNUM(loc)) {
 			return TRUE;
@@ -5540,7 +5863,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 		return FALSE;
 	}
 
-	if (IS_CARRYING_N(ch) + GET_OBJ_INVENTORY_SIZE(proto) > CAN_CARRY_N(ch)) {
+	if (!CAN_CARRY_OBJ(ch, proto)) {
 		msg_to_char(ch, "Your arms are full.\r\n");
 		return FALSE;
 	}
@@ -5686,10 +6009,10 @@ struct empire_unique_storage *find_eus_entry(obj_data *obj, empire_data *emp, ro
 		if (location && GET_ISLAND_ID(location) != iter->island) {
 			continue;
 		}
-		if (location && ROOM_BLD_FLAGGED(location, BLD_VAULT) && !IS_SET(iter->flags, EUS_VAULT)) {
+		if (location && HAS_FUNCTION(location, FNC_VAULT) && !IS_SET(iter->flags, EUS_VAULT)) {
 			continue;
 		}
-		if (location && !ROOM_BLD_FLAGGED(location, BLD_VAULT) && IS_SET(iter->flags, EUS_VAULT)) {
+		if (location && !HAS_FUNCTION(location, FNC_VAULT) && IS_SET(iter->flags, EUS_VAULT)) {
 			continue;
 		}
 		
@@ -5731,6 +6054,8 @@ void remove_eus_entry(struct empire_unique_storage *eus, empire_data *emp) {
 * @param bool *full A variable to set TRUE if the storage is full and the item can't be stored.
 */
 void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data *room, bool *full) {
+	extern int get_main_island(empire_data *emp);
+	
 	struct empire_unique_storage *eus;
 	bool extract = FALSE;
 	
@@ -5769,7 +6094,10 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 		eus->obj = obj;
 		eus->amount = 1;
 		eus->island = room ? GET_ISLAND_ID(room) : NO_ISLAND;
-		if (ROOM_BLD_FLAGGED(room, BLD_VAULT)) {
+		if (eus->island == NO_ISLAND) {
+			eus->island = get_main_island(emp);
+		}
+		if (room && HAS_FUNCTION(room, FNC_VAULT)) {
 			eus->flags = EUS_VAULT;
 		}
 			
@@ -5827,17 +6155,19 @@ int find_all_dots(char *arg) {
  *  *ch      This is the person that is trying to "find"
  *  **tar_ch Will be NULL if no character was found, otherwise points
  * **tar_obj Will be NULL if no object was found, otherwise points
+ * **tar_veh Will be NULL if no vehicle was found, otherwise points
  *
  * The routine used to return a pointer to the next word in *arg (just
  * like the one_argument routine), but now it returns an integer that
  * describes what it filled in.
  */
-int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj) {
+int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh) {
 	int i, found;
 	char name[256];
 
 	*tar_ch = NULL;
 	*tar_obj = NULL;
+	*tar_veh = NULL;
 
 	one_argument(arg, name);
 
@@ -5869,6 +6199,11 @@ int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **ta
 	if (IS_SET(bitvector, FIND_OBJ_INV)) {
 		if ((*tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != NULL) {
 			return (FIND_OBJ_INV);
+		}
+	}
+	if (IS_SET(bitvector, FIND_VEHICLE_ROOM)) {
+		if ((*tar_veh = get_vehicle_in_room_vis(ch, name)) != NULL) {
+			return (FIND_VEHICLE_ROOM);
 		}
 	}
 	if (IS_SET(bitvector, FIND_OBJ_ROOM)) {
@@ -5919,6 +6254,299 @@ int get_number(char **name) {
 	
 	// default
 	return (1);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE HANDLERS ////////////////////////////////////////////////////////
+
+/**
+* Extracts a vehicle from the game.
+*
+* @param vehicle_data *veh The vehicle to extract and free.
+*/
+void extract_vehicle(vehicle_data *veh) {
+	void empty_vehicle(vehicle_data *veh);
+	void relocate_players(room_data *room, room_data *to_room);
+	extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
+	
+	struct vehicle_room_list *vrl, *next_vrl;
+	room_data *main_room;
+	
+	if (veh == dg_owner_veh) {
+		dg_owner_purged = 1;
+		dg_owner_veh = NULL;
+	}
+	
+	// delete interior
+	if ((main_room = VEH_INTERIOR_HOME_ROOM(veh)) || VEH_ROOM_LIST(veh)) {
+		LL_FOREACH_SAFE(VEH_ROOM_LIST(veh), vrl, next_vrl) {
+			if (vrl->room == main_room) {
+				continue;	// do this one last
+			}
+			
+			if (IN_ROOM(veh)) {
+				relocate_players(vrl->room, IN_ROOM(veh));
+			}
+			delete_room(vrl->room, FALSE);	// MUST check_all_exits later
+		}
+		
+		if (main_room) {
+			if (IN_ROOM(veh)) {
+				relocate_players(main_room, IN_ROOM(veh));
+			}
+			delete_room(main_room, FALSE);
+		}
+		check_all_exits();
+	}
+	
+	if (VEH_LED_BY(veh)) {
+		GET_LEADING_VEHICLE(VEH_LED_BY(veh)) = NULL;
+		VEH_LED_BY(veh) = NULL;
+	}
+	if (VEH_SITTING_ON(veh)) {
+		unseat_char_from_vehicle(VEH_SITTING_ON(veh));
+	}
+	if (VEH_DRIVER(veh)) {
+		GET_DRIVING(VEH_DRIVER(veh)) = NULL;
+		VEH_DRIVER(veh) = NULL;
+	}
+	
+	if (IN_ROOM(veh)) {
+		vehicle_from_room(veh);
+	}
+	
+	// dump contents (this will extract them since it's not in a room)
+	empty_vehicle(veh);
+	
+	// remove animals: doing this without the vehicle in a room will not spawn the mobs
+	while (VEH_ANIMALS(veh)) {
+		unharness_mob_from_vehicle(VEH_ANIMALS(veh), veh);
+	}
+	
+	LL_DELETE2(vehicle_list, veh, next);
+	free_vehicle(veh);
+}
+
+
+/**
+* @param char_data *ch Someone trying to sit.
+* @param vehicle_data *veh The vehicle to seat them on.
+*/
+void sit_on_vehicle(char_data *ch, vehicle_data *veh) {
+	// safety first
+	if (GET_SITTING_ON(ch)) {
+		unseat_char_from_vehicle(ch);
+	}
+	if (VEH_SITTING_ON(veh)) {
+		unseat_char_from_vehicle(VEH_SITTING_ON(veh));
+	}
+	
+	GET_SITTING_ON(ch) = veh;
+	VEH_SITTING_ON(veh) = ch;
+}
+
+
+/**
+* @param char_data *ch A player to remove from the seat he is in/on.
+*/
+void unseat_char_from_vehicle(char_data *ch) {
+	if (GET_SITTING_ON(ch)) {
+		VEH_SITTING_ON(GET_SITTING_ON(ch)) = NULL;
+	}
+	GET_SITTING_ON(ch) = NULL;
+}
+
+
+/**
+* Remove a vehicle from the room it is in.
+*
+* @param vehicle_data *veh The vehicle to remove from its room.
+*/
+void vehicle_from_room(vehicle_data *veh) {
+	if (!veh || !IN_ROOM(veh)) {
+		log("SYSERR: NULL vehicle (%p) or vehicle not in a room (%p) passed to vehicle_from_room", veh, IN_ROOM(veh));
+		return;
+	}
+	
+	LL_DELETE2(ROOM_VEHICLES(IN_ROOM(veh)), veh, next_in_room);
+	IN_ROOM(veh) = NULL;
+}
+
+
+/**
+* Put a vehicle in a room.
+*
+* @param vehicle_data *veh The vehicle.
+* @param room_data *room The room to put it in.
+*/
+void vehicle_to_room(vehicle_data *veh, room_data *room) {
+	if (!veh || !room) {
+		log("SYSERR: Illegal value(s) passed to vehicle_to_room. (Room %p, vehicle %p)", room, veh);
+		return;
+	}
+	
+	if (IN_ROOM(veh)) {
+		vehicle_from_room(veh);
+	}
+	
+	LL_PREPEND2(ROOM_VEHICLES(room), veh, next_in_room);
+	IN_ROOM(veh) = room;
+	VEH_LAST_MOVE_TIME(veh) = time(0);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE TARGETING HANDLERS //////////////////////////////////////////////
+
+/**
+* Finds a vehicle the char can see in the room.
+*
+* @param char_data *ch The person who's looking.
+* @param char *name The target argument.
+* @parma room_data *room Which room to look for a vehicle in.
+* @return vehicle_data* The vehicle found, or NULL.
+*/
+vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, char *name) {
+	int found = 0, number;
+	char tmpname[MAX_INPUT_LENGTH];
+	char *tmp = tmpname;
+	vehicle_data *iter;
+
+	strcpy(tmp, name);
+	
+	// 0.x does not target vehicles
+	if ((number = get_number(&tmp)) == 0) {
+		return (NULL);
+	}
+	
+	LL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
+		if (!isname(tmp, VEH_KEYWORDS(iter))) {
+			continue;
+		}
+		if (!CAN_SEE_VEHICLE(ch, iter)) {
+			continue;
+		}
+		
+		// found: check number
+		if (++found == number) {
+			return iter;
+		}
+	}
+
+	return NULL;
+}
+
+
+/**
+* Find a vehicle in the world, visible to the character.
+*
+* @param char_data *ch The person looking.
+* @param char *name The string they typed.
+* @return vehicle_data* The vehicle found, or NULL.
+*/
+vehicle_data *get_vehicle_vis(char_data *ch, char *name) {
+	int found = 0, number;
+	char tmpname[MAX_INPUT_LENGTH];
+	char *tmp = tmpname;
+	vehicle_data *iter;
+	
+	// prefer match in same room
+	if ((iter = get_vehicle_in_room_vis(ch, name))) {
+		return iter;
+	}
+
+	strcpy(tmp, name);
+	
+	// 0.x does not target vehicles
+	if ((number = get_number(&tmp)) == 0) {
+		return (NULL);
+	}
+	
+	LL_FOREACH2(vehicle_list, iter, next) {
+		if (!isname(tmp, VEH_KEYWORDS(iter))) {
+			continue;
+		}
+		if (!CAN_SEE_VEHICLE(ch, iter)) {
+			continue;
+		}
+		
+		// found: check number
+		if (++found == number) {
+			return iter;
+		}
+	}
+
+	return NULL;
+}
+
+
+/**
+* Find a vehicle in the room, without regard to visibility.
+*
+* @param room_data *room The room to look in.
+* @param char *name The string to search for.
+* @return vehicle_data* The found vehicle, or NULL.
+*/
+vehicle_data *get_vehicle_room(room_data *room, char *name) {
+	int found = 0, number;
+	char tmpname[MAX_INPUT_LENGTH];
+	char *tmp = tmpname;
+	vehicle_data *iter;
+
+	strcpy(tmp, name);
+	
+	// 0.x does not target vehicles
+	if ((number = get_number(&tmp)) == 0) {
+		return (NULL);
+	}
+	
+	LL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
+		if (!isname(tmp, VEH_KEYWORDS(iter))) {
+			continue;
+		}
+		
+		// found: check number
+		if (++found == number) {
+			return iter;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
+* Find a vehicle in the world, without regard to visibility.
+*
+* @param char *name The string to search for.
+* @return vehicle_data* The vehicle found, or NULL.
+*/
+vehicle_data *get_vehicle_world(char *name) {
+	int found = 0, number;
+	char tmpname[MAX_INPUT_LENGTH];
+	char *tmp = tmpname;
+	vehicle_data *iter;
+
+	strcpy(tmp, name);
+	
+	// 0.x does not target vehicles
+	if ((number = get_number(&tmp)) == 0) {
+		return (NULL);
+	}
+	
+	LL_FOREACH2(vehicle_list, iter, next) {
+		if (!isname(tmp, VEH_KEYWORDS(iter))) {
+			continue;
+		}
+		
+		// found: check number
+		if (++found == number) {
+			return iter;
+		}
+	}
+
+	return NULL;
 }
 
 

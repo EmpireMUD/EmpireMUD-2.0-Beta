@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_event.h                                      EmpireMUD 2.0b3 *
+*   File: dg_event.h                                      EmpireMUD 2.0b4 *
 *  Usage: structures and prototypes for events                            *
 *                                                                         *
 *  DG Scripts code by Eric Green (ejg3@cornell.edu)                       *

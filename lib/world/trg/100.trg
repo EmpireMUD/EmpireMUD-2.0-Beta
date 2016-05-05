@@ -150,13 +150,19 @@ say I could use some more rat skins, if you have any.
 Ratskins's reward~
 0 c 100
 trade~
+eval test %%self.varexists(gave%actor.id%)%%
+if %test%
+  %send% %actor% You have already completed this quest in this adventure.
+  halt
+end
 if (%actor.has_resources(10013,15)%)
   nop %actor.add_resources(10013,-15)%
   say Excellent, %actor.name%, this is exactly what I was looking for!
   %load% o 10015 %actor% inv
   %send% %actor% %self.name% gives you the ratskin totem.
   %echoaround% %actor% %self.name% gives %actor.name% the ratskin totem.
-  detach all %self.id%
+  eval gave%actor.id% 1
+  remote gave%actor.id% %self.id%
 else
   say What I'm looking for is 15 rat skins.
 end
@@ -643,7 +649,7 @@ eval charge %%actor.add_resources(10036,-%cost%)%%
 nop %charge%
 %load% obj %vnum% %actor% inv %actor.level%
 %send% %actor% You buy %named% for %cost% skystones.
-%echoaround% %actor% %actor.name% buys a %named%.
+%echoaround% %actor% %actor.name% buys %named%.
 ~
 #10038
 Goblin Wrangler passive~
@@ -1122,7 +1128,7 @@ buy~
 command: buy
 eval vnum 10066
 eval cost 5
-eval named a formfitting backpack
+eval named a form-fitting backpack
 eval keyw backpack
 if (!%arg%)
   %send% %actor% %self.name% sells %named% for %cost% greater skystones.
@@ -1140,8 +1146,8 @@ end
 eval charge %%actor.add_resources(10037,-%cost%)%%
 nop %charge%
 %load% obj %vnum% %actor% inv %actor.level%
-%send% %actor% You buy a %named% for %cost% greater skystones.
-%echoaround% %actor% %actor.name% buys a %named%.
+%send% %actor% You buy %named% for %cost% greater skystones.
+%echoaround% %actor% %actor.name% buys %named%.
 ~
 #10058
 Barrosh passive~
@@ -1235,8 +1241,8 @@ end
 eval charge %%actor.add_resources(10037,-%cost%)%%
 nop %charge%
 %load% obj %vnum% %actor% inv %actor.level%
-%send% %actor% You buy a %named% for %cost% greater skystones.
-%echoaround% %actor% %actor.name% buys a %named%.
+%send% %actor% You buy %named% for %cost% greater skystones.
+%echoaround% %actor% %actor.name% buys %named%.
 ~
 #10061
 Knezz passive~
@@ -1337,8 +1343,8 @@ end
 eval charge %%actor.add_resources(10037,-%cost%)%%
 nop %charge%
 %load% obj %vnum% %actor% inv %actor.level%
-%send% %actor% You buy a %named% for %cost% greater skystones.
-%echoaround% %actor% %actor.name% buys a %named%.
+%send% %actor% You buy %named% for %cost% greater skystones.
+%echoaround% %actor% %actor.name% buys %named%.
 ~
 #10064
 Escaped experiment passive~
