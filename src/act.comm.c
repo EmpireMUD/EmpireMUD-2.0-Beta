@@ -800,9 +800,13 @@ ACMD(do_slash_channel) {
 			
 			// announce it (this also messages the player)
 			if (!global_mute_slash_channel_joins) {
-				msg_to_char(ch, "You join \t%c/%s\tn.\r\n", chan->color, chan->name);
+				// announce to channel members
 				if (GET_INVIS_LEV(ch) <= LVL_APPROVED) {
 					announce_to_slash_channel(chan, "%s has joined the channel", PERS(ch, ch, TRUE));
+				}
+				// if player wouldn't see their own join announce
+				if (GET_INVIS_LEV(ch) > LVL_APPROVED || PRF_FLAGGED(ch, PRF_NO_CHANNEL_JOINS)) {
+					msg_to_char(ch, "You join \t%c/%s\tn.\r\n", chan->color, chan->name);
 				}
 			}
 		}

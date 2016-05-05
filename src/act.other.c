@@ -783,6 +783,7 @@ void alt_import_ignores(char_data *ch, char_data *alt) {
 				GET_IGNORE_LIST(ch, sub) = GET_IGNORE_LIST(alt, iter);
 				imported = TRUE;
 				found = TRUE;
+				break;
 			}
 		}
 		
