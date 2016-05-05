@@ -854,6 +854,7 @@ void alt_import_slash_channels(char_data *ch, char_data *alt) {
 	char buf[MAX_STRING_LENGTH];
 	bool imported = FALSE;
 	
+	// if not in the game, slash channels are here
 	LL_FOREACH(LOAD_SLASH_CHANNELS(alt), load_slash) {
 		if ((chan = find_slash_channel_by_name(load_slash->name, TRUE)) && !find_on_slash_channel(ch, chan->id)) {
 			snprintf(buf, sizeof(buf), "join %s", chan->name);
@@ -862,6 +863,7 @@ void alt_import_slash_channels(char_data *ch, char_data *alt) {
 		}
 	}
 	
+	// if in-game, slash channels are here
 	LL_FOREACH(GET_SLASH_CHANNELS(alt), iter) {
 		if (!find_on_slash_channel(ch, iter->id) && (chan = find_slash_channel_by_id(iter->id))) {
 			snprintf(buf, sizeof(buf), "join %s", chan->name);
