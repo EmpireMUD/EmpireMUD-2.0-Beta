@@ -31,12 +31,14 @@
 * Contents:
 *   Helpers
 *   Accept/Reject Helpers
+*   Alt Import
 *   Toggle Callbacks
 *   Commands
 */
 
 // external prototypes
 extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
+void check_delayed_load(char_data *ch);
 extern bool check_scaling(char_data *mob, char_data *attacker);
 extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
 extern char *get_room_name(room_data *room, bool color);
@@ -687,6 +689,271 @@ OFFER_FINISH(ofin_summon) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// ALT IMPORT //////////////////////////////////////////////////////////////
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
+void alt_import_aliases(char_data *ch, char_data *alt) {
+	struct alias_data *al, *iter, *newl;
+	bool found, imported = FALSE;
+	
+	// may have been loaded from file
+	check_delayed_load(alt);
+	
+	LL_FOREACH(GET_ALIASES(alt), al) {
+		// ensure not already aliased
+		found = FALSE;
+		LL_FOREACH(GET_ALIASES(ch), iter) {
+			if (!str_cmp(al->alias, iter->alias)) {
+				found = TRUE;
+				break;
+			}
+		}
+		if (found) {
+			continue;	// already aliased
+		}
+		
+		CREATE(newl, struct alias_data, 1);
+		newl->alias = str_dup(al->alias);
+		newl->replacement = str_dup(al->replacement);
+		newl->type = al->type;
+		
+		newl->next = GET_ALIASES(ch);
+		GET_ALIASES(ch) = newl;
+		
+		msg_to_char(ch, "Imported alias '%s'.\r\n", newl->alias);
+		imported = TRUE;
+	}
+	
+	if (!imported) {
+		msg_to_char(ch, "No aliases to import.\r\n");
+	}
+}
+
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
+void alt_import_fprompt(char_data *ch, char_data *alt) {
+	if (GET_FIGHT_PROMPT(alt) && *GET_FIGHT_PROMPT(alt)) {
+		if (GET_FIGHT_PROMPT(ch)) {
+			free(GET_FIGHT_PROMPT(ch));
+		}
+		GET_FIGHT_PROMPT(ch) = str_dup(GET_FIGHT_PROMPT(alt));
+		msg_to_char(ch, "Imported fprompt.\r\n");
+	}
+	else {
+		msg_to_char(ch, "No fprompt to import.\r\n");
+	}
+}
+
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
+void alt_import_ignores(char_data *ch, char_data *alt) {
+	bool found, imported = FALSE, full = FALSE;
+	int iter, sub;
+	
+	for (iter = 0; iter < MAX_IGNORES && !full; ++iter) {
+		if (GET_IGNORE_LIST(alt, iter) <= 0) {
+			continue;	// no ignore to copy
+		}
+		
+		// ensure not already ignoring
+		found = FALSE;
+		for (sub = 0; sub < MAX_IGNORES; ++sub) {
+			if (GET_IGNORE_LIST(ch, sub) == GET_IGNORE_LIST(alt, iter)) {
+				found = TRUE;
+				break;
+			}
+		}
+		if (found) {
+			continue;	// no need to copy
+		}
+		
+		// attempt to copy
+		found = FALSE;
+		for (sub = 0; sub < MAX_IGNORES; ++sub) {
+			if (GET_IGNORE_LIST(ch, sub) <= 0) {
+				GET_IGNORE_LIST(ch, sub) = GET_IGNORE_LIST(alt, iter);
+				imported = TRUE;
+				found = TRUE;
+			}
+		}
+		
+		if (!found) {
+			// nowhere to insert!
+			full = TRUE;
+			break;
+		}
+	}
+	
+	if (imported) {
+		msg_to_char(ch, "Imported ignores.\r\n");
+	}
+	if (full) {
+		msg_to_char(ch, "Your ignore list is too full to add more.\r\n");
+	}
+	if (!imported && !full) {
+		msg_to_char(ch, "No ignores to import.\r\n");
+	}
+}
+
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
+void alt_import_prompt(char_data *ch, char_data *alt) {
+	if (GET_PROMPT(alt) && *GET_PROMPT(alt)) {
+		if (GET_PROMPT(ch)) {
+			free(GET_PROMPT(ch));
+		}
+		GET_PROMPT(ch) = str_dup(GET_PROMPT(alt));
+		msg_to_char(ch, "Imported prompt.\r\n");
+	}
+	else {
+		msg_to_char(ch, "No prompt to import.\r\n");
+	}
+}
+
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
+void alt_import_recolors(char_data *ch, char_data *alt) {
+	int iter;
+	
+	for (iter = 0; iter < NUM_CUSTOM_COLORS; ++iter) {
+		GET_CUSTOM_COLOR(ch, iter) = GET_CUSTOM_COLOR(alt, iter);
+	}
+	
+	msg_to_char(ch, "Imported recolors.\r\n");
+}
+
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
+void alt_import_slash_channels(char_data *ch, char_data *alt) {
+	extern struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
+	extern struct slash_channel *find_slash_channel_by_id(int id);
+	ACMD(do_slash_channel);
+	
+	struct player_slash_channel *iter;
+	char buf[MAX_STRING_LENGTH];
+	struct slash_channel *chan;
+	bool imported = FALSE;
+	
+	LL_FOREACH(GET_SLASH_CHANNELS(alt), iter) {
+		if (!find_on_slash_channel(ch, iter->id) && (chan = find_slash_channel_by_id(iter->id))) {
+			snprintf(buf, sizeof(buf), "join %s", chan->name);
+			do_slash_channel(ch, buf, 0, 0);
+			imported = TRUE;
+		}
+	}
+	
+	if (!imported) {
+		msg_to_char(ch, "No channels to import.\r\n");
+	}
+}
+
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
+void alt_import_toggles(char_data *ch, char_data *alt) {
+	if (IS_IMMORTAL(alt)) {
+		msg_to_char(ch, "You can't import toggles from an immortal.\r\n");
+	}
+	else {
+		PRF_FLAGS(ch) = PRF_FLAGS(alt);
+		msg_to_char(ch, "Imported toggles.\r\n");
+	}
+}
+
+
+/**
+* Sub-processor for "alt import".
+*
+* @param char_data *ch The player.
+* @param char *argument Remaining args.
+*/
+void do_alt_import(char_data *ch, char *argument) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	char_data *alt = NULL;
+	bool file = FALSE;
+	
+	static const char *valid_fields = "Valid fields: aliases, prompt, fprompt, toggles, recolors, slash-channels, ignores, all\r\n";
+	
+	two_arguments(argument, arg1, arg2);
+	
+	// validate
+	if (!*arg1 || !*arg2) {
+		msg_to_char(ch, "Usage: alt import <name> <field | all>\r\n");
+		msg_to_char(ch, valid_fields);
+	}
+	else if (!(alt = find_or_load_player(arg1, &file))) {
+		msg_to_char(ch, "Unknown alt '%s'.\r\n", arg1);
+	}
+	else if (GET_ACCOUNT(ch) != GET_ACCOUNT(alt)) {
+		msg_to_char(ch, "That's not even your alt!\r\n");
+	}
+	
+	// process import
+	else if (is_abbrev(arg2, "aliases")) {
+		alt_import_aliases(ch, alt);
+	}
+	else if (is_abbrev(arg2, "prompt")) {
+		alt_import_prompt(ch, alt);
+	}
+	else if (is_abbrev(arg2, "fprompt")) {
+		alt_import_fprompt(ch, alt);
+	}
+	else if (is_abbrev(arg2, "toggles")) {
+		alt_import_toggles(ch, alt);
+	}
+	else if (is_abbrev(arg2, "recolors")) {
+		alt_import_recolors(ch, alt);
+	}
+	else if (is_abbrev(arg2, "slash-channels")) {
+		alt_import_slash_channels(ch, alt);
+	}
+	else if (is_abbrev(arg2, "ignores")) {
+		alt_import_ignores(ch, alt);
+	}
+	
+	// last
+	else if (!str_cmp(arg2, "all")) {
+		alt_import_aliases(ch, alt);
+		alt_import_prompt(ch, alt);
+		alt_import_fprompt(ch, alt);
+		alt_import_toggles(ch, alt);
+		alt_import_recolors(ch, alt);
+		alt_import_ignores(ch, alt);
+		alt_import_slash_channels(ch, alt);
+	}
+	else {
+		msg_to_char(ch, "Uknown field '%s'.\r\n", arg2);
+		msg_to_char(ch, valid_fields);
+	}
+
+	// cleanup	
+	if (alt && file) {
+		free_char(alt);
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// TOGGLE CALLBACKS ////////////////////////////////////////////////////////
 
 /**
@@ -900,7 +1167,7 @@ ACMD(do_alternate) {
 	int days, hours;
 	size_t size;
 	
-	any_one_arg(argument, arg);
+	argument = any_one_arg(argument, arg);
 	
 	if (!ch->desc) {
 		msg_to_char(ch, "You can't do anything without a player controlling you. Who's even reading this?\r\n");
@@ -910,7 +1177,7 @@ ACMD(do_alternate) {
 	}
 	else if (!*arg) {
 		msg_to_char(ch, "This command lets you switch which character you're logged in with.\r\n");
-		msg_to_char(ch, "Usage: alternate <character name>\r\n");
+		msg_to_char(ch, "Usage: alternate <character name | list | import>\r\n");
 	}
 	else if (!str_cmp(arg, "list")) {
 		size = snprintf(buf, sizeof(buf), "Account characters:\r\n");
@@ -960,6 +1227,9 @@ ACMD(do_alternate) {
 			page_string(ch->desc, buf, TRUE);
 		}
 		command_lag(ch, WAIT_OTHER);
+	}
+	else if (!str_cmp(arg, "import")) {
+		do_alt_import(ch, argument);
 	}
 	else if (ch->desc->str) {
 		msg_to_char(ch, "You can't alternate while editing text (use ,/save or ,/abort first).\r\n");
