@@ -846,12 +846,21 @@ void alt_import_recolors(char_data *ch, char_data *alt) {
 void alt_import_slash_channels(char_data *ch, char_data *alt) {
 	extern struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
 	extern struct slash_channel *find_slash_channel_by_id(int id);
+	extern struct slash_channel *find_slash_channel_by_name(char *name, bool exact);
 	ACMD(do_slash_channel);
 	
+	struct slash_channel *chan, *load_slash;
 	struct player_slash_channel *iter;
 	char buf[MAX_STRING_LENGTH];
-	struct slash_channel *chan;
 	bool imported = FALSE;
+	
+	LL_FOREACH(LOAD_SLASH_CHANNELS(alt), load_slash) {
+		if ((chan = find_slash_channel_by_name(load_slash->name, TRUE)) && !find_on_slash_channel(ch, chan->id)) {
+			snprintf(buf, sizeof(buf), "join %s", chan->name);
+			do_slash_channel(ch, buf, 0, 0);
+			imported = TRUE;
+		}
+	}
 	
 	LL_FOREACH(GET_SLASH_CHANNELS(alt), iter) {
 		if (!find_on_slash_channel(ch, iter->id) && (chan = find_slash_channel_by_id(iter->id))) {
