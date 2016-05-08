@@ -3529,6 +3529,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					break;
 				}
+				case 'l': {	// obj.l*
+					if (!str_cmp(field, "level")) {
+						snprintf(str, slen, "%d", GET_OBJ_CURRENT_SCALE_LEVEL(o));
+					}
+					break;
+				}
 				case 'm': {	// obj.m*
 					if (!str_cmp(field, "material")) {
 						extern const struct material_data materials[NUM_MATERIALS];
