@@ -2258,7 +2258,7 @@ void check_version(void) {
 		if (MATCH_VERSION("b4.1")) {
 			log("Adding b4.1 approval data...");
 			update_all_players(NULL, b4_1_approve_players);
-			read_empire_members(NULL, FALSE);
+			reread_empire_tech(NULL);
 		}
 	}
 	
