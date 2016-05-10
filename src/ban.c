@@ -250,6 +250,7 @@ int Valid_Name(char *newname) {
 				return (0);
 			}
 		}
+	}
 
 	return (1);
 }

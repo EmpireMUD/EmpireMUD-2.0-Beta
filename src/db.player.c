@@ -3416,12 +3416,8 @@ void start_new_character(char_data *ch) {
 	}
 	// auto-authorization
 	if (!IS_APPROVED(ch) && config_get_bool("auto_approve")) {
-		if (config_get_bool("approve_per_character")) {
-			SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
-		}
-		else {	// per-account (default)
-			SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_APPROVED);
-		}
+		// only approve the character automatically
+		SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
 	}
 	
 	GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
