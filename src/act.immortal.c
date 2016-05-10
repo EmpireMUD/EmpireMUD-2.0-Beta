@@ -1355,8 +1355,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		
 		RANGE(0, LVL_IMPL);
 		vict->player.access_level = (byte) value;
-		if (!IS_NPC(vict))
-			GET_IMMORTAL_LEVEL(vict) = IS_IMMORTAL(vict) ? LVL_TOP - GET_ACCESS_LEVEL(vict) : -1;
+		if (!IS_NPC(vict)) {
+			GET_IMMORTAL_LEVEL(vict) = (GET_ACCESS_LEVEL(vict) > LVL_MORTAL ? (LVL_TOP - GET_ACCESS_LEVEL(vict)) : -1);
+		}
 		SAVE_CHAR(vict);
 		check_autowiz(ch);
 	}
@@ -4298,7 +4299,7 @@ ACMD(do_advance) {
 	if (newlevel < GET_ACCESS_LEVEL(victim)) {
 		start_new_character(victim);
 		GET_ACCESS_LEVEL(victim) = newlevel;
-		GET_IMMORTAL_LEVEL(victim) = IS_IMMORTAL(victim) ? LVL_TOP - GET_ACCESS_LEVEL(victim) : -1;
+		GET_IMMORTAL_LEVEL(victim) = GET_ACCESS_LEVEL(victim) > LVL_MORTAL ? (LVL_TOP - GET_ACCESS_LEVEL(victim)) : -1;
 		send_to_char("You are momentarily enveloped by darkness!\r\nYou feel somewhat diminished.\r\n", victim);
 	}
 	else {
@@ -4333,7 +4334,7 @@ ACMD(do_advance) {
 	}
 
 	GET_ACCESS_LEVEL(victim) = newlevel;
-	GET_IMMORTAL_LEVEL(victim) = IS_IMMORTAL(victim) ? LVL_TOP - GET_ACCESS_LEVEL(victim) : -1;
+	GET_IMMORTAL_LEVEL(victim) = GET_ACCESS_LEVEL(victim) > LVL_MORTAL ? (LVL_TOP - GET_ACCESS_LEVEL(victim)) : -1;
 	SAVE_CHAR(victim);
 	check_autowiz(victim);
 }

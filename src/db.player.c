@@ -2957,7 +2957,10 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	if (GET_IMMORTAL_LEVEL(ch) > -1) {
 		GET_ACCESS_LEVEL(ch) = LVL_TOP - GET_IMMORTAL_LEVEL(ch);
-		GET_ACCESS_LEVEL(ch) = MAX(GET_ACCESS_LEVEL(ch), LVL_START_IMM);
+		GET_ACCESS_LEVEL(ch) = MAX(GET_ACCESS_LEVEL(ch), LVL_GOD);
+	}
+	else {	// not an imm/god
+		GET_ACCESS_LEVEL(ch) = MIN(GET_ACCESS_LEVEL(ch), LVL_MORTAL);
 	}
 	
 	if (PLR_FLAGGED(ch, PLR_INVSTART))
