@@ -906,7 +906,7 @@ typedef struct vehicle_data vehicle_data;
  *  - Make sure that the levels for commands in interpreter.c are okay
  *  - Unless you have more than three immortal levels, the mud will auto-
  *    magically set the command levels for you.
- *  - Make sure LVL_TOP is no less than 4!
+ *  - Make sure LVL_TOP is no less than 3!
  *  - If you want more levels than those listed in the chart, you'll have to
  *    make necessary adjustments yourself:
  *    = Add a clause in db.player.c, Autowiz section: level_params[]
@@ -918,21 +918,21 @@ typedef struct vehicle_data vehicle_data;
  * Quick Reference:
  *  Levels    You'll Have
  *  ------    -----------
- *    4           Unapproved, Approved, God, Implementor
- *    5           Unapproved, Approved, God, Immortal, Implementor
- *    6           Unapproved, Approved, God, Immortal, Assistant, Implementor
- *    7           Unapproved, Approved, God, Immortal, Assistant, Co-Implementor, Implementor
+ *    3           Mortal, God, Implementor
+ *    4           Mortal, God, Immortal, Implementor
+ *    5           Mortal, God, Immortal, Assistant, Implementor
+ *    6           Mortal, God, Immortal, Assistant, Co-Implementor, Implementor
  */
 
-#define LVL_TOP  7	// Highest possible access level
-#define LVL_APPROVED  2	// Level when players can use commands -- don't set less than 2
+#define LVL_TOP  6	// Highest possible access level
+#define LVL_MORTAL  1	// Level when players can use commands -- don't set less than 1
 
 // admin levels
 #define LVL_IMPL  LVL_TOP
 #define LVL_CIMPL  (LVL_ASST < LVL_TOP ? LVL_ASST + 1 : LVL_ASST)
 #define LVL_ASST  (LVL_START_IMM < LVL_TOP ? LVL_START_IMM + 1 : LVL_START_IMM)
 #define LVL_START_IMM  (LVL_GOD+1)
-#define LVL_GOD  (LVL_APPROVED+1)
+#define LVL_GOD  (LVL_MORTAL+1)
 
 
 // Player killing options (config.c)
@@ -1338,6 +1338,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACCT_NOTITLE  BIT(3)	// d. cannot change own title
 #define ACCT_MULTI_IP  BIT(4)	// e. can log in at the same time as other accounts on the same IP
 #define ACCT_MULTI_CHAR  BIT(5)	// f. can log in more than one character on this account
+#define ACCT_APPROVED  BIT(6)	// g. approved for full gameplay
 
 
 // ACT_x: Periodic actions -- WARNING: changing the order of these will have tragic consequences with saved players
@@ -1500,7 +1501,7 @@ typedef struct vehicle_data vehicle_data;
 #define GRANT_USERS  BIT(28)
 #define GRANT_WIZLOCK  BIT(29)
 #define GRANT_RESCALE  BIT(30)
-#define GRANT_AUTHORIZE  BIT(31)
+#define GRANT_APPROVE  BIT(31)
 #define GRANT_FORGIVE  BIT(32)
 #define GRANT_HOSTILE  BIT(33)
 #define GRANT_SLAY  BIT(34)
@@ -1553,7 +1554,7 @@ typedef struct vehicle_data vehicle_data;
 
 
 // PLR_x: Player flags: used by char_data.char_specials.act
-	#define PLR_UNUSED1		BIT(0)
+#define PLR_APPROVED	BIT(0)	// player is approved to play the full game
 #define PLR_WRITING		BIT(1)	/* Player writing (board/mail)			*/
 #define PLR_MAILING		BIT(2)	/* Player is writing mail				*/
 #define PLR_DONTSET		BIT(3)	/* Don't EVER set (ISNPC bit)			*/
@@ -2657,7 +2658,7 @@ struct account_data {
 	int id;	// corresponds to player_index_data account_id and player's saved account id
 	struct account_player *players;	// linked list of players
 	time_t last_logon;	// timestamp of the last login on the account
-	bitvector_t flags;	// ACCT_x
+	bitvector_t flags;	// ACCT_
 	char *notes;	// account notes
 	
 	UT_hash_handle hh;	// account_table
@@ -2702,7 +2703,7 @@ struct player_index_data {
 	time_t birth;	// creation time
 	int played;	// time played
 	int access_level;	// player's access level
-	bitvector_t plr_flags;	// PLR_x: a copy of the last-saved player flags
+	bitvector_t plr_flags;	// PLR_: a copy of the last-saved player flags
 	empire_data *loyalty;	// empire, if any
 	int rank;	// empire rank
 	char *last_host;	// last known host

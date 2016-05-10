@@ -2136,6 +2136,9 @@ ACMD(do_chip) {
 		act("$n stops chipping.", TRUE, ch, NULL, NULL, TO_ROOM);
 		cancel_action(ch);
 	}
+	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already busy doing something else.\r\n");
 	}
@@ -2172,6 +2175,9 @@ ACMD(do_chop) {
 		act("$n stops chopping.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
+	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
@@ -2202,6 +2208,9 @@ ACMD(do_dig) {
 		act("$n stops digging.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
+	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
@@ -2226,6 +2235,9 @@ ACMD(do_excavate) {
 		msg_to_char(ch, "You stop the excavation.\r\n");
 		act("$n stops excavating the trench.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
+	}
+	else if (!IS_APPROVED(ch) && config_get_bool("terraform_approval")) {
+		send_config_msg(ch, "need_approval_string");
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
 		// even if already started
@@ -2278,6 +2290,9 @@ ACMD(do_fillin) {
 		msg_to_char(ch, "You stop filling in the trench.\r\n");
 		act("$n stops filling in the trench.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
+	}
+	else if (!IS_APPROVED(ch) && config_get_bool("terraform_approval")) {
+		send_config_msg(ch, "need_approval_string");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already quite busy.\r\n");
@@ -2332,6 +2347,9 @@ ACMD(do_gather) {
 		act("$n stops looking around.", TRUE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
+	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
@@ -2359,6 +2377,9 @@ ACMD(do_harvest) {
 		msg_to_char(ch, "You stop harvesting the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 		act("$n stops harvesting.\r\n", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
+	}
+	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
+		send_config_msg(ch, "need_approval_string");
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
 		msg_to_char(ch, "You can't harvest here.\r\n");
@@ -2404,6 +2425,9 @@ ACMD(do_mine) {
 		act("$n stops mining.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
+	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
 	}
@@ -2441,6 +2465,9 @@ ACMD(do_mint) {
 		msg_to_char(ch, "You stop minting coins.\r\n");
 		act("$n stops minting coins.", FALSE, ch, NULL, NULL, TO_ROOM);
 		cancel_action(ch);
+	}
+	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
+		send_config_msg(ch, "need_approval_string");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
@@ -2494,6 +2521,9 @@ ACMD(do_pan) {
 		msg_to_char(ch, "You stop panning.\r\n");
 		cancel_action(ch);
 	}
+	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're a bit busy right now.\r\n");
 	}
@@ -2521,6 +2551,9 @@ ACMD(do_pan) {
 ACMD(do_pick) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot pick.\r\n");
+	}
+	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
+		send_config_msg(ch, "need_approval_string");
 	}
 	else if (GET_ACTION(ch) == ACT_PICKING) {
 		send_to_char("You stop searching.\r\n", ch);
@@ -2556,6 +2589,9 @@ ACMD(do_plant) {
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't plant.\r\n");
+	}
+	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
+		send_config_msg(ch, "need_approval_string");
 	}
 	else if (GET_ACTION(ch) == ACT_PLANTING) {
 		msg_to_char(ch, "You're already planting something.\r\n");
@@ -2678,6 +2714,9 @@ ACMD(do_quarry) {
 		act("$n stops quarrying.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
+	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
@@ -2701,6 +2740,9 @@ ACMD(do_saw) {
 	if (GET_ACTION(ch) == ACT_SAWING) {
 		act("You stop sawing.", FALSE, ch, NULL, NULL, TO_CHAR);
 		cancel_action(ch);
+	}
+	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
+		send_config_msg(ch, "need_approval_string");
 	}
 	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_SAW) || !IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can only saw in a lumber yard.\r\n");
@@ -2743,6 +2785,9 @@ ACMD(do_scrape) {
 	if (GET_ACTION(ch) == ACT_SCRAPING) {
 		act("You stop scraping.", FALSE, ch, NULL, NULL, TO_CHAR);
 		cancel_action(ch);
+	}
+	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
+		send_config_msg(ch, "need_approval_string");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already busy doing something else.\r\n");
@@ -2804,6 +2849,9 @@ ACMD(do_tan) {
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't tan.\r\n");
+	}
+	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
+		send_config_msg(ch, "need_approval_string");
 	}
 	else if (!*arg) {
 		msg_to_char(ch, "What would you like to tan?\r\n");

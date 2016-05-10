@@ -239,9 +239,18 @@ int Valid_Name(char *newname) {
 		tempname[i] = LOWER(tempname[i]);
 
 	/* Does the desired name contain a string in the invalid list? */
-	for (i = 0; i < num_invalid; i++)
-		if (strstr(tempname, invalid_list[i]))
-			return (0);
+	for (i = 0; i < num_invalid; i++) {
+		if (*invalid_list[i] == '%') {	// leading * means substr
+			if (strstr(tempname, invalid_list[i] + 1)) {
+				return (0);
+			}
+		}
+		else {	// otherwise exact-match
+			if (!str_cmp(tempname, invalid_list[i])) {
+				return (0);
+			}
+		}
+	}
 
 	return (1);
 }

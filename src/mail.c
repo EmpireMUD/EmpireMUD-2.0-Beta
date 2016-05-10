@@ -150,7 +150,10 @@ ACMD(do_mail) {
 	
 	two_arguments(argument, arg, buf);
 	
-	if (!*arg) {
+	if (!IS_APPROVED(ch) && config_get_bool("write_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!*arg) {
 		msg_to_char(ch, "Usage: mail send <name>, mail check, mail receive <number>\r\n");
 	}
 	else if (is_abbrev(arg, "check")) {

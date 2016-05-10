@@ -57,6 +57,13 @@ The following things will speed up various chores:
 
 See also: BONUS TRAITS, FINDER, SHOVEL, TOGGLE
 #
+APPROVAL AUTHORIZATION AUTHORIZED APPROVED
+
+If this MUD is configured to require player approval, you need to contact the
+game's staff to find out how to become approved. Or, check the MOTD or website.
+
+Implementors: update this help file in: lib/text/help/info.hlp
+#
 ADVENTURE "ADVENTURE ZONE" ZONE "ADVENTURE SUMMON"
 
 Usage:  adventure

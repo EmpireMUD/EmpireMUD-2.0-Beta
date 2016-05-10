@@ -1021,6 +1021,10 @@ ACMD(do_build) {
 		msg_to_char(ch, "NPCs cannot use the build command.\r\n");
 		return;
 	}
+	if (!IS_APPROVED(ch) && config_get_bool("build_approval")) {
+		send_config_msg(ch, "need_approval_string");
+		return;
+	}
 	
 	argument = any_one_word(argument, arg);
 	skip_spaces(&argument);
@@ -1265,6 +1269,11 @@ ACMD(do_dismantle) {
 		GET_ACTION(ch) = ACT_NONE;
 		return;
 	}
+	
+	if (!IS_APPROVED(ch) && config_get_bool("build_approval")) {
+		send_config_msg(ch, "need_approval_string");
+		return;
+	}
 
 	if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're kinda busy right now.\r\n");
@@ -1503,7 +1512,10 @@ ACMD(do_designate) {
 	valid_des_flags = veh ? VEH_DESIGNATE_FLAGS(veh) : (GET_BUILDING(home) ? GET_BLD_DESIGNATE_FLAGS(GET_BUILDING(home)) : NOBITS);
 	hasrooms = veh ? VEH_INSIDE_ROOMS(veh) : GET_INSIDE_ROOMS(home);
 
-	if (!*argument || !(type = get_building_by_name(argument, TRUE))) {
+	if (!IS_APPROVED(ch) && config_get_bool("build_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!*argument || !(type = get_building_by_name(argument, TRUE))) {
 		msg_to_char(ch, "Usage: %s <room>\r\n", (subcmd == SCMD_REDESIGNATE) ? "redesignate" : "designate <direction>");
 
 		if (!ROOM_IS_CLOSED(IN_ROOM(ch)) && (subcmd == SCMD_DESIGNATE) && GET_INSIDE_ROOMS(home) >= maxrooms) {
@@ -1746,6 +1758,9 @@ ACMD(do_lay) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't lay roads.\r\n");
 	}
+	else if (!IS_APPROVED(ch) && config_get_bool("build_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're a little busy right now.\r\n");
 	}
@@ -1849,7 +1864,10 @@ ACMD(do_maintain) {
 
 
 ACMD(do_nodismantle) {
-	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "Your empire doesn't own this tile.\r\n");
 	}
 	else if (!IS_ANY_BUILDING(IN_ROOM(ch))) {
@@ -1973,6 +1991,9 @@ ACMD(do_upgrade) {
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use the upgrade command.\r\n");
+	}
+	else if (!IS_APPROVED(ch) && config_get_bool("build_approval")) {
+		send_config_msg(ch, "need_approval_string");
 	}
 	else if (!GET_BUILDING(IN_ROOM(ch)) || (upgrade = GET_BLD_UPGRADES_TO(GET_BUILDING(IN_ROOM(ch)))) == NOTHING || !building_proto(upgrade)) {
 		msg_to_char(ch, "You can't upgrade this.\r\n");

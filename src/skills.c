@@ -639,6 +639,10 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount) {
 		return FALSE;
 	}
 	
+	if (!IS_APPROVED(ch) && config_get_bool("skill_gain_approval")) {
+		return FALSE;
+	}
+	
 	// inability to gain from 0?
 	if (get_skill_level(ch, SKILL_VNUM(skill)) == 0 && !CAN_GAIN_NEW_SKILLS(ch)) {
 		return FALSE;

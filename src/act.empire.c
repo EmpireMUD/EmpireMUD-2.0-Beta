@@ -2270,7 +2270,11 @@ ACMD(do_abandon) {
 	
 	one_argument(argument, arg);
 	
-	if (FIGHTING(ch)) {
+	
+	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (FIGHTING(ch)) {
 		msg_to_char(ch, "You're too busy fighting!\r\n");
 	}
 	else if (!GET_LOYALTY(ch)) {
@@ -2405,7 +2409,10 @@ ACMD(do_cede) {
 	argument = one_argument(argument, arg);
 	any_one_word(argument, arg2);
 
-	if (!e)
+	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!e)
 		msg_to_char(ch, "You own no territory.\r\n");
 	else if (!*arg)
 		msg_to_char(ch, "Usage: cede <person> (x, y)\r\n");
@@ -2479,6 +2486,10 @@ ACMD(do_city) {
 	}
 	else if (is_abbrev(arg, "list")) {
 		list_cities(ch, arg1);
+	}
+	// all other options require manage-empire
+	else if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
 	}
 	else if (is_abbrev(arg, "found")) {
 		found_city(ch, arg1);
@@ -2607,7 +2618,10 @@ ACMD(do_claim) {
 	
 	one_argument(argument, arg);
 	
-	if (FIGHTING(ch)) {
+	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (FIGHTING(ch)) {
 		msg_to_char(ch, "You're too busy fighting!\r\n");
 	}
 	else if (!get_or_create_empire(ch)) {
@@ -2674,7 +2688,11 @@ ACMD(do_demote) {
 
 	e = GET_LOYALTY(ch);
 
-	if (!e) {
+	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
+		return;
+	}
+	else if (!e) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 		return;
 	}
@@ -2795,6 +2813,11 @@ ACMD(do_diplomacy) {
 	empire_data *ch_emp, *vict_emp;
 	int iter, type, war_cost = 0;
 	bool cancel = FALSE;
+	
+	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
+		return;
+	}
 	
 	half_chop(argument, type_arg, emp_arg);
 	
@@ -3385,9 +3408,10 @@ ACMD(do_enroll) {
 	bool file = FALSE, sub_file = FALSE;
 	obj_data *obj;
 
-	if (IS_NPC(ch))
+	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
 		return;
-
+	}
 	if (IS_NPC(ch) || !GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 		return;
@@ -3415,6 +3439,9 @@ ACMD(do_enroll) {
 		act("$E has not pledged $Mself to your empire.", FALSE, ch, 0, targ, TO_CHAR | TO_SLEEP);
 	else if ((old = GET_LOYALTY(targ)) && EMPIRE_LEADER(old) != GET_IDNUM(targ))
 		act("$E is already loyal to another empire.", FALSE, ch, 0, targ, TO_CHAR | TO_SLEEP);
+	else if (!IS_APPROVED(targ) && config_get_bool("join_empire_approval")) {
+		act("$E needs to be approved to play before $E can join your empire.", FALSE, ch, NULL, targ, TO_CHAR | TO_SLEEP);
+	}
 	else {
 		log_to_empire(e, ELOG_MEMBERS, "%s has been enrolled in the empire", PERS(targ, targ, 1));
 		msg_to_char(targ, "You have been enrolled in %s.\r\n", EMPIRE_NAME(e));
@@ -3755,7 +3782,10 @@ ACMD(do_expel) {
 	one_argument(argument, arg);
 
 	// it's important not to RETURN from here, as the target may need to be freed later
-	if (!e)
+	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!e)
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 	else if (GET_RANK(ch) != EMPIRE_NUM_RANKS(e))
 		msg_to_char(ch, "You don't have the authority to expel followers.\r\n");
@@ -4249,6 +4279,9 @@ ACMD(do_import) {
 	if (IS_NPC(ch) || !ch->desc) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
+	else if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if (!emp) {
 		msg_to_char(ch, "You must be in an empire to set trade rules.\r\n");
 	}
@@ -4356,6 +4389,9 @@ ACMD(do_pledge) {
 	if (IS_NPC(ch)) {
 		return;
 	}
+	else if (!IS_APPROVED(ch) && config_get_bool("join_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if ((old = GET_LOYALTY(ch)) && EMPIRE_LEADER(old) != GET_IDNUM(ch))
 		msg_to_char(ch, "You're already a member of an empire.\r\n");
 	else if (!(e = get_empire_by_name(argument)))
@@ -4393,6 +4429,10 @@ ACMD(do_promote) {
 	skip_spaces(&argument);
 
 	// initial checks
+	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
+		return;
+	}
 	if (!e) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 		return;
@@ -4460,7 +4500,10 @@ ACMD(do_promote) {
 
 
 ACMD(do_publicize) {
-	if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch))
+	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch))
 		msg_to_char(ch, "You can't do that here -- try it in the main room.\r\n");
 	else if (!GET_LOYALTY(ch))
 		msg_to_char(ch, "You're not in an empire.\r\n");
@@ -4899,7 +4942,10 @@ ACMD(do_unpublicize) {
 	empire_data *e;
 	room_data *iter, *next_iter;
 
-	if (!(e = GET_LOYALTY(ch)))
+	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!(e = GET_LOYALTY(ch)))
 		msg_to_char(ch, "You're not in an empire.\r\n");
 	else if (GET_RANK(ch) < EMPIRE_NUM_RANKS(e))
 		msg_to_char(ch, "You're of insufficient rank to remove all public status for the empire.\r\n");
@@ -4939,6 +4985,9 @@ ACMD(do_workforce) {
 	else if (!*arg) {
 		msg_to_char(ch, "Usage: workforce [chore] [on | off | <limit>] [island name | all]\r\n");
 		show_workforce_setup_to_char(emp, ch);
+	}
+	else if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
 	}
 	else if (is_abbrev(arg, "where")) {
 		show_workforce_where(emp, ch);

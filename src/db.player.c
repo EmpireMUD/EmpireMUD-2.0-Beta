@@ -2957,7 +2957,10 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	if (GET_IMMORTAL_LEVEL(ch) > -1) {
 		GET_ACCESS_LEVEL(ch) = LVL_TOP - GET_IMMORTAL_LEVEL(ch);
-		GET_ACCESS_LEVEL(ch) = MAX(GET_ACCESS_LEVEL(ch), LVL_START_IMM);
+		GET_ACCESS_LEVEL(ch) = MAX(GET_ACCESS_LEVEL(ch), LVL_GOD);
+	}
+	else {	// not an imm/god
+		GET_ACCESS_LEVEL(ch) = MIN(GET_ACCESS_LEVEL(ch), LVL_MORTAL);
 	}
 	
 	if (PLR_FLAGGED(ch, PLR_INVSTART))
@@ -3200,6 +3203,7 @@ void init_player(char_data *ch) {
 	player_index_data *index;
 	int account_id = NOTHING;
 	account_data *acct;
+	bool first = FALSE;
 	int i, iter;
 
 	// create a player_special structure, if needed
@@ -3218,6 +3222,8 @@ void init_player(char_data *ch) {
 
 	/* *** if this is our first player --- he be God *** */
 	if (HASH_CNT(idnum_hh, player_table_by_idnum) == 0) {
+		first = TRUE;
+		
 		GET_ACCESS_LEVEL(ch) = LVL_TOP;
 		GET_IMMORTAL_LEVEL(ch) = 0;			/* Initialize it to 0, meaning Implementor */
 
@@ -3230,6 +3236,7 @@ void init_player(char_data *ch) {
 		ch->real_attributes[INTELLIGENCE] = att_max(ch);
 		ch->real_attributes[WITS] = att_max(ch);
 		
+		SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
 		SET_BIT(PRF_FLAGS(ch), PRF_HOLYLIGHT | PRF_ROOMFLAGS | PRF_NOHASSLE);
 		
 		// turn on all syslogs
@@ -3279,6 +3286,13 @@ void init_player(char_data *ch) {
 		else if (!GET_ACCOUNT(ch)) {
 			create_account_for_player(ch);
 		}
+	}
+	
+	// hold-over from earlier; needed account
+	if (first) {
+		SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_APPROVED);
+		SAVE_ACCOUNT(GET_ACCOUNT(ch));
+		update_player_index(index, ch);
 	}
 	
 	ch->char_specials.affected_by = 0;
@@ -3398,11 +3412,16 @@ void start_new_character(char_data *ch) {
 	}
 	GET_CREATION_HOST(ch) = ch->desc ? str_dup(ch->desc->host) : NULL;
 	
-	// level
-	if (GET_ACCESS_LEVEL(ch) < LVL_APPROVED && !config_get_bool("require_auth")) {
-		GET_ACCESS_LEVEL(ch) = LVL_APPROVED;
+	// access level: set to LVL_MORTAL
+	if (GET_ACCESS_LEVEL(ch) < LVL_MORTAL) {
+		GET_ACCESS_LEVEL(ch) = LVL_MORTAL;
 	}
-
+	// auto-authorization
+	if (!IS_APPROVED(ch) && config_get_bool("auto_approve")) {
+		// only approve the character automatically
+		SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
+	}
+	
 	GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
 	GET_MOVE(ch) = GET_MAX_MOVE(ch);
 	GET_MANA(ch) = GET_MAX_MANA(ch);

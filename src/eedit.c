@@ -227,7 +227,10 @@ ACMD(do_eedit) {
 		}
 	}
 	
-	if (IS_NPC(ch) || !emp) {
+	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (IS_NPC(ch) || !emp) {
 		msg_to_char(ch, "You are not in any empire.\r\n");
 	}
 	else if (!imm_access && GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) {

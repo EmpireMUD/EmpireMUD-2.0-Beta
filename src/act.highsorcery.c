@@ -125,6 +125,7 @@ RITUAL_FINISH_FUNC(perform_chant_of_illusions);
 RITUAL_FINISH_FUNC(perform_chant_of_nature);
 RITUAL_SETUP_FUNC(start_chant_of_druids);
 RITUAL_SETUP_FUNC(start_chant_of_illusions);
+RITUAL_SETUP_FUNC(start_chant_of_nature);
 
 
 // SCMD_RITUAL, SCMD_CHANT
@@ -254,7 +255,7 @@ struct ritual_data_type {
 	
 	// 9: chant of nature
 	{ "nature", 0, ABIL_CHANT_OF_NATURE, 0, SCMD_CHANT,
-		start_simple_ritual,
+		start_chant_of_nature,
 		perform_chant_of_nature,
 		{{ "You start the chant of nature...", "$n starts the chant of nature..." },
 		{ "You chant, 'Chant of nature placeholder text.'", "$n chants, 'Chant of nature placeholder text.'" },
@@ -1464,6 +1465,16 @@ RITUAL_FINISH_FUNC(perform_chant_of_illusions) {
 	msg_to_char(ch, "As you finish the chant, the road is cloaked in illusion!\r\n");
 }
 
+
+RITUAL_SETUP_FUNC(start_chant_of_nature) {
+	if (!IS_APPROVED(ch) && config_get_bool("terraform_approval")) {
+		send_config_msg(ch, "need_approval_string");
+		return FALSE;
+	}
+	
+	start_ritual(ch, ritual);
+	return TRUE;
+}
 
 RITUAL_FINISH_FUNC(perform_chant_of_nature) {
 	sector_data *new_sect, *preserve;

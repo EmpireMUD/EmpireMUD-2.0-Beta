@@ -4897,6 +4897,9 @@ ACMD(do_roadsign) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't use roadsign.\r\n");
 	}
+	else if (!IS_APPROVED(ch) && config_get_bool("build_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if (get_skill_level(ch, SKILL_EMPIRE) <= BASIC_SKILL_CAP) {
 		msg_to_char(ch, "You need the Roads ability and an Empire skill of at least %d to set up road signs.\r\n", BASIC_SKILL_CAP+1);
 	}
@@ -5048,7 +5051,10 @@ ACMD(do_ship) {
 		snprintf(keywords, sizeof(keywords), "%s%s%s", arg2, *argument ? " " : "", argument);
 	}
 	
-	if (IS_NPC(ch) || !GET_LOYALTY(ch) || !ch->desc) {
+	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (IS_NPC(ch) || !GET_LOYALTY(ch) || !ch->desc) {
 		msg_to_char(ch, "You can't use the shipping system unless you're in an empire.\r\n");
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_SHIPPING)) {
