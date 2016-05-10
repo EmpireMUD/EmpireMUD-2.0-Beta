@@ -1172,7 +1172,7 @@ void remove_empire_from_table(empire_data *emp) {
 */
 empire_data *create_empire(char_data *ch) {
 	void add_empire_to_table(empire_data *emp);
-	void resort_empires();
+	void resort_empires(bool force);
 
 	archetype_data *arch;
 	char colorcode[10];
@@ -1241,7 +1241,7 @@ empire_data *create_empire(char_data *ch) {
 	reread_empire_tech(emp);
 
 	// this is a good time to sort and rank
-	resort_empires();
+	resort_empires(FALSE);
 	
 	return emp;
 }

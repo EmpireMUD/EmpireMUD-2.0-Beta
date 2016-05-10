@@ -3662,7 +3662,7 @@ bool member_is_timed_out_ch(char_data *ch) {
 * @param bool read_techs if TRUE, will add techs based on players (usually only during startup)
 */
 void read_empire_members(empire_data *only_empire, bool read_techs) {
-	void resort_empires();
+	void resort_empires(bool force);
 	bool should_delete_empire(empire_data *emp);
 	
 	struct empire_member_reader_data *account_list = NULL, *emrd;
@@ -3750,7 +3750,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 	
 	// re-sort now only if we aren't reading techs (this hints that we're also reading territory)
 	if (!read_techs) {
-		resort_empires();
+		resort_empires(FALSE);
 	}
 }
 

@@ -630,15 +630,17 @@ void process_imports(void) {
 
 /**
 * Trigger a score update and re-sort of the empires.
+*
+* @param bool force Overrides the time limit on resorting.
 */
-void resort_empires(void) {
+void resort_empires(bool force) {
 	extern int sort_empires(empire_data *a, empire_data *b);
 	
 	static time_t last_sort_time = 0;
 	static int last_sort_size = 0;
 
 	// prevent constant re-sorting by limiting this to once per minute
-	if (last_sort_size != HASH_COUNT(empire_table) || last_sort_time + (60 * 1) < time(0)) {
+	if (force || last_sort_size != HASH_COUNT(empire_table) || last_sort_time + (60 * 1) < time(0)) {
 		// better score them first
 		score_empires();
 		HASH_SORT(empire_table, sort_empires);

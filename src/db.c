@@ -2089,6 +2089,8 @@ PLAYER_UPDATE_FUNC(b4_1_approve_players) {
 * Performs some auto-updates when the mud detects a new version.
 */
 void check_version(void) {
+	void resort_empires(bool force);
+	
 	int last, iter, current = NOTHING;
 	
 	#define MATCH_VERSION(name)  (!str_cmp(versions_list[iter], name))
@@ -2259,6 +2261,7 @@ void check_version(void) {
 			log("Adding b4.1 approval data...");
 			update_all_players(NULL, b4_1_approve_players);
 			reread_empire_tech(NULL);
+			resort_empires(TRUE);
 		}
 	}
 	
