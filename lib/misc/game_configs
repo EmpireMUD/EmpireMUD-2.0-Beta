@@ -207,6 +207,6 @@ skill_gain_approval 1
 tell_approval 1
 terraform_approval 1
 title_approval 1
-travel_approval 0
+travel_approval 1
 write_approval 1
 $~
