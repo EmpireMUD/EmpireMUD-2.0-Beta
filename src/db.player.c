@@ -3292,6 +3292,7 @@ void init_player(char_data *ch) {
 	if (first) {
 		SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_APPROVED);
 		SAVE_ACCOUNT(GET_ACCOUNT(ch));
+		update_player_index(index, ch);
 	}
 	
 	ch->char_specials.affected_by = 0;
