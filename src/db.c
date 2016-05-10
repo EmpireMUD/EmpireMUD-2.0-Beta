@@ -2088,7 +2088,7 @@ PLAYER_UPDATE_FUNC(b4_1_approve_players) {
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
-void check_version(void) {	
+void check_version(void) {
 	int last, iter, current = NOTHING;
 	
 	#define MATCH_VERSION(name)  (!str_cmp(versions_list[iter], name))
@@ -2258,6 +2258,7 @@ void check_version(void) {
 		if (MATCH_VERSION("b4.1")) {
 			log("Adding b4.1 approval data...");
 			update_all_players(NULL, b4_1_approve_players);
+			read_empire_members(NULL, FALSE);
 		}
 	}
 	

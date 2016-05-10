@@ -3679,6 +3679,8 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			EMPIRE_GREATNESS(emp) = 0;
 			EMPIRE_TOTAL_PLAYTIME(emp) = 0;
 			EMPIRE_LAST_LOGON(emp) = 0;
+			EMPIRE_IMM_ONLY(emp) = 0;
+			EMPIRE_LAST_LOGON(emp) = 0;
 		}
 	}
 	
