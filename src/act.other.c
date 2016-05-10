@@ -818,6 +818,35 @@ void alt_import_ignores(char_data *ch, char_data *alt) {
 * @param char_data *ch Player to import to.
 * @param char_data *alt Player to import from.
 */
+void alt_import_preferences(char_data *ch, char_data *alt) {
+	bitvector_t set;
+	
+	// prf flags to import
+	bitvector_t prfs = PRF_COMPACT | PRF_DEAF | PRF_NOTELL | PRF_MORTLOG | PRF_NOREPEAT | PRF_NOMAPCOL | PRF_NO_CHANNEL_JOINS | PRF_SCROLLING | PRF_BRIEF | PRF_AUTORECALL | PRF_NOSPAM | PRF_SCREEN_READER;
+	
+	// add flags
+	set = PRF_FLAGS(alt) & prfs;
+	if (set) {
+		SET_BIT(PRF_FLAGS(ch), set);
+	}
+	
+	// remove any missing flags
+	set = ~PRF_FLAGS(alt) & prfs;
+	if (set) {
+		REMOVE_BIT(PRF_FLAGS(ch), set);
+	}
+	
+	// non-toggle prefs
+	GET_MAPSIZE(ch) = GET_MAPSIZE(alt);
+	
+	msg_to_char(ch, "Imported preferences.\r\n");
+}
+
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
 void alt_import_prompt(char_data *ch, char_data *alt) {
 	if (GET_PROMPT(alt) && *GET_PROMPT(alt)) {
 		if (GET_PROMPT(ch)) {
@@ -887,21 +916,6 @@ void alt_import_slash_channels(char_data *ch, char_data *alt) {
 
 
 /**
-* @param char_data *ch Player to import to.
-* @param char_data *alt Player to import from.
-*/
-void alt_import_toggles(char_data *ch, char_data *alt) {
-	if (IS_IMMORTAL(alt)) {
-		msg_to_char(ch, "You can't import toggles from an immortal.\r\n");
-	}
-	else {
-		PRF_FLAGS(ch) = PRF_FLAGS(alt);
-		msg_to_char(ch, "Imported toggles.\r\n");
-	}
-}
-
-
-/**
 * Sub-processor for "alt import".
 *
 * @param char_data *ch The player.
@@ -912,7 +926,7 @@ void do_alt_import(char_data *ch, char *argument) {
 	char_data *alt = NULL;
 	bool file = FALSE;
 	
-	static const char *valid_fields = "Valid fields: aliases, prompt, fprompt, toggles, recolors, slash-channels, ignores, all\r\n";
+	static const char *valid_fields = "Valid fields: aliases, prompt, fprompt, preferences, recolors, slash-channels, ignores, all\r\n";
 	
 	two_arguments(argument, arg1, arg2);
 	
@@ -938,8 +952,8 @@ void do_alt_import(char_data *ch, char *argument) {
 	else if (is_abbrev(arg2, "fprompt")) {
 		alt_import_fprompt(ch, alt);
 	}
-	else if (is_abbrev(arg2, "toggles")) {
-		alt_import_toggles(ch, alt);
+	else if (is_abbrev(arg2, "preferences")) {
+		alt_import_preferences(ch, alt);
 	}
 	else if (is_abbrev(arg2, "recolors")) {
 		alt_import_recolors(ch, alt);
@@ -956,7 +970,7 @@ void do_alt_import(char_data *ch, char *argument) {
 		alt_import_aliases(ch, alt);
 		alt_import_prompt(ch, alt);
 		alt_import_fprompt(ch, alt);
-		alt_import_toggles(ch, alt);
+		alt_import_preferences(ch, alt);
 		alt_import_recolors(ch, alt);
 		alt_import_ignores(ch, alt);
 		alt_import_slash_channels(ch, alt);

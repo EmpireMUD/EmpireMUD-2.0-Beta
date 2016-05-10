@@ -168,8 +168,10 @@ other characters. In most cases, these will be merged with the ones you already
 have. For example, if you have an alias named "foo" and you import aliases, it
 won't overwrite the "foo" you already have with one from an alt.
 
-You can import: aliases, prompt, fprompt, toggles, recolors, slash-channels,
-ignores.
+You can import: aliases, prompt, fprompt, preferences, recolors,
+slash-channels, and ignores.
+
+"Preferences" will import some toggles, as well as mapsize.
 
 See also: ALT
 #
