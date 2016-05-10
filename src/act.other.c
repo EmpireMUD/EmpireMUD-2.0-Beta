@@ -308,11 +308,11 @@ void perform_alternate(char_data *old, char_data *new) {
 		send_to_char("&rYou have mail waiting.&0\r\n", new);
 	}
 	
+	if (!IS_APPROVED(new)) {
+		send_to_char(unapproved_login_message, new);
+	}
 	if (show_start) {
 		send_to_char(START_MESSG, new);
-		if (!IS_APPROVED(new)) {
-			send_to_char(unapproved_login_message, new);
-		}
 	}
 	
 	if (!IS_IMMORTAL(new) && !was_imm) {

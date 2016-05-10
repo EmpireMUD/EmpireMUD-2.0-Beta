@@ -2589,11 +2589,11 @@ void nanny(descriptor_data *d, char *arg) {
 				send_to_char("&rYou have mail waiting.&0\r\n", d->character);
 			}
 			
+			if (!IS_APPROVED(d->character)) {
+				send_to_char(unapproved_login_message, d->character);
+			}
 			if (show_start) {
 				send_to_char(START_MESSG, d->character);
-				if (!IS_APPROVED(d->character)) {
-					send_to_char(unapproved_login_message, d->character);
-				}
 			}
 			
 			d->has_prompt = 0;
