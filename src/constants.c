@@ -59,8 +59,7 @@ const char *version = "EmpireMUD 2.0 beta 4";
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
 const char *level_names[][2] = {
 		{ "N/A", "Not Started" },
-		{ "UNAPP", "Unapproved" },
-		{ "APPR", "Approved" },
+		{ "MORT", "Mortal" },
 		{ "GOD", "God" },
 	#if (LVL_START_IMM < LVL_TOP)
 		{ "IMM", "Immortal" },
