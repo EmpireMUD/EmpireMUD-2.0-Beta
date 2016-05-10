@@ -2054,9 +2054,10 @@ void b3_17_road_update(void) {
 PLAYER_UPDATE_FUNC(b4_1_approve_players) {
 	void check_delayed_load(char_data *ch);
 	
-	// this update created a possible issue where gods are demoted to mortals,
-	// and low-ranking imms are demoted to gods -- so if someone is a god here,
-	// bump them back up
+	// fix some level glitches caused by this patch
+	if (GET_IMMORTAL_LEVEL(ch) == -1) {
+		GET_ACCESS_LEVEL(ch) = MIN(LVL_MORTAL, GET_ACCESS_LEVEL(ch));
+	}
 	if (GET_ACCESS_LEVEL(ch) == LVL_GOD) {
 		GET_ACCESS_LEVEL(ch) = LVL_START_IMM;
 	}
