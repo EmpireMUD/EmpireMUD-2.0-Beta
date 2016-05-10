@@ -217,7 +217,7 @@ int num_invalid = 0;
 int Valid_Name(char *newname) {
 	int i;
 	descriptor_data *dt;
-	char tempname[MAX_INPUT_LENGTH], tempinvalid[MAX_INPUT_LENGTH];
+	char tempname[MAX_INPUT_LENGTH];
 
 	/*
 	 * Make sure someone isn't trying to create this same name.  We want to
@@ -240,9 +240,8 @@ int Valid_Name(char *newname) {
 
 	/* Does the desired name contain a string in the invalid list? */
 	for (i = 0; i < num_invalid; i++) {
-		if (*invalid_list[i] == '*') {	// leading * means substr
-			strcpy(tempinvalid, invalid_list[i] + 1);
-			if (strstr(tempname, tempinvalid)) {
+		if (*invalid_list[i] == '%') {	// leading * means substr
+			if (strstr(tempname, invalid_list[i] + 1)) {
 				return (0);
 			}
 		}
