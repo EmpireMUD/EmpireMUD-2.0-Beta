@@ -239,6 +239,7 @@ const char *account_flags[] = {
 	"!TITLE",
 	"MULTI-IP",
 	"MULTI-CHAR",
+	"APPR",
 	"\n"
 };
 
@@ -362,7 +363,7 @@ const char *grant_bits[] = {
 	"users",
 	"wizlock",
 	"rescale",	// 30
-	"authorize",
+	"approve",
 	"forgive",
 	"hostile",
 	"slay",
@@ -376,7 +377,7 @@ const char *grant_bits[] = {
 
 /* PLR_x */
 const char *player_bits[] = {
-		"UNUSED",
+	"APPR",
 	"WRITING",
 	"MAILING",
 	"DONTSET",
@@ -463,7 +464,7 @@ const char *class_role_color[] = {
 
 // PRF_x: for do_toggle, this controls the "toggle" command and these are displayed in rows of 3	
 const struct toggle_data_type toggle_data[] = {
-	// name, type, prf, level
+	// name, type, prf, level, func
 	{ "pvp", TOG_ONOFF, PRF_ALLOW_PVP, 0, NULL },
 	{ "mortlog", TOG_ONOFF, PRF_MORTLOG, 0, NULL },
 	{ "autokill", TOG_ONOFF, PRF_AUTOKILL, 0, NULL },
@@ -490,7 +491,7 @@ const struct toggle_data_type toggle_data[] = {
 	{ "afk", TOG_ONOFF, PRF_AFK, 0, afk_notify },
 	
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
-	{ "stealthable", TOG_ONOFF, PRF_STEALTHABLE, LVL_APPROVED, NULL },
+	{ "stealthable", TOG_ONOFF, PRF_STEALTHABLE, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },

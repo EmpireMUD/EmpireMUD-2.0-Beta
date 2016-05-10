@@ -633,32 +633,32 @@ LIBRARY_SCMD(library_burn) {
 struct {
 	int subcmd;
 	char *name;
-	int level;
+	int needs_approval;
 	bitvector_t flags;
 	void (*func)(char_data *ch, char *argument);
 } library_command[] = {
-	{ SCMD_LIBRARY, "browse", 0, LIBR_REQ_LIBRARY, library_browse },
-	{ SCMD_LIBRARY, "checkout", 0, LIBR_REQ_LIBRARY, library_checkout },
-	{ SCMD_LIBRARY, "shelve", LVL_APPROVED, LIBR_REQ_LIBRARY, library_shelve },
-	{ SCMD_LIBRARY, "burn", LVL_APPROVED, LIBR_REQ_LIBRARY, library_burn },
+	{ SCMD_LIBRARY, "browse", FALSE, LIBR_REQ_LIBRARY, library_browse },
+	{ SCMD_LIBRARY, "checkout", FALSE, LIBR_REQ_LIBRARY, library_checkout },
+	{ SCMD_LIBRARY, "shelve", TRUE, LIBR_REQ_LIBRARY, library_shelve },
+	{ SCMD_LIBRARY, "burn", TRUE, LIBR_REQ_LIBRARY, library_burn },
 	
-	{ SCMD_BOOKEDIT, "list", LVL_APPROVED, LIBR_REQ_LIBRARY, bookedit_list },
-	{ SCMD_BOOKEDIT, "copy", LVL_APPROVED, LIBR_REQ_LIBRARY, bookedit_copy },
-	{ SCMD_BOOKEDIT, "delete", LVL_APPROVED, LIBR_REQ_LIBRARY, bookedit_delete },
-	{ SCMD_BOOKEDIT, "write", LVL_APPROVED, LIBR_REQ_LIBRARY, bookedit_write },
+	{ SCMD_BOOKEDIT, "list", TRUE, LIBR_REQ_LIBRARY, bookedit_list },
+	{ SCMD_BOOKEDIT, "copy", TRUE, LIBR_REQ_LIBRARY, bookedit_copy },
+	{ SCMD_BOOKEDIT, "delete", TRUE, LIBR_REQ_LIBRARY, bookedit_delete },
+	{ SCMD_BOOKEDIT, "write", TRUE, LIBR_REQ_LIBRARY, bookedit_write },
 	
-	{ SCMD_BOOKEDIT, "abort", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_abort },
-	{ SCMD_BOOKEDIT, "author", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_author },
-	{ SCMD_BOOKEDIT, "byline", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_byline },
-	{ SCMD_BOOKEDIT, "description", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_item_description },
-	{ SCMD_BOOKEDIT, "item", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_item_name },
-	{ SCMD_BOOKEDIT, "license", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_license },
-	{ SCMD_BOOKEDIT, "paragraphs", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_paragraphs },
-	{ SCMD_BOOKEDIT, "save", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_save },
-	{ SCMD_BOOKEDIT, "title", LVL_APPROVED, LIBR_REQ_EDITOR, bookedit_title },
+	{ SCMD_BOOKEDIT, "abort", TRUE, LIBR_REQ_EDITOR, bookedit_abort },
+	{ SCMD_BOOKEDIT, "author", TRUE, LIBR_REQ_EDITOR, bookedit_author },
+	{ SCMD_BOOKEDIT, "byline", TRUE, LIBR_REQ_EDITOR, bookedit_byline },
+	{ SCMD_BOOKEDIT, "description", TRUE, LIBR_REQ_EDITOR, bookedit_item_description },
+	{ SCMD_BOOKEDIT, "item", TRUE, LIBR_REQ_EDITOR, bookedit_item_name },
+	{ SCMD_BOOKEDIT, "license", TRUE, LIBR_REQ_EDITOR, bookedit_license },
+	{ SCMD_BOOKEDIT, "paragraphs", TRUE, LIBR_REQ_EDITOR, bookedit_paragraphs },
+	{ SCMD_BOOKEDIT, "save", TRUE, LIBR_REQ_EDITOR, bookedit_save },
+	{ SCMD_BOOKEDIT, "title", TRUE, LIBR_REQ_EDITOR, bookedit_title },
 
 	// last!
-	{ SCMD_LIBRARY, "\n", 0, NOBITS, NULL }
+	{ SCMD_LIBRARY, "\n", FALSE, NOBITS, NULL }
 };
 
 
@@ -687,17 +687,34 @@ ACMD(do_library) {
 		msg_to_char(ch, "You can use the following %s commands:", types[subcmd]);
 		comma = FALSE;
 		for (iter = 0; *(library_command[iter].name) != '\n'; ++iter) {
-			if (library_command[iter].level <= GET_ACCESS_LEVEL(ch) && library_command[iter].subcmd == subcmd && (!IS_SET(library_command[iter].flags, LIBR_REQ_EDITOR) || GET_OLC_BOOK(ch->desc))) {
-				msg_to_char(ch, "%s%s", comma ? ", " : " ", library_command[iter].name);
-				comma = TRUE;
+			if (library_command[iter].subcmd != subcmd) {
+				continue;
 			}
+			if (library_command[iter].needs_approval && !IS_APPROVED(ch) && config_get_bool("write_approval")) {
+				continue;
+			}
+			if (IS_SET(library_command[iter].flags, LIBR_REQ_EDITOR) && !GET_OLC_BOOK(ch->desc)) {
+				continue;
+			}
+			
+			// ok
+			msg_to_char(ch, "%s%s", comma ? ", " : " ", library_command[iter].name);
+			comma = TRUE;
 		}
 		send_to_char("\r\n", ch);
 	}
 	else {
 		// find command
 		for (iter = 0; pos == NOTHING && *(library_command[iter].name) != '\n'; ++iter) {
-			if (library_command[iter].level <= GET_ACCESS_LEVEL(ch) && library_command[iter].subcmd == subcmd && is_abbrev(arg, library_command[iter].name)) {
+			if (library_command[iter].subcmd != subcmd) {
+				continue;
+			}
+			if (library_command[iter].needs_approval && !IS_APPROVED(ch) && config_get_bool("write_approval")) {
+				continue;
+			}
+			
+			// ok
+			if (is_abbrev(arg, library_command[iter].name)) {
 				pos = iter;
 			}
 		}

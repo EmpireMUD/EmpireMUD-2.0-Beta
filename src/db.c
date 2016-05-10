@@ -1114,8 +1114,8 @@ void load_help(FILE *fl) {
 					el.level = LVL_GOD;
 					break;
 				}
-				case 'f': {
-					el.level = LVL_APPROVED;
+				case 'f': {	// everyone can see this anyway
+					el.level = LVL_MORTAL;
 					break;
 				}
 			}
@@ -1678,6 +1678,7 @@ const char *versions_list[] = {
 	"b3.12",
 	"b3.15",
 	"b3.17",
+	"b4.1",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2049,6 +2050,22 @@ void b3_17_road_update(void) {
 }
 
 
+// adds approval
+PLAYER_UPDATE_FUNC(b4_1_approve_players) {
+	void check_delayed_load(char_data *ch);
+	
+	// if we should approve them (approve all imms now)
+	if (IS_IMMORTAL(ch) || (GET_ACCESS_LEVEL(ch) >= LVL_MORTAL && config_get_bool("auto_approve"))) {
+		if (config_get_bool("approve_per_character")) {
+			SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
+		}
+		else {	// per-account (default)
+			SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_APPROVED);
+		}
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -2218,6 +2235,10 @@ void check_version(void) {
 		if (MATCH_VERSION("b3.17")) {
 			log("Adding b3.17 road data...");
 			b3_17_road_update();
+		}
+		if (MATCH_VERSION("b4.1")) {
+			log("Adding b4.1 approval data...");
+			update_all_players(NULL, b4_1_approve_players);
 		}
 	}
 	

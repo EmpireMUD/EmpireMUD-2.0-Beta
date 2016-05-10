@@ -191,6 +191,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	void start_new_character(char_data *ch);
 	extern char *START_MESSG;
+	extern const char *unapproved_login_message;
 	extern bool global_mute_slash_channel_joins;
 	
 	char sys[MAX_STRING_LENGTH], mort_in[MAX_STRING_LENGTH], mort_out[MAX_STRING_LENGTH], mort_alt[MAX_STRING_LENGTH], temp[256];
@@ -309,6 +310,9 @@ void perform_alternate(char_data *old, char_data *new) {
 	
 	if (show_start) {
 		send_to_char(START_MESSG, new);
+		if (!IS_APPROVED(new)) {
+			send_to_char(unapproved_login_message, new);
+		}
 	}
 	
 	if (!IS_IMMORTAL(new) && !was_imm) {
@@ -632,6 +636,10 @@ OFFER_VALIDATE(oval_summon) {
 	room_data *loc = real_room(offer->location);
 	int type = offer->data;
 	
+	if (!IS_APPROVED(ch) && config_get_bool("travel_approval")) {
+		send_config_msg(ch, "need_approval_string");
+		return FALSE;
+	}
 	if (!loc) {
 		msg_to_char(ch, "Summon location invalid.\r\n");
 		return FALSE;
@@ -2263,7 +2271,10 @@ ACMD(do_shear) {
 
 	one_argument(argument, arg);
 
-	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch))) {
+	if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to be in a stable to shear anything.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
@@ -2305,7 +2316,10 @@ ACMD(do_skin) {
 
 	one_argument(argument, arg);
 
-	if (!*arg)
+	if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!*arg)
 		msg_to_char(ch, "What would you like to skin.\r\n");
 	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))
 		msg_to_char(ch, "You don't seem to have anything like that.\r\n");
@@ -2626,6 +2640,9 @@ ACMD(do_title) {
 
 	if (IS_NPC(ch))
 		send_to_char("Your title is fine... go away.\r\n", ch);
+	else if (!IS_APPROVED(ch) && config_get_bool("title_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
 		send_to_char("You can't title yourself -- you shouldn't have abused it!\r\n", ch);
 	}

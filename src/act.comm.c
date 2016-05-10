@@ -128,6 +128,10 @@ bool is_ignoring(char_data *ch, char_data *victim) {
 int is_tell_ok(char_data *ch, char_data *vict) {
 	if (ch == vict)
 		msg_to_char(ch, "You try to tell yourself something.\r\n");
+	else if (!IS_APPROVED(ch) && !IS_IMMORTAL(ch) && !IS_IMMORTAL(vict) && config_get_bool("tell_approval")) {
+		// can always tell immortals
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if (!REAL_NPC(ch) && PRF_FLAGGED(ch, PRF_NOTELL))
 		msg_to_char(ch, "You can't tell other people while you have notell on.\r\n");
 	else if (!REAL_NPC(vict) && !vict->desc)        /* linkless */
@@ -290,6 +294,9 @@ ACMD(do_pub_comm) {
 	// simple validation
 	if (AFF_FLAGGED(ch, AFF_CHARM) && !ch->desc) {
 		msg_to_char(ch, "You can't %s.\r\n", pub_comm[subcmd].name);
+	}
+	else if (!IS_APPROVED(ch) && !IS_IMMORTAL(ch) && config_get_bool("chat_approval")) {
+		send_config_msg(ch, "need_approval_string");
 	}
 	else if (ACCOUNT_FLAGGED(ch, ACCT_MUTED)) {
 		msg_to_char(ch, "You are muted and can't use the %s channel.\r\n", pub_comm[subcmd].name);
@@ -704,6 +711,10 @@ ACMD(do_slash_channel) {
 		msg_to_char(ch, "No NPCs on slash channels.\r\n");
 		return;
 	}
+	if (!IS_APPROVED(ch) && !IS_IMMORTAL(ch) && config_get_bool("chat_approval")) {
+		send_config_msg(ch, "need_approval_string");
+		return;
+	}
 	
 	if (!*arg) {
 		msg_to_char(ch, "Valid slash-channel commands are: /join, /leave, /who, /hist, /history, /check, /list, and /<channel>\r\n");
@@ -801,11 +812,11 @@ ACMD(do_slash_channel) {
 			// announce it (this also messages the player)
 			if (!global_mute_slash_channel_joins) {
 				// announce to channel members
-				if (GET_INVIS_LEV(ch) <= LVL_APPROVED) {
+				if (GET_INVIS_LEV(ch) <= LVL_MORTAL) {
 					announce_to_slash_channel(chan, "%s has joined the channel", PERS(ch, ch, TRUE));
 				}
 				// if player wouldn't see their own join announce
-				if (GET_INVIS_LEV(ch) > LVL_APPROVED || PRF_FLAGGED(ch, PRF_NO_CHANNEL_JOINS)) {
+				if (GET_INVIS_LEV(ch) > LVL_MORTAL || PRF_FLAGGED(ch, PRF_NO_CHANNEL_JOINS)) {
 					msg_to_char(ch, "You join \t%c/%s\tn.\r\n", chan->color, chan->name);
 				}
 			}
@@ -822,9 +833,6 @@ ACMD(do_slash_channel) {
 		else {
 			// announce
 			msg_to_char(ch, "You leave \t%c/%s\tn.\r\n", chan->color, chan->name);
-			if (GET_INVIS_LEV(ch) <= LVL_APPROVED) {
-				announce_to_slash_channel(chan, "%s has left the channel", PERS(ch, ch, TRUE));
-			}
 			
 			while ((slash = find_on_slash_channel(ch, chan->id))) {
 				REMOVE_FROM_LIST(slash, GET_SLASH_CHANNELS(ch), next);
@@ -838,6 +846,10 @@ ACMD(do_slash_channel) {
 				}
 				
 				free(slash);
+			}
+			
+			if (GET_INVIS_LEV(ch) <= LVL_MORTAL) {
+				announce_to_slash_channel(chan, "%s has left the channel", PERS(ch, ch, TRUE));
 			}
 		}
 	}
@@ -898,7 +910,10 @@ ACMD(do_gsay) {
 	
 	skip_spaces(&argument);
 
-	if (!GROUP(ch)) {
+	if (!IS_APPROVED(ch) && !IS_IMMORTAL(ch) && config_get_bool("chat_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!GROUP(ch)) {
 		msg_to_char(ch, "But you are not a member of a group!\r\n");
 	}
 	else if (!*argument) {
@@ -1285,10 +1300,13 @@ ACMD(do_spec_comm) {
 
 	half_chop(argument, buf, buf2);
 
-	if (!*buf || !*buf2) {
+	if (!IS_APPROVED(ch) && !IS_IMMORTAL(ch) && config_get_bool("chat_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!*buf || !*buf2) {
 		sprintf(buf, "Whom do you want to %s... and what??\r\n", action_sing);
 		msg_to_char(ch, buf);
-		}
+	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT))
 		msg_to_char(ch, "You speak, but no words come out!\r\n");
 	else if (!(vict = get_char_vis(ch, buf, FIND_CHAR_ROOM)))
@@ -1328,7 +1346,6 @@ ACMD(do_tell) {
 	}
 	else if (!(vict = get_player_vis(ch, target, FIND_CHAR_WORLD | FIND_NO_DARK))) {
 		send_config_msg(ch, "no_person");
-	
 	}
 	else if (is_tell_ok(ch, vict)) {
 		perform_tell(ch, vict, string);

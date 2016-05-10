@@ -94,6 +94,14 @@ struct promo_code_list promo_codes[] = {
 };
 
 
+// Text shown to players if they are not approved on login  -- TODO add long-form strings to in-game configs
+const char *unapproved_login_message =
+"\r\n&o"
+"Your character is not yet approved to play on this MUD. You can still enter\r\n"
+"the game, but have a limited set of commands and features. Contact the game's\r\n"
+"staff to find out what you have to do to be approved.&0\r\n";
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE CONFIGS //////////////////////////////////////////////////////////
 
@@ -283,6 +291,7 @@ const sector_vnum climate_default_sector[NUM_CLIMATES] = {
 #define CONFIG_TRADE  10
 #define CONFIG_WAR  11
 #define CONFIG_WORLD  12
+#define CONFIG_APPROVAL  13
 
 
 // data types of configs (search CONFTYPE_x for places to configure)
@@ -310,6 +319,7 @@ const char *config_groups[] = {
 	"Trade",
 	"War",
 	"World",
+	"Approval",
 	"\n"
 };
 
@@ -340,7 +350,7 @@ union config_data_union {
 
 // for the master config system
 struct config_type {
-	int set;	// CONFIG_x
+	int set;	// CONFIG_
 	char *key;	// string key
 	int type;	// CONFTYPE_x how to access the data
 	char *description;	// long desc for contextual help
@@ -1449,7 +1459,7 @@ int sort_configs(struct config_type *a, struct config_type *b) {
 /**
 * Set up a config element to be read from the conf file.
 *
-* @param int set CONFIG_x group.
+* @param int set CONFIG_ group.
 * @param char *key Unique string key of this config (MUST be all one word).
 * @param int type CONFTYPE_x expected data type.
 * @param char *description String for contextual help.
@@ -1565,6 +1575,24 @@ void init_config_system(void) {
 	}
 
 	// first set up all the config types
+	
+	// approval
+	init_config(CONFIG_APPROVAL, "auto_approve", CONFTYPE_BOOL, "automatically approve players when created");
+	init_config(CONFIG_APPROVAL, "approve_per_character", CONFTYPE_BOOL, "require approval for every character, rather than by account");
+	init_config(CONFIG_APPROVAL, "need_approval_string", CONFTYPE_SHORT_STRING, "error message when an unapproved player uses a command");
+	init_config(CONFIG_APPROVAL, "build_approval", CONFTYPE_BOOL, "build, upgrade, lay roads, roadsigns");
+	init_config(CONFIG_APPROVAL, "chat_approval", CONFTYPE_BOOL, "slash-channels and global channels");
+	init_config(CONFIG_APPROVAL, "craft_approval", CONFTYPE_BOOL, "all crafting commands");
+	init_config(CONFIG_APPROVAL, "gather_approval", CONFTYPE_BOOL, "all resource gathering");
+	init_config(CONFIG_APPROVAL, "join_empire_approval", CONFTYPE_BOOL, "pledge, enroll");
+	init_config(CONFIG_APPROVAL, "manage_empire_approval", CONFTYPE_BOOL, "commands related to having an empire");
+	init_config(CONFIG_APPROVAL, "quest_approval", CONFTYPE_BOOL, "quest command");
+	init_config(CONFIG_APPROVAL, "skill_gain_approval", CONFTYPE_BOOL, "gain any skill points");
+	init_config(CONFIG_APPROVAL, "tell_approval", CONFTYPE_BOOL, "sending tells (except to immortals)");
+	init_config(CONFIG_APPROVAL, "terraform_approval", CONFTYPE_BOOL, "excavate, fillin, chant of nature");
+	init_config(CONFIG_APPROVAL, "title_approval", CONFTYPE_BOOL, "set own title");
+	init_config(CONFIG_APPROVAL, "travel_approval", CONFTYPE_BOOL, "transport, portal, summon, vehicles");
+	init_config(CONFIG_APPROVAL, "write_approval", CONFTYPE_BOOL, "boards, books, mail");
 
 	// game configs
 	init_config(CONFIG_GAME, "allow_extended_color_codes", CONFTYPE_BOOL, "if on, players can use \t&[F000] and \t&[B000]");
@@ -1586,7 +1614,6 @@ void init_config_system(void) {
 	init_config(CONFIG_GAME, "no_person", CONFTYPE_SHORT_STRING, "bad target error for no person");
 	init_config(CONFIG_GAME, "huh_string", CONFTYPE_SHORT_STRING, "message for invalid command");
 	init_config(CONFIG_GAME, "public_logins", CONFTYPE_BOOL, "login/out/alt display to mortlog instead of elog");
-	init_config(CONFIG_GAME, "require_auth", CONFTYPE_BOOL, "new players will not auto-authorize");
 
 	// actions
 	init_config(CONFIG_ACTIONS, "chore_distance", CONFTYPE_INT, "tiles away from home a citizen will work");
@@ -1760,7 +1787,7 @@ void init_config_system(void) {
 	init_config(CONFIG_WORLD, "newbie_adventure_cap", CONFTYPE_INT, "highest adventure min-level that can spawn on newbie islands");
 	init_config(CONFIG_WORLD, "arctic_percent", CONFTYPE_DOUBLE, "what percent of top/bottom of the map is arctic");
 	init_config(CONFIG_WORLD, "tropics_percent", CONFTYPE_DOUBLE, "what percent of the middle of the map is tropics");
-
+	
 	// TODO note: deprecated
 	init_config(CONFIG_WORLD, "ocean_pool_size", CONFTYPE_INT, "how many spare ocean tiles to keep on-hand");
 	

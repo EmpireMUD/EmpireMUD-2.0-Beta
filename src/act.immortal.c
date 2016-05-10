@@ -4339,6 +4339,65 @@ ACMD(do_advance) {
 }
 
 
+// also do_unapprove
+ACMD(do_approve) {
+	char_data *vict = NULL;
+	bool file = FALSE;
+
+	one_argument(argument, arg);
+
+	if (!*arg)
+		msg_to_char(ch, "Usage: %sapprove <character>\r\n", (subcmd == SCMD_UNAPPROVE ? "un" : ""));
+	else if (!(vict = find_or_load_player(arg, &file))) {
+		msg_to_char(ch, "Unable to find character '%s'.\r\n", arg);
+	}
+	else if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch) && ch != vict) {
+		msg_to_char(ch, "You can only %sapprove players below your access level.\r\n", (subcmd == SCMD_UNAPPROVE ? "un" : ""));
+	}
+	else if (subcmd == SCMD_APPROVE && IS_APPROVED(vict)) {
+		msg_to_char(ch, "That player is already approved.\r\n");
+	}
+	else if (subcmd == SCMD_UNAPPROVE && !IS_APPROVED(vict)) {
+		msg_to_char(ch, "That player is not even approved.\r\n");
+	}
+	else {
+		if (subcmd == SCMD_APPROVE) {
+			if (config_get_bool("approve_per_character")) {
+				SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
+			}
+			else {	// per-account (default)
+				SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_APPROVED);
+			}
+			
+			if (GET_ACCESS_LEVEL(vict) < LVL_MORTAL) {
+				GET_ACCESS_LEVEL(vict) = LVL_MORTAL;
+			}
+		}
+		else {
+			REMOVE_BIT(GET_ACCOUNT(vict)->flags, ACCT_APPROVED);
+			REMOVE_BIT(PLR_FLAGS(vict), PLR_APPROVED);
+		}
+		
+		if (!file) {
+			msg_to_char(vict, "Your character %s approved.\r\n", (subcmd == SCMD_APPROVE ? "has been" : "is no longer"));
+		}
+		syslog(SYS_VALID, GET_INVIS_LEV(ch), TRUE, "VALID: %s has been %sapproved by %s", GET_PC_NAME(vict), (subcmd == SCMD_UNAPPROVE ? "un" : ""), GET_NAME(ch));
+		msg_to_char(ch, "%s %sapproved.\r\n", GET_PC_NAME(vict), (subcmd == SCMD_UNAPPROVE ? "un" : ""));
+
+		if (file) {
+			store_loaded_char(vict);
+			vict = NULL;
+			file = FALSE;
+		}
+		
+	}
+	
+	if (vict && file) {
+		free_char(vict);
+	}
+}
+
+
 ACMD(do_at) {
 	room_data *location, *original_loc;
 
@@ -4367,42 +4426,6 @@ ACMD(do_at) {
 	if (IN_ROOM(ch) == location) {
 		char_from_room(ch);
 		char_to_room(ch, original_loc);
-	}
-}
-
-
-ACMD(do_authorize) {
-	char_data *vict = NULL;
-	bool file = FALSE;
-
-	one_argument(argument, arg);
-
-	if (!*arg)
-		msg_to_char(ch, "Usage: authorize <character>\r\n");
-	else if (!(vict = find_or_load_player(arg, &file))) {
-		msg_to_char(ch, "Unable to find character '%s'?\r\n", arg);
-	}
-	else {
-		if (GET_ACCESS_LEVEL(vict) < LVL_APPROVED) {
-			GET_ACCESS_LEVEL(vict) = LVL_APPROVED;
-		}
-		if (!file) {
-			msg_to_char(vict, "Your character has been authorized.\r\n");
-		}
-		mortlog("%s has been authorized!", PERS(vict, vict, TRUE));
-		syslog(SYS_VALID, GET_INVIS_LEV(ch), TRUE, "VALID: %s has been authorized by %s", GET_PC_NAME(vict), GET_NAME(ch));
-		msg_to_char(ch, "%s authorized.\r\n", GET_PC_NAME(vict));
-
-		if (file) {
-			store_loaded_char(vict);
-			vict = NULL;
-			file = FALSE;
-		}
-		
-	}
-	
-	if (vict && file) {
-		free_char(vict);
 	}
 }
 

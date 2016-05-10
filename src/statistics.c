@@ -376,7 +376,7 @@ void update_players_online_stats(void) {
 		}
 		
 		// morts only
-		if (IS_IMMORTAL(d->character) || GET_INVIS_LEV(d->character) > LVL_APPROVED) {
+		if (IS_IMMORTAL(d->character) || GET_INVIS_LEV(d->character) > LVL_MORTAL) {
 			continue;
 		}
 		

@@ -880,7 +880,10 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 	
 	skip_spaces(&argument);	// usually done ahead of time, but in case
 	
-	if (GET_POS(ch) == POS_FIGHTING) {
+	if (!IS_APPROVED(ch) && config_get_bool("travel_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (GET_POS(ch) == POS_FIGHTING) {
 		msg_to_char(ch, "You can't really do that right now!\r\n");
 	}
 	else if (GET_POS(ch) < POS_STANDING || GET_SITTING_ON(ch)) {
@@ -1041,6 +1044,9 @@ ACMD(do_board) {
 	if (IS_NPC(ch) && AFF_FLAGGED(ch, AFF_ORDERED)) {
 		return;
 	}
+	else if (!IS_APPROVED(ch) && config_get_bool("travel_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
 		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
 	}
@@ -1183,7 +1189,10 @@ ACMD(do_disembark) {
 	room_data *was_in = IN_ROOM(ch), *to_room;
 	struct follow_type *k;
 
-	if (!veh || !(to_room = IN_ROOM(veh))) {
+	if (!IS_APPROVED(ch) && config_get_bool("travel_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!veh || !(to_room = IN_ROOM(veh))) {
 		msg_to_char(ch, "You can't disembark from here!\r\n");
 	}
 	else if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {

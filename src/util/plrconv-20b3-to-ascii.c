@@ -1583,7 +1583,7 @@ int main(int argc, char *argv[]) {
 		if (stOld.access_level >= LVL_START_IMM) {
 			printf("*");
 		}
-		else if (stOld.access_level >= LVL_APPROVED) {
+		else if (stOld.access_level >= LVL_MORTAL) {
 			printf("-");
 		}
 		else {
