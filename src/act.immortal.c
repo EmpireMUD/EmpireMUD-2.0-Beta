@@ -4368,6 +4368,7 @@ ACMD(do_approve) {
 			}
 			else {	// per-account (default)
 				SET_BIT(GET_ACCOUNT(vict)->flags, ACCT_APPROVED);
+				SAVE_ACCOUNT(GET_ACCOUNT(vict));
 			}
 			
 			if (GET_ACCESS_LEVEL(vict) < LVL_MORTAL) {
@@ -4376,6 +4377,7 @@ ACMD(do_approve) {
 		}
 		else {
 			REMOVE_BIT(GET_ACCOUNT(vict)->flags, ACCT_APPROVED);
+			SAVE_ACCOUNT(GET_ACCOUNT(vict));
 			REMOVE_BIT(PLR_FLAGS(vict), PLR_APPROVED);
 		}
 		
