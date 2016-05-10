@@ -193,15 +193,15 @@ tropics_percent 35.000000
 water_crop_distance 4
 *
 * Approval configs
-auto_approve 1
 approve_per_character 0
-need_approval_string You must be approved before you can do that.
+auto_approve 1
 build_approval 1
 chat_approval 1
 craft_approval 1
 gather_approval 1
 join_empire_approval 1
 manage_empire_approval 1
+need_approval_string You must be approved before you can do that.
 quest_approval 1
 skill_gain_approval 1
 tell_approval 1
