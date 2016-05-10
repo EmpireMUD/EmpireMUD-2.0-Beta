@@ -617,6 +617,10 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 		msg_to_char(ch, "You can't do that while muted.\r\n");
 		return;
 	}
+	if (!IS_APPROVED(ch) && !IS_IMMORTAL(ch) && config_get_bool("chat_approval")) {
+		send_config_msg(ch, "need_approval_string");
+		return;
+	}
 
 	skip_spaces(&argument);
 
@@ -709,10 +713,6 @@ ACMD(do_slash_channel) {
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "No NPCs on slash channels.\r\n");
-		return;
-	}
-	if (!IS_APPROVED(ch) && !IS_IMMORTAL(ch) && config_get_bool("chat_approval")) {
-		send_config_msg(ch, "need_approval_string");
 		return;
 	}
 	
