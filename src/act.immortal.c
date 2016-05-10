@@ -4364,10 +4364,10 @@ ACMD(do_approve) {
 	else {
 		if (subcmd == SCMD_APPROVE) {
 			if (config_get_bool("approve_per_character")) {
-				SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
+				SET_BIT(PLR_FLAGS(vict), PLR_APPROVED);
 			}
 			else {	// per-account (default)
-				SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_APPROVED);
+				SET_BIT(GET_ACCOUNT(vict)->flags, ACCT_APPROVED);
 			}
 			
 			if (GET_ACCESS_LEVEL(vict) < LVL_MORTAL) {
