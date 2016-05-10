@@ -2053,6 +2053,7 @@ void b3_17_road_update(void) {
 // adds approval
 PLAYER_UPDATE_FUNC(b4_1_approve_players) {
 	void check_delayed_load(char_data *ch);
+	player_index_data *index;
 	
 	// fix some level glitches caused by this patch
 	if (GET_IMMORTAL_LEVEL(ch) == -1) {
@@ -2075,6 +2076,11 @@ PLAYER_UPDATE_FUNC(b4_1_approve_players) {
 			SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_APPROVED);
 			SAVE_ACCOUNT(GET_ACCOUNT(ch));
 		}
+	}
+	
+	// update the index in case any of this changed
+	if ((index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
+		update_player_index(index, ch);
 	}
 }
 
