@@ -132,7 +132,7 @@ Basic Crafts:
   violet dye  (glassblowing)
   orange dye  (glassblowing)
 
-See also: CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP
+See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP
 #
 CARTS WAGONS CARRIAGES CARAVANS "LAND VEHICLES"
 
@@ -198,7 +198,24 @@ Without any skill or ability, you can always cook:
   candied apple  (apiaries)
 
 See also: COOKING FIRE, FAMILY RECIPES, GOURMET CHEF, CRAFTING LEVEL, MILL,
-   BAKERY, RESOURCES, KEEP
+   BAKERY, RESOURCES, KEEP, RECIPES, COOK INFO
+#
+"CRAFT INFO" "FORGE INFO" "SEW INFO" "BUILD INFO" "MANUFACTURE INFO" "COOK INFO"
+
+Usage:  <verb> info <recipe name>
+
+The 'info' subcommand allows you to see specific information on a recipe. This
+includes what resources you need for it, what ability it uses, what it creates,
+and what else you need for the recipe.
+
+This commmand prioritizes recipes you have the ability for, but can target ones
+you don't know. To get crafting information for a pattern recipe, you must have
+its pattern in your inventory.
+
+For build, this also shows where you can build the building.
+For recipes from patterns, this also shows the level range of the recipe.
+
+See also; RESOURCES, SCALABLE CRAFTS, PATTERNS
 #
 "DANGEROUS LEATHERS"
 
@@ -324,7 +341,7 @@ With the basic Forge skill, you can create:
   coin mill
   anchor -- used on ships
 
-See also: CRAFTING LEVEL, RESOURCES, KEEP, SMELT, WEAPONCRAFTING,
+See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, SMELT, WEAPONCRAFTING,
   ARMORSMITHING, JEWELRY, MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS,
   DEADLY WEAPONS, IMPERIAL ARMORS
 #
@@ -578,6 +595,19 @@ can come out superior.
 See also: RAWHIDE STITCHING, LEATHERWORKING, DANGEROUS LEATHERS,
   MAGIC ATTIRE, MAGICAL VESTMENTS, SUPERIOR
 #
+PATTERNS "ADVENTURE CRAFTS" "CRAFTING PATTERNS"
+
+Some items can be found in adventures which allow you to use crafting recipes as
+long as you own them. These are usually called 'patterns'. Crafts from patterns
+are not limited by the levels of your skills or the ability used to make them.
+
+The level of the crafted item is based on your crafting level, but many patterns
+have their own upper limit. Usually the pattern will mention if there's a limit.
+  
+You can see the level range of the item a pattern makes on its info display.
+
+See also: CRAFTING LEVEL, CRAFT INFO, SCALABLE CRAFTS
+#
 POTTER POTTERY
 
 Pottery (Trade ability)
@@ -665,31 +695,20 @@ See also: MASTER BLACKSMITH, MASTER TAILOR, SHARE
 
 Many craftable items (including things made with brew, craft, forge, and sew)
 are scalable, which means they change in power and attributes based on the
-level and skills of the person.
+level and skills of the person who crafted them.
 
-For normal craftables, the level range of the ability will determine the upper
-level limit of the item created. For example, the arming sword made by
-Iron Blades can only be levels 55 to 75, since that's the level range of
-Iron Blades. Abilities bought at levels 0-49 will make items up to level 50.
-Abilities bought at levels 50-74 will make crafted items that scale as high as
-75. Abilities bought at 75-100 make crafted items scaled up to 100. The actual
-level will be based on the Trade skill of the crafter, within that range. The
-item will never scale higher than the maker's crafting level.
+For most recipes, the level of the resulting item will be the lowest of:
+  The level range of the ability that gives the recipe (50/75/100).
+  Your level in the ability's skill (usually Trade).
+  Your Crafting level.
 
-If a craft recipe comes from an adventure zone, loot drop, or other non-ability
-source, it can make an item that scales up to the player's crafting level --
-even if it requires a certain ability to craft it. Only normal craftable items
-are constrained by the ability's level range. However, the content builder who
-added those adventure craft recipes may have set limits on what level the
-craftables may scale to.
+For example, the arming sword from Iron Blades cannot be higher than level 75,
+since this ability is from the 50-75 level range.
 
-If a craftable item is made superior, it will scale higher even at the same
-level.
+Recipes which come from crafting patterns follow slightly different rules - see
+HELP CRAFTING PATTERNS for more information.
 
-The identify command will help you determine if two crafted items are different
-in power, even if they have the same name.
-
-See also: CRAFTING LEVEL, IDENTIFY, SUPERIOR
+See also: PATTERNS, CRAFTING LEVEL, IDENTIFY, SUPERIOR
 #
 SEW SEWING
 
@@ -713,7 +732,8 @@ With basic Sewing, you can make:
 Additional sewing items are available from other abilities in the Trade skill,
 as well as patterns and crafts hidden around the world.
 
-See also: CRAFTING LEVEL, RESOURCES, KEEP, LEATHERWORKING, RAWHIDE STITCHING
+See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, LEATHERWORKING,
+   RAWHIDE STITCHING
 #
 SHIP SHIPS 
 
@@ -763,8 +783,8 @@ With basic Shipbuilding you can manufacture:
     Health: 32
     Extra rooms: 1
 
-See also: ADVANCED SHIPS, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE,
-   RESOURCES, KEEP
+See also: CRAFT INFO, ADVANCED SHIPS, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS,
+   UPGRADE, RESOURCES, KEEP
 #
 SIEGEWORKS "SIEGE WORKS"
 
