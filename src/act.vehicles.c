@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.vehicles.c                                  EmpireMUD 2.0b3 *
+*   File: act.vehicles.c                                  EmpireMUD 2.0b4 *
 *  Usage: commands related to vehicles and vehicle movement               *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

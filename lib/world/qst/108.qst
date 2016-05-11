@@ -1041,10 +1041,10 @@ Natural Magic: Heal The Spirits~
 the healing ability using 'skill buy heal', and then heal the Spirit of Mana
 using 'heal mana'. The Heal ability can usually only be used on yourself (until
 you learn Heal Friend), but the Spirit of Mana can be healed with the basic
-Heal.  
+Heal.
 ~
    You have restored the Spirit of Mana! You can heal yourself after combat to
-raise your Natural Magic skill further.  
+raise your Natural Magic skill further.
 ~
 12 0 0 25 -1
 A
@@ -1159,12 +1159,12 @@ Vampire: Feed On Blood~
    The Spirit of Blood wants you to feed on a living creature to refill your
 blood. Leave the Soulstream and find something with a beating heart to feast
 from. Knock out your victim in combat ('toggle autokill' will make you stop
-combat before killing your victim), then 'bite' them and drain some blood. 
-When you have done this, return to the Spirit of Blood.  
+combat before killing your victim), then 'bite' them and drain some blood.
+When you have done this, return to the Spirit of Blood.
 ~
    You have satisfied the Spirit of Blood! Drinking the blood of live creatures
 is enough to gain Vampire skill up to level 15. After that, buy and use Vampire
-abilities to become a sanguine master.  
+abilities to become a sanguine master.
 ~
 8 0 0 25 -1
 A
@@ -1195,7 +1195,7 @@ S
 Trade: Craft A Flint Set~
    The Spirit of Innovation would like you to craft a simple flint set, which
 can be used to start fires or light torches. Flint sets are handy to carry with
-you, because you never know when you'll want to cook food or brew a potion.  
+you, because you never know when you'll want to cook food or brew a potion.
  1. Leave the Soulstream by entering the exit portal.
  2. Find a suitable place and type 'dig'.
  3. Dig until you find a rock and a flint stone.
@@ -1204,7 +1204,7 @@ you, because you never know when you'll want to cook food or brew a potion.
 ~
    You have satisfied the Spirit of Innovation! That flint set can be used to
 make a torch by typing 'light stick', or to make a cooking fire with 'light
-tree'.  
+tree'.
 ~
 7 0 0 25 -1
 A
@@ -1237,7 +1237,7 @@ Complete More Tutorials~
    Complete more of the tutorials in the Soulstream in order to earn enough
 spirit tokens for a special reward. Once you have four of the tokens, you can
 finish this quest anywhere. You can find tutorials for each skill tree, so long
-as you're between levels 1 and 49 in that tree.  
+as you're between levels 1 and 49 in that tree.
 ~
    Congratulations! You've completed enough Soulstream tutorials to earn a
 special companion! Take this spirit bell, and use it any time you want to
@@ -1255,11 +1255,11 @@ S
 Empire: Find The Pageboy~
    Now that you've done the basic Empire skill tutorial, you have the option to
 do a longer Empire skill tutorial. Seek out the pageboy on the newbie island
-and he will get you started. Try using 'where pageboy' to find him.  
+and he will get you started. Try using 'where pageboy' to find him.
 ~
 You've found the pageboy...
 ~
-1 0 0 25 -1
+2 0 0 25 -1
 A
 1 10856
 P
@@ -1272,6 +1272,8 @@ P
 6 10801 0 1
 P
 6 10802 0 1
+P
+0 10856 0 1
 R
 6 10801 1
 W
@@ -1281,13 +1283,13 @@ Z
 S
 #10861
 Trade: Find The Crier~
-   Now that you've done the basic Trade skil ltutorial, you have the option to
+   Now that you've done the basic Trade skill tutorial, you have the option to
 do a longer Trade skill tutorial. Seek out the museum crier on the newbie
-island and he will get you started. Try using 'where crier' to find him.  
+island and he will get you started. Try using 'where crier' to find him.
 ~
 You've found the museum crier...
 ~
-2 0 0 25 -1
+3 0 0 25 -1
 A
 1 10858
 P
@@ -1300,6 +1302,8 @@ P
 6 10826 0 1
 P
 6 10827 0 1
+P
+0 10858 0 1
 R
 6 10826 1
 W

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: augments.c                                      EmpireMUD 2.0b3 *
+*   File: augments.c                                      EmpireMUD 2.0b4 *
 *  Usage: DB and OLC for augments (item enchantments)                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

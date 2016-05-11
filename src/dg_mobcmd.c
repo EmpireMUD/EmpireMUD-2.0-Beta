@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_mobcmd.c                                     EmpireMUD 2.0b3 *
+*   File: dg_mobcmd.c                                     EmpireMUD 2.0b4 *
 *  Usage: Script-related commands for mobs                                *
 *                                                                         *
 *  DG Scripts code came with the attributions in the next two blocks      *

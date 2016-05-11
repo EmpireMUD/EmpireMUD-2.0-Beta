@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: books.h                                         EmpireMUD 2.0b3 *
+*   File: books.h                                         EmpireMUD 2.0b4 *
 *  Usage: header file for books and libraries                             *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

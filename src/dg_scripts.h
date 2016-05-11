@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_scripts.h                                    EmpireMUD 2.0b3 *
+*   File: dg_scripts.h                                    EmpireMUD 2.0b4 *
 *  Usage: header file for script structures and contstants, and           *
 *         function prototypes for dg_scripts.c                            *
 *                                                                         *

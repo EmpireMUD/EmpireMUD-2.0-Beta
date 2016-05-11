@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file:  cryptpasswd.c                                   EmpireMUD 2.0b3 *
+*  file:  cryptpasswd.c                                   EmpireMUD 2.0b4 *
 *  Usage: generates an encrypted password for manually editing pfiles     *
 *                                                                         *
 *  You can edit player's passwords directly in the playerfiles, but they  *

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: utils.c                                         EmpireMUD 2.0b3 *
+*   File: utils.c                                         EmpireMUD 2.0b4 *
 *  Usage: various internal functions of a utility nature                  *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -3767,13 +3767,30 @@ char *strip_color(char *input) {
 	int iter, pos;
 
 	for (iter = 0, pos = 0; pos < (MAX_STRING_LENGTH-1) && iter < strlen(input); ++iter) {
-		if (input[iter] == '&' && input[iter+1] != '&') {
-			++iter;
+		if (input[iter] == '&') {
+			if (input[iter+1] == '&') {
+				// double &: copy both
+				lbuf[pos++] = input[iter];
+				lbuf[pos++] = input[++iter];
+			}
+			else {
+				// single &: skip next char (color code)
+				++iter;
+			}
 		}
-		else if (input[iter] == '\t' && input[iter+1] != '\t') {
-			++iter;
+		else if (input[iter] == '\t') {
+			if (input[iter+1] == '&' || input[iter+1] == '\t') {
+				// double \t: copy both
+				lbuf[pos++] = input[iter];
+				lbuf[pos++] = input[++iter];
+			}
+			else {
+				// single \t: skip next char (color code)
+				++iter;
+			}
 		}
 		else {
+			// normal char: copy it
 			lbuf[pos++] = input[iter];
 		}
 	}

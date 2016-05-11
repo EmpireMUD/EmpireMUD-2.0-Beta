@@ -133,10 +133,11 @@ The special variable $* represents the entire input line after an alias:
 
 See also: !, ^, SUGGESTED ALIASES
 #
-ALT ALTERNATE
+ALT ALTERNATE "ALT LIST"
 
 Usage:  alt <name>
         alt list
+        alt import <name> <field | all>
 
 This command lets you switch from one alt to another. An "alt" is a character
 you own, on your account. You can only use this command to switch between
@@ -156,7 +157,21 @@ instead, but this will leave your character vulnerable.
 You should read the multiplaying/alts rules on the POLICY command for more
 information on these rules.
 
-See also: QUIT
+See also: QUIT, ALT IMPORT
+#
+"ALT IMPORT" "ALTERNATE IMPORT" "IMPORT FROM ALTS"
+
+Usage:  alt import <name> <field | all>
+
+You can use the alt command to import some preferences and features from your
+other characters. In most cases, these will be merged with the ones you already
+have. For example, if you have an alias named "foo" and you import aliases, it
+won't overwrite the "foo" you already have with one from an alt.
+
+You can import: aliases, prompt, fprompt, toggles, recolors, slash-channels,
+ignores.
+
+See also: ALT
 #
 ANSI COLOR COLORS MAPCOLOR "MAP COLOR" MAP-COLOR &&
 

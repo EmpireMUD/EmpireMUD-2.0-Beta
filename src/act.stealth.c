@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.stealth.c                                   EmpireMUD 2.0b3 *
+*   File: act.stealth.c                                   EmpireMUD 2.0b4 *
 *  Usage: code related to non-offensive skills and abilities              *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

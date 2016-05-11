@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.item.c                                      EmpireMUD 2.0b3 *
+*   File: act.item.c                                      EmpireMUD 2.0b4 *
 *  Usage: object handling routines -- get/drop and container handling     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_misc.c                                       EmpireMUD 2.0b3 *
+*   File: dg_misc.c                                       EmpireMUD 2.0b4 *
 *  Usage: contains general functions for script usage.                    *
 *                                                                         *
 *  DG Scripts code had no header or author info in this file              *

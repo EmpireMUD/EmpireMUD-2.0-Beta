@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_objcmd.c                                     EmpireMUD 2.0b3 *
+*   File: dg_objcmd.c                                     EmpireMUD 2.0b4 *
 *  Usage: contains the command_interpreter for objects, object commands.  *
 *                                                                         *
 *  DG Scripts code by galion, 1996/08/04 23:10:16, revision 3.8           *

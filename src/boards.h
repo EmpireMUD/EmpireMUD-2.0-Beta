@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: boards.h                                        EmpireMUD 2.0b3 *
+*   File: boards.h                                        EmpireMUD 2.0b4 *
 *  Usage: header file for bulletin boards                                 *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

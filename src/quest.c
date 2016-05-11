@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: quest.c                                         EmpireMUD 2.0b3 *
+*   File: quest.c                                         EmpireMUD 2.0b4 *
 *  Usage: quest loading, saving, OLC, and processing                      *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

@@ -53,25 +53,28 @@ blocks that are currently in use.
 
 
 Included Adventure Zones
-[  100] Magiterranean: The Grove [10000-10005] (1-75)
-[  101] Magiterranean: The Hidden Garden [10225-10249] (15+)
-[  102] Magiterranean: Interdimensional Whirlwind [10500-10549] (5+)
-[  120] Mountain Cave: Red Dragon [10006-10010] (300-300)
-[  121] The Swamp Hag [10100-10104] (75-150)
-[  122] Ruins: Three Banditos [10105-10109] (100-200)
-[  123] Ruins: Thieves [10110-10129] (25-75)
-[  125] Ruins: The Goblin Challenge [10200-10224] (50-150)
-[  126] Mountain Cave: Flame Dragon [10300-10329] (100-150)
-[  127] Abandoned Dragon Nest [10330-10359] (125-175)
-[  140] The Sewer: Ratskins [10011-10027] (1-50)
-[  141] The Sewer: Goblin Outpost [10450-10499] (50-100)
-[  160] The Tower Skycleave [10030-10099] (30-200)
-[  161] Portal to the Primeval [10250-10299] (75-100)
-[  170] Hamlet of the Undead [10400-10449] (175-225)
-[  180] Misplaced Mother Goose [10730-10749] (1-25)
-[  181] Goblin Mines [10750-10774] (1-25)
-[  190] Winter Wonderland [10700-10729] (1-300)
-[  200] Burrow Canyons [11100-11129] (75-100)
-[  201] The Cursed Chalice of Mill Manor [11130-11159] (100-150)
-[  281] Mountain Valley: Molten Fiend [18075-18099] (200-250)
-[  282] Goblin Logging Camp [18100-18124] (10-50)
+[   50] Tutorial: Royal Planning Office [10800-10824] (1-50) 4 mobs, 1 obj, 4 rooms
+[   51] Tutorial: Museum of Early Man [10825-10849] (1-50) 3 mobs, 1 obj, 3 rooms
+[   52] Tutorial Quests [10850-10899] (1-50) 9 mobs, 6 objs, 5 rooms
+[  100] Magiterranean: The Grove [10000-10005] (1-75) 6 mobs, 6 objs, 6 rooms
+[  101] Magiterranean: The Hidden Garden [10225-10249] (15+) 3 mobs, 21 objs, 6 rooms
+[  102] Magiterranean: Interdimensional Whirlwind [10500-10549] (5+) 17 mobs, 38 objs, 1 room
+[  120] Mountain Cave: Red Dragon [10006-10010] (300) 2 mobs, 5 objs, 1 room
+[  121] The Swamp Hag [10100-10104] (75-150) 2 mobs, 5 objs, 1 room
+[  122] Ruins: Three Banditos [10105-10109] (100-200) 4 mobs, 5 objs, 1 room
+[  123] Ruins: Thieves [10110-10129] (25-75) 5 mobs, 17 objs, 1 room
+[  125] Ruins: The Goblin Challenge [10200-10224] (50-150) 8 mobs, 22 objs, 1 room
+[  126] Mountain Cave: Flame Dragon [10300-10329] (100-150) 8 mobs, 17 objs, 1 room
+[  127] Abandoned Dragon Nest [10330-10359] (125-175) 8 mobs, 23 objs, 1 room
+[  140] The Sewer: Ratskins [10011-10027] (1-50) 11 mobs, 17 objs, 17 rooms
+[  141] The Sewer: Goblin Outpost [10450-10499] (50-100) 6 mobs, 33 objs, 5 rooms
+[  160] The Tower Skycleave [10030-10099] (30-200) 25 mobs, 49 objs, 29 rooms
+[  161] Portal to the Primeval [10250-10299] (75-100) 17 mobs, 36 objs, 9 rooms
+[  170] Hamlet of the Undead [10400-10449] (175-225) 22 mobs, 36 objs, 19 rooms
+[  180] Misplaced Mother Goose [10730-10749] (1-25) 10 mobs, 18 objs, 1 room
+[  181] Goblin Mines [10750-10774] (1-25) 7 mobs, 20 objs, 6 rooms
+[  190] Winter Wonderland [10700-10729] (1-300) 7 mobs, 19 objs, 6 rooms
+[  200] Burrow Canyons [11100-11129] (75-100) 14 mobs, 24 objs, 24 rooms
+[  201] The Cursed Chalice of Mill Manor [11130-11159] (100-150) 10 mobs, 20 objs, 19 rooms
+[  281] Mountain Valley: Molten Fiend [18075-18099] (200-250) 5 mobs, 22 objs, 2 rooms
+[  282] Goblin Logging Camp [18100-18124] (10-50) 1 mob, 7 objs, 1 room
