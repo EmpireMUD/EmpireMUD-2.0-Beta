@@ -220,8 +220,8 @@ void do_mount_list(char_data *ch, char *argument) {
 	
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
 	struct mount_data *mount, *next_mount;
+	bool any = FALSE, cur;
 	char_data *proto;
-	bool any = FALSE;
 	size_t size = 0;
 	int count = 0;
 	
@@ -231,7 +231,7 @@ void do_mount_list(char_data *ch, char *argument) {
 	}
 	
 	// header
-	if (*argument) {
+	if (!*argument) {
 		size = snprintf(buf, sizeof(buf), "Your mounts:\r\n");
 	}
 	else {
@@ -250,15 +250,16 @@ void do_mount_list(char_data *ch, char *argument) {
 		}
 		
 		// build line
+		cur = (GET_MOUNT_VNUM(ch) == mount->vnum);
 		if (mount->flags) {
 			prettier_sprintbit(mount->flags, mount_flags, temp);
-			snprintf(part, sizeof(part), "%s (%s)%s", skip_filler(GET_SHORT_DESC(proto)), temp, (GET_MOUNT_VNUM(ch) == mount->vnum ? " [current]" : ""));
+			snprintf(part, sizeof(part), "%s (%s)%s", skip_filler(GET_SHORT_DESC(proto)), temp, (cur && PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " [current]" : ""));
 		}
 		else {
-			snprintf(part, sizeof(part), "%s%s", skip_filler(GET_SHORT_DESC(proto)), (GET_MOUNT_VNUM(ch) == mount->vnum ? " [current]" : ""));
+			snprintf(part, sizeof(part), "%s%s", skip_filler(GET_SHORT_DESC(proto)), (cur && PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " [current]" : ""));
 		}
 		
-		size += snprintf(buf + size, sizeof(buf) - size, " %-38s%s", part, PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : (!(++count % 2) ? "\r\n" : " "));
+		size += snprintf(buf + size, sizeof(buf) - size, " %s%-38s%s%s", (cur ? "&l" : ""), part, (cur ? "&0" : ""), PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : (!(++count % 2) ? "\r\n" : " "));
 		any = TRUE;
 	}
 	
