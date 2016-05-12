@@ -252,13 +252,13 @@ void do_mount_list(char_data *ch, char *argument) {
 		// build line
 		if (mount->flags) {
 			prettier_sprintbit(mount->flags, mount_flags, temp);
-			snprintf(part, sizeof(part), "%s (%s)", skip_filler(GET_SHORT_DESC(proto)), temp);
+			snprintf(part, sizeof(part), "%s (%s)%s", skip_filler(GET_SHORT_DESC(proto)), temp, (GET_MOUNT_VNUM(ch) == mount->vnum ? " [current]" : ""));
 		}
 		else {
-			snprintf(part, sizeof(part), "%s", skip_filler(GET_SHORT_DESC(proto)));
+			snprintf(part, sizeof(part), "%s%s", skip_filler(GET_SHORT_DESC(proto)), (GET_MOUNT_VNUM(ch) == mount->vnum ? " [current]" : ""));
 		}
 		
-		size += snprintf(buf + size, sizeof(buf) - size, " %-38.38s%s", part, PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : (!(++count % 2) ? "\r\n" : " "));
+		size += snprintf(buf + size, sizeof(buf) - size, " %-38s%s", part, PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : (!(++count % 2) ? "\r\n" : " "));
 		any = TRUE;
 	}
 	
@@ -353,7 +353,7 @@ void do_mount_release(char_data *ch, char *argument) {
 	if (!has_ability(ch, ABIL_STABLEMASTER)) {
 		msg_to_char(ch, "You need the Stablemaster ability to release a mount.\r\n");
 	}
-	else if (!GET_MOUNT_VNUM(ch) || !mob_proto(GET_MOUNT_VNUM(ch))) {
+	else if (GET_MOUNT_VNUM(ch) == NOTHING || !mob_proto(GET_MOUNT_VNUM(ch))) {
 		msg_to_char(ch, "You have no active mount to release.\r\n");
 	}
 	else {
