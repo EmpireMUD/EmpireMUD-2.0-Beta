@@ -301,6 +301,9 @@ void do_mount_new(char_data *ch, char *argument) {
 	else if (!IS_NPC(mob)) {
 		msg_to_char(ch, "You can't ride on other players.\r\n");
 	}
+	else if (find_mount_data(ch, GET_MOB_VNUM(mob))) {
+		act("You already have $N in your stable.", FALSE, ch, NULL, mob, TO_CHAR);
+	}
 	else if (!MOB_FLAGGED(mob, MOB_MOUNTABLE) && !IS_IMMORTAL(ch)) {
 		act("You can't ride $N!", FALSE, ch, 0, mob, TO_CHAR);
 	}
@@ -353,6 +356,9 @@ void do_mount_release(char_data *ch, char *argument) {
 	
 	if (!has_ability(ch, ABIL_STABLEMASTER)) {
 		msg_to_char(ch, "You need the Stablemaster ability to release a mount.\r\n");
+	}
+	else if (*argument) {
+		msg_to_char(ch, "You can only release your active mount (you get this error if you type a name).\r\n");
 	}
 	else if (GET_MOUNT_VNUM(ch) == NOTHING || !mob_proto(GET_MOUNT_VNUM(ch))) {
 		msg_to_char(ch, "You have no active mount to release.\r\n");
