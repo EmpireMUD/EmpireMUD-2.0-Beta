@@ -180,6 +180,7 @@ All-Terrain Riding (Survival ability)
 
 Usage:  dismount
         mount [animal]
+        mount <list | swap> <keyword(s)>
 
 Once you have learned to Ride, travel becomes faster and easier. With All-
 Terrain Riding, you can coax your mount across rivers and mountains, too.
@@ -188,7 +189,8 @@ Riding lowers the delay during movement, as well as the movement point cost.
 When you dismount, the animal you were riding is stored. You can see it on your
 affects list. If you type "mount" again without targetting a new animal, you
 will re-mount your stored ride. If you target a new animal while you already
-have a stored mount, the old one will be released.
+have a stored mount, the old one will be released. You can store more than one
+mount and swap them at a stable.
 
 If you have a saddle in your inventory, you will automatically equip it when
 you mount up. The saddle will be removed automatically when you dismount. You
@@ -202,7 +204,7 @@ Riding only gains experience when you cross water or mountains while mounted.
 Note: The "ride" command can also be used to get onto carts and other ridable
 vehicles; this does not require any ability.
 
-See also: AFFECTS, BASIC CRAFTS, DRAGONRIDING, MOVEMENT POINTS
+See also: AFFECTS, BASIC CRAFTS, DRAGONRIDING, MOVEMENT POINTS, STABLEMASTER
 #
 MOUNTAIN "MOUNTAIN CLIMBING"
 

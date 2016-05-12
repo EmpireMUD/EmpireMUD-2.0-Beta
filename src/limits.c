@@ -320,6 +320,10 @@ void point_update_char(char_data *ch) {
 		gain_ability_exp(ch, ABIL_COMMERCE, 2);
 		gain_ability_exp(ch, ABIL_SATED_THIRST, 2);
 		
+		if (GET_MOUNT_LIST(ch)) {
+			gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
+		}
+		
 		if (IS_VAMPIRE(ch)) {
 			gain_ability_exp(ch, ABIL_UNNATURAL_THIRST, 2);
 		}

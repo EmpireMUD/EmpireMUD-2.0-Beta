@@ -709,6 +709,7 @@ void free_char(char_data *ch) {
 	struct slash_channel *loadslash, *next_loadslash;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
+	struct mount_data *mount, *next_mount;
 	struct channel_history_data *history;
 	struct player_slash_channel *slash;
 	struct interaction_item *interact;
@@ -865,6 +866,10 @@ void free_char(char_data *ch) {
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
 			HASH_DEL(GET_ABILITY_HASH(ch), abil);
 			free(abil);
+		}
+		HASH_ITER(hh, GET_MOUNT_LIST(ch), mount, next_mount) {
+			HASH_DEL(GET_MOUNT_LIST(ch), mount);
+			free(mount);
 		}
 		
 		free_player_completed_quests(&GET_COMPLETED_QUESTS(ch));
@@ -1482,6 +1487,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (PFILE_TAG(line, "Morph:", length)) {
 					GET_MORPH(ch) = morph_proto(atoi(line + length + 1));
 				}
+				else if (PFILE_TAG(line, "Mount:", length)) {
+					sscanf(line + length + 1, "%d %s", &i_in[0], str_in);
+					add_mount(ch, i_in[0], asciiflag_conv(str_in));
+				}
 				else if (PFILE_TAG(line, "Mount Flags:", length)) {
 					GET_MOUNT_FLAGS(ch) = asciiflag_conv(line + length + 1);
 				}
@@ -1958,6 +1967,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct affected_type *af, *new_af, *next_af, *af_list;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
+	struct mount_data *mount, *next_mount;
 	struct player_slash_channel *slash;
 	struct over_time_effect_type *dot;
 	struct slash_channel *loadslash;
@@ -2204,6 +2214,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	if (IS_MORPHED(ch)) {
 		fprintf(fl, "Morph: %d\n", MORPH_VNUM(GET_MORPH(ch)));
+	}
+	HASH_ITER(hh, GET_MOUNT_LIST(ch), mount, next_mount) {
+		fprintf(fl, "Mount: %d %s\n", mount->vnum, bitv_to_alpha(mount->flags));
 	}
 	if (GET_MOUNT_FLAGS(ch) != NOBITS) {
 		fprintf(fl, "Mount Flags: %s\n", bitv_to_alpha(GET_MOUNT_FLAGS(ch)));
