@@ -282,7 +282,10 @@ void do_mount_new(char_data *ch, char *argument) {
 	char_data *mob, *proto;
 	bool only;
 	
-	if (!*argument) {
+	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to mount anything here!\r\n");
+	}
+	else if (!*argument) {
 		msg_to_char(ch, "What did you want to mount?\r\n");
 	}
 	else if (!(mob = get_char_vis(ch, argument, FIND_CHAR_ROOM))) {
@@ -354,7 +357,10 @@ void do_mount_release(char_data *ch, char *argument) {
 	struct mount_data *mount;
 	char_data *mob;
 	
-	if (!has_ability(ch, ABIL_STABLEMASTER)) {
+	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to release mounts here (you wouldn't be able to re-mount it)!\r\n");
+	}
+	else if (!has_ability(ch, ABIL_STABLEMASTER)) {
 		msg_to_char(ch, "You need the Stablemaster ability to release a mount.\r\n");
 	}
 	else if (*argument) {
@@ -401,6 +407,10 @@ void do_mount_swap(char_data *ch, char *argument) {
 	
 	if (!has_ability(ch, ABIL_STABLEMASTER) && (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can only swap mounts in a stable unless you have the Stablemaster ability.\r\n");
+		return;
+	}
+	if (!has_ability(ch, ABIL_STABLEMASTER) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You don't have permission to mount anything here!\r\n");
 		return;
 	}
 	if (!*argument) {
