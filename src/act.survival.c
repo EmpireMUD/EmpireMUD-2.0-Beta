@@ -220,6 +220,8 @@ void do_mount_list(char_data *ch, char *argument) {
 	
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
 	struct mount_data *mount, *next_mount;
+	char_data *proto;
+	bool any = FALSE;
 	size_t size = 0;
 	int count = 0;
 	
@@ -240,21 +242,32 @@ void do_mount_list(char_data *ch, char *argument) {
 		if (size >= sizeof(buf)) {	// overflow
 			break;
 		}
+		if (!(proto = mob_proto(mount->vnum))) {
+			continue;
+		}
+		if (*argument && !multi_isname(argument, GET_PC_NAME(proto))) {
+			continue;
+		}
 		
 		// build line
 		if (mount->flags) {
 			prettier_sprintbit(mount->flags, mount_flags, temp);
-			snprintf(part, sizeof(part), "%s (%s)", skip_filler(get_mob_name_by_proto(mount->vnum)), temp);
+			snprintf(part, sizeof(part), "%s (%s)", skip_filler(GET_SHORT_DESC(proto)), temp);
 		}
 		else {
-			snprintf(part, sizeof(part), "%s", skip_filler(get_mob_name_by_proto(mount->vnum)));
+			snprintf(part, sizeof(part), "%s", skip_filler(GET_SHORT_DESC(proto)));
 		}
 		
 		size += snprintf(buf + size, sizeof(buf) - size, " %-38.38s%s", part, PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : (!(++count % 2) ? "\r\n" : " "));
+		any = TRUE;
 	}
 	
 	if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && !(++count % 2)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+	}
+	
+	if (!any) {
+		size += snprintf(buf + size, sizeof(buf) - size, " no matches\r\n");
 	}
 	
 	if (ch->desc) {
@@ -310,7 +323,7 @@ void do_mount_new(char_data *ch, char *argument) {
 		only = GET_MOUNT_LIST(ch) ? FALSE : TRUE;
 		
 		// add mob to pool
-		add_mount(ch, GET_MOUNT_VNUM(mob), get_mount_flags_by_mob(mob));
+		add_mount(ch, GET_MOB_VNUM(mob), get_mount_flags_by_mob(mob));
 		
 		if (only) {
 			// NOTE: this deliberately has no carriage return (will get another message from do_mount_current)
@@ -356,7 +369,7 @@ void do_mount_release(char_data *ch, char *argument) {
 		act("$n drops $N's lead and releases $M.", TRUE, ch, NULL, mob, TO_NOTVICT);
 		
 		// remove data
-		if ((mount = find_mount_data(ch, GET_MOUNT_VNUM(ch)))) {
+		if ((mount = find_mount_data(ch, GET_MOB_VNUM(mob)))) {
 			HASH_DEL(GET_MOUNT_LIST(ch), mount);
 			free(mount);
 		}
