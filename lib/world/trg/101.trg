@@ -82,12 +82,12 @@ Swamp Hag reward~
 eval room_var %self.room%
 eval ch %room_var.people%
 while %ch%
-  eval test %%self.is_enemy(%ch%)%%
+  eval test %%ch.is_ally(%actor%)%%
   if %ch.is_pc% && %test%
     if %ch.skill(Natural Magic)% < 50 && %ch.skill(Natural Magic)% > 0
       %ch.gain_skill(Natural Magic,1)%
-    elseif %ch.skill(Sorcery)% < 50 && %ch.skill(Sorcery)% > 0
-      %ch.gain_skill(Sorcery,1)%
+    elseif %ch.skill(High Sorcery)% < 50 && %ch.skill(High Sorcery)% > 0
+      %ch.gain_skill(High Sorcery,1)%
     elseif %ch.skill(Battle)% < 50 && %ch.skill(Battle)% > 0
       %ch.gain_skill(Battle,1)%
     elseif %ch.skill(Stealth)% < 50 && %ch.skill(Stealth)% > 0
