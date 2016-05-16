@@ -1489,7 +1489,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				}
 				else if (PFILE_TAG(line, "Mount:", length)) {
 					sscanf(line + length + 1, "%d %s", &i_in[0], str_in);
-					add_mount(ch, i_in[0], asciiflag_conv(str_in));
+					// only if mob exists
+					if (mob_proto(i_in[0])) {
+						add_mount(ch, i_in[0], asciiflag_conv(str_in));
+					}
 				}
 				else if (PFILE_TAG(line, "Mount Flags:", length)) {
 					GET_MOUNT_FLAGS(ch) = asciiflag_conv(line + length + 1);

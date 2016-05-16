@@ -326,8 +326,8 @@ void do_mount_new(char_data *ch, char *argument) {
 		return;
 	}
 	else {
-		// will immediately attempt to ride if this is the only mount
-		only = GET_MOUNT_LIST(ch) ? FALSE : TRUE;
+		// will immediately attempt to ride if they have no current mount
+		only = (GET_MOUNT_VNUM(ch) == NOTHING);
 		
 		// add mob to pool
 		add_mount(ch, GET_MOB_VNUM(mob), get_mount_flags_by_mob(mob));
