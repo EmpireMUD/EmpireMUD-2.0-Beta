@@ -2979,8 +2979,11 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		GET_ACCESS_LEVEL(ch) = MIN(GET_ACCESS_LEVEL(ch), LVL_MORTAL);
 	}
 	
-	if (PLR_FLAGGED(ch, PLR_INVSTART))
+	// set (and correct) invis level
+	if (PLR_FLAGGED(ch, PLR_INVSTART)) {
 		GET_INVIS_LEV(ch) = GET_ACCESS_LEVEL(ch);
+	}
+	GET_INVIS_LEV(ch) = MIN(GET_INVIS_LEV(ch), GET_ACCESS_LEVEL(ch));
 
 	/*
 	 * We have to place the character in a room before equipping them
