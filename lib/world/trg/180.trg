@@ -243,6 +243,12 @@ flee~
 Fissure drop destruction~
 2 h 100
 ~
+if %object.vnum% == 18097
+  * Block people from wasting essence by accident
+  %send% %actor% There's no point in dropping essence into the fissure.
+  return 0
+  halt
+end
 %send% %actor% You drop %object.shortdesc% into the fissure!
 %echoaround% %actor% %actor.name% drops %object.shortdesc% into the fissure!
 %echo% The fire and darkness below your feet swallow %object.shortdesc%...
