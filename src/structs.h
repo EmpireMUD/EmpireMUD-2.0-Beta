@@ -1541,7 +1541,7 @@ typedef struct vehicle_data vehicle_data;
 #define MORPHF_CONSUME_OBJ  BIT(10)	// k. uses up the requiresobj
 
 
-// mount flags -- MOUNT_FLAGGED(ch, flag)
+// MOUNT_x: mount flags -- MOUNT_FLAGGED(ch, flag)
 #define MOUNT_RIDING  BIT(0)	// player is currently mounted
 #define MOUNT_AQUATIC  BIT(1)	// mount can swim
 #define MOUNT_FLYING  BIT(2)	// mount can fly
@@ -2839,6 +2839,15 @@ struct mail_data {
 };
 
 
+// for player mount collections
+struct mount_data {
+	mob_vnum vnum;	// mob that's mounted, for name
+	bitvector_t flags;	// stored MOUNT_ flags
+	
+	UT_hash_handle hh;	// hash handle for GET_MOUNT_LIST(ch)
+};
+
+
 // used in player_special_data
 struct player_ability_data {
 	any_vnum vnum;	// ABIL_ or ability vnum
@@ -2978,9 +2987,12 @@ struct player_special_data {
 	byte confused_dir;  // people without Navigation think this dir is north
 	char *disguised_name;	// verbatim copy of name -- grabs custom mob names and empire names
 	byte disguised_sex;	// sex of the mob you're disguised as
-	bitvector_t mount_flags;	// flags for the stored mount
-	mob_vnum mount_vnum;	// stored mount
 	byte using_poison;	// poison preference for Stealth
+
+	// mount info
+	struct mount_data *mount_list;	// list of stored mounts
+	mob_vnum mount_vnum;	// current mount vnum
+	bitvector_t mount_flags;	// current mount flags
 	
 	// UNSAVED PORTION //
 	

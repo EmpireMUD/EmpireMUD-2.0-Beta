@@ -374,6 +374,15 @@ const char *grant_bits[] = {
 };
 
 
+// MOUNT_x: mount flags
+const char *mount_flags[] = {
+	"riding",
+	"aquatic",
+	"flying",
+	"\n"
+};
+
+
 /* PLR_x */
 const char *player_bits[] = {
 	"APPR",

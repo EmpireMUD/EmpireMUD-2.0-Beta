@@ -1679,6 +1679,7 @@ const char *versions_list[] = {
 	"b3.15",
 	"b3.17",
 	"b4.1",
+	"b4.2",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2052,7 +2053,6 @@ void b3_17_road_update(void) {
 
 // adds approval
 PLAYER_UPDATE_FUNC(b4_1_approve_players) {
-	void check_delayed_load(char_data *ch);
 	player_index_data *index;
 	
 	// fix some level glitches caused by this patch
@@ -2081,6 +2081,18 @@ PLAYER_UPDATE_FUNC(b4_1_approve_players) {
 	// update the index in case any of this changed
 	if ((index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
 		update_player_index(index, ch);
+	}
+}
+
+
+// adds current mount to mounts list
+PLAYER_UPDATE_FUNC(b4_2_mount_update) {
+	void check_delayed_load(char_data *ch);
+	
+	check_delayed_load(ch);
+	
+	if (GET_MOUNT_VNUM(ch)) {
+		add_mount(ch, GET_MOUNT_VNUM(ch), GET_MOUNT_FLAGS(ch) & ~MOUNT_RIDING);
 	}
 }
 
@@ -2262,6 +2274,10 @@ void check_version(void) {
 			update_all_players(NULL, b4_1_approve_players);
 			reread_empire_tech(NULL);
 			resort_empires(TRUE);
+		}
+		if (MATCH_VERSION("b4.2")) {
+			log("Adding b4.2 mount data...");
+			update_all_players(NULL, b4_2_mount_update);
 		}
 	}
 	

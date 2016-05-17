@@ -80,9 +80,7 @@ extern bool room_affected_by_spell(room_data *room, int type);
 // character handlers
 void extract_char(char_data *ch);
 void extract_char_final(char_data *ch);
-void perform_dismount(char_data *ch);
 void perform_idle_out(char_data *ch);
-void perform_mount(char_data *ch, char_data *mount);
 
 // character location handlers
 void char_from_room(char_data *ch);
@@ -169,6 +167,13 @@ extern bool find_id_in_tag_list(int id, struct mob_tag *list);
 void expand_mob_tags(char_data *mob);
 void free_mob_tags(struct mob_tag **list);
 void tag_mob(char_data *mob, char_data *player);
+
+// mount handlers
+void add_mount(char_data *ch, mob_vnum vnum, bitvector_t flags);
+extern bitvector_t get_mount_flags_by_mob(char_data *mob);
+extern struct mount_data *find_mount_data(char_data *ch, mob_vnum vnum);
+void perform_dismount(char_data *ch);
+void perform_mount(char_data *ch, char_data *mount);
 
 // object handlers
 void add_to_object_list(obj_data *obj);

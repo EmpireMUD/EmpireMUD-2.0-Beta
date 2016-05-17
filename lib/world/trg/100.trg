@@ -234,10 +234,15 @@ end
 Rare thief death~
 0 f 100
 ~
+eval room %self.room%
 eval ch %room.people%
 while %ch%
-  eval test %%self.is_enemy(%ch%)%%
-  if (%ch.is_pc% && %test%)
+  * Combat is ended by the thief's death, so is_enemy doesn't actually work
+  eval test %%ch.is_ally(%actor%)%%
+  eval ch_stealth %ch.skill(Stealth)%
+  eval can_gain (%ch_stealth% != 0) && (%ch_stealth% != 50) && (%ch_stealth% != 75) && (%ch_stealth% != 100)
+  if (%ch.is_pc% && %test% && %can_gain%)
+    %send% %actor% You learn a bit about Stealth from watching %self.name% fight.
     nop %ch.gain_skill(Stealth, 1)%
   end
   eval ch %ch.next_in_room%
@@ -384,9 +389,10 @@ wait 2 sec
 %purge% %self.name%
 ~
 #10027
-Nest de-spawn~
+Nest miniboss spawn/despawn~
 2 f 100
 ~
+* Get rid of the old miniboss
 eval ch %room.people%
 while %ch%
   eval next_ch %ch.next_in_room%
@@ -398,6 +404,11 @@ while %ch%
   end
   eval ch %next_ch%
 done
+* Spawn a new one
+eval vnum 10017+%random.3%
+%load% mob %vnum%
+eval person %self.people%
+%echo% %person.name% arrives.
 ~
 #10030
 Gossipers~

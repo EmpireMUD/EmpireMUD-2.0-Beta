@@ -453,9 +453,6 @@ b 0
 D0
 ~
 0 10022
-M 0 10018 33.00 1
-M 0 10019 33.00 1
-M 0 10020 33.00 1
 M 0 10011 50.00 15
 M 0 10012 50.00 15
 T 10011
@@ -668,8 +665,8 @@ The Base of the Staircase~
    The second floor, with its immaculate wooden floors, comes to a gradual end
 here, as it curves up into a staircase and further up the tower. A long line of
 the Tower Skycleave's former masters comes to an apparent end here at the
-stairs, where its current leaders, Knezz, Barosh, and Celiya occupy the final
-three frames.
+stairs, where its current leaders, Knezz, Barrosh, and Celiya occupy the final
+three frames.  
 ~
 ch 0
 D5

@@ -42,6 +42,7 @@
 *   Interaction Handlers
 *   Lore Handlers
 *   Mob Tagging Handlers
+*   Mount Handlers
 *   Object Handlers
 *   Object Binding Handlers
 *   Object Location Handlers
@@ -1040,26 +1041,6 @@ void extract_pending_chars(void) {
 
 
 /**
-* This dismounts a player, but keeps the mount data stored.
-*
-* @param char_data *ch The player who is dismounting.
-*/
-void perform_dismount(char_data *ch) {
-	// NPCs don't mount
-	if (IS_NPC(ch)) {
-		return;
-	}
-	
-	// un-set the riding flag but keep the mount info stored	
-	REMOVE_BIT(GET_MOUNT_FLAGS(ch), MOUNT_RIDING);
-	
-	if (GET_EQ(ch, WEAR_SADDLE)) {
-		perform_remove(ch, WEAR_SADDLE);
-	}
-}
-
-
-/**
 * Handles the actual extract of an idle character.
 * 
 * @param char_data *ch The player to idle out.
@@ -1107,35 +1088,6 @@ void perform_idle_out(char_data *ch) {
 		extract_pending_chars();	// ensure char is gone
 		read_empire_members(emp, FALSE);
 	}
-}
-
-
-/**
-* Caution: this function will extract the mount mob
-*
-* @param char_data *ch The player doing the mounting
-* @param char_data *mount The NPC to be mounted
-*/
-void perform_mount(char_data *ch, char_data *mount) {
-	// sanity check
-	if (IS_NPC(ch) || !IS_NPC(mount)) {
-		return;
-	}
-
-	// store mount vnum and set riding
-	GET_MOUNT_VNUM(ch) = GET_MOB_VNUM(mount);
-	SET_BIT(GET_MOUNT_FLAGS(ch), MOUNT_RIDING);
-	
-	// detect mount flags
-	if (AFF_FLAGGED(mount, AFF_FLY)) {
-		SET_BIT(GET_MOUNT_FLAGS(ch), MOUNT_FLYING);
-	}
-	if (MOB_FLAGGED(mount, MOB_AQUATIC)) {
-		SET_BIT(GET_MOUNT_FLAGS(ch), MOUNT_AQUATIC);
-	}
-
-	// extract the mount mob
-	extract_char(mount);
 }
 
 
@@ -3452,6 +3404,119 @@ void tag_mob(char_data *mob, char_data *player) {
 		// just tag for player
 		add_mob_tag(GET_IDNUM(player), &MOB_TAGGED_BY(mob));
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MOUNT HANDLERS //////////////////////////////////////////////////////////
+
+/**
+* Adds a mount to a player by vnum/flags. Won't add a duplicate.
+*
+* @param char_data *ch The player.
+* @param mob_vnum vnum The mount's vnum.
+* @param bitvector_t flags The MOUNT_ flags to set.
+*/
+void add_mount(char_data *ch, mob_vnum vnum, bitvector_t flags) {
+	struct mount_data *mount;
+	
+	// npcs can't add mounts
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	// find or add data (don't want to double up)
+	if (!(mount = find_mount_data(ch, vnum))) {
+		CREATE(mount, struct mount_data, 1);
+		mount->vnum = vnum;
+		HASH_ADD_INT(GET_MOUNT_LIST(ch), vnum, mount);
+	}
+	
+	// we can safely overwrite flags here
+	mount->flags = flags;
+}
+
+
+/**
+* @param char_data *mob The mount mob.
+* @return bitvector_t MOUNT_ flags corresponding to that mob.
+*/
+bitvector_t get_mount_flags_by_mob(char_data *mob) {
+	bitvector_t flags = NOBITS;
+	
+	// MOUNT_x: detect mount flags
+	if (AFF_FLAGGED(mob, AFF_FLY)) {
+		SET_BIT(flags, MOUNT_FLYING);
+	}
+	if (MOB_FLAGGED(mob, MOB_AQUATIC)) {
+		SET_BIT(flags, MOUNT_AQUATIC);
+	}
+	
+	return flags;
+}
+
+
+/**
+* Find the mount_data entry for a certain mount on a player.
+*
+* @param char_data *ch The player.
+* @param mob_vnum vnum The mount mob vnum to find.
+* @return struct mount_data* The found data, or NULL if player doesn't have it.
+*/
+struct mount_data *find_mount_data(char_data *ch, mob_vnum vnum) {
+	struct mount_data *data;
+	
+	if (IS_NPC(ch)) {
+		return NULL;
+	}
+	
+	HASH_FIND_INT(GET_MOUNT_LIST(ch), &vnum, data);
+	return data;
+}
+
+
+/**
+* This dismounts a player, but keeps the mount data stored.
+*
+* @param char_data *ch The player who is dismounting.
+*/
+void perform_dismount(char_data *ch) {
+	// NPCs don't mount
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	// un-set the riding flag but keep the mount info stored	
+	REMOVE_BIT(GET_MOUNT_FLAGS(ch), MOUNT_RIDING);
+	
+	if (GET_EQ(ch, WEAR_SADDLE)) {
+		perform_remove(ch, WEAR_SADDLE);
+	}
+}
+
+
+/**
+* Caution: this function will extract the mount mob
+*
+* @param char_data *ch The player doing the mounting
+* @param char_data *mount The NPC to be mounted
+*/
+void perform_mount(char_data *ch, char_data *mount) {
+	bitvector_t flags;
+	
+	// sanity check
+	if (IS_NPC(ch) || !IS_NPC(mount)) {
+		return;
+	}
+	
+	// store mount vnum and set riding
+	flags = get_mount_flags_by_mob(mount);
+	add_mount(ch, GET_MOB_VNUM(mount), flags);
+	GET_MOUNT_VNUM(ch) = GET_MOB_VNUM(mount);
+	SET_BIT(GET_MOUNT_FLAGS(ch), MOUNT_RIDING | flags);
+	
+	// extract the mount mob
+	extract_char(mount);
 }
 
 
