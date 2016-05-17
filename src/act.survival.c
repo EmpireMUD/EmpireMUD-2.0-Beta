@@ -279,6 +279,7 @@ void do_mount_list(char_data *ch, char *argument) {
 
 // attempt to add a mount
 void do_mount_new(char_data *ch, char *argument) {
+	struct mount_data *mount;
 	char_data *mob, *proto;
 	bool only;
 	
@@ -332,11 +333,13 @@ void do_mount_new(char_data *ch, char *argument) {
 		// add mob to pool
 		add_mount(ch, GET_MOB_VNUM(mob), get_mount_flags_by_mob(mob));
 		
-		if (only) {
+		if (only && (mount = find_mount_data(ch, GET_MOB_VNUM(mob)))) {
 			// NOTE: this deliberately has no carriage return (will get another message from do_mount_current)
 			msg_to_char(ch, "You gain %s as a mount and attempt to ride %s: ", PERS(mob, mob, FALSE), HMHR(mob));
 			act("$n gains $N as a mount.", FALSE, ch, NULL, mob, TO_NOTVICT);
 			
+			GET_MOUNT_VNUM(ch) = mount->vnum;
+			GET_MOUNT_FLAGS(ch) = mount->flags;
 			do_mount_current(ch);
 		}
 		else {	// has other mobs
