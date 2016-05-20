@@ -2369,7 +2369,6 @@ char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *np
 	// spawn data
 	SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED | MOB_EMPIRE);
 	GET_LOYALTY(mob) = emp;
-	MOB_SPAWN_TIME(mob) = time(0);
 	
 	// update spawn time
 	ROOM_LAST_SPAWN_TIME(room) = time(0);

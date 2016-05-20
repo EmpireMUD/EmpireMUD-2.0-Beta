@@ -942,8 +942,7 @@ static void spawn_one_room(room_data *room) {
 			// in case of generic names
 			setup_generic_npc(mob, ROOM_OWNER(home), NOTHING, NOTHING);
 		
-			// spawn data
-			MOB_SPAWN_TIME(mob) = now;
+			// enforce spawn data
 			SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
 				
 			// put in the room
