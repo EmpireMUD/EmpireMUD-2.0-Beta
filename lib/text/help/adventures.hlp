@@ -1,4 +1,4 @@
-"COLOSSAL RED DRAGON" "MYTHIC FORGE" "LEGENDARY STITCHING" "LORE CRAFTS" "FABLED HIDES"
+"COLOSSAL RED DRAGON" "MYTHIC FORGE" "LEGENDARY STITCHING" "LORE CRAFTS" "FABLED HIDES" "DRAGON TOKENS"
 
 Colossal Red Dragon (level 250-300 adventure)
 
@@ -6,6 +6,13 @@ The Colossal Red Dragon adventure includes new crafting patterns for equipment
 that scales up to level 325. Complete any part of the adventure and the pattern
 vendor will appear. These patterns are for weapons, off-hand items, and belts
 for each class role.
+
+Resources:
+  red dragon hide (skinned)
+  colossal dragon bone (butchered)
+  bolt of dragon cloth (woven from hide)
+  tough dragon leather (tanned from hide)
+  dragonsteel ingot (smelted from bone)
 
 Each type of pattern requires a tradesman from a specific class:
   Mythic Forge (forge): Steelsmith, Guildsman
