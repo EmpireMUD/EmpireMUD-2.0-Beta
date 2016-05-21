@@ -1,0 +1,14 @@
+#10900
+The Dragon's Lair~
+   You have stumbled into a dragon's lair! The mammoth cave has ended in a
+truly gigantic chamber, and it seems a dragon has made its home in it. The back
+of the cave is dominated by a huge nest, apparently made from whole trees. No
+creature but a red dragon builds a nest so large. To the side, you can see
+charred bits of armor, perhaps returned from the dragon's sensitive stomach.
+~
+b 0
+M 0 10900 100.00 1
+M 0 10901 100.00 1
+M 0 10902 100.00 1
+S
+$
