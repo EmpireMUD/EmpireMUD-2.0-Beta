@@ -58,7 +58,7 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 /* external functions */
 extern int count_harnessed_animals(vehicle_data *veh);
 void free_varlist(struct trig_var_data *vd);
-extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest);
+extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
 extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);	// quest.c
@@ -2711,7 +2711,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "completed_quest")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							any_vnum vnum = atoi(subfield);
-							if (!IS_NPC(c) && has_completed_quest(c, vnum)) {
+							if (!IS_NPC(c) && has_completed_quest(c, vnum, NOTHING)) {
 								strcpy(str, "1");
 							}
 							else {
