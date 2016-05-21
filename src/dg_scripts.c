@@ -3402,6 +3402,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 
 			*str = '\x1';
 			switch (LOWER(*field)) {
+				case 'b': {	// obj.b*
+					if (!str_cmp(field, "bind")) {
+						void free_obj_binding(struct obj_binding **list);
+						if (subfield && *subfield) {
+							if (!str_cmp(subfield, "none") || !str_cmp(subfield, "nobody")) {
+								free_obj_binding(&OBJ_BOUND_TO(o));
+							}
+							else {	// attempt to bind it
+								char_data *targ = (*subfield == UID_CHAR) ? get_char(subfield) : get_char_by_obj(o, subfield);
+								if (targ && !IS_NPC(targ) && OBJ_FLAGGED(o, OBJ_BIND_FLAGS)) {
+									// unbind first
+									free_obj_binding(&OBJ_BOUND_TO(o));
+									bind_obj_to_player(o, targ);
+									reduce_obj_binding(o, targ);
+								}
+							}
+						}
+						// no result
+						*str = '\0';
+					}
+					break;
+				}
 				case 'c': {	// obj.c*
 					if (!str_cmp(field, "carried_by")) {
 						if (o->carried_by)
