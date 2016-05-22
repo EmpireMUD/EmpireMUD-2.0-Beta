@@ -562,7 +562,7 @@ OLC_MODULE(booked_license) {
 
 
 OLC_MODULE(booked_paragraphs) {
-	char arg1[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	book_data *book = GET_OLC_BOOK(ch->desc);
 	struct paragraph_data *para, *new, *last, *temp;
 	size_t size;
@@ -592,7 +592,16 @@ OLC_MODULE(booked_paragraphs) {
 		
 		for (para = book->paragraphs, count = 1; para; para = para->next, ++count) {
 			if ((from == -1 || from <= count) && (to == -1 || to >= count)) {
-				size += snprintf(buf + size, sizeof(buf) - size, "\r\n\tcParagraph %d\t0\r\n%s", count, NULLSAFE(para->text));
+				snprintf(line, sizeof(line), "\r\n\tcParagraph %d\t0\r\n%s", count, NULLSAFE(para->text));
+				
+				if (size + strlen(line) < sizeof(buf)) {
+					size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+				}
+				else {
+					// too long!
+					size += snprintf(buf + size, sizeof(buf) - size, "\r\n...string too long!\r\n");
+					break;
+				}
 			}
 		}
 		
