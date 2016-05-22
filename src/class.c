@@ -142,9 +142,11 @@ void check_classes(void) {
 		LL_FOREACH_SAFE(CLASS_ABILITIES(cls), clab, next_clab) {
 			if (!find_ability_by_vnum(clab->vnum)) {
 				log("- Class [%d] %s has invalid ability %d", CLASS_VNUM(cls), CLASS_NAME(cls), clab->vnum);
-				error = TRUE;
 				LL_DELETE(CLASS_ABILITIES(cls), clab);
 				free(clab);
+				
+				// missing ability isn't considered fatal
+				// error = TRUE;
 			}
 		}
 		
@@ -1503,7 +1505,7 @@ OLC_MODULE(classedit_role) {
 //// COMMANDS ///////////////////////////////////////////////////////////////
 
 ACMD(do_class) {
-	void resort_empires(bool force);
+	void resort_empires();
 	
 	char arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	empire_data *emp = GET_LOYALTY(ch);
@@ -1542,7 +1544,7 @@ ACMD(do_class) {
 			assign_class_abilities(ch, NULL, NOTHING);
 			if (emp) {
 				adjust_abilities_to_empire(ch, emp, TRUE);
-				resort_empires(FALSE);
+				resort_empires();
 			}
 			
 			msg_to_char(ch, "Your class role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
