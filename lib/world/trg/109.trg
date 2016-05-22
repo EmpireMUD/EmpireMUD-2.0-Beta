@@ -106,6 +106,8 @@ if %actor% && %actor.is_pc%
   if !%self.is_flagged(BOE)%
     nop %self.flag(BOE)%
   end
+  * Default flag is BOP so need to unbind when setting BOE
+  nop %self.bind(nobody)%
 else
   * Item was probably dropped
   if !%self.is_flagged(BOP)%
@@ -446,38 +448,38 @@ Dragon token shop list~
 list~
 if !%arg%
   %send% %actor% %self.name% sells crafting materials, building materials, and crafting patterns.
-  %send% %actor% Use 'list materials', 'list buildings' and 'list crafting' to browse.
+  %send% %actor% Use '&clist materials&0', '&clist buildings&0' and '&clist crafting&0' to browse.
   %send% %actor% For more information on these items, see HELP COLOSSAL RED DRAGON.
 elseif materials /= %arg%
   %send% %actor% For more information on these crafting materials, see HELP COLOSSAL RED DRAGON.
-  %send% %actor% %self.name% sells:
-  %send% %actor%  a dragon scale ('buy scale', 2 dragon tokens)
-  %send% %actor%  a colossal dragon bone ('buy bone', 2 dragon tokens)
-  %send% %actor%  a red dragon hide ('buy hide', 2 dragon tokens)
+  %send% %actor% %self.name% sells the following materials for 2 dragon tokens each:
+  %send% %actor% - dragon scale  ('buy scale')
+  %send% %actor% - colossal dragon bone  ('buy bone')
+  %send% %actor% - red dragon hide  ('buy hide')
 elseif buildings /= %arg%
   %send% %actor% For more information on these buildings, see HELP COLOSSAL RED DRAGON.
-  %send% %actor% %self.name% sells:
-  %send% %actor% For a butcher tent:    a dragonsflame butcher block ('buy butcher', 6 dragon tokens)
-  %send% %actor% For a dragon cave:     a dragonstone hearth ('buy hearth', 6 dragon tokens)
-  %send% %actor% For a dragon statue:   a dragonseye ruby ('buy ruby', 6 dragon tokens)
-  %send% %actor% For a dragon library:  a dragonquill pen ('buy pen', 6 dragon tokens)
+  %send% %actor% %self.name% sells the following buildings for 6 dragon tokens each:
+  %send% %actor% For a butcher tent:    dragonsflame butcher block ('buy butcher')
+  %send% %actor% For a dragon cave:  dragonstone hearth ('buy hearth')
+  %send% %actor% For a dragon statue:  dragonseye ruby ('buy ruby')
+  %send% %actor% For a dragon library:  dragonquill pen ('buy pen')
 elseif crafting /= %arg%
   %send% %actor% For more information on the items these patterns are for, see HELP COLOSSAL RED DRAGON.
-  %send% %actor% %self.name% sells:
-  %send% %actor% a warhammer pattern ('buy warhammer', 12 dragon tokens)
-  %send% %actor% a claymore pattern ('buy claymore', 12 dragon tokens)
-  %send% %actor% a mace pattern ('buy mace', 12 dragon tokens)
-  %send% %actor% a wand pattern ('buy wand', 12 dragon tokens)
-  %send% %actor% a staff pattern ('buy staff', 12 dragon tokens)
-  %send% %actor% a wristblade pattern ('buy wristblade', 12 dragon tokens)
-  %send% %actor% a shield pattern ('buy shield', 12 dragon tokens)
-  %send% %actor% a charm pattern ('buy charm', 12 dragon tokens)
-  %send% %actor% a tome pattern ('buy tome', 12 dragon tokens)
-  %send% %actor% a girdle pattern ('buy girdle', 12 dragon tokens)
-  %send% %actor% a waistband pattern ('buy waistband', 12 dragon tokens)
-  %send% %actor% a cincture pattern ('buy cincture', 12 dragon tokens)
-  %send% %actor% a sash pattern ('buy sash', 12 dragon tokens)
-  %send% %actor% a bracelet pattern ('buy bracelet', 12 dragon tokens)
+  %send% %actor% %self.name% sells the following crafting patterns for 12 dragon tokens each:
+  %send% %actor% - dragonsteel warhammer schematic  ('buy warhammer')
+  %send% %actor% - dragonsteel claymore schematic  ('buy claymore')
+  %send% %actor% - dragonbone mace schematic  ('buy mace')
+  %send% %actor% - draconic wand schematic  ('buy wand')
+  %send% %actor% - dragonbone staff schematic  ('buy staff')
+  %send% %actor% - dragonbone wristblade design  ('buy wristblade')
+  %send% %actor% - dragonbone tower shield design  ('buy shield')
+  %send% %actor% - red dragon charm design  ('buy charm')
+  %send% %actor% - dragonkind tome design  ('buy tome')
+  %send% %actor% - crimson dragon girdle pattern  ('buy girdle')
+  %send% %actor% - burning dragonsteel waistband pattern  ('buy waistband')
+  %send% %actor% - flaming draconic cincture pattern  ('buy cincture')
+  %send% %actor% - burning dragoncloth sash pattern  ('buy sash')
+  %send% %actor% - magnificent dragon bracelet schematic  ('buy bracelet')
 else
   %send% %actor% Valid categories are 'materials', 'buildings', and 'crafting'.
 end
@@ -528,59 +530,59 @@ elseif pen /= %arg%
 elseif warhammer /= %arg%
   eval vnum 10930
   eval cost 12
-  eval named a warhammer schematic
+  eval named a dragonsteel warhammer schematic
 elseif claymore /= %arg%
   eval vnum 10931
   eval cost 12
-  eval named a claymore schematic
+  eval named a dragonsteel claymore schematic
 elseif mace /= %arg%
   eval vnum 10932
   eval cost 12
-  eval named a mace schematic
+  eval named a dragonbone mace schematic
 elseif wand /= %arg%
   eval vnum 10934
   eval cost 12
-  eval named a wand schematic
+  eval named a draconic wand schematic
 elseif staff /= %arg%
   eval vnum 10935
   eval cost 12
-  eval named a staff schematic
+  eval named a dragonbone staff schematic
 elseif wristblade /= %arg%
   eval vnum 10936
   eval cost 12
-  eval named a wristblade pattern
+  eval named a dragonbone wristblade design
 elseif shield /= %arg%
   eval vnum 10937
   eval cost 12
-  eval named a shield pattern
+  eval named a dragonbone tower shield design
 elseif charm /= %arg%
   eval vnum 10938
   eval cost 12
-  eval named a charm pattern
+  eval named a red dragon charm design
 elseif tome /= %arg%
   eval vnum 10939
   eval cost 12
-  eval named a tome pattern
+  eval named a dragonkind tome design
 elseif girdle /= %arg%
   eval vnum 10940
   eval cost 12
-  eval named a girdle pattern
+  eval named a crimson dragon girdle pattern
 elseif waistband /= %arg%
   eval vnum 10941
   eval cost 12
-  eval named a waistband pattern
+  eval named a burning dragonsteel waistband pattern
 elseif cincture /= %arg%
   eval vnum 10942
   eval cost 12
-  eval named a cincture pattern
+  eval named a flaming draconic cincture pattern
 elseif sash /= %arg%
   eval vnum 10943
   eval cost 12
-  eval named a sash pattern
-elseif bracelets /= %arg%
+  eval named a burning dragoncloth sash pattern
+elseif bracelet /= %arg%
   eval vnum 10947
   eval cost 12
-  eval named a bracelet pattern
+  eval named a magnificent dragon bracelet schematic
   * End of crafting patterns
 else
   %send% %actor% They don't seem to sell '%arg%' here.
