@@ -2619,7 +2619,6 @@ ACMD(do_summon) {
 			
 			// spawn data
 			SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED | MOB_NO_LOOT);
-			MOB_SPAWN_TIME(mob) = time(0);
 			
 			char_to_room(mob, IN_ROOM(ch));
 			act("$n approaches!", FALSE, mob, 0, 0, TO_ROOM);

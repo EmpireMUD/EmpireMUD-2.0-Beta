@@ -1566,6 +1566,9 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 	else {
 		mob->proto_script = NULL;
 	}
+	
+	// note this may lead to slight over-spawning after reboots -pc 5/20/16
+	MOB_SPAWN_TIME(mob) = time(0);
 
 	return (mob);
 }

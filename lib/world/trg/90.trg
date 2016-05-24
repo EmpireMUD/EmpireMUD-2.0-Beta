@@ -318,7 +318,7 @@ done
 Wandering Vampire combat~
 0 k 25
 ~
-if !%self.mob_flagged(VAMPIRE)%
+if !%self.vampire()%
   halt
 end
 if %time.hour%>=7 && %time.hour%<=19
@@ -327,7 +327,23 @@ end
 %send% %actor% %self.name% lunges forward and sinks %self.hisher% teeth into your shoulder!
 %echoaround% %actor% %self.name% lunges forward and sinks %self.hisher% teeth into %actor.name%'s shoulder!
 eval healthprct %actor.health% * 100 / %actor.maxhealth%
-if (%healthprct% < 50) && (!%actor.vampire()% && !%actor.nohassle%)
+eval can_turn 1
+if %healthprct% > 50 || %actor.aff_flagged(!VAMPIRE)% || %actor.vampire()%
+  * Too much health left, or immune to vampirism
+  eval can_turn 0
+end
+if %actor.is_pc%
+  if %actor.nohassle% 
+    * PC is immune to vampirism (rare)
+    eval can_turn 0
+  end
+else
+  if !%actor.mob_flagged(HUMAN)% || %actor.mob_flagged(GROUP)% || %actor.mob_flagged(HARD)%
+    * NPC is immune to vampirism (at least from this)
+    eval can_turn 0
+  end
+end
+if %can_turn%
   * Strings copied from sire_char
   %send% %actor% You fall limply to the ground. In the distance, you think you see a light...
   %echoaround% %actor% %actor.name% drops limply from %self.name%'s fangs...
@@ -335,6 +351,9 @@ if (%healthprct% < 50) && (!%actor.vampire()% && !%actor.nohassle%)
   %send% %actor% &rSuddenly, a warm sensation touches your lips and a stream of blood flows down your throat...&0
   %send% %actor% &rAs the blood fills you, a strange sensation covers your body... The light in the distance turns blood-red and a hunger builds within you!&0
   nop %actor.vampire(on)%
+  if %actor.is_npc%
+    attach 9064 %actor.id%
+  end
   dg_affect %self% STUNNED on 5
 else
   %damage% %actor% 25

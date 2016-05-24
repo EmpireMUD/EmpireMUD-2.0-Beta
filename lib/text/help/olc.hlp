@@ -281,6 +281,19 @@ Quests (QEDIT):
   reward items, as the scale level may go up.
 - If you use the QUEST-CHAIN reward type, put it last. It will look better
   at the end.
+- If you set REPEAT-PER-INSTANCE, you should almost always also set the
+  EXPIRES-AFTER-INSTANCE flag. This way, the player will always have a version
+  from their current instance.
+- When you use REPEAT-PER-INSTANCE, the COMPLETED-QUEST and NOT-COMPLETED tasks
+  will only count quests that were/not completed in the same instance. This
+  allows you to create complex chains or mutually-exclusive quests that reset
+  with each new instance.
+- The REPEAT-PER-INSTANCE feature can be somewhat muddled if players start a
+  new instance without finishing the previous one, as the game is not designed
+  for this scenario and they player may end up with a mixture of quests from
+  the two instances. If you have a good solution for this problem, suggest it
+  to Paul (paul@empiremud.net). The current advice is to not worry about it and
+  hope players don't get themselves into these confusing situations.
 
 Room Templates (REDIT):
 - Don't confuse room templates with the designated rooms that players can add
