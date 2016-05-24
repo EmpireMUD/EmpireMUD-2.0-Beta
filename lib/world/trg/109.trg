@@ -434,6 +434,11 @@ if %actor.inventory(10945)%
   halt
 end
 if %actor.on_quest(10902)%
+  if %self.level%-%actor.level% > 50
+    %send% %actor% You're not high enough level to steal from %self.name%! It'd just eat you.
+    return 0
+    halt
+  end
   %send% %actor% You pick %self.name%'s pocket...
   %load% obj 10945 %actor% inv
   eval item %actor.inventory()%
@@ -608,7 +613,7 @@ remote %currency% %actor.id%
 Colossal Dragon must-fight~
 0 q 100
 ~
-if (%actor.nohassle% || %actor.on_quest(10900)% || %self.aff_flagged(!ATTACK)%)
+if (%actor.is_npc% || %actor.nohassle% || %actor.on_quest(10900)% || %self.aff_flagged(!ATTACK)%)
   halt
 end
 if %actor.aff_flagged(SNEAK)%
