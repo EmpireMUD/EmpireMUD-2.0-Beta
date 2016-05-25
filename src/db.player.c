@@ -3407,12 +3407,13 @@ void start_new_character(char_data *ch) {
 	extern int tips_of_the_day_size;
 	
 	char lbuf[MAX_INPUT_LENGTH];
-	struct global_data *glb, *next_glb;
+	struct global_data *glb, *next_glb, *choose_last;
 	int cumulative_prc, iter;
 	bool done_cumulative = FALSE;
 	struct archetype_gear *gear;
 	struct archetype_skill *sk;
 	archetype_data *arch;
+	bool found;
 	
 	// announce to existing players that we have a newbie
 	mortlog("%s has joined the game", PERS(ch, ch, TRUE));
@@ -3506,8 +3507,10 @@ void start_new_character(char_data *ch) {
 			give_newbie_gear(ch, gear->vnum, gear->wear);
 		}
 		
-		// global newbie gear
+		// global newbie gear -- TODO there must be a better, more generic way to run globals -pc 5/24/2016
 		cumulative_prc = number(1, 10000);
+		choose_last = NULL;
+		found = FALSE;
 		HASH_ITER(hh, globals_table, glb, next_glb) {
 			if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR || IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
 				continue;
@@ -3535,7 +3538,24 @@ void start_new_character(char_data *ch) {
 			}
 		
 			// success!
+			
+			// check choose-last
+			if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CHOOSE_LAST)) {
+				if (!choose_last) {
+					choose_last = glb;
+				}
+				continue;
+			}
+			
+			// safe to apply
 			for (gear = GET_GLOBAL_GEAR(glb); gear; gear = gear->next) {
+				give_newbie_gear(ch, gear->vnum, gear->wear);
+			}
+			found = TRUE;
+		}
+		// do the choose-last
+		if (choose_last && !found) {
+			for (gear = GET_GLOBAL_GEAR(choose_last); gear; gear = gear->next) {
 				give_newbie_gear(ch, gear->vnum, gear->wear);
 			}
 		}

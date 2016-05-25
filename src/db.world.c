@@ -602,7 +602,7 @@ void fill_trench(room_data *room) {
 void init_mine(room_data *room, char_data *ch) {
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
-	struct global_data *glb, *next_glb;
+	struct global_data *glb, *next_glb, *choose_last, *found;
 	bool done_cumulative = FALSE;
 	int cumulative_prc;
 	adv_data *adv;
@@ -614,7 +614,8 @@ void init_mine(room_data *room, char_data *ch) {
 	
 	adv = (GET_ROOM_TEMPLATE(room) ? get_adventure_for_vnum(GET_RMT_VNUM(GET_ROOM_TEMPLATE(room))) : NULL);
 	cumulative_prc = number(1, 10000);
-
+	choose_last = found = NULL;
+	
 	HASH_ITER(hh, globals_table, glb, next_glb) {
 		if (GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
 			continue;
@@ -667,20 +668,38 @@ void init_mine(room_data *room, char_data *ch) {
 		}
 		
 		// we have a match!
-		set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, GET_GLOBAL_VNUM(glb));
-		set_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, number(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)));
+		
+		// check choose-last
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CHOOSE_LAST)) {
+			if (!choose_last) {
+				choose_last = glb;
+			}
+			continue;
+		}
+		else {	// not choose-last
+			found = glb;
+			break;	// can only use first match
+		}
+	}
+	
+	// failover
+	if (!found) {
+		found = choose_last;
+	}
+	
+	// VICTORY: set mine type
+	if (found) {
+		set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, GET_GLOBAL_VNUM(found));
+		set_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, number(GET_GLOBAL_VAL(found, GLB_VAL_MAX_MINE_SIZE) / 2, GET_GLOBAL_VAL(found, GLB_VAL_MAX_MINE_SIZE)));
 		
 		if (ch && has_ability(ch, ABIL_DEEP_MINES)) {
 			multiply_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, 1.5);
 			gain_ability_exp(ch, ABIL_DEEP_MINES, 15);
 		}
 		
-		if (ch && GET_GLOBAL_ABILITY(glb) != NO_ABIL) {
-			gain_ability_exp(ch, GET_GLOBAL_ABILITY(glb), 75);
+		if (ch && GET_GLOBAL_ABILITY(found) != NO_ABIL) {
+			gain_ability_exp(ch, GET_GLOBAL_ABILITY(found), 75);
 		}
-		
-		// can only use first match
-		break;
 	}
 }
 

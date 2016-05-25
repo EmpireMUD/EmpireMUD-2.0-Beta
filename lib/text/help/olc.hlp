@@ -1914,6 +1914,9 @@ Available flags:
  IN-DEVELOPMENT - Will not be used live.
  ADVENTURE-ONLY - This global table will only apply to the adventure it's in.
  CUMULATIVE-PRC - Percent check will be cumulative.
+ CHOOSE-LAST - The first choose-last global that passes the percent check will
+    be saved for later, and only used if no other global succeeds. This can
+    be used to create 100% "choose if nothing else passes" final cases.
 
 See also: GEDIT PERCENT, OLC GLOBALS
 #d

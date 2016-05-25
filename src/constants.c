@@ -3219,6 +3219,7 @@ const char *global_flags[] = {
 	"IN-DEVELOPMENT",
 	"ADVENTURE-ONLY",
 	"CUMULATIVE-PRC",
+	"CHOOSE-LAST",
 	"\n"
 };
 
