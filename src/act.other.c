@@ -1551,7 +1551,7 @@ ACMD(do_fightmessages) {
 				msg_to_char(ch, "%s: %s\r\n", combat_message_types[iter], on ? "on" : "off");
 			}
 			else {
-				msg_to_char(ch, " [%s%3.3s\t0] %-25.15s%s", on ? "\tg" : "\tr", on ? "on" : "off", combat_message_types[iter], (!(++count % 2) ? "\r\n" : ""));
+				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", combat_message_types[iter], (!(++count % 2) ? "\r\n" : ""));
 			}
 		}
 		
@@ -1571,7 +1571,7 @@ ACMD(do_fightmessages) {
 			REMOVE_BIT(GET_FIGHT_MESSAGES(ch), BIT(type));
 		}
 		
-		msg_to_char(ch, "You toggle '%s' %s\t0.\r\n", combat_message_types[type], on ? "\tgon" : "\roff");
+		msg_to_char(ch, "You toggle '%s' %s\t0.\r\n", combat_message_types[type], on ? "\tgon" : "\troff");
 	}
 }
 
