@@ -3319,6 +3319,7 @@ void init_player(char_data *ch) {
 	}
 	
 	ch->char_specials.affected_by = 0;
+	GET_FIGHT_MESSAGES(ch) = DEFAULT_FIGHT_MESSAGES;
 
 	for (i = 0; i < NUM_CONDS; i++)
 		GET_COND(ch, i) = (GET_ACCESS_LEVEL(ch) == LVL_IMPL ? UNLIMITED : 0);
