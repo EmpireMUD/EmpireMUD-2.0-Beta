@@ -52,7 +52,7 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 #define DG_NO_TRIG  BIT(13)	// don't check act trigger
 #define ACT_VEHICLE_OBJ  BIT(14)  // the middle/obj param is a vehicle
 #define TO_COMBAT_HIT  BIT(15)	// is a hit (fightmessages) -- REQUIRES vict_obj is a char
-#define TO_COMBAT_MISS  BIT(15)	// is a miss (fightmessages) -- REQUIRES vict_obj is a char
+#define TO_COMBAT_MISS  BIT(16)	// is a miss (fightmessages) -- REQUIRES vict_obj is a char
 
 /* I/O functions */
 int write_to_descriptor(socket_t desc, const char *txt);
