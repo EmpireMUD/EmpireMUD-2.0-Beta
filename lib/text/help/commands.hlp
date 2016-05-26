@@ -168,7 +168,7 @@ other characters. In most cases, these will be merged with the ones you already
 have. For example, if you have an alias named "foo" and you import aliases, it
 won't overwrite the "foo" you already have with one from an alt.
 
-You can import: aliases, prompt, fprompt, preferences, recolors,
+You can import: aliases, prompt, fprompt, preferences, fightmessages, recolors,
 slash-channels, and ignores.
 
 "Preferences" will import some toggles, as well as mapsize.
@@ -574,6 +574,7 @@ only useful indoors, because on the world map all directions are exits.
 FIGHTMESSAGES "FIGHT MESSAGES" FMESSAGES "FIGHT SPAM" "COMBAT SPAM" "COMBAT MESSAGES"
 
 Usage:  fightmessages [type]
+        fmessages all <on | off>
 
 This command lets you toggle which fight messages you do or don't see. This can
 make combat less spammy and easier to understand. You can use multi-word

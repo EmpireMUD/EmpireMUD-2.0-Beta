@@ -745,6 +745,16 @@ void alt_import_aliases(char_data *ch, char_data *alt) {
 * @param char_data *ch Player to import to.
 * @param char_data *alt Player to import from.
 */
+void alt_import_fmessages(char_data *ch, char_data *alt) {
+	GET_FIGHT_MESSAGES(ch) = GET_FIGHT_MESSAGES(alt);
+	msg_to_char(ch, "Imported fight message settings.\r\n");
+}
+
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
 void alt_import_fprompt(char_data *ch, char_data *alt) {
 	if (GET_FIGHT_PROMPT(alt) && *GET_FIGHT_PROMPT(alt)) {
 		if (GET_FIGHT_PROMPT(ch)) {
@@ -926,7 +936,7 @@ void do_alt_import(char_data *ch, char *argument) {
 	char_data *alt = NULL;
 	bool file = FALSE;
 	
-	static const char *valid_fields = "Valid fields: aliases, prompt, fprompt, preferences, recolors, slash-channels, ignores, all\r\n";
+	static const char *valid_fields = "Valid fields: aliases, prompt, fprompt, preferences, fightmessages, recolors, slash-channels, ignores, all\r\n";
 	
 	two_arguments(argument, arg1, arg2);
 	
@@ -955,6 +965,9 @@ void do_alt_import(char_data *ch, char *argument) {
 	else if (is_abbrev(arg2, "preferences")) {
 		alt_import_preferences(ch, alt);
 	}
+	else if (is_abbrev(arg2, "fmessages") || is_abbrev(arg2, "fightmessages")) {
+		alt_import_fmessages(ch, alt);
+	}
 	else if (is_abbrev(arg2, "recolors")) {
 		alt_import_recolors(ch, alt);
 	}
@@ -971,6 +984,7 @@ void do_alt_import(char_data *ch, char *argument) {
 		alt_import_prompt(ch, alt);
 		alt_import_fprompt(ch, alt);
 		alt_import_preferences(ch, alt);
+		alt_import_fmessages(ch, alt);
 		alt_import_recolors(ch, alt);
 		alt_import_ignores(ch, alt);
 		alt_import_slash_channels(ch, alt);
@@ -1558,6 +1572,20 @@ ACMD(do_fightmessages) {
 		if (count % 2 && !screenreader) {
 			send_to_char("\r\n", ch);
 		}
+	}
+	else if (!str_cmp(argument, "all on")) {
+		// turn ON all bits that have names
+		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
+			SET_BIT(GET_FIGHT_MESSAGES(ch), BIT(iter));
+		}
+		msg_to_char(ch, "You toggle all fight messages \tgon\t0.\r\n");
+	}
+	else if (!str_cmp(argument, "all off")) {
+		// turn ON all bits that have names
+		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
+			REMOVE_BIT(GET_FIGHT_MESSAGES(ch), BIT(iter));
+		}
+		msg_to_char(ch, "You toggle all fight messages \troff\t0.\r\n");
 	}
 	else if (type == NOTHING) {
 		msg_to_char(ch, "Unknown fight message type '%s'.\r\n", argument);
