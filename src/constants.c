@@ -329,6 +329,27 @@ const char *extra_attribute_types[] = {
 };
 
 
+// FM_x: combat messages
+const char *combat_message_types[] = {
+	"autodiagnose",	// 0
+	"my hits",
+	"my misses",
+	"hits against me",
+	"misses against me",
+	"ally hits",		// 5
+	"ally misses",
+	"hits against allies",
+	"misses against allies",
+	"hits against target",
+	"misses against target",	// 10
+	"hits against tank",
+	"misses against tank",
+	"other hits",
+	"other misses",
+	"\n"
+};
+
+
 // GRANT_x
 const char *grant_bits[] = {
 	"advance",

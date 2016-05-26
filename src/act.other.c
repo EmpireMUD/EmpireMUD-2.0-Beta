@@ -1520,6 +1520,62 @@ ACMD(do_douse) {
 }
 
 
+ACMD(do_fightmessages) {
+	extern const char *combat_message_types[];
+
+	bool screenreader = PRF_FLAGGED(ch, PRF_SCREEN_READER);
+	int iter, type = NOTHING, count;
+	bool on;
+	
+	// detect possible type
+	skip_spaces(&argument);
+	if (*argument) {
+		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
+			if (is_multiword_abbrev(argument, combat_message_types[iter])) {
+				type = iter;
+				break;
+			}
+		}
+	}
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs do not have fight message toggles.\r\n");
+	}
+	else if (!*argument) {
+		msg_to_char(ch, "Fight message toggles:\r\n");
+		
+		count = 0;
+		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
+			on = SHOW_FIGHT_MESSAGES(ch, BIT(iter));
+			if (screenreader) {
+				msg_to_char(ch, "%s: %s\r\n", combat_message_types[iter], on ? "on" : "off");
+			}
+			else {
+				msg_to_char(ch, " [%s%3.3s\t0] %-25.15s%s", on ? "\tg" : "\tr", on ? "on" : "off", combat_message_types[iter], (!(++count % 2) ? "\r\n" : ""));
+			}
+		}
+		
+		if (count % 2 && !screenreader) {
+			send_to_char("\r\n", ch);
+		}
+	}
+	else if (type == NOTHING) {
+		msg_to_char(ch, "Unknown fight message type '%s'.\r\n", argument);
+	}
+	else {
+		on = !SHOW_FIGHT_MESSAGES(ch, BIT(type));
+		if (on) {
+			SET_BIT(GET_FIGHT_MESSAGES(ch), BIT(type));
+		}
+		else {
+			REMOVE_BIT(GET_FIGHT_MESSAGES(ch), BIT(type));
+		}
+		
+		msg_to_char(ch, "You toggle '%s' %s\t0.\r\n", combat_message_types[type], on ? "\tgon" : "\roff");
+	}
+}
+
+
 ACMD(do_gen_write) {
 	char locpart[256];
 	const char *filename;

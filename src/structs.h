@@ -1470,6 +1470,26 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_CONDS  3
 
 
+// FM_x: combat messages
+#define FM_AUTO_DIAGNOSE  BIT(0)	// does a diagnose after each hit
+#define FM_MY_HITS  BIT(1)	// player's own hits
+#define FM_MY_MISSES  BIT(2)	// player's misses
+#define FM_HITS_AGAINST_ME  BIT(3)	// player is hit
+#define FM_MISSES_AGAINST_ME  BIT(4)	// player is missed
+#define FM_ALLY_HITS  BIT(5)	// any allied character hits
+#define FM_ALLY_MISSES  BIT(6)	// any allied player misses
+#define FM_HITS_AGAINST_ALLIES  BIT(7)	// any ally is hit
+#define FM_MISSES_AGAINST_ALLIES  BIT(8)	// any ally is missed
+#define FM_HITS_AGAINST_TARGET  BIT(9)	// anybody hits your target
+#define FM_MISSES_AGAINST_TARGET  BIT(10)	// anybody misses your target
+#define FM_HITS_AGAINST_TANK  BIT(11)	// anybody hits tank (target's focus)
+#define FM_MISSES_AGAINST_TANK  BIT(12)	// anybody misses tank (target's focus)
+#define FM_OTHER_HITS  BIT(13)	// hits not covered by other rules
+#define FM_OTHER_MISSES  BIT(14)	// misses not covered by other rules
+
+#define DEFAULT_FIGHT_MESSAGES  (FM_AUTO_DIAGNOSE | FM_MY_HITS | FM_MY_MISSES | FM_HITS_AGAINST_ME | FM_MISSES_AGAINST_ME | FM_ALLY_HITS | FM_ALLY_MISSES | FM_HITS_AGAINST_ALLIES | FM_MISSES_AGAINST_ALLIES | FM_HITS_AGAINST_TARGET | FM_MISSES_AGAINST_TARGET |FM_HITS_AGAINST_TANK | FM_MISSES_AGAINST_TANK | FM_OTHER_HITS | FM_OTHER_MISSES)
+
+
 // GRANT_X: Grant flags allow players to use abilities below the required access level
 #define GRANT_ADVANCE  BIT(0)
 #define GRANT_BAN  BIT(1)
@@ -2898,7 +2918,8 @@ struct player_special_data {
 	byte immortal_level;	// stored so that if level numbers are changed, imms stay at the correct level
 	bitvector_t grants;	// grant imm abilities
 	bitvector_t syslogs;	// which syslogs people want to see
-	bitvector_t bonus_traits;	// BONUS_x
+	bitvector_t bonus_traits;	// BONUS_
+	bitvector_t fight_messages;	// FM_ flags
 	ubyte bad_pws;	// number of bad password attemps
 	struct mail_data *mail_pending;	// uncollected letters
 	int create_alt_id;	// used in CON_Q_ALT_NAME and CON_Q_ALT_PASSWORD

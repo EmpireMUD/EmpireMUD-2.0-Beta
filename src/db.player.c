@@ -1350,7 +1350,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'F': {
-				if (PFILE_TAG(line, "Fight Prompt:", length)) {
+				if (PFILE_TAG(line, "Fight Messages:", length)) {
+					GET_FIGHT_MESSAGES(ch) = asciiflag_conv(line + length + 1);
+				}
+				else if (PFILE_TAG(line, "Fight Prompt:", length)) {
 					if (GET_FIGHT_PROMPT(ch)) {
 						free(GET_FIGHT_PROMPT(ch));
 					}
@@ -2162,6 +2165,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'F'
+	fprintf(fl, "Fight Messages: %s\n", bitv_to_alpha(GET_FIGHT_MESSAGES(ch)));
 	if (GET_FIGHT_PROMPT(ch)) {
 		fprintf(fl, "Fight Prompt: %s\n", GET_FIGHT_PROMPT(ch));
 	}

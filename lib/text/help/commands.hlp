@@ -571,6 +571,16 @@ Usage:  exits
 Gives you a list of the obvious exits from your location. This command is
 only useful indoors, because on the world map all directions are exits.
 #
+FIGHTMESSAGES "FIGHT MESSAGES" FMESSAGES "FIGHT SPAM" "COMBAT SPAM" "COMBAT MESSAGES"
+
+Usage:  fightmessages [type]
+
+This command lets you toggle which fight messages you do or don't see. This can
+make combat less spammy and easier to understand. You can use multi-word
+abbreviations for these toggles, like "miss ag me" for "misses against me".
+
+See also: TOGGLE
+#
 FILL
 
 Usage:  fill <item> [from] well
@@ -1725,6 +1735,8 @@ Immortal toggles:
   idle-out - if off, the immortal will not disconnect from idling
   incognito - if on, the immortal does not appear on 'who' to mortals
   wizhide - if on, the immortal can't be seen in rooms but is not invisible
+
+See also: FIGHT MESSAGES
 #
 UNLOAD UNLOADVEHICLE BOATUNLOAD
 
