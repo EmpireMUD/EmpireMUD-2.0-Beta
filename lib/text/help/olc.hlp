@@ -4689,7 +4689,7 @@ The following special codes may be used in icons:
 
 The following special colors may be used in icons:
  &&? - The tile color of the base terrain.
- &&V - Wall color (walls are colored by enchantments).
+ &&# - Wall color (walls are colored by enchantments).
 #d
 "STRING EDITOR" "TEXT EDITOR" "STRING EDITING" ,
 
