@@ -22,6 +22,7 @@
 #include "db.h"
 #include "skills.h"
 #include "vnums.h"
+#include "dg_scripts.h"
 
 /**
 * Contents:
@@ -64,6 +65,7 @@ int empire_chore_limit(empire_data *emp, int island_id, int chore);
 
 // external functions
 void empire_skillup(empire_data *emp, any_vnum ability, double amount);	// skills.c
+void scale_item_to_level(obj_data *obj, int level);	// act.item.c
 void stop_room_action(room_data *room, int action, int chore);	// act.action.c
 
 // gen_craft protos:
@@ -1207,11 +1209,22 @@ void do_chore_building(empire_data *emp, room_data *room) {
 
 INTERACTION_FUNC(one_chop_chore) {
 	empire_data *emp = ROOM_OWNER(inter_room);
+	obj_data *proto, *obj;
 	
 	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_CHOPPING, interaction->vnum)) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum);
-		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
-		return TRUE;
+		if ((proto = obj_proto(interaction->vnum))) {
+			if (proto->storage) {
+				add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
+			}
+			else {	// not storable
+				obj = read_object(interaction->vnum, TRUE);
+				scale_item_to_level(obj, 1);	// minimum level
+				obj_to_room(obj, inter_room);
+				load_otrigger(obj);
+			}
+			return TRUE;
+		}
 	}
 	
 	return FALSE;

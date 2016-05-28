@@ -342,5 +342,5 @@ weather.o: weather.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
   handler.h interpreter.h db.h skills.h
 	$(CC) -c $(CFLAGS) weather.c
 workforce.o: workforce.c conf.h sysdep.h structs.h uthash.h utils.h \
-  comm.h handler.h db.h skills.h vnums.h
+  comm.h handler.h db.h skills.h vnums.h dg_scripts.h
 	$(CC) -c $(CFLAGS) workforce.c
