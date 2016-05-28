@@ -402,6 +402,8 @@ When using field  - The variable returns:
    for loops, or an empty return.
 &cnohassle&0 - If TRUE, the player is an immortal with !HASSLE on.
 &cnoskill(Skill)&0 - TRUE if the player has 'noskilled' that skill.
+&cobj_target(name)&0 - Finds a targeted object the character can see/has.
+&cobj_target_inv(name)&0 - Finds a targeted object in the character's inventory.
 &con_quest(vnum)&0 - TRUE if the player is currently on that quest.
 &cpc_name&0 - Player's name or mob's keyword list, rather than short desc
 &cplr_flagged(FLAG)&0 - Returns TRUE if the player has the given flag (VAMPIRE).

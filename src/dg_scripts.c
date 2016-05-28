@@ -3128,7 +3128,25 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'o': {	// char.o*
-					if (!str_cmp(field, "on_quest")) {
+					if (!str_cmp(field, "obj_target")) {
+						obj_data *targ;
+						*str = '\0';	// default to no-target
+						if (subfield && *subfield) {
+							if ((targ = get_obj_in_list_vis(c, subfield, c->carrying)) || (targ = get_obj_in_list_vis(c, subfield, ROOM_CONTENTS(IN_ROOM(c))))) {
+								snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(targ));
+							}
+						}
+					}
+					else if (!str_cmp(field, "obj_target_inv")) {
+						obj_data *targ;
+						*str = '\0';	// default to no-target
+						if (subfield && *subfield) {
+							if ((targ = get_obj_in_list_vis(c, subfield, c->carrying))) {
+								snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(targ));
+							}
+						}
+					}
+					else if (!str_cmp(field, "on_quest")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							any_vnum vnum = atoi(subfield);
 							if (!IS_NPC(c) && is_on_quest(c, vnum)) {
@@ -3251,7 +3269,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "room")) {
-						snprintf(str, slen, "%c%d",UID_CHAR, GET_ROOM_VNUM(IN_ROOM(c)) + ROOM_ID_BASE); 
+						snprintf(str, slen, "%c%d",UID_CHAR, GET_ROOM_VNUM(IN_ROOM(c)) + ROOM_ID_BASE);
 					}
 
 					else if (!str_cmp(field, "riding")) {
