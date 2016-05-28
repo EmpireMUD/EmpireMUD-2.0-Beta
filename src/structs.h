@@ -1062,6 +1062,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_MOVE_DRIFTS  30
 #define MOB_MOVE_BOUNCES  31
 #define MOB_MOVE_FLOWS  32
+#define MOB_MOVE_LEAVES  33
 
 
 // name sets: add matching files in lib/text/names/

@@ -124,6 +124,9 @@ Augments (AUGEDIT):
   a re-usable augment.
 - Unlike crafts, it is safe to use SCALABLE items as resources and requires-
   objects, because augments are instant and non-refundable.
+- CUMULATIVE-PRC and CHOOSE-LAST are not compatible. If you want a 100% last-
+  choice for a cumulative set, give it 100% non-cumulative and the choose-last
+  flag. If no cumulative choice is picked, it will be chosen.
 
 Buildings (BEDIT):
 - Designated rooms are also built in the building editor, using the ROOM flag.

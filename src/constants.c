@@ -1508,6 +1508,7 @@ const char *mob_move_types[] = {
 	"drifts",
 	"bounces",
 	"flows",
+	"leaves",
 	"\n"
 };
 

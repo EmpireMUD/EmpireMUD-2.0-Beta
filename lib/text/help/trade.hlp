@@ -376,6 +376,19 @@ Weave items:
 
 See also: WEAVE
 #
+"HERBCLOTH WEAVING" "SPARKFIBER CLOTH" "MANASILK CLOTH"
+
+Herbcloth Weaving (Trade ability)
+Command:  weave <sparkfiber | manasilk> cloth
+
+Skilled tradesmen can weave enchanted herbs into their textiles in order to
+imbue magical properties. Sparkfiber is usually used to make caster dps gear,
+and manasilk is generally used for healer items.
+
+These cloths are generally used in crafts in the 200-300 level range.
+
+See also: HERBS, WEAVE
+#
 HONE HONED
 
 Hone (Trade ability)
@@ -595,6 +608,19 @@ can come out superior.
 See also: RAWHIDE STITCHING, LEATHERWORKING, DANGEROUS LEATHERS,
   MAGIC ATTIRE, MAGICAL VESTMENTS, SUPERIOR
 #
+"MOONSTONE SMELTING" "MOONSTONE ORE" MOONSTONE "ARGENTINE INGOT" "EVENTIDE INGOT"
+
+Moonstone Smelting (Trade ability)
+Command:  smelt <argentine | eventide> ingot
+
+The super-rare moonstone ore is highly prized by metallurgists, and can be
+smelted into imperium and nocturnium ingots to produce valuable argentine and
+eventide metals, respectively.
+
+These metals are generally used in crafts in the 200-300 level range.
+
+See also: RARE METALS, SMELT
+#
 PATTERNS "ADVENTURE CRAFTS" "CRAFTING PATTERNS"
 
 Some items can be found in adventures which allow you to use crafting recipes as
@@ -626,6 +652,20 @@ With Pottery you can craft:
   trinket of conveyance
 
 See also: CLAY, DIG, FINE POTTERY, MASTER CRAFTSMAN
+#
+"PRISMATIC CRYSTALS" "PRISMATIC CRYSTAL"
+
+Prismatic Crystals (Trade ability)
+Command:  craft prismatic crystal
+Cost:  100 mana
+
+This high-level Trade ability allows you to combine a bunch of magic gems into
+one multi-colored gem. The prismatic crystal is used in high-level crafts and
+enchantments.
+
+These gems are generally used in crafts in the 200-300 level range.
+
+See also: CRAFT
 #
 "RAWHIDE STITCHING"
 
@@ -872,6 +912,18 @@ Forge items:
   clips and buckles  (crafter item)
 
 See also: FORGE
+#
+"VERDANT LEATHERS" "BRIAR HIDE" "ABSINTHIAN LEATHER"
+
+Verdant Leathers (Trade ability)
+Command:  craft <briar hide | absinthian leather>
+
+Certain tradesman learn to treat fine leather with a bath of herbs, creating
+magical leathers that are used to make the finest leather weapons and armor.
+
+These leathers are generally used in crafts in the 200-300 level range.
+
+See also: CRAFT, HERBS
 #
 WEAPONCRAFTING WEAPONSMITHING
 
