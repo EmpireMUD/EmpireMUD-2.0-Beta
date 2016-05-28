@@ -322,6 +322,7 @@ When using field  - The variable returns:
 &ccan_gain_new_skills&0 - Checks if the character can gain a new skill from 0.
 &ccancel_adventure_summon&0 - Call this if a script teleports a player around, to
    prevent them from being teleported again if they were adventure-summoned.
+&cchar_target(name)&0 - Finds a visible target character in the room, by name.
 &ccharge_coins(amt)&0 - Charges the actor a number of coins.
 &ccanbeseen&0 - True if the actor can be seen by the mob (always true 
    for non-mob triggers).
