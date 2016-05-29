@@ -33,8 +33,8 @@ end
 Hestian Trinket~
 1 c 2
 use~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
   return 0
   halt
 end
@@ -93,13 +93,7 @@ if !%arg%
 end
 eval item %actor.inventory()%
 eval found 0
-while %item% && !%found
-  eval test %%item.is_name(%arg%)%%
-  if %test%
-    eval found %item%
-  end
-  eval item %item.next_in_list%
-done
+eval found %%actor.obj_target(%arg%)%%
 if !%found%
   %send% %actor% You don't seem to have that.
   halt
@@ -119,8 +113,8 @@ end
 Trinket of Conveyance~
 1 c 2
 use~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
   return 0
   halt
 end
@@ -172,8 +166,8 @@ Letheian Icon use~
 use~
 eval item %arg.car%
 eval sk %arg.cdr%
-eval test %%self.is_name(%item%)%%
-if !(%test% && use /= %cmd%)
+eval test %%actor.obj_target(%item%)%%
+if (%test% != %self%) && (use /= %cmd%)
   return 0
   halt
 end

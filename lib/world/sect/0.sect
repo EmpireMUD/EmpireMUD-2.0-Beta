@@ -17,6 +17,8 @@ D4
 ....~
 &0~
 E
+2 604 0.01 602
+E
 2 28 0.20 27
 E
 2 29 0.20 27
@@ -1848,8 +1850,8 @@ M
 9064 0.90 ad
 S
 #27
-Light Jungle~
-The Jungle~
+Partial Jungle~
+The Jungle, Partially Cleared~
 '^' 12 3 6 d g
 C
 chop, gather~
