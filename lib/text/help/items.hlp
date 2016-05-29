@@ -320,7 +320,8 @@ MAGEWOOD "MAGE WOOD" "ENCHANTED TREE" "ENCHANTED FOREST" "ENCHANTED WOODS" "ENCH
 
 Magewood is a type of lumber sawn from the trees of the enchanted forest. This
 type of forest is extremely rare. To grow it, you must find the strange crystal
-seed, enchant it, plant it, then use the chant of nature to grow it.
+seed, enchant it (Enchant Tools), plant it, then use the chant of nature to
+grow it.
 
 Enchanted Forests are protected from over-chopping because they will grow back
 even from stumps. Be sure to claim the forest, though, as necrovandal cultists
@@ -331,7 +332,7 @@ vandals destroy them.
 
 This wood is generally used in crafts in the 200-300 level range.
 
-See also: ABANDON, CHOP, CLAIM, SAW
+See also: ABANDON, CHOP, CLAIM, ENCHANT TOOLS, SAW
 #
 METALS INGOTS BARS "METAL COMPONENT"
 
