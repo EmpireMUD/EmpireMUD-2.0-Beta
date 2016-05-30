@@ -288,7 +288,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_WITS(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
 			break;
 		case APPLY_AGE:
-			SAFE_ADD(ch->player.time.birth, (mod * SECS_PER_MUD_YEAR), LONG_MIN, LONG_MAX, TRUE);
+			SAFE_ADD(ch->player.time.birth, -(mod * SECS_PER_MUD_YEAR), LONG_MIN, LONG_MAX, TRUE);
 			break;
 		case APPLY_MOVE:
 			SAFE_ADD(GET_MAX_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
