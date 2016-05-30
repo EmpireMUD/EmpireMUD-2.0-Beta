@@ -997,6 +997,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	int account_id = NOTHING, ignore_pos = 0, reward_pos = 0;
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	struct over_time_effect_type *dot, *last_dot = NULL;
+	struct affected_type *af, *next_af, *af_list = NULL;
 	struct player_quest *plrq, *last_plrq = NULL;
 	struct offer_data *offer, *last_offer = NULL;
 	struct alias_data *alias, *last_alias = NULL;
@@ -1009,7 +1010,6 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	int length, i_in[7], iter, num;
 	struct slash_channel *slash;
 	struct cooldown_data *cool;
-	struct affected_type *af;
 	struct quest_task *task;
 	account_data *acct;
 	bitvector_t bit_in;
@@ -1146,9 +1146,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					af->modifier = i_in[3];
 					af->location = i_in[4];
 					af->bitvector = asciiflag_conv(str_in);
-
-					affect_to_char(ch, af);
-					free(af);
+					
+					// store for later
+					LL_APPEND(af_list, af);
 				}
 				else if (PFILE_TAG(line, "Affect Flags:", length)) {
 					AFF_FLAGS(ch) = asciiflag_conv(line + length + 1);
@@ -1780,6 +1780,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		else {
 			GET_LORE(ch) = new_lore;
 		}
+	}
+	
+	// apply affects
+	LL_FOREACH_SAFE(af_list, af, next_af) {
+		affect_to_char(ch, af);
+		free(af);
 	}
 	
 	// safety
