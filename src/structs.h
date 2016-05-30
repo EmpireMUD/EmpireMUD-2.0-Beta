@@ -1355,7 +1355,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_MINING			8
 #define ACT_MINTING			9
 #define ACT_FISHING			10
-	#define ACT_UNUSED1  11
+#define ACT_START_FILLIN	11
 #define ACT_REPAIRING		12
 #define ACT_CHIPPING		13
 #define ACT_PANNING			14

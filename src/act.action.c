@@ -88,6 +88,7 @@ void process_reclaim(char_data *ch);
 void process_repairing(char_data *ch);
 void process_scraping(char_data *ch);
 void process_siring(char_data *ch);
+void process_start_fillin(char_data *ch);
 void process_tanning(char_data *ch);
 
 
@@ -107,7 +108,7 @@ const struct action_data_struct action_data[] = {
 	{ "mining", "is mining at the walls.", ACTF_HASTE | ACTF_FAST_CHORES, process_mining, NULL },	// ACT_MINING
 	{ "minting", "is minting coins.", ACTF_FAST_CHORES, process_minting, cancel_minting },	// ACT_MINTING
 	{ "fishing", "is fishing.", NOBITS, process_fishing, NULL },	// ACT_FISHING
-		{ "unknown", "is doing something.", NOBITS, NULL, NULL },	// unused
+	{ "preparing", "is preparing to fill in the trench.", NOBITS, process_start_fillin, NULL },	// ACT_START_FILLIN
 	{ "repairing", "is doing some repairs.", ACTF_FAST_CHORES | ACTF_HASTE, process_repairing, NULL },	// ACT_REPAIRING
 	{ "chipping", "is chipping rocks.", ACTF_FAST_CHORES, process_chipping, cancel_resource_list },	// ACT_CHIPPING
 	{ "panning", "is panning for gold.", ACTF_FINDER, process_panning, NULL },	// ACT_PANNING
@@ -2027,6 +2028,50 @@ void process_siring(char_data *ch) {
 
 
 /**
+* Tick update for start-fillin.
+*
+* @param char_data *ch The person trying to fill in.
+*/
+void process_start_fillin(char_data *ch) {
+	sector_data *old_sect;
+	
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH)) {
+		// someone already finished the start-fillin
+		start_action(ch, ACT_FILLING_IN, 0);
+		msg_to_char(ch, "You begin to fill in the trench.\r\n");
+		
+		// already finished the trench? start it back to -1 (otherwise, just continue)
+		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) >= 0) {
+			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, -1);
+		}
+	}
+	else if (GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE || !(old_sect = reverse_lookup_evolution_for_sector(SECT(IN_ROOM(ch)), EVO_TRENCH_FULL))) {
+		// anything to reverse it to?
+		msg_to_char(ch, "You can't fill anything in here.\r\n");
+		cancel_action(ch);
+	}
+	else if (GET_ACTION_TIMER(ch) <= 0) {
+		// finished starting the fillin
+		start_action(ch, ACT_FILLING_IN, 0);
+		msg_to_char(ch, "You block off the water and begin to fill in the trench.\r\n");
+		
+		// set it up
+		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(old_sect));
+		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, -1);
+	}
+	else {
+		// decrement
+		GET_ACTION_TIMER(ch) -= 1;
+		
+		if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
+			msg_to_char(ch, "You prepare to fill in the trench...\r\n");
+		}
+		act("$n prepares to fill in the trench...", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+	}
+}
+
+
+/**
 * Ticker for tanners.
 *
 * @param char_data *ch The tanner.
@@ -2286,7 +2331,12 @@ ACMD(do_excavate) {
 ACMD(do_fillin) {
 	sector_data *old_sect;
 	
-	if (GET_ACTION(ch) == ACT_FILLING_IN) {
+	if (GET_ACTION(ch) == ACT_START_FILLIN) {
+		msg_to_char(ch, "You stop preparing to fill in the trench.\r\n");
+		act("$n stops preparing to fill in the trench.", FALSE, ch, 0, 0, TO_ROOM);
+		cancel_action(ch);
+	}
+	else if (GET_ACTION(ch) == ACT_FILLING_IN) {
 		msg_to_char(ch, "You stop filling in the trench.\r\n");
 		act("$n stops filling in the trench.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
@@ -2329,12 +2379,9 @@ ACMD(do_fillin) {
 		msg_to_char(ch, "You don't have permission to fill in here!\r\n");
 	}
 	else {
-		start_action(ch, ACT_FILLING_IN, 0);
-		msg_to_char(ch, "You block off the water and begin to fill in the trench.\r\n");
-
-		// set it up
-		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(old_sect));
-		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, -1);
+		// always takes 1 minute
+		start_action(ch, ACT_START_FILLIN, SECS_PER_REAL_MIN / ACTION_CYCLE_TIME);
+		msg_to_char(ch, "You begin preparing to fill in the trench.\r\n");
 	}
 }
 
