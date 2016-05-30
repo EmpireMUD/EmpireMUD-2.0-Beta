@@ -5,9 +5,9 @@ A strange crystal seed is lying on the ground.~
    This unusual seed is encased in a shell of clear crystal, and it glimmers as
 it catches the light. Legend says that if a sorcerer were to enchant a seed
 like this with a prismatic crystal, it would grow into an entire enchanted
-forest.
+forest. To enchant the seed, use 'enchant seed'. This requires Enchant Tools.
 ~
-3 0 a 3
+3 0 a 4
 0 0 0
 12 0
 R
@@ -26,13 +26,9 @@ the seed has been infused with magic, you need only plant it and use the chant
 of nature to bring it to life. Be sure to claim the tile you plant it on, as
 powerful necrovandals seek out unclaimed enchanted forests.
 ~
-3 j a 4
+3 j a 5
 0 0 0
 12 0
-R
-5511 0
-R
-5164 0
 T 601
 S
 #602
@@ -272,7 +268,7 @@ handle elegant~
 an elegant handle~
 An elegant handle is lying on the ground.~
    This wooden handle has taken on a deep magenta color, and there is a faint
-mist of mana flowing from its exotic leather grip.  
+mist of mana flowing from its exotic leather grip.
 ~
 1 0 ano 4
 0 3 5
