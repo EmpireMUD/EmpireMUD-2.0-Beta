@@ -200,7 +200,7 @@ Gems are a component type encompassing the four magical gems: red bloodstones,
 yellow lightning stones, iridescent blue irises, and glowing green seashells.
 Most recipes require a specific one of these, but a few accept any of them.
 
-See also: COMPONENT
+See also: COMPONENT, PRISMATIC CRYSTAL
 #
 "GLOWING GREEN SEASHELL" "GLOWING SEASHELL" "GREEN SEASHELL" SEASHELL
 
@@ -294,7 +294,7 @@ Leather (component)
 
 Leather is a component type used in many sewing recipes.
 
-See also: COMPONENT, TAN, SKIN
+See also: COMPONENT, TAN, SKIN, VERDANT LEATHERS
 #
 "LIGHTNING STONE" "YELLOW LIGHTNING STONE" "YELLOW STONE"
 
@@ -314,7 +314,7 @@ Lumber is a component type created by sawing logs or trees at a lumber yard. It
 is used for many buildings. If a recipe calls for lumber, any type of lumber is
 usually fine.
 
-See also: COMPONENT, CHOP, SAW
+See also: COMPONENT, CHOP, MAGEWOOD, SAW
 #
 MAGEWOOD "MAGE WOOD" "ENCHANTED TREE" "ENCHANTED FOREST" "ENCHANTED WOODS" "ENCHANTED COPSE" "CRYSTAL SEED" "PRISMATIC SEED" "STRANGE CRYSTAL SEED"
 
@@ -561,7 +561,7 @@ You can weave cotton or wool into cloth. It will go faster if you're at a Tailor
 You can use any type of cloth if a recipe calls for a (textile), but some recipes
 may need a specific type.
 
-See also: COMPONENT, CLOTH, WEAVE, COTTON, WOOL, TAILOR
+See also: COMPONENT, CLOTH, COTTON, HERBCLOTH WEAVING, TAILOR, WEAVE, WOOL
 #
 "TRADE COMMAND"
 

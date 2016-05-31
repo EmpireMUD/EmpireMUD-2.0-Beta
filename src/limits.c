@@ -50,6 +50,7 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 extern obj_data *die(char_data *ch, char_data *killer);
 void death_log(char_data *ch, char_data *killer, int type);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
@@ -290,6 +291,7 @@ void point_update_char(char_data *ch) {
 	void remove_quest_items(char_data *ch);
 	
 	struct cooldown_data *cool, *next_cool;
+	struct instance_data *inst;
 	empire_data *emp;
 	char_data *c;
 	bool found;
@@ -386,6 +388,16 @@ void point_update_char(char_data *ch) {
 					GET_MANA(ch) = GET_MAX_MANA(ch);
 					if (GET_POS(ch) < POS_SLEEPING) {
 						GET_POS(ch) = POS_STANDING;
+					}
+					
+					// reset scaling if possible...
+					inst = get_instance_by_id(MOB_INSTANCE_ID(ch));
+					if (!inst && IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+						inst = find_instance_by_room(IN_ROOM(ch), FALSE);
+					}
+					// if no instance or not level-locked
+					if (!inst || inst->level <= 0) {
+						GET_CURRENT_SCALE_LEVEL(ch) = 0;
 					}
 				}
 			}
