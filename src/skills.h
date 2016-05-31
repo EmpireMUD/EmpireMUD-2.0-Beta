@@ -659,8 +659,9 @@ struct attack_hit_type {
 	const char *singular;	// You "slash"
 	const char *plural;	// $n "slashes"
 	double speed[NUM_SPEEDS];	// { fast, normal, slow }
-	int weapon_type;	// WEAPON_x
-	int damage_type;	// DAM_x
+	int weapon_type;	// WEAPON_ type
+	int damage_type;	// DAM_ type
+	bool disarmable;	// whether or not disarm works
 };
 
 
