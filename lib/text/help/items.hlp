@@ -232,7 +232,9 @@ Create a handle using the craft command.
 Handles are used in forging and crafting to provide a grasping surface to a
 tool or weapon. The most basic handles are made from sticks.
 
-See also: COMPONENT, CRAFT, FORGE
+The more advanced elegant handle can be made from magic wood.
+
+See also: COMPONENT, CRAFT, FORGE, EXQUISITE WOODWORKING
 #
 HERB HERBS "HERB COMPONENT"
 
