@@ -2037,7 +2037,7 @@ struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES] = {
 	{ "fire", "burn", "burns", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_FIRE, TRUE },
 	{ "vampire claws", "claw", "claws", { 2.4, 2.6, 2.8 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
 	{ "crush", "crush", "crushes", { 3.6, 3.8, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
-	{ "hit", "hit", "hits", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALASE },
+	{ "hit", "hit", "hits", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
 	{ "magic fire", "blast", "blasts", { 3.6, 3.8, 4.0 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
 	{ "lightning staff", "zap", "zaps", { 2.2, 2.5, 2.8 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
 	{ "burn staff", "burn", "burns", { 2.6, 2.9, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
