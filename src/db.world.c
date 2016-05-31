@@ -942,7 +942,7 @@ static void annual_update_map_tile(room_data *room) {
 	}
 	
 	// fill in trenches slightly
-	if (ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH) && (trenched = get_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS)) < 0) {
+	if (ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH) && !ROOM_OWNER(room) && (trenched = get_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS)) < 0) {
 		// move halfway toward initial: remember initial value is negative
 		amount = (config_get_int("trench_initial_value") - trenched) / 2;
 		trenched += amount;

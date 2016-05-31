@@ -1230,6 +1230,10 @@ void process_excavating(char_data *ch) {
 			msg_to_char(ch, "You stop excavating, as this is no longer a trench.\r\n");
 			cancel_action(ch);
 		}
+		else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+			msg_to_char(ch, "You no longer have permission to excavate here.\r\n");
+			cancel_action(ch);
+		}
 		else {
 			// count up toward zero
 			add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, 1);
@@ -1278,6 +1282,10 @@ void process_fillin(char_data *ch) {
 		}
 		else if (!ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH)) {
 			msg_to_char(ch, "You stop filling in, as this is no longer a trench.\r\n");
+			cancel_action(ch);
+		}
+		else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+			msg_to_char(ch, "You no longer have permission to fill in here.\r\n");
 			cancel_action(ch);
 		}
 		else {
@@ -2050,7 +2058,18 @@ void process_start_fillin(char_data *ch) {
 		msg_to_char(ch, "You can't fill anything in here.\r\n");
 		cancel_action(ch);
 	}
+	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You no longer have permission to fill in here.\r\n");
+		cancel_action(ch);
+	}
 	else if (GET_ACTION_TIMER(ch) <= 0) {
+		// final permissions check
+		if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+			msg_to_char(ch, "You no longer have permission to fill in here.\r\n");
+			cancel_action(ch);
+			return;
+		}
+		
 		// finished starting the fillin
 		start_action(ch, ACT_FILLING_IN, 0);
 		msg_to_char(ch, "You block off the water and begin to fill in the trench.\r\n");
@@ -2291,7 +2310,7 @@ ACMD(do_excavate) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already quite busy.\r\n");
 	}
-	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
+	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		// 1st check: allies ok
 		msg_to_char(ch, "You don't have permission to excavate here!\r\n");
 	}
@@ -2350,7 +2369,7 @@ ACMD(do_fillin) {
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
 		msg_to_char(ch, "You can't do that here.\r\n");
 	}
-	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
+	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		// 1st check: allies can help
 		msg_to_char(ch, "You don't have permission to fill in here!\r\n");
 	}
