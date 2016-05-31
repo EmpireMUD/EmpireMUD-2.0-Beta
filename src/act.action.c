@@ -1230,6 +1230,10 @@ void process_excavating(char_data *ch) {
 			msg_to_char(ch, "You stop excavating, as this is no longer a trench.\r\n");
 			cancel_action(ch);
 		}
+		else if (!ROOM_OWNER(IN_ROOM(ch))) {
+			msg_to_char(ch, "You can only excavate claimed tiles.\r\n");
+			cancel_action(ch);
+		}
 		else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 			msg_to_char(ch, "You no longer have permission to excavate here.\r\n");
 			cancel_action(ch);
@@ -1282,6 +1286,10 @@ void process_fillin(char_data *ch) {
 		}
 		else if (!ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH)) {
 			msg_to_char(ch, "You stop filling in, as this is no longer a trench.\r\n");
+			cancel_action(ch);
+		}
+		else if (!ROOM_OWNER(IN_ROOM(ch))) {
+			msg_to_char(ch, "You can only fill in claimed tiles.\r\n");
 			cancel_action(ch);
 		}
 		else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
@@ -2058,6 +2066,10 @@ void process_start_fillin(char_data *ch) {
 		msg_to_char(ch, "You can't fill anything in here.\r\n");
 		cancel_action(ch);
 	}
+	else if (!ROOM_OWNER(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can only fill in claimed tiles.\r\n");
+		cancel_action(ch);
+	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You no longer have permission to fill in here.\r\n");
 		cancel_action(ch);
@@ -2294,7 +2306,7 @@ ACMD(do_excavate) {
 	extern bool is_entrance(room_data *room);
 	
 	struct evolution_data *evo;
-
+	
 	if (GET_ACTION(ch) == ACT_EXCAVATING) {
 		msg_to_char(ch, "You stop the excavation.\r\n");
 		act("$n stops excavating the trench.", FALSE, ch, 0, 0, TO_ROOM);
@@ -2309,6 +2321,9 @@ ACMD(do_excavate) {
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already quite busy.\r\n");
+	}
+	else if (!ROOM_OWNER(IN_ROOM(ch))) {
+		msg_to_char(ch, "You must claim a tile in order to excavate it.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		// 1st check: allies ok
@@ -2368,6 +2383,9 @@ ACMD(do_fillin) {
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
 		msg_to_char(ch, "You can't do that here.\r\n");
+	}
+	else if (!ROOM_OWNER(IN_ROOM(ch))) {
+		msg_to_char(ch, "You must claim a tile in order to fill it in.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		// 1st check: allies can help
