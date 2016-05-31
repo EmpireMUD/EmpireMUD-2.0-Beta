@@ -397,7 +397,8 @@ void point_update_char(char_data *ch) {
 					}
 					// if no instance or not level-locked
 					if (!inst || inst->level <= 0) {
-						GET_CURRENT_SCALE_LEVEL(ch) = 0;
+						// currently disabled because it gives mirrorimages more health
+						// GET_CURRENT_SCALE_LEVEL(ch) = 0;
 					}
 				}
 			}
