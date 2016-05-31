@@ -331,7 +331,7 @@ end
 * What are we buying?
 eval check %arg%
 eval vnum 0
-eval name nothing
+set name nothing
 if firecloth /= %check%
   %send% %actor% Did you mean firecloth skirt or firecloth pauldrons?
   halt
@@ -345,64 +345,64 @@ elseif fiend /= %check%
   %send% %actor% Did you mean fiendskin jerkin or fiendhorn bladed bow?
   halt
 elseif firecloth skirt /= %check%
-  eval name a firecloth skirt
+  set name a firecloth skirt
   eval vnum 18075
 elseif firecloth pauldrons /= %check%
-  eval name firecloth pauldrons
+  set name firecloth pauldrons
   eval vnum 18076
 elseif hearthflame skirt /= %check%
-  eval name a hearthflame skirt
+  set name a hearthflame skirt
   eval vnum 18077
 elseif hearthflame sleeves /= %check%
-  eval name hearthflame sleeves
+  set name hearthflame sleeves
   eval vnum 18078
 elseif magma-forged pauldrons /= %check%
-  eval name magma-forged pauldrons
+  set name magma-forged pauldrons
   eval vnum 18079
 elseif core-forged plate armor /= %check%
-  eval name core-forged plate armor
+  set name core-forged plate armor
   eval vnum 18080
 elseif huge spiked pauldrons /= %check%
-  eval name huge spiked pauldrons
+  set name huge spiked pauldrons
   eval vnum 18081
 elseif fiendskin jerkin /= %check%
-  eval name a fiendskin jerkin
+  set name a fiendskin jerkin
   eval vnum 18082
 elseif bottomless pouch /= %check%
-  eval name a bottomless pouch
+  set name a bottomless pouch
   eval vnum 18083
 elseif igneous shield /= %check%
-  eval name an igneous shield
+  set name an igneous shield
   eval vnum 18084
 elseif cold lava ring /= %check%
-  eval name a cold lava ring
+  set name a cold lava ring
   eval vnum 18085
 elseif mantle of flames /= %check%
-  eval name a mantle of flames
+  set name a mantle of flames
   eval vnum 18086
 elseif frozen flame earrings /= %check%
-  eval name frozen flame earrings
+  set name frozen flame earrings
   eval vnum 18087
 elseif emberweave gloves /= %check%
-  eval name emberweave gloves
+  set name emberweave gloves
   eval vnum 18088
 elseif molten gauntlets /= %check%
-  eval name molten gauntlets
+  set name molten gauntlets
   eval vnum 18089
 elseif molten fiend earrings /= %check%
-  eval name the molten fiend's earrings
+  set name the molten fiend's earrings
   eval vnum 18090
 elseif Flametalon /= %check%
-  eval name Flametalon
+  set name Flametalon
   eval vnum 18091
 elseif obsidian earring /= %check%
-  eval name an obsidian earring
+  set name an obsidian earring
   eval vnum 18092
 elseif crown of abyssal flames /= %check%
-  eval name a crown of abyssal flames
+  set name a crown of abyssal flames
   eval vnum 18093
 elseif fiendhorn bladed bow /= %check%
-  eval name a fiendhorn bladed bow
+  set name a fiendhorn bladed bow
   eval vnum 18094
 end
 if !%vnum%

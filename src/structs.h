@@ -289,6 +289,7 @@ typedef struct vehicle_data vehicle_data;
 #define GLB_FLAG_IN_DEVELOPMENT  BIT(0)	// not live
 #define GLB_FLAG_ADVENTURE_ONLY  BIT(1)	// does not apply outside same-adventure
 #define GLB_FLAG_CUMULATIVE_PERCENT  BIT(2)	// accumulates percent with other valid globals instead of its own percent
+#define GLB_FLAG_CHOOSE_LAST  BIT(3)	// the first choose-last global that passes is saved for later, if nothing else is chosen
 
 
 // Group Defines
@@ -1061,6 +1062,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_MOVE_DRIFTS  30
 #define MOB_MOVE_BOUNCES  31
 #define MOB_MOVE_FLOWS  32
+#define MOB_MOVE_LEAVES  33
 
 
 // name sets: add matching files in lib/text/names/
@@ -1353,7 +1355,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_MINING			8
 #define ACT_MINTING			9
 #define ACT_FISHING			10
-	#define ACT_UNUSED1  11
+#define ACT_START_FILLIN	11
 #define ACT_REPAIRING		12
 #define ACT_CHIPPING		13
 #define ACT_PANNING			14
@@ -1467,6 +1469,26 @@ typedef struct vehicle_data vehicle_data;
 #define FULL  1
 #define THIRST  2
 #define NUM_CONDS  3
+
+
+// FM_x: combat messages
+#define FM_MY_HITS  BIT(0)	// player's own hits
+#define FM_MY_MISSES  BIT(1)	// player's misses
+#define FM_HITS_AGAINST_ME  BIT(2)	// player is hit
+#define FM_MISSES_AGAINST_ME  BIT(3)	// player is missed
+#define FM_ALLY_HITS  BIT(4)	// any allied character hits
+#define FM_ALLY_MISSES  BIT(5)	// any allied player misses
+#define FM_HITS_AGAINST_ALLIES  BIT(6)	// any ally is hit
+#define FM_MISSES_AGAINST_ALLIES  BIT(7)	// any ally is missed
+#define FM_HITS_AGAINST_TARGET  BIT(8)	// anybody hits your target
+#define FM_MISSES_AGAINST_TARGET  BIT(9)	// anybody misses your target
+#define FM_HITS_AGAINST_TANK  BIT(10)	// anybody hits tank (target's focus)
+#define FM_MISSES_AGAINST_TANK  BIT(11)	// anybody misses tank (target's focus)
+#define FM_OTHER_HITS  BIT(12)	// hits not covered by other rules
+#define FM_OTHER_MISSES  BIT(13)	// misses not covered by other rules
+#define FM_AUTO_DIAGNOSE  BIT(14)	// does a diagnose after each hit
+
+#define DEFAULT_FIGHT_MESSAGES  (FM_MY_HITS | FM_MY_MISSES | FM_HITS_AGAINST_ME | FM_MISSES_AGAINST_ME | FM_ALLY_HITS | FM_ALLY_MISSES | FM_HITS_AGAINST_ALLIES | FM_MISSES_AGAINST_ALLIES | FM_HITS_AGAINST_TARGET | FM_MISSES_AGAINST_TARGET |FM_HITS_AGAINST_TANK | FM_MISSES_AGAINST_TANK | FM_OTHER_HITS | FM_OTHER_MISSES | FM_AUTO_DIAGNOSE)
 
 
 // GRANT_X: Grant flags allow players to use abilities below the required access level
@@ -2897,7 +2919,8 @@ struct player_special_data {
 	byte immortal_level;	// stored so that if level numbers are changed, imms stay at the correct level
 	bitvector_t grants;	// grant imm abilities
 	bitvector_t syslogs;	// which syslogs people want to see
-	bitvector_t bonus_traits;	// BONUS_x
+	bitvector_t bonus_traits;	// BONUS_
+	bitvector_t fight_messages;	// FM_ flags
 	ubyte bad_pws;	// number of bad password attemps
 	struct mail_data *mail_pending;	// uncollected letters
 	int create_alt_id;	// used in CON_Q_ALT_NAME and CON_Q_ALT_PASSWORD

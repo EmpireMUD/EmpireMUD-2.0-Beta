@@ -997,6 +997,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	int account_id = NOTHING, ignore_pos = 0, reward_pos = 0;
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	struct over_time_effect_type *dot, *last_dot = NULL;
+	struct affected_type *af, *next_af, *af_list = NULL;
 	struct player_quest *plrq, *last_plrq = NULL;
 	struct offer_data *offer, *last_offer = NULL;
 	struct alias_data *alias, *last_alias = NULL;
@@ -1009,7 +1010,6 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	int length, i_in[7], iter, num;
 	struct slash_channel *slash;
 	struct cooldown_data *cool;
-	struct affected_type *af;
 	struct quest_task *task;
 	account_data *acct;
 	bitvector_t bit_in;
@@ -1146,9 +1146,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					af->modifier = i_in[3];
 					af->location = i_in[4];
 					af->bitvector = asciiflag_conv(str_in);
-
-					affect_to_char(ch, af);
-					free(af);
+					
+					// store for later
+					LL_APPEND(af_list, af);
 				}
 				else if (PFILE_TAG(line, "Affect Flags:", length)) {
 					AFF_FLAGS(ch) = asciiflag_conv(line + length + 1);
@@ -1350,7 +1350,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'F': {
-				if (PFILE_TAG(line, "Fight Prompt:", length)) {
+				if (PFILE_TAG(line, "Fight Messages:", length)) {
+					GET_FIGHT_MESSAGES(ch) = asciiflag_conv(line + length + 1);
+				}
+				else if (PFILE_TAG(line, "Fight Prompt:", length)) {
 					if (GET_FIGHT_PROMPT(ch)) {
 						free(GET_FIGHT_PROMPT(ch));
 					}
@@ -1779,6 +1782,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		}
 	}
 	
+	// apply affects
+	LL_FOREACH_SAFE(af_list, af, next_af) {
+		affect_to_char(ch, af);
+		free(af);
+	}
+	
 	// safety
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_EXTRACTED | PLR_DONTSET);
 	
@@ -2162,6 +2171,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'F'
+	fprintf(fl, "Fight Messages: %s\n", bitv_to_alpha(GET_FIGHT_MESSAGES(ch)));
 	if (GET_FIGHT_PROMPT(ch)) {
 		fprintf(fl, "Fight Prompt: %s\n", GET_FIGHT_PROMPT(ch));
 	}
@@ -3315,6 +3325,7 @@ void init_player(char_data *ch) {
 	}
 	
 	ch->char_specials.affected_by = 0;
+	GET_FIGHT_MESSAGES(ch) = DEFAULT_FIGHT_MESSAGES;
 
 	for (i = 0; i < NUM_CONDS; i++)
 		GET_COND(ch, i) = (GET_ACCESS_LEVEL(ch) == LVL_IMPL ? UNLIMITED : 0);
@@ -3407,12 +3418,13 @@ void start_new_character(char_data *ch) {
 	extern int tips_of_the_day_size;
 	
 	char lbuf[MAX_INPUT_LENGTH];
-	struct global_data *glb, *next_glb;
+	struct global_data *glb, *next_glb, *choose_last;
 	int cumulative_prc, iter;
 	bool done_cumulative = FALSE;
 	struct archetype_gear *gear;
 	struct archetype_skill *sk;
 	archetype_data *arch;
+	bool found;
 	
 	// announce to existing players that we have a newbie
 	mortlog("%s has joined the game", PERS(ch, ch, TRUE));
@@ -3506,8 +3518,10 @@ void start_new_character(char_data *ch) {
 			give_newbie_gear(ch, gear->vnum, gear->wear);
 		}
 		
-		// global newbie gear
+		// global newbie gear -- TODO there must be a better, more generic way to run globals -pc 5/24/2016
 		cumulative_prc = number(1, 10000);
+		choose_last = NULL;
+		found = FALSE;
 		HASH_ITER(hh, globals_table, glb, next_glb) {
 			if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR || IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
 				continue;
@@ -3535,7 +3549,24 @@ void start_new_character(char_data *ch) {
 			}
 		
 			// success!
+			
+			// check choose-last
+			if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CHOOSE_LAST)) {
+				if (!choose_last) {
+					choose_last = glb;
+				}
+				continue;
+			}
+			
+			// safe to apply
 			for (gear = GET_GLOBAL_GEAR(glb); gear; gear = gear->next) {
+				give_newbie_gear(ch, gear->vnum, gear->wear);
+			}
+			found = TRUE;
+		}
+		// do the choose-last
+		if (choose_last && !found) {
+			for (gear = GET_GLOBAL_GEAR(choose_last); gear; gear = gear->next) {
 				give_newbie_gear(ch, gear->vnum, gear->wear);
 			}
 		}

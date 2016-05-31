@@ -447,7 +447,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	msg_to_char(to, "  Age: %-19.19s Play Time: %-13.13s", buf, buf1);
 	
 	// row 2 col 3: rank
-	if ((emp = GET_LOYALTY(ch))) {
+	if ((emp = GET_LOYALTY(ch)) && !IS_NPC(ch)) {
 		msg_to_char(to, " Rank: %s&0\r\n", EMPIRE_RANK(emp, GET_RANK(ch)-1));
 	}
 	else {

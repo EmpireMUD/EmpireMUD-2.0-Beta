@@ -566,7 +566,10 @@ to fill with water. Eventually, it becomes a river.
 
 The "fillin" command is the opposite of excavate: it fills trenches in until
 they are ordinary plains or desert again. It will also work on a player-created
-oasis or river.
+oasis or river. It takes 1 minute to begin a fillin on a completed trench; if
+you cancel the action or are interrupted, you must start the minute over.
+
+You can only excavate and fill in on claimed land.
 
 If you fill a desert trench, it will become an Oasis instead of a river. Oases
 convert into rivers if they are adjacent to other rivers or to oceans.
@@ -578,7 +581,7 @@ There are three ways to fill a finished trench with water:
 
 An unfinished trench will not fill with water.
 
-See also: OASIS DRAINAGE
+See also: CLAIM, OASIS DRAINAGE
 #
 EXCHANGE
 

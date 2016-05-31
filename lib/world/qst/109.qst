@@ -4,7 +4,7 @@ That Meddling Knight~
 of understanding the colossal red dragon as she tells you the tale of a knight
 who won't stop pestering her. It seems dragons do not take kindly to knights
 trying to slay them, and this dragon will reward you if you will put an end to
-the knight's meddling.  
+the knight's meddling.
    Seek out Sir Vivor and defeat him in combat, then return to the colossal
 red dragon for your reward. You can only complete this quest if you haven't
 also done Sir Vivor's quest in the same adventure instance.
@@ -35,7 +35,7 @@ Slay The Red Dragon~
 once destroyed his entire village. Of course, to a lowly knight like Sir Vivor,
 all dragons look the same. As such, he has set out to find every red dragon
 cave and defeat them all. But as it turns out, Sir Vivor isn't particularly
-brave or strong. He needs you to defeat the dragon for him.  
+brave or strong. He needs you to defeat the dragon for him.
    Find the colossal red dragon's cave and defeat the beast, then return to
 Sir Vivor for your reward. You can only complete this quest if you haven't
 also done the dragon's quest in the same adventure instance.
@@ -62,9 +62,9 @@ S
 #10902
 The Dragon's Hoard~
    You met a shifty, nervous-looking thief named Bangles. He has a buyer who is
-looking for a rare red dragon hoard, but Bangles isn't exctly known for his
+looking for a rare red dragon hoard, but Bangles isn't exactly known for his
 ability to sneak about. If you can help Bangles get the hoard, he's willing to
-split the profits with you. 
+split the profits with you.
    Find the nearby red dragon cave, sneak in, and pickpocket the dragon. Once
 you have her hoard, sneak back out and return to Bangles for your reward. You
 can complete this quest once per adventure instance, and it doesn't stop you
@@ -74,7 +74,7 @@ quest. You're not much of a thief if you have to kill the dragon to get it.
 ~
 You split the dragon's treasure with the thief!
 ~
-10 bc 250 300 -1
+11 bc 250 300 -1
 A
 1 10902
 P

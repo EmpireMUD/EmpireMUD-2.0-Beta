@@ -496,7 +496,6 @@ buy~
 eval vnum -1
 eval cost 0
 eval named a thing
-eval keyw skycleaver
 eval currency dragtoken_128
 if (!%arg%)
   %send% %actor% Type 'list' to see what's available.
@@ -533,15 +532,15 @@ elseif pen /= %arg%
   eval named a dragonquill pen
   * Start of crafting patterns
 elseif warhammer /= %arg%
-  eval vnum 10930
+  eval vnum 10931
   eval cost 12
   eval named a dragonsteel warhammer schematic
 elseif claymore /= %arg%
-  eval vnum 10931
+  eval vnum 10932
   eval cost 12
   eval named a dragonsteel claymore schematic
 elseif mace /= %arg%
-  eval vnum 10932
+  eval vnum 10933
   eval cost 12
   eval named a dragonbone mace schematic
 elseif wand /= %arg%

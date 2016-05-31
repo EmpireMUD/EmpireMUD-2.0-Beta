@@ -288,7 +288,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_WITS(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
 			break;
 		case APPLY_AGE:
-			ch->player.time.birth -= (mod * SECS_PER_MUD_YEAR);
+			SAFE_ADD(ch->player.time.birth, -(mod * SECS_PER_MUD_YEAR), LONG_MIN, LONG_MAX, TRUE);
 			break;
 		case APPLY_MOVE:
 			SAFE_ADD(GET_MAX_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
@@ -2982,7 +2982,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
 	bool any = FALSE, done_cumulative = FALSE;
-	struct global_data *glb, *next_glb;
+	struct global_data *glb, *next_glb, *choose_last;
 	int cumulative_prc;
 	adv_data *adv;
 	
@@ -2993,6 +2993,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 	
 	adv = get_adventure_for_vnum(GET_MOB_VNUM(mob));
 	cumulative_prc = number(1, 10000);
+	choose_last = NULL;
 
 	HASH_ITER(hh, globals_table, glb, next_glb) {
 		if (GET_GLOBAL_TYPE(glb) != GLOBAL_MOB_INTERACTIONS) {
@@ -3046,7 +3047,22 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 		}
 		
 		// we have a match!
+		
+		// check choose-last
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CHOOSE_LAST)) {
+			if (!choose_last) {
+				choose_last = glb;
+			}
+			continue;
+		}
+		
+		// not choose-last: run it
 		any |= run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), type, IN_ROOM(ch), mob, NULL, func);
+	}
+	
+	// do the choose-last
+	if (choose_last && !any) {
+		any |= run_interactions(ch, GET_GLOBAL_INTERACTIONS(choose_last), type, IN_ROOM(ch), mob, NULL, func);
 	}
 	
 	return any;

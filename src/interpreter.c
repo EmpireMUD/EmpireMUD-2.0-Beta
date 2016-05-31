@@ -166,6 +166,7 @@ ACMD(do_expel);
 
 ACMD(do_familiar);
 ACMD(do_feed);
+ACMD(do_fightmessages);
 ACMD(do_file);
 ACMD(do_fillin);
 ACMD(do_findmaintenance);
@@ -672,6 +673,8 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "familiar", POS_STANDING, do_familiar, NO_MIN, CTYPE_SKILL ),
 	SCMD_CMD( "fastmorph", POS_RESTING, do_morph, NO_MIN, CTYPE_MOVE, SCMD_FASTMORPH ),
 	SIMPLE_CMD( "feed", POS_STANDING, do_feed, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "fightmessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "fmessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "file", POS_DEAD, do_file, LVL_START_IMM, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "fillin", POS_STANDING, do_fillin, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "findmaintenance", POS_DEAD, do_findmaintenance, NO_MIN, CTYPE_EMPIRE ),
