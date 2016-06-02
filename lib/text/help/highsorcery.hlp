@@ -236,8 +236,12 @@ It's good enough to fool at least one of the people hitting you (they will
 switch targets to the mirror image), and none of the people attacking you will
 see the message that you split in two.
 
-Mirror images are charmed, so they take orders. Gain experience by summoning
-a mirror image.
+Mirror images are charmed, so they take orders. They can't be healed and will
+only rescue you in combat one time. Once combat ends, they can't start combat
+on their own, so they can't be re-used and are only useful when summoned in
+combat. You can dismiss the mirror image and summon a new one.
+
+Gain experience by summoning a mirror image.
 
 See also: ORDER
 #
