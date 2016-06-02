@@ -1443,6 +1443,7 @@ ACMD(do_resurrect) {
 ACMD(do_skybrand) {
 	char_data *vict = NULL;
 	int cost = 30;
+	int dmg;
 	
 	if (!can_use_ability(ch, ABIL_SKYBRAND, MANA, cost, COOLDOWN_SKYBRAND)) {
 		return;
@@ -1490,8 +1491,16 @@ ACMD(do_skybrand) {
 		act("You mark $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n marks you with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n marks $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_NOTVICT);
-	
-		apply_dot_effect(vict, ATYPE_SKYBRAND, 6, DAM_MAGICAL, get_ability_level(ch, ABIL_SKYBRAND) / 24, 3, ch);
+		
+		dmg = get_ability_level(ch, ABIL_SKYBRAND) / 24;
+		if (IS_CLASS_ABILITY(ch, ABIL_SKYBRAND)) {
+			dmg = MAX(dmg, (get_approximate_level(ch) / 24));
+		}
+		
+		// spread bonus magical over the whole duration
+		dmg += GET_BONUS_MAGICAL(ch) / 6;
+		
+		apply_dot_effect(vict, ATYPE_SKYBRAND, 6, DAM_MAGICAL, dmg, 3, ch);
 		engage_combat(ch, vict, FALSE);
 	}
 	
