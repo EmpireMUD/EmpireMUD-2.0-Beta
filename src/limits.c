@@ -391,14 +391,15 @@ void point_update_char(char_data *ch) {
 					}
 					
 					// reset scaling if possible...
-					inst = get_instance_by_id(MOB_INSTANCE_ID(ch));
-					if (!inst && IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
-						inst = find_instance_by_room(IN_ROOM(ch), FALSE);
-					}
-					// if no instance or not level-locked
-					if (!inst || inst->level <= 0) {
-						// currently disabled because it gives mirrorimages more health
-						// GET_CURRENT_SCALE_LEVEL(ch) = 0;
+					if (!MOB_FLAGGED(ch, MOB_NO_RESCALE)) {
+						inst = get_instance_by_id(MOB_INSTANCE_ID(ch));
+						if (!inst && IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+							inst = find_instance_by_room(IN_ROOM(ch), FALSE);
+						}
+						// if no instance or not level-locked
+						if (!inst || inst->level <= 0) {
+							GET_CURRENT_SCALE_LEVEL(ch) = 0;
+						}
 					}
 				}
 			}

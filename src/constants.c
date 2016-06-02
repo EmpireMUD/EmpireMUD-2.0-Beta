@@ -1469,6 +1469,7 @@ const char *action_bits[] = {
 	"!LOOT",
 	"!TELEPORT",
 	"!EXP",
+	"!RESCALE",
 	"\n"
 };
 

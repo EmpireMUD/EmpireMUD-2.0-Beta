@@ -231,14 +231,15 @@ Usage:  mirrorimage
 Cooldown:  5 minutes
 Cost:  40 mana
 
-This spell creates an identical duplicate of the caster (with reduced health).
-It's good enough to fool at least one of the people hitting you.
+This spell creates an identical duplicate of the caster that deals no damage.
+It's good enough to fool at least one of the people hitting you (they will
+switch targets to the mirror image), and none of the people attacking you will
+see the message that you split in two.
 
-The mirror image counts as a familiar.
+Mirror images are charmed, so they take orders. Gain experience by summoning
+a mirror image.
 
-Gain experience by summoning it.
-
-See also: FAMILIAR, DISMISS, ORDER
+See also: ORDER
 #
 "PHOENIX RITE"
 

@@ -997,7 +997,7 @@ ACMD(do_mirrorimage) {
 	
 	char_data *mob, *other;
 	obj_data *wield;
-	int cost = 40, iter;
+	int cost = 40;
 	mob_vnum vnum = MIRROR_IMAGE_MOB;
 	bool found;
 	
@@ -1005,8 +1005,16 @@ ACMD(do_mirrorimage) {
 		return;
 	}
 	
-	if (has_familiar(ch)) {
-		msg_to_char(ch, "You can't summon a mirror image while you already have a charmed follower.\r\n");
+	// limit 1
+	found = FALSE;
+	LL_FOREACH(character_list, other) {
+		if (ch != other && IS_NPC(other) && GET_MOB_VNUM(other) == vnum && other->master == ch) {
+			found = TRUE;
+			break;
+		}
+	}
+	if (found) {
+		msg_to_char(ch, "You can't summon a second mirror image.\r\n");
 		return;
 	}
 	
@@ -1028,26 +1036,28 @@ ACMD(do_mirrorimage) {
 	sprintf(buf, "%s is standing here.\r\n", GET_SHORT_DESC(mob));
 	*buf = UPPER(*buf);
 	GET_LONG_DESC(mob) = str_dup(buf);
-
+	
 	// stats
 	GET_REAL_SEX(mob) = GET_REAL_SEX(ch);
 	
-	mob->points.max_pools[HEALTH] = MIN(100, GET_HEALTH(ch));	// NOTE lower health
-	mob->points.current_pools[HEALTH] = MIN(100, GET_HEALTH(ch));	// NOTE lower health
+	// inherit scaled mob health
+	// mob->points.max_pools[HEALTH] = get_approximate_level(ch) * level_health_mod;
+	// mob->points.current_pools[HEALTH] = mob->points.max_pools[HEALTH];
 	mob->points.max_pools[MOVE] = GET_MAX_MOVE(ch);
 	mob->points.current_pools[MOVE] = GET_MOVE(ch);
 	mob->points.max_pools[MANA] = GET_MAX_MANA(ch);
 	mob->points.current_pools[MANA] = GET_MANA(ch);
-	mob->points.max_pools[BLOOD] = GET_MAX_BLOOD(ch);
-	mob->points.current_pools[BLOOD] = GET_BLOOD(ch);
+	mob->points.max_pools[BLOOD] = 10;	// not meant to be a blood source
+	mob->points.current_pools[BLOOD] = 10;
 	
-	for (iter = 0; iter < NUM_EXTRA_ATTRIBUTES; ++iter) {
-		GET_EXTRA_ATT(mob, iter) = GET_EXTRA_ATT(ch, iter);
-	}
-	
+	// mimic weapon
 	wield = GET_EQ(ch, WEAR_WIELD);
 	MOB_ATTACK_TYPE(mob) = wield ? GET_WEAPON_TYPE(wield) : TYPE_HIT;
-	MOB_DAMAGE(mob) = wield ? GET_WEAPON_DAMAGE_BONUS(wield) : 3;
+	MOB_DAMAGE(mob) = 3;	// deliberately low (it will miss anyway)
+	
+	// mirrors are no good at hitting or dodging
+	mob->mob_specials.to_hit = 0;
+	mob->mob_specials.to_dodge = 0;
 	
 	mob->real_attributes[STRENGTH] = GET_STRENGTH(ch);
 	mob->real_attributes[DEXTERITY] = GET_DEXTERITY(ch);
@@ -1055,12 +1065,12 @@ ACMD(do_mirrorimage) {
 	mob->real_attributes[GREATNESS] = GET_GREATNESS(ch);
 	mob->real_attributes[INTELLIGENCE] = GET_INTELLIGENCE(ch);
 	mob->real_attributes[WITS] = GET_WITS(ch);
+
 	SET_BIT(AFF_FLAGS(mob), AFF_CHARM);
-	SET_BIT(MOB_FLAGS(mob), MOB_FAMILIAR);
+	SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);
 	affect_total(mob);
 	
 	act("You create a mirror image to distract your foes!", FALSE, ch, NULL, NULL, TO_CHAR);
-	act("$n suddenly splits in two!", FALSE, ch, NULL, NULL, TO_ROOM);
 	
 	// switch at least 1 thing that's hitting ch
 	found = FALSE;
@@ -1070,6 +1080,9 @@ ACMD(do_mirrorimage) {
 				found = TRUE;
 				FIGHTING(other) = mob;
 			}
+		}
+		else if (other != ch) {	// only people not hitting ch see the split
+			act("$n suddenly splits in two!", TRUE, ch, NULL, other, TO_VICT);
 		}
 	}
 	

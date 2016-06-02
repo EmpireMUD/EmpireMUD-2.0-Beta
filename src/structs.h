@@ -1026,6 +1026,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_NO_LOOT  BIT(29)	// D. do not drop loot
 #define MOB_NO_TELEPORT  BIT(30)  // E. cannot teleport to this mob
 #define MOB_NO_EXPERIENCE  BIT(31)	// F. players get no exp against this mob
+#define MOB_NO_RESCALE  BIT(32)	// G. mob won't rescale (after the first time), e.g. if specific traits were set
 
 
 // MOB_MOVE_x: mob/vehicle movement types
