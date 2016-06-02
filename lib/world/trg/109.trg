@@ -248,10 +248,27 @@ if !%self.fighting% && %self.varexists(enrage_counter)%
   if %self.enrage_counter% == 0
     halt
   end
+  if %self.aff_flagged(!ATTACK)%
+    halt
+  end
+  if %self.aff_flagged(!SEE)%
+    %echo% %self.name% returns.
+  end
   %load% mob %self.vnum%
-  %echo% %self.name% settles back down to rest.
+  %echo% %self.name% settles down to rest.
   %purge% %self%
 end
+~
+#10909
+No Leave During Combat - must fight~
+0 s 100
+~
+if %self.fighting%
+  %send% %actor% You cannot flee during the combat with %actor.name%!
+  return 0
+  halt
+end
+return 1
 ~
 #10910
 Sir Vivor Combat + Enrage~
@@ -284,14 +301,21 @@ remote enrage_counter %self.id%
 * Enrage effects:
 if %enraged%
   if %enraged% == 2
-    * In case people manage to chase him down after he flees
-    %damage% %self% -1000
-    * Sir Vivor will probably fully heal if he escapes so this is bad
-    flee
+    * Pretend to flee
+    if %self.aff_flagged(STUNNED)%
+      %echo% %self.name% shakes his head and recovers from stunning!
+    end
+    if %self.aff_flagged(ENTANGLED)%
+      %echo% %self.name% breaks free of the vines entangling him!
+    end
+    %echo% %self.name% tries to flee...
+    %echo% %self.name% runs behind a large stalagmite and disappears!
+    dg_affect %self% !ATTACK on 300
+    dg_affect %self% !SEE on -1
   end
   * Don't always show the message or it would be even spammier
   if %random.4% == 4
-    %echo% %self.name%'s swings his sword with strength born of terror!
+    %echo% %self.name% swings his sword with strength born of terror!
   end
   dg_affect %self% BONUS-PHYSICAL 5 3600
 end
