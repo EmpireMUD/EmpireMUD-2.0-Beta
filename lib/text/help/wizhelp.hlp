@@ -681,9 +681,10 @@ Usage:  restore <player | mobile>
 RESTORE restores a player or mobile to full hit, mana, and movement points.
 It also resets all cooldowns. This command is grantable.
 
-If used on immortals, it also sets all skill levels to 100%.
+If used on immortals, it also sets all skill levels to 100 and grants all
+abilities (on the first skill set only).
 
-See also: GRANT
+See also: GRANT, SKILL SWAP
 #d
 RETURN
 

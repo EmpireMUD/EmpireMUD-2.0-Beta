@@ -859,6 +859,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_CONFUSED_DIR(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->confused_dir))
 #define GET_CREATION_ALT_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->create_alt_id))
 #define GET_CREATION_HOST(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->creation_host))
+#define GET_CURRENT_SKILL_SET(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->current_skill_set))
 #define GET_CUSTOM_COLOR(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->custom_colors[(pos)]))
 #define GET_DAILY_BONUS_EXPERIENCE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->daily_bonus_experience))
 #define GET_DAILY_CYCLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->daily_cycle))

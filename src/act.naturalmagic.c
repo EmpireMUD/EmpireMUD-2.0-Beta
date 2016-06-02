@@ -1498,7 +1498,7 @@ ACMD(do_skybrand) {
 		}
 		
 		// spread bonus magical over the whole duration
-		dmg += GET_BONUS_MAGICAL(ch) / 6;
+		dmg += (GET_INTELLIGENCE(ch) + GET_BONUS_MAGICAL(ch)) / 6;
 		
 		apply_dot_effect(vict, ATYPE_SKYBRAND, 6, DAM_MAGICAL, dmg, 3, ch);
 		engage_combat(ch, vict, FALSE);

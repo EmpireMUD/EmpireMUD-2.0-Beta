@@ -89,6 +89,7 @@ void process_repairing(char_data *ch);
 void process_scraping(char_data *ch);
 void process_siring(char_data *ch);
 void process_start_fillin(char_data *ch);
+void process_swap_skill_sets(char_data *ch);
 void process_tanning(char_data *ch);
 
 
@@ -135,7 +136,8 @@ const struct action_data_struct action_data[] = {
 	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT
 	{ "sailing", "is sailing the ship.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_SAILING
 	{ "piloting", "is piloting the vessel.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_PILOTING
-
+	{ "skillswap", "is swapping skill sets.", NOBITS, process_swap_skill_sets, NULL },	// ACT_SWAP_SKILL_SETS
+	
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
 
@@ -2098,6 +2100,26 @@ void process_start_fillin(char_data *ch) {
 			msg_to_char(ch, "You prepare to fill in the trench...\r\n");
 		}
 		act("$n prepares to fill in the trench...", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+	}
+}
+
+
+/**
+* Tick update for start-fillin.
+*
+* @param char_data *ch The person trying to fill in.
+*/
+void process_swap_skill_sets(char_data *ch) {
+	void perform_swap_skill_sets(char_data *ch);
+	
+	GET_ACTION_TIMER(ch) -= 1;
+	
+	if (GET_ACTION_TIMER(ch) <= 0) {
+		msg_to_char(ch, "You swap skill sets.\r\n");
+		act("$n swaps skill sets.", TRUE, ch, NULL, NULL, TO_ROOM);
+		
+		perform_swap_skill_sets(ch);
+		GET_ACTION(ch) = ACT_NONE;
 	}
 }
 

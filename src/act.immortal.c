@@ -2107,7 +2107,7 @@ SHOW(show_skills) {
 		HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
 			abil = plab->ptr;
 			
-			if (!plab->purchased) {
+			if (!plab->purchased[GET_CURRENT_SKILL_SET(vict)]) {
 				continue;
 			}
 			if (ABIL_ASSIGNED_SKILL(abil) != skill) {
@@ -2126,7 +2126,7 @@ SHOW(show_skills) {
 	HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
 		abil = plab->ptr;
 		
-		if (!plab->purchased) {
+		if (!plab->purchased[GET_CURRENT_SKILL_SET(vict)]) {
 			continue;
 		}
 		if (ABIL_ASSIGNED_SKILL(abil) != NULL) {
@@ -6038,6 +6038,8 @@ ACMD(do_rescale) {
 
 
 ACMD(do_restore) {
+	void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
+	
 	ability_data *abil, *next_abil;
 	skill_data *skill, *next_skill;
 	struct cooldown_data *cool;
@@ -6091,7 +6093,8 @@ ACMD(do_restore) {
 			}
 			
 			HASH_ITER(hh, ability_table, abil, next_abil) {
-				add_ability(vict, abil, TRUE);
+				// add abilities to set 0
+				add_ability_by_set(vict, abil, 0, TRUE);
 			}
 
 			affect_total(vict);

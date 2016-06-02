@@ -1086,10 +1086,21 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 			}
 			case 'A': {
 				if (PFILE_TAG(line, "Ability:", length)) {
-					sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]);
-					if ((abildata = get_ability_data(ch, i_in[0], TRUE))) {
-						abildata->purchased = i_in[1] ? TRUE : FALSE;
-						abildata->levels_gained = i_in[2];
+					if (sscanf(line + length + 1, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
+						// post-b4.5 version
+						if ((abildata = get_ability_data(ch, i_in[0], TRUE))) {
+							abildata->levels_gained = i_in[1];
+							// note: NUM_SKILL_SETS is not used for this, and 2 are assumed
+							abildata->purchased[0] = i_in[2] ? TRUE : FALSE;
+							abildata->purchased[1] = i_in[3] ? TRUE : FALSE;
+						}
+					}
+					else if (sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]) == 3) {
+						// backwards-compatibility
+						if ((abildata = get_ability_data(ch, i_in[0], TRUE))) {
+							abildata->purchased[0] = i_in[1] ? TRUE : FALSE;
+							abildata->levels_gained = i_in[2];
+						}
 					}
 				}
 				else if (PFILE_TAG(line, "Access Level:", length)) {
@@ -1691,6 +1702,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (PFILE_TAG(line, "Skill Level:", length)) {
 					GET_SKILL_LEVEL(ch) = atoi(line + length + 1);
 				}
+				else if (PFILE_TAG(line, "Skill Set:", length)) {
+					GET_CURRENT_SKILL_SET(ch) = atoi(line + length + 1);
+					GET_CURRENT_SKILL_SET(ch) = MAX(0, GET_CURRENT_SKILL_SET(ch));
+					GET_CURRENT_SKILL_SET(ch) = MIN(NUM_SKILL_SETS-1, GET_CURRENT_SKILL_SET(ch));
+				}
 				else if (PFILE_TAG(line, "Slash-channel:", length)) {
 					CREATE(slash, struct slash_channel, 1);
 					slash->name = str_dup(trim(line + length + 1));
@@ -2077,9 +2093,8 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	
 	// 'A'
 	HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
-		if (abil->purchased || abil->levels_gained > 0) {
-			fprintf(fl, "Ability: %d %d %d\n", abil->vnum, abil->purchased ? 1 : 0, abil->levels_gained);
-		}
+		// Note: NUM_SKILL_SETS isn't used here but last 2 args are sets 0 and 1
+		fprintf(fl, "Ability: %d %d %d %d\n", abil->vnum, abil->levels_gained, abil->purchased[0] ? 1 : 0, abil->purchased[1] ? 1 : 0);
 	}
 	fprintf(fl, "Access Level: %d\n", GET_ACCESS_LEVEL(ch));
 	if (GET_ACTION(ch) != ACT_NONE) {
@@ -2289,6 +2304,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		}
 	}
 	fprintf(fl, "Skill Level: %d\n", GET_SKILL_LEVEL(ch));
+	fprintf(fl, "Skill Set: %d\n", GET_CURRENT_SKILL_SET(ch));
 	for (slash = GET_SLASH_CHANNELS(ch); slash; slash = slash->next) {
 		if ((channel = find_slash_channel_by_id(slash->id))) {
 			fprintf(fl, "Slash-channel: %s\n", channel->name);
@@ -2775,6 +2791,8 @@ void announce_login(char_data *ch) {
 * class. This should be called on login.
 */
 void check_skills_and_abilities(char_data *ch) {
+	void check_ability_levels(char_data *ch, any_vnum skill);
+	
 	struct player_ability_data *plab, *next_plab;
 	struct player_skill_data *plsk, *next_plsk;
 	
@@ -2795,6 +2813,7 @@ void check_skills_and_abilities(char_data *ch) {
 		}
 	}
 	update_class(ch);
+	check_ability_levels(ch, NOTHING);
 }
 
 

@@ -1741,6 +1741,7 @@ void init_config_system(void) {
 	init_config(CONFIG_SKILLS, "must_be_vampire", CONFTYPE_SHORT_STRING, "message for doing vampire things while not a vampire");
 	init_config(CONFIG_SKILLS, "potion_heal_scale", CONFTYPE_DOUBLE, "modifier applied to potion scale, for healing");
 	init_config(CONFIG_SKILLS, "potion_apply_per_100", CONFTYPE_DOUBLE, "apply points per 100 potion scale levels");
+	init_config(CONFIG_SKILLS, "skill_swap_min_level", CONFTYPE_INT, "level to use multi-spec");
 	init_config(CONFIG_SKILLS, "summon_npc_limit", CONFTYPE_INT, "npc amount that blocks summons");
 
 	// system

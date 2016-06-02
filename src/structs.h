@@ -1383,6 +1383,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_GEN_CRAFT		35
 #define ACT_SAILING			36
 #define ACT_PILOTING		37
+#define ACT_SWAP_SKILL_SETS	38
 
 // act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -1974,6 +1975,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_ACTION_VNUMS  3	// action vnums 0, 1, 2
 #define NUM_OBJ_VAL_POSITIONS  3	// GET_OBJ_VAL(obj, X) -- caution: changing this will require you to change the .obj file format
 #define NUM_GLB_VAL_POSITIONS  3	// GET_GLOBAL_VAL(glb, X) -- caution: changing this will require you to change the .glb file format
+#define NUM_SKILL_SETS  2	// number of different sets a player has
 
 
 /*
@@ -2874,7 +2876,7 @@ struct mount_data {
 // used in player_special_data
 struct player_ability_data {
 	any_vnum vnum;	// ABIL_ or ability vnum
-	bool purchased;	// whether or not the player bought it
+	bool purchased[NUM_SKILL_SETS];	// whether or not the player bought it
 	byte levels_gained;	// tracks for the cap on how many times one ability grants skillups
 	ability_data *ptr;	// live abil pointer
 
@@ -2998,6 +3000,7 @@ struct player_special_data {
 	any_vnum creation_archetype;	// this is now stored permanently so later decisions can be made based on it
 	struct player_skill_data *skill_hash;
 	struct player_ability_data *ability_hash;
+	int current_skill_set;	// which skill set a player is currently in
 	bool can_gain_new_skills;	// not required to keep skills at zero
 	bool can_get_bonus_skills;	// can buy extra 75's
 	sh_int skill_level;  // levels computed based on class skills
