@@ -1562,7 +1562,11 @@ ACMD(do_skills) {
 		}
 	}
 	else if (!str_cmp(argument, "swap")) {
-		if (get_approximate_level(ch) < config_get_int("skill_swap_min_level")) {
+		if (IS_IMMORTAL(ch)) {
+			perform_swap_skill_sets(ch);
+			msg_to_char(ch, "You swap skill sets.\r\n");
+		}
+		else if (get_approximate_level(ch) < config_get_int("skill_swap_min_level")) {
 			msg_to_char(ch, "You must be at least level %d to swap skill sets.\r\n", config_get_int("skill_swap_min_level"));
 		}
 		else if (GET_POS(ch) < POS_STANDING) {
