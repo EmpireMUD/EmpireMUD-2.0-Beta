@@ -1619,15 +1619,15 @@ ACMD(do_skills) {
 		}
 		
 		// good to go
-		remove_ability(ch, abil, FALSE);
 		msg_to_char(ch, "You no longer know %s.\r\n", ABIL_NAME(abil));
-		SAVE_CHAR(ch);
 
 		if (GET_LOYALTY(ch)) {
 			adjust_abilities_to_empire(ch, GET_LOYALTY(ch), FALSE);
 		}
 
+		remove_ability(ch, abil, FALSE);
 		check_skill_sell(ch, abil);
+		SAVE_CHAR(ch);
 		
 		if (GET_LOYALTY(ch)) {
 			adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
