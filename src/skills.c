@@ -1566,6 +1566,9 @@ ACMD(do_skills) {
 			perform_swap_skill_sets(ch);
 			msg_to_char(ch, "You swap skill sets.\r\n");
 		}
+		else if (!config_get_bool("skill_swap_allowed")) {
+			msg_to_char(ch, "This game does not allow skill swap.\r\n");
+		}
 		else if (get_approximate_level(ch) < config_get_int("skill_swap_min_level")) {
 			msg_to_char(ch, "You must be at least level %d to swap skill sets.\r\n", config_get_int("skill_swap_min_level"));
 		}
