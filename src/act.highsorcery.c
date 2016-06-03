@@ -997,7 +997,7 @@ ACMD(do_mirrorimage) {
 	
 	char_data *mob, *other;
 	obj_data *wield;
-	int cost = 40;
+	int cost = GET_MAX_MANA(ch) / 5;
 	mob_vnum vnum = MIRROR_IMAGE_MOB;
 	bool found;
 	
