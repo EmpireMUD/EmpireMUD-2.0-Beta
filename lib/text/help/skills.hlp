@@ -461,6 +461,8 @@ Players who reach level 100 can have two different sets of ability purchases
 for their skills. When you use "skill swap", all of your skills change from
 one set to the other.
 
+Swapping skill sets will reduce your moves and mana to 25% of your total.
+
 When you first change to your alternate skill set, no abilities have been
 purchased. Resetting a skill only resets your current set, not the other set.
 Your count of skill levels gained from using each ability (x/10) is shared
@@ -468,7 +470,7 @@ between both sets.
 
 Swapping skill sets takes 15 seconds and cannot be done in combat.
 
-See also: SKILLS
+See also: SKILLS, SLEEP
 #
 "TRAINING SKILLS" "SKILL POINTS" "SKILL EXPERIENCE" "SKILLUPS" EXPERIENCE
 

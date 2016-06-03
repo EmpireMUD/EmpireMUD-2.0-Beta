@@ -2120,6 +2120,9 @@ void process_swap_skill_sets(char_data *ch) {
 		
 		perform_swap_skill_sets(ch);
 		GET_ACTION(ch) = ACT_NONE;
+		
+		GET_MOVE(ch) = MIN(GET_MOVE(ch), GET_MAX_MOVE(ch)/4);
+		GET_MANA(ch) = MIN(GET_MANA(ch), GET_MAX_MANA(ch)/4);
 	}
 }
 
