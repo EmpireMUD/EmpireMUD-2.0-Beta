@@ -559,8 +559,12 @@ void check_ability_levels(char_data *ch, any_vnum skill) {
 	HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
 		abd = abil->ptr;
 		
+		// is assigned to some skill
+		if (!ABIL_ASSIGNED_SKILL(abd)) {
+			continue;
+		}
 		// matches requested skill
-		if (!all && (!ABIL_ASSIGNED_SKILL(abd) || SKILL_VNUM(ABIL_ASSIGNED_SKILL(abd)) == skill)) {
+		if (!all && SKILL_VNUM(ABIL_ASSIGNED_SKILL(abd)) != skill) {
 			continue;
 		}
 		
