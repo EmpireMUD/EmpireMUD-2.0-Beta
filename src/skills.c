@@ -47,6 +47,7 @@ const char *default_skill_desc = "New skill";
 extern const char *skill_flags[];
 
 // eternal functions
+void resort_empires(bool force);
 extern bool is_class_ability(ability_data *abil);
 void update_class(char_data *ch);
 
@@ -550,8 +551,6 @@ void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cool
 * @param any_vnum skill which skill, or NO_SKILL for all
 */
 void check_ability_levels(char_data *ch, any_vnum skill) {
-	void resort_empires(bool force);
-	
 	struct player_ability_data *abil, *next_abil;
 	empire_data *emp = GET_LOYALTY(ch);
 	bool all = (skill == NO_SKILL);
@@ -608,8 +607,6 @@ void check_ability_levels(char_data *ch, any_vnum skill) {
 * @param any_vnum skill which skill, or NO_SKILL for all
 */
 void clear_char_abilities(char_data *ch, any_vnum skill) {
-	void resort_empires(bool force);
-	
 	struct player_ability_data *abil, *next_abil;
 	empire_data *emp = GET_LOYALTY(ch);
 	bool all = (skill == NO_SKILL);
@@ -1220,6 +1217,11 @@ void perform_swap_skill_sets(char_data *ch) {
 	old_set = GET_CURRENT_SKILL_SET(ch);
 	cur_set = (old_set == 1) ? 0 : 1;
 	
+	// remove ability techs
+	if (GET_LOYALTY(ch)) {
+		adjust_abilities_to_empire(ch, GET_LOYALTY(ch), FALSE);
+	}
+	
 	// update skill set
 	GET_CURRENT_SKILL_SET(ch) = cur_set;
 	
@@ -1246,6 +1248,12 @@ void perform_swap_skill_sets(char_data *ch) {
 	
 	// call this at the end just in case
 	assign_class_abilities(ch, NULL, NOTHING);
+	
+	// add ability techs -- only if playing
+	if (GET_LOYALTY(ch)) {
+		adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
+		resort_empires(FALSE);
+	}
 }
 
 
@@ -1390,7 +1398,6 @@ ACMD(do_noskill) {
 
 ACMD(do_skills) {
 	void clear_char_abilities(char_data *ch, any_vnum skill);
-	void resort_empires(bool force);
 	
 	char arg2[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], outbuf[MAX_STRING_LENGTH];
 	struct player_skill_data *skdata;
