@@ -727,13 +727,19 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 * @param int armor_type ARMOR_x
 */
 void remove_armor_by_type(char_data *ch, int armor_type) {
+	bool found = FALSE;
 	int iter;
 	
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (GET_EQ(ch, iter) && GET_ARMOR_TYPE(GET_EQ(ch, iter)) == armor_type) {
 			act("You take off $p.", FALSE, ch, GET_EQ(ch, iter), NULL, TO_CHAR);
 			unequip_char_to_inventory(ch, iter);
+			found = TRUE;
 		}
+	}
+	
+	if (found) {
+		determine_gear_level(ch);
 	}
 }
 
@@ -898,13 +904,17 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 		msg_to_char(ch, "You don't have %s!\r\n", money_amount(type, amount));
 	}
 	else {
+		// decrease coins first
+		decrease_coins(ch, type, amount);
+		
 		if (mode != SCMD_JUNK) {
 			/* to prevent coin-bombing */
 			command_lag(ch, WAIT_OTHER);
 			obj = create_money(type, amount);
+			obj_to_char(obj, ch);	// temporarily
 
 			if (!drop_wtrigger(obj, ch)) {
-				extract_obj(obj);
+				// stays in inventory, which is odd, but better than the alternative (a crash if the script purged the object and we extract it here)
 				return;
 			}
 
@@ -928,9 +938,6 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 
 			msg_to_char(ch, "You drop %s which disappear%s in a puff of smoke!\r\n", (amount != 1 ? "some coins" : "a coin"), (amount == 1 ? "s" : ""));
 		}
-		
-		// in any event
-		decrease_coins(ch, type, amount);
 	}
 }
 

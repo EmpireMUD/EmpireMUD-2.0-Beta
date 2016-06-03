@@ -128,6 +128,10 @@ void check_attribute_gear(char_data *ch) {
 			}
 		}
 	}
+	
+	if (found) {
+		determine_gear_level(ch);
+	}
 }
 
 
@@ -457,6 +461,7 @@ void real_update_char(char_data *ch) {
 	char_data *room_ch, *next_ch;
 	int result, iter, type;
 	int fol_count, gain;
+	bool found;
 	
 	// first check location: this may move the player
 	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
@@ -632,13 +637,18 @@ void real_update_char(char_data *ch) {
 	check_attribute_gear(ch);
 	
 	// ensure character isn't using any gear they shouldn't be
+	found = FALSE;
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (wear_data[iter].count_stats && GET_EQ(ch, iter) && !can_wear_item(ch, GET_EQ(ch, iter), TRUE)) {
 			// can_wear_item sends own message to ch
 			act("$n stops using $p.", TRUE, ch, GET_EQ(ch, iter), NULL, TO_ROOM);
 			// this may extract it
 			unequip_char_to_inventory(ch, iter);
+			found = TRUE;
 		}
+	}
+	if (found) {
+		determine_gear_level(ch);
 	}
 
 	/* moving on.. */
