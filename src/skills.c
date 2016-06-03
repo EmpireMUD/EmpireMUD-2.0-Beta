@@ -1553,7 +1553,7 @@ ACMD(do_skills) {
 		}
 		else {
 			// good to go!
-			msg_to_char(ch, "You have dropped your %s skill to %d and reset its abilities.\r\n", SKILL_NAME(skill), level);
+			msg_to_char(ch, "You have dropped your %s skill to %d and reset abilities above that level.\r\n", SKILL_NAME(skill), level);
 			set_skill(ch, SKILL_VNUM(skill), level);
 			update_class(ch);
 			check_ability_levels(ch, SKILL_VNUM(skill));
