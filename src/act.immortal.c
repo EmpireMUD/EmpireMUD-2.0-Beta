@@ -2079,8 +2079,10 @@ SHOW(show_skills) {
 	skill_data *skill;
 	char_data *vict;
 	bool found, is_file = FALSE;
+	int set;
 	
 	argument = one_argument(argument, arg);
+	skip_spaces(&argument);
 	
 	if (!(vict = find_or_load_player(arg, &is_file))) {
 		send_config_msg(ch, "no_person");
@@ -2096,6 +2098,13 @@ SHOW(show_skills) {
 		return;
 	}
 	
+	// detect "swap" arg
+	set = GET_CURRENT_SKILL_SET(vict);
+	if (*argument && is_abbrev(argument, "swap")) {
+		// note: this ONLY supports 2 different sets
+		set = (!set ? 1 : 0);
+	}
+	
 	msg_to_char(ch, "Skills for %s:\r\n", PERS(vict, ch, TRUE));
 	
 	HASH_ITER(hh, GET_SKILL_HASH(vict), plsk, next_plsk) {
@@ -2107,7 +2116,7 @@ SHOW(show_skills) {
 		HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
 			abil = plab->ptr;
 			
-			if (!plab->purchased[GET_CURRENT_SKILL_SET(vict)]) {
+			if (!plab->purchased[set]) {
 				continue;
 			}
 			if (ABIL_ASSIGNED_SKILL(abil) != skill) {
@@ -2126,6 +2135,7 @@ SHOW(show_skills) {
 	HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
 		abil = plab->ptr;
 		
+		// ALWAYS use current set for class abilities
 		if (!plab->purchased[GET_CURRENT_SKILL_SET(vict)]) {
 			continue;
 		}

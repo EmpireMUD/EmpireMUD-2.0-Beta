@@ -92,6 +92,14 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			end_alacrity(ch);
 			break;
 		}
+		case ABIL_ARCHERY: {
+			if (GET_EQ(ch, WEAR_RANGED) && IS_MISSILE_WEAPON(GET_EQ(ch, WEAR_RANGED))) {
+				act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_RANGED), NULL, TO_CHAR);
+				unequip_char_to_inventory(ch, WEAR_RANGED);
+				determine_gear_level(ch);
+			}
+			break;
+		}
 		case ABIL_BANSHEE: {
 			despawn_familiar(ch, FAMILIAR_BANSHEE);
 			break;
@@ -105,6 +113,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 				if (GET_OBJ_VNUM(obj) == o_BLOODSWORD) {
 					act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR);
 					unequip_char_to_inventory(ch, WEAR_WIELD);
+					determine_gear_level(ch);
 				}
 			}
 			break;
@@ -258,6 +267,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 				if (GET_OBJ_VNUM(obj) == o_FIREBALL) {
 					act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR);
 					unequip_char_to_inventory(ch, WEAR_WIELD);
+					determine_gear_level(ch);
 				}
 			}
 			break;
@@ -288,6 +298,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			if ((obj = GET_EQ(ch, WEAR_HOLD)) && IS_SHIELD(obj)) {
 				act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_HOLD), NULL, TO_CHAR);
 				unequip_char_to_inventory(ch, WEAR_HOLD);
+				determine_gear_level(ch);
 			}
 			break;
 		}
