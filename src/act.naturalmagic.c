@@ -1442,8 +1442,23 @@ ACMD(do_resurrect) {
 
 ACMD(do_skybrand) {
 	char_data *vict = NULL;
-	int cost = 30;
+	int cost;
+	int dur = 6;	// ticks
 	int dmg;
+	
+	double cost_mod[] = { 2.0, 1.5, 1.1 };
+	
+	// determine damage (which determines cost
+	dmg = get_ability_level(ch, ABIL_SKYBRAND) / 24;	// skill level base
+	if ((IS_NPC(ch) || GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+		dmg = MAX(dmg, (get_approximate_level(ch) / 24));	// total level base
+		dmg += GET_BONUS_MAGICAL(ch) / dur;
+	}
+	
+	dmg += GET_INTELLIGENCE(ch) / dur;	// always add int
+	
+	// determine cost
+	cost = round(dmg * CHOOSE_BY_ABILITY_LEVEL(cost_mod, ch, ABIL_SKYBRAND));
 	
 	if (!can_use_ability(ch, ABIL_SKYBRAND, MANA, cost, COOLDOWN_SKYBRAND)) {
 		return;
@@ -1491,14 +1506,6 @@ ACMD(do_skybrand) {
 		act("You mark $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n marks you with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n marks $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_NOTVICT);
-		
-		dmg = get_ability_level(ch, ABIL_SKYBRAND) / 24;
-		if (IS_CLASS_ABILITY(ch, ABIL_SKYBRAND)) {
-			dmg = MAX(dmg, (get_approximate_level(ch) / 24));
-		}
-		
-		// spread bonus magical over the whole duration
-		dmg += (GET_INTELLIGENCE(ch) + GET_BONUS_MAGICAL(ch)) / 6;
 		
 		apply_dot_effect(vict, ATYPE_SKYBRAND, 6, DAM_MAGICAL, dmg, 3, ch);
 		engage_combat(ch, vict, FALSE);
