@@ -524,7 +524,8 @@ Sunshock blasts your target with the pure light of the sun. This deals a small
 amount of damage (scaled by your level, role, and traits), and causes a very
 short blinding effect.
 
-Sunshock does 1.5x damage to vampires.
+Sunshock does 1.5x damage to vampires, but this damage bonus does not change
+the cost.
 
 If you are in combat and specify no target, Sunshock hits your current
 opponent.
