@@ -6388,7 +6388,7 @@ ACMD(do_slay) {
 
 			// this would prevent the death
 			if (affected_by_spell(vict, ATYPE_PHOENIX_RITE)) {
-				affect_from_char(vict, ATYPE_PHOENIX_RITE);
+				affect_from_char(vict, ATYPE_PHOENIX_RITE, FALSE);
 			}
 
 			die(vict, ch);

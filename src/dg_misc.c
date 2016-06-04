@@ -148,10 +148,10 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 
 	if (!str_cmp(value_p, "off")) {
 		if (type == APPLY_TYPE) {
-			affect_from_char_by_apply(ch, ATYPE_DG_AFFECT, i);
+			affect_from_char_by_apply(ch, ATYPE_DG_AFFECT, i, FALSE);
 		}
 		else {
-			affect_from_char_by_bitvector(ch, ATYPE_DG_AFFECT, BIT(i));
+			affect_from_char_by_bitvector(ch, ATYPE_DG_AFFECT, BIT(i), FALSE);
 		}
 		return;
 	}

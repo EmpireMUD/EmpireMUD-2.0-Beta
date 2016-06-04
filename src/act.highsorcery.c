@@ -962,7 +962,7 @@ ACMD(do_manashield) {
 	if (affected_by_spell(ch, ATYPE_MANASHIELD)) {
 		msg_to_char(ch, "You wipe the symbols off your arm and cancel your mana shield.\r\n");
 		act("$n wipes the arcane symbols off $s arm.", TRUE, ch, NULL, NULL, TO_ROOM);
-		affect_from_char(ch, ATYPE_MANASHIELD);
+		affect_from_char(ch, ATYPE_MANASHIELD, FALSE);
 	}
 	else if (!can_use_ability(ch, ABIL_MANASHIELD, MANA, cost, NOTHING)) {
 		return;

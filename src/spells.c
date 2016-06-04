@@ -49,7 +49,7 @@
 bool trigger_counterspell(char_data *ch) {
 	if (affected_by_spell(ch, ATYPE_COUNTERSPELL)) {
 		msg_to_char(ch, "Your counterspell goes off!\r\n");
-		affect_from_char(ch, ATYPE_COUNTERSPELL);
+		affect_from_char(ch, ATYPE_COUNTERSPELL, FALSE);
 		gain_ability_exp(ch, ABIL_COUNTERSPELL, 100);
 		return TRUE;
 	}

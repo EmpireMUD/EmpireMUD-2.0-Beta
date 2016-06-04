@@ -3081,7 +3081,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// verify morph stats
 	if (!IS_MORPHED(ch)) {
-		affect_from_char(ch, ATYPE_MORPH);
+		affect_from_char(ch, ATYPE_MORPH, FALSE);
 	}
 	
 	if (dolog) {
@@ -3137,7 +3137,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		
 		// clear this for long logout
 		GET_RECENT_DEATH_COUNT(ch) = 0;
-		affect_from_char(ch, ATYPE_DEATH_PENALTY);
+		affect_from_char(ch, ATYPE_DEATH_PENALTY, FALSE);
 		
 		RESTORE_ON_LOGIN(ch) = FALSE;
 		clean_lore(ch);

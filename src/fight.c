@@ -879,7 +879,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	
 	// somebody saaaaaaave meeeeeeeee
 	if (affected_by_spell(ch, ATYPE_PHOENIX_RITE)) {
-		affect_from_char(ch, ATYPE_PHOENIX_RITE);
+		affect_from_char(ch, ATYPE_PHOENIX_RITE, FALSE);
 		GET_HEALTH(ch) = GET_MAX_HEALTH(ch) / 4;
 		GET_BLOOD(ch) = IS_VAMPIRE(ch) ? MAX(GET_BLOOD(ch), GET_MAX_BLOOD(ch) / 5) : GET_MAX_BLOOD(ch);
 		GET_MOVE(ch) = MAX(GET_MOVE(ch), GET_MAX_MOVE(ch) / 5);
@@ -1204,7 +1204,7 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 			GET_RECENT_DEATH_COUNT(ch) -= 1;
 		}
 	}
-	affect_from_char(ch, ATYPE_DEATH_PENALTY);	// in case
+	affect_from_char(ch, ATYPE_DEATH_PENALTY, FALSE);	// in case
 	remove_offers_by_type(ch, OFFER_RESURRECTION);
 
 	// log
@@ -2040,7 +2040,7 @@ bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_dat
 * @param char_data *ch The person who will appear.
 */
 void appear(char_data *ch) {
-	affects_from_char_by_aff_flag(ch, AFF_HIDE | AFF_INVISIBLE);
+	affects_from_char_by_aff_flag(ch, AFF_HIDE | AFF_INVISIBLE, FALSE);
 	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE | AFF_INVISIBLE);
 
 	if (GET_ACCESS_LEVEL(ch) < LVL_GOD) {
@@ -3125,7 +3125,7 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 	GET_POS(ch) = POS_FIGHTING;
 	
 	// remove all stuns when combat starts
-	affects_from_char_by_aff_flag(ch, AFF_STUNNED);
+	affects_from_char_by_aff_flag(ch, AFF_STUNNED, FALSE);
 }
 
 

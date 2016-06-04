@@ -3839,7 +3839,7 @@ ACMD(do_eat) {
 		}
 		
 		// remove any old buffs
-		affect_from_char(ch, ATYPE_WELL_FED);
+		affect_from_char(ch, ATYPE_WELL_FED, FALSE);
 		
 		if (GET_OBJ_AFF_FLAGS(food)) {
 			af = create_flag_aff(ATYPE_WELL_FED, eat_hours MUD_HOURS, GET_OBJ_AFF_FLAGS(food), ch);

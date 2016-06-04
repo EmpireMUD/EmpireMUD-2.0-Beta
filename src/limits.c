@@ -273,8 +273,7 @@ int limit_crowd_control(char_data *victim, int atype) {
 	for (iter = ROOM_PEOPLE(IN_ROOM(victim)); iter; iter = iter->next_in_room) {
 		if (iter != victim && affected_by_spell(iter, atype)) {
 			++count;
-			affect_from_char(iter, atype);
-			act("You recover.", FALSE, iter, NULL, NULL, TO_CHAR);
+			affect_from_char(iter, atype, TRUE);	// sends message
 			act("$n recovers.", TRUE, iter, NULL, NULL, TO_ROOM);
 		}
 	}
@@ -506,9 +505,7 @@ void real_update_char(char_data *ch) {
 		else if (af->duration != UNLIMITED) {
 			if ((af->type > 0)) {
 				if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
-					if (ch->desc && *affect_wear_off_msgs[af->type]) {
-						msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', affect_wear_off_msgs[af->type]);
-					}
+					show_wear_off_msg(ch, af->type);
 				}
 			}
 			
@@ -548,8 +545,8 @@ void real_update_char(char_data *ch) {
 		}
 		else if (dot->duration != UNLIMITED) {
 			// expired
-			if (dot->type > 0 && ch->desc && *affect_wear_off_msgs[dot->type]) {
-				msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', affect_wear_off_msgs[dot->type]);
+			if (dot->type > 0) {
+				show_wear_off_msg(ch, dot->type);
 			}
 			dot_remove(ch, dot);
 		}
@@ -1872,7 +1869,7 @@ void gain_condition(char_data *ch, int condition, int value) {
 	
 	// prevent well-fed if hungry
 	if (IS_HUNGRY(ch) && value > 0) {
-		affect_from_char(ch, ATYPE_WELL_FED);
+		affect_from_char(ch, ATYPE_WELL_FED, TRUE);
 	}
 
 	if (PLR_FLAGGED(ch, PLR_WRITING) || !gain_cond_messsage) {

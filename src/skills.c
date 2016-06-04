@@ -124,7 +124,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			break;
 		}
 		case ABIL_BOOST: {
-			affect_from_char(ch, ATYPE_BOOST);
+			affect_from_char(ch, ATYPE_BOOST, TRUE);
 			break;
 		}
 		case ABIL_CHANT_OF_NATURE: {
@@ -144,7 +144,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			break;
 		}
 		case ABIL_COUNTERSPELL: {
-			affect_from_char(ch, ATYPE_COUNTERSPELL);
+			affect_from_char(ch, ATYPE_COUNTERSPELL, TRUE);
 			break;
 		}
 		case ABIL_DEATHSHROUD: {
@@ -162,6 +162,10 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			if (IS_DISGUISED(ch)) {
 				undisguise(ch);
 			}
+			break;
+		}
+		case ABIL_EARTHARMOR: {
+			affect_from_char_by_caster(ch, ATYPE_EARTHARMOR, ch, TRUE);
 			break;
 		}
 		case ABIL_EARTHMELD: {
@@ -185,15 +189,19 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			break;
 		}
 		case ABIL_FLY: {
-			affect_from_char(ch, ATYPE_FLY);
+			affect_from_char(ch, ATYPE_FLY, TRUE);
 			break;
 		}
 		case ABIL_FORESIGHT: {
-			affect_from_char(ch, ATYPE_FORESIGHT);
+			affect_from_char_by_caster(ch, ATYPE_FORESIGHT, ch, TRUE);
 			break;
 		}
 		case ABIL_GRIFFIN: {
 			despawn_familiar(ch, FAMILIAR_GRIFFIN);
+			break;
+		}
+		case ABIL_HASTEN: {
+			affect_from_char_by_caster(ch, ATYPE_HASTEN, ch, TRUE);
 			break;
 		}
 		case ABIL_HEAVY_ARMOR: {
@@ -209,7 +217,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			break;
 		}
 		case ABIL_MANASHIELD: {
-			affect_from_char(ch, ATYPE_MANASHIELD);
+			affect_from_char(ch, ATYPE_MANASHIELD, TRUE);
 			break;
 		}
 		case ABIL_MANTICORE: {
@@ -243,7 +251,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			if (affected_by_spell(ch, ATYPE_NIGHTSIGHT)) {
 				msg_to_char(ch, "You end your nightsight.\r\n");
 				act("The glow in $n's eyes fades.", TRUE, ch, NULL, NULL, TO_ROOM);
-				affect_from_char(ch, ATYPE_NIGHTSIGHT);
+				affect_from_char(ch, ATYPE_NIGHTSIGHT, TRUE);
 			}
 			break;
 		}
@@ -256,11 +264,11 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			break;
 		}
 		case ABIL_PHOENIX_RITE: {
-			affect_from_char(ch, ATYPE_PHOENIX_RITE);
+			affect_from_char(ch, ATYPE_PHOENIX_RITE, TRUE);
 			break;
 		}
 		case ABIL_RADIANCE: {
-			affect_from_char(ch, ATYPE_RADIANCE);
+			affect_from_char(ch, ATYPE_RADIANCE, TRUE);
 			break;
 		}
 		case ABIL_READY_FIREBALL: {
@@ -283,7 +291,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		case ABIL_RITUAL_OF_BURDENS: {
 			if (affected_by_spell(ch, ATYPE_UNBURDENED)) {
 				msg_to_char(ch, "Your burdens return.\r\n");
-				affect_from_char(ch, ATYPE_UNBURDENED);
+				affect_from_char(ch, ATYPE_UNBURDENED, TRUE);
 			}
 			break;
 		}
@@ -304,7 +312,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			break;
 		}
 		case ABIL_SIPHON: {
-			affect_from_char(ch, ATYPE_SIPHON);
+			affect_from_char(ch, ATYPE_SIPHON, TRUE);
 			break;
 		}
 		case ABIL_SKELETAL_HULK: {
@@ -316,7 +324,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			break;
 		}
 		case ABIL_SOULMASK: {
-			affect_from_char(ch, ATYPE_SOULMASK);
+			affect_from_char(ch, ATYPE_SOULMASK, TRUE);
 			break;
 		}
 		default: {

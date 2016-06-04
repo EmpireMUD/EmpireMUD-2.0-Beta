@@ -165,7 +165,7 @@ void report_healing(char_data *healed, int amount, char_data *report_to) {
 */
 void un_earthmeld(char_data *ch) {
 	if (AFF_FLAGGED(ch, AFF_EARTHMELD)) {
-		affects_from_char_by_aff_flag(ch, AFF_EARTHMELD);
+		affects_from_char_by_aff_flag(ch, AFF_EARTHMELD, FALSE);
 		if (!AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 			msg_to_char(ch, "You rise from the ground!\r\n");
 			act("$n rises from the ground!", TRUE, ch, 0, 0, TO_ROOM);
@@ -239,7 +239,7 @@ void apply_potion(char_data *ch, int type, int scale) {
 	// atype
 	if (potion_data[type].atype > 0) {
 		// remove any old effect
-		affect_from_char(ch, potion_data[type].atype);
+		affect_from_char(ch, potion_data[type].atype, FALSE);
 		
 		if (potion_data[type].apply != APPLY_NONE) {
 			double points = config_get_double("potion_apply_per_100") * scale / 100.0;
@@ -881,7 +881,7 @@ ACMD(do_fly) {
 	if (affected_by_spell(ch, ATYPE_FLY)) {
 		msg_to_char(ch, "You stop flying and your wings fade away.\r\n");
 		act("$n lands and $s wings fade away.", TRUE, ch, NULL, NULL, TO_ROOM);
-		affect_from_char(ch, ATYPE_FLY);
+		affect_from_char(ch, ATYPE_FLY, FALSE);
 		command_lag(ch, WAIT_OTHER);
 		return;
 	}
