@@ -1653,6 +1653,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		rename(buf1, buf2);
 		
 		SAVE_CHAR(vict);
+		save_library_file_for_vnum(DB_BOOT_ACCT, GET_ACCOUNT(vict)->id);
 		sprintf(output, "%s's name changed to %s.", oldname, GET_NAME(vict));
 	}
 	
