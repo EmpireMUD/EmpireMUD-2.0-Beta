@@ -480,12 +480,13 @@ Lightningbolt (Natural Magic ability)
 Usage:  lightningbolt [target]
 Cooldown:  9 seconds
 DoT Duration:  15 seconds
-Cost:  25 mana
+Cost:  based on damage
 Debuff type:  Natural Magic
 
 A powerful nature mage can shoot bolts of lightning from her fingertips,
 causing massive trauma to the target, and leaving them shocked. Victims con-
-tinue to take damage for several seconds.
+tinue to take damage for several seconds. Damage is based on level, role, and
+traits.
 
 If you cast this spell without a target, it will hit the person you are
 fighting.
