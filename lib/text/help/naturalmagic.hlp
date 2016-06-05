@@ -66,7 +66,7 @@ Familiar type:  debuff
 
 The banshee familiar will use the following abilities in combat:
 - Soul-shattering wail: -(level/20) Resist-Physical/Magical on enemies (30 sec)
-- Terrifying wail: -10 To-Hit on enemies (30 sec)
+- Terrifying wail: -(5+level/50) To-Hit on enemies (30 sec)
 - Heart-wrenching wail: -(level/30) Bonus-Physical/Magical on enemies (30 sec)
 - Blood-curdling wail: Magical DoT on enemies (30 sec)
 
@@ -91,10 +91,10 @@ Class ability:  Feral
 Familiar type:  debuff
 
 The basilisk familiar will use the following abilities in combat:
-- Marble gaze: +20 Block on the tank (30 sec)
+- Marble gaze: +(15+level/50) Block on the tank (30 sec)
 - Quartzite gaze: -(level/20) Bonus-Physical/Magical on enemy (30 sec)
-- Basalt gaze: -4 Wits on enemy (30 sec)
-- Granite gaze: -20 To-Hit on enemy (30 sec)
+- Basalt gaze: -(2+level/100) Wits on enemy (30 sec)
+- Granite gaze: -(15+level/25) To-Hit on enemy (30 sec)
 
 See also: DEBUFF, FAMILIAR, FERAL CLASS
 #
@@ -510,10 +510,10 @@ Class ability:  Werewolf (healer)
 Familiar type:  buff
 
 The moon rabbit familiar will use the following abilities in combat:
-- Replenish: +(level/3) Mana to master (instant)
-- Re-energize: +(level/20) Mana-Regen to master (30 sec)
+- Replenish: +(level*2/3) Mana to master (instant)
+- Re-energize: +(level/10) Mana-Regen to master (30 sec)
 - Bright as the moon: +(level/20) Resist-Physical/Magical on party (30 sec)
-- Moon's protection: +(level/10) Resist-Physical/Magical on the tank (30 sec)
+- Moon's protection: +(level/5) Resist-Physical/Magical on the tank (30 sec)
 
 See also: BUFF, FAMILIAR, WEREWOLF CLASS
 #
@@ -561,10 +561,10 @@ Class ability:  Shadow Wolf (healer)
 Familiar type:  buff
 
 The owl shadow familiar will use the following abilities in combat:
-- Dark Wings: +20 Dodge on tank (30 sec)
+- Dark Wings: +(15+level/25) Dodge on tank (30 sec)
 - Healing Darkness: +(level/20) Heal-Over-Time on party (30 sec)
 - Invigorating Darkness: +(level/5) Move points on party (instant)
-- Brilliant Darkness: +2 Wits on party (30 sec)
+- Brilliant Darkness: +(1+level/100) Wits on party (30 sec)
 
 See also: BUFF, FAMILIAR, SHADOW WOLF CLASS
 #
@@ -690,7 +690,7 @@ Familiar type:  buff
 The salamander familiar will use the following abilities in combat:
 - Alchemist's Fire: +(level/4) Bonus-Healing on master (10 sec)
 - Soothing flames: +(level/4) Heal-Over-Time on tank (10 sec)
-- Guardian flames: +20 Dodge on tank (10 sec)
+- Guardian flames: +(15+level/25) Dodge on tank (10 sec)
 - Ember surge: +(level/30) Bonus-Physical/Magical on party (30 sec)
 
 See also: BUFF, FAMILIAR, ALCHEMIST CLASS
@@ -716,7 +716,7 @@ Familiar type:  debuff
 The scorpion shadow familiar will use the following abilities in combat:
 - Creeping Venom: slows an enemy (30 sec)
 - Shadow Venom: -(level/20) bonus physical/magical damage on enemy (30 sec)
-- Numbing Venom: -4 Wits on enemy (30 sec)
+- Numbing Venom: -(2+level/100) Wits on enemy (30 sec)
 - Agonizing Venom: Poison DoT on enemy (30 sec)
 
 See also: DEBUFF, FAMILIAR, SHADOW WOLF CLASS
@@ -784,9 +784,9 @@ Class ability:  Werewolf (tank)
 Familiar type:  debuff
 
 The spirit wolf familiar will use the following abilities in combat:
-- Bolt of Lightning: -2 Dexterity on enemy (30 sec)
-- Clap of Thunder: -20 Dodge on enemy (30 sec)
-- Bark/Blurred Vision: -20 To-Hit on enemy (30 sec)
+- Bolt of Lightning: -(level/100) Dexterity on enemy (30 sec)
+- Clap of Thunder: -(15+level/25) Dodge on enemy (30 sec)
+- Bark/Blurred Vision: -(15+level/25) To-Hit on enemy (30 sec)
 - Bite/Ghost Energy: Magical DoT on enemy (30 sec)
 
 See also: DEBUFF, FAMILIAR, WEREWOLF CLASS
