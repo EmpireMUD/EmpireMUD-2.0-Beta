@@ -879,7 +879,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	
 	// somebody saaaaaaave meeeeeeeee
 	if (affected_by_spell(ch, ATYPE_PHOENIX_RITE)) {
-		affect_from_char(ch, ATYPE_PHOENIX_RITE);
+		affect_from_char(ch, ATYPE_PHOENIX_RITE, FALSE);
 		GET_HEALTH(ch) = GET_MAX_HEALTH(ch) / 4;
 		GET_BLOOD(ch) = IS_VAMPIRE(ch) ? MAX(GET_BLOOD(ch), GET_MAX_BLOOD(ch) / 5) : GET_MAX_BLOOD(ch);
 		GET_MOVE(ch) = MAX(GET_MOVE(ch), GET_MAX_MOVE(ch) / 5);
@@ -1204,7 +1204,7 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 			GET_RECENT_DEATH_COUNT(ch) -= 1;
 		}
 	}
-	affect_from_char(ch, ATYPE_DEATH_PENALTY);	// in case
+	affect_from_char(ch, ATYPE_DEATH_PENALTY, FALSE);	// in case
 	remove_offers_by_type(ch, OFFER_RESURRECTION);
 
 	// log
@@ -1582,14 +1582,14 @@ void block_attack(char_data *ch, char_data *victim, int w_type) {
 	
 	// block message to onlookers
 	pbuf = replace_fight_string("$N blocks $n's #w.", attack_hit_info[w_type].singular, attack_hit_info[w_type].plural);
-	act(pbuf, FALSE, ch, NULL, victim, TO_NOTVICT);
+	act(pbuf, FALSE, ch, NULL, victim, TO_NOTVICT | TO_COMBAT_MISS);
 
 	// block message to ch
 	if (ch->desc) {
 		// send color separately because of act capitalization
 		send_to_char("&y", ch);
 		pbuf = replace_fight_string("You try to #w $N, but $E blocks.&0", attack_hit_info[w_type].singular, attack_hit_info[w_type].plural);
-		act(pbuf, FALSE, ch, NULL, victim, TO_CHAR);
+		act(pbuf, FALSE, ch, NULL, victim, TO_CHAR | TO_COMBAT_MISS);
 	}
 
 	// block message to victim
@@ -1597,7 +1597,7 @@ void block_attack(char_data *ch, char_data *victim, int w_type) {
 		// send color separately because of act capitalization
 		send_to_char("&r", victim);
 		pbuf = replace_fight_string("You block $n's #w.&0", attack_hit_info[w_type].singular, attack_hit_info[w_type].plural);
-		act(pbuf, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
+		act(pbuf, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP | TO_COMBAT_MISS);
 	}
 	
 	// ensure combat
@@ -1613,9 +1613,9 @@ void block_attack(char_data *ch, char_data *victim, int w_type) {
 * @param obj_data *arrow The arrow item being shot.
 */
 void block_missile_attack(char_data *ch, char_data *victim, obj_data *arrow) {
-	act("You shoot $p at $N, but $E blocks.", FALSE, ch, arrow, victim, TO_CHAR);
-	act("$n shoots $p at $N, who blocks.", FALSE, ch, arrow, victim, TO_NOTVICT);
-	act("$n shoots $p at you, but you block.", FALSE, ch, arrow, victim, TO_VICT);
+	act("You shoot $p at $N, but $E blocks.", FALSE, ch, arrow, victim, TO_CHAR | TO_COMBAT_MISS);
+	act("$n shoots $p at $N, who blocks.", FALSE, ch, arrow, victim, TO_NOTVICT | TO_COMBAT_MISS);
+	act("$n shoots $p at you, but you block.", FALSE, ch, arrow, victim, TO_VICT | TO_COMBAT_MISS);
 }
 
 
@@ -1628,6 +1628,7 @@ void block_missile_attack(char_data *ch, char_data *victim, obj_data *arrow) {
 * @param int w_type The weapon type (TYPE_x)
 */
 void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
+	bitvector_t fmsg_type;
 	char *buf;
 	int iter, msgnum;
 
@@ -1720,16 +1721,18 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 			break;
 		}
 	}
+	
+	fmsg_type = (dam > 0 ? TO_COMBAT_HIT : TO_COMBAT_MISS);
 
 	/* damage message to onlookers */
 	buf = replace_fight_string(dam_weapons[msgnum].to_room, attack_hit_info[w_type].singular, attack_hit_info[w_type].plural);
-	act(buf, FALSE, ch, NULL, victim, TO_NOTVICT);
+	act(buf, FALSE, ch, NULL, victim, TO_NOTVICT | fmsg_type);
 
 	/* damage message to damager */
 	if (ch->desc) {
 		send_to_char("&y", ch);
 		buf = replace_fight_string(dam_weapons[msgnum].to_char, attack_hit_info[w_type].singular, attack_hit_info[w_type].plural);
-		act(buf, FALSE, ch, NULL, victim, TO_CHAR);
+		act(buf, FALSE, ch, NULL, victim, TO_CHAR | fmsg_type);
 		send_to_char("&0", ch);
 	}
 
@@ -1737,7 +1740,7 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 	if (victim->desc) {
 		send_to_char("&r", victim);
 		buf = replace_fight_string(dam_weapons[msgnum].to_victim, attack_hit_info[w_type].singular, attack_hit_info[w_type].plural);
-		act(buf, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
+		act(buf, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP | fmsg_type);
 		send_to_char("&0", victim);
 	}
 }
@@ -1772,44 +1775,44 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype) {
 			}
 
 			if (!IS_NPC(vict) && (IS_IMMORTAL(vict) || (IS_GOD(vict) && !IS_GOD(ch)))) {
-				act(msg->god_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR);
-				act(msg->god_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT);
-				act(msg->god_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT);
+				act(msg->god_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
+				act(msg->god_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_COMBAT_MISS);
+				act(msg->god_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_MISS);
 			}
 			else if (dam != 0) {
 				if (GET_POS(vict) == POS_DEAD) {
 					send_to_char("&y", ch);
-					act(msg->die_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR);
+					act(msg->die_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
 					send_to_char("&0", ch);
 
 					send_to_char("&r", vict);
-					act(msg->die_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP);
+					act(msg->die_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_HIT);
 					send_to_char("&0", vict);
 
-					act(msg->die_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT);
+					act(msg->die_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_HIT);
 				}
 				else {
 					send_to_char("&y", ch);
-					act(msg->hit_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR);
+					act(msg->hit_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
 					send_to_char("&0", ch);
 
 					send_to_char("&r", vict);
-					act(msg->hit_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP);
+					act(msg->hit_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_HIT);
 					send_to_char("&0", vict);
 
-					act(msg->hit_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT);
+					act(msg->hit_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_HIT);
 				}
 			}
 			else if (ch != vict) {	/* Dam == 0 */
 				send_to_char("&y", ch);
-				act(msg->miss_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR);
+				act(msg->miss_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
 				send_to_char("&0", ch);
 
 				send_to_char("&r", vict);
-				act(msg->miss_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP);
+				act(msg->miss_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_MISS);
 				send_to_char("&0", vict);
 
-				act(msg->miss_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT);
+				act(msg->miss_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_MISS);
 			}
 			return (1);
 		}
@@ -2037,7 +2040,7 @@ bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_dat
 * @param char_data *ch The person who will appear.
 */
 void appear(char_data *ch) {
-	affects_from_char_by_aff_flag(ch, AFF_HIDE | AFF_INVISIBLE);
+	affects_from_char_by_aff_flag(ch, AFF_HIDE | AFF_INVISIBLE, FALSE);
 	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE | AFF_INVISIBLE);
 
 	if (GET_ACCESS_LEVEL(ch) < LVL_GOD) {
@@ -3122,7 +3125,7 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 	GET_POS(ch) = POS_FIGHTING;
 	
 	// remove all stuns when combat starts
-	affects_from_char_by_aff_flag(ch, AFF_STUNNED);
+	affects_from_char_by_aff_flag(ch, AFF_STUNNED, FALSE);
 }
 
 
@@ -3384,7 +3387,7 @@ void one_combat_round(char_data *ch, double speed, obj_data *weapon) {
 	}
 
 	// still fighting?
-	if (FIGHTING(ch) && IN_ROOM(ch) == IN_ROOM(FIGHTING(ch))) {
+	if (FIGHTING(ch) && IN_ROOM(ch) == IN_ROOM(FIGHTING(ch)) && SHOW_FIGHT_MESSAGES(ch, FM_AUTO_DIAGNOSE)) {
 		diag_char_to_char(FIGHTING(ch), ch);
 	}
 }

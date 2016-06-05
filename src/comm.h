@@ -26,7 +26,7 @@ void send_to_room(const char *messg, room_data *room);
 void send_to_outdoor(const char *messg, ...) __attribute__((format(printf, 1, 2)));
 void perform_to_all(const char *messg, char_data *ch);
 void close_socket(descriptor_data *d);
-void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, int type);
+void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, bitvector_t act_flags);
 
 
 // background color codes - not available to players so you have to sprintf/strcpy them in
@@ -51,6 +51,8 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 #define TO_IGNORE_BAD_CODE  BIT(12)	// ignores bad $ codes
 #define DG_NO_TRIG  BIT(13)	// don't check act trigger
 #define ACT_VEHICLE_OBJ  BIT(14)  // the middle/obj param is a vehicle
+#define TO_COMBAT_HIT  BIT(15)	// is a hit (fightmessages) -- REQUIRES vict_obj is a char
+#define TO_COMBAT_MISS  BIT(16)	// is a miss (fightmessages) -- REQUIRES vict_obj is a char
 
 /* I/O functions */
 int write_to_descriptor(socket_t desc, const char *txt);

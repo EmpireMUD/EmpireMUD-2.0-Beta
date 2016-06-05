@@ -248,10 +248,27 @@ if !%self.fighting% && %self.varexists(enrage_counter)%
   if %self.enrage_counter% == 0
     halt
   end
+  if %self.aff_flagged(!ATTACK)%
+    halt
+  end
+  if %self.aff_flagged(!SEE)%
+    %echo% %self.name% returns.
+  end
   %load% mob %self.vnum%
-  %echo% %self.name% settles back down to rest.
+  %echo% %self.name% settles down to rest.
   %purge% %self%
 end
+~
+#10909
+No Leave During Combat - must fight~
+0 s 100
+~
+if %self.fighting%
+  %send% %actor% You cannot flee during the combat with %actor.name%!
+  return 0
+  halt
+end
+return 1
 ~
 #10910
 Sir Vivor Combat + Enrage~
@@ -284,14 +301,21 @@ remote enrage_counter %self.id%
 * Enrage effects:
 if %enraged%
   if %enraged% == 2
-    * In case people manage to chase him down after he flees
-    %damage% %self% -1000
-    * Sir Vivor will probably fully heal if he escapes so this is bad
-    flee
+    * Pretend to flee
+    if %self.aff_flagged(STUNNED)%
+      %echo% %self.name% shakes his head and recovers from stunning!
+    end
+    if %self.aff_flagged(ENTANGLED)%
+      %echo% %self.name% breaks free of the vines entangling him!
+    end
+    %echo% %self.name% tries to flee...
+    %echo% %self.name% runs behind a large stalagmite and disappears!
+    dg_affect %self% !ATTACK on 300
+    dg_affect %self% !SEE on -1
   end
   * Don't always show the message or it would be even spammier
   if %random.4% == 4
-    %echo% %self.name%'s swings his sword with strength born of terror!
+    %echo% %self.name% swings his sword with strength born of terror!
   end
   dg_affect %self% BONUS-PHYSICAL 5 3600
 end
@@ -434,6 +458,11 @@ if %actor.inventory(10945)%
   halt
 end
 if %actor.on_quest(10902)%
+  if %self.level%-%actor.level% > 50
+    %send% %actor% You're not high enough level to steal from %self.name%! It'd just eat you.
+    return 0
+    halt
+  end
   %send% %actor% You pick %self.name%'s pocket...
   %load% obj 10945 %actor% inv
   eval item %actor.inventory()%
@@ -491,7 +520,6 @@ buy~
 eval vnum -1
 eval cost 0
 eval named a thing
-eval keyw skycleaver
 eval currency dragtoken_128
 if (!%arg%)
   %send% %actor% Type 'list' to see what's available.
@@ -528,15 +556,15 @@ elseif pen /= %arg%
   eval named a dragonquill pen
   * Start of crafting patterns
 elseif warhammer /= %arg%
-  eval vnum 10930
+  eval vnum 10931
   eval cost 12
   eval named a dragonsteel warhammer schematic
 elseif claymore /= %arg%
-  eval vnum 10931
+  eval vnum 10932
   eval cost 12
   eval named a dragonsteel claymore schematic
 elseif mace /= %arg%
-  eval vnum 10932
+  eval vnum 10933
   eval cost 12
   eval named a dragonbone mace schematic
 elseif wand /= %arg%
@@ -608,7 +636,7 @@ remote %currency% %actor.id%
 Colossal Dragon must-fight~
 0 q 100
 ~
-if (%actor.nohassle% || %actor.on_quest(10900)% || %self.aff_flagged(!ATTACK)%)
+if (%actor.is_npc% || %actor.nohassle% || %actor.on_quest(10900)% || %self.aff_flagged(!ATTACK)%)
   halt
 end
 if %actor.aff_flagged(SNEAK)%

@@ -289,6 +289,7 @@ typedef struct vehicle_data vehicle_data;
 #define GLB_FLAG_IN_DEVELOPMENT  BIT(0)	// not live
 #define GLB_FLAG_ADVENTURE_ONLY  BIT(1)	// does not apply outside same-adventure
 #define GLB_FLAG_CUMULATIVE_PERCENT  BIT(2)	// accumulates percent with other valid globals instead of its own percent
+#define GLB_FLAG_CHOOSE_LAST  BIT(3)	// the first choose-last global that passes is saved for later, if nothing else is chosen
 
 
 // Group Defines
@@ -1025,6 +1026,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_NO_LOOT  BIT(29)	// D. do not drop loot
 #define MOB_NO_TELEPORT  BIT(30)  // E. cannot teleport to this mob
 #define MOB_NO_EXPERIENCE  BIT(31)	// F. players get no exp against this mob
+#define MOB_NO_RESCALE  BIT(32)	// G. mob won't rescale (after the first time), e.g. if specific traits were set
 
 
 // MOB_MOVE_x: mob/vehicle movement types
@@ -1061,6 +1063,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_MOVE_DRIFTS  30
 #define MOB_MOVE_BOUNCES  31
 #define MOB_MOVE_FLOWS  32
+#define MOB_MOVE_LEAVES  33
 
 
 // name sets: add matching files in lib/text/names/
@@ -1353,7 +1356,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_MINING			8
 #define ACT_MINTING			9
 #define ACT_FISHING			10
-	#define ACT_UNUSED1  11
+#define ACT_START_FILLIN	11
 #define ACT_REPAIRING		12
 #define ACT_CHIPPING		13
 #define ACT_PANNING			14
@@ -1380,6 +1383,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_GEN_CRAFT		35
 #define ACT_SAILING			36
 #define ACT_PILOTING		37
+#define ACT_SWAP_SKILL_SETS	38
 
 // act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -1467,6 +1471,26 @@ typedef struct vehicle_data vehicle_data;
 #define FULL  1
 #define THIRST  2
 #define NUM_CONDS  3
+
+
+// FM_x: combat messages
+#define FM_MY_HITS  BIT(0)	// player's own hits
+#define FM_MY_MISSES  BIT(1)	// player's misses
+#define FM_HITS_AGAINST_ME  BIT(2)	// player is hit
+#define FM_MISSES_AGAINST_ME  BIT(3)	// player is missed
+#define FM_ALLY_HITS  BIT(4)	// any allied character hits
+#define FM_ALLY_MISSES  BIT(5)	// any allied player misses
+#define FM_HITS_AGAINST_ALLIES  BIT(6)	// any ally is hit
+#define FM_MISSES_AGAINST_ALLIES  BIT(7)	// any ally is missed
+#define FM_HITS_AGAINST_TARGET  BIT(8)	// anybody hits your target
+#define FM_MISSES_AGAINST_TARGET  BIT(9)	// anybody misses your target
+#define FM_HITS_AGAINST_TANK  BIT(10)	// anybody hits tank (target's focus)
+#define FM_MISSES_AGAINST_TANK  BIT(11)	// anybody misses tank (target's focus)
+#define FM_OTHER_HITS  BIT(12)	// hits not covered by other rules
+#define FM_OTHER_MISSES  BIT(13)	// misses not covered by other rules
+#define FM_AUTO_DIAGNOSE  BIT(14)	// does a diagnose after each hit
+
+#define DEFAULT_FIGHT_MESSAGES  (FM_MY_HITS | FM_MY_MISSES | FM_HITS_AGAINST_ME | FM_MISSES_AGAINST_ME | FM_ALLY_HITS | FM_ALLY_MISSES | FM_HITS_AGAINST_ALLIES | FM_MISSES_AGAINST_ALLIES | FM_HITS_AGAINST_TARGET | FM_MISSES_AGAINST_TARGET |FM_HITS_AGAINST_TANK | FM_MISSES_AGAINST_TANK | FM_OTHER_HITS | FM_OTHER_MISSES | FM_AUTO_DIAGNOSE)
 
 
 // GRANT_X: Grant flags allow players to use abilities below the required access level
@@ -1951,6 +1975,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_ACTION_VNUMS  3	// action vnums 0, 1, 2
 #define NUM_OBJ_VAL_POSITIONS  3	// GET_OBJ_VAL(obj, X) -- caution: changing this will require you to change the .obj file format
 #define NUM_GLB_VAL_POSITIONS  3	// GET_GLOBAL_VAL(glb, X) -- caution: changing this will require you to change the .glb file format
+#define NUM_SKILL_SETS  2	// number of different sets a player has
 
 
 /*
@@ -2851,7 +2876,7 @@ struct mount_data {
 // used in player_special_data
 struct player_ability_data {
 	any_vnum vnum;	// ABIL_ or ability vnum
-	bool purchased;	// whether or not the player bought it
+	bool purchased[NUM_SKILL_SETS];	// whether or not the player bought it
 	byte levels_gained;	// tracks for the cap on how many times one ability grants skillups
 	ability_data *ptr;	// live abil pointer
 
@@ -2897,7 +2922,8 @@ struct player_special_data {
 	byte immortal_level;	// stored so that if level numbers are changed, imms stay at the correct level
 	bitvector_t grants;	// grant imm abilities
 	bitvector_t syslogs;	// which syslogs people want to see
-	bitvector_t bonus_traits;	// BONUS_x
+	bitvector_t bonus_traits;	// BONUS_
+	bitvector_t fight_messages;	// FM_ flags
 	ubyte bad_pws;	// number of bad password attemps
 	struct mail_data *mail_pending;	// uncollected letters
 	int create_alt_id;	// used in CON_Q_ALT_NAME and CON_Q_ALT_PASSWORD
@@ -2974,6 +3000,7 @@ struct player_special_data {
 	any_vnum creation_archetype;	// this is now stored permanently so later decisions can be made based on it
 	struct player_skill_data *skill_hash;
 	struct player_ability_data *ability_hash;
+	int current_skill_set;	// which skill set a player is currently in
 	bool can_gain_new_skills;	// not required to keep skills at zero
 	bool can_get_bonus_skills;	// can buy extra 75's
 	sh_int skill_level;  // levels computed based on class skills

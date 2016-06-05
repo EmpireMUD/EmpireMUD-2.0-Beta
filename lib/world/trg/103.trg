@@ -19,7 +19,7 @@ elseif (%room.sector% == Desert Crop || %room.sector% == Sandy Field)
 elseif (%room.sector% == Desert)
   %echo% %self.name% scorches the desert!
   %terraform% %room% 10305
-elseif (%room.sector% ~= Forest || %room.sector% ~= Jungle)
+elseif ((%room.sector% ~= Forest || %room.sector% ~= Jungle) && %room.sector% != Enchanted Forest)
   %echo% %self.name% scorches the trees!
   %terraform% %room% 10300
 elseif (%room.sector% == Grove)

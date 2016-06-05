@@ -1683,6 +1683,7 @@ const char *versions_list[] = {
 	"b3.17",
 	"b4.1",
 	"b4.2",
+	"b4.4",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2100,6 +2101,12 @@ PLAYER_UPDATE_FUNC(b4_2_mount_update) {
 }
 
 
+// sets default fight message flags
+PLAYER_UPDATE_FUNC(b4_4_fight_messages) {
+	SET_BIT(GET_FIGHT_MESSAGES(ch), DEFAULT_FIGHT_MESSAGES);
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -2281,6 +2288,10 @@ void check_version(void) {
 		if (MATCH_VERSION("b4.2")) {
 			log("Adding b4.2 mount data...");
 			update_all_players(NULL, b4_2_mount_update);
+		}
+		if (MATCH_VERSION("b4.4")) {
+			log("Adding b4.4 fight messages...");
+			update_all_players(NULL, b4_4_fight_messages);
 		}
 	}
 	

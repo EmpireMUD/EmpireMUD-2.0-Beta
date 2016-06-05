@@ -50,6 +50,7 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 extern obj_data *die(char_data *ch, char_data *killer);
 void death_log(char_data *ch, char_data *killer, int type);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
@@ -126,6 +127,10 @@ void check_attribute_gear(char_data *ch) {
 				}
 			}
 		}
+	}
+	
+	if (found) {
+		determine_gear_level(ch);
 	}
 }
 
@@ -268,8 +273,7 @@ int limit_crowd_control(char_data *victim, int atype) {
 	for (iter = ROOM_PEOPLE(IN_ROOM(victim)); iter; iter = iter->next_in_room) {
 		if (iter != victim && affected_by_spell(iter, atype)) {
 			++count;
-			affect_from_char(iter, atype);
-			act("You recover.", FALSE, iter, NULL, NULL, TO_CHAR);
+			affect_from_char(iter, atype, TRUE);	// sends message
 			act("$n recovers.", TRUE, iter, NULL, NULL, TO_ROOM);
 		}
 	}
@@ -290,6 +294,7 @@ void point_update_char(char_data *ch) {
 	void remove_quest_items(char_data *ch);
 	
 	struct cooldown_data *cool, *next_cool;
+	struct instance_data *inst;
 	empire_data *emp;
 	char_data *c;
 	bool found;
@@ -387,6 +392,18 @@ void point_update_char(char_data *ch) {
 					if (GET_POS(ch) < POS_SLEEPING) {
 						GET_POS(ch) = POS_STANDING;
 					}
+					
+					// reset scaling if possible...
+					if (!MOB_FLAGGED(ch, MOB_NO_RESCALE)) {
+						inst = get_instance_by_id(MOB_INSTANCE_ID(ch));
+						if (!inst && IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+							inst = find_instance_by_room(IN_ROOM(ch), FALSE);
+						}
+						// if no instance or not level-locked
+						if (!inst || inst->level <= 0) {
+							GET_CURRENT_SCALE_LEVEL(ch) = 0;
+						}
+					}
 				}
 			}
 		}
@@ -443,6 +460,7 @@ void real_update_char(char_data *ch) {
 	char_data *room_ch, *next_ch;
 	int result, iter, type;
 	int fol_count, gain;
+	bool found;
 	
 	// first check location: this may move the player
 	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
@@ -487,9 +505,7 @@ void real_update_char(char_data *ch) {
 		else if (af->duration != UNLIMITED) {
 			if ((af->type > 0)) {
 				if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
-					if (ch->desc && *affect_wear_off_msgs[af->type]) {
-						msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', affect_wear_off_msgs[af->type]);
-					}
+					show_wear_off_msg(ch, af->type);
 				}
 			}
 			
@@ -529,8 +545,8 @@ void real_update_char(char_data *ch) {
 		}
 		else if (dot->duration != UNLIMITED) {
 			// expired
-			if (dot->type > 0 && ch->desc && *affect_wear_off_msgs[dot->type]) {
-				msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', affect_wear_off_msgs[dot->type]);
+			if (dot->type > 0) {
+				show_wear_off_msg(ch, dot->type);
 			}
 			dot_remove(ch, dot);
 		}
@@ -618,13 +634,18 @@ void real_update_char(char_data *ch) {
 	check_attribute_gear(ch);
 	
 	// ensure character isn't using any gear they shouldn't be
+	found = FALSE;
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (wear_data[iter].count_stats && GET_EQ(ch, iter) && !can_wear_item(ch, GET_EQ(ch, iter), TRUE)) {
 			// can_wear_item sends own message to ch
 			act("$n stops using $p.", TRUE, ch, GET_EQ(ch, iter), NULL, TO_ROOM);
 			// this may extract it
 			unequip_char_to_inventory(ch, iter);
+			found = TRUE;
 		}
+	}
+	if (found) {
+		determine_gear_level(ch);
 	}
 
 	/* moving on.. */
@@ -1848,7 +1869,7 @@ void gain_condition(char_data *ch, int condition, int value) {
 	
 	// prevent well-fed if hungry
 	if (IS_HUNGRY(ch) && value > 0) {
-		affect_from_char(ch, ATYPE_WELL_FED);
+		affect_from_char(ch, ATYPE_WELL_FED, TRUE);
 	}
 
 	if (PLR_FLAGGED(ch, PLR_WRITING) || !gain_cond_messsage) {

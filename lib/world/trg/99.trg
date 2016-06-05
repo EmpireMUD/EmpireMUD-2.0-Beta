@@ -2,8 +2,8 @@
 Mini-pet Use~
 1 c 2
 use~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
   return 0
   halt
 end
@@ -67,8 +67,8 @@ end
 Dismissable~
 0 ct 0
 dismiss~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+eval test %%actor.char_target(%arg%)%%
+if %test% != %self%
   return 0
   halt
 end
@@ -77,8 +77,9 @@ if (%self.master% && %self.master% == %actor%)
   %echoaround %actor% %actor.name% dismisses %self.name%.
   %purge% %self%
 else
-  * ordinary dismiss error
-  return 0
+  %send% %actor% That's not your pet.
+  return 1
+  halt
 end
 ~
 #9902

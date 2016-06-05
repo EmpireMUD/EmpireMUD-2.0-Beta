@@ -9,7 +9,7 @@ blocks that are currently in use.
  300  Barded mount mobs
  400  High Sorcery mobs
  500  Natural Magic mobs
- 600  
+ 600  level 200-300 crafting resources, with related sectors and mobs
  700 
  800  Glass and wax items
  900  Carpentry items and carts

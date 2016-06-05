@@ -158,6 +158,7 @@ Enchant Armor:
 
 Enchant Tools:
   embiggening (pack) - capacity  (1 of each of the 4 gems)
+  this ability also lets you enchant the crystal seed world drop
 
 See also: CRAFTING LEVEL, GREATER ENCHANTMENTS, RECIPES, SHARE
 #
@@ -228,16 +229,21 @@ Mirrorimage (High Sorcery ability)
 
 Usage:  mirrorimage
 Cooldown:  5 minutes
-Cost:  40 mana
+Cost:  20% of max mana
 
-This spell creates an identical duplicate of the caster (with reduced health).
-It's good enough to fool at least one of the people hitting you.
+This spell creates an identical duplicate of the caster that deals no damage.
+It's good enough to fool at least one of the people hitting you (they will
+switch targets to the mirror image), and none of the people attacking you will
+see the message that you split in two.
 
-The mirror image counts as a familiar.
+Mirror images are charmed, so they take orders. They can't be healed and will
+only rescue you in combat one time. Once combat ends, they can't start combat
+on their own, so they can't be re-used and are only useful when summoned in
+combat. You can dismiss the mirror image and summon a new one.
 
-Gain experience by summoning it.
+Gain experience by summoning a mirror image.
 
-See also: FAMILIAR, DISMISS, ORDER
+See also: ORDER
 #
 "PHOENIX RITE"
 
@@ -511,14 +517,15 @@ Sunshock (High Sorcery ability)
 
 Usage:  sunshock [victim]
 Cooldown:  9 seconds
-Cost:  25 mana
+Cost:  based on damage
 Debuff type:  High Sorcery
 
 Sunshock blasts your target with the pure light of the sun. This deals a small
-amount of damage (scaled by your level in High Sorcery), and causes a very
+amount of damage (scaled by your level, role, and traits), and causes a very
 short blinding effect.
 
-Sunshock does 2x damage to vampires.
+Sunshock does 1.5x damage to vampires, but this damage bonus does not change
+the cost.
 
 If you are in combat and specify no target, Sunshock hits your current
 opponent.

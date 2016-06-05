@@ -1742,7 +1742,7 @@ void perform_inspire(char_data *ch, char_data *vict, int type) {
 	int time, value;
 	bool two;
 	
-	affect_from_char(vict, ATYPE_INSPIRE);
+	affect_from_char(vict, ATYPE_INSPIRE, FALSE);
 	
 	if (ch == vict || (GET_LOYALTY(ch) && GET_LOYALTY(ch) == GET_LOYALTY(vict))) {
 		time = 24 MUD_HOURS;
@@ -4531,7 +4531,7 @@ ACMD(do_radiance) {
 	
 	if (affected_by_spell(ch, ATYPE_RADIANCE)) {
 		msg_to_char(ch, "You turn off your radiant aura.\r\n");
-		affect_from_char(ch, ATYPE_RADIANCE);
+		affect_from_char(ch, ATYPE_RADIANCE, FALSE);
 	}
 	else if (!can_use_ability(ch, ABIL_RADIANCE, NOTHING, 0, NOTHING)) {
 		return;

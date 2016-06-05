@@ -1491,8 +1491,8 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			replace_question_color(buf, base_color, lbuf);
 			strcpy(buf, lbuf);
 		}
-		if (strstr(buf, "&V")) {
-			str = str_replace("&V", ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY) ? "&m" : "&0", buf);
+		if (strstr(buf, "&#")) {
+			str = str_replace("&#", ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY) ? "&m" : "&0", buf);
 			strcpy(buf, str);
 			free(str);
 		}
