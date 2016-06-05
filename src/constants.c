@@ -2792,6 +2792,17 @@ const char *affect_types[] = {
 	"morph",
 	"whisperstride",
 	"well-fed",
+	"ablate",	// 65
+	"acidblast",
+	"astralclaw",
+	"chronoblast",
+	"dispirit",
+	"erode",	// 70
+	"scour",
+	"shadowlash",	// blind
+	"shadowlash",	// dot
+	"soulchain",
+	"thornlash",	// 75
 	"\n"
 	};
 
@@ -2863,6 +2874,17 @@ const char *affect_wear_off_msgs[] = {
 	"",	// morph stats -- no wear-off message
 	"Your whisperstride fades.",
 	"You no longer feel well-fed.",
+	"The ablation fades.",	// 65
+	"The acid blast wears off.",
+	"",	// astral claw
+	"Time speeds back up to normal.",
+	"Your wits return.",
+	"",	// 70, erode
+	"",	// scour
+	"Your vision returns.",
+	"",	// shadowlash-dot
+	"Your soul is unchained.",
+	"",	// 75, thornlast
 	"\n"
 };
 
@@ -2923,7 +2945,20 @@ const char *cooldown_types[] = {
 	"diversion",
 	"rogue flag",
 	"portal sickness",
-	"whisperstride",	// 54
+	"whisperstride",
+	"ablate",	// 55
+	"acidblast",
+	"arclight",
+	"astralclaw",
+	"chronoblast",
+	"deathtouch",	// 60
+	"dispirit",
+	"erode",
+	"scour",
+	"shadowlash",
+	"soulchain",	// 65
+	"starstrike",
+	"thornlash",	// 67
 	"\n"
 };
 

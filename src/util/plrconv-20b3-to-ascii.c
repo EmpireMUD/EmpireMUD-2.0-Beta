@@ -391,7 +391,7 @@ struct b3_over_time_effect_type {
 };
 
 struct b3_cooldown_data {
-	sh_int type;	// any COOLDOWN_x const
+	sh_int type;	// any COOLDOWN_ const
 	time_t expire_time;	// time at which the cooldown has expired
 	
 	struct b3_cooldown_data *next;	// linked list

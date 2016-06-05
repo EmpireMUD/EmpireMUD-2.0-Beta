@@ -480,7 +480,7 @@ bool can_gain_skill_from(char_data *ch, ability_data *abil) {
 * @param any_vnum ability Any ABIL_ const or vnum.
 * @param int cost_pool HEALTH, MANA, MOVE, BLOOD (NOTHING if no charge).
 * @param int cost_amount Mana (or whatever) amount required, if any.
-* @param int cooldown_type Any COOLDOWN_x const, or NOTHING for no cooldown check.
+* @param int cooldown_type Any COOLDOWN_ const, or NOTHING for no cooldown check.
 * @return bool TRUE if ch can use ability; FALSE if not.
 */
 bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type) {
@@ -533,7 +533,7 @@ bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_am
 * @param char_data *ch The player or NPC.
 * @param int cost_pool HEALTH, MANA, MOVE, BLOOD (NOTHING if no charge).
 * @param int cost_amount Mana (or whatever) amount required, if any.
-* @param int cooldown_type Any COOLDOWN_x const to apply (NOTHING for none).
+* @param int cooldown_type Any COOLDOWN_ const to apply (NOTHING for none).
 * @param int cooldown_time Cooldown duration, if any.
 * @param int wait_type Any WAIT_x const or WAIT_NONE for no command lag.
 */
