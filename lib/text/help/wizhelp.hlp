@@ -13,6 +13,19 @@ Example:
 
 See also: GRANT, SET
 #d
+APPROVE UNAPPROVE AUTHORIZED AUTHORIZATION APPROVAL
+
+Usage:  approve <name>
+        unapprove <name>
+
+If the mud is configured to require approval for players/characters, the
+'approve' command gives that approval, and the 'unapprove' command revokes it.
+This command is grantable.
+
+The command "config approval -v" will show the current configuration.
+
+See also: CONFIG, GRANT
+#d
 AT WIZAT
 
 Usage:  at <room | coords | item | mob | player name> <command> <arguments>
@@ -31,20 +44,6 @@ Examples:
   > at (0,0) bark  -- There must be no spaces in the coordinates
 
 See also: GOTO
-#d
-AUTHORIZE
-
-Usage:  authorize <name>
-
-This command is used if the mud requires character authorization. Authorization
-is configured via the "config game" command. If it's shut off, players will
-automatically authorize during character creation. This command is grantable.
-
-If you wish to use authorization on your EmpireMUD, you should turn on the
-'require_auth' game config and then either use the 'authorize' command
-manually, or set up an automatic system.
-
-See also: GRANT
 #d
 AUTOWIZ
 

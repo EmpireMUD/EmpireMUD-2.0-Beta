@@ -119,7 +119,10 @@ bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bo
 	bool ok = FALSE;
 	
 	// easy checks
-	if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
+	if (!IS_APPROVED(ch) && config_get_bool("travel_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
 		msg_to_char(ch, "You are entangled and can't enter anything.\r\n");
 	}
 	else if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && IN_ROOM(ch) == IN_ROOM(ch->master)) {
@@ -1848,7 +1851,10 @@ ACMD(do_transport) {
 	
 	one_word(argument, arg);
 	
-	if (!ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_START_LOCATION)) {
+	if (!IS_APPROVED(ch) && config_get_bool("travel_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_START_LOCATION)) {
 		msg_to_char(ch, "You need to be at a starting location to transport!\r\n");
 	}
 	else if (*arg && !(target = find_target_room(ch, arg))) {

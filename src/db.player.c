@@ -709,6 +709,7 @@ void free_char(char_data *ch) {
 	struct slash_channel *loadslash, *next_loadslash;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
+	struct mount_data *mount, *next_mount;
 	struct channel_history_data *history;
 	struct player_slash_channel *slash;
 	struct interaction_item *interact;
@@ -865,6 +866,10 @@ void free_char(char_data *ch) {
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
 			HASH_DEL(GET_ABILITY_HASH(ch), abil);
 			free(abil);
+		}
+		HASH_ITER(hh, GET_MOUNT_LIST(ch), mount, next_mount) {
+			HASH_DEL(GET_MOUNT_LIST(ch), mount);
+			free(mount);
 		}
 		
 		free_player_completed_quests(&GET_COMPLETED_QUESTS(ch));
@@ -1482,6 +1487,13 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (PFILE_TAG(line, "Morph:", length)) {
 					GET_MORPH(ch) = morph_proto(atoi(line + length + 1));
 				}
+				else if (PFILE_TAG(line, "Mount:", length)) {
+					sscanf(line + length + 1, "%d %s", &i_in[0], str_in);
+					// only if mob exists
+					if (mob_proto(i_in[0])) {
+						add_mount(ch, i_in[0], asciiflag_conv(str_in));
+					}
+				}
 				else if (PFILE_TAG(line, "Mount Flags:", length)) {
 					GET_MOUNT_FLAGS(ch) = asciiflag_conv(line + length + 1);
 				}
@@ -1958,6 +1970,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct affected_type *af, *new_af, *next_af, *af_list;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
+	struct mount_data *mount, *next_mount;
 	struct player_slash_channel *slash;
 	struct over_time_effect_type *dot;
 	struct slash_channel *loadslash;
@@ -2204,6 +2217,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	if (IS_MORPHED(ch)) {
 		fprintf(fl, "Morph: %d\n", MORPH_VNUM(GET_MORPH(ch)));
+	}
+	HASH_ITER(hh, GET_MOUNT_LIST(ch), mount, next_mount) {
+		fprintf(fl, "Mount: %d %s\n", mount->vnum, bitv_to_alpha(mount->flags));
 	}
 	if (GET_MOUNT_FLAGS(ch) != NOBITS) {
 		fprintf(fl, "Mount Flags: %s\n", bitv_to_alpha(GET_MOUNT_FLAGS(ch)));
@@ -2957,11 +2973,17 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	if (GET_IMMORTAL_LEVEL(ch) > -1) {
 		GET_ACCESS_LEVEL(ch) = LVL_TOP - GET_IMMORTAL_LEVEL(ch);
-		GET_ACCESS_LEVEL(ch) = MAX(GET_ACCESS_LEVEL(ch), LVL_START_IMM);
+		GET_ACCESS_LEVEL(ch) = MAX(GET_ACCESS_LEVEL(ch), LVL_GOD);
+	}
+	else {	// not an imm/god
+		GET_ACCESS_LEVEL(ch) = MIN(GET_ACCESS_LEVEL(ch), LVL_MORTAL);
 	}
 	
-	if (PLR_FLAGGED(ch, PLR_INVSTART))
+	// set (and correct) invis level
+	if (PLR_FLAGGED(ch, PLR_INVSTART)) {
 		GET_INVIS_LEV(ch) = GET_ACCESS_LEVEL(ch);
+	}
+	GET_INVIS_LEV(ch) = MIN(GET_INVIS_LEV(ch), GET_ACCESS_LEVEL(ch));
 
 	/*
 	 * We have to place the character in a room before equipping them
@@ -3200,6 +3222,7 @@ void init_player(char_data *ch) {
 	player_index_data *index;
 	int account_id = NOTHING;
 	account_data *acct;
+	bool first = FALSE;
 	int i, iter;
 
 	// create a player_special structure, if needed
@@ -3218,6 +3241,8 @@ void init_player(char_data *ch) {
 
 	/* *** if this is our first player --- he be God *** */
 	if (HASH_CNT(idnum_hh, player_table_by_idnum) == 0) {
+		first = TRUE;
+		
 		GET_ACCESS_LEVEL(ch) = LVL_TOP;
 		GET_IMMORTAL_LEVEL(ch) = 0;			/* Initialize it to 0, meaning Implementor */
 
@@ -3230,6 +3255,7 @@ void init_player(char_data *ch) {
 		ch->real_attributes[INTELLIGENCE] = att_max(ch);
 		ch->real_attributes[WITS] = att_max(ch);
 		
+		SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
 		SET_BIT(PRF_FLAGS(ch), PRF_HOLYLIGHT | PRF_ROOMFLAGS | PRF_NOHASSLE);
 		
 		// turn on all syslogs
@@ -3279,6 +3305,13 @@ void init_player(char_data *ch) {
 		else if (!GET_ACCOUNT(ch)) {
 			create_account_for_player(ch);
 		}
+	}
+	
+	// hold-over from earlier; needed account
+	if (first) {
+		SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_APPROVED);
+		SAVE_ACCOUNT(GET_ACCOUNT(ch));
+		update_player_index(index, ch);
 	}
 	
 	ch->char_specials.affected_by = 0;
@@ -3398,11 +3431,16 @@ void start_new_character(char_data *ch) {
 	}
 	GET_CREATION_HOST(ch) = ch->desc ? str_dup(ch->desc->host) : NULL;
 	
-	// level
-	if (GET_ACCESS_LEVEL(ch) < LVL_APPROVED && !config_get_bool("require_auth")) {
-		GET_ACCESS_LEVEL(ch) = LVL_APPROVED;
+	// access level: set to LVL_MORTAL
+	if (GET_ACCESS_LEVEL(ch) < LVL_MORTAL) {
+		GET_ACCESS_LEVEL(ch) = LVL_MORTAL;
 	}
-
+	// auto-authorization
+	if (!IS_APPROVED(ch) && config_get_bool("auto_approve")) {
+		// only approve the character automatically
+		SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
+	}
+	
 	GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
 	GET_MOVE(ch) = GET_MAX_MOVE(ch);
 	GET_MANA(ch) = GET_MAX_MANA(ch);
@@ -3643,7 +3681,7 @@ bool member_is_timed_out_ch(char_data *ch) {
 * @param bool read_techs if TRUE, will add techs based on players (usually only during startup)
 */
 void read_empire_members(empire_data *only_empire, bool read_techs) {
-	void resort_empires();
+	void resort_empires(bool force);
 	bool should_delete_empire(empire_data *emp);
 	
 	struct empire_member_reader_data *account_list = NULL, *emrd;
@@ -3660,6 +3698,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			EMPIRE_GREATNESS(emp) = 0;
 			EMPIRE_TOTAL_PLAYTIME(emp) = 0;
 			EMPIRE_LAST_LOGON(emp) = 0;
+			EMPIRE_IMM_ONLY(emp) = 0;
 		}
 	}
 	
@@ -3730,7 +3769,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 	
 	// re-sort now only if we aren't reading techs (this hints that we're also reading territory)
 	if (!read_techs) {
-		resort_empires();
+		resort_empires(FALSE);
 	}
 }
 

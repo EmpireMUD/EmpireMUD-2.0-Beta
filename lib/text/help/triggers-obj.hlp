@@ -146,6 +146,7 @@ For each type, there is a help file named &yOTRIG <type>&0.
 All object scripts provide the &c%self%&0 variable.
 
 When using field  - The variable returns:
+&cbind(person)&0 - Binds the item to a player (or "nobody" to unbind it).
 &ccarried_by&0 - The id of the character carrying the object, or an empty return.
 &ccontents&0 - Gives the first object in a container.
 &ccount(str)&0 - Number of matching items (name/vnum) inside it.
@@ -156,6 +157,7 @@ When using field  - The variable returns:
 &cis_flagged(FLAG)&0 - Returns whether or not the flag is on.
 &cis_inroom&0 - Returns true if object is in room.
 &cis_name(str)&0 - Returns true if str contains names for the object.
+&clevel&0 - The current scaled level of the object (0 if not yet scaled).
 &cmaterial&0 - Name of what the object is made out of, e.g. GOLD.
 &cname&0 - The list of key words of the object.
 &cnext_in_list&0 - The id of the next object in the characters inventory, or an

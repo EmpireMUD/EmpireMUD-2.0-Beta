@@ -215,6 +215,9 @@ wait 5 sec *Global cooldown
 Fiend No Leave~
 0 s 100
 ~
+if %actor.nohassle%
+  halt
+end
 %send% %actor% You try to leave, but a wall of fire blocks your escape!
 %echoaround% %actor% %actor.name% tries to leave, but a wall of fire blocks %actor.hisher% escape!
 return 0
@@ -235,5 +238,209 @@ Fiend No Flee~
 flee~
 %send% %actor% You turn to flee, but a wall of fire blocks your escape!
 %echoaround% %actor% %actor.name% turns to flee, but a wall of fire blocks %actor.hisher% escape!
+~
+#18082
+Fissure drop destruction~
+2 h 100
+~
+if %object.vnum% == 18097
+  * Block people from wasting essence by accident
+  %send% %actor% There's no point in dropping essence into the fissure.
+  return 0
+  halt
+end
+%send% %actor% You drop %object.shortdesc% into the fissure!
+%echoaround% %actor% %actor.name% drops %object.shortdesc% into the fissure!
+%echo% The fire and darkness below your feet swallow %object.shortdesc%...
+if (%object.vnum% >= 18075) && (%object.vnum% <= 18094)
+  %load% obj 18097 %actor% inv %object.level%
+  %send% %actor% The molten essence released by the destruction of %object.shortdesc% gathers around you.
+  %echoaround% %actor% The molten essence released by the destruction of %object.shortdesc% gathers around %actor.name%.
+end
+%purge% %object%
+return 0
+~
+#18083
+Molten essence identify~
+1 c 6
+identify~
+eval test %%self.is_name(%arg%)%%
+if !%test%
+  halt
+end
+return 0
+wait 1
+eval level 250
+%send% %actor% This essence is from an item of level: %level%.
+~
+#18084
+Fissure shop list~
+2 c 0
+list~
+* If player has no essence, ignore the command
+if !%actor.has_resources(18097,1)%
+  return 0
+  halt
+end
+%send% %actor% &0All items cost 10 essence each and will be the same level as the lowest level
+%send% %actor% &0essence spent to make them. All items are created exactly the same as if the
+%send% %actor% &0fiend dropped that item, but bound to you alone.
+%send% %actor% You can create (with 'buy <item>') any of the following items:
+%send% %actor% &0
+%send% %actor% firecloth skirt             (caster legs)
+%send% %actor% firecloth pauldrons         (caster arms)
+%send% %actor% hearthflame skirt           (healer legs)
+%send% %actor% hearthflame sleeves         (healer arms)
+%send% %actor% magma-forged pauldrons      (tank arms)
+%send% %actor% core-forged plate armor     (tank armor)
+%send% %actor% huge spiked pauldrons       (melee arms)
+%send% %actor% fiendskin jerkin            (melee armor)
+%send% %actor% bottomless pouch            (general pack)
+%send% %actor% igneous shield              (hybrid shield)
+%send% %actor% cold lava ring              (caster ring)
+%send% %actor% mantle of flames            (caster about)
+%send% %actor% frozen flame earrings       (healer ears)
+%send% %actor% emberweave gloves           (healer hands)
+%send% %actor% molten gauntlets            (tank hands)
+%send% %actor% molten fiend earrings       (tank ears)
+%send% %actor% Flametalon                  (melee dagger)
+%send% %actor% obsidian earring            (melee ears)
+%send% %actor% crown of abyssal flames     (healer head)
+%send% %actor% fiendhorn bladed bow        (tank ranged)
+~
+#18085
+Molten fiend shop buy~
+2 c 0
+buy~
+* This trigger is REALLY LONG.
+* If player has no essence, ignore the command
+if !%actor.has_resources(18097,1)%
+  return 0
+  halt
+end
+if !%arg%
+  %send% %actor% Create what from essence?
+  halt
+end
+* If player doesn't have enough essence, give an error
+if !%actor.has_resources(18097,10)%
+  %send% %actor% You need 10 essence.
+  return 1
+  halt
+end
+* What are we buying?
+eval check %arg%
+eval vnum 0
+eval name nothing
+if firecloth /= %check%
+  %send% %actor% Did you mean firecloth skirt or firecloth pauldrons?
+  halt
+elseif hearthflame s /= %check%
+  %send% %actor% Did you mean hearthflame skirt or hearthflame sleeves?
+  halt
+elseif molten /= %check%
+  %send% %actor% Did you mean molten gauntlets or molten fiend earrings?
+  halt
+elseif fiend /= %check%
+  %send% %actor% Did you mean fiendskin jerkin or fiendhorn bladed bow?
+  halt
+elseif firecloth skirt /= %check%
+  eval name a firecloth skirt
+  eval vnum 18075
+elseif firecloth pauldrons /= %check%
+  eval name firecloth pauldrons
+  eval vnum 18076
+elseif hearthflame skirt /= %check%
+  eval name a hearthflame skirt
+  eval vnum 18077
+elseif hearthflame sleeves /= %check%
+  eval name hearthflame sleeves
+  eval vnum 18078
+elseif magma-forged pauldrons /= %check%
+  eval name magma-forged pauldrons
+  eval vnum 18079
+elseif core-forged plate armor /= %check%
+  eval name core-forged plate armor
+  eval vnum 18080
+elseif huge spiked pauldrons /= %check%
+  eval name huge spiked pauldrons
+  eval vnum 18081
+elseif fiendskin jerkin /= %check%
+  eval name a fiendskin jerkin
+  eval vnum 18082
+elseif bottomless pouch /= %check%
+  eval name a bottomless pouch
+  eval vnum 18083
+elseif igneous shield /= %check%
+  eval name an igneous shield
+  eval vnum 18084
+elseif cold lava ring /= %check%
+  eval name a cold lava ring
+  eval vnum 18085
+elseif mantle of flames /= %check%
+  eval name a mantle of flames
+  eval vnum 18086
+elseif frozen flame earrings /= %check%
+  eval name frozen flame earrings
+  eval vnum 18087
+elseif emberweave gloves /= %check%
+  eval name emberweave gloves
+  eval vnum 18088
+elseif molten gauntlets /= %check%
+  eval name molten gauntlets
+  eval vnum 18089
+elseif molten fiend earrings /= %check%
+  eval name the molten fiend's earrings
+  eval vnum 18090
+elseif Flametalon /= %check%
+  eval name Flametalon
+  eval vnum 18091
+elseif obsidian earring /= %check%
+  eval name an obsidian earring
+  eval vnum 18092
+elseif crown of abyssal flames /= %check%
+  eval name a crown of abyssal flames
+  eval vnum 18093
+elseif fiendhorn bladed bow /= %check%
+  eval name a fiendhorn bladed bow
+  eval vnum 18094
+end
+if !%vnum%
+  %send% %actor% You can't create that from essence.
+  halt
+end
+* We have a valid item
+%send% %actor% You bring the ten motes of demonic essence together with a fiery explosion!
+%echoaround% %actor% %actor.name% brings ten motes of fiery light together, causing an explosion!
+* Charge essence cost and check level to scale to
+eval lowest_level 250
+eval essence_count 0
+while %essence_count%<10
+  eval next_essence %actor.inventory(18097)%
+  if !%next_essence%
+    %send% %actor% Something has gone horribly wrong while creating your item! Please submit a bug report containing this message.
+  end
+  if %next_essence.level%<%lowest_level%
+    eval lowest_level %next_essence.level%
+  end
+  %purge% %next_essence%
+  eval essence_count %essence_count% + 1
+done
+* If unscaled essence was used, the level may be 0
+if %lowest_level% < 1
+  eval lowest_level 1
+end
+* Create the item
+%send% %actor% You create %name%!
+%echoaround% %actor% %actor.name% creates %name%!
+%load% obj %vnum% %actor% inv
+eval made %%actor.inventory(%vnum%)%%
+if %made%
+  nop %made.flag(HARD-DROP)%
+  nop %made.flag(GROUP-DROP)%
+  %scale% %made% %lowest_level%
+else
+  %send% %actor% Error setting flags and scaling.
+end
 ~
 $

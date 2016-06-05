@@ -297,6 +297,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
 	bld_data *bld, *next_bld;
+	struct mount_data *mount;
 	bool found;
 	
 	if (!(proto = mob_proto(vnum))) {
@@ -309,7 +310,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		return;
 	}
 		
-	// remove mobs from the list: DO THIS FIRST
+	// remove mobs and mounts from the list: DO THIS FIRST
 	for (mob_iter = character_list; mob_iter; mob_iter = next_mob) {
 		next_mob = mob_iter->next;
 		
@@ -320,7 +321,22 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 				extract_char(mob_iter);
 			}
 		}
+		else {	// player
+			if (GET_MOUNT_VNUM(mob_iter) == vnum) {
+				if (IS_RIDING(mob_iter)) {
+					msg_to_char(mob_iter, "Your mount has been deleted.\r\n");
+					perform_dismount(mob_iter);
+					GET_MOUNT_VNUM(mob_iter) = NOTHING;
+					GET_MOUNT_FLAGS(mob_iter) = NOBITS;
+				}
+				if ((mount = find_mount_data(mob_iter, vnum))) {
+					HASH_DEL(GET_MOUNT_LIST(mob_iter), mount);
+					free(mount);
+				}
+			}
+		}
 	}
+	
 	// their data will already be free, so we need to clear them out now
 	extract_pending_chars();
 	

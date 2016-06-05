@@ -826,7 +826,7 @@ int main(int argc, char *argv[]) {
 		// log progress to screen
 		if (stNew.access_level >= LVL_START_IMM)
 			printf("*");
-		else if (stNew.access_level >= LVL_APPROVED)
+		else if (stNew.access_level >= LVL_MORTAL)
 			printf("-");
 		else
 			printf(".");

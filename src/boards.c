@@ -142,6 +142,9 @@ ACMD(do_write) {
 		log("SYSERR:  degenerate board!  (what the hell...)");
 		msg_to_char(ch, "There's no board here.\r\n");
 	}
+	else if (!IS_APPROVED(ch) && config_get_bool("write_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if (ACCOUNT_FLAGGED(ch, ACCT_MUTED))
 		msg_to_char(ch, "You can't write on boards while muted.\r\n");
 	else if (!Board_write_message(board_type, ch, argument, board))

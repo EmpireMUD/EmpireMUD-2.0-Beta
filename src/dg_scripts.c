@@ -58,7 +58,7 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 /* external functions */
 extern int count_harnessed_animals(vehicle_data *veh);
 void free_varlist(struct trig_var_data *vd);
-extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest);
+extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
 extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);	// quest.c
@@ -2711,7 +2711,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "completed_quest")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							any_vnum vnum = atoi(subfield);
-							if (!IS_NPC(c) && has_completed_quest(c, vnum)) {
+							if (!IS_NPC(c) && has_completed_quest(c, vnum, NOTHING)) {
 								strcpy(str, "1");
 							}
 							else {
@@ -3402,6 +3402,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 
 			*str = '\x1';
 			switch (LOWER(*field)) {
+				case 'b': {	// obj.b*
+					if (!str_cmp(field, "bind")) {
+						void free_obj_binding(struct obj_binding **list);
+						if (subfield && *subfield) {
+							if (!str_cmp(subfield, "none") || !str_cmp(subfield, "nobody")) {
+								free_obj_binding(&OBJ_BOUND_TO(o));
+							}
+							else {	// attempt to bind it
+								char_data *targ = (*subfield == UID_CHAR) ? get_char(subfield) : get_char_by_obj(o, subfield);
+								if (targ && !IS_NPC(targ) && OBJ_FLAGGED(o, OBJ_BIND_FLAGS)) {
+									// unbind first
+									free_obj_binding(&OBJ_BOUND_TO(o));
+									bind_obj_to_player(o, targ);
+									reduce_obj_binding(o, targ);
+								}
+							}
+						}
+						// no result
+						*str = '\0';
+					}
+					break;
+				}
 				case 'c': {	// obj.c*
 					if (!str_cmp(field, "carried_by")) {
 						if (o->carried_by)
@@ -3526,6 +3548,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else {
 							snprintf(str, slen, "0");
 						}
+					}
+					break;
+				}
+				case 'l': {	// obj.l*
+					if (!str_cmp(field, "level")) {
+						snprintf(str, slen, "%d", GET_OBJ_CURRENT_SCALE_LEVEL(o));
 					}
 					break;
 				}

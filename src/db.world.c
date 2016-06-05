@@ -1554,7 +1554,7 @@ void read_empire_territory(empire_data *emp) {
 * @param empire_data *emp An empire number, or NOTHING to read all of them
 */
 void reread_empire_tech(empire_data *emp) {
-	void resort_empires();
+	void resort_empires(bool force);
 	
 	struct empire_island *isle, *next_isle;
 	empire_data *iter, *next_iter;
@@ -1605,7 +1605,7 @@ void reread_empire_tech(empire_data *emp) {
 		}
 	}
 	
-	resort_empires();
+	resort_empires(FALSE);
 }
 
 

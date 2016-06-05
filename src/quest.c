@@ -70,7 +70,7 @@ void free_player_quests(struct player_quest *list);
 void free_quest_givers(struct quest_giver *list);
 void free_quest_tasks(struct quest_task *list);
 void free_quest_temp_list(struct quest_temp_list *list);
-struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest);
+struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void update_mob_quest_lookups(mob_vnum vnum);
@@ -586,7 +586,7 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 		// QT_x: refreshable types only
 		switch (task->type) {
 			case QT_COMPLETED_QUEST: {
-				task->current = has_completed_quest(ch, task->vnum) ? task->needed : 0;
+				task->current = has_completed_quest(ch, task->vnum, pq->instance_id) ? task->needed : 0;
 				break;
 			}
 			case QT_GET_COMPONENT: {
@@ -598,7 +598,7 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				break;
 			}
 			case QT_NOT_COMPLETED_QUEST: {
-				task->current = has_completed_quest(ch, task->vnum) ? 0 : task->needed;
+				task->current = has_completed_quest(ch, task->vnum, pq->instance_id) ? 0 : task->needed;
 				break;
 			}
 			case QT_NOT_ON_QUEST: {
@@ -1375,7 +1375,7 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *
 	}
 	
 	// check repeatability
-	if ((completed = has_completed_quest(ch, QUEST_VNUM(quest)))) {
+	if ((completed = has_completed_quest(ch, QUEST_VNUM(quest), instance ? instance->id : NOTHING))) {
 		if (QUEST_REPEATABLE_AFTER(quest) >= 0 && completed->last_completed + (QUEST_REPEATABLE_AFTER(quest) * SECS_PER_REAL_MIN) <= time(0)) {
 			// repeat time: ok
 		}
@@ -1398,7 +1398,7 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *
 		// QT_x: only tasks that can be prereqs
 		switch(task->type) {
 			case QT_COMPLETED_QUEST: {
-				if (!has_completed_quest(ch, task->vnum)) {
+				if (!has_completed_quest(ch, task->vnum, instance ? instance->id : NOTHING)) {
 					ok = FALSE;
 				}
 				break;
@@ -1422,7 +1422,7 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *
 				break;
 			}
 			case QT_NOT_COMPLETED_QUEST: {
-				if (has_completed_quest(ch, task->vnum)) {
+				if (has_completed_quest(ch, task->vnum, instance ? instance->id : NOTHING)) {
 					ok = FALSE;
 				}
 				break;
@@ -1482,18 +1482,33 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *
 
 
 /**
+* Note: repeats-per-instance quests will only show as has-completed if it was
+* the same instance.
+*
 * @param char_data *ch Any player.
 * @param quest_vnum quest The quest to check.
+* @param int instance_id Optional: For per-instance quests, the instance id to check. (NOTHING = no check / doesn't matter)
 * @return struct player_completed_quest* Returns completion data (TRUE) if the player has completed the quest; NULL (FALSE) otherwise.
 */
-struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest) {
+struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id) {
 	struct player_completed_quest *pcq;
 	
 	if (IS_NPC(ch)) {
 		return FALSE;
 	}
 	
+	// look up completion data
 	HASH_FIND_INT(GET_COMPLETED_QUESTS(ch), &quest, pcq);
+	
+	// check per-instance limit (only bother with this part if instructed to check)
+	if (instance_id != NOTHING && pcq) {
+		quest_data *qst = quest_proto(quest);
+		if (qst && QUEST_FLAGGED(qst, QST_REPEAT_PER_INSTANCE) && pcq->last_instance_id != instance_id) {
+			// bad find
+			pcq = NULL;
+		}
+	}
+	
 	return pcq;
 }
 

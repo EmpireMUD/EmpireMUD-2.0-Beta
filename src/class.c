@@ -142,9 +142,11 @@ void check_classes(void) {
 		LL_FOREACH_SAFE(CLASS_ABILITIES(cls), clab, next_clab) {
 			if (!find_ability_by_vnum(clab->vnum)) {
 				log("- Class [%d] %s has invalid ability %d", CLASS_VNUM(cls), CLASS_NAME(cls), clab->vnum);
-				error = TRUE;
 				LL_DELETE(CLASS_ABILITIES(cls), clab);
 				free(clab);
+				
+				// missing ability isn't considered fatal
+				// error = TRUE;
 			}
 		}
 		

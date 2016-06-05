@@ -518,7 +518,7 @@ void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cool
 * @param any_vnum skill which skill, or NO_SKILL for all
 */
 void clear_char_abilities(char_data *ch, any_vnum skill) {
-	void resort_empires();
+	void resort_empires(bool force);
 	
 	struct player_ability_data *abil, *next_abil;
 	empire_data *emp = GET_LOYALTY(ch);
@@ -545,7 +545,7 @@ void clear_char_abilities(char_data *ch, any_vnum skill) {
 		// add ability techs -- only if playing
 		if (emp && ch->desc && STATE(ch->desc) == CON_PLAYING) {
 			adjust_abilities_to_empire(ch, emp, TRUE);
-			resort_empires();
+			resort_empires(FALSE);
 		}
 	}
 }
@@ -636,6 +636,10 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount) {
 	int points;
 	
 	if (!ch || IS_NPC(ch) || !skill) {
+		return FALSE;
+	}
+	
+	if (!IS_APPROVED(ch) && config_get_bool("skill_gain_approval")) {
 		return FALSE;
 	}
 	
@@ -1230,7 +1234,7 @@ ACMD(do_noskill) {
 
 ACMD(do_skills) {
 	void clear_char_abilities(char_data *ch, any_vnum skill);
-	void resort_empires();
+	void resort_empires(bool force);
 	
 	char arg2[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], outbuf[MAX_STRING_LENGTH];
 	struct player_skill_data *skdata;
@@ -1330,7 +1334,7 @@ ACMD(do_skills) {
 		// re-add empire abilities
 		if (emp) {
 			adjust_abilities_to_empire(ch, emp, TRUE);
-			resort_empires();
+			resort_empires(FALSE);
 		}
 	}
 	else if (!strn_cmp(argument, "reset", 5)) {
@@ -1445,7 +1449,7 @@ ACMD(do_skills) {
 		
 		if (GET_LOYALTY(ch)) {
 			adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
-			resort_empires();
+			resort_empires(FALSE);
 		}
 	}
 	else {

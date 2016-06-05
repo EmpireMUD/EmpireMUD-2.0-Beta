@@ -9,15 +9,13 @@ inferno! It is only warm, not hot, to the touch.
 0 0 0
 10 0
 A
-22 3
+22 3 0
 A
-17 1
+17 1 0
 A
-7 1
+7 1 0
 B
 c
-C
-0 0
 S
 #18076
 pauldrons firecloth pair blazing~
@@ -30,15 +28,13 @@ raging inferno! They throw off a fierce heat, but are safe to wear.
 0 0 0
 10 0
 A
-22 3
+22 3 0
 A
-17 1
+17 1 0
 A
-16 1
+16 1 0
 B
 c
-C
-0 0
 S
 #18077
 skirt hearthflame warm~
@@ -50,15 +46,13 @@ This dark red cloth skirt feels soothing and warm to the touch.
 0 0 0
 10 0
 A
-23 1
+23 1 0
 A
-7 2
+7 2 0
 A
-9 1
+9 1 0
 A
-16 1
-C
-0 0
+16 1 0
 S
 #18078
 sleeves hearthflame pair~
@@ -70,15 +64,13 @@ Touching these dark red cloth sleeves makes you feel slightly more calm.
 0 0 0
 11 0
 A
-23 2
+23 2 0
 A
-7 2
+7 2 0
 A
-9 1
+9 1 0
 A
-8 1
-C
-0 0
+8 1 0
 S
 #18079
 pauldrons magma-forged forged heavy~
@@ -87,19 +79,17 @@ A pair of heavy magma-forged pauldrons is lying here.~
    These heavy iron pauldrons were forged by the land itself at a density no
 mortal smith could hope to match.
 ~
-27 mp ai 11
+27 mp ai 13
 3 0 0
 2 0
 A
-13 1
+13 1 0
 A
-18 2
+18 2 0
 A
-2 1
+2 1 0
 A
-1 1
-C
-0 0
+1 1 0
 S
 #18080
 armor plate core-forged forged~
@@ -112,15 +102,13 @@ incredible density. No normal man could even wear this armor.
 3 0 0
 2 0
 A
-1 -3
+1 -3 0
 A
-13 3
+13 3 0
 A
-12 2
+12 2 0
 A
-18 1
-C
-0 0
+18 1 0
 S
 #18081
 pauldrons huge spiked pair~
@@ -133,17 +121,15 @@ guards! Be careful not to shrug.
 1 0 0
 2 0
 A
-12 -3
+12 -3 0
 A
-21 5
+21 5 0
 A
-17 2
+17 2 0
 A
-9 1
+9 1 0
 A
-2 1
-C
-0 0
+2 1 0
 S
 #18082
 jerkin fiendskin~
@@ -156,36 +142,32 @@ of a blizzard.
 1 0 0
 7 0
 A
-12 -3
+12 -3 0
 A
-21 3
+21 3 0
 A
-17 2
+17 2 0
 A
-2 1
-C
-0 0
+2 1 0
 S
 #18083
-pouch bottomless flame-patterned patterned~
+pouch bottomless flame-embroidered embroidered~
 a bottomless pouch~
-Someone has left a flame-patterned pouch here.~
+Someone has left a flame-embroidered pouch here.~
    This leather pouch is stained with fiery designs. It appears to be quite
 deep... Luckily, it is too small to fall into.
 ~
-24 mp ar 19
+24 mp ar 20
 2 0 0
 7 0
 A
-2 1
+2 1 0
 A
-9 1
+9 1 0
 A
-6 1
+6 1 0
 A
-11 1
-C
-0 0
+11 1 0
 S
 #18084
 shield igneous spiked~
@@ -198,13 +180,11 @@ damage! It's a bit awkward to hold, though.
 0 0 0
 1 0
 A
-13 3
+13 3 0
 A
-2 2
+2 2 0
 A
-21 2
-C
-0 0
+21 2 0
 S
 #18085
 ring lava cold~
@@ -217,15 +197,13 @@ patterns on it still look like they're flowing...
 0 0 0
 1 0
 A
-22 2
+22 2 0
 A
-7 1
+7 1 0
 A
-16 1
+16 1 0
 A
-23 -1
-C
-0 0
+23 -1 0
 S
 #18086
 mantle flames sheet flickering~
@@ -238,19 +216,17 @@ could safely wrap it around yourself!
 0 0 0
 10 0
 A
-22 5
+22 5 0
 A
-8 1
+8 1 0
 A
-2 1
+2 1 0
 A
-23 -3
+23 -3 0
 A
-17 1
+17 1 0
 B
 c
-C
-0 0
 S
 #18087
 earrings flame-shaped shaped frozen~
@@ -263,13 +239,11 @@ magically frozen fires. They should be safe to wear anyhow.
 0 0 0
 10 0
 A
-7 2
+7 2 0
 A
-16 1
+16 1 0
 A
-8 1
-C
-0 0
+8 1 0
 S
 #18088
 gloves glowing emberweave pair~
@@ -282,13 +256,11 @@ they are only pleasantly warm to the touch.
 0 0 0
 11 0
 A
-23 5
+23 5 0
 A
-7 1
+7 1 0
 A
-8 1
-C
-0 0
+8 1 0
 S
 #18089
 gauntlets iron molten pair~
@@ -301,17 +273,15 @@ crest, are extremely hot, but safe to wear. For a given value of 'safe'.
 3 0 0
 2 0
 A
-9 -2
+9 -2 0
 A
-15 2
+15 2 0
 A
-12 2
+12 2 0
 A
-24 2
+24 2 0
 B
 c
-C
-0 0
 S
 #18090
 earrings fiend's molten~
@@ -324,15 +294,13 @@ unholy vitality to the wearer!
 0 0 0
 4 0
 A
-15 4
+15 4 0
 A
-3 1
+3 1 0
 A
-6 1
+6 1 0
 B
 c
-C
-0 0
 S
 #18091
 flametalon flaming talon~
@@ -345,11 +313,9 @@ fiendish flames. It looks absolutely lethal!
 0 6 4
 14 0
 A
-17 2
+17 2 0
 A
-6 1
-C
-0 0
+6 1 0
 S
 #18092
 earring obsidian razor-sharp sharp~
@@ -362,13 +328,11 @@ again, you would probably cut yourself in the process.
 0 0 0
 8 0
 A
-21 3
+21 3 0
 A
-1 1
+1 1 0
 A
-17 2
-C
-0 0
+17 2 0
 S
 #18093
 crown abyssal obsidian flames~
@@ -381,17 +345,15 @@ off the heat of a blast furnace. Only the wearer is safe...
 0 0 0
 1 0
 A
-16 3
+16 3 0
 A
-7 1
+7 1 0
 A
-8 1
+8 1 0
 A
-5 1
+5 1 0
 B
 c
-C
-0 0
 S
 #18094
 bow bladed fiendhorn fiend's fiends horns~
@@ -404,9 +366,7 @@ this demon's horns always neatly bow-shaped?
 0 3 0
 14 0
 A
-15 3
-C
-0 0
+15 3 0
 S
 #18095
 reins hellish hellsteed's~
@@ -430,5 +390,22 @@ will be indebted to you!
 18079 0 0
 10 0
 T 10263
+S
+#18097
+essence molten~
+some molten essence~
+Some molten essence is floating here.~
+   This essence is released when the molten fiend's equipment is thrown into
+the fissure outside its lair. If you collect enough of it, maybe you can make
+something out of it?  
+ 
+While standing on the ledge, type 'list' to see the things you can make and
+'buy <item>' to buy one.  
+~
+3 mp ao 7
+0 0 0
+10 0
+C
+200 250
 S
 $

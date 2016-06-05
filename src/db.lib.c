@@ -1172,7 +1172,7 @@ void remove_empire_from_table(empire_data *emp) {
 */
 empire_data *create_empire(char_data *ch) {
 	void add_empire_to_table(empire_data *emp);
-	void resort_empires();
+	void resort_empires(bool force);
 
 	archetype_data *arch;
 	char colorcode[10];
@@ -1241,7 +1241,7 @@ empire_data *create_empire(char_data *ch) {
 	reread_empire_tech(emp);
 
 	// this is a good time to sort and rank
-	resort_empires();
+	resort_empires(FALSE);
 	
 	return emp;
 }
@@ -2369,7 +2369,6 @@ char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *np
 	// spawn data
 	SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED | MOB_EMPIRE);
 	GET_LOYALTY(mob) = emp;
-	MOB_SPAWN_TIME(mob) = time(0);
 	
 	// update spawn time
 	ROOM_LAST_SPAWN_TIME(room) = time(0);
@@ -6370,6 +6369,9 @@ empire_data *get_or_create_empire(char_data *ch) {
 	}
 	if ((emp = GET_LOYALTY(ch))) {
 		return emp;
+	}
+	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		return NULL;	// do not create
 	}
 	return create_empire(ch);
 }

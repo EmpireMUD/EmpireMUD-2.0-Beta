@@ -176,15 +176,15 @@ I 4 10013 50.00 1  # LOOT: a rat skin
 I 4 10019 20.00 1  # LOOT: a hooded cloak
 I 4 10024 50.00 1  # LOOT: a vial of sewage
 I 4 10025 20.00 1  # LOOT: a ratsnest hat
-I 4 1359 75.00 1  # LOOT: a bolt of cloth
+I 4 1359 75.00 1  # LOOT: a bolt of cotton cloth
 T 10016
 S
 #10016
-#n thief~
-#n the thief~
-#n is leaning against the wall, flipping a dagger.
+#n thief master~
+#n the master thief~
+The master thief #n is leaning against the wall, flipping a dagger.
 ~
-75 75 bdvzA 0
+20 50 bdvzB 0
 0 0 0 4
 I 4 10018 30.00 1 X  # LOOT: a wristblade
 I 4 10022 10.00 1 X  # LOOT: a spider-hair ring
@@ -278,7 +278,7 @@ A page is bustling past you.
 ~
 30 50 advxA 0
 1 0 0 15
-I 4 10036 100.00 1  # LOOT: a skystone
+I 4 10036 100.00 1  # LOOT: a small skystone
 I 4 10043 10.00 1 X  # LOOT: page robes
 I 4 10042 10.00 1 X  # LOOT: bustling shoes
 T 10031
@@ -344,7 +344,7 @@ An apprentice is staring intently at a glass case.
 0 0 0 16
 I 4 10045 10.00 1 X  # LOOT: apprentice robes
 I 4 10044 10.00 1 X  # LOOT: a skycleaver spellbook
-I 4 10036 100.00 1  # LOOT: a skystone
+I 4 10036 100.00 1  # LOOT: a small skystone
 T 10045
 T 10046
 S
@@ -357,7 +357,7 @@ The goblin wrangler snaps his whip at a cage.
 1 0 0 7
 I 4 10047 10.00 1 X  # LOOT: goblin wrangler pants
 I 4 10046 10.00 1 X  # LOOT: a goblin wrangler whip
-I 4 10036 100.00 1  # LOOT: a skystone
+I 4 10036 100.00 1  # LOOT: a small skystone
 T 10038
 T 10039
 S
@@ -370,7 +370,7 @@ A caged goblin is making a strange chirping noise.
 0 0 0 1
 I 4 10049 10.00 1 X  # LOOT: a goblin's vest
 I 4 10048 10.00 1 X  # LOOT: a goblin shortsword
-I 4 10036 100.00 1  # LOOT: a skystone
+I 4 10036 100.00 1  # LOOT: a small skystone
 T 10040
 S
 #10040
@@ -382,8 +382,8 @@ A goblin commando is biting the cage bars.
 0 0 0 1
 I 4 10051 50.00 1 X  # LOOT: pleated goblin armor
 I 4 10050 50.00 1 X  # LOOT: a goblin skull
-I 4 10036 100.00 1  # LOOT: a skystone
-I 4 10036 50.00 1  # LOOT: a skystone
+I 4 10036 100.00 1  # LOOT: a small skystone
+I 4 10036 50.00 1  # LOOT: a small skystone
 T 10040
 S
 #10041
@@ -393,7 +393,7 @@ S
 ~
 50 70 bdvxA 0
 0 0 0 17
-I 4 10036 100.00 1  # LOOT: a skystone
+I 4 10036 100.00 1  # LOOT: a small skystone
 T 10046
 S
 #10042
@@ -404,7 +404,7 @@ An escaped pixy is fluttering around your head.
 30 50 dxz 0
 0 0 2 9
 I 4 10052 100.00 1  # LOOT: a vial of pixy dust
-I 4 10036 100.00 1  # LOOT: a skystone
+I 4 10036 100.00 1  # LOOT: a small skystone
 S
 #10043
 #n watcher~
@@ -415,7 +415,7 @@ Watcher #n~
 0 2 0 1
 I 4 10054 10.00 1 X  # LOOT: a glass shield
 I 4 10053 10.00 1 X  # LOOT: a glass sword
-I 4 10036 100.00 1  # LOOT: a skystone
+I 4 10036 100.00 1  # LOOT: a small skystone
 T 10044
 T 10046
 S
@@ -428,7 +428,7 @@ A sorcerer resident looks rather busy.
 2 0 0 16
 I 4 10056 10.00 1 X  # LOOT: a glimmering doublet
 I 4 10055 10.00 1 X  # LOOT: a pointed earcuff
-I 4 10036 100.00 1  # LOOT: a skystone
+I 4 10036 100.00 1  # LOOT: a small skystone
 T 10046
 S
 #10045
@@ -440,7 +440,7 @@ High Master #n is overseeing the residents.
 0 2 0 16
 I 4 10058 10.00 1 X  # LOOT: a double-pocket
 I 4 10057 10.00 1 X  # LOOT: a bone wand
-I 4 10036 100.00 1  # LOOT: a skystone
+I 4 10036 100.00 1  # LOOT: a small skystone
 T 10047
 T 10046
 S
@@ -463,7 +463,7 @@ A huge otherworlder is chained to the floor!
 1 0 0 5
 I 4 10060 10.00 1 X  # LOOT: the otherworlder's wristbands
 I 4 10059 10.00 1 X  # LOOT: the otherworlder's gauntlet
-I 4 10036 100.00 1  # LOOT: a skystone
+I 4 10036 100.00 1  # LOOT: a small skystone
 T 10049
 T 10050
 S
@@ -476,7 +476,7 @@ A bony lich is channelling a spell.
 1 0 2 16
 I 4 10061 10.00 1 X  # LOOT: lich bindings
 I 4 10062 10.00 1 X  # LOOT: a tattered lich cloak
-I 4 10036 100.00 1  # LOOT: a skystone
+I 4 10036 100.00 1  # LOOT: a small skystone
 T 10051
 T 10052
 S
@@ -488,7 +488,7 @@ A rusty, dusty skeleton is ambling around the room.
 50 75 abdh 0
 0 0 0 10
 I 4 10063 10.00 1  # LOOT: a bone club
-I 4 10036 100.00 1  # LOOT: a skystone
+I 4 10036 100.00 1  # LOOT: a small skystone
 T 10053
 S
 #10050
@@ -499,7 +499,7 @@ A ghost in chains floats about the room.
 50 75 abdh 0
 0 0 0 7
 I 4 10064 10.00 1  # LOOT: ghastly chains
-I 4 10036 100.00 1  # LOOT: a skystone
+I 4 10036 100.00 1  # LOOT: a small skystone
 T 10054
 S
 #10051
@@ -511,7 +511,7 @@ An escaped experiment is running past you!
 0 0 0 15
 I 4 10077 50.00 1 X  # LOOT: experimental handwraps
 I 4 10078 50.00 1 X  # LOOT: an experimental aura
-I 4 10036 100.00 1  # LOOT: a skystone
+I 4 10036 100.00 1  # LOOT: a small skystone
 T 10064
 T 10065
 S

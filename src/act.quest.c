@@ -979,6 +979,10 @@ ACMD(do_quest) {
 		msg_to_char(ch, "NPCs don't quest.\r\n");
 		return;
 	}
+	if (!IS_APPROVED(ch) && config_get_bool("quest_approval")) {
+		send_config_msg(ch, "need_approval_string");
+		return;
+	}
 
 	// grab first arg as command
 	argument = any_one_arg(argument, cmd_arg);

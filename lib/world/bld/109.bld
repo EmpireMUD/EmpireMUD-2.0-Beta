@@ -1,0 +1,62 @@
+#10923
+Butcher Tent~
+The Butcher Tent~
+&r{BB}~
+45 1 bR 0
+0 0 0 -1
+C
+(functions as a stable with a cooking fire)~
+D
+   The tent is made from red dragon hides, but it could as easily be red from
+the blood of animals slaughtered here. There's a pen for fresh animals that's
+half in the tent, and half outside. The center of the tent has a roasting pit
+and a cooking fire.
+~
+F
+wG
+S
+#10924
+Dragon Cave~
+A Dragon Cave~
+/&r()&?\~
+45 1 R adeim
+10 4 0 -1
+A
+d
+D
+   Though it's easy to miss at a distance, the entrance to this cave is quite
+large. Someone has built a door just inside, and the landing is decorated like
+a front porch. It looks like someone has made this cave into a house. Colossal
+claw marks just beyond the porch suggest a dragon once called this cave home.
+~
+S
+#10925
+Dragonslayer Statue~
+A Dragonslayer Statue~
+&w~}{~~
+40 5 dh 0
+0 0 0 -1
+C
+dedicate~
+T 10925
+S
+#10926
+Dragon Library~
+A Dragonstone Library~
+&o[^^]~
+45 15 R 0
+0 0 0 -1
+C
+library, bookedit~
+D
+   This magnificent library is build from red-stained stones, and fabulously
+decorated with images of dragons and knights. Sturdy masonry shelves hold
+countless books and artifacts, but the centerpiece is a massive dragonquill pen
+posed as if writing in a stone book. The back room appears to be an alchemy
+laboratory.
+~
+F
+l
+T 10926
+S
+$

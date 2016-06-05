@@ -394,6 +394,7 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_WEREWOLF_FORM  269
 #define ABIL_FAMILY_RECIPES  270
 #define ABIL_GOURMET_CHEF  271
+#define ABIL_STABLEMASTER  272
 
 
 // cooldowns -- see COOLDOWN_x in constants.c
