@@ -3061,6 +3061,7 @@ Available flags:
  &ctropical&0 - Comes from tropical areas (especially foods)
  &ccommon&0 - Opposite of rare
  &caquatic&0 - Comes from the water
+ &cbasic&0 - A tier 1, minimum-level resource.
 
 See also: OEDIT COMPONENT
 #d
