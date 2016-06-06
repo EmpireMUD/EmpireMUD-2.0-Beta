@@ -261,11 +261,6 @@ ACMD(do_damage_spell) {
 	// cost calculations
 	cost = round((dmg + dot_dmg) * CHOOSE_BY_ABILITY_LEVEL(cost_mod, ch, ABIL_SKYBRAND) * damage_spell[type].cost_mod);
 	
-	// special-casing (done AFTER cost)
-	if (damage_spell[type].ability == ABIL_SUNSHOCK && IS_VAMPIRE(vict)) {
-		dmg *= 1.5;
-	}
-	
 	// check ability and cost
 	if (!can_use_ability(ch, subcmd, MANA, cost, damage_spell[type].cooldown_type)) {
 		return;
@@ -300,6 +295,11 @@ ACMD(do_damage_spell) {
 	
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
+	}
+	
+	// special-casing damage (done AFTER cost); requires vict
+	if (damage_spell[type].ability == ABIL_SUNSHOCK && IS_VAMPIRE(vict)) {
+		dmg *= 1.5;
 	}
 	
 	// check counterspell and then damage
