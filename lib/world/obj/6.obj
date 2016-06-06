@@ -129,12 +129,14 @@ The shimmering hide of a magical beast is lying here.~
    Light breaks apart into rainbows as it passes near this magical skin, making
 it hard to tell what color it really is.
 ~
-3 0 a 2
+3 0 a 3
 0 0 0
 7 0
 I 18 608 100.00 1 t  # TAN: a piece of shimmering leather
 O
 24 f
+R
+5120 0
 S
 #608
 leather shimmering piece~
@@ -144,11 +146,13 @@ A large piece of shimmering leather is lying here.~
 softly with iridescent light. While pretty, it's mostly only useful for the
 same things as ordinary leather.
 ~
-3 0 a 2
+3 0 a 4
 0 0 0
 7 0
 O
 15 f
+R
+5120 0
 S
 #609
 moonstoneore moonstone ore chunk majestic~
