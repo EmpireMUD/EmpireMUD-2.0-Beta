@@ -1676,10 +1676,10 @@ void do_chore_maintenance(empire_data *emp, room_data *room) {
 	}
 
 	// check resources	
-	if (!empire_can_afford_component(emp, islid, CMP_LUMBER, NOBITS, amount)) {
+	if (!empire_can_afford_component(emp, islid, CMP_LUMBER, CMPF_BASIC, amount)) {
 		ok = FALSE;
 	}
-	if (!empire_can_afford_component(emp, islid, CMP_NAILS, NOBITS, amount)) {
+	if (!empire_can_afford_component(emp, islid, CMP_NAILS, CMPF_BASIC, amount)) {
 		ok = FALSE;
 	}
 	

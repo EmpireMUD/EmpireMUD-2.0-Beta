@@ -1838,8 +1838,8 @@ ACMD(do_lay) {
 ACMD(do_maintain) {
 	struct resource_data *res = NULL;
 	
-	add_to_resource_list(&res, RES_COMPONENT, CMP_LUMBER, BUILDING_DISREPAIR(IN_ROOM(ch)), 0);
-	add_to_resource_list(&res, RES_COMPONENT, CMP_NAILS, BUILDING_DISREPAIR(IN_ROOM(ch)), 0);
+	add_to_resource_list(&res, RES_COMPONENT, CMP_LUMBER, BUILDING_DISREPAIR(IN_ROOM(ch)), CMPF_BASIC);
+	add_to_resource_list(&res, RES_COMPONENT, CMP_NAILS, BUILDING_DISREPAIR(IN_ROOM(ch)), CMPF_BASIC);
 	
 	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You can't perform maintenance here.\r\n");

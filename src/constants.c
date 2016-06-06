@@ -1970,6 +1970,7 @@ const char *component_flags[] = {
 	"tropical",
 	"common",
 	"aquatic",
+	"basic",
 	"\n"
 };
 
