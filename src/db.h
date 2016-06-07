@@ -330,6 +330,7 @@ obj_data *read_object(obj_vnum nr, bool with_triggers);
 
 // players
 extern struct group_data *group_list;
+extern char_data *find_player_in_room_by_id(room_data *room, int id);
 extern char_data *is_at_menu(int id);
 extern char_data *is_playing(int id);
 

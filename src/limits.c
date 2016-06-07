@@ -449,6 +449,7 @@ void real_update_char(char_data *ch) {
 	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 	void check_combat_end(char_data *ch);
 	void check_morph_ability(char_data *ch);
+	void combat_meter_damage_dealt(char_data *ch, int amt);
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	void do_unseat_from_vehicle(char_data *ch);
 	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
@@ -458,7 +459,7 @@ void real_update_char(char_data *ch) {
 	
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *af, *next_af, *immune;
-	char_data *room_ch, *next_ch;
+	char_data *room_ch, *next_ch, *caster;
 	int result, iter, type;
 	int fol_count, gain;
 	bool found;
@@ -541,6 +542,9 @@ void real_update_char(char_data *ch) {
 		));
 		
 		result = damage(ch, ch, dot->damage * dot->stack, type, dot->damage_type);
+		if (result > 0 && (caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by))) {
+			combat_meter_damage_dealt(ch, result);
+		}
 		if (result < 0 || EXTRACTED(ch) || IS_DEAD(ch)) {
 			return;
 		}

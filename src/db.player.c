@@ -136,6 +136,23 @@ player_index_data *find_player_index_by_name(char *name) {
 
 
 /**
+* @param room_data *room The room to search in.
+* @param int id A player id.
+* @return char_data* if the player is in the room, or NULL otherwise.
+*/
+char_data *find_player_in_room_by_id(room_data *room, int id) {
+	char_data *ch;
+	
+	LL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
+		if (!IS_NPC(ch) && GET_IDNUM(ch) == id && !EXTRACTED(ch)) {
+			return ch;
+		}
+	}
+	return NULL;
+}
+
+
+/**
 * Finds a character who is sitting at a menu, for various functions that update
 * all players and check which are in-game vs not. If a person is at a menu,
 * then to safely update them you should change both their live data and saved
