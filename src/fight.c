@@ -2704,14 +2704,15 @@ void heal(char_data *ch, char_data *vict, int amount) {
 int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	void add_pursuit(char_data *ch, char_data *target);
 	extern int apply_poison(char_data *ch, char_data *vict, int type);
+	extern const double basic_speed;
 	
 	struct instance_data *inst;
-	int w_type;
-	int dam, result;
+	int w_type, result;
 	bool success = FALSE, block = FALSE;
 	bool can_gain_skill;
 	empire_data *victim_emp;
 	struct affected_type *af;
+	double speed, dam;
 	char_data *check;
 	
 	// some config TODO move this into the config system?
@@ -2727,6 +2728,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	// set up some vars
 	w_type = get_attack_type(ch, weapon);
 	victim_emp = GET_LOYALTY(victim);
+	speed = get_combat_speed(ch, weapon ? weapon->worn_on : WEAR_WIELD);
 	
 	// weapons not allowed if disarmed (do this after get_attack type, which accounts for this)
 	if (AFF_FLAGGED(ch, AFF_DISARM)) {
@@ -2834,11 +2836,12 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			dam += MOB_DAMAGE(ch) / (AFF_FLAGGED(ch, AFF_DISARM) ? 2 : 1);
 		}
 		
+		// these adds are based on speed
 		if (IS_MAGIC_ATTACK(w_type)) {
-			dam += GET_BONUS_MAGICAL(ch);
+			dam += GET_BONUS_MAGICAL(ch) * speed / basic_speed;
 		}
 		else {
-			dam += GET_BONUS_PHYSICAL(ch);
+			dam += GET_BONUS_PHYSICAL(ch) * speed / basic_speed;
 		}
 				
 		// All these abilities add damage: no skill gain on an already-beated foe
@@ -2881,11 +2884,12 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				}
 			}
 		}
-
+		
+		dam = round(dam);
 		dam = MAX(0, dam);
 
 		// anything after this must NOT rely on victim being alive
-		result = damage(ch, victim, dam, w_type, attack_hit_info[w_type].damage_type);
+		result = damage(ch, victim, (int) dam, w_type, attack_hit_info[w_type].damage_type);
 		
 		// exp gain
 		if (combat_round && can_gain_skill && can_gain_exp_from(ch, victim)) {

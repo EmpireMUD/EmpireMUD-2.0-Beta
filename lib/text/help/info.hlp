@@ -273,7 +273,9 @@ The BONUS-MAGICAL gear stat, also shown on your score page as "Magical +X",
 is an amount added to any magical damage you deal, including Intelligence-based
 melee attacks (like Ready Fireball) and spells.
 
-It is added to damage in the same way as Intelligence.
+Bonus-Magical is applied to an average speed of 2.0, meaning if your attack
+is faster than that, a smaller amount may be added to your damage -- and the
+opposite if you're slower. It is worth 0.5 damage per second.
 
 See also: SCORE
 #
@@ -283,7 +285,9 @@ The BONUS-PHYSICAL gear stat, also shown on your score page as "Physical +X",
 is an amount added to any physical damage you deal. This includes melee combat
 and physical abilities.
 
-It is added to damage in the same way as Strength.
+Bonus-Physical is applied to an average speed of 2.0, meaning if your attack
+is faster than that, a smaller amount may be added to your damage -- and the
+opposite if you're slower. It is worth 0.5 damage per second.
 
 See also: SCORE
 #
