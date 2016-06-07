@@ -28,6 +28,7 @@
 /**
 * Contents:
 *   Getters / Helpers
+*   Combat Meters
 *   Death and Corpses
 *   Guard Towers
 *   Messaging
@@ -764,6 +765,153 @@ static char *replace_fight_string(const char *str, const char *weapon_singular, 
 	}
 
 	return (buf);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// COMBAT METERS ///////////////////////////////////////////////////////////
+
+/**
+* Resets all of a player's meters and begins combat.
+*
+* @param char_data *ch The player.
+*/
+void reset_combat_meters(char_data *ch) {
+	struct combat_meters *mtr;
+	
+	if (IS_NPC(ch)) {
+		return;	// no meter
+	}
+	
+	mtr = &GET_COMBAT_METERS(ch);
+	mtr->hits = 0;
+	mtr->misses = 0;
+	mtr->hits_taken = 0;
+	mtr->dodges = 0;
+	mtr->damage_dealt = 0;
+	mtr->damage_taken = 0;
+	mtr->pet_damage = 0;
+	mtr->heals_dealt = 0;
+	mtr->heals_taken = 0;
+	mtr->start = mtr->end = time(0);
+	mtr->over = FALSE;
+}
+
+
+/**
+* Checks if a player is out of combat yet and ends the meter, if active.
+*
+* @param char_data *ch The player.
+*/
+void check_combat_end(char_data *ch) {
+	if (!IS_NPC(ch) && GET_COMBAT_METERS(ch).over == FALSE && !is_fighting(ch)) {
+		GET_COMBAT_METERS(ch).over = TRUE;
+		GET_COMBAT_METERS(ch).end = time(0);
+	}
+}
+
+
+/**
+* Called in combat, to reset meters if a new combat has started.
+*
+* @param char_data *ch The player.
+*/
+void check_combat_start(char_data *ch) {
+	if (!IS_NPC(ch) && GET_COMBAT_METERS(ch).over == TRUE) {
+		reset_combat_meters(ch);
+	}
+}
+
+
+/**
+* Marks damage dealt on the meters.
+* @param char_data *ch The player.
+*/
+void combat_meter_damage_dealt(char_data *ch, int amt) {
+	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
+		GET_COMBAT_METERS(ch).damage_dealt += amt;
+	}
+	else if (ch->master && !IS_NPC(ch->master) && !GET_COMBAT_METERS(ch->master).over) {
+		// credit the NPC's immediate master
+		GET_COMBAT_METERS(ch->master).pet_damage += amt;
+	}
+}
+
+
+/**
+* Marks damage taken on the meters.
+* @param char_data *ch The player.
+*/
+void combat_meter_damage_taken(char_data *ch, int amt) {
+	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
+		GET_COMBAT_METERS(ch).damage_taken += amt;
+	}
+}
+
+
+/**
+* Marks a dodge on the meters.
+* @param char_data *ch The player.
+*/
+void combat_meter_dodge(char_data *ch) {
+	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
+		GET_COMBAT_METERS(ch).dodges += 1;
+	}
+}
+
+
+/**
+* Marks a heal dealt on the meters.
+* @param char_data *ch The player.
+*/
+void combat_meter_heal_dealt(char_data *ch, int amt) {
+	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
+		GET_COMBAT_METERS(ch).heals_dealt += amt;
+	}
+}
+
+
+/**
+* Marks a heal taken on the meters.
+* @param char_data *ch The player.
+*/
+void combat_meter_heal_taken(char_data *ch, int amt) {
+	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
+		GET_COMBAT_METERS(ch).heals_taken += amt;
+	}
+}
+
+
+/**
+* Marks a hit on the meters.
+* @param char_data *ch The player.
+*/
+void combat_meter_hit(char_data *ch) {
+	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
+		GET_COMBAT_METERS(ch).hits += 1;
+	}
+}
+
+
+/**
+* Marks a hit taken on the meters.
+* @param char_data *ch The player.
+*/
+void combat_meter_hit_taken(char_data *ch) {
+	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
+		GET_COMBAT_METERS(ch).hits_taken += 1;
+	}
+}
+
+
+/**
+* Marks a miss on the meters.
+* @param char_data *ch The player.
+*/
+void combat_meter_miss(char_data *ch) {
+	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
+		GET_COMBAT_METERS(ch).misses += 1;
+	}
 }
 
 
@@ -2466,9 +2614,13 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 
 	// Add Damage
 	GET_HEALTH(victim) = GET_HEALTH(victim) - dam;
-
 	update_pos(victim);
-
+	
+	if (ch != victim) {
+		combat_meter_damage_dealt(ch, dam);
+	}
+	combat_meter_damage_taken(victim, dam);
+	
 	/*
 	 * skill_message sends a message from the messages file in lib/misc.
 	 * dam_message just sends a generic "You hit $n extremely hard.".
@@ -2682,9 +2834,12 @@ void heal(char_data *ch, char_data *vict, int amount) {
 	if (IS_DEAD(vict)) {
 		return;
 	}
-
+	
 	// no negative healing
 	amount = MAX(0, amount);
+	
+	combat_meter_heal_dealt(ch, amount);
+	combat_meter_heal_taken(vict, amount);
 	
 	// apply heal
 	GET_HEALTH(vict) = MIN(GET_MAX_HEALTH(vict), GET_HEALTH(vict) + amount);
@@ -2731,6 +2886,10 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	if (!victim || !ch || EXTRACTED(victim) || IS_DEAD(victim)) {
 		return -1;
 	}
+	
+	// ensure meters started
+	check_combat_start(ch);
+	check_combat_start(victim);
 	
 	// set up some vars
 	w_type = get_attack_type(ch, weapon);
@@ -2811,6 +2970,8 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	// outcome:
 	if (!success) {
 		// miss
+		combat_meter_miss(ch);
+		combat_meter_dodge(victim);
 		return damage(ch, victim, 0, w_type, attack_hit_info[w_type].damage_type);
 	}
 	else if (block) {
@@ -2819,6 +2980,8 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	}
 	else {
 		/* okay, we know the guy has been hit.  now calculate damage. */
+		combat_meter_hit(ch);
+		combat_meter_hit_taken(victim);
 
 		// TODO move this damage computation to its own function so that it can be called remotely too
 
@@ -3137,6 +3300,9 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 	
 	// remove all stuns when combat starts
 	affects_from_char_by_aff_flag(ch, AFF_STUNNED, FALSE);
+	
+	// mark start
+	check_combat_start(ch);
 }
 
 
@@ -3152,6 +3318,8 @@ void stop_fighting(char_data *ch) {
 	FIGHTING(ch) = NULL;
 	GET_POS(ch) = POS_STANDING;
 	update_pos(ch);
+	
+	check_combat_end(ch);
 }
 
 
@@ -3400,6 +3568,10 @@ void one_combat_round(char_data *ch, double speed, obj_data *weapon) {
 	// still fighting?
 	if (FIGHTING(ch) && IN_ROOM(ch) == IN_ROOM(FIGHTING(ch)) && SHOW_FIGHT_MESSAGES(ch, FM_AUTO_DIAGNOSE)) {
 		diag_char_to_char(FIGHTING(ch), ch);
+	}
+	
+	if (!FIGHTING(ch)) {
+		check_combat_end(ch);
 	}
 }
 

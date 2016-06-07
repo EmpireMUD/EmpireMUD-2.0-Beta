@@ -447,6 +447,7 @@ void point_update_char(char_data *ch) {
 void real_update_char(char_data *ch) {
 	void adventure_unsummon(char_data *ch);
 	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
+	void check_combat_end(char_data *ch);
 	void check_morph_ability(char_data *ch);
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	void do_unseat_from_vehicle(char_data *ch);
@@ -461,6 +462,11 @@ void real_update_char(char_data *ch) {
 	int result, iter, type;
 	int fol_count, gain;
 	bool found;
+	
+	// check for end of meters (in case it was missed in the fight code)
+	if (!FIGHTING(ch)) {
+		check_combat_end(ch);
+	}
 	
 	// first check location: this may move the player
 	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {

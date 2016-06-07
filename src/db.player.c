@@ -2964,6 +2964,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	extern room_data *find_home(char_data *ch);
 	extern room_data *find_load_room(char_data *ch);
 	void refresh_all_quests(char_data *ch);
+	void reset_combat_meters(char_data *ch);
 	
 	extern bool global_mute_slash_channel_joins;
 
@@ -2978,6 +2979,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 
 	reset_char(ch);
 	check_delayed_load(ch);	// ensure everything is loaded
+	reset_combat_meters(ch);
+	GET_COMBAT_METERS(ch).over = TRUE;	// ensure no active meter
 	
 	// remove this now
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);

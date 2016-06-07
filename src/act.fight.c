@@ -309,6 +309,52 @@ ACMD(do_hit) {
 }
 
 
+ACMD(do_meters) {
+	struct combat_meters *mtr;
+	int length = 1;
+	double calc;
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "You have no damage meters.\r\n");
+		return;
+	}
+	
+	mtr = &GET_COMBAT_METERS(ch);
+	
+	msg_to_char(ch, "Damage meters:\r\n");
+	
+	// raw length
+	length = (mtr->over ? mtr->end : time(0)) - mtr->start;
+	msg_to_char(ch, "Length: %d:%2d (%d second%s)\r\n", (length/60), (length%60), length, PLURAL(length));
+	
+	// prevent divide-by-zero
+	length = MAX(1, length);
+	
+	calc = mtr->hits + mtr->misses;
+	calc = MAX(1.0, calc);	// div/0
+	msg_to_char(ch, "Hit percent: %.2f%% (%d/%d)\r\n", mtr->hits * 100.0 / calc, mtr->hits, (mtr->hits + mtr->misses));
+	
+	calc = mtr->hits_taken + mtr->dodges;
+	calc = MAX(1.0, calc);	// div/0
+	msg_to_char(ch, "Dodge percent: %.2f%% (%d/%d)\r\n", mtr->dodges * 100.0 / calc, mtr->dodges, (mtr->hits_taken + mtr->dodges));
+	
+	msg_to_char(ch, "Damage dealt: %d (%.2f dps)\r\n", mtr->damage_dealt, (double) mtr->damage_dealt / length);
+	
+	if (mtr->pet_damage > 0) {
+		msg_to_char(ch, "Pet damage: %d (%.2f dps, %.2f total dps)\r\n", mtr->pet_damage, (double) mtr->pet_damage / length, (double) (mtr->damage_dealt + mtr->pet_damage) / length);
+	}
+	
+	msg_to_char(ch, "Damage taken: %d (%.2f dps)\r\n", mtr->damage_taken, (double) mtr->damage_taken / length);
+	
+	if (mtr->heals_dealt > 0) {
+		msg_to_char(ch, "Heals dealt: %d (%.2f hps)\r\n", mtr->heals_dealt, (double) mtr->heals_dealt / length);
+	}
+	if (mtr->heals_taken > 0) {
+		msg_to_char(ch, "Heals taken: %d (%.2f hps)\r\n", mtr->heals_taken, (double) mtr->heals_taken / length);
+	}
+}
+
+
 ACMD(do_respawn) {
 	extern room_data *find_load_room(char_data *ch);
 	extern obj_data *player_death(char_data *ch);

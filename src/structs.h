@@ -2848,6 +2848,17 @@ struct descriptor_data {
 };
 
 
+// used in player specials to track combat
+struct combat_meters {
+	int hits, misses;	// my hit %
+	int hits_taken, dodges;	// my dodge %
+	int damage_dealt, damage_taken, pet_damage;
+	int heals_dealt, heals_taken;
+	time_t start, end;	// times
+	bool over;
+};
+
+
 // basic paragraphs for book_data
 struct paragraph_data {
 	char *text;
@@ -3028,6 +3039,8 @@ struct player_special_data {
 	byte reboot_conf;	// Reboot confirmation
 	byte create_points;	// Used in character creation
 	int group_invite_by;	// idnum of the last player to invite this one
+	
+	struct combat_meters meters;	// combat meter data
 	
 	bool needs_delayed_load;	// whether or not the player still needs delayed data
 	bool restore_on_login;	// mark the player to trigger a free reset when they enter the game
