@@ -664,8 +664,8 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 	extern bool check_blood_fortitude(char_data *ch, bool can_gain_skill);
 	
 	bool self = (!attacker || attacker == victim);
-	int max_resist, use_resist;
-	double resist_prc;
+	int max_resist;
+	double resist_prc, use_resist;
 	
 	if (!self) {
 		if (has_ability(victim, ABIL_NOBLE_BEARING) && check_solo_role(victim)) {
@@ -684,11 +684,18 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 				use_resist = GET_RESIST_MAGICAL(victim);
 			}
 			
-			// require at least half of the magical resistance requirement to reduce any
-			if (use_resist > max_resist / 2) {
-				use_resist = MIN(use_resist, max_resist);
-				resist_prc = ((double) use_resist - (max_resist/2.0)) / (max_resist / 2.0);	
+			// absolute cap
+			use_resist = MIN(use_resist, max_resist);
+			
+			if (use_resist > 0) {	// positive resistance
+				resist_prc = (use_resist / max_resist);
 				dam = (int) round(dam * (1.0 - (resist_prc / 4.0))); // at 1.0 resist_prc, it reduces damage by 25% (1/4)
+			}
+			else if (use_resist < 0) {	// negative resistance (penalty)
+				use_resist *= -1;	// make positive
+				use_resist = diminishing_returns(use_resist, 2.0);	// diminish on a scale of 2
+				use_resist /= 100;	// use_resist is now a % to increase
+				dam = (int) round(dam * (1.0 + use_resist));
 			}
 		}
 	
