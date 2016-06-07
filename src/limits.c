@@ -543,7 +543,7 @@ void real_update_char(char_data *ch) {
 		
 		result = damage(ch, ch, dot->damage * dot->stack, type, dot->damage_type);
 		if (result > 0 && (caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by))) {
-			combat_meter_damage_dealt(ch, result);
+			combat_meter_damage_dealt(caster, result);
 		}
 		if (result < 0 || EXTRACTED(ch) || IS_DEAD(ch)) {
 			return;
