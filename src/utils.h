@@ -1454,6 +1454,7 @@ extern char *get_vehicle_name_by_proto(obj_vnum vnum);
  * example.  If you really couldn't care less, change this to a '#if 0'.
  */
 #if 1
+	extern struct player_special_data dummy_mob;
 	#define CHECK_PLAYER_SPECIAL(ch, var)  (*(((ch)->player_specials == &dummy_mob) ? (log("SYSERR: Mob using '"#var"' at %s:%d.", __FILE__, __LINE__), &(var)) : &(var)))
 #else
 	#define CHECK_PLAYER_SPECIAL(ch, var)  (var)

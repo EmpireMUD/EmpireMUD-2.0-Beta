@@ -763,7 +763,13 @@ static inline int get_skill_resets(char_data *ch, any_vnum skill) {
 * @return bool TRUE if the player has the ability; FALSE if not.
 */
 static inline bool has_ability_in_set(char_data *ch, any_vnum abil_id, int skill_set) {
-	struct player_ability_data *data = get_ability_data(ch, abil_id, 0);
+	struct player_ability_data *data;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	data = get_ability_data(ch, abil_id, 0);
 	return data && data->purchased[skill_set];
 }
 
@@ -776,8 +782,12 @@ static inline bool has_ability_in_set(char_data *ch, any_vnum abil_id, int skill
 * @return bool TRUE if the player has the ability; FALSE if not.
 */
 static inline bool has_ability(char_data *ch, any_vnum abil_id) {
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
 	// GET_CURRENT_SKILL_SET(ch) not available here
-	return has_ability_in_set(ch, abil_id, ch->player_specials->current_skill_set);
+	return has_ability_in_set(ch, abil_id, GET_CURRENT_SKILL_SET(ch));
 }
 
 

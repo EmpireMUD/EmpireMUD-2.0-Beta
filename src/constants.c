@@ -14,8 +14,8 @@
 #include "sysdep.h"
 
 #include "structs.h"
-#include "skills.h"
 #include "utils.h"
+#include "skills.h"
 #include "interpreter.h"	/* alias_data */
 #include "vnums.h"
 #include "olc.h"
