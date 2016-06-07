@@ -118,6 +118,7 @@ Disarm (Battle ability)
 
 Usage:  disarm [target]
 Cooldown:  30 seconds
+Duration:  15 / 25 seconds
 Cost:  15 move
 Debuff type:  Battle
 
@@ -389,7 +390,7 @@ By sparring, you can learn to hit more accurately. This ability gives at least
 As a specialty ability, it adds 5% of your total level to your to-hit.
 As a class ability, it adds 10% of your total level to your to-hit.
 
-This to-hit bonus is refleced on your 'score'.
+This to-hit bonus is reflected on your 'score'.
 
 Gain experience when you attack something.
 

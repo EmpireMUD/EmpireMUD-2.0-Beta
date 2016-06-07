@@ -391,6 +391,7 @@ Usage:  skills -- list all skills
         skill buy <ability> -- purchase an ability
         skill reset <skill> -- reset your ability points
         skill drop <skill> <level> -- lose skill levels
+        skill swap
 
 This multi-purpose command helps you understand your skills. It shows your
 progress in each skill, and the ability points you've earned.
@@ -406,12 +407,13 @@ something else, although this is the name of a skill.
 When you hit a skill cap level (50, 75, 100) you get to reset your abilities
 in that skill. To do that, you can type "skill reset <skill>". If you type it
 without the skill name, you can see which skills have free resets available.
+Resetting a skill only resets your current set (see SKILL SWAP).
 
 It also shows the range in which you can gain the skill, although you can gain
 no more than 10 points from any one ability.
 
-See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, TRAINING SKILLS, ABILITY
-POINTS
+See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, TRAINING SKILLS,
+   ABILITY POINTS, SKILL SWAP
 #
 "SKILL CAPS" CAPS "MAX SKILL" "MAXIMUM SKILL" "CLASS SKILLS" "SPECIALTY SKILLS" "BASIC SKILLS"
 
@@ -450,6 +452,25 @@ Once you use this command, those skill points are gone forever. You will also
 lose any abilities you purchased above the new level.
 
 See also: SKILL
+#
+"SKILL SWAP" "SKILL SETS" MULTISPEC MULTI-SPEC "MULTI SPEC"
+
+Usage:  skill swap
+
+Players who reach level 100 can have two different sets of ability purchases
+for their skills. When you use "skill swap", all of your skills change from
+one set to the other.
+
+Swapping skill sets will reduce your moves and mana to 25% of your total.
+
+When you first change to your alternate skill set, no abilities have been
+purchased. Resetting a skill only resets your current set, not the other set.
+Your count of skill levels gained from using each ability (x/10) is shared
+between both sets.
+
+Swapping skill sets takes 15 seconds and cannot be done in combat.
+
+See also: SKILLS, SLEEP
 #
 "TRAINING SKILLS" "SKILL POINTS" "SKILL EXPERIENCE" "SKILLUPS" EXPERIENCE
 

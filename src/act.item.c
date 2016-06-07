@@ -727,13 +727,19 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 * @param int armor_type ARMOR_x
 */
 void remove_armor_by_type(char_data *ch, int armor_type) {
+	bool found = FALSE;
 	int iter;
 	
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (GET_EQ(ch, iter) && GET_ARMOR_TYPE(GET_EQ(ch, iter)) == armor_type) {
 			act("You take off $p.", FALSE, ch, GET_EQ(ch, iter), NULL, TO_CHAR);
 			unequip_char_to_inventory(ch, iter);
+			found = TRUE;
 		}
+	}
+	
+	if (found) {
+		determine_gear_level(ch);
 	}
 }
 
@@ -3833,7 +3839,7 @@ ACMD(do_eat) {
 		}
 		
 		// remove any old buffs
-		affect_from_char(ch, ATYPE_WELL_FED);
+		affect_from_char(ch, ATYPE_WELL_FED, FALSE);
 		
 		if (GET_OBJ_AFF_FLAGS(food)) {
 			af = create_flag_aff(ATYPE_WELL_FED, eat_hours MUD_HOURS, GET_OBJ_AFF_FLAGS(food), ch);

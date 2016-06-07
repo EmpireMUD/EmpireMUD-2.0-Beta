@@ -1495,7 +1495,7 @@ ACMD(do_land) {
 		return;
 	}
 
-	affects_from_char_by_aff_flag(ch, AFF_FLY);
+	affects_from_char_by_aff_flag(ch, AFF_FLY, FALSE);
 	
 	if (!AFF_FLAGGED(ch, AFF_FLY)) {
 		msg_to_char(ch, "You land.\r\n");

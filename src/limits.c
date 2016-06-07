@@ -128,6 +128,10 @@ void check_attribute_gear(char_data *ch) {
 			}
 		}
 	}
+	
+	if (found) {
+		determine_gear_level(ch);
+	}
 }
 
 
@@ -269,8 +273,7 @@ int limit_crowd_control(char_data *victim, int atype) {
 	for (iter = ROOM_PEOPLE(IN_ROOM(victim)); iter; iter = iter->next_in_room) {
 		if (iter != victim && affected_by_spell(iter, atype)) {
 			++count;
-			affect_from_char(iter, atype);
-			act("You recover.", FALSE, iter, NULL, NULL, TO_CHAR);
+			affect_from_char(iter, atype, TRUE);	// sends message
 			act("$n recovers.", TRUE, iter, NULL, NULL, TO_ROOM);
 		}
 	}
@@ -391,14 +394,15 @@ void point_update_char(char_data *ch) {
 					}
 					
 					// reset scaling if possible...
-					inst = get_instance_by_id(MOB_INSTANCE_ID(ch));
-					if (!inst && IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
-						inst = find_instance_by_room(IN_ROOM(ch), FALSE);
-					}
-					// if no instance or not level-locked
-					if (!inst || inst->level <= 0) {
-						// currently disabled because it gives mirrorimages more health
-						// GET_CURRENT_SCALE_LEVEL(ch) = 0;
+					if (!MOB_FLAGGED(ch, MOB_NO_RESCALE)) {
+						inst = get_instance_by_id(MOB_INSTANCE_ID(ch));
+						if (!inst && IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+							inst = find_instance_by_room(IN_ROOM(ch), FALSE);
+						}
+						// if no instance or not level-locked
+						if (!inst || inst->level <= 0) {
+							GET_CURRENT_SCALE_LEVEL(ch) = 0;
+						}
 					}
 				}
 			}
@@ -443,7 +447,9 @@ void point_update_char(char_data *ch) {
 void real_update_char(char_data *ch) {
 	void adventure_unsummon(char_data *ch);
 	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
+	void check_combat_end(char_data *ch);
 	void check_morph_ability(char_data *ch);
+	void combat_meter_damage_dealt(char_data *ch, int amt);
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	void do_unseat_from_vehicle(char_data *ch);
 	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
@@ -453,9 +459,15 @@ void real_update_char(char_data *ch) {
 	
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *af, *next_af, *immune;
-	char_data *room_ch, *next_ch;
+	char_data *room_ch, *next_ch, *caster;
 	int result, iter, type;
 	int fol_count, gain;
+	bool found;
+	
+	// check for end of meters (in case it was missed in the fight code)
+	if (!FIGHTING(ch)) {
+		check_combat_end(ch);
+	}
 	
 	// first check location: this may move the player
 	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
@@ -500,9 +512,7 @@ void real_update_char(char_data *ch) {
 		else if (af->duration != UNLIMITED) {
 			if ((af->type > 0)) {
 				if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
-					if (ch->desc && *affect_wear_off_msgs[af->type]) {
-						msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', affect_wear_off_msgs[af->type]);
-					}
+					show_wear_off_msg(ch, af->type);
 				}
 			}
 			
@@ -532,6 +542,9 @@ void real_update_char(char_data *ch) {
 		));
 		
 		result = damage(ch, ch, dot->damage * dot->stack, type, dot->damage_type);
+		if (result > 0 && (caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by))) {
+			combat_meter_damage_dealt(caster, result);
+		}
 		if (result < 0 || EXTRACTED(ch) || IS_DEAD(ch)) {
 			return;
 		}
@@ -542,8 +555,8 @@ void real_update_char(char_data *ch) {
 		}
 		else if (dot->duration != UNLIMITED) {
 			// expired
-			if (dot->type > 0 && ch->desc && *affect_wear_off_msgs[dot->type]) {
-				msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', affect_wear_off_msgs[dot->type]);
+			if (dot->type > 0) {
+				show_wear_off_msg(ch, dot->type);
 			}
 			dot_remove(ch, dot);
 		}
@@ -631,13 +644,18 @@ void real_update_char(char_data *ch) {
 	check_attribute_gear(ch);
 	
 	// ensure character isn't using any gear they shouldn't be
+	found = FALSE;
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (wear_data[iter].count_stats && GET_EQ(ch, iter) && !can_wear_item(ch, GET_EQ(ch, iter), TRUE)) {
 			// can_wear_item sends own message to ch
 			act("$n stops using $p.", TRUE, ch, GET_EQ(ch, iter), NULL, TO_ROOM);
 			// this may extract it
 			unequip_char_to_inventory(ch, iter);
+			found = TRUE;
 		}
+	}
+	if (found) {
+		determine_gear_level(ch);
 	}
 
 	/* moving on.. */
@@ -1861,7 +1879,7 @@ void gain_condition(char_data *ch, int condition, int value) {
 	
 	// prevent well-fed if hungry
 	if (IS_HUNGRY(ch) && value > 0) {
-		affect_from_char(ch, ATYPE_WELL_FED);
+		affect_from_char(ch, ATYPE_WELL_FED, TRUE);
 	}
 
 	if (PLR_FLAGGED(ch, PLR_WRITING) || !gain_cond_messsage) {

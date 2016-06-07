@@ -165,7 +165,7 @@ void report_healing(char_data *healed, int amount, char_data *report_to) {
 */
 void un_earthmeld(char_data *ch) {
 	if (AFF_FLAGGED(ch, AFF_EARTHMELD)) {
-		affects_from_char_by_aff_flag(ch, AFF_EARTHMELD);
+		affects_from_char_by_aff_flag(ch, AFF_EARTHMELD, FALSE);
 		if (!AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 			msg_to_char(ch, "You rise from the ground!\r\n");
 			act("$n rises from the ground!", TRUE, ch, 0, 0, TO_ROOM);
@@ -239,7 +239,7 @@ void apply_potion(char_data *ch, int type, int scale) {
 	// atype
 	if (potion_data[type].atype > 0) {
 		// remove any old effect
-		affect_from_char(ch, potion_data[type].atype);
+		affect_from_char(ch, potion_data[type].atype, FALSE);
 		
 		if (potion_data[type].apply != APPLY_NONE) {
 			double points = config_get_double("potion_apply_per_100") * scale / 100.0;
@@ -881,7 +881,7 @@ ACMD(do_fly) {
 	if (affected_by_spell(ch, ATYPE_FLY)) {
 		msg_to_char(ch, "You stop flying and your wings fade away.\r\n");
 		act("$n lands and $s wings fade away.", TRUE, ch, NULL, NULL, TO_ROOM);
-		affect_from_char(ch, ATYPE_FLY);
+		affect_from_char(ch, ATYPE_FLY, FALSE);
 		command_lag(ch, WAIT_OTHER);
 		return;
 	}
@@ -1442,7 +1442,23 @@ ACMD(do_resurrect) {
 
 ACMD(do_skybrand) {
 	char_data *vict = NULL;
-	int cost = 30;
+	int cost;
+	int dur = 6;	// ticks
+	int dmg;
+	
+	double cost_mod[] = { 2.0, 1.5, 1.1 };
+	
+	// determine damage (which determines cost
+	dmg = get_ability_level(ch, ABIL_SKYBRAND) / 24;	// skill level base
+	if ((IS_NPC(ch) || GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+		dmg = MAX(dmg, (get_approximate_level(ch) / 24));	// total level base
+		dmg += GET_BONUS_MAGICAL(ch) / dur;
+	}
+	
+	dmg += GET_INTELLIGENCE(ch) / dur;	// always add int
+	
+	// determine cost
+	cost = round(dmg * CHOOSE_BY_ABILITY_LEVEL(cost_mod, ch, ABIL_SKYBRAND));
 	
 	if (!can_use_ability(ch, ABIL_SKYBRAND, MANA, cost, COOLDOWN_SKYBRAND)) {
 		return;
@@ -1490,8 +1506,8 @@ ACMD(do_skybrand) {
 		act("You mark $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n marks you with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n marks $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_NOTVICT);
-	
-		apply_dot_effect(vict, ATYPE_SKYBRAND, 6, DAM_MAGICAL, get_ability_level(ch, ABIL_SKYBRAND) / 24, 3, ch);
+		
+		apply_dot_effect(vict, ATYPE_SKYBRAND, 6, DAM_MAGICAL, dmg, 3, ch);
 		engage_combat(ch, vict, FALSE);
 	}
 	

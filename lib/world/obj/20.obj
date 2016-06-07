@@ -440,7 +440,7 @@ a length of rope~
 A rope is coiled on the ground.~
 Rope can be used to lead, tie, or harness an animal.
 ~
-3 l a 4
+3 l a 5
 0 0 0
 7 0
 M
@@ -450,7 +450,7 @@ M
 7
 $n attaches a rope to $V.~
 O
-28 0
+28 u
 R
 5121 0
 R

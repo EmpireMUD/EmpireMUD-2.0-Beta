@@ -89,14 +89,20 @@ static int extractions_pending = 0;
 *
 * @param char_data *ch The person to remove affects from.
 * @param int type Any ATYPE_ const
+* @param bool show_msg If TRUE, will show the wears-off message.
 */
-void affect_from_char(char_data *ch, int type) {
+void affect_from_char(char_data *ch, int type, bool show_msg) {
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *hjp, *next;
+	bool shown = FALSE;
 
 	for (hjp = ch->affected; hjp; hjp = next) {
 		next = hjp->next;
 		if (hjp->type == type) {
+			if (show_msg && !shown) {
+				show_wear_off_msg(ch, type);
+				shown = TRUE;
+			}
 			affect_remove(ch, hjp);
 		}
 	}
@@ -105,6 +111,10 @@ void affect_from_char(char_data *ch, int type) {
 	for (dot = ch->over_time_effects; dot; dot = next_dot) {
 		next_dot = dot->next;
 		if (dot->type == type) {
+			if (show_msg && !shown) {
+				show_wear_off_msg(ch, type);
+				shown = TRUE;
+			}
 			dot_remove(ch, dot);
 		}
 	}
@@ -117,13 +127,19 @@ void affect_from_char(char_data *ch, int type) {
 * @param char_data *ch The person to remove affects from.
 * @param int type Any ATYPE_ const to match.
 * @param int apply Any APPLY_ const to match.
+* @param bool show_msg If TRUE, will show the wears-off message.
 */
-void affect_from_char_by_apply(char_data *ch, int type, int apply) {
+void affect_from_char_by_apply(char_data *ch, int type, int apply, bool show_msg) {
 	struct affected_type *aff, *next_aff;
+	bool shown = FALSE;
 
 	for (aff = ch->affected; aff; aff = next_aff) {
 		next_aff = aff->next;
 		if (aff->type == type && aff->location == apply) {
+			if (show_msg && !shown) {
+				show_wear_off_msg(ch, type);
+				shown = TRUE;
+			}
 			affect_remove(ch, aff);
 		}
 	}
@@ -136,13 +152,44 @@ void affect_from_char_by_apply(char_data *ch, int type, int apply) {
 * @param char_data *ch The person to remove affects from.
 * @param int type Any ATYPE_ const to match.
 * @param bitvector_t bits Any AFF_ bit(s) to match.
+* @param bool show_msg If TRUE, will show the wears-off message.
 */
-void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits) {
+void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits, bool show_msg) {
 	struct affected_type *aff, *next_aff;
+	bool shown = FALSE;
 
 	for (aff = ch->affected; aff; aff = next_aff) {
 		next_aff = aff->next;
 		if (aff->type == type && IS_SET(aff->bitvector, bits)) {
+			if (show_msg && !shown) {
+				show_wear_off_msg(ch, type);
+				shown = TRUE;
+			}
+			affect_remove(ch, aff);
+		}
+	}
+}
+
+
+/**
+* Calls affect_remove on every affect of type "type" with location "apply".
+*
+* @param char_data *ch The person to remove affects from.
+* @param int type Any ATYPE_ const to match.
+* @param char_data *caster The person whose affects to remove.
+* @param bool show_msg If TRUE, will send the wears-off message.
+*/
+void affect_from_char_by_caster(char_data *ch, int type, char_data *caster, bool show_msg) {
+	struct affected_type *aff, *next_aff;
+	bool shown = FALSE;
+	
+	LL_FOREACH_SAFE(ch->affected, aff, next_aff) {
+		if (aff->type == type && aff->cast_by == CAST_BY_ID(caster)) {
+			if (show_msg && !shown) {
+				show_wear_off_msg(ch, type);
+				shown = TRUE;
+			}
+			
 			affect_remove(ch, aff);
 		}
 	}
@@ -156,15 +203,16 @@ void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits) {
 *
 * @param char_data *ch The person to remove from.
 * @param bitvector_t aff_flag Any AFF_x flags to remove.
+* @param bool show_msg If TRUE, will show the wears-off message.
 */
-void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag) {
+void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag, bool show_msg) {
 	struct affected_type *af, *next_af;
 	
 	for (af = ch->affected; af; af = next_af) {
 		next_af = af->next;
 		if (IS_SET(af->bitvector, aff_flag)) {
 			// calling it this way removes ALL affects of that ability
-			affect_from_char(ch, af->type);
+			affect_from_char(ch, af->type, show_msg);
 		}
 	}
 }
@@ -782,6 +830,20 @@ bool room_affected_by_spell(room_data *room, int type) {
 	}
 
 	return found;
+}
+
+
+/**
+* Shows the affect-wear-off message for a given type.
+*
+* @param char_data *ch The person wearing off of.
+* @param int atype The ATYPE_ affect type.
+*/
+void show_wear_off_msg(char_data *ch, int atype) {
+	extern const char *affect_wear_off_msgs[];
+	if (*affect_wear_off_msgs[atype] && ch->desc) {
+		msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', affect_wear_off_msgs[atype]);
+	}
 }
 
 
@@ -2062,7 +2124,7 @@ int total_coins(char_data *ch) {
 * two durations is kept.
 *
 * @param char_data *ch The character.
-* @param int type Any COOLDOWN_x.
+* @param int type Any COOLDOWN_.
 * @param int seconds_duration How long it lasts.
 */
 void add_cooldown(char_data *ch, int type, int seconds_duration) {
@@ -2093,7 +2155,7 @@ void add_cooldown(char_data *ch, int type, int seconds_duration) {
 * does not have that ability on cooldown.
 *
 * @param char_data *ch The character.
-* @param int type Any COOLDOWN_x.
+* @param int type Any COOLDOWN_.
 * @return int The time remaining on the cooldown (in seconds), or 0.
 */
 int get_cooldown_time(char_data *ch, int type) {
@@ -2128,7 +2190,7 @@ void remove_cooldown(char_data *ch, struct cooldown_data *cool) {
 * Removes any cooldowns of a given type from the character.
 *
 * @param char_data *ch The character.
-* @param int type Any COOLDOWN_x.
+* @param int type Any COOLDOWN_.
 */
 void remove_cooldown_by_type(char_data *ch, int type) {
 	struct cooldown_data *cool, *next_cool;

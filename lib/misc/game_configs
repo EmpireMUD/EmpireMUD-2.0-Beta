@@ -142,6 +142,8 @@ morph_timer 2
 must_be_vampire You must be a vampire to use this ability.
 potion_apply_per_100 1.333300
 potion_heal_scale 0.666600
+skill_swap_allowed 1
+skill_swap_min_level 100
 summon_npc_limit 5
 tracks_lifespan 60
 *

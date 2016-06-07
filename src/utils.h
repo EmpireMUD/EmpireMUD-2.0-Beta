@@ -853,12 +853,14 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_CLASS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->character_class))
 #define GET_CLASS_PROGRESSION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->class_progression))
 #define GET_CLASS_ROLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->class_role))
+#define GET_COMBAT_METERS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->meters))
 #define GET_COMPLETED_QUESTS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->completed_quests))
 #define GET_COMPUTED_LEVEL(ch)  (GET_SKILL_LEVEL(ch) + GET_GEAR_LEVEL(ch))
 #define GET_COND(ch, i)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->conditions[(i)]))
 #define GET_CONFUSED_DIR(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->confused_dir))
 #define GET_CREATION_ALT_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->create_alt_id))
 #define GET_CREATION_HOST(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->creation_host))
+#define GET_CURRENT_SKILL_SET(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->current_skill_set))
 #define GET_CUSTOM_COLOR(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->custom_colors[(pos)]))
 #define GET_DAILY_BONUS_EXPERIENCE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->daily_bonus_experience))
 #define GET_DAILY_CYCLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->daily_cycle))
@@ -1453,6 +1455,7 @@ extern char *get_vehicle_name_by_proto(obj_vnum vnum);
  * example.  If you really couldn't care less, change this to a '#if 0'.
  */
 #if 1
+	extern struct player_special_data dummy_mob;
 	#define CHECK_PLAYER_SPECIAL(ch, var)  (*(((ch)->player_specials == &dummy_mob) ? (log("SYSERR: Mob using '"#var"' at %s:%d.", __FILE__, __LINE__), &(var)) : &(var)))
 #else
 	#define CHECK_PLAYER_SPECIAL(ch, var)  (var)

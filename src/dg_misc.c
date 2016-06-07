@@ -27,6 +27,11 @@
 #include "db.h"
 #include "skills.h"
 
+// external funcs
+void combat_meter_damage_dealt(char_data *ch, int amt);
+void combat_meter_damage_taken(char_data *ch, int amt);
+void combat_meter_heal_dealt(char_data *ch, int amt);
+void combat_meter_heal_taken(char_data *ch, int amt);
 extern obj_data *die(char_data *ch, char_data *killer);
 
 /* external vars */
@@ -148,10 +153,10 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 
 	if (!str_cmp(value_p, "off")) {
 		if (type == APPLY_TYPE) {
-			affect_from_char_by_apply(ch, ATYPE_DG_AFFECT, i);
+			affect_from_char_by_apply(ch, ATYPE_DG_AFFECT, i, FALSE);
 		}
 		else {
-			affect_from_char_by_bitvector(ch, ATYPE_DG_AFFECT, BIT(i));
+			affect_from_char_by_bitvector(ch, ATYPE_DG_AFFECT, BIT(i), FALSE);
 		}
 		return;
 	}
@@ -501,10 +506,18 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	if (modifier > 0) {
 		dam = reduce_damage_from_skills(dam, vict, killer, dam_type);	// resistance, etc
 		dam = MAX(1, dam);
+		
+		if (vict != killer) {
+			combat_meter_damage_dealt(killer, dam);
+		}
+		combat_meter_damage_taken(vict, dam);
 	}
 	else if (modifier < 0) {
 		// healing
 		dam = MIN(-1, dam);
+		
+		combat_meter_heal_dealt(killer, -dam);
+		combat_meter_heal_taken(vict, -dam);
 	}
 	
 	GET_HEALTH(vict) -= dam;

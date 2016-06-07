@@ -2464,6 +2464,9 @@ Available mob flags:
  !LOOT - Will not drop any loot.
  !TELEPORT - Cannot teleport to this mob.
  !EXP - Players get no experience from using abilities against this mob.
+ !RESCALE - Mob will not rescale after its initial scaling, e.g. if you set
+    specific attributes on it after it loaded. Note that it will still scale
+    the first time, so ensure that it is scaled before changing attributes.
 
 See also: OLC MOBILES
 #d
@@ -3058,6 +3061,7 @@ Available flags:
  &ctropical&0 - Comes from tropical areas (especially foods)
  &ccommon&0 - Opposite of rare
  &caquatic&0 - Comes from the water
+ &cbasic&0 - A tier 1, minimum-level resource.
 
 See also: OEDIT COMPONENT
 #d

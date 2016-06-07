@@ -232,13 +232,13 @@ appears when you finish any of the quests.
 10900 10949 250-300
 5 0 0 4
 L
-1 0
-10006 -1 -1
-14 c c
-L
 5 0
 1440 -1 -1
 -1 0 0
+L
+1 0
+10900 -1 -1
+14 c c
 S
 #140
 The Sewer: Ratskins~

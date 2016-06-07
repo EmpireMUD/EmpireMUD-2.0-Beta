@@ -395,6 +395,19 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_FAMILY_RECIPES  270
 #define ABIL_GOURMET_CHEF  271
 #define ABIL_STABLEMASTER  272
+#define ABIL_ABLATE  273
+#define ABIL_ACIDBLAST  274
+#define ABIL_ARCLIGHT  275
+#define ABIL_ASTRALCLAW  276
+#define ABIL_CHRONOBLAST  277
+#define ABIL_DEATHTOUCH  278
+#define ABIL_DISPIRIT  279
+#define ABIL_ERODE  280
+#define ABIL_SCOUR  281
+#define ABIL_SHADOWLASH  282
+#define ABIL_SOULCHAIN  283
+#define ABIL_STARSTRIKE  284
+#define ABIL_THORNLASH  285
 
 
 // cooldowns -- see COOLDOWN_x in constants.c
@@ -453,6 +466,19 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define COOLDOWN_ROGUE_FLAG  52
 #define COOLDOWN_PORTAL_SICKNESS  53
 #define COOLDOWN_WHISPERSTRIDE  54
+#define COOLDOWN_ABLATE  55
+#define COOLDOWN_ACIDBLAST  56
+#define COOLDOWN_ARCLIGHT  57
+#define COOLDOWN_ASTRALCLAW  58
+#define COOLDOWN_CHRONOBLAST  59
+#define COOLDOWN_DEATHTOUCH  60
+#define COOLDOWN_DISPIRIT  61
+#define COOLDOWN_ERODE  62
+#define COOLDOWN_SCOUR  63
+#define COOLDOWN_SHADOWLASH  64
+#define COOLDOWN_SOULCHAIN  65
+#define COOLDOWN_STARSTRIKE  66
+#define COOLDOWN_THORNLASH  67
 
 
 /* WEAPON ATTACK TYPES */
@@ -510,15 +536,28 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ATTACK_POISON			(TYPE_SUFFERING + 7)
 #define ATTACK_CREO_IGNEM		(TYPE_SUFFERING + 8)
 	#define ATTACK_UNUSED			(TYPE_SUFFERING + 9)
-#define ATTACK_LIGHTNINGBOLT	(TYPE_SUFFERING + 10)
+#define ATTACK_LIGHTNINGBOLT	(TYPE_SUFFERING + 10)	// 60
 #define ATTACK_PHYSICAL_DOT		(TYPE_SUFFERING + 11)
 #define ATTACK_BACKSTAB			(TYPE_SUFFERING + 12)
 #define ATTACK_SUNSHOCK			(TYPE_SUFFERING + 13)
 #define ATTACK_MAGICAL_DOT		(TYPE_SUFFERING + 14)
 #define ATTACK_FIRE_DOT			(TYPE_SUFFERING + 15)
 #define ATTACK_POISON_DOT		(TYPE_SUFFERING + 16)
+#define ATTACK_ABLATE			(TYPE_SUFFERING + 17)
+#define ATTACK_ACIDBLAST		(TYPE_SUFFERING + 18)
+#define ATTACK_ARCLIGHT			(TYPE_SUFFERING + 19)
+#define ATTACK_ASTRALCLAW		(TYPE_SUFFERING + 20)	// 70
+#define ATTACK_CHRONOBLAST		(TYPE_SUFFERING + 21)
+#define ATTACK_DEATHTOUCH		(TYPE_SUFFERING + 22)
+#define ATTACK_DISPIRIT			(TYPE_SUFFERING + 23)
+#define ATTACK_ERODE			(TYPE_SUFFERING + 24)
+#define ATTACK_SCOUR			(TYPE_SUFFERING + 25)
+#define ATTACK_SHADOWLASH		(TYPE_SUFFERING + 26)
+#define ATTACK_SOULCHAIN		(TYPE_SUFFERING + 27)
+#define ATTACK_STARSTRIKE		(TYPE_SUFFERING + 28)
+#define ATTACK_THORNLASH		(TYPE_SUFFERING + 29)
 
-#define TOTAL_ATTACK_TYPES		(TYPE_SUFFERING + 17)
+#define TOTAL_ATTACK_TYPES		(TYPE_SUFFERING + 30)
 
 
 // SIEGE_x types for besiege
@@ -593,8 +632,19 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ATYPE_MORPH  62
 #define ATYPE_WHISPERSTRIDE  63
 #define ATYPE_WELL_FED  64
+#define ATYPE_ABLATE  65
+#define ATYPE_ACIDBLAST  66
+#define ATYPE_ASTRALCLAW  67
+#define ATYPE_CHRONOBLAST  68
+#define ATYPE_DISPIRIT  69
+#define ATYPE_ERODE  70
+#define ATYPE_SCOUR  71
+#define ATYPE_SHADOWLASH_BLIND  72
+#define ATYPE_SHADOWLASH_DOT  73
+#define ATYPE_SOULCHAIN  74
+#define ATYPE_THORNLASH  75
 
-#define NUM_ATYPES  65	// total number, for bounds checking
+#define NUM_ATYPES  76	// total number, for bounds checking
 
 
 // armor types
@@ -709,11 +759,35 @@ static inline int get_skill_resets(char_data *ch, any_vnum skill) {
 /**
 * @param char_data *ch The player to check.
 * @param any_vnum abil_id Any valid ability.
+* @param int skill_set Which skill set number (0..NUM_SKILL_SETS-1).
+* @return bool TRUE if the player has the ability; FALSE if not.
+*/
+static inline bool has_ability_in_set(char_data *ch, any_vnum abil_id, int skill_set) {
+	struct player_ability_data *data;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	data = get_ability_data(ch, abil_id, 0);
+	return data && data->purchased[skill_set];
+}
+
+
+/**
+* Look up skill in the player's current set.
+*
+* @param char_data *ch The player to check.
+* @param any_vnum abil_id Any valid ability.
 * @return bool TRUE if the player has the ability; FALSE if not.
 */
 static inline bool has_ability(char_data *ch, any_vnum abil_id) {
-	struct player_ability_data *data = get_ability_data(ch, abil_id, 0);
-	return data && data->purchased;
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	// GET_CURRENT_SKILL_SET(ch) not available here
+	return has_ability_in_set(ch, abil_id, GET_CURRENT_SKILL_SET(ch));
 }
 
 

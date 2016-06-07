@@ -1026,6 +1026,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_NO_LOOT  BIT(29)	// D. do not drop loot
 #define MOB_NO_TELEPORT  BIT(30)  // E. cannot teleport to this mob
 #define MOB_NO_EXPERIENCE  BIT(31)	// F. players get no exp against this mob
+#define MOB_NO_RESCALE  BIT(32)	// G. mob won't rescale (after the first time), e.g. if specific traits were set
 
 
 // MOB_MOVE_x: mob/vehicle movement types
@@ -1134,6 +1135,7 @@ typedef struct vehicle_data vehicle_data;
 #define CMPF_TROPICAL  BIT(17)
 #define CMPF_COMMON  BIT(18)
 #define CMPF_AQUATIC  BIT(19)
+#define CMPF_BASIC  BIT(20)
 
 
 // Container flags -- limited to 31 because of int type in obj value
@@ -1382,6 +1384,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_GEN_CRAFT		35
 #define ACT_SAILING			36
 #define ACT_PILOTING		37
+#define ACT_SWAP_SKILL_SETS	38
 
 // act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -1973,6 +1976,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_ACTION_VNUMS  3	// action vnums 0, 1, 2
 #define NUM_OBJ_VAL_POSITIONS  3	// GET_OBJ_VAL(obj, X) -- caution: changing this will require you to change the .obj file format
 #define NUM_GLB_VAL_POSITIONS  3	// GET_GLOBAL_VAL(glb, X) -- caution: changing this will require you to change the .glb file format
+#define NUM_SKILL_SETS  2	// number of different sets a player has
 
 
 /*
@@ -2844,6 +2848,17 @@ struct descriptor_data {
 };
 
 
+// used in player specials to track combat
+struct combat_meters {
+	int hits, misses;	// my hit %
+	int hits_taken, dodges;	// my dodge %
+	int damage_dealt, damage_taken, pet_damage;
+	int heals_dealt, heals_taken;
+	time_t start, end;	// times
+	bool over;
+};
+
+
 // basic paragraphs for book_data
 struct paragraph_data {
 	char *text;
@@ -2873,7 +2888,7 @@ struct mount_data {
 // used in player_special_data
 struct player_ability_data {
 	any_vnum vnum;	// ABIL_ or ability vnum
-	bool purchased;	// whether or not the player bought it
+	bool purchased[NUM_SKILL_SETS];	// whether or not the player bought it
 	byte levels_gained;	// tracks for the cap on how many times one ability grants skillups
 	ability_data *ptr;	// live abil pointer
 
@@ -2997,6 +3012,7 @@ struct player_special_data {
 	any_vnum creation_archetype;	// this is now stored permanently so later decisions can be made based on it
 	struct player_skill_data *skill_hash;
 	struct player_ability_data *ability_hash;
+	int current_skill_set;	// which skill set a player is currently in
 	bool can_gain_new_skills;	// not required to keep skills at zero
 	bool can_get_bonus_skills;	// can buy extra 75's
 	sh_int skill_level;  // levels computed based on class skills
@@ -3023,6 +3039,8 @@ struct player_special_data {
 	byte reboot_conf;	// Reboot confirmation
 	byte create_points;	// Used in character creation
 	int group_invite_by;	// idnum of the last player to invite this one
+	
+	struct combat_meters meters;	// combat meter data
 	
 	bool needs_delayed_load;	// whether or not the player still needs delayed data
 	bool restore_on_login;	// mark the player to trigger a free reset when they enter the game
@@ -3163,7 +3181,7 @@ struct char_data {
 
 // cooldown info
 struct cooldown_data {
-	sh_int type;	// any COOLDOWN_x const
+	sh_int type;	// any COOLDOWN_ const
 	time_t expire_time;	// time at which the cooldown has expired
 	
 	struct cooldown_data *next;	// linked list

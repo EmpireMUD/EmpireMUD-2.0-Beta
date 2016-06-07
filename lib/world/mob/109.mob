@@ -42,13 +42,14 @@ T 10908
 T 10915
 T 10919
 T 10907
+T 10909
 S
 #10901
 Sir Vivor~
 Sir Vivor~
 Sir Vivor is glancing around nervously.
 ~
-250 300 dkvxyzAB cE
+250 300 bdkvxyzAB cE
 1 0 0 1
 I 4 10907 75.00 2  # LOOT: a raw dragon steak
 I 4 10907 75.00 2  # LOOT: a raw dragon steak
@@ -82,11 +83,10 @@ I 4 10902 25.00 4 s  # LOOT: a red dragon hide
 I 4 10006 75.00 1 t  # LOOT: a dragon scale
 I 4 10006 25.00 2 t  # LOOT: a dragon scale
 T 10910
-T 10902
-T 10903
 T 10908
 T 10912
 T 10911
+T 10909
 S
 #10902
 Bangles thief nervous~

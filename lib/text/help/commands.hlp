@@ -951,6 +951,12 @@ Workforce.
 
 See also: WORKFORCE
 #
+METERS "COMBAT METERS"
+
+Usage:  meters
+
+This shows your combat meters from your current or most recent fight.
+#
 MORTLOG
 
 Usage:  toggle mortlog

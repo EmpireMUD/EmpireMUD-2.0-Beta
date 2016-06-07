@@ -273,7 +273,9 @@ The BONUS-MAGICAL gear stat, also shown on your score page as "Magical +X",
 is an amount added to any magical damage you deal, including Intelligence-based
 melee attacks (like Ready Fireball) and spells.
 
-It is added to damage in the same way as Intelligence.
+Bonus-Magical is applied to an average speed of 2.0, meaning if your attack
+is faster than that, a smaller amount may be added to your damage -- and the
+opposite if you're slower. It is worth 0.5 damage per second.
 
 See also: SCORE
 #
@@ -283,7 +285,9 @@ The BONUS-PHYSICAL gear stat, also shown on your score page as "Physical +X",
 is an amount added to any physical damage you deal. This includes melee combat
 and physical abilities.
 
-It is added to damage in the same way as Strength.
+Bonus-Physical is applied to an average speed of 2.0, meaning if your attack
+is faster than that, a smaller amount may be added to your damage -- and the
+opposite if you're slower. It is worth 0.5 damage per second.
 
 See also: SCORE
 #
@@ -840,6 +844,8 @@ of the attacker's level. (You need 50 resistance to reach the cap against a
 level 100 mob.) Magical resistance is the second number in the 'Resist' section
 of your score.
 
+If your resistance is negative, you will take increased damage.
+
 Note that fire from magical sources (like the Ready Fireball ability) is
 reduced by this, but fire from physical sources (like a torch weapon) falls
 under physical resistance instead.
@@ -857,6 +863,8 @@ The amount of resistance required to hit the 25% reduction cap is equal to half
 of the attacker's level. (You need 50 resistance to reach the cap against a
 level 100 mob.) Physical resistance is the first number in the 'Resist' section
 of your score.
+
+If your resistance is negative, you will take increased damage.
 
 Physical resistance includes resistance to fire damage (but not magical fire;
 that's magic resistance). This trait is similar to the "soak" trait from older
