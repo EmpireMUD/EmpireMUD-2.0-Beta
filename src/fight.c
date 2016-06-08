@@ -187,8 +187,8 @@ bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand) {
 			min = 0;
 		}
 	
-		// real chance to hit is what % chance is of max
-		chance = tohit * 100 / max;
+		// real chance to hit is what % chance is of max (ensure max is not less than 1)
+		chance = tohit * 100 / MAX(1, max);
 		return (chance >= (number(1, 100) - min));
 	}
 }
