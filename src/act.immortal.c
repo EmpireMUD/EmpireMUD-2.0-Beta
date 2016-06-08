@@ -3516,12 +3516,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			break;
 		}
 		case ITEM_WEAPON:
-			msg_to_char(ch, "Speed: %.2f, Damage: %s", get_weapon_speed(j), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"));
-			if (GET_WEAPON_DAMAGE_BONUS(j) != 0)
-				msg_to_char(ch, "%+d", GET_WEAPON_DAMAGE_BONUS(j));
-			
-			msg_to_char(ch, " (%.2f base dps)\r\n", get_base_dps(j));
-
+			msg_to_char(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)\r\n", get_weapon_speed(j), GET_WEAPON_DAMAGE_BONUS(j), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
 			msg_to_char(ch, "Damage type: %s\r\n", attack_hit_info[GET_WEAPON_TYPE(j)].name);
 			break;
 		case ITEM_ARMOR:
