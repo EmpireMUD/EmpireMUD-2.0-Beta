@@ -1104,6 +1104,7 @@ void scale_mob_as_familiar(char_data *mob, char_data *master) {
 		scale_level = MAX(CLASS_SKILL_CAP, scale_level - 25);
 	}
 	scale_mob_to_level(mob, scale_level);
+	SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);	// ensure it doesn't rescale itself
 }
 
 
