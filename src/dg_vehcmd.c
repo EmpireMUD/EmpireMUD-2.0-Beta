@@ -897,6 +897,7 @@ VCMD(do_dgvload) {
 		if (target && *target && isdigit(*target)) {
 			// target is scale level
 			scale_mob_to_level(mob, atoi(target));
+			SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);
 		}
 		
 		load_mtrigger(mob);
@@ -1303,6 +1304,7 @@ VCMD(do_vscale) {
 		}
 
 		scale_mob_to_level(victim, level);
+		SET_BIT(MOB_FLAGS(victim), MOB_NO_RESCALE);
 	}
 	else if ((vehicle = get_vehicle_by_vehicle(veh, arg))) {
 		scale_vehicle_to_level(vehicle, level);
