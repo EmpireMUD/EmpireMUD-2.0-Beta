@@ -160,7 +160,7 @@ When using field  - The variable returns:
 &clevel&0 - The current scaled level of the object (0 if not yet scaled).
 &cmaterial&0 - Name of what the object is made out of, e.g. GOLD.
 &cname&0 - The list of key words of the object.
-&cnext_in_list&0 - The id of the next object in the characters inventory, or an
+&cnext_in_list&0 - The id of the next object in the inventory/room, or an
    empty return
 &croom&0 - Returns the room id the object is in.
 &cshortdesc&0 - The name of the object that players see.
