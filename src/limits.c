@@ -1397,6 +1397,17 @@ void point_update_obj(obj_data *obj) {
 						act("$p flickers briefly, then vanishes with a poof.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR);
 					}
 					break;
+				case MAT_WAX: {
+					if (obj->carried_by)
+						act("$p melts in your hands and is gone.", FALSE, obj->carried_by, obj, 0, TO_CHAR);
+					else if (obj->worn_by)
+						act("$p melts off of you and is gone.", FALSE, obj->worn_by, obj, 0, TO_CHAR);
+					else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
+						act("$p melts and is gone.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_ROOM);
+						act("$p melts and is gone.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR);
+					}
+					break;
+				}
 				case MAT_WOOD:
 				case MAT_BONE:
 				case MAT_HAIR:
