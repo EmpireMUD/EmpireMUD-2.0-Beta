@@ -36,4 +36,30 @@ Dragon buildings:
   dragonstatue (dragonseye ruby): A new type of statue (Dragonslayer).
   dragonlibrary (dragonquill pen): A library with an alchemy lab inside.
 #
+"GIGANTIC NEST" "A GIGANTIC NEST" "GOLDEN TALONS" "CORRUPTED TALONS"
+
+A Gigantic Nest (level 100-125 solo adventure)
+
+The Gigantic Nest adventure includes new crafting patterns for gear that scales
+up to level 150. There are two different currencies in this adventure: golden
+talons for completing the helpful quests, and corrupted talons for completing
+the harmful quests. You can only complete 1 quest per instance, but you are
+free to choose a different quest each time you find a nest. Completing a quest
+will spawn the vendor who trades in golden or corrupted talons.
+
+Crafting patterns by role:
+  Caster: roc feather sleeves, wondrous feather gloves
+  Healer: downy white sleeves, roc quill finger caps
+  Melee: swift feathered arm guards, razor feather gauntlets
+  Tank: stonefeather arm plates, feathered imperium gauntlets
+  Empire: earrings of hte roc
+  Trade: magnificent feathered headdress
+
+Other:
+  Building: The Dome (huge dome capstone)
+  Gear: downy rucksack, feathered saddle
+  Minipet: baby ostrich
+  Mounts: lithe ostrich, trumpeter swan, tawny roc
+  Vehicle: Clockwork Roc (roc-stone gear)
+#
 $
