@@ -656,7 +656,7 @@ void mobile_activity(void) {
 			}
 		}	// end pursuit
 		
-		if (!moved && !MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) && !AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED) && GET_POS(ch) == POS_STANDING && (!ch->master || IN_ROOM(ch) != IN_ROOM(ch->master))) {
+		if (!moved && !MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) && !AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED) && GET_POS(ch) == POS_STANDING && (!ch->master || IN_ROOM(ch) != IN_ROOM(ch->master)) && (!MOB_FLAGGED(ch, MOB_PURSUE) || !MOB_PURSUIT(ch))) {
 			moved = try_mobile_movement(ch);
 		}
 		
