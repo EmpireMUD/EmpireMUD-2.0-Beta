@@ -1662,6 +1662,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		value = MAX(GET_MIN_SCALE_LEVEL(vict), value);
 		value = MIN(GET_MAX_SCALE_LEVEL(vict), value);
 		scale_mob_to_level(vict, value);
+		SET_BIT(MOB_FLAGS(vict), MOB_NO_RESCALE);
 	}
 	
 	// this goes last, after all SET_CASE statements
@@ -3516,12 +3517,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			break;
 		}
 		case ITEM_WEAPON:
-			msg_to_char(ch, "Speed: %.2f, Damage: %s", get_weapon_speed(j), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"));
-			if (GET_WEAPON_DAMAGE_BONUS(j) != 0)
-				msg_to_char(ch, "%+d", GET_WEAPON_DAMAGE_BONUS(j));
-			
-			msg_to_char(ch, " (%.2f base dps)\r\n", get_base_dps(j));
-
+			msg_to_char(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)\r\n", get_weapon_speed(j), GET_WEAPON_DAMAGE_BONUS(j), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
 			msg_to_char(ch, "Damage type: %s\r\n", attack_hit_info[GET_WEAPON_TYPE(j)].name);
 			break;
 		case ITEM_ARMOR:
@@ -6006,6 +6002,7 @@ ACMD(do_rescale) {
 		}
 		else {
 			scale_mob_to_level(vict, level);
+			SET_BIT(MOB_FLAGS(vict), MOB_NO_RESCALE);
 			
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled mob %s to level %d at %s", GET_NAME(ch), PERS(vict, vict, FALSE), GET_CURRENT_SCALE_LEVEL(vict), room_log_identifier(IN_ROOM(vict)));
 			

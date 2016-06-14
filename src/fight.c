@@ -187,8 +187,8 @@ bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand) {
 			min = 0;
 		}
 	
-		// real chance to hit is what % chance is of max
-		chance = tohit * 100 / max;
+		// real chance to hit is what % chance is of max (ensure max is not less than 1)
+		chance = tohit * 100 / MAX(1, max);
 		return (chance >= (number(1, 100) - min));
 	}
 }
@@ -305,7 +305,37 @@ int get_block_rating(char_data *ch, bool can_gain_skill) {
 
 
 /**
-* Computes combat speed based on weapon, abilities, etc.
+* The player's basic speed -- just weapon or attack type.
+*
+* Do NOT do gain_skill_exp or skill_checks in this function. It is called every
+* 0.1 seconds to determine when you act, and random modifiers will not work
+* well here.
+*
+* @param char_data *ch the person whose speed to get
+* @param int pos Which position to check (WEAR_WIELD, WEAR_HOLD, WEAR_RANGED)
+* @return double The basic speed for the character.
+*/
+double get_base_speed(char_data *ch, int pos) {
+	obj_data *weapon = GET_EQ(ch, pos);
+	double base = 3.0;
+	int w_type;
+	
+	w_type = get_attack_type(ch, weapon);
+	
+	if (weapon) {
+		base = get_weapon_speed(weapon);
+	}
+	else {
+		// basic speed
+		base = attack_hit_info[w_type].speed[SPD_NORMAL];
+	}
+	
+	return base;
+}
+
+
+/**
+* Computes current real combat speed with abilities, affects, etc.
 *
 * Do NOT do gain_skill_exp or skill_checks in this function. It is called every
 * 0.1 seconds to determine when you act, and random modifiers will not work
@@ -317,22 +347,11 @@ int get_block_rating(char_data *ch, bool can_gain_skill) {
 */
 double get_combat_speed(char_data *ch, int pos) {
 	obj_data *weapon = GET_EQ(ch, pos);
-	double base = 3.0;
-	int w_type;
+	double base = get_base_speed(ch, pos);
 	
 	double finesse[] = { 0.9, 0.85, 0.8 };
 	double quick_draw[] = { 0.75, 0.75, 0.65 };
 	
-	w_type = get_attack_type(ch, weapon);
-	
-	if (weapon) {
-		base = get_weapon_speed(weapon);
-	}
-	else {
-		// basic speed
-		base = attack_hit_info[w_type].speed[SPD_NORMAL];
-	}
-
 	// ability mods: player only
 	if (!IS_NPC(ch) && weapon) {
 		if (has_ability(ch, ABIL_FINESSE) && !IS_MISSILE_WEAPON(weapon)) {
@@ -2869,12 +2888,12 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	extern const double basic_speed;
 	
 	struct instance_data *inst;
-	int w_type, result;
+	int w_type, result, bonus;
 	bool success = FALSE, block = FALSE;
 	bool can_gain_skill;
 	empire_data *victim_emp;
 	struct affected_type *af;
-	double speed, dam;
+	double attack_speed, cur_speed, dam;
 	char_data *check;
 	
 	// some config TODO move this into the config system?
@@ -2894,12 +2913,15 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	// set up some vars
 	w_type = get_attack_type(ch, weapon);
 	victim_emp = GET_LOYALTY(victim);
-	speed = get_combat_speed(ch, weapon ? weapon->worn_on : WEAR_WIELD);
 	
 	// weapons not allowed if disarmed (do this after get_attack type, which accounts for this)
 	if (AFF_FLAGGED(ch, AFF_DISARM)) {
 		weapon = NULL;
 	}
+	
+	// determine speeds now
+	attack_speed = get_base_speed(ch, weapon ? weapon->worn_on : WEAR_WIELD);
+	cur_speed = get_combat_speed(ch, weapon ? weapon->worn_on : WEAR_WIELD);
 	
 	// look for an instance to lock (before running triggers)
 	if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch)) && (inst = COMPLEX_DATA(IN_ROOM(ch))->instance)) {
@@ -2985,18 +3007,8 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 
 		// TODO move this damage computation to its own function so that it can be called remotely too
 
-		if (IS_MAGIC_ATTACK(w_type)) {
-			dam = GET_INTELLIGENCE(ch);
-		}
-		else {
-			/* Melee attacks are based upon strength.. */
-			dam = GET_STRENGTH(ch);
-		}
+		dam = 0;	// to start
 		
-		if (w_type == TYPE_VAMPIRE_CLAWS) {
-			dam *= 2;
-		}
-
 		if (weapon && IS_WEAPON(weapon)) {
 			/* Add weapon-based damage if a weapon is being wielded */
 			dam += GET_WEAPON_DAMAGE_BONUS(weapon);
@@ -3006,14 +3018,22 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			dam += MOB_DAMAGE(ch) / (AFF_FLAGGED(ch, AFF_DISARM) ? 2 : 1);
 		}
 		
-		// these adds are based on speed
+		// applicable bonuses
 		if (IS_MAGIC_ATTACK(w_type)) {
-			dam += GET_BONUS_MAGICAL(ch) * speed / basic_speed;
+			bonus = GET_INTELLIGENCE(ch) + GET_BONUS_MAGICAL(ch);
 		}
 		else {
-			dam += GET_BONUS_PHYSICAL(ch) * speed / basic_speed;
+			bonus = GET_STRENGTH(ch) + GET_BONUS_PHYSICAL(ch);
 		}
-				
+		
+		// bonus add is based on speeds
+		dam += bonus * (attack_speed / basic_speed) * (attack_speed / cur_speed);
+		
+		// TODO this is probably WAY overpowered. WAY WAY. Consider changing it to a 'ready' weapon.
+		if (w_type == TYPE_VAMPIRE_CLAWS) {
+			dam *= 2;
+		}
+		
 		// All these abilities add damage: no skill gain on an already-beated foe
 		if (can_gain_skill) {
 			if (!IS_NPC(ch) && has_ability(ch, ABIL_DAGGER_MASTERY) && weapon && GET_WEAPON_TYPE(weapon) == TYPE_STAB) {

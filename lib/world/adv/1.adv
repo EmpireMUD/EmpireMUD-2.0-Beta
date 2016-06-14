@@ -240,6 +240,41 @@ L
 10900 -1 -1
 14 c c
 S
+#129
+A Gigantic Nest~
+Paul Clarke and Owen Morris~
+   You have stumbled across a gigantic nest, woven together from entire trees,
+perched inelegantly on the landscape. The nest's owner is nowhere to be seen,
+but a single, huge, warm egg is gently rocking in the center. It looks like the
+egg could hatch any time.  
+   There are several quests to choose from each time you find one of these
+nests, but you can only do one per nest. Save up your rewards and buy new
+crafting patterns and items at the end of the quest.
+   This is a solo adventure. Only one player can enter the nest at a time.
+~
+11000 11049 100-125
+50 0 dg 1
+L
+5 0
+1440 -1 -1
+-1 0 0
+L
+6 0
+50 -1 -1
+-1 0 0
+L
+4 0
+11000 11000 11000
+-1 b bcn
+L
+4 0
+11003 11000 11000
+-1 el cejl
+L
+4 0
+11002 11000 11000
+-1 c beln
+S
 #140
 The Sewer: Ratskins~
 Paul Clarke~

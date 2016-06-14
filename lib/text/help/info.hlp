@@ -91,7 +91,7 @@ ATTRIBUTES STATS STRENGTH DEXTERITY CHARISMA GREATNESS GRT INTELLIGENCE INTELLEC
 Current stat implementations are as follows:
 
 Physical attributes:
-  Strength (active) - Affects melee weapon damage (except magic weapons).
+  Strength (active) - Affects melee weapon dps (except magic weapons).
   Dexterity (passive) - Affects to-hit and dodge chances.
 
 Social attributes:
@@ -99,14 +99,14 @@ Social attributes:
   Greatness (passive) - Affects empire score and total available territory.
 
 Mental attributes: 
-  Intelligence (active) - Affects magic strength and magic weapon damage.
-  Wits (passive) - Affects combat speed (rate of attack).
+  Intelligence (active) - Affects magic strength and magic weapon dps.
+  Wits (passive) - Affects combat speed (rate of attack) and damage.
 
 The active attribute in each category cannot go below 1 from equipment; you
 will not be able to use any item that lowers your active attributes below 1.
 There is also currently a maximum rating of 15 in these attributes.
 
-See also: DODGE, EMPIRE GREATNESS, SPEED, TO-HIT
+See also: DODGE, DPS, EMPIRE GREATNESS, SPEED, TO-HIT
 #
 AUTORECALL "AUTO-RECALL" "AUTO RECALL"
 
@@ -273,9 +273,10 @@ The BONUS-MAGICAL gear stat, also shown on your score page as "Magical +X",
 is an amount added to any magical damage you deal, including Intelligence-based
 melee attacks (like Ready Fireball) and spells.
 
-Bonus-Magical is applied to an average speed of 2.0, meaning if your attack
+Bonus-Magical is applied to an average speed of 4.0, meaning if your weapon
 is faster than that, a smaller amount may be added to your damage -- and the
-opposite if you're slower. It is worth 0.5 damage per second.
+opposite if it's slower. It is worth 0.25 damage per second. Speed boosts like
+Wits and Haste will increase the percentage of bonus damage added.
 
 See also: SCORE
 #
@@ -285,9 +286,10 @@ The BONUS-PHYSICAL gear stat, also shown on your score page as "Physical +X",
 is an amount added to any physical damage you deal. This includes melee combat
 and physical abilities.
 
-Bonus-Physical is applied to an average speed of 2.0, meaning if your attack
+Bonus-Physical is applied to an average speed of 4.0, meaning if your weapon
 is faster than that, a smaller amount may be added to your damage -- and the
-opposite if you're slower. It is worth 0.5 damage per second.
+opposite if it's slower. It is worth 0.25 damage per second. Speed boosts like
+Wits and Haste will increase the percentage of bonus damage added.
 
 See also: SCORE
 #

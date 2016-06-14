@@ -405,6 +405,9 @@ short your character waits between attacks.
 Your current speed is shown on your score display. A lower speed is better,
 since it is the time between attacks.
 
+Things that boost your speed, such as Wits and Hasten, increase your damage
+proportionally.
+
 See also: SCORE, WITS, HASTEN, SLOW
 #
 "STUNNING BLOW"

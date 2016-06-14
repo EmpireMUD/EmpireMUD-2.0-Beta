@@ -656,7 +656,7 @@ void mobile_activity(void) {
 			}
 		}	// end pursuit
 		
-		if (!moved && !MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) && !AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED) && GET_POS(ch) == POS_STANDING && (!ch->master || IN_ROOM(ch) != IN_ROOM(ch->master))) {
+		if (!moved && !MOB_FLAGGED(ch, MOB_SENTINEL | MOB_TIED) && !AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED) && GET_POS(ch) == POS_STANDING && (!ch->master || IN_ROOM(ch) != IN_ROOM(ch->master)) && (!MOB_FLAGGED(ch, MOB_PURSUE) || !MOB_PURSUIT(ch))) {
 			moved = try_mobile_movement(ch);
 		}
 		
@@ -1104,6 +1104,7 @@ void scale_mob_as_familiar(char_data *mob, char_data *master) {
 		scale_level = MAX(CLASS_SKILL_CAP, scale_level - 25);
 	}
 	scale_mob_to_level(mob, scale_level);
+	SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);	// ensure it doesn't rescale itself
 }
 
 
@@ -1183,10 +1184,10 @@ void scale_mob_to_level(char_data *mob, int level) {
 	GET_CURRENT_SCALE_LEVEL(mob) = level;
 
 	// health
-	value = (1.5 * low_level) + (3.0 * mid_level) + (4.5 * high_level) + (10.5 * over_level);
-	value *= MOB_FLAGGED(mob, MOB_TANK) ? 5.0 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_HARD) ? 4.0 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 5.0 : 1.0;
+	value = (1.5 * low_level) + (3.5 * mid_level) + (5.5 * high_level) + (14 * over_level);
+	value *= MOB_FLAGGED(mob, MOB_TANK) ? 6.0 : 1.0;
+	value *= MOB_FLAGGED(mob, MOB_HARD) ? 5.0 : 1.0;
+	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 6.0 : 1.0;
 	mob->points.max_pools[HEALTH] = MAX(1, (int) ceil(value));
 	
 	// move

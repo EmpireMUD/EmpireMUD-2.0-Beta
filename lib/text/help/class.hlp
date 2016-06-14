@@ -205,7 +205,7 @@ Caster traits:
  - Dexterity: Counteracts your target's Dexterity and boosts your hit chance.
  - To-Hit: You need to be as close to the hit cap for your level as possible.
  - Wits: Increases the speed of your attacks and boosts the damage you deal.
- - Bonus-Magical: Any spare points can go here to boost your magical damage.
+ - Bonus-Magical: Any spare points can go here to boost your magical dps.
 
 See also: HEALER, HIT CAP, MELEE, TANK
 #
@@ -356,7 +356,7 @@ Melee traits:
  - Dexterity: Counteracts your target's Dexterity and boosts your hit chance.
  - To-Hit: You need to be as close to the hit cap for your level as possible.
  - Wits: Increases your combat speed and raises the damage you deal.
- - Bonus-Physical: Any spare points should go here to raise damage.
+ - Bonus-Physical: Any spare points should go here to raise dps.
 
 See also: CASTER, HEALER, HIT CAP, TANK
 #

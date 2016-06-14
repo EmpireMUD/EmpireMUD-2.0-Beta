@@ -1684,8 +1684,8 @@ void do_chore_maintenance(empire_data *emp, room_data *room) {
 	}
 	
 	if (ok && (worker = find_chore_worker_in_room(room, chore_data[CHORE_MAINTENANCE].mob))) {
-		charge_stored_component(emp, islid, CMP_LUMBER, NOBITS, amount, NULL);
-		charge_stored_component(emp, islid, CMP_NAILS, NOBITS, amount, NULL);
+		charge_stored_component(emp, islid, CMP_LUMBER, CMPF_BASIC, amount, NULL);
+		charge_stored_component(emp, islid, CMP_NAILS, CMPF_BASIC, amount, NULL);
 		COMPLEX_DATA(room)->disrepair = 0;
 		empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 		

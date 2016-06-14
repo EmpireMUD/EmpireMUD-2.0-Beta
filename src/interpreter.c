@@ -537,6 +537,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( ".", POS_STANDING, do_library, NO_MIN, CTYPE_UTIL, SCMD_BOOKEDIT ),
 	
 	SIMPLE_CMD( "at", POS_DEAD, do_at, LVL_START_IMM, CTYPE_IMMORTAL ),
+	SIMPLE_CMD( "abandon", POS_RESTING, do_abandon, NO_MIN, CTYPE_EMPIRE ),
 	STANDARD_CMD( "ablate", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_ABLATE, CTYPE_COMBAT, NOBITS, ABIL_ABLATE ),
 	SCMD_CMD( "accept", POS_DEAD, do_accept, NO_MIN, CTYPE_UTIL, SCMD_ACCEPT ),
 	STANDARD_CMD( "acidblast", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_ACIDBLAST, CTYPE_COMBAT, NOBITS, ABIL_ACIDBLAST ),
@@ -546,7 +547,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "alias", POS_DEAD, do_alias, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "alacrity", POS_RESTING, do_alacrity, NO_MIN, CTYPE_SKILL, ABIL_ALACRITY ),
 	SIMPLE_CMD( "alternate", POS_RESTING, do_alternate, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "abandon", POS_RESTING, do_abandon, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "affects", POS_DEAD, do_affects, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "approve", POS_DEAD, do_approve, LVL_CIMPL, GRANT_APPROVE, SCMD_APPROVE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 	STANDARD_CMD( "arclight", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_ARCLIGHT, CTYPE_COMBAT, NOBITS, ABIL_ARCLIGHT ),

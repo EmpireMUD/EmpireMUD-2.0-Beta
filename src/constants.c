@@ -2056,9 +2056,9 @@ struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES] = {
 };
 
 
-// basic speed is the expected average speed with factors like Wits/Haste included
+// basic speed is the theoretical average weapon speed without wits/haste,
 // and is used to apply bonus-physical/magical evenly by adjusting for speed
-const double basic_speed = 2.0;	// seconds between attacks
+const double basic_speed = 4.0;	// seconds between attacks
 
 
 // missile speeds
