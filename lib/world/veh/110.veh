@@ -1,0 +1,20 @@
+#11034
+roc clockwork~
+the clockwork roc~
+A clockwork roc soars above you.~
+   The clockwork roc is essentially a giant sailing ship, but in place of sails
+it has powerful wooden wings lined with the massive feathers of a roc.
+Whatever engineer created this flying ship shall surely go down in history, if
+not in the mountains.
+~
+&0~vv~~
+dt 25 96 0 0
+D
+11034 0 0
+R
+16 4 1 0
+R
+19 2 1 0
+T 11034
+S
+$
