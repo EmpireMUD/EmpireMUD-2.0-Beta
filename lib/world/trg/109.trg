@@ -98,6 +98,12 @@ Dragon loot load boe/bop~
 1 n 100
 ~
 eval actor %self.carried_by%
+if !%actor%
+  eval actor %self.worn_by%
+end
+if !%actor%
+  halt
+end
 if %actor% && %actor.is_pc%
   * Item was crafted
   if %self.is_flagged(BOP)%
