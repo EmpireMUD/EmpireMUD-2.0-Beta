@@ -667,6 +667,16 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	// ch first
 	char_from_room(ch);
 	char_to_room(ch, to_room);
+	
+	// move them first, then move them back if they aren't allowed to go.
+	// see if an entry trigger disallows the move
+	if (!entry_mtrigger(ch) || !enter_wtrigger(IN_ROOM(ch), ch, NO_DIR)) {
+		char_from_room(ch);
+		char_to_room(ch, was_in);
+		return;
+	}
+	
+	// update visit and last-dir
 	qt_visit_room(ch, to_room);
 	if (!IS_NPC(ch)) {
 		GET_LAST_DIR(ch) = NO_DIR;
@@ -674,7 +684,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	
 	// see if there's a different portal on the other end
 	use_portal = find_back_portal(to_room, was_in, portal);
-
+	
 	act("$n appears from $p!", TRUE, ch, use_portal, 0, TO_ROOM);
 	look_at_room(ch);
 	command_lag(ch, WAIT_MOVEMENT);
@@ -690,12 +700,6 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 		snprintf(buf, sizeof(buf), "$V %s in through $p.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
 		act(buf, FALSE, ch, use_portal, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM);
 	}
-	
-	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
-	entry_memory_mtrigger(ch);
-	greet_mtrigger(ch, NO_DIR);
-	greet_memory_mtrigger(ch);
-	greet_vtrigger(ch, NO_DIR);
 	
 	// now followers
 	for (fol = ch->followers; fol; fol = next_fol) {
@@ -715,6 +719,17 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	// trigger distrust?
 	if (!following && ROOM_OWNER(was_in) && !IS_IMMORTAL(ch) && !IS_NPC(ch) && !can_use_room(ch, was_in, GUESTS_ALLOWED)) {
 		trigger_distrust_from_stealth(ch, ROOM_OWNER(was_in));
+	}
+	
+	// trigger section
+	entry_memory_mtrigger(ch);
+	if (!greet_mtrigger(ch, NO_DIR) || !greet_vtrigger(ch, NO_DIR)) {
+		char_from_room(ch);
+		char_to_room(ch, was_in);
+		look_at_room(ch);
+	}
+	else {
+		greet_memory_mtrigger(ch);
 	}
 }
 
@@ -1017,7 +1032,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 			gain_ability_exp(ch, ABIL_FLY, 1);
 		}
 	}
-
+	
 	// trigger section
 	entry_memory_mtrigger(ch);
 	if (!greet_mtrigger(ch, dir) || !greet_vtrigger(ch, dir)) {
