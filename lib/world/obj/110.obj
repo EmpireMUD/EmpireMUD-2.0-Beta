@@ -493,9 +493,17 @@ A pair of swift feathered arm guards is lying here.~
    These arm guards are made from strong hardened leather and covered in
 carefully arranged feathers to help the arms cut through the air.
 ~
-27 moy ai 12
+27 moy ai 14
 1 0 0
 7 0
+A
+1 1 0
+A
+17 2 0
+A
+21 2 0
+A
+12 -1 0
 C
 0 150
 S
@@ -518,9 +526,23 @@ A pair of stonefeather arm plates is lying here.~
 shield the user from a powerful blow. They're rather heavy, but a trained
 warrior should have no trouble wearing them.
 ~
-27 moy ai 13
+27 moy ai 14
 3 0 0
 1 0
+A
+2 1 0
+A
+18 1 0
+A
+13 2 0
+A
+24 1 0
+A
+12 1 0
+A
+9 -2 0
+A
+21 -2 0
 C
 0 150
 S
@@ -543,9 +565,17 @@ A pair of roc feather sleeves are lying here.~
 rumored to eat entire farmyards in a single meal. The sleeves have a faint red
 glow, barely visible except in the dark.
 ~
-27 moy ai 13
+27 moy ai 14
 0 0 0
 7 0
+A
+8 1 0
+A
+17 2 0
+A
+22 2 0
+A
+23 -2 0
 C
 0 150
 S
@@ -567,9 +597,19 @@ A pair of downy white sleeves is lying here.~
    These sleeves are made from huge tufts of down, kept in place by the finest
 of nets. The down is bright white, but has the faintest of red glows.
 ~
-27 moy ai 14
+27 moy ai 15
 0 0 0
 7 0
+A
+8 1 0
+A
+7 2 0
+A
+9 1 0
+A
+23 3 0
+A
+22 -4 0
 C
 0 150
 S
@@ -592,9 +632,19 @@ A pair of razor feather gauntlets is lying here.~
 The quality of the craftsmanship is exquisite, and the feathers look quite
 rare.
 ~
-27 moy ah 13
+27 moy ah 14
 1 0 0
 7 0
+A
+9 1 0
+A
+1 1 0
+A
+21 2 0
+A
+12 -1 0
+A
+24 -1 0
 C
 0 150
 S
@@ -617,9 +667,19 @@ A pair of feathered imperium gauntlets is lying here.~
 with giant roc feathers, for purposes that are not immediately apparent.
 Perhaps it makes the gauntlets stronger, or perhaps just more stylish.
 ~
-27 moy ah 14
+27 moy ah 15
 3 0 0
 7 0
+A
+18 3 0
+A
+13 1 0
+A
+24 2 0
+A
+12 2 0
+A
+21 -4 0
 C
 0 150
 S
@@ -642,9 +702,17 @@ A pair of wondrous feather gloves is lying here.~
 which, somehow, don't seem to restrict arm movement in combat. Perhaps the roc
 feathers are naturally inclined to move through the air.
 ~
-27 moy ah 15
+27 moy ah 16
 0 0 0
 7 0
+A
+17 1 0
+A
+9 1 0
+A
+22 4 0
+A
+23 -2 0
 C
 0 150
 S
@@ -666,9 +734,17 @@ A set of roc quill finger caps is strewn on the ground.~
    These finger caps are made from the quills of roc feathers, and act are said
 to channel the life-giving magic of the air in which the roc flew.
 ~
-27 moy ah 16
+27 moy ah 18
 0 0 0
 7 0
+A
+7 1 0
+A
+9 1 0
+A
+23 4 0
+A
+22 -4 0
 C
 0 150
 S
