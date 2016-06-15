@@ -230,6 +230,7 @@ eval distance %%room.distance(%instance.location%)%%
 if %distance% > 10
   mgoto %instance.location%
 end
+eval room %self.room%
 eval item %room.contents%
 while %item%
   if %item.vnum% == 11022 || %item.vnum% == 11023
@@ -317,6 +318,11 @@ eval cost 0
 set named a thing
 eval currency roc_tokens_good
 set gearname roc-stone gear
+eval test %%actor.varexists(%currency%)%%
+if !%test%
+  %send% %actor% You don't have any of this shop's currency!
+  halt
+end
 if (!%arg%)
   %send% %actor% Type 'list' to see what's available.
   halt
@@ -495,6 +501,11 @@ eval vnum -1
 eval cost 0
 set named a thing
 eval currency roc_tokens_evil
+eval test %%actor.varexists(%currency%)%%
+if !%test%
+  %send% %actor% You don't have any of this shop's currency!
+  halt
+end
 if (!%arg%)
   %send% %actor% Type 'list' to see what's available.
   halt
