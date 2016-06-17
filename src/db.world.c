@@ -90,9 +90,7 @@ void change_base_sector(room_data *room, sector_data *sect) {
 		return;
 	}
 	
-	BASE_SECT(room) = sect;
-	world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].base_sector = sect;
-	world_map_needs_save = TRUE;
+	perform_change_base_sect(room, NULL, sect);
 }
 
 
@@ -165,14 +163,8 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	}
 	
 	// change sect
-	SECT(room) = st;
-	BASE_SECT(room) = st;
-	
-	// update the world map
-	map = &(world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)]);
-	map->sector_type = st;
-	map->base_sector = st;
-	world_map_needs_save = TRUE;
+	perform_change_sect(room, NULL, st);
+	perform_change_base_sect(room, NULL, st);
 		
 	// need room data?
 	if ((IS_ANY_BUILDING(room) || IS_ADVENTURE_ROOM(room)) && !COMPLEX_DATA(room)) {
@@ -208,6 +200,7 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	
 	// need land-map update?
 	if (st != old_sect) {
+		map = &(world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)]);
 		if (GET_SECT_VNUM(old_sect) == BASIC_OCEAN) {
 			// add to land_map (at the start is fine)
 			map->next = land_map;
@@ -1889,6 +1882,7 @@ room_data *load_map_room(room_vnum vnum) {
 	room->vnum = vnum;
 	add_room_to_world_tables(room);
 	
+	// do not use perform_change_sect here because we're only loading from the existing data
 	SECT(room) = map->sector_type;
 	BASE_SECT(room) = map->base_sector;
 	SET_ISLAND_ID(room, map->island);
@@ -2201,8 +2195,8 @@ void init_room(room_data *room, room_vnum vnum) {
 
 	room->owner = NULL;
 	
-	room->sector_type = inside;
-	room->base_sector = inside;
+	perform_change_sect(room, NULL, inside);
+	perform_change_base_sect(room, NULL, inside);
 	
 	COMPLEX_DATA(room) = init_complex_data();	// no type at this point
 	room->light = 0;

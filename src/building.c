@@ -325,11 +325,7 @@ void disassociate_building(room_data *room) {
 	free_proto_scripts(&room->proto_script);
 
 	// restore sect: this does not use change_terrain()
-	SECT(room) = BASE_SECT(room);
-	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-		world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type = SECT(room);
-		world_map_needs_save = TRUE;
-	}
+	perform_change_sect(room, NULL, BASE_SECT(room));
 	
 	if (COMPLEX_DATA(room)) {
 		COMPLEX_DATA(room)->home_room = NULL;
