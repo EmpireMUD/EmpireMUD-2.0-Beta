@@ -3597,7 +3597,7 @@ const char *skip_filler(char *string) {
  * to cast a non-const array as const than to cast a const one as non-const.
  * Doesn't really matter since this function doesn't change the array though.
  */
-void sprintbit(bitvector_t bitvector, const char *names[], char *result, byte space) {
+void sprintbit(bitvector_t bitvector, const char *names[], char *result, bool space) {
 	long nr;
 
 	*result = '\0';
