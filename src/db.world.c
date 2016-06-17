@@ -85,11 +85,8 @@ void change_base_sector(room_data *room, sector_data *sect) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Attempting to change_base_sector outside the map (%d)", GET_ROOM_VNUM(room));
 		return;
 	}
-	if (!sect) {
-		log("SYSERR: change_terrain called with invalid sector");
-		return;
-	}
 	
+	// TODO there is a 90% chance change_base_sector can be completely replaced by this:
 	perform_change_base_sect(room, NULL, sect);
 }
 

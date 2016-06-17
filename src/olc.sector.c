@@ -136,7 +136,6 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
 	void remove_sector_from_table(sector_data *sect);
 	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
-	extern bool world_map_needs_save;
 	
 	sector_data *sect, *sect_iter, *next_sect, *replace_sect;
 	quest_data *quest, *next_quest;

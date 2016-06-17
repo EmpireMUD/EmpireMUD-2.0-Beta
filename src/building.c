@@ -287,7 +287,6 @@ void disassociate_building(room_data *room) {
 	void decustomize_room(room_data *room);
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void remove_designate_objects(room_data *room);
-	extern bool world_map_needs_save;
 	
 	room_data *iter, *next_iter;
 	struct instance_data *inst;

@@ -1484,7 +1484,6 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int
 
 INTERACTION_FUNC(one_farming_chore) {
 	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
-	extern bool world_map_needs_save;
 	
 	empire_data *emp = ROOM_OWNER(inter_room);
 	sector_data *old_sect;
