@@ -29,6 +29,7 @@
 *   Annual Map Update
 *   City Lib
 *   Room Resets
+*   Sector Indexing
 *   Territory
 *   Helpers
 *   Map Output
@@ -1351,6 +1352,135 @@ void startup_room_reset(void) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// SECTOR INDEXING /////////////////////////////////////////////////////////
+
+
+/**
+* Finds the index entry for a sector type; adds a blank entry if it doesn't
+* exist.
+*
+* @param sector_vnum vnum Which sector.
+* @return struct sector_index_type* The index entry (guaranteed).
+*/
+struct sector_index_type *find_sector_index(sector_vnum vnum) {
+	struct sector_index_type *idx;
+	HASH_FIND_INT(sector_index, &vnum, idx);
+	if (!idx) {
+		CREATE(idx, struct sector_index_type, 1);
+		idx->vnum = vnum;
+		HASH_ADD_INT(sector_index, vnum, idx);
+	}
+	return idx;
+}
+
+
+/**
+* Change a room's base sector (and the world_map) from one type to another, and
+* update counts. ALL base sector changes should be done through this function.
+*
+* @param room_data *loc The location to change (optional, or provide map).
+* @param struct map_data *map The location to change (optional, or provide room).
+* @param sector_data *sect The type to change it to.
+*/
+void perform_change_base_sect(room_data *loc, struct map_data *map, sector_data *sect) {
+	struct sector_index_type *idx;
+	sector_data *old_sect;
+	
+	if (!loc && !map) {
+		log("SYSERR: perform_change_base_sect called without loc or map");
+		return;
+	}
+	if (!sect) {
+		log("SYSERR: perform_change_base_sect called without sect");
+		return;
+	}
+	
+	// preserve
+	old_sect = (loc ? BASE_SECT(loc) : map->base_sector);
+	
+	// update room
+	if (loc || (loc = real_real_room(map->vnum))) {
+		BASE_SECT(loc) = sect;
+	}
+	
+	// update the world map
+	if (map || (GET_ROOM_VNUM(loc) < MAP_SIZE && (map = &(world_map[FLAT_X_COORD(loc)][FLAT_Y_COORD(loc)])))) {
+		map->base_sector = sect;
+		world_map_needs_save = TRUE;
+	}
+	
+	// old index
+	if (old_sect) {	// does not exist at first instantiation/set
+		idx = find_sector_index(GET_SECT_VNUM(old_sect));
+		--idx->base_count;
+		if (map) {
+			LL_DELETE2(idx->base_rooms, map, next_in_base_sect);
+		}
+	}
+	
+	// new index
+	idx = find_sector_index(GET_SECT_VNUM(sect));
+	++idx->base_count;
+	if (map) {
+		LL_PREPEND2(idx->base_rooms, map, next_in_base_sect);
+	}
+}
+
+
+/**
+* Change a room's sector (and the world_map) from one type to another, and
+* update counts. ALL sector changes should be done through this function.
+*
+* @param room_data *loc The location to change (optional, or provide map).
+* @param struct map_data *map The location to change (optional, or provide room).
+* @param sector_data *sect The type to change it to.
+*/
+void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect) {
+	struct sector_index_type *idx;
+	sector_data *old_sect;
+	
+	if (!loc && !map) {
+		log("SYSERR: perform_change_sect called without loc or map");
+		return;
+	}
+	if (!sect) {
+		log("SYSERR: perform_change_sect called without sect");
+		return;
+	}
+	
+	// preserve
+	old_sect = (loc ? SECT(loc) : map->sector_type);
+	
+	// update room
+	if (loc || (loc = real_real_room(map->vnum))) {
+		SECT(loc) = sect;
+	}
+	
+	// update the world map
+	if (map || (GET_ROOM_VNUM(loc) < MAP_SIZE && (map = &(world_map[FLAT_X_COORD(loc)][FLAT_Y_COORD(loc)])))) {
+		map->sector_type = sect;
+		world_map_needs_save = TRUE;
+	}
+	
+	// old index
+	if (old_sect) {	// does not exist at first instantiation/set
+		idx = find_sector_index(GET_SECT_VNUM(old_sect));
+		--idx->sect_count;
+		if (map) {
+			LL_DELETE2(idx->sect_rooms, map, next_in_sect);
+		}
+	}
+	
+	// new index
+	idx = find_sector_index(GET_SECT_VNUM(sect));
+	++idx->sect_count;
+	if (map) {
+		LL_PREPEND2(idx->sect_rooms, map, next_in_sect);
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// TERRITORY ///////////////////////////////////////////////////////////////
 
 /**
@@ -2307,14 +2437,21 @@ void output_map_to_file(void) {
 void build_land_map(void) {
 	struct map_data *map, *last = NULL;
 	sector_data *ocean = sector_proto(BASIC_OCEAN);
+	struct sector_index_type *idx;
+	room_data *room;
 	int x, y;
+	
+	if (!ocean) {
+		log("SYSERR: Unable to start game without basic ocean sector (%d)", BASIC_OCEAN);
+		exit(1);
+	}
 	
 	land_map = NULL;
 	
 	for (x = 0; x < MAP_WIDTH; ++x) {
 		for (y = 0; y < MAP_HEIGHT; ++y) {
 			map = &(world_map[x][y]);
-						
+			
 			// ensure data
 			if (!map->sector_type) {
 				map->sector_type = ocean;
@@ -2337,7 +2474,31 @@ void build_land_map(void) {
 				}
 				last = map;
 			}
+			
+			// index sector
+			idx = find_sector_index(GET_SECT_VNUM(map->sector_type));
+			++idx->sect_count;
+			LL_PREPEND2(idx->sect_rooms, map, next_in_sect);
+			
+			// index base
+			if (map->base_sector != map->sector_type) {
+				idx = find_sector_index(GET_SECT_VNUM(map->base_sector));
+			}
+			++idx->base_count;
+			LL_PREPEND2(idx->base_rooms, map, next_in_base_sect);
 		}
+	}
+	
+	// also index the interior while we're here, so it's completely done
+	LL_FOREACH2(interior_room_list, room, next_interior) {
+		idx = find_sector_index(GET_SECT_VNUM(SECT(room)));
+		++idx->sect_count;
+		
+		// index base
+		if (BASE_SECT(room) != SECT(room)) {
+			idx = find_sector_index(GET_SECT_VNUM(BASE_SECT(room)));
+		}
+		++idx->base_count;
 	}
 }
 

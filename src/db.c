@@ -158,6 +158,7 @@ room_template *room_template_table = NULL;	// hash table of room templates
 
 // sectors
 sector_data *sector_table = NULL;	// sector hash table
+struct sector_index_type *sector_index = NULL;	// index lists
 
 // skills
 skill_data *skill_table = NULL;	// main skills hash (hh)

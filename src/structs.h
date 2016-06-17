@@ -3867,6 +3867,20 @@ struct evolution_data {
 };
 
 
+// for iteration of map locations by sector
+struct sector_index_type {
+	sector_vnum vnum;	// which sect
+	
+	struct map_data *sect_rooms;	// LL of rooms
+	int sect_count;	// how many rooms in the list
+	
+	struct map_data *base_rooms;	// LL of rooms
+	int base_count;	// number of rooms with it as the base sect
+	
+	UT_hash_handle hh;	// sector_index hash handle
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// TRIGGER STRUCTS /////////////////////////////////////////////////////////
 
@@ -4135,5 +4149,8 @@ struct map_data {
 	
 	crop_data *crop_type;	// possible crop type
 	
+	// lists
+	struct map_data *next_in_sect;	// LL of all map locations of a given sect
+	struct map_data *next_in_base_sect;	// LL for base sect
 	struct map_data *next;	// linked list of non-ocean tiles, for iterating
 };

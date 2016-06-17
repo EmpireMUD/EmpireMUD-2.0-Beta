@@ -3919,7 +3919,9 @@ void do_stat_room_template(char_data *ch, room_template *rmt) {
 void do_stat_sector(char_data *ch, sector_data *st) {
 	void get_evolution_display(struct evolution_data *list, char *save_buffer);
 	
-	msg_to_char(ch, "Sector VNum: [&c%d&0], Name: '&c%s&0'\r\n", st->vnum, st->name);
+	struct sector_index_type *idx = find_sector_index(GET_SECT_VNUM(st));
+	
+	msg_to_char(ch, "Sector VNum: [&c%d&0], Name: '&c%s&0', Live Count [&c%d&0/&c%d&0]\r\n", st->vnum, st->name, idx->sect_count, idx->base_count);
 	msg_to_char(ch, "Room Title: %s\r\n", st->title);
 	
 	if (st->commands && *st->commands) {
