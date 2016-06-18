@@ -795,8 +795,11 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 				map_shift = NULL;
 				dir = NO_DIR;	// we may set this if needed
 				
+				// if it's instantiated already...
+				room = real_real_room(map->vnum);
+				
 				// actual building type
-				if (findbdg && (BUILDING_VNUM(room) != GET_BLD_VNUM(findbdg) || !IS_COMPLETE(room))) {
+				if (findbdg && (!room || BUILDING_VNUM(room) != GET_BLD_VNUM(findbdg) || !IS_COMPLETE(room))) {
 					continue;
 				}
 				// check buildon reqs
@@ -834,7 +837,9 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 				}
 				
 				// need the room by this point
-				room = real_room(map->vnum);
+				if (!room) {
+					room = real_room(map->vnum);
+				}
 				
 				// checking for buildon that required a room
 				if (match_buildon) {
