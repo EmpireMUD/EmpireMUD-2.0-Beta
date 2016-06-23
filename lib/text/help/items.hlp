@@ -88,6 +88,40 @@ dig up more clay. It can be stored at the Potter.
 
 See also: CLAY PIT, COMPONENT, POTTER
 #
+"COMPONENT TYPES" "COMPONENT TYPE LIST"
+
+Available components:
+ &cadhesive&0 - not currently used
+ &cbone&0 - not currently used
+ &cblock&0 - building materials like bricks or blocks
+ &cclay&0 - moldable clay
+ &cdye&0 - any kind of dye
+ &cfeathers&0 - not currently used
+ &cfibers&0 - cotton, straw, etc.
+ &cflour&0 - ground up grains
+ &cfruit&0 - for cooking
+ &cfur&0 - animal furs for crafting
+ &cgem&0 - precious stones
+ &cgrain&0 - wheat, etc.
+ &chandle&0 - used for tools and weapons
+ &cherb&0 - used in potions and cooking
+ &cleather&0 - for armor and crafts
+ &clumber&0 - a core building material
+ &cmeat&0 - raw meat for cooking
+ &cmetal&0 - various useful or precious metals
+ &cnails&0 - a core building material
+ &coil&0 - for cooking or maintaining machinery
+ &cpillar&0 - for construction, like a log
+ &crock&0 - common stones dug up from the ground
+ &cseeds&0 - for planting or cooking
+ &cskin&0 - unprocessed animal skin or rawhide
+ &cstick&0 - a common building and crafting material
+ &ctextile&0 - cloth or fabric for crafting
+ &cvegetable&0 - for cooking
+ &crope&0 - for construction and harnessing animals
+
+See also: COMPONENT
+#
 "CRAFTER ITEMS" "CRAFTING ITEMS" "CRAFT ITEMS" "CRAFTING LEVEL" "CRAFTER LEVEL" "CRAFT LEVEL"
 
 A character's crafts (forge, sew, craft, etc.) are scaled up to the character's
@@ -146,9 +180,10 @@ FIBERS "FIBERS COMPONENT" "FIBER COMPONENT"
 
 Fibers (component)
 
-Used for:  nothing (yet)
+Used for:  weaving, adventure crafts
 
-Fibers are a component type.
+Fibers are a component type usually used to make cloth. Typical examples are
+cotton and wool.
 
 See also: COMPONENT
 #
@@ -196,9 +231,14 @@ Gem (component)
 Used for:  crafting, enchanting
 Stored in:  Tower of Sorcery
 
-Gems are a component type encompassing the four magical gems: red bloodstones,
-yellow lightning stones, iridescent blue irises, and glowing green seashells.
+Gems are a component type encompassing the magical gems. The basic examples are
+red bloodstones, yellow lightning stones, iridescent blue irises, and glowing
+green seashells.
+
 Most recipes require a specific one of these, but a few accept any of them.
+
+magic, basic:  iris, bloodstone, seashell, lightning stone
+magic, refined:  prismatic crystals
 
 See also: COMPONENT
 #
@@ -348,7 +388,11 @@ Meat (component)
 Used for:  cooking
 
 Meat is a component type mostly used in cooking. It is obtained by butchering
-animal corpses or fishing.
+animal corpses or fishing. Only raw meats count as a meat component, and are
+cooked when used in a recipe.
+
+raw:  meat fillets, poultry, pork
+raw, aquatic:  fish
 
 See also: COMPONENT, BUTCHER, COOK, FISH
 #
@@ -375,7 +419,9 @@ OIL "OIL COMPONENT"
 
 Oil (component)
 
-Used for:  cooking
+Used for:  cooking, vehicle repair
+
+The most common oil is olive oil. You can get olive oil by pressing olives.
 
 See also: COMPONENT, COOK, PRESS
 #
