@@ -330,6 +330,7 @@ obj_data *read_object(obj_vnum nr, bool with_triggers);
 
 // players
 extern struct group_data *group_list;
+extern char_data *find_player_in_room_by_id(room_data *room, int id);
 extern char_data *is_at_menu(int id);
 extern char_data *is_playing(int id);
 
@@ -345,7 +346,11 @@ extern room_template *room_template_proto(rmt_vnum vnum);
 
 // sectors
 extern sector_data *sector_table;
+extern struct sector_index_type *sector_index;
+extern struct sector_index_type *find_sector_index(sector_vnum vnum);
 void free_sector(struct sector_data *st);
+void perform_change_base_sect(room_data *loc, struct map_data *map, sector_data *sect);
+void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect);
 extern sector_data *sector_proto(sector_vnum vnum);
 
 // skills

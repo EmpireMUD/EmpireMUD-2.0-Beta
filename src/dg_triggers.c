@@ -1356,7 +1356,7 @@ int drop_wtrigger(obj_data *obj, char_data *actor) {
 			ADD_UID_VAR(buf, t, obj, "object", 0);
 			sdd.r = room;
 			ret_val = script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
-			if (obj->carried_by != actor)
+			if (ret_val && obj->carried_by != actor)
 				return 0;
 			else
 				return ret_val;

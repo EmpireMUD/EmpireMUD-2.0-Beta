@@ -28,6 +28,7 @@
 /**
 * Contents:
 *   Getters / Helpers
+*   Combat Meters
 *   Death and Corpses
 *   Guard Towers
 *   Messaging
@@ -186,8 +187,8 @@ bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand) {
 			min = 0;
 		}
 	
-		// real chance to hit is what % chance is of max
-		chance = tohit * 100 / max;
+		// real chance to hit is what % chance is of max (ensure max is not less than 1)
+		chance = tohit * 100 / MAX(1, max);
 		return (chance >= (number(1, 100) - min));
 	}
 }
@@ -304,7 +305,37 @@ int get_block_rating(char_data *ch, bool can_gain_skill) {
 
 
 /**
-* Computes combat speed based on weapon, abilities, etc.
+* The player's basic speed -- just weapon or attack type.
+*
+* Do NOT do gain_skill_exp or skill_checks in this function. It is called every
+* 0.1 seconds to determine when you act, and random modifiers will not work
+* well here.
+*
+* @param char_data *ch the person whose speed to get
+* @param int pos Which position to check (WEAR_WIELD, WEAR_HOLD, WEAR_RANGED)
+* @return double The basic speed for the character.
+*/
+double get_base_speed(char_data *ch, int pos) {
+	obj_data *weapon = GET_EQ(ch, pos);
+	double base = 3.0;
+	int w_type;
+	
+	w_type = get_attack_type(ch, weapon);
+	
+	if (weapon) {
+		base = get_weapon_speed(weapon);
+	}
+	else {
+		// basic speed
+		base = attack_hit_info[w_type].speed[SPD_NORMAL];
+	}
+	
+	return base;
+}
+
+
+/**
+* Computes current real combat speed with abilities, affects, etc.
 *
 * Do NOT do gain_skill_exp or skill_checks in this function. It is called every
 * 0.1 seconds to determine when you act, and random modifiers will not work
@@ -316,22 +347,11 @@ int get_block_rating(char_data *ch, bool can_gain_skill) {
 */
 double get_combat_speed(char_data *ch, int pos) {
 	obj_data *weapon = GET_EQ(ch, pos);
-	double base = 3.0;
-	int w_type;
+	double base = get_base_speed(ch, pos);
 	
 	double finesse[] = { 0.9, 0.85, 0.8 };
 	double quick_draw[] = { 0.75, 0.75, 0.65 };
 	
-	w_type = get_attack_type(ch, weapon);
-	
-	if (weapon) {
-		base = get_weapon_speed(weapon);
-	}
-	else {
-		// basic speed
-		base = attack_hit_info[w_type].speed[SPD_NORMAL];
-	}
-
 	// ability mods: player only
 	if (!IS_NPC(ch) && weapon) {
 		if (has_ability(ch, ABIL_FINESSE) && !IS_MISSILE_WEAPON(weapon)) {
@@ -664,8 +684,8 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 	extern bool check_blood_fortitude(char_data *ch, bool can_gain_skill);
 	
 	bool self = (!attacker || attacker == victim);
-	int max_resist, use_resist;
-	double resist_prc;
+	int max_resist;
+	double resist_prc, use_resist;
 	
 	if (!self) {
 		if (has_ability(victim, ABIL_NOBLE_BEARING) && check_solo_role(victim)) {
@@ -684,11 +704,18 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 				use_resist = GET_RESIST_MAGICAL(victim);
 			}
 			
-			// require at least half of the magical resistance requirement to reduce any
-			if (use_resist > max_resist / 2) {
-				use_resist = MIN(use_resist, max_resist);
-				resist_prc = ((double) use_resist - (max_resist/2.0)) / (max_resist / 2.0);	
+			// absolute cap
+			use_resist = MIN(use_resist, max_resist);
+			
+			if (use_resist > 0) {	// positive resistance
+				resist_prc = (use_resist / max_resist);
 				dam = (int) round(dam * (1.0 - (resist_prc / 4.0))); // at 1.0 resist_prc, it reduces damage by 25% (1/4)
+			}
+			else if (use_resist < 0) {	// negative resistance (penalty)
+				use_resist *= -1;	// make positive
+				use_resist = diminishing_returns(use_resist, 2.0);	// diminish on a scale of 2
+				use_resist /= 100;	// use_resist is now a % to increase
+				dam = (int) round(dam * (1.0 + use_resist));
 			}
 		}
 	
@@ -757,6 +784,153 @@ static char *replace_fight_string(const char *str, const char *weapon_singular, 
 	}
 
 	return (buf);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// COMBAT METERS ///////////////////////////////////////////////////////////
+
+/**
+* Resets all of a player's meters and begins combat.
+*
+* @param char_data *ch The player.
+*/
+void reset_combat_meters(char_data *ch) {
+	struct combat_meters *mtr;
+	
+	if (IS_NPC(ch)) {
+		return;	// no meter
+	}
+	
+	mtr = &GET_COMBAT_METERS(ch);
+	mtr->hits = 0;
+	mtr->misses = 0;
+	mtr->hits_taken = 0;
+	mtr->dodges = 0;
+	mtr->damage_dealt = 0;
+	mtr->damage_taken = 0;
+	mtr->pet_damage = 0;
+	mtr->heals_dealt = 0;
+	mtr->heals_taken = 0;
+	mtr->start = mtr->end = time(0);
+	mtr->over = FALSE;
+}
+
+
+/**
+* Checks if a player is out of combat yet and ends the meter, if active.
+*
+* @param char_data *ch The player.
+*/
+void check_combat_end(char_data *ch) {
+	if (!IS_NPC(ch) && GET_COMBAT_METERS(ch).over == FALSE && !is_fighting(ch)) {
+		GET_COMBAT_METERS(ch).over = TRUE;
+		GET_COMBAT_METERS(ch).end = time(0);
+	}
+}
+
+
+/**
+* Called in combat, to reset meters if a new combat has started.
+*
+* @param char_data *ch The player.
+*/
+void check_combat_start(char_data *ch) {
+	if (!IS_NPC(ch) && GET_COMBAT_METERS(ch).over == TRUE) {
+		reset_combat_meters(ch);
+	}
+}
+
+
+/**
+* Marks damage dealt on the meters.
+* @param char_data *ch The player.
+*/
+void combat_meter_damage_dealt(char_data *ch, int amt) {
+	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
+		GET_COMBAT_METERS(ch).damage_dealt += amt;
+	}
+	else if (ch->master && !IS_NPC(ch->master) && !GET_COMBAT_METERS(ch->master).over) {
+		// credit the NPC's immediate master
+		GET_COMBAT_METERS(ch->master).pet_damage += amt;
+	}
+}
+
+
+/**
+* Marks damage taken on the meters.
+* @param char_data *ch The player.
+*/
+void combat_meter_damage_taken(char_data *ch, int amt) {
+	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
+		GET_COMBAT_METERS(ch).damage_taken += amt;
+	}
+}
+
+
+/**
+* Marks a dodge on the meters.
+* @param char_data *ch The player.
+*/
+void combat_meter_dodge(char_data *ch) {
+	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
+		GET_COMBAT_METERS(ch).dodges += 1;
+	}
+}
+
+
+/**
+* Marks a heal dealt on the meters.
+* @param char_data *ch The player.
+*/
+void combat_meter_heal_dealt(char_data *ch, int amt) {
+	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
+		GET_COMBAT_METERS(ch).heals_dealt += amt;
+	}
+}
+
+
+/**
+* Marks a heal taken on the meters.
+* @param char_data *ch The player.
+*/
+void combat_meter_heal_taken(char_data *ch, int amt) {
+	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
+		GET_COMBAT_METERS(ch).heals_taken += amt;
+	}
+}
+
+
+/**
+* Marks a hit on the meters.
+* @param char_data *ch The player.
+*/
+void combat_meter_hit(char_data *ch) {
+	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
+		GET_COMBAT_METERS(ch).hits += 1;
+	}
+}
+
+
+/**
+* Marks a hit taken on the meters.
+* @param char_data *ch The player.
+*/
+void combat_meter_hit_taken(char_data *ch) {
+	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
+		GET_COMBAT_METERS(ch).hits_taken += 1;
+	}
+}
+
+
+/**
+* Marks a miss on the meters.
+* @param char_data *ch The player.
+*/
+void combat_meter_miss(char_data *ch) {
+	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
+		GET_COMBAT_METERS(ch).misses += 1;
+	}
 }
 
 
@@ -2459,9 +2633,13 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 
 	// Add Damage
 	GET_HEALTH(victim) = GET_HEALTH(victim) - dam;
-
 	update_pos(victim);
-
+	
+	if (ch != victim) {
+		combat_meter_damage_dealt(ch, dam);
+	}
+	combat_meter_damage_taken(victim, dam);
+	
 	/*
 	 * skill_message sends a message from the messages file in lib/misc.
 	 * dam_message just sends a generic "You hit $n extremely hard.".
@@ -2675,9 +2853,12 @@ void heal(char_data *ch, char_data *vict, int amount) {
 	if (IS_DEAD(vict)) {
 		return;
 	}
-
+	
 	// no negative healing
 	amount = MAX(0, amount);
+	
+	combat_meter_heal_dealt(ch, amount);
+	combat_meter_heal_taken(vict, amount);
 	
 	// apply heal
 	GET_HEALTH(vict) = MIN(GET_MAX_HEALTH(vict), GET_HEALTH(vict) + amount);
@@ -2704,14 +2885,15 @@ void heal(char_data *ch, char_data *vict, int amount) {
 int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	void add_pursuit(char_data *ch, char_data *target);
 	extern int apply_poison(char_data *ch, char_data *vict, int type);
+	extern const double basic_speed;
 	
 	struct instance_data *inst;
-	int w_type;
-	int dam, result;
+	int w_type, result, bonus;
 	bool success = FALSE, block = FALSE;
 	bool can_gain_skill;
 	empire_data *victim_emp;
 	struct affected_type *af;
+	double attack_speed, cur_speed, dam;
 	char_data *check;
 	
 	// some config TODO move this into the config system?
@@ -2724,6 +2906,10 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		return -1;
 	}
 	
+	// ensure meters started
+	check_combat_start(ch);
+	check_combat_start(victim);
+	
 	// set up some vars
 	w_type = get_attack_type(ch, weapon);
 	victim_emp = GET_LOYALTY(victim);
@@ -2732,6 +2918,10 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	if (AFF_FLAGGED(ch, AFF_DISARM)) {
 		weapon = NULL;
 	}
+	
+	// determine speeds now
+	attack_speed = get_base_speed(ch, weapon ? weapon->worn_on : WEAR_WIELD);
+	cur_speed = get_combat_speed(ch, weapon ? weapon->worn_on : WEAR_WIELD);
 	
 	// look for an instance to lock (before running triggers)
 	if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch)) && (inst = COMPLEX_DATA(IN_ROOM(ch))->instance)) {
@@ -2802,6 +2992,8 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	// outcome:
 	if (!success) {
 		// miss
+		combat_meter_miss(ch);
+		combat_meter_dodge(victim);
 		return damage(ch, victim, 0, w_type, attack_hit_info[w_type].damage_type);
 	}
 	else if (block) {
@@ -2810,21 +3002,13 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	}
 	else {
 		/* okay, we know the guy has been hit.  now calculate damage. */
+		combat_meter_hit(ch);
+		combat_meter_hit_taken(victim);
 
 		// TODO move this damage computation to its own function so that it can be called remotely too
 
-		if (IS_MAGIC_ATTACK(w_type)) {
-			dam = GET_INTELLIGENCE(ch);
-		}
-		else {
-			/* Melee attacks are based upon strength.. */
-			dam = GET_STRENGTH(ch);
-		}
+		dam = 0;	// to start
 		
-		if (w_type == TYPE_VAMPIRE_CLAWS) {
-			dam *= 2;
-		}
-
 		if (weapon && IS_WEAPON(weapon)) {
 			/* Add weapon-based damage if a weapon is being wielded */
 			dam += GET_WEAPON_DAMAGE_BONUS(weapon);
@@ -2834,13 +3018,22 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			dam += MOB_DAMAGE(ch) / (AFF_FLAGGED(ch, AFF_DISARM) ? 2 : 1);
 		}
 		
+		// applicable bonuses
 		if (IS_MAGIC_ATTACK(w_type)) {
-			dam += GET_BONUS_MAGICAL(ch);
+			bonus = GET_INTELLIGENCE(ch) + GET_BONUS_MAGICAL(ch);
 		}
 		else {
-			dam += GET_BONUS_PHYSICAL(ch);
+			bonus = GET_STRENGTH(ch) + GET_BONUS_PHYSICAL(ch);
 		}
-				
+		
+		// bonus add is based on speeds
+		dam += bonus * (attack_speed / basic_speed) * (attack_speed / cur_speed);
+		
+		// TODO this is probably WAY overpowered. WAY WAY. Consider changing it to a 'ready' weapon.
+		if (w_type == TYPE_VAMPIRE_CLAWS) {
+			dam *= 2;
+		}
+		
 		// All these abilities add damage: no skill gain on an already-beated foe
 		if (can_gain_skill) {
 			if (!IS_NPC(ch) && has_ability(ch, ABIL_DAGGER_MASTERY) && weapon && GET_WEAPON_TYPE(weapon) == TYPE_STAB) {
@@ -2881,11 +3074,12 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				}
 			}
 		}
-
+		
+		dam = round(dam);
 		dam = MAX(0, dam);
 
 		// anything after this must NOT rely on victim being alive
-		result = damage(ch, victim, dam, w_type, attack_hit_info[w_type].damage_type);
+		result = damage(ch, victim, (int) dam, w_type, attack_hit_info[w_type].damage_type);
 		
 		// exp gain
 		if (combat_round && can_gain_skill && can_gain_exp_from(ch, victim)) {
@@ -3126,6 +3320,9 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 	
 	// remove all stuns when combat starts
 	affects_from_char_by_aff_flag(ch, AFF_STUNNED, FALSE);
+	
+	// mark start
+	check_combat_start(ch);
 }
 
 
@@ -3141,6 +3338,8 @@ void stop_fighting(char_data *ch) {
 	FIGHTING(ch) = NULL;
 	GET_POS(ch) = POS_STANDING;
 	update_pos(ch);
+	
+	check_combat_end(ch);
 }
 
 
@@ -3389,6 +3588,10 @@ void one_combat_round(char_data *ch, double speed, obj_data *weapon) {
 	// still fighting?
 	if (FIGHTING(ch) && IN_ROOM(ch) == IN_ROOM(FIGHTING(ch)) && SHOW_FIGHT_MESSAGES(ch, FM_AUTO_DIAGNOSE)) {
 		diag_char_to_char(FIGHTING(ch), ch);
+	}
+	
+	if (!FIGHTING(ch)) {
+		check_combat_end(ch);
 	}
 }
 

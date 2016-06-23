@@ -1377,7 +1377,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		}
 		case ITEM_WEAPON: {
 			sprintf(storage + strlen(storage), "<&yweapontype&0> %s\r\n", attack_hit_info[GET_WEAPON_TYPE(obj)].name);
-			sprintf(storage + strlen(storage), "<&ydamage&0> %s %+d (speed %.2f, %.2f base dps)\r\n", (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), GET_WEAPON_DAMAGE_BONUS(obj), get_weapon_speed(obj), get_base_dps(obj));
+			sprintf(storage + strlen(storage), "<&ydamage&0> %d (speed %.2f, %s+%.2f base dps)\r\n", GET_WEAPON_DAMAGE_BONUS(obj), get_weapon_speed(obj), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
 			break;
 		}
 		case ITEM_CONTAINER: {

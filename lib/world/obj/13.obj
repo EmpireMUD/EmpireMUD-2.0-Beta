@@ -4,11 +4,11 @@ a glowing green seashell~
 A glowing green seashell is sitting on the ground.~
 The seashell can be used in certain crafts and enchantments.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 1 0
 O
-11 g
+11 gu
 R
 5164 0
 R
@@ -88,7 +88,7 @@ a pouch of nails~
 A pouch of nails is sitting here.~
 Nails are used for building.
 ~
-3 l a 3
+3 l a 4
 0 0 0
 2 0
 M
@@ -104,7 +104,7 @@ M
 7
 $n hammers nails into $V.~
 O
-19 0
+19 u
 R
 5134 0
 R
@@ -274,12 +274,12 @@ a small skin~
 A small pile of skin is stacked on the ground.~
 Skin can be tanned to make leather.
 ~
-3 l a 3
+3 l a 4
 0 0 0
 7 0
 I 18 1356 100.00 1  # TAN: a small piece of leather
 O
-24 o
+24 ou
 R
 5120 0
 S
@@ -289,12 +289,12 @@ a large skin~
 A large pile of skin is stacked on the ground.~
 Skin can be tanned to make leather.
 ~
-3 l a 3
+3 l a 4
 0 0 0
 7 0
 I 18 1357 100.00 1  # TAN: a large piece of leather
 O
-24 f
+24 fu
 R
 5120 0
 S
@@ -304,11 +304,11 @@ a luxurious fox fur~
 A fox fur is crumpled on the ground.~
 Fox fur is used in some types of clothing.
 ~
-3 0 a 2
+3 0 a 3
 0 0 0
 7 0
 O
-10 o
+10 ou
 R
 5120 0
 S
@@ -318,11 +318,11 @@ a big cat pelt~
 A big cat pelt is lying here.~
 This pelt, from a dangerous big cat, can be made into fancy clothing.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 7 0
 O
-10 f
+10 fu
 R
 5120 0
 S
@@ -356,11 +356,11 @@ a small piece of leather~
 A pile of small pieces of leather is sitting here.~
 Leather can be sewn into armor.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 7 0
 O
-15 o
+15 ou
 R
 5134 0
 R
@@ -372,11 +372,11 @@ a large piece of leather~
 A pile of large pieces of leather is sitting here.~
 Leather can be sewn into armor.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 7 0
 O
-15 f
+15 fu
 R
 5120 0
 S
@@ -400,7 +400,7 @@ a bolt of cotton cloth~
 A bolt of cotton cloth is lying on the ground.~
 This simple cloth is used to sew clothing.
 ~
-3 l a 5
+3 l a 6
 0 0 0
 7 0
 M
@@ -410,7 +410,7 @@ M
 7
 $n hangs some cloth on $V.~
 O
-26 h
+26 hu
 R
 5137 0
 R
@@ -422,7 +422,7 @@ a bolt of wool cloth~
 A bolt of wool cloth is sitting here.~
 This simple cloth is used to sew clothing.
 ~
-3 l a 6
+3 l a 7
 0 0 0
 7 0
 M
@@ -432,7 +432,7 @@ M
 7
 $n hangs some cloth on $V.~
 O
-26 h
+26 hu
 R
 5137 0
 R

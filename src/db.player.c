@@ -136,6 +136,23 @@ player_index_data *find_player_index_by_name(char *name) {
 
 
 /**
+* @param room_data *room The room to search in.
+* @param int id A player id.
+* @return char_data* if the player is in the room, or NULL otherwise.
+*/
+char_data *find_player_in_room_by_id(room_data *room, int id) {
+	char_data *ch;
+	
+	LL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
+		if (!IS_NPC(ch) && GET_IDNUM(ch) == id && !EXTRACTED(ch)) {
+			return ch;
+		}
+	}
+	return NULL;
+}
+
+
+/**
 * Finds a character who is sitting at a menu, for various functions that update
 * all players and check which are in-game vs not. If a person is at a menu,
 * then to safely update them you should change both their live data and saved
@@ -2964,6 +2981,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	extern room_data *find_home(char_data *ch);
 	extern room_data *find_load_room(char_data *ch);
 	void refresh_all_quests(char_data *ch);
+	void reset_combat_meters(char_data *ch);
 	
 	extern bool global_mute_slash_channel_joins;
 
@@ -2978,6 +2996,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 
 	reset_char(ch);
 	check_delayed_load(ch);	// ensure everything is loaded
+	reset_combat_meters(ch);
+	GET_COMBAT_METERS(ch).over = TRUE;	// ensure no active meter
 	
 	// remove this now
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);

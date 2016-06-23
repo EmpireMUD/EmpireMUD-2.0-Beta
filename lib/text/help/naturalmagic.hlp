@@ -21,6 +21,21 @@ See also: CHANT, CHANT OF NATURE, HEAL, CLEANSE, PURIFY, EARTHARMOR,
     SOLAR POWER, EARTHMELD, WORM, FLY, GIFT OF NATURE, SUMMON ANIMALS,
     TOUCH OF FLAME, ANIMAL FORMS
 #
+ACIDBLAST "ACID BLAST"
+
+Acidblast
+Class ability:  Alchemist
+
+Usage:  acidblast [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+Debuff type:  Natural Magic
+
+An alchemist can create a magical acid blast, injuring her victim as well as
+decreasing the victim's magical resistance.
+
+See also: ALCHEMIST CLASS
+#
 "ANCESTRAL HEALING"
 
 Ancestral Healing
@@ -57,6 +72,22 @@ jungle/swamp: tapir, monkey, muskrat
 This ability gains experience when you finish morphing into one of these forms.
 
 See also: MORPH
+#
+ASTRALCLAW "ASTRAL CLAW"
+
+Astralclaw
+Class ability:  Werewolf
+
+Usage:  astralclaw [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+Debuff type:  Natural Magic
+
+By striking out with astral claws, the werewolf deals magical damage at a
+distance. These claw strikes also rip open the victim's flesh, dealing physical
+damage over time. This DoT effect stacks up to 3 times.
+
+See also: DOT, WEREWOLF CLASS
 #
 "BANSHEE FAMILIAR"
 
@@ -246,6 +277,20 @@ it deflects a spell. You can only have one counterspell active at a time.
 
 This ability gains experience when your counterspell is triggered.
 #
+DEATHTOUCH "DEATH TOUCH"
+
+Deathtouch
+Class ability:  Necromancer
+
+Usage:  deathtouch [victim]
+Cooldown:  6 seconds
+Cost:  based on damage
+
+This fast spell deals instant damage to your victim, as the very essence of
+death seeps into him.
+
+See also: NECROMANCER CLASS
+#
 "DIRE WOLF FAMILIAR"
 
 Dire Wolf
@@ -256,6 +301,20 @@ The dire wolf will assist you in combat, adding to the damage against your
 enemy.
 
 See also: FAMILIAR, WEREWOLF CLASS
+#
+DISPIRIT DESPIRIT
+
+Dispirit
+Class ability:  Shadow Wolf
+
+Usage:  dispirit [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+Debuff type:  Natural Magic
+
+Dispirit drains the opponent's wits, causing him pain and anguish as it does.
+
+See also: SHADOW WOLF CLASS
 #
 EARTHARMOR "EARTH ARMOR"
 
@@ -309,6 +368,22 @@ Only one person in the room may be entangled at a time. Using the ability on a
 second person will release the first one.
 
 Gain experience when you cast this spell.
+#
+ERODE
+
+Erode
+Class ability:  Luminary
+
+Usage:  erode [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+Debuff type:  Natural Magic
+
+Erode causes the victim's skin to dry up and shed, like a cliffside in the
+wind. It causes great pain immediately, then continues to deal magical damage
+over time. This DoT effect stacks up to 3 times.
+
+See also: DOT, LUMINARY CLASS
 #
 FAMILIAR
 
@@ -813,6 +888,20 @@ take simple orders.
 Summon Animals gains experience when you use it, even if no animals appear.
 
 See also: ORDER
+#
+STARSTRIKE "STAR STRIKE"
+
+Starstrike
+Class ability:  Feral
+
+Usage:  starstrike [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+
+Starstrike calls down meteors from the heavens, dealing incredible damage to
+your victim!
+
+See also: FERAL CLASS
 #
 "TOUCH OF FLAME"
 

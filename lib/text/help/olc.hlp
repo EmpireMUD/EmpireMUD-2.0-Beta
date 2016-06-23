@@ -2875,7 +2875,7 @@ Most applies are self-explanatory:
  MOVE-REGEN - rate of move regen (per 5 second tick)
  MANA-REGEN - rate of mana regen (per 5 second tick)
  INTELLIGENCE - characters can't use an item that would reduce them below 1
- WITS - combat speed
+ WITS - combat speed and damage
  AGE - this actually raises/lowers the player's age, which has no effect
  MAX-MOVE - move pool
  RESIST-PHYSICAL - physical damage reduction
@@ -2887,8 +2887,8 @@ Most applies are self-explanatory:
  DODGE - chance to dodge (%)
  INVENTORY - this adds to inventory capacity
  MAX-BLOOD - blood pool size
- BONUS-PHYSICAL - added to strength-based damage
- BONUS-MAGICAL - added to magical damage
+ BONUS-PHYSICAL - added to strength-based damage and weapon dps
+ BONUS-MAGICAL - added to magical damage and weapon dps
  BONUS-HEALING - added to damage healed (by abilities this player uses)
  RESIST-MAGICAL - magical damage reduction
  CRAFTING - bonus to craft level (unscaled)
@@ -3061,6 +3061,7 @@ Available flags:
  &ctropical&0 - Comes from tropical areas (especially foods)
  &ccommon&0 - Opposite of rare
  &caquatic&0 - Comes from the water
+ &cbasic&0 - A tier 1, minimum-level resource.
 
 See also: OEDIT COMPONENT
 #d

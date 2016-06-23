@@ -287,7 +287,6 @@ void disassociate_building(room_data *room) {
 	void decustomize_room(room_data *room);
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void remove_designate_objects(room_data *room);
-	extern bool world_map_needs_save;
 	
 	room_data *iter, *next_iter;
 	struct instance_data *inst;
@@ -325,11 +324,7 @@ void disassociate_building(room_data *room) {
 	free_proto_scripts(&room->proto_script);
 
 	// restore sect: this does not use change_terrain()
-	SECT(room) = BASE_SECT(room);
-	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-		world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type = SECT(room);
-		world_map_needs_save = TRUE;
-	}
+	perform_change_sect(room, NULL, BASE_SECT(room));
 	
 	if (COMPLEX_DATA(room)) {
 		COMPLEX_DATA(room)->home_room = NULL;
@@ -1838,8 +1833,8 @@ ACMD(do_lay) {
 ACMD(do_maintain) {
 	struct resource_data *res = NULL;
 	
-	add_to_resource_list(&res, RES_COMPONENT, CMP_LUMBER, BUILDING_DISREPAIR(IN_ROOM(ch)), 0);
-	add_to_resource_list(&res, RES_COMPONENT, CMP_NAILS, BUILDING_DISREPAIR(IN_ROOM(ch)), 0);
+	add_to_resource_list(&res, RES_COMPONENT, CMP_LUMBER, BUILDING_DISREPAIR(IN_ROOM(ch)), CMPF_BASIC);
+	add_to_resource_list(&res, RES_COMPONENT, CMP_NAILS, BUILDING_DISREPAIR(IN_ROOM(ch)), CMPF_BASIC);
 	
 	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You can't perform maintenance here.\r\n");

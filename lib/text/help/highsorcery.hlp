@@ -15,6 +15,21 @@ See also: STUDY, SORCERY TOWER, RITUAL, STAFFMAKING, FORESIGHT, MANASHIELD,
     DEVASTATION RITUAL, ENCHANT, ENERVATE, SIPHON, SLOW, SUNSHOCK, MIRRORIMAGE,
     ARCANE POWER, DISPEL, COLLAPSE
 #
+ABLATE ABLATION
+
+Ablate
+Class ability:  Battlemage
+
+Usage:  ablate [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+Debuff type:  High Sorcery
+
+Ablate deals damage to your victim and will cause bits of his armor to burn
+off, leaving him less resistant to physical damage.
+
+See also: BATTLEMAGE CLASS
+#
 "ARCANE POWER"
 
 Arcane Power (High Sorcery ability)
@@ -24,6 +39,35 @@ those without. Your total mana increases by this amount, including any bonuses
 from equipment and other abilities.
 
 Gains experience passively over time.
+#
+ARCLIGHT "ARC LIGHT"
+
+Arclight
+Class ability:  Archmage
+
+Usage:  arclight [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+
+Arclight is the Archmage's best magical attack. It deals direct damage to the
+target.
+
+See also: ARCHMAGE CLASS
+#
+CHRONOBLAST
+
+Chronoblast
+Class ability:  Artificer
+
+Usage:  chronoblast [victim]
+Cooldown:  6 seconds
+Cost:  based on damage
+Debuff type:  High Sorcery
+
+Chronoblast uses the artificer's knowledge of clocks to slow down the enemy,
+and the transition into a slower time frame deals serious magical damage.
+
+See also: ARTIFICER CLASS
 #
 "CITY TELEPORTATION"
 
@@ -378,6 +422,37 @@ Teleportation).
 
 See also: CITY TELEPORTATION, RITUAL
 #
+SCOUR
+
+Scour
+Class ability:  Exarch
+
+Usage:  scour [victim]
+Cooldown:  6 seconds
+Cost:  based on damage
+Debuff type:  High Sorcery
+
+Scour will scrub away at your opponent, damaging them magically over time (in
+addition to damage with the initial hit). This DoT stacks up to 5 times.
+
+See also: DOT, EXARCH CLASS
+#
+SHADOWLASH "SHADOW LASH"
+
+Shadowlash
+Class ability:  Occultist
+
+Usage:  shadowlash [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+Debuff type:  High Sorcery
+
+Shadowlash calls forth a tentacle of pure shadow, which wraps itself around
+your victim's head for both instantaneous and lasting damage. It also blinds
+your victim briefly. The DoT effect stacks up to 3 times.
+
+See also: DOT, OCCULTIST CLASS
+#
 "SIEGE RITUAL"
 
 Siege Ritual (High Sorcery ability)
@@ -430,6 +505,21 @@ will target the person you are fighting. As a class ability, this spell's
 duration increases.
 
 Gain experience by casting this spell.
+#
+SOULCHAIN "SOUL CHAIN"
+
+Soulchain
+Class ability:  Lich
+
+Usage:  soulchain [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+Debuff type:  High Sorcery
+
+Soulchain wraps the victim in a painful spiritual binding, sapping his
+intelligence as well as dealing magical damage.
+
+See also: LICH CLASS
 #
 STAFFMAKING "STAFF MAKING" STAFF STAVES "POWERFUL STAVES"
 
@@ -533,6 +623,22 @@ opponent.
 Gains experience by casting this spell.
 
 See also: BLIND
+#
+THORNLASH "THORN LASH"
+
+Thornlash
+Class ability:  Theurge
+
+Usage:  thornlash [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+Debuff type:  High Sorcery
+
+Thornlash wraps a coil of thorny vines around your victim. The vines cause
+immediate pain, while the thorns dig in and deal poison damage over time. This
+DoT effect stacks up to 3 times.
+
+See also: DOT, THEURGE CLASS
 #
 VIGOR
 

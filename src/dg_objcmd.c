@@ -969,6 +969,7 @@ OCMD(do_dgoload) {
 		if (target && *target && isdigit(*target)) {
 			// target is scale level
 			scale_mob_to_level(mob, atoi(target));
+			SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);
 		}
 		
 		load_mtrigger(mob);
@@ -1393,6 +1394,7 @@ OCMD(do_oscale) {
 		}
 
 		scale_mob_to_level(victim, level);
+		SET_BIT(MOB_FLAGS(victim), MOB_NO_RESCALE);
 	}
 	// scale vehicle
 	else if ((veh = get_vehicle_by_obj(obj, arg))) {

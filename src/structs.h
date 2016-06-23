@@ -1135,6 +1135,7 @@ typedef struct vehicle_data vehicle_data;
 #define CMPF_TROPICAL  BIT(17)
 #define CMPF_COMMON  BIT(18)
 #define CMPF_AQUATIC  BIT(19)
+#define CMPF_BASIC  BIT(20)
 
 
 // Container flags -- limited to 31 because of int type in obj value
@@ -2847,6 +2848,17 @@ struct descriptor_data {
 };
 
 
+// used in player specials to track combat
+struct combat_meters {
+	int hits, misses;	// my hit %
+	int hits_taken, dodges;	// my dodge %
+	int damage_dealt, damage_taken, pet_damage;
+	int heals_dealt, heals_taken;
+	time_t start, end;	// times
+	bool over;
+};
+
+
 // basic paragraphs for book_data
 struct paragraph_data {
 	char *text;
@@ -3028,6 +3040,8 @@ struct player_special_data {
 	byte create_points;	// Used in character creation
 	int group_invite_by;	// idnum of the last player to invite this one
 	
+	struct combat_meters meters;	// combat meter data
+	
 	bool needs_delayed_load;	// whether or not the player still needs delayed data
 	bool restore_on_login;	// mark the player to trigger a free reset when they enter the game
 	bool reread_empire_tech_on_login;	// mark the player to trigger empire tech re-read on entering the game
@@ -3167,7 +3181,7 @@ struct char_data {
 
 // cooldown info
 struct cooldown_data {
-	sh_int type;	// any COOLDOWN_x const
+	sh_int type;	// any COOLDOWN_ const
 	time_t expire_time;	// time at which the cooldown has expired
 	
 	struct cooldown_data *next;	// linked list
@@ -3853,6 +3867,20 @@ struct evolution_data {
 };
 
 
+// for iteration of map locations by sector
+struct sector_index_type {
+	sector_vnum vnum;	// which sect
+	
+	struct map_data *sect_rooms;	// LL of rooms
+	int sect_count;	// how many rooms in the list
+	
+	struct map_data *base_rooms;	// LL of rooms
+	int base_count;	// number of rooms with it as the base sect
+	
+	UT_hash_handle hh;	// sector_index hash handle
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// TRIGGER STRUCTS /////////////////////////////////////////////////////////
 
@@ -4121,5 +4149,8 @@ struct map_data {
 	
 	crop_data *crop_type;	// possible crop type
 	
+	// lists
+	struct map_data *next_in_sect;	// LL of all map locations of a given sect
+	struct map_data *next_in_base_sect;	// LL for base sect
 	struct map_data *next;	// linked list of non-ocean tiles, for iterating
 };

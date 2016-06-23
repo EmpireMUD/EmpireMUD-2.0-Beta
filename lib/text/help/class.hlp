@@ -73,6 +73,7 @@ Alchemist
 Natural Magic + Trade
 
 All: Alchemist Crafts, Resurrect, Salamander (familiar)
+Caster: Acidblast
 Healer: Fastcasting, Healing Boost
 
 Note: Class abilities are unfinished.
@@ -107,6 +108,7 @@ Archmage
 High Sorcery + Natural Magic
 
 All: Phoenix (familiar), Resurrect
+Caster: Arclight
 Healer: Fastcasting, Healing Boost
 
 Note: Class abilities are unfinished.
@@ -119,6 +121,7 @@ Artificer
 High Sorcery + Trade
 
 All: Artificer Crafts
+Caster: Chronoblast
 
 Note: Class abilities are unfinished.
 
@@ -165,7 +168,7 @@ See also: CLASS, TANK, MELEE
 Battlemage
 Battle + High Sorcery
 
-No abilities assigned.
+Caster: Ablate
 
 Note: Class abilities are unfinished.
 
@@ -202,7 +205,7 @@ Caster traits:
  - Dexterity: Counteracts your target's Dexterity and boosts your hit chance.
  - To-Hit: You need to be as close to the hit cap for your level as possible.
  - Wits: Increases the speed of your attacks and boosts the damage you deal.
- - Bonus-Magical: Any spare points can go here to boost your magical damage.
+ - Bonus-Magical: Any spare points can go here to boost your magical dps.
 
 See also: HEALER, HIT CAP, MELEE, TANK
 #
@@ -248,6 +251,7 @@ Exarch
 Empire + High Sorcery
 
 All: Dragonriding, Exarch Crafts
+Caster: Scour
 
 Note: Class abilities are unfinished.
 
@@ -260,7 +264,7 @@ Natural Magic + Survival
 
 All: Basilisk (familiar), Resurrect, Werewolf Form
 Tank: Towering Werewolf Form
-Caster: Astral Werewolf Form
+Caster: Astral Werewolf Form, Starstrike
 Healer: Fastcasting, Healing Boost, Sage Werewolf Form
 
 Note: Class abilities are unfinished.
@@ -309,7 +313,7 @@ See also: CASTER, MELEE, TANK
 Lich
 High Sorcery + Vampire
 
-Caster: Dread Blood Form
+Caster: Dread Blood Form, Soulchain
 
 Note: Class abilities are unfinished.
 
@@ -322,6 +326,7 @@ Empire + Natural Magic
 
 All: Chant of Illusions, Dragonriding, Griffin (familiar),
    Manticore (familiar), Resurrect
+Caster: Erode
 Healer: Ancestral Healing, Fastcasting, Healing Boost
 
 Luminary Healers gain additional healing power from Greatness and should build
@@ -351,7 +356,7 @@ Melee traits:
  - Dexterity: Counteracts your target's Dexterity and boosts your hit chance.
  - To-Hit: You need to be as close to the hit cap for your level as possible.
  - Wits: Increases your combat speed and raises the damage you deal.
- - Bonus-Physical: Any spare points should go here to raise damage.
+ - Bonus-Physical: Any spare points should go here to raise dps.
 
 See also: CASTER, HEALER, HIT CAP, TANK
 #
@@ -361,7 +366,7 @@ Necromancer
 Natural Magic + Vampire
 
 All: Resurrect
-Caster: Dread Blood Form, Skeletal Hulk (familiar)
+Caster: Deathtouch, Dread Blood Form, Skeletal Hulk (familiar)
 Healer: Banshee (familiar), Fastcasting, Healing Boost
 
 Note: Class abilities are unfinished.
@@ -373,6 +378,7 @@ See also: CLASS, CASTER, HEALER
 Occultist
 High Sorcery + Stealth
 
+Caster: Shadowlash
 Melee: Shadowcage
 
 Note: Class abilities are unfinished.
@@ -421,7 +427,7 @@ Natural Magic + Stealth
 
 All: Moonrise, Werewolf Form
 Melee: Howl, Savage Werewolf Form, Scorpion Shadow (familiar)
-Caster: Astral Werewolf Form, Scorpion Shadow (familiar)
+Caster: Astral Werewolf Form, Dispirit, Scorpion Shadow (familiar)
 Healer: Fastcasting, Healing Boost, Owl Shadow (familiar), Sage Werewolf Form
 
 Note: Class abilities are unfinished.
@@ -493,7 +499,7 @@ See also: CASTER, DODGE CAP, HEALER, MELEE
 Theurge
 High Sorcery + Survival
 
-Utility: none
+Caster: Thornlash
 
 Note: Class abilities are unfinished.
 
@@ -529,7 +535,7 @@ Battle + Natural Magic
 All: Resurrect, Werewolf Form
 Tank: Spirit Wolf (familiar), Towering Werewolf Form
 Melee: Dire Wolf (familiar), Savage Werewolf Form
-Caster: Astral Werewolf Form, Dire Wolf (familiar)
+Caster: Astral Werewolf Form, Astralclaw, Dire Wolf (familiar)
 Healer: Confer, Fastcasting, Healing Boost, Moon Rabbit (familiar), Sage
         Werewolf Form
 

@@ -14,8 +14,8 @@
 #include "sysdep.h"
 
 #include "structs.h"
-#include "skills.h"
 #include "utils.h"
+#include "skills.h"
 #include "interpreter.h"	/* alias_data */
 #include "vnums.h"
 #include "olc.h"
@@ -1970,6 +1970,7 @@ const char *component_flags[] = {
 	"tropical",
 	"common",
 	"aquatic",
+	"basic",
 	"\n"
 };
 
@@ -2053,6 +2054,11 @@ struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES] = {
 	{ "gore", "gore", "gores", { 3.9, 4.1, 4.3 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
 	{ "mana blast", "blast", "blasts", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, FALSE }
 };
+
+
+// basic speed is the theoretical average weapon speed without wits/haste,
+// and is used to apply bonus-physical/magical evenly by adjusting for speed
+const double basic_speed = 4.0;	// seconds between attacks
 
 
 // missile speeds
@@ -2792,6 +2798,17 @@ const char *affect_types[] = {
 	"morph",
 	"whisperstride",
 	"well-fed",
+	"ablate",	// 65
+	"acidblast",
+	"astralclaw",
+	"chronoblast",
+	"dispirit",
+	"erode",	// 70
+	"scour",
+	"shadowlash",	// blind
+	"shadowlash",	// dot
+	"soulchain",
+	"thornlash",	// 75
 	"\n"
 	};
 
@@ -2863,6 +2880,17 @@ const char *affect_wear_off_msgs[] = {
 	"",	// morph stats -- no wear-off message
 	"Your whisperstride fades.",
 	"You no longer feel well-fed.",
+	"The ablation fades.",	// 65
+	"The acid blast wears off.",
+	"",	// astral claw
+	"Time speeds back up to normal.",
+	"Your wits return.",
+	"",	// 70, erode
+	"",	// scour
+	"Your vision returns.",
+	"",	// shadowlash-dot
+	"Your soul is unchained.",
+	"",	// 75, thornlast
 	"\n"
 };
 
@@ -2923,7 +2951,20 @@ const char *cooldown_types[] = {
 	"diversion",
 	"rogue flag",
 	"portal sickness",
-	"whisperstride",	// 54
+	"whisperstride",
+	"ablate",	// 55
+	"acidblast",
+	"arclight",
+	"astralclaw",
+	"chronoblast",
+	"deathtouch",	// 60
+	"dispirit",
+	"erode",
+	"scour",
+	"shadowlash",
+	"soulchain",	// 65
+	"starstrike",
+	"thornlash",	// 67
 	"\n"
 };
 

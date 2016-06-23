@@ -594,7 +594,10 @@ void affect_total(char_data *ch) {
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
 			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, i)); apply; apply = apply->next) {
-				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), FALSE);
+				affect_modify(ch, apply->location, apply->modifier, NOBITS, FALSE);
+			}
+			if (GET_OBJ_AFF_FLAGS(GET_EQ(ch, i))) {
+				affect_modify(ch, APPLY_NONE, 0, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), FALSE);
 			}
 		}
 	}
@@ -628,7 +631,10 @@ void affect_total(char_data *ch) {
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
 			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, i)); apply; apply = apply->next) {
-				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), TRUE);
+				affect_modify(ch, apply->location, apply->modifier, NOBITS, TRUE);
+			}
+			if (GET_OBJ_AFF_FLAGS(GET_EQ(ch, i))) {
+				affect_modify(ch, APPLY_NONE, 0, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), TRUE);
 			}
 		}
 	}
@@ -2124,7 +2130,7 @@ int total_coins(char_data *ch) {
 * two durations is kept.
 *
 * @param char_data *ch The character.
-* @param int type Any COOLDOWN_x.
+* @param int type Any COOLDOWN_.
 * @param int seconds_duration How long it lasts.
 */
 void add_cooldown(char_data *ch, int type, int seconds_duration) {
@@ -2155,7 +2161,7 @@ void add_cooldown(char_data *ch, int type, int seconds_duration) {
 * does not have that ability on cooldown.
 *
 * @param char_data *ch The character.
-* @param int type Any COOLDOWN_x.
+* @param int type Any COOLDOWN_.
 * @return int The time remaining on the cooldown (in seconds), or 0.
 */
 int get_cooldown_time(char_data *ch, int type) {
@@ -2190,7 +2196,7 @@ void remove_cooldown(char_data *ch, struct cooldown_data *cool) {
 * Removes any cooldowns of a given type from the character.
 *
 * @param char_data *ch The character.
-* @param int type Any COOLDOWN_x.
+* @param int type Any COOLDOWN_.
 */
 void remove_cooldown_by_type(char_data *ch, int type) {
 	struct cooldown_data *cool, *next_cool;
@@ -4197,7 +4203,10 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 
 		if (wear_data[pos].count_stats) {
 			for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
-				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(obj), TRUE);
+				affect_modify(ch, apply->location, apply->modifier, NOBITS, TRUE);
+			}
+			if (GET_OBJ_AFF_FLAGS(obj)) {
+				affect_modify(ch, APPLY_NONE, 0, GET_OBJ_AFF_FLAGS(obj), TRUE);
 			}
 		}
 
@@ -4605,7 +4614,10 @@ obj_data *unequip_char(char_data *ch, int pos) {
 		// un-apply affects
 		if (wear_data[pos].count_stats) {
 			for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
-				affect_modify(ch, apply->location, apply->modifier, GET_OBJ_AFF_FLAGS(obj), FALSE);
+				affect_modify(ch, apply->location, apply->modifier, NOBITS, FALSE);
+			}
+			if (GET_OBJ_AFF_FLAGS(obj)) {
+				affect_modify(ch, APPLY_NONE, 0, GET_OBJ_AFF_FLAGS(obj), FALSE);
 			}
 		}
 

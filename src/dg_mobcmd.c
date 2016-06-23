@@ -602,12 +602,16 @@ ACMD(do_mload) {
 		}
 		
 		if (*target && isdigit(*target)) {
-			// scale to requested level
+			// scale to requested level and lock it there
 			scale_mob_to_level(mob, atoi(target));
+			SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);
 		}
 		else if (GET_CURRENT_SCALE_LEVEL(ch) > 0) {
 			// only scale mob if self is scaled
 			scale_mob_to_level(mob, GET_CURRENT_SCALE_LEVEL(ch));
+			if (MOB_FLAGGED(ch, MOB_NO_RESCALE)) {
+				SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);
+			}
 		}
 		
 		load_mtrigger(mob);
@@ -2076,6 +2080,7 @@ ACMD(do_mscale) {
 		}
 
 		scale_mob_to_level(victim, level);
+		SET_BIT(MOB_FLAGS(victim), MOB_NO_RESCALE);
 	}
 	// scale evhicle
 	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_in_room_vis(ch, arg))) {

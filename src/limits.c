@@ -447,7 +447,9 @@ void point_update_char(char_data *ch) {
 void real_update_char(char_data *ch) {
 	void adventure_unsummon(char_data *ch);
 	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
+	void check_combat_end(char_data *ch);
 	void check_morph_ability(char_data *ch);
+	void combat_meter_damage_dealt(char_data *ch, int amt);
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	void do_unseat_from_vehicle(char_data *ch);
 	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
@@ -457,10 +459,15 @@ void real_update_char(char_data *ch) {
 	
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *af, *next_af, *immune;
-	char_data *room_ch, *next_ch;
+	char_data *room_ch, *next_ch, *caster;
 	int result, iter, type;
 	int fol_count, gain;
 	bool found;
+	
+	// check for end of meters (in case it was missed in the fight code)
+	if (!FIGHTING(ch)) {
+		check_combat_end(ch);
+	}
 	
 	// first check location: this may move the player
 	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
@@ -535,6 +542,9 @@ void real_update_char(char_data *ch) {
 		));
 		
 		result = damage(ch, ch, dot->damage * dot->stack, type, dot->damage_type);
+		if (result > 0 && (caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by))) {
+			combat_meter_damage_dealt(caster, result);
+		}
 		if (result < 0 || EXTRACTED(ch) || IS_DEAD(ch)) {
 			return;
 		}
@@ -1387,6 +1397,17 @@ void point_update_obj(obj_data *obj) {
 						act("$p flickers briefly, then vanishes with a poof.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR);
 					}
 					break;
+				case MAT_WAX: {
+					if (obj->carried_by)
+						act("$p melts in your hands and is gone.", FALSE, obj->carried_by, obj, 0, TO_CHAR);
+					else if (obj->worn_by)
+						act("$p melts off of you and is gone.", FALSE, obj->worn_by, obj, 0, TO_CHAR);
+					else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
+						act("$p melts and is gone.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_ROOM);
+						act("$p melts and is gone.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR);
+					}
+					break;
+				}
 				case MAT_WOOD:
 				case MAT_BONE:
 				case MAT_HAIR:

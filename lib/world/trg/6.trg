@@ -177,13 +177,27 @@ switch %random.4%
     %echo% %self.name% thumps %self.hisher% foot on the ground.
   break
   case 3
-    eval room %self.room%
-    * only duplicate if not in a building
-    if (!%room.building%)
-      %echo% %self.name% does a little backflip and splits into two bunnies!
-      %load% mob 612
+    if %self.varexists(has_duped)%
+      eval has_duped %self.has_duped%
     else
-      say I'm late! I'm late!
+      eval has_duped 0
+    end
+    if %has_duped% > 0
+      * has already duplicated
+      %echo% %self.name% curls up, becomes a ball of dust, and blows away in the wind.
+      %purge% %self%
+      halt
+    else
+      eval room %self.room%
+      * only duplicate if not in a building
+      if (!%room.building%)
+        %echo% %self.name% does a little backflip and splits into two bunnies!
+        %load% mob 612
+        eval has_duped 1
+        remote has_duped %self.id%
+      else
+        say I'm late! I'm late!
+      end
     end
   break
   case 4
