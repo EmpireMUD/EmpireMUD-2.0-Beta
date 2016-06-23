@@ -1175,7 +1175,7 @@ WCMD(do_wdot) {
 	argument = one_argument(argument, stackarg);	// optional, defualt: 1
 
 	if (!*name || !*modarg || !*durarg) {
-		wld_log(room, "dot: bad syntax");
+		wld_log(room, "wdot: bad syntax");
 		return;
 	}
 
@@ -1186,14 +1186,14 @@ WCMD(do_wdot) {
 	ch = get_char_by_room(room, name);
 
 	if (!ch) {
-		wld_log(room, "dot: target not found");      
+		wld_log(room, "wdot: target not found");      
 		return;
 	}
 	
 	if (*typearg) {
 		type = search_block(typearg, damage_types, FALSE);
 		if (type == NOTHING) {
-			wld_log(room, "wdamage: invalid type argument, using physical damage");
+			wld_log(room, "wdot: invalid type argument, using physical damage");
 			type = DAM_PHYSICAL;
 		}
 	}

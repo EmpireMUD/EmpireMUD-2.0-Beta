@@ -513,11 +513,13 @@ a bolt of dragon cloth~
 A bolt of dragon cloth is lying here.~
    Dragon cloth is made by stripping fibers from dragon hide, then weaving them
 on a loom. The result is a tough, powerful, magical cloth. It is suited for
-many enchanted crafts.
+many enchanted crafts. You can light the cloth on fire to return it to its
+original dragon hide state.  
 ~
-3 e a 7
+3 e a 8
 0 0 0
 7 0
+I 11 10902 100.00 1 x  # LIGHT: a red dragon hide
 O
 26 gk
 R
@@ -530,11 +532,13 @@ leather dragon tough~
 tough dragon leather~
 A pile of tough dragon leather is stacked here.~
    This dragon leather is tough and, though heavy, is still lighter than iron.
-This could be made into powerful gear.
+This could be made into powerful gear. You can light the leather on fire to
+return it to its original dragon hide state.  
 ~
-3 e a 7
+3 e a 8
 0 0 0
 7 0
+I 11 10902 100.00 1 x  # LIGHT: a red dragon hide
 O
 15 gk
 R
@@ -547,11 +551,14 @@ ingot dragonsteel steel~
 a dragonsteel ingot~
 A dragonsteel ingot is stacked here.~
    The dragonsteel ingot is made from smelting an entire dragon bone, which
-liquifies like metal and then can be forged into powerful weapons and armor.
+liquifies like metal and then can be forged into powerful weapons and armor. 
+You can light the unforged dragonsteel ingot on fire to return it to its
+original dragon bone state.  
 ~
-3 e a 6
+3 e a 8
 0 0 0
 14 0
+I 11 10903 100.00 1 x  # LIGHT: a colossal dragon bone
 O
 18 gk
 R
@@ -764,7 +771,7 @@ magnificent dragon bracelets~
 A pair of magnificent dragon bracelets is lying here.~
    These colossal bracelets are forged from the remains of a red dragon. And
 from the looks of the scales, it was a big one! These bracelets surely show off
-the majesty of your empire!  
+the majesty of your empire!
 ~
 2 eo aj 1
 0 0 0
@@ -782,7 +789,7 @@ the magnificent dragon bracelet schematic~
 The magnificent dragon bracelet schematic is lying here.~
    This schematic makes a pair of magnificent dragon bracelets, a powerful
 wrist item that brings Greatness to your empire! You require Fabled Hides
-(Antiquarian or Alchemist) to sew this item.  
+(Antiquarian or Alchemist) to sew this item.
 ~
 3 o a 5
 0 0 0

@@ -480,12 +480,13 @@ Lightningbolt (Natural Magic ability)
 Usage:  lightningbolt [target]
 Cooldown:  9 seconds
 DoT Duration:  15 seconds
-Cost:  25 mana
+Cost:  based on damage
 Debuff type:  Natural Magic
 
 A powerful nature mage can shoot bolts of lightning from her fingertips,
 causing massive trauma to the target, and leaving them shocked. Victims con-
-tinue to take damage for several seconds.
+tinue to take damage for several seconds. Damage is based on level, role, and
+traits.
 
 If you cast this spell without a target, it will hit the person you are
 fighting.
@@ -738,16 +739,22 @@ Skybrand (Natural Magic ability)
 
 Usage:  skybrand [target]
 Cooldown:  6 seconds
-Cost:  30 mana
+Cost:  based on damage and skill level
 Debuff type:  Natural Magic
 
 A nature mage can mark a target with the Skybrand, causing the victim to take
 damage for several seconds. This ability stacks up to 3 times.
 
+In caster or solo role, damage is based on total level, Intelligence, and
+Bonus-Magical damage. In all other roles, it is based on skill level and
+Intelligence only.
+
 If you cast this spell with no target, it will target the person you are
 fighting.
 
 Gains experience when you cast this spell.
+
+See also: CASTER, SOLO
 #
 "SOLAR POWER"
 

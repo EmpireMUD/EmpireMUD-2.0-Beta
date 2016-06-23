@@ -313,7 +313,7 @@ void perform_morph(char_data *ch, morph_data *morph) {
 	mana_mod = (double) GET_MANA(ch) / GET_MAX_MANA(ch);
 	
 	// remove all existing morph effects
-	affect_from_char(ch, ATYPE_MORPH);
+	affect_from_char(ch, ATYPE_MORPH, FALSE);
 
 	if (IS_RIDING(ch) && morph != NULL) {
 		do_dismount(ch, "", 0, 0);

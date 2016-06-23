@@ -709,7 +709,7 @@ the creation of a chemist's cleansing cap, a level 200-300 crafting headpiece.
 
 Craft (requires Alchemist Crafts and crafting 200): alchemical filter
 ~
-3 0 a 8
+3 o a 9
 0 0 0
 0 0
 S
@@ -722,7 +722,7 @@ make an antiquated arcane apparatus, a level 200-300 crafting offhand.
 
 Forge (requires Antiquarian Crafts and crafting 200): antique device parts
 ~
-3 0 a 8
+3 o a 9
 0 0 0
 0 0
 S
@@ -735,7 +735,7 @@ the creation of a superb smuggling sash, a level 200-300 crafting belt.
 
 Sew (requires Smuggler Crafts and crafting 200): concealed silk pouches
 ~
-3 0 a 6
+3 o a 7
 0 0 0
 0 0
 S
@@ -748,7 +748,7 @@ traveling tinker's trappings, a set of level 200-300 crafting clothes.
 
 Forge (requires Tinker Crafts and crafting 200): tinker harness
 ~
-3 0 a 5
+3 o a 6
 0 0 0
 0 0
 S
@@ -759,10 +759,9 @@ An alchemical filter is lying here.~
    This alchemically treated metal filter is used in the construction of a
 chemist's cleansing cap. It will bind to whoever crafts it.
 
-
 Sew (requires crafting 200): chemists cleansing cap
 ~
-3 0 a 5
+3 0 a 6
 0 0 0
 2 0
 S
@@ -863,6 +862,211 @@ on the move if you knew how to use it.
 2 0
 A
 25 50 0
+C
+150 150
+S
+#2359
+pattern smuggled olympian laurel branch~
+the smuggled Olympian laurel branch pattern~
+The smuggled Olympian laurel branch pattern is lying here.~
+   This pattern shows you how to make the Olympian laurel branch that is
+required for the tier 3 crafting headpiece, the laurel crown of Olympus.
+
+Craft (Smuggler Crafts, level 300): smuggled Olympian laurel branch
+~
+3 o a 6
+0 0 0
+1 0
+S
+#2360
+recipe silk olympic~
+the Olympic silk recipe~
+The Olympic silk recipe is lying here.~
+   On one side of this white marble slab is engraved the alchemical formulae
+for the creation of Olympic silk. The other side bears patterns for Olympian
+robes. The robe of the Olympians is a tier 3 crafting item.
+
+Weave (Alchemist Crafts, level 300): Olympic silk
+~
+3 o a 8
+0 0 0
+1 0
+S
+#2361
+pattern amazonian leather~
+the Amazonian leather pattern~
+The pattern for Amazonian leather is lying here.~
+   This pattern shows how to craft leather in the ancient Amazonian style. As
+such, it can only be done by an Antiquarian. This leather is used to craft the
+regal girdle of Hippolyta, a tier 3 crafting item.
+
+Craft (Antiquarian Crafts, level 300): Amazonian leather
+~
+3 o a 7
+0 0 0
+1 0
+S
+#2362
+pattern hammer head guild-forged forged~
+the guild-forged hammer head pattern~
+The guild-forged hammer head pattern is lying here.~
+   This pattern is carved on white marble with a set of perfectly regular
+lines. It gives rough instructions for forging the hammer of Hephaestus, a tier
+3 crafting item. The only problem is that you need an entire guild of smiths to
+forge the head...
+ 
+Forge (Guildsman Crafts, level 300): guild-forged hammer head
+~
+3 o a 7
+0 0 0
+1 0
+S
+#2363
+branch smuggled olympian laurel~
+a smuggled Olympian laurel branch~
+A smuggled Olympian laurel branch is lying here.~
+   This laurel branch was surely smuggled from Mount Olympus, home of the
+classic Greek gods. It can be used to make the tier 3 crafting item, the laurel
+crown of Olympus.  
+
+Craft (level 300): laurel crown of Olympus
+~
+3 0 a 10
+0 0 0
+0 0
+S
+#2364
+silk olympic bolt~
+a bolt of Olympic silk~
+A bolt of Olympic silk is floating here.~
+   Olympic silk is so fine that you can barely feel it touch your fingers. It
+has the soft aroma of fresh herbs, and as you wrap yourself in the silk, you
+feel as if you could sleep forever. This silk is used to make the tier 3
+crafting clothing.  
+
+Sew (level 300): robe of the Olympians
+~
+3 0 a 8
+0 0 0
+11 0
+S
+#2365
+leather Amazonian wide band~
+a wide band of Amazonian leather~
+Some Amazonian leather is lying here.~
+   This fine Amazonian leather is already cut in the shape of a large belt or
+girdle, though it is unadorned. It is said that this leather can be made into a
+powerful girdle that boosts the skill of craftsmen -- and craftswomen. The
+girdle is the tier 3 crafting belt.
+ 
+Sew (level 300): girdle of Hippolyta
+~
+3 0 a 10
+0 0 0
+7 0
+S
+#2366
+head hammer guild-forged forged~
+a guild-forged hammer head~
+A guild-forged hammer head is lying here.~
+   This hammer head is made from a magical alloy so hard it takes hundreds of
+craftsmen to beat it into shape. It can be used to create the hammer of
+Hephaestus, which is the tier 3 crafting offhand item.  
+
+Forge (level 300): hammer of Hephaestus
+~
+3 0 a 12
+0 0 0
+2 0
+S
+#2367
+crown laurels Olympus~
+the laurel crown of Olympus~
+A crown of laurels is lying here, glowing faintly.~
+   This crown is made from a wreath of magical Olympian laurel leaves. It
+grants the wearer godlike crafting ability while worn. This is a tier 3
+crafting item.  
+~
+2 p ae 19
+0 0 0
+0 0
+A
+25 75 0
+A
+5 1 0
+C
+150 150
+M
+8
+You feel divine inspiration as you don $p!~
+M
+9
+$n glows faintly as $e dons $p.~
+S
+#2368
+robe Olympians~
+the robe of the Olympians~
+A robe of the Olympians is floating slightly off the ground.~
+   These beautiful enchanted robes are based on those worn by a god of
+craftsmen, and carry powerful enchantments to help with crafting. This is a
+tier 3 crafting item.  
+~
+2 p ad 17
+0 0 0
+11 0
+A
+25 75 0
+A
+5 1 0
+C
+150 150
+M
+8
+You begin to glow as you wrap yourself in $p.~
+M
+9
+$n begins to glow as $e wraps $mself in $p.~
+S
+#2369
+girdle regal Hippolyta~
+the regal girdle of Hippolyta~
+A regal girdle is glowing on the ground.~
+   This royal belt was made by Ares -- or perhaps by Hephaestus -- and given
+out to signify the right to rule. It bestows the ability to make legendary
+crafts to the wearer. It is a tier 3 crafting item.  
+~
+2 p al 17
+0 0 0
+4 0
+A
+25 75 0
+A
+5 1 0
+C
+150 150
+M
+8
+You wear $p and feel majestic.~
+M
+9
+$n wears $p and takes on an aura of majesty.~
+S
+#2370
+hammer Hephaestus~
+the hammer of Hephaestus~
+The hammer of Hephaestus is lying here.~
+   While not the original hammer of the God of Smiths, this hammer is a fairly
+close imitation. It carries many powerful enchantments to help you in the
+forge. This is the tier 3 crafting offhand item, and can also be used as a
+tool.  
+~
+1 dp ao 20
+0 20 6
+2 0
+A
+25 75 0
+A
+5 1 0
 C
 150 150
 S

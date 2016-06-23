@@ -745,6 +745,16 @@ void alt_import_aliases(char_data *ch, char_data *alt) {
 * @param char_data *ch Player to import to.
 * @param char_data *alt Player to import from.
 */
+void alt_import_fmessages(char_data *ch, char_data *alt) {
+	GET_FIGHT_MESSAGES(ch) = GET_FIGHT_MESSAGES(alt);
+	msg_to_char(ch, "Imported fight message settings.\r\n");
+}
+
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
 void alt_import_fprompt(char_data *ch, char_data *alt) {
 	if (GET_FIGHT_PROMPT(alt) && *GET_FIGHT_PROMPT(alt)) {
 		if (GET_FIGHT_PROMPT(ch)) {
@@ -926,7 +936,7 @@ void do_alt_import(char_data *ch, char *argument) {
 	char_data *alt = NULL;
 	bool file = FALSE;
 	
-	static const char *valid_fields = "Valid fields: aliases, prompt, fprompt, preferences, recolors, slash-channels, ignores, all\r\n";
+	static const char *valid_fields = "Valid fields: aliases, prompt, fprompt, preferences, fightmessages, recolors, slash-channels, ignores, all\r\n";
 	
 	two_arguments(argument, arg1, arg2);
 	
@@ -955,6 +965,9 @@ void do_alt_import(char_data *ch, char *argument) {
 	else if (is_abbrev(arg2, "preferences")) {
 		alt_import_preferences(ch, alt);
 	}
+	else if (is_abbrev(arg2, "fmessages") || is_abbrev(arg2, "fightmessages")) {
+		alt_import_fmessages(ch, alt);
+	}
 	else if (is_abbrev(arg2, "recolors")) {
 		alt_import_recolors(ch, alt);
 	}
@@ -971,6 +984,7 @@ void do_alt_import(char_data *ch, char *argument) {
 		alt_import_prompt(ch, alt);
 		alt_import_fprompt(ch, alt);
 		alt_import_preferences(ch, alt);
+		alt_import_fmessages(ch, alt);
 		alt_import_recolors(ch, alt);
 		alt_import_ignores(ch, alt);
 		alt_import_slash_channels(ch, alt);
@@ -1516,6 +1530,76 @@ ACMD(do_douse) {
 			act("The flames have been extinguished!", FALSE, ch, 0, 0, TO_CHAR | TO_ROOM);
 			COMPLEX_DATA(room)->burning = 0;
 		}
+	}
+}
+
+
+ACMD(do_fightmessages) {
+	extern const char *combat_message_types[];
+
+	bool screenreader = PRF_FLAGGED(ch, PRF_SCREEN_READER);
+	int iter, type = NOTHING, count;
+	bool on;
+	
+	// detect possible type
+	skip_spaces(&argument);
+	if (*argument) {
+		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
+			if (is_multiword_abbrev(argument, combat_message_types[iter])) {
+				type = iter;
+				break;
+			}
+		}
+	}
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs do not have fight message toggles.\r\n");
+	}
+	else if (!*argument) {
+		msg_to_char(ch, "Fight message toggles:\r\n");
+		
+		count = 0;
+		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
+			on = SHOW_FIGHT_MESSAGES(ch, BIT(iter));
+			if (screenreader) {
+				msg_to_char(ch, "%s: %s\r\n", combat_message_types[iter], on ? "on" : "off");
+			}
+			else {
+				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", combat_message_types[iter], (!(++count % 2) ? "\r\n" : ""));
+			}
+		}
+		
+		if (count % 2 && !screenreader) {
+			send_to_char("\r\n", ch);
+		}
+	}
+	else if (!str_cmp(argument, "all on")) {
+		// turn ON all bits that have names
+		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
+			SET_BIT(GET_FIGHT_MESSAGES(ch), BIT(iter));
+		}
+		msg_to_char(ch, "You toggle all fight messages \tgon\t0.\r\n");
+	}
+	else if (!str_cmp(argument, "all off")) {
+		// turn ON all bits that have names
+		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
+			REMOVE_BIT(GET_FIGHT_MESSAGES(ch), BIT(iter));
+		}
+		msg_to_char(ch, "You toggle all fight messages \troff\t0.\r\n");
+	}
+	else if (type == NOTHING) {
+		msg_to_char(ch, "Unknown fight message type '%s'.\r\n", argument);
+	}
+	else {
+		on = !SHOW_FIGHT_MESSAGES(ch, BIT(type));
+		if (on) {
+			SET_BIT(GET_FIGHT_MESSAGES(ch), BIT(type));
+		}
+		else {
+			REMOVE_BIT(GET_FIGHT_MESSAGES(ch), BIT(type));
+		}
+		
+		msg_to_char(ch, "You toggle '%s' %s\t0.\r\n", combat_message_types[type], on ? "\tgon" : "\troff");
 	}
 }
 

@@ -1653,6 +1653,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		rename(buf1, buf2);
 		
 		SAVE_CHAR(vict);
+		save_library_file_for_vnum(DB_BOOT_ACCT, GET_ACCOUNT(vict)->id);
 		sprintf(output, "%s's name changed to %s.", oldname, GET_NAME(vict));
 	}
 	
@@ -2079,8 +2080,10 @@ SHOW(show_skills) {
 	skill_data *skill;
 	char_data *vict;
 	bool found, is_file = FALSE;
+	int set;
 	
 	argument = one_argument(argument, arg);
+	skip_spaces(&argument);
 	
 	if (!(vict = find_or_load_player(arg, &is_file))) {
 		send_config_msg(ch, "no_person");
@@ -2096,6 +2099,13 @@ SHOW(show_skills) {
 		return;
 	}
 	
+	// detect "swap" arg
+	set = GET_CURRENT_SKILL_SET(vict);
+	if (*argument && is_abbrev(argument, "swap")) {
+		// note: this ONLY supports 2 different sets
+		set = (!set ? 1 : 0);
+	}
+	
 	msg_to_char(ch, "Skills for %s:\r\n", PERS(vict, ch, TRUE));
 	
 	HASH_ITER(hh, GET_SKILL_HASH(vict), plsk, next_plsk) {
@@ -2107,7 +2117,7 @@ SHOW(show_skills) {
 		HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
 			abil = plab->ptr;
 			
-			if (!plab->purchased) {
+			if (!plab->purchased[set]) {
 				continue;
 			}
 			if (ABIL_ASSIGNED_SKILL(abil) != skill) {
@@ -2126,7 +2136,8 @@ SHOW(show_skills) {
 	HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
 		abil = plab->ptr;
 		
-		if (!plab->purchased) {
+		// ALWAYS use current set for class abilities
+		if (!plab->purchased[GET_CURRENT_SKILL_SET(vict)]) {
 			continue;
 		}
 		if (ABIL_ASSIGNED_SKILL(abil) != NULL) {
@@ -6038,6 +6049,8 @@ ACMD(do_rescale) {
 
 
 ACMD(do_restore) {
+	void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
+	
 	ability_data *abil, *next_abil;
 	skill_data *skill, *next_skill;
 	struct cooldown_data *cool;
@@ -6091,7 +6104,8 @@ ACMD(do_restore) {
 			}
 			
 			HASH_ITER(hh, ability_table, abil, next_abil) {
-				add_ability(vict, abil, TRUE);
+				// add abilities to set 0
+				add_ability_by_set(vict, abil, 0, TRUE);
 			}
 
 			affect_total(vict);
@@ -6375,7 +6389,7 @@ ACMD(do_slay) {
 
 			// this would prevent the death
 			if (affected_by_spell(vict, ATYPE_PHOENIX_RITE)) {
-				affect_from_char(vict, ATYPE_PHOENIX_RITE);
+				affect_from_char(vict, ATYPE_PHOENIX_RITE, FALSE);
 			}
 
 			die(vict, ch);

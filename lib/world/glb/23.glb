@@ -1,9 +1,23 @@
 #2347
 Tier 2 Crafting Recipes~
-0 0 B 0 175-250
+0 0 B 0 175-274
+E
+-1 100.00
+0 0 0
 I 4 2347 1.00 1 c  # LOOT: the alchemical filter pattern
 I 4 2348 1.00 1 c  # LOOT: the antiquated device design
 I 4 2349 1.00 1 c  # LOOT: the concealed pouch pattern
 I 4 2350 1.00 1 c  # LOOT: the tinker's harness pattern
+S
+#2348
+Tier 3 Crafting Recipes~
+0 0 B 0 275-374
+E
+-1 100.00
+0 0 0
+I 4 2359 1.00 1 c  # LOOT: the smuggled olympian laurel branch pattern
+I 4 2360 1.00 1 c  # LOOT: the olympic silk recipe
+I 4 2361 1.00 1 c  # LOOT: the antique wonders pattern
+I 4 2362 1.00 1 c  # LOOT: the guild-forged hammerhead pattern
 S
 $

@@ -60,6 +60,10 @@ bool audit_global(struct global_data *glb, char_data *ch) {
 		olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "IN-DEVELOPMENT");
 		problem = TRUE;
 	}
+	if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) && IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CHOOSE_LAST)) {
+		olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Has both CUMULATIVE-PRC and CHOOSE-LAST");
+		problem = TRUE;
+	}
 	if (GET_GLOBAL_MIN_LEVEL(glb) > GET_GLOBAL_MAX_LEVEL(glb)) {
 		olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Min level is greater than max level");
 		problem = TRUE;

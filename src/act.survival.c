@@ -689,7 +689,7 @@ ACMD(do_nightsight) {
 	if (affected_by_spell(ch, ATYPE_NIGHTSIGHT)) {
 		msg_to_char(ch, "You end your nightsight.\r\n");
 		act("The glow in $n's eyes fades.", TRUE, ch, NULL, NULL, TO_ROOM);
-		affect_from_char(ch, ATYPE_NIGHTSIGHT);
+		affect_from_char(ch, ATYPE_NIGHTSIGHT, FALSE);
 	}
 	else if (!can_use_ability(ch, ABIL_NIGHTSIGHT, NOTHING, 0, NOTHING)) {
 		return;

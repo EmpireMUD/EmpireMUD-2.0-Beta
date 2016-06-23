@@ -659,8 +659,9 @@ struct attack_hit_type {
 	const char *singular;	// You "slash"
 	const char *plural;	// $n "slashes"
 	double speed[NUM_SPEEDS];	// { fast, normal, slow }
-	int weapon_type;	// WEAPON_x
-	int damage_type;	// DAM_x
+	int weapon_type;	// WEAPON_ type
+	int damage_type;	// DAM_ type
+	bool disarmable;	// whether or not disarm works
 };
 
 
@@ -708,11 +709,25 @@ static inline int get_skill_resets(char_data *ch, any_vnum skill) {
 /**
 * @param char_data *ch The player to check.
 * @param any_vnum abil_id Any valid ability.
+* @param int skill_set Which skill set number (0..NUM_SKILL_SETS-1).
+* @return bool TRUE if the player has the ability; FALSE if not.
+*/
+static inline bool has_ability_in_set(char_data *ch, any_vnum abil_id, int skill_set) {
+	struct player_ability_data *data = get_ability_data(ch, abil_id, 0);
+	return data && data->purchased[skill_set];
+}
+
+
+/**
+* Look up skill in the player's current set.
+*
+* @param char_data *ch The player to check.
+* @param any_vnum abil_id Any valid ability.
 * @return bool TRUE if the player has the ability; FALSE if not.
 */
 static inline bool has_ability(char_data *ch, any_vnum abil_id) {
-	struct player_ability_data *data = get_ability_data(ch, abil_id, 0);
-	return data && data->purchased;
+	// GET_CURRENT_SKILL_SET(ch) not available here
+	return has_ability_in_set(ch, abil_id, ch->player_specials->current_skill_set);
 }
 
 

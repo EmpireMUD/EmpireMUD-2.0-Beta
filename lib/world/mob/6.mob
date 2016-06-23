@@ -1,0 +1,99 @@
+#602
+necrovandal vandal cultist~
+the necrovandal~
+A necrovandal cultist skulks about beneath a midnight-blue, hooded robe.
+~
+50 75 bdovx c
+1 0 0 19
+T 602
+S
+#610
+horse talking~
+a talking horse~
+A horse looks up from the grass and greets you by name.
+~
+10 20 dejo 0
+0 0 14 11
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 607 100.00 2  # SKIN: a shimmering hide
+I 3 611 100.00 1 X  # BARDE: a talking warhorse
+T 610
+S
+#611
+warhorse horse armored talking~
+a talking warhorse~
+An armored warhorse shouts its battle cry.
+~
+40 80 bdej 0
+0 0 0 11
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 607 100.00 2  # SKIN: a shimmering hide
+I 4 175 100.00 4  # LOOT: an iron ingot
+I 4 175 75.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+I 4 175 50.00 2  # LOOT: an iron ingot
+T 611
+S
+#612
+bunny talking~
+a talking bunny~
+A bunny thumps its foot and asks you for the time.
+~
+1 5 djo 0
+0 0 15 9
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 607 100.00 1  # SKIN: a shimmering hide
+T 612
+S
+#613
+bear singing~
+a singing bear~
+A bear is dancing around and singing a tune.
+~
+20 40 dgjkoy c
+0 0 0 10
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 607 100.00 2  # SKIN: a shimmering hide
+T 613
+S
+#614
+tree walking~
+a walking tree~
+A tree has uprooted itself and is walking around.
+~
+20 30 dho 0
+0 0 33 15
+I 4 120 100.00 1  # LOOT: a large tree
+T 614
+S
+#615
+pixy pixie feral~
+a feral pixy~
+A feral pixy swoops down at you from the trees.
+~
+30 50 doxz 0
+0 0 2 9
+I 4 103 20.00 1 g  # LOOT: a yellow lightning stone
+I 4 104 20.00 1 g  # LOOT: a red bloodstone
+I 4 1300 20.00 1 g  # LOOT: a glowing green seashell
+I 4 1206 20.00 1 g  # LOOT: an iridescent blue iris
+T 615
+S
+#616
+pixy pixie queen~
+a pixy queen~
+A pixy queen is buzzing around your head.
+~
+30 50 dxzA 0
+2 0 2 9
+I 4 103 20.00 1 g  # LOOT: a yellow lightning stone
+I 4 104 20.00 1 g  # LOOT: a red bloodstone
+I 4 1300 20.00 1 g  # LOOT: a glowing green seashell
+I 4 1206 20.00 1 g  # LOOT: an iridescent blue iris
+T 616
+S
+$

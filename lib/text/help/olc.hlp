@@ -124,6 +124,9 @@ Augments (AUGEDIT):
   a re-usable augment.
 - Unlike crafts, it is safe to use SCALABLE items as resources and requires-
   objects, because augments are instant and non-refundable.
+- CUMULATIVE-PRC and CHOOSE-LAST are not compatible. If you want a 100% last-
+  choice for a cumulative set, give it 100% non-cumulative and the choose-last
+  flag. If no cumulative choice is picked, it will be chosen.
 
 Buildings (BEDIT):
 - Designated rooms are also built in the building editor, using the ROOM flag.
@@ -1914,6 +1917,9 @@ Available flags:
  IN-DEVELOPMENT - Will not be used live.
  ADVENTURE-ONLY - This global table will only apply to the adventure it's in.
  CUMULATIVE-PRC - Percent check will be cumulative.
+ CHOOSE-LAST - The first choose-last global that passes the percent check will
+    be saved for later, and only used if no other global succeeds. This can
+    be used to create 100% "choose if nothing else passes" final cases.
 
 See also: GEDIT PERCENT, OLC GLOBALS
 #d
@@ -2458,6 +2464,9 @@ Available mob flags:
  !LOOT - Will not drop any loot.
  !TELEPORT - Cannot teleport to this mob.
  !EXP - Players get no experience from using abilities against this mob.
+ !RESCALE - Mob will not rescale after its initial scaling, e.g. if you set
+    specific attributes on it after it loaded. Note that it will still scale
+    the first time, so ensure that it is scaled before changing attributes.
 
 See also: OLC MOBILES
 #d
@@ -4686,7 +4695,7 @@ The following special codes may be used in icons:
 
 The following special colors may be used in icons:
  &&? - The tile color of the base terrain.
- &&V - Wall color (walls are colored by enchantments).
+ &&# - Wall color (walls are colored by enchantments).
 #d
 "STRING EDITOR" "TEXT EDITOR" "STRING EDITING" ,
 

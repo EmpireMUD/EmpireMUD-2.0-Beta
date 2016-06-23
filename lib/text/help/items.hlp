@@ -240,7 +240,7 @@ Most recipes require a specific one of these, but a few accept any of them.
 magic, basic:  iris, bloodstone, seashell, lightning stone
 magic, refined:  prismatic crystals
 
-See also: COMPONENT
+See also: COMPONENT, PRISMATIC CRYSTAL
 #
 "GLOWING GREEN SEASHELL" "GLOWING SEASHELL" "GREEN SEASHELL" SEASHELL
 
@@ -272,7 +272,9 @@ Create a handle using the craft command.
 Handles are used in forging and crafting to provide a grasping surface to a
 tool or weapon. The most basic handles are made from sticks.
 
-See also: COMPONENT, CRAFT, FORGE
+The more advanced elegant handle can be made from magic wood.
+
+See also: COMPONENT, CRAFT, FORGE, EXQUISITE WOODWORKING
 #
 HERB HERBS "HERB COMPONENT"
 
@@ -334,7 +336,7 @@ Leather (component)
 
 Leather is a component type used in many sewing recipes.
 
-See also: COMPONENT, TAN, SKIN
+See also: COMPONENT, TAN, SKIN, VERDANT LEATHERS
 #
 "LIGHTNING STONE" "YELLOW LIGHTNING STONE" "YELLOW STONE"
 
@@ -354,7 +356,25 @@ Lumber is a component type created by sawing logs or trees at a lumber yard. It
 is used for many buildings. If a recipe calls for lumber, any type of lumber is
 usually fine.
 
-See also: COMPONENT, CHOP, SAW
+See also: COMPONENT, CHOP, MAGEWOOD, SAW
+#
+MAGEWOOD "MAGE WOOD" "ENCHANTED TREE" "ENCHANTED FOREST" "ENCHANTED WOODS" "ENCHANTED COPSE" "CRYSTAL SEED" "PRISMATIC SEED" "STRANGE CRYSTAL SEED"
+
+Magewood is a type of lumber sawn from the trees of the enchanted forest. This
+type of forest is extremely rare. To grow it, you must find the strange crystal
+seed, enchant it (Enchant Tools), plant it, then use the chant of nature to
+grow it.
+
+Enchanted Forests are protected from over-chopping because they will grow back
+even from stumps. Be sure to claim the forest, though, as necrovandal cultists
+will quickly detect and destroy any unclaimed enchanted forest tiles.
+
+The only way to remove the forest tiles is to abandon them and let the necro-
+vandals destroy them.
+
+This wood is generally used in crafts in the 200-300 level range.
+
+See also: ABANDON, CHOP, CLAIM, ENCHANT TOOLS, SAW
 #
 METALS INGOTS BARS "METAL COMPONENT"
 
@@ -589,7 +609,7 @@ You can weave cotton or wool into cloth. It will go faster if you're at a Tailor
 You can use any type of cloth if a recipe calls for a (textile), but some recipes
 may need a specific type.
 
-See also: COMPONENT, CLOTH, WEAVE, COTTON, WOOL, TAILOR
+See also: COMPONENT, CLOTH, COTTON, HERBCLOTH WEAVING, TAILOR, WEAVE, WOOL
 #
 "TRADE COMMAND"
 

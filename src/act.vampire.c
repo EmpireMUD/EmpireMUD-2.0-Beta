@@ -80,7 +80,7 @@ void cancel_blood_upkeeps(char_data *ch) {
 				snprintf(buf, sizeof(buf), "$n's %s effect fades.", affect_types[aff->type]);
 				act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 				
-				affect_from_char(ch, aff->type);
+				affect_from_char(ch, aff->type, FALSE);
 				any = TRUE;
 				break;	// this removes multiple affs so it's not safe to continue on the list
 			}
@@ -167,7 +167,7 @@ bool check_vampire_sun(char_data *ch, bool message) {
 // for do_alacrity
 void end_alacrity(char_data *ch) {
 	if (affected_by_spell(ch, ATYPE_ALACRITY)) {
-		affect_from_char(ch, ATYPE_ALACRITY);
+		affect_from_char(ch, ATYPE_ALACRITY, FALSE);
 		msg_to_char(ch, "Your supernatural alacrity fades.\r\n");
 		if (!AFF_FLAGGED(ch, AFF_HASTE)) {
 			act("$n seems to slow down.", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -184,7 +184,7 @@ void end_alacrity(char_data *ch) {
 void end_boost(char_data *ch) {
 	if (affected_by_spell(ch, ATYPE_BOOST)) {
 		msg_to_char(ch, "Your boost fades.\r\n");
-		affect_from_char(ch, ATYPE_BOOST);
+		affect_from_char(ch, ATYPE_BOOST, FALSE);
 	}
 }
 
@@ -192,7 +192,7 @@ void end_boost(char_data *ch) {
 // for do_majesty: shuts off majesty
 void end_majesty(char_data *ch) {
 	if (AFF_FLAGGED(ch, AFF_MAJESTY)) {
-		affects_from_char_by_aff_flag(ch, AFF_MAJESTY);
+		affects_from_char_by_aff_flag(ch, AFF_MAJESTY, FALSE);
 		if (!AFF_FLAGGED(ch, AFF_MAJESTY)) {
 			msg_to_char(ch, "You reduce your supernatural majesty.\r\n");
 			act("$n seems less majestic now.", TRUE, ch, 0, 0, TO_ROOM);
@@ -262,7 +262,7 @@ void make_vampire(char_data *ch, bool lore) {
 // for do_claws
 void retract_claws(char_data *ch) {
 	if (AFF_FLAGGED(ch, AFF_CLAWS)) {
-		affects_from_char_by_aff_flag(ch, AFF_CLAWS);
+		affects_from_char_by_aff_flag(ch, AFF_CLAWS, FALSE);
 		if (!AFF_FLAGGED(ch, AFF_CLAWS)) {
 			msg_to_char(ch, "Your claws meld back into your fingers!\r\n");
 			act("$n's claws meld back into $s fingers!", TRUE, ch, 0, 0, TO_ROOM);
@@ -369,7 +369,7 @@ void taste_blood(char_data *ch, char_data *vict) {
 */
 void un_mummify(char_data *ch) {
 	if (AFF_FLAGGED(ch, AFF_MUMMIFY)) {
-		affects_from_char_by_aff_flag(ch, AFF_MUMMIFY);
+		affects_from_char_by_aff_flag(ch, AFF_MUMMIFY, FALSE);
 		if (!AFF_FLAGGED(ch, AFF_MUMMIFY)) {
 			msg_to_char(ch, "Your flesh softens and the mummified layers flake off!\r\n");
 			act("$n sheds a layer of skin and appears normal again!", TRUE, ch, 0, 0, TO_ROOM);
@@ -386,7 +386,7 @@ void un_mummify(char_data *ch) {
 */
 void un_deathshroud(char_data *ch) {
 	if (AFF_FLAGGED(ch, AFF_DEATHSHROUD)) {
-		affects_from_char_by_aff_flag(ch, AFF_DEATHSHROUD);
+		affects_from_char_by_aff_flag(ch, AFF_DEATHSHROUD, FALSE);
 		if (!AFF_FLAGGED(ch, AFF_DEATHSHROUD)) {
 			msg_to_char(ch, "Your flesh returns to normal!\r\n");
 			act("$n appears normal again!", TRUE, ch, 0, 0, TO_ROOM);
@@ -553,7 +553,7 @@ void update_vampire_sun(char_data *ch) {
 			sun_message(ch);
 		}
 		found = TRUE;
-		affect_from_char(ch, ATYPE_BOOST);
+		affect_from_char(ch, ATYPE_BOOST, FALSE);
 	}
 	
 	// lastly
@@ -727,7 +727,7 @@ ACMD(do_bloodsweat) {
 		}
 		
 		if (affected_by_spell(ch, ATYPE_POISON)) {
-			affect_from_char(ch, ATYPE_POISON);
+			affect_from_char(ch, ATYPE_POISON, FALSE);
 			any = TRUE;
 		}
 		
@@ -1377,7 +1377,7 @@ ACMD(do_soulmask) {
 
 	if (affected_by_spell(ch, ATYPE_SOULMASK)) {
 		msg_to_char(ch, "You turn off your soulmask.\r\n");
-		affect_from_char(ch, ATYPE_SOULMASK);
+		affect_from_char(ch, ATYPE_SOULMASK, FALSE);
 		command_lag(ch, WAIT_OTHER);
 		return;
 	}

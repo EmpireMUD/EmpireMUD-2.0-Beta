@@ -329,6 +329,27 @@ const char *extra_attribute_types[] = {
 };
 
 
+// FM_x: combat messages
+const char *combat_message_types[] = {
+	"my hits",	// 0
+	"my misses",
+	"hits against me",
+	"misses against me",
+	"ally hits",
+	"ally misses",		// 5
+	"hits against allies",
+	"misses against allies",
+	"hits against target",
+	"misses against target",
+	"hits against tank",	// 10
+	"misses against tank",
+	"other hits",
+	"other misses",
+	"autodiagnose",
+	"\n"
+};
+
+
 // GRANT_x
 const char *grant_bits[] = {
 	"advance",
@@ -1448,6 +1469,7 @@ const char *action_bits[] = {
 	"!LOOT",
 	"!TELEPORT",
 	"!EXP",
+	"!RESCALE",
 	"\n"
 };
 
@@ -1487,6 +1509,7 @@ const char *mob_move_types[] = {
 	"drifts",
 	"bounces",
 	"flows",
+	"leaves",
 	"\n"
 };
 
@@ -1999,36 +2022,36 @@ const char *obj_custom_types[] = {
 // Weapon attack texts -- TYPE_x
 struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES] = {
 	// * lower numbers are better for speeds (seconds between attacks)
-	// name, singular, plural, { fast spd, normal spd, slow spd }, WEAPON_x, DAM_x
-	{ "RESERVED", "hit", "hits", { 1.8, 2.0, 2.2 }, WEAPON_BLUNT, DAM_PHYSICAL },
-	{ "slash", "slash", "slashes", { 2.6, 2.8, 3.0 }, WEAPON_SHARP, DAM_PHYSICAL },
-	{ "slice", "slice", "slices", { 3.0, 3.2, 3.4 }, WEAPON_SHARP, DAM_PHYSICAL },
-	{ "jab", "jab", "jabs", { 2.6, 2.8, 3.0 }, WEAPON_SHARP, DAM_PHYSICAL },
-	{ "stab", "stab", "stabs", { 2.0, 2.2, 2.4 }, WEAPON_SHARP, DAM_PHYSICAL },
-	{ "pound", "pound", "pounds", { 3.4, 3.6, 3.8 }, WEAPON_BLUNT, DAM_PHYSICAL },
-	{ "hammer", "hammer", "hammers", { 3.4, 3.6, 3.8 }, WEAPON_BLUNT, DAM_PHYSICAL },
-	{ "whip", "whip", "whips", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL },
-	{ "pick", "jab", "jabs", { 3.4, 3.6, 3.8 }, WEAPON_SHARP, DAM_PHYSICAL },
-	{ "bite", "bite", "bites", { 2.2, 2.4, 2.6 }, WEAPON_SHARP, DAM_PHYSICAL },
-	{ "claw", "claw", "claws", { 2.4, 2.6, 2.8 }, WEAPON_SHARP, DAM_PHYSICAL },
-	{ "kick", "kick", "kicks", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL },
-	{ "fire", "burn", "burns", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_FIRE },
-	{ "vampire claws", "claw", "claws", { 2.4, 2.6, 2.8 }, WEAPON_SHARP, DAM_PHYSICAL },
-	{ "crush", "crush", "crushes", { 3.6, 3.8, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL },
-	{ "hit", "hit", "hits", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL },
-	{ "magic fire", "blast", "blasts", { 3.6, 3.8, 4.0 }, WEAPON_MAGIC, DAM_MAGICAL },
-	{ "lightning staff", "zap", "zaps", { 2.2, 2.5, 2.8 }, WEAPON_MAGIC, DAM_MAGICAL },
-	{ "burn staff", "burn", "burns", { 2.6, 2.9, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL },
-	{ "agony staff", "agonize", "agonizes", { 3.3, 3.6, 3.9 }, WEAPON_MAGIC, DAM_MAGICAL },
-	{ "magic frost", "chill", "chills", { 4.1, 4.3, 4.5 }, WEAPON_MAGIC, DAM_MAGICAL },
-	{ "magic shock", "shock", "shocks", { 2.6, 2.8, 3.0 }, WEAPON_MAGIC, DAM_MAGICAL },
-	{ "magic light", "flash", "flashes", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL },
-	{ "sting", "sting", "stings", { 3.6, 3.8, 4.0 }, WEAPON_SHARP, DAM_PHYSICAL },
-	{ "swipe", "swipe", "swipes", { 3.6, 3.8, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL },
-	{ "tail swipe", "swipe", "swipes", { 4.0, 4.2, 4.4 }, WEAPON_BLUNT, DAM_PHYSICAL },
-	{ "peck", "peck", "pecks", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL },
-	{ "gore", "gore", "gores", { 3.9, 4.1, 4.3 }, WEAPON_BLUNT, DAM_PHYSICAL },
-	{ "mana blast", "blast", "blasts", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL }
+	// name, singular, plural, { fast spd, normal spd, slow spd }, WEAPON_, DAM_, disarmable
+	{ "RESERVED", "hit", "hits", { 1.8, 2.0, 2.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "slash", "slash", "slashes", { 2.6, 2.8, 3.0 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "slice", "slice", "slices", { 3.0, 3.2, 3.4 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "jab", "jab", "jabs", { 2.6, 2.8, 3.0 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "stab", "stab", "stabs", { 2.0, 2.2, 2.4 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "pound", "pound", "pounds", { 3.4, 3.6, 3.8 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
+	{ "hammer", "hammer", "hammers", { 3.4, 3.6, 3.8 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
+	{ "whip", "whip", "whips", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL, TRUE },
+	{ "pick", "jab", "jabs", { 3.4, 3.6, 3.8 }, WEAPON_SHARP, DAM_PHYSICAL, TRUE },
+	{ "bite", "bite", "bites", { 2.2, 2.4, 2.6 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
+	{ "claw", "claw", "claws", { 2.4, 2.6, 2.8 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
+	{ "kick", "kick", "kicks", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "fire", "burn", "burns", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_FIRE, TRUE },
+	{ "vampire claws", "claw", "claws", { 2.4, 2.6, 2.8 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
+	{ "crush", "crush", "crushes", { 3.6, 3.8, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "hit", "hit", "hits", { 2.8, 3.0, 3.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "magic fire", "blast", "blasts", { 3.6, 3.8, 4.0 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "lightning staff", "zap", "zaps", { 2.2, 2.5, 2.8 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "burn staff", "burn", "burns", { 2.6, 2.9, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "agony staff", "agonize", "agonizes", { 3.3, 3.6, 3.9 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "magic frost", "chill", "chills", { 4.1, 4.3, 4.5 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "magic shock", "shock", "shocks", { 2.6, 2.8, 3.0 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "magic light", "flash", "flashes", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, TRUE },
+	{ "sting", "sting", "stings", { 3.6, 3.8, 4.0 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
+	{ "swipe", "swipe", "swipes", { 3.6, 3.8, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "tail swipe", "swipe", "swipes", { 4.0, 4.2, 4.4 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "peck", "peck", "pecks", { 2.6, 2.8, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "gore", "gore", "gores", { 3.9, 4.1, 4.3 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "mana blast", "blast", "blasts", { 2.8, 3.0, 3.2 }, WEAPON_MAGIC, DAM_MAGICAL, FALSE }
 };
 
 
@@ -3219,6 +3242,7 @@ const char *global_flags[] = {
 	"IN-DEVELOPMENT",
 	"ADVENTURE-ONLY",
 	"CUMULATIVE-PRC",
+	"CHOOSE-LAST",
 	"\n"
 };
 

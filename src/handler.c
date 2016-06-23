@@ -89,14 +89,20 @@ static int extractions_pending = 0;
 *
 * @param char_data *ch The person to remove affects from.
 * @param int type Any ATYPE_ const
+* @param bool show_msg If TRUE, will show the wears-off message.
 */
-void affect_from_char(char_data *ch, int type) {
+void affect_from_char(char_data *ch, int type, bool show_msg) {
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *hjp, *next;
+	bool shown = FALSE;
 
 	for (hjp = ch->affected; hjp; hjp = next) {
 		next = hjp->next;
 		if (hjp->type == type) {
+			if (show_msg && !shown) {
+				show_wear_off_msg(ch, type);
+				shown = TRUE;
+			}
 			affect_remove(ch, hjp);
 		}
 	}
@@ -105,6 +111,10 @@ void affect_from_char(char_data *ch, int type) {
 	for (dot = ch->over_time_effects; dot; dot = next_dot) {
 		next_dot = dot->next;
 		if (dot->type == type) {
+			if (show_msg && !shown) {
+				show_wear_off_msg(ch, type);
+				shown = TRUE;
+			}
 			dot_remove(ch, dot);
 		}
 	}
@@ -117,13 +127,19 @@ void affect_from_char(char_data *ch, int type) {
 * @param char_data *ch The person to remove affects from.
 * @param int type Any ATYPE_ const to match.
 * @param int apply Any APPLY_ const to match.
+* @param bool show_msg If TRUE, will show the wears-off message.
 */
-void affect_from_char_by_apply(char_data *ch, int type, int apply) {
+void affect_from_char_by_apply(char_data *ch, int type, int apply, bool show_msg) {
 	struct affected_type *aff, *next_aff;
+	bool shown = FALSE;
 
 	for (aff = ch->affected; aff; aff = next_aff) {
 		next_aff = aff->next;
 		if (aff->type == type && aff->location == apply) {
+			if (show_msg && !shown) {
+				show_wear_off_msg(ch, type);
+				shown = TRUE;
+			}
 			affect_remove(ch, aff);
 		}
 	}
@@ -136,13 +152,44 @@ void affect_from_char_by_apply(char_data *ch, int type, int apply) {
 * @param char_data *ch The person to remove affects from.
 * @param int type Any ATYPE_ const to match.
 * @param bitvector_t bits Any AFF_ bit(s) to match.
+* @param bool show_msg If TRUE, will show the wears-off message.
 */
-void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits) {
+void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits, bool show_msg) {
 	struct affected_type *aff, *next_aff;
+	bool shown = FALSE;
 
 	for (aff = ch->affected; aff; aff = next_aff) {
 		next_aff = aff->next;
 		if (aff->type == type && IS_SET(aff->bitvector, bits)) {
+			if (show_msg && !shown) {
+				show_wear_off_msg(ch, type);
+				shown = TRUE;
+			}
+			affect_remove(ch, aff);
+		}
+	}
+}
+
+
+/**
+* Calls affect_remove on every affect of type "type" with location "apply".
+*
+* @param char_data *ch The person to remove affects from.
+* @param int type Any ATYPE_ const to match.
+* @param char_data *caster The person whose affects to remove.
+* @param bool show_msg If TRUE, will send the wears-off message.
+*/
+void affect_from_char_by_caster(char_data *ch, int type, char_data *caster, bool show_msg) {
+	struct affected_type *aff, *next_aff;
+	bool shown = FALSE;
+	
+	LL_FOREACH_SAFE(ch->affected, aff, next_aff) {
+		if (aff->type == type && aff->cast_by == CAST_BY_ID(caster)) {
+			if (show_msg && !shown) {
+				show_wear_off_msg(ch, type);
+				shown = TRUE;
+			}
+			
 			affect_remove(ch, aff);
 		}
 	}
@@ -156,15 +203,16 @@ void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits) {
 *
 * @param char_data *ch The person to remove from.
 * @param bitvector_t aff_flag Any AFF_x flags to remove.
+* @param bool show_msg If TRUE, will show the wears-off message.
 */
-void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag) {
+void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag, bool show_msg) {
 	struct affected_type *af, *next_af;
 	
 	for (af = ch->affected; af; af = next_af) {
 		next_af = af->next;
 		if (IS_SET(af->bitvector, aff_flag)) {
 			// calling it this way removes ALL affects of that ability
-			affect_from_char(ch, af->type);
+			affect_from_char(ch, af->type, show_msg);
 		}
 	}
 }
@@ -288,7 +336,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_WITS(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
 			break;
 		case APPLY_AGE:
-			ch->player.time.birth -= (mod * SECS_PER_MUD_YEAR);
+			SAFE_ADD(ch->player.time.birth, -(mod * SECS_PER_MUD_YEAR), LONG_MIN, LONG_MAX, TRUE);
 			break;
 		case APPLY_MOVE:
 			SAFE_ADD(GET_MAX_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
@@ -782,6 +830,20 @@ bool room_affected_by_spell(room_data *room, int type) {
 	}
 
 	return found;
+}
+
+
+/**
+* Shows the affect-wear-off message for a given type.
+*
+* @param char_data *ch The person wearing off of.
+* @param int atype The ATYPE_ affect type.
+*/
+void show_wear_off_msg(char_data *ch, int atype) {
+	extern const char *affect_wear_off_msgs[];
+	if (*affect_wear_off_msgs[atype] && ch->desc) {
+		msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', affect_wear_off_msgs[atype]);
+	}
 }
 
 
@@ -2982,7 +3044,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
 	bool any = FALSE, done_cumulative = FALSE;
-	struct global_data *glb, *next_glb;
+	struct global_data *glb, *next_glb, *choose_last;
 	int cumulative_prc;
 	adv_data *adv;
 	
@@ -2993,6 +3055,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 	
 	adv = get_adventure_for_vnum(GET_MOB_VNUM(mob));
 	cumulative_prc = number(1, 10000);
+	choose_last = NULL;
 
 	HASH_ITER(hh, globals_table, glb, next_glb) {
 		if (GET_GLOBAL_TYPE(glb) != GLOBAL_MOB_INTERACTIONS) {
@@ -3046,7 +3109,22 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 		}
 		
 		// we have a match!
+		
+		// check choose-last
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CHOOSE_LAST)) {
+			if (!choose_last) {
+				choose_last = glb;
+			}
+			continue;
+		}
+		
+		// not choose-last: run it
 		any |= run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), type, IN_ROOM(ch), mob, NULL, func);
+	}
+	
+	// do the choose-last
+	if (choose_last && !any) {
+		any |= run_interactions(ch, GET_GLOBAL_INTERACTIONS(choose_last), type, IN_ROOM(ch), mob, NULL, func);
 	}
 	
 	return any;

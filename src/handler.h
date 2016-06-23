@@ -54,10 +54,11 @@
 //// handler.c protos ////////////////////////////////////////////////////////
 
 // affect handlers
-void affect_from_char(char_data *ch, int type);
-void affect_from_char_by_apply(char_data *ch, int type, int apply);
-void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits);
-void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag);
+void affect_from_char(char_data *ch, int type, bool show_msg);
+void affect_from_char_by_apply(char_data *ch, int type, int apply, bool show_msg);
+void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits, bool show_msg);
+void affect_from_char_by_caster(char_data *ch, int type, char_data *caster, bool show_msg);
+void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag, bool show_msg);
 void affect_from_room(room_data *room, int type);
 void affect_join(char_data *ch, struct affected_type *af, int flags);
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add);
@@ -72,6 +73,7 @@ extern struct affected_type *create_aff(int type, int duration, int location, in
 void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
 void dot_remove(char_data *ch, struct over_time_effect_type *dot);
 extern bool room_affected_by_spell(room_data *room, int type);
+void show_wear_off_msg(char_data *ch, int atype);
 
 // affect shortcut macros
 #define create_flag_aff(type, duration, bit, cast_by)  create_aff((type), (duration), APPLY_NONE, 0, (bit), (cast_by))
