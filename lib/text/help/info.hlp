@@ -905,7 +905,7 @@ building, or vehicle name. It will scan a distance up to your mapsize.
 
 Example:
  > scan southwest
- southwest: River, River, River, Swamp, Overgrown Forest, Road, Overgrown Forest, Jungle, Jungle
+ southwest: 3x River, Swamp, Overgrown Forest, Road, Overgrown Forest, 2x Jungle
 
 See also: MAPSIZE, SCREEN-READERS
 #

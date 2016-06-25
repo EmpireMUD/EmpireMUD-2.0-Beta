@@ -222,6 +222,9 @@ Used for:  sewing
 
 Fur is a component type primarily used for clothing and mage armor.
 
+small:  fox fur
+large:  big cat pelt
+
 See also: COMPONENT, SEW, SKIN COMMAND
 #
 GEMS "GEM COMPONENT"
