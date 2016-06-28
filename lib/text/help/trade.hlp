@@ -780,13 +780,11 @@ SHIP SHIPS
 (Disambiguation: Did you mean HELP SHIP COMMAND ?)
 
 The most efficient form of ocean travel, ships can be sailed at a fixed speed
-(with 'sail <direction>'), consuming no moves. Multiple players can combine
-their efforts to sail a single ship faster.
+(with 'sail <direction>'), consuming no moves.
 
-Ships can be used to manually transport resources, though you should be wary of
-leaving them unattended, as autostorage while at sea (though slower) will cause
-the ship's cargo to be permanently lost. Each room of a ship can hold up to 404
-items, but large items count twice each as if they were kept in your inventory.
+Ships can be used to manually transport resources, but items inside a ship's
+storage hold (via 'put <item> [in] <ship>') will auto-store to the empire's
+main island if the ship is left alone at sea.
 
 Ships can also be used to transport resources automatically using the ship
 command.
