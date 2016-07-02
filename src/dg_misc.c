@@ -187,13 +187,13 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int script_type, char *cmd) {
 	extern const char *room_aff_bits[];
 	
-	int value = 0, duration = 0;
 	char junk[MAX_INPUT_LENGTH]; /* will be set to "dg_affect_room" */
 	char roomname[MAX_INPUT_LENGTH], property[MAX_INPUT_LENGTH];
 	char value_p[MAX_INPUT_LENGTH], duration_p[MAX_INPUT_LENGTH];
 	bitvector_t i = 0, type = 0;
 	struct affected_type af;
 	room_data *room = NULL;
+	int duration = 0;
 
 	half_chop(cmd, junk, cmd);
 	half_chop(cmd, roomname, cmd);
@@ -205,8 +205,7 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 		script_log("Trigger: %s, VNum %d. dg_affect_room usage: <room> <property> <on|off> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		return;
 	}
-
-	value = atoi(value_p);
+	
 	duration = atoi(duration_p);
 	if (duration == 0 || duration < -1) {
 		script_log("Trigger: %s, VNum %d. dg_affect_room: need positive duration!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
