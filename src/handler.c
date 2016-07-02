@@ -6053,6 +6053,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	obj = read_object(store->vnum, TRUE);
 	available = store->amount - 1;	// for later
 	charge_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), store->vnum, 1);
+	scale_item_to_level(obj, 1);	// scale to its minimum
 
 	obj_to_char(obj, ch);
 	act("You retrieve $p.", FALSE, ch, obj, 0, TO_CHAR);
