@@ -3169,7 +3169,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'p': {	// char.p*
-					if (!str_cmp(field, "pc_name")) {
+					if (!str_cmp(field, "parse_dir")) {
+						if (subfield && *subfield) {
+							int dir;
+							if ((dir = parse_direction(c, subfield)) != NO_DIR) {
+								snprintf(str, slen, "%s", dirs[dir]);	// real dir
+							}
+							else {
+								// bad direction -- just give them their arg back
+								snprintf(str, slen, "%s", subfield);
+							}
+						}
+						else {	// missing arg
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "pc_name")) {
 						snprintf(str, slen, "%s", GET_PC_NAME(c));
 					}
 					else if (!str_cmp(field, "plr_flagged")) {
