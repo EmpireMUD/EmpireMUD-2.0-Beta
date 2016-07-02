@@ -349,6 +349,7 @@ The following is a list of special commands that can be used in triggers:
 &cdefault&0 - Part of a switch statement.
 &cdetach&0 - Removes a trigger from something.
 &cdg_affect&0 - Adds a spell effect to a person.
+&cdg_affect_room&0 - Adds a spell effect to a room.
 &cdone&0 - Ends a switch or while statement.
 &celse&0 - Part of an if/elseif/else/end series of conditions.
 &celseif&0 - Part of an if/elseif/else/end series of conditions.

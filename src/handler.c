@@ -64,6 +64,7 @@
 */
 
 // externs
+extern const char *affect_wear_off_msgs[];
 extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
 extern const char *drinks[];
 extern int get_north_for_char(char_data *ch);
@@ -231,6 +232,33 @@ void affect_from_room(room_data *room, int type) {
 		next = hjp->next;
 		if (hjp->type == type) {
 			affect_remove_room(room, hjp);
+		}
+	}
+}
+
+
+/**
+* Calls affect_remove_room on every affect of type "type" that sets AFF flag
+* "bits".
+*
+* @param room_data *rom The room to remove affects from.
+* @param int type Any ATYPE_ const to match.
+* @param bitvector_t bits Any AFF_ bit(s) to match.
+* @param bool show_msg If TRUE, shows the wear-off message.
+*/
+void affect_from_room_by_bitvector(room_data *room, int type, bitvector_t bits, bool show_msg) {
+	struct affected_type *aff, *next_aff;
+	bool shown = FALSE;
+	
+	LL_FOREACH_SAFE(ROOM_AFFECTS(room), aff, next_aff) {
+		if (aff->type == type && IS_SET(aff->bitvector, bits)) {
+			if (show_msg && !shown) {
+				if (*affect_wear_off_msgs[aff->type] && ROOM_PEOPLE(room)) {
+					act(affect_wear_off_msgs[aff->type], FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+				}
+				shown = TRUE;
+			}
+			affect_remove_room(room, aff);
 		}
 	}
 }
@@ -846,7 +874,6 @@ bool room_affected_by_spell(room_data *room, int type) {
 * @param int atype The ATYPE_ affect type.
 */
 void show_wear_off_msg(char_data *ch, int atype) {
-	extern const char *affect_wear_off_msgs[];
 	if (*affect_wear_off_msgs[atype] && ch->desc) {
 		msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', affect_wear_off_msgs[atype]);
 	}

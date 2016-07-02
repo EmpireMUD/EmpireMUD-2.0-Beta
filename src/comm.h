@@ -23,7 +23,7 @@ void msg_to_vehicle(vehicle_data *veh, bool awake_only, const char *messg, ...) 
 void olc_audit_msg(char_data *ch, any_vnum vnum, const char *messg, ...);
 void send_to_group(char_data *ch, struct group_data *group, const char * msg, ...) __attribute__ ((format (printf, 3, 4)));
 void send_to_room(const char *messg, room_data *room);
-void send_to_outdoor(const char *messg, ...) __attribute__((format(printf, 1, 2)));
+void send_to_outdoor(bool weather, const char *messg, ...) __attribute__((format(printf, 2, 3)));
 void perform_to_all(const char *messg, char_data *ch);
 void close_socket(descriptor_data *d);
 void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, bitvector_t act_flags);

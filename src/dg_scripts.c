@@ -5862,6 +5862,8 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 
 			else if (!strn_cmp(cmd, "dg_affect ", 10))
 				do_dg_affect(go, sc, trig, type, cmd);
+			else if (!strn_cmp(cmd, "dg_affect_room ", 15))
+				do_dg_affect_room(go, sc, trig, type, cmd);
 
 			else if (!strn_cmp(cmd, "global ", 7))
 				process_global(sc, trig, cmd, sc->context);

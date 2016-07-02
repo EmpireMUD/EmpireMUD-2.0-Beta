@@ -2582,7 +2582,7 @@ const char *room_aff_bits[] = {
 	"*PUBLIC",
 	"*DISMANTLING",
 	"!FLY",
-	"*",
+	"!WEATHER",
 	"*",
 	"*!WORK",
 	"!DISREPAIR",
