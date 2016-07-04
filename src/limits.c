@@ -357,7 +357,7 @@ void point_update_char(char_data *ch) {
 	}
 	
 	// bloody upkeep
-	if (IS_VAMPIRE(ch) && !IS_IMMORTAL(ch)) {
+	if (IS_VAMPIRE(ch) && !IS_IMMORTAL(ch) && !IS_NPC(ch)) {
 		GET_BLOOD(ch) -= MAX(0, GET_BLOOD_UPKEEP(ch));
 		
 		if (GET_BLOOD(ch) < 0) {
@@ -365,7 +365,7 @@ void point_update_char(char_data *ch) {
 			return;
 		}
 	}
-	else {	// not a vampire (or is imm)
+	else {	// not a vampire (or is imm/npc)
 		// don't gain blood whilst being fed upon
 		if (GET_FED_ON_BY(ch) == NULL) {
 			GET_BLOOD(ch) = MIN(GET_BLOOD(ch) + 1, GET_MAX_BLOOD(ch));
