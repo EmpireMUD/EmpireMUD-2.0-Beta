@@ -757,7 +757,7 @@ QCMD(qcmd_group) {
 
 QCMD(qcmd_info) {
 	extern char *quest_giver_string(struct quest_giver *giver, bool show_vnums);
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], *buf2;
 	struct instance_data *inst;
 	struct quest_giver *giver;
 	struct player_quest *pq;
@@ -797,6 +797,21 @@ QCMD(qcmd_info) {
 			}
 		}
 		if (*buf) {
+			if (strstr(buf, "#e") || strstr(buf, "#n") || strstr(buf, "#a")) {
+				// #n
+				buf2 = str_replace("#n", "<name>", buf);
+				strcpy(buf, buf2);
+				free(buf2);
+				// #e
+				buf2 = str_replace("#e", "<empire>", buf);
+				strcpy(buf, buf2);
+				free(buf2);
+				// #a
+				buf2 = str_replace("#a", "<empire>", buf);
+				strcpy(buf, buf2);
+				free(buf2);
+			}
+			
 			msg_to_char(ch, "Turn in at: %s.\r\n", buf);
 		}
 	}
