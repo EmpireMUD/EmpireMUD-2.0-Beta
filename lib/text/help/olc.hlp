@@ -2999,7 +2999,7 @@ to add modifiers to your component type.
 Available components (common flags listed in parentheses):
  &cadhesive&0 - not currently used
  &cbone&0 - not currently used
- &cblock&0 - builing materials like bricks or blocks
+ &cblock&0 - building materials like bricks or blocks
  &cclay&0 - moldable clay
  &cdye&0 - any kind of dye
  &cfeathers&0 - not currently used
