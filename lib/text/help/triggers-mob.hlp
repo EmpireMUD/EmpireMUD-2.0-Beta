@@ -337,7 +337,7 @@ When using field  - The variable returns:
 &ccarrying&0 - Size of character's inventory (items carried).
 &ccha&0 - The actor's Charisma.
 &cclass&0 - The actor's class, as a string.
-&ccompleted_quest(vnum)% - Whether or not the player has completed and
+&ccompleted_quest(vnum)&0 - Whether or not the player has completed and
    turned in that quest vnum.
 &ccrafting_level&0 - The actor's crafting level.
 &cdex&0 - The actor's Dexterity.

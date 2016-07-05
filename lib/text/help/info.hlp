@@ -36,7 +36,7 @@ Full multiplaying rules are found by typing POLICY.
 
 See also: ALTERNATE
 #
-ACTION ACTIONS CHORE CHORES "TIMED ACTION"
+ACTION ACTIONS CHORE CHORES "TIMED ACTIONS"
 
 EmpireMUD uses timed actions for most chores. These are things that happen
 over time until complete. Some of them will also automatically repeat when
@@ -905,7 +905,7 @@ building, or vehicle name. It will scan a distance up to your mapsize.
 
 Example:
  > scan southwest
- southwest: River, River, River, Swamp, Overgrown Forest, Road, Overgrown Forest, Jungle, Jungle
+ southwest: 3x River, Swamp, Overgrown Forest, Road, Overgrown Forest, 2x Jungle
 
 See also: MAPSIZE, SCREEN-READERS
 #

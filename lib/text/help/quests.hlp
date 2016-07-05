@@ -2,17 +2,19 @@ QUEST QUESTS
 
 Usage:  quest <command> <...>
 
-The following quest commands are available:
- &cquest check&0 - See what quests are available here.
- &cquest completed&0 - List quests you have finished.
- &cquest drop&0 - Cancel a quest you're on.
- &cquest finish&0 - Turn in one or more quests.
+The following quest commands are most commonly used:
+ &cquest check&0 - See what quests are &yavailable&0 here.
+ &cquest finish&0 - &yTurn in&0 one or more quests.
+ &cquest start&0 - &yBegin&0 a quest.
+ &cquest tracker&0 - Show the quest &yprogress&0 tracker for one quest you're on.
+ 
+The following quest commands are also available:
+ &cquest completed&0 - List quests you have &yfinished&0.
+ &cquest drop&0 - &yCancel&0 a quest you're on.
  &cquest group&0 - See which quests you share with group members.
- &cquest info&0 - See details on a quest you're on or one available here.
+ &cquest info&0 - See &ydetails&0 on a quest you're on or one available here.
  &cquest list&0 - Show your quests and progress.
  &cquest share&0 - Offer a quest to members of your group.
- &cquest start&0 - Begin a quest.
- &cquest tracker&0 - Show the quest tracker for one quest you're on.
 
 Hint: You can abbreviate "q t", or even alias these commands if you use them
 a lot.
