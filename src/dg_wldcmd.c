@@ -29,6 +29,7 @@
 extern const char *damage_types[];
 extern const char *alt_dirs[];
 extern const char *dirs[];
+extern struct instance_data *quest_instance_global;
 
 // external functions
 void send_char_pos(char_data *ch, int dam);
@@ -127,8 +128,15 @@ void act_to_room(char *str, room_data *room) {
 WCMD(do_wadventurecomplete) {
 	void mark_instance_completed(struct instance_data *inst);
 	
-	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
-		mark_instance_completed(COMPLEX_DATA(room)->instance);
+	struct instance_data *inst;
+	
+	inst = quest_instance_global;
+	if (!inst) {
+		inst = COMPLEX_DATA(room) ? COMPLEX_DATA(room)->instance : NULL;
+	}
+	
+	if (inst) {
+		mark_instance_completed(inst);
 	}
 }
 

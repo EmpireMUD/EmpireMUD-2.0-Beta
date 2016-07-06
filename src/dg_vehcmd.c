@@ -35,6 +35,7 @@
 extern const char *damage_types[];
 extern const char *alt_dirs[];
 extern const char *dirs[];
+extern struct instance_data *quest_instance_global;
 
 // external functions
 void die(char_data *ch, char_data *killer);
@@ -133,9 +134,15 @@ VCMD(do_vadventurecomplete) {
 	void mark_instance_completed(struct instance_data *inst);
 	
 	room_data *room = IN_ROOM(veh);
+	struct instance_data *inst;
 	
-	if (room && COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
-		mark_instance_completed(COMPLEX_DATA(room)->instance);
+	inst = quest_instance_global;
+	if (!inst) {
+		inst = (room && COMPLEX_DATA(room)) ? COMPLEX_DATA(room)->instance : NULL;
+	}
+	
+	if (inst) {
+		mark_instance_completed(inst);
 	}
 }
 

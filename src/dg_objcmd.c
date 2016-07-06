@@ -29,6 +29,7 @@
 extern const char *damage_types[];
 extern const char *dirs[];
 extern const char *alt_dirs[];
+extern struct instance_data *quest_instance_global;
 
 // external functions
 void obj_command_interpreter(obj_data *obj, char *argument);
@@ -141,10 +142,16 @@ room_data *obj_room(obj_data *obj) {
 OCMD(do_oadventurecomplete) {
 	void mark_instance_completed(struct instance_data *inst);
 	
+	struct instance_data *inst;
 	room_data *room = obj_room(obj);
 	
-	if (room && COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
-		mark_instance_completed(COMPLEX_DATA(room)->instance);
+	inst = quest_instance_global;
+	if (!inst) {
+		inst = (room && COMPLEX_DATA(room)) ? COMPLEX_DATA(room)->instance : NULL;
+	}
+	
+	if (inst) {
+		mark_instance_completed(inst);
 	}
 }
 
