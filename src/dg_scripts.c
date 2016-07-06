@@ -2353,7 +2353,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						char_data *miter, *found_mob = NULL;
 						mob_vnum vnum = atoi(subfield);
 						for (miter = character_list; miter && !found_mob; miter = miter->next) {
-							if (GET_MOB_VNUM(miter) == vnum) {
+							if (!EXTRACTED(miter) && GET_MOB_VNUM(miter) == vnum) {
 								if (MOB_INSTANCE_ID(miter) == inst->id || ROOM_INSTANCE(IN_ROOM(miter)) == inst) {
 									found_mob = miter;
 									break;
