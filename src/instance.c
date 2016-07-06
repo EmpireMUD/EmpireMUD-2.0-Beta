@@ -60,6 +60,7 @@ void unlink_instance_entrance(room_data *room);
 // local globals
 struct instance_data *instance_list = NULL;	// global instance list
 bool instance_save_wait = FALSE;	// prevents repeated instance saving
+struct instance_data *quest_instance_global = NULL;	// passes instances through to some quest triggers
 
 // ADV_LINK_x: whether or not a rule specifies a possible location (other types are for limits)
 const bool is_location_rule[] = {

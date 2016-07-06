@@ -50,6 +50,7 @@ extern const char *exit_bits[];
 extern const char *mob_move_types[];
 extern struct time_info_data time_info;
 extern const char *otrig_types[];
+extern struct instance_data *quest_instance_global;
 extern const char *trig_attach_types[];
 extern const char *trig_types[];
 extern const char *wtrig_types[];
@@ -2297,31 +2298,38 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 				struct instance_data *inst = NULL;
 				room_data *orm;
-				switch (type) {
-					case MOB_TRIGGER: {
-						// try mob first
-						if (MOB_INSTANCE_ID((char_data*)go) != NOTHING) {
-							inst = get_instance_by_id(MOB_INSTANCE_ID((char_data*)go));
+				
+				// prefer global instance if any (e.g. from a quest trigger)
+				if (quest_instance_global) {
+					inst = quest_instance_global;
+				}
+				else {
+					switch (type) {
+						case MOB_TRIGGER: {
+							// try mob first
+							if (MOB_INSTANCE_ID((char_data*)go) != NOTHING) {
+								inst = get_instance_by_id(MOB_INSTANCE_ID((char_data*)go));
+							}
+							if (!inst) {
+								inst = find_instance_by_room(IN_ROOM((char_data*)go), FALSE);
+							}
+							break;
 						}
-						if (!inst) {
-							inst = find_instance_by_room(IN_ROOM((char_data*)go), FALSE);
+						case OBJ_TRIGGER:
+							if ((orm = obj_room((obj_data*)go))) {
+								inst = find_instance_by_room(orm, FALSE);
+							}
+							break;
+						case WLD_TRIGGER:
+						case RMT_TRIGGER:
+						case BLD_TRIGGER:
+						case ADV_TRIGGER:
+							inst = find_instance_by_room((room_data*)go, FALSE);
+							break;
+						case VEH_TRIGGER: {
+							inst = find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE);
+							break;
 						}
-						break;
-					}
-					case OBJ_TRIGGER:
-						if ((orm = obj_room((obj_data*)go))) {
-							inst = find_instance_by_room(orm, FALSE);
-						}
-						break;
-					case WLD_TRIGGER:
-					case RMT_TRIGGER:
-					case BLD_TRIGGER:
-					case ADV_TRIGGER:
-						inst = find_instance_by_room((room_data*)go, FALSE);
-						break;
-					case VEH_TRIGGER: {
-						inst = find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE);
-						break;
 					}
 				}
 				

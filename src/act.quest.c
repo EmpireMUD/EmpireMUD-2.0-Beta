@@ -491,7 +491,7 @@ void show_quest_tracker(char_data *ch, struct player_quest *pq) {
 * @param struct instance_data *inst The associated instance, if any.
 */
 void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
-	extern int check_start_quest_trigger(char_data *actor, quest_data *quest);
+	extern int check_start_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
 	
 	char buf[MAX_STRING_LENGTH];
 	struct player_quest *pq;
@@ -502,7 +502,7 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
 	}
 	
 	// triggers
-	if (!check_start_quest_trigger(ch, qst)) {
+	if (!check_start_quest_trigger(ch, qst, inst)) {
 		return;
 	}
 	
