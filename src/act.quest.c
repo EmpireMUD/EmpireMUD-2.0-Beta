@@ -608,11 +608,12 @@ QCMD(qcmd_drop) {
 *
 * @param char_data *ch The player.
 * @param struct player_quest *pq The quest to attempt to finish.
+* @param struct instance_data *inst The associated instance, if any.
 * @param bool show_errors If FALSE, runs silently (e.g. trying to turn in all).
 */
-bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
+bool qcmd_finish_one(char_data *ch, struct player_quest *pq, struct instance_data *inst, bool show_errors) {
 	extern bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empire_data **giver_emp);
-	extern int check_finish_quest_trigger(char_data *actor, quest_data *quest);
+	extern int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
 	
 	quest_data *quest = quest_proto(pq->vnum);
 	empire_data *giver_emp = NULL;
@@ -652,7 +653,7 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 	}
 	
 	// triggers?
-	if (!check_finish_quest_trigger(ch, quest)) {
+	if (!check_finish_quest_trigger(ch, quest, inst)) {
 		return FALSE;
 	}
 	
@@ -664,7 +665,7 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 
 QCMD(qcmd_finish) {
 	struct player_quest *pq, *next_pq;
-	struct instance_data *inst;
+	struct instance_data *inst = NULL;
 	quest_data *qst;
 	bool all, any;
 	
@@ -682,7 +683,7 @@ QCMD(qcmd_finish) {
 			any = FALSE;
 			LL_FOREACH_SAFE(GET_QUESTS(ch), pq, next_pq) {
 				
-				any |= qcmd_finish_one(ch, pq, FALSE);
+				any |= qcmd_finish_one(ch, pq, inst, FALSE);
 			}
 			if (any) {
 				SAVE_CHAR(ch);
@@ -692,7 +693,7 @@ QCMD(qcmd_finish) {
 			}
 		}
 		else {
-			any = qcmd_finish_one(ch, pq, TRUE);
+			any = qcmd_finish_one(ch, pq, inst, TRUE);
 			if (any) {
 				SAVE_CHAR(ch);
 			}
