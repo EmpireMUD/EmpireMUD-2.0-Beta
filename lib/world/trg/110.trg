@@ -32,6 +32,9 @@ if %healthprct% < 90
     %purge% %egg%
   end
 end
+if %self.vnum% == 11002
+  nop %actor.move(-5)%
+end
 * If we want a regular fight trigger, put it down here
 if %random.5% != 1
   halt
@@ -156,7 +159,8 @@ Hatch/Protect Finisher~
 ~
 %load% mob 11004
 %load% mob 11005
-%adventurecomplete%
+* Delay-complete
+%load% obj 11058
 ~
 #11007
 Cattails unclaimed decay~

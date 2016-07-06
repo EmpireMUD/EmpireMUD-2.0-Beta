@@ -300,9 +300,9 @@ a sense of loss~
 A sense of loss looms where an egg should be.~
 There should be something here, but it's gone...
 ~
-3 0 0 3
+3 0 0 4
 0 0 0
-10 48
+10 96
 T 11021
 T 11022
 S
@@ -314,9 +314,9 @@ A half-eaten cow carcass is rotting on the ground.~
 torn off most of the meat. What remains of the cow is covered in maggots, and
 the smell is foul enough to make you retch.
 ~
-3 0 0 3
+3 0 0 4
 0 0 0
-7 576
+7 144
 S
 #11023
 carcass~
@@ -327,9 +327,9 @@ and maggots. Something has already picked most of the meat and organs from the
 carcass, and splattered blood suggests the carcass was badly beaten -- or
 dropped from a great height.
 ~
-3 0 0 2
+3 0 0 3
 0 0 0
-7 576
+7 144
 S
 #11024
 rucksack sack downy~
@@ -479,10 +479,10 @@ a roc-stone gear~
 A roc-stone gear is lying on the ground.~
    This gear is carved from the stone heart of a great roc, and enables a ship
 to fly. You can manufacture the clockwork roc airship from this gear at a
-carpenter, by typing 'manufacture clockwork roc'. Or type 'manufacture info
-clockwork roc' to see the requirements.
+shipyard, by typing 'manufacture clockwork roc'. Or type 'manufacture info
+clockwork roc' to see the requirements.  
 ~
-3 ej a 1
+3 ej a 2
 0 0 0
 1 0
 S
@@ -856,5 +856,16 @@ traps; you'll lose them when you turn in the quest.
 0 0 0
 0 0
 Q 11001
+S
+#11058
+eggshell shards~
+some shards of eggshell~
+Some shards of eggshell are scattered here.~
+The egg that was here has hatched safely.
+~
+3 0 0 3
+0 0 0
+14 96
+T 11021
 S
 $

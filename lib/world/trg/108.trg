@@ -99,6 +99,22 @@ if (%actor.is_npc% && %boss%)
   %teleport% %actor% %boss.room%
 end
 ~
+#10850
+Soulstream block entry without quest~
+2 g 100
+~
+if %direction%
+  * not a portal entry
+  return 1
+  halt
+end
+eval test (%actor.on_quest(10850)% || %actor.completed_quest(10850)%)
+if !%test%
+  %send% %actor% You must start the quest 'Enter the Soulstream' before entering.
+  %send% %actor% Use 'quest start Enter' to begin the quest.
+  return 0
+end
+~
 #10851
 Detect Ritual of Burdens~
 2 p 100

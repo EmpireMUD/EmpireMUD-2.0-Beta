@@ -436,4 +436,1119 @@ if (%Rand% <= %cumulative%) && %found% == 0
 end
 %purge% %self%
 ~
+#10140
+Cactus combat~
+0 k 25
+~
+switch %random.3%
+  case 1
+    %send% %actor% %self.name% brushes against you, leaving lots of painful spines stuck in you!
+    %echoaround% %actor% %self.name% brushes against %actor.name%, leaving spines stuck in %actor.himher%!
+    %damage% %actor% 10 physical
+    %dot% %actor% 50 30 physical 3
+  break
+  case 2
+    %echo% %self.name% puffs up like an angry cat, summoning miniature storm clouds!
+    wait 1 sec
+    if %actor% && (%actor.room% == %self.room%)
+      %send% %actor% A torrent of water strikes you in the face, briefly blinding you!
+      %echoaround% %actor% A torrent of water strikes %actor.name% in the face!
+      dg_affect %actor% BLIND on 10
+    else
+      halt
+    end
+  break
+  case 3
+    %echo% %self.name%'s spines ripple!
+    wait 1 sec
+    if %actor% && (%actor.room% == %self.room%)
+      %echo% %self.name% regrows slightly.
+      %damage% %self% -25
+    else
+      halt
+    end
+  break
+done
+~
+#10141
+Delayed aggro greet/entry~
+0 gi 100
+~
+if %actor%
+  * Actor entered room - valid target?
+  if (%actor.is_npc% && %actor.mob_flagged(HUMAN)% && !%actor.aff_flagged(!ATTACK)%) || (%actor.is_pc% && %actor.level% > 25 && !%actor.on_quest(10147)%)
+    eval target %actor%
+  end
+else
+  * entry - look for valid target in room
+  eval person %room.people%
+  while %person%
+    * Manage cactus population
+    if %person.vnum% == %self.vnum%
+      if %random.2% == 2
+        %echo% %self.name% turns back into an ordinary cactus.
+        %purge% %self%
+        halt
+      end
+    end
+    * validate
+    if (%person.is_npc% && %person.mob_flagged(HUMAN)% && !%person.aff_flagged(!ATTACK)%) || (%person.is_pc% && %person.level% > 25 && !%person.on_quest(10147)%)
+      eval target %person%
+    end
+    eval person %person.next_in_room%
+  done
+end
+if !%target%
+  halt
+end
+wait 2
+%send% %target% %self.name% moves menacingly towards you...
+%echoaround% %target% %self.name% moves menacingly towards %target.name%...
+wait 1 sec
+if %target.room% != %self.room%
+  halt
+end
+%echoaround% %target% %self.name% attacks %target.name%!
+%send% %target% %self.name% attacks you!
+mkill %target%
+~
+#10142
+Monsoon Rift cleanup + complete~
+2 v 100
+~
+eval cactus %instance.mob(10140)%
+while %cactus%
+  %echoaround% %cactus% %cactus.name% turns back into an ordinary cactus.
+  %purge% %cactus%
+  eval cactus %instance.mob(10140)%
+done
+eval cactus %instance.mob(10141)%
+while %cactus%
+  %echoaround% %cactus% %cactus.name% turns back into an ordinary cactus.
+  %purge% %cactus%
+  eval cactus %instance.mob(10141)%
+done
+eval cactus %instance.mob(10142)%
+while %cactus%
+  %echoaround% %cactus% %cactus.name% turns back into an ordinary cactus.
+  %purge% %cactus%
+  eval cactus %instance.mob(10142)%
+done
+* Despawn the entry portal
+eval loc %instance.location%
+eval obj %loc.contents%
+while %obj%
+  eval next_obj %obj.next_in_list%
+  if %obj.vnum% == 10140
+    %at% %loc% %echo% The monsoon rift closes.
+    %purge% %obj%
+  end
+  eval obj %next_obj%
+done
+* Despawn vampires
+eval mob %instance.mob(10147)%
+while %mob%
+  %echoaround% %mob% %mob.name% leaves.
+  %purge% %mob%
+  eval mob %instance.mob(10147)%
+done
+* Despawn wandering merchant
+eval mob %instance.mob(10146)%
+while %mob%
+  %echoaround% %mob% %mob.name% leaves.
+  %purge% %mob%
+  eval mob %instance.mob(10146)%
+done
+* Despawn robed thief
+eval mob %instance.mob(10145)%
+while %mob%
+  %echoaround% %mob% %mob.name% leaves.
+  %purge% %mob%
+  eval mob %instance.mob(10145)%
+done
+* Despawn head druid
+eval mob %instance.mob(10144)%
+while %mob%
+  %echoaround% %mob% %mob.name% leaves.
+  %purge% %mob%
+  eval mob %instance.mob(10144)%
+done
+* Despawn saguaro mob
+eval mob %instance.mob(10143)%
+while %mob%
+  %echoaround% %mob% %mob.name% turns back into a regular saguaro, and you lose track of it.
+  %purge% %mob%
+  eval mob %instance.mob(10143)%
+done
+* Despawn saguaro obj
+eval loc i10145
+if %loc%
+  eval obj %loc.contents%
+  while %obj%
+    eval next_obj %obj.next_in_list%
+    if %obj.vnum% == 10171
+      %echo% You lose track of %obj.shortdesc%.
+      %purge% %obj%
+    end
+    eval obj %next_obj%
+  done
+end
+%adventurecomplete%
+~
+#10143
+Saguaro treant combat~
+0 k 25
+~
+switch %random.4%
+  case 1
+    %send% %actor% %self.name% brushes an arm against you, leaving dozens of painful spines behind!
+    %echoaround% %actor% %self.name% brushes an arm against %actor.name%, leaving behind dozens of spines!
+    %dot% %actor% 20 30 physical 10
+    %dot% %actor% 20 30 physical 10
+  break
+  case 2
+    %echo% %self.name%'s spines ripple, and storm clouds form overhead.
+    wait 1 sec
+    %send% %actor% You are struck by lightning!
+    %echoaround% %actor% %actor.name% is struck by lightning!
+    %damage% %actor% 75 magical
+  break
+  case 3
+    %echo% %self.name% puffs up like an angry cat, and monsoon clouds form overhead.
+    wait 1 sec
+    %send% %actor% The clouds burst, turning the ground beneath your feet into mud and slowing you down!
+    %echoaround% %actor% The clouds burst, turning the ground beneath %actor.name%'s feet into mud and slowing %actor.himher% down!
+    dg_affect %actor% SLOW on 30
+  break
+  case 4
+    %send% %actor% %self.name% clubs you painfully with an arm, leaving stinging spines stuck into you!
+    %echoaround% %actor% %self.name% clubs %actor.name% with an arm, leaving several spines stuck in %actor.himher%!
+    %damage% %actor% 25 physical
+    %dot% %actor% 20 30 physical 10
+  break
+done
+~
+#10144
+Monsoon Cloud~
+1 b 10
+~
+switch %random.4%
+  case 1
+    %echo% Lightning crawls from cloud to cloud like spiderwebs.
+  break
+  case 2
+    %echo% Rain drops like sheets from the clouds, until you can barely see where you're going.
+  break
+  case 3
+    %echo% The sky flashes as a brilliant column of lightning splits it in two.
+  break
+  case 4
+    %echo% Rolling thunder shakes the rain-soaked desert.
+  break
+end
+~
+#10145
+Monsoon totem fake chant command~
+1 c 2
+chant~
+if (!(monsoon /= %arg%) || %actor.position% != Standing)
+  return 0
+  halt
+end
+eval room %actor.room%
+eval cycles_left 5
+while %cycles_left% >= 0
+  eval permission %%actor.canuseroom_member(%room%)%%
+  eval sector_valid ((%room.sector% == Desert) || (%room.sector% == Grove))
+  eval cloud_present 0
+  eval object %room.contents%
+  while %object% && !%cloud_present%
+    if %object.vnum% == 10144
+      eval cloud_present 1
+    end
+    eval object %object.next_in_list%
+  done
+  if (%actor.room% != %room%) || !%permission% || !%sector_valid% || %cloud_present% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+    * We've either moved or the room's no longer suitable for the chant
+    if %cycles_left% < 5
+      %echoaround% %actor% %actor.name%'s chant is interrupted.
+      %send% %actor% Your chant is interrupted.
+    elseif !%permission%
+      %send% %actor% You don't have permission to use the monsoon chant here.
+    elseif !%sector_valid%
+      %send% %actor% You must perform the chant on a desert or grove.
+    elseif %cloud_present%
+      %send% %actor% The monsoon chant has already been performed here.
+    else
+      * combat, stun, sitting down, etc
+      %send% %actor% You can't do that now.
+    end
+    halt
+  end
+  * Fake ritual messages
+  switch %cycles_left%
+    case 5
+      %echoaround% %actor% %actor.name% begins the monsoon chant...
+      %send% %actor% You begin the monsoon chant...
+    break
+    case 4
+      %echoaround% %actor% %actor.name% sways and chants the monsoon chant...
+      %send% %actor% You sway and chant the monsoon chant...
+    break
+    case 3
+      %echoaround% %actor% %actor.name% sways and chants the monsoon chant...
+      %send% %actor% You sway and chant the monsoon chant...
+    break
+    case 2
+      %echoaround% %actor% %actor.name% sways and chants the monsoon chant...
+      %send% %actor% You sway and chant the monsoon chant...
+    break
+    case 1
+      %echoaround% %actor% %actor.name% sways and chants the monsoon chant...
+      %send% %actor% You sway and chant the monsoon chant...
+    break
+    case 0
+      %echoaround% %actor% %actor.name% completes %actor.hisher% chant, summoning a monsoon cloud!
+      %send% %actor% You complete your chant, summoning a monsoon cloud!
+      %load% obj 10144 %room%
+      if %actor.varexists(monsoon_chant_counter)%
+        eval monsoon_chant_counter %actor.monsoon_chant_counter)% + 1
+      else
+        eval monsoon_chant_counter 1
+      end
+      remote monsoon_chant_counter %actor.id%
+      if %monsoon_chant_counter% >= 6
+        %quest% %actor% trigger 10147
+        %send% %actor% You have finished quenching the cacti, and should return to the druid.
+        %send% %actor% Your monsoon totem splinters and breaks!
+        %echoaround% %actor% %actor.name%'s ironwood totem splinters and breaks!
+        %purge% %self%
+      end
+      halt
+    break
+  done
+  wait 5 sec
+  eval cycles_left %cycles_left% - 1
+done
+~
+#10147
+Natural Magic: Cacti quench quest start~
+2 u 100
+~
+eval monsoon_chant_counter 0
+remote monsoon_chant_counter %actor.id%
+if !%actor.inventory(10143)%
+  %load% obj 10143 %actor% inv
+  eval item %actor.inventory(10143)%
+  %send% %actor% You receive %item.shortdesc%.
+end
+~
+#10148
+Monsoon cactus death tracker + reward~
+0 f 100
+~
+if %actor.on_quest(10147)%
+  %quest% %actor% drop 10147
+  %send% %actor% You fail the quest Quench the Desert - you're supposed to water the cacti, not kill them!
+end
+* Number of attacker kills for quest completion
+eval target 4
+eval room %self.room%
+eval char %room.people%
+while %char%
+  if %char.is_pc%
+    * Bonus exp reward
+    if %random.2% == 2
+      %send% %char% You gain 1 bonus experience point.
+      nop %char.bonus_exp(1)%
+    end
+    if %char.on_quest(10141)%
+      * We're already on the quest
+      if %char.varexists(monsoon_attacker_kills)%
+        eval monsoon_attacker_kills %char.monsoon_attacker_kills)% + 1
+      else
+        eval monsoon_attacker_kills 1
+      end
+      remote monsoon_attacker_kills %char.id%
+      if %monsoon_attacker_kills% >= %target%
+        %quest% %char% trigger 10141
+        %send% %char% You have killed enough of these cacti. Head into the rift and look for their leader on top of the hill.
+        halt
+      else
+        %send% %char% You have killed %monsoon_attacker_kills% cacti.
+      end
+    else
+      * We're not on the quest yet; start it
+      %quest% %char% start 10141
+      if !%char.on_quest(10141)%
+        * Quest start silently failed - this shouldn't normally happen (happens if the player has already completed the quest), so we halt in this case
+        halt
+      end
+      * Reset attacker kill count for the new quest
+      eval monsoon_attacker_kills 1
+      remote monsoon_attacker_kills %char.id%
+    end
+  end
+  eval char %char.next_in_room%
+done
+~
+#10149
+Saguaro treant must-fight~
+0 s 100
+~
+%send% %actor% You cannot flee from %self.name%!
+return 0
+~
+#10150
+Free-tailed bat emotes~
+0 b 10
+~
+if (%self.disabled% || %self.fighting%)
+  halt
+end
+switch %random.3%
+  case 1
+    %echo% %self.name% flits about overhead.
+  break
+  case 2
+    %echo% %self.name% snatches a moth out of the air.
+  break
+  case 3
+    %echo% %self.name% joins a swarm of bats overhead.
+    %purge% %self%
+  break
+end
+~
+#10151
+Gila monster emotes~
+0 b 10
+~
+if (%self.disabled% || %self.fighting%)
+  halt
+end
+switch %random.3%
+  case 1
+    %echo% %self.name% suns itself on the rocks.
+  break
+  case 2
+    %echo% %self.name% flicks its tongue in search of a scent.
+  break
+  case 3
+    %echo% %self.name% crawls into a burrow in the ground.
+    %purge% %self%
+  break
+end
+~
+#10152
+Armadillo emotes~
+0 b 10
+~
+if (%self.disabled% || %self.fighting%)
+  halt
+end
+switch %random.3%
+  case 1
+    %echo% %self.name% rolls up into a ball and rolls away from you.
+    %purge% %self%
+  break
+  case 2
+    %echo% %self.name% digs at the ground until it finds a tasty grub.
+  break
+  case 3
+    %echo% %self.name% scampers around in the dirt.
+  break
+end
+~
+#10153
+Cactus wren emotes~
+0 b 10
+~
+if (%self.disabled% || %self.fighting%)
+  halt
+end
+switch %random.3%
+  case 1
+    %echo% %self.name% pecks at loose seeds on the ground.
+  break
+  case 2
+    %echo% %self.name% picks through leaves and sticks, looking for insects.
+  break
+  case 3
+    %echo% %self.name% pokes its head out from its home in a cactus.
+  break
+end
+~
+#10154
+Antelope squirrel emotes~
+0 b 10
+~
+if (%self.disabled% || %self.fighting%)
+  halt
+end
+switch %random.3%
+  case 1
+    %echo% %self.name% stashes a seed in its cheek.
+  break
+  case 2
+    %echo% %self.name% grooms its long, thin tail.
+  break
+  case 3
+    %echo% %self.name% scurries into the shade and hugs the cool ground.
+  break
+end
+~
+#10155
+Bighorn sheep emotes~
+0 b 10
+~
+if (%self.disabled% || %self.fighting%)
+  halt
+end
+switch %random.3%
+  case 1
+    %echo% %self.name% rubs its horns against a shrub.
+  break
+  case 2
+    %echo% %self.name% runs off after an interloping ram.
+    %purge% %self%
+  break
+  case 3
+    %echo% %self.name% chews thoughtfully on a stray branch from a shrub.
+  break
+end
+~
+#10156
+Coati emotes~
+0 b 10
+~
+if (%self.disabled% || %self.fighting%)
+  halt
+end
+switch %random.3%
+  case 1
+    %echo% %self.name% rustles through the ground litter, looking for bugs.
+  break
+  case 2
+    %echo% %self.name% chirps and snorts at you.
+  break
+  case 3
+    %echo% %self.name% struts around with its long tail held straight up.
+  break
+end
+~
+#10157
+Monsoon room environment~
+2 b 10
+~
+switch %random.4%
+  case 1
+    %echo% Large, cold raindrops fall on you from above.
+  break
+  case 2
+    %echo% The winds shift, bringing fresh petrichor from the cool rain.
+  break
+  case 3
+    %echo% Lightning flashes across the stormclouds.
+  break
+  case 4
+    %echo% Rolling thunder shakes the rain-soaked desert.
+  break
+end
+~
+#10158
+Hug a Cactus~
+0 ct 0
+hug~
+* test targeting me
+eval test %%actor.char_target(%arg%)%%
+if (%test% != %self% || %actor.nohassle%)
+  return 0
+  halt
+end
+%send% %actor% You hug %self.name% and immediately realize your mistake as dozens of barbed spines stick into your skin!
+%echoaround% %actor% %actor.name% hugs %self.name% but immediately lets out a yelp of pain as dozens of barbed spines stick into %actor.hisher% skin!
+%dot% %actor% 100 10 physical 1
+return 1
+~
+#10159
+Teddybear cactus emotes~
+0 bt 5
+~
+if (%self.disabled% || %self.fighting%)
+  halt
+end
+switch %random.3%
+  case 1
+    say Why won't anyone huuuug me?
+  break
+  case 2
+    %echo% %self.name% brushes its spines.
+  break
+  case 3
+    %echo% You find %self.name% sitting dangerously close to your leg.
+  break
+end
+~
+#10160
+Monsoon sorcery quest study command~
+1 c 2
+study~
+if (!(monsoon /= %arg%) || %actor.position% != Standing)
+  return 0
+  halt
+end
+eval room %actor.room%
+eval start_cycles 5
+eval cycles_left %start_cycles%
+while %cycles_left% >= 0
+  eval permission %%actor.canuseroom_guest(%room%)%%
+  eval location_valid (%room.building% == Tower of Sorcery || %room.building% == Top of the Tower)
+  if (%actor.room% != %room%) || !%permission% || !%location_valid% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+    * We've either moved or the room's no longer suitable for the chant
+    if %cycles_left% < %start_cycles%
+      %echoaround% %actor% %actor.name%'s studying is interrupted.
+      %send% %actor% Your studying is interrupted.
+    elseif !%permission%
+      %send% %actor% You don't have permission to study here.
+    elseif !%sector_valid%
+      %send% %actor% You must study at a Tower of Sorcery.
+    else
+      * combat, stun, sitting down, etc
+      %send% %actor% You can't do that now.
+    end
+    halt
+  end
+  * Fake ritual messages
+  switch %cycles_left%
+    case 5
+      %echoaround% %actor% %actor.name% starts studying the monsoon...
+      %send% %actor% You start studying the monsoon...
+    break
+    case 4
+      %send% %actor% PLACEHOLDER
+    break
+    case 3
+      %send% %actor% PLACEHOLDER
+    break
+    case 2
+      %send% %actor% PLACEHOLDER
+    break
+    case 1
+      %send% %actor% PLACEHOLDER
+    break
+    case 0
+      %echoaround% %actor% %actor.name% closes %actor.hisher% book and puts it down.
+      %send% %actor% You close your book and put it down.
+      %quest% %actor% trigger 10144
+      halt
+    break
+  done
+  wait 4 sec
+  eval cycles_left %cycles_left% - 1
+done
+~
+#10161
+Fake infiltrate higher template id~
+2 c 0
+infiltrate~
+if !%actor.on_quest(10150)%
+  return 0
+  halt
+end
+if !%arg%
+  return 0
+  halt
+end
+* One quick trick to get the target room
+eval direction %%actor.parse_dir(%arg%)%%
+eval room_var %self%
+eval tricky %%room_var.%direction%(room)%%
+if !%tricky% || (%tricky.template% < %room_var.template%)
+  return 0
+  halt
+end
+%send% %actor% You successfully infiltrate!
+%teleport% %actor% %tricky%
+%force% %actor% look
+return 1
+~
+#10162
+Room block higher template id without infiltrate~
+2 q 100
+~
+* One quick trick to get the target room
+eval room_var %self%
+eval tricky %%room_var.%direction%(room)%%
+eval to_room %tricky%
+* Compare template ids to figure out if they're going forward or back
+if %actor.nohassle%
+  %send% %actor% The obstruction gives you no hassle.
+  halt
+end
+if (!%tricky% || %tricky.template% < %room_var.template%)
+  halt
+end
+%send% %actor% You can't go that way without Infiltrate!
+return 0
+~
+#10163
+Weather in the Rift~
+2 c 0
+weather~
+%send% %actor% It's raining lightly overhead, but the weather worsens further off the path, until you can't see past the wall of rain.
+~
+#10164
+Weather outside the Rift~
+1 c 4
+weather~
+%send% %actor% Dark monsoon clouds loom overhead, dropping rain in sheets.
+~
+#10165
+Suppress Weather~
+1 n 100
+~
+* Turns on !WEATHER for a number of seconds equal to <value1>
+dg_affect_room %self.room% !WEATHER on %self.val0%
+~
+#10166
+Cactus Spawn Teleport~
+0 n 100
+~
+eval room %self.room%
+if (!%instance.location% || %room.template% != 10146)
+  halt
+end
+mgoto %instance.location%
+%echo% A stream of mana flows from the rift, animating %self.name%!
+detach 1016 %self.id%
+~
+#10167
+Monsoon thief + vampire spawn teleport/hide~
+0 n 100
+~
+eval loc %instance.location%
+if !%loc% || !%self.vampire%
+  eval loc %self.room%
+end
+eval hide_again 1
+eval person %loc.people%
+while %person% && %hide_again%
+  if %person.is_pc% && ((%person.skill(Vampire)% > 50 && %self.vampire%) || (%person.skill(Stealth)% && !%self.vampire))
+    eval hide_again 0
+  end
+  eval person %person.next_in_room%
+done
+eval person %loc.people%
+while %person%
+  eval next_person %person.next_in_room%
+  if %person% != %self% && %person.vnum% == %self.vnum%
+    if !%person.aff_flagged(HIDE)%
+      if %hide_again%
+        %echoaround% %person% %person.name% steps into the shadows and disappears.
+      end
+    end
+    %purge% %person%
+  end
+  eval person %next_person%
+done
+if %loc%
+  mgoto %loc%
+end
+if %hide_again%
+  dg_affect %self% HIDE on -1
+end
+~
+#10168
+Spawn Saguaro Treant~
+2 u 100
+~
+* find and purge the saguaro obj
+eval obj %room.contents%
+while %obj%
+  eval next_obj %obj.next_in_list%
+  if (%obj.vnum% == 10171)
+    %purge% %obj%
+  end
+  eval obj %next_obj%
+done
+* load treant boss
+%load% mob 10143
+~
+#10169
+Monsoon reward replacer~
+1 n 100
+~
+* After 1 second, purge this object and load an object - rotating through the loot list
+wait 1
+eval actor %self.carried_by%
+if %actor.varexists(last_monsoon_loot_item)%
+  eval last_monsoon_loot_item %actor.last_monsoon_loot_item%
+end
+eval next_item 0
+switch %last_monsoon_loot_item%
+  case 10159
+    eval next_item 10153
+  break
+  case 10153
+    eval next_item 10160
+  break
+  case 10160
+    eval next_item 10155
+  break
+  case 10155
+    eval next_item 10167
+  break
+  case 10167
+    eval next_item 10152
+  break
+  case 10152
+    eval next_item 10168
+  break
+  case 10168
+    eval next_item 10163
+  break
+  case 10163
+    eval next_item 10165
+  break
+  case 10165
+    eval next_item 10162
+  break
+  case 10162
+    eval next_item 10166
+  break
+  default
+    eval next_item 10159
+  break
+done
+eval level %self.level%
+if !%level%
+  eval level %actor.level%
+end
+%load% obj %next_item% %actor% inv %level%
+eval item %actor.inventory()%
+%send% %actor% %self.shortdesc% opens, revealing %item.shortdesc%!
+eval last_monsoon_loot_item %next_item%
+remote last_monsoon_loot_item %actor.id%
+%purge% %self%
+~
+#10171
+Monsoon thief + vampire reveal~
+0 h 100
+~
+if (%self.vampire% && %actor.skill(Vampire)% < 51) || (!%self.vampire% && %actor.skill(Stealth)% < 51)
+  halt
+end
+visible
+wait 1
+%send% %actor% %self.name% steps out of the shadows to greet you.
+%echoaround% %actor% %self.name% steps out of the shadows to greet %actor.name%.
+* Reveal hide affect from self
+detach 10171 %self.id%
+~
+#10172
+Wandering Merchant Spawner~
+1 n 100
+~
+%load% mob 10146
+~
+#10173
+Give Supply List~
+2 u 100
+~
+%load% obj 10174 %actor% inv
+~
+#10174
+Give Sorcery Notes~
+2 u 100
+~
+if (%questvnum% == 10144)
+  %load% obj 10142 %actor% inv
+elseif (%questvnum% == 10145)
+  %load% obj 10175 %actor% inv
+end
+~
+#10175
+Monsoon wandering merchant leash~
+0 in 100
+~
+eval start_room %instance.location%
+if !%start_room%
+  * No instance
+  halt
+end
+eval room %self.room%
+eval dist %%room.distance(%start_room%)%%
+if %room.template% == 10146
+  mgoto %start_room%
+  mmove
+  mmove
+  mmove
+  mmove
+elseif %dist% > 20
+  mgoto %start_room%
+end
+~
+#10176
+Monsoon infuse bat totem at oasis~
+1 c 2
+infuse~
+if !%actor.vampire%
+  return 0
+  halt
+end
+* Infuse only at an oasis during the night. Costs 50 blood.
+eval blood %actor.blood()%
+eval room %actor.room%
+eval cost 50
+* Condition checking
+if %blood% < %cost%
+  %send% %actor% You don't have enough blood to infuse %self.shortdesc% - it costs %cost%.
+  halt
+end
+if %room.sector% != Oasis
+  %send% %actor% You can only infuse %self.shortdesc% at an oasis.
+  halt
+end
+if %time.hour% > 7 && %time.hour% < 19
+  %send% %actor% You can only infuse %self.shortdesc% at night.
+  halt
+end
+* Charge blood
+eval charge %%actor.blood(-%cost%)%%
+nop %charge%
+* Quest sends a message already
+%quest% %actor% trigger 10156
+%quest% %actor% finish 10156
+~
+#10177
+Monsoon eclipse vampire ritual~
+1 c 2
+ritual rite~
+if (!(eclipse /= %arg%) || %actor.position% != Standing)
+  return 0
+  halt
+end
+* Check time of day (only at start to avoid sunset annoyances)
+if %time.hour% < 7 || %time.hour% > 19
+  %send% %actor% You can only perform this ritual during the day.
+  halt
+end
+eval room %actor.room%
+eval cycles_left 5
+while %cycles_left% >= 0
+  eval sector_valid (%room.template% == 10145)
+  if (%actor.room% != %room%) || !%sector_valid% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+    * We've either moved or the room's no longer suitable for the ritual
+    if %cycles_left% < 5
+      %echoaround% %actor% %actor.name%'s ritual is interrupted.
+      %send% %actor% Your ritual is interrupted.
+      * Refund blood here if we want to
+    elseif !%sector_valid%
+      %send% %actor% You must perform the eclipse ritual at the rocky hilltop beyond the rift.
+    else
+      * combat, stun, sitting down, etc
+      %send% %actor% You can't do that now.
+    end
+    halt
+  end
+  * Fake ritual messages
+  switch %cycles_left%
+    case 5
+      * Check cost here so invalid location doesn't charge
+      eval cost 0
+      if %actor.blood% < %cost%
+        %send% %actor% You don't have enough blood to perform the eclipse ritual - it costs %cost%.
+        halt
+      end
+      eval charge %%actor.blood(-%cost%)%%
+      nop %charge%
+      %echoaround% %actor% %actor.name% begins the eclipse ritual...
+      %send% %actor% You begin the eclipse ritual...
+    break
+    case 4
+      %echoaround% %actor% %actor.name% performs the eclipse ritual...
+      %send% %actor% You perform the eclipse ritual...
+    break
+    case 2
+      %echoaround% %actor% %actor.name% performs the eclipse ritual...
+      %send% %actor% You perform the eclipse ritual...
+    break
+    case 1
+      %echoaround% %actor% %actor.name% performs the eclipse ritual...
+      %send% %actor% You perform the eclipse ritual...
+    break
+    case 0
+      %echoaround% %actor% %actor.name% completes %actor.hisher% ritual!
+      %send% %actor% You complete your ritual!
+      %quest% %actor% trigger 10157
+      %send% %actor% %self.shortdesc% splinters and breaks!
+      %echoaround% %actor% %self.shortdesc% splinters and breaks!
+      %quest% %actor% finish 10157
+      %purge% %self%
+      halt
+    break
+  done
+  wait 5 sec
+  eval cycles_left %cycles_left% - 1
+done
+~
+#10178
+Give Bat Totem~
+2 u 100
+~
+if (%questvnum% == 10156)
+  %load% obj 10161 %actor% inv
+elseif (%questvnum% == 10157)
+  %load% obj 10173 %actor% inv
+end
+~
+#10179
+Age Herbicide~
+1 f 0
+~
+if %self.carried_by%
+  %load% obj 10177 %self.carried_by% inv
+  %send% %self.carried_by% One of the herbicide vials turns a bright red color and is done aging.
+  %purge% %self%
+  return 0
+end
+~
+#10180
+Monsoon rift close sorcery ritual~
+1 c 2
+ritual rite~
+if (!(rift /= %arg%) || %actor.position% != Standing)
+  return 0
+  halt
+end
+eval room %actor.room%
+eval cycles_left 5
+while %cycles_left% >= 0
+  eval sector_valid (%room.building% == Monsoon Rift)
+  eval rift_present 0
+  eval object %room.contents%
+  while %object% && !%rift_present%
+    if %object.vnum% == 10140
+      eval rift_present 1
+    end
+    eval object %object.next_in_list%
+  done
+  if (%actor.room% != %room%) || !%sector_valid% || !%rift_present% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+    * We've either moved or the room's no longer suitable for the chant
+    if %cycles_left% < 5
+      %echoaround% %actor% %actor.name%'s ritual is interrupted.
+      %send% %actor% Your ritual is interrupted.
+    elseif !%permission%
+      %send% %actor% You don't have permission to use the rift ritual here.
+    elseif !%sector_valid%
+      %send% %actor% You must perform the ritual at the monsoon rift.
+    elseif !%rift_present%
+      %send% %actor% The rift here has already been closed.
+    else
+      * combat, stun, sitting down, etc
+      %send% %actor% You can't do that now.
+    end
+    halt
+  end
+  * Fake ritual messages
+  switch %cycles_left%
+    case 5
+      %echoaround% %actor% %actor.name% begins the rift ritual...
+      %send% %actor% You begin the rift ritual...
+    break
+    case 4
+      %echoaround% %actor% %actor.name% performs the rift ritual...
+      %send% %actor% You perform the rift ritual...
+    break
+    case 2
+      %echoaround% %actor% %actor.name% performs the rift ritual...
+      %send% %actor% You perform the rift ritual...
+    break
+    case 1
+      %echoaround% %actor% %actor.name% performs the rift ritual...
+      %send% %actor% You perform the rift ritual...
+    break
+    case 0
+      %echoaround% %actor% %actor.name% completes %actor.hisher% ritual, closing the monsoon rift!
+      %send% %actor% You complete your ritual, closing the monsoon rift!
+      %quest% %actor% trigger 10145
+      %send% %actor% %self.shortdesc% splinters and breaks!
+      %echoaround% %actor% %self.shortdesc% splinters and breaks!
+      %quest% %actor% finish 10145
+      %purge% %self%
+      halt
+    break
+  done
+  wait 5 sec
+  eval cycles_left %cycles_left% - 1
+done
+~
+#10181
+Druid tent fake search~
+2 c 0
+search~
+if (%actor.position% != Standing)
+  return 0
+  halt
+end
+if %actor.quest_triggered(10150)%
+  %send% %actor% You have already found all the evidence you need.
+  return 1
+  halt
+end
+if !(%actor.on_quest(10150)%
+  %send% %actor% You don't need to search here right now.
+  return 1
+  halt
+end
+eval room %actor.room%
+eval cycles_left 5
+while %cycles_left% >= 0
+  if (%actor.room% != %room%) || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+    * We've either moved or the room's no longer suitable for the action
+    if %cycles_left% < 5
+      %echoaround% %actor% %actor.name%'s search is interrupted.
+      %send% %actor% Your search is interrupted.
+    else
+      * combat, stun, sitting down, etc
+      %send% %actor% You can't do that now.
+    end
+    halt
+  end
+  * Fake ritual messages
+  switch %cycles_left%
+    case 5
+      %echoaround% %actor% %actor.name% starts searching the druid's tent...
+      %send% %actor% You start searching the druid's tent...
+    break
+    case 4
+      %echoaround% %actor% %actor.name% rummages through the druid's belongings...
+      %send% %actor% You rummage through the druid's belongings...
+    break
+    case 3
+      %echoaround% %actor% %actor.name% searches through the scrolls on the druid's shelves...
+      %send% %actor% You search through the scrolls on the druid's shelves...
+    break
+    case 2
+      %echoaround% %actor% %actor.name% opens the druid's ironwood trunk and peers inside...
+      %send% %actor% You open the druid's ironwood trunk and peer inside...
+    break
+    case 1
+      %echoaround% %actor% %actor.name% searches the druid's writing desk...
+      %send% %actor% You search the druid's writing desk...
+    break
+    case 0
+      %echoaround% %actor% %actor.name% completes %actor.hisher% search!
+      %send% %actor% You complete your search!
+      * Quest complete
+      %load% obj 10178 %actor% inv
+      %quest% %actor% trigger 10150
+      %send% %actor% You should return to the robed thief.
+      halt
+    break
+  done
+  wait 5 sec
+  eval cycles_left %cycles_left% - 1
+done
+~
 $
