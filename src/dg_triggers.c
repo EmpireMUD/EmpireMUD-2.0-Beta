@@ -99,6 +99,46 @@ int is_substring(char *sub, char *string) {
 }
 
 
+/**
+* @param char *input The player's command input (without args).
+* @param char *match The text to match (one or more words).
+* @param int mode CMDTRG_EXACT or CMDTRG_ABBREV.
+* @return bool TRUE if the input matches, FALSE if not.
+*/
+bool match_command_trig(char *input, char *match, bool mode) {
+	if (!input || !match) {	// missing input
+		return FALSE;
+	}
+	
+	skip_spaces(&match);
+	
+	if (*match == '*') {	// match anything
+		return TRUE;
+	}
+	if (!strchr(match, ' ')) {	// no spaces? simple match
+		if (mode == CMDTRG_EXACT) {
+			return !str_cmp(input, match);
+		}
+		else if (mode == CMDTRG_ABBREV) {
+			return is_abbrev(input, match);
+		}
+	}
+	else {	// has spaces (multiple possible words)
+		char buffer[MAX_INPUT_LENGTH], word[MAX_INPUT_LENGTH];
+		strcpy(buffer, match);
+		while (*buffer) {
+			half_chop(buffer, word, buffer);
+			if ((mode == CMDTRG_EXACT && !str_cmp(input, word)) || (mode == CMDTRG_ABBREV && is_abbrev(input, word))) {
+				return TRUE;
+			}
+		}
+	}
+	
+	// no matches
+	return FALSE;
+}
+
+
 /*
 * return 1 if str contains a word or phrase from wordlist.
 * phrases are in double quotes (").
@@ -345,8 +385,8 @@ int command_mtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 					syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: Command Trigger #%d has no text argument!", GET_TRIG_VNUM(t));
 					continue;
 				}
-
-				if (*GET_TRIG_ARG(t) == '*' || (mode == CMDTRG_EXACT && !str_cmp(cmd, GET_TRIG_ARG(t))) || (mode == CMDTRG_ABBREV && is_abbrev(cmd, GET_TRIG_ARG(t)))) {
+				
+				if (match_command_trig(cmd, GET_TRIG_ARG(t), mode)) {
 					union script_driver_data_u sdd;
 					ADD_UID_VAR(buf, t, actor, "actor", 0);
 					skip_spaces(&argument);
@@ -802,7 +842,7 @@ int cmd_otrig(obj_data *obj, char_data *actor, char *cmd, char *argument, int ty
 				continue;
 			}
 
-			if (*GET_TRIG_ARG(t) == '*' || (mode == CMDTRG_EXACT && !str_cmp(cmd, GET_TRIG_ARG(t))) || (mode == CMDTRG_ABBREV && is_abbrev(cmd, GET_TRIG_ARG(t)))) {
+			if (match_command_trig(cmd, GET_TRIG_ARG(t), mode)) {
 				ADD_UID_VAR(buf, t, actor, "actor", 0);
 				skip_spaces(&argument);
 				add_var(&GET_TRIG_VARS(t), "arg", argument, 0);
@@ -1290,7 +1330,7 @@ int command_wtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 			continue;
 		}
 
-		if (*GET_TRIG_ARG(t) == '*' || (mode == CMDTRG_EXACT && !str_cmp(cmd, GET_TRIG_ARG(t))) || (mode == CMDTRG_ABBREV && is_abbrev(cmd, GET_TRIG_ARG(t)))) {
+		if (match_command_trig(cmd, GET_TRIG_ARG(t), mode)) {
 			union script_driver_data_u sdd;
 			ADD_ROOM_UID_VAR(buf, t, room, "room", 0);
 			ADD_UID_VAR(buf, t, actor, "actor", 0);
@@ -1517,7 +1557,7 @@ int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 					continue;
 				}
 
-				if (*GET_TRIG_ARG(t) == '*' || (mode == CMDTRG_EXACT && !str_cmp(cmd, GET_TRIG_ARG(t))) || (mode == CMDTRG_ABBREV && is_abbrev(cmd, GET_TRIG_ARG(t)))) {
+				if (match_command_trig(cmd, GET_TRIG_ARG(t), mode)) {
 					union script_driver_data_u sdd;
 					ADD_UID_VAR(buf, t, actor, "actor", 0);
 					skip_spaces(&argument);
