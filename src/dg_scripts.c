@@ -2303,7 +2303,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				if (quest_instance_global) {
 					inst = quest_instance_global;
 				}
-				else {
+				if (!inst) {
 					switch (type) {
 						case MOB_TRIGGER: {
 							// try mob first
