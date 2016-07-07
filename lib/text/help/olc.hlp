@@ -760,6 +760,7 @@ The following affect flags are available:
  !STEALTH - Immune to the Stealth debuffs.
  !VAMPIRE - Immune to Vampire debuffs.
  !STUN - Immune to stun effects.
+ !DRINK-BLOOD - Can't be bitten/sired by vampires.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
