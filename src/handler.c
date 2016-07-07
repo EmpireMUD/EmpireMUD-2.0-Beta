@@ -203,7 +203,7 @@ void affect_from_char_by_caster(char_data *ch, int type, char_data *caster, bool
 * calling this function with AFF_FLY will remove both parts).
 *
 * @param char_data *ch The person to remove from.
-* @param bitvector_t aff_flag Any AFF_x flags to remove.
+* @param bitvector_t aff_flag Any AFF_ flags to remove.
 * @param bool show_msg If TRUE, will show the wears-off message.
 */
 void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag, bool show_msg) {
@@ -318,7 +318,7 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 * @param char_data *ch The person to apply to
 * @param byte loc APPLY_ const
 * @param sh_int mod The modifier amount for the apply
-* @param bitvector_t bitv AFF_x bits
+* @param bitvector_t bitv AFF_ bits
 * @param bool add if TRUE, applies this effect; if FALSE, removes it
 */
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add) {

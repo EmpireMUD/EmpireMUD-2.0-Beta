@@ -630,7 +630,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_EXTRA_ATTRIBUTES  13
 
 
-/* Affect bits */
+// AFF_x: Affect bits
 /* WARNING: In the world files, NEVER set the bits marked "R" ("Reserved") */
 #define AFF_BLIND  BIT(0)	// a. (R) Char is blind
 #define AFF_MAJESTY  BIT(1)	// b. majesty
@@ -664,6 +664,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_IMMUNE_VAMPIRE  BIT(29)	// D. Immune to vampire debuffs
 #define AFF_IMMUNE_STUN  BIT(30)	// E. Cannot be hit by stun effects
 #define AFF_ORDERED  BIT(31)	// F. Has been issued an order from a player
+#define AFF_NO_DRINK_BLOOD  BIT(32)	// G. Vampires can't bite or sire
 
 
 // Injury flags -- IS_INJURED
@@ -1879,7 +1880,7 @@ typedef struct vehicle_data vehicle_data;
 #define ISLE_NO_AGGRO  BIT(1)	// b. Island will not fire aggro mobs or guard towers
 
 
-// Room affects -- these are similar to room flags, but if you want to set them
+// ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them
 // in a "permanent" way, set the room's base_affects as well as its current
 // affects.
 // TODO this system could be cleaned up by adding an affect_total_room that
@@ -2421,7 +2422,7 @@ struct room_template {
 	
 	// numeric data
 	bitvector_t flags;	// RMT_x
-	bitvector_t base_affects;	// ROOM_AFF_x
+	bitvector_t base_affects;	// ROOM_AFF_
 	
 	// lists
 	struct adventure_spawn *spawns;	// list of objs/mobs
@@ -2574,7 +2575,7 @@ struct bld_data {
 	
 	int extra_rooms;	// how many rooms it can have
 	bitvector_t designate_flags;	// DES_x
-	bitvector_t base_affects;	// ROOM_AFF_x
+	bitvector_t base_affects;	// ROOM_AFF_
 	
 	int citizens;	// how many people live here
 	int military;	// how much it adds to the military pool

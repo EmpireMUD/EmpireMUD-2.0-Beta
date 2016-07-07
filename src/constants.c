@@ -862,75 +862,81 @@ const char *affected_bits[] = {
 	"!VAMPIRE",
 	"!STUN",
 	"*ORDERED",
+	"!DRINK-BLOOD",
 	"\n"
 };
 
 // AFF_x (2/3) - strings shown when you consider someone (empty for no-show)
 const char *affected_bits_consider[] = {
-	"",	// blind
+	"",	// 0 - blind
 	"$E has a majestic aura!",	// majesty
 	"",	// infra
 	"",	// sneak
 	"",	// hide
-	"",	// charm
+	"",	// 5 - charm
 	"",	// invis
 	"$E is immune to Battle debuffs.",	// !battle
 	"",	// sense hide
 	"$E is immune to physical damage.",	// !physical
-	"",	// no-target-in-room
+	"",	// 10 - no-target-in-room
 	"",	// no-see-in-room
 	"",	// fly
 	"$E cannot be attacked.",	// !attack
 	"$E is immune to High Sorcery debuffs.",	// !highsorc
-	"",	// disarm
+	"",	// 15 - disarm
 	"",	// haste
 	"",	// entangled
 	"",	// slow
 	"",	// stunned
-	"",	// stoned
+	"",	// 20 - stoned
 	"",	// can't spend blood
 	"",	// claws
 	"",	// deathshroud
 	"",	// earthmeld
-	"",	// mummify
+	"",	// 25 - mummify
 	"$E is soulmasked.",	// soulmask
 	"$E is immune to Natural Magic debuffs.",	// !natmag
 	"$E is immune to Stealth debuffs.",	// !stealth
 	"$E is immune to Vampire debuffs.",	// !vampire
-	"$E is immune to stuns.",	// !stun
+	"$E is immune to stuns.",	// 30 - !stun
 	"",	// ordred
+	"",	// !drink-blood
 	"\n"
 };
 
 // AFF_x (3/3) - determines if an aff flag is "bad" for the bearer
 const bool aff_is_bad[] = {
-	TRUE,	// blind
+	TRUE,	// 0 - blind
 	FALSE,
 	FALSE,
 	FALSE,
 	FALSE,
+	FALSE,	// 5
 	FALSE,
 	FALSE,
 	FALSE,
 	FALSE,
-	FALSE,
-	FALSE,
+	FALSE,	// 10
 	FALSE,
 	FALSE,
 	FALSE,
 	FALSE,	// unused
-	TRUE,	// disarm
+	TRUE,	// 15 - disarm
 	FALSE,
 	TRUE,	// entangled
 	TRUE,	// slow
 	TRUE,	// stunned
-	TRUE,	// stoned
+	TRUE,	// 20 - stoned
 	TRUE,	// !blood
 	FALSE,
 	FALSE,
 	FALSE,
+	FALSE,	// 25
 	FALSE,
 	FALSE,
+	FALSE,
+	FALSE,
+	FALSE,	// 30
 	FALSE,
 	FALSE
 };
