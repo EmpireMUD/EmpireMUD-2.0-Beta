@@ -133,7 +133,7 @@ monsoon rift and type 'ritual rift' to seal it off and end the cactus invasion.
 fade and lose its hold. Almost instantly, the rift begins to collapse.
 Hopefully nobody is trapped on the wrong side of it!
 ~
-4 c 75 100 0
+5 c 75 100 0
 A
 2 10142
 P
@@ -160,7 +160,6 @@ R
 0 0 3
 R
 2 10169 1
-T 10142
 T 10174
 W
 12 10140 0 1
@@ -372,7 +371,7 @@ have been ravaging the countryside.
 animates the cacti begins to fade. In the distance, you can see the rift
 starting to close. You better hurry out!
 ~
-7 c 75 100 0
+8 c 75 100 0
 A
 2 10161
 P
@@ -399,7 +398,6 @@ R
 0 0 3
 R
 2 10169 1
-T 10142
 T 10178
 W
 13 10145 0 1

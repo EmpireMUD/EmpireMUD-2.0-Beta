@@ -535,6 +535,8 @@ while %current_vnum% <= 10147
   done
   eval current_vnum %current_vnum% + 1
 done
+eval loc %instance.location%
+eval obj %loc.contents%
 while %obj%
   eval next_obj %obj.next_in_list%
   if %obj.vnum% == 10140
@@ -1375,6 +1377,8 @@ while %cycles_left% >= 0
         done
         eval current_vnum %current_vnum% + 1
       done
+      eval loc %instance.location%
+      eval obj %loc.contents%
       while %obj%
         eval next_obj %obj.next_in_list%
         if %obj.vnum% == 10140
@@ -1508,6 +1512,8 @@ while %cycles_left% >= 0
         done
         eval current_vnum %current_vnum% + 1
       done
+      eval loc %instance.location%
+      eval obj %loc.contents%
       while %obj%
         eval next_obj %obj.next_in_list%
         if %obj.vnum% == 10140
