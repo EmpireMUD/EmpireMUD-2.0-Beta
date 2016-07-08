@@ -132,7 +132,7 @@ WCMD(do_wadventurecomplete) {
 	
 	inst = quest_instance_global;
 	if (!inst) {
-		inst = COMPLEX_DATA(room) ? COMPLEX_DATA(room)->instance : NULL;
+		inst = find_instance_by_room(room, FALSE);
 	}
 	
 	if (inst) {

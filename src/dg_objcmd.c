@@ -147,7 +147,7 @@ OCMD(do_oadventurecomplete) {
 	
 	inst = quest_instance_global;
 	if (!inst) {
-		inst = (room && COMPLEX_DATA(room)) ? COMPLEX_DATA(room)->instance : NULL;
+		inst = room ? find_instance_by_room(room, FALSE) : NULL;
 	}
 	
 	if (inst) {
