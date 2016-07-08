@@ -50,7 +50,7 @@ imp flame little~
 a flame imp~
 A little imp is jumping from flame to flame.
 ~
-1 15 doA 0
+1 15 doA G
 0 0 9 16
 S
 #10304
@@ -58,7 +58,7 @@ phoenix scorched~
 a scorched phoenix~
 A scorched phoenix soars low above you!
 ~
-100 125 deho m
+100 125 deho mG
 0 0 2 12
 S
 #10305

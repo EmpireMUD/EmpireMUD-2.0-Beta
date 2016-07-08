@@ -60,6 +60,7 @@ void unlink_instance_entrance(room_data *room);
 // local globals
 struct instance_data *instance_list = NULL;	// global instance list
 bool instance_save_wait = FALSE;	// prevents repeated instance saving
+struct instance_data *quest_instance_global = NULL;	// passes instances through to some quest triggers
 
 // ADV_LINK_x: whether or not a rule specifies a possible location (other types are for limits)
 const bool is_location_rule[] = {
@@ -403,6 +404,7 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 	
 	const bitvector_t default_affs = ROOM_AFF_UNCLAIMABLE;
 	
+	sector_data *sect;
 	room_data *room;
 	
 	if (!rmt) {
@@ -411,7 +413,9 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 	
 	room = create_room();
 	attach_template_to_room(rmt, room);
-	BASE_SECT(room) = SECT(room) = sector_proto(config_get_int("default_adventure_sect"));
+	sect = sector_proto(config_get_int("default_adventure_sect"));
+	perform_change_sect(room, NULL, sect);
+	perform_change_base_sect(room, NULL, sect);
 	SET_BIT(ROOM_BASE_FLAGS(room), GET_RMT_BASE_AFFECTS(rmt) | default_affs);
 	SET_BIT(ROOM_AFF_FLAGS(room), GET_RMT_BASE_AFFECTS(rmt) | default_affs);
 	

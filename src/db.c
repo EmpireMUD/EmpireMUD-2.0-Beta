@@ -158,6 +158,7 @@ room_template *room_template_table = NULL;	// hash table of room templates
 
 // sectors
 sector_data *sector_table = NULL;	// sector hash table
+struct sector_index_type *sector_index = NULL;	// index lists
 
 // skills
 skill_data *skill_table = NULL;	// main skills hash (hh)
@@ -785,11 +786,7 @@ void verify_sectors(void) {
 	HASH_ITER(hh, world_table, room, next_room) {
 		if (!SECT(room)) {
 			// can't use change_terrain() here
-			SECT(room) = use_sect;
-			if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-				world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type = use_sect;
-				world_map_needs_save = TRUE;
-			}
+			perform_change_sect(room, NULL, use_sect);
 		}
 		if (!BASE_SECT(room)) {
 			change_base_sector(room, use_sect);

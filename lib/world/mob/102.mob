@@ -192,7 +192,7 @@ tumbleweed enchanted~
 an enchanted tumbleweed~
 An enchanted tumbleweed is blowing through.
 ~
-0 50 de 0
+0 50 de G
 0 0 4 16
 S
 #10250
@@ -396,7 +396,7 @@ ants swarm~
 a swarm of ants~
 A swarm of ants is coming toward you!
 ~
-0 0 bdjyE c
+0 0 bdjyE cG
 0 0 0 9
 I 4 10259 10.00 1 X  # LOOT: a primitive satchel
 I 4 10261 10.00 1 X  # LOOT: an unlit branch

@@ -415,9 +415,11 @@ An axeroot chopper sticks up from the ground.~
 created by the druids of the Magiterranean in their magi-netically modified
 foods program.
 ~
-1 0 an 2
+1 0 an 4
 0 5 2
 2 0
+C
+50 50
 R
 5121 0
 R
@@ -431,11 +433,11 @@ A spade-axe is sticking out of the ground.~
 to be good for both chopping and digging. It's no wonder the Magiterranean
 druids have been magi-netically engineering new plants. This is useful!
 ~
-1 emou an 5
+1 emou an 6
 0 1 2
 2 0
 C
-0 100
+0 125
 S
 #10528
 chowberries crunchy~
@@ -500,13 +502,13 @@ S
 stalk pickthorn~
 a pickthorn stalk~
 A pickthorn stalk seems planted here.~
-   The pickthorn is a plant magi-netically engineed by Magiterranean druids to
-grow useful tools on unused farmland.
+   The pickthorn is a plant magi-netically engineered by Magiterranean druids
+to grow useful tools on unused farmland.  
 
 Craft (Basic Crafts): thorn pick
 Craft (Master Craftsman, level 150): pick-and-pan
 ~
-3 0 a 7
+3 0 a 8
 0 0 0
 0 0
 R
@@ -538,9 +540,11 @@ A pick-and-pan is lying on the ground.~
 pickthorn and bladegrass. It can be used for mining metals, or for panning them
 in the stream.
 ~
-1 emot an 2
+1 emot an 3
 0 1 8
 0 0
+C
+0 125
 S
 #10535
 vines vigilant bundle~

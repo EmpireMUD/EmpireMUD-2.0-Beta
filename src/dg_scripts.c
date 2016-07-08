@@ -50,6 +50,7 @@ extern const char *exit_bits[];
 extern const char *mob_move_types[];
 extern struct time_info_data time_info;
 extern const char *otrig_types[];
+extern struct instance_data *quest_instance_global;
 extern const char *trig_attach_types[];
 extern const char *trig_types[];
 extern const char *wtrig_types[];
@@ -2297,31 +2298,38 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 				struct instance_data *inst = NULL;
 				room_data *orm;
-				switch (type) {
-					case MOB_TRIGGER: {
-						// try mob first
-						if (MOB_INSTANCE_ID((char_data*)go) != NOTHING) {
-							inst = get_instance_by_id(MOB_INSTANCE_ID((char_data*)go));
+				
+				// prefer global instance if any (e.g. from a quest trigger)
+				if (quest_instance_global) {
+					inst = quest_instance_global;
+				}
+				if (!inst) {
+					switch (type) {
+						case MOB_TRIGGER: {
+							// try mob first
+							if (MOB_INSTANCE_ID((char_data*)go) != NOTHING) {
+								inst = get_instance_by_id(MOB_INSTANCE_ID((char_data*)go));
+							}
+							if (!inst) {
+								inst = find_instance_by_room(IN_ROOM((char_data*)go), FALSE);
+							}
+							break;
 						}
-						if (!inst) {
-							inst = find_instance_by_room(IN_ROOM((char_data*)go), FALSE);
+						case OBJ_TRIGGER:
+							if ((orm = obj_room((obj_data*)go))) {
+								inst = find_instance_by_room(orm, FALSE);
+							}
+							break;
+						case WLD_TRIGGER:
+						case RMT_TRIGGER:
+						case BLD_TRIGGER:
+						case ADV_TRIGGER:
+							inst = find_instance_by_room((room_data*)go, FALSE);
+							break;
+						case VEH_TRIGGER: {
+							inst = find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE);
+							break;
 						}
-						break;
-					}
-					case OBJ_TRIGGER:
-						if ((orm = obj_room((obj_data*)go))) {
-							inst = find_instance_by_room(orm, FALSE);
-						}
-						break;
-					case WLD_TRIGGER:
-					case RMT_TRIGGER:
-					case BLD_TRIGGER:
-					case ADV_TRIGGER:
-						inst = find_instance_by_room((room_data*)go, FALSE);
-						break;
-					case VEH_TRIGGER: {
-						inst = find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE);
-						break;
 					}
 				}
 				
@@ -2345,7 +2353,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						char_data *miter, *found_mob = NULL;
 						mob_vnum vnum = atoi(subfield);
 						for (miter = character_list; miter && !found_mob; miter = miter->next) {
-							if (GET_MOB_VNUM(miter) == vnum) {
+							if (!EXTRACTED(miter) && GET_MOB_VNUM(miter) == vnum) {
 								if (MOB_INSTANCE_ID(miter) == inst->id || ROOM_INSTANCE(IN_ROOM(miter)) == inst) {
 									found_mob = miter;
 									break;
@@ -3169,7 +3177,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'p': {	// char.p*
-					if (!str_cmp(field, "pc_name")) {
+					if (!str_cmp(field, "parse_dir")) {
+						if (subfield && *subfield) {
+							int dir;
+							if ((dir = parse_direction(c, subfield)) != NO_DIR) {
+								snprintf(str, slen, "%s", dirs[dir]);	// real dir
+							}
+							else {
+								// bad direction -- just give them their arg back
+								snprintf(str, slen, "%s", subfield);
+							}
+						}
+						else {	// missing arg
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "pc_name")) {
 						snprintf(str, slen, "%s", GET_PC_NAME(c));
 					}
 					else if (!str_cmp(field, "plr_flagged")) {
@@ -5862,6 +5885,8 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 
 			else if (!strn_cmp(cmd, "dg_affect ", 10))
 				do_dg_affect(go, sc, trig, type, cmd);
+			else if (!strn_cmp(cmd, "dg_affect_room ", 15))
+				do_dg_affect_room(go, sc, trig, type, cmd);
 
 			else if (!strn_cmp(cmd, "global ", 7))
 				process_global(sc, trig, cmd, sc->context);

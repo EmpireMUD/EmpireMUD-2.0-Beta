@@ -33,6 +33,7 @@ void combat_meter_damage_taken(char_data *ch, int amt);
 void combat_meter_heal_dealt(char_data *ch, int amt);
 void combat_meter_heal_taken(char_data *ch, int amt);
 extern obj_data *die(char_data *ch, char_data *killer);
+extern room_data *get_room(room_data *ref, char *name);
 
 /* external vars */
 extern const char *apply_types[];
@@ -177,6 +178,77 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	}
 
 	affect_to_char(ch, &af);
+}
+
+
+/**
+* add/remove an affect on a room
+*/
+void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int script_type, char *cmd) {
+	extern const char *room_aff_bits[];
+	
+	char junk[MAX_INPUT_LENGTH]; /* will be set to "dg_affect_room" */
+	char roomname[MAX_INPUT_LENGTH], property[MAX_INPUT_LENGTH];
+	char value_p[MAX_INPUT_LENGTH], duration_p[MAX_INPUT_LENGTH];
+	bitvector_t i = 0, type = 0;
+	struct affected_type af;
+	room_data *room = NULL;
+	int duration = 0;
+
+	half_chop(cmd, junk, cmd);
+	half_chop(cmd, roomname, cmd);
+	half_chop(cmd, property, cmd);
+	half_chop(cmd, value_p, duration_p);
+
+	/* make sure all parameters are present */
+	if (!*roomname || !*property || !*value_p || !*duration_p) {
+		script_log("Trigger: %s, VNum %d. dg_affect_room usage: <room> <property> <on|off> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+		return;
+	}
+	
+	duration = atoi(duration_p);
+	if (duration == 0 || duration < -1) {
+		script_log("Trigger: %s, VNum %d. dg_affect_room: need positive duration!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+		script_log("Line was: dg_affect_room %s %s %s %s (%d)", roomname, property, value_p, duration_p, duration);
+		return;
+	}
+
+	// find the property -- search room_aff_bits
+	if ((i = search_block(property, room_aff_bits, TRUE)) != NOTHING) {
+		type = AFFECT_TYPE;
+	}
+
+	if (!type) { // property not found
+		script_log("Trigger: %s, VNum %d. dg_affect_room: unknown property '%s'!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), property);
+		return;
+	}
+
+	/* locate the target */
+	room = get_room((script_type == WLD_TRIGGER ? (room_data*)go : NULL), roomname);
+	if (!room) {
+		script_log("Trigger: %s, VNum %d. dg_affect_room: cannot locate target: %s", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), roomname);
+		return;
+	}
+	
+	if (duration == -1 && IS_OUTDOOR_TILE(room) && GET_ROOM_VNUM(room) < MAP_SIZE) {
+		script_log("Trigger: %s, VNum %d. dg_affect_room: cannot use infinite duration on map tile target", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+		return;
+	}
+
+	if (!str_cmp(value_p, "off")) {
+		affect_from_room_by_bitvector(room, ATYPE_DG_AFFECT, BIT(i), FALSE);
+		return;
+	}
+
+	/* add the affect */
+	af.type = ATYPE_DG_AFFECT;
+	af.cast_by = (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
+	af.duration = (duration == -1 ? UNLIMITED : ceil((double)duration / SECS_PER_MUD_HOUR));
+	af.modifier = 0;
+	af.location = APPLY_NONE;
+	af.bitvector = BIT(i);
+
+	affect_to_room(room, &af);
 }
 
 

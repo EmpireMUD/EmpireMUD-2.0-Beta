@@ -213,7 +213,7 @@ spider rat-eating eating~
 a rat-eating spider~
 A rat-eating spider is picking through a nest.
 ~
-0 50 bdjA c
+0 50 bdjA cG
 0 0 8 9
 I 4 10021 50.00 1 X  # LOOT: a spider fang dagger
 I 4 10022 50.00 1 X  # LOOT: a spider-hair ring
@@ -472,11 +472,11 @@ lich bony scaldorran~
 the lich Scaldorran~
 A bony lich is channelling a spell.
 ~
-70 90 bdhwxzA 0
+70 90 bdhwxzA G
 1 0 2 16
+I 4 10036 100.00 1  # LOOT: a small skystone
 I 4 10061 10.00 1 X  # LOOT: lich bindings
 I 4 10062 10.00 1 X  # LOOT: a tattered lich cloak
-I 4 10036 100.00 1  # LOOT: a small skystone
 T 10051
 T 10052
 S
@@ -485,7 +485,7 @@ skeleton rusty dusty~
 a skeleton~
 A rusty, dusty skeleton is ambling around the room.
 ~
-50 75 abdh 0
+50 75 abdh G
 0 0 0 10
 I 4 10063 10.00 1  # LOOT: a bone club
 I 4 10036 100.00 1  # LOOT: a small skystone
@@ -496,7 +496,7 @@ ghost shackled chains~
 a shackled ghost~
 A ghost in chains floats about the room.
 ~
-50 75 abdh 0
+50 75 abdh G
 0 0 0 7
 I 4 10064 10.00 1  # LOOT: ghastly chains
 I 4 10036 100.00 1  # LOOT: a small skystone

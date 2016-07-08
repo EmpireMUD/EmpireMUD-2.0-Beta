@@ -136,7 +136,6 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
 	void remove_sector_from_table(sector_data *sect);
 	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
-	extern bool world_map_needs_save;
 	
 	sector_data *sect, *sect_iter, *next_sect, *replace_sect;
 	quest_data *quest, *next_quest;
@@ -182,18 +181,11 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 			room = NULL;
 			
 			if (map->sector_type == sect) {
-				if (!room) {
-					room = real_room(map->vnum);
-				}
-				map->sector_type = replace_sect;
-				SECT(room) = replace_sect;
+				perform_change_sect(NULL, map, replace_sect);
 				++count;
 			}
 			if (map->base_sector == sect) {
-				if (!room) {
-					room = real_room(map->vnum);
-				}
-				change_base_sector(room, replace_sect);
+				perform_change_base_sect(NULL, map, replace_sect);
 			}
 			if (map->natural_sector == sect) {
 				map->natural_sector = replace_sect;
@@ -205,14 +197,8 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	LL_FOREACH2(interior_room_list, room, next_interior) {
 		if (SECT(room) == sect) {
 			// can't use change_terrain() here
-			SECT(room) = replace_sect;
+			perform_change_sect(room, NULL, replace_sect);
 			++count;
-			
-			// this SHOULD already have been taken care of, but just in case...
-			if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-				world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type = replace_sect;
-				world_map_needs_save = TRUE;
-			}
 		}
 		if (BASE_SECT(room) == sect) {
 			change_base_sector(room, replace_sect);

@@ -64,6 +64,7 @@
 */
 
 // externs
+extern const char *affect_wear_off_msgs[];
 extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
 extern const char *drinks[];
 extern int get_north_for_char(char_data *ch);
@@ -202,7 +203,7 @@ void affect_from_char_by_caster(char_data *ch, int type, char_data *caster, bool
 * calling this function with AFF_FLY will remove both parts).
 *
 * @param char_data *ch The person to remove from.
-* @param bitvector_t aff_flag Any AFF_x flags to remove.
+* @param bitvector_t aff_flag Any AFF_ flags to remove.
 * @param bool show_msg If TRUE, will show the wears-off message.
 */
 void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag, bool show_msg) {
@@ -231,6 +232,33 @@ void affect_from_room(room_data *room, int type) {
 		next = hjp->next;
 		if (hjp->type == type) {
 			affect_remove_room(room, hjp);
+		}
+	}
+}
+
+
+/**
+* Calls affect_remove_room on every affect of type "type" that sets AFF flag
+* "bits".
+*
+* @param room_data *rom The room to remove affects from.
+* @param int type Any ATYPE_ const to match.
+* @param bitvector_t bits Any AFF_ bit(s) to match.
+* @param bool show_msg If TRUE, shows the wear-off message.
+*/
+void affect_from_room_by_bitvector(room_data *room, int type, bitvector_t bits, bool show_msg) {
+	struct affected_type *aff, *next_aff;
+	bool shown = FALSE;
+	
+	LL_FOREACH_SAFE(ROOM_AFFECTS(room), aff, next_aff) {
+		if (aff->type == type && IS_SET(aff->bitvector, bits)) {
+			if (show_msg && !shown) {
+				if (*affect_wear_off_msgs[aff->type] && ROOM_PEOPLE(room)) {
+					act(affect_wear_off_msgs[aff->type], FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+				}
+				shown = TRUE;
+			}
+			affect_remove_room(room, aff);
 		}
 	}
 }
@@ -290,7 +318,7 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 * @param char_data *ch The person to apply to
 * @param byte loc APPLY_ const
 * @param sh_int mod The modifier amount for the apply
-* @param bitvector_t bitv AFF_x bits
+* @param bitvector_t bitv AFF_ bits
 * @param bool add if TRUE, applies this effect; if FALSE, removes it
 */
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add) {
@@ -846,7 +874,6 @@ bool room_affected_by_spell(room_data *room, int type) {
 * @param int atype The ATYPE_ affect type.
 */
 void show_wear_off_msg(char_data *ch, int atype) {
-	extern const char *affect_wear_off_msgs[];
 	if (*affect_wear_off_msgs[atype] && ch->desc) {
 		msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', affect_wear_off_msgs[atype]);
 	}
@@ -6026,6 +6053,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	obj = read_object(store->vnum, TRUE);
 	available = store->amount - 1;	// for later
 	charge_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), store->vnum, 1);
+	scale_item_to_level(obj, 1);	// scale to its minimum
 
 	obj_to_char(obj, ch);
 	act("You retrieve $p.", FALSE, ch, obj, 0, TO_CHAR);

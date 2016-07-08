@@ -176,4 +176,212 @@ T 10113
 T 10111
 T 10000
 S
+#10140
+cactus jumping~
+a jumping cactus~
+A jumping cactus leans toward you with its bristling spines.
+~
+75 100 dhuxz cdiG
+0 0 8 23
+I 4 10170 100.00 1  # LOOT: a cactus skeleton
+T 10140
+T 10141
+T 10148
+T 10166
+S
+#10141
+cactus barbary fig~
+a barbary fig~
+A barbary fig cactus turns is spiny pads toward you.
+~
+75 100 dhuxz cdiG
+0 0 8 23
+I 4 10170 100.00 1  # LOOT: a cactus skeleton
+T 10140
+T 10141
+T 10148
+T 10166
+S
+#10142
+cactus creeping devil~
+a creeping devil cactus~
+A creeping devil cactus lies dangerously close to your feet.
+~
+75 100 dhuxz cdiG
+0 0 8 23
+I 4 10170 100.00 1  # LOOT: a cactus skeleton
+T 10140
+T 10141
+T 10148
+T 10166
+S
+#10143
+cactus saguaro treant~
+a saguaro treant~
+A huge saguaro cactus bends its spiny arm down toward you.
+~
+75 100 bdhxzA cdiG
+0 0 8 23
+I 4 10149 100.00 1  # LOOT: a fallen saguaro cactus
+I 4 10146 100.00 2  # LOOT: a basket of saguaro fruit
+T 10149
+T 10143
+S
+#10144
+druid head #n~
+Head Druid #n~
+Head Druid #n stands at the center of the circle, protected by powerful magic.
+~
+0 0 bd n
+0 2 0 15
+S
+#10145
+thief robed~
+a robed thief~
+A robed thief leans out from behind a large shrub.
+~
+0 0 bd ein
+1 0 0 15
+T 10171
+S
+#10146
+merchant wandering~
+a wandering merchant~
+A wandering merchants stands here, lamenting the loss of his goods.
+~
+0 0 d n
+1 0 0 15
+T 10175
+S
+#10147
+man pale~
+a pale man~
+A pale man is lurking in the shadows.
+~
+0 0 bdw in
+1 0 0 15
+T 10167
+T 10171
+S
+#10150
+bat free-tailed tailed little~
+a free-tailed bat~
+A little bat flitters around above you.
+~
+1 5 djo m
+0 0 2 9
+T 10150
+S
+#10151
+monster gila orange black~
+a gila monster~
+An orange and black gila monster is lying on a rock.
+~
+10 20 dj 0
+0 0 0 9
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+T 10151
+S
+#10152
+armadillo~
+an armadillo~
+An armadillo is rolling around on the ground.
+~
+10 20 dj 0
+0 0 0 9
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+T 10152
+S
+#10153
+wren cactus~
+a cactus wren~
+A cactus wren is picking at seeds.
+~
+1 5 dgjo c
+0 0 2 9
+I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+T 10153
+S
+#10154
+squirrel antelope~
+an antelope squirrel~
+An antelope squirrel darts out from under a shrub.
+~
+1 5 djo c
+0 0 0 9
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1350 100.00 1  # SKIN: a small skin
+T 10154
+S
+#10155
+sheep bighorn desert~
+a desert bighorn~
+A desert bighorn sheep won't take its eyes off of you.
+~
+10 20 djo 0
+0 0 0 27
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 1  # SKIN: a large skin
+T 10155
+S
+#10156
+coati long-tailed tailed~
+a coati~
+A long-tailed coati is digging furiously at the ground.
+~
+20 30 djo c
+0 0 0 10
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 1  # SKIN: a large skin
+T 10156
+S
+#10158
+elemental melon~
+a melon elemental~
+A melon elemental is rolling around.
+~
+55 75 dhoz cG
+0 0 21 28
+I 4 10157 50.00 2 x  # LOOT: a maroon firemelon
+I 4 10158 50.00 2 x  # LOOT: a crimson firemelon
+S
+#10159
+teddybear cactus white spiny~
+a teddybear cactus~
+A white, spiny teddybear cactus is growing here.
+~
+1 1 bdoD dn
+0 0 0 9
+T 9901
+T 9902
+T 10158
+T 10159
+S
+#10160
+armadillo giant~
+a giant armadillo~
+A giant armadillo grazes nearby.
+~
+100 125 dej 0
+0 0 26 9
+S
+#10161
+sloth giant ground~
+a giant ground sloth~
+A giant ground sloth turns slowly toward you.
+~
+100 125 dej 0
+0 0 26 24
+S
+#10162
+moth sphinx giant~
+a giant sphinx moth~
+A giant sphinx moth buzzes over you.
+~
+100 125 de m
+0 0 2 28
+S
 $

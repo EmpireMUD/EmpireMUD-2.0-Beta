@@ -337,7 +337,7 @@ When using field  - The variable returns:
 &ccarrying&0 - Size of character's inventory (items carried).
 &ccha&0 - The actor's Charisma.
 &cclass&0 - The actor's class, as a string.
-&ccompleted_quest(vnum)% - Whether or not the player has completed and
+&ccompleted_quest(vnum)&0 - Whether or not the player has completed and
    turned in that quest vnum.
 &ccrafting_level&0 - The actor's crafting level.
 &cdex&0 - The actor's Dexterity.
@@ -406,6 +406,8 @@ When using field  - The variable returns:
 &cobj_target(name)&0 - Finds a targeted object the character can see/has.
 &cobj_target_inv(name)&0 - Finds a targeted object in the character's inventory.
 &con_quest(vnum)&0 - TRUE if the player is currently on that quest.
+&cparse_dir(dir)&0 - Gets the real direction that the char thinks is 'dir',
+   based on whether or not they have Navigation/alcohol.
 &cpc_name&0 - Player's name or mob's keyword list, rather than short desc
 &cplr_flagged(FLAG)&0 - Returns TRUE if the player has the given flag (VAMPIRE).
 &cpoison_immunity&0 - Returns TRUE if the player has Poison Immunity.

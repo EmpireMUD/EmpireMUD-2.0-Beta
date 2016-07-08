@@ -209,6 +209,7 @@ A curious bobcat is sitting here, waiting.
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
+T 9002
 S
 #9120
 coyote lanky~
@@ -654,7 +655,7 @@ Someone is lurking behind a tree!
 ~
 75 100 cdov c
 1 0 0 4
-I 4 170 20.00 1  # LOOT: a silver disc
+I 4 170 20.00 1  # LOOT: a silver ingot
 S
 #9163
 manatee~
@@ -1026,6 +1027,7 @@ A tabby cat purrs nearby.
 5 15 djoz c
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+T 9002
 S
 #9193
 cat tabby~
@@ -1035,6 +1037,7 @@ A tabby cat arches and hisses at you.
 5 15 djoz c
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+T 9002
 S
 #9194
 hound dog~

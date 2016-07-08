@@ -1463,7 +1463,13 @@ void send_to_group(char_data *ch, struct group_data *group, const char *msg, ...
 }
 
 
-void send_to_outdoor(const char *messg, ...) {
+/**
+* Sends a message to all outdoor players.
+*
+* @param bool weather If TRUE, ignores players in !WEATHER rooms.
+* @param const char *messg... The string to send.
+*/
+void send_to_outdoor(bool weather, const char *messg, ...) {
 	descriptor_data *i;
 	va_list tArgList;
 	char output[MAX_STRING_LENGTH];
@@ -1479,6 +1485,9 @@ void send_to_outdoor(const char *messg, ...) {
 			continue;
 		if (!AWAKE(i->character) || !IS_OUTDOORS(i->character) || IS_WRITING(i->character))
 			continue;
+		if (weather && ROOM_AFF_FLAGGED(IN_ROOM(i->character), ROOM_AFF_NO_WEATHER)) {
+			continue;
+		}
 		SEND_TO_Q(output, i);
 	}
 	va_end(tArgList);

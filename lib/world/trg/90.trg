@@ -51,6 +51,20 @@ else
   end
 end
 ~
+#9002
+Herd Cats~
+0 c 0
+herd~
+* test targeting me
+eval test %%actor.char_target(%arg.car%)%%
+if %test% != %self%
+  return 0
+  halt
+end
+%send% %actor% Herding cats is not as easy as it looks; you fail.
+%echoaround% %actor% %actor.name% tries and fails to herd %self.name%.
+return 1
+~
 #9004
 Sheep Animation~
 0 b 1
@@ -324,6 +338,10 @@ end
 if %time.hour%>=7 && %time.hour%<=19
   halt
 end
+if %actor.aff_flagged(!DRINK-BLOOD)%
+  * Don't bite !DRINK-BLOOD targets
+  halt
+end
 %send% %actor% %self.name% lunges forward and sinks %self.hisher% teeth into your shoulder!
 %echoaround% %actor% %self.name% lunges forward and sinks %self.hisher% teeth into %actor.name%'s shoulder!
 eval healthprct %actor.health% * 100 / %actor.maxhealth%
@@ -333,7 +351,7 @@ if %healthprct% > 50 || %actor.aff_flagged(!VAMPIRE)% || %actor.vampire()%
   eval can_turn 0
 end
 if %actor.is_pc%
-  if %actor.nohassle% 
+  if %actor.nohassle%
     * PC is immune to vampirism (rare)
     eval can_turn 0
   end

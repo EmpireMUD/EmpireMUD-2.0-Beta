@@ -739,6 +739,36 @@ void remove_armor_by_type(char_data *ch, int armor_type) {
 
 
 /**
+* Removes all honed items from a character's equipment.
+*
+* @param char_data *ch the character
+*/
+void remove_honed_gear(char_data *ch) {
+	struct obj_apply *app;
+	bool found = FALSE;
+	int iter;
+	
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (!GET_EQ(ch, iter)) {
+			continue;
+		}
+		LL_FOREACH(GET_OBJ_APPLIES(GET_EQ(ch, iter)), app) {
+			if (app->apply_type == APPLY_TYPE_HONED) {
+				act("You take off $p.", FALSE, ch, GET_EQ(ch, iter), NULL, TO_CHAR);
+				unequip_char_to_inventory(ch, iter);
+				found = TRUE;
+				break;
+			}
+		}
+	}
+	
+	if (found) {
+		determine_gear_level(ch);
+	}
+}
+
+
+/**
 * Interaction func for "separate".
 */
 INTERACTION_FUNC(separate_obj_interact) {

@@ -34,4 +34,193 @@ ac 0
 M 1 10110 33.00 1
 M 1 10115 100.00 1
 S
+#10140
+Inside the Rift~
+   The torrential storms look vicious, but little of the rain falls here.
+Instead, most of it is being pulled out the rift and into your native plane.
+The rain looks more intense further from the rift, so you can't get your
+bearings. Even though most of the sun is blocked by storm clouds, the desert
+seems brighter here than outside the rift. Every color is more intense. Every
+plant seems alive as it clings to the ground against blowing wind. Large,
+exposed roots form a loose pathway above the pooling rainwater.
+~
+acgi k
+D14
+~
+0 10141
+D14
+~
+0 10144
+E
+plants cactus cacti trees~
+   The pale green plantlife seems to swell as it soaks up every droplet of
+water from this rare summer monsoon. But as you look at the cacti and shrubs,
+they turn a brighter and brighter shade of green, and seem to swirl with magic.
+After all, this is the Magiterranean.
+~
+E
+roots path~
+Large, woody roots form a natural walkway above the wet desert floor.
+~
+T 10163
+T 10157
+S
+#10141
+A Torchlit Path~
+   Large, tangled roots form a pathway over the puddling water. Bright torches
+line the path, somehow untouched by the monsoon rains. Rain is light on the
+path, but the droplets that hit you are large and cold. You can't see pastt the
+first line of plants, though, as the monsoon rain forms a wall of water.
+~
+acgi k
+D14
+~
+0 10140
+D14
+~
+0 10142
+E
+path roots~
+Large, woody roots form a natural walkway above the wet desert floor.
+~
+E
+plants cacti cactus trees~
+   The pale green plantlife seems to swell as it soaks up every droplet of
+water from this rare summer monsoon. But as you look at the cacti and shrubs,
+they turn a brighter and brighter shade of green, and seem to swirl with magic.
+After all, this is the Magiterranean.
+~
+M 0 10145 100.00 1
+T 10163
+T 10157
+S
+#10142
+A Torchlit Stone Circle~
+   The path leads to a circle made from tall stones. The dirt inside the circle
+is well-worn, but completely dry. No rain seems to fall inside the circle, but
+it's coming down so hard everywhere else that you can barely see anything past
+the stones. The root path leads back to the rift from here, and there's also a
+small trail leading into the druid's tent.
+~
+acgi k
+D14
+~
+0 10141
+D14
+~
+0 10143
+E
+stones circle~
+   The stones are twice as tall as you are. They're curved on the outside but
+flat on the inside, and inscribed with pictographs you can't understand.
+~
+E
+trail tent~
+   A small trail leads into a large leather tent, but the high druid is
+watching you and won't let you go that way.
+~
+M 0 10144 100.00 1
+T 10161
+T 10162
+T 10163
+T 10157
+S
+#10143
+The Head Druid's Tent~
+   You have managed to sneak into the druid's tent which, inexplicably, is
+larger on the inside. The outside of the tent looked like it was made from
+animal hides, but the inside is fine ironwood. Wooden shelves hold piles and
+piles of scrolled parchment. There's a writing desk and a wooden trunk, and a
+bed made from piled skins. But the rest of the druid's possessions are piled
+haphazardly like a half-mad hoarder.
+Commands: &csearch&0
+~
+gi 0
+D14
+~
+0 10142
+E
+ironwood walls~
+   The walls are made of dark, rich ironwood. You know this type of wood to be
+very heavy, so the sheer amount of it used in building this large tent is
+impressive.
+~
+E
+desk~
+The writing desk is covered in empty ink bottles and half-written texts.
+~
+E
+shelves scrolls parchment~
+   All of the scrolls are written in a language you don't understand, and all
+in the same shaky hand.
+~
+T 10181
+S
+#10144
+A Desert Path~
+   The path of overgrown roots twists and winds through the desert, cutting a
+dry route through torrential downpour. Indeed, you can barely see past the
+first plants, and any attempt to move off the path is met with cold, painful
+raindrops.
+~
+agi k
+D14
+~
+0 10140
+D14
+~
+0 10145
+E
+path roots~
+Large, woody roots form a natural walkway above the wet desert floor.
+~
+E
+plants cacti cactus trees~
+   The pale green plantlife seems to swell as it soaks up every droplet of
+water from this rare summer monsoon. But as you look at the cacti and shrubs,
+they turn a brighter and brighter shade of green, and seem to swirl with magic.
+After all, this is the Magiterranean.
+~
+T 10163
+T 10157
+S
+#10145
+A Rocky Hilltop~
+   The path leads up a small, rocky hill to a vantage point overlooking the
+rainy desert. The plants seem to sway like revelers, glad for every drop of
+precious water. On the hill, like the root path, the rain is lighter and you
+feel only the occasional cold drop.
+~
+agi k
+D14
+~
+0 10144
+E
+path roots~
+Large, woody roots form a natural walkway above the wet desert floor.
+~
+E
+plants trees cacti~
+   The pale green plantlife seems to swell as it soaks up every droplet of
+water from this rare summer monsoon. But as you look at the cacti and shrubs,
+they turn a brighter and brighter shade of green, and seem to swirl with magic.
+After all, this is the Magiterranean.
+~
+M 1 10171 100.00 1
+T 10163
+T 10157
+S
+#10146
+The Cactus Garden Dimension~
+   This pocket dimension spawns the aggressive cacti for the Monsoon Rift.
+This location is not reachable by players. The cacti teleport themselves out on
+spawn.
+~
+gi k
+M 0 10140 66.66 10
+M 0 10141 66.66 10
+M 0 10142 66.66 10
+M 0 10147 100.00 1
+M 1 10172 100.00 1
+S
 $
