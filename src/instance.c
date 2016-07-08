@@ -712,22 +712,23 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	extern bool can_build_on(room_data *room, bitvector_t flags);
 	
 	room_template *start_room = room_template_proto(GET_ADV_START_VNUM(adv));
-	sector_data *sect, *next_sect, *findsect = NULL;
-	int dir, num_found, found_dir, x_coord, y_coord;
-	room_data *room, *shift, *found = NULL;
-	struct map_data *map, *map_shift;
-	struct sector_index_type *idx;
+	room_data *room, *next_room, *loc, *shift, *found = NULL;
+	int dir, iter, sub, num_found, pos;
+	sector_data *findsect = NULL;
 	bool match_buildon = FALSE;
 	bld_data *findbdg = NULL;
+	struct map_data *map;
 	
-	*which_dir = found_dir = NO_DIR;
+	const int max_tries = 500, max_dir_tries = 10;	// for random checks
+	
+	*which_dir = NO_DIR;
 	
 	// cannot find a location without a start room
 	if (!start_room) {
 		return NULL;
 	}
 	
-	// ADV_LINK_x: determine what we're looking for
+	// ADV_LINK_x
 	switch (rule->type) {
 		case ADV_LINK_BUILDING_EXISTING: {
 			findbdg = building_proto(rule->value);
@@ -755,11 +756,15 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 		}
 	}
 	
-	// several ways of doing this:
-	if (findsect) {	// only check rooms that have this sector
+	// two ways of doing this:
+	if (findsect) {	// scan the whole map
 		num_found = 0;
-		idx = find_sector_index(GET_SECT_VNUM(findsect));
-		LL_FOREACH2(idx->sect_rooms, map, next_in_sect) {
+		for (map = land_map; map; map = map->next) {
+			// looking for sect: fail
+			if (findsect && map->sector_type != findsect) {
+				continue;
+			}
+			
 			// attributes/limits checks
 			if (!validate_one_loc(adv, rule, NULL, map) || !validate_linking_limits(adv, NULL, map)) {
 				continue;
@@ -772,25 +777,50 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 			}
 		}
 	}
-	else {	// will check multiple sectors (findbdg or match_buildon)
+	else if (findbdg) {	// check live rooms for matching building
 		num_found = 0;
-		HASH_ITER(hh, sector_table, sect, next_sect) {
+		HASH_ITER(hh, world_table, room, next_room) {
+			if (BUILDING_VNUM(room) != GET_BLD_VNUM(findbdg) || !IS_COMPLETE(room)) {
+				continue;
+			}
+			
+			// attributes/limits checks
+			if (!validate_one_loc(adv, rule, room, NULL) || !validate_linking_limits(adv, room, NULL)) {
+				continue;
+			}
+			
+			// SUCCESS: mark it ok
+			if (!number(0, num_found++) || !found) {
+				found = room;
+			}
+		}
+	}
+	else if (match_buildon) {
+		// try to match a build rule
+		for (iter = 0; iter < max_tries && !found; ++iter) {
+			// random location:
+			pos = number(0, MAP_SIZE-1);
+			map = &(world_map[MAP_X_COORD(pos)][MAP_Y_COORD(pos)]);
+			
 			// shortcut: skip BASIC_OCEAN
-			if (GET_SECT_VNUM(sect) == BASIC_OCEAN) {
-				continue;
-			}
-			// are we looking for a building?
-			if (findbdg && !ANY_BUILDING_SECT(sect)) {
-				continue;
-			}
-			// are we looking for something we can build on? this is a preliminary match of the build rule (not guaranteed)
-			if (match_buildon && !IS_SET(GET_SECT_BUILD_FLAGS(sect), rule->bld_on)) {
+			if (GET_SECT_VNUM(map->sector_type) == BASIC_OCEAN) {
 				continue;
 			}
 			
-			// ok at this point we are reasonably sure this sector type is valid
-			idx = find_sector_index(GET_SECT_VNUM(sect));
+			// basic validation
+			if (!validate_one_loc(adv, rule, NULL, map)) {
+				continue;
+			}
 			
+			// check secondary limits
+			if (!validate_linking_limits(adv, NULL, map)) {
+				continue;
+			}
+			
+			// this spot SEEMS ok... now we need the actual spot:
+			loc = real_room(pos);
+			
+<<<<<<< HEAD
 			// check its map locations
 			LL_FOREACH2(idx->sect_rooms, map, next_in_sect) {
 				map_shift = NULL;
@@ -846,33 +876,42 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 				if (match_buildon) {
 					// can we build here? (never build on a closed location)
 					if (ROOM_IS_CLOSED(room) || !can_build_on(room, rule->bld_on)) {
+=======
+			// can we build here? (never build on a closed location)
+			if (ROOM_IS_CLOSED(loc) || !can_build_on(loc, rule->bld_on)) {
+				continue;
+			}
+			
+			if (rule->bld_facing == NOBITS) {
+				// success!
+				found = loc;
+				break;
+			}
+			else {
+				for (sub = 0; sub < max_dir_tries && !found; ++sub) {
+					dir = number(0, NUM_2D_DIRS-1);
+					
+					// matches the dir we need inside?
+					if (dir == rule->dir) {
 						continue;
 					}
-					// more validation on the facing tile
-					if (rule->bld_facing != NOBITS) {
-						// did we somehow get here without these set?
-						if (dir == NO_DIR || !map_shift) {
-							continue;
-						}
-						
-						// need a valid map tile to face
-						if (!(shift = real_room(map_shift->vnum)) || !can_build_on(shift, rule->bld_facing)) {
-							continue;
-						}
+					// need a valid map tile to face
+					if (!(shift = real_shift(loc, shift_dir[dir][0], shift_dir[dir][1]))) {
+>>>>>>> parent of a76edbc... new instancer using sect lists
+						continue;
 					}
-				}
-				
-				// SUCCESS: mark it ok
-				if (!number(0, num_found++) || !found) {
-					found = room;
-					found_dir = dir;
+					
+					// ok go
+					if (can_build_on(shift, rule->bld_facing)) {
+						*which_dir = dir;
+						found = loc;
+						break;
+					}
 				}
 			}
 		}
 	}
 	
-	// and return what we did or did not find
-	*which_dir = found_dir;
 	return found;
 }
 
