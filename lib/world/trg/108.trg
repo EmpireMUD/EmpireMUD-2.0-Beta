@@ -99,22 +99,6 @@ if (%actor.is_npc% && %boss%)
   %teleport% %actor% %boss.room%
 end
 ~
-#10850
-Soulstream block entry without quest~
-2 g 100
-~
-if %direction%
-  * not a portal entry
-  return 1
-  halt
-end
-eval test (%actor.on_quest(10850)% || %actor.completed_quest(10850)%)
-if !%test%
-  %send% %actor% You must start the quest 'Enter the Soulstream' before entering.
-  %send% %actor% Use 'quest start Enter' to begin the quest.
-  return 0
-end
-~
 #10851
 Detect Ritual of Burdens~
 2 p 100
@@ -194,15 +178,28 @@ eval bloodamt %actor.blood%
 remote bloodamt %actor.id%
 ~
 #10858
-Detect Full Blood~
+Detect Full Blood + Soulstream Entry~
 2 g 100
 ~
-if (!%actor.on_quest(10857)% || !%actor.varexists(bloodamt)%)
-  halt
+* Detect full blood
+if (%actor.on_quest(10857)% && %actor.varexists(bloodamt)%)
+  if %actor.blood% > %actor.bloodamt%
+    %quest% %actor% trigger 10857
+    rdelete bloodamt %actor.id%
+  end
 end
-if %actor.blood% > %actor.bloodamt%
-  %quest% %actor% trigger 10857
-  rdelete bloodamt %actor.id%
+* Detect soulstream entry
+if %room.template% == 10850
+  if (%direction% != none || %actor.nohassle%)
+    * Not a portal entry - or an immortal with hassle off
+    return 1
+    halt
+  end
+  if (!%actor.on_quest(10850)% && !%actor.completed_quest(10850)%)
+    %send% %actor% You must start the quest 'Enter the Soulstream' before entering.
+    %send% %actor% Use 'quest start Enter' to begin the quest.
+    return 0
+  end
 end
 ~
 $

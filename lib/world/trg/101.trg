@@ -516,27 +516,25 @@ mkill %target%
 Monsoon Rift cleanup + complete~
 2 v 100
 ~
-eval cactus %instance.mob(10140)%
-while %cactus%
-  %echoaround% %cactus% %cactus.name% turns back into an ordinary cactus.
-  %purge% %cactus%
-  eval cactus %instance.mob(10140)%
+* Start of script fragment: Monsoon cleanup
+* Iterates over a series of vnums and removes all mobs with those vnums from the instance.
+* Also cleans up the entrance portal and saguaro cactus.
+* This script fragment is duplicated in triggers: 10142, 10177, 10180
+eval current_vnum 10140
+while %current_vnum% <= 10147
+  if %current_vnum% <= 10143
+    set message turns back into an ordinary cactus.
+  else
+    set message leaves.
+  end
+  eval mob %%instance.mob(%current_vnum%)%%
+  while %mob%
+    %echoaround% %mob% %mob.name% %message%
+    %purge% %mob%
+    eval mob %%instance.mob(%current_vnum%)%%
+  done
+  eval current_vnum %current_vnum% + 1
 done
-eval cactus %instance.mob(10141)%
-while %cactus%
-  %echoaround% %cactus% %cactus.name% turns back into an ordinary cactus.
-  %purge% %cactus%
-  eval cactus %instance.mob(10141)%
-done
-eval cactus %instance.mob(10142)%
-while %cactus%
-  %echoaround% %cactus% %cactus.name% turns back into an ordinary cactus.
-  %purge% %cactus%
-  eval cactus %instance.mob(10142)%
-done
-* Despawn the entry portal
-eval loc %instance.location%
-eval obj %loc.contents%
 while %obj%
   eval next_obj %obj.next_in_list%
   if %obj.vnum% == 10140
@@ -545,55 +543,21 @@ while %obj%
   end
   eval obj %next_obj%
 done
-* Despawn vampires
-eval mob %instance.mob(10147)%
-while %mob%
-  %echoaround% %mob% %mob.name% leaves.
-  %purge% %mob%
-  eval mob %instance.mob(10147)%
-done
-* Despawn wandering merchant
-eval mob %instance.mob(10146)%
-while %mob%
-  %echoaround% %mob% %mob.name% leaves.
-  %purge% %mob%
-  eval mob %instance.mob(10146)%
-done
-* Despawn robed thief
-eval mob %instance.mob(10145)%
-while %mob%
-  %echoaround% %mob% %mob.name% leaves.
-  %purge% %mob%
-  eval mob %instance.mob(10145)%
-done
-* Despawn head druid
-eval mob %instance.mob(10144)%
-while %mob%
-  %echoaround% %mob% %mob.name% leaves.
-  %purge% %mob%
-  eval mob %instance.mob(10144)%
-done
-* Despawn saguaro mob
-eval mob %instance.mob(10143)%
-while %mob%
-  %echoaround% %mob% %mob.name% turns back into a regular saguaro, and you lose track of it.
-  %purge% %mob%
-  eval mob %instance.mob(10143)%
-done
 * Despawn saguaro obj
-eval loc i10145
+makeuid loc room i10145
 if %loc%
   eval obj %loc.contents%
   while %obj%
     eval next_obj %obj.next_in_list%
     if %obj.vnum% == 10171
-      %echo% You lose track of %obj.shortdesc%.
+      %at% %loc% %echo% You lose track of %obj.shortdesc%.
       %purge% %obj%
     end
     eval obj %next_obj%
   done
 end
 %adventurecomplete%
+* End of script fragment.
 ~
 #10143
 Saguaro treant combat~
@@ -727,7 +691,10 @@ while %cycles_left% >= 0
       halt
     break
   done
-  wait 5 sec
+  * Shortcut for immortals
+  if !%actor.nohassle%
+    wait 5 sec
+  end
   eval cycles_left %cycles_left% - 1
 done
 ~
@@ -1311,7 +1278,11 @@ if %room.sector% != Oasis
 end
 if %time.hour% > 7 && %time.hour% < 19
   %send% %actor% You can only infuse %self.shortdesc% at night.
-  halt
+  if !%actor.nohassle%
+    halt
+  else
+    %send% %actor% You use your immortal powers to ignore this restriction.
+  end
 end
 * Charge blood
 eval charge %%actor.blood(-%cost%)%%
@@ -1380,11 +1351,55 @@ while %cycles_left% >= 0
     case 0
       %echoaround% %actor% %actor.name% completes %actor.hisher% ritual!
       %send% %actor% You complete your ritual!
+      * Echo the eclipse globally
+      %regionecho% %actor.room% -9999 A dark shadow covers the land as the sun is momentarily eclipsed.
       %quest% %actor% trigger 10157
       %send% %actor% %self.shortdesc% splinters and breaks!
       %echoaround% %actor% %self.shortdesc% splinters and breaks!
+      * Start of script fragment: Monsoon cleanup
+      * Iterates over a series of vnums and removes all mobs with those vnums from the instance.
+      * Also cleans up the entrance portal and saguaro cactus.
+      * This script fragment is duplicated in triggers: 10142, 10177, 10180
+      eval current_vnum 10140
+      while %current_vnum% <= 10147
+        if %current_vnum% <= 10143
+          set message turns back into an ordinary cactus.
+        else
+          set message leaves.
+        end
+        eval mob %%instance.mob(%current_vnum%)%%
+        while %mob%
+          %echoaround% %mob% %mob.name% %message%
+          %purge% %mob%
+          eval mob %%instance.mob(%current_vnum%)%%
+        done
+        eval current_vnum %current_vnum% + 1
+      done
+      while %obj%
+        eval next_obj %obj.next_in_list%
+        if %obj.vnum% == 10140
+          %at% %loc% %echo% The monsoon rift closes.
+          %purge% %obj%
+        end
+        eval obj %next_obj%
+      done
+      * Despawn saguaro obj
+      makeuid loc room i10145
+      if %loc%
+        eval obj %loc.contents%
+        while %obj%
+          eval next_obj %obj.next_in_list%
+          if %obj.vnum% == 10171
+            %at% %loc% %echo% You lose track of %obj.shortdesc%.
+            %purge% %obj%
+          end
+          eval obj %next_obj%
+        done
+      end
+      %adventurecomplete%
+      * End of script fragment.
       %quest% %actor% finish 10157
-      %purge% %self%
+      * Quest finish will purge this for us
       halt
     break
   done
@@ -1427,7 +1442,7 @@ while %cycles_left% >= 0
   eval sector_valid (%room.building% == Monsoon Rift)
   eval rift_present 0
   eval object %room.contents%
-  while %object% && !%rift_present%
+  while %object% & !%rift_present%
     if %object.vnum% == 10140
       eval rift_present 1
     end
@@ -1472,10 +1487,52 @@ while %cycles_left% >= 0
       %echoaround% %actor% %actor.name% completes %actor.hisher% ritual, closing the monsoon rift!
       %send% %actor% You complete your ritual, closing the monsoon rift!
       %quest% %actor% trigger 10145
-      %send% %actor% %self.shortdesc% splinters and breaks!
-      %echoaround% %actor% %self.shortdesc% splinters and breaks!
+      %send% %actor% %self.shortdesc% bursts into flames!
+      %echoaround% %actor% %self.shortdesc% bursts into flames!
+      * Start of script fragment: Monsoon cleanup
+      * Iterates over a series of vnums and removes all mobs with those vnums from the instance.
+      * Also cleans up the entrance portal and saguaro cactus.
+      * This script fragment is duplicated in triggers: 10142, 10177, 10180
+      eval current_vnum 10140
+      while %current_vnum% <= 10147
+        if %current_vnum% <= 10143
+          set message turns back into an ordinary cactus.
+        else
+          set message leaves.
+        end
+        eval mob %%instance.mob(%current_vnum%)%%
+        while %mob%
+          %echoaround% %mob% %mob.name% %message%
+          %purge% %mob%
+          eval mob %%instance.mob(%current_vnum%)%%
+        done
+        eval current_vnum %current_vnum% + 1
+      done
+      while %obj%
+        eval next_obj %obj.next_in_list%
+        if %obj.vnum% == 10140
+          %at% %loc% %echo% The monsoon rift closes.
+          %purge% %obj%
+        end
+        eval obj %next_obj%
+      done
+      * Despawn saguaro obj
+      makeuid loc room i10145
+      if %loc%
+        eval obj %loc.contents%
+        while %obj%
+          eval next_obj %obj.next_in_list%
+          if %obj.vnum% == 10171
+            %at% %loc% %echo% You lose track of %obj.shortdesc%.
+            %purge% %obj%
+          end
+          eval obj %next_obj%
+        done
+      end
+      %adventurecomplete%
+      * End of script fragment.
       %quest% %actor% finish 10145
-      %purge% %self%
+      * Quest finish will purge the ritual object for us
       halt
     break
   done

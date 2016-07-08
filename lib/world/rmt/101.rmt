@@ -44,7 +44,7 @@ seems brighter here than outside the rift. Every color is more intense. Every
 plant seems alive as it clings to the ground against blowing wind. Large,
 exposed roots form a loose pathway above the pooling rainwater.
 ~
-agi k
+acgi k
 D14
 ~
 0 10141
@@ -212,9 +212,9 @@ T 10157
 S
 #10146
 The Cactus Garden Dimension~
-   This pocket dimension spawns the aggressive cacti for the Monsoon Rift. 
+   This pocket dimension spawns the aggressive cacti for the Monsoon Rift.
 This location is not reachable by players. The cacti teleport themselves out on
-spawn.  
+spawn.
 ~
 gi k
 M 0 10140 66.66 10

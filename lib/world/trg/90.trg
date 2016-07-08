@@ -338,6 +338,10 @@ end
 if %time.hour%>=7 && %time.hour%<=19
   halt
 end
+if %actor.aff_flagged(!DRINK-BLOOD)%
+  * Don't bite !DRINK-BLOOD targets
+  halt
+end
 %send% %actor% %self.name% lunges forward and sinks %self.hisher% teeth into your shoulder!
 %echoaround% %actor% %self.name% lunges forward and sinks %self.hisher% teeth into %actor.name%'s shoulder!
 eval healthprct %actor.health% * 100 / %actor.maxhealth%

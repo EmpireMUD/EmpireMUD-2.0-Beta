@@ -181,7 +181,7 @@ cactus jumping~
 a jumping cactus~
 A jumping cactus leans toward you with its bristling spines.
 ~
-75 100 dhuxz cdi
+75 100 dhuxz cdiG
 0 0 8 23
 I 4 10170 100.00 1  # LOOT: a cactus skeleton
 T 10140
@@ -194,7 +194,7 @@ cactus barbary fig~
 a barbary fig~
 A barbary fig cactus turns is spiny pads toward you.
 ~
-75 100 dhuxz cdi
+75 100 dhuxz cdiG
 0 0 8 23
 I 4 10170 100.00 1  # LOOT: a cactus skeleton
 T 10140
@@ -207,7 +207,7 @@ cactus creeping devil~
 a creeping devil cactus~
 A creeping devil cactus lies dangerously close to your feet.
 ~
-75 100 dhuxz cdi
+75 100 dhuxz cdiG
 0 0 8 23
 I 4 10170 100.00 1  # LOOT: a cactus skeleton
 T 10140
@@ -220,7 +220,7 @@ cactus saguaro treant~
 a saguaro treant~
 A huge saguaro cactus bends its spiny arm down toward you.
 ~
-75 100 dhxzA cdi
+75 100 bdhxzA cdiG
 0 0 8 23
 I 4 10149 100.00 1  # LOOT: a fallen saguaro cactus
 I 4 10146 100.00 2  # LOOT: a basket of saguaro fruit
@@ -343,7 +343,7 @@ elemental melon~
 a melon elemental~
 A melon elemental is rolling around.
 ~
-55 75 dhoz c
+55 75 dhoz cG
 0 0 21 28
 I 4 10157 50.00 2 x  # LOOT: a maroon firemelon
 I 4 10158 50.00 2 x  # LOOT: a crimson firemelon
