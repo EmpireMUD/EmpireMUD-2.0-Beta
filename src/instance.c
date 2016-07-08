@@ -820,63 +820,6 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 			// this spot SEEMS ok... now we need the actual spot:
 			loc = real_room(pos);
 			
-<<<<<<< HEAD
-			// check its map locations
-			LL_FOREACH2(idx->sect_rooms, map, next_in_sect) {
-				map_shift = NULL;
-				dir = NO_DIR;	// we may set this if needed
-				
-				// if it's instantiated already...
-				room = real_real_room(map->vnum);
-				
-				// actual building type
-				if (findbdg && (!room || BUILDING_VNUM(room) != GET_BLD_VNUM(findbdg) || !IS_COMPLETE(room))) {
-					continue;
-				}
-				// check buildon reqs
-				if (match_buildon) {
-					// must find a facing direction (we'll only try 1 per tile)
-					if (rule->bld_facing != NOBITS) {
-						// pick a dir (we will ONLY try one per room)
-						dir = number(0, NUM_2D_DIRS-1);
-						
-						// matches the dir we need inside
-						if (dir == rule->dir) {
-							continue;
-						}
-						
-						// find an adjacent room in that dir
-						if (!get_coord_shift(MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum), shift_dir[dir][0], shift_dir[dir][1], &x_coord, &y_coord)) {
-							continue;
-						}
-						map_shift = &(world_map[x_coord][y_coord]);
-						
-						// check bld_facing flags
-						if (!IS_SET(GET_SECT_BUILD_FLAGS(map_shift->sector_type), rule->bld_facing)) {
-							continue;
-						}
-					}
-				}
-				
-				// basic validation
-				if (!validate_one_loc(adv, rule, NULL, map)) {
-					continue;
-				}
-				// check secondary limits
-				if (!validate_linking_limits(adv, NULL, map)) {
-					continue;
-				}
-				
-				// need the room by this point
-				if (!room) {
-					room = real_room(map->vnum);
-				}
-				
-				// checking for buildon that required a room
-				if (match_buildon) {
-					// can we build here? (never build on a closed location)
-					if (ROOM_IS_CLOSED(room) || !can_build_on(room, rule->bld_on)) {
-=======
 			// can we build here? (never build on a closed location)
 			if (ROOM_IS_CLOSED(loc) || !can_build_on(loc, rule->bld_on)) {
 				continue;
@@ -897,7 +840,6 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 					}
 					// need a valid map tile to face
 					if (!(shift = real_shift(loc, shift_dir[dir][0], shift_dir[dir][1]))) {
->>>>>>> parent of a76edbc... new instancer using sect lists
 						continue;
 					}
 					
