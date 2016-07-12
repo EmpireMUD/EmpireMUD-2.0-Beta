@@ -13,7 +13,7 @@ quest first.
 ~
 You have defeated enough attackers to summon the final cactus...
 ~
-3 c 75 100 1440
+5 c 75 100 1440
 A
 4 10148
 P
@@ -50,7 +50,7 @@ cactus stirs to life... Defeat it to complete this quest and close the rift.
 immediately. You sense that the mana holding open the rift has begun to fade,
 and realize you should leave the rift immediately.
 ~
-8 c 75 100 0
+9 bc 75 100 0
 A
 4 10148
 P
@@ -133,7 +133,7 @@ monsoon rift and type 'ritual rift' to seal it off and end the cactus invasion.
 fade and lose its hold. Almost instantly, the rift begins to collapse.
 Hopefully nobody is trapped on the wrong side of it!
 ~
-5 c 75 100 0
+6 bc 75 100 0
 A
 2 10142
 P
@@ -371,7 +371,7 @@ have been ravaging the countryside.
 animates the cacti begins to fade. In the distance, you can see the rift
 starting to close. You better hurry out!
 ~
-8 c 75 100 0
+9 bc 75 100 0
 A
 2 10161
 P

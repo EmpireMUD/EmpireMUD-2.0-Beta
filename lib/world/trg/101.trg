@@ -502,10 +502,13 @@ if !%target%
   halt
 end
 wait 2
+if %actor.room% != %self.room% || %self.disabled%
+  halt
+end
 %send% %target% %self.name% moves menacingly towards you...
 %echoaround% %target% %self.name% moves menacingly towards %target.name%...
 wait 1 sec
-if %target.room% != %self.room%
+if %target.room% != %self.room% || %self.disabled%
   halt
 end
 %echoaround% %target% %self.name% attacks %target.name%!
@@ -749,14 +752,16 @@ while %char%
       end
     else
       * We're not on the quest yet; start it
-      %quest% %char% start 10141
-      if !%char.on_quest(10141)%
-        * Quest start silently failed - this shouldn't normally happen (happens if the player has already completed the quest), so we halt in this case
-        halt
+      if %actor.can_start_quest(10141)%
+        %quest% %char% start 10141
       end
-      * Reset attacker kill count for the new quest
-      eval monsoon_attacker_kills 1
-      remote monsoon_attacker_kills %char.id%
+      if !%char.on_quest(10141)%
+        * Quest start failed
+      else
+        * Reset attacker kill count for the new quest
+        eval monsoon_attacker_kills 1
+        remote monsoon_attacker_kills %char.id%
+      end
     end
   end
   eval char %char.next_in_room%

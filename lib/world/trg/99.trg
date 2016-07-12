@@ -60,6 +60,7 @@ else
     eval %varname% %timestamp%
     remote %varname% %actor.id%
     dg_affect %pet% *CHARM on -1
+    nop %pet.unlink_instance%
   end
 end
 ~

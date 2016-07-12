@@ -722,9 +722,9 @@ totem sphinx moth giant~
 a giant sphinx moth totem~
 A giant sphinx moth totem was dropped here.~
    This totem is carved from dark, heavy ironwood, although it's small enough
-to fit in your pocket. Type 'ues totem' to summon this flying mount.
+to fit in your pocket. Type 'use totem' to summon this flying mount.
 ~
-3 ep a 11
+3 ep a 12
 10162 0 0
 2 0
 T 10263
@@ -908,11 +908,11 @@ the herbicide supply list~
 An herbicide supply list is lying here.~
    The supply list tells you that you will need bileberries, daggerbite, and
 glowing green seashells. Once you've brewed the herbicide at an alchemist, you
-need to let it age for several minutes before brinding it back to the merchant.
+need to let it age for several minutes before bringing it back to the merchant.
 You need 3 vials of herbicide in total. Use 'brew info herbicide' to see the
 exact requirements.
 ~
-3 0 a 2
+3 0 a 3
 0 0 0
 0 0
 Q 10153
