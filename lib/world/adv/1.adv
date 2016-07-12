@@ -66,6 +66,32 @@ L
 -1 0 0
 T 10507
 S
+#103
+Magiterranean: Monsoon Rift~
+Paul Clarke and Owen Morris~
+   A rift has opened in the fabric between your world and the Magiterranean,
+the druidic plane of nature magic. A vicious monsoon storm is escaping through
+the rift, but it's not the only thing: animated cacti are attacking your world!
+   You can seal the rift using your Battle, High Sorcery, Natural Magic,
+Stealth, Trade, or Vampire skill. Each skill solution can only be completed
+once per day, even if you find another rift. The invading cacti will vanish as
+soon as you close the rift.
+~
+10140 10199 75-100
+5 30 g 0
+L
+4 0
+10140 10140 10141
+-1 el 0
+L
+5 0
+4320 -1 -1
+-1 0 0
+L
+6 0
+100 -1 -1
+-1 0 0
+S
 #120
 Mountain Cave: Red Dragon~
 Paul Clarke~
@@ -246,13 +272,13 @@ Paul Clarke and Owen Morris~
    You have stumbled across a gigantic nest, woven together from entire trees,
 perched inelegantly on the landscape. The nest's owner is nowhere to be seen,
 but a single, huge, warm egg is gently rocking in the center. It looks like the
-egg could hatch any time.  
+egg could hatch any time.
    There are several quests to choose from each time you find one of these
 nests, but you can only do one per nest. Save up your rewards and buy new
 crafting patterns and items at the end of the quest.
    This is a solo adventure. Only one player can enter the nest at a time.
 ~
-11000 11049 100-125
+11000 11074 100-125
 50 0 dg 1
 L
 5 0

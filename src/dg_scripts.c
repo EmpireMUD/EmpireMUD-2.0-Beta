@@ -50,6 +50,7 @@ extern const char *exit_bits[];
 extern const char *mob_move_types[];
 extern struct time_info_data time_info;
 extern const char *otrig_types[];
+extern struct instance_data *quest_instance_global;
 extern const char *trig_attach_types[];
 extern const char *trig_types[];
 extern const char *wtrig_types[];
@@ -57,6 +58,8 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 
 /* external functions */
 extern int count_harnessed_animals(vehicle_data *veh);
+extern struct instance_data *get_instance_by_id(any_vnum instance_id);
+extern struct instance_data *get_instance_for_script(int go_type, void *go);
 void free_varlist(struct trig_var_data *vd);
 extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
@@ -2293,37 +2296,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				return;
 			}
 			else if (!str_cmp(var, "instance")) {
-				extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
-				extern struct instance_data *get_instance_by_id(any_vnum instance_id);
-				struct instance_data *inst = NULL;
-				room_data *orm;
-				switch (type) {
-					case MOB_TRIGGER: {
-						// try mob first
-						if (MOB_INSTANCE_ID((char_data*)go) != NOTHING) {
-							inst = get_instance_by_id(MOB_INSTANCE_ID((char_data*)go));
-						}
-						if (!inst) {
-							inst = find_instance_by_room(IN_ROOM((char_data*)go), FALSE);
-						}
-						break;
-					}
-					case OBJ_TRIGGER:
-						if ((orm = obj_room((obj_data*)go))) {
-							inst = find_instance_by_room(orm, FALSE);
-						}
-						break;
-					case WLD_TRIGGER:
-					case RMT_TRIGGER:
-					case BLD_TRIGGER:
-					case ADV_TRIGGER:
-						inst = find_instance_by_room((room_data*)go, FALSE);
-						break;
-					case VEH_TRIGGER: {
-						inst = find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE);
-						break;
-					}
-				}
+				struct instance_data *inst = get_instance_for_script(type, go);
 				
 				if (!inst) {
 					// safety
@@ -2345,7 +2318,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						char_data *miter, *found_mob = NULL;
 						mob_vnum vnum = atoi(subfield);
 						for (miter = character_list; miter && !found_mob; miter = miter->next) {
-							if (GET_MOB_VNUM(miter) == vnum) {
+							if (!EXTRACTED(miter) && GET_MOB_VNUM(miter) == vnum) {
 								if (MOB_INSTANCE_ID(miter) == inst->id || ROOM_INSTANCE(IN_ROOM(miter)) == inst) {
 									found_mob = miter;
 									break;
@@ -2666,6 +2639,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						*str = '\0';
 					}
+					else if (!str_cmp(field, "can_start_quest")) {
+						extern bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
+						
+						if (subfield && *subfield && isdigit(*subfield)) {
+							any_vnum vnum = atoi(subfield);
+							quest_data *qst = quest_proto(vnum);
+							if (IS_NPC(c) || !qst || is_on_quest(c, vnum)) {
+								// cannot start
+								strcpy(str, "0");
+							}
+							else {
+								// maybe
+								struct instance_data *inst = get_instance_for_script(type, go);
+								if (char_meets_prereqs(c, qst, inst)) {
+									strcpy(str, "1");
+								}
+								else {
+									strcpy(str, "0");
+								}
+							}
+						}
+					}
 					else if (!str_cmp(field, "char_target")) {
 						char_data *targ;
 						*str = '\0';	// default to no-target
@@ -2761,7 +2756,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "disabled")) {
 						// things which would keep a character from acting
-						if (GET_FEEDING_FROM(c) || GET_FED_ON_BY(c) || IS_DEAD(c) || GET_POS(c) < POS_SLEEPING || AFF_FLAGGED(c, AFF_STUNNED)) {
+						if (EXTRACTED(c) || GET_FEEDING_FROM(c) || GET_FED_ON_BY(c) || IS_DEAD(c) || GET_POS(c) < POS_SLEEPING || AFF_FLAGGED(c, AFF_STUNNED)) {
 							snprintf(str, slen, "1");
 						}
 						else {
@@ -3169,7 +3164,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'p': {	// char.p*
-					if (!str_cmp(field, "pc_name")) {
+					if (!str_cmp(field, "parse_dir")) {
+						if (subfield && *subfield) {
+							int dir;
+							if ((dir = parse_direction(c, subfield)) != NO_DIR) {
+								snprintf(str, slen, "%s", dirs[dir]);	// real dir
+							}
+							else {
+								// bad direction -- just give them their arg back
+								snprintf(str, slen, "%s", subfield);
+							}
+						}
+						else {	// missing arg
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "pc_name")) {
 						snprintf(str, slen, "%s", GET_PC_NAME(c));
 					}
 					else if (!str_cmp(field, "plr_flagged")) {
@@ -3342,6 +3352,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else {
 							snprintf(str, slen, "0");
 						}
+					}
+					break;
+				}
+				case 'u': {	// char.u*
+					if (!str_cmp(field, "unlink_instance")) {
+						if (IS_NPC(c)) {
+							MOB_INSTANCE_ID(c) = NOTHING;
+						}
+						*str = '\0';
 					}
 					break;
 				}
@@ -5862,6 +5881,8 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 
 			else if (!strn_cmp(cmd, "dg_affect ", 10))
 				do_dg_affect(go, sc, trig, type, cmd);
+			else if (!strn_cmp(cmd, "dg_affect_room ", 15))
+				do_dg_affect_room(go, sc, trig, type, cmd);
 
 			else if (!strn_cmp(cmd, "global ", 7))
 				process_global(sc, trig, cmd, sc->context);

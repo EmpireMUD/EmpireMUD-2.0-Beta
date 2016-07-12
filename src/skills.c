@@ -74,6 +74,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 	void end_majesty(char_data *ch);
 	void finish_morphing(char_data *ch, morph_data *morph);
 	void remove_armor_by_type(char_data *ch, int armor_type);
+	void remove_honed_gear(char_data *ch);
 	void retract_claws(char_data *ch);
 	void undisguise(char_data *ch);	
 	
@@ -206,6 +207,10 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_HEAVY_ARMOR: {
 			remove_armor_by_type(ch, ARMOR_HEAVY);
+			break;
+		}
+		case ABIL_HONE: {
+			remove_honed_gear(ch);
 			break;
 		}
 		case ABIL_LIGHT_ARMOR: {
@@ -1776,7 +1781,9 @@ bool can_gain_exp_from(char_data *ch, char_data *vict) {
 bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	char buf[MAX_STRING_LENGTH];
 	any_vnum abil = NO_ABIL;
+	struct obj_apply *app;
 	int iter, level_min;
+	bool honed;
 
 	// players won't be able to use gear >= these levels if their skill level is < the level
 	int skill_level_ranges[] = { CLASS_SKILL_CAP, SPECIALTY_SKILL_CAP, BASIC_SKILL_CAP, -1 };	// terminate with -1
@@ -1818,6 +1825,21 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	if (abil != NO_ABIL && !has_ability(ch, abil)) {
 		if (send_messages) {
 			snprintf(buf, sizeof(buf), "You must purchase the %s ability to use $p.", get_ability_name_by_vnum(abil));
+			act(buf, FALSE, ch, item, NULL, TO_CHAR);
+		}
+		return FALSE;
+	}
+	
+	// check honed
+	honed = FALSE;
+	LL_FOREACH(GET_OBJ_APPLIES(item), app) {
+		if (app->apply_type == APPLY_TYPE_HONED) {
+			honed = TRUE;
+		}
+	}
+	if (honed && !has_ability(ch, ABIL_HONE)) {
+		if (send_messages) {
+			snprintf(buf, sizeof(buf), "You must purchase the %s ability to use $p.", get_ability_name_by_vnum(ABIL_HONE));
 			act(buf, FALSE, ch, item, NULL, TO_CHAR);
 		}
 		return FALSE;

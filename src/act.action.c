@@ -707,6 +707,7 @@ INTERACTION_FUNC(finish_mining) {
 	
 	for (iter = 0; iter < interaction->quantity; ++iter) {
 		obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(obj, 1);	// ensure scaling
 		obj_to_char_or_room(obj, ch);
 
 		act("With that last stroke, $p falls from the wall!", FALSE, ch, obj, 0, TO_CHAR);

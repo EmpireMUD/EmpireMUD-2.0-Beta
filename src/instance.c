@@ -47,6 +47,7 @@ int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum);
 int count_players_in_instance(struct instance_data *inst, bool include_imms);
 int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum);
 static int determine_random_exit(adv_data *adv, room_data *from, room_data *to);
+struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type);
 any_vnum get_new_instance_id(void);
@@ -60,6 +61,7 @@ void unlink_instance_entrance(room_data *room);
 // local globals
 struct instance_data *instance_list = NULL;	// global instance list
 bool instance_save_wait = FALSE;	// prevents repeated instance saving
+struct instance_data *quest_instance_global = NULL;	// passes instances through to some quest triggers
 
 // ADV_LINK_x: whether or not a rule specifies a possible location (other types are for limits)
 const bool is_location_rule[] = {
@@ -711,22 +713,23 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	extern bool can_build_on(room_data *room, bitvector_t flags);
 	
 	room_template *start_room = room_template_proto(GET_ADV_START_VNUM(adv));
-	sector_data *sect, *next_sect, *findsect = NULL;
-	int dir, num_found, found_dir, x_coord, y_coord;
-	room_data *room, *shift, *found = NULL;
-	struct map_data *map, *map_shift;
-	struct sector_index_type *idx;
+	room_data *room, *next_room, *loc, *shift, *found = NULL;
+	int dir, iter, sub, num_found, pos;
+	sector_data *findsect = NULL;
 	bool match_buildon = FALSE;
 	bld_data *findbdg = NULL;
+	struct map_data *map;
 	
-	*which_dir = found_dir = NO_DIR;
+	const int max_tries = 500, max_dir_tries = 10;	// for random checks
+	
+	*which_dir = NO_DIR;
 	
 	// cannot find a location without a start room
 	if (!start_room) {
 		return NULL;
 	}
 	
-	// ADV_LINK_x: determine what we're looking for
+	// ADV_LINK_x
 	switch (rule->type) {
 		case ADV_LINK_BUILDING_EXISTING: {
 			findbdg = building_proto(rule->value);
@@ -754,11 +757,15 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 		}
 	}
 	
-	// several ways of doing this:
-	if (findsect) {	// only check rooms that have this sector
+	// two ways of doing this:
+	if (findsect) {	// scan the whole map
 		num_found = 0;
-		idx = find_sector_index(GET_SECT_VNUM(findsect));
-		LL_FOREACH2(idx->sect_rooms, map, next_in_sect) {
+		for (map = land_map; map; map = map->next) {
+			// looking for sect: fail
+			if (findsect && map->sector_type != findsect) {
+				continue;
+			}
+			
 			// attributes/limits checks
 			if (!validate_one_loc(adv, rule, NULL, map) || !validate_linking_limits(adv, NULL, map)) {
 				continue;
@@ -771,107 +778,83 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 			}
 		}
 	}
-	else {	// will check multiple sectors (findbdg or match_buildon)
+	else if (findbdg) {	// check live rooms for matching building
 		num_found = 0;
-		HASH_ITER(hh, sector_table, sect, next_sect) {
+		HASH_ITER(hh, world_table, room, next_room) {
+			if (BUILDING_VNUM(room) != GET_BLD_VNUM(findbdg) || !IS_COMPLETE(room)) {
+				continue;
+			}
+			
+			// attributes/limits checks
+			if (!validate_one_loc(adv, rule, room, NULL) || !validate_linking_limits(adv, room, NULL)) {
+				continue;
+			}
+			
+			// SUCCESS: mark it ok
+			if (!number(0, num_found++) || !found) {
+				found = room;
+			}
+		}
+	}
+	else if (match_buildon) {
+		// try to match a build rule
+		for (iter = 0; iter < max_tries && !found; ++iter) {
+			// random location:
+			pos = number(0, MAP_SIZE-1);
+			map = &(world_map[MAP_X_COORD(pos)][MAP_Y_COORD(pos)]);
+			
 			// shortcut: skip BASIC_OCEAN
-			if (GET_SECT_VNUM(sect) == BASIC_OCEAN) {
-				continue;
-			}
-			// are we looking for a building?
-			if (findbdg && !ANY_BUILDING_SECT(sect)) {
-				continue;
-			}
-			// are we looking for something we can build on? this is a preliminary match of the build rule (not guaranteed)
-			if (match_buildon && !IS_SET(GET_SECT_BUILD_FLAGS(sect), rule->bld_on)) {
+			if (GET_SECT_VNUM(map->sector_type) == BASIC_OCEAN) {
 				continue;
 			}
 			
-			// ok at this point we are reasonably sure this sector type is valid
-			idx = find_sector_index(GET_SECT_VNUM(sect));
+			// basic validation
+			if (!validate_one_loc(adv, rule, NULL, map)) {
+				continue;
+			}
 			
-			// check its map locations
-			LL_FOREACH2(idx->sect_rooms, map, next_in_sect) {
-				map_shift = NULL;
-				dir = NO_DIR;	// we may set this if needed
-				
-				// if it's instantiated already...
-				room = real_real_room(map->vnum);
-				
-				// actual building type
-				if (findbdg && (!room || BUILDING_VNUM(room) != GET_BLD_VNUM(findbdg) || !IS_COMPLETE(room))) {
-					continue;
-				}
-				// check buildon reqs
-				if (match_buildon) {
-					// must find a facing direction (we'll only try 1 per tile)
-					if (rule->bld_facing != NOBITS) {
-						// pick a dir (we will ONLY try one per room)
-						dir = number(0, NUM_2D_DIRS-1);
-						
-						// matches the dir we need inside
-						if (dir == rule->dir) {
-							continue;
-						}
-						
-						// find an adjacent room in that dir
-						if (!get_coord_shift(MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum), shift_dir[dir][0], shift_dir[dir][1], &x_coord, &y_coord)) {
-							continue;
-						}
-						map_shift = &(world_map[x_coord][y_coord]);
-						
-						// check bld_facing flags
-						if (!IS_SET(GET_SECT_BUILD_FLAGS(map_shift->sector_type), rule->bld_facing)) {
-							continue;
-						}
-					}
-				}
-				
-				// basic validation
-				if (!validate_one_loc(adv, rule, NULL, map)) {
-					continue;
-				}
-				// check secondary limits
-				if (!validate_linking_limits(adv, NULL, map)) {
-					continue;
-				}
-				
-				// need the room by this point
-				if (!room) {
-					room = real_room(map->vnum);
-				}
-				
-				// checking for buildon that required a room
-				if (match_buildon) {
-					// can we build here? (never build on a closed location)
-					if (ROOM_IS_CLOSED(room) || !can_build_on(room, rule->bld_on)) {
+			// check secondary limits
+			if (!validate_linking_limits(adv, NULL, map)) {
+				continue;
+			}
+			
+			// this spot SEEMS ok... now we need the actual spot:
+			loc = real_room(pos);
+			
+			// can we build here? (never build on a closed location)
+			if (ROOM_IS_CLOSED(loc) || !can_build_on(loc, rule->bld_on)) {
+				continue;
+			}
+			
+			if (rule->bld_facing == NOBITS) {
+				// success!
+				found = loc;
+				break;
+			}
+			else {
+				for (sub = 0; sub < max_dir_tries && !found; ++sub) {
+					dir = number(0, NUM_2D_DIRS-1);
+					
+					// matches the dir we need inside?
+					if (dir == rule->dir) {
 						continue;
 					}
-					// more validation on the facing tile
-					if (rule->bld_facing != NOBITS) {
-						// did we somehow get here without these set?
-						if (dir == NO_DIR || !map_shift) {
-							continue;
-						}
-						
-						// need a valid map tile to face
-						if (!(shift = real_room(map_shift->vnum)) || !can_build_on(shift, rule->bld_facing)) {
-							continue;
-						}
+					// need a valid map tile to face
+					if (!(shift = real_shift(loc, shift_dir[dir][0], shift_dir[dir][1]))) {
+						continue;
 					}
-				}
-				
-				// SUCCESS: mark it ok
-				if (!number(0, num_found++) || !found) {
-					found = room;
-					found_dir = dir;
+					
+					// ok go
+					if (can_build_on(shift, rule->bld_facing)) {
+						*which_dir = dir;
+						found = loc;
+						break;
+					}
 				}
 			}
 		}
 	}
 	
-	// and return what we did or did not find
-	*which_dir = found_dir;
 	return found;
 }
 
@@ -1524,6 +1507,60 @@ struct instance_data *get_instance_by_mob(char_data *mob) {
 	}
 	
 	// one way or the other...
+	return inst;
+}
+
+
+/*
+* Try to find the relevant instance for a script.
+*
+* @param int go_type _TRIGGER type for 'go'
+* @param void *go A pointer to the thing the script is running on.
+* @return struct instance_data* The matching instance for where the script is running, or NULL if none.
+*/
+struct instance_data *get_instance_for_script(int go_type, void *go) {
+	extern room_data *obj_room(obj_data *obj);
+	
+	struct instance_data *inst = NULL;
+	room_data *orm;
+	
+	// prefer global instance if any (e.g. from a quest trigger)
+	if (quest_instance_global) {
+		inst = quest_instance_global;
+	}
+	if (!inst) {
+		switch (go_type) {
+			case MOB_TRIGGER: {
+				// try mob first
+				if (MOB_INSTANCE_ID((char_data*)go) != NOTHING) {
+					inst = get_instance_by_id(MOB_INSTANCE_ID((char_data*)go));
+				}
+				if (!inst) {
+					inst = find_instance_by_room(IN_ROOM((char_data*)go), FALSE);
+				}
+				break;
+			}
+			case OBJ_TRIGGER: {
+				if ((orm = obj_room((obj_data*)go))) {
+					inst = find_instance_by_room(orm, FALSE);
+				}
+				break;
+			}
+			case WLD_TRIGGER:
+			case RMT_TRIGGER:
+			case BLD_TRIGGER:
+			case ADV_TRIGGER: {
+				inst = find_instance_by_room((room_data*)go, FALSE);
+				break;
+			}
+			case VEH_TRIGGER: {
+				inst = find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE);
+				break;
+			}
+		}
+	}
+	
+	// may or may not have found one
 	return inst;
 }
 

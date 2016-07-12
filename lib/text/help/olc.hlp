@@ -760,6 +760,7 @@ The following affect flags are available:
  !STEALTH - Immune to the Stealth debuffs.
  !VAMPIRE - Immune to Vampire debuffs.
  !STUN - Immune to stun effects.
+ !DRINK-BLOOD - Can't be bitten/sired by vampires.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
@@ -1050,6 +1051,7 @@ Available affects (do not set affects with *):
  CHAMELEON - at distance, appears as the tile it was built upon
  !EVOLVE - will not grow trees or process other evolutions
  !FLY - flying characters cannot enter, like an enchanted wall
+ !WEATHER - suppress weather messages and command
  !DISREPAIR - never falls into disrepair (caution: this prevents empire decay)
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES

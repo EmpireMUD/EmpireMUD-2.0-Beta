@@ -642,6 +642,9 @@ ACMD(do_bite) {
 	else if (IS_DEAD(victim)) {
 		msg_to_char(ch, "Your victim seems to be dead.\r\n");
 	}
+	else if (AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD)) {
+		act("You can't drink blood from $N.", FALSE, ch, NULL, victim, TO_CHAR);
+	}
 	else if ((IS_NPC(victim) || !PRF_FLAGGED(victim, PRF_BOTHERABLE)) && !can_fight(ch, victim))
 		act("You can't attack $N!", FALSE, ch, 0, victim, TO_CHAR);
 	else if (check_scaling(victim, ch) && !PRF_FLAGGED(victim, PRF_BOTHERABLE) && AWAKE(victim) && GET_HEALTH(victim) > MAX(5, GET_MAX_HEALTH(victim)/20)) {

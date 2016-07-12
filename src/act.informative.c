@@ -2517,8 +2517,11 @@ ACMD(do_weather) {
 		"rainy",
 		"lit by flashes of lightning"
 		};
-
-	if (IS_OUTDOORS(ch)) {
+	
+	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_WEATHER)) {
+		msg_to_char(ch, "There's nothing interesting about the weather.\r\n");
+	}
+	else if (IS_OUTDOORS(ch)) {
 		msg_to_char(ch, "The sky is %s and %s.\r\n", sky_look[weather_info.sky], (weather_info.change >= 0 ? "you feel a warm wind from the south" : "your foot tells you bad weather is due"));
 		if (weather_info.sunlight == SUN_SET || weather_info.sunlight == SUN_DARK) {
 			list_moons_to_char(ch);

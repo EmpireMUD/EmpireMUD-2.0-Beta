@@ -2358,7 +2358,7 @@ ACMD(do_barde) {
 					newmob = read_mobile(interact->vnum, TRUE);
 					setup_generic_npc(newmob, GET_LOYALTY(mob), MOB_DYNAMIC_NAME(mob), MOB_DYNAMIC_SEX(mob));
 					char_to_room(newmob, IN_ROOM(ch));
-					MOB_INSTANCE_ID(newmob) = MOB_INSTANCE_ID(ch);
+					MOB_INSTANCE_ID(newmob) = MOB_INSTANCE_ID(mob);
 		
 					prc = (double)GET_HEALTH(mob) / MAX(1, GET_MAX_HEALTH(mob));
 					GET_HEALTH(newmob) = (int)(prc * GET_MAX_HEALTH(newmob));

@@ -49,7 +49,8 @@ See also: MTRIG CHARMED
 
 Command (trigger type)
 
-Argument type:  name of the command (string)
+Argument type:  name of the command (string), * for match any command, and
+                match multiple commands by separating them with spaces
 Return value:  return 0 to proceed with normal command execution
                return 1 (default) if the trigger processed the command
 
@@ -349,6 +350,7 @@ The following is a list of special commands that can be used in triggers:
 &cdefault&0 - Part of a switch statement.
 &cdetach&0 - Removes a trigger from something.
 &cdg_affect&0 - Adds a spell effect to a person.
+&cdg_affect_room&0 - Adds a spell effect to a room.
 &cdone&0 - Ends a switch or while statement.
 &celse&0 - Part of an if/elseif/else/end series of conditions.
 &celseif&0 - Part of an if/elseif/else/end series of conditions.

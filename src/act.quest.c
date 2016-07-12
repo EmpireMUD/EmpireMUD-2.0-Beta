@@ -491,7 +491,7 @@ void show_quest_tracker(char_data *ch, struct player_quest *pq) {
 * @param struct instance_data *inst The associated instance, if any.
 */
 void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
-	extern int check_start_quest_trigger(char_data *actor, quest_data *quest);
+	extern int check_start_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
 	
 	char buf[MAX_STRING_LENGTH];
 	struct player_quest *pq;
@@ -502,7 +502,7 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
 	}
 	
 	// triggers
-	if (!check_start_quest_trigger(ch, qst)) {
+	if (!check_start_quest_trigger(ch, qst, inst)) {
 		return;
 	}
 	
@@ -612,7 +612,7 @@ QCMD(qcmd_drop) {
 */
 bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 	extern bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empire_data **giver_emp);
-	extern int check_finish_quest_trigger(char_data *actor, quest_data *quest);
+	extern int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
 	
 	quest_data *quest = quest_proto(pq->vnum);
 	empire_data *giver_emp = NULL;
@@ -652,7 +652,7 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 	}
 	
 	// triggers?
-	if (!check_finish_quest_trigger(ch, quest)) {
+	if (!check_finish_quest_trigger(ch, quest, get_instance_by_id(pq->instance_id))) {
 		return FALSE;
 	}
 	
@@ -664,7 +664,7 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 
 QCMD(qcmd_finish) {
 	struct player_quest *pq, *next_pq;
-	struct instance_data *inst;
+	struct instance_data *inst = NULL;
 	quest_data *qst;
 	bool all, any;
 	
@@ -681,7 +681,6 @@ QCMD(qcmd_finish) {
 		if (all) {
 			any = FALSE;
 			LL_FOREACH_SAFE(GET_QUESTS(ch), pq, next_pq) {
-				
 				any |= qcmd_finish_one(ch, pq, FALSE);
 			}
 			if (any) {
@@ -757,7 +756,7 @@ QCMD(qcmd_group) {
 
 QCMD(qcmd_info) {
 	extern char *quest_giver_string(struct quest_giver *giver, bool show_vnums);
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], *buf2;
 	struct instance_data *inst;
 	struct quest_giver *giver;
 	struct player_quest *pq;
@@ -797,6 +796,21 @@ QCMD(qcmd_info) {
 			}
 		}
 		if (*buf) {
+			if (strstr(buf, "#e") || strstr(buf, "#n") || strstr(buf, "#a")) {
+				// #n
+				buf2 = str_replace("#n", "<name>", buf);
+				strcpy(buf, buf2);
+				free(buf2);
+				// #e
+				buf2 = str_replace("#e", "<empire>", buf);
+				strcpy(buf, buf2);
+				free(buf2);
+				// #a
+				buf2 = str_replace("#a", "<empire>", buf);
+				strcpy(buf, buf2);
+				free(buf2);
+			}
+			
 			msg_to_char(ch, "Turn in at: %s.\r\n", buf);
 		}
 	}

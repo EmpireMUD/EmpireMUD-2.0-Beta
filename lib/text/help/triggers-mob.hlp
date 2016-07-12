@@ -320,6 +320,7 @@ When using field  - The variable returns:
 &cbonus_physical&0 - Character's Bonus-Physical damage trait.
 &ccan_afford(amt)&0 - Checks if the actor has enough coins of any converted type.
 &ccan_gain_new_skills&0 - Checks if the character can gain a new skill from 0.
+&ccan_start_quest(vnum)& - Whether or not the character can start a quest.
 &ccancel_adventure_summon&0 - Call this if a script teleports a player around, to
    prevent them from being teleported again if they were adventure-summoned.
 &cchar_target(name)&0 - Finds a visible target character in the room, by name.
@@ -406,6 +407,8 @@ When using field  - The variable returns:
 &cobj_target(name)&0 - Finds a targeted object the character can see/has.
 &cobj_target_inv(name)&0 - Finds a targeted object in the character's inventory.
 &con_quest(vnum)&0 - TRUE if the player is currently on that quest.
+&cparse_dir(dir)&0 - Gets the real direction that the char thinks is 'dir',
+   based on whether or not they have Navigation/alcohol.
 &cpc_name&0 - Player's name or mob's keyword list, rather than short desc
 &cplr_flagged(FLAG)&0 - Returns TRUE if the player has the given flag (VAMPIRE).
 &cpoison_immunity&0 - Returns TRUE if the player has Poison Immunity.
@@ -428,6 +431,9 @@ When using field  - The variable returns:
 &ctohit&0 - The player's to-hit rating.
 &ctrigger_counterspell&0 - Fires the character's counterspell and returns 1 if
    so, or returns 0 if there was no counterspell.
+&cunlink_instance&0 - Disconnects the mob from any adventure instance, meaning
+   it will not be cleaned up when the instance closes (e.g. player gets to keep
+   a mob that was loaded inside an instance).
 &cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
    Useful when dealing with remote vars on players.
 &cvampire(on/off)&0 - Can change whether a player/mob is a vampire if on/off

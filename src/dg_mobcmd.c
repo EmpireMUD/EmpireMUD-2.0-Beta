@@ -56,6 +56,7 @@
 // external vars
 extern const char *damage_types[];
 extern const char *dirs[];
+extern struct instance_data *quest_instance_global;
 
 // external funcs
 void die(char_data *ch, char_data *killer);
@@ -133,7 +134,7 @@ ACMD(do_madventurecomplete) {
 		return;
 	}
 	
-	if ((inst = get_instance_by_mob(ch))) {
+	if ((inst = quest_instance_global) || (inst = get_instance_by_mob(ch))) {
 		mark_instance_completed(inst);
 	}
 }
