@@ -301,6 +301,11 @@ if (%actor.position% != Standing)
 end
 %load% m 10227
 %echo% The enchanted tumbleweed comes to life!
+eval room_var %self.room%
+eval mob %room_var.people%
+if (%mob% && %mob.vnum% == 10227)
+  nop %mob.unlink_instance%
+end
 %purge% %self%
 ~
 #10233
@@ -535,6 +540,11 @@ end
 %load% m %self.val0%
 %send% %actor% You use %self.shortdesc% and a new mount appears!
 %echoaround% %actor% %actor.name% uses %self.shortdesc% and a new mount appears!
+eval room_var %self.room%
+eval mob %room_var.people%
+if (%mob% && %mob.vnum% == %self.val0%)
+  nop %mob.unlink_instance%
+end
 %purge% %self%
 ~
 #10264
