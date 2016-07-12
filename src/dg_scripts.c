@@ -3355,6 +3355,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					break;
 				}
+				case 'u': {	// char.u*
+					if (!str_cmp(field, "unlink_instance")) {
+						if (IS_NPC(c)) {
+							MOB_INSTANCE_ID(c) = NOTHING;
+						}
+						*str = '\0';
+					}
+					break;
+				}
 				case 'v': {	// char.v*
 					if (!str_cmp(field, "vampire")) {
 						// subfield can change vampire status

@@ -431,6 +431,9 @@ When using field  - The variable returns:
 &ctohit&0 - The player's to-hit rating.
 &ctrigger_counterspell&0 - Fires the character's counterspell and returns 1 if
    so, or returns 0 if there was no counterspell.
+&cunlink_instance&0 - Disconnects the mob from any adventure instance, meaning
+   it will not be cleaned up when the instance closes (e.g. player gets to keep
+   a mob that was loaded inside an instance).
 &cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
    Useful when dealing with remote vars on players.
 &cvampire(on/off)&0 - Can change whether a player/mob is a vampire if on/off
