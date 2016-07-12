@@ -2756,7 +2756,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "disabled")) {
 						// things which would keep a character from acting
-						if (GET_FEEDING_FROM(c) || GET_FED_ON_BY(c) || IS_DEAD(c) || GET_POS(c) < POS_SLEEPING || AFF_FLAGGED(c, AFF_STUNNED)) {
+						if (EXTRACTED(c) || GET_FEEDING_FROM(c) || GET_FED_ON_BY(c) || IS_DEAD(c) || GET_POS(c) < POS_SLEEPING || AFF_FLAGGED(c, AFF_STUNNED)) {
 							snprintf(str, slen, "1");
 						}
 						else {
