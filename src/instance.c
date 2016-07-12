@@ -47,6 +47,7 @@ int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum);
 int count_players_in_instance(struct instance_data *inst, bool include_imms);
 int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum);
 static int determine_random_exit(adv_data *adv, room_data *from, room_data *to);
+struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type);
 any_vnum get_new_instance_id(void);
@@ -1506,6 +1507,60 @@ struct instance_data *get_instance_by_mob(char_data *mob) {
 	}
 	
 	// one way or the other...
+	return inst;
+}
+
+
+/*
+* Try to find the relevant instance for a script.
+*
+* @param int go_type _TRIGGER type for 'go'
+* @param void *go A pointer to the thing the script is running on.
+* @return struct instance_data* The matching instance for where the script is running, or NULL if none.
+*/
+struct instance_data *get_instance_for_script(int go_type, void *go) {
+	extern room_data *obj_room(obj_data *obj);
+	
+	struct instance_data *inst = NULL;
+	room_data *orm;
+	
+	// prefer global instance if any (e.g. from a quest trigger)
+	if (quest_instance_global) {
+		inst = quest_instance_global;
+	}
+	if (!inst) {
+		switch (go_type) {
+			case MOB_TRIGGER: {
+				// try mob first
+				if (MOB_INSTANCE_ID((char_data*)go) != NOTHING) {
+					inst = get_instance_by_id(MOB_INSTANCE_ID((char_data*)go));
+				}
+				if (!inst) {
+					inst = find_instance_by_room(IN_ROOM((char_data*)go), FALSE);
+				}
+				break;
+			}
+			case OBJ_TRIGGER: {
+				if ((orm = obj_room((obj_data*)go))) {
+					inst = find_instance_by_room(orm, FALSE);
+				}
+				break;
+			}
+			case WLD_TRIGGER:
+			case RMT_TRIGGER:
+			case BLD_TRIGGER:
+			case ADV_TRIGGER: {
+				inst = find_instance_by_room((room_data*)go, FALSE);
+				break;
+			}
+			case VEH_TRIGGER: {
+				inst = find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE);
+				break;
+			}
+		}
+	}
+	
+	// may or may not have found one
 	return inst;
 }
 

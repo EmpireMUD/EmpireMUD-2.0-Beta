@@ -58,6 +58,8 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 
 /* external functions */
 extern int count_harnessed_animals(vehicle_data *veh);
+extern struct instance_data *get_instance_by_id(any_vnum instance_id);
+extern struct instance_data *get_instance_for_script(int go_type, void *go);
 void free_varlist(struct trig_var_data *vd);
 extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
@@ -2294,44 +2296,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				return;
 			}
 			else if (!str_cmp(var, "instance")) {
-				extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
-				extern struct instance_data *get_instance_by_id(any_vnum instance_id);
-				struct instance_data *inst = NULL;
-				room_data *orm;
-				
-				// prefer global instance if any (e.g. from a quest trigger)
-				if (quest_instance_global) {
-					inst = quest_instance_global;
-				}
-				if (!inst) {
-					switch (type) {
-						case MOB_TRIGGER: {
-							// try mob first
-							if (MOB_INSTANCE_ID((char_data*)go) != NOTHING) {
-								inst = get_instance_by_id(MOB_INSTANCE_ID((char_data*)go));
-							}
-							if (!inst) {
-								inst = find_instance_by_room(IN_ROOM((char_data*)go), FALSE);
-							}
-							break;
-						}
-						case OBJ_TRIGGER:
-							if ((orm = obj_room((obj_data*)go))) {
-								inst = find_instance_by_room(orm, FALSE);
-							}
-							break;
-						case WLD_TRIGGER:
-						case RMT_TRIGGER:
-						case BLD_TRIGGER:
-						case ADV_TRIGGER:
-							inst = find_instance_by_room((room_data*)go, FALSE);
-							break;
-						case VEH_TRIGGER: {
-							inst = find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE);
-							break;
-						}
-					}
-				}
+				struct instance_data *inst = get_instance_for_script(type, go);
 				
 				if (!inst) {
 					// safety
@@ -2673,6 +2638,28 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							cancel_adventure_summon(c);
 						}
 						*str = '\0';
+					}
+					else if (!str_cmp(field, "can_start_quest")) {
+						extern bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
+						
+						if (subfield && *subfield && isdigit(*subfield)) {
+							any_vnum vnum = atoi(subfield);
+							quest_data *qst = quest_proto(vnum);
+							if (IS_NPC(c) || !qst || is_on_quest(c, vnum)) {
+								// cannot start
+								strcpy(str, "0");
+							}
+							else {
+								// maybe
+								struct instance_data *inst = get_instance_for_script(type, go);
+								if (char_meets_prereqs(c, qst, inst)) {
+									strcpy(str, "1");
+								}
+								else {
+									strcpy(str, "0");
+								}
+							}
+						}
 					}
 					else if (!str_cmp(field, "char_target")) {
 						char_data *targ;

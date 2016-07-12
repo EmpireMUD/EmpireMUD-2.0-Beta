@@ -486,12 +486,12 @@ Quest commands:
     person meets the requirements -- check %char.quest_finished(vnum)% first.
   &cstart&0 - Will give the player the quest, whether or not they meet the
     prerequisites, if they are not already on it. Consider checking
-    %char.completed_quest(vnum)% first.
+    %char.completed_quest(vnum)% or %char.can_start_quest(vnum)% first.
   &ctrigger&0 - Activate any 'triggered' quest task, if the player is on that
     quest. You can check %char.quest_triggered(vnum)% to see if the condition
     is already triggered.
 
-See also: QUEST
+See also: CHAR-VAR, QUEST
 #d
 RDELETE
 
