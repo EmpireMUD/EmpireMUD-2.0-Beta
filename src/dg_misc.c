@@ -334,6 +334,10 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 		script_log_by_type(go_type, go, "dg_quest: invalid vnum '%s'", vnum_arg);
 		return;
 	}
+	if (QUEST_FLAGGED(quest, QST_IN_DEVELOPMENT)) {
+		script_log_by_type(go_type, go, "dg_quest: quest [%d] %s is set IN-DEVELOPMENT", QUEST_VNUM(quest), QUEST_NAME(quest));
+		return;
+	}
 	
 	// find vict by uid?
 	if (*vict_arg == UID_CHAR) {
