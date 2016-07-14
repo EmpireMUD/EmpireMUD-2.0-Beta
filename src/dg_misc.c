@@ -426,6 +426,9 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 	else if (is_abbrev(cmd_arg, "trigger")) {
 		qt_triggered_task(vict, QUEST_VNUM(quest));
 	}
+	else if (is_abbrev(cmd_arg, "untrigger")) {
+		qt_untrigger_task(vict, QUEST_VNUM(quest));
+	}
 	else {
 		script_log_by_type(go_type, go, "dg_quest: invalid command '%s'", cmd_arg);
 	}

@@ -33,6 +33,7 @@
 #define QCMD(name)		void (name)(char_data *ch, char *argument)
 
 // external vars
+extern int daily_cycle;
 
 // external funcs
 extern bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_list **build_list);
@@ -51,6 +52,7 @@ void scale_item_to_level(obj_data *obj, int level);
 
 // local prototypes
 void drop_quest(char_data *ch, struct player_quest *pq);
+bool fail_daily_quests(char_data *ch);
 void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
 
 
@@ -190,6 +192,11 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	pcq->last_instance_id = pq->instance_id;
 	pcq->last_adventure = pq->adventure;
 	
+	// completion time slightly different for dailies
+	if (QUEST_FLAGGED(quest, QST_DAILY)) {
+		pcq->last_completed = daily_cycle;
+	}
+	
 	// remove from player's tracker
 	LL_DELETE(GET_QUESTS(ch), pq);
 	pq->next = NULL;
@@ -298,6 +305,16 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	}
 	
 	remove_quest_items_by_quest(ch, QUEST_VNUM(quest));
+	
+	// dailies:
+	if (QUEST_FLAGGED(quest, QST_DAILY)) {
+		GET_DAILY_QUESTS(ch) += 1;
+		
+		// fail remaining quests
+		if (GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day") && fail_daily_quests(ch)) {
+			msg_to_char(ch, "You have hit the daily quest limit and your remaining daily quests expire.\r\n");
+		}
+	}
 }
 
 
@@ -316,6 +333,37 @@ void count_quest_tasks(struct player_quest *pq, int *complete, int *total) {
 			++*complete;
 		}
 	}
+}
+
+
+/**
+* Cancels all daily quests a player is on.
+*
+* @param char_data *ch The player to fail.
+* @return bool TRUE if any quests were failed, FALSE if there were none.
+*/
+bool fail_daily_quests(char_data *ch) {
+	struct player_quest *pq, *next_pq;
+	quest_data *quest;
+	int found = 0;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	LL_FOREACH_SAFE(GET_QUESTS(ch), pq, next_pq) {
+		if (!(quest = quest_proto(pq->vnum))) {	// somehow?
+			continue;
+		}
+		if (!QUEST_FLAGGED(quest, QST_DAILY)) {	// not a daily
+			continue;
+		}
+		
+		drop_quest(ch, pq);
+		++found;
+	}
+	
+	return (found > 0);
 }
 
 
@@ -441,6 +489,28 @@ void drop_quest(char_data *ch, struct player_quest *pq) {
 
 
 /**
+* Shown on some quest commands to indicate number of dailies remaining.
+*
+* @param char_data *ch The person whose count to show.
+* @return char* A string to display.
+*/
+char *show_daily_quest_line(char_data *ch) {
+	static char output[MAX_STRING_LENGTH];
+	int amount;
+	
+	amount = IS_NPC(ch) ? 0 : (config_get_int("dailies_per_day") - GET_DAILY_QUESTS(ch));
+	if (amount > 0) {
+		snprintf(output, sizeof(output), "You can complete %d more daily quest%s today.", amount, PLURAL(amount));
+	}
+	else {
+		snprintf(output, sizeof(output), "You have completed all your daily quests for the day.\r\n");
+	}
+	
+	return output;
+}
+
+
+/**
 * @param char_data *ch The person to show to.
 * @param struct player_quest *pq The quest to show the tracker for.
 */
@@ -469,7 +539,7 @@ void show_quest_tracker(char_data *ch, struct player_quest *pq) {
 					strcpy(buf, " (complete)");
 				}
 				else {
-					*buf = '\0';
+					strcpy(buf, " (not complete)");
 				}
 				break;
 			}
@@ -534,40 +604,6 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
  //////////////////////////////////////////////////////////////////////////////
 //// QUEST SUBCOMMANDS ///////////////////////////////////////////////////////
 
-QCMD(qcmd_check) {
-	struct quest_temp_list *qtl, *quest_list = NULL;
-	char buf[MAX_STRING_LENGTH];
-	bool any = FALSE;
-	
-	// find quests
-	quest_list = build_available_quest_list(ch);
-	
-	// now show any quests available
-	LL_FOREACH(quest_list, qtl) {
-		// show it
-		if (!any) {
-			msg_to_char(ch, "Quests available here:\r\n");
-			any = TRUE;
-		}
-		
-		if (QUEST_MIN_LEVEL(qtl->quest) > 0 || QUEST_MAX_LEVEL(qtl->quest) > 0) {
-			sprintf(buf, " (%s)", level_range_string(QUEST_MIN_LEVEL(qtl->quest), QUEST_MAX_LEVEL(qtl->quest), 0));
-		}
-		else {
-			*buf = '\0';
-		}
-		
-		msg_to_char(ch, "  %s%s%s\t0\r\n", QUEST_LEVEL_COLOR(ch, qtl->quest), QUEST_NAME(qtl->quest), buf);
-	}
-	
-	if (!any) {
-		msg_to_char(ch, "There are no quests available here.\r\n");
-	}
-	
-	free_quest_temp_list(quest_list);
-}
-
-
 QCMD(qcmd_completed) {
 	char buf[MAX_STRING_LENGTH];
 	struct player_completed_quest *pcq, *next_pcq;
@@ -630,6 +666,12 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 		}
 		return FALSE;
 	}
+	if (QUEST_FLAGGED(quest, QST_DAILY) && GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
+		if (show_errors) {
+			msg_to_char(ch, "You can't finish any more daily quests today.\r\n");
+		}
+		return FALSE;
+	}
 	
 	
 	// preliminary completeness check
@@ -670,8 +712,11 @@ QCMD(qcmd_finish) {
 	
 	all = !str_cmp(argument, "all");
 	
-	if (!*argument) {
-		msg_to_char(ch, "Finish which quest?\r\n");
+	if (CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)) {
+		msg_to_char(ch, "You can't start or finish quests in this form.\r\n");
+	}
+	else if (!*argument) {
+		msg_to_char(ch, "Finish which quest (use 'quest list' to see quests you're on)?\r\n");
 	}
 	else if (!all && (!(qst = find_local_quest_by_name(ch, argument, TRUE, FALSE, &inst)) || !(pq = is_on_quest(ch, QUEST_VNUM(qst))))) {
 		msg_to_char(ch, "You don't seem to be on a quest called '%s'.\r\n", argument);
@@ -764,7 +809,7 @@ QCMD(qcmd_info) {
 	quest_data *qst;
 	
 	if (!*argument) {
-		msg_to_char(ch, "Get info on which quest?\r\n");
+		msg_to_char(ch, "Get info on which quest? You can use 'quest list' to list quests you're on, or\r\n'quest start' to see ones available here.\r\n");
 	}
 	else if (!(qst = find_local_quest_by_name(ch, argument, TRUE, TRUE, &inst))) {
 		msg_to_char(ch, "You don't see a quest called '%s' here.\r\n", argument);
@@ -833,9 +878,12 @@ QCMD(qcmd_list) {
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		count_quest_tasks(pq, &count, &total);
 		if ((proto = quest_proto(pq->vnum))) {
-			size += snprintf(buf + size, sizeof(buf) - size, "  %s%s\t0 (%d/%d tasks)\r\n", QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), count, total);
+			size += snprintf(buf + size, sizeof(buf) - size, "  %s%s\t0 (%d/%d tasks%s)\r\n", QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), count, total, QUEST_FLAGGED(proto, QST_DAILY) ? "; daily" : "");
 		}
 	}
+	
+	// show dailies status, too
+	size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", show_daily_quest_line(ch));
 	
 	if (ch->desc) {
 		page_string(ch->desc, buf, TRUE);
@@ -904,13 +952,50 @@ QCMD(qcmd_share) {
 
 
 QCMD(qcmd_start) {
-	struct quest_temp_list *qtl, *quest_list;
+	struct quest_temp_list *qtl, *quest_list = NULL;
 	struct instance_data *inst = NULL;
+	char buf[MAX_STRING_LENGTH];
 	quest_data *qst;
 	bool any;
 	
-	if (!*argument) {
-		msg_to_char(ch, "Start which quest?\r\n");
+	if (!*argument) {	// no-arg: just list them
+		// find quests
+		quest_list = build_available_quest_list(ch);
+		any = FALSE;
+	
+		// now show any quests available
+		LL_FOREACH(quest_list, qtl) {
+			// show it
+			if (!any) {
+				msg_to_char(ch, "Quests available here:\r\n");
+				any = TRUE;
+			}
+			
+			if (QUEST_MIN_LEVEL(qtl->quest) > 0 || QUEST_MAX_LEVEL(qtl->quest) > 0) {
+				sprintf(buf, " (%s)", level_range_string(QUEST_MIN_LEVEL(qtl->quest), QUEST_MAX_LEVEL(qtl->quest), 0));
+			}
+			else {
+				*buf = '\0';
+			}
+		
+			msg_to_char(ch, "  %s%s%s%s\t0\r\n", QUEST_LEVEL_COLOR(ch, qtl->quest), QUEST_NAME(qtl->quest), buf, QUEST_FLAGGED(qtl->quest, QST_DAILY) ? " (daily)" : "");
+		}
+	
+		if (!any) {
+			msg_to_char(ch, "There are no quests available here.\r\n");
+		}
+	
+		free_quest_temp_list(quest_list);
+		
+		// show dailies status, too
+		msg_to_char(ch, "%s\r\n", show_daily_quest_line(ch));
+	}
+	else if (GET_POS(ch) < POS_STANDING) {
+		// anything other than a list requires standing
+		msg_to_char(ch, "You must %s to start a quest.\r\n", FIGHTING(ch) ? "finish fighting" : "be standing");
+	}
+	else if (CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)) {
+		msg_to_char(ch, "You can't start or finish quests in this form.\r\n");
 	}
 	else if (!str_cmp(argument, "all")) {
 		// start all quests
@@ -936,6 +1021,9 @@ QCMD(qcmd_start) {
 	}
 	else if (!(qst = find_local_quest_by_name(ch, argument, FALSE, TRUE, &inst))) {
 		msg_to_char(ch, "You don't see that quest here.\r\n");
+	}
+	else if (QUEST_FLAGGED(qst, QST_DAILY) && GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
+		msg_to_char(ch, "You can't start any more daily quests today.\r\n");
 	}
 	else {
 		start_quest(ch, qst, inst);
@@ -966,16 +1054,18 @@ QCMD(qcmd_tracker) {
 // quest command configs:
 const struct { char *command; QCMD(*func); int min_pos; } quest_cmd[] = {
 	// command, function, min pos
-	{ "check", qcmd_check, POS_RESTING },
 	{ "completed", qcmd_completed, POS_DEAD },
 	{ "drop", qcmd_drop, POS_DEAD },
 	{ "group", qcmd_group, POS_DEAD },
 	{ "finish", qcmd_finish, POS_STANDING },
 	{ "info", qcmd_info, POS_DEAD },
 	{ "list", qcmd_list, POS_DEAD },
-	{ "start", qcmd_start, POS_STANDING },
+	{ "start", qcmd_start, POS_RESTING },
 	{ "share", qcmd_share, POS_DEAD },
 	{ "tracker", qcmd_tracker, POS_DEAD },
+	
+	// for historical reasons; 'check' just calls 'start now
+	{ "check", qcmd_start, POS_RESTING },
 	
 	// this goes last
 	{ "\n", NULL, POS_DEAD }
