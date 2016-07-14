@@ -1089,6 +1089,10 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_lis
 		if (QUEST_FLAGGED(ql->quest, QST_DAILY) && !dailies) {
 			continue;
 		}
+		// matching empire
+		if (QUEST_FLAGGED(ql->quest, QST_EMPIRE_ONLY) && GET_LOYALTY(mob) != GET_LOYALTY(ch)) {
+			continue;
+		}
 		// already on quest?
 		if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
 			continue;
@@ -1208,6 +1212,10 @@ bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_l
 			if (QUEST_FLAGGED(ql->quest, QST_DAILY) && !dailies) {
 				continue;
 			}
+			// matching empire
+			if (QUEST_FLAGGED(ql->quest, QST_EMPIRE_ONLY) && ROOM_OWNER(room) != GET_LOYALTY(ch)) {
+				continue;
+			}
 			// already on quest?
 			if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
 				continue;
@@ -1254,6 +1262,10 @@ bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_l
 	LL_FOREACH(MOB_QUEST_LOOKUPS(mob), ql) {
 		// make sure they're a giver
 		if (!find_quest_giver_in_list(QUEST_ENDS_AT(ql->quest), QG_MOBILE, GET_MOB_VNUM(mob))) {
+			continue;
+		}
+		// matching empire
+		if (QUEST_FLAGGED(ql->quest, QST_EMPIRE_ONLY) && GET_LOYALTY(mob) != GET_LOYALTY(ch)) {
 			continue;
 		}
 		// are they on quest?
@@ -1354,6 +1366,10 @@ bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp
 				continue;
 			}
 			if (iter == 1 && !find_quest_giver_in_list(QUEST_ENDS_AT(ql->quest), QG_ROOM_TEMPLATE, GET_RMT_VNUM(GET_ROOM_TEMPLATE(room)))) {
+				continue;
+			}
+			// matching empire
+			if (QUEST_FLAGGED(ql->quest, QST_EMPIRE_ONLY) && ROOM_OWNER(room) != GET_LOYALTY(ch)) {
 				continue;
 			}
 			// are they on quest?
