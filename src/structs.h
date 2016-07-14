@@ -1672,6 +1672,8 @@ typedef struct vehicle_data vehicle_data;
 #define QST_REPEAT_PER_INSTANCE  BIT(1)	// clears completion when instance closes
 #define QST_EXPIRES_AFTER_INSTANCE  BIT(2)	// fails if instance closes
 #define QST_EXTRACT_TASK_OBJECTS  BIT(3)	// takes away items required by the task
+#define QST_DAILY  BIT(4)	// counts toward dailies; repeats each "day"
+#define QST_EMPIRE_ONLY  BIT(5)	// only available if quest giver and player are in the same empire
 
 
 // QG_x: quest giver types
@@ -1679,7 +1681,8 @@ typedef struct vehicle_data vehicle_data;
 #define QG_MOBILE  1
 #define QG_OBJECT  2
 #define QG_ROOM_TEMPLATE  3
-#define QG_TRIGGER  4
+#define QG_TRIGGER  4	// just to help lookups
+#define QG_QUEST  5	// (e.g. as chain reward) just to help lookups
 
 
 // QR_x: quest reward types
@@ -2982,6 +2985,7 @@ struct player_special_data {
 	int daily_cycle;	// Last update cycle registered
 	ubyte daily_bonus_experience;	// boosted skill gain points
 	int rewarded_today[MAX_REWARDS_PER_DAY];	// idnums, for ABIL_REWARD
+	int daily_quests;	// number of daily quests completed today
 
 	// action info
 	int action;	// ACT_

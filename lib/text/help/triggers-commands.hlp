@@ -490,6 +490,7 @@ Quest commands:
   &ctrigger&0 - Activate any 'triggered' quest task, if the player is on that
     quest. You can check %char.quest_triggered(vnum)% to see if the condition
     is already triggered.
+  &cuntrigger&0 - Cancels a 'triggered' quest task, if the player has it.
 
 See also: CHAR-VAR, QUEST
 #d

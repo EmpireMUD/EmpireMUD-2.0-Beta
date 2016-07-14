@@ -2143,6 +2143,8 @@ const char *quest_flags[] = {
 	"REPEAT-PER-INSTANCE",
 	"EXPIRES-AFTER-INSTANCE",
 	"EXTRACT-TASK-OBJECTS",
+	"DAILY",
+	"EMPIRE-ONLY",
 	"\n"
 };
 
@@ -2153,7 +2155,8 @@ const char *quest_giver_types[] = {
 	"MOBILE",
 	"OBJECT",
 	"ROOM-TEMPLATE",
-	"TRIGGER",	// 4
+	"TRIGGER",
+	"QUEST",	// 5
 	"\n"
 };
 
