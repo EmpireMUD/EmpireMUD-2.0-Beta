@@ -267,7 +267,7 @@ extern struct empire_island *get_empire_island(empire_data *emp, int island_id);
 extern empire_data *get_or_create_empire(char_data *ch);
 void free_empire(empire_data *emp);
 void read_empire_members(empire_data *only_empire, bool read_techs);
-void read_empire_territory(empire_data *emp);
+void read_empire_territory(empire_data *emp, bool check_tech);
 extern empire_data *real_empire(empire_vnum vnum);
 void reread_empire_tech(empire_data *emp);
 void save_empire(empire_data *e);

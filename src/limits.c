@@ -792,7 +792,6 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 	if (!found_building) {
 		log_to_empire(emp, ELOG_TERRITORY, "%s (%d, %d) abandoned as ruins", city->name, X_COORD(city->location), Y_COORD(city->location));
 		perform_abandon_city(emp, city, TRUE);
-		read_empire_territory(emp);
 		return TRUE;
 	}
 	
@@ -807,21 +806,15 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 */
 void check_ruined_cities(void) {
 	struct empire_city_data *city, *next_city;
-	bool ruined_any = FALSE;
 	empire_data *emp, *next_emp;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if (!EMPIRE_IMM_ONLY(emp)) {
 			for (city = EMPIRE_CITY_LIST(emp); city; city = next_city) {
 				next_city = city->next;
-				
-				ruined_any |= check_one_city_for_ruin(emp, city);
+				check_one_city_for_ruin(emp, city);
 			}
 		}
-	}
-	
-	if (ruined_any) {
-		read_empire_territory(NULL);
 	}
 }
 
@@ -900,7 +893,6 @@ static void reduce_city_overage_one(empire_data *emp) {
 	}
 	
 	save_empire(emp);
-	read_empire_territory(emp);
 }
 
 
@@ -984,7 +976,6 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	if (farthest) {
 		log_to_empire(emp, ELOG_TERRITORY, "Abandoning %s (%d, %d) because too much outside territory has been claimed", get_room_name(farthest, FALSE), X_COORD(farthest), Y_COORD(farthest));
 		abandon_room(farthest);
-		read_empire_territory(emp);
 	}
 }
 
@@ -1068,7 +1059,6 @@ static void reduce_stale_empires_one(empire_data *emp) {
 	if (found_room) {
 		// this is only called on VERY stale empires (no members), so there's no real need to log this abandon
 		abandon_room(found_room);
-		read_empire_territory(emp);
 	}
 }
 
@@ -1565,7 +1555,6 @@ void point_update_room(room_data *room) {
 				if (emp && !is_in_city_for_empire(room, emp, TRUE, &junk)) {
 					// does check the city time limit for abandon protection
 					abandon_room(room);
-					read_empire_territory(emp);
 				}
 
 				/* Destroy 50% of the objects */

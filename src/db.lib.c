@@ -3992,7 +3992,6 @@ void parse_room(FILE *fl, room_vnum vnum) {
 	
 	// basic setup: things that don't default to 0/NULL
 	room->vnum = vnum;
-	room->owner = NULL;
 	
 	HASH_FIND_INT(world_table, &vnum, find);
 	if (find) {

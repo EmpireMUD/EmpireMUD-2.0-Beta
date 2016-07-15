@@ -503,6 +503,8 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 
 // only some types of tiles are kept in the shortlist of territories -- particularly ones with associated chores
 #define BELONGS_IN_TERRITORY_LIST(room)  (IS_ANY_BUILDING(room) || COMPLEX_DATA(room) || ROOM_SECT_FLAGGED(room, SECTF_CHORE))
+#define COUNTS_AS_TERRITORY(room)  (HOME_ROOM(room) == (room) && !GET_ROOM_VEHICLE(room))
+#define LARGE_CITY_RADIUS(room)  (ROOM_BLD_FLAGGED((room), BLD_LARGE_CITY_RADIUS) || ROOM_SECT_FLAGGED((room), SECTF_LARGE_CITY_RADIUS))
 
 
  //////////////////////////////////////////////////////////////////////////////

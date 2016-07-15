@@ -751,7 +751,7 @@ void abandon_city(char_data *ch, char *argument) {
 	log_to_empire(emp, ELOG_TERRITORY, "%s has abandoned %s", PERS(ch, ch, 1), city->name);
 	perform_abandon_city(emp, city, TRUE);
 	
-	read_empire_territory(emp);
+	read_empire_territory(emp, FALSE);
 	save_empire(emp);
 }
 
@@ -866,9 +866,6 @@ void claim_city(char_data *ch, char *argument) {
 			if (all || (SECT(to_room) != BASE_SECT(to_room))) {
 				found = TRUE;
 				claim_room(to_room, emp);
-				
-				// increment territory now so can_claim updates
-				EMPIRE_CITY_TERRITORY(emp) += 1;
 			}
 		}
 	}
@@ -880,13 +877,11 @@ void claim_city(char_data *ch, char *argument) {
 			
 			home = HOME_ROOM(iter);
 			if (home != iter && ROOM_OWNER(home) == emp) {
-				ROOM_OWNER(iter) = emp;
+				claim_room(iter, emp);
 			}
 		}
 				
 		msg_to_char(ch, "You have claimed all %s in the %s of %s.\r\n", all ? "tiles" : "unclaimed structures", city_type[city->type].name, city->name);
-		read_empire_territory(emp);
-		save_empire(emp);
 	}
 	else {
 		msg_to_char(ch, "The %s of %s has no unclaimed %s.\r\n", city_type[city->type].name, city->name, all ? "tiles" : "structures");
@@ -928,7 +923,7 @@ void downgrade_city(char_data *ch, char *argument) {
 	}
 	
 	save_empire(emp);
-	read_empire_territory(emp);
+	read_empire_territory(emp, FALSE);
 }
 
 
@@ -1056,7 +1051,7 @@ void found_city(char_data *ch, char *argument) {
 	stop_room_action(IN_ROOM(ch), ACT_HARVESTING, NOTHING);
 	stop_room_action(IN_ROOM(ch), ACT_PLANTING, NOTHING);
 	
-	read_empire_territory(emp);
+	read_empire_territory(emp, FALSE);
 	save_empire(emp);
 }
 
@@ -1076,10 +1071,9 @@ bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bo
 	int dist;
 	
 	int wait = config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN;
-	bool large_radius = (ROOM_BLD_FLAGGED(loc, BLD_LARGE_CITY_RADIUS) || ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS));
 	
 	*too_soon = FALSE;
-
+	
 	if (!emp) {
 		return FALSE;
 	}
@@ -1092,7 +1086,7 @@ bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bo
 	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
 		dist = compute_distance(loc, city->location);
 		
-		if (dist <= city_type[city->type].radius || (large_radius && dist <= (3 * city_type[city->type].radius))) {
+		if (dist <= city_type[city->type].radius || (LARGE_CITY_RADIUS(loc) && dist <= (3 * city_type[city->type].radius))) {
 			if (!check_wait || (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + wait) < time(0)) {
 				return TRUE;
 			}
@@ -1280,7 +1274,7 @@ void upgrade_city(char_data *ch, char *argument) {
 	city->type++;
 	
 	log_to_empire(emp, ELOG_TERRITORY, "%s has upgraded %s to a %s", PERS(ch, ch, 1), city->name, city_type[city->type].name);
-	read_empire_territory(emp);
+	read_empire_territory(emp, FALSE);
 	save_empire(emp);
 }
 
@@ -2227,7 +2221,6 @@ void do_abandon_room(char_data *ch, room_data *room) {
 			act("$n abandons $s claim to this area.", FALSE, ch, NULL, NULL, TO_ROOM);
 		}
 		abandon_room(room);
-		read_empire_territory(GET_LOYALTY(ch));
 	}
 }
 
@@ -2468,10 +2461,6 @@ ACMD(do_cede) {
 				set_room_extra_data(iter, ROOM_EXTRA_CEDED, 1);
 			}
 		}
-
-		/* Transfers wealth, etc */
-		read_empire_territory(e);
-		read_empire_territory(f);
 	}
 }
 
@@ -2564,8 +2553,6 @@ void do_claim_room(char_data *ch, room_data *room) {
 			act("$N stakes a claim to this area.", FALSE, ROOM_PEOPLE(room), NULL, ch, TO_CHAR | TO_ROOM);
 		}
 		claim_room(room, emp);
-		read_empire_territory(emp);
-		save_empire(emp);
 	}
 }
 
@@ -3596,7 +3583,8 @@ ACMD(do_enroll) {
 			// move territory over
 			HASH_ITER(hh, world_table, room, next_room) {
 				if (ROOM_OWNER(room) == old) {
-					ROOM_OWNER(room) = e;
+					abandon_room(room);
+					claim_room(room, e);
 				}
 			}
 			
@@ -4586,13 +4574,7 @@ void process_reclaim(char_data *ch) {
 
 		abandon_room(IN_ROOM(ch));
 		claim_room(IN_ROOM(ch), emp);
-
-		/* Transfers wealth, etc */
-		save_empire(emp);
-		reread_empire_tech(emp);
-		if (enemy != emp) {
-			reread_empire_tech(enemy);
-		}
+		
 		GET_ACTION(ch) = ACT_NONE;
 	}
 }

@@ -2276,7 +2276,6 @@ void besiege_room(room_data *to_room, int damage) {
 			if (emp && !is_in_city_for_empire(to_room, emp, TRUE, &junk)) {
 				// this does check the city found time so that recently-founded cities don't get abandon protection
 				abandon_room(to_room);
-				read_empire_territory(emp);
 			}
 			if (ROOM_PEOPLE(to_room)) {
 				act("The building is hit and crumbles!", FALSE, ROOM_PEOPLE(to_room), 0, 0, TO_CHAR | TO_ROOM);
