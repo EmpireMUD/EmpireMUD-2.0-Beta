@@ -106,12 +106,14 @@ bool can_build_on(room_data *room, bitvector_t flags) {
 * @param room_data *room The location of the road.
 */
 void check_lay_territory(char_data *ch, room_data *room) {
-	empire_data *emp = GET_LOYALTY(ch);
-	bool junk;
+//	empire_data *emp = GET_LOYALTY(ch);
+//	bool junk;
 	
+	/*
 	if (emp && ROOM_OWNER(room) && !is_in_city_for_empire(room, emp, FALSE, &junk)) {
 		read_empire_territory(emp, FALSE);
 	}
+	*/
 }
 
 
