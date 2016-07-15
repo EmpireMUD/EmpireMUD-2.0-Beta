@@ -681,6 +681,7 @@ void link_and_check_vehicles(void) {
 	// only bother this if we deleted anything
 	if (found) {
 		check_all_exits();
+		read_empire_territory(NULL, FALSE);
 	}
 }
 
