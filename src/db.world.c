@@ -1450,8 +1450,8 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	}
 	
 	// for updating territory counts
-	was_large = LARGE_CITY_RADIUS(loc);
-	was_in_city = (was_large && ROOM_OWNER(loc)) ? is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk) : FALSE;
+	was_large = loc ? LARGE_CITY_RADIUS(loc) : FALSE;
+	was_in_city = (loc && was_large && ROOM_OWNER(loc)) ? is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk) : FALSE;
 	
 	// preserve
 	old_sect = (loc ? SECT(loc) : map->sector_type);
