@@ -3316,7 +3316,8 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 		FIGHT_WAIT(ch) = 0;
 	}
 	GET_POS(ch) = POS_FIGHTING;
-	GET_LAST_SWING_MAINHAND(ch) = GET_LAST_SWING_OFFHAND(ch) = time(0);
+	GET_LAST_SWING_MAINHAND(ch) = time(0);
+	GET_LAST_SWING_OFFHAND(ch) = time(0);
 	
 	// remove all stuns when combat starts
 	affects_from_char_by_aff_flag(ch, AFF_STUNNED, FALSE);
