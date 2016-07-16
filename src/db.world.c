@@ -1451,7 +1451,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	
 	// for updating territory counts
 	was_large = (loc && SECT(loc)) ? LARGE_CITY_RADIUS(loc) : FALSE;
-	was_in_city = (loc && was_large && ROOM_OWNER(loc)) ? is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk) : FALSE;
+	was_in_city = (loc && ROOM_OWNER(loc)) ? is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk) : FALSE;
 	
 	// preserve
 	old_sect = (loc ? SECT(loc) : map->sector_type);
@@ -1490,7 +1490,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) -= 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) += 1;
 		}
-		else if (!was_large && !was_in_city && is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
+		else if (LARGE_CITY_RADIUS(loc) && !was_in_city && is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
 			// changing from outside-territory to in-city
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) += 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) -= 1;

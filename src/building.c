@@ -100,24 +100,6 @@ bool can_build_on(room_data *room, bitvector_t flags) {
 
 
 /**
-* makes sure to update territory, as roads "count as in city"
-*
-* @param char_data *ch The lay-er.
-* @param room_data *room The location of the road.
-*/
-void check_lay_territory(char_data *ch, room_data *room) {
-//	empire_data *emp = GET_LOYALTY(ch);
-//	bool junk;
-	
-	/*
-	if (emp && ROOM_OWNER(room) && !is_in_city_for_empire(room, emp, FALSE, &junk)) {
-		read_empire_territory(emp, FALSE);
-	}
-	*/
-}
-
-
-/**
 * This creates a resource list that is a merged copy of two lists. You will
 * need to free_resource_list() on the result when done with it.
 *
@@ -209,7 +191,7 @@ void construct_building(room_data *room, bld_vnum type) {
 	
 	// for updating territory counts
 	was_large = LARGE_CITY_RADIUS(room);
-	was_in_city = (was_large && ROOM_OWNER(room)) ? is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : FALSE;
+	was_in_city = ROOM_OWNER(room) ? is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : FALSE;
 	
 	sect = SECT(room);
 	change_terrain(room, config_get_int("default_building_sect"));
@@ -228,7 +210,7 @@ void construct_building(room_data *room, bld_vnum type) {
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) -= 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) += 1;
 		}
-		else if (!was_large && !was_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
+		else if (LARGE_CITY_RADIUS(room) && !was_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
 			// changing from outside-territory to in-city
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) += 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) -= 1;
@@ -319,7 +301,7 @@ void disassociate_building(room_data *room) {
 	
 	// for updating territory counts
 	was_large = LARGE_CITY_RADIUS(room);
-	was_in_city = (was_large && ROOM_OWNER(room)) ? is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : FALSE;
+	was_in_city = ROOM_OWNER(room) ? is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : FALSE;
 	
 	if (ROOM_OWNER(room) && GET_BUILDING(room) && IS_COMPLETE(room)) {
 		qt_empire_players(ROOM_OWNER(room), qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
@@ -415,7 +397,7 @@ void disassociate_building(room_data *room) {
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) -= 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) += 1;
 		}
-		else if (!was_large && !was_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
+		else if (LARGE_CITY_RADIUS(room) && !was_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
 			// changing from outside-territory to in-city
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) += 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) -= 1;
@@ -1826,7 +1808,6 @@ ACMD(do_lay) {
 		// this will tear it back down to its base type
 		disassociate_building(IN_ROOM(ch));
 		command_lag(ch, WAIT_OTHER);
-		check_lay_territory(ch, IN_ROOM(ch));
 	}
 	else if (!road_sect) {
 		msg_to_char(ch, "Road data has not been set up for this game.\r\n");
@@ -1865,7 +1846,6 @@ ACMD(do_lay) {
 		}
 		
 		command_lag(ch, WAIT_OTHER);
-		check_lay_territory(ch, IN_ROOM(ch));
 	}
 }
 
