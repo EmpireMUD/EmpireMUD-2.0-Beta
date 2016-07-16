@@ -988,10 +988,7 @@ void heartbeat(int heart_pulse) {
 			process_imports();
 			if (debug_log && HEARTBEAT(15)) { log("debug 25:\t%lld", microtime()); }
 		}
-	}
-	
-	// just over 7.5 minutes -- to avoid putting it right on the same cycle as hours
-	if (HEARTBEAT(455)) {
+		// evos happen every hour
 		run_map_evolutions();
 		if (debug_log && HEARTBEAT(15)) { log("debug 26:\t%lld", microtime()); }
 	}

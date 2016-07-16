@@ -2352,7 +2352,7 @@ const char *designate_flags[] = {
 };
 
 
-// EVO_x world evolutions
+// EVO_x 1/3: world evolution names
 const char *evo_types[] = {
 	"CHOPPED-DOWN",
 	"CROP-GROWS",
@@ -2370,7 +2370,7 @@ const char *evo_types[] = {
 };
 
 
-// EVO_x -- what type of data the evolution.value uses
+// EVO_x 2/3: what type of data the evolution.value uses
 const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NONE,	// chopped-down
 	EVO_VAL_NONE,	// crop-grows
@@ -2384,6 +2384,23 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NONE,	// magic-growth
 	EVO_VAL_SECTOR,	// not-adjacent
 	EVO_VAL_SECTOR,	// not-near-sector
+};
+
+
+// EVO_x 3/3: evolution is over time (as opposed to triggered by an action)
+bool evo_is_over_time[] = {
+	FALSE,	// chopped
+	FALSE,	// crop grows
+	TRUE,	// adjacent-one
+	TRUE,	// adjacent-many
+	TRUE,	// random
+	FALSE,	// trench-start
+	FALSE,	// trench-full
+	TRUE,	// near-sect
+	FALSE,	// plants-to
+	FALSE,	// magic-growth
+	TRUE,	// not-adjacent
+	TRUE,	// not-near-sector
 };
 
 

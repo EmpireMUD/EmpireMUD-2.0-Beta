@@ -2623,13 +2623,42 @@ void load_world_map_from_file(void) {
 
 
 /**
-* Runs evolutions on all the land mass in the world. This skips the oceans.
+* Runs evolutions on 1/24 of sectors per hour.
 */
 void run_map_evolutions(void) {
-	struct map_data *map;
+	extern bool evo_is_over_time[];
 	
-	for (map = land_map; map; map = map->next) {
-		evolve_one_map_tile(map);
+	struct sector_index_type *idx;
+	sector_data *sect, *next_sect;
+	struct evolution_data *evo;
+	struct map_data *map;
+	bool any = FALSE;
+	
+	HASH_ITER(hh, sector_table, sect, next_sect) {
+		// validation
+		if ((GET_SECT_VNUM(sect) % 24) != time_info.hours || GET_SECT_VNUM(sect) == BASIC_OCEAN) {
+			continue;	// 1/24th per hour
+		}
+		
+		// ensure it has at least 1 over-time evolution
+		any = FALSE;
+		LL_FOREACH(GET_SECT_EVOS(sect), evo) {
+			if (evo_is_over_time[evo->type]) {
+				any = TRUE;
+				break;	// only need 1
+			}
+		}
+		if (!any) {
+			continue;
+		}
+		
+		// load the index
+		idx = find_sector_index(GET_SECT_VNUM(sect));
+		
+		// check the rooms in the list
+		LL_FOREACH2(idx->sect_rooms, map, next_in_sect) {
+			evolve_one_map_tile(map);
+		}
 	}
 }
 
