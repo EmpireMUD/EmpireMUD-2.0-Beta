@@ -2277,7 +2277,7 @@ void claim_room(room_data *room, empire_data *emp) {
 	room_data *home = HOME_ROOM(room);
 	room_data *iter, *next_iter;
 	
-	if (!room || !emp) {
+	if (!room || !emp || ROOM_OWNER(home)) {
 		return;
 	}
 	

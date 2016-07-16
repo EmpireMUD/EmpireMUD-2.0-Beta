@@ -1241,7 +1241,7 @@ ACMD(do_build) {
 	special_building_setup(ch, IN_ROOM(ch));
 	
 	// can_claim checks total available land, but the outside is check done within this block
-	if (can_claim(ch) && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
+	if (!ROOM_OWNER(IN_ROOM(ch)) && can_claim(ch) && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
 		if (e || (e = get_or_create_empire(ch))) {
 			if (EMPIRE_OUTSIDE_TERRITORY(e) < land_can_claim(e, TRUE) || is_in_city_for_empire(IN_ROOM(ch), e, FALSE, &junk)) {
 				claim_room(IN_ROOM(ch), e);
