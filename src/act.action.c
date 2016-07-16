@@ -38,7 +38,7 @@
 // external vars
 
 // external funcs
-extern room_data *dir_to_room(room_data *room, int dir);
+extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern double get_base_dps(obj_data *weapon);
 extern obj_data *find_chip_weapon(char_data *ch);
 extern obj_data *has_sharp_tool(char_data *ch);
@@ -1339,7 +1339,7 @@ void process_fishing(char_data *ch) {
 	int dir;
 	
 	dir = GET_ACTION_VNUM(ch, 0);
-	room = (dir == NO_DIR) ? IN_ROOM(ch) : dir_to_room(IN_ROOM(ch), dir);
+	room = (dir == NO_DIR) ? IN_ROOM(ch) : dir_to_room(IN_ROOM(ch), dir, FALSE);
 	
 	if (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) != ITEM_WEAPON || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_JAB) {
 		msg_to_char(ch, "You'll need a spear to fish.\r\n");
@@ -1666,7 +1666,7 @@ void process_panning(char_data *ch) {
 	int dir;
 	
 	dir = GET_ACTION_VNUM(ch, 0);
-	room = (dir == NO_DIR) ? IN_ROOM(ch) : dir_to_room(IN_ROOM(ch), dir);
+	room = (dir == NO_DIR) ? IN_ROOM(ch) : dir_to_room(IN_ROOM(ch), dir, FALSE);
 
 	if ((!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_PAN)) && (!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_PAN))) {
 		msg_to_char(ch, "You need to be holding a pan to do that.\r\n");
@@ -2640,7 +2640,7 @@ ACMD(do_pan) {
 	else if (*arg && (dir = parse_direction(ch, arg)) == NO_DIR) {
 		msg_to_char(ch, "Pan what direction?\r\n");
 	}
-	else if (dir != NO_DIR && !(room = dir_to_room(IN_ROOM(ch), dir))) {
+	else if (dir != NO_DIR && !(room = dir_to_room(IN_ROOM(ch), dir, FALSE))) {
 		msg_to_char(ch, "You can't pan in that direction.\r\n");
 	}
 	else if (!CAN_INTERACT_ROOM(room, INTERACT_PAN)) {

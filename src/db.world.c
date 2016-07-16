@@ -1847,8 +1847,13 @@ void clear_private_owner(int id) {
 * Gets a simple movable room based on valid exits. This does not take a player
 * into account, only that a room exists that way and it's possible to move to
 * it.
+*
+* @param room_data *room Origin room.
+* @param int dir Which way to target.
+* @param bool ignore_entrance If TRUE, doesn't care which way the target tile is entered (e.g. for siege)
+* @return room_data* The target room if it was valid, or NULL if not.
 */
-room_data *dir_to_room(room_data *room, int dir) {
+room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance) {
 	struct room_direction_data *ex;
 	room_data *to_room = NULL;
 	
@@ -1861,7 +1866,7 @@ room_data *dir_to_room(room_data *room, int dir) {
 		to_room = real_shift(room, shift_dir[dir][0], shift_dir[dir][1]);
 		
 		// check building entrance
-		if (to_room && IS_MAP_BUILDING(to_room) && !IS_INSIDE(room) && !IS_ADVENTURE_ROOM(room) && BUILDING_ENTRANCE(to_room) != dir && ROOM_IS_CLOSED(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
+		if (!ignore_entrance && to_room && IS_MAP_BUILDING(to_room) && !IS_INSIDE(room) && !IS_ADVENTURE_ROOM(room) && BUILDING_ENTRANCE(to_room) != dir && ROOM_IS_CLOSED(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
 			to_room = NULL;	// can't enter this way
 		}
 		else if (to_room == room) {
