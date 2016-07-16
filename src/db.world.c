@@ -1450,7 +1450,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	}
 	
 	// for updating territory counts
-	was_large = (loc && SECT(loc)) ? LARGE_CITY_RADIUS(loc) : FALSE;
+	was_large = (loc && SECT(loc)) ? ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS) : FALSE;
 	was_in_city = (loc && ROOM_OWNER(loc)) ? is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk) : FALSE;
 	
 	// preserve
@@ -1484,13 +1484,13 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	}
 	
 	// check for territory updates
-	if (loc && ROOM_OWNER(loc) && was_large != LARGE_CITY_RADIUS(loc)) {
+	if (loc && ROOM_OWNER(loc) && was_large != ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS)) {
 		if (was_large && was_in_city && !is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
 			// changing from in-city to not
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) -= 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) += 1;
 		}
-		else if (LARGE_CITY_RADIUS(loc) && !was_in_city && is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
+		else if (ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
 			// changing from outside-territory to in-city
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) += 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) -= 1;

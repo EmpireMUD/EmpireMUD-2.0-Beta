@@ -190,7 +190,7 @@ void construct_building(room_data *room, bld_vnum type) {
 	disassociate_building(room);	// just in case
 	
 	// for updating territory counts
-	was_large = LARGE_CITY_RADIUS(room);
+	was_large = ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS);
 	was_in_city = ROOM_OWNER(room) ? is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : FALSE;
 	
 	sect = SECT(room);
@@ -204,13 +204,13 @@ void construct_building(room_data *room, bld_vnum type) {
 	SET_BIT(ROOM_AFF_FLAGS(room), BLD_BASE_AFFECTS(room));
 	
 	// check for territory updates
-	if (ROOM_OWNER(room) && was_large != LARGE_CITY_RADIUS(room)) {
+	if (ROOM_OWNER(room) && was_large != ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS)) {
 		if (was_large && was_in_city && !is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
 			// changing from in-city to not
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) -= 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) += 1;
 		}
-		else if (LARGE_CITY_RADIUS(room) && !was_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
+		else if (ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
 			// changing from outside-territory to in-city
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) += 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) -= 1;
@@ -300,7 +300,7 @@ void disassociate_building(room_data *room) {
 	bool deleted = FALSE;
 	
 	// for updating territory counts
-	was_large = LARGE_CITY_RADIUS(room);
+	was_large = ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS);
 	was_in_city = ROOM_OWNER(room) ? is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : FALSE;
 	
 	if (ROOM_OWNER(room) && GET_BUILDING(room) && IS_COMPLETE(room)) {
@@ -391,13 +391,13 @@ void disassociate_building(room_data *room) {
 	}
 	
 	// check for territory updates
-	if (ROOM_OWNER(room) && was_large != LARGE_CITY_RADIUS(room)) {
+	if (ROOM_OWNER(room) && was_large != ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS)) {
 		if (was_large && was_in_city && !is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
 			// changing from in-city to not
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) -= 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) += 1;
 		}
-		else if (LARGE_CITY_RADIUS(room) && !was_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
+		else if (ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
 			// changing from outside-territory to in-city
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) += 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) -= 1;
