@@ -220,6 +220,13 @@ void stop_room_action(room_data *room, int action, int chore) {
 */
 void update_actions(void) {
 	extern struct gen_craft_data_t gen_craft_data[];
+	extern bool catch_up_actions;
+	
+	// prevent running multiple action rounds during a catch-up cycle
+	if (!catch_up_actions) {
+		return;
+	}
+	catch_up_actions = FALSE;
 	
 	descriptor_data *desc;
 	bitvector_t act_flags;

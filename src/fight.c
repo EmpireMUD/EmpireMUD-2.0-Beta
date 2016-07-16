@@ -3663,8 +3663,16 @@ void fight_wait_run(char_data *ch, double speed) {
 * @param int pulse the current game pulse, for determining whose turn it is
 */
 void frequent_combat(int pulse) {
+	extern bool catch_up_combat;
+	
 	char_data *ch, *vict;
 	double speed;
+	
+	// prevent running multiple combat rounds during a catch-up cycle
+	if (!catch_up_combat) {
+		return;
+	}
+	catch_up_combat = FALSE;
 	
 	for (ch = combat_list; ch; ch = next_combat_list) {
 		next_combat_list = ch->next_fighting;
@@ -3690,9 +3698,10 @@ void frequent_combat(int pulse) {
 			}
 			case FMODE_MISSILE: {
 				speed = get_combat_speed(ch, WEAR_RANGED);
-		
+				
 				// my turn?
-				if ((pulse % ((int)(speed RL_SEC))) == 0) {
+				if (GET_LAST_SWING_MAINHAND(ch) + speed <= time(0)) {
+					GET_LAST_SWING_MAINHAND(ch) = time(0);
 					one_combat_round(ch, speed, GET_EQ(ch, WEAR_RANGED));
 				}
 				break;
@@ -3701,14 +3710,16 @@ void frequent_combat(int pulse) {
 			default: {
 				// main hand
 				speed = get_combat_speed(ch, WEAR_WIELD);
-				if ((pulse % ((int)(speed RL_SEC))) == 0) {
+				if (GET_LAST_SWING_MAINHAND(ch) + speed <= time(0)) {
+					GET_LAST_SWING_MAINHAND(ch) = time(0);
 					one_combat_round(ch, speed, GET_EQ(ch, WEAR_WIELD));
 				}
 				
 				// still fighting and can dual-wield?
 				if (!IS_NPC(ch) && FIGHTING(ch) && !IS_DEAD(ch) && !EXTRACTED(ch) && !EXTRACTED(FIGHTING(ch)) && has_ability(ch, ABIL_DUAL_WIELD) && check_solo_role(ch) && GET_EQ(ch, WEAR_HOLD) && IS_WEAPON(GET_EQ(ch, WEAR_HOLD))) {
 					speed = get_combat_speed(ch, WEAR_HOLD);
-					if ((pulse % ((int)(speed RL_SEC))) == 0) {
+					if (GET_LAST_SWING_OFFHAND(ch) + speed <= time(0)) {
+						GET_LAST_SWING_OFFHAND(ch) = time(0);
 						one_combat_round(ch, speed, GET_EQ(ch, WEAR_HOLD));
 					}
 				}

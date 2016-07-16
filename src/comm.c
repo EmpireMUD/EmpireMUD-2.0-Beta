@@ -131,6 +131,11 @@ static bool reboot_recovery = FALSE;
 int mother_desc;
 ush_int port;
 
+// vars to prevent running multiple cycles during a missed-pulse catch-up cycle
+bool catch_up_combat = FALSE;	// frequent_combat()
+bool catch_up_actions = FALSE;	// update_actions()
+bool catch_up_mobs = FALSE;	// mobile_activity()
+
 /* Reboot data (default to a normal reboot once per week) */
 struct reboot_control_data reboot_control = { SCMD_REBOOT, 7.5 * (24 * 60), SHUTDOWN_NORMAL, FALSE };
 
@@ -3483,6 +3488,9 @@ void game_loop(socket_t mother_desc) {
 		}
 
 		/* Now execute the heartbeat functions */
+		catch_up_combat = TRUE;
+		catch_up_actions = TRUE;
+		catch_up_mobs = TRUE;
 		while (missed_pulses--) {
 			heartbeat(++pulse);
 		}
