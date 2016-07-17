@@ -15,7 +15,7 @@ D0
 &r...&y^~
 &y~
 E
-4 0 0.05 0
+4 0 0.20 0
 E
 9 0 75.00 1
 I 6 10302 100.00 1  # FORAGE: some firefruit seeds
@@ -65,7 +65,7 @@ D0
 &r...&y^~
 &y~
 E
-4 0 0.05 20
+4 0 0.20 20
 E
 9 0 75.00 26
 I 6 10302 100.00 1  # FORAGE: some firefruit seeds
@@ -106,7 +106,7 @@ D0
 ....~
 &r~
 E
-4 0 0.05 0
+4 0 0.20 0
 E
 9 0 75.00 1
 I 6 10302 100.00 1  # FORAGE: some firefruit seeds
@@ -147,7 +147,7 @@ D0
 ....~
 &r~
 E
-4 0 0.05 0
+4 0 0.20 0
 E
 9 0 75.00 1
 I 6 10302 100.00 1  # FORAGE: some firefruit seeds
@@ -188,7 +188,7 @@ D0
 ....~
 &r~
 E
-4 0 0.05 20
+4 0 0.20 20
 E
 9 0 75.00 26
 I 6 10302 100.00 1  # FORAGE: some firefruit seeds
@@ -229,7 +229,7 @@ D0
 ....~
 &r~
 E
-4 0 0.05 20
+4 0 0.20 20
 E
 9 0 75.00 26
 I 6 10302 100.00 1  # FORAGE: some firefruit seeds

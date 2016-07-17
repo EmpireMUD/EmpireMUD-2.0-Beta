@@ -65,6 +65,21 @@ end
 %echoaround% %actor% %actor.name% tries and fails to herd %self.name%.
 return 1
 ~
+#9003
+Daily Quest Item Handout~
+2 u 100
+~
+if %questvnum% == 9009
+  %load% obj 9010 %actor% inv
+  eval item %actor.inventory(9010)%
+  if %item%
+    %send% %actor% The stablemaster gives you %item.shortdesc%.
+  end
+elseif %questvnum% == 9036
+  nop %actor.add_resources(9036, 5)%
+  %send% %actor% The High Sorcerer gives you five enchanted trinkets.
+end
+~
 #9004
 Sheep Animation~
 0 b 1
@@ -327,6 +342,23 @@ switch (%random.3%)
     %echo% %self.name%'s ears prick forward as though listening for danger...
   break
 done
+~
+#9036
+Disenchant checker~
+2 v 100
+~
+eval obj %actor.inventory()%
+while %obj%
+  if %obj.vnum% == 9036
+    if %obj.flag(ENCHANTED)%
+      %send% %actor% You have not disenchanted all of the trinkets!
+      return 0
+      halt
+    end
+  end
+  eval obj %obj.next_in_list%
+done
+return 1
 ~
 #9064
 Wandering Vampire combat~
