@@ -2840,6 +2840,8 @@ void engage_combat(char_data *ch, char_data *vict, bool melee) {
 	}
 	if (!FIGHTING(vict) && AWAKE(vict)) {
 		set_fighting(vict, ch, melee ? FMODE_MELEE : FMODE_WAITING);
+		GET_LAST_SWING_MAINHAND(vict) = microtime() - 250000;	// quarter-second delay
+		GET_LAST_SWING_OFFHAND(vict) = GET_LAST_SWING_MAINHAND(vict);
 	}
 }
 
