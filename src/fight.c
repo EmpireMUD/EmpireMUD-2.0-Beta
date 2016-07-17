@@ -2603,8 +2603,8 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 		if (GET_POS(victim) > POS_STUNNED && (FIGHTING(victim) == NULL)) {
 			set_fighting(victim, ch, FMODE_MELEE);
 			
-			GET_LAST_SWING_MAINHAND(ch) = microtime() - 250000;	// quarter-second delay
-			GET_LAST_SWING_OFFHAND(ch) = GET_LAST_SWING_MAINHAND(ch);
+			GET_LAST_SWING_MAINHAND(victim) = microtime() - 250000;	// quarter-second delay
+			GET_LAST_SWING_OFFHAND(victim) = GET_LAST_SWING_MAINHAND(victim);
 		}
 	}
 
