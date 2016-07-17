@@ -2598,8 +2598,8 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 		if (GET_POS(victim) > POS_STUNNED && (FIGHTING(victim) == NULL)) {
 			unsigned long long timestamp = microtime();
 			set_fighting(victim, ch, FMODE_MELEE);
-			GET_LAST_SWING_MAINHAND(victim) = timestamp - get_combat_speed(victim, WEAR_WIELD)/2;	// half-round time offset
-			GET_LAST_SWING_OFFHAND(victim) = timestamp - get_combat_speed(victim, WEAR_HOLD)/2;	// half-round time offset
+			GET_LAST_SWING_MAINHAND(victim) = timestamp - (get_combat_speed(victim, WEAR_WIELD)/2 SEC_MICRO);	// half-round time offset
+			GET_LAST_SWING_OFFHAND(victim) = timestamp - (get_combat_speed(victim, WEAR_HOLD)/2 SEC_MICRO);	// half-round time offset
 		}
 	}
 
@@ -2837,8 +2837,8 @@ void engage_combat(char_data *ch, char_data *vict, bool melee) {
 		unsigned long long timestamp = microtime();
 		set_fighting(vict, ch, melee ? FMODE_MELEE : FMODE_WAITING);
 		
-		GET_LAST_SWING_MAINHAND(vict) = timestamp - get_combat_speed(vict, WEAR_WIELD)/2;	// half-round time offset
-		GET_LAST_SWING_OFFHAND(vict) = timestamp - get_combat_speed(vict, WEAR_HOLD)/2;	// half-round time offset
+		GET_LAST_SWING_MAINHAND(vict) = timestamp - (get_combat_speed(vict, WEAR_WIELD)/2 SEC_MICRO);	// half-round time offset
+		GET_LAST_SWING_OFFHAND(vict) = timestamp - (get_combat_speed(vict, WEAR_HOLD)/2 SEC_MICRO);	// half-round time offset
 	}
 }
 
@@ -3705,7 +3705,7 @@ void frequent_combat(int pulse) {
 				speed = get_combat_speed(ch, WEAR_RANGED);
 				
 				// my turn?
-				if (GET_LAST_SWING_MAINHAND(ch) + speed * 1000000 <= microtime()) {
+				if (GET_LAST_SWING_MAINHAND(ch) + (speed SEC_MICRO) <= microtime()) {
 					GET_LAST_SWING_MAINHAND(ch) = microtime();
 					one_combat_round(ch, speed, GET_EQ(ch, WEAR_RANGED));
 				}
@@ -3717,7 +3717,7 @@ void frequent_combat(int pulse) {
 				
 				// main hand
 				speed = get_combat_speed(ch, WEAR_WIELD);
-				if (GET_LAST_SWING_MAINHAND(ch) + speed * 1000000 <= timestamp) {
+				if (GET_LAST_SWING_MAINHAND(ch) + (speed SEC_MICRO) <= timestamp) {
 					GET_LAST_SWING_MAINHAND(ch) = timestamp;
 					one_combat_round(ch, speed, GET_EQ(ch, WEAR_WIELD));
 				}
@@ -3725,7 +3725,7 @@ void frequent_combat(int pulse) {
 				// still fighting and can dual-wield?
 				if (!IS_NPC(ch) && FIGHTING(ch) && !IS_DEAD(ch) && !EXTRACTED(ch) && !EXTRACTED(FIGHTING(ch)) && has_ability(ch, ABIL_DUAL_WIELD) && check_solo_role(ch) && GET_EQ(ch, WEAR_HOLD) && IS_WEAPON(GET_EQ(ch, WEAR_HOLD))) {
 					speed = get_combat_speed(ch, WEAR_HOLD);
-					if (GET_LAST_SWING_OFFHAND(ch) + speed * 1000000<= timestamp) {
+					if (GET_LAST_SWING_OFFHAND(ch) + (speed SEC_MICRO) <= timestamp) {
 						GET_LAST_SWING_OFFHAND(ch) = timestamp;
 						one_combat_round(ch, speed, GET_EQ(ch, WEAR_HOLD));
 					}
