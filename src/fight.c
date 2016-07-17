@@ -2600,8 +2600,12 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 			set_fighting(ch, victim, FMODE_MELEE);
 
 		/* Start the victim fighting the attacker */
-		if (GET_POS(victim) > POS_STUNNED && (FIGHTING(victim) == NULL))
+		if (GET_POS(victim) > POS_STUNNED && (FIGHTING(victim) == NULL)) {
 			set_fighting(victim, ch, FMODE_MELEE);
+			
+			GET_LAST_SWING_MAINHAND(ch) = microtime() - 250000;	// quarter-second delay
+			GET_LAST_SWING_OFFHAND(ch) = GET_LAST_SWING_MAINHAND(ch);
+		}
 	}
 
 	/* If you attack a pet, it hates your guts */
@@ -3316,8 +3320,8 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 		FIGHT_WAIT(ch) = 0;
 	}
 	GET_POS(ch) = POS_FIGHTING;
-	GET_LAST_SWING_MAINHAND(ch) = time(0);
-	GET_LAST_SWING_OFFHAND(ch) = time(0);
+	GET_LAST_SWING_MAINHAND(ch) = microtime();
+	GET_LAST_SWING_OFFHAND(ch) = microtime();
 	
 	// remove all stuns when combat starts
 	affects_from_char_by_aff_flag(ch, AFF_STUNNED, FALSE);
@@ -3702,8 +3706,8 @@ void frequent_combat(int pulse) {
 				speed = get_combat_speed(ch, WEAR_RANGED);
 				
 				// my turn?
-				if (GET_LAST_SWING_MAINHAND(ch) + speed <= time(0)) {
-					GET_LAST_SWING_MAINHAND(ch) = time(0);
+				if (GET_LAST_SWING_MAINHAND(ch) + speed * 1000000 <= microtime()) {
+					GET_LAST_SWING_MAINHAND(ch) = microtime();
 					one_combat_round(ch, speed, GET_EQ(ch, WEAR_RANGED));
 				}
 				break;
@@ -3712,16 +3716,16 @@ void frequent_combat(int pulse) {
 			default: {
 				// main hand
 				speed = get_combat_speed(ch, WEAR_WIELD);
-				if (GET_LAST_SWING_MAINHAND(ch) + speed <= time(0)) {
-					GET_LAST_SWING_MAINHAND(ch) = time(0);
+				if (GET_LAST_SWING_MAINHAND(ch) + speed * 1000000 <= microtime()) {
+					GET_LAST_SWING_MAINHAND(ch) = microtime();
 					one_combat_round(ch, speed, GET_EQ(ch, WEAR_WIELD));
 				}
 				
 				// still fighting and can dual-wield?
 				if (!IS_NPC(ch) && FIGHTING(ch) && !IS_DEAD(ch) && !EXTRACTED(ch) && !EXTRACTED(FIGHTING(ch)) && has_ability(ch, ABIL_DUAL_WIELD) && check_solo_role(ch) && GET_EQ(ch, WEAR_HOLD) && IS_WEAPON(GET_EQ(ch, WEAR_HOLD))) {
 					speed = get_combat_speed(ch, WEAR_HOLD);
-					if (GET_LAST_SWING_OFFHAND(ch) + speed <= time(0)) {
-						GET_LAST_SWING_OFFHAND(ch) = time(0);
+					if (GET_LAST_SWING_OFFHAND(ch) + speed * 1000000<= microtime()) {
+						GET_LAST_SWING_OFFHAND(ch) = microtime();
 						one_combat_round(ch, speed, GET_EQ(ch, WEAR_HOLD));
 					}
 				}

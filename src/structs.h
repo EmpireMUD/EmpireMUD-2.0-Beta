@@ -3096,8 +3096,8 @@ struct fight_data {
 	char_data *victim;	// Actual victim
 	byte mode;	// Fight mode, FMODE_x
 	byte wait;	// Time to intercept
-	time_t last_swing_mainhand;	// last attack time
-	time_t last_swing_offhand;	// last attack time
+	unsigned long long last_swing_mainhand;	// last attack time (microseconds)
+	unsigned long long last_swing_offhand;	// last attack time (microseconds)
 };
 
 
