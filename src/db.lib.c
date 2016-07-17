@@ -2268,7 +2268,7 @@ void update_empire_npc_data(void) {
 	
 	// each empire
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		// skip idle empires
+		// skip idle empires: TODO could macro this
 		if (EMPIRE_LAST_LOGON(emp) + time_to_empire_emptiness < time(0)) {
 			continue;
 		}
