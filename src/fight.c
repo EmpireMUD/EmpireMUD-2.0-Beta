@@ -375,12 +375,7 @@ double get_combat_speed(char_data *ch, int pos) {
 		base *= (1.0 - (0.025 * GET_WITS(ch)));
 	}
 	
-	// round to .1 seconds
-	base *= 10.0;
-	base += 0.5;
-	base = (double)((int)base);	// poor-man's floor()
-	base /= 10.0;
-	
+	// absolute minimum of 0.1 (yikes)
 	return base < 0.1 ? 0.1 : base;
 }
 
@@ -2601,10 +2596,10 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 
 		/* Start the victim fighting the attacker */
 		if (GET_POS(victim) > POS_STUNNED && (FIGHTING(victim) == NULL)) {
+			unsigned long long timestamp = microtime();
 			set_fighting(victim, ch, FMODE_MELEE);
-			
-			GET_LAST_SWING_MAINHAND(victim) = microtime() - 250000;	// quarter-second time offset
-			GET_LAST_SWING_OFFHAND(victim) = GET_LAST_SWING_MAINHAND(victim);
+			GET_LAST_SWING_MAINHAND(victim) = timestamp - get_combat_speed(victim, WEAR_WIELD)/2;	// half-round time offset
+			GET_LAST_SWING_OFFHAND(victim) = timestamp - get_combat_speed(victim, WEAR_HOLD)/2;	// half-round time offset
 		}
 	}
 
@@ -2839,9 +2834,11 @@ void engage_combat(char_data *ch, char_data *vict, bool melee) {
 		set_fighting(ch, vict, melee ? FMODE_MELEE : FMODE_WAITING);
 	}
 	if (!FIGHTING(vict) && AWAKE(vict)) {
+		unsigned long long timestamp = microtime();
 		set_fighting(vict, ch, melee ? FMODE_MELEE : FMODE_WAITING);
-		GET_LAST_SWING_MAINHAND(vict) = microtime() - 250000;	// quarter-second time offset
-		GET_LAST_SWING_OFFHAND(vict) = GET_LAST_SWING_MAINHAND(vict);
+		
+		GET_LAST_SWING_MAINHAND(vict) = timestamp - get_combat_speed(vict, WEAR_WIELD)/2;	// half-round time offset
+		GET_LAST_SWING_OFFHAND(vict) = timestamp - get_combat_speed(vict, WEAR_HOLD)/2;	// half-round time offset
 	}
 }
 
@@ -3323,7 +3320,7 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 	}
 	GET_POS(ch) = POS_FIGHTING;
 	GET_LAST_SWING_MAINHAND(ch) = microtime();
-	GET_LAST_SWING_OFFHAND(ch) = microtime();
+	GET_LAST_SWING_OFFHAND(ch) = GET_LAST_SWING_MAINHAND(ch);
 	
 	// remove all stuns when combat starts
 	affects_from_char_by_aff_flag(ch, AFF_STUNNED, FALSE);
@@ -3716,18 +3713,20 @@ void frequent_combat(int pulse) {
 			}
 			case FMODE_MELEE:
 			default: {
+				unsigned long long timestamp = microtime();
+				
 				// main hand
 				speed = get_combat_speed(ch, WEAR_WIELD);
-				if (GET_LAST_SWING_MAINHAND(ch) + speed * 1000000 <= microtime()) {
-					GET_LAST_SWING_MAINHAND(ch) = microtime();
+				if (GET_LAST_SWING_MAINHAND(ch) + speed * 1000000 <= timestamp) {
+					GET_LAST_SWING_MAINHAND(ch) = timestamp;
 					one_combat_round(ch, speed, GET_EQ(ch, WEAR_WIELD));
 				}
 				
 				// still fighting and can dual-wield?
 				if (!IS_NPC(ch) && FIGHTING(ch) && !IS_DEAD(ch) && !EXTRACTED(ch) && !EXTRACTED(FIGHTING(ch)) && has_ability(ch, ABIL_DUAL_WIELD) && check_solo_role(ch) && GET_EQ(ch, WEAR_HOLD) && IS_WEAPON(GET_EQ(ch, WEAR_HOLD))) {
 					speed = get_combat_speed(ch, WEAR_HOLD);
-					if (GET_LAST_SWING_OFFHAND(ch) + speed * 1000000<= microtime()) {
-						GET_LAST_SWING_OFFHAND(ch) = microtime();
+					if (GET_LAST_SWING_OFFHAND(ch) + speed * 1000000<= timestamp) {
+						GET_LAST_SWING_OFFHAND(ch) = timestamp;
 						one_combat_round(ch, speed, GET_EQ(ch, WEAR_HOLD));
 					}
 				}
