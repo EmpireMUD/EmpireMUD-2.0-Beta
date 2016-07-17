@@ -2603,7 +2603,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 		if (GET_POS(victim) > POS_STUNNED && (FIGHTING(victim) == NULL)) {
 			set_fighting(victim, ch, FMODE_MELEE);
 			
-			GET_LAST_SWING_MAINHAND(victim) = microtime() - 250000;	// quarter-second delay
+			GET_LAST_SWING_MAINHAND(victim) = microtime() - 250000;	// quarter-second time offset
 			GET_LAST_SWING_OFFHAND(victim) = GET_LAST_SWING_MAINHAND(victim);
 		}
 	}
@@ -2840,7 +2840,7 @@ void engage_combat(char_data *ch, char_data *vict, bool melee) {
 	}
 	if (!FIGHTING(vict) && AWAKE(vict)) {
 		set_fighting(vict, ch, melee ? FMODE_MELEE : FMODE_WAITING);
-		GET_LAST_SWING_MAINHAND(vict) = microtime() - 250000;	// quarter-second delay
+		GET_LAST_SWING_MAINHAND(vict) = microtime() - 250000;	// quarter-second time offset
 		GET_LAST_SWING_OFFHAND(vict) = GET_LAST_SWING_MAINHAND(vict);
 	}
 }
