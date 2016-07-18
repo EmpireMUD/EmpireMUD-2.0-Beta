@@ -374,8 +374,12 @@ double get_combat_speed(char_data *ch, int pos) {
 	if (!has_ability(ch, ABIL_FASTCASTING)) {
 		base *= (1.0 - (0.025 * GET_WITS(ch)));
 	}
+	// round to .1 seconds
+	base *= 10.0;
+	base += 0.5;
+	base = (double)((int)base);	// poor-man's floor()
+	base /= 10.0;
 	
-	// absolute minimum of 0.1 (yikes)
 	return base < 0.1 ? 0.1 : base;
 }
 
