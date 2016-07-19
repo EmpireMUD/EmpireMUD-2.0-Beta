@@ -1966,7 +1966,7 @@ void run_map_evolutions(void) {
 			}
 			
 			// READY: figure out where to start
-			if (last_evo_tile && last_evo_tile->next && last_evo_tile->sector_type == sect) {
+			if (last_evo_tile && last_evo_tile->next_in_sect && last_evo_tile->sector_type == sect) {
 				map_start = last_evo_tile->next_in_sect;
 			}
 			else {
