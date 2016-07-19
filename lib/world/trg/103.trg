@@ -63,7 +63,7 @@ end
 ~
 #10304
 Flame Dragon environmental~
-0 bw 0
+0 bw 5
 ~
 if (%self.fighting% || %self.disabled%)
   halt
@@ -113,7 +113,7 @@ eval vnum 10330 + %random.4% - 1
 ~
 #10334
 Abandoned Dragon animation~
-0 bw 0
+0 bw 5
 ~
 if (%self.fighting% || %self.disabled%)
   halt
@@ -176,7 +176,7 @@ end
 ~
 #10337
 Fire Ox animation~
-0 bw 0
+0 bw 5
 ~
 if (%self.fighting% || %self.disabled%)
   halt
@@ -195,7 +195,7 @@ end
 ~
 #10338
 Dragonguard animation~
-0 bw 0
+0 bw 5
 ~
 if (%self.fighting% || %self.disabled%)
   halt

@@ -118,7 +118,7 @@ done
 ~
 #610
 Talking Horse script~
-0 bw 0
+0 bw 10
 ~
 if %self.disabled%
   halt
@@ -140,7 +140,7 @@ done
 ~
 #611
 Talking Warhorse script~
-0 bw 0
+0 bw 10
 ~
 if %self.disabled%
   halt
@@ -164,7 +164,7 @@ done
 ~
 #612
 Talking Bunny script~
-0 bw 0
+0 bw 10
 ~
 if %self.disabled%
   halt
@@ -207,7 +207,7 @@ done
 ~
 #613
 Singing Bear script~
-0 bw 0
+0 bw 10
 ~
 if %self.disabled%
   halt
@@ -229,7 +229,7 @@ done
 ~
 #614
 Walking Tree script~
-0 bw 0
+0 bw 10
 ~
 if %self.disabled%
   halt
@@ -261,7 +261,7 @@ done
 ~
 #615
 Feral Pixy script~
-0 bw 0
+0 bw 10
 ~
 if %self.disabled%
   halt
@@ -291,7 +291,7 @@ done
 ~
 #616
 Pixy Queen script~
-0 bw 0
+0 bw 10
 ~
 if %self.disabled%
   halt

@@ -56,7 +56,7 @@ end
 ~
 #10005
 Magiterranean Grove environment~
-2 bw 0
+2 bw 10
 ~
 switch %random.4%
   case 1
@@ -122,7 +122,7 @@ end
 ~
 #10011
 Sewer Environment~
-2 bw 0
+2 bw 5
 ~
 switch %random.4%
   case 1
@@ -141,7 +141,7 @@ done
 ~
 #10012
 Ratskins's request~
-0 bw 0
+0 bw 15
 ~
 say I could use some more rat skins, if you have any.
 %echo% (Type 'trade' to exchange 15 rat skins.)
@@ -261,7 +261,7 @@ end
 ~
 #10019
 Thief recruiter passive~
-0 bw 0
+0 bw 5
 ~
 set room_var %self.room%
 set target_char %room_var.people%
@@ -275,7 +275,7 @@ done
 ~
 #10021
 City Official says~
-0 bw 0
+0 bw 15
 ~
 switch %random.4%
   case 1
@@ -294,7 +294,7 @@ done
 ~
 #10022
 City Official rewards~
-0 bw 0
+0 bw 30
 ~
 * Rewards some gold when a player has ratskins in their inventory.
 eval target %random%
@@ -412,7 +412,7 @@ eval person %self.people%
 ~
 #10030
 Gossipers~
-0 bw 0
+0 bw 10
 ~
 switch %random.4%
   case 1
@@ -431,7 +431,7 @@ done
 ~
 #10031
 Bustling Page~
-0 bw 0
+0 bw 10
 ~
 switch %random.4%
   case 1
@@ -451,7 +451,7 @@ done
 ~
 #10032
 Barista passive~
-0 bw 0
+0 bw 5
 ~
 switch %random.4%
   case 1
@@ -509,7 +509,7 @@ nop %charge%
 ~
 #10034
 Teacher passive~
-0 bw 0
+0 bw 5
 ~
 eval room_var %self.room%
 context %room_var.vnum%
@@ -664,7 +664,7 @@ nop %charge%
 ~
 #10038
 Goblin Wrangler passive~
-0 bw 0
+0 bw 5
 ~
 switch %random.4%
   case 1
@@ -723,7 +723,7 @@ end
 ~
 #10041
 Pixy race passive~
-2 bw 0
+2 bw 100
 ~
 context %instance.id%
 if %pixy_race_running%
@@ -796,7 +796,7 @@ nop %charge%
 ~
 #10043
 Pixy race~
-2 bw 0
+2 bw 100
 ~
 context %instance.id%
 if !%pixy_race_running% || (%race_stage% && %race_stage% > 0)
@@ -899,7 +899,7 @@ unset pixy_race_running
 ~
 #10045
 Apprentice passive~
-0 bw 0
+0 bw 5
 ~
 switch %random.4%
   case 1
@@ -952,7 +952,7 @@ end
 ~
 #10048
 Otherworlder guard passive~
-0 bw 0
+0 bw 5
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos%
@@ -981,7 +981,7 @@ remote msg_pos %self.id%
 ~
 #10049
 Otherworlder prisoner passive~
-0 bw 0
+0 bw 5
 ~
 %echo% %self.name% pulls at its chains and lets out a shout.
 ~
@@ -997,7 +997,7 @@ end
 ~
 #10051
 Lich passive~
-0 bw 0
+0 bw 5
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos%
@@ -1081,7 +1081,7 @@ dg_affect %actor% ENTANGLED on 20
 ~
 #10055
 Celiya passive~
-0 bw 0
+0 bw 5
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos%
@@ -1162,7 +1162,7 @@ nop %charge%
 ~
 #10058
 Barrosh passive~
-0 bw 0
+0 bw 5
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos%
@@ -1257,7 +1257,7 @@ nop %charge%
 ~
 #10061
 Knezz passive~
-0 bw 0
+0 bw 5
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos%
@@ -1359,7 +1359,7 @@ nop %charge%
 ~
 #10064
 Escaped experiment passive~
-0 bw 0
+0 bw 5
 ~
 switch %random.3%
   case 1
@@ -1428,7 +1428,7 @@ end
 ~
 #10068
 Tower Skycleave announcement~
-2 abw 0
+2 abw 1
 ~
 if %random.3% == 3
   %regionecho% %room% 100 The Tower Skycleave has appeared in the region %room.coords%.

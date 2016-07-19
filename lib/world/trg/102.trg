@@ -310,7 +310,7 @@ end
 ~
 #10233
 Gardener passive~
-0 bw 0
+0 bw 15
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos%
@@ -865,7 +865,7 @@ nop %actor.charge_coins(1000)%
 ~
 #10274
 Primeval environment~
-2 bw 0
+2 bw 5
 ~
 switch %random.4%
   case 1

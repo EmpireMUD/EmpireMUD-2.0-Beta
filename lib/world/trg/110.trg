@@ -423,7 +423,7 @@ list~
 ~
 #11017
 Baby Ostrich emotes~
-0 btw 0
+0 btw 5
 ~
 if %self.disabled%
   halt

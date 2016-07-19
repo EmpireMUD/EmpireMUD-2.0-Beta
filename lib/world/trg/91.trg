@@ -1,6 +1,6 @@
 #9106
 Jungle Bird Animation~
-0 bw 0
+0 bw 3
 ~
 * Jungle Bird Animation (9106)
 switch (%random.8%)
@@ -30,7 +30,7 @@ remote last_phrase %self.id%
 ~
 #9133
 Great Horned Owl Animation~
-0 bw 0
+0 bw 3
 ~
 * Great Horned Owl Animation (9133)
 if (%random.2% == 1)
@@ -41,7 +41,7 @@ end
 ~
 #9148
 Songbird Animation~
-0 bw 0
+0 bw 3
 ~
 * songbird Animation (9148)
 * Works for 148 and 149
@@ -52,7 +52,7 @@ end
 ~
 #9150
 woodpecker animation~
-0 bw 0
+0 bw 3
 ~
 * Woodpecker Animation (9150)
 eval room %self.room%
@@ -82,14 +82,14 @@ remote penguins_killed %actor.id%
 ~
 #9188
 Tiny Critter Despawn~
-0 bw 0
+0 bw 10
 ~
 %echo% %self.name% vanishes down a hole.
 %purge% %self%
 ~
 #9198
 Critter Flutters Off~
-0 bw 0
+0 bw 10
 ~
 %echo% %self.name% flutters off.
 %purge% %self%

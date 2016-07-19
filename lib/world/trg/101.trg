@@ -1,6 +1,6 @@
 #10100
 Swamp Hut passive~
-2 bw 0
+2 bw 5
 ~
 switch %random.4%
   case 1
@@ -19,7 +19,7 @@ done
 ~
 #10101
 Swamp Hag passive~
-0 bw 0
+0 bw 5
 ~
 switch %random.4%
   case 1
@@ -472,7 +472,7 @@ done
 ~
 #10141
 Delayed aggro greet/entry~
-0 giw 0
+0 giw 100
 ~
 if %actor%
   * Actor entered room - valid target?
@@ -599,7 +599,7 @@ done
 ~
 #10144
 Monsoon Cloud~
-1 bw 0
+1 bw 10
 ~
 switch %random.4%
   case 1
@@ -775,7 +775,7 @@ return 0
 ~
 #10150
 Free-tailed bat emotes~
-0 bw 0
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -795,7 +795,7 @@ end
 ~
 #10151
 Gila monster emotes~
-0 bw 0
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -815,7 +815,7 @@ end
 ~
 #10152
 Armadillo emotes~
-0 bw 0
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -835,7 +835,7 @@ end
 ~
 #10153
 Cactus wren emotes~
-0 bw 0
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -854,7 +854,7 @@ end
 ~
 #10154
 Antelope squirrel emotes~
-0 bw 0
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -873,7 +873,7 @@ end
 ~
 #10155
 Bighorn sheep emotes~
-0 bw 0
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -893,7 +893,7 @@ end
 ~
 #10156
 Coati emotes~
-0 bw 0
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -912,7 +912,7 @@ end
 ~
 #10157
 Monsoon room environment~
-2 bw 0
+2 bw 10
 ~
 switch %random.4%
   case 1
@@ -946,7 +946,7 @@ return 1
 ~
 #10159
 Teddybear cactus emotes~
-0 btw 0
+0 btw 5
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -1210,7 +1210,7 @@ remote last_monsoon_loot_item %actor.id%
 ~
 #10171
 Monsoon thief + vampire reveal~
-0 hw 0
+0 hw 100
 ~
 if (%self.vampire% && %actor.skill(Vampire)% < 51) || (!%self.vampire% && %actor.skill(Stealth)% < 51)
   halt
