@@ -1138,7 +1138,6 @@ Available utilities:
  &cclearroles&0 - Clears the class roles and class abilities of all players.
  &cdiminish <number> <scale>&0 - Applies the game's diminishing returns formula,
     and returns the result.
- &cevolutions&0 - Show which sectors evolve on which hour tick.
  &cislandsize&0 - Counts and displays tile counts for all islands.
  &cplayerdump&0 - Outputs a data file with tab-separated lines for all players with
     account, playtime, and host.

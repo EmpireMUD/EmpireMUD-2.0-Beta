@@ -31,6 +31,7 @@
 *   Room Resets
 *   Sector Indexing
 *   Territory
+*   Evolutions
 *   Helpers
 *   Map Output
 *   World Map System
@@ -42,6 +43,10 @@ extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 extern bool need_world_index;
 extern const int rev_dir[];
 extern bool world_map_needs_save;
+extern struct map_data *last_evo_tile;
+extern sector_data *last_evo_sect;
+extern int evos_per_hour;
+
 
 // external funcs
 void add_room_to_world_tables(room_data *room);
@@ -854,7 +859,7 @@ void save_whole_world(void) {
 
 
 /**
-* Handles non-adventure reset triggers as well as evolutions, on part of the
+* Handles non-adventure reset triggers and other periodicals, on part of the
 * world every 30 seconds. The world is only actually saved every 30 minutes --
 * once per mud day.
 */
@@ -1472,6 +1477,9 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 		idx = find_sector_index(GET_SECT_VNUM(old_sect));
 		--idx->sect_count;
 		if (map) {
+			if (last_evo_tile == map) {
+				last_evo_tile = map->next_in_sect;
+			}
 			LL_DELETE2(idx->sect_rooms, map, next_in_sect);
 		}
 	}
@@ -1776,6 +1784,214 @@ void reread_empire_tech(empire_data *emp) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// EVOLUTIONS //////////////////////////////////////////////////////////////
+
+/**
+* This code handles the massive evolution of map tiles, with the goal of load-
+* balancing it over the number of game hours.
+*/
+
+
+/**
+* Determines whether a sector periodicaly evolves at all.
+*
+* @param sector_data *sect Which sector.
+* @return bool TRUE if at least one over-time evo, FALSE if none.
+*/
+inline bool has_over_time_evo(sector_data *sect) {
+	extern bool evo_is_over_time[];
+	struct evolution_data *evo;
+	LL_FOREACH(GET_SECT_EVOS(sect), evo) {
+		if (evo_is_over_time[evo->type]) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+
+/**
+* Updates the number of evolutions to do per hour. This is run at startup,
+* and is re-run periodically to ensure it's doing the right number. This func
+* should be called any time there are LARGE changes to the world.
+*/
+void detect_evos_per_hour(void) {
+	sector_data *sect, *next_sect;
+	struct sector_index_type *idx;
+	int total_evolvable_tiles = 0;
+	
+	HASH_ITER(hh, sector_table, sect, next_sect) {
+		if (!has_over_time_evo(sect)) {
+			continue;
+		}
+		idx = find_sector_index(GET_SECT_VNUM(sect));
+		total_evolvable_tiles += idx->sect_count;
+	}
+	
+	evos_per_hour = total_evolvable_tiles / 24;
+	evos_per_hour = MAX(1, evos_per_hour);	// safe limit
+}
+
+
+/**
+* Checks and runs evolutions for a single map tile.
+*
+* @param struct map_data *tile The map location to evolve.
+*/
+static void evolve_one_map_tile(struct map_data *tile) {
+	extern bool is_entrance(room_data *room);
+	
+	struct evolution_data *evo;
+	sector_data *original;
+	sector_vnum become;
+	room_data *room;
+	
+	// this may return NULL -- we don't need it if so
+	room = real_real_room(tile->vnum);
+	
+	// no further action if !evolve or if no evos
+	if ((room && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE)) || !GET_SECT_EVOS(tile->sector_type)) {
+		return;
+	}
+	
+	// to avoid running more than one:
+	original = tile->sector_type;
+	become = NOTHING;
+	
+	// run some evolutions!
+	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_RANDOM))) {
+		become = evo->becomes;
+	}
+	
+	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_ADJACENT_ONE))) {
+		room = room ? room : real_room(tile->vnum);
+		if (count_adjacent_sectors(room, evo->value, TRUE) >= 1) {
+			become = evo->becomes;
+		}
+	}
+	
+	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_NOT_ADJACENT))) {
+		room = room ? room : real_room(tile->vnum);
+		if (count_adjacent_sectors(room, evo->value, TRUE) < 1) {
+			become = evo->becomes;
+		}
+	}
+	
+	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_ADJACENT_MANY))) {
+		room = room ? room : real_room(tile->vnum);
+		if (count_adjacent_sectors(room, evo->value, TRUE) >= 6) {
+			become = evo->becomes;
+		}
+	}
+	
+	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_NEAR_SECTOR))) {
+		room = room ? room : real_room(tile->vnum);
+		if (find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
+			become = evo->becomes;
+		}
+	}
+	
+	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_NOT_NEAR_SECTOR))) {
+		room = room ? room : real_room(tile->vnum);
+		if (!find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
+			become = evo->becomes;
+		}
+	}
+	
+	// DONE: now change it
+	if (become != NOTHING && sector_proto(become)) {
+		// in case we didn't get it earlier
+		if (!room) {
+			room = real_room(tile->vnum);
+		}
+		
+	 	if (room && !is_entrance(room)) {
+			change_terrain(room, become);
+			
+			// If the new sector has crop data, we should store the original (e.g. a desert that randomly grows into a crop)
+			if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && BASE_SECT(room) == SECT(room)) {
+				change_base_sector(room, original);
+			}
+		}
+	}
+}
+
+
+/**
+* Runs evolutions on 1/24 of sectors per hour.
+*/
+void run_map_evolutions(void) {
+	extern bool evo_is_over_time[];
+	
+	struct map_data *map, *next_map, *map_start;
+	struct sector_index_type *idx;
+	sector_data *sect, *next_sect;
+	bool found_start;
+	int try, to_do;
+	
+	to_do = evos_per_hour;	// how many tiles to evolve before we quit
+	
+	// going to loop through sectors twice so we repeat at the start
+	found_start = FALSE;
+	for (try = 1; try <= 2 && to_do > 0; ++try) {
+		HASH_ITER(hh, sector_table, sect, next_sect) {
+			// early exit
+			if (to_do <= 0) {
+				break;
+			}
+			
+			// finding where we left off
+			if (try == 1 && sect == last_evo_sect) {
+				// mark that we found the sector to start on
+				found_start = TRUE;
+				
+				// we will skip this sector if there's no work to be done in it
+				if (last_evo_tile == NULL || last_evo_tile->next_in_sect != NULL) {
+					continue;
+				}
+			}
+			// otherwise if it's try 1, skip sectors BEFORE the start sector
+			if (try == 1 && !found_start) {
+				continue;
+			}
+			
+			// other basic validation
+			if (GET_SECT_VNUM(sect) == BASIC_OCEAN) {
+				continue;	// always skip
+			}
+			if (!has_over_time_evo(sect)) {
+				continue;	// never evolves
+			}
+			
+			// READY: figure out where to start
+			if (last_evo_tile && last_evo_tile->next) {
+				map_start = last_evo_tile->next;
+			}
+			else {
+				idx = find_sector_index(GET_SECT_VNUM(sect));
+				map_start = idx->sect_rooms;
+			}
+			
+			// update this now, just in case
+			last_evo_sect = sect;
+			
+			// now attempt to evolve rooms in the list
+			LL_FOREACH_SAFE2(map_start, map, next_map, next_in_sect) {
+				last_evo_tile = map;	// update this NOW
+				
+				evolve_one_map_tile(map);
+				
+				// end if done
+				if (--to_do <= 0) {
+					break;
+				}
+			}
+		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
@@ -1944,90 +2160,6 @@ void decustomize_room(room_data *room) {
 	if (ROOM_CUSTOM_ICON(room)) {
 		free(ROOM_CUSTOM_ICON(room));
 		ROOM_CUSTOM_ICON(room) = NULL;
-	}
-}
-
-
-/**
-* Checks and runs evolutions for a single map tile.
-*
-* @param struct map_data *tile The map location to evolve.
-*/
-static void evolve_one_map_tile(struct map_data *tile) {
-	extern bool is_entrance(room_data *room);
-	
-	struct evolution_data *evo;
-	sector_data *original;
-	sector_vnum become;
-	room_data *room;
-	
-	// this may return NULL -- we don't need it if so
-	room = real_real_room(tile->vnum);
-	
-	// no further action if !evolve or if no evos
-	if ((room && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE)) || !GET_SECT_EVOS(tile->sector_type)) {
-		return;
-	}
-	
-	// to avoid running more than one:
-	original = tile->sector_type;
-	become = NOTHING;
-	
-	// run some evolutions!
-	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_RANDOM))) {
-		become = evo->becomes;
-	}
-	
-	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_ADJACENT_ONE))) {
-		room = room ? room : real_room(tile->vnum);
-		if (count_adjacent_sectors(room, evo->value, TRUE) >= 1) {
-			become = evo->becomes;
-		}
-	}
-	
-	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_NOT_ADJACENT))) {
-		room = room ? room : real_room(tile->vnum);
-		if (count_adjacent_sectors(room, evo->value, TRUE) < 1) {
-			become = evo->becomes;
-		}
-	}
-	
-	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_ADJACENT_MANY))) {
-		room = room ? room : real_room(tile->vnum);
-		if (count_adjacent_sectors(room, evo->value, TRUE) >= 6) {
-			become = evo->becomes;
-		}
-	}
-	
-	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_NEAR_SECTOR))) {
-		room = room ? room : real_room(tile->vnum);
-		if (find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
-			become = evo->becomes;
-		}
-	}
-	
-	if (become == NOTHING && (evo = get_evolution_by_type(tile->sector_type, EVO_NOT_NEAR_SECTOR))) {
-		room = room ? room : real_room(tile->vnum);
-		if (!find_sect_within_distance_from_room(room, evo->value, config_get_int("nearby_sector_distance"))) {
-			become = evo->becomes;
-		}
-	}
-	
-	// DONE: now change it
-	if (become != NOTHING && sector_proto(become)) {
-		// in case we didn't get it earlier
-		if (!room) {
-			room = real_room(tile->vnum);
-		}
-		
-	 	if (room && !is_entrance(room)) {
-			change_terrain(room, become);
-			
-			// If the new sector has crop data, we should store the original (e.g. a desert that randomly grows into a crop)
-			if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && BASE_SECT(room) == SECT(room)) {
-				change_base_sector(room, original);
-			}
-		}
 	}
 }
 
@@ -2619,47 +2751,6 @@ void load_world_map_from_file(void) {
 	}
 	
 	fclose(fl);
-}
-
-
-/**
-* Runs evolutions on 1/24 of sectors per hour.
-*/
-void run_map_evolutions(void) {
-	extern bool evo_is_over_time[];
-	
-	struct sector_index_type *idx;
-	sector_data *sect, *next_sect;
-	struct evolution_data *evo;
-	struct map_data *map;
-	bool any = FALSE;
-	
-	HASH_ITER(hh, sector_table, sect, next_sect) {
-		// validation
-		if ((GET_SECT_VNUM(sect) % 24) != time_info.hours || GET_SECT_VNUM(sect) == BASIC_OCEAN) {
-			continue;	// 1/24th per hour
-		}
-		
-		// ensure it has at least 1 over-time evolution
-		any = FALSE;
-		LL_FOREACH(GET_SECT_EVOS(sect), evo) {
-			if (evo_is_over_time[evo->type]) {
-				any = TRUE;
-				break;	// only need 1
-			}
-		}
-		if (!any) {
-			continue;
-		}
-		
-		// load the index
-		idx = find_sector_index(GET_SECT_VNUM(sect));
-		
-		// check the rooms in the list
-		LL_FOREACH2(idx->sect_rooms, map, next_in_sect) {
-			evolve_one_map_tile(map);
-		}
-	}
 }
 
 

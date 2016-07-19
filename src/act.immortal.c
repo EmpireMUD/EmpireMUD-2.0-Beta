@@ -304,7 +304,6 @@ bool users_output(char_data *to, char_data *tch, descriptor_data *d, char *name_
 ADMIN_UTIL(util_b318_buildings);
 ADMIN_UTIL(util_clear_roles);
 ADMIN_UTIL(util_diminish);
-ADMIN_UTIL(util_evolutions);
 ADMIN_UTIL(util_islandsize);
 ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
@@ -323,7 +322,6 @@ struct {
 	{ "b318buildings", LVL_CIMPL, util_b318_buildings },
 	{ "clearroles", LVL_CIMPL, util_clear_roles },
 	{ "diminish", LVL_START_IMM, util_diminish },
-	{ "evolutions", LVL_START_IMM, util_evolutions },
 	{ "islandsize", LVL_START_IMM, util_islandsize },
 	{ "playerdump", LVL_IMPL, util_playerdump },
 	{ "randtest", LVL_CIMPL, util_randtest },
@@ -417,40 +415,6 @@ ADMIN_UTIL(util_diminish) {
 		result = diminishing_returns(number, scale);
 		
 		msg_to_char(ch, "Diminished value: %.2f\r\n", result);
-	}
-}
-
-
-ADMIN_UTIL(util_evolutions) {
-	sector_data *sect, *next_sect;
-	struct sector_index_type *idx;
-	int iter;
-	bool any;
-	
-	// evos are split based on hour
-	for (iter = 0; iter < 23; ++iter) {
-		msg_to_char(ch, "%d%s:", (iter > 12 ? (iter-12) : (iter == 0 ? 12 : iter)), (iter >= 12 ? "pm" : "am"));
-		
-		any = FALSE;
-		HASH_ITER(hh, sector_table, sect, next_sect) {
-			if (!GET_SECT_EVOS(sect) || GET_SECT_VNUM(sect) == BASIC_OCEAN) {
-				continue;	// never evolved
-			}
-			if ((GET_SECT_VNUM(sect) % 24) != iter) {
-				continue;	// not my hour
-			}
-			
-			idx = find_sector_index(GET_SECT_VNUM(sect));
-			msg_to_char(ch, "%s%s (%d)", (any ? ", " : " "), GET_SECT_NAME(sect), idx->sect_count);
-			any = TRUE;
-		}
-		
-		if (any) {
-			msg_to_char(ch, "\r\n");
-		}
-		else {
-			msg_to_char(ch, " none\r\n");
-		}
 	}
 }
 

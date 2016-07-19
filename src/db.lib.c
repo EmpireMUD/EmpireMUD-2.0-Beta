@@ -4759,6 +4759,13 @@ void add_sector_to_table(sector_data *sect) {
 * @param sector_data *sect The sect to remove from the table.
 */
 void remove_sector_from_table(sector_data *sect) {
+	extern sector_data *last_evo_sect;
+	
+	// if we left off on this sect, remove it entirely
+	if (last_evo_sect == sect) {
+		last_evo_sect = NULL;
+	}
+	
 	HASH_DEL(sector_table, sect);
 }
 
