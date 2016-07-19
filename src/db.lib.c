@@ -2268,7 +2268,7 @@ void update_empire_npc_data(void) {
 	
 	// each empire
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		// skip idle empires
+		// skip idle empires: TODO could macro this
 		if (EMPIRE_LAST_LOGON(emp) + time_to_empire_emptiness < time(0)) {
 			continue;
 		}
@@ -3992,7 +3992,6 @@ void parse_room(FILE *fl, room_vnum vnum) {
 	
 	// basic setup: things that don't default to 0/NULL
 	room->vnum = vnum;
-	room->owner = NULL;
 	
 	HASH_FIND_INT(world_table, &vnum, find);
 	if (find) {

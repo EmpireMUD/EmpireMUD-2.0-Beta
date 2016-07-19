@@ -59,6 +59,7 @@ void write_room_to_file(FILE *fl, room_data *room);
 
 // locals
 int count_city_points_used(empire_data *emp);
+struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 void decustomize_room(room_data *room);
 room_vnum find_free_vnum();
 void grow_crop(room_data *room);
@@ -137,6 +138,7 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	
 	bool belongs = BELONGS_IN_TERRITORY_LIST(room);
 	sector_data *old_sect = SECT(room), *st = sector_proto(sect);
+	struct empire_territory_data *ter;
 	struct map_data *map, *temp;
 	crop_data *new_crop = NULL;
 	empire_data *emp;
@@ -217,11 +219,12 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	if (emp && SECT_FLAGGED(st, SECTF_NO_CLAIM)) {
 		abandon_room(room);
 	}
-	
-	// do we need to re-read empire territory?
-	if (emp) {
-		if (belongs != BELONGS_IN_TERRITORY_LIST(room)) {
-			read_empire_territory(emp);
+	else if (emp && belongs != BELONGS_IN_TERRITORY_LIST(room)) {	// do we need to add/remove the territory entry?
+		if (belongs && (ter = find_territory_entry(emp, room))) {	// losing
+			delete_territory_entry(emp, ter);
+		}
+		else if (!belongs && !find_territory_entry(emp, room)) {	// adding
+			create_territory_entry(emp, room);
 		}
 	}
 }
@@ -365,6 +368,11 @@ void delete_room(room_data *room, bool check_exits) {
 	if (room == dg_owner_room) {
 		dg_owner_purged = 1;
 		dg_owner_room = NULL;
+	}
+	
+	// ensure not owned
+	if (ROOM_OWNER(room)) {
+		perform_abandon_room(room);
 	}
 	
 	// delete any open instance here
@@ -1060,9 +1068,6 @@ void annual_world_update(void) {
 	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		annual_update_vehicle(veh);
 	}
-	
-	// lastly
-	read_empire_territory(NULL);
 }
 
 
@@ -1180,7 +1185,7 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 	}
 	
 	// verify ownership
-	ROOM_OWNER(location) = emp;
+	claim_room(location, emp);
 	
 	return city;
 }
@@ -1426,6 +1431,7 @@ void perform_change_base_sect(room_data *loc, struct map_data *map, sector_data 
 * @param sector_data *sect The type to change it to.
 */
 void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect) {
+	bool was_large, was_in_city, junk;
 	struct sector_index_type *idx;
 	sector_data *old_sect;
 	
@@ -1438,11 +1444,20 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 		return;
 	}
 	
+	// ensure we have loc if possible
+	if (!loc) {
+		loc = real_real_room(map->vnum);
+	}
+	
+	// for updating territory counts
+	was_large = (loc && SECT(loc)) ? ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS) : FALSE;
+	was_in_city = (loc && ROOM_OWNER(loc)) ? is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk) : FALSE;
+	
 	// preserve
 	old_sect = (loc ? SECT(loc) : map->sector_type);
 	
 	// update room
-	if (loc || (loc = real_real_room(map->vnum))) {
+	if (loc) {
 		SECT(loc) = sect;
 	}
 	
@@ -1467,6 +1482,23 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	if (map) {
 		LL_PREPEND2(idx->sect_rooms, map, next_in_sect);
 	}
+	
+	// check for territory updates
+	if (loc && ROOM_OWNER(loc) && was_large != ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS)) {
+		if (was_large && was_in_city && !is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
+			// changing from in-city to not
+			EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) -= 1;
+			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) += 1;
+		}
+		else if (ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
+			// changing from outside-territory to in-city
+			EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) += 1;
+			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) -= 1;
+		}
+		else {
+			// no relevant change
+		}
+	}
 }
 
 
@@ -1474,16 +1506,21 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 //// TERRITORY ///////////////////////////////////////////////////////////////
 
 /**
-* Mark empire technologies based on room.
+* Mark empire technologies, fame, etc; based on room. You should call this
+* BEFORE starting a dismantle, as it only works on completed buildings. Also
+* call it when you finish a building, or claim one. Call it with add=FALSE
+* BEFORE an abandon, dismantle, or other loss of building.
 *
 * @param empire_data *emp the empire
 * @param room_data *room the room to check
+* @param bool add Adds the techs if TRUE, or removes them if FALSE.
 */
-void check_building_tech(empire_data *emp, room_data *room) {
+void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	struct empire_island *isle = NULL;
+	int amt = add ? 1 : -1;	// adding or removing 1
 	int island;
 	
-	// only care about complete buildings
+	// only care about buildings
 	if (!emp || !GET_BUILDING(room) || !IS_COMPLETE(room) || IS_DISMANTLING(room)) {
 		return;
 	}
@@ -1494,26 +1531,58 @@ void check_building_tech(empire_data *emp, room_data *room) {
 	}
 	
 	if (HAS_FUNCTION(room, FNC_APIARY)) {
-		EMPIRE_TECH(emp, TECH_APIARIES) += 1;
+		EMPIRE_TECH(emp, TECH_APIARIES) += amt;
 		if (isle || (isle = get_empire_island(emp, island))) {
-			isle->tech[TECH_APIARIES] += 1;
+			isle->tech[TECH_APIARIES] += amt;
 		}
 	}
 	if (HAS_FUNCTION(room, FNC_GLASSBLOWER)) {
-		EMPIRE_TECH(emp, TECH_GLASSBLOWING) += 1;
+		EMPIRE_TECH(emp, TECH_GLASSBLOWING) += amt;
 		if (isle || (isle = get_empire_island(emp, island))) {
-			isle->tech[TECH_GLASSBLOWING] += 1;
+			isle->tech[TECH_GLASSBLOWING] += amt;
 		}
 	}
 	if (HAS_FUNCTION(room, FNC_DOCKS)) {
-		EMPIRE_TECH(emp, TECH_SEAPORT) += 1;
+		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
 		if (isle || (isle = get_empire_island(emp, island))) {
-			isle->tech[TECH_SEAPORT] += 1;
+			isle->tech[TECH_SEAPORT] += amt;
 		}
 	}
 	
-	// set up military right away
-	EMPIRE_MILITARY(emp) += GET_BLD_MILITARY(GET_BUILDING(room));
+	// other traits from buildings?
+	EMPIRE_MILITARY(emp) += GET_BLD_MILITARY(GET_BUILDING(room)) * amt;
+	EMPIRE_FAME(emp) += GET_BLD_FAME(GET_BUILDING(room)) * amt;
+}
+
+
+/**
+* Resets the techs for one (or all) empire(s).
+*
+* @param empire_data *emp An empire if doing one, or NULL to clear all of them.
+*/
+void clear_empire_techs(empire_data *emp) {
+	struct empire_island *isle, *next_isle;
+	empire_data *iter, *next_iter;
+	int sub;
+	
+	HASH_ITER(hh, empire_table, iter, next_iter) {
+		// find one or all?
+		if (emp && iter != emp) {
+			continue;
+		}
+		
+		// zero out existing islands
+		HASH_ITER(hh, EMPIRE_ISLANDS(iter), isle, next_isle) {
+			for (sub = 0; sub < NUM_TECHS; ++sub) {
+				isle->population = 0;
+				isle->tech[sub] = 0;
+			}
+		}
+		// main techs
+		for (sub = 0; sub < NUM_TECHS; ++sub) {
+			EMPIRE_TECH(iter, sub) = 0;
+		}
+	}
 }
 
 
@@ -1524,8 +1593,8 @@ void check_building_tech(empire_data *emp, room_data *room) {
 * @param room_data *room The room to add
 * @return struct empire_territory_data* The new entry
 */
-struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room) {	
-	struct empire_territory_data *ter, *tt;
+struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room) {
+	struct empire_territory_data *ter;
 	
 	CREATE(ter, struct empire_territory_data, 1);
 	ter->room = room;
@@ -1533,20 +1602,8 @@ struct empire_territory_data *create_territory_entry(empire_data *emp, room_data
 	ter->npcs = NULL;
 	ter->marked = FALSE;
 	
-	// link up
-	if (EMPIRE_TERRITORY_LIST(emp)) {
-		tt = EMPIRE_TERRITORY_LIST(emp);
-		while (tt->next) {
-			tt = tt->next;
-		}
-		
-		tt->next = ter;
-		ter->next = NULL;
-	}
-	else {
-		ter->next = EMPIRE_TERRITORY_LIST(emp);
-		EMPIRE_TERRITORY_LIST(emp) = ter;
-	}
+	// put it at the end
+	LL_APPEND(EMPIRE_TERRITORY_LIST(emp), ter);
 	
 	return ter;
 }
@@ -1561,8 +1618,6 @@ struct empire_territory_data *create_territory_entry(empire_data *emp, room_data
 void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter) {
 	void delete_room_npcs(room_data *room, struct empire_territory_data *ter);
 	extern struct empire_territory_data *global_next_territory_entry;
-
-	struct empire_territory_data *temp;
 	
 	// prevent loss
 	if (ter == global_next_territory_entry) {
@@ -1572,22 +1627,19 @@ void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter)
 	delete_room_npcs(NULL, ter);
 	ter->npcs = NULL;
 	
-	REMOVE_FROM_LIST(ter, EMPIRE_TERRITORY_LIST(emp), next);
+	LL_DELETE(EMPIRE_TERRITORY_LIST(emp), ter);
 	free(ter);
 }
 
 
-/* This function sets up empire territory at startup and when two empires merge */
 /**
-* This function sets up empire territory. It is called at startup, after
-* empires merge, during claims, during abandons, and some other actions.
+* This function sets up empire territory. It is called rarely after startup.
 * It can be called on one specific empire, or it can be used for ALL empires.
 *
-* However, calling this on all empires can get rather slow.
-*
 * @param empire_data *emp The empire to read, or NULL for "all".
+* @param bool check_tech If TRUE, also does techs (you should almost never do this)
 */
-void read_empire_territory(empire_data *emp) {
+void read_empire_territory(empire_data *emp, bool check_tech) {
 	void read_vault(empire_data *emp);
 	
 	struct empire_territory_data *ter, *next_ter;
@@ -1603,8 +1655,6 @@ void read_empire_territory(empire_data *emp) {
 			EMPIRE_CITY_TERRITORY(e) = 0;
 			EMPIRE_OUTSIDE_TERRITORY(e) = 0;
 			EMPIRE_POPULATION(e) = 0;
-			EMPIRE_MILITARY(e) = 0;
-			EMPIRE_FAME(e) = 0;
 		
 			read_vault(e);
 
@@ -1622,51 +1672,40 @@ void read_empire_territory(empire_data *emp) {
 
 	// scan the whole world
 	HASH_ITER(hh, world_table, iter, next_iter) {
-		// skip dependent multi- rooms
-		if (ROOM_OWNER(iter) && (!emp || ROOM_OWNER(iter) == emp) && (HOME_ROOM(iter) == iter || IS_INSIDE(iter))) {
-			if ((e = ROOM_OWNER(iter))) {
-				// only count each building as 1
-				if (HOME_ROOM(iter) == iter && !GET_ROOM_VEHICLE(iter)) {
-					if (is_in_city_for_empire(iter, e, FALSE, &junk)) {
-						EMPIRE_CITY_TERRITORY(e) += 1;
-					}
-					else {
-						EMPIRE_OUTSIDE_TERRITORY(e) += 1;
-					}
+		if ((e = ROOM_OWNER(iter)) && (!emp || e == emp)) {
+			// only count each building as 1
+			if (COUNTS_AS_TERRITORY(iter)) {
+				if (is_in_city_for_empire(iter, e, FALSE, &junk)) {
+					EMPIRE_CITY_TERRITORY(e) += 1;
 				}
-
-				if (IS_COMPLETE(iter)) {
-					if (GET_BUILDING(iter)) {
-						EMPIRE_FAME(e) += GET_BLD_FAME(GET_BUILDING(iter));
-					}
-			
-					// check for tech
-					check_building_tech(e, iter);
-				}
-
-				// only some things are in the territory list
-				if (BELONGS_IN_TERRITORY_LIST(iter)) {
-					// locate
-					if (!(ter = find_territory_entry(e, iter))) {
-						// or create
-						ter = create_territory_entry(e, iter);
-					}
-					
-					// mark it added/found
-					ter->marked = TRUE;
-					
-					if (IS_COMPLETE(iter)) {
-						isle = get_empire_island(e, GET_ISLAND_ID(iter));
-						for (npc = ter->npcs; npc; npc = npc->next) {
-							EMPIRE_POPULATION(e) += 1;
-							isle->population += 1;
-						}
-					}
+				else {
+					EMPIRE_OUTSIDE_TERRITORY(e) += 1;
 				}
 			}
-			else if (ROOM_OWNER(iter)) {
-				// real_empire did not check out
-				abandon_room(iter);
+			
+			// this is only done if we are re-reading techs
+			if (check_tech) {
+				adjust_building_tech(e, iter, TRUE);
+			}
+			
+			// only some things are in the territory list
+			if (BELONGS_IN_TERRITORY_LIST(iter)) {
+				// locate
+				if (!(ter = find_territory_entry(e, iter))) {
+					// or create
+					ter = create_territory_entry(e, iter);
+				}
+				
+				// mark it added/found
+				ter->marked = TRUE;
+				
+				if (IS_COMPLETE(iter)) {
+					isle = get_empire_island(e, GET_ISLAND_ID(iter));
+					for (npc = ter->npcs; npc; npc = npc->next) {
+						EMPIRE_POPULATION(e) += 1;
+						isle->population += 1;
+					}
+				}
 			}
 		}
 	}
@@ -1674,9 +1713,7 @@ void read_empire_territory(empire_data *emp) {
 	// remove any territory that wasn't marked ... in case there is any
 	HASH_ITER(hh, empire_table, e, next_e) {
 		if (e == emp || !emp) {
-			for (ter = EMPIRE_TERRITORY_LIST(e); ter; ter = next_ter) {
-				next_ter = ter->next;
-			
+			LL_FOREACH_SAFE(EMPIRE_TERRITORY_LIST(e), ter, next_ter) {
 				if (!ter->marked) {
 					delete_territory_entry(e, ter);
 				}
@@ -1690,7 +1727,7 @@ void read_empire_territory(empire_data *emp) {
 * This function clears and re-reads empire technology. In the process, it also
 * resets greatness and membership.
 *
-* @param empire_data *emp An empire number, or NOTHING to read all of them
+* @param empire_data *emp An empire if doing one, or NULL to clear all of them.
 */
 void reread_empire_tech(empire_data *emp) {
 	void resort_empires(bool force);
@@ -1704,26 +1741,13 @@ void reread_empire_tech(empire_data *emp) {
 		return;
 	}
 	
-	HASH_ITER(hh, empire_table, iter, next_iter) {
-		if (emp && iter != emp) {
-			continue;
-		}
-		
-		// zero out existing islands
-		HASH_ITER(hh, EMPIRE_ISLANDS(iter), isle, next_isle) {
-			for (sub = 0; sub < NUM_TECHS; ++sub) {
-				isle->population = 0;
-				isle->tech[sub] = 0;
-			}
-		}
-		// main techs
-		for (sub = 0; sub < NUM_TECHS; ++sub) {
-			EMPIRE_TECH(iter, sub) = 0;
-		}
-	}
 	
+	// reset first
+	clear_empire_techs(emp);
+	
+	// re-read both things
 	read_empire_members(emp, TRUE);
-	read_empire_territory(emp);
+	read_empire_territory(emp, TRUE);
 	
 	// special-handling for imm-only empires: give them all techs
 	HASH_ITER(hh, empire_table, iter, next_iter) {
@@ -1733,17 +1757,20 @@ void reread_empire_tech(empire_data *emp) {
 		if (!EMPIRE_IMM_ONLY(iter)) {
 			continue;
 		}
-
+		
+		// give all techs
 		for (sub = 0; sub < NUM_TECHS; ++sub) {
 			EMPIRE_TECH(iter, sub) += 1;
 		}
 		HASH_ITER(hh, EMPIRE_ISLANDS(iter), isle, next_isle) {
+			// give all island techs
 			for (sub = 0; sub < NUM_TECHS; ++sub) {
 				isle->tech[sub] += 1;
 			}
 		}
 	}
 	
+	// trigger a re-sort now
 	resort_empires(FALSE);
 }
 
@@ -1820,8 +1847,13 @@ void clear_private_owner(int id) {
 * Gets a simple movable room based on valid exits. This does not take a player
 * into account, only that a room exists that way and it's possible to move to
 * it.
+*
+* @param room_data *room Origin room.
+* @param int dir Which way to target.
+* @param bool ignore_entrance If TRUE, doesn't care which way the target tile is entered (e.g. for siege)
+* @return room_data* The target room if it was valid, or NULL if not.
 */
-room_data *dir_to_room(room_data *room, int dir) {
+room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance) {
 	struct room_direction_data *ex;
 	room_data *to_room = NULL;
 	
@@ -1834,7 +1866,7 @@ room_data *dir_to_room(room_data *room, int dir) {
 		to_room = real_shift(room, shift_dir[dir][0], shift_dir[dir][1]);
 		
 		// check building entrance
-		if (to_room && IS_MAP_BUILDING(to_room) && !IS_INSIDE(room) && !IS_ADVENTURE_ROOM(room) && BUILDING_ENTRANCE(to_room) != dir && ROOM_IS_CLOSED(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
+		if (!ignore_entrance && to_room && IS_MAP_BUILDING(to_room) && !IS_INSIDE(room) && !IS_ADVENTURE_ROOM(room) && BUILDING_ENTRANCE(to_room) != dir && ROOM_IS_CLOSED(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
 			to_room = NULL;	// can't enter this way
 		}
 		else if (to_room == room) {
@@ -2591,13 +2623,42 @@ void load_world_map_from_file(void) {
 
 
 /**
-* Runs evolutions on all the land mass in the world. This skips the oceans.
+* Runs evolutions on 1/24 of sectors per hour.
 */
 void run_map_evolutions(void) {
-	struct map_data *map;
+	extern bool evo_is_over_time[];
 	
-	for (map = land_map; map; map = map->next) {
-		evolve_one_map_tile(map);
+	struct sector_index_type *idx;
+	sector_data *sect, *next_sect;
+	struct evolution_data *evo;
+	struct map_data *map;
+	bool any = FALSE;
+	
+	HASH_ITER(hh, sector_table, sect, next_sect) {
+		// validation
+		if ((GET_SECT_VNUM(sect) % 24) != time_info.hours || GET_SECT_VNUM(sect) == BASIC_OCEAN) {
+			continue;	// 1/24th per hour
+		}
+		
+		// ensure it has at least 1 over-time evolution
+		any = FALSE;
+		LL_FOREACH(GET_SECT_EVOS(sect), evo) {
+			if (evo_is_over_time[evo->type]) {
+				any = TRUE;
+				break;	// only need 1
+			}
+		}
+		if (!any) {
+			continue;
+		}
+		
+		// load the index
+		idx = find_sector_index(GET_SECT_VNUM(sect));
+		
+		// check the rooms in the list
+		LL_FOREACH2(idx->sect_rooms, map, next_in_sect) {
+			evolve_one_map_tile(map);
+		}
 	}
 }
 

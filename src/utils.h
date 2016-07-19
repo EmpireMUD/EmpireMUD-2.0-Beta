@@ -314,6 +314,8 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_HEALTH_REGEN(ch)  ((ch)->char_specials.health_regen)
 #define GET_ID(x)  ((x)->id)
 #define GET_IDNUM(ch)  (REAL_CHAR(ch)->char_specials.idnum)
+#define GET_LAST_SWING_MAINHAND(ch)  ((ch)->char_specials.fighting.last_swing_mainhand)
+#define GET_LAST_SWING_OFFHAND(ch)  ((ch)->char_specials.fighting.last_swing_mainhand)
 #define GET_LEADING_MOB(ch)  ((ch)->char_specials.leading_mob)
 #define GET_LEADING_VEHICLE(ch)  ((ch)->char_specials.leading_vehicle)
 #define GET_LED_BY(ch)  ((ch)->char_specials.led_by)
@@ -503,6 +505,8 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 
 // only some types of tiles are kept in the shortlist of territories -- particularly ones with associated chores
 #define BELONGS_IN_TERRITORY_LIST(room)  (IS_ANY_BUILDING(room) || COMPLEX_DATA(room) || ROOM_SECT_FLAGGED(room, SECTF_CHORE))
+#define COUNTS_AS_TERRITORY(room)  (HOME_ROOM(room) == (room) && !GET_ROOM_VEHICLE(room))
+#define LARGE_CITY_RADIUS(room)  (ROOM_BLD_FLAGGED((room), BLD_LARGE_CITY_RADIUS) || ROOM_SECT_FLAGGED((room), SECTF_LARGE_CITY_RADIUS))
 
 
  //////////////////////////////////////////////////////////////////////////////

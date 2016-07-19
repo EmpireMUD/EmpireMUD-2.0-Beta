@@ -854,7 +854,7 @@ OLC_MODULE(tedit_types) {
 	trig_data *trig = GET_OLC_TRIGGER(ch->desc);	
 	bitvector_t old = GET_TRIG_TYPE(trig), diff;
 	
-	bitvector_t ignore_changes = MTRIG_GLOBAL;	// all types ignore global changes
+	bitvector_t ignore_changes = MTRIG_GLOBAL | MTRIG_PLAYER_IN_ROOM;	// all types ignore global changes
 	
 	// mobs also ignore changes to the charmed flag
 	if (trig->attach_type == MOB_TRIGGER) {

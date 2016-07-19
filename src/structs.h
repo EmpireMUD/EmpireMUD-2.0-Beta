@@ -974,6 +974,7 @@ typedef struct vehicle_data vehicle_data;
 #define OPT_USEC  100000	// 10 passes per second
 #define PASSES_PER_SEC  (1000000 / OPT_USEC)
 #define RL_SEC  * PASSES_PER_SEC
+#define SEC_MICRO  *1000000	// convert seconds to microseconds for microtime()
 
 
 // Variables for the output buffering system
@@ -3096,6 +3097,8 @@ struct fight_data {
 	char_data *victim;	// Actual victim
 	byte mode;	// Fight mode, FMODE_x
 	byte wait;	// Time to intercept
+	unsigned long long last_swing_mainhand;	// last attack time (microseconds)
+	unsigned long long last_swing_offhand;	// last attack time (microseconds)
 };
 
 

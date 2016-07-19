@@ -41,7 +41,7 @@ extern const int rev_dir[];
 
 // external funcs
 extern int count_harnessed_animals(vehicle_data *veh);
-extern room_data *dir_to_room(room_data *room, int dir);
+extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
 extern room_data *get_vehicle_interior(vehicle_data *veh);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
@@ -193,7 +193,7 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 	
 	// direction targeting
 	if ((find_dir = parse_direction(ch, arg)) != NO_DIR) {
-		if (!is_flat_dir[find_dir] || !(room = dir_to_room(from_room, find_dir)) || room == from_room) {
+		if (!is_flat_dir[find_dir] || !(room = dir_to_room(from_room, find_dir, TRUE)) || room == from_room) {
 			msg_to_char(ch, "You can't shoot that direction.\r\n");
 		}
 		else if (!validate_siege_target_room(ch, veh, room)) {
@@ -252,7 +252,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	}
 
 	// targeting
-	if (!(to_room = dir_to_room(IN_ROOM(veh), dir))) {
+	if (!(to_room = dir_to_room(IN_ROOM(veh), dir, FALSE))) {
 		if (ch) {
 			snprintf(buf, sizeof(buf), "$V can't %s any further %s.", drive_data[subcmd].command, dirs[get_direction_for_char(ch, dir)]);
 			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
@@ -1504,7 +1504,7 @@ ACMD(do_drag) {
 	else if ((dir = parse_direction(ch, where)) == NO_DIR) {
 		do_drag_portal(ch, veh, where);
 	}
-	else if (!(to_room = dir_to_room(IN_ROOM(ch), dir))) {
+	else if (!(to_room = dir_to_room(IN_ROOM(ch), dir, FALSE))) {
 		msg_to_char(ch, "You can't drag anything in that direction.\r\n");
 	}
 	else if (IS_WATER_SECT(SECT(to_room))) {
@@ -1677,7 +1677,7 @@ ACMD(do_drive) {
 			msg_to_char(ch, "You can't %s that direction.\r\n", drive_data[subcmd].command);
 		}
 	}
-	else if (dir == DIR_RANDOM || !dir_to_room(IN_ROOM(veh), dir) || (subcmd != SCMD_PILOT && !is_flat_dir[dir])) {
+	else if (dir == DIR_RANDOM || !dir_to_room(IN_ROOM(veh), dir, FALSE) || (subcmd != SCMD_PILOT && !is_flat_dir[dir])) {
 		msg_to_char(ch, "You can't %s that direction.\r\n", drive_data[subcmd].command);
 	}
 	else if (GET_ACTION(ch) == drive_data[subcmd].action && GET_ACTION_VNUM(ch, 0) == dir && !*dist_arg) {

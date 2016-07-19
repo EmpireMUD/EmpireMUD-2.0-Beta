@@ -116,14 +116,6 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 };
 
 
-// for marking which empires need a territory re-read
-struct ctt_type {
-	empire_data *emp;
-	UT_hash_handle hh;
-};
-struct ctt_type *chore_territory_tracker = NULL;	// hash table
-
-
 // global for which chore type might be running
 int einv_interaction_chore_type = 0;
 
@@ -437,29 +429,6 @@ static void ewt_mark_for_interactions(empire_data *emp, room_data *room, int int
  /////////////////////////////////////////////////////////////////////////////
 //// HELPERS ////////////////////////////////////////////////////////////////
 
-
-/**
-* This function marks an empire as needing a territory re-read after all chores
-* have run.
-*
-* @param empire_data *emp The empire to track
-*/
-void add_chore_tracker(empire_data *add) {
-	struct ctt_type *find;
-
-	if (!add) {
-		return;
-	}
-	
-	HASH_FIND_PTR(chore_territory_tracker, add, find);
-	if (!find) {
-		CREATE(find, struct ctt_type, 1);
-		find->emp = add;
-		HASH_ADD_PTR(chore_territory_tracker, emp, find);
-	}
-}
-
-
 /**
 * This function sets the cap at which NPCs will no longer work a certain
 * task. Data is tracked between calls in order to reduce the overall work, and
@@ -602,7 +571,6 @@ bool can_gain_chore_resource_from_interaction(empire_data *emp, room_data *room,
 */
 void chore_update(void) {
 	void ewt_free_tracker(struct empire_workforce_tracker **tracker);
-	void run_chore_tracker_updates();
 	
 	struct empire_territory_data *ter;
 	vehicle_data *veh, *next_veh;
@@ -635,9 +603,6 @@ void chore_update(void) {
 			ewt_free_tracker(&EMPIRE_WORKFORCE_TRACKER(emp));
 		}
 	}
-	
-	// look for changes
-	run_chore_tracker_updates();
 }
 
 
@@ -863,34 +828,6 @@ char_data *place_chore_worker(empire_data *emp, int chore, room_data *room) {
 	}
 	
 	return mob;
-}
-
-
-/**
-* Runs the read_empire_territory() calls for empires that needed them.
-*/
-void run_chore_tracker_updates(void) {
-	struct ctt_type *iter, *next_iter;
-	bool read_all_territory = FALSE;
-	
-	// save work if more than 1
-	if (HASH_COUNT(chore_territory_tracker) > 1) {
-		read_all_territory = TRUE;
-	}
-	
-	HASH_ITER(hh, chore_territory_tracker, iter, next_iter) {
-		if (!read_all_territory) {
-			read_empire_territory(iter->emp);
-		}
-		
-		HASH_DEL(chore_territory_tracker, iter);
-		free(iter);
-	}
-	
-	if (read_all_territory) {
-		read_empire_territory(NULL);
-	}
-
 }
 
 
@@ -1249,7 +1186,6 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 					
 					if (empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_CHOPPED)) {
 						abandon_room(room);
-						add_chore_tracker(emp);
 					}
 				}
 			}
@@ -1358,7 +1294,6 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 			if (empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_DISMANTLED)) {
 				abandon_room(room);
-				add_chore_tracker(emp);
 			}
 			stop_room_action(room, ACT_DISMANTLING, CHORE_BUILDING);
 		}
@@ -1385,7 +1320,6 @@ void do_chore_dismantle_mines(empire_data *emp, room_data *room) {
 	
 	if (worker && can_do) {
 		start_dismantle_building(room);
-		add_chore_tracker(emp);
 		act("$n begins to dismantle the building.", FALSE, worker, NULL, NULL, TO_ROOM);
 		
 		// if they have the building chore on, we'll keep using the mob
@@ -1544,7 +1478,6 @@ INTERACTION_FUNC(one_farming_chore) {
 					
 					if (empire_chore_limit(emp, GET_ISLAND_ID(inter_room), CHORE_ABANDON_FARMED)) {
 						abandon_room(inter_room);
-						add_chore_tracker(emp);
 					}
 				}
 				

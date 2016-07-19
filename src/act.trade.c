@@ -291,6 +291,52 @@ vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, bool *any
 
 
 /**
+* Finds an unfinished vehicle in the room that the character can finish, by
+* name, and also locates the matching craft to resume.
+*
+* @param char_data *ch The person trying to craft a vehicle.
+* @param int craft_type The command (CRAFT_TYPE_ const) the player is using.
+* @param char *name The argument typed.
+* @param craft_data **found_craft If a vehicle is found, this is the craft for it.
+* @return vehicle_data* The found vehicle, or NULL if none.
+*/
+vehicle_data *find_vehicle_to_resume_by_name(char_data *ch, int craft_type, char *name, craft_data **found_craft) {
+	craft_data *craft, *next_craft;
+	vehicle_data *veh;
+	
+	*found_craft = NULL;
+	
+	LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+		if (VEH_IS_COMPLETE(veh)) {
+			continue;	// skip finished vehicles
+		}
+		if (!multi_isname(name, VEH_KEYWORDS(veh))) {
+			continue;	// not a keyword match
+		}
+		if (!can_use_vehicle(ch, veh, GUESTS_ALLOWED)) {
+			continue;	// not allowed to work on it
+		}
+		
+		// seems to be a match... now find a matching craft
+		HASH_ITER(hh, craft_table, craft, next_craft) {
+			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT) || !CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+				continue;	// not a valid target
+			}
+			if (GET_CRAFT_OBJECT(craft) != VEH_VNUM(veh)) {
+				continue;
+			}
+			
+			// we have a match!
+			*found_craft = craft;
+			return veh;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
 * This finds a drink container that is at least half-full of water.
 *
 * @param char_data *ch the person looking
@@ -484,6 +530,30 @@ bool obj_has_apply_type(obj_data *obj, int apply_type) {
 		}
 	}
 	return FALSE;
+}
+
+
+/**
+* Resumes working on an incomplete vehicle.
+*
+* @param char_data *ch The player.
+* @param vehicle_data *veh The vehicle to resume work on.
+* @param craft_data *craft The craft recipe it uses.
+*/
+void resume_craft_vehicle(char_data *ch, vehicle_data *veh, craft_data *craft) {
+	char buf[MAX_STRING_LENGTH];
+	
+	if (!ch || IS_NPC(ch) || !veh || !craft) {
+		return;
+	}
+	
+	start_action(ch, ACT_GEN_CRAFT, -1);
+	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(craft);
+	
+	snprintf(buf, sizeof(buf), "You resume %s $V.", gen_craft_data[GET_CRAFT_TYPE(craft)].verb);
+	act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+	snprintf(buf, sizeof(buf), "$n resumes %s $V.", gen_craft_data[GET_CRAFT_TYPE(craft)].verb);
+	act(buf, FALSE, ch, NULL, veh, TO_ROOM);
 }
 
 
@@ -1215,13 +1285,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	
 	// found one to resume
 	if ((veh = find_finishable_vehicle(ch, type, &any))) {
-		start_action(ch, ACT_GEN_CRAFT, -1);
-		GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(type);
-		
-		snprintf(buf, sizeof(buf), "You resume %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
-		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
-		snprintf(buf, sizeof(buf), "$n resumes %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
-		act(buf, FALSE, ch, NULL, veh, TO_ROOM);
+		resume_craft_vehicle(ch, veh, type);
 		return;
 	}
 	
@@ -1259,7 +1323,8 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 ACMD(do_gen_craft) {	
 	int timer, num = 1;
 	bool this_line, found;
-	craft_data *craft, *next_craft, *type = NULL, *abbrev_match = NULL;
+	craft_data *craft, *next_craft, *type = NULL, *find_type = NULL, *abbrev_match = NULL;
+	vehicle_data *veh;
 	bool is_master;
 	obj_data *drinkcon = NULL;
 	ability_data *cft_abil;
@@ -1324,6 +1389,15 @@ ACMD(do_gen_craft) {
 
 	if (subcmd == CRAFT_TYPE_ERROR) {
 		msg_to_char(ch, "This command is not yet implemented.\r\n");
+	}
+	else if (*arg && (veh = find_vehicle_to_resume_by_name(ch, subcmd, arg, &find_type))) {
+		// attempting to resume a vehicle by name
+		if (GET_ACTION(ch) != ACT_NONE) {
+			msg_to_char(ch, "You are already doing something.\r\n");
+		}
+		else {
+			resume_craft_vehicle(ch, veh, find_type);
+		}
 	}
 	else if (!*arg || !type) {
 		// master craft list

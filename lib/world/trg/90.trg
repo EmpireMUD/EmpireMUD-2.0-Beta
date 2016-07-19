@@ -1,6 +1,6 @@
 #9000
 Cow Animation~
-0 b 1
+0 bw 1
 ~
 Cow Animation
 * The cow will do a couple different things, so we do an if on a random generator.
@@ -18,7 +18,7 @@ end
 ~
 #9001
 Wolf Animation~
-0 b 3
+0 bw 3
 ~
 * Wolf Animation (9001-9003)
 * Time of day is important, can't have wolves howling at the sun...
@@ -65,9 +65,24 @@ end
 %echoaround% %actor% %actor.name% tries and fails to herd %self.name%.
 return 1
 ~
+#9003
+Daily Quest Item Handout~
+2 u 100
+~
+if %questvnum% == 9009
+  %load% obj 9010 %actor% inv
+  eval item %actor.inventory(9010)%
+  if %item%
+    %send% %actor% The stablemaster gives you %item.shortdesc%.
+  end
+elseif %questvnum% == 9036
+  nop %actor.add_resources(9036, 5)%
+  %send% %actor% The High Sorcerer gives you five enchanted trinkets.
+end
+~
 #9004
 Sheep Animation~
-0 b 1
+0 bw 1
 ~
 * The sheep will do a couple different things, so we do an if on a random generator.
 if (%random.2% == 2)
@@ -84,7 +99,7 @@ end
 ~
 #9008
 Squirrel Animation~
-0 b 4
+0 bw 4
 ~
 * Get current terrain.
 eval room %self.room%
@@ -96,7 +111,7 @@ end
 ~
 #9009
 Cow Animation~
-0 b 3
+0 bw 3
 ~
 Cow Animation
 * The cow will do a couple different things, so we do an if on a random generator.
@@ -114,7 +129,7 @@ end
 ~
 #9010
 Chicken Animation~
-0 b 3
+0 bw 3
 ~
 * Chicken Animation (9010)
 switch (%random.4%)
@@ -138,7 +153,7 @@ done
 ~
 #9011
 Rooster Animation~
-0 b 3
+0 bw 3
 ~
 * Rooster Animation (9011)
 switch (%random.4%)
@@ -162,7 +177,7 @@ done
 ~
 #9012
 Dog Animation~
-0 b 3
+0 bw 3
 ~
 * Dog Animation (9012)
 switch (%random.8%)
@@ -215,7 +230,7 @@ done
 ~
 #9013
 Prairie Dog Animation~
-0 b 3
+0 bw 3
 ~
 * Prairie Dog Animation (9013)
 switch (%random.6%)
@@ -234,14 +249,14 @@ done
 ~
 #9018
 Vulture Animation~
-0 b 1
+0 bw 1
 ~
 * Vulture Animation (9018)
 %echo% %self.name% circles high overhead, patiently waiting...
 ~
 #9020
 Quail Animation~
-0 b 3
+0 bw 3
 ~
 * Quail Animation (9020)
 if (%random.2% == 1)
@@ -256,14 +271,14 @@ end
 ~
 #9021
 Donkey Animation~
-0 b 3
+0 bw 3
 ~
 * Donkey Animation (9021)
 %echo% %self.name% brays loudly.
 ~
 #9022
 Black Cat Animation~
-0 b 0
+0 bw 3
 ~
 * Black Cat Animation (9022)
 switch (%random.3%)
@@ -291,7 +306,7 @@ done
 ~
 #9025
 Eagle Animation~
-0 b 3
+0 bw 3
 ~
 * Eagle Animation (9025)
 eval room %self.room%
@@ -313,7 +328,7 @@ done
 ~
 #9034
 Horse Animation~
-0 b 3
+0 bw 3
 ~
 * Horse Animation (9034)
 switch (%random.3%)
@@ -327,6 +342,23 @@ switch (%random.3%)
     %echo% %self.name%'s ears prick forward as though listening for danger...
   break
 done
+~
+#9036
+Disenchant checker~
+2 v 100
+~
+eval obj %actor.inventory()%
+while %obj%
+  if %obj.vnum% == 9036
+    if %obj.flag(ENCHANTED)%
+      %send% %actor% You have not disenchanted all of the trinkets!
+      return 0
+      halt
+    end
+  end
+  eval obj %obj.next_in_list%
+done
+return 1
 ~
 #9064
 Wandering Vampire combat~

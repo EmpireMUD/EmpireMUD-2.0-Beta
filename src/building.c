@@ -37,6 +37,7 @@ void process_build(char_data *ch, room_data *room);
 void setup_tunnel_entrance(char_data *ch, room_data *room, int dir);
 
 // externs
+void adjust_building_tech(empire_data *emp, room_data *room, bool add);
 extern bool can_claim(char_data *ch);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 void delete_room_npcs(room_data *room, struct empire_territory_data *ter);
@@ -95,22 +96,6 @@ bool can_build_on(room_data *room, bitvector_t flags) {
 		IS_SET(GET_SECT_BUILD_FLAGS(SECT(room)), flags) || 
 		(IS_SET(flags, BLD_FACING_OPEN_BUILDING) && CLEAR_OPEN_BUILDING(room))
 	);
-}
-
-
-/**
-* makes sure to update territory, as roads "count as in city"
-*
-* @param char_data *ch The lay-er.
-* @param room_data *room The location of the road.
-*/
-void check_lay_territory(char_data *ch, room_data *room) {
-	empire_data *emp = GET_LOYALTY(ch);
-	bool junk;
-	
-	if (emp && ROOM_OWNER(room) && !is_in_city_for_empire(room, emp, FALSE, &junk)) {
-		read_empire_territory(emp);
-	}
 }
 
 
@@ -178,7 +163,7 @@ void complete_building(room_data *room) {
 	
 	// lastly
 	if ((emp = ROOM_OWNER(room))) {
-		read_empire_territory(emp);
+		adjust_building_tech(emp, room, TRUE);
 		
 		if (GET_BUILDING(room)) {
 			qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
@@ -194,6 +179,7 @@ void complete_building(room_data *room) {
 * @param bld_vnum type The building vnum to set up.
 */
 void construct_building(room_data *room, bld_vnum type) {
+	bool was_large, was_in_city, junk;
 	sector_data *sect;
 	
 	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
@@ -202,6 +188,10 @@ void construct_building(room_data *room, bld_vnum type) {
 	}
 	
 	disassociate_building(room);	// just in case
+	
+	// for updating territory counts
+	was_large = ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS);
+	was_in_city = ROOM_OWNER(room) ? is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : FALSE;
 	
 	sect = SECT(room);
 	change_terrain(room, config_get_int("default_building_sect"));
@@ -212,6 +202,23 @@ void construct_building(room_data *room, bld_vnum type) {
 	
 	SET_BIT(ROOM_BASE_FLAGS(room), BLD_BASE_AFFECTS(room));
 	SET_BIT(ROOM_AFF_FLAGS(room), BLD_BASE_AFFECTS(room));
+	
+	// check for territory updates
+	if (ROOM_OWNER(room) && was_large != ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS)) {
+		if (was_large && was_in_city && !is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
+			// changing from in-city to not
+			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) -= 1;
+			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) += 1;
+		}
+		else if (ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
+			// changing from outside-territory to in-city
+			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) += 1;
+			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) -= 1;
+		}
+		else {
+			// no relevant change
+		}
+	}
 	
 	load_wtrigger(room);
 }
@@ -254,11 +261,18 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 	for (iter = 0; iter < length; ++iter) {
 		new_room = create_room();
 		attach_building_to_room(building_proto(RTYPE_TUNNEL), new_room, TRUE);
-		ROOM_OWNER(new_room) = ROOM_OWNER((iter <= length/2) ? entrance : exit);
 		COMPLEX_DATA(new_room)->home_room = (iter <= length/2) ? entrance : exit;
 		GET_BUILDING_RESOURCES(new_room) = copy_resource_list(resources);
 
 		create_exit(last_room, new_room, dir, TRUE);
+		
+		// set ownership?
+		if (iter <= length/2 && ROOM_OWNER(entrance)) {
+			perform_claim_room(new_room, ROOM_OWNER(entrance));
+		}
+		else if (iter > length/2 && ROOM_OWNER(exit)) {
+			perform_claim_room(new_room, ROOM_OWNER(exit));
+		}
 		
 		// save for next cycle
 		last_room = new_room;
@@ -266,14 +280,6 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 	
 	// link the final tunnel room
 	create_exit(last_room, exit, dir, TRUE);
-	
-	// get it all added to territory
-	if (ROOM_OWNER(entrance)) {
-		read_empire_territory(ROOM_OWNER(entrance));
-	}
-	if (ROOM_OWNER(exit) && ROOM_OWNER(exit) != ROOM_OWNER(entrance)) {
-		read_empire_territory(ROOM_OWNER(exit));
-	}
 }
 
 
@@ -288,12 +294,21 @@ void disassociate_building(room_data *room) {
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void remove_designate_objects(room_data *room);
 	
+	bool was_large, was_in_city, junk;
 	room_data *iter, *next_iter;
 	struct instance_data *inst;
 	bool deleted = FALSE;
 	
+	// for updating territory counts
+	was_large = ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS);
+	was_in_city = ROOM_OWNER(room) ? is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : FALSE;
+	
 	if (ROOM_OWNER(room) && GET_BUILDING(room) && IS_COMPLETE(room)) {
 		qt_empire_players(ROOM_OWNER(room), qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
+	}
+	
+	if (ROOM_OWNER(room)) {
+		adjust_building_tech(ROOM_OWNER(room), room, FALSE);
 	}
 	
 	// delete any open instance here
@@ -373,6 +388,23 @@ void disassociate_building(room_data *room) {
 	if (COMPLEX_DATA(room)) {
 		free_complex_data(COMPLEX_DATA(room));
 		COMPLEX_DATA(room) = NULL;
+	}
+	
+	// check for territory updates
+	if (ROOM_OWNER(room) && was_large != ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS)) {
+		if (was_large && was_in_city && !is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
+			// changing from in-city to not
+			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) -= 1;
+			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) += 1;
+		}
+		else if (ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
+			// changing from outside-territory to in-city
+			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) += 1;
+			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) -= 1;
+		}
+		else {
+			// no relevant change
+		}
 	}
 }
 
@@ -706,7 +738,6 @@ void process_dismantling(char_data *ch, room_data *room) {
 	
 	struct resource_data *res, *find_res, *next_res, *copy;
 	char buf[MAX_STRING_LENGTH];
-	empire_data *emp;
 
 	// sometimes zeroes end up in here ... just clear them
 	res = NULL;
@@ -785,10 +816,6 @@ void process_dismantling(char_data *ch, room_data *room) {
 	// done?
 	if (!BUILDING_RESOURCES(room)) {
 		finish_dismantle(ch, room);
-		
-		if ((emp = ROOM_OWNER(room))) {
-			read_empire_territory(emp);
-		}
 	}
 }
 
@@ -845,7 +872,7 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 	COMPLEX_DATA(room)->entrance = dir;
 	if (emp && can_claim(ch) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) {
 		if (EMPIRE_OUTSIDE_TERRITORY(emp) < land_can_claim(emp, TRUE) || is_in_city_for_empire(room, emp, FALSE, &junk)) {
-			ROOM_OWNER(room) = emp;
+			claim_room(room, emp);
 		}
 	}
 }
@@ -877,7 +904,12 @@ void start_dismantle_building(room_data *loc) {
 		log("SYSERR: Attempting to dismantle non-dismantlable building at #%d", GET_ROOM_VNUM(loc));
 		return;
 	}
-
+	
+	// shut off techs now
+	if (ROOM_OWNER(loc)) {
+		adjust_building_tech(ROOM_OWNER(loc), loc, FALSE);
+	}
+	
 	// interior only
 	for (room = interior_room_list; room; room = next_room) {
 		next_room = room->next_interior;
@@ -1003,7 +1035,7 @@ ACMD(do_build) {
 	
 	room_data *to_room = NULL, *to_rev = NULL;
 	obj_data *found_obj = NULL;
-	empire_data *e = NULL, *emp;
+	empire_data *e = NULL;
 	int dir = NORTH;
 	craft_data *iter, *next_iter, *type = NULL, *abbrev_match = NULL;
 	bool found = FALSE, found_any, this_line, is_closed, needs_facing, needs_reverse;
@@ -1209,10 +1241,10 @@ ACMD(do_build) {
 	special_building_setup(ch, IN_ROOM(ch));
 	
 	// can_claim checks total available land, but the outside is check done within this block
-	if (can_claim(ch) && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
+	if (!ROOM_OWNER(IN_ROOM(ch)) && can_claim(ch) && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
 		if (e || (e = get_or_create_empire(ch))) {
 			if (EMPIRE_OUTSIDE_TERRITORY(e) < land_can_claim(e, TRUE) || is_in_city_for_empire(IN_ROOM(ch), e, FALSE, &junk)) {
-				ROOM_OWNER(IN_ROOM(ch)) = e;
+				claim_room(IN_ROOM(ch), e);
 			}
 		}
 	}
@@ -1242,11 +1274,6 @@ ACMD(do_build) {
 	
 	// do a build action now
 	process_build(ch, IN_ROOM(ch));
-	
-	// lastly
-	if ((emp = ROOM_OWNER(IN_ROOM(ch)))) {
-		read_empire_territory(emp);
-	}
 }
 
 
@@ -1340,11 +1367,6 @@ ACMD(do_dismantle) {
 	act("$n begins to dismantle the building.\r\n", FALSE, ch, 0, 0, TO_ROOM);
 	process_dismantling(ch, IN_ROOM(ch));
 	command_lag(ch, WAIT_OTHER);
-	
-	// read this AFTER the process_dismantle, in case the building completes
-	if (ROOM_OWNER(IN_ROOM(ch))) {
-		reread_empire_tech(ROOM_OWNER(IN_ROOM(ch)));
-	}
 }
 
 
@@ -1596,12 +1618,15 @@ ACMD(do_designate) {
 
 			COMPLEX_DATA(new)->home_room = home;
 			COMPLEX_DATA(home)->inside_rooms++;
-			ROOM_OWNER(new) = ROOM_OWNER(home);
 			
 			if (veh) {
 				++VEH_INSIDE_ROOMS(veh);
 				COMPLEX_DATA(new)->vehicle = veh;
 				add_room_to_vehicle(new, veh);
+			}
+			
+			if (ROOM_OWNER(home)) {
+				perform_claim_room(new, ROOM_OWNER(home));
 			}
 		}
 		
@@ -1639,9 +1664,6 @@ ACMD(do_designate) {
 				}
 			}
 			
-			if (ROOM_OWNER(new)) {
-				create_territory_entry(ROOM_OWNER(new), new);
-			}
 			// sort now just in case
 			sort_world_table();
 		}
@@ -1786,7 +1808,6 @@ ACMD(do_lay) {
 		// this will tear it back down to its base type
 		disassociate_building(IN_ROOM(ch));
 		command_lag(ch, WAIT_OTHER);
-		check_lay_territory(ch, IN_ROOM(ch));
 	}
 	else if (!road_sect) {
 		msg_to_char(ch, "Road data has not been set up for this game.\r\n");
@@ -1825,7 +1846,6 @@ ACMD(do_lay) {
 		}
 		
 		command_lag(ch, WAIT_OTHER);
-		check_lay_territory(ch, IN_ROOM(ch));
 	}
 }
 

@@ -1,6 +1,6 @@
 #10100
 Swamp Hut passive~
-2 b 5
+2 bw 5
 ~
 switch %random.4%
   case 1
@@ -19,7 +19,7 @@ done
 ~
 #10101
 Swamp Hag passive~
-0 b 5
+0 bw 5
 ~
 switch %random.4%
   case 1
@@ -472,7 +472,7 @@ done
 ~
 #10141
 Delayed aggro greet/entry~
-0 gi 100
+0 giw 100
 ~
 if %actor%
   * Actor entered room - valid target?
@@ -599,7 +599,7 @@ done
 ~
 #10144
 Monsoon Cloud~
-1 b 10
+1 bw 10
 ~
 switch %random.4%
   case 1
@@ -730,11 +730,6 @@ eval room %self.room%
 eval char %room.people%
 while %char%
   if %char.is_pc%
-    * Bonus exp reward
-    if %random.2% == 2
-      %send% %char% You gain 1 bonus experience point.
-      nop %char.bonus_exp(1)%
-    end
     if %char.on_quest(10141)%
       * We're already on the quest
       if %char.varexists(monsoon_attacker_kills)%
@@ -746,7 +741,6 @@ while %char%
       if %monsoon_attacker_kills% >= %target%
         %quest% %char% trigger 10141
         %send% %char% You have killed enough of these cacti. Head into the rift and look for their leader on top of the hill.
-        halt
       else
         %send% %char% You have killed %monsoon_attacker_kills% cacti.
       end
@@ -763,6 +757,11 @@ while %char%
         remote monsoon_attacker_kills %char.id%
       end
     end
+    * Bonus exp reward
+    if %random.2% == 2 && (%random.2% == 2 || (%actor.on_quest(10141)% && !%actor.quest_triggered(10141)%))
+      %send% %char% You gain 1 bonus experience point.
+      nop %char.bonus_exp(1)%
+    end
   end
   eval char %char.next_in_room%
 done
@@ -776,7 +775,7 @@ return 0
 ~
 #10150
 Free-tailed bat emotes~
-0 b 10
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -796,7 +795,7 @@ end
 ~
 #10151
 Gila monster emotes~
-0 b 10
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -816,7 +815,7 @@ end
 ~
 #10152
 Armadillo emotes~
-0 b 10
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -836,7 +835,7 @@ end
 ~
 #10153
 Cactus wren emotes~
-0 b 10
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -855,7 +854,7 @@ end
 ~
 #10154
 Antelope squirrel emotes~
-0 b 10
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -874,7 +873,7 @@ end
 ~
 #10155
 Bighorn sheep emotes~
-0 b 10
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -894,7 +893,7 @@ end
 ~
 #10156
 Coati emotes~
-0 b 10
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -913,7 +912,7 @@ end
 ~
 #10157
 Monsoon room environment~
-2 b 10
+2 bw 10
 ~
 switch %random.4%
   case 1
@@ -947,7 +946,7 @@ return 1
 ~
 #10159
 Teddybear cactus emotes~
-0 bt 5
+0 btw 5
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -1211,7 +1210,7 @@ remote last_monsoon_loot_item %actor.id%
 ~
 #10171
 Monsoon thief + vampire reveal~
-0 h 100
+0 hw 100
 ~
 if (%self.vampire% && %actor.skill(Vampire)% < 51) || (!%self.vampire% && %actor.skill(Stealth)% < 51)
   halt

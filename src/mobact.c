@@ -570,6 +570,8 @@ bool try_mobile_movement(char_data *ch) {
 * Main cycle of mob activity (iterates over character list).
 */
 void mobile_activity(void) {
+	extern bool catch_up_mobs;
+	
 	register char_data *ch, *next_ch, *vict, *targ, *m;
 	struct track_data *track;
 	struct pursuit_data *purs, *next_purs, *temp;
@@ -579,6 +581,12 @@ void mobile_activity(void) {
 	bool moved;
 
 	#define CAN_AGGRO(mob, vict)  (!IS_DEAD(vict) && !NOHASSLE(vict) && !IS_GOD(vict) && CAN_SEE(mob, vict) && vict != mob->master && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL | AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_NO_ATTACK))
+	
+	// prevent running multiple mob moves during a catch-up cycle
+	if (!catch_up_mobs) {
+		return;
+	}
+	catch_up_mobs = FALSE;
 
 	for (ch = character_list; ch; ch = next_ch) {
 		next_ch = ch->next;

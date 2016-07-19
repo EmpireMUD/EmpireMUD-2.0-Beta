@@ -41,7 +41,7 @@ D4
 &0..&?.&0.~
 &C~
 E
-4 0 0.05 602
+4 0 0.20 602
 I 5 103 2.00 1 d  # DIG: a yellow lightning stone
 I 5 104 2.00 1 d  # DIG: a red bloodstone
 I 5 1300 2.00 1 d  # DIG: a glowing green seashell
@@ -129,7 +129,7 @@ D4
 E
 0 0 100.00 601
 E
-4 0 0.05 603
+4 0 0.20 603
 I 5 103 2.00 1 d  # DIG: a yellow lightning stone
 I 5 104 2.00 1 d  # DIG: a red bloodstone
 I 5 1300 2.00 1 d  # DIG: a glowing green seashell
@@ -246,7 +246,7 @@ D4
 E
 0 0 100.00 602
 E
-4 0 0.05 604
+4 0 0.20 604
 I 5 103 2.00 1 d  # DIG: a yellow lightning stone
 I 5 104 2.00 1 d  # DIG: a red bloodstone
 I 5 1300 2.00 1 d  # DIG: a glowing green seashell
@@ -646,7 +646,7 @@ D4
 E
 0 0 100.00 0
 E
-4 0 0.20 1
+4 0 0.80 1
 E
 9 0 50.00 3
 I 5 102 9.00 1 d  # DIG: a flint stone

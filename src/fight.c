@@ -374,7 +374,6 @@ double get_combat_speed(char_data *ch, int pos) {
 	if (!has_ability(ch, ABIL_FASTCASTING)) {
 		base *= (1.0 - (0.025 * GET_WITS(ch)));
 	}
-	
 	// round to .1 seconds
 	base *= 10.0;
 	base += 0.5;
@@ -2276,7 +2275,6 @@ void besiege_room(room_data *to_room, int damage) {
 			if (emp && !is_in_city_for_empire(to_room, emp, TRUE, &junk)) {
 				// this does check the city found time so that recently-founded cities don't get abandon protection
 				abandon_room(to_room);
-				read_empire_territory(emp);
 			}
 			if (ROOM_PEOPLE(to_room)) {
 				act("The building is hit and crumbles!", FALSE, ROOM_PEOPLE(to_room), 0, 0, TO_CHAR | TO_ROOM);
@@ -2601,8 +2599,12 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 			set_fighting(ch, victim, FMODE_MELEE);
 
 		/* Start the victim fighting the attacker */
-		if (GET_POS(victim) > POS_STUNNED && (FIGHTING(victim) == NULL))
+		if (GET_POS(victim) > POS_STUNNED && (FIGHTING(victim) == NULL)) {
+			unsigned long long timestamp = microtime();
 			set_fighting(victim, ch, FMODE_MELEE);
+			GET_LAST_SWING_MAINHAND(victim) = timestamp - (get_combat_speed(victim, WEAR_WIELD)/2 SEC_MICRO);	// half-round time offset
+			GET_LAST_SWING_OFFHAND(victim) = timestamp - (get_combat_speed(victim, WEAR_HOLD)/2 SEC_MICRO);	// half-round time offset
+		}
 	}
 
 	/* If you attack a pet, it hates your guts */
@@ -2836,7 +2838,11 @@ void engage_combat(char_data *ch, char_data *vict, bool melee) {
 		set_fighting(ch, vict, melee ? FMODE_MELEE : FMODE_WAITING);
 	}
 	if (!FIGHTING(vict) && AWAKE(vict)) {
+		unsigned long long timestamp = microtime();
 		set_fighting(vict, ch, melee ? FMODE_MELEE : FMODE_WAITING);
+		
+		GET_LAST_SWING_MAINHAND(vict) = timestamp - (get_combat_speed(vict, WEAR_WIELD)/2 SEC_MICRO);	// half-round time offset
+		GET_LAST_SWING_OFFHAND(vict) = timestamp - (get_combat_speed(vict, WEAR_HOLD)/2 SEC_MICRO);	// half-round time offset
 	}
 }
 
@@ -3317,6 +3323,8 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 		FIGHT_WAIT(ch) = 0;
 	}
 	GET_POS(ch) = POS_FIGHTING;
+	GET_LAST_SWING_MAINHAND(ch) = microtime();
+	GET_LAST_SWING_OFFHAND(ch) = GET_LAST_SWING_MAINHAND(ch);
 	
 	// remove all stuns when combat starts
 	affects_from_char_by_aff_flag(ch, AFF_STUNNED, FALSE);
@@ -3664,8 +3672,16 @@ void fight_wait_run(char_data *ch, double speed) {
 * @param int pulse the current game pulse, for determining whose turn it is
 */
 void frequent_combat(int pulse) {
+	extern bool catch_up_combat;
+	
 	char_data *ch, *vict;
 	double speed;
+	
+	// prevent running multiple combat rounds during a catch-up cycle
+	if (!catch_up_combat) {
+		return;
+	}
+	catch_up_combat = FALSE;
 	
 	for (ch = combat_list; ch; ch = next_combat_list) {
 		next_combat_list = ch->next_fighting;
@@ -3691,25 +3707,30 @@ void frequent_combat(int pulse) {
 			}
 			case FMODE_MISSILE: {
 				speed = get_combat_speed(ch, WEAR_RANGED);
-		
+				
 				// my turn?
-				if ((pulse % ((int)(speed RL_SEC))) == 0) {
+				if (GET_LAST_SWING_MAINHAND(ch) + (speed SEC_MICRO) <= microtime()) {
+					GET_LAST_SWING_MAINHAND(ch) = microtime();
 					one_combat_round(ch, speed, GET_EQ(ch, WEAR_RANGED));
 				}
 				break;
 			}
 			case FMODE_MELEE:
 			default: {
+				unsigned long long timestamp = microtime();
+				
 				// main hand
 				speed = get_combat_speed(ch, WEAR_WIELD);
-				if ((pulse % ((int)(speed RL_SEC))) == 0) {
+				if (GET_LAST_SWING_MAINHAND(ch) + (speed SEC_MICRO) <= timestamp) {
+					GET_LAST_SWING_MAINHAND(ch) = timestamp;
 					one_combat_round(ch, speed, GET_EQ(ch, WEAR_WIELD));
 				}
 				
 				// still fighting and can dual-wield?
 				if (!IS_NPC(ch) && FIGHTING(ch) && !IS_DEAD(ch) && !EXTRACTED(ch) && !EXTRACTED(FIGHTING(ch)) && has_ability(ch, ABIL_DUAL_WIELD) && check_solo_role(ch) && GET_EQ(ch, WEAR_HOLD) && IS_WEAPON(GET_EQ(ch, WEAR_HOLD))) {
 					speed = get_combat_speed(ch, WEAR_HOLD);
-					if ((pulse % ((int)(speed RL_SEC))) == 0) {
+					if (GET_LAST_SWING_OFFHAND(ch) + (speed SEC_MICRO) <= timestamp) {
+						GET_LAST_SWING_OFFHAND(ch) = timestamp;
 						one_combat_round(ch, speed, GET_EQ(ch, WEAR_HOLD));
 					}
 				}
