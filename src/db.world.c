@@ -1931,6 +1931,7 @@ void run_map_evolutions(void) {
 	int try, to_do;
 	
 	to_do = evos_per_hour;	// how many tiles to evolve before we quit
+	log("Debug run_map_evolutions: starting %d with last sect %d and last loc (%d, %d)", to_do, last_evo_sect ? GET_SECT_VNUM(last_evo_sect) : -1, last_evo_tile ? MAP_X_COORD(last_evo_tile->vnum) : -1, last_evo_tile ? MAP_Y_COORD(last_evo_tile->vnum) : -1);
 	
 	// going to loop through sectors twice so we repeat at the start
 	found_start = FALSE;
@@ -1947,7 +1948,7 @@ void run_map_evolutions(void) {
 				found_start = TRUE;
 				
 				// we will skip this sector if there's no work to be done in it
-				if (last_evo_tile == NULL || last_evo_tile->next_in_sect != NULL) {
+				if (last_evo_tile == NULL) {
 					continue;
 				}
 			}
@@ -1965,6 +1966,9 @@ void run_map_evolutions(void) {
 			}
 			
 			// READY: figure out where to start
+			if (last_evo_sect != sect) {
+				last_evo_tile = NULL;	// we are doing a different sector
+			}
 			if (last_evo_tile && last_evo_tile->next) {
 				map_start = last_evo_tile->next;
 			}
