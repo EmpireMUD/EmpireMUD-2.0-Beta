@@ -449,7 +449,7 @@ ADMIN_UTIL(util_evolutions) {
 			msg_to_char(ch, "\r\n");
 		}
 		else {
-			msg_to_char(ch, "none\r\n");
+			msg_to_char(ch, " none\r\n");
 		}
 	}
 }
