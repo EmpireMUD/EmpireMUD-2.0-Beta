@@ -314,6 +314,19 @@ Example:
 
 See also: COMMAND TRIGGER
 #d
+"PLAYER-IN-ROOM TRIGGER" "PLAYER IN ROOM TRIGGER" "MTRIG PLAYER-IN-ROOM" "OTRIG PLAYER-IN-ROOM" "RTRIG PLAYER-IN-ROOM" "VTRIG PLAYER-IN-ROOM"
+
+Player-in-Room (trigger)
+
+This trigger type is not an event itself, but is instead combined with some
+other trigger types to prevent them from triggering unless a player is present.
+This generally reduces the number of triggers running when they don't need to.
+
+Supported types:
+  Random
+
+See also: RANDOM TRIGGER
+#d
 "RANDOM TRIGGER" "MTRIG RANDOM" "OTRIG RANDOM" "RTRIG RANDOM" "VTRIG RANDOM" TRIGEDIT-MOB-RANDOM TRIGEDIT-OBJ-RANDOM TRIGEDIT-ROOM-RANDOM TRIGEDIT-VEH-RANDOM RANDOM-TIMING TIMING
 
 Random (trigger type)
@@ -333,10 +346,12 @@ You can set how often the trigger fires by setting the percent to:
 
 (all times are approximate, except 100%)
 
+You can add the "Global" and "Player-in-Room" modifiers.
+
 Note: Random triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 
-See also: GLOBAL TRIGGER, MTRIG CHARMED
+See also: GLOBAL TRIGGER, MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER
 #d
 "SCRIPT COMMANDS" "TRIGEDIT SCRIPT COMMANDS"
 
