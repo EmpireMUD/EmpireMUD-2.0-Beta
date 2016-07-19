@@ -1134,21 +1134,22 @@ This is a generic command that houses several simple utilities for immortals.
 They generally have no game effect, but can help with testing.
 
 Available utilities:
- b318buildings - Finds buildings using flags that were deprecated in 2.0b3.18.
- clearroles - Clears the class roles and class abilities of all players.
- diminish <number> <scale> - Applies the game's diminishing returns formula,
+ &cb318buildings&0 - Finds buildings using flags that were deprecated in 2.0b3.18.
+ &cclearroles&0 - Clears the class roles and class abilities of all players.
+ &cdiminish <number> <scale>&0 - Applies the game's diminishing returns formula,
     and returns the result.
- islandsize - Counts and displays tile counts for all islands.
- playerdump - Outputs a data file with tab-separated lines for all players with
+ &cevolutions&0 - Show which sectors evolve on which hour tick.
+ &cislandsize&0 - Counts and displays tile counts for all islands.
+ &cplayerdump&0 - Outputs a data file with tab-separated lines for all players with
     account, playtime, and host.
- randtest [number] [size] - Generates a large number of random numbers, and
+ &crandtest [number] [size]&0 - Generates a large number of random numbers, and
     reports the results.
- redoislands - Renumbers all the islands (requires confirmation; may rearrange
+ &credoislands&0 - Renumbers all the islands (requires confirmation; may rearrange
     empire inventories).
- rescan <empire | all> - Rereads territory and members, which can fix issues.
- resetbuildingtriggers <vnum | all> - Reattaches triggers to buildings/rooms,
+ &crescan <empire | all>&0 - Rereads territory and members, which can fix issues.
+ &cresetbuildingtriggers <vnum | all>&0 - Reattaches triggers to buildings/rooms,
     e.g. if you made a change in OLC and want live buildings updated.
- strlen - Give various measures of string length.
+ &cstrlen&0 - Give various measures of string length.
 #d
 VNUM
 
