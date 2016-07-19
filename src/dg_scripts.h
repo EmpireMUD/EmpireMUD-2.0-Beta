@@ -36,7 +36,7 @@
 #define NO_EXTRANEOUS_TRIGGERS
 
 /* mob trigger types */
-#define MTRIG_GLOBAL           BIT(0)      /* check even if zone empty   */
+#define MTRIG_GLOBAL           BIT(0)      // check even if no players nearby
 #define MTRIG_RANDOM           BIT(1)      /* checked randomly           */
 #define MTRIG_COMMAND          BIT(2)	   /* character types a command  */
 #define MTRIG_SPEECH           BIT(3)	   /* a char says a word/phrase  */
@@ -58,10 +58,11 @@
 #define MTRIG_CHARMED          BIT(19)	// fight/random triggers will fire even while charmed
 #define MTRIG_START_QUEST      BIT(20)	// player tries to start a quest
 #define MTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
+#define MTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
 
 
 /* obj trigger types */
-#define OTRIG_GLOBAL           BIT(0)	     /* unused                     */
+#define OTRIG_GLOBAL           BIT(0)	// NOT actually used, currently
 #define OTRIG_RANDOM           BIT(1)	     /* checked randomly           */
 #define OTRIG_COMMAND          BIT(2)      /* character types a command  */
 
@@ -81,10 +82,11 @@
 #define OTRIG_FINISH           BIT(19)	// char finishes reading a book
 #define OTRIG_START_QUEST      BIT(20)	// player tries to start a quest
 #define OTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
+#define OTRIG_PLAYER_IN_ROOM   BIT(22)	// NOT actually used, currently
 
 
 // VTRIG_x: vehicle trigger types
-#define VTRIG_GLOBAL  BIT(0)	// checked even if zone empty
+#define VTRIG_GLOBAL  BIT(0)	// checked even if no players are nearby
 #define VTRIG_RANDOM  BIT(1)	// checked randomly when people nearby
 #define VTRIG_COMMAND  BIT(2)	// character types a command
 #define VTRIG_SPEECH  BIT(3)	// character speaks a word or phrase
@@ -100,6 +102,7 @@
 // unuused: 17-19
 #define VTRIG_START_QUEST      BIT(20)	// player tries to start a quest
 #define VTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
+#define VTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
 
 
 /* wld trigger types */
@@ -120,6 +123,7 @@
 // unused: 18, 19
 #define WTRIG_START_QUEST      BIT(20)	// player tries to start a quest
 #define WTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
+#define WTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
 
 
 /* obj command trigger types */
