@@ -1,6 +1,6 @@
 #9000
 Cow Animation~
-0 b 1
+0 bw 0
 ~
 Cow Animation
 * The cow will do a couple different things, so we do an if on a random generator.
@@ -18,7 +18,7 @@ end
 ~
 #9001
 Wolf Animation~
-0 b 3
+0 bw 0
 ~
 * Wolf Animation (9001-9003)
 * Time of day is important, can't have wolves howling at the sun...
@@ -54,7 +54,7 @@ end
 #9002
 Herd Cats~
 0 c 0
-herd~
+~
 * test targeting me
 eval test %%actor.char_target(%arg.car%)%%
 if %test% != %self%
@@ -82,7 +82,7 @@ end
 ~
 #9004
 Sheep Animation~
-0 b 1
+0 bw 0
 ~
 * The sheep will do a couple different things, so we do an if on a random generator.
 if (%random.2% == 2)
@@ -99,7 +99,7 @@ end
 ~
 #9008
 Squirrel Animation~
-0 b 4
+0 bw 0
 ~
 * Get current terrain.
 eval room %self.room%
@@ -111,7 +111,7 @@ end
 ~
 #9009
 Cow Animation~
-0 b 3
+0 bw 0
 ~
 Cow Animation
 * The cow will do a couple different things, so we do an if on a random generator.
@@ -129,7 +129,7 @@ end
 ~
 #9010
 Chicken Animation~
-0 b 3
+0 bw 0
 ~
 * Chicken Animation (9010)
 switch (%random.4%)
@@ -153,7 +153,7 @@ done
 ~
 #9011
 Rooster Animation~
-0 b 3
+0 bw 0
 ~
 * Rooster Animation (9011)
 switch (%random.4%)
@@ -177,7 +177,7 @@ done
 ~
 #9012
 Dog Animation~
-0 b 3
+0 bw 0
 ~
 * Dog Animation (9012)
 switch (%random.8%)
@@ -230,7 +230,7 @@ done
 ~
 #9013
 Prairie Dog Animation~
-0 b 3
+0 bw 0
 ~
 * Prairie Dog Animation (9013)
 switch (%random.6%)
@@ -249,14 +249,14 @@ done
 ~
 #9018
 Vulture Animation~
-0 b 1
+0 bw 0
 ~
 * Vulture Animation (9018)
 %echo% %self.name% circles high overhead, patiently waiting...
 ~
 #9020
 Quail Animation~
-0 b 3
+0 bw 0
 ~
 * Quail Animation (9020)
 if (%random.2% == 1)
@@ -271,14 +271,14 @@ end
 ~
 #9021
 Donkey Animation~
-0 b 3
+0 bw 0
 ~
 * Donkey Animation (9021)
 %echo% %self.name% brays loudly.
 ~
 #9022
 Black Cat Animation~
-0 b 0
+0 bw 0
 ~
 * Black Cat Animation (9022)
 switch (%random.3%)
@@ -306,7 +306,7 @@ done
 ~
 #9025
 Eagle Animation~
-0 b 3
+0 bw 0
 ~
 * Eagle Animation (9025)
 eval room %self.room%
@@ -328,7 +328,7 @@ done
 ~
 #9034
 Horse Animation~
-0 b 3
+0 bw 0
 ~
 * Horse Animation (9034)
 switch (%random.3%)

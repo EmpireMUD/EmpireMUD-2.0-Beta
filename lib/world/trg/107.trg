@@ -222,7 +222,7 @@ end
 ~
 #10730
 Hey Diddle Diddle~
-0 b 10
+0 bw 0
 ~
 switch %random.3%
   case 1
@@ -245,7 +245,7 @@ return 0
 ~
 #10732
 Jack~
-0 b 10
+0 bw 0
 ~
 switch %random.3%
   case 1
@@ -261,7 +261,7 @@ done
 ~
 #10734
 Jack Be Nimble~
-0 b 10
+0 bw 0
 ~
 switch %random.3%
   case 1
@@ -285,7 +285,7 @@ end
 ~
 #10736
 Jill~
-0 b 10
+0 bw 0
 ~
 switch %random.3%
   case 1
@@ -301,7 +301,7 @@ done
 ~
 #10737
 Jack Sprat~
-0 b 10
+0 bw 0
 ~
 switch %random.3%
   case 1
@@ -316,7 +316,7 @@ switch %random.3%
 ~
 #10739
 Jack Horner~
-0 b 10
+0 bw 0
 ~
 switch %random.3%
   case 1
@@ -332,7 +332,7 @@ done
 ~
 #10741
 Miss Muffet~
-0 b 10
+0 bw 0
 ~
 switch %random.3%
   case 1
@@ -348,7 +348,7 @@ done
 ~
 #10743
 Mary~
-0 b 10
+0 bw 0
 ~
 switch %random.3%
   case 1
@@ -364,7 +364,7 @@ done
 ~
 #10746
 Old Woman who lived in a shoe~
-0 b 10
+0 bw 0
 ~
 switch %random.3%
   case 1
@@ -513,7 +513,7 @@ nop %actor.charge_coins(30)%
 ~
 #10754
 Nynar env~
-0 b 10
+0 bw 0
 ~
 switch %random.4%
   case 1
@@ -534,7 +534,7 @@ done
 ~
 #10755
 Meena env~
-0 b 10
+0 bw 0
 ~
 switch %random.4%
   case 1

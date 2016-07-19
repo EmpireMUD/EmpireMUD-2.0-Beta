@@ -1,6 +1,6 @@
 #11100
 Hermit Greeting~
-0 bg 25
+0 bgw 0
 ~
 wait 1 sec
 say Are you going to eat that?
@@ -320,7 +320,7 @@ end
 ~
 #11113
 Raptor greet/aggro~
-0 g 100
+0 gw 0
 ~
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%) || !%actor.is_pc%)
   halt
@@ -351,7 +351,7 @@ mkill %actor%
 ~
 #11114
 Loch colossus greet/aggro~
-0 g 100
+0 gw 0
 ~
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%) || !%actor.is_pc%)
   halt
