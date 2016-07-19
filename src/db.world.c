@@ -1919,7 +1919,7 @@ static void evolve_one_map_tile(struct map_data *tile) {
 
 
 /**
-* Runs evolutions on 1/24 of sectors per hour.
+* Runs evolutions on 1/24 of evolvable map tiles per hour.
 */
 void run_map_evolutions(void) {
 	extern bool evo_is_over_time[];
@@ -1966,11 +1966,8 @@ void run_map_evolutions(void) {
 			}
 			
 			// READY: figure out where to start
-			if (last_evo_sect != sect) {
-				last_evo_tile = NULL;	// we are doing a different sector
-			}
-			if (last_evo_tile && last_evo_tile->next) {
-				map_start = last_evo_tile->next;
+			if (last_evo_tile && last_evo_tile->next && last_evo_tile->sector_type == sect) {
+				map_start = last_evo_tile->next_in_sect;
 			}
 			else {
 				idx = find_sector_index(GET_SECT_VNUM(sect));
