@@ -824,6 +824,7 @@ void heartbeat(int heart_pulse) {
 	void check_newbie_islands();
 	void check_wars();
 	void chore_update();
+	void detect_evos_per_hour();
 	void extract_pending_chars();
 	void frequent_combat(int pulse);
 	void generate_adventure_instances();
@@ -969,6 +970,8 @@ void heartbeat(int heart_pulse) {
 	if (HEARTBEAT(SECS_PER_REAL_HOUR)) {
 		reduce_stale_empires();
 		if (debug_log && HEARTBEAT(15)) { log("debug 21:\t%lld", microtime()); }
+		detect_evos_per_hour();
+		if (debug_log && HEARTBEAT(15)) { log("debug 21.5:\t%lld", microtime()); }
 	}
 	
 	if (HEARTBEAT(30 * SECS_PER_REAL_MIN)) {

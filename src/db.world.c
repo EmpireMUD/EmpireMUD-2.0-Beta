@@ -1921,8 +1921,6 @@ static void evolve_one_map_tile(struct map_data *tile) {
 * Runs evolutions on 1/24 of evolvable map tiles per hour.
 */
 void run_map_evolutions(void) {
-	extern bool evo_is_over_time[];
-	
 	struct map_data *map, *next_map, *map_start;
 	struct sector_index_type *idx;
 	sector_data *sect, *next_sect;
@@ -1931,7 +1929,7 @@ void run_map_evolutions(void) {
 	
 	to_do = evos_per_hour;	// how many tiles to evolve before we quit
 	
-	// going to loop through sectors twice so we repeat at the start
+	// going to loop through sectors twice: once to find the last starting pos, and a second time if we have to wrap around
 	found_start = FALSE;
 	for (try = 1; try <= 2 && to_do > 0; ++try) {
 		HASH_ITER(hh, sector_table, sect, next_sect) {
