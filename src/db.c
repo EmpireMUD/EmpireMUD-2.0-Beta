@@ -159,6 +159,9 @@ room_template *room_template_table = NULL;	// hash table of room templates
 // sectors
 sector_data *sector_table = NULL;	// sector hash table
 struct sector_index_type *sector_index = NULL;	// index lists
+struct map_data *last_evo_tile = NULL;	// for resuming map evolutions
+sector_data *last_evo_sect = NULL;	// for resuming map evolutions
+int evos_per_hour = 1;	// how many map tiles evolve per hour (for load-balancing)
 
 // skills
 skill_data *skill_table = NULL;	// main skills hash (hh)
@@ -254,6 +257,7 @@ void boot_db(void) {
 	void check_version();
 	void delete_old_players();
 	void delete_orphaned_rooms();
+	void detect_evos_per_hour();
 	void init_config_system();
 	void link_and_check_vehicles();
 	void load_banned();
@@ -360,6 +364,9 @@ void boot_db(void) {
 	
 	log("Building quest lookup hints.");
 	build_all_quest_lookups();
+	
+	// figure out how often to evolve what (do this late)
+	detect_evos_per_hour();
 	
 	// END
 	log("Boot db -- DONE.");
