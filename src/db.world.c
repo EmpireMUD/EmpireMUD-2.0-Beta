@@ -1830,7 +1830,6 @@ void detect_evos_per_hour(void) {
 	
 	evos_per_hour = total_evolvable_tiles / 24;
 	evos_per_hour = MAX(1, evos_per_hour);	// safe limit
-	log("Debug detect_evos_per_hour: %d/%d", evos_per_hour, total_evolvable_tiles);
 }
 
 
@@ -1931,7 +1930,6 @@ void run_map_evolutions(void) {
 	int try, to_do;
 	
 	to_do = evos_per_hour;	// how many tiles to evolve before we quit
-	log("Debug run_map_evolutions: starting %d with last sect %d and last loc (%d, %d)", to_do, last_evo_sect ? GET_SECT_VNUM(last_evo_sect) : -1, last_evo_tile ? MAP_X_COORD(last_evo_tile->vnum) : -1, last_evo_tile ? MAP_Y_COORD(last_evo_tile->vnum) : -1);
 	
 	// going to loop through sectors twice so we repeat at the start
 	found_start = FALSE;
@@ -1976,7 +1974,6 @@ void run_map_evolutions(void) {
 			
 			// update this now, just in case
 			last_evo_sect = sect;
-			log("Debug run_map_evolutions: %d %s at (%d, %d)", GET_SECT_VNUM(sect), GET_SECT_NAME(sect), MAP_X_COORD(map_start->vnum), MAP_Y_COORD(map_start->vnum));
 			
 			// now attempt to evolve rooms in the list
 			LL_FOREACH_SAFE2(map_start, map, next_map, next_in_sect) {
