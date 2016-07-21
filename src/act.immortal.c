@@ -4247,6 +4247,7 @@ ACMD(do_addnotes) {
 			free(acct->notes);
 		}
 		acct->notes = str_dup(notes);
+		SAVE_ACCOUNT(acct);
 		
 		if (index) {
 			strcpy(buf, index->fullname);
