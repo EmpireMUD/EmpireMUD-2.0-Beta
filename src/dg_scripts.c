@@ -27,7 +27,6 @@
 #include "skills.h"
 
 #define PULSES_PER_MUD_HOUR     (SECS_PER_MUD_HOUR*PASSES_PER_SEC)
-#define player_script_radius  25	// map tiles away that players may be for scripts to trigger
 
 
 /* external vars from db.c */
@@ -77,18 +76,6 @@ void extract_value(struct script_data *sc, trig_data *trig, char *cmd);
 struct cmdlist_element *find_done(struct cmdlist_element *cl);
 struct cmdlist_element *find_case(trig_data *trig, struct cmdlist_element *cl, void *go, struct script_data *sc, int type, char *cond);
 void process_eval(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
-
-
-/**
-* Determines if there is a nearby connected player, which is a requirement
-* for some things like random triggers.
-*
-* @param room_data *loc The location to check for nearby players.
-* @return bool TRUE if there are players nearby.
-*/
-static bool players_nearby_script(room_data *loc) {	
-	return distance_to_nearest_player(loc) <= player_script_radius;
-}
 
 
 int trgvar_in_room(room_vnum vnum) {
@@ -978,17 +965,8 @@ void script_trigger_check(void) {
 	struct script_data *sc;
 	
 	LL_FOREACH_SAFE(character_list, ch, next_ch) {
-		if (!(sc = SCRIPT(ch))) {
-			continue;	// no scripts
-		}
-		if (!IS_SET(SCRIPT_TYPES(sc), MTRIG_RANDOM)) {
-			continue;	// no randoms
-		}
-		if (IS_SET(SCRIPT_TYPES(sc), MTRIG_PLAYER_IN_ROOM) && !any_players_in_room(IN_ROOM(ch))) {
-			continue;	// needs players in room
-		}
-		if (!IS_SET(SCRIPT_TYPES(sc), MTRIG_GLOBAL | MTRIG_PLAYER_IN_ROOM) && !players_nearby_script(IN_ROOM(ch))) {
-			continue;	// needs players nearby
+		if (!(sc = SCRIPT(ch)) || !IS_SET(SCRIPT_TYPES(sc), MTRIG_RANDOM)) {
+			continue;	// no random scripts
 		}
 
 		// success
@@ -1012,17 +990,8 @@ void script_trigger_check(void) {
 		if (!IN_ROOM(veh)) {
 			continue; // not in a room?
 		}
-		if (!(sc = SCRIPT(veh))) {
-			return;	// no scripts
-		}
-		if (!IS_SET(SCRIPT_TYPES(sc), VTRIG_RANDOM)) {
-			continue;	// no randoms
-		}
-		if (IS_SET(SCRIPT_TYPES(sc), VTRIG_PLAYER_IN_ROOM) && !any_players_in_room(IN_ROOM(veh))) {
-			continue;	// needs players in room
-		}
-		if (!IS_SET(SCRIPT_TYPES(sc), VTRIG_GLOBAL | VTRIG_PLAYER_IN_ROOM) && !players_nearby_script(IN_ROOM(veh))) {
-			continue;	// needs players nearby
+		if (!(sc = SCRIPT(veh)) || !IS_SET(SCRIPT_TYPES(sc), VTRIG_RANDOM)) {
+			return;	// no random scripts
 		}
 
 		// success
@@ -1033,36 +1002,22 @@ void script_trigger_check(void) {
 	if (++my_cycle >= 5) {
 		my_cycle = 0;
 		HASH_ITER(hh, world_table, room, next_room) {
-			if (!(sc = SCRIPT(room))) {
-				continue;	// no scripts
+			if (!(sc = SCRIPT(room)) || !IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM)) {
+				continue;	// no random scripts
 			}
-			if (!IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM)) {
-			continue;	// no randoms
-			}
-			if (IS_SET(SCRIPT_TYPES(sc), WTRIG_PLAYER_IN_ROOM) && !any_players_in_room(room)) {
-				continue;	// needs players in room
-			}
-			if (!IS_SET(SCRIPT_TYPES(sc), WTRIG_GLOBAL | WTRIG_PLAYER_IN_ROOM) && !players_nearby_script(room)) {
-				continue;	// needs players nearby
-			}
+			
+			// success
 			random_wtrigger(room);
 		}
 	}
 	else {
 		// partial
 		LL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
-			if (!(sc = SCRIPT(room))) {
-				continue;	// no scripts
+			if (!(sc = SCRIPT(room)) || !IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM)) {
+				continue;	// no random scripts
 			}
-			if (!IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM)) {
-			continue;	// no randoms
-			}
-			if (IS_SET(SCRIPT_TYPES(sc), WTRIG_PLAYER_IN_ROOM) && !any_players_in_room(room)) {
-				continue;	// needs players in room
-			}
-			if (!IS_SET(SCRIPT_TYPES(sc), WTRIG_GLOBAL | WTRIG_PLAYER_IN_ROOM) && !players_nearby_script(room)) {
-				continue;	// needs players nearby
-			}
+			
+			// success
 			random_wtrigger(room);
 		}
 	}
