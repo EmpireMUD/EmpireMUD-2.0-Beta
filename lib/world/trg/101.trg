@@ -472,11 +472,11 @@ done
 ~
 #10141
 Delayed aggro greet/entry~
-0 giw 100
+0 gi 100
 ~
 if %actor%
   * Actor entered room - valid target?
-  if (%actor.is_npc% && %actor.mob_flagged(HUMAN)% && !%actor.aff_flagged(!ATTACK)%) || (%actor.is_pc% && %actor.level% > 25 && !%actor.on_quest(10147)%)
+  if (%actor.is_npc% && %actor.mob_flagged(HUMAN)% && !%actor.aff_flagged(!ATTACK)%) || (%actor.is_pc% && %actor.level% > 25 && !%actor.on_quest(10147)% && !%actor.nohassle%)
     eval target %actor%
   end
 else
@@ -492,7 +492,7 @@ else
       end
     end
     * validate
-    if (%person.is_npc% && %person.mob_flagged(HUMAN)% && !%person.aff_flagged(!ATTACK)%) || (%person.is_pc% && %person.level% > 25 && !%person.on_quest(10147)%)
+    if (%person.is_npc% && %person.mob_flagged(HUMAN)% && !%person.aff_flagged(!ATTACK)%) || (%person.is_pc% && %person.level% > 25 && !%person.on_quest(10147)% && !%person.nohassle%)
       eval target %person%
     end
     eval person %person.next_in_room%
@@ -514,6 +514,7 @@ end
 %echoaround% %target% %self.name% attacks %target.name%!
 %send% %target% %self.name% attacks you!
 mkill %target%
+look
 ~
 #10142
 Monsoon Rift cleanup + complete~

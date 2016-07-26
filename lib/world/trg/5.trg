@@ -291,8 +291,12 @@ if (%type% == 4)
     %echoaround% %master% %master.name%'s shadow seems to flap its wings.
     halt
   end
-  %send% %targ% %master.name%'s owl shadow wraps its dark wings around you, protecting you!
-  %send% %master% Your owl shadow wraps its dark wings around %targ.name%, protecting %targ.himher%!
+  if %targ% != %master%
+    %send% %targ% %master.name%'s owl shadow wraps its dark wings around you, protecting you!
+    %send% %master% Your owl shadow wraps its dark wings around %targ.name%, protecting %targ.himher%!
+  else
+    %send% %master% Your owl shadow wraps its dark wings around you, protecting you!
+  end
   %echoneither% %targ% %master% %master.name%'s owl shadow wraps its dark wings around %targ.name%, protecting %targ.himher%!
   eval amount 15 + %self.level% / 25
   dg_affect %targ% DODGE %amount% 30
@@ -340,6 +344,7 @@ if %type% == 2 && %had_effect%
 else
   wait 25 sec
 end
+look
 ~
 #512
 Basilisk Familiar Debuffs~

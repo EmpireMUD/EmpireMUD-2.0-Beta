@@ -2489,7 +2489,7 @@ static int process_output(descriptor_data *t) {
 		return (0);
 
 	/* Handle snooping: prepend "% " and send to snooper. */
-	if (t->snoop_by) {
+	if (t->snoop_by && *t->output) {
 		write_to_output("% ", t->snoop_by);
 		write_to_output(t->output, t->snoop_by);
 		write_to_output("%%", t->snoop_by);

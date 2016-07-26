@@ -4247,6 +4247,7 @@ ACMD(do_addnotes) {
 			free(acct->notes);
 		}
 		acct->notes = str_dup(notes);
+		SAVE_ACCOUNT(acct);
 		
 		if (index) {
 			strcpy(buf, index->fullname);
@@ -5763,12 +5764,14 @@ ACMD(do_purge) {
 
 			if (!REAL_NPC(vict)) {
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has purged %s.", GET_NAME(ch), GET_NAME(vict));
+				SAVE_CHAR(vict);
 				if (vict->desc) {
-					SAVE_CHAR(vict);
 					STATE(vict->desc) = CON_CLOSE;
 					vict->desc->character = NULL;
 					vict->desc = NULL;
 				}
+				
+				extract_all_items(vict);	// otherwise it duplicates items
 			}
 			extract_char(vict);
 		}
