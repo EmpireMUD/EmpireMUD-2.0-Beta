@@ -192,7 +192,7 @@ S
 #10141
 cactus barbary fig~
 a barbary fig~
-A barbary fig cactus turns is spiny pads toward you.
+A barbary fig cactus turns its spiny pads toward you.
 ~
 75 100 dhuxz cdiG
 0 0 8 23
@@ -381,7 +381,7 @@ moth sphinx giant~
 a giant sphinx moth~
 A giant sphinx moth buzzes over you.
 ~
-100 125 de m
+100 125 de mG
 0 0 2 28
 S
 $

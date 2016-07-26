@@ -1006,7 +1006,7 @@ spider~
 a spider~
 A spider scurries by.
 ~
-1 5 bdjo c
+1 5 bdjo cG
 0 0 7 9
 T 9188
 S
@@ -1015,7 +1015,7 @@ spider large~
 a large spider~
 A large spider creeps by.
 ~
-1 5 djo c
+1 5 djo cG
 0 0 9 9
 T 9188
 S
@@ -1079,7 +1079,7 @@ moth~
 a moth~
 A moth flutters nearby.
 ~
-1 5 bdjo c
+1 5 bdjo cG
 0 0 2 15
 T 9198
 S
