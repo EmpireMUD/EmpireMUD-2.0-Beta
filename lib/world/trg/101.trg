@@ -1644,7 +1644,7 @@ end
 eval dist %%room.distance(%instance.location%)%%
 if (%dist% > 4)
   mgoto %instance.location%
-elseif (%room.sector% == Flowing Lava || %room.sector% == Cooling Lava || %room.building% == Volcano Caldera)
+elseif (%room.sector% == Flowing Lava || %room.sector% == Cooling Lava || %room.building% == Volcano Caldera || %room.aff_flagged(*HAS-INSTANCE)%)
   * No Work
   halt
 else
