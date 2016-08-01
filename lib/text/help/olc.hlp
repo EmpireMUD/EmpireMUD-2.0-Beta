@@ -1059,6 +1059,8 @@ Available affects (do not set affects with *):
  !FLY - flying characters cannot enter, like an enchanted wall
  !WEATHER - suppress weather messages and command
  !DISREPAIR - never falls into disrepair (caution: this prevents empire decay)
+ *HAS-INSTANCE - an adventure is linked here
+ *DISMANTLING - someone started dismantling it
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d

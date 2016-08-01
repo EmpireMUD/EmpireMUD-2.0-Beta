@@ -3700,7 +3700,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			*str = '\x1';
 			switch (LOWER(*field)) {
 				case 'a': {	// room.a*
-					if (!str_cmp(field, "aft")) {
+					if (!str_cmp(field, "aff_flagged")) {
+						extern const char *room_aff_bits[];
+						
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, room_aff_bits, FALSE);
+							if (pos != NOTHING) {
+								snprintf(str, slen, "%d", ROOM_AFF_FLAGGED(r, BIT(pos)) ? 1 : 0);
+							}
+							else {
+								snprintf(str, slen, "0");
+							}
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
+					else if (!str_cmp(field, "aft")) {
 						direction_vars(r, AFT, subfield, str, slen);
 					}
 					break;
