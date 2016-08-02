@@ -770,7 +770,7 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 	for (x = -1 * radius; x <= radius && !found_building; ++x) {
 		for (y = -1 * radius; y <= radius && !found_building; ++y) {
 			// skip 0,0 because that is the city center
-			if (x != 0 && y != 0) {
+			if (x != 0 || y != 0) {
 				to_room = real_shift(center, x, y);
 				
 				// we skip compute_distance here so we're really checking a
