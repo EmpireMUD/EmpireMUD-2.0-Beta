@@ -1,0 +1,59 @@
+#10190
+Flowing Lava~
+A Raging Lava Flow~
+'^' 3 0 100 sv 0
+D0
+/\/\~
+&R~
+E
+4 0 0.01 8
+M
+9060 0.10 d
+S
+#10191
+Cooling Lava~
+A Cooling Lava Flow~
+'^' 34 0 100 sv 0
+D0
+/\/\~
+&w~
+E
+4 0 0.01 8
+M
+9060 0.10 d
+S
+#10192
+Volcanic Mountain~
+On a Volcanic Mountain~
+'^' 27 0 100 sv 0
+C
+dig~
+D0
+/\/\~
+&w~
+E
+4 0 1.00 8
+E
+9 0 100.00 8
+I 5 104 17.00 1 X  # DIG: a red bloodstone
+I 5 100 83.00 1 X  # DIG: a rock
+M
+9060 0.05 d
+M
+9143 10.00 dh
+M
+9142 10.00 dh
+M
+9017 5.00 dg
+M
+9118 10.00 adg
+M
+9008 10.00 bd
+M
+9025 10.00 d
+M
+9005 10.00 bd
+M
+9018 10.00 d
+S
+$
