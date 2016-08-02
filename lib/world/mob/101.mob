@@ -384,4 +384,14 @@ A giant sphinx moth buzzes over you.
 100 125 de mG
 0 0 2 28
 S
+#10190
+lavaflow flow~
+the raging lavaflow~
+The lavaflow rages by.
+~
+150 150 dhk dkln
+0 0 0 15
+T 10190
+T 10191
+S
 $

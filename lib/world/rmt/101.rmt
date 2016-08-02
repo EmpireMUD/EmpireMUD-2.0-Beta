@@ -70,7 +70,7 @@ A Torchlit Path~
    Large, tangled roots form a pathway over the puddling water. Bright torches
 line the path, somehow untouched by the monsoon rains. Rain is light on the
 path, but the droplets that hit you are large and cold. You can't see past the
-first line of plants, though, as the monsoon rain forms a wall of water.  
+first line of plants, though, as the monsoon rain forms a wall of water.
 ~
 acgi k
 D14
@@ -222,5 +222,12 @@ M 0 10141 66.66 10
 M 0 10142 66.66 10
 M 0 10147 100.00 1
 M 1 10172 100.00 1
+S
+#10190
+Inside the Volcano~
+This magma chamber is the hidden spawn location for the volcano's lavaflow.
+~
+gk 0
+M 0 10190 100.00 1
 S
 $

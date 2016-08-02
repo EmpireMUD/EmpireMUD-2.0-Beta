@@ -516,7 +516,7 @@ a bluebird~
 A bluebird is pecking at the ground.
 ~
 1 5 djo m
-0 0 2 10
+0 0 2 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 S
 #9149
@@ -525,7 +525,7 @@ a small finch~
 A small finch is perched here.
 ~
 1 5 djo m
-0 0 2 10
+0 0 2 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 S
 #9150
@@ -534,7 +534,7 @@ a woodpecker~
 A woodpecker is hammering away at a tree.
 ~
 1 5 djo m
-0 0 2 10
+0 0 2 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 S
 #9151
@@ -543,7 +543,7 @@ a bird of paradise~
 A bird of paradise is displaying its feathers.
 ~
 10 20 djo m
-0 0 2 10
+0 0 2 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 S
 #9152

@@ -22,4 +22,19 @@ j
 C
 enter rift~
 S
+#10190
+Volcano Caldera~
+The Caldera of a Raging Volcano~
+&w/&R\/&w\~
+1000 0 d 0
+0 0 0 -1
+A
+k
+E
+volcano caldera lava~
+   The mountain has opened up into a raging caldera, spewing lava down the
+mountainside. Above the caldera, the air is hot enough to blister your skin. 
+~
+T 10196
+S
 $

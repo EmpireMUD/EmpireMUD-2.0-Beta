@@ -13,9 +13,9 @@ do the trick. Follow these instructions to complete the quest:
 ~
    You apply the zephyr salve to the egg, which immediately takes on a bright
 red glow and begins to crack... A huge, rust-colored roc alights above you on
-the edge of the nest as her baby breaks out of the shell.  
+the edge of the nest as her baby breaks out of the shell.
 ~
-4 bcd 100 125 -1
+5 bcde 100 125 -1
 A
 2 11001
 P
@@ -40,14 +40,14 @@ S
 #11001
 Protect the Hatchling~
    The gigantic egg is about to hatch, but the chick inside will need some
-supplies if it's going to survive. You receive a supply list for the nest. 
-Return when you've made them all.  
+supplies if it's going to survive. You receive a supply list for the nest.
+Return when you've made them all.
 ~
    You arrive with supplies just as the egg hatches. A rust-colored roc the
 size of a temple alights on the edge of the nest. She looks pleased with the
-supplies you've brought.  
+supplies you've brought.
 ~
-10 bcd 100 125 -1
+11 bcde 100 125 -1
 A
 2 11001
 P
@@ -85,7 +85,7 @@ you're caught, or are in combat when the timer ends, you will fail the quest.
 ~
 You trade the egg for your rewards, relieved that you escaped safely.
 ~
-7 bc 100 125 -1
+8 bce 100 125 -1
 A
 2 11001
 P
@@ -113,11 +113,11 @@ Smash the Egg~
    These fearsome rocs have been killing farm animals in this region. You can
 put a stop to it now! You smash the egg, preventing future generations of the
 legendary bird from terrorizing the countryside. Now you merely need to contend
-with the mother...  
+with the mother...
 ~
 You retrieve your rewards from the dead roc.
 ~
-7 bc 100 125 -1
+8 bce 100 125 -1
 A
 2 11001
 P

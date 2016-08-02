@@ -1027,7 +1027,7 @@ void extract_char_final(char_data *ch) {
 	}
 	
 	// close the desc
-	if (ch->desc) {
+	if (!freed && ch->desc) {
 		ch->desc->character = NULL;
 		STATE(ch->desc) = CON_CLOSE;
 		ch->desc = NULL;

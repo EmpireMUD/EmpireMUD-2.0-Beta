@@ -111,6 +111,7 @@ For each type, there is a help file named &yRTRIG <type>&0.
 All room scripts provide the &c%room%&0 variable.
 
 When using field - The variable returns:
+&caff_flagged(AFF)&0 - True if the room has an affect flag on it.
 &cbld_dir(dir)&0 - Rotates the given direction based on which way the building
    is facing (compared to North). Returns the same dir if no building.
 &cbuilding&0 - The name of the building on the room, if any.
@@ -142,7 +143,7 @@ When using field - The variable returns:
 &cvnum&0 - The room's vnum.
 &cweather&0 - current weather: sunny, cloudy, rainy, or lightning
 
-See also: EMPIRE VARS
+See also: EMPIRE VARS, REDIT AFFECTS
 #d
 "ZONE RESET TRIGGER" "RTRIG ZONE RESET" TRIGEDIT-ROOM-ZONE-RESET TRIGEDIT-ROOM-ZRESET TRIGEDIT-ROOM-LOAD
 
