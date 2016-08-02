@@ -55,7 +55,7 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 struct instance_data *real_instance(any_vnum instance_id);
 void reset_instance(struct instance_data *inst);
 static void scale_instance_to_level(struct instance_data *inst, int level);
-void unlink_instance_entrance(room_data *room);
+void unlink_instance_entrance(room_data *room, struct instance_data *inst);
 
 
 // local globals
@@ -953,7 +953,7 @@ void delete_instance(struct instance_data *inst) {
 		}
 	
 		// unlink from location:
-		unlink_instance_entrance(inst->location);
+		unlink_instance_entrance(inst->location, inst);
 	}
 	
 	// any portal in will be cleaned up by delete_room
@@ -1210,18 +1210,14 @@ void prune_instances(void) {
 * served as the link for an adventure instance.
 *
 * @param room_data *room The map (or interior) location that was the anchor for an instance.
+* @param struct instance_data *inst The instance being cleaned up.
 */
-void unlink_instance_entrance(room_data *room) {
+void unlink_instance_entrance(room_data *room, struct instance_data *inst) {
 	extern bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum);
 	
+	adv_data *adv = inst->adventure;
 	struct trig_proto_list *tpl;
 	trig_data *proto, *trig;
-	adv_data *adv = NULL;
-	
-	// detect adventure
-	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
-		adv = COMPLEX_DATA(room)->instance->adventure;
-	}
 	
 	// exits to it will be cleaned up by delete_room
 	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY)) {

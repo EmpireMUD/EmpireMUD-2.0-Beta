@@ -56,10 +56,10 @@ An enchanted tree is lying here, leaking mana from its stump.~
 these trees is used in certain advanced crafts, to bring magical properties to
 highly skilled artifacts.
 ~
-3 e a 7
+3 e a 8
 0 0 0
 0 0
-I 11 1002 100.00 1  # LIGHT: a roaring fire
+I 11 617 100.00 1  # LIGHT: a magical fire
 I 17 604 100.00 2  # SAW: some stellar magewood
 R
 5118 0
@@ -72,10 +72,10 @@ A pile of magewood is lying here.~
 from its ends, forming a cool mist on the ground. Magewood is used in some
 highly skilled crafts.
 ~
-3 e a 6
+3 e a 7
 0 0 0
 0 0
-I 11 1002 100.00 1  # LIGHT: a roaring fire
+I 11 617 100.00 1  # LIGHT: a magical fire
 M
 0
 You place $p in midair, where it seems to float.~
@@ -283,5 +283,16 @@ O
 13 g
 R
 5121 0
+S
+#617
+fire magical magenta~
+a magical fire~
+A magical magenta fire is roaring here!~
+   A pile of bright pink wood is burning, releasing a bright, hot magenta flame
+and a cool, smoky mist of mana.  
+~
+3 c 0 1
+0 0 0
+0 48
 S
 $
