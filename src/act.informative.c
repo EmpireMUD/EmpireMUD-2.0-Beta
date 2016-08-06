@@ -39,8 +39,10 @@ extern const char *class_role[];
 extern const char *class_role_color[];
 extern const char *dirs[];
 extern struct help_index_element *help_table;
+extern const char *item_types[];
 extern int top_of_helpt;
 extern const char *month_name[];
+extern const char *wear_bits[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // external functions
@@ -2103,21 +2105,155 @@ ACMD(do_helpsearch) {
 
 
 ACMD(do_inventory) {
-	empire_data *ch_emp, *room_emp;
+	skip_spaces(&argument);
 	
-	if (!IS_NPC(ch)) {
-		do_coins(ch, "", 0, 0);
-	}
-
-	msg_to_char(ch, "You are carrying %d/%d items:\r\n", IS_CARRYING_N(ch), CAN_CARRY_N(ch));
-	list_obj_to_char(ch->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
-
-	if (IS_COMPLETE(IN_ROOM(ch)) && GET_LOYALTY(ch) && can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		ch_emp = GET_LOYALTY(ch);
-		room_emp = ROOM_OWNER(IN_ROOM(ch));
+	if (!*argument) {	// no-arg: traditional inventory
+		empire_data *ch_emp, *room_emp;
 		
-		if (!room_emp || ch_emp == room_emp || has_relationship(ch_emp, room_emp, DIPL_TRADE)) {
-			inventory_store_building(ch, IN_ROOM(ch), ch_emp);
+		if (!IS_NPC(ch)) {
+			do_coins(ch, "", 0, 0);
+		}
+
+		msg_to_char(ch, "You are carrying %d/%d items:\r\n", IS_CARRYING_N(ch), CAN_CARRY_N(ch));
+		list_obj_to_char(ch->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
+
+		if (IS_COMPLETE(IN_ROOM(ch)) && GET_LOYALTY(ch) && can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+			ch_emp = GET_LOYALTY(ch);
+			room_emp = ROOM_OWNER(IN_ROOM(ch));
+			
+			if (!room_emp || ch_emp == room_emp || has_relationship(ch_emp, room_emp, DIPL_TRADE)) {
+				inventory_store_building(ch, IN_ROOM(ch), ch_emp);
+			}
+		}
+	}
+	else {	// advanced inventory
+		char word[MAX_INPUT_LENGTH], heading[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
+		int cmp_type = NOTHING, wear_type = NOTHING, type_type = NOTHING;
+		bool kept = FALSE, not_kept = FALSE, identify = FALSE;
+		bitvector_t cmpf_type = NOBITS;
+		obj_data *obj;
+		size_t size;
+		int count;
+		
+		*heading = '\0';
+		
+		// parse flag if any
+		if (*argument == '-') {
+			switch (*(argument+1)) {
+				case 'c': {
+					strcpy(word, argument+2);
+					*argument = '\0';	// no further args
+					if (!*word) {
+						msg_to_char(ch, "Show what components?\r\n");
+						return;
+					}
+					if (!parse_component(word, &cmp_type, &cmpf_type)) {
+						msg_to_char(ch, "Unknown component type '%s'.\r\n", word);
+						return;
+					}
+					
+					snprintf(heading, sizeof(heading), "Items of type '%s':", component_string(cmp_type, cmpf_type));
+					break;
+				}
+				case 'w': {
+					half_chop(argument+2, word, argument);
+					if (!*word) {
+						msg_to_char(ch, "Show items worn on what part?\r\n");
+						return;
+					}
+					if ((wear_type = search_block(word, wear_bits, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown wear location '%s'.\r\n", word);
+						return;
+					}
+					
+					snprintf(heading, sizeof(heading), "Items worn on %s:", wear_bits[wear_type]);
+					break;
+				}
+				case 't': {
+					half_chop(argument+2, word, argument);
+					if (!*word) {
+						msg_to_char(ch, "Show items of what type?\r\n");
+						return;
+					}
+					if ((type_type = search_block(word, item_types, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown item type '%s'.\r\n", word);
+						return;
+					}
+					
+					snprintf(heading, sizeof(heading), "%s items:", item_types[type_type]);
+					break;
+				}
+				case 'k': {
+					kept = TRUE;
+					snprintf(heading, sizeof(heading), "Items marked (keep):");
+					break;
+				}
+				case 'n': {
+					not_kept = TRUE;
+					snprintf(heading, sizeof(heading), "Items not marked (keep):");
+					break;
+				}
+				case 'i': {
+					identify = TRUE;
+					break;
+				}
+			}
+		}
+		
+		// if we get this far, it's okay
+		skip_spaces(&argument);
+		if (!*heading && *argument) {
+			snprintf(heading, sizeof(heading), "Items matching '%s':", argument);
+		}
+		else if (!*heading && !*argument) {
+			snprintf(heading, sizeof(heading), "Items:");
+		}
+		
+		// build string
+		size = snprintf(buf, sizeof(buf), "%s\r\n", heading);
+		count = 0;
+		
+		LL_FOREACH2(ch->carrying, obj, next_content) {
+			// break out early
+			if (size + 80 > sizeof(buf)) {
+				size += snprintf(buf + size, sizeof(buf) - size, "... and more\r\n");
+				break;
+			}
+			
+			// qualify it
+			if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(obj))) {
+				continue;	// not matching keywords
+			}
+			if (cmp_type != NOTHING && GET_OBJ_CMP_TYPE(obj) != cmp_type) {
+				continue;	// not matching component type
+			}
+			if (cmpf_type != NOBITS && (GET_OBJ_CMP_FLAGS(obj) & cmpf_type) != cmpf_type) {
+				continue;	// not matching component flags
+			}
+			if (wear_type != NOTHING && !CAN_WEAR(obj, BIT(wear_type))) {
+				continue;	// not matching wear pos
+			}
+			if (type_type != NOTHING && GET_OBJ_TYPE(obj) != type_type) {
+				continue;	// not matching obj type
+			}
+			if (kept && !OBJ_FLAGGED(obj, OBJ_KEEP)) {
+				continue;	// not matching keep flag
+			}
+			if (not_kept && OBJ_FLAGGED(obj, OBJ_KEEP)) {
+				continue;	// not matching no-keep flag
+			}
+			
+			// looks okay
+			if (identify) {
+				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s (%d)\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s (%d)\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
+			}
+		}
+		
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
 		}
 	}
 }

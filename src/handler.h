@@ -186,6 +186,7 @@ void empty_obj_before_extract(obj_data *obj);
 void extract_obj(obj_data *obj);
 extern obj_data *fresh_copy_obj(obj_data *obj, int scale_level);
 extern bool objs_are_identical(obj_data *obj_a, obj_data *obj_b);
+extern bool parse_component(char *str, int *type, bitvector_t *flags);
 void remove_from_object_list(obj_data *obj);
 
 // object binding handlers
