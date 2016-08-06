@@ -2184,16 +2184,19 @@ ACMD(do_inventory) {
 					break;
 				}
 				case 'k': {
+					half_chop(argument+2, word, argument);
 					kept = TRUE;
 					snprintf(heading, sizeof(heading), "Items marked (keep):");
 					break;
 				}
 				case 'n': {
+					half_chop(argument+2, word, argument);
 					not_kept = TRUE;
 					snprintf(heading, sizeof(heading), "Items not marked (keep):");
 					break;
 				}
 				case 'i': {
+					half_chop(argument+2, word, argument);
 					identify = TRUE;
 					break;
 				}
