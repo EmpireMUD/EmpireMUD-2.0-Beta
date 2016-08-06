@@ -2248,7 +2248,7 @@ ACMD(do_inventory) {
 				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s (%d)\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			}
 			else {
-				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s (%d)\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
+				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
 			}
 		}
 		
