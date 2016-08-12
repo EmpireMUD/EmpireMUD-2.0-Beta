@@ -645,9 +645,8 @@ INTERACTION_FUNC(finish_gathering) {
 		act(buf, FALSE, ch, obj, 0, TO_CHAR);
 		act("$n finds $p!", TRUE, ch, obj, 0, TO_ROOM);
 		
-		if (get_skill_level(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
-			gain_skill_exp(ch, SKILL_SURVIVAL, 10);
-		}
+		gain_ability_exp(ch, ABIL_SCAVENGING, 10);
+		
 		// action does not end normally
 		
 		return TRUE;
@@ -967,9 +966,7 @@ void perform_saw(char_data *ch) {
 		GET_ACTION_RESOURCES(ch) = NULL;
 		
 		if (success && proto) {
-			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-				gain_skill_exp(ch, SKILL_EMPIRE, 10);
-			}
+			gain_ability_exp(ch, ABIL_CHORES, 10);
 			
 			// lather, rinse, rescrape
 			do_saw(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -1075,9 +1072,7 @@ void process_chipping(char_data *ch) {
 		GET_ACTION_RESOURCES(ch) = NULL;
 
 		if (success) {
-			if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
-				gain_skill_exp(ch, SKILL_TRADE, 25);
-			}
+			gain_ability_exp(ch, ABIL_PRIMITIVE_CRAFTS, 25);
 			
 			// repeat! (no -paul) note: keyword-targeting is hard because "chipped rock" also has "rock" as an alias
 			// do_chip(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -1125,9 +1120,7 @@ void process_chop(char_data *ch) {
 		// attempt to change terrain
 		change_chop_territory(IN_ROOM(ch));
 		
-		if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-			gain_skill_exp(ch, SKILL_EMPIRE, 15);
-		}
+		gain_ability_exp(ch, ABIL_CHORES, 15);
 		
 		// stoppin choppin -- don't use stop_room_action because we also restart them
 		// (this includes ch)
@@ -1163,9 +1156,7 @@ void process_digging(char_data *ch) {
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, finish_digging)) {
 			// success
-			if (get_skill_level(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
-				gain_skill_exp(ch, SKILL_SURVIVAL, 10);
-			}
+			gain_ability_exp(ch, ABIL_SCAVENGING, 10);
 		
 			// character is still there and not digging?
 			if (GET_ACTION(ch) == ACT_NONE && in_room == IN_ROOM(ch)) {
@@ -1492,9 +1483,7 @@ void process_harvesting(char_data *ch) {
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_harvesting)) {
 			// skillups
-			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-				gain_skill_exp(ch, SKILL_EMPIRE, 30);
-			}
+			gain_ability_exp(ch, ABIL_CHORES, 30);
 			gain_ability_exp(ch, ABIL_MASTER_FARMER, 5);
 		}
 		else {
@@ -1553,10 +1542,7 @@ void process_mining(char_data *ch) {
 			if (success && in_room == IN_ROOM(ch)) {
 				// skillups
 				if (GET_GLOBAL_ABILITY(glb) != NO_ABIL) {
-					gain_ability_exp(ch, GET_GLOBAL_ABILITY(glb), 5);
-				}
-				else if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-					gain_skill_exp(ch, SKILL_EMPIRE, 10);
+					gain_ability_exp(ch, GET_GLOBAL_ABILITY(glb), 10);
 				}
 				
 				// go again! (if ch is still there)
@@ -1603,9 +1589,7 @@ void process_minting(char_data *ch) {
 		increase_coins(ch, emp, num);
 		
 		GET_ACTION(ch) = ACT_NONE;
-		if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-			gain_skill_exp(ch, SKILL_EMPIRE, 10);
-		}
+		gain_ability_exp(ch, ABIL_CHORES, 30);
 		
 		if ((proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
 			strcpy(tmp, fname(GET_OBJ_KEYWORDS(proto)));
@@ -1738,17 +1722,13 @@ void process_picking(char_data *ch) {
 		}
 		else {
 			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FIND_HERB, finish_picking_herb)) {
-				if (get_skill_level(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
-					gain_skill_exp(ch, SKILL_SURVIVAL, 10);
-				}
+				gain_ability_exp(ch, ABIL_SCAVENGING, 10);
 				found = TRUE;
 			}
 			else if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_HARVEST) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_CROP_FLAGGED(IN_ROOM(ch), CROPF_IS_ORCHARD))) {
 				// only orchards allow pick -- and only run this if we hit no herbs at all
 				if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_picking_crop)) {
-					if (get_skill_level(ch, SKILL_SURVIVAL) < EMPIRE_CHORE_SKILL_CAP) {
-						gain_skill_exp(ch, SKILL_SURVIVAL, 10);
-					}
+					gain_ability_exp(ch, ABIL_SCAVENGING, 10);
 					found = TRUE;
 				}
 			}
@@ -1802,9 +1782,8 @@ void process_planting(char_data *ch) {
 		msg_to_char(ch, "You have finished planting!\r\n");
 		act("$n finishes planting!", FALSE, ch, 0, 0, TO_ROOM);
 		
-		if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-			gain_skill_exp(ch, SKILL_EMPIRE, 30);
-		}
+		gain_ability_exp(ch, ABIL_CHORES, 30);
+		
 		GET_ACTION(ch) = ACT_NONE;
 	}
 }
@@ -1913,9 +1892,7 @@ void process_quarrying(char_data *ch) {
 		GET_ACTION(ch) = ACT_NONE;
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_QUARRY, finish_quarrying)) {
-			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-				gain_skill_exp(ch, SKILL_EMPIRE, 25);
-			}
+			gain_ability_exp(ch, ABIL_CHORES, 25);
 		
 			add_depletion(IN_ROOM(ch), DPLTN_QUARRY, TRUE);
 			
@@ -2025,9 +2002,7 @@ void process_scraping(char_data *ch) {
 		GET_ACTION_RESOURCES(ch) = NULL;
 		
 		if (success && proto) {
-			if (get_skill_level(ch, SKILL_EMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-				gain_skill_exp(ch, SKILL_EMPIRE, 10);
-			}
+			gain_ability_exp(ch, ABIL_CHORES, 10);
 			
 			// lather, rinse, rescrape
 			do_scrape(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -2165,9 +2140,7 @@ void process_tanning(char_data *ch) {
 		GET_ACTION_RESOURCES(ch) = NULL;
 		
 		if (success) {
-			if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
-				gain_skill_exp(ch, SKILL_TRADE, 20);
-			}
+			gain_ability_exp(ch, ABIL_PRIMITIVE_CRAFTS, 20);
 	
 			// repeat!
 			do_tan(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);

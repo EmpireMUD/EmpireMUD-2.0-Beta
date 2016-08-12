@@ -3090,10 +3090,10 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		// exp gain
 		if (combat_round && can_gain_skill && can_gain_exp_from(ch, victim)) {
 			if (!IS_NPC(ch)) {
-				gain_ability_exp(ch, ABIL_FINESSE, 2);
-				if (get_skill_level(ch, SKILL_BATTLE) < EMPIRE_CHORE_SKILL_CAP) {
-					gain_skill_exp(ch, SKILL_BATTLE, 4);
+				if (attack_hit_info[w_type].disarmable) {
+					gain_ability_exp(ch, ABIL_WEAPON_PROFICIENCY, 5);
 				}
+				gain_ability_exp(ch, ABIL_FINESSE, 2);
 				if (affected_by_spell(ch, ATYPE_ALACRITY)) {
 					gain_ability_exp(ch, ABIL_ALACRITY, 2);
 				}
@@ -3117,6 +3117,10 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		
 		// check post-hit skills
 		if (result > 0 && !EXTRACTED(victim) && !IS_DEAD(victim) && IN_ROOM(victim) == IN_ROOM(ch)) {
+			if (!IS_NPC(victim) && can_gain_exp_from(victim, ch)) {
+				gain_ability_exp(victim, ABIL_EVASION, 5);
+			}
+			
 			// cut deep: players only
 			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_BATTLE) && skill_check(ch, ABIL_CUT_DEEP, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
 				apply_dot_effect(victim, ATYPE_CUT_DEEP, CHOOSE_BY_ABILITY_LEVEL(cut_deep_durations, ch, ABIL_CUT_DEEP), DAM_PHYSICAL, 5, 5, ch);
