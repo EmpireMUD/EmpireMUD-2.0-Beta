@@ -3109,6 +3109,9 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				}
 			}
 		}
+		if (result >= 0 && combat_round && can_gain_skill && !IS_NPC(victim) && can_gain_exp_from(victim, ch)) {
+			gain_ability_exp(victim, ABIL_EVASION, 5);
+		}
 		
 		/* check if the victim has a hitprcnt trigger */
 		if (result > 0 && !EXTRACTED(victim) && !IS_DEAD(victim) && IN_ROOM(victim) == IN_ROOM(ch)) {
@@ -3117,10 +3120,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		
 		// check post-hit skills
 		if (result > 0 && !EXTRACTED(victim) && !IS_DEAD(victim) && IN_ROOM(victim) == IN_ROOM(ch)) {
-			if (!IS_NPC(victim) && can_gain_exp_from(victim, ch)) {
-				gain_ability_exp(victim, ABIL_EVASION, 5);
-			}
-			
 			// cut deep: players only
 			if (!IS_NPC(ch) && !AFF_FLAGGED(victim, AFF_IMMUNE_BATTLE) && skill_check(ch, ABIL_CUT_DEEP, DIFF_RARELY) && weapon && attack_hit_info[w_type].weapon_type == WEAPON_SHARP) {
 				apply_dot_effect(victim, ATYPE_CUT_DEEP, CHOOSE_BY_ABILITY_LEVEL(cut_deep_durations, ch, ABIL_CUT_DEEP), DAM_PHYSICAL, 5, 5, ch);
