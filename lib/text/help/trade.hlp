@@ -99,7 +99,7 @@ Craft items:
 
 See also: CRAFT
 #
-"BASIC CRAFTS" CRAFT CRAFTS
+"BASIC CRAFTS"
 
 Basic Crafts (Trade ability)
 
@@ -107,17 +107,6 @@ Command:  craft [number] <item>
           craft info <item>
 
 All crafting abilities train when you complete recipes that require them.
-Unskilled crafts can train Trade up to 15.
-
-Unskilled crafts:
-  handle
-  stone axe
-  flint set
-  stone hammer
-  spear
-
-With Archery, you can craft:
-  arrows
 
 Basic Crafts:
   bricks
@@ -132,7 +121,8 @@ Basic Crafts:
   violet dye  (glassblowing)
   orange dye  (glassblowing)
 
-See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP
+See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP,
+PRIMITIVE CRAFTS
 #
 CARTS WAGONS CARRIAGES CARAVANS "LAND VEHICLES"
 
@@ -177,25 +167,39 @@ See also: SEWING
 #
 COOK COOKING BAKE BAKING
 
+Cook (Trade ability)
+
 Command:  cook [number] <item>
           cook info <item>
 
 The cook command (formerly "bake") allows you to make food from a variety of
 raw ingredients. To cook, you'll need a heat source: a cooking fire, a kitchen,
 a bakery, an alchemist, or a laboratory. The Touch of Flame ability also works.
+Many basic cooked foods also give you small food buffs (see WELL-FED).
 
-Without any skill or ability, you can always cook:
-  bread
-  tortilla
-  fried meat pie
-  casserole
-  jerky
-  burrito
+You can cook:
+  bean soup                              pumpkin pie (charisma)
+  fried meat pie (strength)              blackberry tart
+  apple pie (charisma)                   nutty squash flatbread (dodge
+  peach pie (charisma)                   roast plate (resist-physical)
+  cherry pie (charisma)                  fish plate (wits)
+  candied apple                          catfish plate (intelligence)
+  casserole (inventory)                  roast meat
+  jerky (bonus-physical)                 banana pie (charisma)
+  tortilla                               banana bread (moves)
+  burrito (resist-physical)              spicy jerky (bonus-magical)
+  bread (move-regen)                     potato slices
+  fried rice (dexterity)                 prunes (age)
+  salt pork                              plum pie (charisma)
+  chicken and vegetables (health)        strawberry pie (charisma)
+  ham and cheese sandwich (move-regen)   strawberry jam (mana-regen)
+  fruit bowl                             candied mango
+  orange chicken and pears               blueberry pie (charisma)
+  sausage link (to-hit)                  blueberry jam (mana)
+  road biscuit (block)                   coffee
+  mushroom plate (resist-magical)        oat cake (bonus-healing)
 
-  apple pie
-  cherry pie
-  peach pie
-  candied apple  (apiaries)
+There are also more recipes to find.
 
 See also: COOKING FIRE, FAMILY RECIPES, GOURMET CHEF, CRAFTING LEVEL, MILL,
    BAKERY, RESOURCES, KEEP, RECIPES, COOK INFO
@@ -314,7 +318,7 @@ FORGE
 
 Forge (Trade ability)
 
-Building:  (FF)  Forge  (no skill required)
+Building:  (FF)  Forge  (Basic Buildings)
 Tool:  hammer
 Commands:  forge [number] <item>
            forge info <item>
@@ -652,6 +656,28 @@ With Pottery you can craft:
   trinket of conveyance
 
 See also: CLAY, DIG, FINE POTTERY, MASTER CRAFTSMAN
+#
+"PRIMITIVE CRAFTS" CRAFT CRAFTS
+
+Primitive Crafts (Trade ability)
+
+Command:  craft [number] <item>
+          craft info <item>
+
+All crafting abilities train when you complete recipes that require them.
+
+Primitive crafts:
+  handle
+  stone axe
+  flint set
+  stone hammer
+  spear
+
+With Archery, you can craft:
+  arrows
+
+See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP,
+BASIC CRAFTS
 #
 "PRISMATIC CRYSTALS" "PRISMATIC CRYSTAL"
 
