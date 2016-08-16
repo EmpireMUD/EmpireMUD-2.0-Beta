@@ -1,8 +1,8 @@
 #3014
 bean soup~
-8 12  # 12x bean soup
-3 -1 hi 6 3014
+8 12
+3 293 hi 6 3014
 R
-3014 2  # 2x some dry beans
+3014 2 0 0
 S
 $

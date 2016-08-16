@@ -699,6 +699,8 @@ if !%actor%
 end
 if %actor.fighting%
   * If the egg timer expires: if the player is fighting, they lose the egg.
+  eval enemy %actor.fighting%
+  %send% %actor% The fight with %enemy.name% destroys the stolen egg!
   %purge% %self%
   halt
 else
