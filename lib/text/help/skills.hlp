@@ -1,11 +1,12 @@
 "ABILITY POINTS"
 
 You earn "ability" points at certain skill levels. These points are used to
-purchase abilities from the skill's tree.
+purchase abilities from the skill's tree. Abilities that are level 0 are always
+available and do not cost ability points.
 
 You earn ability points at these levels:
  Basic: 1, 5, 10, 15, 20, 25, 30, 40, 50  (9 total)
- Specialty: 60, 70, 75  (3 total)
+ Specialty: 60, 70, 75 x2  (4 total)
  Class: 80, 90, 100  (3 total)
 
 You can buy abilities with "skill buy <ability>".
@@ -212,7 +213,7 @@ container to hold the milk. Cows can be milked once or twice per day.
 #
 MILL MILLING
 
-Building:  (MM)  Mill  (no skill required)
+Building:  (MM)  Mill  (Basic Buildings)
 Stored at the mill:  cornmeal, flour
 Command:  mill [number] <item>
           mill info <item>
@@ -221,13 +222,13 @@ You can mill:
   wheat into flour
   corn into cornmeal
 
-You must do this at a Mill building. Milling will gain Trade skill up to 15.
+You must do this at a Mill building.
 
 See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP
 #
 MINE MINES
 
-Building:  &y/&0[]&y\&0  Mine  (no skill required)
+Building:  &y/&0[]&y\&0  Mine  (Basic Buildings)
 Command:  mine
 
 "Mine" is both a building type, and the command to work in that building. Mines
@@ -324,8 +325,7 @@ Command:  press [number] <item>
 You can press:
   olives into olive oil
 
-You must do this at an Oilmaker building. Pressing oil will gain Trade skill up
-to 15.
+You must do this at an Oilmaker building.
 
 See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL
 #
@@ -474,11 +474,9 @@ See also: SKILLS, SLEEP
 #
 "TRAINING SKILLS" "SKILL POINTS" "SKILL EXPERIENCE" "SKILLUPS" EXPERIENCE
 
-The two ways to gain skill levels are:
-- By using "yellow" abilities from the skill's tree (abilities that aren't at
-  max).
-- For skills under level 15, you can usually gain skill by doing "chores". See
-  the help file for each skill tree for more information on leveling it.
+You can gain skill experience and levels by using any of the "yellow" abilities
+in the skill tree (abilities that aren't at max yet). You can't gain more than
+10 skill levels from any one ability.
 
 Each skill has an experience rating, as a percentage. This is your chance to
 gain a skill level each time you use one of the skill tree's abilities -- the

@@ -482,10 +482,12 @@ if %actor%
 else
   * entry - look for valid target in room
   eval person %room.people%
+  eval count 0
   while %person%
     * Manage cactus population
-    if %person.vnum% == %self.vnum%
-      if %random.2% == 2
+    if %person.vnum% >= 10140 && %person.vnum% <= 10142
+      eval count %count% + 1
+      if %count% >= 2 || %random.2% == 2
         %echo% %self.name% turns back into an ordinary cactus.
         %purge% %self%
         halt

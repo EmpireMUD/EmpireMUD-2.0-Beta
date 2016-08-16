@@ -4019,6 +4019,59 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 
 
 /**
+* Takes player input of a complex component like "large block" or
+* "large, single fruit" and gets the CMP_ and CMPF_ settings from it.
+*
+* @param char *str The character's input.
+* @param int *type A variable to bind a CMP_ type (may be NOTHING or CMP_NONE).
+* @param bitvector_t *flags Any CMPF_ flags requested.
+* @return bool TRUE if the whole string parses into a component, FALSE if not.
+*/
+bool parse_component(char *str, int *type, bitvector_t *flags) {
+	extern const char *component_types[];
+	extern const char *component_flags[];
+	
+	char temp[MAX_INPUT_LENGTH], word[MAX_INPUT_LENGTH], *ptr;
+	int flg;
+	
+	// base setup
+	*type = NOTHING;
+	*flags = NOBITS;
+	
+	// make copy
+	strncpy(temp, str, MAX_INPUT_LENGTH-1);
+	temp[MAX_INPUT_LENGTH-1] = '\0';	// safety firsty
+	
+	// remove commas
+	while ((ptr = strchr(temp, ','))) {
+		*ptr = ' ';
+	}
+	
+	// check words 1 at a time
+	while (*temp) {
+		half_chop(temp, word, temp);	// split out first word
+		
+		if (!*temp) {	// final word is the component type
+			*type = search_block(word, component_types, FALSE);
+		}
+		else {	// each previous word is a possible flag
+			flg = search_block(word, component_flags, FALSE);
+			if (flg != NOTHING) {
+				*flags |= BIT(flg);
+			}
+			else {
+				// bad flag
+				*type = NOTHING;
+				return FALSE;
+			}
+		}
+	}
+	
+	return (*type != NOTHING && *type != CMP_NONE);
+}
+
+
+/**
 * Remove an object from the global object list.
 *
 * @param obj_data *obj The item to remove from the global object list.

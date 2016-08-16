@@ -634,7 +634,7 @@ void clear_char_abilities(char_data *ch, any_vnum skill) {
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
 			abd = abil->ptr;
 			if (all || (ABIL_ASSIGNED_SKILL(abd) && SKILL_VNUM(ABIL_ASSIGNED_SKILL(abd)) == skill)) {
-				if (abil->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+				if (abil->purchased[GET_CURRENT_SKILL_SET(ch)] && ABIL_SKILL_LEVEL(abd) > 0) {
 					check_skill_sell(REAL_CHAR(ch), abil->ptr);
 					remove_ability(ch, abil->ptr, FALSE);
 				}
@@ -1002,9 +1002,15 @@ int get_ability_points_spent(char_data *ch, any_vnum skill) {
 	}
 	
 	LL_FOREACH(SKILL_ABILITIES(skd), skab) {
-		if (has_ability(ch, skab->vnum)) {
-			++count;
+		if (skab->level <= 0) {
+			continue;	// skip level-0 abils
 		}
+		if (!has_ability(ch, skab->vnum)) {
+			continue;	// does not have ability
+		}
+		
+		// found
+		++count;
 	}
 	
 	return count;
@@ -2047,6 +2053,55 @@ char *get_skill_name_by_vnum(any_vnum vnum) {
 
 
 /**
+* Ensures the player has all level-zero abilities. These are abilities that all
+* players always have.
+*
+* @param char_data *ch The character to give the abilitiies to.
+*/
+void give_level_zero_abilities(char_data *ch) {
+	ability_data *abil, *next_abil;
+	int set;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		if (!ABIL_ASSIGNED_SKILL(abil)) {
+			continue;	// must be assigned
+		}
+		if (SKILL_FLAGGED(ABIL_ASSIGNED_SKILL(abil), SKILLF_IN_DEVELOPMENT)) {
+			continue;	// skip in-dev skills
+		}
+		if (ABIL_SKILL_LEVEL(abil) > 0) {
+			continue;	// must be level-0
+		}
+		
+		// ensure the character has a skill entry for the skill
+		get_skill_data(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)), TRUE);
+		
+		// check that the player has it
+		for (set = 0; set < NUM_SKILL_SETS; ++set) {
+			if (!has_ability_in_set(ch, ABIL_VNUM(abil), set)) {
+				// if current set, need to update empire abilities
+				if (set == GET_CURRENT_SKILL_SET(ch) && GET_LOYALTY(ch)) {
+					adjust_abilities_to_empire(ch, GET_LOYALTY(ch), FALSE);
+				}
+				
+				// add the ability for this set
+				add_ability_by_set(ch, abil, set, FALSE);
+				
+				// if current set, need to update empire abilities
+				if (set == GET_CURRENT_SKILL_SET(ch) && GET_LOYALTY(ch)) {
+					adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
+				}
+			}
+		}
+	}
+}
+
+
+/**
 * @param char_data *ch
 * @return bool TRUE if the character is somewhere he can cook, else FALSE
 */
@@ -2815,6 +2870,7 @@ void save_olc_skill(descriptor_data *desc) {
 	skill_data *proto, *skill = GET_OLC_SKILL(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
 	UT_hash_handle hh, sorted;
+	char_data *ch_iter, *next_ch;
 
 	// have a place to save it?
 	if (!(proto = find_skill_by_vnum(vnum))) {
@@ -2867,6 +2923,13 @@ void save_olc_skill(descriptor_data *desc) {
 	// ... and update some things
 	HASH_SRT(sorted_hh, sorted_skills, sort_skills_by_data);
 	read_ability_requirements();
+	
+	// update all players in case there are new level-0 abilities
+	LL_FOREACH_SAFE(character_list, ch_iter, next_ch) {
+		if (!IS_NPC(ch_iter)) {
+			give_level_zero_abilities(ch_iter);
+		}
+	}
 }
 
 

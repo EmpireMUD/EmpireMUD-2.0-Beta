@@ -206,7 +206,7 @@ const int base_player_pools[NUM_POOLS] = { 50, 100, 50, 100 };
 const int primary_attributes[] = { STRENGTH, CHARISMA, INTELLIGENCE, NOTHING };
 
 // skill levels at which you gain an ability
-int master_ability_levels[] = { 1, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100, -1 };
+int master_ability_levels[] = { 1, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 75, 80, 90, 100, -1 };
 
 // universal wait (command lag) after abilities with cooldowns
 const int universal_wait = 1.25 RL_SEC;

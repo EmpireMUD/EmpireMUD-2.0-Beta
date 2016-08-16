@@ -835,12 +835,7 @@ void finish_gen_craft(char_data *ch) {
 	if (GET_CRAFT_ABILITY(type) != NO_ABIL) {
 		gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 33.4);
 	}
-	else {
-		if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
-			gain_skill_exp(ch, SKILL_TRADE, 33.4);
-		}
-	}
-
+	
 	// master?
 	if (is_master && applied_master) {
 		gain_ability_exp(ch, ABIL_MASTERY_ABIL(cft_abil), 33.4);
@@ -886,11 +881,6 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		// experience per resource
 		if (GET_CRAFT_ABILITY(type) != NO_ABIL) {
 			gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 3);
-		}
-		else {
-			if (get_skill_level(ch, SKILL_TRADE) < EMPIRE_CHORE_SKILL_CAP) {
-				gain_skill_exp(ch, SKILL_TRADE, 3);
-			}
 		}
 		
 		found = TRUE;

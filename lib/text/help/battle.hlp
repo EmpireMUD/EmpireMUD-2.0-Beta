@@ -11,9 +11,8 @@ Sparring branch: Learn to hit faster and harder, and finish the fight.
 Big Game Hunter branch: Take on the world's monsters with no fear.
 Archery branch: Strike from afar.
 
-You can train Battle up to level 15 just by fighting.
-
-See also: REFLEXES, SPARRING, BIG GAME HUNTER, ARCHERY, FIRSTAID, FLEET
+See also: EVASION, REFLEXES, SPARRING, BIG GAME HUNTER, ARCHERY, FIRSTAID,
+FLEET, WEAPONS PROFICIENCY
 #
 AOE "AREA OF EFFECT" "AREA EFFECT" "AREA-OF-EFFECT"
 
@@ -164,6 +163,13 @@ over that 1000. For example, a person who naturally has 2000 health would have
 Gain experience when you take damage.
 
 See also: TANK
+#
+EVASION EVADE
+
+Evasion (Battle ability)
+
+This ability is part of basic combat training and improves your ability to
+fight. It gains experience whenever someone is trying to hit you in combat.
 #
 FINESSE
 
@@ -452,5 +458,12 @@ albeit at a reduced rate. Your normal block chance is halved against magical
 attacks.
 
 See also: BLOCK
+#
+"WEAPON PROFICIENCY" "WEAPONS PROFICIENCY" PROFICIENCY
+
+Weapon Proficiency (Battle ability)
+
+This ability allows you to use weapons. You can gain experience with it by
+fighting with any weapon.
 #
 $
