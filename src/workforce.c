@@ -61,6 +61,7 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh);
 
 // other locals
 int empire_chore_limit(empire_data *emp, int island_id, int chore);
+int sort_einv(struct empire_storage_data *a, struct empire_storage_data *b);
 
 // external functions
 void empire_skillup(empire_data *emp, any_vnum ability, double amount);	// skills.c
@@ -585,6 +586,9 @@ void chore_update(void) {
 		}
 
 		if (EMPIRE_HAS_TECH(emp, TECH_WORKFORCE)) {
+			// sort einv now to ensure it's in a useful order (most quantity first)
+			LL_SORT(EMPIRE_STORAGE(emp), sort_einv);
+			
 			global_next_territory_entry = NULL;
 			for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = global_next_territory_entry) {
 				global_next_territory_entry = ter->next;
@@ -828,6 +832,18 @@ char_data *place_chore_worker(empire_data *emp, int chore, room_data *room) {
 	}
 	
 	return mob;
+}
+
+
+/**
+* Simple sorter puts higher quantities at the top (helps workforce optimize)
+*
+* @param struct empire_storage_data *a One element
+* @param struct empire_storage_data *b Another element
+* @return int Sort instruction of <0, 0, or >0
+*/
+int sort_einv(struct empire_storage_data *a, struct empire_storage_data *b) {
+	return b->amount - a->amount;
 }
 
 

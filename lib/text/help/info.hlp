@@ -36,7 +36,7 @@ Full multiplaying rules are found by typing POLICY.
 
 See also: ALTERNATE
 #
-ACTION ACTIONS CHORE CHORES "TIMED ACTIONS"
+ACTION ACTIONS "TIMED ACTIONS"
 
 EmpireMUD uses timed actions for most chores. These are things that happen
 over time until complete. Some of them will also automatically repeat when

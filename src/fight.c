@@ -3090,10 +3090,10 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		// exp gain
 		if (combat_round && can_gain_skill && can_gain_exp_from(ch, victim)) {
 			if (!IS_NPC(ch)) {
-				gain_ability_exp(ch, ABIL_FINESSE, 2);
-				if (get_skill_level(ch, SKILL_BATTLE) < EMPIRE_CHORE_SKILL_CAP) {
-					gain_skill_exp(ch, SKILL_BATTLE, 4);
+				if (attack_hit_info[w_type].disarmable) {
+					gain_ability_exp(ch, ABIL_WEAPON_PROFICIENCY, 5);
 				}
+				gain_ability_exp(ch, ABIL_FINESSE, 2);
 				if (affected_by_spell(ch, ATYPE_ALACRITY)) {
 					gain_ability_exp(ch, ABIL_ALACRITY, 2);
 				}
@@ -3108,6 +3108,9 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 					gain_ability_exp(victim, ABIL_FORESIGHT, 2);
 				}
 			}
+		}
+		if (result >= 0 && combat_round && can_gain_skill && !IS_NPC(victim) && can_gain_exp_from(victim, ch)) {
+			gain_ability_exp(victim, ABIL_EVASION, 5);
 		}
 		
 		/* check if the victim has a hitprcnt trigger */

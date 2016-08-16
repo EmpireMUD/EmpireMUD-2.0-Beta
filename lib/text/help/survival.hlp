@@ -12,7 +12,7 @@ See also: SWIMMING, FORAGE, SATED THIRST, RIDE, ALL-TERRAIN RIDING, HUNT,
           BY MOONLIGHT, NIGHTSIGHT, FINDER, FIND HERBS, RESIST POISON,
           POISON IMMUNITY, FISH, FIND SHELTER, NAVIGATION, TRACK,
           MASTER TRACKER, NO TRACE, BUTCHER, MOUNTAIN CLIMBING, STAMINA,
-          PATHFINDING, HERB GARDENS, MASTER SURVIVALIST
+          PATHFINDING, HERB GARDENS, MASTER SURVIVALIST, SCAVENGING
 #
 BUTCHER
 
@@ -294,6 +294,20 @@ gives you a partial resistance and a chance to avoid being poisoned. Resist
 Poison also allows your physical resistance trait to apply to poison damage.
 
 Both of these abilities give experience only when they trigger.
+#
+SCAVENGING SCAVENGER
+
+Scavenging (Survival ability)
+
+You can find basic survival materials using various scavenging commands, and
+this is a good way to train the Survival skill at low levels.
+
+Scavenging commands:
+  dig
+  gather
+  pick
+
+See also: DIG, GATHER, PICK
 #
 STABLEMASTER "STABLE MASTER"
 

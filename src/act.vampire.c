@@ -495,9 +495,7 @@ void update_biting_char(char_data *ch) {
 	
 	gain_ability_exp(ch, ABIL_SANGUINE_RESTORATION, 2);
 	gain_ability_exp(ch, ABIL_UNNATURAL_THIRST, 2);
-	if (get_skill_level(ch, SKILL_VAMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-		gain_skill_exp(ch, SKILL_VAMPIRE, 5);
-	}
+	gain_ability_exp(ch, ABIL_BITE, 5);
 }
 
 

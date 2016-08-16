@@ -338,7 +338,14 @@ struct {
 
 // secret implementor-only util for quick changes -- util tool
 ADMIN_UTIL(util_tool) {
-	msg_to_char(ch, "Ok.\r\n");
+	// msg_to_char(ch, "Ok.\r\n");
+	craft_data *craft, *next_craft;
+	
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		if (GET_CRAFT_ABILITY(craft) == NOTHING) {
+			msg_to_char(ch, "[%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		}
+	}
 }
 
 
