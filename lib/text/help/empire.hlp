@@ -96,7 +96,7 @@ Gain experience when you barde something.
 
 See also: RIDE, STABLE
 #
-BUILD BUILDING
+BUILD BUILDING "BASIC BUILDINGS"
 
 Usage:  build <building> [direction]
         build <monument> <god>
@@ -117,34 +117,33 @@ Until a building is completed, you can walk into and out of it freely, and you
 can't build any additional rooms inside. Once finished, nobody who is not
 loyal to your empire will be able to enter.
 
-All buildings give experience as you add materials to their construction. If
-they require an ability they will give experience for that ability. Otherwise,
-they just give Empire experience and only up to Empire 15.
+All buildings give experience as you add materials to their construction.
 
-&g.&0()&g.&0 hut
-&y.&0()&y.&0 mudhut
-(--) cabin
-(==) house
-&y.&0[]&y.&0 pueblo
-&y[==]&0 cliffdwelling
-(&c~~&0) well
-&y/&0[]&y\&0 mine
-(FF) forge
-(MM) mill
-(PP) potter
-(SS) stable
-vvvv fence
-vxvv gate
-{CC} cannery -- store fruits
-{FF} foundry -- store metals
-{GG} granary -- store grains
-{PP} gravelpit -- store rocks
-{LL} lumberyard -- store lumber
-{SS} smokehouse -- store meats
-{TT} tannery -- store skins
-{UU} utilityshed -- store tools
-|__| quarry -- must be on flat land facing a mountain
-&y|__|&0 claypit -- must be on flat land facing water
+Basic buildings:
+  &g.&0()&g.&0 hut
+  &y.&0()&y.&0 mudhut
+  (--) cabin
+  (==) house
+  &y.&0[]&y.&0 pueblo
+  &y[==]&0 cliffdwelling
+  (&c~~&0) well
+  &y/&0[]&y\&0 mine
+  (FF) forge
+  (MM) mill
+  (PP) potter
+  (SS) stable
+  vvvv fence
+  vxvv gate
+  {CC} cannery -- store fruits
+  {FF} foundry -- store metals
+  {GG} granary -- store grains
+  {PP} gravelpit -- store rocks
+  {LL} lumberyard -- store lumber
+  {SS} smokehouse -- store meats
+  {TT} tannery -- store skins
+  {UU} utilityshed -- store tools
+  |__| quarry -- must be on flat land facing a mountain
+  &y|__|&0 claypit -- must be on flat land facing water
 
 For more information on building your first house, see HELP HOUSING GUIDE.
 
@@ -164,6 +163,26 @@ so that you can claim more land may get you in trouble.
 You can't cede land to an empire that is at war.
 
 See also: CLAIM, POLICY, PRIVILEGE, ABANDON
+#
+CHORES CHORE
+
+Chores (Empire ability)
+
+Doing simple chores will help you raise your Empire skill at low levels.
+
+Chores include:
+  chop                      press *
+  harvest                   quarry
+  mill *                    saw
+  mine *                    scrape
+  mint                      smelt *
+  plant
+
+* Most common recipes/types give Chores experience, but some recipes may not.
+  (try 'smelt info iron ingot', for example, to see what ability it uses)
+
+See also: ACTIONS, CHOP, HARVEST, MILL, MINE, MINT, PLANT, PRESS, QUARRY, SAW,
+SCRAPE, SMELT
 #
 CITY
 
@@ -973,16 +992,15 @@ See also: CLAIM, CEDE, ABANDON, UNPUBLICIZE, HOSTILE
 QUARRY
 
 Command:  quarry
-Building:  |__|  Quarry  (no skill required)
+Building:  |__|  Quarry  (Basic Buildings)
 
 A quarry must be built on plains or desert, facing a mountain. Quarries are a
 good place to dig up rocks. You can also quarry stone here using the "quarry"
 command. You will find more rocks before a quarry depletes, compared to digging
 anywhere else.
 
-You can gain Empire skill up to 15 by quarrying stone. This does not require
-an ability. If you have the "dig" workforce enabled, your citizens will only
-dig if you have a quarry.
+If you have the "dig" workforce enabled, your citizens will only dig if you
+have a quarry.
 
 Quarries count as in-city territory as far away as 3x a city's normal radius.
 

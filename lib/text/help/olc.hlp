@@ -297,6 +297,12 @@ Quests (QEDIT):
   the two instances. If you have a good solution for this problem, suggest it
   to Paul (paul@empiremud.net). The current advice is to not worry about it and
   hope players don't get themselves into these confusing situations.
+- Daily quests automatically repeat once per 'daily cycle' if their 'repeat' is
+  set to never/immediately. You can also set longer repeat timers on them; they
+  will still count toward the daily limit but respect the long repeat time.
+- Empire-only quests will also match "not in an empire" if the mob/room and
+  player are both in no empire.
+- Empire-only quests have no effect if the start/end point is an object.
 
 Room Templates (REDIT):
 - Don't confuse room templates with the designated rooms that players can add
@@ -1053,6 +1059,8 @@ Available affects (do not set affects with *):
  !FLY - flying characters cannot enter, like an enchanted wall
  !WEATHER - suppress weather messages and command
  !DISREPAIR - never falls into disrepair (caution: this prevents empire decay)
+ *HAS-INSTANCE - an adventure is linked here
+ *DISMANTLING - someone started dismantling it
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
@@ -4163,8 +4171,11 @@ The following quest flags are available:
  REPEAT-PER-INSTANCE - Clears completion when the instance closes.
  EXPIRES-AFTER-INSTANCE - Fails the quest when the instance closes.
  EXTRACT-TASK-OBJECTS - Items and components required for tasks will be lost.
+ DAILY - Quest counts as a daily.
+ EMPIRE-ONLY - Can only start/finish with mob/room of matching empire (or
+    matching not-in-empire).
 
-See also: OLC QUESTS
+See also: OLC QUESTS, DAILY QUEST
 #d
 "QEDIT MAXLEVEL" "QEDIT MAX LEVEL"
 

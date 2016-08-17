@@ -104,7 +104,7 @@ done
 ~
 #18103
 Goblin lumberjack environmental~
-0 b 50
+0 bw 50
 ~
 * This mob is only flagged SENTINEL when it's chopping
 if (%self.mob_flagged(SENTINEL)% && !%self.fighting%)

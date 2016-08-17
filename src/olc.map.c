@@ -95,10 +95,6 @@ OLC_MODULE(mapedit_build) {
 		msg_to_char(ch, "You create %s %s!\r\n", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
 		sprintf(buf, "$n creates %s %s!", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
-		
-		if (ROOM_OWNER(IN_ROOM(ch))) {
-			read_empire_territory(ROOM_OWNER(IN_ROOM(ch)));
-		}
 	}
 }
 
@@ -168,10 +164,6 @@ OLC_MODULE(mapedit_terrain) {
 		// preserve old original sect for roads -- TODO this is a special-case
 		if (IS_ROAD(IN_ROOM(ch))) {
 			change_base_sector(IN_ROOM(ch), old_sect);
-		}
-
-		if (emp) {
-			read_empire_territory(emp);
 		}
 	}
 }
@@ -407,6 +399,7 @@ OLC_MODULE(mapedit_exits) {
 			to_room = create_room();
 			attach_building_to_room(building_proto(config_get_int("default_interior")), to_room, TRUE);
 			
+			// TODO this is done in several different things that add rooms, and could be moved to a function -paul 7/14/2016
 			if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
 				++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(IN_ROOM(ch)));
 				COMPLEX_DATA(to_room)->vehicle = GET_ROOM_VEHICLE(IN_ROOM(ch));
@@ -415,7 +408,10 @@ OLC_MODULE(mapedit_exits) {
 			COMPLEX_DATA(HOME_ROOM(IN_ROOM(ch)))->inside_rooms++;
 			
 			COMPLEX_DATA(to_room)->home_room = HOME_ROOM(IN_ROOM(ch));
-			ROOM_OWNER(to_room) = ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)));
+			
+			if (ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)))) {
+				perform_claim_room(to_room, ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))));
+			}
 		}
 
 		create_exit(IN_ROOM(ch), to_room, dir, TRUE);

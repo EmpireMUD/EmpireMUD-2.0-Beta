@@ -458,7 +458,7 @@ WCMD(do_wdoor) {
 WCMD(do_wsiege) {
 	void besiege_room(room_data *to_room, int damage);
 	extern bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
-	extern room_data *dir_to_room(room_data *room, int dir);
+	extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
 	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
 	
@@ -488,7 +488,7 @@ WCMD(do_wsiege) {
 	}
 	if (!veh_targ && !room_targ) {
 		if ((dir = search_block(tar_arg, dirs, FALSE)) != NOTHING || (dir = search_block(tar_arg, alt_dirs, FALSE)) != NOTHING) {
-			room_targ = dir_to_room(room, dir);
+			room_targ = dir_to_room(room, dir, FALSE);
 		}
 	}
 	if (!veh_targ && !room_targ) {

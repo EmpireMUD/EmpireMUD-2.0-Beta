@@ -2268,7 +2268,7 @@ void update_empire_npc_data(void) {
 	
 	// each empire
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		// skip idle empires
+		// skip idle empires: TODO could macro this
 		if (EMPIRE_LAST_LOGON(emp) + time_to_empire_emptiness < time(0)) {
 			continue;
 		}
@@ -3992,7 +3992,6 @@ void parse_room(FILE *fl, room_vnum vnum) {
 	
 	// basic setup: things that don't default to 0/NULL
 	room->vnum = vnum;
-	room->owner = NULL;
 	
 	HASH_FIND_INT(world_table, &vnum, find);
 	if (find) {
@@ -4760,6 +4759,13 @@ void add_sector_to_table(sector_data *sect) {
 * @param sector_data *sect The sect to remove from the table.
 */
 void remove_sector_from_table(sector_data *sect) {
+	extern sector_data *last_evo_sect;
+	
+	// if we left off on this sect, remove it entirely
+	if (last_evo_sect == sect) {
+		last_evo_sect = NULL;
+	}
+	
 	HASH_DEL(sector_table, sect);
 }
 

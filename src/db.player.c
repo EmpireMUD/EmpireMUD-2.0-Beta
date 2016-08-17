@@ -2980,6 +2980,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void clean_lore(char_data *ch);
 	extern room_data *find_home(char_data *ch);
 	extern room_data *find_load_room(char_data *ch);
+	void give_level_zero_abilities(char_data *ch);
 	void refresh_all_quests(char_data *ch);
 	void reset_combat_meters(char_data *ch);
 	
@@ -3194,6 +3195,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// verify abils -- TODO should this remove/re-add abilities for the empire? do class abilities affect that?
 	assign_class_abilities(ch, NULL, NOTHING);
+	give_level_zero_abilities(ch);
 	
 	// ensure player has penalty if at war
 	if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch))) {

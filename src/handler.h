@@ -132,6 +132,7 @@ struct empire_trade_data *find_trade_entry(empire_data *emp, int type, obj_vnum 
 extern int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, int amount);
 #define decrease_empire_coins(emp_gaining, coin_empire, amount)  increase_empire_coins((emp_gaining), (coin_empire), -1 * (amount))
 void perform_abandon_room(room_data *room);
+void perform_claim_room(room_data *room, empire_data *emp);
 
 // empire targeting handlers
 extern struct empire_city_data *find_city(empire_data *emp, room_data *loc);
@@ -185,6 +186,7 @@ void empty_obj_before_extract(obj_data *obj);
 void extract_obj(obj_data *obj);
 extern obj_data *fresh_copy_obj(obj_data *obj, int scale_level);
 extern bool objs_are_identical(obj_data *obj_a, obj_data *obj_b);
+extern bool parse_component(char *str, int *type, bitvector_t *flags);
 void remove_from_object_list(obj_data *obj);
 
 // object binding handlers

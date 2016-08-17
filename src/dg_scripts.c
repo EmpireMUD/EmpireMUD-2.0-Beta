@@ -27,7 +27,6 @@
 #include "skills.h"
 
 #define PULSES_PER_MUD_HOUR     (SECS_PER_MUD_HOUR*PASSES_PER_SEC)
-#define player_script_radius  25	// map tiles away that players may be for scripts to trigger
 
 
 /* external vars from db.c */
@@ -77,18 +76,6 @@ void extract_value(struct script_data *sc, trig_data *trig, char *cmd);
 struct cmdlist_element *find_done(struct cmdlist_element *cl);
 struct cmdlist_element *find_case(trig_data *trig, struct cmdlist_element *cl, void *go, struct script_data *sc, int type, char *cond);
 void process_eval(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
-
-
-/**
-* Determines if there is a nearby connected player, which is a requirement
-* for some things like random triggers.
-*
-* @param room_data *loc The location to check for nearby players.
-* @return bool TRUE if there are players nearby.
-*/
-static bool players_nearby_script(room_data *loc) {	
-	return distance_to_nearest_player(loc) <= player_script_radius;
-}
 
 
 int trgvar_in_room(room_vnum vnum) {
@@ -978,48 +965,60 @@ void script_trigger_check(void) {
 	struct script_data *sc;
 	
 	LL_FOREACH_SAFE(character_list, ch, next_ch) {
-		if (SCRIPT(ch)) {
-			sc = SCRIPT(ch);
-
-		if (IS_SET(SCRIPT_TYPES(sc), MTRIG_RANDOM) && (IS_SET(SCRIPT_TYPES(sc), MTRIG_GLOBAL) || players_nearby_script(IN_ROOM(ch))))
-			random_mtrigger(ch);
+		if (!(sc = SCRIPT(ch)) || !IS_SET(SCRIPT_TYPES(sc), MTRIG_RANDOM)) {
+			continue;	// no random scripts
 		}
+
+		// success
+		random_mtrigger(ch);
 	}
 	
 	LL_FOREACH_SAFE(object_list, obj, next_obj) {
-		if (SCRIPT(obj)) {
-			sc = SCRIPT(obj);
-
-			if (IS_SET(SCRIPT_TYPES(sc), OTRIG_RANDOM))
-				random_otrigger(obj);
+		if (!(sc = SCRIPT(obj))) {
+			continue;	// no scripts
 		}
+		if (!IS_SET(SCRIPT_TYPES(sc), OTRIG_RANDOM)) {
+			continue;	// no randoms
+		}
+		// objs do not check players nearby
+		
+		// success
+		random_otrigger(obj);
 	}
 	
 	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
-		if (IN_ROOM(veh) && SCRIPT(veh)) {
-			sc = SCRIPT(veh);
-
-			if (IS_SET(SCRIPT_TYPES(sc), VTRIG_RANDOM) && (IS_SET(SCRIPT_TYPES(sc), VTRIG_GLOBAL) || players_nearby_script(IN_ROOM(veh)))) {
-				random_vtrigger(veh);
-			}
+		if (!IN_ROOM(veh)) {
+			continue; // not in a room?
 		}
+		if (!(sc = SCRIPT(veh)) || !IS_SET(SCRIPT_TYPES(sc), VTRIG_RANDOM)) {
+			return;	// no random scripts
+		}
+
+		// success
+		random_vtrigger(veh);
 	}
 
 	// Except every 5th cycle, this only does "interior" rooms -- to prevent over-frequent map iteration
 	if (++my_cycle >= 5) {
 		my_cycle = 0;
 		HASH_ITER(hh, world_table, room, next_room) {
-			if ((sc = SCRIPT(room)) && IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM) && (players_nearby_script(room) || IS_SET(SCRIPT_TYPES(sc), WTRIG_GLOBAL))) {
-				random_wtrigger(room);
+			if (!(sc = SCRIPT(room)) || !IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM)) {
+				continue;	// no random scripts
 			}
+			
+			// success
+			random_wtrigger(room);
 		}
 	}
 	else {
 		// partial
 		LL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
-			if ((sc = SCRIPT(room)) && IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM) && (IS_SET(SCRIPT_TYPES(sc), WTRIG_GLOBAL) || players_nearby_script(room))) {
-				random_wtrigger(room);
+			if (!(sc = SCRIPT(room)) || !IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM)) {
+				continue;	// no random scripts
 			}
+			
+			// success
+			random_wtrigger(room);
 		}
 	}
 }
@@ -3701,7 +3700,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			*str = '\x1';
 			switch (LOWER(*field)) {
 				case 'a': {	// room.a*
-					if (!str_cmp(field, "aft")) {
+					if (!str_cmp(field, "aff_flagged")) {
+						extern const char *room_aff_bits[];
+						
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, room_aff_bits, FALSE);
+							if (pos != NOTHING) {
+								snprintf(str, slen, "%d", ROOM_AFF_FLAGGED(r, BIT(pos)) ? 1 : 0);
+							}
+							else {
+								snprintf(str, slen, "0");
+							}
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
+					else if (!str_cmp(field, "aft")) {
 						direction_vars(r, AFT, subfield, str, slen);
 					}
 					break;

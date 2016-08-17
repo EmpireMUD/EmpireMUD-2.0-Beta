@@ -423,7 +423,7 @@ list~
 ~
 #11017
 Baby Ostrich emotes~
-0 bt 5
+0 btw 5
 ~
 if %self.disabled%
   halt
@@ -699,6 +699,8 @@ if !%actor%
 end
 if %actor.fighting%
   * If the egg timer expires: if the player is fighting, they lose the egg.
+  eval enemy %actor.fighting%
+  %send% %actor% The fight with %enemy.name% destroys the stolen egg!
   %purge% %self%
   halt
 else

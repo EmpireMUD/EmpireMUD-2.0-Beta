@@ -56,7 +56,7 @@ end
 ~
 #10828
 Curator environment~
-0 b 5
+0 bw 5
 ~
 switch %random.4%
   case 1

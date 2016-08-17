@@ -452,6 +452,7 @@ void real_update_char(char_data *ch) {
 	void combat_meter_damage_dealt(char_data *ch, int amt);
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	void do_unseat_from_vehicle(char_data *ch);
+	extern bool fail_daily_quests(char_data *ch);
 	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
 	void random_encounter(char_data *ch);
 	void update_biting_char(char_data *ch);
@@ -599,11 +600,16 @@ void real_update_char(char_data *ch) {
 	if (GET_DAILY_CYCLE(ch) < daily_cycle) {
 		// other stuff that resets daily
 		GET_DAILY_BONUS_EXPERIENCE(ch) = compute_bonus_exp_per_day(ch);
+		GET_DAILY_QUESTS(ch) = 0;
 		for (iter = 0; iter < MAX_REWARDS_PER_DAY; ++iter) {
 			GET_REWARDED_TODAY(ch, iter) = -1;
 		}
 		
-		msg_to_char(ch, "&yYour daily bonus experience has reset!&0\r\n");
+		msg_to_char(ch, "&yYour daily quests and bonus experience have reset!&0\r\n");
+		
+		if (fail_daily_quests(ch)) {
+			msg_to_char(ch, "Your daily quests expire.\r\n");
+		}
 		
 		// update to this cycle so it only happens once a day
 		GET_DAILY_CYCLE(ch) = daily_cycle;
@@ -764,7 +770,7 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 	for (x = -1 * radius; x <= radius && !found_building; ++x) {
 		for (y = -1 * radius; y <= radius && !found_building; ++y) {
 			// skip 0,0 because that is the city center
-			if (x != 0 && y != 0) {
+			if (x != 0 || y != 0) {
 				to_room = real_shift(center, x, y);
 				
 				// we skip compute_distance here so we're really checking a
@@ -786,7 +792,6 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 	if (!found_building) {
 		log_to_empire(emp, ELOG_TERRITORY, "%s (%d, %d) abandoned as ruins", city->name, X_COORD(city->location), Y_COORD(city->location));
 		perform_abandon_city(emp, city, TRUE);
-		read_empire_territory(emp);
 		return TRUE;
 	}
 	
@@ -801,21 +806,15 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 */
 void check_ruined_cities(void) {
 	struct empire_city_data *city, *next_city;
-	bool ruined_any = FALSE;
 	empire_data *emp, *next_emp;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if (!EMPIRE_IMM_ONLY(emp)) {
 			for (city = EMPIRE_CITY_LIST(emp); city; city = next_city) {
 				next_city = city->next;
-				
-				ruined_any |= check_one_city_for_ruin(emp, city);
+				check_one_city_for_ruin(emp, city);
 			}
 		}
-	}
-	
-	if (ruined_any) {
-		read_empire_territory(NULL);
 	}
 }
 
@@ -894,7 +893,6 @@ static void reduce_city_overage_one(empire_data *emp) {
 	}
 	
 	save_empire(emp);
-	read_empire_territory(emp);
 }
 
 
@@ -978,7 +976,6 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	if (farthest) {
 		log_to_empire(emp, ELOG_TERRITORY, "Abandoning %s (%d, %d) because too much outside territory has been claimed", get_room_name(farthest, FALSE), X_COORD(farthest), Y_COORD(farthest));
 		abandon_room(farthest);
-		read_empire_territory(emp);
 	}
 }
 
@@ -1062,7 +1059,6 @@ static void reduce_stale_empires_one(empire_data *emp) {
 	if (found_room) {
 		// this is only called on VERY stale empires (no members), so there's no real need to log this abandon
 		abandon_room(found_room);
-		read_empire_territory(emp);
 	}
 }
 
@@ -1559,7 +1555,6 @@ void point_update_room(room_data *room) {
 				if (emp && !is_in_city_for_empire(room, emp, TRUE, &junk)) {
 					// does check the city time limit for abandon protection
 					abandon_room(room);
-					read_empire_territory(emp);
 				}
 
 				/* Destroy 50% of the objects */

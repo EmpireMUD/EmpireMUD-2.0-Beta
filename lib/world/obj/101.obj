@@ -972,4 +972,48 @@ this is valuable information indeed.
 11 0
 Q 10150
 S
+#10190
+volcanoportal volcano portal~
+a volcano portal~
+A volcano portal is here.~
+~
+8 0 0 1
+-1 0 0
+1 0
+S
+#10192
+lava flow burning bright red air hot~
+the burning lava~
+The hot air waves above the bright red lava flow.~
+   The lava flow is fresh enough that it is still moving, although the top is
+starting to crust over. It burns you even to stand this close, and your skin is
+starting to blister.
+~
+3 c 0 6
+3600 0 0
+1 48
+C
+150 150
+T 10192
+T 10193
+T 10165
+T 10194
+S
+#10193
+lava cooling veins~
+the cooling lava~
+The veins of lava have begun to cool and harden.~
+   The lava flow has cooled enough that it is no longer moving, and is only
+warm to the touch. It looks like the whole mountain has taken on a fresh, black
+coat of volcanic rock.
+~
+3 0 0 4
+7200 0 0
+1 96
+C
+150 150
+T 10192
+T 10193
+T 10165
+S
 $

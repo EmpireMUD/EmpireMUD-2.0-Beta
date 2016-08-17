@@ -60,6 +60,9 @@ extern struct instance_data *find_instance_by_room(room_data *room, bool check_h
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 
+// external vars
+extern int daily_cycle;
+
 // local protos
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest, struct instance_data *instance);
@@ -138,6 +141,7 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 				break;
 			}
 			// case QG_TRIGGER: never local
+			// case QG_QUEST: never local
 		}
 	}
 	
@@ -389,6 +393,11 @@ char *quest_giver_string(struct quest_giver *giver, bool show_vnums) {
 		case QG_TRIGGER: {
 			trig_data *trig = real_trigger(giver->vnum);
 			snprintf(output, sizeof(output), "%s%s", vnum, trig ? skip_filler(GET_TRIG_NAME(trig)) : "UNKNOWN");
+			break;
+		}
+		case QG_QUEST: {
+			quest_data *qq = quest_proto(giver->vnum);
+			snprintf(output, sizeof(output), "%s%s", vnum, qq ? skip_filler(QUEST_NAME(qq)) : "UNKNOWN");
 			break;
 		}
 		default: {
@@ -885,7 +894,7 @@ void add_or_remove_all_quest_lookups_for(quest_data *quest, bool add) {
 	
 	for (iter = 0; iter < 2; ++iter) {
 		LL_FOREACH(list[iter], giver) {
-			// QG_x
+			// QG_x -- except trigger, quest
 			switch (giver->type) {
 				case QG_BUILDING: {
 					if ((bld = building_proto(giver->vnum))) {
@@ -1063,14 +1072,25 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_lis
 	struct instance_data *inst;
 	struct quest_lookup *ql;
 	bool any = FALSE;
+	bool dailies;
 	
 	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob) || !CAN_SEE(ch, mob)) {
 		return FALSE;
 	}
 	
+	dailies = GET_DAILY_QUESTS(ch) < config_get_int("dailies_per_day");
+	
 	LL_FOREACH(MOB_QUEST_LOOKUPS(mob), ql) {
 		// make sure they're a giver
 		if (!find_quest_giver_in_list(QUEST_STARTS_AT(ql->quest), QG_MOBILE, GET_MOB_VNUM(mob))) {
+			continue;
+		}
+		// hide dailies
+		if (QUEST_FLAGGED(ql->quest, QST_DAILY) && !dailies) {
+			continue;
+		}
+		// matching empire
+		if (QUEST_FLAGGED(ql->quest, QST_EMPIRE_ONLY) && GET_LOYALTY(mob) != GET_LOYALTY(ch)) {
 			continue;
 		}
 		// already on quest?
@@ -1112,14 +1132,21 @@ bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list
 	struct quest_lookup *ql;
 	bool any = FALSE;
 	room_data *room;
+	bool dailies;
 	
 	if (IS_NPC(ch) || !GET_OBJ_QUEST_LOOKUPS(obj) || !CAN_SEE_OBJ(ch, obj) || !bind_ok(obj, ch)) {
 		return FALSE;
 	}
 	
+	dailies = GET_DAILY_QUESTS(ch) < config_get_int("dailies_per_day");
+	
 	LL_FOREACH(GET_OBJ_QUEST_LOOKUPS(obj), ql) {
 		// make sure they're a giver
 		if (!find_quest_giver_in_list(QUEST_STARTS_AT(ql->quest), QG_OBJECT, GET_OBJ_VNUM(obj))) {
+			continue;
+		}
+		// hide dailies
+		if (QUEST_FLAGGED(ql->quest, QST_DAILY) && !dailies) {
 			continue;
 		}
 		// already on quest?
@@ -1159,11 +1186,14 @@ bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_l
 	struct quest_lookup *ql, *list[2];
 	struct instance_data *inst;
 	bool any = FALSE;
+	bool dailies;
 	int iter;
 	
 	if (IS_NPC(ch)) {
 		return FALSE;
 	}
+	
+	dailies = GET_DAILY_QUESTS(ch) < config_get_int("dailies_per_day");
 	
 	// two places to look
 	list[0] = GET_BUILDING(room) ? GET_BLD_QUEST_LOOKUPS(GET_BUILDING(room)) : NULL;
@@ -1176,6 +1206,14 @@ bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_l
 				continue;
 			}
 			if (iter == 1 && !find_quest_giver_in_list(QUEST_STARTS_AT(ql->quest), QG_ROOM_TEMPLATE, GET_RMT_VNUM(GET_ROOM_TEMPLATE(room)))) {
+				continue;
+			}
+			// hide dailies
+			if (QUEST_FLAGGED(ql->quest, QST_DAILY) && !dailies) {
+				continue;
+			}
+			// matching empire
+			if (QUEST_FLAGGED(ql->quest, QST_EMPIRE_ONLY) && ROOM_OWNER(room) != GET_LOYALTY(ch)) {
 				continue;
 			}
 			// already on quest?
@@ -1224,6 +1262,10 @@ bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_l
 	LL_FOREACH(MOB_QUEST_LOOKUPS(mob), ql) {
 		// make sure they're a giver
 		if (!find_quest_giver_in_list(QUEST_ENDS_AT(ql->quest), QG_MOBILE, GET_MOB_VNUM(mob))) {
+			continue;
+		}
+		// matching empire
+		if (QUEST_FLAGGED(ql->quest, QST_EMPIRE_ONLY) && GET_LOYALTY(mob) != GET_LOYALTY(ch)) {
 			continue;
 		}
 		// are they on quest?
@@ -1326,6 +1368,10 @@ bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp
 			if (iter == 1 && !find_quest_giver_in_list(QUEST_ENDS_AT(ql->quest), QG_ROOM_TEMPLATE, GET_RMT_VNUM(GET_ROOM_TEMPLATE(room)))) {
 				continue;
 			}
+			// matching empire
+			if (QUEST_FLAGGED(ql->quest, QST_EMPIRE_ONLY) && ROOM_OWNER(room) != GET_LOYALTY(ch)) {
+				continue;
+			}
 			// are they on quest?
 			if (!(pq = is_on_quest(ch, QUEST_VNUM(ql->quest)))) {
 				continue;
@@ -1359,6 +1405,7 @@ bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp
 * @return bool TRUE if the player can get the quest.
 */
 bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance) {
+	bool daily = QUEST_FLAGGED(quest, QST_DAILY);
 	struct player_completed_quest *completed;
 	struct quest_task *task;
 	bool ok = TRUE;
@@ -1376,7 +1423,10 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *
 	
 	// check repeatability
 	if ((completed = has_completed_quest(ch, QUEST_VNUM(quest), instance ? instance->id : NOTHING))) {
-		if (QUEST_REPEATABLE_AFTER(quest) >= 0 && completed->last_completed + (QUEST_REPEATABLE_AFTER(quest) * SECS_PER_REAL_MIN) <= time(0)) {
+		if (daily && QUEST_REPEATABLE_AFTER(quest) <= 0) {
+			// daily quest allows immediate/never: ok
+		}
+		else if (QUEST_REPEATABLE_AFTER(quest) >= 0 && completed->last_completed + (QUEST_REPEATABLE_AFTER(quest) * SECS_PER_REAL_MIN) <= time(0)) {
 			// repeat time: ok
 		}
 		else if (QUEST_FLAGGED(quest, QST_REPEAT_PER_INSTANCE) && (completed->last_adventure != (instance ? GET_ADV_VNUM(instance->adventure) : NOTHING) || completed->last_instance_id != (instance ? instance->id : NOTHING))) {
@@ -1384,6 +1434,11 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *
 		}
 		else {
 			// not repeatable
+			ok = FALSE;
+		}
+		
+		// make sure daily wasn't already done TODAY
+		if (daily && completed->last_completed >= daily_cycle) {
 			ok = FALSE;
 		}
 	}
@@ -1904,6 +1959,32 @@ void qt_triggered_task(char_data *ch, any_vnum vnum) {
 
 
 /**
+* Quest Tracker: cancel a triggered condition for the quest
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The quest to un-mark.
+*/
+void qt_untrigger_task(char_data *ch, any_vnum vnum) {
+	struct player_quest *pq;
+	struct quest_task *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		if (pq->vnum == vnum) {
+			LL_FOREACH(pq->tracker, task) {
+				if (task->type == QT_TRIGGERED) {
+					task->current = 0;
+				}
+			}
+		}
+	}
+}
+
+
+/**
 * Quest Tracker: ch visits a building
 *
 * @param char_data *ch The player.
@@ -2258,6 +2339,8 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		any |= find_quest_task_in_list(QUEST_TASKS(qiter), QT_NOT_ON_QUEST, vnum);
 		any |= find_quest_task_in_list(QUEST_PREREQS(qiter), QT_NOT_ON_QUEST, vnum);
 		any |= find_quest_reward_in_list(QUEST_REWARDS(qiter), QR_QUEST_CHAIN, vnum);
+		any |= find_quest_giver_in_list(QUEST_STARTS_AT(qiter), QG_QUEST, vnum);
+		any |= find_quest_giver_in_list(QUEST_ENDS_AT(qiter), QG_QUEST, vnum);
 		
 		if (any) {
 			++found;
@@ -2427,6 +2510,12 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 					}
 					break;
 				}
+				case QG_QUEST: {
+					if (quest_proto(vnum)) {
+						ok = TRUE;
+					}
+					break;
+				}
 			}
 			
 			// did we find one? if so, buf is set
@@ -2503,6 +2592,12 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 				}
 				case QG_TRIGGER: {
 					if (real_trigger(vnum)) {
+						ok = TRUE;
+					}
+					break;
+				}
+				case QG_QUEST: {
+					if (quest_proto(vnum)) {
 						ok = TRUE;
 					}
 					break;

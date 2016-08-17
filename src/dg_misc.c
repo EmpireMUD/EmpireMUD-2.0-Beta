@@ -68,7 +68,6 @@ room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
 
 	COMPLEX_DATA(new)->home_room = home;
 	COMPLEX_DATA(home)->inside_rooms++;
-	ROOM_OWNER(new) = ROOM_OWNER(home);
 	
 	if (GET_ROOM_VEHICLE(from)) {
 		++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(from));
@@ -78,8 +77,8 @@ room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
 		SET_BIT(ROOM_BASE_FLAGS(new), ROOM_AFF_IN_VEHICLE);
 	}
 	
-	if (ROOM_OWNER(new)) {
-		create_territory_entry(ROOM_OWNER(new), new);
+	if (ROOM_OWNER(home)) {
+		perform_claim_room(new, ROOM_OWNER(home));
 	}
 	
 	// sort now just in case
@@ -426,6 +425,9 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 	else if (is_abbrev(cmd_arg, "trigger")) {
 		qt_triggered_task(vict, QUEST_VNUM(quest));
 	}
+	else if (is_abbrev(cmd_arg, "untrigger")) {
+		qt_untrigger_task(vict, QUEST_VNUM(quest));
+	}
 	else {
 		script_log_by_type(go_type, go, "dg_quest: invalid command '%s'", cmd_arg);
 	}
@@ -441,13 +443,10 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 */
 void do_dg_terracrop(room_data *target, crop_data *cp) {
 	sector_data *sect;
-	empire_data *emp;
 	
 	if (!target || !cp) {
 		return;
 	}
-	
-	emp = ROOM_OWNER(target);
 	
 	if (!(sect = find_first_matching_sector(SECTF_CROP, NOBITS))) {
 		// no crop sects?
@@ -459,10 +458,6 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 		
 		remove_depletion(target, DPLTN_PICK);
 		remove_depletion(target, DPLTN_FORAGE);
-	}
-	
-	if (emp) {
-		read_empire_territory(emp);
 	}
 }
 
@@ -476,24 +471,18 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 */
 void do_dg_terraform(room_data *target, sector_data *sect) {
 	sector_data *old_sect;
-	empire_data *emp;
 	
 	if (!target || !sect) {
 		return;
 	}
 	
 	old_sect = BASE_SECT(target);
-	emp = ROOM_OWNER(target);
 	
 	change_terrain(target, GET_SECT_VNUM(sect));
 	
 	// preserve old original sect for roads -- TODO this is a special-case
 	if (IS_ROAD(target)) {
 		change_base_sector(target, old_sect);
-	}
-
-	if (emp) {
-		read_empire_territory(emp);
 	}
 }
 
@@ -583,7 +572,7 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 		dam = reduce_damage_from_skills(dam, vict, killer, dam_type);	// resistance, etc
 		dam = MAX(1, dam);
 		
-		if (vict != killer) {
+		if (killer && vict != killer) {
 			combat_meter_damage_dealt(killer, dam);
 		}
 		combat_meter_damage_taken(vict, dam);
@@ -592,7 +581,9 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 		// healing
 		dam = MIN(-1, dam);
 		
-		combat_meter_heal_dealt(killer, -dam);
+		if (killer) {
+			combat_meter_heal_dealt(killer, -dam);
+		}
 		combat_meter_heal_taken(vict, -dam);
 	}
 	

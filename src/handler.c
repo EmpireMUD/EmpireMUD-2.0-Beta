@@ -72,6 +72,7 @@ extern struct complex_room_data *init_complex_data();
 const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
+void adjust_building_tech(empire_data *emp, room_data *room, bool add);
 void scale_item_to_level(obj_data *obj, int level);
 
 // locals
@@ -1026,7 +1027,7 @@ void extract_char_final(char_data *ch) {
 	}
 	
 	// close the desc
-	if (ch->desc) {
+	if (!freed && ch->desc) {
 		ch->desc->character = NULL;
 		STATE(ch->desc) = CON_CLOSE;
 		ch->desc = NULL;
@@ -2242,11 +2243,7 @@ void remove_cooldown_by_type(char_data *ch, int type) {
 //// EMPIRE HANDLERS /////////////////////////////////////////////////////////
 
 /**
-* This function abandons any room and all its associated rooms. It does not,
-* however, re-read empire territory (since it should be expected to be called
-* in a loop in multiple places).
-*
-* You should always read_empire_territory() when you're done calling this.
+* This function abandons any room and all its associated rooms.
 *
 * @param room_data *room The room to abandon.
 */
@@ -2260,11 +2257,9 @@ void abandon_room(room_data *room) {
 	}
 	
 	perform_abandon_room(room);
-
+	
 	// inside
-	for (iter = interior_room_list; iter; iter = next_iter) {
-		next_iter = iter->next_interior;
-		
+	LL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
 		if (HOME_ROOM(iter) == home) {
 			perform_abandon_room(iter);
 		}
@@ -2273,34 +2268,24 @@ void abandon_room(room_data *room) {
 
 
 /**
-* This function claims any room and all its associated rooms. It does not,
-* however, re-read empire territory (since it should be expected to be called
-* in a loop in multiple places).
-*
-* You should always read_empire_territory() when you're done calling this.
+* This function claims any room and all its associated rooms.
 *
 * @param room_data *room The room to claim.
+* @param empire_data *emp The empire to claim for.
 */
 void claim_room(room_data *room, empire_data *emp) {
 	room_data *home = HOME_ROOM(room);
 	room_data *iter, *next_iter;
 	
-	ROOM_OWNER(room) = emp;
-	remove_room_extra_data(room, ROOM_EXTRA_CEDED);	// not ceded if just claimed
-	
-	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
-		qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
+	if (!room || !emp || ROOM_OWNER(home)) {
+		return;
 	}
 	
-	for (iter = interior_room_list; iter; iter = next_iter) {
-		next_iter = iter->next_interior;
-		
+	perform_claim_room(home, emp);
+	
+	LL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
 		if (HOME_ROOM(iter) == home) {
-			ROOM_OWNER(iter) = emp;
-			if (GET_BUILDING(iter) && IS_COMPLETE(iter)) {
-				qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(iter)));
-			}
-			remove_room_extra_data(iter, ROOM_EXTRA_CEDED);	// not ceded if just claimed
+			perform_claim_room(iter, emp);
 		}
 	}
 }
@@ -2450,12 +2435,35 @@ int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, in
 */
 void perform_abandon_room(room_data *room) {
 	void deactivate_workforce_room(empire_data *emp, room_data *room);
+	void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter);
 	
 	empire_data *emp = ROOM_OWNER(room);
+	struct empire_territory_data *ter;
+	bool junk;
 	
-	// ensure workforce is shut off
+	// updates based on owner
 	if (emp) {
 		deactivate_workforce_room(emp, room);
+		adjust_building_tech(emp, room, FALSE);
+		
+		// update territory counts
+		if (COUNTS_AS_TERRITORY(room)) {
+			if (is_in_city_for_empire(room, emp, FALSE, &junk)) {
+				EMPIRE_CITY_TERRITORY(emp) -= 1;
+			}
+			else {
+				EMPIRE_OUTSIDE_TERRITORY(emp) -= 1;
+			}
+		}
+		// territory list
+		if (BELONGS_IN_TERRITORY_LIST(room) && (ter = find_territory_entry(emp, room))) {
+			delete_territory_entry(emp, ter);
+		}
+		
+		// quest tracker for members
+		if (GET_BUILDING(room) && IS_COMPLETE(room)) {
+			qt_empire_players(emp, qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
+		}
 	}
 	
 	ROOM_OWNER(room) = NULL;
@@ -2471,9 +2479,42 @@ void perform_abandon_room(room_data *room) {
 	if (IS_CITY_CENTER(room)) {
 		disassociate_building(room);
 	}
+}
+
+
+/**
+* Called by claim_room() to do the actual work.
+*
+* @param room_data *room The room to claim.
+* @param empire_data *emp The empire to claim for.
+*/
+void perform_claim_room(room_data *room, empire_data *emp) {
+	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 	
-	if (emp && GET_BUILDING(room) && IS_COMPLETE(room)) {
-		qt_empire_players(emp, qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
+	struct empire_territory_data *ter;
+	bool junk;
+	
+	ROOM_OWNER(room) = emp;
+	remove_room_extra_data(room, ROOM_EXTRA_CEDED);	// not ceded if just claimed
+	
+	adjust_building_tech(emp, room, TRUE);
+	
+	// update territory counts
+	if (COUNTS_AS_TERRITORY(room)) {
+		if (is_in_city_for_empire(room, emp, FALSE, &junk)) {
+			EMPIRE_CITY_TERRITORY(emp) += 1;
+		}
+		else {
+			EMPIRE_OUTSIDE_TERRITORY(emp) += 1;
+		}
+	}
+	// territory list
+	if (BELONGS_IN_TERRITORY_LIST(room) && !(ter = find_territory_entry(emp, room))) {
+		ter = create_territory_entry(emp, room);
+	}
+	
+	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
+		qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
 	}
 }
 
@@ -3974,6 +4015,59 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 	
 	// all good then
 	return TRUE;
+}
+
+
+/**
+* Takes player input of a complex component like "large block" or
+* "large, single fruit" and gets the CMP_ and CMPF_ settings from it.
+*
+* @param char *str The character's input.
+* @param int *type A variable to bind a CMP_ type (may be NOTHING or CMP_NONE).
+* @param bitvector_t *flags Any CMPF_ flags requested.
+* @return bool TRUE if the whole string parses into a component, FALSE if not.
+*/
+bool parse_component(char *str, int *type, bitvector_t *flags) {
+	extern const char *component_types[];
+	extern const char *component_flags[];
+	
+	char temp[MAX_INPUT_LENGTH], word[MAX_INPUT_LENGTH], *ptr;
+	int flg;
+	
+	// base setup
+	*type = NOTHING;
+	*flags = NOBITS;
+	
+	// make copy
+	strncpy(temp, str, MAX_INPUT_LENGTH-1);
+	temp[MAX_INPUT_LENGTH-1] = '\0';	// safety firsty
+	
+	// remove commas
+	while ((ptr = strchr(temp, ','))) {
+		*ptr = ' ';
+	}
+	
+	// check words 1 at a time
+	while (*temp) {
+		half_chop(temp, word, temp);	// split out first word
+		
+		if (!*temp) {	// final word is the component type
+			*type = search_block(word, component_types, FALSE);
+		}
+		else {	// each previous word is a possible flag
+			flg = search_block(word, component_flags, FALSE);
+			if (flg != NOTHING) {
+				*flags |= BIT(flg);
+			}
+			else {
+				// bad flag
+				*type = NOTHING;
+				return FALSE;
+			}
+		}
+	}
+	
+	return (*type != NOTHING && *type != CMP_NONE);
 }
 
 

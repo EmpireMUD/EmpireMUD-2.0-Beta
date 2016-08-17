@@ -169,7 +169,6 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	// otherwise, create the interior
 	room = create_room();
 	attach_building_to_room(bld, room, TRUE);
-	ROOM_OWNER(room) = VEH_OWNER(veh);
 	COMPLEX_DATA(room)->home_room = NULL;
 	SET_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_IN_VEHICLE);
 	SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_IN_VEHICLE);
@@ -178,6 +177,10 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	COMPLEX_DATA(room)->vehicle = veh;
 	VEH_INTERIOR_HOME_ROOM(veh) = room;
 	add_room_to_vehicle(room, veh);
+	
+	if (VEH_OWNER(veh)) {
+		claim_room(room, VEH_OWNER(veh));
+	}
 		
 	return room;
 }
@@ -678,8 +681,10 @@ void link_and_check_vehicles(void) {
 	// only bother this if we deleted anything
 	if (found) {
 		check_all_exits();
-		read_empire_territory(NULL);
 	}
+	
+	// need to update territory counts
+	read_empire_territory(NULL, FALSE);
 }
 
 

@@ -570,6 +570,8 @@ bool try_mobile_movement(char_data *ch) {
 * Main cycle of mob activity (iterates over character list).
 */
 void mobile_activity(void) {
+	extern bool catch_up_mobs;
+	
 	register char_data *ch, *next_ch, *vict, *targ, *m;
 	struct track_data *track;
 	struct pursuit_data *purs, *next_purs, *temp;
@@ -579,6 +581,12 @@ void mobile_activity(void) {
 	bool moved;
 
 	#define CAN_AGGRO(mob, vict)  (!IS_DEAD(vict) && !NOHASSLE(vict) && !IS_GOD(vict) && CAN_SEE(mob, vict) && vict != mob->master && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL | AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_NO_ATTACK))
+	
+	// prevent running multiple mob moves during a catch-up cycle
+	if (!catch_up_mobs) {
+		return;
+	}
+	catch_up_mobs = FALSE;
 
 	for (ch = character_list; ch; ch = next_ch) {
 		next_ch = ch->next;
@@ -1184,10 +1192,10 @@ void scale_mob_to_level(char_data *mob, int level) {
 	GET_CURRENT_SCALE_LEVEL(mob) = level;
 
 	// health
-	value = (1.5 * low_level) + (3.5 * mid_level) + (5.5 * high_level) + (14 * over_level);
-	value *= MOB_FLAGGED(mob, MOB_TANK) ? 6.0 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_HARD) ? 5.0 : 1.0;
-	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 6.0 : 1.0;
+	value = (1.5 * low_level) + (3.25 * mid_level) + (5.0 * high_level) + (12 * over_level);
+	value *= MOB_FLAGGED(mob, MOB_TANK) ? 2.0 : 1.0;
+	value *= MOB_FLAGGED(mob, MOB_HARD) ? 4.5 : 1.0;
+	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 5.5 : 1.0;
 	mob->points.max_pools[HEALTH] = MAX(1, (int) ceil(value));
 	
 	// move

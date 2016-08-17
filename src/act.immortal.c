@@ -338,7 +338,14 @@ struct {
 
 // secret implementor-only util for quick changes -- util tool
 ADMIN_UTIL(util_tool) {
-	msg_to_char(ch, "Ok.\r\n");
+	// msg_to_char(ch, "Ok.\r\n");
+	craft_data *craft, *next_craft;
+	
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		if (GET_CRAFT_ABILITY(craft) == NOTHING) {
+			msg_to_char(ch, "[%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		}
+	}
 }
 
 
@@ -1900,7 +1907,7 @@ SHOW(show_quests) {
 			return;
 		}
 		
-		size = snprintf(buf, sizeof(buf), "%s's quests:\r\n", GET_NAME(vict));
+		size = snprintf(buf, sizeof(buf), "%s's quests (%d/%d dailies):\r\n", GET_NAME(vict), GET_DAILY_QUESTS(vict), config_get_int("dailies_per_day"));
 		LL_FOREACH(GET_QUESTS(vict), pq) {
 			count_quest_tasks(pq, &count, &total);
 			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d tasks)\r\n", pq->vnum, get_quest_name_by_proto(pq->vnum), count, total);
@@ -4247,6 +4254,7 @@ ACMD(do_addnotes) {
 			free(acct->notes);
 		}
 		acct->notes = str_dup(notes);
+		SAVE_ACCOUNT(acct);
 		
 		if (index) {
 			strcpy(buf, index->fullname);
@@ -5763,12 +5771,14 @@ ACMD(do_purge) {
 
 			if (!REAL_NPC(vict)) {
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has purged %s.", GET_NAME(ch), GET_NAME(vict));
+				SAVE_CHAR(vict);
 				if (vict->desc) {
-					SAVE_CHAR(vict);
 					STATE(vict->desc) = CON_CLOSE;
 					vict->desc->character = NULL;
 					vict->desc = NULL;
 				}
+				
+				extract_all_items(vict);	// otherwise it duplicates items
 			}
 			extract_char(vict);
 		}

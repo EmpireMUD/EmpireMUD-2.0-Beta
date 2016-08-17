@@ -226,7 +226,7 @@ end
 ~
 #10907
 Colossal Red Dragon environmental~
-0 b 10
+0 bw 10
 ~
 if %self.fighting%
   halt
@@ -405,7 +405,7 @@ end
 ~
 #10912
 Sir Vivor environmental~
-0 b 10
+0 bw 10
 ~
 if %self.fighting%
   halt
@@ -427,7 +427,7 @@ end
 ~
 #10913
 Bangles the thief environmental~
-0 b 10
+0 bw 10
 ~
 switch %random.4%
   case 1

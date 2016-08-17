@@ -1,6 +1,6 @@
 #10100
 Swamp Hut passive~
-2 b 5
+2 bw 5
 ~
 switch %random.4%
   case 1
@@ -19,7 +19,7 @@ done
 ~
 #10101
 Swamp Hag passive~
-0 b 5
+0 bw 5
 ~
 switch %random.4%
   case 1
@@ -476,23 +476,25 @@ Delayed aggro greet/entry~
 ~
 if %actor%
   * Actor entered room - valid target?
-  if (%actor.is_npc% && %actor.mob_flagged(HUMAN)% && !%actor.aff_flagged(!ATTACK)%) || (%actor.is_pc% && %actor.level% > 25 && !%actor.on_quest(10147)%)
+  if (%actor.is_npc% && %actor.mob_flagged(HUMAN)% && !%actor.aff_flagged(!ATTACK)%) || (%actor.is_pc% && %actor.level% > 25 && !%actor.on_quest(10147)% && !%actor.nohassle%)
     eval target %actor%
   end
 else
   * entry - look for valid target in room
   eval person %room.people%
+  eval count 0
   while %person%
     * Manage cactus population
-    if %person.vnum% == %self.vnum%
-      if %random.2% == 2
+    if %person.vnum% >= 10140 && %person.vnum% <= 10142
+      eval count %count% + 1
+      if %count% >= 2 || %random.2% == 2
         %echo% %self.name% turns back into an ordinary cactus.
         %purge% %self%
         halt
       end
     end
     * validate
-    if (%person.is_npc% && %person.mob_flagged(HUMAN)% && !%person.aff_flagged(!ATTACK)%) || (%person.is_pc% && %person.level% > 25 && !%person.on_quest(10147)%)
+    if (%person.is_npc% && %person.mob_flagged(HUMAN)% && !%person.aff_flagged(!ATTACK)%) || (%person.is_pc% && %person.level% > 25 && !%person.on_quest(10147)% && !%person.nohassle%)
       eval target %person%
     end
     eval person %person.next_in_room%
@@ -514,6 +516,7 @@ end
 %echoaround% %target% %self.name% attacks %target.name%!
 %send% %target% %self.name% attacks you!
 mkill %target%
+look
 ~
 #10142
 Monsoon Rift cleanup + complete~
@@ -599,7 +602,7 @@ done
 ~
 #10144
 Monsoon Cloud~
-1 b 10
+1 bw 10
 ~
 switch %random.4%
   case 1
@@ -730,11 +733,6 @@ eval room %self.room%
 eval char %room.people%
 while %char%
   if %char.is_pc%
-    * Bonus exp reward
-    if %random.2% == 2
-      %send% %char% You gain 1 bonus experience point.
-      nop %char.bonus_exp(1)%
-    end
     if %char.on_quest(10141)%
       * We're already on the quest
       if %char.varexists(monsoon_attacker_kills)%
@@ -746,7 +744,6 @@ while %char%
       if %monsoon_attacker_kills% >= %target%
         %quest% %char% trigger 10141
         %send% %char% You have killed enough of these cacti. Head into the rift and look for their leader on top of the hill.
-        halt
       else
         %send% %char% You have killed %monsoon_attacker_kills% cacti.
       end
@@ -763,6 +760,11 @@ while %char%
         remote monsoon_attacker_kills %char.id%
       end
     end
+    * Bonus exp reward
+    if %random.2% == 2 && (%random.2% == 2 || (%actor.on_quest(10141)% && !%actor.quest_triggered(10141)%))
+      %send% %char% You gain 1 bonus experience point.
+      nop %char.bonus_exp(1)%
+    end
   end
   eval char %char.next_in_room%
 done
@@ -776,7 +778,7 @@ return 0
 ~
 #10150
 Free-tailed bat emotes~
-0 b 10
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -796,7 +798,7 @@ end
 ~
 #10151
 Gila monster emotes~
-0 b 10
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -816,7 +818,7 @@ end
 ~
 #10152
 Armadillo emotes~
-0 b 10
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -836,7 +838,7 @@ end
 ~
 #10153
 Cactus wren emotes~
-0 b 10
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -855,7 +857,7 @@ end
 ~
 #10154
 Antelope squirrel emotes~
-0 b 10
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -874,7 +876,7 @@ end
 ~
 #10155
 Bighorn sheep emotes~
-0 b 10
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -894,7 +896,7 @@ end
 ~
 #10156
 Coati emotes~
-0 b 10
+0 bw 10
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -913,7 +915,7 @@ end
 ~
 #10157
 Monsoon room environment~
-2 b 10
+2 bw 10
 ~
 switch %random.4%
   case 1
@@ -947,7 +949,7 @@ return 1
 ~
 #10159
 Teddybear cactus emotes~
-0 bt 5
+0 btw 5
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -1211,7 +1213,7 @@ remote last_monsoon_loot_item %actor.id%
 ~
 #10171
 Monsoon thief + vampire reveal~
-0 h 100
+0 hw 100
 ~
 if (%self.vampire% && %actor.skill(Vampire)% < 51) || (!%self.vampire% && %actor.skill(Stealth)% < 51)
   halt
@@ -1365,58 +1367,58 @@ while %cycles_left% >= 0
       %quest% %actor% trigger 10157
       %send% %actor% %self.shortdesc% splinters and breaks!
       %echoaround% %actor% %self.shortdesc% splinters and breaks!
-      * Start of script fragment: Monsoon cleanup
-      * Iterates over a series of vnums and removes all mobs with those vnums from the instance.
-      * Also cleans up the entrance portal and saguaro cactus.
-      * This script fragment is duplicated in triggers: 10142, 10177, 10180
-      eval current_vnum 10140
-      while %current_vnum% <= 10147
-        if %current_vnum% <= 10143
-          set message turns back into an ordinary cactus.
-        else
-          set message leaves.
-        end
-        eval mob %%instance.mob(%current_vnum%)%%
-        while %mob%
-          %echoaround% %mob% %mob.name% %message%
-          %purge% %mob%
-          eval mob %%instance.mob(%current_vnum%)%%
-        done
-        eval current_vnum %current_vnum% + 1
-      done
-      eval loc %instance.location%
-      eval obj %loc.contents%
-      while %obj%
-        eval next_obj %obj.next_in_list%
-        if %obj.vnum% == 10140
-          %at% %loc% %echo% The monsoon rift closes.
-          %purge% %obj%
-        end
-        eval obj %next_obj%
-      done
-      * Despawn saguaro obj
-      makeuid loc room i10145
-      if %loc%
-        eval obj %loc.contents%
-        while %obj%
-          eval next_obj %obj.next_in_list%
-          if %obj.vnum% == 10171
-            %at% %loc% %echo% You lose track of %obj.shortdesc%.
-            %purge% %obj%
-          end
-          eval obj %next_obj%
-        done
-      end
-      %adventurecomplete%
-      * End of script fragment.
-      %quest% %actor% finish 10157
-      * Quest finish will purge this for us
-      halt
+      * Leave the loop
     break
   done
   wait 5 sec
   eval cycles_left %cycles_left% - 1
 done
+* Start of script fragment: Monsoon cleanup
+* Iterates over a series of vnums and removes all mobs with those vnums from the instance.
+* Also cleans up the entrance portal and saguaro cactus.
+* This script fragment is duplicated in triggers: 10142, 10177, 10180
+eval current_vnum 10140
+while %current_vnum% <= 10147
+  if %current_vnum% <= 10143
+    set message turns back into an ordinary cactus.
+  else
+    set message leaves.
+  end
+  eval mob %%instance.mob(%current_vnum%)%%
+  while %mob%
+    %echoaround% %mob% %mob.name% %message%
+    %purge% %mob%
+    eval mob %%instance.mob(%current_vnum%)%%
+  done
+  eval current_vnum %current_vnum% + 1
+done
+eval loc %instance.location%
+eval obj %loc.contents%
+while %obj%
+  eval next_obj %obj.next_in_list%
+  if %obj.vnum% == 10140
+    %at% %loc% %echo% The monsoon rift closes.
+    %purge% %obj%
+  end
+  eval obj %next_obj%
+done
+* Despawn saguaro obj
+makeuid loc room i10145
+if %loc%
+  eval obj %loc.contents%
+  while %obj%
+    eval next_obj %obj.next_in_list%
+    if %obj.vnum% == 10171
+      %at% %loc% %echo% You lose track of %obj.shortdesc%.
+      %purge% %obj%
+    end
+    eval obj %next_obj%
+  done
+end
+%adventurecomplete%
+* End of script fragment.
+%quest% %actor% finish 10157
+* Quest finish will purge this for us
 ~
 #10178
 Give Bat Totem~
@@ -1500,58 +1502,58 @@ while %cycles_left% >= 0
       %quest% %actor% trigger 10145
       %send% %actor% %self.shortdesc% bursts into flames!
       %echoaround% %actor% %self.shortdesc% bursts into flames!
-      * Start of script fragment: Monsoon cleanup
-      * Iterates over a series of vnums and removes all mobs with those vnums from the instance.
-      * Also cleans up the entrance portal and saguaro cactus.
-      * This script fragment is duplicated in triggers: 10142, 10177, 10180
-      eval current_vnum 10140
-      while %current_vnum% <= 10147
-        if %current_vnum% <= 10143
-          set message turns back into an ordinary cactus.
-        else
-          set message leaves.
-        end
-        eval mob %%instance.mob(%current_vnum%)%%
-        while %mob%
-          %echoaround% %mob% %mob.name% %message%
-          %purge% %mob%
-          eval mob %%instance.mob(%current_vnum%)%%
-        done
-        eval current_vnum %current_vnum% + 1
-      done
-      eval loc %instance.location%
-      eval obj %loc.contents%
-      while %obj%
-        eval next_obj %obj.next_in_list%
-        if %obj.vnum% == 10140
-          %at% %loc% %echo% The monsoon rift closes.
-          %purge% %obj%
-        end
-        eval obj %next_obj%
-      done
-      * Despawn saguaro obj
-      makeuid loc room i10145
-      if %loc%
-        eval obj %loc.contents%
-        while %obj%
-          eval next_obj %obj.next_in_list%
-          if %obj.vnum% == 10171
-            %at% %loc% %echo% You lose track of %obj.shortdesc%.
-            %purge% %obj%
-          end
-          eval obj %next_obj%
-        done
-      end
-      %adventurecomplete%
-      * End of script fragment.
-      %quest% %actor% finish 10145
-      * Quest finish will purge the ritual object for us
-      halt
+      * Leave the loop
     break
   done
   wait 5 sec
   eval cycles_left %cycles_left% - 1
 done
+* Start of script fragment: Monsoon cleanup
+* Iterates over a series of vnums and removes all mobs with those vnums from the instance.
+* Also cleans up the entrance portal and saguaro cactus.
+* This script fragment is duplicated in triggers: 10142, 10177, 10180
+eval current_vnum 10140
+while %current_vnum% <= 10147
+  if %current_vnum% <= 10143
+    set message turns back into an ordinary cactus.
+  else
+    set message leaves.
+  end
+  eval mob %%instance.mob(%current_vnum%)%%
+  while %mob%
+    %echoaround% %mob% %mob.name% %message%
+    %purge% %mob%
+    eval mob %%instance.mob(%current_vnum%)%%
+  done
+  eval current_vnum %current_vnum% + 1
+done
+eval loc %instance.location%
+eval obj %loc.contents%
+while %obj%
+  eval next_obj %obj.next_in_list%
+  if %obj.vnum% == 10140
+    %at% %loc% %echo% The monsoon rift closes.
+    %purge% %obj%
+  end
+  eval obj %next_obj%
+done
+* Despawn saguaro obj
+makeuid loc room i10145
+if %loc%
+  eval obj %loc.contents%
+  while %obj%
+    eval next_obj %obj.next_in_list%
+    if %obj.vnum% == 10171
+      %at% %loc% %echo% You lose track of %obj.shortdesc%.
+      %purge% %obj%
+    end
+    eval obj %next_obj%
+  done
+end
+%adventurecomplete%
+* End of script fragment.
+%quest% %actor% finish 10145
+* Quest finish will purge the ritual object for us
 ~
 #10181
 Druid tent fake search~
@@ -1620,5 +1622,86 @@ while %cycles_left% >= 0
   wait 5 sec
   eval cycles_left %cycles_left% - 1
 done
+~
+#10190
+Lavaformer Spawn~
+0 n 100
+~
+eval room %self.room%
+if (!%instance.location% || %room.template% != 10190)
+  halt
+end
+mgoto %instance.location%
+%purge% volcanoportal
+~
+#10191
+Lavaforming~
+0 i 100
+~
+eval room %self.room%
+if !%instance.location%
+  %purge% %self%
+  halt
+end
+eval dist %%room.distance(%instance.location%)%%
+if (%dist% > 4)
+  mgoto %instance.location%
+elseif (%room.sector% == Flowing Lava || %room.sector% == Cooling Lava || %room.building% == Volcano Caldera || %room.aff_flagged(*HAS-INSTANCE)%)
+  * No Work
+  halt
+else
+  %terraform% %room% 10190
+  %load% obj 10192
+  %echo% The raging lava comes crashing down the mountainside!
+  %aoe% 1000 fire
+end
+~
+#10192
+Lava flow decay~
+1 f 0
+~
+eval room %self.room%
+if (%self.vnum% == 10192)
+  if (%room.sector% != Flowing Lava)
+    halt
+  end
+  %terraform% %room% 10191
+  %load% obj 10193
+  %echo% The lava flow cools and hardens.
+elseif (%self.vnum% == 10193)
+  if (%room.sector% != Cooling Lava)
+    halt
+  end
+  %terraform% %room% 10192
+end
+%purge% %self%
+return 0
+~
+#10193
+Volcanic Weather~
+1 c 4
+weather~
+%send% %actor% Dark clouds of volcanic ash cover the sky!
+~
+#10194
+Lava Damage~
+1 bw 100
+~
+%echo% The hot air from the lava flow blisters your skin!
+%aoe% 100 fire
+~
+#10195
+Volcano Cleanup~
+2 e 100
+~
+%load% obj 10192
+%terraform% %room% 10190
+~
+#10196
+Caldera Damage~
+2 bw 100
+~
+%echo% The hot air from the caldera causes your flesh to blister and melt!
+%aoe% 1000 fire
 ~
 $

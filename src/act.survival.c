@@ -32,7 +32,7 @@
 // external vars
 
 // external funcs
-extern room_data *dir_to_room(room_data *room, int dir);
+extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 void scale_item_to_level(obj_data *obj, int level);
 
 // local protos
@@ -580,7 +580,7 @@ ACMD(do_fish) {
 	else if (*arg && (dir = parse_direction(ch, arg)) == NO_DIR) {
 		msg_to_char(ch, "Fish in what direction?\r\n");
 	}
-	else if (dir != NO_DIR && !(room = dir_to_room(IN_ROOM(ch), dir))) {
+	else if (dir != NO_DIR && !(room = dir_to_room(IN_ROOM(ch), dir, FALSE))) {
 		msg_to_char(ch, "You can't fish in that direction.\r\n");
 	}
 	else if (!CAN_INTERACT_ROOM(room, INTERACT_FISH)) {

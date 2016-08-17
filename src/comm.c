@@ -131,6 +131,11 @@ static bool reboot_recovery = FALSE;
 int mother_desc;
 ush_int port;
 
+// vars to prevent running multiple cycles during a missed-pulse catch-up cycle
+bool catch_up_combat = FALSE;	// frequent_combat()
+bool catch_up_actions = FALSE;	// update_actions()
+bool catch_up_mobs = FALSE;	// mobile_activity()
+
 /* Reboot data (default to a normal reboot once per week) */
 struct reboot_control_data reboot_control = { SCMD_REBOOT, 7.5 * (24 * 60), SHUTDOWN_NORMAL, FALSE };
 
@@ -819,6 +824,7 @@ void heartbeat(int heart_pulse) {
 	void check_newbie_islands();
 	void check_wars();
 	void chore_update();
+	void detect_evos_per_hour();
 	void extract_pending_chars();
 	void frequent_combat(int pulse);
 	void generate_adventure_instances();
@@ -964,6 +970,8 @@ void heartbeat(int heart_pulse) {
 	if (HEARTBEAT(SECS_PER_REAL_HOUR)) {
 		reduce_stale_empires();
 		if (debug_log && HEARTBEAT(15)) { log("debug 21:\t%lld", microtime()); }
+		detect_evos_per_hour();
+		if (debug_log && HEARTBEAT(15)) { log("debug 21.5:\t%lld", microtime()); }
 	}
 	
 	if (HEARTBEAT(30 * SECS_PER_REAL_MIN)) {
@@ -988,10 +996,7 @@ void heartbeat(int heart_pulse) {
 			process_imports();
 			if (debug_log && HEARTBEAT(15)) { log("debug 25:\t%lld", microtime()); }
 		}
-	}
-	
-	// just over 7.5 minutes -- to avoid putting it right on the same cycle as hours
-	if (HEARTBEAT(455)) {
+		// evos happen every hour
 		run_map_evolutions();
 		if (debug_log && HEARTBEAT(15)) { log("debug 26:\t%lld", microtime()); }
 	}
@@ -2484,7 +2489,7 @@ static int process_output(descriptor_data *t) {
 		return (0);
 
 	/* Handle snooping: prepend "% " and send to snooper. */
-	if (t->snoop_by) {
+	if (t->snoop_by && *t->output) {
 		write_to_output("% ", t->snoop_by);
 		write_to_output(t->output, t->snoop_by);
 		write_to_output("%%", t->snoop_by);
@@ -3088,6 +3093,15 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				}
+				case 'q': {	// daily quests left
+					int amt = 0;
+					if (!IS_NPC(ch)) {
+						amt = config_get_int("dailies_per_day") - GET_DAILY_QUESTS(ch);
+					}
+					sprintf(i, "%d", MAX(0, amt));
+					tmp = i;
+					break;
+				}
 				case 'r': {	// room template/building
 					if (IS_IMMORTAL(ch)) {
 						if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
@@ -3477,6 +3491,9 @@ void game_loop(socket_t mother_desc) {
 		}
 
 		/* Now execute the heartbeat functions */
+		catch_up_combat = TRUE;
+		catch_up_actions = TRUE;
+		catch_up_mobs = TRUE;
 		while (missed_pulses--) {
 			heartbeat(++pulse);
 		}

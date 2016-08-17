@@ -115,6 +115,7 @@ test_config 0
 *
 * Players configs
 blood_starvation_level 20
+dailies_per_day 5
 default_class_abbrev Advn
 default_class_name Adventurer
 default_map_size 7
