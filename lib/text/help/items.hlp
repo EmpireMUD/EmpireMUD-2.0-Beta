@@ -88,9 +88,9 @@ dig up more clay. It can be stored at the Potter.
 
 See also: CLAY PIT, COMPONENT, POTTER
 #
-"COMPONENT TYPES" "COMPONENT TYPE LIST"
+"COMPONENT TYPES" "COMPONENT TYPE LIST" "COMPONENT LIST" "RESOURCE TYPES" "RESOURCE LIST" "RESOURCE TYPE LIST"
 
-Available components:
+Available generic components:
  &cadhesive&0 - not currently used
  &cbone&0 - not currently used
  &cblock&0 - building materials like bricks or blocks

@@ -334,7 +334,7 @@ the last mountain reset), otherwise your deep mines ability will have no effect.
 Mines will only display as 'deep' if, thanks to this bonus, they have more ore
 than the normal maximum.
 
-Once you have started a mine (or prospected) a given mountain tile, it will
+Once you have started a mine on (or prospected) a given mountain tile, it will
 remain a deep mine unless the mountain is reset at the end of the year. For
 more information on mountain resets, see HELP MINE.
 
