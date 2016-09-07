@@ -1122,7 +1122,13 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 			case 'F': {
 				if (OBJ_FILE_TAG(line, "Flags:", length)) {
 					if (sscanf(line + length + 1, "%s", s_in)) {
-						VEH_FLAGS(veh) = asciiflag_conv(s_in);
+						if (proto) {	// prefer to keep flags from the proto
+							VEH_FLAGS(veh) = VEH_FLAGS(proto) & ~SAVABLE_VEH_FLAGS;
+							VEH_FLAGS(veh) |= asciiflag_conv(s_in) & SAVABLE_VEH_FLAGS;
+						}
+						else {	// no proto
+							VEH_FLAGS(veh) = asciiflag_conv(s_in);
+						}
 					}
 				}
 				break;
@@ -1933,6 +1939,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 void save_olc_vehicle(descriptor_data *desc) {	
 	vehicle_data *proto, *veh = GET_OLC_VEHICLE(desc), *iter;
 	any_vnum vnum = GET_OLC_VNUM(desc);
+	bitvector_t old_flags;
 	UT_hash_handle hh;
 
 	// have a place to save it?
@@ -1970,6 +1977,10 @@ void save_olc_vehicle(descriptor_data *desc) {
 		if (VEH_VNUM(iter) != vnum) {
 			continue;
 		}
+		
+		// flags (preserve the state of the savable flags only)
+		old_flags = VEH_FLAGS(iter) & SAVABLE_VEH_FLAGS;
+		VEH_FLAGS(iter) = (VEH_FLAGS(veh) & ~SAVABLE_VEH_FLAGS) | old_flags;
 		
 		// update pointers
 		if (VEH_KEYWORDS(iter) == VEH_KEYWORDS(proto)) {

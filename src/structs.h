@@ -1779,6 +1779,11 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_ON_FIRE  BIT(18)	// s. currently on fire
 #define VEH_NO_LOAD_ONTO_VEHICLE  BIT(19)	// t. cannot be loaded onto a vehicle
 
+// The following vehicle flags are saved to file rather than read from the
+// prototype. Flags which are NOT included in this list can be altered with
+// OLC and affect live copies.
+#define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE)
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// WEATHER AND SEASON DEFINES //////////////////////////////////////////////
