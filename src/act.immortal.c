@@ -71,6 +71,7 @@ void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 extern char *get_room_name(room_data *room, bool color);
+void replace_question_color(char *input, char *color, char *output);
 void save_whole_world();
 void scale_mob_to_level(char_data *mob, int level);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
@@ -2874,12 +2875,14 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	extern const char *designate_flags[];
 	extern const char *function_flags[];
 	
+	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	struct obj_storage_type *store;
-	char line[MAX_STRING_LENGTH];
 	obj_data *obj, *next_obj;
 	
 	msg_to_char(ch, "Building VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_BLD_VNUM(bdg), GET_BLD_NAME(bdg));
-	msg_to_char(ch, "Room Title: %s, Icon: %s&0\r\n", GET_BLD_TITLE(bdg), NULLSAFE(GET_BLD_ICON(bdg)));
+	
+	replace_question_color(NULLSAFE(GET_BLD_ICON(bdg)), "&0", lbuf);
+	msg_to_char(ch, "Room Title: %s, Icon: %s&0 %s&0\r\n", GET_BLD_TITLE(bdg), lbuf, show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
 	
 	if (GET_BLD_DESC(bdg) && *GET_BLD_DESC(bdg)) {
 		msg_to_char(ch, "Description:\r\n%s", GET_BLD_DESC(bdg));
