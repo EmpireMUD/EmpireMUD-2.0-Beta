@@ -268,6 +268,7 @@ void boot_db(void) {
 	void load_trading_post();
 	void reset_time();
 	int run_convert_vehicle_list();
+	void run_reboot_triggers();
 	void sort_commands();
 	void startup_room_reset();
 	void verify_sectors();
@@ -367,6 +368,10 @@ void boot_db(void) {
 	
 	// figure out how often to evolve what (do this late)
 	detect_evos_per_hour();
+	
+	// one last thing...
+	log("Running reboot triggers.");
+	run_reboot_triggers();
 	
 	// END
 	log("Boot db -- DONE.");

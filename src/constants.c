@@ -3049,7 +3049,8 @@ const char *trig_types[] = {
 	"Charmed",
 	"Start-Quest",	// 20
 	"Finish-Quest",
-	"Player-in-Room",	// 22
+	"Player-in-Room",
+	"Reboot",	// 23
 	"\n"
 };
 
@@ -3078,6 +3079,7 @@ const bitvector_t mtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// start-quest
 	TRIG_ARG_PERCENT,	// finish-quest
 	TRIG_ARG_PERCENT,	// player-in-room
+	NOBITS,	// reboot
 };
 
 
@@ -3105,7 +3107,8 @@ const char *otrig_types[] = {
 	"Finish",
 	"Start-Quest",	// 20
 	"Finish-Quest",
-	"Player-in-Room",	// 22
+	"Player-in-Room",
+	"Reboot",	// 23
 	"\n"
 };
 
@@ -3134,6 +3137,7 @@ const bitvector_t otrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// start-quest
 	TRIG_ARG_PERCENT,	// finish-quest
 	TRIG_ARG_PERCENT,	// player-in-room
+	NOBITS,	// reboot
 };
 
 
@@ -3161,7 +3165,8 @@ const char *vtrig_types[] = {
 	"*",	// 19
 	"Start-Quest",	// 20
 	"Finish-Quest",
-	"Player-in-Room",	// 22
+	"Player-in-Room",
+	"Reboot",	// 23
 	"\n"
 };
 
@@ -3191,6 +3196,7 @@ const bitvector_t vtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// start-quest
 	TRIG_ARG_PERCENT,	// finish-quest
 	TRIG_ARG_PERCENT,	// player-in-room
+	NOBITS,	// reboot
 };
 
 
@@ -3218,7 +3224,8 @@ const char *wtrig_types[] = {
 	"*",
 	"Start-Quest",	// 20
 	"Finish-Quest",
-	"Player-in-Room",	// 22
+	"Player-in-Room",
+	"Reboot",	// 23
 	"\n"
 };
 
@@ -3247,6 +3254,7 @@ const bitvector_t wtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// start-quest
 	TRIG_ARG_PERCENT,	// finish-quest
 	TRIG_ARG_PERCENT,	// player-in-room
+	NOBITS,	// reboot
 };
 
 

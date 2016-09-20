@@ -353,6 +353,18 @@ Note: Random triggers attached to charmed mobs will not fire unless the trigger
 
 See also: GLOBAL TRIGGER, MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER
 #d
+"REBOOT TRIGGER" "MTRIG REBOOT" "OTRIG REBOOT" "RTRIG REBOOT" "VTRIG REBOOT" TRIGEDIT-MOB-REBOOT TRIGEDIT-OBJ-REBOOT TRIGEDIT-ROOM-REBOOT TRIGEDIT-VEH-REBOOT REBOOT-TIMING TIMING
+
+Reboot (trigger type)
+
+Return value:  return 0 to block more reboot triggers on this mob/obj/etc
+
+This type of trigger fires when the mud starts up, for example after a reboot
+or crash. This allows you to fix complex setups like a mob that should be
+following another mob, and other things that aren't saved through reboots.
+
+You can attach random triggers to mobs, objects, rooms, and vehicles.
+#d
 "SCRIPT COMMANDS" "TRIGEDIT SCRIPT COMMANDS"
 
 The following is a list of special commands that can be used in triggers:
