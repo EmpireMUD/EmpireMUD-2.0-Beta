@@ -44,7 +44,7 @@ bool can_instance(adv_data *adv);
 int count_instances(adv_data *adv);
 int count_mobs_in_instance(struct instance_data *inst, mob_vnum vnum);
 int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum);
-int count_players_in_instance(struct instance_data *inst, bool include_imms);
+int count_players_in_instance(struct instance_data *inst, bool include_imms, char_data *ignore_ch);
 int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum);
 static int determine_random_exit(adv_data *adv, room_data *from, room_data *to);
 struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
@@ -1175,7 +1175,7 @@ void prune_instances(void) {
 		// look for completed or orphaned instances
 		if (INSTANCE_FLAGGED(inst, INST_COMPLETED) || !inst->start || !inst->location || inst->size == 0 || (rule && (inst->created + 60 * rule->value) < time(0))) {
 			// well, only if empty
-			if (count_players_in_instance(inst, TRUE) == 0) {
+			if (count_players_in_instance(inst, TRUE, NULL) == 0) {
 				delete_instance(inst);
 				save = TRUE;
 			}
@@ -1292,7 +1292,7 @@ bool can_enter_instance(char_data *ch, struct instance_data *inst) {
 		return TRUE;
 	}
 	
-	if (GET_ADV_PLAYER_LIMIT(inst->adventure) > 0 && count_players_in_instance(inst, FALSE) >= GET_ADV_PLAYER_LIMIT(inst->adventure)) {
+	if (GET_ADV_PLAYER_LIMIT(inst->adventure) > 0 && count_players_in_instance(inst, FALSE, ch) >= GET_ADV_PLAYER_LIMIT(inst->adventure)) {
 		return FALSE;
 	}
 	else {
@@ -1397,16 +1397,17 @@ int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum) {
 /**
 * @param struct instance_data *inst The instance to check.
 * @param bool count_imms If TRUE, includes immortals (who don't normally contribute to player limits).
+* @param char_data *ignore_ch Optional: A character not to count, e.g. someone trying to enter the instance (to prevent counting them against their own entry) (may be NULL).
 * @return int Total number of players in the instance.
 */
-int count_players_in_instance(struct instance_data *inst, bool count_imms) {
+int count_players_in_instance(struct instance_data *inst, bool count_imms, char_data *ignore_ch) {
 	int iter, count = 0;
 	char_data *ch;
 	
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (inst->room[iter]) {
 			for (ch = ROOM_PEOPLE(inst->room[iter]); ch; ch = ch->next_in_room) {
-				if (!IS_NPC(ch) && (count_imms || !IS_IMMORTAL(ch))) {
+				if (ch != ignore_ch && !IS_NPC(ch) && (count_imms || !IS_IMMORTAL(ch))) {
 					++count;
 				}
 			}
