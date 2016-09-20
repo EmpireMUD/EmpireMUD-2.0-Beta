@@ -306,9 +306,6 @@ void boot_db(void) {
 	log("Generating player index.");
 	build_player_index();
 	
-	log(" Calculating territory and members...");
-	reread_empire_tech(NULL);
-	
 	log(" Checking for ruined cities...");
 	check_ruined_cities();
 
@@ -369,9 +366,12 @@ void boot_db(void) {
 	// figure out how often to evolve what (do this late)
 	detect_evos_per_hour();
 	
-	// one last thing...
+	// final things...
 	log("Running reboot triggers.");
 	run_reboot_triggers();
+	
+	log(" Calculating territory and members.");
+	reread_empire_tech(NULL);
 	
 	// END
 	log("Boot db -- DONE.");
