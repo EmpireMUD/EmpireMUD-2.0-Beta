@@ -247,10 +247,10 @@ a basket of sparkling gemfruits~
 A basket of sparkling gemfruits is lying here.~
    This beautiful fruit will eventually decay if not stored or eaten, leaving
 behind a magical crystal. It can also be planted to grow more gemfruit. Some
-gemfuits will fail to produce gems, and you must be holding them in your
-inventory when they decay to get any gems at all.
+gemfruits will fail to produce gems, and you must be holding them in your
+inventory when they decay to get any gems at all.  
 ~
-6 b a 13
+6 b a 14
 48 10504 0
 12 240
 T 10514
@@ -278,10 +278,8 @@ A basket of magic mushrooms is sitting here.~
 growing a lot of them.
 
 Brew (Healing Elixirs): magic mushroom potion
-  4x basket of magic mushrooms
-  6x magewhisper sepals
 ~
-6 b a 7
+6 b a 8
 24 10505 0
 7 168
 I 15 10515 100.00 4 x  # SEPARATE: a magic mushroom
@@ -295,10 +293,10 @@ S
 #10517
 potion magic mushroom~
 a magic mushroom potion~
-A magic mushroom is lying here.~
+A magic mushroom potion is sitting here.~
 This foul-smelling mana potion is made from magic mushrooms.
 ~
-25 m a 3
+25 m a 4
 4 1 0
 8 0
 C
@@ -503,7 +501,7 @@ stalk pickthorn~
 a pickthorn stalk~
 A pickthorn stalk seems planted here.~
    The pickthorn is a plant magi-netically engineered by Magiterranean druids
-to grow useful tools on unused farmland.  
+to grow useful tools on unused farmland.
 
 Craft (Basic Crafts): thorn pick
 Craft (Master Craftsman, level 150): pick-and-pan
