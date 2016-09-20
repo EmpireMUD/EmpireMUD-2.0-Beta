@@ -878,11 +878,19 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_nexus_crystals) {
 * @return bool TRUE if this workforce chore can work this craft, FALSE if not
 */
 CHORE_GEN_CRAFT_VALIDATOR(chore_milling) {
+	ability_data *abil;
+	
 	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_MILL) {
 		return FALSE;
 	}
-	if (GET_CRAFT_ABILITY(craft) != NO_ABIL) {
-		return FALSE;
+	// won't mill things that require classes or high skill
+	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) ) {
+		if (!ABIL_ASSIGNED_SKILL(abil)) {
+			return FALSE;	// class ability
+		}
+		else if (ABIL_SKILL_LEVEL(abil) > BASIC_SKILL_CAP) {
+			return FALSE;	// level too high
+		}
 	}
 	// success
 	return TRUE;
