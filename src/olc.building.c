@@ -40,6 +40,7 @@ extern const char *spawn_flags[];
 
 // external funcs
 void init_building(bld_data *building);
+void replace_question_color(char *input, char *color, char *output);
 void sort_interactions(struct interaction_item **list);
 
 
@@ -657,7 +658,8 @@ void olc_show_building(char_data *ch) {
 	sprintf(buf + strlen(buf), "<&ytitle&0> %s\r\n", GET_BLD_TITLE(bdg));
 	
 	if (!is_room) {
-		sprintf(buf + strlen(buf), "<&yicon&0> %s&0  %s\r\n", NULLSAFE(GET_BLD_ICON(bdg)), show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
+		replace_question_color(NULLSAFE(GET_BLD_ICON(bdg)), "&0", lbuf);
+		sprintf(buf + strlen(buf), "<&yicon&0> %s&0  %s\r\n", lbuf, show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
 	}
 	sprintf(buf + strlen(buf), "<&ycommands&0> %s\r\n", GET_BLD_COMMANDS(bdg) ? GET_BLD_COMMANDS(bdg) : "");
 	sprintf(buf + strlen(buf), "<&ydescription&0>\r\n%s", GET_BLD_DESC(bdg) ? GET_BLD_DESC(bdg) : "");

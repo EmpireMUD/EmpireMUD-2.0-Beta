@@ -59,6 +59,7 @@
 #define MTRIG_START_QUEST      BIT(20)	// player tries to start a quest
 #define MTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 #define MTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
+#define MTRIG_REBOOT           BIT(23)	// after the mud reboots
 
 
 /* obj trigger types */
@@ -83,6 +84,7 @@
 #define OTRIG_START_QUEST      BIT(20)	// player tries to start a quest
 #define OTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 #define OTRIG_PLAYER_IN_ROOM   BIT(22)	// NOT actually used, currently
+#define OTRIG_REBOOT           BIT(23)	// after the mud reboots
 
 
 // VTRIG_x: vehicle trigger types
@@ -103,6 +105,7 @@
 #define VTRIG_START_QUEST      BIT(20)	// player tries to start a quest
 #define VTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 #define VTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
+#define VTRIG_REBOOT           BIT(23)	// after the mud reboots
 
 
 /* wld trigger types */
@@ -124,6 +127,7 @@
 #define WTRIG_START_QUEST      BIT(20)	// player tries to start a quest
 #define WTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 #define WTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
+#define WTRIG_REBOOT           BIT(23)	// after the mud reboots
 
 
 /* obj command trigger types */

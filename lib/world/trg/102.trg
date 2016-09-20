@@ -569,7 +569,7 @@ Primeval no-flee~
 0 c 0
 flee~
 %send% %actor% There's nowhere to flee!
-return 0
+return 1
 ~
 #10266
 Hint to 10252~

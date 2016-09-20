@@ -1,7 +1,7 @@
 config.*
 syslog
 syslog.CRASH
-
+.DS_Store
 
 *.plist
 

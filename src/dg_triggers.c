@@ -765,6 +765,27 @@ int door_mtrigger(char_data *actor, int subcmd, int dir) {
 }
 
 
+void reboot_mtrigger(char_data *ch) {
+	trig_data *t;
+	int val;
+
+	if (!SCRIPT_CHECK(ch, MTRIG_REBOOT)) {
+		return;
+	}
+
+	for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, MTRIG_REBOOT)) {
+			union script_driver_data_u sdd;
+			sdd.c = ch;
+			val = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+			if (!val) {
+				break;
+			}
+		}
+	}
+}
+
+
 /*
 *  object triggers
 */
@@ -1198,6 +1219,28 @@ int finish_otrigger(obj_data *obj, char_data *actor) {
 }
 
 
+void reboot_otrigger(obj_data *obj) {
+	trig_data *t;
+	int val;
+
+	if (!SCRIPT_CHECK(obj, OTRIG_REBOOT)) {
+		return;
+	}
+
+	for (t = TRIGGERS(SCRIPT(obj)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, OTRIG_REBOOT)) {
+			union script_driver_data_u sdd;
+			sdd.o = obj;
+			val = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
+			obj = sdd.o;
+			if (!val) {
+				break;
+			}
+		}
+	}
+}
+
+
 /*
 *  world triggers
 */
@@ -1551,6 +1594,29 @@ int door_wtrigger(char_data *actor, int subcmd, int dir) {
 }
 
 
+void reboot_wtrigger(room_data *room) {
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *t;
+	int val;
+
+	if (!SCRIPT_CHECK(room, WTRIG_REBOOT)) {
+		return;
+	}
+
+	for (t = TRIGGERS(SCRIPT(room)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, WTRIG_REBOOT)) {
+			union script_driver_data_u sdd;
+			ADD_ROOM_UID_VAR(buf, t, room, "room", 0);
+			sdd.r = room;
+			val = script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
+			if (!val) {
+				break;
+			}
+		}
+	}
+}
+
+
 /**
 * Checks all triggers for a command match.
 *
@@ -1803,6 +1869,27 @@ void random_vtrigger(vehicle_data *veh) {
 			union script_driver_data_u sdd;
 			sdd.v = veh;
 			if (script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW)) {
+				break;
+			}
+		}
+	}
+}
+
+
+void reboot_vtrigger(vehicle_data *veh) {
+	trig_data *t;
+	int val;
+
+	if (!SCRIPT_CHECK(veh, VTRIG_REBOOT)) {
+		return;
+	}
+
+	for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
+		if (TRIGGER_CHECK(t, VTRIG_REBOOT)) {
+			union script_driver_data_u sdd;
+			sdd.v = veh;
+			val = script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW);
+			if (!val) {
 				break;
 			}
 		}
