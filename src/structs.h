@@ -3715,6 +3715,7 @@ struct obj_data {
 	
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;
+	bool search_mark;
 	
 	UT_hash_handle hh;	// object_table hash
 };
