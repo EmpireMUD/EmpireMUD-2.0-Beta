@@ -69,6 +69,7 @@ void delete_instance(struct instance_data *inst);	// instance.c
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
+void get_resource_display(struct resource_data *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 extern char *get_room_name(room_data *room, bool color);
 void replace_question_color(char *input, char *color, char *output);
@@ -2936,6 +2937,11 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 		send_to_char(buf, ch);
 	}
 	
+	if (GET_BLD_YEARLY_MAINTENANCE(bdg)) {
+		get_resource_display(GET_BLD_YEARLY_MAINTENANCE(bdg), buf);
+		msg_to_char(ch, "Yearly maintenance:\r\n%s", buf);
+	}
+	
 	// storage? reverse-lookup
 	*buf = '\0';
 	*line = '\0';
@@ -3262,8 +3268,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 
 void do_stat_craft(char_data *ch, craft_data *craft) {
-	void get_resource_display(struct resource_data *list, char *save_buffer);
-
 	extern const char *craft_flags[];
 	extern const char *craft_types[];
 	
@@ -3750,7 +3754,7 @@ void do_stat_room(char_data *ch) {
 		if (GET_INSIDE_ROOMS(home) > 0) {
 			msg_to_char(ch, "Designated rooms: %d\r\n", GET_INSIDE_ROOMS(home));
 		}
-		msg_to_char(ch, "Burning: %d, Damage: %d, Disrepair: %d year%s\r\n", BUILDING_BURNING(home), BUILDING_DAMAGE(home), BUILDING_DISREPAIR(home), BUILDING_DISREPAIR(home) != 1 ? "s" : "");
+		msg_to_char(ch, "Burning: %d, Damage: %d/%d\r\n", BUILDING_BURNING(home), BUILDING_DAMAGE(home), GET_BUILDING(home) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) : 0);
 	}
 
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || HAS_FUNCTION(IN_ROOM(ch), FNC_MINE)) {

@@ -407,7 +407,11 @@ void free_building(bld_data *bdg) {
 	if (GET_BLD_SCRIPTS(bdg) && (!proto || GET_BLD_SCRIPTS(bdg) != GET_BLD_SCRIPTS(proto))) {
 		free_proto_scripts(&GET_BLD_SCRIPTS(bdg));
 	}
-
+	
+	if (GET_BLD_YEARLY_MAINTENANCE(bdg)) {
+		free_resource_list(GET_BLD_YEARLY_MAINTENANCE(bdg));
+	}
+	
 	free(bdg);
 }
 
@@ -556,6 +560,11 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				break;
 			}
 			
+			case 'R': {	// resources/yearly maintenance
+				parse_resource(fl, &GET_BLD_YEARLY_MAINTENANCE(bld), buf2);
+				break;
+			}
+			
 			case 'T': {	// trigger
 				parse_trig_proto(line, &GET_BLD_SCRIPTS(bld), buf2);
 				break;
@@ -650,6 +659,9 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 		fprintf(fl, "M\n");
 		fprintf(fl, "%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
 	}
+	
+	// 'R': resources
+	write_resources_to_file(fl, 'R', GET_BLD_YEARLY_MAINTENANCE(bld));
 	
 	// T: triggers
 	write_trig_protos_to_file(fl, 'T', GET_BLD_SCRIPTS(bld));
@@ -4056,7 +4068,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				COMPLEX_DATA(room)->burning = t[4];
 				COMPLEX_DATA(room)->damage = t[5];
 				COMPLEX_DATA(room)->private_owner = t[6];
-				COMPLEX_DATA(room)->disrepair = t[7];
+				COMPLEX_DATA(room)->disrepair = t[7];	// not currently used (initialized to 0 after b4.15)
 				
 				break;
 			}
@@ -4279,6 +4291,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	
 	// B building data
 	if (COMPLEX_DATA(room)) {
+		// NOTE: disrepair is not used and is always 0 after b4.15
 		fprintf(fl, "B\n%d %d %d %d %d %d %d %d\n", BUILDING_VNUM(room), ROOM_TEMPLATE_VNUM(room), COMPLEX_DATA(room)->entrance, COMPLEX_DATA(room)->patron, COMPLEX_DATA(room)->burning, COMPLEX_DATA(room)->damage, COMPLEX_DATA(room)->private_owner, COMPLEX_DATA(room)->disrepair);
 	}
 	

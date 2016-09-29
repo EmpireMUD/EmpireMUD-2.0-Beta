@@ -853,10 +853,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		msg_to_char(ch, "This area is unclaimable.\r\n");
 	}
 	
-	if (BUILDING_DISREPAIR(room) > config_get_int("disrepair_major")) {
-		msg_to_char(ch, "It's in a state of serious disrepair.\r\n");
+	if (HAS_MAJOR_DISREPAIR(room)) {
+		msg_to_char(ch, "It's damaged and in a state of serious disrepair.\r\n");
 	}
-	else if (BUILDING_DISREPAIR(room) > config_get_int("disrepair_minor")) {
+	else if (HAS_MINOR_DISREPAIR(room)) {
 		msg_to_char(ch, "It's starting to show some wear.\r\n");
 	}
 	
@@ -899,7 +899,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 
 	if (!IS_COMPLETE(room)) {
 		show_resource_list(BUILDING_RESOURCES(room), partialbuf);
-		msg_to_char(ch, "Remaining to %s: %s\r\n", (IS_DISMANTLING(room) ? "Dismantle" : "Completion"), partialbuf);
+		msg_to_char(ch, "Remaining to %s: %s\r\n", (IS_DISMANTLING(room) ? "Dismantle" : (IS_INCOMPLETE(room) ? "Completion" : "Maintain")), partialbuf);
 	}
 	
 	if (BUILDING_BURNING(room)) {
@@ -1454,10 +1454,10 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			else if (!IS_COMPLETE(to_room)) {
 				strcpy(buf2, "&c");
 			}
-			else if (BUILDING_DISREPAIR(to_room) > config_get_int("disrepair_major")) {
+			else if (HAS_MAJOR_DISREPAIR(to_room)) {
 				strcpy(buf2, "&r");
 			}
-			else if (BUILDING_DISREPAIR(to_room) > config_get_int("disrepair_minor")) {
+			else if (HAS_MINOR_DISREPAIR(to_room)) {
 				strcpy(buf2, "&m");
 			}
 			else if (HAS_FUNCTION(to_room, FNC_MINE)) {
@@ -1673,10 +1673,10 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 				else if (!IS_COMPLETE(to_room)) {
 					sprintf(infobuf + strlen(infobuf), "%sunfinished", *infobuf ? ", " :"");
 				}
-				if (BUILDING_DISREPAIR(to_room) > config_get_int("disrepair_major")) {
+				if (HAS_MAJOR_DISREPAIR(to_room)) {
 					sprintf(infobuf + strlen(infobuf), "%sbad disrepair", *infobuf ? ", " :"");
 				}
-				else if (BUILDING_DISREPAIR(to_room) > config_get_int("disrepair_minor")) {
+				else if (HAS_MINOR_DISREPAIR(to_room)) {
 					sprintf(infobuf + strlen(infobuf), "%sdisrepair", *infobuf ? ", " :"");
 				}
 				if (IS_COMPLETE(to_room) && HAS_FUNCTION(to_room, FNC_MINE)) {

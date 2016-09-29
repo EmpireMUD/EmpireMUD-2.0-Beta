@@ -811,14 +811,15 @@ MAINTAIN MAINTENANCE DISREPAIR
 
 Usage:  maintain
 
-Buildings fall into disrepair over time. It costs 1 pile of lumber and 1 pouch
-of nails per year of disrepair. You can also use workforce to maintain your
-buildings.
+Buildings fall into disrepair over time. Different buildings require different
+items for maintenance, which are shown beneath the building's description or
+map.
 
 It takes roughly two and a half months (realtime) for buildings to decay,
-although unfinished buildings decay faster.
+although some buildings (and all unfinished buildings) decay faster.
 
-Use findmaintenance to find buildings in need.
+Use findmaintenance to find buildings in need. You can also use workforce to
+maintain your buildings.
 
 See also: FINDMAINTENANCE, RUINS, WORKFORCE
 #

@@ -1654,8 +1654,8 @@ void init_config_system(void) {
 	init_config(CONFIG_CITY, "min_distance_from_city_to_starting_location", CONFTYPE_INT, "tiles between a city and a starting location");
 	init_config(CONFIG_CITY, "cities_on_newbie_islands", CONFTYPE_BOOL, "whether or not cities can be founded on newbie islands");
 	init_config(CONFIG_CITY, "city_trait_radius", CONFTYPE_INT, "tiles away that a city's traits are used instead of empire traits");
-	init_config(CONFIG_CITY, "disrepair_minor", CONFTYPE_INT, "years of disrepair to show wear");
-	init_config(CONFIG_CITY, "disrepair_major", CONFTYPE_INT, "years of disrepair to show major wear");
+	init_config(CONFIG_CITY, "disrepair_minor", CONFTYPE_INT, "percent of damage to show minor disrepair");
+	init_config(CONFIG_CITY, "disrepair_major", CONFTYPE_INT, "percent of damage to show major disrepair");
 	init_config(CONFIG_CITY, "disrepair_limit", CONFTYPE_INT, "years of disrepair before collapse");
 	init_config(CONFIG_CITY, "disrepair_limit_unfinished", CONFTYPE_INT, "years of disrepair before unfinished buildings collapse");
 	init_config(CONFIG_CITY, "max_out_of_city_portal", CONFTYPE_INT, "maximum distance a portal can travel outside of a city");

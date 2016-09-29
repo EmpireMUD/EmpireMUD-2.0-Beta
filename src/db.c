@@ -1693,6 +1693,7 @@ const char *versions_list[] = {
 	"b4.1",
 	"b4.2",
 	"b4.4",
+	"b4.15",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2116,6 +2117,58 @@ PLAYER_UPDATE_FUNC(b4_4_fight_messages) {
 }
 
 
+// convert data on unfinished buildings and disrepair
+void b4_15_building_update(void) {
+	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
+	extern struct resource_data *copy_resource_list(struct resource_data *input);
+	
+	struct resource_data *res, *disrepair_res;
+	room_data *room, *next_room;
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		// add INCOMPLETE aff
+		if (BUILDING_RESOURCES(room) && !IS_DISMANTLING(room)) {
+			SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_INCOMPLETE);
+			SET_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_INCOMPLETE);
+		}
+		
+		// convert maintenance
+		if (COMPLEX_DATA(room) && GET_BUILDING(room) && COMPLEX_DATA(room)->disrepair > 0) {
+			// add maintenance
+			if (GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room))) {
+				// basic stuff
+				disrepair_res = copy_resource_list(GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)));
+				
+				// multiply by years of disrepair
+				LL_FOREACH(disrepair_res, res) {
+					res->amount *= COMPLEX_DATA(room)->disrepair;
+				}
+				
+				// combine into existing resources
+				if (BUILDING_RESOURCES(room)) {
+					res = BUILDING_RESOURCES(room);
+					GET_BUILDING_RESOURCES(room) = combine_resources(res, disrepair_res);
+					free_resource_list(res);
+				}
+				else {
+					GET_BUILDING_RESOURCES(room) = disrepair_res;
+				}
+			}
+			
+			// add damage (10% per year of disrepair)
+			COMPLEX_DATA(room)->damage += COMPLEX_DATA(room)->disrepair * GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) / 10;
+		}
+		
+		// clear this
+		if (COMPLEX_DATA(room)) {
+			COMPLEX_DATA(room)->disrepair = 0;
+		}
+	}
+	
+	save_whole_world();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -2301,6 +2354,10 @@ void check_version(void) {
 		if (MATCH_VERSION("b4.4")) {
 			log("Adding b4.4 fight messages...");
 			update_all_players(NULL, b4_4_fight_messages);
+		}
+		if (MATCH_VERSION("b4.15")) {
+			log("Converting b4.15 building data...");
+			b4_15_building_update();
 		}
 	}
 	

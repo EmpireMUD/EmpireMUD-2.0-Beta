@@ -33,7 +33,7 @@
 */
 
 // locals
-void process_build(char_data *ch, room_data *room);
+void process_build(char_data *ch, room_data *room, int act_type);
 void setup_tunnel_entrance(char_data *ch, room_data *room, int dir);
 
 // externs
@@ -146,6 +146,13 @@ void complete_building(room_data *room) {
 	free_resource_list(GET_BUILDING_RESOURCES(room));
 	GET_BUILDING_RESOURCES(room) = NULL;
 	
+	// ensure no damage (locally, not home-room)
+	COMPLEX_DATA(room)->damage = 0;
+	
+	// remove incomplete
+	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_INCOMPLETE);
+	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_INCOMPLETE);
+	
 	complete_wtrigger(room);
 	
 	// check mounted people
@@ -245,15 +252,19 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 		add_to_resource_list(&resources, RES_COMPONENT, CMP_LUMBER, 8, 0);
 		add_to_resource_list(&resources, RES_COMPONENT, CMP_NAILS, 4, 0);
 	}
-
+	
 	// entrance
 	setup_tunnel_entrance(ch, entrance, dir);
 	GET_BUILDING_RESOURCES(entrance) = copy_resource_list(resources);
+	SET_BIT(ROOM_BASE_FLAGS(entrance), ROOM_AFF_INCOMPLETE);
+	SET_BIT(ROOM_AFF_FLAGS(entrance), ROOM_AFF_INCOMPLETE);
 	create_exit(entrance, IN_ROOM(ch), rev_dir[dir], FALSE);
 
 	// exit
 	setup_tunnel_entrance(ch, exit, rev_dir[dir]);
 	GET_BUILDING_RESOURCES(exit) = copy_resource_list(resources);
+	SET_BIT(ROOM_BASE_FLAGS(exit), ROOM_AFF_INCOMPLETE);
+	SET_BIT(ROOM_AFF_FLAGS(exit), ROOM_AFF_INCOMPLETE);
 	to_room = real_shift(exit, shift_dir[dir][0], shift_dir[dir][1]);
 	create_exit(exit, to_room, dir, FALSE);
 
@@ -263,6 +274,8 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 		attach_building_to_room(building_proto(RTYPE_TUNNEL), new_room, TRUE);
 		COMPLEX_DATA(new_room)->home_room = (iter <= length/2) ? entrance : exit;
 		GET_BUILDING_RESOURCES(new_room) = copy_resource_list(resources);
+		SET_BIT(ROOM_BASE_FLAGS(new_room), ROOM_AFF_INCOMPLETE);
+		SET_BIT(ROOM_AFF_FLAGS(new_room), ROOM_AFF_INCOMPLETE);
 
 		create_exit(last_room, new_room, dir, TRUE);
 		
@@ -319,8 +332,8 @@ void disassociate_building(room_data *room) {
 	delete_room_npcs(room, NULL);
 	
 	// remove bits including dismantle
-	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR);
-	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR);
+	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE);
+	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE);
 	
 	// TODO should do an affect-total here in case any of those were also added by an affect?
 
@@ -564,6 +577,28 @@ void finish_dismantle(char_data *ch, room_data *room) {
 
 
 /**
+* Process the end of maintenance.
+*
+* @param char_data *ch the repairman (pc or npc)
+* @param room_data *room the location
+*/
+void finish_maintenance(char_data *ch, room_data *room) {
+	// repair all damage
+	if (COMPLEX_DATA(room)) {
+		COMPLEX_DATA(room)->damage = 0;
+	}
+	if (IS_COMPLETE(room) && BUILDING_RESOURCES(room)) {
+		free_resource_list(GET_BUILDING_RESOURCES(room));
+		GET_BUILDING_RESOURCES(room) = NULL;
+	}
+	
+	msg_to_char(ch, "You complete the maintenance.\r\n");
+	act("$n has completed the maintenance.", FALSE, ch, NULL, NULL, TO_ROOM);
+	stop_room_action(room, ACT_MAINTENANCE, CHORE_MAINTENANCE);
+}
+
+
+/**
 * This pushes animals out of a building.
 *
 * @param room_data *location The building's tile.
@@ -684,38 +719,41 @@ bool is_entrance(room_data *room) {
 *
 * @param char_data *ch The builder.
 * @param room_data *room The location he/she is building.
+* @param int act_type ACT_BUILDING or ACT_MAINTENANCE (determines outcome).
 */
-void process_build(char_data *ch, room_data *room) {
+void process_build(char_data *ch, room_data *room, int act_type) {
 	craft_data *type = find_building_list_entry(room, FIND_BUILD_NORMAL);
 	obj_data *found_obj = NULL;
 	struct resource_data *res;
-		
-	if (!IS_COMPLETE(room)) {
+	
+	// just emergency check that it's not actually dismantling
+	if (!IS_DISMANTLING(room) && BUILDING_RESOURCES(room)) {
 		if ((res = get_next_resource(ch, BUILDING_RESOURCES(room), can_use_room(ch, room, GUESTS_ALLOWED), TRUE, &found_obj))) {
 			// take the item; possibly free the res
 			apply_resource(ch, res, &GET_BUILDING_RESOURCES(room), found_obj, APPLY_RES_BUILD, NULL, &GET_BUILT_WITH(room));
-		
-			// reset disrepair and damage
-			COMPLEX_DATA(room)->disrepair = 0;
-			COMPLEX_DATA(room)->damage = 0;
 			
-			// skillups
-			if (type && GET_CRAFT_ABILITY(type) != NO_ABIL) {
+			// skillups (building only)
+			if (type && act_type == ACT_BUILDING && GET_CRAFT_ABILITY(type) != NO_ABIL) {
 				gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 3);
 			}
 		}
 		else {
 			// missing next resource
-			msg_to_char(ch, "You run out of resources and stop building.\r\n");
-			act("$n runs out of resources and stops building.", FALSE, ch, 0, 0, TO_ROOM);
+			msg_to_char(ch, "You run out of resources and stop working.\r\n");
+			act("$n runs out of resources and stops working.", FALSE, ch, 0, 0, TO_ROOM);
 			GET_ACTION(ch) = ACT_NONE;
 			return;
 		}
 	}
 	
 	// now finished?
-	if (IS_COMPLETE(room)) {
-		finish_building(ch, room);
+	if (!BUILDING_RESOURCES(room)) {
+		if (IS_INCOMPLETE(room)) {
+			finish_building(ch, room);
+		}
+		else {
+			finish_maintenance(ch, room);
+		}
 	}
 }
 
@@ -751,7 +789,7 @@ void process_dismantling(char_data *ch, room_data *room) {
 	if (res) {
 		// RES_x: messaging
 		switch (res->type) {
-			// RES_COMPONENT isn't possible here
+			// RES_COMPONENT and RES_ACTION aren't possible here
 			case RES_OBJECT: {
 				snprintf(buf, sizeof(buf), "You carefully remove %s from the structure.", get_obj_name_by_proto(res->vnum));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
@@ -886,7 +924,7 @@ void start_dismantle_building(room_data *loc) {
 	obj_data *obj, *next_obj;
 	bool deleted = FALSE;
 	bld_data *up_bldg;
-	bool complete = !BUILDING_RESOURCES(loc);	// store now -- this gets changed part way through
+	bool complete = !IS_INCOMPLETE(loc);	// store now -- this gets changed part way through
 	
 	if (!IS_MAP_BUILDING(loc)) {
 		log("SYSERR: Attempting to dismantle non-building room #%d", GET_ROOM_VNUM(loc));
@@ -975,8 +1013,8 @@ void start_dismantle_building(room_data *loc) {
 	
 	// remove liquids, etc
 	LL_FOREACH_SAFE(GET_BUILDING_RESOURCES(loc), res, next_res) {
-		// RES_x: types not refundable by dismantle
-		if (res->type == RES_COMPONENT || res->type == RES_LIQUID || res->type == RES_COINS || res->type == RES_POOL) {
+		// RES_x: only RES_OBJECT is refundable
+		if (res->type != RES_OBJECT) {
 			LL_DELETE(GET_BUILDING_RESOURCES(loc), res);
 			free(res);
 		}
@@ -1046,6 +1084,10 @@ ACMD(do_build) {
 		send_config_msg(ch, "need_approval_string");
 		return;
 	}
+	if (*arg && GET_BUILDING(IN_ROOM(ch)) && IS_INCOMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "To continue working on this building, just type 'build' with no argument.\r\n");
+		return;
+	}
 	
 	argument = any_one_word(argument, arg);
 	skip_spaces(&argument);
@@ -1088,13 +1130,12 @@ ACMD(do_build) {
 			act("$n stops building.", FALSE, ch, 0, 0, TO_ROOM);
 			GET_ACTION(ch) = ACT_NONE;
 		}
-
+		
 		/* Continue building */
-		else if (!IS_COMPLETE(IN_ROOM(ch))) {
-			if (IS_DISMANTLING(IN_ROOM(ch)))
-				msg_to_char(ch, "The building is being dismantled, you can't rebuild it now.\r\n");
-			else if (GET_ACTION(ch) != ACT_NONE)
+		else if (IS_INCOMPLETE(IN_ROOM(ch))) {
+			if (GET_ACTION(ch) != ACT_NONE) {
 				msg_to_char(ch, "You're kinda busy right now.\r\n");
+			}
 			else if (BUILDING_BURNING(IN_ROOM(ch))) {
 				msg_to_char(ch, "You can't work on a burning building!\r\n");
 			}
@@ -1104,7 +1145,17 @@ ACMD(do_build) {
 				act("$n starts building.", FALSE, ch, 0, 0, TO_ROOM);
 			}
 		}
-
+		
+		// needs maintenance instead of build?
+		else if (IS_COMPLETE(IN_ROOM(ch)) && BUILDING_RESOURCES(IN_ROOM(ch))) {
+			msg_to_char(ch, "Use 'maintain' to repair the building.\r\n");
+		}
+		
+		// is being dismantled
+		else if (IS_DISMANTLING(IN_ROOM(ch))) {
+			msg_to_char(ch, "The building is being dismantled, you can't rebuild it now.\r\n");
+		}
+		
 		/* Send output */
 		else {
 			msg_to_char(ch, "Usage: build <structure> [direction]\r\n");
@@ -1231,6 +1282,8 @@ ACMD(do_build) {
 	construct_building(IN_ROOM(ch), GET_CRAFT_BUILD_TYPE(type));
 	set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
 	
+	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);
+	SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);
 	GET_BUILDING_RESOURCES(IN_ROOM(ch)) = copy_resource_list(GET_CRAFT_RESOURCES(type));
 	special_building_setup(ch, IN_ROOM(ch));
 	
@@ -1267,7 +1320,7 @@ ACMD(do_build) {
 	act(buf, FALSE, ch, 0, 0, TO_ROOM);
 	
 	// do a build action now
-	process_build(ch, IN_ROOM(ch));
+	process_build(ch, IN_ROOM(ch), ACT_BUILDING);
 }
 
 
@@ -1845,30 +1898,33 @@ ACMD(do_lay) {
 
 
 ACMD(do_maintain) {
-	struct resource_data *res = NULL;
-	
-	add_to_resource_list(&res, RES_COMPONENT, CMP_LUMBER, BUILDING_DISREPAIR(IN_ROOM(ch)), CMPF_BASIC);
-	add_to_resource_list(&res, RES_COMPONENT, CMP_NAILS, BUILDING_DISREPAIR(IN_ROOM(ch)), CMPF_BASIC);
-	
-	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	if (GET_ACTION(ch) == ACT_MAINTENANCE) {
+		act("You stop maintaining the building.", FALSE, ch, NULL, NULL, TO_CHAR);
+		cancel_action(ch);
+	}
+	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You can't perform maintenance here.\r\n");
 	}
-	else if (BUILDING_DISREPAIR(IN_ROOM(ch)) <= 0) {
-		msg_to_char(ch, "It needs no maintenance.\r\n");
+	else if (GET_ACTION(ch) != ACT_NONE) {
+		msg_to_char(ch, "You're busy right now.\r\n");
 	}
-	else if (!has_resources(ch, res, TRUE, TRUE)) {
-		// sends own messages
+	else if (!BUILDING_RESOURCES(IN_ROOM(ch)) && BUILDING_DAMAGE(IN_ROOM(ch)) == 0) {
+		msg_to_char(ch, "It doesn't need any maintenance.\r\n");
+	}
+	else if (IS_INCOMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "Use 'build' to finish the building instead.\r\n");
+	}
+	else if (IS_DISMANTLING(IN_ROOM(ch))) {
+		msg_to_char(ch, "This building is being dismantled. Use 'dismantle' to continue instead.\r\n");
+	}
+	else if (BUILDING_BURNING(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't maintain a building that's on fire!\r\n");
 	}
 	else {
-		extract_resources(ch, res, TRUE, NULL);
-		COMPLEX_DATA(IN_ROOM(ch))->disrepair = 0;
-		msg_to_char(ch, "You perform some quick maintenance on the building.\r\n");
-		act("$n performs some quick maintenance on the building.", TRUE, ch, NULL, NULL, TO_ROOM);
-		command_lag(ch, WAIT_OTHER);
-		stop_room_action(IN_ROOM(ch), NOTHING, CHORE_MAINTENANCE);
+		start_action(ch, ACT_MAINTENANCE, -1);
+		act("You set to work maintaining the building.", FALSE, ch, NULL, NULL, TO_CHAR);
+		act("$n beings maintaining the building.", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
-	
-	free_resource_list(res);
 }
 
 
@@ -2046,6 +2102,8 @@ ACMD(do_upgrade) {
 
 			attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(type)), IN_ROOM(ch), TRUE);
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
+			SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);
+			SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);
 			GET_BUILDING_RESOURCES(IN_ROOM(ch)) = copy_resource_list(GET_CRAFT_RESOURCES(type));
 
 			msg_to_char(ch, "You begin to upgrade the building.\r\n");

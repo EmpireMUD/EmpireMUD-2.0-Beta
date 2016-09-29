@@ -1051,7 +1051,7 @@ Each building (or room template) type may have a default set of room affect
 flags. These are added to the building tile when built, or are present on a
 room that is instantiated from a room template.
 
-Available affects (do not set affects with *):
+Available affects:
  DARK - magically dark and the map tile shows as blank
  SILENT - magically quiet
  CHAMELEON - at distance, appears as the tile it was built upon
@@ -1059,8 +1059,17 @@ Available affects (do not set affects with *):
  !FLY - flying characters cannot enter, like an enchanted wall
  !WEATHER - suppress weather messages and command
  !DISREPAIR - never falls into disrepair (caution: this prevents empire decay)
+
+Some affects are managed by live data and commands (do not set affects with *):
  *HAS-INSTANCE - an adventure is linked here
+ *TEMPORARY - will be removed when instance is cleaned up
+ *UNCLAIMABLE - cannot be claimed
+ *PUBLIC - can be used by empires other than the owner
  *DISMANTLING - someone started dismantling it
+ *IN-VEHICLE - room is part of the interior of a vehicle
+ *!WORK - workforce ignores the room
+ *!DISMANTLE - cannot be dismantled until nodismantle is toggled
+ *INCOMPLETE - building is unfinished
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
@@ -1282,7 +1291,10 @@ ritual before it is destroyed.
 Catapults deal 8 damage per 100 levels, per shot. Siege rituals deal
 Intelligence + 1 damage.
 
-See also: FIRE, OLC BUILDINGS, SIEGE RITUAL
+If a building takes more than 10% of its hitpoints in damage from an attack,
+it will also need its yearly maintenance resources to be fixed.
+
+See also: BEDIT YEARLY MAINTENANCE, FIRE, OLC BUILDINGS, SIEGE RITUAL
 #d
 "BEDIT ICON"
 
@@ -1333,6 +1345,35 @@ You should choose a name that's as short as possible. For example, if your
 room title is "A Foul-Smelling Outhouse", the name should be "Outhouse".
 
 See also: BEDIT TITLE, OLC BUILDINGS, TERRITORY, VNUM
+#d
+"BEDIT RESOURCES" "BEDIT YEARLY MAINTENANCE"
+
+Usage:  .resource add <type> <amount> <vnum/name> [flags, for components only]
+        .resource change <number> <quantity | vnum | name | flags> <value>
+        .resource remove <number | all>
+        .resource move <number> <up | down>
+
+This command adds materials to the building's "yearly maintenance" list. These
+are resources needed to maintain the building each year. If you don't set any,
+then the building does not require maintenance.
+
+This uses the ".resource" command to be consistent with other editors, but
+these are not the resources needed to build the vehicle in the first place --
+only to repair it.
+
+If a building takes damage from any source, and that damage is more than 10% of
+its hitpoints, it will also add the yearly-maintenance resources to the repair
+cost.
+
+Buildings with only 1 hitpoint will never get their yearly maintenance cost, as
+even 1 year of decay will destroy them.
+
+Note: Interior rooms do not normally require any yearly maintenance and don't
+take damage.
+
+See HELP OLC RESOURCES for more information.
+
+See also: BEDIT HITPOINTS, OLC BUILDINGS, MAINTAIN
 #d
 "BEDIT ROOMS" "BEDIT ROOMS" "BEDIT EXTRA ROOMS"
 
@@ -2188,12 +2229,14 @@ map editor commands make instant changes to the map where you're standing.
 You can get help on any of the mapeditor commands with &yHELP MAPEDIT <COMMAND>&0.
 The following commands are available:
  complete - Finishes the building you're standing in.
+ decay - Performs 1 year of decay (building, trench, mine data) on the tile.
  decustomize - Removes custom icon, name, and description.
  deleteexit - Removes an exit (careful about cutting off building interiors).
  deleteroom - Deletes the room you're standing in (interior rooms only).
  description - Customize the description on an interior room.
  exit - Add a new exit between two interior rooms (similar to interlink).
  icon - Customize the map icon.
+ maintain - Repairs and maintains a building.
  name - Customize the room title.
  passwalls - Able to move on the map unblocked by walls, interiors, etc.
  roomtype - Change the type of an interior room.
@@ -4007,10 +4050,11 @@ Specific syntaxes for adding:
   .resource add liquid <number of units> <liquid name>
   .resource add coins <amount>
   .resource add pool <number of points> <pool type>
+  .resource add action <amount> <type>
 
 Valid pools are: health, mana, move, blood.
 
-See also: COMPONENTS, COMPONENT FLAGS, OEDIT LIQUID
+See also: COMPONENTS, COMPONENT FLAGS, OEDIT LIQUID, RESOURCE ACTIONS
 See also: AUGEDIT RESOURCES, CEDIT RESOURCES, VEDIT RESOURCES
 #d
 "OLC ROOM TEMPLATES" "OLC ROOMTEMPLATES" "OLC ROOMS" REDIT
@@ -4988,6 +5032,26 @@ If you do set your potion as scalable, you only need to set the potionscale to
 1 and it will scale to the correct level.
 
 Potions can only be used once, and then are lost.
+#d
+"RESOURCE ACTIONS" "RESOURCE ACTION TYPES"
+
+Resource lists (like buildings and vehicles) can include "actions", which add
+flavor to construction and take time, but don't cost anything. These will only
+be visible for things that build over time (like buildings, maintenance,
+vehicles, and repair) -- not things that take resources instantly (like forge).
+
+Available resource actions are:
+  dig
+  clear terrain
+  tidy up
+  repair
+  scout area
+  block water
+  engrave
+  magic words
+  organize
+
+See also: BEDIT RESOURCE, CEDIT RESOURCES, VEDIT RESOURCE
 #d
 "SHIELD ITEM" "SHIELD OBJECT"
 

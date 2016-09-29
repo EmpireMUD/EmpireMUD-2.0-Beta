@@ -3824,11 +3824,12 @@ ACMD(do_findmaintenance) {
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	empire_data *emp = GET_LOYALTY(ch);
 	room_data *iter, *next_iter;
+	char arg[MAX_INPUT_LENGTH];
 	
 	// imms can target this
-	skip_spaces(&argument);
-	if (*argument && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES))) {
-		if (!(emp = get_empire_by_name(argument))) {
+	one_word(argument, arg);
+	if (*arg && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES))) {
+		if (!(emp = get_empire_by_name(arg))) {
 			msg_to_char(ch, "Unknown empire.\r\n");
 			return;
 		}
@@ -3851,7 +3852,7 @@ ACMD(do_findmaintenance) {
 			// owned by the empire?
 			if (ROOM_OWNER(iter) == emp) {
 				// needs repair?
-				if (BUILDING_DISREPAIR(iter) > 1) {
+				if (BUILDING_DAMAGE(iter) > 1 || (IS_COMPLETE(iter) && BUILDING_RESOURCES(iter))) {
 					CREATE(node, struct find_territory_node, 1);
 					node->loc = iter;
 					node->count = 1;
@@ -3863,7 +3864,7 @@ ACMD(do_findmaintenance) {
 		
 		if (node_list) {
 			node_list = reduce_territory_node_list(node_list);
-			strcpy(buf, "Locations needing at least 2 maintenance:\r\n");
+			strcpy(buf, "Locations needing maintenance:\r\n");
 			
 			// display and free the nodes
 			for (node = node_list; node; node = next_node) {
@@ -3876,7 +3877,7 @@ ACMD(do_findmaintenance) {
 			page_string(ch->desc, buf, TRUE);
 		}
 		else {
-			msg_to_char(ch, "No buildings were found that needed at least 2 maintenance.\r\n");
+			msg_to_char(ch, "No buildings were found that needed maintenance.\r\n");
 		}
 	}
 }

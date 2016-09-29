@@ -1294,6 +1294,7 @@ typedef struct vehicle_data vehicle_data;
 #define RES_LIQUID  2	// a volume of a given liquid (vnum= LIQ_ type)
 #define RES_COINS  3	// an amount of coins (vnum= empire id of coins)
 #define RES_POOL  4	// health, mana, etc (vnum= HEALTH, etc)
+#define RES_ACTION  5	// flavorful action strings (take time but not resources)
 
 
 // storage flags (for obj storage locations)
@@ -1387,6 +1388,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_SAILING			36
 #define ACT_PILOTING		37
 #define ACT_SWAP_SKILL_SETS	38
+#define ACT_MAINTENANCE		39
 
 // act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -1908,7 +1910,8 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_AFF_IN_VEHICLE  BIT(11)	// l. Part of a vehicle
 #define ROOM_AFF_NO_WORK  BIT(12)	// m. workforce ignores this room
 #define ROOM_AFF_NO_DISREPAIR  BIT(13)	// n. will not fall into disrepair
-#define ROOM_AFF_NO_DISMANTLE  BIT(14)
+#define ROOM_AFF_NO_DISMANTLE  BIT(14)	// o. blocks normal dismantle until turned off
+#define ROOM_AFF_INCOMPLETE  BIT(15)	// p. building is incomplete
 
 
 // For various misc numbers attached to rooms
@@ -2594,6 +2597,7 @@ struct bld_data {
 	struct spawn_info *spawns;	// linked list of spawn data
 	struct interaction_item *interactions;	// interaction items
 	struct trig_proto_list *proto_script;	// list of default triggers
+	struct resource_data *yearly_maintenance;	// needed each year
 	
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;
@@ -4066,7 +4070,7 @@ struct complex_room_data {
 	byte inside_rooms;  // count of designated rooms inside
 	room_data *home_room;  // for interior rooms (and boats and instances), means this is actually part of another room; is saved as vnum to file but is room_data* in real life
 	
-	int disrepair;	// decay over time
+	int disrepair;	// UNUSED: as of b4.15 this is 0 for all buildings and not used (but is saved to file and coule be repurposed)
 	
 	vehicle_data *vehicle;  // the associated vehicle (usually only on the home room)
 	struct instance_data *instance;	// if part of an instantiated adventure
