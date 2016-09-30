@@ -2319,7 +2319,7 @@ const char *bld_flags[] = {
 	"INTERLINK",	// 5
 	"HERD",
 	"DEDICATE",
-	"*DRINK-DEPRECATED",
+	"!RUINS",
 	"!NPC",
 	"BARRIER",	// 10
 	"*TAVERN-DEPRECATED",

@@ -466,7 +466,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_INTERLINK  BIT(5)	// can be interlinked
 #define BLD_HERD  BIT(6)	// can herd
 #define BLD_DEDICATE  BIT(7)	// can be dedicated to a player
-// #define BLD_UNUSED1  BIT(8)
+#define BLD_NO_RUINS  BIT(8)	// building leaves no corpse
 #define BLD_NO_NPC  BIT(9)	// mobs won't walk in
 #define BLD_BARRIER  BIT(10)	// can only go back the direction you came
 // #define BLD_UNUSED2  BIT(11)

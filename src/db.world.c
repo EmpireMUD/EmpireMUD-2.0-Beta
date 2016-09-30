@@ -2421,41 +2421,45 @@ void ruin_one_building(room_data *room) {
 	
 	// abandon first -- this will take care of accessory rooms, too
 	abandon_room(room);
+	disassociate_building(room);
 	
-	// verify closed status and find a room to exit to
-	if (closed) {
-		to_room = SHIFT_DIR(room, rev_dir[dir]);
-		if (!to_room) {
-			closed = FALSE;
-		}
-	}
-
-	// basic setup
-	if (SECT_FLAGGED(BASE_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)) {
-		type = BUILDING_RUINS_FLOODED;
-	}
-	else if (closed) {
-		type = BUILDING_RUINS_CLOSED;
-	}
-	else {
-		type = BUILDING_RUINS_OPEN;
-	}
-	construct_building(room, type);
-	COMPLEX_DATA(room)->entrance = dir;
-	
-	// make the exit
-	if (closed && to_room) {
-		create_exit(room, to_room, rev_dir[dir], FALSE);
-	}
-	
-	set_room_extra_data(room, ROOM_EXTRA_RUINS_ICON, number(0, NUM_RUINS_ICONS-1));
-
 	if (ROOM_PEOPLE(room)) {
 		act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 	}
 	
-	// run completion on the ruins
-	complete_building(room);
+	// create ruins building
+	if (!ROOM_BLD_FLAGGED(room, BLD_NO_RUINS)) {
+		// verify closed status and find a room to exit to
+		if (closed) {
+			to_room = SHIFT_DIR(room, rev_dir[dir]);
+			if (!to_room) {
+				closed = FALSE;
+			}
+		}
+
+		// basic setup
+		if (SECT_FLAGGED(BASE_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)) {
+			type = BUILDING_RUINS_FLOODED;
+		}
+		else if (closed) {
+			type = BUILDING_RUINS_CLOSED;
+		}
+		else {
+			type = BUILDING_RUINS_OPEN;
+		}
+		construct_building(room, type);
+		COMPLEX_DATA(room)->entrance = dir;
+	
+		// make the exit
+		if (closed && to_room) {
+			create_exit(room, to_room, rev_dir[dir], FALSE);
+		}
+	
+		set_room_extra_data(room, ROOM_EXTRA_RUINS_ICON, number(0, NUM_RUINS_ICONS-1));
+	
+		// run completion on the ruins
+		complete_building(room);
+	}
 }
 
 

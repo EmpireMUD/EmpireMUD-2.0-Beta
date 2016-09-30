@@ -1216,6 +1216,7 @@ Available flags:
  HERD - mobs can be herded into this building
  DEDICATE - can be dedicated to a patron god or player, which adds "of Name"
     to the room title
+ !RUINS - building leaves no ruins when it decays
  !NPC - mobs won't enter this building
  BARRIER - can only go back the way you came, unless flying
  LARGE-CITY-RADIUS - counts as in-city much further away than normal
