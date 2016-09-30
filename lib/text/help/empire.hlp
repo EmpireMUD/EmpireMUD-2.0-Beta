@@ -590,8 +590,9 @@ you cancel the action or are interrupted, you must start the minute over.
 
 You can only excavate and fill in on claimed land.
 
-If you fill a desert trench, it will become an Oasis instead of a river. Oases
-convert into rivers if they are adjacent to other rivers or to oceans.
+When a desert trench fills with water, it will become an Oasis instead of a
+river. Oases convert into rivers if they are adjacent to other rivers or to
+oceans.
 
 There are three ways to fill a finished trench with water:
  - If there is more water adjacent, the trench will fill quickly.

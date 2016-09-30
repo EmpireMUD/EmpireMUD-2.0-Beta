@@ -2007,7 +2007,7 @@ const char *res_action_type[] = {
 	"dig",
 	"clear terrain",
 	"tidy up",
-	"repair",
+	"repair",	// 3: used in vnums.h
 	"scout area",
 	"block water",
 	"engrave",
