@@ -3823,7 +3823,7 @@ ACMD(do_expel) {
 ACMD(do_findmaintenance) {
 	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 	
-	char arg[MAX_INPUT_LENGTH], partial[MAX_STRING_LENGTH], temp[MAX_INPUT_LENGTH];
+	char arg[MAX_INPUT_LENGTH], partial[MAX_STRING_LENGTH], temp[MAX_INPUT_LENGTH], *ptr;
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	struct resource_data *old_res, *total_list = NULL;
 	struct island_info *find_island = NULL;
@@ -3841,11 +3841,13 @@ ACMD(do_findmaintenance) {
 	// imms can target this
 	if (*argument && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES))) {
 		strcpy(temp, argument);
-		argument = one_word(temp, arg);
+		ptr = one_word(temp, arg);
 		
-		if (!(emp = get_empire_by_name(arg))) {
+		if ((emp = get_empire_by_name(arg))) {
+			argument = ptr;
+		}
+		else {
 			// wasn't an empire
-			argument = temp;
 			emp = GET_LOYALTY(ch);
 		}
 	}
