@@ -3858,15 +3858,16 @@ ACMD(do_findmaintenance) {
 	}
 	
 	// anything else in the argument?
-	if (*temp == '"' || *temp == '(') {
+	if (*argument == '"' || *argument == '(') {
 		one_word(argument, arg);
 	}
 	else {
 		skip_spaces(&argument);
 		strcpy(arg, argument);
 	}
+	
 	if (*arg) {
-		if (!(find_island = get_island_by_name(arg)) && !(find_room = find_target_room(ch, arg))) {
+		if (!(find_island = get_island_by_name(arg)) && !(find_room = find_target_room(NULL, arg))) {
 			msg_to_char(ch, "Unknown location: %s.\r\n", arg);
 			return;
 		}
