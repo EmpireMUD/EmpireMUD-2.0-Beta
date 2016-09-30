@@ -3894,7 +3894,7 @@ ACMD(do_findmaintenance) {
 		if (GET_ROOM_VNUM(ter->room) >= MAP_SIZE) {
 			continue;
 		}
-		if (!BUILDING_DAMAGE(ter->room) && (!IS_COMPLETE(ter->room) || !BUILDING_RESOURCES(ter->room))) {
+		if ((!IS_COMPLETE(ter->room) || !BUILDING_RESOURCES(ter->room)) && !HAS_MINOR_DISREPAIR(ter->room)) {
 			continue;
 		}
 		if (find_island && GET_ISLAND_ID(ter->room) != find_island->id) {

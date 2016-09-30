@@ -668,12 +668,14 @@ FINDMAINTENANCE "FIND MAINTENANCE"
 Usage:  findmaintenance [coordinates | island]
 
 This command finds all the buildings in your empire that are damaged or need
-yearly maintenance. If you give it target coordinates or an island name, it
-will instead list the resources needed to repair that location or all buildings
-you own on the island.
+at least 2 years of maintenance. If you give it target coordinates or an island
+name, it will instead list the resources needed to repair that location or all
+buildings you own on the island.
 
 If you are using Workforce to maintain your buildings, this generally means
 that only buildings not serviced by your workforce will show up on the list.
+Only buildings that have taken at least 20% of their maximum damage or require
+any maintenance show up on the list.
 
 Immortals can give an empire name as the first argument to see maintenance
 for that empire.
