@@ -897,7 +897,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		msg_to_char(ch, "The field is seeded with %s.\r\n", GET_CROP_NAME(cp));
 	}
 
-	if (!IS_COMPLETE(room)) {
+	if (BUILDING_RESOURCES(room)) {
 		show_resource_list(BUILDING_RESOURCES(room), partialbuf);
 		msg_to_char(ch, "Remaining to %s: %s\r\n", (IS_DISMANTLING(room) ? "Dismantle" : (IS_INCOMPLETE(room) ? "Completion" : "Maintain")), partialbuf);
 	}

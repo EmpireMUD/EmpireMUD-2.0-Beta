@@ -3846,6 +3846,7 @@ ACMD(do_findmaintenance) {
 		if (!(emp = get_empire_by_name(arg))) {
 			// wasn't an empire
 			argument = temp;
+			emp = GET_LOYALTY(ch);
 		}
 	}
 	
