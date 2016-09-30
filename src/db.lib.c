@@ -408,7 +408,7 @@ void free_building(bld_data *bdg) {
 		free_proto_scripts(&GET_BLD_SCRIPTS(bdg));
 	}
 	
-	if (GET_BLD_YEARLY_MAINTENANCE(bdg)) {
+	if (GET_BLD_YEARLY_MAINTENANCE(bdg) && (!proto || GET_BLD_YEARLY_MAINTENANCE(bdg) != GET_BLD_YEARLY_MAINTENANCE(proto))) {
 		free_resource_list(GET_BLD_YEARLY_MAINTENANCE(bdg));
 	}
 	
