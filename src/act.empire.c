@@ -3841,10 +3841,11 @@ ACMD(do_findmaintenance) {
 	// imms can target this
 	if (*argument && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES))) {
 		strcpy(temp, argument);
-		ptr = one_word(temp, arg);
+		ptr = any_one_word(temp, arg);
 		
 		if ((emp = get_empire_by_name(arg))) {
 			argument = ptr;
+			skip_spaces(&argument);
 		}
 		else {
 			// wasn't an empire
@@ -3858,9 +3859,8 @@ ACMD(do_findmaintenance) {
 	}
 	
 	// anything else in the argument?
-	skip_spaces(&argument);
 	if (*argument == '"' || *argument == '(') {
-		one_word(argument, arg);
+		any_one_word(argument, arg);
 	}
 	else {
 		strcpy(arg, argument);
