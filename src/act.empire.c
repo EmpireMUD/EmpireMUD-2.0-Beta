@@ -3858,6 +3858,8 @@ ACMD(do_findmaintenance) {
 		return;
 	}
 	
+	msg_to_char(ch, "Debug: argument '%s'\r\n", argument);
+	
 	// anything else in the argument?
 	if (*argument == '"' || *argument == '(') {
 		any_one_word(argument, arg);
