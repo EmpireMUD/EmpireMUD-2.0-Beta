@@ -3858,11 +3858,11 @@ ACMD(do_findmaintenance) {
 	}
 	
 	// anything else in the argument?
+	skip_spaces(&argument);
 	if (*argument == '"' || *argument == '(') {
 		one_word(argument, arg);
 	}
 	else {
-		skip_spaces(&argument);
 		strcpy(arg, argument);
 	}
 	
