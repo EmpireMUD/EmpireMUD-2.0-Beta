@@ -3862,6 +3862,7 @@ ACMD(do_findmaintenance) {
 		one_word(argument, arg);
 	}
 	else {
+		skip_spaces(&argument);
 		strcpy(arg, argument);
 	}
 	if (*arg) {
