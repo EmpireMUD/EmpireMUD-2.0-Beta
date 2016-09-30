@@ -2646,7 +2646,7 @@ empire_data *get_empire_by_name(char *name) {
 	// we'll take any of these if we don't find a perfect match
 	full_exact = full_abbrev = adj_exact = adj_abbrev = NULL;
 
-	if (isdigit(*name))
+	if (is_number(name))
 		num = atoi(name);
 	else {
 		num = 0;
