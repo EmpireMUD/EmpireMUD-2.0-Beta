@@ -906,11 +906,19 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_milling) {
 * @return bool TRUE if this workforce chore can work this craft, FALSE if not
 */
 CHORE_GEN_CRAFT_VALIDATOR(chore_pressing) {
+	ability_data *abil;
+	
 	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_PRESS) {
 		return FALSE;
 	}
-	if (GET_CRAFT_ABILITY(craft) != NO_ABIL) {
-		return FALSE;
+	// won't press things that require classes or high skill
+	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) ) {
+		if (!ABIL_ASSIGNED_SKILL(abil)) {
+			return FALSE;	// class ability
+		}
+		else if (ABIL_SKILL_LEVEL(abil) > BASIC_SKILL_CAP) {
+			return FALSE;	// level too high
+		}
 	}
 	// success
 	return TRUE;
@@ -932,7 +940,7 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_smelting) {
 	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_SMELT) {
 		return FALSE;
 	}
-	// won't weave things that require classes or high skill
+	// won't smelt things that require classes or high skill
 	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) ) {
 		if (!ABIL_ASSIGNED_SKILL(abil)) {
 			return FALSE;	// class ability
