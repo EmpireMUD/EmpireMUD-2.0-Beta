@@ -2418,8 +2418,12 @@ ACMD(do_cede) {
 	else if (*arg2 && !strstr(arg2, ",")) {
 		msg_to_char(ch, "Usage: cede <person> (x, y)\r\n");
 	}
-	else if (!(*arg2 ? (room = HOME_ROOM(find_target_room(ch, arg2))) : (room = HOME_ROOM(IN_ROOM(ch)))))
+	else if (!(*arg2 ? (room = find_target_room(ch, arg2)) : (room = IN_ROOM(ch)))) {
 		msg_to_char(ch, "Invalid location.\r\n");
+	}
+	else if (!(room = HOME_ROOM(room))) {
+		// dummy error can't actually happen, but does set the variable in the sloppiest way possible...
+	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_CEDE)) {
 		// don't use has_permission here because it would check permits on the room you're in
 		msg_to_char(ch, "You don't have permission to cede.\r\n");
