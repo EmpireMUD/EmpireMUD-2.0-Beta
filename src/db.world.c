@@ -2415,7 +2415,9 @@ void init_room(room_data *room, room_vnum vnum) {
 */
 void ruin_one_building(room_data *room) {
 	bool closed = ROOM_IS_CLOSED(room) ? TRUE : FALSE;
+	struct bld_data *bld = GET_BUILDING(room);
 	int dir = BUILDING_ENTRANCE(room);
+	char buf[MAX_STRING_LENGTH];
 	room_data *to_room;
 	bld_vnum type;
 	
@@ -2454,9 +2456,17 @@ void ruin_one_building(room_data *room) {
 		if (closed && to_room) {
 			create_exit(room, to_room, rev_dir[dir], FALSE);
 		}
-	
+		
+		// customized ruins
+		if (bld) {
+			sprintf(buf, "The Ruins of %s %s", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
+			if (ROOM_CUSTOM_NAME(room)) {
+				free(ROOM_CUSTOM_NAME(room));
+			}
+			ROOM_CUSTOM_NAME(room) = str_dup(buf);
+		}
 		set_room_extra_data(room, ROOM_EXTRA_RUINS_ICON, number(0, NUM_RUINS_ICONS-1));
-	
+		
 		// run completion on the ruins
 		complete_building(room);
 	}
