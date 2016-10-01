@@ -2430,7 +2430,7 @@ void ruin_one_building(room_data *room) {
 	}
 	
 	// create ruins building
-	if (!ROOM_BLD_FLAGGED(room, BLD_NO_RUINS)) {
+	if (bld && !IS_SET(GET_BLD_FLAGS(bld), BLD_NO_RUINS)) {
 		// verify closed status and find a room to exit to
 		if (closed) {
 			to_room = SHIFT_DIR(room, rev_dir[dir]);
@@ -2458,13 +2458,11 @@ void ruin_one_building(room_data *room) {
 		}
 		
 		// customized ruins
-		if (bld) {
-			sprintf(buf, "The Ruins of %s %s", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
-			if (ROOM_CUSTOM_NAME(room)) {
-				free(ROOM_CUSTOM_NAME(room));
-			}
-			ROOM_CUSTOM_NAME(room) = str_dup(buf);
+		sprintf(buf, "The Ruins of %s %s", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
+		if (ROOM_CUSTOM_NAME(room)) {
+			free(ROOM_CUSTOM_NAME(room));
 		}
+		ROOM_CUSTOM_NAME(room) = str_dup(buf);
 		set_room_extra_data(room, ROOM_EXTRA_RUINS_ICON, number(0, NUM_RUINS_ICONS-1));
 		
 		// run completion on the ruins
