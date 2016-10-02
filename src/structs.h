@@ -4078,7 +4078,7 @@ struct complex_room_data {
 	int private_owner;	// for privately-owned houses
 	
 	byte burning;  // if burning, the burn value
-	byte damage;  // for catapulting
+	double damage;  // for catapulting
 };
 
 

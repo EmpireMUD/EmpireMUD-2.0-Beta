@@ -3754,7 +3754,7 @@ void do_stat_room(char_data *ch) {
 		if (GET_INSIDE_ROOMS(home) > 0) {
 			msg_to_char(ch, "Designated rooms: %d\r\n", GET_INSIDE_ROOMS(home));
 		}
-		msg_to_char(ch, "Burning: %d, Damage: %d/%d\r\n", BUILDING_BURNING(home), BUILDING_DAMAGE(home), GET_BUILDING(home) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) : 0);
+		msg_to_char(ch, "Burning: %d, Damage: %d/%d\r\n", BUILDING_BURNING(home), (int) BUILDING_DAMAGE(home), GET_BUILDING(home) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) : 0);
 	}
 
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || HAS_FUNCTION(IN_ROOM(ch), FNC_MINE)) {

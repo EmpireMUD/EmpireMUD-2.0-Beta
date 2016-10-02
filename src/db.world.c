@@ -923,8 +923,9 @@ void annual_update_map_tile(room_data *room) {
 	extern char *get_room_name(room_data *room, bool color);
 	
 	struct resource_data *old_list;
-	empire_data *emp;
 	int trenched, amount;
+	empire_data *emp;
+	double dmg;
 	
 	if (IS_RUINS(room)) {
 		// roughly 2 real years for average chance for ruins to be gone
@@ -942,15 +943,15 @@ void annual_update_map_tile(room_data *room) {
 		
 		// determine damage to do each year
 		if (IS_COMPLETE(room)) {
-			amount = ceil(GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) / (float) config_get_int("disrepair_limit"));
+			dmg = (double) GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) / (double) config_get_int("disrepair_limit");
 		}
 		else {
-			amount = ceil(GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) / (float) config_get_int("disrepair_limit_unfinished"));
+			dmg = (double) GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) / (double) config_get_int("disrepair_limit_unfinished");
 		}
-		amount = MAX(1, amount);
+		dmg = MAX(1.0, dmg);
 		
 		// apply damage
-		COMPLEX_DATA(room)->damage += amount;
+		COMPLEX_DATA(room)->damage += dmg;
 		
 		// apply maintenance resources (if any, and if it's not being dismantled)
 		if (GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)) && !IS_DISMANTLING(room)) {

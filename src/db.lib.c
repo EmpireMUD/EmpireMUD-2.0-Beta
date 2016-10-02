@@ -3991,6 +3991,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 	void add_trd_owner(room_vnum vnum, empire_vnum owner);
 
 	char line[256], line2[256], error_buf[256], error_log[MAX_STRING_LENGTH], str1[256], str2[256];
+	double dbl_in;
 	int t[10];
 	struct depletion_data *dep;
 	struct reset_com *reset, *last_reset = NULL;
@@ -4046,7 +4047,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 		}
 		switch (*line) {
 			case 'B': {	// building data
-				if (!get_line(fl, line2) || sscanf(line2, "%d %d %d %d %d %d %d %d", &t[0], &t[1], &t[2], &t[3], &t[4], &t[5], &t[6], &t[7]) != 8) {
+				if (!get_line(fl, line2) || sscanf(line2, "%d %d %d %d %d %lf %d %d", &t[0], &t[1], &t[2], &t[3], &t[4], &dbl_in, &t[6], &t[7]) != 8) {
 					log("SYSERR: Format error in B line of room #%d", vnum);
 					exit(1);
 				}
@@ -4066,7 +4067,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				COMPLEX_DATA(room)->entrance = t[2];
 				COMPLEX_DATA(room)->patron = t[3];
 				COMPLEX_DATA(room)->burning = t[4];
-				COMPLEX_DATA(room)->damage = t[5];
+				COMPLEX_DATA(room)->damage = dbl_in;	// formerly t[5], which is now unused
 				COMPLEX_DATA(room)->private_owner = t[6];
 				COMPLEX_DATA(room)->disrepair = t[7];	// not currently used (initialized to 0 after b4.15)
 				
@@ -4292,7 +4293,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	// B building data
 	if (COMPLEX_DATA(room)) {
 		// NOTE: disrepair is not used and is always 0 after b4.15
-		fprintf(fl, "B\n%d %d %d %d %d %d %d %d\n", BUILDING_VNUM(room), ROOM_TEMPLATE_VNUM(room), COMPLEX_DATA(room)->entrance, COMPLEX_DATA(room)->patron, COMPLEX_DATA(room)->burning, COMPLEX_DATA(room)->damage, COMPLEX_DATA(room)->private_owner, COMPLEX_DATA(room)->disrepair);
+		fprintf(fl, "B\n%d %d %d %d %d %.2f %d %d\n", BUILDING_VNUM(room), ROOM_TEMPLATE_VNUM(room), COMPLEX_DATA(room)->entrance, COMPLEX_DATA(room)->patron, COMPLEX_DATA(room)->burning, COMPLEX_DATA(room)->damage, COMPLEX_DATA(room)->private_owner, COMPLEX_DATA(room)->disrepair);
 	}
 	
 	// C: load commands
