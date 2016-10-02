@@ -3927,7 +3927,7 @@ struct vehicle_data {
 	// instance data
 	empire_data *owner;	// which empire owns it, if any
 	int scale_level;	// determines amount of damage, etc
-	int health;	// current health
+	double health;	// current health
 	obj_data *contains;	// contains objects
 	int carrying_n;	// size of contents
 	struct vehicle_attached_mob *animals;	// linked list of mobs attached

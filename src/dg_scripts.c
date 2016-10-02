@@ -4187,7 +4187,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", found ? 1 : 0);
 					}
 					else if (!str_cmp(field, "health") || !str_cmp(field, "hitp")) {
-						snprintf(str, slen, "%d", VEH_HEALTH(v));
+						snprintf(str, slen, "%d", (int) VEH_HEALTH(v));
 					}
 					break;
 				}

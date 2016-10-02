@@ -1048,7 +1048,7 @@ void annual_update_vehicle(vehicle_data *veh) {
 		return;
 	}
 	
-	VEH_HEALTH(veh) -= MAX(1, (VEH_MAX_HEALTH(veh) / 10));
+	VEH_HEALTH(veh) -= MAX(1.0, ((double) VEH_MAX_HEALTH(veh) / 10.0));
 	
 	if (VEH_HEALTH(veh) > 0) {
 		// add maintenance
