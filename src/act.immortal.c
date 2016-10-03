@@ -314,6 +314,7 @@ ADMIN_UTIL(util_rescan);
 ADMIN_UTIL(util_resetbuildingtriggers);
 ADMIN_UTIL(util_strlen);
 ADMIN_UTIL(util_tool);
+ADMIN_UTIL(util_yearly);
 
 
 struct {
@@ -332,6 +333,7 @@ struct {
 	{ "resetbuildingtriggers", LVL_CIMPL, util_resetbuildingtriggers },
 	{ "strlen", LVL_START_IMM, util_strlen },
 	{ "tool", LVL_IMPL, util_tool },
+	{ "yearly", LVL_CIMPL, util_yearly },
 
 	// last
 	{ "\n", LVL_TOP+1, NULL }
@@ -670,6 +672,19 @@ ADMIN_UTIL(util_strlen) {
 	msg_to_char(ch, "strlen: %d\r\n", (int)strlen(argument));
 	msg_to_char(ch, "color_strlen: %d\r\n", (int)color_strlen(argument));
 	msg_to_char(ch, "color_code_length: %d\r\n", color_code_length(argument));
+}
+
+
+ADMIN_UTIL(util_yearly) {
+	void annual_world_update();
+	
+	if (!*argument || str_cmp(argument, "confirm")) {
+		msg_to_char(ch, "You must type 'util yearly confirm' to do this. It will cause decay on the entire map.\r\n");
+	}
+	else {
+		send_config_msg(ch, "ok_string");
+		annual_world_update();
+	}
 }
 
 

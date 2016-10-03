@@ -1084,6 +1084,7 @@ void annual_world_update(void) {
 	for (d = descriptor_list; d; d = d->next) {
 		if (STATE(d) == CON_PLAYING && d->character) {
 			write_to_descriptor(d->descriptor, "The ground under you shakes violently!\r\n");
+			d->has_prompt = FALSE;
 			
 			if (!IS_IMMORTAL(d->character)) {
 				if (GET_POS(d->character) > POS_SITTING && !number(0, GET_DEXTERITY(d->character))) {
