@@ -2077,6 +2077,9 @@ ACMD(do_upgrade) {
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't start to upgrade it until you finish the construction.\r\n");
 	}
+	else if (BUILDING_RESOURCES(IN_ROOM(ch))) {
+		msg_to_char(ch, "The building needs some work before it can be upgraded.\r\n");
+	}
 	else {
 		// ok, we know it's upgradeable and they have permission... now locate the upgrade craft...
 		type = NULL;
