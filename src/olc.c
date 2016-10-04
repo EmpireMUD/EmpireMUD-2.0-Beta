@@ -113,6 +113,7 @@ OLC_MODULE(bedit_icon);
 OLC_MODULE(bedit_interaction);
 OLC_MODULE(bedit_military);
 OLC_MODULE(bedit_name);
+OLC_MODULE(bedit_resource);
 OLC_MODULE(bedit_script);
 OLC_MODULE(bedit_spawns);
 OLC_MODULE(bedit_title);
@@ -193,11 +194,13 @@ OLC_MODULE(medit_short_description);
 // map modules
 OLC_MODULE(mapedit_build);
 OLC_MODULE(mapedit_complete_room);
+OLC_MODULE(mapedit_decay);
 OLC_MODULE(mapedit_decustomize);
 OLC_MODULE(mapedit_delete_exit);
 OLC_MODULE(mapedit_delete_room);
 OLC_MODULE(mapedit_exits);
 OLC_MODULE(mapedit_icon);
+OLC_MODULE(mapedit_maintain);
 OLC_MODULE(mapedit_pass_walls);
 OLC_MODULE(mapedit_room_description);
 OLC_MODULE(mapedit_room_name);
@@ -360,6 +363,7 @@ extern const char *olc_flag_bits[];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 extern const char *pool_types[];
 extern const char *resource_types[];
+extern const char *res_action_type[];
 
 // external functions
 void replace_question_color(char *input, char *color, char *output);
@@ -497,6 +501,7 @@ const struct olc_command_data olc_data[] = {
 	{ "interaction", bedit_interaction, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "military", bedit_military, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "name", bedit_name, OLC_BUILDING, OLC_CF_EDITOR },
+	{ "resources", bedit_resource, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "rooms", bedit_extrarooms, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "script", bedit_script, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "spawns", bedit_spawns, OLC_BUILDING, OLC_CF_EDITOR },
@@ -578,12 +583,14 @@ const struct olc_command_data olc_data[] = {
 	// map commands
 	{ "build", mapedit_build, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "complete", mapedit_complete_room, OLC_MAP, OLC_CF_MAP_EDIT },
+	{ "decay", mapedit_decay, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "decustomize", mapedit_decustomize, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "deleteexit", mapedit_delete_exit, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "deleteroom", mapedit_delete_room, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "description", mapedit_room_description, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "exit", mapedit_exits, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "icon", mapedit_icon, OLC_MAP, OLC_CF_MAP_EDIT },
+	{ "maintain", mapedit_maintain, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "name", mapedit_room_name, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "passwalls", mapedit_pass_walls, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "roomtype", mapedit_roomtype, OLC_MAP, OLC_CF_MAP_EDIT },
@@ -3197,6 +3204,11 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
 				break;
 			}
+			case RES_ACTION: {
+				sprintf(line, "%dx [%s]", res->amount, res_action_type[res->vnum]);
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
+				break;
+			}
 			default: {
 				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, "???");
 			}
@@ -4915,6 +4927,22 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					}
 					break;
 				}
+				case RES_ACTION: {
+					// need to re-integrate arg4 and arg5
+					if (*arg5) {
+						strcat(arg4, " ");
+						strcat(arg4, arg5);
+					}
+					
+					if (!*arg4) {
+						msg_to_char(ch, "Usage: resource add action <amount> <type>\r\n");
+						return;
+					}
+					if ((vnum = search_block(arg4, res_action_type, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown action type '%s' (see HELP RESOURCE ACTIONS).\r\n", arg4);
+						return;
+					}
+				}
 			}
 			
 			CREATE(res, struct resource_data, 1);
@@ -5072,6 +5100,15 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					
 					change->vnum = vnum;
 					msg_to_char(ch, "You change resource %d's pool to %s.\r\n", atoi(arg2), pool_types[vnum]);
+					break;
+				}
+				case RES_ACTION: {
+					if ((vnum = search_block(arg4, res_action_type, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown action type '%s' (see HELP RESOURCE ACTIONS).\r\n", arg4);
+						return;
+					}
+					change->vnum = vnum;
+					msg_to_char(ch, "You change resource %d's action to %s.\r\n", atoi(arg2), res_action_type[vnum]);
 					break;
 				}
 				default: {

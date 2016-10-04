@@ -2,21 +2,21 @@
 Gigantic Nest~
 A Gigantic Nest~
 .&t##&?.~
-30 0 d 0
+64 0 d 0
 0 0 0 -1
 S
 #11002
 Gigantic Nest~
 A Gigantic Nest~
 /&t##&?\~
-30 0 d 0
+64 0 d 0
 0 0 0 -1
 S
 #11003
 Gigantic Nest~
 A Gigantic Nest~
 @.&t##&?@.~
-30 0 d 0
+64 0 d 0
 0 0 0 -1
 S
 #11034
@@ -42,12 +42,12 @@ sleep~
 D
    Exposed gears and power shafts line the walls of the small but luxurious
 captain's cabin on the flying clockwork roc. The rich wooden floors vibrate in
-the wind as the roc flies, but the machinery is strangely soothing.  
+the wind as the roc flies, but the machinery is strangely soothing.
 ~
 E
 gears shafts walls~
    The massive wooden gears turn slowly along the walls, ratcheting forward and
-back as the roc flies.  
+back as the roc flies.
 ~
 F
 d
@@ -64,17 +64,17 @@ D
    The back room of the clockwork roc is filled with bird cages, featuring
 everything from albatrosses to woodpeckers. An agitator is linked to the cages
 from one of the gears that lines the walls, and periodically stirs all the
-birds into flight for reasons unknown.  
+birds into flight for reasons unknown.
 ~
 E
 walls gears~
    Huge wooden gears link the inner workings of this room to the larger
-mechanisms of the aircraft.  
+mechanisms of the aircraft.
 ~
 E
 agitator~
    The agitator causes all the birds to take flight, but you're not quite sure
-why.  
+why.
 ~
 F
 m
@@ -95,7 +95,7 @@ S
 Dome~
 The Dome~
 &0(  )~
-100 15 h 0
+48 15 h 0
 0 0 0 -1
 C
 dedicate~
@@ -106,10 +106,12 @@ Much of the floor is empty space, giving priest and pilgrim alike room to lay
 down and appreciate the greatness of the dome high above.
 ~
 E
-mosacis tiles walls~
+mosaics tiles walls~
    The walls are covered with huge mosacis. Some depict great battles, while
 others are religious scenes and legends. At the top, the walls come together in
 the great dome, which depicts a massive, rust-colored bird: the roc.
 ~
+R
+2 1 5 0
 S
 $

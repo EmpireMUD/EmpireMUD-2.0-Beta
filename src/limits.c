@@ -216,7 +216,7 @@ void check_idle_passwords(void) {
 *
 * @param char_data *ch The person to check.
 */
-void check_idling(char_data *ch) {	
+void check_idling(char_data *ch) {
 	if (IS_NPC(ch)) {
 		return;
 	}
@@ -666,6 +666,7 @@ void real_update_char(char_data *ch) {
 
 	/* moving on.. */
 	if (GET_POS(ch) < POS_STUNNED || (GET_POS(ch) == POS_STUNNED && health_gain(ch, TRUE) <= 0)) {
+		GET_HEALTH(ch) = MIN(0, GET_HEALTH(ch));	// fixing? a bug where a player whose health is positve but is in a bleeding out position, would not bleed out right away (but couldn't recover)
 		GET_HEALTH(ch) -= 1;
 		update_pos(ch);
 		if (GET_POS(ch) == POS_DEAD) {
@@ -2109,7 +2110,11 @@ void point_update(bool run_real) {
 			clean_offers(ch);
 		}
 		
-		if (EXTRACTED(ch) || IS_DEAD(ch)) {
+		if (EXTRACTED(ch)) {
+			continue;
+		}
+		if (IS_DEAD(ch)) {
+			check_idling(ch);
 			continue;
 		}
 		

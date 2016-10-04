@@ -69,6 +69,7 @@ void delete_instance(struct instance_data *inst);	// instance.c
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
+void get_resource_display(struct resource_data *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 extern char *get_room_name(room_data *room, bool color);
 void replace_question_color(char *input, char *color, char *output);
@@ -313,6 +314,7 @@ ADMIN_UTIL(util_rescan);
 ADMIN_UTIL(util_resetbuildingtriggers);
 ADMIN_UTIL(util_strlen);
 ADMIN_UTIL(util_tool);
+ADMIN_UTIL(util_yearly);
 
 
 struct {
@@ -331,6 +333,7 @@ struct {
 	{ "resetbuildingtriggers", LVL_CIMPL, util_resetbuildingtriggers },
 	{ "strlen", LVL_START_IMM, util_strlen },
 	{ "tool", LVL_IMPL, util_tool },
+	{ "yearly", LVL_CIMPL, util_yearly },
 
 	// last
 	{ "\n", LVL_TOP+1, NULL }
@@ -669,6 +672,19 @@ ADMIN_UTIL(util_strlen) {
 	msg_to_char(ch, "strlen: %d\r\n", (int)strlen(argument));
 	msg_to_char(ch, "color_strlen: %d\r\n", (int)color_strlen(argument));
 	msg_to_char(ch, "color_code_length: %d\r\n", color_code_length(argument));
+}
+
+
+ADMIN_UTIL(util_yearly) {
+	void annual_world_update();
+	
+	if (!*argument || str_cmp(argument, "confirm")) {
+		msg_to_char(ch, "You must type 'util yearly confirm' to do this. It will cause decay on the entire map.\r\n");
+	}
+	else {
+		send_config_msg(ch, "ok_string");
+		annual_world_update();
+	}
 }
 
 
@@ -2251,6 +2267,7 @@ SHOW(show_uses) {
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
 	struct resource_data *res;
+	bld_data *bld, *next_bld;
 	bitvector_t flags;
 	size_t size;
 	int type;
@@ -2292,6 +2309,29 @@ SHOW(show_uses) {
 					*part = '\0';
 				}
 				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s%s%s%s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), *part ? " (" : "", part, *part ? ")" : "");
+			}
+		}
+		
+		HASH_ITER(hh, building_table, bld, next_bld) {
+			if (size >= sizeof(buf)) {
+				break;
+			}
+			
+			LL_FOREACH(GET_BLD_YEARLY_MAINTENANCE(bld), res) {
+				if (res->type != RES_COMPONENT || res->vnum != type) {
+					continue;
+				}
+				if (flags && (res->misc & flags) != flags) {
+					continue;
+				}
+				
+				if (res->misc) {
+					prettier_sprintbit(res->misc, component_flags, part);
+				}
+				else {
+					*part = '\0';
+				}
+				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s%s%s%s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), *part ? " (" : "", part, *part ? ")" : "");
 			}
 		}
 		
@@ -2936,6 +2976,11 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 		send_to_char(buf, ch);
 	}
 	
+	if (GET_BLD_YEARLY_MAINTENANCE(bdg)) {
+		get_resource_display(GET_BLD_YEARLY_MAINTENANCE(bdg), buf);
+		msg_to_char(ch, "Yearly maintenance:\r\n%s", buf);
+	}
+	
 	// storage? reverse-lookup
 	*buf = '\0';
 	*line = '\0';
@@ -3262,8 +3307,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 
 void do_stat_craft(char_data *ch, craft_data *craft) {
-	void get_resource_display(struct resource_data *list, char *save_buffer);
-
 	extern const char *craft_flags[];
 	extern const char *craft_types[];
 	
@@ -3750,7 +3793,7 @@ void do_stat_room(char_data *ch) {
 		if (GET_INSIDE_ROOMS(home) > 0) {
 			msg_to_char(ch, "Designated rooms: %d\r\n", GET_INSIDE_ROOMS(home));
 		}
-		msg_to_char(ch, "Burning: %d, Damage: %d, Disrepair: %d year%s\r\n", BUILDING_BURNING(home), BUILDING_DAMAGE(home), BUILDING_DISREPAIR(home), BUILDING_DISREPAIR(home) != 1 ? "s" : "");
+		msg_to_char(ch, "Burning: %d, Damage: %d/%d\r\n", BUILDING_BURNING(home), (int) BUILDING_DAMAGE(home), GET_BUILDING(home) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) : 0);
 	}
 
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || HAS_FUNCTION(IN_ROOM(ch), FNC_MINE)) {

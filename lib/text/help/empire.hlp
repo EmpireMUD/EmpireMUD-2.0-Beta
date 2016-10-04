@@ -590,8 +590,9 @@ you cancel the action or are interrupted, you must start the minute over.
 
 You can only excavate and fill in on claimed land.
 
-If you fill a desert trench, it will become an Oasis instead of a river. Oases
-convert into rivers if they are adjacent to other rivers or to oceans.
+When a desert trench fills with water, it will become an Oasis instead of a
+river. Oases convert into rivers if they are adjacent to other rivers or to
+oceans.
 
 There are three ways to fill a finished trench with water:
  - If there is more water adjacent, the trench will fill quickly.
@@ -664,15 +665,20 @@ See also: EMPIRE SCORE
 #
 FINDMAINTENANCE "FIND MAINTENANCE"
 
-Usage:  findmaintenance
+Usage:  findmaintenance [coordinates | island]
 
-This command lists all your buildings that require at least 2 maintenance. This
-means when the new year happens and ALL buildings require maintenance, they
-won't show up on the list right away -- preventing very long lists. After two
-years without maintenance, buildings will show on the findmaintenance list.
+This command finds all the buildings in your empire that are damaged or need
+at least 2 years of maintenance. If you give it target coordinates or an island
+name, it will instead list the resources needed to repair that location or all
+buildings you own on the island.
 
 If you are using Workforce to maintain your buildings, this generally means
 that only buildings not serviced by your workforce will show up on the list.
+Only buildings that have taken at least 20% of their maximum damage or require
+any maintenance show up on the list.
+
+Immortals can give an empire name as the first argument to see maintenance
+for that empire.
 
 See also: MAINTAIN, WORKFORCE
 #
@@ -811,14 +817,15 @@ MAINTAIN MAINTENANCE DISREPAIR
 
 Usage:  maintain
 
-Buildings fall into disrepair over time. It costs 1 pile of lumber and 1 pouch
-of nails per year of disrepair. You can also use workforce to maintain your
-buildings.
+Buildings fall into disrepair over time. Different buildings require different
+items for maintenance, which are shown beneath the building's description or
+map.
 
 It takes roughly two and a half months (realtime) for buildings to decay,
-although unfinished buildings decay faster.
+although some buildings (and all unfinished buildings) decay faster.
 
-Use findmaintenance to find buildings in need.
+Use findmaintenance to find buildings in need. You can also use workforce to
+maintain your buildings.
 
 See also: FINDMAINTENANCE, RUINS, WORKFORCE
 #

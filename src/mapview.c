@@ -853,10 +853,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		msg_to_char(ch, "This area is unclaimable.\r\n");
 	}
 	
-	if (BUILDING_DISREPAIR(room) > config_get_int("disrepair_major")) {
-		msg_to_char(ch, "It's in a state of serious disrepair.\r\n");
+	if (HAS_MAJOR_DISREPAIR(room)) {
+		msg_to_char(ch, "It's damaged and in a state of serious disrepair.\r\n");
 	}
-	else if (BUILDING_DISREPAIR(room) > config_get_int("disrepair_minor")) {
+	else if (HAS_MINOR_DISREPAIR(room)) {
 		msg_to_char(ch, "It's starting to show some wear.\r\n");
 	}
 	
@@ -897,9 +897,9 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		msg_to_char(ch, "The field is seeded with %s.\r\n", GET_CROP_NAME(cp));
 	}
 
-	if (!IS_COMPLETE(room)) {
+	if (BUILDING_RESOURCES(room)) {
 		show_resource_list(BUILDING_RESOURCES(room), partialbuf);
-		msg_to_char(ch, "Remaining to %s: %s\r\n", (IS_DISMANTLING(room) ? "Dismantle" : "Completion"), partialbuf);
+		msg_to_char(ch, "Remaining to %s: %s\r\n", (IS_DISMANTLING(room) ? "Dismantle" : (IS_INCOMPLETE(room) ? "Completion" : "Maintain")), partialbuf);
 	}
 	
 	if (BUILDING_BURNING(room)) {
@@ -1147,7 +1147,8 @@ void look_in_direction(char_data *ch, int dir) {
 * @param bitvector_t options Will recolor the tile if TRUE
 */
 static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, room_data *to_room, bitvector_t options) {
-	extern const char *ruins_icons[NUM_RUINS_ICONS];
+	extern const char *closed_ruins_icons[NUM_RUINS_ICONS];
+	extern const char *open_ruins_icons[NUM_RUINS_ICONS];
 	extern int get_north_for_char(char_data *ch);
 	extern int get_direction_for_char(char_data *ch, int dir);
 	extern struct city_metadata_type city_type[];
@@ -1322,9 +1323,13 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			strcat(buf, "[  ]");
 		}
 	}
-	else if (BUILDING_VNUM(to_room) == BUILDING_RUINS_OPEN || BUILDING_VNUM(to_room) == BUILDING_RUINS_CLOSED) {
-		// TODO could add variable icons system like sectors use
-		strcat(buf, ruins_icons[get_room_extra_data(to_room, ROOM_EXTRA_RUINS_ICON)]);
+	else if (BUILDING_VNUM(to_room) == BUILDING_RUINS_CLOSED) {
+		// TODO could add variable icons system like sectors use, or a "custom ruins icon" to Building data
+		strcat(buf, closed_ruins_icons[get_room_extra_data(to_room, ROOM_EXTRA_RUINS_ICON)]);
+	}
+	else if (BUILDING_VNUM(to_room) == BUILDING_RUINS_OPEN) {
+		// TODO could add variable icons system like sectors use, or a "custom ruins icon" to Building data
+		strcat(buf, open_ruins_icons[get_room_extra_data(to_room, ROOM_EXTRA_RUINS_ICON)]);
 	}
 	else if (IS_MAP_BUILDING(to_room) && GET_BUILDING(to_room)) {
 		strcat(buf, GET_BLD_ICON(GET_BUILDING(to_room)));
@@ -1454,10 +1459,10 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			else if (!IS_COMPLETE(to_room)) {
 				strcpy(buf2, "&c");
 			}
-			else if (BUILDING_DISREPAIR(to_room) > config_get_int("disrepair_major")) {
+			else if (HAS_MAJOR_DISREPAIR(to_room)) {
 				strcpy(buf2, "&r");
 			}
-			else if (BUILDING_DISREPAIR(to_room) > config_get_int("disrepair_minor")) {
+			else if (HAS_MINOR_DISREPAIR(to_room)) {
 				strcpy(buf2, "&m");
 			}
 			else if (HAS_FUNCTION(to_room, FNC_MINE)) {
@@ -1673,10 +1678,10 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 				else if (!IS_COMPLETE(to_room)) {
 					sprintf(infobuf + strlen(infobuf), "%sunfinished", *infobuf ? ", " :"");
 				}
-				if (BUILDING_DISREPAIR(to_room) > config_get_int("disrepair_major")) {
+				if (HAS_MAJOR_DISREPAIR(to_room)) {
 					sprintf(infobuf + strlen(infobuf), "%sbad disrepair", *infobuf ? ", " :"");
 				}
-				else if (BUILDING_DISREPAIR(to_room) > config_get_int("disrepair_minor")) {
+				else if (HAS_MINOR_DISREPAIR(to_room)) {
 					sprintf(infobuf + strlen(infobuf), "%sdisrepair", *infobuf ? ", " :"");
 				}
 				if (IS_COMPLETE(to_room) && HAS_FUNCTION(to_room, FNC_MINE)) {

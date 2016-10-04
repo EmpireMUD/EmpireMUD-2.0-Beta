@@ -2418,8 +2418,12 @@ ACMD(do_cede) {
 	else if (*arg2 && !strstr(arg2, ",")) {
 		msg_to_char(ch, "Usage: cede <person> (x, y)\r\n");
 	}
-	else if (!(*arg2 ? (room = HOME_ROOM(find_target_room(ch, arg2))) : (room = HOME_ROOM(IN_ROOM(ch)))))
+	else if (!(*arg2 ? (room = find_target_room(ch, arg2)) : (room = IN_ROOM(ch)))) {
 		msg_to_char(ch, "Invalid location.\r\n");
+	}
+	else if (!(room = HOME_ROOM(room))) {
+		// dummy error can't actually happen, but does set the variable in the sloppiest way possible...
+	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_CEDE)) {
 		// don't use has_permission here because it would check permits on the room you're in
 		msg_to_char(ch, "You don't have permission to cede.\r\n");
@@ -3821,63 +3825,126 @@ ACMD(do_expel) {
 
 
 ACMD(do_findmaintenance) {
-	struct find_territory_node *node_list = NULL, *node, *next_node;
-	empire_data *emp = GET_LOYALTY(ch);
-	room_data *iter, *next_iter;
+	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 	
-	// imms can target this
-	skip_spaces(&argument);
-	if (*argument && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES))) {
-		if (!(emp = get_empire_by_name(argument))) {
-			msg_to_char(ch, "Unknown empire.\r\n");
-			return;
-		}
-	}
+	char arg[MAX_INPUT_LENGTH], partial[MAX_STRING_LENGTH], temp[MAX_INPUT_LENGTH], *ptr;
+	struct find_territory_node *node_list = NULL, *node, *next_node;
+	struct resource_data *old_res, *total_list = NULL;
+	struct island_info *find_island = NULL;
+	empire_data *emp = GET_LOYALTY(ch);
+	struct empire_territory_data *ter;
+	room_data *find_room = NULL;
+	int total = 0;
 	
 	if (!ch->desc || IS_NPC(ch)) {
 		return;
 	}
 	
-	if (!emp) {
-		msg_to_char(ch, "You can't use findmaintenance if you are not in an empire.\r\n");
-	}
-	else {
-		HASH_ITER(hh, world_table, iter, next_iter) {
-			// skip non-map
-			if (GET_ROOM_VNUM(iter) >= MAP_SIZE) {
-				continue;
-			}
-			
-			// owned by the empire?
-			if (ROOM_OWNER(iter) == emp) {
-				// needs repair?
-				if (BUILDING_DISREPAIR(iter) > 1) {
-					CREATE(node, struct find_territory_node, 1);
-					node->loc = iter;
-					node->count = 1;
-					node->next = node_list;
-					node_list = node;
-				}
-			}
-		}
+	skip_spaces(&argument);
+	
+	// imms can target this
+	if (*argument && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES))) {
+		strcpy(temp, argument);
+		ptr = any_one_word(temp, arg);
 		
-		if (node_list) {
-			node_list = reduce_territory_node_list(node_list);
-			strcpy(buf, "Locations needing at least 2 maintenance:\r\n");
-			
-			// display and free the nodes
-			for (node = node_list; node; node = next_node) {
-				next_node = node->next;
-				sprintf(buf + strlen(buf), "%2d building%s near%s (%*d, %*d) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), X_PRECISION, X_COORD(node->loc), Y_PRECISION, Y_COORD(node->loc), get_room_name(node->loc, FALSE));
-				free(node);
-			}
-			
-			node_list = NULL;
-			page_string(ch->desc, buf, TRUE);
+		if ((emp = get_empire_by_name(arg))) {
+			argument = ptr;
+			skip_spaces(&argument);
 		}
 		else {
-			msg_to_char(ch, "No buildings were found that needed at least 2 maintenance.\r\n");
+			// wasn't an empire
+			emp = GET_LOYALTY(ch);
 		}
+	}
+	
+	if (!emp) {
+		msg_to_char(ch, "You can't use findmaintenance if you are not in an empire.\r\n");
+		return;
+	}
+	
+	// anything else in the argument?
+	if (*argument == '"' || *argument == '(') {
+		any_one_word(argument, arg);
+	}
+	else {
+		strcpy(arg, argument);
+	}
+	
+	if (*arg) {
+		if (!(find_island = get_island_by_name(arg)) && !(find_room = find_target_room(NULL, arg))) {
+			msg_to_char(ch, "Unknown location: %s.\r\n", arg);
+			return;
+		}
+		else if (find_room && ROOM_OWNER(find_room) != emp) {
+			msg_to_char(ch, "The empire does not own that location.\r\n");
+			return;
+		}
+		else if (find_room && !BUILDING_DAMAGE(find_room) && (!IS_COMPLETE(find_room) || !BUILDING_RESOURCES(find_room))) {
+			msg_to_char(ch, "That location needs no maintenance.\r\n");
+			return;
+		}
+	}
+	
+	// player is only checking one room (pre-validated)
+	if (find_room) {
+		show_resource_list(BUILDING_RESOURCES(find_room), partial);
+		msg_to_char(ch, "Maintenance needed for %s (%d, %d): %s\r\n", get_room_name(find_room, FALSE), X_COORD(find_room), Y_COORD(find_room), partial);
+		return;
+	}
+	
+	// check all the territory
+	LL_FOREACH(EMPIRE_TERRITORY_LIST(emp), ter) {
+		// validate the tile
+		if (GET_ROOM_VNUM(ter->room) >= MAP_SIZE) {
+			continue;
+		}
+		if ((!IS_COMPLETE(ter->room) || !BUILDING_RESOURCES(ter->room)) && !HAS_MINOR_DISREPAIR(ter->room)) {
+			continue;
+		}
+		if (find_island && GET_ISLAND_ID(ter->room) != find_island->id) {
+			continue;
+		}
+		
+		// validated
+		++total;
+		
+		// ok, what are we looking for (resource list or node list?)
+		if (find_island) {
+			old_res = total_list;
+			total_list = combine_resources(total_list, BUILDING_RESOURCES(ter->room));
+			free_resource_list(old_res);
+		}
+		else {
+			CREATE(node, struct find_territory_node, 1);
+			node->loc = ter->room;
+			node->count = 1;
+			node->next = node_list;
+			node_list = node;
+		}
+	}
+	
+	// okay, now what to display
+	if (find_island) {
+		show_resource_list(total_list, partial);
+		msg_to_char(ch, "Maintenance needed for %d building%s on %s: %s\r\n", total, PLURAL(total), find_island->name, total_list ? partial : "none");
+		free_resource_list(total_list);
+	}
+	else if (node_list) {
+		node_list = reduce_territory_node_list(node_list);
+		sprintf(buf, "%d location%s needing maintenance:\r\n", total, PLURAL(total));
+		
+		// display and free the nodes
+		for (node = node_list; node; node = next_node) {
+			next_node = node->next;
+			sprintf(buf + strlen(buf), "%2d building%s near%s (%*d, %*d) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), X_PRECISION, X_COORD(node->loc), Y_PRECISION, Y_COORD(node->loc), get_room_name(node->loc, FALSE));
+			free(node);
+		}
+		
+		node_list = NULL;
+		page_string(ch->desc, buf, TRUE);
+	}
+	else {
+		msg_to_char(ch, "No buildings were found that needed maintenance.\r\n");
 	}
 }
 

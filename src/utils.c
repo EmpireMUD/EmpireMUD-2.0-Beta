@@ -2296,6 +2296,8 @@ void add_to_resource_list(struct resource_data **list, int type, any_vnum vnum, 
 * @param struct resource_data **build_used_list Optional: If you need to track the actual resources used, pass a pointer to that list.
 */
 void apply_resource(char_data *ch, struct resource_data *res, struct resource_data **list, obj_data *use_obj, int msg_type, vehicle_data *crafting_veh, struct resource_data **build_used_list) {
+	extern const char *res_action_messages[][NUM_APPLY_RES_TYPES][2];
+	
 	bool messaged_char = FALSE, messaged_room = FALSE;
 	char buf[MAX_STRING_LENGTH];
 	int amt;
@@ -2460,6 +2462,17 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 			res->amount = 0;	// cost paid in full
 			break;
 		}
+		case RES_ACTION: {
+			if (*res_action_messages[res->vnum][msg_type][0]) {
+				act(res_action_messages[res->vnum][msg_type][0], FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
+			}
+			if (*res_action_messages[res->vnum][msg_type][1]) {
+				act(res_action_messages[res->vnum][msg_type][1], FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
+			}
+			
+			res->amount -= 1;	// only 1 at a time
+			break;
+		}
 	}
 	
 	// now possibly remove the resource, if it hit zero
@@ -2620,6 +2633,10 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 					}
 					break;
 				}
+				case RES_ACTION: {
+					// nothing to do
+					break;
+				}
 			}
 		}
 	}
@@ -2719,6 +2736,10 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 				}
 				break;
 			}
+			case RES_ACTION: {
+				// always good
+				return res;
+			}
 		}
 		
 		// if they requested left-to-right, we never pass the first resource in the list
@@ -2739,6 +2760,8 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 * @return char* A short string including quantity and type.
 */
 char *get_resource_name(struct resource_data *res) {
+	extern const char *res_action_type[];
+	
 	static char output[MAX_STRING_LENGTH];
 	
 	*output = '\0';
@@ -2763,6 +2786,10 @@ char *get_resource_name(struct resource_data *res) {
 		}
 		case RES_POOL: {
 			snprintf(output, sizeof(output), "%d %s point%s", res->amount, pool_types[res->vnum], PLURAL(res->amount));
+			break;
+		}
+		case RES_ACTION: {
+			snprintf(output, sizeof(output), "%dx [%s]", res->amount, res_action_type[res->vnum]);
 			break;
 		}
 		default: {
@@ -2791,8 +2818,9 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 	LL_FOREACH(list, res) {
 		// RES_x: give resources by type
 		switch (res->type) {
-			case RES_COMPONENT: {
-				// nothing to do -- we can't refund a generic component
+			case RES_COMPONENT:
+			case RES_ACTION: {
+				// nothing to do -- we can't refund these
 				break;
 			}
 			case RES_OBJECT: {
@@ -3038,6 +3066,10 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 						}
 						ok = FALSE;
 					}
+					break;
+				}
+				case RES_ACTION: {
+					// always has these
 					break;
 				}
 			}

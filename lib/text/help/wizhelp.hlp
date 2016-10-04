@@ -1149,6 +1149,7 @@ Available utilities:
  &cresetbuildingtriggers <vnum | all>&0 - Reattaches triggers to buildings/rooms,
     e.g. if you made a change in OLC and want live buildings updated.
  &cstrlen&0 - Give various measures of string length.
+ &cyearly&0 - Runs a full annual update on the world.
 #d
 VNUM
 

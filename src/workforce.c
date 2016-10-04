@@ -39,7 +39,7 @@ struct empire_territory_data *global_next_territory_entry = NULL;
 
 // protos
 void do_chore_brickmaking(empire_data *emp, room_data *room);
-void do_chore_building(empire_data *emp, room_data *room);
+void do_chore_building(empire_data *emp, room_data *room, int mode);
 void do_chore_chopping(empire_data *emp, room_data *room);
 void do_chore_digging(empire_data *emp, room_data *room);
 void do_chore_dismantle(empire_data *emp, room_data *room);
@@ -48,7 +48,6 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int
 void do_chore_farming(empire_data *emp, room_data *room);
 void do_chore_fire_brigade(empire_data *emp, room_data *room);
 void do_chore_gardening(empire_data *emp, room_data *room);
-void do_chore_maintenance(empire_data *emp, room_data *room);
 void do_chore_mining(empire_data *emp, room_data *room);
 void do_chore_minting(empire_data *emp, room_data *room);
 void do_chore_nailmaking(empire_data *emp, room_data *room);
@@ -161,9 +160,9 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	}
 	
 	// building
-	if (!IS_COMPLETE(room) && CHORE_ACTIVE(CHORE_BUILDING)) {
+	if ((IS_INCOMPLETE(room) || IS_DISMANTLING(room)) && CHORE_ACTIVE(CHORE_BUILDING)) {
 		if (!IS_DISMANTLING(room)) {
-			do_chore_building(emp, room);
+			do_chore_building(emp, room, CHORE_BUILDING);
 		}
 		else {
 			do_chore_dismantle(emp, room);
@@ -175,8 +174,8 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	
 	// buildings
 	if (IS_COMPLETE(room)) {
-		if (BUILDING_DISREPAIR(room) > 0 && CHORE_ACTIVE(CHORE_MAINTENANCE)) {
-			do_chore_maintenance(emp, room);
+		if ((BUILDING_DAMAGE(room) > 0 || BUILDING_RESOURCES(room)) && CHORE_ACTIVE(CHORE_MAINTENANCE)) {
+			do_chore_building(emp, room, CHORE_MAINTENANCE);
 		}
 		
 		// this covers all the herbs
@@ -907,11 +906,19 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_milling) {
 * @return bool TRUE if this workforce chore can work this craft, FALSE if not
 */
 CHORE_GEN_CRAFT_VALIDATOR(chore_pressing) {
+	ability_data *abil;
+	
 	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_PRESS) {
 		return FALSE;
 	}
-	if (GET_CRAFT_ABILITY(craft) != NO_ABIL) {
-		return FALSE;
+	// won't press things that require classes or high skill
+	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) ) {
+		if (!ABIL_ASSIGNED_SKILL(abil)) {
+			return FALSE;	// class ability
+		}
+		else if (ABIL_SKILL_LEVEL(abil) > BASIC_SKILL_CAP) {
+			return FALSE;	// level too high
+		}
 	}
 	// success
 	return TRUE;
@@ -933,7 +940,7 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_smelting) {
 	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_SMELT) {
 		return FALSE;
 	}
-	// won't weave things that require classes or high skill
+	// won't smelt things that require classes or high skill
 	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) ) {
 		if (!ABIL_ASSIGNED_SKILL(abil)) {
 			return FALSE;	// class ability
@@ -1102,24 +1109,36 @@ void do_chore_brickmaking(empire_data *emp, room_data *room) {
 }
 
 
-void do_chore_building(empire_data *emp, room_data *room) {
+/**
+* This is used for both building and maintenance.
+*
+* @param empire_data *emp Which empire is doing the chore.
+* @param room_data *room Which room to build/maintain
+* @param int mode Which CHORE_ is being performed (build/maintain).
+*/
+void do_chore_building(empire_data *emp, room_data *room, int mode) {
 	void finish_building(char_data *ch, room_data *room);
+	void finish_maintenance(char_data *ch, room_data *room);
 	
+	char_data *worker = find_chore_worker_in_room(room, chore_data[mode].mob);
 	struct empire_storage_data *store = NULL;
-	struct resource_data *res = NULL;
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BUILDING].mob);
 	bool can_do = FALSE, found = FALSE;
+	struct resource_data *res = NULL;
 	int islid = GET_ISLAND_ID(room);
 	
-	if (IS_COMPLETE(room)) {
+	if (!BUILDING_RESOURCES(room)) {
+		// is already done; just have to finish
 		can_do = TRUE;
 	}
 	else if ((res = BUILDING_RESOURCES(room))) {
-		// can only process objects in this way
+		// RES_x: can only process some types in this way
 		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && store->amount > 0) {
 			can_do = TRUE;
 		}
 		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, res->misc, 1)) {
+			can_do = TRUE;
+		}
+		else if (res->type == RES_ACTION) {
 			can_do = TRUE;
 		}
 	}
@@ -1147,10 +1166,17 @@ void do_chore_building(empire_data *emp, room_data *room) {
 		}
 		
 		// check for completion
-		if (IS_COMPLETE(room)) {
-			finish_building(worker, room);
+		if (!BUILDING_RESOURCES(room)) {
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-			stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
+			
+			if (mode == CHORE_BUILDING) {
+				finish_building(worker, room);
+				stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
+			}
+			else if (mode == CHORE_MAINTENANCE) {
+				finish_maintenance(worker, room);
+				stop_room_action(room, ACT_MAINTENANCE, CHORE_MAINTENANCE);
+			}
 		}
 
 		if (!found) {
@@ -1158,7 +1184,7 @@ void do_chore_building(empire_data *emp, room_data *room) {
 		}
 	}
 	else if (can_do) {
-		worker = place_chore_worker(emp, CHORE_BUILDING, room);
+		worker = place_chore_worker(emp, mode, room);
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
@@ -1608,44 +1634,6 @@ void do_chore_gardening(empire_data *emp, room_data *room) {
 				ewt_mark_for_interactions(emp, room, INTERACT_FIND_HERB);
 			}
 		}
-	}
-	else if (worker) {
-		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-	}
-}
-
-
-void do_chore_maintenance(empire_data *emp, room_data *room) {
-	void finish_building(char_data *ch, room_data *room);
-	
-	char_data *worker = NULL;
-	bool ok = TRUE;
-	int amount = BUILDING_DISREPAIR(room);
-	int islid = GET_ISLAND_ID(room);
-	
-	if (amount <= 0) {
-		return;
-	}
-
-	// check resources	
-	if (!empire_can_afford_component(emp, islid, CMP_LUMBER, CMPF_BASIC, amount)) {
-		ok = FALSE;
-	}
-	if (!empire_can_afford_component(emp, islid, CMP_NAILS, CMPF_BASIC, amount)) {
-		ok = FALSE;
-	}
-	
-	if (ok && (worker = find_chore_worker_in_room(room, chore_data[CHORE_MAINTENANCE].mob))) {
-		charge_stored_component(emp, islid, CMP_LUMBER, CMPF_BASIC, amount, NULL);
-		charge_stored_component(emp, islid, CMP_NAILS, CMPF_BASIC, amount, NULL);
-		COMPLEX_DATA(room)->disrepair = 0;
-		empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
-		
-		// they don't stay long
-		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
-	}
-	else if (ok) {
-		worker = place_chore_worker(emp, CHORE_MAINTENANCE, room);
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
