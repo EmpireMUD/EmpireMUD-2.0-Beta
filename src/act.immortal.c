@@ -2267,6 +2267,7 @@ SHOW(show_uses) {
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
 	struct resource_data *res;
+	bld_data *bld, *next_bld;
 	bitvector_t flags;
 	size_t size;
 	int type;
@@ -2308,6 +2309,29 @@ SHOW(show_uses) {
 					*part = '\0';
 				}
 				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s%s%s%s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), *part ? " (" : "", part, *part ? ")" : "");
+			}
+		}
+		
+		HASH_ITER(hh, building_table, bld, next_bld) {
+			if (size >= sizeof(buf)) {
+				break;
+			}
+			
+			LL_FOREACH(GET_BLD_YEARLY_MAINTENANCE(bld), res) {
+				if (res->type != RES_COMPONENT || res->vnum != type) {
+					continue;
+				}
+				if (flags && (res->misc & flags) != flags) {
+					continue;
+				}
+				
+				if (res->misc) {
+					prettier_sprintbit(res->misc, component_flags, part);
+				}
+				else {
+					*part = '\0';
+				}
+				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s%s%s%s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), *part ? " (" : "", part, *part ? ")" : "");
 			}
 		}
 		

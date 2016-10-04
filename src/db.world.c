@@ -2417,7 +2417,7 @@ void init_room(room_data *room, room_vnum vnum) {
 */
 void ruin_one_building(room_data *room) {
 	bool closed = ROOM_IS_CLOSED(room) ? TRUE : FALSE;
-	struct bld_data *bld = GET_BUILDING(room);
+	bld_data *bld = GET_BUILDING(room);
 	int dir = BUILDING_ENTRANCE(room);
 	char buf[MAX_STRING_LENGTH];
 	room_data *to_room;
