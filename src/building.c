@@ -1076,6 +1076,8 @@ ACMD(do_build) {
 	// simple rules for ch building a given craft
 	#define CHAR_CAN_BUILD(ch, ttype)  (GET_CRAFT_TYPE((ttype)) == CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)) && (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || has_ability((ch), GET_CRAFT_ABILITY((ttype)))))
 	
+	skip_spaces(&argument);
+	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use the build command.\r\n");
 		return;
@@ -1084,7 +1086,7 @@ ACMD(do_build) {
 		send_config_msg(ch, "need_approval_string");
 		return;
 	}
-	if (*arg && GET_BUILDING(IN_ROOM(ch)) && IS_INCOMPLETE(IN_ROOM(ch))) {
+	if (*argument && GET_BUILDING(IN_ROOM(ch)) && IS_INCOMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "To continue working on this building, just type 'build' with no argument.\r\n");
 		return;
 	}
