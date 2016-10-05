@@ -3781,7 +3781,7 @@ ACMD(do_estats) {
 	// name
 	msg_to_char(ch, "%s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	if (strcmp(EMPIRE_ADJECTIVE(emp), EMPIRE_NAME(emp))) {
-		msg_to_char(ch, "(%s&0)", EMPIRE_ADJECTIVE(emp));
+		msg_to_char(ch, " (%s&0)", EMPIRE_ADJECTIVE(emp));
 	}
 	msg_to_char(ch, "\r\n");
 	
