@@ -3763,6 +3763,36 @@ ACMD(do_esay) {
 }
 
 
+ACMD(do_estats) {
+	empire_data *emp = GET_LOYALTY(ch);
+	
+	skip_spaces(&argument);
+	if (*argument && !(emp = get_empire_by_name(argument))) {
+		msg_to_char(ch, "Unknown empire.\r\n");
+		return;
+	}
+	if (!*argument && !emp) {
+		msg_to_char(ch, "You are not in an empire.\r\n");
+		return;
+	}
+	
+	// show the empire:
+	
+	// name
+	msg_to_char(ch, "%s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	if (strcmp(EMPIRE_ADJECTIVE(emp), EMPIRE_NAME(emp))) {
+		msg_to_char(ch, "(%s&0)", EMPIRE_ADJECTIVE(emp));
+	}
+	msg_to_char(ch, "\r\n");
+	
+	// stats
+	msg_to_char(ch, "Population: %d player%s, %d citizen%s, %d military\r\n", EMPIRE_MEMBERS(emp), PLURAL(EMPIRE_MEMBERS(emp)), EMPIRE_POPULATION(emp), PLURAL(EMPIRE_POPULATION(emp)), EMPIRE_MILITARY(emp));
+	msg_to_char(ch, "Territory: %d in cities, %d/%d outside (%d/%d total)\r\n", EMPIRE_CITY_TERRITORY(emp), EMPIRE_OUTSIDE_TERRITORY(emp), land_can_claim(emp, TRUE), EMPIRE_CITY_TERRITORY(emp) + EMPIRE_OUTSIDE_TERRITORY(emp), land_can_claim(emp, FALSE));
+	msg_to_char(ch, "Wealth: %d coin%s (at %d%%), %d treasure (%d total)\r\n", EMPIRE_COINS(emp), PLURAL(EMPIRE_COINS(emp)), (int)(COIN_VALUE * 100), EMPIRE_WEALTH(emp), GET_TOTAL_WEALTH(emp));
+	msg_to_char(ch, "Fame: %d, Greatness: %d\r\n", EMPIRE_FAME(emp), EMPIRE_GREATNESS(emp));
+}
+
+
 ACMD(do_expel) {
 	empire_data *e;
 	char_data *targ = NULL;
