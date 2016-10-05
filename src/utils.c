@@ -1473,7 +1473,7 @@ void log_to_empire(empire_data *emp, int type, const char *str, ...) {
 			EMPIRE_LOGS(emp) = elog;
 		}
 		
-		save_empire(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 	
 	// show to players

@@ -1430,6 +1430,7 @@ void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_d
 		if ((isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
 			isle->population -= 1;
 		}
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 	
 	LL_DELETE(ter->npcs, npc);
@@ -2179,6 +2180,8 @@ void save_empire(empire_data *emp) {
 		fclose(fl);
 		rename(tempname, fname);
 	}
+	
+	EMPIRE_NEEDS_SAVE(emp) = FALSE;	// done
 }
 
 
@@ -2190,6 +2193,20 @@ void save_all_empires(void) {
 
 	HASH_ITER(hh, empire_table, iter, next_iter) {
 		save_empire(iter);
+	}
+}
+
+
+/**
+* Delayed empire saves -- things marked EMPIRE_NEEDS_SAVE.
+*/
+void save_marked_empires(void) {
+	empire_data *emp, *next_emp;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (EMPIRE_NEEDS_SAVE(emp)) {
+			save_empire(emp);
+		}
 	}
 }
 
@@ -2222,6 +2239,8 @@ struct empire_npc_data *create_empire_npc(empire_data *emp, mob_vnum mobv, int s
 	
 	npc->next = ter->npcs;
 	ter->npcs = npc;
+	
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	
 	return npc;
 }
@@ -2351,7 +2370,7 @@ void update_empire_npc_data(void) {
 		}
 		
 		// good time to save them all
-		save_empire(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 }
 
@@ -2431,6 +2450,7 @@ void kill_empire_npc(char_data *ch) {
 	}
 	
 	GET_EMPIRE_NPC_DATA(ch) = NULL;
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 }
 
 
@@ -6350,7 +6370,7 @@ void clean_empire_logs(void) {
 		}
 		
 		if (save) {
-			save_empire(iter);
+			EMPIRE_NEEDS_SAVE(iter) = TRUE;
 		}
 	}
 }

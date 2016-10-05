@@ -600,7 +600,7 @@ void chore_update(void) {
 				}
 			}
 			
-			save_empire(emp);
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			
 			// no longer need this -- free up the tracker
 			ewt_free_tracker(&EMPIRE_WORKFORCE_TRACKER(emp));

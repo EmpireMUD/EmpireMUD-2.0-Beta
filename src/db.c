@@ -2199,7 +2199,7 @@ void check_version(void) {
 			HASH_ITER(hh, empire_table, emp, next_emp) {
 				// auto-balance was removed and the same id was used for dismantle-mines
 				set_workforce_limit_all(emp, CHORE_DISMANTLE_MINES, 0);
-				save_empire(emp);
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			}
 		}
 		if (MATCH_VERSION("b2.8")) {

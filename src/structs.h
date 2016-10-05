@@ -3599,6 +3599,8 @@ struct empire_data {
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	int top_shipping_id;	// shipping system quick id for the empire
 	
+	bool needs_save;	// for things that delay-save
+	
 	UT_hash_handle hh;	// empire_table hash handle
 };
 

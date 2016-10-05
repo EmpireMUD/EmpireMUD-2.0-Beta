@@ -5578,7 +5578,7 @@ ACMD(do_moveeinv) {
 		}
 		
 		if (count != 0) {
-			save_empire(emp);
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has moved %d einv items for %s from island %d to island %d", GET_REAL_NAME(ch), count, EMPIRE_NAME(emp), island_from, island_to);
 			msg_to_char(ch, "Moved %d items for %s%s&0 from island %d to island %d.\r\n", count, EMPIRE_BANNER(emp), EMPIRE_NAME(emp), island_from, island_to);
 		}

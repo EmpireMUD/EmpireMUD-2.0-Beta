@@ -1828,7 +1828,7 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 	
 	// charge resources
 	charge_stored_resource(emp, from_island, vnum, number);
-	save_empire(emp);
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	
 	// messaging
 	isle = get_island(to_island, TRUE);
@@ -2293,7 +2293,7 @@ void process_shipping_one(empire_data *emp) {
 	}
 	
 	if (changed) {
-		save_empire(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 }
 
@@ -3230,7 +3230,7 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 	}
 	else {
 		SAVE_CHAR(ch);
-		save_empire(GET_LOYALTY(ch));
+		EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
 	}
 }
 
@@ -3349,7 +3349,7 @@ void warehouse_store(char_data *ch, char *argument) {
 
 	if (done) {
 		SAVE_CHAR(ch);
-		save_empire(GET_LOYALTY(ch));
+		EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
 	}
 }
 
@@ -4912,7 +4912,7 @@ ACMD(do_retrieve) {
 
 		/* save the empire */
 		SAVE_CHAR(ch);
-		save_empire(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		read_vault(emp);
 	}
 }
@@ -5180,7 +5180,7 @@ ACMD(do_ship) {
 			
 			REMOVE_FROM_LIST(sd, EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), next);
 			free(sd);
-			save_empire(GET_LOYALTY(ch));
+			EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
 			
 			done = TRUE;
 			break;	// only allow 1st match
@@ -5382,7 +5382,7 @@ ACMD(do_store) {
 
 		/* save the empire */
 		SAVE_CHAR(ch);
-		save_empire(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		read_vault(emp);
 	}
 }

@@ -2139,9 +2139,6 @@ void point_update(bool run_real) {
 	HASH_ITER(hh, world_table, room, next_room) {
 		point_update_room(room);
 	}
-	
-	// fresh empire write
-	save_all_empires();
 }
 
 

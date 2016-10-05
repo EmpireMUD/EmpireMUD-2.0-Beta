@@ -788,7 +788,7 @@ void city_traits(char_data *ch, char *argument) {
 	if (city->traits != old) {
 		prettier_sprintbit(city->traits, empire_trait_types, buf);
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed city traits for %s to %s", PERS(ch, ch, 1), city->name, buf);
-		save_empire(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 }
 
@@ -922,8 +922,8 @@ void downgrade_city(char_data *ch, char *argument) {
 		perform_abandon_city(emp, city, FALSE);
 	}
 	
-	save_empire(emp);
 	read_empire_territory(emp, FALSE);
+	save_empire(emp);
 }
 
 
@@ -1239,7 +1239,7 @@ void rename_city(char_data *ch, char *argument) {
 	
 	free(city->name);
 	city->name = str_dup(newname);
-	save_empire(emp);
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 }
 
 
@@ -1479,7 +1479,7 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 		trade->limit = limit;
 		
 		sort_trade_data(&EMPIRE_TRADE(emp));
-		save_empire(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		
 		msg_to_char(ch, "%s now %ss '%s' costing %s%d, when %s %d.\r\n", EMPIRE_NAME(emp), trade_type[subcmd], get_obj_name_by_proto(vnum), trade_mostleast[subcmd], cost, trade_overunder[subcmd], limit);
 	}
@@ -1508,7 +1508,7 @@ void do_import_remove(char_data *ch, empire_data *emp, char *argument, int subcm
 	else {
 		REMOVE_FROM_LIST(trade, EMPIRE_TRADE(emp), next);
 		free(trade);
-		save_empire(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		
 		msg_to_char(ch, "%s no longer %ss '%s'.\r\n", EMPIRE_NAME(emp), trade_type[subcmd], get_obj_name_by_proto(vnum));
 	}
@@ -1877,6 +1877,7 @@ bool extract_tavern_resources(room_data *room) {
 		}
 	}
 	
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	return ok;
 }
 
@@ -2220,6 +2221,7 @@ void do_abandon_room(char_data *ch, room_data *room) {
 			msg_to_char(ch, "Territory abandoned.\r\n");
 			act("$n abandons $s claim to this area.", FALSE, ch, NULL, NULL, TO_ROOM);
 		}
+		
 		abandon_room(room);
 	}
 }
@@ -2873,7 +2875,7 @@ ACMD(do_diplomacy) {
 			log_to_empire(ch_emp, ELOG_DIPLOMACY, "The offer of %s to %s has been canceled", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
 			log_to_empire(vict_emp, ELOG_DIPLOMACY, "%s has withdrawn the offer of %s", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
 			msg_to_char(ch, "You have withdrawn the offer of %s to %s.\r\n", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
-			save_empire(ch_emp);
+			EMPIRE_NEEDS_SAVE(ch_emp) = TRUE;
 		}
 		return;
 	}
@@ -2971,9 +2973,9 @@ ACMD(do_diplomacy) {
 		if (*vict_log) {
 			log_to_empire(vict_emp, ELOG_DIPLOMACY, "%s", CAP(vict_log));
 		}
-
-		save_empire(ch_emp);
-		save_empire(vict_emp);
+		
+		EMPIRE_NEEDS_SAVE(ch_emp) = TRUE;
+		EMPIRE_NEEDS_SAVE(vict_emp) = TRUE;
 	}
 }
 
@@ -5142,6 +5144,7 @@ ACMD(do_workforce) {
 		}
 		
 		msg_to_char(ch, "You have %s the %s chore for %s.\r\n", (limit == 0) ? "disabled" : ((limit == WORKFORCE_UNLIMITED) ? "enabled" : "set the limit for"), chore_data[type].name, name);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		
 		if (limit == 0) {
 			deactivate_workforce(emp, all ? NO_ISLAND : (here ? GET_ISLAND_ID(IN_ROOM(ch)) : island->id), type);
@@ -5187,5 +5190,6 @@ ACMD(do_withdraw) {
 		
 		decrease_empire_coins(emp, emp, coin_amt);
 		increase_coins(ch, emp, coin_amt);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 }
