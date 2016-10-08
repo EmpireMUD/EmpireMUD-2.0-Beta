@@ -906,8 +906,8 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	if (VEH_SCALE_LEVEL(veh)) {
 		fprintf(fl, "Scale: %d\n", VEH_SCALE_LEVEL(veh));
 	}
-	if (VEH_HEALTH(veh) != VEH_MAX_HEALTH(veh)) {
-		fprintf(fl, "Health: %d\n", VEH_HEALTH(veh));
+	if (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh)) {
+		fprintf(fl, "Health: %.2f\n", VEH_HEALTH(veh));
 	}
 	if (VEH_INTERIOR_HOME_ROOM(veh)) {
 		fprintf(fl, "Interior-home: %d\n", GET_ROOM_VNUM(VEH_INTERIOR_HOME_ROOM(veh)));
@@ -969,6 +969,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 	any_vnum load_vnum;
 	vehicle_data *veh;
 	long long_in[2];
+	double dbl_in;
 	
 	// load based on vnum or, if NOTHING, create anonymous object
 	if (proto) {
@@ -1122,15 +1123,21 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 			case 'F': {
 				if (OBJ_FILE_TAG(line, "Flags:", length)) {
 					if (sscanf(line + length + 1, "%s", s_in)) {
-						VEH_FLAGS(veh) = asciiflag_conv(s_in);
+						if (proto) {	// prefer to keep flags from the proto
+							VEH_FLAGS(veh) = VEH_FLAGS(proto) & ~SAVABLE_VEH_FLAGS;
+							VEH_FLAGS(veh) |= asciiflag_conv(s_in) & SAVABLE_VEH_FLAGS;
+						}
+						else {	// no proto
+							VEH_FLAGS(veh) = asciiflag_conv(s_in);
+						}
 					}
 				}
 				break;
 			}
 			case 'H': {
 				if (OBJ_FILE_TAG(line, "Health:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
-						VEH_HEALTH(veh) = MIN(i_in[0], VEH_MAX_HEALTH(veh));
+					if (sscanf(line + length + 1, "%lf", &dbl_in)) {
+						VEH_HEALTH(veh) = MIN(dbl_in, VEH_MAX_HEALTH(veh));
 					}
 				}
 				break;
@@ -1933,6 +1940,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 void save_olc_vehicle(descriptor_data *desc) {	
 	vehicle_data *proto, *veh = GET_OLC_VEHICLE(desc), *iter;
 	any_vnum vnum = GET_OLC_VNUM(desc);
+	bitvector_t old_flags;
 	UT_hash_handle hh;
 
 	// have a place to save it?
@@ -1970,6 +1978,10 @@ void save_olc_vehicle(descriptor_data *desc) {
 		if (VEH_VNUM(iter) != vnum) {
 			continue;
 		}
+		
+		// flags (preserve the state of the savable flags only)
+		old_flags = VEH_FLAGS(iter) & SAVABLE_VEH_FLAGS;
+		VEH_FLAGS(iter) = (VEH_FLAGS(veh) & ~SAVABLE_VEH_FLAGS) | old_flags;
 		
 		// update pointers
 		if (VEH_KEYWORDS(iter) == VEH_KEYWORDS(proto)) {
@@ -2131,7 +2143,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Map Icon: %s\t0 %s\r\n", VEH_ICON(veh), show_color_codes(VEH_ICON(veh)));
 	}
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]\r\n", VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
+	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]\r\n", (int) VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
 	
 	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING || VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
 		sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, part, TRUE);

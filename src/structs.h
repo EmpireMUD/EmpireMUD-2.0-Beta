@@ -466,7 +466,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_INTERLINK  BIT(5)	// can be interlinked
 #define BLD_HERD  BIT(6)	// can herd
 #define BLD_DEDICATE  BIT(7)	// can be dedicated to a player
-// #define BLD_UNUSED1  BIT(8)
+#define BLD_NO_RUINS  BIT(8)	// building leaves no corpse
 #define BLD_NO_NPC  BIT(9)	// mobs won't walk in
 #define BLD_BARRIER  BIT(10)	// can only go back the direction you came
 // #define BLD_UNUSED2  BIT(11)
@@ -1294,6 +1294,7 @@ typedef struct vehicle_data vehicle_data;
 #define RES_LIQUID  2	// a volume of a given liquid (vnum= LIQ_ type)
 #define RES_COINS  3	// an amount of coins (vnum= empire id of coins)
 #define RES_POOL  4	// health, mana, etc (vnum= HEALTH, etc)
+#define RES_ACTION  5	// flavorful action strings (take time but not resources)
 
 
 // storage flags (for obj storage locations)
@@ -1387,6 +1388,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_SAILING			36
 #define ACT_PILOTING		37
 #define ACT_SWAP_SKILL_SETS	38
+#define ACT_MAINTENANCE		39
 
 // act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -1779,6 +1781,11 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_ON_FIRE  BIT(18)	// s. currently on fire
 #define VEH_NO_LOAD_ONTO_VEHICLE  BIT(19)	// t. cannot be loaded onto a vehicle
 
+// The following vehicle flags are saved to file rather than read from the
+// prototype. Flags which are NOT included in this list can be altered with
+// OLC and affect live copies.
+#define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE)
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// WEATHER AND SEASON DEFINES //////////////////////////////////////////////
@@ -1903,7 +1910,9 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_AFF_IN_VEHICLE  BIT(11)	// l. Part of a vehicle
 #define ROOM_AFF_NO_WORK  BIT(12)	// m. workforce ignores this room
 #define ROOM_AFF_NO_DISREPAIR  BIT(13)	// n. will not fall into disrepair
-#define ROOM_AFF_NO_DISMANTLE  BIT(14)
+#define ROOM_AFF_NO_DISMANTLE  BIT(14)	// o. blocks normal dismantle until turned off
+#define ROOM_AFF_INCOMPLETE  BIT(15)	// p. building is incomplete
+// NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
 // For various misc numbers attached to rooms
@@ -2589,6 +2598,7 @@ struct bld_data {
 	struct spawn_info *spawns;	// linked list of spawn data
 	struct interaction_item *interactions;	// interaction items
 	struct trig_proto_list *proto_script;	// list of default triggers
+	struct resource_data *yearly_maintenance;	// needed each year
 	
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;
@@ -3589,6 +3599,8 @@ struct empire_data {
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	int top_shipping_id;	// shipping system quick id for the empire
 	
+	bool needs_save;	// for things that delay-save
+	
 	UT_hash_handle hh;	// empire_table hash handle
 };
 
@@ -3710,6 +3722,7 @@ struct obj_data {
 	
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;
+	bool search_mark;
 	
 	UT_hash_handle hh;	// object_table hash
 };
@@ -3917,7 +3930,7 @@ struct vehicle_data {
 	// instance data
 	empire_data *owner;	// which empire owns it, if any
 	int scale_level;	// determines amount of damage, etc
-	int health;	// current health
+	double health;	// current health
 	obj_data *contains;	// contains objects
 	int carrying_n;	// size of contents
 	struct vehicle_attached_mob *animals;	// linked list of mobs attached
@@ -4021,8 +4034,8 @@ struct room_data {
 	char *icon;  // same with map icon
 
 	struct affected_type *af;  // room affects
-	sh_int affects;  // affect bitvector (modified)
-	sh_int base_affects;  // base affects
+	unsigned int affects;  // affect bitvector (modified)
+	unsigned int base_affects;  // base affects
 	
 	struct track_data *tracks;	// for tracking
 	
@@ -4060,7 +4073,7 @@ struct complex_room_data {
 	byte inside_rooms;  // count of designated rooms inside
 	room_data *home_room;  // for interior rooms (and boats and instances), means this is actually part of another room; is saved as vnum to file but is room_data* in real life
 	
-	int disrepair;	// decay over time
+	int disrepair;	// UNUSED: as of b4.15 this is 0 for all buildings and not used (but is saved to file and coule be repurposed)
 	
 	vehicle_data *vehicle;  // the associated vehicle (usually only on the home room)
 	struct instance_data *instance;	// if part of an instantiated adventure
@@ -4068,7 +4081,7 @@ struct complex_room_data {
 	int private_owner;	// for privately-owned houses
 	
 	byte burning;  // if burning, the burn value
-	byte damage;  // for catapulting
+	double damage;  // for catapulting
 };
 
 

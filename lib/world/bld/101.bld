@@ -2,7 +2,7 @@
 Hag Swamp Hut~
 A Crude Ladder~
 &c~&0()&c~~
-10 0 R 0
+128 0 R 0
 0 0 0 -1
 D
    You find yourself beneath a hut that stands on tall stilts above the swamp.
@@ -15,7 +15,7 @@ S
 Monsoon Rift~
 A Strange Rift~
 &J\()/~
-24 0 bd 0
+1000 0 bd 0
 0 0 0 -1
 A
 j
@@ -33,7 +33,7 @@ k
 E
 volcano caldera lava~
    The mountain has opened up into a raging caldera, spewing lava down the
-mountainside. Above the caldera, the air is hot enough to blister your skin. 
+mountainside. Above the caldera, the air is hot enough to blister your skin.
 ~
 T 10196
 S

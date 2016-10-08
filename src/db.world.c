@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -50,6 +52,7 @@ extern int evos_per_hour;
 
 // external funcs
 void add_room_to_world_tables(room_data *room);
+extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 void complete_building(room_data *room);
 void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter);
 extern struct complex_room_data *init_complex_data();
@@ -916,11 +919,15 @@ void update_world(void) {
 //// ANNUAL MAP UPDATE ///////////////////////////////////////////////////////
 
 // process map-only annual updates
-static void annual_update_map_tile(room_data *room) {
-	empire_data *emp;
-	int trenched, amount;
+void annual_update_map_tile(room_data *room) {
+	extern char *get_room_name(room_data *room, bool color);
 	
-	if (BUILDING_VNUM(room) == BUILDING_RUINS_OPEN || BUILDING_VNUM(room) == BUILDING_RUINS_CLOSED || BUILDING_VNUM(room) == BUILDING_RUINS_FLOODED) {
+	struct resource_data *old_list;
+	int trenched, amount;
+	empire_data *emp;
+	double dmg;
+	
+	if (IS_RUINS(room)) {
 		// roughly 2 real years for average chance for ruins to be gone
 		if (!number(0, 89)) {
 			disassociate_building(room);
@@ -931,16 +938,42 @@ static void annual_update_map_tile(room_data *room) {
 			}
 		}
 	}
-	else if (COMPLEX_DATA(room) && GET_BUILDING(room) && !IS_CITY_CENTER(room) && HOME_ROOM(room) == room && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_HAS_INSTANCE)) {
-		emp = ROOM_OWNER(room);
-
-		// decay only non-imm empires				
-		if (!emp || !EMPIRE_IMM_ONLY(emp)) {
-			COMPLEX_DATA(room)->disrepair += 1;
+	else if (GET_BUILDING(room) && !IS_CITY_CENTER(room) && HOME_ROOM(room) == room && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_NO_DISREPAIR) && (!ROOM_OWNER(room) || !EMPIRE_IMM_ONLY(ROOM_OWNER(room)))) {
+		// normal building decay:						TODO: City center building could be given the no-disrepair affect, but existing muds would need a patch-updater
 		
-			// 66% chance after 10 years for any building or 2 years for an unfinished one
-			if ((BUILDING_DISREPAIR(room) >= config_get_int("disrepair_limit") && number(0, 2)) || (!IS_COMPLETE(room) && !IS_DISMANTLING(room) && BUILDING_DISREPAIR(room) >= config_get_int("disrepair_limit_unfinished"))) {
+		// determine damage to do each year
+		if (IS_COMPLETE(room)) {
+			dmg = (double) GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) / (double) config_get_int("disrepair_limit");
+		}
+		else {
+			dmg = (double) GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) / (double) config_get_int("disrepair_limit_unfinished");
+		}
+		dmg = MAX(1.0, dmg);
+		
+		// apply damage
+		COMPLEX_DATA(room)->damage += dmg;
+		
+		// apply maintenance resources (if any, and if it's not being dismantled)
+		if (GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)) && !IS_DISMANTLING(room)) {
+			old_list = GET_BUILDING_RESOURCES(room);
+			GET_BUILDING_RESOURCES(room) = combine_resources(old_list, GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)));
+			free_resource_list(old_list);
+		}
+		
+		// check high decay (damage) -- only if there is no instance
+		if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && BUILDING_DAMAGE(room) >= GET_BLD_MAX_DAMAGE(GET_BUILDING(room))) {
+			emp = ROOM_OWNER(room);
+			abandon_room(room);
+			
+			// 50% of the time we just abandon, the rest we also decay to ruins
+			if (!number(0, 1)) {
+				if (emp) {
+					log_to_empire(emp, ELOG_TERRITORY, "%s (%d, %d) has crumbled to ruin", get_room_name(room, FALSE), X_COORD(room), Y_COORD(room));
+				}
 				ruin_one_building(room);
+			}
+			else if (emp) {
+				log_to_empire(emp, ELOG_TERRITORY, "%s (%d, %d) has been abandoned due to decay", get_room_name(room, FALSE), X_COORD(room), Y_COORD(room));
 			}
 		}
 	}
@@ -1000,7 +1033,6 @@ static void annual_update_room(room_data *room) {
 * Runs an annual update (mainly, maintenance) on the vehicle.
 */
 void annual_update_vehicle(vehicle_data *veh) {
-	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 	void fully_empty_vehicle(vehicle_data *veh);
 	
 	static struct resource_data *default_res = NULL;
@@ -1016,7 +1048,7 @@ void annual_update_vehicle(vehicle_data *veh) {
 		return;
 	}
 	
-	VEH_HEALTH(veh) -= MAX(1, (VEH_MAX_HEALTH(veh) / 10));
+	VEH_HEALTH(veh) -= MAX(1.0, ((double) VEH_MAX_HEALTH(veh) / 10.0));
 	
 	if (VEH_HEALTH(veh) > 0) {
 		// add maintenance
@@ -1052,6 +1084,7 @@ void annual_world_update(void) {
 	for (d = descriptor_list; d; d = d->next) {
 		if (STATE(d) == CON_PLAYING && d->character) {
 			write_to_descriptor(d->descriptor, "The ground under you shakes violently!\r\n");
+			d->has_prompt = FALSE;
 			
 			if (!IS_IMMORTAL(d->character)) {
 				if (GET_POS(d->character) > POS_SITTING && !number(0, GET_DEXTERITY(d->character))) {
@@ -1529,7 +1562,7 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	int island;
 	
 	// only care about buildings
-	if (!emp || !GET_BUILDING(room) || !IS_COMPLETE(room) || IS_DISMANTLING(room)) {
+	if (!emp || !GET_BUILDING(room) || IS_INCOMPLETE(room) || IS_DISMANTLING(room)) {
 		return;
 	}
 	
@@ -1663,6 +1696,8 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 			EMPIRE_CITY_TERRITORY(e) = 0;
 			EMPIRE_OUTSIDE_TERRITORY(e) = 0;
 			EMPIRE_POPULATION(e) = 0;
+			EMPIRE_MILITARY(e) = 0;
+			EMPIRE_FAME(e) = 0;
 		
 			read_vault(e);
 
@@ -2382,47 +2417,59 @@ void init_room(room_data *room, room_vnum vnum) {
 */
 void ruin_one_building(room_data *room) {
 	bool closed = ROOM_IS_CLOSED(room) ? TRUE : FALSE;
+	bld_data *bld = GET_BUILDING(room);
 	int dir = BUILDING_ENTRANCE(room);
+	char buf[MAX_STRING_LENGTH];
 	room_data *to_room;
 	bld_vnum type;
 	
 	// abandon first -- this will take care of accessory rooms, too
 	abandon_room(room);
+	disassociate_building(room);
 	
-	// verify closed status and find a room to exit to
-	if (closed) {
-		to_room = SHIFT_DIR(room, rev_dir[dir]);
-		if (!to_room) {
-			closed = FALSE;
-		}
-	}
-
-	// basic setup
-	if (SECT_FLAGGED(BASE_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)) {
-		type = BUILDING_RUINS_FLOODED;
-	}
-	else if (closed) {
-		type = BUILDING_RUINS_CLOSED;
-	}
-	else {
-		type = BUILDING_RUINS_OPEN;
-	}
-	construct_building(room, type);
-	COMPLEX_DATA(room)->entrance = dir;
-	
-	// make the exit
-	if (closed && to_room) {
-		create_exit(room, to_room, rev_dir[dir], FALSE);
-	}
-	
-	set_room_extra_data(room, ROOM_EXTRA_RUINS_ICON, number(0, NUM_RUINS_ICONS-1));
-
 	if (ROOM_PEOPLE(room)) {
 		act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 	}
 	
-	// run completion on the ruins
-	complete_building(room);
+	// create ruins building
+	if (bld && !IS_SET(GET_BLD_FLAGS(bld), BLD_NO_RUINS)) {
+		// verify closed status and find a room to exit to
+		if (closed) {
+			to_room = SHIFT_DIR(room, rev_dir[dir]);
+			if (!to_room) {
+				closed = FALSE;
+			}
+		}
+
+		// basic setup
+		if (SECT_FLAGGED(BASE_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)) {
+			type = BUILDING_RUINS_FLOODED;
+		}
+		else if (closed) {
+			type = BUILDING_RUINS_CLOSED;
+		}
+		else {
+			type = BUILDING_RUINS_OPEN;
+		}
+		construct_building(room, type);
+		COMPLEX_DATA(room)->entrance = dir;
+	
+		// make the exit
+		if (closed && to_room) {
+			create_exit(room, to_room, rev_dir[dir], FALSE);
+		}
+		
+		// customized ruins
+		sprintf(buf, "The Ruins of %s %s", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
+		if (ROOM_CUSTOM_NAME(room)) {
+			free(ROOM_CUSTOM_NAME(room));
+		}
+		ROOM_CUSTOM_NAME(room) = str_dup(buf);
+		set_room_extra_data(room, ROOM_EXTRA_RUINS_ICON, number(0, NUM_RUINS_ICONS-1));
+		
+		// run completion on the ruins
+		complete_building(room);
+	}
 }
 
 

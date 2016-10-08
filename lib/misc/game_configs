@@ -59,8 +59,8 @@ cities_on_newbie_islands 0
 city_trait_radius 100
 disrepair_limit 10
 disrepair_limit_unfinished 2
-disrepair_major 6
-disrepair_minor 2
+disrepair_major 60
+disrepair_minor 20
 max_out_of_city_portal 50
 min_distance_between_ally_cities 10
 min_distance_between_cities 30

@@ -594,7 +594,7 @@ void mobile_activity(void) {
 
 		if (!IS_MOB(ch) || GET_FED_ON_BY(ch) || EXTRACTED(ch) || IS_DEAD(ch) || AFF_FLAGGED(ch, AFF_STUNNED))
 			continue;
-		if (FIGHTING(ch) || !AWAKE(ch) || AFF_FLAGGED(ch, AFF_CHARM) || MOB_FLAGGED(ch, MOB_TIED)  || GET_LED_BY(ch))
+		if (FIGHTING(ch) || !AWAKE(ch) || AFF_FLAGGED(ch, AFF_CHARM) || MOB_FLAGGED(ch, MOB_TIED) || IS_INJURED(ch, INJ_TIED) || GET_LED_BY(ch))
 			continue;
 		
 		// found stops further execution

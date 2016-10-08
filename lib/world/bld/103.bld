@@ -2,7 +2,7 @@
 Mountain Cave~
 A Dark Cave in the Mountainside~
 &y/()\~
-100 0 beR 0
+1000 0 beR 0
 0 0 0 -1
 D
    The cave is small and would be easy to miss if not for the scorched
@@ -14,7 +14,7 @@ S
 Abandoned Dragon Nest~
 An Abandoned Dragon Nest~
 &y/()\~
-100 0 d 0
+128 0 d 0
 0 0 0 -1
 E
 nest cave~

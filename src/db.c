@@ -268,6 +268,7 @@ void boot_db(void) {
 	void load_trading_post();
 	void reset_time();
 	int run_convert_vehicle_list();
+	void run_reboot_triggers();
 	void sort_commands();
 	void startup_room_reset();
 	void verify_sectors();
@@ -304,9 +305,6 @@ void boot_db(void) {
 
 	log("Generating player index.");
 	build_player_index();
-	
-	log(" Calculating territory and members...");
-	reread_empire_tech(NULL);
 	
 	log(" Checking for ruined cities...");
 	check_ruined_cities();
@@ -367,6 +365,13 @@ void boot_db(void) {
 	
 	// figure out how often to evolve what (do this late)
 	detect_evos_per_hour();
+	
+	// final things...
+	log("Running reboot triggers.");
+	run_reboot_triggers();
+	
+	log(" Calculating territory and members.");
+	reread_empire_tech(NULL);
 	
 	// END
 	log("Boot db -- DONE.");
@@ -1688,6 +1693,7 @@ const char *versions_list[] = {
 	"b4.1",
 	"b4.2",
 	"b4.4",
+	"b4.15",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2111,6 +2117,58 @@ PLAYER_UPDATE_FUNC(b4_4_fight_messages) {
 }
 
 
+// convert data on unfinished buildings and disrepair
+void b4_15_building_update(void) {
+	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
+	extern struct resource_data *copy_resource_list(struct resource_data *input);
+	
+	struct resource_data *res, *disrepair_res;
+	room_data *room, *next_room;
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		// add INCOMPLETE aff
+		if (BUILDING_RESOURCES(room) && !IS_DISMANTLING(room)) {
+			SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_INCOMPLETE);
+			SET_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_INCOMPLETE);
+		}
+		
+		// convert maintenance
+		if (COMPLEX_DATA(room) && GET_BUILDING(room) && COMPLEX_DATA(room)->disrepair > 0) {
+			// add maintenance
+			if (GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room))) {
+				// basic stuff
+				disrepair_res = copy_resource_list(GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)));
+				
+				// multiply by years of disrepair
+				LL_FOREACH(disrepair_res, res) {
+					res->amount *= COMPLEX_DATA(room)->disrepair;
+				}
+				
+				// combine into existing resources
+				if (BUILDING_RESOURCES(room)) {
+					res = BUILDING_RESOURCES(room);
+					GET_BUILDING_RESOURCES(room) = combine_resources(res, disrepair_res);
+					free_resource_list(res);
+				}
+				else {
+					GET_BUILDING_RESOURCES(room) = disrepair_res;
+				}
+			}
+			
+			// add damage (10% per year of disrepair)
+			COMPLEX_DATA(room)->damage += COMPLEX_DATA(room)->disrepair * GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) / 10;
+		}
+		
+		// clear this
+		if (COMPLEX_DATA(room)) {
+			COMPLEX_DATA(room)->disrepair = 0;
+		}
+	}
+	
+	save_whole_world();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -2141,7 +2199,7 @@ void check_version(void) {
 			HASH_ITER(hh, empire_table, emp, next_emp) {
 				// auto-balance was removed and the same id was used for dismantle-mines
 				set_workforce_limit_all(emp, CHORE_DISMANTLE_MINES, 0);
-				save_empire(emp);
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			}
 		}
 		if (MATCH_VERSION("b2.8")) {
@@ -2296,6 +2354,10 @@ void check_version(void) {
 		if (MATCH_VERSION("b4.4")) {
 			log("Adding b4.4 fight messages...");
 			update_all_players(NULL, b4_4_fight_messages);
+		}
+		if (MATCH_VERSION("b4.15")) {
+			log("Converting b4.15 building data...");
+			b4_15_building_update();
 		}
 	}
 	

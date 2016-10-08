@@ -40,6 +40,7 @@ extern const char *spawn_flags[];
 
 // external funcs
 void init_building(bld_data *building);
+void replace_question_color(char *input, char *color, char *output);
 void sort_interactions(struct interaction_item **list);
 
 
@@ -96,6 +97,14 @@ bool audit_building(bld_data *bld, char_data *ch) {
 	}
 	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && IS_SET(GET_BLD_FLAGS(bld), BLD_SECONDARY_TERRITORY)) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "2ND-TERRITORY flag on a non-designated building");
+		problem = TRUE;
+	}
+	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && !GET_BLD_YEARLY_MAINTENANCE(bld)) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Requires no maintenance");
+		problem = TRUE;
+	}
+	if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && GET_BLD_YEARLY_MAINTENANCE(bld)) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Interior room has yearly maintenance (will have no effect)");
 		problem = TRUE;
 	}
 	
@@ -533,6 +542,9 @@ void save_olc_building(descriptor_data *desc) {
 		GET_BLD_SCRIPTS(proto) = trig->next;
 		free(trig);
 	}
+	if (GET_BLD_YEARLY_MAINTENANCE(proto)) {
+		free_resource_list(GET_BLD_YEARLY_MAINTENANCE(proto));
+	}
 	
 	// sanity
 	prune_extra_descs(&GET_BLD_EX_DESCS(bdg));
@@ -584,6 +596,7 @@ void save_olc_building(descriptor_data *desc) {
 */
 bld_data *setup_olc_building(bld_data *input) {
 	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
+	extern struct resource_data *copy_resource_list(struct resource_data *input);
 	
 	bld_data *new;
 	
@@ -612,6 +625,9 @@ bld_data *setup_olc_building(bld_data *input) {
 		
 		// scripts
 		GET_BLD_SCRIPTS(new) = copy_trig_protos(GET_BLD_SCRIPTS(input));
+		
+		// maintenance
+		GET_BLD_YEARLY_MAINTENANCE(new) = copy_resource_list(GET_BLD_YEARLY_MAINTENANCE(input));
 	}
 	else {
 		// brand new: some defaults
@@ -638,6 +654,7 @@ bld_data *setup_olc_building(bld_data *input) {
 void olc_show_building(char_data *ch) {
 	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
 	void get_interaction_display(struct interaction_item *list, char *save_buffer);
+	void get_resource_display(struct resource_data *list, char *save_buffer);
 	void get_script_display(struct trig_proto_list *list, char *save_buffer);
 	extern char *show_color_codes(char *string);
 	
@@ -657,7 +674,8 @@ void olc_show_building(char_data *ch) {
 	sprintf(buf + strlen(buf), "<&ytitle&0> %s\r\n", GET_BLD_TITLE(bdg));
 	
 	if (!is_room) {
-		sprintf(buf + strlen(buf), "<&yicon&0> %s&0  %s\r\n", NULLSAFE(GET_BLD_ICON(bdg)), show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
+		replace_question_color(NULLSAFE(GET_BLD_ICON(bdg)), "&0", lbuf);
+		sprintf(buf + strlen(buf), "<&yicon&0> %s&0  %s\r\n", lbuf, show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
 	}
 	sprintf(buf + strlen(buf), "<&ycommands&0> %s\r\n", GET_BLD_COMMANDS(bdg) ? GET_BLD_COMMANDS(bdg) : "");
 	sprintf(buf + strlen(buf), "<&ydescription&0>\r\n%s", GET_BLD_DESC(bdg) ? GET_BLD_DESC(bdg) : "");
@@ -702,6 +720,13 @@ void olc_show_building(char_data *ch) {
 	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
 	if (GET_BLD_INTERACTIONS(bdg)) {
 		get_interaction_display(GET_BLD_INTERACTIONS(bdg), buf1);
+		strcat(buf, buf1);
+	}
+	
+	// maintenance resources
+	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <\tyresource\t0>\r\n");
+	if (GET_BLD_YEARLY_MAINTENANCE(bdg)) {
+		get_resource_display(GET_BLD_YEARLY_MAINTENANCE(bdg), buf1);
 		strcat(buf, buf1);
 	}
 
@@ -901,6 +926,13 @@ OLC_MODULE(bedit_name) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_BLD_NAME(bdg));
 	CAP(GET_BLD_NAME(bdg));
+}
+
+
+OLC_MODULE(bedit_resource) {
+	void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
+	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
+	olc_process_resources(ch, argument, &GET_BLD_YEARLY_MAINTENANCE(bdg));
 }
 
 

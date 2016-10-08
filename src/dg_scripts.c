@@ -2124,6 +2124,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			else if ((num = search_block(var, script_commands, TRUE)) != NOTHING) {
 				snprintf(str, slen, "%c%s", cmd_prefix[type], script_commands[num]);
 			}
+			else if (!str_cmp(var, "instance")) {
+				// %instance% with no field
+				struct instance_data *inst = get_instance_for_script(type, go);
+				snprintf(str, slen, "%d", inst ? inst->id : 0);
+			}
 			else if (!str_cmp(var, "timestamp")) {
 				snprintf(str, slen, "%ld", time(0));
 				return;
@@ -4182,7 +4187,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", found ? 1 : 0);
 					}
 					else if (!str_cmp(field, "health") || !str_cmp(field, "hitp")) {
-						snprintf(str, slen, "%d", VEH_HEALTH(v));
+						snprintf(str, slen, "%d", (int) VEH_HEALTH(v));
 					}
 					break;
 				}

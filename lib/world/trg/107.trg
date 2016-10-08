@@ -259,6 +259,17 @@ switch %random.3%
   break
 done
 ~
+#10733
+Jill find Jack on reboot~
+0 x 0
+~
+eval jack %instance.mob(10732)%
+if !%jack%
+  halt
+end
+mgoto %jack%
+mfollow %jack%
+~
 #10734
 Jack Be Nimble~
 0 bw 10

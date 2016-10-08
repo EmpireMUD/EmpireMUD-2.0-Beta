@@ -553,6 +553,16 @@ If you also want to see empty slots, use the -a flag.
 
 See also: INVENTORY, REMOVE, WEAR, WIELD, HOLD, SHEATH, DRAW, SWAP
 #
+ESTATS ESTATISTICS
+
+Usage:  estats [empire]
+
+This command gets quick info on your empire (or another). It is a short version
+of the longer info shown with the "empire" command, and it defaults to your
+empire if you give no argument.
+
+See also: EMPIRE
+#
 EXECUTE
 
 Usage:  execute <victim>
@@ -757,8 +767,8 @@ Informative map mode shows you details about your buildings.
 
   &C[--]&0  being dismantled
   &c(--)&0  not done building
-  &m(BB)&0  needs maintenance
-  &r(GG)&0  extreme disrepair
+  &m(BB)&0  damaged/needs maintenance
+  &r(GG)&0  high damage/extreme disrepair
   &g/[]\&0  mine with ore
   &r/[]\&0  depleted mine
   &y^()^&0  chameleon building (immortal only)

@@ -1997,7 +1997,75 @@ const char *resource_types[] = {
 	"liquid",
 	"coins",
 	"pool",
+	"action",
 	"\n"
+};
+
+
+// NOTE: these match up with 'res_action_messages', and you must add entries to both
+const char *res_action_type[] = {
+	"dig",
+	"clear terrain",
+	"tidy up",
+	"repair",	// 3: used in vnums.h
+	"scout area",
+	"block water",
+	"engrave",
+	"magic words",
+	"organize",
+	"\n"
+};
+
+
+// these match up with 'res_action_type'; all message pairs are to-char, to-room; vehicles use $V
+const char *res_action_messages[][NUM_APPLY_RES_TYPES][2] = {
+	#define RES_ACTION_MESSAGE(build_to_char, build_to_room, veh_to_char, veh_to_room, repair_to_char, repair_to_room)  {{"",""},{build_to_char,build_to_room},{veh_to_char,veh_to_room},{repair_to_char,repair_to_room}}
+	
+	RES_ACTION_MESSAGE(	// dig
+		"You dig at the ground.", "$n digs at the ground.",	// building/maintaining
+		"You dig underneath $V.", "$n digs underneath $V.",	// craft vehicle
+		"You dig underneath $V.", "$n digs underneath $V."	// repair vehicle
+	),
+	RES_ACTION_MESSAGE(	// clear terrain
+		"You clear the area of debris.", "$n clears the area of debris.",
+		"You clear the area around $V.", "$n clears the area around $V.",
+		"You clear the area around $V.", "$n clears the area around $V."
+	),
+	RES_ACTION_MESSAGE(	// tidy up
+		"You tidy up the area.", "$n tidies up the area.",
+		"You tidy up around $V.", "$n tidies up around $V.",
+		"You tidy up $V.", "$n tidies up $V."
+	),
+	RES_ACTION_MESSAGE(	// repair
+		"You repair the building.", "$n repairs the building.",
+		"You repair $V.", "$n repairs $V.",
+		"You repair $V.", "$n repairs $V."
+	),
+	RES_ACTION_MESSAGE(	// scout area
+		"You scout the area.", "$n scouts the area.",
+		"You scout the area.", "$n scouts the area.",
+		"You scout the area around $V.", "$n scouts the area around $V."
+	),
+	RES_ACTION_MESSAGE(	// block water
+		"You block off the water.", "$n blocks off the water.",
+		"You block off the water around $V.", "$n blocks off the water around $V.",
+		"You block off the water around $V.", "$n blocks off the water around $V."
+	),
+	RES_ACTION_MESSAGE(	// engrave
+		"You engrave the building.", "$n engraves the building.",
+		"You engrave $V.", "$n engraves $V.",
+		"You engrave $V.", "$n engraves $V."
+	),
+	RES_ACTION_MESSAGE(	// magic words
+		"You speak some magic words.", "$n speaks some magic words.",
+		"You speak some magic words.", "$n speaks some magic words.",
+		"You speak some magic words.", "$n speaks some magic words."
+	),
+	RES_ACTION_MESSAGE(	// organize
+		"You organize the building.", "$n organizes the building.",
+		"You organize $V.", "$n organizes $V.",
+		"You organize $V.", "$n organizes $V."
+	),
 };
 
 
@@ -2251,7 +2319,7 @@ const char *bld_flags[] = {
 	"INTERLINK",	// 5
 	"HERD",
 	"DEDICATE",
-	"*DRINK-DEPRECATED",
+	"!RUINS",
 	"!NPC",
 	"BARRIER",	// 10
 	"*TAVERN-DEPRECATED",
@@ -2598,22 +2666,22 @@ const char *road_types[] = {
 
 /* ROOM_AFF_x: */
 const char *room_aff_bits[] = {
-	"DARK",
+	"DARK",	// 0
 	"SILENT",
 	"*HAS-INSTANCE",
 	"CHAMELEON",
 	"*TEMPORARY",
-	"!EVOLVE",
+	"!EVOLVE",	// 5
 	"*UNCLAIMABLE",
 	"*PUBLIC",
 	"*DISMANTLING",
 	"!FLY",
-	"!WEATHER",
-	"*",
+	"!WEATHER",	// 10
+	"*IN-VEHICLE",
 	"*!WORK",
 	"!DISREPAIR",
 	"*!DISMANTLE",
-	"*IN-VEHICLE",
+	"*INCOMPLETE",	// 15
 	"\n"
 };
 
@@ -2642,8 +2710,8 @@ const char *room_extra_types[] = {
 };
 
 
-// used for BUILDING_RUINS
-const char *ruins_icons[NUM_RUINS_ICONS] = {
+// used for BUILDING_RUINS_CLOSED
+const char *closed_ruins_icons[NUM_RUINS_ICONS] = {
 	"..&0/]",
 	"&0[\\&?..",
 	"&0|\\&?..",
@@ -2651,6 +2719,18 @@ const char *ruins_icons[NUM_RUINS_ICONS] = {
 	".&0-&?.&0]",
 	"&0[&?.&0-&?.",
 	"&0[&?__&0]"
+};
+
+
+// used for BUILDING_RUINS_OPEN
+const char *open_ruins_icons[NUM_RUINS_ICONS] = {
+	".&0_i&?.",
+	".&0[.&?.",
+	".&0.v&?.",
+	".&0/]&?.",
+	".&0(\\&?.",
+	".&0}\\.",
+	"&0..}&?."
 };
 
 
@@ -3049,7 +3129,8 @@ const char *trig_types[] = {
 	"Charmed",
 	"Start-Quest",	// 20
 	"Finish-Quest",
-	"Player-in-Room",	// 22
+	"Player-in-Room",
+	"Reboot",	// 23
 	"\n"
 };
 
@@ -3078,6 +3159,7 @@ const bitvector_t mtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// start-quest
 	TRIG_ARG_PERCENT,	// finish-quest
 	TRIG_ARG_PERCENT,	// player-in-room
+	NOBITS,	// reboot
 };
 
 
@@ -3105,7 +3187,8 @@ const char *otrig_types[] = {
 	"Finish",
 	"Start-Quest",	// 20
 	"Finish-Quest",
-	"Player-in-Room",	// 22
+	"Player-in-Room",
+	"Reboot",	// 23
 	"\n"
 };
 
@@ -3134,6 +3217,7 @@ const bitvector_t otrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// start-quest
 	TRIG_ARG_PERCENT,	// finish-quest
 	TRIG_ARG_PERCENT,	// player-in-room
+	NOBITS,	// reboot
 };
 
 
@@ -3161,7 +3245,8 @@ const char *vtrig_types[] = {
 	"*",	// 19
 	"Start-Quest",	// 20
 	"Finish-Quest",
-	"Player-in-Room",	// 22
+	"Player-in-Room",
+	"Reboot",	// 23
 	"\n"
 };
 
@@ -3191,6 +3276,7 @@ const bitvector_t vtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// start-quest
 	TRIG_ARG_PERCENT,	// finish-quest
 	TRIG_ARG_PERCENT,	// player-in-room
+	NOBITS,	// reboot
 };
 
 
@@ -3218,7 +3304,8 @@ const char *wtrig_types[] = {
 	"*",
 	"Start-Quest",	// 20
 	"Finish-Quest",
-	"Player-in-Room",	// 22
+	"Player-in-Room",
+	"Reboot",	// 23
 	"\n"
 };
 
@@ -3247,6 +3334,7 @@ const bitvector_t wtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// start-quest
 	TRIG_ARG_PERCENT,	// finish-quest
 	TRIG_ARG_PERCENT,	// player-in-room
+	NOBITS,	// reboot
 };
 
 

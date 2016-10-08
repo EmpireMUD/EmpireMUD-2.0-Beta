@@ -539,6 +539,35 @@ int valid_dg_target(char_data *ch, int bitvector) {
 
 
 /**
+* Runs triggers to update and prepare the mud at startup.
+*/
+void run_reboot_triggers(void) {
+	void reboot_mtrigger(char_data *ch);
+	void reboot_otrigger(obj_data *obj);
+	void reboot_vtrigger(vehicle_data *veh);
+	void reboot_wtrigger(room_data *room);
+	
+	vehicle_data *veh, *next_veh;
+	room_data *room, *next_room;
+	char_data *mob, *next_mob;
+	obj_data *obj, *next_obj;
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		reboot_wtrigger(room);
+	}
+	LL_FOREACH_SAFE(character_list, mob, next_mob) {
+		reboot_mtrigger(mob);
+	}
+	LL_FOREACH_SAFE(object_list, obj, next_obj) {
+		reboot_otrigger(obj);
+	}
+	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+		reboot_vtrigger(veh);
+	}
+}
+
+
+/**
 * Deals damage to a character based on scaled level and modifier.
 *
 * @param char_data *vict The poor sod who's taking damage.

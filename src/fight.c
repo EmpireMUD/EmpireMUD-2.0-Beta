@@ -46,6 +46,7 @@ extern const double hit_per_dex;
 // external funcs
 ACMD(do_flee);
 bool check_scaling(char_data *mob, char_data *based_on);
+extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 extern int determine_best_scale_level(char_data *ch, bool check_group);
 
 // locals
@@ -2233,13 +2234,20 @@ void appear(char_data *ch) {
 * @param room_data *to_room The target room
 * @param int damage How much damage to deal to the room
 */
-void besiege_room(room_data *to_room, int damage) {	
+void besiege_room(room_data *to_room, int damage) {
+	static struct resource_data *default_res = NULL;
 	char_data *c, *next_c;
 	obj_data *o, *next_o;
 	empire_data *emp = ROOM_OWNER(to_room);
+	struct resource_data *old_list;
 	int max_dam;
 	bool junk;
 	room_data *rm;
+	
+	// resources if it doesn't have its own
+	if (!default_res) {
+		add_to_resource_list(&default_res, RES_ACTION, RES_ACTION_REPAIR, 1, 0);
+	}
 	
 	// make sure we only hit the home-room
 	to_room = HOME_ROOM(to_room);
@@ -2281,6 +2289,13 @@ void besiege_room(room_data *to_room, int damage) {
 			}
 		}
 		else {	// not over-damaged
+			// apply needed maintenance if we did more than 10% damage
+			if (GET_BUILDING(to_room) && GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(to_room)) && damage >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(to_room)) / 10)) {
+				old_list = GET_BUILDING_RESOURCES(to_room);
+				GET_BUILDING_RESOURCES(to_room) = combine_resources(old_list, GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(to_room)) ? GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(to_room)) : default_res);
+				free_resource_list(old_list);
+			}
+		
 			if (ROOM_PEOPLE(to_room)) {
 				act("The building is hit by something and shakes violently!", FALSE, ROOM_PEOPLE(to_room), 0, 0, TO_CHAR | TO_ROOM);
 			}
@@ -2334,7 +2349,6 @@ void besiege_room(room_data *to_room, int damage) {
 * @return bool TRUE if the target survives, FALSE if it's extracted
 */
 bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type) {
-	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 	void fully_empty_vehicle(vehicle_data *veh);
 
 	static struct resource_data *default_res = NULL;
@@ -3385,7 +3399,7 @@ void trigger_distrust_from_hostile(char_data *ch, empire_data *emp) {
 		pol->type = DIPL_DISTRUST;
 		
 		log_to_empire(chemp, ELOG_DIPLOMACY, "%s now distrusts this empire due to hostile activity (%s)", EMPIRE_NAME(emp), PERS(ch, ch, TRUE));
-		save_empire(chemp);
+		EMPIRE_NEEDS_SAVE(chemp) = TRUE;
 	}
 	
 	// check emp->chemp politics
@@ -3397,7 +3411,7 @@ void trigger_distrust_from_hostile(char_data *ch, empire_data *emp) {
 		pol->type = DIPL_DISTRUST;
 		
 		log_to_empire(emp, ELOG_DIPLOMACY, "This empire now officially distrusts %s due to hostile activity", EMPIRE_NAME(chemp));
-		save_empire(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 	
 	// spawn guards?

@@ -99,6 +99,21 @@ OLC_MODULE(mapedit_build) {
 }
 
 
+OLC_MODULE(mapedit_decay) {
+	void annual_update_map_tile(room_data *room);	// db.world.c
+	
+	room_data *room = HOME_ROOM(IN_ROOM(ch));
+	
+	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
+		msg_to_char(ch, "You can only decay map tiles.\r\n");
+	}
+	else {
+		msg_to_char(ch, "Ok.\r\n");
+		annual_update_map_tile(room);
+	}
+}
+
+
 OLC_MODULE(mapedit_terrain) {
 	extern crop_data *get_crop_by_name(char *name);
 	extern sector_data *get_sect_by_name(char *name);
@@ -174,9 +189,26 @@ OLC_MODULE(mapedit_complete_room) {
 		msg_to_char(ch, "Use '.map terrain' instead.\r\n");
 		return;
 	}
-
+	if (!IS_INCOMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "It is already complete.\r\n");
+		return;
+	}
+	
 	complete_building(IN_ROOM(ch));
 	msg_to_char(ch, "Complete.\r\n");
+}
+
+
+OLC_MODULE(mapedit_maintain) {
+	void finish_maintenance(char_data *ch, room_data *room);
+	
+	if (IS_DISMANTLING(IN_ROOM(ch)) || !IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can only maintain completed buildings.\r\n");
+		return;
+	}
+	
+	finish_maintenance(ch, IN_ROOM(ch));
+	msg_to_char(ch, "Done.\r\n");
 }
 
 

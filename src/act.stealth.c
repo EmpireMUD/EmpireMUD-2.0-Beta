@@ -262,7 +262,7 @@ void trigger_distrust_from_stealth(char_data *ch, empire_data *emp) {
 		pol->type = DIPL_DISTRUST;
 		
 		log_to_empire(chemp, ELOG_DIPLOMACY, "%s now distrusts this empire due to stealth activity (%s)", EMPIRE_NAME(emp), PERS(ch, ch, TRUE));
-		save_empire(chemp);
+		EMPIRE_NEEDS_SAVE(chemp) = TRUE;
 	}
 	
 	// check emp->chemp politics
@@ -274,7 +274,7 @@ void trigger_distrust_from_stealth(char_data *ch, empire_data *emp) {
 		pol->type = DIPL_DISTRUST;
 		
 		log_to_empire(emp, ELOG_DIPLOMACY, "This empire now officially distrusts %s due to stealth activity", EMPIRE_NAME(chemp));
-		save_empire(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 	
 	// spawn guards?
@@ -1710,7 +1710,7 @@ ACMD(do_steal) {
 					}
 
 					// save the empire
-					save_empire(emp);
+					EMPIRE_NEEDS_SAVE(emp) = TRUE;
 					read_vault(emp);
 				
 					GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait

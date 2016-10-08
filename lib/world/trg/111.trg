@@ -191,7 +191,21 @@ eval fail 0
 eval ch %room.people%
 while %ch%
   if %ch.is_pc% && !%ch.nohassle%
-    if (%rock_left% && %ch.varexists(lean_right)% && %ch.lean_right%) || (!%rock_left% && %ch.varexists(lean_left)% && %ch.lean_left%)
+    set this_loop_correct 0
+    if %rock_left%
+      if %ch.varexists(lean_right)%
+        if %ch_lean_right%
+          set this_loop_correct 1
+        end
+      end
+    else
+      if %ch.varexists(lean_left)%
+        if %ch.lean_left%
+          set this_loop_correct 1
+        end
+      end
+    end
+    if %this_loop_correct%
       eval correct %correct% + 1
     else
       eval fail %fail% + 1
@@ -239,7 +253,13 @@ eval wins 0
 while %ch%
   eval next_ch %ch.next_in_room%
   if %ch.is_pc%
-    if !(%ch.varexists(has_ducked)% && %ch.has_ducked%)
+    set ducked 0
+    if %ch.varexists(has_ducked)%
+      if %ch.has_ducked%
+        set ducked 1
+      end
+    end
+    if !%ducked%
       %send% %actor% You smack into the tree branch and are knocked from the boat!
       %echoaround% %actor% %actor.name% smacks into the tree branch and is knocked from the boat!
       %teleport% %ch% i11123
@@ -291,7 +311,20 @@ eval fail 0
 eval ch %room.people%
 while %ch%
   if %ch.is_pc% && !%ch.nohassle%
-    if (%opening_left% && %ch.varexists(lean_left)% && %ch.lean_left%) || (!%opening_left% && %ch.varexists(lean_right)% && %ch.lean_right%)
+    set this_loop_correct 0
+    if %opening_left%
+      if %ch.varexists(lean_left)%
+        if %ch.lean_left%
+        end
+      end
+    else
+      if %ch.varexists(lean_right)%
+        if %ch.lean_right%
+          set this_loop_correct 1
+        end
+      end
+    end
+    if %this_loop_correct%
       eval correct %correct% + 1
     else
       eval fail %fail% + 1

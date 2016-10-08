@@ -138,6 +138,8 @@ Objects can trigger on the following events:
 &cFinish&0 - Triggers when the object finishes being used (read).
 &cStart-Quest&0 - Triggers when a player tries to start a quest.
 &cFinish-Quest&0 - Triggers when a player tries to turn in a quest.
+&cPlayer-in-Room&0 - Modifier: trigger requires a player present.
+&cReboot&0 - Triggers when the mud starts up.
 
 For each type, there is a help file named &yOTRIG <type>&0.
 #d

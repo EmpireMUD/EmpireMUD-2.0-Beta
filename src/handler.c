@@ -2301,6 +2301,7 @@ struct empire_political_data *create_relation(empire_data *a, empire_data *b) {
 	pol->next = EMPIRE_DIPLOMACY(a);
 	EMPIRE_DIPLOMACY(a) = pol;
 	
+	EMPIRE_NEEDS_SAVE(a) = TRUE;
 	return pol;
 }
 
@@ -2423,7 +2424,7 @@ int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, in
 		}
 	}
 
-	save_empire(emp_gaining);
+	EMPIRE_NEEDS_SAVE(emp_gaining) = TRUE;
 	return EMPIRE_COINS(emp_gaining);
 }
 
@@ -2646,7 +2647,7 @@ empire_data *get_empire_by_name(char *name) {
 	// we'll take any of these if we don't find a perfect match
 	full_exact = full_abbrev = adj_exact = adj_abbrev = NULL;
 
-	if (isdigit(*name))
+	if (is_number(name))
 		num = atoi(name);
 	else {
 		num = 0;
@@ -5779,6 +5780,8 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 		REMOVE_FROM_LIST(store, EMPIRE_STORAGE(emp), next);
 		free(store);
 	}
+	
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 }
 
 
@@ -5838,6 +5841,7 @@ bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp
 		}
 	}
 	
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	return (found >= amount);
 }
 
@@ -5894,6 +5898,7 @@ bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amo
 		}
 	}
 	
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	return (amount <= 0);
 }
 
@@ -5920,6 +5925,7 @@ bool delete_stored_resource(empire_data *emp, obj_vnum vnum) {
 		}
 	}
 	
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	return (deleted > 0) ? TRUE : FALSE;
 }
 
@@ -6159,6 +6165,8 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 		trigger_distrust_from_stealth(ch, emp);
 	}
 	
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	
 	// if it ran out, return false to prevent loops
 	return (available > 0);
 }
@@ -6178,6 +6186,7 @@ int store_resource(char_data *ch, empire_data *emp, obj_data *obj) {
 
 	add_to_empire_storage(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj), 1);
 	extract_obj(obj);
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	
 	return 1;
 }
@@ -6232,6 +6241,8 @@ void add_eus_entry(struct empire_unique_storage *eus, empire_data *emp) {
 	else {
 		EMPIRE_UNIQUE_STORAGE(emp) = eus;
 	}
+	
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 }
 
 
@@ -6263,6 +6274,9 @@ bool delete_unique_storage_by_vnum(empire_data *emp, obj_vnum vnum) {
 		}
 	}
 	
+	if (any) {
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
 	return any;
 }
 
@@ -6317,6 +6331,7 @@ void remove_eus_entry(struct empire_unique_storage *eus, empire_data *emp) {
 	
 	REMOVE_FROM_LIST(eus, EMPIRE_UNIQUE_STORAGE(emp), next);
 	
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	free(eus);
 }
 
@@ -6390,6 +6405,8 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 	if (extract) {
 		extract_obj(obj);
 	}
+	
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 }
 
 

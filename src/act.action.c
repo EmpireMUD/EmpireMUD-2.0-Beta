@@ -42,6 +42,7 @@ extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern double get_base_dps(obj_data *weapon);
 extern obj_data *find_chip_weapon(char_data *ch);
 extern obj_data *has_sharp_tool(char_data *ch);
+void process_build(char_data *ch, room_data *room, int act_type);
 void scale_item_to_level(obj_data *obj, int level);
 
 // local prototypes
@@ -74,6 +75,7 @@ void process_fishing(char_data *ch);
 void process_gathering(char_data *ch);
 void process_gen_craft(char_data *ch);
 void process_harvesting(char_data *ch);
+void process_maintenance(char_data *ch);
 void process_mining(char_data *ch);
 void process_minting(char_data *ch);
 void process_morphing(char_data *ch);
@@ -137,6 +139,7 @@ const struct action_data_struct action_data[] = {
 	{ "sailing", "is sailing the ship.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_SAILING
 	{ "piloting", "is piloting the vessel.", ACTF_ALWAYS_FAST | ACTF_SITTING, process_driving, cancel_driving },	// ACT_PILOTING
 	{ "skillswap", "is swapping skill sets.", NOBITS, process_swap_skill_sets, NULL },	// ACT_SWAP_SKILL_SETS
+	{ "maintenance", "is repairing the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_maintenance, NULL },	// ACT_MAINTENANCE
 	
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
@@ -1025,13 +1028,11 @@ void process_bathing(char_data *ch) {
 * @param char_data *ch The builder.
 */
 void process_build_action(char_data *ch) {
-	void process_build(char_data *ch, room_data *room);
-	
 	int count, total;
 
 	total = 1;	// number of materials to attach in one go (add things that speed up building)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_BUILDING; ++count) {
-		process_build(ch, IN_ROOM(ch));
+		process_build(ch, IN_ROOM(ch), ACT_BUILDING);
 	}
 }
 
@@ -1490,6 +1491,16 @@ void process_harvesting(char_data *ch) {
 			msg_to_char(ch, "You fail to harvest anything here.\r\n");
 		}
 	}
+}
+
+
+/**
+* Tick update for maintenance.
+*
+* @param char_data *ch The repairman.
+*/
+void process_maintenance(char_data *ch) {
+	process_build(ch, IN_ROOM(ch), ACT_MAINTENANCE);
 }
 
 

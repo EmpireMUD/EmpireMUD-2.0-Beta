@@ -2,7 +2,7 @@
 Burning Hamlet~
 A Burning Hamlet~
 &R[^^]~
-100 0 bR 0
+128 0 bR 0
 0 0 0 -1
 D
    You've come across a small hamlet, ablaze and beset by the undead. Most of
@@ -18,7 +18,7 @@ S
 Goblin War Tent~
 A Goblin War Tent~
 .&0MM&?.~
-10 0 pR cm
+64 0 ipR cm
 2 1 5 -1
 D
    The tent, though magnificent as a feat of goblin engineering, appears to be
@@ -28,12 +28,14 @@ hides, and badly damaged armor. A roaring fire burns in the center of the tent.
 ~
 F
 G
+R
+3 1 5 0
 S
 #10480
 Goblin Message Post~
 A Goblin Message Post~
 @.&0P&?@.@.~
-5 0 dpR 0
+24 0 dipR 0
 0 0 0 -1
 C
 mail check, mail receive, mail send~
@@ -44,12 +46,14 @@ hawks as letter carriers!
 ~
 F
 m
+R
+3 1 5 0
 S
 #10481
 Goblin Lab Tent~
 A Goblin Lab Tent~
 ..&0M&?.~
-5 0 R 0
+24 0 iR 0
 0 0 0 -1
 C
 brew, mix~
@@ -61,12 +65,14 @@ but only marginally.
 ~
 F
 aG
+R
+3 1 5 0
 S
 #10482
 Goblin Dolmen~
 A Goblin Dolmen~
 .&0oo&?.~
-10 0 0 0
+48 0 0 0
 0 0 0 -1
 C
 tomb~
@@ -77,5 +83,7 @@ weeds and rubble cover the surface.
 ~
 F
 B
+R
+1 1 5 0
 S
 $

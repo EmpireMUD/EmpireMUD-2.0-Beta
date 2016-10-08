@@ -551,6 +551,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(bld), TYPE_OBJ, vnum);
+		found |= remove_obj_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(bld), vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
@@ -710,8 +711,10 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	
 		}
 		if (GET_OLC_BUILDING(desc)) {
-			if (delete_from_interaction_list(&GET_OLC_BUILDING(desc)->interactions, TYPE_OBJ, vnum)) {
-				msg_to_char(desc->character, "One of the objects in an interaction for the building you're editing was deleted.\r\n");
+			found = delete_from_interaction_list(&GET_OLC_BUILDING(desc)->interactions, TYPE_OBJ, vnum);
+			found |= remove_obj_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(GET_OLC_BUILDING(desc)), vnum);
+			if (found) {
+				msg_to_char(desc->character, "One of the objects used in the building you're editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_CRAFT(desc)) {
@@ -794,7 +797,10 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
-			found = remove_obj_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), vnum);
+			found = remove_obj_from_resource_list(&VEH_YEARLY_MAINTENANCE(GET_OLC_VEHICLE(desc)), vnum);
+			if (found) {
+				msg_to_char(desc->character, "One of the objects used for maintenance for the vehicle you're editing was deleted.\r\n");
+			}
 		}
 	}
 	

@@ -80,11 +80,11 @@ while %i% < %logs%
   eval i %i% + 1
   %load% obj %loot%
 done
-if !%instance%
+if !%instance.start%
   halt
 end
 * Load the goblin retreat timer item
-%at% i18100 %load% obj 18106
+%at% %instance.start% %load% obj 18106
 ~
 #18102
 Goblin lumberjack combat~

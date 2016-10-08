@@ -2589,11 +2589,8 @@ ACMD(do_survey) {
 	
 	// building info
 	if (COMPLEX_DATA(IN_ROOM(ch))) {
-		if (BUILDING_DISREPAIR(IN_ROOM(ch)) > config_get_int("disrepair_minor")) {
-			msg_to_char(ch, "It's in need of %s repair.\r\n", (BUILDING_DISREPAIR(IN_ROOM(ch)) > config_get_int("disrepair_major")) ? "major" : "some");
-		}
-		if (BUILDING_DAMAGE(IN_ROOM(ch)) > 0) {
-			msg_to_char(ch, "It has been damaged in a siege.\r\n");
+		if (BUILDING_DAMAGE(IN_ROOM(ch)) > 0 || (IS_COMPLETE(IN_ROOM(ch)) && BUILDING_RESOURCES(IN_ROOM(ch)))) {
+			msg_to_char(ch, "It's in need of maintenance and repair.\r\n");
 		}
 		if (BUILDING_BURNING(IN_ROOM(ch)) > 0) {
 			msg_to_char(ch, "It's on fire!\r\n");

@@ -6,7 +6,7 @@ A wooden cart is parked here.~
 ride on the cart and drive it around.
 ~
 ~
-bfhio 22 10 200 1
+bfhio 22 5 200 1
 R
 19 1 1 0
 S
@@ -20,7 +20,7 @@ several people to ride around in style. You must harness an animal to the cart
 and then sit on it to drive it, or board it to get inside.
 ~
 ~
-bfhio 19 14 200 1
+bfhio 19 16 200 1
 D
 5521 0 0
 R
@@ -36,7 +36,7 @@ A covered wagon has been parked here.~
 harness two horses to the wagon and then lead it, or ride in it and drive it.
 ~
 ~
-bfhio 19 20 400 2
+bfhio 19 24 400 2
 R
 19 1 1 0
 R
@@ -50,7 +50,7 @@ A catapult is poised to strike!~
 will need two horses to pull the catapult.
 ~
 &0o==o~
-bor 19 20 0 2
+bor 19 24 0 2
 C
 0 100
 R
@@ -108,14 +108,14 @@ S
 #920
 canoe wooden~
 a wooden canoe~
-A wooden canoe is lying on its side.~
+There is a wooden canoe here.~
    You can ride in a canoe and sail it across the water, or you can drag it on
 land.
 ~
 ~
-cfghln 3 10 0 0
+cfghln 3 3 0 0
 R
-15 1 1 16384
+3 1 5 0
 S
 #921
 caravan brightly-painted painted wooden~

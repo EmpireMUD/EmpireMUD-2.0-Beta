@@ -1422,7 +1422,7 @@ void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
 	else if (!VEH_FLAGGED(veh, VEH_CAN_PORTAL)) {
 		act("$V can't be dragged through portals.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
-	else if (IS_WATER_SECT(SECT(to_room))) {
+	else if (WATER_SECT(to_room)) {
 		msg_to_char(ch, "You can't drag it through there because it can't be dragged into water.\r\n");
 	}
 	else if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !VEH_FLAGGED(veh, VEH_ALLOW_ROUGH)) {
@@ -1468,7 +1468,7 @@ ACMD(do_drag) {
 	else if (GET_SITTING_ON(ch)) {
 		msg_to_char(ch, "You can't drag anything while you're sitting on something.\r\n");
 	}
-	else if (IS_WATER_SECT(SECT(IN_ROOM(ch)))) {
+	else if (WATER_SECT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't drag anything in the water.\r\n");
 	}
 	else if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && IN_ROOM(ch) == IN_ROOM(ch->master)) {
@@ -1507,7 +1507,7 @@ ACMD(do_drag) {
 	else if (!(to_room = dir_to_room(IN_ROOM(ch), dir, FALSE))) {
 		msg_to_char(ch, "You can't drag anything in that direction.\r\n");
 	}
-	else if (IS_WATER_SECT(SECT(to_room))) {
+	else if (WATER_SECT(to_room)) {
 		msg_to_char(ch, "You can't drag anything into the water.\r\n");
 	}
 	else if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !VEH_FLAGGED(veh, VEH_ALLOW_ROUGH)) {
