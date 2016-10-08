@@ -167,7 +167,7 @@ You promise $M you'll be right back!
 $n assures $N that $e will be right back!
 $n mentions to you that $E will be right back.
 See if you can find that person while you're gone.
-You attempt to find a reboot button behind you right ear.
+You attempt to find a reboot button behind your right ear.
 $n tries to reboot $s brain and tune back in to reality.
 
 burp 0 5 0
@@ -413,7 +413,7 @@ $n gropes $mself -- YUCK.
 grovel 1 5 0
 You grovel in the dirt.
 $n grovels in the dirt.
-You grovel before $M
+You grovel before $M.
 $n grovels in the dirt before $N.
 $n grovels in the dirt before you.
 Whom?
