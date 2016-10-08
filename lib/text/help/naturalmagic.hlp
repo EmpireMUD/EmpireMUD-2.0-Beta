@@ -711,7 +711,7 @@ Rejuvenate (Natural Magic ability)
 
 Usage:  rejuvenate [target]
 Cooldown:  15 seconds
-Cost:  25+ mana (based on amount healed)
+Cost:  (based on amount healed)
 
 By blessing a person with rejuvenation, a nature mage can cause that person's
 wounds to heal themselves over time. This spell heals the target every 5
