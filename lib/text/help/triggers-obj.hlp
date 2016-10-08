@@ -153,7 +153,7 @@ When using field  - The variable returns:
 &ccontents&0 - Gives the first object in a container.
 &ccount(str)&0 - Number of matching items (name/vnum) inside it.
 &cempire&0 - The last empire that controlled the object, if any.
-&cflag(FLAG)&0 - Togglesthe flag then returns whether or not the flag is on.
+&cflag(FLAG)&0 - Toggles the flag then returns whether or not the flag is on.
 &chas_in(str)&0 - Has an object (name/vnum) inside it.
 &cid&0 - The unique id of the object.
 &cis_flagged(FLAG)&0 - Returns whether or not the flag is on.
