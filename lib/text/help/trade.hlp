@@ -5,9 +5,9 @@ Trade (skill)
 The Trade skill contains abilities for collecting, crafting, and trading goods
 of all kinds.
 
-You can get started in Trade by chipping rocks together to make handaxes,
-tanning leather, or crafting certain items (from the unskilled crafts section 
-of HELP CRAFT).
+You can get started in Trade by crafting things using the Primitive Crafts and
+Cook abilities, by chipping rocks together to make handaxes, or by tanning skins
+into leather.
 
 Many craftable items are scalable, meaning their stats depend on the level of
 the person who crafts them. HELP SCALABLE CRAFTS has a full explanation.
@@ -397,7 +397,7 @@ HONE HONED
 
 Hone (Trade ability)
 
-Usage:  hone <item>
+Usage:  hone <item> <type>
 Cost:  2 nocturnium ingots
 
 Characters with the Trade skill can learn to hone their own items, making them
