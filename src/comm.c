@@ -1664,6 +1664,9 @@ void close_socket(descriptor_data *d) {
 	if (d->olc_sector) {
 		free_sector(d->olc_sector);
 	}
+	if (d->olc_social) {
+		free_social(d->olc_social);
+	}
 	if (d->olc_trigger) {
 		free_trigger(d->olc_trigger);
 	}

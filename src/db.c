@@ -167,6 +167,10 @@ int evos_per_hour = 1;	// how many map tiles evolve per hour (for load-balancing
 skill_data *skill_table = NULL;	// main skills hash (hh)
 skill_data *sorted_skills = NULL;	// alpha hash (sorted_hh)
 
+// socials
+social_data *social_table = NULL;	// master social hash table (hh)
+social_data *sorted_socials = NULL;	// alphabetic version (sorted_hh)
+
 // strings
 char *credits = NULL;	// game credits
 char *motd = NULL;	// message of the day - mortals
@@ -237,6 +241,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ VEH_PREFIX, VEH_SUFFIX },	// DB_BOOT_SKILL
 	{ MORPH_PREFIX, MORPH_SUFFIX },	// DB_BOOT_MORPH
 	{ QST_PREFIX, QST_SUFFIX },	// DB_BOOT_QST
+	{ SOC_PREFIX, SOC_SUFFIX },	// DB_BOOT_SOC
 };
 
 
@@ -411,6 +416,7 @@ void boot_world(void) {
 	extern int sort_classes_by_data(class_data *a, class_data *b);
 	extern int sort_crafts_by_data(craft_data *a, craft_data *b);
 	extern int sort_skills_by_data(skill_data *a, skill_data *b);
+	extern int sort_socials_by_data(social_data *a, social_data *b);
 
 	// DB_BOOT_x search: boot new types in this function
 	
@@ -497,6 +503,9 @@ void boot_world(void) {
 	log("Loading morphs.");
 	index_boot(DB_BOOT_MORPH);
 	
+	log("Loading socials.");
+	index_boot(DB_BOOT_SOC);
+	
 	log("Loading instances.");
 	load_instances();
 	
@@ -521,6 +530,7 @@ void boot_world(void) {
 	HASH_SRT(sorted_hh, sorted_classes, sort_classes_by_data);
 	HASH_SRT(sorted_hh, sorted_crafts, sort_crafts_by_data);
 	HASH_SRT(sorted_hh, sorted_skills, sort_skills_by_data);
+	HASH_SRT(sorted_hh, sorted_socials, sort_socials_by_data);
 	
 	log("Checking newbie islands.");
 	check_newbie_islands();

@@ -5167,13 +5167,14 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	void parse_morph(FILE *fl, any_vnum vnum);
 	void parse_quest(FILE *fl, any_vnum vnum);
 	void parse_skill(FILE *fl, any_vnum vnum);
+	void parse_social(FILE *fl, any_vnum vnum);
 	void parse_vehicle(FILE *fl, any_vnum vnum);
 	
 	any_vnum nr = -1, last;
 	char line[256];
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest" };
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -5272,6 +5273,10 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 					parse_skill(fl, nr);
 					break;
 				}
+				case DB_BOOT_SOC: {
+					parse_social(fl, nr);
+					break;
+				}
 				case DB_BOOT_TRG: {
 					parse_trigger(fl, nr);
 					break;
@@ -5343,7 +5348,7 @@ void index_boot(int mode) {
 
 	if (!rec_count) {
 		// DB_BOOT_x: some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL || mode == DB_BOOT_VEH || mode == DB_BOOT_MORPH || mode == DB_BOOT_QST) {
+		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL || mode == DB_BOOT_VEH || mode == DB_BOOT_MORPH || mode == DB_BOOT_QST || mode == DB_BOOT_SOC) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -5461,6 +5466,11 @@ void index_boot(int mode) {
 			log("  %d skills, %d bytes in db", rec_count, size[0]);
 			break;
 		}
+		case DB_BOOT_SOC: {
+			size[0] = sizeof(social_data) * rec_count;
+			log("  %d socials, %d bytes in db", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_TRG: {
 			size[0] = sizeof(trig_data) * rec_count;
 			log("   %d triggers, %d bytes in triggers.", rec_count, size[0]);
@@ -5501,6 +5511,7 @@ void index_boot(int mode) {
 			case DB_BOOT_RMT:
 			case DB_BOOT_SECTOR:
 			case DB_BOOT_SKILL:
+			case DB_BOOT_SOC:
 			case DB_BOOT_TRG:
 			case DB_BOOT_VEH:
 			case DB_BOOT_WLD: {
@@ -5714,6 +5725,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, skill_table, skill, next_skill) {
 				if (SKILL_VNUM(skill) >= (zone * 100) && SKILL_VNUM(skill) <= (zone * 100 + 99)) {
 					write_skill_to_file(fl, skill);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_SOC: {
+			void write_social_to_file(FILE *fl, social_data *soc);
+			social_data *soc, *next_soc;
+			HASH_ITER(hh, social_table, soc, next_soc) {
+				if (SOC_VNUM(soc) >= (zone * 100) && SOC_VNUM(soc) <= (zone * 100 + 99)) {
+					write_social_to_file(fl, soc);
 				}
 			}
 			break;
@@ -6041,6 +6062,11 @@ void save_index(int type) {
 		case DB_BOOT_SKILL: {
 			void write_skill_index(FILE *fl);
 			write_skill_index(fl);
+			break;
+		}
+		case DB_BOOT_SOC: {
+			void write_social_index(FILE *fl);
+			write_social_index(fl);
 			break;
 		}
 		case DB_BOOT_TRG: {
