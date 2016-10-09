@@ -1771,8 +1771,8 @@ typedef struct vehicle_data vehicle_data;
 #define SOCM_NO_ARG_TO_CHAR  0
 #define SOCM_NO_ARG_TO_OTHERS  1
 #define SOCM_TARGETED_TO_CHAR  2
-#define SOCM_TARGETED_TO_VICTIM  3
-#define SOCM_TARGETED_TO_OTHERS  4
+#define SOCM_TARGETED_TO_OTHERS  3
+#define SOCM_TARGETED_TO_VICTIM  4
 #define SOCM_TARGETED_NOT_FOUND  5
 #define SOCM_SELF_TO_CHAR  6
 #define SOCM_SELF_TO_OTHERS  7

@@ -3121,8 +3121,8 @@ const char *social_message_types[NUM_SOCM_MESSAGES][2] = {
 	{ "No-arg to character", "n2char" },
 	{ "No-arg to others", "n2other" },
 	{ "Targeted to character", "t2char" },
-	{ "Targeted to victim", "t2vict" },
 	{ "Targeted to others", "t2other" },
+	{ "Targeted to victim", "t2vict" },
 	{ "Target not found", "tnotfound" },	// 5
 	{ "Target-self to character", "s2char" },
 	{ "Target-self to others", "s2other" }
