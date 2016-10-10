@@ -1167,7 +1167,10 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 #define SOC_REQUIREMENTS(soc)  ((soc)->requirements)
 #define SOC_VNUM(soc)  ((soc)->vnum)
 
+// definitions
 #define SOCIAL_FLAGGED(soc, flag)  IS_SET(SOC_FLAGS(soc), (flag))
+#define SOC_HIDDEN(soc)  (SOCIAL_FLAGGED((soc), SOC_HIDE_IF_INVIS))
+#define SOC_IS_TARGETABLE(soc)  (SOC_MESSAGE((soc), SOCM_TARGETED_TO_CHAR) != NULL)
 
 
  //////////////////////////////////////////////////////////////////////////////

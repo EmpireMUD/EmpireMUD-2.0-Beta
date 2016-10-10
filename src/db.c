@@ -254,7 +254,6 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 */
 void boot_db(void) {
 	void Read_Invalid_List();
-	void boot_social_messages();
 	void boot_world();
 	void build_all_quest_lookups();
 	void build_player_index();
@@ -316,9 +315,6 @@ void boot_db(void) {
 
 	log("Loading fight messages.");
 	load_fight_messages();
-
-	log("Loading social messages.");
-	boot_social_messages();
 	
 	log("Loading trading post.");
 	load_trading_post();
@@ -1008,6 +1004,26 @@ int file_to_string_alloc(const char *name, char **buf) {
 
 	*buf = str_dup(temp);
 	return (0);
+}
+
+
+// reads in one action line
+char *fread_action(FILE * fl, int nr) {
+	char buf[MAX_STRING_LENGTH], *rslt;
+
+	fgets(buf, MAX_STRING_LENGTH, fl);
+	if (feof(fl)) {
+		log("SYSERR: fread_action - unexpected EOF near action #%d", nr+1);
+		exit(1);
+		}
+	if (*buf == '#')
+		return (NULL);
+	else {
+		*(buf + strlen(buf) - 1) = '\0';
+		CREATE(rslt, char, strlen(buf) + 1);
+		strcpy(rslt, buf);
+		return (rslt);
+	}
 }
 
 
@@ -2514,8 +2530,6 @@ void load_daily_cycle(void) {
 * types.
 */
 void load_fight_messages(void) {
-	extern char *fread_action(FILE * fl, int nr);
-	
 	FILE *fl;
 	int i, type;
 	struct message_type *messages;

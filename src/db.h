@@ -138,7 +138,6 @@
 #define TYPO_FILE  LIB_MISC"typos"	//         'typo'
 #define BUG_FILE  LIB_MISC"bugs"	//         'bug'
 #define MESS_FILE  LIB_MISC"messages"	// damage messages
-#define SOCMESS_FILE  LIB_MISC"socials"	// messgs for social acts
 #define TIPS_OF_THE_DAY_FILE  LIB_MISC"tips"	// one-line tips shown on login
 #define XNAME_FILE  LIB_MISC"xnames"	// invalid name substrings
 

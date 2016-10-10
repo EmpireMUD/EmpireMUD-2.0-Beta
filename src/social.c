@@ -51,33 +51,14 @@ extern const char *social_message_types[NUM_SOCM_MESSAGES][2];
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
-* Used for choosing a social that's valid for the player.
+* Checks that a character meets all requirements for a social.
 *
-* @param char_data *ch The person trying to social.
-* @param char *name The argument.
-* @return social_data* The matching social, or NULL if none.
+* @param char_data *ch The person to check.
+* @param social_data *soc The social they want to use.
+* @return bool TRUE if the character can do it, FALSE if not.
 */
-social_data *find_social_by_name(char_data *ch, char *name) {
-	social_data *soc, *next_soc, *partial = NULL;
-	
-	HASH_ITER(sorted_hh, sorted_socials, soc, next_soc) {
-		if (SOCIAL_FLAGGED(soc, SOC_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
-			continue;
-		}
-		
-		// matches:
-		if (!str_cmp(name, SOC_NAME(soc))) {
-			// perfect match
-			return soc;
-		}
-		if (!partial && is_multiword_abbrev(name, SOC_NAME(soc))) {
-			// probable match
-			partial = soc;
-		}
-	}
-	
-	// no exact match...
-	return partial;
+bool validate_social_requirements(char_data *ch, social_data *soc) {
+	return TRUE;
 }
 
 
@@ -525,7 +506,6 @@ void write_social_to_file(FILE *fl, social_data *soc) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// OLC HANDLERS ////////////////////////////////////////////////////////////
-
 
 /**
 * Creates a new social entry.

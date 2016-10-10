@@ -23,143 +23,16 @@
 
 /**
 * Contents:
-*   Data
 *   Social Core
 *   Commands
 */
 
+// external funcs
+extern bool validate_social_requirements(char_data *ch, social_data *soc);
+
 // locals
-int find_action(char *name, bool exact);
-char *fread_action(FILE * fl, int nr);
-void perform_action(char_data *ch, int act_nr, char *argument);
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// DATA ////////////////////////////////////////////////////////////////////
-
-#define MAX_SOCIALS		350
-
-/* local globals */
-static int list_top = -1;
-int social_sort_info[MAX_SOCIALS];
-
-// social data
-struct social_messg {
-	char *name;
-
-	int hide;
-	int min_char_position;		/* Position of the character */
-	int min_victim_position;	/* Position of victim */
-
-	/* No argument was supplied */
-	char *char_no_arg;
-	char *others_no_arg;
-
-	/* An argument was there, and a victim was found */
-	char *char_found;		/* if NULL, read no further, ignore args */
-	char *others_found;
-	char *vict_found;
-
-	/* An argument was there, but no victim was found */
-	char *not_found;
-
-	/* The victim turned out to be the character */
-	char *char_auto;
-	char *others_auto;
-} soc_mess_list[MAX_SOCIALS];
-
-
-void boot_social_messages(void) {
-	FILE *fl;
-	int nr, hide, min_vpos, min_cpos, curr_soc = -1;
-	char next_soc[100];
-
-	/* open social file */
-	if (!(fl = fopen(SOCMESS_FILE, "r"))) {
-		sprintf(buf, "SYSERR: Can't open socials file '%s'", SOCMESS_FILE);
-		perror(buf);
-		exit(1);
-	}
-
-	/* now read 'em */
-	for (nr = 0; nr < MAX_SOCIALS; nr++) {
-		fscanf(fl, " %s ", next_soc);
-
-		if (*next_soc == '*') {
-			fscanf(fl, "%s\n", next_soc);
-			continue;
-		}
-		if (*next_soc == '$')
-			break;
-
-		if (fscanf(fl, " %d %d %d \n", &hide, &min_cpos, &min_vpos) != 3) {
-			log("SYSERR: Format error in social file near social '%s'", next_soc);
-			exit(1);
-		}
-		/* read the stuff */
-		curr_soc++;
-		soc_mess_list[curr_soc].name = strdup(next_soc);
-		soc_mess_list[curr_soc].hide = hide;
-		soc_mess_list[curr_soc].min_char_position = min_cpos;
-		soc_mess_list[curr_soc].min_victim_position = min_vpos;
-
-		soc_mess_list[curr_soc].char_no_arg = fread_action(fl, nr);
-		soc_mess_list[curr_soc].others_no_arg = fread_action(fl, nr);
-		soc_mess_list[curr_soc].char_found = fread_action(fl, nr);
-
-		/* if no char_found, the rest is to be ignored */
-		if (!soc_mess_list[curr_soc].char_found)
-			continue;
-
-		soc_mess_list[curr_soc].others_found = fread_action(fl, nr);
-		soc_mess_list[curr_soc].vict_found = fread_action(fl, nr);
-		soc_mess_list[curr_soc].not_found = fread_action(fl, nr);
-		soc_mess_list[curr_soc].char_auto = fread_action(fl, nr);
-		soc_mess_list[curr_soc].others_auto = fread_action(fl, nr);
-	}
-
-	/* close file & set top */
-	fclose(fl);
-	list_top = curr_soc;
-}
-
-
-char *fread_action(FILE * fl, int nr) {
-	char buf[MAX_STRING_LENGTH], *rslt;
-
-	fgets(buf, MAX_STRING_LENGTH, fl);
-	if (feof(fl)) {
-		log("SYSERR: fread_action - unexpected EOF near action #%d", nr+1);
-		exit(1);
-		}
-	if (*buf == '#')
-		return (NULL);
-	else {
-		*(buf + strlen(buf) - 1) = '\0';
-		CREATE(rslt, char, strlen(buf) + 1);
-		strcpy(rslt, buf);
-		return (rslt);
-	}
-}
-
-
-void sort_socials(void) {
-	int a, b, tmp;
-
-	/* initialize array */
-	for (a = 0; a <= list_top; a++)
-		social_sort_info[a] = a;
-
-	for (a = 0; a <= list_top - 1; a++) {
-		for (b = a + 1; b <= list_top; b++) {
-			if (strcmp(soc_mess_list[social_sort_info[a]].name, soc_mess_list[social_sort_info[b]].name) > 0) {
-				tmp = social_sort_info[a];
-				social_sort_info[a] = social_sort_info[b];
-				social_sort_info[b] = tmp;
-			}
-		}
-	}
-}
+social_data *find_social(char_data *ch, char *name, bool exact);
+void perform_social(char_data *ch, social_data *soc, char *argument);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -175,7 +48,7 @@ void sort_socials(void) {
 */
 bool check_social(char_data *ch, char *string, bool exact) {
 	char arg1[MAX_STRING_LENGTH];
-	int action;
+	social_data *soc;
 	
 	skip_spaces(&string);
 	half_chop(string, arg, arg1);
@@ -183,7 +56,7 @@ bool check_social(char_data *ch, char *string, bool exact) {
 	if (!*arg)
 		return FALSE;
 	
-	if ((action = find_action(arg, exact)) == NOTHING)
+	if (!(soc = find_social(ch, arg, exact)))
 		return FALSE;
 
 	if (AFF_FLAGGED(ch, AFF_EARTHMELD | AFF_MUMMIFY | AFF_STUNNED) || IS_INJURED(ch, INJ_TIED | INJ_STAKED)) {
@@ -191,7 +64,7 @@ bool check_social(char_data *ch, char *string, bool exact) {
 		return TRUE;
 	}
 	
-	perform_action(ch, action, arg1);
+	perform_social(ch, soc, arg1);
 	return TRUE;
 }
 
@@ -199,40 +72,64 @@ bool check_social(char_data *ch, char *string, bool exact) {
 /**
 * @param char *name The typed-in social?
 * @param bool exact Must be an exact match if TRUE; may be an abbrev if FALSE.
-* @return int The social ID, or NOTHING if no match.
+* @return social_data* The social, or NULL if no match.
 */
-int find_action(char *name, bool exact) {
-	int i;
-
-	if (list_top < 0)
-		return NOTHING;
-
-	for (i = 0; i <= list_top; i++) {
-		if (!str_cmp(name, soc_mess_list[i].name) || (!exact && is_abbrev(name, soc_mess_list[i].name))) {
-			return (i);
+social_data *find_social(char_data *ch, char *name, bool exact) {
+	social_data *soc, *next_soc, *found = NULL;
+	int num_found = 0;
+	
+	HASH_ITER(hh, sorted_socials, soc, next_soc) {
+		if (*SOC_COMMAND(soc) < *name) {	// shortcut: check first letter
+			continue;
+		}
+		if (*SOC_COMMAND(soc) > *name) {	// short exit: past the right letter
+			break;
+		}
+		if (SOCIAL_FLAGGED(soc, SOC_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+			continue;
+		}
+		if (exact && str_cmp(name, SOC_COMMAND(soc))) {
+			continue;
+		}
+		if (!exact && !is_abbrev(name, SOC_COMMAND(soc))) {
+			continue;
+		}
+		if (!validate_social_requirements(ch, soc)) {
+			continue;
+		}
+		
+		// seems okay -- pick one at random
+		if (!number(0, num_found++) || !found) {
+			found = soc;
 		}
 	}
-
-	return NOTHING;
+	
+	return found;
 }
 
 
-void perform_action(char_data *ch, int act_nr, char *argument) {
+/**
+* Executes the a pre-validated social command.
+*
+* @param char_data *ch The person performing the social.
+* @param social_data *soc The social to perform.
+* @param char *argument The typed-in args, if any.
+*/
+void perform_social(char_data *ch, social_data *soc, char *argument) {
 	void clear_last_act_message(descriptor_data *desc);
 	void add_to_channel_history(descriptor_data *desc, int type, char *message);
 	
-	char hbuf[MAX_INPUT_LENGTH];
-	struct social_messg *action;
+	char buf[MAX_INPUT_LENGTH], hbuf[MAX_INPUT_LENGTH];
 	char_data *vict, *c;
-
-	action = &soc_mess_list[act_nr];
-
-	if (action->char_found)
+	
+	if (SOC_IS_TARGETABLE(soc)) {
 		one_argument(argument, buf);
-	else
+	}
+	else {
 		*buf = '\0';
-
-	if (GET_POS(ch) < action->min_char_position) {
+	}
+	
+	if (GET_POS(ch) < SOC_MIN_CHAR_POS(soc)) {
 		switch (GET_POS(ch)) {
 			case POS_DEAD:
 				send_to_char("Lie still; you are DEAD!!! :-(\r\n", ch);
@@ -259,9 +156,9 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 		}
 		return;
 	}
-
+	
 	// clear last act messages for everyone in the room
-	for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 		if (c->desc) {
 			clear_last_act_message(c->desc);
 
@@ -272,13 +169,13 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 	}
 
 	if (!*buf) {
-		sprintf(hbuf, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0', action->char_no_arg);
+		sprintf(hbuf, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0', NULLSAFE(SOC_MESSAGE(soc, SOCM_NO_ARG_TO_CHAR)));
 		msg_to_char(ch, hbuf);
 		if (ch->desc) {
 			add_to_channel_history(ch->desc, CHANNEL_HISTORY_SAY, hbuf);
 		}
 		
-		act(action->others_no_arg, action->hide, ch, 0, 0, TO_ROOM | TO_NOT_IGNORING);
+		act(NULLSAFE(SOC_MESSAGE(soc, SOCM_NO_ARG_TO_OTHERS)), SOC_HIDDEN(soc), ch, FALSE, FALSE, TO_ROOM | TO_NOT_IGNORING);
 
 		// fetch and store channel history for the room
 		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
@@ -300,7 +197,7 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 		return;
 	}
 	if (!(vict = get_char_room_vis(ch, buf))) {
-		sprintf(hbuf, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0', action->not_found);
+		sprintf(hbuf, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0', NULLSAFE(SOC_MESSAGE(soc, SOCM_TARGETED_NOT_FOUND)));
 		msg_to_char(ch, hbuf);
 		if (ch->desc) {
 			add_to_channel_history(ch->desc, CHANNEL_HISTORY_SAY, hbuf);
@@ -308,21 +205,21 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 	}
 	else if (vict == ch) {
 		// mo message?
-		if (!action->char_auto || !*(action->char_auto)) {
+		if (!SOC_MESSAGE(soc, SOCM_SELF_TO_CHAR) || !*SOC_MESSAGE(soc, SOCM_SELF_TO_CHAR)) {
 			msg_to_char(ch, "You can't really do that.\r\n");
 			return;
 		}
 		
-		sprintf(hbuf, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0', action->char_auto);
+		sprintf(hbuf, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0', NULLSAFE(SOC_MESSAGE(soc, SOCM_SELF_TO_CHAR)));
 		msg_to_char(ch, hbuf);
 		if (ch->desc) {
 			add_to_channel_history(ch->desc, CHANNEL_HISTORY_SAY, hbuf);
 		}
 		
-		act(action->others_auto, action->hide, ch, 0, 0, TO_ROOM | TO_NOT_IGNORING);
+		act(NULLSAFE(SOC_MESSAGE(soc, SOCM_SELF_TO_OTHERS)), SOC_HIDDEN(soc), ch, NULL, NULL, TO_ROOM | TO_NOT_IGNORING);
 
 		// fetch and store channel history for the room
-		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 			if (c == ch || !c->desc) {
 				continue;
 			}
@@ -338,8 +235,8 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 			}
 		}
 	}
-	else {
-		if (GET_POS(vict) < action->min_victim_position) {
+	else {	// targeting someone
+		if (GET_POS(vict) < SOC_MIN_VICT_POS(soc)) {
 			switch (GET_POS(vict)) {
 				case POS_DEAD:
 					act("$E's dead and you can't do much with $M.", FALSE, ch, 0, vict, TO_CHAR);
@@ -366,12 +263,12 @@ void perform_action(char_data *ch, int act_nr, char *argument) {
 			}
 		}
 		else {
-			act(action->char_found, 0, ch, 0, vict, TO_CHAR | TO_SLEEP);
-			act(action->others_found, action->hide, ch, 0, vict, TO_NOTVICT | TO_NOT_IGNORING);
-			act(action->vict_found, action->hide, ch, 0, vict, TO_VICT | TO_NOT_IGNORING);
+			act(NULLSAFE(SOC_MESSAGE(soc, SOCM_TARGETED_TO_CHAR)), FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+			act(NULLSAFE(SOC_MESSAGE(soc, SOCM_TARGETED_TO_OTHERS)), SOC_HIDDEN(soc), ch, NULL, vict, TO_NOTVICT | TO_NOT_IGNORING);
+			act(NULLSAFE(SOC_MESSAGE(soc, SOCM_TARGETED_TO_VICTIM)), SOC_HIDDEN(soc), ch, NULL, vict, TO_VICT | TO_NOT_IGNORING);
 
 			// fetch and store channel history for the room
-			for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+			LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 				if (!c->desc) {
 					continue;
 				}
@@ -401,8 +298,9 @@ ACMD(do_insult) {
 	one_argument(argument, arg);
 
 	if (*arg) {
-		if (!(victim = get_char_room_vis(ch, arg)))
+		if (!(victim = get_char_room_vis(ch, arg))) {
 			send_config_msg(ch, "no_person");
+		}
 		else {
 			if (victim != ch) {
 				sprintf(buf, "You insult %s.\r\n", PERS(victim, ch, 0));
@@ -437,8 +335,9 @@ ACMD(do_insult) {
 			}
 		}
 	}
-	else
+	else {
 		send_to_char("I'm sure you don't want to insult *everybody*...\r\n", ch);
+	}
 }
 
 
@@ -547,18 +446,36 @@ ACMD(do_roll) {
 
 
 ACMD(do_socials) {
-	int sortpos, j = 0;
-
-	/* Ugh, don't forget to sort... */
-	sort_socials();
-
-	sprintf(buf, "The following social commands are available:\r\n");
-
-	for (sortpos = 0; sortpos <= list_top; sortpos++)
-		sprintf(buf+strlen(buf), "%-11.11s%s", soc_mess_list[social_sort_info[sortpos]].name, (!(++j % 7)) ? "\r\n" : "");
+	char buf[MAX_STRING_LENGTH];
+	social_data *soc, *next_soc, *last = NULL;
+	int count = 0;
+	size_t size;
 	
-	if (j % 7) {
+	size = snprintf(buf, sizeof(buf), "The following social commands are available:\r\n");
+	
+	HASH_ITER(hh, sorted_socials, soc, next_soc) {
+		if (size + 11 > sizeof(buf)) {	// early exit for full buffer
+			break;
+		}
+		
+		if (SOCIAL_FLAGGED(soc, SOC_IN_DEVELOPMENT)) {
+			continue;
+		}
+		if (last && !str_cmp(SOC_COMMAND(soc), SOC_COMMAND(last))) {	// skip duplicate names
+			continue;
+		}
+		if (!validate_social_requirements(ch, soc)) {
+			continue;
+		}
+		
+		last = soc;	// duplicate prevention
+		size += snprintf(buf + size, sizeof(buf) - size, "%-11.11s%s", SOC_COMMAND(soc), (!(++count % 7)) ? "\r\n" : "");
+	}
+	
+	// terminating crlf if possible
+	if (count % 7 && (size + 2) < sizeof(buf)) {
 		strcat(buf, "\r\n");
 	}
-	page_string(ch->desc, buf, 1);
+	
+	page_string(ch->desc, buf, TRUE);
 }
