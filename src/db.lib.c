@@ -6065,8 +6065,8 @@ void save_index(int type) {
 			break;
 		}
 		case DB_BOOT_SOC: {
-			void write_social_index(FILE *fl);
-			write_social_index(fl);
+			void write_socials_index(FILE *fl);
+			write_socials_index(fl);
 			break;
 		}
 		case DB_BOOT_TRG: {
