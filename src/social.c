@@ -226,7 +226,7 @@ struct social_requirement *copy_social_requirements(struct social_requirement *l
 		LL_APPEND(new_list, soc);
 	}
 	
-	return soc;
+	return new_list;
 }
 
 
