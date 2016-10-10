@@ -7118,6 +7118,12 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No skills by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "social")) {
+		extern int vnum_social(char *searchname, char_data *ch);
+		if (!vnum_social(buf2, ch)) {
+			msg_to_char(ch, "No socials by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "trigger")) {
 		if (!vnum_trigger(buf2, ch)) {
 			msg_to_char(ch, "No triggers by that name.\r\n");
@@ -7297,6 +7303,15 @@ ACMD(do_vstat) {
 			return;
 		}
 		do_stat_skill(ch, skill);
+	}
+	else if (is_abbrev(buf, "social")) {
+		void do_stat_social(char_data *ch, social_data *soc);
+		social_data *soc = social_proto(number);
+		if (!soc) {
+			msg_to_char(ch, "There is no social with that number.\r\n");
+			return;
+		}
+		do_stat_social(ch, soc);
 	}
 	else if (is_abbrev(buf, "trigger")) {
 		trig_data *trig = real_trigger(number);
