@@ -78,7 +78,7 @@ social_data *find_social(char_data *ch, char *name, bool exact) {
 	social_data *soc, *next_soc, *found = NULL;
 	int num_found = 0;
 	
-	HASH_ITER(hh, sorted_socials, soc, next_soc) {
+	HASH_ITER(sorted_hh, sorted_socials, soc, next_soc) {
 		if (*SOC_COMMAND(soc) < *name) {	// shortcut: check first letter
 			continue;
 		}
@@ -453,7 +453,7 @@ ACMD(do_socials) {
 	
 	size = snprintf(buf, sizeof(buf), "The following social commands are available:\r\n");
 	
-	HASH_ITER(hh, sorted_socials, soc, next_soc) {
+	HASH_ITER(sorted_hh, sorted_socials, soc, next_soc) {
 		if (size + 11 > sizeof(buf)) {	// early exit for full buffer
 			break;
 		}

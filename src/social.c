@@ -163,7 +163,8 @@ int sort_socials_by_data(social_data *a, social_data *b) {
 	int a_reqs, b_reqs, diff;
 	
 	// name first
-	if ((diff = str_cmp(NULLSAFE(SOC_COMMAND(a)), NULLSAFE(SOC_COMMAND(b))))) {
+	diff = str_cmp(NULLSAFE(SOC_COMMAND(a)), NULLSAFE(SOC_COMMAND(b)));
+	if (diff != 0) {
 		return diff;
 	}
 	
