@@ -692,7 +692,7 @@ void do_stat_social(char_data *ch, social_data *soc) {
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Messages:\r\n");
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%s: %s\r\n", social_message_types[iter][0], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
+		size += snprintf(buf + size, sizeof(buf) - size, "\tc%s\t0: %s\r\n", social_message_types[iter][0], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
 	}
 	
 	page_string(ch->desc, buf, TRUE);
