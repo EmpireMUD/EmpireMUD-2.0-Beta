@@ -839,6 +839,7 @@ void heartbeat(int heart_pulse) {
 	void reset_instances();
 	void run_map_evolutions();
 	void sanity_check();
+	void save_marked_empires();
 	void update_actions();
 	void update_empire_npc_data();
 	void update_guard_towers();
@@ -999,6 +1000,11 @@ void heartbeat(int heart_pulse) {
 		// evos happen every hour
 		run_map_evolutions();
 		if (debug_log && HEARTBEAT(15)) { log("debug 26:\t%lld", microtime()); }
+	}
+	
+	if (HEARTBEAT(1)) {
+		save_marked_empires();
+		if (debug_log && HEARTBEAT(15)) { log("debug 27:\t%lld", microtime()); }
 	}
 	
 	// this goes roughly last -- update MSDP users
@@ -1657,6 +1663,9 @@ void close_socket(descriptor_data *d) {
 	}
 	if (d->olc_sector) {
 		free_sector(d->olc_sector);
+	}
+	if (d->olc_social) {
+		free_social(d->olc_social);
 	}
 	if (d->olc_trigger) {
 		free_trigger(d->olc_trigger);

@@ -32,6 +32,7 @@
 *     Player Defines
 *     Quest Defines
 *     Sector Defines
+*     Social Defines
 *     Vehicle Defines
 *     Weather and Season Defines
 *     World Defines
@@ -56,6 +57,7 @@
 *     Object Structs
 *     Quest Structs
 *     Sector Structs
+*     Social Structs
 *     Trigger Structs
 *     Vehicle Structs
 *     Weather and Season Structs
@@ -226,6 +228,7 @@ typedef struct quest_data quest_data;
 typedef struct room_data room_data;
 typedef struct room_template room_template;
 typedef struct sector_data sector_data;
+typedef struct social_data social_data;
 typedef struct skill_data skill_data;
 typedef struct trig_data trig_data;
 typedef struct vehicle_data vehicle_data;
@@ -1757,6 +1760,26 @@ typedef struct vehicle_data vehicle_data;
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// SOCIAL DEFINES //////////////////////////////////////////////////////////
+
+// SOC_x: Social flags
+#define SOC_IN_DEVELOPMENT  BIT(0)	// a. can't be used by players
+#define SOC_HIDE_IF_INVIS  BIT(1)	// b. no "Someone" if player can't be seen
+
+
+// SOCM_x: social message string
+#define SOCM_NO_ARG_TO_CHAR  0
+#define SOCM_NO_ARG_TO_OTHERS  1
+#define SOCM_TARGETED_TO_CHAR  2
+#define SOCM_TARGETED_TO_OTHERS  3
+#define SOCM_TARGETED_TO_VICTIM  4
+#define SOCM_TARGETED_NOT_FOUND  5
+#define SOCM_SELF_TO_CHAR  6
+#define SOCM_SELF_TO_OTHERS  7
+#define NUM_SOCM_MESSAGES  8	// total
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// VEHICLE DEFINES //////////////////////////////////////////////////////////
 
 // VEH_x: vehicle flags
@@ -2854,6 +2877,7 @@ struct descriptor_data {
 	quest_data *olc_quest;	// quest being edited
 	room_template *olc_room_template;	// rmt being edited
 	struct sector_data *olc_sector;	// sector being edited
+	social_data *olc_social;	// social being edited
 	skill_data *olc_skill;	// skill being edited
 	struct trig_data *olc_trigger;	// trigger being edited
 	vehicle_data *olc_vehicle;	// vehicle being edited
@@ -3599,6 +3623,8 @@ struct empire_data {
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	int top_shipping_id;	// shipping system quick id for the empire
 	
+	bool needs_save;	// for things that delay-save
+	
 	UT_hash_handle hh;	// empire_table hash handle
 };
 
@@ -3897,6 +3923,37 @@ struct sector_index_type {
 	int base_count;	// number of rooms with it as the base sect
 	
 	UT_hash_handle hh;	// sector_index hash handle
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SOCIAL STRUCTS //////////////////////////////////////////////////////////
+
+struct social_data {
+	any_vnum vnum;
+	
+	char *name;	// for internal labeling
+	char *command;	// as seen/typed by the player
+	
+	bitvector_t flags;	// AUG_x flags
+	int min_char_position;	// POS_ of the character
+	int min_victim_position;	// POS_ of victim
+	struct social_requirement *requirements;	// linked list
+	
+	char *message[NUM_SOCM_MESSAGES];	// strings
+	
+	UT_hash_handle hh;	// social_table hash
+	UT_hash_handle sorted_hh;	// sorted_socials hash
+};
+
+
+// for restrictions
+struct social_requirement {
+	int type;
+	any_vnum vnum;
+	int misc;
+	
+	struct social_requirement *next;
 };
 
 

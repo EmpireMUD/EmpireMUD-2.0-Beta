@@ -41,6 +41,7 @@
 *   Room Template Utils
 *   Sector Utils
 *   Skill Utils
+*   Social Utils
 *   String Utils
 *   Vehicle Utils
 *   Const Externs
@@ -449,6 +450,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_ROOM_TEMPLATE(desc)  ((desc)->olc_room_template)
 #define GET_OLC_SECTOR(desc)  ((desc)->olc_sector)
 #define GET_OLC_SKILL(desc)  ((desc)->olc_skill)
+#define GET_OLC_SOCIAL(desc)  ((desc)->olc_social)
 #define GET_OLC_TRIGGER(desc)  ((desc)->olc_trigger)
 #define GET_OLC_VEHICLE(desc)  ((desc)->olc_vehicle)
 
@@ -480,6 +482,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_POPULATION(emp)  ((emp)->population)
 #define EMPIRE_MILITARY(emp)  ((emp)->military)
 #define EMPIRE_MOTD(emp)  ((emp)->motd)
+#define EMPIRE_NEEDS_SAVE(emp)  ((emp)->needs_save)
 #define EMPIRE_GREATNESS(emp)  ((emp)->greatness)
 #define EMPIRE_TECH(emp, num)  ((emp)->tech[(num)])
 #define EMPIRE_MEMBERS(emp)  ((emp)->members)
@@ -1150,6 +1153,24 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 
 // utils
 #define SKILL_FLAGGED(skill, flag)  IS_SET(SKILL_FLAGS(skill), (flag))
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SOCIAL UTILS ////////////////////////////////////////////////////////////
+
+#define SOC_COMMAND(soc)  ((soc)->command)
+#define SOC_FLAGS(soc)  ((soc)->flags)
+#define SOC_MESSAGE(soc, num)  ((soc)->message[num])
+#define SOC_MIN_CHAR_POS(soc)  ((soc)->min_char_position)
+#define SOC_MIN_VICT_POS(soc)  ((soc)->min_victim_position)
+#define SOC_NAME(soc)  ((soc)->name)
+#define SOC_REQUIREMENTS(soc)  ((soc)->requirements)
+#define SOC_VNUM(soc)  ((soc)->vnum)
+
+// definitions
+#define SOCIAL_FLAGGED(soc, flag)  IS_SET(SOC_FLAGS(soc), (flag))
+#define SOC_HIDDEN(soc)  (SOCIAL_FLAGGED((soc), SOC_HIDE_IF_INVIS))
+#define SOC_IS_TARGETABLE(soc)  (SOC_MESSAGE((soc), SOCM_TARGETED_TO_CHAR) != NULL)
 
 
  //////////////////////////////////////////////////////////////////////////////

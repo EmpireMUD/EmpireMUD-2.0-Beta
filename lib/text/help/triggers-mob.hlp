@@ -311,9 +311,9 @@ When using field  - The variable returns:
 &cadd_mob_flag(FLG)&0 - Adds a mob flag to the mob. Also, remove_mob_flag().
 &cadd_resources(vnum,amt)&0 - Gives a person <amt> of object <vnum>.
 &caff_flagged(FLG)&0 - Checks if the actor has an AFF flag (e.g. ENTANGLED).
-&calias&0 - The list of aliases (keywords) of the mob or the player name.
 &caffect(name)&0 - Checks the actor for the affect (by name) in the subfield.
    This is the name that shows on your affects/score command when using active.
+&calias&0 - The list of aliases (keywords) of the mob or the player name.
 &cblock&0 - Player's block rating.
 &cblood(amt)&0 - Returns current blood, or adds/removes blood if amt is set.
 &cbonus_exp(amt)&0 - Returns the player's bonus exp (adds to it if amt given)
@@ -323,12 +323,10 @@ When using field  - The variable returns:
 &ccan_afford(amt)&0 - Checks if the actor has enough coins of any converted type.
 &ccan_gain_new_skills&0 - Checks if the character can gain a new skill from 0.
 &ccan_start_quest(vnum)&0 - Whether or not the character can start a quest.
-&ccancel_adventure_summon&0 - Call this if a script teleports a player around, to
-   prevent them from being teleported again if they were adventure-summoned.
-&cchar_target(name)&0 - Finds a visible target character in the room, by name.
-&ccharge_coins(amt)&0 - Charges the actor a number of coins.
 &ccanbeseen&0 - True if the actor can be seen by the mob (always true 
    for non-mob triggers).
+&ccancel_adventure_summon&0 - Call this if a script teleports a player around, to
+   prevent them from being teleported again if they were adventure-summoned.
 &ccanuseroom_ally(room)&0 - Character can use the room as a member or ally (with
    no arg, defaults to current room).
 &ccanuseroom_guest(room)&0 - Character can use the room as a guest (with no arg,
@@ -339,6 +337,8 @@ When using field  - The variable returns:
    (defaults to current room).
 &ccarrying&0 - Size of character's inventory (items carried).
 &ccha&0 - The actor's Charisma.
+&cchar_target(name)&0 - Finds a visible target character in the room, by name.
+&ccharge_coins(amt)&0 - Charges the actor a number of coins.
 &cclass&0 - The actor's class, as a string.
 &ccompleted_quest(vnum)&0 - Whether or not the player has completed and
    turned in that quest vnum.
@@ -364,10 +364,10 @@ When using field  - The variable returns:
    in containers) by subfield name/var/vnum.
 &chas_resources(vnum,amt)&0 - Whether or not the player has <amt> of object <vnum>
    available in the inventory/room.
+&chealth&0 - The current hit points of the actor.
 &cheshe&0 - Returns the correct pronoun (he/she/it).
 &chimher&0 - Returns the correct pronoun (him/her/it).
 &chisher&0 - Returns the correct pronoun (his/her/its).
-&chealth&0 - The current hit points of the actor.      
 &chome&0 - Room id of the player's home, if any.
 &cid&0 - The unique id of the actor.
 &cint&0 - The actor's intelligence.

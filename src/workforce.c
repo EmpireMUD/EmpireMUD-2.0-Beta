@@ -174,7 +174,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	
 	// buildings
 	if (IS_COMPLETE(room)) {
-		if ((BUILDING_DAMAGE(room) > 0 || BUILDING_RESOURCES(room)) && CHORE_ACTIVE(CHORE_MAINTENANCE)) {
+		if ((BUILDING_DAMAGE(room) > 0 || BUILDING_RESOURCES(room)) && HOME_ROOM(room) == room && CHORE_ACTIVE(CHORE_MAINTENANCE)) {
 			do_chore_building(emp, room, CHORE_MAINTENANCE);
 		}
 		
@@ -600,7 +600,7 @@ void chore_update(void) {
 				}
 			}
 			
-			save_empire(emp);
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			
 			// no longer need this -- free up the tracker
 			ewt_free_tracker(&EMPIRE_WORKFORCE_TRACKER(emp));

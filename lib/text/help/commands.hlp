@@ -553,6 +553,16 @@ If you also want to see empty slots, use the -a flag.
 
 See also: INVENTORY, REMOVE, WEAR, WIELD, HOLD, SHEATH, DRAW, SWAP
 #
+ESTATS ESTATISTICS
+
+Usage:  estats [empire]
+
+This command gets quick info on your empire (or another). It is a short version
+of the longer info shown with the "empire" command, and it defaults to your
+empire if you give no argument.
+
+See also: EMPIRE
+#
 EXECUTE
 
 Usage:  execute <victim>

@@ -3399,7 +3399,7 @@ void trigger_distrust_from_hostile(char_data *ch, empire_data *emp) {
 		pol->type = DIPL_DISTRUST;
 		
 		log_to_empire(chemp, ELOG_DIPLOMACY, "%s now distrusts this empire due to hostile activity (%s)", EMPIRE_NAME(emp), PERS(ch, ch, TRUE));
-		save_empire(chemp);
+		EMPIRE_NEEDS_SAVE(chemp) = TRUE;
 	}
 	
 	// check emp->chemp politics
@@ -3411,7 +3411,7 @@ void trigger_distrust_from_hostile(char_data *ch, empire_data *emp) {
 		pol->type = DIPL_DISTRUST;
 		
 		log_to_empire(emp, ELOG_DIPLOMACY, "This empire now officially distrusts %s due to hostile activity", EMPIRE_NAME(chemp));
-		save_empire(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 	
 	// spawn guards?

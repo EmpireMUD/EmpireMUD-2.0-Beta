@@ -563,7 +563,7 @@ void summon_materials(char_data *ch, char *argument) {
 		// save the empire
 		if (found) {
 			GET_MANA(ch) -= cost * count;	// charge only the amount retrieved
-			save_empire(emp);
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			read_vault(emp);
 			gain_ability_exp(ch, ABIL_SUMMON_MATERIALS, 1);
 		}

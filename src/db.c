@@ -167,6 +167,10 @@ int evos_per_hour = 1;	// how many map tiles evolve per hour (for load-balancing
 skill_data *skill_table = NULL;	// main skills hash (hh)
 skill_data *sorted_skills = NULL;	// alpha hash (sorted_hh)
 
+// socials
+social_data *social_table = NULL;	// master social hash table (hh)
+social_data *sorted_socials = NULL;	// alphabetic version (sorted_hh)
+
 // strings
 char *credits = NULL;	// game credits
 char *motd = NULL;	// message of the day - mortals
@@ -237,6 +241,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ VEH_PREFIX, VEH_SUFFIX },	// DB_BOOT_SKILL
 	{ MORPH_PREFIX, MORPH_SUFFIX },	// DB_BOOT_MORPH
 	{ QST_PREFIX, QST_SUFFIX },	// DB_BOOT_QST
+	{ SOC_PREFIX, SOC_SUFFIX },	// DB_BOOT_SOC
 };
 
 
@@ -249,7 +254,6 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 */
 void boot_db(void) {
 	void Read_Invalid_List();
-	void boot_social_messages();
 	void boot_world();
 	void build_all_quest_lookups();
 	void build_player_index();
@@ -311,9 +315,6 @@ void boot_db(void) {
 
 	log("Loading fight messages.");
 	load_fight_messages();
-
-	log("Loading social messages.");
-	boot_social_messages();
 	
 	log("Loading trading post.");
 	load_trading_post();
@@ -411,6 +412,7 @@ void boot_world(void) {
 	extern int sort_classes_by_data(class_data *a, class_data *b);
 	extern int sort_crafts_by_data(craft_data *a, craft_data *b);
 	extern int sort_skills_by_data(skill_data *a, skill_data *b);
+	extern int sort_socials_by_data(social_data *a, social_data *b);
 
 	// DB_BOOT_x search: boot new types in this function
 	
@@ -497,6 +499,9 @@ void boot_world(void) {
 	log("Loading morphs.");
 	index_boot(DB_BOOT_MORPH);
 	
+	log("Loading socials.");
+	index_boot(DB_BOOT_SOC);
+	
 	log("Loading instances.");
 	load_instances();
 	
@@ -521,6 +526,7 @@ void boot_world(void) {
 	HASH_SRT(sorted_hh, sorted_classes, sort_classes_by_data);
 	HASH_SRT(sorted_hh, sorted_crafts, sort_crafts_by_data);
 	HASH_SRT(sorted_hh, sorted_skills, sort_skills_by_data);
+	HASH_SRT(sorted_hh, sorted_socials, sort_socials_by_data);
 	
 	log("Checking newbie islands.");
 	check_newbie_islands();
@@ -998,6 +1004,26 @@ int file_to_string_alloc(const char *name, char **buf) {
 
 	*buf = str_dup(temp);
 	return (0);
+}
+
+
+// reads in one action line
+char *fread_action(FILE * fl, int nr) {
+	char buf[MAX_STRING_LENGTH], *rslt;
+
+	fgets(buf, MAX_STRING_LENGTH, fl);
+	if (feof(fl)) {
+		log("SYSERR: fread_action - unexpected EOF near action #%d", nr+1);
+		exit(1);
+		}
+	if (*buf == '#')
+		return (NULL);
+	else {
+		*(buf + strlen(buf) - 1) = '\0';
+		CREATE(rslt, char, strlen(buf) + 1);
+		strcpy(rslt, buf);
+		return (rslt);
+	}
 }
 
 
@@ -2199,7 +2225,7 @@ void check_version(void) {
 			HASH_ITER(hh, empire_table, emp, next_emp) {
 				// auto-balance was removed and the same id was used for dismantle-mines
 				set_workforce_limit_all(emp, CHORE_DISMANTLE_MINES, 0);
-				save_empire(emp);
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			}
 		}
 		if (MATCH_VERSION("b2.8")) {
@@ -2504,8 +2530,6 @@ void load_daily_cycle(void) {
 * types.
 */
 void load_fight_messages(void) {
-	extern char *fread_action(FILE * fl, int nr);
-	
 	FILE *fl;
 	int i, type;
 	struct message_type *messages;

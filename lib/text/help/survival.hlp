@@ -188,9 +188,9 @@ Riding lowers the delay during movement, as well as the movement point cost.
 
 When you dismount, the animal you were riding is stored. You can see it on your
 affects list. If you type "mount" again without targetting a new animal, you
-will re-mount your stored ride. If you target a new animal while you already
-have a stored mount, the old one will be released. You can store more than one
-mount and swap them at a stable.
+will re-mount your stored ride. You can store more than one mount and swap them
+at a stable. If you target a new animal while you already have a stored mount,
+the new one will be added to your stored mounts.
 
 If you have a saddle in your inventory, you will automatically equip it when
 you mount up. The saddle will be removed automatically when you dismount. You
@@ -312,6 +312,8 @@ See also: DIG, GATHER, PICK
 STABLEMASTER "STABLE MASTER"
 
 Stablemaster (Survival ability)
+
+Usage:  mount <swap | release> <keyword(s)>
 
 Stablemaster allows you to change your active mount anywhere. It also lets you
 release your active mount so that it can be traded to others. Gains experience
