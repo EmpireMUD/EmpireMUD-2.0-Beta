@@ -1031,10 +1031,6 @@ done
 Fake infiltrate higher template id~
 2 c 0
 infiltrate~
-if !%actor.on_quest(10150)%
-  return 0
-  halt
-end
 if !%arg%
   return 0
   halt
@@ -1045,6 +1041,11 @@ eval room_var %self%
 eval tricky %%room_var.%direction%(room)%%
 if !%tricky% || (%tricky.template% < %room_var.template%)
   return 0
+  halt
+end
+if !%actor.on_quest(10150)%
+  %send% %actor% You don't currently have a reason to infiltrate there.
+  return 1
   halt
 end
 %send% %actor% You successfully infiltrate!
