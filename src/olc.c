@@ -321,8 +321,8 @@ OLC_MODULE(skilledit_name);
 OLC_MODULE(skilledit_tree);
 
 // social modules
-OLC_MODULE(socedit_command);
 OLC_MODULE(socedit_charposition);
+OLC_MODULE(socedit_command);
 OLC_MODULE(socedit_flags);
 OLC_MODULE(socedit_name);
 OLC_MODULE(socedit_targetposition);
