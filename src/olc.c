@@ -322,8 +322,10 @@ OLC_MODULE(skilledit_tree);
 
 // social modules
 OLC_MODULE(socedit_command);
+OLC_MODULE(socedit_charposition);
 OLC_MODULE(socedit_flags);
 OLC_MODULE(socedit_name);
+OLC_MODULE(socedit_targetposition);
 OLC_MODULE(socedit_n2char);
 OLC_MODULE(socedit_n2other);
 OLC_MODULE(socedit_s2char);
@@ -726,9 +728,11 @@ const struct olc_command_data olc_data[] = {
 	{ "tree", skilledit_tree, OLC_SKILL, OLC_CF_EDITOR },
 	
 	// social commands
+	{ "charposition", socedit_charposition, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "command", socedit_command, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "flags", socedit_flags, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "name", socedit_name, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "targetposition", socedit_targetposition, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "n2character", socedit_n2char, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "n2others", socedit_n2other, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "s2character", socedit_s2char, OLC_SOCIAL, OLC_CF_EDITOR },
@@ -4014,6 +4018,8 @@ void olc_process_string(char_data *ch, char *argument, const char *name, char **
 		msg_to_char(ch, "Set its %s to what?\r\n", name);
 	}
 	else {
+		delete_doubledollar(argument);
+		
 		if (*save_point) {
 			free(*save_point);
 		}
