@@ -1086,10 +1086,6 @@ ACMD(do_build) {
 		send_config_msg(ch, "need_approval_string");
 		return;
 	}
-	if (*argument && GET_BUILDING(IN_ROOM(ch)) && IS_INCOMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "To continue working on this building, just type 'build' with no argument.\r\n");
-		return;
-	}
 	
 	argument = any_one_word(argument, arg);
 	skip_spaces(&argument);
@@ -1097,6 +1093,15 @@ ACMD(do_build) {
 	// optional info arg
 	if (!str_cmp(arg, "info")) {
 		show_craft_info(ch, argument, CRAFT_TYPE_BUILD);
+		return;
+	}
+	// all other functions require standing
+	if (GET_POS(ch) < POS_STANDING) {
+		send_low_pos_msg(ch);
+		return;
+	}
+	if (*arg && GET_BUILDING(IN_ROOM(ch)) && IS_INCOMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "To continue working on this building, just type 'build' with no argument.\r\n");
 		return;
 	}
 	

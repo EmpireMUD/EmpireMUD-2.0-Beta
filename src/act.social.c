@@ -130,30 +130,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 	}
 	
 	if (GET_POS(ch) < SOC_MIN_CHAR_POS(soc)) {
-		switch (GET_POS(ch)) {
-			case POS_DEAD:
-				send_to_char("Lie still; you are DEAD!!! :-(\r\n", ch);
-				break;
-			case POS_INCAP:
-			case POS_MORTALLYW:
-				send_to_char("You are in a pretty bad shape, unable to do anything!\r\n", ch);
-				break;
-			case POS_STUNNED:
-				send_to_char("All you can do right now is think about the stars!\r\n", ch);
-				break;
-			case POS_SLEEPING:
-				send_to_char("In your dreams, or what?\r\n", ch);
-				break;
-			case POS_RESTING:
-				send_to_char("Nah... You feel too relaxed to do that.\r\n", ch);
-				break;
-			case POS_SITTING:
-				send_to_char("Maybe you should get on your feet first?\r\n", ch);
-				break;
-			case POS_FIGHTING:
-				send_to_char("No way! You're fighting for your life!\r\n", ch);
-				break;
-		}
+		send_low_pos_msg(ch);
 		return;
 	}
 	

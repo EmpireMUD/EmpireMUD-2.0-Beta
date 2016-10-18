@@ -1336,6 +1336,11 @@ ACMD(do_gen_craft) {
 		show_craft_info(ch, argument, subcmd);
 		return;
 	}
+	// all other functions require standing
+	if (GET_POS(ch) < POS_STANDING) {
+		send_low_pos_msg(ch);
+		return;
+	}
 	
 	// optional leading number
 	if ((num = atoi(argument)) > 0) {
