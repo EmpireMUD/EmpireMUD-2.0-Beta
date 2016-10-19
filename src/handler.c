@@ -4020,7 +4020,7 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 
 
 /**
-* Takes player input of a complex component like "large block" or
+* Takes player input of a complex component like "bunch block" or
 * "large, single fruit" and gets the CMP_ and CMPF_ settings from it.
 *
 * @param char *str The character's input.

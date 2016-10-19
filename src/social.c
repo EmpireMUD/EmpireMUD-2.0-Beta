@@ -41,6 +41,7 @@ const char *default_social_name = "Unnamed Social";
 const int default_social_position = POS_RESTING;
 
 // external consts
+extern const char *position_types[];
 extern const char *social_flags[];
 extern const char *social_message_types[NUM_SOCM_MESSAGES][2];
 
@@ -686,7 +687,9 @@ void do_stat_social(char_data *ch, social_data *soc) {
 	
 	// first line
 	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Command: \tc%s\t0 Name: \tc%s\t0\r\n", SOC_VNUM(soc), SOC_COMMAND(soc), SOC_NAME(soc));
-		
+	
+	size += snprintf(buf + size, sizeof(buf) - size, "Min actor position: \ty%s\t0, Min victim position: \ty%s\t0\r\n", position_types[SOC_MIN_CHAR_POS(soc)], position_types[SOC_MIN_VICT_POS(soc)]);
+	
 	sprintbit(SOC_FLAGS(soc), social_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
 	
@@ -723,6 +726,9 @@ void olc_show_social(char_data *ch) {
 	sprintbit(SOC_FLAGS(soc), social_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
 	
+	sprintf(buf + strlen(buf), "<\tycharposition\t0> %s (minimum)\r\n", position_types[SOC_MIN_CHAR_POS(soc)]);
+	sprintf(buf + strlen(buf), "<\tytargetposition\t0> %s (minimum)\r\n", position_types[SOC_MIN_VICT_POS(soc)]);
+	
 	sprintf(buf + strlen(buf), "Messages:\r\n");
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
 		sprintf(buf + strlen(buf), "%s <\ty%s\t0>: %s\r\n", social_message_types[iter][0], social_message_types[iter][1], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
@@ -756,6 +762,12 @@ int vnum_social(char *searchname, char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// OLC MODULES /////////////////////////////////////////////////////////////
 
+OLC_MODULE(socedit_charposition) {
+	social_data *soc = GET_OLC_SOCIAL(ch->desc);
+	SOC_MIN_CHAR_POS(soc) = olc_process_type(ch, argument, "position", "charposition", position_types, SOC_MIN_CHAR_POS(soc));
+}
+
+
 OLC_MODULE(socedit_command) {
 	social_data *soc = GET_OLC_SOCIAL(ch->desc);
 	olc_process_string(ch, argument, "command", &SOC_COMMAND(soc));
@@ -779,6 +791,12 @@ OLC_MODULE(socedit_flags) {
 OLC_MODULE(socedit_name) {
 	social_data *soc = GET_OLC_SOCIAL(ch->desc);
 	olc_process_string(ch, argument, "name", &SOC_NAME(soc));
+}
+
+
+OLC_MODULE(socedit_targetposition) {
+	social_data *soc = GET_OLC_SOCIAL(ch->desc);
+	SOC_MIN_VICT_POS(soc) = olc_process_type(ch, argument, "position", "targetposition", position_types, SOC_MIN_VICT_POS(soc));
 }
 
 
