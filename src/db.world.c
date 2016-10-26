@@ -923,6 +923,7 @@ void annual_update_map_tile(room_data *room) {
 	extern char *get_room_name(room_data *room, bool color);
 	
 	struct resource_data *old_list;
+	struct island_info *isle;
 	int trenched, amount;
 	empire_data *emp;
 	double dmg;
@@ -1000,7 +1001,12 @@ void annual_update_map_tile(room_data *room) {
 		// this will tear it back down to its base type
 		disassociate_building(room);
 	}
-
+	
+	// reset newbie island tiles
+	if (!ROOM_OWNER(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE) && (isle = get_island(GET_ISLAND_ID(room), FALSE)) && IS_SET(isle->flags, ISLE_NEWBIE) && world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].natural_sector != world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type) {
+		change_terrain(room, GET_SECT_VNUM(world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].natural_sector));
+	}
+	
 	// clean mine data from anything that's not currently a mine
 	if (!HAS_FUNCTION(room, FNC_MINE)) {
 		remove_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM);
