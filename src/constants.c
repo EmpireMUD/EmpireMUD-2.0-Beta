@@ -1483,7 +1483,7 @@ const char *action_bits[] = {
 
 // MOB_CUSTOM_x
 const char *mob_custom_types[] = {
-	"emote",
+	"echo",
 	"say",
 	"\n"
 };

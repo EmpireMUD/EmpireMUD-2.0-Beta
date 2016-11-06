@@ -1,64 +1,3 @@
-
-- .map naturalize [island | world] -> return to natural state
-	- .map remember [island] -> change the natural state to current state, skip buildings
-- toggle to fully restore newbie islands
-
--> need to run on whole map, not just live tiles
-
-- helps for naturalize, remember
-
-
-	struct island_info *isle = NULL;
-	struct map_data *map;
-	int last_isle = -1;
-	room_data *room;
-	
-	LL_FOREACH(land_map, map) {
-		// simple checks
-		if (map->sector_type == map->natural_sector) {
-			continue;	// already same
-		}
-		
-		// check island
-		if (!isle || last_isle != map->island) {
-			isle = get_island(map->island, TRUE);
-			last_isle = map->island;
-		}
-		if (!IS_SET(isle->flags, ISLE_NEWBIE)) {
-			continue;
-		}
-		
-		// checks needed if the room exists
-		if ((room = real_real_room(map->vnum))) {
-			if (ROOM_OWNER(room)) {
-				continue;
-			}
-			if (ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
-				continue;
-			}
-		}
-		
-		// looks good: naturalize it
-		if (room) {
-			change_terrain(room, GET_SECT_VNUM(map->natural_sector));
-			if (ROOM_PEOPLE(room)) {
-				act("The area returns to nature!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
-			}
-		}
-		else {
-			perform_change_sect(NULL, map, map->natural_sector);
-			perform_change_base_sect(NULL, map, map->natural_sector);
-		}
-		++count;
-	
-
-	// reset newbie island tiles
-	if (!ROOM_OWNER(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE) && () &&  && world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].natural_sector != world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type) {
-		change_terrain(room, GET_SECT_VNUM(world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].natural_sector));
-	}
-
-
-
 //////////  New website
 
 - What makes EmpireMUD different
@@ -2102,8 +2041,98 @@ al aa .o edit $1;.flag add scala;.apply add 1 $2;.min 1;.max 1;.full 24;.save
 
 
 
-/////  The same-item-counts-twice issue
-Urbain   (Apr 12) [BLD5108] forging a maul with 5 iron, a handle, and excess copper uses only one copper in the process, when it should use 6 copper
 
-- mark items as "used" to prevent being able to count the same item twice
-- need to run "hard items" before components in both has-resources and extract-resources
+/// MOB CUSTOM STRINGS
+ECHO - string to send to the room
+SAY - string to "say"-echo
+
+X OLC editors (delete doubledollar)
+X OLC helps
+X olc copy on copy, free on free
+
+X structs
+X write to file
+X read from file
+X free char
+
+
+- periodic function to run it --> run on players with active links?
+	- while mob is awake/not fighting
+
+
+/**
+* This is called every few seconds to animate mobs in the room with players.
+*/
+void run_mob_echoes(void) {
+	ACMD(do_say);
+	
+	struct mob_custom_message *mcm, *found_mcm;
+	char_data *ch, *mob, *found_mob;
+	descriptor_data *desc;
+	int count;
+	
+	LL_FOREACH(descriptor_list, desc) {
+		// validate ch
+		if (STATE(desc) != CON_PLAYING || !(ch = desc->character) || !AWAKE(ch)) {
+			continue;
+		}
+		
+		// 25% random chance per player to happen at all...
+		if (number(0, 3)) {
+			continue;
+		}
+		
+		// initialize vars
+		found_mob = NULL;
+		found_mcm = NULL;
+		count = 0;
+		
+		// now find a mob with a valid message
+		LL_FOREACH(ROOM_PEOPLE(IN_ROOM(ch)), mob) {
+			// things that disqualify the mob
+			if (mob->desc || !IS_NPC(mob) || FIGHTING(mob) || !AWAKE(mob) || MOB_FLAGGED(mob, MOB_TIED) || IS_INJURED(mob, INJ_TIED) || GET_LED_BY(mob)) {
+				continue;
+			}
+			
+			// ok now find a random message to show?
+			LL_FOREACH(MOB_CUSTOM_MSGS(mob), mcm) {
+				// MOB_CUSTOM_x: types we use here
+				if (mcm->type != MOB_CUSTOM_ECHO && mcm->type != MOB_CUSTOM_SAY) {
+					continue;
+				}
+				
+				// looks good! pick one at random
+				if (!number(0, count++) || !found_mcm) {
+					found_mob = mob;
+					found_mcm = mcm;
+				}
+			}
+		}
+		
+		// did we find something to show?
+		if (found_mcm) {
+			// MOB_CUSTOM_x
+			switch (found_mcm->type) {
+				case MOB_CUSTOM_ECHO: {
+					act(found_mcm->msg, FALSE, found_mob, NULL, NULL, TO_ROOM);
+					break;
+				}
+				case MOB_CUSTOM_SAY: {
+					do_say(found_mob, found_mcm->msg, 0, 0);
+					break;
+				}
+			}
+		}
+	}
+}
+
+
+- convert any mob that has an env trigger
+
+
+struct mob_custom_message
+MOB_CUSTOM_MSGS(ch)
+
+#define MOB_CUSTOM_EMOTE  0
+#define MOB_CUSTOM_SAY  1
+

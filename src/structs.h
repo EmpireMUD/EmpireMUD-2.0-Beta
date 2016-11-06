@@ -1035,7 +1035,7 @@ typedef struct vehicle_data vehicle_data;
 
 
 // MOB_CUSTOM_x: custom message types
-#define MOB_CUSTOM_EMOTE  0
+#define MOB_CUSTOM_ECHO  0
 #define MOB_CUSTOM_SAY  1
 
 
