@@ -2377,6 +2377,21 @@ Important notes:
 
 See also: MAP OLC
 #d
+"MAPEDIT NATURALIZE"
+
+Usage:  .map naturalize [island | world]
+
+This command will restore the sector for the map tile you're in, the whole
+island you're on, or the entire world. The tiles return to the state they
+were in when the map was first generated.
+
+When used on an island/world, claimed tiles are ignored. So are tiles that are
+unclaimable or which have adventures.
+
+You can change a tile/island's natural state with: .map remember [island]
+
+See also: MAP OLC, MAPEDIT REMEMBER
+#d
 "MAPEDIT PASSWALLS"
 
 Usage:  .map passwalls
@@ -2387,6 +2402,21 @@ the interior (designated) rooms of a building; they will instead move to the
 next map tile in the direction that they were walking.
 
 See also: MAP OLC
+#d
+"MAPEDIT REMEMBER"
+
+Usage:  .map remember [island]
+
+This command will store the current sector of the map tile you're in (or the
+entire island you're on) as the "natural" sector. This can be used to change
+how a newbie island will be restored at the end of the year, for example.
+
+Building and adventure tiles are ignored during this command.
+
+The opposite command is .map naturalize, which restores a room/island/world
+to its original state.
+
+See also: MAP OLC, MAPEDIT NATURALIZE
 #d
 "MAPEDIT ROOMTYPE" "MAPEDIT ROOM TYPE"
 
