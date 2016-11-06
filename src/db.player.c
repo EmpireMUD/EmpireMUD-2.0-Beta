@@ -925,7 +925,16 @@ void free_char(char_data *ch) {
 			free(interact);
 		}
 	}
-
+	if (MOB_CUSTOM_MSGS(ch) && (!proto || MOB_CUSTOM_MSGS(ch) != MOB_CUSTOM_MSGS(proto))) {
+		struct mob_custom_message *mcm, *next_mcm;
+		LL_FOREACH_SAFE(MOB_CUSTOM_MSGS(ch), mcm, next_mcm) {
+			if (mcm->msg) {
+				free(mcm->msg);
+			}
+			free(mcm);
+		}
+	}
+	
 	if (ch->desc) {
 		ch->desc->character = NULL;
 	}

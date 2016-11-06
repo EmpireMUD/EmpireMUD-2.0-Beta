@@ -608,6 +608,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_MIN_SCALE_LEVEL(ch)  ((ch)->mob_specials.min_scale_level)
 #define MOB_NAME_SET(ch)  ((ch)->mob_specials.name_set)
 #define MOB_ATTACK_TYPE(ch)  ((ch)->mob_specials.attack_type)
+#define MOB_CUSTOM_MSGS(ch)  ((ch)->mob_specials.custom_msgs)
 #define MOB_DAMAGE(ch)  ((ch)->mob_specials.damage)
 #define MOB_DYNAMIC_NAME(ch)  ((ch)->mob_specials.dynamic_name)
 #define MOB_DYNAMIC_SEX(ch)  ((ch)->mob_specials.dynamic_sex)

@@ -179,6 +179,7 @@ OLC_MODULE(gedit_type);
 // mob edit modules
 OLC_MODULE(medit_affects);
 OLC_MODULE(medit_attack);
+OLC_MODULE(medit_custom);
 OLC_MODULE(medit_flags);
 OLC_MODULE(medit_interaction);
 OLC_MODULE(medit_keywords);
@@ -587,6 +588,7 @@ const struct olc_command_data olc_data[] = {
 	// mob commands
 	{ "affects", medit_affects, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "attack", medit_attack, OLC_MOBILE, OLC_CF_EDITOR },
+	{ "custom", medit_custom, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "flags", medit_flags, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "interaction", medit_interaction, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "keywords", medit_keywords, OLC_MOBILE, OLC_CF_EDITOR },

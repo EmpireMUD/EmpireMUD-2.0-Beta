@@ -34,6 +34,7 @@ extern const char *action_bits[];
 extern const char *affected_bits[];
 extern const char *genders[];
 extern const byte interact_vnum_types[NUM_INTERACTS];
+extern const char *mob_custom_types[];
 extern const char *mob_move_types[];
 extern const char *name_sets[];
 
@@ -636,6 +637,7 @@ void save_olc_mobile(descriptor_data *desc) {
 	char_data *mob = GET_OLC_MOBILE(desc), *mob_iter, *proto;
 	mob_vnum vnum = GET_OLC_VNUM(desc);
 	struct interaction_item *interact;
+	struct mob_custom_message *mcm;
 	struct quest_lookup *ql;
 	UT_hash_handle hh;
 	bool changed;
@@ -667,6 +669,9 @@ void save_olc_mobile(descriptor_data *desc) {
 			// update pointers
 			if (mob_iter->interactions == proto->interactions) {
 				mob_iter->interactions = mob->interactions;
+			}
+			if (MOB_CUSTOM_MSGS(mob_iter) == MOB_CUSTOM_MSGS(proto)) {
+				MOB_CUSTOM_MSGS(mob_iter) = MOB_CUSTOM_MSGS(mob);
 			}
 			
 			// check for changes to level, flags, or damage
@@ -712,6 +717,13 @@ void save_olc_mobile(descriptor_data *desc) {
 		proto->interactions = interact->next;
 		free(interact);
 	}
+	while ((mcm = MOB_CUSTOM_MSGS(proto))) {
+		if (mcm->msg) {
+			free(mcm->msg);
+		}
+		MOB_CUSTOM_MSGS(proto) = mcm->next;
+		free(mcm);
+	}
 
 	if (proto->proto_script) {
 		free_proto_scripts(&proto->proto_script);
@@ -739,6 +751,7 @@ void save_olc_mobile(descriptor_data *desc) {
 * @return char_data *The copied mob.
 */
 char_data *setup_olc_mobile(char_data *input) {
+	struct mob_custom_message *mcm, *mcm_iter;
 	char_data *new;
 	
 	CREATE(new, char_data, 1);
@@ -759,6 +772,18 @@ char_data *setup_olc_mobile(char_data *input) {
 		
 		// copy interactions
 		new->interactions = copy_interaction_list(input->interactions);
+		
+		// copy custom msgs
+		MOB_CUSTOM_MSGS(new) = NULL;
+		LL_FOREACH(MOB_CUSTOM_MSGS(input), mcm_iter) {
+			CREATE(mcm, struct mob_custom_message, 1);
+			
+			mcm->type = mcm_iter->type;
+			mcm->msg = str_dup(mcm_iter->msg);
+			mcm->next = NULL;
+			
+			LL_APPEND(MOB_CUSTOM_MSGS(new), mcm);
+		}
 	}
 	else {
 		// brand new
@@ -791,6 +816,8 @@ void olc_show_mobile(char_data *ch) {
 	void get_script_display(struct trig_proto_list *list, char *save_buffer);
 
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
+	struct mob_custom_message *mcm;
+	int count;
 	
 	if (!mob) {
 		return;
@@ -834,6 +861,13 @@ void olc_show_mobile(char_data *ch) {
 		strcat(buf, buf1);
 	}
 	
+	// custom messages
+	sprintf(buf + strlen(buf), "Custom messages: <&ycustom&0>\r\n");
+	count = 0;
+	LL_FOREACH(MOB_CUSTOM_MSGS(mob), mcm) {
+		sprintf(buf + strlen(buf), " &y%d&0. [%s] %s\r\n", ++count, mob_custom_types[mcm->type], mcm->msg);
+	}
+	
 	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
 	if (mob->proto_script) {
 		get_script_display(mob->proto_script, buf1);
@@ -856,8 +890,145 @@ OLC_MODULE(medit_affects) {
 OLC_MODULE(medit_attack) {
 	extern char **get_weapon_types_string();
 	
-	char_data *mob = GET_OLC_MOBILE(ch->desc);	
+	char_data *mob = GET_OLC_MOBILE(ch->desc);
 	MOB_ATTACK_TYPE(mob) = olc_process_type(ch, argument, "attack type", "attack", (const char**)get_weapon_types_string(), MOB_ATTACK_TYPE(mob));
+}
+
+
+OLC_MODULE(medit_custom) {
+	char_data *mob = GET_OLC_MOBILE(ch->desc);
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *msgstr;
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	struct mob_custom_message *mcm, *change, *temp;
+	int num, iter, msgtype;
+	bool found;
+	
+	// arg1 arg2
+	half_chop(argument, arg1, arg2);
+	
+	if (is_abbrev(arg1, "remove")) {
+		if (!*arg2) {
+			msg_to_char(ch, "Remove which custom message (number)?\r\n");
+		}
+		else if (!str_cmp(arg2, "all")) {
+			while ((mcm = MOB_CUSTOM_MSGS(mob))) {
+				MOB_CUSTOM_MSGS(mob) = mcm->next;
+				if (mcm->msg) {
+					free(mcm->msg);
+				}
+				free(mcm);
+			}
+			msg_to_char(ch, "You remove all the custom messages.\r\n");
+		}
+		else if (!isdigit(*arg2) || (num = atoi(arg2)) < 1) {
+			msg_to_char(ch, "Invalid custom message number.\r\n");
+		}
+		else {
+			found = FALSE;
+			for (mcm = MOB_CUSTOM_MSGS(mob); mcm && !found; mcm = mcm->next) {
+				if (--num == 0) {
+					found = TRUE;
+					
+					msg_to_char(ch, "You remove custom message #%d.\r\n", atoi(arg2));
+					
+					REMOVE_FROM_LIST(mcm, MOB_CUSTOM_MSGS(mob), next);
+					if (mcm->msg) {
+						free(mcm->msg);
+					}
+					free(mcm);
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid custom message number.\r\n");
+			}
+		}
+	}
+	else if (is_abbrev(arg1, "add")) {
+		msgstr = any_one_word(arg2, arg);
+		skip_spaces(&msgstr);
+		
+		if (!*arg || !*msgstr) {
+			msg_to_char(ch, "Usage: custom add <type> <string>\r\n");
+		}
+		else if ((msgtype = search_block(arg, mob_custom_types, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid type '%s'.\r\n", arg);
+		}
+		else {
+			delete_doubledollar(msgstr);
+			
+			CREATE(mcm, struct mob_custom_message, 1);
+
+			mcm->type = msgtype;
+			mcm->msg = str_dup(msgstr);
+			mcm->next = NULL;
+			
+			// append to end
+			if (MOB_CUSTOM_MSGS(mob)) {
+				temp = MOB_CUSTOM_MSGS(mob);
+				while (temp->next) {
+					temp = temp->next;
+				}
+				temp->next = mcm;
+			}
+			else {
+				MOB_CUSTOM_MSGS(mob) = mcm;
+			}
+			
+			msg_to_char(ch, "You add a custom '%s' message:\r\n%s\r\n", mob_custom_types[mcm->type], mcm->msg);			
+		}
+	}
+	else if (is_abbrev(arg1, "change")) {
+		half_chop(arg2, num_arg, arg1);
+		half_chop(arg1, type_arg, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: custom change <number> <type | message> <value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		for (mcm = MOB_CUSTOM_MSGS(mob); mcm && !change; mcm = mcm->next) {
+			if (--num == 0) {
+				change = mcm;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid custom message number.\r\n");
+		}
+		else if (is_abbrev(type_arg, "type")) {
+			if ((msgtype = search_block(val_arg, mob_custom_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid type '%s'.\r\n", val_arg);
+			}
+			else {
+				change->type = msgtype;
+				msg_to_char(ch, "Custom message %d changed to type %s.\r\n", atoi(num_arg), mob_custom_types[msgtype]);
+			}
+		}
+		else if (is_abbrev(type_arg, "message")) {
+			if (change->msg) {
+				free(change->msg);
+			}
+			change->msg = str_dup(val_arg);
+			msg_to_char(ch, "Custom message %d changed to: %s\r\n", atoi(num_arg), val_arg);
+		}
+		else {
+			msg_to_char(ch, "You can only change the type or message.\r\n");
+		}
+	}
+	else {
+		msg_to_char(ch, "Usage: custom add <type> <message>\r\n");
+		msg_to_char(ch, "Usage: custom change <number> <type | message> <value>\r\n");
+		msg_to_char(ch, "Usage: custom remove <number | all>\r\n");
+		msg_to_char(ch, "Available types:\r\n");
+		for (iter = 0; *mob_custom_types[iter] != '\n'; ++iter) {
+			msg_to_char(ch, " %s\r\n", mob_custom_types[iter]);
+		}
+	}
 }
 
 

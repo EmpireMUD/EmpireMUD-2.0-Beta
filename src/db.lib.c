@@ -3344,6 +3344,23 @@ void parse_mobile(FILE *mob_f, int nr) {
 				break;
 			}
 			
+			case 'M': {	// custom messages
+				struct mob_custom_message *mcm;
+				
+				if (!get_line(mob_f, line) || sscanf(line, "%d", &t[0]) != 1) {
+					log("SYSERR: Unable to read message type for 'M' line of %s", buf2);
+					exit(1);
+				}
+				
+				CREATE(mcm, struct mob_custom_message, 1);
+				mcm->type = t[0];
+				mcm->msg = fread_string(mob_f, buf2);
+				mcm->next = NULL;
+				
+				LL_APPEND(MOB_CUSTOM_MSGS(mob), mcm);
+				break;
+			}
+			
 			case 'T': {	// trigger
 				parse_trig_proto(line, &(mob->proto_script), buf2);
 				break;
@@ -3370,6 +3387,7 @@ void parse_mobile(FILE *mob_f, int nr) {
 */
 void write_mob_to_file(FILE *fl, char_data *mob) {
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
+	struct mob_custom_message *mcm;
 	
 	if (!fl || !mob) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_mob_to_file called without %s", !fl ? "file" : "mob");
@@ -3396,6 +3414,13 @@ void write_mob_to_file(FILE *fl, char_data *mob) {
 	
 	// I: interactions
 	write_interactions_to_file(fl, mob->interactions);
+	
+	// M: custom message
+	LL_FOREACH(MOB_CUSTOM_MSGS(mob), mcm) {
+		fprintf(fl, "M\n");
+		fprintf(fl, "%d\n", mcm->type);
+		fprintf(fl, "%s~\n", mcm->msg);
+	}
 	
 	// T, V: triggers
 	write_trig_protos_to_file(fl, 'T', mob->proto_script);

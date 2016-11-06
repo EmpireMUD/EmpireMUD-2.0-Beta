@@ -2515,6 +2515,29 @@ The following attack types are available:
 
 See also: OLC MOBILES
 #d
+"MEDIT CUSTOM"
+
+Usage:  .custom add <type> <message>
+        .custom change <number> <type | message> <value>
+        .custom remove <number | all>
+
+You can set custom messages on mobs, which are shown at different times
+depending upon the type of message.
+
+Some messages may use the tokens $n/$e/$s/$m for name/he/his/him for the mob.
+
+If you set more than one message of the same type, one will be chosen at
+random each time.
+
+Message types:
+ &cemote&0 - The message is shown to the room periodically (may use $ tokens).
+ &csay&0 - The message is said aloud by the mob periodically.
+
+Note: The 'emote' and 'say' types share the same random interval, and the mob
+will only do one or the other each time.
+
+See also: OLC MOBILES
+#d
 "MEDIT FLAGS"
 
 Usage:  .flags <type>

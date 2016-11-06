@@ -1034,6 +1034,11 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_NO_RESCALE  BIT(32)	// G. mob won't rescale (after the first time), e.g. if specific traits were set
 
 
+// MOB_CUSTOM_x: custom message types
+#define MOB_CUSTOM_EMOTE  0
+#define MOB_CUSTOM_SAY  1
+
+
 // MOB_MOVE_x: mob/vehicle movement types
 #define MOB_MOVE_WALK  0
 #define MOB_MOVE_CLIMB  1
@@ -2676,7 +2681,8 @@ struct mob_special_data {
 	int max_scale_level;	// maximum level this mob may be scaled to
 	
 	int name_set;	// NAMES_x
-
+	struct mob_custom_message *custom_msgs;	// any custom messages
+	
 	int to_hit;	// Mob's attack % bonus
 	int to_dodge;	// Mob's dodge % bonus
 	int damage;	// Raw damage
@@ -2694,6 +2700,15 @@ struct mob_special_data {
 	// for #n-named mobs
 	int dynamic_sex;
 	int dynamic_name;
+};
+
+
+// for mobs' custom action messages
+struct mob_custom_message {
+	int type;	// MOB_CUSTOM_x
+	char *msg;
+	
+	struct mob_custom_message *next;
 };
 
 

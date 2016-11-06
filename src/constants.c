@@ -1481,6 +1481,14 @@ const char *action_bits[] = {
 };
 
 
+// MOB_CUSTOM_x
+const char *mob_custom_types[] = {
+	"emote",
+	"say",
+	"\n"
+};
+
+
 // MOB_MOVE_x: mob/vehicle move types
 const char *mob_move_types[] = {
 	"walks",
