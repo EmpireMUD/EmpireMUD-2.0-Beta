@@ -1159,16 +1159,26 @@ void naturalize_newbie_islands(void) {
 			if (ROOM_PEOPLE(room)) {
 				act("The area returns to nature!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 			}
+			
+			if (SECT_FLAGGED(map->natural_sector, SECTF_HAS_CROP_DATA)) {
+				set_crop_type(room, get_potential_crop_for_location(room));
+			}
 		}
 		else {
 			perform_change_sect(NULL, map, map->natural_sector);
 			perform_change_base_sect(NULL, map, map->natural_sector);
+			
+			if (SECT_FLAGGED(map->natural_sector, SECTF_HAS_CROP_DATA)) {
+				room = real_room(map->vnum);	// need it loaded after all
+				set_crop_type(room, get_potential_crop_for_location(room));
+			}
 		}
 		++count;
 	}
 	
 	if (count) {
 		log("New year: naturalized %d tile%s on newbie islands.", count, PLURAL(count));
+		world_map_needs_save = TRUE;
 	}
 }
 

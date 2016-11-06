@@ -27,8 +27,12 @@
 *   Edit Modules
 */
 
+// external vars
+extern bool world_map_needs_save;
+
 // external funcs
 void complete_building(room_data *room);
+extern crop_data *get_potential_crop_for_location(room_data *location);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -529,6 +533,9 @@ OLC_MODULE(mapedit_naturalize) {
 			// looks good: naturalize it
 			if (room) {
 				change_terrain(room, GET_SECT_VNUM(map->natural_sector));
+				if (SECT_FLAGGED(map->natural_sector, SECTF_HAS_CROP_DATA)) {
+					set_crop_type(room, get_potential_crop_for_location(room));
+				}
 				if (ROOM_PEOPLE(room)) {
 					act("The area is naturalized!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 				}
@@ -536,11 +543,18 @@ OLC_MODULE(mapedit_naturalize) {
 			else {
 				perform_change_sect(NULL, map, map->natural_sector);
 				perform_change_base_sect(NULL, map, map->natural_sector);
+				
+				if (SECT_FLAGGED(map->natural_sector, SECTF_HAS_CROP_DATA)) {
+					room = real_room(map->vnum);	// need it loaded after all
+					set_crop_type(room, get_potential_crop_for_location(room));
+				}
 			}
 			++count;
 		}
 		
 		if (count > 0) {
+			world_map_needs_save = TRUE;
+			
 			if (island) {
 				isle = get_island(island_id, TRUE);
 				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has naturalized %d tile%s on island %d %s", GET_NAME(ch), count, PLURAL(count), island_id, isle->name);
@@ -558,6 +572,7 @@ OLC_MODULE(mapedit_naturalize) {
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has set naturalized the sector at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 		msg_to_char(ch, "You have naturalized the sector for this tile.\r\n");
 		act("$n has naturalized the area!", FALSE, ch, NULL, NULL, TO_ROOM);
+		world_map_needs_save = TRUE;
 	}
 }
 
@@ -610,6 +625,7 @@ OLC_MODULE(mapedit_remember) {
 		if (count > 0) {
 			isle = get_island(island_id, TRUE);
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has set 'remember' for %d tile%s on island %d %s", GET_NAME(ch), count, PLURAL(count), island_id, isle->name);
+			world_map_needs_save = TRUE;
 		}
 		msg_to_char(ch, "You have set the map to remember sectors for %d tile%s on this island.\r\n", count, PLURAL(count));
 	}
@@ -619,6 +635,7 @@ OLC_MODULE(mapedit_remember) {
 		
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has set 'remember' for %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 		msg_to_char(ch, "You have set the map to remember the sector for this tile.\r\n");
+		world_map_needs_save = TRUE;
 	}
 }
 
