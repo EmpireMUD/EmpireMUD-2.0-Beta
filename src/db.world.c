@@ -70,6 +70,7 @@ int count_city_points_used(empire_data *emp);
 struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 void decustomize_room(room_data *room);
 room_vnum find_free_vnum();
+crop_data *get_potential_crop_for_location(room_data *location);
 void grow_crop(room_data *room);
 void init_room(room_data *room, room_vnum vnum);
 void naturalize_newbie_islands();
