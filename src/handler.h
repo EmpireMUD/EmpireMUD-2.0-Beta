@@ -215,7 +215,9 @@ extern obj_data *unequip_char(char_data *ch, int pos);
 void unequip_char_to_inventory(char_data *ch, int pos);
 void unequip_char_to_room(char_data *ch, int pos);
 
-// object message handlers
+// custom message handlers
+extern struct custom_message *copy_custom_messages(struct custom_message *from);
+void free_custom_messages(struct custom_message *mes);
 extern char *get_custom_message(obj_data *obj, int type);
 extern bool has_custom_message(obj_data *obj, int type);
 

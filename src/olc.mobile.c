@@ -637,7 +637,6 @@ void save_olc_mobile(descriptor_data *desc) {
 	char_data *mob = GET_OLC_MOBILE(desc), *mob_iter, *proto;
 	mob_vnum vnum = GET_OLC_VNUM(desc);
 	struct interaction_item *interact;
-	struct mob_custom_message *mcm;
 	struct quest_lookup *ql;
 	UT_hash_handle hh;
 	bool changed;
@@ -717,14 +716,8 @@ void save_olc_mobile(descriptor_data *desc) {
 		proto->interactions = interact->next;
 		free(interact);
 	}
-	while ((mcm = MOB_CUSTOM_MSGS(proto))) {
-		if (mcm->msg) {
-			free(mcm->msg);
-		}
-		MOB_CUSTOM_MSGS(proto) = mcm->next;
-		free(mcm);
-	}
-
+	free_custom_messages(MOB_CUSTOM_MSGS(proto));
+	
 	if (proto->proto_script) {
 		free_proto_scripts(&proto->proto_script);
 	}
@@ -751,7 +744,6 @@ void save_olc_mobile(descriptor_data *desc) {
 * @return char_data *The copied mob.
 */
 char_data *setup_olc_mobile(char_data *input) {
-	struct mob_custom_message *mcm, *mcm_iter;
 	char_data *new;
 	
 	CREATE(new, char_data, 1);
@@ -774,16 +766,7 @@ char_data *setup_olc_mobile(char_data *input) {
 		new->interactions = copy_interaction_list(input->interactions);
 		
 		// copy custom msgs
-		MOB_CUSTOM_MSGS(new) = NULL;
-		LL_FOREACH(MOB_CUSTOM_MSGS(input), mcm_iter) {
-			CREATE(mcm, struct mob_custom_message, 1);
-			
-			mcm->type = mcm_iter->type;
-			mcm->msg = str_dup(mcm_iter->msg);
-			mcm->next = NULL;
-			
-			LL_APPEND(MOB_CUSTOM_MSGS(new), mcm);
-		}
+		MOB_CUSTOM_MSGS(new) = copy_custom_messages(MOB_CUSTOM_MSGS(input));
 	}
 	else {
 		// brand new
@@ -816,7 +799,7 @@ void olc_show_mobile(char_data *ch) {
 	void get_script_display(struct trig_proto_list *list, char *save_buffer);
 
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
-	struct mob_custom_message *mcm;
+	struct custom_message *mcm;
 	int count;
 	
 	if (!mob) {
@@ -899,7 +882,7 @@ OLC_MODULE(medit_custom) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *msgstr;
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	struct mob_custom_message *mcm, *change, *temp;
+	struct custom_message *mcm, *change, *temp;
 	int num, iter, msgtype;
 	bool found;
 	
@@ -957,7 +940,7 @@ OLC_MODULE(medit_custom) {
 		else {
 			delete_doubledollar(msgstr);
 			
-			CREATE(mcm, struct mob_custom_message, 1);
+			CREATE(mcm, struct custom_message, 1);
 
 			mcm->type = msgtype;
 			mcm->msg = str_dup(msgstr);

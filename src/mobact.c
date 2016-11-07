@@ -803,7 +803,7 @@ void run_mob_echoes(void) {
 	ACMD(do_mecho);
 	ACMD(do_say);
 	
-	struct mob_custom_message *mcm, *found_mcm;
+	struct custom_message *mcm, *found_mcm;
 	char_data *ch, *mob, *found_mob;
 	descriptor_data *desc;
 	int count;
