@@ -557,7 +557,15 @@ I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
-T 9009
+M
+0
+$n moos contentedly.~
+M
+0
+$n eats some grass.~
+M
+0
+$n chews $s cud.~
 S
 #9153
 ox~

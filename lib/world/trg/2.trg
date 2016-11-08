@@ -79,6 +79,7 @@ end
 %echoaround% %actor% %actor.name% vanishes in a flash of light!
 %teleport% %actor% %actor.home%
 %force% %actor% look
+%echoaround% %actor% %actor.name% appears in a flash of light!
 eval last_hestian_time %timestamp%
 remote last_hestian_time %actor.id%
 nop %actor.cancel_adventure_summon%
@@ -155,6 +156,7 @@ end
 %echoaround% %actor% %actor.name% vanishes in a flourish of yellow light!
 %teleport% %actor% %startloc%
 %force% %actor% look
+%echoaround% %actor% %actor.name% appears in a flourish of yellow light!
 eval last_conveyance_time %timestamp%
 remote last_conveyance_time %actor.id%
 nop %actor.cancel_adventure_summon%
