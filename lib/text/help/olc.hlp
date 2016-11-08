@@ -2377,6 +2377,21 @@ Important notes:
 
 See also: MAP OLC
 #d
+"MAPEDIT NATURALIZE"
+
+Usage:  .map naturalize [island | world]
+
+This command will restore the sector for the map tile you're in, the whole
+island you're on, or the entire world. The tiles return to the state they
+were in when the map was first generated.
+
+When used on an island/world, claimed tiles are ignored. So are tiles that are
+unclaimable or which have adventures.
+
+You can change a tile/island's natural state with: .map remember [island]
+
+See also: MAP OLC, MAPEDIT REMEMBER
+#d
 "MAPEDIT PASSWALLS"
 
 Usage:  .map passwalls
@@ -2387,6 +2402,21 @@ the interior (designated) rooms of a building; they will instead move to the
 next map tile in the direction that they were walking.
 
 See also: MAP OLC
+#d
+"MAPEDIT REMEMBER"
+
+Usage:  .map remember [island]
+
+This command will store the current sector of the map tile you're in (or the
+entire island you're on) as the "natural" sector. This can be used to change
+how a newbie island will be restored at the end of the year, for example.
+
+Building and adventure tiles are ignored during this command.
+
+The opposite command is .map naturalize, which restores a room/island/world
+to its original state.
+
+See also: MAP OLC, MAPEDIT NATURALIZE
 #d
 "MAPEDIT ROOMTYPE" "MAPEDIT ROOM TYPE"
 
@@ -2482,6 +2512,29 @@ The following attack types are available:
 27. peck - animals
 28. gore - animals
 29. mana blast - normal magical attack (e.g. disarmed mage)
+
+See also: OLC MOBILES
+#d
+"MEDIT CUSTOM"
+
+Usage:  .custom add <type> <message>
+        .custom change <number> <type | message> <value>
+        .custom remove <number | all>
+
+You can set custom messages on mobs, which are shown at different times
+depending upon the type of message.
+
+Some messages may use the tokens $n/$e/$s/$m for name/he/his/him for the mob.
+
+If you set more than one message of the same type, one will be chosen at
+random each time.
+
+Message types:
+ &cecho&0 - The message is shown to the room periodically (may use $ tokens).
+ &csay&0 - The message is said aloud by the mob periodically.
+
+Note: The 'echo' and 'say' types share the same random interval, and the mob
+will only do one or the other each time.
 
 See also: OLC MOBILES
 #d

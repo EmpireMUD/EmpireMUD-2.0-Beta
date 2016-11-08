@@ -3028,6 +3028,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern const char *cooldown_types[];
 	extern const char *damage_types[];
 	extern const double hit_per_dex;
+	extern const char *mob_custom_types[];
 	extern const char *mob_move_types[];
 	extern const char *player_bits[];
 	extern const char *position_types[];
@@ -3180,6 +3181,15 @@ void do_stat_character(char_data *ch, char_data *k) {
 		send_to_char("Interactions:\r\n", ch);
 		get_interaction_display(k->interactions, buf);
 		send_to_char(buf, ch);
+	}
+	
+	if (MOB_CUSTOM_MSGS(k)) {
+		struct custom_message *mcm;
+		
+		msg_to_char(ch, "Custom messages:\r\n");
+		LL_FOREACH(MOB_CUSTOM_MSGS(k), mcm) {
+			msg_to_char(ch, " %s: %s\r\n", mob_custom_types[mcm->type], mcm->msg);
+		}
 	}
 
 	if (!IS_NPC(k)) {
@@ -3475,7 +3485,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	obj_vnum vnum = GET_OBJ_VNUM(j);
 	obj_data *j2;
 	struct obj_storage_type *store;
-	struct obj_custom_message *ocm;
+	struct custom_message *ocm;
 	player_index_data *index;
 	crop_data *cp;
 

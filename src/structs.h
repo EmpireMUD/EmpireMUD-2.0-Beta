@@ -1034,6 +1034,11 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_NO_RESCALE  BIT(32)	// G. mob won't rescale (after the first time), e.g. if specific traits were set
 
 
+// MOB_CUSTOM_x: custom message types
+#define MOB_CUSTOM_ECHO  0
+#define MOB_CUSTOM_SAY  1
+
+
 // MOB_MOVE_x: mob/vehicle movement types
 #define MOB_MOVE_WALK  0
 #define MOB_MOVE_CLIMB  1
@@ -1069,6 +1074,8 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_MOVE_BOUNCES  31
 #define MOB_MOVE_FLOWS  32
 #define MOB_MOVE_LEAVES  33
+#define MOB_MOVE_SHUFFLES  34
+#define MOB_MOVE_MARCHES  35
 
 
 // name sets: add matching files in lib/text/names/
@@ -2676,7 +2683,8 @@ struct mob_special_data {
 	int max_scale_level;	// maximum level this mob may be scaled to
 	
 	int name_set;	// NAMES_x
-
+	struct custom_message *custom_msgs;	// any custom messages
+	
 	int to_hit;	// Mob's attack % bonus
 	int to_dodge;	// Mob's dodge % bonus
 	int damage;	// Raw damage
@@ -2694,6 +2702,15 @@ struct mob_special_data {
 	// for #n-named mobs
 	int dynamic_sex;
 	int dynamic_name;
+};
+
+
+// for mobs/objs custom action messages
+struct custom_message {
+	int type;	// OBJ_CUSTOM_ or MOB_CUSTOM_
+	char *msg;
+	
+	struct custom_message *next;
 };
 
 
@@ -3718,7 +3735,7 @@ struct obj_data {
 	char *short_description;	// sentence-building; when worn/carry/in cont.
 	char *action_description;	// What to write when looked at
 	struct extra_descr_data *ex_description;	// extra descriptions
-	struct obj_custom_message *custom_msgs;	// any custom messages
+	struct custom_message *custom_msgs;	// any custom messages
 	vehicle_data *in_vehicle;	// in vehicle or NULL
 	char_data *carried_by;	// Carried by NULL in room/container
 	char_data *worn_by;	// Worn by?
@@ -3749,15 +3766,6 @@ struct obj_data {
 	bool search_mark;
 	
 	UT_hash_handle hh;	// object_table hash
-};
-
-
-// for object custom action messages
-struct obj_custom_message {
-	int type;	// OBJ_CUSTOM_x
-	char *msg;
-	
-	struct obj_custom_message *next;
 };
 
 

@@ -838,6 +838,7 @@ void heartbeat(int heart_pulse) {
 	void reduce_stale_empires();
 	void reset_instances();
 	void run_map_evolutions();
+	void run_mob_echoes();
 	void sanity_check();
 	void save_marked_empires();
 	void update_actions();
@@ -890,6 +891,8 @@ void heartbeat(int heart_pulse) {
 		if (debug_log && HEARTBEAT(15)) { log("debug  7:\t%lld", microtime()); }
 		check_death_respawn();
 		if (debug_log && HEARTBEAT(15)) { log("debug  7.5:\t%lld", microtime()); }
+		run_mob_echoes();
+		if (debug_log && HEARTBEAT(15)) { log("debug  7.6:\t%lld", microtime()); }
 	}
 
 	if (HEARTBEAT(30)) {

@@ -278,11 +278,17 @@ return 1
 Gemfruit decay~
 1 f 0
 ~
-if !%self.carried_by% || %random.4% == 1
-  halt
+eval actor %self.carried_by%
+eval gem 0
+if %actor%
+  if %actor.is_pc%
+    if %random.4% != 1
+      eval gem %random.4%
+    end
+  end
 end
 eval object nothing
-switch %random.4%
+switch %gem%
   case 1
     * iris
     eval object an iridescent blue iris
@@ -308,9 +314,9 @@ switch %random.4%
   break
 done
 if %self.carried_by%
-  %send% %self.carried_by% %self.shortdesc% disintegrates, leaving behind %object%!
+  %send% %self.carried_by% %self.shortdesc% in your inventory disintegrates, leaving behind %object%!
 else
-  %echo% %self.shortdesc% disintegrates, leaving behind %object%!
+  %echo% %self.shortdesc% in the room disintegrates, leaving behind %object%!
 end
 %purge% %self%
 ~

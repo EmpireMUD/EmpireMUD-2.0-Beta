@@ -796,6 +796,73 @@ void mobile_activity(void) {
 }
 
 
+/**
+* This is called every few seconds to animate mobs in the room with players.
+*/
+void run_mob_echoes(void) {
+	ACMD(do_mecho);
+	ACMD(do_say);
+	
+	struct custom_message *mcm, *found_mcm;
+	char_data *ch, *mob, *found_mob;
+	descriptor_data *desc;
+	int count;
+	
+	LL_FOREACH(descriptor_list, desc) {
+		// validate ch
+		if (STATE(desc) != CON_PLAYING || !(ch = desc->character) || !AWAKE(ch)) {
+			continue;
+		}
+		
+		// 25% random chance per player to happen at all...
+		if (number(0, 3)) {
+			continue;
+		}
+		
+		// initialize vars
+		found_mob = NULL;
+		found_mcm = NULL;
+		count = 0;
+		
+		// now find a mob with a valid message
+		LL_FOREACH(ROOM_PEOPLE(IN_ROOM(ch)), mob) {
+			// things that disqualify the mob
+			if (mob->desc || !IS_NPC(mob) || FIGHTING(mob) || !AWAKE(mob) || MOB_FLAGGED(mob, MOB_TIED) || IS_INJURED(mob, INJ_TIED) || GET_LED_BY(mob)) {
+				continue;
+			}
+			
+			// ok now find a random message to show?
+			LL_FOREACH(MOB_CUSTOM_MSGS(mob), mcm) {
+				// MOB_CUSTOM_x: types we use here
+				if (mcm->type != MOB_CUSTOM_ECHO && mcm->type != MOB_CUSTOM_SAY) {
+					continue;
+				}
+				
+				// looks good! pick one at random
+				if (!number(0, count++) || !found_mcm) {
+					found_mob = mob;
+					found_mcm = mcm;
+				}
+			}
+		}
+		
+		// did we find something to show?
+		if (found_mcm) {
+			// MOB_CUSTOM_x
+			switch (found_mcm->type) {
+				case MOB_CUSTOM_ECHO: {
+					do_mecho(found_mob, found_mcm->msg, 0, 0);
+					break;
+				}
+				case MOB_CUSTOM_SAY: {
+					do_say(found_mob, found_mcm->msg, 0, 0);
+					break;
+				}
+			}
+		}
+	}
+}
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// MOB SPAWNING ////////////////////////////////////////////////////////////

@@ -8,7 +8,12 @@ A brown wolf snarls at you.
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
-T 9001
+M
+0
+$n looks directly at you, opens $s mouth to show $s fangs, and growls deep in $s chest as $s hackles stand on end...~
+M
+0
+$n points $s muzzle toward the sky and howls.~
 S
 #9002
 wolf brown~
@@ -19,7 +24,21 @@ A brown wolf is sitting here.
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
-T 9001
+M
+0
+$n pants, with $s tongue hanging out and tail gently wagging.~
+M
+0
+$n yawns, showing off an impressive set of gleaming white fangs.~
+M
+0
+$n rolls around, all four paws in the air, making odd snorting sounds.~
+M
+0
+$n scratches $s ear with a hind foot.~
+M
+0
+$n points $s muzzle toward the sky and howls.~
 S
 #9003
 wolf small brown~
@@ -30,7 +49,21 @@ A small, brown wolf is resting here.
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
-T 9001
+M
+0
+$n pants, with $s tongue hanging out and tail gently wagging.~
+M
+0
+$n yawns, showing off an impressive set of gleaming white fangs.~
+M
+0
+$n rolls around, all four paws in the air, making odd snorting sounds.~
+M
+0
+$n scratches $s ear with a hind foot.~
+M
+0
+$n points $s muzzle toward the sky and howls.~
 S
 #9004
 sheep fluffy~
@@ -44,6 +77,15 @@ I 1 1351 100.00 1  # SKIN: a large skin
 I 2 1358 100.00 1  # SHEAR: a bag of wool
 I 2 1358 50.00 1  # SHEAR: a bag of wool
 I 2 1358 5.00 1  # SHEAR: a bag of wool
+M
+0
+$n chews %self.hisher% cud.~
+M
+0
+$n eats some grass.~
+M
+0
+$n baas contentedly.~
 S
 #9005
 goat mountain~
@@ -86,7 +128,12 @@ A small squirrel sits on his haunches and stares at you.
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
-T 9008
+M
+0
+$n bombards you with acorns!~
+M
+0
+$n chatters angrily at you for invading $s territory!~
 S
 #9009
 cow hefty~
@@ -98,7 +145,15 @@ A hefty cow is grazing here.
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-T 9009
+M
+0
+$n moos contentedly.~
+M
+0
+$n eats some grass.~
+M
+0
+$n chews $s cud.~
 S
 #9010
 chicken~
@@ -108,7 +163,18 @@ A chicken is pecking at the ground.
 1 5 djo 0
 2 0 0 10
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-T 9010
+M
+0
+$n clucks with contentment as $e preens $mself.~
+M
+0
+$n clucks in panic as $e desperately flaps $s wings in an attempt to escape a threat that only $e perceives!~
+M
+0
+$n deftly catches a bug in its beak and gobbles it down.~
+M
+0
+$n searches around on the ground, looking for bugs.~
 S
 #9011
 rooster~
@@ -118,7 +184,18 @@ A rooster is crowing at you.
 1 5 djo 0
 1 0 0 10
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-T 9011
+M
+0
+$n clucks with contentment as $e preens $mself.~
+M
+0
+$n clucks in panic as $e desperately flaps $s wings in an attempt to escape a threat that only $e perceives!~
+M
+0
+$n deftly catches a bug in its beak and gobbles it down.~
+M
+0
+$n searches around on the ground, looking for bugs.~
 S
 #9012
 dog large~
@@ -128,7 +205,30 @@ A large dog is lying in the sun.
 5 15 djoz c
 0 0 14 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
-T 9012
+M
+0
+$n gives a mournful, pleading look, as if $e hasn't eaten in months.~
+M
+0
+$n pants, with $s tongue hanging out and tail gently wagging.~
+M
+0
+$n shakes vigorously showering you with doggy scented drops of water.~
+M
+0
+$n jumps up on you, getting mud all over you!~
+M
+0
+$n sniffs at the ground.~
+M
+0
+$n yawns, showing off an impressive set of gleaming white fangs.~
+M
+0
+$n rolls around, all four paws in the air, making odd snorting sounds.~
+M
+0
+$n scratches $s ear with a hind foot.~
 S
 #9013
 prairie dog~
@@ -139,6 +239,12 @@ A small prairie dog pokes its head out of the ground.
 0 0 0 9
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
+M
+0
+$n stands on $s hind legs and looks around.~
+M
+0
+$n peeks out of $s hole.~
 S
 #9016
 tiger hungry~
@@ -171,7 +277,9 @@ A hideous vulture circles over your head.
 5 15 djo m
 0 0 2 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-T 9018
+M
+0
+$n circles high overhead, patiently waiting...~
 S
 #9019
 shark huge~
@@ -193,7 +301,15 @@ A stout quail dashes past you.
 1 5 djo 0
 0 0 0 9
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
-T 9020
+M
+0
+$n calls, 'Bob, Bob, White'.~
+M
+0
+$n calls, 'Bob, White'.~
+M
+0
+$n runs around on the ground looking for food.~
 S
 #9021
 donkey mule grey~

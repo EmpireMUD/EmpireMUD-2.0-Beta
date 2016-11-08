@@ -925,7 +925,10 @@ void free_char(char_data *ch) {
 			free(interact);
 		}
 	}
-
+	if (MOB_CUSTOM_MSGS(ch) && (!proto || MOB_CUSTOM_MSGS(ch) != MOB_CUSTOM_MSGS(proto))) {
+		free_custom_messages(MOB_CUSTOM_MSGS(ch));
+	}
+	
 	if (ch->desc) {
 		ch->desc->character = NULL;
 	}

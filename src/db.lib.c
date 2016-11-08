@@ -69,6 +69,7 @@ void sort_world_table();
 int check_object(obj_data *obj);
 int count_hash_records(FILE *fl);
 empire_vnum find_free_empire_vnum(void);
+void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
 void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
 void parse_generic_name_file(FILE *fl, char *err_str);
 void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part);
@@ -76,6 +77,7 @@ void parse_interaction(char *line, struct interaction_item **list, char *error_p
 void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 int sort_empires(empire_data *a, empire_data *b);
 int sort_room_templates(room_template *a, room_template *b);
+void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list);
 void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list);
 void write_interactions_to_file(FILE *fl, struct interaction_item *list);
@@ -3344,6 +3346,11 @@ void parse_mobile(FILE *mob_f, int nr) {
 				break;
 			}
 			
+			case 'M': {	// custom messages
+				parse_custom_message(mob_f, &MOB_CUSTOM_MSGS(mob), buf2);
+				break;
+			}
+			
 			case 'T': {	// trigger
 				parse_trig_proto(line, &(mob->proto_script), buf2);
 				break;
@@ -3396,6 +3403,9 @@ void write_mob_to_file(FILE *fl, char_data *mob) {
 	
 	// I: interactions
 	write_interactions_to_file(fl, mob->interactions);
+	
+	// M: custom message
+	write_custom_messages_to_file(fl, 'M', MOB_CUSTOM_MSGS(mob));
 	
 	// T, V: triggers
 	write_trig_protos_to_file(fl, 'T', mob->proto_script);
@@ -3456,7 +3466,6 @@ void free_obj_binding(struct obj_binding **list) {
 void free_obj(obj_data *obj) {
 	struct interaction_item *interact;
 	struct obj_storage_type *store;
-	struct obj_custom_message *ocm;
 	obj_data *proto;
 	
 	proto = obj_proto(GET_OBJ_VNUM(obj));
@@ -3493,14 +3502,8 @@ void free_obj(obj_data *obj) {
 		}
 	}
 	
-	if (obj->custom_msgs && (!proto || obj->custom_msgs != proto->custom_msgs)) {		
-		while ((ocm = obj->custom_msgs)) {
-			if (ocm->msg) {
-				free(ocm->msg);
-			}
-			obj->custom_msgs = ocm->next;
-			free(ocm);
-		}
+	if (obj->custom_msgs && (!proto || obj->custom_msgs != proto->custom_msgs)) {
+		free_custom_messages(obj->custom_msgs);
 	}
 	
 	free_obj_binding(&OBJ_BOUND_TO(obj));
@@ -3531,7 +3534,6 @@ void parse_object(FILE *obj_f, int nr) {
 	int t[10], retval;
 	char *tmpptr;
 	char f1[256], f2[256];
-	struct obj_custom_message *ocm, *last_ocm = NULL;
 	struct obj_storage_type *store, *last_store = NULL;
 	struct obj_apply *apply, *last_apply = NULL;
 	obj_data *obj, *find;
@@ -3682,25 +3684,7 @@ void parse_object(FILE *obj_f, int nr) {
 			}
 						
 			case 'M': {	// custom messages
-				if (!get_line(obj_f, line) || sscanf(line, "%d", &t[0]) != 1) {
-					log("SYSERR: Unable to read message type for 'M' line of %s", buf2);
-					exit(1);
-				}
-				
-				CREATE(ocm, struct obj_custom_message, 1);
-				ocm->type = t[0];
-				ocm->msg = fread_string(obj_f, buf2);
-				ocm->next = NULL;
-				
-				// preserve order of the messages
-				if (last_ocm) {
-					last_ocm->next = ocm;
-				}
-				else {
-					obj->custom_msgs = ocm;
-				}
-				
-				last_ocm = ocm;
+				parse_custom_message(obj_f, &obj->custom_msgs, buf2);
 				break;
 			}
 			
@@ -3770,7 +3754,6 @@ void parse_object(FILE *obj_f, int nr) {
 void write_obj_to_file(FILE *fl, obj_data *obj) {
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
 	struct obj_storage_type *store;
-	struct obj_custom_message *ocm;
 	struct obj_apply *apply;
 	
 	if (!fl || !obj) {
@@ -3824,11 +3807,7 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	write_interactions_to_file(fl, obj->interactions);
 	
 	// M: custom message
-	for (ocm = obj->custom_msgs; ocm; ocm = ocm->next) {
-		fprintf(fl, "M\n");
-		fprintf(fl, "%d\n", ocm->type);
-		fprintf(fl, "%s~\n", ocm->msg);
-	}
+	write_custom_messages_to_file(fl, 'M', obj->custom_msgs);
 	
 	// O: component data
 	if (GET_OBJ_CMP_TYPE(obj) != CMP_NONE) {
@@ -6472,6 +6451,51 @@ empire_vnum find_free_empire_vnum(void) {
 	
 	// there's no fffing way there are more than MAX_INT-1 empires -pc
 	return NOTHING;
+}
+
+
+/**
+* Reads in a custom message, after the 'M' tag (or whichever letter) has been
+* read.
+*
+* @param FILE *fl The file already open for reading.
+* @param struct custom_message **list The list to append the message to.
+* @param char *error The partial error message, in case of emergencies.
+*/
+void parse_custom_message(FILE *fl, struct custom_message **list, char *error) {
+	char line[MAX_STRING_LENGTH];
+	struct custom_message *mes;
+	int num;
+	
+	if (!get_line(fl, line) || sscanf(line, "%d", &num) != 1) {
+		log("SYSERR: Unable to read message type for custom message line of %s", error);
+		exit(1);
+	}
+	
+	CREATE(mes, struct custom_message, 1);
+	mes->type = num;
+	mes->msg = fread_string(fl, error);
+	
+	LL_APPEND(*list, mes);
+}
+
+
+/**
+* Writes out a set of custom messages to a mob/obj file.
+*
+* @param FILE *fl The file, open for writing.
+* @param char letter The key letter (usually 'M').
+* @param struct custom_message *list The list to write.
+*/
+void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list) {
+	struct custom_message *iter;
+	
+	// M: custom message
+	LL_FOREACH(list, iter) {
+		fprintf(fl, "%c\n", letter);
+		fprintf(fl, "%d\n", iter->type);
+		fprintf(fl, "%s~\n", iter->msg);
+	}
 }
 
 
