@@ -759,10 +759,12 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// CROP DEFINES ////////////////////////////////////////////////////////////
 
-// crop flags
+// CROPF_x: crop flags
 #define CROPF_REQUIRES_WATER  BIT(0)	// only plants near water
 #define CROPF_IS_ORCHARD  BIT(1)	// follows orchard rules
 #define CROPF_NOT_WILD  BIT(2)	// crop will never spawn in the wild
+#define CROPF_NEWBIE_ONLY  BIT(3)	// only spawns on newbie islands
+#define CROPF_NO_NEWBIE  BIT(4)	// never spawns on newbie islands
 
 
  //////////////////////////////////////////////////////////////////////////////

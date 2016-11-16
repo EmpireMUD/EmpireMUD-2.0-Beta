@@ -2391,6 +2391,8 @@ const char *crop_flags[] = {
 	"REQUIRES-WATER",
 	"ORCHARD",
 	"!WILD",
+	"NEWBIE-ONLY",
+	"!NEWBIE",
 	"\n"
 };
 

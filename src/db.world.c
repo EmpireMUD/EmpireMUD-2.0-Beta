@@ -2337,6 +2337,7 @@ crop_data *get_potential_crop_for_location(room_data *location) {
 	int x = X_COORD(location), y = Y_COORD(location);
 	bool water = find_flagged_sect_within_distance_from_room(location, SECTF_FRESH_WATER, NOBITS, config_get_int("water_crop_distance"));
 	bool x_min_ok, x_max_ok, y_min_ok, y_max_ok;
+	struct island_info *isle = NULL;
 	int climate;
 	crop_data *found, *crop, *next_crop;
 	int num_found = 0;
@@ -2360,21 +2361,36 @@ crop_data *get_potential_crop_for_location(room_data *location) {
 	// find any match
 	found = NULL;
 	HASH_ITER(hh, crop_table, crop, next_crop) {
-		if (GET_CROP_CLIMATE(crop) == climate && !CROP_FLAGGED(crop, CROPF_NOT_WILD)) {
-			if (water || !CROP_FLAGGED(crop, CROPF_REQUIRES_WATER) ) {
-				// check bounds
-				x_min_ok = (x >= (GET_CROP_X_MIN(crop) * MAP_WIDTH / 100));
-				x_max_ok = (x <= (GET_CROP_X_MAX(crop) * MAP_WIDTH / 100));
-				y_min_ok = (y >= (GET_CROP_Y_MIN(crop) * MAP_HEIGHT / 100));
-				y_max_ok = (y <= (GET_CROP_Y_MAX(crop) * MAP_HEIGHT / 100));
-			
-				if ((x_min_ok && x_max_ok) || (GET_CROP_X_MIN(crop) > GET_CROP_X_MAX(crop) && (x_min_ok || x_max_ok))) {
-					if ((y_min_ok && y_max_ok) || (GET_CROP_Y_MIN(crop) > GET_CROP_Y_MAX(crop) && (y_min_ok || y_max_ok))) {
-						// valid
-						if (!number(0, num_found++) || !found) {
-							found = crop;
-						}
-					}
+		// basic checks
+		if (GET_CROP_CLIMATE(crop) != climate || CROP_FLAGGED(crop, CROPF_NOT_WILD)) {
+			continue;
+		}
+		if (CROP_FLAGGED(crop, CROPF_REQUIRES_WATER) && !water) {
+			continue;
+		}
+		if (CROP_FLAGGED(crop, CROPF_NO_NEWBIE | CROPF_NEWBIE_ONLY)) {
+			if (!isle) {
+				isle = get_island(GET_ISLAND_ID(location), TRUE);
+			}
+			if (CROP_FLAGGED(crop, CROPF_NO_NEWBIE) && IS_SET(isle->flags, ISLE_NEWBIE)) {
+				continue;
+			}
+			if (CROP_FLAGGED(crop, CROPF_NEWBIE_ONLY) && !IS_SET(isle->flags, ISLE_NEWBIE)) {
+				continue;
+			}
+		}
+		
+		// check bounds
+		x_min_ok = (x >= (GET_CROP_X_MIN(crop) * MAP_WIDTH / 100));
+		x_max_ok = (x <= (GET_CROP_X_MAX(crop) * MAP_WIDTH / 100));
+		y_min_ok = (y >= (GET_CROP_Y_MIN(crop) * MAP_HEIGHT / 100));
+		y_max_ok = (y <= (GET_CROP_Y_MAX(crop) * MAP_HEIGHT / 100));
+		
+		if ((x_min_ok && x_max_ok) || (GET_CROP_X_MIN(crop) > GET_CROP_X_MAX(crop) && (x_min_ok || x_max_ok))) {
+			if ((y_min_ok && y_max_ok) || (GET_CROP_Y_MIN(crop) > GET_CROP_Y_MAX(crop) && (y_min_ok || y_max_ok))) {
+				// valid
+				if (!number(0, num_found++) || !found) {
+					found = crop;
 				}
 			}
 		}

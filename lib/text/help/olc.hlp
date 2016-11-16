@@ -1900,6 +1900,9 @@ Crop flags determine some various properties about crops.
 Available flags:
  REQUIRES-WATER - Can only be planted within 4 tiles of fresh water
  ORCHARD - Uses 'pick' instead of 'harvest', shows the orchard commands list, can be chopped down
+ !WILD - Won't spawn in the wild
+ NEWBIE-ONLY - Only spawns on newbie islands (can be planted anywhere)
+ !NEWBIE - Does not spawn on newbie islands
 
 See also: OLC CROPS
 #d
