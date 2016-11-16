@@ -41,7 +41,9 @@
 extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern double get_base_dps(obj_data *weapon);
 extern obj_data *find_chip_weapon(char_data *ch);
+extern char *get_mine_type_name(room_data *room);
 extern obj_data *has_sharp_tool(char_data *ch);
+extern bool is_deep_mine(room_data *room);
 void process_build(char_data *ch, room_data *room, int act_type);
 void scale_item_to_level(obj_data *obj, int level);
 
@@ -344,6 +346,27 @@ obj_data *has_shovel(char_data *ch) {
 	}
 	
 	return NULL;
+}
+
+
+/**
+* Display prospect information for the room.
+*
+* @param char_data *ch The person seeing the info.
+* @param room_data *room The room to prospect.
+*/
+void show_prospect_result(char_data *ch, room_data *room) {
+	if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0 || !global_proto(get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM))) {
+		msg_to_char(ch, "This area has already been mined for all it's worth.\r\n");
+	}
+	else {
+		if (is_deep_mine(room)) {
+			msg_to_char(ch, "You discover that this area is a deep %s.\r\n", get_mine_type_name(room));
+		}
+		else {
+			msg_to_char(ch, "You discover that this area is %s %s.\r\n", AN(get_mine_type_name(room)), get_mine_type_name(room));
+		}
+	}
 }
 
 
@@ -1806,8 +1829,6 @@ void process_planting(char_data *ch) {
 * @param char_data *ch The prospector.
 */
 void process_prospecting(char_data *ch) {
-	extern char *get_mine_type_name(room_data *room);
-	extern bool is_deep_mine(room_data *room);
 	void init_mine(room_data *room, char_data *ch);
 		
 	// simple decrement
@@ -1836,18 +1857,8 @@ void process_prospecting(char_data *ch) {
 			GET_ACTION(ch) = ACT_NONE;
 			init_mine(IN_ROOM(ch), ch);
 			
-			if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0 || !global_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM))) {
-				msg_to_char(ch, "This area has already been mined for all it's worth.\r\n");
-			}
-			else {
-				if (is_deep_mine(IN_ROOM(ch))) {
-					msg_to_char(ch, "You discover that this area is a deep %s.\r\n", get_mine_type_name(IN_ROOM(ch)));
-				}
-				else {
-					msg_to_char(ch, "You discover that this area is %s %s.\r\n", AN(get_mine_type_name(IN_ROOM(ch))), get_mine_type_name(IN_ROOM(ch)));
-				}
-				act("$n finishes prospecting.", TRUE, ch, NULL, NULL, TO_ROOM);
-			}
+			show_prospect_result(ch, IN_ROOM(ch));
+			act("$n finishes prospecting.", TRUE, ch, NULL, NULL, TO_ROOM);
 			
 			gain_ability_exp(ch, ABIL_PROSPECT, 15);
 			break;
@@ -2799,6 +2810,12 @@ ACMD(do_prospect) {
 	}
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_PROSPECT)) {
 		return;
+	}
+	else if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) > 0) {
+		msg_to_char(ch, "You see evidence that someone has already prospected this area...\r\n");
+		show_prospect_result(ch, IN_ROOM(ch));
+		act("$n quickly prospects the area.", TRUE, ch, NULL, NULL, TO_ROOM);
+		command_lag(ch, WAIT_ABILITY);
 	}
 	else {
 		start_action(ch, ACT_PROSPECTING, 6);
