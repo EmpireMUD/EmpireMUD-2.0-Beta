@@ -36,6 +36,7 @@
 */
 
 // external vars
+extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 
 // external funcs
 extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
@@ -683,8 +684,6 @@ INTERACTION_FUNC(finish_gathering) {
 
 
 INTERACTION_FUNC(finish_harvesting) {
-	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
-
 	sector_data *sect = NULL;
 	crop_data *cp;
 	int count, num;
@@ -1468,7 +1467,7 @@ void process_gathering(char_data *ch) {
 *
 * @param char_data *ch The harvester.
 */
-void process_harvesting(char_data *ch) {	
+void process_harvesting(char_data *ch) {
 	if (!GET_EQ(ch, WEAR_WIELD) || (GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE && GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLASH)) {
 		send_to_char("You're not wielding the proper tool for harvesting.\r\n", ch);
 		cancel_action(ch);
@@ -1512,6 +1511,23 @@ void process_harvesting(char_data *ch) {
 		}
 		else {
 			msg_to_char(ch, "You fail to harvest anything here.\r\n");
+		}
+		
+		// change the sector
+		if (BASE_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) {
+			// use original terrain (appears to have been stored)
+			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(BASE_SECT(IN_ROOM(ch))));
+		}
+		else {
+			// attempt to detect
+			crop_data *cp = ROOM_CROP(IN_ROOM(ch));
+			sector_data *sect = cp ? sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]) : NULL;
+			if (!sect) {
+				sect = find_first_matching_sector(NOBITS, SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE);
+			}
+			if (sect) {
+				change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
+			}
 		}
 	}
 }
