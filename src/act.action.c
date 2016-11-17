@@ -684,12 +684,11 @@ INTERACTION_FUNC(finish_gathering) {
 
 
 INTERACTION_FUNC(finish_harvesting) {
-	sector_data *sect = NULL;
 	crop_data *cp;
 	int count, num;
 	obj_data *obj = NULL;
 		
-	if ((cp = ROOM_CROP(inter_room)) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
+	if ((cp = ROOM_CROP(inter_room)) ) {
 		// victory
 		act("You finish harvesting the crop!", FALSE, ch, 0, 0, TO_CHAR);
 		act("$n finished harvesting the crop!", FALSE, ch, 0, 0, TO_ROOM);
@@ -713,20 +712,10 @@ INTERACTION_FUNC(finish_harvesting) {
 		}
 	}
 	else {
-		sect = find_first_matching_sector(NOBITS, SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE);
 		msg_to_char(ch, "You finish harvesting but the crop appears to have died.\r\n");
 		act("$n finishes harvesting, but the crop appears to have died.", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
-
-	// finally, change the terrain
-	if (BASE_SECT(inter_room) != SECT(inter_room)) {
-		// use original terrain (appears to have been stored)
-		change_terrain(inter_room, GET_SECT_VNUM(BASE_SECT(inter_room)));
-	}
-	else if (sect) {
-		// use fallback sect
-		change_terrain(inter_room, GET_SECT_VNUM(sect));
-	}
+	
 	return TRUE;
 }
 
