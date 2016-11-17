@@ -689,10 +689,6 @@ INTERACTION_FUNC(finish_harvesting) {
 	obj_data *obj = NULL;
 		
 	if ((cp = ROOM_CROP(inter_room)) ) {
-		// victory
-		act("You finish harvesting the crop!", FALSE, ch, 0, 0, TO_CHAR);
-		act("$n finished harvesting the crop!", FALSE, ch, 0, 0, TO_ROOM);
-
 		// how many to get
 		num = number(2, 6) + (has_ability(ch, ABIL_MASTER_FARMER) ? number(2, 6) : 0);
 		num *= interaction->quantity;
@@ -712,8 +708,7 @@ INTERACTION_FUNC(finish_harvesting) {
 		}
 	}
 	else {
-		msg_to_char(ch, "You finish harvesting but the crop appears to have died.\r\n");
-		act("$n finishes harvesting, but the crop appears to have died.", FALSE, ch, NULL, NULL, TO_ROOM);
+		msg_to_char(ch, "The crop appears to have died and you get nothing useful.\r\n");
 	}
 	
 	return TRUE;
@@ -1492,6 +1487,9 @@ void process_harvesting(char_data *ch) {
 
 		// stop all harvesters including ch
 		stop_room_action(IN_ROOM(ch), ACT_HARVESTING, CHORE_FARMING);
+		
+		act("You finish harvesting the crop!", FALSE, ch, NULL, NULL, TO_CHAR);
+		act("$n finished harvesting the crop!", FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_harvesting)) {
 			// skillups
