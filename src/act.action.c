@@ -690,9 +690,8 @@ INTERACTION_FUNC(finish_harvesting) {
 		
 	if ((cp = ROOM_CROP(inter_room)) ) {
 		// how many to get
-		num = number(2, 6) + (has_ability(ch, ABIL_MASTER_FARMER) ? number(2, 6) : 0);
-		num *= interaction->quantity;
-	
+		num = interaction->quantity * (has_ability(ch, ABIL_MASTER_FARMER) ? 2 : 1);
+		
 		// give them over
 		for (count = 0; count < num; ++count) {
 			obj = read_object(interaction->vnum, TRUE);
