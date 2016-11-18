@@ -1491,7 +1491,7 @@ INTERACTION_FUNC(one_farming_chore) {
 			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 			remove_room_extra_data(inter_room, ROOM_EXTRA_HARVEST_PROGRESS);
 			
-			amt = number(4, 8) * interaction->quantity;
+			amt = interaction->quantity;
 			add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
 			
 			if (ROOM_CROP_FLAGGED(inter_room, CROPF_IS_ORCHARD)) {
