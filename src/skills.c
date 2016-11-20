@@ -53,7 +53,9 @@ void update_class(char_data *ch);
 
 // local protos
 bool can_gain_skill_from(char_data *ch, ability_data *abil);
+void clear_char_abilities(char_data *ch, any_vnum skill);
 struct skill_ability *find_skill_ability(skill_data *skill, ability_data *abil);
+int get_ability_points_available(any_vnum skill, int level);
 int get_ability_points_spent(char_data *ch, any_vnum skill);
 bool green_skill_deadend(char_data *ch, any_vnum skill);
 void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
@@ -558,7 +560,8 @@ void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cool
 
 /**
 * Checks one skill for a player, and removes and abilities that are above the
-* players range.
+* players range. If the player is overspent on points after that, the whole
+* ability is cleared.
 *
 * @param char_data *ch the player
 * @param any_vnum skill which skill, or NO_SKILL for all
@@ -603,6 +606,12 @@ void check_ability_levels(char_data *ch, any_vnum skill) {
 			}
 		}
 	}
+	
+	// check if they have too many points spent now (e.g. got early points)
+	if (get_ability_points_available(skill, get_skill_level(ch, skill)) < get_ability_points_spent(ch, skill)) {
+		clear_char_abilities(ch, skill);
+	}
+	
 	SAVE_CHAR(ch);
 	
 	// add ability techs -- only if playing
