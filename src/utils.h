@@ -1149,6 +1149,8 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 #define SKILL_ABILITIES(skill)  ((skill)->abilities)
 #define SKILL_DESC(skill)  ((skill)->desc)
 #define SKILL_FLAGS(skill)  ((skill)->flags)
+#define SKILL_MAX_LEVEL(skill)  ((skill)->max_level)
+#define SKILL_MIN_DROP_LEVEL(skill)  ((skill)->min_drop_level)
 #define SKILL_NAME(skill)  ((skill)->name)
 #define SKILL_VNUM(skill)  ((skill)->vnum)
 

@@ -2299,6 +2299,8 @@ struct skill_data {
 	char *desc;
 	
 	bitvector_t flags;	// SKILLF_ flags
+	int max_level;	// skill's maximum level (default 100)
+	int min_drop_level;	// how low the skill can be dropped manually (default 0)
 	struct skill_ability *abilities;	// assigned abilities
 	
 	UT_hash_handle hh;	// skill_table hash handle

@@ -1580,14 +1580,28 @@ ACMD(do_skills) {
 		else if (!(skill = find_skill_by_name(arg))) {
 			msg_to_char(ch, "Unknown skill '%s'.\r\n", arg);
 		}
+		else if (SKILL_MIN_DROP_LEVEL(skill) >= CLASS_SKILL_CAP) {
+			msg_to_char(ch, "You can't drop your skill level in %s.\r\n", SKILL_NAME(skill));
+		}
 		else if (!is_number(arg2)) {
 			msg_to_char(ch, "Invalid level.\r\n");
 		}
 		else if ((level = atoi(arg2)) >= get_skill_level(ch, SKILL_VNUM(skill))) {
 			msg_to_char(ch, "You can only drop skills to lower levels.\r\n");
 		}
-		else if (level != 0 && level != BASIC_SKILL_CAP && level != SPECIALTY_SKILL_CAP) {
-			msg_to_char(ch, "You can only drop skills to the following levels: 0, %d, %d\r\n", BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP);
+		else if (level < SKILL_MIN_DROP_LEVEL(skill)) {
+			msg_to_char(ch, "You can't drop %s lower than %d.\r\n", SKILL_NAME(skill), SKILL_MIN_DROP_LEVEL(skill));
+		}
+		else if (level != SKILL_MIN_DROP_LEVEL(skill) && level != BASIC_SKILL_CAP && level != SPECIALTY_SKILL_CAP) {
+			if (SKILL_MIN_DROP_LEVEL(skill) < BASIC_SKILL_CAP) {
+				msg_to_char(ch, "You can only drop skills to the following levels: %d, %d, %d\r\n", SKILL_MIN_DROP_LEVEL(skill), BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP);
+			}
+			else if (SKILL_MIN_DROP_LEVEL(skill) < SPECIALTY_SKILL_CAP) {
+				msg_to_char(ch, "You can only drop skills to the following levels: %d, %d\r\n", SKILL_MIN_DROP_LEVEL(skill), SPECIALTY_SKILL_CAP);
+			}
+			else {
+				msg_to_char(ch, "You can only drop skills to the following levels: %d\r\n", SKILL_MIN_DROP_LEVEL(skill));
+			}
 		}
 		else {
 			// good to go!
@@ -2488,6 +2502,7 @@ void clear_skill(skill_data *skill) {
 	memset((char *) skill, 0, sizeof(skill_data));
 	
 	SKILL_VNUM(skill) = NOTHING;
+	SKILL_MAX_LEVEL(skill) = CLASS_SKILL_CAP;
 }
 
 
@@ -2611,6 +2626,17 @@ void parse_skill(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case 'L': {	// additional level data
+				if (sscanf(line, "L %d %d", &int_in[0], &int_in[1]) != 2) {
+					log("SYSERR: Format error in L line of %s", error);
+					exit(1);
+				}
+				
+				SKILL_MAX_LEVEL(skill) = int_in[0];
+				SKILL_MIN_DROP_LEVEL(skill) = int_in[1];
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -2672,6 +2698,9 @@ void write_skill_to_file(FILE *fl, skill_data *skill) {
 	LL_FOREACH(SKILL_ABILITIES(skill), iter) {
 		fprintf(fl, "A %d %d %d\n", iter->vnum, iter->prerequisite, iter->level);
 	}
+	
+	// L: additional level data
+	fprintf(fl, "L %d %d\n", SKILL_MAX_LEVEL(skill), SKILL_MIN_DROP_LEVEL(skill));
 	
 	// end
 	fprintf(fl, "S\n");
@@ -3194,6 +3223,9 @@ void olc_show_skill(char_data *ch) {
 	sprintbit(SKILL_FLAGS(skill), skill_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
 	
+	sprintf(buf + strlen(buf), "<\tymaxlevel\t0> %d\r\n", SKILL_MAX_LEVEL(skill));
+	sprintf(buf + strlen(buf), "<\tymindrop\t0> %d\r\n", SKILL_MIN_DROP_LEVEL(skill));
+	
 	LL_COUNT(SKILL_ABILITIES(skill), skab, total);
 	sprintf(buf + strlen(buf), "<\tytree\t0> %d %s\r\n", total, total == 1 ? "ability" : "abilities");
 	get_skill_ability_display(SKILL_ABILITIES(skill), lbuf, sizeof(lbuf));
@@ -3261,6 +3293,18 @@ OLC_MODULE(skilledit_flags) {
 		msg_to_char(ch, "You don't have permission to remove the IN-DEVELOPMENT flag.\r\n");
 		SET_BIT(SKILL_FLAGS(skill), SKILLF_IN_DEVELOPMENT);
 	}
+}
+
+
+OLC_MODULE(skilledit_maxlevel) {
+	skill_data *skill = GET_OLC_SKILL(ch->desc);
+	SKILL_MAX_LEVEL(skill) = olc_process_number(ch, argument, "maximum level", "maxlevel", 1, CLASS_SKILL_CAP, SKILL_MAX_LEVEL(skill));
+}
+
+
+OLC_MODULE(skilledit_mindrop) {
+	skill_data *skill = GET_OLC_SKILL(ch->desc);
+	SKILL_MIN_DROP_LEVEL(skill) = olc_process_number(ch, argument, "minimum drop level", "mindrop", 0, CLASS_SKILL_CAP, SKILL_MIN_DROP_LEVEL(skill));
 }
 
 
