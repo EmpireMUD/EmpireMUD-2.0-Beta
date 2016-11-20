@@ -4780,6 +4780,28 @@ Available flags:
 
 See also: OLC SKILLS, OLC REMOVEINDEV
 #d
+"SKILLEDIT MAXLEVEL" "SKILLEDIT MAX LEVEL"
+
+Usage:  .maxlevel <level>
+
+This is the maximum level the skill can go up to. Normally, it is set to 100.
+However, you can also limit skills to 50 or 75, to create "minor skill trees".
+
+You can choose numbers other than 50 or 75, but setting the maximum to 80
+would still require the player to specialize past 75.
+
+See also: OLC SKILLS
+#d
+"SKILLEDIT MINDROP" "SKILLEDIT MIN DROP" "SKILLEDIT MIN DROP LEVEL"
+
+Usage:  .mindrop <level>
+
+This is the lowest a player can voluntarily "skill drop" the skill to. For
+example, the Vampire skill has a min-drop of 1 because the player can't get
+rid of his vampire status this way.
+
+See also: OLC SKILLS
+#d
 "SKILLEDIT NAME"
 
 Usage:  .name <name>

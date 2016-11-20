@@ -6158,7 +6158,7 @@ ACMD(do_restore) {
 			}
 			
 			HASH_ITER(hh, skill_table, skill, next_skill) {
-				set_skill(vict, SKILL_VNUM(skill), 100);
+				set_skill(vict, SKILL_VNUM(skill), SKILL_MAX_LEVEL(skill));
 			}
 			update_class(vict);
 			

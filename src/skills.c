@@ -461,7 +461,7 @@ void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add) {
 */
 bool can_gain_skill_from(char_data *ch, ability_data *abil) {
 	// must have the ability and not gained too many from it
-	if (ABIL_ASSIGNED_SKILL(abil) && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < CLASS_SKILL_CAP && has_ability(ch, ABIL_VNUM(abil)) && levels_gained_from_ability(ch, abil) < GAINS_PER_ABILITY) {
+	if (ABIL_ASSIGNED_SKILL(abil) && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < SKILL_MAX_LEVEL(ABIL_ASSIGNED_SKILL(abil)) && has_ability(ch, ABIL_VNUM(abil)) && levels_gained_from_ability(ch, abil) < GAINS_PER_ABILITY) {
 		// these limit abilities purchased under each cap to players who are still under that cap
 		if (ABIL_SKILL_LEVEL(abil) >= BASIC_SKILL_CAP || get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < BASIC_SKILL_CAP) {
 			if (ABIL_SKILL_LEVEL(abil) >= SPECIALTY_SKILL_CAP || get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < SPECIALTY_SKILL_CAP) {
@@ -1720,6 +1720,9 @@ ACMD(do_specialize) {
 	}
 	else if (get_skill_level(ch, SKILL_VNUM(sk)) != BASIC_SKILL_CAP && get_skill_level(ch, SKILL_VNUM(sk)) != SPECIALTY_SKILL_CAP) {
 		msg_to_char(ch, "You can only specialize skills which are at %d or %d.\r\n", BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP);
+	}
+	else if (get_skill_level(ch, SKILL_VNUM(sk)) >= SKILL_MAX_LEVEL(sk)) {
+		msg_to_char(ch, "%s cannot go above %d.\r\n", SKILL_NAME(sk), SKILL_MAX_LEVEL(sk));
 	}
 	else {
 		// check > basic
