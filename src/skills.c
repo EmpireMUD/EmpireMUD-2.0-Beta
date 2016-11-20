@@ -1594,13 +1594,13 @@ ACMD(do_skills) {
 		}
 		else if (level != SKILL_MIN_DROP_LEVEL(skill) && level != BASIC_SKILL_CAP && level != SPECIALTY_SKILL_CAP) {
 			if (SKILL_MIN_DROP_LEVEL(skill) < BASIC_SKILL_CAP) {
-				msg_to_char(ch, "You can only drop skills to the following levels: %d, %d, %d\r\n", SKILL_MIN_DROP_LEVEL(skill), BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP);
+				msg_to_char(ch, "You can only drop %s to the following levels: %d, %d, %d\r\n", SKILL_NAME(skill), SKILL_MIN_DROP_LEVEL(skill), BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP);
 			}
 			else if (SKILL_MIN_DROP_LEVEL(skill) < SPECIALTY_SKILL_CAP) {
-				msg_to_char(ch, "You can only drop skills to the following levels: %d, %d\r\n", SKILL_MIN_DROP_LEVEL(skill), SPECIALTY_SKILL_CAP);
+				msg_to_char(ch, "You can only drop %s to the following levels: %d, %d\r\n", SKILL_NAME(skill), SKILL_MIN_DROP_LEVEL(skill), SPECIALTY_SKILL_CAP);
 			}
 			else {
-				msg_to_char(ch, "You can only drop skills to the following levels: %d\r\n", SKILL_MIN_DROP_LEVEL(skill));
+				msg_to_char(ch, "You can only drop %s to the following levels: %d\r\n", SKILL_NAME(skill), SKILL_MIN_DROP_LEVEL(skill));
 			}
 		}
 		else {
