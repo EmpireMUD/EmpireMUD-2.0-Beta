@@ -421,7 +421,7 @@ const char *player_bits[] = {
 	"INVST",
 	"IPMASK",
 	"DISGUISED",
-	"VAMPIRE",
+		"UNUSED",
 		"UNUSED",
 	"NEEDS-NEWBIE-SETUP",
 	"!RESTICT",

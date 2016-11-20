@@ -1609,7 +1609,7 @@ typedef struct vehicle_data vehicle_data;
 #define PLR_INVSTART	BIT(11)	/* Player should enter game wizinvis	*/
 #define PLR_IPMASK		BIT(12)	/* Player is IP-masked					*/
 #define PLR_DISGUISED	BIT(13)	// Player is using a disguise
-#define PLR_VAMPIRE		BIT(14)	/* Player is a vampire					*/
+	#define PLR_UNUSEDV		BIT(14)
 	#define PLR_UNUSED6		BIT(15)
 #define PLR_NEEDS_NEWBIE_SETUP  BIT(16)  // player is created but needs gear and setup
 #define PLR_UNRESTRICT	BIT(17)	/* !walls, !buildings					*/
