@@ -10,7 +10,11 @@ D0
 &CJ&G|/&?.~
 &g~
 I 6 10500 100.00 1  # FORAGE: a glowkra pod
-I 8 10501 100.00 1  # HARVEST: a handful of glowkra pods
+I 8 10501 20.00 2 H  # HARVEST: a handful of glowkra pods
+I 8 10501 20.00 3 H  # HARVEST: a handful of glowkra pods
+I 8 10501 20.00 4 H  # HARVEST: a handful of glowkra pods
+I 8 10501 20.00 5 H  # HARVEST: a handful of glowkra pods
+I 8 10501 20.00 6 H  # HARVEST: a handful of glowkra pods
 M
 9134 5.00 bdh
 M
@@ -87,7 +91,13 @@ D0
 ||||~
 &y~
 I 6 10506 100.00 1  # FORAGE: a handful of spadebrush seeds
-I 8 10507 100.00 1  # HARVEST: a bundle of spadebrush
+I 8 10507 20.00 2 H  # HARVEST: a bundle of spadebrush
+I 8 10507 20.00 3 H  # HARVEST: a bundle of spadebrush
+I 8 10507 20.00 4 H  # HARVEST: a bundle of spadebrush
+I 8 10507 20.00 5 H  # HARVEST: a bundle of spadebrush
+I 8 10507 20.00 6 H  # HARVEST: a bundle of spadebrush
+I 8 10506 75.00 1 S  # HARVEST: a handful of spadebrush seeds
+I 8 10506 25.00 2 S  # HARVEST: a handful of spadebrush seeds
 I 9 121 100.00 1  # GATHER: a stick
 M
 9145 5.00 adh
@@ -175,7 +185,11 @@ D0
 ,,,,~
 &W~
 I 6 10536 100.00 1  # FORAGE: some ashes
-I 8 10504 100.00 1  # HARVEST: a dragon's tooth
+I 8 10504 20.00 2 H  # HARVEST: a dragon's tooth
+I 8 10504 20.00 3 H  # HARVEST: a dragon's tooth
+I 8 10504 20.00 4 H  # HARVEST: a dragon's tooth
+I 8 10504 20.00 5 H  # HARVEST: a dragon's tooth
+I 8 10504 20.00 6 H  # HARVEST: a dragon's tooth
 M
 250 0.10 ad
 M
@@ -224,7 +238,13 @@ D0
 ||||~
 &w~
 I 6 10509 100.00 1  # FORAGE: a handful of bladegrass seeds
-I 8 10510 100.00 1  # HARVEST: a bushel of bladegrass
+I 8 10510 20.00 2 H  # HARVEST: a bushel of bladegrass
+I 8 10510 20.00 3 H  # HARVEST: a bushel of bladegrass
+I 8 10510 20.00 4 H  # HARVEST: a bushel of bladegrass
+I 8 10510 20.00 5 H  # HARVEST: a bushel of bladegrass
+I 8 10510 20.00 6 H  # HARVEST: a bushel of bladegrass
+I 8 10509 75.00 1 S  # HARVEST: a handful of bladegrass seeds
+I 8 10509 25.00 2 S  # HARVEST: a handful of bladegrass seeds
 M
 9134 5.00 bdh
 M
@@ -313,7 +333,11 @@ D0
 /&Mo&g/&Mo~
 &g~
 I 6 10513 100.00 1  # FORAGE: an unripe gemfruit
-I 8 10514 100.00 1  # HARVEST: a basket of sparkling gemfruits
+I 8 10514 20.00 2 H  # HARVEST: a basket of sparkling gemfruits
+I 8 10514 20.00 3 H  # HARVEST: a basket of sparkling gemfruits
+I 8 10514 20.00 4 H  # HARVEST: a basket of sparkling gemfruits
+I 8 10514 20.00 5 H  # HARVEST: a basket of sparkling gemfruits
+I 8 10514 20.00 6 H  # HARVEST: a basket of sparkling gemfruits
 M
 9134 5.00 bdh
 M
@@ -390,7 +414,11 @@ D0
 nnnn~
 &0~
 I 6 10515 100.00 1  # FORAGE: a magic mushroom
-I 8 10516 100.00 1  # HARVEST: a basket of magic mushrooms
+I 8 10516 20.00 2 H  # HARVEST: a basket of magic mushrooms
+I 8 10516 20.00 3 H  # HARVEST: a basket of magic mushrooms
+I 8 10516 20.00 4 H  # HARVEST: a basket of magic mushrooms
+I 8 10516 20.00 5 H  # HARVEST: a basket of magic mushrooms
+I 8 10516 20.00 6 H  # HARVEST: a basket of magic mushrooms
 M
 9145 5.00 adh
 M
@@ -580,6 +608,8 @@ D0
 &g~
 I 6 10523 100.00 1  # FORAGE: a handful of magic beans
 I 8 10537 100.00 1  # HARVEST: a giant beanstalk
+I 8 10523 75.00 1 S  # HARVEST: a handful of magic beans
+I 8 10523 25.00 2 S  # HARVEST: a handful of magic beans
 M
 9145 5.00 adh
 M
@@ -666,7 +696,11 @@ D0
 vvvv~
 &b~
 I 6 10524 100.00 1  # FORAGE: some axeroot leaves
-I 8 10525 100.00 1  # HARVEST: an axeroot
+I 8 10525 20.00 2 H  # HARVEST: an axeroot
+I 8 10525 20.00 3 H  # HARVEST: an axeroot
+I 8 10525 20.00 4 H  # HARVEST: an axeroot
+I 8 10525 20.00 5 H  # HARVEST: an axeroot
+I 8 10525 20.00 6 H  # HARVEST: an axeroot
 M
 9145 5.00 adh
 M
@@ -759,7 +793,11 @@ D0
 &?..&g\&yo~
 &g~
 I 6 10528 100.00 1  # FORAGE: some crunchy chowberries
-I 8 10529 100.00 1  # HARVEST: a puppy pod
+I 8 10529 20.00 2 H  # HARVEST: a puppy pod
+I 8 10529 20.00 3 H  # HARVEST: a puppy pod
+I 8 10529 20.00 4 H  # HARVEST: a puppy pod
+I 8 10529 20.00 5 H  # HARVEST: a puppy pod
+I 8 10529 20.00 6 H  # HARVEST: a puppy pod
 M
 9037 5.00 dh
 M
@@ -815,7 +853,13 @@ D0
 &?.&rL&?..~
 &g~
 I 6 10531 100.00 1  # FORAGE: a red pickthorn fruit
-I 8 10532 100.00 1  # HARVEST: a pickthorn stalk
+I 8 10532 20.00 2 H  # HARVEST: a pickthorn stalk
+I 8 10532 20.00 3 H  # HARVEST: a pickthorn stalk
+I 8 10532 20.00 4 H  # HARVEST: a pickthorn stalk
+I 8 10532 20.00 5 H  # HARVEST: a pickthorn stalk
+I 8 10532 20.00 6 H  # HARVEST: a pickthorn stalk
+I 8 10531 75.00 1 S  # HARVEST: a red pickthorn fruit
+I 8 10531 25.00 2 S  # HARVEST: a red pickthorn fruit
 I 9 121 100.00 1  # GATHER: a stick
 M
 9145 5.00 adh
@@ -909,7 +953,11 @@ D0
 ..&&&&~
 &g~
 I 6 3015 100.00 1  # FORAGE: some red berries
-I 8 10535 100.00 1  # HARVEST: a bundle of vigilant vines
+I 8 10535 20.00 2 H  # HARVEST: a bundle of vigilant vines
+I 8 10535 20.00 3 H  # HARVEST: a bundle of vigilant vines
+I 8 10535 20.00 4 H  # HARVEST: a bundle of vigilant vines
+I 8 10535 20.00 5 H  # HARVEST: a bundle of vigilant vines
+I 8 10535 20.00 6 H  # HARVEST: a bundle of vigilant vines
 M
 10515 50.00 e
 M
