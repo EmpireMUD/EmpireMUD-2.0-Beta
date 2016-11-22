@@ -238,12 +238,14 @@ int GET_MAX_BLOOD(char_data *ch) {
 void make_vampire(char_data *ch, bool lore) {
 	void set_skill(char_data *ch, any_vnum skill, int level);
 	
-	if (!IS_NPC(ch)) {	
+	if (!noskill_ok(ch, SKILL_VAMPIRE)) {
+		return;
+	}
+	
+	if (!IS_NPC(ch)) {
 		/* set BEFORE set as a vampire! */
 		GET_APPARENT_AGE(ch) = GET_AGE(ch);
-
-		SET_BIT(PLR_FLAGS(ch), PLR_VAMPIRE);
-	
+		
 		if (get_skill_level(ch, SKILL_VAMPIRE) < 1) {
 			gain_skill(ch, find_skill_by_vnum(SKILL_VAMPIRE), 1);
 		}
@@ -279,8 +281,8 @@ void sire_char(char_data *ch, char_data *victim) {
 	act("$N drops limply from your fangs...", FALSE, ch, 0, victim, TO_CHAR);
 	act("$N drops limply from $n's fangs...", FALSE, ch, 0, victim, TO_NOTVICT);
 	act("You fall limply to the ground. In the distance, you think you see a light...", FALSE, ch, 0, victim, TO_VICT);
-
-	if (CAN_GAIN_NEW_SKILLS(victim)) {
+	
+	if (CAN_GAIN_NEW_SKILLS(victim) && noskill_ok(victim, SKILL_VAMPIRE)) {
 		make_vampire(victim, FALSE);
 		GET_BLOOD(ch) -= 10;
 
@@ -402,8 +404,8 @@ void un_vampire(char_data *ch) {
 
 	if (!IS_NPC(ch)) {
 		add_lore(ch, LORE_PURIFY, "Purified");
-		REMOVE_BIT(PLR_FLAGS(ch), PLR_VAMPIRE);
 		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+		set_skill(ch, SKILL_VAMPIRE, 0);
 		clear_char_abilities(ch, SKILL_VAMPIRE);
 		SAVE_CHAR(ch);
 	}

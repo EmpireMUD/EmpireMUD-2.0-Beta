@@ -2830,6 +2830,12 @@ void check_skills_and_abilities(char_data *ch) {
 		if (!plsk->ptr) {
 			HASH_DEL(GET_SKILL_HASH(ch), plsk);
 			free(plsk);
+			continue;
+		}
+		
+		// check skill level cap
+		if (plsk->level > SKILL_MAX_LEVEL(plsk->ptr)) {
+			plsk->level = SKILL_MAX_LEVEL(plsk->ptr);
 		}
 	}
 	update_class(ch);

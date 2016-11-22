@@ -421,7 +421,7 @@ const char *player_bits[] = {
 	"INVST",
 	"IPMASK",
 	"DISGUISED",
-	"VAMPIRE",
+		"UNUSED",
 		"UNUSED",
 	"NEEDS-NEWBIE-SETUP",
 	"!RESTICT",
@@ -2391,6 +2391,8 @@ const char *crop_flags[] = {
 	"REQUIRES-WATER",
 	"ORCHARD",
 	"!WILD",
+	"NEWBIE-ONLY",
+	"!NEWBIE",
 	"\n"
 };
 

@@ -16,7 +16,9 @@ D4
 .&j'|&?.~
 &y~
 I 6 10147 100.00 1  # FORAGE: a spiny red fruit
-I 8 10146 100.00 1  # HARVEST: a basket of saguaro fruit
+I 8 10146 33.40 2 H  # HARVEST: a basket of saguaro fruit
+I 8 10146 33.30 3 H  # HARVEST: a basket of saguaro fruit
+I 8 10146 33.30 4 H  # HARVEST: a basket of saguaro fruit
 I 20 10149 100.00 1  # CHOP: a fallen saguaro cactus
 M
 9040 0.01 d
@@ -153,7 +155,8 @@ D4
 .&j^&?..~
 &y~
 I 6 3014 100.00 1  # FORAGE: some dry beans
-I 8 10152 100.00 1  # HARVEST: a handful of mesquite pods
+I 8 10152 50.00 2 H  # HARVEST: a handful of mesquite pods
+I 8 10152 50.00 3 H  # HARVEST: a handful of mesquite pods
 I 9 121 100.00 1  # GATHER: a stick
 I 20 10151 50.00 2 c  # CHOP: a mesquite tree
 I 20 10151 50.00 1 c  # CHOP: a mesquite tree
@@ -544,8 +547,12 @@ D0
 www&Ro~
 &G~
 I 6 3014 100.00 1  # FORAGE: some dry beans
-I 8 10157 50.00 1 x  # HARVEST: a maroon firemelon
-I 8 10158 50.00 1 x  # HARVEST: a crimson firemelon
+I 8 10157 16.67 2 H  # HARVEST: a maroon firemelon
+I 8 10157 16.67 3 H  # HARVEST: a maroon firemelon
+I 8 10157 16.66 4 H  # HARVEST: a maroon firemelon
+I 8 10158 16.67 2 H  # HARVEST: a crimson firemelon
+I 8 10158 16.67 3 H  # HARVEST: a crimson firemelon
+I 8 10158 16.66 4 H  # HARVEST: a crimson firemelon
 M
 9040 0.01 d
 M

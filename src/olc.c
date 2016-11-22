@@ -320,6 +320,8 @@ OLC_MODULE(sectedit_title);
 OLC_MODULE(skilledit_abbrev);
 OLC_MODULE(skilledit_description);
 OLC_MODULE(skilledit_flags);
+OLC_MODULE(skilledit_maxlevel);
+OLC_MODULE(skilledit_mindrop);
 OLC_MODULE(skilledit_name);
 OLC_MODULE(skilledit_tree);
 
@@ -730,6 +732,8 @@ const struct olc_command_data olc_data[] = {
 	{ "abbrev", skilledit_abbrev, OLC_SKILL, OLC_CF_EDITOR },
 	{ "description", skilledit_description, OLC_SKILL, OLC_CF_EDITOR },
 	{ "flags", skilledit_flags, OLC_SKILL, OLC_CF_EDITOR },
+	{ "maxlevel", skilledit_maxlevel, OLC_SKILL, OLC_CF_EDITOR },
+	{ "mindrop", skilledit_mindrop, OLC_SKILL, OLC_CF_EDITOR },
 	{ "name", skilledit_name, OLC_SKILL, OLC_CF_EDITOR },
 	{ "tree", skilledit_tree, OLC_SKILL, OLC_CF_EDITOR },
 	

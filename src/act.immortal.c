@@ -1307,8 +1307,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("vampire") {
 		if (IS_VAMPIRE(vict)) {
-			GET_BLOOD(vict) = GET_MAX_BLOOD(vict);
-			REMOVE_BIT(PLR_FLAGS(vict), PLR_VAMPIRE);
+			void un_vampire(char_data *ch);
+			un_vampire(vict);
 		}
 		else {
 			make_vampire(vict, TRUE);
@@ -6158,7 +6158,7 @@ ACMD(do_restore) {
 			}
 			
 			HASH_ITER(hh, skill_table, skill, next_skill) {
-				set_skill(vict, SKILL_VNUM(skill), 100);
+				set_skill(vict, SKILL_VNUM(skill), SKILL_MAX_LEVEL(skill));
 			}
 			update_class(vict);
 			

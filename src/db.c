@@ -1720,6 +1720,7 @@ const char *versions_list[] = {
 	"b4.2",
 	"b4.4",
 	"b4.15",
+	"b4.19",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2195,6 +2196,13 @@ void b4_15_building_update(void) {
 }
 
 
+// 4.19 removes the vampire flag
+PLAYER_UPDATE_FUNC(b4_19_update_players) {
+	bitvector_t PLR_VAMPIRE = BIT(14);
+	REMOVE_BIT(PLR_FLAGS(ch), PLR_VAMPIRE);
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -2384,6 +2392,10 @@ void check_version(void) {
 		if (MATCH_VERSION("b4.15")) {
 			log("Converting b4.15 building data...");
 			b4_15_building_update();
+		}
+		if (MATCH_VERSION("b4.19")) {
+			log("Applying b4.19 update to players...");
+			update_all_players(NULL, b4_19_update_players);
 		}
 	}
 	

@@ -759,10 +759,12 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// CROP DEFINES ////////////////////////////////////////////////////////////
 
-// crop flags
+// CROPF_x: crop flags
 #define CROPF_REQUIRES_WATER  BIT(0)	// only plants near water
 #define CROPF_IS_ORCHARD  BIT(1)	// follows orchard rules
 #define CROPF_NOT_WILD  BIT(2)	// crop will never spawn in the wild
+#define CROPF_NEWBIE_ONLY  BIT(3)	// only spawns on newbie islands
+#define CROPF_NO_NEWBIE  BIT(4)	// never spawns on newbie islands
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1607,7 +1609,7 @@ typedef struct vehicle_data vehicle_data;
 #define PLR_INVSTART	BIT(11)	/* Player should enter game wizinvis	*/
 #define PLR_IPMASK		BIT(12)	/* Player is IP-masked					*/
 #define PLR_DISGUISED	BIT(13)	// Player is using a disguise
-#define PLR_VAMPIRE		BIT(14)	/* Player is a vampire					*/
+	#define PLR_UNUSEDV		BIT(14)
 	#define PLR_UNUSED6		BIT(15)
 #define PLR_NEEDS_NEWBIE_SETUP  BIT(16)  // player is created but needs gear and setup
 #define PLR_UNRESTRICT	BIT(17)	/* !walls, !buildings					*/
@@ -2297,6 +2299,8 @@ struct skill_data {
 	char *desc;
 	
 	bitvector_t flags;	// SKILLF_ flags
+	int max_level;	// skill's maximum level (default 100)
+	int min_drop_level;	// how low the skill can be dropped manually (default 0)
 	struct skill_ability *abilities;	// assigned abilities
 	
 	UT_hash_handle hh;	// skill_table hash handle

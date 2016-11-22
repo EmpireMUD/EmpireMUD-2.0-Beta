@@ -533,9 +533,6 @@ OLC_MODULE(mapedit_naturalize) {
 			// looks good: naturalize it
 			if (room) {
 				change_terrain(room, GET_SECT_VNUM(map->natural_sector));
-				if (SECT_FLAGGED(map->natural_sector, SECTF_HAS_CROP_DATA)) {
-					set_crop_type(room, get_potential_crop_for_location(room));
-				}
 				if (ROOM_PEOPLE(room)) {
 					act("The area is naturalized!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 				}
@@ -547,6 +544,9 @@ OLC_MODULE(mapedit_naturalize) {
 				if (SECT_FLAGGED(map->natural_sector, SECTF_HAS_CROP_DATA)) {
 					room = real_room(map->vnum);	// need it loaded after all
 					set_crop_type(room, get_potential_crop_for_location(room));
+				}
+				else {
+					map->crop_type = NULL;
 				}
 			}
 			++count;

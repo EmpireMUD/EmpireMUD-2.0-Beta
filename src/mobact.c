@@ -800,7 +800,6 @@ void mobile_activity(void) {
 * This is called every few seconds to animate mobs in the room with players.
 */
 void run_mob_echoes(void) {
-	ACMD(do_mecho);
 	ACMD(do_say);
 	
 	struct custom_message *mcm, *found_mcm;
@@ -851,7 +850,7 @@ void run_mob_echoes(void) {
 			// MOB_CUSTOM_x
 			switch (found_mcm->type) {
 				case MOB_CUSTOM_ECHO: {
-					do_mecho(found_mob, found_mcm->msg, 0, 0);
+					act(found_mcm->msg, FALSE, found_mob, NULL, NULL, TO_ROOM);
 					break;
 				}
 				case MOB_CUSTOM_SAY: {
