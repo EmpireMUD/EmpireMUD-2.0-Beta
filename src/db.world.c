@@ -1160,10 +1160,6 @@ void naturalize_newbie_islands(void) {
 			if (ROOM_PEOPLE(room)) {
 				act("The area returns to nature!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 			}
-			
-			if (SECT_FLAGGED(map->natural_sector, SECTF_HAS_CROP_DATA)) {
-				set_crop_type(room, get_potential_crop_for_location(room));
-			}
 		}
 		else {
 			perform_change_sect(NULL, map, map->natural_sector);
@@ -1172,6 +1168,9 @@ void naturalize_newbie_islands(void) {
 			if (SECT_FLAGGED(map->natural_sector, SECTF_HAS_CROP_DATA)) {
 				room = real_room(map->vnum);	// need it loaded after all
 				set_crop_type(room, get_potential_crop_for_location(room));
+			}
+			else {
+				map->crop_type = NULL;
 			}
 		}
 		++count;
@@ -2655,7 +2654,7 @@ void output_map_to_file(void) {
 			}
 			
 			// normal map output
-			if (world_map[x][y].crop_type) {
+			if (SECT_FLAGGED(sect, SECTF_HAS_CROP_DATA) && world_map[x][y].crop_type) {
 				fprintf(out, "%c", mapout_color_tokens[GET_CROP_MAPOUT(world_map[x][y].crop_type)]);
 			}
 			else {
