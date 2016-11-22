@@ -3195,6 +3195,8 @@ void do_stat_skill(char_data *ch, skill_data *skill) {
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Description: %s\r\n", SKILL_DESC(skill));
 	
+	size += snprintf(buf + size, sizeof(buf) - size, "Minimum drop level: [\tc%d\t0], Maximum level: [\tc%d\t0]\r\n", SKILL_MIN_DROP_LEVEL(skill), SKILL_MAX_LEVEL(skill));
+	
 	sprintbit(SKILL_FLAGS(skill), skill_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
 	
