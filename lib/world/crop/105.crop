@@ -1025,4 +1025,59 @@ M
 M
 10516 0.50 d
 S
+#10551
+rhubarb~
+A Patch of Rhubarb~
+35 1 c
+0 100 0 100
+D0
+rrrr~
+&j~
+I 6 10552 100.00 1  # FORAGE: some arctic brambleberries
+I 8 10551 20.00 2 H  # HARVEST: a bunch of rhubarb
+I 8 10551 20.00 3 H  # HARVEST: a bunch of rhubarb
+I 8 10551 20.00 4 H  # HARVEST: a bunch of rhubarb
+I 8 10551 20.00 5 H  # HARVEST: a bunch of rhubarb
+I 8 10551 20.00 6 H  # HARVEST: a bunch of rhubarb
+M
+9172 5.00 g
+M
+9177 5.00 g
+M
+9179 15.00 g
+M
+9171 5.00 0
+M
+10556 5.00 0
+M
+10557 5.00 0
+M
+10558 5.00 0
+S
+#10560
+frost ferns~
+A Dell of Frost Ferns~
+2 1 c
+0 100 0 100
+D0
+@@@@~
+&W~
+I 6 10552 100.00 1  # FORAGE: some arctic brambleberries
+I 8 10561 50.00 1 H  # HARVEST: a bouquet of frost ferns
+I 8 10561 50.00 2 H  # HARVEST: a bouquet of frost ferns
+M
+9172 5.00 g
+M
+9177 5.00 g
+M
+9179 15.00 g
+M
+9171 5.00 0
+M
+10556 5.00 0
+M
+10557 5.00 0
+M
+10558 5.00 0
+S
 $

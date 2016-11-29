@@ -92,6 +92,32 @@ L
 100 -1 -1
 -1 0 0
 S
+#104
+Magiterranean: Permafrost~
+Paul Clarke and Owen Morris~
+   In a chilling turn of events, a strange portal has opened over the river and
+begun to freeze its waters. Now, the spreading frost threatens to overwhelm our
+world. You must travel into the Magiterranean and defeat the nefarious Polar
+Baron in order to end this threat once and for all.  
+   This adventure features a difficulty selector so it can be completed solo,
+or in groups of up to four. All gear looted from this adventure will be higher
+quality on harder difficulties.
+~
+10550 10599 75-125
+15 0 cg 4
+L
+4 0
+10550 10550 10550
+-1 f 0
+L
+5 0
+10080 -1 -1
+-1 0 0
+L
+6 0
+50 -1 -1
+-1 0 0
+S
 #120
 Mountain Cave: Red Dragon~
 Paul Clarke~
