@@ -320,4 +320,341 @@ else
 end
 %purge% %self%
 ~
+#10554
+Frosty difficulty select~
+1 c 4
+difficulty~
+if !%arg%
+  %send% %actor% You must specify a level of difficulty.
+  return 1
+  halt
+end
+* TODO: Check nobody's in the adventure before changing difficulty
+if normal /= %arg%
+  %echo% Changing difficulty to Normal...
+  eval difficulty 1
+elseif hard /= %arg%
+  %echo% Changing difficulty to Hard...
+  eval difficulty 2
+elseif group /= %arg%
+  %echo% Changing difficulty to Group...
+  eval difficulty 3
+elseif boss /= %arg%
+  %echo% Changing difficulty to Boss...
+  eval difficulty 4
+else
+  %send% %actor% That is not a valid difficulty level for this adventure.
+  halt
+  return 1
+end
+* Clear existing difficulty flags and set new ones.
+eval vnum 10550
+while %vnum% <= 10552
+  eval mob %%instance.mob(%vnum%)%%
+  if !%mob%
+    * This was for debugging. We could do something about this.
+    * Maybe just ignore it and keep on setting?
+  else
+    nop %mob.remove_mob_flag(HARD)%
+    nop %mob.remove_mob_flag(GROUP)%
+    if %difficulty% == 1
+      * Then we don't need to do anything
+    elseif %difficulty% == 2
+      nop %mob.add_mob_flag(HARD)%
+    elseif %difficulty% == 3
+      nop %mob.add_mob_flag(GROUP)%
+    elseif %difficulty% == 4
+      nop %mob.add_mob_flag(HARD)%
+      nop %mob.add_mob_flag(GROUP)%
+    end
+  end
+  eval vnum %vnum% + 1
+done
+%echo% The glacier cracks and splits, revealing two paths.
+eval newroom i10552
+if %newroom%
+  %at% %newroom% %load% obj 10555
+end
+eval exitroom i10550
+if %exitroom%
+  %door% %exitroom% north room %newroom%
+end
+eval room %self.room%
+eval person %room.people%
+while %person%
+  eval next_person %person.next_in_room%
+  %teleport% %person% %newroom%
+  eval person %next_person%
+done
+~
+#10555
+Frosty delayed despawn~
+1 f 0
+~
+%adventurecomplete%
+%purge% %self%
+~
+#10556
+Frosty tokens count~
+1 c 2
+count~
+eval test %%self.is_name(%arg%)%%
+if !%test%
+  return 0
+  halt
+end
+eval var_name permafrost_tokens_104
+%send% %actor% You count %self.shortdesc%.
+eval test %%actor.varexists(%var_name%)%%
+%echoaround% %actor% %actor.name% counts %self.shortdesc%.
+if %test%
+  eval count %%actor.%var_name%%%
+  if %count% == 1
+    %send% %actor% You have one token.
+  else
+    %send% %actor% You have %count% tokens.
+  end
+else
+  %send% %actor% You have no tokens.
+end
+~
+#10557
+Frosty token load/purge~
+1 gn 100
+~
+eval var_name permafrost_tokens_104
+if !%actor%
+  eval actor %self.carried_by%
+else
+  %send% %actor% You take %self.shortdesc%.
+  return 0
+end
+if %actor%
+  if %actor.is_npc%
+    * Oops
+    halt
+  end
+  if !%actor.inventory(10556)%
+    %load% obj 10556 %actor% inv
+    %send% %actor% You find a pouch to store your permafrost tokens in.
+  end
+  eval test %%actor.varexists(%var_name%)%%
+  if %test%
+    eval val %%actor.%var_name%%%
+    eval %var_name% %val%+1
+    remote %var_name% %actor.id%
+  else
+    eval %var_name% 1
+    remote %var_name% %actor.id%
+  end
+  %purge% %self%
+end
+~
+#10558
+Frosty trash block higher template id~
+0 s 100
+~
+* One quick trick to get the target room
+eval room_var %self.room%
+eval tricky %%room_var.%direction%(room)%%
+eval to_room %tricky%
+* Compare template ids to figure out if they're going forward or back
+if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
+  halt
+end
+if %actor.aff_flagged(SNEAK)%
+  * Can sneak past
+  halt
+end
+%send% %actor% Frozen winds block your progress.
+return 0
+~
+#10559
+River freezer~
+0 i 100
+~
+eval room %self.room%
+if !%instance.location%
+  %purge% %self%
+  halt
+end
+eval dist %%room.distance(%instance.location%)%%
+if (%dist% > 2)
+  mgoto %instance.location%
+elseif %room.aff_flagged(*HAS-INSTANCE)%
+  halt
+elseif (%room.sector% == River && %dist% <= 2)
+  %terraform% %room% 10550
+  %echo% The river freezes over!
+end
+~
+#10560
+Terraformer exit on load~
+0 n 100
+~
+if !%instance.location%
+  %purge% %self%
+  halt
+end
+mgoto %instance.location%
+~
+#10561
+Frost flower fake plant~
+1 c 2
+plant~
+eval room %actor.room%
+if %room.sector% != Overgrown Forest
+  return 0
+  halt
+end
+eval check %%actor.canuseroom_member(%room%)%%
+if !%check%
+  %send% %actor% You don't have permission to use %self.shortdesc% here.
+  return 1
+  halt
+end
+%send% %actor% You plant %self.shortdesc%...
+%echoaround% %actor% %actor.name% plants %self.shortdesc%...
+%echo% The forest around you shifts slowly into an evergreen forest!
+%terraform% %room% 10565
+return 1
+%purge% %self%
+~
+#10570
+Boss loot replacer~
+1 n 100
+~
+eval actor %self.carried_by%
+if %actor%
+  if %actor.mob_flagged(GROUP)%
+    * Roll for mount
+    eval percent_roll %random.100%
+    if %percent_roll% <= 2
+      * Minipet
+      eval vnum 10567
+    else
+      eval percent_roll %percent_roll% - 2
+      if %percent_roll% <= 2
+        * Land mount
+        eval vnum 10564
+      else
+        eval percent_roll %percent_roll% - 2
+        if %percent_roll% <= 2
+          * Sea mount
+          eval vnum 10565
+        else
+          eval percent_roll %percent_roll% - 2
+          if %percent_roll% <= 1
+            * Flying mount
+            eval vnum 10566
+          else
+            eval percent_roll %percent_roll% - 1
+            if %percent_roll% <= 1
+              * Morpher
+              eval vnum 10568
+            else
+              eval percent_roll %percent_roll% - 1
+              if %percent_roll% <= 1
+                * Vehicle pattern item
+                eval vnum 10569
+              else
+                * Token
+                eval vnum 10557
+              end
+            end
+          end
+        end
+      end
+    end
+    if %self.level%
+      eval level %self.level%
+    else
+      eval level 100
+    end
+    %load% obj %vnum% %actor% inv %level%
+    * eval item %%actor.inventory(%vnum%)%%
+    * %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
+  end
+end
+%purge% %self%
+~
+#10593
+Wand of Polar Power activation~
+1 c 2
+freeze~
+if %actor.varexists(permafrost_mobs_iced)%
+  if %actor.permafrost_mobs_iced% >= 6
+    * Quest is completed but we currently allow you to keep zapping if you like
+  end
+end
+if !%arg%
+  %send% %actor% What do you want to blast with %self.shortdesc%?
+  return 1
+  halt
+end
+eval target %%actor.char_target(%arg%)%%
+if !%target%
+  %send% %actor% They must have fled from your awesome power, because they're not here.
+  return 1
+  halt
+end
+if %target.is_npc% && %target.vnum% >= 10553 && %target.vnum% <= 10555
+  %send% %actor% You point %self.shortdesc% at %target.name% and unleash a blast of icy magic!
+  %echoaround% %actor% %actor.name% points %self.shortdesc% at %target.name% and unleashes a blast of icy magic!
+  %echo% %target.name% is encased in a huge block of ice!
+  %purge% %target%
+  %load% obj 10595 %actor.room%
+elseif %target.is_npc% && %target.vnum% >= 10550 && %target.vnum% <= 10552
+  %send% %actor% You point %self.shortdesc% at %target.name% and unleash a blast of icy magic!
+  %echoaround% %actor% %actor.name% points %self.shortdesc% at %target.name% and unleashes a blast of icy magic!
+  %echo% %target.name% absorbs the icy blast harmlessly.
+  return 1
+  halt
+else
+  %send% %actor% %self.shortdesc% only works on enemies from the Permafrost area of the Magiterranean.
+  return 1
+  halt
+end
+eval room %actor.room%
+eval person %room.people%
+while %person%
+  if %person.is_pc%
+    if %person.varexists(permafrost_mobs_iced)%
+      eval permafrost_mobs_iced %person.permafrost_mobs_iced% + 1
+    else
+      eval permafrost_mobs_iced 1
+    end
+    remote permafrost_mobs_iced %actor.id%
+    if %permafrost_mobs_iced% >= 6
+      %quest% %actor% trigger 10595
+    end
+  end
+  eval person %person.next_in_room%
+done
+~
+#10594
+Permafrost trash spawner~
+1 n 100
+~
+switch %random.3%
+  case 1
+    %load% mob 10553
+  break
+  case 2
+    %load% mob 10554
+  break
+  case 3
+    %load% mob 10555
+  break
+done
+%purge% %self%
+~
+#10595
+pacify quest-start~
+2 u 100
+~
+eval permafrost_mobs_iced 0
+remote permafrost_mobs_iced %actor.id%
+%load% obj 10593 %actor% inv
+~
 $

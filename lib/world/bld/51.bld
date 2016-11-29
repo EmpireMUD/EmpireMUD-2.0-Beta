@@ -674,7 +674,7 @@ The Carpenter~
 10 0 bpR 0
 0 0 0 217
 C
-craft, harness~
+craft, harness, inventory, retrieve, store~
 D
    The building reeks of carpenters' stains and several unfamiliar preserving
 agents. All around you are incomplete objects which are waiting to be
