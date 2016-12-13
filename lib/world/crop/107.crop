@@ -1,7 +1,7 @@
 #10700
 chestnuts~
 A Chestnut Tree~
-25 1 c
+25 1 bc
 0 100 0 100
 D1
 .^&to&g.~
@@ -15,12 +15,10 @@ D3
 D4
 .Y&to&0.~
 &0~
-I 6 10720 100.00 1  # FORAGE: a basket of chestnuts
-I 8 10720 20.00 2 H  # HARVEST: a basket of chestnuts
-I 8 10720 20.00 3 H  # HARVEST: a basket of chestnuts
-I 8 10720 20.00 4 H  # HARVEST: a basket of chestnuts
-I 8 10720 20.00 5 H  # HARVEST: a basket of chestnuts
-I 8 10720 20.00 6 H  # HARVEST: a basket of chestnuts
+I 6 10721 100.00 1  # FORAGE: a handful of chestnuts
+I 8 10720 100.00 1  # HARVEST: a basket of chestnuts
+I 9 121 100.00 1  # GATHER: a stick
+I 20 120 100.00 1  # CHOP: a large tree
 M
 9145 5.00 adh
 M

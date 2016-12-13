@@ -79,13 +79,13 @@ I 2 1358 50.00 1  # SHEAR: a bag of wool
 I 2 1358 5.00 1  # SHEAR: a bag of wool
 M
 0
-$n chews %self.hisher% cud.~
-M
-0
 $n eats some grass.~
 M
 0
 $n baas contentedly.~
+M
+0
+$n chews $s cud.~
 S
 #9005
 goat mountain~
