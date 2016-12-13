@@ -1,3 +1,24 @@
+#10700
+Mini-pet quest start~
+0 u 100
+~
+if (%vnum% != 10700)
+  return 1
+  halt
+end
+eval vnum 10723
+while %vnum% <= 10726
+  eval check %%actor.inventory(%vnum%)%%
+  if !%check%
+    return 1
+    halt
+  end
+  eval vnum %vnum% + 1
+done
+%send% %actor% You already have all of the rewards from this quest.
+%send% %actor% You can still repeat it, but you won't get anything else.
+return 1
+~
 #10701
 Carolers caroling a'merrily~
 0 g 100
@@ -74,7 +95,7 @@ if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor
   halt
 end
 if !%actor.varexists(last_christmas_gift_item)%
-  eval last_christmas_gift_item 10714
+  eval last_christmas_gift_item 10706
 else
   eval last_christmas_gift_item %actor.last_christmas_gift_item%
 end
@@ -99,6 +120,15 @@ switch %last_christmas_gift_item%
     eval next_gift 10714
   break
   case 10714
+    eval next_gift 10728
+  break
+  case 10728
+    eval next_gift 10719
+  break
+  case 10719
+    eval next_gift 10720
+  break
+  case 10720
     eval next_gift 10708
   break
 done
@@ -219,6 +249,144 @@ else
   %load% mob 10705
 end
 %purge% %self%
+~
+#10727
+Christmas minipet replacer~
+1 n 100
+~
+wait 1
+eval actor %self.carried_by%
+if !%actor%
+  %purge% %self%
+  halt
+end
+* Pick a random pet the owner doesn't have on him/her
+* This crudely simulates an array... it might be doable in a better way
+eval pets_remaining 4
+eval vnum 10723
+eval number 1
+while %vnum% <= 10726
+  eval cond %%actor.inventory(%vnum%)%%
+  if %cond%
+    eval pets_remaining %pets_remaining%-1
+    eval has_%vnum% 1
+  else
+    eval has_%vnum% 0
+    eval pet_%number% %vnum%
+    eval number %number% + 1
+  end
+  eval vnum %vnum% + 1
+done
+if %pets_remaining% == 0
+  %send% %actor% You already have all four mini-pets from this quest!
+  %purge% %self%
+  halt
+end
+eval ran_num %%random.%pets_remaining%%%
+eval vnum %%pet_%ran_num%%%
+* and give them the pet
+if %actor%
+  * We don't need to scale pet whistles
+  * if %self.level%
+  *   eval level %self.level%
+  * else
+  *   eval level 100
+  * end
+  %load% obj %vnum% %actor% inv %level%
+  eval item %%actor.inventory(%vnum%)%%
+  %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
+  if %item.is_flagged(BOE)%
+    nop %item.flag(BOE)%
+  end
+  if !%item.is_flagged(BOP)%
+    nop %item.flag(BOP)%
+  end
+  eval do_bind %%item.bind(%actor%)%%
+  nop %do_bind%
+end
+%purge% %self%
+~
+#10728
+Magical coal use~
+1 c 2
+use~
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
+  return 0
+  halt
+end
+eval room %actor.room%
+if (%actor.position% != Standing)
+  %send% %actor% You can't do that right now.
+  halt
+end
+eval varname summon_%self.vnum%
+eval test %%actor.varexists(%varname%)%%
+* Cooldown
+if %test%
+  eval tt %%actor.%varname%%%
+  if (%timestamp% - %tt%) < 180
+    eval diff (%tt% - %timestamp%) + 180
+    eval diff2 %diff%/60
+    eval diff %diff%//60
+    if %diff%<10
+      set diff 0%diff%
+    end
+    %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc% again.
+    halt
+  end
+end
+eval ch %room.people%
+while %ch% && !%found%
+  if %ch.is_npc%
+    eval mobs %mobs% + 1
+  end
+  eval ch %ch.next_in_room%
+done
+if %mobs% > 4
+  %send% %actor% There are too many mobs here already.
+  return 1
+  halt
+end
+%send% %actor% You throw a handful of the magical coal lumps into the sky...
+%echoaround% %actor% %actor.name% uses throws a handful of sparkling coal lumps into the sky...
+wait 1 sec
+if (%actor.room% != %room% || %actor.position% != Standing)
+  %send% %actor% You stop building the snowman.
+end
+%echo% A sudden flurry of snow comes from the sky, creating a large pile nearby.
+wait 1 sec 
+if (%actor.room% != %room% || %actor.position% != Standing)
+  %send% %actor% You stop building the snowman.
+end
+%send% %actor% You start rolling the snow into a large ball...
+%echoaround% %actor% %actor.name% starts rolling the snow into a large ball...
+wait 3 sec 
+if (%actor.room% != %room% || %actor.position% != Standing)
+  %send% %actor% You stop building the snowman.
+end
+%send% %actor% You finish the snowman's body and start rummaging through your belongings...
+%echoaround% %actor% %actor.name% finishes the snowman's body and starts rummaging through %actor.hisher% belongings...
+wait 1 sec 
+if (%actor.room% != %room% || %actor.position% != Standing)
+  %send% %actor% You stop building the snowman.
+end
+%send% %actor% You find a carrot and some sticks, and add them to your snowman...
+%echoaround% %actor% %actor.name% finds a carrot and some sticks, and adds them to %actor.hisher% snowman...
+wait 1 sec 
+if (%actor.room% != %room% || %actor.position% != Standing)
+  %send% %actor% You stop building the snowman.
+end
+%send% %actor% You finish your snowman and step back to admire your work.
+%echoaround% %actor% %actor.name% finishes %actor.hisher% snowman and steps back with a satisfied nod.
+eval %varname% %timestamp%
+remote %varname% %actor.id%
+%load% m 10728
+eval room_var %self.room%
+eval mob %room_var.people%
+if (%mob% && %mob.vnum% == %self.val0%)
+  nop %mob.unlink_instance%
+end
 ~
 #10730
 Hey Diddle Diddle~
