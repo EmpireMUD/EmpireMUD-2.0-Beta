@@ -196,19 +196,6 @@ You let out a terrifying howl, penalizing all enemies. The first victim loses
 to-hit equal to 4x your Charisma. Each additional victim loses to-hit equal to
 2x Charisma instead.
 #
-SHADOWCAGE "SHADOW CAGE"
-
-Shadowcage
-Class ability: Occultist
-Debuff type: Stealth
-Cost: 50 move
-Cooldown: 30 seconds
-Usage:  shadowcage
-
-You create a cage of shadows, penalizing all enemies. The first victim loses
-dodge equal to 4x your Charisma. Each additional victim loses dodge equal to 2x
-Charisma instead. This effect lasts 15 seconds.
-#
 INFILTRATE "IMPROVED INFILTRATE"
 
 Infiltrate, Improved Infiltrate (Stealth abilities)
@@ -402,9 +389,10 @@ Class ability: Occultist
 Debuff type: Stealth
 Cost: 50 move
 Cooldown: 30 seconds
+Usage:  shadowcage
 
 You create a cage of shadows, penalizing all enemies. The first victim loses
-dodge equal to 5x your Charisma. Each additional victim loses dodge equal to 3x
+dodge equal to 4x your Charisma. Each additional victim loses dodge equal to 2x
 Charisma instead. This effect lasts 15 seconds.
 #
 SHADOWSTEP "SHADOW STEP"
