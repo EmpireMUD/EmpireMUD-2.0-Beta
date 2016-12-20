@@ -45,13 +45,14 @@ See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC GLOBALS,
 See also: OLC ABORT, OLC AUDIT, OLC COPY, OLC DELETE, OLC EDIT, OLC FREE, 
    OLC LIST, OLC SAVE, OLC SEARCH, OLC LICENSE, TEXT EDITOR, VNUM
 #d
-"OLC ABBREVIATIONS" "OLC ABBREVS" ADV BLD BDG CFT CRP MOB OBJ RMT SCT TRG
+"OLC ABBREVIATIONS" "OLC ABBREVS" ADV BLD BDG CFT CRP MOB OBJ QST RMT SCT SOC TRG
 
 Sometimes abbreviations are used for core "thing" types, like mobs. Here are
 some common ones:
 
 abil - ability
 adv - adventure
+aug - augment
 bld (or bdg) - building (these include designated rooms)
 cft - craft
 cls - class
@@ -61,9 +62,11 @@ mob - mobile/npc
 mph - morph
 npc - non-player character (mob)
 obj - object
+qst - quest
 rmt - room template
 sct - sector/terrain
 skl - skill
+soc - social
 trg - trigger
 veh - vehicle
 #d
@@ -344,6 +347,12 @@ Skills (SKILLEDIT):
 - Abilities can be on more than one class and more than one role within a class
   but you CANNOT assign an ability to both a class and a skill -- it would
   count toward purchased abilities in that skill tree.
+
+Socials (SOCEDIT):
+- Players must meet all the requirements for a social to use it.
+- If a player types a social that has multiple versions, they get the one that
+  has the most requirements. If they qualify for more than one same-named
+  social with the same number of requirements, one is chosen at random.
 
 Triggers and Scripts (TRIGEDIT):
 - Scripts must be formatted with /f -- this will also ensure your if/end and
@@ -1891,6 +1900,9 @@ Crop flags determine some various properties about crops.
 Available flags:
  REQUIRES-WATER - Can only be planted within 4 tiles of fresh water
  ORCHARD - Uses 'pick' instead of 'harvest', shows the orchard commands list, can be chopped down
+ !WILD - Won't spawn in the wild
+ NEWBIE-ONLY - Only spawns on newbie islands (can be planted anywhere)
+ !NEWBIE - Does not spawn on newbie islands
 
 See also: OLC CROPS
 #d
@@ -2165,9 +2177,9 @@ See also: BUILDING GUIDE, OLC GLOBALS
 #d
 IN-DEVELOPMENT "IN DEVELOPMENT" IN-DEV
 
-The IN-DEVELOPMENT flag prevents an augment, craft, or global from being
-available to players. Generally immortals can still use them (although they
-won't appear in craft lists).
+The IN-DEVELOPMENT flag prevents an augment, craft, global, or other type from
+being available to players. Generally immortals can still use them (although
+they won't appear in craft lists).
 
 You can quickly remove the IN-DEV flag using the .removeindev command. The OLC
 auditors will warn about items that still have IN-DEV flags.
@@ -2368,6 +2380,21 @@ Important notes:
 
 See also: MAP OLC
 #d
+"MAPEDIT NATURALIZE"
+
+Usage:  .map naturalize [island | world]
+
+This command will restore the sector for the map tile you're in, the whole
+island you're on, or the entire world. The tiles return to the state they
+were in when the map was first generated.
+
+When used on an island/world, claimed tiles are ignored. So are tiles that are
+unclaimable or which have adventures.
+
+You can change a tile/island's natural state with: .map remember [island]
+
+See also: MAP OLC, MAPEDIT REMEMBER
+#d
 "MAPEDIT PASSWALLS"
 
 Usage:  .map passwalls
@@ -2378,6 +2405,21 @@ the interior (designated) rooms of a building; they will instead move to the
 next map tile in the direction that they were walking.
 
 See also: MAP OLC
+#d
+"MAPEDIT REMEMBER"
+
+Usage:  .map remember [island]
+
+This command will store the current sector of the map tile you're in (or the
+entire island you're on) as the "natural" sector. This can be used to change
+how a newbie island will be restored at the end of the year, for example.
+
+Building and adventure tiles are ignored during this command.
+
+The opposite command is .map naturalize, which restores a room/island/world
+to its original state.
+
+See also: MAP OLC, MAPEDIT NATURALIZE
 #d
 "MAPEDIT ROOMTYPE" "MAPEDIT ROOM TYPE"
 
@@ -2473,6 +2515,29 @@ The following attack types are available:
 27. peck - animals
 28. gore - animals
 29. mana blast - normal magical attack (e.g. disarmed mage)
+
+See also: OLC MOBILES
+#d
+"MEDIT CUSTOM"
+
+Usage:  .custom add <type> <message>
+        .custom change <number> <type | message> <value>
+        .custom remove <number | all>
+
+You can set custom messages on mobs, which are shown at different times
+depending upon the type of message.
+
+Some messages may use the tokens $n/$e/$s/$m for name/he/his/him for the mob.
+
+If you set more than one message of the same type, one will be chosen at
+random each time.
+
+Message types:
+ &cecho&0 - The message is shown to the room periodically (may use $ tokens).
+ &csay&0 - The message is said aloud by the mob periodically.
+
+Note: The 'echo' and 'say' types share the same random interval, and the mob
+will only do one or the other each time.
 
 See also: OLC MOBILES
 #d
@@ -3808,6 +3873,8 @@ Available flags:
  - SKILLS -- CAN edit skills
  - !VEHICLES -- Cannot edit vehicles
  - !MORPHS -- Cannot edit morphs
+ - !QUESTS -- Cannot edit quests
+ - !SOCIALS -- Cannot edit socials
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 #d
@@ -4031,6 +4098,7 @@ The following types will have IN-DEVELOPMENT flags removed in the vnum range:
 - crafts
 - globals
 - skills
+- socials
 
 See also: OLC CONTROLS, OLC ADVENTURES, ADVEDIT FLAGS, CEDIT FLAGS
 #d
@@ -4712,6 +4780,28 @@ Available flags:
 
 See also: OLC SKILLS, OLC REMOVEINDEV
 #d
+"SKILLEDIT MAXLEVEL" "SKILLEDIT MAX LEVEL"
+
+Usage:  .maxlevel <level>
+
+This is the maximum level the skill can go up to. Normally, it is set to 100.
+However, you can also limit skills to 50 or 75, to create "minor skill trees".
+
+You can choose numbers other than 50 or 75, but setting the maximum to 80
+would still require the player to specialize past 75.
+
+See also: OLC SKILLS
+#d
+"SKILLEDIT MINDROP" "SKILLEDIT MIN DROP" "SKILLEDIT MIN DROP LEVEL"
+
+Usage:  .mindrop <level>
+
+This is the lowest a player can voluntarily "skill drop" the skill to. For
+example, the Vampire skill has a min-drop of 1 because the player can't get
+rid of his vampire status this way.
+
+See also: OLC SKILLS
+#d
 "SKILLEDIT NAME"
 
 Usage:  .name <name>
@@ -4755,6 +4845,100 @@ The following special codes may be used in icons:
 The following special colors may be used in icons:
  &&? - The tile color of the base terrain.
  &&# - Wall color (walls are colored by enchantments).
+#d
+SOCEDIT "OLC SOCIALS" "SOCIAL OLC" "SOCIAL EDITOR"
+
+Usage:  .soc <command>
+        .<command>
+
+The .olc social editor is a tool for creating and editing social commands
+(which are like pre-set emotes). It provides a simple in-game menu with
+contextual choices to design all types of socials.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on these by typing &yHELP SOCEDIT <COMMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .soc edit 10199
+ > .name smile (with mask)
+ > .command smile
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"SOCEDIT COMMAND"
+
+Usage:  .command <word>
+
+This is the command which is typed to use the social. It must be one single
+word (usually a verb), as any additional words would be interpreted as a
+target.
+
+Social commands never override regular game commands.
+
+If more than one social has the same command, the one with the most matched
+requirements will be used. If a player qualifies for two copies of a social
+that have the same number of requirements, one is chosen at random.
+
+See also: OLC SOCIALS
+#d
+"SOCEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Social flags are properties that affect how the social behaves.
+
+Available flags:
+ IN-DEV - Cannot be used by mortals.
+ HIDE-IF-INVIS - No messages are shown to the room if the actor is not visible.
+   (this is normally used for socials that are visual but silent, like 'smile')
+
+See also: OLC SOCIALS
+#d
+"SOCEDIT MESSAGES" "SOCEDIT N2CHARACTER" "SOCEDIT N2OTHERS" "SOCEDIT S2CHARACTER" "SOCEDIT S2OTHERS" "SOCEDIT T2CHARACTER" "SOCEDIT T2VICTIM" "SOCEDIT T2OTHERS" "SOCEDIT TNOTFOUND"
+
+Usage:  .n2char <message>
+        .<type> <message>
+
+These messages are the ones shown when the player uses the social.
+
+Messages when a social is typed without an argument ("grin"):
+  No-arg to character <&yn2char&0>
+  No-arg to others <&yn2other&0>
+
+Messages when a social is typed with an argument ("grin Gaia"):
+  Targeted to character <&yt2char&0>
+  Targeted to others <&yt2other&0>
+  Targeted to victim <&yt2vict&0>
+  Target not found <&ytnotfound&0>  - sent to the actor when target is invalid
+
+Messages when the actor targets himself ("grin self"):
+  Target-self to character <&ys2char&0>
+  Target-self to others <&ys2other&0>
+
+See &cHELP DOLLAR SIGN CODES&0 for a list of codes that can be used in socials:
+  $n, $m, $e, $s - used for the actor
+  $N, $M, $E, $s - used for the target (targeted strings only)
+
+See also: OLC SOCIALS
+#d
+"SOCEDIT NAME"
+
+Usage:  .name <name>
+
+The social name is text used internally, to distinguish between different
+socials that share the same command. Players don't see the names of socials.
+
+Examples:
+ - Smile
+ - Smile with Mask
+ - Fangy Vampire Smile
+
+See also: OLC SOCIALS
 #d
 "STRING EDITOR" "TEXT EDITOR" "STRING EDITING" ,
 

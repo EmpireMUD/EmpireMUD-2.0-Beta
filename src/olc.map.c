@@ -27,8 +27,12 @@
 *   Edit Modules
 */
 
+// external vars
+extern bool world_map_needs_save;
+
 // external funcs
 void complete_building(room_data *room);
+extern crop_data *get_potential_crop_for_location(room_data *location);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -476,6 +480,162 @@ OLC_MODULE(mapedit_delete_exit) {
 			free(ex);
 		}
 		msg_to_char(ch, "Exit deleted. Target room not deleted.\r\n");
+	}
+}
+
+
+OLC_MODULE(mapedit_naturalize) {
+	bool island = FALSE, world = FALSE;
+	int count, island_id = NO_ISLAND;
+	struct island_info *isle;
+	struct map_data *map;
+	room_data *room;
+	
+	// parse argument
+	skip_spaces(&argument);
+	if (*argument && is_abbrev(argument, "island")) {
+		island = TRUE;
+	}
+	else if (*argument && !str_cmp(argument, "world")) {
+		world = TRUE;
+	}
+	else if (*argument) {
+		msg_to_char(ch, "Usage: .map naturalize [island | world]\r\n");
+		return;
+	}
+	
+	if (!island && !world && (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch)) || GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE)) {
+		msg_to_char(ch, "Leave the building or area first.\r\n");
+	}
+	else if (island && (island_id = GET_ISLAND_ID(IN_ROOM(ch))) == NO_ISLAND) {
+		msg_to_char(ch, "You can't do that while not on any island.\r\n");
+	}
+	else if (island || world) {	// normal processing for whole island/world
+		count = 0;
+		
+		// check all land tiles
+		LL_FOREACH(land_map, map) {
+			room = real_real_room(map->vnum);	// may or may not exist
+			
+			if (island && map->island != island_id) {
+				continue;
+			}
+			if (room && ROOM_OWNER(room)) {
+				continue;
+			}
+			if (room && ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
+				continue;
+			}
+			if (map->sector_type == map->natural_sector) {
+				continue;	// already same
+			}
+			
+			// looks good: naturalize it
+			if (room) {
+				change_terrain(room, GET_SECT_VNUM(map->natural_sector));
+				if (ROOM_PEOPLE(room)) {
+					act("The area is naturalized!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+				}
+			}
+			else {
+				perform_change_sect(NULL, map, map->natural_sector);
+				perform_change_base_sect(NULL, map, map->natural_sector);
+				
+				if (SECT_FLAGGED(map->natural_sector, SECTF_HAS_CROP_DATA)) {
+					room = real_room(map->vnum);	// need it loaded after all
+					set_crop_type(room, get_potential_crop_for_location(room));
+				}
+				else {
+					map->crop_type = NULL;
+				}
+			}
+			++count;
+		}
+		
+		if (count > 0) {
+			world_map_needs_save = TRUE;
+			
+			if (island) {
+				isle = get_island(island_id, TRUE);
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has naturalized %d tile%s on island %d %s", GET_NAME(ch), count, PLURAL(count), island_id, isle->name);
+			}
+			else if (world) {
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has naturalized %d tile%s for the whole world!", GET_NAME(ch), count, PLURAL(count));
+			}
+		}
+		msg_to_char(ch, "You have naturalized the sectors for %d tile%s%s.\r\n", count, PLURAL(count), island ? " on this island" : "");
+	}
+	else {	// normal processing for 1 room
+		map = &(world_map[FLAT_X_COORD(IN_ROOM(ch))][FLAT_Y_COORD(IN_ROOM(ch))]);
+		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(map->natural_sector));
+		
+		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has set naturalized the sector at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
+		msg_to_char(ch, "You have naturalized the sector for this tile.\r\n");
+		act("$n has naturalized the area!", FALSE, ch, NULL, NULL, TO_ROOM);
+		world_map_needs_save = TRUE;
+	}
+}
+
+
+OLC_MODULE(mapedit_remember) {
+	int count, island_id = NO_ISLAND;
+	struct island_info *isle;
+	struct map_data *map;
+	bool island = FALSE;
+	
+	// parse argument
+	skip_spaces(&argument);
+	if (*argument && is_abbrev(argument, "island")) {
+		island = TRUE;
+	}
+	else if (*argument) {
+		msg_to_char(ch, "Usage: .map remember [island]\r\n");
+		return;
+	}
+	
+	if (!island && (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch)) || GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE)) {
+		msg_to_char(ch, "Leave the building or area first.\r\n");
+	}
+	else if (island && (island_id = GET_ISLAND_ID(IN_ROOM(ch))) == NO_ISLAND) {
+		msg_to_char(ch, "You can't do that while not on any island.\r\n");
+	}
+	else if (!island && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE)) {
+		msg_to_char(ch, "You can't make it remember a sector which requires extra data like this one.\r\n");
+	}
+	else if (island) {	// normal processing for whole island
+		count = 0;
+		
+		// check all land tiles
+		LL_FOREACH(land_map, map) {
+			if (map->island != island_id) {
+				continue;
+			}
+			if (SECT_FLAGGED(map->sector_type, SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE)) {
+				continue;
+			}
+			if (map->natural_sector == map->sector_type) {
+				continue;	// already same
+			}
+			
+			// looks good
+			map->natural_sector = map->sector_type;
+			++count;
+		}
+		
+		if (count > 0) {
+			isle = get_island(island_id, TRUE);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has set 'remember' for %d tile%s on island %d %s", GET_NAME(ch), count, PLURAL(count), island_id, isle->name);
+			world_map_needs_save = TRUE;
+		}
+		msg_to_char(ch, "You have set the map to remember sectors for %d tile%s on this island.\r\n", count, PLURAL(count));
+	}
+	else {	// normal processing for 1 room
+		map = &(world_map[FLAT_X_COORD(IN_ROOM(ch))][FLAT_Y_COORD(IN_ROOM(ch))]);
+		map->natural_sector = map->sector_type;
+		
+		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has set 'remember' for %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
+		msg_to_char(ch, "You have set the map to remember the sector for this tile.\r\n");
+		world_map_needs_save = TRUE;
 	}
 }
 

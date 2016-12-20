@@ -74,6 +74,54 @@ A cheerful elf is dancing about.
 T 9901
 T 9902
 S
+#10723
+sapling pine little~
+a little pine sapling~
+An little pine sapling laden with decorations shuffles past.
+~
+1 1 bdoD n
+0 0 31 23
+T 9901
+T 9902
+S
+#10724
+fawn reindeer~
+a reindeer fawn~
+A reindeer fawn gazes curiously around.
+~
+1 1 bdoD n
+0 0 14 11
+T 9901
+T 9902
+S
+#10725
+snowman animated small~
+a small animated snowman~
+A small snowman turns and looks at you with its button eyes.
+~
+1 1 bdoD n
+0 0 21 15
+T 9901
+T 9902
+S
+#10726
+soldier toy~
+a toy soldier~
+A toy soldier salutes you smartly.
+~
+1 1 bdoD n
+0 0 35 1
+T 9901
+T 9902
+S
+#10728
+snowman large~
+a large snowman~
+A large snowman stands nearby.
+~
+1 1 dhoD nrG
+0 0 9 15
+S
 #10730
 cat musical~
 the cat~

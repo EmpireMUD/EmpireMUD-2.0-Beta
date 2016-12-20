@@ -451,6 +451,8 @@ want to try a different specialty.
 Once you use this command, those skill points are gone forever. You will also
 lose any abilities you purchased above the new level.
 
+Some skills cannot be dropped all the way to zero voluntarily.
+
 See also: SKILL
 #
 "SKILL SWAP" "SKILL SETS" MULTISPEC MULTI-SPEC "MULTI SPEC"

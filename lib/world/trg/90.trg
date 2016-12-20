@@ -2,7 +2,7 @@
 Cow Animation~
 0 bw 1
 ~
-Cow Animation
+* This script is no longer used. It was replaced by custom strings.
 * The cow will do a couple different things, so we do an if on a random generator.
 if (%random.2% == 2)
   %echo% %self.name% moos contentedly.
@@ -20,6 +20,7 @@ end
 Wolf Animation~
 0 bw 3
 ~
+* This script is no longer used. It was replaced by custom strings.
 * Wolf Animation (9001-9003)
 * Time of day is important, can't have wolves howling at the sun...
 if ((%time.hour% < 7) && (%time.hour% > 19))
@@ -84,6 +85,7 @@ end
 Sheep Animation~
 0 bw 1
 ~
+* This script is no longer used. It was replaced by custom strings.
 * The sheep will do a couple different things, so we do an if on a random generator.
 if (%random.2% == 2)
   %echo% %self.name% baas contentedly.
@@ -101,6 +103,7 @@ end
 Squirrel Animation~
 0 bw 4
 ~
+* This script is no longer used. It was replaced by custom strings.
 * Get current terrain.
 eval room %self.room%
 * If we are in forest, bombard players with acorns!
@@ -113,7 +116,7 @@ end
 Cow Animation~
 0 bw 3
 ~
-Cow Animation
+* This script is no longer used. It was replaced by custom strings.
 * The cow will do a couple different things, so we do an if on a random generator.
 if (%random.2% == 2)
   %echo% %self.name% moos contentedly.
@@ -131,6 +134,7 @@ end
 Chicken Animation~
 0 bw 3
 ~
+* This script is no longer used. It was replaced by custom strings.
 * Chicken Animation (9010)
 switch (%random.4%)
   case 1
@@ -155,6 +159,7 @@ done
 Rooster Animation~
 0 bw 3
 ~
+* This script is no longer used. It was replaced by custom strings.
 * Rooster Animation (9011)
 switch (%random.4%)
   case 1
@@ -179,6 +184,7 @@ done
 Dog Animation~
 0 bw 3
 ~
+* This script is no longer used. It was replaced by custom strings.
 * Dog Animation (9012)
 switch (%random.8%)
   case 1
@@ -232,6 +238,7 @@ done
 Prairie Dog Animation~
 0 bw 3
 ~
+* This script is no longer used. It was replaced by custom strings.
 * Prairie Dog Animation (9013)
 switch (%random.6%)
   case 1
@@ -251,6 +258,7 @@ done
 Vulture Animation~
 0 bw 1
 ~
+* This script is no longer used. It was replaced by custom strings.
 * Vulture Animation (9018)
 %echo% %self.name% circles high overhead, patiently waiting...
 ~
@@ -258,6 +266,7 @@ Vulture Animation~
 Quail Animation~
 0 bw 3
 ~
+* This script is no longer used. It was replaced by custom strings.
 * Quail Animation (9020)
 if (%random.2% == 1)
   %echo% %self.name% runs around on the ground looking for food.

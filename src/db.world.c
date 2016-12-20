@@ -70,8 +70,10 @@ int count_city_points_used(empire_data *emp);
 struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 void decustomize_room(room_data *room);
 room_vnum find_free_vnum();
+crop_data *get_potential_crop_for_location(room_data *location);
 void grow_crop(room_data *room);
 void init_room(room_data *room, room_vnum vnum);
+void naturalize_newbie_islands();
 void ruin_one_building(room_data *room);
 void save_world_map_to_file();
 extern int sort_empire_islands(struct empire_island *a, struct empire_island *b);
@@ -1000,7 +1002,7 @@ void annual_update_map_tile(room_data *room) {
 		// this will tear it back down to its base type
 		disassociate_building(room);
 	}
-
+		
 	// clean mine data from anything that's not currently a mine
 	if (!HAS_FUNCTION(room, FNC_MINE)) {
 		remove_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM);
@@ -1095,7 +1097,10 @@ void annual_world_update(void) {
 			}
 		}
 	}
-
+	
+	// reset newbie islands before doing rooms
+	naturalize_newbie_islands();
+	
 	HASH_ITER(hh, world_table, room, next_room) {
 		if (GET_ROOM_VNUM(room) < MAP_SIZE) {
 			annual_update_map_tile(room);
@@ -1105,6 +1110,75 @@ void annual_world_update(void) {
 	
 	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		annual_update_vehicle(veh);
+	}
+}
+
+
+/**
+* Restores the newbie islands to nature at the end of the year, if the
+* "naturalize_newbie_islands" option is configured on.
+*
+*/
+void naturalize_newbie_islands(void) {
+	struct island_info *isle = NULL;
+	int count = 0, last_isle = -1;
+	struct map_data *map;
+	room_data *room;
+	
+	if (!config_get_bool("naturalize_newbie_islands")) {
+		return;
+	}
+	
+	LL_FOREACH(land_map, map) {
+		// simple checks
+		if (map->sector_type == map->natural_sector) {
+			continue;	// already same
+		}
+		
+		// check island
+		if (!isle || last_isle != map->island) {
+			isle = get_island(map->island, TRUE);
+			last_isle = map->island;
+		}
+		if (!IS_SET(isle->flags, ISLE_NEWBIE)) {
+			continue;
+		}
+		
+		// checks needed if the room exists
+		if ((room = real_real_room(map->vnum))) {
+			if (ROOM_OWNER(room)) {
+				continue;
+			}
+			if (ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
+				continue;
+			}
+		}
+		
+		// looks good: naturalize it
+		if (room) {
+			change_terrain(room, GET_SECT_VNUM(map->natural_sector));
+			if (ROOM_PEOPLE(room)) {
+				act("The area returns to nature!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+			}
+		}
+		else {
+			perform_change_sect(NULL, map, map->natural_sector);
+			perform_change_base_sect(NULL, map, map->natural_sector);
+			
+			if (SECT_FLAGGED(map->natural_sector, SECTF_HAS_CROP_DATA)) {
+				room = real_room(map->vnum);	// need it loaded after all
+				set_crop_type(room, get_potential_crop_for_location(room));
+			}
+			else {
+				map->crop_type = NULL;
+			}
+		}
+		++count;
+	}
+	
+	if (count) {
+		log("New year: naturalized %d tile%s on newbie islands.", count, PLURAL(count));
+		world_map_needs_save = TRUE;
 	}
 }
 
@@ -2262,6 +2336,7 @@ crop_data *get_potential_crop_for_location(room_data *location) {
 	int x = X_COORD(location), y = Y_COORD(location);
 	bool water = find_flagged_sect_within_distance_from_room(location, SECTF_FRESH_WATER, NOBITS, config_get_int("water_crop_distance"));
 	bool x_min_ok, x_max_ok, y_min_ok, y_max_ok;
+	struct island_info *isle = NULL;
 	int climate;
 	crop_data *found, *crop, *next_crop;
 	int num_found = 0;
@@ -2285,21 +2360,36 @@ crop_data *get_potential_crop_for_location(room_data *location) {
 	// find any match
 	found = NULL;
 	HASH_ITER(hh, crop_table, crop, next_crop) {
-		if (GET_CROP_CLIMATE(crop) == climate && !CROP_FLAGGED(crop, CROPF_NOT_WILD)) {
-			if (water || !CROP_FLAGGED(crop, CROPF_REQUIRES_WATER) ) {
-				// check bounds
-				x_min_ok = (x >= (GET_CROP_X_MIN(crop) * MAP_WIDTH / 100));
-				x_max_ok = (x <= (GET_CROP_X_MAX(crop) * MAP_WIDTH / 100));
-				y_min_ok = (y >= (GET_CROP_Y_MIN(crop) * MAP_HEIGHT / 100));
-				y_max_ok = (y <= (GET_CROP_Y_MAX(crop) * MAP_HEIGHT / 100));
-			
-				if ((x_min_ok && x_max_ok) || (GET_CROP_X_MIN(crop) > GET_CROP_X_MAX(crop) && (x_min_ok || x_max_ok))) {
-					if ((y_min_ok && y_max_ok) || (GET_CROP_Y_MIN(crop) > GET_CROP_Y_MAX(crop) && (y_min_ok || y_max_ok))) {
-						// valid
-						if (!number(0, num_found++) || !found) {
-							found = crop;
-						}
-					}
+		// basic checks
+		if (GET_CROP_CLIMATE(crop) != climate || CROP_FLAGGED(crop, CROPF_NOT_WILD)) {
+			continue;
+		}
+		if (CROP_FLAGGED(crop, CROPF_REQUIRES_WATER) && !water) {
+			continue;
+		}
+		if (CROP_FLAGGED(crop, CROPF_NO_NEWBIE | CROPF_NEWBIE_ONLY)) {
+			if (!isle) {
+				isle = get_island(GET_ISLAND_ID(location), TRUE);
+			}
+			if (CROP_FLAGGED(crop, CROPF_NO_NEWBIE) && IS_SET(isle->flags, ISLE_NEWBIE)) {
+				continue;
+			}
+			if (CROP_FLAGGED(crop, CROPF_NEWBIE_ONLY) && !IS_SET(isle->flags, ISLE_NEWBIE)) {
+				continue;
+			}
+		}
+		
+		// check bounds
+		x_min_ok = (x >= (GET_CROP_X_MIN(crop) * MAP_WIDTH / 100));
+		x_max_ok = (x <= (GET_CROP_X_MAX(crop) * MAP_WIDTH / 100));
+		y_min_ok = (y >= (GET_CROP_Y_MIN(crop) * MAP_HEIGHT / 100));
+		y_max_ok = (y <= (GET_CROP_Y_MAX(crop) * MAP_HEIGHT / 100));
+		
+		if ((x_min_ok && x_max_ok) || (GET_CROP_X_MIN(crop) > GET_CROP_X_MAX(crop) && (x_min_ok || x_max_ok))) {
+			if ((y_min_ok && y_max_ok) || (GET_CROP_Y_MIN(crop) > GET_CROP_Y_MAX(crop) && (y_min_ok || y_max_ok))) {
+				// valid
+				if (!number(0, num_found++) || !found) {
+					found = crop;
 				}
 			}
 		}
@@ -2564,7 +2654,7 @@ void output_map_to_file(void) {
 			}
 			
 			// normal map output
-			if (world_map[x][y].crop_type) {
+			if (SECT_FLAGGED(sect, SECTF_HAS_CROP_DATA) && world_map[x][y].crop_type) {
 				fprintf(out, "%c", mapout_color_tokens[GET_CROP_MAPOUT(world_map[x][y].crop_type)]);
 			}
 			else {

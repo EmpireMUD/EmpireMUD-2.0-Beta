@@ -925,7 +925,10 @@ void free_char(char_data *ch) {
 			free(interact);
 		}
 	}
-
+	if (MOB_CUSTOM_MSGS(ch) && (!proto || MOB_CUSTOM_MSGS(ch) != MOB_CUSTOM_MSGS(proto))) {
+		free_custom_messages(MOB_CUSTOM_MSGS(ch));
+	}
+	
 	if (ch->desc) {
 		ch->desc->character = NULL;
 	}
@@ -2827,6 +2830,12 @@ void check_skills_and_abilities(char_data *ch) {
 		if (!plsk->ptr) {
 			HASH_DEL(GET_SKILL_HASH(ch), plsk);
 			free(plsk);
+			continue;
+		}
+		
+		// check skill level cap
+		if (plsk->level > SKILL_MAX_LEVEL(plsk->ptr)) {
+			plsk->level = SKILL_MAX_LEVEL(plsk->ptr);
 		}
 	}
 	update_class(ch);

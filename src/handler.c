@@ -46,7 +46,7 @@
 *   Object Handlers
 *   Object Binding Handlers
 *   Object Location Handlers
-*   Object Message Handlers
+*   Custom Message Handlers
 *   Object Targeting Handlers
 *   Offer Handlers
 *   Resource Depletion Handlers
@@ -4020,7 +4020,7 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 
 
 /**
-* Takes player input of a complex component like "large block" or
+* Takes player input of a complex component like "bunch block" or
 * "large, single fruit" and gets the CMP_ and CMPF_ settings from it.
 *
 * @param char *str The character's input.
@@ -4789,7 +4789,46 @@ void unequip_char_to_room(char_data *ch, int pos) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// OBJECT MESSAGE HANDLERS /////////////////////////////////////////////////
+//// CUSTOM MESSAGE HANDLERS /////////////////////////////////////////////////
+
+/**
+* Duplicates a list of custom messages.
+*
+* @param struct custom_message *from The list to copy.
+* @return struct custom_message* The copied list.
+*/
+struct custom_message *copy_custom_messages(struct custom_message *from) {
+	struct custom_message *list = NULL, *mes, *iter;
+	
+	LL_FOREACH(from, iter) {
+		CREATE(mes, struct custom_message, 1);
+		
+		mes->type = iter->type;
+		mes->msg = iter->msg ? str_dup(iter->msg) : NULL;
+		
+		LL_APPEND(list, mes);
+	}
+	
+	return list;
+}
+
+
+/**
+* Frees a list of custom messages.
+*
+* @param struct custom_message *mes The list to free.
+*/
+void free_custom_messages(struct custom_message *mes) {
+	struct custom_message *iter, *next;
+	
+	LL_FOREACH_SAFE(mes, iter, next) {
+		if (iter->msg) {
+			free(iter->msg);
+		}
+		free(iter);
+	}
+}
+
 
 /**
 * This gets a custom message of a given type for an object. If there is more
@@ -4802,7 +4841,7 @@ void unequip_char_to_room(char_data *ch, int pos) {
 * @return char* The custom message, or NULL if there is none.
 */
 char *get_custom_message(obj_data *obj, int type) {
-	struct obj_custom_message *ocm;
+	struct custom_message *ocm;
 	char *found = NULL;
 	int num_found = 0;
 	
@@ -4824,7 +4863,7 @@ char *get_custom_message(obj_data *obj, int type) {
 * @return bool TRUE if the object has at least one message of the requested type.
 */
 bool has_custom_message(obj_data *obj, int type) {
-	struct obj_custom_message *ocm;
+	struct custom_message *ocm;
 	bool found = FALSE;
 	
 	for (ocm = obj->custom_msgs; ocm && !found; ocm = ocm->next) {

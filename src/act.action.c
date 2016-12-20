@@ -36,12 +36,15 @@
 */
 
 // external vars
+extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 
 // external funcs
 extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern double get_base_dps(obj_data *weapon);
 extern obj_data *find_chip_weapon(char_data *ch);
+extern char *get_mine_type_name(room_data *room);
 extern obj_data *has_sharp_tool(char_data *ch);
+extern bool is_deep_mine(room_data *room);
 void process_build(char_data *ch, room_data *room, int act_type);
 void scale_item_to_level(obj_data *obj, int level);
 
@@ -344,6 +347,27 @@ obj_data *has_shovel(char_data *ch) {
 	}
 	
 	return NULL;
+}
+
+
+/**
+* Display prospect information for the room.
+*
+* @param char_data *ch The person seeing the info.
+* @param room_data *room The room to prospect.
+*/
+void show_prospect_result(char_data *ch, room_data *room) {
+	if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0 || !global_proto(get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM))) {
+		msg_to_char(ch, "This area has already been mined for all it's worth.\r\n");
+	}
+	else {
+		if (is_deep_mine(room)) {
+			msg_to_char(ch, "You discover that this area is a deep %s.\r\n", get_mine_type_name(room));
+		}
+		else {
+			msg_to_char(ch, "You discover that this area is %s %s.\r\n", AN(get_mine_type_name(room)), get_mine_type_name(room));
+		}
+	}
 }
 
 
@@ -660,22 +684,14 @@ INTERACTION_FUNC(finish_gathering) {
 
 
 INTERACTION_FUNC(finish_harvesting) {
-	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
-
-	sector_data *sect = NULL;
 	crop_data *cp;
 	int count, num;
 	obj_data *obj = NULL;
 		
-	if ((cp = ROOM_CROP(inter_room)) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
-		// victory
-		act("You finish harvesting the crop!", FALSE, ch, 0, 0, TO_CHAR);
-		act("$n finished harvesting the crop!", FALSE, ch, 0, 0, TO_ROOM);
-
+	if ((cp = ROOM_CROP(inter_room)) ) {
 		// how many to get
-		num = number(2, 6) + (has_ability(ch, ABIL_MASTER_FARMER) ? number(2, 6) : 0);
-		num *= interaction->quantity;
-	
+		num = interaction->quantity * (has_ability(ch, ABIL_MASTER_FARMER) ? 2 : 1);
+		
 		// give them over
 		for (count = 0; count < num; ++count) {
 			obj = read_object(interaction->vnum, TRUE);
@@ -691,20 +707,9 @@ INTERACTION_FUNC(finish_harvesting) {
 		}
 	}
 	else {
-		sect = find_first_matching_sector(NOBITS, SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE);
-		msg_to_char(ch, "You finish harvesting but the crop appears to have died.\r\n");
-		act("$n finishes harvesting, but the crop appears to have died.", FALSE, ch, NULL, NULL, TO_ROOM);
+		msg_to_char(ch, "The crop appears to have died and you get nothing useful.\r\n");
 	}
-
-	// finally, change the terrain
-	if (BASE_SECT(inter_room) != SECT(inter_room)) {
-		// use original terrain (appears to have been stored)
-		change_terrain(inter_room, GET_SECT_VNUM(BASE_SECT(inter_room)));
-	}
-	else if (sect) {
-		// use fallback sect
-		change_terrain(inter_room, GET_SECT_VNUM(sect));
-	}
+	
 	return TRUE;
 }
 
@@ -1445,7 +1450,7 @@ void process_gathering(char_data *ch) {
 *
 * @param char_data *ch The harvester.
 */
-void process_harvesting(char_data *ch) {	
+void process_harvesting(char_data *ch) {
 	if (!GET_EQ(ch, WEAR_WIELD) || (GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE && GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLASH)) {
 		send_to_char("You're not wielding the proper tool for harvesting.\r\n", ch);
 		cancel_action(ch);
@@ -1482,6 +1487,9 @@ void process_harvesting(char_data *ch) {
 		// stop all harvesters including ch
 		stop_room_action(IN_ROOM(ch), ACT_HARVESTING, CHORE_FARMING);
 		
+		act("You finish harvesting the crop!", FALSE, ch, NULL, NULL, TO_CHAR);
+		act("$n finished harvesting the crop!", FALSE, ch, NULL, NULL, TO_ROOM);
+		
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_harvesting)) {
 			// skillups
 			gain_ability_exp(ch, ABIL_CHORES, 30);
@@ -1489,6 +1497,23 @@ void process_harvesting(char_data *ch) {
 		}
 		else {
 			msg_to_char(ch, "You fail to harvest anything here.\r\n");
+		}
+		
+		// change the sector
+		if (BASE_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) {
+			// use original terrain (appears to have been stored)
+			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(BASE_SECT(IN_ROOM(ch))));
+		}
+		else {
+			// attempt to detect
+			crop_data *cp = ROOM_CROP(IN_ROOM(ch));
+			sector_data *sect = cp ? sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]) : NULL;
+			if (!sect) {
+				sect = find_first_matching_sector(NOBITS, SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE);
+			}
+			if (sect) {
+				change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
+			}
 		}
 	}
 }
@@ -1806,8 +1831,6 @@ void process_planting(char_data *ch) {
 * @param char_data *ch The prospector.
 */
 void process_prospecting(char_data *ch) {
-	extern char *get_mine_type_name(room_data *room);
-	extern bool is_deep_mine(room_data *room);
 	void init_mine(room_data *room, char_data *ch);
 		
 	// simple decrement
@@ -1836,18 +1859,8 @@ void process_prospecting(char_data *ch) {
 			GET_ACTION(ch) = ACT_NONE;
 			init_mine(IN_ROOM(ch), ch);
 			
-			if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0 || !global_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM))) {
-				msg_to_char(ch, "This area has already been mined for all it's worth.\r\n");
-			}
-			else {
-				if (is_deep_mine(IN_ROOM(ch))) {
-					msg_to_char(ch, "You discover that this area is a deep %s.\r\n", get_mine_type_name(IN_ROOM(ch)));
-				}
-				else {
-					msg_to_char(ch, "You discover that this area is %s %s.\r\n", AN(get_mine_type_name(IN_ROOM(ch))), get_mine_type_name(IN_ROOM(ch)));
-				}
-				act("$n finishes prospecting.", TRUE, ch, NULL, NULL, TO_ROOM);
-			}
+			show_prospect_result(ch, IN_ROOM(ch));
+			act("$n finishes prospecting.", TRUE, ch, NULL, NULL, TO_ROOM);
 			
 			gain_ability_exp(ch, ABIL_PROSPECT, 15);
 			break;
@@ -2799,6 +2812,12 @@ ACMD(do_prospect) {
 	}
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_PROSPECT)) {
 		return;
+	}
+	else if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) > 0) {
+		msg_to_char(ch, "You see evidence that someone has already prospected this area...\r\n");
+		show_prospect_result(ch, IN_ROOM(ch));
+		act("$n quickly prospects the area.", TRUE, ch, NULL, NULL, TO_ROOM);
+		command_lag(ch, WAIT_ABILITY);
 	}
 	else {
 		start_action(ch, ACT_PROSPECTING, 6);

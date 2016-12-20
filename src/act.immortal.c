@@ -1307,8 +1307,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("vampire") {
 		if (IS_VAMPIRE(vict)) {
-			GET_BLOOD(vict) = GET_MAX_BLOOD(vict);
-			REMOVE_BIT(PLR_FLAGS(vict), PLR_VAMPIRE);
+			void un_vampire(char_data *ch);
+			un_vampire(vict);
 		}
 		else {
 			make_vampire(vict, TRUE);
@@ -3028,6 +3028,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern const char *cooldown_types[];
 	extern const char *damage_types[];
 	extern const double hit_per_dex;
+	extern const char *mob_custom_types[];
 	extern const char *mob_move_types[];
 	extern const char *player_bits[];
 	extern const char *position_types[];
@@ -3180,6 +3181,15 @@ void do_stat_character(char_data *ch, char_data *k) {
 		send_to_char("Interactions:\r\n", ch);
 		get_interaction_display(k->interactions, buf);
 		send_to_char(buf, ch);
+	}
+	
+	if (MOB_CUSTOM_MSGS(k)) {
+		struct custom_message *mcm;
+		
+		msg_to_char(ch, "Custom messages:\r\n");
+		LL_FOREACH(MOB_CUSTOM_MSGS(k), mcm) {
+			msg_to_char(ch, " %s: %s\r\n", mob_custom_types[mcm->type], mcm->msg);
+		}
 	}
 
 	if (!IS_NPC(k)) {
@@ -3475,7 +3485,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	obj_vnum vnum = GET_OBJ_VNUM(j);
 	obj_data *j2;
 	struct obj_storage_type *store;
-	struct obj_custom_message *ocm;
+	struct custom_message *ocm;
 	player_index_data *index;
 	crop_data *cp;
 
@@ -6148,7 +6158,7 @@ ACMD(do_restore) {
 			}
 			
 			HASH_ITER(hh, skill_table, skill, next_skill) {
-				set_skill(vict, SKILL_VNUM(skill), 100);
+				set_skill(vict, SKILL_VNUM(skill), SKILL_MAX_LEVEL(skill));
 			}
 			update_class(vict);
 			
@@ -7118,6 +7128,12 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No skills by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "social")) {
+		extern int vnum_social(char *searchname, char_data *ch);
+		if (!vnum_social(buf2, ch)) {
+			msg_to_char(ch, "No socials by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "trigger")) {
 		if (!vnum_trigger(buf2, ch)) {
 			msg_to_char(ch, "No triggers by that name.\r\n");
@@ -7297,6 +7313,15 @@ ACMD(do_vstat) {
 			return;
 		}
 		do_stat_skill(ch, skill);
+	}
+	else if (is_abbrev(buf, "social")) {
+		void do_stat_social(char_data *ch, social_data *soc);
+		social_data *soc = social_proto(number);
+		if (!soc) {
+			msg_to_char(ch, "There is no social with that number.\r\n");
+			return;
+		}
+		do_stat_social(ch, soc);
 	}
 	else if (is_abbrev(buf, "trigger")) {
 		trig_data *trig = real_trigger(number);

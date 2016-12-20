@@ -34,7 +34,8 @@
 #define DB_BOOT_VEH  20
 #define DB_BOOT_MORPH  21
 #define DB_BOOT_QST  22
-#define NUM_DB_BOOT_TYPES  23	// total
+#define DB_BOOT_SOC  23
+#define NUM_DB_BOOT_TYPES  24	// total
 
 
 // library sub-dirs
@@ -86,6 +87,7 @@
 #define RMT_PREFIX  LIB_WORLD"rmt/"	// room templates
 #define SECTOR_PREFIX  LIB_WORLD"sect/"	// sect definitions
 #define SKILL_PREFIX  LIB_WORLD"skill/"	// player skills
+#define SOC_PREFIX  LIB_WORLD"soc/"	// socials
 #define TRG_PREFIX  LIB_WORLD"trg/"	// trigger files
 #define VEH_PREFIX  LIB_WORLD"veh/"	// vehicle files
 #define HLP_PREFIX  LIB_TEXT"help/"	// for HELP <keyword>
@@ -113,6 +115,7 @@
 #define RMT_SUFFIX  ".rmt"	// room template suffix
 #define SECTOR_SUFFIX  ".sect"	// sector file suffix
 #define SKILL_SUFFIX  ".skill"	// player skills
+#define SOC_SUFFIX  ".soc"	// social file suffix
 #define TRG_SUFFIX  ".trg"	// trigger file suffix
 #define VEH_SUFFIX  ".veh"	// vehicle file suffix
 #define WLD_SUFFIX  ".wld"	// suffix for rooms
@@ -135,7 +138,6 @@
 #define TYPO_FILE  LIB_MISC"typos"	//         'typo'
 #define BUG_FILE  LIB_MISC"bugs"	//         'bug'
 #define MESS_FILE  LIB_MISC"messages"	// damage messages
-#define SOCMESS_FILE  LIB_MISC"socials"	// messgs for social acts
 #define TIPS_OF_THE_DAY_FILE  LIB_MISC"tips"	// one-line tips shown on login
 #define XNAME_FILE  LIB_MISC"xnames"	// invalid name substrings
 
@@ -362,6 +364,12 @@ extern skill_data *find_skill_by_vnum(any_vnum vnum);
 void free_skill(skill_data *skill);
 extern char *get_skill_abbrev_by_vnum(any_vnum vnum);
 extern char *get_skill_name_by_vnum(any_vnum vnum);
+
+// socials
+extern social_data *social_table;
+extern social_data *sorted_socials;
+extern social_data *social_proto(any_vnum vnum);
+void free_social(social_data *soc);
 
 // triggers
 extern trig_data *trigger_table;

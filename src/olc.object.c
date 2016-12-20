@@ -1119,7 +1119,6 @@ void save_olc_object(descriptor_data *desc) {
 	struct empire_unique_storage *eus;
 	struct interaction_item *interact;
 	struct obj_storage_type *store;
-	struct obj_custom_message *ocm;
 	struct trading_post_data *tpd;
 	empire_data *emp, *next_emp;
 	struct quest_lookup *ql;
@@ -1175,14 +1174,7 @@ void save_olc_object(descriptor_data *desc) {
 		proto->storage = store->next;
 		free(store);
 	}
-	
-	while ((ocm = proto->custom_msgs)) {
-		if (ocm->msg) {
-			free(ocm->msg);
-		}
-		proto->custom_msgs = ocm->next;
-		free(ocm);
-	}
+	free_custom_messages(proto->custom_msgs);
 	
 	// old applies
 	free_obj_apply_list(GET_OBJ_APPLIES(proto));
@@ -1273,7 +1265,6 @@ struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list) {
 */
 obj_data *setup_olc_object(obj_data *input) {
 	struct obj_storage_type *store, *new_store, *last_store;
-	struct obj_custom_message *ocm, *new_ocm, *last_ocm;
 	obj_data *new;
 	
 	CREATE(new, obj_data, 1);
@@ -1313,23 +1304,7 @@ obj_data *setup_olc_object(obj_data *input) {
 		}
 		
 		// copy custom msgs
-		new->custom_msgs = NULL;
-		last_ocm = NULL;
-		for (ocm = input->custom_msgs; ocm; ocm = ocm->next) {
-			CREATE(new_ocm, struct obj_custom_message, 1);
-			
-			new_ocm->type = ocm->type;
-			new_ocm->msg = str_dup(ocm->msg);
-			new_ocm->next = NULL;
-			
-			if (last_ocm) {
-				last_ocm->next = new_ocm;
-			}
-			else {
-				new->custom_msgs = new_ocm;
-			}
-			last_ocm = new_ocm;
-		}
+		new->custom_msgs = copy_custom_messages(input->custom_msgs);
 		
 		// copy applies
 		GET_OBJ_APPLIES(new) = copy_obj_apply_list(GET_OBJ_APPLIES(input));
@@ -1492,7 +1467,7 @@ void olc_show_object(char_data *ch) {
 	
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	struct obj_storage_type *store;
-	struct obj_custom_message *ocm;
+	struct custom_message *ocm;
 	struct obj_apply *apply;
 	int count, minutes;
 	
@@ -1960,7 +1935,7 @@ OLC_MODULE(oedit_custom) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *msgstr;
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	int num, iter, msgtype;
-	struct obj_custom_message *ocm, *change, *temp;
+	struct custom_message *ocm, *change, *temp;
 	bool found;
 	
 	// arg1 arg2
@@ -2017,7 +1992,7 @@ OLC_MODULE(oedit_custom) {
 		else {
 			delete_doubledollar(msgstr);
 			
-			CREATE(ocm, struct obj_custom_message, 1);
+			CREATE(ocm, struct custom_message, 1);
 
 			ocm->type = msgtype;
 			ocm->msg = str_dup(msgstr);

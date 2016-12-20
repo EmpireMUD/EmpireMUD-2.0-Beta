@@ -16,7 +16,11 @@ D0
 ;;;;~
 &Y~
 I 6 3003 100.00 1  # FORAGE: a handful of grain
-I 8 141 100.00 1  # HARVEST: a bundle of wheat
+I 8 141 20.00 2 H  # HARVEST: a bundle of wheat
+I 8 141 20.00 3 H  # HARVEST: a bundle of wheat
+I 8 141 20.00 4 H  # HARVEST: a bundle of wheat
+I 8 141 20.00 5 H  # HARVEST: a bundle of wheat
+I 8 141 20.00 6 H  # HARVEST: a bundle of wheat
 M
 9134 5.00 bdh
 M
@@ -93,7 +97,11 @@ D0
 iiii~
 &g~
 I 6 3003 100.00 1  # FORAGE: a handful of grain
-I 8 3005 100.00 1  # HARVEST: a bushel of corn
+I 8 3005 20.00 2 H  # HARVEST: a bushel of corn
+I 8 3005 20.00 3 H  # HARVEST: a bushel of corn
+I 8 3005 20.00 4 H  # HARVEST: a bushel of corn
+I 8 3005 20.00 5 H  # HARVEST: a bushel of corn
+I 8 3005 20.00 6 H  # HARVEST: a bushel of corn
 M
 9134 5.00 bdh
 M
@@ -169,7 +177,11 @@ A Field of Hops~
 D0
 ::::~
 &G~
-I 8 143 100.00 1  # HARVEST: a bushel of hops
+I 8 143 20.00 2 H  # HARVEST: a bushel of hops
+I 8 143 20.00 3 H  # HARVEST: a bushel of hops
+I 8 143 20.00 4 H  # HARVEST: a bushel of hops
+I 8 143 20.00 5 H  # HARVEST: a bushel of hops
+I 8 143 20.00 6 H  # HARVEST: a bushel of hops
 M
 9134 5.00 bdh
 M
@@ -245,7 +257,11 @@ A Field of Cotton~
 D0
 ::::~
 &0~
-I 8 144 100.00 1  # HARVEST: a basket of cotton
+I 8 144 20.00 2 H  # HARVEST: a basket of cotton
+I 8 144 20.00 3 H  # HARVEST: a basket of cotton
+I 8 144 20.00 4 H  # HARVEST: a basket of cotton
+I 8 144 20.00 5 H  # HARVEST: a basket of cotton
+I 8 144 20.00 6 H  # HARVEST: a basket of cotton
 M
 250 0.10 ad
 M
@@ -292,7 +308,11 @@ D0
 ::::~
 &Y~
 I 6 3003 100.00 1  # FORAGE: a handful of grain
-I 8 145 100.00 1  # HARVEST: a sack of barley
+I 8 145 20.00 2 H  # HARVEST: a sack of barley
+I 8 145 20.00 3 H  # HARVEST: a sack of barley
+I 8 145 20.00 4 H  # HARVEST: a sack of barley
+I 8 145 20.00 5 H  # HARVEST: a sack of barley
+I 8 145 20.00 6 H  # HARVEST: a sack of barley
 M
 9134 5.00 bdh
 M
@@ -660,7 +680,11 @@ D0
 ,,,,~
 &g~
 I 6 3003 100.00 1  # FORAGE: a handful of grain
-I 8 3011 100.00 1  # HARVEST: a sack of dried rice
+I 8 3011 20.00 2 H  # HARVEST: a sack of dried rice
+I 8 3011 20.00 3 H  # HARVEST: a sack of dried rice
+I 8 3011 20.00 4 H  # HARVEST: a sack of dried rice
+I 8 3011 20.00 5 H  # HARVEST: a sack of dried rice
+I 8 3011 20.00 6 H  # HARVEST: a sack of dried rice
 M
 9134 5.00 bdh
 M
@@ -796,7 +820,11 @@ D0
 ....~
 &G~
 I 6 3020 100.00 1  # FORAGE: a handful of peas
-I 8 3021 100.00 1  # HARVEST: a basket of peas
+I 8 3021 20.00 2 H  # HARVEST: a basket of peas
+I 8 3021 20.00 3 H  # HARVEST: a basket of peas
+I 8 3021 20.00 4 H  # HARVEST: a basket of peas
+I 8 3021 20.00 5 H  # HARVEST: a basket of peas
+I 8 3021 20.00 6 H  # HARVEST: a basket of peas
 M
 9134 5.00 bdh
 M
@@ -873,7 +901,7 @@ D0
 oooo~
 &y~
 I 6 3022 100.00 1  # FORAGE: a yellow squash
-I 8 3023 100.00 1  # HARVEST: a basket of gourds
+I 8 3023 100.00 2  # HARVEST: a basket of gourds
 M
 9134 5.00 bdh
 M
@@ -1066,7 +1094,11 @@ D0
 &Gd&?\/&Gb~
 &g~
 I 6 3024 100.00 1  # FORAGE: an unripe plantain
-I 8 3025 100.00 1  # HARVEST: a basket of plantains
+I 8 3025 20.00 2 H  # HARVEST: a basket of plantains
+I 8 3025 20.00 3 H  # HARVEST: a basket of plantains
+I 8 3025 20.00 4 H  # HARVEST: a basket of plantains
+I 8 3025 20.00 5 H  # HARVEST: a basket of plantains
+I 8 3025 20.00 6 H  # HARVEST: a basket of plantains
 M
 9061 0.01 d
 M

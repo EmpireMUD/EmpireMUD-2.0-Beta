@@ -174,7 +174,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	
 	// buildings
 	if (IS_COMPLETE(room)) {
-		if ((BUILDING_DAMAGE(room) > 0 || BUILDING_RESOURCES(room)) && CHORE_ACTIVE(CHORE_MAINTENANCE)) {
+		if ((BUILDING_DAMAGE(room) > 0 || BUILDING_RESOURCES(room)) && HOME_ROOM(room) == room && CHORE_ACTIVE(CHORE_MAINTENANCE)) {
 			do_chore_building(emp, room, CHORE_MAINTENANCE);
 		}
 		
@@ -1491,7 +1491,7 @@ INTERACTION_FUNC(one_farming_chore) {
 			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 			remove_room_extra_data(inter_room, ROOM_EXTRA_HARVEST_PROGRESS);
 			
-			amt = number(4, 8) * interaction->quantity;
+			amt = interaction->quantity;
 			add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
 			
 			if (ROOM_CROP_FLAGGED(inter_room, CROPF_IS_ORCHARD)) {

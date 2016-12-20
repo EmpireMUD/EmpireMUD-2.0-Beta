@@ -1111,4 +1111,48 @@ M
 4
 You fill yourself on fancy desserts.~
 S
+#3362
+jar oil lettuce seed~
+a jar of lettuce seed oil~
+There is a jar of lettuce seed oil here.~
+   The jar has a sacred seal on top, as the oil inside is primarily used in
+ceremonies. It is made from the pressed seeds of the lettuce plant.  
+~
+3 l a 6
+0 0 0
+6 168
+O
+20 u
+R
+5134 0
+R
+5192 0
+R
+5148 0
+R
+5150 0
+S
+#3363
+salad fresh~
+a fresh salad~
+Someone has left a fresh salad on the ground.~
+   The salad is made from fresh, crisp lettuce and chopped vegetables. It has
+been dressed with oil and lightly seasoned.  
+~
+6 m a 5
+24 0 0
+7 336
+A
+18 1 0
+C
+1 1
+M
+4
+You crunch on a fresh salad.~
+M
+5
+$n crunches on a fresh salad.~
+R
+5606 0
+S
 $

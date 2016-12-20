@@ -41,6 +41,7 @@
 *   Room Template Utils
 *   Sector Utils
 *   Skill Utils
+*   Social Utils
 *   String Utils
 *   Vehicle Utils
 *   Const Externs
@@ -346,7 +347,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define IS_HUMAN(ch)  (!IS_VAMPIRE(ch))
 #define IS_MAGE(ch)  (IS_NPC(ch) ? GET_MAX_MANA(ch) > 0 : (get_skill_level((ch), SKILL_NATURAL_MAGIC) > 0 || get_skill_level((ch), SKILL_HIGH_SORCERY) > 0))
 #define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
-#define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : PLR_FLAGGED((ch), PLR_VAMPIRE))
+#define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : (get_skill_level((ch), SKILL_VAMPIRE) > 0))
 #define WOULD_EXECUTE(ch, vict)  (IS_NPC(ch) ? (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP)) : (PRF_FLAGGED((ch), PRF_AUTOKILL) || MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP)))
 
 // helpers
@@ -449,6 +450,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_ROOM_TEMPLATE(desc)  ((desc)->olc_room_template)
 #define GET_OLC_SECTOR(desc)  ((desc)->olc_sector)
 #define GET_OLC_SKILL(desc)  ((desc)->olc_skill)
+#define GET_OLC_SOCIAL(desc)  ((desc)->olc_social)
 #define GET_OLC_TRIGGER(desc)  ((desc)->olc_trigger)
 #define GET_OLC_VEHICLE(desc)  ((desc)->olc_vehicle)
 
@@ -606,6 +608,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_MIN_SCALE_LEVEL(ch)  ((ch)->mob_specials.min_scale_level)
 #define MOB_NAME_SET(ch)  ((ch)->mob_specials.name_set)
 #define MOB_ATTACK_TYPE(ch)  ((ch)->mob_specials.attack_type)
+#define MOB_CUSTOM_MSGS(ch)  ((ch)->mob_specials.custom_msgs)
 #define MOB_DAMAGE(ch)  ((ch)->mob_specials.damage)
 #define MOB_DYNAMIC_NAME(ch)  ((ch)->mob_specials.dynamic_name)
 #define MOB_DYNAMIC_SEX(ch)  ((ch)->mob_specials.dynamic_sex)
@@ -1146,11 +1149,31 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 #define SKILL_ABILITIES(skill)  ((skill)->abilities)
 #define SKILL_DESC(skill)  ((skill)->desc)
 #define SKILL_FLAGS(skill)  ((skill)->flags)
+#define SKILL_MAX_LEVEL(skill)  ((skill)->max_level)
+#define SKILL_MIN_DROP_LEVEL(skill)  ((skill)->min_drop_level)
 #define SKILL_NAME(skill)  ((skill)->name)
 #define SKILL_VNUM(skill)  ((skill)->vnum)
 
 // utils
 #define SKILL_FLAGGED(skill, flag)  IS_SET(SKILL_FLAGS(skill), (flag))
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SOCIAL UTILS ////////////////////////////////////////////////////////////
+
+#define SOC_COMMAND(soc)  ((soc)->command)
+#define SOC_FLAGS(soc)  ((soc)->flags)
+#define SOC_MESSAGE(soc, num)  ((soc)->message[num])
+#define SOC_MIN_CHAR_POS(soc)  ((soc)->min_char_position)
+#define SOC_MIN_VICT_POS(soc)  ((soc)->min_victim_position)
+#define SOC_NAME(soc)  ((soc)->name)
+#define SOC_REQUIREMENTS(soc)  ((soc)->requirements)
+#define SOC_VNUM(soc)  ((soc)->vnum)
+
+// definitions
+#define SOCIAL_FLAGGED(soc, flag)  IS_SET(SOC_FLAGS(soc), (flag))
+#define SOC_HIDDEN(soc)  (SOCIAL_FLAGGED((soc), SOC_HIDE_IF_INVIS))
+#define SOC_IS_TARGETABLE(soc)  (SOC_MESSAGE((soc), SOCM_TARGETED_TO_CHAR) != NULL)
 
 
  //////////////////////////////////////////////////////////////////////////////

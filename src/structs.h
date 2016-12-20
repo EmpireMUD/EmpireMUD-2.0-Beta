@@ -32,6 +32,7 @@
 *     Player Defines
 *     Quest Defines
 *     Sector Defines
+*     Social Defines
 *     Vehicle Defines
 *     Weather and Season Defines
 *     World Defines
@@ -56,6 +57,7 @@
 *     Object Structs
 *     Quest Structs
 *     Sector Structs
+*     Social Structs
 *     Trigger Structs
 *     Vehicle Structs
 *     Weather and Season Structs
@@ -226,6 +228,7 @@ typedef struct quest_data quest_data;
 typedef struct room_data room_data;
 typedef struct room_template room_template;
 typedef struct sector_data sector_data;
+typedef struct social_data social_data;
 typedef struct skill_data skill_data;
 typedef struct trig_data trig_data;
 typedef struct vehicle_data vehicle_data;
@@ -756,10 +759,12 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// CROP DEFINES ////////////////////////////////////////////////////////////
 
-// crop flags
+// CROPF_x: crop flags
 #define CROPF_REQUIRES_WATER  BIT(0)	// only plants near water
 #define CROPF_IS_ORCHARD  BIT(1)	// follows orchard rules
 #define CROPF_NOT_WILD  BIT(2)	// crop will never spawn in the wild
+#define CROPF_NEWBIE_ONLY  BIT(3)	// only spawns on newbie islands
+#define CROPF_NO_NEWBIE  BIT(4)	// never spawns on newbie islands
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1031,6 +1036,11 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_NO_RESCALE  BIT(32)	// G. mob won't rescale (after the first time), e.g. if specific traits were set
 
 
+// MOB_CUSTOM_x: custom message types
+#define MOB_CUSTOM_ECHO  0
+#define MOB_CUSTOM_SAY  1
+
+
 // MOB_MOVE_x: mob/vehicle movement types
 #define MOB_MOVE_WALK  0
 #define MOB_MOVE_CLIMB  1
@@ -1066,6 +1076,8 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_MOVE_BOUNCES  31
 #define MOB_MOVE_FLOWS  32
 #define MOB_MOVE_LEAVES  33
+#define MOB_MOVE_SHUFFLES  34
+#define MOB_MOVE_MARCHES  35
 
 
 // name sets: add matching files in lib/text/names/
@@ -1597,7 +1609,7 @@ typedef struct vehicle_data vehicle_data;
 #define PLR_INVSTART	BIT(11)	/* Player should enter game wizinvis	*/
 #define PLR_IPMASK		BIT(12)	/* Player is IP-masked					*/
 #define PLR_DISGUISED	BIT(13)	// Player is using a disguise
-#define PLR_VAMPIRE		BIT(14)	/* Player is a vampire					*/
+	#define PLR_UNUSEDV		BIT(14)
 	#define PLR_UNUSED6		BIT(15)
 #define PLR_NEEDS_NEWBIE_SETUP  BIT(16)  // player is created but needs gear and setup
 #define PLR_UNRESTRICT	BIT(17)	/* !walls, !buildings					*/
@@ -1754,6 +1766,26 @@ typedef struct vehicle_data vehicle_data;
 	#define SECTF_UNUSED1  BIT(20)
 #define SECTF_ROUGH  BIT(21)	// hard terrain, requires ATR; other mountain-like properties
 #define SECTF_SHALLOW_WATER  BIT(22)	// can't earthmeld; other properties like swamp and oasis have
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SOCIAL DEFINES //////////////////////////////////////////////////////////
+
+// SOC_x: Social flags
+#define SOC_IN_DEVELOPMENT  BIT(0)	// a. can't be used by players
+#define SOC_HIDE_IF_INVIS  BIT(1)	// b. no "Someone" if player can't be seen
+
+
+// SOCM_x: social message string
+#define SOCM_NO_ARG_TO_CHAR  0
+#define SOCM_NO_ARG_TO_OTHERS  1
+#define SOCM_TARGETED_TO_CHAR  2
+#define SOCM_TARGETED_TO_OTHERS  3
+#define SOCM_TARGETED_TO_VICTIM  4
+#define SOCM_TARGETED_NOT_FOUND  5
+#define SOCM_SELF_TO_CHAR  6
+#define SOCM_SELF_TO_OTHERS  7
+#define NUM_SOCM_MESSAGES  8	// total
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2267,6 +2299,8 @@ struct skill_data {
 	char *desc;
 	
 	bitvector_t flags;	// SKILLF_ flags
+	int max_level;	// skill's maximum level (default 100)
+	int min_drop_level;	// how low the skill can be dropped manually (default 0)
 	struct skill_ability *abilities;	// assigned abilities
 	
 	UT_hash_handle hh;	// skill_table hash handle
@@ -2653,7 +2687,8 @@ struct mob_special_data {
 	int max_scale_level;	// maximum level this mob may be scaled to
 	
 	int name_set;	// NAMES_x
-
+	struct custom_message *custom_msgs;	// any custom messages
+	
 	int to_hit;	// Mob's attack % bonus
 	int to_dodge;	// Mob's dodge % bonus
 	int damage;	// Raw damage
@@ -2671,6 +2706,15 @@ struct mob_special_data {
 	// for #n-named mobs
 	int dynamic_sex;
 	int dynamic_name;
+};
+
+
+// for mobs/objs custom action messages
+struct custom_message {
+	int type;	// OBJ_CUSTOM_ or MOB_CUSTOM_
+	char *msg;
+	
+	struct custom_message *next;
 };
 
 
@@ -2854,6 +2898,7 @@ struct descriptor_data {
 	quest_data *olc_quest;	// quest being edited
 	room_template *olc_room_template;	// rmt being edited
 	struct sector_data *olc_sector;	// sector being edited
+	social_data *olc_social;	// social being edited
 	skill_data *olc_skill;	// skill being edited
 	struct trig_data *olc_trigger;	// trigger being edited
 	vehicle_data *olc_vehicle;	// vehicle being edited
@@ -3694,7 +3739,7 @@ struct obj_data {
 	char *short_description;	// sentence-building; when worn/carry/in cont.
 	char *action_description;	// What to write when looked at
 	struct extra_descr_data *ex_description;	// extra descriptions
-	struct obj_custom_message *custom_msgs;	// any custom messages
+	struct custom_message *custom_msgs;	// any custom messages
 	vehicle_data *in_vehicle;	// in vehicle or NULL
 	char_data *carried_by;	// Carried by NULL in room/container
 	char_data *worn_by;	// Worn by?
@@ -3725,15 +3770,6 @@ struct obj_data {
 	bool search_mark;
 	
 	UT_hash_handle hh;	// object_table hash
-};
-
-
-// for object custom action messages
-struct obj_custom_message {
-	int type;	// OBJ_CUSTOM_x
-	char *msg;
-	
-	struct obj_custom_message *next;
 };
 
 
@@ -3899,6 +3935,37 @@ struct sector_index_type {
 	int base_count;	// number of rooms with it as the base sect
 	
 	UT_hash_handle hh;	// sector_index hash handle
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SOCIAL STRUCTS //////////////////////////////////////////////////////////
+
+struct social_data {
+	any_vnum vnum;
+	
+	char *name;	// for internal labeling
+	char *command;	// as seen/typed by the player
+	
+	bitvector_t flags;	// AUG_x flags
+	int min_char_position;	// POS_ of the character
+	int min_victim_position;	// POS_ of victim
+	struct social_requirement *requirements;	// linked list
+	
+	char *message[NUM_SOCM_MESSAGES];	// strings
+	
+	UT_hash_handle hh;	// social_table hash
+	UT_hash_handle sorted_hh;	// sorted_socials hash
+};
+
+
+// for restrictions
+struct social_requirement {
+	int type;
+	any_vnum vnum;
+	int misc;
+	
+	struct social_requirement *next;
 };
 
 

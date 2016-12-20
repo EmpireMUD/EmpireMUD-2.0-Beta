@@ -20,6 +20,7 @@ void command_interpreter(char_data *ch, char *argument);
 char lower( char c );
 void nanny(descriptor_data *d, char *arg);
 int find_command(const char *command);
+void send_low_pos_msg(char_data *ch);
 
 
 struct command_info {

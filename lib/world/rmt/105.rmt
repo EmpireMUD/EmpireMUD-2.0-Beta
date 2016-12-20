@@ -7,4 +7,195 @@ and of strange realms beyond the knowledge of mortal men.
 ag 0
 M 0 10500 100.00 3
 S
+#10550
+A Frozen River~
+   Steep glaciers rise up above the edges of the river, which itself has frozen
+over completely. Above you, high above the glaciers, the skies are a strange
+shade of indigo. The sun is up and there isn't a cloud in sight, but it's at
+least twenty degrees lower here than outside the portal. The sparkling sky
+belies the true nature of this place: you have found yourself back in the
+Magiterranean, the secret realm of nature mages.  
+~
+ch 0
+D0
+~
+0 10551
+M 0 10559 100.00 1
+S
+#10551
+The Wall of the Glacier~
+   The glaciers lining the river bank rise nearly to the sky, but it is when
+you look at their base that you realize this is the same river as outside the
+portal. But in this realm, nothing borders it but eternal ice. You must have
+entered the Permafrost, one of the most notorious and dangerous realms of the
+Magiterranean, where a wary wanderer could find himself frozen to death.  
+~
+c 0
+D2
+~
+0 10550
+M 1 10554 100.00 1
+S
+#10552
+The Base of the Glacier~
+   The glacier has cracked open in two places, forming uneven steps up toward
+the encampments of the Polar Baron and his icy apprentices. To the South, you
+can still see the portal out of this forsaken place. The glacier shakes around
+you, threatening to collapse at any second. But for now, at least, it seems to
+be holding.  
+~
+cd 0
+D2
+~
+0 10550
+D14
+~
+0 10553
+D14
+~
+0 10557
+S
+#10553
+A Rising Path up the Glacier~
+   The treacherous path up the glacier climbs steeply, rarely leveling off long
+enough for a break. The path is winding, and the only thing you can see besides
+the ice walls is the indigo sky above.  
+~
+c 0
+D14
+~
+0 10552
+D8
+~
+0 10554
+M 1 10594 100.00 6
+S
+#10554
+A Rising Path up the Glacier~
+   As you ascend the glacier, the path begins to level out. The walls are still
+steep, but you must be approaching the top. A small trickle of meltwater has
+begun to wash away the stairs you are climbing, and you realize this glacier
+may not last.  
+~
+c 0
+D9
+~
+0 10553
+D8
+~
+0 10555
+M 1 10594 100.00 6
+S
+#10555
+An Outcropping at the Top~
+   You have reached the top of the glacier, though the path doesn't end here.
+Now that you have a clear view of the countryside, you see it is far different
+than you remember it on the outside of the portal. Frost covers every treetop
+that pokes out from the endless sea of rolling snow.  
+~
+cd 0
+D9
+~
+0 10554
+D14
+~
+0 10556
+M 0 10551 100.00 1
+S
+#10556
+A Path Through Deep Snow~
+   The path along the top of the glacier leads you into thick, light snow,
+which looks as if it must just have fallen, though the sky is clear. The path
+has been cut just wide enough to walk in single file and it winds through the
+deep snow so that you can hardly tell what's ahead. A steady stream of
+meltwater runs along the path, giving you cause to think the glacier has
+already begun to melt.  
+~
+c 0
+D14
+~
+0 10555
+D14
+~
+0 10561
+M 1 10594 100.00 6
+S
+#10557
+A Rising Path up the Glacier~
+   The twisting staircase of ice leads you on a dangerous path up the glacier.
+You hear the howl of strange animals, punctuated by louder howls from the
+fierce winds that threaten to tear you from the path.  
+~
+c 0
+D14
+~
+0 10552
+D8
+~
+0 10558
+M 1 10594 100.00 6
+S
+#10558
+A Rising Path up the Glacier~
+   You come to a narrow ledge, with only the cold iron handgrips that have been
+drilled into the glacier for stability. As you turn the corner on the ledge,
+the platform widens only slightly, before leading to another staircase.  
+~
+c 0
+D9
+~
+0 10557
+D8
+~
+0 10559
+M 1 10594 100.00 6
+S
+#10559
+A Small Cave at the Top~
+   The staircase ends at a small cave, which quickly proves to be a tunnel as
+it exits onto the top of the glacier. In the center of the cave, a violet fire
+burns atop blue logs of ice. No heat seems to come from the fire -- at least,
+none that you can feel.  
+~
+cd 0
+D9
+~
+0 10558
+D14
+~
+0 10560
+M 0 10552 100.00 1
+S
+#10560
+A Tunnel Through the Snow~
+   A meltwater river has cut a tunnel through the snow, and flat rocks have
+been placed in such a way as to provide a steady path through it. You still
+seem to be at the top of the glacier, although you can't see the sky from here.
+~
+c 0
+D14
+~
+0 10559
+D14
+~
+0 10561
+M 1 10594 100.00 6
+S
+#10561
+Atop a Frozen Altar~
+   The path leads up to an enormous altar made entirely of ice. As you ascend
+its steps, you realize you can see the entire realm from here. It looks so
+similar to the world outside the portal, despite being covered in glaciers and
+a sea of snow. Torches of cold, violet fire illuminate the entire altar, and
+cast eerie shadows that are, somehow, colder than the ice.  
+~
+cd 0
+D14
+~
+0 10556
+D14
+~
+0 10560
+M 0 10550 100.00 1
+S
 $

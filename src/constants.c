@@ -38,6 +38,7 @@
 *   Quest Constants
 *   Room/World Constants
 *   Skill Constants
+*   Social Constants
 *   Trigger Constants
 *   Misc Constants
 */
@@ -420,7 +421,7 @@ const char *player_bits[] = {
 	"INVST",
 	"IPMASK",
 	"DISGUISED",
-	"VAMPIRE",
+		"UNUSED",
 		"UNUSED",
 	"NEEDS-NEWBIE-SETUP",
 	"!RESTICT",
@@ -1480,6 +1481,14 @@ const char *action_bits[] = {
 };
 
 
+// MOB_CUSTOM_x
+const char *mob_custom_types[] = {
+	"echo",
+	"say",
+	"\n"
+};
+
+
 // MOB_MOVE_x: mob/vehicle move types
 const char *mob_move_types[] = {
 	"walks",
@@ -1516,6 +1525,8 @@ const char *mob_move_types[] = {
 	"bounces",
 	"flows",
 	"leaves",
+	"shuffles",
+	"marches",
 	"\n"
 };
 
@@ -2172,6 +2183,7 @@ const char *olc_flag_bits[] = {
 	"!VEHICLES",
 	"!MORPHS",
 	"!QUESTS",
+	"!SOCIALS",
 	"\n"
 };
 
@@ -2198,6 +2210,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"vehicle",
 	"morph",
 	"quest",
+	"social",
 	"\n"
 };
 
@@ -2378,6 +2391,8 @@ const char *crop_flags[] = {
 	"REQUIRES-WATER",
 	"ORCHARD",
 	"!WILD",
+	"NEWBIE-ONLY",
+	"!NEWBIE",
 	"\n"
 };
 
@@ -3099,6 +3114,30 @@ double skill_check_difficulty_modifier[NUM_DIFF_TYPES] = {
 const char *skill_flags[] = {
 	"IN-DEVELOPMENT",
 	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SOCIAL CONSTANTS ////////////////////////////////////////////////////////
+
+// SOC_x: Social flags
+const char *social_flags[] = {
+	"IN-DEVELOPMENT",
+	"HIDE-IF-INVIS",
+	"\n"
+};
+
+
+// SOCM_x: social message string  { "Label", "command" }
+const char *social_message_types[NUM_SOCM_MESSAGES][2] = {
+	{ "No-arg to character", "n2char" },
+	{ "No-arg to others", "n2other" },
+	{ "Targeted to character", "t2char" },
+	{ "Targeted to others", "t2other" },
+	{ "Targeted to victim", "t2vict" },
+	{ "Target not found", "tnotfound" },	// 5
+	{ "Target-self to character", "s2char" },
+	{ "Target-self to others", "s2other" }
 };
 
 

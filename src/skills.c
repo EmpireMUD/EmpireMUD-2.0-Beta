@@ -53,7 +53,9 @@ void update_class(char_data *ch);
 
 // local protos
 bool can_gain_skill_from(char_data *ch, ability_data *abil);
+void clear_char_abilities(char_data *ch, any_vnum skill);
 struct skill_ability *find_skill_ability(skill_data *skill, ability_data *abil);
+int get_ability_points_available(any_vnum skill, int level);
 int get_ability_points_spent(char_data *ch, any_vnum skill);
 bool green_skill_deadend(char_data *ch, any_vnum skill);
 void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
@@ -461,7 +463,7 @@ void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add) {
 */
 bool can_gain_skill_from(char_data *ch, ability_data *abil) {
 	// must have the ability and not gained too many from it
-	if (ABIL_ASSIGNED_SKILL(abil) && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < CLASS_SKILL_CAP && has_ability(ch, ABIL_VNUM(abil)) && levels_gained_from_ability(ch, abil) < GAINS_PER_ABILITY) {
+	if (ABIL_ASSIGNED_SKILL(abil) && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < SKILL_MAX_LEVEL(ABIL_ASSIGNED_SKILL(abil)) && has_ability(ch, ABIL_VNUM(abil)) && levels_gained_from_ability(ch, abil) < GAINS_PER_ABILITY) {
 		// these limit abilities purchased under each cap to players who are still under that cap
 		if (ABIL_SKILL_LEVEL(abil) >= BASIC_SKILL_CAP || get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < BASIC_SKILL_CAP) {
 			if (ABIL_SKILL_LEVEL(abil) >= SPECIALTY_SKILL_CAP || get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < SPECIALTY_SKILL_CAP) {
@@ -558,7 +560,8 @@ void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cool
 
 /**
 * Checks one skill for a player, and removes and abilities that are above the
-* players range.
+* players range. If the player is overspent on points after that, the whole
+* ability is cleared.
 *
 * @param char_data *ch the player
 * @param any_vnum skill which skill, or NO_SKILL for all
@@ -603,6 +606,12 @@ void check_ability_levels(char_data *ch, any_vnum skill) {
 			}
 		}
 	}
+	
+	// check if they have too many points spent now (e.g. got early points)
+	if (get_ability_points_available(skill, get_skill_level(ch, skill)) < get_ability_points_spent(ch, skill)) {
+		clear_char_abilities(ch, skill);
+	}
+	
 	SAVE_CHAR(ch);
 	
 	// add ability techs -- only if playing
@@ -1580,14 +1589,28 @@ ACMD(do_skills) {
 		else if (!(skill = find_skill_by_name(arg))) {
 			msg_to_char(ch, "Unknown skill '%s'.\r\n", arg);
 		}
+		else if (SKILL_MIN_DROP_LEVEL(skill) >= CLASS_SKILL_CAP) {
+			msg_to_char(ch, "You can't drop your skill level in %s.\r\n", SKILL_NAME(skill));
+		}
 		else if (!is_number(arg2)) {
 			msg_to_char(ch, "Invalid level.\r\n");
 		}
 		else if ((level = atoi(arg2)) >= get_skill_level(ch, SKILL_VNUM(skill))) {
 			msg_to_char(ch, "You can only drop skills to lower levels.\r\n");
 		}
-		else if (level != 0 && level != BASIC_SKILL_CAP && level != SPECIALTY_SKILL_CAP) {
-			msg_to_char(ch, "You can only drop skills to the following levels: 0, %d, %d\r\n", BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP);
+		else if (level < SKILL_MIN_DROP_LEVEL(skill)) {
+			msg_to_char(ch, "You can't drop %s lower than %d.\r\n", SKILL_NAME(skill), SKILL_MIN_DROP_LEVEL(skill));
+		}
+		else if (level != SKILL_MIN_DROP_LEVEL(skill) && level != BASIC_SKILL_CAP && level != SPECIALTY_SKILL_CAP) {
+			if (SKILL_MIN_DROP_LEVEL(skill) < BASIC_SKILL_CAP) {
+				msg_to_char(ch, "You can only drop %s to the following levels: %d, %d, %d\r\n", SKILL_NAME(skill), SKILL_MIN_DROP_LEVEL(skill), BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP);
+			}
+			else if (SKILL_MIN_DROP_LEVEL(skill) < SPECIALTY_SKILL_CAP) {
+				msg_to_char(ch, "You can only drop %s to the following levels: %d, %d\r\n", SKILL_NAME(skill), SKILL_MIN_DROP_LEVEL(skill), SPECIALTY_SKILL_CAP);
+			}
+			else {
+				msg_to_char(ch, "You can only drop %s to the following levels: %d\r\n", SKILL_NAME(skill), SKILL_MIN_DROP_LEVEL(skill));
+			}
 		}
 		else {
 			// good to go!
@@ -1706,6 +1729,9 @@ ACMD(do_specialize) {
 	}
 	else if (get_skill_level(ch, SKILL_VNUM(sk)) != BASIC_SKILL_CAP && get_skill_level(ch, SKILL_VNUM(sk)) != SPECIALTY_SKILL_CAP) {
 		msg_to_char(ch, "You can only specialize skills which are at %d or %d.\r\n", BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP);
+	}
+	else if (get_skill_level(ch, SKILL_VNUM(sk)) >= SKILL_MAX_LEVEL(sk)) {
+		msg_to_char(ch, "%s cannot go above %d.\r\n", SKILL_NAME(sk), SKILL_MAX_LEVEL(sk));
 	}
 	else {
 		// check > basic
@@ -2488,6 +2514,7 @@ void clear_skill(skill_data *skill) {
 	memset((char *) skill, 0, sizeof(skill_data));
 	
 	SKILL_VNUM(skill) = NOTHING;
+	SKILL_MAX_LEVEL(skill) = CLASS_SKILL_CAP;
 }
 
 
@@ -2611,6 +2638,17 @@ void parse_skill(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case 'L': {	// additional level data
+				if (sscanf(line, "L %d %d", &int_in[0], &int_in[1]) != 2) {
+					log("SYSERR: Format error in L line of %s", error);
+					exit(1);
+				}
+				
+				SKILL_MAX_LEVEL(skill) = int_in[0];
+				SKILL_MIN_DROP_LEVEL(skill) = int_in[1];
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -2672,6 +2710,9 @@ void write_skill_to_file(FILE *fl, skill_data *skill) {
 	LL_FOREACH(SKILL_ABILITIES(skill), iter) {
 		fprintf(fl, "A %d %d %d\n", iter->vnum, iter->prerequisite, iter->level);
 	}
+	
+	// L: additional level data
+	fprintf(fl, "L %d %d\n", SKILL_MAX_LEVEL(skill), SKILL_MIN_DROP_LEVEL(skill));
 	
 	// end
 	fprintf(fl, "S\n");
@@ -3154,6 +3195,8 @@ void do_stat_skill(char_data *ch, skill_data *skill) {
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Description: %s\r\n", SKILL_DESC(skill));
 	
+	size += snprintf(buf + size, sizeof(buf) - size, "Minimum drop level: [\tc%d\t0], Maximum level: [\tc%d\t0]\r\n", SKILL_MIN_DROP_LEVEL(skill), SKILL_MAX_LEVEL(skill));
+	
 	sprintbit(SKILL_FLAGS(skill), skill_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
 	
@@ -3193,6 +3236,9 @@ void olc_show_skill(char_data *ch) {
 	
 	sprintbit(SKILL_FLAGS(skill), skill_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
+	
+	sprintf(buf + strlen(buf), "<\tymaxlevel\t0> %d\r\n", SKILL_MAX_LEVEL(skill));
+	sprintf(buf + strlen(buf), "<\tymindrop\t0> %d\r\n", SKILL_MIN_DROP_LEVEL(skill));
 	
 	LL_COUNT(SKILL_ABILITIES(skill), skab, total);
 	sprintf(buf + strlen(buf), "<\tytree\t0> %d %s\r\n", total, total == 1 ? "ability" : "abilities");
@@ -3261,6 +3307,18 @@ OLC_MODULE(skilledit_flags) {
 		msg_to_char(ch, "You don't have permission to remove the IN-DEVELOPMENT flag.\r\n");
 		SET_BIT(SKILL_FLAGS(skill), SKILLF_IN_DEVELOPMENT);
 	}
+}
+
+
+OLC_MODULE(skilledit_maxlevel) {
+	skill_data *skill = GET_OLC_SKILL(ch->desc);
+	SKILL_MAX_LEVEL(skill) = olc_process_number(ch, argument, "maximum level", "maxlevel", 1, CLASS_SKILL_CAP, SKILL_MAX_LEVEL(skill));
+}
+
+
+OLC_MODULE(skilledit_mindrop) {
+	skill_data *skill = GET_OLC_SKILL(ch->desc);
+	SKILL_MIN_DROP_LEVEL(skill) = olc_process_number(ch, argument, "minimum drop level", "mindrop", 0, CLASS_SKILL_CAP, SKILL_MIN_DROP_LEVEL(skill));
 }
 
 

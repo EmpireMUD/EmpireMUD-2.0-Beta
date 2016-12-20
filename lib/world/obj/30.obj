@@ -660,4 +660,30 @@ They look like they'd be a bit chewy, but surprisingly tasty.
 6 0 0
 0 48
 S
+#3049
+lettuce head~
+a head of lettuce~
+A head of lettuce is sitting here.~
+   Lettuce is bland on its own, but you can still eat it that way. It can also
+be made into a salad with the 'cook' command.  
+~
+6 l a 5
+4 3017 0
+7 168
+R
+5606 0
+S
+#3050
+seeds lettuce~
+some lettuce seeds~
+Some lettuce seeds are scattered on the ground.~
+   It looks like about a handful of tiny seeds. They can be used to plant
+lettuce, or you can press them into oil.  
+~
+6 bl a 6
+1 3017 0
+7 576
+R
+5116 0
+S
 $

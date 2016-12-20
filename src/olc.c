@@ -179,6 +179,7 @@ OLC_MODULE(gedit_type);
 // mob edit modules
 OLC_MODULE(medit_affects);
 OLC_MODULE(medit_attack);
+OLC_MODULE(medit_custom);
 OLC_MODULE(medit_flags);
 OLC_MODULE(medit_interaction);
 OLC_MODULE(medit_keywords);
@@ -201,7 +202,9 @@ OLC_MODULE(mapedit_delete_room);
 OLC_MODULE(mapedit_exits);
 OLC_MODULE(mapedit_icon);
 OLC_MODULE(mapedit_maintain);
+OLC_MODULE(mapedit_naturalize);
 OLC_MODULE(mapedit_pass_walls);
+OLC_MODULE(mapedit_remember);
 OLC_MODULE(mapedit_room_description);
 OLC_MODULE(mapedit_room_name);
 OLC_MODULE(mapedit_roomtype);
@@ -317,8 +320,25 @@ OLC_MODULE(sectedit_title);
 OLC_MODULE(skilledit_abbrev);
 OLC_MODULE(skilledit_description);
 OLC_MODULE(skilledit_flags);
+OLC_MODULE(skilledit_maxlevel);
+OLC_MODULE(skilledit_mindrop);
 OLC_MODULE(skilledit_name);
 OLC_MODULE(skilledit_tree);
+
+// social modules
+OLC_MODULE(socedit_charposition);
+OLC_MODULE(socedit_command);
+OLC_MODULE(socedit_flags);
+OLC_MODULE(socedit_name);
+OLC_MODULE(socedit_targetposition);
+OLC_MODULE(socedit_n2char);
+OLC_MODULE(socedit_n2other);
+OLC_MODULE(socedit_s2char);
+OLC_MODULE(socedit_s2other);
+OLC_MODULE(socedit_t2char);
+OLC_MODULE(socedit_t2vict);
+OLC_MODULE(socedit_t2other);
+OLC_MODULE(socedit_tnotfound);
 
 // trigger modules
 OLC_MODULE(tedit_argtype);
@@ -390,6 +410,7 @@ void olc_show_quest(char_data *ch);
 void olc_show_room_template(char_data *ch);
 void olc_show_sector(char_data *ch);
 void olc_show_skill(char_data *ch);
+void olc_show_social(char_data *ch);
 void olc_show_trigger(char_data *ch);
 void olc_show_vehicle(char_data *ch);
 extern ability_data *setup_olc_ability(ability_data *input);
@@ -409,6 +430,7 @@ extern quest_data *setup_olc_quest(quest_data *input);
 extern room_template *setup_olc_room_template(room_template *input);
 extern sector_data *setup_olc_sector(sector_data *input);
 extern skill_data *setup_olc_skill(skill_data *input);
+extern social_data *setup_olc_social(social_data *input);
 extern struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_storage);
 extern vehicle_data *setup_olc_vehicle(vehicle_data *input);
 extern bool validate_icon(char *icon);
@@ -417,16 +439,16 @@ extern bool validate_icon(char *icon);
 // master olc command structure
 const struct olc_command_data olc_data[] = {
 	// OLC_x: main commands
-	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SKILL | OLC_VEHICLE, NOBITS },
-	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
+	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SKILL | OLC_SOCIAL | OLC_VEHICLE, NOBITS },
+	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
-	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	
 	// admin
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
@@ -568,6 +590,7 @@ const struct olc_command_data olc_data[] = {
 	// mob commands
 	{ "affects", medit_affects, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "attack", medit_attack, OLC_MOBILE, OLC_CF_EDITOR },
+	{ "custom", medit_custom, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "flags", medit_flags, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "interaction", medit_interaction, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "keywords", medit_keywords, OLC_MOBILE, OLC_CF_EDITOR },
@@ -592,7 +615,9 @@ const struct olc_command_data olc_data[] = {
 	{ "icon", mapedit_icon, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "maintain", mapedit_maintain, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "name", mapedit_room_name, OLC_MAP, OLC_CF_MAP_EDIT },
+	{ "naturalize", mapedit_naturalize, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "passwalls", mapedit_pass_walls, OLC_MAP, OLC_CF_MAP_EDIT },
+	{ "remember", mapedit_remember, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "roomtype", mapedit_roomtype, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "ruin", mapedit_ruin, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "terrain", mapedit_terrain, OLC_MAP, OLC_CF_MAP_EDIT },
@@ -707,8 +732,25 @@ const struct olc_command_data olc_data[] = {
 	{ "abbrev", skilledit_abbrev, OLC_SKILL, OLC_CF_EDITOR },
 	{ "description", skilledit_description, OLC_SKILL, OLC_CF_EDITOR },
 	{ "flags", skilledit_flags, OLC_SKILL, OLC_CF_EDITOR },
+	{ "maxlevel", skilledit_maxlevel, OLC_SKILL, OLC_CF_EDITOR },
+	{ "mindrop", skilledit_mindrop, OLC_SKILL, OLC_CF_EDITOR },
 	{ "name", skilledit_name, OLC_SKILL, OLC_CF_EDITOR },
 	{ "tree", skilledit_tree, OLC_SKILL, OLC_CF_EDITOR },
+	
+	// social commands
+	{ "charposition", socedit_charposition, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "command", socedit_command, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "flags", socedit_flags, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "name", socedit_name, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "targetposition", socedit_targetposition, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "n2character", socedit_n2char, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "n2others", socedit_n2other, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "s2character", socedit_s2char, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "s2others", socedit_s2other, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "t2character", socedit_t2char, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "t2victim", socedit_t2vict, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "t2others", socedit_t2other, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "tnotfound", socedit_tnotfound, OLC_SOCIAL, OLC_CF_EDITOR },
 	
 	// trigger commands
 	{ "argtype", tedit_argtype, OLC_TRIGGER, OLC_CF_EDITOR },
@@ -936,6 +978,11 @@ OLC_MODULE(olc_abort) {
 				GET_OLC_SKILL(ch->desc) = NULL;
 				break;
 			}
+			case OLC_SOCIAL: {
+				free_social(GET_OLC_SOCIAL(ch->desc));
+				GET_OLC_SOCIAL(ch->desc) = NULL;
+				break;
+			}
 			case OLC_TRIGGER: {
 				free_trigger(GET_OLC_TRIGGER(ch->desc));
 				GET_OLC_TRIGGER(ch->desc) = NULL;
@@ -1156,6 +1203,16 @@ OLC_MODULE(olc_audit) {
 				}
 				break;
 			}
+			case OLC_SOCIAL: {
+				extern bool audit_social(social_data *soc, char_data *ch);
+				social_data *soc, *next_soc;
+				HASH_ITER(hh, social_table, soc, next_soc) {
+					if (SOC_VNUM(soc) >= from_vnum && SOC_VNUM(soc) <= to_vnum) {
+						found |= audit_social(soc, ch);
+					}
+				}
+				break;
+			}
 			/*
 			case OLC_TRIGGER: {
 				trig_data *trig, *next_trig;
@@ -1311,6 +1368,11 @@ OLC_MODULE(olc_copy) {
 		case OLC_SKILL: {
 			found = (find_skill_by_vnum(vnum) != NULL);
 			exists = (find_skill_by_vnum(from_vnum) != NULL);
+			break;
+		}
+		case OLC_SOCIAL: {
+			found = (social_proto(vnum) != NULL);
+			exists = (social_proto(from_vnum) != NULL);
 			break;
 		}
 		case OLC_TRIGGER: {
@@ -1481,6 +1543,13 @@ OLC_MODULE(olc_copy) {
 			olc_show_skill(ch);
 			break;
 		}
+		case OLC_SOCIAL: {
+			GET_OLC_SOCIAL(ch->desc) = setup_olc_social(social_proto(from_vnum));
+			GET_OLC_SOCIAL(ch->desc)->vnum = vnum;
+			SET_BIT(GET_OLC_SOCIAL(ch->desc)->flags, SOC_IN_DEVELOPMENT);	// ensure flag
+			olc_show_social(ch);
+			break;
+		}
 		case OLC_TRIGGER: {
 			GET_OLC_TRIGGER(ch->desc) = setup_olc_trigger(real_trigger(from_vnum), &GET_OLC_STORAGE(ch->desc));
 			GET_OLC_TRIGGER(ch->desc)->vnum = vnum;
@@ -1524,6 +1593,7 @@ OLC_MODULE(olc_delete) {
 	void olc_delete_room_template(char_data *ch, rmt_vnum vnum);
 	void olc_delete_sector(char_data *ch, sector_vnum vnum);
 	void olc_delete_skill(char_data *ch, any_vnum vnum);
+	void olc_delete_social(char_data *ch, any_vnum vnum);
 	void olc_delete_trigger(char_data *ch, trig_vnum vnum);
 	void olc_delete_vehicle(char_data *ch, any_vnum vnum);
 	
@@ -1632,6 +1702,10 @@ OLC_MODULE(olc_delete) {
 			olc_delete_skill(ch, vnum);
 			break;
 		}
+		case OLC_SOCIAL: {
+			olc_delete_social(ch, vnum);
+			break;
+		}
 		case OLC_TRIGGER: {
 			olc_delete_trigger(ch, vnum);
 			break;
@@ -1717,6 +1791,10 @@ OLC_MODULE(olc_display) {
 		}
 		case OLC_SKILL: {
 			olc_show_skill(ch);
+			break;
+		}
+		case OLC_SOCIAL: {
+			olc_show_social(ch);
 			break;
 		}
 		case OLC_TRIGGER: {
@@ -1912,6 +1990,13 @@ OLC_MODULE(olc_edit) {
 			olc_show_skill(ch);
 			break;
 		}
+		case OLC_SOCIAL: {
+			// this sets up either new or existing automatically
+			GET_OLC_SOCIAL(ch->desc) = setup_olc_social(social_proto(vnum));
+			GET_OLC_SOCIAL(ch->desc)->vnum = vnum;
+			olc_show_social(ch);
+			break;
+		}
 		case OLC_TRIGGER: {
 			// this will set up from existing OR new automatically
 			GET_OLC_TRIGGER(ch->desc) = setup_olc_trigger(real_trigger(vnum), &GET_OLC_STORAGE(ch->desc));
@@ -2036,6 +2121,10 @@ OLC_MODULE(olc_free) {
 				}
 				case OLC_SKILL: {
 					free = (find_skill_by_vnum(iter) == NULL);
+					break;
+				}
+				case OLC_SOCIAL: {
+					free = (social_proto(iter) == NULL);
 					break;
 				}
 				case OLC_TRIGGER: {
@@ -2374,6 +2463,20 @@ OLC_MODULE(olc_list) {
 				}
 				break;
 			}
+			case OLC_SOCIAL: {
+				extern char *list_one_social(social_data *soc, bool detail);
+				social_data *soc, *next_soc;
+				HASH_ITER(hh, social_table, soc, next_soc) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (SOC_VNUM(soc) >= from_vnum && SOC_VNUM(soc) <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_social(soc, show_details));
+					}
+				}
+				break;
+			}
 			case OLC_TRIGGER: {
 				extern char *list_one_trigger(trig_data *trig, bool detail);
 				trig_data *trig, *next_trig;
@@ -2426,6 +2529,7 @@ OLC_MODULE(olc_removeindev) {
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	skill_data *skill, *next_skill;
+	social_data *soc, *next_soc;
 	augment_data *aug, *next_aug;
 	class_data *cls, *next_cls;
 	adv_data *adv = NULL;
@@ -2615,6 +2719,23 @@ OLC_MODULE(olc_removeindev) {
 			any = TRUE;
 		}
 		
+		HASH_ITER(hh, social_table, soc, next_soc) {
+			if (SOC_VNUM(soc) < from || SOC_VNUM(soc) > to) {
+				continue;
+			}
+			if (!SOCIAL_FLAGGED(soc, SOC_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (!player_can_olc_edit(ch, OLC_SOCIAL, SOC_VNUM(soc))) {
+				continue;
+			}
+			
+			REMOVE_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
+			msg_to_char(ch, "Removed IN-DEV flag from social [%d] %s.\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			any = TRUE;
+		}
+		
 		if (!any) {
 			msg_to_char(ch, "No in-development flags to remove.\r\n");
 		}
@@ -2645,6 +2766,7 @@ OLC_MODULE(olc_save) {
 	void save_olc_room_template(descriptor_data *desc);
 	void save_olc_sector(descriptor_data *desc);	
 	void save_olc_skill(descriptor_data *desc);
+	void save_olc_social(descriptor_data *desc);
 	void save_olc_trigger(descriptor_data *desc, char *script_text);
 	
 	char typename[42];
@@ -2766,6 +2888,12 @@ OLC_MODULE(olc_save) {
 				GET_OLC_SKILL(ch->desc) = NULL;
 				break;
 			}
+			case OLC_SOCIAL: {
+				save_olc_social(ch->desc);
+				free_social(GET_OLC_SOCIAL(ch->desc));
+				GET_OLC_SOCIAL(ch->desc) = NULL;
+				break;
+			}
 			case OLC_TRIGGER: {
 				save_olc_trigger(ch->desc, GET_OLC_STORAGE(ch->desc));
 				free_trigger(GET_OLC_TRIGGER(ch->desc));
@@ -2813,6 +2941,7 @@ OLC_MODULE(olc_search) {
 	void olc_search_room_template(char_data *ch, rmt_vnum vnum);
 	void olc_search_sector(char_data *ch, sector_vnum vnum);
 	void olc_search_skill(char_data *ch, any_vnum vnum);
+	void olc_search_social(char_data *ch, any_vnum vnum);
 	void olc_search_trigger(char_data *ch, trig_vnum vnum);
 	void olc_search_vehicle(char_data *ch, any_vnum vnum);
 
@@ -2888,6 +3017,10 @@ OLC_MODULE(olc_search) {
 			}
 			case OLC_SKILL: {
 				olc_search_skill(ch, vnum);
+				break;
+			}
+			case OLC_SOCIAL: {
+				olc_search_social(ch, vnum);
 				break;
 			}
 			case OLC_TRIGGER: {
@@ -3612,6 +3745,9 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 		else if (IS_SET(type, OLC_ROOM_TEMPLATE) && !OLC_FLAGGED(ch, OLC_FLAG_NO_ROOM_TEMPLATE)) {
 			return TRUE;
 		}
+		else if (IS_SET(type, OLC_SOCIAL) && !OLC_FLAGGED(ch, OLC_FLAG_NO_SOCIALS)) {
+			return TRUE;
+		}
 		else if (IS_SET(type, OLC_TRIGGER) && !OLC_FLAGGED(ch, OLC_FLAG_NO_TRIGGER)) {
 			return TRUE;
 		}
@@ -3884,14 +4020,16 @@ int olc_process_number(char_data *ch, char *argument, char *name, char *command,
 *
 * @param char_data *ch The player using OLC.
 * @param char *argument The arguments the player entered.
-* @param char *name The display name of the string we're setting, e.g. "short description".
+* @param const char *name The display name of the string we're setting, e.g. "short description".
 * @param char **save_point A pointer to the location to save the string.
 */
-void olc_process_string(char_data *ch, char *argument, char *name, char **save_point) {
+void olc_process_string(char_data *ch, char *argument, const char *name, char **save_point) {
 	if (!*argument) {
 		msg_to_char(ch, "Set its %s to what?\r\n", name);
 	}
 	else {
+		delete_doubledollar(argument);
+		
 		if (*save_point) {
 			free(*save_point);
 		}

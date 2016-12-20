@@ -674,7 +674,7 @@ The Carpenter~
 10 0 bpR 0
 0 0 0 217
 C
-craft, harness~
+craft, harness, inventory, retrieve, store~
 D
    The building reeks of carpenters' stains and several unfamiliar preserving
 agents. All around you are incomplete objects which are waiting to be
@@ -846,7 +846,7 @@ dedicate~
 R
 1 1 5 0
 R
-3 1 1 32
+3 1 1 0
 S
 #5142
 Henge~
@@ -863,7 +863,7 @@ M
 R
 1 1 5 0
 R
-3 1 1 32
+3 1 1 0
 S
 #5143
 Megalith~
@@ -874,7 +874,7 @@ A Gigantic Megalith~
 R
 1 1 5 0
 R
-3 1 1 32
+3 1 1 0
 S
 #5144
 Cemetery~
@@ -1022,7 +1022,7 @@ R
 R
 19 1 1 0
 R
-3 1 1 32
+3 1 1 0
 S
 #5151
 Pyramid~
@@ -1054,7 +1054,7 @@ R
 R
 19 1 1 0
 R
-3 1 1 32
+3 1 1 0
 S
 #5152
 Docks~
@@ -1293,7 +1293,7 @@ M
 M
 237 5.00 ce
 R
-3 1 1 32
+3 1 1 0
 S
 #5164
 Tower of Sorcery~
@@ -1318,7 +1318,7 @@ R
 R
 19 1 1 0
 R
-3 1 1 32
+3 1 1 0
 T 5164
 S
 #5165
@@ -1449,7 +1449,7 @@ making it very durable and safe.
 M
 252 33.00 c
 R
-3 2 1 32
+3 2 1 0
 S
 #5171
 Barracks~
@@ -1464,7 +1464,7 @@ meat wafts from the kitchen at all hours. So long as the troops are well-fed
 and well-trained, there is little need for the empire to fear.
 ~
 R
-3 2 1 32
+3 2 1 0
 S
 #5172
 Training Yard~
@@ -1479,7 +1479,7 @@ finest troops hone their combat skills and square off against each other for
 pride and glory, lest they be unprepared when war comes.
 ~
 R
-3 2 1 32
+3 2 1 0
 S
 #5173
 Gatehouse~
@@ -1495,7 +1495,7 @@ infiltrators, it prevents access by common men and animals.
 M
 251 33.00 ce
 R
-3 1 1 32
+3 1 1 0
 R
 3 1 5 0
 S
@@ -1506,7 +1506,7 @@ A Stone Wall~
 32 0 djk 0
 0 0 0 -1
 R
-3 1 1 32
+3 1 1 0
 R
 3 1 5 0
 S
@@ -1533,7 +1533,7 @@ swimmers. Guards stand post along the walls of the gate, and strong laborers
 turn cranks to open and close the doors.
 ~
 R
-3 1 1 32
+3 1 1 0
 R
 3 1 5 0
 S
@@ -1633,7 +1633,7 @@ R
 R
 19 1 1 0
 R
-3 1 1 32
+3 1 1 0
 S
 #5183
 Trading Post~
@@ -1682,7 +1682,7 @@ R
 R
 19 1 1 0
 R
-3 1 1 32
+3 1 1 0
 S
 #5185
 Portal~
@@ -1701,7 +1701,7 @@ power that flows through this place.
 F
 q
 R
-3 1 1 32
+3 1 1 0
 R
 7 1 5 0
 S
@@ -1809,7 +1809,7 @@ summon player <name>~
 F
 x
 R
-3 1 1 32
+3 1 1 0
 R
 7 1 5 0
 S
