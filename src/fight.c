@@ -2494,7 +2494,7 @@ void check_auto_assist(char_data *ch) {
 			continue;
 		}
 		
-		if (in_same_group(ch, ch_iter)) {
+		if (!IS_NPC(ch_iter) && in_same_group(ch, ch_iter)) {
 			// party assist
 			assist = TRUE;
 		}		
