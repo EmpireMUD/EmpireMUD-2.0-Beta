@@ -150,7 +150,7 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_MUMMIFY  25
 #define ABIL_TWO_HANDED_WEAPONS  26
 #define ABIL_REGENERATE  27
-#define ABIL_SUMMON_THUGS  28
+#define ABIL_SUMMON_THUG  28
 #define ABIL_SNEAK  29
 #define ABIL_SOLAR_POWER  30
 #define ABIL_SOULSIGHT  31
@@ -450,7 +450,7 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define COOLDOWN_SUMMON_ANIMALS  28
 #define COOLDOWN_SUMMON_GUARDS  29
 #define COOLDOWN_SUMMON_BODYGUARD  30
-#define COOLDOWN_SUMMON_THUGS  31
+#define COOLDOWN_SUMMON_THUG  31
 #define COOLDOWN_SUMMON_SWIFT  32
 #define COOLDOWN_REWARD  33
 #define COOLDOWN_SEARCH  34

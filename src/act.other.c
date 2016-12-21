@@ -2452,7 +2452,7 @@ ACMD(do_summon) {
 	char_data *mob;
 	int vnum = NOTHING, ability = NO_ABIL, iter, max = 1, cost = 0;
 	empire_data *emp = NULL;
-	bool follow = FALSE, familiar = FALSE, charm = FALSE;
+	bool follow = FALSE, familiar = FALSE, charm = FALSE, local = FALSE;
 	int count, cooldown = NOTHING, cooldown_time = 0, cost_type = MOVE, gain = 20;
 	
 	const int animal_vnums[] = { DOG, CHICKEN, QUAIL };
@@ -2492,9 +2492,9 @@ ACMD(do_summon) {
 		cooldown_time = 5 * SECS_PER_REAL_MIN;
 	}
 	else if (is_abbrev(arg, "thugs")) {
-		ability = ABIL_SUMMON_THUGS;
-		cooldown = COOLDOWN_SUMMON_THUGS;
-		cooldown_time = 3 * SECS_PER_REAL_MIN;
+		ability = ABIL_SUMMON_THUG;
+		cooldown = COOLDOWN_SUMMON_THUG;
+		cooldown_time = 30;
 	}
 	else if (is_abbrev(arg, "swift")) {
 		ability = ABIL_SUMMON_SWIFT;
@@ -2603,8 +2603,8 @@ ACMD(do_summon) {
 			max = 1;
 			break;
 		}
-		case ABIL_SUMMON_THUGS: {
-			cost = 10;
+		case ABIL_SUMMON_THUG: {
+			cost = 50;
 			cost_type = MOVE;
 			
 			if (!can_use_ability(ch, ability, cost_type, cost, cooldown)) {
@@ -2612,8 +2612,9 @@ ACMD(do_summon) {
 			}
 			
 			vnum = THUG;
-			max = ceil(GET_CHARISMA(ch) / 3.0);
-			follow = TRUE;
+			max = 1;
+			follow = FALSE;
+			local = TRUE;
 			break;
 		}
 		case ABIL_SUMMON_GUARDS: {
@@ -2719,6 +2720,11 @@ ACMD(do_summon) {
 			else if (follow) {
 				add_follower(mob, ch, TRUE);
 				SET_BIT(MOB_FLAGS(mob), MOB_SENTINEL);
+			}
+			
+			// mob empire attachment
+			if (local) {
+				GET_LOYALTY(mob) = ROOM_OWNER(IN_ROOM(ch));
 			}
 			
 			load_mtrigger(mob);
