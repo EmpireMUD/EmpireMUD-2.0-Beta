@@ -129,11 +129,13 @@ end
 Dragontooth Sceptre Summon~
 1 c 1
 use~
+* Check this item was the one used
 eval test %%self.is_name(%arg%)%%
 if !%test%
   return 0
   halt
 end
+* Cooldown
 eval varname summon%target%
 eval test %%actor.varexists(%varname%)%%
 * Change this if trigger vnum != mob vnum
@@ -152,17 +154,27 @@ if %test%
     halt
   end
 end
+* Must be standing
 if (%actor.position% != Standing)
   %send% %actor% You can't do that right now.
+  return 1
   halt
 end
-%load% m %target%
+* We now only allow summoning of these on claimed tiles
 eval room_var %self.room%
+if %room_var.empire% != %actor.empire%
+  %send% %actor% You can only summon skeleton guards on your own territory.
+  return 1
+  halt
+end
+* Summon and message
+%load% m %target%
 eval mob %room_var.people%
 if (%mob% && %mob.vnum% == %target%)
   %own% %mob% %actor.empire%
-  %send% %actor% You use %self.shortdesc% and %mob.name% appears!
-  %echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
+  %send% %actor% You raise %self.shortdesc% high in the air, then drive it into the ground!
+  %echoaround% %actor% %actor.name% raises %self.shortdesc% high in the air, then drives it into the ground!
+  %echo% %mob.name% bursts from the ground!
   eval %varname% %timestamp%
   remote %varname% %actor.id%
 end
@@ -264,7 +276,7 @@ end
 ~
 #10508
 Dragonstooth sceptre equip first~
-1 c 2
+1 c 6
 use~
 eval test %%actor.obj_target(%arg%)%%
 if %test% != %self%
@@ -331,16 +343,16 @@ if !%arg%
 end
 * TODO: Check nobody's in the adventure before changing difficulty
 if normal /= %arg%
-  %echo% Changing difficulty to Normal...
+  %echo% Setting difficulty to Normal...
   eval difficulty 1
 elseif hard /= %arg%
-  %echo% Changing difficulty to Hard...
+  %echo% Setting difficulty to Hard...
   eval difficulty 2
 elseif group /= %arg%
-  %echo% Changing difficulty to Group...
+  %echo% Setting difficulty to Group...
   eval difficulty 3
 elseif boss /= %arg%
-  %echo% Changing difficulty to Boss...
+  %echo% Setting difficulty to Boss...
   eval difficulty 4
 else
   %send% %actor% That is not a valid difficulty level for this adventure.
@@ -392,7 +404,6 @@ Frosty delayed despawn~
 1 f 0
 ~
 %adventurecomplete%
-%purge% %self%
 ~
 #10556
 Frosty tokens count~
@@ -427,6 +438,7 @@ if !%actor%
   eval actor %self.carried_by%
 else
   %send% %actor% You take %self.shortdesc%.
+  %echoaround% %actor% %actor.name% takes %self.shortdesc%.
   return 0
 end
 if %actor%
@@ -502,6 +514,11 @@ mgoto %instance.location%
 Frost flower fake plant~
 1 c 2
 plant~
+eval targ %%actor.obj_target(%arg%)%%
+if %targ% != %self%
+  return 0
+  halt
+end
 eval room %actor.room%
 if %room.sector% != Overgrown Forest
   return 0
@@ -519,6 +536,64 @@ end
 %terraform% %room% 10565
 return 1
 %purge% %self%
+~
+#10562
+Permafrost boss death~
+0 f 100
+~
+eval var_name permafrost_tokens_104
+* It's a token party and everyone's invited! ...No, not toking.
+eval room %self.room%
+eval person %room.people%
+while %person%
+  if %person.is_pc%
+    * You get a token, and you get a token, and YOU get a token!
+    %send% %person% As %self.name% dies, %self.hisher% power crystallizes into a permafrost token!
+    if !%person.inventory(10556)%
+      %load% obj 10556 %person% inv
+      %send% %person% You find a pouch to store your permafrost tokens in.
+    end
+    eval test %%person.varexists(%var_name%)%%
+    if %test%
+      eval val %%person.%var_name%%%
+      eval %var_name% %val%+1
+      remote %var_name% %person.id%
+    else
+      eval %var_name% 1
+      remote %var_name% %person.id%
+    end
+  end
+  eval person %person.next_in_room%
+done
+* Was this Aquilo?
+if %self.vnum% == 10550
+  * Quietly stop freezing the river outside
+  eval mob %instance.mob(10559)%
+  if %mob%
+    %purge% %mob%
+  end
+  * And message anyone outside
+  %regionecho% %self.room% -3 You feel a sudden gust of warm wind...
+end
+~
+#10567
+Frosty shop list - ?~
+0 c 0
+list~
+* TEMPORARY VALUES - Probably way too expensive
+%send% %actor% These are the placeholder values. If you're seeing this: Oops.
+* List of items
+%send% %actor% %self.name% sells the following items for permafrost tokens:
+%send% %actor% - polar bear charm (14 tokens, land mount)
+%send% %actor% - penguin charm (16 tokens, aquatic mount)
+%send% %actor% - wyvern charm (40 tokens, flying mount)
+%send% %actor% - polar cub whistle (24 tokens, minipet)
+%send% %actor% - yeti charm (18 tokens, unskilled non-disguise morph)
+%send% %actor% - gossamer sails of the Polar Wind (26 tokens, huge cargo ship)
+%send% %actor% - whipping winds of the North pattern (20 tokens, tank weapon)
+%send% %actor% - frozen pykrete sword pattern (20 tokens, melee weapon)
+%send% %actor% - icy star of winter pattern (20 tokens, healer weapon)
+%send% %actor% - glacial staff of the Maelstrom pattern (20 tokens, caster weapon)
 ~
 #10570
 Boss loot replacer~

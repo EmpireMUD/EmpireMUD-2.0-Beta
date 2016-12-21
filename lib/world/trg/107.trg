@@ -1,8 +1,8 @@
 #10700
 Mini-pet quest start~
-0 u 100
+2 u 100
 ~
-if (%vnum% != 10700)
+if (%questvnum% != 10700)
   return 1
   halt
 end
@@ -349,31 +349,31 @@ if %mobs% > 4
   halt
 end
 %send% %actor% You throw a handful of the magical coal lumps into the sky...
-%echoaround% %actor% %actor.name% uses throws a handful of sparkling coal lumps into the sky...
+%echoaround% %actor% %actor.name% throws a handful of sparkling coal lumps into the sky...
 wait 1 sec
 if (%actor.room% != %room% || %actor.position% != Standing)
   %send% %actor% You stop building the snowman.
 end
 %echo% A sudden flurry of snow comes from the sky, creating a large pile nearby.
-wait 1 sec 
+wait 1 sec
 if (%actor.room% != %room% || %actor.position% != Standing)
   %send% %actor% You stop building the snowman.
 end
 %send% %actor% You start rolling the snow into a large ball...
 %echoaround% %actor% %actor.name% starts rolling the snow into a large ball...
-wait 3 sec 
+wait 3 sec
 if (%actor.room% != %room% || %actor.position% != Standing)
   %send% %actor% You stop building the snowman.
 end
 %send% %actor% You finish the snowman's body and start rummaging through your belongings...
 %echoaround% %actor% %actor.name% finishes the snowman's body and starts rummaging through %actor.hisher% belongings...
-wait 1 sec 
+wait 1 sec
 if (%actor.room% != %room% || %actor.position% != Standing)
   %send% %actor% You stop building the snowman.
 end
 %send% %actor% You find a carrot and some sticks, and add them to your snowman...
 %echoaround% %actor% %actor.name% finds a carrot and some sticks, and adds them to %actor.hisher% snowman...
-wait 1 sec 
+wait 1 sec
 if (%actor.room% != %room% || %actor.position% != Standing)
   %send% %actor% You stop building the snowman.
 end
