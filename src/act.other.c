@@ -2055,6 +2055,9 @@ ACMD(do_morph) {
 	else if (morph && MORPH_FLAGGED(morph, MORPHF_VAMPIRE_ONLY) && !IS_VAMPIRE(ch)) {
 		msg_to_char(ch, "You must be a vampire to do that.\r\n");
 	}
+	else if (morph && subcmd == SCMD_FASTMORPH && MORPH_FLAGGED(morph, MORPHF_NO_FASTMORPH)) {
+		msg_to_char(ch, "You cannot fastmorph into that form.\r\n");
+	}
 	else {
 		// charge costs
 		if (morph) {

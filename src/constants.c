@@ -3550,6 +3550,7 @@ const char *morph_flags[] = {
 	"!SLEEP",
 	"GENDER-NEUTRAL",
 	"CONSUME-OBJ",	// 10
+	"!FASTMORPH",
 	"\n"
 };
 
