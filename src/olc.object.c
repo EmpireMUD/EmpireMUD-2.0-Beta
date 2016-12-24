@@ -2048,6 +2048,7 @@ OLC_MODULE(oedit_custom) {
 			if (change->msg) {
 				free(change->msg);
 			}
+			delete_doubledollar(val_arg);
 			change->msg = str_dup(val_arg);
 			msg_to_char(ch, "Custom message %d changed to: %s\r\n", atoi(num_arg), val_arg);
 		}
