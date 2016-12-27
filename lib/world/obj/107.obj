@@ -262,7 +262,7 @@ A basket of sweet chestnuts is lying here.~
    The pale yellow insides of these smooth, brown nuts can be roasted and
 eaten, if you can remove them from their prickly green cases.
 ~
-6 b a 3
+6 b a 4
 24 10700 0
 7 336
 I 15 10721 100.00 4  # SEPARATE: a handful of chestnuts
@@ -272,13 +272,17 @@ You peel open $p and eat them.~
 M
 5
 $n peels open $p and eats them.~
+R
+5606 0
+R
+5610 0
 S
 #10721
 chestnuts handful~
 a handful of chestnuts~
 A handful of chestnuts are lying here.~
    The insides of these smooth brown nuts can be eaten. Or you could roast
-them, if you can find some more.  
+them, if you can find some more.
 ~
 6 0 a 3
 0 0 0
@@ -298,13 +302,15 @@ A bowl of roast chestnuts is sitting here.~
    The insides of these chestnuts have turned a golden brown, and they smell
 delicious.
 ~
-6 m a 2
+6 m a 3
 18 0 0
 7 336
 A
 9 1 0
 C
 50 50
+R
+5606 0
 S
 #10723
 whistle Christmas tree~
@@ -370,7 +376,7 @@ coal lumps magical pile~
 a pile of magical coal lumps~
 A pile of magical coal lumps is lying here, twinkling slightly.~
    This pile of enchanted coal lumps can be used to build snowmen even in the
-middle of summer! Just 'use coal' to get started.  
+middle of summer! Just 'use coal' to get started.
 ~
 3 p a 3
 0 0 0
