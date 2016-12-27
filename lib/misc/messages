@@ -174,7 +174,7 @@ M
  4
 You stab $N through the heart!  Instant death!
 $n drives a stab at you, it pierces your heart!  RIP!
-$n stabs brutally at $N, killing him as $N is impaled by $n!
+$n stabs brutally at $N, killing $M as $E is impaled by $n!
 You stab at $N, missing!
 $n misses a particularily nasty stab in your direction!
 $n stabs at $N, but $e misses!
@@ -227,7 +227,7 @@ With a loud whistle through the air, $n misses $s pounding attack upon $N!
 #
 Who are you trying to kid?
 Hmmm... I think you missed the joke that $n was trying to tell you.
-$N looks somewhat perplexed as $n tries to pound him!
+$N looks somewhat perplexed as $n tries to pound $M!
 
 * Hammer
 M
@@ -259,7 +259,7 @@ $n cracks $s whip at $N but only hits $mself in the face!
 #
 You'd better stop before $N whips your butt.
 $n is trying to whip you... how cute!
-$n tries to whip $N - isn't he cute?
+$n tries to whip $N - isn't $e cute?
 M
  7
 Your dextrous whip messily tears $N's torso right off!
@@ -297,7 +297,7 @@ M
 You sink your teeth deep into $N's neck -- blood sprays everywhere!
 $n sinks $s teeth deep into your neck, tearing your jugular vein to bits!
 $n sinks $s teeth deep into $N's neck, tearing $S jugular vein to bits!
-You snap your teeth at $N but miss him.
+You snap your teeth at $N but miss $M.
 $n snaps $s teeth at you fiercely but misses.
 $n fiercely snaps $s teeth at $N but misses the mark.
 #
@@ -966,7 +966,7 @@ Your kick hits $N in the solar plexus!
 You're hit in the solar plexus, wow, this is breathtaking!!
 $n kicks $N in the solar plexus, $N is rendered breathless!
 You attempt to kick $N but lose your balance and fall face down in some mud that has suddenly appeared.
-When $n tries to kick you, you quickly make him fall in some mud you have created.
+When $n tries to kick you, you quickly make $m fall in some mud you have created.
 $n falls face down in some mud created by $N.
 
 * Bash
@@ -1024,13 +1024,13 @@ You shoot a bolt of fire at $N, who is incinerated!
 Your flesh is incinerated by a bolt of fire from $n's hand!
 $n shoots a bolt of fire at $N, who is incinerated!
 You shoot a bolt of fire at $N, but miss!
-$n shoots a bolt of fire from his hand, but misses you pathetically!
+$n shoots a bolt of fire from $s hand, but misses you pathetically!
 $n shoots a bolt of fire from $s hand, but misses $N!
 You shoot a bolt of fire from your fist which knocks $N back violently!
 $n shoots a bolt of fire from $s fist...  You're knocked to the ground in flames!
 $n shoots a bolt of fire from $s fist which knocks $N back violently!
 You shoot a bolt of fire at $N, but miss!
-$n shoots a bolt of fire from his hand, but misses you pathetically!
+$n shoots a bolt of fire from $s hand, but misses you pathetically!
 $n shoots a bolt of fire from $s hand, but misses $N!
 
 * Bleeding -- THIS IS NOW UNUSED
@@ -1054,7 +1054,7 @@ M
  60
 Your lightning bolt cuts straight through $N -- $E falls over dead.
 You reel in pain as $n's lightning bolt cuts straight through you, and you fall down dead.
-$N staggers as $n's lightning bolt cuts straight through him -- $E falls down dead.
+$N staggers as $n's lightning bolt cuts straight through $M -- $E falls down dead.
 You hit $N with a lightning bolt, but it doesn't seem to affect $M.
 You're hit by a lightning bolt from $n, but it doesn't seem to affect you.
 $n shoots a lightning bolt at $N, but it doesn't seem to affect $M.
@@ -1386,7 +1386,7 @@ $n tosses a magical soulchain at $N, separating $S spirit from $S body.
 You try to wrap a soulchain around $N, but $E dodges.
 $n tries to wrap a soulchain around you, but you dodge.
 $n tries to wrap a soulchain around $N, but $E dodges.
-You wrap a magical soulchain around $N, and watch as he struggles in anguish!
+You wrap a magical soulchain around $N, and watch as $E struggles in anguish!
 $n wraps a magical soulchain around you, and watches as you struggle in anguish!
 $n wraps a magical soulchain around $N, who struggles in anguish!
 Your soulchain doesn't even seem to tickle $N.
