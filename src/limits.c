@@ -291,19 +291,38 @@ int limit_crowd_control(char_data *victim, int atype) {
 */
 void point_update_char(char_data *ch) {
 	void despawn_mob(char_data *ch);
+	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);
 	void remove_quest_items(char_data *ch);
 	
 	struct cooldown_data *cool, *next_cool;
 	struct instance_data *inst;
+	obj_data *obj, *next_obj;
 	empire_data *emp;
 	char_data *c;
 	bool found;
+	int count;
 	
 	if (!IS_NPC(ch)) {
 		emp = GET_LOYALTY(ch);
 		
 		// check bad quest items
 		remove_quest_items(ch);
+		
+		// check way over-inventory (2x overburdened)
+		if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > 2 * CAN_CARRY_N(ch)) {
+			count = 0;
+			found = FALSE;
+			LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+				count += obj_carry_size(obj);
+				if (count > 2 * CAN_CARRY_N(ch)) {
+					if (!found) {
+						found = TRUE;
+						msg_to_char(ch, "You are way overburdened and begin losing items...\r\n");
+					}
+					perform_drop(ch, obj, SCMD_JUNK, "lose");
+				}
+			}
+		}
 		
 		if (IS_BLOOD_STARVED(ch)) {
 			msg_to_char(ch, "You are starving!\r\n");

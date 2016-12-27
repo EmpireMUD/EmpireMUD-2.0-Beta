@@ -1442,6 +1442,9 @@ ACMD(do_gen_craft) {
 		// vehicles pass off at this point
 		do_gen_craft_vehicle(ch, type);
 	}
+	else if (IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+		msg_to_char(ch, "You can't %s anything while overburdened.\r\n", gen_craft_data[subcmd].command);
+	}
 	
 	// regular craft
 	else if (!has_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
