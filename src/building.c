@@ -1930,7 +1930,7 @@ ACMD(do_maintain) {
 	else {
 		start_action(ch, ACT_MAINTENANCE, -1);
 		act("You set to work maintaining the building.", FALSE, ch, NULL, NULL, TO_CHAR);
-		act("$n beings maintaining the building.", FALSE, ch, NULL, NULL, TO_ROOM);
+		act("$n begins maintaining the building.", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 

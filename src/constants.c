@@ -3049,7 +3049,7 @@ const char *cooldown_types[] = {
 	"summon animals",
 	"summon guards",
 	"summon bodyguard",	// 30
-	"summon thugs",
+	"summon thug",
 	"summon swift",
 	"reward",
 	"search",
@@ -3550,6 +3550,7 @@ const char *morph_flags[] = {
 	"!SLEEP",
 	"GENDER-NEUTRAL",
 	"CONSUME-OBJ",	// 10
+	"!FASTMORPH",
 	"\n"
 };
 

@@ -98,11 +98,11 @@ S
 steak dragon raw huge~
 a raw dragon steak~
 A huge dragon steak is lying on the ground.~
-   This dragon steak is huge! You can cook it into roast dragon, which is
+   This dragon steak is huge! You can cook it into a dragon roast, which is
 long-lasting and very filling. Or, if you're a Gourmet Chef, you can make a
-roast dragon feast and boost the party's damage significantly.
+roast dragon feast and boost the party's damage significantly.  
 ~
-3 0 a 6
+3 0 a 7
 0 0 0
 7 288
 O
@@ -466,9 +466,9 @@ a dragonstone hearth~
 A dragonstone hearth is lying here.~
    The dragonstone hearth is huge, and allows you to make a colossal cave home
 for yourself. Type 'build dragoncave <direction>' to set up this great house in
-the mountainside.
+the mountainside. You need the Luxury ability to start building it.  
 ~
-3 e a 3
+3 e a 4
 0 0 0
 1 0
 R
@@ -514,7 +514,7 @@ A bolt of dragon cloth is lying here.~
    Dragon cloth is made by stripping fibers from dragon hide, then weaving them
 on a loom. The result is a tough, powerful, magical cloth. It is suited for
 many enchanted crafts. You can light the cloth on fire to return it to its
-original dragon hide state.  
+original dragon hide state.
 ~
 3 e a 8
 0 0 0
@@ -533,7 +533,7 @@ tough dragon leather~
 A pile of tough dragon leather is stacked here.~
    This dragon leather is tough and, though heavy, is still lighter than iron.
 This could be made into powerful gear. You can light the leather on fire to
-return it to its original dragon hide state.  
+return it to its original dragon hide state.
 ~
 3 e a 8
 0 0 0
@@ -551,9 +551,9 @@ ingot dragonsteel steel~
 a dragonsteel ingot~
 A dragonsteel ingot is stacked here.~
    The dragonsteel ingot is made from smelting an entire dragon bone, which
-liquifies like metal and then can be forged into powerful weapons and armor. 
+liquifies like metal and then can be forged into powerful weapons and armor.
 You can light the unforged dragonsteel ingot on fire to return it to its
-original dragon bone state.  
+original dragon bone state.
 ~
 3 e a 8
 0 0 0

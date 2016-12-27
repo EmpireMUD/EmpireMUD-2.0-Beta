@@ -4421,6 +4421,7 @@ void obj_from_vehicle(obj_data *object) {
 		log("SYSERR: NULL object (%p) or obj not in a vehicle (%p) passed to obj_from_vehicle", object, object->in_vehicle);
 	}
 	else {
+		VEH_LAST_MOVE_TIME(object->in_vehicle) = time(0);	// reset autostore time
 		VEH_CARRYING_N(object->in_vehicle) -= obj_carry_size(object);
 		LL_DELETE2(VEH_CONTAINS(object->in_vehicle), object, next_content);
 		object->in_vehicle = NULL;
@@ -4660,7 +4661,7 @@ void obj_to_vehicle(obj_data *object, vehicle_data *veh) {
 		REMOVE_BIT(GET_OBJ_EXTRA(object), OBJ_KEEP);
 		
 		// set the timer here; actual rules for it are in limits.c
-		GET_AUTOSTORE_TIMER(object) = time(0);
+		VEH_LAST_MOVE_TIME(veh) = GET_AUTOSTORE_TIMER(object) = time(0);
 	}
 }
 

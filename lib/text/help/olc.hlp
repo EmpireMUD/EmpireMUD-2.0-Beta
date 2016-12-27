@@ -2865,6 +2865,7 @@ The following morph flags are available:
  !SLEEP - Cannot sleep in this form.
  GENDER-NEUTRAL - Shows as "it" instead of he/she/him/her.
  CONSUME-OBJ - Will use up the requiresobj to morph.
+ !FASTMORPH - This morph won't work with 'fastmorph'.
 
 See also: OLC MORPHS
 #d

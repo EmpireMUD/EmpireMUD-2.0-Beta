@@ -2494,7 +2494,7 @@ void check_auto_assist(char_data *ch) {
 			continue;
 		}
 		
-		if (in_same_group(ch, ch_iter)) {
+		if (!IS_NPC(ch_iter) && in_same_group(ch, ch_iter)) {
 			// party assist
 			assist = TRUE;
 		}		
@@ -2641,7 +2641,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 			GET_WAIT_STATE(victim) = (3 RL_SEC * (1.0 - ((double) GET_DEXTERITY(victim) / (att_max(victim) + 1))));
 		}
 		
-		gain_ability_exp(ch, ABIL_MASTER_SURVIVALIST, 33.4);
+		gain_ability_exp(victim, ABIL_MASTER_SURVIVALIST, 33.4);
 	}
 
 	/* Minimum damage of 0.. can't do negative */
