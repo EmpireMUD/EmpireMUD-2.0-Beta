@@ -1879,7 +1879,7 @@ void start_creation_process(descriptor_data *d) {
 
 /* Determine if a person is multiplaying (FALSE), true is "ok to log in" for some reason */
 bool check_multiplaying(descriptor_data *d) {
-	descriptor_data *c;
+	descriptor_data *c, *next_c;
 	bool ok = TRUE;
 	
 	if (ACCOUNT_FLAGGED(d->character, ACCT_MULTI_CHAR)) {
@@ -1887,15 +1887,20 @@ bool check_multiplaying(descriptor_data *d) {
 	}
 	
 	/* Check for connected players with identical hosts */
-	for (c = descriptor_list; c && ok; c = c->next) {
+	for (c = descriptor_list; c && ok; c = next_c) {
+		next_c = c->next;
+		
 		if (c == d || STATE(c) != CON_PLAYING || GET_IDNUM(c->character) == GET_IDNUM(d->character)) {
 			continue;
 		}
 		
 		if (!ACCOUNT_FLAGGED(d->character, ACCT_MULTI_CHAR) && GET_ACCOUNT(d->character) == GET_ACCOUNT(c->character)) {
-			ok = FALSE;
+			// account is already online: disconnect the other one (rather than bounce them)
+			STATE(c) = (STATE(c) == CON_PLAYING) ? CON_DISCONNECT : CON_CLOSE;
+			// ok = FALSE;
 		}
 		else if (!ACCOUNT_FLAGGED(d->character, ACCT_MULTI_IP | ACCT_MULTI_CHAR) && !ACCOUNT_FLAGGED(c->character, ACCT_MULTI_IP | ACCT_MULTI_CHAR) && !PLR_FLAGGED(d->character, PLR_IPMASK) && !strcmp(c->host, d->host)) {
+			// IP is already logged in: just decline the connection
 			ok = FALSE;
 		}
 	}
