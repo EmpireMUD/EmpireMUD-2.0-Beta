@@ -1896,6 +1896,7 @@ bool check_multiplaying(descriptor_data *d) {
 		
 		if (!ACCOUNT_FLAGGED(d->character, ACCT_MULTI_CHAR) && GET_ACCOUNT(d->character) == GET_ACCOUNT(c->character)) {
 			// account is already online: disconnect the other one (rather than bounce them)
+			SEND_TO_Q("\r\nYour login has been usurped by another character from your account!\r\n", c);
 			STATE(c) = (STATE(c) == CON_PLAYING) ? CON_DISCONNECT : CON_CLOSE;
 			// ok = FALSE;
 		}
