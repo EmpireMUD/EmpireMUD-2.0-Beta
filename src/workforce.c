@@ -1302,6 +1302,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 	struct resource_data *res, *next_res;
 	bool can_do = FALSE, found = FALSE;
 	char_data *worker;
+	obj_data *proto;
 	
 	// anything we can dismantle?
 	if (!BUILDING_RESOURCES(room)) {
@@ -1309,7 +1310,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 	}
 	else {
 		LL_FOREACH(BUILDING_RESOURCES(room), res) {
-			if (res->type == RES_OBJECT) {
+			if (res->type == RES_OBJECT && (proto = obj_proto(res->vnum)) && proto->storage) {
 				can_do = TRUE;
 				break;
 			}
@@ -1320,8 +1321,8 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 		for (res = BUILDING_RESOURCES(room); res && !found; res = next_res) {
 			next_res = res->next;
 			
-			// can only remove obj types
-			if (res->type != RES_OBJECT) {
+			// can only remove storable obj types
+			if (res->type != RES_OBJECT || !(proto = obj_proto(res->vnum)) || !proto->storage) {
 				continue;
 			}
 			
