@@ -931,6 +931,7 @@ ACMD(do_gsay) {
 				sprintf(normal, "[\tGgsay\tn %s]: %s\tn\r\n", PERS(ch, ch, TRUE), argument);
 			}
 			
+			delete_doubledollar(normal);
 			send_to_char(normal, ch);
 			if (ch->desc) {
 				add_to_channel_history(ch->desc, CHANNEL_HISTORY_SAY, normal);
