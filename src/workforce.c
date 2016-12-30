@@ -445,9 +445,10 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore,
 	int island_id, island_max, total_max;
 	struct empire_workforce_tracker *tt;
 	struct empire_island *emp_isle;
+	obj_data *proto;
 	
 	// safety
-	if (!emp || !loc || vnum == NOTHING) {
+	if (!emp || !loc || vnum == NOTHING || !(proto = obj_proto(vnum)) || !proto->storage) {
 		return FALSE;
 	}
 	
