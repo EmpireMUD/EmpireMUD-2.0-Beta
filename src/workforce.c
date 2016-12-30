@@ -1301,7 +1301,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 	
 	struct resource_data *res, *next_res;
 	bool can_do = FALSE, found = FALSE;
-	char_data *worker;
+	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BUILDING].mob);
 	obj_data *proto;
 	
 	// anything we can dismantle?
@@ -1317,7 +1317,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 		}
 	}
 	
-	if (can_do && (worker = find_chore_worker_in_room(room, chore_data[CHORE_BUILDING].mob))) {
+	if (can_do && worker) {
 		for (res = BUILDING_RESOURCES(room); res && !found; res = next_res) {
 			next_res = res->next;
 			
