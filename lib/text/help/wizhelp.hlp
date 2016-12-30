@@ -1161,7 +1161,7 @@ that match ALL of those keywords.
 
 Valid types are: adventure, ability, archetype, augment, book, building, craft,
                  class, crop, global, mob, morph, obj, quest, roomtemplate,
-                 sector, skill, social, vehicle
+                 sector, skill, social, trigger, vehicle
 
 Examples:
 
@@ -1183,7 +1183,7 @@ Used to stat a prototypical object by virtual number.
 
 Valid types are: adventure, ability, archetype, augment, building, book, craft,
                  class, crop, global, mob, morph, obj, quest, roomtemplate,
-                 sector, skill, social, vehicle
+                 sector, skill, social, trigger, vehicle
 
 Examples:
 
