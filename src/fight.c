@@ -807,6 +807,7 @@ void reset_combat_meters(char_data *ch) {
 	mtr->misses = 0;
 	mtr->hits_taken = 0;
 	mtr->dodges = 0;
+	mtr->blocks = 0;
 	mtr->damage_dealt = 0;
 	mtr->damage_taken = 0;
 	mtr->pet_damage = 0;
@@ -864,6 +865,17 @@ void combat_meter_damage_dealt(char_data *ch, int amt) {
 void combat_meter_damage_taken(char_data *ch, int amt) {
 	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
 		GET_COMBAT_METERS(ch).damage_taken += amt;
+	}
+}
+
+
+/**
+* Marks a block on the meters.
+* @param char_data *ch The player.
+*/
+void combat_meter_block(char_data *ch) {
+	if (!IS_NPC(ch) && !GET_COMBAT_METERS(ch).over) {
+		GET_COMBAT_METERS(ch).blocks += 1;
 	}
 }
 
@@ -3017,6 +3029,8 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		return damage(ch, victim, 0, w_type, attack_hit_info[w_type].damage_type);
 	}
 	else if (block) {
+		combat_meter_miss(ch);
+		combat_meter_block(victim);
 		block_attack(ch, victim, w_type);
 		return 0;
 	}
