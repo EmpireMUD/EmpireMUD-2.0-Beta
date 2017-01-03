@@ -2912,7 +2912,7 @@ struct descriptor_data {
 // used in player specials to track combat
 struct combat_meters {
 	int hits, misses;	// my hit %
-	int hits_taken, dodges;	// my dodge %
+	int hits_taken, dodges, blocks;	// my dodge %
 	int damage_dealt, damage_taken, pet_damage;
 	int heals_dealt, heals_taken;
 	time_t start, end;	// times

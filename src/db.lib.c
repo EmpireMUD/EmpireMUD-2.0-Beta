@@ -1598,7 +1598,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	struct empire_storage_data *store, *last_store = NULL;
 	struct empire_unique_storage *eus, *last_eus = NULL;
 	struct shipping_data *shipd, *last_shipd = NULL;
-	obj_data *obj;
+	obj_data *obj, *proto;
 	
 	if (!fl || !emp) {
 		return;
@@ -1620,7 +1620,8 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				}
 				
 				// validate vnum
-				if (obj_proto(t[0])) {
+				proto = obj_proto(t[0]);
+				if (proto && proto->storage) {
 					CREATE(store, struct empire_storage_data, 1);
 					store->vnum = t[0];
 					store->amount = t[1];
@@ -1634,6 +1635,9 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 						emp->store = store;
 					}
 					last_store = store;
+				}
+				else if (proto && !proto->storage) {
+					log("- removing %dx #%d from empire storage for %s: not storable", t[1], t[0], EMPIRE_NAME(emp));
 				}
 				else {
 					log("- removing %dx #%d from empire storage for %s: no such object", t[1], t[0], EMPIRE_NAME(emp));

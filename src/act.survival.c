@@ -318,7 +318,7 @@ void do_mount_new(char_data *ch, char *argument) {
 		act("You can't ride $N!", FALSE, ch, 0, mob, TO_CHAR);
 	}
 	else if (GET_LED_BY(mob)) {
-		msg_to_char(ch, "You can't ride someone's who's being led around.\r\n");
+		msg_to_char(ch, "You can't ride someone who's being led around.\r\n");
 	}
 	else if (GET_POS(mob) < POS_STANDING) {
 		act("You can't mount $N right now.", FALSE, ch, NULL, mob, TO_CHAR);

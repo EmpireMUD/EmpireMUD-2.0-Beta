@@ -1536,7 +1536,7 @@ ACMD(do_commands) {
 	/* cmd_num starts at 1, not 0, to remove 'RESERVED' */
 	for (no = 1, cmd_num = 1; cmd_num < num_of_cmds; cmd_num++) {
 		i = cmd_sort_info[cmd_num].sort_pos;
-		if (cmd_info[i].minimum_level >= 0 && (cmd_info[i].ability == NO_ABIL || has_ability(vict, cmd_info[i].ability)) && (GET_ACCESS_LEVEL(vict) >= cmd_info[i].minimum_level || (cmd_info[i].grants != NO_GRANTS && IS_GRANTED(ch, cmd_info[i].grants))) && (cmd_info[i].minimum_level >= LVL_GOD) == wizhelp) {
+		if (cmd_info[i].minimum_level >= 0 && (cmd_info[i].ability == NO_ABIL || has_ability(vict, cmd_info[i].ability)) && (GET_ACCESS_LEVEL(vict) >= cmd_info[i].minimum_level || (cmd_info[i].grants != NO_GRANTS && IS_GRANTED(vict, cmd_info[i].grants))) && (cmd_info[i].minimum_level >= LVL_GOD) == wizhelp) {
 			if (!IS_SET(cmd_info[i].flags, CMD_IMM_OR_MOB_ONLY) || GET_ACCESS_LEVEL(vict) >= LVL_START_IMM || IS_NPC(vict)) {
 				sprintf(buf + strlen(buf), "%-15s", cmd_info[i].command);
 				if (!(no % 5))
@@ -1879,7 +1879,7 @@ void start_creation_process(descriptor_data *d) {
 
 /* Determine if a person is multiplaying (FALSE), true is "ok to log in" for some reason */
 bool check_multiplaying(descriptor_data *d) {
-	descriptor_data *c;
+	descriptor_data *c, *next_c;
 	bool ok = TRUE;
 	
 	if (ACCOUNT_FLAGGED(d->character, ACCT_MULTI_CHAR)) {
@@ -1887,15 +1887,21 @@ bool check_multiplaying(descriptor_data *d) {
 	}
 	
 	/* Check for connected players with identical hosts */
-	for (c = descriptor_list; c && ok; c = c->next) {
+	for (c = descriptor_list; c && ok; c = next_c) {
+		next_c = c->next;
+		
 		if (c == d || STATE(c) != CON_PLAYING || GET_IDNUM(c->character) == GET_IDNUM(d->character)) {
 			continue;
 		}
 		
 		if (!ACCOUNT_FLAGGED(d->character, ACCT_MULTI_CHAR) && GET_ACCOUNT(d->character) == GET_ACCOUNT(c->character)) {
-			ok = FALSE;
+			// account is already online: disconnect the other one (rather than bounce them)
+			SEND_TO_Q("\r\nYour login has been usurped by another character from your account!\r\n", c);
+			STATE(c) = (STATE(c) == CON_PLAYING) ? CON_DISCONNECT : CON_CLOSE;
+			// ok = FALSE;
 		}
 		else if (!ACCOUNT_FLAGGED(d->character, ACCT_MULTI_IP | ACCT_MULTI_CHAR) && !ACCOUNT_FLAGGED(c->character, ACCT_MULTI_IP | ACCT_MULTI_CHAR) && !PLR_FLAGGED(d->character, PLR_IPMASK) && !strcmp(c->host, d->host)) {
+			// IP is already logged in: just decline the connection
 			ok = FALSE;
 		}
 	}

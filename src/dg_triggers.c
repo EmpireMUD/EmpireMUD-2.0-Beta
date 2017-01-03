@@ -1629,6 +1629,10 @@ void reboot_wtrigger(room_data *room) {
 bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode) {
 	int cont = 0;
 	
+	if (!IS_NPC(actor) && ACCOUNT_FLAGGED(actor, ACCT_FROZEN)) {
+		return cont;
+	}
+	
 	// never override the toggle command for immortals
 	if (IS_IMMORTAL(actor) && is_abbrev(cmd, "toggle")) {
 		return cont;

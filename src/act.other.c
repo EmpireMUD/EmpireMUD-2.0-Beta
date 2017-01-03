@@ -2421,7 +2421,7 @@ ACMD(do_skin) {
 		send_config_msg(ch, "need_approval_string");
 	}
 	else if (!*arg)
-		msg_to_char(ch, "What would you like to skin.\r\n");
+		msg_to_char(ch, "What would you like to skin?\r\n");
 	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))
 		msg_to_char(ch, "You don't seem to have anything like that.\r\n");
 	else if (!IS_CORPSE(obj))

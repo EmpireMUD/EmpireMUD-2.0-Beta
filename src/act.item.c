@@ -525,7 +525,7 @@ int obj_carry_size(obj_data *obj) {
 	int size = 0;
 	
 	// my size
-	if (IS_COINS(obj)) {
+	if (FREE_TO_CARRY(obj)) {
 		size = 0;
 	}
 	else if (OBJ_FLAGGED(obj, OBJ_LARGE)) {
