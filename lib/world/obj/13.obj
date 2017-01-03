@@ -443,25 +443,31 @@ wool llama soft bag~
 a bag of soft llama wool~
 Some soft llama wool is scattered on the ground.~
    Llama wool is softer than sheep wool, and comes in a variety of colors. It
-can be woven into llama fiber cloth.  
+can be woven into llama fiber cloth.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 7 0
 O
 7 a
+R
+5137 0
 S
 #1362
 cloth wool llama bolt~
 a bolt of llama wool cloth~
 A bolt of llama wool cloth is lying here.~
    Often smoother and warmer than sheep wool, llama wool cloth can be used to
-sew clothing.  
+sew clothing.
 ~
-3 0 a 1
+3 0 a 2
 0 0 0
 11 0
 O
 26 hu
+R
+5137 0
+R
+5134 0
 S
 $

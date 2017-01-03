@@ -191,7 +191,7 @@ Cryomancer #n~
 Cryomancer #n, apprentice to the Polar Baron, glares at you from atop a frozen column.
 ~
 0 0 bdvxyE c
-0 2 0 20
+0 3 0 20
 I 4 10570 100.00 1  # LOOT: a chance of boss loot
 I 4 10579 7.15 1 L  # LOOT: cold echoes of the future
 I 4 10580 7.14 1 L  # LOOT: whispers of icy cataclysm
@@ -221,7 +221,7 @@ Rime Mage #n~
 Rime Mage #n glowers at you from behind a cold violet fire.
 ~
 0 0 bdvxyE c
-0 2 0 20
+0 3 0 20
 I 4 10570 100.00 1  # LOOT: a chance of boss loot
 I 4 10579 7.15 1 L  # LOOT: cold echoes of the future
 I 4 10580 7.14 1 L  # LOOT: whispers of icy cataclysm
