@@ -74,6 +74,9 @@ struct quest_temp_list *build_available_quest_list(char_data *ch) {
 	char_data *mob;
 	obj_data *obj;
 	
+	// search room
+	can_get_quest_from_room(ch, IN_ROOM(ch), &quest_list);
+	
 	// search in inventory
 	LL_FOREACH2(ch->carrying, obj, next_content) {
 		can_get_quest_from_obj(ch, obj, &quest_list);
