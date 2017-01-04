@@ -911,10 +911,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 
 	if (!AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 		if (can_get_quest_from_room(ch, room, NULL)) {
-			msg_to_char(ch, "...there is a quest here for you!\r\n");
+			msg_to_char(ch, "\tA...there is a quest here for you!\t0\r\n");
 		}
 		if (can_turn_quest_in_to_room(ch, room, NULL)) {
-			msg_to_char(ch, "...you can turn in a quest here!\r\n");
+			msg_to_char(ch, "\tA...you can turn in a quest here!\t0\r\n");
 		}
 	
 		/* now list characters & objects */
