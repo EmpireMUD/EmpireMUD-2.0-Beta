@@ -40,4 +40,32 @@ M
 M
 10558 5.00 0
 S
+#10561
+Aboard the Polar Wind~
+Aboard the Polar Wind~
+~
+0 0 aHR 0
+0 0 0 -1
+C
+disembark, sail~
+D
+You're standing on the deck of the Polar Wind, looking out.
+~
+M
+255 20.00 c
+S
+#10562
+Helm of the Polar Wind~
+The Helm of the Polar Wind~
+~
+0 0 aHR 0
+0 0 0 -1
+C
+disembark, sail~
+D
+You are standing at the helm of the majestic Polar Wind.
+~
+M
+255 20.00 c
+S
 $

@@ -5,15 +5,16 @@ A huge icebreaker ship called the Polar Wind looms over you.~
    The Polar Wind is massive, with sails that look like they are made from
 gossamer -- or, perhaps, from wind itself. The front of the ship has iron bars
 to prevent the hull from being squeezed in icy waters. The rest of the hull has
-a blue tint, perhaps from longterm exposure to cold.  
+a blue tint, perhaps from longterm exposure to cold.
 ~
 &C<&u44&0&C>~
 cijpqt 29 128 400 0
 D
-5501 12 opq
+10561 12 opq
 R
 16 1 1 0
 R
 19 1 1 0
+T 10566
 S
 $

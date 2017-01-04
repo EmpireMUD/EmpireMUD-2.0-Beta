@@ -640,7 +640,7 @@ R
 5606 0
 S
 #10554
-runes strange~
+runes strange glacier~
 the strange runes~
 Strange, glowing runes are carved into the side of the glacier.~
    The runes appear to be a safeguard left by kinder mages, to help heroes who
@@ -648,7 +648,7 @@ must come and defeat the Polar Baron, should he use his glacial powers to
 spread frost across the world. There is a small plaque beneath the runes.
 Usage:  difficulty <normal | hard | group | boss>
 ~
-3 0 0 4
+3 0 0 5
 0 0 0
 10 0
 E
@@ -1332,5 +1332,59 @@ Upon closer inspection, there appears to be a creature trapped inside...
 3 0 0 1
 0 0 0
 8 8064
+S
+#10596
+fillet filet meat frozen~
+a fillet of frozen meat~
+There is a fillet of frozen meat sitting on the ground.~
+   This meat is frozen solid and you simply cannot eat it in this state. Try
+cooking it first...
+~
+3 0 a 4
+0 0 0
+7 720
+O
+17 l
+S
+#10597
+plate cold cuts~
+a plate of cold cuts~
+A plate of cold cuts is lying on the ground.~
+   These cold cuts are, indeed, very cold. It's as if they were made from
+frozen meat.
+~
+6 m a 4
+18 0 0
+7 96
+A
+24 1 0
+C
+1 1
+S
+#10598
+gemstone stone frozen~
+a frozen gemstone~
+A frozen gemstone is melting on the ground.~
+It twinkles like a gemstone, but it seems to be mere ice.
+~
+3 0 a 5
+0 0 0
+1 24
+O
+11 gu
+T 10598
+S
+#10599
+vial strange frostblood frost~
+a vial of frostblood~
+A strange vial of frostblood is lying here.~
+   The frostblood is a deep shade of violet, and is ice cold to the touch, yet
+it swirls effortlessly as you twirl the vial in your fingers. Take this vial to
+any crypt to complete the quest.  
+~
+3 0 a 2
+0 0 0
+8 0
+Q 10555
 S
 $
