@@ -940,7 +940,7 @@ void annual_update_map_tile(room_data *room) {
 			}
 		}
 	}
-	else if (GET_BUILDING(room) && !IS_CITY_CENTER(room) && HOME_ROOM(room) == room && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_NO_DISREPAIR) && (!ROOM_OWNER(room) || !EMPIRE_IMM_ONLY(ROOM_OWNER(room)))) {
+	else if (GET_BUILDING(room) && !IS_CITY_CENTER(room) && HOME_ROOM(room) == room && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_TEMPORARY) && (!ROOM_OWNER(room) || !EMPIRE_IMM_ONLY(ROOM_OWNER(room)))) {
 		// normal building decay:						TODO: City center building could be given the no-disrepair affect, but existing muds would need a patch-updater
 		
 		// determine damage to do each year
