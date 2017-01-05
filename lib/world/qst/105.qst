@@ -9,7 +9,7 @@ consecrated and buried.
    You have pacified the hostile mage-spawns of the Permafrost! You whisper a
 short chant of consecration, and bury the wand beneath the henge.  
 ~
-15 be 75 125 -1
+17 be 75 125 -1
 A
 3 10550
 P
@@ -26,6 +26,8 @@ P
 6 10555 0 1
 P
 5 10555 0 1
+P
+9 3 0 50
 R
 2 10557 2
 R
@@ -94,7 +96,7 @@ frostblood over the unquiet remains in the crypt. The blood bubbles, as if
 boiling, but the bones seem to freeze and the wailing stops. You aren't sure if
 you've done this correctly, but you do gain some experience for trying.  
 ~
-15 bde 75 125 -1
+16 bde 75 125 -1
 A
 3 10550
 P
@@ -111,6 +113,8 @@ P
 6 10556 0 1
 P
 5 10556 0 1
+P
+9 7 0 50
 R
 2 10557 2
 R
@@ -133,7 +137,7 @@ and 'cook' some cold cuts. Deliver them at any tavern for your reward.
 ~
 You deliver the cold cuts at the bar.
 ~
-15 bde 75 125 -1
+16 bde 75 125 -1
 A
 3 10550
 P
@@ -150,6 +154,8 @@ P
 6 10555 0 1
 P
 5 10555 0 1
+P
+9 6 0 50
 R
 2 10557 2
 R
@@ -198,10 +204,10 @@ Perhaps if you brought back enough gems to repair the altar, you could use it
 to attune yourself to the magic energies of the Permafrost.
 ~
    You place each of the gemstones into the corresponding notch in the altar.
-The stick so securely into place that you can't remove them again, and it
-freezes your fingers just to try.
+They stick so securely into place that you can't remove them again, and it
+freezes your fingers just to try.  
 ~
-4 d 75 125 -1
+5 d 75 125 -1
 A
 3 10561
 P
@@ -229,13 +235,15 @@ seedling grows, twisting and curling up into the shape of a small fern. As the
 wind blows across its fractal leaves, there appears a voice like a singing
 harp: 'To prove your worth to the Permafrost, you must seek out the rare frost
 fern, cultivate it, and bring its bounty back to the altar.'
+   If you're having trouble finding ferns, try foraging on the ice outside the
+frosty portal.
 ~
    You place the frost ferns on the altar, where they instantly combust into a
 violet flame. As you breathe in the minty smoke, and feel it sear the inside of
 your cold lungs, you feel a deeper connection to the Permafrost. You have
 unlocked Permafrost quests that can be completed in future portals.
 ~
-5 d 75 125 -1
+6 d 75 125 -1
 A
 3 10561
 P

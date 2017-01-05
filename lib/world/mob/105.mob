@@ -218,6 +218,7 @@ M
 This is the realm of the Polar Baron, you have no place here!~
 T 10558
 T 10551
+T 10562
 S
 #10552
 mage rime #n apprentice~
@@ -250,6 +251,7 @@ M
 We will freeze this river, and then your whole realm!~
 T 10558
 T 10552
+T 10562
 S
 #10553
 caribou rabid~
@@ -350,8 +352,18 @@ sprite ice~
 an ice sprite~
 An ice sprite is flitting around here.
 ~
-75 125 abdhoxzDF cm
+75 125 abdhoxDF cm
 0 0 2 28
+T 10564
+S
+#10562
+elemental ice~
+an ice elemental~
+A summoned ice elemental soars overhead on wings of rime.
+~
+75 125 abdhoxzDF cm
+0 0 2 20
+T 10564
 S
 #10564
 bear polar~

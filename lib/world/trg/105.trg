@@ -342,11 +342,11 @@ eval heroic_mode %self.mob_flagged(GROUP)%
 * Stacking DoT on tank
 * Lasts 75 seconds, should be refreshed every 45-55
 * Normal/Hard: 25%, stacks up to 5
-* Group/Boss: 50%, stacks up to 10
+* Group/Boss: 75%, stacks up to 10
 %send% %actor% &r%self.name%'s icy blasts leave a lingering cold which chills you to the bone...
 %echoaround% %actor% %actor.name% shivers under %self.name%'s icy onslaught.
 if %heroic_mode%
-  %dot% %actor% 50 75 magical 10
+  %dot% %actor% 75 75 magical 10
 else
   %dot% %actor% 25 75 magical 5
 end
@@ -398,7 +398,7 @@ switch %random.3%
   break
   case 3
     * Enchanted Sword
-    * Summon attacks tank for 45 seconds
+    * Summon attacks tank for 30 seconds
     * Normal/Hard: Aquilo is stunned for 15 seconds
     * Group/Boss: Aquilo keeps attacking
     %send% %actor% %self.name% forms a sword out of ice and hurls it at you!
@@ -407,7 +407,8 @@ switch %random.3%
     eval room %self.room%
     eval summon %room.people%
     if %summon.vnum% == 10560
-      %echo% %summon.name% begins attacking %actor.name% with a malevolent will of %summon.hisher% own!
+      %send% %actor% %summon.name% begins attacking you with a malevolent will of %summon.hisher% own!
+      %echoaround% %actor% %summon.name% begins attacking %actor.name% with a malevolent will of %summon.hisher% own!
       %force% %summon.name% mkill %actor%
     end
     if !%heroic_mode%
@@ -416,7 +417,7 @@ switch %random.3%
     end
   break
 done
-wait 45 sec
+wait 30 sec
 ~
 #10551
 Permafrost Cryomancer combat~
@@ -474,16 +475,19 @@ switch %random.3%
   break
   case 3
     * Summon Ice Elemental
-    * Normal/Hard: 15 second duration
-    * Group/Boss: Elementals are permanent
+    * Normal/Hard: Summon a temporary ice sprite
+    * Summon a permanent ice elemental (DPS flag)
     %echo% %self.name% puts %self.hisher% fingers to %self.hisher% mouth and releases a piercing whistle!
-    %load% mob 10561 ally %self.level%
+    if !%heroic_mode%
+      eval summon_vnum 10561
+    else
+      eval summon_vnum 10562
+    end
+    %load% mob %summon_vnum% ally %self.level%
+    eval room %self.room%
     eval summon %room.people%
-    if %summon.vnum% == 10561
+    if %summon.vnum% == %summon_vnum%
       %echo% %summon.name% soars down from the clear violet sky!
-      if !%heroic_mode%
-        attach 10564 %summon.id%
-      end
       %force% %summon% mkill %actor%
     end
   break
@@ -619,7 +623,7 @@ switch %random.3%
     elseif %self.vnum% == 10555
       %send% %actor% %self.name% nips viciously at your ankles, drawing blood and slowing you down!
       %echoaround% %actor% %self.name% nips viciously at %actor.name%'s ankles, drawing blood and slowing %actor.himher% down!
-      %dot% %actor% 50 physical 15
+      %dot% %actor% 50 15 physical
       dg_affect %actor% DEXTERITY -1 15
     end
   break
@@ -890,11 +894,11 @@ return 1
 ~
 #10564
 Permafrost boss minion timer~
-0 kn 100
+0 bnw 100
 ~
 if %self.vnum% == 10560
-  * attached mob is Aquilo's summon (45 seconds)
-  wait 45 s
+  * attached mob is Aquilo's summon (30 seconds)
+  wait 30 s
   %echo% %self.name% falls to the ground and shatters.
   %purge% %self%
 elseif %self.vnum% == 10561
@@ -902,6 +906,12 @@ elseif %self.vnum% == 10561
   wait 15 s
   %echo% %self.name% flies away, bored.
   %purge% %self%
+elseif %self.vnum% == 10562
+  * Attached mob is Cryomancer's summon on group/boss (permanent until end of combat)
+  if !%self.fighting%
+    %echo% %self.name% flies away.
+    %purge% %self%
+  end
 end
 ~
 #10566
@@ -930,7 +940,7 @@ list~
 %send% %actor% - penguin charm (16 tokens, aquatic mount)
 %send% %actor% - wyvern charm (40 tokens, flying mount)
 %send% %actor% - polar cub whistle (24 tokens, minipet)
-%send% %actor% - yeti charm (18 tokens, unskilled non-disguise morph)
+%send% %actor% - yeti charm (18 tokens, yeti)
 %send% %actor% - gossamer sails of the Polar Wind (26 tokens, huge cargo ship)
 %send% %actor% - whipping winds of the North pattern (20 tokens, tank weapon)
 %send% %actor% - frozen pykrete sword pattern (20 tokens, melee weapon)
