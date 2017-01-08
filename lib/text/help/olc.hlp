@@ -2586,6 +2586,7 @@ Available mob flags:
  !RESCALE - Mob will not rescale after its initial scaling, e.g. if you set
     specific attributes on it after it loaded. Note that it will still scale
     the first time, so ensure that it is scaled before changing attributes.
+ SILENT - Mob will not display custom strings while this flag is on.
 
 See also: OLC MOBILES
 #d
