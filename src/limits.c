@@ -319,7 +319,9 @@ void point_update_char(char_data *ch) {
 						found = TRUE;
 						msg_to_char(ch, "You are way overburdened and begin losing items...\r\n");
 					}
-					perform_drop(ch, obj, SCMD_JUNK, "lose");
+					if (perform_drop(ch, obj, SCMD_DROP, "drop") <= 0) {
+						perform_drop(ch, obj, SCMD_JUNK, "lose");
+					}
 				}
 			}
 		}
@@ -472,7 +474,6 @@ void real_update_char(char_data *ch) {
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	void do_unseat_from_vehicle(char_data *ch);
 	extern bool fail_daily_quests(char_data *ch);
-	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
 	void random_encounter(char_data *ch);
 	void update_biting_char(char_data *ch);
 	void update_vampire_sun(char_data *ch);
