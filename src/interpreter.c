@@ -38,8 +38,6 @@
 */
 
 // external funcs
-void echo_off(descriptor_data *d);
-void echo_on(descriptor_data *d);
 void parse_archetype_menu(descriptor_data *desc, char *argument);
 
 // locals
@@ -1658,14 +1656,14 @@ void prompt_creation(descriptor_data *d) {
 		}
 		case CON_Q_ALT_PASSWORD: {
 			SEND_TO_Q("\r\nEnter the password for that character: ", d);
-			echo_off(d);
+			ProtocolNoEcho(d, true);
 			break;
 		}
 		case CON_NEWPASSWD: {
 			SEND_TO_Q("New character.\r\n\r\n", d);
 			sprintf(buf, "Give me a password for %s: ", GET_PC_NAME(d->character));
 			SEND_TO_Q(buf, d);
-			echo_off(d);
+			ProtocolNoEcho(d, true);
 			break;
 		}
 		case CON_CNFPASSWD: {
@@ -1790,7 +1788,7 @@ void process_alt_password(descriptor_data *d, char *arg) {
 			}
 			else {
 				SEND_TO_Q("Wrong password.\r\nPassword: ", d);
-				echo_off(d);
+				ProtocolNoEcho(d, true);
 			}
 		}
 		else {	// password ok
@@ -2096,7 +2094,7 @@ int perform_dupe_check(descriptor_data *d) {
 	MXPSendTag(d, "<VERSION>");
 	
 	// guarantee echo is on -- no, this could lead to an echo loop
-	// echo_on(d);
+	// ProtocolNoEcho(d, false);
 
 	return (1);
 }
@@ -2198,7 +2196,7 @@ void nanny(descriptor_data *d, char *arg) {
 					REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
 
 					SEND_TO_Q("Password: ", d);
-					echo_off(d);
+					ProtocolNoEcho(d, true);
 					d->idle_tics = 0;
 					STATE(d) = CON_PASSWORD;
 				}
@@ -2265,7 +2263,7 @@ void nanny(descriptor_data *d, char *arg) {
 			 */
 
 			/* turn echo back on */
-			echo_on(d);
+			ProtocolNoEcho(d, false);
 
 			/* New echo-on eats the return on telnet. Extra space better than none. */
 			SEND_TO_Q("\r\n", d);
@@ -2286,7 +2284,7 @@ void nanny(descriptor_data *d, char *arg) {
 					}
 					else {
 						SEND_TO_Q("Wrong password.\r\nPassword: ", d);
-						echo_off(d);
+						ProtocolNoEcho(d, true);
 					}
 					return;
 				}
@@ -2372,7 +2370,7 @@ void nanny(descriptor_data *d, char *arg) {
 				STATE(d) = CON_NEWPASSWD;
 				return;
 			}
-			echo_on(d);
+			ProtocolNoEcho(d, false);
 			next_creation_step(d);
 			break;
 		}
@@ -2425,7 +2423,7 @@ void nanny(descriptor_data *d, char *arg) {
 			break;
 		}
 		case CON_Q_ALT_PASSWORD: {
-			echo_on(d);
+			ProtocolNoEcho(d, false);
 			SEND_TO_Q("\r\n", d);	// echo-off usually hides the CR
 			process_alt_password(d, arg);
 			break;

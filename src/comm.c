@@ -1098,35 +1098,6 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 	Global_ignore_dark = FALSE;
 }
 
-/**
-* Turn off echoing (specific to telnet client)
-*/
-void echo_off(descriptor_data *d) {
-	char off_string[] = {
-		(char) IAC,
-		(char) WILL,
-		(char) TELOPT_ECHO,
-		(char) 0,
-	};
-	
-	SEND_TO_Q(off_string, d);
-}
-
-
-/**
-* Turn on echoing (specific to telnet client)
-*/
-void echo_on(descriptor_data *d) {
-	char on_string[] = {
-		(char) IAC,
-		(char) WONT,
-		(char) TELOPT_ECHO,
-		(char) 0
-	};
-	
-	SEND_TO_Q(on_string, d);
-}
-
 
 /**
 * Identical to msg_to_char except takes a descriptor.
