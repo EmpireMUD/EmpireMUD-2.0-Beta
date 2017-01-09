@@ -196,19 +196,6 @@ You let out a terrifying howl, penalizing all enemies. The first victim loses
 to-hit equal to 4x your Charisma. Each additional victim loses to-hit equal to
 2x Charisma instead.
 #
-SHADOWCAGE "SHADOW CAGE"
-
-Shadowcage
-Class ability: Occultist
-Debuff type: Stealth
-Cost: 50 move
-Cooldown: 30 seconds
-Usage:  shadowcage
-
-You create a cage of shadows, penalizing all enemies. The first victim loses
-dodge equal to 4x your Charisma. Each additional victim loses dodge equal to 2x
-Charisma instead. This effect lasts 15 seconds.
-#
 INFILTRATE "IMPROVED INFILTRATE"
 
 Infiltrate, Improved Infiltrate (Stealth abilities)
@@ -402,9 +389,10 @@ Class ability: Occultist
 Debuff type: Stealth
 Cost: 50 move
 Cooldown: 30 seconds
+Usage:  shadowcage
 
 You create a cage of shadows, penalizing all enemies. The first victim loses
-dodge equal to 5x your Charisma. Each additional victim loses dodge equal to 3x
+dodge equal to 4x your Charisma. Each additional victim loses dodge equal to 2x
 Charisma instead. This effect lasts 15 seconds.
 #
 SHADOWSTEP "SHADOW STEP"
@@ -483,15 +471,16 @@ Gains experience when you steal something.
 
 See also: VAULTCRACKING
 #
-"SUMMON THUGS"
+"SUMMON THUG"
 
-Usage:  summon thugs
-Cooldown:  3 minutes
-Cost:  10 move
+Usage:  summon thug
+Cooldown:  30 seconds
+Cost:  50 move
 
-This ability summons up to (Charisma / 3, rounded up) thugs, who will follow
-you around. This is best combined with the Disguise ability, as you can mask
-yourself as a thug.
+This ability summons a local thug who will stand around and distract whoever
+is following you. This is best combined with the Disguise ability, as you can
+mask yourself as a thug. Thugs will have the empire of the tile they are
+summoned on.
 
 Gains experience when you attempt to summon thugs.
 

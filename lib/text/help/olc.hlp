@@ -2586,6 +2586,7 @@ Available mob flags:
  !RESCALE - Mob will not rescale after its initial scaling, e.g. if you set
     specific attributes on it after it loaded. Note that it will still scale
     the first time, so ensure that it is scaled before changing attributes.
+ SILENT - Mob will not display custom strings while this flag is on.
 
 See also: OLC MOBILES
 #d
@@ -2865,6 +2866,7 @@ The following morph flags are available:
  !SLEEP - Cannot sleep in this form.
  GENDER-NEUTRAL - Shows as "it" instead of he/she/him/her.
  CONSUME-OBJ - Will use up the requiresobj to morph.
+ !FASTMORPH - This morph won't work with 'fastmorph'.
 
 See also: OLC MORPHS
 #d

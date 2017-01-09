@@ -445,9 +445,10 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore,
 	int island_id, island_max, total_max;
 	struct empire_workforce_tracker *tt;
 	struct empire_island *emp_isle;
+	obj_data *proto;
 	
 	// safety
-	if (!emp || !loc || vnum == NOTHING) {
+	if (!emp || !loc || vnum == NOTHING || !(proto = obj_proto(vnum)) || !proto->storage) {
 		return FALSE;
 	}
 	
@@ -1300,7 +1301,8 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 	
 	struct resource_data *res, *next_res;
 	bool can_do = FALSE, found = FALSE;
-	char_data *worker;
+	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BUILDING].mob);
+	obj_data *proto;
 	
 	// anything we can dismantle?
 	if (!BUILDING_RESOURCES(room)) {
@@ -1308,19 +1310,19 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 	}
 	else {
 		LL_FOREACH(BUILDING_RESOURCES(room), res) {
-			if (res->type == RES_OBJECT) {
+			if (res->type == RES_OBJECT && (proto = obj_proto(res->vnum)) && proto->storage) {
 				can_do = TRUE;
 				break;
 			}
 		}
 	}
 	
-	if (can_do && (worker = find_chore_worker_in_room(room, chore_data[CHORE_BUILDING].mob))) {
+	if (can_do && worker) {
 		for (res = BUILDING_RESOURCES(room); res && !found; res = next_res) {
 			next_res = res->next;
 			
-			// can only remove obj types
-			if (res->type != RES_OBJECT) {
+			// can only remove storable obj types
+			if (res->type != RES_OBJECT || !(proto = obj_proto(res->vnum)) || !proto->storage) {
 				continue;
 			}
 			

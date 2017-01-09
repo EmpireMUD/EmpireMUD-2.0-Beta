@@ -73,6 +73,7 @@ void free_player_quests(struct player_quest *list);
 void free_quest_givers(struct quest_giver *list);
 void free_quest_tasks(struct quest_task *list);
 void free_quest_temp_list(struct quest_temp_list *list);
+struct player_completed_quest *has_completed_quest_any(char_data *ch, any_vnum quest);
 struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
@@ -1436,11 +1437,11 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *
 			// not repeatable
 			ok = FALSE;
 		}
-		
-		// make sure daily wasn't already done TODAY
-		if (daily && completed->last_completed >= daily_cycle) {
-			ok = FALSE;
-		}
+	}
+	
+	// make sure daily wasn't already done TODAY
+	if (daily && (completed = has_completed_quest_any(ch, QUEST_VNUM(quest))) && completed->last_completed >= daily_cycle) {
+		ok = FALSE;
 	}
 	
 	// check prereqs
@@ -1537,15 +1538,14 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *
 
 
 /**
-* Note: repeats-per-instance quests will only show as has-completed if it was
-* the same instance.
+* Similar to has_completed_quest() except it doesn't care which instance it
+* was completed on.
 *
 * @param char_data *ch Any player.
 * @param quest_vnum quest The quest to check.
-* @param int instance_id Optional: For per-instance quests, the instance id to check. (NOTHING = no check / doesn't matter)
 * @return struct player_completed_quest* Returns completion data (TRUE) if the player has completed the quest; NULL (FALSE) otherwise.
 */
-struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id) {
+struct player_completed_quest *has_completed_quest_any(char_data *ch, any_vnum quest) {
 	struct player_completed_quest *pcq;
 	
 	if (IS_NPC(ch)) {
@@ -1555,6 +1555,22 @@ struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest
 	// look up completion data
 	HASH_FIND_INT(GET_COMPLETED_QUESTS(ch), &quest, pcq);
 	
+	return pcq;
+}
+
+
+/**
+* Note: repeats-per-instance quests will only show as has-completed if it was
+* the same instance.
+*
+* @param char_data *ch Any player.
+* @param quest_vnum quest The quest to check.
+* @param int instance_id Optional: For per-instance quests, the instance id to check. (NOTHING = no check / doesn't matter)
+* @return struct player_completed_quest* Returns completion data (TRUE) if the player has completed the quest; NULL (FALSE) otherwise.
+*/
+struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id) {
+	struct player_completed_quest *pcq = has_completed_quest_any(ch, quest);
+		
 	// check per-instance limit (only bother with this part if instructed to check)
 	if (instance_id != NOTHING && pcq) {
 		quest_data *qst = quest_proto(quest);

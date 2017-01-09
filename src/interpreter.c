@@ -1029,40 +1029,40 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "tattach", POS_DEAD, do_tattach, NO_MIN, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY ),
 	ABILITY_CMD( "tdetach", POS_DEAD, do_tdetach, NO_MIN, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY ),
 	SIMPLE_CMD( "vdelete", POS_DEAD, do_vdelete, LVL_CIMPL, CTYPE_IMMORTAL ),
-	STANDARD_CMD( "madventurecomplete", POS_DEAD, do_madventurecomplete, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "masound", POS_DEAD, do_masound, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mkill", POS_FIGHTING, do_mkill, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mjunk", POS_DEAD, do_mjunk, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mdamage", POS_DEAD, do_mdamage, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "maoe", POS_DEAD, do_maoe, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mdot", POS_DEAD, do_mdot, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mdoor", POS_DEAD, do_mdoor, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mecho", POS_DEAD, do_mecho, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mechoaround", POS_DEAD, do_mechoaround, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mechoneither", POS_DEAD, do_mechoneither, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "msend", POS_DEAD, do_msend, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mload", POS_DEAD, do_mload, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mmorph", POS_DEAD, do_mmorph, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mmove", POS_STANDING, do_mmove, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mpurge", POS_DEAD, do_mpurge, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mquest", POS_DEAD, do_mquest, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mgoto", POS_DEAD, do_mgoto, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mat", POS_DEAD, do_mat, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mown", POS_DEAD, do_mown, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mscale", POS_DEAD, do_mscale, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "msiege", POS_DEAD, do_msiege, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mteleport", POS_DEAD, do_mteleport, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mterracrop", POS_DEAD, do_mterracrop, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mterraform", POS_DEAD, do_mterraform, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mforce", POS_DEAD, do_mforce, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mhunt", POS_DEAD, do_mhunt, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mremember", POS_DEAD, do_mremember, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mforget", POS_DEAD, do_mforget, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mtransform", POS_DEAD, do_mtransform, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mbuildingecho", POS_DEAD, do_mbuildingecho, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mvehicleecho", POS_DEAD, do_mvehicleecho, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mregionecho", POS_DEAD, do_mregionecho, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "mfollow", POS_DEAD, do_mfollow, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
+	STANDARD_CMD( "madventurecomplete", POS_DEAD, do_madventurecomplete, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "masound", POS_DEAD, do_masound, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mkill", POS_FIGHTING, do_mkill, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mjunk", POS_DEAD, do_mjunk, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mdamage", POS_DEAD, do_mdamage, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "maoe", POS_DEAD, do_maoe, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mdot", POS_DEAD, do_mdot, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mdoor", POS_DEAD, do_mdoor, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mecho", POS_DEAD, do_mecho, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mechoaround", POS_DEAD, do_mechoaround, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mechoneither", POS_DEAD, do_mechoneither, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "msend", POS_DEAD, do_msend, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mload", POS_DEAD, do_mload, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mmorph", POS_DEAD, do_mmorph, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mmove", POS_STANDING, do_mmove, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mpurge", POS_DEAD, do_mpurge, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mquest", POS_DEAD, do_mquest, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mgoto", POS_DEAD, do_mgoto, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mat", POS_DEAD, do_mat, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mown", POS_DEAD, do_mown, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mscale", POS_DEAD, do_mscale, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "msiege", POS_DEAD, do_msiege, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mteleport", POS_DEAD, do_mteleport, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mterracrop", POS_DEAD, do_mterracrop, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mterraform", POS_DEAD, do_mterraform, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mforce", POS_DEAD, do_mforce, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mhunt", POS_DEAD, do_mhunt, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mremember", POS_DEAD, do_mremember, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mforget", POS_DEAD, do_mforget, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mtransform", POS_DEAD, do_mtransform, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mbuildingecho", POS_DEAD, do_mbuildingecho, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mvehicleecho", POS_DEAD, do_mvehicleecho, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mregionecho", POS_DEAD, do_mregionecho, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mfollow", POS_DEAD, do_mfollow, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 
 	/* this must be last */
 	STANDARD_CMD( "\n", POS_DEAD, NULL, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_UTIL, NOBITS, NO_ABIL )
@@ -1536,7 +1536,7 @@ ACMD(do_commands) {
 	/* cmd_num starts at 1, not 0, to remove 'RESERVED' */
 	for (no = 1, cmd_num = 1; cmd_num < num_of_cmds; cmd_num++) {
 		i = cmd_sort_info[cmd_num].sort_pos;
-		if (cmd_info[i].minimum_level >= 0 && (cmd_info[i].ability == NO_ABIL || has_ability(vict, cmd_info[i].ability)) && (GET_ACCESS_LEVEL(vict) >= cmd_info[i].minimum_level || (cmd_info[i].grants != NO_GRANTS && IS_GRANTED(ch, cmd_info[i].grants))) && (cmd_info[i].minimum_level >= LVL_GOD) == wizhelp) {
+		if (cmd_info[i].minimum_level >= 0 && (cmd_info[i].ability == NO_ABIL || has_ability(vict, cmd_info[i].ability)) && (GET_ACCESS_LEVEL(vict) >= cmd_info[i].minimum_level || (cmd_info[i].grants != NO_GRANTS && IS_GRANTED(vict, cmd_info[i].grants))) && (cmd_info[i].minimum_level >= LVL_GOD) == wizhelp) {
 			if (!IS_SET(cmd_info[i].flags, CMD_IMM_OR_MOB_ONLY) || GET_ACCESS_LEVEL(vict) >= LVL_START_IMM || IS_NPC(vict)) {
 				sprintf(buf + strlen(buf), "%-15s", cmd_info[i].command);
 				if (!(no % 5))
@@ -1879,7 +1879,7 @@ void start_creation_process(descriptor_data *d) {
 
 /* Determine if a person is multiplaying (FALSE), true is "ok to log in" for some reason */
 bool check_multiplaying(descriptor_data *d) {
-	descriptor_data *c;
+	descriptor_data *c, *next_c;
 	bool ok = TRUE;
 	
 	if (ACCOUNT_FLAGGED(d->character, ACCT_MULTI_CHAR)) {
@@ -1887,15 +1887,21 @@ bool check_multiplaying(descriptor_data *d) {
 	}
 	
 	/* Check for connected players with identical hosts */
-	for (c = descriptor_list; c && ok; c = c->next) {
+	for (c = descriptor_list; c && ok; c = next_c) {
+		next_c = c->next;
+		
 		if (c == d || STATE(c) != CON_PLAYING || GET_IDNUM(c->character) == GET_IDNUM(d->character)) {
 			continue;
 		}
 		
 		if (!ACCOUNT_FLAGGED(d->character, ACCT_MULTI_CHAR) && GET_ACCOUNT(d->character) == GET_ACCOUNT(c->character)) {
-			ok = FALSE;
+			// account is already online: disconnect the other one (rather than bounce them)
+			SEND_TO_Q("\r\nYour login has been usurped by another character from your account!\r\n", c);
+			STATE(c) = (STATE(c) == CON_PLAYING) ? CON_DISCONNECT : CON_CLOSE;
+			// ok = FALSE;
 		}
 		else if (!ACCOUNT_FLAGGED(d->character, ACCT_MULTI_IP | ACCT_MULTI_CHAR) && !ACCOUNT_FLAGGED(c->character, ACCT_MULTI_IP | ACCT_MULTI_CHAR) && !PLR_FLAGGED(d->character, PLR_IPMASK) && !strcmp(c->host, d->host)) {
+			// IP is already logged in: just decline the connection
 			ok = FALSE;
 		}
 	}

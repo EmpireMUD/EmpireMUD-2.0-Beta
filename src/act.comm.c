@@ -931,6 +931,7 @@ ACMD(do_gsay) {
 				sprintf(normal, "[\tGgsay\tn %s]: %s\tn\r\n", PERS(ch, ch, TRUE), argument);
 			}
 			
+			delete_doubledollar(normal);
 			send_to_char(normal, ch);
 			if (ch->desc) {
 				add_to_channel_history(ch->desc, CHANNEL_HISTORY_SAY, normal);
@@ -1053,6 +1054,9 @@ ACMD(do_ignore) {
 	}
 	else if (!(victim = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
 		msg_to_char(ch, "No one by that name here.\r\n");
+	}
+	else if (ch == victim) {
+		msg_to_char(ch, "If you ignore yourself, who will you have left to talk to?\r\n");
 	}
 	else if (IS_IMMORTAL(victim)) {
 		msg_to_char(ch, "You cannot ignore an immortal.\r\n");

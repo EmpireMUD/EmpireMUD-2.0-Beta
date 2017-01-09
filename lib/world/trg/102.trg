@@ -346,18 +346,21 @@ if %actor.position% != Standing
   halt
 end
 if !(tokens /= %arg%)
-  %send% %actor% You can't combine that.
+  return 0
   halt
 end
-if !(%actor.has_item(10234)%)
+eval copper_token %actor.inventory(10234)%
+if !%copper_token
   %send% %actor% You require a copper grain token to combine.
   halt
-elseif !(%actor.has_item(10233)%)
+end
+eval wooden_token %actor.inventory(10233)%
+if !%wooden_token%
   %send% %actor% You require a wooden fruit token to combine.
   halt
 end
-nop %actor.add_resources(10233,-1)%
-nop %actor.add_resources(10234,-1)%
+%purge% %wooden_token%
+%purge% %copper_token%
 %send% %actor% You magically combine all three tokens into a gnarled wooden token!
 %echoaround% %actor% %actor.name% magically combines three strange tokens into a gnarled wooden token!
 %load% obj 10236 %actor% inv

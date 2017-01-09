@@ -2374,8 +2374,10 @@ int process_input(descriptor_data *t) {
 		}
 		do_not_add = 0;
 
-		if (*input == '!' && !(*(input + 1)))	/* Redo last command. */
-			strcpy(input, t->last_input);
+		if (*input == '!' && !(*(input + 1))) {	/* Redo last command. */
+			strncpy(input, t->last_input, MAX_INPUT_LENGTH-1);
+			input[MAX_INPUT_LENGTH-1] = '\0';
+		}
 		else if (*input == '!' && *(input + 1)) {
 			char *commandln = (input + 1);
 			int starting_pos = t->history_pos, cnt = (t->history_pos == 0 ? HISTORY_SIZE - 1 : t->history_pos - 1);
@@ -2384,7 +2386,8 @@ int process_input(descriptor_data *t) {
 			for (; cnt != starting_pos; cnt--) {
 				if (t->history[cnt] && is_abbrev(commandln, t->history[cnt])) {
 					strcpy(input, t->history[cnt]);
-					strcpy(t->last_input, input);
+					strncpy(t->last_input, input, sizeof(t->last_input)-1);
+					t->last_input[sizeof(t->last_input)-1] = '\0';
 					SEND_TO_Q(input, t);
 					SEND_TO_Q("\r\n", t);
 					break;
@@ -2394,8 +2397,10 @@ int process_input(descriptor_data *t) {
 			}
 		}
 		else if (*input == '^') {
-			if (!(do_not_add = perform_subst(t, t->last_input, input)))
-				strcpy(t->last_input, input);
+			if (!(do_not_add = perform_subst(t, t->last_input, input))) {
+				strncpy(t->last_input, input, sizeof(t->last_input)-1);
+				t->last_input[sizeof(t->last_input)-1] = '\0';
+			}
 		}
 		else if (*input == '+') {	// add to head of queue
 			add_to_head = TRUE;
@@ -2407,7 +2412,9 @@ int process_input(descriptor_data *t) {
 			do_not_add = 1;
 		}
 		else {
-			strcpy(t->last_input, input);
+			strncpy(t->last_input, input, sizeof(t->last_input)-1);
+			t->last_input[sizeof(t->last_input)-1] = '\0';
+			
 			if (t->history[t->history_pos])
 				free(t->history[t->history_pos]);	/* Clear the old line. */
 			t->history[t->history_pos] = str_dup(input);	/* Save the new. */

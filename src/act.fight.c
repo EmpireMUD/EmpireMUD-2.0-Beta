@@ -334,9 +334,10 @@ ACMD(do_meters) {
 	calc = MAX(1.0, calc);	// div/0
 	msg_to_char(ch, "Hit percent: %.2f%% (%d/%d)\r\n", mtr->hits * 100.0 / calc, mtr->hits, (mtr->hits + mtr->misses));
 	
-	calc = mtr->hits_taken + mtr->dodges;
+	calc = mtr->hits_taken + mtr->dodges + mtr->blocks;
 	calc = MAX(1.0, calc);	// div/0
-	msg_to_char(ch, "Dodge percent: %.2f%% (%d/%d)\r\n", mtr->dodges * 100.0 / calc, mtr->dodges, (mtr->hits_taken + mtr->dodges));
+	msg_to_char(ch, "Dodge percent: %.2f%% (%d/%d)\r\n", mtr->dodges * 100.0 / calc, mtr->dodges, (mtr->hits_taken + mtr->dodges + mtr->blocks));
+	msg_to_char(ch, "Block percent: %.2f%% (%d/%d)\r\n", mtr->blocks * 100.0 / calc, mtr->blocks, (mtr->hits_taken + mtr->dodges + mtr->blocks));
 	
 	msg_to_char(ch, "Damage dealt: %d (%.2f dps)\r\n", mtr->damage_dealt, (double) mtr->damage_dealt / length);
 	

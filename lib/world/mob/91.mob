@@ -460,6 +460,9 @@ A llama is looking at you.
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
+I 2 1361 100.00 1  # SHEAR: a bag of soft llama wool
+I 2 1361 50.00 1  # SHEAR: a bag of soft llama wool
+I 2 1361 5.00 1  # SHEAR: a bag of soft llama wool
 S
 #9143
 leopard snow~

@@ -1034,6 +1034,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_NO_TELEPORT  BIT(30)  // E. cannot teleport to this mob
 #define MOB_NO_EXPERIENCE  BIT(31)	// F. players get no exp against this mob
 #define MOB_NO_RESCALE  BIT(32)	// G. mob won't rescale (after the first time), e.g. if specific traits were set
+#define MOB_SILENT  BIT(33)	// H. will not set off custom strings
 
 
 // MOB_CUSTOM_x: custom message types
@@ -1580,6 +1581,7 @@ typedef struct vehicle_data vehicle_data;
 #define MORPHF_NO_SLEEP  BIT(8)	// i. cannot sleep in this form
 #define MORPHF_GENDER_NEUTRAL  BIT(9)	// j. causes an "it" instead of him/her
 #define MORPHF_CONSUME_OBJ  BIT(10)	// k. uses up the requiresobj
+#define MORPHF_NO_FASTMORPH  BIT(11)	// l. cannot fastmorph into this form
 
 
 // MOUNT_x: mount flags -- MOUNT_FLAGGED(ch, flag)
@@ -2911,7 +2913,7 @@ struct descriptor_data {
 // used in player specials to track combat
 struct combat_meters {
 	int hits, misses;	// my hit %
-	int hits_taken, dodges;	// my dodge %
+	int hits_taken, dodges, blocks;	// my dodge %
 	int damage_dealt, damage_taken, pet_damage;
 	int heals_dealt, heals_taken;
 	time_t start, end;	// times

@@ -39,7 +39,7 @@ S
 #10562
 Thin Evergreen Forest~
 A Thin Evergreen Forest~
-'.' 14 1 3 dl n
+'.' 33 1 3 dl n
 C
 chop, dig, gather, pick~
 D1
@@ -194,7 +194,7 @@ S
 #10563
 Evergreen Forest~
 An Evergreen Forest~
-'^' 14 1 4 dl n
+'^' 33 1 4 dl n
 C
 chop, dig, gather, pick~
 D1
@@ -345,7 +345,7 @@ S
 #10564
 Overgrown Evergreen Forest~
 An Overgrown Evergreen Forest~
-'^' 14 1 5 dl n
+'^' 33 1 5 dl n
 C
 chop, dig, gather, pick~
 D1
@@ -460,7 +460,7 @@ S
 #10565
 Thick Evergreen Forest~
 A Thick Evergreen Forest~
-'^' 14 1 6 dl dn
+'^' 33 1 6 dl dn
 C
 chop, dig, gather, pick~
 D1
