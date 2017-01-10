@@ -838,7 +838,15 @@ static void wear_message(char_data *ch, obj_data *obj, int where) {
 
 #define VANISH(mode) (mode == SCMD_JUNK ? "  It vanishes in a puff of smoke!" : "")
 
-// returns 0 in all cases except -1 to cancel execution
+/**
+* Attempts to complete a drop/junk.
+*
+* @param char_data *ch The person dropping.
+* @param obj_data *obj The thing to drop.
+* @param byte mode SCMD_DROP or SCMD_JUNK.
+* @param const char *sname The verb they are typing ("drop").
+* @return int 1 for success, 0 for basic fail, -1 to stop further drops (in a drop all)
+*/
 int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	bool need_capacity = ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ITEM_LIMIT) ? TRUE : FALSE;
 	char_data *iter;
@@ -891,16 +899,16 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 				}
 			}
 			
-			return (0);
+			return (1);
 		case SCMD_JUNK:
 			extract_obj(obj);
-			return (0);
+			return (1);
 		default:
 			log("SYSERR: Incorrect argument %d passed to perform_drop.", mode);
 			break;
 	}
 
-	return (0);
+	return (1);
 }
 
 
@@ -3920,7 +3928,7 @@ ACMD(do_exchange) {
 		msg_to_char(ch, "This building does not belong to any empire, and can't exchange coins.\r\n");
 	}
 	else if (!EMPIRE_HAS_TECH(emp, TECH_COMMERCE)) {
-		msg_to_char(ch, "This empire does not have Commerce, and cannot exchnage coins.\r\n");
+		msg_to_char(ch, "This empire does not have Commerce, and cannot exchange coins.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to exchange anything here.\r\n");

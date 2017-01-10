@@ -526,21 +526,6 @@ Monsoon Rift cleanup + complete~
 * Iterates over a series of vnums and removes all mobs with those vnums from the instance.
 * Also cleans up the entrance portal and saguaro cactus.
 * This script fragment is duplicated in triggers: 10142, 10177, 10180
-eval current_vnum 10140
-while %current_vnum% <= 10147
-  if %current_vnum% <= 10143
-    set message turns back into an ordinary cactus.
-  else
-    set message leaves.
-  end
-  eval mob %%instance.mob(%current_vnum%)%%
-  while %mob%
-    %echoaround% %mob% %mob.name% %message%
-    %purge% %mob%
-    eval mob %%instance.mob(%current_vnum%)%%
-  done
-  eval current_vnum %current_vnum% + 1
-done
 eval loc %instance.location%
 eval obj %loc.contents%
 while %obj%
@@ -565,6 +550,21 @@ if %loc%
   done
 end
 %adventurecomplete%
+eval current_vnum 10147
+while %current_vnum% >= 10140
+  if %current_vnum% <= 10143
+    set message turns back into an ordinary cactus.
+  else
+    set message leaves.
+  end
+  eval mob %%instance.mob(%current_vnum%)%%
+  while %mob%
+    %echoaround% %mob% %mob.name% %message%
+    %purge% %mob%
+    eval mob %%instance.mob(%current_vnum%)%%
+  done
+  eval current_vnum %current_vnum% - 1
+done
 * End of script fragment.
 ~
 #10143
@@ -1290,7 +1290,7 @@ if %room.sector% != Oasis
 end
 if %time.hour% > 7 && %time.hour% < 19
   %send% %actor% You can only infuse %self.shortdesc% at night.
-  if !%actor.nohassle%
+  if !%actor.is_immortal%
     halt
   else
     %send% %actor% You use your immortal powers to ignore this restriction.
@@ -1371,28 +1371,15 @@ while %cycles_left% >= 0
       * Leave the loop
     break
   done
-  wait 5 sec
+  if %cycles_left% > 0
+    wait 5 sec
+  end
   eval cycles_left %cycles_left% - 1
 done
 * Start of script fragment: Monsoon cleanup
 * Iterates over a series of vnums and removes all mobs with those vnums from the instance.
 * Also cleans up the entrance portal and saguaro cactus.
 * This script fragment is duplicated in triggers: 10142, 10177, 10180
-eval current_vnum 10140
-while %current_vnum% <= 10147
-  if %current_vnum% <= 10143
-    set message turns back into an ordinary cactus.
-  else
-    set message leaves.
-  end
-  eval mob %%instance.mob(%current_vnum%)%%
-  while %mob%
-    %echoaround% %mob% %mob.name% %message%
-    %purge% %mob%
-    eval mob %%instance.mob(%current_vnum%)%%
-  done
-  eval current_vnum %current_vnum% + 1
-done
 eval loc %instance.location%
 eval obj %loc.contents%
 while %obj%
@@ -1417,6 +1404,21 @@ if %loc%
   done
 end
 %adventurecomplete%
+eval current_vnum 10147
+while %current_vnum% >= 10140
+  if %current_vnum% <= 10143
+    set message turns back into an ordinary cactus.
+  else
+    set message leaves.
+  end
+  eval mob %%instance.mob(%current_vnum%)%%
+  while %mob%
+    %echoaround% %mob% %mob.name% %message%
+    %purge% %mob%
+    eval mob %%instance.mob(%current_vnum%)%%
+  done
+  eval current_vnum %current_vnum% - 1
+done
 * End of script fragment.
 %quest% %actor% finish 10157
 * Quest finish will purge this for us
@@ -1456,7 +1458,7 @@ while %cycles_left% >= 0
   eval sector_valid (%room.building% == Monsoon Rift)
   eval rift_present 0
   eval object %room.contents%
-  while %object% & !%rift_present%
+  while %object% && !%rift_present%
     if %object.vnum% == 10140
       eval rift_present 1
     end
@@ -1467,8 +1469,6 @@ while %cycles_left% >= 0
     if %cycles_left% < 5
       %echoaround% %actor% %actor.name%'s ritual is interrupted.
       %send% %actor% Your ritual is interrupted.
-    elseif !%permission%
-      %send% %actor% You don't have permission to use the rift ritual here.
     elseif !%sector_valid%
       %send% %actor% You must perform the ritual at the monsoon rift.
     elseif !%rift_present%
@@ -1506,28 +1506,15 @@ while %cycles_left% >= 0
       * Leave the loop
     break
   done
-  wait 5 sec
+  if %cycles_left% > 0
+    wait 5 sec
+  end
   eval cycles_left %cycles_left% - 1
 done
 * Start of script fragment: Monsoon cleanup
 * Iterates over a series of vnums and removes all mobs with those vnums from the instance.
 * Also cleans up the entrance portal and saguaro cactus.
 * This script fragment is duplicated in triggers: 10142, 10177, 10180
-eval current_vnum 10140
-while %current_vnum% <= 10147
-  if %current_vnum% <= 10143
-    set message turns back into an ordinary cactus.
-  else
-    set message leaves.
-  end
-  eval mob %%instance.mob(%current_vnum%)%%
-  while %mob%
-    %echoaround% %mob% %mob.name% %message%
-    %purge% %mob%
-    eval mob %%instance.mob(%current_vnum%)%%
-  done
-  eval current_vnum %current_vnum% + 1
-done
 eval loc %instance.location%
 eval obj %loc.contents%
 while %obj%
@@ -1552,6 +1539,21 @@ if %loc%
   done
 end
 %adventurecomplete%
+eval current_vnum 10147
+while %current_vnum% >= 10140
+  if %current_vnum% <= 10143
+    set message turns back into an ordinary cactus.
+  else
+    set message leaves.
+  end
+  eval mob %%instance.mob(%current_vnum%)%%
+  while %mob%
+    %echoaround% %mob% %mob.name% %message%
+    %purge% %mob%
+    eval mob %%instance.mob(%current_vnum%)%%
+  done
+  eval current_vnum %current_vnum% - 1
+done
 * End of script fragment.
 %quest% %actor% finish 10145
 * Quest finish will purge the ritual object for us

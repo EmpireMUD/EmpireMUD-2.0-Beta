@@ -5,7 +5,7 @@ A collapsed cabin tent is folded on the ground.~
    A patchwork of large animal hides, sewn together into several long side
 pieces, and one large roof. Stacked between the folds are several weathered
 tusks, to be used as uprights. You can set this tent up using 'build
-cabintent'.  
+cabintent'.
 ~
 3 0 a 2
 0 0 0
@@ -33,10 +33,10 @@ dagger antler reindeer~
 a reindeer antler dagger~
 A dagger forged from a reindeer antler rests nearby.~
    The hilt, fashioned from the antler of a reindeer, forms a sort of cradling
-brace for the weilder's wrist. It is as unique a piece as the animal which
+brace for the wielder's wrist. It is as unique a piece as the animal which
 produced it.
 ~
-1 hmo ano 1
+1 hmo ano 2
 0 1 4
 14 0
 A

@@ -1474,9 +1474,10 @@ const char *action_bits[] = {
 	"GROUP",
 	"*EXTRACTED",
 	"!LOOT",
-	"!TELEPORT",
+	"!TELEPORT",	// 30
 	"!EXP",
 	"!RESCALE",
+	"SILENT",
 	"\n"
 };
 

@@ -1314,6 +1314,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				if (PFILE_TAG(line, "Daily Cycle:", length)) {
 					GET_DAILY_CYCLE(ch) = atoi(line + length + 1);
 				}
+				else if (PFILE_TAG(line, "Daily Quests:", length)) {
+					GET_DAILY_QUESTS(ch) = atoi(line + length + 1);
+				}
 				else if (PFILE_TAG(line, "Deficit:", length)) {
 					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, pool_types, TRUE)) != NOTHING) {
@@ -2183,6 +2186,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	
 	// 'D'
 	fprintf(fl, "Daily Cycle: %d\n", GET_DAILY_CYCLE(ch));
+	fprintf(fl, "Daily Quests: %d\n", GET_DAILY_QUESTS(ch));
 	if (GET_LONG_DESC(ch)) {
 		strcpy(temp, NULLSAFE(GET_LONG_DESC(ch)));
 		strip_crlf(temp);

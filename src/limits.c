@@ -319,7 +319,9 @@ void point_update_char(char_data *ch) {
 						found = TRUE;
 						msg_to_char(ch, "You are way overburdened and begin losing items...\r\n");
 					}
-					perform_drop(ch, obj, SCMD_JUNK, "lose");
+					if (perform_drop(ch, obj, SCMD_DROP, "drop") <= 0) {
+						perform_drop(ch, obj, SCMD_JUNK, "lose");
+					}
 				}
 			}
 		}
@@ -472,7 +474,6 @@ void real_update_char(char_data *ch) {
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	void do_unseat_from_vehicle(char_data *ch);
 	extern bool fail_daily_quests(char_data *ch);
-	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
 	void random_encounter(char_data *ch);
 	void update_biting_char(char_data *ch);
 	void update_vampire_sun(char_data *ch);
@@ -1294,7 +1295,7 @@ void point_update_obj(obj_data *obj) {
 	}
 
 	// float or sink
-	if (IN_ROOM(obj) && ROOM_SECT_FLAGGED(IN_ROOM(obj), SECTF_FRESH_WATER | SECTF_OCEAN)) {
+	if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE) && ROOM_SECT_FLAGGED(IN_ROOM(obj), SECTF_FRESH_WATER | SECTF_OCEAN)) {
 		if (materials[GET_OBJ_MATERIAL(obj)].floats && (to_room = real_shift(IN_ROOM(obj), shift_dir[WEST][0], shift_dir[WEST][1]))) {
 			if (!number(0, 2) && !ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_IS_CLOSED(to_room)) {
 				// float-west message

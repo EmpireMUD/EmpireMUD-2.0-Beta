@@ -157,7 +157,7 @@ Aquilo polar baron~
 Aquilo, the Polar Baron~
 Aquilo, the Polar Baron, hovers above the snow on a frosty updraft.
 ~
-0 0 bdvxyzBE cmq
+0 0 bdvxyzABE cm
 1 0 2 20
 I 4 10570 100.00 1  # LOOT: a chance of boss loot
 I 4 10579 14.28 1 L  # LOOT: cold echoes of the future
@@ -174,6 +174,7 @@ I 4 10582 14.28 1 M  # LOOT: frost flower ear cuffs
 I 4 10587 14.29 1 M  # LOOT: the empyrean pearls of the Permafrost
 I 4 10592 14.28 1 M  # LOOT: the Tome of the Polar Baron
 I 4 10588 14.30 1 M  # LOOT: the aegis charm of the Permafrost
+I 12 10598 100.00 1  # PICKPOCKET: a frozen gemstone
 M
 1
 The frost will be your doooooooom!~
@@ -184,6 +185,7 @@ M
 1
 Death is a cold place, as you shall soon see!~
 T 10562
+T 10550
 S
 #10551
 #n cryomancer apprentice~
@@ -207,6 +209,7 @@ I 4 10589 7.14 1 L  # LOOT: the polar bear shield
 I 4 10590 7.14 1 L  # LOOT: an intricately runed walrus tusk
 I 4 10591 7.15 1 L  # LOOT: a frozen adder stone
 I 4 10592 7.14 1 L  # LOOT: the Tome of the Polar Baron
+I 12 10598 100.00 1  # PICKPOCKET: a frozen gemstone
 M
 1
 Aquilo said you'd come.~
@@ -214,6 +217,8 @@ M
 1
 This is the realm of the Polar Baron, you have no place here!~
 T 10558
+T 10551
+T 10562
 S
 #10552
 mage rime #n apprentice~
@@ -237,6 +242,7 @@ I 4 10589 7.14 1 L  # LOOT: the polar bear shield
 I 4 10590 7.14 1 L  # LOOT: an intricately runed walrus tusk
 I 4 10591 7.15 1 L  # LOOT: a frozen adder stone
 I 4 10592 7.14 1 L  # LOOT: the Tome of the Polar Baron
+I 12 10598 100.00 1  # PICKPOCKET: a frozen gemstone
 M
 1
 The elements will be your undoing!~
@@ -244,6 +250,8 @@ M
 1
 We will freeze this river, and then your whole realm!~
 T 10558
+T 10552
+T 10562
 S
 #10553
 caribou rabid~
@@ -252,7 +260,9 @@ A rabid caribou charges at you, spraying frozen foam from its mouth!
 ~
 0 0 bdj 0
 0 0 0 27
+I 0 10596 100.00 1  # BUTCHER: a fillet of frozen meat
 T 10558
+T 10553
 S
 #10554
 orca flying enchanted~
@@ -261,16 +271,20 @@ An enchanted orca surprises you from above!
 ~
 0 0 bdj m
 0 0 2 9
+I 0 10596 100.00 1  # BUTCHER: a fillet of frozen meat
 T 10558
+T 10553
 S
 #10555
-ermine pack vicious~
+ermines pack vicious~
 a pack of vicious ermines~
 A pack of vicious ermines surprises you from tunnels in the snow!
 ~
 0 0 bdj 0
 0 0 0 9
+I 0 10596 100.00 1  # BUTCHER: a fillet of frozen meat
 T 10558
+T 10553
 S
 #10556
 hare snowshoe~
@@ -324,12 +338,39 @@ The river freezer is here.
 T 10559
 T 10560
 S
+#10560
+sword enchanted ice~
+the enchanted ice sword~
+A sword of ice animated by Aquilo's power is flying around.
+~
+0 0 abdhzDF m
+0 0 2 1
+T 10564
+S
+#10561
+sprite ice~
+an ice sprite~
+An ice sprite is flitting around here.
+~
+75 125 abdhoxDF cm
+0 0 2 28
+T 10564
+S
+#10562
+elemental ice~
+an ice elemental~
+A summoned ice elemental soars overhead on wings of rime.
+~
+75 125 abdhoxzDF cm
+0 0 2 20
+T 10564
+S
 #10564
 bear polar~
 a polar bear~
 A polar bear is resting here.
 ~
-100 125 dej 0
+100 125 bdej 0
 0 0 26 9
 S
 #10565
@@ -357,5 +398,29 @@ A polar bear cub is rolling around on the ground.
 0 0 0 9
 T 9901
 T 9902
+S
+#10568
+walrus vested~
+a vested walrus~
+A walrus wearing a vest and tophat has set up a shop on the ice (list).
+~
+75 125 bdEH enD
+1 0 0 15
+M
+1
+Step right up! Step right up! Just type 'list' to see my wares!~
+M
+0
+$n straightens $s vest using $s reflection in the ice.~
+M
+0
+$n shuffles off into the portal for a moment, then reappears with more items.~
+M
+1
+Have you ever seen such fine goods? Surely you have not!~
+T 10560
+T 10567
+T 10568
+T 10569
 S
 $
