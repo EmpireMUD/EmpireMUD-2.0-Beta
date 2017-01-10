@@ -370,7 +370,7 @@ bear polar~
 a polar bear~
 A polar bear is resting here.
 ~
-100 125 dej 0
+100 125 bdej 0
 0 0 26 9
 S
 #10565
@@ -404,7 +404,7 @@ walrus vested~
 a vested walrus~
 A walrus wearing a vest and tophat has set up a shop on the ice (list).
 ~
-75 125 bdE enD
+75 125 bdEH enD
 1 0 0 15
 M
 1

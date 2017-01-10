@@ -219,6 +219,7 @@ else
     %force% %pet% mfollow %actor%
     %echo% %pet.name% appears!
   end
+  %purge% %self%
 end
 ~
 #10507
@@ -409,7 +410,7 @@ switch %random.3%
     if %summon.vnum% == 10560
       %send% %actor% %summon.name% begins attacking you with a malevolent will of %summon.hisher% own!
       %echoaround% %actor% %summon.name% begins attacking %actor.name% with a malevolent will of %summon.hisher% own!
-      %force% %summon.name% mkill %actor%
+      %force% %summon% mkill %actor%
     end
     if !%heroic_mode%
       %echo% %self.name% steps back and folds %self.hisher% arms.
@@ -845,7 +846,8 @@ eval person %room.people%
 while %person%
   if %person.is_pc%
     * You get a token, and you get a token, and YOU get a token!
-    %send% %person% As %self.name% dies, %self.hisher% power crystallizes into a permafrost token!
+    %send% %person% As %self.name% dies, %self.hisher% power crystallizes, creating a permafrost token!
+    %send% %person% You take the newly created token.
     if !%person.inventory(10556)%
       %load% obj 10556 %person% inv
       %send% %person% You find a pouch to store your permafrost tokens in.
@@ -908,6 +910,8 @@ elseif %self.vnum% == 10561
   %purge% %self%
 elseif %self.vnum% == 10562
   * Attached mob is Cryomancer's summon on group/boss (permanent until end of combat)
+  * make sure we're not despawning right away
+  wait 5 sec
   if !%self.fighting%
     %echo% %self.name% flies away.
     %purge% %self%
@@ -934,14 +938,18 @@ detach 10566 %self.id%
 Permafrost shop list - vested walrus~
 0 c 0
 list~
+if !%self.canbeseen%
+  return 0
+  halt
+end
 * List of items
 %send% %actor% %self.name% sells the following items for permafrost tokens:
 %send% %actor% - polar bear charm (14 tokens, land mount)
 %send% %actor% - penguin charm (16 tokens, aquatic mount)
 %send% %actor% - wyvern charm (40 tokens, flying mount)
 %send% %actor% - polar cub whistle (24 tokens, minipet)
-%send% %actor% - yeti charm (18 tokens, yeti)
-%send% %actor% - gossamer sails of the Polar Wind (26 tokens, huge cargo ship)
+%send% %actor% - yeti charm (18 tokens, yeti morph)
+%send% %actor% - gossamer sails of the Polar Wind (26 tokens, unique upgraded carrack)
 %send% %actor% - whipping winds of the North pattern (20 tokens, tank weapon)
 %send% %actor% - frozen pykrete sword pattern (20 tokens, melee weapon)
 %send% %actor% - icy star of winter pattern (20 tokens, healer weapon)
@@ -951,6 +959,10 @@ list~
 Permafrost shop buy - vested walrus~
 0 c 0
 buy~
+if !%self.canbeseen%
+  return 0
+  halt
+end
 eval vnum -1
 eval cost 0
 set named a thing
@@ -1043,9 +1055,12 @@ end
 if %actor.permafrost_tokens_104% < %cheapest_item_cost%
   halt
 end
-visible
-wait 1
-%echo% %self.name% shuffles out of the portal and sets up a shop on the ice.
+if %self.aff_flagged(HIDE)%
+  nop %self.remove_mob_flag(SILENT)%
+  visible
+  wait 1
+  %echo% %self.name% shuffles out of the portal and sets up a shop on the ice.
+end
 ~
 #10570
 Boss loot replacer~
