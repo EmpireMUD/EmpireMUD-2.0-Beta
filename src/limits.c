@@ -314,7 +314,7 @@ void point_update_char(char_data *ch) {
 			found = FALSE;
 			LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 				count += obj_carry_size(obj);
-				if (count > 2 * CAN_CARRY_N(ch)) {
+				if (count > 2 * GET_LARGEST_INVENTORY(ch)) {
 					if (!found) {
 						found = TRUE;
 						msg_to_char(ch, "You are way overburdened and begin losing items...\r\n");
