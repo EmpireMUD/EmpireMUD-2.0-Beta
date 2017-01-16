@@ -340,6 +340,9 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			break;
 		case APPLY_INVENTORY: {
 			SAFE_ADD(GET_BONUS_INVENTORY(ch), mod, INT_MIN, INT_MAX, TRUE);
+			if (!IS_NPC(ch) && mod > 0 && CAN_CARRY_N(ch) > GET_LARGEST_INVENTORY(ch)) {
+				GET_LARGEST_INVENTORY(ch) = CAN_CARRY_N(ch);
+			}
 			break;
 		}
 		case APPLY_STRENGTH:

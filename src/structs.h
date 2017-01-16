@@ -3096,6 +3096,9 @@ struct player_special_data {
 	mob_vnum mount_vnum;	// current mount vnum
 	bitvector_t mount_flags;	// current mount flags
 	
+	// other
+	int largest_inventory;	// highest inventory size a player has ever had
+	
 	// UNSAVED PORTION //
 	
 	int gear_level;	// computed gear level -- determine_gear_level()
