@@ -251,10 +251,10 @@ S
 column wooden bound~
 a bound wooden column~
 A bound column of wood is lying on the ground.~
-   It looks as though someone has tied bound some lumber and sticks to make a
-structural support. This could be used in place of logs for building.
+   It looks as though someone has bound some lumber and sticks to make a
+structural support. This could be used in place of logs for building.  
 ~
-3 e a 6
+3 e a 7
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire

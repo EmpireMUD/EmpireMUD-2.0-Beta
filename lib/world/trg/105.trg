@@ -707,8 +707,8 @@ Frosty delayed despawn~
 Frosty tokens count~
 1 c 2
 count~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+eval test %%actor.obj_target(%arg%)%%
+if %self% != %test%
   return 0
   halt
 end
@@ -1006,19 +1006,19 @@ elseif (gossamer sails of the Polar Wind /= %arg%)
   eval cost 26
   set named the gossamer sails of the Polar Wind
 elseif whipping winds of the North pattern /= %arg%
-  eval vnum 11071
+  eval vnum 10572
   eval cost 20
   set named the whipping winds of the North pattern
 elseif frozen pykrete sword pattern /= %arg%
-  eval vnum 11073
+  eval vnum 10574
   eval cost 20
   set named the frozen pykrete sword pattern
 elseif icy star of winter pattern /= %arg%
-  eval vnum 11075
+  eval vnum 10576
   eval cost 20
   set named the icy star of winter pattern
 elseif glacial staff of the Maelstrom pattern /= %arg%
-  eval vnum 11077
+  eval vnum 10578
   eval cost 20
   set named the glacial staff of the Maelstrom pattern
 else
