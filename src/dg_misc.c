@@ -302,6 +302,57 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 
 
 /**
+* Purges all matching vnums in an instance. This is called from:
+* %purge% instance <arguments>
+*
+* Currently it supports:
+* - mob <vnum> [message]
+*
+* @param void *owner The owner of the script, to check if it purges itself.
+* @param struct instance_data *inst The instance whose contents are being purged.
+* @param char *argument The arguments passed to "%purge% instance".
+*/
+void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	char_data *mob, *next_mob;
+	any_vnum vnum;
+	
+	if (!inst) {
+		return;
+	}
+	
+	argument = any_one_arg(argument, arg1);	// type
+	argument = any_one_arg(argument, arg2);	// vnum
+	skip_spaces(&argument);	// message
+	vnum = atoi(arg2);
+	
+	if (!*arg1 || !*arg2) {
+		script_log("dg_purge_instance called with invalid arguments: %s %s %s", arg1, arg2, argument);
+	}
+	else if (is_abbrev(arg1, "mobile")) {
+		LL_FOREACH_SAFE(character_list, mob, next_mob) {
+			if (!IS_NPC(mob) || GET_MOB_VNUM(mob) != vnum || EXTRACTED(mob)) {
+				continue;
+			}
+			
+			// found
+			if (*argument) {
+				act(argument, TRUE, mob, NULL, NULL, TO_ROOM);
+			}
+			
+			if (mob == owner) {
+				dg_owner_purged = 1;
+			}
+			extract_char(mob);
+		}
+	}
+	else {
+		script_log("dg_purge_instance called with invalid type: %s", arg1);
+	}
+}
+
+
+/**
 * Processes the %quest% command.
 *
 * @param int go_type _TRIGGER type for 'go'

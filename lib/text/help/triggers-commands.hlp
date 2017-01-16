@@ -459,12 +459,25 @@ See also: EMPIRE VARS
 #d
 %PURGE% MPURGE OPURGE VPURGE WPURGE
 
-Usage:  %purge% <victim | obj | vehicle>
+Usage:  %purge% <victim | obj | vehicle> [message]
+        %purge% instance mob <vnum> [message]
 
 Purge removes objects, mobs, or vehicles from the game. If no argument is
 given, then all objects and mobs (but not vehicles) in the room will be
 removed. If there is an argument, only that thing will be  purged. Players
 cannot be purged.
+
+The "purge instance" feature lets you purge ALL mobs by vnum in an instance.
+In the future, other types may be supported for this. Request one if you need
+it for your scripts.
+
+The optional [message] argument echoes a message for each thing extracted.
+If using "purge instance", you must use "dollar sign codes" rather than script
+variables in the messages (script variables are processed before the %purge%
+command is executed).
+  $n $e $s $m - For a mob being purged.
+  $p $a - For an object being purged.
+  $V - For a vehicle being purged (note the capital V).
 
 Examples: 
   %purge% %self%

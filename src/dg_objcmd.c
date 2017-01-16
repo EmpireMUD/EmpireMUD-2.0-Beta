@@ -618,7 +618,8 @@ OCMD(do_opurge) {
 	vehicle_data *veh;
 	room_data *rm;
 
-	one_argument(argument, arg);
+	argument = one_argument(argument, arg);
+	skip_spaces(&argument);
 
 	if (!*arg) {
 		/* purge all */
@@ -639,23 +640,48 @@ OCMD(do_opurge) {
 		return;
 	} /* no arg */
 	
+	
+	// purge all mobs/objs in an instance
+	if (!str_cmp(arg, "instance")) {
+		room_data *room = obj_room(obj);
+		struct instance_data *inst = quest_instance_global;
+		if (!inst) {
+			inst = room ? find_instance_by_room(room, FALSE) : NULL;
+		}
+		
+		if (!inst) {
+			obj_log(obj, "opurge: obj using purge instance outside an instance");
+			return;
+		}
+		dg_purge_instance(obj, inst, argument);
+	}
 	// purge char
-	if ((ch = get_char_by_obj(obj, arg))) {
+	else if ((ch = get_char_by_obj(obj, arg))) {
 		if (!IS_NPC(ch)) {
 			obj_log(obj, "opurge: purging a PC");
 			return;
 		}
 
+		if (*argument) {
+			act(argument, TRUE, ch, NULL, NULL, TO_ROOM);
+		}
 		extract_char(ch);
 	}
 	// purge vehicle
 	else if ((veh = get_vehicle_by_obj(obj, arg))) {
+		if (*argument) {
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_ROOM);
+		}
 		extract_vehicle(veh);
 	}
 	// purge obj
 	else if ((o = get_obj_by_obj(obj, arg))) {
 		if (o == obj) {
 			dg_owner_purged = 1;
+		}
+		if (*argument) {
+			room_data *room = obj_room(o);
+			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, o, NULL, TO_ROOM);
 		}
 		extract_obj(o);
 	}
