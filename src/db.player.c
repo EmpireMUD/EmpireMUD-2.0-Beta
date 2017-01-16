@@ -1435,7 +1435,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				if (PFILE_TAG(line, "Largest Inventory:", length)) {
 					GET_LARGEST_INVENTORY(ch) = atoi(line + length + 1);
 				}
-				if (PFILE_TAG(line, "Lastname:", length)) {
+				else if (PFILE_TAG(line, "Lastname:", length)) {
 					if (GET_LASTNAME(ch)) {
 						free(GET_LASTNAME(ch));
 					}
