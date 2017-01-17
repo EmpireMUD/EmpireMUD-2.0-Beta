@@ -85,12 +85,12 @@ S
 #9042
 Deliver a Letter~
    The postmaster's pigeons are all out and he has an urgent letter to be
-delivered! Examine the letter to check its recipient, and use 'deliver' to hand
-it over, then return for a reward.
+delivered! Examine the letter to check its recipient, and 'give' it to them,
+then return for a reward.  
 ~
 The postmaster thanks you for your help.
 ~
-8 ef 0 0 -1
+9 ef 0 0 -1
 A
 1 263
 P

@@ -36,7 +36,7 @@ S
 picture trinket~
 a picture of the trinket~
 A picture of a trinket is lying here.~
-You'll need this to identify the trinket the guildmaster wants you to steal. 
+You'll need this to identify the trinket the guildmaster wants you to steal.
 ~
 3 0 a 2
 0 0 0
@@ -51,18 +51,18 @@ A useless trinket is sitting here.~
    These useless trinkets are used by novice sorcerers to practice enchanting.
 The High Sorcerer wants them disenchanted so they can be reused.
 ~
-3 jp a 3
+3 jp a 4
 0 0 0
 8 0
 Q 9036
-T 9037
+T 9036
 S
 #9042
 letter smith undelivered~
 a letter for the smith~
 An undelivered letter is lying here.~
    This letter needs to be delivered to the smith in your empire... But maybe
-you could take a peek.  
+you could take a peek.
 ~
 3 0 a 2
 0 0 0
@@ -74,8 +74,8 @@ S
 letter high sorcerer undelivered~
 a letter for the High Sorcerer~
 An undelivered letter is lying here.~
-   This letter needs to be delivered to the High Sorcerer in your empire... 
-But maybe you could take a peek.  
+   This letter needs to be delivered to the High Sorcerer in your empire...
+But maybe you could take a peek.
 ~
 3 0 a 2
 0 0 0
@@ -88,7 +88,7 @@ letter alchemist undelivered~
 a letter for the alchemist~
 An undelivered letter is lying here.~
    This letter needs to be delivered to the Alchemist in your empire... But
-maybe you could take a peek.  
+maybe you could take a peek.
 ~
 3 0 a 3
 0 0 0

@@ -84,8 +84,9 @@ elseif %questvnum% == 9033
   end
 elseif %questvnum% == 9036
   if %actor.varexists(last_quest_9036_time)%
+    * 15 minute cooldown
     if %timestamp% - %actor.last_quest_9036_time% < 900
-      eval diff (%actor.last_quest_9036_time% - %timestamp%) + 1800
+      eval diff (%actor.last_quest_9036_time% - %timestamp%) + 900
       eval diff2 %diff%/60
       eval diff %diff%//60
       if %diff%<10
@@ -371,7 +372,12 @@ if !%actor.ability(pickpocket)%
   return 0
   halt
 end
-if (%target.vnum% != 202 && %target.vnum% != 203) || %target.empire% != %actor.empire%
+if %target.empire% != %actor.empire%
+  * Wrong empire
+  return 0
+  halt
+end
+if (%target.vnum% != 202 && %target.vnum% != 203)
   * Not an empire citizen
   return 0
   halt
@@ -380,19 +386,24 @@ if %target.mob_flagged(*PICKPOCKETED)%
   return 0
   halt
 end
-if %random.3% != 3 || %actor.inventory(9033)% || !%actor.on_quest(9033)%
-  %send% %actor% This must have been the wrong citizen.
+if %actor.inventory(9033)% || !%actor.on_quest(9033)%
+  * Don't need the trinket
   return 0
   halt
 end
-return 1
-%send% %actor% You pick %target.name%'s pocket...
-nop %target.add_mob_flag(*PICKPOCKETED)%
-%load% obj 9033 %actor% inv
-eval item %actor.inventory()%
-%send% %actor% You find %item.shortdesc%!
-return 1
-halt
+if %random.3% != 3
+  %send% %actor% This must have been the wrong citizen.
+  return 0
+  halt
+else
+  %send% %actor% You pick %target.name%'s pocket...
+  nop %target.add_mob_flag(*PICKPOCKETED)%
+  %load% obj 9033 %actor% inv
+  eval item %actor.inventory()%
+  %send% %actor% You find %item.shortdesc%!
+  return 1
+  halt
+end
 ~
 #9034
 Horse Animation~
@@ -412,23 +423,6 @@ switch (%random.3%)
 done
 ~
 #9036
-Disenchant checker~
-2 v 100
-~
-eval obj %actor.inventory()%
-while %obj%
-  if %obj.vnum% == 9036
-    if %obj.is_flagged(ENCHANTED)%
-      %send% %actor% You have not disenchanted all of the trinkets!
-      return 0
-      halt
-    end
-  end
-  eval obj %obj.next_in_list%
-done
-return 1
-~
-#9037
 Disenchant detector~
 1 p 100
 ~
@@ -462,8 +456,8 @@ eval item %%actor.inventory(%vnum%)%%
 ~
 #9043
 Postmaster daily letter delivery~
-1 c 2
-deliver~
+1 i 100
+~
 eval recipient 0
 switch %self.vnum%
   case 9042
@@ -475,36 +469,25 @@ switch %self.vnum%
     eval recipient 228
   break
   case 9044
-    * alchemist
+    * Alchemist
     eval recipient 231
   break
 done
-eval found 0
-eval found_wrong_empire 0
-eval room %self.room%
-eval person %room.people%
-while %person%
-  if %person.vnum% == %recipient% && %person.empire% == %actor.empire%
-    eval found %person%
-    eval found_wrong_empire 0
-    eval person 0
-  elseif %person.vnum% == %recipient% && %person.empire% != %actor.empire%
-    eval found_wrong_empire %person%
-    eval person %person.next_in_room%
-  else
-    eval person %person.next_in_room%
-  end
-done
-return 1
+eval person %victim%
+eval found (%person.vnum% == %recipient% && %person.empire% == %actor.empire%)
+eval wrong_empire %person.vnum% == %recipient% && %person.empire% != %actor.empire%
 if %found%
-  %send% %actor% You give the letter to %found.name%.
+  %send% %actor% You give the letter to %person.name%.
   %quest% %actor% trigger 9042
+  return 1
   %purge% %self%
-elseif %found_wrong_empire%
-  %send% %actor% %found_wrong_empire.name% does not belong to your empire.
+elseif %wrong_empire%
+  %send% %actor% %person.name% does not belong to your empire.
+  return 0
   halt
 else
-  %send% %actor% The person who you need to deliver your letter to is not here.
+  %send% %actor% That's not who you need to deliver the letter to.
+  return 0
   halt
 end
 ~

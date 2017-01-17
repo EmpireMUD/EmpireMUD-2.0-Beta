@@ -550,19 +550,15 @@ if %loc%
   done
 end
 %adventurecomplete%
+%purge% instance mob 10140
 eval current_vnum 10147
 while %current_vnum% >= 10140
   if %current_vnum% <= 10143
-    set message turns back into an ordinary cactus.
+    set message $n turns back into an ordinary cactus.
   else
-    set message leaves.
+    set message $n leaves.
   end
-  eval mob %%instance.mob(%current_vnum%)%%
-  while %mob%
-    %echoaround% %mob% %mob.name% %message%
-    %purge% %mob%
-    eval mob %%instance.mob(%current_vnum%)%%
-  done
+  %purge% instance mob %current_vnum% %message%
   eval current_vnum %current_vnum% - 1
 done
 * End of script fragment.
@@ -1404,19 +1400,15 @@ if %loc%
   done
 end
 %adventurecomplete%
+%purge% instance mob 10140
 eval current_vnum 10147
 while %current_vnum% >= 10140
   if %current_vnum% <= 10143
-    set message turns back into an ordinary cactus.
+    set message $n turns back into an ordinary cactus.
   else
-    set message leaves.
+    set message $n leaves.
   end
-  eval mob %%instance.mob(%current_vnum%)%%
-  while %mob%
-    %echoaround% %mob% %mob.name% %message%
-    %purge% %mob%
-    eval mob %%instance.mob(%current_vnum%)%%
-  done
+  %purge% instance mob %current_vnum% %message%
   eval current_vnum %current_vnum% - 1
 done
 * End of script fragment.
@@ -1539,19 +1531,15 @@ if %loc%
   done
 end
 %adventurecomplete%
+%purge% instance mob 10140
 eval current_vnum 10147
 while %current_vnum% >= 10140
   if %current_vnum% <= 10143
-    set message turns back into an ordinary cactus.
+    set message $n turns back into an ordinary cactus.
   else
-    set message leaves.
+    set message $n leaves.
   end
-  eval mob %%instance.mob(%current_vnum%)%%
-  while %mob%
-    %echoaround% %mob% %mob.name% %message%
-    %purge% %mob%
-    eval mob %%instance.mob(%current_vnum%)%%
-  done
+  %purge% instance mob %current_vnum% %message%
   eval current_vnum %current_vnum% - 1
 done
 * End of script fragment.
