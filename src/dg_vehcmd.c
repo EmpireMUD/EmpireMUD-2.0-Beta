@@ -47,6 +47,7 @@ extern vehicle_data *get_vehicle(char *name);
 extern vehicle_data *get_vehicle_by_vehicle(vehicle_data *veh, char *name);
 extern vehicle_data *get_vehicle_near_vehicle(vehicle_data *veh, char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
+extern room_data *obj_room(obj_data *obj);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
@@ -544,7 +545,8 @@ VCMD(do_vpurge) {
 	vehicle_data *v;
 	room_data *rm;
 
-	one_argument(argument, arg);
+	argument = one_argument(argument, arg);
+	skip_spaces(&argument);
 
 	if (!*arg) {
 		// purge all
@@ -565,20 +567,42 @@ VCMD(do_vpurge) {
 		return;
 	}
 	
-	if ((ch = get_char_by_vehicle(veh, arg))) {
+	if (!str_cmp(arg, "instance")) {
+		room_data *room = IN_ROOM(veh);
+		struct instance_data *inst = quest_instance_global;
+		if (!inst) {
+			inst = room ? find_instance_by_room(room, FALSE) : NULL;
+		}
+		if (!inst) {
+			veh_log(veh, "vpurge: vehicle using purge instance outside of an instance");
+			return;
+		}
+		dg_purge_instance(veh, inst, argument);
+	}
+	else if ((ch = get_char_by_vehicle(veh, arg))) {
 		if (!IS_NPC(ch)) {
 			veh_log(veh, "vpurge: purging a PC");
 			return;
 		}
-
+		
+		if (*argument) {
+			act(argument, TRUE, ch, NULL, NULL, TO_ROOM);
+		}
 		extract_char(ch);
 	}
 	else if ((o = get_obj_by_vehicle(veh, arg))) {
+		if (*argument) {
+			room_data *room = obj_room(o);
+			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, o, NULL, TO_ROOM);
+		}
 		extract_obj(o);
 	}
 	else if ((v = get_vehicle_by_vehicle(veh, arg))) {
 		if (v == veh) {
 			dg_owner_purged = 1;
+		}
+		if (*argument) {
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(v)), NULL, v, TO_ROOM);
 		}
 		extract_vehicle(v);
 	}

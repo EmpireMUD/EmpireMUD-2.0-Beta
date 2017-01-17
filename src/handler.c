@@ -713,6 +713,11 @@ void affect_total(char_data *ch) {
 	GET_MOVE(ch) = move;
 	GET_MANA(ch) = mana;
 	
+	// check for inventory size
+	if (!IS_NPC(ch) && CAN_CARRY_N(ch) > GET_LARGEST_INVENTORY(ch)) {
+		GET_LARGEST_INVENTORY(ch) = CAN_CARRY_N(ch);
+	}
+	
 	// this is to prevent weird quirks because GET_MAX_BLOOD is a function
 	GET_MAX_POOL(ch, BLOOD) = GET_MAX_BLOOD(ch);
 }

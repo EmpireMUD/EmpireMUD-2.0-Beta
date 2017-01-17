@@ -309,12 +309,12 @@ void point_update_char(char_data *ch) {
 		remove_quest_items(ch);
 		
 		// check way over-inventory (2x overburdened)
-		if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > 2 * CAN_CARRY_N(ch)) {
+		if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
 			count = 0;
 			found = FALSE;
 			LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 				count += obj_carry_size(obj);
-				if (count > 2 * CAN_CARRY_N(ch)) {
+				if (count > 2 * GET_LARGEST_INVENTORY(ch)) {
 					if (!found) {
 						found = TRUE;
 						msg_to_char(ch, "You are way overburdened and begin losing items...\r\n");

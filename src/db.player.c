@@ -1432,7 +1432,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'L': {
-				if (PFILE_TAG(line, "Lastname:", length)) {
+				if (PFILE_TAG(line, "Largest Inventory:", length)) {
+					GET_LARGEST_INVENTORY(ch) = atoi(line + length + 1);
+				}
+				else if (PFILE_TAG(line, "Lastname:", length)) {
 					if (GET_LASTNAME(ch)) {
 						free(GET_LASTNAME(ch));
 					}
@@ -2238,6 +2241,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'L'
+	fprintf(fl, "Largest Inventory: %d\n", GET_LARGEST_INVENTORY(ch));
 	if (GET_LAST_CORPSE_ID(ch) > 0) {
 		fprintf(fl, "Last Corpse Id: %d\n", GET_LAST_CORPSE_ID(ch));
 	}

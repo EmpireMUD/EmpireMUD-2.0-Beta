@@ -33,6 +33,8 @@ daily quests may have longer repeat restrictions.
 If you are still on any daily quests when the daily reset happens, you will
 fail those quests and drop them. When you finish your last daily quest, you
 will immediately fail any remaining daily quests in your quest list.
+
+See also: CITY DAILIES
 #
 "QUEST DROP"
 
@@ -114,5 +116,21 @@ Usage:  quest tracker <name>
 This shows the quest tracker for a quest you're on.
 
 See also: QUEST
+#
+"CITY DAILIES"
+
+These basic daily quests can be completed for a little extra bonus experience.
+They can be started from an artisan in the listed building (for example, the
+miller for the mill).
+
+Grain for the Miller (Mill, requires Empire 15)
+Forge Horseshoes (Stable, requires Trade 15)
+Steal a Trinket (Tavern, requires Stealth 15)
+Disenchant Trinkets (Tower of Sorcery, requires High Sorcery 15)
+Deliver a Letter (Pigeon Post, requires Tower of Sorcery, Forge and Alchemist)
+
+You can only do these quests in your own empire.
+
+See also: DAILY QUESTS
 #
 $
