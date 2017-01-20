@@ -924,7 +924,7 @@ WCMD(do_wpurge) {
 		dg_purge_instance(room, inst, argument);
 	}
 	// purge char
-	if ((*arg == UID_CHAR && (ch = get_char(arg))) || (ch = get_char_in_room(room, arg))) {
+	else if ((*arg == UID_CHAR && (ch = get_char(arg))) || (ch = get_char_in_room(room, arg))) {
 		if (!IS_NPC(ch)) {
 			wld_log(room, "wpurge: purging a PC");
 			return;
