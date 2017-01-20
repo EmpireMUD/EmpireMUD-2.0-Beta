@@ -1765,6 +1765,7 @@ Immortal toggles:
   idle-out - if off, the immortal will not disconnect from idling
   incognito - if on, the immortal does not appear on 'who' to mortals
   wizhide - if on, the immortal can't be seen in rooms but is not invisible
+  autonotes - automatically show notes on accounts when players log in
 
 See also: FIGHT MESSAGES
 #

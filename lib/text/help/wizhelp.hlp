@@ -165,11 +165,12 @@ Usage:  edelete <empire>
 
 Immortal tool to delete an empire.
 #d
-EDITNOTES ADDNOTES NOTES "PLAYER NOTES" "ADMIN NOTES" "EDIT NOTES" "ADD NOTES" "SHOW NOTES"
+EDITNOTES ADDNOTES NOTES "PLAYER NOTES" "ADMIN NOTES" "EDIT NOTES" "ADD NOTES" "SHOW NOTES" AUTONOTES "AUTO NOTES" "TOGGLE AUTONOTES"
 
 Usage:  editnotes <player>
         addnotes <player> <text>
         show notes <player>
+        toggle autonotes
 
 You can edit and leave notes about a player, to help inform other immortals
 of disciplinary issues or unusual authorizations. Any immortal can see the
@@ -179,6 +180,10 @@ below his own level. Editnotes command is grantable, and includes addnotes.
 Editnotes opens a text editor; addnotes just adds a line to the existing notes.
 Notes have a 240-character limit; raising this requires converting the player
 file.
+
+The autonotes toggle will cause an immortal player to see the "notes" on player
+accounts as they log into the game. It shows up immediately after the syslog
+for entering the game, only if there are any notes to show.
 
 See also: GRANT
 #d
