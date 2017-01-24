@@ -82,6 +82,12 @@ elseif %questvnum% == 9033
   if %item%
     %send% %actor% The guildmaster gives you %item.shortdesc%.
   end
+elseif %questvnum% == 9030
+  %load% obj 9031 %actor% inv
+  eval item %actor.inventory(9031)%
+  if %item%
+    %send% %actor% The barkeep gives you %item.shortdesc%.
+  end
 elseif %questvnum% == 9036
   if %actor.varexists(last_quest_9036_time)%
     * 15 minute cooldown
@@ -356,6 +362,60 @@ switch (%random.3)
     %echo% %self.name% suddenly dives, then takes off again, a squirrel in %self.hisher% talons.
   break
 done
+~
+#9030
+Butcher detect~
+1 c 2
+butcher~
+eval target %%actor.obj_target(%arg%)%%
+if !%target%
+  * Invalid target
+  return 0
+  halt
+end
+if !%actor.ability(butcher)%
+  * Player does not have butcher
+  return 0
+  halt
+end
+* Debug...
+if %test% != *CORPSE && %test%
+  return 0
+  halt
+end
+if %target.val0%
+  eval mob_vnum %target.val0%
+else
+  * Probably not really a corpse
+  return 0
+  halt
+end
+* Check mob vnum
+if %mob_vnum% == 9017 || %mob_vnum% == 9177
+  * Bear, polar bear
+elseif %mob_vnum% == 9001 || %mob_vnum% == 9002
+  * Snarling and brown wolf
+elseif %mob_vnum% == 9016 || %mob_vnum% == 9100 || %mob_vnum% == 9143 || %mob_vnum% == 9118 || %mob.vnum% == 9102
+  * Tiger, leopard, snow leopard, cougar, jaguar
+else
+  * Wrong kind of corpse
+  return 0
+  halt
+end
+if %actor.inventory(9030)% || !%actor.on_quest(9030)%
+  * Don't need the trinket
+  return 0
+  halt
+end
+%send% %actor% You cut the head off %target.shortdesc%...
+%load% obj 9030 %actor% inv
+eval item %actor.inventory()%
+if %item%
+  %send% %actor% You get %item.shortdesc%!
+end
+* Don't butcher normally this time. Less buggy this way.
+return 1
+halt
 ~
 #9033
 Fake pickpocket~

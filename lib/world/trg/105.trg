@@ -1055,8 +1055,8 @@ end
 if %actor.permafrost_tokens_104% < %cheapest_item_cost%
   halt
 end
+nop %self.remove_mob_flag(SILENT)%
 if %self.aff_flagged(HIDE)%
-  nop %self.remove_mob_flag(SILENT)%
   visible
   wait 1
   %echo% %self.name% shuffles out of the portal and sets up a shop on the ice.

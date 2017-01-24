@@ -2800,7 +2800,36 @@ void check_autowiz(char_data *ch) {
 * @param char_data *ch The person logging in.
 */
 void announce_login(char_data *ch) {
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+	descriptor_data *desc;
+	int iter;
+	
 	syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s has entered the game", GET_NAME(ch));
+	
+	// auto-notes
+	if (GET_ACCOUNT(ch) && GET_ACCOUNT(ch)->notes) {
+		LL_FOREACH(descriptor_list, desc) {
+			if (STATE(desc) != CON_PLAYING || !desc->character) {
+				continue;
+			}
+			if (!IS_IMMORTAL(desc->character) || !PRF_FLAGGED(desc->character, PRF_AUTONOTES)) {
+				continue;
+			}
+			if (GET_ACCESS_LEVEL(desc->character) < GET_ACCESS_LEVEL(ch)) {
+				continue;
+			}
+			
+			snprintf(buf, sizeof(buf), "(%s account notes)", GET_NAME(ch));
+			msg_to_char(desc->character, "%s- %s ", GET_ACCOUNT(ch)->notes, buf);
+			
+			// rest of the divider
+			for (iter = 0; iter < 79 - (3 + strlen(buf)); ++iter) {
+				buf2[iter] = '-';
+			}
+			buf2[iter] = '\0';	// terminate
+			msg_to_char(ch, "%s\r\n", buf2);
+		}
+	}
 	
 	// mortlog
 	if (GET_INVIS_LEV(ch) == 0) {

@@ -1620,7 +1620,7 @@ typedef struct vehicle_data vehicle_data;
 #define PLR_ADVENTURE_SUMMONED  BIT(20)	// marks the player for return to whence they came
 
 
-// Preference flags
+// PRF_x: Preference flags
 #define PRF_AFK  BIT(0)	// player is marked away
 #define PRF_COMPACT  BIT(1)	// No extra CRLF pair before prompts
 #define PRF_DEAF  BIT(2)	// Can't hear shouts
@@ -1649,6 +1649,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_SCREEN_READER  BIT(25)	// player is visually impaired and using a screen reader that can't read the map
 #define PRF_STEALTHABLE  BIT(26)	// player can steal (rather than be prevented from accidentally stealing)
 #define PRF_WIZHIDE  BIT(27)	// player can't be seen in the room
+#define PRF_AUTONOTES  BIT(28)	// Player login syslogs automatically show notes
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -3442,7 +3443,7 @@ struct tavern_data_type {
 struct toggle_data_type {
 	char *name;	// toggle display and subcommand
 	int type;	// TOG_ONOFF, TOG_OFFON
-	bitvector_t bit;	// PRF_x
+	bitvector_t bit;	// PRF_
 	int level;	// required level to see/use toggle
 	void (*callback_func)(char_data *ch);	// optional function to alert changes
 };
