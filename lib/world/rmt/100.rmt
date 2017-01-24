@@ -173,7 +173,7 @@ I 9 121 100.00 1 X  # GATHER: a stick
 M 0 10001 20.00 2
 M 0 10002 10.00 1
 M 0 10003 10.00 1
-M 0 10004 90.00 1
+M 0 10004 100.00 1
 T 10005
 S
 #10005
@@ -666,7 +666,7 @@ The Base of the Staircase~
 here, as it curves up into a staircase and further up the tower. A long line of
 the Tower Skycleave's former masters comes to an apparent end here at the
 stairs, where its current leaders, Knezz, Barrosh, and Celiya occupy the final
-three frames.  
+three frames.
 ~
 ch 0
 D5

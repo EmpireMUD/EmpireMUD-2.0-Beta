@@ -550,7 +550,6 @@ if %loc%
   done
 end
 %adventurecomplete%
-%purge% instance mob 10140
 eval current_vnum 10147
 while %current_vnum% >= 10140
   if %current_vnum% <= 10143
@@ -966,7 +965,7 @@ end
 Monsoon sorcery quest study command~
 1 c 2
 study~
-if (!(monsoon /= %arg%) || %actor.position% != Standing)
+if (!((monsoon /= %arg%) || (rift /= %arg%)) || %actor.position% != Standing)
   return 0
   halt
 end
@@ -1141,15 +1140,19 @@ Spawn Saguaro Treant~
 ~
 * find and purge the saguaro obj
 eval obj %room.contents%
+eval found 0
 while %obj%
   eval next_obj %obj.next_in_list%
   if (%obj.vnum% == 10171)
+    eval found 1
     %purge% %obj%
   end
   eval obj %next_obj%
 done
-* load treant boss
-%load% mob 10143
+if %found%
+  * load treant boss
+  %load% mob 10143
+end
 ~
 #10169
 Monsoon reward replacer~
@@ -1400,7 +1403,6 @@ if %loc%
   done
 end
 %adventurecomplete%
-%purge% instance mob 10140
 eval current_vnum 10147
 while %current_vnum% >= 10140
   if %current_vnum% <= 10143
@@ -1531,7 +1533,6 @@ if %loc%
   done
 end
 %adventurecomplete%
-%purge% instance mob 10140
 eval current_vnum 10147
 while %current_vnum% >= 10140
   if %current_vnum% <= 10143
