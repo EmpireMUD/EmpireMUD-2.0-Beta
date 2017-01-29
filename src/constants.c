@@ -32,6 +32,7 @@
 *   Character Constants
 *   Craft Recipe Constants
 *   Empire Constants
+*   Faction Constants
 *   Mob Constants
 *   Item Contants
 *   OLC Constants
@@ -1442,6 +1443,45 @@ const char *trade_overunder[] = {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// FACTION CONSTANTS ///////////////////////////////////////////////////////
+
+// FCT_x: faction flags
+const char *faction_flags[] = {
+	"IN-DEVELOPMENT",
+	"GAINS-FROM-KILLS",
+};
+
+
+// FCTR_x: relationship flags
+const char *relationship_flags[] = {
+	"SHARED-GAINS",
+	"INVERSE-GAINS",
+	"MUTUALLY-EXCLUSIVE",
+	"\n"
+};
+
+
+// REP_x: faction reputation levels
+struct faction_reputation_type reputation_levels[] = {
+	// { type const, name, points to achieve this level } -> ASCENDING ORDER
+	// note: you achieve the level when you reach the absolute value of its
+	// points (-9 < x < 9 is neutral, +/-10 are the cutoffs for the first rank)
+	
+	{ REP_DESPISED, "Despised", "\tr", -100 },
+	{ REP_HATED, "Hated", "\tr", -75 },
+	{ REP_LOATHED, "Loathed", "\to", -30 },
+	{ REP_DISLIKED, "Disliked", "\ty", -10 },
+	{ REP_NEUTRAL, "Neutral", "\tt", 0 },
+	{ REP_LIKED, "Liked", "\tc", 10 },
+	{ REP_ESTEEMED, "Esteemed", "\ta", 30 },
+	{ REP_VENERATED, "Venerated", "\tg", 75 },
+	{ REP_REVERED, "Revered", "\tg", 100 },
+	
+	{ -1, "\n", "\t0", 0 },	// last
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// MOB CONSTANTS ///////////////////////////////////////////////////////////
 
 /* MOB_x */
@@ -2187,6 +2227,7 @@ const char *olc_flag_bits[] = {
 	"!MORPHS",
 	"!QUESTS",
 	"!SOCIALS",
+	"!FACTIONS",
 	"\n"
 };
 

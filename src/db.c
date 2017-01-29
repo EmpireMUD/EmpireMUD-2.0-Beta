@@ -101,6 +101,10 @@ empire_data *empire_table = NULL;	// hash table of empires
 double empire_score_average[NUM_SCORES];
 struct trading_post_data *trading_list = NULL;	// global LL of trading post stuff
 
+// factions
+faction_data *faction_table = NULL;	// main hash (hh)
+faction_data *sorted_factions = NULL;	// alpha hash (sorted_hh)
+
 // fight system
 struct message_list fight_messages[MAX_MESSAGES];	// fighting messages
 
@@ -242,6 +246,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ MORPH_PREFIX, MORPH_SUFFIX },	// DB_BOOT_MORPH
 	{ QST_PREFIX, QST_SUFFIX },	// DB_BOOT_QST
 	{ SOC_PREFIX, SOC_SUFFIX },	// DB_BOOT_SOC
+	{ FCT_PREFIX, FCT_SUFFIX },	// DB_BOOT_FCT
 };
 
 
@@ -389,6 +394,7 @@ void boot_world(void) {
 	void build_land_map();
 	void build_world_map();
 	void check_abilities();
+	void check_and_link_faction_relations();
 	void check_archetypes();
 	void check_classes();
 	void check_skills();
@@ -445,6 +451,9 @@ void boot_world(void) {
 	
 	log("Loading vehicles.");
 	index_boot(DB_BOOT_VEH);
+	
+	log("Loading factions.");
+	index_boot(DB_BOOT_FCT);
 	
 	// requires sectors, buildings, and room templates -- order matters here
 	log("Loading the world.");
@@ -511,6 +520,7 @@ void boot_world(void) {
 	// check for bad data
 	log("Verifying data.");
 	check_abilities();
+	check_and_link_faction_relations();
 	check_archetypes();
 	check_classes();
 	check_skills();
