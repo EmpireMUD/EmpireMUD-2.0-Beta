@@ -960,7 +960,7 @@ ACMD(do_mbuild) {
 	}
 
 	tmp = any_one_word(argument, loc_arg);
-	any_one_word(tmp, bld_arg);
+	strcpy(bld_arg, tmp);
 	
 	// usage: %build% [location] <vnum [dir] | ruin | demolish>
 	if (!*loc_arg) {
@@ -971,7 +971,7 @@ ACMD(do_mbuild) {
 	// check number of args
 	if (!*bld_arg) {
 		// only arg is actually bld arg
-		strcpy(bld_arg, loc_arg);
+		strcpy(bld_arg, argument);
 		target = IN_ROOM(ch);
 	}
 	else {

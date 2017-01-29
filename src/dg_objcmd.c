@@ -163,7 +163,7 @@ OCMD(do_obuild) {
 	room_data *orm = obj_room(obj), *target;
 	
 	tmp = any_one_word(argument, loc_arg);
-	any_one_word(tmp, bld_arg);
+	strcpy(bld_arg, tmp);
 	
 	// usage: %build% [location] <vnum [dir] | ruin | demolish>
 	if (!*loc_arg) {
@@ -174,7 +174,7 @@ OCMD(do_obuild) {
 	// check number of args
 	if (!*bld_arg) {
 		// only arg is actually building arg
-		strcpy(bld_arg, tmp);
+		strcpy(bld_arg, argument);
 		target = orm;
 	}
 	else {
