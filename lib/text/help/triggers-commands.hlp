@@ -67,7 +67,7 @@ See also: DETACH, TATTACH, TDETACH
 #d
 %BUILD% MBUILD OBUILD VBUILD WBUILD
 
-%build% [location] <vnum [dir] | ruin | demolish>
+Usage:  %build% [location] <vnum [dir] | ruin | demolish>
 
 This allows you to place a building on the map, or remove or ruin one. It is
 usually a bad idea to %build% tiles by coordinates. It's almost always
@@ -749,7 +749,7 @@ Examples:
 #d
 %TERRACROP% MTERRACROP OTERRACROP VTERRACROP WTERRACROP
 
-%terracrop% [location] <crop vnum>
+Usage:  %terracrop% [location] <crop vnum>
 
 This command allows you to make changes to the map, one tile at a time. It is
 usually a bad idea to terracrop tiles by coordinates. It's almost always
@@ -766,7 +766,7 @@ See also: %BUILD%, %TERRAFORM%
 #d
 %TERRAFORM% MTERRAFORM OTERRAFORM VTERRAFORM WTERRAFORM
 
-%terraform% [location] <sector vnum>
+Usage:  %terraform% [location] <sector vnum>
 
 This command allows you to make changes to the map, one tile at a time. It is
 usually a bad idea to terraform tiles by coordinates. It's almost always
@@ -786,7 +786,7 @@ See also: %BUILD%, %TERRACROP%
 &rNOTE: This functionality is disabled and not currently supported by EmpireMUD.
 If you have a use for it, send a request for it to be implemented.&0
 
-%transform% <vnum|-vnum>
+Usage:  %transform% <vnum|-vnum>
 
 This command causes the executing mob or object to transform into another 
 mob or object, based on the vnum argument supplied. The transformation is 
