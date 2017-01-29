@@ -148,6 +148,47 @@ VCMD(do_vadventurecomplete) {
 }
 
 
+VCMD(do_vbuild) {
+	void do_dg_build(room_data *target, char *argument);
+
+	char loc_arg[MAX_INPUT_LENGTH], bld_arg[MAX_INPUT_LENGTH], *tmp;
+	room_data *orm = IN_ROOM(veh), *target;
+	
+	tmp = any_one_word(argument, loc_arg);
+	any_one_word(tmp, bld_arg);
+	
+	// usage: %build% [location] <vnum [dir] | ruin | demolish>
+	if (!*loc_arg) {
+		veh_log(veh, "vbuild: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*bld_arg) {
+		// only arg is actually building arg
+		strcpy(bld_arg, loc_arg);
+		target = orm;
+	}
+	else {
+		// two arguments
+		target = get_room(orm, loc_arg);
+	}
+	
+	if (!target) {
+		veh_log(veh, "vbuild: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't build -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+
+	// good to go
+	do_dg_build(target, bld_arg);
+}
+
+
 VCMD(do_vecho) {
 	skip_spaces(&argument);
 
@@ -1387,6 +1428,7 @@ const struct vehicle_command_info veh_cmd_info[] = {
 
 	{ "vadventurecomplete", do_vadventurecomplete, NO_SCMD },
 	{ "vat", do_vat, NO_SCMD },
+	{ "vbuild", do_vbuild, NO_SCMD },
 	{ "vdoor", do_vdoor, NO_SCMD },
 	{ "vdamage", do_vdamage,   NO_SCMD },
 	{ "vaoe", do_vaoe,   NO_SCMD },

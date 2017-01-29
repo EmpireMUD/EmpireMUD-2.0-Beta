@@ -239,6 +239,7 @@ are player-only), in addition to some special commands:
 &c%aoe%&0 - Deals scaled damage to all people in the room.
 &c%asound%&0 - Echoes to rooms around the mob (but not its own).
 &c%at%&0 - Performs an action in another room, without moving the mob.
+&c%build%&0 - Adds or removes a building on the map.
 &c%buildingecho%&0 - Sends a message to everyone in a building.
 &c%damage%&0 - Deals scaled damage to a person.
 &c%door%&0 - Various functions for changing doors and exits.

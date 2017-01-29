@@ -155,6 +155,48 @@ OCMD(do_oadventurecomplete) {
 	}
 }
 
+
+OCMD(do_obuild) {
+	void do_dg_build(room_data *target, char *argument);
+
+	char loc_arg[MAX_INPUT_LENGTH], bld_arg[MAX_INPUT_LENGTH], *tmp;
+	room_data *orm = obj_room(obj), *target;
+	
+	tmp = any_one_word(argument, loc_arg);
+	any_one_word(tmp, bld_arg);
+	
+	// usage: %build% [location] <vnum [dir] | ruin | demolish>
+	if (!*loc_arg) {
+		obj_log(obj, "obuild: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*bld_arg) {
+		// only arg is actually building arg
+		strcpy(bld_arg, tmp);
+		target = orm;
+	}
+	else {
+		// two arguments
+		target = get_room(orm, loc_arg);
+	}
+	
+	if (!target) {
+		obj_log(obj, "obuild: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't build -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+	
+	// good to go
+	do_dg_build(target, bld_arg);
+}
+
+
 OCMD(do_oecho) {
 	room_data *room;
 
@@ -1463,6 +1505,7 @@ const struct obj_command_info obj_cmd_info[] = {
 
 	{ "oadventurecomplete", do_oadventurecomplete, NO_SCMD },
 	{ "oat", do_oat, NO_SCMD },
+	{ "obuild", do_obuild, NO_SCMD },
 	{ "odoor", do_odoor, NO_SCMD },
 	{ "odamage", do_odamage,   NO_SCMD },
 	{ "oaoe", do_oaoe,   NO_SCMD },
