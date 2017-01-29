@@ -1219,14 +1219,6 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst) {
 	struct trig_proto_list *tpl;
 	trig_data *proto, *trig;
 	
-	// exits to it will be cleaned up by delete_room
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY)) {
-		if (ROOM_PEOPLE(room)) {
-			act("The adventure vanishes around you!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
-		}
-		disassociate_building(room);
-	}
-	
 	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_HAS_INSTANCE);
 	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_HAS_INSTANCE);
 	
@@ -1272,6 +1264,14 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst) {
 				remove_live_script_by_vnum(SCRIPT(room), tpl->vnum);
 			}
 		}
+	}
+	
+	// exits to it will be cleaned up by delete_room
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY)) {
+		if (ROOM_PEOPLE(room)) {
+			act("The adventure vanishes around you!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+		}
+		disassociate_building(room);
 	}
 }
 
