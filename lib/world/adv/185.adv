@@ -1,0 +1,29 @@
+#18500
+The Lost Temple~
+Owen Morris and Paul Clarke~
+   You have discovered an ancient, overgrown temple deep in the jungle. Surely
+its depths must hold great undiscovered treasures of an ancient civilization,
+if you're brave enough to venture below...
+   This adventure features a difficulty selector so it can be completed solo,
+or in groups of up to four. All gear looted from this adventure will be higher
+quality on harder difficulties.
+   Beware! Dungeons such as this one often have traps. &cSEARCH&0 carefully before
+advancing, or be prepared to &cJUMP&0, &cDUCK&0 or &cRUN&0 very fast.
+~
+18500 18599 125-175
+10 0 0 4
+L
+6 0
+50 -1 -1
+-1 0 0
+L
+5 0
+10080 -1 -1
+-1 0 0
+L
+1 0
+18500 -1 -1
+9 g g
+T 18522
+S
+$
