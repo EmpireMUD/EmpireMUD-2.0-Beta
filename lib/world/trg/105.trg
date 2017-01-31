@@ -938,8 +938,10 @@ detach 10566 %self.id%
 Permafrost shop list - vested walrus~
 0 c 0
 list~
-if !%self.canbeseen%
-  return 0
+* Are we hidden?
+if %self.aff_flagged(HIDE)%
+  %send% %actor% There's no shop visible here.
+  return 1
   halt
 end
 * List of items
@@ -959,8 +961,10 @@ end
 Permafrost shop buy - vested walrus~
 0 c 0
 buy~
-if !%self.canbeseen%
-  return 0
+* Are we hidden?
+if %self.aff_flagged(HIDE)%
+  %send% %actor% Nobody here is selling anything...
+  return 1
   halt
 end
 eval vnum -1

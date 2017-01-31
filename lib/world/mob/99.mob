@@ -193,7 +193,7 @@ bug cute~
 a cute bug~
 You have found a cute bug.
 ~
-1 1 bdoD n
+1 1 bdoD mn
 0 0 8 9
 T 9901
 T 9902
@@ -223,8 +223,8 @@ eye floating~
 a floating eye~
 A floating eye without a body is staring at you.
 ~
-1 1 bdoD n
-0 0 9 20
+1 1 bdoD mn
+0 0 27 20
 T 9901
 T 9902
 S

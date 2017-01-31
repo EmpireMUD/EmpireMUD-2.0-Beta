@@ -254,7 +254,7 @@ The Tomb of the Ancient King~
    You step through the archway behind the throne and into a tall, octagonal
 chamber, bare of decoration or ornaments. Above your head, a miniature sun of
 emerald light swirls and crackles. An ornately carved stone sarcophagus lies
-open in the center of the room.  
+open in the center of the room.
 ~
 c 0
 D3
@@ -269,7 +269,7 @@ ill-fitted blocks and overgrown with vines. It should be easy to climb back up,
 but you may have to deal with the source of the incessant hissing sounds
 first...
 ~
-g 0
+cg 0
 D8
 ~
 0 18500

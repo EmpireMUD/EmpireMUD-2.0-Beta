@@ -65,7 +65,7 @@ switch %random.4%
     if %heroic_mode%
       %dot% %actor% 500 15 fire
       %damage% %actor% 150 fire
-    else    
+    else
       %dot% %actor% 200 15 fire
       %damage% %actor% 100 fire
     end
@@ -236,7 +236,7 @@ switch %attack%
       %damage% %actor% 100
       %send% %actor% The pain of the bite numbs...
       %dot% %actor% 100 30 poison
-      dg_affect %actor% SLOWED on 10
+      dg_affect %actor% SLOW on 10
     end
     wait 30 sec
   break
@@ -329,7 +329,7 @@ switch %attack%
     * Wind Dance
     * Buff dodge by level/5 (25-35) for 30 seconds
     * Boss: Also regen level/2 * 6 (372-522) health over 30 seconds (12-17 heal per second)
-    * Amount: 
+    * Amount:
     eval dodge_magnitude %self.level%/5
     eval heal_magnitude %self.level%/2
     %echo% %self.name% dances on the wind, becoming harder to hit!
@@ -368,8 +368,7 @@ switch %attack%
     eval room %self.room%
     eval person %room.people%
     while %person%
-      eval person %person.next_in_room%
-      eval test %%person.is_enemy(%self%)%%
+      eval test %%self.is_enemy(%person%)%%
       if %test%
         %load% mob 18506
         eval summon %room.people%
@@ -377,6 +376,7 @@ switch %attack%
           %force% %summon% mkill %person%
         end
       end
+      eval person %person.next_in_room%
     done
     if !%heroic_mode%
       dg_affect %self% STUNNED on 10

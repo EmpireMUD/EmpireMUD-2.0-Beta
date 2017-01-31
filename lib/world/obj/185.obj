@@ -67,11 +67,15 @@ S
 idol jade small~
 the jade idol~
 A small jade idol of a serpent is displayed here.~
-This ancient idol has served its purpose, but it's still valuable.
+This ancient idol is carved from a single gemstone! It looks valuable!  
 ~
-15 0 a 3
+15 0 a 6
 10 0 0
 12 0
+R
+5184 a
+R
+5611 a
 T 18509
 S
 #18510
@@ -272,7 +276,7 @@ a feathered serpent armor pattern~
 A feathered serpent armor pattern is lying here.~
    You can use this to craft a set of armor based on the great feathered
 serpent deity of the jungle. It won't help you fly, but it will give your magic
-a light touch, like the wind.  
+a light touch, like the wind.
 Sew (Magical Vestments, crafting level 125): feathered serpent armor
 ~
 3 o a 5
@@ -314,7 +318,7 @@ pattern eagle warrior armor~
 an eagle warrior armor pattern~
 An eagle warrior armor pattern is lying here.~
    You can use these instructions to craft a set of armor fit for a powerful
-war shaman! Unfortunately, it won't help you fly.  
+war shaman! Unfortunately, it won't help you fly.
 Sew (Magical Vestments, crafting level 125): eagle warrior armor
 ~
 3 o a 6
@@ -358,7 +362,7 @@ a blue chameleon armor pattern~
 A blue chameleon armor pattern is lying here.~
    You can use this pattern to craft a suit of combat armor based on a
 chameleon! It probably won't make you invisible, but at least it will look
-cool.  
+cool.
 Forge (Imperial Armors, crafting level 125): blue chameleon armor
 ~
 3 o a 6
@@ -447,9 +451,9 @@ S
 gauntlets pair plated jaguar~
 plated jaguar gauntlets~
 A pair of plated jaguar gauntlets is lying here.~
-   These gauntlets look like oversized jaguar paws, forged from solid metal. 
+   These gauntlets look like oversized jaguar paws, forged from solid metal.
 The exotic fur of a jaguar adorns the back of the gauntlets, which are
-surprisingly comfortable for such heavy plate.  
+surprisingly comfortable for such heavy plate.
 ~
 27 mp ah 4
 3 0 0
@@ -465,7 +469,7 @@ coyote claw gauntlets~
 A pair of coyote claw gauntlets is lying here.~
    These gauntlets are made from fine leather, but covered in the fur and claws
 of coyotes in order to imbue them with the power of nature's greatest
-tricksters.  
+tricksters.
 ~
 27 mp ah 4
 1 0 0
@@ -479,9 +483,9 @@ S
 gloves sparkling feathered pair~
 sparkling feathered gloves~
 A pair of sparkling feathered gloves is lying here.~
-   These gloves are made from the smooth, scaly skin of an exotic serpent. 
+   These gloves are made from the smooth, scaly skin of an exotic serpent.
 From there, long green, red, and yellow feathers have been sewn in, making the
-gloves appear larger but surprisingly light.  
+gloves appear larger but surprisingly light.
 ~
 27 mp ah 3
 0 0 0
@@ -497,7 +501,7 @@ eagle talon gloves~
 A pair of eagle talon gloves is lying here.~
    These fine gloves are made from eagle leather, and bound with long golden
 eagle feathers. A strange, serene energy flows through your fingertips as you
-touch them, and the punctuated screech of an eagle fills your ears.  
+touch them, and the punctuated screech of an eagle fills your ears.
 ~
 27 mp ah 3
 0 0 0
@@ -514,7 +518,7 @@ A pair of shifting chameleon gauntlets is lying here.~
    These gauntlets are made from the green-brown skin of a chameleon, but they
 seem to shimmer and shift in the light. The gauntlets are soft and pliable to
 the touch, but when you punch or block, they instantly harden as if they were
-made from argentine imperium.  
+made from argentine imperium.
 ~
 27 mp ah 3
 2 0 0
@@ -532,7 +536,7 @@ the roar of the jaguar~
 The roar of the jaguar lingers in the air.~
    As you approach, you hear the guttural roar of a jaguar, as if the majestic
 beast is pouncing on you from just out of sight! But when you turn to look, it
-is gone.  
+is gone.
 ~
 27 mp ak 3
 3 0 0
@@ -546,9 +550,9 @@ S
 howl coyote~
 the howl of the coyote~
 The howl of the coyote pierces the air.~
-   You stop in your tracks as the shrill howl of a coyote pierces the air. 
+   You stop in your tracks as the shrill howl of a coyote pierces the air.
 Then another howl. And another. Just as it seems that a pack of hungry coyotes
-is bearing down on you, you turn... And the howls fade into the wind.  
+is bearing down on you, you turn... And the howls fade into the wind.
 ~
 27 mp ak 3
 1 0 0
@@ -563,10 +567,10 @@ wind serpent feathered~
 the wind of the feathered serpent~
 The wind of the feathered serpent whistles through the air.~
    The air is perfectly still in one instant, and whistling past your ear the
-next. A faint hiss approaches you from the grass, then another from the air. 
+next. A faint hiss approaches you from the grass, then another from the air.
 You feel something brush against your ankle, and your neck. But just as the
 little hairs on your arms and neck begin to stand up, the feeling is gone, like
-the wind itself.  
+the wind itself.
 ~
 27 mp ak 3
 0 0 0
@@ -580,10 +584,10 @@ S
 call eagle~
 the call of the eagle~
 The call of the eagle cuts through the air on razor talons.~
-   A sharp, cackling cry fills the air. You look up, but there is no bird. 
+   A sharp, cackling cry fills the air. You look up, but there is no bird.
 Then another eagle calls to you from another direction, and another. You feel
 the oppressive burst of air from a raptor swooping over you, but you turn to
-look and there is nothing.  
+look and there is nothing.
 ~
 27 mp ak 3
 0 0 0
@@ -599,7 +603,7 @@ the shadow of the chameleon~
 The shadow of the chameleon fades into the background.~
    The room dims as something blocks your light. When you turn to look at it,
 you're blinded. There's nothing there. Another shadow creeps past you, but when
-you glance toward it, it is gone.  
+you glance toward it, it is gone.
 ~
 27 mp ak 3
 2 0 0
