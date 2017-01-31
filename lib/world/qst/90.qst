@@ -48,10 +48,10 @@ Fetch a Trophy~
    The barkeep wants a trophy to hang on the wall of the tavern. The head of a
 mighty beast slain by the owner is traditional, but the barkeep's not much of a
 fighter. Take his knife, slay a wolf, bear, or big cat, and butcher it to get
-its head, then return.  
+its head, then return.
 ~
    You hand over the beast's severed head. The barkeep thanks you, and heads
-off to get it stuffed.  
+off to get it stuffed.
 ~
 2 ef 0 0 -1
 A
@@ -112,6 +112,56 @@ W
 11 0 0 1
 Z
 1 228
+S
+#9039
+Herbs for the Alchemist~
+   The alchemist needs some herbs for his latest experiment. Since apparently
+nobody else knows what a herb looks like and he's too busy watching the
+experiment, he asks you to bring him the herbs.  
+~
+   You give the herbs to the alchemist, who immediately criticizes your
+herb-picking technique. At least you learned something from it.  
+~
+4 def 0 0 -1
+A
+1 231
+P
+9 5 0 50
+R
+0 0 1
+R
+4 5 50
+W
+2 1202 0 4
+W
+2 1205 0 4
+Z
+1 231
+S
+#9040
+Flowers for the Alchemist~
+   The alchemist is working on an experiment to prove that flowers are not
+completely useless. Since he can't leave his experiment alone, he asks you to
+pick some flowers for him.  
+~
+   You hand over the flowers to the alchemist, who tosses them into a cauldron.
+Nothing appears to happen.  
+~
+3 def 0 0 -1
+A
+1 231
+P
+9 5 0 15
+P
+10 5 0 49
+R
+0 0 1
+R
+4 5 25
+W
+2 123 0 8
+Z
+1 231
 S
 #9042
 Deliver a Letter~

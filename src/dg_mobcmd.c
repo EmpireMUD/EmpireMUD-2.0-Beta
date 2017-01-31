@@ -948,6 +948,52 @@ ACMD(do_mat) {
 }
 
 
+ACMD(do_mbuild) {
+	void do_dg_build(room_data *target, char *argument);
+	
+	char loc_arg[MAX_INPUT_LENGTH], bld_arg[MAX_INPUT_LENGTH], *tmp;
+	room_data *target;
+	
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+
+	tmp = any_one_word(argument, loc_arg);
+	strcpy(bld_arg, tmp);
+	
+	// usage: %build% [location] <vnum [dir] | ruin | demolish>
+	if (!*loc_arg) {
+		mob_log(ch, "mbuild: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*bld_arg) {
+		// only arg is actually bld arg
+		strcpy(bld_arg, argument);
+		target = IN_ROOM(ch);
+	}
+	else {
+		// two arguments
+		target = find_target_room(ch, loc_arg);
+	}
+	
+	if (!target) {
+		mob_log(ch, "mbuild: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't build -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+
+	// good to go
+	do_dg_build(target, bld_arg);
+}
+
+
 /*
 * lets the mobile transfer people.  the all argument transfers
 * everyone in the current room to the specified location

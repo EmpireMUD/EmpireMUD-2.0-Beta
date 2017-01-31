@@ -6942,7 +6942,7 @@ int get_direction_for_char(char_data *ch, int dir) {
 *
 * This function does not allow mortals to pick DIR_RANDOM (imms can, though).
 *
-* @param char_data *ch The possibly-confused character.
+* @param char_data *ch The possibly-confused character (optional).
 * @param char *dir The argument string ("north")
 * @return int A real direction (EAST), or NO_DIR if none.
 */
@@ -6958,12 +6958,12 @@ int parse_direction(char_data *ch, char *dir) {
 	}
 	
 	// confused?
-	if (d != NOTHING) {
+	if (ch && d != NOTHING) {
 		d = confused_dirs[get_north_for_char(ch)][0][d];
 	}
 	
 	// random check
-	if (!IS_IMMORTAL(ch) && d == DIR_RANDOM) {
+	if ((!ch || !IS_IMMORTAL(ch)) && d == DIR_RANDOM) {
 		d = NO_DIR;
 	}
 

@@ -178,6 +178,47 @@ WCMD(do_wasound) {
 }
 
 
+WCMD(do_wbuild) {
+	void do_dg_build(room_data *target, char *argument);
+
+	char loc_arg[MAX_INPUT_LENGTH], bld_arg[MAX_INPUT_LENGTH], *tmp;
+	room_data *target;
+	
+	tmp = any_one_word(argument, loc_arg);
+	strcpy(bld_arg, tmp);
+	
+	// usage: %build% [location] <vnum [dir] | ruin | demolish>
+	if (!*loc_arg) {
+		wld_log(room, "obuild: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*bld_arg) {
+		// only arg is actually building arg
+		strcpy(bld_arg, argument);
+		target = room;
+	}
+	else {
+		// two arguments
+		target = get_room(room, loc_arg);
+	}
+	
+	if (!target) {
+		wld_log(room, "obuild: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't build -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+
+	// good to go
+	do_dg_build(target, bld_arg);
+}
+
+
 WCMD(do_wecho) {
 	skip_spaces(&argument);
 
@@ -1331,6 +1372,7 @@ const struct wld_command_info wld_cmd_info[] = {
 
 	{ "wadventurecomplete", do_wadventurecomplete, NO_SCMD },
 	{ "wasound", do_wasound, NO_SCMD },
+	{ "wbuild", do_wbuild, NO_SCMD },
 	{ "wdoor", do_wdoor, NO_SCMD },
 	{ "wecho", do_wecho, NO_SCMD },
 	{ "wechoaround", do_wsend, SCMD_WECHOAROUND },

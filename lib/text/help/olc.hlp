@@ -16,13 +16,17 @@ Upper immortals can control the olc permissions of builders with the OLC
 CONTROLS.
 
 Available types are:
- .b - buildings
- .c - crafts
- .crop - crops
- .m - mobiles
- .o - objects
- .map - map tiles, rooms, and interiors
- .sect - map sectors
+ .abil - abilities               .adv - adventures
+ .aug - augments                 .arch - archetypes
+ .b - buildings                  .book - books
+ .c - crafts                     .class - classes
+ .crop - crops                   .f - factions
+ .g - globals                    .m - mobiles
+ .map - map tiles/interiors      .morph - morphs
+ .o - objects                    .q - quests
+ .r - room templates             .sect - map sectors
+ .skill - skills                 .soc - socials
+ .t - scripts/triggers           .v - vehicles
 
 Basic commands:
  . - typing '.' by itself shows your current editor
@@ -185,6 +189,9 @@ Crops (CROPEDIT):
 - Crops should have a HARVEST interaction for a plantable large item.
 - Orchard crops need a CHOP interaction if they will give trees. Orchards are
   still choppable without this, though.
+
+Factions (FEDIT):
+- ...
 
 Globals (GEDIT):
 - All global tables must be approved by the head builder, because they apply

@@ -7095,6 +7095,12 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No crops by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "faction")) {
+		extern int vnum_faction(char *searchname, char_data *ch);
+		if (!vnum_faction(buf2, ch)) {
+			msg_to_char(ch, "No factions by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "global")) {
 		if (!vnum_global(buf2, ch)) {
 			msg_to_char(ch, "No globals by that name.\r\n");
@@ -7242,6 +7248,15 @@ ACMD(do_vstat) {
 			return;
 		}
 		do_stat_crop(ch, crop);
+	}
+	else if (is_abbrev(buf, "faction")) {
+		void do_stat_faction(char_data *ch, faction_data *fct);
+		faction_data *fct = find_faction_by_vnum(number);
+		if (!fct) {
+			msg_to_char(ch, "There is no faction with that number.\r\n");
+			return;
+		}
+		do_stat_faction(ch, fct);
 	}
 	else if (is_abbrev(buf, "global")) {
 		struct global_data *glb = global_proto(number);

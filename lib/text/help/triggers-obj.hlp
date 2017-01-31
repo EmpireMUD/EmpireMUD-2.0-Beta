@@ -94,6 +94,7 @@ help files for more info):
 &c%adventurecomplete%&0 - Triggers completion of the adventure it's in.
 &c%aoe%&0 - Deals scaled damage to all people in the room.
 &c%at%&0 - Performs a command as if it's at that location.
+&c%build%&0 - Adds or removes a building on the map.
 &c%buildingecho%&0 - Sends a message to everyone at a certain map location.
 &c%damage%&0 - Deals scaled damage to a person.
 &c%door%&0 - Various functions for changing doors and exits.

@@ -48,7 +48,8 @@
 #define OLC_MORPH  BIT(18)
 #define OLC_QUEST  BIT(19)
 #define OLC_SOCIAL  BIT(20)
-#define NUM_OLC_TYPES  21
+#define OLC_FACTION  BIT(21)
+#define NUM_OLC_TYPES  22
 
 
 // olc command flags
@@ -80,6 +81,7 @@
 #define OLC_FLAG_NO_MORPHS  BIT(19)	// cannot edit morphs
 #define OLC_FLAG_NO_QUESTS  BIT(19)	// cannot edit quests
 #define OLC_FLAG_NO_SOCIALS  BIT(20)	// cannot edit socials
+#define OLC_FLAG_NO_FACTIONS  BIT(21)	// cannot edit factionss
 
 
 // for trigger editing

@@ -26,6 +26,7 @@
 *     Craft Defines
 *     Crop Defines
 *     Empire Defines
+*     Faction Defines
 *     Game Defines
 *     Mobile Defines
 *     Object Defines
@@ -52,6 +53,7 @@
 *     Crop Structs
 *     Data Structs
 *     Empire Structs
+*     Faction Structs
 *     Fight Structs
 *     Game Structs
 *     Object Structs
@@ -220,6 +222,7 @@ typedef struct craft_data craft_data;
 typedef struct crop_data crop_data;
 typedef struct descriptor_data descriptor_data;
 typedef struct empire_data empire_data;
+typedef struct faction_data faction_data;
 typedef struct index_data index_data;
 typedef struct morph_data morph_data;
 typedef struct obj_data obj_data;
@@ -901,6 +904,32 @@ typedef struct vehicle_data vehicle_data;
 #define GUESTS_ALLOWED  0
 #define MEMBERS_ONLY  1
 #define MEMBERS_AND_ALLIES  2
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// FACTION DEFINES /////////////////////////////////////////////////////////
+
+// FCT_x: Faction flags
+#define FCT_IN_DEVELOPMENT  BIT(0)	// a. not live
+#define FCT_GAINS_FROM_KILLS  BIT(1)	// b. killing mobs affects faction rating
+
+
+// FCTR_x: Relationship flags
+#define FCTR_SHARED_GAINS  BIT(0)	// a. also gains rep when that one gains rep
+#define FCTR_INVERSE_GAINS  BIT(1)	// b. loses rep when that one gains rep
+#define FCTR_MUTUALLY_EXCLUSIVE  BIT(2)	// c. cannot gain if that one is positive
+
+
+// REP_x: Faction reputation levels
+#define REP_NEUTRAL  0	// no opinion
+#define REP_DESPISED  1	// lower cap
+#define REP_HATED  2	// worst
+#define REP_LOATHED  3	// bad
+#define REP_DISLIKED  4	// not good
+#define REP_LIKED  5	// decent
+#define REP_ESTEEMED  6	// good
+#define REP_VENERATED  7	// great!
+#define REP_REVERED  8	// upper cap
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2897,6 +2926,7 @@ struct descriptor_data {
 	craft_data *olc_craft;	// craft recipe being edited
 	bld_data *olc_building;	// building being edited
 	crop_data *olc_crop;	// crop being edited
+	faction_data *olc_faction;	// faction being edited
 	struct global_data *olc_global;	// global being edited
 	quest_data *olc_quest;	// quest being edited
 	room_template *olc_room_template;	// rmt being edited
@@ -3653,6 +3683,46 @@ struct empire_data {
 	bool needs_save;	// for things that delay-save
 	
 	UT_hash_handle hh;	// empire_table hash handle
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// FACTION STRUCTS /////////////////////////////////////////////////////////
+
+struct faction_data {
+	any_vnum vnum;
+	
+	char *name;	// basic name
+	char *description;	// full text desc
+	
+	bitvector_t flags;	// FCT_ flags
+	int max_rep;	// REP_ they cap at, positive
+	int min_rep;	// REP_ they cap at, negative
+	int starting_rep;	// REP_ initial reputation for players
+	struct faction_relation *relations;	// linked list
+	
+	// lists
+	UT_hash_handle hh;	// faction_table hash handle
+	UT_hash_handle sorted_hh;	// sorted_factions hash handle
+};
+
+
+// how factions view each other
+struct faction_relation {
+	any_vnum vnum;	// who it's with
+	bitvector_t flags;	// FCTR_ flags
+	faction_data *ptr;	// quick reference
+	
+	struct faction_relation *next;	// LL
+};
+
+
+// used to determine the order and value of reputations
+struct faction_reputation_type {
+	int type;	// REP_ type
+	char *name;
+	char *color;	// & or \t color code
+	int value;	// points total a player must be at for this
 };
 
 
