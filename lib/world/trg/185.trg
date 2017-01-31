@@ -313,7 +313,7 @@ switch %attack%
       eval person %room.people%
       while %person%
         eval person %person.next_in_room%
-        eval test %%person.is_enemy(%self%)%%
+        eval test %%self.is_enemy(%person%)%%
         if %test%
           dg_affect %person% BLIND on 10
         end
@@ -349,7 +349,7 @@ switch %attack%
     eval person %room.people%
     while %person%
       eval person %person.next_in_room%
-      eval test %%person.is_enemy(%self%)%%
+      eval test %%self.is_enemy(%person%)%%
       if %test%
         dg_affect %person% DISARM on 15
       end
