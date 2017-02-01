@@ -515,10 +515,10 @@ int compare_reptuation(int rep_a, int rep_b) {
 	ind_a = rep_const_to_index(rep_a);
 	ind_b = rep_const_to_index(rep_b);
 	
-	if (rep_a < rep_b) {
+	if (ind_a < ind_b) {
 		return -1;
 	}
-	else if (rep_a > rep_b) {
+	else if (ind_a > ind_b) {
 		return 1;
 	}
 	else {
@@ -917,7 +917,7 @@ OLC_MODULE(fedit_name) {
 
 
 OLC_MODULE(fedit_relation) {
-	faction_data *fct = GET_OLC_FACTION(ch->desc);
+	// faction_data *fct = GET_OLC_FACTION(ch->desc);
 	// TODO
 }
 
