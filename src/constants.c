@@ -1449,6 +1449,7 @@ const char *trade_overunder[] = {
 const char *faction_flags[] = {
 	"IN-DEVELOPMENT",
 	"GAINS-FROM-KILLS",
+	"\n"
 };
 
 

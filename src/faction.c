@@ -35,6 +35,9 @@
 
 // local data
 const char *default_faction_name = "Unnamed Faction";
+const int default_min_rep = REP_DESPISED;
+const int default_max_rep = REP_REVERED;
+const int default_starting_rep = REP_NEUTRAL;
 
 // local protos
 void get_faction_relation_display(struct faction_relation *list, char *save_buffer);
@@ -729,6 +732,9 @@ faction_data *setup_olc_faction(faction_data *input) {
 		// brand new: some defaults
 		FCT_NAME(new) = str_dup(default_faction_name);
 		FCT_FLAGS(new) = FCT_IN_DEVELOPMENT;
+		FCT_MIN_REP(new) = default_min_rep;
+		FCT_MAX_REP(new) = default_max_rep;
+		FCT_STARTING_REP(new) = default_starting_rep;
 	}
 	
 	// done
@@ -876,6 +882,13 @@ OLC_MODULE(fedit_maxreputation) {
 	faction_data *fct = GET_OLC_FACTION(ch->desc);
 	int rep, idx;
 	
+	if (!*argument) {
+		msg_to_char(ch, "Available reputation levels:\r\n");
+		for (idx = 0; *reputation_levels[idx].name != '\n'; ++idx) {
+			msg_to_char(ch, " %s%s\t0 (%d)\r\n", reputation_levels[idx].color, reputation_levels[idx].name, reputation_levels[idx].value);
+		}
+	}
+	
 	if ((rep = get_reputation_by_name(argument)) == NOTHING || (idx = rep_const_to_index(rep)) == NOTHING) {
 		msg_to_char(ch, "Unknown reputation level '%s'.\r\n", argument);
 		return;
@@ -894,6 +907,13 @@ OLC_MODULE(fedit_maxreputation) {
 OLC_MODULE(fedit_minreputation) {
 	faction_data *fct = GET_OLC_FACTION(ch->desc);
 	int rep, idx;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Available reputation levels:\r\n");
+		for (idx = 0; *reputation_levels[idx].name != '\n'; ++idx) {
+			msg_to_char(ch, " %s%s\t0 (%d)\r\n", reputation_levels[idx].color, reputation_levels[idx].name, reputation_levels[idx].value);
+		}
+	}
 	
 	if ((rep = get_reputation_by_name(argument)) == NOTHING || (idx = rep_const_to_index(rep)) == NOTHING) {
 		msg_to_char(ch, "Unknown reputation level '%s'.\r\n", argument);
@@ -925,6 +945,13 @@ OLC_MODULE(fedit_relation) {
 OLC_MODULE(fedit_startingreputation) {
 	faction_data *fct = GET_OLC_FACTION(ch->desc);
 	int rep, idx;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Available reputation levels:\r\n");
+		for (idx = 0; *reputation_levels[idx].name != '\n'; ++idx) {
+			msg_to_char(ch, " %s%s\t0 (%d)\r\n", reputation_levels[idx].color, reputation_levels[idx].name, reputation_levels[idx].value);
+		}
+	}
 	
 	if ((rep = get_reputation_by_name(argument)) == NOTHING || (idx = rep_const_to_index(rep)) == NOTHING) {
 		msg_to_char(ch, "Unknown reputation level '%s'.\r\n", argument);
