@@ -810,7 +810,7 @@ void olc_show_faction(char_data *ch) {
 	sprintbit(FCT_FLAGS(fct), faction_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
 	
-	sprintf(buf + strlen(buf), "<\tyminreptuation\t0> %s\r\n", get_reputation_name(FCT_MIN_REP(fct)));
+	sprintf(buf + strlen(buf), "<\tyminreputation\t0> %s\r\n", get_reputation_name(FCT_MIN_REP(fct)));
 	sprintf(buf + strlen(buf), "<\tymaxreputation\t0> %s\r\n", get_reputation_name(FCT_MAX_REP(fct)));
 	sprintf(buf + strlen(buf), "<\tystartingreuptation\t0> %s\r\n", get_reputation_name(FCT_STARTING_REP(fct)));
 	
@@ -853,7 +853,7 @@ OLC_MODULE(fedit_description) {
 	}
 	else {
 		sprintf(buf, "description for %s", FCT_NAME(fct));
-		start_string_editor(ch->desc, buf, &FCT_NAME(fct), MAX_FACTION_DESCRIPTION);
+		start_string_editor(ch->desc, buf, &FCT_DESCRIPTION(fct), MAX_FACTION_DESCRIPTION);
 	}
 }
 
