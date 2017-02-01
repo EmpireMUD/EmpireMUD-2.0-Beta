@@ -2021,6 +2021,7 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_CONDITION  750	// FULL, etc
 #define MAX_COOLDOWNS  32
 #define MAX_EMPIRE_DESCRIPTION  2000
+#define MAX_FACTION_DESCRIPTION  4000
 #define MAX_GROUP_SIZE  4	// how many members a group allows
 #define MAX_IGNORES  15	// total number of players you can ignore
 #define MAX_INPUT_LENGTH  1024	// Max length per *line* of input

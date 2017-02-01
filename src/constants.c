@@ -2255,6 +2255,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"morph",
 	"quest",
 	"social",
+	"faction",
 	"\n"
 };
 

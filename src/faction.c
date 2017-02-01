@@ -27,7 +27,7 @@
 *   Helpers
 *   Utilities
 *   Database
-*   Character Creation
+*   Reputation Handlers
 *   OLC Handlers
 *   Displays
 *   Edit Modules
@@ -502,6 +502,86 @@ void write_faction_to_file(FILE *fl, faction_data *fct) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// REPUTATION HANDLERS /////////////////////////////////////////////////////
+
+/**
+* Comparison function to determine if one REP_ const is higher than another.
+* This does NOT account for 'magnitude', where a negative rank is "higher"
+* than another negative rank if its absolute value is larger.
+*/
+int compare_reptuation(int rep_a, int rep_b) {
+	int ind_a, ind_b;
+	
+	ind_a = rep_const_to_index(rep_a);
+	ind_b = rep_const_to_index(rep_b);
+	
+	if (rep_a < rep_b) {
+		return -1;
+	}
+	else if (rep_a > rep_b) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+
+/**
+* Finds a reputation const by name.
+*
+* @param char *name The name to find.
+* @return int Any REP_ const, or NOTHING if not found.
+*/
+int get_reputation_by_name(char *name) {
+	int iter, partial = NOTHING;
+	
+	for (iter = 0; *reputation_levels[iter].name != '\n'; ++iter) {
+		if (!str_cmp(name, reputation_levels[iter].name)) {
+			return reputation_levels[iter].type;
+		}
+		else if (is_abbrev(name, reputation_levels[iter].name)) {
+			partial = iter;
+		}
+	}
+	
+	return partial != NOTHING ? reputation_levels[partial].type : NOTHING;
+}
+
+
+/**
+* Detect the min/max values for reputation at startup.
+*/
+void init_reputation(void) {
+	int iter;
+	
+	for (iter = 0; *reputation_levels[iter].name != '\n'; ++iter) {
+		MAX_REPUTATION = MAX(MAX_REPUTATION, reputation_levels[iter].value);
+		MIN_REPUTATION = MIN(MIN_REPUTATION, reputation_levels[iter].value);
+	}
+}
+
+
+/**
+* Converts a REP_ const into a reputation_levels[] index.
+*
+* @param int rep_const Any REP_ type.
+* @return int Its location in the reputation_levels array, or NOTHING if not found.
+*/
+int rep_const_to_index(int rep_const) {
+	int iter;
+	
+	for (iter = 0; *reputation_levels[iter].name != '\n'; ++iter) {
+		if (reputation_levels[iter].type == rep_const) {
+			return iter;
+		}
+	}
+	
+	return NOTHING;	// not found
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// OLC HANDLERS ////////////////////////////////////////////////////////////
 
 /**
@@ -765,6 +845,19 @@ int vnum_faction(char *searchname, char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// OLC MODULES /////////////////////////////////////////////////////////////
 
+OLC_MODULE(fedit_description) {
+	faction_data *fct = GET_OLC_FACTION(ch->desc);
+	
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "description for %s", FCT_NAME(fct));
+		start_string_editor(ch->desc, buf, &FCT_NAME(fct), MAX_FACTION_DESCRIPTION);
+	}
+}
+
+
 OLC_MODULE(fedit_flags) {
 	faction_data *fct = GET_OLC_FACTION(ch->desc);
 	bool had_indev = IS_SET(FCT_FLAGS(fct), FCT_IN_DEVELOPMENT) ? TRUE : FALSE;
@@ -781,11 +874,68 @@ OLC_MODULE(fedit_flags) {
 
 OLC_MODULE(fedit_maxreputation) {
 	faction_data *fct = GET_OLC_FACTION(ch->desc);
-	// CLASS_POOL(fct, HEALTH) = olc_process_number(ch, argument, "max health", "maxhealth", 1, MAX_INT, CLASS_POOL(fct, HEALTH));
+	int rep, idx;
+	
+	if ((rep = get_reputation_by_name(argument)) == NOTHING || (idx = rep_const_to_index(rep)) == NOTHING) {
+		msg_to_char(ch, "Unknown reputation level '%s'.\r\n", argument);
+		return;
+	}
+	
+	FCT_MAX_REP(fct) = rep;
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		send_config_msg(ch, "ok_string");
+	}
+	else {
+		msg_to_char(ch, "You set the maximum reputation to %s.\r\n", reputation_levels[idx].name);
+	}
+}
+
+
+OLC_MODULE(fedit_minreputation) {
+	faction_data *fct = GET_OLC_FACTION(ch->desc);
+	int rep, idx;
+	
+	if ((rep = get_reputation_by_name(argument)) == NOTHING || (idx = rep_const_to_index(rep)) == NOTHING) {
+		msg_to_char(ch, "Unknown reputation level '%s'.\r\n", argument);
+		return;
+	}
+	
+	FCT_MIN_REP(fct) = rep;
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		send_config_msg(ch, "ok_string");
+	}
+	else {
+		msg_to_char(ch, "You set the minimum reputation to %s.\r\n", reputation_levels[idx].name);
+	}
 }
 
 
 OLC_MODULE(fedit_name) {
 	faction_data *fct = GET_OLC_FACTION(ch->desc);
 	olc_process_string(ch, argument, "name", &FCT_NAME(fct));
+}
+
+
+OLC_MODULE(fedit_relation) {
+	faction_data *fct = GET_OLC_FACTION(ch->desc);
+	// TODO
+}
+
+
+OLC_MODULE(fedit_startingreputation) {
+	faction_data *fct = GET_OLC_FACTION(ch->desc);
+	int rep, idx;
+	
+	if ((rep = get_reputation_by_name(argument)) == NOTHING || (idx = rep_const_to_index(rep)) == NOTHING) {
+		msg_to_char(ch, "Unknown reputation level '%s'.\r\n", argument);
+		return;
+	}
+	
+	FCT_STARTING_REP(fct) = rep;
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		send_config_msg(ch, "ok_string");
+	}
+	else {
+		msg_to_char(ch, "You set the starting reputation to %s.\r\n", reputation_levels[idx].name);
+	}
 }

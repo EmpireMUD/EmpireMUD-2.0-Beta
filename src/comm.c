@@ -1655,6 +1655,9 @@ void close_socket(descriptor_data *d) {
 	if (d->olc_crop) {
 		free_crop(d->olc_crop);
 	}
+	if (d->olc_faction) {
+		free_faction(d->olc_faction);
+	}
 	if (d->olc_global) {
 		free_global(d->olc_global);
 	}

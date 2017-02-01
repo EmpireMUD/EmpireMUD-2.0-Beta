@@ -160,6 +160,15 @@ OLC_MODULE(cropedit_xmin);
 OLC_MODULE(cropedit_ymax);
 OLC_MODULE(cropedit_ymin);
 
+// faction modules
+OLC_MODULE(fedit_description);
+OLC_MODULE(fedit_flags);
+OLC_MODULE(fedit_maxreputation);
+OLC_MODULE(fedit_minreputation);
+OLC_MODULE(fedit_name);
+OLC_MODULE(fedit_relation);
+OLC_MODULE(fedit_startingreputation);
+
 // global modules
 OLC_MODULE(gedit_ability);
 OLC_MODULE(gedit_capacity);
@@ -402,6 +411,7 @@ void olc_show_building(char_data *ch);
 void olc_show_class(char_data *ch);
 void olc_show_craft(char_data *ch);
 void olc_show_crop(char_data *ch);
+void olc_show_faction(char_data *ch);
 void olc_show_global(char_data *ch);
 void olc_show_mobile(char_data *ch);
 void olc_show_morph(char_data *ch);
@@ -422,6 +432,7 @@ extern bld_data *setup_olc_building(bld_data *input);
 extern class_data *setup_olc_class(class_data *input);
 extern craft_data *setup_olc_craft(craft_data *input);
 extern crop_data *setup_olc_crop(crop_data *input);
+extern faction_data *setup_olc_faction(faction_data *input);
 extern struct global_data *setup_olc_global(struct global_data *input);
 extern char_data *setup_olc_mobile(char_data *input);
 extern morph_data *setup_olc_morph(morph_data *input);
@@ -439,16 +450,16 @@ extern bool validate_icon(char *icon);
 // master olc command structure
 const struct olc_command_data olc_data[] = {
 	// OLC_x: main commands
-	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SKILL | OLC_SOCIAL | OLC_VEHICLE, NOBITS },
-	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
+	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SKILL | OLC_SOCIAL | OLC_VEHICLE, NOBITS },
+	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
-	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	
 	// admin
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
@@ -570,6 +581,15 @@ const struct olc_command_data olc_data[] = {
 	{ "xmin", cropedit_xmin, OLC_CROP, OLC_CF_EDITOR },
 	{ "ymax", cropedit_ymax, OLC_CROP, OLC_CF_EDITOR },
 	{ "ymin", cropedit_ymin, OLC_CROP, OLC_CF_EDITOR },
+	
+	// faction commands
+	{ "description", fedit_description, OLC_FACTION, OLC_CF_EDITOR },
+	{ "flags", fedit_flags, OLC_FACTION, OLC_CF_EDITOR },
+	{ "maxreputation", fedit_maxreputation, OLC_FACTION, OLC_CF_EDITOR },
+	{ "minreputation", fedit_minreputation, OLC_FACTION, OLC_CF_EDITOR },
+	{ "name", fedit_name, OLC_FACTION, OLC_CF_EDITOR },
+	{ "relationship", fedit_relation, OLC_FACTION, OLC_CF_EDITOR },
+	{ "startingreputation", fedit_startingreputation, OLC_FACTION, OLC_CF_EDITOR },
 	
 	// globals commands
 	{ "capacity", gedit_capacity, OLC_GLOBAL, OLC_CF_EDITOR },
@@ -938,6 +958,11 @@ OLC_MODULE(olc_abort) {
 				GET_OLC_CROP(ch->desc) = NULL;
 				break;
 			}
+			case OLC_FACTION: {
+				free_faction(GET_OLC_FACTION(ch->desc));
+				GET_OLC_FACTION(ch->desc) = NULL;
+				break;
+			}
 			case OLC_GLOBAL: {
 				free_global(GET_OLC_GLOBAL(ch->desc));
 				GET_OLC_GLOBAL(ch->desc) = NULL;
@@ -1114,6 +1139,16 @@ OLC_MODULE(olc_audit) {
 				HASH_ITER(hh, crop_table, cp, next_cp) {
 					if (GET_CROP_VNUM(cp) >= from_vnum && GET_CROP_VNUM(cp) <= to_vnum) {
 						found |= audit_crop(cp, ch);
+					}
+				}
+				break;
+			}
+			case OLC_FACTION: {
+				extern bool audit_faction(faction_data *fct, char_data *ch);
+				faction_data *fct, *next_fct;
+				HASH_ITER(hh, faction_table, fct, next_fct) {
+					if (FCT_VNUM(fct) >= from_vnum && FCT_VNUM(fct) <= to_vnum) {
+						found |= audit_faction(fct, ch);
 					}
 				}
 				break;
@@ -1330,6 +1365,11 @@ OLC_MODULE(olc_copy) {
 			exists = (crop_proto(from_vnum) != NULL);
 			break;
 		}
+		case OLC_FACTION: {
+			found = (find_faction_by_vnum(vnum) != NULL);
+			exists = (find_faction_by_vnum(from_vnum) != NULL);
+			break;
+		}
 		case OLC_GLOBAL: {
 			found = (global_proto(vnum) != NULL);
 			exists = (global_proto(from_vnum) != NULL);
@@ -1487,6 +1527,13 @@ OLC_MODULE(olc_copy) {
 			GET_OLC_CROP(ch->desc)->vnum = vnum;
 			SET_BIT(GET_OLC_CROP(ch->desc)->flags, CROPF_NOT_WILD);	// ensure flag
 			olc_show_crop(ch);
+			break;
+		}
+		case OLC_FACTION: {
+			GET_OLC_FACTION(ch->desc) = setup_olc_faction(find_faction_by_vnum(from_vnum));
+			GET_OLC_FACTION(ch->desc)->vnum = vnum;
+			SET_BIT(FCT_FLAGS(GET_OLC_FACTION(ch->desc)), FCT_IN_DEVELOPMENT);	// ensure flag
+			olc_show_faction(ch);
 			break;
 		}
 		case OLC_GLOBAL: {
@@ -1669,6 +1716,11 @@ OLC_MODULE(olc_delete) {
 			olc_delete_crop(ch, vnum);
 			break;
 		}
+		case OLC_FACTION: {
+			void olc_delete_faction(char_data *ch, any_vnum vnum);
+			olc_delete_faction(ch, vnum);
+			break;
+		}
 		case OLC_GLOBAL: {
 			olc_delete_global(ch, vnum);
 			break;
@@ -1759,6 +1811,10 @@ OLC_MODULE(olc_display) {
 		}
 		case OLC_CROP: {
 			olc_show_crop(ch);
+			break;
+		}
+		case OLC_FACTION: {
+			olc_show_faction(ch);
 			break;
 		}
 		case OLC_GLOBAL: {
@@ -1934,6 +1990,13 @@ OLC_MODULE(olc_edit) {
 			olc_show_crop(ch);
 			break;
 		}
+		case OLC_FACTION: {
+			// this will set up from existing OR new automatically based on find_faction_by_vnum
+			GET_OLC_FACTION(ch->desc) = setup_olc_faction(find_faction_by_vnum(vnum));
+			GET_OLC_FACTION(ch->desc)->vnum = vnum;			
+			olc_show_faction(ch);
+			break;
+		}
 		case OLC_GLOBAL: {
 			// this will set up from existing OR new automatically based on global_proto
 			GET_OLC_GLOBAL(ch->desc) = setup_olc_global(global_proto(vnum));
@@ -2089,6 +2152,10 @@ OLC_MODULE(olc_free) {
 				}
 				case OLC_CROP: {
 					free = (crop_proto(iter) == NULL);
+					break;
+				}
+				case OLC_FACTION: {
+					free = (find_faction_by_vnum(iter) == NULL);
 					break;
 				}
 				case OLC_GLOBAL: {
@@ -2351,6 +2418,20 @@ OLC_MODULE(olc_list) {
 				}
 				break;
 			}
+			case OLC_FACTION: {
+				extern char *list_one_faction(faction_data *fct, bool detail);
+				faction_data *fct, *next_fct;
+				HASH_ITER(hh, faction_table, fct, next_fct) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (FCT_VNUM(fct) >= from_vnum && FCT_VNUM(fct) <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_faction(fct, show_details));
+					}
+				}
+				break;
+			}
 			case OLC_GLOBAL: {
 				extern char *list_one_global(struct global_data *glb, bool detail);
 				struct global_data *glb, *next_glb;
@@ -2529,6 +2610,7 @@ OLC_MODULE(olc_removeindev) {
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	skill_data *skill, *next_skill;
+	faction_data *fct, *next_fct;
 	social_data *soc, *next_soc;
 	augment_data *aug, *next_aug;
 	class_data *cls, *next_cls;
@@ -2614,6 +2696,23 @@ OLC_MODULE(olc_removeindev) {
 			REMOVE_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
 			msg_to_char(ch, "Removed IN-DEV flag from craft [%d] %s.\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+			any = TRUE;
+		}
+		
+		HASH_ITER(hh, faction_table, fct, next_fct) {
+			if (FCT_VNUM(fct) < from || FCT_VNUM(fct) > to) {
+				continue;
+			}
+			if (!IS_SET(FCT_FLAGS(fct), FCT_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (!player_can_olc_edit(ch, OLC_FACTION, FCT_VNUM(fct))) {
+				continue;
+			}
+			
+			REMOVE_BIT(FCT_FLAGS(fct), FCT_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_FCT, FCT_VNUM(fct));
+			msg_to_char(ch, "Removed IN-DEV flag from faction [%d] %s.\r\n", FCT_VNUM(fct), FCT_NAME(fct));
 			any = TRUE;
 		}
 		
@@ -2839,6 +2938,13 @@ OLC_MODULE(olc_save) {
 				GET_OLC_CROP(ch->desc) = NULL;
 				break;
 			}
+			case OLC_FACTION: {
+				void save_olc_faction(descriptor_data *desc);
+				save_olc_faction(ch->desc);
+				free_faction(GET_OLC_FACTION(ch->desc));
+				GET_OLC_FACTION(ch->desc) = NULL;
+				break;
+			}
 			case OLC_GLOBAL: {
 				save_olc_global(ch->desc);
 				free_global(GET_OLC_GLOBAL(ch->desc));
@@ -2984,6 +3090,11 @@ OLC_MODULE(olc_search) {
 			}
 			case OLC_CROP: {
 				olc_search_crop(ch, vnum);
+				break;
+			}
+			case OLC_FACTION: {
+				void olc_search_faction(char_data *ch, any_vnum vnum);
+				olc_search_faction(ch, vnum);
 				break;
 			}
 			case OLC_GLOBAL: {

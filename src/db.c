@@ -104,6 +104,8 @@ struct trading_post_data *trading_list = NULL;	// global LL of trading post stuf
 // factions
 faction_data *faction_table = NULL;	// main hash (hh)
 faction_data *sorted_factions = NULL;	// alpha hash (sorted_hh)
+int MAX_REPUTATION = 0;	// highest possible rep value, auto-detected at startup
+int MIN_REPUTATION = 0;	// lowest possible rep value, auto-detected at startup
 
 // fight system
 struct message_list fight_messages[MAX_MESSAGES];	// fighting messages
@@ -404,6 +406,7 @@ void boot_world(void) {
 	void check_triggers();
 	void clean_empire_logs();
 	void index_boot_world();
+	void init_reputation();
 	void load_empire_storage();
 	void load_instances();
 	void load_islands();
@@ -454,6 +457,7 @@ void boot_world(void) {
 	
 	log("Loading factions.");
 	index_boot(DB_BOOT_FCT);
+	init_reputation();
 	
 	// requires sectors, buildings, and room templates -- order matters here
 	log("Loading the world.");
