@@ -2483,6 +2483,15 @@ always active on the mob, as if a spell had been cast on them.
 
 See also: AFFECT FLAGS, OLC MOBILES
 #d
+"MEDIT ALLEGIANCE"
+
+Usage:  .allegiance <none | vnum | name>
+
+This sets a mob to be a member of a faction. For some factions, this will cause
+reputation gain if a player kills the mob.
+
+See also: FACTION, OLC FACTIONS, OLC MOBILES
+#d
 "MEDIT ATTACK" "ATTACK TYPES"
 
 Usage:  .attack <type>

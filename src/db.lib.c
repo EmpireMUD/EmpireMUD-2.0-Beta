@@ -3405,6 +3405,11 @@ void write_mob_to_file(FILE *fl, char_data *mob) {
 
 	// optionals:
 	
+	// F: faction
+	if (MOB_FACTION(mob)) {
+		fprintf(fl, "F %d\n", FCT_VNUM(MOB_FACTION(mob)));
+	}
+	
 	// I: interactions
 	write_interactions_to_file(fl, mob->interactions);
 	

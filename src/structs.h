@@ -2721,14 +2721,15 @@ struct mob_special_data {
 	
 	int name_set;	// NAMES_x
 	struct custom_message *custom_msgs;	// any custom messages
+	faction_data *faction;	// if any
 	
 	int to_hit;	// Mob's attack % bonus
 	int to_dodge;	// Mob's dodge % bonus
 	int damage;	// Raw damage
 	int	attack_type;	// weapon type
-
+	
 	byte move_type;	// how the mob moves
-
+	
 	struct pursuit_data *pursuit;	// mob pursuit
 	room_vnum pursuit_leash_loc;	// where to return to
 	struct mob_tag *tagged_by;	// mob tagged by

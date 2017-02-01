@@ -672,6 +672,7 @@ void save_olc_mobile(descriptor_data *desc) {
 			if (MOB_CUSTOM_MSGS(mob_iter) == MOB_CUSTOM_MSGS(proto)) {
 				MOB_CUSTOM_MSGS(mob_iter) = MOB_CUSTOM_MSGS(mob);
 			}
+			MOB_FACTION(mob_iter) = MOB_FACTION(mob);
 			
 			// check for changes to level, flags, or damage
 			changed = (GET_MIN_SCALE_LEVEL(mob_iter) != GET_MIN_SCALE_LEVEL(mob)) || (GET_MAX_SCALE_LEVEL(mob_iter) != GET_MAX_SCALE_LEVEL(mob)) || (MOB_ATTACK_TYPE(mob_iter) != MOB_ATTACK_TYPE(mob)) || (MOB_FLAGS(mob_iter) != MOB_FLAGS(mob));
@@ -837,7 +838,8 @@ void olc_show_mobile(char_data *ch) {
 	sprintf(buf + strlen(buf), "<&yattack&0> %s\r\n", attack_hit_info[MOB_ATTACK_TYPE(mob)].name);
 	sprintf(buf + strlen(buf), "<&ymovetype&0> %s\r\n", mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
 	sprintf(buf + strlen(buf), "<&ynameset&0> %s\r\n", name_sets[MOB_NAME_SET(mob)]);
-
+	sprintf(buf + strlen(buf), "<&yallegiance&0> %s\r\n", MOB_FACTION(mob) ? FCT_NAME(MOB_FACTION(mob)) : "none");
+	
 	sprintf(buf + strlen(buf), "Interactions: <&yinteraction&0>\r\n");
 	if (mob->interactions) {
 		get_interaction_display(mob->interactions, buf1);
@@ -867,6 +869,27 @@ void olc_show_mobile(char_data *ch) {
 OLC_MODULE(medit_affects) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
 	AFF_FLAGS(mob) = olc_process_flag(ch, argument, "affect", "affects", affected_bits, AFF_FLAGS(mob));
+}
+
+
+OLC_MODULE(medit_allegiance) {
+	char_data *mob = GET_OLC_MOBILE(ch->desc);
+	faction_data *fct;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Set the mob's allegiance to which faction (or 'none')?\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		msg_to_char(ch, "You set its allegience to 'none'.\r\n");
+		MOB_FACTION(mob) = NULL;
+	}
+	else if (!(fct = find_faction(argument))) {
+		msg_to_char(ch, "Unknown faction '%s'.\r\n", argument);
+	}
+	else {
+		MOB_FACTION(mob) = fct;
+		msg_to_char(ch, "You set its allegiance to %s.\r\n", FCT_NAME(fct));
+	}
 }
 
 

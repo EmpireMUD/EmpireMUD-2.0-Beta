@@ -196,6 +196,7 @@ char *list_one_faction(faction_data *fct, bool detail) {
 void olc_search_faction(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	faction_data *fct = find_faction_by_vnum(vnum);
+	char_data *mob, *next_mob;
 	int size, found;
 	
 	if (!fct) {
@@ -206,7 +207,13 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of faction %d (%s):\r\n", vnum, FCT_NAME(fct));
 	
-	// factions are not used anywhere else yet
+	// check mob allegiance
+	HASH_ITER(hh, mobile_table, mob, next_mob) {
+		if (MOB_FACTION(mob) == fct) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+		}
+	}
 	
 	if (found > 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
@@ -624,6 +631,7 @@ faction_data *create_faction_table_entry(any_vnum vnum) {
 */
 void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	faction_data *fct, *iter, *next_iter;
+	char_data *mob, *next_mob, *chiter;
 	
 	if (!(fct = find_faction_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such faction %d.\r\n", vnum);
@@ -633,22 +641,20 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	// remove it from the hash table first
 	remove_faction_from_table(fct);
 	
-	// remove from other factions
-	
 	// remove from live players
-	/*
 	LL_FOREACH(character_list, chiter) {
-		if (IS_NPC(chiter)) {
-			continue;
+		if (IS_NPC(chiter) && MOB_FACTION(chiter) == fct) {
+			MOB_FACTION(chiter) = NULL;
 		}
-		if (GET_CLASS(chiter) != fct) {
-			continue;
-		}
-		update_class(chiter);
 	}
-	*/
 	
-	// remove from mobs, quests
+	// remove from mobs
+	HASH_ITER(hh, mobile_table, mob, next_mob) {
+		if (MOB_FACTION(mob) == fct) {
+			MOB_FACTION(mob) = NULL;
+			save_library_file_for_vnum(DB_BOOT_MOB, GET_MOB_VNUM(mob));
+		}
+	}
 
 	// save index and faction file now
 	save_index(DB_BOOT_FCT);
@@ -887,6 +893,7 @@ OLC_MODULE(fedit_maxreputation) {
 		for (idx = 0; *reputation_levels[idx].name != '\n'; ++idx) {
 			msg_to_char(ch, " %s%s\t0 (%d)\r\n", reputation_levels[idx].color, reputation_levels[idx].name, reputation_levels[idx].value);
 		}
+		return;
 	}
 	
 	if ((rep = get_reputation_by_name(argument)) == NOTHING || (idx = rep_const_to_index(rep)) == NOTHING) {
@@ -913,6 +920,7 @@ OLC_MODULE(fedit_minreputation) {
 		for (idx = 0; *reputation_levels[idx].name != '\n'; ++idx) {
 			msg_to_char(ch, " %s%s\t0 (%d)\r\n", reputation_levels[idx].color, reputation_levels[idx].name, reputation_levels[idx].value);
 		}
+		return;
 	}
 	
 	if ((rep = get_reputation_by_name(argument)) == NOTHING || (idx = rep_const_to_index(rep)) == NOTHING) {
@@ -951,6 +959,7 @@ OLC_MODULE(fedit_startingreputation) {
 		for (idx = 0; *reputation_levels[idx].name != '\n'; ++idx) {
 			msg_to_char(ch, " %s%s\t0 (%d)\r\n", reputation_levels[idx].color, reputation_levels[idx].name, reputation_levels[idx].value);
 		}
+		return;
 	}
 	
 	if ((rep = get_reputation_by_name(argument)) == NOTHING || (idx = rep_const_to_index(rep)) == NOTHING) {
