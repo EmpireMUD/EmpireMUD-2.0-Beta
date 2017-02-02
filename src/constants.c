@@ -1453,11 +1453,22 @@ const char *faction_flags[] = {
 };
 
 
-// FCTR_x: relationship flags
+// FCTR_x (1/2): relationship flags
 const char *relationship_flags[] = {
 	"SHARED-GAINS",
 	"INVERSE-GAINS",
 	"MUTUALLY-EXCLUSIVE",
+	"UNLISTED",
+	"\n"
+};
+
+
+// FCTR_x (2/2): relationship descriptions (shown to players)
+const char *relationship_descs[] = {
+	"Allied",
+	"Enemies",
+	"Mutually Exclusive",
+	"",	// unlisted
 	"\n"
 };
 

@@ -918,6 +918,7 @@ typedef struct vehicle_data vehicle_data;
 #define FCTR_SHARED_GAINS  BIT(0)	// a. also gains rep when that one gains rep
 #define FCTR_INVERSE_GAINS  BIT(1)	// b. loses rep when that one gains rep
 #define FCTR_MUTUALLY_EXCLUSIVE  BIT(2)	// c. cannot gain if that one is positive
+#define FCTR_UNLISTED  BIT(3)  // d. mortals won't see this relationship
 
 
 // REP_x: Faction reputation levels

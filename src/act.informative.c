@@ -1971,11 +1971,16 @@ ACMD(do_examine) {
 
 
 ACMD(do_factions) {
+	extern const char *relationship_descs[];
+	
 	struct player_faction_data *pfd, *next_pfd;
+	struct faction_relation *rel, *next_rel;
+	char buf[MAX_STRING_LENGTH];
 	faction_data *fct;
 	int idx = NOTHING;
 	int count = 0;
 	size_t size;
+	bool any;
 	
 	skip_spaces(&argument);
 	
@@ -1996,6 +2001,24 @@ ACMD(do_factions) {
 				msg_to_char(ch, "Reputation: none\r\n");
 			}
 			msg_to_char(ch, "%s", NULLSAFE(FCT_DESCRIPTION(fct)));
+			
+			// relations?
+			any = FALSE;
+			HASH_ITER(hh, FCT_RELATIONS(fct), rel, next_rel) {
+				if (IS_SET(rel->flags, FCTR_UNLISTED)) {
+					continue;
+				}
+				
+				// show it
+				if (!any) {	// header
+					any = TRUE;
+					msg_to_char(ch, "Relationships:\r\n");
+				}
+				pfd = get_reputation(ch, rel->vnum, FALSE);
+				idx = (pfd ? rep_const_to_index(pfd->rep) : NOTHING);
+				prettier_sprintbit(rel->flags, relationship_descs, buf);
+				msg_to_char(ch, " %s%s\t0 - %s\r\n", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(rel->ptr), buf);
+			}
 		}
 	}
 	else {	// no arg, show all
