@@ -770,11 +770,11 @@ void update_reputations(char_data *ch) {
 			}
 			else if (reputation_levels[iter].value < 0 && pfd->value <= reputation_levels[iter].value) {
 				pfd->rep = reputation_levels[iter].type;
-				break;
+				break;	// break -- looking for lowest value match only
 			}
 			else if (reputation_levels[iter].value > 0 && pfd->value >= reputation_levels[iter].value) {
 				pfd->rep = reputation_levels[iter].type;
-				break;
+				// don't break, looking for highest value
 			}
 		}
 	}
