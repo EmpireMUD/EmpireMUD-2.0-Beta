@@ -2839,7 +2839,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'f': {	// char.f*
-					if (!str_cmp(field, "fighting")) {
+					if (!str_cmp(field, "faction_name")) {
+						if (IS_NPC(c) && MOB_FACTION(c)) {
+							snprintf(str, slen, "%s", FCT_NAME(MOB_FACTION(c)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "fighting")) {
 						if (FIGHTING(c))
 							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(FIGHTING(c)));
 						else 

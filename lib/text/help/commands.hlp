@@ -593,13 +593,13 @@ You can see information about any faction by using its name with this command.
 
 Reputation levels and values:
   &RDespised&0  -100
-  &rHated&0  -75
-  &oLoathed&0  -30
-  &yDisliked&0  -10
-  &tNeutral&0  0
-  &cLiked&0  10
-  &aEsteemed&0  30
-  &gVenerated&0  75
+  &rHated&0  -99 to -75
+  &oLoathed&0  -74 to -30
+  &yDisliked&0  -29 to -10
+  &tNeutral&0  -9 to 9
+  &cLiked&0  10 to 29
+  &aEsteemed&0  30 to 74
+  &gVenerated&0  75 to 99
   &gRevered&0  100
 #
 FIGHTMESSAGES "FIGHT MESSAGES" FMESSAGES "FIGHT SPAM" "COMBAT SPAM" "COMBAT MESSAGES"
