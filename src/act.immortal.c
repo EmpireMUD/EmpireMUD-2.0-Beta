@@ -1568,7 +1568,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		max_rep = (max_idx != NOTHING) ? reputation_levels[max_idx].value : MAX_REPUTATION;
 		
 		// parse val arg
-		if (isdigit(*fct_val)) {
+		if (isdigit(*fct_val) || *fct_val == '-') {
 			new_val = atoi(fct_val);
 		}
 		else if ((new_rep = get_reputation_by_name(fct_val)) == NOTHING) {
