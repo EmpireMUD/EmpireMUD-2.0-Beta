@@ -657,7 +657,7 @@ struct player_faction_data *get_reputation(char_data *ch, any_vnum vnum, bool cr
 		return NULL;	// only players have this
 	}
 	
-	HASH_FIND_INT(faction_table, &vnum, pfd);
+	HASH_FIND_INT(GET_FACTIONS(ch), &vnum, pfd);
 	if (!pfd && create && (fct = find_faction_by_vnum(vnum))) {
 		CREATE(pfd, struct player_faction_data, 1);
 		pfd->vnum = vnum;
