@@ -151,6 +151,8 @@ faction_data *find_faction_by_vnum(any_vnum vnum) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_faction(faction_data *fct, char_data *ch) {
+	struct faction_relation *rel, *next_rel, *back;
+	int min_idx, max_idx, start_idx;
 	bool problem = FALSE;
 	
 	if (FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
@@ -160,6 +162,40 @@ bool audit_faction(faction_data *fct, char_data *ch) {
 	if (!FCT_NAME(fct) || !*FCT_NAME(fct) || !str_cmp(FCT_NAME(fct), default_faction_name)) {
 		olc_audit_msg(ch, FCT_VNUM(fct), "No name set");
 		problem = TRUE;
+	}
+	if (!FCT_DESCRIPTION(fct) || !*FCT_DESCRIPTION(fct)) {
+		olc_audit_msg(ch, FCT_VNUM(fct), "No description set");
+		problem = TRUE;
+	}
+	
+	// limits
+	min_idx = rep_const_to_index(FCT_MIN_REP(fct));
+	max_idx = rep_const_to_index(FCT_MAX_REP(fct));
+	start_idx = rep_const_to_index(FCT_STARTING_REP(fct));
+	if (min_idx == NOTHING || max_idx == NOTHING || start_idx == NOTHING) {
+		olc_audit_msg(ch, FCT_VNUM(fct), "Invalid reputation settings");
+		problem = TRUE;
+	}
+	if (max_idx < min_idx) {
+		olc_audit_msg(ch, FCT_VNUM(fct), "Max reputation is lower than min reputation");
+		problem = TRUE;
+	}
+	if (start_idx < min_idx || start_idx > max_idx) {
+		olc_audit_msg(ch, FCT_VNUM(fct), "Starting reputation is out of bounds");
+		problem = TRUE;
+	}
+	
+	HASH_ITER(hh, FCT_RELATIONS(fct), rel, next_rel) {
+		if (IS_SET(rel->flags, FCTR_SHARED_GAINS) && IS_SET(rel->flags, FCTR_INVERSE_GAINS | FCTR_MUTUALLY_EXCLUSIVE)) {
+			olc_audit_msg(ch, FCT_VNUM(fct), "Nonsensical relationship flags with %d %s", FCT_VNUM(rel->ptr), FCT_NAME(rel->ptr));
+			problem = TRUE;
+		}
+		
+		HASH_FIND_INT(FCT_RELATIONS(rel->ptr), &FCT_VNUM(fct), back);
+		if (!back || rel->flags != back->flags) {
+			olc_audit_msg(ch, FCT_VNUM(fct), "Asymmetrical relationship flags with %d %s", FCT_VNUM(rel->ptr), FCT_NAME(rel->ptr));
+			problem = TRUE;
+		}
 	}
 	
 	return problem;
