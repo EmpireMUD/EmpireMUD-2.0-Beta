@@ -1963,6 +1963,61 @@ ACMD(do_examine) {
 }
 
 
+ACMD(do_factions) {
+	extern struct faction_reputation_type reputation_levels[];
+	
+	struct player_faction_data *pfd, *next_pfd;
+	faction_data *fct;
+	int idx = NOTHING;
+	int count = 0;
+	size_t size;
+	
+	skip_spaces(&argument);
+	
+	if (*argument) {
+		if (!(fct = find_faction_by_name(argument)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
+			msg_to_char(ch, "Unknown faction '%s'.\r\n", argument);
+		}
+		else {
+			if ((pfd = get_reputation(ch, FCT_VNUM(fct), FALSE))) {
+				idx = rep_const_to_index(pfd->rep);
+			}
+			
+			msg_to_char(ch, "%s%s\t0\r\n", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(fct));
+			if (pfd && idx != NOTHING) {
+				msg_to_char(ch, "Reputation: %s / %d\r\n", reputation_levels[idx].name, pfd->value);
+			}
+			else {
+				msg_to_char(ch, "Reputation: none\r\n");
+			}
+			msg_to_char(ch, "%s", FCT_DESCRIPTION(fct));
+		}
+	}
+	else {	// no arg, show all
+		size = snprintf(buf, sizeof(buf), "Your factions:\r\n");
+		HASH_ITER(hh, GET_FACTIONS(ch), pfd, next_pfd) {
+			if (size + 10 >= sizeof(buf)) {
+				break;	// out of room
+			}
+			if (!(fct = find_faction_by_vnum(pfd->vnum))) {
+				continue;
+			}
+			
+			++count;
+			idx = rep_const_to_index(pfd->rep);
+			size += snprintf(buf + size, sizeof(buf) - size, " %s %s(%s / %d)\t0\r\n", FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value);
+		}
+		
+		if (!count) {
+			strcat(buf, " none\r\n");
+		}
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+}
+
+
 /* Generic page_string function for displaying text */
 ACMD(do_gen_ps) {
 	switch (subcmd) {

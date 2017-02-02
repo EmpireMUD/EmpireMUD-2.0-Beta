@@ -3345,6 +3345,11 @@ void parse_mobile(FILE *mob_f, int nr) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'F': {	// faction
+				if (strlen(line) > 2) {
+					MOB_FACTION(mob) = find_faction_by_vnum(atoi(line + 2));
+				}
+			}
 			case 'I': {	// interaction item
 				parse_interaction(line, &mob->interactions, buf2);
 				break;

@@ -581,6 +581,27 @@ Usage:  exits
 Gives you a list of the obvious exits from your location. This command is
 only useful indoors, because on the world map all directions are exits.
 #
+FACTION FACTIONS
+
+Usage:  factions [name]
+
+Factions are groups of NPCs and adventures with whom players can gain or lose
+reputation. The consequences of higher or lower reputation depend on the
+specific adventures where you find them.
+
+You can see information about any faction by using its name with this command.
+
+Reputation levels and values:
+  &RDespised&0  -100
+  &rHated&0  -75
+  &oLoathed&0  -30
+  &yDisliked&0  -10
+  &tNeutral&0  0
+  &cLiked&0  10
+  &aEsteemed&0  30
+  &gVenerated&0  75
+  &gRevered&0  100
+#
 FIGHTMESSAGES "FIGHT MESSAGES" FMESSAGES "FIGHT SPAM" "COMBAT SPAM" "COMBAT MESSAGES"
 
 Usage:  fightmessages [type]
