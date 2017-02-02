@@ -1134,6 +1134,7 @@ struct set_struct {
 		{ "bonusexp", LVL_START_IMM, PC, NUMBER },
 		{ "grants",		LVL_CIMPL,	PC,		MISC },
 		{ "skill", LVL_START_IMM, PC, MISC },
+		{ "faction", LVL_START_IMM, PC, MISC },
 
 		{ "strength",	LVL_START_IMM,	BOTH,	NUMBER },
 		{ "dexterity",	LVL_START_IMM,	BOTH,	NUMBER },
@@ -1538,6 +1539,65 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			}
 			increase_coins(vict, type, amt);
 		}
+	}
+	else if SET_CASE("faction") {
+		void update_reputations(char_data *ch);
+		
+		int min_idx, min_rep, max_idx, max_rep, new_rep, new_val = 0;
+		char fct_arg[MAX_INPUT_LENGTH], *fct_val;
+		struct player_faction_data *pfd;
+		faction_data *fct;
+		
+		// usage: set <player> faction <name/vnum> <rep/value>
+		fct_val = any_one_word(val_arg, fct_arg);
+		skip_spaces(&fct_val);
+		
+		if (!*fct_arg || !*fct_val) {
+			msg_to_char(ch, "Usage: set <player> faction <name/vnum> <rep/value>\r\n");
+			return 0;
+		}
+		if (!(fct = find_faction(fct_arg)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
+			msg_to_char(ch, "Unknown faction '%s'.\r\n", fct_arg);
+			return 0;
+		}
+		
+		// helper data
+		min_idx = rep_const_to_index(FCT_MIN_REP(fct));
+		min_rep = (min_idx != NOTHING) ? reputation_levels[min_idx].value : MIN_REPUTATION;
+		max_idx = rep_const_to_index(FCT_MAX_REP(fct));
+		max_rep = (max_idx != NOTHING) ? reputation_levels[max_idx].value : MAX_REPUTATION;
+		
+		// parse val arg
+		if (isdigit(*fct_val)) {
+			new_val = atoi(fct_val);
+		}
+		else if ((new_rep = get_reputation_by_name(fct_val)) == NOTHING) {
+			msg_to_char(ch, "Invalid reputation level '%s'.\r\n", fct_val);
+			return 0;
+		}
+		else {
+			new_val = reputation_levels[rep_const_to_index(new_rep)].value;
+		}
+		
+		// bounds check
+		if (new_val < min_rep || new_val > max_rep) {
+			msg_to_char(ch, "You can't set the reputation to that level. That faction has a range of %d-%d.\r\n", min_rep, max_rep);
+			return 0;
+		}
+		
+		// load data
+		if (!(pfd = get_reputation(vict, FCT_VNUM(fct), TRUE))) {
+			msg_to_char(ch, "Unable to set reputation for that player and faction.\r\n");
+			return 0;
+		}
+		
+		// and go
+		pfd->value = new_val;
+		update_reputations(vict);
+		pfd = get_reputation(vict, FCT_VNUM(fct), TRUE);
+		new_rep = rep_const_to_index(pfd->rep);
+		
+		sprintf(output, "%s's reputation with %s set to %s / %d", GET_NAME(vict), FCT_NAME(fct), reputation_levels[new_rep].name, pfd->value);
 	}
 	else if SET_CASE("skill") {
 		char skillname[MAX_INPUT_LENGTH], *skillval;

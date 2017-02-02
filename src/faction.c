@@ -113,7 +113,7 @@ faction_data *find_faction_by_name(char *name) {
 			// perfect match
 			return fct;
 		}
-		if (!partial && is_multiword_abbrev(name, FCT_NAME(fct))) {
+		if (!partial && multi_isname(name, FCT_NAME(fct))) {
 			// probable match
 			partial = fct;
 		}

@@ -733,6 +733,7 @@ age            BOTH    NUMBER       Player age
 bonustrait     PC      MISC         Set bonus traits for player
 bonusexp       PC      NUMBER       Set daily bonus exp for the player
 coins          PC      MISC         Sets coins on-hand for player
+faction        PC      MISC         Change faction reputations (SET FACTION)
 grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
 lastname       PC      STRING       Player's last name, or off
@@ -777,6 +778,15 @@ wizhide        PC      BINARY       Turns on/off wizhide
 scale          NPC     NUMBER       Rescales a mob to a given level
 
 See also: GRANT, STAT
+#d
+"SET FACTION"
+
+Usage:  set [file] <player> faction <name/vnum> <rep/value>
+
+This allows you to change a player's faction reputation to any reputation
+level (e.g. "Revered") or specific point value.
+
+See also: FACTION, SHOW FACTIONS
 #d
 SHOW
 
@@ -846,7 +856,7 @@ Usage:  show factions <player> [filter]
 This command shows you all of a player's faction reputation levels. It can
 be filtered by name.
 
-You can change those levels using: set <player> faction <vnum> <rep/value>
+See also: FACTION, SET FACTION
 #e
 "SHOW IGNORING"
 
