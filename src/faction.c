@@ -538,6 +538,140 @@ int compare_reptuation(int rep_a, int rep_b) {
 
 
 /**
+* Causes basic reputation gain or loss.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The faction to gain/lose rep with.
+* @param int amount The value to gain/lose (bounded by rep limits).
+* @param bool cascade If TRUE, will call this function recursively on shared-/inverse-gain factions.
+*/
+void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool cascade) {
+	int idx, min_idx, max_idx, min_rep, max_rep, old_val, old_rep;
+	faction_data *fct, *iter, *next_iter;
+	struct player_faction_data *pfd;
+	struct faction_relation *rel;
+	
+	if (IS_NPC(ch) || amount == 0) {
+		return;
+	}
+	if (!(fct = find_faction_by_vnum(vnum)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
+		return;	// faction doesn't exist?
+	}
+	if (!(pfd = get_reputation(ch, vnum, TRUE))) {
+		return;	// unable to get a rep entry?
+	}
+	
+	// check for exclusions
+	LL_FOREACH(FCT_RELATIONS(fct), rel) {
+		if (IS_SET(rel->flags, FCTR_MUTUALLY_EXCLUSIVE) && amount > 0 && get_reputation_value(ch, rel->vnum) > 0) {
+			return;	// can't gain while it's positive
+		}
+	}
+	
+	// safe to attempt to cascade NOW (before we cancel out due to min/max)
+	if (cascade) {
+		HASH_ITER(hh, faction_table, iter, next_iter) {
+			if (iter == fct || FACTION_FLAGGED(iter, FCT_IN_DEVELOPMENT)) {
+				continue;
+			}
+			
+			LL_FOREACH(FCT_RELATIONS(iter), rel) {
+				if (rel->ptr != fct) {
+					continue;
+				}
+				
+				// ok we have a relationship
+				if (IS_SET(rel->flags, FCTR_SHARED_GAINS)) {
+					gain_reputation(ch, rel->vnum, amount, FALSE);
+				}
+				if (IS_SET(rel->flags, FCTR_INVERSE_GAINS)) {
+					gain_reputation(ch, rel->vnum, -amount, FALSE);
+				}
+			}
+		}
+	}
+	
+	// bounds
+	min_idx = rep_const_to_index(FCT_MIN_REP(fct));
+	min_rep = (min_idx != NOTHING) ? reputation_levels[min_idx].value : MIN_REPUTATION;
+	if (amount < 0 && pfd->value <= MIN_REPUTATION) {
+		return;	// at min
+	}
+	max_idx = rep_const_to_index(FCT_MAX_REP(fct));
+	max_rep = (max_idx != NOTHING) ? reputation_levels[max_idx].value : MAX_REPUTATION;
+	if (amount > 0 && pfd->value >= MAX_REPUTATION) {
+		return;	// at max
+	}
+	
+	// seems ok
+	old_val = pfd->value;
+	old_rep = pfd->rep;
+	SAFE_ADD(pfd->value, amount, MIN_REPUTATION, MAX_REPUTATION, FALSE);
+	
+	// detect new rep now
+	idx = rep_const_to_index(pfd->rep);
+	if (amount > 0) {
+		if (pfd->value > 0 && pfd->value >= reputation_levels[idx+1].value) {
+			pfd->rep = reputation_levels[idx+1].type;
+		}
+		else if (pfd->value < 0 && pfd->value > reputation_levels[idx].value) {
+			pfd->rep = reputation_levels[idx+1].type;
+		}
+	}
+	else if (amount < 0) {
+		if (pfd->value > 0 && pfd->value < reputation_levels[idx].value) {
+			pfd->rep = reputation_levels[idx-1].type;
+		}
+		else if (pfd->value < 0 && pfd->value <= reputation_levels[idx-1].value) {
+			pfd->rep = reputation_levels[idx-1].type;
+		}
+	}
+	
+	// and message
+	if (!cascade) {
+		idx = rep_const_to_index(pfd->rep);
+		amount = pfd->value - old_val;
+		msg_to_char(ch, "%sYou %s %d reputation with %s.\t0\r\n", reputation_levels[idx].color, (amount > 0 ? "gain" : "lose"), amount, FCT_NAME(fct));
+		if (old_rep != pfd->rep) {
+			msg_to_char(ch, "%sYou are now %s with %s.\t0\r\n", reputation_levels[idx].color, reputation_levels[idx].name, FCT_NAME(fct));
+		}
+	}
+}
+
+
+/**
+* Finds a player's reputation data for a faction. This will attempt (not
+* guarantee) to create an entry if it doesn't exist, if desired.
+*
+* @param char_data *ch The player.
+* @param any_vnum A faction vnum.
+* @param bool create If TRUE, will attempt to create the entry.
+* @return struct player_faction_data* The player's faction rep entry, if it exists.
+*/
+struct player_faction_data *get_reputation(char_data *ch, any_vnum vnum, bool create) {
+	struct player_faction_data *pfd;
+	faction_data *fct;
+	int idx;
+	
+	if (IS_NPC(ch)) {
+		return NULL;	// only players have this
+	}
+	
+	HASH_FIND_INT(faction_table, &vnum, pfd);
+	if (!pfd && create && (fct = find_faction_by_vnum(vnum))) {
+		CREATE(pfd, struct player_faction_data, 1);
+		pfd->vnum = vnum;
+		idx = rep_const_to_index(FCT_STARTING_REP(fct));
+		pfd->rep = idx != NOTHING ? FCT_STARTING_REP(fct) : REP_NEUTRAL;
+		pfd->value = (idx != NOTHING ? reputation_levels[idx].value : 0);
+		HASH_ADD_INT(GET_FACTIONS(ch), vnum, pfd);
+	}
+	
+	return pfd;
+}
+
+
+/**
 * Finds a reputation const by name.
 *
 * @param char *name The name to find.
@@ -556,6 +690,19 @@ int get_reputation_by_name(char *name) {
 	}
 	
 	return partial != NOTHING ? reputation_levels[partial].type : NOTHING;
+}
+
+
+/**
+* Fetches a player's reputation value with a given faction, if they have one.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The faction's vnum.
+* @return int The reputation value, or 0 if no reputation exists.
+*/
+int get_reputation_value(char_data *ch, any_vnum vnum) {
+	struct player_faction_data *pfd = get_reputation(ch, vnum, FALSE);
+	return pfd ? pfd->value : 0;
 }
 
 
@@ -588,6 +735,49 @@ int rep_const_to_index(int rep_const) {
 	}
 	
 	return NOTHING;	// not found
+}
+
+
+/**
+* Updates all of a player's REP_ consts on their factions.
+*
+* @param char_data *ch The player.
+*/
+void update_reputations(char_data *ch) {
+	struct player_faction_data *pfd, *next_pfd;
+	int iter, min_idx, max_idx;
+	faction_data *fct;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_ITER(hh, GET_FACTIONS(ch), pfd, next_pfd) {
+		if (!(fct = find_faction_by_vnum(pfd->vnum)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
+			HASH_DEL(GET_FACTIONS(ch), pfd);
+			free(pfd);
+			continue;
+		}
+		
+		min_idx = rep_const_to_index(FCT_MIN_REP(fct));
+		max_idx = rep_const_to_index(FCT_MAX_REP(fct));
+		pfd->rep = FCT_STARTING_REP(fct);	// default
+		
+		for (iter = min_idx; iter <= max_idx; ++iter) {
+			if (reputation_levels[iter].value == pfd->value) {
+				pfd->rep = reputation_levels[iter].type;
+				break;
+			}
+			else if (reputation_levels[iter].value < 0 && pfd->value <= reputation_levels[iter].value) {
+				pfd->rep = reputation_levels[iter].type;
+				break;
+			}
+			else if (reputation_levels[iter].value > 0 && pfd->value >= reputation_levels[iter].value) {
+				pfd->rep = reputation_levels[iter].type;
+				break;
+			}
+		}
+	}
 }
 
 
@@ -632,6 +822,7 @@ faction_data *create_faction_table_entry(any_vnum vnum) {
 void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	faction_data *fct, *iter, *next_iter;
 	char_data *mob, *next_mob, *chiter;
+	descriptor_data *desc;
 	
 	if (!(fct = find_faction_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such faction %d.\r\n", vnum);
@@ -646,6 +837,9 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 		if (IS_NPC(chiter) && MOB_FACTION(chiter) == fct) {
 			MOB_FACTION(chiter) = NULL;
 		}
+		else if (!IS_NPC(chiter)) {
+			update_reputations(chiter);
+		}
 	}
 	
 	// remove from mobs
@@ -655,7 +849,17 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 			save_library_file_for_vnum(DB_BOOT_MOB, GET_MOB_VNUM(mob));
 		}
 	}
-
+	
+	// remove from active editors
+	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (GET_OLC_MOBILE(desc)) {
+			if (MOB_FACTION(GET_OLC_MOBILE(desc)) == fct) {
+				MOB_FACTION(GET_OLC_MOBILE(desc)) = NULL;
+				msg_to_char(desc->character, "The allegiance faction for the mob you're editing was deleted.\r\n");
+			}
+		}
+	}
+	
 	// save index and faction file now
 	save_index(DB_BOOT_FCT);
 	save_library_file_for_vnum(DB_BOOT_FCT, vnum);
@@ -676,6 +880,7 @@ void save_olc_faction(descriptor_data *desc) {
 	faction_data *proto, *fct = GET_OLC_FACTION(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
 	UT_hash_handle hh, sorted;
+	char_data *chiter;
 
 	// have a place to save it?
 	if (!(proto = find_faction_by_vnum(vnum))) {
@@ -695,7 +900,7 @@ void save_olc_faction(descriptor_data *desc) {
 		}
 		FCT_NAME(fct) = str_dup(default_faction_name);
 	}
-
+	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
 	sorted = proto->sorted_hh;
@@ -709,6 +914,14 @@ void save_olc_faction(descriptor_data *desc) {
 
 	// ... and re-sort
 	HASH_SRT(sorted_hh, sorted_factions, sort_factions_by_data);
+	
+	// update live players
+	LL_FOREACH(character_list, chiter) {
+		if (IS_NPC(chiter)) {
+			continue;
+		}
+		update_reputations(chiter);
+	}
 }
 
 

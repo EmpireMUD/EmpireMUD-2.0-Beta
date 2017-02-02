@@ -3071,6 +3071,7 @@ struct player_special_data {
 	struct offer_data *offers;	// various offers for do_accept/reject
 	struct player_slash_channel *slash_channels;	// channels the player is on
 	struct slash_channel *load_slash_channels;	// temporary storage between load and join
+	struct player_faction_data *factions;	// hash table of factions
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered
@@ -3725,6 +3726,15 @@ struct faction_reputation_type {
 	char *name;
 	char *color;	// & or \t color code
 	int value;	// points total a player must be at for this
+};
+
+
+// for hash table of player faction levels
+struct player_faction_data {
+	any_vnum vnum;	// faction vnum
+	int value;	// reputation points
+	int rep;	// REP_ const
+	UT_hash_handle hh;	// GET_FACTIONS(ch) hash
 };
 
 
