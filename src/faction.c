@@ -1038,13 +1038,15 @@ void do_stat_faction(char_data *ch, faction_data *fct) {
 void get_faction_relation_display(struct faction_relation *list, char *save_buffer) {
 	struct faction_relation *iter, *next_iter;
 	char lbuf[MAX_STRING_LENGTH];
-	int count = 0;
 	
 	*save_buffer = '\0';
 	
 	HASH_ITER(hh, list, iter, next_iter) {
 		sprintbit(iter->flags, relationship_flags, lbuf, TRUE);
-		sprintf(save_buffer + strlen(save_buffer), "%2d. [%5d] %s - %s\r\n", ++count, iter->vnum, FCT_NAME(iter->ptr), lbuf);
+		sprintf(save_buffer + strlen(save_buffer), " [%5d] %s - %s\r\n", iter->vnum, FCT_NAME(iter->ptr), lbuf);
+	}
+	if (!list) {
+		strcpy(save_buffer, " none\r\n");
 	}
 }
 
