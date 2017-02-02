@@ -594,12 +594,12 @@ void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool cascade) {
 	// bounds
 	min_idx = rep_const_to_index(FCT_MIN_REP(fct));
 	min_rep = (min_idx != NOTHING) ? reputation_levels[min_idx].value : MIN_REPUTATION;
-	if (amount < 0 && pfd->value <= MIN_REPUTATION) {
+	if (amount < 0 && pfd->value <= min_rep) {
 		return;	// at min
 	}
 	max_idx = rep_const_to_index(FCT_MAX_REP(fct));
 	max_rep = (max_idx != NOTHING) ? reputation_levels[max_idx].value : MAX_REPUTATION;
-	if (amount > 0 && pfd->value >= MAX_REPUTATION) {
+	if (amount > 0 && pfd->value >= max_rep) {
 		return;	// at max
 	}
 	
