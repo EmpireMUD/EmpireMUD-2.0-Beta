@@ -592,10 +592,10 @@ void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, boo
 			HASH_FIND_INT(FCT_RELATIONS(iter), &FCT_VNUM(fct), rel);
 			if (rel) {
 				if (IS_SET(rel->flags, FCTR_SHARED_GAINS)) {
-					gain_reputation(ch, rel->vnum, amount, is_kill, FALSE);
+					gain_reputation(ch, FCT_VNUM(iter), amount, is_kill, FALSE);
 				}
 				if (IS_SET(rel->flags, FCTR_INVERSE_GAINS)) {
-					gain_reputation(ch, rel->vnum, -amount, is_kill, FALSE);
+					gain_reputation(ch, FCT_VNUM(iter), -amount, is_kill, FALSE);
 				}
 			}
 		}
@@ -646,7 +646,7 @@ void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, boo
 	if (cascade) {
 		idx = rep_const_to_index(pfd->rep);
 		amount = pfd->value - old_val;
-		msg_to_char(ch, "%sYou %s %d reputation with %s.\t0\r\n", reputation_levels[idx].color, (amount > 0 ? "gain" : "lose"), amount, FCT_NAME(fct));
+		msg_to_char(ch, "%sYou %s %d reputation with %s.\t0\r\n", reputation_levels[idx].color, (amount > 0 ? "gain" : "lose"), ABSOLUTE(amount), FCT_NAME(fct));
 		if (old_rep != pfd->rep) {
 			msg_to_char(ch, "%sYou are now %s with %s.\t0\r\n", reputation_levels[idx].color, reputation_levels[idx].name, FCT_NAME(fct));
 		}
