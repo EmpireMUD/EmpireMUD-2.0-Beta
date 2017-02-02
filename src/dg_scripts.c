@@ -2883,7 +2883,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							
 							comma_args(subfield, arg1, arg2);
 							if (*arg1 && *arg2 && (fct = find_faction(arg1)) && (amount = atoi(arg2)) != 0) {
-								gain_reputation(c, FCT_VNUM(fct), amount, TRUE);
+								gain_reputation(c, FCT_VNUM(fct), amount, FALSE, TRUE);
 								snprintf(str, slen, "1");
 							}
 						}

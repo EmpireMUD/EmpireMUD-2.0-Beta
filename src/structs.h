@@ -911,7 +911,7 @@ typedef struct vehicle_data vehicle_data;
 
 // FCT_x: Faction flags
 #define FCT_IN_DEVELOPMENT  BIT(0)	// a. not live
-#define FCT_GAINS_FROM_KILLS  BIT(1)	// b. killing mobs affects faction rating
+#define FCT_REP_FROM_KILLS  BIT(1)	// b. killing mobs affects faction rating
 
 
 // FCTR_x: Relationship flags
@@ -3702,7 +3702,7 @@ struct faction_data {
 	int max_rep;	// REP_ they cap at, positive
 	int min_rep;	// REP_ they cap at, negative
 	int starting_rep;	// REP_ initial reputation for players
-	struct faction_relation *relations;	// linked list
+	struct faction_relation *relations;	// hash table
 	
 	// lists
 	UT_hash_handle hh;	// faction_table hash handle
@@ -3716,7 +3716,7 @@ struct faction_relation {
 	bitvector_t flags;	// FCTR_ flags
 	faction_data *ptr;	// quick reference
 	
-	struct faction_relation *next;	// LL
+	UT_hash_handle hh;	// fct->relations hash handle
 };
 
 

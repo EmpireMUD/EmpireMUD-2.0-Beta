@@ -1448,7 +1448,7 @@ const char *trade_overunder[] = {
 // FCT_x: faction flags
 const char *faction_flags[] = {
 	"IN-DEVELOPMENT",
-	"GAINS-FROM-KILLS",
+	"REP-FROM-KILLS",
 	"\n"
 };
 

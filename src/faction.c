@@ -196,6 +196,7 @@ char *list_one_faction(faction_data *fct, bool detail) {
 void olc_search_faction(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	faction_data *fct = find_faction_by_vnum(vnum);
+	faction_data *iter, *next_iter, *find;
 	char_data *mob, *next_mob;
 	int size, found;
 	
@@ -206,6 +207,15 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of faction %d (%s):\r\n", vnum, FCT_NAME(fct));
+	
+	// check other factions
+	HASH_ITER(hh, faction_table, iter, next_iter) {
+		HASH_FIND_INT(FCT_RELATIONS(iter), &FCT_VNUM(fct), find);
+		if (find) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "FCT [%5d] %s\r\n", FCT_VNUM(iter), FCT_NAME(iter));
+		}
+	}
 	
 	// check mob allegiance
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
@@ -287,11 +297,11 @@ void check_and_link_faction_relations(void) {
 	faction_data *fct, *next_fct;
 	
 	HASH_ITER(hh, faction_table, fct, next_fct) {
-		LL_FOREACH_SAFE(FCT_RELATIONS(fct), rel, next_rel) {
+		HASH_ITER(hh, FCT_RELATIONS(fct), rel, next_rel) {
 			rel->ptr = find_faction_by_vnum(rel->vnum);
 			
 			if (!rel->ptr) {
-				LL_DELETE(FCT_RELATIONS(fct), rel);
+				HASH_DEL(FCT_RELATIONS(fct), rel);
 				free(rel);
 			}
 		}
@@ -313,32 +323,31 @@ void clear_faction(faction_data *fct) {
 
 
 /**
-* Duplicates a list of faction relationships, for editing.
+* Duplicates a hash table of faction relationships, for editing.
 *
-* @param struct faction_relation *input The head of the list to copy.
-* @return struct faction_relation* The copied list.
+* @param struct faction_relation *input The hash table to copy.
+* @return struct faction_relation* The copied hash.
 */
 struct faction_relation *copy_faction_relations(struct faction_relation *input) {
-	struct faction_relation *el, *iter, *list = NULL;
+	struct faction_relation *el, *iter, *next_iter, *hash = NULL;
 	
-	LL_FOREACH(input, iter) {
+	HASH_ITER(hh, input, iter, next_iter) {
 		CREATE(el, struct faction_relation, 1);
 		*el = *iter;
-		el->next = NULL;
-		LL_APPEND(list, el);
+		HASH_ADD_INT(hash, vnum, el);
 	}
 	
-	return list;
+	return hash;
 }
 
 
 /**
-* @param struct faction_relation *list Frees the memory for this list.
+* @param struct faction_relation *hash Frees the memory for this hash table.
 */
-void free_faction_relations(struct faction_relation *list) {
+void free_faction_relations(struct faction_relation *hash) {
 	struct faction_relation *tmp, *next;
 	
-	LL_FOREACH_SAFE(list, tmp, next) {
+	HASH_ITER(hh, hash, tmp, next) {
 		free(tmp);
 	}
 }
@@ -430,10 +439,14 @@ void parse_faction(FILE *fl, any_vnum vnum) {
 					exit(1);
 				}
 				
-				CREATE(rel, struct faction_relation, 1);
+				HASH_FIND_INT(FCT_RELATIONS(fct), &int_in[0], rel);
+				if (!rel) {
+					CREATE(rel, struct faction_relation, 1);
+				}
+				
 				rel->vnum = int_in[0];
 				rel->flags = asciiflag_conv(str_in);
-				LL_APPEND(FCT_RELATIONS(fct), rel);
+				HASH_ADD_INT(FCT_RELATIONS(fct), vnum, rel);
 				break;
 			}
 			
@@ -477,7 +490,7 @@ void write_faction_index(FILE *fl) {
 * @param faction_data *fct The thing to save.
 */
 void write_faction_to_file(FILE *fl, faction_data *fct) {
-	struct faction_relation *rel;
+	struct faction_relation *rel, *next_rel;
 	char temp[MAX_STRING_LENGTH];
 	
 	if (!fl || !fct) {
@@ -502,7 +515,7 @@ void write_faction_to_file(FILE *fl, faction_data *fct) {
 	fprintf(fl, "%d %d %d\n", FCT_MIN_REP(fct), FCT_MAX_REP(fct), FCT_STARTING_REP(fct));
 	
 	// 'R': relations
-	LL_FOREACH(FCT_RELATIONS(fct), rel) {
+	HASH_ITER(hh, FCT_RELATIONS(fct), rel, next_rel) {
 		fprintf(fl, "R %d %s\n", rel->vnum, bitv_to_alpha(rel->flags));
 	}
 	
@@ -543,13 +556,14 @@ int compare_reptuation(int rep_a, int rep_b) {
 * @param char_data *ch The player.
 * @param any_vnum vnum The faction to gain/lose rep with.
 * @param int amount The value to gain/lose (bounded by rep limits).
+* @param bool is_kill If TRUE, gains can be toggled by faction flags.
 * @param bool cascade If TRUE, will call this function recursively on shared-/inverse-gain factions.
 */
-void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool cascade) {
+void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, bool cascade) {
 	int idx, min_idx, max_idx, min_rep, max_rep, old_val, old_rep;
+	struct faction_relation *rel, *next_rel;
 	faction_data *fct, *iter, *next_iter;
 	struct player_faction_data *pfd;
-	struct faction_relation *rel;
 	
 	if (IS_NPC(ch) || amount == 0) {
 		return;
@@ -562,7 +576,7 @@ void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool cascade) {
 	}
 	
 	// check for exclusions
-	LL_FOREACH(FCT_RELATIONS(fct), rel) {
+	HASH_ITER(hh, FCT_RELATIONS(fct), rel, next_rel) {
 		if (IS_SET(rel->flags, FCTR_MUTUALLY_EXCLUSIVE) && amount > 0 && get_reputation_value(ch, rel->vnum) > 0) {
 			return;	// can't gain while it's positive
 		}
@@ -575,20 +589,21 @@ void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool cascade) {
 				continue;
 			}
 			
-			LL_FOREACH(FCT_RELATIONS(iter), rel) {
-				if (rel->ptr != fct) {
-					continue;
-				}
-				
-				// ok we have a relationship
+			HASH_FIND_INT(FCT_RELATIONS(iter), &FCT_VNUM(fct), rel);
+			if (rel) {
 				if (IS_SET(rel->flags, FCTR_SHARED_GAINS)) {
-					gain_reputation(ch, rel->vnum, amount, FALSE);
+					gain_reputation(ch, rel->vnum, amount, is_kill, FALSE);
 				}
 				if (IS_SET(rel->flags, FCTR_INVERSE_GAINS)) {
-					gain_reputation(ch, rel->vnum, -amount, FALSE);
+					gain_reputation(ch, rel->vnum, -amount, is_kill, FALSE);
 				}
 			}
 		}
+	}
+	
+	// limits based on kills (do AFTER cascading)
+	if (is_kill && !FACTION_FLAGGED(fct, FCT_REP_FROM_KILLS)) {
+		return;
 	}
 	
 	// bounds
@@ -820,7 +835,7 @@ faction_data *create_faction_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_faction(char_data *ch, any_vnum vnum) {
-	faction_data *fct, *iter, *next_iter;
+	faction_data *fct, *iter, *next_iter, *find;
 	char_data *mob, *next_mob, *chiter;
 	descriptor_data *desc;
 	
@@ -842,6 +857,16 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// remove from other factions
+	HASH_ITER(hh, faction_table, iter, next_iter) {
+		HASH_FIND_INT(FCT_RELATIONS(iter), &FCT_VNUM(fct), find);
+		if (find) {
+			HASH_DEL(FCT_RELATIONS(iter), find);
+			free(find);
+			save_library_file_for_vnum(DB_BOOT_FCT, FCT_VNUM(iter));
+		}
+	}
+	
 	// remove from mobs
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		if (MOB_FACTION(mob) == fct) {
@@ -856,6 +881,14 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 			if (MOB_FACTION(GET_OLC_MOBILE(desc)) == fct) {
 				MOB_FACTION(GET_OLC_MOBILE(desc)) = NULL;
 				msg_to_char(desc->character, "The allegiance faction for the mob you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_FACTION(desc)) {
+			HASH_FIND_INT(FCT_RELATIONS(GET_OLC_FACTION(desc)), &FCT_VNUM(fct), find);
+			if (find) {
+				HASH_DEL(FCT_RELATIONS(GET_OLC_FACTION(desc)), find);
+				free(find);
+				msg_to_char(desc->character, "A related faction for the faction you're editing was deleted.\r\n");
 			}
 		}
 	}
@@ -999,13 +1032,13 @@ void do_stat_faction(char_data *ch, faction_data *fct) {
 * @param char *save_buffer A buffer to store the display to.
 */
 void get_faction_relation_display(struct faction_relation *list, char *save_buffer) {
-	struct faction_relation *iter;
+	struct faction_relation *iter, *next_iter;
 	char lbuf[MAX_STRING_LENGTH];
 	int count = 0;
 	
 	*save_buffer = '\0';
 	
-	LL_FOREACH(list, iter) {
+	HASH_ITER(hh, list, iter, next_iter) {
 		sprintbit(iter->flags, relationship_flags, lbuf, TRUE);
 		sprintf(save_buffer + strlen(save_buffer), "%2d. [%5d] %s - %s\r\n", ++count, iter->vnum, FCT_NAME(iter->ptr), lbuf);
 	}

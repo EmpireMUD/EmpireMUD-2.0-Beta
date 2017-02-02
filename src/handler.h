@@ -332,7 +332,7 @@ extern const char *config_get_string(char *key);
 
 // faction.c
 extern int compare_reptuation(int rep_a, int rep_b);
-void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool cascade);
+void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, bool cascade);
 extern struct player_faction_data *get_reputation(char_data *ch, any_vnum vnum, bool create);
 extern int get_reputation_by_name(char *name);
 extern int get_reputation_value(char_data *ch, any_vnum vnum);
