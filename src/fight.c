@@ -1130,10 +1130,17 @@ obj_data *die(char_data *ch, char_data *killer) {
 	// expand tags, if there are any
 	expand_mob_tags(ch);
 	
-	// mark killed
+	// mark killed and give faction rep
 	LL_FOREACH(MOB_TAGGED_BY(ch), tag) {
 		if ((player = is_playing(tag->idnum))) {
 			qt_kill_mob(player, ch);
+			
+			// if in same room, give faction rep
+			if (IN_ROOM(player) == IN_ROOM(ch)) {
+				if (MOB_FACTION(ch) && FACTION_FLAGGED(MOB_FACTION(ch), FCT_GAINS_FROM_KILLS)) {
+					gain_reputation(player, FCT_VNUM(MOB_FACTION(ch)), -1, TRUE);
+				}
+			}
 		}
 	}
 
