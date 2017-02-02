@@ -42,6 +42,7 @@ extern struct help_index_element *help_table;
 extern const char *item_types[];
 extern int top_of_helpt;
 extern const char *month_name[];
+extern struct faction_reputation_type reputation_levels[];
 extern const char *wear_bits[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
@@ -979,7 +980,13 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	}
 	
 	if (GET_LOYALTY(i) && !disguise) {
-		sprintf(buf, "   $E is a member of %s.", EMPIRE_NAME(GET_LOYALTY(i)));
+		sprintf(buf, "$E is a member of %s%s\t0.", EMPIRE_BANNER(GET_LOYALTY(i)), EMPIRE_NAME(GET_LOYALTY(i)));
+		act(buf, FALSE, ch, NULL, i, TO_CHAR);
+	}
+	if (IS_NPC(i) && MOB_FACTION(i)) {
+		struct player_faction_data *pfd = get_reputation(ch, FCT_VNUM(MOB_FACTION(i)), FALSE);
+		int idx = rep_const_to_index(pfd ? pfd->rep : NOTHING);
+		sprintf(buf, "$E is a member of %s%s\t0.", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(MOB_FACTION(i)));
 		act(buf, FALSE, ch, NULL, i, TO_CHAR);
 	}
 	
@@ -1964,8 +1971,6 @@ ACMD(do_examine) {
 
 
 ACMD(do_factions) {
-	extern struct faction_reputation_type reputation_levels[];
-	
 	struct player_faction_data *pfd, *next_pfd;
 	faction_data *fct;
 	int idx = NOTHING;
