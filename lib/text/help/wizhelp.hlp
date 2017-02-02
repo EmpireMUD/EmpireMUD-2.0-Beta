@@ -791,6 +791,7 @@ Mode       Level    Description
 stats      God      Shows game stats including prototypes.
 arrowtypes Immort   Shows the 'arrow type' setting for all bows and arrows.
 components Immort   Shows all items matching a component type (and flags).
+factions   Immort   Shows a player's faction levels.
 ignoring   Immort   Shows you who a player has on their ignore list.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
 notes      Immort   Show notes on a player.
@@ -837,6 +838,15 @@ If you specify any flags, all those flags must match the output.
 
 For a list of component types, see: HELP COMPONENT TYPES
 For a list of component flags, see: HELP COMPONENT FLAGS
+#e
+"SHOW FACTIONS"
+
+Usage:  show factions <player> [filter]
+
+This command shows you all of a player's faction reputation levels. It can
+be filtered by name.
+
+You can change those levels using: set <player> faction <vnum> <rep/value>
 #e
 "SHOW IGNORING"
 

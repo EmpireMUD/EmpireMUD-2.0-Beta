@@ -54,6 +54,7 @@ extern const char *genders[];
 extern const char *grant_bits[];
 extern const char *island_bits[];
 extern const char *mapout_color_names[];
+extern struct faction_reputation_type reputation_levels[];
 extern const char *room_aff_bits[];
 extern const char *sector_flags[];
 extern const char *spawn_flags[];
@@ -1757,6 +1758,57 @@ SHOW(show_components) {
 		if (ch->desc) {
 			page_string(ch->desc, buf, TRUE);
 		}
+	}
+}
+
+
+SHOW(show_factions) {
+	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH];
+	struct player_faction_data *pfd, *next_pfd;
+	faction_data *fct;
+	bool file = FALSE;
+	char_data *vict;
+	int count = 0;
+	size_t size;
+	int idx;
+	
+	arg2 = any_one_arg(argument, name);
+	skip_spaces(&arg2);
+	
+	if (!(vict = find_or_load_player(name, &file))) {
+		msg_to_char(ch, "No player by that name.\r\n");
+	}
+	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else {
+		size = snprintf(buf, sizeof(buf), "%s's factions:\r\n", GET_NAME(vict));
+		HASH_ITER(hh, GET_FACTIONS(vict), pfd, next_pfd) {
+			if (size + 10 >= sizeof(buf)) {
+				break;	// out of room
+			}
+			if (!(fct = find_faction_by_vnum(pfd->vnum))) {
+				continue;
+			}
+			if (*arg2 && !multi_isname(arg2, FCT_NAME(fct))) {
+				continue;	// filter
+			}
+			
+			++count;
+			idx = rep_const_to_index(pfd->rep);
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s %s(%s / %d)\t0\r\n", pfd->vnum, FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value);
+		}
+		
+		if (!count) {
+			strcat(buf, " none\r\n");
+		}
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+	
+	if (file) {
+		free_char(vict);
 	}
 }
 
@@ -6371,6 +6423,7 @@ ACMD(do_show) {
 		{ "components", LVL_START_IMM, show_components },
 		{ "quests", LVL_START_IMM, show_quests },
 		{ "uses", LVL_START_IMM, show_uses },
+		{ "factions", LVL_START_IMM, show_factions },
 
 		// last
 		{ "\n", 0, NULL }
