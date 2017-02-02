@@ -1741,6 +1741,7 @@ typedef struct vehicle_data vehicle_data;
 #define QR_SKILL_EXP  4
 #define QR_SKILL_LEVELS  5
 #define QR_QUEST_CHAIN  6
+#define QR_REPUTATION  7
 
 
 // QT_x: quest tracker types (conditions and pre-reqs)
@@ -1760,6 +1761,8 @@ typedef struct vehicle_data vehicle_data;
 #define QT_VISIT_ROOM_TEMPLATE  13
 #define QT_VISIT_SECTOR  14
 #define QT_HAVE_ABILITY  15
+#define QT_REP_OVER  16
+#define QT_REP_UNDER  17
 
 
 // QT_AMT_x: How quest trackers are displayed for different QT_ types

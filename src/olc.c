@@ -163,6 +163,7 @@ OLC_MODULE(cropedit_ymin);
 // faction modules
 OLC_MODULE(fedit_description);
 OLC_MODULE(fedit_flags);
+OLC_MODULE(fedit_matchrelations);
 OLC_MODULE(fedit_maxreputation);
 OLC_MODULE(fedit_minreputation);
 OLC_MODULE(fedit_name);
@@ -586,6 +587,7 @@ const struct olc_command_data olc_data[] = {
 	// faction commands
 	{ "description", fedit_description, OLC_FACTION, OLC_CF_EDITOR },
 	{ "flags", fedit_flags, OLC_FACTION, OLC_CF_EDITOR },
+	{ "matchrelations", fedit_matchrelations, OLC_FACTION, OLC_CF_EDITOR },
 	{ "maxreputation", fedit_maxreputation, OLC_FACTION, OLC_CF_EDITOR },
 	{ "minreputation", fedit_minreputation, OLC_FACTION, OLC_CF_EDITOR },
 	{ "name", fedit_name, OLC_FACTION, OLC_CF_EDITOR },

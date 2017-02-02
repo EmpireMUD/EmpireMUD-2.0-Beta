@@ -1172,6 +1172,44 @@ OLC_MODULE(fedit_flags) {
 }
 
 
+OLC_MODULE(fedit_matchrelations) {
+	faction_data *fct = GET_OLC_FACTION(ch->desc), *iter, *next_iter;
+	struct faction_relation *find, *rel;
+	bool found = FALSE;
+	
+	HASH_ITER(hh, faction_table, iter, next_iter) {
+		if (FCT_VNUM(iter) == FCT_VNUM(fct)) {
+			continue;
+		}
+		
+		// find us
+		HASH_FIND_INT(FCT_RELATIONS(iter), &FCT_VNUM(fct), find);
+		if (!find) {
+			continue;
+		}
+		
+		// our entry
+		HASH_FIND_INT(FCT_RELATIONS(fct), &FCT_VNUM(iter), rel);
+		if (!rel) {
+			CREATE(rel, struct faction_relation, 1);
+			rel->vnum = FCT_VNUM(iter);
+			rel->ptr = iter;
+			HASH_ADD_INT(FCT_RELATIONS(fct), vnum, rel);
+		}
+		
+		// copy
+		rel->flags = find->flags;
+		sprintbit(rel->flags, relationship_flags, buf, TRUE);
+		msg_to_char(ch, "Matched [%5d] %s: %s\r\n", FCT_VNUM(iter), FCT_NAME(iter), buf);
+		found = TRUE;
+	}
+	
+	if (!found) {
+		msg_to_char(ch, "No relations to match.\r\n");
+	}
+}
+
+
 OLC_MODULE(fedit_maxreputation) {
 	faction_data *fct = GET_OLC_FACTION(ch->desc);
 	int rep, idx;

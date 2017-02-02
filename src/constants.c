@@ -2308,6 +2308,7 @@ const char *quest_reward_types[] = {
 	"SKILL-EXP",
 	"SKILL-LEVELS",	// 5
 	"QUEST-CHAIN",
+	"REPUTATION",
 	"\n",
 };
 
@@ -2330,6 +2331,8 @@ const char *quest_tracker_types[] = {
 	"VISIT-ROOM-TEMPLATE",
 	"VISIT-SECTOR",
 	"HAVE-ABILITY",	// 15
+	"REP-OVER",
+	"REP-UNDER",
 	"\n",
 };
 
@@ -2352,6 +2355,8 @@ const bool quest_tracker_amt_type[] = {
 	QT_AMT_NONE,	// visit rmt
 	QT_AMT_NONE,	// visit sect
 	QT_AMT_NONE,	// have ability
+	QT_AMT_NONE,	// faction-over
+	QT_AMT_NONE,	// faction-under
 };
 
 
