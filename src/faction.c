@@ -1191,8 +1191,78 @@ OLC_MODULE(fedit_name) {
 
 
 OLC_MODULE(fedit_relation) {
-	// faction_data *fct = GET_OLC_FACTION(ch->desc);
-	// TODO
+	char which_arg[MAX_INPUT_LENGTH], cmd_arg[MAX_INPUT_LENGTH], more_args[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	faction_data *fct = GET_OLC_FACTION(ch->desc), *other;
+	struct faction_relation *rel;
+	
+	// .rel <name/vnum> [flags | delete] [which flags]
+	// .rel <name/vnum> -> shows status and mutual status?
+	argument = any_one_word(argument, which_arg);
+	half_chop(argument, cmd_arg, more_args);
+	
+	if (!*which_arg) {
+		msg_to_char(ch, ".relation <name/vnum> [flags | delete] [which flags]\r\n");
+	}
+	else if (!(other = find_faction(which_arg))) {
+		msg_to_char(ch, "Unknown faction '%s'.\r\n", which_arg);
+	}
+	else if (FCT_VNUM(other) == FCT_VNUM(fct)) {
+		msg_to_char(ch, "Factions aren't allowed to have relations with themselves.\r\n");
+	}
+	else if (!*cmd_arg) {
+		// show status: us to them
+		HASH_FIND_INT(FCT_RELATIONS(fct), &FCT_VNUM(other), rel);
+		if (rel) {
+			sprintbit(rel->flags, relationship_flags, buf, TRUE);
+			msg_to_char(ch, "%s -> %s: %s\r\n", FCT_NAME(fct), FCT_NAME(other), buf);
+		}
+		else {
+			msg_to_char(ch, "%s -> %s: no relations\r\n", FCT_NAME(fct), FCT_NAME(other));
+		}
+		
+		// show status: them
+		HASH_FIND_INT(FCT_RELATIONS(other), &FCT_VNUM(fct), rel);
+		if (rel) {
+			sprintbit(rel->flags, relationship_flags, buf, TRUE);
+			msg_to_char(ch, "%s -> %s: %s\r\n", FCT_NAME(other), FCT_NAME(fct), buf);
+		}
+		else {
+			msg_to_char(ch, "%s -> %s: no relations\r\n", FCT_NAME(other), FCT_NAME(fct));
+		}
+	}
+	else if (is_abbrev(cmd_arg, "delete") || is_abbrev(cmd_arg, "remove")) {
+		// delete one
+		HASH_FIND_INT(FCT_RELATIONS(fct), &FCT_VNUM(other), rel);
+		if (!rel) {
+			msg_to_char(ch, "There are no relations with that faction.\r\n");
+		}
+		else {
+			HASH_DEL(FCT_RELATIONS(fct), rel);
+			free(rel);
+			msg_to_char(ch, "You delete the relations with %s.\r\n", FCT_NAME(other));
+		}
+	}
+	else if (is_abbrev(cmd_arg, "flags")) {
+		// find/add relations
+		HASH_FIND_INT(FCT_RELATIONS(fct), &FCT_VNUM(other), rel);
+		if (!rel) {
+			CREATE(rel, struct faction_relation, 1);
+			rel->vnum = FCT_VNUM(other);
+			rel->ptr = other;
+			HASH_ADD_INT(FCT_RELATIONS(fct), vnum, rel);
+		}
+		
+		rel->flags = olc_process_flag(ch, more_args, "relationship", NULL, relationship_flags, rel->flags);
+		
+		// remove if no flags
+		if (!rel->flags) {
+			HASH_DEL(FCT_RELATIONS(fct), rel);
+			free(rel);
+		}
+	}
+	else {
+		msg_to_char(ch, ".relation <name/vnum> [flags | delete] [which flags]\r\n");
+	}
 }
 
 
