@@ -1995,7 +1995,7 @@ ACMD(do_factions) {
 			else {
 				msg_to_char(ch, "Reputation: none\r\n");
 			}
-			msg_to_char(ch, "%s", FCT_DESCRIPTION(fct));
+			msg_to_char(ch, "%s", NULLSAFE(FCT_DESCRIPTION(fct)));
 		}
 	}
 	else {	// no arg, show all

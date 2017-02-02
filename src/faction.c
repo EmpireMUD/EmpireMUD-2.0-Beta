@@ -924,6 +924,9 @@ void save_olc_faction(descriptor_data *desc) {
 	if (FCT_NAME(proto)) {
 		free(FCT_NAME(proto));
 	}
+	if (FCT_DESCRIPTION(proto)) {
+		free(FCT_DESCRIPTION(proto));
+	}
 	free_faction_relations(FCT_RELATIONS(proto));
 	
 	// sanity
@@ -976,6 +979,7 @@ faction_data *setup_olc_faction(faction_data *input) {
 
 		// copy things that are pointers
 		FCT_NAME(new) = FCT_NAME(input) ? str_dup(FCT_NAME(input)) : NULL;
+		FCT_DESCRIPTION(new) = FCT_DESCRIPTION(input) ? str_dup(FCT_DESCRIPTION(input)) : NULL;
 		
 		// copy lists
 		FCT_RELATIONS(new) = copy_faction_relations(FCT_RELATIONS(input));
