@@ -1115,7 +1115,7 @@ void olc_show_faction(char_data *ch) {
 	sprintf(buf + strlen(buf), "<\tystartingreuptation\t0> %s\r\n", get_reputation_name(FCT_STARTING_REP(fct)));
 	
 	get_faction_relation_display(FCT_RELATIONS(fct), lbuf);
-	sprintf(buf + strlen(buf), "Relationships: <\tyrelation\t0>\r\n%s", FCT_RELATIONS(fct) ? lbuf : "");
+	sprintf(buf + strlen(buf), "Relationships: <\tyrelation\t0>, <\tymatchrelations\t0>\r\n%s", FCT_RELATIONS(fct) ? lbuf : "");
 	
 	page_string(ch->desc, buf, TRUE);
 }
