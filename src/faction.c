@@ -628,7 +628,7 @@ void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool cascade) {
 	}
 	
 	// and message
-	if (!cascade) {
+	if (cascade) {
 		idx = rep_const_to_index(pfd->rep);
 		amount = pfd->value - old_val;
 		msg_to_char(ch, "%sYou %s %d reputation with %s.\t0\r\n", reputation_levels[idx].color, (amount > 0 ? "gain" : "lose"), amount, FCT_NAME(fct));
