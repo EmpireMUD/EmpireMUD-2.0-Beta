@@ -2847,6 +2847,7 @@ SHOW(show_variables) {
 	}
 	else {
 		msg_to_char(ch, "Global Variables:\r\n");
+		check_delayed_load(plr);
 		
 		if (plr->script && plr->script->global_vars) {
 			/* currently, variable context for players is always 0, so it is */
