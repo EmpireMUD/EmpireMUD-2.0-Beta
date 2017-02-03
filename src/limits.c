@@ -395,35 +395,33 @@ void point_update_char(char_data *ch) {
 
 	// healing for NPCs -- pcs are in real_update
 	if (IS_NPC(ch)) {
-		if (GET_POS(ch) >= POS_STUNNED) {
-			if (!FIGHTING(ch) && (GET_HEALTH(ch) < GET_MAX_HEALTH(ch) || GET_MOVE(ch) < GET_MAX_MOVE(ch) || GET_MANA(ch) < GET_MAX_MANA(ch))) {
-				// verify not fighting at all
-				for (c = ROOM_PEOPLE(IN_ROOM(ch)), found = FALSE; c && !found; c = c->next_in_room) {
-					if (FIGHTING(c) == ch) {
-						found = TRUE;
-					}
+		if (GET_POS(ch) >= POS_STUNNED && !FIGHTING(ch)) {
+			// verify not fighting at all
+			for (c = ROOM_PEOPLE(IN_ROOM(ch)), found = FALSE; c && !found; c = c->next_in_room) {
+				if (FIGHTING(c) == ch) {
+					found = TRUE;
 				}
+			}
 			
+			if (!found) {
 				// not fighting for a tick? full health! (and reset tags)
-				if (!found) {
-					free_mob_tags(&MOB_TAGGED_BY(ch));
-					GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
-					GET_MOVE(ch) = GET_MAX_MOVE(ch);
-					GET_MANA(ch) = GET_MAX_MANA(ch);
-					if (GET_POS(ch) < POS_SLEEPING) {
-						GET_POS(ch) = POS_STANDING;
+				free_mob_tags(&MOB_TAGGED_BY(ch));
+				GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
+				GET_MOVE(ch) = GET_MAX_MOVE(ch);
+				GET_MANA(ch) = GET_MAX_MANA(ch);
+				if (GET_POS(ch) < POS_SLEEPING) {
+					GET_POS(ch) = POS_STANDING;
+				}
+				
+				// reset scaling if possible...
+				if (!MOB_FLAGGED(ch, MOB_NO_RESCALE)) {
+					inst = get_instance_by_id(MOB_INSTANCE_ID(ch));
+					if (!inst && IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+						inst = find_instance_by_room(IN_ROOM(ch), FALSE);
 					}
-					
-					// reset scaling if possible...
-					if (!MOB_FLAGGED(ch, MOB_NO_RESCALE)) {
-						inst = get_instance_by_id(MOB_INSTANCE_ID(ch));
-						if (!inst && IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
-							inst = find_instance_by_room(IN_ROOM(ch), FALSE);
-						}
-						// if no instance or not level-locked
-						if (!inst || inst->level <= 0) {
-							GET_CURRENT_SCALE_LEVEL(ch) = 0;
-						}
+					// if no instance or not level-locked
+					if (!inst || inst->level <= 0) {
+						GET_CURRENT_SCALE_LEVEL(ch) = 0;
 					}
 				}
 			}
