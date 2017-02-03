@@ -1842,6 +1842,7 @@ SHOW(show_factions) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else {
+		check_delayed_load(vict);
 		size = snprintf(buf, sizeof(buf), "%s's factions:\r\n", GET_NAME(vict));
 		HASH_ITER(hh, GET_FACTIONS(vict), pfd, next_pfd) {
 			if (size + 10 >= sizeof(buf)) {
