@@ -581,7 +581,7 @@ Usage:  exits
 Gives you a list of the obvious exits from your location. This command is
 only useful indoors, because on the world map all directions are exits.
 #
-FACTION FACTIONS
+FACTION FACTIONS REPUTATION "FACTION REP"
 
 Usage:  factions [name]
 

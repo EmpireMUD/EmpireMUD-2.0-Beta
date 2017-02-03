@@ -466,6 +466,11 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 			snprintf(output, sizeof(output), "%s%s", vnum, get_quest_name_by_proto(reward->vnum));
 			break;
 		}
+		case QR_REPUTATION: {
+			faction_data *fct = find_faction_by_vnum(reward->vnum);
+			snprintf(output, sizeof(output), "%s%+d rep to %s", vnum, reward->amount, (fct ? FCT_NAME(fct) : "UNKNOWN"));
+			break;
+		}
 		default: {
 			snprintf(output, sizeof(output), "%s%dx UNKNOWN", vnum, reward->amount);
 			break;
@@ -4372,7 +4377,7 @@ OLC_MODULE(qedit_rewards) {
 		// usage: rewards add <type> <amount> <vnum/type>
 		argument = any_one_arg(argument, type_arg);
 		argument = any_one_arg(argument, num_arg);
-		argument = any_one_arg(argument, vnum_arg);
+		argument = any_one_word(argument, vnum_arg);
 		
 		if (!*type_arg || !*num_arg || !isdigit(*num_arg)) {
 			msg_to_char(ch, "Usage: rewards add <type> <amount> <vnum/type>\r\n");
@@ -4453,6 +4458,18 @@ OLC_MODULE(qedit_rewards) {
 					num = 1;
 					break;
 				}
+				case QR_REPUTATION: {
+					if (!*vnum_arg) {
+						msg_to_char(ch, "Usage: rewards add reputation <amount> <faction>\r\n");
+						return;
+					}
+					if (!find_faction(vnum_arg)) {
+						msg_to_char(ch, "Invalid faction '%s'.\r\n", vnum_arg);
+						return;
+					}
+					ok = TRUE;
+					break;
+				}
 			}
 			
 			// did we find one?
@@ -4475,7 +4492,7 @@ OLC_MODULE(qedit_rewards) {
 		// usage: rewards change <number> <amount | vnum> <value>
 		argument = any_one_arg(argument, num_arg);
 		argument = any_one_arg(argument, field_arg);
-		argument = any_one_arg(argument, vnum_arg);
+		argument = any_one_word(argument, vnum_arg);
 		
 		if (!*num_arg || !isdigit(*num_arg) || !*field_arg || !*vnum_arg) {
 			msg_to_char(ch, "Usage: rewards change <number> <amount | vnum> <value>\r\n");
@@ -4559,6 +4576,14 @@ OLC_MODULE(qedit_rewards) {
 					if (quest_proto(vnum)) {
 						ok = TRUE;
 					}
+					break;
+				}
+				case QR_REPUTATION: {
+					if (!*vnum_arg || !find_faction(vnum_arg)) {
+						msg_to_char(ch, "Invalid faction '%s'.\r\n", vnum_arg);
+						return;
+					}
+					ok = TRUE;
 					break;
 				}
 			}

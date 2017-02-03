@@ -304,6 +304,10 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 				
 				break;
 			}
+			case QR_REPUTATION: {
+				gain_reputation(ch, reward->vnum, reward->amount, FALSE, TRUE);
+				break;
+			}
 		}
 	}
 	

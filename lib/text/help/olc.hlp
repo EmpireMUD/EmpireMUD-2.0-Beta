@@ -4369,6 +4369,7 @@ Available reward types:
  SKILL-LEVELS - Raise the player's skill level, if possible.
  QUEST-CHAIN - Starts a player on another quest, if they meet the pre-reqs and
     are not already on it.
+ REPUTATION - Gain/lose faction reputation.
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.
