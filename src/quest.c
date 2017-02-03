@@ -2806,7 +2806,7 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 		}
 	}
 	
-	// possible args
+	// QT_AMT_x: possible args
 	if (quest_tracker_amt_type[type] == QT_AMT_REPUTATION && find_amount) {
 		argument = any_one_arg(argument, arg);
 		if (!*arg || (*amount = get_reputation_by_name(arg)) == NOTHING) {
@@ -4387,6 +4387,7 @@ OLC_MODULE(qedit_rewards) {
 	struct quest_reward *reward, *iter, *change, *copyfrom;
 	struct quest_reward **list = &QUEST_REWARDS(quest);
 	int findtype, num, stype;
+	faction_data *fct;
 	bool found, ok;
 	any_vnum vnum;
 	
@@ -4560,10 +4561,11 @@ OLC_MODULE(qedit_rewards) {
 						msg_to_char(ch, "Usage: rewards add reputation <amount> <faction>\r\n");
 						return;
 					}
-					if (!find_faction(vnum_arg)) {
+					if (!(fct = find_faction(vnum_arg))) {
 						msg_to_char(ch, "Invalid faction '%s'.\r\n", vnum_arg);
 						return;
 					}
+					vnum = FCT_VNUM(fct);
 					ok = TRUE;
 					break;
 				}
@@ -4676,10 +4678,11 @@ OLC_MODULE(qedit_rewards) {
 					break;
 				}
 				case QR_REPUTATION: {
-					if (!*vnum_arg || !find_faction(vnum_arg)) {
+					if (!*vnum_arg || !(fct = find_faction(vnum_arg))) {
 						msg_to_char(ch, "Invalid faction '%s'.\r\n", vnum_arg);
 						return;
 					}
+					vnum = FCT_VNUM(fct);
 					ok = TRUE;
 					break;
 				}
