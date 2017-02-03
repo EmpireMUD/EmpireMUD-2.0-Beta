@@ -856,6 +856,8 @@ void update_reputations(char_data *ch) {
 		
 		min_idx = rep_const_to_index(FCT_MIN_REP(fct));
 		max_idx = rep_const_to_index(FCT_MAX_REP(fct));
+		pfd->value = MAX(reputation_levels[min_idx].value, pfd->value);
+		pfd->value = MIN(reputation_levels[max_idx].value, pfd->value);
 		pfd->rep = FCT_STARTING_REP(fct);	// default
 		
 		for (iter = min_idx; iter <= max_idx; ++iter) {
