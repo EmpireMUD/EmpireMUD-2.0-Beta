@@ -1437,6 +1437,7 @@ extern char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
 extern int obj_carry_size(obj_data *obj);
 
 // utils from faction.c
+extern const char *get_faction_name_by_vnum(any_vnum vnum);
 extern const char *get_reputation_name(int type);
 
 // utils from limits.c

@@ -576,6 +576,14 @@ char *quest_task_string(struct quest_task *task, bool show_vnums) {
 			snprintf(output, sizeof(output), "Have ability: %s%s", vnum, get_ability_name_by_vnum(task->vnum));
 			break;
 		}
+		case QT_REP_OVER: {
+			snprintf(output, sizeof(output), "%s%s at least %s", vnum, get_faction_name_by_vnum(task->vnum), get_reputation_name(task->needed));
+			break;
+		}
+		case QT_REP_UNDER: {
+			snprintf(output, sizeof(output), "%s%s not over %s", vnum, get_faction_name_by_vnum(task->vnum), get_reputation_name(task->needed));
+			break;
+		}
 		default: {
 			sprintf(buf, "Unknown condition");
 			break;
@@ -669,6 +677,18 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 			}
 			case QT_HAVE_ABILITY: {
 				task->current = has_ability(ch, task->vnum) ? task->needed : 0;	// full
+				break;
+			}
+			case QT_REP_OVER: {
+				struct player_faction_data *pfd = get_reputation(ch, task->vnum, FALSE);
+				faction_data *fct = find_faction_by_vnum(task->vnum);
+				task->current = (compare_reptuation((pfd ? pfd->rep : (fct ? FCT_STARTING_REP(fct) : REP_NEUTRAL)), task->needed) >= 0) ? task->needed : 0;	// full
+				break;
+			}
+			case QT_REP_UNDER: {
+				struct player_faction_data *pfd = get_reputation(ch, task->vnum, FALSE);
+				faction_data *fct = find_faction_by_vnum(task->vnum);
+				task->current = (compare_reptuation((pfd ? pfd->rep : (fct ? FCT_STARTING_REP(fct) : REP_NEUTRAL)), task->needed) <= 0) ? task->needed : 0;	// full
 				break;
 			}
 		}
@@ -1520,6 +1540,22 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *
 			}
 			case QT_HAVE_ABILITY: {
 				if (!has_ability(ch, task->vnum)) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case QT_REP_OVER: {
+				struct player_faction_data *pfd = get_reputation(ch, task->vnum, FALSE);
+				faction_data *fct = find_faction_by_vnum(task->vnum);
+				if (compare_reptuation((pfd ? pfd->rep : (fct ? FCT_STARTING_REP(fct) : REP_NEUTRAL)), task->needed) < 0) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case QT_REP_UNDER: {
+				struct player_faction_data *pfd = get_reputation(ch, task->vnum, FALSE);
+				faction_data *fct = find_faction_by_vnum(task->vnum);
+				if (compare_reptuation((pfd ? pfd->rep : (fct ? FCT_STARTING_REP(fct) : REP_NEUTRAL)), task->needed) > 0) {
 					ok = FALSE;
 				}
 				break;
@@ -2668,7 +2704,7 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 	bool need_abil = FALSE, need_bld = FALSE, need_component = FALSE;
 	bool need_mob = FALSE, need_obj = FALSE, need_quest = FALSE;
 	bool need_rmt = FALSE, need_sect = FALSE, need_skill = FALSE;
-	bool need_veh = FALSE, need_mob_flags = FALSE;
+	bool need_veh = FALSE, need_mob_flags = FALSE, need_faction = FALSE;
 	
 	*amount = 1;
 	*vnum = 0;
@@ -2731,6 +2767,14 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 			need_abil = TRUE;
 			break;
 		}
+		case QT_REP_OVER: {
+			need_faction = TRUE;
+			break;
+		}
+		case QT_REP_UNDER: {
+			need_faction = TRUE;
+			break;
+		}
 	}
 	
 	// possible args
@@ -2779,6 +2823,19 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 		if (*argument) {
 			*misc = olc_process_flag(ch, argument, "component", "", component_flags, NOBITS);
 		}
+	}
+	if (need_faction) {
+		faction_data *fct;
+		argument = any_one_word(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a faction.\r\n");
+			return FALSE;
+		}
+		if (!(fct = find_faction(arg))) {
+			msg_to_char(ch, "Invalid faction '%s'.\r\n", arg);
+			return FALSE;
+		}
+		*vnum = FCT_VNUM(fct);
 	}
 	if (need_mob) {
 		argument = any_one_arg(argument, arg);
@@ -3815,6 +3872,8 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		found |= delete_quest_task_from_list(&QUEST_TASKS(qiter), QT_NOT_ON_QUEST, vnum);
 		found |= delete_quest_task_from_list(&QUEST_PREREQS(qiter), QT_NOT_ON_QUEST, vnum);
 		found |= delete_quest_reward_from_list(&QUEST_REWARDS(qiter), QR_QUEST_CHAIN, vnum);
+		found |= delete_quest_giver_from_list(&QUEST_STARTS_AT(qiter), QG_QUEST, vnum);
+		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(qiter), QG_QUEST, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(qiter), QST_IN_DEVELOPMENT);
@@ -3833,6 +3892,8 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_NOT_ON_QUEST, vnum);
 			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_NOT_ON_QUEST, vnum);
 			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_QUEST_CHAIN, vnum);
+			found |= delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_QUEST, vnum);
+			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_QUEST, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);

@@ -48,10 +48,33 @@ extern const char *relationship_flags[];
 extern struct faction_reputation_type reputation_levels[];
 
 // external funcs
+extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
+extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
+extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
+extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
 
 
  /////////////////////////////////////////////////////////////////////////////
 //// HELPERS ////////////////////////////////////////////////////////////////
+
+/**
+* Gets the name of a faction by vnum.
+*
+* @param any_vnum vnum Which faction.
+* @return const char* Its name.
+*/
+const char *get_faction_name_by_vnum(any_vnum vnum) {
+	const char *unknown = "UNKNOWN";
+	faction_data *fct;
+	
+	if ((fct = find_faction_by_vnum(vnum))) {
+		return FCT_NAME(fct);
+	}
+	else {
+		return unknown;
+	}
+}
+
 
 /**
 * Gets the name of a reputation by REP_ type.
@@ -233,8 +256,10 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	faction_data *fct = find_faction_by_vnum(vnum);
 	faction_data *iter, *next_iter, *find;
+	quest_data *qiter, *next_qiter;
 	char_data *mob, *next_mob;
 	int size, found;
+	bool any;
 	
 	if (!fct) {
 		msg_to_char(ch, "There is no faction %d.\r\n", vnum);
@@ -258,6 +283,24 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 		if (MOB_FACTION(mob) == fct) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+		}
+	}
+	
+	// check quests
+	HASH_ITER(hh, quest_table, qiter, next_qiter) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// QR_x, QT_x: quest types
+		any = find_quest_task_in_list(QUEST_TASKS(qiter), QT_REP_OVER, vnum);
+		any |= find_quest_task_in_list(QUEST_PREREQS(qiter), QT_REP_OVER, vnum);
+		any |= find_quest_task_in_list(QUEST_TASKS(qiter), QT_REP_UNDER, vnum);
+		any |= find_quest_task_in_list(QUEST_PREREQS(qiter), QT_REP_UNDER, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(qiter), QR_REPUTATION, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(qiter), QUEST_NAME(qiter));
 		}
 	}
 	
@@ -873,7 +916,9 @@ faction_data *create_faction_table_entry(any_vnum vnum) {
 void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	faction_data *fct, *iter, *next_iter, *find;
 	char_data *mob, *next_mob, *chiter;
+	quest_data *qiter, *next_qiter;
 	descriptor_data *desc;
+	bool found;
 	
 	if (!(fct = find_faction_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such faction %d.\r\n", vnum);
@@ -911,20 +956,48 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// remove from quests
+	HASH_ITER(hh, quest_table, qiter, next_qiter) {
+		// QT_x, QR_x: quest types
+		found = delete_quest_task_from_list(&QUEST_TASKS(qiter), QT_REP_OVER, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(qiter), QT_REP_OVER, vnum);
+		found |= delete_quest_task_from_list(&QUEST_TASKS(qiter), QT_REP_UNDER, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(qiter), QT_REP_UNDER, vnum);
+		found |= delete_quest_reward_from_list(&QUEST_REWARDS(qiter), QR_REPUTATION, vnum);
+		
+		if (found) {
+			SET_BIT(QUEST_FLAGS(qiter), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(qiter));
+		}
+	}
+	
 	// remove from active editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
-		if (GET_OLC_MOBILE(desc)) {
-			if (MOB_FACTION(GET_OLC_MOBILE(desc)) == fct) {
-				MOB_FACTION(GET_OLC_MOBILE(desc)) = NULL;
-				msg_to_char(desc->character, "The allegiance faction for the mob you're editing was deleted.\r\n");
-			}
-		}
 		if (GET_OLC_FACTION(desc)) {
 			HASH_FIND_INT(FCT_RELATIONS(GET_OLC_FACTION(desc)), &FCT_VNUM(fct), find);
 			if (find) {
 				HASH_DEL(FCT_RELATIONS(GET_OLC_FACTION(desc)), find);
 				free(find);
 				msg_to_char(desc->character, "A related faction for the faction you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_MOBILE(desc)) {
+			if (MOB_FACTION(GET_OLC_MOBILE(desc)) == fct) {
+				MOB_FACTION(GET_OLC_MOBILE(desc)) = NULL;
+				msg_to_char(desc->character, "The allegiance faction for the mob you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_QUEST(desc)) {
+			// QT_x, QR_x: quest types
+			found = delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_REP_OVER, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_REP_OVER, vnum);
+			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_REP_UNDER, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_REP_UNDER, vnum);
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_REPUTATION, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A faction used by the quest you are editing was deleted.\r\n");
 			}
 		}
 	}

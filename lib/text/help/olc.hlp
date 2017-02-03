@@ -4430,6 +4430,8 @@ Available tasks:
  VISIT-ROOM-TEMPLATE &r*&0 - Player must go to a certain room template.
  VISIT-SECTOR &r*&0 - Player must go to a certain terrain.
  HAVE-ABILITY - Player must have a certain ability.
+ REP-OVER - Player must have a certain faction reputation.
+ REP-UNDER - Player must be below a certain faction reputation.
 
 &r*&0 Some types cannot be used as prereqs, only as tasks.
 

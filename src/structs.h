@@ -922,15 +922,16 @@ typedef struct vehicle_data vehicle_data;
 
 
 // REP_x: Faction reputation levels
-#define REP_NEUTRAL  0	// no opinion
-#define REP_DESPISED  1	// lower cap
-#define REP_HATED  2	// worst
-#define REP_LOATHED  3	// bad
-#define REP_DISLIKED  4	// not good
-#define REP_LIKED  5	// decent
-#define REP_ESTEEMED  6	// good
-#define REP_VENERATED  7	// great!
-#define REP_REVERED  8	// upper cap
+#define REP_NONE  0	// base / un-set
+#define REP_NEUTRAL  1	// no opinion
+#define REP_DESPISED  2	// lower cap
+#define REP_HATED  3	// worst
+#define REP_LOATHED  4	// bad
+#define REP_DISLIKED  5	// not good
+#define REP_LIKED  6	// decent
+#define REP_ESTEEMED  7	// good
+#define REP_VENERATED  8	// great!
+#define REP_REVERED  9	// upper cap
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1769,6 +1770,7 @@ typedef struct vehicle_data vehicle_data;
 #define QT_AMT_NONE  0	// show as "completed"
 #define QT_AMT_NUMBER  1  // show as x/X
 #define QT_AMT_THRESHOLD  2	// needs a numeric arg but shows as a threshold
+#define QT_AMT_REPUTATION  3	// uses a faction reputation
 
 
 // indicates empire (rather than misc) coins for a reward

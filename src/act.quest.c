@@ -540,6 +540,7 @@ void show_quest_tracker(char_data *ch, struct player_quest *pq) {
 				sprintf(buf, " (%d/%d)", lefthand, task->needed);
 				break;
 			}
+			case QT_AMT_REPUTATION:
 			case QT_AMT_THRESHOLD:
 			case QT_AMT_NONE: {
 				if (task->current >= task->needed) {

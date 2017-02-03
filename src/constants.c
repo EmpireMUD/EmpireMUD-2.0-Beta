@@ -2355,8 +2355,8 @@ const bool quest_tracker_amt_type[] = {
 	QT_AMT_NONE,	// visit rmt
 	QT_AMT_NONE,	// visit sect
 	QT_AMT_NONE,	// have ability
-	QT_AMT_NONE,	// faction-over
-	QT_AMT_NONE,	// faction-under
+	QT_AMT_REPUTATION,	// faction-over
+	QT_AMT_REPUTATION,	// faction-under
 };
 
 
