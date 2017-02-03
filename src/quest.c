@@ -48,6 +48,7 @@ extern const char *action_bits[];
 extern const char *quest_flags[];
 extern const char *quest_giver_types[];
 extern const char *quest_reward_types[];
+extern const bool quest_tracker_amt_type[];
 extern const char *quest_tracker_types[];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
@@ -2727,7 +2728,6 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_amount, int *amount, any_vnum *vnum, bitvector_t *misc) {
 	extern const char *component_flags[];
 	extern const char *component_types[];
-	extern const bool quest_tracker_amt_type[];
 	
 	char arg[MAX_INPUT_LENGTH]; 
 	bool need_abil = FALSE, need_bld = FALSE, need_component = FALSE;
@@ -3117,7 +3117,11 @@ void qedit_process_quest_tasks(char_data *ch, char *argument, struct quest_task 
 			msg_to_char(ch, "Invalid %s number.\r\n", command);
 		}
 		else if (is_abbrev(field_arg, "amount")) {
-			if (!isdigit(*argument) || (num = atoi(argument)) < 0) {
+			if (quest_tracker_amt_type[change->type] == QT_AMT_REPUTATION && (num = get_reputation_by_name(argument)) == NOTHING) {
+				msg_to_char(ch, "Invalid reputation '%s'.\r\n", argument);
+				return;
+			}
+			else if (quest_tracker_amt_type[change->type] != QT_AMT_REPUTATION && (!isdigit(*argument) || (num = atoi(argument)) < 0)) {
 				msg_to_char(ch, "Invalid amount '%s'.\r\n", argument);
 				return;
 			}
