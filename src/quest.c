@@ -2807,7 +2807,14 @@ bool qedit_parse_task_args(char_data *ch, int type, char *argument, bool find_am
 	}
 	
 	// possible args
-	if (quest_tracker_amt_type[type] != QT_AMT_NONE && find_amount) {
+	if (quest_tracker_amt_type[type] == QT_AMT_REPUTATION && find_amount) {
+		argument = any_one_arg(argument, arg);
+		if (!*arg || (*amount = get_reputation_by_name(arg)) == NOTHING) {
+			msg_to_char(ch, "You must provide a reputation.\r\n");
+			return FALSE;
+		}
+	}
+	else if (quest_tracker_amt_type[type] != QT_AMT_NONE && find_amount) {
 		argument = any_one_arg(argument, arg);
 		if (!*arg || !isdigit(*arg) || (*amount = atoi(arg)) < 0) {
 			msg_to_char(ch, "You must provide an amount.\r\n");
