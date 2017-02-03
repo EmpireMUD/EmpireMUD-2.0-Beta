@@ -1670,6 +1670,35 @@ void qt_change_ability(char_data *ch, any_vnum abil) {
 
 
 /**
+* Quest Tracker: ch gains or loses faction reputation
+*
+* @param char_data *ch The player.
+* @param any_vnum faction Which faction changed.
+*/
+void qt_change_reputation(char_data *ch, any_vnum faction) {
+	struct player_faction_data *pfd = get_reputation(ch, faction, FALSE);
+	faction_data *fct = find_faction_by_vnum(faction);
+	struct player_quest *pq;
+	struct quest_task *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == QT_REP_OVER && task->vnum == faction) {
+				task->current = (compare_reptuation((pfd ? pfd->rep : (fct ? FCT_STARTING_REP(fct) : REP_NEUTRAL)), task->needed) >= 0) ? task->needed : 0;
+			}
+			else if (task->type == QT_REP_UNDER && task->vnum == faction) {
+				task->current = (compare_reptuation((pfd ? pfd->rep : (fct ? FCT_STARTING_REP(fct) : REP_NEUTRAL)), task->needed) <= 0) ? task->needed : 0;
+			}
+		}
+	}
+}
+
+
+/**
 * Quest Tracker: ch gains or loses skill
 *
 * @param char_data *ch The player.

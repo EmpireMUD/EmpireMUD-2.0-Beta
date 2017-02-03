@@ -728,6 +728,7 @@ void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, boo
 		msg_to_char(ch, "%sYou %s %d reputation with %s.\t0\r\n", reputation_levels[idx].color, (amount > 0 ? "gain" : "lose"), ABSOLUTE(amount), FCT_NAME(fct));
 		if (old_rep != pfd->rep) {
 			msg_to_char(ch, "%sYou are now %s with %s.\t0\r\n", reputation_levels[idx].color, reputation_levels[idx].name, FCT_NAME(fct));
+			qt_change_reputation(ch, FCT_VNUM(fct));
 		}
 	}
 }
@@ -871,6 +872,8 @@ void update_reputations(char_data *ch) {
 				// don't break, looking for highest value
 			}
 		}
+		
+		qt_change_reputation(ch, pfd->vnum);
 	}
 }
 
