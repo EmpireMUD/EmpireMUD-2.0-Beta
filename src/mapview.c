@@ -1341,6 +1341,8 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	
 	// buf is now the completed icon, but has both color codes (&) and variable tile codes (@)
 	if (strchr(buf, '@')) {
+		// NOTE: If you add new @ codes here, you must update "const char *icon_codes" in utils.c
+		
 		// here (@.) roadside icon
 		if (strstr(buf, "@.")) {
 			icon = get_icon_from_set(GET_SECT_ICONS(base_sect), tileset);
