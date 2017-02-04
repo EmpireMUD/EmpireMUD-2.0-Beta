@@ -546,6 +546,11 @@ double get_weapon_speed(obj_data *weapon) {
 bool is_fight_ally(char_data *ch, char_data *frenemy) {
 	char_data *fighting = FIGHTING(frenemy), *ch_iter, *fr_iter;
 	
+	// one of them is fighting the other
+	if (fighting == ch || FIGHTING(ch) == frenemy) {
+		return FALSE;
+	}
+	
 	// check "master" tree up both sides == people are allies if ch (or any of ch's masters) are the same as frenemy (or any of frenemy's masters)
 	ch_iter = ch;
 	while (ch_iter) {
@@ -555,9 +560,21 @@ bool is_fight_ally(char_data *ch, char_data *frenemy) {
 				// self is ally!
 				return TRUE;
 			}
-			fr_iter = fr_iter->master;
+			
+			if (FIGHTING(fr_iter) != fr_iter->master) {
+				fr_iter = fr_iter->master;
+			}
+			else {
+				break;	// hit someone they are fighting AND following
+			}
 		}
-		ch_iter = ch_iter->master;
+		
+		if (FIGHTING(ch_iter) != ch_iter->master) {
+			ch_iter = ch_iter->master;
+		}
+		else {
+			break;	// hit someone they are fighting AND following
+		}
 	}
 	
 	if (fighting) {
@@ -570,11 +587,11 @@ bool is_fight_ally(char_data *ch, char_data *frenemy) {
 			return TRUE;
 		}
 		// frenemy is ch's leader
-		if (frenemy == ch->master) {
+		if (frenemy == ch->master && FIGHTING(ch) != frenemy) {
 			return TRUE;
 		}
 		// frenemy and ch follow the same master
-		if (ch->master != NULL && frenemy->master == ch->master) {
+		if (ch->master != NULL && frenemy->master == ch->master && FIGHTING(ch) != frenemy->master && FIGHTING(frenemy) != ch->master) {
 			return TRUE;
 		}
 		// frenemy and ch are fighting the same thing
