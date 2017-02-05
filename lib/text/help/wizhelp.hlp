@@ -782,9 +782,12 @@ See also: GRANT, STAT
 "SET FACTION"
 
 Usage:  set [file] <player> faction <name/vnum> <rep/value>
+        set [file] <player> faction <name/vnum> none
 
 This allows you to change a player's faction reputation to any reputation
 level (e.g. "Revered") or specific point value.
+
+You can delete a reputation entirely by setting it to 'none'.
 
 See also: FACTION, SHOW FACTIONS
 #d

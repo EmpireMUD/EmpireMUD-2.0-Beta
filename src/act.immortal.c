@@ -1546,6 +1546,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		int min_idx, min_rep, max_idx, max_rep, new_rep, new_val = 0;
 		char fct_arg[MAX_INPUT_LENGTH], *fct_val;
 		struct player_faction_data *pfd;
+		bool del_rep = FALSE;
 		faction_data *fct;
 		
 		// usage: set <player> faction <name/vnum> <rep/value>
@@ -1568,7 +1569,10 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		max_rep = (max_idx != NOTHING) ? reputation_levels[max_idx].value : MAX_REPUTATION;
 		
 		// parse val arg
-		if (isdigit(*fct_val) || *fct_val == '-') {
+		if (!str_cmp(fct_val, "none")) {
+			del_rep = TRUE;
+		}
+		else if (isdigit(*fct_val) || *fct_val == '-') {
 			new_val = atoi(fct_val);
 		}
 		else if ((new_rep = get_reputation_by_name(fct_val)) == NOTHING) {
@@ -1580,7 +1584,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 		
 		// bounds check
-		if (new_val < min_rep || new_val > max_rep) {
+		if (!del_rep && (new_val < min_rep || new_val > max_rep)) {
 			msg_to_char(ch, "You can't set the reputation to that level. That faction has a range of %d-%d.\r\n", min_rep, max_rep);
 			return 0;
 		}
@@ -1592,12 +1596,18 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 		
 		// and go
-		pfd->value = new_val;
-		update_reputations(vict);
-		pfd = get_reputation(vict, FCT_VNUM(fct), TRUE);
-		new_rep = rep_const_to_index(pfd->rep);
-		
-		sprintf(output, "%s's reputation with %s set to %s / %d", GET_NAME(vict), FCT_NAME(fct), reputation_levels[new_rep].name, pfd->value);
+		if (del_rep) {
+			HASH_DEL(GET_FACTIONS(vict), pfd);
+			free(pfd);
+			sprintf(output, "%s's reputation with %s deleted", GET_NAME(vict), FCT_NAME(fct));
+		}
+		else {
+			pfd->value = new_val;
+			update_reputations(vict);
+			pfd = get_reputation(vict, FCT_VNUM(fct), TRUE);
+			new_rep = rep_const_to_index(pfd->rep);
+			sprintf(output, "%s's reputation with %s set to %s / %d", GET_NAME(vict), FCT_NAME(fct), reputation_levels[new_rep].name, pfd->value);
+		}
 	}
 	else if SET_CASE("skill") {
 		char skillname[MAX_INPUT_LENGTH], *skillval;
