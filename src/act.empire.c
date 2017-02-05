@@ -4039,9 +4039,11 @@ ACMD(do_home) {
 		else if (GET_POS(ch) < POS_STANDING) {
 			msg_to_char(ch, "You can't do that right now. You need to be standing.\r\n");
 		}
+		/*
 		else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
 			msg_to_char(ch, "You can't set your home in a vehicle.\r\n");
 		}
+		*/
 		else if (!GET_LOYALTY(ch) || ROOM_OWNER(real) != GET_LOYALTY(ch)) {
 			msg_to_char(ch, "You need to own a building to make it your home.\r\n");
 		}
