@@ -2144,7 +2144,7 @@ ACMD(do_helpsearch) {
 	size_t size;
 	
 	delete_doubledollar(argument);
-	one_argument(argument, arg);	// this removes leading filler words, which are going to show up in a lot of helps
+	one_word(argument, arg);	// this removes leading filler words, which are going to show up in a lot of helps
 	
 	if (!ch->desc) {
 		// don't bother
