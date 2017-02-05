@@ -643,6 +643,7 @@ void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, boo
 	struct faction_relation *rel, *next_rel;
 	faction_data *fct, *iter, *next_iter;
 	struct player_faction_data *pfd;
+	bool changed;
 	
 	if (IS_NPC(ch) || amount == 0) {
 		return;
@@ -703,23 +704,31 @@ void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, boo
 	SAFE_ADD(pfd->value, amount, MIN_REPUTATION, MAX_REPUTATION, FALSE);
 	
 	// detect new rep now
-	idx = rep_const_to_index(pfd->rep);
-	if (amount > 0) {
-		if (pfd->value > 0 && pfd->value >= reputation_levels[idx+1].value) {
-			pfd->rep = reputation_levels[idx+1].type;
+	do {
+		changed = FALSE;
+		idx = rep_const_to_index(pfd->rep);
+		if (amount > 0) {
+			if (pfd->value > 0 && pfd->value >= reputation_levels[idx+1].value) {
+				pfd->rep = reputation_levels[idx+1].type;
+				changed = TRUE;
+			}
+			else if (pfd->value < 0 && pfd->value > reputation_levels[idx].value) {
+				pfd->rep = reputation_levels[idx+1].type;
+				changed = TRUE;
+			}
 		}
-		else if (pfd->value < 0 && pfd->value > reputation_levels[idx].value) {
-			pfd->rep = reputation_levels[idx+1].type;
+		else if (amount < 0) {
+			if (pfd->value > 0 && pfd->value < reputation_levels[idx].value) {
+				pfd->rep = reputation_levels[idx-1].type;
+				changed = TRUE;
+			}
+			else if (pfd->value < 0 && pfd->value <= reputation_levels[idx-1].value) {
+				pfd->rep = reputation_levels[idx-1].type;
+				changed = TRUE;
+			}
 		}
 	}
-	else if (amount < 0) {
-		if (pfd->value > 0 && pfd->value < reputation_levels[idx].value) {
-			pfd->rep = reputation_levels[idx-1].type;
-		}
-		else if (pfd->value < 0 && pfd->value <= reputation_levels[idx-1].value) {
-			pfd->rep = reputation_levels[idx-1].type;
-		}
-	}
+	while (changed);
 	
 	// and message
 	if (cascade) {
