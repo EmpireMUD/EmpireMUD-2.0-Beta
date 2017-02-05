@@ -352,6 +352,10 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		found = delete_mob_from_spawn_list(&GET_BLD_SPAWNS(bld), vnum);
 		found |= delete_from_interaction_list(&GET_BLD_INTERACTIONS(bld), TYPE_MOB, vnum);
+		if (GET_BLD_ARTISAN(bld) == vnum) {
+			GET_BLD_ARTISAN(bld) = NOTHING;
+			found |= TRUE;
+		}
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
@@ -415,6 +419,10 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	// remove spawn locations and interactions from active editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (GET_OLC_BUILDING(desc)) {
+			if (GET_BLD_ARTISAN(GET_OLC_BUILDING(desc)) == vnum) {
+				GET_BLD_ARTISAN(GET_OLC_BUILDING(desc)) = NOTHING;
+				msg_to_char(desc->character, "The artisan mob for the building you're editing was deleted.\r\n");
+			}
 			if (delete_mob_from_spawn_list(&GET_OLC_BUILDING(desc)->spawns, vnum)) {
 				msg_to_char(desc->character, "One of the mobs that spawns in the building you're editing was deleted.\r\n");
 			}
@@ -507,19 +515,25 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	// buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		any = FALSE;
+		if (GET_BLD_ARTISAN(bld) == vnum) {
+			any = TRUE;
+			++found;
+		}
 		for (spawn = GET_BLD_SPAWNS(bld); spawn && !any; spawn = spawn->next) {
 			if (spawn->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "BDG [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
 		}
 		for (inter = GET_BLD_INTERACTIONS(bld); inter && !any; inter = inter->next) {
 			if (interact_vnum_types[inter->type] == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "BDG [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
+		}
+		
+		if (any) {
+			size += snprintf(buf + size, sizeof(buf) - size, "BDG [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 		}
 	}
 	
