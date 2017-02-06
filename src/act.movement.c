@@ -442,6 +442,8 @@ void perform_transport(char_data *ch, room_data *to_room) {
 
 // dir here is a real dir, not a confused dir
 int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check) {
+	ACMD(do_dismount);
+	
 	if (WATER_SECT(to_room) && !EFFECTIVELY_SWIMMING(ch)) {
 		send_to_char("You don't know how to swim.\r\n", ch);
 		return 0;
