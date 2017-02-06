@@ -1681,6 +1681,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_STEALTHABLE  BIT(26)	// player can steal (rather than be prevented from accidentally stealing)
 #define PRF_WIZHIDE  BIT(27)	// player can't be seen in the room
 #define PRF_AUTONOTES  BIT(28)	// Player login syslogs automatically show notes
+#define PRF_AUTODISMOUNT  BIT(29)	// will dismount while moving instead of seeing an error
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

@@ -486,8 +486,13 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 	
 	// need a generic for this -- a nearly identical condition is used in do_mount
 	if (IS_RIDING(ch) && IS_COMPLETE(to_room) && !BLD_ALLOWS_MOUNTS(to_room)) {
-		msg_to_char(ch, "You can't ride indoors.\r\n");
-		return 0;
+		if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
+			do_dismount(ch, "", 0, 0);
+		}
+		else {
+			msg_to_char(ch, "You can't ride indoors.\r\n");
+			return 0;
+		}
 	}
 	
 	if (MOB_FLAGGED(ch, MOB_AQUATIC) && !WATER_SECT(to_room) && !EFFECTIVELY_FLYING(ch)) {

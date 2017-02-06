@@ -2844,7 +2844,7 @@ void announce_login(char_data *ch) {
 				buf2[iter] = '-';
 			}
 			buf2[iter] = '\0';	// terminate
-			msg_to_char(ch, "%s\r\n", buf2);
+			msg_to_char(desc->character, "%s\r\n", buf2);
 		}
 	}
 	
