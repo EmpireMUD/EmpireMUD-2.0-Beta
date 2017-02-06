@@ -230,6 +230,38 @@ void check_idling(char_data *ch) {
 
 
 /**
+* Determines if a player can really be riding. Dismounts them if not.
+*
+* @param char_data *ch The player to check.
+*/
+void check_should_dismount(char_data *ch) {
+	ACMD(do_dismount);
+	
+	bool ok = TRUE;
+	
+	if (!IS_RIDING(ch)) {
+		return;	// nm
+	}
+	else if (IS_MORPHED(ch)) {
+		ok = FALSE;
+	}
+	else if (IS_COMPLETE(IN_ROOM(ch)) && !BLD_ALLOWS_MOUNTS(IN_ROOM(ch))) {
+		ok = FALSE;
+	}
+	else if (GET_SITTING_ON(ch)) {
+		ok = FALSE;
+	}
+	else if (MOUNT_FLAGGED(ch, MOUNT_FLYING) && !CAN_RIDE_FLYING_MOUNT(ch)) {
+		ok = FALSE;
+	}
+	
+	if (!ok) {
+		do_dismount(ch, "", 0, 0);
+	}
+}
+
+
+/**
 * This clears the linkdead players out, and should be called before you run
 * anything that updates offline players, as players in this state can cause
 * actual problems if they reconnect.
@@ -495,6 +527,10 @@ void real_update_char(char_data *ch) {
 	
 	if (!IS_NPC(ch) && IS_MORPHED(ch)) {
 		check_morph_ability(ch);
+	}
+	
+	if (!IS_NPC(ch) && IS_RIDING(ch)) {
+		check_should_dismount(ch);
 	}
 	
 	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_VEHICLE(ch))) {
