@@ -464,6 +464,7 @@ const char *preference_bits[] = {
 	"STEALTHABLE",
 	"WIZHIDE",
 	"AUTONOTES",
+	"AUTODISMOUNT",
 	"\n"
 };
 
@@ -524,6 +525,7 @@ const struct toggle_data_type toggle_data[] = {
 	
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
 	{ "stealthable", TOG_ONOFF, PRF_STEALTHABLE, 0, NULL },
+	{ "autodismount", TOG_ONOFF, PRF_AUTODISMOUNT, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
@@ -1448,15 +1450,27 @@ const char *trade_overunder[] = {
 // FCT_x: faction flags
 const char *faction_flags[] = {
 	"IN-DEVELOPMENT",
-	"GAINS-FROM-KILLS",
+	"REP-FROM-KILLS",
+	"\n"
 };
 
 
-// FCTR_x: relationship flags
+// FCTR_x (1/2): relationship flags
 const char *relationship_flags[] = {
 	"SHARED-GAINS",
 	"INVERSE-GAINS",
 	"MUTUALLY-EXCLUSIVE",
+	"UNLISTED",
+	"\n"
+};
+
+
+// FCTR_x (2/2): relationship descriptions (shown to players)
+const char *relationship_descs[] = {
+	"Allied",
+	"Enemies",
+	"Mutually Exclusive",
+	"",	// unlisted
 	"\n"
 };
 
@@ -2255,6 +2269,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"morph",
 	"quest",
 	"social",
+	"faction",
 	"\n"
 };
 
@@ -2295,6 +2310,7 @@ const char *quest_reward_types[] = {
 	"SKILL-EXP",
 	"SKILL-LEVELS",	// 5
 	"QUEST-CHAIN",
+	"REPUTATION",
 	"\n",
 };
 
@@ -2317,6 +2333,8 @@ const char *quest_tracker_types[] = {
 	"VISIT-ROOM-TEMPLATE",
 	"VISIT-SECTOR",
 	"HAVE-ABILITY",	// 15
+	"REP-OVER",
+	"REP-UNDER",
 	"\n",
 };
 
@@ -2339,6 +2357,8 @@ const bool quest_tracker_amt_type[] = {
 	QT_AMT_NONE,	// visit rmt
 	QT_AMT_NONE,	// visit sect
 	QT_AMT_NONE,	// have ability
+	QT_AMT_REPUTATION,	// faction-over
+	QT_AMT_REPUTATION,	// faction-under
 };
 
 

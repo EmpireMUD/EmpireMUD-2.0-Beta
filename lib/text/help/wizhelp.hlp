@@ -733,6 +733,7 @@ age            BOTH    NUMBER       Player age
 bonustrait     PC      MISC         Set bonus traits for player
 bonusexp       PC      NUMBER       Set daily bonus exp for the player
 coins          PC      MISC         Sets coins on-hand for player
+faction        PC      MISC         Change faction reputations (SET FACTION)
 grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
 lastname       PC      STRING       Player's last name, or off
@@ -778,6 +779,18 @@ scale          NPC     NUMBER       Rescales a mob to a given level
 
 See also: GRANT, STAT
 #d
+"SET FACTION"
+
+Usage:  set [file] <player> faction <name/vnum> <rep/value>
+        set [file] <player> faction <name/vnum> none
+
+This allows you to change a player's faction reputation to any reputation
+level (e.g. "Revered") or specific point value.
+
+You can delete a reputation entirely by setting it to 'none'.
+
+See also: FACTION, SHOW FACTIONS
+#d
 SHOW
 
 Usage:  show <mode> [argument]
@@ -791,6 +804,7 @@ Mode       Level    Description
 stats      God      Shows game stats including prototypes.
 arrowtypes Immort   Shows the 'arrow type' setting for all bows and arrows.
 components Immort   Shows all items matching a component type (and flags).
+factions   Immort   Shows a player's faction levels.
 ignoring   Immort   Shows you who a player has on their ignore list.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
 notes      Immort   Show notes on a player.
@@ -837,6 +851,15 @@ If you specify any flags, all those flags must match the output.
 
 For a list of component types, see: HELP COMPONENT TYPES
 For a list of component flags, see: HELP COMPONENT FLAGS
+#e
+"SHOW FACTIONS"
+
+Usage:  show factions <player> [filter]
+
+This command shows you all of a player's faction reputation levels. It can
+be filtered by name.
+
+See also: FACTION, SET FACTION
 #e
 "SHOW IGNORING"
 

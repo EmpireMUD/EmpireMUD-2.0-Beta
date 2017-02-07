@@ -1941,7 +1941,8 @@ static void scale_instance_to_level(struct instance_data *inst, int level) {
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (inst->room[iter]) {
 			for (ch = ROOM_PEOPLE(inst->room[iter]); ch; ch = ch->next_in_room) {
-				if (IS_NPC(ch) && GET_CURRENT_SCALE_LEVEL(ch) == 0) {
+				if (IS_NPC(ch) && GET_CURRENT_SCALE_LEVEL(ch) != level) {
+					GET_CURRENT_SCALE_LEVEL(ch) = 0;	// force override on level
 					scale_mob_to_level(ch, level);
 				}
 			}

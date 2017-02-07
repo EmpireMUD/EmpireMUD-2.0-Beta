@@ -1770,8 +1770,11 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 			EMPIRE_CITY_TERRITORY(e) = 0;
 			EMPIRE_OUTSIDE_TERRITORY(e) = 0;
 			EMPIRE_POPULATION(e) = 0;
-			EMPIRE_MILITARY(e) = 0;
-			EMPIRE_FAME(e) = 0;
+			
+			if (check_tech) {	// this will only be re-read if we check tech
+				EMPIRE_MILITARY(e) = 0;
+				EMPIRE_FAME(e) = 0;
+			}
 		
 			read_vault(e);
 

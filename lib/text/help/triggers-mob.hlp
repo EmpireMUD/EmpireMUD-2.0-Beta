@@ -315,6 +315,8 @@ When using field  - The variable returns:
 &caffect(name)&0 - Checks the actor for the affect (by name) in the subfield.
    This is the name that shows on your affects/score command when using active.
 &calias&0 - The list of aliases (keywords) of the mob or the player name.
+&callegiance(faction)&0 - Returns a mob's faction vnum, or changes the faction
+   to a different one (or 'none').
 &cblock&0 - Player's block rating.
 &cblood(amt)&0 - Returns current blood, or adds/removes blood if amt is set.
 &cbonus_exp(amt)&0 - Returns the player's bonus exp (adds to it if amt given)
@@ -354,15 +356,19 @@ When using field  - The variable returns:
 &ceq()&0 - This will return the identifier (id) for the object equipped in
    position, if any. The specified position may be either a position number
    (0-18) or the name of the location * checks all positions. &yHELP POSITIONS&0
+&cfaction_name&0 - The name of the mob's 'allegiance' faction, if any.
 &cfighting&0 - The unique id of the mob fighting the actor.
 &cfirstname&0 - The actor's first name (or first keyword, for mobs).
 &cfollower(name)&0 - The follower of the actor (as an id) with name supplied.
 &cgain_skill(sk,amt)&0 - Gives the player points in a skill, or takes them.
+&cgain_reputation(faction,amt)&0 - Gives the player faction rep (or takes).
 &cgive_coins(amt)&0 - Gives the actor a number of coins.
 &cgive_skill_reset(sk)&0 - Grants the player a free skill reset in that skill.
 &cgrt&0 - The actor's Greatness.
 &chas_item()&0 - Checks if the actor has a object (inventory, equipped and
    in containers) by subfield name/var/vnum.
+&chas_reputation(faction,rep)&0 - Whether or not the player has at least that
+   much reputation with the given faction.
 &chas_resources(vnum,amt)&0 - Whether or not the player has <amt> of object <vnum>
    available in the inventory/room.
 &chealth&0 - The current hit points of the actor.

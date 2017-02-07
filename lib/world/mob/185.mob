@@ -221,7 +221,7 @@ snakes knot~
 a knot of snakes~
 A knot of snakes slithers towards you, hissing.
 ~
-0 0 cdoz 0
+0 0 cdoz c
 0 0 5 9
 T 18516
 S
@@ -233,5 +233,6 @@ The renowned archaeologist, Professor #n, is setting up shop here...
 0 0 bd cn
 0 1 0 15
 T 18517
+T 18518
 S
 $

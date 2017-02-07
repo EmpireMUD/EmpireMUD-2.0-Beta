@@ -283,6 +283,8 @@ void free_extra_descs(struct extra_descr_data **list);
 
 // factions
 extern faction_data *faction_table;
+extern int MAX_REPUTATION;
+extern int MIN_REPUTATION;
 extern faction_data *sorted_factions;
 extern faction_data *find_faction(char *argument);
 extern faction_data *find_faction_by_name(char *name);

@@ -6,13 +6,13 @@ eval heroic_mode %self.mob_flagged(GROUP)%
 * Count combat script cycles until enrage
 * 1 cycle should be 30 seconds
 if %heroic_mode%
-  * Start scaling up immediately, game over at 10 minutes
+  * Start scaling up immediately, game over at 15 minutes
   eval soft_enrage_cycles 1
-  eval hard_enrage_cycles 20
-else
-  * Start scaling up after 5 minutes, game over at 15 minutes
-  eval soft_enrage_cycles 10
   eval hard_enrage_cycles 30
+else
+  * Start scaling up after 5 minutes, game over at 20 minutes
+  eval soft_enrage_cycles 10
+  eval hard_enrage_cycles 40
 end
 eval enrage_counter 0
 eval enraged 0
@@ -90,11 +90,11 @@ switch %random.4%
   * Mana drain + spirit bomb
   case 3
     %echo% %self.name% starts drawing all the mana in the room to %self.himher%self...
-    eval cycles 5
+    eval cycles 4
     eval amount 50
     eval total_drained 0
     if %heroic_mode%
-      eval amount 100
+      eval amount 125
     end
     while %cycles%>0
       wait 5 sec
@@ -131,15 +131,15 @@ switch %random.4%
       %damage% %actor% %damage_scale% magical
       if %damage_scale% >= 600
         %echo% &rThe energy blast explodes!
-        %aoe% %damage_scale%/10 magical
+        eval aoe_scale %damage_scale%/10
+        %aoe% %aoe_scale% magical
       end
-      wait 1 sec
     else
       %send% %actor% &r%self.name% hurls the stolen mana at you in the form of an energy blast!
       %echoaround% %actor% %self.name% hurls the stolen mana at %actor.name% in the form of an energy blast!
       %damage% %actor% 100
-      wait 2 sec
     end
+    wait 7 sec
   break
   * Power word stun
   case 4
@@ -312,11 +312,11 @@ switch %attack%
       eval room %self.room%
       eval person %room.people%
       while %person%
-        eval person %person.next_in_room%
         eval test %%self.is_enemy(%person%)%%
         if %test%
           dg_affect %person% BLIND on 10
         end
+        eval person %person.next_in_room%
       done
     else
       %send% %actor% &r%self.name%'s jeweled feathers flash brightly, blinding you!
@@ -348,11 +348,11 @@ switch %attack%
     eval room %self.room%
     eval person %room.people%
     while %person%
-      eval person %person.next_in_room%
       eval test %%self.is_enemy(%person%)%%
       if %test%
         dg_affect %person% DISARM on 15
       end
+      eval person %person.next_in_room%
     done
     if %heroic_mode%
       %echo% %self.name% tumbles through the air faster than before!
@@ -420,7 +420,7 @@ switch %random.3%
       %echoaround% %target% %self.name% shoots a bolt of crackling emerald light at %target.name%, but it explodes in mid flight!
     else
       %send% %target% &r%self.name% shoots a bolt of crackling emerald light at you!
-      %echoaround% %target% &r%self.name% shoots a bolt of crackling emerald light at %target.name%!
+      %echoaround% %target% %self.name% shoots a bolt of crackling emerald light at %target.name%!
       %damage% %target% 100 magical
     end
   break
@@ -446,7 +446,7 @@ switch %random.3%
       %echo% %self.name% crouches, gathering energy to pounce...
       wait 5
       %send% %actor% &r%self.name% pounces on you, raking you with %self.hisher% claws!
-      %echoaround% %actor% &r%self.name% pounces on %actor.name%, raking %actor.himher% with %self.hisher% claws!
+      %echoaround% %actor% %self.name% pounces on %actor.name%, raking %actor.himher% with %self.hisher% claws!
       %damage% %actor% 150 physical
       %dot% %actor% 150 15 physical
     elseif %self.vnum% == 18505
@@ -921,8 +921,104 @@ return 0
 #18517
 Jungle Temple shop list - archaeologist~
 0 c 0
-list buy~
-%send% %actor% %self.name% doesn't sell anything... yet.
+list~
+* List of items
+%send% %actor% %self.name% sells the following items for permafrost tokens:
+%send% %actor% - riding jaguar whistle (14 tokens, land mount)
+%send% %actor% - sea serpent whistle (16 tokens, aquatic mount)
+%send% %actor% - feathered serpent whistle (40 tokens, flying mount)
+%send% %actor% - jaguar cub whistle (24 tokens, minipet)
+%send% %actor% - jaguar charm (18 tokens, Animal Morphs disguise morph)
+%send% %actor% - fearsome jaguar armor pattern (20 tokens, tank armor)
+%send% %actor% - red coyote armor pattern (20 tokens, melee armor)
+%send% %actor% - feathered serpent armor pattern (20 tokens, healer armor)
+%send% %actor% - eagle warrior armor pattern (20 tokens, caster armor)
+%send% %actor% - blue chameleon armor pattern (20 tokens, pvp armor)
+~
+#18518
+Jungle Temple shop buy - archaeologist~
+0 c 0
+buy~
+eval vnum -1
+eval cost 0
+set named a thing
+eval currency jungletemple_tokens
+eval test %%actor.varexists(%currency%)%%
+if !%test%
+  %send% %actor% You don't have any of this shop's currency!
+  halt
+end
+if (!%arg%)
+  %send% %actor% Type 'list' to see what's available.
+  halt
+  * Disambiguate
+elseif jaguar /= %arg%
+  %send% %actor% Jaguar charm or jaguar cub whistle?
+  halt
+elseif feathered serpent /= %arg%
+  %send% %actor% Feathered serpent whistle or feathered serpent armor pattern? 
+  halt
+  * Mounts and pets etc
+elseif riding jaguar whistle /= %arg%
+  eval vnum 18512
+  eval cost 14
+  set named a riding jaguar whistle
+elseif sea serpent whistle /= %arg%
+  eval vnum 18513
+  eval cost 16
+  set named a sea serpent whistle
+elseif feathered serpent whistle /= %arg%
+  eval vnum 18514
+  eval cost 40
+  set named a feathered serpent whistle
+elseif jaguar cub whistle /= %arg%
+  eval vnum 18515
+  eval cost 24
+  set named a jaguar cub whistle
+elseif jaguar charm /= %arg%
+  eval vnum 18516
+  eval cost 18
+  set named a jaguar charm
+  * Crafts
+elseif fearsome jaguar armor pattern /= %arg%
+  eval vnum 18517
+  eval cost 20
+  set named the fearsome jaguar armor pattern
+elseif red coyote armor pattern /= %arg%
+  eval vnum 18519
+  eval cost 20
+  set named the red coyote armor pattern
+elseif feathered serpent armor pattern /= %arg%
+  eval vnum 18521
+  eval cost 20
+  set named feathered serpent armor pattern
+elseif eagle warrior armor pattern /= %arg%
+  eval vnum 18523
+  eval cost 20
+  set named the eagle warrior armor pattern
+elseif blue chameleon armor pattern /= %arg%
+  eval vnum 18525
+  eval cost 20
+  set named the blue chameleon armor pattern
+else
+  %send% %actor% They don't seem to sell '%arg%' here.
+  halt
+end
+eval var %%actor.%currency%%%
+eval test %var% >= %cost%
+eval correct_noun tokens
+if %cost% == 1
+  eval correct_noun token
+end
+if !%test%
+  %send% %actor% %self.name% tells you, 'You'll need %cost% jungle temple %correct_noun% to buy that.'
+  halt
+end
+eval %currency% %var%-%cost%
+remote %currency% %actor.id%
+%load% obj %vnum% %actor% inv %actor.level%
+%send% %actor% You buy %named% for %cost% jungle temple %correct_noun%.
+%echoaround% %actor% %actor.name% buys %named%.
 ~
 #18519
 Jungle Temple boss death - drop tokens~
@@ -950,6 +1046,11 @@ while %person%
       eval %var_name% 1
       remote %var_name% %person.id%
     end
+    * Now purge summons
+  elseif %person.vnum% == 18506
+    %purge% %person% $n slithers away.
+  elseif %person.vnum% == 18507
+    %purge% %person% $n vanishes.
   end
   eval person %person.next_in_room%
 done

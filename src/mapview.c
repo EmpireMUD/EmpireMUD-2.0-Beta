@@ -816,7 +816,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	emp = ROOM_OWNER(HOME_ROOM(room));
 	
 	if (GET_ROOM_VEHICLE(room) && VEH_OWNER(GET_ROOM_VEHICLE(room))) {
-		msg_to_char(ch, "The %s is owned by %s%s\t0%s.\r\n", skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(room))), EMPIRE_BANNER(VEH_OWNER(GET_ROOM_VEHICLE(room))), EMPIRE_NAME(VEH_OWNER(GET_ROOM_VEHICLE(room))), ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_PUBLIC) ? " (public)" : "");
+		msg_to_char(ch, "The %s is owned by %s%s\t0%s.", skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(room))), EMPIRE_BANNER(VEH_OWNER(GET_ROOM_VEHICLE(room))), EMPIRE_NAME(VEH_OWNER(GET_ROOM_VEHICLE(room))), ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_PUBLIC) ? " (public)" : "");
+		if (ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
+			msg_to_char(ch, " This is %s's private residence.", (index = find_player_index_by_idnum(ROOM_PRIVATE_OWNER(HOME_ROOM(room)))) ? index->fullname : "someone");
+		}
+		msg_to_char(ch, "\r\n");
 	}
 	else if (emp) {
 		if ((city = find_city(emp, room))) {
@@ -1341,6 +1345,8 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	
 	// buf is now the completed icon, but has both color codes (&) and variable tile codes (@)
 	if (strchr(buf, '@')) {
+		// NOTE: If you add new @ codes here, you must update "const char *icon_codes" in utils.c
+		
 		// here (@.) roadside icon
 		if (strstr(buf, "@.")) {
 			icon = get_icon_from_set(GET_SECT_ICONS(base_sect), tileset);

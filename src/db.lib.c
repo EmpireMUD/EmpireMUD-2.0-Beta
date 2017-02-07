@@ -3345,6 +3345,12 @@ void parse_mobile(FILE *mob_f, int nr) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'F': {	// faction
+				if (strlen(line) > 2) {
+					MOB_FACTION(mob) = find_faction_by_vnum(atoi(line + 2));
+				}
+				break;
+			}
 			case 'I': {	// interaction item
 				parse_interaction(line, &mob->interactions, buf2);
 				break;
@@ -3404,6 +3410,11 @@ void write_mob_to_file(FILE *fl, char_data *mob) {
 	fprintf(fl, "%d %d %d %d\n", GET_SEX(mob), MOB_NAME_SET(mob), MOB_MOVE_TYPE(mob), MOB_ATTACK_TYPE(mob));
 
 	// optionals:
+	
+	// F: faction
+	if (MOB_FACTION(mob)) {
+		fprintf(fl, "F %d\n", FCT_VNUM(MOB_FACTION(mob)));
+	}
 	
 	// I: interactions
 	write_interactions_to_file(fl, mob->interactions);

@@ -911,25 +911,27 @@ typedef struct vehicle_data vehicle_data;
 
 // FCT_x: Faction flags
 #define FCT_IN_DEVELOPMENT  BIT(0)	// a. not live
-#define FCT_GAINS_FROM_KILLS  BIT(1)	// b. killing mobs affects faction rating
+#define FCT_REP_FROM_KILLS  BIT(1)	// b. killing mobs affects faction rating
 
 
 // FCTR_x: Relationship flags
 #define FCTR_SHARED_GAINS  BIT(0)	// a. also gains rep when that one gains rep
 #define FCTR_INVERSE_GAINS  BIT(1)	// b. loses rep when that one gains rep
 #define FCTR_MUTUALLY_EXCLUSIVE  BIT(2)	// c. cannot gain if that one is positive
+#define FCTR_UNLISTED  BIT(3)  // d. mortals won't see this relationship
 
 
 // REP_x: Faction reputation levels
-#define REP_NEUTRAL  0	// no opinion
-#define REP_DESPISED  1	// lower cap
-#define REP_HATED  2	// worst
-#define REP_LOATHED  3	// bad
-#define REP_DISLIKED  4	// not good
-#define REP_LIKED  5	// decent
-#define REP_ESTEEMED  6	// good
-#define REP_VENERATED  7	// great!
-#define REP_REVERED  8	// upper cap
+#define REP_NONE  0	// base / un-set
+#define REP_NEUTRAL  1	// no opinion
+#define REP_DESPISED  2	// lower cap
+#define REP_HATED  3	// worst
+#define REP_LOATHED  4	// bad
+#define REP_DISLIKED  5	// not good
+#define REP_LIKED  6	// decent
+#define REP_ESTEEMED  7	// good
+#define REP_VENERATED  8	// great!
+#define REP_REVERED  9	// upper cap
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1679,6 +1681,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_STEALTHABLE  BIT(26)	// player can steal (rather than be prevented from accidentally stealing)
 #define PRF_WIZHIDE  BIT(27)	// player can't be seen in the room
 #define PRF_AUTONOTES  BIT(28)	// Player login syslogs automatically show notes
+#define PRF_AUTODISMOUNT  BIT(29)	// will dismount while moving instead of seeing an error
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -1740,6 +1743,7 @@ typedef struct vehicle_data vehicle_data;
 #define QR_SKILL_EXP  4
 #define QR_SKILL_LEVELS  5
 #define QR_QUEST_CHAIN  6
+#define QR_REPUTATION  7
 
 
 // QT_x: quest tracker types (conditions and pre-reqs)
@@ -1759,12 +1763,15 @@ typedef struct vehicle_data vehicle_data;
 #define QT_VISIT_ROOM_TEMPLATE  13
 #define QT_VISIT_SECTOR  14
 #define QT_HAVE_ABILITY  15
+#define QT_REP_OVER  16
+#define QT_REP_UNDER  17
 
 
 // QT_AMT_x: How quest trackers are displayed for different QT_ types
 #define QT_AMT_NONE  0	// show as "completed"
 #define QT_AMT_NUMBER  1  // show as x/X
 #define QT_AMT_THRESHOLD  2	// needs a numeric arg but shows as a threshold
+#define QT_AMT_REPUTATION  3	// uses a faction reputation
 
 
 // indicates empire (rather than misc) coins for a reward
@@ -2021,6 +2028,7 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_CONDITION  750	// FULL, etc
 #define MAX_COOLDOWNS  32
 #define MAX_EMPIRE_DESCRIPTION  2000
+#define MAX_FACTION_DESCRIPTION  4000
 #define MAX_GROUP_SIZE  4	// how many members a group allows
 #define MAX_IGNORES  15	// total number of players you can ignore
 #define MAX_INPUT_LENGTH  1024	// Max length per *line* of input
@@ -2720,14 +2728,15 @@ struct mob_special_data {
 	
 	int name_set;	// NAMES_x
 	struct custom_message *custom_msgs;	// any custom messages
+	faction_data *faction;	// if any
 	
 	int to_hit;	// Mob's attack % bonus
 	int to_dodge;	// Mob's dodge % bonus
 	int damage;	// Raw damage
 	int	attack_type;	// weapon type
-
+	
 	byte move_type;	// how the mob moves
-
+	
 	struct pursuit_data *pursuit;	// mob pursuit
 	room_vnum pursuit_leash_loc;	// where to return to
 	struct mob_tag *tagged_by;	// mob tagged by
@@ -3069,6 +3078,7 @@ struct player_special_data {
 	struct offer_data *offers;	// various offers for do_accept/reject
 	struct player_slash_channel *slash_channels;	// channels the player is on
 	struct slash_channel *load_slash_channels;	// temporary storage between load and join
+	struct player_faction_data *factions;	// hash table of factions
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered
@@ -3699,7 +3709,7 @@ struct faction_data {
 	int max_rep;	// REP_ they cap at, positive
 	int min_rep;	// REP_ they cap at, negative
 	int starting_rep;	// REP_ initial reputation for players
-	struct faction_relation *relations;	// linked list
+	struct faction_relation *relations;	// hash table
 	
 	// lists
 	UT_hash_handle hh;	// faction_table hash handle
@@ -3713,7 +3723,7 @@ struct faction_relation {
 	bitvector_t flags;	// FCTR_ flags
 	faction_data *ptr;	// quick reference
 	
-	struct faction_relation *next;	// LL
+	UT_hash_handle hh;	// fct->relations hash handle
 };
 
 
@@ -3723,6 +3733,15 @@ struct faction_reputation_type {
 	char *name;
 	char *color;	// & or \t color code
 	int value;	// points total a player must be at for this
+};
+
+
+// for hash table of player faction levels
+struct player_faction_data {
+	any_vnum vnum;	// faction vnum
+	int value;	// reputation points
+	int rep;	// REP_ const
+	UT_hash_handle hh;	// GET_FACTIONS(ch) hash
 };
 
 

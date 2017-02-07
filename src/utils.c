@@ -3349,9 +3349,11 @@ int color_code_length(const char *str) {
 * @return int the number of @ codes.
 */
 int count_icon_codes(char *string) {
+	const char *icon_codes = ".ewuUvV";
+	
 	int iter, count = 0, len = strlen(string);
 	for (iter = 0; iter < len - 1; ++iter) {
-		if (string[iter] == '@' && string[iter+1] != '@') {
+		if (string[iter] == '@' && strchr(icon_codes, string[iter+1])) {
 			++count;
 			++iter;	// advance past the color code
 		}

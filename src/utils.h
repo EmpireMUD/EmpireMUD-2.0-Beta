@@ -631,6 +631,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define MOB_DAMAGE(ch)  ((ch)->mob_specials.damage)
 #define MOB_DYNAMIC_NAME(ch)  ((ch)->mob_specials.dynamic_name)
 #define MOB_DYNAMIC_SEX(ch)  ((ch)->mob_specials.dynamic_sex)
+#define MOB_FACTION(ch)  ((ch)->mob_specials.faction)
 #define MOB_INSTANCE_ID(ch)  ((ch)->mob_specials.instance_id)
 #define MOB_MOVE_TYPE(ch)  ((ch)->mob_specials.move_type)
 #define MOB_PURSUIT(ch)  ((ch)->mob_specials.pursuit)
@@ -896,6 +897,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_DISGUISED_NAME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->disguised_name))
 #define GET_DISGUISED_SEX(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->disguised_sex))
 #define GET_EXP_TODAY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->exp_today))
+#define GET_FACTIONS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->factions))
 #define GET_FIGHT_MESSAGES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->fight_messages))
 #define GET_FIGHT_PROMPT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->fight_prompt))
 #define GET_GEAR_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->gear_level))
@@ -1435,6 +1437,7 @@ extern char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
 extern int obj_carry_size(obj_data *obj);
 
 // utils from faction.c
+extern const char *get_faction_name_by_vnum(any_vnum vnum);
 extern const char *get_reputation_name(int type);
 
 // utils from limits.c
@@ -1449,6 +1452,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 // utils from quest.c
 extern char *get_quest_name_by_proto(any_vnum vnum);
 void qt_change_ability(char_data *ch, any_vnum abil);
+void qt_change_reputation(char_data *ch, any_vnum faction);
 void qt_change_skill_level(char_data *ch, any_vnum skl);
 void qt_drop_obj(char_data *ch, obj_data *obj);
 void qt_empire_players(empire_data *emp, void (*func)(char_data *ch, any_vnum vnum), any_vnum vnum);

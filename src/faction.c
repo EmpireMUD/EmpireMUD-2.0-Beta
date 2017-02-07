@@ -27,7 +27,7 @@
 *   Helpers
 *   Utilities
 *   Database
-*   Character Creation
+*   Reputation Handlers
 *   OLC Handlers
 *   Displays
 *   Edit Modules
@@ -35,6 +35,9 @@
 
 // local data
 const char *default_faction_name = "Unnamed Faction";
+const int default_min_rep = REP_DESPISED;
+const int default_max_rep = REP_REVERED;
+const int default_starting_rep = REP_NEUTRAL;
 
 // local protos
 void get_faction_relation_display(struct faction_relation *list, char *save_buffer);
@@ -45,10 +48,33 @@ extern const char *relationship_flags[];
 extern struct faction_reputation_type reputation_levels[];
 
 // external funcs
+extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
+extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
+extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
+extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
 
 
  /////////////////////////////////////////////////////////////////////////////
 //// HELPERS ////////////////////////////////////////////////////////////////
+
+/**
+* Gets the name of a faction by vnum.
+*
+* @param any_vnum vnum Which faction.
+* @return const char* Its name.
+*/
+const char *get_faction_name_by_vnum(any_vnum vnum) {
+	const char *unknown = "UNKNOWN";
+	faction_data *fct;
+	
+	if ((fct = find_faction_by_vnum(vnum))) {
+		return FCT_NAME(fct);
+	}
+	else {
+		return unknown;
+	}
+}
+
 
 /**
 * Gets the name of a reputation by REP_ type.
@@ -110,7 +136,7 @@ faction_data *find_faction_by_name(char *name) {
 			// perfect match
 			return fct;
 		}
-		if (!partial && is_multiword_abbrev(name, FCT_NAME(fct))) {
+		if (!partial && multi_isname(name, FCT_NAME(fct))) {
 			// probable match
 			partial = fct;
 		}
@@ -148,6 +174,8 @@ faction_data *find_faction_by_vnum(any_vnum vnum) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_faction(faction_data *fct, char_data *ch) {
+	struct faction_relation *rel, *next_rel, *back;
+	int min_idx, max_idx, start_idx;
 	bool problem = FALSE;
 	
 	if (FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
@@ -157,6 +185,40 @@ bool audit_faction(faction_data *fct, char_data *ch) {
 	if (!FCT_NAME(fct) || !*FCT_NAME(fct) || !str_cmp(FCT_NAME(fct), default_faction_name)) {
 		olc_audit_msg(ch, FCT_VNUM(fct), "No name set");
 		problem = TRUE;
+	}
+	if (!FCT_DESCRIPTION(fct) || !*FCT_DESCRIPTION(fct)) {
+		olc_audit_msg(ch, FCT_VNUM(fct), "No description set");
+		problem = TRUE;
+	}
+	
+	// limits
+	min_idx = rep_const_to_index(FCT_MIN_REP(fct));
+	max_idx = rep_const_to_index(FCT_MAX_REP(fct));
+	start_idx = rep_const_to_index(FCT_STARTING_REP(fct));
+	if (min_idx == NOTHING || max_idx == NOTHING || start_idx == NOTHING) {
+		olc_audit_msg(ch, FCT_VNUM(fct), "Invalid reputation settings");
+		problem = TRUE;
+	}
+	if (max_idx < min_idx) {
+		olc_audit_msg(ch, FCT_VNUM(fct), "Max reputation is lower than min reputation");
+		problem = TRUE;
+	}
+	if (start_idx < min_idx || start_idx > max_idx) {
+		olc_audit_msg(ch, FCT_VNUM(fct), "Starting reputation is out of bounds");
+		problem = TRUE;
+	}
+	
+	HASH_ITER(hh, FCT_RELATIONS(fct), rel, next_rel) {
+		if (IS_SET(rel->flags, FCTR_SHARED_GAINS) && IS_SET(rel->flags, FCTR_INVERSE_GAINS | FCTR_MUTUALLY_EXCLUSIVE)) {
+			olc_audit_msg(ch, FCT_VNUM(fct), "Nonsensical relationship flags with %d %s", FCT_VNUM(rel->ptr), FCT_NAME(rel->ptr));
+			problem = TRUE;
+		}
+		
+		HASH_FIND_INT(FCT_RELATIONS(rel->ptr), &FCT_VNUM(fct), back);
+		if (!back || rel->flags != back->flags) {
+			olc_audit_msg(ch, FCT_VNUM(fct), "Asymmetrical relationship flags with %d %s", FCT_VNUM(rel->ptr), FCT_NAME(rel->ptr));
+			problem = TRUE;
+		}
 	}
 	
 	return problem;
@@ -193,7 +255,11 @@ char *list_one_faction(faction_data *fct, bool detail) {
 void olc_search_faction(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	faction_data *fct = find_faction_by_vnum(vnum);
+	faction_data *iter, *next_iter, *find;
+	quest_data *qiter, *next_qiter;
+	char_data *mob, *next_mob;
 	int size, found;
+	bool any;
 	
 	if (!fct) {
 		msg_to_char(ch, "There is no faction %d.\r\n", vnum);
@@ -203,7 +269,40 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of faction %d (%s):\r\n", vnum, FCT_NAME(fct));
 	
-	// factions are not used anywhere else yet
+	// check other factions
+	HASH_ITER(hh, faction_table, iter, next_iter) {
+		HASH_FIND_INT(FCT_RELATIONS(iter), &FCT_VNUM(fct), find);
+		if (find) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "FCT [%5d] %s\r\n", FCT_VNUM(iter), FCT_NAME(iter));
+		}
+	}
+	
+	// check mob allegiance
+	HASH_ITER(hh, mobile_table, mob, next_mob) {
+		if (MOB_FACTION(mob) == fct) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+		}
+	}
+	
+	// check quests
+	HASH_ITER(hh, quest_table, qiter, next_qiter) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// QR_x, QT_x: quest types
+		any = find_quest_task_in_list(QUEST_TASKS(qiter), QT_REP_OVER, vnum);
+		any |= find_quest_task_in_list(QUEST_PREREQS(qiter), QT_REP_OVER, vnum);
+		any |= find_quest_task_in_list(QUEST_TASKS(qiter), QT_REP_UNDER, vnum);
+		any |= find_quest_task_in_list(QUEST_PREREQS(qiter), QT_REP_UNDER, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(qiter), QR_REPUTATION, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+		}
+	}
 	
 	if (found > 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
@@ -277,11 +376,11 @@ void check_and_link_faction_relations(void) {
 	faction_data *fct, *next_fct;
 	
 	HASH_ITER(hh, faction_table, fct, next_fct) {
-		LL_FOREACH_SAFE(FCT_RELATIONS(fct), rel, next_rel) {
+		HASH_ITER(hh, FCT_RELATIONS(fct), rel, next_rel) {
 			rel->ptr = find_faction_by_vnum(rel->vnum);
 			
 			if (!rel->ptr) {
-				LL_DELETE(FCT_RELATIONS(fct), rel);
+				HASH_DEL(FCT_RELATIONS(fct), rel);
 				free(rel);
 			}
 		}
@@ -303,32 +402,31 @@ void clear_faction(faction_data *fct) {
 
 
 /**
-* Duplicates a list of faction relationships, for editing.
+* Duplicates a hash table of faction relationships, for editing.
 *
-* @param struct faction_relation *input The head of the list to copy.
-* @return struct faction_relation* The copied list.
+* @param struct faction_relation *input The hash table to copy.
+* @return struct faction_relation* The copied hash.
 */
 struct faction_relation *copy_faction_relations(struct faction_relation *input) {
-	struct faction_relation *el, *iter, *list = NULL;
+	struct faction_relation *el, *iter, *next_iter, *hash = NULL;
 	
-	LL_FOREACH(input, iter) {
+	HASH_ITER(hh, input, iter, next_iter) {
 		CREATE(el, struct faction_relation, 1);
 		*el = *iter;
-		el->next = NULL;
-		LL_APPEND(list, el);
+		HASH_ADD_INT(hash, vnum, el);
 	}
 	
-	return list;
+	return hash;
 }
 
 
 /**
-* @param struct faction_relation *list Frees the memory for this list.
+* @param struct faction_relation *hash Frees the memory for this hash table.
 */
-void free_faction_relations(struct faction_relation *list) {
+void free_faction_relations(struct faction_relation *hash) {
 	struct faction_relation *tmp, *next;
 	
-	LL_FOREACH_SAFE(list, tmp, next) {
+	HASH_ITER(hh, hash, tmp, next) {
 		free(tmp);
 	}
 }
@@ -420,10 +518,14 @@ void parse_faction(FILE *fl, any_vnum vnum) {
 					exit(1);
 				}
 				
-				CREATE(rel, struct faction_relation, 1);
+				HASH_FIND_INT(FCT_RELATIONS(fct), &int_in[0], rel);
+				if (!rel) {
+					CREATE(rel, struct faction_relation, 1);
+				}
+				
 				rel->vnum = int_in[0];
 				rel->flags = asciiflag_conv(str_in);
-				LL_APPEND(FCT_RELATIONS(fct), rel);
+				HASH_ADD_INT(FCT_RELATIONS(fct), vnum, rel);
 				break;
 			}
 			
@@ -467,7 +569,7 @@ void write_faction_index(FILE *fl) {
 * @param faction_data *fct The thing to save.
 */
 void write_faction_to_file(FILE *fl, faction_data *fct) {
-	struct faction_relation *rel;
+	struct faction_relation *rel, *next_rel;
 	char temp[MAX_STRING_LENGTH];
 	
 	if (!fl || !fct) {
@@ -492,12 +594,298 @@ void write_faction_to_file(FILE *fl, faction_data *fct) {
 	fprintf(fl, "%d %d %d\n", FCT_MIN_REP(fct), FCT_MAX_REP(fct), FCT_STARTING_REP(fct));
 	
 	// 'R': relations
-	LL_FOREACH(FCT_RELATIONS(fct), rel) {
+	HASH_ITER(hh, FCT_RELATIONS(fct), rel, next_rel) {
 		fprintf(fl, "R %d %s\n", rel->vnum, bitv_to_alpha(rel->flags));
 	}
 	
 	// end
 	fprintf(fl, "S\n");
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// REPUTATION HANDLERS /////////////////////////////////////////////////////
+
+/**
+* Comparison function to determine if one REP_ const is higher than another.
+* This does NOT account for 'magnitude', where a negative rank is "higher"
+* than another negative rank if its absolute value is larger.
+*/
+int compare_reptuation(int rep_a, int rep_b) {
+	int ind_a, ind_b;
+	
+	ind_a = rep_const_to_index(rep_a);
+	ind_b = rep_const_to_index(rep_b);
+	
+	if (ind_a < ind_b) {
+		return -1;
+	}
+	else if (ind_a > ind_b) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+
+/**
+* Causes basic reputation gain or loss.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The faction to gain/lose rep with.
+* @param int amount The value to gain/lose (bounded by rep limits).
+* @param bool is_kill If TRUE, gains can be toggled by faction flags.
+* @param bool cascade If TRUE, will call this function recursively on shared-/inverse-gain factions.
+*/
+void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, bool cascade) {
+	int idx, min_idx, max_idx, min_rep, max_rep, old_val, old_rep;
+	struct faction_relation *rel, *next_rel;
+	faction_data *fct, *iter, *next_iter;
+	struct player_faction_data *pfd;
+	bool changed;
+	
+	if (IS_NPC(ch) || amount == 0) {
+		return;
+	}
+	if (!(fct = find_faction_by_vnum(vnum)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
+		return;	// faction doesn't exist?
+	}
+	if (!(pfd = get_reputation(ch, vnum, TRUE))) {
+		return;	// unable to get a rep entry?
+	}
+	
+	// check for exclusions
+	HASH_ITER(hh, FCT_RELATIONS(fct), rel, next_rel) {
+		if (IS_SET(rel->flags, FCTR_MUTUALLY_EXCLUSIVE) && amount > 0 && get_reputation_value(ch, rel->vnum) > 0) {
+			return;	// can't gain while it's positive
+		}
+	}
+	
+	// safe to attempt to cascade NOW (before we cancel out due to min/max)
+	if (cascade) {
+		HASH_ITER(hh, faction_table, iter, next_iter) {
+			if (iter == fct || FACTION_FLAGGED(iter, FCT_IN_DEVELOPMENT)) {
+				continue;
+			}
+			
+			HASH_FIND_INT(FCT_RELATIONS(iter), &FCT_VNUM(fct), rel);
+			if (rel) {
+				if (IS_SET(rel->flags, FCTR_SHARED_GAINS)) {
+					gain_reputation(ch, FCT_VNUM(iter), amount, is_kill, FALSE);
+				}
+				if (IS_SET(rel->flags, FCTR_INVERSE_GAINS)) {
+					gain_reputation(ch, FCT_VNUM(iter), -amount, is_kill, FALSE);
+				}
+			}
+		}
+	}
+	
+	// limits based on kills (do AFTER cascading)
+	if (is_kill && !FACTION_FLAGGED(fct, FCT_REP_FROM_KILLS)) {
+		return;
+	}
+	
+	// bounds
+	min_idx = rep_const_to_index(FCT_MIN_REP(fct));
+	min_rep = (min_idx != NOTHING) ? reputation_levels[min_idx].value : MIN_REPUTATION;
+	if (amount < 0 && pfd->value <= min_rep) {
+		return;	// at min
+	}
+	max_idx = rep_const_to_index(FCT_MAX_REP(fct));
+	max_rep = (max_idx != NOTHING) ? reputation_levels[max_idx].value : MAX_REPUTATION;
+	if (amount > 0 && pfd->value >= max_rep) {
+		return;	// at max
+	}
+	
+	// seems ok
+	old_val = pfd->value;
+	old_rep = pfd->rep;
+	SAFE_ADD(pfd->value, amount, MIN_REPUTATION, MAX_REPUTATION, FALSE);
+	
+	// detect new rep now
+	do {
+		changed = FALSE;
+		idx = rep_const_to_index(pfd->rep);
+		if (amount > 0) {
+			if (pfd->value > 0 && pfd->value >= reputation_levels[idx+1].value) {
+				pfd->rep = reputation_levels[idx+1].type;
+				changed = TRUE;
+			}
+			else if (pfd->value < 0 && pfd->value > reputation_levels[idx].value) {
+				pfd->rep = reputation_levels[idx+1].type;
+				changed = TRUE;
+			}
+		}
+		else if (amount < 0) {
+			if (pfd->value > 0 && pfd->value < reputation_levels[idx].value) {
+				pfd->rep = reputation_levels[idx-1].type;
+				changed = TRUE;
+			}
+			else if (pfd->value < 0 && pfd->value <= reputation_levels[idx-1].value) {
+				pfd->rep = reputation_levels[idx-1].type;
+				changed = TRUE;
+			}
+		}
+	}
+	while (changed);
+	
+	// and message
+	if (cascade) {
+		idx = rep_const_to_index(pfd->rep);
+		amount = pfd->value - old_val;
+		msg_to_char(ch, "%sYou %s %d reputation with %s.\t0\r\n", reputation_levels[idx].color, (amount > 0 ? "gain" : "lose"), ABSOLUTE(amount), FCT_NAME(fct));
+		if (old_rep != pfd->rep) {
+			msg_to_char(ch, "%sYou are now %s with %s.\t0\r\n", reputation_levels[idx].color, reputation_levels[idx].name, FCT_NAME(fct));
+			qt_change_reputation(ch, FCT_VNUM(fct));
+		}
+	}
+}
+
+
+/**
+* Finds a player's reputation data for a faction. This will attempt (not
+* guarantee) to create an entry if it doesn't exist, if desired.
+*
+* @param char_data *ch The player.
+* @param any_vnum A faction vnum.
+* @param bool create If TRUE, will attempt to create the entry.
+* @return struct player_faction_data* The player's faction rep entry, if it exists.
+*/
+struct player_faction_data *get_reputation(char_data *ch, any_vnum vnum, bool create) {
+	struct player_faction_data *pfd;
+	faction_data *fct;
+	int idx;
+	
+	if (IS_NPC(ch)) {
+		return NULL;	// only players have this
+	}
+	
+	HASH_FIND_INT(GET_FACTIONS(ch), &vnum, pfd);
+	if (!pfd && create && (fct = find_faction_by_vnum(vnum))) {
+		CREATE(pfd, struct player_faction_data, 1);
+		pfd->vnum = vnum;
+		idx = rep_const_to_index(FCT_STARTING_REP(fct));
+		pfd->rep = idx != NOTHING ? FCT_STARTING_REP(fct) : REP_NEUTRAL;
+		pfd->value = (idx != NOTHING ? reputation_levels[idx].value : 0);
+		HASH_ADD_INT(GET_FACTIONS(ch), vnum, pfd);
+	}
+	
+	return pfd;
+}
+
+
+/**
+* Finds a reputation const by name.
+*
+* @param char *name The name to find.
+* @return int Any REP_ const, or NOTHING if not found.
+*/
+int get_reputation_by_name(char *name) {
+	int iter, partial = NOTHING;
+	
+	for (iter = 0; *reputation_levels[iter].name != '\n'; ++iter) {
+		if (!str_cmp(name, reputation_levels[iter].name)) {
+			return reputation_levels[iter].type;
+		}
+		else if (is_abbrev(name, reputation_levels[iter].name)) {
+			partial = iter;
+		}
+	}
+	
+	return partial != NOTHING ? reputation_levels[partial].type : NOTHING;
+}
+
+
+/**
+* Fetches a player's reputation value with a given faction, if they have one.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The faction's vnum.
+* @return int The reputation value, or 0 if no reputation exists.
+*/
+int get_reputation_value(char_data *ch, any_vnum vnum) {
+	struct player_faction_data *pfd = get_reputation(ch, vnum, FALSE);
+	return pfd ? pfd->value : 0;
+}
+
+
+/**
+* Detect the min/max values for reputation at startup.
+*/
+void init_reputation(void) {
+	int iter;
+	
+	for (iter = 0; *reputation_levels[iter].name != '\n'; ++iter) {
+		MAX_REPUTATION = MAX(MAX_REPUTATION, reputation_levels[iter].value);
+		MIN_REPUTATION = MIN(MIN_REPUTATION, reputation_levels[iter].value);
+	}
+}
+
+
+/**
+* Converts a REP_ const into a reputation_levels[] index.
+*
+* @param int rep_const Any REP_ type.
+* @return int Its location in the reputation_levels array, or NOTHING if not found.
+*/
+int rep_const_to_index(int rep_const) {
+	int iter;
+	
+	for (iter = 0; *reputation_levels[iter].name != '\n'; ++iter) {
+		if (reputation_levels[iter].type == rep_const) {
+			return iter;
+		}
+	}
+	
+	return NOTHING;	// not found
+}
+
+
+/**
+* Updates all of a player's REP_ consts on their factions.
+*
+* @param char_data *ch The player.
+*/
+void update_reputations(char_data *ch) {
+	struct player_faction_data *pfd, *next_pfd;
+	int iter, min_idx, max_idx;
+	faction_data *fct;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_ITER(hh, GET_FACTIONS(ch), pfd, next_pfd) {
+		if (!(fct = find_faction_by_vnum(pfd->vnum)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
+			HASH_DEL(GET_FACTIONS(ch), pfd);
+			free(pfd);
+			continue;
+		}
+		
+		min_idx = rep_const_to_index(FCT_MIN_REP(fct));
+		max_idx = rep_const_to_index(FCT_MAX_REP(fct));
+		pfd->value = MAX(reputation_levels[min_idx].value, pfd->value);
+		pfd->value = MIN(reputation_levels[max_idx].value, pfd->value);
+		pfd->rep = FCT_STARTING_REP(fct);	// default
+		
+		for (iter = min_idx; iter <= max_idx; ++iter) {
+			if (reputation_levels[iter].value == pfd->value) {
+				pfd->rep = reputation_levels[iter].type;
+				break;
+			}
+			else if (reputation_levels[iter].value < 0 && pfd->value <= reputation_levels[iter].value) {
+				pfd->rep = reputation_levels[iter].type;
+				break;	// break -- looking for lowest value match only
+			}
+			else if (reputation_levels[iter].value > 0 && pfd->value >= reputation_levels[iter].value) {
+				pfd->rep = reputation_levels[iter].type;
+				// don't break, looking for highest value
+			}
+		}
+		
+		qt_change_reputation(ch, pfd->vnum);
+	}
 }
 
 
@@ -540,7 +928,11 @@ faction_data *create_faction_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_faction(char_data *ch, any_vnum vnum) {
-	faction_data *fct, *iter, *next_iter;
+	faction_data *fct, *iter, *next_iter, *find;
+	char_data *mob, *next_mob, *chiter;
+	quest_data *qiter, *next_qiter;
+	descriptor_data *desc;
+	bool found;
 	
 	if (!(fct = find_faction_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such faction %d.\r\n", vnum);
@@ -550,23 +942,80 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	// remove it from the hash table first
 	remove_faction_from_table(fct);
 	
-	// remove from other factions
-	
 	// remove from live players
-	/*
 	LL_FOREACH(character_list, chiter) {
-		if (IS_NPC(chiter)) {
-			continue;
+		if (IS_NPC(chiter) && MOB_FACTION(chiter) == fct) {
+			MOB_FACTION(chiter) = NULL;
 		}
-		if (GET_CLASS(chiter) != fct) {
-			continue;
+		else if (!IS_NPC(chiter)) {
+			update_reputations(chiter);
 		}
-		update_class(chiter);
 	}
-	*/
 	
-	// remove from mobs, quests
-
+	// remove from other factions
+	HASH_ITER(hh, faction_table, iter, next_iter) {
+		HASH_FIND_INT(FCT_RELATIONS(iter), &FCT_VNUM(fct), find);
+		if (find) {
+			HASH_DEL(FCT_RELATIONS(iter), find);
+			free(find);
+			save_library_file_for_vnum(DB_BOOT_FCT, FCT_VNUM(iter));
+		}
+	}
+	
+	// remove from mobs
+	HASH_ITER(hh, mobile_table, mob, next_mob) {
+		if (MOB_FACTION(mob) == fct) {
+			MOB_FACTION(mob) = NULL;
+			save_library_file_for_vnum(DB_BOOT_MOB, GET_MOB_VNUM(mob));
+		}
+	}
+	
+	// remove from quests
+	HASH_ITER(hh, quest_table, qiter, next_qiter) {
+		// QT_x, QR_x: quest types
+		found = delete_quest_task_from_list(&QUEST_TASKS(qiter), QT_REP_OVER, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(qiter), QT_REP_OVER, vnum);
+		found |= delete_quest_task_from_list(&QUEST_TASKS(qiter), QT_REP_UNDER, vnum);
+		found |= delete_quest_task_from_list(&QUEST_PREREQS(qiter), QT_REP_UNDER, vnum);
+		found |= delete_quest_reward_from_list(&QUEST_REWARDS(qiter), QR_REPUTATION, vnum);
+		
+		if (found) {
+			SET_BIT(QUEST_FLAGS(qiter), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(qiter));
+		}
+	}
+	
+	// remove from active editors
+	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (GET_OLC_FACTION(desc)) {
+			HASH_FIND_INT(FCT_RELATIONS(GET_OLC_FACTION(desc)), &FCT_VNUM(fct), find);
+			if (find) {
+				HASH_DEL(FCT_RELATIONS(GET_OLC_FACTION(desc)), find);
+				free(find);
+				msg_to_char(desc->character, "A related faction for the faction you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_MOBILE(desc)) {
+			if (MOB_FACTION(GET_OLC_MOBILE(desc)) == fct) {
+				MOB_FACTION(GET_OLC_MOBILE(desc)) = NULL;
+				msg_to_char(desc->character, "The allegiance faction for the mob you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_QUEST(desc)) {
+			// QT_x, QR_x: quest types
+			found = delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_REP_OVER, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_REP_OVER, vnum);
+			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_REP_UNDER, vnum);
+			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_REP_UNDER, vnum);
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_REPUTATION, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A faction used by the quest you are editing was deleted.\r\n");
+			}
+		}
+	}
+	
 	// save index and faction file now
 	save_index(DB_BOOT_FCT);
 	save_library_file_for_vnum(DB_BOOT_FCT, vnum);
@@ -587,6 +1036,7 @@ void save_olc_faction(descriptor_data *desc) {
 	faction_data *proto, *fct = GET_OLC_FACTION(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
 	UT_hash_handle hh, sorted;
+	char_data *chiter;
 
 	// have a place to save it?
 	if (!(proto = find_faction_by_vnum(vnum))) {
@@ -597,6 +1047,9 @@ void save_olc_faction(descriptor_data *desc) {
 	if (FCT_NAME(proto)) {
 		free(FCT_NAME(proto));
 	}
+	if (FCT_DESCRIPTION(proto)) {
+		free(FCT_DESCRIPTION(proto));
+	}
 	free_faction_relations(FCT_RELATIONS(proto));
 	
 	// sanity
@@ -606,7 +1059,7 @@ void save_olc_faction(descriptor_data *desc) {
 		}
 		FCT_NAME(fct) = str_dup(default_faction_name);
 	}
-
+	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
 	sorted = proto->sorted_hh;
@@ -620,6 +1073,14 @@ void save_olc_faction(descriptor_data *desc) {
 
 	// ... and re-sort
 	HASH_SRT(sorted_hh, sorted_factions, sort_factions_by_data);
+	
+	// update live players
+	LL_FOREACH(character_list, chiter) {
+		if (IS_NPC(chiter)) {
+			continue;
+		}
+		update_reputations(chiter);
+	}
 }
 
 
@@ -641,6 +1102,7 @@ faction_data *setup_olc_faction(faction_data *input) {
 
 		// copy things that are pointers
 		FCT_NAME(new) = FCT_NAME(input) ? str_dup(FCT_NAME(input)) : NULL;
+		FCT_DESCRIPTION(new) = FCT_DESCRIPTION(input) ? str_dup(FCT_DESCRIPTION(input)) : NULL;
 		
 		// copy lists
 		FCT_RELATIONS(new) = copy_faction_relations(FCT_RELATIONS(input));
@@ -649,6 +1111,9 @@ faction_data *setup_olc_faction(faction_data *input) {
 		// brand new: some defaults
 		FCT_NAME(new) = str_dup(default_faction_name);
 		FCT_FLAGS(new) = FCT_IN_DEVELOPMENT;
+		FCT_MIN_REP(new) = default_min_rep;
+		FCT_MAX_REP(new) = default_max_rep;
+		FCT_STARTING_REP(new) = default_starting_rep;
 	}
 	
 	// done
@@ -694,15 +1159,17 @@ void do_stat_faction(char_data *ch, faction_data *fct) {
 * @param char *save_buffer A buffer to store the display to.
 */
 void get_faction_relation_display(struct faction_relation *list, char *save_buffer) {
-	struct faction_relation *iter;
+	struct faction_relation *iter, *next_iter;
 	char lbuf[MAX_STRING_LENGTH];
-	int count = 0;
 	
 	*save_buffer = '\0';
 	
-	LL_FOREACH(list, iter) {
+	HASH_ITER(hh, list, iter, next_iter) {
 		sprintbit(iter->flags, relationship_flags, lbuf, TRUE);
-		sprintf(save_buffer + strlen(save_buffer), "%2d. [%5d] %s - %s\r\n", ++count, iter->vnum, FCT_NAME(iter->ptr), lbuf);
+		sprintf(save_buffer + strlen(save_buffer), " [%5d] %s - %s\r\n", iter->vnum, FCT_NAME(iter->ptr), lbuf);
+	}
+	if (!list) {
+		strcpy(save_buffer, " none\r\n");
 	}
 }
 
@@ -730,12 +1197,12 @@ void olc_show_faction(char_data *ch) {
 	sprintbit(FCT_FLAGS(fct), faction_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
 	
-	sprintf(buf + strlen(buf), "<\tyminreptuation\t0> %s\r\n", get_reputation_name(FCT_MIN_REP(fct)));
+	sprintf(buf + strlen(buf), "<\tyminreputation\t0> %s\r\n", get_reputation_name(FCT_MIN_REP(fct)));
 	sprintf(buf + strlen(buf), "<\tymaxreputation\t0> %s\r\n", get_reputation_name(FCT_MAX_REP(fct)));
 	sprintf(buf + strlen(buf), "<\tystartingreuptation\t0> %s\r\n", get_reputation_name(FCT_STARTING_REP(fct)));
 	
 	get_faction_relation_display(FCT_RELATIONS(fct), lbuf);
-	sprintf(buf + strlen(buf), "Relationships: <\tyrelation\t0>\r\n%s", FCT_RELATIONS(fct) ? lbuf : "");
+	sprintf(buf + strlen(buf), "Relationships: <\tyrelation\t0>, <\tymatchrelations\t0>\r\n%s", FCT_RELATIONS(fct) ? lbuf : "");
 	
 	page_string(ch->desc, buf, TRUE);
 }
@@ -765,6 +1232,19 @@ int vnum_faction(char *searchname, char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// OLC MODULES /////////////////////////////////////////////////////////////
 
+OLC_MODULE(fedit_description) {
+	faction_data *fct = GET_OLC_FACTION(ch->desc);
+	
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "description for %s", FCT_NAME(fct));
+		start_string_editor(ch->desc, buf, &FCT_DESCRIPTION(fct), MAX_FACTION_DESCRIPTION);
+	}
+}
+
+
 OLC_MODULE(fedit_flags) {
 	faction_data *fct = GET_OLC_FACTION(ch->desc);
 	bool had_indev = IS_SET(FCT_FLAGS(fct), FCT_IN_DEVELOPMENT) ? TRUE : FALSE;
@@ -779,13 +1259,202 @@ OLC_MODULE(fedit_flags) {
 }
 
 
+OLC_MODULE(fedit_matchrelations) {
+	faction_data *fct = GET_OLC_FACTION(ch->desc), *iter, *next_iter;
+	struct faction_relation *find, *rel;
+	bool found = FALSE;
+	
+	HASH_ITER(hh, faction_table, iter, next_iter) {
+		if (FCT_VNUM(iter) == FCT_VNUM(fct)) {
+			continue;
+		}
+		
+		// find us
+		HASH_FIND_INT(FCT_RELATIONS(iter), &FCT_VNUM(fct), find);
+		if (!find) {
+			continue;
+		}
+		
+		// our entry
+		HASH_FIND_INT(FCT_RELATIONS(fct), &FCT_VNUM(iter), rel);
+		if (!rel) {
+			CREATE(rel, struct faction_relation, 1);
+			rel->vnum = FCT_VNUM(iter);
+			rel->ptr = iter;
+			HASH_ADD_INT(FCT_RELATIONS(fct), vnum, rel);
+		}
+		
+		// copy
+		rel->flags = find->flags;
+		sprintbit(rel->flags, relationship_flags, buf, TRUE);
+		msg_to_char(ch, "Matched [%5d] %s: %s\r\n", FCT_VNUM(iter), FCT_NAME(iter), buf);
+		found = TRUE;
+	}
+	
+	if (!found) {
+		msg_to_char(ch, "No relations to match.\r\n");
+	}
+}
+
+
 OLC_MODULE(fedit_maxreputation) {
 	faction_data *fct = GET_OLC_FACTION(ch->desc);
-	// CLASS_POOL(fct, HEALTH) = olc_process_number(ch, argument, "max health", "maxhealth", 1, MAX_INT, CLASS_POOL(fct, HEALTH));
+	int rep, idx;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Available reputation levels:\r\n");
+		for (idx = 0; *reputation_levels[idx].name != '\n'; ++idx) {
+			msg_to_char(ch, " %s%s\t0 (%d)\r\n", reputation_levels[idx].color, reputation_levels[idx].name, reputation_levels[idx].value);
+		}
+		return;
+	}
+	
+	if ((rep = get_reputation_by_name(argument)) == NOTHING || (idx = rep_const_to_index(rep)) == NOTHING) {
+		msg_to_char(ch, "Unknown reputation level '%s'.\r\n", argument);
+		return;
+	}
+	
+	FCT_MAX_REP(fct) = rep;
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		send_config_msg(ch, "ok_string");
+	}
+	else {
+		msg_to_char(ch, "You set the maximum reputation to %s.\r\n", reputation_levels[idx].name);
+	}
+}
+
+
+OLC_MODULE(fedit_minreputation) {
+	faction_data *fct = GET_OLC_FACTION(ch->desc);
+	int rep, idx;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Available reputation levels:\r\n");
+		for (idx = 0; *reputation_levels[idx].name != '\n'; ++idx) {
+			msg_to_char(ch, " %s%s\t0 (%d)\r\n", reputation_levels[idx].color, reputation_levels[idx].name, reputation_levels[idx].value);
+		}
+		return;
+	}
+	
+	if ((rep = get_reputation_by_name(argument)) == NOTHING || (idx = rep_const_to_index(rep)) == NOTHING) {
+		msg_to_char(ch, "Unknown reputation level '%s'.\r\n", argument);
+		return;
+	}
+	
+	FCT_MIN_REP(fct) = rep;
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		send_config_msg(ch, "ok_string");
+	}
+	else {
+		msg_to_char(ch, "You set the minimum reputation to %s.\r\n", reputation_levels[idx].name);
+	}
 }
 
 
 OLC_MODULE(fedit_name) {
 	faction_data *fct = GET_OLC_FACTION(ch->desc);
 	olc_process_string(ch, argument, "name", &FCT_NAME(fct));
+}
+
+
+OLC_MODULE(fedit_relation) {
+	char which_arg[MAX_INPUT_LENGTH], cmd_arg[MAX_INPUT_LENGTH], more_args[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	faction_data *fct = GET_OLC_FACTION(ch->desc), *other;
+	struct faction_relation *rel;
+	
+	// .rel <name/vnum> [flags | delete] [which flags]
+	// .rel <name/vnum> -> shows status and mutual status?
+	argument = any_one_word(argument, which_arg);
+	half_chop(argument, cmd_arg, more_args);
+	
+	if (!*which_arg) {
+		msg_to_char(ch, ".relation <name/vnum> [flags | delete] [which flags]\r\n");
+	}
+	else if (!(other = find_faction(which_arg))) {
+		msg_to_char(ch, "Unknown faction '%s'.\r\n", which_arg);
+	}
+	else if (FCT_VNUM(other) == FCT_VNUM(fct)) {
+		msg_to_char(ch, "Factions aren't allowed to have relations with themselves.\r\n");
+	}
+	else if (!*cmd_arg) {
+		// show status: us to them
+		HASH_FIND_INT(FCT_RELATIONS(fct), &FCT_VNUM(other), rel);
+		if (rel) {
+			sprintbit(rel->flags, relationship_flags, buf, TRUE);
+			msg_to_char(ch, "%s -> %s: %s\r\n", FCT_NAME(fct), FCT_NAME(other), buf);
+		}
+		else {
+			msg_to_char(ch, "%s -> %s: no relations\r\n", FCT_NAME(fct), FCT_NAME(other));
+		}
+		
+		// show status: them
+		HASH_FIND_INT(FCT_RELATIONS(other), &FCT_VNUM(fct), rel);
+		if (rel) {
+			sprintbit(rel->flags, relationship_flags, buf, TRUE);
+			msg_to_char(ch, "%s -> %s: %s\r\n", FCT_NAME(other), FCT_NAME(fct), buf);
+		}
+		else {
+			msg_to_char(ch, "%s -> %s: no relations\r\n", FCT_NAME(other), FCT_NAME(fct));
+		}
+	}
+	else if (is_abbrev(cmd_arg, "delete") || is_abbrev(cmd_arg, "remove")) {
+		// delete one
+		HASH_FIND_INT(FCT_RELATIONS(fct), &FCT_VNUM(other), rel);
+		if (!rel) {
+			msg_to_char(ch, "There are no relations with that faction.\r\n");
+		}
+		else {
+			HASH_DEL(FCT_RELATIONS(fct), rel);
+			free(rel);
+			msg_to_char(ch, "You delete the relations with %s.\r\n", FCT_NAME(other));
+		}
+	}
+	else if (is_abbrev(cmd_arg, "flags")) {
+		// find/add relations
+		HASH_FIND_INT(FCT_RELATIONS(fct), &FCT_VNUM(other), rel);
+		if (!rel) {
+			CREATE(rel, struct faction_relation, 1);
+			rel->vnum = FCT_VNUM(other);
+			rel->ptr = other;
+			HASH_ADD_INT(FCT_RELATIONS(fct), vnum, rel);
+		}
+		
+		rel->flags = olc_process_flag(ch, more_args, "relationship", NULL, relationship_flags, rel->flags);
+		
+		// remove if no flags
+		if (!rel->flags) {
+			HASH_DEL(FCT_RELATIONS(fct), rel);
+			free(rel);
+		}
+	}
+	else {
+		msg_to_char(ch, ".relation <name/vnum> [flags | delete] [which flags]\r\n");
+	}
+}
+
+
+OLC_MODULE(fedit_startingreputation) {
+	faction_data *fct = GET_OLC_FACTION(ch->desc);
+	int rep, idx;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Available reputation levels:\r\n");
+		for (idx = 0; *reputation_levels[idx].name != '\n'; ++idx) {
+			msg_to_char(ch, " %s%s\t0 (%d)\r\n", reputation_levels[idx].color, reputation_levels[idx].name, reputation_levels[idx].value);
+		}
+		return;
+	}
+	
+	if ((rep = get_reputation_by_name(argument)) == NOTHING || (idx = rep_const_to_index(rep)) == NOTHING) {
+		msg_to_char(ch, "Unknown reputation level '%s'.\r\n", argument);
+		return;
+	}
+	
+	FCT_STARTING_REP(fct) = rep;
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		send_config_msg(ch, "ok_string");
+	}
+	else {
+		msg_to_char(ch, "You set the starting reputation to %s.\r\n", reputation_levels[idx].name);
+	}
 }
