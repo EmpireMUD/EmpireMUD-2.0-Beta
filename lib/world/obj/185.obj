@@ -67,7 +67,7 @@ S
 idol jade small~
 the jade idol~
 A small jade idol of a serpent is displayed here.~
-This ancient idol is carved from a single gemstone! It looks valuable!  
+This ancient idol is carved from a single gemstone! It looks valuable!
 ~
 15 0 a 6
 10 0 0
@@ -84,7 +84,7 @@ a secret passageway~
 A secret passageway has opened up nearby!~
 It looks like a shortcut to somewhere else in the area.
 ~
-8 0 a 2
+8 0 0 3
 18504 0 0
 0 0
 S
@@ -100,12 +100,12 @@ This item spawns a mob and then purges itself.
 T 18511
 S
 #18512
-whistle feathered serpent~
-a feathered serpent whistle~
-A feathered serpent whistle is lying on the ground.~
-This whistle can be used just once, to summon a feathered serpent mount.
+whistle jaguar riding~
+a riding jaguar whistle~
+A riding jaguar whistle is lying on the ground.~
+This whistle can be used just once, to summon a riding jaguar mount.
 ~
-3 0 a 2
+3 0 a 3
 18512 0 0
 14 0
 T 10263
@@ -122,24 +122,24 @@ This whistle can be used just once, to summon a sea serpent mount.
 T 10263
 S
 #18514
-whistle terrosaur giant~
-the giant terrosaur whistle~
-A giant terrosaur whistle is lying here.~
-This whistle can be used just once, to summon a giant terrosaur mount.
+whistle feathered serpent~
+the feathered serpent whistle~
+A feathered serpent whistle is lying on the ground here.~
+This whistle can be used just once, to summon a feathered serpent mount.
 ~
-3 0 a 5
+3 0 a 6
 18514 0 0
 14 0
 T 10263
 S
 #18515
-whistle leopard cub~
-a leopard cub whistle~
-A leopard cub whistle is lying here.~
+whistle jaguar cub~
+a jaguar cub whistle~
+A jaguar cub whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-3 p a 6
+3 p a 7
 18515 0 0
 2 0
 T 9900

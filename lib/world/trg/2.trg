@@ -46,9 +46,23 @@ if !%actor.can_teleport_room% || !%actor.canuseroom_guest%
   %send% %actor% You can't teleport out of here.
   halt
 end
-if !%actor.home%
+eval home %actor.home%
+if !%home%
   %send% %actor% You have no home to teleport back to with this trinket.
   halt
+end
+eval veh %home.in_vehicle%
+if %veh%
+  eval outside_room %veh.room%
+  eval test %%actor.canuseroom_guest(%outside_room%)%%
+  eval test2 eval test %%actor.can_teleport_room(%outside_room%)%%
+  if !%test%
+    %send% %actor% You can't teleport home to a vehicle that's parked on foreign territory you don't have permission to use!
+    halt
+  elseif !%test2%
+    %send% %actor% You can't teleport to your home's current location.
+    halt
+  end
 end
 * once per 60 minutes
 if %actor.varexists(last_hestian_time)%
