@@ -1986,10 +1986,10 @@ typedef struct vehicle_data vehicle_data;
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
-// For various misc numbers attached to rooms
+// ROOM_EXTRA_x: For various misc numbers attached to rooms
 // WARNING: Make sure you have a place these are set, a place they are read,
 // and *especially* a place they are removed. -pc
-	#define ROOM_EXTRA_UNUSED  0	// was MINE_TYPE prior to b3.1
+#define ROOM_EXTRA_PROSPECT_EMPIRE  0
 #define ROOM_EXTRA_MINE_AMOUNT  1
 	#define ROOM_EXTRA_UNUSED2  2
 #define ROOM_EXTRA_SEED_TIME  3

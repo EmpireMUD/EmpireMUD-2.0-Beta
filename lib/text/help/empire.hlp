@@ -979,7 +979,8 @@ mountain tile (since the last mountain reset), that tile will benefit from your
 Deep Mines and/or Rare Metals until the next mountain reset. For more info on
 mountain resets, see HELP MINE.
 
-Gain experience when you finish prospecting a tile.
+Gain experience when you finish prospecting a tile. Prospecting happens
+instantly if your empire was the last one to prospect the tile.
 
 See also: MINE, DEEP MINES, RARE METALS
 #

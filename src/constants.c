@@ -2767,7 +2767,7 @@ const char *room_aff_bits[] = {
 
 // ROOM_EXTRA_x
 const char *room_extra_types[] = {
-		"unused",
+	"prospect empire",
 	"mine amount",
 		"unused",
 	"seed time",
