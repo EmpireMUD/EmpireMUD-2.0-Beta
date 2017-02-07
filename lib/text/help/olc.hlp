@@ -204,6 +204,7 @@ Factions (FEDIT):
   checking faction reputation in quests and scripts, you should use the
   Hated/Venerated. Despised/Revered don't have ranges, and players can 'bump
   out' of those ranges by gaining/losing even 1 reputation point.
+- See HELP FACTION SCRIPTING for tips on writing scripts.
 
 Globals (GEDIT):
 - All global tables must be approved by the head builder, because they apply
@@ -1989,6 +1990,29 @@ usually helps to draw yourself a diagram on paper of the regions of the map
 covered by the crops.
 
 See also: OLC CROPS
+#d
+"FACTION SCRIPTING" "SCRIPTING FACTIONS"
+
+Writing scripts using faction gives you the ability to control access to
+content using the faction system. You should usually prefer to use the Hated
+and Venerated levels, rather than the endcap Despised and Revered levels,
+because gaining/losing even 1 reputation point can bump a player out of the
+endcaps.
+
+Testing reputation against the mob's faction:
+eval test %%actor.has_reputation(%self.allegiance%,Liked)%%
+if %!test%
+  %send% %actor% You must be Liked by %self.faction_name%!
+  return 0
+end
+
+You can also cause players to gain/lose reputation with:
+nop %actor.gain_reputation(1234,-1)%
+
+You can change the faction of a mob with:
+nop %mob.allegiance(1234)%
+
+See also: OLC FACTIONS
 #d
 FEDIT FACTIONEDIT "OLC FACTIONS" "FACTION EDITOR"
 
@@ -4565,8 +4589,8 @@ Available tasks:
  VISIT-ROOM-TEMPLATE &r*&0 - Player must go to a certain room template.
  VISIT-SECTOR &r*&0 - Player must go to a certain terrain.
  HAVE-ABILITY - Player must have a certain ability.
- REP-OVER - Player must have a certain faction reputation.
- REP-UNDER - Player must be below a certain faction reputation.
+ REP-OVER - Player must have at least this faction reputation.
+ REP-UNDER - Player must be at or below this faction reputation.
 
 &r*&0 Some types cannot be used as prereqs, only as tasks.
 
