@@ -2417,6 +2417,9 @@ ACMD(do_cede) {
 		msg_to_char(ch, "You can't cede land to NPCs!\r\n");
 	else if (ch == targ)
 		msg_to_char(ch, "You can't cede land to yourself!\r\n");
+	else if (!PRF_FLAGGED(targ, PRF_BOTHERABLE)) {
+		msg_to_char(ch, "You can't cede land to someone with 'bother' toggled off.\r\n");
+	}
 	else if (*arg2 && !strstr(arg2, ",")) {
 		msg_to_char(ch, "Usage: cede <person> (x, y)\r\n");
 	}
