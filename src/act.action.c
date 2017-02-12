@@ -1858,6 +1858,7 @@ void process_prospecting(char_data *ch) {
 		case 0: {
 			GET_ACTION(ch) = ACT_NONE;
 			init_mine(IN_ROOM(ch), ch);
+			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_PROSPECT_EMPIRE, GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING);
 			
 			show_prospect_result(ch, IN_ROOM(ch));
 			act("$n finishes prospecting.", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -2813,7 +2814,7 @@ ACMD(do_prospect) {
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_PROSPECT)) {
 		return;
 	}
-	else if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) > 0) {
+	else if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) > 0 && GET_LOYALTY(ch) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_PROSPECT_EMPIRE) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
 		msg_to_char(ch, "You see evidence that someone has already prospected this area...\r\n");
 		show_prospect_result(ch, IN_ROOM(ch));
 		act("$n quickly prospects the area.", TRUE, ch, NULL, NULL, TO_ROOM);

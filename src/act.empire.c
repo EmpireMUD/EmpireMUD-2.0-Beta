@@ -2417,6 +2417,9 @@ ACMD(do_cede) {
 		msg_to_char(ch, "You can't cede land to NPCs!\r\n");
 	else if (ch == targ)
 		msg_to_char(ch, "You can't cede land to yourself!\r\n");
+	else if (!PRF_FLAGGED(targ, PRF_BOTHERABLE)) {
+		msg_to_char(ch, "You can't cede land to someone with 'bother' toggled off.\r\n");
+	}
 	else if (*arg2 && !strstr(arg2, ",")) {
 		msg_to_char(ch, "Usage: cede <person> (x, y)\r\n");
 	}
@@ -4039,9 +4042,6 @@ ACMD(do_home) {
 		else if (GET_POS(ch) < POS_STANDING) {
 			msg_to_char(ch, "You can't do that right now. You need to be standing.\r\n");
 		}
-		else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
-			msg_to_char(ch, "You can't set your home in a vehicle.\r\n");
-		}
 		else if (!GET_LOYALTY(ch) || ROOM_OWNER(real) != GET_LOYALTY(ch)) {
 			msg_to_char(ch, "You need to own a building to make it your home.\r\n");
 		}
@@ -4054,7 +4054,7 @@ ACMD(do_home) {
 		else if (ROOM_PRIVATE_OWNER(real) != NOBODY && GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) {
 			msg_to_char(ch, "Someone already owns this home.\r\n");
 		}
-		else if (!IS_MAP_BUILDING(real) || !IS_COMPLETE(real) || !GET_BUILDING(real) || GET_BLD_CITIZENS(GET_BUILDING(real)) <= 0) {
+		else if (!IS_COMPLETE(real) || !GET_BUILDING(real) || GET_BLD_CITIZENS(GET_BUILDING(real)) <= 0) {
 			msg_to_char(ch, "You can't make this your home.\r\n");
 		}
 		else if (ROOM_AFF_FLAGGED(real, ROOM_AFF_HAS_INSTANCE)) {

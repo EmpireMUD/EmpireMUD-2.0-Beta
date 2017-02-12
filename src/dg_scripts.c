@@ -2053,6 +2053,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		"aoe",
 		"asound",
 		"at",
+		"build",
 		"buildingecho",
 		"damage",
 		"door",
@@ -2527,6 +2528,27 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					
 					else if (!str_cmp(field, "alias"))
 						snprintf(str, slen, "%s", GET_PC_NAME(c));
+					else if (!str_cmp(field, "allegiance")) {
+						if (IS_NPC(c)) {
+							faction_data *fct;
+							if (subfield && *subfield) {
+								if (!str_cmp(subfield, "none")) {
+									MOB_FACTION(c) = NULL;
+								}
+								else if ((fct = find_faction(subfield))) {
+									MOB_FACTION(c) = fct;
+								}
+								else {
+									script_log("Trigger: %s, VNum %d, unknown faction: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+								}
+							}
+							
+							snprintf(str, slen, "%d", MOB_FACTION(c) ? FCT_VNUM(MOB_FACTION(c)) : -1);
+						}
+						else {
+							snprintf(str, slen, "-1");
+						}
+					}
 					/*
 					else if (!str_cmp(field, "align")) {
 						if (subfield && *subfield) {
@@ -2817,7 +2839,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'f': {	// char.f*
-					if (!str_cmp(field, "fighting")) {
+					if (!str_cmp(field, "faction_name")) {
+						if (IS_NPC(c) && MOB_FACTION(c)) {
+							snprintf(str, slen, "%s", FCT_NAME(MOB_FACTION(c)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "fighting")) {
 						if (FIGHTING(c))
 							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(FIGHTING(c)));
 						else 
@@ -2845,6 +2875,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "grt") || !str_cmp(field, "greatness")) {
 						snprintf(str, slen, "%d", GET_GREATNESS(c));
 					}
+					else if (!str_cmp(field, "gain_reputation")) {
+						if (subfield && *subfield && !IS_NPC(c)) {
+							char arg1[256], arg2[256];
+							faction_data *fct;
+							int amount = 0;
+							
+							comma_args(subfield, arg1, arg2);
+							if (*arg1 && *arg2 && (fct = find_faction(arg1)) && (amount = atoi(arg2)) != 0) {
+								gain_reputation(c, FCT_VNUM(fct), amount, FALSE, TRUE);
+								snprintf(str, slen, "1");
+							}
+						}
+						// all other cases...
+						if (*str != '1') {
+							snprintf(str, slen, "0");
+						}
+					}
 					else if (!str_cmp(field, "gain_skill")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.gain_skill(skill, amount)%
@@ -2860,7 +2907,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						// all other cases...
-						if (*str != '1') {							
+						if (*str != '1') {
 							snprintf(str, slen, "0");
 						}
 					}
@@ -2887,6 +2934,25 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						else
 							snprintf(str, slen, "%d", char_has_item(subfield, c));
+					}
+					
+					else if (!str_cmp(field, "has_reputation")) {
+						if (subfield && *subfield && !IS_NPC(c)) {
+							// %actor.has_reputation(vnum, level)%
+							struct player_faction_data *pfd;
+							char arg1[256], arg2[256];
+							faction_data *fct;
+							int rep;
+							
+							comma_args(subfield, arg1, arg2);
+							if (*arg1 && *arg2 && (fct = find_faction(arg1)) && (rep = get_reputation_by_name(arg2)) != NOTHING && (pfd = get_reputation(c, FCT_VNUM(fct), FALSE))) {
+								snprintf(str, slen, "%d", (rep_const_to_index(pfd->rep) >= rep_const_to_index(rep)) ? 1 : 0);
+							}
+						}
+						// all other cases...
+						if (*str != '1') {
+							snprintf(str, slen, "0");
+						}
 					}
 					
 					else if (!str_cmp(field, "has_resources")) {

@@ -304,6 +304,10 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 				
 				break;
 			}
+			case QR_REPUTATION: {
+				gain_reputation(ch, reward->vnum, reward->amount, FALSE, TRUE);
+				break;
+			}
 		}
 	}
 	
@@ -536,6 +540,7 @@ void show_quest_tracker(char_data *ch, struct player_quest *pq) {
 				sprintf(buf, " (%d/%d)", lefthand, task->needed);
 				break;
 			}
+			case QT_AMT_REPUTATION:
 			case QT_AMT_THRESHOLD:
 			case QT_AMT_NONE: {
 				if (task->current >= task->needed) {

@@ -32,6 +32,7 @@
 *   Character Constants
 *   Craft Recipe Constants
 *   Empire Constants
+*   Faction Constants
 *   Mob Constants
 *   Item Contants
 *   OLC Constants
@@ -462,6 +463,8 @@ const char *preference_bits[] = {
 	"SCREENREADER",
 	"STEALTHABLE",
 	"WIZHIDE",
+	"AUTONOTES",
+	"AUTODISMOUNT",
 	"\n"
 };
 
@@ -522,6 +525,7 @@ const struct toggle_data_type toggle_data[] = {
 	
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
 	{ "stealthable", TOG_ONOFF, PRF_STEALTHABLE, 0, NULL },
+	{ "autodismount", TOG_ONOFF, PRF_AUTODISMOUNT, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
@@ -533,6 +537,7 @@ const struct toggle_data_type toggle_data[] = {
 	{ "incognito", TOG_ONOFF, PRF_INCOGNITO, LVL_START_IMM, NULL },
 	
 	{ "wizhide", TOG_ONOFF, PRF_WIZHIDE, LVL_START_IMM, NULL },
+	{ "autonotes", TOG_ONOFF, PRF_AUTONOTES, LVL_START_IMM, NULL },
 	
 	// this goes last
 	{ "\n", 0, NOBITS, 0, NULL }
@@ -1440,6 +1445,57 @@ const char *trade_overunder[] = {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// FACTION CONSTANTS ///////////////////////////////////////////////////////
+
+// FCT_x: faction flags
+const char *faction_flags[] = {
+	"IN-DEVELOPMENT",
+	"REP-FROM-KILLS",
+	"\n"
+};
+
+
+// FCTR_x (1/2): relationship flags
+const char *relationship_flags[] = {
+	"SHARED-GAINS",
+	"INVERSE-GAINS",
+	"MUTUALLY-EXCLUSIVE",
+	"UNLISTED",
+	"\n"
+};
+
+
+// FCTR_x (2/2): relationship descriptions (shown to players)
+const char *relationship_descs[] = {
+	"Allied",
+	"Enemies",
+	"Mutually Exclusive",
+	"",	// unlisted
+	"\n"
+};
+
+
+// REP_x: faction reputation levels
+struct faction_reputation_type reputation_levels[] = {
+	// { type const, name, points to achieve this level } -> ASCENDING ORDER
+	// note: you achieve the level when you reach the absolute value of its
+	// points (-9 < x < 9 is neutral, +/-10 are the cutoffs for the first rank)
+	
+	{ REP_DESPISED, "Despised", "\tr", -100 },
+	{ REP_HATED, "Hated", "\tr", -75 },
+	{ REP_LOATHED, "Loathed", "\to", -30 },
+	{ REP_DISLIKED, "Disliked", "\ty", -10 },
+	{ REP_NEUTRAL, "Neutral", "\tt", 0 },
+	{ REP_LIKED, "Liked", "\tc", 10 },
+	{ REP_ESTEEMED, "Esteemed", "\ta", 30 },
+	{ REP_VENERATED, "Venerated", "\tg", 75 },
+	{ REP_REVERED, "Revered", "\tg", 100 },
+	
+	{ -1, "\n", "\t0", 0 },	// last
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// MOB CONSTANTS ///////////////////////////////////////////////////////////
 
 /* MOB_x */
@@ -2185,6 +2241,7 @@ const char *olc_flag_bits[] = {
 	"!MORPHS",
 	"!QUESTS",
 	"!SOCIALS",
+	"!FACTIONS",
 	"\n"
 };
 
@@ -2212,6 +2269,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"morph",
 	"quest",
 	"social",
+	"faction",
 	"\n"
 };
 
@@ -2252,6 +2310,7 @@ const char *quest_reward_types[] = {
 	"SKILL-EXP",
 	"SKILL-LEVELS",	// 5
 	"QUEST-CHAIN",
+	"REPUTATION",
 	"\n",
 };
 
@@ -2274,6 +2333,8 @@ const char *quest_tracker_types[] = {
 	"VISIT-ROOM-TEMPLATE",
 	"VISIT-SECTOR",
 	"HAVE-ABILITY",	// 15
+	"REP-OVER",
+	"REP-UNDER",
 	"\n",
 };
 
@@ -2296,6 +2357,8 @@ const bool quest_tracker_amt_type[] = {
 	QT_AMT_NONE,	// visit rmt
 	QT_AMT_NONE,	// visit sect
 	QT_AMT_NONE,	// have ability
+	QT_AMT_REPUTATION,	// faction-over
+	QT_AMT_REPUTATION,	// faction-under
 };
 
 
@@ -2704,7 +2767,7 @@ const char *room_aff_bits[] = {
 
 // ROOM_EXTRA_x
 const char *room_extra_types[] = {
-		"unused",
+	"prospect empire",
 	"mine amount",
 		"unused",
 	"seed time",

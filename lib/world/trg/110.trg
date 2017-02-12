@@ -221,7 +221,7 @@ forage~
 eval num 4
 %send% %actor% You forage around and find a large tree (x%num%)!
 %echoaround% %actor% %actor.name% forages around and finds a large tree (x%num%)
-eval give %%actor.add_resources(128, %num%)%%
+eval give %%actor.add_resources(120, %num%)%%
 nop %give%
 detach 11009 %self.id%
 ~

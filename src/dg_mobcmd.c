@@ -64,6 +64,7 @@ extern struct instance_data *get_instance_by_mob(char_data *mob);
 extern room_data *get_room(room_data *ref, char *name);
 extern vehicle_data *get_vehicle(char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
+extern room_data *obj_room(obj_data *obj);
 extern struct instance_data *real_instance(any_vnum instance_id);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
@@ -780,7 +781,8 @@ ACMD(do_mpurge) {
 	if (ch->desc && (GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL))
 		return;
 
-	one_argument(argument, arg);
+	argument = one_argument(argument, arg);
+	skip_spaces(&argument);
 
 	if (!*arg) {
 		/* 'purge' */
@@ -801,8 +803,17 @@ ACMD(do_mpurge) {
 		return;
 	}
 	
+	// purge all mobs/objs in an instance
+	if (!str_cmp(arg, "instance")) {
+		struct instance_data *inst = real_instance(MOB_INSTANCE_ID(ch));
+		if (!inst) {
+			mob_log(ch, "mpurge: non-instance mob using purge instance");
+			return;
+		}
+		dg_purge_instance(ch, inst, argument);
+	}
 	// purge mob
-	if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg))) {
+	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg))) {
 		if (!IS_NPC(victim)) {
 			mob_log(ch, "mpurge: purging a PC");
 			return;
@@ -812,14 +823,24 @@ ACMD(do_mpurge) {
 			dg_owner_purged = 1;
 		}
 
+		if (*argument) {
+			act(argument, TRUE, victim, NULL, NULL, TO_ROOM);
+		}
 		extract_char(victim);
 	}
 	// purge vehicle
 	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_in_room_vis(ch, arg))) {
+		if (*argument) {
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_ROOM);
+		}
 		extract_vehicle(veh);
 	}
 	// purge obj
 	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_vis(ch, arg))) {
+		if (*argument) {
+			room_data *room = obj_room(obj);
+			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, obj, NULL, TO_ROOM);
+		}
 		extract_obj(obj);
 	}
 	// bad arg
@@ -924,6 +945,52 @@ ACMD(do_mat) {
 		char_from_room(ch);
 		char_to_room(ch, original);
 	}
+}
+
+
+ACMD(do_mbuild) {
+	void do_dg_build(room_data *target, char *argument);
+	
+	char loc_arg[MAX_INPUT_LENGTH], bld_arg[MAX_INPUT_LENGTH], *tmp;
+	room_data *target;
+	
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+
+	tmp = any_one_word(argument, loc_arg);
+	strcpy(bld_arg, tmp);
+	
+	// usage: %build% [location] <vnum [dir] | ruin | demolish>
+	if (!*loc_arg) {
+		mob_log(ch, "mbuild: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*bld_arg) {
+		// only arg is actually bld arg
+		strcpy(bld_arg, argument);
+		target = IN_ROOM(ch);
+	}
+	else {
+		// two arguments
+		target = find_target_room(ch, loc_arg);
+	}
+	
+	if (!target) {
+		mob_log(ch, "mbuild: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't build -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+
+	// good to go
+	do_dg_build(target, bld_arg);
 }
 
 

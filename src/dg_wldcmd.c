@@ -43,6 +43,7 @@ char_data *get_char_in_room(room_data *room, char *name);
 obj_data *get_obj_in_room(room_data *room, char *name);
 extern vehicle_data *get_vehicle(char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
+extern room_data *obj_room(obj_data *obj);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
@@ -174,6 +175,47 @@ WCMD(do_wasound) {
 			}
 		}
 	}
+}
+
+
+WCMD(do_wbuild) {
+	void do_dg_build(room_data *target, char *argument);
+
+	char loc_arg[MAX_INPUT_LENGTH], bld_arg[MAX_INPUT_LENGTH], *tmp;
+	room_data *target;
+	
+	tmp = any_one_word(argument, loc_arg);
+	strcpy(bld_arg, tmp);
+	
+	// usage: %build% [location] <vnum [dir] | ruin | demolish>
+	if (!*loc_arg) {
+		wld_log(room, "obuild: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*bld_arg) {
+		// only arg is actually building arg
+		strcpy(bld_arg, argument);
+		target = room;
+	}
+	else {
+		// two arguments
+		target = get_room(room, loc_arg);
+	}
+	
+	if (!target) {
+		wld_log(room, "obuild: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't build -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+
+	// good to go
+	do_dg_build(target, bld_arg);
 }
 
 
@@ -894,7 +936,8 @@ WCMD(do_wpurge) {
 	obj_data *obj, *next_obj;
 	vehicle_data *veh;
 
-	one_argument(argument, arg);
+	argument = one_argument(argument, arg);
+	skip_spaces(&argument);
 
 	if (!*arg) {
 		/* purge all */
@@ -912,21 +955,40 @@ WCMD(do_wpurge) {
 		return;
 	}
 	
+	// purge all mobs/objs in an instance
+	if (!str_cmp(arg, "instance")) {
+		struct instance_data *inst = ROOM_INSTANCE(room);
+		if (!inst) {
+			wld_log(room, "wpurge: room using purge instance outside an instance");
+			return;
+		}
+		dg_purge_instance(room, inst, argument);
+	}
 	// purge char
-	if ((*arg == UID_CHAR && (ch = get_char(arg))) || (ch = get_char_in_room(room, arg))) {
+	else if ((*arg == UID_CHAR && (ch = get_char(arg))) || (ch = get_char_in_room(room, arg))) {
 		if (!IS_NPC(ch)) {
 			wld_log(room, "wpurge: purging a PC");
 			return;
 		}
-
+		
+		if (*argument) {
+			act(argument, TRUE, ch, NULL, NULL, TO_ROOM);
+		}
 		extract_char(ch);
 	}
 	// purge vehicle
 	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_room(room, arg))) {
+		if (*argument) {
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_ROOM);
+		}
 		extract_vehicle(veh);
 	}
 	// purge obj
 	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_in_room(room, arg))) {
+		if (*argument) {
+			room_data *room = obj_room(obj);
+			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, obj, NULL, TO_ROOM);
+		}
 		extract_obj(obj);
 	}
 	else {
@@ -1310,6 +1372,7 @@ const struct wld_command_info wld_cmd_info[] = {
 
 	{ "wadventurecomplete", do_wadventurecomplete, NO_SCMD },
 	{ "wasound", do_wasound, NO_SCMD },
+	{ "wbuild", do_wbuild, NO_SCMD },
 	{ "wdoor", do_wdoor, NO_SCMD },
 	{ "wecho", do_wecho, NO_SCMD },
 	{ "wechoaround", do_wsend, SCMD_WECHOAROUND },

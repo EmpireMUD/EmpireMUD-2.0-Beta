@@ -16,13 +16,17 @@ Upper immortals can control the olc permissions of builders with the OLC
 CONTROLS.
 
 Available types are:
- .b - buildings
- .c - crafts
- .crop - crops
- .m - mobiles
- .o - objects
- .map - map tiles, rooms, and interiors
- .sect - map sectors
+ .abil - abilities               .adv - adventures
+ .aug - augments                 .arch - archetypes
+ .b - buildings                  .book - books
+ .c - crafts                     .class - classes
+ .crop - crops                   .f - factions
+ .g - globals                    .m - mobiles
+ .map - map tiles/interiors      .morph - morphs
+ .o - objects                    .q - quests
+ .r - room templates             .sect - map sectors
+ .skill - skills                 .soc - socials
+ .t - scripts/triggers           .v - vehicles
 
 Basic commands:
  . - typing '.' by itself shows your current editor
@@ -40,8 +44,8 @@ Examples:
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
  
-See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC GLOBALS,
-   OLC MOBILES, OLC OBJECTS, OLC SECTORS, MAP OLC
+See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC FACTIONS,
+   OLC GLOBALS, OLC MOBILES, OLC OBJECTS, OLC SECTORS, MAP OLC
 See also: OLC ABORT, OLC AUDIT, OLC COPY, OLC DELETE, OLC EDIT, OLC FREE, 
    OLC LIST, OLC SAVE, OLC SEARCH, OLC LICENSE, TEXT EDITOR, VNUM
 #d
@@ -53,10 +57,12 @@ some common ones:
 abil - ability
 adv - adventure
 aug - augment
+arch - archetypes
 bld (or bdg) - building (these include designated rooms)
 cft - craft
 cls - class
 crp - crop
+fct - factions
 glb - global
 mob - mobile/npc
 mph - morph
@@ -185,6 +191,20 @@ Crops (CROPEDIT):
 - Crops should have a HARVEST interaction for a plantable large item.
 - Orchard crops need a CHOP interaction if they will give trees. Orchards are
   still choppable without this, though.
+
+Factions (FEDIT):
+- The REP-FROM-KILLS flag causes you to lose reputation if you kill a mob who
+  belongs to this faction or its allies (SHARED-GAINS relationship), and gain
+  repationship if you kill a mob from an enemy faction (INVERSE-GAINS). It
+  doesn't matter if that other faction has the REP-FROM-KILLS flag or not.
+- Two related factions don't have to have identical relationship flags, but
+  there aren't very many good reasons not to.
+- Reputation levels go Despised, Hated, ... Venerated, Revered. The Despised/
+  Revered endcaps are good for min/max limits on factions. However, when
+  checking faction reputation in quests and scripts, you should use the
+  Hated/Venerated. Despised/Revered don't have ranges, and players can 'bump
+  out' of those ranges by gaining/losing even 1 reputation point.
+- See HELP FACTION SCRIPTING for tips on writing scripts.
 
 Globals (GEDIT):
 - All global tables must be approved by the head builder, because they apply
@@ -1971,6 +1991,152 @@ covered by the crops.
 
 See also: OLC CROPS
 #d
+"FACTION SCRIPTING" "SCRIPTING FACTIONS"
+
+Writing scripts using faction gives you the ability to control access to
+content using the faction system. You should usually prefer to use the Hated
+and Venerated levels, rather than the endcap Despised and Revered levels,
+because gaining/losing even 1 reputation point can bump a player out of the
+endcaps.
+
+Testing reputation against the mob's faction:
+eval test %%actor.has_reputation(%self.allegiance%,Liked)%%
+if %!test%
+  %send% %actor% You must be Liked by %self.faction_name%!
+  return 0
+end
+
+You can also cause players to gain/lose reputation with:
+nop %actor.gain_reputation(1234,-1)%
+
+You can change the faction of a mob with:
+nop %mob.allegiance(1234)%
+
+See also: OLC FACTIONS
+#d
+FEDIT FACTIONEDIT "OLC FACTIONS" "FACTION EDITOR"
+
+Usage:  .f <command>
+        .command
+
+The .olc faction editor allows you to configure the data for factdions, which
+are groups that NPCs can belong to. Players gain and lose reputation with
+factions, and these reputation levels can be used to control access to quests
+and adventure content.
+
+All commands in the editor arg highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP FEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .f edit 123
+> .name Tree Elves
+> .flag REP-FROM-KILLS
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"FEDIT NAME"
+
+Usage:  .name <name>
+
+A faction's name should be capitalized and short, and should never be a
+complete sentence. A leading article like "A" or "The" is optional.
+
+Examples:
+> The Elves of West Treeville
+> The Goblins of Nachotriste
+> MacDdraig, the Whale Dragon
+
+See also: OLC FACTIONS
+#d
+"FEDIT DESCRIPTION"
+
+Usage:  .description
+
+Faction descriptions can be any length (up to 4000 characters), and should
+include basic information about the faction. If it isn't immediately obvious
+where to find your faction or how to gain/lose reputation with them, you
+should also include this information.
+
+Players only see faction descriptions if they use the 'faction' command.
+
+See also: FACTION, OLC FACTIONS, STRING EDITOR
+#d
+"FEDIT FLAGS" "FACTION FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The following faction flags are available:
+ IN-DEVELOPMENT - The faction can't be seen by players, and won't gain rep.
+ REP-FROM-KILLS - Players can gain/lose rep by killing faction mobs.
+
+See also: OLC FACTIONS, OLC REMOVEINDEV, RELATIONSHIP FLAGS
+#d
+"FEDIT MATCHRELATIONS" "FEDIT MAXRELATIONSHIPS" "FEDIT MATCH RELATIONS" "FEDIT MATCH RELATIONSHIPS"
+
+Usage:  .matchrelations
+
+This will synchronize relationships between this faction and other factions,
+and will add any relations that are missing. It will not, however, remove any
+relationships that are on this faction but don't exist on the other faction.
+
+Usually, the relation flags should be the same on both factions, and
+matchrelations makes this easier. However, there may also be reasons to have
+different relationship flags on each side.
+
+See also: FEDIT RELATION, OLC FACTIONS
+#d
+"FEDIT MAXREPUTATION" "FEDIT MAX REPUTATION" "FEDIT MINREPUTATION" "FEDIT MIN REPUTATION"
+
+Usage:  .maxreputation <reputation>
+        .minreputation <reputation>
+
+These settings determine the highest and lowest reputations a player can
+possibly have with this faction. Players can never move outside this range,
+no matter how much reputation they gain or lose. They will still gain/lose
+rep with related factions when at these limits.
+
+See also: OLC FACTIONS, OLC LEVELS, REPUTATIONS
+#d
+"FEDIT RELATION" "FEDIT RELATIONS" "FEDIT RELATIONSHIPS" "RELATIONSHIP FLAGS"
+
+Usage:  .relation <name/vnum> flags [which flags]
+        .relation <name/vnum> delete
+
+Factions can have relationships with other factions. This affects how players
+gain reputation with one faction, based on their reputation with another.
+
+These flags determine the kind of relationship:
+ SHARED-GAINS - Allies: If a player gains rep with that faction, they also gain
+   this one, and vice versa.
+ INVERSE-GAINS - Enemies: If a player gains rep with that faction, they lose
+   rep with this one, and vice versa.
+ MUTUALLY-EXCLUSIVE - If a player has a positive reputation with that faction,
+   they cannot gain rep with this faction at all.
+ UNLISTED - This relationship will not show to players on the faction info.
+
+Note: If a reputation gain/loss is from killing a mob, it will only affect
+  related factions with REP-FROM-KILLS flags, whether the original faction
+  had this flag or not.
+
+See also: FEDIT MATCH RELATIONS, OLC FACTIONS
+#d
+"FEDIT STARTINGREPUTATION" "FEDIT STARTING REPUTATION"
+
+Usage:  .startingreputation <reputation>
+
+This is the reputation level a player starts at when they first meet the
+faction. Usually players start at neutral, but there are reasons to start
+higher or lower. For example, perhaps you start out Despised by a faction
+and must work your way up into their good graces. Or, start out Revered by
+a faction but lose reputation over time.
+
+See also: OLC FACTIONS, OLC LEVELS, REPUTATIONS
+#d
 "GEDIT FLAGS"
 
 Usage:  .flags [add | remove] <flags>
@@ -2475,6 +2641,15 @@ This command adds, removes, or toggles a set of affect flags. These flags are
 always active on the mob, as if a spell had been cast on them.
 
 See also: AFFECT FLAGS, OLC MOBILES
+#d
+"MEDIT ALLEGIANCE"
+
+Usage:  .allegiance <none | vnum | name>
+
+This sets a mob to be a member of a faction. For some factions, this will cause
+reputation gain if a player kills the mob.
+
+See also: FACTION, OLC FACTIONS, OLC MOBILES
 #d
 "MEDIT ATTACK" "ATTACK TYPES"
 
@@ -4353,6 +4528,7 @@ Available reward types:
  SKILL-LEVELS - Raise the player's skill level, if possible.
  QUEST-CHAIN - Starts a player on another quest, if they meet the pre-reqs and
     are not already on it.
+ REPUTATION - Gain/lose faction reputation.
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.
@@ -4413,6 +4589,8 @@ Available tasks:
  VISIT-ROOM-TEMPLATE &r*&0 - Player must go to a certain room template.
  VISIT-SECTOR &r*&0 - Player must go to a certain terrain.
  HAVE-ABILITY - Player must have a certain ability.
+ REP-OVER - Player must have at least this faction reputation.
+ REP-UNDER - Player must be at or below this faction reputation.
 
 &r*&0 Some types cannot be used as prereqs, only as tasks.
 

@@ -1219,14 +1219,6 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst) {
 	struct trig_proto_list *tpl;
 	trig_data *proto, *trig;
 	
-	// exits to it will be cleaned up by delete_room
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY)) {
-		if (ROOM_PEOPLE(room)) {
-			act("The adventure vanishes around you!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
-		}
-		disassociate_building(room);
-	}
-	
 	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_HAS_INSTANCE);
 	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_HAS_INSTANCE);
 	
@@ -1272,6 +1264,14 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst) {
 				remove_live_script_by_vnum(SCRIPT(room), tpl->vnum);
 			}
 		}
+	}
+	
+	// exits to it will be cleaned up by delete_room
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY)) {
+		if (ROOM_PEOPLE(room)) {
+			act("The adventure vanishes around you!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+		}
+		disassociate_building(room);
 	}
 }
 
@@ -1941,7 +1941,8 @@ static void scale_instance_to_level(struct instance_data *inst, int level) {
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (inst->room[iter]) {
 			for (ch = ROOM_PEOPLE(inst->room[iter]); ch; ch = ch->next_in_room) {
-				if (IS_NPC(ch) && GET_CURRENT_SCALE_LEVEL(ch) == 0) {
+				if (IS_NPC(ch) && GET_CURRENT_SCALE_LEVEL(ch) != level) {
+					GET_CURRENT_SCALE_LEVEL(ch) = 0;	// force override on level
 					scale_mob_to_level(ch, level);
 				}
 			}

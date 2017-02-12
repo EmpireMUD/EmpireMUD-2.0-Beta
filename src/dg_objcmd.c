@@ -155,6 +155,48 @@ OCMD(do_oadventurecomplete) {
 	}
 }
 
+
+OCMD(do_obuild) {
+	void do_dg_build(room_data *target, char *argument);
+
+	char loc_arg[MAX_INPUT_LENGTH], bld_arg[MAX_INPUT_LENGTH], *tmp;
+	room_data *orm = obj_room(obj), *target;
+	
+	tmp = any_one_word(argument, loc_arg);
+	strcpy(bld_arg, tmp);
+	
+	// usage: %build% [location] <vnum [dir] | ruin | demolish>
+	if (!*loc_arg) {
+		obj_log(obj, "obuild: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*bld_arg) {
+		// only arg is actually building arg
+		strcpy(bld_arg, argument);
+		target = orm;
+	}
+	else {
+		// two arguments
+		target = get_room(orm, loc_arg);
+	}
+	
+	if (!target) {
+		obj_log(obj, "obuild: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't build -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+	
+	// good to go
+	do_dg_build(target, bld_arg);
+}
+
+
 OCMD(do_oecho) {
 	room_data *room;
 
@@ -618,7 +660,8 @@ OCMD(do_opurge) {
 	vehicle_data *veh;
 	room_data *rm;
 
-	one_argument(argument, arg);
+	argument = one_argument(argument, arg);
+	skip_spaces(&argument);
 
 	if (!*arg) {
 		/* purge all */
@@ -639,23 +682,48 @@ OCMD(do_opurge) {
 		return;
 	} /* no arg */
 	
+	
+	// purge all mobs/objs in an instance
+	if (!str_cmp(arg, "instance")) {
+		room_data *room = obj_room(obj);
+		struct instance_data *inst = quest_instance_global;
+		if (!inst) {
+			inst = room ? find_instance_by_room(room, FALSE) : NULL;
+		}
+		
+		if (!inst) {
+			obj_log(obj, "opurge: obj using purge instance outside an instance");
+			return;
+		}
+		dg_purge_instance(obj, inst, argument);
+	}
 	// purge char
-	if ((ch = get_char_by_obj(obj, arg))) {
+	else if ((ch = get_char_by_obj(obj, arg))) {
 		if (!IS_NPC(ch)) {
 			obj_log(obj, "opurge: purging a PC");
 			return;
 		}
 
+		if (*argument) {
+			act(argument, TRUE, ch, NULL, NULL, TO_ROOM);
+		}
 		extract_char(ch);
 	}
 	// purge vehicle
 	else if ((veh = get_vehicle_by_obj(obj, arg))) {
+		if (*argument) {
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_ROOM);
+		}
 		extract_vehicle(veh);
 	}
 	// purge obj
 	else if ((o = get_obj_by_obj(obj, arg))) {
 		if (o == obj) {
 			dg_owner_purged = 1;
+		}
+		if (*argument) {
+			room_data *room = obj_room(o);
+			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, o, NULL, TO_ROOM);
 		}
 		extract_obj(o);
 	}
@@ -1437,6 +1505,7 @@ const struct obj_command_info obj_cmd_info[] = {
 
 	{ "oadventurecomplete", do_oadventurecomplete, NO_SCMD },
 	{ "oat", do_oat, NO_SCMD },
+	{ "obuild", do_obuild, NO_SCMD },
 	{ "odoor", do_odoor, NO_SCMD },
 	{ "odamage", do_odamage,   NO_SCMD },
 	{ "oaoe", do_oaoe,   NO_SCMD },

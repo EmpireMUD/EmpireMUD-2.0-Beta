@@ -1554,7 +1554,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_burdens) {
 
 
 RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
-	room_data *room, *next_room, *to_room = NULL;
+	room_data *room, *next_room, *to_room = NULL, *map;
 	struct empire_city_data *city;
 	int subtype = NOWHERE;
 	bool wait;
@@ -1584,8 +1584,16 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 			msg_to_char(ch, "Your home teleportation is still on cooldown.\r\n");
 			return FALSE;
 		}
-		else if (IS_RIDING(ch)) {
-			msg_to_char(ch, "You can't teleport home while riding.\r\n");
+		else if (!(map = get_map_location_for(to_room))) {
+			msg_to_char(ch, "You can't teleport home right now.\r\n");
+			return FALSE;
+		}
+		else if (!can_use_room(ch, map, GUESTS_ALLOWED)) {
+			msg_to_char(ch, "You can't teleport home because your home is somewhere you don't have permission to be.\r\n");
+			return FALSE;
+		}
+		else if (!can_teleport_to(ch, map, FALSE)) {
+			msg_to_char(ch, "You can't teleport home right now.\r\n");
 			return FALSE;
 		}
 		else {
@@ -1618,7 +1626,7 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 	void cancel_adventure_summon(char_data *ch);
 	
-	room_data *to_room, *rand_room;
+	room_data *to_room, *rand_room, *map;
 	int tries, rand_x, rand_y;
 	bool random;
 	
@@ -1639,8 +1647,11 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 		}
 	}
 	
-	if (!to_room || !can_teleport_to(ch, to_room, TRUE)) {
+	if (!to_room || !can_teleport_to(ch, to_room, TRUE) || !(map = get_map_location_for(to_room))) {
 		msg_to_char(ch, "Teleportation failed: you couldn't find a safe place to teleport.\r\n");
+	}
+	else if (!can_teleport_to(ch, map, FALSE)) {
+		msg_to_char(ch, "Teleportation failed: you can't seem to teleport there right now.\r\n");
 	}
 	else {
 		act("$n vanishes in a brilliant flash of light!", FALSE, ch, NULL, NULL, TO_ROOM);

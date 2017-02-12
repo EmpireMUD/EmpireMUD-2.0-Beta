@@ -27,6 +27,7 @@
 *   Crop Utils
 *   Descriptor Utils
 *   Empire Utils
+*   Faction Utils
 *   Fight Utils
 *   Global Utils
 *   Map Utils
@@ -443,6 +444,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_CLASS(desc)  ((desc)->olc_class)
 #define GET_OLC_CRAFT(desc)  ((desc)->olc_craft)
 #define GET_OLC_CROP(desc)  ((desc)->olc_crop)
+#define GET_OLC_FACTION(desc)  ((desc)->olc_faction)
 #define GET_OLC_GLOBAL(desc)  ((desc)->olc_global)
 #define GET_OLC_MOBILE(desc)  ((desc)->olc_mobile)
 #define GET_OLC_MORPH(desc)  ((desc)->olc_morph)
@@ -512,6 +514,22 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define BELONGS_IN_TERRITORY_LIST(room)  (IS_ANY_BUILDING(room) || COMPLEX_DATA(room) || ROOM_SECT_FLAGGED(room, SECTF_CHORE))
 #define COUNTS_AS_TERRITORY(room)  (HOME_ROOM(room) == (room) && !GET_ROOM_VEHICLE(room))
 #define LARGE_CITY_RADIUS(room)  (ROOM_BLD_FLAGGED((room), BLD_LARGE_CITY_RADIUS) || ROOM_SECT_FLAGGED((room), SECTF_LARGE_CITY_RADIUS))
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// FACTION UTILS ///////////////////////////////////////////////////////////
+
+#define FCT_VNUM(fct)  ((fct)->vnum)
+#define FCT_DESCRIPTION(fct)  ((fct)->description)
+#define FCT_FLAGS(fct)  ((fct)->flags)
+#define FCT_MAX_REP(fct)  ((fct)->max_rep)
+#define FCT_MIN_REP(fct)  ((fct)->min_rep)
+#define FCT_NAME(fct)  ((fct)->name)
+#define FCT_RELATIONS(fct)  ((fct)->relations)
+#define FCT_STARTING_REP(fct)  ((fct)->starting_rep)
+
+// helpers
+#define FACTION_FLAGGED(fct, flag)  IS_SET(FCT_FLAGS(fct), (flag))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -613,6 +631,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define MOB_DAMAGE(ch)  ((ch)->mob_specials.damage)
 #define MOB_DYNAMIC_NAME(ch)  ((ch)->mob_specials.dynamic_name)
 #define MOB_DYNAMIC_SEX(ch)  ((ch)->mob_specials.dynamic_sex)
+#define MOB_FACTION(ch)  ((ch)->mob_specials.faction)
 #define MOB_INSTANCE_ID(ch)  ((ch)->mob_specials.instance_id)
 #define MOB_MOVE_TYPE(ch)  ((ch)->mob_specials.move_type)
 #define MOB_PURSUIT(ch)  ((ch)->mob_specials.pursuit)
@@ -878,6 +897,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_DISGUISED_NAME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->disguised_name))
 #define GET_DISGUISED_SEX(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->disguised_sex))
 #define GET_EXP_TODAY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->exp_today))
+#define GET_FACTIONS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->factions))
 #define GET_FIGHT_MESSAGES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->fight_messages))
 #define GET_FIGHT_PROMPT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->fight_prompt))
 #define GET_GEAR_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->gear_level))
@@ -887,6 +907,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_IGNORE_LIST(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->ignore_list[(pos)]))
 #define GET_IMMORTAL_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->immortal_level))
 #define GET_INVIS_LEV(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->invis_level))
+#define GET_LARGEST_INVENTORY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->largest_inventory))
 #define GET_LASTNAME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->lastname))
 #define GET_LAST_CORPSE_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_corpse_id))
 #define GET_LAST_DEATH_TIME(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->last_death_time))
@@ -1415,6 +1436,10 @@ extern char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
 // utils from act.item.c
 extern int obj_carry_size(obj_data *obj);
 
+// utils from faction.c
+extern const char *get_faction_name_by_vnum(any_vnum vnum);
+extern const char *get_reputation_name(int type);
+
 // utils from limits.c
 extern bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner);
 void gain_condition(char_data *ch, int condition, int value);
@@ -1427,6 +1452,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 // utils from quest.c
 extern char *get_quest_name_by_proto(any_vnum vnum);
 void qt_change_ability(char_data *ch, any_vnum abil);
+void qt_change_reputation(char_data *ch, any_vnum faction);
 void qt_change_skill_level(char_data *ch, any_vnum skl);
 void qt_drop_obj(char_data *ch, obj_data *obj);
 void qt_empire_players(empire_data *emp, void (*func)(char_data *ch, any_vnum vnum), any_vnum vnum);

@@ -252,6 +252,90 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 
 
 /**
+* Do the actual work for the %build% commands, once everything has been
+* validated except the last arg.
+*
+* @param room_data *target The room to change.
+* @param char *argument <vnum [dir] | ruin | demolish>
+*/
+void do_dg_build(room_data *target, char *argument) {
+	void complete_building(room_data *room);
+	void ruin_one_building(room_data *room);	// db.world.c
+	void special_building_setup(char_data *ch, room_data *room);
+	extern const int rev_dir[];
+	
+	char vnum_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH];
+	bool ruin = FALSE, demolish = FALSE;
+	any_vnum vnum = NOTHING;
+	bld_data *bld = NULL;
+	int dir = NORTH;
+	
+	skip_spaces(&argument);
+	
+	if (!target || !*argument) {
+		return;
+	}
+	
+	// parse arg
+	if (is_abbrev(argument, "ruin")) {
+		ruin = TRUE;
+	}
+	else if (is_abbrev(argument, "demolish")) {
+		demolish = TRUE;
+	}
+	else if (isdigit(*argument)) {
+		argument = any_one_arg(argument, vnum_arg);
+		argument = any_one_arg(argument, dir_arg);
+		
+		if ((vnum = atoi(vnum_arg)) < 0 || !(bld = building_proto(vnum)) || IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM)) {
+			script_log("do_dg_build: invalid building: %d", vnum);
+			return;
+		}
+		else if (*dir_arg && ((dir = parse_direction(NULL, dir_arg)) == NO_DIR || dir >= NUM_2D_DIRS)) {
+			script_log("do_dg_build: invalid direction: %s", dir_arg);
+			return;
+		}
+		else if (dir != NO_DIR && (!SHIFT_DIR(target, dir) || (IS_SET(GET_BLD_FLAGS(bld), BLD_TWO_ENTRANCES) && !SHIFT_DIR(target, rev_dir[dir])))) {
+			script_log("do_dg_build: invalid direction from room %d: %s", GET_ROOM_VNUM(target), dir_arg);
+			return;
+		}
+		
+		// bld validated
+	}
+	else {
+		script_log("do_dg_build: invalid argument: %s", argument);
+		return;
+	}
+	
+	
+	if (ruin) {
+		room_data *home = HOME_ROOM(target);
+		if (GET_ROOM_VNUM(home) < MAP_SIZE && GET_BUILDING(home)) {
+			ruin_one_building(home);
+		}
+	}
+	else if (demolish) {
+		disassociate_building(target);
+	}
+	else if (bld) {
+		disassociate_building(target);
+	
+		construct_building(target, GET_BLD_VNUM(bld));
+		special_building_setup(NULL, target);
+		complete_building(target);
+	
+		if (dir != NO_DIR) {
+			create_exit(target, SHIFT_DIR(target, dir), dir, FALSE);
+			if (IS_SET(GET_BLD_FLAGS(bld), BLD_TWO_ENTRANCES)) {
+				create_exit(target, SHIFT_DIR(target, rev_dir[dir]), rev_dir[dir], FALSE);
+			}
+			COMPLEX_DATA(target)->entrance = rev_dir[dir];
+		}
+	}
+}
+
+
+/**
 * Performs a script-caused ownership change on one (or more) things.
 *
 * @param empire_data *emp The empire to change ownership to (may be NULL for none).
@@ -297,6 +381,57 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 		if (GET_ROOM_VEHICLE(room)) {
 			VEH_OWNER(GET_ROOM_VEHICLE(room)) = emp;
 		}
+	}
+}
+
+
+/**
+* Purges all matching vnums in an instance. This is called from:
+* %purge% instance <arguments>
+*
+* Currently it supports:
+* - mob <vnum> [message]
+*
+* @param void *owner The owner of the script, to check if it purges itself.
+* @param struct instance_data *inst The instance whose contents are being purged.
+* @param char *argument The arguments passed to "%purge% instance".
+*/
+void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	char_data *mob, *next_mob;
+	any_vnum vnum;
+	
+	if (!inst) {
+		return;
+	}
+	
+	argument = any_one_arg(argument, arg1);	// type
+	argument = any_one_arg(argument, arg2);	// vnum
+	skip_spaces(&argument);	// message
+	vnum = atoi(arg2);
+	
+	if (!*arg1 || !*arg2) {
+		script_log("dg_purge_instance called with invalid arguments: %s %s %s", arg1, arg2, argument);
+	}
+	else if (is_abbrev(arg1, "mobile")) {
+		LL_FOREACH_SAFE(character_list, mob, next_mob) {
+			if (!IS_NPC(mob) || GET_MOB_VNUM(mob) != vnum || EXTRACTED(mob)) {
+				continue;
+			}
+			
+			// found
+			if (*argument) {
+				act(argument, TRUE, mob, NULL, NULL, TO_ROOM);
+			}
+			
+			if (mob == owner) {
+				dg_owner_purged = 1;
+			}
+			extract_char(mob);
+		}
+	}
+	else {
+		script_log("dg_purge_instance called with invalid type: %s", arg1);
 	}
 }
 

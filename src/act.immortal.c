@@ -54,6 +54,7 @@ extern const char *genders[];
 extern const char *grant_bits[];
 extern const char *island_bits[];
 extern const char *mapout_color_names[];
+extern struct faction_reputation_type reputation_levels[];
 extern const char *room_aff_bits[];
 extern const char *sector_flags[];
 extern const char *spawn_flags[];
@@ -1133,6 +1134,7 @@ struct set_struct {
 		{ "bonusexp", LVL_START_IMM, PC, NUMBER },
 		{ "grants",		LVL_CIMPL,	PC,		MISC },
 		{ "skill", LVL_START_IMM, PC, MISC },
+		{ "faction", LVL_START_IMM, PC, MISC },
 
 		{ "strength",	LVL_START_IMM,	BOTH,	NUMBER },
 		{ "dexterity",	LVL_START_IMM,	BOTH,	NUMBER },
@@ -1538,6 +1540,75 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			increase_coins(vict, type, amt);
 		}
 	}
+	else if SET_CASE("faction") {
+		void update_reputations(char_data *ch);
+		
+		int min_idx, min_rep, max_idx, max_rep, new_rep, new_val = 0;
+		char fct_arg[MAX_INPUT_LENGTH], *fct_val;
+		struct player_faction_data *pfd;
+		bool del_rep = FALSE;
+		faction_data *fct;
+		
+		// usage: set <player> faction <name/vnum> <rep/value>
+		fct_val = any_one_word(val_arg, fct_arg);
+		skip_spaces(&fct_val);
+		
+		if (!*fct_arg || !*fct_val) {
+			msg_to_char(ch, "Usage: set <player> faction <name/vnum> <rep/value>\r\n");
+			return 0;
+		}
+		if (!(fct = find_faction(fct_arg)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
+			msg_to_char(ch, "Unknown faction '%s'.\r\n", fct_arg);
+			return 0;
+		}
+		
+		// helper data
+		min_idx = rep_const_to_index(FCT_MIN_REP(fct));
+		min_rep = (min_idx != NOTHING) ? reputation_levels[min_idx].value : MIN_REPUTATION;
+		max_idx = rep_const_to_index(FCT_MAX_REP(fct));
+		max_rep = (max_idx != NOTHING) ? reputation_levels[max_idx].value : MAX_REPUTATION;
+		
+		// parse val arg
+		if (!str_cmp(fct_val, "none")) {
+			del_rep = TRUE;
+		}
+		else if (isdigit(*fct_val) || *fct_val == '-') {
+			new_val = atoi(fct_val);
+		}
+		else if ((new_rep = get_reputation_by_name(fct_val)) == NOTHING) {
+			msg_to_char(ch, "Invalid reputation level '%s'.\r\n", fct_val);
+			return 0;
+		}
+		else {
+			new_val = reputation_levels[rep_const_to_index(new_rep)].value;
+		}
+		
+		// bounds check
+		if (!del_rep && (new_val < min_rep || new_val > max_rep)) {
+			msg_to_char(ch, "You can't set the reputation to that level. That faction has a range of %d-%d.\r\n", min_rep, max_rep);
+			return 0;
+		}
+		
+		// load data
+		if (!(pfd = get_reputation(vict, FCT_VNUM(fct), TRUE))) {
+			msg_to_char(ch, "Unable to set reputation for that player and faction.\r\n");
+			return 0;
+		}
+		
+		// and go
+		if (del_rep) {
+			HASH_DEL(GET_FACTIONS(vict), pfd);
+			free(pfd);
+			sprintf(output, "%s's reputation with %s deleted", GET_NAME(vict), FCT_NAME(fct));
+		}
+		else {
+			pfd->value = new_val;
+			update_reputations(vict);
+			pfd = get_reputation(vict, FCT_VNUM(fct), TRUE);
+			new_rep = rep_const_to_index(pfd->rep);
+			sprintf(output, "%s's reputation with %s set to %s / %d", GET_NAME(vict), FCT_NAME(fct), reputation_levels[new_rep].name, pfd->value);
+		}
+	}
 	else if SET_CASE("skill") {
 		char skillname[MAX_INPUT_LENGTH], *skillval;
 		int level = -1, old_level;
@@ -1757,6 +1828,58 @@ SHOW(show_components) {
 		if (ch->desc) {
 			page_string(ch->desc, buf, TRUE);
 		}
+	}
+}
+
+
+SHOW(show_factions) {
+	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH];
+	struct player_faction_data *pfd, *next_pfd;
+	faction_data *fct;
+	bool file = FALSE;
+	char_data *vict;
+	int count = 0;
+	size_t size;
+	int idx;
+	
+	arg2 = any_one_arg(argument, name);
+	skip_spaces(&arg2);
+	
+	if (!(vict = find_or_load_player(name, &file))) {
+		msg_to_char(ch, "No player by that name.\r\n");
+	}
+	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else {
+		check_delayed_load(vict);
+		size = snprintf(buf, sizeof(buf), "%s's factions:\r\n", GET_NAME(vict));
+		HASH_ITER(hh, GET_FACTIONS(vict), pfd, next_pfd) {
+			if (size + 10 >= sizeof(buf)) {
+				break;	// out of room
+			}
+			if (!(fct = find_faction_by_vnum(pfd->vnum))) {
+				continue;
+			}
+			if (*arg2 && !multi_isname(arg2, FCT_NAME(fct))) {
+				continue;	// filter
+			}
+			
+			++count;
+			idx = rep_const_to_index(pfd->rep);
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s %s(%s / %d)\t0\r\n", pfd->vnum, FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value);
+		}
+		
+		if (!count) {
+			strcat(buf, " none\r\n");
+		}
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+	
+	if (file) {
+		free_char(vict);
 	}
 }
 
@@ -2735,6 +2858,7 @@ SHOW(show_variables) {
 	}
 	else {
 		msg_to_char(ch, "Global Variables:\r\n");
+		check_delayed_load(plr);
 		
 		if (plr->script && plr->script->global_vars) {
 			/* currently, variable context for players is always 0, so it is */
@@ -3068,7 +3192,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	}
 
 	if (IS_NPC(k)) {
-		msg_to_char(ch, "Scaled level: [&c%d&0|&c%d&0-&c%d&0]\r\n", GET_CURRENT_SCALE_LEVEL(k), GET_MIN_SCALE_LEVEL(k), GET_MAX_SCALE_LEVEL(k));
+		msg_to_char(ch, "Scaled level: [&c%d&0|&c%d&0-&c%d&0], Faction: [\tt%s\t0]\r\n", GET_CURRENT_SCALE_LEVEL(k), GET_MIN_SCALE_LEVEL(k), GET_MAX_SCALE_LEVEL(k), MOB_FACTION(k) ? FCT_NAME(MOB_FACTION(k)) : "none");
 	}
 	else {	// not NPC
 		msg_to_char(ch, "Title: %s&0\r\n", (GET_TITLE(k) ? GET_TITLE(k) : "<None>"));
@@ -6371,6 +6495,7 @@ ACMD(do_show) {
 		{ "components", LVL_START_IMM, show_components },
 		{ "quests", LVL_START_IMM, show_quests },
 		{ "uses", LVL_START_IMM, show_uses },
+		{ "factions", LVL_START_IMM, show_factions },
 
 		// last
 		{ "\n", 0, NULL }
@@ -7095,6 +7220,12 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No crops by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "faction")) {
+		extern int vnum_faction(char *searchname, char_data *ch);
+		if (!vnum_faction(buf2, ch)) {
+			msg_to_char(ch, "No factions by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "global")) {
 		if (!vnum_global(buf2, ch)) {
 			msg_to_char(ch, "No globals by that name.\r\n");
@@ -7242,6 +7373,15 @@ ACMD(do_vstat) {
 			return;
 		}
 		do_stat_crop(ch, crop);
+	}
+	else if (is_abbrev(buf, "faction")) {
+		void do_stat_faction(char_data *ch, faction_data *fct);
+		faction_data *fct = find_faction_by_vnum(number);
+		if (!fct) {
+			msg_to_char(ch, "There is no faction with that number.\r\n");
+			return;
+		}
+		do_stat_faction(ch, fct);
 	}
 	else if (is_abbrev(buf, "global")) {
 		struct global_data *glb = global_proto(number);

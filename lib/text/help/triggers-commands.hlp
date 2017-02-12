@@ -65,6 +65,21 @@ Example:
 
 See also: DETACH, TATTACH, TDETACH
 #d
+%BUILD% MBUILD OBUILD VBUILD WBUILD
+
+Usage:  %build% <location> <vnum [dir] | ruin | demolish>
+
+This allows you to place a building on the map, or remove or ruin one. It is
+usually a bad idea to %build% tiles by coordinates. It's almost always
+safest to do this on the map tile the script is running in.
+
+Example:
+  if (%room.sector% ~= Forest)
+    %build% %room% 1100
+  end
+
+See also: %TERRAFORM%, %TERRACROP%
+#d
 %BUILDINGECHO% %ECHO% %ECHOAROUND% %ECHONEITHER% %VEHICLEECHO% %SEND% BUILDINGECHO VEHICLEECHO %ZECHOAROUND% ECHOAROUND TRIG-SEND
 
 &c%echo% <message>&0
@@ -459,12 +474,25 @@ See also: EMPIRE VARS
 #d
 %PURGE% MPURGE OPURGE VPURGE WPURGE
 
-Usage:  %purge% <victim | obj | vehicle>
+Usage:  %purge% <victim | obj | vehicle> [message]
+        %purge% instance mob <vnum> [message]
 
 Purge removes objects, mobs, or vehicles from the game. If no argument is
 given, then all objects and mobs (but not vehicles) in the room will be
 removed. If there is an argument, only that thing will be  purged. Players
 cannot be purged.
+
+The "purge instance" feature lets you purge ALL mobs by vnum in an instance.
+In the future, other types may be supported for this. Request one if you need
+it for your scripts.
+
+The optional [message] argument echoes a message for each thing extracted.
+If using "purge instance", you must use "dollar sign codes" rather than script
+variables in the messages (script variables are processed before the %purge%
+command is executed).
+  $n $e $s $m - For a mob being purged.
+  $p $a - For an object being purged.
+  $V - For a vehicle being purged (note the capital V).
 
 Examples: 
   %purge% %self%
@@ -721,7 +749,7 @@ Examples:
 #d
 %TERRACROP% MTERRACROP OTERRACROP VTERRACROP WTERRACROP
 
-%terracrop% [location] <crop vnum>
+Usage:  %terracrop% [location] <crop vnum>
 
 This command allows you to make changes to the map, one tile at a time. It is
 usually a bad idea to terracrop tiles by coordinates. It's almost always
@@ -734,11 +762,11 @@ Example:
     %terracrop% %room% 4900
   end
 
-See also: %TERRAFORM%
+See also: %BUILD%, %TERRAFORM%
 #d
 %TERRAFORM% MTERRAFORM OTERRAFORM VTERRAFORM WTERRAFORM
 
-%terraform% [location] <sector vnum>
+Usage:  %terraform% [location] <sector vnum>
 
 This command allows you to make changes to the map, one tile at a time. It is
 usually a bad idea to terraform tiles by coordinates. It's almost always
@@ -751,14 +779,14 @@ Example:
     %terraform% %room% 4412
   end
 
-See also: %TERRACROP%
+See also: %BUILD%, %TERRACROP%
 #d
 %TRANSFORM% TRANSFORM MTRANSFORM OTRANSFORM
 
 &rNOTE: This functionality is disabled and not currently supported by EmpireMUD.
 If you have a use for it, send a request for it to be implemented.&0
 
-%transform% <vnum|-vnum>
+Usage:  %transform% <vnum|-vnum>
 
 This command causes the executing mob or object to transform into another 
 mob or object, based on the vnum argument supplied. The transformation is 

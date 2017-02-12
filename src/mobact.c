@@ -1122,10 +1122,8 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 	int level_ranges[] = { BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP, CLASS_SKILL_CAP, -1 };	// terminate with -1
 	
 	// determine who we're really scaling to
-	if (IS_NPC(scale_to)) {
-		while (scale_to->master) {
-			scale_to = scale_to->master;
-		}
+	while (IS_NPC(scale_to) && scale_to->master) {
+		scale_to = scale_to->master;
 	}
 	
 	// now determine the ideal level based on scale_to

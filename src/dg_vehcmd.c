@@ -47,6 +47,7 @@ extern vehicle_data *get_vehicle(char *name);
 extern vehicle_data *get_vehicle_by_vehicle(vehicle_data *veh, char *name);
 extern vehicle_data *get_vehicle_near_vehicle(vehicle_data *veh, char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
+extern room_data *obj_room(obj_data *obj);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
@@ -144,6 +145,47 @@ VCMD(do_vadventurecomplete) {
 	if (inst) {
 		mark_instance_completed(inst);
 	}
+}
+
+
+VCMD(do_vbuild) {
+	void do_dg_build(room_data *target, char *argument);
+
+	char loc_arg[MAX_INPUT_LENGTH], bld_arg[MAX_INPUT_LENGTH], *tmp;
+	room_data *orm = IN_ROOM(veh), *target;
+	
+	tmp = any_one_word(argument, loc_arg);
+	strcpy(bld_arg, tmp);
+	
+	// usage: %build% [location] <vnum [dir] | ruin | demolish>
+	if (!*loc_arg) {
+		veh_log(veh, "vbuild: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*bld_arg) {
+		// only arg is actually building arg
+		strcpy(bld_arg, argument);
+		target = orm;
+	}
+	else {
+		// two arguments
+		target = get_room(orm, loc_arg);
+	}
+	
+	if (!target) {
+		veh_log(veh, "vbuild: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't build -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+
+	// good to go
+	do_dg_build(target, bld_arg);
 }
 
 
@@ -544,7 +586,8 @@ VCMD(do_vpurge) {
 	vehicle_data *v;
 	room_data *rm;
 
-	one_argument(argument, arg);
+	argument = one_argument(argument, arg);
+	skip_spaces(&argument);
 
 	if (!*arg) {
 		// purge all
@@ -565,20 +608,42 @@ VCMD(do_vpurge) {
 		return;
 	}
 	
-	if ((ch = get_char_by_vehicle(veh, arg))) {
+	if (!str_cmp(arg, "instance")) {
+		room_data *room = IN_ROOM(veh);
+		struct instance_data *inst = quest_instance_global;
+		if (!inst) {
+			inst = room ? find_instance_by_room(room, FALSE) : NULL;
+		}
+		if (!inst) {
+			veh_log(veh, "vpurge: vehicle using purge instance outside of an instance");
+			return;
+		}
+		dg_purge_instance(veh, inst, argument);
+	}
+	else if ((ch = get_char_by_vehicle(veh, arg))) {
 		if (!IS_NPC(ch)) {
 			veh_log(veh, "vpurge: purging a PC");
 			return;
 		}
-
+		
+		if (*argument) {
+			act(argument, TRUE, ch, NULL, NULL, TO_ROOM);
+		}
 		extract_char(ch);
 	}
 	else if ((o = get_obj_by_vehicle(veh, arg))) {
+		if (*argument) {
+			room_data *room = obj_room(o);
+			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, o, NULL, TO_ROOM);
+		}
 		extract_obj(o);
 	}
 	else if ((v = get_vehicle_by_vehicle(veh, arg))) {
 		if (v == veh) {
 			dg_owner_purged = 1;
+		}
+		if (*argument) {
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(v)), NULL, v, TO_ROOM);
 		}
 		extract_vehicle(v);
 	}
@@ -1363,6 +1428,7 @@ const struct vehicle_command_info veh_cmd_info[] = {
 
 	{ "vadventurecomplete", do_vadventurecomplete, NO_SCMD },
 	{ "vat", do_vat, NO_SCMD },
+	{ "vbuild", do_vbuild, NO_SCMD },
 	{ "vdoor", do_vdoor, NO_SCMD },
 	{ "vdamage", do_vdamage,   NO_SCMD },
 	{ "vaoe", do_vaoe,   NO_SCMD },

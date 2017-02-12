@@ -330,6 +330,14 @@ extern int config_get_int(char *key);
 extern int *config_get_int_array(char *key, int *array_size);
 extern const char *config_get_string(char *key);
 
+// faction.c
+extern int compare_reptuation(int rep_a, int rep_b);
+void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, bool cascade);
+extern struct player_faction_data *get_reputation(char_data *ch, any_vnum vnum, bool create);
+extern int get_reputation_by_name(char *name);
+extern int get_reputation_value(char_data *ch, any_vnum vnum);
+extern int rep_const_to_index(int rep_const);
+
 // fight.c
 void appear(char_data *ch);
 extern bool can_fight(char_data *ch, char_data *victim);

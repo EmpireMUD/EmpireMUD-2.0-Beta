@@ -605,6 +605,26 @@ struct player_slash_channel *find_on_slash_channel(char_data *ch, int id) {
 }
 
 
+/**
+* Skips (copies over) a leading slash in the string.
+*
+* @param char *string The string to MODIFY (deletes the leading slash, if any).
+*/
+void skip_slash(char *string) {
+	int iter;
+	
+	// short-circuit
+	if (*string != '/') {
+		return;
+	}
+	
+	// we already know the first letter is a /
+	for (iter = 1; iter <= strlen(string); ++iter) {
+		string[iter-1] = string[iter];
+	}
+}
+
+
 void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *argument) {
 	struct player_slash_channel *slash;
 	char lbuf[MAX_STRING_LENGTH], invis_string[10];
@@ -696,7 +716,7 @@ ACMD(do_slash_channel) {
 	struct slash_channel *chan;
 	struct channel_history_data *hist;
 	struct player_slash_channel *slash, *temp;
-	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	descriptor_data *desc;
 	char_data *vict;
 	int iter;
@@ -705,11 +725,6 @@ ACMD(do_slash_channel) {
 	char *invalid_channel_names[] = { "/", "join", "leave", "who", "hist", "history", "list", "\n" };
 	
 	half_chop(argument, arg, arg2);
-	// remove leading / if present
-	while (*arg2 == '/') {
-		strcpy(buf, arg2 + 1);
-		strcpy(arg2, buf);
-	}
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "No NPCs on slash channels.\r\n");
@@ -768,6 +783,7 @@ ACMD(do_slash_channel) {
 	}
 	else if (!str_cmp(arg, "join")) {
 		// join channel: just first word
+		skip_slash(arg2);
 		any_one_arg(arg2, arg3);
 		
 		// validate name
@@ -823,6 +839,8 @@ ACMD(do_slash_channel) {
 		}
 	}
 	else if (!str_cmp(arg, "leave")) {
+		skip_slash(arg2);
+		
 		// leave channel
 		if (!*arg2) {
 			msg_to_char(ch, "Usage: /leave <channel>\r\n");
@@ -854,6 +872,8 @@ ACMD(do_slash_channel) {
 		}
 	}
 	else if (!str_cmp(arg, "who")) {
+		skip_slash(arg2);
+		
 		// list players
 		if (!*arg2) {
 			msg_to_char(ch, "Usage: /who <channel>\r\n");
@@ -872,6 +892,8 @@ ACMD(do_slash_channel) {
 		}
 	}
 	else if (!str_cmp(arg, "history") || !str_cmp(arg, "hist")) {
+		skip_slash(arg2);
+		
 		// list players
 		if (!*arg2) {
 			msg_to_char(ch, "Usage: /history <channel>\r\n");

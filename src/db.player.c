@@ -690,6 +690,8 @@ void build_player_index(void) {
 * @param char_data *ch The player to finish loading.
 */
 void check_delayed_load(char_data *ch) {
+	void update_reputations(char_data *ch);
+	
 	char filename[256];
 	FILE *fl;
 	
@@ -712,6 +714,8 @@ void check_delayed_load(char_data *ch) {
 	
 	ch = read_player_from_file(fl, GET_PC_NAME(ch), FALSE, ch);
 	fclose(fl);	
+	
+	update_reputations(ch);
 }
 
 
@@ -1384,7 +1388,14 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'F': {
-				if (PFILE_TAG(line, "Fight Messages:", length)) {
+				if (PFILE_TAG(line, "Faction:", length)) {
+					struct player_faction_data *pfd;
+					sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]);
+					if ((pfd = get_reputation(ch, i_in[0], TRUE))) {
+						pfd->value = i_in[1];
+					}
+				}
+				else if (PFILE_TAG(line, "Fight Messages:", length)) {
 					GET_FIGHT_MESSAGES(ch) = asciiflag_conv(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Fight Prompt:", length)) {
@@ -1432,7 +1443,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'L': {
-				if (PFILE_TAG(line, "Lastname:", length)) {
+				if (PFILE_TAG(line, "Largest Inventory:", length)) {
+					GET_LARGEST_INVENTORY(ch) = atoi(line + length + 1);
+				}
+				else if (PFILE_TAG(line, "Lastname:", length)) {
 					if (GET_LASTNAME(ch)) {
 						free(GET_LASTNAME(ch));
 					}
@@ -2238,6 +2252,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'L'
+	fprintf(fl, "Largest Inventory: %d\n", GET_LARGEST_INVENTORY(ch));
 	if (GET_LAST_CORPSE_ID(ch) > 0) {
 		fprintf(fl, "Last Corpse Id: %d\n", GET_LAST_CORPSE_ID(ch));
 	}
@@ -2401,6 +2416,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	void write_mail_to_file(FILE *fl, char_data *ch);
 	
 	struct player_completed_quest *plrcom, *next_plrcom;
+	struct player_faction_data *pfd, *next_pfd;
 	struct trig_var_data *vars;
 	struct player_quest *plrq;
 	struct alias_data *alias;
@@ -2429,6 +2445,11 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	// 'C'
 	for (coin = GET_PLAYER_COINS(ch); coin; coin = coin->next) {
 		fprintf(fl, "Coin: %d %d %ld\n", coin->amount, coin->empire_id, coin->last_acquired);
+	}
+	
+	// 'F'
+	HASH_ITER(hh, GET_FACTIONS(ch), pfd, next_pfd) {
+		fprintf(fl, "Faction: %d %d\n", pfd->vnum, pfd->value);
 	}
 	
 	// 'L'
@@ -2796,7 +2817,36 @@ void check_autowiz(char_data *ch) {
 * @param char_data *ch The person logging in.
 */
 void announce_login(char_data *ch) {
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+	descriptor_data *desc;
+	int iter;
+	
 	syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s has entered the game", GET_NAME(ch));
+	
+	// auto-notes
+	if (GET_ACCOUNT(ch) && GET_ACCOUNT(ch)->notes) {
+		LL_FOREACH(descriptor_list, desc) {
+			if (STATE(desc) != CON_PLAYING || !desc->character) {
+				continue;
+			}
+			if (!IS_IMMORTAL(desc->character) || !PRF_FLAGGED(desc->character, PRF_AUTONOTES)) {
+				continue;
+			}
+			if (GET_ACCESS_LEVEL(desc->character) < GET_ACCESS_LEVEL(ch)) {
+				continue;
+			}
+			
+			snprintf(buf, sizeof(buf), "(%s account notes)", GET_NAME(ch));
+			msg_to_char(desc->character, "%s- %s ", GET_ACCOUNT(ch)->notes, buf);
+			
+			// rest of the divider
+			for (iter = 0; iter < 79 - (3 + strlen(buf)); ++iter) {
+				buf2[iter] = '-';
+			}
+			buf2[iter] = '\0';	// terminate
+			msg_to_char(desc->character, "%s\r\n", buf2);
+		}
+	}
 	
 	// mortlog
 	if (GET_INVIS_LEV(ch) == 0) {

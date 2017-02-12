@@ -1007,6 +1007,7 @@ void annual_update_map_tile(room_data *room) {
 	if (!HAS_FUNCTION(room, FNC_MINE)) {
 		remove_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM);
 		remove_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT);
+		remove_room_extra_data(room, ROOM_EXTRA_PROSPECT_EMPIRE);
 	}
 }
 
@@ -1770,8 +1771,11 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 			EMPIRE_CITY_TERRITORY(e) = 0;
 			EMPIRE_OUTSIDE_TERRITORY(e) = 0;
 			EMPIRE_POPULATION(e) = 0;
-			EMPIRE_MILITARY(e) = 0;
-			EMPIRE_FAME(e) = 0;
+			
+			if (check_tech) {	// this will only be re-read if we check tech
+				EMPIRE_MILITARY(e) = 0;
+				EMPIRE_FAME(e) = 0;
+			}
 		
 			read_vault(e);
 

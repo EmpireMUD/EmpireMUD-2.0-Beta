@@ -1,3 +1,86 @@
+#10000
+Grove Portal~
+A Portal in the Forest~
+@.&L()@.~
+50 0 d 0
+0 0 0 -1
+C
+enter portal~
+M
+9040 0.01 d
+M
+9056 0.01 d
+M
+9109 10.00 dh
+M
+9145 5.00 adh
+M
+9147 5.00 bdh
+M
+9007 5.00 dg
+M
+9006 5.00 dg
+M
+9141 5.00 dg
+M
+9146 5.00 adg
+M
+9144 5.00 adg
+M
+9002 5.00 adg
+M
+9001 10.00 dg
+M
+9136 5.00 bdg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9017 5.00 d
+M
+9150 5.00 d
+M
+9149 5.00 d
+M
+9148 5.00 d
+M
+9008 5.00 d
+M
+9133 5.00 ad
+M
+9116 5.00 ad
+M
+9025 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9154 10.00 bc
+M
+9153 10.00 bc
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+S
 #10006
 Mountain Cave~
 A Dark Cave in the Mountainside~

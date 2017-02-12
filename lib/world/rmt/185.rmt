@@ -1,0 +1,277 @@
+#18500
+An Overgrown Chamber~
+   You have climbed down a large pile of rubble in one corner of this
+collapsing chamber at the top of the temple. The embers of a recent campfire
+smoulder in the centre of the chamber, lighting the room with a dim red glow.
+The stone walls are almost completely hidden by layers upon layers of plants.
+~
+c 0
+D0
+~
+0 18501
+M 0 18517 100.00 1
+S
+#18501
+A Great Gate~
+   You stand before a huge, thick stone gate, engraved with carvings of tribal
+warriors dressed as eagles and jaguars. The gate is closed; you should look for
+a way to open it. A newly made plaque nearby warns of the dangers within.
+~
+c 0
+D2
+~
+0 18500
+E
+plaque~
+   Beware! Dungeons such as this one often have traps. SEARCH carefully before
+advancing, or be prepared to JUMP, DUCK or RUN very fast.
+  - Guild of Treasure Hunters
+~
+M 1 18507 100.00 1
+S
+#18502
+A Great Gate~
+   You stand before a huge, thick stone gate, engraved with carvings of tribal
+warriors dressed as eagles and jaguars. The gate is open; you can advance
+deeper into the temple. A newly made plaque nearby warns of the dangers within.
+~
+c 0
+D2
+~
+0 18500
+D0
+~
+0 18503
+E
+plaque~
+   Beware! Dungeons such as this one often have traps. SEARCH carefully before
+advancing, or be prepared to JUMP, DUCK or RUN very fast.
+  - Guild of Treasure Hunters
+~
+S
+#18503
+A Suspicious Gallery~
+   Thick vines and dark shadows obscure the walls and floor of this wide
+corridor. A faint breeze blowing through cracks in the uneven stone walls
+rustles the leaves growing on the walls, producing an eerie hissing sound.
+~
+c 0
+D2
+~
+0 18502
+D0
+~
+0 18504
+E
+floor walls~
+   It's hard to say if anything looks out of place. A detailed search might
+reveal more.
+~
+M 1 18511 100.00 99
+T 18510
+S
+#18504
+A Shadowy Chamber~
+   Huge bas-relief carvings adorn the walls of this cavernous hall. No daylight
+penetrates this deep into the temple. Instead, an eerie green light with no
+apparent source fills the room, revealing a huge staircase leading deeper into
+the temple.
+~
+c 0
+D2
+~
+0 18503
+D3
+~
+0 18505
+E
+carvings walls~
+   The carvings covering the walls are mostly of snakes, people, and
+snake-people. Whoever built this temple must have really liked snakes.
+~
+M 1 18511 100.00 99
+S
+#18505
+A Collapsing Staircase~
+   As you descend the steps deeper into the temple, you come to a section where
+the ceiling has completely caved in, blocking any further progress. However,
+the falling rocks knocked a few stones loose from the floor. It looks like this
+temple is built on top of something else. Vines snake down into the green-lit
+depths below.
+~
+c 0
+D1
+~
+0 18504
+D9
+~
+0 18506
+M 1 18511 100.00 99
+S
+#18506
+A Hidden Valley~
+   You have climbed down the vines into a wide ravine, deep beneath the temple.
+Leaves and vines line the curved stone walls. Several large shafts of light
+shine through the high, uneven ceiling of leaves and stone. Nearby, at the base
+of one such shaft of light, a grove of papaya trees is growing.
+~
+ac 0
+D14
+~
+0 18507
+D8
+~
+0 18505
+I 6 18501 100.00 1  # FORAGE: a single papaya
+I 8 18500 100.00 1  # HARVEST: a basket of papayas
+M 0 18502 100.00 1
+S
+#18507
+The Lower Gate~
+   Following the ravine beneath the temple, you eventually come to an old stone
+gate, like the one at the entrance of the temple, but much smaller. Vines have
+forced it slightly open; you could squeeze through.
+~
+c 0
+D14
+~
+0 18506
+D2
+~
+0 18508
+M 1 18511 100.00 99
+S
+#18508
+A Suspicious Gallery~
+   Thick vines and dark shadows obscure the walls and floor of this wide
+corridor. A faint breeze blowing through cracks in the uneven stone walls
+rustles the leaves growing on the walls, producing an eerie hissing sound.
+~
+c 0
+D0
+~
+0 18507
+D2
+~
+0 18509
+E
+floor walls~
+   It's hard to say if anything looks out of place. A detailed search might
+reveal more.
+~
+M 1 18511 100.00 99
+T 18510
+S
+#18509
+The Temple Depths~
+   You have squeezed through the narrow crack and into the depths of the
+temple. Nearby, you see the far side of the huge pile of rocks which blocks the
+main entrance to this area. The eerie glow seems to have spread unobstructed by
+the rocks, and fills this area as well.
+~
+c 0
+D0
+~
+0 18508
+D2
+~
+0 18510
+M 1 18511 100.00 99
+S
+#18510
+The Ancient Treasury~
+   You have reached the deepest part of the temple. Piles of silver and gold
+coins are scattered around the edges of the room, and an elevated pedestal in
+the centre of the room prominently displays the greatest treasure in the room.
+~
+c 0
+D0
+~
+0 18509
+M 1 18509 100.00 1
+M 0 18501 100.00 1
+M 1 18506 100.00 5
+M 1 18506 100.00 5
+M 1 18506 100.00 5
+M 1 18506 100.00 5
+M 1 18506 100.00 5
+S
+#18511
+An Intact Staircase~
+   You step through the secret door and onto another staircase, the mirror of
+the first, but untouched by the centuries. The carvings of snakes common
+throughout the rest of the temple are replaced with a long series of carvings
+depicting a man wearing a crown shaped like a sun.
+~
+c 0
+D1
+~
+0 18512
+D3
+~
+0 18504
+M 1 18511 100.00 99
+S
+#18512
+A Suspicious Gallery~
+   Thick vines and dark shadows obscure the walls and floor of this wide
+corridor. A faint breeze blowing through cracks in the uneven stone walls
+rustles the leaves growing on the walls, producing an eerie hissing sound.
+~
+c 0
+D3
+~
+0 18511
+D1
+~
+0 18513
+E
+floor walls~
+   It's hard to say if anything looks out of place. A detailed search might
+reveal more.
+~
+M 1 18511 100.00 99
+T 18510
+S
+#18513
+An Ancient Throne Room~
+   No vines grow on the vaulted walls of this ancient chamber. Sarcophagi
+engraved with mystical symbols line the walls. A great stone throne stands
+empty on the dais at the far end of the hall. A huge painting of the sun covers
+the wall behind the throne, with a small archway in the middle.
+~
+c 0
+D3
+~
+0 18512
+D1
+~
+0 18514
+M 1 18511 100.00 99
+S
+#18514
+The Tomb of the Ancient King~
+   You step through the archway behind the throne and into a tall, octagonal
+chamber, bare of decoration or ornaments. Above your head, a miniature sun of
+emerald light swirls and crackles. An ornately carved stone sarcophagus lies
+open in the center of the room.
+~
+c 0
+D3
+~
+0 18513
+M 0 18500 100.00 1
+S
+#18516
+A Pit of Snakes~
+   You have fallen into a deep pit. The stone walls are built from large,
+ill-fitted blocks and overgrown with vines. It should be easy to climb back up,
+but you may have to deal with the source of the incessant hissing sounds
+first...
+~
+cg 0
+D8
+~
+0 18500
+S
+$

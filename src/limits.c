@@ -230,6 +230,38 @@ void check_idling(char_data *ch) {
 
 
 /**
+* Determines if a player can really be riding. Dismounts them if not.
+*
+* @param char_data *ch The player to check.
+*/
+void check_should_dismount(char_data *ch) {
+	ACMD(do_dismount);
+	
+	bool ok = TRUE;
+	
+	if (!IS_RIDING(ch)) {
+		return;	// nm
+	}
+	else if (IS_MORPHED(ch)) {
+		ok = FALSE;
+	}
+	else if (IS_COMPLETE(IN_ROOM(ch)) && !BLD_ALLOWS_MOUNTS(IN_ROOM(ch))) {
+		ok = FALSE;
+	}
+	else if (GET_SITTING_ON(ch)) {
+		ok = FALSE;
+	}
+	else if (MOUNT_FLAGGED(ch, MOUNT_FLYING) && !CAN_RIDE_FLYING_MOUNT(ch)) {
+		ok = FALSE;
+	}
+	
+	if (!ok) {
+		do_dismount(ch, "", 0, 0);
+	}
+}
+
+
+/**
 * This clears the linkdead players out, and should be called before you run
 * anything that updates offline players, as players in this state can cause
 * actual problems if they reconnect.
@@ -309,12 +341,12 @@ void point_update_char(char_data *ch) {
 		remove_quest_items(ch);
 		
 		// check way over-inventory (2x overburdened)
-		if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > 2 * CAN_CARRY_N(ch)) {
+		if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
 			count = 0;
 			found = FALSE;
 			LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 				count += obj_carry_size(obj);
-				if (count > 2 * CAN_CARRY_N(ch)) {
+				if (count > 2 * GET_LARGEST_INVENTORY(ch)) {
 					if (!found) {
 						found = TRUE;
 						msg_to_char(ch, "You are way overburdened and begin losing items...\r\n");
@@ -395,35 +427,33 @@ void point_update_char(char_data *ch) {
 
 	// healing for NPCs -- pcs are in real_update
 	if (IS_NPC(ch)) {
-		if (GET_POS(ch) >= POS_STUNNED) {
-			if (!FIGHTING(ch) && (GET_HEALTH(ch) < GET_MAX_HEALTH(ch) || GET_MOVE(ch) < GET_MAX_MOVE(ch) || GET_MANA(ch) < GET_MAX_MANA(ch))) {
-				// verify not fighting at all
-				for (c = ROOM_PEOPLE(IN_ROOM(ch)), found = FALSE; c && !found; c = c->next_in_room) {
-					if (FIGHTING(c) == ch) {
-						found = TRUE;
-					}
+		if (GET_POS(ch) >= POS_STUNNED && !FIGHTING(ch)) {
+			// verify not fighting at all
+			for (c = ROOM_PEOPLE(IN_ROOM(ch)), found = FALSE; c && !found; c = c->next_in_room) {
+				if (FIGHTING(c) == ch) {
+					found = TRUE;
 				}
+			}
 			
+			if (!found) {
 				// not fighting for a tick? full health! (and reset tags)
-				if (!found) {
-					free_mob_tags(&MOB_TAGGED_BY(ch));
-					GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
-					GET_MOVE(ch) = GET_MAX_MOVE(ch);
-					GET_MANA(ch) = GET_MAX_MANA(ch);
-					if (GET_POS(ch) < POS_SLEEPING) {
-						GET_POS(ch) = POS_STANDING;
+				free_mob_tags(&MOB_TAGGED_BY(ch));
+				GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
+				GET_MOVE(ch) = GET_MAX_MOVE(ch);
+				GET_MANA(ch) = GET_MAX_MANA(ch);
+				if (GET_POS(ch) < POS_SLEEPING) {
+					GET_POS(ch) = POS_STANDING;
+				}
+				
+				// reset scaling if possible...
+				if (!MOB_FLAGGED(ch, MOB_NO_RESCALE)) {
+					inst = get_instance_by_id(MOB_INSTANCE_ID(ch));
+					if (!inst && IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+						inst = find_instance_by_room(IN_ROOM(ch), FALSE);
 					}
-					
-					// reset scaling if possible...
-					if (!MOB_FLAGGED(ch, MOB_NO_RESCALE)) {
-						inst = get_instance_by_id(MOB_INSTANCE_ID(ch));
-						if (!inst && IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
-							inst = find_instance_by_room(IN_ROOM(ch), FALSE);
-						}
-						// if no instance or not level-locked
-						if (!inst || inst->level <= 0) {
-							GET_CURRENT_SCALE_LEVEL(ch) = 0;
-						}
+					// if no instance or not level-locked
+					if (!inst || inst->level <= 0) {
+						GET_CURRENT_SCALE_LEVEL(ch) = 0;
 					}
 				}
 			}
@@ -497,6 +527,10 @@ void real_update_char(char_data *ch) {
 	
 	if (!IS_NPC(ch) && IS_MORPHED(ch)) {
 		check_morph_ability(ch);
+	}
+	
+	if (!IS_NPC(ch) && IS_RIDING(ch)) {
+		check_should_dismount(ch);
 	}
 	
 	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_VEHICLE(ch))) {

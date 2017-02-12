@@ -581,6 +581,27 @@ Usage:  exits
 Gives you a list of the obvious exits from your location. This command is
 only useful indoors, because on the world map all directions are exits.
 #
+FACTION FACTIONS REPUTATIONS REP "FACTION REP"
+
+Usage:  factions [name]
+
+Factions are groups of NPCs and adventures with whom players can gain or lose
+reputation. The consequences of higher or lower reputation depend on the
+specific adventures where you find them.
+
+You can see information about any faction by using its name with this command.
+
+Reputation levels and values:
+  &RDespised&0  -100
+  &rHated&0  -99 to -75
+  &oLoathed&0  -74 to -30
+  &yDisliked&0  -29 to -10
+  &tNeutral&0  -9 to 9
+  &cLiked&0  10 to 29
+  &aEsteemed&0  30 to 74
+  &gVenerated&0  75 to 99
+  &gRevered&0  100
+#
 FIGHTMESSAGES "FIGHT MESSAGES" FMESSAGES "FIGHT SPAM" "COMBAT SPAM" "COMBAT MESSAGES"
 
 Usage:  fightmessages [type]
@@ -1756,6 +1777,7 @@ Toggles:
   channel-joins - blocks slash-channel join messages
   autorecall - if you're logged out over an hour, automatically sends you home
   stealthable - if off, you will be prevented from accidentally stealing
+  autodismount - will dismount you while moving, if necessary
 
 Immortal toggles:
   wiznet - shuts off the immortal channel
@@ -1765,6 +1787,7 @@ Immortal toggles:
   idle-out - if off, the immortal will not disconnect from idling
   incognito - if on, the immortal does not appear on 'who' to mortals
   wizhide - if on, the immortal can't be seen in rooms but is not invisible
+  autonotes - automatically show notes on accounts when players log in
 
 See also: FIGHT MESSAGES
 #

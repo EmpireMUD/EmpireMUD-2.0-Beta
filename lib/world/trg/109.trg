@@ -2,8 +2,8 @@
 Dragon tokens count~
 1 c 2
 count~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+eval test %%actor.obj_target(%arg%)%%
+if %self% != %test%
   return 0
   halt
 end

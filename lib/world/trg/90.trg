@@ -76,7 +76,35 @@ if %questvnum% == 9009
   if %item%
     %send% %actor% The stablemaster gives you %item.shortdesc%.
   end
+elseif %questvnum% == 9033
+  %load% obj 9034 %actor% inv
+  eval item %actor.inventory(9034)%
+  if %item%
+    %send% %actor% The guildmaster gives you %item.shortdesc%.
+  end
+elseif %questvnum% == 9030
+  %load% obj 9031 %actor% inv
+  eval item %actor.inventory(9031)%
+  if %item%
+    %send% %actor% The barkeep gives you %item.shortdesc%.
+  end
 elseif %questvnum% == 9036
+  if %actor.varexists(last_quest_9036_time)%
+    * 15 minute cooldown
+    if %timestamp% - %actor.last_quest_9036_time% < 900
+      eval diff (%actor.last_quest_9036_time% - %timestamp%) + 900
+      eval diff2 %diff%/60
+      eval diff %diff%//60
+      if %diff%<10
+        set diff 0%diff%
+      end
+      %send% %actor% You must wait %diff2%:%diff% to start this quest again.
+      return 0
+      halt
+    end
+  end
+  eval last_quest_9036_time %timestamp%
+  remote last_quest_9036_time %actor.id%
   nop %actor.add_resources(9036, 5)%
   %send% %actor% The High Sorcerer gives you five enchanted trinkets.
 end
@@ -335,6 +363,108 @@ switch (%random.3)
   break
 done
 ~
+#9030
+Butcher detect~
+1 c 2
+butcher~
+eval target %%actor.obj_target(%arg%)%%
+if !%target%
+  * Invalid target
+  return 0
+  halt
+end
+if !%actor.ability(butcher)%
+  * Player does not have butcher
+  return 0
+  halt
+end
+* Debug...
+if %test% != *CORPSE && %test%
+  return 0
+  halt
+end
+if %target.val0%
+  eval mob_vnum %target.val0%
+else
+  * Probably not really a corpse
+  return 0
+  halt
+end
+* Check mob vnum
+if %mob_vnum% == 9017 || %mob_vnum% == 9177
+  * Bear, polar bear
+elseif %mob_vnum% == 9001 || %mob_vnum% == 9002
+  * Snarling and brown wolf
+elseif %mob_vnum% == 9016 || %mob_vnum% == 9100 || %mob_vnum% == 9143 || %mob_vnum% == 9118 || %mob.vnum% == 9102
+  * Tiger, leopard, snow leopard, cougar, jaguar
+else
+  * Wrong kind of corpse
+  return 0
+  halt
+end
+if %actor.inventory(9030)% || !%actor.on_quest(9030)%
+  * Don't need the trinket
+  return 0
+  halt
+end
+%send% %actor% You cut the head off %target.shortdesc%...
+%load% obj 9030 %actor% inv
+eval item %actor.inventory()%
+if %item%
+  %send% %actor% You get %item.shortdesc%!
+end
+* Don't butcher normally this time. Less buggy this way.
+return 1
+halt
+~
+#9033
+Fake pickpocket~
+1 c 2
+pickpocket~
+eval target %%actor.char_target(%arg%)%%
+if !%target%
+  * Invalid target
+  return 0
+  halt
+end
+if !%actor.ability(pickpocket)%
+  * Player does not have pickpocket
+  return 0
+  halt
+end
+if %target.empire% != %actor.empire%
+  * Wrong empire
+  return 0
+  halt
+end
+if (%target.vnum% != 202 && %target.vnum% != 203)
+  * Not an empire citizen
+  return 0
+  halt
+end
+if %target.mob_flagged(*PICKPOCKETED)%
+  return 0
+  halt
+end
+if %actor.inventory(9033)% || !%actor.on_quest(9033)%
+  * Don't need the trinket
+  return 0
+  halt
+end
+if %random.3% != 3
+  %send% %actor% This must have been the wrong citizen.
+  return 0
+  halt
+else
+  %send% %actor% You pick %target.name%'s pocket...
+  nop %target.add_mob_flag(*PICKPOCKETED)%
+  %load% obj 9033 %actor% inv
+  eval item %actor.inventory()%
+  %send% %actor% You find %item.shortdesc%!
+  return 1
+  halt
+end
+~
 #9034
 Horse Animation~
 0 bw 3
@@ -353,21 +483,73 @@ switch (%random.3%)
 done
 ~
 #9036
-Disenchant checker~
-2 v 100
+Disenchant detector~
+1 p 100
 ~
+if %abilityname% != Disenchant
+  return 1
+  halt
+end
+eval done 1
 eval obj %actor.inventory()%
 while %obj%
   if %obj.vnum% == 9036
-    if %obj.flag(ENCHANTED)%
-      %send% %actor% You have not disenchanted all of the trinkets!
-      return 0
-      halt
+    if %obj.is_flagged(ENCHANTED)% && %obj% != %self%
+      eval done 0
     end
   end
   eval obj %obj.next_in_list%
 done
+if %done%
+  %quest% %actor% trigger 9036
+end
 return 1
+~
+#9042
+Postmaster quest start~
+2 u 100
+~
+eval vnum 9041+%random.3%
+%load% obj %vnum% %actor% inv
+eval item %%actor.inventory(%vnum%)%%
+%send% %actor% You receive %item.shortdesc%.
+~
+#9043
+Postmaster daily letter delivery~
+1 i 100
+~
+eval recipient 0
+switch %self.vnum%
+  case 9042
+    * Smith
+    eval recipient 212
+  break
+  case 9043
+    * High Sorcerer
+    eval recipient 228
+  break
+  case 9044
+    * Alchemist
+    eval recipient 231
+  break
+done
+eval person %victim%
+eval found (%person.vnum% == %recipient% && %person.empire% == %actor.empire%)
+eval wrong_empire %person.vnum% == %recipient% && %person.empire% != %actor.empire%
+if %found%
+  %send% %actor% You give the letter to %person.name%.
+  %quest% %actor% trigger 9042
+  return 1
+  %purge% %self%
+elseif %wrong_empire%
+  %send% %actor% %person.name% does not belong to your empire.
+  return 0
+  halt
+else
+  %send% %actor% That's not who you need to deliver the letter to.
+  return 0
+  halt
+end
 ~
 #9064
 Wandering Vampire combat~

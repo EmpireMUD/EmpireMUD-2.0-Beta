@@ -35,7 +35,8 @@
 #define DB_BOOT_MORPH  21
 #define DB_BOOT_QST  22
 #define DB_BOOT_SOC  23
-#define NUM_DB_BOOT_TYPES  24	// total
+#define DB_BOOT_FCT  24
+#define NUM_DB_BOOT_TYPES  25	// total
 
 
 // library sub-dirs
@@ -77,6 +78,7 @@
 #define CLASS_PREFIX  LIB_WORLD"class/"	// player classes
 #define CRAFT_PREFIX  LIB_WORLD"craft/"	// craft recipes
 #define CROP_PREFIX  LIB_WORLD"crop/"	// crop definitions
+#define FCT_PREFIX  LIB_WORLD"fct/"	// factions
 #define GLB_PREFIX  LIB_WORLD"glb/"	// global templates
 #define WLD_PREFIX  LIB_WORLD"wld/"	// room definitions
 #define MOB_PREFIX  LIB_WORLD"mob/"	// monster prototypes
@@ -107,6 +109,7 @@
 #define CRAFT_SUFFIX  ".craft"	// craft file suffix
 #define CROP_SUFFIX  ".crop"	// crop file suffix
 #define EMPIRE_SUFFIX  ".empire"	// empire file suffix
+#define FCT_SUFFIX  ".fct"	// factions
 #define GLB_SUFFIX  ".glb"	// global suffix
 #define MOB_SUFFIX  ".mob"	// mob suffix for file saves
 #define MORPH_SUFFIX  ".morph"	// morph file suffix
@@ -277,6 +280,16 @@ void save_all_empires();
 
 // extra descs
 void free_extra_descs(struct extra_descr_data **list);
+
+// factions
+extern faction_data *faction_table;
+extern int MAX_REPUTATION;
+extern int MIN_REPUTATION;
+extern faction_data *sorted_factions;
+extern faction_data *find_faction(char *argument);
+extern faction_data *find_faction_by_name(char *name);
+extern faction_data *find_faction_by_vnum(any_vnum vnum);
+void free_faction(faction_data *fct);
 
 // globals
 extern struct global_data *globals_table;

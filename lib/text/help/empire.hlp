@@ -160,9 +160,10 @@ If you do not include an (x, y) coordinate, it will cede the land you're on.
 You can only cede land owned by your empire. Ceding land to a god or immortal
 so that you can claim more land may get you in trouble.
 
-You can't cede land to an empire that is at war.
+Your target must have the 'bother' toggle turned on. You can't cede land to an
+empire that is at war.
 
-See also: CLAIM, POLICY, PRIVILEGE, ABANDON
+See also: CLAIM, POLICY, PRIVILEGE, ABANDON, TOGGLE
 #
 CHORES CHORE
 
@@ -979,7 +980,8 @@ mountain tile (since the last mountain reset), that tile will benefit from your
 Deep Mines and/or Rare Metals until the next mountain reset. For more info on
 mountain resets, see HELP MINE.
 
-Gain experience when you finish prospecting a tile.
+Gain experience when you finish prospecting a tile. Prospecting happens
+instantly if your empire was the last one to prospect the tile.
 
 See also: MINE, DEEP MINES, RARE METALS
 #

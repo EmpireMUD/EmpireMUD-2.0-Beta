@@ -26,6 +26,7 @@
 *     Craft Defines
 *     Crop Defines
 *     Empire Defines
+*     Faction Defines
 *     Game Defines
 *     Mobile Defines
 *     Object Defines
@@ -52,6 +53,7 @@
 *     Crop Structs
 *     Data Structs
 *     Empire Structs
+*     Faction Structs
 *     Fight Structs
 *     Game Structs
 *     Object Structs
@@ -220,6 +222,7 @@ typedef struct craft_data craft_data;
 typedef struct crop_data crop_data;
 typedef struct descriptor_data descriptor_data;
 typedef struct empire_data empire_data;
+typedef struct faction_data faction_data;
 typedef struct index_data index_data;
 typedef struct morph_data morph_data;
 typedef struct obj_data obj_data;
@@ -901,6 +904,34 @@ typedef struct vehicle_data vehicle_data;
 #define GUESTS_ALLOWED  0
 #define MEMBERS_ONLY  1
 #define MEMBERS_AND_ALLIES  2
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// FACTION DEFINES /////////////////////////////////////////////////////////
+
+// FCT_x: Faction flags
+#define FCT_IN_DEVELOPMENT  BIT(0)	// a. not live
+#define FCT_REP_FROM_KILLS  BIT(1)	// b. killing mobs affects faction rating
+
+
+// FCTR_x: Relationship flags
+#define FCTR_SHARED_GAINS  BIT(0)	// a. also gains rep when that one gains rep
+#define FCTR_INVERSE_GAINS  BIT(1)	// b. loses rep when that one gains rep
+#define FCTR_MUTUALLY_EXCLUSIVE  BIT(2)	// c. cannot gain if that one is positive
+#define FCTR_UNLISTED  BIT(3)  // d. mortals won't see this relationship
+
+
+// REP_x: Faction reputation levels
+#define REP_NONE  0	// base / un-set
+#define REP_NEUTRAL  1	// no opinion
+#define REP_DESPISED  2	// lower cap
+#define REP_HATED  3	// worst
+#define REP_LOATHED  4	// bad
+#define REP_DISLIKED  5	// not good
+#define REP_LIKED  6	// decent
+#define REP_ESTEEMED  7	// good
+#define REP_VENERATED  8	// great!
+#define REP_REVERED  9	// upper cap
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1620,7 +1651,7 @@ typedef struct vehicle_data vehicle_data;
 #define PLR_ADVENTURE_SUMMONED  BIT(20)	// marks the player for return to whence they came
 
 
-// Preference flags
+// PRF_x: Preference flags
 #define PRF_AFK  BIT(0)	// player is marked away
 #define PRF_COMPACT  BIT(1)	// No extra CRLF pair before prompts
 #define PRF_DEAF  BIT(2)	// Can't hear shouts
@@ -1649,6 +1680,8 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_SCREEN_READER  BIT(25)	// player is visually impaired and using a screen reader that can't read the map
 #define PRF_STEALTHABLE  BIT(26)	// player can steal (rather than be prevented from accidentally stealing)
 #define PRF_WIZHIDE  BIT(27)	// player can't be seen in the room
+#define PRF_AUTONOTES  BIT(28)	// Player login syslogs automatically show notes
+#define PRF_AUTODISMOUNT  BIT(29)	// will dismount while moving instead of seeing an error
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -1710,6 +1743,7 @@ typedef struct vehicle_data vehicle_data;
 #define QR_SKILL_EXP  4
 #define QR_SKILL_LEVELS  5
 #define QR_QUEST_CHAIN  6
+#define QR_REPUTATION  7
 
 
 // QT_x: quest tracker types (conditions and pre-reqs)
@@ -1729,12 +1763,15 @@ typedef struct vehicle_data vehicle_data;
 #define QT_VISIT_ROOM_TEMPLATE  13
 #define QT_VISIT_SECTOR  14
 #define QT_HAVE_ABILITY  15
+#define QT_REP_OVER  16
+#define QT_REP_UNDER  17
 
 
 // QT_AMT_x: How quest trackers are displayed for different QT_ types
 #define QT_AMT_NONE  0	// show as "completed"
 #define QT_AMT_NUMBER  1  // show as x/X
 #define QT_AMT_THRESHOLD  2	// needs a numeric arg but shows as a threshold
+#define QT_AMT_REPUTATION  3	// uses a faction reputation
 
 
 // indicates empire (rather than misc) coins for a reward
@@ -1949,10 +1986,10 @@ typedef struct vehicle_data vehicle_data;
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
-// For various misc numbers attached to rooms
+// ROOM_EXTRA_x: For various misc numbers attached to rooms
 // WARNING: Make sure you have a place these are set, a place they are read,
 // and *especially* a place they are removed. -pc
-	#define ROOM_EXTRA_UNUSED  0	// was MINE_TYPE prior to b3.1
+#define ROOM_EXTRA_PROSPECT_EMPIRE  0
 #define ROOM_EXTRA_MINE_AMOUNT  1
 	#define ROOM_EXTRA_UNUSED2  2
 #define ROOM_EXTRA_SEED_TIME  3
@@ -1991,6 +2028,7 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_CONDITION  750	// FULL, etc
 #define MAX_COOLDOWNS  32
 #define MAX_EMPIRE_DESCRIPTION  2000
+#define MAX_FACTION_DESCRIPTION  4000
 #define MAX_GROUP_SIZE  4	// how many members a group allows
 #define MAX_IGNORES  15	// total number of players you can ignore
 #define MAX_INPUT_LENGTH  1024	// Max length per *line* of input
@@ -2690,14 +2728,15 @@ struct mob_special_data {
 	
 	int name_set;	// NAMES_x
 	struct custom_message *custom_msgs;	// any custom messages
+	faction_data *faction;	// if any
 	
 	int to_hit;	// Mob's attack % bonus
 	int to_dodge;	// Mob's dodge % bonus
 	int damage;	// Raw damage
 	int	attack_type;	// weapon type
-
+	
 	byte move_type;	// how the mob moves
-
+	
 	struct pursuit_data *pursuit;	// mob pursuit
 	room_vnum pursuit_leash_loc;	// where to return to
 	struct mob_tag *tagged_by;	// mob tagged by
@@ -2896,6 +2935,7 @@ struct descriptor_data {
 	craft_data *olc_craft;	// craft recipe being edited
 	bld_data *olc_building;	// building being edited
 	crop_data *olc_crop;	// crop being edited
+	faction_data *olc_faction;	// faction being edited
 	struct global_data *olc_global;	// global being edited
 	quest_data *olc_quest;	// quest being edited
 	room_template *olc_room_template;	// rmt being edited
@@ -3038,6 +3078,7 @@ struct player_special_data {
 	struct offer_data *offers;	// various offers for do_accept/reject
 	struct player_slash_channel *slash_channels;	// channels the player is on
 	struct slash_channel *load_slash_channels;	// temporary storage between load and join
+	struct player_faction_data *factions;	// hash table of factions
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered
@@ -3095,6 +3136,9 @@ struct player_special_data {
 	struct mount_data *mount_list;	// list of stored mounts
 	mob_vnum mount_vnum;	// current mount vnum
 	bitvector_t mount_flags;	// current mount flags
+	
+	// other
+	int largest_inventory;	// highest inventory size a player has ever had
 	
 	// UNSAVED PORTION //
 	
@@ -3439,7 +3483,7 @@ struct tavern_data_type {
 struct toggle_data_type {
 	char *name;	// toggle display and subcommand
 	int type;	// TOG_ONOFF, TOG_OFFON
-	bitvector_t bit;	// PRF_x
+	bitvector_t bit;	// PRF_
 	int level;	// required level to see/use toggle
 	void (*callback_func)(char_data *ch);	// optional function to alert changes
 };
@@ -3649,6 +3693,55 @@ struct empire_data {
 	bool needs_save;	// for things that delay-save
 	
 	UT_hash_handle hh;	// empire_table hash handle
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// FACTION STRUCTS /////////////////////////////////////////////////////////
+
+struct faction_data {
+	any_vnum vnum;
+	
+	char *name;	// basic name
+	char *description;	// full text desc
+	
+	bitvector_t flags;	// FCT_ flags
+	int max_rep;	// REP_ they cap at, positive
+	int min_rep;	// REP_ they cap at, negative
+	int starting_rep;	// REP_ initial reputation for players
+	struct faction_relation *relations;	// hash table
+	
+	// lists
+	UT_hash_handle hh;	// faction_table hash handle
+	UT_hash_handle sorted_hh;	// sorted_factions hash handle
+};
+
+
+// how factions view each other
+struct faction_relation {
+	any_vnum vnum;	// who it's with
+	bitvector_t flags;	// FCTR_ flags
+	faction_data *ptr;	// quick reference
+	
+	UT_hash_handle hh;	// fct->relations hash handle
+};
+
+
+// used to determine the order and value of reputations
+struct faction_reputation_type {
+	int type;	// REP_ type
+	char *name;
+	char *color;	// & or \t color code
+	int value;	// points total a player must be at for this
+};
+
+
+// for hash table of player faction levels
+struct player_faction_data {
+	any_vnum vnum;	// faction vnum
+	int value;	// reputation points
+	int rep;	// REP_ const
+	UT_hash_handle hh;	// GET_FACTIONS(ch) hash
 };
 
 
