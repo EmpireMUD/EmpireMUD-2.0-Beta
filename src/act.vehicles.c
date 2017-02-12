@@ -1674,7 +1674,7 @@ ACMD(do_drive) {
 			do_drive_through_portal(ch, veh, portal, subcmd);
 		}
 		else {
-			msg_to_char(ch, "You can't %s that direction.\r\n", drive_data[subcmd].command);
+			msg_to_char(ch, "'%s' isn't a direction you can %s.\r\n", dir_arg, drive_data[subcmd].command);
 		}
 	}
 	else if (dir == DIR_RANDOM || !dir_to_room(IN_ROOM(veh), dir, FALSE) || (subcmd != SCMD_PILOT && !is_flat_dir[dir])) {
