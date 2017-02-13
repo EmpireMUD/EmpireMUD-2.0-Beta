@@ -405,6 +405,10 @@ different types of resources:
    craft, you must have the entire pool cost available at once. You can't spend
    your last health or blood point in this way, but be warned: you can get
    dangerously close to death if the resource requirement is health or blood.
+   
+&cTasks&0 - Some recipes (especially for maintenance) just need a bit more work.
+   Tasks are written in square brackets like "1x [dig]". They take time like
+   adding any other resource, but don't use any materials.
 
 When you dismantle a building, you get back half of the resources you used to
 build it -- but only items (including generic components). Canceling a craft
