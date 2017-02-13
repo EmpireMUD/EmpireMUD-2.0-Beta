@@ -248,11 +248,13 @@ See also: DISEMBARK, SAIL, MANUFACTURE, LOAD, SHIPS
 #
 BOTHER NOBOTHER
 
+Usage: toggle bother
+
 When enabled, this toggle protects you from having your character affected by
 various other commands - you cannot be sired, you cannot be purified of
 vampirism, and vampires can't bite you unless you're restrained or unconscious.
 
-See also: BITE, PURIFY, SIRE
+See also: BITE, CEDE, PURIFY, SIRE, TOGGLE
 #
 BRIEF
 
