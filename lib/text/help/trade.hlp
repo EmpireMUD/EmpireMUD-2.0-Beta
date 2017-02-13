@@ -530,6 +530,16 @@ Rawhide Stitching -> Leatherworking -> Dangerous Leathers
 See also: SEWING, DANGEROUS LEATHERS, MASTER TAILOR, RAWHIDE STITCHING, SKIN,
   TAN
 #
+"LETHEIAN ICON"
+
+usage: use <icon> <skill name>
+
+Letheian icons are consumable trinkets which grant an extra skill reset for a
+skill of your choice, allowing you to choose new abilities for that skill. They
+are crafted using the Master Craftsman ability.
+
+See also: MASTER CRAFTSMAN, SKILL RESET
+#
 "MAGIC ATTIRE" "MAGICAL ATTIRE" "MAGE ATTIRE"
 
 Magic Attire (Trade ability)
@@ -599,7 +609,7 @@ It also allows you to craft the following:
 
   letheian icon (skill reset)
 
-See also: POTTERY, FINE POTTERY, SUPERIOR
+See also: POTTERY, FINE POTTERY, SUPERIOR, LETHEIAN ICON
 #
 "MASTER TAILOR"
 
