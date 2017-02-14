@@ -2997,6 +2997,7 @@ const char *affect_types[] = {
 	"shadowlash",	// dot
 	"soulchain",
 	"thornlash",	// 75
+	"arrow to the knee",
 	"\n"
 	};
 
@@ -3079,6 +3080,7 @@ const char *affect_wear_off_msgs[] = {
 	"",	// shadowlash-dot
 	"Your soul is unchained.",
 	"",	// 75, thornlast
+	"Your knee feels better",
 	"\n"
 };
 
