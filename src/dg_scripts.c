@@ -3534,6 +3534,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									bind_obj_to_player(o, targ);
 									reduce_obj_binding(o, targ);
 								}
+								else {	// wasn't targeting a person, try an obj
+									struct obj_binding *copy_obj_bindings(struct obj_binding *from);
+									obj_data *oarg = (*subfield == UID_CHAR) ? get_obj(subfield) : get_obj_by_obj(o, subfield);
+									if (oarg) {
+										free_obj_binding(&OBJ_BOUND_TO(o));	// unbind first
+										OBJ_BOUND_TO(o) = copy_obj_bindings(OBJ_BOUND_TO(oarg));
+									}
+								}
 							}
 						}
 						// no result

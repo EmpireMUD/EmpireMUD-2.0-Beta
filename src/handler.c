@@ -4233,6 +4233,25 @@ bool bind_ok(obj_data *obj, char_data *ch) {
 
 
 /**
+* Duplicates an obj binding list.
+*
+* @param struct obj_binding *from The list to copy.
+* @return struct obj_binding* The copied list.
+*/
+struct obj_binding *copy_obj_bindings(struct obj_binding *from) {
+	struct obj_binding *list = NULL, *bind, *iter;
+	
+	LL_FOREACH(from, iter) {
+		CREATE(bind, struct obj_binding, 1);
+		*bind = *iter;
+		LL_APPEND(list, bind);
+	}
+	
+	return list;
+}
+
+
+/**
 * Removes all bindings on an object other than a player's, for things that were
 * bound to multiple players but are now reduced to just one.
 *
