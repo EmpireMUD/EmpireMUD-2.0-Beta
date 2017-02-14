@@ -1756,7 +1756,8 @@ TOGGLE TOGGLES
 Usage:  toggle [type]
 
 This command is the master switchboard for various preference toggles. You can
-use it to see your current preferences, or to switch them on and off.
+use it to see your current preferences, or to switch them on and off. Some
+toggles have their own help files under 'HELP TOGGLE <option>'.
 
 Toggles:
   tell - the tell channel
@@ -1780,6 +1781,7 @@ Toggles:
   autorecall - if you're logged out over an hour, automatically sends you home
   stealthable - if off, you will be prevented from accidentally stealing
   autodismount - will dismount you while moving, if necessary
+  no-empire - will not create a new empire when you try to claim or build
 
 Immortal toggles:
   wiznet - shuts off the immortal channel
@@ -1792,6 +1794,14 @@ Immortal toggles:
   autonotes - automatically show notes on accounts when players log in
 
 See also: FIGHT MESSAGES
+#
+"TOGGLE NO-EMPIRE" "TOGGLE NOEMPIRE" NOEMPIRE NO-EMPIRE
+
+Usage:  toggle no-empire
+
+This toggle is for players who do not wish to be in any empire. The game will
+no longer create a new empire for you when you try to do things like claim
+or build.
 #
 UNLOAD UNLOADVEHICLE BOATUNLOAD
 
