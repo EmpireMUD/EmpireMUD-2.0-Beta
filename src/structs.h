@@ -1682,6 +1682,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_WIZHIDE  BIT(27)	// player can't be seen in the room
 #define PRF_AUTONOTES  BIT(28)	// Player login syslogs automatically show notes
 #define PRF_AUTODISMOUNT  BIT(29)	// will dismount while moving instead of seeing an error
+#define PRF_NOEMPIRE  BIT(30)	// the game will not automatically create an empire
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

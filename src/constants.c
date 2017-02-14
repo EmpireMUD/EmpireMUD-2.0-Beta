@@ -465,6 +465,7 @@ const char *preference_bits[] = {
 	"WIZHIDE",
 	"AUTONOTES",
 	"AUTODISMOUNT",
+	"!EMPIRE",
 	"\n"
 };
 
@@ -526,6 +527,8 @@ const struct toggle_data_type toggle_data[] = {
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
 	{ "stealthable", TOG_ONOFF, PRF_STEALTHABLE, 0, NULL },
 	{ "autodismount", TOG_ONOFF, PRF_AUTODISMOUNT, 0, NULL },
+	
+	{ "no-empire", TOG_ONOFF, PRF_NOEMPIRE, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
