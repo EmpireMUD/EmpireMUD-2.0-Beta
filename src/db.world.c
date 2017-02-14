@@ -1007,6 +1007,7 @@ void annual_update_map_tile(room_data *room) {
 	if (!HAS_FUNCTION(room, FNC_MINE)) {
 		remove_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM);
 		remove_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT);
+		remove_room_extra_data(room, ROOM_EXTRA_PROSPECT_EMPIRE);
 	}
 }
 

@@ -6450,7 +6450,7 @@ int count_hash_records(FILE *fl) {
 empire_data *get_or_create_empire(char_data *ch) {
 	empire_data *emp;
 	
-	if (IS_NPC(ch)) {
+	if (IS_NPC(ch) || PRF_FLAGGED(ch, PRF_NOEMPIRE)) {
 		return NULL;
 	}
 	if ((emp = GET_LOYALTY(ch))) {

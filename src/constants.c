@@ -465,6 +465,7 @@ const char *preference_bits[] = {
 	"WIZHIDE",
 	"AUTONOTES",
 	"AUTODISMOUNT",
+	"!EMPIRE",
 	"\n"
 };
 
@@ -526,6 +527,8 @@ const struct toggle_data_type toggle_data[] = {
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
 	{ "stealthable", TOG_ONOFF, PRF_STEALTHABLE, 0, NULL },
 	{ "autodismount", TOG_ONOFF, PRF_AUTODISMOUNT, 0, NULL },
+	
+	{ "no-empire", TOG_ONOFF, PRF_NOEMPIRE, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
@@ -2767,7 +2770,7 @@ const char *room_aff_bits[] = {
 
 // ROOM_EXTRA_x
 const char *room_extra_types[] = {
-		"unused",
+	"prospect empire",
 	"mine amount",
 		"unused",
 	"seed time",
@@ -2994,6 +2997,7 @@ const char *affect_types[] = {
 	"shadowlash",	// dot
 	"soulchain",
 	"thornlash",	// 75
+	"arrow to the knee",
 	"\n"
 	};
 
@@ -3076,6 +3080,7 @@ const char *affect_wear_off_msgs[] = {
 	"",	// shadowlash-dot
 	"Your soul is unchained.",
 	"",	// 75, thornlast
+	"Your knee feels better",
 	"\n"
 };
 

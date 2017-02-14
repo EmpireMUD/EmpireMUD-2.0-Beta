@@ -1,0 +1,79 @@
+#18200
+Join the Guild of Adventurers~
+   If you want to join the Guild of Adventurers, you must first demonstrate
+commitment by commissioning a guildhall in one of your cities. You receive a
+guild charter; take it home and 'build guildhall <direction>' to set it up.
+Once the new guildhall is complete and guild officials have moved in, speak to
+the Superintendant in your guildhall.
+~
+   You have demonstrated your eagerness to join the Guild of Adventurers by
+building a guildhall. The Superintendant grants you membership and you may now
+take on guild quests. Look around the guildhall for tasks you can perform to
+ingratiate yourself with the guild.
+~
+3 0 0 0 -1
+A
+1 18212
+P
+17 18200 0 5
+R
+7 18200 20
+T 18217
+W
+7 18216 0 1
+Z
+1 18219
+S
+#18221
+plant atlasian egg~
+This quest has no description.
+~
+You have completed the quest.
+~
+5 a 0 0 -1
+A
+2 18221
+R
+6 18222 1
+W
+7 18221 0 1
+Z
+0 18221
+S
+#18222
+cattails for atlasian egg~
+This quest has no description.
+~
+You have completed the quest.
+~
+4 ad 0 0 -1
+A
+0 18221
+P
+0 18221 0 1
+R
+6 18223 1
+T 18222
+W
+2 11016 0 4
+Z
+0 18221
+S
+#18223
+magewood for atlasian egg~
+This quest has no description.
+~
+You have completed the quest.
+~
+2 ad 0 0 -1
+A
+0 18222
+P
+0 18222 0 1
+T 18223
+W
+2 604 0 4
+Z
+0 18222
+S
+$

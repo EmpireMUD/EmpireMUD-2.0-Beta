@@ -1074,7 +1074,7 @@ ACMD(do_build) {
 	bool junk, wait;
 	
 	// simple rules for ch building a given craft
-	#define CHAR_CAN_BUILD(ch, ttype)  (GET_CRAFT_TYPE((ttype)) == CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)) && (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || has_ability((ch), GET_CRAFT_ABILITY((ttype)))))
+	#define CHAR_CAN_BUILD(ch, ttype)  (GET_CRAFT_TYPE((ttype)) == CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)) && (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || has_ability((ch), GET_CRAFT_ABILITY((ttype)))) && (GET_CRAFT_REQUIRES_OBJ(ttype) == NOTHING || get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(ttype), ch->carrying)))
 	
 	skip_spaces(&argument);
 	
@@ -1174,11 +1174,6 @@ ACMD(do_build) {
 		
 			HASH_ITER(sorted_hh, sorted_crafts, iter, next_iter) {
 				if (CHAR_CAN_BUILD(ch, iter)) {
-					// only display if they have the required object
-					if (GET_CRAFT_REQUIRES_OBJ(iter) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(iter), ch->carrying)) {
-						continue;
-					}
-
 					if (strlen(buf) + strlen(GET_CRAFT_NAME(iter)) + 2 >= 80) {
 						this_line = FALSE;
 						msg_to_char(ch, "%s\r\n", buf);

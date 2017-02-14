@@ -1682,6 +1682,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_WIZHIDE  BIT(27)	// player can't be seen in the room
 #define PRF_AUTONOTES  BIT(28)	// Player login syslogs automatically show notes
 #define PRF_AUTODISMOUNT  BIT(29)	// will dismount while moving instead of seeing an error
+#define PRF_NOEMPIRE  BIT(30)	// the game will not automatically create an empire
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -1986,10 +1987,10 @@ typedef struct vehicle_data vehicle_data;
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
-// For various misc numbers attached to rooms
+// ROOM_EXTRA_x: For various misc numbers attached to rooms
 // WARNING: Make sure you have a place these are set, a place they are read,
 // and *especially* a place they are removed. -pc
-	#define ROOM_EXTRA_UNUSED  0	// was MINE_TYPE prior to b3.1
+#define ROOM_EXTRA_PROSPECT_EMPIRE  0
 #define ROOM_EXTRA_MINE_AMOUNT  1
 	#define ROOM_EXTRA_UNUSED2  2
 #define ROOM_EXTRA_SEED_TIME  3

@@ -1534,16 +1534,19 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 	int dam, type = ATTACK_GUARD_TOWER;
 	empire_data *emp = ROOM_OWNER(from_room);
 	room_data *to_room = IN_ROOM(ch);
+	struct affected_type *af;
 
 	/* Now we're sure we can hit this person: gets worse with dex */
 	if (!AWAKE(ch) || !number(0, MAX(0, (GET_DEXTERITY(ch)/2) - 1))) {
-		dam = 15 + (ROOM_BLD_FLAGGED(from_room, BLD_UPGRADED) ? 5 : 0);
+		dam = 25 + (ROOM_BLD_FLAGGED(from_room, BLD_UPGRADED) ? 50 : 0);
 	}
 	else {
 		dam = 0;
 	}
 	
 	if (damage(ch, ch, dam, type, DAM_PHYSICAL) != 0) {
+		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 1 MUD_HOURS, AFF_SLOW, ch);
+		affect_join(ch, af, ADD_DURATION);
 		log_to_empire(emp, ELOG_HOSTILITY, "Guard tower at (%d, %d) is shooting at an infiltrator at (%d, %d)", X_COORD(from_room), Y_COORD(from_room), X_COORD(to_room), Y_COORD(to_room));
 	}
 }
