@@ -1628,13 +1628,13 @@ ACMD(do_sneak) {
 		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	}
 
-	// Delay after sneaking -- on top of normal move lag
-	GET_WAIT_STATE(ch) += 1 RL_SEC;
-
 	if (perform_move(ch, dir, FALSE, 0)) {	// should be MOVE_NORMAL
 		gain_ability_exp(ch, ABIL_SNEAK, 5);
 	}
-
+	
+	// Delay after sneaking -- on top of normal move lag
+	GET_WAIT_STATE(ch) += 1 RL_SEC;
+	
 	if (!sneaking) {
 		REMOVE_BIT(AFF_FLAGS(ch), AFF_SNEAK);
 	}
