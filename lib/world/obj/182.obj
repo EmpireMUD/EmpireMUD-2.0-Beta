@@ -1,0 +1,186 @@
+#18200
+tavern tipsy tortoise building inn~
+the Tipsy Tortoise Tavern~
+The Tipsy Tortoise Tavern stands precariously on the creature's back.~
+   The tavern is a tall building and looks quite old. Large sections of the
+walls have been repaired in different types of wood, likely sourced wherever
+the tortoise happens to have roamed. The building is held to the massive
+creature by a great leather strap, made from an animal so massive that the
+strap reaches unbroken around the tortoise's shell. The tavern is loud enough
+that you can nearly make out their song from here.
+~
+8 0 0 2
+18202 0 0
+0 0
+S
+#18201
+door tavern~
+the tavern door~
+The tavern door swings freely as the tortoise shakes.~
+   The door swings back and forth as the tortoise sways, blocking little from
+the outside. Its hinges are sturdy, perhaps imperium, although they don't match
+the rest of the hardware of the rest of the building, so they must have been
+replacements.
+~
+8 0 0 2
+18201 0 0
+0 0
+T 18206
+S
+#18203
+fountain shadow pitch-black water~
+the shadow fountain~
+A fountain of pitch-black water hovers in the air.~
+   The fountain appears black as midnight, but has the soft babble and cool
+touch of water. It spins and cycles in the air, free of any container, as if
+gravity hasn't noticed it in this dark corner.  
+~
+5 0 0 1
+2000 2000 0
+10 0
+S
+#18204
+cornucopia boundless food~
+a boundless cornucopia~
+A boundless cornucopia of food sits on the counter.~
+   The cornucopia sits on the counter, overflowing with breads, fruits, meats,
+and all manner of other foods. Each time you take a piece, a little more food
+falls out of the cornucopia. But if you move too far from it, the food crumbles
+and is gone.  
+~
+6 m 0 2
+500 0 0
+10 0
+A
+15 1 0
+A
+6 1 0
+C
+50 50
+M
+4
+You grab a golden apple from the cornucopia -- the best apple you've ever had.~
+M
+5
+$n feasts on the bounty of the cornucopia.~
+M
+4
+You take a large steak from the cornucopia, and can remember no beef that equals it.~
+M
+4
+You eat a roll from the cornucopia, and find it was filled with butter and honey.~
+M
+4
+You eat a bunch of grapes from the cornucopia, each more delicious than the last.~
+M
+4
+You take a biscuit from the cornucopia, and are briefly transported back to your childhood.~
+M
+4
+You take a chicken drumstick from the cornucopia and find it perfectly cooked, well-seasoned, and unusually juicy.~
+M
+4
+You take a dragonfruit from the cornucopia and the world goes blurry as no other sensation matches its flavor.~
+M
+4
+You eat a sliced pineapple from the cornucopia, and feel the breeze of the islands on your skin.~
+S
+#18207
+spawner~
+the tavern patron spawner~
+The tavern patron spawner isn't working...~
+   This despawns any old patrons, spawns a common and a silly patron, and
+purges itself.  
+~
+3 0 0 2
+0 0 0
+0 0
+T 18207
+S
+#18209
+token tipsy turtle~
+a tipsy turtle token~
+A tipsy turtle token is lying here.~
+Can be used in the Tipsy Turtle's shop to buy pets and stuff.
+~
+3 p a 1
+0 0 0
+0 0
+S
+#18216
+charter guild adventurers~
+a Guild of Adventurers charter~
+A guild charter is lying here.~
+   This document bears the official seal of the Guild of Adventurers. Its text
+is a difficult combination of wordiness and verbosity, but it appears to
+sanction the building of an Adventurer's Guildhall in your city.
+Use: build guildhall <direction> (city-only, single use)
+~
+3 gp a 2
+0 0 0
+0 0
+Q 18200
+S
+#18217
+charter guild adventurers~
+a Guild of Adventurers charter~
+A guild charter is lying here.~
+   This document bears the official seal of the Guild of Adventurers. Its text
+is a difficult combination of wordiness and verbosity, but it appears to
+sanction the building of an Adventurer's Guildhall in your city.
+Use: build guildhall <direction> (city-only, single use)
+~
+3 gp a 3
+0 0 0
+0 0
+S
+#18221
+egg atlasian~
+an atlasian egg~
+An atlasian egg is here.~
+   This massive, leathery egg could only have come from an atlasian tortoise.
+It's so large that you can feel its heartbeat through shell. 'Plant' the egg in
+the plains or desert and perhaps with some care, you can get it to hatch.  
+~
+3 ep a 5
+0 0 0
+14 0
+T 18221
+S
+#18225
+whistle tortoise baby~
+a baby tortoise whistle~
+A baby tortoise is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 4
+18225 0 0
+2 0
+T 9900
+S
+#18226
+whistle ninja tortoise~
+a ninja tortoise whistle~
+A ninja tortoise whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 5
+18226 0 0
+2 0
+T 9900
+S
+#18227
+whistle dragon turtle~
+a dragon turtle whistle~
+A dragon turtle whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 6
+18227 0 0
+2 0
+T 9900
+S
+$
