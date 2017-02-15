@@ -691,6 +691,9 @@ void mobile_activity(void) {
 				if (!CAN_AGGRO(ch, vict) || !can_fight(ch, vict)) {
 					continue;
 				}
+				if (MOB_FACTION(ch) && has_reputation(vict, FCT_VNUM(MOB_FACTION(ch)), REP_LIKED)) {
+					continue;	// don't aggro people we like
+				}
 				
 				// ok good to go
 				if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE) && can_gain_exp_from(vict, ch)) {

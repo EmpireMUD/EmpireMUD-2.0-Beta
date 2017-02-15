@@ -2939,14 +2939,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "has_reputation")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.has_reputation(vnum, level)%
-							struct player_faction_data *pfd;
 							char arg1[256], arg2[256];
 							faction_data *fct;
 							int rep;
 							
 							comma_args(subfield, arg1, arg2);
-							if (*arg1 && *arg2 && (fct = find_faction(arg1)) && (rep = get_reputation_by_name(arg2)) != NOTHING && (pfd = get_reputation(c, FCT_VNUM(fct), FALSE))) {
-								snprintf(str, slen, "%d", (rep_const_to_index(pfd->rep) >= rep_const_to_index(rep)) ? 1 : 0);
+							if (*arg1 && *arg2 && (fct = find_faction(arg1)) && (rep = get_reputation_by_name(arg2)) != NOTHING) {
+								snprintf(str, slen, "%d", has_reputation(c, FCT_VNUM(fct), rep) ? 1 : 0);
 							}
 						}
 						// all other cases...

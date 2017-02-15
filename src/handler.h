@@ -336,6 +336,7 @@ void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, boo
 extern struct player_faction_data *get_reputation(char_data *ch, any_vnum vnum, bool create);
 extern int get_reputation_by_name(char *name);
 extern int get_reputation_value(char_data *ch, any_vnum vnum);
+extern bool has_reputation(char_data *ch, any_vnum faction, int rep);
 extern int rep_const_to_index(int rep_const);
 
 // fight.c
