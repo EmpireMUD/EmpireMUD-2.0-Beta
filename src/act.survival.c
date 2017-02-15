@@ -139,6 +139,25 @@ obj_data *find_best_saddle(char_data *ch) {
 }
 
 
+/**
+* Determines if a room qualifies for No Trace (outdoors/wilderness).
+*
+* @param room_data *room Where to check.
+* @return bool TRUE if No Trace works here.
+*/
+bool valid_no_trace(room_data *room) {
+	if (IS_ADVENTURE_ROOM(room)) {
+		return FALSE;	// adventures do not trigger this ability
+	}
+	if (!IS_OUTDOOR_TILE(room) || IS_ROAD(room) || IS_ANY_BUILDING(room)) {
+		return FALSE;	// not outdoors
+	}
+	
+	// all other cases?
+	return TRUE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// MOUNT COMMANDS //////////////////////////////////////////////////////////
 

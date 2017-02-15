@@ -507,7 +507,7 @@ Gains experience when you try to terrify someone.
 Unseen Passing (Stealth ability)
 
 When in a city or indoors, Unseen Passing makes you immune to the "where" and
-"track" commands. It doesn't work in the wilderness.
+"track" commands. It doesn't work in the wilderness or in adventures.
 
 This ability gains experience whenever it prevents you from being found with
 "where", and whenever it prevents you from leaving tracks.

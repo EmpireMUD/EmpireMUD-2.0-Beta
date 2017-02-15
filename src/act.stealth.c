@@ -297,6 +297,28 @@ void undisguise(char_data *ch) {
 }
 
 
+/**
+* Determines if a room qualifies for Unseen Passing (indoors/in-city).
+*
+* @param room_data *room Where to check.
+* @return bool TRUE if Unseen Passing works here.
+*/
+bool valid_unseen_passing(room_data *room) {
+	if (IS_ADVENTURE_ROOM(room)) {
+		return FALSE;	// adventures do not trigger this ability
+	}
+	if (ROOM_OWNER(room) && find_city(ROOM_OWNER(room), room)) {
+		return TRUE;	// IS inside a city (even if wilderness)
+	}
+	if (IS_OUTDOOR_TILE(room) && !IS_ROAD(room) && !IS_ANY_BUILDING(room)) {
+		return FALSE;	// outdoors; this goes after the city check
+	}
+	
+	// all other cases?
+	return TRUE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// POISONS /////////////////////////////////////////////////////////////////
 

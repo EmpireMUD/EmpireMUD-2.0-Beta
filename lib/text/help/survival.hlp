@@ -254,7 +254,8 @@ See also: BY MOONLIGHT
 No trace (Survival ability)
 
 A person who has learned to leave no trace can not be found using the "track"
-or "where" commands, but this ability only functions outdoors.
+or "where" commands, but this ability only functions outdoor in the wilderness.
+It also won't work in adventures at all.
 
 See also: TRACK, WHERE, UNSEEN PASSING
 #
