@@ -52,7 +52,6 @@ room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum v
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type);
 any_vnum get_new_instance_id(void);
 static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
-struct instance_data *real_instance(any_vnum instance_id);
 void reset_instance(struct instance_data *inst);
 static void scale_instance_to_level(struct instance_data *inst, int level);
 void unlink_instance_entrance(room_data *room, struct instance_data *inst);
@@ -934,6 +933,7 @@ void delete_instance(struct instance_data *inst) {
 	void extract_pending_chars();
 	void relocate_players(room_data *room, room_data *to_room);
 	
+	struct instance_mob *im, *next_im;
 	struct instance_data *temp;
 	char_data *mob, *next_mob;
 	room_data *room;
@@ -966,6 +966,7 @@ void delete_instance(struct instance_data *inst) {
 			if (ADVENTURE_FLAGGED(inst->adventure, ADV_NO_MOB_CLEANUP)) {
 				// just disassociate
 				MOB_INSTANCE_ID(mob) = NOTHING;
+				// shouldn't need this: subtract_instance_mob(inst, GET_MOB_VNUM(mob));
 			}
 			else {
 				act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
@@ -990,6 +991,12 @@ void delete_instance(struct instance_data *inst) {
 	if (inst->room) {
 		free(inst->room);
 	}
+	
+	// other stuff to free
+	HASH_ITER(hh, inst->mob_counts, im, next_im) {
+		free(im);
+	}
+	
 	free(inst);
 	
 	// re-enable instance saving
@@ -1073,6 +1080,7 @@ static void reset_instance_room(struct instance_data *inst, room_data *room) {
 					if (mob_proto(spawn->vnum) && count_mobs_in_instance(inst, spawn->vnum) < spawn->limit) {
 						mob = read_mobile(spawn->vnum, TRUE);
 						MOB_INSTANCE_ID(mob) = inst->id;
+						add_instance_mob(inst, GET_MOB_VNUM(mob));
 						setup_generic_npc(mob, NULL, NOTHING, NOTHING);
 						char_to_room(mob, room);
 						if (inst->level > 0) {
@@ -1280,6 +1288,32 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst) {
 //// INSTANCE UTILS //////////////////////////////////////////////////////////
 
 /**
+* Marks a mob as belonging to an instance (for counting purposes).
+*
+* @param struct instance_data *inst The instance.
+* @param mob_vnum vnum Which mob vnum to add to.
+*/
+void add_instance_mob(struct instance_data *inst, mob_vnum vnum) {
+	struct instance_mob *im;
+	
+	if (!inst || vnum == NOTHING) {
+		return;
+	}
+	
+	// find or create
+	HASH_FIND_INT(inst->mob_counts, &vnum, im);
+	if (!im) {
+		CREATE(im, struct instance_mob, 1);
+		im->vnum = vnum;
+		HASH_ADD_INT(inst->mob_counts, vnum, im);
+	}
+	
+	// add
+	im->count += 1;
+}
+
+
+/**
 * Determines if a player is eligible to enter an instance in any way.
 *
 * @param char_data *ch The person trying to enter.
@@ -1349,25 +1383,27 @@ int count_instances(adv_data *adv) {
 
 
 /**
-* @param struct instance_data *inst The instance to check.
-* @param mob_vnum vnum Mob vnum to look for.
-* @return int Total number of that mob in the instance.
+* Returns how many of a mob are live in the world, who originated from the
+* instance.
+*
+* @param struct instance_data *inst The instance.
+* @param mob_vnum vnum Which mob vnum to count.
+* @return int The number of that mob from the instance.
 */
 int count_mobs_in_instance(struct instance_data *inst, mob_vnum vnum) {
-	int iter, count = 0;
-	char_data *ch;
+	struct instance_mob *im;
 	
-	for (iter = 0; iter < inst->size; ++iter) {
-		if (inst->room[iter]) {
-			for (ch = ROOM_PEOPLE(inst->room[iter]); ch; ch = ch->next_in_room) {
-				if (IS_NPC(ch) && GET_MOB_VNUM(ch) == vnum) {
-					++count;
-				}
-			}
-		}
+	if (!inst || vnum == NOTHING) {
+		return 0;
 	}
 	
-	return count;
+	HASH_FIND_INT(inst->mob_counts, &vnum, im);
+	if (im) {
+		return im->count;
+	}
+	else {
+		return 0;
+	}
 }
 
 
@@ -1616,6 +1652,31 @@ struct instance_data *real_instance(any_vnum instance_id) {
 	}
 	
 	return NULL;
+}
+
+
+/**
+* Removes a mob from the instance's count (e.g. when it dies).
+*
+* @param struct instance_data *inst The instance.
+* @param mob_vnum vnum Which mob vnum to subtract.
+*/
+void subtract_instance_mob(struct instance_data *inst, mob_vnum vnum) {
+	struct instance_mob *im;
+	
+	if (!inst || vnum == NOTHING) {
+		return;
+	}
+	
+	// find
+	HASH_FIND_INT(inst->mob_counts, &vnum, im);
+	if (im) {
+		im->count -= 1;
+		if (im->count <= 0) {
+			HASH_DEL(inst->mob_counts, im);
+			free(im);
+		}
+	}
 }
 
 

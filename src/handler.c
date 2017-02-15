@@ -1069,6 +1069,10 @@ void extract_char(char_data *ch) {
 	if (!EXTRACTED(ch)) {
 		if (IS_NPC(ch)) {
 			SET_BIT(MOB_FLAGS(ch), MOB_EXTRACTED);
+			
+			if (MOB_INSTANCE_ID(ch) != NOTHING) {
+				subtract_instance_mob(real_instance(MOB_INSTANCE_ID(ch)), GET_MOB_VNUM(ch));
+			}
 		}
 		else {
 			SET_BIT(PLR_FLAGS(ch), PLR_EXTRACTED);
@@ -5542,7 +5546,6 @@ void set_room_extra_data(room_data *room, int type, int value) {
 room_data *find_target_room(char_data *ch, char *rawroomstr) {
 	extern vehicle_data *get_vehicle(char *name);
 	extern room_data *obj_room(obj_data *obj);
-	extern struct instance_data *real_instance(any_vnum instance_id);
 	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 	
 	struct instance_data *inst;

@@ -2495,8 +2495,17 @@ struct instance_data {
 	// unstored data
 	int size;	// size of room arrays
 	room_data **room;	// array of rooms (some == NULL)
+	struct instance_mob *mob_counts;	// hash table (hh)
 	
 	struct instance_data *next;
+};
+
+
+// tracks the mobs in an instance
+struct instance_mob {
+	mob_vnum vnum;
+	int count;
+	UT_hash_handle hh;	// instance->mob_counts
 };
 
 

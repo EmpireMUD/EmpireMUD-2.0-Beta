@@ -183,6 +183,9 @@ INTERACTION_FUNC(run_one_encounter) {
 		setup_generic_npc(aggr, NULL, NOTHING, NOTHING);
 		if (COMPLEX_DATA(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch))->instance) {
 			MOB_INSTANCE_ID(aggr) = COMPLEX_DATA(IN_ROOM(ch))->instance->id;
+			if (MOB_INSTANCE_ID(aggr) != NOTHING) {
+				add_instance_mob(real_instance(MOB_INSTANCE_ID(aggr)), GET_MOB_VNUM(aggr));
+			}
 		}
 		char_to_room(aggr, IN_ROOM(ch));
 		SET_BIT(MOB_FLAGS(aggr), MOB_SPAWNED);

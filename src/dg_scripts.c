@@ -3427,7 +3427,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'u': {	// char.u*
 					if (!str_cmp(field, "unlink_instance")) {
-						if (IS_NPC(c)) {
+						if (IS_NPC(c) && MOB_INSTANCE_ID(c) != NOTHING) {
+							subtract_instance_mob(real_instance(MOB_INSTANCE_ID(c)), GET_MOB_VNUM(c));
 							MOB_INSTANCE_ID(c) = NOTHING;
 						}
 						*str = '\0';

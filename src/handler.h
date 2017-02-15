@@ -350,6 +350,11 @@ void set_fighting(char_data *ch, char_data *victim, byte mode);
 void stop_fighting(char_data *ch);
 void update_pos(char_data *victim);
 
+// instance.c
+void add_instance_mob(struct instance_data *inst, mob_vnum vnum);
+extern struct instance_data *real_instance(any_vnum instance_id);
+void subtract_instance_mob(struct instance_data *inst, mob_vnum vnum);
+
 // limits.c
 extern int limit_crowd_control(char_data *victim, int atype);
 

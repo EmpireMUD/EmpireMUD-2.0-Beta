@@ -1360,6 +1360,7 @@ void reset_one_room(room_data *room) {
 			case 'I': {	// add instance data to mob
 				if (mob) {
 					MOB_INSTANCE_ID(mob) = reset->arg1;
+					add_instance_mob(real_instance(reset->arg1), GET_MOB_VNUM(mob));
 				}
 				break;
 			}
