@@ -1978,11 +1978,14 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 	bool can_do = FALSE;
 	
 	if ((res = VEH_NEEDS_RESOURCES(veh))) {
-		// can ONLY do it if it requires an object or component
+		// RES_x: can ONLY do it if it requires an object, component, or action
 		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && store->amount > 0) {
 			can_do = TRUE;
 		}
 		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, res->misc, 1)) {
+			can_do = TRUE;
+		}
+		else if (res->type == RES_ACTION) {
 			can_do = TRUE;
 		}
 	}
