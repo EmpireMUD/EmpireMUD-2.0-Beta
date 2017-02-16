@@ -680,7 +680,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 				if (VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto)) {
 					free(VEH_LONG_DESC(veh));
 				}
-				sprintf(buf, "%s (%s)\r\n", VEH_LONG_DESC(proto), VEH_SHORT_DESC(veh));
+				sprintf(buf, "%s (%s)", VEH_LONG_DESC(proto), VEH_SHORT_DESC(veh));
 				VEH_LONG_DESC(veh) = str_dup(buf);
 			}
 			
