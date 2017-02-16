@@ -394,6 +394,8 @@ Triggers and Scripts (TRIGEDIT):
   zone, the script may also need to scale the obj's/mob's level itself.
 
 Vehicles (VEDIT):
+- Keywords should always have the most significant word first (the noun). This
+  keyword is preserved when the vehicle is renamed.
 - Only set an icon on a vehicle if it should be visible on the map; in most
   cases you should leave this blank.
 - Vehicles only have an interior (are boardable) if the "interior room"
@@ -5598,7 +5600,8 @@ This command updates the keywords on a vehicle. The keywords are a list of
 single words that can be used to target it. It should include any words from
 the short or long description that identify the vehicle.
 
-Usually the most significant keyword should be first.
+Usually the most significant keyword should be first. This keyword is retained
+when the vehicle is renamed by players.
 
 Example:
  name: a cart
