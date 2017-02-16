@@ -35,6 +35,7 @@
 #define FIND_OBJ_EQUIP		BIT(5)
 #define FIND_NO_DARK		BIT(6)
 #define FIND_VEHICLE_ROOM	BIT(7)
+#define FIND_VEHICLE_INSIDE	BIT(8)
 
 
 // for the interaction handlers (returns TRUE if the character performs the interaction; FALSE if it aborts)

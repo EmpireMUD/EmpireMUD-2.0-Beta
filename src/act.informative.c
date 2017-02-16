@@ -179,7 +179,7 @@ void look_at_target(char_data *ch, char *arg) {
 		return;
 		}
 
-	bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM | FIND_VEHICLE_ROOM, ch, &found_char, &found_obj, &found_veh);
+	bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &found_char, &found_obj, &found_veh);
 
 	/* Is the target a character? */
 	if (found_char != NULL) {
@@ -285,7 +285,7 @@ void look_in_obj(char_data *ch, char *arg) {
 
 	if (!*arg)
 		send_to_char("Look in what?\r\n", ch);
-	else if (!(bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &dummy, &obj, &veh))) {
+	else if (!(bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &dummy, &obj, &veh))) {
 		sprintf(buf, "There doesn't seem to be %s %s here.\r\n", AN(arg), arg);
 		send_to_char(buf, ch);
 	}
@@ -1955,7 +1955,7 @@ ACMD(do_examine) {
 	}
 	look_at_target(ch, arg);
 
-	generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &tmp_object, &tmp_veh);
+	generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &tmp_object, &tmp_veh);
 
 	if (tmp_object) {
 		if ((GET_OBJ_TYPE(tmp_object) == ITEM_DRINKCON) || (GET_OBJ_TYPE(tmp_object) == ITEM_CONTAINER) || (GET_OBJ_TYPE(tmp_object) == ITEM_CORPSE)) {

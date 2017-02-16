@@ -6567,6 +6567,12 @@ int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **ta
 			return (FIND_VEHICLE_ROOM);
 		}
 	}
+	if (IS_SET(bitvector, FIND_VEHICLE_INSIDE)) {
+		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(name, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
+			*tar_veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
+			return (FIND_VEHICLE_INSIDE);
+		}
+	}
 	if (IS_SET(bitvector, FIND_OBJ_ROOM)) {
 		if ((*tar_obj = get_obj_in_list_vis(ch, name, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
 			return (FIND_OBJ_ROOM);
