@@ -3885,8 +3885,8 @@ void do_stat_room(char_data *ch) {
 	player_index_data *index;
 	struct global_data *glb;
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
-
-
+	vehicle_data *veh;
+	
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
 		strcpy(buf2, GET_CROP_NAME(cp));
 		CAP(buf2);
@@ -3957,7 +3957,33 @@ void do_stat_room(char_data *ch) {
 
 	if (*buf)
 		send_to_char(strcat(buf, "\r\n&0"), ch);
+	
+	if (ROOM_VEHICLES(IN_ROOM(ch))) {
+		sprintf(buf, "Vehicles:&w");
+		found = 0;
+		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			if (!CAN_SEE_VEHICLE(ch, veh)) {
+				continue;
+			}
+			sprintf(buf2, "%s %s", found++ ? "," : "", VEH_SHORT_DESC(veh));
+			strcat(buf, buf2);
+			if (strlen(buf) >= 62) {
+				if (veh->next_in_room) {
+					send_to_char(strcat(buf, ",\r\n"), ch);
+				}
+				else {
+					send_to_char(strcat(buf, "\r\n"), ch);
+				}
+				*buf = found = 0;
+			}
+		}
 
+		if (*buf) {
+			send_to_char(strcat(buf, "\r\n"), ch);
+		}
+		send_to_char("&0", ch);
+	}
+	
 	if (ROOM_CONTENTS(IN_ROOM(ch))) {
 		sprintf(buf, "Contents:&g");
 		for (found = 0, j = ROOM_CONTENTS(IN_ROOM(ch)); j; j = j->next_content) {

@@ -617,7 +617,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else if (!*tar_arg || !*type_arg || !*argument) {
-		msg_to_char(ch, "Usage: customize vehicle <target> <name | longdesc | description> <value>\r\n");
+		msg_to_char(ch, "Usage: customize vehicle <target> <name | longdesc | description> <value | set | none>\r\n");
 	}
 	// vehicle validation
 	else if (!(veh = get_vehicle_in_room_vis(ch, tar_arg)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(tar_arg, VEH_KEYWORDS(veh)))) {
