@@ -4066,10 +4066,6 @@ ACMD(do_get) {
 				// pass off to vehicle handler
 				do_get_from_vehicle(ch, find_veh, arg1, mode, amount);
 			}
-			else if (!cont && GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg2, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
-				// vehicle they are in
-				do_get_from_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), arg1, mode, amount);
-			}
 			else if (!cont) {
 				sprintf(buf, "You don't have %s %s.\r\n", AN(arg2), arg2);
 				send_to_char(buf, ch);
@@ -4642,10 +4638,6 @@ ACMD(do_put) {
 		if (find_veh) {
 			// override for put obj in vehicle
 			do_put_obj_in_vehicle(ch, find_veh, obj_dotmode, theobj, howmany);
-		}
-		else if (!cont && GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(thecont, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
-			// the vehicle they are in
-			do_put_obj_in_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj_dotmode, theobj, howmany);
 		}
 		else if (!cont) {
 			sprintf(buf, "You don't see %s %s here.\r\n", AN(thecont), thecont);

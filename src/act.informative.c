@@ -250,12 +250,6 @@ void look_at_target(char_data *ch, char *arg) {
 		}
 	}
 	
-	// look at vehicle they're in
-	if (!found && GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
-		look_at_vehicle(GET_ROOM_VEHICLE(IN_ROOM(ch)), ch);
-		found = TRUE;
-	}
-	
 	/* If an object was found back in generic_find */
 	if (bits) {
 		if (!found) {
@@ -289,7 +283,7 @@ void look_in_obj(char_data *ch, char *arg) {
 		sprintf(buf, "There doesn't seem to be %s %s here.\r\n", AN(arg), arg);
 		send_to_char(buf, ch);
 	}
-	else if (veh || (!obj && (veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && isname(arg, VEH_KEYWORDS(veh)))) {
+	else if (veh) {
 		// vehicle section
 		if (!VEH_FLAGGED(veh, VEH_CONTAINER)) {
 			act("$V isn't a container.", FALSE, ch, NULL, veh, TO_CHAR);
