@@ -168,6 +168,7 @@ deaths_before_penalty 5
 deaths_before_penalty_war 0
 fire_extinguish_value 120
 hostile_flag_time 60
+hostile_login_delay 30
 mutual_war_only 0
 rogue_flag_time 1440
 pvp_timer 5

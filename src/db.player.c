@@ -3054,9 +3054,10 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	room_data *load_room = NULL, *map_loc;
 	char_data *ch = d->character;
 	char lbuf[MAX_STRING_LENGTH];
+	struct affected_type *af;
 	player_index_data *index;
 	empire_data *emp;
-	int iter;
+	int iter, duration;
 
 	reset_char(ch);
 	check_delayed_load(ch);	// ensure everything is loaded
@@ -3260,11 +3261,16 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	assign_class_abilities(ch, NULL, NOTHING);
 	give_level_zero_abilities(ch);
 	
-	// ensure player has penalty if at war
-	if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch))) {
-		int duration = config_get_int("war_login_delay") / SECS_PER_REAL_UPDATE;
-		struct affected_type *af = create_flag_aff(ATYPE_WAR_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED, ch);
-		affect_join(ch, af, ADD_DURATION);
+	if (!IS_IMMORTAL(ch)) {
+		// ensure player has penalty if at war
+		if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch)) && (duration = config_get_int("war_login_delay") / SECS_PER_REAL_UPDATE) > 0) {
+			af = create_flag_aff(ATYPE_WAR_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED, ch);
+			affect_join(ch, af, ADD_DURATION);
+		}
+		else if (fresh && ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch)) && (duration = config_get_int("hostile_login_delay") / SECS_PER_REAL_UPDATE) > 0) {
+			af = create_flag_aff(ATYPE_HOSTILE_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED, ch);
+			affect_join(ch, af, ADD_DURATION);
+		}
 	}
 
 	// script/trigger stuff
