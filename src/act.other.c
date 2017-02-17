@@ -1288,7 +1288,7 @@ ACMD(do_alternate) {
 	else if (GET_OLC_TYPE(ch->desc) != 0) {
 		msg_to_char(ch, "You can't alternate with an editor open (use .save or .abort first).\r\n");
 	}
-	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))) {
+	else if (IN_HOSTILE_TERRITORY(ch)) {
 		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
 	}
 	else if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0 && !IS_IMMORTAL(ch)) {
@@ -2252,7 +2252,7 @@ ACMD(do_quit) {
 		msg_to_char(ch, "You can't quit with fangs in your neck!\r\n");
 	else if (GET_FEEDING_FROM(ch))
 		msg_to_char(ch, "You can't quit while drinking blood!\r\n");
-	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch)) && !IS_IMMORTAL(ch)) {
+	else if (IN_HOSTILE_TERRITORY(ch)) {
 		msg_to_char(ch, "You can't quit in hostile territory.\r\n");
 	}
 	else {
