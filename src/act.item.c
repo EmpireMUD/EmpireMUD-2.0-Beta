@@ -1005,7 +1005,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 		act("$p: you must be on the quest to get this.", FALSE, ch, obj, NULL, TO_CHAR);
 		return TRUE;
 	}
-	if (IN_ROOM(cont) && LAST_OWNER_ID(cont) != idnum && LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	if (IN_ROOM(cont) && LAST_OWNER_ID(cont) != idnum && LAST_OWNER_ID(obj) != idnum && (!GET_LOYALTY(ch) || EMPIRE_VNUM(GET_LOYALTY(ch)) != GET_STOLEN_FROM(obj)) && (!GET_LOYALTY(ch) || EMPIRE_VNUM(GET_LOYALTY(ch)) != GET_STOLEN_FROM(cont)) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		stealing = TRUE;
 		
 		if (!IS_IMMORTAL(ch) && emp && !can_steal(ch, emp)) {
@@ -1043,9 +1043,14 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 				
 				if (!IS_IMMORTAL(ch)) {
 					GET_STOLEN_TIMER(obj) = time(0);
+					GET_STOLEN_FROM(obj) = emp ? EMPIRE_VNUM(emp) : NOTHING;
 					trigger_distrust_from_stealth(ch, emp);
 					gain_ability_exp(ch, ABIL_STEAL, 50);
 				}
+			}
+			else if (IS_STOLEN(obj) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
+				// un-steal if this was the original owner
+				GET_STOLEN_TIMER(obj) = 0;
 			}
 			
 			get_check_money(ch, obj);
@@ -1130,7 +1135,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR);
 		return TRUE;	// don't break loop
 	}
-	if (LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	if (LAST_OWNER_ID(obj) != idnum && (!GET_LOYALTY(ch) || EMPIRE_VNUM(GET_LOYALTY(ch)) != GET_STOLEN_FROM(obj)) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		stealing = TRUE;
 		
 		if (!IS_IMMORTAL(ch) && emp && !can_steal(ch, emp)) {
@@ -1171,9 +1176,14 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 			
 			if (!IS_IMMORTAL(ch)) {
 				GET_STOLEN_TIMER(obj) = time(0);
+				GET_STOLEN_FROM(obj) = emp ? EMPIRE_VNUM(emp) : NOTHING;
 				trigger_distrust_from_stealth(ch, emp);
 				gain_ability_exp(ch, ABIL_STEAL, 50);
 			}
+		}
+		else if (IS_STOLEN(obj) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
+			// un-steal if this was the original owner
+			GET_STOLEN_TIMER(obj) = 0;
 		}
 		
 		get_check_money(ch, obj);
@@ -1288,6 +1298,11 @@ static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
 	act("You give $p to $N.", FALSE, ch, obj, vict, TO_CHAR);
 	act("$n gives you $p.", FALSE, ch, obj, vict, TO_VICT);
 	act("$n gives $p to $N.", TRUE, ch, obj, vict, TO_NOTVICT);
+	
+	if (IS_STOLEN(obj) && !IS_NPC(vict) && GET_LOYALTY(vict) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(vict))) {
+		// un-steal if this was the original owner
+		GET_STOLEN_TIMER(obj) = 0;
+	}
 }
 
 

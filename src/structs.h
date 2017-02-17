@@ -3853,6 +3853,7 @@ struct obj_data {
 	empire_vnum last_empire_id;	// id of the last empire to have this
 	int last_owner_id;	// last person to have the item
 	time_t stolen_timer;	// when the object was last stolen
+	empire_vnum stolen_from;	// empire who owned it
 	
 	struct interaction_item *interactions;	// interaction items
 	struct obj_storage_type *storage;	// linked list of where an obj can be stored

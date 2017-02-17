@@ -1638,6 +1638,7 @@ void clear_object(obj_data *obj) {
 	
 	obj->last_owner_id = NOBODY;
 	obj->last_empire_id = NOTHING;
+	obj->stolen_from = NOTHING;
 }
 
 

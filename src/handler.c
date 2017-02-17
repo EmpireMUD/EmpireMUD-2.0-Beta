@@ -3766,6 +3766,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	GET_OBJ_TYPE(obj) = GET_OBJ_TYPE(input);
 	GET_OBJ_WEAR(obj) = GET_OBJ_WEAR(input);
 	GET_STOLEN_TIMER(obj) = GET_STOLEN_TIMER(input);
+	GET_STOLEN_FROM(obj) = GET_STOLEN_FROM(input);
 	
 	for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
 		GET_OBJ_VAL(obj, iter) = GET_OBJ_VAL(input, iter);
@@ -3885,6 +3886,7 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	GET_OBJ_TIMER(new) = GET_OBJ_TIMER(obj);
 	GET_AUTOSTORE_TIMER(new) = GET_AUTOSTORE_TIMER(obj);
 	new->stolen_timer = obj->stolen_timer;
+	GET_STOLEN_FROM(new) = GET_STOLEN_FROM(obj);
 	new->last_owner_id = obj->last_owner_id;
 	new->last_empire_id = obj->last_empire_id;
 	
@@ -3977,6 +3979,9 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 		return FALSE;
 	}
 	if (GET_STOLEN_TIMER(obj_a) != GET_STOLEN_TIMER(obj_b)) {
+		return FALSE;
+	}
+	if (GET_STOLEN_FROM(obj_a) != GET_STOLEN_FROM(obj_b)) {
 		return FALSE;
 	}
 	for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
@@ -6229,6 +6234,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	
 	if (stolen) {
 		GET_STOLEN_TIMER(obj) = time(0);
+		GET_STOLEN_FROM(obj) = EMPIRE_VNUM(emp);
 		trigger_distrust_from_stealth(ch, emp);
 	}
 	
