@@ -3009,7 +3009,7 @@ void qedit_process_quest_tasks(char_data *ch, char *argument, struct quest_task 
 			switch (findtype) {
 				case OLC_QUEST: {
 					// requires tasks/preqeqs
-					if (!*field_arg || !is_abbrev(field_arg, "tasks")) {
+					if (!*field_arg || (!is_abbrev(field_arg, "tasks") && !is_abbrev(field_arg, "prereqs"))) {
 						msg_to_char(ch, "Copy from the 'tasks' or 'prereqs' list?\r\n");
 						return;
 					}
