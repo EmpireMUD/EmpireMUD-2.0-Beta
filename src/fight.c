@@ -1545,8 +1545,16 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 	}
 	
 	if (damage(ch, ch, dam, type, DAM_PHYSICAL) != 0) {
+		// slow effect
 		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 1 MUD_HOURS, AFF_SLOW, ch);
 		affect_join(ch, af, ADD_DURATION);
+		
+		// cancel any action the character is doing
+		if (GET_ACTION(ch) != ACT_NONE) {
+			void cancel_action(char_data *ch);
+			cancel_action(ch);
+		}
+		
 		log_to_empire(emp, ELOG_HOSTILITY, "Guard tower at (%d, %d) is shooting at an infiltrator at (%d, %d)", X_COORD(from_room), Y_COORD(from_room), X_COORD(to_room), Y_COORD(to_room));
 	}
 }
