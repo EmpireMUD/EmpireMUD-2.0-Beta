@@ -1350,7 +1350,7 @@ obj_data *make_corpse(char_data *ch) {
 	else {
 		// not an npc, but check for stolen
 		for (o = ch->carrying; o; o = next_o) {
-			next_o = o->next;
+			next_o = o->next_content;
 			
 			// is it stolen?
 			if (IS_STOLEN(o)) {
