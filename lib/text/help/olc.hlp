@@ -326,6 +326,9 @@ Quests (QEDIT):
 - Empire-only quests will also match "not in an empire" if the mob/room and
   player are both in no empire.
 - Empire-only quests have no effect if the start/end point is an object.
+- If multiple DAILY quests share the same 'daily cycle', only one of them is
+  available per day. Any unique integer can be a daily cycle, but for the sake
+  of cleanliness, you should pick the vnum of one of the quests on the cycle.
 
 Room Templates (REDIT):
 - Don't confuse room templates with the designated rooms that players can add
@@ -4441,6 +4444,16 @@ The message is set in the string editor. You should use /fi to format it
 with indent inside the string editor if it's longer than one line (80 chars).
 
 See also: OLC QUESTS, STRING EDITOR
+#d
+"QEDIT DAILYCYCLE" "QEDIT DAILY CYCLE" "DAILY CYCLE"
+
+Usage:  .dailycycle <number>
+
+When two or more daily quests have the same 'dailycycle' value, only one of
+those quests will be available per day, at random. For the sake of cleanliness,
+you should pick the vnum of 1 of those quests as the cycle id.
+
+See also: OLC QUESTS, SHOW DAILYCYCLE
 #d
 "QEDIT DESCRIPTION"
 

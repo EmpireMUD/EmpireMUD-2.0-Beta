@@ -3910,6 +3910,7 @@ struct quest_data {
 	int max_level;	// or 0 for no max
 	struct quest_task *prereqs;	// linked list of prerequisites
 	int repeatable_after;	// minutes to repeat; NOT_REPEATABLE for none
+	int daily_cycle;	// for dailies that rotate with others
 	
 	struct trig_proto_list *proto_script;	// quest triggers
 	

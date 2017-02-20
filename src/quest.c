@@ -3317,6 +3317,7 @@ void clear_quest(quest_data *quest) {
 	
 	QUEST_VNUM(quest) = NOTHING;
 	QUEST_REPEATABLE_AFTER(quest) = NOT_REPEATABLE;
+	QUEST_DAILY_CYCLE(quest) = NOTHING;
 }
 
 
@@ -3672,6 +3673,15 @@ void parse_quest(FILE *fl, any_vnum vnum) {
 				parse_quest_giver(fl, &QUEST_STARTS_AT(quest), error);
 				break;
 			}
+			case 'D': {	// daily cycle
+				if (sscanf(line, "D %d", &int_in[0]) != 1) {
+					log("SYSERR: Format error in D flag of %s", error);
+					exit(1);
+				}
+				
+				QUEST_DAILY_CYCLE(quest) = int_in[0];
+				break;
+			}
 			case 'P': {	// preq-requisites
 				parse_quest_task(fl, &QUEST_PREREQS(quest), error);
 				break;
@@ -3808,6 +3818,11 @@ void write_quest_to_file(FILE *fl, quest_data *quest) {
 		
 	// A. starts at
 	write_quest_givers_to_file(fl, 'A', QUEST_STARTS_AT(quest));
+	
+	// D. daily cycle
+	if (QUEST_FLAGGED(quest, QST_DAILY) && QUEST_DAILY_CYCLE(quest) != NOTHING) {
+		fprintf(fl, "D %d\n", QUEST_DAILY_CYCLE(quest));
+	}
 	
 	// P. pre-requisites
 	write_quest_tasks_to_file(fl, 'P', QUEST_PREREQS(quest));
@@ -4159,6 +4174,15 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 	sprintbit(QUEST_FLAGS(quest), quest_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
 	
+	if (QUEST_FLAGGED(quest, QST_DAILY)) {
+		if (QUEST_DAILY_CYCLE(quest) != NOTHING) {
+			size += snprintf(buf + size, sizeof(buf) - size, "Daily cycle id: \tc%d\t0\r\n", QUEST_DAILY_CYCLE(quest));
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "Daily cycle id: \tcnone\t0\r\n");
+		}
+	}
+	
 	if (QUEST_REPEATABLE_AFTER(quest) == NOT_REPEATABLE) {
 		strcpy(part, "never");
 	}
@@ -4243,6 +4267,15 @@ void olc_show_quest(char_data *ch) {
 		sprintf(buf + strlen(buf), "<\tyrepeat\t0> immediately\r\n");
 	}
 	
+	if (QUEST_FLAGGED(quest, QST_DAILY)) {
+		if (QUEST_DAILY_CYCLE(quest) != NOTHING) {
+			sprintf(buf + strlen(buf), "<\tydailycycle\t0> %d\r\n", QUEST_DAILY_CYCLE(quest));
+		}
+		else {
+			sprintf(buf + strlen(buf), "<\tydailycycle\t0> none\r\n");
+		}
+	}
+	
 	get_quest_giver_display(QUEST_STARTS_AT(quest), lbuf);
 	sprintf(buf + strlen(buf), "Starts at: <\tystarts\t0>\r\n%s", lbuf);
 	
@@ -4302,6 +4335,23 @@ OLC_MODULE(qedit_completemessage) {
 	}
 }
 
+
+OLC_MODULE(qedit_dailycycle) {
+	quest_data *quest = GET_OLC_QUEST(ch->desc);
+	
+	if (!QUEST_FLAGGED(quest, QST_DAILY)) {
+		msg_to_char(ch, "This is not a daily quest.\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		QUEST_DAILY_CYCLE(quest) = NOTHING;
+		msg_to_char(ch, "It is no longer part of a daily cycle.\r\n");
+	}
+	else {
+		QUEST_DAILY_CYCLE(quest) = olc_process_number(ch, argument, "daily cycle", "dailycycle", 0, MAX_INT, QUEST_DAILY_CYCLE(quest));
+	}
+}
+
+
 OLC_MODULE(qedit_description) {
 	quest_data *quest = GET_OLC_QUEST(ch->desc);
 	
@@ -4331,6 +4381,11 @@ OLC_MODULE(qedit_flags) {
 	if (had_indev && !IS_SET(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT) && GET_ACCESS_LEVEL(ch) < LVL_UNRESTRICTED_BUILDER && !OLC_FLAGGED(ch, OLC_FLAG_CLEAR_IN_DEV)) {
 		msg_to_char(ch, "You don't have permission to remove the IN-DEVELOPMENT flag.\r\n");
 		SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+	}
+	
+	// check for no daily flag
+	if (!QUEST_FLAGGED(quest, QST_DAILY)) {
+		QUEST_DAILY_CYCLE(quest) = NOTHING;
 	}
 }
 

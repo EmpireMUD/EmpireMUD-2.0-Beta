@@ -287,6 +287,7 @@ OLC_MODULE(oedit_wear);
 
 // quests
 OLC_MODULE(qedit_completemessage);
+OLC_MODULE(qedit_dailycycle);
 OLC_MODULE(qedit_description);
 OLC_MODULE(qedit_ends);
 OLC_MODULE(qedit_flags);
@@ -712,6 +713,7 @@ const struct olc_command_data olc_data[] = {
 	
 	// quest commands
 	{ "completemessage", qedit_completemessage, OLC_QUEST, OLC_CF_EDITOR },
+	{ "dailycycle", qedit_dailycycle, OLC_QUEST, OLC_CF_EDITOR },
 	{ "description", qedit_description, OLC_QUEST, OLC_CF_EDITOR },
 	{ "ends", qedit_ends, OLC_QUEST, OLC_CF_EDITOR },
 	{ "flags", qedit_flags, OLC_QUEST, OLC_CF_EDITOR },

@@ -2324,6 +2324,37 @@ SHOW(show_commons) {
 }
 
 
+SHOW(show_dailycycle) {
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	quest_data *qst, *next_qst;
+	size_t size;
+	int num;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg || !isdigit(*arg)) {
+		msg_to_char(ch, "Usage: show dailycycle <number>\r\n");
+	}
+	else if ((num = atoi(arg)) < 0) {
+		msg_to_char(ch, "Invalid cycle number.\r\n");
+	}
+	else {
+		size = snprintf(buf, sizeof(buf), "Daily quests with cycle id %d:\r\n", num);
+		HASH_ITER(hh, quest_table, qst, next_qst) {
+			if (!QUEST_FLAGGED(qst, QST_DAILY) || QUEST_DAILY_CYCLE(qst) != num) {
+				continue;
+			}
+			
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", QUEST_VNUM(qst), QUEST_NAME(qst));
+		}
+		
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+}
+
+
 SHOW(show_players) {
 	char_data *vict;
 	descriptor_data *d;
@@ -6522,6 +6553,7 @@ ACMD(do_show) {
 		{ "quests", LVL_START_IMM, show_quests },
 		{ "uses", LVL_START_IMM, show_uses },
 		{ "factions", LVL_START_IMM, show_factions },
+		{ "dailycycle", LVL_START_IMM, show_dailycycle },
 
 		// last
 		{ "\n", 0, NULL }
