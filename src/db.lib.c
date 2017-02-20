@@ -2305,7 +2305,7 @@ void populate_npc(room_data *room, struct empire_territory_data *ter) {
 	if (!room || !(emp = ROOM_OWNER(room)) || (!ter && !(ter = find_territory_entry(emp, room)))) {
 		return;	// no work
 	}
-	if (!IS_COMPLETE(room) && ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
+	if (!IS_COMPLETE(room) || ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
 		return;	// nobody populates here
 	}
 	
