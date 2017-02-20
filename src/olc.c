@@ -215,6 +215,7 @@ OLC_MODULE(mapedit_icon);
 OLC_MODULE(mapedit_maintain);
 OLC_MODULE(mapedit_naturalize);
 OLC_MODULE(mapedit_pass_walls);
+OLC_MODULE(mapedit_populate);
 OLC_MODULE(mapedit_remember);
 OLC_MODULE(mapedit_room_description);
 OLC_MODULE(mapedit_room_name);
@@ -642,6 +643,7 @@ const struct olc_command_data olc_data[] = {
 	{ "name", mapedit_room_name, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "naturalize", mapedit_naturalize, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "passwalls", mapedit_pass_walls, OLC_MAP, OLC_CF_MAP_EDIT },
+	{ "populate", mapedit_populate, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "remember", mapedit_remember, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "roomtype", mapedit_roomtype, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "ruin", mapedit_ruin, OLC_MAP, OLC_CF_MAP_EDIT },

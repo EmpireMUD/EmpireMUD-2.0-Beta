@@ -2285,22 +2285,94 @@ void delete_room_npcs(room_data *room, struct empire_territory_data *ter) {
 
 
 /**
-* This updates buildings and assigns new NPCs to them as-needed.
+* Causes a room to populate (NPC moves in), if possible.
+*
+* @param room_data *room The location to populate.
+* @param struct empire_territory_data *ter The territory entry, if you already have it (will attempt to detect otherwise).
 */
-void update_empire_npc_data(void) {
+void populate_npc(room_data *room, struct empire_territory_data *ter) {
 	extern int pick_generic_name(int name_set, int sex);
 	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
 	
-	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
-	empire_data *emp, *next_emp;
 	struct empire_island *isle;
+	bool found_artisan = FALSE;
 	int count, max, sex;
-	mob_vnum artisan;
-	bool found_artisan;
+	empire_data *emp;
 	char_data *proto;
+	mob_vnum artisan;
 	
-	int building_population_timer = config_get_int("building_population_timer");
+	if (!room || !(emp = ROOM_OWNER(room)) || (!ter && !(ter = find_territory_entry(emp, room)))) {
+		return;	// no work
+	}
+	if (!IS_COMPLETE(room) && ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
+		return;	// nobody populates here
+	}
+	
+	// reset timer
+	ter->population_timer = config_get_int("building_population_timer");
+	
+	// detect max npcs
+	if (GET_BUILDING(room)) {
+		max = GET_BLD_CITIZENS(GET_BUILDING(room));
+		artisan = GET_BLD_ARTISAN(GET_BUILDING(room));
+	}
+	else {
+		max = 0;
+		artisan = NOTHING;
+	}
+	
+	// check npcs living here
+	for (count = 0, npc = ter->npcs; npc; npc = npc->next) {
+		++count;
+		if (npc->vnum == artisan) {
+			found_artisan = TRUE;
+		}
+	}
+	
+	// further processing only if we're short npcs here
+	if (artisan != NOTHING && !found_artisan) {
+		sex = number(SEX_MALE, SEX_FEMALE);
+		proto = mob_proto(artisan);
+		npc = create_empire_npc(emp, artisan, sex, pick_generic_name(proto ? MOB_NAME_SET(proto) : 0, sex), ter);
+		EMPIRE_POPULATION(emp) += 1;
+		if ((isle = get_empire_island(emp, GET_ISLAND_ID(room)))) {
+			isle->population += 1;
+		}
+		
+		// spawn it right away if anybody is in the room
+		if (ROOM_PEOPLE(room)) {
+			spawn_empire_npc_to_room(emp, npc, ter->room, NOTHING);
+		}
+		
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+	else if (count < max) {
+		sex = number(SEX_MALE, SEX_FEMALE);
+		proto = mob_proto(sex == SEX_MALE ? CITIZEN_MALE : CITIZEN_FEMALE);
+		npc = create_empire_npc(emp, proto ? GET_MOB_VNUM(proto) : 0, sex, pick_generic_name(MOB_NAME_SET(proto), sex), ter);
+		EMPIRE_POPULATION(emp) += 1;
+		if ((isle = get_empire_island(emp, GET_ISLAND_ID(room)))) {
+			isle->population += 1;
+		}
+
+		// spawn it right away if anybody is in the room
+		if (ROOM_PEOPLE(room)) {
+			spawn_empire_npc_to_room(emp, npc, room, NOTHING);
+		}
+		
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+}
+
+
+/**
+* This updates buildings and assigns new NPCs to them as-needed.
+*/
+void update_empire_npc_data(void) {	
+	struct empire_territory_data *ter, *next_ter;
+	empire_data *emp, *next_emp;
+	
 	int time_to_empire_emptiness = config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK;
 	
 	// each empire
@@ -2315,68 +2387,9 @@ void update_empire_npc_data(void) {
 			next_ter = ter->next;
 			
 			if (--ter->population_timer <= 0) {
-				// reset timer
-				ter->population_timer = building_population_timer;
-				
-				if (ROOM_PRIVATE_OWNER(HOME_ROOM(ter->room)) == NOBODY) {
-					if (IS_COMPLETE(ter->room)) {
-						// setup
-						found_artisan = FALSE;
-			
-						// detect max npcs
-						if (GET_BUILDING(ter->room)) {
-							max = GET_BLD_CITIZENS(GET_BUILDING(ter->room));
-							artisan = GET_BLD_ARTISAN(GET_BUILDING(ter->room));
-						}
-						else {
-							max = 0;
-							artisan = NOTHING;
-						}
-		
-						// check npcs living here
-						for (count = 0, npc = ter->npcs; npc; npc = npc->next) {
-							++count;
-							if (npc->vnum == artisan) {
-								found_artisan = TRUE;
-							}
-						}
-			
-						// further processing only if we're short npcs here
-						if (artisan != NOTHING && !found_artisan) {
-							sex = number(SEX_MALE, SEX_FEMALE);
-							proto = mob_proto(artisan);
-							npc = create_empire_npc(emp, artisan, sex, pick_generic_name(proto ? MOB_NAME_SET(proto) : 0, sex), ter);
-							EMPIRE_POPULATION(emp) += 1;
-							if ((isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
-								isle->population += 1;
-							}
-					
-							// spawn it right away if anybody is in the room
-							if (ROOM_PEOPLE(ter->room)) {
-								spawn_empire_npc_to_room(emp, npc, ter->room, NOTHING);
-							}
-						}
-						else if (count < max) {
-							sex = number(SEX_MALE, SEX_FEMALE);
-							proto = mob_proto(sex == SEX_MALE ? CITIZEN_MALE : CITIZEN_FEMALE);
-							npc = create_empire_npc(emp, proto ? GET_MOB_VNUM(proto) : 0, sex, pick_generic_name(MOB_NAME_SET(proto), sex), ter);
-							EMPIRE_POPULATION(emp) += 1;
-							if ((isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
-								isle->population += 1;
-							}
-					
-							// spawn it right away if anybody is in the room
-							if (ROOM_PEOPLE(ter->room)) {
-								spawn_empire_npc_to_room(emp, npc, ter->room, NOTHING);
-							}
-						}
-					}
-				}
+				populate_npc(ter->room, ter);
 			}
 		}
-		
-		// good time to save them all
-		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 }
 
