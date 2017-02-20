@@ -600,8 +600,9 @@ void show_detailed_workforce_setup_to_char(empire_data *emp, char_data *ch, int 
 *
 * @param empire_data *emp The empire to check.
 * @param char_data *to The person to show the info to.
+* @param bool here If it should filter workforce in the same island.
 */
-void show_workforce_where(empire_data *emp, char_data *to) {
+void show_workforce_where(empire_data *emp, char_data *to, bool here) {
 	// helper data type
 	struct workforce_count_type {
 		int chore;
@@ -612,7 +613,7 @@ void show_workforce_where(empire_data *emp, char_data *to) {
 	struct workforce_count_type *find, *wct, *next_wct, *counts = NULL;
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	char_data *ch_iter;
-	int chore, iter;
+	int chore, iter, requesters_island;
 	size_t size;
 	
 	if (!emp) {
@@ -620,9 +621,15 @@ void show_workforce_where(empire_data *emp, char_data *to) {
 		return;
 	}
 	
+	requesters_island = GET_ISLAND_ID(IN_ROOM(to));
+	
 	// count up workforce mobs
 	for (ch_iter = character_list; ch_iter; ch_iter = ch_iter->next) {
 		if (!IS_NPC(ch_iter) || GET_LOYALTY(ch_iter) != emp) {
+			continue;
+		}
+		
+		if ( here && requesters_island != GET_ISLAND_ID(IN_ROOM(ch_iter))) {
 			continue;
 		}
 		
@@ -5046,7 +5053,7 @@ ACMD(do_workforce) {
 	void deactivate_workforce(empire_data *emp, int island_id, int type);
 	void deactivate_workforce_room(empire_data *emp, room_data *room);
 	
-	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH], local_arg[MAX_INPUT_LENGTH];
 	struct island_info *island = NULL;
 	bool all = FALSE, here = FALSE;
 	int iter, type, limit = 0;
@@ -5071,7 +5078,11 @@ ACMD(do_workforce) {
 		send_config_msg(ch, "need_approval_string");
 	}
 	else if (is_abbrev(arg, "where")) {
-		show_workforce_where(emp, ch);
+		argument = any_one_arg(argument, local_arg);
+		if ( is_abbrev(local_arg, "here") ){
+			here = true;
+		}
+		show_workforce_where(emp, ch, here);
 	}
 	// everything below requires privileges
 	else if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_WORKFORCE)) {
