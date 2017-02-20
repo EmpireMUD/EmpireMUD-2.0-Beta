@@ -2345,7 +2345,7 @@ SHOW(show_dailycycle) {
 				continue;
 			}
 			
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", QUEST_VNUM(qst), QUEST_NAME(qst));
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s%s\r\n", QUEST_VNUM(qst), QUEST_NAME(qst), QUEST_DAILY_ACTIVE(qst) ? " (active)" : "");
 		}
 		
 		if (ch->desc) {
