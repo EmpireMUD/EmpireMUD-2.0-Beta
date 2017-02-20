@@ -1358,7 +1358,7 @@ Workforce, Skilled Labor (Empire abilities)
 
 Usage:  workforce [chore] [on | off | <limit>] [island name | all]
         workforce no-work
-        workforce where
+        workforce where [here]
 
 Once at least one member of an empire has the Workforce ability, the empire's
 citizens (NPCs) will start performing simple tasks for the empire. You can
@@ -1381,7 +1381,8 @@ abandon-* toggles don't use the limit).
 
 You can use the "workforce no-work" command to toggle whether or not your
 citizens will work the room you're currently standing in. The "workforce where"
-will tell you how many citizens are working each task.
+will tell you how many citizens are working each task. Optionally you may also 
+use "workforce where here" to filter the workforce to your current island.
 
 Note: Your workforce will only do chores if your empire has less than 200 of
 the resource provided by the chore. For example, miners won't do any work in
