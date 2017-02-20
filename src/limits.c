@@ -2132,6 +2132,7 @@ int move_gain(char_data *ch, bool info_only) {
 void point_update(bool run_real) {
 	void clean_offers(char_data *ch);
 	void save_daily_cycle();
+	void setup_daily_quest_cycles(int only_cycle);
 	void update_players_online_stats();
 	extern int max_players_today;
 	
@@ -2152,6 +2153,7 @@ void point_update(bool run_real) {
 		// reset players seen today too
 		max_players_today = 0;
 		update_players_online_stats();
+		setup_daily_quest_cycles(NOTHING);
 	}
 	
 	// characters

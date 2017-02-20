@@ -797,6 +797,68 @@ void remove_quest_items_by_quest(char_data *ch, any_vnum vnum) {
 
 
 /**
+* This turns quests on and off based on shared 'daily cycles'. Only quests with
+* the DAILY flag and a dailycycle id are affected.
+*
+* @param int only_cycle Only updates quests on this cycle, if any (NOTHING to do all quests).
+*/
+void setup_daily_quest_cycles(int only_cycle) {
+	// mini type for tracking
+	struct sdqc_t {
+		int cycle;
+		int found;
+		quest_data *last_active;
+		UT_hash_handle hh;
+	};
+	
+	quest_data *qst, *next_qst;
+	struct sdqc_t *entry, *next_entry, *list = NULL;
+	
+	HASH_ITER(hh, quest_table, qst, next_qst) {
+		if (only_cycle != NOTHING && QUEST_DAILY_CYCLE(qst) != only_cycle) {
+			continue;	// only doing 1
+		}
+		
+		QUEST_DAILY_ACTIVE(qst) = TRUE;	// by default
+		
+		if (QUEST_FLAGGED(qst, QST_IN_DEVELOPMENT)) {
+			continue;	// not active
+		}
+		if (!QUEST_FLAGGED(qst, QST_DAILY) || QUEST_DAILY_CYCLE(qst) == NOTHING) {
+			continue;	// not a cycling daily
+		}
+		
+		// find or add entry
+		HASH_FIND_INT(list, &QUEST_DAILY_CYCLE(qst), entry);
+		if (!entry) {
+			CREATE(entry, struct sdqc_t, 1);
+			entry->cycle = QUEST_DAILY_CYCLE(qst);
+			HASH_ADD_INT(list, cycle, entry);
+		}
+		
+		// check for active
+		if (!number(0, entry->found++)) {
+			// success!
+			if (entry->last_active) {
+				QUEST_DAILY_ACTIVE(entry->last_active) = FALSE;
+			}
+			QUEST_DAILY_ACTIVE(qst) = TRUE;
+			entry->last_active = qst;
+		}
+		else {
+			// not active
+			QUEST_DAILY_ACTIVE(qst) = FALSE;
+		}
+	}
+	
+	// free data
+	HASH_ITER(hh, list, entry, next_entry) {
+		free(entry);
+	}
+}
+
+
+/**
 * Copies entries from one list into another, only if they are not already in
 * the to_list.
 *
@@ -1445,6 +1507,11 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *
 	
 	// only immortals see in-dev quests
 	if (QUEST_FLAGGED(quest, QST_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+		return FALSE;
+	}
+	
+	// some daily quests are off
+	if (QUEST_FLAGGED(quest, QST_DAILY) && !QUEST_DAILY_ACTIVE(quest)) {
 		return FALSE;
 	}
 	
@@ -3972,13 +4039,17 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 void save_olc_quest(descriptor_data *desc) {	
 	quest_data *proto, *quest = GET_OLC_QUEST(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
+	int old_cycle = NOTHING;
 	descriptor_data *iter;
 	UT_hash_handle hh;
-
+	
 	// have a place to save it?
 	if (!(proto = quest_proto(vnum))) {
 		proto = create_quest_table_entry(vnum);
 	}
+	
+	// store for later
+	old_cycle = QUEST_DAILY_CYCLE(proto);
 	
 	// free prototype strings and pointers
 	if (QUEST_NAME(proto)) {
@@ -4041,6 +4112,14 @@ void save_olc_quest(descriptor_data *desc) {
 			continue;
 		}
 		refresh_all_quests(iter->character);
+	}
+	
+	// update daily cycles
+	if (old_cycle != NOTHING) {
+		setup_daily_quest_cycles(old_cycle);
+	}
+	if (QUEST_DAILY_CYCLE(proto) != NOTHING && QUEST_DAILY_CYCLE(proto) != old_cycle) {
+		setup_daily_quest_cycles(QUEST_DAILY_CYCLE(proto));
 	}
 }
 

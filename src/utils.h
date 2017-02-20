@@ -995,6 +995,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 #define QUEST_VNUM(quest)  ((quest)->vnum)
 #define QUEST_COMPLETE_MSG(quest)  ((quest)->complete_msg)
+#define QUEST_DAILY_ACTIVE(quest)  ((quest)->daily_active)
 #define QUEST_DAILY_CYCLE(quest)  ((quest)->daily_cycle)
 #define QUEST_DESCRIPTION(quest)  ((quest)->description)
 #define QUEST_ENDS_AT(quest)  ((quest)->ends_at)

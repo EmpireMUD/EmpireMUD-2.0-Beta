@@ -3912,6 +3912,9 @@ struct quest_data {
 	int repeatable_after;	// minutes to repeat; NOT_REPEATABLE for none
 	int daily_cycle;	// for dailies that rotate with others
 	
+	// misc data
+	bool daily_active;	// if FALSE, quest is not available today
+	
 	struct trig_proto_list *proto_script;	// quest triggers
 	
 	UT_hash_handle hh;	// hash handle for quest_table

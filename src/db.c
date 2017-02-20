@@ -414,6 +414,7 @@ void boot_world(void) {
 	void number_and_count_islands(bool reset);
 	void read_ability_requirements();
 	void renum_world();
+	void setup_daily_quest_cycles(int only_cycle);
 	void setup_start_locations();
 	extern int sort_abilities_by_data(ability_data *a, ability_data *b);
 	extern int sort_archetypes_by_data(archetype_data *a, archetype_data *b);
@@ -534,6 +535,7 @@ void boot_world(void) {
 	check_triggers();
 	
 	log("Sorting data.");
+	setup_daily_quest_cycles(NOTHING);
 	HASH_SRT(sorted_hh, sorted_abilities, sort_abilities_by_data);
 	HASH_SRT(sorted_hh, sorted_archetypes, sort_archetypes_by_data);
 	HASH_SRT(sorted_hh, sorted_augments, sort_augments_by_data);
