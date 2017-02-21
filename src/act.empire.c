@@ -3466,6 +3466,10 @@ ACMD(do_enroll) {
 		if (old && EMPIRE_LEADER(old) == GET_IDNUM(targ)) {
 			eliminate_linkdead_players();
 			
+			// attempt to estimate the new member count so cities and territory transfer correctly
+			// note: may over-estimate if some players already had alts in both empires
+			EMPIRE_MEMBERS(e) += EMPIRE_MEMBERS(old);
+			
 			// move members
 			HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
 				// find only members of the old empire (other than targ)
