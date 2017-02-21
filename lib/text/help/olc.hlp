@@ -801,6 +801,7 @@ The following affect flags are available:
  !VAMPIRE - Immune to Vampire debuffs.
  !STUN - Immune to stun effects.
  !DRINK-BLOOD - Can't be bitten/sired by vampires.
+ DISTRACTED - Cannot perform timed actions.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 

@@ -1545,9 +1545,13 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 	}
 	
 	if (damage(ch, ch, dam, type, DAM_PHYSICAL) != 0) {
-		// slow effect
+		// slow effect (1 mud hour)
 		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 1 MUD_HOURS, AFF_SLOW, ch);
 		affect_join(ch, af, ADD_DURATION);
+		
+		// distraction effect (5 sec)
+		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 1, AFF_DISTRACTED, ch);
+		affect_join(ch, af, 0);
 		
 		// cancel any action the character is doing
 		if (GET_ACTION(ch) != ACT_NONE) {

@@ -872,6 +872,7 @@ const char *affected_bits[] = {
 	"!STUN",
 	"*ORDERED",
 	"!DRINK-BLOOD",
+	"DISTRACTED",
 	"\n"
 };
 
@@ -910,6 +911,7 @@ const char *affected_bits_consider[] = {
 	"$E is immune to stuns.",	// 30 - !stun
 	"",	// ordred
 	"",	// !drink-blood
+	"",	// distracted
 	"\n"
 };
 
@@ -947,7 +949,8 @@ const bool aff_is_bad[] = {
 	FALSE,
 	FALSE,	// 30
 	FALSE,
-	FALSE
+	FALSE,
+	TRUE
 };
 
 

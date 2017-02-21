@@ -277,6 +277,11 @@ void update_actions(void) {
 			cancel_action(ch);
 			continue;
 		}
+		if (AFF_FLAGGED(ch, AFF_DISTRACTED)) {
+			msg_to_char(ch, "You are distracted and stop what you were doing.\r\n");
+			cancel_action(ch);
+			continue;
+		}
 		
 		// action-cycle is time remaining -- compute how fast we go through it
 		speed = ACTION_CYCLE_MULTIPLIER;	// makes it a full second

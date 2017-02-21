@@ -671,6 +671,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_IMMUNE_STUN  BIT(30)	// E. Cannot be hit by stun effects
 #define AFF_ORDERED  BIT(31)	// F. Has been issued an order from a player
 #define AFF_NO_DRINK_BLOOD  BIT(32)	// G. Vampires can't bite or sire
+#define AFF_DISTRACTED  BIT(33)	// H. Player cannot perform timed actions
 
 
 // Injury flags -- IS_INJURED
