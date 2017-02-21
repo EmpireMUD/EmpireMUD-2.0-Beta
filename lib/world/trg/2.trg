@@ -81,13 +81,13 @@ eval room_var %actor.room%
 %send% %actor% You touch %self.shortdesc% and it begins to swirl with light...
 %echoaround% %actor% %actor.name% touches %self.shortdesc% and it begins to swirl with light...
 wait 5 sec
-if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor%
+if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
 end
 %send% %actor% %self.shortdesc% glows a bright blue and the light begins to envelop you!
 %echoaround% %actor% %self.shortdesc% glows a bright blue and the light begins to envelop %actor.name%!
 wait 5 sec
-if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor%
+if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
 end
 %echoaround% %actor% %actor.name% vanishes in a flash of light!
@@ -158,13 +158,13 @@ eval room_var %actor.room%
 %send% %actor% You touch %self.shortdesc% and it begins to swirl with light...
 %echoaround% %actor% %actor.name% touches %self.shortdesc% and it begins to swirl with light...
 wait 5 sec
-if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor%
+if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
 end
 %send% %actor% Yellow light begins to whirl around you...
 %echoaround% %actor% Yellow light begins to whirl around %actor.name%...
 wait 5 sec
-if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor%
+if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
 end
 %echoaround% %actor% %actor.name% vanishes in a flourish of yellow light!

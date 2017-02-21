@@ -1778,6 +1778,8 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options)
 
 void perform_mortal_where(char_data *ch, char *arg) {
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+	extern bool valid_no_trace(room_data *room);
+	extern bool valid_unseen_passing(room_data *room);
 	
 	int check_x, check_y, closest, dir, dist, max_distance;
 	struct instance_data *ch_inst, *i_inst;
@@ -1816,11 +1818,11 @@ void perform_mortal_where(char_data *ch, char *arg) {
 					continue;
 				}
 			}
-			if (has_ability(i, ABIL_NO_TRACE) && IS_OUTDOORS(i)) {
+			if (has_ability(i, ABIL_NO_TRACE) && valid_no_trace(IN_ROOM(i))) {
 				gain_ability_exp(i, ABIL_NO_TRACE, 10);
 				continue;
 			}
-			if (has_ability(i, ABIL_UNSEEN_PASSING) && !IS_OUTDOORS(i)) {
+			if (has_ability(i, ABIL_UNSEEN_PASSING) && valid_unseen_passing(IN_ROOM(i))) {
 				gain_ability_exp(i, ABIL_UNSEEN_PASSING, 10);
 				continue;
 			}
@@ -1869,11 +1871,11 @@ void perform_mortal_where(char_data *ch, char *arg) {
 					continue;
 				}
 			}
-			if (has_ability(i, ABIL_NO_TRACE) && IS_OUTDOORS(i)) {
+			if (has_ability(i, ABIL_NO_TRACE) && valid_no_trace(IN_ROOM(i))) {
 				gain_ability_exp(i, ABIL_NO_TRACE, 10);
 				continue;
 			}
-			if (has_ability(i, ABIL_UNSEEN_PASSING) && !IS_OUTDOORS(i)) {
+			if (has_ability(i, ABIL_UNSEEN_PASSING) && valid_unseen_passing(IN_ROOM(i))) {
 				gain_ability_exp(i, ABIL_UNSEEN_PASSING, 10);
 				continue;
 			}

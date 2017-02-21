@@ -849,6 +849,9 @@ ACMD(do_familiar) {
 	SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE);
 	if (IS_NPC(ch)) {
 		MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
+		if (MOB_INSTANCE_ID(mob) != NOTHING) {
+			add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
+		}
 	}
 	setup_generic_npc(mob, GET_LOYALTY(ch), NOTHING, NOTHING);
 	

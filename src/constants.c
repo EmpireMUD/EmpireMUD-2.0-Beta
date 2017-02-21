@@ -872,6 +872,7 @@ const char *affected_bits[] = {
 	"!STUN",
 	"*ORDERED",
 	"!DRINK-BLOOD",
+	"DISTRACTED",
 	"\n"
 };
 
@@ -910,6 +911,7 @@ const char *affected_bits_consider[] = {
 	"$E is immune to stuns.",	// 30 - !stun
 	"",	// ordred
 	"",	// !drink-blood
+	"",	// distracted
 	"\n"
 };
 
@@ -947,7 +949,8 @@ const bool aff_is_bad[] = {
 	FALSE,
 	FALSE,	// 30
 	FALSE,
-	FALSE
+	FALSE,
+	TRUE
 };
 
 
@@ -2998,6 +3001,7 @@ const char *affect_types[] = {
 	"soulchain",
 	"thornlash",	// 75
 	"arrow to the knee",
+	"hostile delay",
 	"\n"
 	};
 
@@ -3080,7 +3084,8 @@ const char *affect_wear_off_msgs[] = {
 	"",	// shadowlash-dot
 	"Your soul is unchained.",
 	"",	// 75, thornlast
-	"Your knee feels better",
+	"Your knee feels better.",
+	"Your hostile login delay ends and you are free to act.",
 	"\n"
 };
 

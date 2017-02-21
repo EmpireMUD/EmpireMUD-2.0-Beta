@@ -71,13 +71,16 @@ const int flags_door[] = {
 * @param byte dir the direction the person went
 */
 void add_tracks(char_data *ch, room_data *room, byte dir) {
+	extern bool valid_no_trace(room_data *room);
+	extern bool valid_unseen_passing(room_data *room);
+	
 	struct track_data *track;
 	
 	if (!IS_IMMORTAL(ch) && !ROOM_SECT_FLAGGED(room, SECTF_FRESH_WATER | SECTF_FRESH_WATER)) {
-		if (!IS_NPC(ch) && has_ability(ch, ABIL_NO_TRACE) && !COMPLEX_DATA(room) && !IS_ROAD(room)) {
+		if (!IS_NPC(ch) && has_ability(ch, ABIL_NO_TRACE) && valid_no_trace(room)) {
 			gain_ability_exp(ch, ABIL_NO_TRACE, 5);
 		}
-		else if (!IS_NPC(ch) && has_ability(ch, ABIL_UNSEEN_PASSING) && (COMPLEX_DATA(room) || IS_ROAD(room))) {
+		else if (!IS_NPC(ch) && has_ability(ch, ABIL_UNSEEN_PASSING) && valid_unseen_passing(room)) {
 			gain_ability_exp(ch, ABIL_UNSEEN_PASSING, 5);
 		}
 		else {

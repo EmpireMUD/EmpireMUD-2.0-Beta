@@ -2939,14 +2939,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "has_reputation")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.has_reputation(vnum, level)%
-							struct player_faction_data *pfd;
 							char arg1[256], arg2[256];
 							faction_data *fct;
 							int rep;
 							
 							comma_args(subfield, arg1, arg2);
-							if (*arg1 && *arg2 && (fct = find_faction(arg1)) && (rep = get_reputation_by_name(arg2)) != NOTHING && (pfd = get_reputation(c, FCT_VNUM(fct), FALSE))) {
-								snprintf(str, slen, "%d", (rep_const_to_index(pfd->rep) >= rep_const_to_index(rep)) ? 1 : 0);
+							if (*arg1 && *arg2 && (fct = find_faction(arg1)) && (rep = get_reputation_by_name(arg2)) != NOTHING) {
+								snprintf(str, slen, "%d", has_reputation(c, FCT_VNUM(fct), rep) ? 1 : 0);
 							}
 						}
 						// all other cases...
@@ -3427,7 +3426,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'u': {	// char.u*
 					if (!str_cmp(field, "unlink_instance")) {
-						if (IS_NPC(c)) {
+						if (IS_NPC(c) && MOB_INSTANCE_ID(c) != NOTHING) {
+							subtract_instance_mob(real_instance(MOB_INSTANCE_ID(c)), GET_MOB_VNUM(c));
 							MOB_INSTANCE_ID(c) = NOTHING;
 						}
 						*str = '\0';
@@ -3533,6 +3533,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									free_obj_binding(&OBJ_BOUND_TO(o));
 									bind_obj_to_player(o, targ);
 									reduce_obj_binding(o, targ);
+								}
+								else {	// wasn't targeting a person, try an obj
+									struct obj_binding *copy_obj_bindings(struct obj_binding *from);
+									obj_data *oarg = (*subfield == UID_CHAR) ? get_obj(subfield) : get_obj_by_obj(o, subfield);
+									if (oarg) {
+										free_obj_binding(&OBJ_BOUND_TO(o));	// unbind first
+										OBJ_BOUND_TO(o) = copy_obj_bindings(OBJ_BOUND_TO(oarg));
+									}
 								}
 							}
 						}

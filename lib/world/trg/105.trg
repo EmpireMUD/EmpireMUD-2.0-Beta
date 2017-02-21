@@ -1118,7 +1118,9 @@ if %actor%
       eval level 100
     end
     %load% obj %vnum% %actor% inv %level%
-    * eval item %%actor.inventory(%vnum%)%%
+    eval item %%actor.inventory(%vnum%)%%
+    eval bind %%item.bind(%self%)%%
+    nop %bind%
     * %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
   end
 end

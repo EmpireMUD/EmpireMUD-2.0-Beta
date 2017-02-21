@@ -671,6 +671,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_IMMUNE_STUN  BIT(30)	// E. Cannot be hit by stun effects
 #define AFF_ORDERED  BIT(31)	// F. Has been issued an order from a player
 #define AFF_NO_DRINK_BLOOD  BIT(32)	// G. Vampires can't bite or sire
+#define AFF_DISTRACTED  BIT(33)	// H. Player cannot perform timed actions
 
 
 // Injury flags -- IS_INJURED
@@ -2495,8 +2496,17 @@ struct instance_data {
 	// unstored data
 	int size;	// size of room arrays
 	room_data **room;	// array of rooms (some == NULL)
+	struct instance_mob *mob_counts;	// hash table (hh)
 	
 	struct instance_data *next;
+};
+
+
+// tracks the mobs in an instance
+struct instance_mob {
+	mob_vnum vnum;
+	int count;
+	UT_hash_handle hh;	// instance->mob_counts
 };
 
 
@@ -3844,6 +3854,7 @@ struct obj_data {
 	empire_vnum last_empire_id;	// id of the last empire to have this
 	int last_owner_id;	// last person to have the item
 	time_t stolen_timer;	// when the object was last stolen
+	empire_vnum stolen_from;	// empire who owned it
 	
 	struct interaction_item *interactions;	// interaction items
 	struct obj_storage_type *storage;	// linked list of where an obj can be stored
@@ -3900,6 +3911,10 @@ struct quest_data {
 	int max_level;	// or 0 for no max
 	struct quest_task *prereqs;	// linked list of prerequisites
 	int repeatable_after;	// minutes to repeat; NOT_REPEATABLE for none
+	int daily_cycle;	// for dailies that rotate with others
+	
+	// misc data
+	bool daily_active;	// if FALSE, quest is not available today
 	
 	struct trig_proto_list *proto_script;	// quest triggers
 	

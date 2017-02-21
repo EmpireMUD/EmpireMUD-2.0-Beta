@@ -2361,6 +2361,9 @@ ACMD(do_barde) {
 					setup_generic_npc(newmob, GET_LOYALTY(mob), MOB_DYNAMIC_NAME(mob), MOB_DYNAMIC_SEX(mob));
 					char_to_room(newmob, IN_ROOM(ch));
 					MOB_INSTANCE_ID(newmob) = MOB_INSTANCE_ID(mob);
+					if (MOB_INSTANCE_ID(newmob) != NOTHING) {
+						add_instance_mob(real_instance(MOB_INSTANCE_ID(newmob)), GET_MOB_VNUM(newmob));
+					}
 		
 					prc = (double)GET_HEALTH(mob) / MAX(1, GET_MAX_HEALTH(mob));
 					GET_HEALTH(newmob) = (int)(prc * GET_MAX_HEALTH(newmob));
@@ -3462,6 +3465,10 @@ ACMD(do_enroll) {
 		// move data over
 		if (old && EMPIRE_LEADER(old) == GET_IDNUM(targ)) {
 			eliminate_linkdead_players();
+			
+			// attempt to estimate the new member count so cities and territory transfer correctly
+			// note: may over-estimate if some players already had alts in both empires
+			EMPIRE_MEMBERS(e) += EMPIRE_MEMBERS(old);
 			
 			// move members
 			HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {

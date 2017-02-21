@@ -261,14 +261,15 @@ a magic mushroom~
 A magic mushroom is lying here.~
 You trip while looking at the mushroom.
 ~
-6 0 a 5
+6 0 a 6
 1 0 0
 7 48
+B
+u
 I 14 10516 100.00 4 x  # COMBINE: a basket of magic mushrooms
 M
 4
 You chew $p until your mouth is dry, and suddenly you don't feel so good...~
-T 10502
 S
 #10516
 basket mushrooms magic~
@@ -279,16 +280,17 @@ growing a lot of them.
 
 Brew (Healing Elixirs): magic mushroom potion
 ~
-6 b a 8
+6 b a 9
 24 10505 0
 7 168
+B
+u
 I 15 10515 100.00 4 x  # SEPARATE: a magic mushroom
 M
 4
 You chew $p until your mouth is dry, and suddenly you don't feel so good...~
 R
 5606 0
-T 10503
 S
 #10517
 potion magic mushroom~
@@ -1380,7 +1382,7 @@ a vial of frostblood~
 A strange vial of frostblood is lying here.~
    The frostblood is a deep shade of violet, and is ice cold to the touch, yet
 it swirls effortlessly as you twirl the vial in your fingers. Take this vial to
-any crypt to complete the quest.  
+any crypt to complete the quest.
 ~
 3 0 a 2
 0 0 0

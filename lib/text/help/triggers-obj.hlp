@@ -149,7 +149,8 @@ For each type, there is a help file named &yOTRIG <type>&0.
 All object scripts provide the &c%self%&0 variable.
 
 When using field  - The variable returns:
-&cbind(person)&0 - Binds the item to a player (or "nobody" to unbind it).
+&cbind(person)&0 - Binds the item to a player (or "nobody" to unbind it). You
+   can copy another object's whole binding list with %%newobj.bind(%obj%)%%.
 &ccarried_by&0 - The id of the character carrying the object, or an empty return.
 &ccontents&0 - Gives the first object in a container.
 &ccount(str)&0 - Number of matching items (name/vnum) inside it.

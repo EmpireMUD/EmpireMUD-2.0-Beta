@@ -399,6 +399,9 @@ Valid fields:
 - longdesc: the text shown in the room (doesn't work on buildings)
 - description: will open a text editor
 
+Note: On vehicles, changing the name will also put the new name at the end of
+the longdesc, unless (or until) you also change the longdesc.
+
 See also: CUSTOMIZE BUILDING, TEXT EDITOR
 #
 DIAGNOSE

@@ -1627,7 +1627,7 @@ ACMD(do_reforge) {
 	time_t old_stolen_time;
 	ability_data *cft_abil;
 	craft_data *ctype;
-	int old_timer, iter, level;
+	int old_timer, iter, level, old_stolen_from;
 	bool found;
 	obj_data *obj, *new, *proto;
 	
@@ -1740,6 +1740,7 @@ ACMD(do_reforge) {
 			
 			// actual reforging: just junk it and load a new one
 			old_stolen_time = obj->stolen_timer;
+			old_stolen_from = GET_STOLEN_FROM(obj);
 			old_timer = GET_OBJ_TIMER(obj);
 			level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
 			
@@ -1752,6 +1753,7 @@ ACMD(do_reforge) {
 			
 			// re-apply
 			new->stolen_timer = old_stolen_time;
+			GET_STOLEN_FROM(new) = old_stolen_from;
 			GET_OBJ_TIMER(new) = old_timer;
 			if (level > 0) {
 				scale_item_to_level(new, level);
@@ -1798,6 +1800,7 @@ ACMD(do_reforge) {
 			
 			// actual reforging: just junk it and load a new one
 			old_stolen_time = obj->stolen_timer;
+			old_stolen_from = GET_STOLEN_FROM(obj);
 			old_timer = GET_OBJ_TIMER(obj);
 			level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
 			
@@ -1827,6 +1830,7 @@ ACMD(do_reforge) {
 			
 			// re-apply values
 			new->stolen_timer = old_stolen_time;
+			GET_STOLEN_FROM(new) = old_stolen_from;
 			GET_OBJ_TIMER(new) = old_timer;
 			if (level > 0) {
 				scale_item_to_level(new, level);

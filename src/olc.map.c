@@ -577,6 +577,27 @@ OLC_MODULE(mapedit_naturalize) {
 }
 
 
+OLC_MODULE(mapedit_populate) {
+	void populate_npc(room_data *room, struct empire_territory_data *ter);
+	char_data *current = ROOM_PEOPLE(IN_ROOM(ch));
+	
+	if (!GET_BUILDING(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can only populate buildings.\r\n");
+	}
+	else if (!ROOM_OWNER(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can only populate owned buildings.\r\n");
+	}
+	else {
+		// should send an "arrives" message if successful
+		populate_npc(IN_ROOM(ch), NULL);
+		
+		if (current == ROOM_PEOPLE(IN_ROOM(ch))) {
+			msg_to_char(ch, "Okay. But there didn't seem to be anything to populate.\r\n");
+		}
+	}
+}
+
+
 OLC_MODULE(mapedit_remember) {
 	int count, island_id = NO_ISLAND;
 	struct island_info *isle;

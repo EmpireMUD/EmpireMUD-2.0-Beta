@@ -52,6 +52,8 @@ elseif %mobs% > 4
 else
   %send% %actor% You use %self.shortdesc%...
   %echoaround% %actor% %actor.name% uses %self.shortdesc%...
+  eval bind %%self.bind(%actor%)%%
+  nop %bind%
   %load% m %self.val0%
   eval pet %room_var.people%
   if (%pet% && %pet.vnum% == %self.val0%)

@@ -3054,9 +3054,10 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	room_data *load_room = NULL, *map_loc;
 	char_data *ch = d->character;
 	char lbuf[MAX_STRING_LENGTH];
+	struct affected_type *af;
 	player_index_data *index;
 	empire_data *emp;
-	int iter;
+	int iter, duration;
 
 	reset_char(ch);
 	check_delayed_load(ch);	// ensure everything is loaded
@@ -3124,7 +3125,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 		
 	// long logout and in somewhere hostile
-	if (load_room && RESTORE_ON_LOGIN(ch) && ROOM_OWNER(load_room) && empire_is_hostile(ROOM_OWNER(load_room), GET_LOYALTY(ch), load_room)) {
+	if (load_room && RESTORE_ON_LOGIN(ch) && ROOM_OWNER(load_room) && ROOM_OWNER(load_room) != GET_LOYALTY(ch) && (IS_HOSTILE(ch) || empire_is_hostile(ROOM_OWNER(load_room), GET_LOYALTY(ch), load_room))) {
 		load_room = NULL;	// re-detect
 		try_home = TRUE;
 	}
@@ -3260,11 +3261,18 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	assign_class_abilities(ch, NULL, NOTHING);
 	give_level_zero_abilities(ch);
 	
-	// ensure player has penalty if at war
-	if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch))) {
-		int duration = config_get_int("war_login_delay") / SECS_PER_REAL_UPDATE;
-		struct affected_type *af = create_flag_aff(ATYPE_WAR_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED, ch);
-		affect_join(ch, af, ADD_DURATION);
+	if (!IS_IMMORTAL(ch)) {
+		// ensure player has penalty if at war
+		if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch)) && (duration = config_get_int("war_login_delay") / SECS_PER_REAL_UPDATE) > 0) {
+			af = create_flag_aff(ATYPE_WAR_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED, ch);
+			affect_join(ch, af, ADD_DURATION);
+			msg_to_char(ch, "\trYou are stunned for %d second%s because your empire is at war.\r\n", duration, PLURAL(duration));
+		}
+		else if (fresh && IN_HOSTILE_TERRITORY(ch) && (duration = config_get_int("hostile_login_delay") / SECS_PER_REAL_UPDATE) > 0) {
+			af = create_flag_aff(ATYPE_HOSTILE_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED, ch);
+			affect_join(ch, af, ADD_DURATION);
+			msg_to_char(ch, "\trYou are stunned for %d second%s because you logged in in hostile territory.\r\n", duration, PLURAL(duration));
+		}
 	}
 
 	// script/trigger stuff
@@ -3431,8 +3439,14 @@ void init_player(char_data *ch) {
 	ch->char_specials.affected_by = 0;
 	GET_FIGHT_MESSAGES(ch) = DEFAULT_FIGHT_MESSAGES;
 
-	for (i = 0; i < NUM_CONDS; i++)
+	for (i = 0; i < NUM_CONDS; i++) {
 		GET_COND(ch, i) = (GET_ACCESS_LEVEL(ch) == LVL_IMPL ? UNLIMITED : 0);
+	}
+	
+	// script allocation
+	if (!SCRIPT(ch)) {
+		CREATE(SCRIPT(ch), struct script_data, 1);
+	}
 }
 
 

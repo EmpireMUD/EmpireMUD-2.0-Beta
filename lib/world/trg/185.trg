@@ -923,7 +923,7 @@ Jungle Temple shop list - archaeologist~
 0 c 0
 list~
 * List of items
-%send% %actor% %self.name% sells the following items for permafrost tokens:
+%send% %actor% %self.name% sells the following items for jungle temple tokens:
 %send% %actor% - riding jaguar whistle (14 tokens, land mount)
 %send% %actor% - sea serpent whistle (16 tokens, aquatic mount)
 %send% %actor% - feathered serpent whistle (40 tokens, flying mount)
@@ -956,7 +956,7 @@ elseif jaguar /= %arg%
   %send% %actor% Jaguar charm or jaguar cub whistle?
   halt
 elseif feathered serpent /= %arg%
-  %send% %actor% Feathered serpent whistle or feathered serpent armor pattern? 
+  %send% %actor% Feathered serpent whistle or feathered serpent armor pattern?
   halt
   * Mounts and pets etc
 elseif riding jaguar whistle /= %arg%
@@ -981,23 +981,23 @@ elseif jaguar charm /= %arg%
   set named a jaguar charm
   * Crafts
 elseif fearsome jaguar armor pattern /= %arg%
-  eval vnum 18517
+  eval vnum 18518
   eval cost 20
   set named the fearsome jaguar armor pattern
 elseif red coyote armor pattern /= %arg%
-  eval vnum 18519
+  eval vnum 18520
   eval cost 20
   set named the red coyote armor pattern
 elseif feathered serpent armor pattern /= %arg%
-  eval vnum 18521
+  eval vnum 18522
   eval cost 20
   set named feathered serpent armor pattern
 elseif eagle warrior armor pattern /= %arg%
-  eval vnum 18523
+  eval vnum 18524
   eval cost 20
   set named the eagle warrior armor pattern
 elseif blue chameleon armor pattern /= %arg%
-  eval vnum 18525
+  eval vnum 18526
   eval cost 20
   set named the blue chameleon armor pattern
 else
@@ -1231,7 +1231,9 @@ if %actor%
       eval level 100
     end
     %load% obj %vnum% %actor% inv %level%
-    * eval item %%actor.inventory(%vnum%)%%
+    eval item %%actor.inventory(%vnum%)%%
+    eval bind %%item.bind(%self%)%%
+    nop %bind%
     * %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
   end
 end

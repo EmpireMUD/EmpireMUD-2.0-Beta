@@ -1069,6 +1069,10 @@ void extract_char(char_data *ch) {
 	if (!EXTRACTED(ch)) {
 		if (IS_NPC(ch)) {
 			SET_BIT(MOB_FLAGS(ch), MOB_EXTRACTED);
+			
+			if (MOB_INSTANCE_ID(ch) != NOTHING) {
+				subtract_instance_mob(real_instance(MOB_INSTANCE_ID(ch)), GET_MOB_VNUM(ch));
+			}
 		}
 		else {
 			SET_BIT(PLR_FLAGS(ch), PLR_EXTRACTED);
@@ -3762,6 +3766,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	GET_OBJ_TYPE(obj) = GET_OBJ_TYPE(input);
 	GET_OBJ_WEAR(obj) = GET_OBJ_WEAR(input);
 	GET_STOLEN_TIMER(obj) = GET_STOLEN_TIMER(input);
+	GET_STOLEN_FROM(obj) = GET_STOLEN_FROM(input);
 	
 	for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
 		GET_OBJ_VAL(obj, iter) = GET_OBJ_VAL(input, iter);
@@ -3881,6 +3886,7 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	GET_OBJ_TIMER(new) = GET_OBJ_TIMER(obj);
 	GET_AUTOSTORE_TIMER(new) = GET_AUTOSTORE_TIMER(obj);
 	new->stolen_timer = obj->stolen_timer;
+	GET_STOLEN_FROM(new) = GET_STOLEN_FROM(obj);
 	new->last_owner_id = obj->last_owner_id;
 	new->last_empire_id = obj->last_empire_id;
 	
@@ -3973,6 +3979,9 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 		return FALSE;
 	}
 	if (GET_STOLEN_TIMER(obj_a) != GET_STOLEN_TIMER(obj_b)) {
+		return FALSE;
+	}
+	if (GET_STOLEN_FROM(obj_a) != GET_STOLEN_FROM(obj_b)) {
 		return FALSE;
 	}
 	for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
@@ -4229,6 +4238,25 @@ bool bind_ok(obj_data *obj, char_data *ch) {
 	}
 	
 	return FALSE;
+}
+
+
+/**
+* Duplicates an obj binding list.
+*
+* @param struct obj_binding *from The list to copy.
+* @return struct obj_binding* The copied list.
+*/
+struct obj_binding *copy_obj_bindings(struct obj_binding *from) {
+	struct obj_binding *list = NULL, *bind, *iter;
+	
+	LL_FOREACH(from, iter) {
+		CREATE(bind, struct obj_binding, 1);
+		*bind = *iter;
+		LL_APPEND(list, bind);
+	}
+	
+	return list;
 }
 
 
@@ -5523,7 +5551,6 @@ void set_room_extra_data(room_data *room, int type, int value) {
 room_data *find_target_room(char_data *ch, char *rawroomstr) {
 	extern vehicle_data *get_vehicle(char *name);
 	extern room_data *obj_room(obj_data *obj);
-	extern struct instance_data *real_instance(any_vnum instance_id);
 	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 	
 	struct instance_data *inst;
@@ -6207,6 +6234,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	
 	if (stolen) {
 		GET_STOLEN_TIMER(obj) = time(0);
+		GET_STOLEN_FROM(obj) = EMPIRE_VNUM(emp);
 		trigger_distrust_from_stealth(ch, emp);
 	}
 	
@@ -6543,6 +6571,12 @@ int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **ta
 	if (IS_SET(bitvector, FIND_VEHICLE_ROOM)) {
 		if ((*tar_veh = get_vehicle_in_room_vis(ch, name)) != NULL) {
 			return (FIND_VEHICLE_ROOM);
+		}
+	}
+	if (IS_SET(bitvector, FIND_VEHICLE_INSIDE)) {
+		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(name, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
+			*tar_veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
+			return (FIND_VEHICLE_INSIDE);
 		}
 	}
 	if (IS_SET(bitvector, FIND_OBJ_ROOM)) {
