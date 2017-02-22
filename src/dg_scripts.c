@@ -2777,8 +2777,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						struct instance_data *inst;
 						if (troom && IS_ADVENTURE_ROOM(troom) && (inst = find_instance_by_room(troom, FALSE))) {
 							// only if not already in there
-							if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || find_instance_by_room(IN_ROOM(ch), FALSE) != inst) {
-								if (!can_enter_instance(ch, inst)) {
+							if (!IS_ADVENTURE_ROOM(IN_ROOM(c)) || find_instance_by_room(IN_ROOM(c), FALSE) != inst) {
+								if (!can_enter_instance(c, inst)) {
 									snprintf(str, slen, "0");
 								}
 							}
