@@ -2308,7 +2308,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					extern room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum);
 					room_data *find;
 					any_vnum vnum;
-					if (subfield && isdigit(*subfield) && (vnum = atoi(subfield) != NOTHING) && (find = find_nearest_rmt(IN_ROOM(ch), vnum))) {
+					if (subfield && isdigit(*subfield) && ((vnum = atoi(subfield)) != NOTHING) && (find = find_nearest_rmt(IN_ROOM(ch), vnum))) {
 						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(inst->location) + ROOM_ID_BASE);
 					}
 					else {
