@@ -2775,6 +2775,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
 						struct instance_data *inst;
+						
 						if (troom && IS_ADVENTURE_ROOM(troom) && (inst = find_instance_by_room(troom, FALSE))) {
 							// only if not already in there
 							if (!IS_ADVENTURE_ROOM(IN_ROOM(c)) || find_instance_by_room(IN_ROOM(c), FALSE) != inst) {
@@ -2783,7 +2784,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								}
 							}
 						}
-						else {	// all other cases
+						if (*str != '0') {	// all other cases
 							snprintf(str, slen, "1");
 						}
 					}
