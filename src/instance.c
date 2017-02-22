@@ -1478,6 +1478,53 @@ int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum) {
 
 
 /**
+* Finds the closest instance with a given room template, and returns the
+* instantiated room location.
+*
+* @param room_data *from Our "closest to" starting point.
+* @param rmt_vnum vnum Which room template vnum to look for.
+*/
+room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum) {
+	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
+	
+	adv_data *adv = get_adventure_for_vnum(vnum);
+	struct instance_data *inst, *closest = NULL;
+	int this, dist = 0;
+	room_data *map;
+	
+	if (!adv) {
+		return NULL;	// no such adventure
+	}
+	if (!(map = get_map_location_for(from))) {
+		return NULL;	// does not work if no map loc
+	}
+	
+	LL_FOREACH(instance_list, inst) {
+		if (inst->adventure != adv) {
+			continue;	// wrong adv
+		}
+		if (IS_SET(inst->flags, INST_COMPLETED)) {
+			continue;	// do not pick a completed adventure
+		}
+		
+		// this could work
+		this = compute_distance(map, inst->location);
+		if (!closest || this < dist) {
+			closest = inst;	// save for later
+			dist = this;
+		}
+	}
+	
+	if (closest) {
+		return find_room_template_in_instance(closest, vnum);
+	}
+	else {
+		return NULL;
+	}
+}
+
+
+/**
 * This finds a location in an instance by its room template vnum -- allowing
 * portals and other things to target by the instance's local version of a
 * room.
