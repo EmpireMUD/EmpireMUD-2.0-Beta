@@ -2770,6 +2770,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
 						snprintf(str, slen, "%d", (troom && can_use_room(c, troom, MEMBERS_ONLY)) ? 1 : 0);
 					}
+					else if (!str_cmp(field, "can_enter_instance")) {
+						extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
+						extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
+						struct instance_data *inst;
+						if (troom && IS_ADVENTURE_ROOM(troom) && (inst = find_instance_by_room(troom, FALSE))) {
+							// only if not already in there
+							if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || find_instance_by_room(IN_ROOM(ch), FALSE) != inst) {
+								if (!can_enter_instance(ch, inst)) {
+									snprintf(str, slen, "0");
+								}
+							}
+						}
+						else {	// all other cases
+							snprintf(str, slen, "1");
+						}
+					}
 					else if (!str_cmp(field, "can_teleport_room")) {
 						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
 						snprintf(str, slen, "%d", (troom && can_teleport_to(c, troom, TRUE)) ? 1 : 0);

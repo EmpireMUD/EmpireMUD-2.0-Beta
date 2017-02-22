@@ -336,6 +336,8 @@ When using field  - The variable returns:
    defaults to current room).
 &ccanuseroom_member(room)&0 - Character can use the room as a member (with no arg,
    defaults to current room).
+&ccan_enter_instance(room)&0 - Determines if a player can enter the instance
+   that a room is in (e.g. due to player limits).
 &ccan_teleport_room(room)&0 - Character can legally teleport in/out of the room
    (defaults to current room).
 &ccarrying&0 - Size of character's inventory (items carried).
