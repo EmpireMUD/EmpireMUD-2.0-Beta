@@ -527,6 +527,42 @@ room_data *get_room(room_data *ref, char *name) {
 
 
 /**
+* Attempts to find a room, if possible, for a script that's running.
+*
+* @param int type Script type (WLD_TRIGGER, etc.)
+* @param void *go The thing running the script (ambiguous).
+* @return room_data* The room the script is running in (may be NULL if undetectable).
+*/
+room_data *get_room_by_script(int type, void *go) {
+	room_data *room = NULL;
+	
+	switch (type) {
+		case WLD_TRIGGER:
+		case RMT_TRIGGER:
+		case BLD_TRIGGER:
+		case ADV_TRIGGER: {
+			room = (room_data*)go;
+			break;
+		}
+		case OBJ_TRIGGER: {
+			room = obj_room((obj_data*)go);
+			break;
+		}
+		case MOB_TRIGGER: {
+			room = IN_ROOM((char_data*)go);
+			break;
+		}
+		case VEH_TRIGGER: {
+			room = IN_ROOM((vehicle_data*)go);
+			break;
+		}
+	}
+	
+	return room;
+}
+
+
+/**
 * Find a vehicle in the world by name/uid.
 *
 * @param char *name The name to look up.
@@ -2308,7 +2344,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					extern room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum);
 					room_data *find;
 					any_vnum vnum;
-					if (subfield && isdigit(*subfield) && ((vnum = atoi(subfield)) != NOTHING) && (find = find_nearest_rmt(IN_ROOM(ch), vnum))) {
+					if (subfield && isdigit(*subfield) && ((vnum = atoi(subfield)) != NOTHING) && (find = find_nearest_rmt(get_room_by_script(type, go), vnum))) {
 						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(find) + ROOM_ID_BASE);
 					}
 					else {
