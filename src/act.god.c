@@ -46,6 +46,10 @@ static int perform_sacrifice(char_data *ch, char_data *god, obj_data *obj, bool 
 	double bonus = 1.0;
 	int num = 1;
 	
+	if (IS_STOLEN(obj)) {
+		act("$p: You can't sacrifice stolen items!", FALSE, ch, obj, NULL, TO_CHAR);
+		return 0;
+	}
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
 		act("$p: you can't sacrifice quest items.", FALSE, ch, obj, NULL, TO_CHAR);
 		return 0;
