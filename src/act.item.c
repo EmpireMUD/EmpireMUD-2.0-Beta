@@ -860,6 +860,12 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 		return 0;
 	}
 	
+	// can't junk stolen items
+	if (mode == SCMD_JUNK && IS_STOLEN(obj)) {
+		act("$p: You can't junk stolen items!", FALSE, ch, obj, NULL, TO_CHAR);
+		return -1;
+	}
+	
 	// don't let people drop bound items in other people's territory
 	if (mode != SCMD_JUNK && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
 		act("$p: You can't drop bound items here.", FALSE, ch, obj, NULL, TO_CHAR);

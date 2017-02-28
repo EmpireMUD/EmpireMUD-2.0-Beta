@@ -76,4 +76,318 @@ W
 Z
 0 18222
 S
+#18256
+The Grove: Capture a Wildling~
+   The Guild of Adventurers needs more information on the Magiterranean. Find a
+portal into The Grove somewhere in the forest, make your way inside, and find a
+wildling. Be warned! The wildlings like to spring out from the forest without
+warning. Take this trusty net and type 'net wildling' once you find one. Bring
+the captured wildling back here for further study.
+~
+   You drop the net with your captured wildling. You can now perform daily
+quests in The Grove for the Guild of Adventurers.
+~
+3 d 0 0 -1
+A
+1 18217
+A
+1 18209
+P
+16 18200 0 6
+R
+7 18200 2
+R
+2 18209 1
+T 18257
+W
+2 18257 0 1
+Z
+1 18217
+Z
+1 18209
+S
+#18258
+Monsoon Rift: Investiage the Rift~
+   The Magiterranean is a dangerous place, but many adventurers get their start
+exploring its strange wilderness. The Guild needs more information about the
+rifts in the desert. Seek one out -- be careful of the cacti guarding it -- and
+venture inside. Speak to the head druid to learn more about the rifts. But
+whatever he tells you, you must also find a way to collapse the rift. Return
+when you've accomplished this. (Type 'speak' when you find the druid.)
+~
+   The guild is satisfied that you closed the rift, and takes the druid's
+propaganda for further study. You can now perform daily quests in the Monsoon
+Rift for the Guild of Adventurers.
+~
+6 d 0 0 -1
+A
+1 18217
+A
+1 18209
+P
+16 18200 0 6
+R
+7 18200 2
+R
+2 18209 1
+W
+2 18258 0 1
+W
+11 0 0 1
+Z
+1 18217
+Z
+1 18209
+S
+#18260
+Goblin Outpost: Pay Off Dryleef~
+   From time to time, you may find goblins setting up shop in your cities'
+sewers. Find a goblin outpost somewhere in your sewers, and pay off the
+goblins' leader, Dryleef, to ensure the goblins don't cause any trouble. Of
+course, you can't be seen bribing the goblins, so just ask Dryleef if you can
+buy a ticket to the "Goblin Gala". Type 'buy ticket' when you find Dryleef.
+~
+   You hand over your ticket to the Goblin Gala, but the guild leader just
+laughs. 'At least now we shouldn't have to worry about the goblins stealing
+from the city,' he says.
+~
+4 d 0 0 -1
+A
+1 18219
+A
+1 18211
+P
+16 18200 0 6
+R
+7 18200 2
+R
+2 18209 1
+T 18261
+W
+2 18261 0 1
+Z
+1 18219
+Z
+1 18211
+S
+#18262
+Permafrost: Cold Cold Cuts~
+   The Guild of Adventurers has heard of icy winds coming from strange portals
+around the river. Rumor has it that these portals lead into the Permafrost, a
+particularly inhospitable corner of the Magiterranean. Seek out such a portal
+and head into the Permafrost, and see what awaits you there. If you can,
+butcher some of the wildlife and help us prepare a plate of cold cuts for
+Nostrazak. (If you don't have Butcher, try bringing the Permafrost animal
+corpses to a player who does.)
+~
+   Ah, these cold cuts are perfect. And it seems you have survived the
+Permafrost. You can now perform Guild daily quests in the Permafrost.
+~
+3 d 0 0 -1
+A
+1 18219
+A
+1 18210
+P
+16 18200 0 6
+R
+7 18200 2
+R
+2 18209 1
+W
+0 10563 0 1
+W
+2 10597 0 4
+Z
+1 18219
+Z
+1 18210
+S
+#18263
+Thieves: Locate the Hideout~
+   The Guild has heard that some thieves have taken up residence in some old
+ruins. Thieves are not necessarily enemies of the Guild of Adventurers, but it
+is still a good idea to keep tabs on them. Locate the correct ruins and find
+the thieves' den inside, and report back to the Guild.
+~
+   Your report on the thieves and their hideout in the ruins has helped the
+Guild, and you can now perform daily quests in that adventure.
+~
+2 0 0 0 -1
+A
+1 18218
+A
+1 18208
+P
+16 18200 0 6
+R
+7 18200 2
+R
+2 18209 1
+W
+13 10110 0 1
+Z
+1 18208
+Z
+1 18218
+S
+#18264
+Ratskins: A Totem of our Friendship~
+   A former member of the Guild of Adventurers has moved into the sewers. They
+call him Ratskins, and you can probably guess why. He's no longer with the
+guild, but Nostrazak wants to keep a line of communication open with him. Kill
+15 sewer rats and take their skins to Ratskins, and type 'trade'. He will give
+you a small totem made from some of those skins as a reward. Return with the
+totem so that we can analyze its mana source.
+~
+   You hand over the ratskin totem. You can now perform daily quests for the
+Guild of Adventurers in Ratskins's sewer.
+~
+2 d 0 0 -1
+A
+1 18218
+A
+1 18208
+P
+16 18200 0 6
+R
+7 18200 2
+R
+2 18209 1
+W
+2 10015 0 1
+Z
+1 18218
+Z
+1 18208
+S
+#18265
+Grove 1: Wild Fire~
+This quest has no description.
+~
+You have completed the quest.
+~
+3 ade 0 0 -1
+A
+1 18217
+A
+1 18209
+D 18265
+P
+0 18256 0 1
+R
+7 18200 1
+R
+1 -1 50
+W
+2 10001 0 1
+Z
+1 18217
+Z
+1 18209
+S
+#18266
+Grove 2: Kill Wildlings~
+This quest has no description.
+~
+You have completed the quest.
+~
+4 ae 0 0 -1
+A
+1 18217
+A
+1 18209
+D 18265
+P
+0 18256 0 1
+R
+7 18200 1
+R
+1 -1 50
+W
+3 10000 0 4
+Z
+1 18217
+Z
+1 18209
+S
+#18267
+Monsoon 1: Kill Cacti~
+This quest has no description.
+~
+You have completed the quest.
+~
+4 ae 0 0 -1
+A
+1 18217
+A
+1 18209
+D 18267
+P
+0 18258 0 1
+R
+7 18200 1
+R
+1 -1 50
+W
+3 10140 0 1
+W
+3 10141 0 1
+W
+3 10142 0 1
+Z
+1 18217
+Z
+1 18209
+S
+#18268
+Monsoon daily: Close a Rift~
+This quest has no description.
+~
+You have completed the quest.
+~
+2 ae 0 0 -1
+A
+1 18217
+A
+1 18209
+D 18267
+P
+0 18258 0 1
+R
+7 18200 1
+R
+1 -1 50
+W
+11 0 0 1
+Z
+1 18217
+Z
+1 18209
+S
+#18269
+Permafrost 1: Rhubarb Pie~
+This quest has no description.
+~
+You have completed the quest.
+~
+3 ade 0 0 -1
+A
+1 18219
+A
+1 18210
+D 18269
+P
+0 18262 0 1
+R
+7 18200 1
+R
+1 -1 50
+W
+2 10553 0 4
+Z
+1 18219
+Z
+1 18210
+S
 $

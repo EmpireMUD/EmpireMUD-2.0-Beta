@@ -238,4 +238,27 @@ A prehistoric bug has been unearthed.
 T 9901
 T 9902
 S
+#9924
+beagle bald~
+a bald beagle~
+A bald beagle hops along the ground, trying to take flight.
+~
+1 1 bdoD n
+0 0 15 9
+M
+0
+$n tries to screech like an eagle, but it comes out as a high whine.~
+T 9901
+T 9902
+S
+#9925
+snark great white~
+a great white snark~
+A great white snark drags itself slowly along the ground.
+~
+0 0 bdoD n
+0 0 17 9
+T 9901
+T 9902
+S
 $

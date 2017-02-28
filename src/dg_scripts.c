@@ -527,6 +527,42 @@ room_data *get_room(room_data *ref, char *name) {
 
 
 /**
+* Attempts to find a room, if possible, for a script that's running.
+*
+* @param int type Script type (WLD_TRIGGER, etc.)
+* @param void *go The thing running the script (ambiguous).
+* @return room_data* The room the script is running in (may be NULL if undetectable).
+*/
+room_data *get_room_by_script(int type, void *go) {
+	room_data *room = NULL;
+	
+	switch (type) {
+		case WLD_TRIGGER:
+		case RMT_TRIGGER:
+		case BLD_TRIGGER:
+		case ADV_TRIGGER: {
+			room = (room_data*)go;
+			break;
+		}
+		case OBJ_TRIGGER: {
+			room = obj_room((obj_data*)go);
+			break;
+		}
+		case MOB_TRIGGER: {
+			room = IN_ROOM((char_data*)go);
+			break;
+		}
+		case VEH_TRIGGER: {
+			room = IN_ROOM((vehicle_data*)go);
+			break;
+		}
+	}
+	
+	return room;
+}
+
+
+/**
 * Find a vehicle in the world by name/uid.
 *
 * @param char *name The name to look up.
@@ -2303,7 +2339,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			else if (!str_cmp(var, "instance")) {
 				struct instance_data *inst = get_instance_for_script(type, go);
 				
-				if (!inst) {
+				// does not require an instance
+				if (!str_cmp(field, "nearest_rmt")) {
+					extern room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum);
+					room_data *find;
+					any_vnum vnum;
+					if (subfield && isdigit(*subfield) && ((vnum = atoi(subfield)) != NOTHING) && (find = find_nearest_rmt(get_room_by_script(type, go), vnum))) {
+						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(find) + ROOM_ID_BASE);
+					}
+					else {
+						snprintf(str, slen, "0");
+					}
+				}
+				
+				// everything else requires inst exists
+				else if (!inst) {
 					// safety
 					snprintf(str, slen, "0");
 				}
@@ -2719,6 +2769,24 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "canuseroom_member")) {
 						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
 						snprintf(str, slen, "%d", (troom && can_use_room(c, troom, MEMBERS_ONLY)) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "can_enter_instance")) {
+						extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
+						extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
+						struct instance_data *inst;
+						
+						if (troom && IS_ADVENTURE_ROOM(troom) && (inst = find_instance_by_room(troom, FALSE))) {
+							// only if not already in there
+							if (!IS_ADVENTURE_ROOM(IN_ROOM(c)) || find_instance_by_room(IN_ROOM(c), FALSE) != inst) {
+								if (!can_enter_instance(c, inst)) {
+									snprintf(str, slen, "0");
+								}
+							}
+						}
+						if (*str != '0') {	// all other cases
+							snprintf(str, slen, "1");
+						}
 					}
 					else if (!str_cmp(field, "can_teleport_room")) {
 						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
