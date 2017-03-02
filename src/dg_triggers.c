@@ -1168,6 +1168,14 @@ int consume_otrigger(obj_data *obj, char_data *actor, int cmd) {
 					add_var(&GET_TRIG_VARS(t), "command", "read", 0);
 					break;
 				}
+				case OCMD_BUILD: {
+					add_var(&GET_TRIG_VARS(t), "command", "build", 0);
+					break;
+				}
+				case OCMD_CRAFT: {
+					add_var(&GET_TRIG_VARS(t), "command", "craft", 0);
+					break;
+				}
 			}
 			sdd.o = obj;
 			ret_val = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);

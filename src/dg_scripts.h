@@ -140,6 +140,8 @@
 #define OCMD_DRINK  2
 #define OCMD_QUAFF  3
 #define OCMD_READ  4
+#define OCMD_BUILD  5
+#define OCMD_CRAFT  6
 
 #define TRIG_NEW                0	     /* trigger starts from top  */
 #define TRIG_RESTART            1	     /* trigger restarting       */

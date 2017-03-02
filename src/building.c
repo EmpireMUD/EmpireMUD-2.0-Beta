@@ -1229,6 +1229,9 @@ ACMD(do_build) {
 	else if (GET_CRAFT_BUILD_TYPE(type) == NOTHING || !building_proto(GET_CRAFT_BUILD_TYPE(type))) {
 		msg_to_char(ch, "That build recipe is not implemented.\r\n");
 	}
+	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && found_obj && !consume_otrigger(found_obj, ch, OCMD_BUILD)) {
+		return;	// the trigger should send its own message if it prevented this
+	}
 	else {
 		found = TRUE;
 	}

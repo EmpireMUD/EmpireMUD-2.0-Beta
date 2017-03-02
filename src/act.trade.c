@@ -1316,7 +1316,7 @@ ACMD(do_gen_craft) {
 	craft_data *craft, *next_craft, *type = NULL, *find_type = NULL, *abbrev_match = NULL;
 	vehicle_data *veh;
 	bool is_master;
-	obj_data *drinkcon = NULL;
+	obj_data *found_obj = NULL, *drinkcon = NULL;
 	ability_data *cft_abil;
 	
 	if (IS_NPC(ch)) {
@@ -1431,7 +1431,7 @@ ACMD(do_gen_craft) {
 	else if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
 		msg_to_char(ch, "You need to have a crafting level of %d to %s that.\r\n", GET_CRAFT_MIN_LEVEL(type), gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
-	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(type), ch->carrying)) {
+	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && !(found_obj = get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(type), ch->carrying))) {
 		msg_to_char(ch, "You need %s to make that.\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(type)));
 	}
 	else if (!check_can_craft(ch, type)) {
@@ -1450,6 +1450,9 @@ ACMD(do_gen_craft) {
 	else if (!has_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
 		// this sends its own message ("You need X more of ...")
 		//msg_to_char(ch, "You don't have the resources to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+	}
+	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && found_obj && !consume_otrigger(found_obj, ch, OCMD_CRAFT)) {
+		return;	// trigger hopefully sent its own message
 	}
 	else {
 		cft_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(type));
