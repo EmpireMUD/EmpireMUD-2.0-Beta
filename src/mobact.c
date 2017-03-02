@@ -809,13 +809,28 @@ void run_mob_echoes(void) {
 	ACMD(do_say);
 	
 	struct custom_message *mcm, *found_mcm;
-	char_data *ch, *mob, *found_mob;
+	char_data *ch, *mob, *found_mob, *chiter;
 	descriptor_data *desc;
 	int count;
+	bool oops;
 	
 	LL_FOREACH(descriptor_list, desc) {
 		// validate ch
 		if (STATE(desc) != CON_PLAYING || !(ch = desc->character) || !AWAKE(ch)) {
+			continue;
+		}
+		
+		// only the first connected player in the room counts, so multiple players don't lead to spam
+		oops = FALSE;
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
+			if (chiter->desc) {
+				if (chiter != ch) {
+					oops = TRUE;	// not first
+				}
+				break;	// found any descriptor
+			}
+		}
+		if (oops) {
 			continue;
 		}
 		
