@@ -2405,7 +2405,7 @@ const char *bld_flags[] = {
 	"!RUINS",
 	"!NPC",
 	"BARRIER",	// 10
-	"*TAVERN-DEPRECATED",
+	"IN-CITY-ONLY",
 	"LARGE-CITY-RADIUS",
 	"*MINE-DEPRECATED",
 	"ATTACH-ROAD",

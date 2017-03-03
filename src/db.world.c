@@ -901,7 +901,7 @@ void update_world(void) {
 			}
 			
 			// type-specific updates
-			if (HAS_FUNCTION(iter, FNC_TAVERN) && IS_COMPLETE(iter)) {
+			if (room_has_function_and_city_ok(iter, FNC_TAVERN)) {
 				update_tavern(iter);
 			}
 			if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && get_room_extra_data(iter, ROOM_EXTRA_SEED_TIME)) {
@@ -1646,6 +1646,8 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	if ((island = GET_ISLAND_ID(room)) == NO_ISLAND) {
 		return;
 	}
+	
+	// WARNING: do not check in-city status on these ... it can change at a time when territory is not re-scanned
 	
 	if (HAS_FUNCTION(room, FNC_APIARY)) {
 		EMPIRE_TECH(emp, TECH_APIARIES) += amt;

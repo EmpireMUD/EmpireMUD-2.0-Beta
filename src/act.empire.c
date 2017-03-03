@@ -763,6 +763,30 @@ void abandon_city(char_data *ch, char *argument) {
 }
 
 
+/**
+* Checks if a building has the IN-CITY-ONLY flag and whether or not the room
+* is in a city. For interior rooms inside a building, it ALSO checks the main
+* building.
+*
+* @param room_data *room The room to check.
+* @param bool check_wait If TRUE, requires that the city is over an hour old (or as-configured).
+* @return bool TRUE if the room is okay to use, FALSE if it failed this check.
+*/
+bool check_in_city_requirement(room_data *room, bool check_wait) {
+	room_data *home = HOME_ROOM(room);
+	bool junk;
+	
+	if (!ROOM_BLD_FLAGGED(room, BLD_IN_CITY_ONLY) && !ROOM_BLD_FLAGGED(home, BLD_IN_CITY_ONLY)) {
+		return TRUE;
+	}
+	if (ROOM_OWNER(room) && is_in_city_for_empire(room, ROOM_OWNER(room), check_wait, &junk)) {
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+
 void city_traits(char_data *ch, char *argument) {	
 	empire_data *emp = GET_LOYALTY(ch);
 	struct empire_city_data *city;
@@ -1906,7 +1930,7 @@ void show_tavern_status(char_data *ch) {
 	msg_to_char(ch, "Your taverns:\r\n");
 	
 	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
-		if (HAS_FUNCTION(ter->room, FNC_TAVERN)) {
+		if (room_has_function_and_city_ok(ter->room, FNC_TAVERN)) {
 			found = TRUE;
 			
 			if (has_ability(ch, ABIL_NAVIGATION)) {
@@ -2323,6 +2347,9 @@ ACMD(do_barde) {
 	}
 	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch)))
 		msg_to_char(ch, "You must barde animals in the stable.\r\n");
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it.\r\n");
+	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED))
 		msg_to_char(ch, "You don't have permission to barde animals here.\r\n");
 	else if (!*arg)
@@ -2782,6 +2809,9 @@ ACMD(do_deposit) {
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You must finish building it first.\r\n");
+	}
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
 	else if (!(emp = ROOM_OWNER(IN_ROOM(ch)))) {
 		msg_to_char(ch, "No empire stores coins here.\r\n");
@@ -4074,6 +4104,9 @@ ACMD(do_home) {
 		else if (ROOM_AFF_FLAGGED(real, ROOM_AFF_HAS_INSTANCE)) {
 			msg_to_char(ch, "You can't make this your home right now.\r\n");
 		}
+		else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+			msg_to_char(ch, "You can't make this your home because it's not in a city.\r\n");
+		}
 		else {
 			// if someone is overriding it
 			if (ROOM_PRIVATE_OWNER(real) != NOBODY) {
@@ -4253,6 +4286,9 @@ ACMD(do_tavern) {
 		show_tavern_status(ch);
 		msg_to_char(ch, "You can only change what's being brewed while actually in the tavern.\r\n");
 	}
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it.\r\n");
+	}
 	else if (!GET_LOYALTY(ch) || GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(ch))) {
 		msg_to_char(ch, "Your empire doesn't own this tavern.\r\n");
 	}
@@ -4317,7 +4353,7 @@ ACMD(do_tomb) {
 		if (tomb && !can_use_room(ch, tomb, GUESTS_ALLOWED)) {
 			msg_to_char(ch, "You no longer have access to that tomb because it's owned by %s.\r\n", ROOM_OWNER(tomb) ? EMPIRE_NAME(ROOM_OWNER(tomb)) : "someone else");
 		}
-		if (HAS_FUNCTION(IN_ROOM(ch), FNC_TOMB) && IS_COMPLETE(IN_ROOM(ch))) {
+		if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_TOMB)) {
 			msg_to_char(ch, "Use 'tomb set' to change your tomb to this room.\r\n");
 		}
 	}
@@ -4339,6 +4375,9 @@ ACMD(do_tomb) {
 		}
 		else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE) || ROOM_AFF_FLAGGED(real, ROOM_AFF_HAS_INSTANCE)) {
 			msg_to_char(ch, "You can't make this your tomb right now.\r\n");
+		}
+		else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+			msg_to_char(ch, "You can't make this your tomb because it's not in a city.\r\n");
 		}
 		else {			
 			GET_TOMB_ROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
@@ -5213,6 +5252,9 @@ ACMD(do_withdraw) {
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You must finish building it first.\r\n");
+	}
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
 	else if (!(emp = ROOM_OWNER(IN_ROOM(ch)))) {
 		msg_to_char(ch, "No empire stores coins here.\r\n");

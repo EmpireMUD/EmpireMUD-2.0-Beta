@@ -143,7 +143,7 @@ vehicle_data *find_ship_to_dispatch(char_data *ch, char *arg) {
 		}
 		
 		// ensure in docks if we're finding it remotely
-		if (!IN_ROOM(veh) || !HAS_FUNCTION(IN_ROOM(veh), FNC_DOCKS) || !IS_COMPLETE(IN_ROOM(veh))) {
+		if (!IN_ROOM(veh) || !room_has_function_and_city_ok(IN_ROOM(veh), FNC_DOCKS)) {
 			continue;
 		}
 		if (GET_ISLAND_ID(IN_ROOM(veh)) != island) {

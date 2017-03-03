@@ -4347,7 +4347,7 @@ room_data *find_load_room(char_data *ch) {
 	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch)))) {
 		// does not require last room but if there is one, it must be the same island
 		rl_last_room = real_room(GET_LAST_ROOM(ch));
-		if (HAS_FUNCTION(rl, FNC_TOMB) && (!rl_last_room || GET_ISLAND_ID(rl) == GET_ISLAND_ID(rl_last_room)) && can_use_room(ch, rl, GUESTS_ALLOWED)) {
+		if (room_has_function_and_city_ok(rl, FNC_TOMB) && (!rl_last_room || GET_ISLAND_ID(rl) == GET_ISLAND_ID(rl_last_room)) && can_use_room(ch, rl, GUESTS_ALLOWED)) {
 			return rl;
 		}
 	}
@@ -4356,7 +4356,7 @@ room_data *find_load_room(char_data *ch) {
 	if (!IS_NPC(ch) && (rl = real_room(GET_LAST_ROOM(ch))) && GET_LOYALTY(ch)) {
 		island = GET_ISLAND_ID(rl);
 		for (ter = EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)); ter; ter = ter->next) {
-			if (HAS_FUNCTION(ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island) {
+			if (room_has_function_and_city_ok(ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = ter->room;
@@ -4893,6 +4893,28 @@ unsigned long long microtime(void) {
 	
 	gettimeofday(&time, NULL);
 	return ((unsigned long long)time.tv_sec * 1000000) + time.tv_usec;
+}
+
+
+/**
+* Determines if a room both has a function flag, and passes any necessary
+* in-city requirements. (If the room does not have BLD_IN_CITY_ONLY, this only
+* checks the function.)
+*
+* @param room_data *room The room to check.
+* @param bitvector_t fnc_flag Any FNC_ flag.
+* @return bool TRUE if the room has the function and passed the city check, FALSE if not.
+*/
+bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag) {
+	if (!HAS_FUNCTION(room, fnc_flag) || !IS_COMPLETE(room)) {
+		return FALSE;
+	}
+	if (!check_in_city_requirement(room, TRUE)) {
+		return FALSE;
+	}
+	
+	// oh okay
+	return TRUE;
 }
 
 
