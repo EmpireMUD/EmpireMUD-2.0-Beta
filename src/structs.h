@@ -369,7 +369,7 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// ADVENTURE DEFINES ///////////////////////////////////////////////////////
 
-// adventure flags
+// ADV_x: adventure flags
 #define ADV_IN_DEVELOPMENT  BIT(0)	// will not generate instances
 #define ADV_LOCK_LEVEL_ON_ENTER  BIT(1)	// lock levels on entry
 #define ADV_LOCK_LEVEL_ON_COMBAT  BIT(2)	// lock levels when combat starts
@@ -379,6 +379,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_NO_NEWBIE  BIT(6)	// prevents spawning on newbie islands
 #define ADV_NEWBIE_ONLY  BIT(7)	// only spawns on newbie islands
 #define ADV_NO_MOB_CLEANUP  BIT(8)	// won't despawn mobs that escaped the instance
+#define ADV_EMPTY_RESET_ONLY  BIT(9)	// won't reset while players are inside
 
 
 // adventure link rule types
@@ -2433,7 +2434,7 @@ struct adventure_data {
 	int min_level, max_level;	// level range
 	int max_instances;	// total number possible in world
 	int reset_time;	// how often to reset things (minutes)
-	bitvector_t flags;	// ADV_x
+	bitvector_t flags;	// ADV_ flags
 	int player_limit;	// maximum number of players at a time (if over 0)
 	
 	// lists

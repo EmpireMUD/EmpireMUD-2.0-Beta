@@ -116,6 +116,7 @@ const char *adventure_flags[] = {
 	"!NEWBIE",
 	"NEWBIE-ONLY",
 	"NO-MOB-CLEANUP",
+	"EMPTY-RESET-ONLY",
 	"\n"
 };
 

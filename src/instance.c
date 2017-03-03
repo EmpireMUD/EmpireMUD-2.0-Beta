@@ -1159,6 +1159,10 @@ void reset_instances(void) {
 		if (inst->last_reset + (60 * GET_ADV_RESET_TIME(inst->adventure)) > time(0)) {
 			continue;
 		}
+		// needs to be empty?
+		if (ADVENTURE_FLAGGED(inst->adventure, ADV_EMPTY_RESET_ONLY) && count_players_in_instance(inst, FALSE, NULL) > 0) {
+			continue;
+		}
 		
 		reset_instance(inst);
 	}
