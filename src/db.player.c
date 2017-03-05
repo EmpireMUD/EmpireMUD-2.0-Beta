@@ -1056,7 +1056,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	
 	// ensure script allocation
 	if (!SCRIPT(ch)) {
-		CREATE(SCRIPT(ch), struct script_data, 1);
+		create_script_data(ch, MOB_TRIGGER);
 	}
 	
 	// some parts may already be added, so find the end of lists:
@@ -3445,7 +3445,7 @@ void init_player(char_data *ch) {
 	
 	// script allocation
 	if (!SCRIPT(ch)) {
-		CREATE(SCRIPT(ch), struct script_data, 1);
+		create_script_data(ch, MOB_TRIGGER);
 	}
 }
 

@@ -1392,7 +1392,7 @@ void reset_one_room(room_data *room) {
 			case 'T': {	// trigger attach
 				if (reset->arg1 == MOB_TRIGGER && tmob) {
 					if (!SCRIPT(tmob)) {
-						CREATE(SCRIPT(tmob), struct script_data, 1);
+						create_script_data(tmob, MOB_TRIGGER);
 					}
 					if ((trig = read_trigger(reset->arg2))) {
 						add_trigger(SCRIPT(tmob), trig, -1);
@@ -1400,7 +1400,7 @@ void reset_one_room(room_data *room) {
 				}
 				else if (reset->arg1 == WLD_TRIGGER) {
 					if (!room->script) {
-						CREATE(room->script, struct script_data, 1);
+						create_script_data(room, WLD_TRIGGER);
 					}
 					if ((trig = read_trigger(reset->arg2))) {
 						add_trigger(room->script, trig, -1);

@@ -1299,9 +1299,13 @@ void add_trigger(struct script_data *sc, trig_data *t, int loc) {
 	}
 
 	SCRIPT_TYPES(sc) |= GET_TRIG_TYPE(t);
-
-	t->next_in_world = trigger_list;
-	trigger_list = t;
+	t->attached_to = sc;
+	
+	// add to lists
+	LL_PREPEND2(trigger_list, t, next_in_world);
+	if (TRIG_IS_GLOBAL(t)) {
+		LL_PREPEND2(global_triggers, t, next_global);
+	}
 }
 
 
@@ -1356,8 +1360,9 @@ ACMD(do_tattach) {
 			return;
 		}
 
-		if (!SCRIPT(victim))
-			CREATE(SCRIPT(victim), struct script_data, 1);
+		if (!SCRIPT(victim)) {
+			create_script_data(victim, MOB_TRIGGER);
+		}
 		add_trigger(SCRIPT(victim), trig, loc);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s.", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim), GET_NAME(ch));
@@ -1394,8 +1399,9 @@ ACMD(do_tattach) {
 			return;
 		}
 
-		if (!SCRIPT(object))
-			CREATE(SCRIPT(object), struct script_data, 1);
+		if (!SCRIPT(object)) {
+			create_script_data(object, OBJ_TRIGGER);
+		}
 		add_trigger(SCRIPT(object), trig, loc);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s.", tn, GET_TRIG_NAME(trig), (GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name), GET_OBJ_VNUM(object), GET_NAME(ch));
@@ -1431,7 +1437,7 @@ ACMD(do_tattach) {
 		}
 
 		if (!SCRIPT(veh)) {
-			CREATE(SCRIPT(veh), struct script_data, 1);
+			create_script_data(veh, VEH_TRIGGER);
 		}
 		add_trigger(SCRIPT(veh), trig, loc);
 
@@ -1466,8 +1472,9 @@ ACMD(do_tattach) {
 			return;
 		}
 
-		if (!SCRIPT(room))
-			CREATE(SCRIPT(room), struct script_data, 1);
+		if (!SCRIPT(room)) {
+			create_script_data(room, WLD_TRIGGER);
+		}
 		add_trigger(SCRIPT(room), trig, loc);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to room %d by %s.", tn, GET_TRIG_NAME(trig), GET_ROOM_VNUM(room), GET_NAME(ch));
@@ -5228,30 +5235,33 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 			script_log("Trigger: %s, VNum %d. attach invalid target: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), GET_NAME(c));
 			return;
 		}
-		if (!SCRIPT(c))
-			CREATE(SCRIPT(c), struct script_data, 1);
+		if (!SCRIPT(c)) {
+			create_script_data(c, MOB_TRIGGER);
+		}
 		add_trigger(SCRIPT(c), newtrig, -1);
 		return;
 	}
 
 	if (v) {
 		if (!SCRIPT(v)) {
-			CREATE(SCRIPT(v), struct script_data, 1);
+			create_script_data(v, VEH_TRIGGER);
 		}
 		add_trigger(SCRIPT(v), newtrig, -1);
 		return;
 	}
 
 	if (o) {
-		if (!SCRIPT(o))
-			CREATE(SCRIPT(o), struct script_data, 1);
+		if (!SCRIPT(o)) {
+			create_script_data(o, OBJ_TRIGGER);
+		}
 		add_trigger(SCRIPT(o), newtrig, -1);
 		return;
 	}
 
 	if (r) {
-		if (!SCRIPT(r))
-			CREATE(SCRIPT(r), struct script_data, 1);
+		if (!SCRIPT(r)) {
+			create_script_data(r, WLD_TRIGGER);
+		}
 		add_trigger(SCRIPT(r), newtrig, -1);
 		return;
 	}

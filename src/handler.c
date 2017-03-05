@@ -3731,7 +3731,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	// copy only existing scripts
 	if (SCRIPT(input)) {
 		if (!SCRIPT(obj)) {
-			CREATE(SCRIPT(obj), struct script_data, 1);
+			create_script_data(obj, OBJ_TRIGGER);
 		}
 
 		for (trig = TRIGGERS(SCRIPT(input)); trig; trig = trig->next) {

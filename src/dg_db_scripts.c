@@ -245,8 +245,9 @@ void assign_triggers(void *i, int type) {
 					syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: trigger #%d non-existant, for mob #%d", trg_proto->vnum, GET_MOB_VNUM(mob));
 				}
 				else {
-					if (!SCRIPT(mob))
-						CREATE(SCRIPT(mob), struct script_data, 1);
+					if (!SCRIPT(mob)) {
+						create_script_data(mob, MOB_TRIGGER);
+					}
 					add_trigger(SCRIPT(mob), read_trigger(trg_proto->vnum), -1);
 				}
 				trg_proto = trg_proto->next;
@@ -261,8 +262,9 @@ void assign_triggers(void *i, int type) {
 					log("SYSERR: trigger #%d non-existant, for obj #%d", trg_proto->vnum, obj->vnum);
 				}
 				else {
-					if (!SCRIPT(obj))
-						CREATE(SCRIPT(obj), struct script_data, 1);
+					if (!SCRIPT(obj)) {
+						create_script_data(obj, OBJ_TRIGGER);
+					}
 					add_trigger(SCRIPT(obj), read_trigger(trg_proto->vnum), -1);
 				}
 				trg_proto = trg_proto->next;
@@ -281,8 +283,9 @@ void assign_triggers(void *i, int type) {
 					trg_proto->vnum, GET_ROOM_VNUM(room));
 				}
 				else {
-					if (!SCRIPT(room))
-						CREATE(SCRIPT(room), struct script_data, 1);
+					if (!SCRIPT(room)) {
+						create_script_data(room, WLD_TRIGGER);
+					}
 					add_trigger(SCRIPT(room), read_trigger(trg_proto->vnum), -1);
 				}
 				trg_proto = trg_proto->next;
@@ -297,8 +300,9 @@ void assign_triggers(void *i, int type) {
 					syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: trigger #%d non-existant, for vehicle #%d", trg_proto->vnum, VEH_VNUM(veh));
 				}
 				else {
-					if (!SCRIPT(veh))
-						CREATE(SCRIPT(veh), struct script_data, 1);
+					if (!SCRIPT(veh)) {
+						create_script_data(veh, VEH_TRIGGER);
+					}
 					add_trigger(SCRIPT(veh), read_trigger(trg_proto->vnum), -1);
 				}
 				trg_proto = trg_proto->next;

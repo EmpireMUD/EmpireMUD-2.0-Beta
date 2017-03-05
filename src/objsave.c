@@ -341,7 +341,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				else if (OBJ_FILE_TAG(line, "Trigger:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0]) && real_trigger(i_in[0])) {
 						if (!SCRIPT(obj)) {
-							CREATE(SCRIPT(obj), struct script_data, 1);
+							create_script_data(obj, OBJ_TRIGGER);
 						}
 						add_trigger(SCRIPT(obj), read_trigger(i_in[0]), -1);
 					}

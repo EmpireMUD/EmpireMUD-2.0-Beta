@@ -130,6 +130,10 @@
 #define WTRIG_REBOOT           BIT(23)	// after the mud reboots
 
 
+// list of global trigger types (for global_triggers linked list)
+#define TRIG_IS_GLOBAL(trig)  (((trig)->attach_type == MOB_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), MTRIG_GLOBAL)) || ((trig)->attach_type == OBJ_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), OTRIG_GLOBAL)) || ((trig)->attach_type == VEH_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), VTRIG_GLOBAL)) || (((trig)->attach_type == WLD_TRIGGER || (trig)->attach_type == RMT_TRIGGER || (trig)->attach_type == ADV_TRIGGER || (trig)->attach_type == BLD_TRIGGER) && IS_SET(GET_TRIG_TYPE(trig), WTRIG_GLOBAL)))
+
+
 /* obj command trigger types */
 #define OCMD_EQUIP             BIT(0)	     /* obj must be in char's equip */
 #define OCMD_INVEN             BIT(1)	     /* obj must be in char's inven */
@@ -186,9 +190,12 @@ struct trig_data {
 	struct event *wait_event;   	/* event to pause the trigger      */
 	ubyte purged;			/* trigger is set to be purged     */
 	struct trig_var_data *var_list;	/* list of local vars for trigger  */
-
-	struct trig_data *next;  
+	
+	struct script_data *attached_to;	// reference to what I'm on
+	
+	struct trig_data *next;	// next on assigned SCRIPT()
 	struct trig_data *next_in_world;    /* next in the global trigger list */
+	struct trig_data *next_global;	// linked list: global_triggers
 	
 	UT_hash_handle hh;	// trigger_table hash handle
 };
@@ -201,7 +208,10 @@ struct script_data {
 	struct trig_var_data *global_vars;	/* list of global variables   */
 	ubyte purged;				/* script is set to be purged */
 	long context;				/* current context for statics */
-
+	
+	void *attached_to;	// person/place/thing it's attached to
+	int attached_type;	// *_TRIGGER consts
+	
 	struct script_data *next;		/* used for purged_scripts    */
 };
 
@@ -295,6 +305,7 @@ void do_sstat_room(char_data *ch);
 void do_sstat_object(char_data *ch, obj_data *j);
 void do_sstat_character(char_data *ch, char_data *k);
 
+extern struct script_data *create_script_data(void *attach_to, int type);
 void script_vlog(const char *format, va_list args);
 void script_log(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
 void script_log_by_type(int go_type, void *go, const char *format, ...) __attribute__ ((format (printf, 3, 4)));

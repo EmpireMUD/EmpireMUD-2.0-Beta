@@ -2184,7 +2184,7 @@ int check_start_quest_trigger(char_data *actor, quest_data *quest, struct instan
 				continue;
 			}
 			if (!SCRIPT(room)) {
-				CREATE(SCRIPT(room), struct script_data, 1);
+				create_script_data(room, WLD_TRIGGER);
 			}
 			add_trigger(SCRIPT(room), trig, -1);
 		}
@@ -2455,7 +2455,7 @@ int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct insta
 				continue;
 			}
 			if (!SCRIPT(room)) {
-				CREATE(SCRIPT(room), struct script_data, 1);
+				create_script_data(room, WLD_TRIGGER);
 			}
 			add_trigger(SCRIPT(room), trig, -1);
 		}

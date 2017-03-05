@@ -1254,7 +1254,7 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst) {
 				continue;
 			}
 			if (!SCRIPT(room)) {
-				CREATE(SCRIPT(room), struct script_data, 1);
+				create_script_data(room, WLD_TRIGGER);
 			}
 			add_trigger(SCRIPT(room), trig, -1);
 		}

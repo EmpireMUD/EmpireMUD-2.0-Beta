@@ -24,6 +24,68 @@
 #include "dg_event.h"
 
 
+/**
+* Ensures the "attach_to" thing (also called "go" in some scripting code)
+* has a SCRIPT() var, and sets up data that will be needed later.
+*
+* @param void *attach_to Any char/obj/room/vehicle that could have SCRIPT().
+* @param int type _TRIGGER consts such as MOB_TRIGGER, corresponding to 'attach_to'.
+* @return struct script_data* A pointer to the script data (which is also attached to 'attach_to'), or NULL if it failed.
+*/
+struct script_data *create_script_data(void *attach_to, int type) {
+	struct script_data *scr = NULL;
+	
+	// x_TRIGGER: attach types
+	switch (type) {
+		case MOB_TRIGGER: {
+			char_data *mob = (char_data*)attach_to;
+			if (!(scr = SCRIPT(mob))) {
+				CREATE(scr, struct script_data, 1);
+				SCRIPT(mob) = scr;
+			}
+			break;
+		}
+		case OBJ_TRIGGER: {
+			obj_data *obj = (obj_data*)attach_to;
+			if (!(scr = SCRIPT(obj))) {
+				CREATE(scr, struct script_data, 1);
+				SCRIPT(obj) = scr;
+			}
+			break;
+		}
+		case WLD_TRIGGER:
+		case RMT_TRIGGER:
+		case ADV_TRIGGER:
+		case BLD_TRIGGER: {
+			room_data *room = (room_data*)attach_to;
+			if (!(scr = SCRIPT(room))) {
+				CREATE(scr, struct script_data, 1);
+				SCRIPT(room) = scr;
+			}
+			type = WLD_TRIGGER;	// override other types
+			break;
+		}
+		case VEH_TRIGGER: {
+			vehicle_data *veh = (vehicle_data*)attach_to;
+			if (!(scr = SCRIPT(veh))) {
+				CREATE(scr, struct script_data, 1);
+				SCRIPT(veh) = scr;
+			}
+			break;
+		}
+		// no default: just won't set scr
+	}
+	
+	// attach data
+	if (scr) {
+		scr->attached_to = attach_to;
+		scr->attached_type = type;
+	}
+	
+	return scr;	// or NULL
+}
+
+
 /* release memory allocated for a variable list */
 void free_varlist(struct trig_var_data *vd) {
 	struct trig_var_data *i, *j;
@@ -68,15 +130,18 @@ void free_trigger(trig_data *trig) {
 
 /* remove a single trigger from a mob/obj/room */
 void extract_trigger(trig_data *trig) {
-	trig_data *temp;
-
 	if (GET_TRIG_WAIT(trig)) {
 		event_cancel(GET_TRIG_WAIT(trig));
 		GET_TRIG_WAIT(trig) = NULL;
 	}
 
 	/* walk the trigger list and remove this one */
-	REMOVE_FROM_LIST(trig, trigger_list, next_in_world);
+	LL_DELETE2(trigger_list, trig, next_in_world);
+	
+	// global trig?
+	if (TRIG_IS_GLOBAL(trig)) {
+		LL_DELETE2(global_triggers, trig, next_global);
+	}
 
 	free_trigger(trig);
 }
