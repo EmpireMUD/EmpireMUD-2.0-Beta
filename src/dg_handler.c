@@ -139,8 +139,8 @@ void extract_trigger(trig_data *trig) {
 	LL_DELETE2(trigger_list, trig, next_in_world);
 	
 	// global trig?
-	if (TRIG_IS_GLOBAL(trig)) {
-		LL_DELETE2(global_triggers, trig, next_global);
+	if (TRIG_IS_RANDOM(trig)) {
+		LL_DELETE2(random_triggers, trig, next_in_random_triggers);
 	}
 
 	free_trigger(trig);

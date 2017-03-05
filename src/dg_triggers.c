@@ -45,8 +45,6 @@ extern struct instance_data *quest_instance_global;
 *  General functions used by several triggers
 */
 
-#define player_script_radius  25	// map tiles away that players may be for scripts to trigger
-
 
 /*
 * Copy first phrase into first_arg, returns rest of string
@@ -141,18 +139,6 @@ bool match_command_trig(char *input, char *match, bool mode) {
 }
 
 
-/**
-* Determines if there is a nearby connected player, which is a requirement
-* for some things like random triggers.
-*
-* @param room_data *loc The location to check for nearby players.
-* @return bool TRUE if there are players nearby.
-*/
-static bool players_nearby_script(room_data *loc) {
-	return distance_to_nearest_player(loc) <= player_script_radius;
-}
-
-
 /*
 * return 1 if str contains a word or phrase from wordlist.
 * phrases are in double quotes (").
@@ -179,51 +165,6 @@ int word_check(char *str, char *wordlist) {
 *  mob triggers
 */
 
-void random_mtrigger(char_data *ch) {
-	bool near = FALSE, local = FALSE, checked_near = FALSE, checked_local = FALSE;
-	trig_data *t;
-	
-	if (!SCRIPT_CHECK(ch, MTRIG_RANDOM)) {
-		return;
-	}
-	
-	for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
-		// validation:
-		if (GET_TRIG_DEPTH(t)) {
-			continue;	// trigger already running
-		}
-		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
-			continue;	// can't do while charmed
-		}
-		if (IS_SET(GET_TRIG_TYPE(t), MTRIG_PLAYER_IN_ROOM)) {
-			if (!checked_local) {	// prevent repeat checks
-				local = any_players_in_room(IN_ROOM(ch));
-				checked_local = TRUE;
-			}
-			if (!local) {
-				continue;	// needs players in room
-			}
-		}
-		if (!IS_SET(GET_TRIG_TYPE(t), MTRIG_GLOBAL | MTRIG_PLAYER_IN_ROOM)) {
-			if (!checked_near) {	// prevent repeat checks
-				near = players_nearby_script(IN_ROOM(ch));
-				checked_near = TRUE;
-			}
-			if (!near) {
-				continue;	// needs players nearby
-			}
-		}
-		
-		// okay: run it
-		if (TRIGGER_CHECK(t, MTRIG_RANDOM) && (number(1, 100) <= GET_TRIG_NARG(t))) {
-			union script_driver_data_u sdd;
-			sdd.c = ch;
-			if (script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW)) {
-				break;
-			}
-		}
-	}
-}
 
 void greet_memory_mtrigger(char_data *actor) {
 	trig_data *t;
@@ -790,26 +731,6 @@ void reboot_mtrigger(char_data *ch) {
 *  object triggers
 */
 
-void random_otrigger(obj_data *obj) {
-	trig_data *t;
-	int val;
-
-	if (!SCRIPT_CHECK(obj, OTRIG_RANDOM))
-		return;
-
-	for (t = TRIGGERS(SCRIPT(obj)); t; t = t->next) {
-		if (TRIGGER_CHECK(t, OTRIG_RANDOM) && (number(1, 100) <= GET_TRIG_NARG(t))) {
-			union script_driver_data_u sdd;
-			sdd.o = obj;
-			val = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
-			obj = sdd.o;
-			if (val) {
-				break;
-			}
-		}
-	}
-}
-
 
 // returns 0 if obj was purged
 int timer_otrigger(obj_data *obj) {
@@ -1341,49 +1262,6 @@ void reset_wtrigger(room_data *room) {
 	}
 }
 
-void random_wtrigger(room_data *room) {
-	bool near = FALSE, local = FALSE, checked_near = FALSE, checked_local = FALSE;
-	char buf[MAX_INPUT_LENGTH];
-	trig_data *t;
-
-	if (!SCRIPT_CHECK(room, WTRIG_RANDOM))
-		return;
-
-	for (t = TRIGGERS(SCRIPT(room)); t; t = t->next) {
-		// validation:
-		if (GET_TRIG_DEPTH(t)) {
-			continue;	// trigger already running
-		}
-		if (IS_SET(GET_TRIG_TYPE(t), WTRIG_PLAYER_IN_ROOM)) {
-			if (!checked_local) {	// prevent repeat checks
-				local = any_players_in_room(room);
-				checked_local = TRUE;
-			}
-			if (!local) {
-				continue;	// needs players in room
-			}
-		}
-		if (!IS_SET(GET_TRIG_TYPE(t), WTRIG_GLOBAL | WTRIG_PLAYER_IN_ROOM)) {
-			if (!checked_near) {	// prevent repeat checks
-				near = players_nearby_script(room);
-				checked_near = TRUE;
-			}
-			if (!near) {
-				continue;	// needs players nearby
-			}
-		}
-		
-		// okay: run it
-		if (TRIGGER_CHECK(t, WTRIG_RANDOM) && (number(1, 100) <= GET_TRIG_NARG(t))) {
-			union script_driver_data_u sdd;
-			ADD_ROOM_UID_VAR(buf, t, room, "room", 0);
-			sdd.r = room;
-			if (script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW))
-				break;
-		}
-	}
-}
-
 
 int enter_wtrigger(room_data *room, char_data *actor, int dir) {
 	trig_data *t;
@@ -1845,47 +1723,6 @@ void load_vtrigger(vehicle_data *veh) {
 *
 * @param vehicle_data *veh The vehicle triggering.
 */
-void random_vtrigger(vehicle_data *veh) {
-	bool near = FALSE, local = FALSE, checked_near = FALSE, checked_local = FALSE;
-	trig_data *t;
-
-	if (!SCRIPT_CHECK(veh, VTRIG_RANDOM)) {
-		return;
-	}
-
-	for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
-		// validation:
-		if (GET_TRIG_DEPTH(t)) {
-			continue;	// trigger already running
-		}
-		if (IS_SET(GET_TRIG_TYPE(t), VTRIG_PLAYER_IN_ROOM)) {
-			if (!checked_local) {	// prevent repeat checks
-				local = any_players_in_room(IN_ROOM(veh));
-				checked_local = TRUE;
-			}
-			if (!local) {
-				continue;	// needs players in room
-			}
-		}
-		if (!IS_SET(GET_TRIG_TYPE(t), VTRIG_GLOBAL | VTRIG_PLAYER_IN_ROOM)) {
-			if (!checked_near) {	// prevent repeat checks
-				near = players_nearby_script(IN_ROOM(veh));
-				checked_near = TRUE;
-			}
-			if (!near) {
-				continue;	// needs players nearby
-			}
-		}
-		
-		if (TRIGGER_CHECK(t, VTRIG_RANDOM) && (number(1, 100) <= GET_TRIG_NARG(t))) {
-			union script_driver_data_u sdd;
-			sdd.v = veh;
-			if (script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW)) {
-				break;
-			}
-		}
-	}
-}
 
 
 void reboot_vtrigger(vehicle_data *veh) {

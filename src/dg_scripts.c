@@ -27,6 +27,7 @@
 #include "skills.h"
 
 #define PULSES_PER_MUD_HOUR     (SECS_PER_MUD_HOUR*PASSES_PER_SEC)
+#define player_script_radius  25	// map tiles away that players may be for scripts to trigger
 
 
 /* external vars from db.c */
@@ -199,6 +200,18 @@ int find_eq_pos_script(char *arg) {
 
 int can_wear_on_pos(obj_data *obj, int pos) {
 	return CAN_WEAR(obj, wear_data[pos].item_wear);
+}
+
+
+/**
+* Determines if there is a nearby connected player, which is a requirement
+* for some things like random triggers.
+*
+* @param room_data *loc The location to check for nearby players.
+* @return bool TRUE if there are players nearby.
+*/
+static bool players_nearby_script(room_data *loc) {
+	return distance_to_nearest_player(loc) <= player_script_radius;
 }
 
 
@@ -992,69 +1005,100 @@ int char_has_item(char *item, char_data *ch) {
 
 /* checks every PULSE_SCRIPT for random triggers */
 void script_trigger_check(void) {
-	static int my_cycle = 0;
-	
-	vehicle_data *veh, *next_veh;
-	char_data *ch, *next_ch;
-	obj_data *obj, *next_obj;
-	room_data *room, *next_room;
+	room_data *room, *in_room = NULL;
+	trig_data *trig, *next_trig;
+	char buf[MAX_STRING_LENGTH];
 	struct script_data *sc;
+	vehicle_data *veh;
+	char_data *mob;
+	obj_data *obj;
+	bool fail;
 	
-	LL_FOREACH_SAFE(character_list, ch, next_ch) {
-		if (!(sc = SCRIPT(ch)) || !IS_SET(SCRIPT_TYPES(sc), MTRIG_RANDOM)) {
-			continue;	// no random scripts
+	// iterate over global list of random triggers
+	LL_FOREACH_SAFE2(random_triggers, trig, next_trig, next_in_random_triggers) {
+		if (GET_TRIG_DEPTH(trig)) {
+			continue;	// trigger already running
 		}
-
-		// success
-		random_mtrigger(ch);
-	}
-	
-	LL_FOREACH_SAFE(object_list, obj, next_obj) {
-		if (!(sc = SCRIPT(obj))) {
-			continue;	// no scripts
+		if (!(sc = trig->attached_to)) {
+			continue;	// can't get script data
 		}
-		if (!IS_SET(SCRIPT_TYPES(sc), OTRIG_RANDOM)) {
-			continue;	// no randoms
+		if (!(sc->attached_to)) {
+			continue;	// script somehow not attached to anything
 		}
-		// objs do not check players nearby
+		if (number(1, 100) > GET_TRIG_NARG(trig)) {
+			continue;	// failed % check (this is cheap so we do it first)
+		}
 		
-		// success
-		random_otrigger(obj);
-	}
-	
-	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
-		if (!IN_ROOM(veh)) {
-			continue; // not in a room?
-		}
-		if (!(sc = SCRIPT(veh)) || !IS_SET(SCRIPT_TYPES(sc), VTRIG_RANDOM)) {
-			return;	// no random scripts
-		}
-
-		// success
-		random_vtrigger(veh);
-	}
-
-	// Except every 5th cycle, this only does "interior" rooms -- to prevent over-frequent map iteration
-	if (++my_cycle >= 5) {
-		my_cycle = 0;
-		HASH_ITER(hh, world_table, room, next_room) {
-			if (!(sc = SCRIPT(room)) || !IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM)) {
-				continue;	// no random scripts
+		// clean vars
+		mob = NULL;
+		obj = NULL;
+		veh = NULL;
+		room = in_room = NULL;
+		fail = FALSE;
+		
+		// x_TRIGGER: basic setup by type
+		switch (sc->attached_type) {
+			case MOB_TRIGGER: {
+				mob = (char_data *)sc->attached_to;
+				in_room = IN_ROOM(mob);
+				if (AFF_FLAGGED(mob, AFF_CHARM) && !TRIGGER_CHECK(trig, MTRIG_CHARMED)) {
+					fail = TRUE;	// can't do while charmed
+				}
+				break;
 			}
-			
-			// success
-			random_wtrigger(room);
-		}
-	}
-	else {
-		// partial
-		LL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
-			if (!(sc = SCRIPT(room)) || !IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM)) {
-				continue;	// no random scripts
+			case OBJ_TRIGGER: {
+				obj = (obj_data *)sc->attached_to;
+				in_room = obj_room(obj);
+				break;
 			}
-			
-			// success
-			random_wtrigger(room);
+			case VEH_TRIGGER: {
+				veh = (vehicle_data *)sc->attached_to;
+				in_room = IN_ROOM(veh);
+				break;
+			}
+			default: {	// all world trigger types
+				room = in_room = (room_data*)sc->attached_to;
+				break;
+			}
+		}
+		
+		if (fail) {
+			continue; // type-based fail
+		}
+		if (TRIG_IS_LOCAL(trig) && (!in_room || !any_players_in_room(in_room))) {
+			continue;	// need player present (is local)
+		}
+		else if (!TRIG_IS_GLOBAL(trig) && (!in_room || !players_nearby_script(in_room))) {
+			continue;	// need players nearby (not global)
+		}
+		
+		// x_TRIGGER: run the triggers, by type
+		switch (sc->attached_type) {
+			case MOB_TRIGGER: {
+				union script_driver_data_u sdd;
+				sdd.c = mob;
+				script_driver(&sdd, trig, MOB_TRIGGER, TRIG_NEW);
+				break;
+			}
+			case OBJ_TRIGGER: {
+				union script_driver_data_u sdd;
+				sdd.o = obj;
+				script_driver(&sdd, trig, OBJ_TRIGGER, TRIG_NEW);
+				break;
+			}
+			case VEH_TRIGGER: {
+				union script_driver_data_u sdd;
+				sdd.v = veh;
+				script_driver(&sdd, trig, VEH_TRIGGER, TRIG_NEW);
+				break;
+			}
+			default: {	// all world trigger types
+				union script_driver_data_u sdd;
+				ADD_ROOM_UID_VAR(buf, trig, room, "room", 0);
+				sdd.r = room;
+				script_driver(&sdd, trig, WLD_TRIGGER, TRIG_NEW);
+				break;
+			}
 		}
 	}
 }
@@ -1303,8 +1347,8 @@ void add_trigger(struct script_data *sc, trig_data *t, int loc) {
 	
 	// add to lists
 	LL_PREPEND2(trigger_list, t, next_in_world);
-	if (TRIG_IS_GLOBAL(t)) {
-		LL_PREPEND2(global_triggers, t, next_global);
+	if (TRIG_IS_RANDOM(t)) {
+		LL_PREPEND2(random_triggers, t, next_in_random_triggers);
 	}
 }
 

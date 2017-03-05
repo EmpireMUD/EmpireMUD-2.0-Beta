@@ -387,7 +387,7 @@ void free_social(social_data *soc);
 // triggers
 extern trig_data *trigger_table;
 extern trig_data *trigger_list;
-extern trig_data *global_triggers;
+extern trig_data *random_triggers;
 
 // vehicles
 extern vehicle_data *vehicle_list;

@@ -130,8 +130,10 @@
 #define WTRIG_REBOOT           BIT(23)	// after the mud reboots
 
 
-// list of global trigger types (for global_triggers linked list)
+// list of global trigger types (for random_triggers linked list)
 #define TRIG_IS_GLOBAL(trig)  (((trig)->attach_type == MOB_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), MTRIG_GLOBAL)) || ((trig)->attach_type == OBJ_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), OTRIG_GLOBAL)) || ((trig)->attach_type == VEH_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), VTRIG_GLOBAL)) || (((trig)->attach_type == WLD_TRIGGER || (trig)->attach_type == RMT_TRIGGER || (trig)->attach_type == ADV_TRIGGER || (trig)->attach_type == BLD_TRIGGER) && IS_SET(GET_TRIG_TYPE(trig), WTRIG_GLOBAL)))
+#define TRIG_IS_LOCAL(trig)  (((trig)->attach_type == MOB_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), MTRIG_PLAYER_IN_ROOM)) || ((trig)->attach_type == OBJ_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), OTRIG_PLAYER_IN_ROOM)) || ((trig)->attach_type == VEH_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), VTRIG_PLAYER_IN_ROOM)) || (((trig)->attach_type == WLD_TRIGGER || (trig)->attach_type == RMT_TRIGGER || (trig)->attach_type == ADV_TRIGGER || (trig)->attach_type == BLD_TRIGGER) && IS_SET(GET_TRIG_TYPE(trig), WTRIG_PLAYER_IN_ROOM)))
+#define TRIG_IS_RANDOM(trig)  (((trig)->attach_type == MOB_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), MTRIG_RANDOM)) || ((trig)->attach_type == OBJ_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), OTRIG_RANDOM)) || ((trig)->attach_type == VEH_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), VTRIG_RANDOM)) || (((trig)->attach_type == WLD_TRIGGER || (trig)->attach_type == RMT_TRIGGER || (trig)->attach_type == ADV_TRIGGER || (trig)->attach_type == BLD_TRIGGER) && IS_SET(GET_TRIG_TYPE(trig), WTRIG_RANDOM)))
 
 
 /* obj command trigger types */
@@ -195,7 +197,7 @@ struct trig_data {
 	
 	struct trig_data *next;	// next on assigned SCRIPT()
 	struct trig_data *next_in_world;    /* next in the global trigger list */
-	struct trig_data *next_global;	// linked list: global_triggers
+	struct trig_data *next_in_random_triggers;	// linked list: random_triggers
 	
 	UT_hash_handle hh;	// trigger_table hash handle
 };
@@ -259,9 +261,6 @@ void bribe_mtrigger(char_data *ch, char_data *actor, int amount);
 
 void complete_wtrigger(room_data *room);
 
-void random_mtrigger(char_data *ch);
-void random_otrigger(obj_data *obj);
-void random_wtrigger(room_data *ch);
 void reset_wtrigger(room_data *ch);
 
 void load_mtrigger(char_data *ch);
@@ -289,7 +288,6 @@ int entry_vtrigger(vehicle_data *veh);
 int leave_vtrigger(char_data *actor, int dir);
 void load_vtrigger(vehicle_data *veh);
 int greet_vtrigger(char_data *actor, int dir);
-void random_vtrigger(vehicle_data *veh);
 void speech_vtrigger(char_data *actor, char *str);
 
 /* function prototypes from scripts.c */
