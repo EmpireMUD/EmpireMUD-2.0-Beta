@@ -816,10 +816,11 @@ int get_reputation_value(char_data *ch, any_vnum vnum) {
 * @param char_data *ch The player.
 * @param any_vnum faction Which faction.
 * @param int rep Any REP_ const.
+* @return bool TRUE if it's high enough.
 */
 bool has_reputation(char_data *ch, any_vnum faction, int rep) {
 	struct player_faction_data *pfd = get_reputation(ch, faction, FALSE);
-	return (rep_const_to_index(pfd->rep) >= rep_const_to_index(rep));
+	return pfd ? (rep_const_to_index(pfd->rep) >= rep_const_to_index(rep)) : FALSE;
 }
 
 
