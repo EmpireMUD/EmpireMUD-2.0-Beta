@@ -144,6 +144,7 @@ Basic buildings:
   {UU} utilityshed -- store tools
   |__| quarry -- must be on flat land facing a mountain
   &y|__|&0 claypit -- must be on flat land facing water
+  ..x. familygrave -- used as a respawn point (city only)
 
 For more information on building your first house, see HELP HOUSING GUIDE.
 
