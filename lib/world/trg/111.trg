@@ -194,7 +194,7 @@ while %ch%
     set this_loop_correct 0
     if %rock_left%
       if %ch.varexists(lean_right)%
-        if %ch_lean_right%
+        if %ch.lean_right%
           set this_loop_correct 1
         end
       end
@@ -315,6 +315,7 @@ while %ch%
     if %opening_left%
       if %ch.varexists(lean_left)%
         if %ch.lean_left%
+          set this_loop_correct 1
         end
       end
     else
