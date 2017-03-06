@@ -290,6 +290,15 @@ A spiderling crawls over its master.
 ~
 1 1 bdoD n
 0 0 8 9
+M
+0
+$n skitters around playfully.~
+M
+0
+$n attempts to crawl up your leg.~
+M
+0
+$n hisses quietly to $mself.~
 T 9901
 T 9902
 S
@@ -300,9 +309,23 @@ Nynar the goblin stands here, looking into his boot ('buy potion').
 ~
 25 25 d cn
 1 0 0 15
+M
+1
+So much webs... So much webs...~
+M
+0
+$n shivers uncomfortably.~
+M
+1
+Nynar sell bug potion for 30 coin! (type 'buy potion')~
+M
+0
+$n scratches $mself all over.~
+M
+1
+Never going back there.~
 T 10756
-T 10753
-T 10754
+T 10752
 S
 #10755
 meena miner goblin~
@@ -311,9 +334,23 @@ Meena the goblin is sitting here, filing her pick ('buy pick').
 ~
 25 25 d cn
 2 0 0 15
+M
+1
+All of the screaming!~
+M
+0
+$n shivers uncomfortably.~
+M
+1
+Meena sell goblin pick for 50 coin! (type 'buy pick')~
+M
+0
+$n leaps up suddenly, as if something crawled up her leg.~
+M
+1
+Meena should have been a major.~
 T 10756
 T 10752
-T 10755
 S
 #10756
 goblin webbed goblin-shaped cocoon~
@@ -328,5 +365,52 @@ I 4 10756 4.17 1 a  # LOOT: a rusty goblin ring
 I 4 10757 4.17 1 a  # LOOT: a rusty goblin idol
 I 4 10758 4.17 1 a  # LOOT: a rusty goblin helmet
 I 4 10759 4.17 1 a  # LOOT: a rusty flask
+S
+#10757
+Blacklung, goblin foreman~
+Blacklung, Goblin Foreman~
+The goblin foreman is looking around nervously ('buy coffin').
+~
+25 25 d cn
+1 0 0 15
+M
+1
+Coffin for sale! 50 coin! (type 'buy coffin')~
+M
+1
+Much spiders!~
+M
+0
+$n coughs into $s fist.~
+M
+0
+$n bends over and starts coughing.~
+M
+0
+$n coughs so hard a lump of coal comes out.~
+T 10756
+T 10752
+S
+#10758
+Hanx miner~
+Miner Hanx~
+Miner Hanx runs past you ('buy raft').
+~
+25 25 d cn
+1 0 0 15
+M
+1
+Goblin selling spare raft, 50 coin! (type 'buy raft')~
+M
+1
+Must find a way off this island!~
+M
+0
+$n looks back toward the mine and shouts, 'Wiiiiilsooooooon!'~
+M
+0
+$n ties some sticks together with an old piece of twine.~
+T 10756
+T 10752
 S
 $

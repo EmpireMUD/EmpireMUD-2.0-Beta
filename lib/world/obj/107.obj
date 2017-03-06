@@ -907,4 +907,28 @@ It seems you have completed the adventure.
 10 4
 T 10769
 S
+#10770
+coffin goblin~
+a goblin coffin~
+A goblin coffin is lying here.~
+   You can use this to 'build coffin', and then set it as your tomb in order to
+have a nearby respawn point when you die.
+~
+3 g a 5
+0 0 0
+0 0
+T 10770
+S
+#10771
+coffin goblin decaying~
+a goblin coffin~
+A decaying coffin is sticking up from the gravesite.~
+   The coffin looks small and cramped, but you might be able to fit a human in
+it. It's in poor condition and doesn't look like it will last very long
+~
+3 0 0 6
+0 0 0
+0 288
+T 10771
+S
 $
