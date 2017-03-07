@@ -680,7 +680,7 @@ done
 ~
 #10925
 Dragonslayer Statue~
-2 b 50
+2 bw 15
 ~
 switch %random.4%
   case 1

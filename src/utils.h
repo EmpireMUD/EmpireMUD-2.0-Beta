@@ -1426,12 +1426,14 @@ extern sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector
 
 // misc functions from utils.c
 extern unsigned long long microtime(void);
+extern bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag);
 
 // utils from act.action.c
 void cancel_action(char_data *ch);
 void start_action(char_data *ch, int type, int timer);
 
 // utils from act.empire.c
+extern bool check_in_city_requirement(room_data *room, bool check_wait);
 extern bool is_in_city_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *too_soon);
 
 // utils from act.informative.c

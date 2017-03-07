@@ -35,6 +35,7 @@ extern const char *trig_attach_types[];
 
 
 // external funcs
+void extract_trigger(trig_data *trig);
 void trig_data_init(trig_data *this_data);
 
 
@@ -140,8 +141,6 @@ char *list_one_trigger(trig_data *trig, bool detail) {
 * @return bool TRUE if any were removed; FALSE otherwise.
 */
 bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum) {
-	void extract_trigger(trig_data *trig);
-	
 	struct trig_data *trig, *next_trig, *temp;
 	bool found = FALSE;
 	
@@ -548,11 +547,13 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 	extern struct cmdlist_element *compile_command_list(char *input);
 	void free_varlist(struct trig_var_data *vd);
 	
-	trig_data *proto, *live_trig, *trig = GET_OLC_TRIGGER(desc);
+	trig_data *proto, *live_trig, *next_trig, *find, *trig = GET_OLC_TRIGGER(desc);
 	trig_vnum vnum = GET_OLC_VNUM(desc);
 	struct cmdlist_element *cmd, *next_cmd;
+	struct script_data *sc;
 	bool free_text = FALSE;
 	UT_hash_handle hh;
+	int pos;
 	
 	// have a place to save it?
 	if (!(proto = real_trigger(vnum))) {
@@ -594,41 +595,34 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 	trig_data_copy(proto, trig);
 	proto->hh = hh;
 	proto->vnum = vnum;	// ensure correct vnu,
-
-	// go through the mud and replace existing triggers
-	for (live_trig = trigger_list; live_trig; live_trig = live_trig->next_in_world) {
-		if (GET_TRIG_VNUM(live_trig) == vnum) {
-			if (live_trig->arglist) {
-				free(live_trig->arglist);
-				live_trig->arglist = NULL;
+	
+	// remove and reattach existing copies of this trigger
+	LL_FOREACH_SAFE2(trigger_list, live_trig, next_trig, next_in_world) {
+		if (GET_TRIG_VNUM(live_trig) != vnum) {
+			continue;	// wrong trigger
+		}
+		if (!(sc = live_trig->attached_to)) {
+			continue;	// can't get attachment data for some reason
+		}
+		
+		// determin position
+		pos = 0;
+		LL_FOREACH(TRIGGERS(sc), find) {
+			if (find == trig) {
+				break;
 			}
-			if (live_trig->name) {
-				free(live_trig->name);
-				live_trig->name = NULL;
+			else {
+				++pos;
 			}
-
-			if (proto->arglist)
-				live_trig->arglist = strdup(proto->arglist);
-			if (proto->name)
-				live_trig->name = strdup(proto->name);
-
-			// anything could have happened so we don't want to keep these
-			if (GET_TRIG_WAIT(live_trig)) {
-				event_cancel(GET_TRIG_WAIT(live_trig));
-				GET_TRIG_WAIT(live_trig)=NULL;
-			}
-			if (live_trig->var_list) {
-				free_varlist(live_trig->var_list);
-				live_trig->var_list=NULL;
-			}
-
-			live_trig->cmdlist = proto->cmdlist;
-			live_trig->curr_state = live_trig->cmdlist;
-			live_trig->trigger_type = proto->trigger_type;
-			live_trig->attach_type = proto->attach_type;
-			live_trig->narg = proto->narg;
-			live_trig->data_type = proto->data_type;
-			live_trig->depth = 0;
+		}
+		
+		// un-attach and free
+		LL_DELETE(TRIGGERS(sc), live_trig);
+		extract_trigger(live_trig);
+		
+		// load and re-attach
+		if ((live_trig = read_trigger(vnum))) {
+			add_trigger(sc, live_trig, pos);
 		}
 	}
 	

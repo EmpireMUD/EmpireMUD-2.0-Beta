@@ -1,0 +1,36 @@
+#18450
+beaverportal portal~
+the beaver portal~
+A beaver portal is here.~
+You shouldn't be seeing this.
+~
+8 0 a 1
+-1 0 0
+10 0
+S
+#18452
+whistle beaver~
+a beaver whistle~
+A beaver whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 4
+18452 0 0
+2 0
+T 9900
+S
+#18453
+stick gnawed gnarled walking~
+a gnawed walking stick~
+A gnawed and gnarled stick has been left here.~
+   This stick has been badly chewed by a beaver, but is still fairly long,
+straight and sturdy. It would make a good walking stick.  
+~
+3 mp ao 3
+0 0 0
+0 0
+A
+6 1 0
+S
+$

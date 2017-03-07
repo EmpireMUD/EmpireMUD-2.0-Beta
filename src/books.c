@@ -725,6 +725,9 @@ ACMD(do_library) {
 		else if (IS_SET(library_command[pos].flags, LIBR_REQ_LIBRARY) && !HAS_FUNCTION(IN_ROOM(ch), FNC_LIBRARY)) {
 			msg_to_char(ch, "You must be inside a library to do this.\r\n");
 		}
+		else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+			msg_to_char(ch, "This building must be in a city to use it.\r\n");
+		}
 		else if (IS_SET(library_command[pos].flags, LIBR_REQ_LIBRARY) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 			msg_to_char(ch, "You don't have permission to use this library.\r\n");
 		}

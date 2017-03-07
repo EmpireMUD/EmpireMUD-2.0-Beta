@@ -344,11 +344,13 @@ struct {
 // secret implementor-only util for quick changes -- util tool
 ADMIN_UTIL(util_tool) {
 	// msg_to_char(ch, "Ok.\r\n");
-	craft_data *craft, *next_craft;
+	trig_data *trig, *next_trig;
 	
-	HASH_ITER(hh, craft_table, craft, next_craft) {
-		if (GET_CRAFT_ABILITY(craft) == NOTHING) {
-			msg_to_char(ch, "[%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trig->attach_type == WLD_TRIGGER || trig->attach_type == RMT_TRIGGER || trig->attach_type == BLD_TRIGGER || trig->attach_type == ADV_TRIGGER) {
+			if (IS_SET(GET_TRIG_TYPE(trig), WTRIG_RANDOM)) {
+				msg_to_char(ch, "[%5d] %s\r\n", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+			}
 		}
 	}
 }
@@ -3961,7 +3963,7 @@ void do_stat_room(char_data *ch) {
 		msg_to_char(ch, "Burning: %d, Damage: %d/%d\r\n", BUILDING_BURNING(home), (int) BUILDING_DAMAGE(home), GET_BUILDING(home) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) : 0);
 	}
 
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || HAS_FUNCTION(IN_ROOM(ch), FNC_MINE)) {
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE)) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) <= 0 || !(glb = global_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM))) || GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
 			msg_to_char(ch, "This area is unmined.\r\n");
 		}

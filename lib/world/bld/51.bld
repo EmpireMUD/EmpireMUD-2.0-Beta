@@ -1363,7 +1363,7 @@ S
 Guard Tower~
 A Guard Tower~
 @U&0TT@V~
-16 0 bpR 0
+16 0 blpR 0
 0 0 0 -1
 C
 upgrade~
@@ -1389,7 +1389,7 @@ S
 Advanced Guard Tower~
 An Advanced Guard Tower~
 &0'TT'~
-24 0 bpRU 0
+24 0 blpRU 0
 0 0 0 -1
 C
 upgrade~
@@ -1415,7 +1415,7 @@ S
 Superior Guard Tower~
 A Superior Guard Tower~
 &0"TT"~
-64 0 bRU 0
+64 0 blRU 0
 0 0 0 -1
 D
    This is a well-constructed guard tower. It is tall, allowing it to see
@@ -1866,5 +1866,28 @@ R
 16 1 1 0
 R
 19 1 1 0
+S
+#5194
+Family Gravesite~
+A Family Gravesite~
+..&0x&?.~
+10 0 dilp 0
+0 0 0 -1
+C
+tomb~
+F
+B
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9191 2.00 0
+M
+9198 2.00 0
+M
+9199 2.00 0
+R
+2 1 5 0
 S
 $

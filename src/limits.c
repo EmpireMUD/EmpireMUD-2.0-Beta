@@ -400,7 +400,7 @@ void point_update_char(char_data *ch) {
 	}
 	
 	// check spawned
-	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && (!MOB_FLAGGED(ch, MOB_ANIMAL) || !HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE)) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN)) {
+	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && (!MOB_FLAGGED(ch, MOB_ANIMAL) || !room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE)) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN)) {
 		if (!GET_LED_BY(ch) && !GET_LEADING_MOB(ch) && !GET_LEADING_VEHICLE(ch) && !MOB_FLAGGED(ch, MOB_TIED)) {
 			if (distance_to_nearest_player(IN_ROOM(ch)) > config_get_int("mob_despawn_radius")) {
 				despawn_mob(ch);
@@ -2002,7 +2002,7 @@ int health_gain(char_data *ch, bool info_only) {
 		}
 		
 		if (GET_POS(ch) == POS_SLEEPING) {
-			min = round((double) GET_MAX_HEALTH(ch) / ((double) config_get_int("max_sleeping_regen_time") / (HAS_FUNCTION(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			min = round((double) GET_MAX_HEALTH(ch) / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 		
@@ -2058,7 +2058,7 @@ int mana_gain(char_data *ch, bool info_only) {
 		}
 		
 		if (GET_POS(ch) == POS_SLEEPING) {
-			min = round((double) GET_MAX_MANA(ch) / ((double) config_get_int("max_sleeping_regen_time") / (HAS_FUNCTION(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			min = round((double) GET_MAX_MANA(ch) / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 		
@@ -2110,7 +2110,7 @@ int move_gain(char_data *ch, bool info_only) {
 		}
 		
 		if (GET_POS(ch) == POS_SLEEPING) {
-			min = round((double) GET_MAX_MOVE(ch) / ((double) config_get_int("max_sleeping_regen_time") / (HAS_FUNCTION(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			min = round((double) GET_MAX_MOVE(ch) / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 

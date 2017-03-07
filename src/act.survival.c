@@ -431,6 +431,10 @@ void do_mount_swap(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can only swap mounts in a stable unless you have the Stablemaster ability.\r\n");
 		return;
 	}
+	if (!has_ability(ch, ABIL_STABLEMASTER) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to swap mounts here.\r\n");
+		return;
+	}
 	if (!has_ability(ch, ABIL_STABLEMASTER) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to mount anything here!\r\n");
 		return;

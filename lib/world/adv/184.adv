@@ -1,0 +1,22 @@
+#18450
+That Dammed River~
+Yvain~
+   Beavers have built a dam here and the rising river is causing floods! 
+Killing their leader or destroying the lodge should drive them away, stopping
+the flooding. You can use Chant of Nature to restore flooded tiles and Siege
+Ritual to demolish dam tiles, but they will eventually return to normal on
+their own.  
+~
+18450 18459 25-75
+5 0 dg 0
+L
+4 0
+18450 18450 18450
+-1 f f
+L
+5 0
+10080 -1 -1
+-1 0 0
+T 18452
+S
+$

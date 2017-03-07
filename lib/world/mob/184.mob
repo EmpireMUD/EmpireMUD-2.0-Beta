@@ -1,0 +1,34 @@
+#18450
+beaver dire~
+a dire beaver~
+A dire beaver is building a huge dam here.
+~
+25 75 djy cm
+0 0 0 9
+I 4 18452 5.00 1  # LOOT: a beaver whistle
+I 4 18453 100.00 1 x  # LOOT: a gnawed walking stick
+T 18451
+T 18453
+T 18454
+S
+#18451
+water rising~
+the rising water~
+The water is rising here.
+~
+0 0 dh dklmn
+0 0 0 15
+T 18450
+T 18451
+S
+#18452
+kit beaver~
+a beaver kit~
+A beaver kit is gnawing on a twig.
+~
+1 1 bdoD n
+0 0 0 9
+T 9901
+T 9902
+S
+$

@@ -654,20 +654,84 @@ nop %actor.give_coins(5)%
 %purge% %self%
 ~
 #10752
-Buy Pick/Meena~
+Goblin Mine Shops~
 0 c 0
 buy~
 eval vnum -1
 set named a thing
+set nynar_is_here 0
+set meena_is_here 0
+set blacklung_is_here 0
+set hanx_is_here 0
+eval room %self.room%
+eval person %room.people%
+while %person%
+  if %person.vnum% == 10754
+    set nynar_is_here 1
+  elseif %person.vnum% == 10755
+    set meena_is_here 1
+  elseif %person.vnum% == 10757
+    set blacklung_is_here 1
+  elseif %person.vnum% == 10758
+    set hanx_is_here 1
+  end
+  eval person %person.next_in_room%
+done
 if (!%arg%)
-  %send% %actor% %self.name% tells you, 'Meena only sell pick.'
-  %send% %actor% (Type 'buy pick' to spend 50 coins and buy a goblin pick.)
+  %send% %actor% %self.name% tells you, 'What you want?'
+  %send% %actor% (Type 'buy <item>' to spend 50 coins and buy something.)
+  if %meena_is_here%
+    %send% %actor% Meena sells: a goblin pick ('buy pick')
+  end
+  if %nynar_is_here%
+    %send% %actor% Nynar sells: a bug potion ('buy bug potion')
+  end
+  if %blacklung_is_here%
+    %send% %actor% Blacklung sells: a goblin coffin ('buy coffin')
+  end
+  if %hanx_is_here%
+    %send% %actor% Hanx sells: a goblin raft ('buy raft')
+  end
   halt
 elseif pick ~= %arg%
-  eval vnum 10768
-  set named a goblin pick
+  if !%meena_is_here%
+    %send% %actor% %self.name% tells you, 'Meena sell that. She not here.'
+    return 1
+    halt
+  else
+    eval vnum 10768
+    set named a goblin pick
+  end
+elseif bug potion ~= %arg%
+  if !%nynar_is_here%
+    %send% %actor% %self.name% tells you, 'Nynar sell that. He not here.'
+    return 1
+    halt
+  else
+    eval vnum 10754
+    set named a bug potion
+  end
+elseif coffin ~= %arg%
+  if !%blacklung_is_here%
+    %send% %actor% %self.name% tells you, 'Blacklung sell that. He not here.'
+    return 1
+    halt
+  else
+    eval vnum 10770
+    set named a goblin coffin
+  end
+elseif raft ~= %arg%
+  if !%hanx_is_here%
+    %send% %actor% %self.name% tells you, 'Hanx sell that. He not here.'
+    return 1
+    halt
+  else
+    eval vnum 10771
+    set named a goblin raft
+    eval is_veh 1
+  end
 else
-  %send% %actor% %self.name% tells you, 'Meena don't sell %arg%.'
+  %send% %actor% %self.name% tells you, 'Goblin don't sell %arg%.'
   halt
 end
 if !%actor.can_afford(50)%
@@ -675,7 +739,16 @@ if !%actor.can_afford(50)%
   halt
 end
 nop %actor.charge_coins(50)%
-%load% obj %vnum% %actor% inv 25
+if !%is_veh%
+  %load% obj %vnum% %actor% inv 25
+else
+  %load% veh %vnum% 25
+  eval emp %actor.empire%
+  eval veh %room.vehicles%
+  if %emp%
+    %own% veh %veh% %emp%
+  end
+end
 %send% %actor% You buy %named% for 50 coins.
 %echoaround% %actor% %actor.name% buys %named%.
 ~
@@ -709,6 +782,7 @@ nop %actor.charge_coins(30)%
 Nynar env~
 0 bw 10
 ~
+* NO LONGER USED -- replaced by mob custom msgs
 switch %random.4%
   case 1
     say So much webs... So much webs...
@@ -730,6 +804,7 @@ done
 Meena env~
 0 bw 10
 ~
+* NO LONGER USED - replaced by mob custom messages
 switch %random.4%
   case 1
     say All of the screaming!
@@ -777,10 +852,127 @@ Widow Spider Complete~
 %load% obj 10769
 return 0
 ~
+#10758
+Buy Coffin/Blacklung~
+0 c 0
+buy~
+eval vnum -1
+set named a thing
+if (!%arg%)
+  %send% %actor% %self.name% tells you, 'Blacklung only sell coffin.'
+  %send% %actor% (Type 'buy coffin' to spend 50 coins and buy a goblin coffin.)
+  halt
+elseif coffin ~= %arg%
+  eval vnum 10770
+  set named a goblin coffin
+else
+  %send% %actor% %self.name% tells you, 'Blacklung don't sell %arg%.'
+  halt
+end
+if !%actor.can_afford(50)%
+  %send% %actor% %self.name% tells you, 'Big human needs 50 coin to buy that.'
+  halt
+end
+nop %actor.charge_coins(50)%
+%load% obj %vnum% %actor% inv 25
+%send% %actor% You buy %named% for 50 coins.
+%echoaround% %actor% %actor.name% buys %named%.
+~
+#10759
+Buy Raft/Hanx~
+0 c 0
+buy~
+eval vnum -1
+set named a thing
+if (!%arg%)
+  %send% %actor% %self.name% tells you, 'Hanx only sell raft.'
+  %send% %actor% (Type 'buy raft' to spend 50 coins and buy a goblin raft.)
+  halt
+elseif raft ~= %arg%
+  eval vnum 10771
+  set named a goblin raft
+else
+  %send% %actor% %self.name% tells you, 'Hanx don't sell %arg%.'
+  halt
+end
+if !%actor.can_afford(50)%
+  %send% %actor% %self.name% tells you, 'Big human needs 50 coin to buy that.'
+  halt
+end
+nop %actor.charge_coins(50)%
+%load% veh %vnum% 25
+eval emp %actor.empire%
+eval veh %room.vehicles%
+if %emp%
+  %own% %veh% %emp%
+end
+%send% %actor% You buy %named% for 50 coins.
+%echoaround% %actor% %actor.name% buys %named%.
+~
 #10769
 Delayed Completer~
 1 f 0
 ~
 %adventurecomplete%
+~
+#10770
+Instant tomb cooldown~
+1 s 100
+~
+if %command% != build
+  halt
+end
+eval varname tomb%self.vnum%
+* once per 5 minutes
+eval test %%actor.varexists(%varname%)%%
+if %test%
+  eval var %%actor.%varname%%%
+  if (%timestamp% - %var%) < 21600
+    eval diff (%var% - %timestamp%) + 21600
+    eval diff2 %diff%/60
+    eval diff %diff%//60
+    eval diff3 %diff2%/60
+    eval diff2 %diff2% // 60
+    if %diff%<10
+      set diff 0%diff%
+    end
+    if %diff3% == 0
+      %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc% again.
+    else
+      if %diff2% < 10
+        set diff2 0%diff2%
+      end
+      %send% %actor% You must wait %diff3%:%diff2%:%diff% to use %self.shortdesc% again.
+    end
+    return 0
+    halt
+  end
+end
+eval %varname% %timestamp%
+remote %varname% %actor.id%
+return 1
+~
+#10771
+Goblin gravesite decay timer~
+1 f 0
+~
+eval room %self.room%
+if %room.building% == Goblin Gravesite
+  %build% %room% demolish
+end
+~
+#10772
+Goblin gravesite setup timer~
+2 o 100
+~
+eval obj %room.contents%
+while %obj%
+  eval next %obj.next_in_list%
+  if %obj.vnum% == 10771
+    %purge% %obj%
+  end
+  eval obj %next%
+done
+%load% obj 10771
 ~
 $

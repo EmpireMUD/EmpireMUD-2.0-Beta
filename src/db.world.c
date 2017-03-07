@@ -901,7 +901,7 @@ void update_world(void) {
 			}
 			
 			// type-specific updates
-			if (HAS_FUNCTION(iter, FNC_TAVERN) && IS_COMPLETE(iter)) {
+			if (room_has_function_and_city_ok(iter, FNC_TAVERN)) {
 				update_tavern(iter);
 			}
 			if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && get_room_extra_data(iter, ROOM_EXTRA_SEED_TIME)) {
@@ -1392,7 +1392,7 @@ void reset_one_room(room_data *room) {
 			case 'T': {	// trigger attach
 				if (reset->arg1 == MOB_TRIGGER && tmob) {
 					if (!SCRIPT(tmob)) {
-						CREATE(SCRIPT(tmob), struct script_data, 1);
+						create_script_data(tmob, MOB_TRIGGER);
 					}
 					if ((trig = read_trigger(reset->arg2))) {
 						add_trigger(SCRIPT(tmob), trig, -1);
@@ -1400,7 +1400,7 @@ void reset_one_room(room_data *room) {
 				}
 				else if (reset->arg1 == WLD_TRIGGER) {
 					if (!room->script) {
-						CREATE(room->script, struct script_data, 1);
+						create_script_data(room, WLD_TRIGGER);
 					}
 					if ((trig = read_trigger(reset->arg2))) {
 						add_trigger(room->script, trig, -1);
@@ -1646,6 +1646,8 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	if ((island = GET_ISLAND_ID(room)) == NO_ISLAND) {
 		return;
 	}
+	
+	// WARNING: do not check in-city status on these ... it can change at a time when territory is not re-scanned
 	
 	if (HAS_FUNCTION(room, FNC_APIARY)) {
 		EMPIRE_TECH(emp, TECH_APIARIES) += amt;

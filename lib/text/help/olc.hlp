@@ -547,6 +547,7 @@ The following adventure flags are available:
  !NEWBIE - Will not spawn on newbie islands.
  NEWBIE-ONLY - Only spawns on newbie islands.
  NO-MOB-CLEANUP - Won't despawn mobs that got out of the instance on cleanup.
+ EMPTY-RESET-ONLY - Won't reset while players are inside.
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
@@ -1254,6 +1255,7 @@ Available flags:
  !RUINS - building leaves no ruins when it decays
  !NPC - mobs won't enter this building
  BARRIER - can only go back the way you came, unless flying
+ IN-CITY-ONLY - can only be used if in an established city
  LARGE-CITY-RADIUS - counts as in-city much further away than normal
  ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
  BURNABLE - will catch fire if a fire is placed inside by a hostile empire

@@ -3731,7 +3731,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	// copy only existing scripts
 	if (SCRIPT(input)) {
 		if (!SCRIPT(obj)) {
-			CREATE(SCRIPT(obj), struct script_data, 1);
+			create_script_data(obj, OBJ_TRIGGER);
 		}
 
 		for (trig = TRIGGERS(SCRIPT(input)); trig; trig = trig->next) {
@@ -6373,10 +6373,10 @@ struct empire_unique_storage *find_eus_entry(obj_data *obj, empire_data *emp, ro
 		if (location && GET_ISLAND_ID(location) != iter->island) {
 			continue;
 		}
-		if (location && HAS_FUNCTION(location, FNC_VAULT) && !IS_SET(iter->flags, EUS_VAULT)) {
+		if (location && room_has_function_and_city_ok(location, FNC_VAULT) && !IS_SET(iter->flags, EUS_VAULT)) {
 			continue;
 		}
-		if (location && !HAS_FUNCTION(location, FNC_VAULT) && IS_SET(iter->flags, EUS_VAULT)) {
+		if (location && !room_has_function_and_city_ok(location, FNC_VAULT) && IS_SET(iter->flags, EUS_VAULT)) {
 			continue;
 		}
 		
@@ -6462,7 +6462,7 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 		if (eus->island == NO_ISLAND) {
 			eus->island = get_main_island(emp);
 		}
-		if (room && HAS_FUNCTION(room, FNC_VAULT)) {
+		if (room && room_has_function_and_city_ok(room, FNC_VAULT)) {
 			eus->flags = EUS_VAULT;
 		}
 			

@@ -369,7 +369,7 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// ADVENTURE DEFINES ///////////////////////////////////////////////////////
 
-// adventure flags
+// ADV_x: adventure flags
 #define ADV_IN_DEVELOPMENT  BIT(0)	// will not generate instances
 #define ADV_LOCK_LEVEL_ON_ENTER  BIT(1)	// lock levels on entry
 #define ADV_LOCK_LEVEL_ON_COMBAT  BIT(2)	// lock levels when combat starts
@@ -379,6 +379,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_NO_NEWBIE  BIT(6)	// prevents spawning on newbie islands
 #define ADV_NEWBIE_ONLY  BIT(7)	// only spawns on newbie islands
 #define ADV_NO_MOB_CLEANUP  BIT(8)	// won't despawn mobs that escaped the instance
+#define ADV_EMPTY_RESET_ONLY  BIT(9)	// won't reset while players are inside
 
 
 // adventure link rule types
@@ -475,7 +476,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_NO_RUINS  BIT(8)	// building leaves no corpse
 #define BLD_NO_NPC  BIT(9)	// mobs won't walk in
 #define BLD_BARRIER  BIT(10)	// can only go back the direction you came
-// #define BLD_UNUSED2  BIT(11)
+#define BLD_IN_CITY_ONLY  BIT(11)	// can only be used in-city
 #define BLD_LARGE_CITY_RADIUS  BIT(12)	// counts as in-city further than normal
 // #define BLD_UNUSED3  BIT(13)
 #define BLD_ATTACH_ROAD  BIT(14)	// building connects to roads on the map
@@ -754,6 +755,8 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_SHIPYARD  BIT(14)	// requires a shipyard
 #define CRAFT_BLD_UPGRADED  BIT(15)	// requires a building with the upgraded flag
 
+// list of above craft flags that require a building in some way
+#define CRAFT_FLAGS_REQUIRING_BUILDINGS  (CRAFT_GLASSBLOWER | CRAFT_CARPENTER | CRAFT_ALCHEMY | CRAFT_SHIPYARD)
 
 // For find_building_list_entry
 #define FIND_BUILD_NORMAL  0
@@ -2431,7 +2434,7 @@ struct adventure_data {
 	int min_level, max_level;	// level range
 	int max_instances;	// total number possible in world
 	int reset_time;	// how often to reset things (minutes)
-	bitvector_t flags;	// ADV_x
+	bitvector_t flags;	// ADV_ flags
 	int player_limit;	// maximum number of players at a time (if over 0)
 	
 	// lists

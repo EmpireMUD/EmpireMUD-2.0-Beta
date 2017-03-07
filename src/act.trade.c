@@ -119,6 +119,9 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_ALCHEMY) && !HAS_FUNCTION(IN_ROOM(ch), FNC_ALCHEMIST) && !has_tech_available(ch, TECH_GLASSBLOWING)) {
 		// sends its own messages -- needs glassblowing unless in alchemist room
 	}
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_FLAGS_REQUIRING_BUILDINGS) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it.\r\n");
+	}
 	// end flag checks
 	
 	else {
@@ -142,6 +145,9 @@ bool can_forge(char_data *ch) {
 	
 	if (!IS_IMMORTAL(ch) && (!HAS_FUNCTION(IN_ROOM(ch), FNC_FORGE) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need to be in a forge to do that.\r\n");
+	}
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
 	else if (!has_hammer(ch)) {
 		// sends own message
@@ -951,7 +957,7 @@ void process_gen_craft(char_data *ch) {
 		}
 		
 		// tailor bonus for weave
-		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && HAS_FUNCTION(IN_ROOM(ch), FNC_TAILOR) && IS_COMPLETE(IN_ROOM(ch))) {
+		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAILOR) && IS_COMPLETE(IN_ROOM(ch))) {
 			GET_ACTION_TIMER(ch) -= 3;
 		}
 
@@ -1008,6 +1014,9 @@ bool can_refashion(char_data *ch) {
 	
 	if (!IS_IMMORTAL(ch) && !HAS_FUNCTION(IN_ROOM(ch), FNC_TAILOR)) {
 		msg_to_char(ch, "You need to be at the tailor to do that.\r\n");
+	}
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
 	else {
 		ok = TRUE;
@@ -1316,7 +1325,7 @@ ACMD(do_gen_craft) {
 	craft_data *craft, *next_craft, *type = NULL, *find_type = NULL, *abbrev_match = NULL;
 	vehicle_data *veh;
 	bool is_master;
-	obj_data *drinkcon = NULL;
+	obj_data *found_obj = NULL, *drinkcon = NULL;
 	ability_data *cft_abil;
 	
 	if (IS_NPC(ch)) {
@@ -1431,7 +1440,7 @@ ACMD(do_gen_craft) {
 	else if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
 		msg_to_char(ch, "You need to have a crafting level of %d to %s that.\r\n", GET_CRAFT_MIN_LEVEL(type), gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
-	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(type), ch->carrying)) {
+	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && !(found_obj = get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(type), ch->carrying))) {
 		msg_to_char(ch, "You need %s to make that.\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(type)));
 	}
 	else if (!check_can_craft(ch, type)) {
@@ -1451,6 +1460,9 @@ ACMD(do_gen_craft) {
 		// this sends its own message ("You need X more of ...")
 		//msg_to_char(ch, "You don't have the resources to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
+	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && found_obj && !consume_otrigger(found_obj, ch, OCMD_CRAFT)) {
+		return;	// trigger hopefully sent its own message
+	}
 	else {
 		cft_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(type));
 		is_master = (cft_abil && ABIL_MASTERY_ABIL(cft_abil) != NOTHING && has_ability(ch, ABIL_MASTERY_ABIL(cft_abil)));
@@ -1459,7 +1471,7 @@ ACMD(do_gen_craft) {
 		timer = GET_CRAFT_TIME(type);
 		
 		// potter building bonus	
-		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_POTTERY) && HAS_FUNCTION(IN_ROOM(ch), FNC_POTTER) && IS_COMPLETE(IN_ROOM(ch))) {
+		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_POTTERY) && room_has_function_and_city_ok(IN_ROOM(ch), FNC_POTTER) && IS_COMPLETE(IN_ROOM(ch))) {
 			timer /= 4;
 		}
 		

@@ -143,7 +143,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	}
 	
 	// wait wait don't work here
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK | ROOM_AFF_HAS_INSTANCE)) {
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK | ROOM_AFF_HAS_INSTANCE) || !check_in_city_requirement(room, TRUE)) {
 		return;
 	}
 	

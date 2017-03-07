@@ -1703,8 +1703,7 @@ void process_tower(room_data *room) {
 	char_data *ch, *found = NULL;
 	struct tower_victim_list *victim_list = NULL, *tvl;
 	int num_victs = 0, pick;
-	bool junk;
-
+	
 	// empire check
 	if (!(emp = ROOM_OWNER(room))) {
 		return;
@@ -1712,11 +1711,6 @@ void process_tower(room_data *room) {
 	
 	// building complete?
 	if (!IS_COMPLETE(room)) {
-		return;
-	}
-	
-	// building is in city?
-	if (!is_in_city_for_empire(room, emp, TRUE, &junk)) {
 		return;
 	}
 	
@@ -1784,7 +1778,7 @@ void update_guard_towers(void) {
 		for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
 			tower = ter->room;
 			
-			if (HAS_FUNCTION(tower, FNC_GUARD_TOWER) && IS_COMPLETE(tower)) {
+			if (room_has_function_and_city_ok(tower, FNC_GUARD_TOWER)) {
 				process_tower(tower);
 			}
 		}

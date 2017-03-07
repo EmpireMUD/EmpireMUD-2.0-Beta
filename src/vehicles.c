@@ -1253,7 +1253,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 				if (OBJ_FILE_TAG(line, "Trigger:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0]) && real_trigger(i_in[0])) {
 						if (!SCRIPT(veh)) {
-							CREATE(SCRIPT(veh), struct script_data, 1);
+							create_script_data(veh, VEH_TRIGGER);
 						}
 						add_trigger(SCRIPT(veh), read_trigger(i_in[0]), -1);
 					}
