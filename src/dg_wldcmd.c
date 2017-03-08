@@ -461,7 +461,7 @@ WCMD(do_wdoor) {
 				strcpy(newexit->keyword, value);
 				break;
 			case 3:  /* room        */
-				if ((to_room = real_room(atoi(value)))) {
+				if ((to_room = get_room(room, value))) {
 					if (!newexit) {
 						newexit = create_exit(rm, to_room, dir, FALSE);
 					}
