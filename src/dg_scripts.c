@@ -3850,15 +3850,24 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'v': {	// obj.v*
 					if (!str_cmp(field, "vnum"))
 						snprintf(str, slen, "%d", GET_OBJ_VNUM(o));
-					else if (!str_cmp(field, "val0"))
+					else if (!str_cmp(field, "val0")) {
+						if (subfield && is_number(subfield)) {
+							GET_OBJ_VAL(o, 0) = atoi(subfield);
+						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 0));
-
-					else if (!str_cmp(field, "val1"))
+					}
+					else if (!str_cmp(field, "val1")) {
+						if (subfield && is_number(subfield)) {
+							GET_OBJ_VAL(o, 1) = atoi(subfield);
+						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 1));
-
-					else if (!str_cmp(field, "val2"))
+					}
+					else if (!str_cmp(field, "val2")) {
+						if (subfield && is_number(subfield)) {
+							GET_OBJ_VAL(o, 2) = atoi(subfield);
+						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 2));
-
+					}
 					break;
 				}
 				case 'w': {	// obj.w*
