@@ -3279,6 +3279,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "morph")) {
 						snprintf(str, slen, "%d", IS_MORPHED(c) ? MORPH_VNUM(GET_MORPH(c)) : 0);
 					}
+					else if (!str_cmp(field, "movetype")) {
+						snprintf(str, slen, "%s", IS_NPC(c) ? mob_move_types[(int) MOB_MOVE_TYPE(c)] : (EFFECTIVELY_FLYING(c) ? "flies" : "walks"));
+					}
 				
 					break;
 				}

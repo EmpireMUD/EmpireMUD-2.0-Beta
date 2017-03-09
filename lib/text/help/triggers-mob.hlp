@@ -410,6 +410,7 @@ When using field  - The variable returns:
 &cmorph&0 - The vnum of the person's morph form (if morphed) or 0 if not morphed.
 &cmove&0 - The movement points of the actor.
 &cmove(amount)&0 - Add/subtract movement points on the actor.
+&cmovetype&0 - The "walks" verb for this mob/player.
 &cname&0 - The actor's name (the short description for mobs).
 &cnext_in_room&0 - The next actor in the room as a variable (id) nice to use
    for loops, or an empty return.
