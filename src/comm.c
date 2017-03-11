@@ -301,7 +301,7 @@ static void msdp_update(void) {
 	struct over_time_effect_type *dot;
 	char buf[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
-	char_data *ch, *pOpponent;
+	char_data *ch, *pOpponent, *focus;
 	struct affected_type *aff;
 	descriptor_data *d;
 	int hit_points, PlayerCount = 0;
@@ -449,9 +449,11 @@ static void msdp_update(void) {
 				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH_MAX, 100);
 				MSDPSetNumber(d, eMSDP_OPPONENT_LEVEL, get_approximate_level(pOpponent));
 				MSDPSetString(d, eMSDP_OPPONENT_NAME, PERS(pOpponent, ch, FALSE));
-				hit_points = (GET_HEALTH(FIGHTING(pOpponent)) * 100) / MAX(1,GET_MAX_HEALTH(FIGHTING(pOpponent)));
-				MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, hit_points);
-				MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 100);
+				if ((focus = FIGHTING(pOpponent))) {
+					hit_points = (GET_HEALTH(focus) * 100) / MAX(1,GET_MAX_HEALTH(focus));
+					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, hit_points);
+					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 100);
+				}
 			}
 			else { // Clear the values
 				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH, 0);
