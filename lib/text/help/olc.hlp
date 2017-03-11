@@ -1275,12 +1275,12 @@ Available flags:
 
 See also: BEDIT FUNCTIONS, INTERLINK, OLC BUILDINGS
 #d
-"BEDIT FUNCTIONS" "FUNCTION FLAGS"
+"BEDIT FUNCTIONS" "REDIT FUNCTIONS" "FUNCTION FLAGS"
 
 Usage:  .flags [add | remove] <flags>
 
 The function flags determine what chores, actions, and other tasks happen at
-that building.
+that building or room template.
 
 Available functions:
  ALCHEMIST - can brew and mix here
@@ -1317,7 +1317,7 @@ Available functions:
  DRINK-WATER - can get water here, like a well
  COOKING-FIRE - can cook, brew, and other tasks that require a fire
 
-See also: OLC BUILDINGS
+See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
 "BEDIT HITPOINTS"
 
