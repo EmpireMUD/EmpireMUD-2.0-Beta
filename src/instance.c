@@ -934,6 +934,7 @@ void delete_instance(struct instance_data *inst) {
 	void relocate_players(room_data *room, room_data *to_room);
 	
 	struct instance_mob *im, *next_im;
+	vehicle_data *veh, *next_veh;
 	struct instance_data *temp;
 	char_data *mob, *next_mob;
 	room_data *room;
@@ -948,6 +949,11 @@ void delete_instance(struct instance_data *inst) {
 		// remove any players inside
 		for (iter = 0; iter < inst->size; ++iter) {
 			if (inst->room[iter]) {
+				// get rid of vehicles first (helps relocate players inside)
+				LL_FOREACH_SAFE2(ROOM_VEHICLES(inst->room[iter]), veh, next_veh, next_in_room) {
+					extract_vehicle(veh);
+				}
+	
 				relocate_players(inst->room[iter], room);
 			}
 		}
