@@ -309,6 +309,7 @@ OLC_MODULE(rmedit_exit);
 OLC_MODULE(rmedit_extra_desc);
 OLC_MODULE(rmedit_interaction);
 OLC_MODULE(rmedit_flags);
+OLC_MODULE(rmedit_functions);
 OLC_MODULE(rmedit_matchexits);
 OLC_MODULE(rmedit_title);
 OLC_MODULE(rmedit_script);
@@ -736,6 +737,7 @@ const struct olc_command_data olc_data[] = {
 	{ "extra", rmedit_extra_desc, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "interaction", rmedit_interaction, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "flags", rmedit_flags, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
+	{ "functions", rmedit_functions, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "matchexits", rmedit_matchexits, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "title", rmedit_title, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "script", rmedit_script, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },

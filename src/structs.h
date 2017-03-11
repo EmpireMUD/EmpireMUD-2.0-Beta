@@ -2522,8 +2522,9 @@ struct room_template {
 	char *description;
 	
 	// numeric data
-	bitvector_t flags;	// RMT_x
+	bitvector_t flags;	// RMT_
 	bitvector_t base_affects;	// ROOM_AFF_
+	bitvector_t functions;	// FNC_
 	
 	// lists
 	struct adventure_spawn *spawns;	// list of objs/mobs
