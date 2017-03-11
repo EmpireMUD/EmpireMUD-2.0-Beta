@@ -449,11 +449,15 @@ static void msdp_update(void) {
 				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH_MAX, 100);
 				MSDPSetNumber(d, eMSDP_OPPONENT_LEVEL, get_approximate_level(pOpponent));
 				MSDPSetString(d, eMSDP_OPPONENT_NAME, PERS(pOpponent, ch, FALSE));
+				hit_points = (GET_HEALTH(FIGHTING(pOpponent)) * 100) / GET_MAX_HEALTH(FIGHTING(pOpponent));
+				MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, hit_points);
+				MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 100);
 			}
 			else { // Clear the values
 				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH, 0);
 				MSDPSetNumber(d, eMSDP_OPPONENT_LEVEL, 0);
 				MSDPSetString(d, eMSDP_OPPONENT_NAME, "");
+				MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, 0);
 			}
 			
 			MSDPSetNumber(d, eMSDP_WORLD_TIME, time_info.hours);
