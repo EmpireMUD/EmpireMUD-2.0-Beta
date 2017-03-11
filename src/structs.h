@@ -418,8 +418,8 @@ typedef struct vehicle_data vehicle_data;
 #define RMT_NO_TELEPORT  BIT(6)	// g. cannot teleport in/out
 #define RMT_LOOK_OUT  BIT(7)	// h. can see the map using "look out"
 #define RMT_NO_LOCATION  BIT(8)	// i. don't show a location, disables where
-#define RMT_PIGEON_POST  BIT(9)	// j. can use mail here
-#define RMT_COOKING_FIRE  BIT(10)	// k. can cook here
+	#define RMT_UNUSED1  BIT(9)
+	#define RMT_UNUSED2  BIT(10)
 
 
  //////////////////////////////////////////////////////////////////////////////

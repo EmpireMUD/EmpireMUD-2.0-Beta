@@ -205,7 +205,7 @@ ACMD(do_mail) {
 		}
 	}
 	else if (is_abbrev(arg, "send")) {
-		if (!IS_IMMORTAL(ch) && ((!HAS_FUNCTION(IN_ROOM(ch), FNC_MAIL) && !RMT_FLAGGED(IN_ROOM(ch), RMT_PIGEON_POST)) || !IS_COMPLETE(IN_ROOM(ch)))) {
+		if (!IS_IMMORTAL(ch) && (!HAS_FUNCTION(IN_ROOM(ch), FNC_MAIL) || !IS_COMPLETE(IN_ROOM(ch)))) {
 			msg_to_char(ch, "You can only send mail from a pigeon post.\r\n");
 		}
 		else if (!IS_IMMORTAL(ch) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
