@@ -424,13 +424,13 @@ void delete_room(room_data *room, bool check_exits) {
 		--VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(home));
 	}
 	
-	// get rid of players
-	relocate_players(room, NULL);
-	
 	// get rid of vehicles
 	LL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
 		extract_vehicle(veh);
 	}
+	
+	// get rid of players
+	relocate_players(room, NULL);
 	
 	// Remove remaining chars
 	for (c = ROOM_PEOPLE(room); c; c = next_c) {
