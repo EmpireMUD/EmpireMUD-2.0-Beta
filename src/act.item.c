@@ -255,6 +255,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern const char *wear_bits[];
 
 	struct obj_storage_type *store;
+	struct custom_message *ocm;
 	player_index_data *index;
 	struct obj_apply *apply;
 	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH];
@@ -447,6 +448,17 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 	if (*lbuf) {
 		msg_to_char(ch, "Modifiers: %s\r\n", lbuf);
+	}
+	
+	// some custom messages
+	LL_FOREACH(obj->custom_msgs, ocm) {
+		switch (ocm->type) {
+			case OBJ_CUSTOM_LONGDESC: {
+				sprintf(lbuf, "Gives long description: %s\r\n", ocm->msg);
+				act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
+				break;
+			}
+		}
 	}
 }
 
