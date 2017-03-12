@@ -759,6 +759,9 @@ EmpireMUD supports the following MSDP variables:
  OPPONENT_HEALTH_MAX - Always 100 (when in combat)
  OPPONENT_LEVEL - In combat, the opponent's level
  OPPONENT_NAME - In combat, the opponent's name
+ OPPONENT_FOCUS_NAME - In combat, the opponent's focus' name
+ OPPONENT_FOCUS_HEALTH - In combat, the opponent's focus' health
+ OPPONENT_FOCUS_HEALTH_MAX - In combat, the opponent's focus' max health
 
  AREA_NAME - The name of the adventure, city, or island the player is in
  ROOM - The room data array, see http://tintin.sourceforge.net/msdp/index.php
