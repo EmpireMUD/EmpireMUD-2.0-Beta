@@ -302,6 +302,7 @@ static void msdp_update(void) {
 	char buf[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
 	char_data *ch, *pOpponent, *focus;
+	bool is_ally;
 	struct affected_type *aff;
 	descriptor_data *d;
 	int hit_points, PlayerCount = 0;
@@ -450,16 +451,24 @@ static void msdp_update(void) {
 				MSDPSetNumber(d, eMSDP_OPPONENT_LEVEL, get_approximate_level(pOpponent));
 				MSDPSetString(d, eMSDP_OPPONENT_NAME, PERS(pOpponent, ch, FALSE));
 				if ((focus = FIGHTING(pOpponent))) {
-					hit_points = (GET_HEALTH(focus) * 100) / MAX(1,GET_MAX_HEALTH(focus));
+					is_ally = is_fight_ally(ch, iter);
+					hit_points = is_ally ? GET_HEALTH(focus) : (GET_HEALTH(focus) * 100) / MAX(1,GET_MAX_HEALTH(focus));
 					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, hit_points);
-					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 100);
+					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, is_ally ? GET_MAX_HEALTH(focus) : 100);
+					MSDPSetString(d, eMSDP_OPPONENT_FOCUS_NAME, PERS(focus, ch, FALSE));
+				} else {
+					MSDPSetString(d, eMSDP_OPPONENT_FOCUS_NAME, "");
+					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, 0);
+					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 0);
 				}
 			}
 			else { // Clear the values
 				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH, 0);
 				MSDPSetNumber(d, eMSDP_OPPONENT_LEVEL, 0);
 				MSDPSetString(d, eMSDP_OPPONENT_NAME, "");
+				MSDPSetString(d, eMSDP_OPPONENT_FOCUS_NAME, "");
 				MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, 0);
+				MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 0);
 			}
 			
 			MSDPSetNumber(d, eMSDP_WORLD_TIME, time_info.hours);
