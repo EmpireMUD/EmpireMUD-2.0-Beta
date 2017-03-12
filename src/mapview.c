@@ -1377,7 +1377,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		// west (@u) barrier attachment
 		if (strstr(buf, "@u") || strstr(buf, "@U")) {
 			if (!r_west || ((IS_BARRIER(r_west) || ROOM_IS_CLOSED(r_west)) && !ROOM_AFF_FLAGGED(r_west, ROOM_AFF_CHAMELEON))) {
-				enchanted = ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
+				enchanted = r_west && (ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY));
 				// west is a barrier
 				sprintf(buf1, "%sv", enchanted ? "&m" : "&0");
 				str = str_replace("@u", buf1, buf);
@@ -1403,7 +1403,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		//  east (@v) barrier attachment
 		if (strstr(buf, "@v") || strstr(buf, "@V")) {
 			if (!r_east || ((IS_BARRIER(r_east) || ROOM_IS_CLOSED(r_east)) && !ROOM_AFF_FLAGGED(r_east, ROOM_AFF_CHAMELEON))) {
-				enchanted = ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
+				enchanted = r_east && (ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY));
 				// east is a barrier
 				sprintf(buf1, "%sv", enchanted ? "&m" : "&0");
 				str = str_replace("@v", buf1, buf);
