@@ -454,7 +454,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	LL_FOREACH(obj->custom_msgs, ocm) {
 		switch (ocm->type) {
 			case OBJ_CUSTOM_LONGDESC: {
-				sprintf(lbuf, "Gives long description: %s\r\n", ocm->msg);
+				sprintf(lbuf, "Gives long description: %s", ocm->msg);
 				act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
 				break;
 			}
