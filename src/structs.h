@@ -1334,6 +1334,7 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_CUSTOM_WEAR_TO_ROOM  9
 #define OBJ_CUSTOM_REMOVE_TO_CHAR  10
 #define OBJ_CUSTOM_REMOVE_TO_ROOM  11
+#define OBJ_CUSTOM_LONGDESC  12
 
 
 // RES_x: resource requirement types

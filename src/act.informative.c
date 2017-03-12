@@ -670,7 +670,10 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	extern bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
 	extern bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
 	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
+	extern struct custom_message *pick_custom_message_from_eq(char_data *ch, int type);
 	extern struct action_data_struct action_data[];
+	
+	struct custom_message *ocm;
 	
 	// POS_x
 	const char *positions[] = {
@@ -743,48 +746,26 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		msg_to_char(ch, GET_LONG_DESC(i));
 	}
 	else {
-		if (IS_NPC(i)) {
-			strcpy(buf, PERS(i, ch, FALSE));
-			CAP(buf);
-		}
-		else {
-			if (AFF_FLAGGED(i, AFF_INVISIBLE))
-				strcpy(buf, "*");
-			else
-				*buf = '\0';
-
-			sprintf(buf1, PERS(i, ch, 0));
-			strcat(buf, CAP(buf1));
-
-			switch (GET_SEX(i)) {
-				case SEX_MALE:		strcpy(buf1, "man");	break;
-				case SEX_FEMALE:	strcpy(buf1, "woman");	break;
-				default:			strcpy(buf1, "person");	break;
-			}
-		}
-
-		if (AFF_FLAGGED(i, AFF_HIDE))
-			strcat(buf, " (hidden)");
-		if (!IS_NPC(i) && !i->desc)
-			strcat(buf, " (linkless)");
-		if (!IS_NPC(i) && PLR_FLAGGED(i, PLR_WRITING))
-			strcat(buf, " (writing)");
-
+		*buf = '\0';
+		
 		if (GET_POS(i) != POS_FIGHTING) {
 			if (GET_SITTING_ON(i)) {
-				sprintf(buf + strlen(buf), " is sitting %s %s%s%s.", IN_OR_ON(GET_SITTING_ON(i)), get_vehicle_short_desc(GET_SITTING_ON(i), ch), (VEH_ANIMALS(GET_SITTING_ON(i)) ? ", being pulled by " : ""), (VEH_ANIMALS(GET_SITTING_ON(i)) ? list_harnessed_mobs(GET_SITTING_ON(i)) : ""));
+				sprintf(buf, "$n is sitting %s %s%s%s.", IN_OR_ON(GET_SITTING_ON(i)), get_vehicle_short_desc(GET_SITTING_ON(i), ch), (VEH_ANIMALS(GET_SITTING_ON(i)) ? ", being pulled by " : ""), (VEH_ANIMALS(GET_SITTING_ON(i)) ? list_harnessed_mobs(GET_SITTING_ON(i)) : ""));
 			}
 			else if (!IS_NPC(i) && GET_ACTION(i) != ACT_NONE) {
-				sprintf(buf + strlen(buf), " %s", action_data[GET_ACTION(i)].long_desc);
+				sprintf(buf, "$n %s", action_data[GET_ACTION(i)].long_desc);
 			}
 			else if (AFF_FLAGGED(i, AFF_DEATHSHROUD) && GET_POS(i) <= POS_RESTING) {
-				sprintf(buf + strlen(buf), " %s", positions[POS_DEAD]);
+				sprintf(buf, "$n %s", positions[POS_DEAD]);
 			}
 			else if (GET_POS(i) == POS_STANDING && AFF_FLAGGED(i, AFF_FLY)) {
-				strcat(buf, " is flying here.");
+				strcpy(buf, "$n is flying here.");
+			}
+			else if ((ocm = pick_custom_message_from_eq(i, OBJ_CUSTOM_LONGDESC))) {
+				strcpy(buf, ocm->msg);
 			}
 			else {	// normal positions
-				sprintf(buf + strlen(buf), " %s", positions[(int) GET_POS(i)]);
+				sprintf(buf, "$n %s", positions[(int) GET_POS(i)]);
 			}
 		}
 		else {
@@ -803,8 +784,18 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 			else			/* NIL fighting pointer */
 				strcat(buf, " is here struggling with thin air.");
 		}
-
-		msg_to_char(ch, "%s\r\n", buf);
+		
+		if (AFF_FLAGGED(i, AFF_HIDE))
+			strcat(buf, " (hidden)");
+		if (!IS_NPC(i) && !i->desc)
+			strcat(buf, " (linkless)");
+		if (!IS_NPC(i) && PLR_FLAGGED(i, PLR_WRITING))
+			strcat(buf, " (writing)");
+		if (!IS_NPC(i) && AFF_FLAGGED(i, AFF_INVISIBLE)) {
+			strcat(buf, " (invis)");
+		}
+		
+		act(buf, FALSE, i, NULL, ch, TO_VICT);
 	}
 	
 	if (can_get_quest_from_mob(ch, i, NULL)) {

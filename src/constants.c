@@ -2165,6 +2165,7 @@ const char *obj_custom_types[] = {
 	"wear-to-room",
 	"remove-to-char",
 	"remove-to-room",
+	"longdesc",
 	"\n"
 };
 
