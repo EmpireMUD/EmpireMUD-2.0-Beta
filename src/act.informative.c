@@ -770,7 +770,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		}
 		else {
 			if (FIGHTING(i)) {
-				strcat(buf, " is here, fighting ");
+				strcpy(buf, "$n is here, fighting ");
 				if (FIGHTING(i) == ch)
 					strcat(buf, "YOU!");
 				else {
@@ -782,7 +782,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 					}
 				}
 			else			/* NIL fighting pointer */
-				strcat(buf, " is here struggling with thin air.");
+				strcpy(buf, "$n is here struggling with thin air.");
 		}
 		
 		if (AFF_FLAGGED(i, AFF_HIDE))
