@@ -68,6 +68,7 @@ void mobile_activity(void);
 void show_string(descriptor_data *d, char *input);
 int isbanned(char *hostname);
 void save_whole_world();
+extern bool is_fight_ally(char_data *ch, char_data *frenemy);
 
 // local functions
 RETSIGTYPE checkpointing(int sig);
@@ -451,7 +452,7 @@ static void msdp_update(void) {
 				MSDPSetNumber(d, eMSDP_OPPONENT_LEVEL, get_approximate_level(pOpponent));
 				MSDPSetString(d, eMSDP_OPPONENT_NAME, PERS(pOpponent, ch, FALSE));
 				if ((focus = FIGHTING(pOpponent))) {
-					is_ally = is_fight_ally(ch, iter);
+					is_ally = is_fight_ally(ch, focus);
 					hit_points = is_ally ? GET_HEALTH(focus) : (GET_HEALTH(focus) * 100) / MAX(1,GET_MAX_HEALTH(focus));
 					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, hit_points);
 					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, is_ally ? GET_MAX_HEALTH(focus) : 100);
