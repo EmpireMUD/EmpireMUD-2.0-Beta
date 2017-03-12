@@ -761,7 +761,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 			else if (GET_POS(i) == POS_STANDING && AFF_FLAGGED(i, AFF_FLY)) {
 				strcpy(buf, "$n is flying here.");
 			}
-			else if ((ocm = pick_custom_message_from_eq(i, OBJ_CUSTOM_LONGDESC))) {
+			else if (GET_POS(i) == POS_STANDING && (ocm = pick_custom_message_from_eq(i, OBJ_CUSTOM_LONGDESC))) {
 				strcpy(buf, ocm->msg);
 			}
 			else {	// normal positions
