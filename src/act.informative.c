@@ -797,7 +797,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 			else if (GET_POS(i) == POS_STANDING && AFF_FLAGGED(i, AFF_FLY)) {
 				strcpy(buf, "$n is flying here.");
 			}
-			else if (GET_POS(i) == POS_STANDING && (ocm = pick_custom_longdesc(i))) {
+			else if (GET_POS(i) == POS_STANDING && !IS_DISGUISED(i) && (ocm = pick_custom_longdesc(i))) {
 				strcpy(buf, ocm->msg);
 			}
 			else {	// normal positions
@@ -827,10 +827,11 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 			strcat(buf, " (linkless)");
 		if (!IS_NPC(i) && PLR_FLAGGED(i, PLR_WRITING))
 			strcat(buf, " (writing)");
-		if (!IS_NPC(i) && AFF_FLAGGED(i, AFF_INVISIBLE)) {
-			strcat(buf, " (invis)");
-		}
 		
+		// send it
+		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
+			msg_to_char(ch, "*");
+		}
 		act(buf, FALSE, i, NULL, ch, TO_VICT);
 	}
 	
