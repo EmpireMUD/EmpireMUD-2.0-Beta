@@ -1465,8 +1465,17 @@ OCMD(do_oscale) {
 		return;
 	}
 
+	// scale adventure
+	if (!str_cmp(arg, "instance")) {
+		void scale_instance_to_level(struct instance_data *inst, int level);
+		room_data *orm = obj_room(obj);
+		struct instance_data *inst;
+		if ((inst = find_instance_by_room(orm, FALSE))) {
+			scale_instance_to_level(inst, level);
+		}
+	}
 	// scale char
-	if ((victim = get_char_by_obj(obj, arg))) {
+	else if ((victim = get_char_by_obj(obj, arg))) {
 		if (!IS_NPC(victim)) {
 			obj_log(obj, "oscale: unable to scale a PC");
 			return;

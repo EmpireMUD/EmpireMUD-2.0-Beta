@@ -1334,8 +1334,15 @@ WCMD(do_wscale) {
 		return;
 	}
 	
+	// scale adventure
+	if (!str_cmp(arg, "instance")) {
+		void scale_instance_to_level(struct instance_data *inst, int level);
+		if (inst || (inst = find_instance_by_room(room, FALSE))) {
+			scale_instance_to_level(inst, level);
+		}
+	}
 	// scale char
-	if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_in_room(room, arg))) {
+	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_in_room(room, arg))) {
 		if (!IS_NPC(victim)) {
 			wld_log(room, "wscale: unable to scale a PC");
 			return;

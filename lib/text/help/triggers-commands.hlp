@@ -587,7 +587,7 @@ See also: HALT, WAIT
 #d
 %SCALE% MSCALE OSCALE VSCALE WSCALE
 
-%scale% <victim/object/vehicle> [level]
+%scale% <instancevictim/object/vehicle> [level]
 
 This scales (or re-scales) a target NPC, object, or vehicle to a given level.
 If no level is provided, the script will attempt to use the scale of the
@@ -601,6 +601,7 @@ If you scale an item that is already scaled, a fresh copy will be loaded and
 scaled. This would result in the original item being purged.
 
 Examples: 
+  %scale% instance 125
   %scale% bag 100
   %scale% sword %actor.level%
 #d
