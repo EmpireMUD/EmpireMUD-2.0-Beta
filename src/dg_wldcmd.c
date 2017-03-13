@@ -1302,7 +1302,7 @@ WCMD(do_wat) {
 
 WCMD(do_wscale) {
 	char arg[MAX_INPUT_LENGTH], lvl_arg[MAX_INPUT_LENGTH];
-	struct instance_data *inst;
+	struct instance_data *inst = NULL;
 	char_data *victim;
 	obj_data *obj, *fresh, *proto;
 	vehicle_data *veh;
