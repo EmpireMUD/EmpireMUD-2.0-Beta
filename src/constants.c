@@ -2166,6 +2166,8 @@ const char *obj_custom_types[] = {
 	"remove-to-char",
 	"remove-to-room",
 	"longdesc",
+	"longdesc-female",
+	"longdesc-male",
 	"\n"
 };
 

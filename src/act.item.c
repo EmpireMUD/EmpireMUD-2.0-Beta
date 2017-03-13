@@ -458,6 +458,20 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 				act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
 				break;
 			}
+			case OBJ_CUSTOM_LONGDESC_FEMALE: {
+				if (GET_SEX(ch) == SEX_FEMALE) {
+					sprintf(lbuf, "Gives long description: %s", ocm->msg);
+					act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
+				}
+				break;
+			}
+			case OBJ_CUSTOM_LONGDESC_MALE: {
+				if (GET_SEX(ch) == SEX_MALE) {
+					sprintf(lbuf, "Gives long description: %s", ocm->msg);
+					act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
+				}
+				break;
+			}
 		}
 	}
 }

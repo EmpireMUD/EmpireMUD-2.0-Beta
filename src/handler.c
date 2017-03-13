@@ -4910,38 +4910,6 @@ bool has_custom_message(obj_data *obj, int type) {
 }
 
 
-/**
-* Picks a random custom message of the given type from the player's gear.
-*
-* @param char_data *ch The player.
-* @param int type Any OBJ_CUSTOM_ type.
-* @return struct custom_message* The chosen message, or NULL.
-*/
-struct custom_message *pick_custom_message_from_eq(char_data *ch, int type) {
-	struct custom_message *ocm, *found = NULL;
-	int iter, count = 0;
-	
-	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (!GET_EQ(ch, iter)) {
-			continue;
-		}
-		
-		LL_FOREACH(GET_EQ(ch, iter)->custom_msgs, ocm) {
-			if (ocm->type != type) {
-				continue;
-			}
-			
-			// matching
-			if (!number(0, count++) || !found) {
-				found = ocm;
-			}
-		}
-	}
-	
-	return found;
-}
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// OBJECT TARGETING HANDLERS ///////////////////////////////////////////////
 

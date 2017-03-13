@@ -3421,7 +3421,9 @@ Message types:
  &cwear-to-room&0 - Shown to the room when the person wears an item ($p for item).
  &cremove-to-char&0 - Shown to the person when they remove an item ($p for item).
  &cremove-to-room&0 - Shown to the room when the person removes an item ($p for item).
- &clongdesc&0 - Object give sthe player a custom long description when worn.
+ &clongdesc&0 - Object gives the player a custom long description when worn.
+ &clongdesc-female&0 - Same as longdesc but only for females.
+ &clongdesc-male&0 - Same as longdesc but only for males.
 
 See also: OLC OBJECTS
 #d

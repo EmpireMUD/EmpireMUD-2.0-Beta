@@ -150,6 +150,43 @@ char *instance_level_string(struct instance_data *inst) {
 }
 
 
+/**
+* Picks a random custom long description from a player's equipment.
+*
+* @param char_data *ch The player.
+* @return struct custom_message* The chosen message, or NULL.
+*/
+struct custom_message *pick_custom_longdesc(char_data *ch) {
+	struct custom_message *ocm, *found = NULL;
+	int iter, count = 0;
+	
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (!GET_EQ(ch, iter)) {
+			continue;
+		}
+		
+		LL_FOREACH(GET_EQ(ch, iter)->custom_msgs, ocm) {
+			if (ocm->type != OBJ_CUSTOM_LONGDESC && ocm->type != OBJ_CUSTOM_LONGDESC_FEMALE && ocm->type != OBJ_CUSTOM_LONGDESC_MALE) {
+				continue;
+			}
+			if (ocm->type == OBJ_CUSTOM_LONGDESC_FEMALE && GET_SEX(ch) != SEX_FEMALE) {
+				continue;
+			}
+			if (ocm->type == OBJ_CUSTOM_LONGDESC_MALE && GET_SEX(ch) != SEX_MALE) {
+				continue;
+			}
+			
+			// matching
+			if (!number(0, count++) || !found) {
+				found = ocm;
+			}
+		}
+	}
+	
+	return found;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// LOOK ASSIST FUNCTIONS ///////////////////////////////////////////////////
 
@@ -670,7 +707,6 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	extern bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
 	extern bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
 	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
-	extern struct custom_message *pick_custom_message_from_eq(char_data *ch, int type);
 	extern struct action_data_struct action_data[];
 	
 	struct custom_message *ocm;
@@ -761,7 +797,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 			else if (GET_POS(i) == POS_STANDING && AFF_FLAGGED(i, AFF_FLY)) {
 				strcpy(buf, "$n is flying here.");
 			}
-			else if (GET_POS(i) == POS_STANDING && (ocm = pick_custom_message_from_eq(i, OBJ_CUSTOM_LONGDESC))) {
+			else if (GET_POS(i) == POS_STANDING && (ocm = pick_custom_longdesc(i))) {
 				strcpy(buf, ocm->msg);
 			}
 			else {	// normal positions
