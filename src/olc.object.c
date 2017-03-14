@@ -929,7 +929,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		if (find_applies) {	// look up its applies
 			found_applies = NOBITS;
 			LL_FOREACH(GET_OBJ_APPLIES(obj), app) {
-				found_applies |= BIT(app->apply_type);
+				found_applies |= BIT(app->location);
 			}
 			if ((find_applies & found_applies) != find_applies) {
 				continue;
