@@ -3529,6 +3529,28 @@ take longer to decay, rather than basic it strictly on realism.
 
 See also: OEDIT DECAY, OLC OBJECTS
 #d
+"OEDIT FULLSEARCH"
+
+Usage:  .o fullsearch <field> <argument> <...>
+
+This command allows you to search for objects matching certain criteria. You
+can specify multiple fields if you want. Any leftover arguments are matched to
+the object's keywords.
+
+Fields:
+  &cflagged&0 - see HELP OEDIT FLAGS
+  &cnotflagged&0
+  &clevel&0 - matches anything where this level is within the range
+     (note: will not account for objects whose levels are inherited from mobs
+     or adventures)
+  &ctype&0 - see HELP OEDIT TYPE
+  &cwear&0 - see HELP OEDIT WEAR
+
+Examples:
+ > .o fullsearch type WEAPON wear HOLD
+ > .o fullsearch flagged LARGE flagged TOOL-SHOVEL
+ > .o fullsearch level 50 sword
+#d
 "OEDIT KEYWORDS"
 
 Usage:  .keywords <list>
@@ -4192,6 +4214,13 @@ This command finds the first available vnum in a given range -- the opposite
 of the olc 'list' command.
 
 See also: OLC LIST, VNUM
+#d
+"OLC FULLSEARCH"
+
+Usage:  .<type> fullsearch <arguments>
+
+See the individual help files such as OEDIT FULLSEARCH. This command is only
+implemented for types that have such a help file.
 #d
 "OLC LIST" OLIST MLIST RLIST
 
