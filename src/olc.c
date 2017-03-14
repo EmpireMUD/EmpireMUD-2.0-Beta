@@ -815,7 +815,7 @@ const struct olc_command_data olc_data[] = {
 	
 	
 	// misc commands that should not take precedence over editor commands
-	{ "fullsearch", olc_fullsearch, OLC_OBJECT, NOBITS },
+	{ "fullsearch", olc_fullsearch, OLC_OBJECT | OLC_TRIGGER, NOBITS },
 	
 	// this goes last
 	{ "\n", NULL, NOBITS, NOBITS }
@@ -2244,6 +2244,11 @@ OLC_MODULE(olc_fullsearch) {
 		case OLC_OBJECT: {
 			void olc_fullsearch_obj(char_data *ch, char *argument);
 			olc_fullsearch_obj(ch, argument);
+			break;
+		}
+		case OLC_TRIGGER: {
+			void olc_fullsearch_trigger(char_data *ch, char *argument);
+			olc_fullsearch_trigger(ch, argument);
 			break;
 		}
 		default: {

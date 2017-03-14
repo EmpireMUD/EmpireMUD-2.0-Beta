@@ -834,7 +834,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	*find_keywords = '\0';
 	while (*argument) {
 		// figure out a type
-		argument = any_one_word(argument, type_arg);
+		argument = any_one_arg(argument, type_arg);
 		
 		if (is_abbrev(type_arg, "apply") || is_abbrev(type_arg, "applies")) {
 			argument = any_one_word(argument, val_arg);

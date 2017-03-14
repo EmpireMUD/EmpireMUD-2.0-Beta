@@ -32,6 +32,10 @@
 // external consts
 extern const char **trig_attach_type_list[];
 extern const char *trig_attach_types[];
+extern const char *trig_types[];
+extern const char *otrig_types[];
+extern const char *vtrig_types[];
+extern const char *wtrig_types[];
 
 
 // external funcs
@@ -413,6 +417,101 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	msg_to_char(ch, "Trigger %d deleted.\r\n", vnum);
 	
 	free_trigger(trig);
+}
+
+
+/**
+* Searches properties of triggers.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_trigger(char_data *ch, char *argument) {
+	char buf[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	int count, lookup, only_attaches = NOTHING;
+	bitvector_t only_types = NOBITS;
+	trig_data *trig, *next_trig;
+	struct cmdlist_element *cmd;
+	size_t size;
+	bool any;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP TEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (is_abbrev(type_arg, "attaches")) {
+			argument = any_one_word(argument, val_arg);
+			if ((only_attaches = search_block(val_arg, trig_attach_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid attach type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "types")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, trig_types, FALSE)) == NOTHING && (lookup = search_block(val_arg, otrig_types, FALSE)) == NOTHING && (lookup = search_block(val_arg, vtrig_types, FALSE)) == NOTHING && (lookup = search_block(val_arg, wtrig_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid trigger type '%s'.\r\n", val_arg);
+				return;
+			}
+			else {
+				only_types |= BIT(lookup);
+			}
+		}
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Trigger fullsearch: %s\r\n", find_keywords);
+	count = 0;
+	
+	// okay now look up items
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (only_attaches != NOTHING && trig->attach_type != only_attaches) {
+			continue;
+		}
+		if (only_types && (GET_TRIG_TYPE(trig) & only_types) != only_types) {
+			continue;
+		}
+		if (*find_keywords) {
+			any = multi_isname(find_keywords, GET_TRIG_NAME(trig));	// check name first
+			
+			if (!any) {
+				LL_FOREACH(trig->cmdlist, cmd) {
+					if (strstr(cmd->cmd, find_keywords)) {
+						any = TRUE;
+						break;
+					}
+				}
+			}
+			if (!any) {
+				continue;
+			}
+		}
+		
+		size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+		++count;
+	}
+	
+	if (count > 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, "(%d triggers)\r\n", count);
+	}
+	else {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
 }
 
 
