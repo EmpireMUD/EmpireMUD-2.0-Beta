@@ -812,6 +812,131 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 
 
 /**
+* Searches properties of objects.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_obj(char_data *ch, char *argument) {
+	char buf[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_worn = NOBITS;
+	int count, lookup, only_level = NOTHING, only_type = NOTHING;
+	obj_data *obj, *next_obj;
+	size_t size;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP OEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_word(argument, type_arg);
+		
+		if (is_abbrev(type_arg, "flags") || is_abbrev(type_arg, "flagged")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, extra_bits, FALSE)) != NOTHING) {
+				only_flags |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid wear location '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "level")) {
+			argument = any_one_word(argument, val_arg);
+			if (!isdigit(*val_arg) || (only_level = atoi(val_arg)) < 0) {
+				msg_to_char(ch, "Invalid level '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "type")) {
+			argument = any_one_word(argument, val_arg);
+			if ((only_type = search_block(val_arg, item_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "unflagged")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, extra_bits, FALSE)) != NOTHING) {
+				not_flagged |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid wear location '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "wear") || is_abbrev(type_arg, "worn")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, wear_bits, FALSE)) != NOTHING) {
+				only_worn |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid wear location '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Object fullsearch: %s\r\n", find_keywords);
+	count = 0;
+	
+	// okay now look up items
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		if (only_level != NOTHING) {	// level-based checks
+			if (GET_OBJ_MAX_SCALE_LEVEL(obj) != 0 && only_level > GET_OBJ_MAX_SCALE_LEVEL(obj)) {
+				continue;
+			}
+			if (GET_OBJ_MIN_SCALE_LEVEL(obj) != 0 && only_level < GET_OBJ_MIN_SCALE_LEVEL(obj)) {
+				continue;
+			}
+		}
+		if (only_type != NOTHING && GET_OBJ_TYPE(obj) != only_type) {
+			continue;
+		}
+		if (not_flagged != NOBITS && OBJ_FLAGGED(obj, not_flagged)) {
+			continue;
+		}
+		if (not_flagged != NOBITS && OBJ_FLAGGED(obj, not_flagged)) {
+			continue;
+		}
+		if (only_flags != NOBITS && (GET_OBJ_EXTRA(obj) & only_flags) != only_flags) {
+			continue;
+		}
+		if (only_worn != NOBITS && (GET_OBJ_WEAR(obj) & only_worn) != only_worn) {
+			continue;
+		}
+		if (*find_keywords && !multi_isname(find_keywords, GET_OBJ_KEYWORDS(obj))) {
+			continue;
+		}
+		
+		size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		++count;
+	}
+	
+	if (count > 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, "(%d objects)\r\n", count);
+	}
+	else {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+/**
 * Searches for all uses of a crop and displays them.
 *
 * @param char_data *ch The player.

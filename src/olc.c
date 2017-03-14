@@ -37,6 +37,7 @@ OLC_MODULE(olc_copy);
 OLC_MODULE(olc_delete);
 OLC_MODULE(olc_display);
 OLC_MODULE(olc_edit);
+OLC_MODULE(olc_fullsearch);
 OLC_MODULE(olc_free);
 OLC_MODULE(olc_list);
 OLC_MODULE(olc_removeindev);
@@ -462,6 +463,7 @@ const struct olc_command_data olc_data[] = {
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
 	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "fullsearch", olc_fullsearch, OLC_OBJECT, NOBITS },
 	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
 	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
@@ -2228,6 +2230,24 @@ OLC_MODULE(olc_free) {
 		}
 		
 		msg_to_char(ch, "No free vnums found in that range.\r\n");
+	}
+}
+
+
+OLC_MODULE(olc_fullsearch) {
+	skip_spaces(&argument);
+	
+	// OLC_x:
+	switch (type) {
+		case OLC_OBJECT: {
+			void olc_fullsearch_obj(char_data *ch, char *argument);
+			olc_fullsearch_obj(ch, argument);
+			break;
+		}
+		default: {
+			msg_to_char(ch, "It doesn't seem to be implemented for that type.\r\n");
+			break;
+		}
 	}
 }
 
