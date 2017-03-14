@@ -3971,6 +3971,15 @@ Weapons can often by set WIELD and HOLD and used in both positions.
 
 Missile weapons and instruments must be set HOLD.
 
+Wear flags:
+   TAKE        FINGER        NECK
+   CLOTHES     HEAD          LEGS
+   FEET        HANDS         ARMS
+   WRISTS      ABOUT         WAIST
+   EARS        WIELD         HOLD
+   RANGED      ARMOR         PACK
+   SADDLE
+
 See also: OLC OBJECTS
 #d
 "OLC ABORT"
