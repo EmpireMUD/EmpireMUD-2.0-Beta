@@ -1739,6 +1739,7 @@ const char *versions_list[] = {
 	"b4.4",
 	"b4.15",
 	"b4.19",
+	"b4.32",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2221,6 +2222,30 @@ PLAYER_UPDATE_FUNC(b4_19_update_players) {
 }
 
 
+// 4.32 moves 2 rmt flags to fnc flags
+void b4_32_convert_rmts(void) {
+	bitvector_t RMT_PIGEON_POST = BIT(9);	// j. can use mail here
+	bitvector_t RMT_COOKING_FIRE = BIT(10);	// k. can cook here
+
+	room_template *rmt, *next_rmt;
+	
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		if (IS_SET(GET_RMT_FLAGS(rmt), RMT_PIGEON_POST)) {
+			REMOVE_BIT(GET_RMT_FLAGS(rmt), RMT_PIGEON_POST);
+			SET_BIT(GET_RMT_FUNCTIONS(rmt), FNC_MAIL);
+			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
+			log("- updated rmt %d: PIGEON-POST", GET_RMT_VNUM(rmt));
+		}
+		if (IS_SET(GET_RMT_FLAGS(rmt), RMT_COOKING_FIRE)) {
+			REMOVE_BIT(GET_RMT_FLAGS(rmt), RMT_COOKING_FIRE);
+			SET_BIT(GET_RMT_FUNCTIONS(rmt), FNC_COOKING_FIRE);
+			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
+			log("- updated rmt %d: COOKING-FIRE", GET_RMT_VNUM(rmt));
+		}
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -2414,6 +2439,10 @@ void check_version(void) {
 		if (MATCH_VERSION("b4.19")) {
 			log("Applying b4.19 update to players...");
 			update_all_players(NULL, b4_19_update_players);
+		}
+		if (MATCH_VERSION("b4.32")) {
+			log("Applying b4.32 update to rmts...");
+			b4_32_convert_rmts();
 		}
 	}
 	

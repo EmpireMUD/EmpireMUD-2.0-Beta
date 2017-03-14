@@ -53,7 +53,7 @@ static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type
 any_vnum get_new_instance_id(void);
 static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
 void reset_instance(struct instance_data *inst);
-static void scale_instance_to_level(struct instance_data *inst, int level);
+void scale_instance_to_level(struct instance_data *inst, int level);
 void unlink_instance_entrance(room_data *room, struct instance_data *inst);
 
 
@@ -934,6 +934,7 @@ void delete_instance(struct instance_data *inst) {
 	void relocate_players(room_data *room, room_data *to_room);
 	
 	struct instance_mob *im, *next_im;
+	vehicle_data *veh, *next_veh;
 	struct instance_data *temp;
 	char_data *mob, *next_mob;
 	room_data *room;
@@ -948,6 +949,11 @@ void delete_instance(struct instance_data *inst) {
 		// remove any players inside
 		for (iter = 0; iter < inst->size; ++iter) {
 			if (inst->room[iter]) {
+				// get rid of vehicles first (helps relocate players inside)
+				LL_FOREACH_SAFE2(ROOM_VEHICLES(inst->room[iter]), veh, next_veh, next_in_room) {
+					extract_vehicle(veh);
+				}
+	
 				relocate_players(inst->room[iter], room);
 			}
 		}
@@ -1908,13 +1914,6 @@ int lock_instance_level(room_data *room, int level) {
 	
 	if (IS_ADVENTURE_ROOM(room) && COMPLEX_DATA(room) && (inst = COMPLEX_DATA(room)->instance)) {
 		if (inst->level <= 0) {
-			if (GET_ADV_MIN_LEVEL(inst->adventure) > 0) {
-				level = MAX(level, GET_ADV_MIN_LEVEL(inst->adventure));
-			}
-			if (GET_ADV_MAX_LEVEL(inst->adventure) > 0) {
-				level = MIN(level, GET_ADV_MAX_LEVEL(inst->adventure));
-			}
-			
 			scale_instance_to_level(inst, level);
 		}
 		else {
@@ -2040,13 +2039,20 @@ void save_instances(void) {
 * @param struct instance_data *inst The instance to scale.
 * @param int level A pre-validated level.
 */
-static void scale_instance_to_level(struct instance_data *inst, int level) {	
+void scale_instance_to_level(struct instance_data *inst, int level) {	
 	void scale_vehicle_to_level(vehicle_data *veh, int level);
 	
 	int iter;
 	vehicle_data *veh;
 	char_data *ch;
 	obj_data *obj;
+	
+	if (GET_ADV_MIN_LEVEL(inst->adventure) > 0) {
+		level = MAX(level, GET_ADV_MIN_LEVEL(inst->adventure));
+	}
+	if (GET_ADV_MAX_LEVEL(inst->adventure) > 0) {
+		level = MIN(level, GET_ADV_MAX_LEVEL(inst->adventure));
+	}
 	
 	inst->level = level;
 	

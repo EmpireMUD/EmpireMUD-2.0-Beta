@@ -431,6 +431,10 @@ elseif lab tent /= %arg%
 elseif dolmen stone /= %arg%
   eval vnum 10482
   set named a goblin dolmen stone
+elseif ticket /= %arg%
+  * Fall through to adventurer guild quest command trigger
+  return 0
+  halt
 else
   %send% %actor% They don't seem to sell '%arg%' here.
   halt

@@ -1093,7 +1093,16 @@ obj_data *die(char_data *ch, char_data *killer) {
 		gain_ability_exp(ch, ABIL_PHOENIX_RITE, 100);
 		return NULL;
 	}
-
+	
+	// hostile activity triggers distrust unless the ch is pvp-flagged or already hostile
+	if (!IS_NPC(killer) && GET_LOYALTY(ch) && GET_LOYALTY(killer) != GET_LOYALTY(ch)) {
+		// we check the ch's master if it's an NPC and the master is a PC
+		char_data *check = (IS_NPC(ch) && ch->master && !IS_NPC(ch->master)) ? ch->master : ch;
+		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && !IS_HOSTILE(check)) {
+			trigger_distrust_from_hostile(killer, GET_LOYALTY(ch));
+		}
+	}
+	
 	// Alert Group if Applicable
 	if (GROUP(ch)) {
 		send_to_group(ch, GROUP(ch), "%s has died.", GET_NAME(ch));

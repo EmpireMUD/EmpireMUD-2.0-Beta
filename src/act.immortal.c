@@ -50,6 +50,7 @@ extern const char *component_types[];
 extern const char *dirs[];
 extern const char *drinks[];
 extern const char *extra_bits[];
+extern const char *function_flags[];
 extern const char *genders[];
 extern const char *grant_bits[];
 extern const char *island_bits[];
@@ -3070,7 +3071,6 @@ void do_stat_book(char_data *ch, book_data *book) {
 void do_stat_building(char_data *ch, bld_data *bdg) {
 	extern const char *bld_flags[];
 	extern const char *designate_flags[];
-	extern const char *function_flags[];
 	
 	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	struct obj_storage_type *store;
@@ -4125,9 +4125,12 @@ void do_stat_room_template(char_data *ch, room_template *rmt) {
 	
 	sprintbit(GET_RMT_FLAGS(rmt), room_template_flags, lbuf, TRUE);
 	msg_to_char(ch, "Flags: &g%s&0\r\n", lbuf);
+	
+	sprintbit(GET_RMT_FUNCTIONS(rmt), function_flags, lbuf, TRUE);
+	msg_to_char(ch, "Functions: &y%s&0\r\n", lbuf);
 
 	sprintbit(GET_RMT_BASE_AFFECTS(rmt), room_aff_bits, lbuf, TRUE);
-	msg_to_char(ch, "Affects: &y%s&0\r\n", lbuf);
+	msg_to_char(ch, "Affects: &g%s&0\r\n", lbuf);
 	
 	if (GET_RMT_EX_DESCS(rmt)) {
 		struct extra_descr_data *desc;

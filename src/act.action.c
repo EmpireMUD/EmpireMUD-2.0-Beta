@@ -809,7 +809,7 @@ INTERACTION_FUNC(finish_picking_herb) {
 	
 	if (obj) {
 		if (num > 1) {
-			sprintf(buf, "You find $p (d%d)!", num);
+			sprintf(buf, "You find $p (x%d)!", num);
 			act(buf, FALSE, ch, obj, 0, TO_CHAR);
 		}
 		else {
@@ -846,7 +846,7 @@ INTERACTION_FUNC(finish_picking_crop) {
 	
 	if (obj) {
 		if (interaction->quantity > 1) {
-			sprintf(buf, "You find $p (d%d)!", interaction->quantity);
+			sprintf(buf, "You find $p (x%d)!", interaction->quantity);
 			act(buf, FALSE, ch, obj, 0, TO_CHAR);
 		}
 		else {

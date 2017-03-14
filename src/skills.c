@@ -2141,9 +2141,6 @@ bool has_cooking_fire(char_data *ch) {
 	if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_COOKING_FIRE)) {	
 		return TRUE;
 	}
-	if (RMT_FLAGGED(IN_ROOM(ch), RMT_COOKING_FIRE)) {	
-		return TRUE;
-	}
 	
 	for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = obj->next_content) {
 		if (OBJ_FLAGGED(obj, OBJ_LIGHT) && !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {

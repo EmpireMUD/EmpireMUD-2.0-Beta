@@ -1782,6 +1782,10 @@ bool is_multiword_abbrev(const char *arg, const char *phrase) {
 * @return int TRUE if str is a number, FALSE if it contains anything else.
 */
 int is_number(const char *str) {
+	if (!*str) {
+		return (0);
+	}
+	
 	// allow leading negative
 	if (*str == '-') {
 		str++;

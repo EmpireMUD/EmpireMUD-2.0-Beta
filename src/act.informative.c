@@ -150,6 +150,43 @@ char *instance_level_string(struct instance_data *inst) {
 }
 
 
+/**
+* Picks a random custom long description from a player's equipment.
+*
+* @param char_data *ch The player.
+* @return struct custom_message* The chosen message, or NULL.
+*/
+struct custom_message *pick_custom_longdesc(char_data *ch) {
+	struct custom_message *ocm, *found = NULL;
+	int iter, count = 0;
+	
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (!GET_EQ(ch, iter)) {
+			continue;
+		}
+		
+		LL_FOREACH(GET_EQ(ch, iter)->custom_msgs, ocm) {
+			if (ocm->type != OBJ_CUSTOM_LONGDESC && ocm->type != OBJ_CUSTOM_LONGDESC_FEMALE && ocm->type != OBJ_CUSTOM_LONGDESC_MALE) {
+				continue;
+			}
+			if (ocm->type == OBJ_CUSTOM_LONGDESC_FEMALE && GET_SEX(ch) != SEX_FEMALE) {
+				continue;
+			}
+			if (ocm->type == OBJ_CUSTOM_LONGDESC_MALE && GET_SEX(ch) != SEX_MALE) {
+				continue;
+			}
+			
+			// matching
+			if (!number(0, count++) || !found) {
+				found = ocm;
+			}
+		}
+	}
+	
+	return found;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// LOOK ASSIST FUNCTIONS ///////////////////////////////////////////////////
 
@@ -672,6 +709,8 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern struct action_data_struct action_data[];
 	
+	struct custom_message *ocm;
+	
 	// POS_x
 	const char *positions[] = {
 		"is lying here, dead.",
@@ -743,53 +782,31 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		msg_to_char(ch, GET_LONG_DESC(i));
 	}
 	else {
-		if (IS_NPC(i)) {
-			strcpy(buf, PERS(i, ch, FALSE));
-			CAP(buf);
-		}
-		else {
-			if (AFF_FLAGGED(i, AFF_INVISIBLE))
-				strcpy(buf, "*");
-			else
-				*buf = '\0';
-
-			sprintf(buf1, PERS(i, ch, 0));
-			strcat(buf, CAP(buf1));
-
-			switch (GET_SEX(i)) {
-				case SEX_MALE:		strcpy(buf1, "man");	break;
-				case SEX_FEMALE:	strcpy(buf1, "woman");	break;
-				default:			strcpy(buf1, "person");	break;
-			}
-		}
-
-		if (AFF_FLAGGED(i, AFF_HIDE))
-			strcat(buf, " (hidden)");
-		if (!IS_NPC(i) && !i->desc)
-			strcat(buf, " (linkless)");
-		if (!IS_NPC(i) && PLR_FLAGGED(i, PLR_WRITING))
-			strcat(buf, " (writing)");
-
+		*buf = '\0';
+		
 		if (GET_POS(i) != POS_FIGHTING) {
 			if (GET_SITTING_ON(i)) {
-				sprintf(buf + strlen(buf), " is sitting %s %s%s%s.", IN_OR_ON(GET_SITTING_ON(i)), get_vehicle_short_desc(GET_SITTING_ON(i), ch), (VEH_ANIMALS(GET_SITTING_ON(i)) ? ", being pulled by " : ""), (VEH_ANIMALS(GET_SITTING_ON(i)) ? list_harnessed_mobs(GET_SITTING_ON(i)) : ""));
+				sprintf(buf, "$n is sitting %s %s%s%s.", IN_OR_ON(GET_SITTING_ON(i)), get_vehicle_short_desc(GET_SITTING_ON(i), ch), (VEH_ANIMALS(GET_SITTING_ON(i)) ? ", being pulled by " : ""), (VEH_ANIMALS(GET_SITTING_ON(i)) ? list_harnessed_mobs(GET_SITTING_ON(i)) : ""));
 			}
 			else if (!IS_NPC(i) && GET_ACTION(i) != ACT_NONE) {
-				sprintf(buf + strlen(buf), " %s", action_data[GET_ACTION(i)].long_desc);
+				sprintf(buf, "$n %s", action_data[GET_ACTION(i)].long_desc);
 			}
 			else if (AFF_FLAGGED(i, AFF_DEATHSHROUD) && GET_POS(i) <= POS_RESTING) {
-				sprintf(buf + strlen(buf), " %s", positions[POS_DEAD]);
+				sprintf(buf, "$n %s", positions[POS_DEAD]);
 			}
 			else if (GET_POS(i) == POS_STANDING && AFF_FLAGGED(i, AFF_FLY)) {
-				strcat(buf, " is flying here.");
+				strcpy(buf, "$n is flying here.");
+			}
+			else if (GET_POS(i) == POS_STANDING && !IS_DISGUISED(i) && (ocm = pick_custom_longdesc(i))) {
+				strcpy(buf, ocm->msg);
 			}
 			else {	// normal positions
-				sprintf(buf + strlen(buf), " %s", positions[(int) GET_POS(i)]);
+				sprintf(buf, "$n %s", positions[(int) GET_POS(i)]);
 			}
 		}
 		else {
 			if (FIGHTING(i)) {
-				strcat(buf, " is here, fighting ");
+				strcpy(buf, "$n is here, fighting ");
 				if (FIGHTING(i) == ch)
 					strcat(buf, "YOU!");
 				else {
@@ -801,10 +818,21 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 					}
 				}
 			else			/* NIL fighting pointer */
-				strcat(buf, " is here struggling with thin air.");
+				strcpy(buf, "$n is here struggling with thin air.");
 		}
-
-		msg_to_char(ch, "%s\r\n", buf);
+		
+		if (AFF_FLAGGED(i, AFF_HIDE))
+			strcat(buf, " (hidden)");
+		if (!IS_NPC(i) && !i->desc)
+			strcat(buf, " (linkless)");
+		if (!IS_NPC(i) && PLR_FLAGGED(i, PLR_WRITING))
+			strcat(buf, " (writing)");
+		
+		// send it
+		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
+			msg_to_char(ch, "*");
+		}
+		act(buf, FALSE, i, NULL, ch, TO_VICT);
 	}
 	
 	if (can_get_quest_from_mob(ch, i, NULL)) {
@@ -2752,7 +2780,7 @@ ACMD(do_weather) {
 
 
 ACMD(do_whereami) {	
-	if (has_ability(ch, ABIL_NAVIGATION)) {
+	if (has_ability(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
 		msg_to_char(ch, "You are at: %s (%d, %d)\r\n", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 	}
 	else {

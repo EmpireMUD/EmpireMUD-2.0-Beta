@@ -170,8 +170,8 @@ const char *room_template_flags[] = {
 	"!TELEPORT",
 	"LOOK-OUT",
 	"!LOCATION",
-	"PIGEON-POST",
-	"COOKING-FIRE",
+	"*",
+	"*",
 	"\n"
 };
 
@@ -2165,6 +2165,9 @@ const char *obj_custom_types[] = {
 	"wear-to-room",
 	"remove-to-char",
 	"remove-to-room",
+	"longdesc",
+	"longdesc-female",
+	"longdesc-male",
 	"\n"
 };
 

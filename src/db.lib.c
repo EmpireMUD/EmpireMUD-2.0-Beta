@@ -4600,7 +4600,7 @@ void init_room_template(room_template *rmt) {
 void parse_room_template(FILE *fl, rmt_vnum vnum) {
 	int int_in[4];
 	double dbl_in;
-	char line[256], str_in[256], str_in2[256];
+	char line[256], str_in[256], str_in2[256], str_in3[256];
 	struct adventure_spawn *spawn, *last_spawn = NULL;
 	struct exit_template *ex, *last_ex = NULL;
 	room_template *rmt, *find;
@@ -4623,14 +4623,24 @@ void parse_room_template(FILE *fl, rmt_vnum vnum) {
 	GET_RMT_TITLE(rmt) = fread_string(fl, buf2);
 	GET_RMT_DESC(rmt) = fread_string(fl, buf2);
 	
-	// line 3: flags base_affects
-	if (!get_line(fl, line) || sscanf(line, "%s %s", str_in, str_in2) != 2) {
+	// line 3: flags base_affects [functions]
+	if (!get_line(fl, line)) {
+		log("SYSERR: Missing line 3 of %s", buf2);
+		exit(1);
+	}
+	if (sscanf(line, "%s %s %s", str_in, str_in2, str_in3) == 3) {
+		GET_RMT_FLAGS(rmt) = asciiflag_conv(str_in);
+		GET_RMT_BASE_AFFECTS(rmt) = asciiflag_conv(str_in2);
+		GET_RMT_FUNCTIONS(rmt) = asciiflag_conv(str_in3);
+	}
+	else if (sscanf(line, "%s %s", str_in, str_in2) == 2) {
+		GET_RMT_FLAGS(rmt) = asciiflag_conv(str_in);
+		GET_RMT_BASE_AFFECTS(rmt) = asciiflag_conv(str_in2);
+	}
+	else {
 		log("SYSERR: Format error in line 3 of %s", buf2);
 		exit(1);
 	}
-	
-	GET_RMT_FLAGS(rmt) = asciiflag_conv(str_in);
-	GET_RMT_BASE_AFFECTS(rmt) = asciiflag_conv(str_in2);
 		
 	// optionals
 	for (;;) {
@@ -4723,7 +4733,7 @@ void parse_room_template(FILE *fl, rmt_vnum vnum) {
 * @param room_template *rmt The thing to save.
 */
 void write_room_template_to_file(FILE *fl, room_template *rmt) {
-	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
+	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH];
 	struct adventure_spawn *sp;
 	struct exit_template *ex;
 	
@@ -4742,7 +4752,8 @@ void write_room_template_to_file(FILE *fl, room_template *rmt) {
 
 	strcpy(temp, bitv_to_alpha(GET_RMT_FLAGS(rmt)));
 	strcpy(temp2, bitv_to_alpha(GET_RMT_BASE_AFFECTS(rmt)));
-	fprintf(fl, "%s %s\n", temp, temp2);
+	strcpy(temp3, bitv_to_alpha(GET_RMT_FUNCTIONS(rmt)));
+	fprintf(fl, "%s %s %s\n", temp, temp2, temp3);
 
 	// D: exits
 	for (ex = GET_RMT_EXITS(rmt); ex; ex = ex->next) {

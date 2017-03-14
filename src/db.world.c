@@ -390,12 +390,6 @@ void delete_room(room_data *room, bool check_exits) {
 		SET_BIT(inst->flags, INST_COMPLETED);
 	}
 	
-	// remove it now
-	remove_room_from_world_tables(room);
-	if (GET_ROOM_VEHICLE(room)) {
-		remove_room_from_vehicle(room, GET_ROOM_VEHICLE(room));
-	}
-	
 	if (check_exits) {
 		// search world for portals that link here
 		for (o = object_list; o; o = next_o) {
@@ -424,12 +418,18 @@ void delete_room(room_data *room, bool check_exits) {
 		--VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(home));
 	}
 	
-	// get rid of players
-	relocate_players(room, NULL);
-	
 	// get rid of vehicles
 	LL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
 		extract_vehicle(veh);
+	}
+	
+	// get rid of players
+	relocate_players(room, NULL);
+	
+	// remove room from world now
+	remove_room_from_world_tables(room);
+	if (GET_ROOM_VEHICLE(room)) {
+		remove_room_from_vehicle(room, GET_ROOM_VEHICLE(room));
 	}
 	
 	// Remove remaining chars

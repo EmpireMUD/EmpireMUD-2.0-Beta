@@ -869,7 +869,7 @@ OLC_MODULE(bedit_flags) {
 
 OLC_MODULE(bedit_functions) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
-	GET_BLD_FUNCTIONS(bdg) = olc_process_flag(ch, argument, "function", "flags", function_flags, GET_BLD_FUNCTIONS(bdg));
+	GET_BLD_FUNCTIONS(bdg) = olc_process_flag(ch, argument, "function", "functions", function_flags, GET_BLD_FUNCTIONS(bdg));
 }
 
 

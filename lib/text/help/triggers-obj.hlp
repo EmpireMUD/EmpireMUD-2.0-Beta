@@ -172,8 +172,11 @@ When using field  - The variable returns:
 &ctimer&0 - The timer of the object.
 &ctype&0 - The type of object, such as WAND, ARMOR, or KEY.
 &cval0&0 - Returns the current value 0 of the object, defined here.
+&cval0(num)&0 - Changes the value 0 of the object.
 &cval1&0 - Returns the current value 1 of the object, defined here.
+&cval1(num)&0 - Changes the value 1 of the object.
 &cval2&0 - Returns the current value 2 of the object, defined here.
+&cval2(num)&0 - Changes the value 2 of the object.
 &cvnum&0 - The virtual number of the object.
 &cworn_by&0 - The id of the character wearing the object, or an empty return.
 

@@ -2145,8 +2145,16 @@ ACMD(do_mscale) {
 		return;
 	}
 	
+	// scale adventure
+	if (!str_cmp(arg, "instance")) {
+		void scale_instance_to_level(struct instance_data *inst, int level);
+		struct instance_data *inst;
+		if (MOB_INSTANCE_ID(ch) != NOTHING && (inst = get_instance_by_mob(ch))) {
+			scale_instance_to_level(inst, level);
+		}
+	}
 	// scale char
-	if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg))) {
+	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg))) {
 		if (!IS_NPC(victim)) {
 			mob_log(ch, "mscale: unable to scale a PC");
 			return;

@@ -418,8 +418,8 @@ typedef struct vehicle_data vehicle_data;
 #define RMT_NO_TELEPORT  BIT(6)	// g. cannot teleport in/out
 #define RMT_LOOK_OUT  BIT(7)	// h. can see the map using "look out"
 #define RMT_NO_LOCATION  BIT(8)	// i. don't show a location, disables where
-#define RMT_PIGEON_POST  BIT(9)	// j. can use mail here
-#define RMT_COOKING_FIRE  BIT(10)	// k. can cook here
+	#define RMT_UNUSED1  BIT(9)
+	#define RMT_UNUSED2  BIT(10)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1334,6 +1334,9 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_CUSTOM_WEAR_TO_ROOM  9
 #define OBJ_CUSTOM_REMOVE_TO_CHAR  10
 #define OBJ_CUSTOM_REMOVE_TO_ROOM  11
+#define OBJ_CUSTOM_LONGDESC  12
+#define OBJ_CUSTOM_LONGDESC_FEMALE  13
+#define OBJ_CUSTOM_LONGDESC_MALE  14
 
 
 // RES_x: resource requirement types
@@ -2522,8 +2525,9 @@ struct room_template {
 	char *description;
 	
 	// numeric data
-	bitvector_t flags;	// RMT_x
+	bitvector_t flags;	// RMT_
 	bitvector_t base_affects;	// ROOM_AFF_
+	bitvector_t functions;	// FNC_
 	
 	// lists
 	struct adventure_spawn *spawns;	// list of objs/mobs

@@ -1100,7 +1100,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // helpers
 #define BLD_DESIGNATE_FLAGGED(room, flag)  (GET_BUILDING(HOME_ROOM(room)) && IS_SET(GET_BLD_DESIGNATE_FLAGS(GET_BUILDING(HOME_ROOM(room))), (flag)))
-#define HAS_FUNCTION(room, flag)  (GET_BUILDING(room) && IS_SET(GET_BLD_FUNCTIONS(GET_BUILDING(room)), (flag)))
+#define HAS_FUNCTION(room, flag)  ((GET_BUILDING(room) && IS_SET(GET_BLD_FUNCTIONS(GET_BUILDING(room)), (flag))) || (GET_ROOM_TEMPLATE(room) && IS_SET(GET_RMT_FUNCTIONS(GET_ROOM_TEMPLATE(room)), (flag))))
 #define RMT_FLAGGED(room, flag)  (GET_ROOM_TEMPLATE(room) && IS_SET(GET_RMT_FLAGS(GET_ROOM_TEMPLATE(room)), (flag)))
 #define ROOM_AFF_FLAGGED(r, flag)  (IS_SET(ROOM_AFF_FLAGS(r), (flag)))
 #define ROOM_BLD_FLAGGED(room, flag)  (GET_BUILDING(room) && IS_SET(GET_BLD_FLAGS(GET_BUILDING(room)), (flag)))
@@ -1136,6 +1136,7 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 #define GET_RMT_TITLE(rmt)  ((rmt)->title)
 #define GET_RMT_DESC(rmt)  ((rmt)->description)
 #define GET_RMT_FLAGS(rmt)  ((rmt)->flags)
+#define GET_RMT_FUNCTIONS(rmt)  ((rmt)->functions)
 #define GET_RMT_BASE_AFFECTS(rmt)  ((rmt)->base_affects)
 #define GET_RMT_SPAWNS(rmt)  ((rmt)->spawns)
 #define GET_RMT_EX_DESCS(rmt)  ((rmt)->ex_description)

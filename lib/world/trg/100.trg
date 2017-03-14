@@ -1437,7 +1437,7 @@ end
 ~
 #10068
 Tower Skycleave announcement~
-2 abw 1
+2 ab 1
 ~
 if %random.3% == 3
   %regionecho% %room% 100 The Tower Skycleave has appeared in the region %room.coords%.
