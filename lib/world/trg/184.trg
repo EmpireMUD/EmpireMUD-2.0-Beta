@@ -338,6 +338,7 @@ Hobbit hole env~
 switch %random.6%
   case 1
     %echo% You hit your head on the low ceiling. Ow!
+    %scale% instance 10
     %aoe% 1
   break
   case 2
@@ -368,7 +369,7 @@ end
 eval num_people 0
 eval person %room.people%
 while %person%
-  if %person.is_pc% && %person.health% > 0
+  if %person.is_pc% && %person.vampire%
     eval num_people %num_people% + 1
     eval person_%num_people% %person%
   end
@@ -926,5 +927,12 @@ while %item%
 done
 %send% %actor% You link the unstable portal to %new_room.name%.
 %echoaround% %actor% %actor.name% links the unstable portal to %new_room.name%.
+~
+#18496
+Unstable portal block where~
+2 c 0
+where~
+%send% %actor% You don't even know where YOU are!
+return 1
 ~
 $
