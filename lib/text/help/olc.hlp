@@ -3538,6 +3538,7 @@ can specify multiple fields if you want. Any leftover arguments are matched to
 the object's keywords.
 
 Fields:
+  &capply&0 - see HELP OEDIT APPLY
   &cflagged&0 - see HELP OEDIT FLAGS
   &cnotflagged&0
   &clevel&0 - matches anything where this level is within the range

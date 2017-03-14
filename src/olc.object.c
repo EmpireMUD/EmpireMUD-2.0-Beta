@@ -819,9 +819,10 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 */
 void olc_fullsearch_obj(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
-	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_worn = NOBITS;
+	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS, only_worn = NOBITS;
 	int count, lookup, only_level = NOTHING, only_type = NOTHING;
 	obj_data *obj, *next_obj;
+	struct obj_apply *app;
 	size_t size;
 	
 	if (!*argument) {
@@ -835,7 +836,17 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		// figure out a type
 		argument = any_one_word(argument, type_arg);
 		
-		if (is_abbrev(type_arg, "flags") || is_abbrev(type_arg, "flagged")) {
+		if (is_abbrev(type_arg, "apply") || is_abbrev(type_arg, "applies")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, apply_types, FALSE)) != NOTHING) {
+				find_applies |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid apply type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "flags") || is_abbrev(type_arg, "flagged")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, extra_bits, FALSE)) != NOTHING) {
 				only_flags |= BIT(lookup);
@@ -914,6 +925,15 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		}
 		if (only_worn != NOBITS && (GET_OBJ_WEAR(obj) & only_worn) != only_worn) {
 			continue;
+		}
+		if (find_applies) {	// look up its applies
+			found_applies = NOBITS;
+			LL_FOREACH(GET_OBJ_APPLIES(obj), app) {
+				found_applies |= BIT(app->apply_type);
+			}
+			if ((find_applies & found_applies) != find_applies) {
+				continue;
+			}
 		}
 		if (*find_keywords && !multi_isname(find_keywords, GET_OBJ_KEYWORDS(obj))) {
 			continue;
