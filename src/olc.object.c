@@ -1046,7 +1046,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		if (find_custom) {	// look up its custom messages
 			found_custom = NOBITS;
 			LL_FOREACH(obj->custom_msgs, cust) {
-				found_custom |= BIT(inter->type);
+				found_custom |= BIT(cust->type);
 			}
 			if ((find_custom & found_custom) != find_custom) {
 				continue;
