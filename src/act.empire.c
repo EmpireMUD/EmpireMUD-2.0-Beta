@@ -4889,26 +4889,35 @@ ACMD(do_roster) {
 	extern const char *class_role[];
 	extern const char *class_role_color[];
 
-	char buf[MAX_STRING_LENGTH * 2], buf1[MAX_STRING_LENGTH * 2], arg[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], buf1[MAX_STRING_LENGTH * 2], arg[MAX_INPUT_LENGTH];
 	player_index_data *index, *next_index;
+	empire_data *e = GET_LOYALTY(ch);
 	bool timed_out, is_file = FALSE;
 	int days, hours, size;
 	char_data *member;
-	empire_data *e;
-
-	one_word(argument, arg);
-
-	if (!*arg || (GET_ACCESS_LEVEL(ch) < LVL_CIMPL && !IS_GRANTED(ch, GRANT_EMPIRES))) {
-		if (!(e = GET_LOYALTY(ch))) {
-			msg_to_char(ch, "You don't belong to any empire!\r\n");
+	bool all = FALSE;
+	
+	// imm usage: roster ["empire"] [all]
+	// mortal usage: roster [all]
+	
+	while (*argument) {
+		argument = any_one_word(argument, arg);
+		
+		if (!str_cmp(arg, "all") || is_abbrev(arg, "-all")) {
+			all = TRUE;
+		}
+		else if (*arg && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES))) {
+			if (!(e = get_empire_by_name(arg))) {
+				msg_to_char(ch, "Unknown empire.\r\n");
+				return;
+			}
+		}
+		else if (*arg) {
+			msg_to_char(ch, "Usage: roster %s[all]\r\n", (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES)) ? "[\"empire\"] " : "");
 			return;
 		}
 	}
-	else if (!(e = get_empire_by_name(arg))) {
-		send_to_char("Unknown empire.\r\n", ch);
-		return;
-	}
-
+	
 	*buf = '\0';
 	size = 0;
 	
@@ -4923,8 +4932,12 @@ ACMD(do_roster) {
 			continue;
 		}
 		
-		// display:
 		timed_out = member_is_timed_out_ch(member);
+		if (timed_out && !all) {
+			continue;
+		}
+		
+		// display:
 		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 			size += snprintf(buf + size, sizeof(buf) - size, "[%d %s %s] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), SHOW_CLASS_NAME(member), class_role[GET_CLASS_ROLE(member)], EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
 		}
