@@ -39,6 +39,7 @@ extern const char *component_types[];
 extern const char *container_bits[];
 extern const char *drinks[];
 extern const char *extra_bits[];
+extern const char *interact_types[];
 extern const char *item_types[];
 extern const struct material_data materials[NUM_MATERIALS];
 extern const char *obj_custom_types[];
@@ -845,8 +846,12 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 */
 void olc_fullsearch_obj(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
-	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS, only_worn = NOBITS, cmp_flags = NOBITS, not_cmp_flagged = NOBITS;
+	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
+	bitvector_t only_worn = NOBITS, cmp_flags = NOBITS, not_cmp_flagged = NOBITS, only_affs = NOBITS;
+	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	int count, lookup, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING, only_cmp = NOTHING;
+	struct interaction_item *inter;
+	struct custom_message *cust;
 	obj_data *obj, *next_obj;
 	struct obj_apply *app;
 	size_t size;
@@ -862,7 +867,17 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		// figure out a type
 		argument = any_one_arg(argument, type_arg);
 		
-		if (is_abbrev(type_arg, "apply") || is_abbrev(type_arg, "applies")) {
+		if (is_abbrev(type_arg, "affects")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, affected_bits, FALSE)) != NOTHING) {
+				only_affs |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid affect flag '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "apply") || is_abbrev(type_arg, "applies")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, apply_types, FALSE)) != NOTHING) {
 				find_applies |= BIT(lookup);
@@ -889,6 +904,16 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				return;
 			}
 		}
+		else if (is_abbrev(type_arg, "custom")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, obj_custom_types, FALSE)) != NOTHING) {
+				find_custom |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid custom message type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
 		else if (is_abbrev(type_arg, "flags") || is_abbrev(type_arg, "flagged")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, extra_bits, FALSE)) != NOTHING) {
@@ -896,6 +921,16 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 			}
 			else {
 				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "interaction")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, interact_types, FALSE)) != NOTHING) {
+				find_interacts |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid interaction type '%s'.\r\n", val_arg);
 				return;
 			}
 		}
@@ -984,6 +1019,9 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		if (not_flagged != NOBITS && OBJ_FLAGGED(obj, not_flagged)) {
 			continue;
 		}
+		if (only_affs != NOBITS && (GET_OBJ_AFF_FLAGS(obj) & only_affs) != only_affs) {
+			continue;
+		}
 		if (cmp_flags != NOBITS && (GET_OBJ_CMP_FLAGS(obj) & cmp_flags) != cmp_flags) {
 			continue;
 		}
@@ -1002,6 +1040,24 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				found_applies |= BIT(app->location);
 			}
 			if ((find_applies & found_applies) != find_applies) {
+				continue;
+			}
+		}
+		if (find_custom) {	// look up its custom messages
+			found_custom = NOBITS;
+			LL_FOREACH(obj->custom_msgs, cust) {
+				found_custom |= BIT(inter->type);
+			}
+			if ((find_custom & found_custom) != find_custom) {
+				continue;
+			}
+		}
+		if (find_interacts) {	// look up its interactions
+			found_interacts = NOBITS;
+			LL_FOREACH(obj->interactions, inter) {
+				found_interacts |= BIT(inter->type);
+			}
+			if ((find_interacts & found_interacts) != find_interacts) {
 				continue;
 			}
 		}
