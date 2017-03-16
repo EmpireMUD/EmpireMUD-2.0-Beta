@@ -3540,13 +3540,11 @@ the object's keywords.
 Fields:
   &caffects&0 - see HELP AFFECT FLAGS
   &capply&0 - see HELP OEDIT APPLY
-  &ccflagged&0 - see HELP COMPONENT FLAGS
-  &cnotcflagged&0
+  &ccflagged&0, &cnotcflagged&0 - see HELP COMPONENT FLAGS
   &ccomponent&0 - see HELP OEDIT COMPONENT
   &ccustom&0 - has a specific type, see HELP OEDIT CUSTOM
-  &cflagged&0 - see HELP OEDIT FLAGS
+  &cflagged&0, &cnotflagged&0 - see HELP OEDIT FLAGS
   &cinteraction&0 - has a specific type, see HELP OEDIT INTERACTION
-  &cnotflagged&0
   &clevel&0 - matches anything where this level is within the range
      (note: will not account for objects whose levels are inherited from mobs
      or adventures)
