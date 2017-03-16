@@ -427,7 +427,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_trigger(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count, lookup, only_attaches = NOTHING;
 	bitvector_t only_types = NOBITS;
 	trig_data *trig, *next_trig;
@@ -498,14 +498,22 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 			}
 		}
 		
-		size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
-		++count;
+		// show it
+		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+		if (strlen(line) + size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			++count;
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
 	}
 	
-	if (count > 0) {
+	if (count > 0 && (size + 14) < sizeof(buf)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "(%d triggers)\r\n", count);
 	}
-	else {
+	else if (count == 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
 	}
 	

@@ -818,7 +818,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_obj(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS, only_worn = NOBITS;
 	int count, lookup, only_level = NOTHING, only_type = NOTHING;
 	obj_data *obj, *next_obj;
@@ -939,14 +939,22 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 			continue;
 		}
 		
-		size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
-		++count;
+		// show it
+		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		if (strlen(line) + size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			++count;
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
 	}
 	
-	if (count > 0) {
+	if (count > 0 && (size + 14) < sizeof(buf)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "(%d objects)\r\n", count);
 	}
-	else {
+	else if (count == 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
 	}
 	
