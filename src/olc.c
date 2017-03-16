@@ -280,9 +280,9 @@ OLC_MODULE(oedit_short_description);
 OLC_MODULE(oedit_storage);
 OLC_MODULE(oedit_timer);
 OLC_MODULE(oedit_type);
+OLC_MODULE(oedit_value0);
 OLC_MODULE(oedit_value1);
 OLC_MODULE(oedit_value2);
-OLC_MODULE(oedit_value3);
 OLC_MODULE(oedit_wealth);
 OLC_MODULE(oedit_weapontype);
 OLC_MODULE(oedit_wear);
@@ -708,9 +708,9 @@ const struct olc_command_data olc_data[] = {
 	{ "store", oedit_storage, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "timer", oedit_timer, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "type", oedit_type, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "value0", oedit_value0, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "value1", oedit_value1, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "value2", oedit_value2, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "value3", oedit_value3, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "wealth", oedit_wealth, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "weapontype", oedit_weapontype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "wear", oedit_wear, OLC_OBJECT, OLC_CF_EDITOR },

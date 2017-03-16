@@ -3555,6 +3555,10 @@ Examples:
  > .o fullsearch type WEAPON wear HOLD
  > .o fullsearch flagged LARGE flagged TOOL-SHOVEL
  > .o fullsearch level 50 sword
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find all objects with the "Mini-pet Use"
+trigger, use ".t search 9900".
 #d
 "OEDIT KEYWORDS"
 
@@ -3898,19 +3902,19 @@ You can get specific help on each of these via HELP <type> ITEM
 
 See also: OEDIT WEAR, OLC OBJECTS
 #d
-"OEDIT VALUE1" "OEDIT VALUE2" "OEDIT VALUE3"
+"OEDIT VALUE0" "OEDIT VALUE1" "OEDIT VALUE2"
 
-Usage:  .value1 <number>
+Usage:  .value0 <number>
+        .value1 <number>
         .value2 <number>
-        .value3 <number>
 
 For item type OTHER, you can manually set the three object values. For all
 other item types, these values are used for things like damage, fullness,
 and capacity.
 
-If you set your OTHER object with the PLANTABLE flag, value2 is replaced by
+If you set your OTHER object with the PLANTABLE flag, value1 is replaced by
 the 'plants' property. If you can't see the plants property in the editor,
-it means your value2 is invalid for planting and you should set your value2
+it means your value1 is invalid for planting and you should set your value1
 back to 0.
 
 Some special procedures may use the object values of an OTHER object; the

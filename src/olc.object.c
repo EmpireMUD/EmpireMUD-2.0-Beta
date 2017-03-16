@@ -1661,10 +1661,10 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		default: {
 			// don't show "value2" (val 1) if it's plantable
 			if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE) >= 0) {
-				sprintf(storage + strlen(storage), "<&yvalue1&0> %d, <&yvalue3&0> %d\r\n", GET_OBJ_VAL(obj, 0), GET_OBJ_VAL(obj, 2));
+				sprintf(storage + strlen(storage), "<&yvalue0&0> %d, <&yvalue2&0> %d\r\n", GET_OBJ_VAL(obj, 0), GET_OBJ_VAL(obj, 2));
 			}
 			else {
-				sprintf(storage + strlen(storage), "<&yvalue1&0> %d, <&yvalue2&0> %d, <&yvalue3&0> %d\r\n", GET_OBJ_VAL(obj, 0), GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 2));
+				sprintf(storage + strlen(storage), "<&yvalue0&0> %d, <&yvalue1&0> %d, <&yvalue2&0> %d\r\n", GET_OBJ_VAL(obj, 0), GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 2));
 			}
 			break;
 		}
@@ -2775,6 +2775,18 @@ OLC_MODULE(oedit_type) {
 }
 
 
+OLC_MODULE(oedit_value0) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	
+	if (GET_OBJ_TYPE(obj) != ITEM_OTHER) {
+		msg_to_char(ch, "You can only manually set values on OTHER-type objects.\r\n");
+	}
+	else {
+		GET_OBJ_VAL(obj, 0) = olc_process_number(ch, argument, "value 0", "value0", -MAX_INT, MAX_INT, GET_OBJ_VAL(obj, 0));
+	}
+}
+
+
 OLC_MODULE(oedit_value1) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
@@ -2782,7 +2794,7 @@ OLC_MODULE(oedit_value1) {
 		msg_to_char(ch, "You can only manually set values on OTHER-type objects.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, 0) = olc_process_number(ch, argument, "first value", "value1", -MAX_INT, MAX_INT, GET_OBJ_VAL(obj, 0));
+		GET_OBJ_VAL(obj, 1) = olc_process_number(ch, argument, "value 1", "value1", -MAX_INT, MAX_INT, GET_OBJ_VAL(obj, 1));
 	}
 }
 
@@ -2794,19 +2806,7 @@ OLC_MODULE(oedit_value2) {
 		msg_to_char(ch, "You can only manually set values on OTHER-type objects.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, 1) = olc_process_number(ch, argument, "second value", "value2", -MAX_INT, MAX_INT, GET_OBJ_VAL(obj, 1));
-	}
-}
-
-
-OLC_MODULE(oedit_value3) {
-	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	
-	if (GET_OBJ_TYPE(obj) != ITEM_OTHER) {
-		msg_to_char(ch, "You can only manually set values on OTHER-type objects.\r\n");
-	}
-	else {
-		GET_OBJ_VAL(obj, 2) = olc_process_number(ch, argument, "third value", "value3", -MAX_INT, MAX_INT, GET_OBJ_VAL(obj, 2));
+		GET_OBJ_VAL(obj, 2) = olc_process_number(ch, argument, "value 2", "value2", -MAX_INT, MAX_INT, GET_OBJ_VAL(obj, 2));
 	}
 }
 
