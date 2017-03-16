@@ -55,6 +55,9 @@ extern double get_weapon_speed(obj_data *weapon);
 // locals
 char **get_weapon_types_string();
 
+// data
+char **olc_material_list = NULL;	// used for olc
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -257,6 +260,29 @@ bool audit_object(obj_data *obj, char_data *ch) {
 	}
 	
 	return problem;
+}
+
+
+/**
+* Converts material data to a list that can be used by search_block and olc
+* functions.
+*
+* TODO: Could macro this process since it is also used by weapons, etc.
+*/
+void check_oedit_material_list(void) {
+	int iter;
+	
+	// this does not have a const char** list .. build one the first time
+	if (!olc_material_list) {
+		CREATE(olc_material_list, char*, NUM_MATERIALS+1);
+		
+		for (iter = 0; iter < NUM_MATERIALS; ++iter) {
+			olc_material_list[iter] = str_dup(materials[iter].name);
+		}
+		
+		// must terminate
+		olc_material_list[NUM_MATERIALS] = str_dup("\n");
+	}
 }
 
 
@@ -819,8 +845,8 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 */
 void olc_fullsearch_obj(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
-	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS, only_worn = NOBITS;
-	int count, lookup, only_level = NOTHING, only_type = NOTHING;
+	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS, only_worn = NOBITS, cmp_flags = NOBITS, not_cmp_flagged = NOBITS;
+	int count, lookup, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING, only_cmp = NOTHING;
 	obj_data *obj, *next_obj;
 	struct obj_apply *app;
 	size_t size;
@@ -846,13 +872,30 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				return;
 			}
 		}
+		else if (is_abbrev(type_arg, "cflags") || is_abbrev(type_arg, "cflagged")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, component_flags, FALSE)) != NOTHING) {
+				cmp_flags |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid component flag '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "component")) {
+			argument = any_one_word(argument, val_arg);
+			if ((only_cmp = search_block(val_arg, component_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid component '%s'.\r\n", val_arg);
+				return;
+			}
+		}
 		else if (is_abbrev(type_arg, "flags") || is_abbrev(type_arg, "flagged")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, extra_bits, FALSE)) != NOTHING) {
 				only_flags |= BIT(lookup);
 			}
 			else {
-				msg_to_char(ch, "Invalid wear location '%s'.\r\n", val_arg);
+				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
 				return;
 			}
 		}
@@ -863,10 +906,28 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				return;
 			}
 		}
+		else if (is_abbrev(type_arg, "material")) {
+			check_oedit_material_list();
+			argument = any_one_word(argument, val_arg);
+			if ((only_mat = search_block(val_arg, (const char **)olc_material_list, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid material '%s'.\r\n", val_arg);
+				return;
+			}
+		}
 		else if (is_abbrev(type_arg, "type")) {
 			argument = any_one_word(argument, val_arg);
 			if ((only_type = search_block(val_arg, item_types, FALSE)) == NOTHING) {
 				msg_to_char(ch, "Invalid type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "uncflagged")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, component_flags, FALSE)) != NOTHING) {
+				not_cmp_flagged |= BIT(lookup);
+			}
+			else {
+				msg_to_char(ch, "Invalid component flag '%s'.\r\n", val_arg);
 				return;
 			}
 		}
@@ -876,7 +937,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				not_flagged |= BIT(lookup);
 			}
 			else {
-				msg_to_char(ch, "Invalid wear location '%s'.\r\n", val_arg);
+				msg_to_char(ch, "Invalid flag '%s'.\r\n", val_arg);
 				return;
 			}
 		}
@@ -911,19 +972,28 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				continue;
 			}
 		}
+		if (only_cmp != NOTHING && GET_OBJ_CMP_TYPE(obj) != only_cmp) {
+			continue;
+		}
 		if (only_type != NOTHING && GET_OBJ_TYPE(obj) != only_type) {
 			continue;
 		}
-		if (not_flagged != NOBITS && OBJ_FLAGGED(obj, not_flagged)) {
+		if (not_cmp_flagged != NOBITS && OBJ_CMP_FLAGGED(obj, not_cmp_flagged)) {
 			continue;
 		}
 		if (not_flagged != NOBITS && OBJ_FLAGGED(obj, not_flagged)) {
+			continue;
+		}
+		if (cmp_flags != NOBITS && (GET_OBJ_CMP_FLAGS(obj) & cmp_flags) != cmp_flags) {
 			continue;
 		}
 		if (only_flags != NOBITS && (GET_OBJ_EXTRA(obj) & only_flags) != only_flags) {
 			continue;
 		}
 		if (only_worn != NOBITS && (GET_OBJ_WEAR(obj) & only_worn) != only_worn) {
+			continue;
+		}
+		if (only_mat != NOTHING && GET_OBJ_MATERIAL(obj) != only_mat) {
 			continue;
 		}
 		if (find_applies) {	// look up its applies
@@ -935,7 +1005,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_OBJ_KEYWORDS(obj))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_OBJ_KEYWORDS(obj)) && !multi_isname(find_keywords, GET_OBJ_SHORT_DESC(obj)) && !multi_isname(find_keywords, GET_OBJ_LONG_DESC(obj)) && !multi_isname(find_keywords, NULLSAFE(GET_OBJ_ACTION_DESC(obj)))) {
 			continue;
 		}
 		
@@ -2312,22 +2382,8 @@ OLC_MODULE(oedit_long_desc) {
 
 OLC_MODULE(oedit_material) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	static char **material_types = NULL;
-	int iter;
-	
-	// this does not have a const char** list .. build one the first time
-	if (!material_types) {
-		CREATE(material_types, char*, NUM_MATERIALS+1);
-		
-		for (iter = 0; iter < NUM_MATERIALS; ++iter) {
-			material_types[iter] = str_dup(materials[iter].name);
-		}
-		
-		// must terminate
-		material_types[NUM_MATERIALS] = str_dup("\n");
-	}
-	
-	GET_OBJ_MATERIAL(obj) = olc_process_type(ch, argument, "material", "material", (const char**)material_types, GET_OBJ_MATERIAL(obj));
+	check_oedit_material_list();
+	GET_OBJ_MATERIAL(obj) = olc_process_type(ch, argument, "material", "material", (const char**)olc_material_list, GET_OBJ_MATERIAL(obj));
 }
 
 

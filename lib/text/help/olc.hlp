@@ -3539,11 +3539,15 @@ the object's keywords.
 
 Fields:
   &capply&0 - see HELP OEDIT APPLY
+  &ccflagged&0 - see HELP COMPONENT FLAGS
+  &cnotcflagged&0
+  &ccomponent&0 - see HELP OEDIT COMPONENT
   &cflagged&0 - see HELP OEDIT FLAGS
   &cnotflagged&0
   &clevel&0 - matches anything where this level is within the range
      (note: will not account for objects whose levels are inherited from mobs
      or adventures)
+  &cmaterial&0 - see OEDIT MATERIAL
   &ctype&0 - see HELP OEDIT TYPE
   &cwear&0 - see HELP OEDIT WEAR
 
@@ -3647,6 +3651,14 @@ spends.
 Choose the material that best fits your object. If there isn't one that fits
 at all, contact the programmer to discuss adding a new one. But remember, the
 material doesn't need to be exact. It just needs to be close enough.
+
+Available mat
+  WOOD     ROCK      IRON
+  SILVER   GOLD      FLINT
+  CLAY     FLESH     GLASS
+  WAX      MAGIC     CLOTH
+  GEM      COPPER    BONE
+  HAIR
 
 See also: OLC OBJECTS
 #d
