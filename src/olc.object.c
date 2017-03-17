@@ -867,7 +867,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		// figure out a type
 		argument = any_one_arg(argument, type_arg);
 		
-		if (is_abbrev(type_arg, "affects")) {
+		if (is_abbrev(type_arg, "-affects")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, affected_bits, FALSE)) != NOTHING) {
 				only_affs |= BIT(lookup);
@@ -877,7 +877,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "apply") || is_abbrev(type_arg, "applies")) {
+		else if (is_abbrev(type_arg, "-apply") || is_abbrev(type_arg, "-applies")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, apply_types, FALSE)) != NOTHING) {
 				find_applies |= BIT(lookup);
@@ -887,7 +887,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "cflags") || is_abbrev(type_arg, "cflagged")) {
+		else if (is_abbrev(type_arg, "-cflags") || is_abbrev(type_arg, "-cflagged")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, component_flags, FALSE)) != NOTHING) {
 				cmp_flags |= BIT(lookup);
@@ -897,14 +897,14 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "component")) {
+		else if (is_abbrev(type_arg, "-component")) {
 			argument = any_one_word(argument, val_arg);
 			if ((only_cmp = search_block(val_arg, component_types, FALSE)) == NOTHING) {
 				msg_to_char(ch, "Invalid component '%s'.\r\n", val_arg);
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "custom")) {
+		else if (is_abbrev(type_arg, "-custom")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, obj_custom_types, FALSE)) != NOTHING) {
 				find_custom |= BIT(lookup);
@@ -914,7 +914,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "flags") || is_abbrev(type_arg, "flagged")) {
+		else if (is_abbrev(type_arg, "-flags") || is_abbrev(type_arg, "-flagged")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, extra_bits, FALSE)) != NOTHING) {
 				only_flags |= BIT(lookup);
@@ -924,7 +924,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "interaction")) {
+		else if (is_abbrev(type_arg, "-interaction")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, interact_types, FALSE)) != NOTHING) {
 				find_interacts |= BIT(lookup);
@@ -934,14 +934,14 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "level")) {
+		else if (is_abbrev(type_arg, "-level")) {
 			argument = any_one_word(argument, val_arg);
 			if (!isdigit(*val_arg) || (only_level = atoi(val_arg)) < 0) {
 				msg_to_char(ch, "Invalid level '%s'.\r\n", val_arg);
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "material")) {
+		else if (is_abbrev(type_arg, "-material")) {
 			check_oedit_material_list();
 			argument = any_one_word(argument, val_arg);
 			if ((only_mat = search_block(val_arg, (const char **)olc_material_list, FALSE)) == NOTHING) {
@@ -949,14 +949,14 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "type")) {
+		else if (is_abbrev(type_arg, "-type")) {
 			argument = any_one_word(argument, val_arg);
 			if ((only_type = search_block(val_arg, item_types, FALSE)) == NOTHING) {
 				msg_to_char(ch, "Invalid type '%s'.\r\n", val_arg);
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "uncflagged")) {
+		else if (is_abbrev(type_arg, "-uncflagged")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, component_flags, FALSE)) != NOTHING) {
 				not_cmp_flagged |= BIT(lookup);
@@ -966,7 +966,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "unflagged")) {
+		else if (is_abbrev(type_arg, "-unflagged")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, extra_bits, FALSE)) != NOTHING) {
 				not_flagged |= BIT(lookup);
@@ -976,7 +976,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "wear") || is_abbrev(type_arg, "worn")) {
+		else if (is_abbrev(type_arg, "-wear") || is_abbrev(type_arg, "-worn")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, wear_bits, FALSE)) != NOTHING) {
 				only_worn |= BIT(lookup);

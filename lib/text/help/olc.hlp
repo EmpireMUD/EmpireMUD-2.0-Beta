@@ -3531,31 +3531,31 @@ See also: OEDIT DECAY, OLC OBJECTS
 #d
 "OEDIT FULLSEARCH"
 
-Usage:  .o fullsearch <field> <argument> <...>
+Usage:  .o fullsearch -<field> <argument> <...>
 
 This command allows you to search for objects matching certain criteria. You
-can specify multiple fields if you want. Any leftover arguments are matched to
-the object's keywords.
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the object's keywords and short/long/look descriptions.
 
 Fields:
-  &caffects&0 - see HELP AFFECT FLAGS
-  &capply&0 - see HELP OEDIT APPLY
-  &ccflagged&0, &cnotcflagged&0 - see HELP COMPONENT FLAGS
-  &ccomponent&0 - see HELP OEDIT COMPONENT
-  &ccustom&0 - has a specific type, see HELP OEDIT CUSTOM
-  &cflagged&0, &cnotflagged&0 - see HELP OEDIT FLAGS
-  &cinteraction&0 - has a specific type, see HELP OEDIT INTERACTION
-  &clevel&0 - matches anything where this level is within the range
+  &c-affects&0 - see HELP AFFECT FLAGS
+  &c-apply&0 - see HELP OEDIT APPLY
+  &c-cflagged&0, &cnotcflagged&0 - see HELP COMPONENT FLAGS
+  &c-component&0 - see HELP OEDIT COMPONENT
+  &c-custom&0 - has a specific type, see HELP OEDIT CUSTOM
+  &c-flagged&0, &cnotflagged&0 - see HELP OEDIT FLAGS
+  &c-interaction&0 - has a specific type, see HELP OEDIT INTERACTION
+  &c-level&0 - matches anything where this level is within the range
      (note: will not account for objects whose levels are inherited from mobs
      or adventures)
-  &cmaterial&0 - see OEDIT MATERIAL
-  &ctype&0 - see HELP OEDIT TYPE
-  &cwear&0 - see HELP OEDIT WEAR
+  &c-material&0 - see OEDIT MATERIAL
+  &c-type&0 - see HELP OEDIT TYPE
+  &c-wear&0 - see HELP OEDIT WEAR
 
 Examples:
- > .o fullsearch type WEAPON wear HOLD
- > .o fullsearch flagged LARGE flagged TOOL-SHOVEL
- > .o fullsearch level 50 sword
+ > .o fullsearch -type WEAPON -wear HOLD
+ > .o fullsearch -flagged LARGE -flagged TOOL-SHOVEL
+ > .o fullsearch -level 50 sword
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all objects with the "Mini-pet Use"
@@ -5257,18 +5257,18 @@ See also: SCRIPT COMMANDS, OLC TRIGGERS, TEXT EDITOR
 #d
 "TRIGEDIT FULLSEARCH"
 
-Usage:  .t fullsearch <field> <argument> <...>
+Usage:  .t fullsearch -<field> <argument> <...>
 
 This command allows you to search for triggers matching certain criteria. You
 can specify multiple fields if you want. Any leftover arguments are matched to
 the trigger's name and command text.
 
 Fields:
-  &cattaches&0 - see HELP TRIGEDIT ATTACHES
-  &ctype&0 - see HELP MTRIG TYPES, etc.
+  &c-attaches&0 - see HELP TRIGEDIT ATTACHES
+  &c-type&0 - see HELP MTRIG TYPES, etc.
 
 Examples:
- > .t fullsearch type Random type Global
+ > .t fullsearch -type Random -type Global
  > .t fullsearch i11234
  > .t fullsearch %force%
 #d

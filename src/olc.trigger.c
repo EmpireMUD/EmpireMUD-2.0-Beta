@@ -446,14 +446,14 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 		// figure out a type
 		argument = any_one_arg(argument, type_arg);
 		
-		if (is_abbrev(type_arg, "attaches")) {
+		if (is_abbrev(type_arg, "-attaches")) {
 			argument = any_one_word(argument, val_arg);
 			if ((only_attaches = search_block(val_arg, trig_attach_types, FALSE)) == NOTHING) {
 				msg_to_char(ch, "Invalid attach type '%s'.\r\n", val_arg);
 				return;
 			}
 		}
-		else if (is_abbrev(type_arg, "types")) {
+		else if (is_abbrev(type_arg, "-types")) {
 			argument = any_one_word(argument, val_arg);
 			if ((lookup = search_block(val_arg, trig_types, FALSE)) == NOTHING && (lookup = search_block(val_arg, otrig_types, FALSE)) == NOTHING && (lookup = search_block(val_arg, vtrig_types, FALSE)) == NOTHING && (lookup = search_block(val_arg, wtrig_types, FALSE)) == NOTHING) {
 				msg_to_char(ch, "Invalid trigger type '%s'.\r\n", val_arg);
