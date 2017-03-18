@@ -110,6 +110,53 @@ void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
 	EMPIRE_SHIPPING_LIST(old_emp) = NULL;
 }
 
+/**
+* Copies workforce limits from target island into the island the character is currently in.
+*
+* @param empire_data *emp The empire whose settings to consider.
+* @param char_data *ch The person requesting the copy.
+* @param struct island_info *island Which island to copy the limits from.
+*/
+void copy_workforce_limits_into_current_island(empire_data *emp, char_data *ch, struct island_info *island) {
+	struct empire_island *isle, *next_isle, *source_isle = NULL;
+	struct island_info *ch_current_island = NULL;
+	int iter;
+	
+	ch_current_island = get_island(GET_ISLAND_ID(IN_ROOM(ch)), false);
+	
+	if (!ch_current_island || ch_current_island->id == NO_ISLAND) {
+		msg_to_char(ch, "You are not currently in any island.");
+		return;
+	}
+	
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		if (isle->island == island->id){
+			source_isle = isle;
+		}
+	}
+	
+	//Error validation
+	if ( !source_isle ) {
+		msg_to_char(ch, "Your empire has no affiliation with source island \"%s\".", island->name);
+		return;
+	}
+	if ( source_isle->island == ch_current_island->id ) {
+		msg_to_char(ch, "Your source island can't be the same as your current island.");
+		return;
+	}
+	
+	//Things went fine? Let's copy!
+	for (iter = 0; iter < NUM_CHORES; ++iter) {
+		set_workforce_limit(emp, ch_current_island->id, iter, source_isle->workforce_limit[iter]);
+		if (source_isle->workforce_limit[iter] == 0) {
+			deactivate_workforce(emp, ch_current_island->id, iter);
+		}
+	}
+	
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	
+	msg_to_char(ch, "Successfuly copied workforce limits from \"%s\" to \"%s\".",island->name,ch_current_island->name);
+}
 
 /**
 * Determines how much an empire must spend to start a war with another empire,
@@ -5151,6 +5198,22 @@ ACMD(do_workforce) {
 			msg_to_char(ch, "Workforce will no longer work this tile.\r\n");
 			deactivate_workforce_room(emp, IN_ROOM(ch));
 		}
+	}
+	else if (is_abbrev(arg, "copy")) {
+		// process remaining args (island name may have quotes)
+		skip_spaces(&argument);
+		while (*argument == '"') {	// remove initial "
+			++argument;
+		}
+		if (*argument && argument[strlen(argument)-1] == '"') {	// remove trailing "
+			argument[strlen(argument)-1] = '\0';
+		}
+		
+		if (!(island = get_island_by_name(argument)) && !(island = get_island_by_coords(argument))) {
+			msg_to_char(ch, "Unknown island \"%s\".\r\n", argument);
+			return;
+		}
+		copy_workforce_limits_into_current_island(emp,ch,island);
 	}
 	else {	// <chore>: show/change type
 		// find chore
