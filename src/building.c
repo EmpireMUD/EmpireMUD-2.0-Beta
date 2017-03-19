@@ -212,15 +212,20 @@ void construct_building(room_data *room, bld_vnum type) {
 	
 	// check for territory updates
 	if (ROOM_OWNER(room) && was_large != ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS)) {
+		struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
 		if (was_large && was_in_city && !is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
 			// changing from in-city to not
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) -= 1;
+			eisle->city_terr -= 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) += 1;
+			eisle->outside_terr += 1;
 		}
 		else if (ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
 			// changing from outside-territory to in-city
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) += 1;
+			eisle->city_terr += 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) -= 1;
+			eisle->outside_terr -= 1;
 		}
 		else {
 			// no relevant change
@@ -405,15 +410,20 @@ void disassociate_building(room_data *room) {
 	
 	// check for territory updates
 	if (ROOM_OWNER(room) && was_large != ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS)) {
+		struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
 		if (was_large && was_in_city && !is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
 			// changing from in-city to not
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) -= 1;
+			eisle->city_terr -= 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) += 1;
+			eisle->outside_terr += 1;
 		}
 		else if (ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
 			// changing from outside-territory to in-city
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) += 1;
+			eisle->city_terr += 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) -= 1;
+			eisle->outside_terr -= 1;
 		}
 		else {
 			// no relevant change
@@ -1074,7 +1084,7 @@ ACMD(do_build) {
 	bool junk, wait;
 	
 	// simple rules for ch building a given craft
-	#define CHAR_CAN_BUILD(ch, ttype)  (GET_CRAFT_TYPE((ttype)) == CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)) && (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || has_ability((ch), GET_CRAFT_ABILITY((ttype)))))
+	#define CHAR_CAN_BUILD(ch, ttype)  (GET_CRAFT_TYPE((ttype)) == CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)) && (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || has_ability((ch), GET_CRAFT_ABILITY((ttype)))) && (GET_CRAFT_REQUIRES_OBJ(ttype) == NOTHING || get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(ttype), ch->carrying)))
 	
 	skip_spaces(&argument);
 	
@@ -1174,11 +1184,6 @@ ACMD(do_build) {
 		
 			HASH_ITER(sorted_hh, sorted_crafts, iter, next_iter) {
 				if (CHAR_CAN_BUILD(ch, iter)) {
-					// only display if they have the required object
-					if (GET_CRAFT_REQUIRES_OBJ(iter) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(iter), ch->carrying)) {
-						continue;
-					}
-
 					if (strlen(buf) + strlen(GET_CRAFT_NAME(iter)) + 2 >= 80) {
 						this_line = FALSE;
 						msg_to_char(ch, "%s\r\n", buf);
@@ -1233,6 +1238,9 @@ ACMD(do_build) {
 	}
 	else if (GET_CRAFT_BUILD_TYPE(type) == NOTHING || !building_proto(GET_CRAFT_BUILD_TYPE(type))) {
 		msg_to_char(ch, "That build recipe is not implemented.\r\n");
+	}
+	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && found_obj && !consume_otrigger(found_obj, ch, OCMD_BUILD)) {
+		return;	// the trigger should send its own message if it prevented this
 	}
 	else {
 		found = TRUE;

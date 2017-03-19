@@ -286,4 +286,28 @@ Type 'use whistle' to summon it.
 2 0
 T 9900
 S
+#9924
+whistle bald beagle~
+a bald beagle whistle~
+A bald beagle whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 6
+9924 0 0
+2 0
+T 9900
+S
+#9925
+whistle great white snark~
+a great white snark whistle~
+A great white snark whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 7
+9925 0 0
+2 0
+T 9900
+S
 $

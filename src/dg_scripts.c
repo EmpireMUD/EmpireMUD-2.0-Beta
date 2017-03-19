@@ -27,6 +27,7 @@
 #include "skills.h"
 
 #define PULSES_PER_MUD_HOUR     (SECS_PER_MUD_HOUR*PASSES_PER_SEC)
+#define player_script_radius  25	// map tiles away that players may be for scripts to trigger
 
 
 /* external vars from db.c */
@@ -199,6 +200,18 @@ int find_eq_pos_script(char *arg) {
 
 int can_wear_on_pos(obj_data *obj, int pos) {
 	return CAN_WEAR(obj, wear_data[pos].item_wear);
+}
+
+
+/**
+* Determines if there is a nearby connected player, which is a requirement
+* for some things like random triggers.
+*
+* @param room_data *loc The location to check for nearby players.
+* @return bool TRUE if there are players nearby.
+*/
+static bool players_nearby_script(room_data *loc) {
+	return distance_to_nearest_player(loc) <= player_script_radius;
 }
 
 
@@ -523,6 +536,42 @@ room_data *get_room(room_data *ref, char *name) {
 		return NULL;
 	else
 		return nr;
+}
+
+
+/**
+* Attempts to find a room, if possible, for a script that's running.
+*
+* @param int type Script type (WLD_TRIGGER, etc.)
+* @param void *go The thing running the script (ambiguous).
+* @return room_data* The room the script is running in (may be NULL if undetectable).
+*/
+room_data *get_room_by_script(int type, void *go) {
+	room_data *room = NULL;
+	
+	switch (type) {
+		case WLD_TRIGGER:
+		case RMT_TRIGGER:
+		case BLD_TRIGGER:
+		case ADV_TRIGGER: {
+			room = (room_data*)go;
+			break;
+		}
+		case OBJ_TRIGGER: {
+			room = obj_room((obj_data*)go);
+			break;
+		}
+		case MOB_TRIGGER: {
+			room = IN_ROOM((char_data*)go);
+			break;
+		}
+		case VEH_TRIGGER: {
+			room = IN_ROOM((vehicle_data*)go);
+			break;
+		}
+	}
+	
+	return room;
 }
 
 
@@ -956,69 +1005,100 @@ int char_has_item(char *item, char_data *ch) {
 
 /* checks every PULSE_SCRIPT for random triggers */
 void script_trigger_check(void) {
-	static int my_cycle = 0;
-	
-	vehicle_data *veh, *next_veh;
-	char_data *ch, *next_ch;
-	obj_data *obj, *next_obj;
-	room_data *room, *next_room;
+	room_data *room, *in_room = NULL;
+	trig_data *trig, *next_trig;
+	char buf[MAX_STRING_LENGTH];
 	struct script_data *sc;
+	vehicle_data *veh;
+	char_data *mob;
+	obj_data *obj;
+	bool fail;
 	
-	LL_FOREACH_SAFE(character_list, ch, next_ch) {
-		if (!(sc = SCRIPT(ch)) || !IS_SET(SCRIPT_TYPES(sc), MTRIG_RANDOM)) {
-			continue;	// no random scripts
+	// iterate over global list of random triggers
+	LL_FOREACH_SAFE2(random_triggers, trig, next_trig, next_in_random_triggers) {
+		if (GET_TRIG_DEPTH(trig)) {
+			continue;	// trigger already running
 		}
-
-		// success
-		random_mtrigger(ch);
-	}
-	
-	LL_FOREACH_SAFE(object_list, obj, next_obj) {
-		if (!(sc = SCRIPT(obj))) {
-			continue;	// no scripts
+		if (!(sc = trig->attached_to)) {
+			continue;	// can't get script data
 		}
-		if (!IS_SET(SCRIPT_TYPES(sc), OTRIG_RANDOM)) {
-			continue;	// no randoms
+		if (!(sc->attached_to)) {
+			continue;	// script somehow not attached to anything
 		}
-		// objs do not check players nearby
+		if (number(1, 100) > GET_TRIG_NARG(trig)) {
+			continue;	// failed % check (this is cheap so we do it first)
+		}
 		
-		// success
-		random_otrigger(obj);
-	}
-	
-	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
-		if (!IN_ROOM(veh)) {
-			continue; // not in a room?
-		}
-		if (!(sc = SCRIPT(veh)) || !IS_SET(SCRIPT_TYPES(sc), VTRIG_RANDOM)) {
-			return;	// no random scripts
-		}
-
-		// success
-		random_vtrigger(veh);
-	}
-
-	// Except every 5th cycle, this only does "interior" rooms -- to prevent over-frequent map iteration
-	if (++my_cycle >= 5) {
-		my_cycle = 0;
-		HASH_ITER(hh, world_table, room, next_room) {
-			if (!(sc = SCRIPT(room)) || !IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM)) {
-				continue;	// no random scripts
+		// clean vars
+		mob = NULL;
+		obj = NULL;
+		veh = NULL;
+		room = in_room = NULL;
+		fail = FALSE;
+		
+		// x_TRIGGER: basic setup by type
+		switch (sc->attached_type) {
+			case MOB_TRIGGER: {
+				mob = (char_data *)sc->attached_to;
+				in_room = IN_ROOM(mob);
+				if (AFF_FLAGGED(mob, AFF_CHARM) && !TRIGGER_CHECK(trig, MTRIG_CHARMED)) {
+					fail = TRUE;	// can't do while charmed
+				}
+				break;
 			}
-			
-			// success
-			random_wtrigger(room);
-		}
-	}
-	else {
-		// partial
-		LL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
-			if (!(sc = SCRIPT(room)) || !IS_SET(SCRIPT_TYPES(sc), WTRIG_RANDOM)) {
-				continue;	// no random scripts
+			case OBJ_TRIGGER: {
+				obj = (obj_data *)sc->attached_to;
+				in_room = obj_room(obj);
+				break;
 			}
-			
-			// success
-			random_wtrigger(room);
+			case VEH_TRIGGER: {
+				veh = (vehicle_data *)sc->attached_to;
+				in_room = IN_ROOM(veh);
+				break;
+			}
+			default: {	// all world trigger types
+				room = in_room = (room_data*)sc->attached_to;
+				break;
+			}
+		}
+		
+		if (fail) {
+			continue; // type-based fail
+		}
+		if (TRIG_IS_LOCAL(trig) && (!in_room || !any_players_in_room(in_room))) {
+			continue;	// need player present (is local)
+		}
+		else if (!TRIG_IS_GLOBAL(trig) && (!in_room || !players_nearby_script(in_room))) {
+			continue;	// need players nearby (not global)
+		}
+		
+		// x_TRIGGER: run the triggers, by type
+		switch (sc->attached_type) {
+			case MOB_TRIGGER: {
+				union script_driver_data_u sdd;
+				sdd.c = mob;
+				script_driver(&sdd, trig, MOB_TRIGGER, TRIG_NEW);
+				break;
+			}
+			case OBJ_TRIGGER: {
+				union script_driver_data_u sdd;
+				sdd.o = obj;
+				script_driver(&sdd, trig, OBJ_TRIGGER, TRIG_NEW);
+				break;
+			}
+			case VEH_TRIGGER: {
+				union script_driver_data_u sdd;
+				sdd.v = veh;
+				script_driver(&sdd, trig, VEH_TRIGGER, TRIG_NEW);
+				break;
+			}
+			default: {	// all world trigger types
+				union script_driver_data_u sdd;
+				ADD_ROOM_UID_VAR(buf, trig, room, "room", 0);
+				sdd.r = room;
+				script_driver(&sdd, trig, WLD_TRIGGER, TRIG_NEW);
+				break;
+			}
 		}
 	}
 }
@@ -1263,9 +1343,13 @@ void add_trigger(struct script_data *sc, trig_data *t, int loc) {
 	}
 
 	SCRIPT_TYPES(sc) |= GET_TRIG_TYPE(t);
-
-	t->next_in_world = trigger_list;
-	trigger_list = t;
+	t->attached_to = sc;
+	
+	// add to lists
+	LL_PREPEND2(trigger_list, t, next_in_world);
+	if (TRIG_IS_RANDOM(t)) {
+		LL_PREPEND2(random_triggers, t, next_in_random_triggers);
+	}
 }
 
 
@@ -1320,8 +1404,9 @@ ACMD(do_tattach) {
 			return;
 		}
 
-		if (!SCRIPT(victim))
-			CREATE(SCRIPT(victim), struct script_data, 1);
+		if (!SCRIPT(victim)) {
+			create_script_data(victim, MOB_TRIGGER);
+		}
 		add_trigger(SCRIPT(victim), trig, loc);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s.", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim), GET_NAME(ch));
@@ -1358,8 +1443,9 @@ ACMD(do_tattach) {
 			return;
 		}
 
-		if (!SCRIPT(object))
-			CREATE(SCRIPT(object), struct script_data, 1);
+		if (!SCRIPT(object)) {
+			create_script_data(object, OBJ_TRIGGER);
+		}
 		add_trigger(SCRIPT(object), trig, loc);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s.", tn, GET_TRIG_NAME(trig), (GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name), GET_OBJ_VNUM(object), GET_NAME(ch));
@@ -1395,7 +1481,7 @@ ACMD(do_tattach) {
 		}
 
 		if (!SCRIPT(veh)) {
-			CREATE(SCRIPT(veh), struct script_data, 1);
+			create_script_data(veh, VEH_TRIGGER);
 		}
 		add_trigger(SCRIPT(veh), trig, loc);
 
@@ -1430,8 +1516,9 @@ ACMD(do_tattach) {
 			return;
 		}
 
-		if (!SCRIPT(room))
-			CREATE(SCRIPT(room), struct script_data, 1);
+		if (!SCRIPT(room)) {
+			create_script_data(room, WLD_TRIGGER);
+		}
 		add_trigger(SCRIPT(room), trig, loc);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to room %d by %s.", tn, GET_TRIG_NAME(trig), GET_ROOM_VNUM(room), GET_NAME(ch));
@@ -2303,7 +2390,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			else if (!str_cmp(var, "instance")) {
 				struct instance_data *inst = get_instance_for_script(type, go);
 				
-				if (!inst) {
+				// does not require an instance
+				if (!str_cmp(field, "nearest_rmt")) {
+					extern room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum);
+					room_data *find;
+					any_vnum vnum;
+					if (subfield && isdigit(*subfield) && ((vnum = atoi(subfield)) != NOTHING) && (find = find_nearest_rmt(get_room_by_script(type, go), vnum))) {
+						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(find) + ROOM_ID_BASE);
+					}
+					else {
+						snprintf(str, slen, "0");
+					}
+				}
+				
+				// everything else requires inst exists
+				else if (!inst) {
 					// safety
 					snprintf(str, slen, "0");
 				}
@@ -2720,6 +2821,24 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
 						snprintf(str, slen, "%d", (troom && can_use_room(c, troom, MEMBERS_ONLY)) ? 1 : 0);
 					}
+					else if (!str_cmp(field, "can_enter_instance")) {
+						extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
+						extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
+						struct instance_data *inst;
+						
+						if (troom && IS_ADVENTURE_ROOM(troom) && (inst = find_instance_by_room(troom, FALSE))) {
+							// only if not already in there
+							if (!IS_ADVENTURE_ROOM(IN_ROOM(c)) || find_instance_by_room(IN_ROOM(c), FALSE) != inst) {
+								if (!can_enter_instance(c, inst)) {
+									snprintf(str, slen, "0");
+								}
+							}
+						}
+						if (*str != '0') {	// all other cases
+							snprintf(str, slen, "1");
+						}
+					}
 					else if (!str_cmp(field, "can_teleport_room")) {
 						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
 						snprintf(str, slen, "%d", (troom && can_teleport_to(c, troom, TRUE)) ? 1 : 0);
@@ -2939,14 +3058,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "has_reputation")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.has_reputation(vnum, level)%
-							struct player_faction_data *pfd;
 							char arg1[256], arg2[256];
 							faction_data *fct;
 							int rep;
 							
 							comma_args(subfield, arg1, arg2);
-							if (*arg1 && *arg2 && (fct = find_faction(arg1)) && (rep = get_reputation_by_name(arg2)) != NOTHING && (pfd = get_reputation(c, FCT_VNUM(fct), FALSE))) {
-								snprintf(str, slen, "%d", (rep_const_to_index(pfd->rep) >= rep_const_to_index(rep)) ? 1 : 0);
+							if (*arg1 && *arg2 && (fct = find_faction(arg1)) && (rep = get_reputation_by_name(arg2)) != NOTHING) {
+								snprintf(str, slen, "%d", has_reputation(c, FCT_VNUM(fct), rep) ? 1 : 0);
 							}
 						}
 						// all other cases...
@@ -3160,6 +3278,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "morph")) {
 						snprintf(str, slen, "%d", IS_MORPHED(c) ? MORPH_VNUM(GET_MORPH(c)) : 0);
+					}
+					else if (!str_cmp(field, "movetype")) {
+						snprintf(str, slen, "%s", IS_NPC(c) ? mob_move_types[(int) MOB_MOVE_TYPE(c)] : (EFFECTIVELY_FLYING(c) ? "flies" : "walks"));
 					}
 				
 					break;
@@ -3427,7 +3548,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'u': {	// char.u*
 					if (!str_cmp(field, "unlink_instance")) {
-						if (IS_NPC(c)) {
+						if (IS_NPC(c) && MOB_INSTANCE_ID(c) != NOTHING) {
+							subtract_instance_mob(real_instance(MOB_INSTANCE_ID(c)), GET_MOB_VNUM(c));
 							MOB_INSTANCE_ID(c) = NOTHING;
 						}
 						*str = '\0';
@@ -3533,6 +3655,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									free_obj_binding(&OBJ_BOUND_TO(o));
 									bind_obj_to_player(o, targ);
 									reduce_obj_binding(o, targ);
+								}
+								else {	// wasn't targeting a person, try an obj
+									struct obj_binding *copy_obj_bindings(struct obj_binding *from);
+									obj_data *oarg = (*subfield == UID_CHAR) ? get_obj(subfield) : get_obj_by_obj(o, subfield);
+									if (oarg) {
+										free_obj_binding(&OBJ_BOUND_TO(o));	// unbind first
+										OBJ_BOUND_TO(o) = copy_obj_bindings(OBJ_BOUND_TO(oarg));
+									}
 								}
 							}
 						}
@@ -3723,15 +3853,24 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'v': {	// obj.v*
 					if (!str_cmp(field, "vnum"))
 						snprintf(str, slen, "%d", GET_OBJ_VNUM(o));
-					else if (!str_cmp(field, "val0"))
+					else if (!str_cmp(field, "val0")) {
+						if (subfield && is_number(subfield)) {
+							GET_OBJ_VAL(o, 0) = atoi(subfield);
+						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 0));
-
-					else if (!str_cmp(field, "val1"))
+					}
+					else if (!str_cmp(field, "val1")) {
+						if (subfield && is_number(subfield)) {
+							GET_OBJ_VAL(o, 1) = atoi(subfield);
+						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 1));
-
-					else if (!str_cmp(field, "val2"))
+					}
+					else if (!str_cmp(field, "val2")) {
+						if (subfield && is_number(subfield)) {
+							GET_OBJ_VAL(o, 2) = atoi(subfield);
+						}
 						snprintf(str, slen, "%d", GET_OBJ_VAL(o, 2));
-
+					}
 					break;
 				}
 				case 'w': {	// obj.w*
@@ -5152,30 +5291,33 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 			script_log("Trigger: %s, VNum %d. attach invalid target: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), GET_NAME(c));
 			return;
 		}
-		if (!SCRIPT(c))
-			CREATE(SCRIPT(c), struct script_data, 1);
+		if (!SCRIPT(c)) {
+			create_script_data(c, MOB_TRIGGER);
+		}
 		add_trigger(SCRIPT(c), newtrig, -1);
 		return;
 	}
 
 	if (v) {
 		if (!SCRIPT(v)) {
-			CREATE(SCRIPT(v), struct script_data, 1);
+			create_script_data(v, VEH_TRIGGER);
 		}
 		add_trigger(SCRIPT(v), newtrig, -1);
 		return;
 	}
 
 	if (o) {
-		if (!SCRIPT(o))
-			CREATE(SCRIPT(o), struct script_data, 1);
+		if (!SCRIPT(o)) {
+			create_script_data(o, OBJ_TRIGGER);
+		}
 		add_trigger(SCRIPT(o), newtrig, -1);
 		return;
 	}
 
 	if (r) {
-		if (!SCRIPT(r))
-			CREATE(SCRIPT(r), struct script_data, 1);
+		if (!SCRIPT(r)) {
+			create_script_data(r, WLD_TRIGGER);
+		}
 		add_trigger(SCRIPT(r), newtrig, -1);
 		return;
 	}

@@ -1253,7 +1253,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 				if (OBJ_FILE_TAG(line, "Trigger:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0]) && real_trigger(i_in[0])) {
 						if (!SCRIPT(veh)) {
-							CREATE(SCRIPT(veh), struct script_data, 1);
+							create_script_data(veh, VEH_TRIGGER);
 						}
 						add_trigger(SCRIPT(veh), read_trigger(i_in[0]), -1);
 					}
@@ -2227,7 +2227,8 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 	proto = vehicle_proto(VEH_VNUM(veh));
 	
 	if (VEH_LOOK_DESC(veh) && *VEH_LOOK_DESC(veh)) {
-		msg_to_char(ch, "%s", VEH_LOOK_DESC(veh));
+		sprintf(lbuf, "%s:\r\n%s", VEH_SHORT_DESC(veh), VEH_LOOK_DESC(veh));
+		msg_to_char(ch, "%s", CAP(lbuf));
 	}
 	else {
 		act("You look at $V but see nothing special.", FALSE, ch, NULL, veh, TO_CHAR);

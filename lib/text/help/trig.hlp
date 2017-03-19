@@ -413,6 +413,8 @@ Special Variables When using field - The variable returns:
 &cinstance.location&0 - The map/linked location of the instance, if any.
 &cinstance.mob(vnum)&0 - Finds a copy of a mob belonging to the instance.
 &cinstance.name&0 - Name of the adventure instance, if any.
+&cinstance.nearest(rmt vnum)&0 - Finds a given room in the nearest instance
+   that has one (only works if you aren't in a !LOCATION spot).
 &cinstance.start&0 - The entry room of the instance, if any.
 &cpeople.<vnum>&0 - This variable returns the number of people in the room 
    specified via vnum.

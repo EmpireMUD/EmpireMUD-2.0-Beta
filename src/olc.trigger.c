@@ -32,9 +32,14 @@
 // external consts
 extern const char **trig_attach_type_list[];
 extern const char *trig_attach_types[];
+extern const char *trig_types[];
+extern const char *otrig_types[];
+extern const char *vtrig_types[];
+extern const char *wtrig_types[];
 
 
 // external funcs
+void extract_trigger(trig_data *trig);
 void trig_data_init(trig_data *this_data);
 
 
@@ -140,8 +145,6 @@ char *list_one_trigger(trig_data *trig, bool detail) {
 * @return bool TRUE if any were removed; FALSE otherwise.
 */
 bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum) {
-	void extract_trigger(trig_data *trig);
-	
 	struct trig_data *trig, *next_trig, *temp;
 	bool found = FALSE;
 	
@@ -418,6 +421,109 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 
 
 /**
+* Searches properties of triggers.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_trigger(char_data *ch, char *argument) {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	int count, lookup, only_attaches = NOTHING;
+	bitvector_t only_types = NOBITS;
+	trig_data *trig, *next_trig;
+	struct cmdlist_element *cmd;
+	size_t size;
+	bool any;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP TEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (is_abbrev(type_arg, "-attaches")) {
+			argument = any_one_word(argument, val_arg);
+			if ((only_attaches = search_block(val_arg, trig_attach_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid attach type '%s'.\r\n", val_arg);
+				return;
+			}
+		}
+		else if (is_abbrev(type_arg, "-types")) {
+			argument = any_one_word(argument, val_arg);
+			if ((lookup = search_block(val_arg, trig_types, FALSE)) == NOTHING && (lookup = search_block(val_arg, otrig_types, FALSE)) == NOTHING && (lookup = search_block(val_arg, vtrig_types, FALSE)) == NOTHING && (lookup = search_block(val_arg, wtrig_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid trigger type '%s'.\r\n", val_arg);
+				return;
+			}
+			else {
+				only_types |= BIT(lookup);
+			}
+		}
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Trigger fullsearch: %s\r\n", find_keywords);
+	count = 0;
+	
+	// okay now look up items
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (only_attaches != NOTHING && trig->attach_type != only_attaches) {
+			continue;
+		}
+		if (only_types && (GET_TRIG_TYPE(trig) & only_types) != only_types) {
+			continue;
+		}
+		if (*find_keywords) {
+			any = multi_isname(find_keywords, GET_TRIG_NAME(trig));	// check name first
+			
+			if (!any) {
+				LL_FOREACH(trig->cmdlist, cmd) {
+					if (strstr(cmd->cmd, find_keywords)) {
+						any = TRUE;
+						break;
+					}
+				}
+			}
+			if (!any) {
+				continue;
+			}
+		}
+		
+		// show it
+		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+		if (strlen(line) + size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			++count;
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (count > 0 && (size + 14) < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "(%d triggers)\r\n", count);
+	}
+	else if (count == 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+/**
 * Searches for all uses of a crop and displays them.
 *
 * @param char_data *ch The player.
@@ -548,11 +654,13 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 	extern struct cmdlist_element *compile_command_list(char *input);
 	void free_varlist(struct trig_var_data *vd);
 	
-	trig_data *proto, *live_trig, *trig = GET_OLC_TRIGGER(desc);
+	trig_data *proto, *live_trig, *next_trig, *find, *trig = GET_OLC_TRIGGER(desc);
 	trig_vnum vnum = GET_OLC_VNUM(desc);
 	struct cmdlist_element *cmd, *next_cmd;
+	struct script_data *sc;
 	bool free_text = FALSE;
 	UT_hash_handle hh;
+	int pos;
 	
 	// have a place to save it?
 	if (!(proto = real_trigger(vnum))) {
@@ -594,41 +702,34 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 	trig_data_copy(proto, trig);
 	proto->hh = hh;
 	proto->vnum = vnum;	// ensure correct vnu,
-
-	// go through the mud and replace existing triggers
-	for (live_trig = trigger_list; live_trig; live_trig = live_trig->next_in_world) {
-		if (GET_TRIG_VNUM(live_trig) == vnum) {
-			if (live_trig->arglist) {
-				free(live_trig->arglist);
-				live_trig->arglist = NULL;
+	
+	// remove and reattach existing copies of this trigger
+	LL_FOREACH_SAFE2(trigger_list, live_trig, next_trig, next_in_world) {
+		if (GET_TRIG_VNUM(live_trig) != vnum) {
+			continue;	// wrong trigger
+		}
+		if (!(sc = live_trig->attached_to)) {
+			continue;	// can't get attachment data for some reason
+		}
+		
+		// determin position
+		pos = 0;
+		LL_FOREACH(TRIGGERS(sc), find) {
+			if (find == trig) {
+				break;
 			}
-			if (live_trig->name) {
-				free(live_trig->name);
-				live_trig->name = NULL;
+			else {
+				++pos;
 			}
-
-			if (proto->arglist)
-				live_trig->arglist = strdup(proto->arglist);
-			if (proto->name)
-				live_trig->name = strdup(proto->name);
-
-			// anything could have happened so we don't want to keep these
-			if (GET_TRIG_WAIT(live_trig)) {
-				event_cancel(GET_TRIG_WAIT(live_trig));
-				GET_TRIG_WAIT(live_trig)=NULL;
-			}
-			if (live_trig->var_list) {
-				free_varlist(live_trig->var_list);
-				live_trig->var_list=NULL;
-			}
-
-			live_trig->cmdlist = proto->cmdlist;
-			live_trig->curr_state = live_trig->cmdlist;
-			live_trig->trigger_type = proto->trigger_type;
-			live_trig->attach_type = proto->attach_type;
-			live_trig->narg = proto->narg;
-			live_trig->data_type = proto->data_type;
-			live_trig->depth = 0;
+		}
+		
+		// un-attach and free
+		LL_DELETE(TRIGGERS(sc), live_trig);
+		extract_trigger(live_trig);
+		
+		// load and re-attach
+		if ((live_trig = read_trigger(vnum))) {
+			add_trigger(sc, live_trig, pos);
 		}
 	}
 	

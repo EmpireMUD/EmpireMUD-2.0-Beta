@@ -37,6 +37,7 @@ OLC_MODULE(olc_copy);
 OLC_MODULE(olc_delete);
 OLC_MODULE(olc_display);
 OLC_MODULE(olc_edit);
+OLC_MODULE(olc_fullsearch);
 OLC_MODULE(olc_free);
 OLC_MODULE(olc_list);
 OLC_MODULE(olc_removeindev);
@@ -215,6 +216,7 @@ OLC_MODULE(mapedit_icon);
 OLC_MODULE(mapedit_maintain);
 OLC_MODULE(mapedit_naturalize);
 OLC_MODULE(mapedit_pass_walls);
+OLC_MODULE(mapedit_populate);
 OLC_MODULE(mapedit_remember);
 OLC_MODULE(mapedit_room_description);
 OLC_MODULE(mapedit_room_name);
@@ -278,15 +280,16 @@ OLC_MODULE(oedit_short_description);
 OLC_MODULE(oedit_storage);
 OLC_MODULE(oedit_timer);
 OLC_MODULE(oedit_type);
+OLC_MODULE(oedit_value0);
 OLC_MODULE(oedit_value1);
 OLC_MODULE(oedit_value2);
-OLC_MODULE(oedit_value3);
 OLC_MODULE(oedit_wealth);
 OLC_MODULE(oedit_weapontype);
 OLC_MODULE(oedit_wear);
 
 // quests
 OLC_MODULE(qedit_completemessage);
+OLC_MODULE(qedit_dailycycle);
 OLC_MODULE(qedit_description);
 OLC_MODULE(qedit_ends);
 OLC_MODULE(qedit_flags);
@@ -307,6 +310,7 @@ OLC_MODULE(rmedit_exit);
 OLC_MODULE(rmedit_extra_desc);
 OLC_MODULE(rmedit_interaction);
 OLC_MODULE(rmedit_flags);
+OLC_MODULE(rmedit_functions);
 OLC_MODULE(rmedit_matchexits);
 OLC_MODULE(rmedit_title);
 OLC_MODULE(rmedit_script);
@@ -641,6 +645,7 @@ const struct olc_command_data olc_data[] = {
 	{ "name", mapedit_room_name, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "naturalize", mapedit_naturalize, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "passwalls", mapedit_pass_walls, OLC_MAP, OLC_CF_MAP_EDIT },
+	{ "populate", mapedit_populate, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "remember", mapedit_remember, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "roomtype", mapedit_roomtype, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "ruin", mapedit_ruin, OLC_MAP, OLC_CF_MAP_EDIT },
@@ -703,15 +708,16 @@ const struct olc_command_data olc_data[] = {
 	{ "store", oedit_storage, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "timer", oedit_timer, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "type", oedit_type, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "value0", oedit_value0, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "value1", oedit_value1, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "value2", oedit_value2, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "value3", oedit_value3, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "wealth", oedit_wealth, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "weapontype", oedit_weapontype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "wear", oedit_wear, OLC_OBJECT, OLC_CF_EDITOR },
 	
 	// quest commands
 	{ "completemessage", qedit_completemessage, OLC_QUEST, OLC_CF_EDITOR },
+	{ "dailycycle", qedit_dailycycle, OLC_QUEST, OLC_CF_EDITOR },
 	{ "description", qedit_description, OLC_QUEST, OLC_CF_EDITOR },
 	{ "ends", qedit_ends, OLC_QUEST, OLC_CF_EDITOR },
 	{ "flags", qedit_flags, OLC_QUEST, OLC_CF_EDITOR },
@@ -732,6 +738,7 @@ const struct olc_command_data olc_data[] = {
 	{ "extra", rmedit_extra_desc, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "interaction", rmedit_interaction, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "flags", rmedit_flags, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
+	{ "functions", rmedit_functions, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "matchexits", rmedit_matchexits, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "title", rmedit_title, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "script", rmedit_script, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
@@ -805,8 +812,11 @@ const struct olc_command_data olc_data[] = {
 	{ "resource", vedit_resource, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "script", vedit_script, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "shortdescription", vedit_shortdescription, OLC_VEHICLE, OLC_CF_EDITOR },
-
-
+	
+	
+	// misc commands that should not take precedence over editor commands
+	{ "fullsearch", olc_fullsearch, OLC_OBJECT | OLC_TRIGGER, NOBITS },
+	
 	// this goes last
 	{ "\n", NULL, NOBITS, NOBITS }
 };
@@ -2222,6 +2232,29 @@ OLC_MODULE(olc_free) {
 		}
 		
 		msg_to_char(ch, "No free vnums found in that range.\r\n");
+	}
+}
+
+
+OLC_MODULE(olc_fullsearch) {
+	skip_spaces(&argument);
+	
+	// OLC_x:
+	switch (type) {
+		case OLC_OBJECT: {
+			void olc_fullsearch_obj(char_data *ch, char *argument);
+			olc_fullsearch_obj(ch, argument);
+			break;
+		}
+		case OLC_TRIGGER: {
+			void olc_fullsearch_trigger(char_data *ch, char *argument);
+			olc_fullsearch_trigger(ch, argument);
+			break;
+		}
+		default: {
+			msg_to_char(ch, "It doesn't seem to be implemented for that type.\r\n");
+			break;
+		}
 	}
 }
 

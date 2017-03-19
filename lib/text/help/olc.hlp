@@ -326,6 +326,9 @@ Quests (QEDIT):
 - Empire-only quests will also match "not in an empire" if the mob/room and
   player are both in no empire.
 - Empire-only quests have no effect if the start/end point is an object.
+- If multiple DAILY quests share the same 'daily cycle', only one of them is
+  available per day. Any unique integer can be a daily cycle, but for the sake
+  of cleanliness, you should pick the vnum of one of the quests on the cycle.
 
 Room Templates (REDIT):
 - Don't confuse room templates with the designated rooms that players can add
@@ -394,6 +397,8 @@ Triggers and Scripts (TRIGEDIT):
   zone, the script may also need to scale the obj's/mob's level itself.
 
 Vehicles (VEDIT):
+- Keywords should always have the most significant word first (the noun). This
+  keyword is preserved when the vehicle is renamed.
 - Only set an icon on a vehicle if it should be visible on the map; in most
   cases you should leave this blank.
 - Vehicles only have an interior (are boardable) if the "interior room"
@@ -542,6 +547,7 @@ The following adventure flags are available:
  !NEWBIE - Will not spawn on newbie islands.
  NEWBIE-ONLY - Only spawns on newbie islands.
  NO-MOB-CLEANUP - Won't despawn mobs that got out of the instance on cleanup.
+ EMPTY-RESET-ONLY - Won't reset while players are inside.
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
@@ -796,6 +802,7 @@ The following affect flags are available:
  !VAMPIRE - Immune to Vampire debuffs.
  !STUN - Immune to stun effects.
  !DRINK-BLOOD - Can't be bitten/sired by vampires.
+ DISTRACTED - Cannot perform timed actions.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
@@ -1248,6 +1255,7 @@ Available flags:
  !RUINS - building leaves no ruins when it decays
  !NPC - mobs won't enter this building
  BARRIER - can only go back the way you came, unless flying
+ IN-CITY-ONLY - can only be used if in an established city
  LARGE-CITY-RADIUS - counts as in-city much further away than normal
  ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
  BURNABLE - will catch fire if a fire is placed inside by a hostile empire
@@ -1267,12 +1275,12 @@ Available flags:
 
 See also: BEDIT FUNCTIONS, INTERLINK, OLC BUILDINGS
 #d
-"BEDIT FUNCTIONS" "FUNCTION FLAGS"
+"BEDIT FUNCTIONS" "REDIT FUNCTIONS" "FUNCTION FLAGS"
 
 Usage:  .flags [add | remove] <flags>
 
 The function flags determine what chores, actions, and other tasks happen at
-that building.
+that building or room template.
 
 Available functions:
  ALCHEMIST - can brew and mix here
@@ -1309,7 +1317,7 @@ Available functions:
  DRINK-WATER - can get water here, like a well
  COOKING-FIRE - can cook, brew, and other tasks that require a fire
 
-See also: OLC BUILDINGS
+See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
 "BEDIT HITPOINTS"
 
@@ -2417,7 +2425,10 @@ The following commands are available:
  icon - Customize the map icon.
  maintain - Repairs and maintains a building.
  name - Customize the room title.
+ naturalize - Returns this tile to its 'natural terrain'.
  passwalls - Able to move on the map unblocked by walls, interiors, etc.
+ populate - Forces a building/room to populate an npc, if possible.
+ remember - Stores the current terrain as the 'natural terrain'.
  roomtype - Change the type of an interior room.
  ruin - Turn a building to ruins.
  terrain - Change the tile you're standing on.
@@ -3410,6 +3421,9 @@ Message types:
  &cwear-to-room&0 - Shown to the room when the person wears an item ($p for item).
  &cremove-to-char&0 - Shown to the person when they remove an item ($p for item).
  &cremove-to-room&0 - Shown to the room when the person removes an item ($p for item).
+ &clongdesc&0 - Object gives the player a custom long description when worn.
+ &clongdesc-female&0 - Same as longdesc but only for females.
+ &clongdesc-male&0 - Same as longdesc but only for males.
 
 See also: OLC OBJECTS
 #d
@@ -3515,6 +3529,38 @@ take longer to decay, rather than basic it strictly on realism.
 
 See also: OEDIT DECAY, OLC OBJECTS
 #d
+"OEDIT FULLSEARCH"
+
+Usage:  .o fullsearch -<field> <argument> <...>
+
+This command allows you to search for objects matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the object's keywords and short/long/look descriptions.
+
+Fields:
+  &c-affects&0 - see HELP AFFECT FLAGS
+  &c-apply&0 - see HELP OEDIT APPLY
+  &c-cflagged&0, &cnotcflagged&0 - see HELP COMPONENT FLAGS
+  &c-component&0 - see HELP OEDIT COMPONENT
+  &c-custom&0 - has a specific type, see HELP OEDIT CUSTOM
+  &c-flagged&0, &cnotflagged&0 - see HELP OEDIT FLAGS
+  &c-interaction&0 - has a specific type, see HELP OEDIT INTERACTION
+  &c-level&0 - matches anything where this level is within the range
+     (note: will not account for objects whose levels are inherited from mobs
+     or adventures)
+  &c-material&0 - see OEDIT MATERIAL
+  &c-type&0 - see HELP OEDIT TYPE
+  &c-wear&0 - see HELP OEDIT WEAR
+
+Examples:
+ > .o fullsearch -type WEAPON -wear HOLD
+ > .o fullsearch -flagged LARGE -flagged TOOL-SHOVEL
+ > .o fullsearch -level 50 sword
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find all objects with the "Mini-pet Use"
+trigger, use ".t search 9900".
+#d
 "OEDIT KEYWORDS"
 
 Usage:  .keywords <list>
@@ -3610,6 +3656,14 @@ spends.
 Choose the material that best fits your object. If there isn't one that fits
 at all, contact the programmer to discuss adding a new one. But remember, the
 material doesn't need to be exact. It just needs to be close enough.
+
+Available mat
+  WOOD     ROCK      IRON
+  SILVER   GOLD      FLINT
+  CLAY     FLESH     GLASS
+  WAX      MAGIC     CLOTH
+  GEM      COPPER    BONE
+  HAIR
 
 See also: OLC OBJECTS
 #d
@@ -3849,19 +3903,19 @@ You can get specific help on each of these via HELP <type> ITEM
 
 See also: OEDIT WEAR, OLC OBJECTS
 #d
-"OEDIT VALUE1" "OEDIT VALUE2" "OEDIT VALUE3"
+"OEDIT VALUE0" "OEDIT VALUE1" "OEDIT VALUE2"
 
-Usage:  .value1 <number>
+Usage:  .value0 <number>
+        .value1 <number>
         .value2 <number>
-        .value3 <number>
 
 For item type OTHER, you can manually set the three object values. For all
 other item types, these values are used for things like damage, fullness,
 and capacity.
 
-If you set your OTHER object with the PLANTABLE flag, value2 is replaced by
+If you set your OTHER object with the PLANTABLE flag, value1 is replaced by
 the 'plants' property. If you can't see the plants property in the editor,
-it means your value2 is invalid for planting and you should set your value2
+it means your value1 is invalid for planting and you should set your value1
 back to 0.
 
 Some special procedures may use the object values of an OTHER object; the
@@ -3934,6 +3988,15 @@ Only items set TAKE can be picked up off the ground.
 Weapons can often by set WIELD and HOLD and used in both positions.
 
 Missile weapons and instruments must be set HOLD.
+
+Wear flags:
+   TAKE        FINGER        NECK
+   CLOTHES     HEAD          LEGS
+   FEET        HANDS         ARMS
+   WRISTS      ABOUT         WAIST
+   EARS        WIELD         HOLD
+   RANGED      ARMOR         PACK
+   SADDLE
 
 See also: OLC OBJECTS
 #d
@@ -4178,6 +4241,13 @@ This command finds the first available vnum in a given range -- the opposite
 of the olc 'list' command.
 
 See also: OLC LIST, VNUM
+#d
+"OLC FULLSEARCH"
+
+Usage:  .<type> fullsearch <arguments>
+
+See the individual help files such as OEDIT FULLSEARCH. This command is only
+implemented for types that have such a help file.
 #d
 "OLC LIST" OLIST MLIST RLIST
 
@@ -4440,6 +4510,16 @@ with indent inside the string editor if it's longer than one line (80 chars).
 
 See also: OLC QUESTS, STRING EDITOR
 #d
+"QEDIT DAILYCYCLE" "QEDIT DAILY CYCLE" "DAILY CYCLE"
+
+Usage:  .dailycycle <number>
+
+When two or more daily quests have the same 'dailycycle' value, only one of
+those quests will be available per day, at random. For the sake of cleanliness,
+you should pick the vnum of 1 of those quests as the cycle id.
+
+See also: OLC QUESTS, SHOW DAILYCYCLE
+#d
 "QEDIT DESCRIPTION"
 
 Usage:  .description
@@ -4647,8 +4727,6 @@ The following room template flags are available:
  !TELEPORT - Cannot teleport in or out.
  LOOK-OUT - can see the map using "look out"
  !LOCATION - no location shown; disables "where"
- PIGEON-POST - can send mail here
- COOKING-FIRE - can cook here
 
 See also: OLC ROOM TEMPLATES
 #d
@@ -5177,6 +5255,23 @@ well as check it to help make sure it will run safely.
 See also: MTRIG COMMANDS, OTRIG COMMANDS, RTRIG COMMANDS, VTRIG COMMANDS
 See also: SCRIPT COMMANDS, OLC TRIGGERS, TEXT EDITOR
 #d
+"TRIGEDIT FULLSEARCH"
+
+Usage:  .t fullsearch -<field> <argument> <...>
+
+This command allows you to search for triggers matching certain criteria. You
+can specify multiple fields if you want. Any leftover arguments are matched to
+the trigger's name and command text.
+
+Fields:
+  &c-attaches&0 - see HELP TRIGEDIT ATTACHES
+  &c-type&0 - see HELP MTRIG TYPES, etc.
+
+Examples:
+ > .t fullsearch -type Random -type Global
+ > .t fullsearch i11234
+ > .t fullsearch %force%
+#d
 "TRIGEDIT NAME"
 
 Usage:  .name <name>
@@ -5598,7 +5693,8 @@ This command updates the keywords on a vehicle. The keywords are a list of
 single words that can be used to target it. It should include any words from
 the short or long description that identify the vehicle.
 
-Usually the most significant keyword should be first.
+Usually the most significant keyword should be first. This keyword is retained
+when the vehicle is renamed by players.
 
 Example:
  name: a cart

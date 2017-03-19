@@ -277,6 +277,11 @@ void update_actions(void) {
 			cancel_action(ch);
 			continue;
 		}
+		if (AFF_FLAGGED(ch, AFF_DISTRACTED)) {
+			msg_to_char(ch, "You are distracted and stop what you were doing.\r\n");
+			cancel_action(ch);
+			continue;
+		}
 		
 		// action-cycle is time remaining -- compute how fast we go through it
 		speed = ACTION_CYCLE_MULTIPLIER;	// makes it a full second
@@ -483,7 +488,7 @@ static void start_digging(char_data *ch) {
 void start_mining(char_data *ch) {
 	int mining_timer = config_get_int("mining_timer");
 	
-	if (HAS_FUNCTION(IN_ROOM(ch), FNC_MINE) && IS_COMPLETE(IN_ROOM(ch))) {
+	if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE)) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) > 0) {
 			start_action(ch, ACT_MINING, mining_timer);
 			
@@ -804,7 +809,7 @@ INTERACTION_FUNC(finish_picking_herb) {
 	
 	if (obj) {
 		if (num > 1) {
-			sprintf(buf, "You find $p (d%d)!", num);
+			sprintf(buf, "You find $p (x%d)!", num);
 			act(buf, FALSE, ch, obj, 0, TO_CHAR);
 		}
 		else {
@@ -841,7 +846,7 @@ INTERACTION_FUNC(finish_picking_crop) {
 	
 	if (obj) {
 		if (interaction->quantity > 1) {
-			sprintf(buf, "You find $p (d%d)!", interaction->quantity);
+			sprintf(buf, "You find $p (x%d)!", interaction->quantity);
 			act(buf, FALSE, ch, obj, 0, TO_CHAR);
 		}
 		else {
@@ -1547,7 +1552,7 @@ void process_mining(char_data *ch) {
 			cancel_action(ch);
 			break;
 		}
-		if (!HAS_FUNCTION(IN_ROOM(ch), FNC_MINE) || !IS_COMPLETE(IN_ROOM(ch)) || get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0) {
+		if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE) || get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0) {
 			msg_to_char(ch, "You can't mine here.\r\n");
 			cancel_action(ch);
 			break;
@@ -2146,7 +2151,7 @@ void process_tanning(char_data *ch) {
 	obj_data *proto;
 	bool success;
 	
-	GET_ACTION_TIMER(ch) -= (HAS_FUNCTION(IN_ROOM(ch), FNC_TANNERY) ? 4 : 1);
+	GET_ACTION_TIMER(ch) -= (room_has_function_and_city_ok(IN_ROOM(ch), FNC_TANNERY) ? 4 : 1);
 	
 	// need the prototype
 	if (!(proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
@@ -2217,11 +2222,8 @@ ACMD(do_bathe) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're a bit busy right now.\r\n");
 	}
-	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_BATHS) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_SHALLOW_WATER)) {
+	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_BATHS) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_SHALLOW_WATER)) {
 		msg_to_char(ch, "You can't bathe here!\r\n");
-	}
-	else if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "There isn't even any water in the baths yet!\r\n");
 	}
 	else {
 		start_action(ch, ACT_BATHING, 4);
@@ -2549,6 +2551,9 @@ ACMD(do_mine) {
 	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_MINE)) {
 		msg_to_char(ch, "This isn't a mine.\r\n");
 	}
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "You can't mine here because it's not in a city.\r\n");
+	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "The mine shafts aren't finished yet.\r\n");
 	}
@@ -2587,7 +2592,7 @@ ACMD(do_mint) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
 	}
-	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_MINT)) {
+	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINT)) {
 		msg_to_char(ch, "You can't mint anything here.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -2867,6 +2872,9 @@ ACMD(do_saw) {
 	}
 	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_SAW) || !IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can only saw in a lumber yard.\r\n");
+	}
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to saw here.\r\n");

@@ -392,6 +392,7 @@ customize its things.
 
 Valid types:
 - building (requires the Customize Building ability)
+- island
 - vehicle
 
 Valid fields:
@@ -399,7 +400,25 @@ Valid fields:
 - longdesc: the text shown in the room (doesn't work on buildings)
 - description: will open a text editor
 
-See also: CUSTOMIZE BUILDING, TEXT EDITOR
+Note: On vehicles, changing the name will also put the new name at the end of
+the longdesc, unless (or until) you also change the longdesc.
+
+See also: CUSTOMIZE BUILDING, CUSTOMIZE ISLAND, TEXT EDITOR
+#
+"CUSTOMIZE ISLAND"
+
+Usage:  customize island name <name | none>
+
+This command allows your empire to name an island. If the island isn't already
+named, this will also become the global name. You can only name islands where
+you have an established city.
+
+Each empire can have its own name for an island. If they are the only empire
+with cities on the island, their name for the island will also become its
+global name.
+
+You cannot remove the global name from an island, even if you set its name to
+'none'.
 #
 DIAGNOSE
 
@@ -1756,7 +1775,8 @@ TOGGLE TOGGLES
 Usage:  toggle [type]
 
 This command is the master switchboard for various preference toggles. You can
-use it to see your current preferences, or to switch them on and off.
+use it to see your current preferences, or to switch them on and off. Some
+toggles have their own help files under 'HELP TOGGLE <option>'.
 
 Toggles:
   tell - the tell channel
@@ -1780,6 +1800,7 @@ Toggles:
   autorecall - if you're logged out over an hour, automatically sends you home
   stealthable - if off, you will be prevented from accidentally stealing
   autodismount - will dismount you while moving, if necessary
+  no-empire - will not create a new empire when you try to claim or build
 
 Immortal toggles:
   wiznet - shuts off the immortal channel
@@ -1792,6 +1813,14 @@ Immortal toggles:
   autonotes - automatically show notes on accounts when players log in
 
 See also: FIGHT MESSAGES
+#
+"TOGGLE NO-EMPIRE" "TOGGLE NOEMPIRE" NOEMPIRE NO-EMPIRE
+
+Usage:  toggle no-empire
+
+This toggle is for players who do not wish to be in any empire. The game will
+no longer create a new empire for you when you try to do things like claim
+or build.
 #
 UNLOAD UNLOADVEHICLE BOATUNLOAD
 

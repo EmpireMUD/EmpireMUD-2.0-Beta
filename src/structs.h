@@ -369,7 +369,7 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// ADVENTURE DEFINES ///////////////////////////////////////////////////////
 
-// adventure flags
+// ADV_x: adventure flags
 #define ADV_IN_DEVELOPMENT  BIT(0)	// will not generate instances
 #define ADV_LOCK_LEVEL_ON_ENTER  BIT(1)	// lock levels on entry
 #define ADV_LOCK_LEVEL_ON_COMBAT  BIT(2)	// lock levels when combat starts
@@ -379,6 +379,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_NO_NEWBIE  BIT(6)	// prevents spawning on newbie islands
 #define ADV_NEWBIE_ONLY  BIT(7)	// only spawns on newbie islands
 #define ADV_NO_MOB_CLEANUP  BIT(8)	// won't despawn mobs that escaped the instance
+#define ADV_EMPTY_RESET_ONLY  BIT(9)	// won't reset while players are inside
 
 
 // adventure link rule types
@@ -417,8 +418,8 @@ typedef struct vehicle_data vehicle_data;
 #define RMT_NO_TELEPORT  BIT(6)	// g. cannot teleport in/out
 #define RMT_LOOK_OUT  BIT(7)	// h. can see the map using "look out"
 #define RMT_NO_LOCATION  BIT(8)	// i. don't show a location, disables where
-#define RMT_PIGEON_POST  BIT(9)	// j. can use mail here
-#define RMT_COOKING_FIRE  BIT(10)	// k. can cook here
+	#define RMT_UNUSED1  BIT(9)
+	#define RMT_UNUSED2  BIT(10)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -475,7 +476,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_NO_RUINS  BIT(8)	// building leaves no corpse
 #define BLD_NO_NPC  BIT(9)	// mobs won't walk in
 #define BLD_BARRIER  BIT(10)	// can only go back the direction you came
-// #define BLD_UNUSED2  BIT(11)
+#define BLD_IN_CITY_ONLY  BIT(11)	// can only be used in-city
 #define BLD_LARGE_CITY_RADIUS  BIT(12)	// counts as in-city further than normal
 // #define BLD_UNUSED3  BIT(13)
 #define BLD_ATTACH_ROAD  BIT(14)	// building connects to roads on the map
@@ -671,6 +672,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_IMMUNE_STUN  BIT(30)	// E. Cannot be hit by stun effects
 #define AFF_ORDERED  BIT(31)	// F. Has been issued an order from a player
 #define AFF_NO_DRINK_BLOOD  BIT(32)	// G. Vampires can't bite or sire
+#define AFF_DISTRACTED  BIT(33)	// H. Player cannot perform timed actions
 
 
 // Injury flags -- IS_INJURED
@@ -753,6 +755,8 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_SHIPYARD  BIT(14)	// requires a shipyard
 #define CRAFT_BLD_UPGRADED  BIT(15)	// requires a building with the upgraded flag
 
+// list of above craft flags that require a building in some way
+#define CRAFT_FLAGS_REQUIRING_BUILDINGS  (CRAFT_GLASSBLOWER | CRAFT_CARPENTER | CRAFT_ALCHEMY | CRAFT_SHIPYARD)
 
 // For find_building_list_entry
 #define FIND_BUILD_NORMAL  0
@@ -1330,6 +1334,9 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_CUSTOM_WEAR_TO_ROOM  9
 #define OBJ_CUSTOM_REMOVE_TO_CHAR  10
 #define OBJ_CUSTOM_REMOVE_TO_ROOM  11
+#define OBJ_CUSTOM_LONGDESC  12
+#define OBJ_CUSTOM_LONGDESC_FEMALE  13
+#define OBJ_CUSTOM_LONGDESC_MALE  14
 
 
 // RES_x: resource requirement types
@@ -1390,6 +1397,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACCT_MULTI_IP  BIT(4)	// e. can log in at the same time as other accounts on the same IP
 #define ACCT_MULTI_CHAR  BIT(5)	// f. can log in more than one character on this account
 #define ACCT_APPROVED  BIT(6)	// g. approved for full gameplay
+#define ACCT_NOCUSTOMIZE  BIT(7)	// h. cannot use 'customize'
 
 
 // ACT_x: Periodic actions -- WARNING: changing the order of these will have tragic consequences with saved players
@@ -1682,6 +1690,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_WIZHIDE  BIT(27)	// player can't be seen in the room
 #define PRF_AUTONOTES  BIT(28)	// Player login syslogs automatically show notes
 #define PRF_AUTODISMOUNT  BIT(29)	// will dismount while moving instead of seeing an error
+#define PRF_NOEMPIRE  BIT(30)	// the game will not automatically create an empire
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -1960,6 +1969,7 @@ typedef struct vehicle_data vehicle_data;
 // Island flags -- ISLE_x
 #define ISLE_NEWBIE  BIT(0)	// a. Island follows newbie rules
 #define ISLE_NO_AGGRO  BIT(1)	// b. Island will not fire aggro mobs or guard towers
+#define ISLE_NO_CUSTOMIZE  BIT(2)	// c. cannot be renamed
 
 
 // ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them
@@ -2429,7 +2439,7 @@ struct adventure_data {
 	int min_level, max_level;	// level range
 	int max_instances;	// total number possible in world
 	int reset_time;	// how often to reset things (minutes)
-	bitvector_t flags;	// ADV_x
+	bitvector_t flags;	// ADV_ flags
 	int player_limit;	// maximum number of players at a time (if over 0)
 	
 	// lists
@@ -2494,8 +2504,17 @@ struct instance_data {
 	// unstored data
 	int size;	// size of room arrays
 	room_data **room;	// array of rooms (some == NULL)
+	struct instance_mob *mob_counts;	// hash table (hh)
 	
 	struct instance_data *next;
+};
+
+
+// tracks the mobs in an instance
+struct instance_mob {
+	mob_vnum vnum;
+	int count;
+	UT_hash_handle hh;	// instance->mob_counts
 };
 
 
@@ -2508,8 +2527,9 @@ struct room_template {
 	char *description;
 	
 	// numeric data
-	bitvector_t flags;	// RMT_x
+	bitvector_t flags;	// RMT_
 	bitvector_t base_affects;	// ROOM_AFF_
+	bitvector_t functions;	// FNC_
 	
 	// lists
 	struct adventure_spawn *spawns;	// list of objs/mobs
@@ -3527,10 +3547,13 @@ struct empire_island {
 	
 	// saved portion
 	int workforce_limit[NUM_CHORES];	// workforce settings
+	char *name;	// empire's local name for the island
 	
 	// unsaved portion
 	int tech[NUM_TECHS];	// TECH_ present on that island
 	int population;	// citizens
+	int city_terr;	// total territory IN cities on the island
+	int outside_terr;	// total territory OUTSIDE cities on the island
 	
 	UT_hash_handle hh;	// EMPIRE_ISLANDS(emp) hash handle
 };
@@ -3843,6 +3866,7 @@ struct obj_data {
 	empire_vnum last_empire_id;	// id of the last empire to have this
 	int last_owner_id;	// last person to have the item
 	time_t stolen_timer;	// when the object was last stolen
+	empire_vnum stolen_from;	// empire who owned it
 	
 	struct interaction_item *interactions;	// interaction items
 	struct obj_storage_type *storage;	// linked list of where an obj can be stored
@@ -3899,6 +3923,10 @@ struct quest_data {
 	int max_level;	// or 0 for no max
 	struct quest_task *prereqs;	// linked list of prerequisites
 	int repeatable_after;	// minutes to repeat; NOT_REPEATABLE for none
+	int daily_cycle;	// for dailies that rotate with others
+	
+	// misc data
+	bool daily_active;	// if FALSE, quest is not available today
 	
 	struct trig_proto_list *proto_script;	// quest triggers
 	
@@ -4259,8 +4287,8 @@ struct depletion_data {
 // data for the island_table
 struct island_info {
 	any_vnum id;	// game-assigned, permanent id
-	char *name;	// player-designated island naming
-	bitvector_t flags;	// ISLE_x flags
+	char *name;	// global name for the island
+	bitvector_t flags;	// ISLE_ flags
 	
 	// computed data
 	int tile_size;

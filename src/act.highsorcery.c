@@ -1415,6 +1415,10 @@ RITUAL_SETUP_FUNC(start_chant_of_druids) {
 		msg_to_char(ch, "You can't perform the chant of druids unless you are at a henge.\r\n");
 		return FALSE;
 	}
+	if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it.\r\n");
+		return FALSE;
+	}
 	if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to finish it before you can perform the chant of druids.\r\n");
 		return FALSE;
@@ -1426,7 +1430,7 @@ RITUAL_SETUP_FUNC(start_chant_of_druids) {
 }
 
 RITUAL_FINISH_FUNC(perform_chant_of_druids) {
-	if (CAN_GAIN_NEW_SKILLS(ch) && get_skill_level(ch, SKILL_NATURAL_MAGIC) == 0 && noskill_ok(ch, SKILL_NATURAL_MAGIC) && HAS_FUNCTION(IN_ROOM(ch), FNC_HENGE) && IS_COMPLETE(IN_ROOM(ch))) {
+	if (CAN_GAIN_NEW_SKILLS(ch) && get_skill_level(ch, SKILL_NATURAL_MAGIC) == 0 && noskill_ok(ch, SKILL_NATURAL_MAGIC) && room_has_function_and_city_ok(IN_ROOM(ch), FNC_HENGE)) {
 		msg_to_char(ch, "&gAs you finish the chant, you begin to see the weave of mana through nature...&0\r\n");
 		set_skill(ch, SKILL_NATURAL_MAGIC, 1);
 		SAVE_CHAR(ch);

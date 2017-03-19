@@ -255,6 +255,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern const char *wear_bits[];
 
 	struct obj_storage_type *store;
+	struct custom_message *ocm;
 	player_index_data *index;
 	struct obj_apply *apply;
 	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH];
@@ -447,6 +448,31 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 	if (*lbuf) {
 		msg_to_char(ch, "Modifiers: %s\r\n", lbuf);
+	}
+	
+	// some custom messages
+	LL_FOREACH(obj->custom_msgs, ocm) {
+		switch (ocm->type) {
+			case OBJ_CUSTOM_LONGDESC: {
+				sprintf(lbuf, "Gives long description: %s", ocm->msg);
+				act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
+				break;
+			}
+			case OBJ_CUSTOM_LONGDESC_FEMALE: {
+				if (GET_SEX(ch) == SEX_FEMALE) {
+					sprintf(lbuf, "Gives long description: %s", ocm->msg);
+					act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
+				}
+				break;
+			}
+			case OBJ_CUSTOM_LONGDESC_MALE: {
+				if (GET_SEX(ch) == SEX_MALE) {
+					sprintf(lbuf, "Gives long description: %s", ocm->msg);
+					act(lbuf, FALSE, ch, NULL, NULL, TO_CHAR);
+				}
+				break;
+			}
+		}
 	}
 }
 
@@ -860,6 +886,12 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 		return 0;
 	}
 	
+	// can't junk stolen items
+	if (mode == SCMD_JUNK && IS_STOLEN(obj)) {
+		act("$p: You can't junk stolen items!", FALSE, ch, obj, NULL, TO_CHAR);
+		return -1;
+	}
+	
 	// don't let people drop bound items in other people's territory
 	if (mode != SCMD_JUNK && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
 		act("$p: You can't drop bound items here.", FALSE, ch, obj, NULL, TO_CHAR);
@@ -1005,7 +1037,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 		act("$p: you must be on the quest to get this.", FALSE, ch, obj, NULL, TO_CHAR);
 		return TRUE;
 	}
-	if (IN_ROOM(cont) && LAST_OWNER_ID(cont) != idnum && LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	if (IN_ROOM(cont) && LAST_OWNER_ID(cont) != idnum && LAST_OWNER_ID(obj) != idnum && (!GET_LOYALTY(ch) || EMPIRE_VNUM(GET_LOYALTY(ch)) != GET_STOLEN_FROM(obj)) && (!GET_LOYALTY(ch) || EMPIRE_VNUM(GET_LOYALTY(ch)) != GET_STOLEN_FROM(cont)) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		stealing = TRUE;
 		
 		if (!IS_IMMORTAL(ch) && emp && !can_steal(ch, emp)) {
@@ -1043,9 +1075,14 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 				
 				if (!IS_IMMORTAL(ch)) {
 					GET_STOLEN_TIMER(obj) = time(0);
+					GET_STOLEN_FROM(obj) = emp ? EMPIRE_VNUM(emp) : NOTHING;
 					trigger_distrust_from_stealth(ch, emp);
 					gain_ability_exp(ch, ABIL_STEAL, 50);
 				}
+			}
+			else if (IS_STOLEN(obj) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
+				// un-steal if this was the original owner
+				GET_STOLEN_TIMER(obj) = 0;
 			}
 			
 			get_check_money(ch, obj);
@@ -1130,7 +1167,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR);
 		return TRUE;	// don't break loop
 	}
-	if (LAST_OWNER_ID(obj) != idnum && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	if (LAST_OWNER_ID(obj) != idnum && (!GET_LOYALTY(ch) || EMPIRE_VNUM(GET_LOYALTY(ch)) != GET_STOLEN_FROM(obj)) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		stealing = TRUE;
 		
 		if (!IS_IMMORTAL(ch) && emp && !can_steal(ch, emp)) {
@@ -1171,9 +1208,14 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 			
 			if (!IS_IMMORTAL(ch)) {
 				GET_STOLEN_TIMER(obj) = time(0);
+				GET_STOLEN_FROM(obj) = emp ? EMPIRE_VNUM(emp) : NOTHING;
 				trigger_distrust_from_stealth(ch, emp);
 				gain_ability_exp(ch, ABIL_STEAL, 50);
 			}
+		}
+		else if (IS_STOLEN(obj) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
+			// un-steal if this was the original owner
+			GET_STOLEN_TIMER(obj) = 0;
 		}
 		
 		get_check_money(ch, obj);
@@ -1288,6 +1330,11 @@ static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
 	act("You give $p to $N.", FALSE, ch, obj, vict, TO_CHAR);
 	act("$n gives you $p.", FALSE, ch, obj, vict, TO_VICT);
 	act("$n gives $p to $N.", TRUE, ch, obj, vict, TO_NOTVICT);
+	
+	if (IS_STOLEN(obj) && !IS_NPC(vict) && GET_LOYALTY(vict) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(vict))) {
+		// un-steal if this was the original owner
+		GET_STOLEN_TIMER(obj) = 0;
+	}
 }
 
 
@@ -1423,7 +1470,7 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 	int liquid = LIQ_WATER;
 	int timer = UNLIMITED;
 
-	if (HAS_FUNCTION(IN_ROOM(ch), FNC_TAVERN)) {
+	if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAVERN)) {
 		liquid = tavern_data[get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE)].liquid;
 	}
 	
@@ -1840,7 +1887,7 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 	
 	// messaging
 	isle = get_island(to_island, TRUE);
-	msg_to_char(ch, "You set %d '%s' to ship to %s.\r\n", number, skip_filler(get_obj_name_by_proto(vnum)), isle ? isle->name : "an unknown island");
+	msg_to_char(ch, "You set %d '%s' to ship to %s.\r\n", number, skip_filler(get_obj_name_by_proto(vnum)), isle ? get_island_name_for(isle->id, ch) : "an unknown island");
 }
 
 
@@ -1949,7 +1996,7 @@ room_data *find_docks(empire_data *emp, int island_id) {
 		if (GET_ISLAND_ID(ter->room) != island_id) {
 			continue;
 		}
-		if (!HAS_FUNCTION(ter->room, FNC_DOCKS) || !IS_COMPLETE(ter->room)) {
+		if (!room_has_function_and_city_ok(ter->room, FNC_DOCKS)) {
 			continue;
 		}
 		if (ROOM_AFF_FLAGGED(ter->room, ROOM_AFF_NO_WORK)) {
@@ -1985,7 +2032,7 @@ vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 		if (GET_ISLAND_ID(ter->room) != shipd->from_island) {
 			continue;
 		}
-		if (!HAS_FUNCTION(ter->room, FNC_DOCKS) || !IS_COMPLETE(ter->room)) {
+		if (!room_has_function_and_city_ok(ter->room, FNC_DOCKS)) {
 			continue;
 		}
 		if (ROOM_AFF_FLAGGED(ter->room, ROOM_AFF_NO_WORK)) {
@@ -3046,7 +3093,7 @@ void warehouse_identify(char_data *ch, char *argument) {
 	}
 	
 	// access permission
-	if (!imm_access && (!HAS_FUNCTION(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (!imm_access && (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can't do that here.\r\n");
 		return;
 	}
@@ -3118,7 +3165,7 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 	}
 	
 	// access permission
-	if (!imm_access && (!HAS_FUNCTION(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (!imm_access && (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can't do that here.\r\n");
 		return;
 	}
@@ -3126,11 +3173,11 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to do that here.\r\n");
 		return;
 	}
-	if (!imm_access && HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW)) {
+	if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW)) {
 		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
 		return;
 	}
-	if (!imm_access && HAS_FUNCTION(IN_ROOM(ch), FNC_WAREHOUSE) && !has_permission(ch, PRIV_WAREHOUSE)) {
+	if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE) && !has_permission(ch, PRIV_WAREHOUSE)) {
 		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
 		return;
 	}
@@ -3188,7 +3235,7 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		}
 		
 		// vault permission was pre-validated, but they have to be in one to use it
-		if (IS_SET(iter->flags, EUS_VAULT) && !imm_access && !HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT)) {
+		if (IS_SET(iter->flags, EUS_VAULT) && !imm_access && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT)) {
 			msg_to_char(ch, "You need to be in a vault to retrieve %s.\r\n", GET_OBJ_SHORT_DESC(iter->obj));
 			return;
 		}
@@ -3263,7 +3310,7 @@ void warehouse_store(char_data *ch, char *argument) {
 	}
 	
 	// access permission
-	if (!imm_access && (!HAS_FUNCTION(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
+	if (!imm_access && (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can't do that here.\r\n");
 		return;
 	}
@@ -3271,7 +3318,7 @@ void warehouse_store(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to do that here.\r\n");
 		return;
 	}
-	if (!imm_access && HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW)) {
+	if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW)) {
 		msg_to_char(ch, "You don't have permission to store items here.\r\n");
 		return;
 	}
@@ -3447,7 +3494,7 @@ ACMD(do_drink) {
 	if (!*arg) {
 		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK))
 			type = drink_ROOM;
-		else if (HAS_FUNCTION(IN_ROOM(ch), FNC_DRINK_WATER)) {
+		else if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_DRINK_WATER)) {
 			if (!can_drink_from_room(ch, (type = drink_ROOM))) {
 				return;
 			}
@@ -3462,7 +3509,7 @@ ACMD(do_drink) {
 	}
 
 	if (type == NOTHING && !(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-		if (HAS_FUNCTION(IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(arg, "water") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)))) {
+		if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(arg, "water") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)))) {
 			if (!can_drink_from_room(ch, (type = drink_ROOM))) {
 				return;
 			}
@@ -3918,7 +3965,7 @@ ACMD(do_exchange) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't exchange anything.\r\n");
 	}
-	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_MINT | FNC_VAULT)) {
+	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINT | FNC_VAULT)) {
 		msg_to_char(ch, "You can't exchange treasure for coins here.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -4060,15 +4107,11 @@ ACMD(do_get) {
 		}
 		cont_dotmode = find_all_dots(arg2);
 		if (cont_dotmode == FIND_INDIV) {
-			mode = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &cont, &find_veh);
+			mode = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
 			
 			if (find_veh) {
 				// pass off to vehicle handler
 				do_get_from_vehicle(ch, find_veh, arg1, mode, amount);
-			}
-			else if (!cont && GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg2, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
-				// vehicle they are in
-				do_get_from_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), arg1, mode, amount);
 			}
 			else if (!cont) {
 				sprintf(buf, "You don't have %s %s.\r\n", AN(arg2), arg2);
@@ -4273,7 +4316,7 @@ ACMD(do_identify) {
 	if (!*arg) {
 		msg_to_char(ch, "Identify what object?\r\n");
 	}
-	else if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &obj, &veh)) {
+	else if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &obj, &veh)) {
 		msg_to_char(ch, "You see nothing like that here.\r\n");
 	}
 	else if (obj) {
@@ -4465,7 +4508,7 @@ ACMD(do_pour) {
 			return;
 		}
 		if (!*arg2) {		/* no 2nd argument */
-			if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK) || find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1) || (HAS_FUNCTION(IN_ROOM(ch), FNC_DRINK_WATER | FNC_TAVERN) && IS_COMPLETE(IN_ROOM(ch)))) {
+			if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK) || find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1) || (room_has_function_and_city_ok(IN_ROOM(ch), FNC_DRINK_WATER | FNC_TAVERN) && IS_COMPLETE(IN_ROOM(ch)))) {
 				fill_from_room(ch, to_obj);
 				return;
 			}
@@ -4487,7 +4530,7 @@ ACMD(do_pour) {
 				return;
 			}
 		}
-		if (is_abbrev(arg2, "water") && HAS_FUNCTION(IN_ROOM(ch), FNC_DRINK_WATER)) {
+		if (is_abbrev(arg2, "water") && room_has_function_and_city_ok(IN_ROOM(ch), FNC_DRINK_WATER)) {
 			fill_from_room(ch, to_obj);
 			return;
 		}
@@ -4637,15 +4680,11 @@ ACMD(do_put) {
 		send_to_char(buf, ch);
 	}
 	else {
-		generic_find(thecont, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &cont, &find_veh);
+		generic_find(thecont, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
 		
 		if (find_veh) {
 			// override for put obj in vehicle
 			do_put_obj_in_vehicle(ch, find_veh, obj_dotmode, theobj, howmany);
-		}
-		else if (!cont && GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(thecont, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
-			// the vehicle they are in
-			do_put_obj_in_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj_dotmode, theobj, howmany);
 		}
 		else if (!cont) {
 			sprintf(buf, "You don't see %s %s here.\r\n", AN(thecont), thecont);
@@ -5205,7 +5244,7 @@ ACMD(do_ship) {
 		else if (!find_docks(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)))) {
 			msg_to_char(ch, "This island has no docks (docks must not be set no-work).\r\n");
 		}
-		else if (!(to_isle = get_island_by_name(arg1)) && !(to_isle = get_island_by_coords(arg1))) {
+		else if (!(to_isle = get_island_by_name(ch, arg1)) && !(to_isle = get_island_by_coords(arg1))) {
 			msg_to_char(ch, "Unknown target island \"%s\".\r\n", arg1);
 		}
 		else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(ch))) {
@@ -5436,7 +5475,7 @@ ACMD(do_trade) {
 	else if (is_abbrev(command, "check")) {
 		trade_check(ch, argument);
 	}
-	else if ((!HAS_FUNCTION(IN_ROOM(ch), FNC_TRADING_POST) || !IS_COMPLETE(IN_ROOM(ch))) && !IS_IMMORTAL(ch)) {
+	else if ((!room_has_function_and_city_ok(IN_ROOM(ch), FNC_TRADING_POST) || !IS_COMPLETE(IN_ROOM(ch))) && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't trade here.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) && !IS_IMMORTAL(ch)) {

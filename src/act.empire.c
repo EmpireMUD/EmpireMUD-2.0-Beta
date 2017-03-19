@@ -112,6 +112,109 @@ void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
 
 
 /**
+* Sub-processor for do_customize: customize island name <name | none>
+*
+* @param char_data *ch The person trying to customize the island.
+* @param char *argument The arguments.
+*/
+void do_customize_island(char_data *ch, char *argument) {
+	extern bool island_has_default_name(struct island_info *island);
+	void save_island_table();
+	
+	char type_arg[MAX_INPUT_LENGTH];
+	struct empire_city_data *city;
+	struct empire_island *eisle;
+	struct island_info *island;
+	bool has_city = FALSE;
+	
+	// check cities ahead of time
+	if (GET_LOYALTY(ch)) {
+		LL_FOREACH(EMPIRE_CITY_LIST(GET_LOYALTY(ch)), city) {
+			if (GET_ISLAND_ID(city->location) == GET_ISLAND_ID(IN_ROOM(ch)) && (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) < time(0))) {
+				has_city = TRUE;
+				break;
+			}
+		}
+	}
+	
+	argument = one_argument(argument, type_arg);
+	skip_spaces(&argument);
+	
+	if (!ch->desc) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else if (!GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You must be part of an empire to customize an island.\r\n");;
+	}
+	else if (!has_permission(ch, PRIV_CUSTOMIZE)) {
+		msg_to_char(ch, "You don't have permission to customize anything.\r\n");
+	}
+	else if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND || !(island = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE)) || !(eisle = get_empire_island(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch))))) {
+		msg_to_char(ch, "You can't do that here.\r\n");
+	}
+	else if (IS_SET(island->flags, ISLE_NO_CUSTOMIZE)) {
+		msg_to_char(ch, "This island cannot be customized.\r\n");
+	}
+	else if (!has_city) {
+		msg_to_char(ch, "Your empire needs an established city on this island in order to customize it.\r\n");
+	}
+	else if (!*type_arg || !*argument) {
+		msg_to_char(ch, "Usage: customize island <name> <value | none>\r\n");
+	}
+	
+	// types:
+	else if (is_abbrev(type_arg, "name")) {
+		if (!*argument) {
+			msg_to_char(ch, "What would you like to name this island (or \"none\")?\r\n");
+		}
+		else if (!str_cmp(argument, "none")) {
+			if (!eisle->name) {
+				msg_to_char(ch, "Your empire has no custom name for this island.\r\n");
+			}
+			else {
+				log_to_empire(GET_LOYALTY(ch), ELOG_TERRITORY, "%s has removed the custom name for %s (%s)", PERS(ch, ch, TRUE), eisle->name, island->name);
+				msg_to_char(ch, "This island no longer has a custom name.\r\n");
+				
+				free(eisle->name);
+				eisle->name = NULL;
+				EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
+			}
+		}
+		else if (color_code_length(argument) > 0) {
+			msg_to_char(ch, "You cannot use color codes in custom names.\r\n");
+		}
+		else if (strlen(argument) > 30) {
+			msg_to_char(ch, "That name is too long. Island names may not be over 30 characters.\r\n");
+		}
+		else {
+			log_to_empire(GET_LOYALTY(ch), ELOG_TERRITORY, "%s has given %s the custom name of %s", PERS(ch, ch, TRUE), get_island_name_for(island->id, ch), argument);
+			msg_to_char(ch, "It is now called \"%s\".\r\n", argument);
+			
+			if (eisle->name) {
+				free(eisle->name);
+			}
+			eisle->name = str_dup(argument);
+			EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
+			
+			// need to apply global name?
+			if (island_has_default_name(island)) {
+				syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "%s has renamed island %d (%s) to %s", GET_NAME(ch), island->id, NULLSAFE(island->name), eisle->name);
+				
+				if (island->name) {
+					free(island->name);
+				}
+				island->name = str_dup(eisle->name);
+				save_island_table();
+			}
+		}
+	}
+	else {
+		msg_to_char(ch, "You can customize: name\r\n");
+	}
+}
+
+
+/**
 * Determines how much an empire must spend to start a war with another empire,
 * based on the configs "war_cost_max" and "war_cost_min". This is calculated
 * by the difference in score between the two empires with the maximum value at
@@ -570,13 +673,13 @@ void show_detailed_workforce_setup_to_char(empire_data *emp, char_data *ch, int 
 		}
 		
 		if (isle->workforce_limit[chore] == WORKFORCE_UNLIMITED) {
-			snprintf(part, sizeof(part), "%s: &con&0%s", island->name, isle->population <= 0 ? " (no citizens)" : "");
+			snprintf(part, sizeof(part), "%s: &con&0%s", get_island_name_for(island->id, ch), isle->population <= 0 ? " (no citizens)" : "");
 		}
 		else if (isle->workforce_limit[chore] == 0) {
-			snprintf(part, sizeof(part), "%s: &yoff&0%s", island->name, isle->population <= 0 ? " (no citizens)" : "");
+			snprintf(part, sizeof(part), "%s: &yoff&0%s", get_island_name_for(island->id, ch), isle->population <= 0 ? " (no citizens)" : "");
 		}
 		else {
-			snprintf(part, sizeof(part), "%s: &climit %d&0%s", island->name, isle->workforce_limit[chore], isle->population <= 0 ? " (no citizens)" : "");
+			snprintf(part, sizeof(part), "%s: &climit %d&0%s", get_island_name_for(island->id, ch), isle->workforce_limit[chore], isle->population <= 0 ? " (no citizens)" : "");
 		}
 		
 		if (size + strlen(part) + 3 < sizeof(buf)) {
@@ -600,8 +703,9 @@ void show_detailed_workforce_setup_to_char(empire_data *emp, char_data *ch, int 
 *
 * @param empire_data *emp The empire to check.
 * @param char_data *to The person to show the info to.
+* @param bool here If it should filter workforce in the same island.
 */
-void show_workforce_where(empire_data *emp, char_data *to) {
+void show_workforce_where(empire_data *emp, char_data *to, bool here) {
 	// helper data type
 	struct workforce_count_type {
 		int chore;
@@ -612,7 +716,7 @@ void show_workforce_where(empire_data *emp, char_data *to) {
 	struct workforce_count_type *find, *wct, *next_wct, *counts = NULL;
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	char_data *ch_iter;
-	int chore, iter;
+	int chore, iter, requesters_island;
 	size_t size;
 	
 	if (!emp) {
@@ -620,9 +724,15 @@ void show_workforce_where(empire_data *emp, char_data *to) {
 		return;
 	}
 	
+	requesters_island = GET_ISLAND_ID(IN_ROOM(to));
+	
 	// count up workforce mobs
 	for (ch_iter = character_list; ch_iter; ch_iter = ch_iter->next) {
 		if (!IS_NPC(ch_iter) || GET_LOYALTY(ch_iter) != emp) {
+			continue;
+		}
+		
+		if ( here && requesters_island != GET_ISLAND_ID(IN_ROOM(ch_iter))) {
 			continue;
 		}
 		
@@ -753,6 +863,30 @@ void abandon_city(char_data *ch, char *argument) {
 	
 	read_empire_territory(emp, FALSE);
 	save_empire(emp);
+}
+
+
+/**
+* Checks if a building has the IN-CITY-ONLY flag and whether or not the room
+* is in a city. For interior rooms inside a building, it ALSO checks the main
+* building.
+*
+* @param room_data *room The room to check.
+* @param bool check_wait If TRUE, requires that the city is over an hour old (or as-configured).
+* @return bool TRUE if the room is okay to use, FALSE if it failed this check.
+*/
+bool check_in_city_requirement(room_data *room, bool check_wait) {
+	room_data *home = HOME_ROOM(room);
+	bool junk;
+	
+	if (!ROOM_BLD_FLAGGED(room, BLD_IN_CITY_ONLY) && !ROOM_BLD_FLAGGED(home, BLD_IN_CITY_ONLY)) {
+		return TRUE;
+	}
+	if (ROOM_OWNER(room) && is_in_city_for_empire(room, ROOM_OWNER(room), check_wait, &junk)) {
+		return TRUE;
+	}
+	
+	return FALSE;
 }
 
 
@@ -1137,7 +1271,7 @@ void list_cities(char_data *ch, char *argument) {
 		isle = get_island(GET_ISLAND_ID(rl), TRUE);
 		
 		pending = (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) > time(0));			
-		msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d), traits: %s%s\r\n", ++count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, isle->name, city_type[city->type].name, city_type[city->type].radius, buf, pending ? " &r(new)&0" : "");
+		msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d), traits: %s%s\r\n", ++count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, buf, pending ? " &r(new)&0" : "");
 	}
 	
 	if (!found) {
@@ -1783,7 +1917,7 @@ void perform_inspire(char_data *ch, char_data *vict, int type) {
 // helper data for do_islands
 struct do_islands_data {
 	int id;
-	bool has_territory;
+	int territory;
 	int einv_size;
 	UT_hash_handle hh;
 };
@@ -1814,8 +1948,9 @@ void do_islands_add_einv(struct do_islands_data **list, int island_id, int amoun
 *
 * @param struct do_islands_data **list Pointer to a do_islands hash.
 * @param int island_id Which island.
+* @param int amount How much territory on the island.
 */
-void do_islands_has_territory(struct do_islands_data **list, int island_id) {
+void do_islands_has_territory(struct do_islands_data **list, int island_id, int amount) {
 	struct do_islands_data *isle;
 	
 	HASH_FIND_INT(*list, &island_id, isle);
@@ -1824,7 +1959,7 @@ void do_islands_has_territory(struct do_islands_data **list, int island_id) {
 		isle->id = island_id;
 		HASH_ADD_INT(*list, id, isle);
 	}
-	isle->has_territory = TRUE;
+	SAFE_ADD(isle->territory, amount, INT_MIN, INT_MAX, TRUE);
 }
 
 
@@ -1899,7 +2034,7 @@ void show_tavern_status(char_data *ch) {
 	msg_to_char(ch, "Your taverns:\r\n");
 	
 	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
-		if (HAS_FUNCTION(ter->room, FNC_TAVERN)) {
+		if (room_has_function_and_city_ok(ter->room, FNC_TAVERN)) {
 			found = TRUE;
 			
 			if (has_ability(ch, ABIL_NAVIGATION)) {
@@ -2316,6 +2451,9 @@ ACMD(do_barde) {
 	}
 	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch)))
 		msg_to_char(ch, "You must barde animals in the stable.\r\n");
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it.\r\n");
+	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED))
 		msg_to_char(ch, "You don't have permission to barde animals here.\r\n");
 	else if (!*arg)
@@ -2354,6 +2492,9 @@ ACMD(do_barde) {
 					setup_generic_npc(newmob, GET_LOYALTY(mob), MOB_DYNAMIC_NAME(mob), MOB_DYNAMIC_SEX(mob));
 					char_to_room(newmob, IN_ROOM(ch));
 					MOB_INSTANCE_ID(newmob) = MOB_INSTANCE_ID(mob);
+					if (MOB_INSTANCE_ID(newmob) != NOTHING) {
+						add_instance_mob(real_instance(MOB_INSTANCE_ID(newmob)), GET_MOB_VNUM(newmob));
+					}
 		
 					prc = (double)GET_HEALTH(mob) / MAX(1, GET_MAX_HEALTH(mob));
 					GET_HEALTH(newmob) = (int)(prc * GET_MAX_HEALTH(newmob));
@@ -2772,6 +2913,9 @@ ACMD(do_deposit) {
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You must finish building it first.\r\n");
+	}
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
 	else if (!(emp = ROOM_OWNER(IN_ROOM(ch)))) {
 		msg_to_char(ch, "No empire stores coins here.\r\n");
@@ -3456,6 +3600,10 @@ ACMD(do_enroll) {
 		if (old && EMPIRE_LEADER(old) == GET_IDNUM(targ)) {
 			eliminate_linkdead_players();
 			
+			// attempt to estimate the new member count so cities and territory transfer correctly
+			// note: may over-estimate if some players already had alts in both empires
+			EMPIRE_MEMBERS(e) += EMPIRE_MEMBERS(old);
+			
 			// move members
 			HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
 				// find only members of the old empire (other than targ)
@@ -3906,7 +4054,7 @@ ACMD(do_findmaintenance) {
 	}
 	
 	if (*arg) {
-		if (!(find_island = get_island_by_name(arg)) && !(find_room = find_target_room(NULL, arg))) {
+		if (!(find_island = get_island_by_name(ch, arg)) && !(find_room = find_target_room(NULL, arg))) {
 			msg_to_char(ch, "Unknown location: %s.\r\n", arg);
 			return;
 		}
@@ -4060,6 +4208,9 @@ ACMD(do_home) {
 		else if (ROOM_AFF_FLAGGED(real, ROOM_AFF_HAS_INSTANCE)) {
 			msg_to_char(ch, "You can't make this your home right now.\r\n");
 		}
+		else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+			msg_to_char(ch, "You can't make this your home because it's not in a city.\r\n");
+		}
 		else {
 			// if someone is overriding it
 			if (ROOM_PRIVATE_OWNER(real) != NOBODY) {
@@ -4125,13 +4276,12 @@ ACMD(do_home) {
 ACMD(do_islands) {
 	char output[MAX_STRING_LENGTH*2], line[256], emp_arg[MAX_INPUT_LENGTH];
 	struct do_islands_data *item, *next_item, *list = NULL;
+	struct empire_island *eisle, *next_eisle;
 	struct empire_unique_storage *eus;
-	struct empire_territory_data *ter;
 	struct empire_storage_data *store;
 	struct island_info *isle;
 	empire_data *emp;
 	room_data *room;
-	int id, last_id = -1;
 	size_t size, lsize;
 	bool overflow = FALSE;
 	
@@ -4162,16 +4312,8 @@ ACMD(do_islands) {
 	}
 	
 	// mark your territory
-	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
-		id = GET_ISLAND_ID(ter->room);
-		
-		if (id != last_id) {
-			last_id = id;
-			
-			if (id != NO_ISLAND) {
-				do_islands_has_territory(&list, id);
-			}
-		}
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
+		do_islands_has_territory(&list, eisle->island, eisle->city_terr + eisle->outside_terr);
 	}
 	
 	// compute einv
@@ -4194,13 +4336,13 @@ ACMD(do_islands) {
 	HASH_ITER(hh, list, item, next_item) {
 		isle = get_island(item->id, TRUE);
 		room = real_room(isle->center);
-		lsize = snprintf(line, sizeof(line), " %s (%d, %d) - ", isle->name, X_COORD(room), Y_COORD(room));
+		lsize = snprintf(line, sizeof(line), " %s (%d, %d) - ", get_island_name_for(isle->id, ch), X_COORD(room), Y_COORD(room));
 		
-		if (item->has_territory) {
-			lsize += snprintf(line + lsize, sizeof(line) - lsize, "has territory%s", item->einv_size > 0 ? ", " : "");
+		if (item->territory > 0) {
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d territory%s", item->territory, item->einv_size > 0 ? ", " : "");
 		}
 		if (item->einv_size > 0) {
-			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d item%s in einventory", item->einv_size, PLURAL(item->einv_size));
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d einventory", item->einv_size);
 		}
 		
 		if (size + lsize + 3 < sizeof(output)) {
@@ -4238,6 +4380,9 @@ ACMD(do_tavern) {
 	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_TAVERN) || !IS_COMPLETE(IN_ROOM(ch))) {
 		show_tavern_status(ch);
 		msg_to_char(ch, "You can only change what's being brewed while actually in the tavern.\r\n");
+	}
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
 	else if (!GET_LOYALTY(ch) || GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(ch))) {
 		msg_to_char(ch, "Your empire doesn't own this tavern.\r\n");
@@ -4303,7 +4448,7 @@ ACMD(do_tomb) {
 		if (tomb && !can_use_room(ch, tomb, GUESTS_ALLOWED)) {
 			msg_to_char(ch, "You no longer have access to that tomb because it's owned by %s.\r\n", ROOM_OWNER(tomb) ? EMPIRE_NAME(ROOM_OWNER(tomb)) : "someone else");
 		}
-		if (HAS_FUNCTION(IN_ROOM(ch), FNC_TOMB) && IS_COMPLETE(IN_ROOM(ch))) {
+		if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_TOMB)) {
 			msg_to_char(ch, "Use 'tomb set' to change your tomb to this room.\r\n");
 		}
 	}
@@ -4325,6 +4470,9 @@ ACMD(do_tomb) {
 		}
 		else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE) || ROOM_AFF_FLAGGED(real, ROOM_AFF_HAS_INSTANCE)) {
 			msg_to_char(ch, "You can't make this your tomb right now.\r\n");
+		}
+		else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+			msg_to_char(ch, "You can't make this your tomb because it's not in a city.\r\n");
 		}
 		else {			
 			GET_TOMB_ROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
@@ -4836,26 +4984,35 @@ ACMD(do_roster) {
 	extern const char *class_role[];
 	extern const char *class_role_color[];
 
-	char buf[MAX_STRING_LENGTH * 2], buf1[MAX_STRING_LENGTH * 2], arg[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], buf1[MAX_STRING_LENGTH * 2], arg[MAX_INPUT_LENGTH];
 	player_index_data *index, *next_index;
+	empire_data *e = GET_LOYALTY(ch);
 	bool timed_out, is_file = FALSE;
 	int days, hours, size;
 	char_data *member;
-	empire_data *e;
-
-	one_word(argument, arg);
-
-	if (!*arg || (GET_ACCESS_LEVEL(ch) < LVL_CIMPL && !IS_GRANTED(ch, GRANT_EMPIRES))) {
-		if (!(e = GET_LOYALTY(ch))) {
-			msg_to_char(ch, "You don't belong to any empire!\r\n");
+	bool all = FALSE;
+	
+	// imm usage: roster ["empire"] [all]
+	// mortal usage: roster [all]
+	
+	while (*argument) {
+		argument = any_one_word(argument, arg);
+		
+		if (!str_cmp(arg, "all") || is_abbrev(arg, "-all")) {
+			all = TRUE;
+		}
+		else if (*arg && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES))) {
+			if (!(e = get_empire_by_name(arg))) {
+				msg_to_char(ch, "Unknown empire.\r\n");
+				return;
+			}
+		}
+		else if (*arg) {
+			msg_to_char(ch, "Usage: roster %s[all]\r\n", (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES)) ? "[\"empire\"] " : "");
 			return;
 		}
 	}
-	else if (!(e = get_empire_by_name(arg))) {
-		send_to_char("Unknown empire.\r\n", ch);
-		return;
-	}
-
+	
 	*buf = '\0';
 	size = 0;
 	
@@ -4870,8 +5027,12 @@ ACMD(do_roster) {
 			continue;
 		}
 		
-		// display:
 		timed_out = member_is_timed_out_ch(member);
+		if (timed_out && !all) {
+			continue;
+		}
+		
+		// display:
 		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 			size += snprintf(buf + size, sizeof(buf) - size, "[%d %s %s] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), SHOW_CLASS_NAME(member), class_role[GET_CLASS_ROLE(member)], EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
 		}
@@ -5046,7 +5207,7 @@ ACMD(do_workforce) {
 	void deactivate_workforce(empire_data *emp, int island_id, int type);
 	void deactivate_workforce_room(empire_data *emp, room_data *room);
 	
-	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH], local_arg[MAX_INPUT_LENGTH];
 	struct island_info *island = NULL;
 	bool all = FALSE, here = FALSE;
 	int iter, type, limit = 0;
@@ -5071,7 +5232,11 @@ ACMD(do_workforce) {
 		send_config_msg(ch, "need_approval_string");
 	}
 	else if (is_abbrev(arg, "where")) {
-		show_workforce_where(emp, ch);
+		argument = any_one_arg(argument, local_arg);
+		if ( is_abbrev(local_arg, "here") ){
+			here = true;
+		}
+		show_workforce_where(emp, ch, here);
 	}
 	// everything below requires privileges
 	else if (GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_WORKFORCE)) {
@@ -5149,7 +5314,7 @@ ACMD(do_workforce) {
 		else if (!str_cmp(argument, "all")) {
 			all = TRUE;
 		}
-		else if (!(island = get_island_by_name(argument)) && !(island = get_island_by_coords(argument))) {
+		else if (!(island = get_island_by_name(ch, argument)) && !(island = get_island_by_coords(argument))) {
 			msg_to_char(ch, "Unknown island \"%s\".\r\n", argument);
 			return;
 		}
@@ -5166,7 +5331,7 @@ ACMD(do_workforce) {
 		}
 		else if (island) {
 			set_workforce_limit(emp, island->id, type, limit);
-			snprintf(name, sizeof(name), "%s", island->name);
+			snprintf(name, sizeof(name), "%s", get_island_name_for(island->id, ch));
 		}
 		else {
 			msg_to_char(ch, "No workforce to set for that.\r\n");
@@ -5195,6 +5360,9 @@ ACMD(do_withdraw) {
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You must finish building it first.\r\n");
+	}
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
 	else if (!(emp = ROOM_OWNER(IN_ROOM(ch)))) {
 		msg_to_char(ch, "No empire stores coins here.\r\n");

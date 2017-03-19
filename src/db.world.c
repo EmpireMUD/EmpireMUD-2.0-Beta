@@ -77,6 +77,7 @@ void naturalize_newbie_islands();
 void ruin_one_building(room_data *room);
 void save_world_map_to_file();
 extern int sort_empire_islands(struct empire_island *a, struct empire_island *b);
+void update_island_names();
 void update_tavern(room_data *room);
 
 
@@ -390,12 +391,6 @@ void delete_room(room_data *room, bool check_exits) {
 		SET_BIT(inst->flags, INST_COMPLETED);
 	}
 	
-	// remove it now
-	remove_room_from_world_tables(room);
-	if (GET_ROOM_VEHICLE(room)) {
-		remove_room_from_vehicle(room, GET_ROOM_VEHICLE(room));
-	}
-	
 	if (check_exits) {
 		// search world for portals that link here
 		for (o = object_list; o; o = next_o) {
@@ -424,12 +419,18 @@ void delete_room(room_data *room, bool check_exits) {
 		--VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(home));
 	}
 	
-	// get rid of players
-	relocate_players(room, NULL);
-	
 	// get rid of vehicles
 	LL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
 		extract_vehicle(veh);
+	}
+	
+	// get rid of players
+	relocate_players(room, NULL);
+	
+	// remove room from world now
+	remove_room_from_world_tables(room);
+	if (GET_ROOM_VEHICLE(room)) {
+		remove_room_from_vehicle(room, GET_ROOM_VEHICLE(room));
 	}
 	
 	// Remove remaining chars
@@ -901,7 +902,7 @@ void update_world(void) {
 			}
 			
 			// type-specific updates
-			if (HAS_FUNCTION(iter, FNC_TAVERN) && IS_COMPLETE(iter)) {
+			if (room_has_function_and_city_ok(iter, FNC_TAVERN)) {
 				update_tavern(iter);
 			}
 			if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && get_room_extra_data(iter, ROOM_EXTRA_SEED_TIME)) {
@@ -1112,6 +1113,9 @@ void annual_world_update(void) {
 	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		annual_update_vehicle(veh);
 	}
+	
+	// rename islands
+	update_island_names();
 }
 
 
@@ -1180,6 +1184,70 @@ void naturalize_newbie_islands(void) {
 	if (count) {
 		log("New year: naturalized %d tile%s on newbie islands.", count, PLURAL(count));
 		world_map_needs_save = TRUE;
+	}
+}
+
+
+/**
+* Checks periodically to see if an empire is the only one left on an island,
+* and renames the island if they have a custom name for it.
+*/
+void update_island_names(void) {
+	void save_island_table();
+	
+	empire_data *emp, *next_emp, *found_emp;
+	struct island_info *isle, *next_isle;
+	struct empire_city_data *city;
+	struct empire_island *eisle;
+	char *last_name = NULL;
+	int count;
+	
+	HASH_ITER(hh, island_table, isle, next_isle) {
+		if (isle->id == NO_ISLAND || IS_SET(isle->flags, ISLE_NO_CUSTOMIZE)) {
+			continue;
+		}
+		
+		// look for empires with cities on the island
+		found_emp = NULL;
+		count = 0;
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
+				if (GET_ISLAND_ID(city->location) == isle->id) {
+					eisle = get_empire_island(emp, isle->id);
+					
+					// if the empire HAS named the island
+					if (eisle->name) {
+						if (!last_name || !str_cmp(eisle->name, last_name)) {
+							++count;	// only count in this case
+							found_emp = emp;	// found an empire with a name
+						}
+					}
+					else {
+						++count;	// no name; always count
+					}
+					
+					break;	// only care about 1 city per empire
+				}
+			}
+			
+			if (count > 1) {
+				break;	// we only care if there's more than 1 empire
+			}
+		}
+		
+		if (count == 1 && found_emp) {
+			eisle = get_empire_island(found_emp, isle->id);
+			if (eisle->name && strcmp(eisle->name, isle->name)) {
+				// HERE: We are now ready to change the name
+				syslog(SYS_INFO, LVL_START_IMM, TRUE, "Island %d (%s) is now called %s (%s)", isle->id, NULLSAFE(isle->name), eisle->name, EMPIRE_NAME(found_emp));
+				
+				if (isle->name) {
+					free(isle->name);
+				}
+				isle->name = str_dup(eisle->name);
+				save_island_table();
+			}
+		}
 	}
 }
 
@@ -1360,6 +1428,7 @@ void reset_one_room(room_data *room) {
 			case 'I': {	// add instance data to mob
 				if (mob) {
 					MOB_INSTANCE_ID(mob) = reset->arg1;
+					add_instance_mob(real_instance(reset->arg1), GET_MOB_VNUM(mob));
 				}
 				break;
 			}
@@ -1391,7 +1460,7 @@ void reset_one_room(room_data *room) {
 			case 'T': {	// trigger attach
 				if (reset->arg1 == MOB_TRIGGER && tmob) {
 					if (!SCRIPT(tmob)) {
-						CREATE(SCRIPT(tmob), struct script_data, 1);
+						create_script_data(tmob, MOB_TRIGGER);
 					}
 					if ((trig = read_trigger(reset->arg2))) {
 						add_trigger(SCRIPT(tmob), trig, -1);
@@ -1399,7 +1468,7 @@ void reset_one_room(room_data *room) {
 				}
 				else if (reset->arg1 == WLD_TRIGGER) {
 					if (!room->script) {
-						CREATE(room->script, struct script_data, 1);
+						create_script_data(room, WLD_TRIGGER);
 					}
 					if ((trig = read_trigger(reset->arg2))) {
 						add_trigger(room->script, trig, -1);
@@ -1601,15 +1670,20 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	
 	// check for territory updates
 	if (loc && ROOM_OWNER(loc) && was_large != ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS)) {
+		struct empire_island *eisle = get_empire_island(ROOM_OWNER(loc), GET_ISLAND_ID(loc));
 		if (was_large && was_in_city && !is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
 			// changing from in-city to not
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) -= 1;
+			eisle->city_terr -= 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) += 1;
+			eisle->outside_terr += 1;
 		}
 		else if (ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
 			// changing from outside-territory to in-city
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) += 1;
+			eisle->city_terr -= 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) -= 1;
+			eisle->outside_terr += 1;
 		}
 		else {
 			// no relevant change
@@ -1645,6 +1719,8 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	if ((island = GET_ISLAND_ID(room)) == NO_ISLAND) {
 		return;
 	}
+	
+	// WARNING: do not check in-city status on these ... it can change at a time when territory is not re-scanned
 	
 	if (HAS_FUNCTION(room, FNC_APIARY)) {
 		EMPIRE_TECH(emp, TECH_APIARIES) += amt;
@@ -1784,9 +1860,11 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 				ter->marked = FALSE;
 			}
 			
-			// reset population
+			// reset counters
 			HASH_ITER(hh, EMPIRE_ISLANDS(e), isle, next_isle) {
 				isle->population = 0;
+				isle->city_terr = 0;
+				isle->outside_terr = 0;
 			}
 		}
 	}
@@ -1796,11 +1874,14 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 		if ((e = ROOM_OWNER(iter)) && (!emp || e == emp)) {
 			// only count each building as 1
 			if (COUNTS_AS_TERRITORY(iter)) {
+				isle = get_empire_island(e, GET_ISLAND_ID(iter));
 				if (is_in_city_for_empire(iter, e, FALSE, &junk)) {
 					EMPIRE_CITY_TERRITORY(e) += 1;
+					isle->city_terr += 1;
 				}
 				else {
 					EMPIRE_OUTSIDE_TERRITORY(e) += 1;
+					isle->outside_terr += 1;
 				}
 			}
 			

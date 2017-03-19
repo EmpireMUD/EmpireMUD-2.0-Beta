@@ -1069,6 +1069,10 @@ void extract_char(char_data *ch) {
 	if (!EXTRACTED(ch)) {
 		if (IS_NPC(ch)) {
 			SET_BIT(MOB_FLAGS(ch), MOB_EXTRACTED);
+			
+			if (MOB_INSTANCE_ID(ch) != NOTHING) {
+				subtract_instance_mob(real_instance(MOB_INSTANCE_ID(ch)), GET_MOB_VNUM(ch));
+			}
 		}
 		else {
 			SET_BIT(PLR_FLAGS(ch), PLR_EXTRACTED);
@@ -2454,11 +2458,14 @@ void perform_abandon_room(room_data *room) {
 		
 		// update territory counts
 		if (COUNTS_AS_TERRITORY(room)) {
+			struct empire_island *eisle = get_empire_island(emp, GET_ISLAND_ID(room));
 			if (is_in_city_for_empire(room, emp, FALSE, &junk)) {
 				EMPIRE_CITY_TERRITORY(emp) -= 1;
+				eisle->city_terr -= 1;
 			}
 			else {
 				EMPIRE_OUTSIDE_TERRITORY(emp) -= 1;
+				eisle->outside_terr -= 1;
 			}
 		}
 		// territory list
@@ -2507,11 +2514,14 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	
 	// update territory counts
 	if (COUNTS_AS_TERRITORY(room)) {
+		struct empire_island *eisle = get_empire_island(emp, GET_ISLAND_ID(room));
 		if (is_in_city_for_empire(room, emp, FALSE, &junk)) {
 			EMPIRE_CITY_TERRITORY(emp) += 1;
+			eisle->city_terr += 1;
 		}
 		else {
 			EMPIRE_OUTSIDE_TERRITORY(emp) += 1;
+			eisle->outside_terr += 1;
 		}
 	}
 	// territory list
@@ -3727,7 +3737,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	// copy only existing scripts
 	if (SCRIPT(input)) {
 		if (!SCRIPT(obj)) {
-			CREATE(SCRIPT(obj), struct script_data, 1);
+			create_script_data(obj, OBJ_TRIGGER);
 		}
 
 		for (trig = TRIGGERS(SCRIPT(input)); trig; trig = trig->next) {
@@ -3762,6 +3772,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	GET_OBJ_TYPE(obj) = GET_OBJ_TYPE(input);
 	GET_OBJ_WEAR(obj) = GET_OBJ_WEAR(input);
 	GET_STOLEN_TIMER(obj) = GET_STOLEN_TIMER(input);
+	GET_STOLEN_FROM(obj) = GET_STOLEN_FROM(input);
 	
 	for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
 		GET_OBJ_VAL(obj, iter) = GET_OBJ_VAL(input, iter);
@@ -3881,6 +3892,7 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 	GET_OBJ_TIMER(new) = GET_OBJ_TIMER(obj);
 	GET_AUTOSTORE_TIMER(new) = GET_AUTOSTORE_TIMER(obj);
 	new->stolen_timer = obj->stolen_timer;
+	GET_STOLEN_FROM(new) = GET_STOLEN_FROM(obj);
 	new->last_owner_id = obj->last_owner_id;
 	new->last_empire_id = obj->last_empire_id;
 	
@@ -3973,6 +3985,9 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 		return FALSE;
 	}
 	if (GET_STOLEN_TIMER(obj_a) != GET_STOLEN_TIMER(obj_b)) {
+		return FALSE;
+	}
+	if (GET_STOLEN_FROM(obj_a) != GET_STOLEN_FROM(obj_b)) {
 		return FALSE;
 	}
 	for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
@@ -4229,6 +4244,25 @@ bool bind_ok(obj_data *obj, char_data *ch) {
 	}
 	
 	return FALSE;
+}
+
+
+/**
+* Duplicates an obj binding list.
+*
+* @param struct obj_binding *from The list to copy.
+* @return struct obj_binding* The copied list.
+*/
+struct obj_binding *copy_obj_bindings(struct obj_binding *from) {
+	struct obj_binding *list = NULL, *bind, *iter;
+	
+	LL_FOREACH(from, iter) {
+		CREATE(bind, struct obj_binding, 1);
+		*bind = *iter;
+		LL_APPEND(list, bind);
+	}
+	
+	return list;
 }
 
 
@@ -5523,7 +5557,6 @@ void set_room_extra_data(room_data *room, int type, int value) {
 room_data *find_target_room(char_data *ch, char *rawroomstr) {
 	extern vehicle_data *get_vehicle(char *name);
 	extern room_data *obj_room(obj_data *obj);
-	extern struct instance_data *real_instance(any_vnum instance_id);
 	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 	
 	struct instance_data *inst;
@@ -6207,6 +6240,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	
 	if (stolen) {
 		GET_STOLEN_TIMER(obj) = time(0);
+		GET_STOLEN_FROM(obj) = EMPIRE_VNUM(emp);
 		trigger_distrust_from_stealth(ch, emp);
 	}
 	
@@ -6345,10 +6379,10 @@ struct empire_unique_storage *find_eus_entry(obj_data *obj, empire_data *emp, ro
 		if (location && GET_ISLAND_ID(location) != iter->island) {
 			continue;
 		}
-		if (location && HAS_FUNCTION(location, FNC_VAULT) && !IS_SET(iter->flags, EUS_VAULT)) {
+		if (location && room_has_function_and_city_ok(location, FNC_VAULT) && !IS_SET(iter->flags, EUS_VAULT)) {
 			continue;
 		}
-		if (location && !HAS_FUNCTION(location, FNC_VAULT) && IS_SET(iter->flags, EUS_VAULT)) {
+		if (location && !room_has_function_and_city_ok(location, FNC_VAULT) && IS_SET(iter->flags, EUS_VAULT)) {
 			continue;
 		}
 		
@@ -6434,7 +6468,7 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 		if (eus->island == NO_ISLAND) {
 			eus->island = get_main_island(emp);
 		}
-		if (room && HAS_FUNCTION(room, FNC_VAULT)) {
+		if (room && room_has_function_and_city_ok(room, FNC_VAULT)) {
 			eus->flags = EUS_VAULT;
 		}
 			
@@ -6543,6 +6577,12 @@ int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **ta
 	if (IS_SET(bitvector, FIND_VEHICLE_ROOM)) {
 		if ((*tar_veh = get_vehicle_in_room_vis(ch, name)) != NULL) {
 			return (FIND_VEHICLE_ROOM);
+		}
+	}
+	if (IS_SET(bitvector, FIND_VEHICLE_INSIDE)) {
+		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(name, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
+			*tar_veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
+			return (FIND_VEHICLE_INSIDE);
 		}
 	}
 	if (IS_SET(bitvector, FIND_OBJ_ROOM)) {

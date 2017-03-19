@@ -116,6 +116,7 @@ const char *adventure_flags[] = {
 	"!NEWBIE",
 	"NEWBIE-ONLY",
 	"NO-MOB-CLEANUP",
+	"EMPTY-RESET-ONLY",
 	"\n"
 };
 
@@ -169,8 +170,8 @@ const char *room_template_flags[] = {
 	"!TELEPORT",
 	"LOOK-OUT",
 	"!LOCATION",
-	"PIGEON-POST",
-	"COOKING-FIRE",
+	"*",
+	"*",
 	"\n"
 };
 
@@ -241,6 +242,7 @@ const char *account_flags[] = {
 	"MULTI-IP",
 	"MULTI-CHAR",
 	"APPR",
+	"!CUSTOMIZE",
 	"\n"
 };
 
@@ -465,6 +467,7 @@ const char *preference_bits[] = {
 	"WIZHIDE",
 	"AUTONOTES",
 	"AUTODISMOUNT",
+	"!EMPIRE",
 	"\n"
 };
 
@@ -526,6 +529,8 @@ const struct toggle_data_type toggle_data[] = {
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
 	{ "stealthable", TOG_ONOFF, PRF_STEALTHABLE, 0, NULL },
 	{ "autodismount", TOG_ONOFF, PRF_AUTODISMOUNT, 0, NULL },
+	
+	{ "no-empire", TOG_ONOFF, PRF_NOEMPIRE, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
@@ -869,6 +874,7 @@ const char *affected_bits[] = {
 	"!STUN",
 	"*ORDERED",
 	"!DRINK-BLOOD",
+	"DISTRACTED",
 	"\n"
 };
 
@@ -907,6 +913,7 @@ const char *affected_bits_consider[] = {
 	"$E is immune to stuns.",	// 30 - !stun
 	"",	// ordred
 	"",	// !drink-blood
+	"",	// distracted
 	"\n"
 };
 
@@ -944,7 +951,8 @@ const bool aff_is_bad[] = {
 	FALSE,
 	FALSE,	// 30
 	FALSE,
-	FALSE
+	FALSE,
+	TRUE
 };
 
 
@@ -2158,6 +2166,9 @@ const char *obj_custom_types[] = {
 	"wear-to-room",
 	"remove-to-char",
 	"remove-to-room",
+	"longdesc",
+	"longdesc-female",
+	"longdesc-male",
 	"\n"
 };
 
@@ -2399,7 +2410,7 @@ const char *bld_flags[] = {
 	"!RUINS",
 	"!NPC",
 	"BARRIER",	// 10
-	"*TAVERN-DEPRECATED",
+	"IN-CITY-ONLY",
 	"LARGE-CITY-RADIUS",
 	"*MINE-DEPRECATED",
 	"ATTACH-ROAD",
@@ -2594,6 +2605,7 @@ const char *function_flags[] = {
 const char *island_bits[] = {
 	"NEWBIE",
 	"!AGGRO",
+	"!CUSTOMIZE",
 	"\n"
 };
 
@@ -2994,6 +3006,8 @@ const char *affect_types[] = {
 	"shadowlash",	// dot
 	"soulchain",
 	"thornlash",	// 75
+	"arrow to the knee",
+	"hostile delay",
 	"\n"
 	};
 
@@ -3076,6 +3090,8 @@ const char *affect_wear_off_msgs[] = {
 	"",	// shadowlash-dot
 	"Your soul is unchained.",
 	"",	// 75, thornlast
+	"Your knee feels better.",
+	"Your hostile login delay ends and you are free to act.",
 	"\n"
 };
 

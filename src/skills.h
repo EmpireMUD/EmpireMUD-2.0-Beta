@@ -651,8 +651,10 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ATYPE_SHADOWLASH_DOT  73
 #define ATYPE_SOULCHAIN  74
 #define ATYPE_THORNLASH  75
+#define ATYPE_ARROW_TO_THE_KNEE  76
+#define ATYPE_HOSTILE_DELAY  77
 
-#define NUM_ATYPES  76	// total number, for bounds checking
+#define NUM_ATYPES  78	// total number, for bounds checking
 
 
 // armor types

@@ -92,7 +92,7 @@ switch %random.4%
   case 1
     * Dexterity debuff on enemy
     %send% %targ% %self.name% flashes brightly and shoots a bolt of lightning at you!
-    %echoaround% %targ% %self.name% flashes brightly and shoots a bolt of lighting at %targ.name%!
+    %echoaround% %targ% %self.name% flashes brightly and shoots a bolt of lightning at %targ.name%!
     eval amount %self.level% / 100
     dg_affect %targ% DEXTERITY -%amount% 30
     wait 25 sec

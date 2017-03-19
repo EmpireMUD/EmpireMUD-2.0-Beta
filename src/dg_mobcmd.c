@@ -65,7 +65,6 @@ extern room_data *get_room(room_data *ref, char *name);
 extern vehicle_data *get_vehicle(char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 extern room_data *obj_room(obj_data *obj);
-extern struct instance_data *real_instance(any_vnum instance_id);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
@@ -593,6 +592,9 @@ ACMD(do_mload) {
 		}
 		mob = read_mobile(number, TRUE);
 		MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
+		if (MOB_INSTANCE_ID(mob) != NOTHING) {
+			add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
+		}
 		char_to_room(mob, IN_ROOM(ch));
 		setup_generic_npc(mob, GET_LOYALTY(ch), NOTHING, NOTHING);
 		
@@ -1706,6 +1708,9 @@ ACMD(do_mtransform) {
 		}
 		
 		MOB_INSTANCE_ID(m) = MOB_INSTANCE_ID(ch);
+		if (MOB_INSTANCE_ID(m) != NOTHING) {
+			add_instance_mob(real_instance(MOB_INSTANCE_ID(m)), GET_MOB_VNUM(m));
+		}
 		
 		setup_generic_npc(m, GET_LOYALTY(ch), MOB_DYNAMIC_NAME(ch), MOB_DYNAMIC_SEX(ch));
 
@@ -2140,8 +2145,16 @@ ACMD(do_mscale) {
 		return;
 	}
 	
+	// scale adventure
+	if (!str_cmp(arg, "instance")) {
+		void scale_instance_to_level(struct instance_data *inst, int level);
+		struct instance_data *inst;
+		if (MOB_INSTANCE_ID(ch) != NOTHING && (inst = get_instance_by_mob(ch))) {
+			scale_instance_to_level(inst, level);
+		}
+	}
 	// scale char
-	if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg))) {
+	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg))) {
 		if (!IS_NPC(victim)) {
 			mob_log(ch, "mscale: unable to scale a PC");
 			return;

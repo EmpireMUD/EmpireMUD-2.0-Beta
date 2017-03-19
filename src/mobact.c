@@ -183,6 +183,9 @@ INTERACTION_FUNC(run_one_encounter) {
 		setup_generic_npc(aggr, NULL, NOTHING, NOTHING);
 		if (COMPLEX_DATA(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch))->instance) {
 			MOB_INSTANCE_ID(aggr) = COMPLEX_DATA(IN_ROOM(ch))->instance->id;
+			if (MOB_INSTANCE_ID(aggr) != NOTHING) {
+				add_instance_mob(real_instance(MOB_INSTANCE_ID(aggr)), GET_MOB_VNUM(aggr));
+			}
 		}
 		char_to_room(aggr, IN_ROOM(ch));
 		SET_BIT(MOB_FLAGS(aggr), MOB_SPAWNED);
@@ -688,6 +691,9 @@ void mobile_activity(void) {
 				if (!CAN_AGGRO(ch, vict) || !can_fight(ch, vict)) {
 					continue;
 				}
+				if (MOB_FACTION(ch) && has_reputation(vict, FCT_VNUM(MOB_FACTION(ch)), REP_LIKED)) {
+					continue;	// don't aggro people we like
+				}
 				
 				// ok good to go
 				if (affected_by_spell(vict, ATYPE_MAJESTY) && !AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE) && can_gain_exp_from(vict, ch)) {
@@ -803,13 +809,28 @@ void run_mob_echoes(void) {
 	ACMD(do_say);
 	
 	struct custom_message *mcm, *found_mcm;
-	char_data *ch, *mob, *found_mob;
+	char_data *ch, *mob, *found_mob, *chiter;
 	descriptor_data *desc;
 	int count;
+	bool oops;
 	
 	LL_FOREACH(descriptor_list, desc) {
 		// validate ch
 		if (STATE(desc) != CON_PLAYING || !(ch = desc->character) || !AWAKE(ch)) {
+			continue;
+		}
+		
+		// only the first connected player in the room counts, so multiple players don't lead to spam
+		oops = FALSE;
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
+			if (chiter->desc) {
+				if (chiter != ch) {
+					oops = TRUE;	// not first
+				}
+				break;	// found any descriptor
+			}
+		}
+		if (oops) {
 			continue;
 		}
 		
@@ -824,7 +845,7 @@ void run_mob_echoes(void) {
 		count = 0;
 		
 		// now find a mob with a valid message
-		LL_FOREACH(ROOM_PEOPLE(IN_ROOM(ch)), mob) {
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
 			// things that disqualify the mob
 			if (mob->desc || !IS_NPC(mob) || FIGHTING(mob) || !AWAKE(mob) || MOB_FLAGGED(mob, MOB_TIED | MOB_SILENT) || IS_INJURED(mob, INJ_TIED) || GET_LED_BY(mob)) {
 				continue;

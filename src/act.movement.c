@@ -71,13 +71,16 @@ const int flags_door[] = {
 * @param byte dir the direction the person went
 */
 void add_tracks(char_data *ch, room_data *room, byte dir) {
+	extern bool valid_no_trace(room_data *room);
+	extern bool valid_unseen_passing(room_data *room);
+	
 	struct track_data *track;
 	
 	if (!IS_IMMORTAL(ch) && !ROOM_SECT_FLAGGED(room, SECTF_FRESH_WATER | SECTF_FRESH_WATER)) {
-		if (!IS_NPC(ch) && has_ability(ch, ABIL_NO_TRACE) && !COMPLEX_DATA(room) && !IS_ROAD(room)) {
+		if (!IS_NPC(ch) && has_ability(ch, ABIL_NO_TRACE) && valid_no_trace(room)) {
 			gain_ability_exp(ch, ABIL_NO_TRACE, 5);
 		}
-		else if (!IS_NPC(ch) && has_ability(ch, ABIL_UNSEEN_PASSING) && (COMPLEX_DATA(room) || IS_ROAD(room))) {
+		else if (!IS_NPC(ch) && has_ability(ch, ABIL_UNSEEN_PASSING) && valid_unseen_passing(room)) {
 			gain_ability_exp(ch, ABIL_UNSEEN_PASSING, 5);
 		}
 		else {
@@ -1590,7 +1593,7 @@ ACMD(do_portal) {
 			dist = compute_distance(IN_ROOM(ch), room);
 			there_in_city = is_in_city_for_empire(room, ROOM_OWNER(room), TRUE, &wait_there);
 			
-			if (ROOM_OWNER(room) && HAS_FUNCTION(room, FNC_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, all ? GUESTS_ALLOWED : MEMBERS_AND_ALLIES) && (!all || (dist <= max_out_of_city_portal || (ch_in_city && there_in_city)))) {
+			if (ROOM_OWNER(room) && room_has_function_and_city_ok(room, FNC_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, all ? GUESTS_ALLOWED : MEMBERS_AND_ALLIES) && (!all || (dist <= max_out_of_city_portal || (ch_in_city && there_in_city)))) {
 				// only shows owned portals the character can use
 				++count;
 				*line = '\0';
@@ -1625,7 +1628,7 @@ ACMD(do_portal) {
 	// targeting: by list number (only targets member/ally portals
 	if (is_number(arg) && (num = atoi(arg)) >= 1 && GET_LOYALTY(ch)) {
 		HASH_ITER(hh, world_table, room, next_room) {
-			if (ROOM_OWNER(room) && HAS_FUNCTION(room, FNC_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, MEMBERS_AND_ALLIES)) {
+			if (ROOM_OWNER(room) && room_has_function_and_city_ok(room, FNC_PORTAL) && IS_COMPLETE(room) && can_use_room(ch, room, MEMBERS_AND_ALLIES)) {
 				if (--num <= 0) {
 					target = room;
 					break;
@@ -1655,6 +1658,10 @@ ACMD(do_portal) {
 	}
 	if (!all_access && (!HAS_FUNCTION(IN_ROOM(ch), FNC_PORTAL) || !HAS_FUNCTION(target, FNC_PORTAL) || !IS_COMPLETE(target) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can only open portals between portal buildings.\r\n");
+		return;
+	}
+	if (!all_access && (!check_in_city_requirement(IN_ROOM(ch), TRUE) || !check_in_city_requirement(target, TRUE))) {
+		msg_to_char(ch, "You can't open that portal because of one the locations must be in a city, and isn't.\r\n");
 		return;
 	}
 	if (!all_access && !can_use_room(ch, target, GUESTS_ALLOWED)) {

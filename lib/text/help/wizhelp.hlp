@@ -499,6 +499,15 @@ grantable.
 
 See also: FLAGS, GRANT
 #d
+NOCUSTOMIZE !CUSTOMIZE "NO CUSTOMIZE"
+
+Usage:  set <name> nocustomize <on | off>
+
+This setting prevents a player from using the 'customize' command, if they have
+been abusing it. This is an account-wide setting.
+
+See also: SET
+#d
 NOTITLE
 
 Usage:  notitle <vicitim>
@@ -768,6 +777,7 @@ ipmask         PC      BINARY       IP address is hidden
 multi-ip       PC      BINARY       Can log in more than 1 account per IP
 multi-char     PC      BINARY       Can log in more than 1 char per account
 muted          PC      BINARY       Player is muted
+nocustomize    PC      BINARY       Player cannot use 'customize'
 nodelete       PC      BINARY       Can't be deleted
 noidleout      PC      BINARY       Won't idle out
 notitle        PC      BINARY       Can't change title
@@ -804,6 +814,7 @@ Mode       Level    Description
 stats      God      Shows game stats including prototypes.
 arrowtypes Immort   Shows the 'arrow type' setting for all bows and arrows.
 components Immort   Shows all items matching a component type (and flags).
+dailycycle Immort   Shows daily quests with a given cycle id.
 factions   Immort   Shows a player's faction levels.
 ignoring   Immort   Shows you who a player has on their ignore list.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
@@ -851,6 +862,14 @@ If you specify any flags, all those flags must match the output.
 
 For a list of component types, see: HELP COMPONENT TYPES
 For a list of component flags, see: HELP COMPONENT FLAGS
+#e
+"SHOW DAILYCYCLE" "SHOW DAILY CYCLE"
+
+Usage:  show dailycycle <number>
+
+This command will find all daily quests that share a certain cycle id.
+
+See also:  QEDIT DAILYCYCLE
 #e
 "SHOW FACTIONS"
 

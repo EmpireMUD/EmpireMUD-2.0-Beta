@@ -661,13 +661,15 @@ The solar raiment lies folded here.~
 ancient, continent-spanning empire. Wear it, and bring a light into the dark
 places of the world!
 ~
-2 o ad 9
+2 o ad 10
 0 0 0
 11 0
 A
 5 1 0
 B
 c
+C
+0 125
 M
 9
 $n puts on $p and glows with an aura of majesty.~

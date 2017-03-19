@@ -320,6 +320,11 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 					}
 					GET_OBJ_SHORT_DESC(obj) = fread_string(fl, error);
 				}
+				else if (OBJ_FILE_TAG(line, "Stolen-from:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						obj->stolen_from = i_in[0];
+					}
+				}
 				else if (OBJ_FILE_TAG(line, "Stolen-timer:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0])) {
 						obj->stolen_timer = i_in[0];
@@ -336,7 +341,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				else if (OBJ_FILE_TAG(line, "Trigger:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0]) && real_trigger(i_in[0])) {
 						if (!SCRIPT(obj)) {
-							CREATE(SCRIPT(obj), struct script_data, 1);
+							create_script_data(obj, OBJ_TRIGGER);
 						}
 						add_trigger(SCRIPT(obj), read_trigger(i_in[0]), -1);
 					}
@@ -540,6 +545,7 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 		fprintf(fl, "Last-owner: %d\n", obj->last_owner_id);
 	}
 	if (IS_STOLEN(obj)) {
+		fprintf(fl, "Stolen-from: %d\n", obj->stolen_from);
 		fprintf(fl, "Stolen-timer: %d\n", (int) obj->stolen_timer);
 	}
 	if (GET_AUTOSTORE_TIMER(obj) > 0) {

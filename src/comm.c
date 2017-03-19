@@ -68,6 +68,7 @@ void mobile_activity(void);
 void show_string(descriptor_data *d, char *input);
 int isbanned(char *hostname);
 void save_whole_world();
+extern bool is_fight_ally(char_data *ch, char_data *frenemy);
 
 // local functions
 RETSIGTYPE checkpointing(int sig);
@@ -214,9 +215,9 @@ void msdp_update_room(char_data *ch) {
 	char buf[MAX_STRING_LENGTH], area_name[128], exits[256];
 	struct empire_city_data *city;
 	struct instance_data *inst;
-	struct island_info *isle;
 	size_t buf_size, ex_size;
 	descriptor_data *desc;
+	int isle_id;
 	
 	// no work
 	if (!ch || !(desc = ch->desc)) {
@@ -230,8 +231,8 @@ void msdp_update_room(char_data *ch) {
 	else if ((city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
 		snprintf(area_name, sizeof(area_name), "%s", city->name);
 	}
-	else if ((isle = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE))) {
-		snprintf(area_name, sizeof(area_name), "%s", isle->name);
+	else if ((isle_id = GET_ISLAND_ID(IN_ROOM(ch))) != NO_ISLAND) {
+		snprintf(area_name, sizeof(area_name), "%s", get_island_name_for(isle_id, ch));
 	}
 	else {
 		snprintf(area_name, sizeof(area_name), "Unknown");
@@ -244,7 +245,7 @@ void msdp_update_room(char_data *ch) {
 	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cAREA%c%s", (char)MSDP_VAR, (char)MSDP_VAL, area_name);
 	
 	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cCOORDS%c%c", (char)MSDP_VAR, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
-	if (has_ability(ch, ABIL_NAVIGATION)) {
+	if (has_ability(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
 		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cX%c%d", (char)MSDP_VAR, (char)MSDP_VAL, X_COORD(IN_ROOM(ch)));
 		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cY%c%d", (char)MSDP_VAR, (char)MSDP_VAL, Y_COORD(IN_ROOM(ch)));
 	}
@@ -301,7 +302,8 @@ static void msdp_update(void) {
 	struct over_time_effect_type *dot;
 	char buf[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
-	char_data *ch, *pOpponent;
+	char_data *ch, *pOpponent, *focus;
+	bool is_ally;
 	struct affected_type *aff;
 	descriptor_data *d;
 	int hit_points, PlayerCount = 0;
@@ -449,11 +451,25 @@ static void msdp_update(void) {
 				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH_MAX, 100);
 				MSDPSetNumber(d, eMSDP_OPPONENT_LEVEL, get_approximate_level(pOpponent));
 				MSDPSetString(d, eMSDP_OPPONENT_NAME, PERS(pOpponent, ch, FALSE));
+				if ((focus = FIGHTING(pOpponent))) {
+					is_ally = is_fight_ally(ch, focus);
+					hit_points = is_ally ? GET_HEALTH(focus) : (GET_HEALTH(focus) * 100) / MAX(1,GET_MAX_HEALTH(focus));
+					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, hit_points);
+					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, is_ally ? GET_MAX_HEALTH(focus) : 100);
+					MSDPSetString(d, eMSDP_OPPONENT_FOCUS_NAME, PERS(focus, ch, FALSE));
+				} else {
+					MSDPSetString(d, eMSDP_OPPONENT_FOCUS_NAME, "");
+					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, 0);
+					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 0);
+				}
 			}
 			else { // Clear the values
 				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH, 0);
 				MSDPSetNumber(d, eMSDP_OPPONENT_LEVEL, 0);
 				MSDPSetString(d, eMSDP_OPPONENT_NAME, "");
+				MSDPSetString(d, eMSDP_OPPONENT_FOCUS_NAME, "");
+				MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, 0);
+				MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 0);
 			}
 			
 			MSDPSetNumber(d, eMSDP_WORLD_TIME, time_info.hours);

@@ -1,0 +1,542 @@
+#18450
+beaver dire~
+a dire beaver~
+A dire beaver is building a huge dam here.
+~
+25 75 djy cm
+0 0 0 9
+I 4 18452 5.00 1  # LOOT: a beaver whistle
+I 4 18453 100.00 1 x  # LOOT: a gnawed walking stick
+T 18451
+T 18453
+T 18454
+S
+#18451
+water rising~
+the rising water~
+The water is rising here.
+~
+0 0 dh dklmn
+0 0 0 15
+T 18450
+T 18451
+S
+#18452
+kit beaver~
+a beaver kit~
+A beaver kit is gnawing on a twig.
+~
+1 1 bdoD n
+0 0 0 9
+T 9901
+T 9902
+S
+#18462
+owl snowy small~
+a snowy owl~
+A small snowy owl is drifting overhead.
+~
+1 1 bdoD mn
+0 0 0 9
+M
+0
+$n picks up a small scroll, flies away, and then returns again.~
+M
+0
+$n hoots softly.~
+M
+0
+$n twists $s head all the way around and watches you carefully.~
+M
+0
+$n hoots softly.~
+M
+0
+$n hoots softly.~
+M
+0
+$n hoots softly.~
+T 9901
+T 9902
+S
+#18463
+fido beastly~
+the beastly fido~
+A beastly fido is mucking through the garbage looking for food here.
+~
+1 1 bdoD n
+1 0 0 9
+M
+0
+$n smells awful.~
+M
+0
+A foul smell wafts from $n as $e wags $s tongue.~
+M
+0
+$n sniffs around on the ground.~
+M
+0
+$n gnaws at some rotted meat.~
+T 9901
+T 9902
+S
+#18464
+scarecrow brainless tiny little~
+a brainless little scarecrow~
+A tiny, brainless scarecrow is dancing and singing around your feet.
+~
+1 1 bdoD mn
+1 0 0 9
+M
+1
+We're off to see the wizard!~
+M
+1
+If I only had a brain...~
+M
+1
+I'd be clever as a gizzard...~
+M
+0
+$n races circles around your feet.~
+T 9901
+T 9902
+S
+#18465
+bird little cheerful~
+a cheerful little bird~
+A cheerful little bird is sitting here singing.
+~
+1 1 bdoD mn
+0 0 2 26
+T 9901
+T 9902
+S
+#18466
+yarn ball vorpal~
+a ball of vorpal yarn~
+A ball of vorpal yarn in the shape of a sheep is frolicking here.
+~
+1 1 bdoD n
+0 0 14 9
+T 9901
+T 9902
+S
+#18467
+hobbit timid~
+a timid hobbit~
+A hobbit stands nearby, looking timidly around.
+~
+1 1 bdoD n
+1 0 0 15
+T 18490
+T 9901
+T 9902
+S
+#18468
+werewolf pint-sized pintsized~
+the pint-sized werewolf~
+A pint-sized werewolf is running in circles.
+~
+1 1 bdoD n
+0 0 28 9
+M
+0
+$n throws its head back and gives a tiny howl!~
+M
+0
+$n nips at your heels.~
+M
+0
+$n scratches vigorously behind its ear.~
+M
+0
+$n vanishes into the Umbra, only to reappear moments later, soaking wet.~
+M
+0
+$n vanishes into the Umbra, only to reappear moments later, covered in mud.~
+M
+0
+$n vanishes into the Umbra, only to reappear moments later, holding a totem in its mouth.~
+T 9901
+T 9902
+S
+#18469
+guest blue~
+Blue Guest~
+Blue Guest (out on his feet) is here.
+~
+1 1 bdoD n
+1 0 0 9
+T 9901
+T 9902
+S
+#18470
+radroach roach huge~
+a radroach~
+A huge radroach probes the ground with its antennae.
+~
+1 1 bdoD n
+0 0 0 9
+T 9901
+T 9902
+S
+#18471
+poodle teacup~
+a teacup poodle~
+A teacup poodle sits happily in its owner's handbag.
+~
+1 1 bdoD dn
+0 0 0 9
+M
+0
+$n yips.~
+M
+0
+$n yips loudly.~
+M
+0
+$n yips.~
+T 9901
+T 9902
+S
+#18472
+dysentery cloud~
+a cloud of dysentery~
+A cloud of dysentery hangs in the air.
+~
+1 1 bdoD mn
+0 0 0 9
+M
+0
+You cough.~
+M
+0
+Your stomach doesn't feel so good.~
+M
+0
+You feel like you might be running a fever.~
+T 9901
+T 9902
+S
+#18482
+keeper peacekeeper~
+the Peacekeeper~
+A Peacekeeper is standing here, ready to jump in at the first sign of trouble.
+~
+0 0 bdv nD
+1 0 0 1
+M
+0
+$n spits in your face.~
+M
+0
+$n screams 'PROTECT THE INNOCENT!  BANZAI!  CHARGE!  ARARARAGGGHH!'~
+T 18482
+S
+#18483
+green gelatinous blob oozing~
+the green gelatinous blob~
+An oozing green gelatinous blob is here, sucking in bits of debris.
+~
+0 0 bd nD
+0 0 32 9
+M
+0
+$n ripples in the wind.~
+M
+0
+$n belches loudly.~
+M
+0
+$n sucks up some litter from the corner.~
+M
+0
+$n rolls around, leaving a slime trail wherever it goes.~
+T 18482
+S
+#18484
+janitor~
+the janitor~
+A janitor is walking around, cleaning up.
+~
+0 0 bdv nD
+1 0 0 1
+M
+0
+$n sweeps up some litter from the corner.~
+M
+0
+$n tips $s hat at you.~
+M
+0
+$n wipes down the temple gates.~
+M
+0
+$n touches up one of the paintings.~
+T 18482
+S
+#18485
+scarecrow raggedy~
+the scarecrow~
+A raggedy scarecrow is draped on an old wooden frame.
+~
+0 0 bd nD
+1 0 0 1
+M
+0
+The cold wind blows as it snows popcorn from the dried out stalks.~
+M
+1
+If I only had a brain...~
+M
+0
+$n is hypnotized by fireflies that glow in the dark.~
+M
+1
+The king has been overthrown by jesterly fools, and the power of the people shall come to believe they do rule.~
+M
+0
+You nearly jump out of your boots as an ear of corn bursts behind you.~
+M
+1
+Oil can what?~
+M
+1
+I'd be clever as a gizzard...~
+S
+#18486
+cow sheepish wooly woolly~
+a sheepish cow~
+A woolly cow stares at you sheepishly.
+~
+10 20 dfjoy 0
+0 0 0 11
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 2 1358 100.00 1  # SHEAR: a bag of wool
+I 2 1358 50.00 1  # SHEAR: a bag of wool
+I 2 1358 5.00 1  # SHEAR: a bag of wool
+M
+0
+$n moos contentedly.~
+M
+0
+$n eats some grass.~
+M
+0
+$n chews $s cud.~
+M
+0
+$n baas contentedly, then looks confused.~
+S
+#18487
+something horse~
+something that definitely isn't a horse~
+Something is standing here, and you're pretty sure it's not a horse.
+~
+100 125 bdej 0
+0 0 14 11
+I 3 18488 100.00 1  # BARDE: an armored whatsit
+S
+#18488
+whatsit armored~
+an armored whatsit~
+An armored whatsit is here. It's definitely not a horse.
+~
+150 175 bdejy 0
+0 0 14 11
+S
+#18489
+#n ravenous vampire~
+#n~
+A ravenous vampire is standing here.
+~
+0 0 bdvw nD
+0 0 0 9
+T 18489
+S
+#18490
+crowd shoppers~
+the crowd of shoppers~
+A crowd of busy shoppers moves back and forth, oblivious to your presence.
+~
+0 0 bdv nD
+0 0 0 1
+M
+0
+A shopper says, 'Whoa, nice cosplay!'~
+M
+0
+A passer-by says, 'Mom, that guy had a sword!'~
+M
+0
+A young woman says, 'Like, ugh! I can't even!'~
+M
+0
+One of the shoppers says, 'I've been drinking a lot of bottled water, and I'm too scared to drink tap water because I don't want a reverse reaction.'~
+M
+0
+A shopper laments, 'I just need some artisan meats for my artisan bread.'~
+M
+0
+One of the shoppers says, 'I'm a raw vegan but I'm still eating fish and chicken.'~
+M
+0
+A young man says, 'I'm actually a neo-hipster now. It's basically when you're a hipster, but since hipsterism has gone so mainstream, you dress and act like a regular person... ironically.'~
+M
+0
+One shopper says, 'I don't know how I failed that test. Isn't Florida the only country that's shaped like a boot?'~
+M
+0
+A customer says, 'Don't buy that batch of kale. Buy this one; its aura is stronger.'~
+M
+0
+A man runs down the street, yelling, 'For Harambe!'~
+M
+0
+A man says to his wife, 'I'll buy you a green dress. But not a real green dress, that's cruel.'~
+M
+0
+A passing shopper says, 'Thanks, Obama.'~
+M
+0
+A passer-by says, 'I wear my dreads on the inside.'~
+M
+0
+A passing philosopher says, 'What if the Hokey Pokey really IS what it's all about?'~
+S
+#18491
+man crazy~
+the crazy man~
+A crazy man with wild, white hair stands here in a matching jacket.
+~
+0 0 bdv nD
+1 0 0 1
+M
+1
+Great Scott!~
+M
+1
+What in the name of Sir Isaac H. Newton happened here?~
+M
+1
+It's a weather experiment.~
+M
+1
+What idiot dressed you in that outfit?~
+M
+1
+Your future is whatever you make it, so make it a good one.~
+S
+#18492
+doctor strange mad man~
+the strange doctor~
+A mad man is standing next to his box.
+~
+0 0 bdv nD
+1 0 0 1
+M
+1
+The universe is big. It's vast and complicated and ridiculous. And sometimes, very rarely, impossible things just happen.~
+M
+1
+You want weapons? We have a library! Books! The best weapons in the world!~
+M
+1
+There's something you'd better understand about me 'cause it's important, and one day your life may depend on it: I am definitely a mad man with a box!~
+M
+1
+Do what I do. Hold tight and pretend it's a plan!~
+M
+1
+In 900 years of time and space, I've never met anyone who wasn't important.~
+M
+1
+Never ignore coincidence. Unless, of course, you're busy. In which case, always ignore coincidence.~
+M
+1
+All that counts is here and now.~
+M
+1
+I am and always will be the optimist. The hoper of far-flung hopes and the dreamer of improbable dreams.~
+M
+1
+We're all stories, in the end. Just make it a good one, eh?~
+M
+1
+Always take a banana to the party.~
+T 18494
+S
+#18493
+canine clockwork~
+a clockwork canine~
+A clockwork canine is parked at your feet.
+~
+1 1 bdoD n
+0 0 0 9
+M
+1
+Affirmative.~
+M
+1
+Master!~
+M
+0
+$n whirs around in circles.~
+M
+0
+$n makes a strange beeping noise.~
+T 9901
+T 9902
+S
+#18494
+woman blue strange~
+the woman in blue~
+A woman in a strange blue and yellow suit stands before you.
+~
+0 0 bdv nD
+2 0 0 1
+M
+1
+War. War never changes.~
+M
+1
+I can't believe you're replacing me with this... thing.~
+M
+1
+Look, that armor's great, don't get me wrong. But how the hell do you, you know... Pee?~
+M
+1
+The thing about happiness is that you only know you had it when it's gone.~
+M
+1
+You may think to yourself that you're happy. But you don't really believe it. It's only looking back by comparison with what comes after that you really understand, that's what happiness felt like.~
+S
+#18497
+lion time~
+a time lion~
+A time lion is stalking you from the shadows.
+~
+100 125 dej 0
+0 0 9 10
+S
+#18498
+nautilus huge~
+a huge nautilus~
+A huge nautilus is curled up here.
+~
+100 125 del 0
+0 0 6 28
+S
+#18499
+hippogriff hippogryph majestic~
+a majestic hippogriff~
+A majestic hippogriff is prancing overhead.
+~
+100 125 de m
+0 0 2 26
+S
+$

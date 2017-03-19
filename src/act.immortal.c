@@ -50,6 +50,7 @@ extern const char *component_types[];
 extern const char *dirs[];
 extern const char *drinks[];
 extern const char *extra_bits[];
+extern const char *function_flags[];
 extern const char *genders[];
 extern const char *grant_bits[];
 extern const char *island_bits[];
@@ -86,6 +87,31 @@ void instance_list_row(struct instance_data *inst, int number, char *save_buffer
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Removes custom data from an island (as customized by empires).
+*
+* @param int island_id The island being decustomized.
+*/
+void decustomize_island(int island_id) {
+	struct island_info *island = get_island(island_id, FALSE);
+	
+	struct empire_island *eisle;
+	empire_data *emp, *next_emp;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		HASH_FIND_INT(EMPIRE_ISLANDS(emp), &island_id, eisle);
+		if (eisle && eisle->name) {
+			log_to_empire(emp, ELOG_TERRITORY, "%s has lost its custom name and is now called %s", eisle->name, island ? island->name : "???");
+			if (eisle->name) {
+				free(eisle->name);
+			}
+			eisle->name = NULL;
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		}
+	}
+}
+
 
 /**
 * Autostores one item. Contents are emptied out to where the object was.
@@ -344,11 +370,13 @@ struct {
 // secret implementor-only util for quick changes -- util tool
 ADMIN_UTIL(util_tool) {
 	// msg_to_char(ch, "Ok.\r\n");
-	craft_data *craft, *next_craft;
+	trig_data *trig, *next_trig;
 	
-	HASH_ITER(hh, craft_table, craft, next_craft) {
-		if (GET_CRAFT_ABILITY(craft) == NOTHING) {
-			msg_to_char(ch, "[%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trig->attach_type == WLD_TRIGGER || trig->attach_type == RMT_TRIGGER || trig->attach_type == BLD_TRIGGER || trig->attach_type == ADV_TRIGGER) {
+			if (IS_SET(GET_TRIG_TYPE(trig), WTRIG_RANDOM)) {
+				msg_to_char(ch, "[%5d] %s\r\n", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+			}
 		}
 	}
 }
@@ -1100,6 +1128,7 @@ struct set_struct {
 		{ "invstart", 	LVL_START_IMM, 	PC, 	BINARY },
 		{ "title",		LVL_START_IMM, 	PC, 	MISC },
 		{ "notitle",	LVL_START_IMM,	PC, 	BINARY },
+		{ "nocustomize", LVL_START_IMM,	PC,		BINARY },
 
 		{ "health",		LVL_START_IMM, 	NPC, 	NUMBER },
 		{ "move",		LVL_START_IMM, 	NPC, 	NUMBER },
@@ -1284,6 +1313,10 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("muted") {
 		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_MUTED);
+		SAVE_ACCOUNT(GET_ACCOUNT(vict));
+	}
+	else if SET_CASE("nocustomize") {
+		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_NOCUSTOMIZE);
 		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("notitle") {
@@ -1970,7 +2003,7 @@ SHOW(show_islands) {
 			}
 			
 			isle = get_island(cur->island, TRUE);
-			msg_to_char(ch, "%2d. %s: %d items\r\n", cur->island, isle->name, cur->count);
+			msg_to_char(ch, "%2d. %s: %d items\r\n", cur->island, get_island_name_for(isle->id, ch), cur->count);
 			// pull it out of the list to prevent unlimited iteration
 			REMOVE_FROM_LIST(cur, list, next);
 			free(cur);
@@ -2321,6 +2354,37 @@ SHOW(show_commons) {
 		msg_to_char(ch, buf);
 	else
 		msg_to_char(ch, "None.\r\n");
+}
+
+
+SHOW(show_dailycycle) {
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	quest_data *qst, *next_qst;
+	size_t size;
+	int num;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg || !isdigit(*arg)) {
+		msg_to_char(ch, "Usage: show dailycycle <number>\r\n");
+	}
+	else if ((num = atoi(arg)) < 0) {
+		msg_to_char(ch, "Invalid cycle number.\r\n");
+	}
+	else {
+		size = snprintf(buf, sizeof(buf), "Daily quests with cycle id %d:\r\n", num);
+		HASH_ITER(hh, quest_table, qst, next_qst) {
+			if (!QUEST_FLAGGED(qst, QST_DAILY) || QUEST_DAILY_CYCLE(qst) != num) {
+				continue;
+			}
+			
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s%s\r\n", QUEST_VNUM(qst), QUEST_NAME(qst), QUEST_DAILY_ACTIVE(qst) ? " (active)" : "");
+		}
+		
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
 }
 
 
@@ -3037,7 +3101,6 @@ void do_stat_book(char_data *ch, book_data *book) {
 void do_stat_building(char_data *ch, bld_data *bdg) {
 	extern const char *bld_flags[];
 	extern const char *designate_flags[];
-	extern const char *function_flags[];
 	
 	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	struct obj_storage_type *store;
@@ -3885,8 +3948,8 @@ void do_stat_room(char_data *ch) {
 	player_index_data *index;
 	struct global_data *glb;
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
-
-
+	vehicle_data *veh;
+	
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
 		strcpy(buf2, GET_CROP_NAME(cp));
 		CAP(buf2);
@@ -3930,7 +3993,7 @@ void do_stat_room(char_data *ch) {
 		msg_to_char(ch, "Burning: %d, Damage: %d/%d\r\n", BUILDING_BURNING(home), (int) BUILDING_DAMAGE(home), GET_BUILDING(home) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) : 0);
 	}
 
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || HAS_FUNCTION(IN_ROOM(ch), FNC_MINE)) {
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE)) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) <= 0 || !(glb = global_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM))) || GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
 			msg_to_char(ch, "This area is unmined.\r\n");
 		}
@@ -3957,7 +4020,33 @@ void do_stat_room(char_data *ch) {
 
 	if (*buf)
 		send_to_char(strcat(buf, "\r\n&0"), ch);
+	
+	if (ROOM_VEHICLES(IN_ROOM(ch))) {
+		sprintf(buf, "Vehicles:&w");
+		found = 0;
+		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			if (!CAN_SEE_VEHICLE(ch, veh)) {
+				continue;
+			}
+			sprintf(buf2, "%s %s", found++ ? "," : "", VEH_SHORT_DESC(veh));
+			strcat(buf, buf2);
+			if (strlen(buf) >= 62) {
+				if (veh->next_in_room) {
+					send_to_char(strcat(buf, ",\r\n"), ch);
+				}
+				else {
+					send_to_char(strcat(buf, "\r\n"), ch);
+				}
+				*buf = found = 0;
+			}
+		}
 
+		if (*buf) {
+			send_to_char(strcat(buf, "\r\n"), ch);
+		}
+		send_to_char("&0", ch);
+	}
+	
 	if (ROOM_CONTENTS(IN_ROOM(ch))) {
 		sprintf(buf, "Contents:&g");
 		for (found = 0, j = ROOM_CONTENTS(IN_ROOM(ch)); j; j = j->next_content) {
@@ -4066,9 +4155,12 @@ void do_stat_room_template(char_data *ch, room_template *rmt) {
 	
 	sprintbit(GET_RMT_FLAGS(rmt), room_template_flags, lbuf, TRUE);
 	msg_to_char(ch, "Flags: &g%s&0\r\n", lbuf);
+	
+	sprintbit(GET_RMT_FUNCTIONS(rmt), function_flags, lbuf, TRUE);
+	msg_to_char(ch, "Functions: &y%s&0\r\n", lbuf);
 
 	sprintbit(GET_RMT_BASE_AFFECTS(rmt), room_aff_bits, lbuf, TRUE);
-	msg_to_char(ch, "Affects: &y%s&0\r\n", lbuf);
+	msg_to_char(ch, "Affects: &g%s&0\r\n", lbuf);
 	
 	if (GET_RMT_EX_DESCS(rmt)) {
 		struct extra_descr_data *desc;
@@ -5550,6 +5642,10 @@ ACMD(do_island) {
 				sprintbit(isle->flags, island_bits, flags, TRUE);
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has set island %d (%s) flags to: %s", GET_NAME(ch), isle->id, NULLSAFE(isle->name), flags);
 				save_island_table();
+				
+				if (IS_SET(isle->flags, ISLE_NO_CUSTOMIZE) && !IS_SET(old, ISLE_NO_CUSTOMIZE)) {
+					decustomize_island(isle->id);
+				}
 			}
 		}
 	}
@@ -6496,6 +6592,7 @@ ACMD(do_show) {
 		{ "quests", LVL_START_IMM, show_quests },
 		{ "uses", LVL_START_IMM, show_uses },
 		{ "factions", LVL_START_IMM, show_factions },
+		{ "dailycycle", LVL_START_IMM, show_dailycycle },
 
 		// last
 		{ "\n", 0, NULL }

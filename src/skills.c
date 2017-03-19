@@ -2138,10 +2138,7 @@ bool has_cooking_fire(char_data *ch) {
 		return TRUE;
 	}
 
-	if (HAS_FUNCTION(IN_ROOM(ch), FNC_COOKING_FIRE)) {	
-		return TRUE;
-	}
-	if (RMT_FLAGGED(IN_ROOM(ch), RMT_COOKING_FIRE)) {	
+	if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_COOKING_FIRE)) {	
 		return TRUE;
 	}
 	

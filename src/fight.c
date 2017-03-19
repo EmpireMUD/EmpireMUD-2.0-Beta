@@ -1093,7 +1093,16 @@ obj_data *die(char_data *ch, char_data *killer) {
 		gain_ability_exp(ch, ABIL_PHOENIX_RITE, 100);
 		return NULL;
 	}
-
+	
+	// hostile activity triggers distrust unless the ch is pvp-flagged or already hostile
+	if (!IS_NPC(killer) && GET_LOYALTY(ch) && GET_LOYALTY(killer) != GET_LOYALTY(ch)) {
+		// we check the ch's master if it's an NPC and the master is a PC
+		char_data *check = (IS_NPC(ch) && ch->master && !IS_NPC(ch->master)) ? ch->master : ch;
+		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && !IS_HOSTILE(check)) {
+			trigger_distrust_from_hostile(killer, GET_LOYALTY(ch));
+		}
+	}
+	
 	// Alert Group if Applicable
 	if (GROUP(ch)) {
 		send_to_group(ch, GROUP(ch), "%s has died.", GET_NAME(ch));
@@ -1350,7 +1359,7 @@ obj_data *make_corpse(char_data *ch) {
 	else {
 		// not an npc, but check for stolen
 		for (o = ch->carrying; o; o = next_o) {
-			next_o = o->next;
+			next_o = o->next_content;
 			
 			// is it stolen?
 			if (IS_STOLEN(o)) {
@@ -1534,16 +1543,31 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 	int dam, type = ATTACK_GUARD_TOWER;
 	empire_data *emp = ROOM_OWNER(from_room);
 	room_data *to_room = IN_ROOM(ch);
+	struct affected_type *af;
 
 	/* Now we're sure we can hit this person: gets worse with dex */
 	if (!AWAKE(ch) || !number(0, MAX(0, (GET_DEXTERITY(ch)/2) - 1))) {
-		dam = 15 + (ROOM_BLD_FLAGGED(from_room, BLD_UPGRADED) ? 5 : 0);
+		dam = 25 + (ROOM_BLD_FLAGGED(from_room, BLD_UPGRADED) ? 50 : 0);
 	}
 	else {
 		dam = 0;
 	}
 	
 	if (damage(ch, ch, dam, type, DAM_PHYSICAL) != 0) {
+		// slow effect (1 mud hour)
+		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 1 MUD_HOURS, AFF_SLOW, ch);
+		affect_join(ch, af, ADD_DURATION);
+		
+		// distraction effect (5 sec)
+		af = create_flag_aff(ATYPE_ARROW_TO_THE_KNEE, 1, AFF_DISTRACTED, ch);
+		affect_join(ch, af, 0);
+		
+		// cancel any action the character is doing
+		if (GET_ACTION(ch) != ACT_NONE) {
+			void cancel_action(char_data *ch);
+			cancel_action(ch);
+		}
+		
 		log_to_empire(emp, ELOG_HOSTILITY, "Guard tower at (%d, %d) is shooting at an infiltrator at (%d, %d)", X_COORD(from_room), Y_COORD(from_room), X_COORD(to_room), Y_COORD(to_room));
 	}
 }
@@ -1688,8 +1712,7 @@ void process_tower(room_data *room) {
 	char_data *ch, *found = NULL;
 	struct tower_victim_list *victim_list = NULL, *tvl;
 	int num_victs = 0, pick;
-	bool junk;
-
+	
 	// empire check
 	if (!(emp = ROOM_OWNER(room))) {
 		return;
@@ -1697,11 +1720,6 @@ void process_tower(room_data *room) {
 	
 	// building complete?
 	if (!IS_COMPLETE(room)) {
-		return;
-	}
-	
-	// building is in city?
-	if (!is_in_city_for_empire(room, emp, TRUE, &junk)) {
 		return;
 	}
 	
@@ -1769,7 +1787,7 @@ void update_guard_towers(void) {
 		for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
 			tower = ter->room;
 			
-			if (HAS_FUNCTION(tower, FNC_GUARD_TOWER) && IS_COMPLETE(tower)) {
+			if (room_has_function_and_city_ok(tower, FNC_GUARD_TOWER)) {
 				process_tower(tower);
 			}
 		}

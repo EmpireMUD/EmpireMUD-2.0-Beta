@@ -458,6 +458,7 @@ OCMD(do_otransform) {
 		tmpobj.last_empire_id = obj->last_empire_id;
 		tmpobj.last_owner_id = obj->last_owner_id;
 		tmpobj.stolen_timer = obj->stolen_timer;
+		tmpobj.stolen_from = obj->stolen_from;
 		tmpobj.autostore_timer = obj->autostore_timer;
 		tmpobj.carried_by = obj->carried_by;
 		tmpobj.in_vehicle = obj->in_vehicle;
@@ -1037,6 +1038,9 @@ OCMD(do_dgoload) {
 		mob = read_mobile(number, TRUE);
 		if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
 			MOB_INSTANCE_ID(mob) = COMPLEX_DATA(room)->instance->id;
+			if (MOB_INSTANCE_ID(mob) != NOTHING) {
+				add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
+			}
 		}
 		char_to_room(mob, room);
 		setup_generic_npc(mob, NULL, NOTHING, NOTHING);
@@ -1461,8 +1465,17 @@ OCMD(do_oscale) {
 		return;
 	}
 
+	// scale adventure
+	if (!str_cmp(arg, "instance")) {
+		void scale_instance_to_level(struct instance_data *inst, int level);
+		room_data *orm = obj_room(obj);
+		struct instance_data *inst;
+		if ((inst = find_instance_by_room(orm, FALSE))) {
+			scale_instance_to_level(inst, level);
+		}
+	}
 	// scale char
-	if ((victim = get_char_by_obj(obj, arg))) {
+	else if ((victim = get_char_by_obj(obj, arg))) {
 		if (!IS_NPC(victim)) {
 			obj_log(obj, "oscale: unable to scale a PC");
 			return;

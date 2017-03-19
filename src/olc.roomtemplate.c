@@ -33,6 +33,7 @@
 extern const char *adventure_spawn_types[];
 extern const char *dirs[];
 extern const char *exit_bits[];
+extern const char *function_flags[];
 extern const char *interact_types[];
 extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *room_aff_bits[];
@@ -749,6 +750,9 @@ void olc_show_room_template(char_data *ch) {
 	sprintbit(GET_RMT_FLAGS(rmt), room_template_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<&yflags&0> %s\r\n", lbuf);
 	
+	sprintbit(GET_RMT_FUNCTIONS(rmt), function_flags, lbuf, TRUE);
+	sprintf(buf + strlen(buf), "<&yfunctions&0> %s\r\n", lbuf);
+	
 	sprintbit(GET_RMT_BASE_AFFECTS(rmt), room_aff_bits, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<&yaffects&0> %s\r\n", lbuf);
 	
@@ -994,6 +998,12 @@ OLC_MODULE(rmedit_interaction) {
 OLC_MODULE(rmedit_flags) {
 	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
 	GET_RMT_FLAGS(rmt) = olc_process_flag(ch, argument, "room template", "flags", room_template_flags, GET_RMT_FLAGS(rmt));
+}
+
+
+OLC_MODULE(rmedit_functions) {
+	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
+	GET_RMT_FUNCTIONS(rmt) = olc_process_flag(ch, argument, "function", "functions", function_flags, GET_RMT_FUNCTIONS(rmt));
 }
 
 

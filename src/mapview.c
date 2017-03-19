@@ -882,11 +882,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		}
 	}
 	
-	if (HAS_FUNCTION(room, FNC_TAVERN) && IS_COMPLETE(room)) {
+	if (room_has_function_and_city_ok(room, FNC_TAVERN) && IS_COMPLETE(room)) {
 		msg_to_char(ch, "The tavern has %s on tap.\r\n", tavern_data[get_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE)].name);
 	}
 
-	if (HAS_FUNCTION(room, FNC_MINE) && IS_COMPLETE(room)) {
+	if (room_has_function_and_city_ok(room, FNC_MINE) && IS_COMPLETE(room)) {
 		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {
 			msg_to_char(ch, "This mine is depleted.\r\n");
 		}
@@ -1376,8 +1376,8 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		
 		// west (@u) barrier attachment
 		if (strstr(buf, "@u") || strstr(buf, "@U")) {
-			if (!r_west || IS_BARRIER(r_west) || ROOM_IS_CLOSED(r_west)) {
-				enchanted = ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
+			if (!r_west || ((IS_BARRIER(r_west) || ROOM_IS_CLOSED(r_west)) && !ROOM_AFF_FLAGGED(r_west, ROOM_AFF_CHAMELEON))) {
+				enchanted = (r_west && ROOM_AFF_FLAGGED(r_west, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
 				// west is a barrier
 				sprintf(buf1, "%sv", enchanted ? "&m" : "&0");
 				str = str_replace("@u", buf1, buf);
@@ -1402,8 +1402,8 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		
 		//  east (@v) barrier attachment
 		if (strstr(buf, "@v") || strstr(buf, "@V")) {
-			if (!r_east || IS_BARRIER(r_east) || ROOM_IS_CLOSED(r_east)) {
-				enchanted = ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
+			if (!r_east || ((IS_BARRIER(r_east) || ROOM_IS_CLOSED(r_east)) && !ROOM_AFF_FLAGGED(r_east, ROOM_AFF_CHAMELEON))) {
+				enchanted = (r_east && ROOM_AFF_FLAGGED(r_east, ROOM_AFF_NO_FLY)) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY);
 				// east is a barrier
 				sprintf(buf1, "%sv", enchanted ? "&m" : "&0");
 				str = str_replace("@v", buf1, buf);
@@ -1471,7 +1471,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			else if (HAS_MINOR_DISREPAIR(to_room)) {
 				strcpy(buf2, "&m");
 			}
-			else if (HAS_FUNCTION(to_room, FNC_MINE)) {
+			else if (room_has_function_and_city_ok(to_room, FNC_MINE)) {
 				if (get_room_extra_data(to_room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
 					strcpy(buf2, "&g");
 				}
@@ -1690,7 +1690,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 				else if (HAS_MINOR_DISREPAIR(to_room)) {
 					sprintf(infobuf + strlen(infobuf), "%sdisrepair", *infobuf ? ", " :"");
 				}
-				if (IS_COMPLETE(to_room) && HAS_FUNCTION(to_room, FNC_MINE)) {
+				if (IS_COMPLETE(to_room) && room_has_function_and_city_ok(to_room, FNC_MINE)) {
 					if (get_room_extra_data(to_room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
 						sprintf(infobuf + strlen(infobuf), "%shas ore", *infobuf ? ", " :"");
 					}
@@ -1778,6 +1778,8 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options)
 
 void perform_mortal_where(char_data *ch, char *arg) {
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+	extern bool valid_no_trace(room_data *room);
+	extern bool valid_unseen_passing(room_data *room);
 	
 	int check_x, check_y, closest, dir, dist, max_distance;
 	struct instance_data *ch_inst, *i_inst;
@@ -1816,11 +1818,11 @@ void perform_mortal_where(char_data *ch, char *arg) {
 					continue;
 				}
 			}
-			if (has_ability(i, ABIL_NO_TRACE) && IS_OUTDOORS(i)) {
+			if (has_ability(i, ABIL_NO_TRACE) && valid_no_trace(IN_ROOM(i))) {
 				gain_ability_exp(i, ABIL_NO_TRACE, 10);
 				continue;
 			}
-			if (has_ability(i, ABIL_UNSEEN_PASSING) && !IS_OUTDOORS(i)) {
+			if (has_ability(i, ABIL_UNSEEN_PASSING) && valid_unseen_passing(IN_ROOM(i))) {
 				gain_ability_exp(i, ABIL_UNSEEN_PASSING, 10);
 				continue;
 			}
@@ -1869,11 +1871,11 @@ void perform_mortal_where(char_data *ch, char *arg) {
 					continue;
 				}
 			}
-			if (has_ability(i, ABIL_NO_TRACE) && IS_OUTDOORS(i)) {
+			if (has_ability(i, ABIL_NO_TRACE) && valid_no_trace(IN_ROOM(i))) {
 				gain_ability_exp(i, ABIL_NO_TRACE, 10);
 				continue;
 			}
-			if (has_ability(i, ABIL_UNSEEN_PASSING) && !IS_OUTDOORS(i)) {
+			if (has_ability(i, ABIL_UNSEEN_PASSING) && valid_unseen_passing(IN_ROOM(i))) {
 				gain_ability_exp(i, ABIL_UNSEEN_PASSING, 10);
 				continue;
 			}

@@ -469,7 +469,7 @@ void summon_player(char_data *ch, char *argument) {
 	
 	one_argument(argument, arg);
 	
-	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_SUMMON_PLAYER)) {
+	if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_SUMMON_PLAYER)) {
 		msg_to_char(ch, "You can't summon players here.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -1288,7 +1288,7 @@ ACMD(do_alternate) {
 	else if (GET_OLC_TYPE(ch->desc) != 0) {
 		msg_to_char(ch, "You can't alternate with an editor open (use .save or .abort first).\r\n");
 	}
-	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))) {
+	else if (IN_HOSTILE_TERRITORY(ch)) {
 		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
 	}
 	else if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0 && !IS_IMMORTAL(ch)) {
@@ -1421,17 +1421,24 @@ ACMD(do_confirm) {
 
 ACMD(do_customize) {
 	void do_customize_room(char_data *ch, char *argument);
+	void do_customize_island(char_data *ch, char *argument);
 	void do_customize_vehicle(char_data *ch, char *argument);
 
 	char arg2[MAX_INPUT_LENGTH];
 	
 	half_chop(argument, arg, arg2);
 	
-	if (!*arg) {
+	if (ACCOUNT_FLAGGED(ch, ACCT_NOCUSTOMIZE)) {
+		msg_to_char(ch, "You are not allowed to customize anything anymore.\r\n");
+	}
+	else if (!*arg) {
 		msg_to_char(ch, "What do you want to customize? (See HELP CUSTOMIZE)\r\n");
 	}
 	else if (is_abbrev(arg, "building") || is_abbrev(arg, "room")) {
 		do_customize_room(ch, arg2);
+	}
+	else if (is_abbrev(arg, "island") || is_abbrev(arg, "isle")) {
+		do_customize_island(ch, arg2);
 	}
 	else if (is_abbrev(arg, "vehicle") || is_abbrev(arg, "ship")) {
 		do_customize_vehicle(ch, arg2);
@@ -1945,7 +1952,7 @@ ACMD(do_milk) {
 
 	two_arguments(argument, arg, buf);
 
-	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE))
+	if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE))
 		msg_to_char(ch, "You can't milk animals here!\r\n");
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to finish building the stable before you can milk anything.\r\n");
@@ -2252,7 +2259,7 @@ ACMD(do_quit) {
 		msg_to_char(ch, "You can't quit with fangs in your neck!\r\n");
 	else if (GET_FEEDING_FROM(ch))
 		msg_to_char(ch, "You can't quit while drinking blood!\r\n");
-	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch)) && !IS_IMMORTAL(ch)) {
+	else if (IN_HOSTILE_TERRITORY(ch)) {
 		msg_to_char(ch, "You can't quit in hostile territory.\r\n");
 	}
 	else {
@@ -2377,6 +2384,9 @@ ACMD(do_shear) {
 	}
 	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to be in a stable to shear anything.\r\n");
+	}
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're a bit busy right now.\r\n");
@@ -2693,6 +2703,9 @@ ACMD(do_summon) {
 			mob = read_mobile(vnum, TRUE);
 			if (IS_NPC(ch)) {
 				MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
+				if (MOB_INSTANCE_ID(mob) != NOTHING) {
+					add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
+				}
 			}
 			
 			SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE);	// never gain exp

@@ -144,6 +144,7 @@ Basic buildings:
   {UU} utilityshed -- store tools
   |__| quarry -- must be on flat land facing a mountain
   &y|__|&0 claypit -- must be on flat land facing water
+  ..x. familygrave -- used as a respawn point (city only)
 
 For more information on building your first house, see HELP HOUSING GUIDE.
 
@@ -781,9 +782,13 @@ This command lists the islands your empire has territory or einventory on
 (including warehouse storage). You must have the Navigation ability. The
 coordinates for each island are the approximate center of the island.
 
+Empires can rename islands using the 'customize island' command. These names
+become global if the empire is the only one with cities on the island, or
+all empires on the island share the same custom name for it.
+
 Note: Immortals with the 'empires' grant can list the islands of any empire.
 
-See also: SURVEY
+See also: CUSTOMIZE ISLAND, SURVEY
 #
 LOCKSMITHING
 
@@ -1093,11 +1098,15 @@ See also: BONUS EXPERIENCE POINTS
 #
 ROSTER
 
-Usage:  roster
+Usage:  roster [all]
 
 This command shows you the members of your empire and lets you know who's on-
 line and who's been gone a while. The color of the player's class name (if not
 white) indicates their role, if any: &aCaster&0, &jHealer&0, &yTank&0 or &rMelee&0.
+
+If you don't use the "all" option, you won't see members who have timed out.
+
+High-level immortals can also target other empires with this command.
 
 See also: CLASS, WHO
 #
@@ -1358,7 +1367,7 @@ Workforce, Skilled Labor (Empire abilities)
 
 Usage:  workforce [chore] [on | off | <limit>] [island name | all]
         workforce no-work
-        workforce where
+        workforce where [here]
 
 Once at least one member of an empire has the Workforce ability, the empire's
 citizens (NPCs) will start performing simple tasks for the empire. You can
@@ -1381,7 +1390,8 @@ abandon-* toggles don't use the limit).
 
 You can use the "workforce no-work" command to toggle whether or not your
 citizens will work the room you're currently standing in. The "workforce where"
-will tell you how many citizens are working each task.
+will tell you how many citizens are working each task. Optionally you may also 
+use "workforce where here" to filter the workforce to your current island.
 
 Note: Your workforce will only do chores if your empire has less than 200 of
 the resource provided by the chore. For example, miners won't do any work in

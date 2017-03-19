@@ -143,7 +143,7 @@ vehicle_data *find_ship_to_dispatch(char_data *ch, char *arg) {
 		}
 		
 		// ensure in docks if we're finding it remotely
-		if (!IN_ROOM(veh) || !HAS_FUNCTION(IN_ROOM(veh), FNC_DOCKS) || !IS_COMPLETE(IN_ROOM(veh))) {
+		if (!IN_ROOM(veh) || !room_has_function_and_city_ok(IN_ROOM(veh), FNC_DOCKS)) {
 			continue;
 		}
 		if (GET_ISLAND_ID(IN_ROOM(veh)) != island) {
@@ -607,7 +607,7 @@ void process_driving(char_data *ch) {
 * @param char *argument The argument.
 */
 void do_customize_vehicle(char_data *ch, char *argument) {
-	char tar_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];
+	char tar_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	vehicle_data *veh, *proto;
 	
 	argument = two_arguments(argument, tar_arg, type_arg);
@@ -617,7 +617,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else if (!*tar_arg || !*type_arg || !*argument) {
-		msg_to_char(ch, "Usage: customize vehicle <target> <name | longdesc | description> <value>\r\n");
+		msg_to_char(ch, "Usage: customize vehicle <target> <name | longdesc | description> <value | set | none>\r\n");
 	}
 	// vehicle validation
 	else if (!(veh = get_vehicle_in_room_vis(ch, tar_arg)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(tar_arg, VEH_KEYWORDS(veh)))) {
@@ -638,13 +638,17 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 		else if (!str_cmp(argument, "none")) {
 			proto = vehicle_proto(VEH_VNUM(veh));
 			
-			if (!proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto)) {
+			if (proto && VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto)) {
 				free(VEH_SHORT_DESC(veh));
 				VEH_SHORT_DESC(veh) = VEH_SHORT_DESC(proto);
 			}
-			if (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto)) {
+			if (proto && VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto)) {
 				free(VEH_KEYWORDS(veh));
 				VEH_KEYWORDS(veh) = VEH_KEYWORDS(proto);
+			}
+			if (proto && VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto) && strstr(VEH_LONG_DESC(veh), VEH_LONG_DESC(proto))) {
+				free(VEH_LONG_DESC(veh));
+				VEH_LONG_DESC(veh) = VEH_LONG_DESC(proto);
 			}
 			
 			msg_to_char(ch, "The vehicle no longer has a custom name.\r\n");
@@ -658,15 +662,27 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 		else {
 			proto = vehicle_proto(VEH_VNUM(veh));
 			
+			// change short desc
 			if (!proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto)) {
 				free(VEH_SHORT_DESC(veh));
 			}
+			VEH_SHORT_DESC(veh) = str_dup(argument);
+			
+			// change keywords
+			sprintf(buf, "%s %s", fname(VEH_KEYWORDS(veh)), skip_filler(argument));
 			if (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto)) {
 				free(VEH_KEYWORDS(veh));
 			}
+			VEH_KEYWORDS(veh) = str_dup(buf);
 			
-			VEH_SHORT_DESC(veh) = str_dup(argument);
-			VEH_KEYWORDS(veh) = str_dup(skip_filler(argument));
+			// optionally, change the longdesc too
+			if (proto && (VEH_LONG_DESC(veh) == VEH_LONG_DESC(proto) || strstr(VEH_LONG_DESC(veh), VEH_LONG_DESC(proto)))) {
+				if (VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto)) {
+					free(VEH_LONG_DESC(veh));
+				}
+				sprintf(buf, "%s (%s)", VEH_LONG_DESC(proto), VEH_SHORT_DESC(veh));
+				VEH_LONG_DESC(veh) = str_dup(buf);
+			}
 			
 			msg_to_char(ch, "It is now called \"%s\".\r\n", argument);
 		}
@@ -1349,7 +1365,7 @@ ACMD(do_dispatch) {
 	else if (GET_ISLAND_ID(IN_ROOM(veh)) == NO_ISLAND) {
 		msg_to_char(ch, "You can't automatically dispatch ships that are out at sea.\r\n");
 	}
-	else if (!(to_isle = get_island_by_name(argument)) && !(to_isle = get_island_by_coords(argument))) {
+	else if (!(to_isle = get_island_by_name(ch, argument)) && !(to_isle = get_island_by_coords(argument))) {
 		msg_to_char(ch, "Unknown target island \"%s\".\r\n", argument);
 	}
 	else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(veh)) && HAS_FUNCTION(IN_ROOM(veh), FNC_DOCKS)) {

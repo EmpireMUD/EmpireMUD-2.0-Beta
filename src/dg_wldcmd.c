@@ -461,7 +461,7 @@ WCMD(do_wdoor) {
 				strcpy(newexit->keyword, value);
 				break;
 			case 3:  /* room        */
-				if ((to_room = real_room(atoi(value)))) {
+				if ((to_room = get_room(room, value))) {
 					if (!newexit) {
 						newexit = create_exit(rm, to_room, dir, FALSE);
 					}
@@ -1035,6 +1035,9 @@ WCMD(do_wload) {
 		// store instance id
 		if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
 			MOB_INSTANCE_ID(mob) = COMPLEX_DATA(room)->instance->id;
+			if (MOB_INSTANCE_ID(mob) != NOTHING) {
+				add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
+			}
 		}
 		
 		if (*target && isdigit(*target)) {
@@ -1299,7 +1302,7 @@ WCMD(do_wat) {
 
 WCMD(do_wscale) {
 	char arg[MAX_INPUT_LENGTH], lvl_arg[MAX_INPUT_LENGTH];
-	struct instance_data *inst;
+	struct instance_data *inst = NULL;
 	char_data *victim;
 	obj_data *obj, *fresh, *proto;
 	vehicle_data *veh;
@@ -1331,8 +1334,15 @@ WCMD(do_wscale) {
 		return;
 	}
 	
+	// scale adventure
+	if (!str_cmp(arg, "instance")) {
+		void scale_instance_to_level(struct instance_data *inst, int level);
+		if (inst || (inst = find_instance_by_room(room, FALSE))) {
+			scale_instance_to_level(inst, level);
+		}
+	}
 	// scale char
-	if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_in_room(room, arg))) {
+	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_in_room(room, arg))) {
 		if (!IS_NPC(victim)) {
 			wld_log(room, "wscale: unable to scale a PC");
 			return;

@@ -811,6 +811,20 @@ int get_reputation_value(char_data *ch, any_vnum vnum) {
 
 
 /**
+* Determines if a character's reputation with a faction is at least this high.
+*
+* @param char_data *ch The player.
+* @param any_vnum faction Which faction.
+* @param int rep Any REP_ const.
+* @return bool TRUE if it's high enough.
+*/
+bool has_reputation(char_data *ch, any_vnum faction, int rep) {
+	struct player_faction_data *pfd = get_reputation(ch, faction, TRUE);
+	return pfd ? (rep_const_to_index(pfd->rep) >= rep_const_to_index(rep)) : FALSE;
+}
+
+
+/**
 * Detect the min/max values for reputation at startup.
 */
 void init_reputation(void) {

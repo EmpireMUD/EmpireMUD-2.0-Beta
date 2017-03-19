@@ -5,7 +5,7 @@ insects that swarm outside. The inside of the hut is a single room, cluttered
 with furs that have been turned into crude dolls and furniture made from
 strange bones. This is not the sort of place most people would choose to live.
 ~
-h 0
+h 0 0
 E
 insects bugs swarm~
 There are more insects here than you would believe.
@@ -20,7 +20,7 @@ partially collapsed and provide at best minimal protection from the elements.
 There are three bedrolls by the best wall, and a tiny fire beneath a missing
 section of roof.
 ~
-acd 0
+acd 0 0
 M 1 10116 100.00 1
 S
 #10110
@@ -30,7 +30,7 @@ to the outdoors but still shielded from view by walls that are mostly still
 standing. There is a small fire here, as if someone has been living amongst the
 ruins.
 ~
-ac 0
+ac 0 0
 M 1 10110 33.00 1
 M 1 10115 100.00 1
 S
@@ -44,7 +44,7 @@ seems brighter here than outside the rift. Every color is more intense. Every
 plant seems alive as it clings to the ground against blowing wind. Large,
 exposed roots form a loose pathway above the pooling rainwater.
 ~
-acgi k
+acgi k 0
 D14
 ~
 0 10141
@@ -72,7 +72,7 @@ line the path, somehow untouched by the monsoon rains. Rain is light on the
 path, but the droplets that hit you are large and cold. You can't see past the
 first line of plants, though, as the monsoon rain forms a wall of water.
 ~
-acgi k
+acgi k 0
 D14
 ~
 0 10140
@@ -102,7 +102,7 @@ it's coming down so hard everywhere else that you can barely see anything past
 the stones. The root path leads back to the rift from here, and there's also a
 small trail leading into the druid's tent.
 ~
-acgi k
+acgi k 0
 D14
 ~
 0 10141
@@ -135,7 +135,7 @@ bed made from piled skins. But the rest of the druid's possessions are piled
 haphazardly like a half-mad hoarder.
 Commands: &csearch&0
 ~
-gi 0
+gi 0 0
 D14
 ~
 0 10142
@@ -163,7 +163,7 @@ dry route through torrential downpour. Indeed, you can barely see past the
 first plants, and any attempt to move off the path is met with cold, painful
 raindrops.
 ~
-agi k
+agi k 0
 D14
 ~
 0 10140
@@ -191,7 +191,7 @@ rainy desert. The plants seem to sway like revelers, glad for every drop of
 precious water. On the hill, like the root path, the rain is lighter and you
 feel only the occasional cold drop.
 ~
-agi k
+agi k 0
 D14
 ~
 0 10144
@@ -216,7 +216,7 @@ The Cactus Garden Dimension~
 This location is not reachable by players. The cacti teleport themselves out on
 spawn.
 ~
-gi k
+gi k 0
 M 0 10140 66.66 10
 M 0 10141 66.66 10
 M 0 10142 66.66 10
@@ -227,7 +227,7 @@ S
 Inside the Volcano~
 This magma chamber is the hidden spawn location for the volcano's lavaflow.
 ~
-gk 0
+g 0 G
 M 0 10190 100.00 1
 S
 $

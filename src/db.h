@@ -300,7 +300,8 @@ extern struct global_data *global_proto(any_vnum vnum);
 extern struct island_info *island_table;
 extern struct island_info *get_island(int island_id, bool create_if_missing);
 extern struct island_info *get_island_by_coords(char *coords);
-extern struct island_info *get_island_by_name(char *name);
+extern struct island_info *get_island_by_name(char_data *ch, char *name);
+extern char *get_island_name_for(int island_id, char_data *for_ch);
 
 // mobiles/chars
 extern account_data *account_table;
@@ -387,6 +388,7 @@ void free_social(social_data *soc);
 // triggers
 extern trig_data *trigger_table;
 extern trig_data *trigger_list;
+extern trig_data *random_triggers;
 
 // vehicles
 extern vehicle_data *vehicle_list;

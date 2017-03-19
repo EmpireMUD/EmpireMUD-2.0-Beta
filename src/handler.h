@@ -35,6 +35,7 @@
 #define FIND_OBJ_EQUIP		BIT(5)
 #define FIND_NO_DARK		BIT(6)
 #define FIND_VEHICLE_ROOM	BIT(7)
+#define FIND_VEHICLE_INSIDE	BIT(8)
 
 
 // for the interaction handlers (returns TRUE if the character performs the interaction; FALSE if it aborts)
@@ -336,6 +337,7 @@ void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, boo
 extern struct player_faction_data *get_reputation(char_data *ch, any_vnum vnum, bool create);
 extern int get_reputation_by_name(char *name);
 extern int get_reputation_value(char_data *ch, any_vnum vnum);
+extern bool has_reputation(char_data *ch, any_vnum faction, int rep);
 extern int rep_const_to_index(int rep_const);
 
 // fight.c
@@ -349,6 +351,11 @@ extern bool is_fighting(char_data *ch);
 void set_fighting(char_data *ch, char_data *victim, byte mode);
 void stop_fighting(char_data *ch);
 void update_pos(char_data *victim);
+
+// instance.c
+void add_instance_mob(struct instance_data *inst, mob_vnum vnum);
+extern struct instance_data *real_instance(any_vnum instance_id);
+void subtract_instance_mob(struct instance_data *inst, mob_vnum vnum);
 
 // limits.c
 extern int limit_crowd_control(char_data *victim, int atype);

@@ -962,6 +962,9 @@ VCMD(do_dgvload) {
 		mob = read_mobile(number, TRUE);
 		if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
 			MOB_INSTANCE_ID(mob) = COMPLEX_DATA(room)->instance->id;
+			if (MOB_INSTANCE_ID(mob) != NOTHING) {
+				add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
+			}
 		}
 		char_to_room(mob, room);
 		setup_generic_npc(mob, NULL, NOTHING, NOTHING);
@@ -1369,7 +1372,15 @@ VCMD(do_vscale) {
 		return;
 	}
 
-	if ((victim = get_char_by_vehicle(veh, arg))) {
+	// scale adventure
+	if (!str_cmp(arg, "instance")) {
+		void scale_instance_to_level(struct instance_data *inst, int level);
+		struct instance_data *inst;
+		if ((inst = find_instance_by_room(IN_ROOM(veh), FALSE))) {
+			scale_instance_to_level(inst, level);
+		}
+	}
+	else if ((victim = get_char_by_vehicle(veh, arg))) {
 		if (!IS_NPC(victim)) {
 			veh_log(veh, "vscale: unable to scale a PC");
 			return;

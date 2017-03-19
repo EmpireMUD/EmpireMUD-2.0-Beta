@@ -109,8 +109,8 @@ S
 canoe wooden~
 a wooden canoe~
 There is a wooden canoe here.~
-   You can ride in a canoe and sail it across the water, or you can drag it on
-land.
+   The canoe is carved from the trunk of an old tree. You can 'drag' the canoe
+to the edge of the water, 'sit' in it, and then type 'sail <direction>'.  
 ~
 ~
 cfghln 3 3 0 0

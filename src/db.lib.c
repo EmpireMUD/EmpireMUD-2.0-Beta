@@ -1879,6 +1879,12 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				emp->coins = t[0];
 				break;
 			}
+			case 'I': {	// island name
+				if ((isle = get_empire_island(emp, atoi(line+1)))) {
+					isle->name = fread_string(fl, buf2);
+				}
+				break;
+			}
 			case 'L': {	// logs
 				if (!get_line(fl, line) || sscanf(line, "%d %d", &t[0], &t[1]) != 2) {
 					log("SYSERR: Format error in L line of empire %d", vnum);
@@ -2052,6 +2058,13 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	
 	// E: extra data
 	fprintf(fl, "E\n%s %d\n", bitv_to_alpha(EMPIRE_FRONTIER_TRAITS(emp)), emp->coins);
+	
+	// I: island names
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		if (isle->name) {
+			fprintf(fl, "I%d\n%s~\n", isle->island, isle->name);
+		}
+	}
 	
 	// M: MOTD
 	if (EMPIRE_MOTD(emp) && *EMPIRE_MOTD(emp)) {
@@ -2285,22 +2298,94 @@ void delete_room_npcs(room_data *room, struct empire_territory_data *ter) {
 
 
 /**
-* This updates buildings and assigns new NPCs to them as-needed.
+* Causes a room to populate (NPC moves in), if possible.
+*
+* @param room_data *room The location to populate.
+* @param struct empire_territory_data *ter The territory entry, if you already have it (will attempt to detect otherwise).
 */
-void update_empire_npc_data(void) {
+void populate_npc(room_data *room, struct empire_territory_data *ter) {
 	extern int pick_generic_name(int name_set, int sex);
 	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
 	
-	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
-	empire_data *emp, *next_emp;
 	struct empire_island *isle;
+	bool found_artisan = FALSE;
 	int count, max, sex;
-	mob_vnum artisan;
-	bool found_artisan;
+	empire_data *emp;
 	char_data *proto;
+	mob_vnum artisan;
 	
-	int building_population_timer = config_get_int("building_population_timer");
+	if (!room || !(emp = ROOM_OWNER(room)) || (!ter && !(ter = find_territory_entry(emp, room)))) {
+		return;	// no work
+	}
+	if (!IS_COMPLETE(room) || ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
+		return;	// nobody populates here
+	}
+	
+	// reset timer
+	ter->population_timer = config_get_int("building_population_timer");
+	
+	// detect max npcs
+	if (GET_BUILDING(room)) {
+		max = GET_BLD_CITIZENS(GET_BUILDING(room));
+		artisan = GET_BLD_ARTISAN(GET_BUILDING(room));
+	}
+	else {
+		max = 0;
+		artisan = NOTHING;
+	}
+	
+	// check npcs living here
+	for (count = 0, npc = ter->npcs; npc; npc = npc->next) {
+		++count;
+		if (npc->vnum == artisan) {
+			found_artisan = TRUE;
+		}
+	}
+	
+	// further processing only if we're short npcs here
+	if (artisan != NOTHING && !found_artisan) {
+		sex = number(SEX_MALE, SEX_FEMALE);
+		proto = mob_proto(artisan);
+		npc = create_empire_npc(emp, artisan, sex, pick_generic_name(proto ? MOB_NAME_SET(proto) : 0, sex), ter);
+		EMPIRE_POPULATION(emp) += 1;
+		if ((isle = get_empire_island(emp, GET_ISLAND_ID(room)))) {
+			isle->population += 1;
+		}
+		
+		// spawn it right away if anybody is in the room
+		if (ROOM_PEOPLE(room)) {
+			spawn_empire_npc_to_room(emp, npc, ter->room, NOTHING);
+		}
+		
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+	else if (count < max) {
+		sex = number(SEX_MALE, SEX_FEMALE);
+		proto = mob_proto(sex == SEX_MALE ? CITIZEN_MALE : CITIZEN_FEMALE);
+		npc = create_empire_npc(emp, proto ? GET_MOB_VNUM(proto) : 0, sex, pick_generic_name(MOB_NAME_SET(proto), sex), ter);
+		EMPIRE_POPULATION(emp) += 1;
+		if ((isle = get_empire_island(emp, GET_ISLAND_ID(room)))) {
+			isle->population += 1;
+		}
+
+		// spawn it right away if anybody is in the room
+		if (ROOM_PEOPLE(room)) {
+			spawn_empire_npc_to_room(emp, npc, room, NOTHING);
+		}
+		
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+}
+
+
+/**
+* This updates buildings and assigns new NPCs to them as-needed.
+*/
+void update_empire_npc_data(void) {	
+	struct empire_territory_data *ter, *next_ter;
+	empire_data *emp, *next_emp;
+	
 	int time_to_empire_emptiness = config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK;
 	
 	// each empire
@@ -2315,68 +2400,9 @@ void update_empire_npc_data(void) {
 			next_ter = ter->next;
 			
 			if (--ter->population_timer <= 0) {
-				// reset timer
-				ter->population_timer = building_population_timer;
-				
-				if (ROOM_PRIVATE_OWNER(HOME_ROOM(ter->room)) == NOBODY) {
-					if (IS_COMPLETE(ter->room)) {
-						// setup
-						found_artisan = FALSE;
-			
-						// detect max npcs
-						if (GET_BUILDING(ter->room)) {
-							max = GET_BLD_CITIZENS(GET_BUILDING(ter->room));
-							artisan = GET_BLD_ARTISAN(GET_BUILDING(ter->room));
-						}
-						else {
-							max = 0;
-							artisan = NOTHING;
-						}
-		
-						// check npcs living here
-						for (count = 0, npc = ter->npcs; npc; npc = npc->next) {
-							++count;
-							if (npc->vnum == artisan) {
-								found_artisan = TRUE;
-							}
-						}
-			
-						// further processing only if we're short npcs here
-						if (artisan != NOTHING && !found_artisan) {
-							sex = number(SEX_MALE, SEX_FEMALE);
-							proto = mob_proto(artisan);
-							npc = create_empire_npc(emp, artisan, sex, pick_generic_name(proto ? MOB_NAME_SET(proto) : 0, sex), ter);
-							EMPIRE_POPULATION(emp) += 1;
-							if ((isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
-								isle->population += 1;
-							}
-					
-							// spawn it right away if anybody is in the room
-							if (ROOM_PEOPLE(ter->room)) {
-								spawn_empire_npc_to_room(emp, npc, ter->room, NOTHING);
-							}
-						}
-						else if (count < max) {
-							sex = number(SEX_MALE, SEX_FEMALE);
-							proto = mob_proto(sex == SEX_MALE ? CITIZEN_MALE : CITIZEN_FEMALE);
-							npc = create_empire_npc(emp, proto ? GET_MOB_VNUM(proto) : 0, sex, pick_generic_name(MOB_NAME_SET(proto), sex), ter);
-							EMPIRE_POPULATION(emp) += 1;
-							if ((isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
-								isle->population += 1;
-							}
-					
-							// spawn it right away if anybody is in the room
-							if (ROOM_PEOPLE(ter->room)) {
-								spawn_empire_npc_to_room(emp, npc, ter->room, NOTHING);
-							}
-						}
-					}
-				}
+				populate_npc(ter->room, ter);
 			}
 		}
-		
-		// good time to save them all
-		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 }
 
@@ -3021,6 +3047,7 @@ struct island_info *get_island(int island_id, bool create_if_missing) {
 	extern int sort_island_table(struct island_info *a, struct island_info *b);
 	
 	struct island_info *isle = NULL;
+	char buf[MAX_STRING_LENGTH];
 	int iter;
 	
 	HASH_FIND_INT(island_table, &island_id, isle);
@@ -3029,7 +3056,8 @@ struct island_info *get_island(int island_id, bool create_if_missing) {
 		CREATE(isle, struct island_info, 1);
 		// ensure good data
 		isle->id = island_id;
-		isle->name = str_dup("Unexplored Island");
+		sprintf(buf, "Unexplored Island %d", island_id);
+		isle->name = str_dup(buf);
 		isle->flags = NOBITS;
 		isle->tile_size = 0;
 		isle->center = NOWHERE;
@@ -3083,13 +3111,34 @@ struct island_info *get_island_by_coords(char *coords) {
 
 
 /**
-* This finds an island by name. It prefers exact matches over abbrevs.
+* This finds an island by name. It prefers exact matches over abbrevs. If a
+* player is given, it will check the player's name for the island too.
 * 
+* @param char_data *ch Optional: A player who's looking (may be NULL).
 * @param char *name The name of an island.
 * @return struct island_info* Returns an island if any matched, or NULL.
 */
-struct island_info *get_island_by_name(char *name) {
+struct island_info *get_island_by_name(char_data *ch, char *name) {
+	struct empire_island *eisle, *next_eisle, *e_abbrev;
 	struct island_info *isle, *next_isle, *abbrev;
+	
+	// check custom names first
+	if (ch && GET_LOYALTY(ch)) {
+		e_abbrev = NULL;
+		
+		HASH_ITER(hh, EMPIRE_ISLANDS(GET_LOYALTY(ch)), eisle, next_eisle) {
+			if (eisle->name && !str_cmp(name, eisle->name)) {
+				return get_island(eisle->island, TRUE);
+			}
+			else if (eisle->name && !e_abbrev && is_abbrev(name, eisle->name)) {
+				e_abbrev = eisle;
+			}
+		}
+		
+		if (e_abbrev) {
+			return get_island(e_abbrev->island, TRUE);
+		}
+	}
 	
 	abbrev = NULL;
 	HASH_ITER(hh, island_table, isle, next_isle) {
@@ -3103,6 +3152,44 @@ struct island_info *get_island_by_name(char *name) {
 	
 	// didn't find an exact match, so:
 	return abbrev;
+}
+
+
+/**
+* Gets the name that a player sees for an island.
+*
+* @param int island_id Which island.
+* @param char_data *for_ch The player.
+*/
+char *get_island_name_for(int island_id, char_data *for_ch) {
+	struct empire_island *eisle;
+	struct island_info *island;
+	
+	if (island_id == NO_ISLAND || !(island = get_island(island_id, TRUE))) {
+		return "No Island";
+	}
+	if (!GET_LOYALTY(for_ch)) {
+		return island->name;
+	}
+	if (!(eisle = get_empire_island(GET_LOYALTY(for_ch), island_id))) {
+		return island->name;
+	}
+	
+	return eisle->name ? eisle->name : island->name;
+}
+
+
+/**
+* Determines if an island has a default name or not.
+*
+* @param struct island_info *island The island to check.
+* @return bool TRUE if the island has its default name.
+*/
+bool island_has_default_name(struct island_info *island) {
+	char buf[MAX_STRING_LENGTH];
+	
+	sprintf(buf, "Unexplored Island %d", island->id);
+	return !str_cmp(island->name, buf);
 }
 
 
@@ -4587,7 +4674,7 @@ void init_room_template(room_template *rmt) {
 void parse_room_template(FILE *fl, rmt_vnum vnum) {
 	int int_in[4];
 	double dbl_in;
-	char line[256], str_in[256], str_in2[256];
+	char line[256], str_in[256], str_in2[256], str_in3[256];
 	struct adventure_spawn *spawn, *last_spawn = NULL;
 	struct exit_template *ex, *last_ex = NULL;
 	room_template *rmt, *find;
@@ -4610,14 +4697,24 @@ void parse_room_template(FILE *fl, rmt_vnum vnum) {
 	GET_RMT_TITLE(rmt) = fread_string(fl, buf2);
 	GET_RMT_DESC(rmt) = fread_string(fl, buf2);
 	
-	// line 3: flags base_affects
-	if (!get_line(fl, line) || sscanf(line, "%s %s", str_in, str_in2) != 2) {
+	// line 3: flags base_affects [functions]
+	if (!get_line(fl, line)) {
+		log("SYSERR: Missing line 3 of %s", buf2);
+		exit(1);
+	}
+	if (sscanf(line, "%s %s %s", str_in, str_in2, str_in3) == 3) {
+		GET_RMT_FLAGS(rmt) = asciiflag_conv(str_in);
+		GET_RMT_BASE_AFFECTS(rmt) = asciiflag_conv(str_in2);
+		GET_RMT_FUNCTIONS(rmt) = asciiflag_conv(str_in3);
+	}
+	else if (sscanf(line, "%s %s", str_in, str_in2) == 2) {
+		GET_RMT_FLAGS(rmt) = asciiflag_conv(str_in);
+		GET_RMT_BASE_AFFECTS(rmt) = asciiflag_conv(str_in2);
+	}
+	else {
 		log("SYSERR: Format error in line 3 of %s", buf2);
 		exit(1);
 	}
-	
-	GET_RMT_FLAGS(rmt) = asciiflag_conv(str_in);
-	GET_RMT_BASE_AFFECTS(rmt) = asciiflag_conv(str_in2);
 		
 	// optionals
 	for (;;) {
@@ -4710,7 +4807,7 @@ void parse_room_template(FILE *fl, rmt_vnum vnum) {
 * @param room_template *rmt The thing to save.
 */
 void write_room_template_to_file(FILE *fl, room_template *rmt) {
-	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
+	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH];
 	struct adventure_spawn *sp;
 	struct exit_template *ex;
 	
@@ -4729,7 +4826,8 @@ void write_room_template_to_file(FILE *fl, room_template *rmt) {
 
 	strcpy(temp, bitv_to_alpha(GET_RMT_FLAGS(rmt)));
 	strcpy(temp2, bitv_to_alpha(GET_RMT_BASE_AFFECTS(rmt)));
-	fprintf(fl, "%s %s\n", temp, temp2);
+	strcpy(temp3, bitv_to_alpha(GET_RMT_FUNCTIONS(rmt)));
+	fprintf(fl, "%s %s %s\n", temp, temp2, temp3);
 
 	// D: exits
 	for (ex = GET_RMT_EXITS(rmt); ex; ex = ex->next) {
@@ -6450,7 +6548,7 @@ int count_hash_records(FILE *fl) {
 empire_data *get_or_create_empire(char_data *ch) {
 	empire_data *emp;
 	
-	if (IS_NPC(ch)) {
+	if (IS_NPC(ch) || PRF_FLAGGED(ch, PRF_NOEMPIRE)) {
 		return NULL;
 	}
 	if ((emp = GET_LOYALTY(ch))) {

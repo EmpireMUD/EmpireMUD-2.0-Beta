@@ -297,6 +297,28 @@ void undisguise(char_data *ch) {
 }
 
 
+/**
+* Determines if a room qualifies for Unseen Passing (indoors/in-city).
+*
+* @param room_data *room Where to check.
+* @return bool TRUE if Unseen Passing works here.
+*/
+bool valid_unseen_passing(room_data *room) {
+	if (IS_ADVENTURE_ROOM(room)) {
+		return FALSE;	// adventures do not trigger this ability
+	}
+	if (ROOM_OWNER(room) && find_city(ROOM_OWNER(room), room)) {
+		return TRUE;	// IS inside a city (even if wilderness)
+	}
+	if (IS_OUTDOOR_TILE(room) && !IS_ROAD(room) && !IS_ANY_BUILDING(room)) {
+		return FALSE;	// outdoors; this goes after the city check
+	}
+	
+	// all other cases?
+	return TRUE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// POISONS /////////////////////////////////////////////////////////////////
 
@@ -1628,13 +1650,13 @@ ACMD(do_sneak) {
 		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	}
 
-	// Delay after sneaking -- on top of normal move lag
-	GET_WAIT_STATE(ch) += 1 RL_SEC;
-
 	if (perform_move(ch, dir, FALSE, 0)) {	// should be MOVE_NORMAL
 		gain_ability_exp(ch, ABIL_SNEAK, 5);
 	}
-
+	
+	// Delay after sneaking -- on top of normal move lag
+	GET_WAIT_STATE(ch) += 1 RL_SEC;
+	
 	if (!sneaking) {
 		REMOVE_BIT(AFF_FLAGS(ch), AFF_SNEAK);
 	}

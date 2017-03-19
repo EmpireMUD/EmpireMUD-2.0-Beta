@@ -50,7 +50,7 @@ cactus stirs to life... Defeat it to complete this quest and close the rift.
 immediately. You sense that the mana holding open the rift has begun to fade,
 and realize you should leave the rift immediately.
 ~
-9 bc 75 100 0
+10 bc 75 100 0
 A
 4 10148
 P
@@ -77,6 +77,7 @@ R
 2 10169 1
 T 10142
 T 10168
+T 18259
 W
 3 10143 0 1
 Z
@@ -133,7 +134,7 @@ monsoon rift and type 'ritual rift' to seal it off and end the cactus invasion.
 fade and lose its hold. Almost instantly, the rift begins to collapse.
 Hopefully nobody is trapped on the wrong side of it!
 ~
-6 bc 75 100 0
+7 bc 75 100 0
 A
 2 10142
 P
@@ -161,6 +162,7 @@ R
 R
 2 10169 1
 T 10174
+T 18259
 W
 12 10140 0 1
 W
@@ -182,7 +184,7 @@ thanks you for your service to nature. Thanks to your help, the thirsty desert
 plants have the water to survive another year. You can already see the rift
 beginning to close -- better hurry back out.
 ~
-8 c 75 100 1440
+9 c 75 100 1440
 A
 1 10144
 P
@@ -209,6 +211,7 @@ R
 2 10169 1
 T 10147
 T 10142
+T 18259
 W
 11 0 0 1
 Z
@@ -232,7 +235,7 @@ laundry, ties them to a pigeon, and sends it off.
    Within moments, the rift starts to close. Clearly the head druid got the
 message. You had better head out of the rift, before it collapses completely.
 ~
-7 cd 75 100 1440
+8 cd 75 100 1440
 A
 1 10145
 P
@@ -258,6 +261,7 @@ R
 R
 2 10169 1
 T 10142
+T 18259
 W
 13 10143 0 1
 W
@@ -281,9 +285,9 @@ clear out the cacti and, presumably, the rift will seal itself.
 the finished product back to the wandering merchant.
 ~
    You hand the merchant the herbicide. His face lights up to see so much of
-it, and you can tell he's eager to douse some of the animated cacti with it. 
+it, and you can tell he's eager to douse some of the animated cacti with it.
 ~
-8 cd 75 100 1440
+9 cd 75 100 1440
 A
 1 10146
 P
@@ -310,6 +314,7 @@ R
 2 10169 1
 T 10142
 T 10173
+T 18259
 W
 2 10177 0 3
 Z
@@ -371,7 +376,7 @@ have been ravaging the countryside.
 animates the cacti begins to fade. In the distance, you can see the rift
 starting to close. You better hurry out!
 ~
-9 bc 75 100 0
+10 bc 75 100 0
 A
 2 10161
 P
@@ -399,6 +404,7 @@ R
 R
 2 10169 1
 T 10178
+T 18259
 W
 13 10145 0 1
 W
