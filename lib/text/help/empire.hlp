@@ -782,6 +782,10 @@ This command lists the islands your empire has territory or einventory on
 (including warehouse storage). You must have the Navigation ability. The
 coordinates for each island are the approximate center of the island.
 
+Empires can rename islands using the 'customize island' command. These names
+become global if the empire is the only one with cities on the island, or
+all empires on the island share the same custom name for it.
+
 Note: Immortals with the 'empires' grant can list the islands of any empire.
 
 See also: CUSTOMIZE ISLAND, SURVEY
