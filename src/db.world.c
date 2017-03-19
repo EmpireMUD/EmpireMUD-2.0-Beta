@@ -1199,6 +1199,7 @@ void update_island_names(void) {
 	struct island_info *isle, *next_isle;
 	struct empire_city_data *city;
 	struct empire_island *eisle;
+	char *last_name = NULL;
 	int count;
 	
 	HASH_ITER(hh, island_table, isle, next_isle) {
@@ -1212,8 +1213,19 @@ void update_island_names(void) {
 		HASH_ITER(hh, empire_table, emp, next_emp) {
 			LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
 				if (GET_ISLAND_ID(city->location) == isle->id) {
-					found_emp = emp;
-					++count;
+					eisle = get_empire_island(emp, isle->id);
+					
+					// if the empire HAS named the island
+					if (eisle->name) {
+						if (!last_name || !str_cmp(eisle->name, last_name)) {
+							++count;	// only count in this case
+							found_emp = emp;	// found an empire with a name
+						}
+					}
+					else {
+						++count;	// no name; always count
+					}
+					
 					break;	// only care about 1 city per empire
 				}
 			}
@@ -1223,7 +1235,8 @@ void update_island_names(void) {
 			}
 		}
 		
-		if (count == 1 && found_emp && (eisle = get_empire_island(found_emp, isle->id))) {
+		if (count == 1 && found_emp) {
+			eisle = get_empire_island(found_emp, isle->id);
 			if (eisle->name && strcmp(eisle->name, isle->name)) {
 				// HERE: We are now ready to change the name
 				syslog(SYS_INFO, LVL_START_IMM, TRUE, "Island %d (%s) is now called %s (%s)", isle->id, NULLSAFE(isle->name), eisle->name, EMPIRE_NAME(found_emp));
