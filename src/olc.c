@@ -37,6 +37,7 @@ OLC_MODULE(olc_copy);
 OLC_MODULE(olc_delete);
 OLC_MODULE(olc_display);
 OLC_MODULE(olc_edit);
+OLC_MODULE(olc_fullsearch);
 OLC_MODULE(olc_free);
 OLC_MODULE(olc_list);
 OLC_MODULE(olc_removeindev);
@@ -279,9 +280,9 @@ OLC_MODULE(oedit_short_description);
 OLC_MODULE(oedit_storage);
 OLC_MODULE(oedit_timer);
 OLC_MODULE(oedit_type);
+OLC_MODULE(oedit_value0);
 OLC_MODULE(oedit_value1);
 OLC_MODULE(oedit_value2);
-OLC_MODULE(oedit_value3);
 OLC_MODULE(oedit_wealth);
 OLC_MODULE(oedit_weapontype);
 OLC_MODULE(oedit_wear);
@@ -707,9 +708,9 @@ const struct olc_command_data olc_data[] = {
 	{ "store", oedit_storage, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "timer", oedit_timer, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "type", oedit_type, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "value0", oedit_value0, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "value1", oedit_value1, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "value2", oedit_value2, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "value3", oedit_value3, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "wealth", oedit_wealth, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "weapontype", oedit_weapontype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "wear", oedit_wear, OLC_OBJECT, OLC_CF_EDITOR },
@@ -811,8 +812,11 @@ const struct olc_command_data olc_data[] = {
 	{ "resource", vedit_resource, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "script", vedit_script, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "shortdescription", vedit_shortdescription, OLC_VEHICLE, OLC_CF_EDITOR },
-
-
+	
+	
+	// misc commands that should not take precedence over editor commands
+	{ "fullsearch", olc_fullsearch, OLC_OBJECT | OLC_TRIGGER, NOBITS },
+	
 	// this goes last
 	{ "\n", NULL, NOBITS, NOBITS }
 };
@@ -2228,6 +2232,29 @@ OLC_MODULE(olc_free) {
 		}
 		
 		msg_to_char(ch, "No free vnums found in that range.\r\n");
+	}
+}
+
+
+OLC_MODULE(olc_fullsearch) {
+	skip_spaces(&argument);
+	
+	// OLC_x:
+	switch (type) {
+		case OLC_OBJECT: {
+			void olc_fullsearch_obj(char_data *ch, char *argument);
+			olc_fullsearch_obj(ch, argument);
+			break;
+		}
+		case OLC_TRIGGER: {
+			void olc_fullsearch_trigger(char_data *ch, char *argument);
+			olc_fullsearch_trigger(ch, argument);
+			break;
+		}
+		default: {
+			msg_to_char(ch, "It doesn't seem to be implemented for that type.\r\n");
+			break;
+		}
 	}
 }
 

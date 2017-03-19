@@ -1094,11 +1094,15 @@ See also: BONUS EXPERIENCE POINTS
 #
 ROSTER
 
-Usage:  roster
+Usage:  roster [all]
 
 This command shows you the members of your empire and lets you know who's on-
 line and who's been gone a while. The color of the player's class name (if not
 white) indicates their role, if any: &aCaster&0, &jHealer&0, &yTank&0 or &rMelee&0.
+
+If you don't use the "all" option, you won't see members who have timed out.
+
+High-level immortals can also target other empires with this command.
 
 See also: CLASS, WHO
 #
