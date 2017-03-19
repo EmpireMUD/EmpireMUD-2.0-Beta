@@ -3034,6 +3034,7 @@ struct island_info *get_island(int island_id, bool create_if_missing) {
 	extern int sort_island_table(struct island_info *a, struct island_info *b);
 	
 	struct island_info *isle = NULL;
+	char buf[MAX_STRING_LENGTH];
 	int iter;
 	
 	HASH_FIND_INT(island_table, &island_id, isle);
@@ -3042,7 +3043,8 @@ struct island_info *get_island(int island_id, bool create_if_missing) {
 		CREATE(isle, struct island_info, 1);
 		// ensure good data
 		isle->id = island_id;
-		isle->name = str_dup("Unexplored Island");
+		sprintf(buf, "Unexplored Island %d", island_id);
+		isle->name = str_dup(buf);
 		isle->flags = NOBITS;
 		isle->tile_size = 0;
 		isle->center = NOWHERE;
