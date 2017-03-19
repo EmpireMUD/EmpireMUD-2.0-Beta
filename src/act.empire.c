@@ -1814,7 +1814,7 @@ void perform_inspire(char_data *ch, char_data *vict, int type) {
 // helper data for do_islands
 struct do_islands_data {
 	int id;
-	bool has_territory;
+	int territory;
 	int einv_size;
 	UT_hash_handle hh;
 };
@@ -1845,8 +1845,9 @@ void do_islands_add_einv(struct do_islands_data **list, int island_id, int amoun
 *
 * @param struct do_islands_data **list Pointer to a do_islands hash.
 * @param int island_id Which island.
+* @param int amount How much territory on the island.
 */
-void do_islands_has_territory(struct do_islands_data **list, int island_id) {
+void do_islands_has_territory(struct do_islands_data **list, int island_id, int amount) {
 	struct do_islands_data *isle;
 	
 	HASH_FIND_INT(*list, &island_id, isle);
@@ -1855,7 +1856,7 @@ void do_islands_has_territory(struct do_islands_data **list, int island_id) {
 		isle->id = island_id;
 		HASH_ADD_INT(*list, id, isle);
 	}
-	isle->has_territory = TRUE;
+	SAFE_ADD(isle->territory, amount, INT_MIN, INT_MAX, TRUE);
 }
 
 
@@ -4172,13 +4173,12 @@ ACMD(do_home) {
 ACMD(do_islands) {
 	char output[MAX_STRING_LENGTH*2], line[256], emp_arg[MAX_INPUT_LENGTH];
 	struct do_islands_data *item, *next_item, *list = NULL;
+	struct empire_island *eisle, *next_eisle;
 	struct empire_unique_storage *eus;
-	struct empire_territory_data *ter;
 	struct empire_storage_data *store;
 	struct island_info *isle;
 	empire_data *emp;
 	room_data *room;
-	int id, last_id = -1;
 	size_t size, lsize;
 	bool overflow = FALSE;
 	
@@ -4209,16 +4209,8 @@ ACMD(do_islands) {
 	}
 	
 	// mark your territory
-	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
-		id = GET_ISLAND_ID(ter->room);
-		
-		if (id != last_id) {
-			last_id = id;
-			
-			if (id != NO_ISLAND) {
-				do_islands_has_territory(&list, id);
-			}
-		}
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
+		do_islands_has_territory(&list, eisle->island, eisle->city_terr + eisle->outside_terr);
 	}
 	
 	// compute einv
@@ -4243,11 +4235,11 @@ ACMD(do_islands) {
 		room = real_room(isle->center);
 		lsize = snprintf(line, sizeof(line), " %s (%d, %d) - ", isle->name, X_COORD(room), Y_COORD(room));
 		
-		if (item->has_territory) {
-			lsize += snprintf(line + lsize, sizeof(line) - lsize, "has territory%s", item->einv_size > 0 ? ", " : "");
+		if (item->territory > 0) {
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d territory%s", item->territory, item->einv_size > 0 ? ", " : "");
 		}
 		if (item->einv_size > 0) {
-			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d item%s in einventory", item->einv_size, PLURAL(item->einv_size));
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d einventory", item->einv_size);
 		}
 		
 		if (size + lsize + 3 < sizeof(output)) {

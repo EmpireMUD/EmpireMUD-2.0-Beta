@@ -3549,6 +3549,8 @@ struct empire_island {
 	// unsaved portion
 	int tech[NUM_TECHS];	// TECH_ present on that island
 	int population;	// citizens
+	int city_terr;	// total territory IN cities on the island
+	int outside_terr;	// total territory OUTSIDE cities on the island
 	
 	UT_hash_handle hh;	// EMPIRE_ISLANDS(emp) hash handle
 };

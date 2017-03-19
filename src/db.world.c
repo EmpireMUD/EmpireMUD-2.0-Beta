@@ -1602,15 +1602,20 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	
 	// check for territory updates
 	if (loc && ROOM_OWNER(loc) && was_large != ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS)) {
+		struct empire_island *eisle = get_empire_island(ROOM_OWNER(loc), GET_ISLAND_ID(loc));
 		if (was_large && was_in_city && !is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
 			// changing from in-city to not
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) -= 1;
+			eisle->city_terr -= 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) += 1;
+			eisle->outside_terr += 1;
 		}
 		else if (ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
 			// changing from outside-territory to in-city
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) += 1;
+			eisle->city_terr -= 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) -= 1;
+			eisle->outside_terr += 1;
 		}
 		else {
 			// no relevant change
@@ -1787,9 +1792,11 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 				ter->marked = FALSE;
 			}
 			
-			// reset population
+			// reset counters
 			HASH_ITER(hh, EMPIRE_ISLANDS(e), isle, next_isle) {
 				isle->population = 0;
+				isle->city_terr = 0;
+				isle->outside_terr = 0;
 			}
 		}
 	}
@@ -1799,11 +1806,14 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 		if ((e = ROOM_OWNER(iter)) && (!emp || e == emp)) {
 			// only count each building as 1
 			if (COUNTS_AS_TERRITORY(iter)) {
+				isle = get_empire_island(e, GET_ISLAND_ID(iter));
 				if (is_in_city_for_empire(iter, e, FALSE, &junk)) {
 					EMPIRE_CITY_TERRITORY(e) += 1;
+					isle->city_terr += 1;
 				}
 				else {
 					EMPIRE_OUTSIDE_TERRITORY(e) += 1;
+					isle->outside_terr += 1;
 				}
 			}
 			
