@@ -52,6 +52,7 @@ extern bool can_claim(char_data *ch);
 extern int city_points_available(empire_data *emp);
 void clear_private_owner(int id);
 void eliminate_linkdead_players();
+bool is_affiliated_island(empire_data *emp, int island_id);
 extern int get_total_score(empire_data *emp);
 extern char *get_room_name(room_data *room, bool color);
 extern bool is_trading_with(empire_data *emp, empire_data *partner);
@@ -110,6 +111,48 @@ void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
 	EMPIRE_SHIPPING_LIST(old_emp) = NULL;
 }
 
+/**
+* Copies workforce limits from target island into the island the character is currently in.
+*
+* @param char_data *ch The person requesting the copy.
+* @param struct island_info *island Which island to copy the limits from.
+*/
+void copy_workforce_limits_into_current_island(char_data *ch, struct island_info *from_island) {
+	struct empire_island *isle, *next_isle, *source_isle = NULL;
+	struct island_info *ch_current_island = NULL;
+	int iter;
+	empire_data *emp = GET_LOYALTY(ch); //This method should only be called if ch belongs to an empire, so this should never return null here.
+	
+	ch_current_island = get_island(GET_ISLAND_ID(IN_ROOM(ch)), false);
+	
+	//Error validation
+	if (!ch_current_island || ch_current_island->id == NO_ISLAND) {
+		msg_to_char(ch, "You are not currently on any island.");
+		return;
+	}
+	if ( !is_affiliated_island(emp,from_island->id) ) {
+		msg_to_char(ch, "Your empire has no affiliation with source island \"%s\".", from_island->name);
+		return;
+	}
+	if ( from_island->id == ch_current_island->id ) {
+		msg_to_char(ch, "Your source island can't be the same as your current island.");
+		return;
+	}
+	
+	source_isle = get_empire_island(emp,from_island->id);
+	
+	//Things went fine? Let's copy!
+	for (iter = 0; iter < NUM_CHORES; ++iter) {
+		set_workforce_limit(emp, ch_current_island->id, iter, source_isle->workforce_limit[iter]);
+		if (source_isle->workforce_limit[iter] == 0) {
+			deactivate_workforce(emp, ch_current_island->id, iter);
+		}
+	}
+	
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	
+	msg_to_char(ch, "Successfuly copied workforce limits from \"%s\" to \"%s\".",from_island->name,ch_current_island->name);
+}
 
 /**
 * Sub-processor for do_customize: customize island name <name | none>
@@ -243,6 +286,43 @@ int get_war_cost(empire_data *emp, empire_data *victim) {
 	return cost;
 }
 
+/**
+* Copies workforce limits from target island into the island the character is currently in.
+*
+* @param empire_data *emp The empire to test the island against.
+* @param struct empire_island *isle Which island check empire relevancy.
+* @return bool True if the empire is affiliated to that island or false if not.
+*/
+bool is_affiliated_island(empire_data *emp, int island_id) {
+	struct empire_island *isle;
+	struct empire_unique_storage *eus;
+	struct empire_storage_data *store;
+	room_data *last_rm, *room_iter, *next_room_iter;
+	
+	//Grab the empire_isle information.
+	isle = get_empire_island(emp,island_id);
+	
+	//Check if the empire has claimed tiles in the island.
+	if ( isle->city_terr > 0 || isle->outside_terr > 0) {
+		return true;
+	}
+	
+	//Check if the empire has at least an item in there.
+	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
+		if (isle->island == store->island) {
+			return true;
+		}
+	}
+	
+	//Check unique storage too
+	for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+		if (isle->island == eus->island) {
+			return true;
+		}
+	}
+	
+	return false;
+}
 
 /**
 * Sets the workforce limit on one island.
@@ -5207,7 +5287,7 @@ ACMD(do_workforce) {
 	void deactivate_workforce(empire_data *emp, int island_id, int type);
 	void deactivate_workforce_room(empire_data *emp, room_data *room);
 	
-	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH], local_arg[MAX_INPUT_LENGTH];
+	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH], local_arg[MAX_INPUT_LENGTH], from_island_arg[MAX_INPUT_LENGTH];
 	struct island_info *island = NULL;
 	bool all = FALSE, here = FALSE;
 	int iter, type, limit = 0;
@@ -5259,6 +5339,17 @@ ACMD(do_workforce) {
 			msg_to_char(ch, "Workforce will no longer work this tile.\r\n");
 			deactivate_workforce_room(emp, IN_ROOM(ch));
 		}
+	}
+	else if (is_abbrev(arg, "copy")) {
+		// process remaining args (island name may have quotes)
+		argument = any_one_word(argument, from_island_arg);
+		
+		if (!(island = get_island_by_name(from_island_arg)) && !(island = get_island_by_coords(from_island_arg))) {
+			msg_to_char(ch, "Unknown island \"%s\".\r\n", from_island_arg);
+			return;
+		}
+		
+		copy_workforce_limits_into_current_island(ch,island);
 	}
 	else {	// <chore>: show/change type
 		// find chore
