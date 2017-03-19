@@ -77,6 +77,7 @@ void naturalize_newbie_islands();
 void ruin_one_building(room_data *room);
 void save_world_map_to_file();
 extern int sort_empire_islands(struct empire_island *a, struct empire_island *b);
+void update_island_names();
 void update_tavern(room_data *room);
 
 
@@ -1112,6 +1113,9 @@ void annual_world_update(void) {
 	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		annual_update_vehicle(veh);
 	}
+	
+	// rename islands
+	update_island_names();
 }
 
 
@@ -1180,6 +1184,57 @@ void naturalize_newbie_islands(void) {
 	if (count) {
 		log("New year: naturalized %d tile%s on newbie islands.", count, PLURAL(count));
 		world_map_needs_save = TRUE;
+	}
+}
+
+
+/**
+* Checks periodically to see if an empire is the only one left on an island,
+* and renames the island if they have a custom name for it.
+*/
+void update_island_names(void) {
+	void save_island_table();
+	
+	empire_data *emp, *next_emp, *found_emp;
+	struct island_info *isle, *next_isle;
+	struct empire_city_data *city;
+	struct empire_island *eisle;
+	int count;
+	
+	HASH_ITER(hh, island_table, isle, next_isle) {
+		if (isle->id == NO_ISLAND || IS_SET(isle->flags, ISLE_NO_CUSTOMIZE)) {
+			continue;
+		}
+		
+		// look for empires with cities on the island
+		found_emp = NULL;
+		count = 0;
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
+				if (GET_ISLAND_ID(city->location) == isle->id) {
+					found_emp = emp;
+					++count;
+					break;	// only care about 1 city per empire
+				}
+			}
+			
+			if (count > 1) {
+				break;	// we only care if there's more than 1 empire
+			}
+		}
+		
+		if (count == 1 && found_emp && (eisle = get_empire_island(found_emp, isle->id))) {
+			if (eisle->name && strcmp(eisle->name, isle->name)) {
+				// HERE: We are now ready to change the name
+				syslog(SYS_INFO, LVL_START_IMM, TRUE, "Island %d (%s) is now called %s (%s)", isle->id, NULLSAFE(isle->name), eisle->name, EMPIRE_NAME(found_emp));
+				
+				if (isle->name) {
+					free(isle->name);
+				}
+				isle->name = str_dup(eisle->name);
+				save_island_table();
+			}
+		}
 	}
 }
 

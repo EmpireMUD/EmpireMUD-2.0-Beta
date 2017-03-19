@@ -1879,6 +1879,12 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				emp->coins = t[0];
 				break;
 			}
+			case 'I': {	// island name
+				if ((isle = get_empire_island(emp, atoi(line+1)))) {
+					isle->name = fread_string(fl, buf2);
+				}
+				break;
+			}
 			case 'L': {	// logs
 				if (!get_line(fl, line) || sscanf(line, "%d %d", &t[0], &t[1]) != 2) {
 					log("SYSERR: Format error in L line of empire %d", vnum);
@@ -2052,6 +2058,13 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	
 	// E: extra data
 	fprintf(fl, "E\n%s %d\n", bitv_to_alpha(EMPIRE_FRONTIER_TRAITS(emp)), emp->coins);
+	
+	// I: island names
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		if (isle->name) {
+			fprintf(fl, "I%d\n%s~\n", isle->island, isle->name);
+		}
+	}
 	
 	// M: MOTD
 	if (EMPIRE_MOTD(emp) && *EMPIRE_MOTD(emp)) {
@@ -3098,13 +3111,34 @@ struct island_info *get_island_by_coords(char *coords) {
 
 
 /**
-* This finds an island by name. It prefers exact matches over abbrevs.
+* This finds an island by name. It prefers exact matches over abbrevs. If a
+* player is given, it will check the player's name for the island too.
 * 
+* @param char_data *ch Optional: A player who's looking (may be NULL).
 * @param char *name The name of an island.
 * @return struct island_info* Returns an island if any matched, or NULL.
 */
-struct island_info *get_island_by_name(char *name) {
+struct island_info *get_island_by_name(char_data *ch, char *name) {
+	struct empire_island *eisle, *next_eisle, *e_abbrev;
 	struct island_info *isle, *next_isle, *abbrev;
+	
+	// check custom names first
+	if (ch && GET_LOYALTY(ch)) {
+		e_abbrev = NULL;
+		
+		HASH_ITER(hh, EMPIRE_ISLANDS(GET_LOYALTY(ch)), eisle, next_eisle) {
+			if (eisle->name && !str_cmp(name, eisle->name)) {
+				return get_island(eisle->island, TRUE);
+			}
+			else if (eisle->name && !e_abbrev && is_abbrev(name, eisle->name)) {
+				e_abbrev = eisle;
+			}
+		}
+		
+		if (e_abbrev) {
+			return get_island(e_abbrev->island, TRUE);
+		}
+	}
 	
 	abbrev = NULL;
 	HASH_ITER(hh, island_table, isle, next_isle) {
@@ -3118,6 +3152,44 @@ struct island_info *get_island_by_name(char *name) {
 	
 	// didn't find an exact match, so:
 	return abbrev;
+}
+
+
+/**
+* Gets the name that a player sees for an island.
+*
+* @param int island_id Which island.
+* @param char_data *for_ch The player.
+*/
+char *get_island_name_for(int island_id, char_data *for_ch) {
+	struct empire_island *eisle;
+	struct island_info *island;
+	
+	if (island_id == NO_ISLAND || !(island = get_island(island_id, TRUE))) {
+		return "No Island";
+	}
+	if (!GET_LOYALTY(for_ch)) {
+		return island->name;
+	}
+	if (!(eisle = get_empire_island(GET_LOYALTY(for_ch), island_id))) {
+		return island->name;
+	}
+	
+	return eisle->name ? eisle->name : island->name;
+}
+
+
+/**
+* Determines if an island has a default name or not.
+*
+* @param struct island_info *island The island to check.
+* @return bool TRUE if the island has its default name.
+*/
+bool island_has_default_name(struct island_info *island) {
+	char buf[MAX_STRING_LENGTH];
+	
+	sprintf(buf, "Unexplored Island %d", island->id);
+	return !str_cmp(island->name, buf);
 }
 
 

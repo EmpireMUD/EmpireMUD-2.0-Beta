@@ -242,6 +242,7 @@ const char *account_flags[] = {
 	"MULTI-IP",
 	"MULTI-CHAR",
 	"APPR",
+	"!CUSTOMIZE",
 	"\n"
 };
 
@@ -2604,6 +2605,7 @@ const char *function_flags[] = {
 const char *island_bits[] = {
 	"NEWBIE",
 	"!AGGRO",
+	"!CUSTOMIZE",
 	"\n"
 };
 

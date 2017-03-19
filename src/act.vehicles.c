@@ -1365,7 +1365,7 @@ ACMD(do_dispatch) {
 	else if (GET_ISLAND_ID(IN_ROOM(veh)) == NO_ISLAND) {
 		msg_to_char(ch, "You can't automatically dispatch ships that are out at sea.\r\n");
 	}
-	else if (!(to_isle = get_island_by_name(argument)) && !(to_isle = get_island_by_coords(argument))) {
+	else if (!(to_isle = get_island_by_name(ch, argument)) && !(to_isle = get_island_by_coords(argument))) {
 		msg_to_char(ch, "Unknown target island \"%s\".\r\n", argument);
 	}
 	else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(veh)) && HAS_FUNCTION(IN_ROOM(veh), FNC_DOCKS)) {

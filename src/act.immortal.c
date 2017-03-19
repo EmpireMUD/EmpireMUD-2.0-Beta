@@ -89,6 +89,31 @@ void instance_list_row(struct instance_data *inst, int number, char *save_buffer
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Removes custom data from an island (as customized by empires).
+*
+* @param int island_id The island being decustomized.
+*/
+void decustomize_island(int island_id) {
+	struct island_info *island = get_island(island_id, FALSE);
+	
+	struct empire_island *eisle;
+	empire_data *emp, *next_emp;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		HASH_FIND_INT(EMPIRE_ISLANDS(emp), &island_id, eisle);
+		if (eisle && eisle->name) {
+			log_to_empire(emp, ELOG_TERRITORY, "%s has lost its custom name and is now called %s", eisle->name, island ? island->name : "???");
+			if (eisle->name) {
+				free(eisle->name);
+			}
+			eisle->name = NULL;
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		}
+	}
+}
+
+
+/**
 * Autostores one item. Contents are emptied out to where the object was.
 *
 * @param obj_dtaa *obj The item to autostore.
@@ -1103,6 +1128,7 @@ struct set_struct {
 		{ "invstart", 	LVL_START_IMM, 	PC, 	BINARY },
 		{ "title",		LVL_START_IMM, 	PC, 	MISC },
 		{ "notitle",	LVL_START_IMM,	PC, 	BINARY },
+		{ "nocustomize", LVL_START_IMM,	PC,		BINARY },
 
 		{ "health",		LVL_START_IMM, 	NPC, 	NUMBER },
 		{ "move",		LVL_START_IMM, 	NPC, 	NUMBER },
@@ -1287,6 +1313,10 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("muted") {
 		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_MUTED);
+		SAVE_ACCOUNT(GET_ACCOUNT(vict));
+	}
+	else if SET_CASE("nocustomize") {
+		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_NOCUSTOMIZE);
 		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("notitle") {
@@ -1973,7 +2003,7 @@ SHOW(show_islands) {
 			}
 			
 			isle = get_island(cur->island, TRUE);
-			msg_to_char(ch, "%2d. %s: %d items\r\n", cur->island, isle->name, cur->count);
+			msg_to_char(ch, "%2d. %s: %d items\r\n", cur->island, get_island_name_for(isle->id, ch), cur->count);
 			// pull it out of the list to prevent unlimited iteration
 			REMOVE_FROM_LIST(cur, list, next);
 			free(cur);
@@ -5612,6 +5642,10 @@ ACMD(do_island) {
 				sprintbit(isle->flags, island_bits, flags, TRUE);
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has set island %d (%s) flags to: %s", GET_NAME(ch), isle->id, NULLSAFE(isle->name), flags);
 				save_island_table();
+				
+				if (IS_SET(isle->flags, ISLE_NO_CUSTOMIZE) && !IS_SET(old, ISLE_NO_CUSTOMIZE)) {
+					decustomize_island(isle->id);
+				}
 			}
 		}
 	}

@@ -112,6 +112,109 @@ void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
 
 
 /**
+* Sub-processor for do_customize: customize island name <name | none>
+*
+* @param char_data *ch The person trying to customize the island.
+* @param char *argument The arguments.
+*/
+void do_customize_island(char_data *ch, char *argument) {
+	extern bool island_has_default_name(struct island_info *island);
+	void save_island_table();
+	
+	char type_arg[MAX_INPUT_LENGTH];
+	struct empire_city_data *city;
+	struct empire_island *eisle;
+	struct island_info *island;
+	bool has_city = FALSE;
+	
+	// check cities ahead of time
+	if (GET_LOYALTY(ch)) {
+		LL_FOREACH(EMPIRE_CITY_LIST(GET_LOYALTY(ch)), city) {
+			if (GET_ISLAND_ID(city->location) == GET_ISLAND_ID(IN_ROOM(ch)) && (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) < time(0))) {
+				has_city = TRUE;
+				break;
+			}
+		}
+	}
+	
+	argument = one_argument(argument, type_arg);
+	skip_spaces(&argument);
+	
+	if (!ch->desc) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else if (!GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You must be part of an empire to customize an island.\r\n");;
+	}
+	else if (!has_permission(ch, PRIV_CUSTOMIZE)) {
+		msg_to_char(ch, "You don't have permission to customize anything.\r\n");
+	}
+	else if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND || !(island = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE)) || !(eisle = get_empire_island(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch))))) {
+		msg_to_char(ch, "You can't do that here.\r\n");
+	}
+	else if (IS_SET(island->flags, ISLE_NO_CUSTOMIZE)) {
+		msg_to_char(ch, "This island cannot be customized.\r\n");
+	}
+	else if (!has_city) {
+		msg_to_char(ch, "Your empire needs an established city on this island in order to customize it.\r\n");
+	}
+	else if (!*type_arg || !*argument) {
+		msg_to_char(ch, "Usage: customize island <name> <value | none>\r\n");
+	}
+	
+	// types:
+	else if (is_abbrev(type_arg, "name")) {
+		if (!*argument) {
+			msg_to_char(ch, "What would you like to name this island (or \"none\")?\r\n");
+		}
+		else if (!str_cmp(argument, "none")) {
+			if (!eisle->name) {
+				msg_to_char(ch, "Your empire has no custom name for this island.\r\n");
+			}
+			else {
+				log_to_empire(GET_LOYALTY(ch), ELOG_TERRITORY, "%s has removed the custom name for %s (%s)", PERS(ch, ch, TRUE), eisle->name, island->name);
+				msg_to_char(ch, "This island no longer has a custom name.\r\n");
+				
+				free(eisle->name);
+				eisle->name = NULL;
+				EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
+			}
+		}
+		else if (color_code_length(argument) > 0) {
+			msg_to_char(ch, "You cannot use color codes in custom names.\r\n");
+		}
+		else if (strlen(argument) > 30) {
+			msg_to_char(ch, "That name is too long. Island names may not be over 30 characters.\r\n");
+		}
+		else {
+			log_to_empire(GET_LOYALTY(ch), ELOG_TERRITORY, "%s has given %s the custom name of %s", PERS(ch, ch, TRUE), get_island_name_for(island->id, ch), argument);
+			msg_to_char(ch, "It is now called \"%s\".\r\n", argument);
+			
+			if (eisle->name) {
+				free(eisle->name);
+			}
+			eisle->name = str_dup(argument);
+			EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
+			
+			// need to apply global name?
+			if (island_has_default_name(island)) {
+				syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "%s has renamed island %d (%s) to %s", GET_NAME(ch), island->id, NULLSAFE(island->name), eisle->name);
+				
+				if (island->name) {
+					free(island->name);
+				}
+				island->name = str_dup(eisle->name);
+				save_island_table();
+			}
+		}
+	}
+	else {
+		msg_to_char(ch, "You can customize: name\r\n");
+	}
+}
+
+
+/**
 * Determines how much an empire must spend to start a war with another empire,
 * based on the configs "war_cost_max" and "war_cost_min". This is calculated
 * by the difference in score between the two empires with the maximum value at
@@ -570,13 +673,13 @@ void show_detailed_workforce_setup_to_char(empire_data *emp, char_data *ch, int 
 		}
 		
 		if (isle->workforce_limit[chore] == WORKFORCE_UNLIMITED) {
-			snprintf(part, sizeof(part), "%s: &con&0%s", island->name, isle->population <= 0 ? " (no citizens)" : "");
+			snprintf(part, sizeof(part), "%s: &con&0%s", get_island_name_for(island->id, ch), isle->population <= 0 ? " (no citizens)" : "");
 		}
 		else if (isle->workforce_limit[chore] == 0) {
-			snprintf(part, sizeof(part), "%s: &yoff&0%s", island->name, isle->population <= 0 ? " (no citizens)" : "");
+			snprintf(part, sizeof(part), "%s: &yoff&0%s", get_island_name_for(island->id, ch), isle->population <= 0 ? " (no citizens)" : "");
 		}
 		else {
-			snprintf(part, sizeof(part), "%s: &climit %d&0%s", island->name, isle->workforce_limit[chore], isle->population <= 0 ? " (no citizens)" : "");
+			snprintf(part, sizeof(part), "%s: &climit %d&0%s", get_island_name_for(island->id, ch), isle->workforce_limit[chore], isle->population <= 0 ? " (no citizens)" : "");
 		}
 		
 		if (size + strlen(part) + 3 < sizeof(buf)) {
@@ -1168,7 +1271,7 @@ void list_cities(char_data *ch, char *argument) {
 		isle = get_island(GET_ISLAND_ID(rl), TRUE);
 		
 		pending = (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) > time(0));			
-		msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d), traits: %s%s\r\n", ++count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, isle->name, city_type[city->type].name, city_type[city->type].radius, buf, pending ? " &r(new)&0" : "");
+		msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d), traits: %s%s\r\n", ++count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, buf, pending ? " &r(new)&0" : "");
 	}
 	
 	if (!found) {
@@ -3951,7 +4054,7 @@ ACMD(do_findmaintenance) {
 	}
 	
 	if (*arg) {
-		if (!(find_island = get_island_by_name(arg)) && !(find_room = find_target_room(NULL, arg))) {
+		if (!(find_island = get_island_by_name(ch, arg)) && !(find_room = find_target_room(NULL, arg))) {
 			msg_to_char(ch, "Unknown location: %s.\r\n", arg);
 			return;
 		}
@@ -4233,7 +4336,7 @@ ACMD(do_islands) {
 	HASH_ITER(hh, list, item, next_item) {
 		isle = get_island(item->id, TRUE);
 		room = real_room(isle->center);
-		lsize = snprintf(line, sizeof(line), " %s (%d, %d) - ", isle->name, X_COORD(room), Y_COORD(room));
+		lsize = snprintf(line, sizeof(line), " %s (%d, %d) - ", get_island_name_for(isle->id, ch), X_COORD(room), Y_COORD(room));
 		
 		if (item->territory > 0) {
 			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d territory%s", item->territory, item->einv_size > 0 ? ", " : "");
@@ -5211,7 +5314,7 @@ ACMD(do_workforce) {
 		else if (!str_cmp(argument, "all")) {
 			all = TRUE;
 		}
-		else if (!(island = get_island_by_name(argument)) && !(island = get_island_by_coords(argument))) {
+		else if (!(island = get_island_by_name(ch, argument)) && !(island = get_island_by_coords(argument))) {
 			msg_to_char(ch, "Unknown island \"%s\".\r\n", argument);
 			return;
 		}
@@ -5228,7 +5331,7 @@ ACMD(do_workforce) {
 		}
 		else if (island) {
 			set_workforce_limit(emp, island->id, type, limit);
-			snprintf(name, sizeof(name), "%s", island->name);
+			snprintf(name, sizeof(name), "%s", get_island_name_for(island->id, ch));
 		}
 		else {
 			msg_to_char(ch, "No workforce to set for that.\r\n");

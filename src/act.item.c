@@ -1887,7 +1887,7 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 	
 	// messaging
 	isle = get_island(to_island, TRUE);
-	msg_to_char(ch, "You set %d '%s' to ship to %s.\r\n", number, skip_filler(get_obj_name_by_proto(vnum)), isle ? isle->name : "an unknown island");
+	msg_to_char(ch, "You set %d '%s' to ship to %s.\r\n", number, skip_filler(get_obj_name_by_proto(vnum)), isle ? get_island_name_for(isle->id, ch) : "an unknown island");
 }
 
 
@@ -5244,7 +5244,7 @@ ACMD(do_ship) {
 		else if (!find_docks(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)))) {
 			msg_to_char(ch, "This island has no docks (docks must not be set no-work).\r\n");
 		}
-		else if (!(to_isle = get_island_by_name(arg1)) && !(to_isle = get_island_by_coords(arg1))) {
+		else if (!(to_isle = get_island_by_name(ch, arg1)) && !(to_isle = get_island_by_coords(arg1))) {
 			msg_to_char(ch, "Unknown target island \"%s\".\r\n", arg1);
 		}
 		else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(ch))) {

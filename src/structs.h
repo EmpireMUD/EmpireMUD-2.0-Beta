@@ -1397,6 +1397,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACCT_MULTI_IP  BIT(4)	// e. can log in at the same time as other accounts on the same IP
 #define ACCT_MULTI_CHAR  BIT(5)	// f. can log in more than one character on this account
 #define ACCT_APPROVED  BIT(6)	// g. approved for full gameplay
+#define ACCT_NOCUSTOMIZE  BIT(7)	// h. cannot use 'customize'
 
 
 // ACT_x: Periodic actions -- WARNING: changing the order of these will have tragic consequences with saved players
@@ -1968,6 +1969,7 @@ typedef struct vehicle_data vehicle_data;
 // Island flags -- ISLE_x
 #define ISLE_NEWBIE  BIT(0)	// a. Island follows newbie rules
 #define ISLE_NO_AGGRO  BIT(1)	// b. Island will not fire aggro mobs or guard towers
+#define ISLE_NO_CUSTOMIZE  BIT(2)	// c. cannot be renamed
 
 
 // ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them
@@ -3545,6 +3547,7 @@ struct empire_island {
 	
 	// saved portion
 	int workforce_limit[NUM_CHORES];	// workforce settings
+	char *name;	// empire's local name for the island
 	
 	// unsaved portion
 	int tech[NUM_TECHS];	// TECH_ present on that island
@@ -4284,8 +4287,8 @@ struct depletion_data {
 // data for the island_table
 struct island_info {
 	any_vnum id;	// game-assigned, permanent id
-	char *name;	// player-designated island naming
-	bitvector_t flags;	// ISLE_x flags
+	char *name;	// global name for the island
+	bitvector_t flags;	// ISLE_ flags
 	
 	// computed data
 	int tile_size;
