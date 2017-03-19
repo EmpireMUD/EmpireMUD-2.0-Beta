@@ -245,7 +245,7 @@ void msdp_update_room(char_data *ch) {
 	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cAREA%c%s", (char)MSDP_VAR, (char)MSDP_VAL, area_name);
 	
 	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cCOORDS%c%c", (char)MSDP_VAR, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
-	if (has_ability(ch, ABIL_NAVIGATION)) {
+	if (has_ability(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
 		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cX%c%d", (char)MSDP_VAR, (char)MSDP_VAL, X_COORD(IN_ROOM(ch)));
 		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cY%c%d", (char)MSDP_VAR, (char)MSDP_VAL, Y_COORD(IN_ROOM(ch)));
 	}
