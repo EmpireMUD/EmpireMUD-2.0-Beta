@@ -52,7 +52,7 @@ extern bool can_claim(char_data *ch);
 extern int city_points_available(empire_data *emp);
 void clear_private_owner(int id);
 void eliminate_linkdead_players();
-bool is_affiliated_island(empire_data *emp, struct empire_island *isle);
+bool is_affiliated_island(empire_data *emp, int island_id);
 extern int get_total_score(empire_data *emp);
 extern char *get_room_name(room_data *room, bool color);
 extern bool is_trading_with(empire_data *emp, empire_data *partner);
@@ -125,22 +125,21 @@ void copy_workforce_limits_into_current_island(char_data *ch, struct island_info
 	
 	ch_current_island = get_island(GET_ISLAND_ID(IN_ROOM(ch)), false);
 	
+	//Error validation
 	if (!ch_current_island || ch_current_island->id == NO_ISLAND) {
 		msg_to_char(ch, "You are not currently on any island.");
 		return;
 	}
-	
-	source_isle = get_empire_island(emp,from_island->id);
-	
-	//Error validation
-	if ( !is_affiliated_island(emp,source_isle) ) {
+	if ( !is_affiliated_island(emp,from_island->id) ) {
 		msg_to_char(ch, "Your empire has no affiliation with source island \"%s\".", from_island->name);
 		return;
 	}
-	if ( source_isle->island == ch_current_island->id ) {
+	if ( from_island->id == ch_current_island->id ) {
 		msg_to_char(ch, "Your source island can't be the same as your current island.");
 		return;
 	}
+	
+	source_isle = get_empire_island(emp,from_island->id);
 	
 	//Things went fine? Let's copy!
 	for (iter = 0; iter < NUM_CHORES; ++iter) {
@@ -191,10 +190,19 @@ int get_war_cost(empire_data *emp, empire_data *victim) {
 * @param struct empire_island *isle Which island check empire relevancy.
 * @return bool True if the empire is affiliated to that island or false if not.
 */
-bool is_affiliated_island(empire_data *emp, struct empire_island *isle) {
+bool is_affiliated_island(empire_data *emp, int island_id) {
+	struct empire_island *isle;
 	struct empire_unique_storage *eus;
 	struct empire_storage_data *store;
 	room_data *last_rm, *room_iter, *next_room_iter;
+	
+	//Grab the empire_isle information.
+	isle = get_empire_island(emp,island_id);
+	
+	//Check if the empire has claimed tiles in the island.
+	if ( isle->city_terr > 0 || isle->outside_terr > 0) {
+		return true;
+	}
 	
 	//Check if the empire has at least an item in there.
 	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
@@ -206,13 +214,6 @@ bool is_affiliated_island(empire_data *emp, struct empire_island *isle) {
 	//Check unique storage too
 	for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
 		if (isle->island == eus->island) {
-			return true;
-		}
-	}
-	
-	//Check if the empire has at least a claimed tile in the island
-	HASH_ITER(hh, world_table, room_iter, next_room_iter) {
-		if (ROOM_OWNER(room_iter) == emp && GET_ISLAND_ID(room_iter) == isle->island) {
 			return true;
 		}
 	}
