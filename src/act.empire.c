@@ -136,7 +136,7 @@ void copy_workforce_limits_into_current_island(char_data *ch, struct island_info
 		return;
 	}
 	if ( !is_affiliated_island(emp,from_island->id) ) {
-		msg_to_char(ch, "Your empire has no affiliation with source island \"%s\".", from_island->name);
+		msg_to_char(ch, "Your empire has no affiliation with source island \"%s\".", get_island_name_for(from_island->id, ch));
 		return;
 	}
 	if ( from_island->id == ch_current_island->id ) {
@@ -156,7 +156,7 @@ void copy_workforce_limits_into_current_island(char_data *ch, struct island_info
 	
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	
-	msg_to_char(ch, "Successfully copied workforce limits from %s to %s.\r\n", from_island->name, ch_current_island->name);
+	msg_to_char(ch, "Successfully copied workforce limits from %s to %s.\r\n", get_island_name_for(from_island->id, ch), get_island_name_for(ch_current_island->id, ch));
 }
 
 
