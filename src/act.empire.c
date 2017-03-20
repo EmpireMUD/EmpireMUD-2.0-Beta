@@ -132,15 +132,15 @@ void copy_workforce_limits_into_current_island(char_data *ch, struct island_info
 	
 	//Error validation
 	if (!ch_current_island || ch_current_island->id == NO_ISLAND) {
-		msg_to_char(ch, "You are not currently on any island.");
+		msg_to_char(ch, "You are not currently on any island.\r\n");
 		return;
 	}
 	if ( !is_affiliated_island(emp,from_island->id) ) {
-		msg_to_char(ch, "Your empire has no affiliation with source island \"%s\".", get_island_name_for(from_island->id, ch));
+		msg_to_char(ch, "Your empire has no affiliation with source island \"%s\".\r\n", get_island_name_for(from_island->id, ch));
 		return;
 	}
 	if ( from_island->id == ch_current_island->id ) {
-		msg_to_char(ch, "Your source island can't be the same as your current island.");
+		msg_to_char(ch, "Your source island can't be the same as your current island.\r\n");
 		return;
 	}
 	
