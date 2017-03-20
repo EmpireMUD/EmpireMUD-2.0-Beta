@@ -54,13 +54,13 @@ void clear_private_owner(int id);
 void deactivate_workforce(empire_data *emp, int island_id, int type);
 void deactivate_workforce_room(empire_data *emp, room_data *room);
 void eliminate_linkdead_players();
-bool is_affiliated_island(empire_data *emp, int island_id);
 extern int get_total_score(empire_data *emp);
 extern char *get_room_name(room_data *room, bool color);
 extern bool is_trading_with(empire_data *emp, empire_data *partner);
 extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
 
 // locals
+bool is_affiliated_island(empire_data *emp, int island_id);
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
 void set_workforce_limit_all(empire_data *emp, int chore, int limit);
