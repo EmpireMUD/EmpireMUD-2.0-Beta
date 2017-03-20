@@ -51,6 +51,8 @@ extern const char *trade_overunder[];
 extern bool can_claim(char_data *ch);
 extern int city_points_available(empire_data *emp);
 void clear_private_owner(int id);
+void deactivate_workforce(empire_data *emp, int island_id, int type);
+void deactivate_workforce_room(empire_data *emp, room_data *room);
 void eliminate_linkdead_players();
 bool is_affiliated_island(empire_data *emp, int island_id);
 extern int get_total_score(empire_data *emp);
@@ -60,6 +62,8 @@ extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, c
 
 // locals
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
+void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
+void set_workforce_limit_all(empire_data *emp, int chore, int limit);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -118,7 +122,7 @@ void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
 * @param struct island_info *island Which island to copy the limits from.
 */
 void copy_workforce_limits_into_current_island(char_data *ch, struct island_info *from_island) {
-	struct empire_island *isle, *next_isle, *source_isle = NULL;
+	struct empire_island *source_isle = NULL;
 	struct island_info *ch_current_island = NULL;
 	int iter;
 	empire_data *emp = GET_LOYALTY(ch); //This method should only be called if ch belongs to an empire, so this should never return null here.
@@ -297,7 +301,6 @@ bool is_affiliated_island(empire_data *emp, int island_id) {
 	struct empire_island *isle;
 	struct empire_unique_storage *eus;
 	struct empire_storage_data *store;
-	room_data *last_rm, *room_iter, *next_room_iter;
 	
 	//Grab the empire_isle information.
 	isle = get_empire_island(emp,island_id);
@@ -5284,9 +5287,6 @@ ACMD(do_unpublicize) {
 
 
 ACMD(do_workforce) {
-	void deactivate_workforce(empire_data *emp, int island_id, int type);
-	void deactivate_workforce_room(empire_data *emp, room_data *room);
-	
 	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH], local_arg[MAX_INPUT_LENGTH], from_island_arg[MAX_INPUT_LENGTH];
 	struct island_info *island = NULL;
 	bool all = FALSE, here = FALSE;
@@ -5344,7 +5344,7 @@ ACMD(do_workforce) {
 		// process remaining args (island name may have quotes)
 		argument = any_one_word(argument, from_island_arg);
 		
-		if (!(island = get_island_by_name(from_island_arg)) && !(island = get_island_by_coords(from_island_arg))) {
+		if (!(island = get_island_by_name(ch, from_island_arg)) && !(island = get_island_by_coords(from_island_arg))) {
 			msg_to_char(ch, "Unknown island \"%s\".\r\n", from_island_arg);
 			return;
 		}
