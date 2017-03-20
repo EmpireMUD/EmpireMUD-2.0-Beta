@@ -1394,8 +1394,8 @@ citizens will work the room you're currently standing in. The "workforce where"
 will tell you how many citizens are working each task. Optionally you may also 
 use "workforce where here" to filter the workforce to your current island.
 
-You can use the "workforce copy" command to copy the workforce limit configuration
-of another island into the island you are currently in.
+You can use the "workforce copy" command to copy the workforce limit
+configuration of another island into the island you are currently in.
 
 Note: Your workforce will only do chores if your empire has less than 200 of
 the resource provided by the chore. For example, miners won't do any work in

@@ -115,6 +115,7 @@ void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
 	EMPIRE_SHIPPING_LIST(old_emp) = NULL;
 }
 
+
 /**
 * Copies workforce limits from target island into the island the character is currently in.
 *
@@ -155,8 +156,9 @@ void copy_workforce_limits_into_current_island(char_data *ch, struct island_info
 	
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	
-	msg_to_char(ch, "Successfuly copied workforce limits from \"%s\" to \"%s\".",from_island->name,ch_current_island->name);
+	msg_to_char(ch, "Successfully copied workforce limits from %s to %s.\r\n", from_island->name, ch_current_island->name);
 }
+
 
 /**
 * Sub-processor for do_customize: customize island name <name | none>
@@ -5344,6 +5346,10 @@ ACMD(do_workforce) {
 		// process remaining args (island name may have quotes)
 		argument = any_one_word(argument, from_island_arg);
 		
+		if (!*from_island_arg) {
+			msg_to_char(ch, "Usage: workforce copy <from island>\r\n");
+			return;
+		}
 		if (!(island = get_island_by_name(ch, from_island_arg)) && !(island = get_island_by_coords(from_island_arg))) {
 			msg_to_char(ch, "Unknown island \"%s\".\r\n", from_island_arg);
 			return;
