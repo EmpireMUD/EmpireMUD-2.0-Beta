@@ -1705,10 +1705,23 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_ARCHETYPE_CNFRM: {
-			void display_archetype_info(descriptor_data *desc, archetype_data *arch);
-			archetype_data *arch = archetype_proto(CREATION_ARCHETYPE(d->character, ARCHT_ORIGIN));
+			int iter, sub;
 			
-			display_archetype_info(d, arch);
+			msg_to_desc(d, "\r\nYou chose the following archetypes:\r\n");
+			for (iter = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
+				archetype_data *arch = archetype_proto(CREATION_ARCHETYPE(d->character, iter));
+				if (arch) {
+					// find menu posm for name
+					for (sub = 0; archetype_menu[sub].type != NOTHING; ++sub) {
+						if (archetype_menu[sub].type == iter) {
+							break;
+						}
+					}
+					
+					msg_to_desc(d, "%s: \tc%s\t0\r\n", archetype_menu[sub].name, GET_ARCH_NAME(arch));
+				}
+			}
+			
 			msg_to_desc(d, "\r\nIs this correct (y/n)? ");
 			break;
 		}
