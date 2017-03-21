@@ -631,10 +631,10 @@ char *list_one_archetype(archetype_data *arch, bool detail) {
 		}
 		strcat(buf, ")");
 		
-		snprintf(output, sizeof(output), "[%5d] %s%s [%d/%d]", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch), GET_ARCH_SKILLS(arch) ? buf : "", atts, skills);
+		snprintf(output, sizeof(output), "[%5d] %s: %s%s [%d/%d]", GET_ARCH_VNUM(arch), archetype_types[GET_ARCH_TYPE(arch)], GET_ARCH_NAME(arch), GET_ARCH_SKILLS(arch) ? buf : "", atts, skills);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+		snprintf(output, sizeof(output), "[%5d] %s: %s", GET_ARCH_VNUM(arch), archetype_types[GET_ARCH_TYPE(arch)], GET_ARCH_NAME(arch));
 	}
 		
 	return output;
