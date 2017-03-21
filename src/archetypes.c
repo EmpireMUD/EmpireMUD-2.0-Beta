@@ -1492,7 +1492,7 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	
 	// first line
 	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Type: \ty%s\t0, Name: \tc%s\t0\r\n", GET_ARCH_VNUM(arch), archetype_types[GET_ARCH_TYPE(arch)], GET_ARCH_NAME(arch));
-	size = snprintf(buf, sizeof(buf), "Ranks: [\ta%s\t0/\tp%s\t0]\r\n", GET_ARCH_MALE_RANK(arch), GET_ARCH_FEMALE_RANK(arch));
+	size += snprintf(buf, sizeof(buf), "Ranks: [\ta%s\t0/\tp%s\t0]\r\n", GET_ARCH_MALE_RANK(arch), GET_ARCH_FEMALE_RANK(arch));
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Description: %s\r\n", GET_ARCH_DESC(arch));
 	
