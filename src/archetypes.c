@@ -959,10 +959,11 @@ void parse_archetype(FILE *fl, any_vnum vnum) {
 		exit(1);
 	}
 	else if (sscanf(line, "%d %s", &int_in[0], str_in) == 2) {
-		GET_ARCH_TYPE(arch) = ARCHT_ORIGIN;
+		GET_ARCH_TYPE(arch) = int_in[0];
 		GET_ARCH_FLAGS(arch) = asciiflag_conv(str_in);
 	}
 	else if (sscanf(line, "%s", str_in) == 1) {
+		GET_ARCH_TYPE(arch) = ARCHT_ORIGIN;
 		GET_ARCH_FLAGS(arch) = asciiflag_conv(str_in);
 	}
 	else {
