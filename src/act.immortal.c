@@ -3228,11 +3228,12 @@ void do_stat_character(char_data *ch, char_data *k) {
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	struct script_memory *mem;
 	struct cooldown_data *cool;
-	int i, i2, diff, found = 0, val;
+	int count, i, i2, iter, diff, found = 0, val;
 	obj_data *j;
 	struct follow_type *fol;
 	struct over_time_effect_type *dot;
 	struct affected_type *aff;
+	archetype_data *arch;
 	
 	bool is_proto = (IS_NPC(k) && k == mob_proto(GET_MOB_VNUM(k)));
 	
@@ -3268,6 +3269,14 @@ void do_stat_character(char_data *ch, char_data *k) {
 		}
 
 		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), SHOW_CLASS_NAME(k), class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k));
+		
+		msg_to_char(ch, "Archetypes:");
+		for (iter = 0, count = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
+			if ((arch = archetype_proto(CREATION_ARCHETYPE(k, iter)))) {
+				msg_to_char(ch, "%s%s", (count++ > 0) ? ", " : " ", GET_ARCH_NAME(arch));
+			}
+		}
+		msg_to_char(ch, "%s\r\n", count ? "" : " none");
 		
 		coin_string(GET_PLAYER_COINS(k), buf);
 		msg_to_char(ch, "Coins: %s\r\n", buf);
