@@ -833,12 +833,16 @@ See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 Usage:  .attribute <type> <number>
         .attribute <copy> <archetype vnum>
 
-This allows you to set the starting level of each attribute. By design, the
+Each of a player's archetypes adds to their attributes. By design, the
 starting attributes should be low. Players will earn higher attributes using
 gear and abilities.
 
-All of the stock archetypes have starting attributes totalling 11 (one at 3,
-two at 1, and the rest at 2).
+An attribute can be positive, negative, or zero. Players will get the sum of
+the attributes from all their archetypes (with guaranteed minimum levels, if
+they end up too low).
+
+All of the stock Origin archetypes have starting attributes totalling 11 (one
+at 3, two at 1, and the rest at 2).
 
 See also: OLC ARCHETYPES
 #d
@@ -936,6 +940,20 @@ points to all skills.
 
 All of the stock archetypes have a total of 30 skill points, usually split
 between two skills as 20/10.
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT TYPE"
+
+Usage:  .type <type>
+
+Archetype types sort them into categories. During creation, a player picks one
+from each category. EmpireMUDs may add or remove archetype types, for example
+to add races or cultures.
+
+Available types:
+ ORIGIN - A character's background and upbringing.
+ HOBBY - Some bonus skill points.
 
 See also: OLC ARCHETYPES
 #d

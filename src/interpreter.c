@@ -37,6 +37,9 @@
 *   Menu Interpreter Functions
 */
 
+// external vars
+extern struct archetype_menu_type archetype_menu[];
+
 // external funcs
 void parse_archetype_menu(descriptor_data *desc, char *argument);
 
@@ -1613,7 +1616,7 @@ struct {
 	{ CON_Q_ALT_NAME },
 	{ CON_Q_ALT_PASSWORD },
 	
-	{ CON_Q_ARCHETYPE },
+	{ CON_Q_ARCHETYPE },	// skips to CON_BONUS_CREATION if no archetypes exist
 	{ CON_ARCHETYPE_CNFRM },
 	{ CON_BONUS_CREATION },
 	
@@ -1691,12 +1694,19 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_Q_ARCHETYPE: {
-			parse_archetype_menu(d, "");
+			if (archetype_menu[0].type != NOTHING) {
+				SUBMENU(d) = 0;
+				parse_archetype_menu(d, "");
+			}
+			else {
+				// no archetypes for some reason?
+				set_creation_state(d, CON_BONUS_CREATION);
+			}
 			break;
 		}
 		case CON_ARCHETYPE_CNFRM: {
 			void display_archetype_info(descriptor_data *desc, archetype_data *arch);
-			archetype_data *arch = archetype_proto(CREATION_ARCHETYPE(d->character));
+			archetype_data *arch = archetype_proto(CREATION_ARCHETYPE(d->character, ARCHT_ORIGIN));
 			
 			display_archetype_info(d, arch);
 			msg_to_desc(d, "\r\nIs this correct (y/n)? ");

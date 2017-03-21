@@ -619,7 +619,7 @@ EEDIT(eedit_num_ranks) {
 			EMPIRE_RANK(emp, iter) = NULL;
 		}
 		
-		arch = archetype_proto(CREATION_ARCHETYPE(ch));
+		arch = archetype_proto(CREATION_ARCHETYPE(ch, ARCHT_ORIGIN));
 		if (!arch) {
 			arch = archetype_proto(0);	// default
 		}

@@ -425,6 +425,12 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// ARCHETYPE DEFINES ///////////////////////////////////////////////////////
 
+// ARCHT_x: archetype types
+#define ARCHT_ORIGIN  0
+#define ARCHT_HOBBY  1
+#define NUM_ARCHETYPE_TYPES  2	// must be total number
+
+
 // ARCH_x: archetype flags
 #define ARCH_IN_DEVELOPMENT  BIT(0)	// a. not available to players
 #define ARCH_BASIC  BIT(1)	// b. will show on the basic list
@@ -2554,7 +2560,8 @@ struct archetype_data {
 	char *name;
 	char *description;
 	char *lore;	// optional lore entry
-	bitvector_t flags;	// ARCH_x
+	int type;	// ARCHT_
+	bitvector_t flags;	// ARCH_
 	
 	// default starting ranks
 	char *male_rank;
@@ -2581,6 +2588,14 @@ struct archetype_gear {
 	int wear;	// WEAR_x, -1 == inventory
 	obj_vnum vnum;
 	struct archetype_gear *next;
+};
+
+
+// used in character creation
+struct archetype_menu_type {
+	int type;
+	char *name;
+	char *description;
 };
 
 
@@ -2896,6 +2911,7 @@ struct descriptor_data {
 	byte bad_pws;	// number of bad pw attemps this login
 	byte idle_tics;	// tics idle at password prompt
 	int connected;	// STATE()
+	int submenu;	// SUBMENU() -- use varies by menu
 	int desc_num;	// unique num assigned to desc
 	time_t login_time;	// when the person connected
 
@@ -3133,7 +3149,7 @@ struct player_special_data {
 	bitvector_t olc_flags;	// olc permissions
 	
 	// skill/ability data
-	any_vnum creation_archetype;	// this is now stored permanently so later decisions can be made based on it
+	any_vnum creation_archetype[NUM_ARCHETYPE_TYPES];	// array of creation choices
 	struct player_skill_data *skill_hash;
 	struct player_ability_data *ability_hash;
 	int current_skill_set;	// which skill set a player is currently in
@@ -3433,6 +3449,7 @@ struct action_data_struct {
 struct attribute_data_type {
 	char *name;
 	char *creation_description;	// shown if players need help during creation
+	bool active;	// attributes are split into active/passive
 };
 
 

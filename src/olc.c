@@ -77,6 +77,7 @@ OLC_MODULE(archedit_lore);
 OLC_MODULE(archedit_malerank);
 OLC_MODULE(archedit_name);
 OLC_MODULE(archedit_skill);
+OLC_MODULE(archedit_type);
 
 // augment modules
 OLC_MODULE(augedit_ability);
@@ -503,6 +504,7 @@ const struct olc_command_data olc_data[] = {
 	{ "malerank", archedit_malerank, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "name", archedit_name, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "startingskill", archedit_skill, OLC_ARCHETYPE, OLC_CF_EDITOR },
+	{ "type", archedit_type, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	
 	// augments
 	{ "apply", augedit_apply, OLC_AUGMENT, OLC_CF_EDITOR },

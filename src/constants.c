@@ -187,6 +187,31 @@ const char *archetype_flags[] = {
 };
 
 
+// ARCHT_x (1/2): archetype types
+const char *archetype_types[] = {
+	"ORIGIN",
+	"HOBBY",
+	"\n"
+};
+
+
+// ARCHT_x (2/2): The order and contents of this array determine what players see during creation.
+struct archetype_menu_type archetype_menu[] = {
+	{ ARCHT_ORIGIN,
+		"Origin",
+		"Your character's origins, be they noble or meager, determine your attributes\r\n"
+		"and starting skills. But remember, this is only the beginning of your path.\r\n"
+	},
+	{ ARCHT_HOBBY,
+		"Hobby",
+		"Round out your character by selecting a hobby. You will receive 5 extra skill\r\n"
+		"points in whichever skill you choose.\r\n"
+	},
+	
+	{ NOTHING, "\n", "\n" }	// this goes last
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// AUGMENT CONSTANTS ///////////////////////////////////////////////////////
 
@@ -1210,12 +1235,12 @@ const bool apply_never_scales[] = {
 
 // STRENGTH, etc (part 1)
 struct attribute_data_type attributes[NUM_ATTRIBUTES] = {
-	{ "Strength", "Strength improves your melee damage and lets you chop trees faster" },
-	{ "Dexterity", "Dexterity helps you hit opponents and dodge hits" },
-	{ "Charisma", "Charisma improves your success with Stealth abilities" },
-	{ "Greatness", "Greatness determines how much territory your empire can claim" },
-	{ "Intelligence", "Intelligence improves your magical damage and healing" },
-	{ "Wits", "Wits improves your speed and effectiveness in combat" }
+	{ "Strength", "Strength improves your melee damage and lets you chop trees faster", TRUE },
+	{ "Dexterity", "Dexterity helps you hit opponents and dodge hits", FALSE },
+	{ "Charisma", "Charisma improves your success with Stealth abilities", TRUE },
+	{ "Greatness", "Greatness determines how much territory your empire can claim", FALSE },
+	{ "Intelligence", "Intelligence improves your magical damage and healing", TRUE },
+	{ "Wits", "Wits improves your speed and effectiveness in combat", FALSE }
 };
 
 // STRENGTH, etc (part 2)

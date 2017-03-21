@@ -61,11 +61,16 @@ Vampire: Reaper (Battle), Ancient (Empire), Lich (High Sorcery), Necromancer
 
 See also: CLASS
 #
-ARCHETYPES "STARTING ARCHETYPES" "STARTING CLASS"
+ARCHETYPES "STARTING ARCHETYPES" "STARTING CLASS" ORIGIN HOBBY
 
-All player characters start with some gear, low attributes, and 30 skill
-points. Generally, one attribute will be 3, two will be 1, and the rest all 2s.
-Starting archetype does not limit your skills or class choices in any way.
+All player characters start with some gear, low attributes, and at least 30
+skill points. Generally, one attribute will be 3, two will be 1, and the rest
+all 2s. Starting archetype does not limit your skills or class choices in any
+way.
+
+There are two types of archetypes:
+- Origins: Your character's background and upbringing.
+- Hobbies: Bonus skills for your character.
 #
 "ALCHEMIST CLASS" ALCH
 

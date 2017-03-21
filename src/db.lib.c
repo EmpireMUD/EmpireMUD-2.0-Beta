@@ -1227,7 +1227,7 @@ empire_data *create_empire(char_data *ch) {
 	}
 	
 	// rank setup
-	arch = archetype_proto(CREATION_ARCHETYPE(ch));
+	arch = archetype_proto(CREATION_ARCHETYPE(ch, ARCHT_ORIGIN));
 	if (!arch) {
 		arch = archetype_proto(0);	// default to 0
 	}
