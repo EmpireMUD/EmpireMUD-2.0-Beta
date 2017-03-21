@@ -3622,7 +3622,11 @@ void start_new_character(char_data *ch) {
 
 	// archetype setup
 	for (iter = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
-		if (!(arch = archetype_proto(CREATION_ARCHETYPE(ch, iter))) && !(arch = archetype_proto(0))) {
+		extern const char *archetype_types[];
+		arch = archetype_proto(CREATION_ARCHETYPE(ch, iter));
+		syslog(SYS_INFO, 0, FALSE, "%s: %s %d: %s", GET_NAME(ch), archetype_types[iter], CREATION_ARCHETYPE(ch, iter), arch ? GET_ARCH_NAME(arch) : "??");
+		
+		if (!arch && !(arch = archetype_proto(0))) {
 			continue;	// couldn't find an archetype
 		}
 		if (GET_ARCH_TYPE(arch) != iter) {
