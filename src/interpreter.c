@@ -1726,7 +1726,7 @@ void prompt_creation(descriptor_data *d) {
 						}
 					}
 					
-					msg_to_desc(d, "%s: \tc%s\t0\r\n", archetype_menu[sub].name, GET_ARCH_NAME(arch));
+					msg_to_desc(d, "%s: \tc%s\t0 - %s\r\n", archetype_menu[sub].name, GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
 				}
 			}
 			
