@@ -1093,7 +1093,7 @@ void write_archetype_to_file(FILE *fl, archetype_data *arch) {
 	
 	// 'A': attributes
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-		if (GET_ARCH_ATTRIBUTE(arch, iter) != 1) {
+		if (GET_ARCH_ATTRIBUTE(arch, iter) != 0) {
 			fprintf(fl, "A\n%d %d\n", iter, GET_ARCH_ATTRIBUTE(arch, iter));
 		}
 	}
