@@ -1212,8 +1212,8 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 * @param int type_pos A position in the archetype_menu[] array.
 */
 void display_archetype_menu(descriptor_data *desc, int type_pos) {
-	msg_to_desc(desc, "[ HINT: These are only your starting traits; you can still learn any skill ]\r\n");
 	msg_to_desc(desc, "\tcChoose your \%s\t0:\r\n%s", archetype_menu[type_pos].name, archetype_menu[type_pos].description);
+	msg_to_desc(desc, "[ HINT: These are only your starting traits; you can still learn any skill ]\r\n");
 	// msg_to_desc(desc, "Choose your %s (type its name), 'info <name>' for more information,\r\n", archetype_menu[type_pos].name);
 	// msg_to_desc(desc, "or type 'list' for more options:\r\n");
 	
