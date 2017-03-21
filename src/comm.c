@@ -215,9 +215,9 @@ void msdp_update_room(char_data *ch) {
 	char buf[MAX_STRING_LENGTH], area_name[128], exits[256];
 	struct empire_city_data *city;
 	struct instance_data *inst;
-	struct island_info *isle;
 	size_t buf_size, ex_size;
 	descriptor_data *desc;
+	int isle_id;
 	
 	// no work
 	if (!ch || !(desc = ch->desc)) {
@@ -231,8 +231,8 @@ void msdp_update_room(char_data *ch) {
 	else if ((city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
 		snprintf(area_name, sizeof(area_name), "%s", city->name);
 	}
-	else if ((isle = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE))) {
-		snprintf(area_name, sizeof(area_name), "%s", isle->name);
+	else if ((isle_id = GET_ISLAND_ID(IN_ROOM(ch))) != NO_ISLAND) {
+		snprintf(area_name, sizeof(area_name), "%s", get_island_name_for(isle_id, ch));
 	}
 	else {
 		snprintf(area_name, sizeof(area_name), "Unknown");
@@ -245,7 +245,7 @@ void msdp_update_room(char_data *ch) {
 	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cAREA%c%s", (char)MSDP_VAR, (char)MSDP_VAL, area_name);
 	
 	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cCOORDS%c%c", (char)MSDP_VAR, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
-	if (has_ability(ch, ABIL_NAVIGATION)) {
+	if (has_ability(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
 		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cX%c%d", (char)MSDP_VAR, (char)MSDP_VAL, X_COORD(IN_ROOM(ch)));
 		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cY%c%d", (char)MSDP_VAR, (char)MSDP_VAL, Y_COORD(IN_ROOM(ch)));
 	}

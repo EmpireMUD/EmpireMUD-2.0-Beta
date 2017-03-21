@@ -392,6 +392,7 @@ customize its things.
 
 Valid types:
 - building (requires the Customize Building ability)
+- island
 - vehicle
 
 Valid fields:
@@ -402,7 +403,26 @@ Valid fields:
 Note: On vehicles, changing the name will also put the new name at the end of
 the longdesc, unless (or until) you also change the longdesc.
 
-See also: CUSTOMIZE BUILDING, TEXT EDITOR
+See also: CUSTOMIZE BUILDING, CUSTOMIZE ISLAND, TEXT EDITOR
+#
+"CUSTOMIZE ISLAND"
+
+Usage:  customize island name <name | none>
+
+This command allows your empire to name an island. You can only name islands
+where you have an established city. Each empire can have its own name for an
+island, in addition to its global (default) name.
+
+You cannot remove the global name from an island, even if you set its name to
+'none'.
+
+There are three ways an island name can become that island's global name:
+Discovery (the first empire to name an unexplored island sets its global name)
+Sole ownership (if yours is the only empire with a city on the island)
+Consensus (if all empires with cities on the island use the same name for it)
+
+Only discovery changes an island's global name immediately; all other changes
+only happen at the beginning of a new MUD year.
 #
 DIAGNOSE
 

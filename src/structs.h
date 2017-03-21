@@ -425,6 +425,12 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// ARCHETYPE DEFINES ///////////////////////////////////////////////////////
 
+// ARCHT_x: archetype types
+#define ARCHT_ORIGIN  0
+#define ARCHT_HOBBY  1
+#define NUM_ARCHETYPE_TYPES  2	// must be total number
+
+
 // ARCH_x: archetype flags
 #define ARCH_IN_DEVELOPMENT  BIT(0)	// a. not available to players
 #define ARCH_BASIC  BIT(1)	// b. will show on the basic list
@@ -1397,6 +1403,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACCT_MULTI_IP  BIT(4)	// e. can log in at the same time as other accounts on the same IP
 #define ACCT_MULTI_CHAR  BIT(5)	// f. can log in more than one character on this account
 #define ACCT_APPROVED  BIT(6)	// g. approved for full gameplay
+#define ACCT_NOCUSTOMIZE  BIT(7)	// h. cannot use 'customize'
 
 
 // ACT_x: Periodic actions -- WARNING: changing the order of these will have tragic consequences with saved players
@@ -1968,6 +1975,7 @@ typedef struct vehicle_data vehicle_data;
 // Island flags -- ISLE_x
 #define ISLE_NEWBIE  BIT(0)	// a. Island follows newbie rules
 #define ISLE_NO_AGGRO  BIT(1)	// b. Island will not fire aggro mobs or guard towers
+#define ISLE_NO_CUSTOMIZE  BIT(2)	// c. cannot be renamed
 
 
 // ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them
@@ -2552,7 +2560,8 @@ struct archetype_data {
 	char *name;
 	char *description;
 	char *lore;	// optional lore entry
-	bitvector_t flags;	// ARCH_x
+	int type;	// ARCHT_
+	bitvector_t flags;	// ARCH_
 	
 	// default starting ranks
 	char *male_rank;
@@ -2579,6 +2588,14 @@ struct archetype_gear {
 	int wear;	// WEAR_x, -1 == inventory
 	obj_vnum vnum;
 	struct archetype_gear *next;
+};
+
+
+// used in character creation
+struct archetype_menu_type {
+	int type;
+	char *name;
+	char *description;
 };
 
 
@@ -2894,6 +2911,7 @@ struct descriptor_data {
 	byte bad_pws;	// number of bad pw attemps this login
 	byte idle_tics;	// tics idle at password prompt
 	int connected;	// STATE()
+	int submenu;	// SUBMENU() -- use varies by menu
 	int desc_num;	// unique num assigned to desc
 	time_t login_time;	// when the person connected
 
@@ -3131,7 +3149,7 @@ struct player_special_data {
 	bitvector_t olc_flags;	// olc permissions
 	
 	// skill/ability data
-	any_vnum creation_archetype;	// this is now stored permanently so later decisions can be made based on it
+	any_vnum creation_archetype[NUM_ARCHETYPE_TYPES];	// array of creation choices
 	struct player_skill_data *skill_hash;
 	struct player_ability_data *ability_hash;
 	int current_skill_set;	// which skill set a player is currently in
@@ -3431,6 +3449,7 @@ struct action_data_struct {
 struct attribute_data_type {
 	char *name;
 	char *creation_description;	// shown if players need help during creation
+	bool active;	// attributes are split into active/passive
 };
 
 
@@ -3545,10 +3564,13 @@ struct empire_island {
 	
 	// saved portion
 	int workforce_limit[NUM_CHORES];	// workforce settings
+	char *name;	// empire's local name for the island
 	
 	// unsaved portion
 	int tech[NUM_TECHS];	// TECH_ present on that island
 	int population;	// citizens
+	int city_terr;	// total territory IN cities on the island
+	int outside_terr;	// total territory OUTSIDE cities on the island
 	
 	UT_hash_handle hh;	// EMPIRE_ISLANDS(emp) hash handle
 };
@@ -4282,8 +4304,8 @@ struct depletion_data {
 // data for the island_table
 struct island_info {
 	any_vnum id;	// game-assigned, permanent id
-	char *name;	// player-designated island naming
-	bitvector_t flags;	// ISLE_x flags
+	char *name;	// global name for the island
+	bitvector_t flags;	// ISLE_ flags
 	
 	// computed data
 	int tile_size;

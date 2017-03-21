@@ -116,9 +116,12 @@ Adventures (ADVEDIT):
 - Adventure scripts will ONLY run if they are 'Adventure Cleanup' scripts.
 
 Archetypes (ARCHEDIT):
-- Archetypes should have a total of 11 attribute points (3 2 2 2 1 1).
-- Archetypes should have a total of 30 skill points.
-- Archetypes should provide gear for: head, clothes, legs, feet, wield, hold.
+- Each set of archetypes has its own rules.
+- If your EmpireMUD wants to add races, cultures, or other groupings, you
+  can use new archetype types.
+- 'Origins' should have a total of 11 attribute points (3 2 2 2 1 1).
+- 'Origins' should have a total of 30 skill points; 'Hobbies' should have 5.
+- 'Origins' should provide gear for: head, clothes, legs, feet, wield, hold.
 - The hold slot is always a long-lasting light, like the newbie torch (2104).
 - You should only set the BASIC flag on very simple archetypes. Most archetypes
   should only appear in the extended list.
@@ -833,12 +836,16 @@ See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 Usage:  .attribute <type> <number>
         .attribute <copy> <archetype vnum>
 
-This allows you to set the starting level of each attribute. By design, the
+Each of a player's archetypes adds to their attributes. By design, the
 starting attributes should be low. Players will earn higher attributes using
 gear and abilities.
 
-All of the stock archetypes have starting attributes totalling 11 (one at 3,
-two at 1, and the rest at 2).
+An attribute can be positive, negative, or zero. Players will get the sum of
+the attributes from all their archetypes (with guaranteed minimum levels, if
+they end up too low).
+
+All of the stock Origin archetypes have starting attributes totalling 11 (one
+at 3, two at 1, and the rest at 2).
 
 See also: OLC ARCHETYPES
 #d
@@ -936,6 +943,20 @@ points to all skills.
 
 All of the stock archetypes have a total of 30 skill points, usually split
 between two skills as 20/10.
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT TYPE"
+
+Usage:  .type <type>
+
+Archetype types sort them into categories. During creation, a player picks one
+from each category. EmpireMUDs may add or remove archetype types, for example
+to add races or cultures.
+
+Available types:
+ ORIGIN - A character's background and upbringing.
+ HOBBY - Some bonus skill points.
 
 See also: OLC ARCHETYPES
 #d
@@ -3529,6 +3550,38 @@ take longer to decay, rather than basic it strictly on realism.
 
 See also: OEDIT DECAY, OLC OBJECTS
 #d
+"OEDIT FULLSEARCH"
+
+Usage:  .o fullsearch -<field> <argument> <...>
+
+This command allows you to search for objects matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the object's keywords and short/long/look descriptions.
+
+Fields:
+  &c-affects&0 - see HELP AFFECT FLAGS
+  &c-apply&0 - see HELP OEDIT APPLY
+  &c-cflagged&0, &cnotcflagged&0 - see HELP COMPONENT FLAGS
+  &c-component&0 - see HELP OEDIT COMPONENT
+  &c-custom&0 - has a specific type, see HELP OEDIT CUSTOM
+  &c-flagged&0, &cnotflagged&0 - see HELP OEDIT FLAGS
+  &c-interaction&0 - has a specific type, see HELP OEDIT INTERACTION
+  &c-level&0 - matches anything where this level is within the range
+     (note: will not account for objects whose levels are inherited from mobs
+     or adventures)
+  &c-material&0 - see OEDIT MATERIAL
+  &c-type&0 - see HELP OEDIT TYPE
+  &c-wear&0 - see HELP OEDIT WEAR
+
+Examples:
+ > .o fullsearch -type WEAPON -wear HOLD
+ > .o fullsearch -flagged LARGE -flagged TOOL-SHOVEL
+ > .o fullsearch -level 50 sword
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find all objects with the "Mini-pet Use"
+trigger, use ".t search 9900".
+#d
 "OEDIT KEYWORDS"
 
 Usage:  .keywords <list>
@@ -3624,6 +3677,14 @@ spends.
 Choose the material that best fits your object. If there isn't one that fits
 at all, contact the programmer to discuss adding a new one. But remember, the
 material doesn't need to be exact. It just needs to be close enough.
+
+Available mat
+  WOOD     ROCK      IRON
+  SILVER   GOLD      FLINT
+  CLAY     FLESH     GLASS
+  WAX      MAGIC     CLOTH
+  GEM      COPPER    BONE
+  HAIR
 
 See also: OLC OBJECTS
 #d
@@ -3863,19 +3924,19 @@ You can get specific help on each of these via HELP <type> ITEM
 
 See also: OEDIT WEAR, OLC OBJECTS
 #d
-"OEDIT VALUE1" "OEDIT VALUE2" "OEDIT VALUE3"
+"OEDIT VALUE0" "OEDIT VALUE1" "OEDIT VALUE2"
 
-Usage:  .value1 <number>
+Usage:  .value0 <number>
+        .value1 <number>
         .value2 <number>
-        .value3 <number>
 
 For item type OTHER, you can manually set the three object values. For all
 other item types, these values are used for things like damage, fullness,
 and capacity.
 
-If you set your OTHER object with the PLANTABLE flag, value2 is replaced by
+If you set your OTHER object with the PLANTABLE flag, value1 is replaced by
 the 'plants' property. If you can't see the plants property in the editor,
-it means your value2 is invalid for planting and you should set your value2
+it means your value1 is invalid for planting and you should set your value1
 back to 0.
 
 Some special procedures may use the object values of an OTHER object; the
@@ -3948,6 +4009,15 @@ Only items set TAKE can be picked up off the ground.
 Weapons can often by set WIELD and HOLD and used in both positions.
 
 Missile weapons and instruments must be set HOLD.
+
+Wear flags:
+   TAKE        FINGER        NECK
+   CLOTHES     HEAD          LEGS
+   FEET        HANDS         ARMS
+   WRISTS      ABOUT         WAIST
+   EARS        WIELD         HOLD
+   RANGED      ARMOR         PACK
+   SADDLE
 
 See also: OLC OBJECTS
 #d
@@ -4192,6 +4262,13 @@ This command finds the first available vnum in a given range -- the opposite
 of the olc 'list' command.
 
 See also: OLC LIST, VNUM
+#d
+"OLC FULLSEARCH"
+
+Usage:  .<type> fullsearch <arguments>
+
+See the individual help files such as OEDIT FULLSEARCH. This command is only
+implemented for types that have such a help file.
 #d
 "OLC LIST" OLIST MLIST RLIST
 
@@ -5198,6 +5275,23 @@ well as check it to help make sure it will run safely.
 
 See also: MTRIG COMMANDS, OTRIG COMMANDS, RTRIG COMMANDS, VTRIG COMMANDS
 See also: SCRIPT COMMANDS, OLC TRIGGERS, TEXT EDITOR
+#d
+"TRIGEDIT FULLSEARCH"
+
+Usage:  .t fullsearch -<field> <argument> <...>
+
+This command allows you to search for triggers matching certain criteria. You
+can specify multiple fields if you want. Any leftover arguments are matched to
+the trigger's name and command text.
+
+Fields:
+  &c-attaches&0 - see HELP TRIGEDIT ATTACHES
+  &c-type&0 - see HELP MTRIG TYPES, etc.
+
+Examples:
+ > .t fullsearch -type Random -type Global
+ > .t fullsearch i11234
+ > .t fullsearch %force%
 #d
 "TRIGEDIT NAME"
 

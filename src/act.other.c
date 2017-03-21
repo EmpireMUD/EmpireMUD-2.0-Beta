@@ -1421,17 +1421,24 @@ ACMD(do_confirm) {
 
 ACMD(do_customize) {
 	void do_customize_room(char_data *ch, char *argument);
+	void do_customize_island(char_data *ch, char *argument);
 	void do_customize_vehicle(char_data *ch, char *argument);
 
 	char arg2[MAX_INPUT_LENGTH];
 	
 	half_chop(argument, arg, arg2);
 	
-	if (!*arg) {
+	if (ACCOUNT_FLAGGED(ch, ACCT_NOCUSTOMIZE)) {
+		msg_to_char(ch, "You are not allowed to customize anything anymore.\r\n");
+	}
+	else if (!*arg) {
 		msg_to_char(ch, "What do you want to customize? (See HELP CUSTOMIZE)\r\n");
 	}
 	else if (is_abbrev(arg, "building") || is_abbrev(arg, "room")) {
 		do_customize_room(ch, arg2);
+	}
+	else if (is_abbrev(arg, "island") || is_abbrev(arg, "isle")) {
+		do_customize_island(ch, arg2);
 	}
 	else if (is_abbrev(arg, "vehicle") || is_abbrev(arg, "ship")) {
 		do_customize_vehicle(ch, arg2);

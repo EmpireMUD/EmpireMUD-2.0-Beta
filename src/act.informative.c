@@ -2679,7 +2679,7 @@ ACMD(do_survey) {
 	
 	if (GET_ISLAND_ID(IN_ROOM(ch)) != NO_ISLAND) {
 		island = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE);
-		msg_to_char(ch, "Location: %s%s\r\n", island->name, IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "");
+		msg_to_char(ch, "Location: %s%s\r\n", get_island_name_for(island->id, ch), IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "");
 	}
 	
 	// empire

@@ -139,6 +139,7 @@
 #define GET_ARCH_MALE_RANK(arch)  ((arch)->male_rank)
 #define GET_ARCH_NAME(arch)  ((arch)->name)
 #define GET_ARCH_SKILLS(arch)  ((arch)->skills)
+#define GET_ARCH_TYPE(arch)  ((arch)->type)
 #define GET_ARCH_VNUM(arch)  ((arch)->vnum)
 
 #define ARCHETYPE_FLAGGED(arch, flag)  IS_SET(GET_ARCH_FLAGS(arch), (flag))
@@ -429,6 +430,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 
 // basic
 #define STATE(d)  ((d)->connected)
+#define SUBMENU(d)  ((d)->submenu)
 
 
 // OLC_x: olc getters
@@ -865,7 +867,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 // ch->player_specials: player_special_data
 #define CAN_GAIN_NEW_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->can_gain_new_skills))
 #define CAN_GET_BONUS_SKILLS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->can_get_bonus_skills))
-#define CREATION_ARCHETYPE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->creation_archetype))
+#define CREATION_ARCHETYPE(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->creation_archetype[pos]))
 #define GET_ABILITY_HASH(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->ability_hash))
 #define GET_ACCOUNT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->account))
 #define GET_ACTION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->action))

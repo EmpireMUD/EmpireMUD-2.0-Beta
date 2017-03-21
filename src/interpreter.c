@@ -37,6 +37,9 @@
 *   Menu Interpreter Functions
 */
 
+// external vars
+extern struct archetype_menu_type archetype_menu[];
+
 // external funcs
 void parse_archetype_menu(descriptor_data *desc, char *argument);
 
@@ -1613,7 +1616,7 @@ struct {
 	{ CON_Q_ALT_NAME },
 	{ CON_Q_ALT_PASSWORD },
 	
-	{ CON_Q_ARCHETYPE },
+	{ CON_Q_ARCHETYPE },	// skips to CON_BONUS_CREATION if no archetypes exist
 	{ CON_ARCHETYPE_CNFRM },
 	{ CON_BONUS_CREATION },
 	
@@ -1634,6 +1637,8 @@ struct {
 * @param descriptor_data *d the user
 */
 void prompt_creation(descriptor_data *d) {
+	int iter;
+	
 	switch (STATE(d)) {
 		case CON_Q_SCREEN_READER: {
 			SEND_TO_Q("\r\nEmpireMUD makes heavy use of an ascii map, but also supports screen\r\n", d);
@@ -1668,6 +1673,12 @@ void prompt_creation(descriptor_data *d) {
 			sprintf(buf, "Give me a password for %s: ", GET_PC_NAME(d->character));
 			SEND_TO_Q(buf, d);
 			ProtocolNoEcho(d, true);
+			
+			// stuff that could be initialized now that we have a new char
+			for (iter = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
+				CREATION_ARCHETYPE(d->character, iter) = NOTHING;
+			}
+			
 			break;
 		}
 		case CON_CNFPASSWD: {
@@ -1691,14 +1702,34 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_Q_ARCHETYPE: {
-			parse_archetype_menu(d, "");
+			if (archetype_menu[0].type != NOTHING) {
+				SUBMENU(d) = 0;
+				parse_archetype_menu(d, "");
+			}
+			else {
+				// no archetypes for some reason?
+				set_creation_state(d, CON_BONUS_CREATION);
+			}
 			break;
 		}
 		case CON_ARCHETYPE_CNFRM: {
-			void display_archetype_info(descriptor_data *desc, archetype_data *arch);
-			archetype_data *arch = archetype_proto(CREATION_ARCHETYPE(d->character));
+			int iter, sub;
 			
-			display_archetype_info(d, arch);
+			msg_to_desc(d, "\r\nYou chose the following archetypes:\r\n");
+			for (iter = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
+				archetype_data *arch = archetype_proto(CREATION_ARCHETYPE(d->character, iter));
+				if (arch) {
+					// find menu posm for name
+					for (sub = 0; archetype_menu[sub].type != NOTHING; ++sub) {
+						if (archetype_menu[sub].type == iter) {
+							break;
+						}
+					}
+					
+					msg_to_desc(d, "%s: \tc%s\t0 - %s\r\n", archetype_menu[sub].name, GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
+				}
+			}
+			
 			msg_to_desc(d, "\r\nIs this correct (y/n)? ");
 			break;
 		}
@@ -2146,7 +2177,6 @@ int _parse_name(char *arg, char *name) {
 */
 void nanny(descriptor_data *d, char *arg) {
 	void check_delayed_load(char_data *ch);
-	void clear_player(char_data *ch);
 	void display_tip_to_char(char_data *ch);
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	extern int isbanned(char *hostname);

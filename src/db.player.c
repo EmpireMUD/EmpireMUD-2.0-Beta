@@ -1215,7 +1215,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					GET_APPARENT_AGE(ch) = atoi(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Archetype:", length)) {
-					CREATION_ARCHETYPE(ch) = atoi(line + length + 1);
+					// NOTE: This tag is outdated and these are now stored as 'Creation Archetype'
+					CREATION_ARCHETYPE(ch, ARCHT_ORIGIN) = atoi(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Attribute:", length)) {
 					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
@@ -1292,6 +1293,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in[0]);
 					CREATE(cool, struct cooldown_data, 1);
 					add_cooldown(ch, i_in[0], l_in[0] - time(0));
+				}
+				else if (PFILE_TAG(line, "Creation Archetype:", length)) {
+					sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]);
+					if (i_in[0] >= 0 && i_in[0] < NUM_ARCHETYPE_TYPES) {
+						CREATION_ARCHETYPE(ch, i_in[0]) = i_in[1];
+					}
 				}
 				else if (PFILE_TAG(line, "Creation Host:", length)) {
 					if (GET_CREATION_HOST(ch)) {
@@ -2155,7 +2162,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (GET_APPARENT_AGE(ch)) {
 		fprintf(fl, "Apparent Age: %d\n", GET_APPARENT_AGE(ch));
 	}
-	fprintf(fl, "Archetype: %d\n", CREATION_ARCHETYPE(ch));
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		fprintf(fl, "Attribute: %s %d\n", attributes[iter].name, GET_REAL_ATT(ch, iter));
 	}
@@ -2193,6 +2199,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	for (cool = ch->cooldowns; cool; cool = cool->next) {
 		fprintf(fl, "Cooldown: %d %ld\n", cool->type, cool->expire_time);
+	}
+	for (iter = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
+		fprintf(fl, "Creation Archetype: %d %d\n", iter, CREATION_ARCHETYPE(ch, iter));
 	}
 	if (GET_CREATION_HOST(ch)) {
 		fprintf(fl, "Creation Host: %s\n", GET_CREATION_HOST(ch));
@@ -3537,7 +3546,7 @@ void start_new_character(char_data *ch) {
 	
 	char lbuf[MAX_INPUT_LENGTH];
 	struct global_data *glb, *next_glb, *choose_last;
-	int cumulative_prc, iter;
+	int arch_iter, cumulative_prc, iter, level;
 	bool done_cumulative = FALSE;
 	struct archetype_gear *gear;
 	struct archetype_skill *sk;
@@ -3610,19 +3619,33 @@ void start_new_character(char_data *ch) {
 		do_slash_channel(ch, lbuf, 0, 0);
 	}
 	global_mute_slash_channel_joins = FALSE;
+	
+	// zero out attributes before applying archetypes
+	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+		ch->real_attributes[iter] = 0;
+	}
 
 	// archetype setup
-	if ((arch = archetype_proto(CREATION_ARCHETYPE(ch))) || (arch = archetype_proto(0))) {
+	for (arch_iter = 0; arch_iter < NUM_ARCHETYPE_TYPES; ++arch_iter) {
+		if (!(arch = archetype_proto(CREATION_ARCHETYPE(ch, arch_iter))) && !(arch = archetype_proto(0))) {
+			continue;	// couldn't find an archetype
+		}
+		if (GET_ARCH_TYPE(arch) != arch_iter) {
+			continue;	// found archetype does not match this category
+		}
+		
+		// Assign it:
+		
 		// attributes
 		for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-			ch->real_attributes[iter] = GET_ARCH_ATTRIBUTE(arch, iter);
+			ch->real_attributes[iter] += GET_ARCH_ATTRIBUTE(arch, iter);
 		}
 	
 		// skills
 		for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
-			if (get_skill_level(ch, sk->skill) < sk->level) {
-				set_skill(ch, sk->skill, sk->level);
-			}
+			level = get_skill_level(ch, sk->skill) + sk->level;
+			level = MIN(level, CLASS_SKILL_CAP);
+			set_skill(ch, sk->skill, level);
 			
 			// special case for vampire
 			if (sk->skill == SKILL_VAMPIRE && !IS_VAMPIRE(ch)) {
@@ -3635,63 +3658,71 @@ void start_new_character(char_data *ch) {
 		for (gear = GET_ARCH_GEAR(arch); gear; gear = gear->next) {
 			give_newbie_gear(ch, gear->vnum, gear->wear);
 		}
-		
-		// global newbie gear -- TODO there must be a better, more generic way to run globals -pc 5/24/2016
-		cumulative_prc = number(1, 10000);
-		choose_last = NULL;
-		found = FALSE;
-		HASH_ITER(hh, globals_table, glb, next_glb) {
-			if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR || IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
-				continue;
-			}
-			if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !has_ability(ch, GET_GLOBAL_ABILITY(glb))) {
-				continue;
-			}
-			
-			// percent checks last
-			if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT)) {
-				if (done_cumulative) {
-					continue;
-				}
-				cumulative_prc -= (int)(GET_GLOBAL_PERCENT(glb) * 100);
-				if (cumulative_prc <= 0) {
-					done_cumulative = TRUE;
-				}
-				else {
-					continue;	// not this time
-				}
-			}
-			else if (number(1, 10000) > (int)(GET_GLOBAL_PERCENT(glb) * 100)) {
-				// normal not-cumulative percent
-				continue;
-			}
-		
-			// success!
-			
-			// check choose-last
-			if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CHOOSE_LAST)) {
-				if (!choose_last) {
-					choose_last = glb;
-				}
-				continue;
-			}
-			
-			// safe to apply
-			for (gear = GET_GLOBAL_GEAR(glb); gear; gear = gear->next) {
-				give_newbie_gear(ch, gear->vnum, gear->wear);
-			}
-			found = TRUE;
-		}
-		// do the choose-last
-		if (choose_last && !found) {
-			for (gear = GET_GLOBAL_GEAR(choose_last); gear; gear = gear->next) {
-				give_newbie_gear(ch, gear->vnum, gear->wear);
-			}
-		}
-		
-		determine_gear_level(ch);
-		add_archetype_lore(ch);
 	}
+	
+	// guarantee minimum of 1 for active attributes
+	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+		if (attributes[iter].active && ch->real_attributes[iter] < 1) {
+			ch->real_attributes[iter] = 1;
+		}
+	}
+	
+	// global newbie gear -- TODO there must be a better, more generic way to run globals -pc 5/24/2016
+	cumulative_prc = number(1, 10000);
+	choose_last = NULL;
+	found = FALSE;
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR || IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !has_ability(ch, GET_GLOBAL_ABILITY(glb))) {
+			continue;
+		}
+		
+		// percent checks last
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT)) {
+			if (done_cumulative) {
+				continue;
+			}
+			cumulative_prc -= (int)(GET_GLOBAL_PERCENT(glb) * 100);
+			if (cumulative_prc <= 0) {
+				done_cumulative = TRUE;
+			}
+			else {
+				continue;	// not this time
+			}
+		}
+		else if (number(1, 10000) > (int)(GET_GLOBAL_PERCENT(glb) * 100)) {
+			// normal not-cumulative percent
+			continue;
+		}
+	
+		// success!
+		
+		// check choose-last
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CHOOSE_LAST)) {
+			if (!choose_last) {
+				choose_last = glb;
+			}
+			continue;
+		}
+		
+		// safe to apply
+		for (gear = GET_GLOBAL_GEAR(glb); gear; gear = gear->next) {
+			give_newbie_gear(ch, gear->vnum, gear->wear);
+		}
+		found = TRUE;
+	}
+	// do the choose-last
+	if (choose_last && !found) {
+		for (gear = GET_GLOBAL_GEAR(choose_last); gear; gear = gear->next) {
+			give_newbie_gear(ch, gear->vnum, gear->wear);
+		}
+	}
+	
+	// basic updates
+	determine_gear_level(ch);
+	add_archetype_lore(ch);
 	
 	// apply any bonus traits that needed it
 	apply_bonus_trait(ch, GET_BONUS_TRAITS(ch), TRUE);

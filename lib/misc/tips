@@ -16,7 +16,7 @@ If an item gets auto-stored, you'll have to build the right building to retrieve
 You can check what's stored in your empire from anywhere using 'einventory'.
 You find a list of territory outside your cities by typing 'territory'.
 You can use the 'territory' command to search for any type of building or crop you own.
-You can find out if cities or starting locations are near you with 'nearby'.
+You can find out if cities, adventures or starting locations are near you with 'nearby'.
 You can change how big a map you see using 'mapsize'.
 You can have more than one of your characters in the same empire, if your account is set up correctly.
 You can see who owns what on the map by turning on 'toggle political'.
@@ -33,7 +33,6 @@ With the Workforce ability, you can give your citizens chores.
 Your Workforce will only work a chore if you don't already have too much of the resource it produces.
 Your Workforce will only work within 20 tiles of each citizen's home.
 If an empire is Distrustful, its guards and towers will attack anyone who isn't at peace with them.
-If an empire is Friendly, its guards and towers ignore anyone who's not at war.
 Highwaymen don't spawn on claimed land.
 Build yourself a nice burial site so you'll have somewhere closer to respawn when you die.
 You can only respawn at your preferred tomb if you died on the same continent.
@@ -59,23 +58,23 @@ The only thing that can get past enchanted walls is Earthmeld.
 Earthmeld won't let you cross a river -- or a moat.
 You can use 'mark' to measure distances on the map.
 Moving at a diagonal is actually slightly further and costs more move points.
-You can use 'home' to set a house as your own.
-You can use 'tomb' to set your burial place.
+You can use 'home' to set a house as your own, and can teleport back with a hestian trinket.
+You can use 'tomb' to set your burial place so you'll respawn there.
 You can see recent empire logs with the 'elog' command.
 You can set up trade using the 'import' and 'export' commands.
 You get better exchange rates with empires that you have treaties with.
 You can type 'toggle scrolling' to get rid of the paged text display.
-You can level Trade all the way to 15 by chipping, tanning, or weaving, before buying any abilities.
-You can level Survival all the way to 15 by digging or gathering, before buying any abilities.
+You can level Trade all the way to 20 by using the level 0 Cooking and Primitive Crafts abilities, before buying any new abilities.
+You can level Survival all the way to 10 using the Scavenging ability, before buying any new abilities.
 If you find some channels hard to see, try using 'recolor'.
 All resources run out eventually. Read more with 'help depletion'.
 Try looking at items to see what they do.
 If you're not sure what a symbol on the map means, try 'help legend'.
 You can craft more than one item in a row using 'craft <number> <item>'. This also works with forge and sew.
-You can find adventures near you with 'nearby'.
+Some adventures don't show up on 'nearby'.
 If you come across an adventure, use the 'adventure' command to find out its level and requirements.
 You can 'consider' enemies to see how hard they'd be.
-Gear makes up a significant portion of your level.
+Gear makes up a significant portion of your level after level 100.
 Type 'keep' to keep yourself from dropping certain items with 'drop all'.
 Some items are marked (boe), or bind-on-equip. Once you use them, you can't give them away.
 You'll need All-Terrain Riding (or Dragonriding) to use a flying mount.
@@ -92,4 +91,34 @@ You get a class when two skills hit level 76, but won't get class abilities unti
 You can identify items to see how good they are, or which is better.
 To identify an item in your inventory when you're wearing something with the same name, try 'id 1.item'.
 You can create new slash-channels with /join.
+Your Workforce and other NPCs will stop spawning if nobody logs in for 2 weeks.
+Once you build a city, you can name your island with the 'customize' command.
+You can see members of your empire with the 'roster' command.
+This game supports MSDP, which some MUD clients use to display information on your screen.
+Clothing can change how you look to others in the room.
+If a player is annoying you, the 'ignore' command can solve the problem.
+You can use 'alt import' to copy settings from your other characters.
+Craft a canoe to get off the newbie island. You can look at it to see how to use it.
+You can only steal from empires whose members are online.
+Some mobs will pursue you if you flee from them. Get far enough away or lose them in a river.
+Pursuing mobs will chase you down even if you go inside a building.
+You can gain reputation with factions in order to unlock more quests and rewards.
+You can do any 5 daily quests per day. Most of these quests repeat every day.
+Dismantle your mines before the end of the year. That's when mountains refresh with new ore.
+You can use 'build info', 'craft info', etc. to see what's required to make something.
+If you flee from a mob, it will heal very quickly.
+Commands like /history, tellhistory, and sayhistory will tell you what you just missed.
+You can equip a pack or satchel to increase your inventory size.
+The 'meters' command will show you how much damage you're dealing/taking.
+You can find out where to store an item by identifying it. Items without regular storage may go in the warehouse.
+Some recipes use generic components, which look like (lumber). Many different types of lumber can be used for this.
+You can morph faster, at an additional cost, by typing 'fastmorph'.
+Forests will regrow faster if they have more forest tiles around them.
+Type 'estats' to get quick info about your empire, or another.
+If you don't maintain your buildings, they will fall into ruin.
+Workforce always uses items you have the most of first.
+You can use 'fmessages' to turn off spammy combat text.
+You can use 'fprompt' to set a different prompt for combat.
+You can write your own books at the library.
+You can have more than one mount, but you have to switch them at a stable.
 $~

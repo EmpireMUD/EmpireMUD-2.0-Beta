@@ -2458,11 +2458,14 @@ void perform_abandon_room(room_data *room) {
 		
 		// update territory counts
 		if (COUNTS_AS_TERRITORY(room)) {
+			struct empire_island *eisle = get_empire_island(emp, GET_ISLAND_ID(room));
 			if (is_in_city_for_empire(room, emp, FALSE, &junk)) {
 				EMPIRE_CITY_TERRITORY(emp) -= 1;
+				eisle->city_terr -= 1;
 			}
 			else {
 				EMPIRE_OUTSIDE_TERRITORY(emp) -= 1;
+				eisle->outside_terr -= 1;
 			}
 		}
 		// territory list
@@ -2511,11 +2514,14 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	
 	// update territory counts
 	if (COUNTS_AS_TERRITORY(room)) {
+		struct empire_island *eisle = get_empire_island(emp, GET_ISLAND_ID(room));
 		if (is_in_city_for_empire(room, emp, FALSE, &junk)) {
 			EMPIRE_CITY_TERRITORY(emp) += 1;
+			eisle->city_terr += 1;
 		}
 		else {
 			EMPIRE_OUTSIDE_TERRITORY(emp) += 1;
+			eisle->outside_terr += 1;
 		}
 	}
 	// territory list

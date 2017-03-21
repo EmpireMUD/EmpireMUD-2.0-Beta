@@ -499,6 +499,15 @@ grantable.
 
 See also: FLAGS, GRANT
 #d
+NOCUSTOMIZE !CUSTOMIZE "NO CUSTOMIZE"
+
+Usage:  set <name> nocustomize <on | off>
+
+This setting prevents a player from using the 'customize' command, if they have
+been abusing it. This is an account-wide setting.
+
+See also: SET
+#d
 NOTITLE
 
 Usage:  notitle <vicitim>
@@ -768,6 +777,7 @@ ipmask         PC      BINARY       IP address is hidden
 multi-ip       PC      BINARY       Can log in more than 1 account per IP
 multi-char     PC      BINARY       Can log in more than 1 char per account
 muted          PC      BINARY       Player is muted
+nocustomize    PC      BINARY       Player cannot use 'customize'
 nodelete       PC      BINARY       Can't be deleted
 noidleout      PC      BINARY       Won't idle out
 notitle        PC      BINARY       Can't change title

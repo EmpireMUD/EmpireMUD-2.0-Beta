@@ -176,7 +176,11 @@ A broad, carniferous yew grows in the middle of the room.
 ~
 0 0 bdgzA G
 0 0 0 5
-I 0 11144 100.00 5  # BUTCHER: some yew berries
+I 0 11144 100.00 1  # BUTCHER: some yew berries
+I 0 11144 100.00 1  # BUTCHER: some yew berries
+I 0 11144 100.00 1  # BUTCHER: some yew berries
+I 0 11144 100.00 1  # BUTCHER: some yew berries
+I 0 11144 100.00 1  # BUTCHER: some yew berries
 S
 #11132
 lulling songbird bird blue purple grey~

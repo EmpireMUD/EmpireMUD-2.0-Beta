@@ -635,13 +635,16 @@ a goblin's vest~
 A goblin has left its vest here, perhaps.~
 This vest is small, and slightly too snug.
 ~
-2 mo ad 1
+2 mo ad 2
 -1 -1 -1
 11 0
 A
 9 1 0
 A
 5 -1 0
+M
+12
+$n is standing here, squeezed into a very small vest.~
 S
 #10050
 skull goblin~

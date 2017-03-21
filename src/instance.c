@@ -636,6 +636,9 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 		if (ROOM_OWNER(home) && !LINK_FLAGGED(rule, ADV_LINKF_CLAIMED_OK | ADV_LINKF_CITY_ONLY)) {
 			return FALSE;
 		}
+		if (ROOM_OWNER(home) && EMPIRE_IS_TIMED_OUT(ROOM_OWNER(home))) {
+			return FALSE;	// owner is timed out -- don't spawn here
+		}
 	
 		// certain room flags are always no-gos
 		if ((ROOM_AFF_FLAGGED(loc, no_no_flags) || ROOM_AFF_FLAGGED(home, no_no_flags))) {

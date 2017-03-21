@@ -212,15 +212,20 @@ void construct_building(room_data *room, bld_vnum type) {
 	
 	// check for territory updates
 	if (ROOM_OWNER(room) && was_large != ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS)) {
+		struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
 		if (was_large && was_in_city && !is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
 			// changing from in-city to not
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) -= 1;
+			eisle->city_terr -= 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) += 1;
+			eisle->outside_terr += 1;
 		}
 		else if (ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
 			// changing from outside-territory to in-city
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) += 1;
+			eisle->city_terr += 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) -= 1;
+			eisle->outside_terr -= 1;
 		}
 		else {
 			// no relevant change
@@ -405,15 +410,20 @@ void disassociate_building(room_data *room) {
 	
 	// check for territory updates
 	if (ROOM_OWNER(room) && was_large != ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS)) {
+		struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
 		if (was_large && was_in_city && !is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
 			// changing from in-city to not
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) -= 1;
+			eisle->city_terr -= 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) += 1;
+			eisle->outside_terr += 1;
 		}
 		else if (ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(room, ROOM_OWNER(room), FALSE, &junk)) {
 			// changing from outside-territory to in-city
 			EMPIRE_CITY_TERRITORY(ROOM_OWNER(room)) += 1;
+			eisle->city_terr += 1;
 			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(room)) -= 1;
+			eisle->outside_terr -= 1;
 		}
 		else {
 			// no relevant change

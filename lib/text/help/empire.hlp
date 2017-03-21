@@ -782,9 +782,13 @@ This command lists the islands your empire has territory or einventory on
 (including warehouse storage). You must have the Navigation ability. The
 coordinates for each island are the approximate center of the island.
 
+Empires can rename islands using the 'customize island' command. These names
+become global if the empire is the only one with cities on the island, or
+all empires on the island share the same custom name for it.
+
 Note: Immortals with the 'empires' grant can list the islands of any empire.
 
-See also: SURVEY
+See also: CUSTOMIZE ISLAND, SURVEY
 #
 LOCKSMITHING
 
@@ -1094,11 +1098,15 @@ See also: BONUS EXPERIENCE POINTS
 #
 ROSTER
 
-Usage:  roster
+Usage:  roster [all]
 
 This command shows you the members of your empire and lets you know who's on-
 line and who's been gone a while. The color of the player's class name (if not
 white) indicates their role, if any: &aCaster&0, &jHealer&0, &yTank&0 or &rMelee&0.
+
+If you don't use the "all" option, you won't see members who have timed out.
+
+High-level immortals can also target other empires with this command.
 
 See also: CLASS, WHO
 #
@@ -1360,6 +1368,7 @@ Workforce, Skilled Labor (Empire abilities)
 Usage:  workforce [chore] [on | off | <limit>] [island name | all]
         workforce no-work
         workforce where [here]
+        workforce copy <island name>
 
 Once at least one member of an empire has the Workforce ability, the empire's
 citizens (NPCs) will start performing simple tasks for the empire. You can
@@ -1385,6 +1394,9 @@ citizens will work the room you're currently standing in. The "workforce where"
 will tell you how many citizens are working each task. Optionally you may also 
 use "workforce where here" to filter the workforce to your current island.
 
+You can use the "workforce copy" command to copy the workforce limit
+configuration of another island into the island you are currently in.
+
 Note: Your workforce will only do chores if your empire has less than 200 of
 the resource provided by the chore. For example, miners won't do any work in
 iron mines if you have 200 iron ore. This does not apply to dismantling. If
@@ -1393,11 +1405,23 @@ is also a total cap for any given resource, which is based on the number of
 players in your empire. After passing the total cap, the locals will collect
 much less of that resource on each island.
 
+See &cHELP WORKFORCE CHORES&0 for a list of all workforce chores with descriptions.
+
+The Workforce ability gains experience when most workforce chores are done
+(including skilled ones) while you are online.
+The Skilled Labor ability gains experience when skilled chores are done while
+you are online.
+
+See also: WORKFORCE CHORES
+#
+"WORKFORCE CHORES" "WORKFORCE TYPES"
+
 Workforce types:
   &ybuilding:&0 NPCs will build any building that has been started, or dismantle
             any building you've started to dismantle. They build using stored
-            empire resources, not items on the ground. Workers can't finish
-            buildings that require resources other than items/components.
+            empire resources, not items on the ground. Workers can't provide
+			coins, liquids (like water), or pools (like mana) for building. Any
+			building that requires one of these must be finished manually.
   &ychopping:&0 NPCs will chop down forests and desert groves (Not orchards - 
      use farming without replanting for that).
   &ydigging:&0 NPCs will dig for rocks in any quarry, or clay in any clay pit.
@@ -1430,11 +1454,6 @@ Workforce types:
   
 Items marked (skilled) require the Skilled Labor ability.
 
-The Workforce ability gains experience when most workforce chores are done
-(including skilled ones) while you are online.
-The Skilled Labor ability gains experience when skilled chores are done while
-you are online.
-
-See also: EXARCH CRAFTS
+See also: EXARCH CRAFTS, WORKFORCE
 #
 $

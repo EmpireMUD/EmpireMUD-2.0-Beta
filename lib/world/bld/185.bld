@@ -43,7 +43,7 @@ D
    The vines have recently been scraped away from the walls of this ancient
 chamber, revealing ancient, intricate carvings of primitive warriors and
 powerful beasts. Torch brackets between the carvings fill the room with a dim
-orange light, and the smell of smoke.  
+orange light, and the smell of smoke.
 ~
 S
 #18503
@@ -56,7 +56,7 @@ D
    You stand before a great stone gate, permanently open now that whatever
 mechanism was used to open and close it is damaged beyond repair. A lighter
 patch on the wall nearby indicates that a plaque has recently been removed from
-the area.  
+the area.
 ~
 S
 #18504
@@ -69,7 +69,7 @@ D
    A wooden boardwalk has recently been built running the length of this
 overgrown gallery. The wind makes a faint hissing as it blows through the
 remaining leaves and vines on the walls. Several signs warn you to stay off the
-stonework, because there may still be undiscovered traps in the area.  
+stonework, because there may still be undiscovered traps in the area.
 ~
 T 18512
 S
@@ -84,7 +84,7 @@ D
 cavernous, torch-lit hall, revealing several massive bas-relief carvings of
 ancient jungle deities. Two staircases lead down nearby, but the entrance to
 one has been bricked up and surrounded with warning signs. You hear strange
-bestial sounds from beyond the wall.  
+bestial sounds from beyond the wall.
 ~
 S
 #18506
@@ -97,7 +97,7 @@ D
    The stairs are worn away from a steady trickle of water, perhaps from years
 of heavy jungle rains since this temple was constructed. The winding stairs
 allow little light from the adjoining rooms, and with every second step you
-find yourself wiping cobwebs from your face.  
+find yourself wiping cobwebs from your face.
 ~
 S
 #18507
@@ -110,7 +110,7 @@ D
    This grand, vaulted chamber is better-preserved than the rest of the temple.
 Though its throne suggests it was once a seat of power, looted sarcophagi hint
 that it was also used as a tomb. A huge painting of the sun covers the wall
-behind the throne.  
+behind the throne.
 ~
 E
 painting sun~
@@ -128,7 +128,7 @@ tomb, sleep~
 D
    This burial chamber, hidden behind the throne, looks to be better maintained
 than much of the rest of the temple. The octagonal chamber is completely
-undecorated, aside from its stone sarcophagus.  
+undecorated, aside from its stone sarcophagus.
 ~
 F
 dB
@@ -137,7 +137,7 @@ S
 Ruined Jungle Temple~
 A Ruined Jungle Temple~
 &y/^&g.\~
-128 10 hiR 0
+3 4 hiR 0
 0 0 0 -1
 C
 dedicate~
