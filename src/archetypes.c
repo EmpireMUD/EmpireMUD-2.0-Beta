@@ -1170,6 +1170,9 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 	*buf = '\0';
 	
 	HASH_ITER(sorted_hh, sorted_archetypes, arch, next_arch) {
+		if (GET_ARCH_TYPE(arch) != type) {
+			continue;
+		}
 		if (basic && !ARCHETYPE_FLAGGED(arch, ARCH_BASIC)) {
 			continue;
 		}
@@ -1209,8 +1212,8 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 * @param int type_pos A position in the archetype_menu[] array.
 */
 void display_archetype_menu(descriptor_data *desc, int type_pos) {
-	msg_to_desc(desc, "\ty[ HINT: These are only your starting traits; you can still learn any skill ]\t0\r\n");
-	msg_to_desc(desc, "Choose your \tc%s\t0:\r\n%s", archetype_menu[type_pos].name, archetype_menu[type_pos].description);
+	msg_to_desc(desc, "[ HINT: These are only your starting traits; you can still learn any skill ]\r\n");
+	msg_to_desc(desc, "\tcChoose your \%s\t0:\r\n%s", archetype_menu[type_pos].name, archetype_menu[type_pos].description);
 	// msg_to_desc(desc, "Choose your %s (type its name), 'info <name>' for more information,\r\n", archetype_menu[type_pos].name);
 	// msg_to_desc(desc, "or type 'list' for more options:\r\n");
 	
@@ -1236,10 +1239,12 @@ void parse_archetype_menu(descriptor_data *desc, char *argument) {
 	if (pos > NUM_ARCHETYPE_TYPES || archetype_menu[pos].type == NOTHING) {
 		// done!
 		next_creation_step(desc);
+		return;
 	}
 	else if (!archetype_exists(archetype_menu[pos].type)) {
 		++SUBMENU(desc);
 		parse_archetype_menu(desc, "");
+		return;
 	}
 	
 	// prepare to parse
@@ -1278,6 +1283,7 @@ void parse_archetype_menu(descriptor_data *desc, char *argument) {
 			// on to the next archetype
 			++SUBMENU(desc);
 			parse_archetype_menu(desc, "");
+			return;
 		}
 	}
 	
