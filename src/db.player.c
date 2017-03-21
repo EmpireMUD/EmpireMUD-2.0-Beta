@@ -3546,7 +3546,7 @@ void start_new_character(char_data *ch) {
 	
 	char lbuf[MAX_INPUT_LENGTH];
 	struct global_data *glb, *next_glb, *choose_last;
-	int cumulative_prc, iter, level;
+	int arch_iter, cumulative_prc, iter, level;
 	bool done_cumulative = FALSE;
 	struct archetype_gear *gear;
 	struct archetype_skill *sk;
@@ -3621,15 +3621,11 @@ void start_new_character(char_data *ch) {
 	global_mute_slash_channel_joins = FALSE;
 
 	// archetype setup
-	for (iter = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
-		extern const char *archetype_types[];
-		arch = archetype_proto(CREATION_ARCHETYPE(ch, iter));
-		syslog(SYS_INFO, 0, FALSE, "%s: %s %d: %s", GET_NAME(ch), archetype_types[iter], CREATION_ARCHETYPE(ch, iter), arch ? GET_ARCH_NAME(arch) : "??");
-		
-		if (!arch && !(arch = archetype_proto(0))) {
+	for (arch_iter = 0; arch_iter < NUM_ARCHETYPE_TYPES; ++arch_iter) {
+		if (!(arch = archetype_proto(CREATION_ARCHETYPE(ch, arch_iter))) && !(arch = archetype_proto(0))) {
 			continue;	// couldn't find an archetype
 		}
-		if (GET_ARCH_TYPE(arch) != iter) {
+		if (GET_ARCH_TYPE(arch) != arch_iter) {
 			continue;	// found archetype does not match this category
 		}
 		
