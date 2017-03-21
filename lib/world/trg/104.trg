@@ -431,7 +431,7 @@ elseif lab tent /= %arg%
 elseif dolmen stone /= %arg%
   eval vnum 10482
   set named a goblin dolmen stone
-elseif ticket /= %arg%
+elseif ticket /= %arg% && %actor.has_item(18260)%
   * Fall through to adventurer guild quest command trigger
   return 0
   halt

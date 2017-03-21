@@ -614,13 +614,16 @@ A guildmaster has left his tunic here.~
    This tunic is finely embroidered with the symbol of a craftsman's guild on
 the front. It is also fireproof, and resists stains.
 ~
-2 p ad 7
+2 p ad 8
 0 0 0
 11 0
 A
 25 25 0
 C
 100 100
+M
+12
+Guildmaster $n is standing here.~
 S
 #2341
 belt utility~
@@ -857,13 +860,16 @@ A traveling tinker's trappings are lying here.~
 attached to a traveler's outfit would probably let you work very efficiently
 on the move if you knew how to use it.
 ~
-2 p ad 6
+2 p ad 7
 0 0 0
 2 0
 A
 25 50 0
 C
 150 150
+M
+12
+$n is standing here, tinkering with something.~
 S
 #2359
 pattern smuggled olympian laurel branch~
@@ -914,7 +920,7 @@ The guild-forged hammer head pattern is lying here.~
 lines. It gives rough instructions for forging the hammer of Hephaestus, a tier
 3 crafting item. The only problem is that you need an entire guild of smiths to
 forge the head...
- 
+
 Forge (Guildsman Crafts, level 300): guild-forged hammer head
 ~
 3 o a 7
@@ -927,7 +933,7 @@ a smuggled Olympian laurel branch~
 A smuggled Olympian laurel branch is lying here.~
    This laurel branch was surely smuggled from Mount Olympus, home of the
 classic Greek gods. It can be used to make the tier 3 crafting item, the laurel
-crown of Olympus.  
+crown of Olympus.
 
 Craft (level 300): laurel crown of Olympus
 ~
@@ -942,7 +948,7 @@ A bolt of Olympic silk is floating here.~
    Olympic silk is so fine that you can barely feel it touch your fingers. It
 has the soft aroma of fresh herbs, and as you wrap yourself in the silk, you
 feel as if you could sleep forever. This silk is used to make the tier 3
-crafting clothing.  
+crafting clothing.
 
 Sew (level 300): robe of the Olympians
 ~
@@ -958,7 +964,7 @@ Some Amazonian leather is lying here.~
 girdle, though it is unadorned. It is said that this leather can be made into a
 powerful girdle that boosts the skill of craftsmen -- and craftswomen. The
 girdle is the tier 3 crafting belt.
- 
+
 Sew (level 300): girdle of Hippolyta
 ~
 3 0 a 10
@@ -971,7 +977,7 @@ a guild-forged hammer head~
 A guild-forged hammer head is lying here.~
    This hammer head is made from a magical alloy so hard it takes hundreds of
 craftsmen to beat it into shape. It can be used to create the hammer of
-Hephaestus, which is the tier 3 crafting offhand item.  
+Hephaestus, which is the tier 3 crafting offhand item.
 
 Forge (level 300): hammer of Hephaestus
 ~
@@ -985,7 +991,7 @@ the laurel crown of Olympus~
 A crown of laurels is lying here, glowing faintly.~
    This crown is made from a wreath of magical Olympian laurel leaves. It
 grants the wearer godlike crafting ability while worn. This is a tier 3
-crafting item.  
+crafting item.
 ~
 2 p ae 19
 0 0 0
@@ -1009,7 +1015,7 @@ the robe of the Olympians~
 A robe of the Olympians is floating slightly off the ground.~
    These beautiful enchanted robes are based on those worn by a god of
 craftsmen, and carry powerful enchantments to help with crafting. This is a
-tier 3 crafting item.  
+tier 3 crafting item.
 ~
 2 p ad 17
 0 0 0
@@ -1033,7 +1039,7 @@ the regal girdle of Hippolyta~
 A regal girdle is glowing on the ground.~
    This royal belt was made by Ares -- or perhaps by Hephaestus -- and given
 out to signify the right to rule. It bestows the ability to make legendary
-crafts to the wearer. It is a tier 3 crafting item.  
+crafts to the wearer. It is a tier 3 crafting item.
 ~
 2 p al 17
 0 0 0
@@ -1058,7 +1064,7 @@ The hammer of Hephaestus is lying here.~
    While not the original hammer of the God of Smiths, this hammer is a fairly
 close imitation. It carries many powerful enchantments to help you in the
 forge. This is the tier 3 crafting offhand item, and can also be used as a
-tool.  
+tool.
 ~
 1 dp ao 20
 0 20 6

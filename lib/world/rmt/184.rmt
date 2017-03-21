@@ -39,9 +39,9 @@ E
 shelves figurines items~
    Two shelves are hung along the edge of the cupboard, above the head of the
 mattress. A set of small toy figurines is the only hint that this might be a
-child's bedroom. Other items on the shelves include brushes, jars, and bags. 
+child's bedroom. Other items on the shelves include brushes, jars, and bags.
 In fact, it looks like this poor child shares his bedroom with the household
-storage. A blue plaque is mounted under the shelf.  
+storage. A blue plaque is mounted under the shelf.
 ~
 E
 plaque~
@@ -94,6 +94,7 @@ T 18461
 T 18462
 T 18483
 T 18496
+T 18492
 S
 #18464
 Cornfields of Popcorn~
@@ -120,7 +121,7 @@ E
 manor house~
    The manor house looks to be in the same state of disrepair as the cornfield.
 Truly this is a tragic kingdom. A blue plaque is mounted on the side of the
-house.  
+house.
 ~
 E
 plaque~
@@ -166,6 +167,7 @@ T 18462
 T 18465
 T 18464
 T 18496
+T 18492
 S
 #18466
 The Unstable~
@@ -215,7 +217,7 @@ D3
 E
 knick knacks knicknacks tchotchkes kitsch~
    The house is absolutely littered with trinkets. You wouldn't even know where
-to start. The only thing that catches your eye is a blue plaque on the wall. 
+to start. The only thing that catches your eye is a blue plaque on the wall.
 
 ~
 E
@@ -323,6 +325,7 @@ M 0 18494 100.00 1
 T 18461
 T 18462
 T 18496
+T 18492
 S
 #18471
 A Long Row of Glass Shops (5th, Main)~
@@ -356,7 +359,7 @@ E
 glass windows shops~
    The glass windows are enormous, each made from a single pane and each
 completely flawless. You cannot imagine the skill of the glassblower who
-created these. A blue plaque hangs on the wall between the shops.  
+created these. A blue plaque hangs on the wall between the shops.
 ~
 M 0 18490 100.00 1
 T 18461
@@ -397,6 +400,7 @@ T 18461
 T 18462
 T 18472
 T 18496
+T 18491
 S
 #18473
 Portal 12~
