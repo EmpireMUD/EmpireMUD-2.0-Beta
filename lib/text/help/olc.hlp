@@ -116,9 +116,12 @@ Adventures (ADVEDIT):
 - Adventure scripts will ONLY run if they are 'Adventure Cleanup' scripts.
 
 Archetypes (ARCHEDIT):
-- Archetypes should have a total of 11 attribute points (3 2 2 2 1 1).
-- Archetypes should have a total of 30 skill points.
-- Archetypes should provide gear for: head, clothes, legs, feet, wield, hold.
+- Each set of archetypes has its own rules.
+- If your EmpireMUD wants to add races, cultures, or other groupings, you
+  can use new archetype types.
+- 'Origins' should have a total of 11 attribute points (3 2 2 2 1 1).
+- 'Origins' should have a total of 30 skill points; 'Hobbies' should have 5.
+- 'Origins' should provide gear for: head, clothes, legs, feet, wield, hold.
 - The hold slot is always a long-lasting light, like the newbie torch (2104).
 - You should only set the BASIC flag on very simple archetypes. Most archetypes
   should only appear in the extended list.
