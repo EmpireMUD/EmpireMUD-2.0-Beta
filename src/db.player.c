@@ -3619,6 +3619,11 @@ void start_new_character(char_data *ch) {
 		do_slash_channel(ch, lbuf, 0, 0);
 	}
 	global_mute_slash_channel_joins = FALSE;
+	
+	// zero out attributes before applying archetypes
+	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+		ch->real_attributes[iter] = 0;
+	}
 
 	// archetype setup
 	for (arch_iter = 0; arch_iter < NUM_ARCHETYPE_TYPES; ++arch_iter) {
