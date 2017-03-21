@@ -757,7 +757,7 @@ void clear_archetype(archetype_data *arch) {
 	
 	// default attributes to 1
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-		GET_ARCH_ATTRIBUTE(arch, iter) = 1;
+		GET_ARCH_ATTRIBUTE(arch, iter) = 0;
 	}
 }
 
@@ -1577,8 +1577,8 @@ void olc_show_archetype(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "<\tytype\t0> %s\r\n", archetype_types[GET_ARCH_TYPE(arch)]);
 	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !archetype_proto(GET_ARCH_VNUM(arch)) ? "new archetype" : GET_ARCH_NAME(archetype_proto(GET_ARCH_VNUM(arch))));
+	sprintf(buf + strlen(buf), "<\tytype\t0> %s\r\n", archetype_types[GET_ARCH_TYPE(arch)]);
 	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(GET_ARCH_NAME(arch)));
 	sprintf(buf + strlen(buf), "<\tydescription\t0> %s\r\n", NULLSAFE(GET_ARCH_DESC(arch)));
 	sprintf(buf + strlen(buf), "<\tylore\t0> %s [on Month Day, Year.]\r\n", (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) ? GET_ARCH_LORE(arch) : "none");
