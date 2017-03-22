@@ -1229,7 +1229,7 @@ int find_command(const char *command) {
 
 struct alias_data *find_alias(struct alias_data *alias_list, char *str) {
 	while (alias_list != NULL) {
-		if (*str == *alias_list->alias)	/* hey, every little bit counts :-) */
+		if (LOWER(*str) == LOWER(*alias_list->alias))	/* hey, every little bit counts :-) */
 			if (!str_cmp(str, alias_list->alias))
 				return (alias_list);
 
