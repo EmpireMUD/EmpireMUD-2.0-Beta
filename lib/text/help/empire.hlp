@@ -1420,8 +1420,8 @@ Workforce types:
   &ybuilding:&0 NPCs will build any building that has been started, or dismantle
             any building you've started to dismantle. They build using stored
             empire resources, not items on the ground. Workers can't provide
-			coins, liquids (like water), or pools (like mana) for building. Any
-			building that requires one of these must be finished manually.
+            coins, liquids (like water), or pools (like mana) for building. Any
+            building that requires one of these must be finished manually.
   &ychopping:&0 NPCs will chop down forests and desert groves (Not orchards - 
      use farming without replanting for that).
   &ydigging:&0 NPCs will dig for rocks in any quarry, or clay in any clay pit.
