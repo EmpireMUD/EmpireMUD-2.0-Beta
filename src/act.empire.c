@@ -256,7 +256,7 @@ void do_customize_island(char_data *ch, char *argument) {
 			if (eisle->name) {
 				free(eisle->name);
 			}
-			eisle->name = str_dup(CAP(argument));
+			eisle->name = str_dup(CAP(trim(argument)));
 			EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
 			
 			// need to apply global name?
