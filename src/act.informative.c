@@ -1918,6 +1918,7 @@ ACMD(do_display) {
 		msg_to_char(ch, "Display what?\r\n");
 	}
 	else {
+		delete_doubledollar(argument);
 		msg_to_char(ch, "%s\r\n", replace_prompt_codes(ch, argument));
 	}
 }
