@@ -4412,7 +4412,9 @@ ACMD(do_islands) {
 	
 	// mark your territory
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
-		do_islands_has_territory(&list, eisle->island, eisle->city_terr + eisle->outside_terr);
+		if (eisle->city_terr + eisle->outside_terr > 0) {
+			do_islands_has_territory(&list, eisle->island, eisle->city_terr + eisle->outside_terr);
+		}
 	}
 	
 	// compute einv
