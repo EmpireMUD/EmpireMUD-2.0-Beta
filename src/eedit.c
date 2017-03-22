@@ -282,6 +282,10 @@ EEDIT(eedit_adjective) {
 		
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the empire's adjective form to %s", PERS(ch, ch, TRUE), EMPIRE_ADJECTIVE(emp));
 		msg_to_char(ch, "The empire's adjective form is now: %s\r\n", EMPIRE_ADJECTIVE(emp));
+		
+		if (emp != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's adjective form to %s", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_ADJECTIVE(emp));
+		}
 	}
 }
 
@@ -303,6 +307,10 @@ EEDIT(eedit_banner) {
 
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the banner color", PERS(ch, ch, TRUE));
 		msg_to_char(ch, "The empire's banner is now: %s%s&0\r\n", EMPIRE_BANNER(emp), show_color_codes(EMPIRE_BANNER(emp)));
+		
+		if (emp != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's banner to %s%s&0", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_BANNER(emp), show_color_codes(EMPIRE_BANNER(emp)));
+		}
 	}
 }
 
@@ -338,6 +346,10 @@ EEDIT(eedit_change_leader) {
 		
 		remove_lore(victim, LORE_PROMOTED);
 		add_lore(victim, LORE_PROMOTED, "Became leader of %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		
+		if (emp != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's leader to %s", GET_NAME(ch), EMPIRE_NAME(emp), GET_NAME(victim));
+		}
 
 		// save now
 		if (file) {
@@ -379,6 +391,7 @@ EEDIT(eedit_description) {
 	
 	sprintf(buf, "description for %s", EMPIRE_NAME(emp));
 	start_string_editor(ch->desc, buf, &EMPIRE_DESCRIPTION(emp), MAX_EMPIRE_DESCRIPTION);
+	ch->desc->save_empire = EMPIRE_VNUM(emp);
 }
 
 
@@ -393,6 +406,10 @@ EEDIT(eedit_frontiertraits) {
 	if (EMPIRE_FRONTIER_TRAITS(emp) != old_traits) {
 		prettier_sprintbit(EMPIRE_FRONTIER_TRAITS(emp), empire_trait_types, buf);
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the frontier traits to %s", PERS(ch, ch, TRUE), buf);
+		
+		if (emp != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's frontier traits to %s", GET_NAME(ch), EMPIRE_NAME(emp), buf);
+		}
 	}
 }
 
@@ -420,11 +437,13 @@ EEDIT(eedit_motd) {
 	
 	sprintf(buf, "motd for %s", EMPIRE_NAME(emp));
 	start_string_editor(ch->desc, buf, &EMPIRE_MOTD(emp), MAX_MOTD_LENGTH);
+	ch->desc->save_empire = EMPIRE_VNUM(emp);
 }
 
 
 EEDIT(eedit_name) {
 	player_index_data *index, *next_index;
+	char buf[MAX_STRING_LENGTH];
 	bool file = FALSE;
 	char_data *mem;
 	
@@ -447,6 +466,7 @@ EEDIT(eedit_name) {
 		msg_to_char(ch, "Invalid empire name.\r\n");
 	}
 	else {
+		strcpy(buf, NULLSAFE(EMPIRE_NAME(emp)));
 		if (EMPIRE_NAME(emp)) {
 			free(EMPIRE_NAME(emp));
 		}
@@ -460,6 +480,10 @@ EEDIT(eedit_name) {
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the empire name to %s", PERS(ch, ch, TRUE), EMPIRE_NAME(emp));
 		msg_to_char(ch, "The empire's name is now: %s\r\n", EMPIRE_NAME(emp));
 		msg_to_char(ch, "The adjective form was also changed (use 'eedit adjective' to change it).\r\n");
+		
+		if (emp != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's empire name to %s", GET_NAME(ch), buf, EMPIRE_NAME(emp));
+		}
 		
 		// update lore for members
 		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
@@ -505,6 +529,10 @@ EEDIT(eedit_privilege) {
 
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the %s privilege to rank %s%s (%d)", PERS(ch, ch, TRUE), priv[pr], EMPIRE_RANK(emp, rnk), EMPIRE_BANNER(emp), rnk+1);
 		msg_to_char(ch, "You set the %s privilege to rank %s&0 (%d).\r\n", priv[pr], EMPIRE_RANK(emp, rnk), rnk+1);
+		
+		if (emp != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's %s privilege to rank %s&0 (%d)", GET_NAME(ch), EMPIRE_NAME(emp), priv[pr], EMPIRE_RANK(emp, rnk), rnk+1);
+		}
 	}
 }
 
@@ -544,6 +572,9 @@ EEDIT(eedit_rank) {
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed rank %d to %s%s", PERS(ch, ch, TRUE), rnk+1, EMPIRE_RANK(emp, rnk), EMPIRE_BANNER(emp));
 		msg_to_char(ch, "You have changed rank %d to %s&0.\r\n", rnk+1, EMPIRE_RANK(emp, rnk));
 		
+		if (emp != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's rank %d to %s&0", GET_NAME(ch), EMPIRE_NAME(emp), rnk+1, EMPIRE_RANK(emp, rnk));
+		}
 		
 		// update lore for members
 		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
@@ -643,5 +674,9 @@ EEDIT(eedit_num_ranks) {
 		
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the number of ranks", PERS(ch, ch, TRUE));
 		msg_to_char(ch, "The empire now has %d ranks.\r\n", EMPIRE_NUM_RANKS(emp));
+		
+		if (emp != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's number of ranks to %d", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_NUM_RANKS(emp));
+		}
 	}
 }

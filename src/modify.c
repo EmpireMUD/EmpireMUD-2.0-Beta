@@ -119,6 +119,7 @@ void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_
 	d->straight_to_editor = TRUE;
 	d->mail_to = 0;
 	d->notes_id = 0;
+	d->save_empire = NOTHING;
 	d->file_storage = NULL;
 	
 	if (STATE(d) == CON_PLAYING && !d->straight_to_editor) {
@@ -245,6 +246,16 @@ void string_add(descriptor_data *d, char *str) {
 			free(d->str);
 			d->str = NULL;
 		}
+		else if (STATE(d) == CON_PLAYING && d->save_empire != NOTHING && action == STRINGADD_SAVE) {
+			empire_data *emp = real_empire(d->save_empire);
+			if (emp) {
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				
+				if (emp != GET_LOYALTY(d->character)) {
+					syslog(SYS_GC, GET_INVIS_LEV(d->character), TRUE, "ABUSE: %s has edited text for %s", GET_NAME(d->character), EMPIRE_NAME(emp));
+				}
+			}
+		}
 		else if (STATE(d) == CON_PLAYING && d->mail_to >= BOARD_MAGIC) {
 			Board_save_board(d->mail_to - BOARD_MAGIC);
 			if (action == STRINGADD_ABORT)
@@ -300,6 +311,7 @@ void string_add(descriptor_data *d, char *str) {
 		d->mail_to = 0;
 		d->notes_id = 0;
 		d->max_str = 0;
+		d->save_empire = NOTHING;
 		if (d->file_storage) {
 			free(d->file_storage);
 		}

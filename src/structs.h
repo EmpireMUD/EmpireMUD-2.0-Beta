@@ -2930,6 +2930,7 @@ struct descriptor_data {
 	size_t max_str;	// max length of editor
 	int mail_to;	// name for mail system
 	int notes_id;	// idnum of player for notes-editing
+	any_vnum save_empire;	// for the text editor to know which empire to save
 	
 	int has_prompt;	// is the user at a prompt?
 	char inbuf[MAX_RAW_INPUT_LENGTH];	// buffer for raw input

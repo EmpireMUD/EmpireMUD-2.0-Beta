@@ -1849,6 +1849,8 @@ void init_descriptor(descriptor_data *newd, int desc) {
 	*newd->output = '\0';
 	newd->bufptr = 0;
 	newd->has_prompt = 0;
+	
+	newd->save_empire = NOTHING;
 
 	CREATE(newd->history, char *, HISTORY_SIZE);
 	newd->pProtocol = ProtocolCreate();
