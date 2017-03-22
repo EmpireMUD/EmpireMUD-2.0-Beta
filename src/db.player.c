@@ -1047,7 +1047,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	if (!ch) {
 		CREATE(ch, char_data, 1);
 		clear_char(ch);
-		CREATE(ch->player_specials, struct player_special_data, 1);
+		init_player_specials(ch);
 		clear_player(ch);
 	
 		// this is now
@@ -3358,7 +3358,7 @@ void init_player(char_data *ch) {
 
 	// create a player_special structure, if needed
 	if (ch->player_specials == NULL) {
-		CREATE(ch->player_specials, struct player_special_data, 1);
+		init_player_specials(ch);
 	}
 	
 	// store temporary account id (may be overwritten by clear_player)

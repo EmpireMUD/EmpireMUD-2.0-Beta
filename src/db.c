@@ -1563,6 +1563,48 @@ void clear_char(char_data *ch) {
 
 
 /**
+* This is called during creation, and before loading a player from file. It
+* initializes things that should be -1/NOTHINGs.
+*
+* @param char_data *ch A player.
+*/
+void init_player_specials(char_data *ch) {
+	int iter;
+	
+	if (IS_NPC(ch)) {
+		syslog(SYS_ERROR, 0, TRUE, "SYSERR: init_player_specials called on an NPC");
+		return;
+	}
+	
+	// ensures they have unique player_specials
+	if (!(ch->player_specials) || ch->player_specials == &dummy_mob) {
+		CREATE(ch->player_specials, struct player_special_data, 1);
+	}
+	
+	GET_LAST_ROOM(ch) = NOWHERE;
+	GET_LOADROOM(ch) = NOWHERE;
+	GET_LOAD_ROOM_CHECK(ch) = NOWHERE;
+	GET_MARK_LOCATION(ch) = NOWHERE;
+	GET_MOUNT_VNUM(ch) = NOTHING;
+	GET_PLEDGE(ch) = NOTHING;
+	GET_TOMB_ROOM(ch) = NOWHERE;
+	GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
+	GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
+	GET_LAST_TELL(ch) = NOBODY;
+	GET_TEMPORARY_ACCOUNT_ID(ch) = NOTHING;
+	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
+	
+	for (iter = 0; iter < MAX_REWARDS_PER_DAY; ++iter) {
+		GET_REWARDED_TODAY(ch, iter) = -1;
+	}
+	
+	for (iter = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
+		CREATION_ARCHETYPE(ch, iter) = NOTHING;
+	}
+}
+
+
+/**
 * Create a new mobile from a prototype. You should almost always call this with
 * with_triggers = TRUE.
 *

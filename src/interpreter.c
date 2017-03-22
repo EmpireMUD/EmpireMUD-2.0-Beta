@@ -1637,8 +1637,6 @@ struct {
 * @param descriptor_data *d the user
 */
 void prompt_creation(descriptor_data *d) {
-	int iter;
-	
 	switch (STATE(d)) {
 		case CON_Q_SCREEN_READER: {
 			SEND_TO_Q("\r\nEmpireMUD makes heavy use of an ascii map, but also supports screen\r\n", d);
@@ -1673,12 +1671,6 @@ void prompt_creation(descriptor_data *d) {
 			sprintf(buf, "Give me a password for %s: ", GET_PC_NAME(d->character));
 			SEND_TO_Q(buf, d);
 			ProtocolNoEcho(d, true);
-			
-			// stuff that could be initialized now that we have a new char
-			for (iter = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
-				CREATION_ARCHETYPE(d->character, iter) = NOTHING;
-			}
-			
 			break;
 		}
 		case CON_CNFPASSWD: {
@@ -2202,7 +2194,7 @@ void nanny(descriptor_data *d, char *arg) {
 			if (d->character == NULL) {
 				CREATE(d->character, char_data, 1);
 				clear_char(d->character);
-				CREATE(d->character->player_specials, struct player_special_data, 1);
+				init_player_specials(d->character);
 				d->character->desc = d;
 			}
 			
