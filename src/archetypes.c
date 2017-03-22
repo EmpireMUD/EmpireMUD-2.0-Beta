@@ -1123,19 +1123,40 @@ void write_archetype_to_file(FILE *fl, archetype_data *arch) {
 void display_archetype_info(descriptor_data *desc, archetype_data *arch) {
 	struct archetype_skill *sk;
 	skill_data *skill;
+	bool show;
 	int iter;
 	
 	msg_to_desc(desc, "[\tc%s\t0] - %s\r\n", GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
 	
-	msg_to_desc(desc, "\tyAttributes\t0:\r\n");
+	// check for attributes to show
+	show = FALSE;
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-		msg_to_desc(desc, " %s: %s%d\t0 (%s)\r\n", attributes[iter].name, HAPPY_COLOR(GET_ARCH_ATTRIBUTE(arch, iter), 2), GET_ARCH_ATTRIBUTE(arch, iter), attributes[iter].creation_description);
+		if (GET_ARCH_ATTRIBUTE(arch, iter) != 0) {
+			show = TRUE;
+			break;
+		}
+	}
+	if (show) {
+		msg_to_desc(desc, "\tyAttributes\t0:\r\n");
+		for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+			msg_to_desc(desc, " %s: %s%d\t0 (%s)\r\n", attributes[iter].name, HAPPY_COLOR(GET_ARCH_ATTRIBUTE(arch, iter), 2), GET_ARCH_ATTRIBUTE(arch, iter), attributes[iter].creation_description);
+		}
 	}
 	
-	msg_to_desc(desc, "\tySkills\t0:\r\n");
+	// check for skills to show
+	show = FALSE;
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
-		if ((skill = find_skill_by_vnum(sk->skill))) {
-			msg_to_desc(desc, " %s: \tg%d\t0 (%s)\r\n", SKILL_NAME(skill), sk->level, SKILL_DESC(skill));
+		if (sk->level != 0) {
+			show = TRUE;
+			break;
+		}
+	}
+	if (show) {
+		msg_to_desc(desc, "\tySkills\t0:\r\n");
+		for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
+			if ((skill = find_skill_by_vnum(sk->skill))) {
+				msg_to_desc(desc, " %s: \tg%d\t0 (%s)\r\n", SKILL_NAME(skill), sk->level, SKILL_DESC(skill));
+			}
 		}
 	}
 }
