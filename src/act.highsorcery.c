@@ -318,9 +318,7 @@ bool can_use_ritual(char_data *ch, int ritual) {
 INTERACTION_FUNC(devastate_crop) {	
 	crop_data *cp = ROOM_CROP(inter_room);
 	obj_data *newobj;
-	int num;
-
-	num = number(1, 4) * interaction->quantity;
+	int num = interaction->quantity;
 	
 	msg_to_char(ch, "You devastate the %s and collect %s (x%d)!\r\n", GET_CROP_NAME(cp), get_obj_name_by_proto(interaction->vnum), num);
 	sprintf(buf, "$n's powerful ritual devastates the %s crops!", GET_CROP_NAME(cp));
