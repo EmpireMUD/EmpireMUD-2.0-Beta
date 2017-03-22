@@ -1244,6 +1244,11 @@ ACMD(do_circle) {
 			break;
 		}
 		
+		if (iter > 0 && !ROOM_IS_CLOSED(to_room)) {
+			found_room = to_room;
+			break;
+		}
+		
 		// detect blocked array
 		for (side = 0; side < NUM_SIMPLE_DIRS; ++side) {
 			side_room = real_shift(to_room, shift_dir[side][0], shift_dir[side][1]);
@@ -1291,11 +1296,6 @@ ACMD(do_circle) {
 		if (!found_side_clear) {
 			msg_to_char(ch, "There is a barrier in the way.\r\n");
 			ok = FALSE;
-			break;
-		}
-		
-		if (!ROOM_IS_CLOSED(to_room)) {
-			found_room = to_room;
 			break;
 		}
 	}
