@@ -811,7 +811,7 @@ OLC_MODULE(rmedit_description) {
 	}
 	else {
 		sprintf(buf, "description for %s", GET_RMT_TITLE(rmt));
-		start_string_editor(ch->desc, buf, &(GET_RMT_DESC(rmt)), MAX_ROOM_DESCRIPTION);
+		start_string_editor(ch->desc, buf, &(GET_RMT_DESC(rmt)), MAX_ROOM_DESCRIPTION, FALSE);
 	}
 }
 

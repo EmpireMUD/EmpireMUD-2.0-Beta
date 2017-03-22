@@ -1506,7 +1506,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			if (!ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))) {
 				gain_ability_exp(ch, ABIL_CUSTOMIZE_BUILDING, 33.4);
 			}
-			start_string_editor(ch->desc, "room description", &(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))), MAX_ROOM_DESCRIPTION);
+			start_string_editor(ch->desc, "room description", &(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))), MAX_ROOM_DESCRIPTION, TRUE);
 			act("$n begins editing the room description.", TRUE, ch, 0, 0, TO_ROOM);
 		}
 		else {

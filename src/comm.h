@@ -60,7 +60,7 @@ void write_to_q(const char *txt, struct txt_q *queue, int aliased, bool add_to_h
 void write_to_output(const char *txt, descriptor_data *d);
 void page_string(descriptor_data *d, char *str, int keep_internal);
 void string_add(descriptor_data *d, char *str);
-void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_t max_len);
+void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_t max_len, bool allow_null);
 
 #define SEND_TO_Q(messg, desc)  write_to_output((messg), desc)
 

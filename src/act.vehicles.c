@@ -731,7 +731,9 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			proto = vehicle_proto(VEH_VNUM(veh));
 			
 			if (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto)) {
-				free(VEH_LOOK_DESC(veh));
+				if (VEH_LOOK_DESC(veh)) {
+					free(VEH_LOOK_DESC(veh));
+				}
 				VEH_LOOK_DESC(veh) = VEH_LOOK_DESC(proto);
 			}
 			msg_to_char(ch, "It no longer has a custom description.\r\n");
@@ -741,12 +743,12 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			
 			if (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto)) {
 				// differs from proto
-				start_string_editor(ch->desc, "vehicle description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION);
+				start_string_editor(ch->desc, "vehicle description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
 			}
 			else {
 				// has proto's desc
-				VEH_LOOK_DESC(veh) = str_dup(VEH_LOOK_DESC(proto));
-				start_string_editor(ch->desc, "vehicle description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION);
+				VEH_LOOK_DESC(veh) = VEH_LOOK_DESC(proto) ? str_dup(VEH_LOOK_DESC(proto)) : NULL;
+				start_string_editor(ch->desc, "vehicle description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
 			}
 			
 			act("$n begins editing a vehicle description.", TRUE, ch, 0, 0, TO_ROOM);

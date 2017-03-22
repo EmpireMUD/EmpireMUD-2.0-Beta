@@ -227,7 +227,7 @@ ACMD(do_mail) {
 			act("$n starts to write some mail.", TRUE, ch, 0, 0, TO_ROOM);
 			SET_BIT(PLR_FLAGS(ch), PLR_MAILING);
 			CREATE(write, char *, 1);
-			start_string_editor(ch->desc, "your message", write, MAX_MAIL_SIZE);
+			start_string_editor(ch->desc, "your message", write, MAX_MAIL_SIZE, FALSE);
 			ch->desc->mail_to = index->idnum;
 		}
 	}

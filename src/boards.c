@@ -274,7 +274,7 @@ int Board_write_message(int board_type, char_data *ch, char *arg, obj_data *boar
 
 	act("$n starts to write a message.", TRUE, ch, 0, 0, TO_ROOM);
 
-	start_string_editor(ch->desc, "your message", &(msg_storage[NEW_MSG_INDEX(board_type).slot_num]), MAX_MESSAGE_LENGTH);
+	start_string_editor(ch->desc, "your message", &(msg_storage[NEW_MSG_INDEX(board_type).slot_num]), MAX_MESSAGE_LENGTH, FALSE);
 	ch->desc->mail_to = board_type + BOARD_MAGIC;
 
 	num_of_msgs[board_type]++;
@@ -673,7 +673,7 @@ int Board_respond_message(int board_type, char_data *ch, char *arg, obj_data *bo
 	NEW_MSG_INDEX(board_type).reply_num = MSG_SLOTNUM(board_type, ind);
 	
 	act("$n starts to write a message.", TRUE, ch, 0, 0, TO_ROOM);
-	start_string_editor(ch->desc, "your message", &(msg_storage[NEW_MSG_INDEX(board_type).slot_num]), MAX_MESSAGE_LENGTH);
+	start_string_editor(ch->desc, "your message", &(msg_storage[NEW_MSG_INDEX(board_type).slot_num]), MAX_MESSAGE_LENGTH, FALSE);
 	ch->desc->mail_to = board_type + BOARD_MAGIC;
 
 	num_of_msgs[board_type]++;

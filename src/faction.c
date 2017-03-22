@@ -1254,7 +1254,7 @@ OLC_MODULE(fedit_description) {
 	}
 	else {
 		sprintf(buf, "description for %s", FCT_NAME(fct));
-		start_string_editor(ch->desc, buf, &FCT_DESCRIPTION(fct), MAX_FACTION_DESCRIPTION);
+		start_string_editor(ch->desc, buf, &FCT_DESCRIPTION(fct), MAX_FACTION_DESCRIPTION, FALSE);
 	}
 }
 

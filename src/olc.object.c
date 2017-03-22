@@ -1495,7 +1495,7 @@ void save_olc_object(descriptor_data *desc) {
 * @param extra_descr_data *ex The extra description.
 */
 void setup_extra_desc_editor(char_data *ch, struct extra_descr_data *ex) {
-	start_string_editor(ch->desc, "extra description", &(ex->description), MAX_ITEM_DESCRIPTION);
+	start_string_editor(ch->desc, "extra description", &(ex->description), MAX_ITEM_DESCRIPTION, FALSE);
 }
 
 
@@ -1865,7 +1865,7 @@ OLC_MODULE(oedit_action_desc) {
 	}
 	else {
 		sprintf(buf, "description for %s", GET_OBJ_SHORT_DESC(obj));
-		start_string_editor(ch->desc, buf, &GET_OBJ_ACTION_DESC(obj), MAX_ITEM_DESCRIPTION);
+		start_string_editor(ch->desc, buf, &GET_OBJ_ACTION_DESC(obj), MAX_ITEM_DESCRIPTION, TRUE);
 	}
 }
 

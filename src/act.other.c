@@ -2107,7 +2107,7 @@ ACMD(do_mydescription) {
 			msg_to_char(ch, "You are already editing text.\r\n");
 		}
 		else {
-			start_string_editor(ch->desc, "your description", &(GET_LONG_DESC(ch)), MAX_PLAYER_DESCRIPTION);
+			start_string_editor(ch->desc, "your description", &(GET_LONG_DESC(ch)), MAX_PLAYER_DESCRIPTION, TRUE);
 		}
 	}
 	else {

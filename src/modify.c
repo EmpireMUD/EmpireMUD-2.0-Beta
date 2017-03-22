@@ -99,8 +99,9 @@ void smash_tilde(char *str) {
 * @param char *prompt The thing being edited ("name", "description for Mobname").
 * @param char **writeto The place where the string will be stored.
 * @param size_t max_len The maximum string length.
+* @param bool allow_null If TRUE, empty strings will be freed and left null.
 */
-void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_t max_len) {
+void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_t max_len, bool allow_null) {
 	if (d->str) {
 		log("SYSERR: start_string_editor called for player already using string editor (len:%d)", (int)max_len);
 		return;
@@ -121,6 +122,7 @@ void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_
 	d->notes_id = 0;
 	d->save_empire = NOTHING;
 	d->file_storage = NULL;
+	d->allow_null = allow_null;
 	
 	if (STATE(d) == CON_PLAYING && !d->straight_to_editor) {
 		msg_to_desc(d, "&cEdit %s: (, to add; ,/s to save; ,/h for help)&0\r\n", prompt);
@@ -207,7 +209,12 @@ void string_add(descriptor_data *d, char *str) {
 		case STRINGADD_SAVE:
 			if (d->str && *d->str && **d->str == '\0') {
 				free(*d->str);
-				*d->str = str_dup("Nothing.\r\n");
+				if (d->allow_null) {
+					*d->str = NULL;
+				}
+				else {
+					*d->str = str_dup("Nothing.\r\n");
+				}
 			}
 			if (d->backstr)
 				free(d->backstr);

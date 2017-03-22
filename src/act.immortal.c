@@ -5210,7 +5210,7 @@ ACMD(do_editnotes) {
 	else {
 		sprintf(buf, "notes for account %d", acct->id);
 	}
-	start_string_editor(ch->desc, buf, &(acct->notes), MAX_ADMIN_NOTES_LENGTH-1);
+	start_string_editor(ch->desc, buf, &(acct->notes), MAX_ADMIN_NOTES_LENGTH-1, TRUE);
 	ch->desc->notes_id = acct->id;
 
 	act("$n begins editing some notes.", TRUE, ch, FALSE, FALSE, TO_ROOM);
@@ -6977,7 +6977,7 @@ ACMD(do_tedit) {
 	}
 
 	/* set up editor stats */
-	start_string_editor(ch->desc, "file", tedit_option[l].buffer, tedit_option[l].size);
+	start_string_editor(ch->desc, "file", tedit_option[l].buffer, tedit_option[l].size, FALSE);
 	ch->desc->file_storage = str_dup(tedit_option[l].filename);
 	act("$n begins editing a file.", TRUE, ch, 0, 0, TO_ROOM);
 }

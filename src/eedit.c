@@ -390,7 +390,7 @@ EEDIT(eedit_description) {
 	}
 	
 	sprintf(buf, "description for %s", EMPIRE_NAME(emp));
-	start_string_editor(ch->desc, buf, &EMPIRE_DESCRIPTION(emp), MAX_EMPIRE_DESCRIPTION);
+	start_string_editor(ch->desc, buf, &EMPIRE_DESCRIPTION(emp), MAX_EMPIRE_DESCRIPTION, TRUE);
 	ch->desc->save_empire = EMPIRE_VNUM(emp);
 }
 
@@ -436,7 +436,7 @@ EEDIT(eedit_motd) {
 	}
 	
 	sprintf(buf, "motd for %s", EMPIRE_NAME(emp));
-	start_string_editor(ch->desc, buf, &EMPIRE_MOTD(emp), MAX_MOTD_LENGTH);
+	start_string_editor(ch->desc, buf, &EMPIRE_MOTD(emp), MAX_MOTD_LENGTH, TRUE);
 	ch->desc->save_empire = EMPIRE_VNUM(emp);
 }
 

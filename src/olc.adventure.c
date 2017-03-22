@@ -739,7 +739,7 @@ OLC_MODULE(advedit_description) {
 	}
 	else {
 		sprintf(buf, "description for %s", GET_ADV_NAME(adv));
-		start_string_editor(ch->desc, buf, &(GET_ADV_DESCRIPTION(adv)), MAX_ROOM_DESCRIPTION);
+		start_string_editor(ch->desc, buf, &(GET_ADV_DESCRIPTION(adv)), MAX_ROOM_DESCRIPTION, FALSE);
 	}
 }
 
