@@ -2673,13 +2673,21 @@ ACMD(do_score) {
 
 ACMD(do_survey) {
 	struct empire_city_data *city;
+	struct empire_island *eisle;
 	struct island_info *island;
 	
 	msg_to_char(ch, "You survey the area:\r\n");
 	
 	if (GET_ISLAND_ID(IN_ROOM(ch)) != NO_ISLAND) {
 		island = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE);
-		msg_to_char(ch, "Location: %s%s\r\n", get_island_name_for(island->id, ch), IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "");
+		
+		// find out if it has a local name
+		if (GET_LOYALTY(ch) && (eisle = get_empire_island(GET_LOYALTY(ch), island->id)) && eisle->name && str_cmp(eisle->name, island->name)) {
+			msg_to_char(ch, "Location: %s (%s)%s\r\n", get_island_name_for(island->id, ch), island->name, IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "");
+		}
+		else {
+			msg_to_char(ch, "Location: %s%s\r\n", get_island_name_for(island->id, ch), IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "");
+		}
 	}
 	
 	// empire
