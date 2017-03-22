@@ -852,7 +852,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "quests", POS_DEAD, do_quest, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "quaff", POS_RESTING, do_quaff, NO_MIN, CTYPE_MOVE ),
 	STANDARD_CMD( "quarry", POS_STANDING, do_quarry, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
-	STANDARD_CMD( "quit", POS_DEAD, do_quit, NO_MIN, NO_GRANTS, SCMD_QUIT, CTYPE_UTIL, CMD_NOT_RP | CMD_NO_ABBREV, NO_ABIL ),
+	STANDARD_CMD( "quit", POS_DEAD, do_quit, NO_MIN, NO_GRANTS, SCMD_QUIT, CTYPE_UTIL, CMD_NO_ABBREV, NO_ABIL ),
 
 	SIMPLE_CMD( "reply", POS_DEAD, do_reply, NO_MIN, CTYPE_COMM ),
 	ABILITY_CMD( "radiance", POS_STANDING, do_radiance, NO_MIN, CTYPE_SKILL, ABIL_RADIANCE ),

@@ -240,7 +240,7 @@ void msdp_update_room(char_data *ch) {
 	MSDPSetString(desc, eMSDP_AREA_NAME, area_name);
 	
 	// room var: table
-	buf_size = snprintf(buf, sizeof(buf), "%cVNUM%c%d", (char)MSDP_VAR, (char)MSDP_VAL, GET_ROOM_VNUM(IN_ROOM(ch)));
+	buf_size = snprintf(buf, sizeof(buf), "%cVNUM%c%d", (char)MSDP_VAR, (char)MSDP_VAL, IS_IMMORTAL(ch) ? GET_ROOM_VNUM(IN_ROOM(ch)) : 0);
 	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cNAME%c%s", (char)MSDP_VAR, (char)MSDP_VAL, get_room_name(IN_ROOM(ch), FALSE));
 	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cAREA%c%s", (char)MSDP_VAR, (char)MSDP_VAL, area_name);
 	
@@ -263,7 +263,7 @@ void msdp_update_room(char_data *ch) {
 		struct room_direction_data *ex;
 		for (ex = COMPLEX_DATA(IN_ROOM(ch))->exits; ex; ex = ex->next) {
 			if (ex->room_ptr && !EXIT_FLAGGED(ex, EX_CLOSED)) {
-				ex_size += snprintf(exits + ex_size, sizeof(exits) - ex_size, "%c%s%c%d", (char)MSDP_VAR, alt_dirs[ex->dir], (char)MSDP_VAL, GET_ROOM_VNUM(ex->room_ptr));
+				ex_size += snprintf(exits + ex_size, sizeof(exits) - ex_size, "%c%s%c%d", (char)MSDP_VAR, alt_dirs[ex->dir], (char)MSDP_VAL, IS_IMMORTAL(ch) ? GET_ROOM_VNUM(ex->room_ptr) : 0);
 			}
 		}
 	}
@@ -271,7 +271,7 @@ void msdp_update_room(char_data *ch) {
 	MSDPSetTable(desc, eMSDP_ROOM, buf);
 	
 	// simple room data
-	MSDPSetNumber(desc, eMSDP_ROOM_VNUM, GET_ROOM_VNUM(IN_ROOM(ch)));
+	MSDPSetNumber(desc, eMSDP_ROOM_VNUM, IS_IMMORTAL(ch) ? GET_ROOM_VNUM(IN_ROOM(ch)) : 0);
 	MSDPSetString(desc, eMSDP_ROOM_NAME, get_room_name(IN_ROOM(ch), FALSE));
 	MSDPSetTable(desc, eMSDP_ROOM_EXITS, exits);
 }
