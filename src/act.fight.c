@@ -635,6 +635,7 @@ ACMD(do_tie) {
 
 
 ACMD(do_throw) {
+	extern int count_objs_in_room(room_data *room);
 	extern const int rev_dir[];
 
 	int dir = NO_DIR;
@@ -679,6 +680,17 @@ ACMD(do_throw) {
 	if (OBJ_BOUND_TO(obj) && ROOM_OWNER(to_room) && ROOM_OWNER(to_room) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You can't throw bound items there.\r\n");
 		return;
+	}
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
+		msg_to_char(ch, "You can't throw quest items.\r\n");
+		return;
+	}
+	if (ROOM_BLD_FLAGGED(to_room, BLD_ITEM_LIMIT)) {
+		int size = (OBJ_FLAGGED(obj, OBJ_LARGE) ? 2 : 1);
+		if ((size + count_objs_in_room(to_room)) > config_get_int("room_item_limit")) {
+			msg_to_char(ch, "You can't throw any more items there.\r\n");
+			return;
+		}
 	}
 
 	/* If we came up with a room, lets throw! */

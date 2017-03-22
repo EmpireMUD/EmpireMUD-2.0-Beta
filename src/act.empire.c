@@ -5305,7 +5305,7 @@ ACMD(do_unpublicize) {
 
 
 ACMD(do_workforce) {
-	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH], local_arg[MAX_INPUT_LENGTH], from_island_arg[MAX_INPUT_LENGTH];
+	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH], local_arg[MAX_INPUT_LENGTH], island_arg[MAX_INPUT_LENGTH];
 	struct island_info *island = NULL;
 	bool all = FALSE, here = FALSE;
 	int iter, type, limit = 0;
@@ -5360,14 +5360,14 @@ ACMD(do_workforce) {
 	}
 	else if (is_abbrev(arg, "copy")) {
 		// process remaining args (island name may have quotes)
-		argument = any_one_word(argument, from_island_arg);
+		argument = any_one_word(argument, island_arg);
 		
-		if (!*from_island_arg) {
+		if (!*island_arg) {
 			msg_to_char(ch, "Usage: workforce copy <from island>\r\n");
 			return;
 		}
-		if (!(island = get_island_by_name(ch, from_island_arg)) && !(island = get_island_by_coords(from_island_arg))) {
-			msg_to_char(ch, "Unknown island \"%s\".\r\n", from_island_arg);
+		if (!(island = get_island_by_name(ch, island_arg)) && !(island = get_island_by_coords(island_arg))) {
+			msg_to_char(ch, "Unknown island \"%s\".\r\n", island_arg);
 			return;
 		}
 		
@@ -5387,13 +5387,7 @@ ACMD(do_workforce) {
 		
 		// process remaining args (island name may have quotes)
 		argument = any_one_arg(argument, lim_arg);
-		skip_spaces(&argument);
-		while (*argument == '"') {	// remove initial "
-			++argument;
-		}
-		if (*argument && argument[strlen(argument)-1] == '"') {	// remove trailing "
-			argument[strlen(argument)-1] = '\0';
-		}
+		any_one_word(argument, island_arg);
 		
 		// limit arg
 		if (!*lim_arg) {
@@ -5415,7 +5409,7 @@ ACMD(do_workforce) {
 		}
 		
 		// island arg
-		if (!*argument) {
+		if (!*island_arg) {
 			if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND) {
 				msg_to_char(ch, "You can't set local workforce options when you're not on any island.\r\n");
 				return;
@@ -5424,11 +5418,11 @@ ACMD(do_workforce) {
 				here = TRUE;
 			}
 		}
-		else if (!str_cmp(argument, "all")) {
+		else if (!str_cmp(island_arg, "all")) {
 			all = TRUE;
 		}
-		else if (!(island = get_island_by_name(ch, argument)) && !(island = get_island_by_coords(argument))) {
-			msg_to_char(ch, "Unknown island \"%s\".\r\n", argument);
+		else if (!(island = get_island_by_name(ch, island_arg)) && !(island = get_island_by_coords(island_arg))) {
+			msg_to_char(ch, "Unknown island \"%s\".\r\n", island_arg);
 			return;
 		}
 		
