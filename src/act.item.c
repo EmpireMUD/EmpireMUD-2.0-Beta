@@ -3301,7 +3301,7 @@ void warehouse_store(char_data *ch, char *argument) {
 	empire_data *room_emp = ROOM_OWNER(IN_ROOM(ch));
 	char numarg[MAX_INPUT_LENGTH], *tmp;
 	obj_data *obj, *next_obj;
-	int total = 1, done = 0, count = 0, dotmode;
+	int total = 1, done = 0, dotmode;
 	bool full = FALSE;
 	
 	if (!*argument) {
@@ -3379,7 +3379,7 @@ void warehouse_store(char_data *ch, char *argument) {
 			return;
 		}
 
-		while (obj && (dotmode == FIND_ALLDOT || count < total)) {
+		while (obj && (dotmode == FIND_ALLDOT || done < total)) {
 			next_obj = get_obj_in_list_vis(ch, argument, obj->next_content);
 
 			// bound objects never store
