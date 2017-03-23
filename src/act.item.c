@@ -3508,7 +3508,7 @@ ACMD(do_drink) {
 		}
 	}
 
-	if (type == NOTHING && !(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	if (type == NOTHING && !(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))) {
 		if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(arg, "water") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)))) {
 			if (!can_drink_from_room(ch, (type = drink_ROOM))) {
 				return;
