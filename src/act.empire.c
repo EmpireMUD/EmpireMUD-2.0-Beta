@@ -1194,7 +1194,7 @@ void found_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can't found a city on a newbie island.\r\n");
 		return;
 	}
-	if (ROOM_IS_CLOSED(IN_ROOM(ch)) || COMPLEX_DATA(IN_ROOM(ch)) || IS_WATER_SECT(SECT(IN_ROOM(ch))) || ROOM_SECT_FLAGGED(IN_ROOM(ch), nocity_flags)) {
+	if (ROOM_IS_CLOSED(IN_ROOM(ch)) || COMPLEX_DATA(IN_ROOM(ch)) || WATER_SECT(IN_ROOM(ch)) || ROOM_SECT_FLAGGED(IN_ROOM(ch), nocity_flags)) {
 		msg_to_char(ch, "You can't found a city on this type of terrain.\r\n");
 		return;
 	}

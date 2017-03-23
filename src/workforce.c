@@ -258,7 +258,7 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	if (!emp || !veh || !IN_ROOM(veh)) {
 		return;
 	}
-	if (IS_WATER_SECT(SECT(IN_ROOM(veh))) || (island = GET_ISLAND_ID(IN_ROOM(veh))) == NO_ISLAND) {
+	if (WATER_SECT(IN_ROOM(veh)) || (island = GET_ISLAND_ID(IN_ROOM(veh))) == NO_ISLAND) {
 		return;
 	}
 	if (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)) {

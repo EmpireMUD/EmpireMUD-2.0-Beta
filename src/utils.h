@@ -1167,7 +1167,6 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 #define GET_SECT_VNUM(sect)  ((sect)->vnum)
 
 // utils
-#define IS_WATER_SECT(sct)  SECT_FLAGGED((sct), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER)
 #define SECT_FLAGGED(sct, flg)  (IS_SET(GET_SECT_FLAGS(sct), (flg)))
 
 

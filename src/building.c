@@ -642,7 +642,7 @@ void herd_animals_out(room_data *location) {
 				}
 			
 				// move the mob
-				if ((!to_room || IS_WATER_SECT(SECT(to_room))) && to_reverse && ROOM_BLD_FLAGGED(location, BLD_TWO_ENTRANCES)) {
+				if ((!to_room || WATER_SECT(to_room)) && to_reverse && ROOM_BLD_FLAGGED(location, BLD_TWO_ENTRANCES)) {
 					if (perform_move(ch_iter, BUILDING_ENTRANCE(location), TRUE, 0)) {
 						found_any = TRUE;
 					}
