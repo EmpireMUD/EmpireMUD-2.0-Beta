@@ -433,7 +433,7 @@ void point_update_char(char_data *ch) {
 
 	// healing for NPCs -- pcs are in real_update
 	if (IS_NPC(ch)) {
-		if (GET_POS(ch) >= POS_STUNNED && !FIGHTING(ch)) {
+		if (GET_POS(ch) >= POS_STUNNED && !FIGHTING(ch) && !GET_FED_ON_BY(ch)) {
 			// verify not fighting at all
 			for (c = ROOM_PEOPLE(IN_ROOM(ch)), found = FALSE; c && !found; c = c->next_in_room) {
 				if (FIGHTING(c) == ch) {
