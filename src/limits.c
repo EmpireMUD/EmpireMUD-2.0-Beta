@@ -254,6 +254,12 @@ void check_should_dismount(char_data *ch) {
 	else if (MOUNT_FLAGGED(ch, MOUNT_FLYING) && !CAN_RIDE_FLYING_MOUNT(ch)) {
 		ok = FALSE;
 	}
+	else if (DEEP_WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
+		ok = FALSE;
+	}
+	else if (!has_ability(ch, ABIL_ALL_TERRAIN_RIDING) && WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
+		ok = FALSE;
+	}
 	
 	if (!ok) {
 		do_dismount(ch, "", 0, 0);
