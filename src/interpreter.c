@@ -2196,6 +2196,7 @@ void nanny(descriptor_data *d, char *arg) {
 				clear_char(d->character);
 				init_player_specials(d->character);
 				d->character->desc = d;
+				d->character->prev_host = str_dup(d->host);	// this will be overwritten if it's not a new char
 			}
 			
 			if (!*arg) {
