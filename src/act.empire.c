@@ -2290,7 +2290,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 			else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(room)) && multi_isname(argument, GET_CROP_NAME(crop))) {
 				ok = TRUE;
 			}
-			else if (multi_isname(argument, get_room_name(room, FALSE))) {
+			else if (multi_isname(argument, get_room_name(room, FALSE)) && !CHECK_CHAMELEON(map, room)) {
 				ok = TRUE;
 			}
 			else {
