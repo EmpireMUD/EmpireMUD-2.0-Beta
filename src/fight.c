@@ -2372,7 +2372,7 @@ void besiege_room(room_data *to_room, int damage) {
 	// if we got this far, we need to hurt some people
 	for (c = ROOM_PEOPLE(to_room); c; c = next_c) {
 		next_c = c->next_in_room;
-		if (GET_DEXTERITY(c) >= 3 && number(0, GET_DEXTERITY(c) / 3)) {
+		if ((GET_DEXTERITY(c) >= 3 && number(0, GET_DEXTERITY(c) / 3)) || IS_IMMORTAL(c)) {
 			msg_to_char(c, "You leap out of the way!\r\n");
 		}
 		else {
