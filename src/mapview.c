@@ -1212,7 +1212,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	}
 
 	/* Hidden buildings */
-	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(to_room) && (!map_loc || !map_to_room || distance(FLAT_X_COORD(map_loc), FLAT_Y_COORD(map_loc), FLAT_X_COORD(map_to_room), FLAT_Y_COORD(map_to_room)) > 2)) {
+	else if (CHECK_CHAMELEON(map_loc, to_room)) {
 		strcat(buf, base_icon->icon);
 		hidden = TRUE;
 	}
@@ -1564,7 +1564,7 @@ char *get_screenreader_room_name(room_data *from_room, room_data *to_room) {
 	
 	strcpy(temp, "*");
 	
-	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(to_room) && compute_distance(from_room, to_room) >= 2) {
+	if (CHECK_CHAMELEON(from_room, to_room)) {
 		strcpy(temp, GET_SECT_NAME(BASE_SECT(to_room)));
 	}
 	else if (GET_BUILDING(to_room) && ROOM_BLD_FLAGGED(to_room, BLD_BARRIER) && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY)) {
@@ -1588,7 +1588,7 @@ char *get_screenreader_room_name(room_data *from_room, room_data *to_room) {
 	}
 	
 	// now check custom name
-	if (ROOM_CUSTOM_NAME(to_room)) {
+	if (ROOM_CUSTOM_NAME(to_room) && !CHECK_CHAMELEON(from_room, to_room)) {
 		sprintf(lbuf, "%s/%s", ROOM_CUSTOM_NAME(to_room), temp);
 	}
 	else {

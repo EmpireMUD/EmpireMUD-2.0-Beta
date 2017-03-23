@@ -2284,7 +2284,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 			if (multi_isname(argument, GET_SECT_NAME(SECT(room)))) {
 				ok = TRUE;
 			}
-			else if (GET_BUILDING(room) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(room))) && !(ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(room) && compute_distance(map, room) >= 2)) {
+			else if (GET_BUILDING(room) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(room))) && !CHECK_CHAMELEON(map, room)) {
 				ok = TRUE;
 			}
 			else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(room)) && multi_isname(argument, GET_CROP_NAME(crop))) {
