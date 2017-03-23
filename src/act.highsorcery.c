@@ -994,13 +994,18 @@ ACMD(do_mirrorimage) {
 	extern struct custom_message *pick_custom_longdesc(char_data *ch);
 	void scale_mob_as_familiar(char_data *mob, char_data *master);
 	
-	char buf[MAX_STRING_LENGTH], *tmp;
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], *tmp;
 	char_data *mob, *other;
 	obj_data *wield;
 	int cost = GET_MAX_MANA(ch) / 5;
 	mob_vnum vnum = MIRROR_IMAGE_MOB;
 	struct custom_message *ocm;
 	bool found;
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot use mirrorimage.\r\n");
+		return;
+	}
 	
 	if (!can_use_ability(ch, ABIL_MIRRORIMAGE, MANA, cost, COOLDOWN_MIRRORIMAGE)) {
 		return;
@@ -1034,10 +1039,11 @@ ACMD(do_mirrorimage) {
 	// restrings
 	GET_PC_NAME(mob) = str_dup(PERS(ch, ch, FALSE));
 	GET_SHORT_DESC(mob) = str_dup(GET_PC_NAME(mob));
+	GET_REAL_SEX(mob) = GET_REAL_SEX(ch);	// need this for some desc stuff
 	
 	// longdesc is more complicated
 	if (GET_MORPH(ch)) {
-		strcpy(buf, MORPH_LONG_DESC(GET_MORPH(ch)));
+		sprintf(buf, "%s\r\n", MORPH_LONG_DESC(GET_MORPH(ch)));
 	}
 	else if ((ocm = pick_custom_longdesc(ch))) {
 		sprintf(buf, "%s\r\n", ocm->msg);
@@ -1069,10 +1075,17 @@ ACMD(do_mirrorimage) {
 		sprintf(buf, "%s is standing here.\r\n", GET_SHORT_DESC(mob));
 	}
 	*buf = UPPER(*buf);
-	GET_LONG_DESC(mob) = str_dup(buf);
+	
+	// attach rank if needed
+	if (GET_LOYALTY(ch)) {
+		sprintf(buf2, "<%s&0&y> %s", EMPIRE_RANK(GET_LOYALTY(ch), GET_RANK(ch)-1), buf);
+		GET_LONG_DESC(mob) = str_dup(buf2);
+	}
+	else {
+		GET_LONG_DESC(mob) = str_dup(buf);
+	}
 	
 	// stats
-	GET_REAL_SEX(mob) = GET_REAL_SEX(ch);
 	
 	// inherit scaled mob health
 	// mob->points.max_pools[HEALTH] = get_approximate_level(ch) * level_health_mod;
