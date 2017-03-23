@@ -3001,7 +3001,6 @@ void delete_player_character(char_data *ch) {
 	player_index_data *index;
 	empire_data *emp = NULL;
 	char filename[256];
-	account_data *acct;
 	
 	if (IS_NPC(ch)) {
 		syslog(SYS_ERROR, 0, TRUE, "SYSERR: delete_player_character called on NPC");
@@ -3017,9 +3016,8 @@ void delete_player_character(char_data *ch) {
 	}
 	
 	// remove account and player index
-	if ((acct = GET_ACCOUNT(ch))) {
+	if (GET_ACCOUNT(ch)) {
 		remove_player_from_account(ch);
-		SAVE_ACCOUNT(acct);
 	}
 	if ((index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
 		remove_player_from_table(index);
