@@ -764,7 +764,11 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 		}
 		die(vict, killer ? killer : vict);
 	}
-}  
+	else if (modifier < 0 && GET_HEALTH(vict) > 0 && GET_POS(vict) < POS_SLEEPING) {
+		msg_to_char(vict, "You recover and wake up.\r\n");
+		GET_POS(vict) = IS_NPC(vict) ? POS_STANDING : POS_SITTING;
+	}
+}
 
 
 /**
