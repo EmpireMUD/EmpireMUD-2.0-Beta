@@ -994,7 +994,7 @@ ACMD(do_mirrorimage) {
 	extern struct custom_message *pick_custom_longdesc(char_data *ch);
 	void scale_mob_as_familiar(char_data *mob, char_data *master);
 	
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], *tmp;
 	char_data *mob, *other;
 	obj_data *wield;
 	int cost = GET_MAX_MANA(ch) / 5;
@@ -1040,7 +1040,30 @@ ACMD(do_mirrorimage) {
 		strcpy(buf, MORPH_LONG_DESC(GET_MORPH(ch)));
 	}
 	else if ((ocm = pick_custom_longdesc(ch))) {
-		strcpy(buf, ocm->msg);
+		sprintf(buf, "%s\r\n", ocm->msg);
+		
+		// must process $n, $s, $e, $m
+		if (strstr(buf, "$n")) {
+			tmp = str_replace("$n", GET_SHORT_DESC(mob), buf);
+			strcpy(buf, tmp);
+			free(tmp);
+		}
+		if (strstr(buf, "$s")) {
+			tmp = str_replace("$s", HSHR(mob), buf);
+			strcpy(buf, tmp);
+			free(tmp);
+		}
+		if (strstr(buf, "$e")) {
+			tmp = str_replace("$e", HSSH(mob), buf);
+			strcpy(buf, tmp);
+			free(tmp);
+		}
+		if (strstr(buf, "$m")) {
+			tmp = str_replace("$m", HMHR(mob), buf);
+			strcpy(buf, tmp);
+			free(tmp);
+		}
+
 	}
 	else {
 		sprintf(buf, "%s is standing here.\r\n", GET_SHORT_DESC(mob));
