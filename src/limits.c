@@ -698,7 +698,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// less drunk
-	gain_condition(ch, DRUNK, -1);
+	gain_condition(ch, DRUNK, AWAKE(ch) ? -1 : -6);
 	
 	// ensure character isn't under on primary attributes
 	check_attribute_gear(ch);
