@@ -991,12 +991,15 @@ ACMD(do_manashield) {
 
 ACMD(do_mirrorimage) {
 	extern char_data *has_familiar(char_data *ch);
+	extern struct custom_message *pick_custom_longdesc(char_data *ch);
 	void scale_mob_as_familiar(char_data *mob, char_data *master);
 	
+	char buf[MAX_STRING_LENGTH];
 	char_data *mob, *other;
 	obj_data *wield;
 	int cost = GET_MAX_MANA(ch) / 5;
 	mob_vnum vnum = MIRROR_IMAGE_MOB;
+	struct custom_message *ocm;
 	bool found;
 	
 	if (!can_use_ability(ch, ABIL_MIRRORIMAGE, MANA, cost, COOLDOWN_MIRRORIMAGE)) {
@@ -1031,7 +1034,17 @@ ACMD(do_mirrorimage) {
 	// restrings
 	GET_PC_NAME(mob) = str_dup(PERS(ch, ch, FALSE));
 	GET_SHORT_DESC(mob) = str_dup(GET_PC_NAME(mob));
-	sprintf(buf, "%s is standing here.\r\n", GET_SHORT_DESC(mob));
+	
+	// longdesc is more complicated
+	if (GET_MORPH(ch)) {
+		strcpy(buf, MORPH_LONG_DESC(GET_MORPH(ch)));
+	}
+	else if ((ocm = pick_custom_longdesc(ch))) {
+		strcpy(buf, ocm->msg);
+	}
+	else {
+		sprintf(buf, "%s is standing here.\r\n", GET_SHORT_DESC(mob));
+	}
 	*buf = UPPER(*buf);
 	GET_LONG_DESC(mob) = str_dup(buf);
 	
