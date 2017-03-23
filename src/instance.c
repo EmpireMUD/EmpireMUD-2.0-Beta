@@ -1095,7 +1095,7 @@ static void reset_instance_room(struct instance_data *inst, room_data *room) {
 						if (inst->level > 0) {
 							scale_mob_to_level(mob, inst->level);
 						}
-						act("$n arrives.", FALSE, mob, NULL, NULL, TO_ROOM);
+						act("$n arrives.", TRUE, mob, NULL, NULL, TO_ROOM);
 						load_mtrigger(mob);
 					}
 					break;
