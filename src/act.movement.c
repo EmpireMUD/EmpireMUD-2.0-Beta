@@ -443,7 +443,15 @@ void perform_transport(char_data *ch, room_data *to_room) {
  //////////////////////////////////////////////////////////////////////////////
 //// MOVE VALIDATORS /////////////////////////////////////////////////////////
 
-// dir here is a real dir, not a confused dir
+/**
+* This determines if a PLAYER can move somewhere. Mobs do not hit this check.
+*
+* @param char_data *ch The player moving.
+* @param int dir A real dir, not a confused dir.
+* @param room_data *to_room The target room.
+* @param int need_specials_check If TRUE, the player is following someone.
+* @return int 0 for fail, 1 for success
+*/
 int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check) {
 	ACMD(do_dismount);
 	
@@ -467,7 +475,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 		}
 		return 0;
 	}
-	if (!IS_IMMORTAL(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && !IS_INSIDE(IN_ROOM(ch)) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && IS_ANY_BUILDING(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && ROOM_IS_CLOSED(to_room) && !need_specials_check) {
+	if (!IS_IMMORTAL(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && !IS_INSIDE(IN_ROOM(ch)) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && IS_ANY_BUILDING(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && ROOM_IS_CLOSED(to_room) && (!need_specials_check || (ch->master && IS_NPC(ch->master)))) {
 		msg_to_char(ch, "You can't enter a building without permission.\r\n");
 		return 0;
 	}
