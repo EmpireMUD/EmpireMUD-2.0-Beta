@@ -2676,8 +2676,12 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	}
 
 	/* If you attack a pet, it hates your guts */
-	if (victim->master == ch)
+	if (victim->master == ch) {
 		stop_follower(victim);
+	}
+	if (ch->master == victim) {
+		stop_follower(ch);	// don't allow following of people while fighting them
+	}
 
 	/* If the attacker is invisible, he becomes visible */
 	if (SHOULD_APPEAR(ch))
