@@ -94,6 +94,31 @@ bool check_banner_color_string(char *str) {
 
 
 /**
+* Makes sure a potential name is unique.
+*
+* @param empire_data *for_emp The empire to be named (may be NULL) -- so we don't disqualify it for already having that name.
+* @param char *name The name to check.
+* @return bool TRUE if the name is valid/unique and FALSE if not.
+*/
+bool check_unique_empire_name(empire_data *for_emp, char *name) {
+	empire_data *emp, *next_emp;
+	
+	// check empires for same name
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (emp == for_emp) {
+			continue;
+		}
+		
+		if (!str_cmp(EMPIRE_NAME(emp), name) || !str_cmp(EMPIRE_ADJECTIVE(emp), name)) {
+			return FALSE;
+		}
+	}
+	
+	return TRUE;	// all good
+}
+
+
+/**
 * @param char *newname The proposed empire name.
 * @return bool TRUE if the name is ok.
 */
@@ -104,20 +129,11 @@ bool valid_empire_name(char *newname) {
 	char *ptr;
 	char tempname[MAX_INPUT_LENGTH];
 	bool ok = TRUE;
-	empire_data *emp, *next_emp;
 	int iter;
 	
 	// check for illegal & codes (anything other than &&)
 	if ((ptr = strchr(newname, '&')) && *(ptr+1) != '&') {
 		ok = FALSE;
-	}
-
-	// check empires for same name
-	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (!str_cmp(EMPIRE_NAME(emp), newname)) {
-			ok = FALSE;
-			break;
-		}
 	}
 	
 	// banned names
@@ -259,6 +275,8 @@ ACMD(do_eedit) {
 //// EDITOR COMMANDS /////////////////////////////////////////////////////////
 
 EEDIT(eedit_adjective) {
+	argument = trim(argument);
+	
 	if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
 		msg_to_char(ch, "You are not allowed to change the empire's adjective.\r\n");
 	}
@@ -273,6 +291,9 @@ EEDIT(eedit_adjective) {
 	}
 	else if (strlen(argument) > MAX_RANK_LENGTH) {
 		msg_to_char(ch, "Adjective names are limited to %d characters.\r\n", MAX_RANK_LENGTH);
+	}
+	else if (!check_unique_empire_name(emp, argument)) {
+		msg_to_char(ch, "That name is already in use.\r\n");
 	}
 	else {
 		if (EMPIRE_ADJECTIVE(emp)) {
@@ -447,6 +468,9 @@ EEDIT(eedit_name) {
 	bool file = FALSE;
 	char_data *mem;
 	
+	argument = trim(argument);
+	CAP(argument);
+	
 	if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
 		msg_to_char(ch, "You are not allowed to change the empire's name.\r\n");
 	}
@@ -465,17 +489,20 @@ EEDIT(eedit_name) {
 	else if (!valid_empire_name(argument)) {
 		msg_to_char(ch, "Invalid empire name.\r\n");
 	}
+	else if (!check_unique_empire_name(emp, argument)) {
+		msg_to_char(ch, "That name is already in use.\r\n");
+	}
 	else {
 		strcpy(buf, NULLSAFE(EMPIRE_NAME(emp)));
 		if (EMPIRE_NAME(emp)) {
 			free(EMPIRE_NAME(emp));
 		}
-		EMPIRE_NAME(emp) = str_dup(CAP(argument));
+		EMPIRE_NAME(emp) = str_dup(argument);
 		
 		if (EMPIRE_ADJECTIVE(emp)) {
 			free(EMPIRE_ADJECTIVE(emp));
 		}
-		EMPIRE_ADJECTIVE(emp) = str_dup(CAP(argument));
+		EMPIRE_ADJECTIVE(emp) = str_dup(argument);
 		
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the empire name to %s", PERS(ch, ch, TRUE), EMPIRE_NAME(emp));
 		msg_to_char(ch, "The empire's name is now: %s\r\n", EMPIRE_NAME(emp));
@@ -544,7 +571,8 @@ EEDIT(eedit_rank) {
 	bool file;
 
 	argument = any_one_word(argument, arg);
-	skip_spaces(&argument);
+	argument = trim(argument);
+	CAP(argument);
 	
 	if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
 		msg_to_char(ch, "You are not allowed to change the empire's rank names.\r\n");

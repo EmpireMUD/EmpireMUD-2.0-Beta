@@ -1186,10 +1186,11 @@ void remove_empire_from_table(empire_data *emp) {
 */
 empire_data *create_empire(char_data *ch) {
 	void add_empire_to_table(empire_data *emp);
+	extern bool check_unique_empire_name(empire_data *for_emp, char *name);
 	void resort_empires(bool force);
 
 	archetype_data *arch;
-	char colorcode[10];
+	char colorcode[10], name[MAX_STRING_LENGTH];
 	empire_vnum vnum;
 	empire_data *emp;
 	int iter;
@@ -1205,14 +1206,28 @@ empire_data *create_empire(char_data *ch) {
 		return NULL;
 	}
 	
+	// determine a name
+	sprintf(name, "%s", PERS(ch, ch, TRUE));	// 1st attempt
+	if (!check_unique_empire_name(NULL, name)) {
+		sprintf(name, "The %s Empire", PERS(ch, ch, TRUE));	// 2nd attempt
+		if (!check_unique_empire_name(NULL, name)) {
+			for (iter = 2; iter < 99; ++iter) {
+				sprintf(name, "%s %d", PERS(ch, ch, TRUE), iter);	// 3rd attempt
+				if (check_unique_empire_name(NULL, name)) {
+					break;	// valid name
+				}
+			}
+		}
+	}
+	
 	// basic creation
 	CREATE(emp, empire_data, 1);
 	EMPIRE_VNUM(emp) = vnum;
 	add_empire_to_table(emp);
 	
 	// starter data
-	EMPIRE_NAME(emp) = str_dup(PERS(ch, ch, TRUE));
-	EMPIRE_ADJECTIVE(emp) = str_dup(EMPIRE_NAME(emp));
+	EMPIRE_NAME(emp) = str_dup(name);
+	EMPIRE_ADJECTIVE(emp) = str_dup(name);
 	sprintf(colorcode, "&%c", colorlist[number(0, num_colors-1)]);	// pick random color
 	EMPIRE_BANNER(emp) = str_dup(colorcode);
 	
