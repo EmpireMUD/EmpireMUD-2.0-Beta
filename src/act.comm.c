@@ -1077,6 +1077,11 @@ ACMD(do_ignore) {
 	else if (!(victim = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
 		msg_to_char(ch, "No one by that name here.\r\n");
 	}
+	else if (is_ignoring(ch, victim)) {
+		// remove it
+		msg_to_char(ch, "You are no longer ignoring %s.\r\n", GET_NAME(victim));
+		remove_ignore(ch, GET_IDNUM(victim));
+	}
 	else if (ch == victim) {
 		msg_to_char(ch, "If you ignore yourself, who will you have left to talk to?\r\n");
 	}
