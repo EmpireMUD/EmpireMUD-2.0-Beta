@@ -2079,7 +2079,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_OBJ_VAL_POSITIONS  3	// GET_OBJ_VAL(obj, X) -- caution: changing this will require you to change the .obj file format
 #define NUM_GLB_VAL_POSITIONS  3	// GET_GLOBAL_VAL(glb, X) -- caution: changing this will require you to change the .glb file format
 #define NUM_SKILL_SETS  2	// number of different sets a player has
-#define TRACK_MOVE_TIMES  10	// player's last X move timestamps
+#define TRACK_MOVE_TIMES  20	// player's last X move timestamps
 
 
 /*
