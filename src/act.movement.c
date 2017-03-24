@@ -219,6 +219,24 @@ bool can_enter_room(char_data *ch, room_data *room) {
 
 
 /**
+* Clears a player's recent move times, which resets their shrinking map.
+*
+* @param char_data *ch The player.
+*/
+void clear_recent_moves(char_data *ch) {
+	int iter;
+	
+	if (!IS_NPC(ch)) {
+		return;
+	}
+	
+	for (iter = 0; iter < TRACK_MOVE_TIMES; ++iter) {
+		GET_MOVE_TIME(ch, iter) = 0;
+	}
+}
+
+
+/**
 * Returns the number of moves a player has made in the last 10 seconds.
 *
 * @param char_data *ch The player.

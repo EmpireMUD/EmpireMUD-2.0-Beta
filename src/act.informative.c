@@ -2372,6 +2372,7 @@ ACMD(do_inventory) {
 
 
 ACMD(do_look) {
+	void clear_recent_moves(char_data *ch);
 	void look_in_direction(char_data *ch, int dir);
 	
 	char arg2[MAX_INPUT_LENGTH];
@@ -2392,19 +2393,23 @@ ACMD(do_look) {
 	else {
 		half_chop(argument, arg, arg2);
 
-		if (!*arg)			/* "look" alone, without an argument at all */
+		if (!*arg) {			/* "look" alone, without an argument at all */
+			clear_recent_moves(ch);
 			look_at_room(ch);
+		}
 		else if (!str_cmp(arg, "out")) {
 			if (!(map = get_map_location_for(IN_ROOM(ch)))) {
 				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
 			else if (map == IN_ROOM(ch) && !ROOM_IS_CLOSED(IN_ROOM(ch))) {
+				clear_recent_moves(ch);
 				look_at_room_by_loc(ch, map, LRR_LOOK_OUT);
 			}
 			else if (!IS_IMMORTAL(ch) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT) && !RMT_FLAGGED(IN_ROOM(ch), RMT_LOOK_OUT)) {
 				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
 			else {
+				clear_recent_moves(ch);
 				look_at_room_by_loc(ch, map, LRR_LOOK_OUT);
 			}
 		}

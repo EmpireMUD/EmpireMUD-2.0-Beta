@@ -185,9 +185,7 @@ struct icon_data *get_icon_from_set(struct icon_data *set, int type) {
 int get_map_radius(char_data *ch) {
 	extern int count_recent_moves(char_data *ch);
 	
-	int mapsize, dflt, recent;
-	
-	dflt = config_get_int("default_map_size");
+	int mapsize, recent;
 
 	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
 	if (mapsize == 0) {
@@ -206,13 +204,14 @@ int get_map_radius(char_data *ch) {
 			mapsize = MIN(wide, max_size);
 		}
 		else {
-			mapsize = dflt;
+			mapsize = config_get_int("default_map_size");
 		}
 	}
 	
-	if (mapsize > dflt && (recent = count_recent_moves(ch)) > 5) {
-		mapsize -= 2 * ((recent - 5) / 2);
-		mapsize = MAX(mapsize, dflt);
+	// automatically limit size if the player is moving too fast
+	if (mapsize > 13 && (recent = count_recent_moves(ch)) > 5) {
+		mapsize -= 2 * (recent - 5);
+		mapsize = MAX(mapsize, 13);
 	}
 	
 	return mapsize;
