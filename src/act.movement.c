@@ -909,7 +909,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	}
 
 	// leaving message
-	if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
+	if (!AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
 		*buf2 = '\0';
 		
 		switch (mode) {
@@ -980,7 +980,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	}
 	
 	// walks-in messages
-	if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
+	if (!AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
 		switch (mode) {
 			case MOVE_LEAD:
 				act("$E leads $n behind $M.", TRUE, ch, 0, GET_LED_BY(ch), TO_NOTVICT);
@@ -1327,7 +1327,7 @@ ACMD(do_circle) {
 	
 	// message
 	msg_to_char(ch, "You circle %s.\r\n", dirs[get_direction_for_char(ch, dir)]);
-	if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
+	if (!AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
 		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
 			if (vict != ch && vict->desc && CAN_SEE(vict, ch)) {
 				sprintf(buf, "$n circles %s.", dirs[get_direction_for_char(vict, dir)]);
@@ -1367,7 +1367,7 @@ ACMD(do_circle) {
 	greet_memory_mtrigger(ch);
 	
 	// message
-	if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
+	if (!AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
 		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
 			if (vict != ch && vict->desc && CAN_SEE(vict, ch)) {
 				sprintf(buf, "$n circles in from %s.", from_dir[get_direction_for_char(vict, dir)]);
