@@ -842,7 +842,7 @@ INTERACTION_FUNC(separate_obj_interact) {
 */
 static void wear_message(char_data *ch, obj_data *obj, int where) {
 	// char message
-	if (has_custom_message(obj, OBJ_CUSTOM_WEAR_TO_CHAR)) {
+	if (wear_data[where].allow_custom_msgs && has_custom_message(obj, OBJ_CUSTOM_WEAR_TO_CHAR)) {
 		act(get_custom_message(obj, OBJ_CUSTOM_WEAR_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
 	}
 	else {
@@ -850,7 +850,7 @@ static void wear_message(char_data *ch, obj_data *obj, int where) {
 	}
 	
 	// room message
-	if (has_custom_message(obj, OBJ_CUSTOM_WEAR_TO_ROOM)) {
+	if (wear_data[where].allow_custom_msgs && has_custom_message(obj, OBJ_CUSTOM_WEAR_TO_ROOM)) {
 		act(get_custom_message(obj, OBJ_CUSTOM_WEAR_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
 	}
 	else {

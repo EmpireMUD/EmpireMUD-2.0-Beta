@@ -161,7 +161,7 @@ struct custom_message *pick_custom_longdesc(char_data *ch) {
 	int iter, count = 0;
 	
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (!GET_EQ(ch, iter)) {
+		if (!GET_EQ(ch, iter) || !wear_data[iter].allow_custom_msgs) {
 			continue;
 		}
 		
