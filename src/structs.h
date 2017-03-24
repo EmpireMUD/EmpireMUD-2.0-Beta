@@ -1136,6 +1136,10 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_TYPE_NATURAL  0	// built-in trait
 #define APPLY_TYPE_ENCHANTMENT  1	// caused by enchant
 #define APPLY_TYPE_HONED  2	// Trade ability
+#define APPLY_TYPE_SUPERIOR  3	// only applies if the item is SUPERIOR when scaled
+#define APPLY_TYPE_HARD_DROP  4	// only applies if the item is HARD-DROP when scaled
+#define APPLY_TYPE_GROUP_DROP  5	// only applies if the item is GROUP-DROP when scaled
+#define APPLY_TYPE_BOSS_DROP  6	// only applies if the item is GROUP- and HARD-DROP both when scaled
 
 
 // CMP_x: component types

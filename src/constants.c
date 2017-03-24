@@ -1100,6 +1100,10 @@ const char *apply_type_names[] = {
 	"natural",
 	"enchantment",
 	"honed",
+	"superior",
+	"hard-drop",
+	"group-drop",
+	"boss-drop",
 	"\n"
 };
 

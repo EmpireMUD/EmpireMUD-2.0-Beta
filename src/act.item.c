@@ -1615,6 +1615,26 @@ void scale_item_to_level(obj_data *obj, int level) {
 	REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_SCALABLE);
 	GET_OBJ_CURRENT_SCALE_LEVEL(obj) = level;
 	
+	// remove applies that don't ... apply
+	LL_FOREACH_SAFE(GET_OBJ_APPLIES(obj), apply, next_apply) {
+		if (apply->apply_type == APPLY_TYPE_SUPERIOR && !OBJ_FLAGGED(obj, OBJ_SUPERIOR)) {
+			LL_DELETE(GET_OBJ_APPLIES(obj), apply);
+			free(apply);
+		}
+		else if (apply->apply_type == APPLY_TYPE_HARD_DROP && !OBJ_FLAGGED(obj, OBJ_HARD_DROP)) {
+			LL_DELETE(GET_OBJ_APPLIES(obj), apply);
+			free(apply);
+		}
+		else if (apply->apply_type == APPLY_TYPE_GROUP_DROP && !OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
+			LL_DELETE(GET_OBJ_APPLIES(obj), apply);
+			free(apply);
+		}
+		else if (apply->apply_type == APPLY_TYPE_BOSS_DROP && (!OBJ_FLAGGED(obj, OBJ_HARD_DROP) || !OBJ_FLAGGED(obj, OBJ_GROUP_DROP))) {
+			LL_DELETE(GET_OBJ_APPLIES(obj), apply);
+			free(apply);
+		}
+	}
+	
 	// determine what we're working with
 	total_share = 0;	// counting up the amount to split
 	bonus = 0;	// extra share for negatives
