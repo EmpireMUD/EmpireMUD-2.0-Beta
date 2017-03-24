@@ -1189,7 +1189,7 @@ void command_interpreter(char_data *ch, char *argument) {
 		send_to_char("You can't use immortal commands while switched.\r\n", ch);
 	else if (IS_INJURED(ch, INJ_TIED) && cmd_info[cmd].minimum_position >= POS_SLEEPING)
 		msg_to_char(ch, "You're tied up!\r\n");
-	else if (AFF_FLAGGED(ch, AFF_NO_ATTACK) && (cmd_info[cmd].ctype == CTYPE_COMBAT || cmd_info[cmd].ctype == CTYPE_SKILL || cmd_info[cmd].ctype == CTYPE_BUILD)) {
+	else if (AFF_FLAGGED(ch, AFF_NO_ATTACK) && !IS_NPC(ch) && (cmd_info[cmd].ctype == CTYPE_COMBAT || cmd_info[cmd].ctype == CTYPE_SKILL || cmd_info[cmd].ctype == CTYPE_BUILD)) {
 		msg_to_char(ch, "You can't do that in this state.\r\n");
 	}
 	else if (GET_POS(ch) < cmd_info[cmd].minimum_position) {
