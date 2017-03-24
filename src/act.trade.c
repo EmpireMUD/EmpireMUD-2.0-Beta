@@ -1544,11 +1544,11 @@ ACMD(do_recipes) {
 			
 			// is the item used to make it?
 			uses_item = FALSE;
-			if (GET_CRAFT_REQUIRES_OBJ(craft) == GET_OBJ_VNUM(obj)) {
+			if (GET_OBJ_VNUM(obj) != NOTHING && GET_CRAFT_REQUIRES_OBJ(craft) == GET_OBJ_VNUM(obj)) {
 				uses_item = TRUE;
 			}
 			for (res = GET_CRAFT_RESOURCES(craft); !uses_item && res; res = res->next) {
-				if (res->type == RES_OBJECT && res->vnum == GET_OBJ_VNUM(obj)) {
+				if (res->type == RES_OBJECT && GET_OBJ_VNUM(obj) != NOTHING && res->vnum == GET_OBJ_VNUM(obj)) {
 					uses_item = TRUE;
 				}
 				else if (res->type == RES_COMPONENT && res->vnum == GET_OBJ_CMP_TYPE(obj) && (res->misc & GET_OBJ_CMP_FLAGS(obj)) == res->misc) {
@@ -1590,11 +1590,11 @@ ACMD(do_recipes) {
 			
 			// is the item used to make it?
 			uses_item = FALSE;
-			if (GET_AUG_REQUIRES_OBJ(aug) == GET_OBJ_VNUM(obj)) {
+			if (GET_OBJ_VNUM(obj) != NOTHING && GET_AUG_REQUIRES_OBJ(aug) == GET_OBJ_VNUM(obj)) {
 				uses_item = TRUE;
 			}
 			for (res = GET_AUG_RESOURCES(aug); !uses_item && res; res = res->next) {
-				if (res->type == RES_OBJECT && res->vnum == GET_OBJ_VNUM(obj)) {
+				if (GET_OBJ_VNUM(obj) != NOTHING && res->type == RES_OBJECT && res->vnum == GET_OBJ_VNUM(obj)) {
 					uses_item = TRUE;
 				}
 				else if (res->type == RES_COMPONENT && res->vnum == GET_OBJ_CMP_TYPE(obj) && (res->misc & GET_OBJ_CMP_FLAGS(obj)) == res->misc) {
