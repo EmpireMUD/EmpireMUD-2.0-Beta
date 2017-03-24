@@ -225,8 +225,9 @@ bool can_enter_room(char_data *ch, room_data *room) {
 */
 void clear_recent_moves(char_data *ch) {
 	int iter;
+	return;
 	
-	if (!IS_NPC(ch)) {
+	if (IS_NPC(ch)) {
 		return;
 	}
 	
@@ -455,7 +456,7 @@ void mark_move_time(char_data *ch) {
 	
 	if (IS_NPC(ch)) {
 		return;
-		}
+	}
 	
 	// slide them all up one
 	for (iter = TRACK_MOVE_TIMES - 1; iter > 0; --iter) {
