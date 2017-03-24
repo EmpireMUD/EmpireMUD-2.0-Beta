@@ -218,6 +218,30 @@ bool can_enter_room(char_data *ch, room_data *room) {
 }
 
 
+/**
+* Returns the number of moves a player has made in the last 10 seconds.
+*
+* @param char_data *ch The player.
+* @return int Number of times moved in 10 seconds.
+*/
+int count_recent_moves(char_data *ch) {
+	time_t now = time(0);
+	int iter, count = 0;
+	
+	if (IS_NPC(ch)) {
+		return 0;
+	}
+	
+	for (iter = 0; iter < TRACK_MOVE_TIMES; ++iter) {
+		if (now - GET_MOVE_TIME(ch, iter) < 10) {
+			++count;
+		}
+	}
+	
+	return count;
+}
+
+
 void do_doorcmd(char_data *ch, obj_data *obj, int door, int scmd) {
 	char lbuf[MAX_STRING_LENGTH];
 	room_data *other_room = NULL;
@@ -400,6 +424,27 @@ void give_portal_sickness(char_data *ch, obj_data *portal, room_data *from, room
 	else {
 		add_cooldown(ch, COOLDOWN_PORTAL_SICKNESS, SECS_PER_REAL_MIN);
 	}
+}
+
+
+/**
+* Marks that a player has moved, for tracking how often they move.
+*
+* @param char_data *ch The player moving.
+*/
+void mark_move_time(char_data *ch) {
+	int iter;
+	
+	if (IS_NPC(ch)) {
+		return;
+		}
+	
+	// slide them all up one
+	for (iter = TRACK_MOVE_TIMES - 1; iter > 0; --iter) {
+		GET_MOVE_TIME(ch, iter) = GET_MOVE_TIME(ch, iter-1);
+	}
+	
+	GET_MOVE_TIME(ch, 0) = time(0);
 }
 
 
@@ -951,6 +996,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 
 	// mark it
 	add_tracks(ch, IN_ROOM(ch), dir);
+	mark_move_time(ch);
 
 	char_from_room(ch);
 	char_to_room(ch, to_room);
@@ -1340,6 +1386,7 @@ ACMD(do_circle) {
 	if (!IS_IMMORTAL(ch) && !IS_NPC(ch)) {
 		GET_MOVE(ch) -= need_movement;
 	}
+	mark_move_time(ch);
 	char_from_room(ch);
 	char_to_room(ch, found_room);
 	qt_visit_room(ch, IN_ROOM(ch));

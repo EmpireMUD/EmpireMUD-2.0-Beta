@@ -183,7 +183,11 @@ struct icon_data *get_icon_from_set(struct icon_data *set, int type) {
 * @return int The map radius.
 */
 int get_map_radius(char_data *ch) {
-	int mapsize;
+	extern int count_recent_moves(char_data *ch);
+	
+	int mapsize, dflt, recent;
+	
+	dflt = config_get_int("default_map_size");
 
 	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
 	if (mapsize == 0) {
@@ -202,8 +206,13 @@ int get_map_radius(char_data *ch) {
 			mapsize = MIN(wide, max_size);
 		}
 		else {
-			mapsize = config_get_int("default_map_size");
+			mapsize = dflt;
 		}
+	}
+	
+	if (mapsize > dflt && (recent = count_recent_moves(ch)) > 5) {
+		mapsize -= 2 * ((recent - 5) / 2);
+		mapsize = MAX(mapsize, dflt);
 	}
 	
 	return mapsize;

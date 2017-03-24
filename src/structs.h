@@ -2079,6 +2079,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_OBJ_VAL_POSITIONS  3	// GET_OBJ_VAL(obj, X) -- caution: changing this will require you to change the .obj file format
 #define NUM_GLB_VAL_POSITIONS  3	// GET_GLOBAL_VAL(glb, X) -- caution: changing this will require you to change the .glb file format
 #define NUM_SKILL_SETS  2	// number of different sets a player has
+#define TRACK_MOVE_TIMES  10	// player's last X move timestamps
 
 
 /*
@@ -3184,6 +3185,7 @@ struct player_special_data {
 	byte reboot_conf;	// Reboot confirmation
 	byte create_points;	// Used in character creation
 	int group_invite_by;	// idnum of the last player to invite this one
+	time_t move_time[TRACK_MOVE_TIMES];	// timestamp of last X moves
 	
 	struct combat_meters meters;	// combat meter data
 	
