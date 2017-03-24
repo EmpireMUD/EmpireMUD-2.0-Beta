@@ -1341,12 +1341,18 @@ ACMD(do_build) {
 
 ACMD(do_dismantle) {
 	craft_data *type;
+	
+	skip_spaces(&argument);
+	if (*argument) {
+		msg_to_char(ch, "Dismantle is only used to dismantle buildings. Just type 'dismantle'. (You get this error if you typed an argument.)\r\n");
+		return;
+	}
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use the dismantle command.\r\n");
 		return;
 	}
-
+	
 	if (GET_ACTION(ch) == ACT_DISMANTLING) {
 		msg_to_char(ch, "You stop dismantling the building.\r\n");
 		act("$n stops dismantling the building.", FALSE, ch, 0, 0, TO_ROOM);
