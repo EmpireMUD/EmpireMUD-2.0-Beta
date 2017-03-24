@@ -88,6 +88,10 @@ void check_attribute_gear(char_data *ch) {
 	if (IS_MORPHED(ch)) {
 		return;
 	}
+	// don't remove gear while fighting
+	if (FIGHTING(ch)) {
+		return;
+	}
 	
 	// ensure work to do (shortcut)
 	found = FALSE;

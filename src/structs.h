@@ -3451,7 +3451,6 @@ struct action_data_struct {
 struct attribute_data_type {
 	char *name;
 	char *creation_description;	// shown if players need help during creation
-	bool active;	// attributes are split into active/passive
 };
 
 

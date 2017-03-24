@@ -3541,6 +3541,7 @@ void start_new_character(char_data *ch) {
 	void set_skill(char_data *ch, any_vnum skill, int level);
 	extern const char *default_channels[];
 	extern bool global_mute_slash_channel_joins;
+	extern const int primary_attributes[];
 	extern struct promo_code_list promo_codes[];
 	extern int tips_of_the_day_size;
 	
@@ -3661,9 +3662,9 @@ void start_new_character(char_data *ch) {
 	}
 	
 	// guarantee minimum of 1 for active attributes
-	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-		if (attributes[iter].active && ch->real_attributes[iter] < 1) {
-			ch->real_attributes[iter] = 1;
+	for (iter = 0; primary_attributes[iter] != NOTHING; ++iter) {
+		if (ch->real_attributes[primary_attributes[iter]] < 1) {
+			ch->real_attributes[primary_attributes[iter]] = 1;
 		}
 	}
 	
