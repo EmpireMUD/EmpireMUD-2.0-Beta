@@ -225,7 +225,6 @@ bool can_enter_room(char_data *ch, room_data *room) {
 */
 void clear_recent_moves(char_data *ch) {
 	int iter;
-	return;
 	
 	if (IS_NPC(ch)) {
 		return;

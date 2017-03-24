@@ -209,9 +209,9 @@ int get_map_radius(char_data *ch) {
 	}
 	
 	// automatically limit size if the player is moving too fast
-	if (mapsize > 13 && (recent = count_recent_moves(ch)) > 5) {
-		mapsize -= 2 * (recent - 5);
-		mapsize = MAX(mapsize, 13);
+	if (mapsize > 5 && (recent = count_recent_moves(ch)) > 5) {
+		mapsize -= (recent - 5);
+		mapsize = MAX(mapsize, 5);
 	}
 	
 	return mapsize;
