@@ -2445,6 +2445,7 @@ int process_input(descriptor_data *t) {
 
 		if (!do_not_add) {
 			write_to_q(input, &t->input, 0, add_to_head);
+			add_to_head = FALSE;
 		}
 
 		/* find the end of this line */
