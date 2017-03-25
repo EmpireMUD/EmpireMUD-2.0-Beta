@@ -1015,6 +1015,10 @@ ACMD(do_heal) {
 		msg_to_char(ch, "You can't heal an enemy like that.\r\n");
 		return;
 	}
+	if (party && !GROUP(ch)) {
+		msg_to_char(ch, "You need to be in a group in order to do this.\r\n");
+		return;
+	}
 	
 	// determine cost
 	if (party) {
