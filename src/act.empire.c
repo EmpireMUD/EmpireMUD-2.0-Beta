@@ -3480,6 +3480,10 @@ ACMD(do_empires) {
 
 	skip_spaces(&argument);
 
+	if (!ch->desc) {
+		return;
+	}
+
 	if (!empire_table) {
 		msg_to_char(ch, "No empires have been formed.\r\n");
 		return;
