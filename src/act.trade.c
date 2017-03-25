@@ -610,7 +610,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		// build info string
 		sprintf(buf, " (%s", item_types[(int) GET_OBJ_TYPE(proto)]);
 		LL_FOREACH(GET_OBJ_APPLIES(proto), apply) {
-			sprintf(buf + strlen(buf), ", %s", apply_types[(int) apply->location]);
+			sprintf(buf + strlen(buf), ", %s%s", (apply->modifier<0 ? "-" : "+"), apply_types[(int) apply->location]);
 		}
 		if (GET_OBJ_AFF_FLAGS(proto)) {
 			prettier_sprintbit(GET_OBJ_AFF_FLAGS(proto), affected_bits, part);
