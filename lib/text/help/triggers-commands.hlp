@@ -191,6 +191,7 @@ use -1 for infinite duration ONLY if the target is an NPC.
 Examples:
   dg_affect %actor% HASTE on 20  -- Sets haste on actor for 20 seconds.
   dg_affect %actor% DODGE 100 20  -- Sets dodge on actor +100 for 20 seconds.
+  dg_affect %actor% STRENGTH off  -- Removes any STRENGTH affects
 
 See also: APPLIES, AFFECTS
 #d

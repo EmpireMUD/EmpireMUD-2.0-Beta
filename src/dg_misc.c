@@ -110,8 +110,12 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	half_chop(cmd, value_p, duration_p);
 
 	/* make sure all parameters are present */
-	if (!*charname || !*property || !*value_p || !*duration_p) {
+	if (!*charname || !*property || !*value_p) {
 		script_log("Trigger: %s, VNum %d. dg_affect usage: <target> <property> <value> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+		return;
+	}
+	if (str_cmp(value_p, "off") && !*duration_p) {
+		script_log("Trigger: %s, VNum %d. dg_affect missing duration", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		return;
 	}
 
