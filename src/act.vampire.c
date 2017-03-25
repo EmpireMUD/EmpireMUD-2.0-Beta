@@ -1096,6 +1096,8 @@ ACMD(do_feed) {
 		msg_to_char(ch, "You can't give THAT much blood.\r\n");
 	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
+	else if ( ch == victim )
+		msg_to_char(ch, "What would be the point in that?\r\n");
 	else if (IS_DEAD(victim)) {
 		act("It would do no good for $M now -- $E's dead!", FALSE, ch, NULL, victim, TO_CHAR);
 	}
