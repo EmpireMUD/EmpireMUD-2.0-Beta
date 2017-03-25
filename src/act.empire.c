@@ -3470,11 +3470,13 @@ ACMD(do_emotd) {
 
 
 ACMD(do_empires) {
+	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH];
 	empire_data *e, *emp, *next_emp;
 	char_data *vict = NULL;
 	int min = 1, count;
 	bool more = FALSE, all = FALSE, file = FALSE;
 	char title[80];
+	size_t lsize, size;
 
 	skip_spaces(&argument);
 
@@ -3556,7 +3558,7 @@ ACMD(do_empires) {
 		strcpy(title, "Prominent empires:");
 	}
 
-	msg_to_char(ch, "%-35.35s  Sc  Mm  Grt  Territory\r\n", title);
+	size = snprintf(output, sizeof(output), "%-35.35s  Sc  Mm  Grt  Territory\r\n", title);
 
 	count = 0;
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -3578,10 +3580,22 @@ ACMD(do_empires) {
 			continue;
 		}
 		
-		msg_to_char(ch, "%3d. %s%-30.30s&0  %2d  %2d  %3d  %d\r\n", count, EMPIRE_BANNER(emp), EMPIRE_NAME(emp), get_total_score(emp), EMPIRE_MEMBERS(emp), EMPIRE_GREATNESS(emp), EMPIRE_CITY_TERRITORY(emp) + EMPIRE_OUTSIDE_TERRITORY(emp));
+		lsize = snprintf(line, sizeof(line), "%3d. %s%-30.30s&0  %2d  %2d  %3d  %d\r\n", count, EMPIRE_BANNER(emp), EMPIRE_NAME(emp), get_total_score(emp), EMPIRE_MEMBERS(emp), EMPIRE_GREATNESS(emp), EMPIRE_CITY_TERRITORY(emp) + EMPIRE_OUTSIDE_TERRITORY(emp));
+		
+		// append if room
+		if (size + lsize < sizeof(output)) {
+			size += lsize;
+			strcat(output, line);
+		}
 	}
 	
-	msg_to_char(ch, "List options: -m for more, -a for all, -## for minimum members\r\n");
+	lsize = snprintf(line, sizeof(line), "List options: -m for more, -a for all, -## for minimum members\r\n");
+	if (size + lsize < sizeof(output)) {
+		size += lsize;
+		strcat(output, line);
+	}
+	
+	page_string(ch->desc, output, TRUE);
 }
 
 
