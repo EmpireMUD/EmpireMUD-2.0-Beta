@@ -1586,14 +1586,14 @@ void scale_item_to_level(obj_data *obj, int level) {
 	if (GET_OBJ_MAX_SCALE_LEVEL(obj) > 0) {
 		level = MIN(level, GET_OBJ_MAX_SCALE_LEVEL(obj));
 	}
-	else if (room_max > 0) {
+	else if (room_max > 0 && !GET_OBJ_MIN_SCALE_LEVEL(obj)) {
 		level = MIN(level, room_max);
 	}
 	
 	if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0) {
 		level = MAX(level, GET_OBJ_MIN_SCALE_LEVEL(obj));
 	}
-	else if (room_min > 0) {
+	else if (room_min > 0 && !GET_OBJ_MAX_SCALE_LEVEL(obj)) {
 		level = MAX(level, room_min);
 	}
 	

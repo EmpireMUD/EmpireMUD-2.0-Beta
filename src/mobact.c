@@ -1247,14 +1247,14 @@ void scale_mob_to_level(char_data *mob, int level) {
 	if (GET_MIN_SCALE_LEVEL(mob) > 0) {
 		level = MAX(GET_MIN_SCALE_LEVEL(mob), level);
 	}
-	else if (room_min > 0) {
+	else if (room_min > 0 && !GET_MAX_SCALE_LEVEL(mob)) {
 		level = MAX(room_min, level);
 	}
 	
 	if (GET_MAX_SCALE_LEVEL(mob) > 0) {
 		level = MIN(GET_MAX_SCALE_LEVEL(mob), level);
 	}
-	else if (room_max > 0) {
+	else if (room_max > 0 && !GET_MIN_SCALE_LEVEL(mob)) {
 		level = MIN(room_max, level);
 	}
 	
