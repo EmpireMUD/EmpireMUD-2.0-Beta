@@ -167,11 +167,11 @@ An eggplant is sitting on the ground.~
 This large, fresh eggplant is a deep aubergine purple. Eggplants this large are
 prized at market, as few dishes require more than one.
 ~
-6 b a 8
+6 b a 9
 24 11011 0
 7 168
 O
-27 b
+27 bq
 R
 5114 0
 S
@@ -182,11 +182,11 @@ A tiny eggplant is lying on the ground.~
    This little eggplant is already a nice deep purple color, but it's barely
 the size of a tomato.
 ~
-6 0 a 9
+6 0 a 10
 6 0 0
 7 48
 O
-27 n
+27 nq
 S
 #11013
 feather roc gigantic~

@@ -14,12 +14,12 @@ a green apple~
 Someone dropped a green apple here.~
 This is just one apple, so it's not enough to plant, but it tastes good.
 ~
-6 0 a 3
+6 0 a 4
 6 0 0
 7 48
 I 14 3002 100.00 4 x  # COMBINE: a bunch of apples
 O
-9 n
+9 nq
 S
 #3002
 apples bunch~
@@ -27,12 +27,12 @@ a bunch of apples~
 There are a bunch of apples scattered across the ground.~
 You can eat apples, or plant them.
 ~
-6 bl a 3
+6 bl a 4
 24 13 0
 7 168
 I 15 3001 100.00 4 x  # SEPARATE: a green apple
 O
-9 b
+9 bq
 R
 5114 0
 S
@@ -54,12 +54,12 @@ a basket of peaches~
 There is a basket of peaches on the ground.~
 You can eat peaches, or plant them.
 ~
-6 bl a 3
+6 bl a 4
 24 6 0
 7 168
 I 15 3006 100.00 4 x  # SEPARATE: a plump peach
 O
-9 b
+9 bq
 R
 5114 0
 S
@@ -83,12 +83,12 @@ a plump peach~
 Someone dropped a peach here.~
 This is just one peach, so it's not enough to plant, but it tastes good.
 ~
-6 0 a 5
+6 0 a 6
 6 0 0
 7 48
 I 14 3004 100.00 4 x  # COMBINE: a basket of peaches
 O
-9 n
+9 nq
 S
 #3007
 cherry cherries couple red~
@@ -96,12 +96,12 @@ a couple red cherries~
 Someone dropped a couple red cherries here.~
 This is just a few cherries, so it's not enough to plant, but they taste good.
 ~
-6 0 a 3
+6 0 a 4
 6 0 0
 7 48
 I 14 3008 100.00 4 x  # COMBINE: a bag of cherries
 O
-9 n
+9 nq
 S
 #3008
 cherries bag~
@@ -109,12 +109,12 @@ a bag of cherries~
 There is a bag of cherries on the ground.~
 You can eat cherries, or plant them.
 ~
-6 bl a 3
+6 bl a 4
 24 7 0
 7 168
 I 15 3007 100.00 4 x  # SEPARATE: a couple red cherries
 O
-9 b
+9 bq
 R
 5114 0
 S
@@ -124,12 +124,12 @@ an orange~
 An orange is lying here.~
 It's a bright orange orange.
 ~
-6 0 a 3
+6 0 a 4
 6 0 0
 7 48
 I 14 3010 100.00 4 x  # COMBINE: a sack of oranges
 O
-9 n
+9 cn
 S
 #3010
 oranges sack~
@@ -137,12 +137,12 @@ a sack of oranges~
 A sack of oranges is sitting here.~
 This prize sack of oranges can be eaten or planted.
 ~
-6 bl a 3
+6 bl a 4
 24 8 0
 7 168
 I 15 3009 100.00 4 x  # SEPARATE: an orange
 O
-9 b
+9 bc
 R
 5114 0
 S
@@ -224,11 +224,11 @@ a plump fig~
 A plump fig is rolling around on the ground.~
 The fig looks good enough to eat.
 ~
-6 0 a 2
+6 0 a 3
 6 0 0
 7 48
 O
-9 n
+9 nq
 S
 #3018
 olives couple green~
@@ -236,12 +236,12 @@ a couple of olives~
 A couple of green olives have been dropped here.~
 It's a handful of green olives.
 ~
-6 0 a 3
+6 0 a 7
 6 0 0
 7 48
 I 14 3019 100.00 4 x  # COMBINE: a basket of olives
 O
-27 n
+27 cn
 S
 #3019
 olives basket~
@@ -249,12 +249,12 @@ a basket of olives~
 A basket of fresh olives is sitting on the ground.~
 You can eat olives, or plant them.
 ~
-6 bl a 3
+6 bl a 6
 24 10 0
 7 168
 I 15 3018 100.00 4 x  # SEPARATE: a couple of olives
 O
-27 b
+27 bcr
 R
 5114 0
 S
@@ -264,12 +264,12 @@ a handful of peas~
 Some green peas have been dropped here.~
 It's a handful of green peas.
 ~
-6 0 a 3
+6 0 a 4
 6 0 0
 7 48
 I 14 3021 100.00 4 x  # COMBINE: a basket of peas
 O
-27 n
+27 nq
 S
 #3021
 peas basket green~
@@ -277,12 +277,12 @@ a basket of peas~
 A basket of green peas is sitting on the ground.~
 You can eat peas, or plant them.
 ~
-6 bl a 3
+6 bl a 4
 24 11 0
 7 168
 I 15 3020 100.00 4 x  # SEPARATE: a handful of peas
 O
-27 b
+27 bq
 R
 5114 0
 S
@@ -292,12 +292,12 @@ a yellow squash~
 A yellow squash is lying on the ground.~
 It's a single, delicious squash.
 ~
-6 0 a 3
+6 0 a 4
 6 0 0
 7 48
 I 14 3023 100.00 4 x  # COMBINE: a basket of gourds
 O
-27 n
+27 nq
 S
 #3023
 gourds basket~
@@ -305,12 +305,12 @@ a basket of gourds~
 A basket full of gourds is sitting on the ground.~
 You can eat gourds, or plant them.
 ~
-6 bl a 3
+6 bl a 4
 24 12 0
 7 168
 I 15 3022 100.00 4 x  # SEPARATE: a yellow squash
 O
-27 b
+27 bq
 R
 5606 0
 R
@@ -322,12 +322,12 @@ an unripe plantain~
 There is an unripe plantain on the ground.~
 This plantain doesn't quite look ripe and it will be starchy, but edible.
 ~
-6 0 a 3
+6 0 a 4
 6 0 0
 7 48
 I 14 3025 100.00 4 x  # COMBINE: a basket of plantains
 O
-27 n
+27 nr
 S
 #3025
 plantains basket~
@@ -335,12 +335,12 @@ a basket of plantains~
 A basket of plantains is sitting here.~
 You can eat the plantains, or plant them.
 ~
-6 bl a 3
+6 bl a 4
 24 14 0
 7 168
 I 15 3024 100.00 4 x  # SEPARATE: an unripe plantain
 O
-27 b
+27 br
 R
 5116 0
 S
@@ -350,12 +350,12 @@ a basket of tomatoes~
 There is a basket of tomatoes on the ground.~
 You can eat tomatoes, or plant them.
 ~
-6 bl a 7
+6 bl a 8
 24 3000 0
 7 168
 I 15 3027 100.00 4 e  # SEPARATE: a ripe tomato
 O
-27 b
+27 bq
 R
 5114 0
 S
@@ -365,12 +365,12 @@ a ripe tomato~
 Someone dropped a ripe tomato here.~
 This is a bright red tomato, pleasantly ripe.
 ~
-6 0 a 6
+6 0 a 7
 6 0 0
 7 48
 I 14 3026 100.00 4 e  # COMBINE: a basket of tomatoes
 O
-27 n
+27 nq
 S
 #3028
 bananas bunch~
@@ -378,12 +378,12 @@ a bunch of bananas~
 There is a bunch of bananas on the ground.~
 You can eat bananas, or plant them.
 ~
-6 bl a 5
+6 bl a 6
 24 3001 0
 7 168
 I 15 3029 100.00 4 e  # SEPARATE: a ripe yellow banana
 O
-9 b
+9 br
 R
 5114 0
 S
@@ -393,12 +393,12 @@ a ripe yellow banana~
 Someone has dropped a ripe yellow banana.~
 This ripe yellow banana looks scrumptious!
 ~
-6 0 a 5
+6 0 a 6
 6 0 0
 7 48
 I 14 3028 100.00 4 e  # COMBINE: a bunch of bananas
 O
-9 n
+9 nr
 S
 #3030
 coconuts bunch~
@@ -431,12 +431,12 @@ a bunch of grapes~
 There is a bunch of grapes on the ground.~
 You can eat grapes, or plant them.
 ~
-6 bl a 7
+6 bl a 8
 24 3003 0
 7 168
 I 15 3033 100.00 4 e  # SEPARATE: a few grapes
 O
-9 b
+9 bq
 R
 5114 0
 S
@@ -446,12 +446,12 @@ a few grapes~
 Someone has dropped a few grapes.~
 These grapes are still attached to the severed stem.
 ~
-6 0 a 6
+6 0 a 7
 6 0 0
 7 48
 I 14 3032 100.00 4 e  # COMBINE: a bunch of grapes
 O
-9 n
+9 nq
 S
 #3034
 peppers basket~
@@ -459,12 +459,12 @@ a basket of peppers~
 There is a basket of peppers on the ground.~
 You can plant peppers, cook food or brew them into poisons.
 ~
-3 bl a 11
+3 bl a 12
 0 3004 0
 7 168
 I 15 3035 100.00 4 e  # SEPARATE: a ripe pepper
 O
-27 b
+27 bc
 R
 5116 0
 S
@@ -475,12 +475,12 @@ Someone dropped a ripe pepper here.~
    This is just one ripe pepper, so it's not enough to plant, but it has a nice
 zing to it.
 ~
-6 0 a 4
+6 0 a 5
 6 0 0
 7 48
 I 14 3034 100.00 4 e  # COMBINE: a basket of peppers
 O
-27 n
+27 cn
 S
 #3036
 potatoes sack~
@@ -488,11 +488,11 @@ a sack of potatoes~
 There is a sack of potatoes on the ground.~
 You can plant potatoes, or use them to cook food.
 ~
-3 bl a 7
+3 bl a 8
 0 3005 0
 7 168
 O
-27 b
+27 bq
 R
 5116 0
 S
@@ -502,12 +502,12 @@ a basket of plums~
 There is a basket of plums on the ground.~
 You can eat plums, or plant them.
 ~
-6 bl a 6
+6 bl a 7
 24 3006 0
 7 168
 I 15 3038 100.00 4 e  # SEPARATE: a ripe plum
 O
-9 b
+9 bq
 R
 5114 0
 S
@@ -517,12 +517,12 @@ a ripe plum~
 Someone dropped a ripe plum here.~
 This ripe plum looks like it has just been picked from the tree.
 ~
-6 0 a 6
+6 0 a 7
 6 0 0
 7 48
 I 14 3037 100.00 4 x  # COMBINE: a basket of plums
 O
-9 n
+9 nq
 S
 #3039
 strawberries basket~
@@ -530,12 +530,12 @@ a basket of strawberries~
 A basket of ripe strawberries is on the ground.~
 You can eat strawberries, or plant them.
 ~
-6 bl a 7
+6 bl a 8
 24 3007 0
 7 168
 I 15 3040 100.00 4 e  # SEPARATE: a couple of strawberries
 O
-9 b
+9 bq
 R
 5114 0
 S
@@ -546,12 +546,12 @@ A couple of strawberries has been left here.~
    This is just a couple of strawberries, so it's not enough to plant, but it
 tastes good.
 ~
-6 0 a 5
+6 0 a 6
 6 0 0
 7 48
 I 14 3039 100.00 4 e  # COMBINE: a basket of strawberries
 O
-9 n
+9 nq
 S
 #3041
 mangoes mangos basket~
@@ -559,12 +559,12 @@ a basket of mangoes~
 A basket of mangoes is on the ground.~
 You can eat mangoes, or plant them.
 ~
-6 bl a 9
+6 bl a 10
 24 3008 0
 7 168
 I 15 3042 100.00 4 e  # SEPARATE: a single ripe mango
 O
-9 b
+9 br
 R
 5114 0
 S
@@ -574,12 +574,12 @@ a single ripe mango~
 A single ripe mango has been dropped on the ground.~
 This is just one mango, so it's not enough to plant, but it tastes good.
 ~
-6 0 a 5
+6 0 a 6
 6 0 0
 7 48
 I 14 3041 100.00 4 e  # COMBINE: a basket of mangoes
 O
-9 n
+9 nr
 S
 #3043
 blueberries basket~
@@ -587,12 +587,12 @@ a basket of blueberries~
 A basket of blueberries is on the ground.~
 You can eat blueberries, or plant them.
 ~
-6 bl a 7
+6 bl a 8
 24 3009 0
 7 168
 I 15 3044 100.00 4 e  # SEPARATE: a handful of blueberries
 O
-9 b
+9 bq
 R
 5114 0
 S
@@ -603,12 +603,12 @@ A handful of blueberries has been scattered on the ground.~
 This is just a handful of blueberries, so it's not enough to plant, but it
 tastes good.
 ~
-6 0 a 4
+6 0 a 5
 6 0 0
 7 48
 I 14 3043 100.00 4 e  # COMBINE: a basket of blueberries
 O
-9 n
+9 nq
 S
 #3045
 beans coffee sack~
@@ -642,11 +642,11 @@ a single ripe watermelon~
 A large ripe watermelon is on the ground.~
 This large ripe watermelon looks like it would make a filling meal.
 ~
-6 bl a 4
+6 bl a 5
 24 3016 0
 7 336
 O
-9 fn
+9 fnr
 R
 5114 0
 S

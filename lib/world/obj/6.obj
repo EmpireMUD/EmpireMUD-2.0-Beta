@@ -111,7 +111,7 @@ Some elderberries are scattered on the ground.~
    These elderberries look fresh. They also have a faint pink glow, perhaps
 because of the forest they grew in.
 ~
-6 0 a 4
+6 0 a 5
 6 0 0
 7 48
 A
@@ -120,7 +120,7 @@ M
 4
 You eat $p and feel... elder.~
 O
-9 n
+9 gn
 S
 #607
 hide shimmering~
@@ -289,7 +289,7 @@ fire magical magenta~
 a magical fire~
 A magical magenta fire is roaring here!~
    A pile of bright pink wood is burning, releasing a bright, hot magenta flame
-and a cool, smoky mist of mana.  
+and a cool, smoky mist of mana.
 ~
 3 c 0 1
 0 0 0

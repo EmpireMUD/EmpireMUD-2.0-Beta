@@ -436,11 +436,11 @@ Bright red saguaro fruits are strewn around on the ground.~
    These red fruits are spiny, and have already started to split open. A ripe
 fruit aroma wafts up from the basket, so they won't keep long before rotting.
 ~
-6 b a 6
+6 b a 7
 24 10146 0
 7 168
 O
-9 b
+9 bc
 R
 5114 0
 S
@@ -450,11 +450,11 @@ a spiny red fruit~
 A spiny red fruit is lying on the ground.~
 This strange, spiny fruit has a sweet, earthy flavor.
 ~
-6 0 a 4
+6 0 a 5
 6 0 0
 7 48
 O
-9 n
+9 cn
 S
 #10148
 ribs pile saguaro~
@@ -569,12 +569,12 @@ A basket of alligator pears is sitting here.~
 dark, bumpy, rigid skin. The inside of the fruit is bright green, with a giant
 seed. They aren't sweet, but have a creamy texture.
 ~
-6 b a 6
+6 b a 7
 24 10153 0
 7 168
 I 15 10154 100.00 4 x  # SEPARATE: a ripe alligator pear
 O
-27 b
+27 bc
 R
 5619 0
 S
@@ -585,12 +585,12 @@ An alligator pear is lying on the ground.~
    The alligator pear has a bumpy, black skin. But the inside is bright green
 and creamy.
 ~
-6 0 a 4
+6 0 a 5
 6 0 0
 7 48
 I 14 10153 100.00 4 x  # COMBINE: a basket of alligator pears
 O
-27 n
+27 cn
 S
 #10155
 limes basket~
@@ -639,7 +639,7 @@ A maroon firemelon is rolling around on the ground.~
    This firemelon has a deep maroon hue, striped by brighter red. The melon is
 warm to the touch, and smells like cinnamon.
 ~
-6 bem a 9
+6 bem a 10
 24 10157 0
 7 336
 A
@@ -650,7 +650,7 @@ M
 4
 You eat the firemelon and feel a burning in your stomach.~
 O
-9 fn
+9 cfn
 R
 5114 0
 S
@@ -661,7 +661,7 @@ A crimson firemelon is rolling around on the ground.~
    This firemelon has a bright crimson hue, striped by darker red. The melon is
 warm to the touch, and smells like cinnamon.
 ~
-6 bem a 10
+6 bem a 11
 24 10157 0
 7 336
 A
@@ -672,7 +672,7 @@ M
 4
 You eat the firemelon and feel a burning in your stomach.~
 O
-9 fn
+9 cfn
 R
 5114 0
 S

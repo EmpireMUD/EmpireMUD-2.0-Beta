@@ -28,12 +28,12 @@ a bunch of carrots~
 There are a bunch of carrots scattered across the ground.~
 You can eat carrots, or plant them.
 ~
-6 bl a 3
+6 bl a 4
 24 11100 0
 7 168
 I 15 11103 100.00 4 x  # SEPARATE: a carrot
 O
-27 b
+27 bq
 R
 5606 0
 S
@@ -43,12 +43,12 @@ a carrot~
 Someone dropped a large carrot here.~
 This is just one carrot, so it's not enough to plant, but it tastes good.
 ~
-6 0 a 3
+6 0 a 4
 6 0 0
 7 48
 I 14 11102 100.00 4 x  # COMBINE: a bunch of carrots
 O
-27 n
+27 cn
 S
 #11104
 blackberries bunch berries~
@@ -56,12 +56,12 @@ a bunch of blackberries~
 There are a bunch of blackberries scattered across the ground.~
 You can eat blackberries, or plant them.
 ~
-6 bl a 3
+6 bl a 4
 24 11101 0
 7 168
 I 15 11105 100.00 4 x  # SEPARATE: a few blackberries
 O
-9 b
+9 bq
 R
 5114 0
 S
@@ -71,12 +71,12 @@ a few blackberries~
 There are a few loose blackberries here.~
 This is just a few blackberries, so they're not enough to plant, but they taste good.
 ~
-6 0 a 3
+6 0 a 4
 6 0 0
 7 48
 I 14 11104 100.00 4 x  # COMBINE: a bunch of blackberries
 O
-9 n
+9 nq
 S
 #11106
 pears juicy~
@@ -84,12 +84,12 @@ some juicy pears~
 There are some juicy pears scattered across the ground.~
 You can eat pears, or plant them.
 ~
-6 bl a 3
+6 bl a 4
 24 11102 0
 7 168
 I 15 11107 100.00 4 x  # SEPARATE: a juicy pear
 O
-9 b
+9 bq
 R
 5114 0
 S
@@ -99,12 +99,12 @@ a juicy pear~
 Someone has dropped a juicy pear nearby.~
 This is just one pear, so it's not enough to plant, but it tastes good.
 ~
-6 0 a 3
+6 0 a 4
 6 0 0
 7 48
 I 14 11106 100.00 4 x  # COMBINE: some juicy pears
 O
-9 n
+9 nq
 S
 #11108
 scarlet-feathered feathered scarlet hood~
@@ -579,13 +579,13 @@ S
 scales titanaconda's titanacondas~
 the titanaconda's scales~
 A length of titanaconda's scales float nearby.~
-   A tough, flexible strip of the titanaconta's scales would make good
+   A tough, flexible strip of the titanaconda's scales would make good
 protection.
 
 Sew (Imperial Armors): titanaconda scale coat
 Sew (Imperial Armors): titanaconda scale trousers
 ~
-3 e a 3
+3 e a 4
 0 0 0
 7 0
 R

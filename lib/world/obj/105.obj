@@ -128,11 +128,12 @@ spadebrush bundle~
 a bundle of spadebrush~
 A bundle of spadebrush is lying here.~
    Spadebrush is a plant that has been magi-netically engineered by the druids
-of the Magiterranean to make handy spades for digging.
+of the Magiterranean to make handy spades for digging. If you get an axeroot,
+you can craft a combination tool - a spade-axe.
 
 Craft (requires Basic Crafts): spadebrush shovel
 ~
-3 k a 4
+3 k a 6
 0 0 0
 0 336
 R
@@ -173,11 +174,12 @@ a bushel of bladegrass~
 A bushel of bladegrass is lying here.~
    This bundle of razor-sharp metallic wheat must have been magi-netically
 modified! It could be milled into long-lasting ironflour, or crafted into
-bladegrass arrows!
+bladegrass arrows! Finally, combine bladegrass with a pickthorn stalk and you
+can craft a combination tool - a pick-and-pan.
 
 Craft (Archery): bladegrass arrows
 ~
-3 0 a 6
+3 0 a 7
 0 0 0
 2 0
 R
@@ -245,12 +247,12 @@ S
 gemfruits sparkling basket~
 a basket of sparkling gemfruits~
 A basket of sparkling gemfruits is lying here.~
-   This beautiful fruit will eventually decay if not stored or eaten, leaving
-behind a magical crystal. It can also be planted to grow more gemfruit. Some
-gemfruits will fail to produce gems, and you must be holding them in your
-inventory when they decay to get any gems at all.
+   This beautiful fruit will eventually decay if not eaten, leaving behind a
+magical crystal. It can also be planted to grow more gemfruit. Some gemfruits
+will fail to produce gems, and you must be holding them in your inventory when
+they decay to get any gems at all.
 ~
-6 b a 14
+6 b a 15
 48 10504 0
 12 240
 T 10514
@@ -433,7 +435,7 @@ A spade-axe is sticking out of the ground.~
 to be good for both chopping and digging. It's no wonder the Magiterranean
 druids have been magi-netically engineering new plants. This is useful!
 ~
-1 emou an 6
+1 emou ano 7
 0 1 2
 2 0
 C
@@ -540,7 +542,7 @@ A pick-and-pan is lying on the ground.~
 pickthorn and bladegrass. It can be used for mining metals, or for panning them
 in the stream.
 ~
-1 emot an 3
+1 emot ano 4
 0 1 8
 0 0
 C
@@ -603,11 +605,11 @@ A bunch of rhubarb is piled on the ground.~
    These rhubarb stems are bright red, and fresh. There are some seeds
 intermixed in the bunch, so you could also plant them.
 ~
-6 b a 4
+6 b a 5
 24 10551 0
 7 168
 O
-9 b
+9 bq
 R
 5114 0
 S
@@ -617,11 +619,11 @@ some arctic brambleberries~
 Some arctic brambleberries are scattered on the ground.~
 You can eat the berries.
 ~
-6 0 a 3
+6 0 a 4
 6 0 0
 7 48
 O
-9 n
+9 nq
 S
 #10553
 pie rhubarb~
@@ -892,7 +894,7 @@ Some boss loot has bugged out.~
    This item purges itself and spawns an actual boss-kill reward. But only on
 Group and Boss difficulties.
 ~
-3 0 a 5
+3 p a 6
 0 0 0
 10 0
 T 10570

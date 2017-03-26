@@ -1117,9 +1117,10 @@ if !%self.fighting% && %self.varexists(enrage_counter)%
   if %self.enrage_counter% == 0
     halt
   end
-  %load% mob %self.vnum%
+  dg_affect BONUS-MAGICAL off 0
+  set enrage_counter 0
+  remote enrage_counter %self.id%
   %echo% %self.name% settles down to rest.
-  %purge% %self%
 end
 ~
 #18542
@@ -1232,8 +1233,10 @@ if %actor%
     end
     %load% obj %vnum% %actor% inv %level%
     eval item %%actor.inventory(%vnum%)%%
-    eval bind %%item.bind(%self%)%%
-    nop %bind%
+    if %item.is_flagged(BOP)%
+      eval bind %%item.bind(%self%)%%
+      nop %bind%
+    end
     * %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
   end
 end
