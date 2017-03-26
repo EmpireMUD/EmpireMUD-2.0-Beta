@@ -163,7 +163,7 @@ int mob_coins(char_data *mob) {
 		if ((emp = GET_LOYALTY(mob))) {
 			amt = MIN(amt, EMPIRE_COINS(emp));
 			EMPIRE_COINS(emp) -= amt;
-			// we don't save the empire here but it's likely to save on its own soon -- just like the dropped coins will
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		}
 	}
 	
