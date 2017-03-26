@@ -2127,6 +2127,7 @@ ACMD(do_exits) {
 
 
 ACMD(do_scan) {
+	void clear_recent_moves(char_data *ch);
 	void scan_for_tile(char_data *ch, char *argument);
 
 	int dir;
@@ -2145,12 +2146,14 @@ ACMD(do_scan) {
 		msg_to_char(ch, "Scan only works out on the map.\r\n");
 	}
 	else if ((dir = parse_direction(ch, argument)) == NO_DIR) {
+		clear_recent_moves(ch);
 		scan_for_tile(ch, argument);
 	}
 	else if (dir >= NUM_2D_DIRS) {
 		msg_to_char(ch, "You can't scan that way.\r\n");
 	}
 	else {
+		clear_recent_moves(ch);
 		screenread_one_dir(ch, use_room, dir);
 	}
 }
