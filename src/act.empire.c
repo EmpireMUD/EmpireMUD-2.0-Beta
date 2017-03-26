@@ -3037,7 +3037,7 @@ ACMD(do_deposit) {
 	}
 	else {
 		msg_to_char(ch, "You deposit %s.\r\n", money_amount(coin_emp, coin_amt));
-		sprintf(buf, "$n deposits %s.\r\n", money_amount(coin_emp, coin_amt));
+		sprintf(buf, "$n deposits %s.", money_amount(coin_emp, coin_amt));
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		increase_empire_coins(emp, coin_emp, coin_amt);
