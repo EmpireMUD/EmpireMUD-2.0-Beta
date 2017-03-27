@@ -984,6 +984,12 @@ in each direction; a mapsize of 15 (standard) shows 7 in each direction.
 If you set your mapsize to 'auto', the game will attempt to detect the size of
 your client window.
 
+When you move very fast on the map, your mapsize will start to shrink as it
+becomes more difficult for your character to pay attention to all his/her
+surroundings (and saves the game time rendering large views repeatedly). You
+can restore your original mapsize if you stop and type 'look', or wait a few
+seconds.
+
 See also: TOGGLE
 #
 MAIL CHECK RECEIVE SEND

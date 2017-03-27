@@ -140,7 +140,7 @@ void extract_trigger(trig_data *trig) {
 	
 	// global trig?
 	if (TRIG_IS_RANDOM(trig)) {
-		LL_DELETE2(random_triggers, trig, next_in_random_triggers);
+		DL_DELETE2(random_triggers, trig, prev_in_random_triggers, next_in_random_triggers);
 	}
 
 	free_trigger(trig);

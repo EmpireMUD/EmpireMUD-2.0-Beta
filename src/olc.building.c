@@ -820,7 +820,7 @@ OLC_MODULE(bedit_description) {
 	}
 	else {
 		sprintf(buf, "description for %s", GET_BLD_NAME(bdg));
-		start_string_editor(ch->desc, buf, &(GET_BLD_DESC(bdg)), MAX_ROOM_DESCRIPTION);
+		start_string_editor(ch->desc, buf, &(GET_BLD_DESC(bdg)), MAX_ROOM_DESCRIPTION, TRUE);
 	}
 }
 

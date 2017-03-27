@@ -656,7 +656,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "echo", POS_SLEEPING, do_echo, LVL_CIMPL, GRANT_ECHO, SCMD_ECHO, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 	GRANT_CMD( "editnotes", POS_STANDING, do_editnotes, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EDITNOTES ),
 	SIMPLE_CMD( "eedit", POS_DEAD, do_eedit, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "efind", POS_STANDING, do_efind, NO_MIN, CTYPE_EMPIRE ),
+	SIMPLE_CMD( "efind", POS_SLEEPING, do_efind, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "elog", POS_DEAD, do_elog, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "empires", POS_DEAD, do_empires, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "empireinventory", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE ),
@@ -852,7 +852,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "quests", POS_DEAD, do_quest, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "quaff", POS_RESTING, do_quaff, NO_MIN, CTYPE_MOVE ),
 	STANDARD_CMD( "quarry", POS_STANDING, do_quarry, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
-	STANDARD_CMD( "quit", POS_DEAD, do_quit, NO_MIN, NO_GRANTS, SCMD_QUIT, CTYPE_UTIL, CMD_NOT_RP | CMD_NO_ABBREV, NO_ABIL ),
+	STANDARD_CMD( "quit", POS_DEAD, do_quit, NO_MIN, NO_GRANTS, SCMD_QUIT, CTYPE_UTIL, CMD_NO_ABBREV, NO_ABIL ),
 
 	SIMPLE_CMD( "reply", POS_DEAD, do_reply, NO_MIN, CTYPE_COMM ),
 	ABILITY_CMD( "radiance", POS_STANDING, do_radiance, NO_MIN, CTYPE_SKILL, ABIL_RADIANCE ),
@@ -1189,7 +1189,7 @@ void command_interpreter(char_data *ch, char *argument) {
 		send_to_char("You can't use immortal commands while switched.\r\n", ch);
 	else if (IS_INJURED(ch, INJ_TIED) && cmd_info[cmd].minimum_position >= POS_SLEEPING)
 		msg_to_char(ch, "You're tied up!\r\n");
-	else if (AFF_FLAGGED(ch, AFF_NO_ATTACK) && (cmd_info[cmd].ctype == CTYPE_COMBAT || cmd_info[cmd].ctype == CTYPE_SKILL || cmd_info[cmd].ctype == CTYPE_BUILD)) {
+	else if (AFF_FLAGGED(ch, AFF_NO_ATTACK) && !IS_NPC(ch) && (cmd_info[cmd].ctype == CTYPE_COMBAT || cmd_info[cmd].ctype == CTYPE_SKILL || cmd_info[cmd].ctype == CTYPE_BUILD)) {
 		msg_to_char(ch, "You can't do that in this state.\r\n");
 	}
 	else if (GET_POS(ch) < cmd_info[cmd].minimum_position) {
@@ -1229,7 +1229,7 @@ int find_command(const char *command) {
 
 struct alias_data *find_alias(struct alias_data *alias_list, char *str) {
 	while (alias_list != NULL) {
-		if (*str == *alias_list->alias)	/* hey, every little bit counts :-) */
+		if (LOWER(*str) == LOWER(*alias_list->alias))	/* hey, every little bit counts :-) */
 			if (!str_cmp(str, alias_list->alias))
 				return (alias_list);
 
@@ -1637,8 +1637,6 @@ struct {
 * @param descriptor_data *d the user
 */
 void prompt_creation(descriptor_data *d) {
-	int iter;
-	
 	switch (STATE(d)) {
 		case CON_Q_SCREEN_READER: {
 			SEND_TO_Q("\r\nEmpireMUD makes heavy use of an ascii map, but also supports screen\r\n", d);
@@ -1673,12 +1671,6 @@ void prompt_creation(descriptor_data *d) {
 			sprintf(buf, "Give me a password for %s: ", GET_PC_NAME(d->character));
 			SEND_TO_Q(buf, d);
 			ProtocolNoEcho(d, true);
-			
-			// stuff that could be initialized now that we have a new char
-			for (iter = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
-				CREATION_ARCHETYPE(d->character, iter) = NOTHING;
-			}
-			
 			break;
 		}
 		case CON_CNFPASSWD: {
@@ -2202,8 +2194,9 @@ void nanny(descriptor_data *d, char *arg) {
 			if (d->character == NULL) {
 				CREATE(d->character, char_data, 1);
 				clear_char(d->character);
-				CREATE(d->character->player_specials, struct player_special_data, 1);
+				init_player_specials(d->character);
 				d->character->desc = d;
+				d->character->prev_host = str_dup(d->host);	// this will be overwritten if it's not a new char
 			}
 			
 			if (!*arg) {

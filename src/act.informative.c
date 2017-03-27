@@ -161,7 +161,7 @@ struct custom_message *pick_custom_longdesc(char_data *ch) {
 	int iter, count = 0;
 	
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (!GET_EQ(ch, iter)) {
+		if (!GET_EQ(ch, iter) || !wear_data[iter].allow_custom_msgs) {
 			continue;
 		}
 		
@@ -1918,6 +1918,7 @@ ACMD(do_display) {
 		msg_to_char(ch, "Display what?\r\n");
 	}
 	else {
+		delete_doubledollar(argument);
 		msg_to_char(ch, "%s\r\n", replace_prompt_codes(ch, argument));
 	}
 }
@@ -2371,6 +2372,7 @@ ACMD(do_inventory) {
 
 
 ACMD(do_look) {
+	void clear_recent_moves(char_data *ch);
 	void look_in_direction(char_data *ch, int dir);
 	
 	char arg2[MAX_INPUT_LENGTH];
@@ -2391,19 +2393,23 @@ ACMD(do_look) {
 	else {
 		half_chop(argument, arg, arg2);
 
-		if (!*arg)			/* "look" alone, without an argument at all */
+		if (!*arg) {			/* "look" alone, without an argument at all */
+			clear_recent_moves(ch);
 			look_at_room(ch);
+		}
 		else if (!str_cmp(arg, "out")) {
 			if (!(map = get_map_location_for(IN_ROOM(ch)))) {
 				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
 			else if (map == IN_ROOM(ch) && !ROOM_IS_CLOSED(IN_ROOM(ch))) {
+				clear_recent_moves(ch);
 				look_at_room_by_loc(ch, map, LRR_LOOK_OUT);
 			}
 			else if (!IS_IMMORTAL(ch) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT) && !RMT_FLAGGED(IN_ROOM(ch), RMT_LOOK_OUT)) {
 				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
 			else {
+				clear_recent_moves(ch);
 				look_at_room_by_loc(ch, map, LRR_LOOK_OUT);
 			}
 		}
@@ -2673,13 +2679,21 @@ ACMD(do_score) {
 
 ACMD(do_survey) {
 	struct empire_city_data *city;
+	struct empire_island *eisle;
 	struct island_info *island;
 	
 	msg_to_char(ch, "You survey the area:\r\n");
 	
 	if (GET_ISLAND_ID(IN_ROOM(ch)) != NO_ISLAND) {
 		island = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE);
-		msg_to_char(ch, "Location: %s%s\r\n", get_island_name_for(island->id, ch), IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "");
+		
+		// find out if it has a local name
+		if (GET_LOYALTY(ch) && (eisle = get_empire_island(GET_LOYALTY(ch), island->id)) && eisle->name && str_cmp(eisle->name, island->name)) {
+			msg_to_char(ch, "Location: %s (%s)%s\r\n", get_island_name_for(island->id, ch), island->name, IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "");
+		}
+		else {
+			msg_to_char(ch, "Location: %s%s\r\n", get_island_name_for(island->id, ch), IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "");
+		}
 	}
 	
 	// empire

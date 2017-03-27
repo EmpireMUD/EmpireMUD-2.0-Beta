@@ -1376,8 +1376,10 @@ int get_line(FILE *fl, char *buf) {
 		}
 		lines++;
 	} while (*temp == '*' || *temp == '\n');
-
-	temp[strlen(temp) - 1] = '\0';
+	
+	if (temp[strlen(temp) - 1] == '\n') {
+		temp[strlen(temp) - 1] = '\0';
+	}
 	strcpy(buf, temp);
 	return (lines);
 }

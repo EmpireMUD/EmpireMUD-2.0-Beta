@@ -79,10 +79,10 @@ social_data *find_social(char_data *ch, char *name, bool exact) {
 	int num_found = 0;
 	
 	HASH_ITER(sorted_hh, sorted_socials, soc, next_soc) {
-		if (*SOC_COMMAND(soc) < *name) {	// shortcut: check first letter
+		if (LOWER(*SOC_COMMAND(soc)) < LOWER(*name)) {	// shortcut: check first letter
 			continue;
 		}
-		if (*SOC_COMMAND(soc) > *name) {	// short exit: past the right letter
+		if (LOWER(*SOC_COMMAND(soc)) > LOWER(*name)) {	// short exit: past the right letter
 			break;
 		}
 		if (SOCIAL_FLAGGED(soc, SOC_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {

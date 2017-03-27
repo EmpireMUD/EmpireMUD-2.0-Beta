@@ -4,12 +4,12 @@ a basket of papayas~
 A basket of papayas has been left here.~
 You can eat this fleshy pink fruit, or plant it.
 ~
-6 bl a 6
+6 bl a 7
 24 18500 0
 7 168
 I 15 18501 100.00 4 x  # SEPARATE: a single papaya
 O
-9 b
+9 br
 R
 5114 0
 S
@@ -19,12 +19,12 @@ a single papaya~
 Someone has dropped a single papaya here.~
 This is just one papaya, not enough to plant but enough to eat.
 ~
-6 0 a 5
+6 0 a 6
 6 0 0
 7 48
 I 14 18500 100.00 4 x  # COMBINE: a basket of papayas
 O
-9 n
+9 nr
 S
 #18506
 coins ancient pile~
@@ -648,7 +648,7 @@ Some boss loot has bugged out.~
    This item purges itself and spawns an actual boss-kill reward. But only on
 Group and Boss difficulties.
 ~
-3 0 a 7
+3 p a 8
 0 0 0
 10 0
 T 18544

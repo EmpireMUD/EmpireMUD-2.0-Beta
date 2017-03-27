@@ -642,7 +642,7 @@ void herd_animals_out(room_data *location) {
 				}
 			
 				// move the mob
-				if ((!to_room || IS_WATER_SECT(SECT(to_room))) && to_reverse && ROOM_BLD_FLAGGED(location, BLD_TWO_ENTRANCES)) {
+				if ((!to_room || WATER_SECT(to_room)) && to_reverse && ROOM_BLD_FLAGGED(location, BLD_TWO_ENTRANCES)) {
 					if (perform_move(ch_iter, BUILDING_ENTRANCE(location), TRUE, 0)) {
 						found_any = TRUE;
 					}
@@ -1341,12 +1341,18 @@ ACMD(do_build) {
 
 ACMD(do_dismantle) {
 	craft_data *type;
+	
+	skip_spaces(&argument);
+	if (*argument) {
+		msg_to_char(ch, "Dismantle is only used to dismantle buildings. Just type 'dismantle'. (You get this error if you typed an argument.)\r\n");
+		return;
+	}
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use the dismantle command.\r\n");
 		return;
 	}
-
+	
 	if (GET_ACTION(ch) == ACT_DISMANTLING) {
 		msg_to_char(ch, "You stop dismantling the building.\r\n");
 		act("$n stops dismantling the building.", FALSE, ch, 0, 0, TO_ROOM);
@@ -1506,7 +1512,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			if (!ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))) {
 				gain_ability_exp(ch, ABIL_CUSTOMIZE_BUILDING, 33.4);
 			}
-			start_string_editor(ch->desc, "room description", &(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))), MAX_ROOM_DESCRIPTION);
+			start_string_editor(ch->desc, "room description", &(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))), MAX_ROOM_DESCRIPTION, TRUE);
 			act("$n begins editing the room description.", TRUE, ch, 0, 0, TO_ROOM);
 		}
 		else {

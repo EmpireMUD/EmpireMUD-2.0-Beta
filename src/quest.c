@@ -4410,7 +4410,7 @@ OLC_MODULE(qedit_completemessage) {
 	}
 	else {
 		sprintf(buf, "completion message for %s", QUEST_NAME(quest));
-		start_string_editor(ch->desc, buf, &QUEST_COMPLETE_MSG(quest), MAX_ITEM_DESCRIPTION);
+		start_string_editor(ch->desc, buf, &QUEST_COMPLETE_MSG(quest), MAX_ITEM_DESCRIPTION, FALSE);
 	}
 }
 
@@ -4439,7 +4439,7 @@ OLC_MODULE(qedit_description) {
 	}
 	else {
 		sprintf(buf, "description for %s", QUEST_NAME(quest));
-		start_string_editor(ch->desc, buf, &QUEST_DESCRIPTION(quest), MAX_ITEM_DESCRIPTION);
+		start_string_editor(ch->desc, buf, &QUEST_DESCRIPTION(quest), MAX_ITEM_DESCRIPTION, FALSE);
 	}
 }
 

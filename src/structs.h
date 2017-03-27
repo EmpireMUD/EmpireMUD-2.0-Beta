@@ -1136,6 +1136,10 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_TYPE_NATURAL  0	// built-in trait
 #define APPLY_TYPE_ENCHANTMENT  1	// caused by enchant
 #define APPLY_TYPE_HONED  2	// Trade ability
+#define APPLY_TYPE_SUPERIOR  3	// only applies if the item is SUPERIOR when scaled
+#define APPLY_TYPE_HARD_DROP  4	// only applies if the item is HARD-DROP when scaled
+#define APPLY_TYPE_GROUP_DROP  5	// only applies if the item is GROUP-DROP when scaled
+#define APPLY_TYPE_BOSS_DROP  6	// only applies if the item is GROUP- and HARD-DROP both when scaled
 
 
 // CMP_x: component types
@@ -2079,6 +2083,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_OBJ_VAL_POSITIONS  3	// GET_OBJ_VAL(obj, X) -- caution: changing this will require you to change the .obj file format
 #define NUM_GLB_VAL_POSITIONS  3	// GET_GLOBAL_VAL(glb, X) -- caution: changing this will require you to change the .glb file format
 #define NUM_SKILL_SETS  2	// number of different sets a player has
+#define TRACK_MOVE_TIMES  20	// player's last X move timestamps
 
 
 /*
@@ -2930,6 +2935,8 @@ struct descriptor_data {
 	size_t max_str;	// max length of editor
 	int mail_to;	// name for mail system
 	int notes_id;	// idnum of player for notes-editing
+	any_vnum save_empire;	// for the text editor to know which empire to save
+	bool allow_null;	// string editor can be empty/null
 	
 	int has_prompt;	// is the user at a prompt?
 	char inbuf[MAX_RAW_INPUT_LENGTH];	// buffer for raw input
@@ -3182,6 +3189,7 @@ struct player_special_data {
 	byte reboot_conf;	// Reboot confirmation
 	byte create_points;	// Used in character creation
 	int group_invite_by;	// idnum of the last player to invite this one
+	time_t move_time[TRACK_MOVE_TIMES];	// timestamp of last X moves
 	
 	struct combat_meters meters;	// combat meter data
 	
@@ -3449,7 +3457,6 @@ struct action_data_struct {
 struct attribute_data_type {
 	char *name;
 	char *creation_description;	// shown if players need help during creation
-	bool active;	// attributes are split into active/passive
 };
 
 
@@ -3537,6 +3544,7 @@ struct wear_data_type {
 	char *already_wearing;	// error message when slot is full
 	char *wear_msg_to_room;	// msg act()'d to room on wear
 	char *wear_msg_to_char;	// msg act()'d to char on wear
+	bool allow_custom_msgs;	// some slots don't
 };
 
 

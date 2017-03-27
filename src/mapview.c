@@ -183,7 +183,9 @@ struct icon_data *get_icon_from_set(struct icon_data *set, int type) {
 * @return int The map radius.
 */
 int get_map_radius(char_data *ch) {
-	int mapsize;
+	extern int count_recent_moves(char_data *ch);
+	
+	int mapsize, recent, max, smallmax;
 
 	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
 	if (mapsize == 0) {
@@ -204,6 +206,14 @@ int get_map_radius(char_data *ch) {
 		else {
 			mapsize = config_get_int("default_map_size");
 		}
+	}
+	
+	// automatically limit size if the player is moving too fast
+	if (mapsize > 5 && (recent = count_recent_moves(ch)) > 5) {
+		max = config_get_int("max_map_size") - (recent - 5);
+		mapsize = MIN(mapsize, max);
+		smallmax = config_get_int("max_map_while_moving");
+		mapsize = MAX(mapsize, smallmax);
 	}
 	
 	return mapsize;
@@ -1212,7 +1222,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	}
 
 	/* Hidden buildings */
-	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(to_room) && (!map_loc || !map_to_room || distance(FLAT_X_COORD(map_loc), FLAT_Y_COORD(map_loc), FLAT_X_COORD(map_to_room), FLAT_Y_COORD(map_to_room)) > 2)) {
+	else if (CHECK_CHAMELEON(map_loc, to_room)) {
 		strcat(buf, base_icon->icon);
 		hidden = TRUE;
 	}
@@ -1564,7 +1574,7 @@ char *get_screenreader_room_name(room_data *from_room, room_data *to_room) {
 	
 	strcpy(temp, "*");
 	
-	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(to_room) && compute_distance(from_room, to_room) >= 2) {
+	if (CHECK_CHAMELEON(from_room, to_room)) {
 		strcpy(temp, GET_SECT_NAME(BASE_SECT(to_room)));
 	}
 	else if (GET_BUILDING(to_room) && ROOM_BLD_FLAGGED(to_room, BLD_BARRIER) && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY)) {
@@ -1588,7 +1598,7 @@ char *get_screenreader_room_name(room_data *from_room, room_data *to_room) {
 	}
 	
 	// now check custom name
-	if (ROOM_CUSTOM_NAME(to_room)) {
+	if (ROOM_CUSTOM_NAME(to_room) && !CHECK_CHAMELEON(from_room, to_room)) {
 		sprintf(lbuf, "%s/%s", ROOM_CUSTOM_NAME(to_room), temp);
 	}
 	else {
@@ -2116,6 +2126,7 @@ ACMD(do_exits) {
 
 
 ACMD(do_scan) {
+	void clear_recent_moves(char_data *ch);
 	void scan_for_tile(char_data *ch, char *argument);
 
 	int dir;
@@ -2134,12 +2145,14 @@ ACMD(do_scan) {
 		msg_to_char(ch, "Scan only works out on the map.\r\n");
 	}
 	else if ((dir = parse_direction(ch, argument)) == NO_DIR) {
+		clear_recent_moves(ch);
 		scan_for_tile(ch, argument);
 	}
 	else if (dir >= NUM_2D_DIRS) {
 		msg_to_char(ch, "You can't scan that way.\r\n");
 	}
 	else {
+		clear_recent_moves(ch);
 		screenread_one_dir(ch, use_room, dir);
 	}
 }

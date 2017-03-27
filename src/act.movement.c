@@ -218,6 +218,48 @@ bool can_enter_room(char_data *ch, room_data *room) {
 }
 
 
+/**
+* Clears a player's recent move times, which resets their shrinking map.
+*
+* @param char_data *ch The player.
+*/
+void clear_recent_moves(char_data *ch) {
+	int iter;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	for (iter = 0; iter < TRACK_MOVE_TIMES; ++iter) {
+		GET_MOVE_TIME(ch, iter) = 0;
+	}
+}
+
+
+/**
+* Returns the number of moves a player has made in the last 10 seconds.
+*
+* @param char_data *ch The player.
+* @return int Number of times moved in 10 seconds.
+*/
+int count_recent_moves(char_data *ch) {
+	time_t now = time(0);
+	int iter, count = 0;
+	
+	if (IS_NPC(ch)) {
+		return 0;
+	}
+	
+	for (iter = 0; iter < TRACK_MOVE_TIMES; ++iter) {
+		if (now - GET_MOVE_TIME(ch, iter) < 10) {
+			++count;
+		}
+	}
+	
+	return count;
+}
+
+
 void do_doorcmd(char_data *ch, obj_data *obj, int door, int scmd) {
 	char lbuf[MAX_STRING_LENGTH];
 	room_data *other_room = NULL;
@@ -404,6 +446,27 @@ void give_portal_sickness(char_data *ch, obj_data *portal, room_data *from, room
 
 
 /**
+* Marks that a player has moved, for tracking how often they move.
+*
+* @param char_data *ch The player moving.
+*/
+void mark_move_time(char_data *ch) {
+	int iter;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	// slide them all up one
+	for (iter = TRACK_MOVE_TIMES - 1; iter > 0; --iter) {
+		GET_MOVE_TIME(ch, iter) = GET_MOVE_TIME(ch, iter-1);
+	}
+	
+	GET_MOVE_TIME(ch, 0) = time(0);
+}
+
+
+/**
 * Actual transport between starting locations.
 *
 * @param char_data *ch The person to transport.
@@ -443,7 +506,15 @@ void perform_transport(char_data *ch, room_data *to_room) {
  //////////////////////////////////////////////////////////////////////////////
 //// MOVE VALIDATORS /////////////////////////////////////////////////////////
 
-// dir here is a real dir, not a confused dir
+/**
+* This determines if a PLAYER can move somewhere. Mobs do not hit this check.
+*
+* @param char_data *ch The player moving.
+* @param int dir A real dir, not a confused dir.
+* @param room_data *to_room The target room.
+* @param int need_specials_check If TRUE, the player is following someone.
+* @return int 0 for fail, 1 for success
+*/
 int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check) {
 	ACMD(do_dismount);
 	
@@ -467,7 +538,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 		}
 		return 0;
 	}
-	if (!IS_IMMORTAL(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && !IS_INSIDE(IN_ROOM(ch)) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && IS_ANY_BUILDING(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && ROOM_IS_CLOSED(to_room) && !need_specials_check) {
+	if (!IS_IMMORTAL(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && !IS_INSIDE(IN_ROOM(ch)) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && IS_ANY_BUILDING(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && ROOM_IS_CLOSED(to_room) && (!need_specials_check || (ch->master && !IS_NPC(ch) && IS_NPC(ch->master)))) {
 		msg_to_char(ch, "You can't enter a building without permission.\r\n");
 		return 0;
 	}
@@ -901,7 +972,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	}
 
 	// leaving message
-	if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
+	if (!AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
 		*buf2 = '\0';
 		
 		switch (mode) {
@@ -943,6 +1014,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 
 	// mark it
 	add_tracks(ch, IN_ROOM(ch), dir);
+	mark_move_time(ch);
 
 	char_from_room(ch);
 	char_to_room(ch, to_room);
@@ -972,7 +1044,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	}
 	
 	// walks-in messages
-	if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
+	if (!AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
 		switch (mode) {
 			case MOVE_LEAD:
 				act("$E leads $n behind $M.", TRUE, ch, 0, GET_LED_BY(ch), TO_NOTVICT);
@@ -1244,6 +1316,11 @@ ACMD(do_circle) {
 			break;
 		}
 		
+		if (iter > 0 && !ROOM_IS_CLOSED(to_room)) {
+			found_room = to_room;
+			break;
+		}
+		
 		// detect blocked array
 		for (side = 0; side < NUM_SIMPLE_DIRS; ++side) {
 			side_room = real_shift(to_room, shift_dir[side][0], shift_dir[side][1]);
@@ -1293,11 +1370,6 @@ ACMD(do_circle) {
 			ok = FALSE;
 			break;
 		}
-		
-		if (!ROOM_IS_CLOSED(to_room)) {
-			found_room = to_room;
-			break;
-		}
 	}
 	
 	if (!ok) {
@@ -1319,7 +1391,7 @@ ACMD(do_circle) {
 	
 	// message
 	msg_to_char(ch, "You circle %s.\r\n", dirs[get_direction_for_char(ch, dir)]);
-	if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
+	if (!AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
 		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
 			if (vict != ch && vict->desc && CAN_SEE(vict, ch)) {
 				sprintf(buf, "$n circles %s.", dirs[get_direction_for_char(vict, dir)]);
@@ -1332,6 +1404,7 @@ ACMD(do_circle) {
 	if (!IS_IMMORTAL(ch) && !IS_NPC(ch)) {
 		GET_MOVE(ch) -= need_movement;
 	}
+	mark_move_time(ch);
 	char_from_room(ch);
 	char_to_room(ch, found_room);
 	qt_visit_room(ch, IN_ROOM(ch));
@@ -1359,7 +1432,7 @@ ACMD(do_circle) {
 	greet_memory_mtrigger(ch);
 	
 	// message
-	if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
+	if (!AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
 		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
 			if (vict != ch && vict->desc && CAN_SEE(vict, ch)) {
 				sprintf(buf, "$n circles in from %s.", from_dir[get_direction_for_char(vict, dir)]);

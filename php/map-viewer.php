@@ -194,10 +194,10 @@ function checkgrid() {
 }
 function checkmap() {
 	if ($("#pol").prop("checked")) {
-		$(".wld").attr("src", "map-political.png");
+		$(".wld").attr("src", "<?= $politicalMap ?>");
 	}
 	else {
-		$(".wld").attr("src", "map.png");
+		$(".wld").attr("src", "<?= $normalMap ?>");
 	}
 }
 function checkcities() {

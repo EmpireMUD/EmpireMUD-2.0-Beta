@@ -810,6 +810,7 @@ Pixy race~
 context %instance.id%
 if !%pixy_race_running% || (%race_stage% && %race_stage% > 0)
   return 0
+  halt
 end
 eval race_stage 1
 global race_stage

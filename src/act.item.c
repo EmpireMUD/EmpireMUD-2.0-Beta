@@ -842,7 +842,7 @@ INTERACTION_FUNC(separate_obj_interact) {
 */
 static void wear_message(char_data *ch, obj_data *obj, int where) {
 	// char message
-	if (has_custom_message(obj, OBJ_CUSTOM_WEAR_TO_CHAR)) {
+	if (wear_data[where].allow_custom_msgs && has_custom_message(obj, OBJ_CUSTOM_WEAR_TO_CHAR)) {
 		act(get_custom_message(obj, OBJ_CUSTOM_WEAR_TO_CHAR), FALSE, ch, obj, NULL, TO_CHAR);
 	}
 	else {
@@ -850,7 +850,7 @@ static void wear_message(char_data *ch, obj_data *obj, int where) {
 	}
 	
 	// room message
-	if (has_custom_message(obj, OBJ_CUSTOM_WEAR_TO_ROOM)) {
+	if (wear_data[where].allow_custom_msgs && has_custom_message(obj, OBJ_CUSTOM_WEAR_TO_ROOM)) {
 		act(get_custom_message(obj, OBJ_CUSTOM_WEAR_TO_ROOM), TRUE, ch, obj, NULL, TO_ROOM);
 	}
 	else {
@@ -1586,14 +1586,14 @@ void scale_item_to_level(obj_data *obj, int level) {
 	if (GET_OBJ_MAX_SCALE_LEVEL(obj) > 0) {
 		level = MIN(level, GET_OBJ_MAX_SCALE_LEVEL(obj));
 	}
-	else if (room_max > 0) {
+	else if (room_max > 0 && !GET_OBJ_MIN_SCALE_LEVEL(obj)) {
 		level = MIN(level, room_max);
 	}
 	
 	if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0) {
 		level = MAX(level, GET_OBJ_MIN_SCALE_LEVEL(obj));
 	}
-	else if (room_min > 0) {
+	else if (room_min > 0 && !GET_OBJ_MAX_SCALE_LEVEL(obj)) {
 		level = MAX(level, room_min);
 	}
 	
@@ -1614,6 +1614,26 @@ void scale_item_to_level(obj_data *obj, int level) {
 	// scale data
 	REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_SCALABLE);
 	GET_OBJ_CURRENT_SCALE_LEVEL(obj) = level;
+	
+	// remove applies that don't ... apply
+	LL_FOREACH_SAFE(GET_OBJ_APPLIES(obj), apply, next_apply) {
+		if (apply->apply_type == APPLY_TYPE_SUPERIOR && !OBJ_FLAGGED(obj, OBJ_SUPERIOR)) {
+			LL_DELETE(GET_OBJ_APPLIES(obj), apply);
+			free(apply);
+		}
+		else if (apply->apply_type == APPLY_TYPE_HARD_DROP && !OBJ_FLAGGED(obj, OBJ_HARD_DROP)) {
+			LL_DELETE(GET_OBJ_APPLIES(obj), apply);
+			free(apply);
+		}
+		else if (apply->apply_type == APPLY_TYPE_GROUP_DROP && !OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
+			LL_DELETE(GET_OBJ_APPLIES(obj), apply);
+			free(apply);
+		}
+		else if (apply->apply_type == APPLY_TYPE_BOSS_DROP && (!OBJ_FLAGGED(obj, OBJ_HARD_DROP) || !OBJ_FLAGGED(obj, OBJ_GROUP_DROP))) {
+			LL_DELETE(GET_OBJ_APPLIES(obj), apply);
+			free(apply);
+		}
+	}
 	
 	// determine what we're working with
 	total_share = 0;	// counting up the amount to split
@@ -3301,7 +3321,7 @@ void warehouse_store(char_data *ch, char *argument) {
 	empire_data *room_emp = ROOM_OWNER(IN_ROOM(ch));
 	char numarg[MAX_INPUT_LENGTH], *tmp;
 	obj_data *obj, *next_obj;
-	int total = 1, done = 0, count = 0, dotmode;
+	int total = 1, done = 0, dotmode;
 	bool full = FALSE;
 	
 	if (!*argument) {
@@ -3379,7 +3399,7 @@ void warehouse_store(char_data *ch, char *argument) {
 			return;
 		}
 
-		while (obj && (dotmode == FIND_ALLDOT || count < total)) {
+		while (obj && (dotmode == FIND_ALLDOT || done < total)) {
 			next_obj = get_obj_in_list_vis(ch, argument, obj->next_content);
 
 			// bound objects never store
@@ -3508,7 +3528,7 @@ ACMD(do_drink) {
 		}
 	}
 
-	if (type == NOTHING && !(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	if (type == NOTHING && !(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))) {
 		if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(arg, "water") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)))) {
 			if (!can_drink_from_room(ch, (type = drink_ROOM))) {
 				return;

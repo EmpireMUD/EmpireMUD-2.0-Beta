@@ -2372,7 +2372,7 @@ void besiege_room(room_data *to_room, int damage) {
 	// if we got this far, we need to hurt some people
 	for (c = ROOM_PEOPLE(to_room); c; c = next_c) {
 		next_c = c->next_in_room;
-		if (GET_DEXTERITY(c) >= 3 && number(0, GET_DEXTERITY(c) / 3)) {
+		if ((GET_DEXTERITY(c) >= 3 && number(0, GET_DEXTERITY(c) / 3)) || IS_IMMORTAL(c)) {
 			msg_to_char(c, "You leap out of the way!\r\n");
 		}
 		else {
@@ -2676,8 +2676,12 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	}
 
 	/* If you attack a pet, it hates your guts */
-	if (victim->master == ch)
+	if (victim->master == ch) {
 		stop_follower(victim);
+	}
+	if (ch->master == victim) {
+		stop_follower(ch);	// don't allow following of people while fighting them
+	}
 
 	/* If the attacker is invisible, he becomes visible */
 	if (SHOULD_APPEAR(ch))
@@ -2944,7 +2948,7 @@ void heal(char_data *ch, char_data *vict, int amount) {
 	// check recovery
 	if (GET_POS(vict) < POS_SLEEPING && GET_HEALTH(vict) > 0) {
 		msg_to_char(vict, "You recover and wake up.\r\n");
-		GET_POS(vict) = POS_SITTING;
+		GET_POS(vict) = IS_NPC(vict) ? POS_STANDING : POS_SITTING;
 	}
 }
 

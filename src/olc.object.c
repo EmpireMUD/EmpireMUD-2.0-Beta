@@ -1495,7 +1495,7 @@ void save_olc_object(descriptor_data *desc) {
 * @param extra_descr_data *ex The extra description.
 */
 void setup_extra_desc_editor(char_data *ch, struct extra_descr_data *ex) {
-	start_string_editor(ch->desc, "extra description", &(ex->description), MAX_ITEM_DESCRIPTION);
+	start_string_editor(ch->desc, "extra description", &(ex->description), MAX_ITEM_DESCRIPTION, FALSE);
 }
 
 
@@ -1749,6 +1749,7 @@ void olc_show_object(char_data *ch) {
 	struct custom_message *ocm;
 	struct obj_apply *apply;
 	int count, minutes;
+	bld_data *bld;
 	
 	if (!obj) {
 		return;
@@ -1832,8 +1833,10 @@ void olc_show_object(char_data *ch) {
 	sprintf(buf + strlen(buf), "Storage: <&ystorage&0>\r\n");
 	count = 0;
 	for (store = obj->storage; store; store = store->next) {
+		bld = building_proto(store->building_type);
+		
 		sprintbit(store->flags, storage_bits, buf2, TRUE);
-		sprintf(buf + strlen(buf), " &y%d&0. %s ( %s)\r\n", ++count, GET_BLD_NAME(building_proto(store->building_type)), buf2);
+		sprintf(buf + strlen(buf), " &y%d&0. [%d] %s ( %s)\r\n", ++count, GET_BLD_VNUM(bld), GET_BLD_NAME(bld), buf2);
 	}
 	
 	// custom messages
@@ -1865,7 +1868,7 @@ OLC_MODULE(oedit_action_desc) {
 	}
 	else {
 		sprintf(buf, "description for %s", GET_OBJ_SHORT_DESC(obj));
-		start_string_editor(ch->desc, buf, &GET_OBJ_ACTION_DESC(obj), MAX_ITEM_DESCRIPTION);
+		start_string_editor(ch->desc, buf, &GET_OBJ_ACTION_DESC(obj), MAX_ITEM_DESCRIPTION, TRUE);
 	}
 }
 

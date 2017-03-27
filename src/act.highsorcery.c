@@ -318,9 +318,7 @@ bool can_use_ritual(char_data *ch, int ritual) {
 INTERACTION_FUNC(devastate_crop) {	
 	crop_data *cp = ROOM_CROP(inter_room);
 	obj_data *newobj;
-	int num;
-
-	num = number(1, 4) * interaction->quantity;
+	int num = interaction->quantity;
 	
 	msg_to_char(ch, "You devastate the %s and collect %s (x%d)!\r\n", GET_CROP_NAME(cp), get_obj_name_by_proto(interaction->vnum), num);
 	sprintf(buf, "$n's powerful ritual devastates the %s crops!", GET_CROP_NAME(cp));
@@ -993,13 +991,21 @@ ACMD(do_manashield) {
 
 ACMD(do_mirrorimage) {
 	extern char_data *has_familiar(char_data *ch);
+	extern struct custom_message *pick_custom_longdesc(char_data *ch);
 	void scale_mob_as_familiar(char_data *mob, char_data *master);
 	
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], *tmp;
 	char_data *mob, *other;
 	obj_data *wield;
 	int cost = GET_MAX_MANA(ch) / 5;
 	mob_vnum vnum = MIRROR_IMAGE_MOB;
+	struct custom_message *ocm;
 	bool found;
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot use mirrorimage.\r\n");
+		return;
+	}
 	
 	if (!can_use_ability(ch, ABIL_MIRRORIMAGE, MANA, cost, COOLDOWN_MIRRORIMAGE)) {
 		return;
@@ -1033,12 +1039,53 @@ ACMD(do_mirrorimage) {
 	// restrings
 	GET_PC_NAME(mob) = str_dup(PERS(ch, ch, FALSE));
 	GET_SHORT_DESC(mob) = str_dup(GET_PC_NAME(mob));
-	sprintf(buf, "%s is standing here.\r\n", GET_SHORT_DESC(mob));
+	GET_REAL_SEX(mob) = GET_REAL_SEX(ch);	// need this for some desc stuff
+	
+	// longdesc is more complicated
+	if (GET_MORPH(ch)) {
+		sprintf(buf, "%s\r\n", MORPH_LONG_DESC(GET_MORPH(ch)));
+	}
+	else if ((ocm = pick_custom_longdesc(ch))) {
+		sprintf(buf, "%s\r\n", ocm->msg);
+		
+		// must process $n, $s, $e, $m
+		if (strstr(buf, "$n")) {
+			tmp = str_replace("$n", GET_SHORT_DESC(mob), buf);
+			strcpy(buf, tmp);
+			free(tmp);
+		}
+		if (strstr(buf, "$s")) {
+			tmp = str_replace("$s", HSHR(mob), buf);
+			strcpy(buf, tmp);
+			free(tmp);
+		}
+		if (strstr(buf, "$e")) {
+			tmp = str_replace("$e", HSSH(mob), buf);
+			strcpy(buf, tmp);
+			free(tmp);
+		}
+		if (strstr(buf, "$m")) {
+			tmp = str_replace("$m", HMHR(mob), buf);
+			strcpy(buf, tmp);
+			free(tmp);
+		}
+
+	}
+	else {
+		sprintf(buf, "%s is standing here.\r\n", GET_SHORT_DESC(mob));
+	}
 	*buf = UPPER(*buf);
-	GET_LONG_DESC(mob) = str_dup(buf);
+	
+	// attach rank if needed
+	if (GET_LOYALTY(ch)) {
+		sprintf(buf2, "<%s&0&y> %s", EMPIRE_RANK(GET_LOYALTY(ch), GET_RANK(ch)-1), buf);
+		GET_LONG_DESC(mob) = str_dup(buf2);
+	}
+	else {
+		GET_LONG_DESC(mob) = str_dup(buf);
+	}
 	
 	// stats
-	GET_REAL_SEX(mob) = GET_REAL_SEX(ch);
 	
 	// inherit scaled mob health
 	// mob->points.max_pools[HEALTH] = get_approximate_level(ch) * level_health_mod;

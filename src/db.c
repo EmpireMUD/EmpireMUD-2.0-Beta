@@ -198,7 +198,7 @@ int tips_of_the_day_size = 0;	// size of tip array
 // triggers
 trig_data *trigger_table = NULL;	// trigger prototype hash
 trig_data *trigger_list = NULL;	// LL of all attached triggers
-trig_data *random_triggers = NULL;	// LL of live random triggers (next_in_random_triggers)
+trig_data *random_triggers = NULL;	// DLL of live random triggers (next_in_random_triggers, prev_in_random_triggers)
 int max_mob_id = MOB_ID_BASE;	// for unique mob ids
 int max_obj_id = OBJ_ID_BASE;	// for unique obj ids
 int max_vehicle_id = VEHICLE_ID_BASE;	// for unique vehicle ids
@@ -1559,6 +1559,48 @@ void clear_char(char_data *ch) {
 	MOB_DYNAMIC_SEX(ch) = NOTHING;
 	MOB_DYNAMIC_NAME(ch) = NOTHING;
 	MOB_PURSUIT_LEASH_LOC(ch) = NOWHERE;
+}
+
+
+/**
+* This is called during creation, and before loading a player from file. It
+* initializes things that should be -1/NOTHINGs.
+*
+* @param char_data *ch A player.
+*/
+void init_player_specials(char_data *ch) {
+	int iter;
+	
+	if (IS_NPC(ch)) {
+		syslog(SYS_ERROR, 0, TRUE, "SYSERR: init_player_specials called on an NPC");
+		return;
+	}
+	
+	// ensures they have unique player_specials
+	if (!(ch->player_specials) || ch->player_specials == &dummy_mob) {
+		CREATE(ch->player_specials, struct player_special_data, 1);
+	}
+	
+	GET_LAST_ROOM(ch) = NOWHERE;
+	GET_LOADROOM(ch) = NOWHERE;
+	GET_LOAD_ROOM_CHECK(ch) = NOWHERE;
+	GET_MARK_LOCATION(ch) = NOWHERE;
+	GET_MOUNT_VNUM(ch) = NOTHING;
+	GET_PLEDGE(ch) = NOTHING;
+	GET_TOMB_ROOM(ch) = NOWHERE;
+	GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
+	GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
+	GET_LAST_TELL(ch) = NOBODY;
+	GET_TEMPORARY_ACCOUNT_ID(ch) = NOTHING;
+	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
+	
+	for (iter = 0; iter < MAX_REWARDS_PER_DAY; ++iter) {
+		GET_REWARDED_TODAY(ch, iter) = -1;
+	}
+	
+	for (iter = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
+		CREATION_ARCHETYPE(ch, iter) = NOTHING;
+	}
 }
 
 

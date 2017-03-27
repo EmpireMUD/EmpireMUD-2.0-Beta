@@ -375,7 +375,7 @@ OLC_MODULE(mapedit_room_description) {
 			msg_to_char(ch, "You are already editing a string.\r\n");
 		}
 		else {
-			start_string_editor(ch->desc, "room description", &(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))), MAX_ROOM_DESCRIPTION);
+			start_string_editor(ch->desc, "room description", &(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))), MAX_ROOM_DESCRIPTION, TRUE);
 		}
 	}
 	else

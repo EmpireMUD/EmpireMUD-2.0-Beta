@@ -88,6 +88,10 @@ void check_attribute_gear(char_data *ch) {
 	if (IS_MORPHED(ch)) {
 		return;
 	}
+	// don't remove gear while fighting
+	if (FIGHTING(ch)) {
+		return;
+	}
 	
 	// ensure work to do (shortcut)
 	found = FALSE;
@@ -252,6 +256,12 @@ void check_should_dismount(char_data *ch) {
 		ok = FALSE;
 	}
 	else if (MOUNT_FLAGGED(ch, MOUNT_FLYING) && !CAN_RIDE_FLYING_MOUNT(ch)) {
+		ok = FALSE;
+	}
+	else if (DEEP_WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
+		ok = FALSE;
+	}
+	else if (!has_ability(ch, ABIL_ALL_TERRAIN_RIDING) && WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
 		ok = FALSE;
 	}
 	
@@ -427,7 +437,7 @@ void point_update_char(char_data *ch) {
 
 	// healing for NPCs -- pcs are in real_update
 	if (IS_NPC(ch)) {
-		if (GET_POS(ch) >= POS_STUNNED && !FIGHTING(ch)) {
+		if (GET_POS(ch) >= POS_STUNNED && !FIGHTING(ch) && !GET_FED_ON_BY(ch)) {
 			// verify not fighting at all
 			for (c = ROOM_PEOPLE(IN_ROOM(ch)), found = FALSE; c && !found; c = c->next_in_room) {
 				if (FIGHTING(c) == ch) {
@@ -698,7 +708,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// less drunk
-	gain_condition(ch, DRUNK, -1);
+	gain_condition(ch, DRUNK, AWAKE(ch) ? -1 : -6);
 	
 	// ensure character isn't under on primary attributes
 	check_attribute_gear(ch);
@@ -2001,7 +2011,7 @@ int health_gain(char_data *ch, bool info_only) {
 			gain *= 4;
 		}
 		
-		if (GET_POS(ch) == POS_SLEEPING) {
+		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 			min = round((double) GET_MAX_HEALTH(ch) / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
@@ -2057,7 +2067,7 @@ int mana_gain(char_data *ch, bool info_only) {
 			gain *= 4;
 		}
 		
-		if (GET_POS(ch) == POS_SLEEPING) {
+		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 			min = round((double) GET_MAX_MANA(ch) / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
@@ -2109,7 +2119,7 @@ int move_gain(char_data *ch, bool info_only) {
 			gain *= 4;
 		}
 		
-		if (GET_POS(ch) == POS_SLEEPING) {
+		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 			min = round((double) GET_MAX_MOVE(ch) / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}

@@ -530,7 +530,7 @@ OLC_MODULE(booked_item_description) {
 		msg_to_char(ch, "You are already editing a string.\r\n");
 	}
 	else {
-		start_string_editor(ch->desc, "book item description", &(book->item_description), MAX_ITEM_DESCRIPTION);
+		start_string_editor(ch->desc, "book item description", &(book->item_description), MAX_ITEM_DESCRIPTION, TRUE);
 	}
 }
 
@@ -625,7 +625,7 @@ OLC_MODULE(booked_paragraphs) {
 				if (--num == 0) {
 					found = TRUE;
 					msg_to_char(ch, "NOTE: Each paragraph should be no more than 4 or 5 lines, formatted with /fi\r\n");
-					start_string_editor(ch->desc, "paragraph", &(para->text), MAX_BOOK_PARAGRAPH);
+					start_string_editor(ch->desc, "paragraph", &(para->text), MAX_BOOK_PARAGRAPH, FALSE);
 					break;
 				}
 			}
@@ -684,7 +684,7 @@ OLC_MODULE(booked_paragraphs) {
 		
 		if (found) {
 			msg_to_char(ch, "NOTE: Each paragraph should be no more than 4 or 5 lines, formatted with /fi\r\n");
-			start_string_editor(ch->desc, "new paragraph", &(new->text), MAX_BOOK_PARAGRAPH);
+			start_string_editor(ch->desc, "new paragraph", &(new->text), MAX_BOOK_PARAGRAPH, FALSE);
 		}
 		else {
 			msg_to_char(ch, "Invalid paragraph position.\r\n");

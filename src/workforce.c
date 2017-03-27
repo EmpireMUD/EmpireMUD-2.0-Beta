@@ -74,7 +74,7 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_pressing);
 CHORE_GEN_CRAFT_VALIDATOR(chore_smelting);
 CHORE_GEN_CRAFT_VALIDATOR(chore_weaving);
 
-void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_CRAFT_VALIDATOR(*validator));
+void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_CRAFT_VALIDATOR(*validator), bool is_skilled);
 
 
  /////////////////////////////////////////////////////////////////////////////
@@ -203,10 +203,10 @@ void process_one_chore(empire_data *emp, room_data *room) {
 			do_chore_brickmaking(emp, room);
 		}
 		if (HAS_FUNCTION(room, FNC_SMELT) && CHORE_ACTIVE(CHORE_SMELTING)) {
-			do_chore_gen_craft(emp, room, CHORE_SMELTING, chore_smelting);
+			do_chore_gen_craft(emp, room, CHORE_SMELTING, chore_smelting, FALSE);
 		}
 		if (HAS_FUNCTION(room, FNC_TAILOR) && CHORE_ACTIVE(CHORE_WEAVING)) {
-			do_chore_gen_craft(emp, room, CHORE_WEAVING, chore_weaving);
+			do_chore_gen_craft(emp, room, CHORE_WEAVING, chore_weaving, FALSE);
 		}
 		if (HAS_FUNCTION(room, FNC_FORGE) && CHORE_ACTIVE(CHORE_NAILMAKING)) {
 			do_chore_nailmaking(emp, room);
@@ -236,13 +236,13 @@ void process_one_chore(empire_data *emp, room_data *room) {
 			do_chore_einv_interaction(emp, room, CHORE_SAWING, INTERACT_SAW);
 		}
 		if (HAS_FUNCTION(room, FNC_MILL) && CHORE_ACTIVE(CHORE_MILLING)) {
-			do_chore_gen_craft(emp, room, CHORE_MILLING, chore_milling);
+			do_chore_gen_craft(emp, room, CHORE_MILLING, chore_milling, FALSE);
 		}
 		if (HAS_FUNCTION(room, FNC_PRESS) && CHORE_ACTIVE(CHORE_OILMAKING)) {
-			do_chore_gen_craft(emp, room, CHORE_OILMAKING, chore_pressing);
+			do_chore_gen_craft(emp, room, CHORE_OILMAKING, chore_pressing, FALSE);
 		}
 		if (BUILDING_VNUM(room) == RTYPE_SORCERER_TOWER && CHORE_ACTIVE(CHORE_NEXUS_CRYSTALS) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && EMPIRE_HAS_TECH(emp, TECH_EXARCH_CRAFTS)) {
-			do_chore_gen_craft(emp, room, CHORE_NEXUS_CRYSTALS, chore_nexus_crystals);
+			do_chore_gen_craft(emp, room, CHORE_NEXUS_CRYSTALS, chore_nexus_crystals, TRUE);
 		}
 	}
 }
@@ -258,7 +258,7 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	if (!emp || !veh || !IN_ROOM(veh)) {
 		return;
 	}
-	if (IS_WATER_SECT(SECT(IN_ROOM(veh))) || (island = GET_ISLAND_ID(IN_ROOM(veh))) == NO_ISLAND) {
+	if (WATER_SECT(IN_ROOM(veh)) || (island = GET_ISLAND_ID(IN_ROOM(veh))) == NO_ISLAND) {
 		return;
 	}
 	if (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)) {
@@ -991,8 +991,9 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_weaving) {
 * @param room_data *room The room the chore is in.
 * @param int chore CHORE_ const for this chore.
 * @param CHORE_GEN_CRAFT_VALIDATOR *validator A function that validates a craft.
+* @param bool is_skilled If TRUE, gains exp for Skilled Labor.
 */
-void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_CRAFT_VALIDATOR(*validator)) {
+void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_CRAFT_VALIDATOR(*validator), bool is_skilled) {
 	extern struct gen_craft_data_t gen_craft_data[];
 	
 	struct empire_storage_data *store = NULL;
@@ -1062,6 +1063,9 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 		
 		add_to_empire_storage(emp, islid, GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));
 		empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
+		if (is_skilled) {
+			empire_skillup(emp, ABIL_SKILLED_LABOR, config_get_double("exp_from_workforce"));
+		}
 		
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {

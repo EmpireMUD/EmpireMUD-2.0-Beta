@@ -163,7 +163,7 @@ int mob_coins(char_data *mob) {
 		if ((emp = GET_LOYALTY(mob))) {
 			amt = MIN(amt, EMPIRE_COINS(emp));
 			EMPIRE_COINS(emp) -= amt;
-			// we don't save the empire here but it's likely to save on its own soon -- just like the dropped coins will
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		}
 	}
 	
@@ -215,7 +215,7 @@ void random_encounter(char_data *ch) {
 	}
 	
 	// water encounters don't trigger if the player is on a vehicle
-	if ((IS_WATER_SECT(SECT(IN_ROOM(ch))) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_NEED_BOAT) || RMT_FLAGGED(IN_ROOM(ch), RMT_NEED_BOAT)) && (GET_SITTING_ON(ch) || EFFECTIVELY_FLYING(ch))) {
+	if ((ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_SHALLOW_WATER) || WATER_SECT(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_NEED_BOAT) || RMT_FLAGGED(IN_ROOM(ch), RMT_NEED_BOAT)) && (GET_SITTING_ON(ch) || EFFECTIVELY_FLYING(ch))) {
 		return;
 	}
 
@@ -1247,14 +1247,14 @@ void scale_mob_to_level(char_data *mob, int level) {
 	if (GET_MIN_SCALE_LEVEL(mob) > 0) {
 		level = MAX(GET_MIN_SCALE_LEVEL(mob), level);
 	}
-	else if (room_min > 0) {
+	else if (room_min > 0 && !GET_MAX_SCALE_LEVEL(mob)) {
 		level = MAX(room_min, level);
 	}
 	
 	if (GET_MAX_SCALE_LEVEL(mob) > 0) {
 		level = MIN(GET_MAX_SCALE_LEVEL(mob), level);
 	}
-	else if (room_max > 0) {
+	else if (room_max > 0 && !GET_MIN_SCALE_LEVEL(mob)) {
 		level = MIN(room_max, level);
 	}
 	

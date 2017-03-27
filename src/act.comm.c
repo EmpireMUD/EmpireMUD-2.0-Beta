@@ -828,11 +828,11 @@ ACMD(do_slash_channel) {
 			// announce it (this also messages the player)
 			if (!global_mute_slash_channel_joins) {
 				// announce to channel members
-				if (GET_INVIS_LEV(ch) <= LVL_MORTAL) {
+				if (GET_INVIS_LEV(ch) <= LVL_MORTAL && !PRF_FLAGGED(ch, PRF_INCOGNITO)) {
 					announce_to_slash_channel(chan, "%s has joined the channel", PERS(ch, ch, TRUE));
 				}
 				// if player wouldn't see their own join announce
-				if (GET_INVIS_LEV(ch) > LVL_MORTAL || PRF_FLAGGED(ch, PRF_NO_CHANNEL_JOINS)) {
+				if (GET_INVIS_LEV(ch) > LVL_MORTAL || PRF_FLAGGED(ch, PRF_NO_CHANNEL_JOINS) || PRF_FLAGGED(ch, PRF_INCOGNITO)) {
 					msg_to_char(ch, "You join \t%c/%s\tn.\r\n", chan->color, chan->name);
 				}
 			}
@@ -866,7 +866,7 @@ ACMD(do_slash_channel) {
 				free(slash);
 			}
 			
-			if (GET_INVIS_LEV(ch) <= LVL_MORTAL) {
+			if (GET_INVIS_LEV(ch) <= LVL_MORTAL && !PRF_FLAGGED(ch, PRF_INCOGNITO)) {
 				announce_to_slash_channel(chan, "%s has left the channel", PERS(ch, ch, TRUE));
 			}
 		}
@@ -1076,6 +1076,11 @@ ACMD(do_ignore) {
 	}
 	else if (!(victim = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
 		msg_to_char(ch, "No one by that name here.\r\n");
+	}
+	else if (is_ignoring(ch, victim)) {
+		// remove it
+		msg_to_char(ch, "You are no longer ignoring %s.\r\n", GET_NAME(victim));
+		remove_ignore(ch, GET_IDNUM(victim));
 	}
 	else if (ch == victim) {
 		msg_to_char(ch, "If you ignore yourself, who will you have left to talk to?\r\n");

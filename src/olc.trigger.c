@@ -882,7 +882,7 @@ OLC_MODULE(tedit_commands) {
 		msg_to_char(ch, "You are already editing a string.\r\n");
 	}
 	else {
-		start_string_editor(ch->desc, "trigger commands", &GET_OLC_STORAGE(ch->desc), MAX_CMD_LENGTH);
+		start_string_editor(ch->desc, "trigger commands", &GET_OLC_STORAGE(ch->desc), MAX_CMD_LENGTH, TRUE);
 	}
 }
 

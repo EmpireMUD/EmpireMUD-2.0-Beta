@@ -90,7 +90,7 @@ water from this rare summer monsoon. But as you look at the cacti and shrubs,
 they turn a brighter and brighter shade of green, and seem to swirl with magic.
 After all, this is the Magiterranean.
 ~
-M 0 10145 100.00 1
+M 0 10145 100.00 2
 T 10163
 T 10157
 S
@@ -220,7 +220,7 @@ gi k 0
 M 0 10140 66.66 10
 M 0 10141 66.66 10
 M 0 10142 66.66 10
-M 0 10147 100.00 1
+M 0 10147 100.00 2
 M 1 10172 100.00 1
 S
 #10190

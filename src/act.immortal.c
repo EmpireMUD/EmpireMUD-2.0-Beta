@@ -3944,6 +3944,7 @@ void do_stat_room(char_data *ch) {
 	extern const char *depletion_type[NUM_DEPLETION_TYPES];
 	extern const char *room_extra_types[];
 	
+	char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
 	struct depletion_data *dep;
 	struct empire_city_data *city;
 	int found;
@@ -3966,7 +3967,16 @@ void do_stat_room(char_data *ch) {
 	else {
 		strcpy(buf2, GET_SECT_NAME(SECT(IN_ROOM(ch))));
 	}
-	msg_to_char(ch, "(%d, %d) %s (&c%s&0/&c%s&0)\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE), buf2, GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
+	
+	// check for natural sect
+	if (GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE) {
+		sprintf(buf3, "/&c%s&0", GET_SECT_NAME(world_map[X_COORD(IN_ROOM(ch))][Y_COORD(IN_ROOM(ch))].natural_sector));
+	}
+	else {
+		*buf3 = '\0';
+	}
+	
+	msg_to_char(ch, "(%d, %d) %s (&c%s&0/&c%s&0%s)\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE), buf2, GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))), buf3);
 	msg_to_char(ch, "VNum: [&g%d&0], Island: [%d] %s\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(home), get_island(GET_ISLAND_ID(home), TRUE)->name);
 	
 	if (home != IN_ROOM(ch)) {
@@ -5210,7 +5220,7 @@ ACMD(do_editnotes) {
 	else {
 		sprintf(buf, "notes for account %d", acct->id);
 	}
-	start_string_editor(ch->desc, buf, &(acct->notes), MAX_ADMIN_NOTES_LENGTH-1);
+	start_string_editor(ch->desc, buf, &(acct->notes), MAX_ADMIN_NOTES_LENGTH-1, TRUE);
 	ch->desc->notes_id = acct->id;
 
 	act("$n begins editing some notes.", TRUE, ch, FALSE, FALSE, TO_ROOM);
@@ -6977,7 +6987,7 @@ ACMD(do_tedit) {
 	}
 
 	/* set up editor stats */
-	start_string_editor(ch->desc, "file", tedit_option[l].buffer, tedit_option[l].size);
+	start_string_editor(ch->desc, "file", tedit_option[l].buffer, tedit_option[l].size, FALSE);
 	ch->desc->file_storage = str_dup(tedit_option[l].filename);
 	act("$n begins editing a file.", TRUE, ch, 0, 0, TO_ROOM);
 }

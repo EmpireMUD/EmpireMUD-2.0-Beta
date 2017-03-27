@@ -1729,6 +1729,7 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "remove_lore_after_years", CONFTYPE_INT, "game years to clean some lore types");
 	init_config(CONFIG_PLAYERS, "default_map_size", CONFTYPE_INT, "distance from the player that can be seen");
 	init_config(CONFIG_PLAYERS, "max_map_size", CONFTYPE_INT, "highest view radius a player may set");
+	init_config(CONFIG_PLAYERS, "max_map_while_moving", CONFTYPE_INT, "maximum mapsize if the player is moving quickly");
 	init_config(CONFIG_PLAYERS, "blood_starvation_level", CONFTYPE_INT, "how low blood gets before a vampire is starving");
 	init_config(CONFIG_PLAYERS, "offer_time", CONFTYPE_INT, "seconds an offer is good for, for accept/reject");
 	

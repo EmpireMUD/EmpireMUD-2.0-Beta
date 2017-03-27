@@ -1015,7 +1015,7 @@ void script_trigger_check(void) {
 	bool fail;
 	
 	// iterate over global list of random triggers
-	LL_FOREACH_SAFE2(random_triggers, trig, next_trig, next_in_random_triggers) {
+	DL_FOREACH_SAFE2(random_triggers, trig, next_trig, next_in_random_triggers) {
 		if (GET_TRIG_DEPTH(trig)) {
 			continue;	// trigger already running
 		}
@@ -1348,7 +1348,8 @@ void add_trigger(struct script_data *sc, trig_data *t, int loc) {
 	// add to lists
 	LL_PREPEND2(trigger_list, t, next_in_world);
 	if (TRIG_IS_RANDOM(t)) {
-		LL_PREPEND2(random_triggers, t, next_in_random_triggers);
+		// add to end
+		DL_APPEND2(random_triggers, t, prev_in_random_triggers, next_in_random_triggers);
 	}
 }
 

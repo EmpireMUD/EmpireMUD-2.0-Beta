@@ -1119,8 +1119,10 @@ if %actor%
     end
     %load% obj %vnum% %actor% inv %level%
     eval item %%actor.inventory(%vnum%)%%
-    eval bind %%item.bind(%self%)%%
-    nop %bind%
+    if %item.is_flagged(BOP)%
+      eval bind %%item.bind(%self%)%%
+      nop %bind%
+    end
     * %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
   end
 end

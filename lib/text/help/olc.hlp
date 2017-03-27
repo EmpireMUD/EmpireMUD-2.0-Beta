@@ -3192,7 +3192,8 @@ Applies are bonuses (or penalties) that an item gives to the player who is
 using it. The following applies are available.
 
 Apply types (optional) let you specify which applies come from enchantments or
-other sources (the default is "natural").
+other sources (the default is "natural"). The superior and *-drop apply types
+will only appear on the item if it has matching flags.
 
 Most applies are self-explanatory:
  STRENGTH - characters can't use an item that would reduce them below 1

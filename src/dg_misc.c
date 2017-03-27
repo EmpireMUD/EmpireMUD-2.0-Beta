@@ -110,8 +110,12 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	half_chop(cmd, value_p, duration_p);
 
 	/* make sure all parameters are present */
-	if (!*charname || !*property || !*value_p || !*duration_p) {
+	if (!*charname || !*property || !*value_p) {
 		script_log("Trigger: %s, VNum %d. dg_affect usage: <target> <property> <value> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+		return;
+	}
+	if (str_cmp(value_p, "off") && !*duration_p) {
+		script_log("Trigger: %s, VNum %d. dg_affect missing duration", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		return;
 	}
 
@@ -764,7 +768,11 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 		}
 		die(vict, killer ? killer : vict);
 	}
-}  
+	else if (modifier < 0 && GET_HEALTH(vict) > 0 && GET_POS(vict) < POS_SLEEPING) {
+		msg_to_char(vict, "You recover and wake up.\r\n");
+		GET_POS(vict) = IS_NPC(vict) ? POS_STANDING : POS_SITTING;
+	}
+}
 
 
 /**

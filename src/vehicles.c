@@ -2455,7 +2455,7 @@ OLC_MODULE(vedit_lookdescription) {
 	}
 	else {
 		sprintf(buf, "description for %s", VEH_SHORT_DESC(veh));
-		start_string_editor(ch->desc, buf, &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION);
+		start_string_editor(ch->desc, buf, &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
 	}
 }
 

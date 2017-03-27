@@ -265,7 +265,7 @@ class_data *find_class_by_vnum(any_vnum vnum) {
 */
 void update_class(char_data *ch) {
 	#define NUM_BEST  3
-	#define IGNORE_BOTTOM_SKILL_POINTS  30	// amount newbies should start with
+	#define IGNORE_BOTTOM_SKILL_POINTS  35	// amount newbies should start with
 	#define BEST_SUM_REQUIRED_FOR_100  (2 * CLASS_SKILL_CAP + SPECIALTY_SKILL_CAP)
 	#define CLASS_LEVEL_BUFFER  24	// allows the class when still this much under the final level requirement
 	
