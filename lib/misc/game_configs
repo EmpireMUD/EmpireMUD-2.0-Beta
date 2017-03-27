@@ -126,6 +126,7 @@ idle_linkdead_rent_time 5
 idle_rent_time 20
 max_capitals_in_name 2
 max_map_size 12
+max_map_while_moving 5
 max_player_attribute 15
 max_sleeping_regen_time 60
 num_bonus_trait_daily_skills 5
