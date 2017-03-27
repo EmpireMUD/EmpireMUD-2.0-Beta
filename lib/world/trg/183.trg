@@ -96,8 +96,8 @@ switch %random.4%
           %send% %person% You are pummeled by raging waters...
           %damage% %person% 100 physical
         end
-        context %person.id%
-        if !%swimming%
+        eval test %%swimming_%person.id%%%
+        if !%test%
           %send% %person% &rYou are drowned by the rising waters!
           %echoaround% %person% %person.name% sinks beneath the rising waters!
           if %heroic_mode%
@@ -108,7 +108,7 @@ switch %random.4%
         else
           %send% %person% You barely keep your head above the water!
           %echoaround% %person% %person.name% barely keeps %person.hisher% head above the water!
-          unset swimming
+          unset swimming_%person.id%
         end
       end
       eval person %person.next_in_room%
@@ -220,9 +220,9 @@ end
 %send% %actor% You start swimming.
 %echoaround% %actor% %actor.name% starts swimming.
 dg_affect %actor% STUNNED on 10
-context %actor.id%
-set swimming 1
-global swimming
+context %instance.id%
+set swimming_%actor.id% 1
+global swimming_%actor.id%
 ~
 #18304
 Pyramid difficulty selector~
