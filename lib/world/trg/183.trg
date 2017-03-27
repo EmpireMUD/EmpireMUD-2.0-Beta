@@ -59,7 +59,7 @@ switch %random.4%
     eval room %self.room%
     if %heroic_mode%
       * Scarab swarm
-      %load% mob 18302
+      %load% mob 18302 ally
       eval summon %room.people%
       if %summon.vnum% == 18302
         %echo% %self.name% summons %summon.name%, and directs them to attack %actor.name%!
@@ -67,7 +67,7 @@ switch %random.4%
       end
     else
       * Jackal
-      %load% mob 18301
+      %load% mob 18301 ally
       eval summon %room.people%
       if %summon.vnum% == 18301
         %echo% %self.name% summons %summon.name%, and directs it to attack %actor.name%!
@@ -138,7 +138,7 @@ switch %random.4%
           if %cycle% == 1
             dg_affect %person% BLIND on 20
           end
-          %damage% %actor% 50 physical
+          %damage% %person% 50 physical
         end
         eval person %person.next_in_room%
       done
@@ -153,7 +153,7 @@ switch %random.4%
   break
   * Bandage bondage
   case 4
-    %send% %actor% &r%self.name%'s bandages unfurl and lash out like tentacles, wrapping around you!
+    %send% %actor% %self.name%'s bandages unfurl and lash out like tentacles, wrapping around you!
     %echoaround% %actor% %self.name%'s bandages unfurl and lash out like tentacles, wrapping around %actor.name%!
     if %heroic_mode%
       set max_cycles 5
@@ -395,7 +395,7 @@ Scarab special attack~
 0 k 100
 ~
 %echo% &rEveryone is bitten and stung by %self.name%!
-%aoe% 25 physical
+%aoe% 100 physical
 ~
 #18309
 Wander Mummy~
@@ -406,5 +406,15 @@ if (!%instance.location%)
 end
 %goto% %instance.location%
 nop %self.unlink_instance%
+~
+#18310
+Wandering Mummy despawn~
+0 ab 1
+~
+if %random.100% == 1
+  if !%self.fighting%
+    %purge% %self% $n takes a halting step, then crumbles to dust.
+  end
+end
 ~
 $

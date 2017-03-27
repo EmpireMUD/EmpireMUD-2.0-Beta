@@ -84,7 +84,7 @@ the wall~
 Strange symbols are carved into the wall.~
    Unusual markings in the shapes of birds, hands, eyes, and flowers decorate
 the walls. It seems to be some kind of ancient language. The only symbols that
-make sense to you seem to indicate the level of danger in the tomb.  
+make sense to you seem to indicate the level of danger in the tomb.
 
 Select the danger level with: difficulty <hard | group | boss>
 ~
@@ -113,17 +113,17 @@ A pair of Naqada wristguards is lying on the ground.~
 pictures of birds, cats, and eyes. It straps to the wrists with thick straps
 that appear to be made from bloodstained crocodile leather.
 ~
-27 mp aj 4
+27 mp aj 5
 3 0 0
 2 0
 A
 2 1 0
 A
-13 3 0
+13 6 0
 A
-12 1 0
+12 2 0
 A
-24 1 0
+24 2 0
 A
 5 1 6
 S
@@ -135,7 +135,7 @@ A pair of pharaonic wristbands is lying here.~
 lazuli. Your fingers start to blister as you touch the wristbands, as the fiery
 spirit of the desert flows through you.
 ~
-27 mp aj 6
+27 mp aj 7
 1 0 0
 2 0
 A
@@ -143,7 +143,7 @@ A
 A
 9 1 0
 A
-21 3 0
+21 6 0
 A
 5 1 6
 S
@@ -155,15 +155,15 @@ A papyrus charm has planted itself here.~
 papyrus fibers. As you play with the charn between your fingers, you feel a
 deep, earthy connection to the plant, and its power of restoration.
 ~
-27 mp aj 6
+27 mp aj 7
 0 0 0
 2 0
 A
 9 1 0
 A
-7 1 0
+7 2 0
 A
-23 3 0
+23 6 0
 A
 5 1 6
 S
@@ -175,7 +175,7 @@ A set of golden bangles is lying on the ground.~
 expensive. As you slip them on your wrists, you suddenly feel like dancing. As
 the energy flows through you, you realize you can channel it with your magic.
 ~
-27 mp aj 7
+27 mp aj 8
 0 0 0
 2 0
 A
@@ -183,7 +183,7 @@ A
 A
 9 1 0
 A
-22 3 0
+22 6 0
 A
 5 1 6
 S
@@ -194,7 +194,7 @@ A scarab charm is sitting on the ground.~
    This little charm is made from the carapace of a shining scarab beetle,
 inlaid with lapis lazuli, and bound on a thin gold chain.
 ~
-27 mp aj 9
+27 mp aj 10
 2 0 0
 2 0
 A
@@ -202,9 +202,9 @@ A
 A
 9 1 0
 A
-12 1 0
+12 2 0
 A
-24 1 0
+24 2 0
 A
 5 1 6
 S
@@ -280,17 +280,17 @@ The linen footwraps of a mummy have unraveled here.~
    You see a long, white linen cloth, of the sort that would be used to wrap
 the feet of a royal mummy before entombment.
 ~
-27 mp ag 6
+27 mp ag 7
 2 0 0
 7 0
 A
-17 1 0
+17 2 0
 A
 9 1 0
 A
-12 1 0
+12 2 0
 A
-24 1 0
+24 2 0
 S
 #18316
 aura geb~
@@ -298,15 +298,15 @@ the aura of Geb~
 The aura of Geb hangs in the air.~
 Geb, god of the earth, husband of Nut, bestows his powerful aura upon you.
 ~
-27 mp ak 2
+27 mp ak 3
 3 0 0
 10 0
 A
 2 1 0
 A
-18 2 0
+18 4 0
 A
-13 2 0
+13 4 0
 A
 5 1 6
 M
@@ -322,17 +322,17 @@ the aura of Nekhbet~
 The aura of Nekhbet lingers around you.~
 Nekhbet, protector of the black lands, bestows her powerful aura upon you.
 ~
-27 mp ak 4
+27 mp ak 5
 1 0 0
 10 0
 A
 1 1 0
 A
-17 2 0
+17 4 0
 A
 9 1 0
 A
-21 1 0
+21 2 0
 A
 5 1 6
 M
@@ -348,17 +348,17 @@ the aura of Osiris~
 The aura of Osiris hangs in the air.~
 Osiris, god of the afterlife, bestows his powerful aura upon you.
 ~
-27 mp ak 4
+27 mp ak 5
 0 0 0
 10 0
 A
 8 1 0
 A
-7 2 0
+7 4 0
 A
 9 1 0
 A
-23 1 0
+23 2 0
 A
 5 1 6
 M
@@ -374,17 +374,17 @@ the aura of Thoth~
 The aura of Thoth surrounds you.~
 Thoth, god of wisdom, blesses you with his powerful aura.
 ~
-27 mp ak 5
+27 mp ak 6
 0 0 0
 10 0
 A
 8 1 0
 A
-17 2 0
+17 4 0
 A
 9 1 0
 A
-22 1 0
+22 2 0
 A
 5 1 6
 M
@@ -400,19 +400,19 @@ the aura of Khufu~
 The aura of Khufu fills the room.~
 Khnum-Khufu, called Medjedu, bestows the power of his legacy upon you.
 ~
-27 mp ak 6
+27 mp ak 7
 2 0 0
 10 0
 A
 2 1 0
 A
-17 1 0
+17 2 0
 A
-18 1 0
+18 2 0
 A
-12 1 0
+12 2 0
 A
-24 1 0
+24 2 0
 A
 5 1 6
 M
