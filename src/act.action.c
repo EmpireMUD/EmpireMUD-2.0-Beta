@@ -2741,15 +2741,15 @@ ACMD(do_plant) {
 		// this is a sanity check for bad crop values
 		msg_to_char(ch, "You can't plant that!\r\n");
 	}
-	else if (GET_SECT_CLIMATE(SECT(IN_ROOM(ch))) != GET_CROP_CLIMATE(cp)) {
-		strcpy(buf, climate_types[GET_CROP_CLIMATE(cp)]);
-		msg_to_char(ch, "You can only plant that in %s areas.\r\n", strtolower(buf));
-	}
 	else if (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) && !find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, config_get_int("water_crop_distance"))) {
 		msg_to_char(ch, "You must plant that closer to fresh water.\r\n");
 	}
 	else if (!(evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_PLANTS_TO))) {
 		msg_to_char(ch, "Nothing can be planted here.\r\n");
+	}
+	else if (GET_SECT_CLIMATE(SECT(IN_ROOM(ch))) != GET_CROP_CLIMATE(cp)) {
+		strcpy(buf, climate_types[GET_CROP_CLIMATE(cp)]);
+		msg_to_char(ch, "You can only plant that in %s areas.\r\n", strtolower(buf));
 	}
 	else {
 		original = SECT(IN_ROOM(ch));
