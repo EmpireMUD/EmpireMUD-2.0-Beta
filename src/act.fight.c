@@ -110,7 +110,9 @@ ACMD(do_consider) {
 	}
 	else {
 		// scale first
-		check_scaling(vict, ch);
+		if (!IS_IMMORTAL(ch)) {
+			check_scaling(vict, ch);
+		}
 		diff = determine_best_scale_level(ch, FALSE) - determine_best_scale_level(vict, FALSE);
 				
 		act("You consider your chances against $N.", FALSE, ch, NULL, vict, TO_CHAR);
