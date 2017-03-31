@@ -5132,6 +5132,11 @@ ACMD(do_roster) {
 		}
 	}
 	
+	if (!e) {
+		msg_to_char(ch, "You must be a member of an empire to do that.\r\n");
+		return;
+	}
+	
 	*buf = '\0';
 	size = 0;
 	
