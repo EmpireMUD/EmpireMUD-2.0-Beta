@@ -2859,7 +2859,7 @@ void announce_login(char_data *ch) {
 	
 	// mortlog
 	if (GET_INVIS_LEV(ch) == 0) {
-		if (config_get_bool("public_logins")) {
+		if (config_get_bool("public_logins") && !PLR_FLAGGED(ch, PLR_NEEDS_NEWBIE_SETUP)) {
 			mortlog("%s has entered the game", PERS(ch, ch, TRUE));
 		}
 		else if (GET_LOYALTY(ch)) {
