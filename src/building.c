@@ -736,6 +736,13 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 	obj_data *found_obj = NULL;
 	struct resource_data *res;
 	
+	// Check if there's no longer a building in that place. 
+	if (!GET_BUILDING(room)) {
+		// Fail silently
+		GET_ACTION(ch) = ACT_NONE;
+		return;
+	}
+	
 	// just emergency check that it's not actually dismantling
 	if (!IS_DISMANTLING(room) && BUILDING_RESOURCES(room)) {
 		if ((res = get_next_resource(ch, BUILDING_RESOURCES(room), can_use_room(ch, room, GUESTS_ALLOWED), TRUE, &found_obj))) {
