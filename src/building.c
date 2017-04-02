@@ -141,6 +141,7 @@ void complete_building(room_data *room) {
 	
 	// stop builders
 	stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
+	stop_room_action(room, ACT_MAINTENANCE, CHORE_MAINTENANCE);
 	
 	// remove any remaining resource requirements
 	free_resource_list(GET_BUILDING_RESOURCES(room));
@@ -605,6 +606,7 @@ void finish_maintenance(char_data *ch, room_data *room) {
 	msg_to_char(ch, "You complete the maintenance.\r\n");
 	act("$n has completed the maintenance.", FALSE, ch, NULL, NULL, TO_ROOM);
 	stop_room_action(room, ACT_MAINTENANCE, CHORE_MAINTENANCE);
+	stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
 }
 
 
