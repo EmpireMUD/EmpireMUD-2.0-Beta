@@ -1591,6 +1591,11 @@ void process_mining(char_data *ch) {
 					start_mining(ch);
 				}
 			}
+			
+			// stop all miners
+			if (get_room_extra_data(in_room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {
+				stop_room_action(in_room, ACT_MINING, CHORE_MINING);
+			}
 		}
 	}
 }
