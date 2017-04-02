@@ -192,6 +192,7 @@ interlink_distance 4
 interlink_mountain_limit 1
 interlink_river_limit 0
 naturalize_newbie_islands 0
+naturalize_unclaimable 1
 nearby_sector_distance 2
 newbie_adventure_cap 25
 ocean_pool_size 1000
