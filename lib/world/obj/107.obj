@@ -808,9 +808,12 @@ a spidersilk gown~
 A silk gown is draped on the ground.~
 This fine gown looks like it was actually woven by a spider.
 ~
-2 o ad 1
+2 o ad 2
 0 0 0
 11 0
+M
+12
+$n stands here, draped in spidersilk.~
 S
 #10761
 pouch silk spidersilk~

@@ -730,11 +730,14 @@ a glimmering doublet~
 A glimmering doublet is lying on the ground.~
 It shines in every color, all at once.
 ~
-2 eo ad 1
+2 eo ad 2
 -1 -1 -1
 10 0
 A
 5 1 0
+M
+12
+$n glimmers in the light.~
 S
 #10057
 wand bone long thin~

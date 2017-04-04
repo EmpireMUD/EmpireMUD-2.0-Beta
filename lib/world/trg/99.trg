@@ -1,9 +1,10 @@
 #9900
 Mini-pet Use~
-1 c 2
+1 c 3
 use~
-eval test %%actor.obj_target(%arg%)%%
-if %test% != %self%
+eval targ %%actor.obj_target(%arg%)%%
+eval test %%self.is_name(%arg%)%%
+if %targ% != %self% && !(%test% && %self.worn_by%)
   return 0
   halt
 end

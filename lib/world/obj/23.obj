@@ -1017,7 +1017,7 @@ A robe of the Olympians is floating slightly off the ground.~
 craftsmen, and carry powerful enchantments to help with crafting. This is a
 tier 3 crafting item.
 ~
-2 p ad 17
+2 p ad 18
 0 0 0
 11 0
 A
@@ -1032,6 +1032,12 @@ You begin to glow as you wrap yourself in $p.~
 M
 9
 $n begins to glow as $e wraps $mself in $p.~
+M
+14
+$n stands here like a shining, golden god.~
+M
+13
+$n stands here like a shining, golden goddess.~
 S
 #2369
 girdle regal Hippolyta~
