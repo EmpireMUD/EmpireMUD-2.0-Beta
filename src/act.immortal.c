@@ -5417,7 +5417,7 @@ ACMD(do_forgive) {
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has forgiven %s", GET_NAME(ch), GET_NAME(vict));
 		}
 		else {
-			act("There's nothing you can forigve $N for.", FALSE, ch, NULL, vict, TO_CHAR);
+			act("There's nothing you can forgive $N for.", FALSE, ch, NULL, vict, TO_CHAR);
 		}
 	}
 }

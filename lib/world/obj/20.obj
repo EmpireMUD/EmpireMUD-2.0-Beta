@@ -91,9 +91,12 @@ a blouse~
 A ruffled blouse is draped across the ground.~
 The blouse is made of fine, expertly tailored cloth.
 ~
-2 0 ad 1
+2 0 ad 2
 0 0 0
 11 0
+M
+12
+$n stands here, wearing a ruffled blouse.~
 R
 5617 0
 S
@@ -104,9 +107,12 @@ A pleated dress has been left here.~
    The dress is made of several layers of fine cloth and is masterfully pleated
 to create a flowing effect as you walk.
 ~
-2 0 ad 1
+2 0 ad 2
 0 0 0
 11 0
+M
+12
+$n is here, in $s best dress.~
 R
 5617 0
 S
@@ -141,9 +147,12 @@ A flowing toga is draped all along the ground.~
    The toga, made from one very long piece of cloth, was once the height of
 city fashion. Now, it reminds people of an earlier time.
 ~
-2 0 ad 1
+2 0 ad 3
 0 0 0
 11 0
+M
+12
+$n stands here in $s best senatorial toga.~
 R
 5617 0
 S
@@ -218,9 +227,12 @@ A spotted robe is lying on the ground.~
 warrior. It is made from the spotted pelt of a ferocious jungle cat, and it
 retains every ounce of that animal's majesty.
 ~
-2 0 ad 1
+2 0 ad 2
 0 0 0
 7 0
+M
+12
+$n stands proudly in $s spotted fur robe.~
 R
 5617 0
 S

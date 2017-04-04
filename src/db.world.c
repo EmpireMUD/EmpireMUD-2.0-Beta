@@ -1129,10 +1129,13 @@ void naturalize_newbie_islands(void) {
 	int count = 0, last_isle = -1;
 	struct map_data *map;
 	room_data *room;
+	bool do_unclaim;
 	
 	if (!config_get_bool("naturalize_newbie_islands")) {
 		return;
 	}
+	
+	do_unclaim = config_get_bool("naturalize_unclaimable");
 	
 	LL_FOREACH(land_map, map) {
 		// simple checks
@@ -1154,7 +1157,10 @@ void naturalize_newbie_islands(void) {
 			if (ROOM_OWNER(room)) {
 				continue;
 			}
-			if (ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
+			if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
+				continue;
+			}
+			if (ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE) && !do_unclaim) {
 				continue;
 			}
 		}

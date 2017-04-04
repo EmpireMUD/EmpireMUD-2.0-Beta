@@ -141,6 +141,7 @@ void complete_building(room_data *room) {
 	
 	// stop builders
 	stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
+	stop_room_action(room, ACT_MAINTENANCE, CHORE_MAINTENANCE);
 	
 	// remove any remaining resource requirements
 	free_resource_list(GET_BUILDING_RESOURCES(room));
@@ -605,6 +606,7 @@ void finish_maintenance(char_data *ch, room_data *room) {
 	msg_to_char(ch, "You complete the maintenance.\r\n");
 	act("$n has completed the maintenance.", FALSE, ch, NULL, NULL, TO_ROOM);
 	stop_room_action(room, ACT_MAINTENANCE, CHORE_MAINTENANCE);
+	stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
 }
 
 
@@ -735,6 +737,13 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 	craft_data *type = find_building_list_entry(room, FIND_BUILD_NORMAL);
 	obj_data *found_obj = NULL;
 	struct resource_data *res;
+	
+	// Check if there's no longer a building in that place. 
+	if (!GET_BUILDING(room)) {
+		// Fail silently
+		GET_ACTION(ch) = ACT_NONE;
+		return;
+	}
 	
 	// just emergency check that it's not actually dismantling
 	if (!IS_DISMANTLING(room) && BUILDING_RESOURCES(room)) {

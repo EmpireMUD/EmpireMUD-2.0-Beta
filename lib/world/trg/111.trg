@@ -165,18 +165,12 @@ end
 Rock Obstacle 11120~
 2 g 100
 ~
-context %room.vnum%
 if %actor.is_pc%
   eval lean_left 0
   remote lean_left %actor.id%
   eval lean_right 0
   remote lean_right %actor.id%
 end
-if (%rock_obstacle_running% && %rock_obstacle_running% + 60 > %timestamp%)
-  halt
-end
-eval rock_obstacle_running %timestamp%
-global rock_obstacle_running
 wait 1 sec
 eval rock_left (%random.2% == 2)
 global rock_left
@@ -213,9 +207,6 @@ while %ch%
   end
   eval ch %ch.next_in_room%
 done
-eval rock_obstacle_running 0
-global rock_obstacle_running
-unset rock_obstacle_running
 if %correct% > %fail%
   %echo% The boat leans away from the huge rock!
   %teleport% all i11121
@@ -235,16 +226,10 @@ end
 Tree Branch 11121~
 2 g 100
 ~
-context %room.vnum%
 if %actor.is_pc%
   eval has_ducked 0
   remote has_ducked %actor.id%
 end
-if (%tree_branch_running% && %tree_branch_running% + 60 > %timestamp%)
-  halt
-end
-eval tree_branch_running %timestamp%
-global tree_branch_running
 wait 1 sec
 %echo% &RThe boat is coming up on a low-hanging tree branch!&0
 wait 8 sec
@@ -271,9 +256,6 @@ while %ch%
   end
   eval ch %next_ch%
 done
-eval tree_branch_running 0
-global tree_branch_running
-unset tree_branch_running
 * send npcs to fail room if no players won
 if !(%wins%)
   %teleport% all i11123
@@ -285,18 +267,12 @@ end
 Narrow Opening 11122~
 2 g 100
 ~
-context %room.vnum%
 if %actor.is_pc%
   eval lean_left 0
   remote lean_left %actor.id%
   eval lean_right 0
   remote lean_right %actor.id%
 end
-if (%narrow_opening_running% && %narrow_opening_running% + 60 > %timestamp%)
-  halt
-end
-eval narrow_opening_running %timestamp%
-global narrow_opening_running
 wait 1 sec
 eval opening_left (%random.2% == 2)
 global opening_left
@@ -333,9 +309,6 @@ while %ch%
   end
   eval ch %ch.next_in_room%
 done
-eval narrow_opening_running 0
-global narrow_opening_running
-unset narrow_opening_running
 if %correct% > %fail%
   %echo% The boat leans into the narrow opening!
   %teleport% all i11113

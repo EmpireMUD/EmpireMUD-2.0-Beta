@@ -1117,7 +1117,7 @@ if !%self.fighting% && %self.varexists(enrage_counter)%
   if %self.enrage_counter% == 0
     halt
   end
-  dg_affect BONUS-MAGICAL off 0
+  dg_affect %self% BONUS-MAGICAL off 1
   set enrage_counter 0
   remote enrage_counter %self.id%
   %echo% %self.name% settles down to rest.

@@ -491,6 +491,8 @@ OLC_MODULE(mapedit_naturalize) {
 	struct map_data *map;
 	room_data *room;
 	
+	bool do_unclaim = config_get_bool("naturalize_unclaimable");
+	
 	// parse argument
 	skip_spaces(&argument);
 	if (*argument && is_abbrev(argument, "island")) {
@@ -523,7 +525,10 @@ OLC_MODULE(mapedit_naturalize) {
 			if (room && ROOM_OWNER(room)) {
 				continue;
 			}
-			if (room && ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
+			if (room && ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
+				continue;
+			}
+			if (room && ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE) && !do_unclaim) {
 				continue;
 			}
 			if (map->sector_type == map->natural_sector) {

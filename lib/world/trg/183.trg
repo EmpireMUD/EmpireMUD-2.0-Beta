@@ -81,11 +81,11 @@ switch %random.4%
     %echo% %self.name% raises %self.hisher% hands!
     %echo% &AWater starts to flood the chamber! Swim for your life!&0
     * Give the group time to type 'swim' (if they're going to)
-    context %instance.id%
     eval running 1
-    global running
+    remote running %self.id%
     wait 10 sec
-    unset running
+    eval running 0
+    remote running %self.id%
     %echo% &AWater floods the chamber!
     eval room %self.room%
     eval person %room.people%
@@ -96,7 +96,10 @@ switch %random.4%
           %send% %person% You are pummeled by raging waters...
           %damage% %person% 100 physical
         end
-        eval test %%swimming_%person.id%%%
+        eval test %%self.varexists(swimming_%person.id%)%%
+        if %test%
+          eval test %%self.swimming_%person.id%%%
+        end
         if !%test%
           %send% %person% &rYou are drowned by the rising waters!
           %echoaround% %person% %person.name% sinks beneath the rising waters!
@@ -211,8 +214,7 @@ end
 Detect swim~
 0 c 0
 swim~
-context %instance.id%
-if !%running%
+if !%self.running%
   %send% %actor% There's nothing to swim in right now.
   return 1
   halt
@@ -220,9 +222,8 @@ end
 %send% %actor% You start swimming.
 %echoaround% %actor% %actor.name% starts swimming.
 dg_affect %actor% STUNNED on 10
-context %instance.id%
 set swimming_%actor.id% 1
-global swimming_%actor.id%
+remote swimming_%actor.id% %self.id%
 ~
 #18304
 Pyramid difficulty selector~
@@ -404,7 +405,7 @@ Wander Mummy~
 if (!%instance.location%)
   halt
 end
-%goto% %instance.location%
+mgoto %instance.location%
 nop %self.unlink_instance%
 ~
 #18310
@@ -416,5 +417,335 @@ if %random.100% == 1
     %purge% %self% $n takes a halting step, then crumbles to dust.
   end
 end
+~
+#18353
+Load: Link random temple~
+2 n 100
+~
+* Pick a temple
+eval room_vnum 18353 + %random.4%
+makeuid active_temple room i%room_vnum%
+makeuid corridor room i18353
+eval tofind 18354
+* Link it
+set direction east
+%door% %corridor% %direction% room %active_temple%
+~
+#18354
+Offering puzzle~
+2 c 0
+offer~
+if %room.east(room)%
+  %send% %actor% The door is open - you do not need to make another offering.
+  return 1
+  halt
+end
+if !%arg%
+  %send% %actor% Offer what?
+  return 1
+  halt
+end
+eval item %%actor.obj_target(%arg%)%%
+if %item.worn_by% || !%item.carried_by%
+  %send% %actor% You can only offer an item from your inventory.
+  return 1
+  halt
+end
+* What IS it?
+set solution 0
+if %item.vnum% == 103
+  * Lightning stone
+  set solution 1
+elseif %item.vnum% == 3362
+  * Lettuce seed oil
+  set solution 2
+elseif %item.vnum% == 1359
+  * Cotton cloth
+  set solution 3
+elseif %item.is_name(fish)%
+  * Any fish (but I'd rather check for 'raw, aquatic meat')
+  set solution 4
+else
+  %send% %actor% The gods reject your offering of %item.shortdesc%.
+  return 1
+  halt
+end
+%send% %actor% You offer %item.shortdesc% to the gods...
+%echoaround% %actor% %actor.name% offers %item.shortdesc% to the gods...
+eval temple_num %room.template% - 18353
+if %solution% == %temple_num%
+  * Bonus reward
+  %echo% The gods are pleased!
+  eval person %room.people%
+  while %person%
+    if %person.is_pc%
+      * random reward
+    end
+    eval person %person.next_in_room%
+  done
+else
+  %echo% The gods accept the offering.
+end
+%echo% One wall of the room slowly slides into the floor with a heavy grinding noise!
+makeuid next_room room i18358
+%door% %room% east room %next_room%
+* Since the next room is the maze, we don't link back. If we did:
+* %door% %next_room% west room %room%
+~
+#18358
+Drop Random Canopic Jars~
+1 n 100
+~
+eval actor %self.carried_by%
+set number 1
+if %actor.mob_flagged(HARD)%
+  eval number %number% + 1
+end
+if %actor.mob_flagged(GROUP)%
+  eval number %number% + 2
+end
+set item_1 18359
+set item_2 18360
+set item_3 18361
+set item_4 18362
+set items_left 4
+while %number% > 0
+  eval index %%random.%items_left%%%
+  * Remove the item from the list
+  eval vnum %%item_%index%%%
+  eval iterator %index% + 1
+  while %iterator% <= %items_left%
+    eval new_num %iterator% - 1
+    eval item_%new_num% %%item_%iterator%%%
+    eval iterator %iterator% + 1
+  done
+  %load% obj %vnum% %actor% inv
+  eval item %%actor.inventory(%vnum%)%%
+  * Bind item
+  eval bind %%item.bind(%self%)%%
+  nop %bind%
+  eval items_left %items_left% - 1
+  eval number %number% - 1
+done
+%purge% %self%
+~
+#18359
+Combine canopic jars~
+1 c 2
+combine~
+eval targ %%actor.obj_target(%arg%)%%
+if %targ% != %self%
+  return 0
+  halt
+end
+return 1
+* got all 4?
+if %actor.inventory(18359)% && %actor.inventory(18360) && %actor.inventory(18361)% && %actor.inventory(18362)%
+  %load% obj 18350 %actor% inv
+  eval item %actor.inventory(18350)%
+  %send% %actor% You combine your four canopic jars into %item.shortdesc%!
+  if %self.vnum% != 18359
+    nop %actor.add_resources(18359, -1)%
+  end
+  if %self.vnum% != 18360
+    nop %actor.add_resources(18360, -1)%
+  end
+  if %self.vnum% != 18361
+    nop %actor.add_resources(18361, -1)%
+  end
+  if %self.vnum% != 18362
+    nop %actor.add_resources(18362, -1)%
+  end
+  %purge% %self%
+else
+  %send% %actor% You need four unique canopic jars.
+end
+~
+#18363
+Falling block trap~
+2 q 100
+~
+if %actor.is_npc%
+  return 1
+  halt
+end
+context %instance.id%
+* One quick trick to get the target room
+eval room_var %self%
+eval tricky %%room_var.%direction%(room)%%
+eval to_room %tricky%
+* Compare template ids to figure out if they're going forward or back
+if (%actor.nohassle% || !%tricky% || %tricky.template% < %room_var.template%)
+  return 1
+  halt
+end
+return 0
+* Trap triggered
+eval trap_running 1
+global trap_running
+eval last_trap_command 0
+remote last_trap_command %actor.id%
+%echoaround% %actor% %actor.name% starts walking %direction%...
+%send% %actor% There is a loud groaning sound from the ceiling!
+%echoaround% %actor% There is a loud groaning sound from the ceiling above %actor.name%!
+wait 8 sec
+eval trap_running 0
+global trap_running
+if %actor.last_trap_command% == run && %actor.position% == Standing
+  %send% %actor% You dash forward as a huge stone block crashes to the floor right behind you!
+  %echoaround% %actor% %actor.name% dashes forward, barely avoiding a huge stone block which falls from the ceiling!
+  %send% %actor% You dive through an archway into the next room.
+  %echoaround% %actor% %actor.name% dives through an archway into the next room.
+  %teleport% %actor% %to_room%
+  %echoaround% %actor% %actor.name% dives through the doorway from the previous room.
+  %force% %actor% look
+else
+  %send% %actor% &rA huge stone block falls from the ceiling, knocking you to the floor!
+  %echoaround% %actor% A huge stone block falls on %actor.name%, knocking %actor.himher% to the floor!
+  %damage% %actor% 400 physical
+  wait 5
+  if %actor.health% > 0 && %actor.position% == Standing
+    %send% %actor% You stagger forward to the next room.
+    %echoaround% %actor% %actor.name% staggers through to the next room, looking dazed.
+    %teleport% %actor% %to_room%
+    %echoaround% %actor% %actor.name% staggers through the doorway from the previous room, looking dazed.
+    %force% %actor% look
+  end
+end
+* Send NPC followers after player
+eval person %room_var.people%
+while %person%
+  eval next_person %person.next_in_room%
+  if %person.is_npc% && %person.master% == %actor%
+    %echoaround% %person% %person.name% follows %actor.name%.
+    %teleport% %person% %actor.room%
+    %send% %actor% %person.name% follows you.
+    %echoaround% %actor% %person.name% follows %actor.name%.
+  end
+  eval person %next_person%
+done
+~
+#18364
+Search for Traps - Pyramid~
+2 p 100
+~
+if %abilityname% != Search
+  return 1
+  halt
+end
+%send% %actor% You search for traps...
+%echoaround% %actor% %actor.name% searches for traps...
+switch %room.template%
+  case 18353
+    %send% %actor% You find a falling block trap. RUN after triggering to avoid it.
+  break
+  case 18364
+    %send% %actor% You find no signs that anyone was ever buried here. This chamber is a fake.
+  break
+  default
+    %send% %actor% You can't spot any traps in this room...
+  break
+done
+return 0
+halt
+~
+#18365
+Trap flee fallback~
+2 q 100
+~
+context %instance.id%
+if %trap_running%
+  %send% %actor% You can't leave right now!
+  return 0
+  halt
+end
+~
+#18366
+Trap action detection~
+2 c 0
+run jump duck~
+context %instance.id%
+if !%trap_running%
+  %send% %actor% You don't need to do that right now.
+  return 1
+  halt
+end
+if run /= %cmd%
+  set last_trap_command run
+  %send% %actor% You lean forward and start sprinting!
+  %echoaround% %actor% %actor.name% leans forward and starts sprinting!
+elseif jump /= %cmd%
+  set last_trap_command jump
+  %send% %actor% You dash forward and prepare to jump...
+  %echoaround% %actor% %actor.name% dashes forward and prepares to jump...
+elseif duck /= %cmd%
+  set last_trap_command duck
+  %send% %actor% You dive for the floor!
+  %echoaround% %actor% %actor.name% dives for the floor and presses %actor.himher%self against the stone!
+end
+remote last_trap_command %actor.id%
+~
+#18389
+Pyramid 2 difficulty selector~
+1 c 4
+difficulty~
+if !%arg%
+  %send% %actor% You must specify a level of difficulty.
+  return 1
+  halt
+end
+* TODO: Check nobody's in the adventure before changing difficulty
+if hard /= %arg%
+  %echo% Setting difficulty to Hard...
+  eval difficulty 2
+elseif group /= %arg%
+  %echo% Setting difficulty to Group...
+  eval difficulty 3
+elseif boss /= %arg%
+  %echo% Setting difficulty to Boss...
+  eval difficulty 4
+else
+  %send% %actor% That is not a valid difficulty level for this adventure.
+  halt
+  return 1
+end
+* Clear existing difficulty flags and set new ones.
+eval vnum 18350
+while %vnum% <= 18350
+  eval mob %%instance.mob(%vnum%)%%
+  if !%mob%
+    * This was for debugging. We could do something about this.
+    * Maybe just ignore it and keep on setting?
+  else
+    nop %mob.remove_mob_flag(HARD)%
+    nop %mob.remove_mob_flag(GROUP)%
+    if %difficulty% == 1
+      * Then we don't need to do anything
+    elseif %difficulty% == 2
+      nop %mob.add_mob_flag(HARD)%
+    elseif %difficulty% == 3
+      nop %mob.add_mob_flag(GROUP)%
+    elseif %difficulty% == 4
+      nop %mob.add_mob_flag(HARD)%
+      nop %mob.add_mob_flag(GROUP)%
+    end
+  end
+  eval vnum %vnum% + 1
+done
+%send% %actor% You touch one of the symbols on the wall, and a section of the wall slowly slides into the floor...
+%echoaround% %actor% %actor.name% touches one of the symbols on the wall, and a section of the wall slowly slides into the floor...
+eval newroom i18352
+eval exitroom i18350
+if %exitroom%
+  %door% %exitroom% down room %newroom%
+end
+eval room %self.room%
+eval person %room.people%
+while %person%
+  eval next_person %person.next_in_room%
+  %teleport% %person% %newroom%
+  eval person %next_person%
+done
+otimer 24
 ~
 $

@@ -149,11 +149,14 @@ a fine village dress~
 A fine village dress has been carefully draped here.~
 The dress is certainly rural, but has its own sort of charm.
 ~
-2 oy ad 1
+2 oy ad 3
 0 0 0
 11 0
 A
 4 1 0
+M
+12
+Villager $n is standing here.~
 S
 #10413
 suit village handsome~
@@ -162,11 +165,14 @@ A handsome village suit is carefully hung here.~
    The suit is nothing you'd wear to the castle on ball night. Still, it has a
 rustic, rural charm that is not soon forgotten.
 ~
-2 oy ad 1
+2 oy ad 2
 0 0 0
 11 0
 A
 4 1 0
+M
+12
+Villager $n is standing here.~
 S
 #10414
 band imperium wedding~
