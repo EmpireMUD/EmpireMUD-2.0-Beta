@@ -2763,6 +2763,13 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 			break;
 	}
 	
+	if (ch != victim && GET_POS(victim) < POS_SLEEPING && !WOULD_EXECUTE(ch, victim)) {
+		// remove all DoTs
+		while (victim->over_time_effects) {
+			dot_remove(victim, victim->over_time_effects);
+		}
+	}
+	
 	// did we do any damage? tag the mob
 	if (dam > 0) {
 		tag_mob(victim, ch);
