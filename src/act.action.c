@@ -543,7 +543,7 @@ void start_picking(char_data *ch) {
 * @param char_data *ch The player who is to quarry.
 */
 void start_quarrying(char_data *ch) {	
-	if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY)) {
+	if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY) && IS_COMPLETE(IN_ROOM(ch))) {
 		if (get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
 			msg_to_char(ch, "There's not enough left to quarry here.\r\n");
 		}
@@ -1888,7 +1888,7 @@ void process_prospecting(char_data *ch) {
 void process_quarrying(char_data *ch) {
 	room_data *in_room;
 	
-	if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY) || get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
+	if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY) || !IS_COMPLETE(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
 		msg_to_char(ch, "You can't quarry anything here.\r\n");
 		cancel_action(ch);
 		return;
@@ -2853,6 +2853,9 @@ ACMD(do_quarry) {
 	}
 	else if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY)) {
 		send_to_char("You can't quarry here.\r\n", ch);
+	}
+	else if (!IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't quarry until it's finished!\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to quarry here.\r\n");
