@@ -862,6 +862,9 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	if (AFF_FLAGGED(i, AFF_STUNNED)) {
 		act("...$e is stunned!", FALSE, i, 0, ch, TO_VICT);
 	}
+	if (AFF_FLAGGED(i, AFF_HIDE)) {
+		act("...$e has attempted to hide $mself.", FALSE, i, 0, ch, TO_VICT);
+	}
 	if (AFF_FLAGGED(i, AFF_BLIND))
 		act("...$e is groping around blindly!", FALSE, i, 0, ch, TO_VICT);
 	if (IS_INJURED(i, INJ_TIED))
