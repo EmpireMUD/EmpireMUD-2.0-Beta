@@ -1049,6 +1049,29 @@ void start_dismantle_building(room_data *loc) {
 	if (loc && ROOM_OWNER(loc) && GET_BUILDING(loc) && complete) {
 		qt_empire_players(ROOM_OWNER(loc), qt_lose_building, GET_BLD_VNUM(GET_BUILDING(loc)));
 	}
+	
+	stop_room_action(loc, ACT_DIGGING, CHORE_DIGGING);
+	stop_room_action(loc, ACT_BUILDING, CHORE_BUILDING);
+	stop_room_action(loc, ACT_MINING, CHORE_MINING);
+	stop_room_action(loc, ACT_MINTING, ACT_MINTING);
+	stop_room_action(loc, ACT_BATHING, NOTHING);
+	stop_room_action(loc, ACT_ESCAPING, NOTHING);
+	stop_room_action(loc, ACT_STUDYING, NOTHING);
+	stop_room_action(loc, ACT_SAWING, CHORE_SAWING);
+	stop_room_action(loc, ACT_QUARRYING, CHORE_QUARRYING);
+	stop_room_action(loc, ACT_MAINTENANCE, CHORE_MAINTENANCE);
+	stop_room_action(loc, ACT_PICKING, CHORE_HERB_GARDENING);
+	stop_room_action(loc, NOTHING, CHORE_SCRAPING);
+	stop_room_action(loc, NOTHING, CHORE_SMELTING);
+	stop_room_action(loc, NOTHING, CHORE_WEAVING);
+	stop_room_action(loc, NOTHING, CHORE_NAILMAKING);
+	stop_room_action(loc, NOTHING, CHORE_BRICKMAKING);
+	stop_room_action(loc, NOTHING, CHORE_TRAPPING);
+	stop_room_action(loc, NOTHING, CHORE_TANNING);
+	stop_room_action(loc, NOTHING, CHORE_SHEARING);
+	stop_room_action(loc, NOTHING, CHORE_NEXUS_CRYSTALS);
+	stop_room_action(loc, NOTHING, CHORE_MILLING);
+	stop_room_action(loc, NOTHING, CHORE_OILMAKING);
 }
 
 
