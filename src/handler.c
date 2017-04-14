@@ -5617,8 +5617,14 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 			send_to_char("No room exists with that number.\r\n", ch);
 		}
 	}
-	else if (ch && (target_mob = get_char_vis(ch, roomstr, FIND_CHAR_WORLD)) != NULL)
-		location = IN_ROOM(target_mob);
+	else if (ch && (target_mob = get_char_vis(ch, roomstr, FIND_CHAR_WORLD)) != NULL) {
+		if (WIZHIDE_OK(ch, target_mob)) {
+			location = IN_ROOM(target_mob);
+		}
+		else {
+			msg_to_char(ch, "That person is not available.\r\n");
+		}
+	}
 	else if (!ch && (target_mob = get_char_world(roomstr)) != NULL) {
 		location = IN_ROOM(target_mob);
 	}
