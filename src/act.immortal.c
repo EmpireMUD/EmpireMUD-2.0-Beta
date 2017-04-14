@@ -69,6 +69,7 @@ void check_delayed_load(char_data *ch);
 void clear_char_abilities(char_data *ch, any_vnum skill);
 void delete_instance(struct instance_data *inst);	// instance.c
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
+extern int get_highest_access_level(account_data *acct);
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
 void get_resource_display(struct resource_data *list, char *save_buffer);
@@ -1674,7 +1675,11 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		sprintf(output, "%s's %s set to %d", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
 
-	else if SET_CASE("account") {		
+	else if SET_CASE("account") {
+		if (get_highest_access_level(GET_ACCOUNT(vict)) > GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You can't edit accounts for people above your access level.\r\n");
+			return 0;
+		}
 		if (!str_cmp(val_arg, "new")) {
 			sprintf(output, "%s is now associated with a new account", GET_NAME(vict));
 			remove_player_from_account(vict);
@@ -1683,6 +1688,14 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		else {
 			// load 2nd player
 			if ((alt = find_or_load_player(val_arg, &file))) {
+				if (get_highest_access_level(GET_ACCOUNT(alt)) > GET_ACCESS_LEVEL(ch)) {
+					msg_to_char(ch, "You can't edit accounts for people above your access level.\r\n");
+					if (file) {
+						free_char(alt);
+					}
+					return 0;
+				}
+				
 				sprintf(output, "%s is now associated with %s's account", GET_NAME(vict), GET_NAME(alt));
 				
 				remove_player_from_account(vict);
