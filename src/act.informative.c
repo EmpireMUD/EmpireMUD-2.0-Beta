@@ -140,7 +140,12 @@ char *instance_level_string(struct instance_data *inst) {
 		snprintf(output, sizeof(output), "levels 1-%d", GET_ADV_MAX_LEVEL(inst->adventure));
 	}
 	else if (GET_ADV_MIN_LEVEL(inst->adventure) == GET_ADV_MAX_LEVEL(inst->adventure)) {
-		snprintf(output, sizeof(output), "level %d", GET_ADV_MAX_LEVEL(inst->adventure));
+		if (GET_ADV_MIN_LEVEL(inst->adventure) == 0) {
+			snprintf(output, sizeof(output), "any level");
+		}
+		else {
+			snprintf(output, sizeof(output), "level %d", GET_ADV_MAX_LEVEL(inst->adventure));
+		}
 	}
 	else {
 		snprintf(output, sizeof(output), "levels %d-%d", GET_ADV_MIN_LEVEL(inst->adventure), GET_ADV_MAX_LEVEL(inst->adventure));
@@ -2544,12 +2549,14 @@ ACMD(do_mudstats) {
 
 
 ACMD(do_nearby) {
+	extern const char *alt_dirs[];
 	extern int num_of_start_locs;
 	extern int *start_locs;
 	
 	int max_dist = 50;
 	
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	bool cities = TRUE, adventures = TRUE, starts = TRUE;
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct instance_data *inst;
 	struct empire_city_data *city;
 	empire_data *emp, *next_emp;
@@ -2566,82 +2573,121 @@ ACMD(do_nearby) {
 		return;
 	}
 	
+	// argument-parsing
+	skip_spaces(&argument);
+	while (*argument == '-') {
+		++argument;
+	}
+	
+	if (is_abbrev(argument, "city") || is_abbrev(argument, "cities")) {
+		adventures = FALSE;
+		starts = FALSE;
+	}
+	else if (is_abbrev(argument, "adventures")) {
+		cities = FALSE;
+		starts = FALSE;
+	}
+	else if (is_abbrev(argument, "starting locations") || is_abbrev(argument, "starts") || is_abbrev(argument, "towers") || is_abbrev(argument, "tower of souls") || is_abbrev(argument, "tos")) {
+		cities = FALSE;
+		adventures = FALSE;
+	}
+	
+	// displaying:
 	size = snprintf(buf, sizeof(buf), "You find nearby:\r\n");
+	#define NEARBY_DIR  (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir]))
 
 	// check starting locations
-	for (iter = 0; iter <= num_of_start_locs; ++iter) {
-		loc = real_room(start_locs[iter]);
-		dist = compute_distance(IN_ROOM(ch), loc);
+	if (starts) {
+		for (iter = 0; iter <= num_of_start_locs; ++iter) {
+			loc = real_room(start_locs[iter]);
+			dist = compute_distance(IN_ROOM(ch), loc);
 		
-		if (dist <= max_dist) {
-			found = TRUE;
+			if (dist <= max_dist) {
+				found = TRUE;
 
-			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
+				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 			
-			if (has_ability(ch, ABIL_NAVIGATION)) {
-				snprintf(line, sizeof(line), " %d tile%s %s: %s (%d, %d)\r\n", dist, (dist != 1 ? "s" : ""), (dir == NO_DIR ? "away" : dirs[dir]), get_room_name(loc, FALSE), X_COORD(loc), Y_COORD(loc));
+				if (has_ability(ch, ABIL_NAVIGATION)) {
+					snprintf(line, sizeof(line), " %d %s: %s (%d, %d)\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE), X_COORD(loc), Y_COORD(loc));
+				}
+				else {
+					snprintf(line, sizeof(line), " %d %s: %s\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE));
+				}
+				
+				if (size + strlen(line) < sizeof(buf)) {
+					strcat(buf, line);
+					size += strlen(line);
+				}
 			}
-			else {
-				snprintf(line, sizeof(line), " %d tile%s %s: %s\r\n", dist, (dist != 1 ? "s" : ""), (dir == NO_DIR ? "away" : dirs[dir]), get_room_name(loc, FALSE));
-			}
-			
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
 		}
 	}
 	
 	// check cities
-	HASH_ITER(hh, empire_table, emp, next_emp) {
-		for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
-			loc = city->location;
-			dist = compute_distance(IN_ROOM(ch), loc);
+	if (cities) {
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
+				loc = city->location;
+				dist = compute_distance(IN_ROOM(ch), loc);
 
-			if (dist <= max_dist) {
-				found = TRUE;
+				if (dist <= max_dist) {
+					found = TRUE;
 				
-				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
+					dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 
-				if (has_ability(ch, ABIL_NAVIGATION)) {
-					snprintf(line, sizeof(line), " %d tile%s %s: the %s of %s (%d, %d) / %s%s&0\r\n", dist, (dist != 1 ? "s" : ""), (dir == NO_DIR ? "away" : dirs[dir]), city_type[city->type].name, city->name, X_COORD(loc), Y_COORD(loc), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+					if (has_ability(ch, ABIL_NAVIGATION)) {
+						snprintf(line, sizeof(line), " %d %s: the %s of %s (%d, %d) / %s%s&0\r\n", dist, NEARBY_DIR, city_type[city->type].name, city->name, X_COORD(loc), Y_COORD(loc), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+					}
+					else {
+						snprintf(line, sizeof(line), " %d %s: the %s of %s / %s%s&0\r\n", dist, NEARBY_DIR, city_type[city->type].name, city->name, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+					}
+					
+					if (size + strlen(line) < sizeof(buf)) {
+						strcat(buf, line);
+						size += strlen(line);
+					}
 				}
-				else {
-					snprintf(line, sizeof(line), " %d tile%s %s: the %s of %s / %s%s&0\r\n", dist, (dist != 1 ? "s" : ""), (dir == NO_DIR ? "away" : dirs[dir]), city_type[city->type].name, city->name, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
-				}
-				
-				size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
 			}
 		}
 	}
 	
 	// check instances
-	for (inst = instance_list; inst; inst = inst->next) {
-		if (!inst->location || INSTANCE_FLAGGED(inst, INST_COMPLETED)) {
-			continue;
-		}
+	if (adventures) {
+		for (inst = instance_list; inst; inst = inst->next) {
+			if (!inst->location || INSTANCE_FLAGGED(inst, INST_COMPLETED)) {
+				continue;
+			}
 		
-		if (ADVENTURE_FLAGGED(inst->adventure, ADV_NO_NEARBY)) {
-			continue;
-		}
+			if (ADVENTURE_FLAGGED(inst->adventure, ADV_NO_NEARBY)) {
+				continue;
+			}
 		
-		loc = inst->location;
-		if (!loc || (dist = compute_distance(IN_ROOM(ch), loc)) > max_dist) {
-			continue;
-		}
+			loc = inst->location;
+			if (!loc || (dist = compute_distance(IN_ROOM(ch), loc)) > max_dist) {
+				continue;
+			}
+			
+			// owner part
+			if (ROOM_OWNER(loc)) {
+				snprintf(part, sizeof(part), " / %s%s&0", EMPIRE_BANNER(ROOM_OWNER(loc)), EMPIRE_NAME(ROOM_OWNER(loc)));
+			}
+			else {
+				*part = '\0';
+			}
 		
-		// show instance
-		found = TRUE;
-		dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), inst->location));
-		if (has_ability(ch, ABIL_NAVIGATION)) {
-			snprintf(line, sizeof(line), " %d tile%s %s: %s (%d, %d) / %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), GET_ADV_NAME(inst->adventure), X_COORD(loc), Y_COORD(loc), instance_level_string(inst));
-		}
-		else {
-			snprintf(line, sizeof(line), " %d tile%s %s: %s / %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), GET_ADV_NAME(inst->adventure), instance_level_string(inst));
-		}
-		
-		if (ROOM_OWNER(loc)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s / %s%s&0\r\n", line,  EMPIRE_BANNER(ROOM_OWNER(loc)), EMPIRE_NAME(ROOM_OWNER(loc)));
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
+			// show instance
+			found = TRUE;
+			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), inst->location));
+			if (has_ability(ch, ABIL_NAVIGATION)) {
+				snprintf(line, sizeof(line), " %d %s: %s (%d, %d) / %s%s\r\n", dist, NEARBY_DIR, GET_ADV_NAME(inst->adventure), X_COORD(loc), Y_COORD(loc), instance_level_string(inst), part);
+			}
+			else {
+				snprintf(line, sizeof(line), " %d %s: %s / %s%s\r\n", dist, NEARBY_DIR, GET_ADV_NAME(inst->adventure), instance_level_string(inst), part);
+			}
+			
+			if (size + strlen(line) < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+			}
 		}
 	}
 	
