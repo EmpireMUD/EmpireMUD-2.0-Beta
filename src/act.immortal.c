@@ -5484,7 +5484,7 @@ ACMD(do_hostile) {
 	one_argument(argument, arg);
 	
 	if (!*arg) {
-		msg_to_char(ch, "Mark whom hostile?r\n");
+		msg_to_char(ch, "Mark whom hostile?\r\n");
 	}
 	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
 		send_config_msg(ch, "no_person");
