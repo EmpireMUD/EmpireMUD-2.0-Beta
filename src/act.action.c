@@ -113,7 +113,7 @@ const struct action_data_struct action_data[] = {
 	{ "planting", "is planting seeds.", ACTF_HASTE | ACTF_FAST_CHORES, process_planting, NULL },	// ACT_PLANTING
 	{ "mining", "is mining at the walls.", ACTF_HASTE | ACTF_FAST_CHORES, process_mining, NULL },	// ACT_MINING
 	{ "minting", "is minting coins.", ACTF_FAST_CHORES, process_minting, cancel_minting },	// ACT_MINTING
-	{ "fishing", "is fishing.", NOBITS, process_fishing, NULL },	// ACT_FISHING
+	{ "fishing", "is fishing.", ACTF_SITTING, process_fishing, NULL },	// ACT_FISHING
 	{ "preparing", "is preparing to fill in the trench.", NOBITS, process_start_fillin, NULL },	// ACT_START_FILLIN
 	{ "repairing", "is doing some repairs.", ACTF_FAST_CHORES | ACTF_HASTE, process_repairing, NULL },	// ACT_REPAIRING
 	{ "chipping", "is chipping rocks.", ACTF_FAST_CHORES, process_chipping, cancel_resource_list },	// ACT_CHIPPING
