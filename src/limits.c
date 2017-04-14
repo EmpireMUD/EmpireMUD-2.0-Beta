@@ -523,7 +523,7 @@ void real_update_char(char_data *ch) {
 	char_data *room_ch, *next_ch, *caster;
 	int result, iter, type;
 	int fol_count, gain;
-	bool found;
+	bool found, took_dot;
 	
 	// check for end of meters (in case it was missed in the fight code)
 	if (!FIGHTING(ch)) {
@@ -597,6 +597,7 @@ void real_update_char(char_data *ch) {
 	}
 
 	// update DoTs (NPCs get this, too)
+	took_dot = FALSE;
 	for (dot = ch->over_time_effects; dot; dot = next_dot) {
 		next_dot = dot->next;
 		
@@ -608,6 +609,7 @@ void real_update_char(char_data *ch) {
 		
 		result = damage(ch, ch, dot->damage * dot->stack, type, dot->damage_type);
 		if (result > 0 && (caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by))) {
+			took_dot = TRUE;
 			combat_meter_damage_dealt(caster, result);
 		}
 		if (result < 0 || EXTRACTED(ch) || IS_DEAD(ch)) {
@@ -750,9 +752,11 @@ void real_update_char(char_data *ch) {
 	}
 
 	// regenerate: do not put move_gain and mana_gain inside of MIN/MAX macros -- this will call them twice
-	gain = health_gain(ch, FALSE);
-	heal(ch, ch, gain);
-	GET_HEALTH_DEFICIT(ch) = MAX(0, GET_HEALTH_DEFICIT(ch) - gain);
+	if (!took_dot) {
+		gain = health_gain(ch, FALSE);
+		heal(ch, ch, gain);
+		GET_HEALTH_DEFICIT(ch) = MAX(0, GET_HEALTH_DEFICIT(ch) - gain);
+	}
 	
 	gain = move_gain(ch, FALSE);
 	GET_MOVE(ch) += gain;
