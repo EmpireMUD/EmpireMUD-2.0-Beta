@@ -1262,8 +1262,12 @@ void drop_loot(char_data *mob, char_data *killer) {
 	if (!mob || !IS_NPC(mob) || MOB_FLAGGED(mob, MOB_NO_LOOT)) {
 		return;
 	}
+
+	// find and drop loot
+	run_interactions(mob, mob->interactions, INTERACT_LOOT, IN_ROOM(mob), mob, NULL, loot_interact);
+	run_global_mob_interactions(mob, mob, INTERACT_LOOT, loot_interact);
 	
-	// loot?
+	// coins?
 	if (killer && !IS_NPC(killer) && (!GET_LOYALTY(mob) || GET_LOYALTY(mob) == GET_LOYALTY(killer) || char_has_relationship(killer, mob, DIPL_WAR))) {
 		coins = mob_coins(mob);
 		coin_emp = GET_LOYALTY(mob);
@@ -1276,10 +1280,6 @@ void drop_loot(char_data *mob, char_data *killer) {
 			obj_to_char(obj, mob);
 		}
 	}
-
-	// find and drop loot
-	run_interactions(mob, mob->interactions, INTERACT_LOOT, IN_ROOM(mob), mob, NULL, loot_interact);
-	run_global_mob_interactions(mob, mob, INTERACT_LOOT, loot_interact);
 }
 
 
