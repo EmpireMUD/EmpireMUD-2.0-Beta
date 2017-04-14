@@ -6381,11 +6381,6 @@ ACMD(do_restore) {
 	else if (!(vict = get_char_vis(ch, buf, FIND_CHAR_WORLD)))
 		send_config_msg(ch, "no_person");
 	else {
-		GET_HEALTH(vict) = GET_MAX_HEALTH(vict);
-		GET_MOVE(vict) = GET_MAX_MOVE(vict);
-		GET_MANA(vict) = GET_MAX_MANA(vict);
-		GET_BLOOD(vict) = GET_MAX_BLOOD(vict);
-		
 		// remove DoTs
 		while (vict->over_time_effects) {
 			dot_remove(vict, vict->over_time_effects);
@@ -6439,6 +6434,11 @@ ACMD(do_restore) {
 				}
 			}
 		}
+		
+		GET_HEALTH(vict) = GET_MAX_HEALTH(vict);
+		GET_MOVE(vict) = GET_MAX_MOVE(vict);
+		GET_MANA(vict) = GET_MAX_MANA(vict);
+		GET_BLOOD(vict) = GET_MAX_BLOOD(vict);
 		
 		update_pos(vict);
 		if (ch != vict) {
