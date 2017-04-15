@@ -243,6 +243,13 @@ void perform_alternate(char_data *old, char_data *new) {
 	// save this to switch over replies
 	last_tell = GET_LAST_TELL(old);
 	
+	// switch over replies for immortals, too
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) == CON_PLAYING && desc->character && IS_IMMORTAL(desc->character) && GET_LAST_TELL(desc->character) == GET_IDNUM(old)) {
+			GET_LAST_TELL(desc->character) = GET_IDNUM(new);
+		}
+	}
+	
 	// move desc (do this AFTER saving)
 	new->desc = old->desc;
 	new->desc->character = new;
