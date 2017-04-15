@@ -199,14 +199,11 @@ void perform_alternate(char_data *old, char_data *new) {
 	bool show_start = FALSE;
 	int invis_lev, old_invis, last_tell;
 	empire_data *old_emp;
-	bool was_imm;
 	
 	if (!old || !new || !old->desc || new->desc) {
 		log("SYSERR: Attempting invalid peform_alternate with %s, %s, %s, %s", old ? "ok" : "no old", new ? "ok" : "no new", old->desc ? "ok" : "no old desc", new->desc ? "new desc" : "ok");
 		return;
 	}
-	
-	was_imm = IS_IMMORTAL(old);
 
 	/*
 	 * kill off all sockets connected to the same player as the one who is
@@ -322,7 +319,7 @@ void perform_alternate(char_data *old, char_data *new) {
 		send_to_char(START_MESSG, new);
 	}
 	
-	if (!IS_IMMORTAL(new) && !was_imm) {
+	if (!IS_IMMORTAL(new)) {
 		add_cooldown(new, COOLDOWN_ALTERNATE, SECS_PER_REAL_MIN);
 	}
 	GET_LAST_TELL(new) = last_tell;
@@ -1298,9 +1295,6 @@ ACMD(do_alternate) {
 	else if (IN_HOSTILE_TERRITORY(ch)) {
 		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
 	}
-	else if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0 && !IS_IMMORTAL(ch)) {
-		msg_to_char(ch, "You can't alternate again so soon.\r\n");
-	}
 	else if (get_cooldown_time(ch, COOLDOWN_PVP_QUIT_TIMER) > 0 && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't alternate so soon after fighting!\r\n");
 	}
@@ -1315,6 +1309,10 @@ ACMD(do_alternate) {
 		
 		if (GET_ACCOUNT(newch) != GET_ACCOUNT(ch)) {
 			msg_to_char(ch, "That character isn't on your account.\r\n");
+			return;
+		}
+		if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0 && !IS_IMMORTAL(newch)) {
+			msg_to_char(ch, "You can't alternate again so soon.\r\n");
 			return;
 		}
 		if (newch->desc || !IN_ROOM(newch)) {
@@ -1340,6 +1338,11 @@ ACMD(do_alternate) {
 		// ensure legal switch
 		if (GET_ACCOUNT(newch) != GET_ACCOUNT(ch)) {
 			msg_to_char(ch, "That character isn't on your account.\r\n");
+			free_char(newch);
+			return;
+		}
+		if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0 && !IS_IMMORTAL(newch)) {
+			msg_to_char(ch, "You can't alternate again so soon.\r\n");
 			free_char(newch);
 			return;
 		}
