@@ -2803,7 +2803,7 @@ ACMD(do_toggle) {
 		}
 	}
 	
-	if (!*argument || type == NOTHING) {
+	if (!*argument) {
 		msg_to_char(ch, "Toggles:\r\n");
 		
 		for (iter = count = 0; *toggle_data[iter].name != '\n'; ++iter) {
@@ -2823,7 +2823,10 @@ ACMD(do_toggle) {
 			send_to_char("\r\n", ch);
 		}
 	}
-	else if (type != NOTHING) {
+	else if (type == NOTHING) {
+		msg_to_char(ch, "Unknown toggle '%s'.\r\n", argument);
+	}
+	else {
 		on = PRF_TOG_CHK(ch, toggle_data[type].bit);
 		on = PRF_FLAGGED(ch, toggle_data[type].bit) ? 1 : 0;
 		
