@@ -280,6 +280,9 @@ EEDIT(eedit_adjective) {
 	if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
 		msg_to_char(ch, "You are not allowed to change the empire's adjective.\r\n");
 	}
+	else if (is_at_war(emp)) {
+		msg_to_char(ch, "You can't rename your empire while at war.\r\n");
+	}
 	else if (!*argument) {
 		msg_to_char(ch, "Set the empire's adjective form to what?\r\n");
 	}
@@ -473,6 +476,9 @@ EEDIT(eedit_name) {
 	
 	if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
 		msg_to_char(ch, "You are not allowed to change the empire's name.\r\n");
+	}
+	else if (is_at_war(emp)) {
+		msg_to_char(ch, "You can't rename your empire while at war.\r\n");
 	}
 	else if (!*argument) {
 		msg_to_char(ch, "Set the empire name to what?\r\n");
