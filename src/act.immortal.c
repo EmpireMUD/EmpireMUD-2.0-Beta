@@ -6184,6 +6184,10 @@ ACMD(do_reboot) {
 		reboot_control.time = time + 1;	// minutes
 		reboot_control.type = subcmd;
 	}
+	
+	if (subcmd == SCMD_REBOOT) {
+		reboot_control.level = SHUTDOWN_NORMAL;	// prevent a reboot from using a shutdown type
+	}
 
 	if (reboot_control.immediate) {
 		msg_to_char(ch, "Rebooting momentarily...\r\n");
