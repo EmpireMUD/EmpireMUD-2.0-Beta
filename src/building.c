@@ -1188,6 +1188,9 @@ ACMD(do_build) {
 			else if (BUILDING_BURNING(IN_ROOM(ch))) {
 				msg_to_char(ch, "You can't work on a burning building!\r\n");
 			}
+			else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+				msg_to_char(ch, "It's too dark to work on the building.\r\n");
+			}
 			else {
 				start_action(ch, ACT_BUILDING, 0);
 				msg_to_char(ch, "You start building.\r\n");
@@ -1267,6 +1270,9 @@ ACMD(do_build) {
 	else if (!can_build_on(IN_ROOM(ch), GET_CRAFT_BUILD_ON(type))) {
 		prettier_sprintbit(GET_CRAFT_BUILD_ON(type), bld_on_flags, buf);
 		msg_to_char(ch, "You need to build on: %s\r\n", buf);
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to build anything here.\r\n");
 	}
 	else if (GET_CRAFT_BUILD_TYPE(type) == NOTHING || !building_proto(GET_CRAFT_BUILD_TYPE(type))) {
 		msg_to_char(ch, "That build recipe is not implemented.\r\n");
@@ -1972,6 +1978,9 @@ ACMD(do_maintain) {
 	}
 	else if (BUILDING_BURNING(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't maintain a building that's on fire!\r\n");
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to maintain anything here.\r\n");
 	}
 	else {
 		start_action(ch, ACT_MAINTENANCE, -1);

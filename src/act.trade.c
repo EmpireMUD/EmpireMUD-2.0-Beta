@@ -878,6 +878,11 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		cancel_gen_craft(ch);
 		return;
 	}
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		cancel_gen_craft(ch);
+		return;
+	}
 	
 	// find and apply something
 	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), FALSE, &found_obj))) {
@@ -946,7 +951,11 @@ void process_gen_craft(char_data *ch) {
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHARP) && !(weapon = has_sharp_tool(ch))) {
 		msg_to_char(ch, "You need to be using a sharp tool to %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
-		cancel_gen_craft(ch);		
+		cancel_gen_craft(ch);
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		cancel_gen_craft(ch);
 	}
 	else {
 		GET_ACTION_TIMER(ch) -= 1;
@@ -1282,6 +1291,11 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		return;
 	}
 	
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to %s anything.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+		return;
+	}
+	
 	// found one to resume
 	if ((veh = find_finishable_vehicle(ch, type, &any))) {
 		resume_craft_vehicle(ch, veh, type);
@@ -1442,6 +1456,9 @@ ACMD(do_gen_craft) {
 	}
 	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && !(found_obj = get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(type), ch->carrying))) {
 		msg_to_char(ch, "You need %s to make that.\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(type)));
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to %s anything.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 	else if (!check_can_craft(ch, type)) {
 		// sends its own messages

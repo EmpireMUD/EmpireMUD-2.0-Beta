@@ -606,6 +606,9 @@ ACMD(do_fish) {
 	else if (GET_ACTION(ch) != ACT_FISHING) {
 		msg_to_char(ch, "You're really too busy to do that.\r\n");
 	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to fish for anything here.\r\n");
+	}
 	else if (*arg && (dir = parse_direction(ch, arg)) == NO_DIR) {
 		msg_to_char(ch, "Fish in what direction?\r\n");
 	}
@@ -662,6 +665,11 @@ ACMD(do_forage) {
 
 	if (get_depletion(IN_ROOM(ch), DPLTN_FORAGE) >= short_depletion) {
 		msg_to_char(ch, "You can't seem to find anything to forage for.\r\n");
+		return;
+	}
+	
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to forage for anything here.\r\n");
 		return;
 	}
 	
@@ -755,6 +763,10 @@ ACMD(do_track) {
 	one_argument(argument, arg);
 	
 	if (!can_use_ability(ch, ABIL_TRACK, NOTHING, 0, NOTHING)) {
+		return;
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to track for anything here.\r\n");
 		return;
 	}
 	else if (!*arg) {
