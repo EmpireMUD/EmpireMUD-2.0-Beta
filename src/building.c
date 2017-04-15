@@ -1419,6 +1419,11 @@ ACMD(do_dismantle) {
 	}
 
 	if (IS_DISMANTLING(IN_ROOM(ch))) {
+		if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+			msg_to_char(ch, "You don't have permission to dismantle here.\r\n");
+			return;
+		}
+		
 		msg_to_char(ch, "You begin to dismantle the building.\r\n");
 		act("$n begins to dismantle the building.", FALSE, ch, 0, 0, TO_ROOM);
 		start_action(ch, ACT_DISMANTLING, 0);
