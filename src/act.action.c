@@ -1203,7 +1203,8 @@ void process_digging(char_data *ch) {
 					start_digging(ch);
 				}
 				else {
-					msg_to_char(ch, "There don't seem to be any other good rocks here.\r\n");
+					// this results in a double-message from finish_digging:
+					// msg_to_char(ch, "There don't seem to be any other good rocks here.\r\n");
 				}
 			}
 		}
