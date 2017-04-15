@@ -2669,6 +2669,9 @@ ACMD(do_cede) {
 	else if (!(room = HOME_ROOM(room))) {
 		// dummy error can't actually happen, but does set the variable in the sloppiest way possible...
 	}
+	else if (GET_ROOM_VEHICLE(room)) {
+		msg_to_char(ch, "You can't cede the inside of a vehicle.\r\n");
+	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_CEDE)) {
 		// don't use has_permission here because it would check permits on the room you're in
 		msg_to_char(ch, "You don't have permission to cede.\r\n");
