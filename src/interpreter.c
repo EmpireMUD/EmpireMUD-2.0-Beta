@@ -1268,7 +1268,7 @@ void perform_complex_alias(struct txt_q *input_q, char *orig, struct alias_data 
 	temp = strtok(strcpy(buf2, orig), " ");
 	while (temp != NULL && num_of_tokens < NUM_TOKENS) {
 		tokens[num_of_tokens++] = temp;
-			temp = strtok(NULL, " ");
+		temp = strtok(NULL, " ");
 	}
 
 	/* initialize */
@@ -1287,7 +1287,10 @@ void perform_complex_alias(struct txt_q *input_q, char *orig, struct alias_data 
 			temp++;
 			if ((num = *temp - '1') < num_of_tokens && num >= 0) {
 				strcpy(write_point, tokens[num]);
-					write_point += strlen(tokens[num]);
+				write_point += strlen(tokens[num]);
+			}
+			else if (num >= 0 && num >= num_of_tokens) {
+				// no arg, just skip it
 			}
 			else if (*temp == ALIAS_GLOB_CHAR) {
 				strcpy(write_point, orig);
