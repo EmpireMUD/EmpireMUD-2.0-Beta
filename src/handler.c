@@ -5570,6 +5570,7 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 	char *srch;
 
 	// we may modify it as we go
+	skip_spaces(&rawroomstr);
 	strcpy(roomstr, rawroomstr);
 
 	if (!*roomstr) {
@@ -5599,6 +5600,7 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 	else if (isdigit(*roomstr) && (srch = strchr(roomstr, ','))) {
 		// coords
 		*(srch++) = '\0';
+		skip_spaces(&srch);
 		x = atoi(roomstr);
 		y = atoi(srch);
 		if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
