@@ -6829,7 +6829,7 @@ ACMD(do_stat) {
 		if (!*buf2)
 			send_to_char("Stats on which mobile?\r\n", ch);
 		else {
-			if ((victim = get_char_vis(ch, buf2, FIND_CHAR_WORLD)) != NULL)
+			if ((victim = get_char_vis(ch, buf2, FIND_CHAR_WORLD | FIND_NPC_ONLY)) != NULL)
 				do_stat_character(ch, victim);
 			else
 				send_to_char("No such mobile around.\r\n", ch);

@@ -1464,7 +1464,7 @@ char_data *get_char_vis(char_data *ch, char *name, bitvector_t where) {
 		}
 
 		for (i = character_list; i && (j <= number) && !found; i = i->next) {
-			if ((CAN_SEE(ch, i) || (IS_SET(where, FIND_NO_DARK) && CAN_SEE_NO_DARK(ch, i))) && MATCH_CHAR_NAME(tmp, i)) {
+			if ((CAN_SEE(ch, i) || (IS_SET(where, FIND_NO_DARK) && CAN_SEE_NO_DARK(ch, i))) && (!IS_SET(where, FIND_NPC_ONLY) || IS_NPC(i)) && MATCH_CHAR_NAME(tmp, i)) {
 				if (++j == number) {
 					found = i;
 				}

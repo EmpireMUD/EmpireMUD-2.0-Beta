@@ -33,9 +33,10 @@
 #define FIND_OBJ_ROOM		BIT(3)
 #define FIND_OBJ_WORLD		BIT(4)
 #define FIND_OBJ_EQUIP		BIT(5)
-#define FIND_NO_DARK		BIT(6)
+#define FIND_NO_DARK		BIT(6)	// ignores light
 #define FIND_VEHICLE_ROOM	BIT(7)
 #define FIND_VEHICLE_INSIDE	BIT(8)
+#define FIND_NPC_ONLY		BIT(9)	// ignores players
 
 
 // for the interaction handlers (returns TRUE if the character performs the interaction; FALSE if it aborts)
