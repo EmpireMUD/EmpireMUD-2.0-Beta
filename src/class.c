@@ -1233,8 +1233,8 @@ void olc_show_class(char_data *ch) {
 	sprintf(buf + strlen(buf), "Skills required: <\tyrequires\t0>\r\n%s", CLASS_SKILL_REQUIREMENTS(cls) ? lbuf : "");
 	
 	sprintf(buf + strlen(buf), "<\tymaxhealth\t0> %d\r\n", CLASS_POOL(cls, HEALTH));
-	sprintf(buf + strlen(buf), "<\tymaxmoves\t0> %d\r\n", CLASS_POOL(cls, MOVE));
 	sprintf(buf + strlen(buf), "<\tymaxmana\t0> %d\r\n", CLASS_POOL(cls, MANA));
+	sprintf(buf + strlen(buf), "<\tymaxmoves\t0> %d\r\n", CLASS_POOL(cls, MOVE));
 	
 	get_class_ability_display(CLASS_ABILITIES(cls), lbuf, NULL);
 	sprintf(buf + strlen(buf), "Class roles and abilities: <\tyrole\t0>\r\n%s%s", lbuf, *lbuf ? "\r\n" : "");
