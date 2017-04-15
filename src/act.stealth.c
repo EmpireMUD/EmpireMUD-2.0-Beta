@@ -908,6 +908,9 @@ ACMD(do_escape) {
 	else if (!IS_INSIDE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't need to escape from here.\r\n");
 	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to try to escape from here.\r\n");
+	}
 	else {
 		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_VEHICLE_IN_ROOM(IN_ROOM(ch)) != IN_ROOM(ch) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN)) {
 			msg_to_char(ch, "You run for the edge to escape!\r\n");
