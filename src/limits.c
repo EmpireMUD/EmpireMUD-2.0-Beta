@@ -665,7 +665,10 @@ void real_update_char(char_data *ch) {
 	// periodic exp and skill gain
 	if (GET_DAILY_CYCLE(ch) < daily_cycle) {
 		// other stuff that resets daily
-		GET_DAILY_BONUS_EXPERIENCE(ch) = compute_bonus_exp_per_day(ch);
+		gain = compute_bonus_exp_per_day(ch);
+		if (GET_DAILY_BONUS_EXPERIENCE(ch) < gain) {
+			GET_DAILY_BONUS_EXPERIENCE(ch) = gain;
+		}
 		GET_DAILY_QUESTS(ch) = 0;
 		for (iter = 0; iter < MAX_REWARDS_PER_DAY; ++iter) {
 			GET_REWARDED_TODAY(ch, iter) = -1;
