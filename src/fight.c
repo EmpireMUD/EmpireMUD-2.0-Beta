@@ -3697,6 +3697,8 @@ void one_combat_round(char_data *ch, double speed, obj_data *weapon) {
 * @param double speed the speed of this round in seconds
 */
 void fight_wait_run(char_data *ch, double speed) {
+	unsigned long long timestamp;
+	
 	// sanity
 	if (!FIGHTING(ch)) {
 		return;
@@ -3744,6 +3746,11 @@ void fight_wait_run(char_data *ch, double speed) {
 		if (FIGHTING(FIGHTING(ch)) == ch) {
 			FIGHT_MODE(FIGHTING(ch)) = FMODE_MELEE;
 		}
+		
+		// half-round bonus if you are the one to run in
+		timestamp = microtime();
+		GET_LAST_SWING_MAINHAND(ch) = timestamp - (get_combat_speed(ch, WEAR_WIELD)/2 SEC_MICRO);
+		GET_LAST_SWING_OFFHAND(ch) = timestamp - (get_combat_speed(ch, WEAR_HOLD)/2 SEC_MICRO);
 	}
 }
 
