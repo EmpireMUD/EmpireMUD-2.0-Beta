@@ -69,6 +69,11 @@ bool can_infiltrate(char_data *ch, empire_data *emp) {
 		return FALSE;
 	}
 	
+	if (EMPIRE_IMM_ONLY(emp)) {
+		msg_to_char(ch, "You cannot infiltrate immortal empires.\r\n");
+		return FALSE;
+	}
+	
 	if (count_members_online(emp) == 0) {
 		msg_to_char(ch, "There are no members of %s online.\r\n", EMPIRE_NAME(emp));
 		return FALSE;
