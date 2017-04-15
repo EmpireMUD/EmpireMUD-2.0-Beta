@@ -2168,10 +2168,12 @@ SHOW(show_stats) {
 	extern int total_accounts, active_accounts, active_accounts_week;
 	
 	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_vehs = 0, num_players = 0, num_descs = 0, menu_count = 0;
+	int num_trigs = 0;
 	empire_data *emp, *next_emp;
 	descriptor_data *desc;
 	vehicle_data *veh;
 	char_data *vict;
+	trig_data *trig;
 	obj_data *obj;
 	
 	// count descriptors at menus
@@ -2197,6 +2199,7 @@ SHOW(show_stats) {
 	// other counts
 	LL_COUNT(object_list, obj, num_objs);
 	LL_COUNT(vehicle_list, veh, num_vehs);
+	LL_COUNT(trigger_list, trig, num_trigs);
 
 	// count active empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -2219,7 +2222,13 @@ SHOW(show_stats) {
 	msg_to_char(ch, "  %6d adventures       %6d total rooms\r\n", HASH_COUNT(adventure_table), HASH_COUNT(world_table));
 	msg_to_char(ch, "  %6d buildings        %6d room templates\r\n", HASH_COUNT(building_table), HASH_COUNT(room_template_table));
 	msg_to_char(ch, "  %6d sectors          %6d crops\r\n", HASH_COUNT(sector_table), HASH_COUNT(crop_table));
-	msg_to_char(ch, "  %6d triggers         %6d craft recipes\r\n", HASH_COUNT(trigger_table), HASH_COUNT(craft_table));
+	msg_to_char(ch, "  %6d triggers         %6d prototypes\r\n", num_trigs, HASH_COUNT(trigger_table));
+	msg_to_char(ch, "  %6d craft recipes    %6d quests\r\n", HASH_COUNT(craft_table), HASH_COUNT(quest_table));
+	msg_to_char(ch, "  %6d archetypes       %6d books\r\n", HASH_COUNT(archetype_table), HASH_COUNT(book_table));
+	msg_to_char(ch, "  %6d classes          %6d skills\r\n", HASH_COUNT(class_table), HASH_COUNT(skill_table));
+	msg_to_char(ch, "  %6d abilities        %6d factions\r\n", HASH_COUNT(ability_table), HASH_COUNT(faction_table));
+	msg_to_char(ch, "  %6d globals          %6d morphs\r\n", HASH_COUNT(globals_table), HASH_COUNT(morph_table));
+	msg_to_char(ch, "  %6d socials\r\n", HASH_COUNT(social_table));
 	msg_to_char(ch, "  %6d large bufs       %6d buf switches\r\n", buf_largecount, buf_switches);
 	msg_to_char(ch, "  %6d overflows\r\n", buf_overflows);
 }
