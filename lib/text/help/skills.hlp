@@ -330,6 +330,18 @@ You must do this at an Oilmaker building.
 
 See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL
 #
+READY
+
+Usage:  ready <weapon type>
+
+Some abilities allow you to create a weapon from mana, blood, or other
+energies. These weapons are temporary and will disappear if you stop using
+them.
+
+See also:
+  READY FIREBALL  (Natural Magic)
+  READY BLOOD WEAPONS  (Vampire)
+#
 SACRIFICE 
 
 Usage:  sacrifice <item> <god>
