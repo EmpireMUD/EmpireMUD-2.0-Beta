@@ -371,7 +371,7 @@ void update_players_online_stats(void) {
 	// determine current count
 	count = 0;
 	for (d = descriptor_list; d; d = d->next) {
-		if (STATE(d) != CON_PLAYING || !d->character) {
+		if (STATE(d) != CON_PLAYING || !d->character || IS_NPC(d->character)) {
 			continue;
 		}
 		
