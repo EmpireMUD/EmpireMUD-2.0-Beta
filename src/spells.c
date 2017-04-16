@@ -334,21 +334,25 @@ ACMD(do_damage_spell) {
 // for do_ready
 struct ready_magic_weapon_type {
 	char *name;
-	int mana;
+	int cost;
+	int cost_pool;	// MANA, etc
 	any_vnum ability;
 	obj_vnum vnum;
-	double min_dps;	// the lowest the DPS should ever go (or close to it)
-	double target_dps;	// DPS at level 100 -- will get as close to this as possible without going over
 } ready_magic_weapon[] = {
-	{ "fireball", 30, ABIL_READY_FIREBALL, o_FIREBALL, 2.0, 5.0 },
+	{ "fireball", 30, MANA, ABIL_READY_FIREBALL, o_FIREBALL },
 	
-	{ "\n", 0, NO_ABIL, NOTHING, 0.0, 0.0 }
+	{ "\n", 0, NO_ABIL, NOTHING }
 };
 
 
-ACMD(do_ready) {	
+ACMD(do_ready) {
+	extern bool check_vampire_sun(char_data *ch, bool message);
+	void scale_item_to_level(obj_data *obj, int level);
+	extern const char *pool_types[];
+	
+	ability_data *abil;
 	obj_data *obj;
-	int type, iter, cost, speed, min_damage;
+	int type, iter, scale_level;
 	bool found;
 	
 	one_argument(argument, arg);
@@ -372,7 +376,8 @@ ACMD(do_ready) {
 		msg_to_char(ch, "%s\r\n", (found ? "" : "none"));
 		return;
 	}
-
+	
+	// lookup
 	found = FALSE;
 	for (iter = 0; *ready_magic_weapon[iter].name != '\n' && !found; ++iter) {
 		if (is_abbrev(arg, ready_magic_weapon[iter].name) && (ready_magic_weapon[iter].ability == NO_ABIL || has_ability(ch, ready_magic_weapon[iter].ability))) {
@@ -381,18 +386,17 @@ ACMD(do_ready) {
 		}
 	}
 	
+	// validate
 	if (!found) {
 		msg_to_char(ch, "You don't know how to ready that.\r\n");
 		return;
 	}
-	
-	cost = ready_magic_weapon[type].mana;
-	
-	if (GET_MANA(ch) < cost) {
-		msg_to_char(ch, "You need %d mana to do that.\r\n", cost);
+	if (!can_use_ability(ch, ready_magic_weapon[type].ability, ready_magic_weapon[type].cost_pool, ready_magic_weapon[type].cost, NOTHING)) {
 		return;
 	}
-	
+	if (ready_magic_weapon[type].cost_pool == BLOOD && !check_vampire_sun(ch, TRUE)) {
+		return;
+	}
 	if (ABILITY_TRIGGERS(ch, NULL, NULL, ready_magic_weapon[type].ability)) {
 		return;
 	}
@@ -411,18 +415,37 @@ ACMD(do_ready) {
 		appear(ch);
 	}
 	
-	GET_MANA(ch) -= cost;
+	charge_ability_cost(ch, ready_magic_weapon[type].cost_pool, ready_magic_weapon[type].cost, NOTHING, 0, WAIT_SPELL);
+	
+	// load the object
 	obj = read_object(ready_magic_weapon[type].vnum, TRUE);
-	
-	// damage based on skill
-	if (ready_magic_weapon[type].ability != NO_ABIL) {		
-		speed = (OBJ_FLAGGED(obj, OBJ_FAST) ? SPD_FAST : (OBJ_FLAGGED(obj, OBJ_SLOW) ? SPD_SLOW : SPD_NORMAL));
-		min_damage = MAX(1, (int) ceil(ready_magic_weapon[type].min_dps * attack_hit_info[GET_WEAPON_TYPE(obj)].speed[speed]));
-		GET_OBJ_VAL(obj, VAL_WEAPON_DAMAGE_BONUS) = MAX(min_damage, (int)(ready_magic_weapon[type].target_dps * (get_ability_level(ch, ready_magic_weapon[type].ability) / 100.0) * attack_hit_info[GET_WEAPON_TYPE(obj)].speed[speed]));
+	abil = find_ability_by_vnum(ready_magic_weapon[type].ability);
+	if (!abil || IS_CLASS_ABILITY(ch, ready_magic_weapon[type].ability) || ABIL_ASSIGNED_SKILL(abil) == NULL) {
+		scale_level = get_approximate_level(ch);	// class-level
 	}
+	else {
+		scale_level = MIN(get_approximate_level(ch), get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
+	}
+	scale_item_to_level(obj, scale_level);
 	
-	act("Mana twists and swirls around your hand and becomes $p!", FALSE, ch, obj, 0, TO_CHAR);
-	act("Mana twists and swirls around $n's hand and becomes $p!", TRUE, ch, obj, 0, TO_ROOM);
+	switch (ready_magic_weapon[type].cost_pool) {
+		case MANA: {
+			act("Mana twists and swirls around your hand and becomes $p!", FALSE, ch, obj, NULL, TO_CHAR);
+			act("Mana twists and swirls around $n's hand and becomes $p!", TRUE, ch, obj, NULL, TO_ROOM);
+			break;
+		}
+		case BLOOD: {
+			act("You drain blood from your wrist and mold it into $p!", FALSE, ch, obj, NULL, TO_CHAR);
+			act("$n twists and molds $s own blood into $p!", TRUE, ch, obj, NULL, TO_ROOM);
+			break;
+		}
+		// HEALTH, MOVE (these could have their own messages if they were used)
+		default: {
+			act("You pull $p from the ether!", FALSE, ch, obj, NULL, TO_CHAR);
+			act("$n pulls $p from the ether!", TRUE, ch, obj, NULL, TO_ROOM);
+			break;
+		}
+	}
 	
 	equip_char(ch, obj, WEAR_WIELD);
 	determine_gear_level(ch);
@@ -430,8 +453,6 @@ ACMD(do_ready) {
 	if (ready_magic_weapon[type].ability != NO_ABIL) {
 		gain_ability_exp(ch, ready_magic_weapon[type].ability, 15);
 	}
-
-	load_otrigger(obj);
 	
-	command_lag(ch, WAIT_SPELL);
+	load_otrigger(obj);
 }

@@ -6310,7 +6310,7 @@ ACMD(do_reload) {
 		return;
 	}
 
-	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has reloaded: %s", arg);
+	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has reloaded: %s", GET_NAME(ch), arg);
 	send_config_msg(ch, "ok_string");
 }
 

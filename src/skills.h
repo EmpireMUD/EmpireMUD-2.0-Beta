@@ -692,27 +692,6 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define WEAPON_MAGIC  2
 
 
-// skill structure
-struct skill_data_type {
-	int number;	// SKILL_x
-	char *name;
-	char *abbrev;
-	char *description;
-	char *creation_description;	// shown to players who ask for help during creation
-	int flags;
-};
-
-
-// ability structure
-struct ability_data_type {
-	int number;	// ABIL_x
-	int parent_skill;	// SKILL_x
-	int parent_skill_required;	// amount of skill to buy
-	int parent_ability;	// ABIL_x
-	char *name;
-};
-
-
 // TYPE_x Attacktypes with grammar
 struct attack_hit_type {
 	const char *name;
