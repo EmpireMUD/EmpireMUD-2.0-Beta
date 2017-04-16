@@ -1914,6 +1914,9 @@ ACMD(do_herd) {
 	else if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_HARD | MOB_GROUP | MOB_AGGRESSIVE)) {
 		act("You can't herd $N!", FALSE, ch, NULL, victim, TO_CHAR);
 	}
+	else if (GET_POS(victim) < POS_STANDING || MOB_FLAGGED(victim, MOB_TIED)) {
+		act("You can't herd $M right now.", FALSE, ch, NULL, victim, TO_CHAR);
+	}
 	else if ((dir = parse_direction(ch, buf)) == NO_DIR || !(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1])))
 		msg_to_char(ch, "That's not a direction!\r\n");
 	else if (!ROOM_IS_CLOSED(IN_ROOM(ch)) && dir >= NUM_2D_DIRS) {
