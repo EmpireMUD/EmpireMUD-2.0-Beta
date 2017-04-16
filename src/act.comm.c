@@ -885,7 +885,7 @@ ACMD(do_slash_channel) {
 			msg_to_char(ch, "Players on \t%c/%s\tn:\r\n", chan->color, chan->name);
 			
 			for (desc = descriptor_list; desc; desc = desc->next) {
-				if (desc->character && !IS_NPC(desc->character) && STATE(desc) == CON_PLAYING && find_on_slash_channel(desc->character, chan->id) && CAN_SEE(ch, desc->character) && INCOGNITO_OK(ch, desc->character)) {
+				if (desc->character && !IS_NPC(desc->character) && STATE(desc) == CON_PLAYING && find_on_slash_channel(desc->character, chan->id) && CAN_SEE_NO_DARK(ch, desc->character) && INCOGNITO_OK(ch, desc->character)) {
 					msg_to_char(ch, " %s\r\n", PERS(desc->character, ch, TRUE));
 				}
 			}
