@@ -343,6 +343,7 @@ struct ready_magic_weapon_type {
 	{ "bloodskean", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODSKEAN },
 	{ "bloodspear", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODSPEAR },
 	{ "bloodsword", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODSWORD },
+	{ "bloodstaff", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODSTAFF },
 	{ "fireball", 30, MANA, ABIL_READY_FIREBALL, o_FIREBALL },
 	
 	{ "\n", 0, NO_ABIL, NOTHING }

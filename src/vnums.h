@@ -100,6 +100,7 @@
 #define o_FIREBALL  1105
 #define o_IMPERIUM_SPIKE  1114
 #define o_NEXUS_CRYSTAL  1115
+#define o_BLOODSTAFF  1116
 #define o_NOCTURNIUM_SPIKE  1119
 
 // herbs

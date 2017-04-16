@@ -709,7 +709,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OBJ_VNUM(obj)  ((obj)->vnum)
 
 // definitions
-#define IS_BLOOD_WEAPON(obj)  (GET_OBJ_VNUM(obj) == o_BLOODSWORD || GET_OBJ_VNUM(obj) == o_BLOODSPEAR || GET_OBJ_VNUM(obj) == o_BLOODSKEAN || GET_OBJ_VNUM(obj) == o_BLOODMACE)
+#define IS_BLOOD_WEAPON(obj)  (GET_OBJ_VNUM(obj) == o_BLOODSWORD || GET_OBJ_VNUM(obj) == o_BLOODSTAFF || GET_OBJ_VNUM(obj) == o_BLOODSPEAR || GET_OBJ_VNUM(obj) == o_BLOODSKEAN || GET_OBJ_VNUM(obj) == o_BLOODMACE)
 #define IS_STOLEN(obj)  (GET_STOLEN_TIMER(obj) > 0 && (config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) + GET_STOLEN_TIMER(obj) > time(0))
 
 // helpers
