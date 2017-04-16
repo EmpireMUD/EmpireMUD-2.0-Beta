@@ -1607,9 +1607,11 @@ ACMD(do_dedicate) {
 ACMD(do_designate) {
 	void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
+	void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
 	extern bld_data *get_building_by_name(char *name, bool room_only);
 	void sort_world_table();
 	
+	struct empire_territory_data *ter;
 	struct room_direction_data *ex;
 	int dir = NO_DIR;
 	room_data *new, *home = HOME_ROOM(IN_ROOM(ch));
@@ -1712,6 +1714,11 @@ ACMD(do_designate) {
 			new = IN_ROOM(ch);
 			
 			remove_designate_objects(new);
+			if (ROOM_OWNER(home) && (ter = find_territory_entry(ROOM_OWNER(home), new))) {
+				while (ter->npcs) {
+					delete_territory_npc(ter, ter->npcs);
+				}
+			}
 			
 			// remove any attached scripts
 			if (SCRIPT(new)) {
