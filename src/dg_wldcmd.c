@@ -1300,6 +1300,113 @@ WCMD(do_wat) {
 }
 
 
+WCMD(do_wrestore) {
+	extern const bool aff_is_bad[];
+	extern const double apply_values[];
+	
+	struct affected_type *aff, *next_aff;
+	char arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh = NULL;
+	char_data *victim = NULL;
+	obj_data *obj = NULL;
+	room_data *rtarg = NULL;
+	bitvector_t bitv;
+	bool done_aff;
+	int pos;
+		
+	one_argument(argument, arg);
+	
+	// find a target
+	if (!*arg) {
+		rtarg = room;
+	}
+	else if (!str_cmp(arg, "room") || !str_cmp(arg, "building")) {
+		rtarg = room;
+	}
+	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_in_room(room, arg))) {
+		// found victim
+	}
+	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_room(room, arg))) {
+		// found vehicle
+		if (!VEH_IS_COMPLETE(veh)) {
+			wld_log(room, "wrestore: used on unfinished vehicle");
+			return;
+		}
+	}
+	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_in_room(room, arg))) {
+		// found obj
+	}
+	else if ((rtarg = get_room(room, arg))) {
+		// found room
+	}
+	else {
+		// bad arg
+		wld_log(room, "wrestore: bad argument");
+		return;
+	}
+	
+	if (rtarg) {
+		rtarg = HOME_ROOM(rtarg);
+		if (!IS_COMPLETE(rtarg)) {
+			wld_log(room, "wrestore: used on unfinished building");
+			return;
+		}
+	}
+	
+	// perform the restoration
+	if (victim) {
+		while (victim->over_time_effects) {
+			dot_remove(victim, victim->over_time_effects);
+		}
+		LL_FOREACH_SAFE(victim->affected, aff, next_aff) {
+			// can't cleanse penalties (things cast by self)
+			if (aff->cast_by == CAST_BY_ID(victim)) {
+				continue;
+			}
+			
+			done_aff = FALSE;
+			if (aff->location != APPLY_NONE && (apply_values[(int) aff->location] == 0.0 || aff->modifier < 0)) {
+				affect_remove(victim, aff);
+				done_aff = TRUE;
+			}
+			if (!done_aff && (bitv = aff->bitvector) != NOBITS) {
+				// check each bit
+				for (pos = 0; bitv && !done_aff; ++pos, bitv >>= 1) {
+					if (IS_SET(bitv, BIT(0)) && aff_is_bad[pos]) {
+						affect_remove(victim, aff);
+						done_aff = TRUE;
+					}
+				}
+			}
+		}
+		if (GET_POS(victim) < POS_SLEEPING) {
+			GET_POS(victim) = POS_STANDING;
+		}
+		GET_HEALTH(victim) = GET_MAX_HEALTH(victim);
+		GET_MOVE(victim) = GET_MAX_MOVE(victim);
+		GET_MANA(victim) = GET_MAX_MANA(victim);
+		GET_BLOOD(victim) = GET_MAX_BLOOD(victim);
+	}
+	if (obj) {
+		// not sure what to do for objs
+	}
+	if (veh) {
+		free_resource_list(VEH_NEEDS_RESOURCES(veh));
+		VEH_NEEDS_RESOURCES(veh) = NULL;
+		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
+		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+	}
+	if (rtarg) {
+		if (COMPLEX_DATA(rtarg)) {
+			free_resource_list(GET_BUILDING_RESOURCES(rtarg));
+			GET_BUILDING_RESOURCES(rtarg) = NULL;
+			COMPLEX_DATA(rtarg)->damage = 0;
+			COMPLEX_DATA(rtarg)->burning = 0;
+		}
+	}
+}
+
+
 WCMD(do_wscale) {
 	char arg[MAX_INPUT_LENGTH], lvl_arg[MAX_INPUT_LENGTH];
 	struct instance_data *inst = NULL;
@@ -1392,6 +1499,7 @@ const struct wld_command_info wld_cmd_info[] = {
 	{ "wmorph", do_wmorph, NO_SCMD },
 	{ "wpurge", do_wpurge, NO_SCMD },
 	{ "wquest", do_wquest, NO_SCMD },
+	{ "wrestore", do_wrestore, NO_SCMD },
 	{ "wscale", do_wscale, NO_SCMD },
 	{ "wsend", do_wsend, SCMD_WSEND },
 	{ "wsiege", do_wsiege, NO_SCMD },

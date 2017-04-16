@@ -1370,26 +1370,31 @@ VCMD(do_vrestore) {
 	}
 	else if ((*arg == UID_CHAR && (vtarg = get_vehicle(arg))) || (veh = get_vehicle_near_vehicle(veh, arg))) {
 		// found vehicle
-		if (!VEH_IS_COMPLETE(vtarg)) {
-			veh_log(veh, "vrestore: used on unfinished vehicle");
-			return;
-		}
 	}
 	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_by_vehicle(veh, arg))) {
 		// found obj
 	}
 	else if ((room = get_room(IN_ROOM(veh), arg))) {
 		// found room
-		room = HOME_ROOM(room);
-		if (!IS_COMPLETE(room)) {
-			veh_log(veh, "vrestore: used on unfinished building");
-			return;
-		}
 	}
 	else {
 		// bad arg
 		veh_log(veh, "vrestore: bad argument");
 		return;
+	}
+	
+	if (vtarg) {
+		if (!VEH_IS_COMPLETE(vtarg)) {
+			veh_log(veh, "vrestore: used on unfinished vehicle");
+			return;
+		}
+	}
+	if (room) {
+		room = HOME_ROOM(room);
+		if (!IS_COMPLETE(room)) {
+			veh_log(veh, "vrestore: used on unfinished building");
+			return;
+		}
 	}
 	
 	// perform the restoration

@@ -415,16 +415,19 @@ OCMD(do_orestore) {
 	}
 	else if ((room = get_room(orm, arg))) {
 		// found room
-		room = HOME_ROOM(room);
-		if (!IS_COMPLETE(room)) {
-			obj_log(obj, "orestore: used on unfinished building");
-			return;
-		}
 	}
 	else {
 		// bad arg
 		obj_log(obj, "orestore: bad argument");
 		return;
+	}
+	
+	if (room) {
+		room = HOME_ROOM(room);
+		if (!IS_COMPLETE(room)) {
+			obj_log(obj, "orestore: used on unfinished building");
+			return;
+		}
 	}
 	
 	// perform the restoration

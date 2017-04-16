@@ -109,6 +109,7 @@ help files for more info):
 &c%purge%&0 - Purges a mob, object, etc.
 &c%quest%&0 - Modifies a player's quests.
 &c%regionecho%&0 - Sends a message to everyone in a given map radius.
+&c%restore%&0 - Heals/repairs someone or something.
 &c%scale%&0 - Changes the scale level of a target.
 &c%send%&0 - Send a message to one person.
 &c%siege%&0 - Deals siege damage to a vehicle or room.

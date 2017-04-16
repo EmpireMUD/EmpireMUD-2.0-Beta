@@ -1039,16 +1039,19 @@ ACMD(do_mrestore) {
 	}
 	else if ((room = find_target_room(ch, arg))) {
 		// found room
-		room = HOME_ROOM(room);
-		if (!IS_COMPLETE(room)) {
-			mob_log(ch, "mrestore: used on unfinished building");
-			return;
-		}
 	}
 	else {
 		// bad arg
 		mob_log(ch, "mrestore: bad argument");
 		return;
+	}
+	
+	if (room) {
+		room = HOME_ROOM(room);
+		if (!IS_COMPLETE(room)) {
+			mob_log(ch, "mrestore: used on unfinished building");
+			return;
+		}
 	}
 	
 	// perform the restoration
