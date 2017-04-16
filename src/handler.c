@@ -1315,35 +1315,28 @@ void char_to_room(char_data *ch, room_data *room) {
 * @return char_data *The nearest matching character.
 */
 char_data *find_closest_char(char_data *ch, char *arg, bool pc_only) {
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp = tmpname;
 	char_data *vict, *best = NULL;
 	int dist, best_dist = MAP_SIZE;
-	int number, count;
 	
 	if ((vict = get_char_room_vis(ch, arg)) && (!pc_only || !IS_NPC(vict))) {
 		return vict;
 	}
 	
-	strcpy(tmp, arg);
-	number = get_number(&tmp);
-	if (number == 0) {
-		return find_closest_char(ch, tmp, TRUE);
-	}
-	
-	for (vict = character_list, count = 0; vict && count <= number; vict = vict->next) {
-		if (CAN_SEE(ch, vict) && (!pc_only || !IS_NPC(vict)) && IN_ROOM(vict) && MATCH_CHAR_NAME_ROOM(ch, tmp, vict)) {
-			// did not specify a number
-			if (number == 1) {
-				dist = compute_distance(IN_ROOM(ch), IN_ROOM(vict));
-				if (dist < best_dist) {
-					dist = best_dist;
-					best = vict;
-				}
-			}
-			else if (++count == number) {
-				return vict;
-			}
+	LL_FOREACH(character_list, vict) {
+		if (pc_only || IS_NPC(vict)) {
+			continue;
+		}
+		if (!CAN_SEE(ch, vict) || !CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(vict))) {
+			continue;
+		}
+		if (!MATCH_CHAR_NAME_ROOM(ch, arg, vict)) {
+			continue;
+		}
+		
+		dist = compute_distance(IN_ROOM(ch), IN_ROOM(vict));
+		if (!best || dist < best_dist) {
+			dist = best_dist;
+			best = vict;
 		}
 	}
 	
