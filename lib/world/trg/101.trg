@@ -504,13 +504,13 @@ if !%target%
   halt
 end
 wait 2
-if %actor.room% != %self.room% || %self.disabled%
+if %target.room% != %self.room% || %self.disabled% || %self.fighting%
   halt
 end
 %send% %target% %self.name% moves menacingly towards you...
 %echoaround% %target% %self.name% moves menacingly towards %target.name%...
 wait 1 sec
-if %target.room% != %self.room% || %self.disabled%
+if %target.room% != %self.room% || %self.disabled% || %self.fighting%
   halt
 end
 %echoaround% %target% %self.name% attacks %target.name%!

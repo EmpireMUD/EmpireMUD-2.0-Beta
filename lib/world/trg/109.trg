@@ -316,6 +316,7 @@ if %enraged%
     end
     %echo% %self.name% tries to flee...
     %echo% %self.name% runs behind a large stalagmite and disappears!
+    %restore% %self%
     dg_affect %self% !ATTACK on 300
     dg_affect %self% !SEE on -1
   end
