@@ -2156,6 +2156,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		"purge",
 		"quest",
 		"regionecho",
+		"restore",
 		"scale",
 		"send",
 		"siege",
