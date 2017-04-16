@@ -339,7 +339,10 @@ struct ready_magic_weapon_type {
 	any_vnum ability;
 	obj_vnum vnum;
 } ready_magic_weapon[] = {
-	{ "bloodsword", 40, BLOOD, ABIL_BLOODSWORD, o_BLOODSWORD },
+	{ "bloodmace", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODMACE },
+	{ "bloodskean", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODSKEAN },
+	{ "bloodspear", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODSPEAR },
+	{ "bloodsword", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODSWORD },
 	{ "fireball", 30, MANA, ABIL_READY_FIREBALL, o_FIREBALL },
 	
 	{ "\n", 0, NO_ABIL, NOTHING }

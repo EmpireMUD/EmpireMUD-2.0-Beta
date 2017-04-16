@@ -18,7 +18,7 @@ To become a vampire, seek out another of their kind -- if you dare.
 Check out &yHELP VAMPIRE GUIDE&0 for a getting-started.
 
 See also: BITE, SIRE, FEED, BOOST, ALACRITY, BLOOD FORTITUDE, MUMMIFY,
-    TASTE BLOOD, ANCIENT BLOOD, READY BLOODSWORD, COMMAND, MAJESTY, SUMMON,
+    TASTE BLOOD, ANCIENT BLOOD, READY BLOOD WEAPONS, COMMAND, MAJESTY, SUMMON,
     SOULMASK, DEATHSHROUD, WOLF FORM, HORRID FORM, MIST FORM, CLAWS,
     PREADTOR VISION, REGENERATE, BUILD HAVEN, DAYWALKING, VEINTAP, WEAKEN,
     BAT FORM, UNNATURAL THIRST, SANGUINE RESTORATION
@@ -104,20 +104,26 @@ Cooldown:  30 seconds
 
 This power purges a vampire's blood of any poisons, by sweating them out.
 #
-BLOODSWORD BLOOD-SWORD "BLOOD SWORD" "READY BLOODSWORD"
+"READY BLOOD WEAPONS" BLOODMACE BLOODSKEAN BLOODSPEAR BLOODSWORD
 
-Ready Bloodsword (Vampire ability)
+Ready Blood Weapons (Vampire ability)
 
-Usage:  ready bloodsword
+Usage:  ready <weapon name>
 Cost:  40 blood
 
-A vampire with this ability can create a sword from its own blood. The blood-
-red sword is only as powerful as the vampire who created it.
+A vampire with this ability can create weapons from its own blood. The blood-
+red weapons are only as powerful as the vampire who created them.
 
-When you activate this power, you will automatically wield the sword, and it
-will disappear when unequipped.
+You can create:
+  bloodmace (pound/blunt)
+  bloodskean (stab/stealth)
+  bloodspear (jab/tank)
+  bloodsword (slash)
 
-Gains experience when you create the bloodsword, or fight with it.
+When you activate this power, you will automatically wield the weapon of your
+choice, and it will disappear when unequipped.
+
+Gains experience when you create the blood weapon, or fight with it.
 #
 BOOST
 
