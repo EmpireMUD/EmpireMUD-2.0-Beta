@@ -2445,8 +2445,13 @@ void do_abandon_room(char_data *ch, room_data *room) {
 		msg_to_char(ch, "Just abandon the main room.\r\n");
 	}
 	else {
-		if (room != IN_ROOM(ch) && has_ability(ch, ABIL_NAVIGATION)) {
-			msg_to_char(ch, "(%d, %d) abandoned.\r\n", X_COORD(room), Y_COORD(room));
+		if (room != IN_ROOM(ch)) {
+			if (has_ability(ch, ABIL_NAVIGATION)) {
+				msg_to_char(ch, "(%d, %d) %s abandoned.\r\n", X_COORD(room), Y_COORD(room), get_room_name(room, FALSE));
+			}
+			else {
+				msg_to_char(ch, "%s abandoned.\r\n", get_room_name(room, FALSE));
+			}
 			if (ROOM_PEOPLE(room)) {
 				act("$N abandons $S claim to this area.", FALSE, ROOM_PEOPLE(room), NULL, ch, TO_CHAR | TO_ROOM);
 			}
@@ -2492,14 +2497,13 @@ void do_abandon_vehicle(char_data *ch, vehicle_data *veh) {
 ACMD(do_abandon) {
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
-	room_data *room;
+	room_data *room = IN_ROOM(ch);
 
 	if (IS_NPC(ch)) {
 		return;
 	}
 	
-	one_argument(argument, arg);
-	
+	one_word(argument, arg);
 	
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
@@ -2517,8 +2521,8 @@ ACMD(do_abandon) {
 	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
 		do_abandon_vehicle(ch, veh);
 	}
-	else if (!(*arg ? (room = find_target_room(ch, arg)) : (room = IN_ROOM(ch)))) {
-		msg_to_char(ch, "You don't see that to abandon.\r\n");
+	else if (*arg && !(room = find_target_room(ch, arg))) {
+		// sends own error
 	}
 	else if (!(room = HOME_ROOM(room))) {
 		msg_to_char(ch, "You can't abandon that!\r\n");
@@ -2645,7 +2649,8 @@ ACMD(do_cede) {
 		return;
 	
 	room = HOME_ROOM(IN_ROOM(ch));
-	one_argument(argument, arg);
+	argument = one_argument(argument, arg);
+	skip_spaces(&argument);
 
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
@@ -2662,6 +2667,9 @@ ACMD(do_cede) {
 		msg_to_char(ch, "You can't cede land to yourself!\r\n");
 	else if (!PRF_FLAGGED(targ, PRF_BOTHERABLE)) {
 		msg_to_char(ch, "You can't cede land to someone with 'bother' toggled off.\r\n");
+	}
+	else if (*argument && strchr(argument, ',')) {
+		msg_to_char(ch, "You can only cede the land you're standing on.\r\n");
 	}
 	else if (GET_ROOM_VEHICLE(room)) {
 		msg_to_char(ch, "You can't cede the inside of a vehicle.\r\n");
