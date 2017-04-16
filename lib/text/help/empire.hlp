@@ -154,12 +154,12 @@ See also: BUILD INFO, RESOURCES, KEEP, EMPIRE, ARTISANS, LUXURY, MONUMENTS,
 #
 CEDE
 
-Usage:  cede <person> (x, y)
+Usage:  cede <person>
 
-This is used to cede one acre of land to anyone else currently in the game. 
-If you do not include an (x, y) coordinate, it will cede the land you're on. 
-You can only cede land owned by your empire. Ceding land to a god or immortal
-so that you can claim more land may get you in trouble.
+This is used to cede one acre of land to anyone else currently in the game. You
+can only cede the map tile you're standing on, and it must be owned by your
+empire. Ceding land to a god or immortal so that you can claim more land may
+get you in trouble.
 
 Your target must have the 'bother' toggle turned on. You can't cede land to an
 empire that is at war.

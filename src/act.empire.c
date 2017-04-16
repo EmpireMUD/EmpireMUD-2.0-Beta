@@ -2492,6 +2492,7 @@ void do_abandon_vehicle(char_data *ch, vehicle_data *veh) {
 ACMD(do_abandon) {
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
+	room_data *room;
 
 	if (IS_NPC(ch)) {
 		return;
@@ -2516,14 +2517,17 @@ ACMD(do_abandon) {
 	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
 		do_abandon_vehicle(ch, veh);
 	}
-	else if (*arg) {
+	else if (!(*arg ? (room = find_target_room(ch, arg)) : (room = IN_ROOM(ch)))) {
 		msg_to_char(ch, "You don't see that to abandon.\r\n");
 	}
-	else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
-		do_abandon_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)));
+	else if (!(room = HOME_ROOM(room))) {
+		msg_to_char(ch, "You can't abandon that!\r\n");
+	}
+	else if (GET_ROOM_VEHICLE(room)) {
+		do_abandon_vehicle(ch, GET_ROOM_VEHICLE(room));
 	}
 	else {
-		do_abandon_room(ch, IN_ROOM(ch));
+		do_abandon_room(ch, room);
 	}
 }
 
@@ -2632,7 +2636,6 @@ ACMD(do_barde) {
 
 
 ACMD(do_cede) {
-	char arg2[MAX_INPUT_LENGTH];
 	empire_data *e = GET_LOYALTY(ch), *f;
 	room_data *room, *iter, *next_iter;
 	char_data *targ;
@@ -2640,9 +2643,9 @@ ACMD(do_cede) {
 
 	if (IS_NPC(ch))
 		return;
-
-	argument = one_argument(argument, arg);
-	any_one_word(argument, arg2);
+	
+	room = HOME_ROOM(IN_ROOM(ch));
+	one_argument(argument, arg);
 
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
@@ -2660,15 +2663,6 @@ ACMD(do_cede) {
 	else if (!PRF_FLAGGED(targ, PRF_BOTHERABLE)) {
 		msg_to_char(ch, "You can't cede land to someone with 'bother' toggled off.\r\n");
 	}
-	else if (*arg2 && !strstr(arg2, ",")) {
-		msg_to_char(ch, "Usage: cede <person> (x, y)\r\n");
-	}
-	else if (!(*arg2 ? (room = find_target_room(ch, arg2)) : (room = IN_ROOM(ch)))) {
-		msg_to_char(ch, "Invalid location.\r\n");
-	}
-	else if (!(room = HOME_ROOM(room))) {
-		// dummy error can't actually happen, but does set the variable in the sloppiest way possible...
-	}
 	else if (GET_ROOM_VEHICLE(room)) {
 		msg_to_char(ch, "You can't cede the inside of a vehicle.\r\n");
 	}
@@ -2677,7 +2671,7 @@ ACMD(do_cede) {
 		msg_to_char(ch, "You don't have permission to cede.\r\n");
 	}
 	else if (ROOM_OWNER(room) != e)
-		msg_to_char(ch, "You don't even own %s acre.\r\n", room == IN_ROOM(ch) ? "this" : "that");
+		msg_to_char(ch, "You don't even own this location.\r\n");
 	else if (ROOM_PRIVATE_OWNER(room) != NOBODY) {
 		msg_to_char(ch, "You can't cede a private house.\r\n");
 	}
