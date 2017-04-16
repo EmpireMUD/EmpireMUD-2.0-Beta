@@ -376,6 +376,111 @@ OCMD(do_oechoneither) {
 }
 
 
+OCMD(do_orestore) {
+	extern const bool aff_is_bad[];
+	extern const double apply_values[];
+	
+	struct affected_type *aff, *next_aff;
+	char arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh = NULL;
+	char_data *victim = NULL;
+	obj_data *otarg = NULL;
+	room_data *room = NULL, *orm;
+	bitvector_t bitv;
+	bool done_aff;
+	int pos;
+	
+	orm = obj_room(obj);
+	one_argument(argument, arg);
+	
+	// find a target
+	if (!*arg) {
+		otarg = obj;
+	}
+	else if (!str_cmp(arg, "room") || !str_cmp(arg, "building")) {
+		room = orm;
+	}
+	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_by_obj(obj, arg))) {
+		// found victim
+	}
+	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_near_obj(obj, arg))) {
+		// found vehicle
+		if (!VEH_IS_COMPLETE(veh)) {
+			obj_log(obj, "orestore: used on unfinished vehicle");
+			return;
+		}
+	}
+	else if ((*arg == UID_CHAR && (otarg = get_obj(arg))) || (otarg = get_obj_by_obj(obj, arg))) {
+		// found obj
+	}
+	else if ((room = get_room(orm, arg))) {
+		// found room
+		room = HOME_ROOM(room);
+		if (!IS_COMPLETE(room)) {
+			obj_log(obj, "orestore: used on unfinished building");
+			return;
+		}
+	}
+	else {
+		// bad arg
+		obj_log(obj, "orestore: bad argument");
+		return;
+	}
+	
+	// perform the restoration
+	if (victim) {
+		while (victim->over_time_effects) {
+			dot_remove(victim, victim->over_time_effects);
+		}
+		LL_FOREACH_SAFE(victim->affected, aff, next_aff) {
+			// can't cleanse penalties (things cast by self)
+			if (aff->cast_by == CAST_BY_ID(victim)) {
+				continue;
+			}
+			
+			done_aff = FALSE;
+			if (aff->location != APPLY_NONE && (apply_values[(int) aff->location] == 0.0 || aff->modifier < 0)) {
+				affect_remove(victim, aff);
+				done_aff = TRUE;
+			}
+			if (!done_aff && (bitv = aff->bitvector) != NOBITS) {
+				// check each bit
+				for (pos = 0; bitv && !done_aff; ++pos, bitv >>= 1) {
+					if (IS_SET(bitv, BIT(0)) && aff_is_bad[pos]) {
+						affect_remove(victim, aff);
+						done_aff = TRUE;
+					}
+				}
+			}
+		}
+		if (GET_POS(victim) < POS_SLEEPING) {
+			GET_POS(victim) = POS_STANDING;
+		}
+		GET_HEALTH(victim) = GET_MAX_HEALTH(victim);
+		GET_MOVE(victim) = GET_MAX_MOVE(victim);
+		GET_MANA(victim) = GET_MAX_MANA(victim);
+		GET_BLOOD(victim) = GET_MAX_BLOOD(victim);
+	}
+	if (otarg) {
+		// not sure what to do for objs
+	}
+	if (veh) {
+		free_resource_list(VEH_NEEDS_RESOURCES(veh));
+		VEH_NEEDS_RESOURCES(veh) = NULL;
+		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
+		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+	}
+	if (room) {
+		if (COMPLEX_DATA(room)) {
+			free_resource_list(GET_BUILDING_RESOURCES(room));
+			GET_BUILDING_RESOURCES(room) = NULL;
+			COMPLEX_DATA(room)->damage = 0;
+			COMPLEX_DATA(room)->burning = 0;
+		}
+	}
+}
+
+
 OCMD(do_osend) {
 	char buf[MAX_INPUT_LENGTH], *msg;
 	char_data *ch;
@@ -1532,6 +1637,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "oown", do_oown, NO_SCMD },
 	{ "opurge", do_opurge, NO_SCMD },
 	{ "oquest", do_oquest, NO_SCMD },
+	{ "orestore", do_orestore, NO_SCMD },
 	{ "oscale", do_oscale, NO_SCMD },
 	{ "osend", do_osend, SCMD_OSEND },
 	{ "osetval", do_osetval, NO_SCMD },
