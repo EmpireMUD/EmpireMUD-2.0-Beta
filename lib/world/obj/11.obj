@@ -20,14 +20,50 @@ The sword drips with blood.
 A
 17 1 0
 S
+#1102
+spear bloodspear vicious~
+a vicious bloodspear~
+A bloodspear is pooling on the ground.~
+The spear drips with blood.
+~
+1 gmp an 3
+0 1 3
+10 0
+A
+18 3 0
+S
+#1103
+skean bloodskean deep red~
+a deep red bloodskean~
+A bloodskean is dripping on the ground.~
+The skean drips with blood.
+~
+1 gmp an 3
+0 3 4
+10 0
+A
+17 1 0
+S
+#1104
+mace bloodmace wicked~
+a wicked bloodmace~
+A bloodmace has melted on the ground.~
+The mace drips with blood.
+~
+1 gmp an 3
+0 3 5
+10 0
+A
+17 1 0
+S
 #1105
 fireball~
 a fireball~
 A fireball is rolling around here.~
 You're ready to shoot fireballs.
 ~
-1 g ano 2
-0 0 16
+1 gmp ano 4
+0 1 16
 10 0
 S
 #1106
