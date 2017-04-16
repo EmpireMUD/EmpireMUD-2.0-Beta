@@ -1335,7 +1335,7 @@ char_data *find_closest_char(char_data *ch, char *arg, bool pc_only) {
 		
 		dist = compute_distance(IN_ROOM(ch), IN_ROOM(vict));
 		if (!best || dist < best_dist) {
-			dist = best_dist;
+			best_dist = dist;
 			best = vict;
 		}
 	}
