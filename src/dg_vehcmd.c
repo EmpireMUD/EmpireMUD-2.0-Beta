@@ -1342,6 +1342,110 @@ VCMD(do_vat)  {
 }
 
 
+VCMD(do_vrestore) {
+	extern const bool aff_is_bad[];
+	extern const double apply_values[];
+	
+	struct affected_type *aff, *next_aff;
+	char arg[MAX_INPUT_LENGTH];
+	vehicle_data *vtarg = NULL;
+	char_data *victim = NULL;
+	obj_data *obj = NULL;
+	room_data *room = NULL;
+	bitvector_t bitv;
+	bool done_aff;
+	int pos;
+		
+	one_argument(argument, arg);
+	
+	// find a target
+	if (!*arg) {
+		vtarg = veh;
+	}
+	else if (!str_cmp(arg, "room") || !str_cmp(arg, "building")) {
+		room = IN_ROOM(veh);
+	}
+	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_by_vehicle(veh, arg))) {
+		// found victim
+	}
+	else if ((*arg == UID_CHAR && (vtarg = get_vehicle(arg))) || (veh = get_vehicle_near_vehicle(veh, arg))) {
+		// found vehicle
+		if (!VEH_IS_COMPLETE(vtarg)) {
+			veh_log(veh, "vrestore: used on unfinished vehicle");
+			return;
+		}
+	}
+	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_by_vehicle(veh, arg))) {
+		// found obj
+	}
+	else if ((room = get_room(IN_ROOM(veh), arg))) {
+		// found room
+		room = HOME_ROOM(room);
+		if (!IS_COMPLETE(room)) {
+			veh_log(veh, "vrestore: used on unfinished building");
+			return;
+		}
+	}
+	else {
+		// bad arg
+		veh_log(veh, "vrestore: bad argument");
+		return;
+	}
+	
+	// perform the restoration
+	if (victim) {
+		while (victim->over_time_effects) {
+			dot_remove(victim, victim->over_time_effects);
+		}
+		LL_FOREACH_SAFE(victim->affected, aff, next_aff) {
+			// can't cleanse penalties (things cast by self)
+			if (aff->cast_by == CAST_BY_ID(victim)) {
+				continue;
+			}
+			
+			done_aff = FALSE;
+			if (aff->location != APPLY_NONE && (apply_values[(int) aff->location] == 0.0 || aff->modifier < 0)) {
+				affect_remove(victim, aff);
+				done_aff = TRUE;
+			}
+			if (!done_aff && (bitv = aff->bitvector) != NOBITS) {
+				// check each bit
+				for (pos = 0; bitv && !done_aff; ++pos, bitv >>= 1) {
+					if (IS_SET(bitv, BIT(0)) && aff_is_bad[pos]) {
+						affect_remove(victim, aff);
+						done_aff = TRUE;
+					}
+				}
+			}
+		}
+		if (GET_POS(victim) < POS_SLEEPING) {
+			GET_POS(victim) = POS_STANDING;
+		}
+		GET_HEALTH(victim) = GET_MAX_HEALTH(victim);
+		GET_MOVE(victim) = GET_MAX_MOVE(victim);
+		GET_MANA(victim) = GET_MAX_MANA(victim);
+		GET_BLOOD(victim) = GET_MAX_BLOOD(victim);
+	}
+	if (obj) {
+		// not sure what to do for objs
+	}
+	if (vtarg) {
+		free_resource_list(VEH_NEEDS_RESOURCES(vtarg));
+		VEH_NEEDS_RESOURCES(vtarg) = NULL;
+		VEH_HEALTH(vtarg) = VEH_MAX_HEALTH(vtarg);
+		REMOVE_BIT(VEH_FLAGS(vtarg), VEH_ON_FIRE);
+	}
+	if (room) {
+		if (COMPLEX_DATA(room)) {
+			free_resource_list(GET_BUILDING_RESOURCES(room));
+			GET_BUILDING_RESOURCES(room) = NULL;
+			COMPLEX_DATA(room)->damage = 0;
+			COMPLEX_DATA(room)->burning = 0;
+		}
+	}
+}
+
+
 VCMD(do_vscale) {
 	char arg[MAX_INPUT_LENGTH], lvl_arg[MAX_INPUT_LENGTH];
 	obj_data *otarg, *fresh, *proto;
@@ -1452,6 +1556,7 @@ const struct vehicle_command_info veh_cmd_info[] = {
 	{ "vmorph", do_vmorph, NO_SCMD },
 	{ "vpurge", do_vpurge, NO_SCMD },
 	{ "vquest", do_vquest, NO_SCMD },
+	{ "vrestore", do_vrestore, NO_SCMD },
 	{ "vscale", do_vscale, NO_SCMD },
 	{ "vsend", do_vsend, SCMD_VSEND },
 	{ "vsiege", do_vsiege, NO_SCMD },
