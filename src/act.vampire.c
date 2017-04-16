@@ -747,61 +747,6 @@ ACMD(do_bloodsweat) {
 }
 
 
-ACMD(do_bloodsword) {
-	void scale_item_to_level(obj_data *obj, int level);
-
-	obj_data *obj;
-	int scale_level;
-	int cost = 40;
-
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot use bloodsword.\r\n");
-		return;
-	}
-	if (!check_vampire_ability(ch, ABIL_BLOODSWORD, BLOOD, cost, NOTHING)) {
-		return;
-	}
-	if (!check_vampire_sun(ch, TRUE)) {
-		return;
-	}
-	
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_BLOODSWORD)) {
-		return;
-	}
-	
-	// attempt to remove existing wield
-	if (GET_EQ(ch, WEAR_WIELD)) {
-		perform_remove(ch, WEAR_WIELD);
-		
-		// did it work? if not, player got an error
-		if (GET_EQ(ch, WEAR_WIELD)) {
-			return;
-		}
-	}
-	
-	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
-	obj = read_object(o_BLOODSWORD, TRUE);
-	
-	if (IS_CLASS_ABILITY(ch, ABIL_BLOODSWORD)) {
-		scale_level = get_approximate_level(ch);
-	}
-	else {
-		scale_level = MIN(get_approximate_level(ch), get_skill_level(ch, SKILL_VAMPIRE));
-	}
-	
-	scale_item_to_level(obj, scale_level);
-	
-	act("You drain blood from your wrist and mold it into $p.", FALSE, ch, obj, NULL, TO_CHAR);
-	act("$n twists and molds $s own blood into $p.", TRUE, ch, obj, NULL, TO_ROOM);
-	
-	equip_char(ch, obj, WEAR_WIELD);
-	determine_gear_level(ch);
-	
-	gain_ability_exp(ch, ABIL_BLOODSWORD, 20);
-	load_otrigger(obj);
-}
-
-
 ACMD(do_boost) {
 	struct affected_type *af;
 	int cost = 10;

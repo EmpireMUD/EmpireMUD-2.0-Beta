@@ -339,6 +339,7 @@ struct ready_magic_weapon_type {
 	any_vnum ability;
 	obj_vnum vnum;
 } ready_magic_weapon[] = {
+	{ "bloodsword", 40, BLOOD, ABIL_BLOODSWORD, o_BLOODSWORD },
 	{ "fireball", 30, MANA, ABIL_READY_FIREBALL, o_FIREBALL },
 	
 	{ "\n", 0, NO_ABIL, NOTHING }
@@ -348,7 +349,6 @@ struct ready_magic_weapon_type {
 ACMD(do_ready) {
 	extern bool check_vampire_sun(char_data *ch, bool message);
 	void scale_item_to_level(obj_data *obj, int level);
-	extern const char *pool_types[];
 	
 	ability_data *abil;
 	obj_data *obj;

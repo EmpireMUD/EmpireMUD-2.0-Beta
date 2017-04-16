@@ -76,7 +76,6 @@ ACMD(do_bathe);
 ACMD(do_bite);
 ACMD(do_blind);
 ACMD(do_bloodsweat);
-ACMD(do_bloodsword);
 ACMD(do_board);
 ACMD(do_boost);
 ACMD(do_build);
@@ -573,7 +572,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "bite", POS_FIGHTING, do_bite, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, ABIL_BITE ),
 	ABILITY_CMD( "blind", POS_FIGHTING, do_blind, NO_MIN, CTYPE_COMBAT, ABIL_BLIND ),
 	ABILITY_CMD( "bloodsweat", POS_SLEEPING, do_bloodsweat, NO_MIN, CTYPE_SKILL, ABIL_BLOODSWEAT ),
-	ABILITY_CMD( "bloodsword", POS_RESTING, do_bloodsword, NO_MIN, CTYPE_SKILL, ABIL_BLOODSWORD ),
 	SCMD_CMD( "board", POS_STANDING, do_board, NO_MIN, CTYPE_MOVE, SCMD_BOARD ),
 	ABILITY_CMD( "boost", POS_RESTING, do_boost, NO_MIN, CTYPE_UTIL, ABIL_BOOST ),
 	SCMD_CMD( "bookedit", POS_STANDING, do_library, NO_MIN, CTYPE_UTIL, SCMD_BOOKEDIT ),
