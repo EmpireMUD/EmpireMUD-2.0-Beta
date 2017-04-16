@@ -5618,6 +5618,10 @@ ACMD(do_island) {
 		outsize = snprintf(output, sizeof(output), "Islands:\r\n");
 		
 		HASH_ITER(hh, island_table, isle, next_isle) {
+			if (*argument && !multi_isname(argument, isle->name)) {
+				continue;
+			}
+			
 			center = real_room(isle->center);
 			
 			snprintf(line, sizeof(line), "%2d. %s (%d, %d), size %d", isle->id, isle->name, (center ? FLAT_X_COORD(center) : -1), (center ? FLAT_Y_COORD(center) : -1), isle->tile_size);
