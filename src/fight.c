@@ -3139,7 +3139,10 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			if (!IS_NPC(ch) && has_ability(ch, ABIL_CLAWS) && w_type == TYPE_VAMPIRE_CLAWS && can_gain_exp_from(ch, victim)) {
 				gain_ability_exp(ch, ABIL_CLAWS, 2);
 			}
-
+			if (!IS_NPC(ch) && GET_EQ(ch, WEAR_WIELD) && GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) == o_BLOODSWORD && w_type == TYPE_SLASH && can_gain_exp_from(ch, victim)) {
+				gain_ability_exp(ch, ABIL_BLOODSWORD, 2);
+			}
+			
 			// raw damage modified by hunt
 			if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_ANIMAL) && has_ability(ch, ABIL_HUNT)) {
 				if (can_gain_exp_from(ch, victim)) {
