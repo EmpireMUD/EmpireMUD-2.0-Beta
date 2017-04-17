@@ -2806,29 +2806,33 @@ OLC_MODULE(oedit_timer) {
 
 OLC_MODULE(oedit_type) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	int old = GET_OBJ_TYPE(obj);
+	
 	GET_OBJ_TYPE(obj) = olc_process_type(ch, argument, "type", "type", item_types, GET_OBJ_TYPE(obj));
 	
 	// reset values to defaults now
-	GET_OBJ_VAL(obj, 0) = 0;
-	GET_OBJ_VAL(obj, 1) = 0;
-	GET_OBJ_VAL(obj, 2) = 0;
+	if (old != GET_OBJ_TYPE(obj)) {
+		GET_OBJ_VAL(obj, 0) = 0;
+		GET_OBJ_VAL(obj, 1) = 0;
+		GET_OBJ_VAL(obj, 2) = 0;
 	
-	switch (GET_OBJ_TYPE(obj)) {
-		case ITEM_COINS: {
-			GET_OBJ_VAL(obj, VAL_COINS_AMOUNT) = 0;
-			GET_OBJ_VAL(obj, VAL_COINS_EMPIRE_ID) = OTHER_COIN;
-			break;
-		}
-		case ITEM_PORTAL: {
-			GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM) = NOTHING;
-			break;
-		}
-		case ITEM_WEAPON: {
-			GET_OBJ_VAL(obj, VAL_WEAPON_TYPE) = TYPE_SLASH;
-			break;
-		}
-		default: {
-			break;
+		switch (GET_OBJ_TYPE(obj)) {
+			case ITEM_COINS: {
+				GET_OBJ_VAL(obj, VAL_COINS_AMOUNT) = 0;
+				GET_OBJ_VAL(obj, VAL_COINS_EMPIRE_ID) = OTHER_COIN;
+				break;
+			}
+			case ITEM_PORTAL: {
+				GET_OBJ_VAL(obj, VAL_PORTAL_TARGET_VNUM) = NOTHING;
+				break;
+			}
+			case ITEM_WEAPON: {
+				GET_OBJ_VAL(obj, VAL_WEAPON_TYPE) = TYPE_SLASH;
+				break;
+			}
+			default: {
+				break;
+			}
 		}
 	}
 }
