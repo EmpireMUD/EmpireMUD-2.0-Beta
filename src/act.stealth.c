@@ -650,7 +650,7 @@ ACMD(do_backstab) {
 	else {
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_BACKSTAB, 9, WAIT_COMBAT_ABILITY);
 
-		success = skill_check(ch, ABIL_BACKSTAB, DIFF_EASY);
+		success = !AWAKE(vict) || !CAN_SEE(vict, ch) || skill_check(ch, ABIL_BACKSTAB, DIFF_EASY);
 
 		if (!success) {
 			damage(ch, vict, 0, ATTACK_BACKSTAB, DAM_PHYSICAL);
