@@ -64,6 +64,7 @@ extern struct instance_data *get_instance_by_mob(char_data *mob);
 extern room_data *get_room(room_data *ref, char *name);
 extern vehicle_data *get_vehicle(char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
+extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern room_data *obj_room(obj_data *obj);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
@@ -136,6 +137,96 @@ ACMD(do_madventurecomplete) {
 	
 	if ((inst = quest_instance_global) || (inst = get_instance_by_mob(ch))) {
 		mark_instance_completed(inst);
+	}
+}
+
+
+// attempts to aggro the player, his party, or any PC present (in order)
+ACMD(do_maggro) {
+	char_data *iter, *next_iter, *victim = NULL;
+	char arg[MAX_INPUT_LENGTH];
+
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	
+	// argument is optional (preferred target)
+	one_argument(argument, arg);
+	if (*arg) {
+		if (*arg == UID_CHAR) {
+			if (!(victim = get_char(arg))) {
+				mob_log(ch, "maggro: victim (%s) not found", arg);
+				return;
+			}
+		}
+		else if (!(victim = get_char_room_vis(ch, arg))) {
+			mob_log(ch, "maggro: victim (%s) not found",arg);
+			return;
+		}
+	
+		if (victim == ch) {
+			mob_log(ch, "maggro: victim is self");
+			return;
+		}
+		if (IN_ROOM(victim) != IN_ROOM(ch)) {
+			mob_log(ch, "maggro: victim is in wrong room");
+			return;
+		}
+		if (!valid_dg_target(victim, DG_ALLOW_GODS)) {
+			mob_log(ch, "maggro: target is invalid");
+			return;
+		}
+	}
+	
+	// stand if needed
+	if (GET_POS(ch) < POS_FIGHTING) {
+		GET_POS(ch) = POS_STANDING;
+	}
+	
+	// attempt victim first
+	if (victim && can_fight(ch, victim)) {
+		hit(ch, victim, GET_EQ(ch, WEAR_WIELD), FALSE);
+		
+		// ensure hitting the right person (in this case only)
+		if (victim && !EXTRACTED(victim) && !IS_DEAD(victim) && FIGHTING(ch) && FIGHTING(ch) != victim) {
+			FIGHTING(ch) = victim;
+		}
+		return;
+	}
+	
+	// if we got here, we missed the victim -- look for his allies
+	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
+		if (iter == ch || is_fight_ally(ch, iter)) {
+			continue;
+		}
+		if (victim && !is_fight_ally(victim, iter)) {
+			continue;	// only looking for allies
+		}
+		if (IS_NPC(iter) && victim) {
+			continue;	// not hitting mobs here (unless they are allies)
+		}
+		if (!can_fight(ch, iter)) {
+			continue;
+		}
+		
+		// success!
+		hit(ch, iter, GET_EQ(ch, WEAR_WIELD), FALSE);
+		return;
+	}
+	
+	// okay, look for a broader target
+	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
+		if (iter == ch || is_fight_ally(ch, iter)) {
+			continue;
+		}
+		if (!can_fight(ch, iter)) {
+			continue;
+		}
+		
+		// success!
+		hit(ch, iter, GET_EQ(ch, WEAR_WIELD), FALSE);
+		return;
 	}
 }
 

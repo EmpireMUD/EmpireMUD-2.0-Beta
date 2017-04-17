@@ -2138,6 +2138,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 	// commands that work with '%command%' syntax (will be replaced with 'mcommand', 'ocommand', etc)
 	const char *script_commands[] = {
 		"adventurecomplete",
+		"aggro",
 		"aoe",
 		"asound",
 		"at",

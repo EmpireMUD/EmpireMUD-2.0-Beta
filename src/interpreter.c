@@ -448,6 +448,7 @@ ACMD(do_write);
 ACMD(do_tattach);
 ACMD(do_tdetach);
 ACMD(do_madventurecomplete);
+ACMD(do_maggro);
 ACMD(do_masound);
 ACMD(do_mkill);
 ACMD(do_mjunk);
@@ -1035,6 +1036,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "tdetach", POS_DEAD, do_tdetach, NO_MIN, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY ),
 	SIMPLE_CMD( "vdelete", POS_DEAD, do_vdelete, LVL_CIMPL, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "madventurecomplete", POS_DEAD, do_madventurecomplete, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "maggro", POS_RESTING, do_maggro, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "masound", POS_DEAD, do_masound, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "mbuild", POS_DEAD, do_mbuild, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "mkill", POS_FIGHTING, do_mkill, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
