@@ -1768,7 +1768,7 @@ ACMD(do_group) {
 			create_group(ch);
 		}
 
-		msg_to_char(ch, "You have invited %s to the group.\r\n", GET_NAME(vict));
+		msg_to_char(ch, "You have invited %s to the group.\r\n", PERS(vict, vict, FALSE));
 		
 		if (!IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_GSAY)) {
 			msg_to_char(vict, "&%c[group] %s has invited you to join a group.&0\r\n", GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_GSAY), GET_NAME(ch));
