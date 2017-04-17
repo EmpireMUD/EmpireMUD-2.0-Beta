@@ -1802,6 +1802,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	emp->name = fread_string(fl, buf2);
 	emp->adjective = fread_string(fl, buf2);
 	emp->banner = fread_string(fl, buf2);
+	EMPIRE_BANNER_HAS_UNDERLINE(emp) = (strstr(EMPIRE_BANNER(emp), "&u") ? TRUE : FALSE);
 	
 	if (!get_line(fl, line)) {
 		log("SYSERR: Expecting ranks type of empire #%d but file ended!", vnum);

@@ -3737,6 +3737,7 @@ struct empire_data {
 	int sort_value;	// for score ties
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	int top_shipping_id;	// shipping system quick id for the empire
+	bool banner_has_underline;	// helper
 	
 	bool needs_save;	// for things that delay-save
 	

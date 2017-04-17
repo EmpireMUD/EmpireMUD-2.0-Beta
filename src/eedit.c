@@ -328,6 +328,8 @@ EEDIT(eedit_banner) {
 			free(EMPIRE_BANNER(emp));
 		}
 		EMPIRE_BANNER(emp) = str_dup(argument);
+		
+		EMPIRE_BANNER_HAS_UNDERLINE(emp) = (strstr(EMPIRE_BANNER(emp), "&u") ? TRUE : FALSE);
 
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the banner color", PERS(ch, ch, TRUE));
 		msg_to_char(ch, "The empire's banner is now: %s%s&0\r\n", EMPIRE_BANNER(emp), show_color_codes(EMPIRE_BANNER(emp)));
