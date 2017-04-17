@@ -744,7 +744,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "howl", POS_FIGHTING, do_howl, NO_MIN, CTYPE_SKILL, ABIL_HOWL ),
 
 	SIMPLE_CMD( "inventory", POS_DEAD, do_inventory, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "identify", POS_STANDING, do_identify, NO_MIN, CTYPE_SKILL ),
+	SIMPLE_CMD( "identify", POS_RESTING, do_identify, NO_MIN, CTYPE_SKILL ),
 	SCMD_CMD( "idea", POS_DEAD, do_gen_write, NO_MIN, CTYPE_COMM, SCMD_IDEA ),
 	SIMPLE_CMD( "ignore", POS_DEAD, do_ignore, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "import", POS_DEAD, do_import, NO_MIN, CTYPE_UTIL, TRADE_IMPORT ),

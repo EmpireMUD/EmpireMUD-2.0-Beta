@@ -4332,8 +4332,11 @@ ACMD(do_identify) {
 	obj_data *obj;
 	
 	one_argument(argument, arg);
-
-	if (!*arg) {
+	
+	if (GET_POS(ch) == POS_FIGHTING) {
+		msg_to_char(ch, "You're too busy to do that now!\r\n");
+	}
+	else if (!*arg) {
 		msg_to_char(ch, "Identify what object?\r\n");
 	}
 	else if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &obj, &veh)) {
@@ -4341,10 +4344,12 @@ ACMD(do_identify) {
 	}
 	else if (obj) {
 		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
+		act("$n identifies $p.", TRUE, ch, obj, NULL, TO_ROOM);
 		identify_obj_to_char(obj, ch);
 	}
 	else if (veh) {
 		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
+		act("$n identifies $V.", TRUE, ch, NULL, veh, TO_ROOM);
 		identify_vehicle_to_char(veh, ch);
 	}
 }
