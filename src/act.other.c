@@ -60,7 +60,7 @@ extern char *show_color_codes(char *string);
 void adventure_summon(char_data *ch, char *argument) {
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH];
 	struct instance_data *inst;
 	char_data *vict;
 	
@@ -116,8 +116,7 @@ void adventure_summon(char_data *ch, char *argument) {
 	}
 	else {
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
-		snprintf(buf, sizeof(buf), "$o is trying to summon you to %s (%s) -- use 'accept/reject summon'.", GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
-		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
+		msg_to_char(vict, "%s is trying to summon you to %s (%s) -- use 'accept/reject summon'.", PERS(ch, ch, TRUE), GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
 		add_offer(vict, ch, OFFER_SUMMON, SUMMON_ADVENTURE);
 		command_lag(ch, WAIT_OTHER);
 	}
