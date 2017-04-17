@@ -1098,7 +1098,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	if (!IS_NPC(killer) && GET_LOYALTY(ch) && GET_LOYALTY(killer) != GET_LOYALTY(ch)) {
 		// we check the ch's master if it's an NPC and the master is a PC
 		char_data *check = (IS_NPC(ch) && ch->master && !IS_NPC(ch->master)) ? ch->master : ch;
-		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && !IS_HOSTILE(check)) {
+		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && !IS_HOSTILE(check) && (!ROOM_OWNER(IN_ROOM(killer)) || ROOM_OWNER(IN_ROOM(killer)) != GET_LOYALTY(killer))) {
 			trigger_distrust_from_hostile(killer, GET_LOYALTY(ch));
 		}
 	}
@@ -3028,7 +3028,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	if (!IS_NPC(ch) && victim_emp && GET_LOYALTY(ch) != victim_emp) {
 		// we check the victim's master if it's an NPC and the master is a PC
 		check = (IS_NPC(victim) && victim->master && !IS_NPC(victim->master)) ? victim->master : victim;
-		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && !IS_HOSTILE(check)) {
+		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && !IS_HOSTILE(check) && (!ROOM_OWNER(IN_ROOM(ch)) || ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch))) {
 			trigger_distrust_from_hostile(ch, victim_emp);
 		}
 	}
