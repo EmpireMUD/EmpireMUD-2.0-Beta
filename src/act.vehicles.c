@@ -547,8 +547,14 @@ void perform_unload_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont
 * @param char_data *ch The character doing the driving.
 */
 void process_driving(char_data *ch) {
+	extern int get_north_for_char(char_data *ch);
+	extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
+	
 	int dir = GET_ACTION_VNUM(ch, 0), subcmd = GET_ACTION_VNUM(ch, 2);
 	vehicle_data *veh;
+	
+	// translate 'dir' from the way the character THINKS he's going, to the actual way
+	dir = confused_dirs[get_north_for_char(ch)][0][dir];
 	
 	// not got a vehicle?
 	if ((!(veh = GET_SITTING_ON(ch)) && !(veh = GET_ROOM_VEHICLE(IN_ROOM(ch)))) || !VEH_FLAGGED(veh, drive_data[subcmd].flag)) {
@@ -1633,6 +1639,7 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 }
 
 
+// do_sail, do_pilot (search hints)
 ACMD(do_drive) {
 	char dir_arg[MAX_INPUT_LENGTH], dist_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct vehicle_room_list *vrl;
@@ -1713,11 +1720,13 @@ ACMD(do_drive) {
 		send_to_char(buf, ch);
 	}
 	else {
+		// 'dir' is the way we are ACTUALLY going, but we store the direction the character thinks it is
+		
 		was_driving = (GET_ACTION(ch) == drive_data[subcmd].action);
-		same_dir = (was_driving && (dir == GET_ACTION_VNUM(ch, 0)));
+		same_dir = (was_driving && (get_direction_for_char(ch, dir) == GET_ACTION_VNUM(ch, 0)));
 		GET_ACTION(ch) = ACT_NONE;	// prevents a stops-moving message
 		start_action(ch, drive_data[subcmd].action, 0);
-		GET_ACTION_VNUM(ch, 0) = dir;
+		GET_ACTION_VNUM(ch, 0) = get_direction_for_char(ch, dir);
 		GET_ACTION_VNUM(ch, 1) = dist;	// may be -1 for continuous
 		GET_ACTION_VNUM(ch, 2) = subcmd;
 		
