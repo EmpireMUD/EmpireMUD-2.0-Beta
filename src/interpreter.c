@@ -946,7 +946,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "stop", POS_DEAD, do_stop, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "struggle", POS_STUNNED, do_struggle, NO_MIN, CTYPE_COMBAT ),
 	STANDARD_CMD( "study", POS_STANDING, do_study, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
-	SIMPLE_CMD( "summary", POS_FIGHTING, do_summary, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "summary", POS_DEAD, do_summary, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "summon", POS_STANDING, do_summon, NO_MIN, CTYPE_SKILL ),
 	STANDARD_CMD( "sunshock", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_SUNSHOCK, CTYPE_COMBAT, NOBITS, ABIL_SUNSHOCK ),
 	SIMPLE_CMD( "survey", POS_STANDING, do_survey, NO_MIN, CTYPE_UTIL ),
