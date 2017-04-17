@@ -1425,7 +1425,7 @@ ACMD(do_weaken) {
 		msg_to_char(ch, "You wouldn't want to do that to yourself...\r\n");
 	else if (IS_GOD(victim) || IS_IMMORTAL(victim))
 		msg_to_char(ch, "You cannot use this power on so godly a target!\r\n");
-	else if (affected_by_spell(victim, ATYPE_WEAKEN) || GET_STRENGTH(victim) <= 1)
+	else if (affected_by_spell(victim, ATYPE_WEAKEN) || (GET_STRENGTH(victim) <= 1 && GET_INTELLIGENCE(victim) <= 1))
 		act("$E is already weak!", FALSE, ch, 0, victim, TO_CHAR);
 	else if (!can_fight(ch, victim))
 		act("You can't attack $M!", FALSE, ch, 0, victim, TO_CHAR);
@@ -1445,6 +1445,8 @@ ACMD(do_weaken) {
 
 		if (!AFF_FLAGGED(victim, AFF_IMMUNE_VAMPIRE)) {
 			af = create_mod_aff(ATYPE_WEAKEN, 1 MUD_HOURS, APPLY_STRENGTH, -1 * MIN(2, GET_STRENGTH(victim)-1), ch);
+			affect_join(victim, af, 0);
+			af = create_mod_aff(ATYPE_WEAKEN, 1 MUD_HOURS, APPLY_INTELLIGENCE, -1 * MIN(2, GET_INTELLIGENCE(victim)-1), ch);
 			affect_join(victim, af, 0);
 			msg_to_char(victim, "You feel weak!\r\n");
 			act("$n hunches over in pain!", TRUE, victim, 0, 0, TO_ROOM);
