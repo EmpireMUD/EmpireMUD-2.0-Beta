@@ -2250,11 +2250,11 @@ void clear_private_owner(int id) {
 	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (COMPLEX_DATA(iter) && ROOM_PRIVATE_OWNER(iter) == id) {
 			COMPLEX_DATA(iter)->private_owner = NOBODY;
-		}
 		
-		// TODO some way to generalize this, please
-		if (BUILDING_VNUM(iter) == RTYPE_BEDROOM && ROOM_PRIVATE_OWNER(HOME_ROOM(iter)) == NOBODY) {
-			remove_designate_objects(iter);
+			// TODO some way to generalize this, please
+			if (BUILDING_VNUM(iter) == RTYPE_BEDROOM) {
+				remove_designate_objects(iter);
+			}
 		}
 	}
 }
