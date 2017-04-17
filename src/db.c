@@ -547,6 +547,9 @@ void boot_world(void) {
 	
 	log("Checking newbie islands.");
 	check_newbie_islands();
+	
+	log("Assigning dummy mob traits.");
+	dummy_mob.rank = 1;	// prevents random crashes when IS_NPC isn't checked correctly in new code
 }
 
 
