@@ -473,6 +473,8 @@ void update_biting_char(char_data *ch) {
 		GET_FED_ON_BY(victim) = NULL;
 		GET_FEEDING_FROM(ch) = NULL;
 
+		check_scaling(victim, ch);	// ensure scaling
+		tag_mob(victim, ch);	// ensures loot binding if applicable
 		corpse = die(victim, ch);
 		
 		// tag corpse
