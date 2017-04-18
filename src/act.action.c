@@ -1823,6 +1823,11 @@ void process_picking(char_data *ch) {
 	int garden_depletion = config_get_int("garden_depletion");
 	int pick_depletion = config_get_int("pick_depletion");
 	
+	if (!IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't pick anything in an incomplete building.\r\n");
+		cancel_action(ch);
+		return;
+	}
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to pick anything.\r\n");
 		cancel_action(ch);
@@ -2810,6 +2815,9 @@ ACMD(do_pick) {
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to pick anything here.\r\n");
+	}
+	else if (!IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't pick anything in an incomplete building.\r\n");
 	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to pick anything here.\r\n");
