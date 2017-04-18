@@ -234,6 +234,52 @@ void check_idling(char_data *ch) {
 
 
 /**
+* This function looks for mobs that are stuck in a pointless fight. This is
+* a fight where nobody is able to attack. If the mob is in such a state, this
+* function will cancel the fight.
+*
+* @param char_data *mob The mob to check.
+*/
+void check_pointless_fight(char_data *mob) {
+	char_data *iter;
+	bool any;
+	
+	#define IS_POINTLESS(ch)  (GET_HEALTH(ch) <= 0 || MOB_FLAGGED(ch, MOB_NO_ATTACK))
+	
+	if (!FIGHTING(mob) || !IS_POINTLESS(mob)) {
+		return;	// mob is not pointless (or not fighting)
+	}
+	if (!IS_POINTLESS(FIGHTING(mob))) {
+		return;	// mob is fighting a non-pointless enemy
+	}
+	
+	any = FALSE;
+	LL_FOREACH(ROOM_PEOPLE(IN_ROOM(mob)), iter) {
+		if (iter == mob || FIGHTING(iter) != mob) {
+			continue;	// only care about people fighting mob
+		}
+		if (!IS_POINTLESS(iter)) {
+			any = TRUE;
+			break;
+		}
+	}
+	
+	// did with find ANY non-pointless people hitting the mob?
+	if (!any) {
+		// stop mob
+		stop_fighting(mob);
+		
+		// stop everyone hitting mob
+		LL_FOREACH(ROOM_PEOPLE(IN_ROOM(mob)), iter) {
+			if (FIGHTING(iter) == mob) {
+				stop_fighting(iter);
+			}
+		}
+	}
+}
+
+
+/**
 * Determines if a player can really be riding. Dismounts them if not.
 *
 * @param char_data *ch The player to check.
@@ -343,6 +389,10 @@ void point_update_char(char_data *ch) {
 	char_data *c;
 	bool found;
 	int count;
+	
+	if (IS_NPC(ch) && FIGHTING(ch)) {
+		check_pointless_fight(ch);
+	}
 	
 	if (!IS_NPC(ch)) {
 		emp = GET_LOYALTY(ch);
