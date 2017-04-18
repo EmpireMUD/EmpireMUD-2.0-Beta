@@ -287,6 +287,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	room_data *room, *next_room;
 	char_data *mob, *next_mob;
 	descriptor_data *dsc;
+	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
 	bld_data *bld, *next_bld;
 	bool found;
@@ -331,6 +332,13 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 			remove_live_script_by_vnum(SCRIPT(room), vnum);
 		}
 		delete_from_proto_list_by_vnum(&(room->proto_script), vnum);
+	}
+	
+	// remove from adventures
+	HASH_ITER(hh, adventure_table, adv, next_adv) {
+		if (delete_from_proto_list_by_vnum(&GET_ADV_SCRIPTS(adv), vnum)) {
+			save_library_file_for_vnum(DB_BOOT_ADV, GET_ADV_VNUM(adv));
+		}
 	}
 	
 	// update building protos
@@ -382,6 +390,9 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	
 	// update olc editors
 	for (dsc = descriptor_list; dsc; dsc = dsc->next) {
+		if (GET_OLC_ADVENTURE(dsc) && delete_from_proto_list_by_vnum(&GET_ADV_SCRIPTS(GET_OLC_ADVENTURE(dsc)), vnum)) {
+			msg_to_char(dsc->character, "A trigger attached to the adventure you're editing was deleted.\r\n");
+		}
 		if (GET_OLC_BUILDING(dsc) && delete_from_proto_list_by_vnum(&GET_BLD_SCRIPTS(GET_OLC_BUILDING(dsc)), vnum)) {
 			msg_to_char(dsc->character, "A trigger attached to the building you're editing was deleted.\r\n");
 		}
@@ -539,6 +550,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 	room_template *rmt, *next_rmt;
 	vehicle_data *veh, *next_veh;
 	char_data *mob, *next_mob;
+	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
 	bld_data *bld, *next_bld;
 	int size, found;
@@ -551,6 +563,18 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of trigger %d (%s):\r\n", vnum, GET_TRIG_NAME(proto));
+	
+	// adventure scripts
+	HASH_ITER(hh, adventure_table, adv, next_adv) {
+		any = FALSE;
+		for (trig = GET_ADV_SCRIPTS(adv); trig && !any; trig = trig->next) {
+			if (trig->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "ADV [%5d] %s\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+			}
+		}
+	}
 	
 	// buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
