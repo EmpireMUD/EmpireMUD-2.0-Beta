@@ -1173,7 +1173,7 @@ void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int m
 	}
 	
 	// only add a \r\n if it didn't just end with one
-	if (formatted[strlen(formatted)-1] != '\n') {
+	if (line_chars > 0) {
 		strcat(formatted, "\r\n");
 	}
 
