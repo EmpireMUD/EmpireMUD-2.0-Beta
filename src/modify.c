@@ -1160,7 +1160,7 @@ void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int m
 			strcat(formatted, start);
 			*flow = temp;
 		}
-		if (cap_next_next) {
+		if (cap_next_next && *(flow+1)) {
 			if (line_chars + 3 > 79) {
 				strcat(formatted, "\r\n");
 				line_chars = 0;
