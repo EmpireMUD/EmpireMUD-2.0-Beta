@@ -1541,7 +1541,7 @@ ACMD(do_skills) {
 					continue;
 				}
 				
-				if (IS_IMMORTAL(ch) || get_skill_resets(ch, SKILL_VNUM(skill)) > 0) {
+				if (get_skill_resets(ch, SKILL_VNUM(skill)) > 0) {
 					msg_to_char(ch, "%s%s", (found ? ", " : ""), SKILL_NAME(skill));
 					if (get_skill_resets(ch, SKILL_VNUM(skill)) > 1) {
 						msg_to_char(ch, " (%d)", get_skill_resets(ch, SKILL_VNUM(skill)));
