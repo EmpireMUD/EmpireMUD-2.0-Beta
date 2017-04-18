@@ -335,6 +335,7 @@ void disassociate_building(room_data *room) {
 		SET_BIT(inst->flags, INST_COMPLETED);
 	}
 	
+	dismantle_wtrigger(room, NULL, FALSE);
 	delete_room_npcs(room, NULL);
 	
 	// remove bits including dismantle
@@ -380,6 +381,7 @@ void disassociate_building(room_data *room) {
 		next_iter = iter->next_interior;
 		
 		if (HOME_ROOM(iter) == room && iter != room) {
+			dismantle_wtrigger(iter, NULL, FALSE);
 			remove_designate_objects(iter);
 			
 			// move people and contents
@@ -884,12 +886,6 @@ void remove_designate_objects(room_data *room) {
 		next_o = o->next_content;
 		
 		switch (BUILDING_VNUM(room)) {
-			case RTYPE_STUDY: {
-				if (GET_OBJ_VNUM(o) == BOARD_MORT) {
-					extract_obj(o);
-				}
-				break;
-			}
 			case RTYPE_BEDROOM: {
 				if (GET_OBJ_VNUM(o) == o_HOME_CHEST) {
 					while (o->contains) {
@@ -967,6 +963,7 @@ void start_dismantle_building(room_data *loc) {
 		
 		if (HOME_ROOM(room) == loc) {
 			remove_designate_objects(room);
+			dismantle_wtrigger(room, NULL, FALSE);
 			delete_room_npcs(room, NULL);
 		
 			for (obj = ROOM_CONTENTS(room); obj; obj = next_obj) {
@@ -1472,6 +1469,10 @@ ACMD(do_dismantle) {
 		return;
 	}
 	
+	if (!dismantle_wtrigger(IN_ROOM(ch), ch, TRUE)) {
+		return;	// this goes last
+	}
+	
 	start_dismantle_building(IN_ROOM(ch));
 	start_action(ch, ACT_DISMANTLING, 0);
 	msg_to_char(ch, "You begin to dismantle the building.\r\n");
@@ -1708,6 +1709,9 @@ ACMD(do_designate) {
 	else if (!IS_SET(valid_des_flags, GET_BLD_DESIGNATE_FLAGS(type))) {
 		msg_to_char(ch, "You can't designate that here!\r\n");
 	}
+	else if (subcmd == SCMD_REDESIGNATE && !dismantle_wtrigger(IN_ROOM(ch), ch, TRUE)) {
+		return;	// this goes last
+	}
 	else {
 		if (subcmd == SCMD_REDESIGNATE) {
 			// redesignate this room
@@ -1750,11 +1754,6 @@ ACMD(do_designate) {
 		
 		// add new objects
 		switch (GET_BLD_VNUM(type)) {
-			case RTYPE_STUDY: {
-				obj_to_room((obj = read_object(BOARD_MORT, TRUE)), new);
-				load_otrigger(obj);
-				break;
-			}
 			case RTYPE_BEDROOM: {
 				if (ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(ch))) != NOBODY) {
 					obj_to_room((obj = read_object(o_HOME_CHEST, TRUE)), new);

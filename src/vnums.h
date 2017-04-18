@@ -44,7 +44,6 @@
 #define RTYPE_SORCERER_TOWER  5511
 
 #define RTYPE_BEDROOM  5601
-#define RTYPE_STUDY  5608
 #define RTYPE_TUNNEL  5612	// for mine complex, tunnel
 
 

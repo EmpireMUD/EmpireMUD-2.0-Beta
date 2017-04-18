@@ -123,7 +123,8 @@
 #define WTRIG_ABILITY          BIT(15)     /* ability used in room */
 #define WTRIG_LEAVE            BIT(16)     /* character leaves the room */
 #define WTRIG_DOOR             BIT(17)     /* door manipulated in room  */
-// unused: 18, 19
+#define WTRIG_DISMANTLE        BIT(18)	// starts dismantling or redesignates
+// unused: 19
 #define WTRIG_START_QUEST      BIT(20)	// player tries to start a quest
 #define WTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 #define WTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
@@ -262,6 +263,7 @@ void hitprcnt_mtrigger(char_data *ch);
 void bribe_mtrigger(char_data *ch, char_data *actor, int amount);
 
 void complete_wtrigger(room_data *room);
+extern int dismantle_wtrigger(room_data *room, char_data *actor, bool preventable);
 
 void reset_wtrigger(room_data *ch);
 

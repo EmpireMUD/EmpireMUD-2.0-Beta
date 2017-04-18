@@ -35,6 +35,21 @@ This trigger happens when a building is completed.
 
 See also: RTRIG LOAD
 #d
+"DISMANTLE TRIGGER" "RTRIG DISMANTLE" TRIGEDIT-ROOM-DISMANTLE TRIGEDIT-DISMANTLE TRIG-DISMANTLE
+
+Dismantle (trigger type)
+
+Return value:  return 0 to prevent the dismantle/redesignate
+
+This trigger is called when someone tries to dismantle or redesignate a room,
+or when the room is destroyed for any reason.
+
+Variables:
+  &c%room%&0 - The room about to be removed.
+  &c%actor%&0 - The person attempting to dismantle (there may be no actor if
+    the dismantle is caused by siege damage or decay).
+  &c%preventable%&0 - Whether or not you can attempt to prevent this action.
+#d
 "RTRIG COMMANDS" "ROOM COMMANDS" TRIGEDIT-ROOM-COMMANDS
 
 The following commands are available in room triggers (see their individual
@@ -103,6 +118,7 @@ Rooms can trigger on the following events:
 &cAbility&0 - Triggers when an ability is used in the room.
 &cLeave&0 - Triggers when a person tries to leave.
 &cDoor&0 - Triggers when a player interacts with a door.
+&cDismantle&0 - Triggers when a player tries to dismantle/redesignate.
 &cStart-Quest&0 - Triggers when a player tries to start a quest.
 &cFinish-Quest&0 - Triggers when a player tries to turn in a quest.
 &cPlayer-in-Room&0 - Modifier: trigger requires a player present.
