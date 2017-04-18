@@ -2048,7 +2048,7 @@ FEDIT FACTIONEDIT "OLC FACTIONS" "FACTION EDITOR"
 Usage:  .f <command>
         .command
 
-The .olc faction editor allows you to configure the data for factdions, which
+The .olc faction editor allows you to configure the data for factions, which
 are groups that NPCs can belong to. Players gain and lose reputation with
 factions, and these reputation levels can be used to control access to quests
 and adventure content.

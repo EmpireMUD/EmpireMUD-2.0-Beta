@@ -206,7 +206,7 @@ INTERACTION_FUNC(run_one_encounter) {
 * @param char_data *ch The unsuspecting fool.
 */
 void random_encounter(char_data *ch) {
-	if (!ch->desc || IS_NPC(ch) || !IN_ROOM(ch) || FIGHTING(ch) || IS_GOD(ch) || NOHASSLE(ch) || ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO)) {
+	if (!ch->desc || IS_NPC(ch) || !IN_ROOM(ch) || FIGHTING(ch) || IS_GOD(ch) || GET_INVIS_LEV(ch) > LVL_MORTAL || PRF_FLAGGED(ch, PRF_WIZHIDE) || NOHASSLE(ch) || ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO)) {
 		return;
 	}
 
