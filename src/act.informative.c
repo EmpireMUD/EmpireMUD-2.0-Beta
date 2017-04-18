@@ -2711,7 +2711,7 @@ ACMD(do_score) {
 	one_argument(argument, arg);
 
 	if (IS_IMMORTAL(ch) && *arg) {
-		if (!(victim = get_char_vis(ch, arg, FIND_CHAR_WORLD)))
+		if (!(victim = get_player_vis(ch, arg, FIND_CHAR_WORLD)))
 			send_config_msg(ch, "no_person");
 		else if (IS_NPC(victim))
 			msg_to_char(ch, "You can't get a score sheet for an NPC.\r\n");
