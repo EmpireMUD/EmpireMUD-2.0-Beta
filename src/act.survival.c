@@ -653,6 +653,11 @@ ACMD(do_forage) {
 		return;
 	}
 	
+	if (GET_ACTION(ch) != ACT_NONE) {
+		msg_to_char(ch, "You're too busy to forage right now.\r\n");
+		return;
+	}
+	
 	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to forage here.\r\n");
 		return;
