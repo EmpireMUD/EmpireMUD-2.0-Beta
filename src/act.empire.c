@@ -922,9 +922,9 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 		
 		snprintf(part, sizeof(part), "%s: %s", chore_data[iter].name, (on == 0) ? "&yoff&0" : ((off == 0) ? "&con&0" : "&mpart&0"));
 		size = 24 + color_code_length(part);
-		msg_to_char(ch, " %-*.*s%s", size, size, part, !((iter+1)%3) ? "\r\n" : " ");
+		msg_to_char(ch, " %-*.*s%s", size, size, part, (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !((iter+1)%3)) ? "\r\n" : " ");
 	}
-	if (iter % 3) {
+	if (iter % 3 && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 		msg_to_char(ch, "\r\n");
 	}
 }
