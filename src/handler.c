@@ -3883,7 +3883,10 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 		add_obj_binding(bind->idnum, &OBJ_BOUND_TO(new));
 	}
 	
-	GET_OBJ_TIMER(new) = GET_OBJ_TIMER(obj);
+	if (GET_OBJ_TIMER(obj) != UNLIMITED && GET_OBJ_TIMER(proto) != UNLIMITED) {
+		// only change if BOTH are unlimited. Otherwise, this trait was changed and we should inherit it.
+		GET_OBJ_TIMER(new) = GET_OBJ_TIMER(obj);
+	}
 	GET_AUTOSTORE_TIMER(new) = GET_AUTOSTORE_TIMER(obj);
 	new->stolen_timer = obj->stolen_timer;
 	GET_STOLEN_FROM(new) = GET_STOLEN_FROM(obj);
