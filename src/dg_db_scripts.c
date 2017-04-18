@@ -277,9 +277,6 @@ void assign_triggers(void *i, int type) {
 			room = (room_data*)i;
 			trg_proto = room->proto_script;
 			while (trg_proto) {
-				if (trg_proto->vnum == 5608 || trg_proto->vnum == 5609) {
-					syslog(SYS_ERROR, 0, TRUE, "debug: assigining %d at [%d]", trg_proto->vnum, room->vnum);
-				}
 				trproto = real_trigger(trg_proto->vnum);
 				if (!trproto) {
 					syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: trigger #%d non-existant, for room #%d",
