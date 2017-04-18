@@ -1176,6 +1176,9 @@ void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int m
 	if (line_chars > 0) {
 		strcat(formatted, "\r\n");
 	}
+	if (formatted[strlen(formatted)-1] == '\n' && formatted[strlen(formatted)-3] == '\n') {
+		formatted[strlen(formatted)-2] = '\0';	// remove trailing \r\n
+	}
 
 	if (strlen(formatted) + 1 > maxlen)
 		formatted[maxlen-1] = '\0';
