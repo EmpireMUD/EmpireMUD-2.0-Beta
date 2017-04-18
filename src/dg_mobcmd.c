@@ -924,7 +924,7 @@ ACMD(do_mpurge) {
 	// purge vehicle
 	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_in_room_vis(ch, arg))) {
 		if (*argument) {
-			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_ROOM);
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}
 		extract_vehicle(veh);
 	}
@@ -932,7 +932,7 @@ ACMD(do_mpurge) {
 	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_vis(ch, arg))) {
 		if (*argument) {
 			room_data *room = obj_room(obj);
-			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, obj, NULL, TO_ROOM);
+			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, obj, NULL, TO_CHAR | TO_ROOM);
 		}
 		extract_obj(obj);
 	}
