@@ -720,8 +720,11 @@ QCMD(qcmd_finish) {
 	
 	all = !str_cmp(argument, "all");
 	
-	if (CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)) {
+	if (CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL) || AFF_FLAGGED(ch, AFF_NO_ATTACK)) {
 		msg_to_char(ch, "You can't start or finish quests in this form.\r\n");
+	}
+	else if (IS_DISGUISED(ch)) {
+		msg_to_char(ch, "You can't start or finish quests while disguised.\r\n");
 	}
 	else if (!*argument) {
 		msg_to_char(ch, "Finish which quest (use 'quest list' to see quests you're on)?\r\n");
@@ -1002,8 +1005,11 @@ QCMD(qcmd_start) {
 		// anything other than a list requires standing
 		msg_to_char(ch, "You must %s to start a quest.\r\n", FIGHTING(ch) ? "finish fighting" : "be standing");
 	}
-	else if (CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)) {
+	else if (CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL) || AFF_FLAGGED(ch, AFF_NO_ATTACK)) {
 		msg_to_char(ch, "You can't start or finish quests in this form.\r\n");
+	}
+	else if (IS_DISGUISED(ch)) {
+		msg_to_char(ch, "You can't start or finish quests while disguised.\r\n");
 	}
 	else if (!str_cmp(argument, "all")) {
 		// start all quests
@@ -1032,6 +1038,9 @@ QCMD(qcmd_start) {
 	}
 	else if (QUEST_FLAGGED(qst, QST_DAILY) && GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
 		msg_to_char(ch, "You can't start any more daily quests today.\r\n");
+	}
+	else if (get_approximate_level(ch) + 50 < QUEST_MIN_LEVEL(qst)) {
+		msg_to_char(ch, "You can't start that quest because it's more than 50 levels above you.\r\n");
 	}
 	else {
 		start_quest(ch, qst, inst);

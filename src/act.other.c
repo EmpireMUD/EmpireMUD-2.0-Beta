@@ -60,7 +60,7 @@ extern char *show_color_codes(char *string);
 void adventure_summon(char_data *ch, char *argument) {
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH];
 	struct instance_data *inst;
 	char_data *vict;
 	
@@ -116,8 +116,7 @@ void adventure_summon(char_data *ch, char *argument) {
 	}
 	else {
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
-		snprintf(buf, sizeof(buf), "$o is trying to summon you to %s (%s) -- use 'accept/reject summon'.", GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
-		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
+		msg_to_char(vict, "%s is trying to summon you to %s (%s) -- use 'accept/reject summon'.", PERS(ch, ch, TRUE), GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
 		add_offer(vict, ch, OFFER_SUMMON, SUMMON_ADVENTURE);
 		command_lag(ch, WAIT_OTHER);
 	}
@@ -199,14 +198,11 @@ void perform_alternate(char_data *old, char_data *new) {
 	bool show_start = FALSE;
 	int invis_lev, old_invis, last_tell;
 	empire_data *old_emp;
-	bool was_imm;
 	
 	if (!old || !new || !old->desc || new->desc) {
 		log("SYSERR: Attempting invalid peform_alternate with %s, %s, %s, %s", old ? "ok" : "no old", new ? "ok" : "no new", old->desc ? "ok" : "no old desc", new->desc ? "new desc" : "ok");
 		return;
 	}
-	
-	was_imm = IS_IMMORTAL(old);
 
 	/*
 	 * kill off all sockets connected to the same player as the one who is
@@ -242,6 +238,13 @@ void perform_alternate(char_data *old, char_data *new) {
 	
 	// save this to switch over replies
 	last_tell = GET_LAST_TELL(old);
+	
+	// switch over replies for immortals, too
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) == CON_PLAYING && desc->character && IS_IMMORTAL(desc->character) && GET_LAST_TELL(desc->character) == GET_IDNUM(old)) {
+			GET_LAST_TELL(desc->character) = GET_IDNUM(new);
+		}
+	}
 	
 	// move desc (do this AFTER saving)
 	new->desc = old->desc;
@@ -315,7 +318,7 @@ void perform_alternate(char_data *old, char_data *new) {
 		send_to_char(START_MESSG, new);
 	}
 	
-	if (!IS_IMMORTAL(new) && !was_imm) {
+	if (!IS_IMMORTAL(new)) {
 		add_cooldown(new, COOLDOWN_ALTERNATE, SECS_PER_REAL_MIN);
 	}
 	GET_LAST_TELL(new) = last_tell;
@@ -1291,9 +1294,6 @@ ACMD(do_alternate) {
 	else if (IN_HOSTILE_TERRITORY(ch)) {
 		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
 	}
-	else if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0 && !IS_IMMORTAL(ch)) {
-		msg_to_char(ch, "You can't alternate again so soon.\r\n");
-	}
 	else if (get_cooldown_time(ch, COOLDOWN_PVP_QUIT_TIMER) > 0 && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't alternate so soon after fighting!\r\n");
 	}
@@ -1308,6 +1308,10 @@ ACMD(do_alternate) {
 		
 		if (GET_ACCOUNT(newch) != GET_ACCOUNT(ch)) {
 			msg_to_char(ch, "That character isn't on your account.\r\n");
+			return;
+		}
+		if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0 && !IS_IMMORTAL(newch)) {
+			msg_to_char(ch, "You can't alternate again so soon.\r\n");
 			return;
 		}
 		if (newch->desc || !IN_ROOM(newch)) {
@@ -1333,6 +1337,11 @@ ACMD(do_alternate) {
 		// ensure legal switch
 		if (GET_ACCOUNT(newch) != GET_ACCOUNT(ch)) {
 			msg_to_char(ch, "That character isn't on your account.\r\n");
+			free_char(newch);
+			return;
+		}
+		if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0 && !IS_IMMORTAL(newch)) {
+			msg_to_char(ch, "You can't alternate again so soon.\r\n");
 			free_char(newch);
 			return;
 		}
@@ -1758,7 +1767,7 @@ ACMD(do_group) {
 			create_group(ch);
 		}
 
-		msg_to_char(ch, "You have invited %s to the group.\r\n", GET_NAME(vict));
+		msg_to_char(ch, "You have invited %s to the group.\r\n", PERS(vict, vict, FALSE));
 		
 		if (!IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_GSAY)) {
 			msg_to_char(vict, "&%c[group] %s has invited you to join a group.&0\r\n", GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_GSAY), GET_NAME(ch));
@@ -1904,6 +1913,9 @@ ACMD(do_herd) {
 	else if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_HARD | MOB_GROUP | MOB_AGGRESSIVE)) {
 		act("You can't herd $N!", FALSE, ch, NULL, victim, TO_CHAR);
 	}
+	else if (GET_POS(victim) < POS_STANDING || MOB_FLAGGED(victim, MOB_TIED)) {
+		act("You can't herd $M right now.", FALSE, ch, NULL, victim, TO_CHAR);
+	}
 	else if ((dir = parse_direction(ch, buf)) == NO_DIR || !(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1])))
 		msg_to_char(ch, "That's not a direction!\r\n");
 	else if (!ROOM_IS_CLOSED(IN_ROOM(ch)) && dir >= NUM_2D_DIRS) {
@@ -1916,7 +1928,7 @@ ACMD(do_herd) {
 		msg_to_char(ch, "You don't have permission to herd here.\r\n");
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_ROUGH))
 		msg_to_char(ch, "You find it difficult to do that here.\r\n");
-	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_ROUGH))
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_ROUGH) || ROOM_BLD_FLAGGED(to_room, BLD_BARRIER))
 		msg_to_char(ch, "You find that difficult to do.\r\n");
 	else if (GET_LED_BY(victim) && IN_ROOM(GET_LED_BY(victim)) == IN_ROOM(victim))
 		msg_to_char(ch, "You can't herd someone who is being led by someone else.\r\n");
@@ -2803,7 +2815,7 @@ ACMD(do_toggle) {
 		}
 	}
 	
-	if (!*argument || type == NOTHING) {
+	if (!*argument) {
 		msg_to_char(ch, "Toggles:\r\n");
 		
 		for (iter = count = 0; *toggle_data[iter].name != '\n'; ++iter) {
@@ -2823,7 +2835,10 @@ ACMD(do_toggle) {
 			send_to_char("\r\n", ch);
 		}
 	}
-	else if (type != NOTHING) {
+	else if (type == NOTHING) {
+		msg_to_char(ch, "Unknown toggle '%s'.\r\n", argument);
+	}
+	else {
 		on = PRF_TOG_CHK(ch, toggle_data[type].bit);
 		on = PRF_FLAGGED(ch, toggle_data[type].bit) ? 1 : 0;
 		

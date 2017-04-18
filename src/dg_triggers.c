@@ -1220,6 +1220,50 @@ void complete_wtrigger(room_data *room) {
 
 
 /**
+* Called when a player attempts to dismantle or redesignate a room. Returning
+* a 0 from the script will prevent the dismantle if possible.
+*
+* NOT preventable if a player is dismantling a building, but this trigger is
+* firing on some interior room (e.g. a study).
+*
+* It's also possible for there to be NO actor if a building is being destroyed
+* by something other than a player.
+*
+* @param room_data *room The room attempting to dismantle.
+* @param char_data *actor Optional: The player attempting the dismantle (may be NULL).
+* @param bool preventable If TRUE, returning 0 will prevent the dismantle.
+* @return int The exit code from the script.
+*/
+int dismantle_wtrigger(room_data *room, char_data *actor, bool preventable) {
+	char buf[MAX_INPUT_LENGTH];
+	trig_data *trig;
+	int one, value = 1;
+	
+	if (!SCRIPT_CHECK(room, WTRIG_DISMANTLE))
+		return 1;
+	
+	LL_FOREACH(TRIGGERS(SCRIPT(room)), trig) {
+		if (TRIGGER_CHECK(trig, WTRIG_DISMANTLE)) {
+			union script_driver_data_u sdd;
+			ADD_ROOM_UID_VAR(buf, trig, room, "room", 0);
+			add_var(&GET_TRIG_VARS(trig), "preventable", preventable ? "1" : "0", 0);
+			if (actor) {
+				ADD_UID_VAR(buf, trig, actor, "actor", 0);
+			}
+			else {
+				add_var(&GET_TRIG_VARS(trig), "actor", "", 0);
+			}
+			sdd.r = room;
+			one = script_driver(&sdd, trig, WLD_TRIGGER, TRIG_NEW);
+			value = MIN(value, one);	// can be set to 0
+		}
+	}
+
+	return value;
+}
+
+
+/**
 * Called when a building first loads.
 *
 * @param room_data *room The room.

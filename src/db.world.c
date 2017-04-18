@@ -1092,6 +1092,9 @@ void annual_world_update(void) {
 			
 			if (!IS_IMMORTAL(d->character)) {
 				if (GET_POS(d->character) > POS_SITTING && !number(0, GET_DEXTERITY(d->character))) {
+					if (IS_RIDING(d->character)) {
+						perform_dismount(d->character);
+					}
 					write_to_descriptor(d->descriptor, "You're knocked to the ground!\r\n");
 					act("$n is knocked to the ground!", TRUE, d->character, NULL, NULL, TO_ROOM);
 					GET_POS(d->character) = POS_SITTING;
@@ -2243,15 +2246,21 @@ void check_all_exits(void) {
 void clear_private_owner(int id) {
 	void remove_designate_objects(room_data *room);
 	room_data *iter, *next_iter;
+	obj_data *obj;
 	
 	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (COMPLEX_DATA(iter) && ROOM_PRIVATE_OWNER(iter) == id) {
 			COMPLEX_DATA(iter)->private_owner = NOBODY;
-		}
 		
-		// TODO some way to generalize this, please
-		if (BUILDING_VNUM(iter) == RTYPE_BEDROOM && ROOM_PRIVATE_OWNER(HOME_ROOM(iter)) == NOBODY) {
-			remove_designate_objects(iter);
+			// TODO some way to generalize this, please
+			if (BUILDING_VNUM(iter) == RTYPE_BEDROOM) {
+				remove_designate_objects(iter);
+			}
+			
+			// reset autostore timer
+			LL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
+				GET_AUTOSTORE_TIMER(obj) = time(0);
+			}
 		}
 	}
 }

@@ -78,7 +78,7 @@ Start Smash Quest~
 %load% mob 11000
 %load% obj 11021
 eval mob %room.people%
-%force% %mob% mkill %actor%
+%force% %mob% %aggro% %actor%
 ~
 #11004
 Roc Tokens count~

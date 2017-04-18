@@ -3448,7 +3448,7 @@ const char *wtrig_types[] = {
 	"Ability",	// 15
 	"Leave",
 	"Door",
-	"*",
+	"Dismantle",
 	"*",
 	"Start-Quest",	// 20
 	"Finish-Quest",
@@ -3477,7 +3477,7 @@ const bitvector_t wtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// ability
 	TRIG_ARG_PERCENT,	// leave
 	TRIG_ARG_PERCENT,	// door
-	NOBITS,	// 18
+	NOBITS,	// dismantle
 	NOBITS,	// 19
 	TRIG_ARG_PERCENT,	// start-quest
 	TRIG_ARG_PERCENT,	// finish-quest

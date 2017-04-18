@@ -112,13 +112,11 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			despawn_familiar(ch, FAMILIAR_BASILISK);
 			break;
 		}
-		case ABIL_BLOODSWORD: {
-			if ((obj = GET_EQ(ch, WEAR_WIELD))) {
-				if (GET_OBJ_VNUM(obj) == o_BLOODSWORD) {
-					act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR);
-					unequip_char_to_inventory(ch, WEAR_WIELD);
-					determine_gear_level(ch);
-				}
+		case ABIL_READY_BLOOD_WEAPONS: {
+			if ((obj = GET_EQ(ch, WEAR_WIELD)) && IS_BLOOD_WEAPON(obj)) {
+				act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR);
+				unequip_char_to_inventory(ch, WEAR_WIELD);
+				determine_gear_level(ch);
 			}
 			break;
 		}

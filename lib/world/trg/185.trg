@@ -284,7 +284,7 @@ switch %attack%
       eval room %self.room%
       eval summon %room.people%
       if %summon.vnum% == 18507
-        %force% %summon% mkill %actor%
+        %force% %summon% %aggro% %actor%
       else
         %echo% Could not find summon.
       end
@@ -373,7 +373,7 @@ switch %attack%
         %load% mob 18506
         eval summon %room.people%
         if %summon.vnum% == 18506
-          %force% %summon% mkill %person%
+          %force% %summon% %aggro% %person%
         end
       end
       eval person %person.next_in_room%
@@ -1120,6 +1120,7 @@ if !%self.fighting% && %self.varexists(enrage_counter)%
   dg_affect %self% BONUS-MAGICAL off 1
   set enrage_counter 0
   remote enrage_counter %self.id%
+  %restore% %self%
   %echo% %self.name% settles down to rest.
 end
 ~

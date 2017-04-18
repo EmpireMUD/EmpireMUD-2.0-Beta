@@ -428,7 +428,7 @@ See also: INVIS, VISIBLE, SET
 #d
 ISLAND "ISLAND COMMAND"
 
-Usage:  island list
+Usage:  island list [keywords]
         island rename <id> <name>
         island flags <id> [add | remove] <flags>
 

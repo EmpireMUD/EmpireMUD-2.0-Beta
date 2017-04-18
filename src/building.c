@@ -335,6 +335,10 @@ void disassociate_building(room_data *room) {
 		SET_BIT(inst->flags, INST_COMPLETED);
 	}
 	
+	dismantle_wtrigger(room, NULL, FALSE);
+	if (GET_BUILDING(room)) {
+		detach_building_from_room(room);
+	}
 	delete_room_npcs(room, NULL);
 	
 	// remove bits including dismantle
@@ -380,6 +384,7 @@ void disassociate_building(room_data *room) {
 		next_iter = iter->next_interior;
 		
 		if (HOME_ROOM(iter) == room && iter != room) {
+			dismantle_wtrigger(iter, NULL, FALSE);
 			remove_designate_objects(iter);
 			
 			// move people and contents
@@ -884,12 +889,6 @@ void remove_designate_objects(room_data *room) {
 		next_o = o->next_content;
 		
 		switch (BUILDING_VNUM(room)) {
-			case RTYPE_STUDY: {
-				if (GET_OBJ_VNUM(o) == BOARD_MORT) {
-					extract_obj(o);
-				}
-				break;
-			}
 			case RTYPE_BEDROOM: {
 				if (GET_OBJ_VNUM(o) == o_HOME_CHEST) {
 					while (o->contains) {
@@ -967,6 +966,7 @@ void start_dismantle_building(room_data *loc) {
 		
 		if (HOME_ROOM(room) == loc) {
 			remove_designate_objects(room);
+			dismantle_wtrigger(room, NULL, FALSE);
 			delete_room_npcs(room, NULL);
 		
 			for (obj = ROOM_CONTENTS(room); obj; obj = next_obj) {
@@ -1049,6 +1049,29 @@ void start_dismantle_building(room_data *loc) {
 	if (loc && ROOM_OWNER(loc) && GET_BUILDING(loc) && complete) {
 		qt_empire_players(ROOM_OWNER(loc), qt_lose_building, GET_BLD_VNUM(GET_BUILDING(loc)));
 	}
+	
+	stop_room_action(loc, ACT_DIGGING, CHORE_DIGGING);
+	stop_room_action(loc, ACT_BUILDING, CHORE_BUILDING);
+	stop_room_action(loc, ACT_MINING, CHORE_MINING);
+	stop_room_action(loc, ACT_MINTING, ACT_MINTING);
+	stop_room_action(loc, ACT_BATHING, NOTHING);
+	stop_room_action(loc, ACT_ESCAPING, NOTHING);
+	stop_room_action(loc, ACT_STUDYING, NOTHING);
+	stop_room_action(loc, ACT_SAWING, CHORE_SAWING);
+	stop_room_action(loc, ACT_QUARRYING, CHORE_QUARRYING);
+	stop_room_action(loc, ACT_MAINTENANCE, CHORE_MAINTENANCE);
+	stop_room_action(loc, ACT_PICKING, CHORE_HERB_GARDENING);
+	stop_room_action(loc, NOTHING, CHORE_SCRAPING);
+	stop_room_action(loc, NOTHING, CHORE_SMELTING);
+	stop_room_action(loc, NOTHING, CHORE_WEAVING);
+	stop_room_action(loc, NOTHING, CHORE_NAILMAKING);
+	stop_room_action(loc, NOTHING, CHORE_BRICKMAKING);
+	stop_room_action(loc, NOTHING, CHORE_TRAPPING);
+	stop_room_action(loc, NOTHING, CHORE_TANNING);
+	stop_room_action(loc, NOTHING, CHORE_SHEARING);
+	stop_room_action(loc, NOTHING, CHORE_NEXUS_CRYSTALS);
+	stop_room_action(loc, NOTHING, CHORE_MILLING);
+	stop_room_action(loc, NOTHING, CHORE_OILMAKING);
 }
 
 
@@ -1165,6 +1188,9 @@ ACMD(do_build) {
 			else if (BUILDING_BURNING(IN_ROOM(ch))) {
 				msg_to_char(ch, "You can't work on a burning building!\r\n");
 			}
+			else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+				msg_to_char(ch, "It's too dark to work on the building.\r\n");
+			}
 			else {
 				start_action(ch, ACT_BUILDING, 0);
 				msg_to_char(ch, "You start building.\r\n");
@@ -1244,6 +1270,9 @@ ACMD(do_build) {
 	else if (!can_build_on(IN_ROOM(ch), GET_CRAFT_BUILD_ON(type))) {
 		prettier_sprintbit(GET_CRAFT_BUILD_ON(type), bld_on_flags, buf);
 		msg_to_char(ch, "You need to build on: %s\r\n", buf);
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to build anything here.\r\n");
 	}
 	else if (GET_CRAFT_BUILD_TYPE(type) == NOTHING || !building_proto(GET_CRAFT_BUILD_TYPE(type))) {
 		msg_to_char(ch, "That build recipe is not implemented.\r\n");
@@ -1390,6 +1419,11 @@ ACMD(do_dismantle) {
 	}
 
 	if (IS_DISMANTLING(IN_ROOM(ch))) {
+		if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+			msg_to_char(ch, "You don't have permission to dismantle here.\r\n");
+			return;
+		}
+		
 		msg_to_char(ch, "You begin to dismantle the building.\r\n");
 		act("$n begins to dismantle the building.", FALSE, ch, 0, 0, TO_ROOM);
 		start_action(ch, ACT_DISMANTLING, 0);
@@ -1436,6 +1470,10 @@ ACMD(do_dismantle) {
 	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_DISMANTLE)) {
 		msg_to_char(ch, "You can't dismantle this building (use 'nodismantle' to toggle).\r\n");
 		return;
+	}
+	
+	if (!dismantle_wtrigger(IN_ROOM(ch), ch, TRUE)) {
+		return;	// this goes last
 	}
 	
 	start_dismantle_building(IN_ROOM(ch));
@@ -1573,9 +1611,11 @@ ACMD(do_dedicate) {
 ACMD(do_designate) {
 	void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
+	void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
 	extern bld_data *get_building_by_name(char *name, bool room_only);
 	void sort_world_table();
 	
+	struct empire_territory_data *ter;
 	struct room_direction_data *ex;
 	int dir = NO_DIR;
 	room_data *new, *home = HOME_ROOM(IN_ROOM(ch));
@@ -1672,19 +1712,22 @@ ACMD(do_designate) {
 	else if (!IS_SET(valid_des_flags, GET_BLD_DESIGNATE_FLAGS(type))) {
 		msg_to_char(ch, "You can't designate that here!\r\n");
 	}
+	else if (subcmd == SCMD_REDESIGNATE && !dismantle_wtrigger(IN_ROOM(ch), ch, TRUE)) {
+		return;	// this goes last
+	}
 	else {
 		if (subcmd == SCMD_REDESIGNATE) {
 			// redesignate this room
 			new = IN_ROOM(ch);
 			
 			remove_designate_objects(new);
-			
-			// remove any attached scripts
-			if (SCRIPT(new)) {
-				extract_script(new, WLD_TRIGGER);
+			if (ROOM_OWNER(home) && (ter = find_territory_entry(ROOM_OWNER(home), new))) {
+				while (ter->npcs) {
+					delete_territory_npc(ter, ter->npcs);
+				}
 			}
-			free_proto_scripts(&new->proto_script);
 			
+			detach_building_from_room(new);
 			attach_building_to_room(type, new, TRUE);
 		}
 		else {
@@ -1709,11 +1752,6 @@ ACMD(do_designate) {
 		
 		// add new objects
 		switch (GET_BLD_VNUM(type)) {
-			case RTYPE_STUDY: {
-				obj_to_room((obj = read_object(BOARD_MORT, TRUE)), new);
-				load_otrigger(obj);
-				break;
-			}
 			case RTYPE_BEDROOM: {
 				if (ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(ch))) != NOBODY) {
 					obj_to_room((obj = read_object(o_HOME_CHEST, TRUE)), new);
@@ -1950,6 +1988,9 @@ ACMD(do_maintain) {
 	else if (BUILDING_BURNING(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't maintain a building that's on fire!\r\n");
 	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to maintain anything here.\r\n");
+	}
 	else {
 		start_action(ch, ACT_MAINTENANCE, -1);
 		act("You set to work maintaining the building.", FALSE, ch, NULL, NULL, TO_CHAR);
@@ -2132,7 +2173,9 @@ ACMD(do_upgrade) {
 		else {
 			// it's good!
 			start_action(ch, ACT_BUILDING, 0);
-
+			
+			dismantle_wtrigger(IN_ROOM(ch), NULL, FALSE);
+			detach_building_from_room(IN_ROOM(ch));
 			attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(type)), IN_ROOM(ch), TRUE);
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
 			SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);

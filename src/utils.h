@@ -469,6 +469,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_NAME(emp)  ((emp)->name)
 #define EMPIRE_ADJECTIVE(emp)  ((emp)->adjective)
 #define EMPIRE_BANNER(emp)  ((emp)->banner)
+#define EMPIRE_BANNER_HAS_UNDERLINE(emp)  ((emp)->banner_has_underline)
 #define EMPIRE_NUM_RANKS(emp)  ((emp)->num_ranks)
 #define EMPIRE_RANK(emp, num)  ((emp)->rank[(num)])
 #define EMPIRE_FRONTIER_TRAITS(emp)  ((emp)->frontier_traits)
@@ -508,6 +509,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_HAS_TECH(emp, num)  (EMPIRE_TECH((emp), (num)) > 0)
 #define EMPIRE_IS_TIMED_OUT(emp)  (EMPIRE_LAST_LOGON(emp) + (config_get_int("whole_empire_timeout") * SECS_PER_REAL_DAY) < time(0))
 #define GET_TOTAL_WEALTH(emp)  (EMPIRE_WEALTH(emp) + (int)(EMPIRE_COINS(emp) * COIN_VALUE))
+#define EXPLICIT_BANNER_TERMINATOR(emp)  (EMPIRE_BANNER_HAS_UNDERLINE(emp) ? "\t0" : "")
 
 // definitions
 #define SAME_EMPIRE(ch, vict)  (!IS_NPC(ch) && !IS_NPC(vict) && GET_LOYALTY(ch) != NULL && GET_LOYALTY(ch) == GET_LOYALTY(vict))
@@ -709,6 +711,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OBJ_VNUM(obj)  ((obj)->vnum)
 
 // definitions
+#define IS_BLOOD_WEAPON(obj)  (GET_OBJ_VNUM(obj) == o_BLOODSWORD || GET_OBJ_VNUM(obj) == o_BLOODSTAFF || GET_OBJ_VNUM(obj) == o_BLOODSPEAR || GET_OBJ_VNUM(obj) == o_BLOODSKEAN || GET_OBJ_VNUM(obj) == o_BLOODMACE)
 #define IS_STOLEN(obj)  (GET_STOLEN_TIMER(obj) > 0 && (config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) + GET_STOLEN_TIMER(obj) > time(0))
 
 // helpers

@@ -3302,6 +3302,22 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 
 
 /**
+* @param account_data *acct Which account to check.
+* @return int The highest access level of any character on that account.
+*/
+int get_highest_access_level(account_data *acct) {
+	struct account_player *plr;
+	int highest = 0;
+	
+	LL_FOREACH(acct->players, plr) {
+		highest = MAX(highest, plr->player->access_level);
+	}
+	
+	return highest;
+}
+
+
+/**
 * Gives a character a piece of newbie gear, if the slot isn't filled. Auto-
 * mathematically cascades to the 2nd neck/finger/etc slot.
 *

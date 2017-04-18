@@ -473,6 +473,8 @@ void update_biting_char(char_data *ch) {
 		GET_FED_ON_BY(victim) = NULL;
 		GET_FEEDING_FROM(ch) = NULL;
 
+		check_scaling(victim, ch);	// ensure scaling
+		tag_mob(victim, ch);	// ensures loot binding if applicable
 		corpse = die(victim, ch);
 		
 		// tag corpse
@@ -744,61 +746,6 @@ ACMD(do_bloodsweat) {
 		msg_to_char(ch, "You sweat blood through your pores, and poison with it!\r\n");
 		act("$n begins sweating blood.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
-}
-
-
-ACMD(do_bloodsword) {
-	void scale_item_to_level(obj_data *obj, int level);
-
-	obj_data *obj;
-	int scale_level;
-	int cost = 40;
-
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot use bloodsword.\r\n");
-		return;
-	}
-	if (!check_vampire_ability(ch, ABIL_BLOODSWORD, BLOOD, cost, NOTHING)) {
-		return;
-	}
-	if (!check_vampire_sun(ch, TRUE)) {
-		return;
-	}
-	
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_BLOODSWORD)) {
-		return;
-	}
-	
-	// attempt to remove existing wield
-	if (GET_EQ(ch, WEAR_WIELD)) {
-		perform_remove(ch, WEAR_WIELD);
-		
-		// did it work? if not, player got an error
-		if (GET_EQ(ch, WEAR_WIELD)) {
-			return;
-		}
-	}
-	
-	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
-	obj = read_object(o_BLOODSWORD, TRUE);
-	
-	if (IS_CLASS_ABILITY(ch, ABIL_BLOODSWORD)) {
-		scale_level = get_approximate_level(ch);
-	}
-	else {
-		scale_level = MIN(get_approximate_level(ch), get_skill_level(ch, SKILL_VAMPIRE));
-	}
-	
-	scale_item_to_level(obj, scale_level);
-	
-	act("You drain blood from your wrist and mold it into $p.", FALSE, ch, obj, NULL, TO_CHAR);
-	act("$n twists and molds $s own blood into $p.", TRUE, ch, obj, NULL, TO_ROOM);
-	
-	equip_char(ch, obj, WEAR_WIELD);
-	determine_gear_level(ch);
-	
-	gain_ability_exp(ch, ABIL_BLOODSWORD, 20);
-	load_otrigger(obj);
 }
 
 
@@ -1480,7 +1427,7 @@ ACMD(do_weaken) {
 		msg_to_char(ch, "You wouldn't want to do that to yourself...\r\n");
 	else if (IS_GOD(victim) || IS_IMMORTAL(victim))
 		msg_to_char(ch, "You cannot use this power on so godly a target!\r\n");
-	else if (affected_by_spell(victim, ATYPE_WEAKEN) || GET_STRENGTH(victim) <= 1)
+	else if (affected_by_spell(victim, ATYPE_WEAKEN) || (GET_STRENGTH(victim) <= 1 && GET_INTELLIGENCE(victim) <= 1))
 		act("$E is already weak!", FALSE, ch, 0, victim, TO_CHAR);
 	else if (!can_fight(ch, victim))
 		act("You can't attack $M!", FALSE, ch, 0, victim, TO_CHAR);
@@ -1500,6 +1447,8 @@ ACMD(do_weaken) {
 
 		if (!AFF_FLAGGED(victim, AFF_IMMUNE_VAMPIRE)) {
 			af = create_mod_aff(ATYPE_WEAKEN, 1 MUD_HOURS, APPLY_STRENGTH, -1 * MIN(2, GET_STRENGTH(victim)-1), ch);
+			affect_join(victim, af, 0);
+			af = create_mod_aff(ATYPE_WEAKEN, 1 MUD_HOURS, APPLY_INTELLIGENCE, -1 * MIN(2, GET_INTELLIGENCE(victim)-1), ch);
 			affect_join(victim, af, 0);
 			msg_to_char(victim, "You feel weak!\r\n");
 			act("$n hunches over in pain!", TRUE, victim, 0, 0, TO_ROOM);

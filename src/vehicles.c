@@ -181,6 +181,8 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	if (VEH_OWNER(veh)) {
 		claim_room(room, VEH_OWNER(veh));
 	}
+	
+	complete_wtrigger(room);
 		
 	return room;
 }

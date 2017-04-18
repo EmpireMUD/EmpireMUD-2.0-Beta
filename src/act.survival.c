@@ -581,7 +581,10 @@ ACMD(do_dismount) {
 
 
 ACMD(do_fish) {
+	extern const char *dirs[];
+	
 	room_data *room = IN_ROOM(ch);
+	char buf[MAX_STRING_LENGTH];
 	int dir = NO_DIR;
 	
 	any_one_arg(argument, arg);
@@ -589,16 +592,22 @@ ACMD(do_fish) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't fish.\r\n");
 	}
-	else if (GET_ACTION(ch) == ACT_FISHING) {
+	else if (GET_ACTION(ch) == ACT_FISHING && !*arg) {
 		msg_to_char(ch, "You stop fishing.\r\n");
 		act("$n stops fishing.", TRUE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
+	else if (FIGHTING(ch) && GET_POS(ch) == POS_FIGHTING) {
+		msg_to_char(ch, "You can't do that now!\r\n");
+	}
 	else if (!can_use_ability(ch, ABIL_FISH, NOTHING, 0, NOTHING)) {
 		// own messages
 	}
-	else if (GET_ACTION(ch)) {
+	else if (GET_ACTION(ch) != ACT_FISHING) {
 		msg_to_char(ch, "You're really too busy to do that.\r\n");
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to fish for anything here.\r\n");
 	}
 	else if (*arg && (dir = parse_direction(ch, arg)) == NO_DIR) {
 		msg_to_char(ch, "Fish in what direction?\r\n");
@@ -619,11 +628,18 @@ ACMD(do_fish) {
 		return;
 	}
 	else {
+		if (dir != NO_DIR) {
+			sprintf(buf, " to the %s", dirs[get_direction_for_char(ch, dir)]);
+		}
+		else {
+			*buf = '\0';
+		}
+		
+		msg_to_char(ch, "You begin looking for fish%s...\r\n", buf);
+		act("$n begins looking for fish.", TRUE, ch, NULL, NULL, TO_ROOM);
+		
 		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1));
 		GET_ACTION_VNUM(ch, 0) = dir;
-		
-		msg_to_char(ch, "You begin looking for fish...\r\n");
-		act("$n begins looking for fish.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 
@@ -649,6 +665,11 @@ ACMD(do_forage) {
 
 	if (get_depletion(IN_ROOM(ch), DPLTN_FORAGE) >= short_depletion) {
 		msg_to_char(ch, "You can't seem to find anything to forage for.\r\n");
+		return;
+	}
+	
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to forage for anything here.\r\n");
 		return;
 	}
 	
@@ -742,6 +763,10 @@ ACMD(do_track) {
 	one_argument(argument, arg);
 	
 	if (!can_use_ability(ch, ABIL_TRACK, NOTHING, 0, NOTHING)) {
+		return;
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to track for anything here.\r\n");
 		return;
 	}
 	else if (!*arg) {

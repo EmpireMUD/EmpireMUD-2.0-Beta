@@ -1810,7 +1810,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 		for (d = descriptor_list; d; d = d->next) {
 			if (STATE(d) != CON_PLAYING || !(i = d->character) || IS_NPC(i) || ch == i || !IN_ROOM(i))
 				continue;
-			if (!CAN_SEE(ch, i) || !CAN_RECOGNIZE(ch, i))
+			if (!CAN_SEE(ch, i) || !CAN_RECOGNIZE(ch, i) || !WIZHIDE_OK(ch, i))
 				continue;
 			if ((dist = compute_distance(IN_ROOM(ch), IN_ROOM(i))) > max_distance)
 				continue;
@@ -1992,7 +1992,7 @@ void perform_immort_where(char_data *ch, char *arg) {
 		for (d = descriptor_list; d; d = d->next) {
 			if (STATE(d) == CON_PLAYING) {
 				i = (d->original ? d->original : d->character);
-				if (i && CAN_SEE(ch, i) && IN_ROOM(i)) {
+				if (i && CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i)) {
 					if (d->original) {
 						check_x = X_COORD(IN_ROOM(d->character));	// not all locations are on the map
 						check_y = Y_COORD(IN_ROOM(d->character));
@@ -2019,7 +2019,7 @@ void perform_immort_where(char_data *ch, char *arg) {
 	}
 	else {
 		for (i = character_list; i; i = i->next) {
-			if (CAN_SEE(ch, i) && IN_ROOM(i) && multi_isname(arg, GET_PC_NAME(i))) {
+			if (CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i) && multi_isname(arg, GET_PC_NAME(i))) {
 				found = 1;
 				check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
 				check_y = Y_COORD(IN_ROOM(i));

@@ -76,7 +76,6 @@ ACMD(do_bathe);
 ACMD(do_bite);
 ACMD(do_blind);
 ACMD(do_bloodsweat);
-ACMD(do_bloodsword);
 ACMD(do_board);
 ACMD(do_boost);
 ACMD(do_build);
@@ -449,6 +448,7 @@ ACMD(do_write);
 ACMD(do_tattach);
 ACMD(do_tdetach);
 ACMD(do_madventurecomplete);
+ACMD(do_maggro);
 ACMD(do_masound);
 ACMD(do_mkill);
 ACMD(do_mjunk);
@@ -468,6 +468,7 @@ ACMD(do_mat);
 ACMD(do_mbuild);
 ACMD(do_mdamage);
 ACMD(do_mdot);
+ACMD(do_mrestore);
 ACMD(do_msiege);
 ACMD(do_mteleport);
 ACMD(do_mterracrop);
@@ -573,7 +574,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "bite", POS_FIGHTING, do_bite, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, ABIL_BITE ),
 	ABILITY_CMD( "blind", POS_FIGHTING, do_blind, NO_MIN, CTYPE_COMBAT, ABIL_BLIND ),
 	ABILITY_CMD( "bloodsweat", POS_SLEEPING, do_bloodsweat, NO_MIN, CTYPE_SKILL, ABIL_BLOODSWEAT ),
-	ABILITY_CMD( "bloodsword", POS_RESTING, do_bloodsword, NO_MIN, CTYPE_SKILL, ABIL_BLOODSWORD ),
 	SCMD_CMD( "board", POS_STANDING, do_board, NO_MIN, CTYPE_MOVE, SCMD_BOARD ),
 	ABILITY_CMD( "boost", POS_RESTING, do_boost, NO_MIN, CTYPE_UTIL, ABIL_BOOST ),
 	SCMD_CMD( "bookedit", POS_STANDING, do_library, NO_MIN, CTYPE_UTIL, SCMD_BOOKEDIT ),
@@ -651,7 +651,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "drive", POS_SITTING, do_drive, NO_MIN, NO_GRANTS, SCMD_DRIVE, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 
 	SCMD_CMD( "eat", POS_RESTING, do_eat, NO_MIN, CTYPE_UTIL, SCMD_EAT ),
-	ABILITY_CMD( "eartharmor", POS_FIGHTING, do_eartharmor, NO_MIN, CTYPE_SKILL, ABIL_EARTHARMOR ),
+	ABILITY_CMD( "eartharmor", POS_RESTING, do_eartharmor, NO_MIN, CTYPE_SKILL, ABIL_EARTHARMOR ),
 	ABILITY_CMD( "earthmeld", POS_STUNNED, do_earthmeld, NO_MIN, CTYPE_MOVE, ABIL_EARTHMELD ),
 	STANDARD_CMD( "echo", POS_SLEEPING, do_echo, LVL_CIMPL, GRANT_ECHO, SCMD_ECHO, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 	GRANT_CMD( "editnotes", POS_STANDING, do_editnotes, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EDITNOTES ),
@@ -698,7 +698,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "findmaintenance", POS_DEAD, do_findmaintenance, NO_MIN, CTYPE_EMPIRE ),
 	STANDARD_CMD( "fire", POS_SITTING, do_fire, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "firstaid", POS_STANDING, do_firstaid, NO_MIN, CTYPE_SKILL, ABIL_FIRSTAID ),
-	STANDARD_CMD( "fish", POS_STANDING, do_fish, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_SKILL, CMD_NO_ANIMALS, ABIL_FISH ),
+	STANDARD_CMD( "fish", POS_SITTING, do_fish, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_SKILL, CMD_NO_ANIMALS, ABIL_FISH ),
 	STANDARD_CMD( "flee", POS_FIGHTING, do_flee, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ABBREV, NO_ABIL ),
 	ABILITY_CMD( "fly", POS_STANDING, do_fly, NO_MIN, CTYPE_SKILL, ABIL_FLY ),
 	SIMPLE_CMD( "follow", POS_RESTING, do_follow, NO_MIN, CTYPE_MOVE ),
@@ -730,7 +730,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "handbook", POS_DEAD, do_gen_ps, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_HANDBOOK ),
 	STANDARD_CMD( "harness", POS_STANDING, do_harness, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "harvest", POS_STANDING, do_harvest, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
-	ABILITY_CMD( "hasten", POS_FIGHTING, do_hasten, NO_MIN, CTYPE_SKILL, ABIL_HASTEN ),
+	ABILITY_CMD( "hasten", POS_RESTING, do_hasten, NO_MIN, CTYPE_SKILL, ABIL_HASTEN ),
 	SIMPLE_CMD( "heal", POS_FIGHTING, do_heal, NO_MIN, CTYPE_SKILL ),
 	SIMPLE_CMD( "herd", POS_STANDING, do_herd, NO_MIN, CTYPE_MOVE ),
 	ABILITY_CMD( "heartstop", POS_FIGHTING, do_heartstop, NO_MIN, CTYPE_COMBAT, ABIL_HEARTSTOP ),
@@ -745,7 +745,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "howl", POS_FIGHTING, do_howl, NO_MIN, CTYPE_SKILL, ABIL_HOWL ),
 
 	SIMPLE_CMD( "inventory", POS_DEAD, do_inventory, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "identify", POS_STANDING, do_identify, NO_MIN, CTYPE_SKILL ),
+	SIMPLE_CMD( "identify", POS_RESTING, do_identify, NO_MIN, CTYPE_SKILL ),
 	SCMD_CMD( "idea", POS_DEAD, do_gen_write, NO_MIN, CTYPE_COMM, SCMD_IDEA ),
 	SIMPLE_CMD( "ignore", POS_DEAD, do_ignore, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "import", POS_DEAD, do_import, NO_MIN, CTYPE_UTIL, TRADE_IMPORT ),
@@ -947,7 +947,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "stop", POS_DEAD, do_stop, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "struggle", POS_STUNNED, do_struggle, NO_MIN, CTYPE_COMBAT ),
 	STANDARD_CMD( "study", POS_STANDING, do_study, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
-	SIMPLE_CMD( "summary", POS_FIGHTING, do_summary, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "summary", POS_DEAD, do_summary, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "summon", POS_STANDING, do_summon, NO_MIN, CTYPE_SKILL ),
 	STANDARD_CMD( "sunshock", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_SUNSHOCK, CTYPE_COMBAT, NOBITS, ABIL_SUNSHOCK ),
 	SIMPLE_CMD( "survey", POS_STANDING, do_survey, NO_MIN, CTYPE_UTIL ),
@@ -1036,6 +1036,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "tdetach", POS_DEAD, do_tdetach, NO_MIN, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY ),
 	SIMPLE_CMD( "vdelete", POS_DEAD, do_vdelete, LVL_CIMPL, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "madventurecomplete", POS_DEAD, do_madventurecomplete, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "maggro", POS_RESTING, do_maggro, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "masound", POS_DEAD, do_masound, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "mbuild", POS_DEAD, do_mbuild, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "mkill", POS_FIGHTING, do_mkill, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
@@ -1056,6 +1057,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "mgoto", POS_DEAD, do_mgoto, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "mat", POS_DEAD, do_mat, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "mown", POS_DEAD, do_mown, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
+	STANDARD_CMD( "mrestore", POS_DEAD, do_mrestore, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "mscale", POS_DEAD, do_mscale, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "msiege", POS_DEAD, do_msiege, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "mteleport", POS_DEAD, do_mteleport, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
@@ -1268,7 +1270,7 @@ void perform_complex_alias(struct txt_q *input_q, char *orig, struct alias_data 
 	temp = strtok(strcpy(buf2, orig), " ");
 	while (temp != NULL && num_of_tokens < NUM_TOKENS) {
 		tokens[num_of_tokens++] = temp;
-			temp = strtok(NULL, " ");
+		temp = strtok(NULL, " ");
 	}
 
 	/* initialize */
@@ -1287,7 +1289,10 @@ void perform_complex_alias(struct txt_q *input_q, char *orig, struct alias_data 
 			temp++;
 			if ((num = *temp - '1') < num_of_tokens && num >= 0) {
 				strcpy(write_point, tokens[num]);
-					write_point += strlen(tokens[num]);
+				write_point += strlen(tokens[num]);
+			}
+			else if (num >= 0 && num >= num_of_tokens) {
+				// no arg, just skip it
 			}
 			else if (*temp == ALIAS_GLOB_CHAR) {
 				strcpy(write_point, orig);

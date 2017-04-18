@@ -515,7 +515,7 @@ wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
 end
-mkill %actor%
+%aggro% %actor%
 ~
 #10262
 Primeval must-fight~
@@ -767,7 +767,7 @@ wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
 end
-mkill %actor%
+%aggro% %actor%
 ~
 #10271
 Terrosaur greet/aggro~
@@ -798,7 +798,7 @@ wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
 end
-mkill %actor%
+%aggro% %actor%
 ~
 #10272
 Primeval salesman list~

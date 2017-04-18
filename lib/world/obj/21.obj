@@ -372,11 +372,13 @@ a spear~
 A long spear is protruding from the ground.~
 Spears can be used for fishing or fighting.
 ~
-1 ehl an 1
+1 ehl an 2
 0 2 3
 1 0
 A
 2 1 0
+C
+1 1
 S
 #2130
 backpack leather~

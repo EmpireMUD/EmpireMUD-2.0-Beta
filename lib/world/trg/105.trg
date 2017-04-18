@@ -337,6 +337,10 @@ end
 Aquilo Combat~
 0 k 100
 ~
+if %self.affect(BLIND)%
+  %echo% %self.name%'s eyes flash blue, and %self.hisher% vision clears!
+  dg_affect %self% BLIND off 1
+end
 eval heroic_mode %self.mob_flagged(GROUP)%
 * Always uses this ability:
 * Bitter Cold
@@ -410,7 +414,7 @@ switch %random.3%
     if %summon.vnum% == 10560
       %send% %actor% %summon.name% begins attacking you with a malevolent will of %summon.hisher% own!
       %echoaround% %actor% %summon.name% begins attacking %actor.name% with a malevolent will of %summon.hisher% own!
-      %force% %summon% mkill %actor%
+      %force% %summon% %aggro% %actor%
     end
     if !%heroic_mode%
       %echo% %self.name% steps back and folds %self.hisher% arms.
@@ -489,7 +493,7 @@ switch %random.3%
     eval summon %room.people%
     if %summon.vnum% == %summon_vnum%
       %echo% %summon.name% soars down from the clear violet sky!
-      %force% %summon% mkill %actor%
+      %force% %summon% %aggro% %actor%
     end
   break
 done

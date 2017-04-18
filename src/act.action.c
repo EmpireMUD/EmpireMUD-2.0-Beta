@@ -113,7 +113,7 @@ const struct action_data_struct action_data[] = {
 	{ "planting", "is planting seeds.", ACTF_HASTE | ACTF_FAST_CHORES, process_planting, NULL },	// ACT_PLANTING
 	{ "mining", "is mining at the walls.", ACTF_HASTE | ACTF_FAST_CHORES, process_mining, NULL },	// ACT_MINING
 	{ "minting", "is minting coins.", ACTF_FAST_CHORES, process_minting, cancel_minting },	// ACT_MINTING
-	{ "fishing", "is fishing.", NOBITS, process_fishing, NULL },	// ACT_FISHING
+	{ "fishing", "is fishing.", ACTF_SITTING, process_fishing, NULL },	// ACT_FISHING
 	{ "preparing", "is preparing to fill in the trench.", NOBITS, process_start_fillin, NULL },	// ACT_START_FILLIN
 	{ "repairing", "is doing some repairs.", ACTF_FAST_CHORES | ACTF_HASTE, process_repairing, NULL },	// ACT_REPAIRING
 	{ "chipping", "is chipping rocks.", ACTF_FAST_CHORES, process_chipping, cancel_resource_list },	// ACT_CHIPPING
@@ -543,7 +543,7 @@ void start_picking(char_data *ch) {
 * @param char_data *ch The player who is to quarry.
 */
 void start_quarrying(char_data *ch) {	
-	if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY)) {
+	if (CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY) && IS_COMPLETE(IN_ROOM(ch))) {
 		if (get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
 			msg_to_char(ch, "There's not enough left to quarry here.\r\n");
 		}
@@ -947,6 +947,12 @@ void perform_saw(char_data *ch) {
 	bool success = FALSE;
 	obj_data *proto;
 	
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to finish sawing.\r\n");
+		cancel_action(ch);
+		return;
+	}
+	
 	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
 		msg_to_char(ch, "You saw %s...\r\n", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
 	}
@@ -1039,6 +1045,12 @@ void process_bathing(char_data *ch) {
 */
 void process_build_action(char_data *ch) {
 	int count, total;
+	
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to keep working here.\r\n");
+		cancel_action(ch);
+		return;
+	}
 
 	total = 1;	// number of materials to attach in one go (add things that speed up building)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_BUILDING; ++count) {
@@ -1058,6 +1070,11 @@ void process_chipping(char_data *ch) {
 	
 	if (!find_chip_weapon(ch)) {
 		msg_to_char(ch, "You need to be using some kind of hammer to chip it.\r\n");
+		cancel_action(ch);
+		return;
+	}
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to finish chipping.\r\n");
 		cancel_action(ch);
 		return;
 	}
@@ -1105,6 +1122,11 @@ void process_chop(char_data *ch) {
 	
 	if (!GET_EQ(ch, WEAR_WIELD) || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE) {
 		send_to_char("You need to be wielding an axe to chop.\r\n", ch);
+		cancel_action(ch);
+		return;
+	}
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to finish chopping.\r\n");
 		cancel_action(ch);
 		return;
 	}
@@ -1156,6 +1178,12 @@ void process_chop(char_data *ch) {
 */
 void process_digging(char_data *ch) {
 	room_data *in_room;
+	
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to dig here.\r\n");
+		cancel_action(ch);
+		return;
+	}
 
 	// decrement timer
 	GET_ACTION_TIMER(ch) -= 1;
@@ -1175,7 +1203,8 @@ void process_digging(char_data *ch) {
 					start_digging(ch);
 				}
 				else {
-					msg_to_char(ch, "There don't seem to be any other good rocks here.\r\n");
+					// this results in a double-message from finish_digging:
+					// msg_to_char(ch, "There don't seem to be any other good rocks here.\r\n");
 				}
 			}
 		}
@@ -1203,6 +1232,12 @@ void process_dismantle_action(char_data *ch) {
 	
 	int count, total;
 	
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to finish dismantling.\r\n");
+		cancel_action(ch);
+		return;
+	}
+	
 	total = 1;	// number of mats to dismantle at once (add things that speed up dismantle)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_DISMANTLING; ++count) {
 		process_dismantling(ch, IN_ROOM(ch));
@@ -1217,6 +1252,12 @@ void process_dismantle_action(char_data *ch) {
 */
 void process_escaping(char_data *ch) {
 	void perform_escape(char_data *ch);
+	
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to find your way out!\r\n");
+		cancel_action(ch);
+		return;
+	}
 	
 	if (--GET_ACTION_TIMER(ch) <= 0) {
 		perform_escape(ch);
@@ -1360,6 +1401,11 @@ void process_fishing(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to fish here.\r\n");
+		cancel_action(ch);
+		return;
+	}
 	
 	GET_ACTION_TIMER(ch) -= GET_CHARISMA(ch) + (skill_check(ch, ABIL_FISH, DIFF_MEDIUM) ? 2 : 0);
 	
@@ -1461,6 +1507,11 @@ void process_harvesting(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to finish harvesting.\r\n");
+		cancel_action(ch);
+		return;
+	}
 
 	// tick messaging
 	switch (number(0, 2)) {
@@ -1530,6 +1581,12 @@ void process_harvesting(char_data *ch) {
 * @param char_data *ch The repairman.
 */
 void process_maintenance(char_data *ch) {
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to maintain the building.\r\n");
+		cancel_action(ch);
+		return;
+	}
+	
 	process_build(ch, IN_ROOM(ch), ACT_MAINTENANCE);
 }
 
@@ -1544,6 +1601,12 @@ void process_mining(char_data *ch) {
 	int count, total;
 	room_data *in_room;
 	bool success;
+	
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to finish mining.\r\n");
+		cancel_action(ch);
+		return;
+	}
 
 	total = 1;	// pick swings at once (add things that speed up mining)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_MINING; ++count) {
@@ -1616,6 +1679,11 @@ void process_minting(char_data *ch) {
 	
 	if (!emp) {
 		msg_to_char(ch, "The mint no longer belongs to any empire and can't be used to make coin.\r\n");
+		cancel_action(ch);
+		return;
+	}
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to finish minting.\r\n");
 		cancel_action(ch);
 		return;
 	}
@@ -1709,6 +1777,10 @@ void process_panning(char_data *ch) {
 		msg_to_char(ch, "You need to be holding a pan to do that.\r\n");
 		cancel_action(ch);
 	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to pan here.\r\n");
+		cancel_action(ch);
+	}
 	else if (!room || !CAN_INTERACT_ROOM(room, INTERACT_PAN) || !can_use_room(ch, room, MEMBERS_ONLY)) {
 		msg_to_char(ch, "You can no longer pan %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
 		cancel_action(ch);
@@ -1750,6 +1822,12 @@ void process_picking(char_data *ch) {
 	
 	int garden_depletion = config_get_int("garden_depletion");
 	int pick_depletion = config_get_int("pick_depletion");
+	
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to pick anything.\r\n");
+		cancel_action(ch);
+		return;
+	}
 	
 	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
 		send_to_char("You look around for something nice to pick...\r\n", ch);
@@ -1888,8 +1966,13 @@ void process_prospecting(char_data *ch) {
 void process_quarrying(char_data *ch) {
 	room_data *in_room;
 	
-	if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY) || get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
+	if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY) || !IS_COMPLETE(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
 		msg_to_char(ch, "You can't quarry anything here.\r\n");
+		cancel_action(ch);
+		return;
+	}
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to finish quarrying.\r\n");
 		cancel_action(ch);
 		return;
 	}
@@ -1965,6 +2048,11 @@ void process_repairing(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to repair anything.\r\n");
+		cancel_action(ch);
+		return;
+	}
 	
 	// good to repair:
 	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), FALSE, &found_obj))) {
@@ -2002,6 +2090,11 @@ void process_scraping(char_data *ch) {
 	
 	if (!has_sharp_tool(ch)) {
 		msg_to_char(ch, "You need to be using a sharp tool to scrape it.\r\n");
+		cancel_action(ch);
+		return;
+	}
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to finish scraping.\r\n");
 		cancel_action(ch);
 		return;
 	}
@@ -2156,6 +2249,12 @@ void process_tanning(char_data *ch) {
 	obj_data *proto;
 	bool success;
 	
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to finish tanning.\r\n");
+		cancel_action(ch);
+		return;
+	}
+	
 	GET_ACTION_TIMER(ch) -= (room_has_function_and_city_ok(IN_ROOM(ch), FNC_TANNERY) ? 4 : 1);
 	
 	// need the prototype
@@ -2256,6 +2355,9 @@ ACMD(do_chip) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already busy doing something else.\r\n");
 	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to chip anything here.\r\n");
+	}
 	else if (!*arg) {
 		msg_to_char(ch, "Chip what?\r\n");
 	}
@@ -2309,6 +2411,9 @@ ACMD(do_chop) {
 	}
 	else if (!GET_EQ(ch, WEAR_WIELD) || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE) {
 		send_to_char("You need to be wielding some kind of axe to chop.\r\n", ch);
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to chop anything here.\r\n");
 	}
 	else {
 		start_chopping(ch);
@@ -2524,6 +2629,9 @@ ACMD(do_harvest) {
 	else if (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) != ITEM_WEAPON || (GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLICE && GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_SLASH)) {
 		msg_to_char(ch, "You aren't using the proper tool for that.\r\n");
 	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to harvest anything here.\r\n");
+	}
 	else {
 		start_action(ch, ACT_HARVESTING, 0);
 
@@ -2570,6 +2678,9 @@ ACMD(do_mine) {
 	}
 	else if (!GET_EQ(ch, WEAR_WIELD) || ((GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) != ITEM_WEAPON || GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_PICK) && GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) != o_HANDAXE)) {
 		msg_to_char(ch, "You don't have a tool suitable for mining.\r\n");
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to mine anything here.\r\n");
 	}
 	else {
 		start_mining(ch);
@@ -2621,6 +2732,9 @@ ACMD(do_mint) {
 	else if (!IS_WEALTH_ITEM(obj) || GET_WEALTH_VALUE(obj) <= 0) {
 		msg_to_char(ch, "You can't mint that into coins.\r\n");
 	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to mint anything here.\r\n");
+	}
 	else {
 		act("You melt down $p and pour it into the coin mill...", FALSE, ch, obj, NULL, TO_CHAR);
 		act("$n melts down $p and pours it into the coin mill...", FALSE, ch, obj, NULL, TO_ROOM);
@@ -2667,6 +2781,9 @@ ACMD(do_pan) {
 	else if ((!GET_EQ(ch, WEAR_WIELD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_TOOL_PAN)) && (!GET_EQ(ch, WEAR_HOLD) || !OBJ_FLAGGED(GET_EQ(ch, WEAR_HOLD), OBJ_TOOL_PAN))) {
 		msg_to_char(ch, "You need to be holding a pan to do that.\r\n");
 	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to pan for anything here.\r\n");
+	}
 	else {
 		start_panning(ch, dir);
 	}
@@ -2693,6 +2810,9 @@ ACMD(do_pick) {
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to pick anything here.\r\n");
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to pick anything here.\r\n");
 	}
 	else {
 		start_picking(ch);
@@ -2854,8 +2974,14 @@ ACMD(do_quarry) {
 	else if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_QUARRY)) {
 		send_to_char("You can't quarry here.\r\n", ch);
 	}
+	else if (!IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't quarry until it's finished!\r\n");
+	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to quarry here.\r\n");
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to quarry anything here.\r\n");
 	}
 	else {
 		start_quarrying(ch);
@@ -2895,6 +3021,9 @@ ACMD(do_saw) {
 	}
 	else if (!has_interaction(obj->interactions, INTERACT_SAW)) {
 		msg_to_char(ch, "You can't saw that!\r\n");
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to saw anything here.\r\n");
 	}
 	else {
 		start_action(ch, ACT_SAWING, 8);
@@ -2937,6 +3066,9 @@ ACMD(do_scrape) {
 	}
 	else if (!has_sharp_tool(ch)) {
 		msg_to_char(ch, "You need to be using a sharp tool to scrape anything.\r\n");
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to scrape anything here.\r\n");
 	}
 	else {
 		start_action(ch, ACT_SCRAPING, 6);
@@ -3001,6 +3133,9 @@ ACMD(do_tan) {
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to tan here.\r\n");
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to tan anything here.\r\n");
 	}
 	else {
 		start_action(ch, ACT_TANNING, tan_timer);

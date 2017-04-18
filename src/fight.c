@@ -1098,7 +1098,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	if (!IS_NPC(killer) && GET_LOYALTY(ch) && GET_LOYALTY(killer) != GET_LOYALTY(ch)) {
 		// we check the ch's master if it's an NPC and the master is a PC
 		char_data *check = (IS_NPC(ch) && ch->master && !IS_NPC(ch->master)) ? ch->master : ch;
-		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && !IS_HOSTILE(check)) {
+		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && !IS_HOSTILE(check) && (!ROOM_OWNER(IN_ROOM(killer)) || ROOM_OWNER(IN_ROOM(killer)) != GET_LOYALTY(killer))) {
 			trigger_distrust_from_hostile(killer, GET_LOYALTY(ch));
 		}
 	}
@@ -1135,6 +1135,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	if (!IS_NPC(ch)) {
 		add_cooldown(ch, COOLDOWN_DEATH_RESPAWN, config_get_int("death_release_minutes") * SECS_PER_REAL_MIN);
 		msg_to_char(ch, "Type 'respawn' to come back at your tomb.\r\n");
+		GET_HEALTH(ch) = MIN(GET_HEALTH(ch), -10);	// ensure negative health
 		GET_POS(ch) = POS_DEAD;	// ensure pos
 		return NULL;
 	}
@@ -1262,8 +1263,12 @@ void drop_loot(char_data *mob, char_data *killer) {
 	if (!mob || !IS_NPC(mob) || MOB_FLAGGED(mob, MOB_NO_LOOT)) {
 		return;
 	}
+
+	// find and drop loot
+	run_interactions(mob, mob->interactions, INTERACT_LOOT, IN_ROOM(mob), mob, NULL, loot_interact);
+	run_global_mob_interactions(mob, mob, INTERACT_LOOT, loot_interact);
 	
-	// loot?
+	// coins?
 	if (killer && !IS_NPC(killer) && (!GET_LOYALTY(mob) || GET_LOYALTY(mob) == GET_LOYALTY(killer) || char_has_relationship(killer, mob, DIPL_WAR))) {
 		coins = mob_coins(mob);
 		coin_emp = GET_LOYALTY(mob);
@@ -1276,10 +1281,6 @@ void drop_loot(char_data *mob, char_data *killer) {
 			obj_to_char(obj, mob);
 		}
 	}
-
-	// find and drop loot
-	run_interactions(mob, mob->interactions, INTERACT_LOOT, IN_ROOM(mob), mob, NULL, loot_interact);
-	run_global_mob_interactions(mob, mob, INTERACT_LOOT, loot_interact);
 }
 
 
@@ -2763,6 +2764,13 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 			break;
 	}
 	
+	if (ch != victim && GET_POS(victim) < POS_SLEEPING && !WOULD_EXECUTE(ch, victim)) {
+		// remove all DoTs
+		while (victim->over_time_effects) {
+			dot_remove(victim, victim->over_time_effects);
+		}
+	}
+	
 	// did we do any damage? tag the mob
 	if (dam > 0) {
 		tag_mob(victim, ch);
@@ -3020,7 +3028,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	if (!IS_NPC(ch) && victim_emp && GET_LOYALTY(ch) != victim_emp) {
 		// we check the victim's master if it's an NPC and the master is a PC
 		check = (IS_NPC(victim) && victim->master && !IS_NPC(victim->master)) ? victim->master : victim;
-		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && !IS_HOSTILE(check)) {
+		if ((IS_NPC(check) || !IS_PVP_FLAGGED(check)) && !IS_HOSTILE(check) && (!ROOM_OWNER(IN_ROOM(ch)) || ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch))) {
 			trigger_distrust_from_hostile(ch, victim_emp);
 		}
 	}
@@ -3131,7 +3139,10 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			if (!IS_NPC(ch) && has_ability(ch, ABIL_CLAWS) && w_type == TYPE_VAMPIRE_CLAWS && can_gain_exp_from(ch, victim)) {
 				gain_ability_exp(ch, ABIL_CLAWS, 2);
 			}
-
+			if (!IS_NPC(ch) && GET_EQ(ch, WEAR_WIELD) && IS_BLOOD_WEAPON(GET_EQ(ch, WEAR_WIELD)) && w_type == TYPE_SLASH && can_gain_exp_from(ch, victim)) {
+				gain_ability_exp(ch, ABIL_READY_BLOOD_WEAPONS, 2);
+			}
+			
 			// raw damage modified by hunt
 			if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_ANIMAL) && has_ability(ch, ABIL_HUNT)) {
 				if (can_gain_exp_from(ch, victim)) {
@@ -3690,6 +3701,8 @@ void one_combat_round(char_data *ch, double speed, obj_data *weapon) {
 * @param double speed the speed of this round in seconds
 */
 void fight_wait_run(char_data *ch, double speed) {
+	unsigned long long timestamp;
+	
 	// sanity
 	if (!FIGHTING(ch)) {
 		return;
@@ -3737,6 +3750,11 @@ void fight_wait_run(char_data *ch, double speed) {
 		if (FIGHTING(FIGHTING(ch)) == ch) {
 			FIGHT_MODE(FIGHTING(ch)) = FMODE_MELEE;
 		}
+		
+		// half-round bonus if you are the one to run in
+		timestamp = microtime();
+		GET_LAST_SWING_MAINHAND(ch) = timestamp - (get_combat_speed(ch, WEAR_WIELD)/2 SEC_MICRO);
+		GET_LAST_SWING_OFFHAND(ch) = timestamp - (get_combat_speed(ch, WEAR_HOLD)/2 SEC_MICRO);
 	}
 }
 

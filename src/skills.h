@@ -128,7 +128,7 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define ABIL_BACKSTAB  3
 #define ABIL_WOLF_FORM  4
 #define ABIL_NULL_MANA  5
-#define ABIL_BLOODSWORD  6
+#define ABIL_READY_BLOOD_WEAPONS  6
 #define ABIL_BOOST  7
 #define ABIL_CLAWS  8
 #define ABIL_COMMAND  9
@@ -690,27 +690,6 @@ extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 #define WEAPON_BLUNT  0
 #define WEAPON_SHARP  1
 #define WEAPON_MAGIC  2
-
-
-// skill structure
-struct skill_data_type {
-	int number;	// SKILL_x
-	char *name;
-	char *abbrev;
-	char *description;
-	char *creation_description;	// shown to players who ask for help during creation
-	int flags;
-};
-
-
-// ability structure
-struct ability_data_type {
-	int number;	// ABIL_x
-	int parent_skill;	// SKILL_x
-	int parent_skill_required;	// amount of skill to buy
-	int parent_ability;	// ABIL_x
-	char *name;
-};
 
 
 // TYPE_x Attacktypes with grammar

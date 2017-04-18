@@ -69,6 +69,11 @@ bool can_infiltrate(char_data *ch, empire_data *emp) {
 		return FALSE;
 	}
 	
+	if (EMPIRE_IMM_ONLY(emp)) {
+		msg_to_char(ch, "You cannot infiltrate immortal empires.\r\n");
+		return FALSE;
+	}
+	
 	if (count_members_online(emp) == 0) {
 		msg_to_char(ch, "There are no members of %s online.\r\n", EMPIRE_NAME(emp));
 		return FALSE;
@@ -645,7 +650,7 @@ ACMD(do_backstab) {
 	else {
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_BACKSTAB, 9, WAIT_COMBAT_ABILITY);
 
-		success = skill_check(ch, ABIL_BACKSTAB, DIFF_EASY);
+		success = !AWAKE(vict) || !CAN_SEE(vict, ch) || skill_check(ch, ABIL_BACKSTAB, DIFF_EASY);
 
 		if (!success) {
 			damage(ch, vict, 0, ATTACK_BACKSTAB, DAM_PHYSICAL);
@@ -754,7 +759,7 @@ ACMD(do_darkness) {
 		CREATE(af, struct affected_type, 1);
 		af->type = ATYPE_DARKNESS;
 		af->cast_by = CAST_BY_ID(ch);
-		af->duration = 6;
+		af->duration = 1;
 		af->modifier = 0;
 		af->location = APPLY_NONE;
 		af->bitvector = ROOM_AFF_DARK;
@@ -907,6 +912,9 @@ ACMD(do_escape) {
 	}
 	else if (!IS_INSIDE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't need to escape from here.\r\n");
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to try to escape from here.\r\n");
 	}
 	else {
 		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_VEHICLE_IN_ROOM(IN_ROOM(ch)) != IN_ROOM(ch) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN)) {
@@ -1213,7 +1221,7 @@ ACMD(do_pickpocket) {
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_PICKPOCKET)) {
 		return;
 	}
-	else if (MOB_FLAGGED(vict, MOB_PICKPOCKETED | MOB_NO_LOOT)) {
+	else if (MOB_FLAGGED(vict, MOB_PICKPOCKETED | MOB_NO_LOOT) || (AFF_FLAGGED(vict, AFF_NO_ATTACK) && !!has_interaction(vict->interactions, INTERACT_PICKPOCKET))) {
 		act("$E doesn't appear to be carrying anything in $S pockets.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else {
@@ -1510,7 +1518,7 @@ ACMD(do_shadowcage) {
 ACMD(do_shadowstep) {
 	bool can_infiltrate(char_data *ch, empire_data *emp);
 
-	char_data *vict;
+	char_data *vict = NULL;
 	empire_data *emp = NULL;
 	int cost = 50;
 	bool infil = FALSE;
@@ -1530,7 +1538,12 @@ ACMD(do_shadowstep) {
 	}
 	else if (!*argument)
 		msg_to_char(ch, "Shadowstep to whom?\r\n");
-	else if (!(vict = find_closest_char(ch, argument, FALSE)) || compute_distance(IN_ROOM(ch), IN_ROOM(vict)) > 7) {
+	else if (!isdigit(*argument) && (!(vict = find_closest_char(ch, argument, FALSE)) || compute_distance(IN_ROOM(ch), IN_ROOM(vict)) > 7)) {
+		// simple targeting: find closest
+		msg_to_char(ch, "Nobody by that name within range.\r\n");
+	}
+	else if (!vict && isdigit(*argument) && (!(vict = get_char_vis(ch, arg, FIND_CHAR_WORLD)) || compute_distance(IN_ROOM(ch), IN_ROOM(vict)) > 7)) {
+		// number targeting: find by name
 		msg_to_char(ch, "Nobody by that name within range.\r\n");
 	}
 	else if (ch == vict) {

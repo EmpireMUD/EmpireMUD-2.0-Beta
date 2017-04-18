@@ -73,6 +73,7 @@ const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
 void adjust_building_tech(empire_data *emp, room_data *room, bool add);
+void extract_trigger(trig_data *trig);
 void scale_item_to_level(obj_data *obj, int level);
 
 // locals
@@ -1315,35 +1316,28 @@ void char_to_room(char_data *ch, room_data *room) {
 * @return char_data *The nearest matching character.
 */
 char_data *find_closest_char(char_data *ch, char *arg, bool pc_only) {
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp = tmpname;
 	char_data *vict, *best = NULL;
 	int dist, best_dist = MAP_SIZE;
-	int number, count;
 	
 	if ((vict = get_char_room_vis(ch, arg)) && (!pc_only || !IS_NPC(vict))) {
 		return vict;
 	}
 	
-	strcpy(tmp, arg);
-	number = get_number(&tmp);
-	if (number == 0) {
-		return find_closest_char(ch, tmp, TRUE);
-	}
-	
-	for (vict = character_list, count = 0; vict && count <= number; vict = vict->next) {
-		if (CAN_SEE(ch, vict) && (!pc_only || !IS_NPC(vict)) && IN_ROOM(vict) && MATCH_CHAR_NAME_ROOM(ch, tmp, vict)) {
-			// did not specify a number
-			if (number == 1) {
-				dist = compute_distance(IN_ROOM(ch), IN_ROOM(vict));
-				if (dist < best_dist) {
-					dist = best_dist;
-					best = vict;
-				}
-			}
-			else if (++count == number) {
-				return vict;
-			}
+	LL_FOREACH(character_list, vict) {
+		if (pc_only && IS_NPC(vict)) {
+			continue;
+		}
+		if (!CAN_SEE(ch, vict) || !CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(vict))) {
+			continue;
+		}
+		if (!MATCH_CHAR_NAME_ROOM(ch, arg, vict)) {
+			continue;
+		}
+		
+		dist = compute_distance(IN_ROOM(ch), IN_ROOM(vict));
+		if (!best || dist < best_dist) {
+			best_dist = dist;
+			best = vict;
 		}
 	}
 	
@@ -1464,7 +1458,7 @@ char_data *get_char_vis(char_data *ch, char *name, bitvector_t where) {
 		}
 
 		for (i = character_list; i && (j <= number) && !found; i = i->next) {
-			if ((CAN_SEE(ch, i) || (IS_SET(where, FIND_NO_DARK) && CAN_SEE_NO_DARK(ch, i))) && MATCH_CHAR_NAME(tmp, i)) {
+			if ((CAN_SEE(ch, i) || (IS_SET(where, FIND_NO_DARK) && CAN_SEE_NO_DARK(ch, i))) && (!IS_SET(where, FIND_NPC_ONLY) || IS_NPC(i)) && MATCH_CHAR_NAME(tmp, i)) {
 				if (++j == number) {
 					found = i;
 				}
@@ -5405,7 +5399,7 @@ void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers)
 	if (with_triggers) {
 		struct trig_proto_list *temp;
 		if ((temp = copy_trig_protos(GET_BLD_SCRIPTS(bld)))) {
-			LL_APPEND(room->proto_script, temp);
+			LL_CONCAT(room->proto_script, temp);
 		}
 		assign_triggers(room, WLD_TRIGGER);
 	}
@@ -5427,6 +5421,63 @@ void attach_template_to_room(room_template *rmt, room_data *room) {
 		COMPLEX_DATA(room) = init_complex_data();
 	}
 	COMPLEX_DATA(room)->rmt_ptr = rmt;
+}
+
+
+/**
+* Sets the building data on a room. If the room isn't already complex, this
+* will automatically add complex data. This should always be called with
+* triggers unless you're loading saved rooms from a file, or some other place
+* where triggers might have been detached.
+*
+* @param bld_data *bld The building prototype (from building_table).
+* @param room_data *room The world room to attach it to.
+* @param bool with_triggers If TRUE, attaches triggers too.
+*/
+void detach_building_from_room(room_data *room) {
+	struct trig_proto_list *tpl, *next_tpl, *search;
+	trig_data *trig, *next_trig;
+	bld_data *bld;
+	bool any;
+	
+	if (!room) {
+		log("SYSERR: detach_building_from_room called without room");
+		return;
+	}
+	if (!COMPLEX_DATA(room) || !(bld = COMPLEX_DATA(room)->bld_ptr)) {
+		return;	// nothing to do
+	}
+	
+	COMPLEX_DATA(room)->bld_ptr = NULL;
+	LL_FOREACH_SAFE(room->proto_script, tpl, next_tpl) {
+		LL_SEARCH_SCALAR(GET_BLD_SCRIPTS(bld), search, vnum, tpl->vnum);
+		if (search) {	// matching vnum on the proto
+			LL_DELETE(room->proto_script, tpl);
+			free(tpl);
+		}
+	}
+	
+	if (SCRIPT(room)) {
+		any = FALSE;
+		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), trig, next_trig) {
+			LL_SEARCH_SCALAR(GET_BLD_SCRIPTS(bld), search, vnum, GET_TRIG_VNUM(trig));
+			if (search) {	// matching vnum on the proto
+				LL_DELETE(TRIGGERS(SCRIPT(room)), trig);
+				extract_trigger(trig);
+				any = TRUE;
+			}
+		}
+		
+		if (any) {	// update script types
+			SCRIPT_TYPES(SCRIPT(room)) = 0;
+			LL_FOREACH(TRIGGERS(SCRIPT(room)), trig) {
+				SCRIPT_TYPES(SCRIPT(room)) |= GET_TRIG_TYPE(trig);
+			}
+		}
+		if (!TRIGGERS(SCRIPT(room))) {
+			extract_script(room, WLD_TRIGGER);
+		}
+	}
 }
 
 
@@ -5570,6 +5621,7 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 	char *srch;
 
 	// we may modify it as we go
+	skip_spaces(&rawroomstr);
 	strcpy(roomstr, rawroomstr);
 
 	if (!*roomstr) {
@@ -5599,6 +5651,7 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 	else if (isdigit(*roomstr) && (srch = strchr(roomstr, ','))) {
 		// coords
 		*(srch++) = '\0';
+		skip_spaces(&srch);
 		x = atoi(roomstr);
 		y = atoi(srch);
 		if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
@@ -5617,8 +5670,14 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 			send_to_char("No room exists with that number.\r\n", ch);
 		}
 	}
-	else if (ch && (target_mob = get_char_vis(ch, roomstr, FIND_CHAR_WORLD)) != NULL)
-		location = IN_ROOM(target_mob);
+	else if (ch && (target_mob = get_char_vis(ch, roomstr, FIND_CHAR_WORLD)) != NULL) {
+		if (WIZHIDE_OK(ch, target_mob)) {
+			location = IN_ROOM(target_mob);
+		}
+		else {
+			msg_to_char(ch, "That person is not available.\r\n");
+		}
+	}
 	else if (!ch && (target_mob = get_char_world(roomstr)) != NULL) {
 		location = IN_ROOM(target_mob);
 	}

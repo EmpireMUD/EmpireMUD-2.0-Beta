@@ -2445,8 +2445,13 @@ void do_abandon_room(char_data *ch, room_data *room) {
 		msg_to_char(ch, "Just abandon the main room.\r\n");
 	}
 	else {
-		if (room != IN_ROOM(ch) && has_ability(ch, ABIL_NAVIGATION)) {
-			msg_to_char(ch, "(%d, %d) abandoned.\r\n", X_COORD(room), Y_COORD(room));
+		if (room != IN_ROOM(ch)) {
+			if (has_ability(ch, ABIL_NAVIGATION)) {
+				msg_to_char(ch, "(%d, %d) %s abandoned.\r\n", X_COORD(room), Y_COORD(room), get_room_name(room, FALSE));
+			}
+			else {
+				msg_to_char(ch, "%s abandoned.\r\n", get_room_name(room, FALSE));
+			}
 			if (ROOM_PEOPLE(room)) {
 				act("$N abandons $S claim to this area.", FALSE, ROOM_PEOPLE(room), NULL, ch, TO_CHAR | TO_ROOM);
 			}
@@ -2492,13 +2497,13 @@ void do_abandon_vehicle(char_data *ch, vehicle_data *veh) {
 ACMD(do_abandon) {
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
+	room_data *room = IN_ROOM(ch);
 
 	if (IS_NPC(ch)) {
 		return;
 	}
 	
-	one_argument(argument, arg);
-	
+	one_word(argument, arg);
 	
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
@@ -2516,14 +2521,17 @@ ACMD(do_abandon) {
 	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
 		do_abandon_vehicle(ch, veh);
 	}
-	else if (*arg) {
-		msg_to_char(ch, "You don't see that to abandon.\r\n");
+	else if (*arg && !(room = find_target_room(ch, arg))) {
+		// sends own error
 	}
-	else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
-		do_abandon_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)));
+	else if (!(room = HOME_ROOM(room))) {
+		msg_to_char(ch, "You can't abandon that!\r\n");
+	}
+	else if (GET_ROOM_VEHICLE(room)) {
+		do_abandon_vehicle(ch, GET_ROOM_VEHICLE(room));
 	}
 	else {
-		do_abandon_room(ch, IN_ROOM(ch));
+		do_abandon_room(ch, room);
 	}
 }
 
@@ -2632,7 +2640,6 @@ ACMD(do_barde) {
 
 
 ACMD(do_cede) {
-	char arg2[MAX_INPUT_LENGTH];
 	empire_data *e = GET_LOYALTY(ch), *f;
 	room_data *room, *iter, *next_iter;
 	char_data *targ;
@@ -2640,9 +2647,10 @@ ACMD(do_cede) {
 
 	if (IS_NPC(ch))
 		return;
-
+	
+	room = HOME_ROOM(IN_ROOM(ch));
 	argument = one_argument(argument, arg);
-	any_one_word(argument, arg2);
+	skip_spaces(&argument);
 
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
@@ -2660,21 +2668,18 @@ ACMD(do_cede) {
 	else if (!PRF_FLAGGED(targ, PRF_BOTHERABLE)) {
 		msg_to_char(ch, "You can't cede land to someone with 'bother' toggled off.\r\n");
 	}
-	else if (*arg2 && !strstr(arg2, ",")) {
-		msg_to_char(ch, "Usage: cede <person> (x, y)\r\n");
+	else if (*argument && strchr(argument, ',')) {
+		msg_to_char(ch, "You can only cede the land you're standing on.\r\n");
 	}
-	else if (!(*arg2 ? (room = find_target_room(ch, arg2)) : (room = IN_ROOM(ch)))) {
-		msg_to_char(ch, "Invalid location.\r\n");
-	}
-	else if (!(room = HOME_ROOM(room))) {
-		// dummy error can't actually happen, but does set the variable in the sloppiest way possible...
+	else if (GET_ROOM_VEHICLE(room)) {
+		msg_to_char(ch, "You can't cede the inside of a vehicle.\r\n");
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_CEDE)) {
 		// don't use has_permission here because it would check permits on the room you're in
 		msg_to_char(ch, "You don't have permission to cede.\r\n");
 	}
 	else if (ROOM_OWNER(room) != e)
-		msg_to_char(ch, "You don't even own %s acre.\r\n", room == IN_ROOM(ch) ? "this" : "that");
+		msg_to_char(ch, "You don't even own this location.\r\n");
 	else if (ROOM_PRIVATE_OWNER(room) != NOBODY) {
 		msg_to_char(ch, "You can't cede a private house.\r\n");
 	}
@@ -3992,7 +3997,7 @@ ACMD(do_esay) {
 			clear_last_act_message(ch->desc);
 		}
 
-		sprintf(color, "\t%c", GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) : '0');
+		sprintf(color, "%s\t%c", EXPLICIT_BANNER_TERMINATOR(e), GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) : '0');
 		if (extra_color) {
 			sprintf(output, buf, color, color, color);
 		}
@@ -4016,7 +4021,7 @@ ACMD(do_esay) {
 		else {
 			clear_last_act_message(d);
 			
-			sprintf(color, "\t%c", GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) : '0');
+			sprintf(color, "%s\t%c", EXPLICIT_BANNER_TERMINATOR(e), GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) : '0');
 			sprintf(output, buf, color, color);
 			act(output, FALSE, ch, 0, tch, TO_VICT | TO_SLEEP | TO_NODARK);
 			

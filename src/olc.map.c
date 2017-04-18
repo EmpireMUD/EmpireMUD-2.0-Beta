@@ -20,6 +20,7 @@
 #include "comm.h"
 #include "olc.h"
 #include "vnums.h"
+#include "dg_scripts.h"
 
 /**
 * Contents:
@@ -448,6 +449,7 @@ OLC_MODULE(mapedit_exits) {
 			if (ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)))) {
 				perform_claim_room(to_room, ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))));
 			}
+			complete_wtrigger(to_room);
 		}
 
 		create_exit(IN_ROOM(ch), to_room, dir, TRUE);
@@ -677,7 +679,10 @@ OLC_MODULE(mapedit_roomtype) {
 		msg_to_char(ch, "What type of room would you like to set (use 'vnum b <name>' to search)?\r\n");
 	}
 	else {
+		dismantle_wtrigger(IN_ROOM(ch), ch, FALSE);
+		detach_building_from_room(IN_ROOM(ch));
 		attach_building_to_room(id, IN_ROOM(ch), TRUE);
 		msg_to_char(ch, "This room is now %s %s.\r\n", AN(GET_BLD_NAME(id)), GET_BLD_NAME(id));
+		complete_wtrigger(IN_ROOM(ch));
 	}
 }

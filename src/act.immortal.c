@@ -69,6 +69,7 @@ void check_delayed_load(char_data *ch);
 void clear_char_abilities(char_data *ch, any_vnum skill);
 void delete_instance(struct instance_data *inst);	// instance.c
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
+extern int get_highest_access_level(account_data *acct);
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
 void get_resource_display(struct resource_data *list, char *save_buffer);
@@ -1674,7 +1675,11 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		sprintf(output, "%s's %s set to %d", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
 
-	else if SET_CASE("account") {		
+	else if SET_CASE("account") {
+		if (get_highest_access_level(GET_ACCOUNT(vict)) > GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You can't edit accounts for people above your access level.\r\n");
+			return 0;
+		}
 		if (!str_cmp(val_arg, "new")) {
 			sprintf(output, "%s is now associated with a new account", GET_NAME(vict));
 			remove_player_from_account(vict);
@@ -1683,6 +1688,14 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		else {
 			// load 2nd player
 			if ((alt = find_or_load_player(val_arg, &file))) {
+				if (get_highest_access_level(GET_ACCOUNT(alt)) > GET_ACCESS_LEVEL(ch)) {
+					msg_to_char(ch, "You can't edit accounts for people above your access level.\r\n");
+					if (file) {
+						free_char(alt);
+					}
+					return 0;
+				}
+				
 				sprintf(output, "%s is now associated with %s's account", GET_NAME(vict), GET_NAME(alt));
 				
 				remove_player_from_account(vict);
@@ -2155,10 +2168,12 @@ SHOW(show_stats) {
 	extern int total_accounts, active_accounts, active_accounts_week;
 	
 	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_vehs = 0, num_players = 0, num_descs = 0, menu_count = 0;
+	int num_trigs = 0;
 	empire_data *emp, *next_emp;
 	descriptor_data *desc;
 	vehicle_data *veh;
 	char_data *vict;
+	trig_data *trig;
 	obj_data *obj;
 	
 	// count descriptors at menus
@@ -2184,6 +2199,7 @@ SHOW(show_stats) {
 	// other counts
 	LL_COUNT(object_list, obj, num_objs);
 	LL_COUNT(vehicle_list, veh, num_vehs);
+	LL_COUNT(trigger_list, trig, num_trigs);
 
 	// count active empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -2206,7 +2222,13 @@ SHOW(show_stats) {
 	msg_to_char(ch, "  %6d adventures       %6d total rooms\r\n", HASH_COUNT(adventure_table), HASH_COUNT(world_table));
 	msg_to_char(ch, "  %6d buildings        %6d room templates\r\n", HASH_COUNT(building_table), HASH_COUNT(room_template_table));
 	msg_to_char(ch, "  %6d sectors          %6d crops\r\n", HASH_COUNT(sector_table), HASH_COUNT(crop_table));
-	msg_to_char(ch, "  %6d triggers         %6d craft recipes\r\n", HASH_COUNT(trigger_table), HASH_COUNT(craft_table));
+	msg_to_char(ch, "  %6d triggers         %6d prototypes\r\n", num_trigs, HASH_COUNT(trigger_table));
+	msg_to_char(ch, "  %6d craft recipes    %6d quests\r\n", HASH_COUNT(craft_table), HASH_COUNT(quest_table));
+	msg_to_char(ch, "  %6d archetypes       %6d books\r\n", HASH_COUNT(archetype_table), HASH_COUNT(book_table));
+	msg_to_char(ch, "  %6d classes          %6d skills\r\n", HASH_COUNT(class_table), HASH_COUNT(skill_table));
+	msg_to_char(ch, "  %6d abilities        %6d factions\r\n", HASH_COUNT(ability_table), HASH_COUNT(faction_table));
+	msg_to_char(ch, "  %6d globals          %6d morphs\r\n", HASH_COUNT(globals_table), HASH_COUNT(morph_table));
+	msg_to_char(ch, "  %6d socials\r\n", HASH_COUNT(social_table));
 	msg_to_char(ch, "  %6d large bufs       %6d buf switches\r\n", buf_largecount, buf_switches);
 	msg_to_char(ch, "  %6d overflows\r\n", buf_overflows);
 }
@@ -5484,7 +5506,7 @@ ACMD(do_hostile) {
 	one_argument(argument, arg);
 	
 	if (!*arg) {
-		msg_to_char(ch, "Mark whom hostile?r\n");
+		msg_to_char(ch, "Mark whom hostile?\r\n");
 	}
 	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
 		send_config_msg(ch, "no_person");
@@ -5596,6 +5618,10 @@ ACMD(do_island) {
 		outsize = snprintf(output, sizeof(output), "Islands:\r\n");
 		
 		HASH_ITER(hh, island_table, isle, next_isle) {
+			if (*argument && !multi_isname(argument, isle->name)) {
+				continue;
+			}
+			
 			center = real_room(isle->center);
 			
 			snprintf(line, sizeof(line), "%2d. %s (%d, %d), size %d", isle->id, isle->name, (center ? FLAT_X_COORD(center) : -1), (center ? FLAT_Y_COORD(center) : -1), isle->tile_size);
@@ -6171,6 +6197,10 @@ ACMD(do_reboot) {
 		reboot_control.time = time + 1;	// minutes
 		reboot_control.type = subcmd;
 	}
+	
+	if (subcmd == SCMD_REBOOT) {
+		reboot_control.level = SHUTDOWN_NORMAL;	// prevent a reboot from using a shutdown type
+	}
 
 	if (reboot_control.immediate) {
 		msg_to_char(ch, "Rebooting momentarily...\r\n");
@@ -6280,6 +6310,7 @@ ACMD(do_reload) {
 		return;
 	}
 
+	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has reloaded: %s", GET_NAME(ch), arg);
 	send_config_msg(ch, "ok_string");
 }
 
@@ -6368,11 +6399,6 @@ ACMD(do_restore) {
 	else if (!(vict = get_char_vis(ch, buf, FIND_CHAR_WORLD)))
 		send_config_msg(ch, "no_person");
 	else {
-		GET_HEALTH(vict) = GET_MAX_HEALTH(vict);
-		GET_MOVE(vict) = GET_MAX_MOVE(vict);
-		GET_MANA(vict) = GET_MAX_MANA(vict);
-		GET_BLOOD(vict) = GET_MAX_BLOOD(vict);
-		
 		// remove DoTs
 		while (vict->over_time_effects) {
 			dot_remove(vict, vict->over_time_effects);
@@ -6426,6 +6452,11 @@ ACMD(do_restore) {
 				}
 			}
 		}
+		
+		GET_HEALTH(vict) = GET_MAX_HEALTH(vict);
+		GET_MOVE(vict) = GET_MAX_MOVE(vict);
+		GET_MANA(vict) = GET_MAX_MANA(vict);
+		GET_BLOOD(vict) = GET_MAX_BLOOD(vict);
 		
 		update_pos(vict);
 		if (ch != vict) {
@@ -6803,7 +6834,7 @@ ACMD(do_stat) {
 		if (!*buf2)
 			send_to_char("Stats on which mobile?\r\n", ch);
 		else {
-			if ((victim = get_char_vis(ch, buf2, FIND_CHAR_WORLD)) != NULL)
+			if ((victim = get_char_vis(ch, buf2, FIND_CHAR_WORLD | FIND_NPC_ONLY)) != NULL)
 				do_stat_character(ch, victim);
 			else
 				send_to_char("No such mobile around.\r\n", ch);

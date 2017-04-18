@@ -796,13 +796,16 @@ See also: ALTERNATE
 #
 NEARBY
 
-Usage:  nearby
+Usage:  nearby [type]
 
 This command lists nearby starting locations and cities, with the distances to
 them. This can help you figure out where to found a new city. It can also find
 some adventure zones.
 
 If you have the Navigation ability, this will also include the location.
+
+You can specify what type of thing to look (cities, adventures, starting
+locations) if you want a shorter list.
 #
 PLAYERKILLING "PLAYER KILLING" PK PVP
 

@@ -33,9 +33,10 @@
 #define FIND_OBJ_ROOM		BIT(3)
 #define FIND_OBJ_WORLD		BIT(4)
 #define FIND_OBJ_EQUIP		BIT(5)
-#define FIND_NO_DARK		BIT(6)
+#define FIND_NO_DARK		BIT(6)	// ignores light
 #define FIND_VEHICLE_ROOM	BIT(7)
 #define FIND_VEHICLE_INSIDE	BIT(8)
+#define FIND_NPC_ONLY		BIT(9)	// ignores players
 
 
 // for the interaction handlers (returns TRUE if the character performs the interaction; FALSE if it aborts)
@@ -247,6 +248,7 @@ void set_depletion(room_data *room, int type, int value);
 // room handlers
 void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers);
 void attach_template_to_room(room_template *rmt, room_data *room);
+void detach_building_from_room(room_data *room);
 
 // room extra data handlers
 void add_to_room_extra_data(room_data *room, int type, int add_value);

@@ -354,7 +354,7 @@ wait 3 sec
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
   halt
 end
-mkill %actor%
+%aggro% %actor%
 ~
 #11114
 Loch colossus greet/aggro~
@@ -385,7 +385,7 @@ wait 3 sec
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
   halt
 end
-mkill %actor%
+%aggro% %actor%
 ~
 #11115
 Vehicle Coupon Summon~
@@ -598,7 +598,7 @@ global sarcophagus_running
 %load% mob 11138
 %load% obj 11140
 makeuid snake mob titanaconda
-%force% %snake% mkill %actor%
+%force% %snake% %aggro% %actor%
 %purge% %self%
 eval sarcophagus_running 0
 global sarcophagus_running
@@ -659,7 +659,7 @@ if %random.4% == 4
   %load% mob 11137
   makeuid dragonfly mob dragonfly
   if %self.carried_by%
-    %force% %dragonfly% mkill %self.carried_by%
+    %force% %dragonfly% %aggro% %self.carried_by%
   else
     %force% %dragonfly% outrage
   end

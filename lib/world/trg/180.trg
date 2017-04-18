@@ -71,9 +71,9 @@ if %phase%==2
       %echo% %self.name% whistles with a sound like escaping steam...
       %echo% A pair of fire elementals appear!
       %load% mob 18077 ally %self.level%
-      %force% %room.people% mkill %actor%
+      %force% %room.people% %aggro% %actor%
       %load% mob 18077 ally %self.level%
-      %force% %room.people% mkill %actor%
+      %force% %room.people% %aggro% %actor%
       %echo% %self.name% looks exhausted!
       *Ensure that no other abilities are used while the elementals are up:
       dg_affect %self% STUNNED on 30

@@ -572,6 +572,18 @@ Example:
 
 See also: CONTEXT, MTRIG VARS, RDELETE, VDELETE, TRIG-SET
 #d
+%RESTORE% MRESTORE ORESTORE VRESTORE WRESTORE
+
+Usage:  %restore% [target]
+
+This command heals/restores/fixes the target. Specifically:
+ mobs/players: health, DoTs, negative effects
+ vehicles: burning, damage, maintenance
+ rooms/buildings: burning, damage, maintenance
+ objects: no current function
+
+Without an argument, this command restores the thing running the script.
+#d
 "RETURN STATEMENT" TRIG-RETURN
  
 Usage:  return 0

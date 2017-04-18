@@ -547,8 +547,14 @@ void perform_unload_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont
 * @param char_data *ch The character doing the driving.
 */
 void process_driving(char_data *ch) {
+	extern int get_north_for_char(char_data *ch);
+	extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
+	
 	int dir = GET_ACTION_VNUM(ch, 0), subcmd = GET_ACTION_VNUM(ch, 2);
 	vehicle_data *veh;
+	
+	// translate 'dir' from the way the character THINKS he's going, to the actual way
+	dir = confused_dirs[get_north_for_char(ch)][0][dir];
 	
 	// not got a vehicle?
 	if ((!(veh = GET_SITTING_ON(ch)) && !(veh = GET_ROOM_VEHICLE(IN_ROOM(ch)))) || !VEH_FLAGGED(veh, drive_data[subcmd].flag)) {
@@ -930,6 +936,9 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 	}
 	else if (VEH_DRIVER(veh)) {
 		msg_to_char(ch, "You can't lead it while someone else is controlling it.\r\n");
+	}
+	else if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
+		msg_to_char(ch, "You don't have permission to sit %s that.\r\n", IN_OR_ON(veh));
 	}
 	else if (GET_LEADING_VEHICLE(ch) || GET_LEADING_MOB(ch)) {
 		msg_to_char(ch, "You can't sit %s it while you're leading something.\r\n", IN_OR_ON(veh));
@@ -1577,6 +1586,9 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 	else if (!VEH_FLAGGED(veh, VEH_CAN_PORTAL)) {
 		act("$V can't go through portals.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
+	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+		act("You don't have permission to use $V.", FALSE, ch, NULL, veh, TO_CHAR);
+	}
 	else if (IN_ROOM(veh) != IN_ROOM(portal)) {
 		snprintf(buf, sizeof(buf), "You can't %s through $p because it's not in the same room as $V.", drive_data[subcmd].command);
 		act(buf, FALSE, ch, portal, veh, TO_CHAR);
@@ -1627,6 +1639,7 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 }
 
 
+// do_sail, do_pilot (search hints)
 ACMD(do_drive) {
 	char dir_arg[MAX_INPUT_LENGTH], dist_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct vehicle_room_list *vrl;
@@ -1667,7 +1680,7 @@ ACMD(do_drive) {
 	else if (veh == GET_ROOM_VEHICLE(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT)) {
 		msg_to_char(ch, "You can't %s here because you can't see outside.\r\n", drive_data[subcmd].command);
 	}
-	else if (veh == GET_ROOM_VEHICLE(IN_ROOM(ch)) && !can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to %s this.\r\n", drive_data[subcmd].command);
 	}
 	else if (VEH_DRIVER(veh) && VEH_DRIVER(veh) != ch) {
@@ -1707,11 +1720,13 @@ ACMD(do_drive) {
 		send_to_char(buf, ch);
 	}
 	else {
+		// 'dir' is the way we are ACTUALLY going, but we store the direction the character thinks it is
+		
 		was_driving = (GET_ACTION(ch) == drive_data[subcmd].action);
-		same_dir = (was_driving && (dir == GET_ACTION_VNUM(ch, 0)));
+		same_dir = (was_driving && (get_direction_for_char(ch, dir) == GET_ACTION_VNUM(ch, 0)));
 		GET_ACTION(ch) = ACT_NONE;	// prevents a stops-moving message
 		start_action(ch, drive_data[subcmd].action, 0);
-		GET_ACTION_VNUM(ch, 0) = dir;
+		GET_ACTION_VNUM(ch, 0) = get_direction_for_char(ch, dir);
 		GET_ACTION_VNUM(ch, 1) = dist;	// may be -1 for continuous
 		GET_ACTION_VNUM(ch, 2) = subcmd;
 		
@@ -2171,6 +2186,9 @@ ACMD(do_repair) {
 	}
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "You can't repair it while it's on fire!\r\n");
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to repair anything here.\r\n");
 	}
 	else {
 		start_action(ch, ACT_REPAIRING, -1);

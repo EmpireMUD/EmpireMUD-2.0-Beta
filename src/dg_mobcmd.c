@@ -64,6 +64,7 @@ extern struct instance_data *get_instance_by_mob(char_data *mob);
 extern room_data *get_room(room_data *ref, char *name);
 extern vehicle_data *get_vehicle(char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
+extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern room_data *obj_room(obj_data *obj);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
@@ -136,6 +137,96 @@ ACMD(do_madventurecomplete) {
 	
 	if ((inst = quest_instance_global) || (inst = get_instance_by_mob(ch))) {
 		mark_instance_completed(inst);
+	}
+}
+
+
+// attempts to aggro the player, his party, or any PC present (in order)
+ACMD(do_maggro) {
+	char_data *iter, *next_iter, *victim = NULL;
+	char arg[MAX_INPUT_LENGTH];
+
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	
+	// argument is optional (preferred target)
+	one_argument(argument, arg);
+	if (*arg) {
+		if (*arg == UID_CHAR) {
+			if (!(victim = get_char(arg))) {
+				mob_log(ch, "maggro: victim (%s) not found", arg);
+				return;
+			}
+		}
+		else if (!(victim = get_char_room_vis(ch, arg))) {
+			mob_log(ch, "maggro: victim (%s) not found",arg);
+			return;
+		}
+	
+		if (victim == ch) {
+			mob_log(ch, "maggro: victim is self");
+			return;
+		}
+		if (IN_ROOM(victim) != IN_ROOM(ch)) {
+			mob_log(ch, "maggro: victim is in wrong room");
+			return;
+		}
+		if (!valid_dg_target(victim, DG_ALLOW_GODS)) {
+			mob_log(ch, "maggro: target is invalid");
+			return;
+		}
+	}
+	
+	// stand if needed
+	if (GET_POS(ch) < POS_FIGHTING) {
+		GET_POS(ch) = POS_STANDING;
+	}
+	
+	// attempt victim first
+	if (victim && can_fight(ch, victim)) {
+		hit(ch, victim, GET_EQ(ch, WEAR_WIELD), FALSE);
+		
+		// ensure hitting the right person (in this case only)
+		if (victim && !EXTRACTED(victim) && !IS_DEAD(victim) && FIGHTING(ch) && FIGHTING(ch) != victim) {
+			FIGHTING(ch) = victim;
+		}
+		return;
+	}
+	
+	// if we got here, we missed the victim -- look for his allies
+	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
+		if (iter == ch || is_fight_ally(ch, iter)) {
+			continue;
+		}
+		if (victim && !is_fight_ally(victim, iter)) {
+			continue;	// only looking for allies
+		}
+		if (IS_NPC(iter) && victim) {
+			continue;	// not hitting mobs here (unless they are allies)
+		}
+		if (!can_fight(ch, iter)) {
+			continue;
+		}
+		
+		// success!
+		hit(ch, iter, GET_EQ(ch, WEAR_WIELD), FALSE);
+		return;
+	}
+	
+	// okay, look for a broader target
+	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
+		if (iter == ch || is_fight_ally(ch, iter)) {
+			continue;
+		}
+		if (!can_fight(ch, iter)) {
+			continue;
+		}
+		
+		// success!
+		hit(ch, iter, GET_EQ(ch, WEAR_WIELD), FALSE);
+		return;
 	}
 }
 
@@ -993,6 +1084,118 @@ ACMD(do_mbuild) {
 
 	// good to go
 	do_dg_build(target, bld_arg);
+}
+
+
+ACMD(do_mrestore) {
+	extern const bool aff_is_bad[];
+	extern const double apply_values[];
+	
+	struct affected_type *aff, *next_aff;
+	char arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh = NULL;
+	char_data *victim = NULL;
+	obj_data *obj = NULL;
+	room_data *room = NULL;
+	bitvector_t bitv;
+	bool done_aff;
+	int pos;
+	
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED) || (ch->desc && (GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL))) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	
+	one_argument(argument, arg);
+	
+	// find a target
+	if (!*arg) {
+		victim = ch;
+	}
+	else if (!str_cmp(arg, "room") || !str_cmp(arg, "building")) {
+		room = IN_ROOM(ch);
+	}
+	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg))) {
+		// found victim
+	}
+	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_in_room_vis(ch, arg))) {
+		// found vehicle
+		if (!VEH_IS_COMPLETE(veh)) {
+			mob_log(ch, "mrestore: used on unfinished vehicle");
+			return;
+		}
+	}
+	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_vis(ch, arg))) {
+		// found obj
+	}
+	else if ((room = find_target_room(ch, arg))) {
+		// found room
+	}
+	else {
+		// bad arg
+		mob_log(ch, "mrestore: bad argument");
+		return;
+	}
+	
+	if (room) {
+		room = HOME_ROOM(room);
+		if (!IS_COMPLETE(room)) {
+			mob_log(ch, "mrestore: used on unfinished building");
+			return;
+		}
+	}
+	
+	// perform the restoration
+	if (victim) {
+		while (victim->over_time_effects) {
+			dot_remove(victim, victim->over_time_effects);
+		}
+		LL_FOREACH_SAFE(victim->affected, aff, next_aff) {
+			// can't cleanse penalties (things cast by self)
+			if (aff->cast_by == CAST_BY_ID(victim)) {
+				continue;
+			}
+			
+			done_aff = FALSE;
+			if (aff->location != APPLY_NONE && (apply_values[(int) aff->location] == 0.0 || aff->modifier < 0)) {
+				affect_remove(victim, aff);
+				done_aff = TRUE;
+			}
+			if (!done_aff && (bitv = aff->bitvector) != NOBITS) {
+				// check each bit
+				for (pos = 0; bitv && !done_aff; ++pos, bitv >>= 1) {
+					if (IS_SET(bitv, BIT(0)) && aff_is_bad[pos]) {
+						affect_remove(victim, aff);
+						done_aff = TRUE;
+					}
+				}
+			}
+		}
+		if (GET_POS(victim) < POS_SLEEPING) {
+			GET_POS(victim) = POS_STANDING;
+		}
+		GET_HEALTH(victim) = GET_MAX_HEALTH(victim);
+		GET_MOVE(victim) = GET_MAX_MOVE(victim);
+		GET_MANA(victim) = GET_MAX_MANA(victim);
+		GET_BLOOD(victim) = GET_MAX_BLOOD(victim);
+	}
+	if (obj) {
+		// not sure what to do for objs
+	}
+	if (veh) {
+		free_resource_list(VEH_NEEDS_RESOURCES(veh));
+		VEH_NEEDS_RESOURCES(veh) = NULL;
+		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
+		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+	}
+	if (room) {
+		if (COMPLEX_DATA(room)) {
+			free_resource_list(GET_BUILDING_RESOURCES(room));
+			GET_BUILDING_RESOURCES(room) = NULL;
+			COMPLEX_DATA(room)->damage = 0;
+			COMPLEX_DATA(room)->burning = 0;
+		}
+	}
 }
 
 

@@ -400,9 +400,9 @@ a bolt of cotton cloth~
 A bolt of cotton cloth is lying on the ground.~
 This simple cloth is used to sew clothing.
 ~
-3 l a 6
+3 l a 7
 0 0 0
-7 0
+11 0
 M
 6
 You hang some cloth on $V.~
@@ -422,9 +422,9 @@ a bolt of wool cloth~
 A bolt of wool cloth is sitting here.~
 This simple cloth is used to sew clothing.
 ~
-3 l a 7
+3 l a 8
 0 0 0
-7 0
+11 0
 M
 6
 You hang some cloth on $V.~

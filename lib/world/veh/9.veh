@@ -110,7 +110,7 @@ canoe wooden~
 a wooden canoe~
 There is a wooden canoe here.~
    The canoe is carved from the trunk of an old tree. You can 'drag' the canoe
-to the edge of the water, 'sit' in it, and then type 'sail <direction>'.  
+to the edge of the water, 'sit' in it, and then type 'sail <direction>'.
 ~
 ~
 cfghln 3 3 0 0
@@ -136,6 +136,19 @@ R
 R
 20 1 1 0
 T 921
+S
+#922
+raft wooden~
+a wooden raft~
+There is a wooden raft here.~
+   The raft is made from rough desert wood, loosely bound together with twigs.
+You can 'drag' the raft to the edge of the water, 'sit' on it, then type 'sail
+<direction>'.  
+~
+~
+cfhln 3 3 0 0
+R
+3 1 5 0
 S
 #952
 caravel lanteen-rigged~
