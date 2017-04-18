@@ -54,6 +54,7 @@
 #include "vnums.h"
 
 // external vars
+extern const char *alt_dirs[];
 extern const char *damage_types[];
 extern const char *dirs[];
 extern struct instance_data *quest_instance_global;
@@ -2006,7 +2007,7 @@ ACMD(do_mdoor) {
 		return;
 	}
 
-	if ((dir = search_block(direction, dirs, FALSE)) == NO_DIR) {
+	if ((dir = search_block(direction, dirs, FALSE)) == NO_DIR && (dir = search_block(direction, alt_dirs, FALSE)) == NO_DIR) {
 		mob_log(ch, "mdoor: invalid direction");
 		return;
 	}

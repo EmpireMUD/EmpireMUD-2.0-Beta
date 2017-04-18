@@ -412,7 +412,7 @@ WCMD(do_wdoor) {
 		return;
 	}
 
-	if ((dir = search_block(direction, dirs, FALSE)) == NOTHING) {
+	if ((dir = search_block(direction, dirs, FALSE)) == NO_DIR && (dir = search_block(direction, alt_dirs, FALSE)) == NO_DIR) {
 		wld_log(room, "wdoor: invalid direction");
 		return;
 	}

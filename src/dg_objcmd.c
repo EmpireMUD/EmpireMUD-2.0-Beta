@@ -1403,7 +1403,7 @@ OCMD(do_odoor) {
 		return;
 	}
 
-	if ((dir = search_block(direction, dirs, FALSE)) == NOTHING) {
+	if ((dir = search_block(direction, dirs, FALSE)) == NO_DIR && (dir = search_block(direction, alt_dirs, FALSE)) == NO_DIR) {
 		obj_log(obj, "odoor: invalid direction");
 		return;
 	}

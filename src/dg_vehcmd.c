@@ -1219,7 +1219,7 @@ VCMD(do_vdoor) {
 		return;
 	}
 
-	if ((dir = search_block(direction, dirs, FALSE)) == NOTHING) {
+	if ((dir = search_block(direction, dirs, FALSE)) == NO_DIR && (dir = search_block(direction, alt_dirs, FALSE)) == NO_DIR) {
 		veh_log(veh, "vdoor: invalid direction");
 		return;
 	}
