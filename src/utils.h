@@ -241,7 +241,7 @@
  //////////////////////////////////////////////////////////////////////////////
 //// CAN SEE VEHICLE UTILS ///////////////////////////////////////////////////////
 
-#define MORT_CAN_SEE_VEHICLE(sub, veh)  (LIGHT_OK(sub))
+#define MORT_CAN_SEE_VEHICLE(sub, veh)  (LIGHT_OK(sub) || VEH_DRIVER(veh) == (sub) || VEH_LED_BY(veh) == (sub) || VEH_SITTING_ON(veh) == (sub) || GET_ROOM_VEHICLE(IN_ROOM(sub)) == (veh))
 #define CAN_SEE_VEHICLE(sub, veh)  (MORT_CAN_SEE_VEHICLE(sub, veh) || (!IS_NPC(sub) && PRF_FLAGGED((sub), PRF_HOLYLIGHT)))
 
 
