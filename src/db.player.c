@@ -3531,6 +3531,9 @@ void set_title(char_data *ch, char *title) {
 
 	if (title == NULL)
 		title = "the newbie";
+	else {
+		title = trim(title);
+	}
 
 	if (GET_TITLE(ch) != NULL)
 		free(GET_TITLE(ch));
