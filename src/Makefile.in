@@ -301,7 +301,7 @@ olc.global.o: olc.global.c conf.h sysdep.h structs.h uthash.h utils.h \
   interpreter.h db.h comm.h olc.h skills.h handler.h
 	$(CC) -c $(CFLAGS) olc.global.c
 olc.map.o: olc.map.c conf.h sysdep.h structs.h uthash.h utils.h \
-  interpreter.h handler.h db.h comm.h olc.h vnums.h
+  interpreter.h handler.h db.h comm.h olc.h vnums.h dg_scripts.h
 	$(CC) -c $(CFLAGS) olc.map.c
 olc.mobile.o: olc.mobile.c conf.h sysdep.h structs.h uthash.h utils.h \
   interpreter.h db.h comm.h olc.h skills.h handler.h dg_scripts.h

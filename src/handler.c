@@ -73,6 +73,7 @@ const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
 void adjust_building_tech(empire_data *emp, room_data *room, bool add);
+void extract_trigger(trig_data *trig);
 void scale_item_to_level(obj_data *obj, int level);
 
 // locals
@@ -5420,6 +5421,63 @@ void attach_template_to_room(room_template *rmt, room_data *room) {
 		COMPLEX_DATA(room) = init_complex_data();
 	}
 	COMPLEX_DATA(room)->rmt_ptr = rmt;
+}
+
+
+/**
+* Sets the building data on a room. If the room isn't already complex, this
+* will automatically add complex data. This should always be called with
+* triggers unless you're loading saved rooms from a file, or some other place
+* where triggers might have been detached.
+*
+* @param bld_data *bld The building prototype (from building_table).
+* @param room_data *room The world room to attach it to.
+* @param bool with_triggers If TRUE, attaches triggers too.
+*/
+void detach_building_from_room(room_data *room) {
+	struct trig_proto_list *tpl, *next_tpl, *search;
+	trig_data *trig, *next_trig;
+	bld_data *bld;
+	bool any;
+	
+	if (!room) {
+		log("SYSERR: detach_building_from_room called without room");
+		return;
+	}
+	if (!COMPLEX_DATA(room) || !(bld = COMPLEX_DATA(room)->bld_ptr)) {
+		return;	// nothing to do
+	}
+	
+	COMPLEX_DATA(room)->bld_ptr = NULL;
+	LL_FOREACH_SAFE(room->proto_script, tpl, next_tpl) {
+		LL_SEARCH_SCALAR(GET_BLD_SCRIPTS(bld), search, vnum, tpl->vnum);
+		if (search) {	// matching vnum on the proto
+			LL_DELETE(room->proto_script, tpl);
+			free(tpl);
+		}
+	}
+	
+	if (SCRIPT(room)) {
+		any = FALSE;
+		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), trig, next_trig) {
+			LL_SEARCH_SCALAR(GET_BLD_SCRIPTS(bld), search, vnum, GET_TRIG_VNUM(trig));
+			if (search) {	// matching vnum on the proto
+				LL_DELETE(TRIGGERS(SCRIPT(room)), trig);
+				extract_trigger(trig);
+				any = TRUE;
+			}
+		}
+		
+		if (any) {	// update script types
+			SCRIPT_TYPES(SCRIPT(room)) = 0;
+			LL_FOREACH(TRIGGERS(SCRIPT(room)), trig) {
+				SCRIPT_TYPES(SCRIPT(room)) |= GET_TRIG_TYPE(trig);
+			}
+		}
+		if (!TRIGGERS(SCRIPT(room))) {
+			extract_script(room, WLD_TRIGGER);
+		}
+	}
 }
 
 

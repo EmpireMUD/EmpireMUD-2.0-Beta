@@ -336,6 +336,9 @@ void disassociate_building(room_data *room) {
 	}
 	
 	dismantle_wtrigger(room, NULL, FALSE);
+	if (GET_BUILDING(room)) {
+		detach_building_from_room(room);
+	}
 	delete_room_npcs(room, NULL);
 	
 	// remove bits including dismantle
@@ -1724,12 +1727,7 @@ ACMD(do_designate) {
 				}
 			}
 			
-			// remove any attached scripts
-			if (SCRIPT(new)) {
-				extract_script(new, WLD_TRIGGER);
-			}
-			free_proto_scripts(&new->proto_script);
-			
+			detach_building_from_room(new);
 			attach_building_to_room(type, new, TRUE);
 		}
 		else {
@@ -2175,7 +2173,9 @@ ACMD(do_upgrade) {
 		else {
 			// it's good!
 			start_action(ch, ACT_BUILDING, 0);
-
+			
+			dismantle_wtrigger(IN_ROOM(ch), NULL, FALSE);
+			detach_building_from_room(IN_ROOM(ch));
 			attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(type)), IN_ROOM(ch), TRUE);
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
 			SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);

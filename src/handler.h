@@ -248,6 +248,7 @@ void set_depletion(room_data *room, int type, int value);
 // room handlers
 void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers);
 void attach_template_to_room(room_template *rmt, room_data *room);
+void detach_building_from_room(room_data *room);
 
 // room extra data handlers
 void add_to_room_extra_data(room_data *room, int type, int add_value);
