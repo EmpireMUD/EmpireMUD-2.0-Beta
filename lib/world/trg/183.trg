@@ -63,7 +63,7 @@ switch %random.4%
       eval summon %room.people%
       if %summon.vnum% == 18302
         %echo% %self.name% summons %summon.name%, and directs them to attack %actor.name%!
-        %force% %summon% mkill %actor%
+        %force% %summon% %aggro% %actor%
       end
     else
       * Jackal
@@ -71,7 +71,7 @@ switch %random.4%
       eval summon %room.people%
       if %summon.vnum% == 18301
         %echo% %self.name% summons %summon.name%, and directs it to attack %actor.name%!
-        %force% %summon% mkill %actor%
+        %force% %summon% %aggro% %actor%
       end
     end
     wait 30 sec

@@ -235,7 +235,7 @@ end
 eval room_var %self.room%
 eval mob %room_var.people%
 if (%mob% && %mob.vnum% == %self.val0%)
-%own% %mob% %actor.empire%
+  %own% %mob% %actor.empire%
   %send% %actor% You use %self.shortdesc% and %mob.name% appears!
   %echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
 end

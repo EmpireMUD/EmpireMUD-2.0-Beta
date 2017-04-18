@@ -57,7 +57,7 @@ else
       makeuid rat mob rat
       if %rat%
         %echo% %rat.name% scurries out from a cage!
-        %force% %rat% mkill %actor%
+        %force% %rat% %aggro% %actor%
       end
     break
     case 3
@@ -179,26 +179,28 @@ Tranc combat~
 0 k 15
 ~
 wait 10
-* spawn dog if not present
-makeuid hound mob black-haired
-makeuid corpse obj hound
-if !%hound% && !%corpse%
-  %echo% Tranc whistles loudly!
-  %load% mob 10108 ally
-  makeuid hound mob black-haired
-  if %hound%
-    echo %hound.name% appears!
-    %force% %hound% mkill %actor%
+* If dog summoned, tank
+if %self.varexists(hound)%
+  if %self.hound%
+    if !%actor.affect(disarm)%
+      disarm
+    elseif %self.health% < (%self.maxhealth% / 2)
+      %echo% Tranc quaffs a potion!
+      %damage% %self% -50
+    end
+    halt
   end
-  halt
 end
-* Otherwise, tanking
-if !%actor.affect(disarm)%
-  disarm
-elseif %self.health% < (%self.maxhealth% / 2)
-  %echo% Tranc quaffs a potion!
-  %damage% %self% -50
+* Otherwise, summon dog
+%echo% Tranc whistles loudly!
+%load% mob 10108 ally
+makeuid hound mob black-haired
+if %hound%
+  echo %hound.name% appears!
+  %force% %hound% %aggro% %actor%
 end
+set hound 1
+remote hound %self.id%
 ~
 #10108
 Liza the Hound combat~
@@ -214,7 +216,7 @@ switch %random.3%
       if %test% && %ch.maxmana% > %actor.maxmana%
         %send% %ch% %self.name% is coming for you!
         %echoaround% %ch% %self.name% runs for %ch.name%!
-        mkill %ch%
+        %aggro% %ch%
         halt
       end
       eval ch %ch.next_in_room%
@@ -515,7 +517,7 @@ if %target.room% != %self.room% || %self.disabled% || %self.fighting%
 end
 %echoaround% %target% %self.name% attacks %target.name%!
 %send% %target% %self.name% attacks you!
-mkill %target%
+%aggro% %target%
 look
 ~
 #10142
@@ -744,7 +746,7 @@ while %char%
       end
     else
       * We're not on the quest yet; start it
-      if %actor.can_start_quest(10141)%
+      if %char.can_start_quest(10141)%
         %quest% %char% start 10141
       end
       if !%char.on_quest(10141)%
@@ -756,7 +758,7 @@ while %char%
       end
     end
     * Bonus exp reward
-    if %random.2% == 2 && (%random.2% == 2 || (%actor.on_quest(10141)% && !%actor.quest_triggered(10141)%))
+    if %random.2% == 2 && (%random.2% == 2 || (%char.on_quest(10141)% && !%char.quest_triggered(10141)%))
       %send% %char% You gain 1 bonus experience point.
       nop %char.bonus_exp(1)%
     end

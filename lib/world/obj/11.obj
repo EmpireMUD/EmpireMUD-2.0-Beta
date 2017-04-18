@@ -195,6 +195,18 @@ R
 R
 5511 0
 S
+#1116
+staff bloodstaff veined~
+a veined bloodstaff~
+A bloodstaff is puddling on the ground.~
+The staff drips with blood.
+~
+1 gmp an 3
+0 3 19
+10 0
+A
+17 1 0
+S
 #1119
 spike nocturnium~
 a nocturnium spike~

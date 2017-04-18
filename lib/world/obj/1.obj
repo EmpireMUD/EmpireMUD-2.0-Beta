@@ -252,7 +252,7 @@ column wooden bound~
 a bound wooden column~
 A bound column of wood is lying on the ground.~
    It looks as though someone has bound some lumber and sticks to make a
-structural support. This could be used in place of logs for building.  
+structural support. This could be used in place of logs for building.
 ~
 3 e a 7
 0 0 0
@@ -716,7 +716,7 @@ a torch~
 A torch has been dropped here.~
 A torch is important when you're out at night.
 ~
-1 chl ao 1
+1 chl ano 2
 0 2 12
 0 8
 S
