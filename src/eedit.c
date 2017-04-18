@@ -485,6 +485,9 @@ EEDIT(eedit_name) {
 	else if (!*argument) {
 		msg_to_char(ch, "Set the empire name to what?\r\n");
 	}
+	else if (!isalpha(*argument)) {
+		msg_to_char(ch, "Empire names must begin with a letter.\r\n");
+	}
 	else if (color_code_length(argument) > 0 || strchr(argument, '&') != NULL) {
 		msg_to_char(ch, "Empire names may not contain color codes or ampersands. Set the banner instead.\r\n");
 	}

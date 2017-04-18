@@ -235,6 +235,8 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 * @return bool TRUE if it moved, FALSE if it was blocked.
 */
 bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
+	void msdp_update_room(char_data *ch);
+	
 	room_data *to_room = NULL, *was_in;
 	struct follow_type *fol, *next_fol;
 	struct vehicle_room_list *vrl;
@@ -321,6 +323,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 			snprintf(buf, sizeof(buf), "You %s $V %s.", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)]);
 		}
 		act(buf, FALSE, VEH_DRIVER(veh), NULL, veh, TO_CHAR);
+		msdp_update_room(VEH_DRIVER(veh));
 	}
 	
 	// move sitter
@@ -366,6 +369,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 						snprintf(buf, sizeof(buf), "$V %s %s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)]);
 					}
 					act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR | TO_SPAMMY);
+					msdp_update_room(ch_iter);
 				}
 			}
 		}
