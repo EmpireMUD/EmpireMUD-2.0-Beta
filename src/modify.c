@@ -1095,7 +1095,7 @@ int format_script(struct descriptor_data *d) {
 
 
 void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen) {
-	int line_chars, startlen, cap_next = TRUE, cap_next_next = FALSE;
+	int line_chars, startlen, len, cap_next = TRUE, cap_next_next = FALSE;
 	char *flow, *start = NULL, temp;
 	char formatted[MAX_STRING_LENGTH];
 
@@ -1160,7 +1160,7 @@ void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int m
 			strcat(formatted, start);
 			*flow = temp;
 		}
-		if (cap_next_next && *(flow+1)) {
+		if (cap_next_next) {
 			if (line_chars + 3 > 79) {
 				strcat(formatted, "\r\n");
 				line_chars = 0;
@@ -1171,7 +1171,14 @@ void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int m
 			}
 		}
 	}
-
+	
+	// prevent trailing double-crlf by removing all trailing space
+	len = strlen(formatted);
+	while (len > 0 && strchr("\n\r\f\t\v ", formatted[len-1])) {
+		formatted[--len] = '\0';
+	}
+	
+	// re-add a crlf
 	strcat(formatted, "\r\n");
 
 	if (strlen(formatted) + 1 > maxlen)
