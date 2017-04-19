@@ -265,8 +265,12 @@ void string_add(descriptor_data *d, char *str) {
 		}
 		else if (STATE(d) == CON_PLAYING && d->mail_to >= BOARD_MAGIC) {
 			Board_save_board(d->mail_to - BOARD_MAGIC);
-			if (action == STRINGADD_ABORT)
+			if (action == STRINGADD_ABORT) {
 				SEND_TO_Q("Post not aborted, use REMOVE <post #>.\r\n", d);
+			}
+			else {
+				SEND_TO_Q("Post complete.\r\n", d);
+			}
 		}
 		else if (d->notes_id > 0) {
 			if (action != STRINGADD_ABORT) {
