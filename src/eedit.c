@@ -343,8 +343,10 @@ EEDIT(eedit_banner) {
 
 EEDIT(eedit_change_leader) {
 	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
+	player_index_data *index;
 	bool file = FALSE;
 	char_data *victim = NULL;
+	int old_leader;
 	
 	one_argument(argument, arg);
 	
@@ -364,12 +366,16 @@ EEDIT(eedit_change_leader) {
 		msg_to_char(ch, "That person is not in the empire.\r\n");
 	}
 	else {
+		old_leader = EMPIRE_LEADER(emp);
+		
+		// promote new leader
 		GET_RANK(victim) = EMPIRE_NUM_RANKS(emp);
 		EMPIRE_LEADER(emp) = GET_IDNUM(victim);
 
 		log_to_empire(emp, ELOG_MEMBERS, "%s is now the leader of the empire!", PERS(victim, victim, TRUE));
 		msg_to_char(ch, "You make %s leader of the empire.\r\n", PERS(victim, victim, TRUE));
 		
+		remove_lore(victim, LORE_DEMOTED);
 		remove_lore(victim, LORE_PROMOTED);
 		add_lore(victim, LORE_PROMOTED, "Became leader of %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		
@@ -384,6 +390,21 @@ EEDIT(eedit_change_leader) {
 		}
 		else {
 			SAVE_CHAR(victim);
+		}
+		
+		// demote old leader (at least, in lore)
+		if ((index = find_player_index_by_idnum(old_leader)) && (victim = find_or_load_player(index->name, &file))) {
+			remove_lore(victim, LORE_PROMOTED);
+			add_lore(victim, LORE_DEMOTED, "No longer leader of %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+			
+			// save now
+			if (file) {
+				store_loaded_char(victim);
+				file = FALSE;
+			}
+			else {
+				SAVE_CHAR(victim);
+			}
 		}
 	}
 	

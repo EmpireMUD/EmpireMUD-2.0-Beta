@@ -73,6 +73,7 @@ const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
 void adjust_building_tech(empire_data *emp, room_data *room, bool add);
+void check_delayed_load(char_data *ch);
 void extract_trigger(trig_data *trig);
 void scale_item_to_level(obj_data *obj, int level);
 
@@ -3299,8 +3300,6 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 * @param ... printf-style args for str.
 */
 void add_lore(char_data *ch, int type, const char *str, ...) {
-	void check_delayed_load(char_data *ch);
-	
 	struct lore_data *new, *lore;
 	char text[MAX_STRING_LENGTH];
 	va_list tArgList;
@@ -3354,6 +3353,9 @@ void clean_lore(char_data *ch) {
 	
 	int remove_lore_after_years = config_get_int("remove_lore_after_years");
 	int starting_year = config_get_int("starting_year");
+	
+	// need the old lore, in case the player is offline
+	check_delayed_load(ch);
 
 	if (!IS_NPC(ch)) {
 		for (lore = GET_LORE(ch); lore; lore = next_lore) {
@@ -3390,6 +3392,9 @@ void remove_lore(char_data *ch, int type) {
 
 	if (IS_NPC(ch))
 		return;
+	
+	// need the old lore, in case the player is offline
+	check_delayed_load(ch);
 
 	for (lore = GET_LORE(ch); lore; lore = next_lore) {
 		next_lore = lore->next;
