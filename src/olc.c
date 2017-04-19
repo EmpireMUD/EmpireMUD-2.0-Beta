@@ -2654,6 +2654,8 @@ OLC_MODULE(olc_removeindev) {
 	augment_data *aug, *next_aug;
 	class_data *cls, *next_cls;
 	adv_data *adv = NULL;
+	descriptor_data *desc;
+	any_vnum check_vnum;
 	int iter;
 	
 	// allow - or : as vnum separators
@@ -2872,6 +2874,52 @@ OLC_MODULE(olc_removeindev) {
 			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 			msg_to_char(ch, "Removed IN-DEV flag from social [%d] %s.\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 			any = TRUE;
+		}
+		
+		// check for people editing in that vnum range
+		if (any) {
+			LL_FOREACH(descriptor_list, desc) {
+				if (!desc->character) {
+					continue;
+				}
+				
+				check_vnum = NOTHING;
+				if (GET_OLC_CLASS(desc) && CLASS_FLAGGED(GET_OLC_CLASS(desc), CLASSF_IN_DEVELOPMENT)) {
+					check_vnum = CLASS_VNUM(GET_OLC_CLASS(desc));
+				}
+				if (GET_OLC_CRAFT(desc) && CRAFT_FLAGGED(GET_OLC_CRAFT(desc), CRAFT_IN_DEVELOPMENT)) {
+					check_vnum = GET_CRAFT_VNUM(GET_OLC_CRAFT(desc));
+				}
+				if (GET_OLC_FACTION(desc) && FACTION_FLAGGED(GET_OLC_FACTION(desc), FCT_IN_DEVELOPMENT)) {
+					check_vnum = FCT_VNUM(GET_OLC_FACTION(desc));
+				}
+				if (GET_OLC_GLOBAL(desc) && IS_SET(GET_GLOBAL_FLAGS(GET_OLC_GLOBAL(desc)), GLB_FLAG_IN_DEVELOPMENT)) {
+					check_vnum = GET_GLOBAL_VNUM(GET_OLC_GLOBAL(desc));
+				}
+				if (GET_OLC_ARCHETYPE(desc) && ARCHETYPE_FLAGGED(GET_OLC_ARCHETYPE(desc), ARCH_IN_DEVELOPMENT)) {
+					check_vnum = GET_ARCH_VNUM(GET_OLC_ARCHETYPE(desc));
+				}
+				if (GET_OLC_AUGMENT(desc) && AUGMENT_FLAGGED(GET_OLC_AUGMENT(desc), AUG_IN_DEVELOPMENT)) {
+					check_vnum = GET_AUG_VNUM(GET_OLC_AUGMENT(desc));
+				}
+				if (GET_OLC_MORPH(desc) && MORPH_FLAGGED(GET_OLC_MORPH(desc), MORPHF_IN_DEVELOPMENT)) {
+					check_vnum = MORPH_VNUM(GET_OLC_MORPH(desc));
+				}
+				if (GET_OLC_QUEST(desc) && QUEST_FLAGGED(GET_OLC_QUEST(desc), QST_IN_DEVELOPMENT)) {
+					check_vnum = QUEST_VNUM(GET_OLC_QUEST(desc));
+				}
+				if (GET_OLC_SKILL(desc) && SKILL_FLAGGED(GET_OLC_SKILL(desc), SKILLF_IN_DEVELOPMENT)) {
+					check_vnum = SKILL_VNUM(GET_OLC_SKILL(desc));
+				}
+				if (GET_OLC_SOCIAL(desc) && SOCIAL_FLAGGED(GET_OLC_SOCIAL(desc), SOC_IN_DEVELOPMENT)) {
+					check_vnum = SOC_VNUM(GET_OLC_SOCIAL(desc));
+				}
+				
+				// is it in range?
+				if (check_vnum >= from && check_vnum <= to) {
+					msg_to_char(ch, "Warning: %s is editing something in that range with an IN-DEV flag.\r\n", GET_NAME(desc->character));
+				}
+			}
 		}
 		
 		if (!any) {
