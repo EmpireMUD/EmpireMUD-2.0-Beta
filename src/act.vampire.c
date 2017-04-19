@@ -450,6 +450,9 @@ void update_biting_char(char_data *ch) {
 		GET_BLOOD(victim) = 0;
 
 		if (!IS_NPC(victim) && !PRF_FLAGGED(ch, PRF_AUTOKILL)) {
+			// give back a little blood
+			GET_BLOOD(victim) = 1;
+			GET_BLOOD(ch) -= 1;
 			do_bite(ch, "", 0, 0);
 			return;
 		}
