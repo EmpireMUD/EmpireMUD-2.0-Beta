@@ -3392,7 +3392,7 @@ const char *double_percents(const char *string) {
 	}
 	
 	// terminate/ensure terminator
-	output[MIN(pos++, (MAX_STRING_LENGTH*2)-1)] = '\0';
+	output[MIN(pos, (MAX_STRING_LENGTH*2)-1)] = '\0';
 	return (const char*)output;
 }
 
