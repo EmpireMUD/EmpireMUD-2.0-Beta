@@ -375,7 +375,6 @@ EEDIT(eedit_change_leader) {
 		log_to_empire(emp, ELOG_MEMBERS, "%s is now the leader of the empire!", PERS(victim, victim, TRUE));
 		msg_to_char(ch, "You make %s leader of the empire.\r\n", PERS(victim, victim, TRUE));
 		
-		remove_lore(victim, LORE_DEMOTED);
 		remove_lore(victim, LORE_PROMOTED);
 		add_lore(victim, LORE_PROMOTED, "Became leader of %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		
@@ -394,16 +393,21 @@ EEDIT(eedit_change_leader) {
 		
 		// demote old leader (at least, in lore)
 		if ((index = find_player_index_by_idnum(old_leader)) && (victim = find_or_load_player(index->name, &file))) {
-			remove_lore(victim, LORE_PROMOTED);
-			add_lore(victim, LORE_DEMOTED, "No longer leader of %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+			if (GET_LOYALTY(victim) == emp) {
+				remove_lore(victim, LORE_PROMOTED);
+				add_lore(victim, LORE_PROMOTED, "No longer leader of %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 			
-			// save now
-			if (file) {
-				store_loaded_char(victim);
-				file = FALSE;
+				// save now
+				if (file) {
+					store_loaded_char(victim);
+					file = FALSE;
+				}
+				else {
+					SAVE_CHAR(victim);
+				}
 			}
-			else {
-				SAVE_CHAR(victim);
+			else if (file) {
+				free_char(victim);
 			}
 		}
 	}
