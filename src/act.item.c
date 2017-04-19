@@ -5595,6 +5595,10 @@ ACMD(do_warehouse) {
 	else if (is_abbrev(command, "inventory")) {
 		warehouse_inventory(ch, argument);
 	}
+	// all other commands require awakeness
+	else if (GET_POS(ch) < POS_RESTING || FIGHTING(ch)) {
+		msg_to_char(ch, "You can't do that right now.\r\n");
+	}
 	else if (is_abbrev(command, "identify")) {
 		warehouse_identify(ch, argument);
 	}
