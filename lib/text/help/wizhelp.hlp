@@ -300,6 +300,7 @@ Most of the grant names correspond to actual commands, but some are special:
  empires - Allows eedit, edelete, moveeinv, and more.
  olc - Allows .olc, vnum, and vstat.
  olc-controls - Allows .setflags, .setminvnum, and .setmaxvnum.
+ transfer - Allows moving mortals with commands like transfer and portal.
 
 Try 'helpsearch grantable' to find grantable commands.
 

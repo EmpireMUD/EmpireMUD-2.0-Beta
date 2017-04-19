@@ -1634,7 +1634,7 @@ ACMD(do_portal) {
 	void empire_skillup(empire_data *emp, any_vnum ability, double amount);
 	extern char *get_room_name(room_data *room, bool color);
 	
-	bool all_access = (IS_IMMORTAL(ch) || (IS_NPC(ch) && !AFF_FLAGGED(ch, AFF_CHARM)));
+	bool all_access = ((IS_IMMORTAL(ch) && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_TRANSFER))) || (IS_NPC(ch) && !AFF_FLAGGED(ch, AFF_CHARM)));
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	room_data *room, *next_room, *target = NULL;
 	obj_data *portal, *end, *obj;
