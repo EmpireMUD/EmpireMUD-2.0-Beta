@@ -234,7 +234,7 @@ struct alias_data {
 #define MOVE_NORMAL  0	// Normal move message
 #define MOVE_LEAD  1	// Leading message
 #define MOVE_FOLLOW  2	// Follower message
-	#define MOVE_UNUSED  3
+#define MOVE_CIRCLE  3	// circling
 #define MOVE_EARTHMELD  4
 #define MOVE_SWIM  5	// swim skill
 

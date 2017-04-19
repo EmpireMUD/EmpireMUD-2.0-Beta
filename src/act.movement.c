@@ -330,6 +330,42 @@ void do_doorcmd(char_data *ch, obj_data *obj, int door, int scmd) {
 }
 
 
+/**
+* Various ability exp gain based on any kind of move.
+*
+* @param char_data *ch The person moving.
+* @param room_data *was_in The room they were in before (if applicable; may be NULL).
+* @param int mode MOVE_NORMAL, etc.
+*/
+void gain_ability_exp_from_moves(char_data *ch, room_data *was_in, int mode) {
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	if (mode == MOVE_SWIM) {
+		gain_ability_exp(ch, ABIL_SWIMMING, 1);
+	}
+	
+	if (IS_RIDING(ch)) {
+		gain_ability_exp(ch, ABIL_RIDE, 1);
+		
+		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_ROUGH)) {
+			gain_ability_exp(ch, ABIL_ALL_TERRAIN_RIDING, 5);
+		}
+	}
+	else {	// not riding
+		if (was_in && ROOM_SECT_FLAGGED(was_in, SECTF_ROUGH) && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH)) {
+			gain_ability_exp(ch, ABIL_MOUNTAIN_CLIMBING, 10);
+		}
+		gain_ability_exp(ch, ABIL_NAVIGATION, 1);
+		
+		if (AFF_FLAGGED(ch, AFF_FLY)) {
+			gain_ability_exp(ch, ABIL_FLY, 1);
+		}
+	}
+}
+
+
 int find_door(char_data *ch, const char *type, char *dir, const char *cmdname) {
 	struct room_direction_data *ex;
 	int door;
@@ -1095,28 +1131,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 		look_at_room(animal);
 	}
 
-	// skill gain section
-	if (mode == MOVE_SWIM) {
-		gain_ability_exp(ch, ABIL_SWIMMING, 1);
-	}
-	
-	if (IS_RIDING(ch)) {
-		gain_ability_exp(ch, ABIL_RIDE, 1);
-		
-		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_ROUGH)) {
-			gain_ability_exp(ch, ABIL_ALL_TERRAIN_RIDING, 5);
-		}
-	}
-	else {	// not riding
-		if (ROOM_SECT_FLAGGED(was_in, SECTF_ROUGH) && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH)) {
-			gain_ability_exp(ch, ABIL_MOUNTAIN_CLIMBING, 10);
-		}
-		gain_ability_exp(ch, ABIL_NAVIGATION, 1);
-
-		if (AFF_FLAGGED(ch, AFF_FLY)) {
-			gain_ability_exp(ch, ABIL_FLY, 1);
-		}
-	}
+	gain_ability_exp_from_moves(ch, was_in, mode);
 	
 	// trigger section
 	entry_memory_mtrigger(ch);
@@ -1438,6 +1453,8 @@ ACMD(do_circle) {
 	}
 	entry_memory_mtrigger(ch);
 	greet_memory_mtrigger(ch);
+	
+	gain_ability_exp_from_moves(ch, was_in, MOVE_CIRCLE);
 	
 	// message
 	if (!AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
