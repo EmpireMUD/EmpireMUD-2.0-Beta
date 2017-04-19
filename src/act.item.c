@@ -877,6 +877,7 @@ static void wear_message(char_data *ch, obj_data *obj, int where) {
 int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	bool need_capacity = ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ITEM_LIMIT) ? TRUE : FALSE;
 	char_data *iter;
+	bool logged;
 	int size;
 	
 	if (!drop_otrigger(obj, ch)) {
@@ -924,11 +925,19 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 			
 			// log dropping items in front of mortals
 			if (IS_IMMORTAL(ch)) {
+				logged = FALSE;
+				
 				for (iter = ROOM_PEOPLE(IN_ROOM(ch)); iter; iter = iter->next_in_room) {
 					if (iter != ch && !IS_NPC(iter) && !IS_IMMORTAL(iter)) {
 						syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s drops %s with mortal present (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_NAME(iter), room_log_identifier(IN_ROOM(ch)));
+						logged = TRUE;
 						break;
 					}
+				}
+				
+				if (!logged && ROOM_OWNER(IN_ROOM(ch)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(ch)))) {
+					syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s drops %s with in mortal empire (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
+					logged = TRUE;
 				}
 			}
 			
