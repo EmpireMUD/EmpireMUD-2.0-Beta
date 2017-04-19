@@ -42,6 +42,7 @@
 // extern variables
 extern const char *drinks[];
 extern int drink_aff[][3];
+extern const char *extra_bits[];
 extern const char *mob_move_types[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
@@ -68,6 +69,9 @@ static void wear_message(char_data *ch, obj_data *obj, int where);
 // local stuff
 #define drink_OBJ  -1
 #define drink_ROOM  1
+
+// ONLY flags to show on identify / warehouse inv
+bitvector_t show_obj_flags = OBJ_LIGHT | OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_GENERIC_DROP;
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -247,7 +251,6 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *apply_type_names[];
 	extern const char *climate_types[];
-	extern const char *extra_bits[];
 	extern const char *drinks[];
 	extern const char *affected_bits[];
 	extern const char *apply_types[];
@@ -263,10 +266,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	bld_data *bld;
 	int found;
 	double rating;
-	
-	// ONLY flags to show
-	bitvector_t show_obj_flags = OBJ_LIGHT | OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_GENERIC_DROP;
-	
+		
 	// sanity / don't bother
 	if (!obj || !ch || !ch->desc) {
 		return;
@@ -3017,7 +3017,7 @@ void trade_post(char_data *ch, char *argument) {
 void warehouse_inventory(char_data *ch, char *argument) {
 	extern const char *unique_storage_flags[];
 
-	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], part[256], flags[256], quantity[256], *tmp;
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], part[256], flags[256], quantity[256], level[256], objflags[256], *tmp;
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	struct empire_unique_storage *iter;
 	empire_data *emp = GET_LOYALTY(ch);
@@ -3060,12 +3060,27 @@ void warehouse_inventory(char_data *ch, char *argument) {
 			continue;
 		}
 		
+		if (GET_OBJ_CURRENT_SCALE_LEVEL(iter->obj) > 0) {
+			snprintf(level, sizeof(level), " (level %d)", GET_OBJ_CURRENT_SCALE_LEVEL(iter->obj));
+		}
+		else {
+			*level = '\0';
+		}
+		
 		if (iter->flags) {
 			prettier_sprintbit(iter->flags, unique_storage_flags, flags);
-			snprintf(part, sizeof(part), " (%s)", flags);
+			snprintf(part, sizeof(part), " [%s]", flags);
 		}
 		else {
 			*part = '\0';
+		}
+		
+		if (GET_OBJ_EXTRA(iter->obj) & show_obj_flags) {
+			prettier_sprintbit(GET_OBJ_EXTRA(iter->obj) & show_obj_flags, extra_bits, flags);
+			snprintf(objflags, sizeof(objflags), " (%s)", flags);
+		}
+		else {
+			*objflags = '\0';
 		}
 		
 		if (iter->amount != 1) {
@@ -3076,7 +3091,7 @@ void warehouse_inventory(char_data *ch, char *argument) {
 		}
 		
 		// build line
-		snprintf(line, sizeof(line), "%2d. %s%s%s\r\n", ++num, quantity, GET_OBJ_SHORT_DESC(iter->obj), part);
+		snprintf(line, sizeof(line), "%2d. %s%s%s%s%s\r\n", ++num, quantity, GET_OBJ_SHORT_DESC(iter->obj), level, objflags, part);
 		
 		if (size + strlen(line) < sizeof(output)) {
 			size += snprintf(output + size, sizeof(output) - size, "%s", line);
