@@ -335,11 +335,12 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		msg_to_char(ch, "\r\n");
 	}
 	
+	if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
+		msg_to_char(ch, "Level: %d\r\n", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+	}
+	
 	// only show gear if equippable (has more than ITEM_WEAR_TRADE)
 	if ((GET_OBJ_WEAR(obj) & ~ITEM_WEAR_TAKE) != NOBITS) {
-		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
-			msg_to_char(ch, "Level: %d\r\n", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-		}
 		if ((rating = rate_item(obj)) > 0) {
 			msg_to_char(ch, "Gear rating: %.1f\r\n", rating);
 		}
