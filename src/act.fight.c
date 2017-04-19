@@ -715,4 +715,9 @@ ACMD(do_throw) {
 			act(buf, FALSE, vict, obj, 0, TO_CHAR);
 		}
 	}
+	
+	// throwing item abuse log
+	if (IS_IMMORTAL(ch)) {
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s threw %s from %s to %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), room_log_identifier(IN_ROOM(ch)), room_log_identifier(to_room));
+	}
 }
