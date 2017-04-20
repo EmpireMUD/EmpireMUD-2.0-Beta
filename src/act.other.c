@@ -2583,7 +2583,7 @@ ACMD(do_summon) {
 
 			charm = TRUE;
 			vnum = animal_vnums[number(0, num_animal_vnums-1)];
-			max = ceil(GET_WITS(ch) / 3.0);
+			max = ceil(GET_CHARISMA(ch) / 3.0);
 			break;
 		}
 		case ABIL_SUMMON_SWIFT: {
