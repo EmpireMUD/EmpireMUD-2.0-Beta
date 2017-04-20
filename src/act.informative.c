@@ -1013,6 +1013,10 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		sprintf(buf, "$E is a member of %s%s\t0.", EMPIRE_BANNER(GET_LOYALTY(i)), EMPIRE_NAME(GET_LOYALTY(i)));
 		act(buf, FALSE, ch, NULL, i, TO_CHAR);
 	}
+	if (ROOM_OWNER(IN_ROOM(i)) && disguise) {
+		sprintf(buf, "$E is a member of %s%s\t0.", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(i))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(i))));
+		act(buf, FALSE, ch, NULL, i, TO_CHAR);
+	}
 	if (IS_NPC(i) && MOB_FACTION(i)) {
 		struct player_faction_data *pfd = get_reputation(ch, FCT_VNUM(MOB_FACTION(i)), FALSE);
 		int idx = rep_const_to_index(pfd ? pfd->rep : NOTHING);
