@@ -2458,8 +2458,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 				}
 				else {
-					// no field
-					snprintf(str, slen, "%d", inst->id);
+					// bad field
+					script_log("Trigger: %s, VNum %d, unknown instance field: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), field);
 				}
 				return;
 			}

@@ -4046,7 +4046,7 @@ void do_stat_room(char_data *ch) {
 	
 	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
 		sprintbit(inst->flags, instance_flags, buf2, TRUE);
-		msg_to_char(ch, "Instance: [\tg%d\t0] \ty%s\t0, Main Room: [\tg%d\t0], Flags: \tc%s\t0\r\n", GET_ADV_VNUM(inst->adventure), GET_ADV_NAME(inst->adventure), (inst->start ? GET_ROOM_VNUM(inst->start) : NOWHERE), buf2);
+		msg_to_char(ch, "Instance \tc%d\t0: [\tg%d\t0] \ty%s\t0, Main Room: [\tg%d\t0], Flags: \tc%s\t0\r\n", inst->id, GET_ADV_VNUM(inst->adventure), GET_ADV_NAME(inst->adventure), (inst->start ? GET_ROOM_VNUM(inst->start) : NOWHERE), buf2);
 	}
 
 	sprintf(buf, "Chars present:&y");
