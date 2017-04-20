@@ -4570,7 +4570,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'c': {	// emp.c*
 					if (!str_cmp(field, "coins")) {
-						snprintf(str, slen, "%d", EMPIRE_COINS(emp));
+						snprintf(str, slen, "%d", (int) EMPIRE_COINS(emp));
 					}
 					break;
 				}
@@ -4693,7 +4693,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'w': {	// emp.w*
 					if (!str_cmp(field, "wealth")) {
-						snprintf(str, slen, "%d", GET_TOTAL_WEALTH(emp));
+						snprintf(str, slen, "%d", (int) GET_TOTAL_WEALTH(emp));
 					}
 					break;
 				}

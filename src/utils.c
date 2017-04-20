@@ -450,9 +450,11 @@ void process_import_pair(empire_data *emp, empire_data *partner, int *limit) {
 	extern int get_main_island(empire_data *emp);
 	
 	struct empire_trade_data *trade, *p_trade, **trade_list = NULL, **partner_list = NULL;
-	int *trade_list_cost = NULL, *trade_list_count = NULL;
+	double *trade_list_cost = NULL;
+	int *trade_list_count = NULL;
 	double rate = exchange_rate(emp, partner);
-	int my_amt, their_amt, found_island, iter, trade_list_size = 0, owed;
+	int found_island, iter, trade_list_size = 0;
+	double my_amt, their_amt, owed;
 	bool found_any;
 	obj_data *orn;
 	
@@ -487,7 +489,7 @@ void process_import_pair(empire_data *emp, empire_data *partner, int *limit) {
 		}
 		
 		// will we pay that much? (we compare this at *imports_per_day on both sides because the cost-per-one may have misleading rounding
-		if ((int) round(p_trade->cost * imports_per_day * (1/rate)) > trade->cost * imports_per_day) {
+		if ((p_trade->cost * imports_per_day * (1.0/rate)) > (trade->cost * imports_per_day)) {
 			continue;
 		}
 		
@@ -509,7 +511,7 @@ void process_import_pair(empire_data *emp, empire_data *partner, int *limit) {
 	
 	// set up costs so we know what to log later
 	if (trade_list_size > 0) {
-		CREATE(trade_list_cost, int, trade_list_size);
+		CREATE(trade_list_cost, double, trade_list_size);
 		CREATE(trade_list_count, int, trade_list_size);
 		for (iter = 0; iter < trade_list_size; ++iter) {
 			trade_list_cost[iter] = 0;
@@ -535,7 +537,7 @@ void process_import_pair(empire_data *emp, empire_data *partner, int *limit) {
 			}
 			
 			// can afford? (comparing total owed because low values may not rate-convert correctly)
-			if (EMPIRE_COINS(emp) < (int) round((owed + partner_list[iter]->cost) * (1/rate))) {
+			if (EMPIRE_COINS(emp) < ((owed + partner_list[iter]->cost) * (1.0/rate))) {
 				continue;
 			}
 			
@@ -559,7 +561,7 @@ void process_import_pair(empire_data *emp, empire_data *partner, int *limit) {
 	
 	// settle up
 	if (owed > 0) {
-		decrease_empire_coins(emp, emp, (int)round(owed * (1/rate)));
+		decrease_empire_coins(emp, emp, owed * (1.0/rate));
 		increase_empire_coins(partner, partner, owed);
 	}
 	
@@ -567,8 +569,8 @@ void process_import_pair(empire_data *emp, empire_data *partner, int *limit) {
 	for (iter = 0; iter < trade_list_size; ++iter) {
 		if (trade_list_count[iter] > 0) {
 			orn = obj_proto(trade_list[iter]->vnum);
-			log_to_empire(emp, ELOG_TRADE, "Imported %s x%d from %s for %d coins", GET_OBJ_SHORT_DESC(orn), trade_list_count[iter], EMPIRE_NAME(partner), (int)round(trade_list_cost[iter] * (1/rate)));
-			log_to_empire(partner, ELOG_TRADE, "Exported %s x%d to %s for %d coins", GET_OBJ_SHORT_DESC(orn), trade_list_count[iter], EMPIRE_NAME(emp), trade_list_cost[iter]);
+			log_to_empire(emp, ELOG_TRADE, "Imported %s x%d from %s for %.1f coins", GET_OBJ_SHORT_DESC(orn), trade_list_count[iter], EMPIRE_NAME(partner), (trade_list_cost[iter] * (1.0/rate)));
+			log_to_empire(partner, ELOG_TRADE, "Exported %s x%d to %s for %.1f coins", GET_OBJ_SHORT_DESC(orn), trade_list_count[iter], EMPIRE_NAME(emp), trade_list_cost[iter]);
 		}
 	}
 	

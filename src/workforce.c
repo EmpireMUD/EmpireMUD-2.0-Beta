@@ -1769,7 +1769,7 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 			}
 			
 			orn = obj_proto(vnum);	// existence of this was pre-validated
-			increase_empire_coins(emp, emp, GET_WEALTH_VALUE(orn) * (1/COIN_VALUE));
+			increase_empire_coins(emp, emp, GET_WEALTH_VALUE(orn) * (1.0/COIN_VALUE));
 			
 			act("$n finishes minting some coins.", FALSE, worker, NULL, NULL, TO_ROOM);
 			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));

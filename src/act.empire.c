@@ -476,7 +476,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	msg_to_char(ch, "Frontier traits: %s\r\n", buf);
 	msg_to_char(ch, "Population: %d player%s, %d citizen%s, %d military\r\n", EMPIRE_MEMBERS(e), (EMPIRE_MEMBERS(e) != 1 ? "s" : ""), EMPIRE_POPULATION(e), (EMPIRE_POPULATION(e) != 1 ? "s" : ""), EMPIRE_MILITARY(e));
 	msg_to_char(ch, "Territory: %d in cities, %d/%d outside (%d/%d total)\r\n", EMPIRE_CITY_TERRITORY(e), EMPIRE_OUTSIDE_TERRITORY(e), land_can_claim(e, TRUE), EMPIRE_CITY_TERRITORY(e) + EMPIRE_OUTSIDE_TERRITORY(e), land_can_claim(e, FALSE));
-	msg_to_char(ch, "Wealth: %d coin%s (at %d%%), %d treasure (%d total)\r\n", EMPIRE_COINS(e), (EMPIRE_COINS(e) != 1 ? "s" : ""), (int)(COIN_VALUE * 100), EMPIRE_WEALTH(e), GET_TOTAL_WEALTH(e));
+	msg_to_char(ch, "Wealth: %.1f coin%s (at %d%%), %d treasure (%d total)\r\n", EMPIRE_COINS(e), (EMPIRE_COINS(e) != 1.0 ? "s" : ""), (int)(COIN_VALUE * 100), EMPIRE_WEALTH(e), (int) GET_TOTAL_WEALTH(e));
 	msg_to_char(ch, "Fame: %d\r\n", EMPIRE_FAME(e));
 	msg_to_char(ch, "Greatness: %d\r\n", EMPIRE_GREATNESS(e));
 	
@@ -1665,7 +1665,8 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 
 	char cost_arg[MAX_INPUT_LENGTH], limit_arg[MAX_INPUT_LENGTH];
 	struct empire_trade_data *trade;
-	int cost, limit;
+	double cost;
+	int limit;
 	obj_vnum vnum = NOTHING;
 	obj_data *obj;
 	
@@ -1675,20 +1676,20 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 	skip_spaces(&argument);	// remaining arg is item name
 	
 	// for later
-	cost = atoi(cost_arg);
+	cost = atof(cost_arg);
 	limit = atoi(limit_arg);
 	
 	if (!*cost_arg || !*limit_arg || !*argument) {
 		msg_to_char(ch, "Usage: %s add <%scost> <%s limit> <item name>\r\n", trade_type[subcmd], trade_mostleast[subcmd], trade_overunder[subcmd]);
 	}
-	else if (!isdigit(*cost_arg)) {
+	else if (!isdigit(*cost_arg) && *cost_arg != '.') {
 		msg_to_char(ch, "Cost must be a number, '%s' given.\r\n", cost_arg);
 	}
 	else if (!isdigit(*limit_arg)) {
 		msg_to_char(ch, "Limit must be a number, '%s' given.\r\n", limit_arg);
 	}
-	else if (cost < 1 || cost > MAX_COIN) {
-		msg_to_char(ch, "That cost is out of bounds.\r\n");
+	else if (cost < 0.1 || cost > MAX_COIN) {
+		msg_to_char(ch, "That cost must be between 0.1 and %d.\r\n", MAX_COIN);
 	}
 	else if (limit < 0 || limit > MAX_COIN) {
 		// max coin is a safe limit here
@@ -1720,7 +1721,7 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 		sort_trade_data(&EMPIRE_TRADE(emp));
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		
-		msg_to_char(ch, "%s now %ss '%s' costing %s%d, when %s %d.\r\n", EMPIRE_NAME(emp), trade_type[subcmd], get_obj_name_by_proto(vnum), trade_mostleast[subcmd], cost, trade_overunder[subcmd], limit);
+		msg_to_char(ch, "%s now %ss '%s' costing %s%.1f, when %s %d.\r\n", EMPIRE_NAME(emp), trade_type[subcmd], get_obj_name_by_proto(vnum), trade_mostleast[subcmd], cost, trade_overunder[subcmd], limit);
 	}
 }
 
@@ -1802,10 +1803,7 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 			++count;
 			
 			// figure out actual cost
-			if (rate != 1.0 && ((int)(rate * 10))%10 == 0) {
-				snprintf(coin_conv, sizeof(coin_conv), " (%d)", (int)round(trade->cost * rate));
-			}
-			else if (rate != 1.0) {
+			if (rate != 1.0) {
 				snprintf(coin_conv, sizeof(coin_conv), " (%.1f)", trade->cost * rate);
 			}
 			
@@ -1825,7 +1823,7 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 				sprintf(over_part, " when %s &g%d&0", trade_overunder[use_type], trade->limit);
 			}
 			
-			snprintf(line, sizeof(line), " &c%s&0 for %s&y%d%s&0 coin%s%s%s\r\n", GET_OBJ_SHORT_DESC(proto), trade_mostleast[use_type], trade->cost, coin_conv, (trade->cost != 1 ? "s" : ""), over_part, indicator);
+			snprintf(line, sizeof(line), " &c%s&0 for %s&y%.1f%s&0 coin%s%s%s\r\n", GET_OBJ_SHORT_DESC(proto), trade_mostleast[use_type], trade->cost, coin_conv, (trade->cost != 1.0 ? "s" : ""), over_part, indicator);
 			if (strlen(buf) + strlen(line) < MAX_STRING_LENGTH + 12) {
 				strcat(buf, line);
 			}
@@ -1886,17 +1884,14 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 			}
 			
 			// figure out actual cost
-			if (rate != 1.0 && ((int)(rate * 10))%10 == 0) {
-				snprintf(coin_conv, sizeof(coin_conv), " (%d)", (int)round(trade->cost * rate));
-			}
-			else if (rate != 1.0) {
+			if (rate != 1.0) {
 				snprintf(coin_conv, sizeof(coin_conv), " (%.1f)", trade->cost * rate);
 			}
 			else {
 				*coin_conv = '\0';
 			}
 			
-			sprintf(line, " %s (%d%%) is %sing it at &y%d%s coin%s&0%s%s%s\r\n", EMPIRE_NAME(iter), (int)(100 * rate), trade_type[find_type], trade->cost, coin_conv, (trade->cost != 1 ? "s" : ""), ((find_type != TRADE_EXPORT || has_avail) ? "" : " (none available)"), ((find_type != TRADE_IMPORT || is_buying) ? "" : " (full)"), (is_trading_with(emp, iter) ? "" : " (not trading)"));
+			sprintf(line, " %s (%d%%) is %sing it at &y%.1f%s coin%s&0%s%s%s\r\n", EMPIRE_NAME(iter), (int)(100 * rate), trade_type[find_type], trade->cost, coin_conv, (trade->cost != 1.0 ? "s" : ""), ((find_type != TRADE_EXPORT || has_avail) ? "" : " (none available)"), ((find_type != TRADE_IMPORT || is_buying) ? "" : " (full)"), (is_trading_with(emp, iter) ? "" : " (not trading)"));
 			found = TRUE;
 			
 			if (strlen(buf) + strlen(line) < MAX_STRING_LENGTH + 15) {
@@ -3043,7 +3038,7 @@ ACMD(do_deposit) {
 	else if ((rate = exchange_rate(coin_emp, emp)) < 0.01) {
 		msg_to_char(ch, "Those coins have no value here.\r\n");
 	}
-	else if ((int)(rate * coin_amt) < 1) {
+	else if ((rate * coin_amt) < 0.1) {
 		msg_to_char(ch, "At this exchange rate, that many coins wouldn't be worth anything.\r\n");
 	}
 	else {
@@ -4067,7 +4062,7 @@ ACMD(do_estats) {
 	// stats
 	msg_to_char(ch, "Population: %d player%s, %d citizen%s, %d military\r\n", EMPIRE_MEMBERS(emp), PLURAL(EMPIRE_MEMBERS(emp)), EMPIRE_POPULATION(emp), PLURAL(EMPIRE_POPULATION(emp)), EMPIRE_MILITARY(emp));
 	msg_to_char(ch, "Territory: %d in cities, %d/%d outside (%d/%d total)\r\n", EMPIRE_CITY_TERRITORY(emp), EMPIRE_OUTSIDE_TERRITORY(emp), land_can_claim(emp, TRUE), EMPIRE_CITY_TERRITORY(emp) + EMPIRE_OUTSIDE_TERRITORY(emp), land_can_claim(emp, FALSE));
-	msg_to_char(ch, "Wealth: %d coin%s (at %d%%), %d treasure (%d total)\r\n", EMPIRE_COINS(emp), PLURAL(EMPIRE_COINS(emp)), (int)(COIN_VALUE * 100), EMPIRE_WEALTH(emp), GET_TOTAL_WEALTH(emp));
+	msg_to_char(ch, "Wealth: %.1f coin%s (at %d%%), %d treasure (%d total)\r\n", EMPIRE_COINS(emp), PLURAL(EMPIRE_COINS(emp)), (int)(COIN_VALUE * 100), EMPIRE_WEALTH(emp), (int) GET_TOTAL_WEALTH(emp));
 	msg_to_char(ch, "Fame: %d, Greatness: %d\r\n", EMPIRE_FAME(emp), EMPIRE_GREATNESS(emp));
 }
 

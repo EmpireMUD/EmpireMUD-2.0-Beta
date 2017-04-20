@@ -1854,13 +1854,13 @@ obj_data *create_money(empire_data *type, int amount) {
 /**
 * Gets the value of a currency when converted to another empire.
 *
-* @param int amount How much money.
+* @param double amount How much money.
 * @param empire_data *convert_from Empire whose currency it was.
 * @param empire_data *convert_to The empire to exchange to.
-* @return int The new value of the money.
+* @return double The new value of the money.
 */
-int exchange_coin_value(int amount, empire_data *convert_from, empire_data *convert_to) {
-	return (int)round(amount * exchange_rate(convert_from, convert_to));
+double exchange_coin_value(double amount, empire_data *convert_from, empire_data *convert_to) {
+	return (amount * exchange_rate(convert_from, convert_to));
 }
 
 
@@ -2418,32 +2418,20 @@ struct empire_trade_data *find_trade_entry(empire_data *emp, int type, obj_vnum 
 * @param int amount How much to +/-.
 * @return int The new coin total of the empire.
 */
-int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, int amount) {
-	int curr, local;
+int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, double amount) {
+	double local;
 	
 	// who??
 	if (!emp_gaining) {
 		return 0;
 	}
 	
-	curr = EMPIRE_COINS(emp_gaining);
-		
 	if (amount < 0) {
-		EMPIRE_COINS(emp_gaining) = MAX(0, curr + amount);
-		
-		// validate to prevent overflow
-		if (EMPIRE_COINS(emp_gaining) > curr) {
-			EMPIRE_COINS(emp_gaining) = 0;
-		}
+		SAFE_ADD(EMPIRE_COINS(emp_gaining), amount, 0, MAX_COIN, FALSE);
 	}
 	else {
 		if ((local = exchange_coin_value(amount, coin_empire, emp_gaining)) > 0) {
-			EMPIRE_COINS(emp_gaining) = MIN(MAX_COIN, curr + local);
-		
-			// validate to prevent overflow
-			if (EMPIRE_COINS(emp_gaining) < curr) {
-				EMPIRE_COINS(emp_gaining) = MAX_COIN;
-			}
+			SAFE_ADD(EMPIRE_COINS(emp_gaining), local, 0, MAX_COIN, FALSE);
 		}
 	}
 

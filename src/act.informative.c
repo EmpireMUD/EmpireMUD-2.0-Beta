@@ -1233,7 +1233,7 @@ bool inventory_store_building(char_data *ch, room_data *room, empire_data *emp) 
 	}
 	
 	if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT)) {
-		msg_to_char(ch, "\r\nVault: %d coin%s, %d treasure (%d total)\r\n", EMPIRE_COINS(emp), (EMPIRE_COINS(emp) != 1 ? "s" : ""), EMPIRE_WEALTH(emp), GET_TOTAL_WEALTH(emp));
+		msg_to_char(ch, "\r\nVault: %.1f coin%s, %d treasure (%d total)\r\n", EMPIRE_COINS(emp), (EMPIRE_COINS(emp) != 1.0 ? "s" : ""), EMPIRE_WEALTH(emp), (int) GET_TOTAL_WEALTH(emp));
 	}
 
 	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {

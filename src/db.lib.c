@@ -1783,6 +1783,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	struct empire_city_data *city;
 	struct empire_island *isle;
 	room_data *room;
+	double dbl_in;
 	long long_in;
 	
 	sprintf(buf2, "empire #%d", vnum);
@@ -1886,13 +1887,13 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 					log("SYSERR: Expected numerical data in E line of empire %d but file ended", vnum);
 					break;
 				}
-				if (sscanf(line, "%s %d", str_in, &t[0]) != 2) {
+				if (sscanf(line, "%s %lf", str_in, &dbl_in) != 2) {
 					log("SYSERR: Expected 2 args in E line of empire %d", vnum);
 					break;
 				}
 				
 				emp->frontier_traits = asciiflag_conv(str_in);
-				emp->coins = t[0];
+				emp->coins = dbl_in;
 				break;
 			}
 			case 'I': {	// island name
@@ -1978,12 +1979,12 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				break;
 			}
 			case 'X': { // trade
-				if (sscanf(line, "X %d %d %d %d", &t[0], &t[1], &t[2], &t[3]) == 4) {
+				if (sscanf(line, "X %d %d %d %lf", &t[0], &t[1], &t[2], &dbl_in) == 4) {
 					CREATE(trade, struct empire_trade_data, 1);
 					trade->type = t[0];
 					trade->vnum = t[1];
 					trade->limit = t[2];
-					trade->cost = t[3];
+					trade->cost = dbl_in;
 					trade->next = NULL;
 					
 					// add to end
@@ -2073,7 +2074,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	}
 	
 	// E: extra data
-	fprintf(fl, "E\n%s %d\n", bitv_to_alpha(EMPIRE_FRONTIER_TRAITS(emp)), emp->coins);
+	fprintf(fl, "E\n%s %.1f\n", bitv_to_alpha(EMPIRE_FRONTIER_TRAITS(emp)), EMPIRE_COINS(emp));
 	
 	// I: island names
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
@@ -2123,7 +2124,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	
 	// X: trade
 	for (trade = EMPIRE_TRADE(emp); trade; trade = trade->next) {
-		fprintf(fl, "X %d %d %d %d\n", trade->type, trade->vnum, trade->limit, trade->cost);
+		fprintf(fl, "X %d %d %d %.1f\n", trade->type, trade->vnum, trade->limit, trade->cost);
 	}
 	
 	// Y: cities

@@ -3646,7 +3646,7 @@ struct empire_trade_data {
 	int type;	// TRADE_x
 	obj_vnum vnum;	// item type
 	int limit;	// min (export), max (import)
-	int cost;	// min (export), max (import)
+	double cost;	// min (export), max (import)
 	
 	struct empire_trade_data *next;
 };
@@ -3699,7 +3699,7 @@ struct empire_data {
 	char *rank[MAX_RANKS];	// Name of each rank
 	
 	bitvector_t frontier_traits;	// ETRAIT_x
-	int coins;	// total coins (always in local currency)
+	double coins;	// total coins (always in local currency)
 
 	byte priv[NUM_PRIVILEGES];	// The rank at which you can use a command
 
