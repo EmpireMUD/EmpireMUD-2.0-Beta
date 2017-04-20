@@ -5773,6 +5773,9 @@ ACMD(do_load) {
 		if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded mob %s with mortal present (%s) at %s", GET_NAME(ch), GET_NAME(mob), GET_NAME(mort), room_log_identifier(IN_ROOM(ch)));
 		}
+		else if (ROOM_OWNER(IN_ROOM(ch)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded mob %s in mortal empire (%s) at %s", GET_NAME(ch), GET_NAME(mob), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
+		}
 	}
 	else if (is_abbrev(buf, "obj")) {
 		if (!obj_proto(number)) {
@@ -5804,6 +5807,9 @@ ACMD(do_load) {
 		
 		if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded vehicle %s with mortal present (%s) at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), GET_NAME(mort), room_log_identifier(IN_ROOM(ch)));
+		}
+		else if (ROOM_OWNER(IN_ROOM(ch)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded vehicle %s in mortal empire (%s) at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
 		}
 	}
 	else {
