@@ -1676,7 +1676,7 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 	skip_spaces(&argument);	// remaining arg is item name
 	
 	// for later
-	cost = atof(cost_arg);
+	cost = floor(atof(cost_arg) * 10.0) / 10.0;	// round to 0.1f
 	limit = atoi(limit_arg);
 	
 	if (!*cost_arg || !*limit_arg || !*argument) {
