@@ -1522,6 +1522,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			}
 			
 			msg_to_char(ch, "This room no longer has a custom name.\r\n");
+			command_lag(ch, WAIT_ABILITY);
 		}
 		else if (color_code_length(arg2) > 0) {
 			msg_to_char(ch, "You cannot use color codes in custom room names.\r\n");
@@ -1539,6 +1540,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			ROOM_CUSTOM_NAME(IN_ROOM(ch)) = str_dup(arg2);
 			
 			msg_to_char(ch, "This room is now called \"%s\".\r\n", arg2);
+			command_lag(ch, WAIT_ABILITY);
 		}
 	}
 	else if (is_abbrev(arg, "description")) {
