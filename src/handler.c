@@ -326,7 +326,7 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 */
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add) {
 	empire_data *emp = GET_LOYALTY(ch);
-	int diff, orig;
+	// int diff, orig;
 	
 	if (add) {
 		SET_BIT(AFF_FLAGS(ch), bitv);
@@ -373,9 +373,9 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_MAX_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
 			// prevent from going negative
-			orig = GET_MOVE(ch);
+			//orig = GET_MOVE(ch);
 			SAFE_ADD(GET_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
-			
+			/*
 			if (!IS_NPC(ch)) {
 				if (GET_MOVE(ch) < 0) {
 					GET_MOVE_DEFICIT(ch) -= GET_MOVE(ch);
@@ -387,15 +387,16 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 					GET_MOVE(ch) -= diff;
 				}
 			}
+			*/
 			break;
 		case APPLY_HEALTH:
 			SAFE_ADD(GET_MAX_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
 			// prevent from going negative
-			orig = GET_HEALTH(ch);
+			//orig = GET_HEALTH(ch);
 			SAFE_ADD(GET_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
 			GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
-			
+			/*
 			if (!IS_NPC(ch)) {
 				if (GET_HEALTH(ch) < 1) {	// min 1 on health
 					GET_HEALTH_DEFICIT(ch) -= (GET_HEALTH(ch)-1);
@@ -412,14 +413,15 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 				// npcs cannot die this way
 				GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
 			}
+			*/
 			break;
 		case APPLY_MANA:
 			SAFE_ADD(GET_MAX_MANA(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
 			// prevent from going negative
-			orig = GET_MANA(ch);
+			//orig = GET_MANA(ch);
 			SAFE_ADD(GET_MANA(ch), mod, INT_MIN, INT_MAX, TRUE);
-			
+			/*
 			if (!IS_NPC(ch)) {
 				if (GET_MANA(ch) < 0) {
 					GET_MANA_DEFICIT(ch) -= GET_MANA(ch);
@@ -431,6 +433,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 					GET_MANA(ch) -= diff;
 				}
 			}
+			*/
 			break;
 		case APPLY_BLOOD: {
 			SAFE_ADD(GET_EXTRA_BLOOD(ch), mod, INT_MIN, INT_MAX, TRUE);
