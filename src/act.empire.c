@@ -697,10 +697,16 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
 		vnum = shipd->vnum;
 		
-		// have this?
 		HASH_FIND_INT(list, &vnum, einv);
-		if (einv) {
+		
+		if (einv) {	// have this?
 			einv->total += shipd->amount;
+		}
+		else if (all) {	// add an entry
+			CREATE(einv, struct einv_type, 1);
+			einv->vnum = vnum;
+			einv->total = shipd->amount;
+			HASH_ADD_INT(list, vnum, einv);
 		}
 	}
 	
