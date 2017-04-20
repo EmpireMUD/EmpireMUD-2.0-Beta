@@ -437,7 +437,7 @@ ACMD(do_confer) {
 			avail_str += (-1 * aff->modifier);
 		}
 	}
-	if (conferred_amt >= avail_str) {
+	if (conferred_amt >= avail_str || conferred_amt >= att_max(ch)) {
 		msg_to_char(ch, "You cannot confer any more strength on %s.\r\n", (ch == vict) ? "yourself" : PERS(vict, vict, FALSE));
 		return;
 	}
