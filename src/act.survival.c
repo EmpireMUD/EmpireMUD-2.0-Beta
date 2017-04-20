@@ -603,7 +603,7 @@ ACMD(do_fish) {
 	else if (!can_use_ability(ch, ABIL_FISH, NOTHING, 0, NOTHING)) {
 		// own messages
 	}
-	else if (GET_ACTION(ch) != ACT_FISHING) {
+	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != ACT_FISHING) {
 		msg_to_char(ch, "You're really too busy to do that.\r\n");
 	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
