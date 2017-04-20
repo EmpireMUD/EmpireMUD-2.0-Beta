@@ -3960,8 +3960,10 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 /* Displays the vital statistics of IN_ROOM(ch) to ch */
 void do_stat_room(char_data *ch) {
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	extern const char *exit_bits[];
 	extern const char *depletion_type[NUM_DEPLETION_TYPES];
+	extern const char *instance_flags[];
 	extern const char *room_extra_types[];
 	
 	char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
@@ -3978,6 +3980,7 @@ void do_stat_room(char_data *ch) {
 	player_index_data *index;
 	struct global_data *glb;
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
+	struct instance_data *inst;
 	vehicle_data *veh;
 	
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
@@ -4039,6 +4042,11 @@ void do_stat_room(char_data *ch) {
 		else {
 			msg_to_char(ch, "Mine type: %s, Amount remaining: %d\r\n", GET_GLOBAL_NAME(glb), get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT));
 		}
+	}
+	
+	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
+		sprintbit(inst->flags, instance_flags, buf2, TRUE);
+		msg_to_char(ch, "Instance: [\tg%d\t0] \tc%s\t0, Main Room: [\tg%d\t0], Flags: \tc%s\t0\r\n", GET_ADV_VNUM(inst->adventure), GET_ADV_NAME(inst->adventure), (inst->start ? GET_ROOM_VNUM(inst->start) : NOWHERE), buf2);
 	}
 
 	sprintf(buf, "Chars present:&y");
