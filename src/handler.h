@@ -94,6 +94,7 @@ void char_to_room(char_data *ch, room_data *room);
 // character targeting handlers
 extern char_data *find_closest_char(char_data *ch, char *arg, bool pc);
 extern char_data *find_mob_in_room_by_vnum(room_data *room, mob_vnum vnum);
+extern char_data *find_mortal_in_room(room_data *room);
 extern char_data *get_char_room(char *name, room_data *room);
 extern char_data *get_char_room_vis(char_data *ch, char *name);
 extern char_data *get_char_vis(char_data *ch, char *name, bitvector_t where);

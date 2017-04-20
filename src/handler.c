@@ -1367,6 +1367,25 @@ char_data *find_mob_in_room_by_vnum(room_data *room, mob_vnum vnum) {
 
 
 /**
+* Checks if any mortal is present, and returns the first one if so.
+*
+* @param room_data *room The room to check.
+* @return char_data* The mortal found, or NULL if none.
+*/
+char_data *find_mortal_in_room(room_data *room) {
+	char_data *iter;
+	
+	LL_FOREACH(ROOM_PEOPLE(room), iter) {
+		if (!IS_NPC(iter) && !IS_IMMORTAL(iter) && !IS_GOD(iter)) {
+			return iter;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
 * search a room for a char, and return a pointer if found..
 * This has no source character, so does not rely on visibility.
 *

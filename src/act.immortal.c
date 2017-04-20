@@ -5742,7 +5742,7 @@ ACMD(do_load) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	vehicle_data *veh;
-	char_data *mob;
+	char_data *mob, *mort;
 	obj_data *obj;
 	any_vnum number;
 
@@ -5769,6 +5769,10 @@ ACMD(do_load) {
 		act("$n has created $N!", FALSE, ch, 0, mob, TO_ROOM);
 		act("You create $N.", FALSE, ch, 0, mob, TO_CHAR);
 		load_mtrigger(mob);
+		
+		if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded mob %s with mortal present (%s) at %s", GET_NAME(ch), GET_NAME(mob), GET_NAME(mort), room_log_identifier(IN_ROOM(ch)));
+		}
 	}
 	else if (is_abbrev(buf, "obj")) {
 		if (!obj_proto(number)) {
@@ -5797,6 +5801,10 @@ ACMD(do_load) {
 		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM);
 		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR);
 		load_vtrigger(veh);
+		
+		if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded vehicle %s with mortal present (%s) at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), GET_NAME(mort), room_log_identifier(IN_ROOM(ch)));
+		}
 	}
 	else {
 		send_to_char("That'll have to be either 'obj', 'mob', or 'vehicle'.\r\n", ch);
