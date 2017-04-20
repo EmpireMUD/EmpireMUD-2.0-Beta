@@ -369,7 +369,7 @@ ACMD(do_confer) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct affected_type *aff, *aff_iter;
 	bool any, found_existing, found_ch;
-	int amt, iter, abbrev, type;
+	int amt, iter, abbrev, type, conferred_amt, avail_str;
 	int match_duration = 0;
 	char_data *vict = ch;
 	
@@ -421,6 +421,24 @@ ACMD(do_confer) {
 	// optional 2nd arg
 	if (*arg2 && !(vict = get_char_vis(ch, arg2, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
+		return;
+	}
+	
+	// compute max confer
+	conferred_amt = 0;
+	LL_FOREACH(vict->affected, aff) {
+		if (aff->type == ATYPE_CONFER && aff->cast_by == GET_IDNUM(ch)) {
+			conferred_amt += apply_values[(int) aff->location] / apply_values[APPLY_STRENGTH];
+		}
+	}
+	avail_str = GET_STRENGTH(ch);
+	LL_FOREACH(ch->affected, aff) {
+		if (aff->type == ATYPE_CONFERRED && aff->location == APPLY_STRENGTH) {
+			avail_str += (-1 * aff->modifier);
+		}
+	}
+	if (conferred_amt >= avail_str) {
+		msg_to_char(ch, "You cannot confer any more strength on %s.\r\n", (ch == vict) ? "yourself" : PERS(vict, vict, FALSE));
 		return;
 	}
 	
