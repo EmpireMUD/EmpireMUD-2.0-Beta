@@ -1879,27 +1879,25 @@ void free_var_el(struct trig_var_data *var) {
 
 /*
 * remove var name from var_list
-* returns 1 if found, else 0
+*
+* @param struct trig_var_data **var_list Pointer to the list of vars.
+* @param char *name The name of the var to remove.
+* @param int context The context to remove (will also remove context=0 no matter what)
+* @return int 1 if found, else 0
 */
-int remove_var(struct trig_var_data **var_list, char *name) {
-	struct trig_var_data *i, *j;
-
-	for (j = NULL, i = *var_list; i && str_cmp(name, i->name); j = i, i = i->next);
-
-	if (i) {
-		if (j) {
-			j->next = i->next;
-			free_var_el(i);
+int remove_var(struct trig_var_data **var_list, char *name, int context) {
+	struct trig_var_data *iter, *next_iter;
+	bool any = FALSE;
+	
+	LL_FOREACH_SAFE(*var_list, iter, next_iter) {
+		if (!str_cmp(name, iter->name) && (iter->context == context || iter->context == 0)) {
+			LL_DELETE(*var_list, iter);
+			free_var_el(iter);
+			any = TRUE;
 		}
-		else {
-			*var_list = i->next;
-			free_var_el(i);
-		}
-
-	return 1;      
 	}
-
-	return 0;
+	
+	return (any ? 1 : 0);
 }
 
 
@@ -5629,8 +5627,8 @@ void process_unset(struct script_data *sc, trig_data *trig, char *cmd) {
 		return;
 	}
 
-	if (!remove_var(&(sc->global_vars), var))
-		remove_var(&GET_TRIG_VARS(trig), var);
+	if (!remove_var(&(sc->global_vars), var, sc->context))
+		remove_var(&GET_TRIG_VARS(trig), var, sc->context);
 }
 
 
@@ -5903,7 +5901,7 @@ void process_global(struct script_data *sc, trig_data *trig, char *cmd, int id) 
 	}    
 
 	add_var(&(sc->global_vars), vd->name, vd->value, id);
-	remove_var(&GET_TRIG_VARS(trig), vd->name);
+	remove_var(&GET_TRIG_VARS(trig), vd->name, id);
 }
 
 
