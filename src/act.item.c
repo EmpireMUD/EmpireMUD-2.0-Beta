@@ -3190,8 +3190,6 @@ void warehouse_identify(char_data *ch, char *argument) {
 * @param char *argument The rest of the argument after "retrieve"
 */
 void warehouse_retrieve(char_data *ch, char *argument) {
-	extern int max_obj_id;
-	
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	empire_data *room_emp = ROOM_OWNER(IN_ROOM(ch));
 	struct empire_unique_storage *iter, *next_iter;
