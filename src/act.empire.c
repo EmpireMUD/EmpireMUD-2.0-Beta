@@ -4459,6 +4459,10 @@ ACMD(do_islands) {
 	}
 	
 	HASH_ITER(hh, list, item, next_item) {
+		if (item->id == NO_ISLAND) {
+			continue;	// skip
+		}
+		
 		isle = get_island(item->id, TRUE);
 		room = real_room(isle->center);
 		lsize = snprintf(line, sizeof(line), " %s (%d, %d) - ", get_island_name_for(isle->id, ch), X_COORD(room), Y_COORD(room));

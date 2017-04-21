@@ -980,7 +980,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define SHOW_FIGHT_MESSAGES(ch, bit)  (!IS_NPC(ch) && IS_SET(GET_FIGHT_MESSAGES(ch), (bit)))
 
 // definitions
-#define IN_HOSTILE_TERRITORY(ch)  (!IS_NPC(ch) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && (IS_HOSTILE(ch) || empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))))
+#define IN_HOSTILE_TERRITORY(ch)  (!IS_NPC(ch) && !IS_IMMORTAL(ch) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && (IS_HOSTILE(ch) || empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))))
 #define IS_APPROVED(ch)  (IS_NPC(ch) || PLR_FLAGGED(ch, PLR_APPROVED) || ACCOUNT_FLAGGED(ch, ACCT_APPROVED))
 #define IS_HOSTILE(ch)  (!IS_NPC(ch) && (get_cooldown_time((ch), COOLDOWN_HOSTILE_FLAG) > 0 || get_cooldown_time((ch), COOLDOWN_ROGUE_FLAG) > 0))
 #define IS_HUNGRY(ch)  (GET_COND(ch, FULL) >= 360 && !has_ability(ch, ABIL_UNNATURAL_THIRST))
