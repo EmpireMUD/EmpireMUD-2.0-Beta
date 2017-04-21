@@ -732,6 +732,9 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	if (IS_DEAD(vict)) {
 		return;
 	}
+	if (AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
+		return;	// can't be attacked
+	}
 	
 	if (IS_IMMORTAL(vict) && (modifier > 0)) {
 		msg_to_char(vict, "Being the cool immortal you are, you sidestep a trap, obviously placed to kill you.\r\n");
