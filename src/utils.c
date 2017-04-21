@@ -732,7 +732,7 @@ bool process_import_one(empire_data *emp) {
 				
 				// money
 				decrease_empire_coins(emp, emp, cost);
-				increase_empire_coins(pair->emp, pair->emp, cost / pair->rate);
+				increase_empire_coins(pair->emp, pair->emp, cost * pair->rate);
 				
 				// update limit
 				limit -= trade_amt;
@@ -741,7 +741,7 @@ bool process_import_one(empire_data *emp) {
 				// log
 				orn = obj_proto(trade->vnum);
 				log_to_empire(emp, ELOG_TRADE, "Imported %s x%d from %s for %.1f coins", GET_OBJ_SHORT_DESC(orn), trade_amt, EMPIRE_NAME(pair->emp), cost);
-				log_to_empire(pair->emp, ELOG_TRADE, "Exported %s x%d to %s for %.1f coins", GET_OBJ_SHORT_DESC(orn), trade_amt, EMPIRE_NAME(emp), cost / pair->rate);
+				log_to_empire(pair->emp, ELOG_TRADE, "Exported %s x%d to %s for %.1f coins", GET_OBJ_SHORT_DESC(orn), trade_amt, EMPIRE_NAME(emp), cost * pair->rate);
 			}
 		}
 		
