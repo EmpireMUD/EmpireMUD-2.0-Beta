@@ -723,6 +723,8 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	void death_log(char_data *ch, char_data *killer, int type);
 	extern char *get_room_name(room_data *room, bool color);
 	extern int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, int damtype);
+	void scale_mob_for_character(char_data *mob, char_data *ch);
+	void scale_mob_to_level(char_data *mob, int level);
 	
 	double dam;
 	
@@ -734,6 +736,19 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	if (IS_IMMORTAL(vict) && (modifier > 0)) {
 		msg_to_char(vict, "Being the cool immortal you are, you sidestep a trap, obviously placed to kill you.\r\n");
 		return;
+	}
+	
+	// check scaling
+	if (killer && IS_NPC(killer) && GET_CURRENT_SCALE_LEVEL(killer) == 0) {
+		scale_mob_for_character(killer, vict);
+	}
+	if (IS_NPC(vict) && GET_CURRENT_SCALE_LEVEL(vict) == 0) {
+		if (killer) {
+			scale_mob_for_character(vict, killer);
+		}
+		else {
+			scale_mob_to_level(vict, level);
+		}
 	}
 	
 	dam = level / 7.0;
