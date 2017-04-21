@@ -132,13 +132,13 @@ int is_tell_ok(char_data *ch, char_data *vict) {
 		// can always tell immortals
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!REAL_NPC(ch) && PRF_FLAGGED(ch, PRF_NOTELL))
+	else if (PRF_FLAGGED(ch, PRF_NOTELL))
 		msg_to_char(ch, "You can't tell other people while you have notell on.\r\n");
 	else if (!REAL_NPC(vict) && !vict->desc)        /* linkless */
 		act("$E's linkless at the moment.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
 	else if (PLR_FLAGGED(vict, PLR_WRITING))
 		act("$E's writing a message right now; try again later.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
-	else if ((!REAL_NPC(vict) && PRF_FLAGGED(vict, PRF_NOTELL)))
+	else if (PRF_FLAGGED(vict, PRF_NOTELL))
 		act("$E can't hear you.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
 	else if (is_ignoring(ch, vict)) {
 		msg_to_char(ch, "You cannot send a tell to someone you're ignoring.\r\n");
@@ -181,7 +181,7 @@ void perform_tell(char_data *ch, char_data *vict, char *arg) {
 		add_to_channel_history(vict->desc, CHANNEL_HISTORY_TELLS, lbuf);
 	}
 
-	if (!REAL_NPC(ch) && PRF_FLAGGED(ch, PRF_NOREPEAT))
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT))
 		send_config_msg(ch, "ok_string");
 	else {
 		// for channel history
@@ -1281,7 +1281,7 @@ ACMD(do_say) {
 			}
 		}
 		
-		if (!REAL_NPC(ch) && PRF_FLAGGED(ch, PRF_NOREPEAT))
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT))
 			send_config_msg(ch, "ok_string");
 		else {
 			delete_doubledollar(argument);

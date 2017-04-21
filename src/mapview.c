@@ -607,7 +607,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (!ROOM_IS_CLOSED(room) || look_out) {
 		// map rooms:
 		
-		if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 			if (show_title) {
 				send_to_char(output, ch);
 			}

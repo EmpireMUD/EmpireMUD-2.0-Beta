@@ -992,7 +992,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define IS_BLOOD_STARVED(ch)  (IS_VAMPIRE(ch) && GET_BLOOD(ch) <= config_get_int("blood_starvation_level"))
 
 // for act() and act-like things (requires to_sleeping and is_spammy set to true/false)
-#define SENDOK(ch)  (((ch)->desc || SCRIPT_CHECK((ch), MTRIG_ACT)) && (to_sleeping || AWAKE(ch)) && (IS_NPC(ch) || !PRF_FLAGGED(ch, PRF_NOSPAM) || !is_spammy) && (IS_NPC(ch) || !PLR_FLAGGED((ch), PLR_WRITING)))
+#define SENDOK(ch)  (((ch)->desc || SCRIPT_CHECK((ch), MTRIG_ACT)) && (to_sleeping || AWAKE(ch)) && (!PRF_FLAGGED(ch, PRF_NOSPAM) || !is_spammy) && (IS_NPC(ch) || !PLR_FLAGGED((ch), PLR_WRITING)))
 
 
  //////////////////////////////////////////////////////////////////////////////

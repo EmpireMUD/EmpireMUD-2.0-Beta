@@ -5478,7 +5478,7 @@ ACMD(do_gecho) {
 			}
 		}
 		
-		if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			send_config_msg(ch, "ok_string");
 		}
 		else {

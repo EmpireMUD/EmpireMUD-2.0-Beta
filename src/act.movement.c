@@ -599,7 +599,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 	
 	// need a generic for this -- a nearly identical condition is used in do_mount
 	if (IS_RIDING(ch) && IS_COMPLETE(to_room) && !BLD_ALLOWS_MOUNTS(to_room)) {
-		if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
+		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 			do_dismount(ch, "", 0, 0);
 		}
 		else {

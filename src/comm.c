@@ -2493,7 +2493,7 @@ static int process_output(descriptor_data *t) {
 		strcat(osb, "**OVERFLOW**\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
 
 	/* add the extra CRLF if the person isn't in compact mode */
-	if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT) && !t->pProtocol->WriteOOB)
+	if (STATE(t) == CON_PLAYING && t->character && !REAL_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT) && !t->pProtocol->WriteOOB)
 		strcat(osb, "\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
 
 	// add prompt
