@@ -23,11 +23,21 @@
 #include "dg_event.h"
 #include "comm.h"
 #include "olc.h"
+#include "interpreter.h"
 
+// external vars
+extern int max_mob_id;
+extern int max_obj_id;
+extern int max_vehicle_id;
+extern struct reboot_control_data reboot_control;
+
+// external fucs
+extern void half_chop(char *string, char *arg1, char *arg2);
+
+// locals
 void trig_data_copy(trig_data *this_data, const trig_data *trg);
 void free_trigger(trig_data *trig);
 
-extern void half_chop(char *string, char *arg1, char *arg2);
 
 /**
 * Uses strtok() to compile a list of trigger commands.
@@ -313,4 +323,69 @@ void assign_triggers(void *i, int type) {
 			syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: unknown type for assign_triggers()");
 			break;
 	}
+}
+
+
+/**
+* Fetches the char's script id -- may also set it here if it's not set yet.
+*
+* @param char_data *ch The character.
+* @return int The unique ID.
+*/
+int char_script_id(char_data *ch) {
+	if (ch->script_id == 0) {
+		ch->script_id = max_mob_id++;
+		add_to_lookup_table(ch->script_id, (void *)ch);
+		
+		if (max_mob_id >= EMPIRE_ID_BASE && reboot_control.time > 16) {
+			reboot_control.time = 16;
+			reboot_control.type = SCMD_REBOOT;
+			syslog(SYS_ERROR, 0, TRUE, "SYSERR: Script IDs for mobiles has exceeded the limit, scheduling an auto-reboot");
+		}
+	}
+	return ch->script_id;
+}
+
+
+/**
+* Fetches the object's script id -- may also set it here if it's not set yet.
+*
+* @param obj_data *obj The object.
+* @return int The unique ID.
+*/
+int obj_script_id(obj_data *obj) {
+	if (obj->script_id == 0) {
+		obj->script_id = max_obj_id++;
+		add_to_lookup_table(obj->script_id, (void *)obj);
+		
+		/* objs don't run out of idspace, currently
+		if (max_obj_id > x && reboot_control.time > 16) {
+			reboot_control.time = 16;
+			reboot_control.type = SCMD_REBOOT;
+			syslog(SYS_ERROR, 0, TRUE, "SYSERR: Script IDs for objects has exceeded the limit, scheduling an auto-reboot");
+		}
+		*/
+	}
+	return obj->script_id;
+}
+
+
+/**
+* Fetches the vehicle's script id -- may also set it here if it's not set yet.
+*
+* @param vehicle_data *veh The vehicle.
+* @return int The unique ID.
+*/
+int veh_script_id(vehicle_data *veh) {
+	if (veh->script_id == 0) {
+		veh->script_id = max_vehicle_id++;
+		add_to_lookup_table(veh->script_id, (void *)veh);
+		
+		if (max_vehicle_id >= OBJ_ID_BASE && reboot_control.time > 16) {
+			reboot_control.time = 16;
+			reboot_control.type = SCMD_REBOOT;
+			syslog(SYS_ERROR, 0, TRUE, "SYSERR: Script IDs for vehicles has exceeded the limit, scheduling an auto-reboot");
+		}
+	}
+	return veh->script_id;
 }

@@ -2196,7 +2196,7 @@ ACMD(do_repair) {
 	}
 	else {
 		start_action(ch, ACT_REPAIRING, -1);
-		GET_ACTION_VNUM(ch, 0) = GET_ID(veh);
+		GET_ACTION_VNUM(ch, 0) = veh_script_id(veh);
 		act("You begin to repair $V.", FALSE, ch, NULL, veh, TO_CHAR);
 		act("$n begins to repair $V.", FALSE, ch, NULL, veh, TO_ROOM);
 	}

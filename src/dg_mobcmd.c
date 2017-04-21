@@ -1739,7 +1739,7 @@ ACMD(do_mremember) {
 	}
 
 	/* fill in the structure */
-	mem->id = GET_ID(victim);
+	mem->id = char_script_id(victim);
 	if (argument && *argument) {
 		mem->cmd = strdup(argument);
 	}
@@ -1784,7 +1784,7 @@ ACMD(do_mforget) {
 	mem = SCRIPT_MEM(ch);
 	prev = NULL;
 	while (mem) {
-		if (mem->id == GET_ID(victim)) {
+		if (mem->id == char_script_id(victim)) {
 			if (mem->cmd)
 				free(mem->cmd);
 			if (prev==NULL) {
@@ -1931,7 +1931,7 @@ ACMD(do_mtransform) {
 		char_to_room(m, IN_ROOM(ch));
 
 		memcpy(&tmpmob, m, sizeof(*m));
-		tmpmob.id = ch->id;
+		tmpmob.script_id = ch->script_id;
 		tmpmob.affected = ch->affected;
 		tmpmob.carrying = ch->carrying;
 		tmpmob.proto_script = ch->proto_script;

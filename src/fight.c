@@ -1298,7 +1298,7 @@ obj_data *make_corpse(char_data *ch) {
 	
 	// store as person's last corpse id
 	if (!IS_NPC(ch)) {
-		GET_LAST_CORPSE_ID(ch) = GET_ID(corpse);
+		GET_LAST_CORPSE_ID(ch) = obj_script_id(corpse);
 	}
 	
 	// binding

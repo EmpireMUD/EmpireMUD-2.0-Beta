@@ -3309,7 +3309,7 @@ struct char_data {
 	obj_data *carrying;	// head of list
 	descriptor_data *desc;	// NULL for mobiles
 
-	int id;	// used by DG triggers - unique id
+	int script_id;	// used by DG triggers - unique id
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct script_data *script;	// script info for the object
 	struct script_memory *memory;	// for mob memory triggers
@@ -3903,7 +3903,7 @@ struct obj_data {
 	obj_data *in_obj;	// In what object NULL when none
 	obj_data *contains;	// Contains objects
 
-	int id;	// used by DG triggers - unique id
+	int script_id;	// used by DG triggers - unique id
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct script_data *script;	// script info for the object
 
@@ -4163,7 +4163,7 @@ struct vehicle_data {
 	char_data *driver;	// person driving it
 	
 	// scripting
-	int id;	// used by DG triggers - unique id
+	int script_id;	// used by DG triggers - unique id
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct script_data *script;	// script info for the object
 	

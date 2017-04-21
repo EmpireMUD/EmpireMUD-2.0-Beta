@@ -3636,7 +3636,9 @@ void free_obj(obj_data *obj) {
 	}
 
 	/* find_obj helper */
-	remove_from_lookup_table(GET_ID(obj));
+	if (obj->script_id > 0) {
+		remove_from_lookup_table(obj->script_id);
+	}
 
 	free(obj);
 }

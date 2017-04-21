@@ -818,9 +818,7 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	IN_ROOM(veh) = NULL;
 	REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);	// ensure not marked incomplete
 	
-	// script id -- find_vehicle helper
-	GET_ID(veh) = max_vehicle_id++;
-	add_to_lookup_table(GET_ID(veh), (void *)veh);
+	veh->script_id = 0;	// initialize later
 	
 	if (with_triggers) {
 		veh->proto_script = copy_trig_protos(proto->proto_script);

@@ -938,7 +938,9 @@ void free_char(char_data *ch) {
 	}
 
 	/* find_char helper */
-	remove_from_lookup_table(GET_ID(ch));
+	if (ch->script_id > 0) {
+		remove_from_lookup_table(ch->script_id);
+	}
 
 	free(ch);
 }
@@ -3166,8 +3168,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// add to lists
 	ch->next = character_list;
 	character_list = ch;
-	GET_ID(ch) = GET_IDNUM(ch);
-	add_to_lookup_table(GET_ID(ch), (void *)ch);
+	ch->script_id = GET_IDNUM(ch);
+	add_to_lookup_table(ch->script_id, (void *)ch);
 	
 	// place character
 	char_to_room(ch, load_room);

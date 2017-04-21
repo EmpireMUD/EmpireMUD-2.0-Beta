@@ -3298,7 +3298,7 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 				obj = iter->obj;
 				iter->obj = NULL;
 				add_to_object_list(obj);	// put back in object list
-				GET_ID(obj) = max_obj_id++;
+				obj->script_id = 0;	// clear this out so it's guaranteed to get a new one
 			}
 			
 			if (obj) {

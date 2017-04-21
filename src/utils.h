@@ -316,7 +316,6 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_FED_ON_BY(ch)  ((ch)->char_specials.fed_on_by)
 #define GET_FEEDING_FROM(ch)  ((ch)->char_specials.feeding_from)
 #define GET_HEALTH_REGEN(ch)  ((ch)->char_specials.health_regen)
-#define GET_ID(x)  ((x)->id)
 #define GET_IDNUM(ch)  (REAL_CHAR(ch)->char_specials.idnum)
 #define GET_LAST_SWING_MAINHAND(ch)  ((ch)->char_specials.fighting.last_swing_mainhand)
 #define GET_LAST_SWING_OFFHAND(ch)  ((ch)->char_specials.fighting.last_swing_offhand)

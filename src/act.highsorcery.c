@@ -1914,7 +1914,7 @@ RITUAL_SETUP_FUNC(start_siege_ritual) {
 		start_ritual(ch, ritual);
 		// action 0 is ritual #
 		GET_ACTION_VNUM(ch, 1) = room_targ ? GET_ROOM_VNUM(room_targ) : NOTHING;
-		GET_ACTION_VNUM(ch, 2) = veh_targ ? GET_ID(veh_targ) : NOTHING;
+		GET_ACTION_VNUM(ch, 2) = veh_targ ? veh_script_id(veh_targ) : NOTHING;
 		return TRUE;
 	}
 	
