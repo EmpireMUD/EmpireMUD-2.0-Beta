@@ -1215,6 +1215,10 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 #define HSSH(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "they" : ((GET_SEX(ch) && !CHAR_MORPH_FLAGGED(ch, MORPHF_GENDER_NEUTRAL)) ? (GET_SEX(ch) == SEX_MALE ? "he" :"she") : "it"))
 #define HMHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "them" : ((GET_SEX(ch) && !CHAR_MORPH_FLAGGED(ch, MORPHF_GENDER_NEUTRAL)) ? (GET_SEX(ch) == SEX_MALE ? "him":"her") : "it"))
 
+#define REAL_HSHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "their" : (GET_REAL_SEX(ch) ? (GET_REAL_SEX(ch) == SEX_MALE ? "his":"her") :"its"))
+#define REAL_HSSH(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "they" : (GET_REAL_SEX(ch) ? (GET_REAL_SEX(ch) == SEX_MALE ? "he" :"she") : "it"))
+#define REAL_HMHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "them" : (GET_REAL_SEX(ch) ? (GET_REAL_SEX(ch) == SEX_MALE ? "him":"her") : "it"))
+
 #define AN(string)  (strchr("aeiouAEIOU", *string) ? "an" : "a")
 #define SANA(obj)  (strchr("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")
 #define ANA(obj)  (strchr("aeiouyAEIOUY", *(obj)->name) ? "An" : "A")

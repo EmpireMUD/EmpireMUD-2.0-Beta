@@ -6490,7 +6490,7 @@ ACMD(do_restore) {
 
 ACMD(do_return) {
 	if (ch->desc && ch->desc->original) {
-		syslog(SYS_GC, GET_INVIS_LEV(ch->desc->original), TRUE, "GC: %s has returned to %s original body", GET_REAL_NAME(ch->desc->original), HSHR(ch->desc->original));
+		syslog(SYS_GC, GET_INVIS_LEV(ch->desc->original), TRUE, "GC: %s has returned to %s original body", GET_REAL_NAME(ch->desc->original), REAL_HSHR(ch->desc->original));
 		send_to_char("You return to your original body.\r\n", ch);
 
 		/*

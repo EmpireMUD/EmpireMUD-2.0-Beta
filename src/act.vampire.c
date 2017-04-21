@@ -351,10 +351,12 @@ void taste_blood(char_data *ch, char_data *vict) {
 		if (GET_BLOOD(vict) != GET_MAX_BLOOD(vict)) {
 			sprintf(buf, "$E is missing about %d%% of $S blood.", (GET_MAX_BLOOD(vict) - GET_BLOOD(vict)) * 100 / GET_MAX_BLOOD(vict));
 			act(buf, FALSE, ch, 0, vict, TO_CHAR);
-			}
-
-		sprintf(buf, "$E is about %d years old.", GET_AGE(vict) + number(-1, 1));
-		act(buf, FALSE, ch, 0, vict, TO_CHAR);
+		}
+		
+		if (!IS_NPC(vict)) {
+			sprintf(buf, "$E is about %d years old.", GET_AGE(vict) + number(-1, 1));
+			act(buf, FALSE, ch, 0, vict, TO_CHAR);
+		}
 		
 		command_lag(ch, WAIT_ABILITY);
 		if (can_gain_exp_from(ch, vict)) {

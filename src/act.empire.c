@@ -2688,11 +2688,11 @@ ACMD(do_cede) {
 		msg_to_char(ch, "You can't cede a city center.\r\n");
 	}
 	else if ((f = get_or_create_empire(targ)) == NULL)
-		msg_to_char(ch, "You can't seem to cede land to %s.\r\n", HMHR(targ));
+		msg_to_char(ch, "You can't seem to cede land to %s.\r\n", REAL_HMHR(targ));
 	else if (f == e)
 		msg_to_char(ch, "You can't cede land to your own empire!\r\n");
 	else if (EMPIRE_CITY_TERRITORY(f) + EMPIRE_OUTSIDE_TERRITORY(f) >= land_can_claim(f, FALSE))
-		msg_to_char(ch, "You can't cede land to %s, %s empire can't own any more land.\r\n", HMHR(targ), HSHR(targ));
+		msg_to_char(ch, "You can't cede land to %s, %s empire can't own any more land.\r\n", REAL_HMHR(targ), REAL_HSHR(targ));
 	else if (!is_in_city_for_empire(room, f, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(f) >= land_can_claim(f, TRUE)) {
 		msg_to_char(ch, "You can't cede land to that empire as it is over its limit for territory outside of cities.\r\n");
 	}
@@ -4364,7 +4364,7 @@ ACMD(do_home) {
 				}
 			}
 			
-			log_to_empire(emp, ELOG_TERRITORY, "%s has made (%d, %d) %s home", PERS(ch, ch, 1), X_COORD(real), Y_COORD(real), HSHR(ch));
+			log_to_empire(emp, ELOG_TERRITORY, "%s has made (%d, %d) %s home", PERS(ch, ch, 1), X_COORD(real), Y_COORD(real), REAL_HSHR(ch));
 			msg_to_char(ch, "You make this your home.\r\n");
 		}
 	}
@@ -4768,7 +4768,7 @@ ACMD(do_pledge) {
 		msg_to_char(ch, "You can't join that empire.\r\n");
 	else {
 		GET_PLEDGE(ch) = EMPIRE_VNUM(e);
-		log_to_empire(e, ELOG_MEMBERS, "%s has offered %s pledge to this empire", PERS(ch, ch, 1), HSHR(ch));
+		log_to_empire(e, ELOG_MEMBERS, "%s has offered %s pledge to this empire", PERS(ch, ch, 1), REAL_HSHR(ch));
 		msg_to_char(ch, "You offer your pledge to %s.\r\n", EMPIRE_NAME(e));
 		SAVE_CHAR(ch);
 	}

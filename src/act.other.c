@@ -106,7 +106,7 @@ void adventure_summon(char_data *ch, char *argument) {
 		msg_to_char(ch, "Your target can't enter this instance.\r\n");
 	}
 	else if (!can_teleport_to(vict, IN_ROOM(vict), TRUE)) {
-		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", HSHR(vict));
+		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", REAL_HSHR(vict));
 	}
 	else if (!can_teleport_to(vict, IN_ROOM(ch), FALSE)) {
 		msg_to_char(ch, "Your target can't be summoned here.\r\n");
@@ -500,7 +500,7 @@ void summon_player(char_data *ch, char *argument) {
 		msg_to_char(ch, "You cannot summon the dead like that.\r\n");
 	}
 	else if (!can_teleport_to(vict, IN_ROOM(vict), TRUE)) {
-		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", HSHR(vict));
+		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", REAL_HSHR(vict));
 	}
 	else if (!can_teleport_to(vict, IN_ROOM(ch), FALSE)) {
 		msg_to_char(ch, "Your target can't be summoned here.\r\n");
@@ -1385,7 +1385,7 @@ ACMD(do_changepass) {
 		GET_PASSWD(ch) = str_dup(CRYPT(new1, PASSWORD_SALT));
 		SAVE_CHAR(ch);
 		
-		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "%s has changed %s password using changepass", GET_NAME(ch), HSHR(ch));
+		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "%s has changed %s password using changepass", GET_NAME(ch), REAL_HSHR(ch));
 		if (ch->desc && ch->desc->snoop_by) {
 			syslog(SYS_INFO, MIN(LVL_TOP, MAX(GET_INVIS_LEV(ch), GET_ACCESS_LEVEL(ch) + 1)), TRUE, "WARNING: %s changed password while being snooped", GET_NAME(ch));
 		}

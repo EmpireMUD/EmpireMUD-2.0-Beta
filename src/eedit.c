@@ -395,7 +395,7 @@ EEDIT(eedit_change_leader) {
 		if ((index = find_player_index_by_idnum(old_leader)) && (victim = find_or_load_player(index->name, &file))) {
 			if (GET_LOYALTY(victim) == emp) {
 				remove_lore(victim, LORE_PROMOTED);
-				add_lore(victim, LORE_PROMOTED, "No longer leader of %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+				add_lore(victim, LORE_PROMOTED, "Stepped down as leader of %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 			
 				// save now
 				if (file) {
