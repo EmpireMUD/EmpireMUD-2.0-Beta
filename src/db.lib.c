@@ -6665,11 +6665,19 @@ void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message 
 */
 int help_sort(const void *a, const void *b) {
 	const struct help_index_element *a1, *b1;
+	int cmp;
 
 	a1 = (const struct help_index_element *) a;
 	b1 = (const struct help_index_element *) b;
 
-	return (str_cmp(a1->keyword, b1->keyword));
+	cmp = (str_cmp(a1->keyword, b1->keyword));
+	
+	if (cmp) {
+		return cmp;
+	}
+	else {
+		return (b1->level - a1->level);
+	}
 }
 
 
