@@ -2061,7 +2061,7 @@ int health_gain(char_data *ch, bool info_only) {
 		gain += GET_HEALTH_REGEN(ch);
 		
 		if (HAS_BONUS_TRAIT(ch, BONUS_HEALTH_REGEN)) {
-			gain += 1;
+			gain += 1 + (get_approximate_level(ch) / 20);
 		}
 		
 		if (GET_FEEDING_FROM(ch) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
@@ -2118,7 +2118,7 @@ int mana_gain(char_data *ch, bool info_only) {
 		}
 		
 		if (HAS_BONUS_TRAIT(ch, BONUS_MANA_REGEN)) {
-			gain += 1;
+			gain += 1 + (get_approximate_level(ch) / 20);
 		}
 		if (GET_FEEDING_FROM(ch) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
 			gain *= 4;
@@ -2170,7 +2170,7 @@ int move_gain(char_data *ch, bool info_only) {
 		}
 		
 		if (HAS_BONUS_TRAIT(ch, BONUS_MOVE_REGEN)) {
-			gain += 1;
+			gain += 1 + (get_approximate_level(ch) / 20);
 		}
 		if (GET_FEEDING_FROM(ch) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
 			gain *= 4;
