@@ -1343,6 +1343,9 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 * @param obj_data *new_proto The olc object being saved as the new prototype.
 */
 void update_live_obj_from_olc(obj_data *to_update, obj_data *old_proto, obj_data *new_proto) {
+	// NOTE: If you ever choose to update flags here, some flags like LIGHT
+	// also require updates to the light counts in the world.
+	
 	// strings
 	if (GET_OBJ_KEYWORDS(to_update) == GET_OBJ_KEYWORDS(old_proto)) {
 		GET_OBJ_KEYWORDS(to_update) = GET_OBJ_KEYWORDS(new_proto);
