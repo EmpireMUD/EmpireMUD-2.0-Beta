@@ -5436,6 +5436,10 @@ ACMD(do_workforce) {
 		else if (isdigit(*lim_arg)) {
 			limit = atoi(lim_arg);
 		}
+		else if (limit < 0) {
+			// caused by absurdly large limits rolling over
+			msg_to_char(ch, "Invalid limit.\r\n");
+		}
 		else {
 			msg_to_char(ch, "Invalid setting (must be on, off, or a limit number).\r\n");
 			return;
