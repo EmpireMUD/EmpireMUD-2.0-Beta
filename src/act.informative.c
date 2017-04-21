@@ -1587,17 +1587,20 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	
 	// shortlist ends here
 	if (shortlist) {
+		// append invis even in short list
+		if (GET_INVIS_LEV(ch)) {
+			size += snprintf(out + size, sizeof(out) - size, " (i%d)", GET_INVIS_LEV(ch));
+		}
+		else if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+			size += snprintf(out + size, sizeof(out) - size, " (inc)");
+		}
+		
+		// determine length to show
 		num = color_code_length(out);
 		sprintf(buf, "%%-%d.%ds", 35 + num, 35 + num);
 		strcpy(buf1, out);
 		
 		size = snprintf(out, sizeof(out), buf, buf1);
-		
-		// append invis even in short list
-		if (GET_INVIS_LEV(ch)) {
-			size += snprintf(out + size, sizeof(out) - size, " (i%d)", GET_INVIS_LEV(ch));
-		}
-		
 		return out;
 	}
 	
@@ -1710,7 +1713,6 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 			continue;
 
 		// show one char
-		++count;
 		CREATE(entry, struct who_entry, 1);
 		entry->access_level = GET_ACCESS_LEVEL(tch);
 		entry->computed_level = GET_COMPUTED_LEVEL(tch);
@@ -1729,7 +1731,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 		
 		// columnar spacing
 		if (shortlist) {
-			size += snprintf(whobuf + size, sizeof(whobuf) - size, "%s", !(count % 2) ? "\r\n" : " ");
+			size += snprintf(whobuf + size, sizeof(whobuf) - size, "%s", !(++count % 2) ? "\r\n" : " ");
 		}
 		
 		free(entry->string);
