@@ -441,7 +441,7 @@ obj_data *find_back_portal(room_data *in_room, room_data *from_room, obj_data *f
 
 // processes the character's north
 int get_north_for_char(char_data *ch) {
-	if (IS_NPC(ch) || (has_ability(ch, ABIL_NAVIGATION) && GET_COND(ch, DRUNK) < 250)) {
+	if (IS_NPC(ch) || (has_ability(ch, ABIL_NAVIGATION) && !IS_DRUNK(ch))) {
 		return NORTH;
 	}
 	else {
