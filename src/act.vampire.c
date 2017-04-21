@@ -686,7 +686,7 @@ ACMD(do_bite) {
 					
 					command_lag(ch, WAIT_COMBAT_ABILITY);
 					if (!FIGHTING(victim)) {
-						hit(victim, ch, GET_EQ(victim, WEAR_WIELD), FALSE);
+						hit(victim, ch, GET_EQ(victim, WEAR_WIELD), TRUE);
 					}
 					return;
 				}

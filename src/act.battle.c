@@ -344,7 +344,7 @@ ACMD(do_heartstop) {
 
 		msg_to_char(victim, "Your blood becomes inert!\r\n");
 		
-		hit(victim, ch, GET_EQ(victim, WEAR_WIELD), FALSE);
+		hit(victim, ch, GET_EQ(victim, WEAR_WIELD), TRUE);
 	}
 }
 

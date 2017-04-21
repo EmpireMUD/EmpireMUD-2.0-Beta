@@ -77,7 +77,7 @@ ACMD(do_assist) {
 			send_to_char("You join the fight!\r\n", ch);
 			act("$N assists you!", 0, helpee, 0, ch, TO_CHAR);
 			act("$n assists $N.", FALSE, ch, 0, helpee, TO_NOTVICT);
-			hit(ch, opponent, GET_EQ(ch, WEAR_WIELD), FALSE);
+			hit(ch, opponent, GET_EQ(ch, WEAR_WIELD), TRUE);
 		}
 		else {
 			act("You can't attack $N!", FALSE, ch, 0, opponent, TO_CHAR);
@@ -291,7 +291,7 @@ ACMD(do_hit) {
 			command_lag(ch, WAIT_OTHER);
 		}
 		else {
-			hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
+			hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
 			// ensure hitting
 			if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && FIGHTING(ch) && FIGHTING(ch) != vict) {
 				FIGHTING(ch) = vict;

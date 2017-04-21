@@ -187,7 +187,7 @@ ACMD(do_maggro) {
 	
 	// attempt victim first
 	if (victim && can_fight(ch, victim)) {
-		hit(ch, victim, GET_EQ(ch, WEAR_WIELD), FALSE);
+		hit(ch, victim, GET_EQ(ch, WEAR_WIELD), TRUE);
 		
 		// ensure hitting the right person (in this case only)
 		if (victim && !EXTRACTED(victim) && !IS_DEAD(victim) && FIGHTING(ch) && FIGHTING(ch) != victim) {
@@ -212,7 +212,7 @@ ACMD(do_maggro) {
 		}
 		
 		// success!
-		hit(ch, iter, GET_EQ(ch, WEAR_WIELD), FALSE);
+		hit(ch, iter, GET_EQ(ch, WEAR_WIELD), TRUE);
 		return;
 	}
 	
@@ -226,7 +226,7 @@ ACMD(do_maggro) {
 		}
 		
 		// success!
-		hit(ch, iter, GET_EQ(ch, WEAR_WIELD), FALSE);
+		hit(ch, iter, GET_EQ(ch, WEAR_WIELD), TRUE);
 		return;
 	}
 }
@@ -313,7 +313,7 @@ ACMD(do_mkill) {
 	}
 
 	// start fight!
-	hit(ch, victim, GET_EQ(ch, WEAR_WIELD), FALSE);
+	hit(ch, victim, GET_EQ(ch, WEAR_WIELD), TRUE);
 	
 	// ensure hitting the right person
 	if (victim && !EXTRACTED(victim) && !IS_DEAD(victim) && FIGHTING(ch) && FIGHTING(ch) != victim) {
