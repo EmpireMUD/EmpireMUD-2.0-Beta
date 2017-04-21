@@ -331,7 +331,9 @@ ACMD(do_heartstop) {
 
 		if (!skill_check(ch, ABIL_HEARTSTOP, DIFF_HARD) || AFF_FLAGGED(victim, AFF_IMMUNE_BATTLE)) {
 			msg_to_char(ch, "But nothing happens.\r\n");
-			hit(victim, ch, GET_EQ(victim, WEAR_WIELD), FALSE);
+			if (!FIGHTING(victim)) {
+				hit(victim, ch, GET_EQ(victim, WEAR_WIELD), FALSE);
+			}
 			return;
 		}
 		
@@ -344,7 +346,9 @@ ACMD(do_heartstop) {
 
 		msg_to_char(victim, "Your blood becomes inert!\r\n");
 		
-		hit(victim, ch, GET_EQ(victim, WEAR_WIELD), TRUE);
+		if (!FIGHTING(victim)) {
+			hit(victim, ch, GET_EQ(victim, WEAR_WIELD), TRUE);
+		}
 	}
 }
 

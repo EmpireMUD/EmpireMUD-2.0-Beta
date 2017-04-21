@@ -291,7 +291,7 @@ ACMD(do_hit) {
 			command_lag(ch, WAIT_OTHER);
 		}
 		else {
-			hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
+			hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FIGHTING(ch) ? FALSE : TRUE);	// count as exp only if not already fighting
 			// ensure hitting
 			if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && FIGHTING(ch) && FIGHTING(ch) != vict) {
 				FIGHTING(ch) = vict;
