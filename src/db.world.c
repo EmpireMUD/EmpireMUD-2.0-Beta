@@ -1612,7 +1612,7 @@ void perform_change_base_sect(room_data *loc, struct map_data *map, sector_data 
 * @param sector_data *sect The type to change it to.
 */
 void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect) {
-	bool belongs = BELONGS_IN_TERRITORY_LIST(loc);
+	bool belongs = (SECT(loc) && BELONGS_IN_TERRITORY_LIST(loc));
 	struct empire_territory_data *ter;
 	bool was_large, was_in_city, junk;
 	struct sector_index_type *idx;
