@@ -4215,7 +4215,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				reset->command = *(line + 2);
 				ptr = line + 3;
 				
-				if (reset->command == 'V') { // V: string-arg command
+				if (reset->command == 'V') { // V: script variable reset
 					// trigger_type misc? room_vnum sarg1 sarg2
 					if (sscanf(line + 3, " %d %d %d %79s %79[^\f\n\r\t\v]", &reset->arg1, &reset->arg2, &reset->arg3, str1, str2) != 5) {
 						error = TRUE;
@@ -4395,6 +4395,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	struct room_extra_data *red, *next_red;
 	struct depletion_data *dep;
 	struct cooldown_data *cool;
+	struct trig_var_data *tvd;
 	trig_data *trig;
 	char_data *mob;
 	
@@ -4423,10 +4424,17 @@ void write_room_to_file(FILE *fl, room_data *room) {
 			// C O
 			fprintf(fl, "C O\n");
 		}
-		// triggers: C T type vnum
+		
 		if (SCRIPT(room)) {
+			// triggers: C T type vnum
 			for (trig = TRIGGERS(SCRIPT(room)); trig; trig = trig->next) {
 				fprintf(fl, "C T %d %d\n", WLD_TRIGGER, GET_TRIG_VNUM(trig));
+			}
+			
+			// triggers: C V
+			LL_FOREACH(SCRIPT(room)->global_vars, tvd) {
+				// trig-type 0 context name value
+				fprintf(fl, "C V %d %d %d %79s %79s\n", WLD_TRIGGER, 0, (int)tvd->context, tvd->name, tvd->value);
 			}
 		}
 		if (ROOM_PEOPLE(room)) {
@@ -4450,17 +4458,22 @@ void write_room_to_file(FILE *fl, room_data *room) {
 						fprintf(fl, "C C %d %d\n", cool->type, (int)(cool->expire_time - time(0)));
 					}
 					
-					// triggers: C T type vnum
 					if (SCRIPT(mob)) {
+						// triggers: C T type vnum
 						for (trig = TRIGGERS(SCRIPT(mob)); trig; trig = trig->next) {
 							fprintf(fl, "C T %d %d\n", MOB_TRIGGER, GET_TRIG_VNUM(trig));
+						}
+						
+						// triggers: C V type context name~
+						//           value~
+						LL_FOREACH(SCRIPT(mob)->global_vars, tvd) {
+							// trig-type 0 context name value
+							fprintf(fl, "C V %d %d %d %79s %79s\n", MOB_TRIGGER, 0, (int)tvd->context, tvd->name, tvd->value);
 						}
 					}
 				}
 			}
 		}
-		
-		// TODO script vars?
 	}
 
 	// E affects
