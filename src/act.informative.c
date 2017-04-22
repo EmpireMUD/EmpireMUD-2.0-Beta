@@ -1727,11 +1727,12 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 	for (entry = list; entry; entry = next_entry) {
 		next_entry = entry->next;
 		
+		++count;
 		size += snprintf(whobuf + size, sizeof(whobuf) - size, "%s", entry->string);
 		
 		// columnar spacing
 		if (shortlist) {
-			size += snprintf(whobuf + size, sizeof(whobuf) - size, "%s", !(++count % 2) ? "\r\n" : " ");
+			size += snprintf(whobuf + size, sizeof(whobuf) - size, "%s", !(count % 2) ? "\r\n" : " ");
 		}
 		
 		free(entry->string);
