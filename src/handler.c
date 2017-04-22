@@ -605,7 +605,7 @@ void affect_total(char_data *ch) {
 	extern const int base_player_pools[NUM_POOLS];
 
 	struct affected_type *af;
-	int i, iter;
+	int i, iter, level;
 	empire_data *emp = GET_LOYALTY(ch);
 	struct obj_apply *apply;
 	int health, move, mana;
@@ -616,6 +616,7 @@ void affect_total(char_data *ch) {
 	health = GET_HEALTH(ch);
 	move = GET_MOVE(ch);
 	mana = GET_MANA(ch);
+	level = get_approximate_level(ch);
 	
 	// only update greatness if ch is in a room (playing)
 	if (!IS_NPC(ch) && emp && IN_ROOM(ch)) {
@@ -675,13 +676,13 @@ void affect_total(char_data *ch) {
 	}
 	
 	if (HAS_BONUS_TRAIT(ch, BONUS_HEALTH)) {
-		GET_MAX_HEALTH(ch) += pool_bonus_amount;
+		GET_MAX_HEALTH(ch) += pool_bonus_amount * (1 + (level / 25));
 	}
 	if (HAS_BONUS_TRAIT(ch, BONUS_MOVES)) {
-		GET_MAX_MOVE(ch) += pool_bonus_amount;
+		GET_MAX_MOVE(ch) += pool_bonus_amount * (1 + (level / 25));
 	}
 	if (HAS_BONUS_TRAIT(ch, BONUS_MANA)) {
-		GET_MAX_MANA(ch) += pool_bonus_amount;
+		GET_MAX_MANA(ch) += pool_bonus_amount * (1 + (level / 25));
 	}
 
 	// ability-based modifiers

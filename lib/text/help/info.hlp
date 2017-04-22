@@ -252,7 +252,7 @@ twice.
 Available traits:
  More Strength, Dexterity, Charisma, Greatness, Intelligence, or Wits - +1
  Extra health, moves, or mana - +15
- Faster health, move, or mana regeneration - +1
+ Faster health, move, or mana regeneration - 1 + (level/20)
  Faster chores - chopping, digging, and other chores go faster
  Extra daily bonus experience - 5 extra daily bonus experience points
  Larger inventory - Carry 5 more small items (or 2 more large items)
