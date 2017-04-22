@@ -1500,7 +1500,7 @@ void reset_one_room(room_data *room) {
 						log("SYSERR: Attempt to give variable to scriptless object");
 					}
 					else {
-						add_var(&(room->script->global_vars), reset->sarg1, reset->sarg2, reset->arg2);
+						add_var(&(room->script->global_vars), reset->sarg1, reset->sarg2, reset->arg3);
 					}
 				}
 				break;
