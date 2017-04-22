@@ -147,9 +147,7 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	extern crop_data *get_potential_crop_for_location(room_data *location);
 	void lock_icon(room_data *room, struct icon_data *use_icon);
 	
-	bool belongs = BELONGS_IN_TERRITORY_LIST(room);
 	sector_data *old_sect = SECT(room), *st = sector_proto(sect);
-	struct empire_territory_data *ter;
 	struct map_data *map, *temp;
 	crop_data *new_crop = NULL;
 	empire_data *emp;
@@ -229,14 +227,6 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	// did it become unclaimable?
 	if (emp && SECT_FLAGGED(st, SECTF_NO_CLAIM)) {
 		abandon_room(room);
-	}
-	else if (emp && belongs != BELONGS_IN_TERRITORY_LIST(room)) {	// do we need to add/remove the territory entry?
-		if (belongs && (ter = find_territory_entry(emp, room))) {	// losing
-			delete_territory_entry(emp, ter);
-		}
-		else if (!belongs && !find_territory_entry(emp, room)) {	// adding
-			create_territory_entry(emp, room);
-		}
 	}
 }
 
@@ -1622,6 +1612,8 @@ void perform_change_base_sect(room_data *loc, struct map_data *map, sector_data 
 * @param sector_data *sect The type to change it to.
 */
 void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect) {
+	bool belongs = BELONGS_IN_TERRITORY_LIST(loc);
+	struct empire_territory_data *ter;
 	bool was_large, was_in_city, junk;
 	struct sector_index_type *idx;
 	sector_data *old_sect;
@@ -1678,24 +1670,34 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	}
 	
 	// check for territory updates
-	if (loc && ROOM_OWNER(loc) && was_large != ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS)) {
-		struct empire_island *eisle = get_empire_island(ROOM_OWNER(loc), GET_ISLAND_ID(loc));
-		if (was_large && was_in_city && !is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
-			// changing from in-city to not
-			EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) -= 1;
-			eisle->city_terr -= 1;
-			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) += 1;
-			eisle->outside_terr += 1;
+	if (loc && ROOM_OWNER(loc)) {
+		if (was_large != ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS)) {
+			struct empire_island *eisle = get_empire_island(ROOM_OWNER(loc), GET_ISLAND_ID(loc));
+			if (was_large && was_in_city && !is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
+				// changing from in-city to not
+				EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) -= 1;
+				eisle->city_terr -= 1;
+				EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) += 1;
+				eisle->outside_terr += 1;
+			}
+			else if (ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
+				// changing from outside-territory to in-city
+				EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) += 1;
+				eisle->city_terr -= 1;
+				EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) -= 1;
+				eisle->outside_terr += 1;
+			}
+			else {
+				// no relevant change
+			}
 		}
-		else if (ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
-			// changing from outside-territory to in-city
-			EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) += 1;
-			eisle->city_terr -= 1;
-			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) -= 1;
-			eisle->outside_terr += 1;
-		}
-		else {
-			// no relevant change
+		if (belongs != BELONGS_IN_TERRITORY_LIST(loc)) {	// do we need to add/remove the territory entry?
+			if (belongs && (ter = find_territory_entry(ROOM_OWNER(loc), loc))) {	// losing
+				delete_territory_entry(ROOM_OWNER(loc), ter);
+			}
+			else if (!belongs && !find_territory_entry(ROOM_OWNER(loc), loc)) {	// adding
+				create_territory_entry(ROOM_OWNER(loc), loc);
+			}
 		}
 	}
 }
