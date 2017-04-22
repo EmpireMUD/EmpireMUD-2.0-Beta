@@ -3064,7 +3064,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	struct slash_channel *load_slash, *next_slash, *temp;
 	bool stop_action = FALSE, try_home = FALSE;
 	room_data *load_room = NULL, *map_loc;
-	char_data *ch = d->character;
+	char_data *ch = d->character, *repl;
 	char lbuf[MAX_STRING_LENGTH];
 	struct affected_type *af;
 	player_index_data *index;
@@ -3298,6 +3298,11 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// ensure quests are up-to-date
 	refresh_all_quests(ch);
+	
+	// break last reply if invis
+	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {
+		GET_LAST_TELL(ch) = NOBODY;
+	}
 	
 	msdp_update_room(ch);
 	
