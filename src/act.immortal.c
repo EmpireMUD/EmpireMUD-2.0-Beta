@@ -4814,6 +4814,24 @@ ACMD(do_autowiz) {
 }
 
 
+ACMD(do_breakreply) {
+	char_data *iter;
+	
+	LL_FOREACH(character_list, iter) {
+		if (IS_NPC(iter) || GET_ACCESS_LEVEL(iter) >= GET_ACCESS_LEVEL(ch)) {
+			continue;
+		}
+		if (GET_LAST_TELL(iter) != ch) {
+			continue;
+		}
+		
+		GET_LAST_TELL(iter) = NOBODY;
+	}
+	
+	send_config_msg(ch, "ok_string");
+}
+
+
 ACMD(do_clearabilities) {
 	char_data *vict;
 	char typestr[MAX_STRING_LENGTH];

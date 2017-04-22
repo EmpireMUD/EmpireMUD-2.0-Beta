@@ -73,6 +73,16 @@ Examples:
 
 See also: GRANT, WIZLOCK
 #d
+BREAKREPLY "BREAK REPLY"
+
+Usage:  breakreply
+
+This command cancels the "reply-to" data for all players in the game who are
+lower level than you. It's useful it you want to be invisible and don't want
+players to be able to see that you're online using "reply".
+
+See also: REPLY
+#d
 CLEARABILITIES
 
 Usage:  clearabilities <player> <skill | all>
