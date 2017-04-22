@@ -4821,7 +4821,7 @@ ACMD(do_breakreply) {
 		if (IS_NPC(iter) || GET_ACCESS_LEVEL(iter) >= GET_ACCESS_LEVEL(ch)) {
 			continue;
 		}
-		if (GET_LAST_TELL(iter) != ch) {
+		if (GET_LAST_TELL(iter) != GET_IDNUM(ch)) {
 			continue;
 		}
 		
