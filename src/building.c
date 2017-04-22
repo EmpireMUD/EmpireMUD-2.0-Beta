@@ -233,6 +233,11 @@ void construct_building(room_data *room, bld_vnum type) {
 		}
 	}
 	
+	if (ROOM_OWNER(room)) {
+		void deactivate_workforce_room(empire_data *emp, room_data *room);
+		deactivate_workforce_room(ROOM_OWNER(room), room);
+	}
+	
 	load_wtrigger(room);
 }
 
@@ -1961,6 +1966,11 @@ ACMD(do_lay) {
 				COMPLEX_DATA(IN_ROOM(ch)) = init_complex_data();
 			}
 			GET_BUILT_WITH(IN_ROOM(ch)) = charged;
+		}
+		
+		if (ROOM_OWNER(IN_ROOM(ch))) {
+			void deactivate_workforce_room(empire_data *emp, room_data *room);
+			deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
 		}
 		
 		command_lag(ch, WAIT_OTHER);

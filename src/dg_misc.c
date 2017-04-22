@@ -601,6 +601,11 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 		
 		remove_depletion(target, DPLTN_PICK);
 		remove_depletion(target, DPLTN_FORAGE);
+		
+		if (ROOM_OWNER(target)) {
+			void deactivate_workforce_room(empire_data *emp, room_data *room);
+			deactivate_workforce_room(ROOM_OWNER(target), target);
+		}
 	}
 }
 
@@ -626,6 +631,11 @@ void do_dg_terraform(room_data *target, sector_data *sect) {
 	// preserve old original sect for roads -- TODO this is a special-case
 	if (IS_ROAD(target)) {
 		change_base_sector(target, old_sect);
+	}
+	
+	if (ROOM_OWNER(target)) {
+		void deactivate_workforce_room(empire_data *emp, room_data *room);
+		deactivate_workforce_room(ROOM_OWNER(target), target);
 	}
 }
 

@@ -144,7 +144,6 @@ void change_chop_territory(room_data *room) {
 * @param sector_vnum sect Any sector vnum
 */
 void change_terrain(room_data *room, sector_vnum sect) {
-	void deactivate_workforce_room(empire_data *emp, room_data *room);
 	extern crop_data *get_potential_crop_for_location(room_data *location);
 	void lock_icon(room_data *room, struct icon_data *use_icon);
 	
@@ -161,11 +160,6 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	if (!st) {
 		log("SYSERR: change_terrain called with invalid sector vnum %d", sect);
 		return;
-	}
-	
-	// shut off workers
-	if (ROOM_OWNER(room)) {
-		deactivate_workforce_room(ROOM_OWNER(room), room);
 	}
 	
 	// tear down any building data and customizations
@@ -2122,6 +2116,11 @@ static void evolve_one_map_tile(struct map_data *tile) {
 			// If the new sector has crop data, we should store the original (e.g. a desert that randomly grows into a crop)
 			if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && BASE_SECT(room) == SECT(room)) {
 				change_base_sector(room, original);
+			}
+			
+			if (ROOM_OWNER(room)) {
+				void deactivate_workforce_room(empire_data *emp, room_data *room);
+				deactivate_workforce_room(ROOM_OWNER(room), room);
 			}
 		}
 	}
