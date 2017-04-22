@@ -3338,15 +3338,16 @@ void do_stat_character(char_data *ch, char_data *k) {
 		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 
 		// dex is removed from to-hit to make it easier to compare to caps
-		sprintf(lbuf, "Mob-dmg  [%d]", MOB_DAMAGE(k));
-		sprintf(lbuf2, "Mob-hit  [%d]", MOB_TO_HIT(k));
-		sprintf(lbuf2, "Mob-dodge  [%d]", MOB_TO_DODGE(k));
+		val = get_to_hit(k, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(k));;
+		sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, base_hit_chance), val);
+		sprintf(lbuf2, "Speed  [&0%.2f&0]", get_combat_speed(k, WEAR_WIELD));
+		sprintf(lbuf3, "Crafting  [%s%d&0]", HAPPY_COLOR(get_crafting_level(k), IS_NPC(k) ? get_approximate_level(k) : GET_SKILL_LEVEL(k)), get_crafting_level(k));
 		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 		
 		if (IS_NPC(k)) {
-			sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, base_hit_chance), val);
-			sprintf(lbuf2, "Speed  [&0%.2f&0]", get_combat_speed(k, WEAR_WIELD));
-			sprintf(lbuf3, "Crafting  [%s%d&0]", HAPPY_COLOR(get_crafting_level(k), IS_NPC(k) ? get_approximate_level(k) : GET_SKILL_LEVEL(k)), get_crafting_level(k));
+			sprintf(lbuf, "Mob-dmg  [%d]", MOB_DAMAGE(k));
+			sprintf(lbuf2, "Mob-hit  [%d]", MOB_TO_HIT(k));
+			sprintf(lbuf3, "Mob-dodge  [%d]", MOB_TO_DODGE(k));
 			msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 			
 			msg_to_char(ch, "NPC Bare Hand Dam: %d\r\n", MOB_DAMAGE(k));
