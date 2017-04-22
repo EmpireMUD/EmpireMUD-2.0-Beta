@@ -791,8 +791,6 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 * @return vehicle_data* The instantiated vehicle.
 */
 vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
-	extern int max_vehicle_id;
-	
 	vehicle_data *veh, *proto;
 	
 	if (!(proto = vehicle_proto(vnum))) {
