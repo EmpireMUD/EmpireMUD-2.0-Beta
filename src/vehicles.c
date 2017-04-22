@@ -870,6 +870,7 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	struct vehicle_attached_mob *vam;
 	char temp[MAX_STRING_LENGTH];
 	struct resource_data *res;
+	struct trig_var_data *tvd;
 	vehicle_data *proto;
 	
 	if (!fl || !veh) {
@@ -942,7 +943,13 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 			fprintf(fl, "Trigger: %d\n", GET_TRIG_VNUM(trig));
 		}
 		
-		// TODO could save SCRIPT(obj)->global_vars here too
+		LL_FOREACH (SCRIPT(veh)->global_vars, tvd) {
+			if (*tvd->name == '-') { // don't save if it begins with -
+				continue;
+			}
+			
+			fprintf(fl, "Variable: %s %ld\n%s\n", tvd->name, tvd->context, tvd->value);
+		}
 	}
 	
 	fprintf(fl, "Vehicle-end\n");
@@ -1259,6 +1266,18 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 					}
 				}
 				break;
+			}
+			case 'V': {
+				if (OBJ_FILE_TAG(line, "Variable:", length)) {
+					if (sscanf(line + length + 1, "%s %d", s_in, &i_in[0]) != 2 || !get_line(fl, line)) {
+						log("SYSERR: Bad variable format in unstore_vehicle_from_file: #%d", VEH_VNUM(veh));
+						exit(1);
+					}
+					if (!SCRIPT(veh)) {
+						create_script_data(veh, VEH_TRIGGER);
+					}
+					add_var(&(SCRIPT(veh)->global_vars), s_in, line, i_in[0]);
+				}
 			}
 		}
 	}

@@ -1489,7 +1489,7 @@ void reset_one_room(room_data *room) {
 			case 'V': {	// variable assignment
 				if (reset->arg1 == MOB_TRIGGER && tmob) {
 					if (!SCRIPT(tmob)) {
-						log("SYSERR: Attempt to give variable to scriptless mobile");
+						create_script_data(tmob, MOB_TRIGGER);
 					}
 					else {
 						add_var(&(SCRIPT(tmob)->global_vars), reset->sarg1, reset->sarg2, reset->arg3);
@@ -1497,7 +1497,7 @@ void reset_one_room(room_data *room) {
 				}
 				else if (reset->arg1 == WLD_TRIGGER) {
 					if (!room->script) {
-						log("SYSERR: Attempt to give variable to scriptless object");
+						create_script_data(room, WLD_TRIGGER);
 					}
 					else {
 						add_var(&(room->script->global_vars), reset->sarg1, reset->sarg2, reset->arg3);
