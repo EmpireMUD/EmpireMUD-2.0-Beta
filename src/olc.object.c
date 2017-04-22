@@ -150,6 +150,10 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Loot quality flags set");
 		problem = TRUE;
 	}
+	if (OBJ_FLAGGED(obj, OBJ_TWO_HANDED) && CAN_WEAR(obj, ITEM_WEAR_HOLD)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "2-handed + holdable");
+		problem = TRUE;
+	}
 	if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "KEEP flag");
 		problem = TRUE;
