@@ -804,6 +804,37 @@ static char *replace_fight_string(const char *str, const char *weapon_singular, 
 }
 
 
+/**
+* Pulls a character out of combat and stops every non-autokill person from
+* hitting him/her.
+*
+* @param char_data *ch The person who is dying.
+*/
+void stop_combat_no_autokill(char_data *ch) {
+	char_data *ch_iter;
+	
+	if (FIGHTING(ch)) {
+		stop_fighting(ch);
+	}
+
+	// look for anybody in the room fighting ch who wouldn't execute:
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+		if (ch_iter != ch && FIGHTING(ch_iter) == ch && !WOULD_EXECUTE(ch_iter, ch)) {
+			stop_fighting(ch_iter);
+		}
+	}
+
+	/* knock 'em out */
+	GET_HEALTH(ch) = -1;
+	GET_POS(ch) = POS_INCAP;
+
+	// remove all DoTs
+	while (ch->over_time_effects) {
+		dot_remove(ch, ch->over_time_effects);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// COMBAT METERS ///////////////////////////////////////////////////////////
 
@@ -2764,13 +2795,6 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 			break;
 	}
 	
-	if (ch != victim && GET_POS(victim) < POS_SLEEPING && !WOULD_EXECUTE(ch, victim)) {
-		// remove all DoTs
-		while (victim->over_time_effects) {
-			dot_remove(victim, victim->over_time_effects);
-		}
-	}
-	
 	// did we do any damage? tag the mob
 	if (dam > 0) {
 		tag_mob(victim, ch);
@@ -2827,7 +2851,11 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 		perform_execute(ch, victim, attacktype, damtype);
 		return -1;
 	}
-
+	else if (ch != victim && GET_POS(victim) < POS_SLEEPING && !WOULD_EXECUTE(ch, victim)) {
+		stop_combat_no_autokill(victim);
+		// no need to message here; they already got a pos message
+	}
+	
 	return dam;
 }
 
@@ -3276,7 +3304,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 
 	bool ok = FALSE;
 	bool revert = TRUE;
-	char_data *m, *ch_iter;
+	char_data *m;
 	obj_data *weapon;
 
 	/* stop_fighting() is split around here to help with exp */
@@ -3300,25 +3328,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 		ok = TRUE;
 
 	if (!ok) {
-		if (FIGHTING(victim))
-			stop_fighting(victim);
-
-		// look for anybody in the room fighting victim (including ch) who wouldn't execute:
-		for (ch_iter = ROOM_PEOPLE(IN_ROOM(victim)); ch_iter; ch_iter = ch_iter->next_in_room) {
-			if (ch_iter != victim && FIGHTING(ch_iter) == victim && !WOULD_EXECUTE(ch_iter, victim)) {
-				stop_fighting(ch_iter);
-			}
-		}
-
-		/* knock 'em out */
-		GET_HEALTH(victim) = -1;
-		GET_POS(victim) = POS_INCAP;
-	
-		// remove all DoTs
-		while (victim->over_time_effects) {
-			dot_remove(victim, victim->over_time_effects);
-		}
-		
+		stop_combat_no_autokill(victim);
 		act("$n is knocked unconscious!", FALSE, victim, 0, 0, TO_ROOM);
 		msg_to_char(victim, "You are knocked unconscious.\r\n");
 		return;
