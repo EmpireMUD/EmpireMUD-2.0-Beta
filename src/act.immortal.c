@@ -3974,7 +3974,7 @@ void do_stat_room(char_data *ch) {
 	char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
 	struct depletion_data *dep;
 	struct empire_city_data *city;
-	int found;
+	int found, num;
 	bool comma;
 	obj_data *j;
 	char_data *k;
@@ -3985,7 +3985,7 @@ void do_stat_room(char_data *ch) {
 	player_index_data *index;
 	struct global_data *glb;
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
-	struct instance_data *inst;
+	struct instance_data *inst, *inst_iter;
 	vehicle_data *veh;
 	
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
@@ -4050,8 +4050,15 @@ void do_stat_room(char_data *ch) {
 	}
 	
 	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
+		num = 0;
+		LL_FOREACH(instance_list, inst_iter) {
+			++num;
+			if (inst_iter == inst) {
+				break;
+			}
+		}
 		sprintbit(inst->flags, instance_flags, buf2, TRUE);
-		msg_to_char(ch, "Instance \tc%d\t0: [\tg%d\t0] \ty%s\t0, Main Room: [\tg%d\t0], Flags: \tc%s\t0\r\n", inst->id, GET_ADV_VNUM(inst->adventure), GET_ADV_NAME(inst->adventure), (inst->start ? GET_ROOM_VNUM(inst->start) : NOWHERE), buf2);
+		msg_to_char(ch, "Instance \tc%d\t0: [\tg%d\t0] \ty%s\t0, Main Room: [\tg%d\t0], Flags: \tc%s\t0\r\n", num, GET_ADV_VNUM(inst->adventure), GET_ADV_NAME(inst->adventure), (inst->start ? GET_ROOM_VNUM(inst->start) : NOWHERE), buf2);
 	}
 
 	sprintf(buf, "Chars present:&y");
