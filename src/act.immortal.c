@@ -3348,7 +3348,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			sprintf(lbuf, "Mob-dmg  [%d]", MOB_DAMAGE(k));
 			sprintf(lbuf2, "Mob-hit  [%d]", MOB_TO_HIT(k));
 			sprintf(lbuf3, "Mob-dodge  [%d]", MOB_TO_DODGE(k));
-			msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
+			msg_to_char(ch, "  %-24.24s %-24.24s %-24.24s\r\n", lbuf, lbuf2, lbuf3);
 			
 			msg_to_char(ch, "NPC Bare Hand Dam: %d\r\n", MOB_DAMAGE(k));
 		}
