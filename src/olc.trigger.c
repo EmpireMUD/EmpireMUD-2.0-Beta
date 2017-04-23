@@ -443,8 +443,8 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 	bitvector_t mob_types = NOBITS, obj_types = NOBITS, wld_types = NOBITS, veh_types = NOBITS;
 	trig_data *trig, *next_trig;
 	struct cmdlist_element *cmd;
+	bool any_types = FALSE, any;
 	size_t size;
-	bool any;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP TEDIT FULLSEARCH for syntax.\r\n");
@@ -469,19 +469,19 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 			any = FALSE;
 			if ((lookup = search_block(val_arg, trig_types, FALSE)) != NOTHING) {
 				mob_types |= BIT(lookup);
-				any = TRUE;
+				any_types = any = TRUE;
 			}
 			if ((lookup = search_block(val_arg, otrig_types, FALSE)) != NOTHING) {
 				obj_types |= BIT(lookup);
-				any = TRUE;
+				any_types = any = TRUE;
 			}
 			if ((lookup = search_block(val_arg, vtrig_types, FALSE)) != NOTHING) {
 				veh_types |= BIT(lookup);
-				any = TRUE;
+				any_types = any = TRUE;
 			}
 			if ((lookup = search_block(val_arg, wtrig_types, FALSE)) != NOTHING) {
 				wld_types |= BIT(lookup);
-				any = TRUE;
+				any_types = any = TRUE;
 			}
 			
 			if (!any) {
@@ -516,6 +516,18 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 			continue;
 		}
 		if (veh_types && trig->attach_type == VEH_TRIGGER && (GET_TRIG_TYPE(trig) & veh_types) != veh_types) {
+			continue;
+		}
+		if (any_types && trig->attach_type == MOB_TRIGGER && !mob_types) {
+			continue;
+		}
+		if (any_types && trig->attach_type == OBJ_TRIGGER && !obj_types) {
+			continue;
+		}
+		if (any_types && (trig->attach_type == WLD_TRIGGER || trig->attach_type == ADV_TRIGGER || trig->attach_type == RMT_TRIGGER || trig->attach_type == BLD_TRIGGER) && !wld_types) {
+			continue;
+		}
+		if (any_types && trig->attach_type == VEH_TRIGGER && !veh_types) {
 			continue;
 		}
 		if (*find_keywords) {
