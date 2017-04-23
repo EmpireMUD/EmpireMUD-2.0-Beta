@@ -913,8 +913,8 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 		// determine if any/all islands have it on
 		on = off = 0;
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
-			// only count populated islands
-			if (isle->population == 0) {
+			// only count islands with territory
+			if (isle->city_terr == 0 && isle->outside_terr == 0) {
 				continue;
 			}
 			
