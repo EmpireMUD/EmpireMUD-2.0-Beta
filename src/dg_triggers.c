@@ -173,6 +173,9 @@ void greet_memory_mtrigger(char_data *actor) {
 	char buf[MAX_INPUT_LENGTH];
 	int command_performed = 0;
 
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return;
+	}
 	if (!valid_dg_target(actor, DG_ALLOW_GODS))
 		return;
 
@@ -277,6 +280,9 @@ void entry_memory_mtrigger(char_data *ch) {
 		return;
 
 	for (actor = ROOM_PEOPLE(IN_ROOM(ch)); actor && SCRIPT_MEM(ch); actor = actor->next_in_room) {
+		if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+			continue;
+		}
 		if (actor!=ch && SCRIPT_MEM(ch)) {
 			for (mem = SCRIPT_MEM(ch); mem && SCRIPT_MEM(ch); mem = mem->next) {
 				if (char_script_id(actor) == mem->id) {
@@ -1323,6 +1329,10 @@ void reset_wtrigger(room_data *room) {
 int enter_wtrigger(room_data *room, char_data *actor, int dir) {
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
+	
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return TRUE;
+	}
 
 	if (!SCRIPT_CHECK(room, WTRIG_ENTER))
 		return 1;
