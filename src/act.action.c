@@ -448,16 +448,16 @@ void start_chopping(char_data *ch) {
 		}
 		
 		if (GET_EQ(ch, WEAR_WIELD)) {
-			strcpy(weapon, skip_filler(GET_OBJ_SHORT_DESC(GET_EQ(ch, WEAR_WIELD))));
+			strcpy(weapon, GET_OBJ_SHORT_DESC(GET_EQ(ch, WEAR_WIELD)));
 		}
 		else {
 			strcpy(weapon, "axe");
 		}
 		
-		snprintf(buf, sizeof(buf), "You swing back your %s and prepare to chop...", weapon);
+		snprintf(buf, sizeof(buf), "You swing back %s and prepare to chop...", weapon);
 		act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
 		
-		snprintf(buf, sizeof(buf), "$n swings $s %s over $s shoulder.", weapon);
+		snprintf(buf, sizeof(buf), "$n swings %s over $s shoulder...", weapon);
 		act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 }
