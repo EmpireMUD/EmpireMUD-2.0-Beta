@@ -341,7 +341,7 @@ ACMD(do_pub_comm) {
 		if (level > pub_comm[subcmd].min_level) {
 			sprintf(level_string, " <%d>", level);
 		}
-		if (GET_INVIS_LEV(ch) > 0) {
+		if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
 			sprintf(invis_string, " (i%d)", GET_INVIS_LEV(ch));
 		}
 		
