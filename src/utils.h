@@ -350,7 +350,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define IS_MAGE(ch)  (IS_NPC(ch) ? GET_MAX_MANA(ch) > 0 : (get_skill_level((ch), SKILL_NATURAL_MAGIC) > 0 || get_skill_level((ch), SKILL_HIGH_SORCERY) > 0))
 #define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
 #define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : (get_skill_level((ch), SKILL_VAMPIRE) > 0))
-#define WOULD_EXECUTE(ch, vict)  (IS_NPC(ch) ? (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP)) : (PRF_FLAGGED((ch), PRF_AUTOKILL) || MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP)))
+#define WOULD_EXECUTE(ch, vict)  (MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP) || (IS_NPC(ch) ? (((ch)->master && !IS_NPC((ch)->master)) ? PRF_FLAGGED((ch)->master, PRF_AUTOKILL) : (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP))) : PRF_FLAGGED((ch), PRF_AUTOKILL)))
 
 // helpers
 #define AFF_FLAGGED(ch, flag)  (IS_SET(AFF_FLAGS(ch), (flag)))

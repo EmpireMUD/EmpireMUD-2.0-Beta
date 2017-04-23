@@ -1070,6 +1070,8 @@ void annual_update_vehicle(vehicle_data *veh) {
 * This runs once a mud year to update the world.
 */
 void annual_world_update(void) {
+	void check_ruined_cities();
+	
 	vehicle_data *veh, *next_veh;
 	descriptor_data *d;
 	room_data *room, *next_room;
@@ -1106,6 +1108,9 @@ void annual_world_update(void) {
 	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		annual_update_vehicle(veh);
 	}
+	
+	// crumble cities that lost their buildings
+	check_ruined_cities();
 	
 	// rename islands
 	update_island_names();
