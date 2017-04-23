@@ -1871,6 +1871,7 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_SIEGE_WEAPONS  BIT(17)	// r. can be used to besiege
 #define VEH_ON_FIRE  BIT(18)	// s. currently on fire
 #define VEH_NO_LOAD_ONTO_VEHICLE  BIT(19)	// t. cannot be loaded onto a vehicle
+#define VEH_VISIBLE_IN_DARK  BIT(20)	// u. can be seen at night
 
 // The following vehicle flags are saved to file rather than read from the
 // prototype. Flags which are NOT included in this list can be altered with

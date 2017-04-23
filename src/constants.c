@@ -3745,5 +3745,6 @@ const char *vehicle_flags[] = {
 	"SIEGE-WEAPONS",
 	"ON-FIRE",
 	"!LOAD-ONTO-VEHICLE",
+	"VISIBLE-IN-DARK",	// 20
 	"\n"
 };
