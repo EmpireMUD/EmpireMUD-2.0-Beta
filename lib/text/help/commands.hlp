@@ -1039,7 +1039,11 @@ METERS "COMBAT METERS"
 
 Usage:  meters
 
-This shows your combat meters from your current or most recent fight.
+This shows your combat meters from your recent fights. If you turn on the
+"clearmeters" toggle, your meters will clear before every new fight. You can
+also type "clearmeters" to clear them at any time.
+
+See also: CLEARMETERS
 #
 MORTLOG
 
