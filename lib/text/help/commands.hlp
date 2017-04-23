@@ -313,6 +313,16 @@ sides by walls. You can circle up to three closed buildings in a row.
 
 You cannot circle onto water tiles or rough terrain.
 #
+CLEARMETERS "CLEAR METERS" "TOGGLE CLEARMETERS"
+
+Usage:  clearmeters
+        toggle clearmeters
+
+This command clears your combat meters so you can get fresh data. Or, you can
+use the toggle to automatically clear meters whenever you start a new fight.
+
+See also: METERS, TOGGLE
+#
 CLS
 
 Usage:  cls
@@ -1812,6 +1822,7 @@ Toggles:
   stealthable - if off, you will be prevented from accidentally stealing
   autodismount - will dismount you while moving, if necessary
   no-empire - will not create a new empire when you try to claim or build
+  clearmeters - automatically clears your meters between combats
 
 Immortal toggles:
   wiznet - shuts off the immortal channel

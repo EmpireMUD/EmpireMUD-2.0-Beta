@@ -1701,6 +1701,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_AUTONOTES  BIT(28)	// Player login syslogs automatically show notes
 #define PRF_AUTODISMOUNT  BIT(29)	// will dismount while moving instead of seeing an error
 #define PRF_NOEMPIRE  BIT(30)	// the game will not automatically create an empire
+#define PRF_CLEARMETERS  BIT(31)	// automatically clears the damage meters before a new fight
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

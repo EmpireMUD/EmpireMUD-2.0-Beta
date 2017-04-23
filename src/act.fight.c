@@ -86,6 +86,14 @@ ACMD(do_assist) {
 }
 
 
+ACMD(do_clearmeters) {
+	void reset_combat_meters(char_data *ch);
+	
+	reset_combat_meters(ch);
+	send_config_msg(ch, "ok_string");
+}
+
+
 ACMD(do_consider) {
 	extern bool check_scaling(char_data *mob, char_data *attacker);
 	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);

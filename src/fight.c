@@ -886,7 +886,15 @@ void check_combat_end(char_data *ch) {
 */
 void check_combat_start(char_data *ch) {
 	if (!IS_NPC(ch) && GET_COMBAT_METERS(ch).over == TRUE) {
-		reset_combat_meters(ch);
+		if (PRF_FLAGGED(ch, PRF_CLEARMETERS)) {
+			reset_combat_meters(ch);
+		}
+		else {
+			// just update the time so combat length is still correct
+			GET_COMBAT_METERS(ch).over = FALSE;
+			GET_COMBAT_METERS(ch).start = time(0) - (GET_COMBAT_METERS(ch).end - GET_COMBAT_METERS(ch).start);
+			GET_COMBAT_METERS(ch).end = GET_COMBAT_METERS(ch).start;
+		}
 	}
 }
 

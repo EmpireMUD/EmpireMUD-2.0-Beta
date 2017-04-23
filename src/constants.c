@@ -493,6 +493,7 @@ const char *preference_bits[] = {
 	"AUTONOTES",
 	"AUTODISMOUNT",
 	"!EMPIRE",
+	"CLEARMETERS",
 	"\n"
 };
 
@@ -556,6 +557,7 @@ const struct toggle_data_type toggle_data[] = {
 	{ "autodismount", TOG_ONOFF, PRF_AUTODISMOUNT, 0, NULL },
 	
 	{ "no-empire", TOG_ONOFF, PRF_NOEMPIRE, 0, NULL },
+	{ "clearmeters", TOG_ONOFF, PRF_CLEARMETERS, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
