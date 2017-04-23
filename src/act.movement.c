@@ -927,7 +927,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 	}
 
 	// move into a barrier at all?
-	if (mode != MOVE_EARTHMELD && !REAL_NPC(ch) && !can_use_room(ch, to_room, MEMBERS_ONLY) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && ROOM_BLD_FLAGGED(to_room, BLD_BARRIER) && IS_COMPLETE(to_room) && !EFFECTIVELY_FLYING(ch)) {
+	if (mode != MOVE_EARTHMELD && !REAL_NPC(ch) && (ROOM_OWNER(to_room) && GET_LOYALTY(ch) != ROOM_OWNER(to_room)) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && ROOM_BLD_FLAGGED(to_room, BLD_BARRIER) && IS_COMPLETE(to_room) && !EFFECTIVELY_FLYING(ch)) {
 		msg_to_char(ch, "There is a barrier in your way.\r\n");
 		return FALSE;
 	}
