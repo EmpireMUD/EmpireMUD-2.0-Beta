@@ -1855,7 +1855,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	
 	// Players who have been out for 1 hour get a free restore
 	RESTORE_ON_LOGIN(ch) = (((int) (time(0) - ch->prev_logon)) >= 1 * SECS_PER_REAL_HOUR);
-	REREAD_EMPIRE_TECH_ON_LOGIN(ch) = member_is_timed_out(ch->player.time.birth, ch->prev_logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR);
+	if (GET_LOYALTY(ch)) {
+		REREAD_EMPIRE_TECH_ON_LOGIN(ch) = (EMPIRE_MEMBERS(GET_LOYALTY(ch)) < 1 || member_is_timed_out(ch->player.time.birth, ch->prev_logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR));
+	}
 	
 	return ch;
 }
@@ -3939,7 +3941,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			EMPIRE_TOTAL_MEMBER_COUNT(e) += 1;
 			
 			// only count players who have logged on in recent history
-			if (!member_is_timed_out_ch(ch)) {
+			if (!is_file || !member_is_timed_out_ch(ch)) {
 				add_to_account_list(&account_list, e, GET_ACCOUNT(ch)->id, GET_GREATNESS(ch));
 				
 				// not account-restricted
