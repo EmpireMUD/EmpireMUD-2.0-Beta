@@ -88,8 +88,12 @@ ACMD(do_assist) {
 
 ACMD(do_clearmeters) {
 	void reset_combat_meters(char_data *ch);
+	void stop_combat_meters(char_data *ch);
 	
-	reset_combat_meters(ch);
+	if (!IS_NPC(ch)) {
+		reset_combat_meters(ch);
+		GET_COMBAT_METERS(ch).over = TRUE;
+	}
 	send_config_msg(ch, "ok_string");
 }
 
