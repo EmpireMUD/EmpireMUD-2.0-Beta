@@ -120,7 +120,7 @@ bool match_command_trig(char *input, char *match, bool mode) {
 			return !str_cmp(input, match);
 		}
 		else if (mode == CMDTRG_ABBREV) {
-			return is_abbrev(input, match);
+			return (is_abbrev(input, match) && str_cmp(input, match));
 		}
 	}
 	else {	// has spaces (multiple possible words)
@@ -128,7 +128,7 @@ bool match_command_trig(char *input, char *match, bool mode) {
 		strcpy(buffer, match);
 		while (*buffer) {
 			half_chop(buffer, word, buffer);
-			if ((mode == CMDTRG_EXACT && !str_cmp(input, word)) || (mode == CMDTRG_ABBREV && is_abbrev(input, word))) {
+			if ((mode == CMDTRG_EXACT && !str_cmp(input, word)) || (mode == CMDTRG_ABBREV && is_abbrev(input, word) && str_cmp(input, word))) {
 				return TRUE;
 			}
 		}
