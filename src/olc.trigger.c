@@ -440,7 +440,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 void olc_fullsearch_trigger(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count, lookup, only_attaches = NOTHING;
-	bitvector_t only_types = NOBITS;
+	bitvector_t mob_types = NOBITS, obj_types = NOBITS, wld_types = NOBITS, veh_types = NOBITS;
 	trig_data *trig, *next_trig;
 	struct cmdlist_element *cmd;
 	size_t size;
@@ -466,12 +466,27 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 		}
 		else if (is_abbrev(type_arg, "-types")) {
 			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, trig_types, FALSE)) == NOTHING && (lookup = search_block(val_arg, otrig_types, FALSE)) == NOTHING && (lookup = search_block(val_arg, vtrig_types, FALSE)) == NOTHING && (lookup = search_block(val_arg, wtrig_types, FALSE)) == NOTHING) {
+			any = FALSE;
+			if ((lookup = search_block(val_arg, trig_types, FALSE)) != NOTHING) {
+				mob_types |= BIT(lookup);
+				any = TRUE;
+			}
+			if ((lookup = search_block(val_arg, otrig_types, FALSE)) != NOTHING) {
+				obj_types |= BIT(lookup);
+				any = TRUE;
+			}
+			if ((lookup = search_block(val_arg, vtrig_types, FALSE)) != NOTHING) {
+				veh_types |= BIT(lookup);
+				any = TRUE;
+			}
+			if ((lookup = search_block(val_arg, wtrig_types, FALSE)) != NOTHING) {
+				wld_types |= BIT(lookup);
+				any = TRUE;
+			}
+			
+			if (!any) {
 				msg_to_char(ch, "Invalid trigger type '%s'.\r\n", val_arg);
 				return;
-			}
-			else {
-				only_types |= BIT(lookup);
 			}
 		}
 		else {	// not sure what to do with it? treat it like a keyword
@@ -490,7 +505,17 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 		if (only_attaches != NOTHING && trig->attach_type != only_attaches) {
 			continue;
 		}
-		if (only_types && (GET_TRIG_TYPE(trig) & only_types) != only_types) {
+		// x_TRIGGER:
+		if (mob_types && trig->attach_type == MOB_TRIGGER && (GET_TRIG_TYPE(trig) & mob_types) != mob_types) {
+			continue;
+		}
+		if (obj_types && trig->attach_type == OBJ_TRIGGER && (GET_TRIG_TYPE(trig) & obj_types) != obj_types) {
+			continue;
+		}
+		if (wld_types && (trig->attach_type == WLD_TRIGGER || trig->attach_type == ADV_TRIGGER || trig->attach_type == RMT_TRIGGER || trig->attach_type == BLD_TRIGGER) && (GET_TRIG_TYPE(trig) & wld_types) != wld_types) {
+			continue;
+		}
+		if (veh_types && trig->attach_type == VEH_TRIGGER && (GET_TRIG_TYPE(trig) & veh_types) != veh_types) {
 			continue;
 		}
 		if (*find_keywords) {
