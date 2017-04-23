@@ -230,6 +230,9 @@ int greet_mtrigger(char_data *actor, int dir) {
 	char buf[MAX_INPUT_LENGTH];
 	int intermediate, final=TRUE;
 
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return TRUE;
+	}
 	if (!valid_dg_target(actor, DG_ALLOW_GODS))
 		return TRUE;
 
@@ -649,7 +652,11 @@ int leave_mtrigger(char_data *actor, int dir) {
 	trig_data *t;
 	char_data *ch;
 	char buf[MAX_INPUT_LENGTH];
-
+	
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return 1;
+	}
+	
 	for (ch = ROOM_PEOPLE(IN_ROOM(actor)); ch; ch = ch->next_in_room) {
 		if (!SCRIPT_CHECK(ch, MTRIG_LEAVE | MTRIG_LEAVE_ALL) || (ch == actor)) {
 			continue;
@@ -1039,7 +1046,11 @@ int leave_otrigger(room_data *room, char_data *actor, int dir) {
 	char buf[MAX_INPUT_LENGTH];
 	int temp, final = 1;
 	obj_data *obj, *obj_next;
-
+	
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return 1;
+	}
+	
 	for (obj = room->contents; obj; obj = obj_next) {
 		obj_next = obj->next_content;
 		if (!SCRIPT_CHECK(obj, OTRIG_LEAVE))
@@ -1480,7 +1491,10 @@ int leave_wtrigger(room_data *room, char_data *actor, int dir) {
 
 	if (!SCRIPT_CHECK(room, WTRIG_LEAVE))
 		return 1;
-
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return 1;
+	}
+	
 	for (t = TRIGGERS(SCRIPT(room)); t; t = t->next) {
 		if (TRIGGER_CHECK(t, WTRIG_LEAVE) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
@@ -1685,6 +1699,9 @@ int greet_vtrigger(char_data *actor, int dir) {
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t;
 
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return 1;
+	}
 	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
 		return TRUE;
 	}
@@ -1721,7 +1738,11 @@ int leave_vtrigger(char_data *actor, int dir) {
 	vehicle_data *veh, *next_veh;
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t;
-
+	
+	if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
+		return 1;
+	}
+	
 	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
 		if (!SCRIPT_CHECK(veh, VTRIG_LEAVE)) {
 			continue;
