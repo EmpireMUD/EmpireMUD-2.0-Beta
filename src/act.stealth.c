@@ -36,6 +36,7 @@
 extern const int rev_dir[];
 
 // external funcs
+void check_combat_start(char_data *ch);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 void scale_item_to_level(obj_data *obj, int level);
 
@@ -649,6 +650,10 @@ ACMD(do_backstab) {
 	}
 	else {
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_BACKSTAB, 9, WAIT_COMBAT_ABILITY);
+	
+		// start meters now, to track direct damage()
+		check_combat_start(ch);
+		check_combat_start(vict);
 
 		success = !AWAKE(vict) || !CAN_SEE(vict, ch) || skill_check(ch, ABIL_BACKSTAB, DIFF_EASY);
 

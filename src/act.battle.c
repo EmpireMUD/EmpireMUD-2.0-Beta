@@ -33,6 +33,7 @@
 // external vars
 
 // external functions
+void check_combat_start(char_data *ch);
 extern bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);	// fight.c
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 
@@ -113,6 +114,10 @@ ACMD(do_bash) {
 	}
 	
 	charge_ability_cost(ch, MOVE, cost, COOLDOWN_BASH, 9, WAIT_COMBAT_ABILITY);
+	
+	// start meters now, to track direct damage()
+	check_combat_start(ch);
+	check_combat_start(vict);
 
 	// determine hit
 	success = IS_SPECIALTY_ABILITY(ch, ABIL_BASH) || check_hit_vs_dodge(ch, vict, FALSE);
@@ -391,6 +396,10 @@ ACMD(do_kick) {
 	}
 	
 	charge_ability_cost(ch, MOVE, cost, COOLDOWN_KICK, 6, WAIT_COMBAT_ABILITY);
+	
+	// start meters now, to track direct damage()
+	check_combat_start(ch);
+	check_combat_start(vict);
 	
 	// determine hit
 	success = IS_SPECIALTY_ABILITY(ch, ABIL_KICK) || check_hit_vs_dodge(ch, vict, FALSE);
