@@ -3802,7 +3802,7 @@ void frequent_combat(int pulse) {
 		}
 
 		// verify still fighting
-		if (vict == NULL || IN_ROOM(ch) != IN_ROOM(vict) || IS_DEAD(vict) || !check_can_still_fight(ch, vict)) {
+		if (vict == NULL || IN_ROOM(ch) != IN_ROOM(vict) || IS_DEAD(vict) || !check_can_still_fight(ch, vict) || AFF_FLAGGED(ch, AFF_NO_ATTACK)) {
 			stop_fighting(ch);
 			continue;
 		}
@@ -3811,7 +3811,7 @@ void frequent_combat(int pulse) {
 		check_auto_assist(ch);
 		
 		// reasons you would not get a round
-		if (GET_POS(ch) < POS_SLEEPING || IS_INJURED(ch, INJ_STAKED | INJ_TIED) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_NO_TARGET_IN_ROOM | AFF_NO_ATTACK | AFF_MUMMIFY | AFF_DEATHSHROUD)) {
+		if (GET_POS(ch) < POS_SLEEPING || IS_INJURED(ch, INJ_STAKED | INJ_TIED) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_NO_TARGET_IN_ROOM | AFF_MUMMIFY | AFF_DEATHSHROUD)) {
 			continue;
 		}
 		
