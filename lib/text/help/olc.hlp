@@ -3943,17 +3943,15 @@ Usage:  .value0 <number>
         .value1 <number>
         .value2 <number>
 
-For item type OTHER, you can manually set the three object values. For all
-other item types, these values are used for things like damage, fullness,
-and capacity.
+For item type OTHER, you can manually set the three object values. They have
+no inherent meaning, but you can use them for scripting with variables like
+%obj.val0%. For regular item types, these values are used for things such as
+damage, fullness, and capacity.
 
 If you set your OTHER object with the PLANTABLE flag, value1 is replaced by
 the 'plants' property. If you can't see the plants property in the editor,
 it means your value1 is invalid for planting and you should set your value1
 back to 0.
-
-Some special procedures may use the object values of an OTHER object; the
-significance of these values would depend on the special procedure.
 
 See also: OEDIT PLANTS, OLC OBJECTS
 #d

@@ -403,7 +403,8 @@ Cost:  2 nocturnium ingots
 
 Characters with the Trade skill can learn to hone their own items, making them
 more powerful. Honing an item will bind it to the character, so it can only be
-used on the user's own gear.
+used on the user's own gear. You must still have the Hone ability to use any
+gear you have honed.
 
 Just like Enchant, the power gained from Hone is based on either your crafting
 level or your composite level (whichever is higher). It's also limited by the
@@ -778,6 +779,7 @@ For most recipes, the level of the resulting item will be the lowest of:
   The level range of the ability that gives the recipe (50/75/100).
   Your level in the ability's skill (usually Trade).
   Your Crafting level.
+  Your skill level (if under 100).
 
 For example, the arming sword from Iron Blades cannot be higher than level 75,
 since this ability is from the 50-75 level range.
@@ -785,7 +787,7 @@ since this ability is from the 50-75 level range.
 Recipes which come from crafting patterns follow slightly different rules - see
 HELP CRAFTING PATTERNS for more information.
 
-See also: PATTERNS, CRAFTING LEVEL, IDENTIFY, SUPERIOR
+See also: PATTERNS, CRAFTING LEVEL, IDENTIFY, SKILL LEVEL, SUPERIOR
 #
 SEW SEWING
 

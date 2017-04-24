@@ -843,6 +843,22 @@ flag will remain active for 5 minutes after you shut it off.
 
 See also: TOGGLE
 #
+POSITIONS
+
+Your character's position determines which commands you can use, whether you
+can move, or how injured you are. The following positions are available:
+  &cStanding&0 - Able to move, fight, and act (the default position).
+  &cFighting&0 - Engaged in combat.
+  &cSitting&0 - Slightly boosted regen, still able to interact.
+  &cResting&0 - Slightly boosted regen, still able to interact.
+  &cSleeping&0 - Very fast regen, unable to see or do anything.
+  &cStunned&0 - Injured in battle, but will recover.
+  &cIncapacitated&0 - Slowly dying, but we're all dying at different speeds.
+  &cMortally wounded&0 - The Usain Bolt of dying.
+  &cDead&0 - The final position.
+
+See also: RESPAWN, REST, SIT, STAND, WAKE
+#
 "QUEST ITEM" "QUEST OBJECT" "QUEST FLAG"
 
 Items marked (quest) are used only when you are on the quest to which they
