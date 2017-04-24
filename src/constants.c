@@ -3306,9 +3306,9 @@ const bitvector_t mtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// door
 	TRIG_ARG_PERCENT,	// leave-all
 	NOBITS,	// charmed modifier
-	TRIG_ARG_PERCENT,	// start-quest
-	TRIG_ARG_PERCENT,	// finish-quest
-	TRIG_ARG_PERCENT,	// player-in-room
+	NOBITS,	// start-quest
+	NOBITS,	// finish-quest
+	NOBITS,	// player-in-room
 	NOBITS,	// reboot
 };
 
@@ -3364,9 +3364,9 @@ const bitvector_t otrig_argument_types[] = {
 	NOBITS,	// 
 	TRIG_ARG_PERCENT,	// consume
 	TRIG_ARG_PERCENT,	// finish
-	TRIG_ARG_PERCENT,	// start-quest
-	TRIG_ARG_PERCENT,	// finish-quest
-	TRIG_ARG_PERCENT,	// player-in-room
+	NOBITS,	// start-quest
+	NOBITS,	// finish-quest
+	NOBITS,	// player-in-room
 	NOBITS,	// reboot
 };
 
@@ -3423,9 +3423,9 @@ const bitvector_t vtrig_argument_types[] = {
 	NOBITS,	// 17
 	NOBITS,	// 18
 	NOBITS,	// 19
-	TRIG_ARG_PERCENT,	// start-quest
-	TRIG_ARG_PERCENT,	// finish-quest
-	TRIG_ARG_PERCENT,	// player-in-room
+	NOBITS,	// start-quest
+	NOBITS,	// finish-quest
+	NOBITS,	// player-in-room
 	NOBITS,	// reboot
 };
 
@@ -3481,9 +3481,9 @@ const bitvector_t wtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// door
 	NOBITS,	// dismantle
 	NOBITS,	// 19
-	TRIG_ARG_PERCENT,	// start-quest
-	TRIG_ARG_PERCENT,	// finish-quest
-	TRIG_ARG_PERCENT,	// player-in-room
+	NOBITS,	// start-quest
+	NOBITS,	// finish-quest
+	NOBITS,	// player-in-room
 	NOBITS,	// reboot
 };
 

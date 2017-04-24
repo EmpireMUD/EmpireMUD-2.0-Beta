@@ -1879,7 +1879,7 @@ int start_quest_mtrigger(char_data *actor, quest_data *quest, struct instance_da
 			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 				continue;
 			}
-			if (IS_SET(GET_TRIG_TYPE(t), MTRIG_START_QUEST) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			if (IS_SET(GET_TRIG_TYPE(t), MTRIG_START_QUEST)) {
 				union script_driver_data_u sdd;
 				if (quest) {
 					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
@@ -1918,7 +1918,7 @@ int start_quest_otrigger_one(obj_data *obj, char_data *actor, quest_data *quest,
 	quest_instance_global = inst;
 
 	for (t = TRIGGERS(SCRIPT(obj)); t; t = t->next) {
-		if (TRIGGER_CHECK(t, OTRIG_START_QUEST) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+		if (TRIGGER_CHECK(t, OTRIG_START_QUEST)) {
 			union script_driver_data_u sdd;
 			if (quest) {
 				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
@@ -1963,7 +1963,7 @@ int start_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_da
 		}
 
 		for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
-			if (IS_SET(GET_TRIG_TYPE(t), VTRIG_START_QUEST) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			if (IS_SET(GET_TRIG_TYPE(t), VTRIG_START_QUEST)) {
 				union script_driver_data_u sdd;
 				if (quest) {
 					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
@@ -2001,7 +2001,7 @@ int start_quest_wtrigger(room_data *room, char_data *actor, quest_data *quest, s
 	quest_instance_global = inst;
 	
 	for (t = TRIGGERS(SCRIPT(room)); t; t = t->next) {
-		if (TRIGGER_CHECK(t, WTRIG_START_QUEST) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+		if (TRIGGER_CHECK(t, WTRIG_START_QUEST)) {
 			union script_driver_data_u sdd;
 			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
 			if (quest) {
@@ -2149,7 +2149,7 @@ int finish_quest_mtrigger(char_data *actor, quest_data *quest, struct instance_d
 			if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 				continue;
 			}
-			if (IS_SET(GET_TRIG_TYPE(t), MTRIG_FINISH_QUEST) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			if (IS_SET(GET_TRIG_TYPE(t), MTRIG_FINISH_QUEST)) {
 				union script_driver_data_u sdd;
 				if (quest) {
 					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
@@ -2189,7 +2189,7 @@ int finish_quest_otrigger_one(obj_data *obj, char_data *actor, quest_data *quest
 	quest_instance_global = inst;
 
 	for (t = TRIGGERS(SCRIPT(obj)); t; t = t->next) {
-		if (TRIGGER_CHECK(t, OTRIG_FINISH_QUEST) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+		if (TRIGGER_CHECK(t, OTRIG_FINISH_QUEST)) {
 			union script_driver_data_u sdd;
 			if (quest) {
 				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
@@ -2234,7 +2234,7 @@ int finish_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_d
 		}
 
 		for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
-			if (IS_SET(GET_TRIG_TYPE(t), VTRIG_FINISH_QUEST) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			if (IS_SET(GET_TRIG_TYPE(t), VTRIG_FINISH_QUEST)) {
 				union script_driver_data_u sdd;
 				if (quest) {
 					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
@@ -2272,7 +2272,7 @@ int finish_quest_wtrigger(room_data *room, char_data *actor, quest_data *quest, 
 	quest_instance_global = inst;
 
 	for (t = TRIGGERS(SCRIPT(room)); t; t = t->next) {
-		if (TRIGGER_CHECK(t, WTRIG_FINISH_QUEST) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+		if (TRIGGER_CHECK(t, WTRIG_FINISH_QUEST)) {
 			union script_driver_data_u sdd;
 			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
 			if (quest) {
