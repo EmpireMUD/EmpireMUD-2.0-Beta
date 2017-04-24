@@ -644,6 +644,11 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 		return;
 	}
 	
+	if (!*argument){
+		msg_to_char(ch, "You must provide the item you wish to identify.\r\n");
+		return;
+	}
+	
 	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
 		//If there isn't an item proto yet, the first item that matches the given argument will become the item used for the rest of the loop.
 		if ( !proto ) {
