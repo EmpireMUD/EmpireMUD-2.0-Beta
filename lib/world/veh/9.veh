@@ -36,7 +36,7 @@ A covered wagon has been parked here.~
 harness two horses to the wagon and then lead it, or ride in it and drive it.
 ~
 ~
-bfhio 19 24 400 2
+bfhiou 19 24 400 2
 R
 19 1 1 0
 R
@@ -113,7 +113,7 @@ There is a wooden canoe here.~
 to the edge of the water, 'sit' in it, and then type 'sail <direction>'.
 ~
 ~
-cfghln 3 3 0 0
+cfghlnu 3 3 0 0
 R
 3 1 5 0
 S
@@ -126,7 +126,7 @@ features of a house on the move, but it's not big enough to be a proper home
 for someone as important as you.
 ~
 ~
-bfhio 19 25 100 4
+bfhiou 19 25 100 4
 D
 5518 1 r
 R
@@ -143,10 +143,10 @@ a wooden raft~
 There is a wooden raft here.~
    The raft is made from rough desert wood, loosely bound together with twigs.
 You can 'drag' the raft to the edge of the water, 'sit' on it, then type 'sail
-<direction>'.  
+<direction>'.
 ~
 ~
-cfhln 3 3 0 0
+cfhlnu 3 3 0 0
 R
 3 1 5 0
 S
@@ -158,7 +158,7 @@ A lanteen-rigged caravel is floating here.~
 everywhere. You can "board" the ship from here.
 ~
 &0<&u44&0>~
-chijkt 20 32 150 0
+chijktu 20 32 150 0
 D
 5501 2 o
 R
@@ -178,7 +178,7 @@ can be used for shipping, or to move items manually between islands. You can
 "board" it from here.
 ~
 &0<&u44&0>~
-cijt 20 32 450 0
+cijtu 20 32 450 0
 D
 5501 1 0
 R
@@ -198,7 +198,7 @@ fierce emblem of its master. This longship is armed with cannon, and used to
 raid up and down the coast. You can "board" it from here.
 ~
 &0<&u44&0>~
-ckrt 20 64 0 0
+ckrtu 20 64 0 0
 C
 0 100
 D
@@ -220,7 +220,7 @@ It has at least ten sails, granting it great speed and control on the high seas
 as it lets the great seafaring empire move weapons over incredible distances.
 ~
 &0<&u44&0>~
-ckpqrt 20 128 0 0
+ckpqrtu 20 128 0 0
 C
 0 100
 D
@@ -241,7 +241,7 @@ A four-masted carrack looms large on the water.~
 to carry the entire expedition, and fast enough to move between continents.
 ~
 &0<&u44&0>~
-cikt 20 96 400 0
+ciktu 20 96 400 0
 D
 5522 8 opq
 R
@@ -260,7 +260,7 @@ A huge cargo hulk is floating here.~
 seas. You can keep items in it, or use it to move goods from dock to dock.
 ~
 &0<&u44&0>~
-cijkpqt 20 64 1000 0
+cijkpqtu 20 64 1000 0
 D
 5501 4 op
 R

@@ -15,7 +15,7 @@ eval obj %room.contents%
 eval next_obj %obj.next_in_list%
 while %obj%
   if %obj.vnum% == 1
-    %purge% %obj% $n disappears.
+    %purge% %obj% $p disappears.
   end
   eval obj %next_obj%
 done

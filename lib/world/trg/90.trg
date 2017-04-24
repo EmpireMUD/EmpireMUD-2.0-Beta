@@ -365,7 +365,7 @@ done
 ~
 #9030
 Butcher detect~
-1 c 2
+1 c 3
 butcher~
 eval target %%actor.obj_target(%arg%)%%
 if !%target%
