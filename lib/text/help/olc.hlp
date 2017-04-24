@@ -3417,6 +3417,18 @@ want it to start out full, set it to the same amount as the capacity.
 
 See also: OEDIT CAPACITY, OLC OBJECTS
 #d
+"OEDIT CORPSEOF" "OEDIT CORPSE OF"
+
+Usage:  .corpseof <mob vnum>
+
+This allows you to set whose corpse an item is. You can leave real corpses in
+your adventure zone, by creating corpse items and setting this value to one
+of your mobs.
+
+All corpse items must be the corpse of something (for skin/butcher data).
+
+See also: VNUM
+#d
 "OEDIT CUSTOM" "CUSTOM MESSAGES"
 
 Usage:  .custom add <type> <message>
@@ -3903,7 +3915,7 @@ Available types:
  * - unused
  PORTAL - transports a player to another place (never set .wear TAKE)
  *BOARD - a message board
- *CORPSE - a corpse
+ CORPSE - a corpse
  COINS - a pile of coins
  *MAIL - a letter
  WEALTH - adds to empire wealth when stored

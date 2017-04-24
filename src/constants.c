@@ -1710,7 +1710,7 @@ const char *item_types[] = {
 	"*",
 	"PORTAL",
 	"*BOARD",
-	"*CORPSE",
+	"CORPSE",
 	"COINS",
 	"*",
 	"*",

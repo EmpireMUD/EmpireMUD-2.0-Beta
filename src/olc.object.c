@@ -1642,6 +1642,10 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			// empire number is not supported -- it will always use OTHER_COIN
 			break;
 		}
+		case ITEM_CORPSE: {
+			sprintf(storage + strlen(storage), "<&ycorpseof&0> %d %s\r\n", GET_CORPSE_NPC_VNUM(obj), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
+			break;
+		}
 		case ITEM_WEAPON: {
 			sprintf(storage + strlen(storage), "<&yweapontype&0> %s\r\n", attack_hit_info[GET_WEAPON_TYPE(obj)].name);
 			sprintf(storage + strlen(storage), "<&ydamage&0> %d (speed %.2f, %s+%.2f base dps)\r\n", GET_WEAPON_DAMAGE_BONUS(obj), get_weapon_speed(obj), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(obj)) ? "Intelligence" : "Strength"), get_base_dps(obj));
@@ -2215,6 +2219,26 @@ OLC_MODULE(oedit_contents) {
 	}
 	else {
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = olc_process_number(ch, argument, "contents", "contents", 0, GET_DRINK_CONTAINER_CAPACITY(obj), GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS));
+	}
+}
+
+
+OLC_MODULE(oedit_corpseof) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	mob_vnum old = GET_CORPSE_NPC_VNUM(obj);
+	
+	if (!IS_CORPSE(obj)) {
+		msg_to_char(ch, "You can only set this on a corpse.\r\n");
+	}
+	else {
+		GET_OBJ_VAL(obj, VAL_CORPSE_IDNUM) = olc_process_number(ch, argument, "corpse of", "corpseof", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_CORPSE_IDNUM));
+		if (!mob_proto(GET_CORPSE_NPC_VNUM(obj))) {
+			GET_OBJ_VAL(obj, VAL_CORPSE_IDNUM) = old;
+			msg_to_char(ch, "There is no mobile with that vnum. Old value restored.\r\n");
+		}
+		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			msg_to_char(ch, "It is now the corpse of: %s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
+		}
 	}
 }
 
