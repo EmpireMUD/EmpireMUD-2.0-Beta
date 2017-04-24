@@ -5011,6 +5011,10 @@ ACMD(do_echo) {
 		send_to_char("Yes... but what?\r\n", ch);
 		return;
 	}
+	if (subcmd == SCMD_EMOTE && strstr(string, "$O")) {
+		msg_to_char(ch, "You can't use the $O symbol in an emote.\r\n");
+		return;
+	}
 
 	// emote features like $n to move your name, @target, #item
 	if (subcmd == SCMD_ECHO || strstr(string, "$n")) {
