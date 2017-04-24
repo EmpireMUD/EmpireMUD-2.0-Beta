@@ -1444,7 +1444,7 @@ void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_d
 	// reduce pop
 	if (emp) {
 		EMPIRE_POPULATION(emp) -= 1;
-		if ((isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
+		if (!GET_ROOM_VEHICLE(ter->room) && (isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
 			isle->population -= 1;
 		}
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
@@ -2366,7 +2366,7 @@ void populate_npc(room_data *room, struct empire_territory_data *ter) {
 		proto = mob_proto(artisan);
 		npc = create_empire_npc(emp, artisan, sex, pick_generic_name(proto ? MOB_NAME_SET(proto) : 0, sex), ter);
 		EMPIRE_POPULATION(emp) += 1;
-		if ((isle = get_empire_island(emp, GET_ISLAND_ID(room)))) {
+		if (!GET_ROOM_VEHICLE(room) && (isle = get_empire_island(emp, GET_ISLAND_ID(room)))) {
 			isle->population += 1;
 		}
 		
@@ -2382,7 +2382,7 @@ void populate_npc(room_data *room, struct empire_territory_data *ter) {
 		proto = mob_proto(sex == SEX_MALE ? CITIZEN_MALE : CITIZEN_FEMALE);
 		npc = create_empire_npc(emp, proto ? GET_MOB_VNUM(proto) : 0, sex, pick_generic_name(MOB_NAME_SET(proto), sex), ter);
 		EMPIRE_POPULATION(emp) += 1;
-		if ((isle = get_empire_island(emp, GET_ISLAND_ID(room)))) {
+		if (!GET_ROOM_VEHICLE(room) && (isle = get_empire_island(emp, GET_ISLAND_ID(room)))) {
 			isle->population += 1;
 		}
 

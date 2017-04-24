@@ -1918,10 +1918,14 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 				ter->marked = TRUE;
 				
 				if (IS_COMPLETE(iter)) {
-					isle = get_empire_island(e, GET_ISLAND_ID(iter));
+					if (!GET_ROOM_VEHICLE(iter)) {
+						isle = get_empire_island(e, GET_ISLAND_ID(iter));
+					}
 					for (npc = ter->npcs; npc; npc = npc->next) {
 						EMPIRE_POPULATION(e) += 1;
-						isle->population += 1;
+						if (!GET_ROOM_VEHICLE(iter)) {
+							isle->population += 1;
+						}
 					}
 				}
 			}
