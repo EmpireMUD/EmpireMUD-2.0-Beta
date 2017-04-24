@@ -153,6 +153,7 @@ ACMD(do_efind);
 ACMD(do_elog);
 ACMD(do_emotd);
 ACMD(do_empire_inventory);
+ACMD(do_empire_identify);
 ACMD(do_empires);
 ACMD(do_enervate);
 ACMD(do_enroll);
@@ -665,6 +666,8 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "empires", POS_DEAD, do_empires, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "empireinventory", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "einventory", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE ),
+	SIMPLE_CMD( "empireidentify", POS_DEAD, do_empire_identify, NO_MIN, CTYPE_EMPIRE ),
+	SIMPLE_CMD( "eidentify", POS_DEAD, do_empire_identify, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "emotd", POS_DEAD, do_emotd, NO_MIN, CTYPE_EMPIRE ),
 	SCMD_CMD( "emote", POS_RESTING, do_echo, NO_MIN, CTYPE_COMM, SCMD_EMOTE ),
 	SCMD_CMD( ":", POS_RESTING, do_echo, NO_MIN, CTYPE_COMM, SCMD_EMOTE ),
