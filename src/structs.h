@@ -2071,7 +2071,7 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_RANKS  20	// Max levels in an empire
 #define MAX_RANK_LENGTH  20	// length limit
 #define MAX_RAW_INPUT_LENGTH  1536  // Max size of *raw* input
-#define MAX_REFERRED_BY_LENGTH  32
+#define MAX_REFERRED_BY_LENGTH  80
 #define MAX_RESOURCES_REQUIRED  10	// how many resources a recipe can need
 #define MAX_REWARDS_PER_DAY  5	//  number of times a player can be rewarded
 #define MAX_ROOM_DESCRIPTION  4000
