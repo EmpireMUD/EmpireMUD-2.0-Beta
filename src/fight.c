@@ -3672,8 +3672,6 @@ void one_combat_round(char_data *ch, double speed, obj_data *weapon) {
 		add_cooldown(FIGHTING(ch), COOLDOWN_PVP_QUIT_TIMER, 45);
 	}
 	
-	check_auto_assist(ch);
-
 	if (!check_combat_position(ch, speed)) {
 		return;
 	}
@@ -3731,8 +3729,6 @@ void fight_wait_run(char_data *ch, double speed) {
 		add_cooldown(ch, COOLDOWN_PVP_QUIT_TIMER, 45);
 		add_cooldown(FIGHTING(ch), COOLDOWN_PVP_QUIT_TIMER, 45);
 	}
-	
-	check_auto_assist(ch);
 	
 	if (!check_combat_position(ch, speed)) {
 		return;
@@ -3799,6 +3795,11 @@ void frequent_combat(int pulse) {
 	for (ch = combat_list; ch; ch = next_combat_list) {
 		next_combat_list = ch->next_fighting;
 		vict = FIGHTING(ch);
+		
+		// never!
+		if (IS_DEAD(ch) || EXTRACTED(ch)) {
+			continue;
+		}
 
 		// verify still fighting
 		if (vict == NULL || IN_ROOM(ch) != IN_ROOM(vict) || IS_DEAD(vict) || !check_can_still_fight(ch, vict)) {
@@ -3806,8 +3807,11 @@ void frequent_combat(int pulse) {
 			continue;
 		}
 		
+		// bring friends in no matter what
+		check_auto_assist(ch);
+		
 		// reasons you would not get a round
-		if (IS_DEAD(ch) || EXTRACTED(ch) || GET_POS(ch) < POS_SLEEPING || IS_INJURED(ch, INJ_STAKED | INJ_TIED) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_NO_TARGET_IN_ROOM | AFF_NO_ATTACK | AFF_MUMMIFY | AFF_DEATHSHROUD)) {
+		if (GET_POS(ch) < POS_SLEEPING || IS_INJURED(ch, INJ_STAKED | INJ_TIED) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_NO_TARGET_IN_ROOM | AFF_NO_ATTACK | AFF_MUMMIFY | AFF_DEATHSHROUD)) {
 			continue;
 		}
 		
