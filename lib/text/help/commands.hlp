@@ -814,6 +814,8 @@ This command provides detailed information about an item or vehicle.
 
 Tip: When trying to identify an item in your inventory that has the same name
 as something you are wearing, try using "1.name".
+
+See also: EIDENTIFY
 #
 INFORMATIVE "TOGGLE INFORMATIVE"
 

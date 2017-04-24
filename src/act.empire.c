@@ -58,6 +58,7 @@ extern int get_total_score(empire_data *emp);
 extern char *get_room_name(room_data *room, bool color);
 extern bool is_trading_with(empire_data *emp, empire_data *partner);
 extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
+void identify_obj_to_char(obj_data *obj, char_data *ch);
 
 // locals
 bool is_affiliated_island(empire_data *emp, int island_id);
@@ -619,6 +620,65 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	}
 }
 
+/**
+* called by do_empire_identify to show eidentify
+*
+* @param char_data *ch The player requesting the einv.
+* @param empire_data *emp The empire whose inventory item to identify.
+* @param char *argument The requested inventory item.
+*/
+static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *argument) {
+	//Helper structure.
+	struct eid_per_island {
+		int island;
+		int quantity;
+		UT_hash_handle hh;
+	};
+	
+	struct empire_storage_data *store;
+	struct eid_per_island *eid_pi, *eid_pi_next, *eid_pi_list = NULL;
+	obj_data *proto = NULL;
+	
+	
+	if (!ch || !ch->desc) {
+		return;
+	}
+	
+	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
+		//If there isn't an item proto yet, the first item that matches the given argument will become the item used for the rest of the loop.
+		if ( !proto ) {
+			if (!multi_isname(argument, GET_OBJ_KEYWORDS(obj_proto(store->vnum)))) {
+				continue;
+			} else {
+				proto = obj_proto(store->vnum);
+			}
+		}else if ( proto->vnum != store->vnum){
+			continue;
+		}
+		
+		//We have a match.
+		CREATE(eid_pi, struct eid_per_island, 1);
+		eid_pi->island = store->island;
+		eid_pi->quantity = store->amount;
+		HASH_ADD_INT(eid_pi_list, island, eid_pi);
+		
+	}
+	if ( !proto ) {
+		msg_to_char(ch, "This empire has no item by that name.\r\n");
+		return;
+	}
+	
+	identify_obj_to_char(proto, ch);
+	
+	msg_to_char(ch, "Storage list: \r\n");
+	HASH_ITER(hh, eid_pi_list, eid_pi, eid_pi_next) {
+		msg_to_char(ch, "(%4d) %s\r\n", eid_pi->quantity, get_island_name_for(eid_pi->island, ch));
+		// Cleaning as we use the hash.
+		HASH_DEL(eid_pi_list, eid_pi);
+		free(eid_pi);
+	}
+	
+}
 
 /**
 * called by do_empire_inventory to show einv
@@ -3608,7 +3668,6 @@ ACMD(do_empires) {
 	page_string(ch->desc, output, TRUE);
 }
 
-
 ACMD(do_empire_inventory) {
 	char error[MAX_STRING_LENGTH], arg2[MAX_INPUT_LENGTH];
 	empire_data *emp;
@@ -3645,9 +3704,12 @@ ACMD(do_empire_inventory) {
 			strcpy(error, "You don't belong to any empire!\r\n");
 		}
 	}
-	
 	if (emp) {
-		show_empire_inventory_to_char(ch, emp, arg2);
+		if ( subcmd == SCMD_EINVENTORY ) {
+			show_empire_inventory_to_char(ch, emp, arg2);
+		} else {
+			show_empire_identify_to_char(ch, emp, arg2);
+		}
 	}
 	else {
 		send_to_char(error, ch);

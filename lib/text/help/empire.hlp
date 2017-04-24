@@ -469,7 +469,7 @@ You can use "efind all" to find all items on the ground in your empire. The
 Example:
  > efind cart
 
-See also: EINVENTORY, NAVIGATION
+See also: EINVENTORY, NAVIGATION, EIDENTIFY
 #
 ELOG ELOGS "EMPIRE LOGS"
 
@@ -501,6 +501,21 @@ This shows you your empire's MOTD (Message Of The Day). It is set in eedit.
 
 See also: EEDIT
 #
+EMPIREIDENTIFY EIDENTIFY
+
+Usage:  empireidentify <item>
+        eidentify <item>
+       
+The eidentify command identifies an item stored by your empire, showing you
+the same information that identify would as well as a listing of quantities
+of this item across the empire's islands.
+
+* Immortals may use this command on any inventory. Mortals may only use it on
+their own empire. If the empire name has more than one word, you can use
+quotation marks.
+
+See also: EFIND, WORKFORCE, EINVENTORY, IDENTIFY
+#
 EMPIREINVENTORY EINVENTORY
 
 Usage:  empireinventory [item | all]
@@ -521,7 +536,7 @@ You can use "warehouse inventory" to see items in warehouse (unique) storage.
 their own empire. If the empire name has more than one word, you can use
 quotation marks.
 
-See also: EFIND, SHIPPING, WORKFORCE
+See also: EFIND, SHIPPING, WORKFORCE, EIDENTIFY
 #
 "EMPIRE SCORE" ESCORE
 
