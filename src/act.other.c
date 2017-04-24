@@ -1924,7 +1924,7 @@ ACMD(do_herd) {
 	else if (COMPLEX_DATA(IN_ROOM(ch)) && ROOM_IS_CLOSED(IN_ROOM(ch)) && (!(ex = find_exit(IN_ROOM(ch), dir)) || !(to_room = ex->room_ptr) || !CAN_GO(ch, ex))) {
 		msg_to_char(ch, "You can't herd anything in that direction.\r\n");
 	}
-	else if (ROOM_IS_CLOSED(IN_ROOM(ch)) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED))
+	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY))
 		msg_to_char(ch, "You don't have permission to herd here.\r\n");
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_ROUGH))
 		msg_to_char(ch, "You find it difficult to do that here.\r\n");

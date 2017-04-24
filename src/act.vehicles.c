@@ -1977,6 +1977,9 @@ ACMD(do_lead) {
 		else if (GET_LOYALTY(mob) && GET_LOYALTY(mob) != GET_LOYALTY(ch)) {
 			msg_to_char(ch, "You can't lead animals owned by other empires.\r\n");
 		}
+		else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+			msg_to_char(ch, "You can't lead animals out of other people's territory.\r\n");
+		}
 		else {
 			act("You begin to lead $N.", FALSE, ch, NULL, mob, TO_CHAR);
 			act("$n begins to lead $N.", TRUE, ch, NULL, mob, TO_ROOM);
