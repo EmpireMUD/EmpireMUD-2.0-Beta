@@ -2408,7 +2408,7 @@ OLC_MODULE(oedit_damage) {
 		msg_to_char(ch, "You can't set damage on this type of object.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, slot) = olc_process_number(ch, argument, "damage", "damage", -100, 100, GET_OBJ_VAL(obj, slot));
+		GET_OBJ_VAL(obj, slot) = olc_process_number(ch, argument, "damage", "damage", -10000, 10000, GET_OBJ_VAL(obj, slot));
 		if (showdps) {
 			msg_to_char(ch, "It now has %.2f base dps.\r\n", get_base_dps(obj));
 		}
