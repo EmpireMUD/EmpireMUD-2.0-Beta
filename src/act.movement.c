@@ -580,21 +580,41 @@ int can_move(char_data *ch, int dir, room_data *to_room, int need_specials_check
 		return 0;
 	}
 	if (IS_RIDING(ch) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !has_ability(ch, ABIL_ALL_TERRAIN_RIDING) && !EFFECTIVELY_FLYING(ch)) {
-		msg_to_char(ch, "You can't ride on such rough terrain.\r\n");
-		return 0;
+		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
+			do_dismount(ch, "", 0, 0);
+		}
+		else {
+			msg_to_char(ch, "You can't ride on such rough terrain.\r\n");
+			return 0;
+		}
 	}
 	if (IS_RIDING(ch) && DEEP_WATER_SECT(to_room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
 		// ATR does not help ocean
-		msg_to_char(ch, "Your mount won't ride into the ocean.\r\n");
-		return 0;
+		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
+			do_dismount(ch, "", 0, 0);
+		}
+		else {
+			msg_to_char(ch, "Your mount won't ride into the ocean.\r\n");
+			return 0;
+		}
 	}
 	if (IS_RIDING(ch) && !has_ability(ch, ABIL_ALL_TERRAIN_RIDING) && WATER_SECT(to_room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
-		msg_to_char(ch, "Your mount won't ride into the water.\r\n");
-		return 0;
+		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
+			do_dismount(ch, "", 0, 0);
+		}
+		else {
+			msg_to_char(ch, "Your mount won't ride into the water.\r\n");
+			return 0;
+		}
 	}
 	if (IS_RIDING(ch) && MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !WATER_SECT(to_room) && !IS_WATER_BUILDING(to_room) && !EFFECTIVELY_FLYING(ch)) {
-		msg_to_char(ch, "Your mount won't go onto the land.\r\n");
-		return 0;
+		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
+			do_dismount(ch, "", 0, 0);
+		}
+		else {
+			msg_to_char(ch, "Your mount won't go onto the land.\r\n");
+			return 0;
+		}
 	}
 	
 	// need a generic for this -- a nearly identical condition is used in do_mount
