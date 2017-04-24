@@ -1868,7 +1868,7 @@ ACMD(do_sit) {
 	switch (GET_POS(ch)) {
 		case POS_STANDING: {
 			if (IS_RIDING(ch)) {
-				msg_to_char(ch, "You're already sitting!\r\n");
+				msg_to_char(ch, "You can't do any more sitting while mounted.\r\n");
 			}
 			else if (!*arg) {
 				send_to_char("You sit down.\r\n", ch);
