@@ -645,7 +645,7 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 	}
 	
 	if (!*argument){
-		msg_to_char(ch, "You must provide the item you wish to identify.\r\n");
+		msg_to_char(ch, "Which stored item would you like to identify?\r\n");
 		return;
 	}
 	
