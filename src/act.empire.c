@@ -645,6 +645,7 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 	}
 	
 	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
+		//If there isn't an item proto yet, the first item that matches the given argument will become the item used for the rest of the loop.
 		if ( !proto ) {
 			if (!multi_isname(argument, GET_OBJ_KEYWORDS(obj_proto(store->vnum)))) {
 				continue;
@@ -663,7 +664,7 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 		
 	}
 	if ( !proto ) {
-		msg_to_char(ch, "Your empire has no item by that name.\r\n");
+		msg_to_char(ch, "This empire has no item by that name.\r\n");
 		return;
 	}
 	
@@ -671,7 +672,10 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 	
 	msg_to_char(ch, "Storage list: \r\n");
 	HASH_ITER(hh, eid_pi_list, eid_pi, eid_pi_next) {
-		msg_to_char(ch, " %s with %d units\r\n",get_island_name_for(eid_pi->island, ch),eid_pi->quantity);
+		msg_to_char(ch, "(%4d) %s\r\n", eid_pi->quantity, get_island_name_for(eid_pi->island, ch));
+		// Cleaning as we use the hash.
+		HASH_DEL(eid_pi_list, eid_pi);
+		free(eid_pi);
 	}
 	
 }
@@ -3664,53 +3668,6 @@ ACMD(do_empires) {
 	page_string(ch->desc, output, TRUE);
 }
 
-ACMD(do_empire_identify) {
-	char error[MAX_STRING_LENGTH], arg2[MAX_INPUT_LENGTH];
-	empire_data *emp;
-	
-	argument = any_one_word(argument, arg);
-	skip_spaces(&argument);
-	strcpy(arg2, argument);
-	
-	//This parameter check ahead should probably have a function of it's own.
-	// only immortals may inventory other empires
-	if (!*arg || (GET_ACCESS_LEVEL(ch) < LVL_CIMPL && !IS_GRANTED(ch, GRANT_EMPIRES))) {
-		emp = GET_LOYALTY(ch);
-		if (*arg2) {
-			sprintf(buf, "%s %s", arg, arg2);
-			strcpy(arg2, buf);
-		}
-		else {
-			strcpy(arg2, arg);
-		}
-		strcpy(error, "You don't belong to any empire!\r\n");
-	}
-	//Is immortal
-	else {
-		emp = get_empire_by_name(arg);
-		if (!emp) {
-			emp = GET_LOYALTY(ch);
-			if (*arg2) {
-				sprintf(buf, "%s %s", arg, arg2);
-				strcpy(arg2, buf);
-			}
-			else {
-				strcpy(arg2, arg);
-			}
-			// in case
-			strcpy(error, "You don't belong to any empire!\r\n");
-		}
-	}
-	
-	if (emp) {
-		show_empire_identify_to_char(ch, emp, arg2);
-	}
-	else {
-		send_to_char(error, ch);
-	}
-	
-}
-
 ACMD(do_empire_inventory) {
 	char error[MAX_STRING_LENGTH], arg2[MAX_INPUT_LENGTH];
 	empire_data *emp;
@@ -3747,9 +3704,12 @@ ACMD(do_empire_inventory) {
 			strcpy(error, "You don't belong to any empire!\r\n");
 		}
 	}
-	
 	if (emp) {
-		show_empire_inventory_to_char(ch, emp, arg2);
+		if ( subcmd == SCMD_EINVENTORY ) {
+			show_empire_inventory_to_char(ch, emp, arg2);
+		} else {
+			show_empire_identify_to_char(ch, emp, arg2);
+		}
 	}
 	else {
 		send_to_char(error, ch);

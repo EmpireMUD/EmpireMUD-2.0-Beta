@@ -224,6 +224,10 @@ struct alias_data {
 #define SCMD_LIBRARY  0
 #define SCMD_BOOKEDIT  1
 
+// do_empire_inventory
+#define SCMD_EINVENTORY	0
+#define SCMD_EIDENTIFY	1
+
 // do_toggle
 #define TOG_ONOFF  0
 #define TOG_OFFON  1
