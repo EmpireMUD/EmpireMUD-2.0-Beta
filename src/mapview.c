@@ -1942,14 +1942,14 @@ void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
 			check_x = X_COORD(IN_ROOM(obj));	// not all locations are on the map
 			check_y = Y_COORD(IN_ROOM(obj));
 			if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-				sprintf(buf + strlen(buf), "(%*d, %*d) %s\r\n", X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(obj), FALSE));
+				sprintf(buf + strlen(buf), "[%d] (%d, %d) %s\r\n",  GET_ROOM_VNUM(IN_ROOM(obj)), check_x, check_y, get_room_name(IN_ROOM(obj), FALSE));
 			}
 			else {
-				sprintf(buf + strlen(buf), "(unknown) %s\r\n", get_room_name(IN_ROOM(obj), FALSE));
+				sprintf(buf + strlen(buf), "[%d] (unknown) %s\r\n", GET_ROOM_VNUM(IN_ROOM(obj)), get_room_name(IN_ROOM(obj), FALSE));
 			}
 		}
 		else {
-			sprintf(buf + strlen(buf), "%s\r\n", get_room_name(IN_ROOM(obj), FALSE));
+			sprintf(buf + strlen(buf), "[%d] %s\r\n", GET_ROOM_VNUM(IN_ROOM(obj)), get_room_name(IN_ROOM(obj), FALSE));
 		}
 		
 		send_to_char(buf, ch);
@@ -1997,20 +1997,20 @@ void perform_immort_where(char_data *ch, char *arg) {
 						check_x = X_COORD(IN_ROOM(d->character));	// not all locations are on the map
 						check_y = Y_COORD(IN_ROOM(d->character));
 						if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-							msg_to_char(ch, "%-20s - (%*d, %*d) %s (in %s)\r\n", GET_NAME(i), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
+							msg_to_char(ch, "%-20s - [%d] (%d, %d) %s (in %s)\r\n", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), check_x, check_y, get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
 						}
 						else {
-							msg_to_char(ch, "%-20s - (unknown) %s (in %s)\r\n", GET_NAME(i), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
+							msg_to_char(ch, "%-20s - [%d] (unknown) %s (in %s)\r\n", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
 						}
 					}
 					else {
 						check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
 						check_y = Y_COORD(IN_ROOM(i));
 						if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-							msg_to_char(ch, "%-20s - (%*d, %*d) %s\r\n", GET_NAME(i), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(i), FALSE));
+							msg_to_char(ch, "%-20s - [%d] (%d, %d) %s\r\n", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), check_x, check_y, get_room_name(IN_ROOM(i), FALSE));
 						}
 						else {
-							msg_to_char(ch, "%-20s - (unknown) %s\r\n", GET_NAME(i), get_room_name(IN_ROOM(i), FALSE));
+							msg_to_char(ch, "%-20s - [%d] (unknown) %s\r\n", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), get_room_name(IN_ROOM(i), FALSE));
 						}
 					}
 				}
@@ -2024,10 +2024,10 @@ void perform_immort_where(char_data *ch, char *arg) {
 				check_x = X_COORD(IN_ROOM(i));	// not all locations are on the map
 				check_y = Y_COORD(IN_ROOM(i));
 				if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-					msg_to_char(ch, "M%3d. %-25s - %s(%*d, %*d) %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && i->proto_script) ? "[TRIG] " : "", X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(i), FALSE));
+					msg_to_char(ch, "M%3d. %-25s - %s[%d] (%d, %d) %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && i->proto_script) ? "[TRIG] " : "", GET_ROOM_VNUM(IN_ROOM(i)), check_x, check_y, get_room_name(IN_ROOM(i), FALSE));
 				}
 				else {
-					msg_to_char(ch, "M%3d. %-25s - %s(unknown) %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && i->proto_script) ? "[TRIG] " : "", get_room_name(IN_ROOM(i), FALSE));
+					msg_to_char(ch, "M%3d. %-25s - %s[%d] (unknown) %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && i->proto_script) ? "[TRIG] " : "", GET_ROOM_VNUM(IN_ROOM(i)), get_room_name(IN_ROOM(i), FALSE));
 				}
 			}
 		}
@@ -2038,10 +2038,10 @@ void perform_immort_where(char_data *ch, char *arg) {
 				check_x = X_COORD(IN_ROOM(veh));	// not all locations are on the map
 				check_y = Y_COORD(IN_ROOM(veh));
 				if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-					msg_to_char(ch, "V%3d. %-25s - %s(%*d, %*d) %s\r\n", ++num, VEH_SHORT_DESC(veh), (veh->proto_script ? "[TRIG] " : ""), X_PRECISION, check_x, Y_PRECISION, check_y, get_room_name(IN_ROOM(veh), FALSE));
+					msg_to_char(ch, "V%3d. %-25s - %s[%d] (%d, %d) %s\r\n", ++num, VEH_SHORT_DESC(veh), (veh->proto_script ? "[TRIG] " : ""), GET_ROOM_VNUM(IN_ROOM(veh)), check_x, check_y, get_room_name(IN_ROOM(veh), FALSE));
 				}
 				else {
-					msg_to_char(ch, "V%3d. %-25s - %s(unknown) %s\r\n", ++num, VEH_SHORT_DESC(veh), (veh->proto_script ? "[TRIG] " : ""), get_room_name(IN_ROOM(veh), FALSE));
+					msg_to_char(ch, "V%3d. %-25s - %s[%d] (unknown) %s\r\n", ++num, VEH_SHORT_DESC(veh), (veh->proto_script ? "[TRIG] " : ""), GET_ROOM_VNUM(IN_ROOM(veh)), get_room_name(IN_ROOM(veh), FALSE));
 				}
 			}
 		}
