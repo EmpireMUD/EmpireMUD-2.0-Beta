@@ -5520,6 +5520,7 @@ ACMD(do_gecho) {
 
 ACMD(do_goto) {
 	room_data *location;
+	char_data *iter;
 
 	one_word(argument, arg);
 	
@@ -5531,7 +5532,23 @@ ACMD(do_goto) {
 		msg_to_char(ch, "You can't teleport there.\r\n");
 		return;
 	}
-
+	
+	// wizhide safety
+	if (!PRF_FLAGGED(ch, PRF_WIZHIDE) && GET_INVIS_LEV(ch) < LVL_START_IMM) {
+		LL_FOREACH2(ROOM_PEOPLE(location), iter, next_in_room) {
+			if (ch == iter || !IS_IMMORTAL(iter)) {
+				continue;
+			}
+			if (GET_INVIS_LEV(iter) > GET_ACCESS_LEVEL(ch)) {
+				continue;	// ignore -- ch can't see them at all
+			}
+			if (PRF_FLAGGED(iter, PRF_WIZHIDE)) {
+				msg_to_char(ch, "You can't teleport there because someone there is using wizhide, and you aren't.\r\n");
+				return;
+			}
+		}
+	}
+	
 	perform_goto(ch, location);
 }
 
