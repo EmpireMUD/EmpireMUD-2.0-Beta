@@ -47,7 +47,7 @@ char *any_one_name(char *argument, char *first_arg) {
 
 
 void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type[]) {
-	char sb[MAX_STRING_LENGTH];
+	char sb[MAX_STRING_LENGTH], *ptr;
 	int i;
 
 	strcpy(sb, "");
@@ -117,7 +117,20 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 
 	strcat(sb,tokens[i]);
 	strcat(sb, "&0\r\n");
-	sb[0] = toupper(sb[0]);
+	
+	// capitalize
+	for (ptr = sb; *ptr; ++*ptr) {
+		if (*ptr == '&' || *ptr == '\t') {
+			++ptr;	// skip the color code
+			if (*ptr && *ptr == '&') {
+				break;
+			}
+		}
+		
+		// find first non-colorcode
+		break;
+	}
+	*ptr = toupper(*ptr);
 	send_to_char(sb, ch);
 }
 
