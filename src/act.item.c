@@ -686,7 +686,10 @@ void perform_remove(char_data *ch, int pos) {
 
 static void perform_wear(char_data *ch, obj_data *obj, int where) {
 	extern const int apply_attribute[];
+	extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
 	extern const int primary_attributes[];
+	
+	char buf[MAX_STRING_LENGTH];
 	struct obj_apply *apply;
 	int iter, type, val;
 
@@ -724,7 +727,8 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 			}
 		
 			if (val < 1) {
-				act("You are too weak to use $p!", FALSE, ch, obj, 0, TO_CHAR);
+				sprintf(buf, "You are %s to use $p!", attributes[type].low_error);
+				act(buf, FALSE, ch, obj, 0, TO_CHAR);
 				return;
 			}
 		}

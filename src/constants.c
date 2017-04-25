@@ -1241,12 +1241,13 @@ const bool apply_never_scales[] = {
 
 // STRENGTH, etc (part 1)
 struct attribute_data_type attributes[NUM_ATTRIBUTES] = {
-	{ "Strength", "Strength improves your melee damage and lets you chop trees faster" },
-	{ "Dexterity", "Dexterity helps you hit opponents and dodge hits" },
-	{ "Charisma", "Charisma improves your success with Stealth abilities" },
-	{ "Greatness", "Greatness determines how much territory your empire can claim" },
-	{ "Intelligence", "Intelligence improves your magical damage and healing" },
-	{ "Wits", "Wits improves your speed and effectiveness in combat" }
+	// Label, Description, low-stat error
+	{ "Strength", "Strength improves your melee damage and lets you chop trees faster", "too weak" },
+	{ "Dexterity", "Dexterity helps you hit opponents and dodge hits", "not agile enough" },
+	{ "Charisma", "Charisma improves your success with Stealth abilities", "not charming enough" },
+	{ "Greatness", "Greatness determines how much territory your empire can claim", "not great enough" },
+	{ "Intelligence", "Intelligence improves your magical damage and healing", "not clever" },
+	{ "Wits", "Wits improves your speed and effectiveness in combat", "too slow" }
 };
 
 // STRENGTH, etc (part 2)
