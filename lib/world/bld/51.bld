@@ -1691,7 +1691,7 @@ A Mystical Portal~
 24 1 bdp 0
 0 0 0 -1
 C
-collapse, enter, portal~
+collapse, enter, inventory, portal, retrieve, store~
 D
    Huge stones encircle you, each set into the ground at such a steep angle
 that they look like could fall at any moment. Each stone is inscribed with a
