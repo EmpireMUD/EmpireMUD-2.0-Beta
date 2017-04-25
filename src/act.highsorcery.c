@@ -180,10 +180,10 @@ struct ritual_data_type {
 		start_ritual_of_defense,
 		perform_ritual_of_defense,
 		{{ "You begin the incantation for the Ritual of Defense.", "\t" },
-		{ "You say, 'Empower now this wall of stone'", "$n says, 'Empower now this wall of stone'" },
-		{ "You say, 'With wisdom of the sages'", "$n says, 'With wisdom of the sages'" },
-		{ "You say, 'Ward against the foes above'", "$n says, 'Ward against the foes above'" },
-		{ "You say, 'And strong, withstand the ages'", "$n says, 'And strong, withstand the ages'" },
+		{ "You say, 'Empower now this wall of stone...'", "$n says, 'Empower now this wall of stone...'" },
+		{ "You say, 'With wisdom of the sages...'", "$n says, 'With wisdom of the sages...'" },
+		{ "You say, 'Ward against the foes above...'", "$n says, 'Ward against the foes above...'" },
+		{ "You say, 'And strong, withstand the ages!'", "$n says, 'And strong, withstand the ages!'" },
 		MESSAGE_END
 	}},
 	

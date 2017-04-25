@@ -554,6 +554,11 @@ Usage:  eat <item>
 If you're hungry or thirsty, these commands are for you! You can drink from
 wells, fountains, and the edge of nearby rivers, too.
 
+Being hungry or thirsty causes you to regenerate health, moves, and mana more
+slowly. It will also slow down any action you take, such as chopping or
+sailing. If you can no longer regenerate moves due to hunger, try sleeping.
+
+Examples:
   > eat bread
   > taste bread
   > drink from cup
