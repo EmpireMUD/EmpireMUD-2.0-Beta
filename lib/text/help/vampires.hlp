@@ -116,6 +116,11 @@ Cost:  40 blood
 A vampire with this ability can create weapons from its own blood. The blood-
 red weapons are only as powerful as the vampire who created them.
 
+The strength of your weapons will be based on your Vampire skill level, unless
+you have a Vampire over 75, in which case it will be based on your total
+composite level (if you're wielding a permanent weapon when you ready a
+blood weapon, this will include any levels you get from that weapon).
+
 You can create:
   bloodmace (pound/blunt)
   bloodskean (stab/stealth)
