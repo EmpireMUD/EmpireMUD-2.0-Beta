@@ -109,7 +109,7 @@ There is also currently a maximum rating of 15 in these attributes.
 
 See also: DODGE, DPS, EMPIRE GREATNESS, SPEED, TO-HIT
 #
-AUTORECALL "AUTO-RECALL" "AUTO RECALL"
+AUTORECALL "AUTO-RECALL" "AUTO RECALL" "TOGGLE AUTORECALL"
 
 Usage:  toggle autorecall
 
@@ -334,7 +334,7 @@ Local channels
 say - in-character speech
 oocsay - out-of-character speech
 
-See also: TOGGLE, SLASH-CHANNELS
+See also: TOGGLE, SAY, SLASH-CHANNELS
 #
 COIN COINS COINAGE CURRENCY GOLD
 
@@ -818,7 +818,7 @@ If you have the Navigation ability, this will also include the location.
 You can specify what type of thing to look (cities, adventures, starting
 locations) if you want a shorter list.
 #
-PLAYERKILLING "PLAYER KILLING" PK PVP
+PLAYERKILLING "PLAYER KILLING" PK PVP "TOGGLE PVP"
 
 EmpireMUD player-killing rules
 

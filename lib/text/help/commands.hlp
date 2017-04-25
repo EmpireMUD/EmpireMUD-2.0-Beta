@@ -1084,7 +1084,7 @@ a slow connection or if it just annoys you.
 
 See also: TOGGLE
 #
-NOTELL "NO TELL"
+NOTELL "NO TELL" "TOGGLE TELL"
 
 Usage:  toggle tell
 
@@ -1092,7 +1092,7 @@ Use this toggle if you wish to prevent other players from using "tell" to
 communicate with you. (notell) will appear after your name in the WHO list if
 you have notell on.
 
-See also: IGNORE, TELL, WHO
+See also: IGNORE, TELL, TOGGLE, WHO
 #
 OPEN CLOSE
 
@@ -1456,7 +1456,7 @@ You can use ' as a shorthand for say, and " for oocsay, as in:
 
   > 'hello there.
 
-See also: GSAY, IGNORE, NOREPEAT, NOTELL, REPLY, SLASH CHANNELS
+See also: CHANNELS, GSAY, IGNORE, NOREPEAT, NOTELL, REPLY, SLASH CHANNELS
 #
 SAYHISTORY
 
@@ -1784,7 +1784,7 @@ Handy time-conversion chart:
  - 1 regeneration tick in-game = 5 seconds
  - 1 hour in-game = 75 seconds
  - 1 day in-game = 30 minutes
- - 1 year in-game = 7 days
+ - 1 year in-game = 7.5 days
 #
 TITLE
 
@@ -1840,7 +1840,7 @@ Immortal toggles:
   wizhide - if on, the immortal can't be seen in rooms but is not invisible
   autonotes - automatically show notes on accounts when players log in
 
-See also: FIGHT MESSAGES
+See also: FIGHT MESSAGES, TOGGLE <type>
 #
 "TOGGLE NO-EMPIRE" "TOGGLE NOEMPIRE" NOEMPIRE NO-EMPIRE
 

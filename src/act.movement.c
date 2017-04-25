@@ -1117,7 +1117,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, int need_special
 				break;
 			default: {
 				// this leaves a %s for later
-				sprintf(buf2, "$n %s up from %%s.", mob_move_types[move_type]);
+				sprintf(buf2, "$n %s %s from %%s.", ROOM_IS_CLOSED(IN_ROOM(ch)) ? "in" : "up", mob_move_types[move_type]);
 
 				for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
 					if (vict == ch || !vict->desc) {
