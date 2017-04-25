@@ -235,6 +235,8 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 * @return bool TRUE if it moved, FALSE if it was blocked.
 */
 bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
+	void msdp_update_room(char_data *ch);
+	
 	room_data *to_room = NULL, *was_in;
 	struct follow_type *fol, *next_fol;
 	struct vehicle_room_list *vrl;
@@ -263,7 +265,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		// sends own message
 		return FALSE;
 	}
-	if (!IS_COMPLETE(to_room)) {
+	if (!IS_COMPLETE(to_room) && (!WATER_SECT(to_room) || !VEH_FLAGGED(veh, VEH_SAILING | VEH_FLYING))) {
 		if (ch) {
 			msg_to_char(ch, "You can't %s in there until it's complete.\r\n", drive_data[subcmd].command);
 		}
@@ -321,6 +323,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 			snprintf(buf, sizeof(buf), "You %s $V %s.", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)]);
 		}
 		act(buf, FALSE, VEH_DRIVER(veh), NULL, veh, TO_CHAR);
+		msdp_update_room(VEH_DRIVER(veh));
 	}
 	
 	// move sitter
@@ -366,6 +369,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 						snprintf(buf, sizeof(buf), "$V %s %s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)]);
 					}
 					act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR | TO_SPAMMY);
+					msdp_update_room(ch_iter);
 				}
 			}
 		}
@@ -1973,6 +1977,9 @@ ACMD(do_lead) {
 		else if (GET_LOYALTY(mob) && GET_LOYALTY(mob) != GET_LOYALTY(ch)) {
 			msg_to_char(ch, "You can't lead animals owned by other empires.\r\n");
 		}
+		else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+			msg_to_char(ch, "You can't lead animals out of other people's territory.\r\n");
+		}
 		else {
 			act("You begin to lead $N.", FALSE, ch, NULL, mob, TO_CHAR);
 			act("$n begins to lead $N.", TRUE, ch, NULL, mob, TO_ROOM);
@@ -2192,7 +2199,7 @@ ACMD(do_repair) {
 	}
 	else {
 		start_action(ch, ACT_REPAIRING, -1);
-		GET_ACTION_VNUM(ch, 0) = GET_ID(veh);
+		GET_ACTION_VNUM(ch, 0) = veh_script_id(veh);
 		act("You begin to repair $V.", FALSE, ch, NULL, veh, TO_CHAR);
 		act("$n begins to repair $V.", FALSE, ch, NULL, veh, TO_ROOM);
 	}

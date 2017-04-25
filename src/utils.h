@@ -241,7 +241,7 @@
  //////////////////////////////////////////////////////////////////////////////
 //// CAN SEE VEHICLE UTILS ///////////////////////////////////////////////////////
 
-#define MORT_CAN_SEE_VEHICLE(sub, veh)  (LIGHT_OK(sub))
+#define MORT_CAN_SEE_VEHICLE(sub, veh)  (VEH_FLAGGED((veh), VEH_VISIBLE_IN_DARK) || LIGHT_OK(sub) || VEH_DRIVER(veh) == (sub) || VEH_LED_BY(veh) == (sub) || VEH_SITTING_ON(veh) == (sub) || GET_ROOM_VEHICLE(IN_ROOM(sub)) == (veh))
 #define CAN_SEE_VEHICLE(sub, veh)  (MORT_CAN_SEE_VEHICLE(sub, veh) || (!IS_NPC(sub) && PRF_FLAGGED((sub), PRF_HOLYLIGHT)))
 
 
@@ -316,7 +316,6 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_FED_ON_BY(ch)  ((ch)->char_specials.fed_on_by)
 #define GET_FEEDING_FROM(ch)  ((ch)->char_specials.feeding_from)
 #define GET_HEALTH_REGEN(ch)  ((ch)->char_specials.health_regen)
-#define GET_ID(x)  ((x)->id)
 #define GET_IDNUM(ch)  (REAL_CHAR(ch)->char_specials.idnum)
 #define GET_LAST_SWING_MAINHAND(ch)  ((ch)->char_specials.fighting.last_swing_mainhand)
 #define GET_LAST_SWING_OFFHAND(ch)  ((ch)->char_specials.fighting.last_swing_offhand)
@@ -351,7 +350,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define IS_MAGE(ch)  (IS_NPC(ch) ? GET_MAX_MANA(ch) > 0 : (get_skill_level((ch), SKILL_NATURAL_MAGIC) > 0 || get_skill_level((ch), SKILL_HIGH_SORCERY) > 0))
 #define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
 #define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : (get_skill_level((ch), SKILL_VAMPIRE) > 0))
-#define WOULD_EXECUTE(ch, vict)  (IS_NPC(ch) ? (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP)) : (PRF_FLAGGED((ch), PRF_AUTOKILL) || MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP)))
+#define WOULD_EXECUTE(ch, vict)  (MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP) || (IS_NPC(ch) ? (((ch)->master && !IS_NPC((ch)->master)) ? PRF_FLAGGED((ch)->master, PRF_AUTOKILL) : (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP))) : PRF_FLAGGED((ch), PRF_AUTOKILL)))
 
 // helpers
 #define AFF_FLAGGED(ch, flag)  (IS_SET(AFF_FLAGS(ch), (flag)))
@@ -508,7 +507,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 // helpers
 #define EMPIRE_HAS_TECH(emp, num)  (EMPIRE_TECH((emp), (num)) > 0)
 #define EMPIRE_IS_TIMED_OUT(emp)  (EMPIRE_LAST_LOGON(emp) + (config_get_int("whole_empire_timeout") * SECS_PER_REAL_DAY) < time(0))
-#define GET_TOTAL_WEALTH(emp)  (EMPIRE_WEALTH(emp) + (int)(EMPIRE_COINS(emp) * COIN_VALUE))
+#define GET_TOTAL_WEALTH(emp)  (EMPIRE_WEALTH(emp) + (EMPIRE_COINS(emp) * COIN_VALUE))
 #define EXPLICIT_BANNER_TERMINATOR(emp)  (EMPIRE_BANNER_HAS_UNDERLINE(emp) ? "\t0" : "")
 
 // definitions
@@ -981,7 +980,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define SHOW_FIGHT_MESSAGES(ch, bit)  (!IS_NPC(ch) && IS_SET(GET_FIGHT_MESSAGES(ch), (bit)))
 
 // definitions
-#define IN_HOSTILE_TERRITORY(ch)  (!IS_NPC(ch) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && (IS_HOSTILE(ch) || empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))))
+#define IN_HOSTILE_TERRITORY(ch)  (!IS_NPC(ch) && !IS_IMMORTAL(ch) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && (IS_HOSTILE(ch) || empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))))
 #define IS_APPROVED(ch)  (IS_NPC(ch) || PLR_FLAGGED(ch, PLR_APPROVED) || ACCOUNT_FLAGGED(ch, ACCT_APPROVED))
 #define IS_HOSTILE(ch)  (!IS_NPC(ch) && (get_cooldown_time((ch), COOLDOWN_HOSTILE_FLAG) > 0 || get_cooldown_time((ch), COOLDOWN_ROGUE_FLAG) > 0))
 #define IS_HUNGRY(ch)  (GET_COND(ch, FULL) >= 360 && !has_ability(ch, ABIL_UNNATURAL_THIRST))
@@ -993,7 +992,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define IS_BLOOD_STARVED(ch)  (IS_VAMPIRE(ch) && GET_BLOOD(ch) <= config_get_int("blood_starvation_level"))
 
 // for act() and act-like things (requires to_sleeping and is_spammy set to true/false)
-#define SENDOK(ch)  (((ch)->desc || SCRIPT_CHECK((ch), MTRIG_ACT)) && (to_sleeping || AWAKE(ch)) && (IS_NPC(ch) || !PRF_FLAGGED(ch, PRF_NOSPAM) || !is_spammy) && (IS_NPC(ch) || !PLR_FLAGGED((ch), PLR_WRITING)))
+#define SENDOK(ch)  (((ch)->desc || SCRIPT_CHECK((ch), MTRIG_ACT)) && (to_sleeping || AWAKE(ch)) && (!PRF_FLAGGED(ch, PRF_NOSPAM) || !is_spammy) && (IS_NPC(ch) || !PLR_FLAGGED((ch), PLR_WRITING)))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1215,6 +1214,10 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 #define HSHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "their" : ((GET_SEX(ch) && !CHAR_MORPH_FLAGGED(ch, MORPHF_GENDER_NEUTRAL)) ? (GET_SEX(ch) == SEX_MALE ? "his":"her") :"its"))
 #define HSSH(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "they" : ((GET_SEX(ch) && !CHAR_MORPH_FLAGGED(ch, MORPHF_GENDER_NEUTRAL)) ? (GET_SEX(ch) == SEX_MALE ? "he" :"she") : "it"))
 #define HMHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "them" : ((GET_SEX(ch) && !CHAR_MORPH_FLAGGED(ch, MORPHF_GENDER_NEUTRAL)) ? (GET_SEX(ch) == SEX_MALE ? "him":"her") : "it"))
+
+#define REAL_HSHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "their" : (GET_REAL_SEX(ch) ? (GET_REAL_SEX(ch) == SEX_MALE ? "his":"her") :"its"))
+#define REAL_HSSH(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "they" : (GET_REAL_SEX(ch) ? (GET_REAL_SEX(ch) == SEX_MALE ? "he" :"she") : "it"))
+#define REAL_HMHR(ch)  (MOB_FLAGGED((ch), MOB_PLURAL) ? "them" : (GET_REAL_SEX(ch) ? (GET_REAL_SEX(ch) == SEX_MALE ? "him":"her") : "it"))
 
 #define AN(string)  (strchr("aeiouAEIOU", *string) ? "an" : "a")
 #define SANA(obj)  (strchr("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")

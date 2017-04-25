@@ -1660,7 +1660,7 @@ ACMD(do_reforge) {
 	bool found;
 	obj_data *obj, *new, *proto;
 	
-	bitvector_t preserve_flags = OBJ_HARD_DROP | OBJ_GROUP_DROP;	// flags to copy over if obj is reloaded
+	bitvector_t preserve_flags = OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_KEEP;	// flags to copy over if obj is reloaded
 	
 	// reforge <item> name <name>
 	// reforge <item> renew

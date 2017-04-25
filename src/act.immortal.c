@@ -1644,8 +1644,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("skill") {
+		void check_ability_levels(char_data *ch, any_vnum skill);
 		char skillname[MAX_INPUT_LENGTH], *skillval;
-		int level = -1, old_level;
+		int level = -1;
 		skill_data *skill;
 		
 		// set <name> skill "<name>" <level>
@@ -1666,12 +1667,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 
 		// victory
-		old_level = get_skill_level(vict, SKILL_VNUM(skill));
 		set_skill(vict, SKILL_VNUM(skill), level);
 		update_class(vict);
-		if (old_level > get_skill_level(vict, SKILL_VNUM(skill))) {
-			clear_char_abilities(vict, SKILL_VNUM(skill));
-		}
+		check_ability_levels(vict, SKILL_VNUM(skill));
 		sprintf(output, "%s's %s set to %d", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
 
@@ -3347,6 +3345,11 @@ void do_stat_character(char_data *ch, char_data *k) {
 		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 		
 		if (IS_NPC(k)) {
+			sprintf(lbuf, "Mob-dmg  [%d]", MOB_DAMAGE(k));
+			sprintf(lbuf2, "Mob-hit  [%d]", MOB_TO_HIT(k));
+			sprintf(lbuf3, "Mob-dodge  [%d]", MOB_TO_DODGE(k));
+			msg_to_char(ch, "  %-24.24s %-24.24s %-24.24s\r\n", lbuf, lbuf2, lbuf3);
+			
 			msg_to_char(ch, "NPC Bare Hand Dam: %d\r\n", MOB_DAMAGE(k));
 		}
 	}
@@ -3962,14 +3965,16 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 /* Displays the vital statistics of IN_ROOM(ch) to ch */
 void do_stat_room(char_data *ch) {
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	extern const char *exit_bits[];
 	extern const char *depletion_type[NUM_DEPLETION_TYPES];
+	extern const char *instance_flags[];
 	extern const char *room_extra_types[];
 	
 	char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
 	struct depletion_data *dep;
 	struct empire_city_data *city;
-	int found;
+	int found, num;
 	bool comma;
 	obj_data *j;
 	char_data *k;
@@ -3980,6 +3985,7 @@ void do_stat_room(char_data *ch) {
 	player_index_data *index;
 	struct global_data *glb;
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
+	struct instance_data *inst, *inst_iter;
 	vehicle_data *veh;
 	
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
@@ -4041,6 +4047,18 @@ void do_stat_room(char_data *ch) {
 		else {
 			msg_to_char(ch, "Mine type: %s, Amount remaining: %d\r\n", GET_GLOBAL_NAME(glb), get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT));
 		}
+	}
+	
+	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
+		num = 0;
+		LL_FOREACH(instance_list, inst_iter) {
+			++num;
+			if (inst_iter == inst) {
+				break;
+			}
+		}
+		sprintbit(inst->flags, instance_flags, buf2, TRUE);
+		msg_to_char(ch, "Instance \tc%d\t0: [\tg%d\t0] \ty%s\t0, Main Room: [\tg%d\t0], Flags: \tc%s\t0\r\n", num, GET_ADV_VNUM(inst->adventure), GET_ADV_NAME(inst->adventure), (inst->start ? GET_ROOM_VNUM(inst->start) : NOWHERE), buf2);
 	}
 
 	sprintf(buf, "Chars present:&y");
@@ -4804,6 +4822,24 @@ ACMD(do_autowiz) {
 }
 
 
+ACMD(do_breakreply) {
+	char_data *iter;
+	
+	LL_FOREACH(character_list, iter) {
+		if (IS_NPC(iter) || GET_ACCESS_LEVEL(iter) >= GET_ACCESS_LEVEL(ch)) {
+			continue;
+		}
+		if (GET_LAST_TELL(iter) != GET_IDNUM(ch)) {
+			continue;
+		}
+		
+		GET_LAST_TELL(iter) = NOBODY;
+	}
+	
+	send_config_msg(ch, "ok_string");
+}
+
+
 ACMD(do_clearabilities) {
 	char_data *vict;
 	char typestr[MAX_STRING_LENGTH];
@@ -4973,6 +5009,10 @@ ACMD(do_echo) {
 
 	if (!*argument) {
 		send_to_char("Yes... but what?\r\n", ch);
+		return;
+	}
+	if (subcmd == SCMD_EMOTE && strstr(string, "$O")) {
+		msg_to_char(ch, "You can't use the $O symbol in an emote.\r\n");
 		return;
 	}
 
@@ -5472,7 +5512,7 @@ ACMD(do_gecho) {
 			}
 		}
 		
-		if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			send_config_msg(ch, "ok_string");
 		}
 		else {
@@ -5484,6 +5524,7 @@ ACMD(do_gecho) {
 
 ACMD(do_goto) {
 	room_data *location;
+	char_data *iter;
 
 	one_word(argument, arg);
 	
@@ -5495,7 +5536,23 @@ ACMD(do_goto) {
 		msg_to_char(ch, "You can't teleport there.\r\n");
 		return;
 	}
-
+	
+	// wizhide safety
+	if (!PRF_FLAGGED(ch, PRF_WIZHIDE) && GET_INVIS_LEV(ch) < LVL_START_IMM) {
+		LL_FOREACH2(ROOM_PEOPLE(location), iter, next_in_room) {
+			if (ch == iter || !IS_IMMORTAL(iter)) {
+				continue;
+			}
+			if (GET_INVIS_LEV(iter) > GET_ACCESS_LEVEL(ch)) {
+				continue;	// ignore -- ch can't see them at all
+			}
+			if (PRF_FLAGGED(iter, PRF_WIZHIDE)) {
+				msg_to_char(ch, "You can't teleport there because someone there is using wizhide, and you aren't.\r\n");
+				return;
+			}
+		}
+	}
+	
 	perform_goto(ch, location);
 }
 
@@ -5736,7 +5793,7 @@ ACMD(do_load) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	vehicle_data *veh;
-	char_data *mob;
+	char_data *mob, *mort;
 	obj_data *obj;
 	any_vnum number;
 
@@ -5763,6 +5820,13 @@ ACMD(do_load) {
 		act("$n has created $N!", FALSE, ch, 0, mob, TO_ROOM);
 		act("You create $N.", FALSE, ch, 0, mob, TO_CHAR);
 		load_mtrigger(mob);
+		
+		if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded mob %s with mortal present (%s) at %s", GET_NAME(ch), GET_NAME(mob), GET_NAME(mort), room_log_identifier(IN_ROOM(ch)));
+		}
+		else if (ROOM_OWNER(IN_ROOM(ch)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded mob %s in mortal empire (%s) at %s", GET_NAME(ch), GET_NAME(mob), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
+		}
 	}
 	else if (is_abbrev(buf, "obj")) {
 		if (!obj_proto(number)) {
@@ -5791,6 +5855,13 @@ ACMD(do_load) {
 		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM);
 		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR);
 		load_vtrigger(veh);
+		
+		if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded vehicle %s with mortal present (%s) at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), GET_NAME(mort), room_log_identifier(IN_ROOM(ch)));
+		}
+		else if (ROOM_OWNER(IN_ROOM(ch)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded vehicle %s in mortal empire (%s) at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
+		}
 	}
 	else {
 		send_to_char("That'll have to be either 'obj', 'mob', or 'vehicle'.\r\n", ch);
@@ -6470,7 +6541,7 @@ ACMD(do_restore) {
 
 ACMD(do_return) {
 	if (ch->desc && ch->desc->original) {
-		syslog(SYS_GC, GET_INVIS_LEV(ch->desc->original), TRUE, "GC: %s has returned to %s original body", GET_REAL_NAME(ch->desc->original), HSHR(ch->desc->original));
+		syslog(SYS_GC, GET_INVIS_LEV(ch->desc->original), TRUE, "GC: %s has returned to %s original body", GET_REAL_NAME(ch->desc->original), REAL_HSHR(ch->desc->original));
 		send_to_char("You return to your original body.\r\n", ch);
 
 		/*

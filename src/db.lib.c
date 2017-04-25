@@ -1444,7 +1444,7 @@ void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_d
 	// reduce pop
 	if (emp) {
 		EMPIRE_POPULATION(emp) -= 1;
-		if ((isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
+		if (!GET_ROOM_VEHICLE(ter->room) && (isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
 			isle->population -= 1;
 		}
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
@@ -1783,6 +1783,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	struct empire_city_data *city;
 	struct empire_island *isle;
 	room_data *room;
+	double dbl_in;
 	long long_in;
 	
 	sprintf(buf2, "empire #%d", vnum);
@@ -1886,13 +1887,13 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 					log("SYSERR: Expected numerical data in E line of empire %d but file ended", vnum);
 					break;
 				}
-				if (sscanf(line, "%s %d", str_in, &t[0]) != 2) {
+				if (sscanf(line, "%s %lf", str_in, &dbl_in) != 2) {
 					log("SYSERR: Expected 2 args in E line of empire %d", vnum);
 					break;
 				}
 				
 				emp->frontier_traits = asciiflag_conv(str_in);
-				emp->coins = t[0];
+				emp->coins = dbl_in;
 				break;
 			}
 			case 'I': {	// island name
@@ -1978,12 +1979,12 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				break;
 			}
 			case 'X': { // trade
-				if (sscanf(line, "X %d %d %d %d", &t[0], &t[1], &t[2], &t[3]) == 4) {
+				if (sscanf(line, "X %d %d %d %lf", &t[0], &t[1], &t[2], &dbl_in) == 4) {
 					CREATE(trade, struct empire_trade_data, 1);
 					trade->type = t[0];
 					trade->vnum = t[1];
 					trade->limit = t[2];
-					trade->cost = t[3];
+					trade->cost = dbl_in;
 					trade->next = NULL;
 					
 					// add to end
@@ -2073,7 +2074,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	}
 	
 	// E: extra data
-	fprintf(fl, "E\n%s %d\n", bitv_to_alpha(EMPIRE_FRONTIER_TRAITS(emp)), emp->coins);
+	fprintf(fl, "E\n%s %.1f\n", bitv_to_alpha(EMPIRE_FRONTIER_TRAITS(emp)), EMPIRE_COINS(emp));
 	
 	// I: island names
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
@@ -2123,7 +2124,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	
 	// X: trade
 	for (trade = EMPIRE_TRADE(emp); trade; trade = trade->next) {
-		fprintf(fl, "X %d %d %d %d\n", trade->type, trade->vnum, trade->limit, trade->cost);
+		fprintf(fl, "X %d %d %d %.1f\n", trade->type, trade->vnum, trade->limit, trade->cost);
 	}
 	
 	// Y: cities
@@ -2365,7 +2366,7 @@ void populate_npc(room_data *room, struct empire_territory_data *ter) {
 		proto = mob_proto(artisan);
 		npc = create_empire_npc(emp, artisan, sex, pick_generic_name(proto ? MOB_NAME_SET(proto) : 0, sex), ter);
 		EMPIRE_POPULATION(emp) += 1;
-		if ((isle = get_empire_island(emp, GET_ISLAND_ID(room)))) {
+		if (!GET_ROOM_VEHICLE(room) && (isle = get_empire_island(emp, GET_ISLAND_ID(room)))) {
 			isle->population += 1;
 		}
 		
@@ -2381,7 +2382,7 @@ void populate_npc(room_data *room, struct empire_territory_data *ter) {
 		proto = mob_proto(sex == SEX_MALE ? CITIZEN_MALE : CITIZEN_FEMALE);
 		npc = create_empire_npc(emp, proto ? GET_MOB_VNUM(proto) : 0, sex, pick_generic_name(MOB_NAME_SET(proto), sex), ter);
 		EMPIRE_POPULATION(emp) += 1;
-		if ((isle = get_empire_island(emp, GET_ISLAND_ID(room)))) {
+		if (!GET_ROOM_VEHICLE(room) && (isle = get_empire_island(emp, GET_ISLAND_ID(room)))) {
 			isle->population += 1;
 		}
 
@@ -3635,7 +3636,9 @@ void free_obj(obj_data *obj) {
 	}
 
 	/* find_obj helper */
-	remove_from_lookup_table(GET_ID(obj));
+	if (obj->script_id > 0) {
+		remove_from_lookup_table(obj->script_id);
+	}
 
 	free(obj);
 }
@@ -4212,7 +4215,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				reset->command = *(line + 2);
 				ptr = line + 3;
 				
-				if (reset->command == 'V') { // V: string-arg command
+				if (reset->command == 'V') { // V: script variable reset
 					// trigger_type misc? room_vnum sarg1 sarg2
 					if (sscanf(line + 3, " %d %d %d %79s %79[^\f\n\r\t\v]", &reset->arg1, &reset->arg2, &reset->arg3, str1, str2) != 5) {
 						error = TRUE;
@@ -4392,6 +4395,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	struct room_extra_data *red, *next_red;
 	struct depletion_data *dep;
 	struct cooldown_data *cool;
+	struct trig_var_data *tvd;
 	trig_data *trig;
 	char_data *mob;
 	
@@ -4420,10 +4424,21 @@ void write_room_to_file(FILE *fl, room_data *room) {
 			// C O
 			fprintf(fl, "C O\n");
 		}
-		// triggers: C T type vnum
+		
 		if (SCRIPT(room)) {
+			// triggers: C T type vnum
 			for (trig = TRIGGERS(SCRIPT(room)); trig; trig = trig->next) {
 				fprintf(fl, "C T %d %d\n", WLD_TRIGGER, GET_TRIG_VNUM(trig));
+			}
+			
+			// triggers: C V
+			LL_FOREACH(SCRIPT(room)->global_vars, tvd) {
+				if (*tvd->name == '-') { // don't save if it begins with -
+					continue;
+				}
+				
+				// trig-type 0 context name value
+				fprintf(fl, "C V %d %d %d %79s %79s\n", WLD_TRIGGER, 0, (int)tvd->context, tvd->name, tvd->value);
 			}
 		}
 		if (ROOM_PEOPLE(room)) {
@@ -4447,17 +4462,26 @@ void write_room_to_file(FILE *fl, room_data *room) {
 						fprintf(fl, "C C %d %d\n", cool->type, (int)(cool->expire_time - time(0)));
 					}
 					
-					// triggers: C T type vnum
 					if (SCRIPT(mob)) {
+						// triggers: C T type vnum
 						for (trig = TRIGGERS(SCRIPT(mob)); trig; trig = trig->next) {
 							fprintf(fl, "C T %d %d\n", MOB_TRIGGER, GET_TRIG_VNUM(trig));
+						}
+						
+						// triggers: C V type context name~
+						//           value~
+						LL_FOREACH(SCRIPT(mob)->global_vars, tvd) {
+							if (*tvd->name == '-') { // don't save if it begins with -
+								continue;
+							}
+							
+							// trig-type 0 context name value
+							fprintf(fl, "C V %d %d %d %79s %79s\n", MOB_TRIGGER, 0, (int)tvd->context, tvd->name, tvd->value);
 						}
 					}
 				}
 			}
 		}
-		
-		// TODO script vars?
 	}
 
 	// E affects
@@ -6662,11 +6686,19 @@ void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message 
 */
 int help_sort(const void *a, const void *b) {
 	const struct help_index_element *a1, *b1;
+	int cmp;
 
 	a1 = (const struct help_index_element *) a;
 	b1 = (const struct help_index_element *) b;
 
-	return (str_cmp(a1->keyword, b1->keyword));
+	cmp = (str_cmp(a1->keyword, b1->keyword));
+	
+	if (cmp) {
+		return cmp;
+	}
+	else {
+		return (b1->level - a1->level);
+	}
 }
 
 

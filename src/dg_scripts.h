@@ -402,12 +402,8 @@ int valid_dg_target(char_data *ch, int bitvector);
 #define SCRIPT_CHECK(go, type)   (SCRIPT(go) && IS_SET(SCRIPT_TYPES(SCRIPT(go)), type))
 #define TRIGGER_CHECK(t, type)   (IS_SET(GET_TRIG_TYPE(t), type) && !GET_TRIG_DEPTH(t))
 
-#define ADD_UID_VAR(buf, trig, go, name, context) do { \
-			sprintf(buf, "%c%d", UID_CHAR, GET_ID(go)); \
-			add_var(&GET_TRIG_VARS(trig), name, buf, context); } while (0)
-
-#define ADD_ROOM_UID_VAR(buf, trig, go, name, context) do { \
-			sprintf(buf, "%c%d", UID_CHAR, GET_ROOM_VNUM(go) + ROOM_ID_BASE); \
+#define ADD_UID_VAR(buf, trig, id, name, context) do { \
+			sprintf(buf, "%c%d", UID_CHAR, id); \
 			add_var(&GET_TRIG_VARS(trig), name, buf, context); } while (0)
 
 
@@ -435,3 +431,9 @@ extern char_data *dg_owner_mob;
 extern obj_data *dg_owner_obj;
 extern vehicle_data *dg_owner_veh;
 extern room_data *dg_owner_room;
+
+// id helpers
+extern int char_script_id(char_data *ch);
+extern int obj_script_id(obj_data *obj);
+extern int veh_script_id(vehicle_data *veh);
+#define room_script_id(room)  (GET_ROOM_VNUM(room) + ROOM_ID_BASE)

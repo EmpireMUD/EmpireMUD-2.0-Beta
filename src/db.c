@@ -1651,11 +1651,9 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 
 	// GET_MAX_BLOOD is a function
 	GET_BLOOD(mob) = GET_MAX_BLOOD(mob);
-
-	GET_ID(mob) = max_mob_id++;
-	/* find_char helper */
-	add_to_lookup_table(GET_ID(mob), (void *)mob);
-
+	
+	mob->script_id = 0;	// will detect when needed
+	
 	if (with_triggers) {
 		mob->proto_script = copy_trig_protos(proto->proto_script);
 		assign_triggers(mob, MOB_TRIGGER);
@@ -1705,11 +1703,9 @@ obj_data *create_obj(void) {
 	
 	// ensure it doesn't decay unless asked
 	GET_OBJ_TIMER(obj) = UNLIMITED;
-
-	GET_ID(obj) = max_obj_id++;
-	/* find_obj helper */
-	add_to_lookup_table(GET_ID(obj), (void *)obj);
-
+	
+	obj->script_id = 0;	// will detect when needed
+	
 	return (obj);
 }
 
@@ -1743,9 +1739,7 @@ obj_data *read_object(obj_vnum nr, bool with_triggers) {
 	if (obj->obj_flags.timer == 0)
 		obj->obj_flags.timer = UNLIMITED;
 	
-	GET_ID(obj) = max_obj_id++;
-	/* find_obj helper */
-	add_to_lookup_table(GET_ID(obj), (void *)obj);
+	obj->script_id = 0;	// will detect when needed
 	
 	if (with_triggers) {
 		obj->proto_script = copy_trig_protos(proto->proto_script);

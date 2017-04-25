@@ -397,7 +397,7 @@ the point where they can summon the aid of a familiar animal. When you call
 a familiar, it appears, follows you, and prepares to take orders.
 
 The power and abilities of the familiar are based on your prowess in Natural
-Magic.
+Magic and your total level.
 
 This ability gains experience when you summon these familiars.
 
@@ -879,7 +879,7 @@ Usage:  summon animals
 Cooldown:  30 seconds
 Cost:  10 mana
 
-This ability allows you to summon up to (Wits / 3, rounded up) animals from
+This ability allows you to summon up to (Charisma / 3, rounded up) animals from
 the surrounding area. These animals will follow you as their leader, and will
 take simple orders.
 

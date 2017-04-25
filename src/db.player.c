@@ -938,7 +938,9 @@ void free_char(char_data *ch) {
 	}
 
 	/* find_char helper */
-	remove_from_lookup_table(GET_ID(ch));
+	if (ch->script_id > 0) {
+		remove_from_lookup_table(ch->script_id);
+	}
 
 	free(ch);
 }
@@ -1853,7 +1855,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	
 	// Players who have been out for 1 hour get a free restore
 	RESTORE_ON_LOGIN(ch) = (((int) (time(0) - ch->prev_logon)) >= 1 * SECS_PER_REAL_HOUR);
-	REREAD_EMPIRE_TECH_ON_LOGIN(ch) = member_is_timed_out(ch->player.time.birth, ch->prev_logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR);
+	if (GET_LOYALTY(ch)) {
+		REREAD_EMPIRE_TECH_ON_LOGIN(ch) = (EMPIRE_MEMBERS(GET_LOYALTY(ch)) < 1 || member_is_timed_out(ch->player.time.birth, ch->prev_logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR));
+	}
 	
 	return ch;
 }
@@ -3053,6 +3057,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	extern room_data *find_home(char_data *ch);
 	extern room_data *find_load_room(char_data *ch);
 	void give_level_zero_abilities(char_data *ch);
+	void msdp_update_room(char_data *ch);
 	void refresh_all_quests(char_data *ch);
 	void reset_combat_meters(char_data *ch);
 	
@@ -3061,7 +3066,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	struct slash_channel *load_slash, *next_slash, *temp;
 	bool stop_action = FALSE, try_home = FALSE;
 	room_data *load_room = NULL, *map_loc;
-	char_data *ch = d->character;
+	char_data *ch = d->character, *repl;
 	char lbuf[MAX_STRING_LENGTH];
 	struct affected_type *af;
 	player_index_data *index;
@@ -3165,8 +3170,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// add to lists
 	ch->next = character_list;
 	character_list = ch;
-	GET_ID(ch) = GET_IDNUM(ch);
-	add_to_lookup_table(GET_ID(ch), (void *)ch);
+	ch->script_id = GET_IDNUM(ch);
+	add_to_lookup_table(ch->script_id, (void *)ch);
 	
 	// place character
 	char_to_room(ch, load_room);
@@ -3295,6 +3300,13 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// ensure quests are up-to-date
 	refresh_all_quests(ch);
+	
+	// break last reply if invis
+	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {
+		GET_LAST_TELL(ch) = NOBODY;
+	}
+	
+	msdp_update_room(ch);
 	
 	// now is a good time to save and be sure we have a good save file
 	SAVE_CHAR(ch);
@@ -3528,6 +3540,9 @@ void set_title(char_data *ch, char *title) {
 
 	if (title == NULL)
 		title = "the newbie";
+	else {
+		title = trim(title);
+	}
 
 	if (GET_TITLE(ch) != NULL)
 		free(GET_TITLE(ch));
@@ -3926,7 +3941,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			EMPIRE_TOTAL_MEMBER_COUNT(e) += 1;
 			
 			// only count players who have logged on in recent history
-			if (!member_is_timed_out_ch(ch)) {
+			if (!is_file || !member_is_timed_out_ch(ch)) {
 				add_to_account_list(&account_list, e, GET_ACCOUNT(ch)->id, GET_GREATNESS(ch));
 				
 				// not account-restricted

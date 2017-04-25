@@ -96,7 +96,7 @@ static void CompressEnd(descriptor_t *apDescriptor) {
 */
 static const char s_Button1[] = "\005\002Help\002help\006";
 static const char s_Button2[] = "\005\002Look\002look\006";
-static const char s_Button3[] = "\005\002Score\002help\006";
+static const char s_Button3[] = "\005\002Score\002score\006";
 static const char s_Button4[] = "\005\002Equipment\002equipment\006";
 static const char s_Button5[] = "\005\002Inventory\002inventory\006";
 

@@ -233,6 +233,11 @@ void construct_building(room_data *room, bld_vnum type) {
 		}
 	}
 	
+	if (ROOM_OWNER(room)) {
+		void deactivate_workforce_room(empire_data *emp, room_data *room);
+		deactivate_workforce_room(ROOM_OWNER(room), room);
+	}
+	
 	load_wtrigger(room);
 }
 
@@ -310,6 +315,7 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 */
 void disassociate_building(room_data *room) {
 	void decustomize_room(room_data *room);
+	void delete_instance(struct instance_data *inst);
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void remove_designate_objects(room_data *room);
 	
@@ -332,7 +338,7 @@ void disassociate_building(room_data *room) {
 	
 	// delete any open instance here
 	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && (inst = find_instance_by_room(room, FALSE))) {
-		SET_BIT(inst->flags, INST_COMPLETED);
+		delete_instance(inst);
 	}
 	
 	dismantle_wtrigger(room, NULL, FALSE);
@@ -1521,6 +1527,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			}
 			
 			msg_to_char(ch, "This room no longer has a custom name.\r\n");
+			command_lag(ch, WAIT_ABILITY);
 		}
 		else if (color_code_length(arg2) > 0) {
 			msg_to_char(ch, "You cannot use color codes in custom room names.\r\n");
@@ -1538,6 +1545,7 @@ void do_customize_room(char_data *ch, char *argument) {
 			ROOM_CUSTOM_NAME(IN_ROOM(ch)) = str_dup(arg2);
 			
 			msg_to_char(ch, "This room is now called \"%s\".\r\n", arg2);
+			command_lag(ch, WAIT_ABILITY);
 		}
 	}
 	else if (is_abbrev(arg, "description")) {
@@ -1958,6 +1966,11 @@ ACMD(do_lay) {
 				COMPLEX_DATA(IN_ROOM(ch)) = init_complex_data();
 			}
 			GET_BUILT_WITH(IN_ROOM(ch)) = charged;
+		}
+		
+		if (ROOM_OWNER(IN_ROOM(ch))) {
+			void deactivate_workforce_room(empire_data *emp, room_data *room);
+			deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
 		}
 		
 		command_lag(ch, WAIT_OTHER);

@@ -180,10 +180,10 @@ struct ritual_data_type {
 		start_ritual_of_defense,
 		perform_ritual_of_defense,
 		{{ "You begin the incantation for the Ritual of Defense.", "\t" },
-		{ "You say, 'Empower now this wall of stone'", "$n says, 'Empower now this wall of stone'" },
-		{ "You say, 'With wisdom of the sages'", "$n says, 'With wisdom of the sages'" },
-		{ "You say, 'Ward against the foes above'", "$n says, 'Ward against the foes above'" },
-		{ "You say, 'And strong, withstand the ages'", "$n says, 'And strong, withstand the ages'" },
+		{ "You say, 'Empower now this wall of stone...'", "$n says, 'Empower now this wall of stone...'" },
+		{ "You say, 'With wisdom of the sages...'", "$n says, 'With wisdom of the sages...'" },
+		{ "You say, 'Ward against the foes above...'", "$n says, 'Ward against the foes above...'" },
+		{ "You say, 'And strong, withstand the ages!'", "$n says, 'And strong, withstand the ages!'" },
 		MESSAGE_END
 	}},
 	
@@ -1039,7 +1039,7 @@ ACMD(do_mirrorimage) {
 	// restrings
 	GET_PC_NAME(mob) = str_dup(PERS(ch, ch, FALSE));
 	GET_SHORT_DESC(mob) = str_dup(GET_PC_NAME(mob));
-	GET_REAL_SEX(mob) = GET_REAL_SEX(ch);	// need this for some desc stuff
+	GET_REAL_SEX(mob) = GET_SEX(ch);	// need this for some desc stuff
 	
 	// longdesc is more complicated
 	if (GET_MORPH(ch)) {
@@ -1663,6 +1663,10 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 			return FALSE;
 		}
 	}
+	else if (find_city_by_name(GET_LOYALTY(ch), argument)) {
+		msg_to_char(ch, "You need to purchase the City Teleportation ability to do that.\r\n");
+		return FALSE;
+	}
 	else {
 		msg_to_char(ch, "That's not a valid place to teleport.\r\n");
 		return FALSE;
@@ -1914,7 +1918,7 @@ RITUAL_SETUP_FUNC(start_siege_ritual) {
 		start_ritual(ch, ritual);
 		// action 0 is ritual #
 		GET_ACTION_VNUM(ch, 1) = room_targ ? GET_ROOM_VNUM(room_targ) : NOTHING;
-		GET_ACTION_VNUM(ch, 2) = veh_targ ? GET_ID(veh_targ) : NOTHING;
+		GET_ACTION_VNUM(ch, 2) = veh_targ ? veh_script_id(veh_targ) : NOTHING;
 		return TRUE;
 	}
 	

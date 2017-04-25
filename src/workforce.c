@@ -1473,94 +1473,94 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int
 
 
 INTERACTION_FUNC(one_farming_chore) {
-	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
-	
 	empire_data *emp = ROOM_OWNER(inter_room);
-	sector_data *old_sect;
 	obj_data *proto = obj_proto(interaction->vnum);
 	int amt;
 	
-	int harvest_timer = config_get_int("harvest_timer");
-	int short_depletion = config_get_int("short_depletion");
-	
 	if (emp && proto && proto->storage && can_gain_chore_resource(emp, inter_room, CHORE_FARMING, interaction->vnum)) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum);
+		empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
 		
-		// already set up?
-		if (get_room_extra_data(inter_room, ROOM_EXTRA_HARVEST_PROGRESS) <= 0) {
-			set_room_extra_data(inter_room, ROOM_EXTRA_HARVEST_PROGRESS, harvest_timer * (ROOM_CROP_FLAGGED(inter_room, CROPF_IS_ORCHARD) ? 2 : 1));
-		}
-	
-		add_to_room_extra_data(inter_room, ROOM_EXTRA_HARVEST_PROGRESS, -1 * number(1, 2));
+		amt = interaction->quantity;
+		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
 		
-		if (get_room_extra_data(inter_room, ROOM_EXTRA_HARVEST_PROGRESS) <= 0) {
-			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));
-			remove_room_extra_data(inter_room, ROOM_EXTRA_HARVEST_PROGRESS);
-			
-			amt = interaction->quantity;
-			add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
-			
-			if (ROOM_CROP_FLAGGED(inter_room, CROPF_IS_ORCHARD)) {
-				while (amt-- > 0) {
-					add_depletion(inter_room, DPLTN_PICK, TRUE);
-				}
+		// add depletion only if orchard
+		if (ROOM_CROP_FLAGGED(inter_room, CROPF_IS_ORCHARD)) {
+			while (amt-- > 0) {
+				add_depletion(inter_room, DPLTN_PICK, TRUE);
 			}
-	
-			sprintf(buf, "$n finishes harvesting the %s.", GET_CROP_NAME(ROOM_CROP(inter_room)));
-			act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
+		}
 
-			// only change to seeded if it's not an orchard OR if it's over-picked			
-			if (!ROOM_CROP_FLAGGED(inter_room, CROPF_IS_ORCHARD) || get_depletion(inter_room, DPLTN_PICK) >= short_depletion) {
-				if (empire_chore_limit(emp, GET_ISLAND_ID(inter_room), CHORE_REPLANTING) && (old_sect = reverse_lookup_evolution_for_sector(SECT(inter_room), EVO_CROP_GROWS))) {
-					// sly-convert back to what it was grown from ... not using change_terrain
-					perform_change_sect(inter_room, NULL, old_sect);
-					
-					// we are keeping the original sect the same as it was
-					// TODO un-magic-number this
-					set_room_extra_data(inter_room, ROOM_EXTRA_SEED_TIME, 60);
-				}
-				else {
-					// do we have a stored original sect?
-					if (BASE_SECT(inter_room) != SECT(inter_room)) {
-						change_terrain(inter_room, GET_SECT_VNUM(BASE_SECT(inter_room)));
-					}
-					else {
-						// fallback
-						change_terrain(inter_room, climate_default_sector[GET_CROP_CLIMATE(ROOM_CROP(inter_room))]);
-					}
-					
-					// stop the farming just in case
-					stop_room_action(inter_room, ACT_CHOPPING, CHORE_CHOPPING);
-					
-					if (empire_chore_limit(emp, GET_ISLAND_ID(inter_room), CHORE_ABANDON_FARMED)) {
-						abandon_room(inter_room);
-					}
-				}
-				
-				// mark for despawn
-				if (IS_NPC(ch)) {
-					SET_BIT(MOB_FLAGS(ch), MOB_SPAWNED);
-				}
-				stop_room_action(inter_room, ACT_HARVESTING, CHORE_FARMING);
-			}
-		}
-		
+		sprintf(buf, "$n finishes harvesting the %s.", GET_CROP_NAME(ROOM_CROP(inter_room)));
+		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		return TRUE;
 	}
-	
+
 	return FALSE;
 }
 
 
 void do_chore_farming(empire_data *emp, room_data *room) {
+	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+	
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_FARMING].mob);
 	bool can_do = can_gain_chore_resource_from_interaction(emp, room, CHORE_FARMING, INTERACT_HARVEST);
+	sector_data *old_sect;
 	
 	if (CAN_INTERACT_ROOM(room, INTERACT_HARVEST) && can_do) {
 		// not able to ewt_mark_resource_worker() until we're inside the interact
 		if (worker) {
-			if (!run_room_interactions(worker, room, INTERACT_HARVEST, one_farming_chore)) {
-				SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+			// set up harvest time if needed
+			if (get_room_extra_data(room, ROOM_EXTRA_HARVEST_PROGRESS) <= 0) {
+				set_room_extra_data(room, ROOM_EXTRA_HARVEST_PROGRESS, config_get_int("harvest_timer") * (ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD) ? 2 : 1));
+			}
+			
+			// harvest ticker
+			add_to_room_extra_data(room, ROOM_EXTRA_HARVEST_PROGRESS, -1 * number(1, 2));
+			
+			// check progress
+			if (get_room_extra_data(room, ROOM_EXTRA_HARVEST_PROGRESS) > 0) {
+				// not done:
+				ewt_mark_for_interactions(emp, room, INTERACT_HARVEST);
+			}
+			else {	// DONE!
+				remove_room_extra_data(room, ROOM_EXTRA_HARVEST_PROGRESS);
+				run_room_interactions(worker, room, INTERACT_HARVEST, one_farming_chore);
+				
+				// only change to seeded if it's not an orchard OR if it's over-picked			
+				if (!ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD) || get_depletion(room, DPLTN_PICK) >= config_get_int("short_depletion")) {
+					if (empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_REPLANTING) && (old_sect = reverse_lookup_evolution_for_sector(SECT(room), EVO_CROP_GROWS))) {
+						// sly-convert back to what it was grown from ... not using change_terrain
+						perform_change_sect(room, NULL, old_sect);
+				
+						// we are keeping the original sect the same as it was
+						// TODO un-magic-number this
+						set_room_extra_data(room, ROOM_EXTRA_SEED_TIME, 60);
+					}
+					else {
+						// do we have a stored original sect?
+						if (BASE_SECT(room) != SECT(room)) {
+							change_terrain(room, GET_SECT_VNUM(BASE_SECT(room)));
+						}
+						else {
+							// fallback
+							change_terrain(room, climate_default_sector[GET_CROP_CLIMATE(ROOM_CROP(room))]);
+						}
+						
+						if (empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_FARMED)) {
+							abandon_room(room);
+						}
+					}
+					
+					// stop all possible chores here since the sector changed
+					stop_room_action(room, ACT_HARVESTING, CHORE_FARMING);
+					stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
+					stop_room_action(room, ACT_PICKING, CHORE_HERB_GARDENING);
+					stop_room_action(room, ACT_GATHERING, NOTHING);
+					
+					// mark for despawn
+					SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+				}
 			}
 		}
 		else {
@@ -1769,7 +1769,7 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 			}
 			
 			orn = obj_proto(vnum);	// existence of this was pre-validated
-			increase_empire_coins(emp, emp, GET_WEALTH_VALUE(orn) * (1/COIN_VALUE));
+			increase_empire_coins(emp, emp, GET_WEALTH_VALUE(orn) * (1.0/COIN_VALUE));
 			
 			act("$n finishes minting some coins.", FALSE, worker, NULL, NULL, TO_ROOM);
 			empire_skillup(emp, ABIL_WORKFORCE, config_get_double("exp_from_workforce"));

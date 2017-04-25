@@ -190,7 +190,7 @@ INTERACTION_FUNC(run_one_encounter) {
 		char_to_room(aggr, IN_ROOM(ch));
 		SET_BIT(MOB_FLAGS(aggr), MOB_SPAWNED);
 		act("$N appears!", FALSE, ch, 0, aggr, TO_CHAR | TO_ROOM);
-		hit(aggr, ch, GET_EQ(aggr, WEAR_WIELD), FALSE);
+		hit(aggr, ch, GET_EQ(aggr, WEAR_WIELD), TRUE);
 		load_mtrigger(aggr);
 		any = TRUE;
 	}
@@ -206,7 +206,7 @@ INTERACTION_FUNC(run_one_encounter) {
 * @param char_data *ch The unsuspecting fool.
 */
 void random_encounter(char_data *ch) {
-	if (!ch->desc || IS_NPC(ch) || !IN_ROOM(ch) || FIGHTING(ch) || IS_GOD(ch) || NOHASSLE(ch) || ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO)) {
+	if (!ch->desc || IS_NPC(ch) || !IN_ROOM(ch) || FIGHTING(ch) || IS_GOD(ch) || GET_INVIS_LEV(ch) > LVL_MORTAL || PRF_FLAGGED(ch, PRF_WIZHIDE) || NOHASSLE(ch) || ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO)) {
 		return;
 	}
 
@@ -700,7 +700,7 @@ void mobile_activity(void) {
 					gain_ability_exp(vict, ABIL_MAJESTY, 10);
 				}
 				if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
-					hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
+					hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
 					found = TRUE;
 				}
 			}
@@ -759,7 +759,7 @@ void mobile_activity(void) {
 										}
 									
 										if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
-											hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
+											hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
 											found = TRUE;
 										}
 									}
@@ -769,12 +769,12 @@ void mobile_activity(void) {
 					}
 					// aggro mobs
 					else if (IS_NPC(vict) && MOB_FLAGGED(vict, MOB_AGGRESSIVE) && GET_LOYALTY(ch) != GET_LOYALTY(vict) && can_fight(ch, vict)) {
-						hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
+						hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
 						found = TRUE;
 					}
 					// hostility against empire mobs
 					else if (IS_NPC(vict) && GET_LOYALTY(vict) && GET_LOYALTY(vict) != GET_LOYALTY(ch) && empire_is_hostile(GET_LOYALTY(ch), GET_LOYALTY(vict), IN_ROOM(ch))) {
-						hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
+						hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
 						found = TRUE;
 					}
 				}

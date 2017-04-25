@@ -349,11 +349,13 @@ Usage:  sacrifice <item> <god>
 Sacrifice is used to destroy an item in the favor of a specific god you
 choose. This helps you by clearing up many unwanted items and resources.
 This also may help you get favor with the god, and in turn, that god may help
-you out with a little help. The sacrifice points are increased if the
-sacrifice is performed in a shrine, temple, or high temple to that god. 
+you out with a little help.
+
+Sacrifices are worth 1.5x the normal resources if you are at a temple (or other
+monument) dedicated to the god to whom you are making the sacrifice. The value
+of a sacrifice is based on its gear level.
 
 Example:  
-
   > sacrifice stick Exar 
 #
 SAW

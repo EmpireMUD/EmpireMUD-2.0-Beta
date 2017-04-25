@@ -94,6 +94,7 @@ void char_to_room(char_data *ch, room_data *room);
 // character targeting handlers
 extern char_data *find_closest_char(char_data *ch, char *arg, bool pc);
 extern char_data *find_mob_in_room_by_vnum(room_data *room, mob_vnum vnum);
+extern char_data *find_mortal_in_room(room_data *room);
 extern char_data *get_char_room(char *name, room_data *room);
 extern char_data *get_char_room_vis(char_data *ch, char *name);
 extern char_data *get_char_vis(char_data *ch, char *name, bitvector_t where);
@@ -108,7 +109,7 @@ void cleanup_coins(char_data *ch);
 void coin_string(struct coin_data *list, char *storage);
 extern obj_data *create_money(empire_data *type, int amount);
 #define decrease_coins(ch, emp, amount)  increase_coins(ch, emp, -1 * amount)
-extern int exchange_coin_value(int amount, empire_data *convert_from, empire_data *convert_to);
+extern double exchange_coin_value(double amount, empire_data *convert_from, empire_data *convert_to);
 double exchange_rate(empire_data *from, empire_data *to);
 extern char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, bool assume_coins);
 extern struct coin_data *find_coin_entry(struct coin_data *list, empire_data *emp);
@@ -131,7 +132,7 @@ extern int find_rank_by_name(empire_data *emp, char *name);
 extern struct empire_political_data *find_relation(empire_data *from, empire_data *to);
 extern struct empire_territory_data *find_territory_entry(empire_data *emp, room_data *room);
 struct empire_trade_data *find_trade_entry(empire_data *emp, int type, obj_vnum vnum);
-extern int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, int amount);
+extern int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, double amount);
 #define decrease_empire_coins(emp_gaining, coin_empire, amount)  increase_empire_coins((emp_gaining), (coin_empire), -1 * (amount))
 void perform_abandon_room(room_data *room);
 void perform_claim_room(room_data *room, empire_data *emp);

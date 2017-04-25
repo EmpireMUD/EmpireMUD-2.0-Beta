@@ -207,7 +207,7 @@ would be extracted. If you want to prevent the object's extraction, you should
 use the "otimer" command to change its timer to -1 (infinite) or to a new
 positive value, then return 0 from the script.
 
-See also: OTIMER
+See also: OTIMER, OEDIT TIMER
 #d
 "WEAR TRIGGER" "OTRIG WEAR" TRIGEDIT-OBJ-WEAR
 

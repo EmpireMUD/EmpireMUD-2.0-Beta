@@ -804,6 +804,37 @@ static char *replace_fight_string(const char *str, const char *weapon_singular, 
 }
 
 
+/**
+* Pulls a character out of combat and stops every non-autokill person from
+* hitting him/her.
+*
+* @param char_data *ch The person who is dying.
+*/
+void stop_combat_no_autokill(char_data *ch) {
+	char_data *ch_iter;
+	
+	if (FIGHTING(ch)) {
+		stop_fighting(ch);
+	}
+
+	// look for anybody in the room fighting ch who wouldn't execute:
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+		if (ch_iter != ch && FIGHTING(ch_iter) == ch && !WOULD_EXECUTE(ch_iter, ch)) {
+			stop_fighting(ch_iter);
+		}
+	}
+
+	/* knock 'em out */
+	GET_HEALTH(ch) = -1;
+	GET_POS(ch) = POS_INCAP;
+
+	// remove all DoTs
+	while (ch->over_time_effects) {
+		dot_remove(ch, ch->over_time_effects);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// COMBAT METERS ///////////////////////////////////////////////////////////
 
@@ -855,7 +886,15 @@ void check_combat_end(char_data *ch) {
 */
 void check_combat_start(char_data *ch) {
 	if (!IS_NPC(ch) && GET_COMBAT_METERS(ch).over == TRUE) {
-		reset_combat_meters(ch);
+		if (PRF_FLAGGED(ch, PRF_CLEARMETERS)) {
+			reset_combat_meters(ch);
+		}
+		else {
+			// just update the time so combat length is still correct
+			GET_COMBAT_METERS(ch).over = FALSE;
+			GET_COMBAT_METERS(ch).start = time(0) - (GET_COMBAT_METERS(ch).end - GET_COMBAT_METERS(ch).start);
+			GET_COMBAT_METERS(ch).end = GET_COMBAT_METERS(ch).start;
+		}
 	}
 }
 
@@ -1298,7 +1337,7 @@ obj_data *make_corpse(char_data *ch) {
 	
 	// store as person's last corpse id
 	if (!IS_NPC(ch)) {
-		GET_LAST_CORPSE_ID(ch) = GET_ID(corpse);
+		GET_LAST_CORPSE_ID(ch) = obj_script_id(corpse);
 	}
 	
 	// binding
@@ -2764,13 +2803,6 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 			break;
 	}
 	
-	if (ch != victim && GET_POS(victim) < POS_SLEEPING && !WOULD_EXECUTE(ch, victim)) {
-		// remove all DoTs
-		while (victim->over_time_effects) {
-			dot_remove(victim, victim->over_time_effects);
-		}
-	}
-	
 	// did we do any damage? tag the mob
 	if (dam > 0) {
 		tag_mob(victim, ch);
@@ -2827,7 +2859,11 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 		perform_execute(ch, victim, attacktype, damtype);
 		return -1;
 	}
-
+	else if (ch != victim && GET_POS(victim) < POS_SLEEPING && !WOULD_EXECUTE(ch, victim)) {
+		stop_combat_no_autokill(victim);
+		// no need to message here; they already got a pos message
+	}
+	
 	return dam;
 }
 
@@ -3276,7 +3312,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 
 	bool ok = FALSE;
 	bool revert = TRUE;
-	char_data *m, *ch_iter;
+	char_data *m;
 	obj_data *weapon;
 
 	/* stop_fighting() is split around here to help with exp */
@@ -3300,25 +3336,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 		ok = TRUE;
 
 	if (!ok) {
-		if (FIGHTING(victim))
-			stop_fighting(victim);
-
-		// look for anybody in the room fighting victim (including ch) who wouldn't execute:
-		for (ch_iter = ROOM_PEOPLE(IN_ROOM(victim)); ch_iter; ch_iter = ch_iter->next_in_room) {
-			if (ch_iter != victim && FIGHTING(ch_iter) == victim && !WOULD_EXECUTE(ch_iter, victim)) {
-				stop_fighting(ch_iter);
-			}
-		}
-
-		/* knock 'em out */
-		GET_HEALTH(victim) = -1;
-		GET_POS(victim) = POS_INCAP;
-	
-		// remove all DoTs
-		while (victim->over_time_effects) {
-			dot_remove(victim, victim->over_time_effects);
-		}
-		
+		stop_combat_no_autokill(victim);
 		act("$n is knocked unconscious!", FALSE, victim, 0, 0, TO_ROOM);
 		msg_to_char(victim, "You are knocked unconscious.\r\n");
 		return;
@@ -3654,8 +3672,6 @@ void one_combat_round(char_data *ch, double speed, obj_data *weapon) {
 		add_cooldown(FIGHTING(ch), COOLDOWN_PVP_QUIT_TIMER, 45);
 	}
 	
-	check_auto_assist(ch);
-
 	if (!check_combat_position(ch, speed)) {
 		return;
 	}
@@ -3713,8 +3729,6 @@ void fight_wait_run(char_data *ch, double speed) {
 		add_cooldown(ch, COOLDOWN_PVP_QUIT_TIMER, 45);
 		add_cooldown(FIGHTING(ch), COOLDOWN_PVP_QUIT_TIMER, 45);
 	}
-	
-	check_auto_assist(ch);
 	
 	if (!check_combat_position(ch, speed)) {
 		return;
@@ -3781,15 +3795,23 @@ void frequent_combat(int pulse) {
 	for (ch = combat_list; ch; ch = next_combat_list) {
 		next_combat_list = ch->next_fighting;
 		vict = FIGHTING(ch);
+		
+		// never!
+		if (IS_DEAD(ch) || EXTRACTED(ch)) {
+			continue;
+		}
 
 		// verify still fighting
-		if (vict == NULL || IN_ROOM(ch) != IN_ROOM(vict) || IS_DEAD(vict) || !check_can_still_fight(ch, vict)) {
+		if (vict == NULL || IN_ROOM(ch) != IN_ROOM(vict) || IS_DEAD(vict) || !check_can_still_fight(ch, vict) || AFF_FLAGGED(ch, AFF_NO_ATTACK)) {
 			stop_fighting(ch);
 			continue;
 		}
 		
+		// bring friends in no matter what
+		check_auto_assist(ch);
+		
 		// reasons you would not get a round
-		if (IS_DEAD(ch) || EXTRACTED(ch) || GET_POS(ch) < POS_SLEEPING || IS_INJURED(ch, INJ_STAKED | INJ_TIED) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_NO_TARGET_IN_ROOM | AFF_NO_ATTACK | AFF_MUMMIFY | AFF_DEATHSHROUD)) {
+		if (GET_POS(ch) < POS_SLEEPING || IS_INJURED(ch, INJ_STAKED | INJ_TIED) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_NO_TARGET_IN_ROOM | AFF_MUMMIFY | AFF_DEATHSHROUD)) {
 			continue;
 		}
 		

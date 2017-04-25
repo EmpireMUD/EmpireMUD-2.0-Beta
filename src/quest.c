@@ -2449,10 +2449,10 @@ char *list_one_quest(quest_data *quest, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
+		snprintf(output, sizeof(output), "[%5d] %s%s", QUEST_VNUM(quest), QUEST_NAME(quest), (QUEST_FLAGGED(quest, QST_DAILY) ? " (daily)" : ""));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
+		snprintf(output, sizeof(output), "[%5d] %s%s", QUEST_VNUM(quest), QUEST_NAME(quest), (QUEST_FLAGGED(quest, QST_DAILY) ? " (daily)" : ""));
 	}
 		
 	return output;

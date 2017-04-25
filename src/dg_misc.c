@@ -149,6 +149,10 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 		script_log("Trigger: %s, VNum %d. dg_affect: cannot locate target!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		return;
 	}
+	if (IS_DEAD(ch) || EXTRACTED(ch)) {
+		// no affects on the dead
+		return;
+	}
 	
 	if (duration == -1 && !IS_NPC(ch)) {
 		script_log("Trigger: %s, VNum %d. dg_affect: cannot use infinite duration on player target", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
@@ -597,6 +601,11 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 		
 		remove_depletion(target, DPLTN_PICK);
 		remove_depletion(target, DPLTN_FORAGE);
+		
+		if (ROOM_OWNER(target)) {
+			void deactivate_workforce_room(empire_data *emp, room_data *room);
+			deactivate_workforce_room(ROOM_OWNER(target), target);
+		}
 	}
 }
 
@@ -622,6 +631,11 @@ void do_dg_terraform(room_data *target, sector_data *sect) {
 	// preserve old original sect for roads -- TODO this is a special-case
 	if (IS_ROAD(target)) {
 		change_base_sector(target, old_sect);
+	}
+	
+	if (ROOM_OWNER(target)) {
+		void deactivate_workforce_room(empire_data *emp, room_data *room);
+		deactivate_workforce_room(ROOM_OWNER(target), target);
 	}
 }
 
@@ -719,6 +733,8 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	void death_log(char_data *ch, char_data *killer, int type);
 	extern char *get_room_name(room_data *room, bool color);
 	extern int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, int damtype);
+	void scale_mob_for_character(char_data *mob, char_data *ch);
+	void scale_mob_to_level(char_data *mob, int level);
 	
 	double dam;
 	
@@ -726,10 +742,26 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	if (IS_DEAD(vict)) {
 		return;
 	}
+	if (AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
+		return;	// can't be attacked
+	}
 	
 	if (IS_IMMORTAL(vict) && (modifier > 0)) {
 		msg_to_char(vict, "Being the cool immortal you are, you sidestep a trap, obviously placed to kill you.\r\n");
 		return;
+	}
+	
+	// check scaling
+	if (killer && IS_NPC(killer) && GET_CURRENT_SCALE_LEVEL(killer) == 0) {
+		scale_mob_for_character(killer, vict);
+	}
+	if (IS_NPC(vict) && GET_CURRENT_SCALE_LEVEL(vict) == 0) {
+		if (killer) {
+			scale_mob_for_character(vict, killer);
+		}
+		else {
+			scale_mob_to_level(vict, level);
+		}
 	}
 	
 	dam = level / 7.0;

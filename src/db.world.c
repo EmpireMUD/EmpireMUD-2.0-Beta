@@ -147,9 +147,7 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	extern crop_data *get_potential_crop_for_location(room_data *location);
 	void lock_icon(room_data *room, struct icon_data *use_icon);
 	
-	bool belongs = BELONGS_IN_TERRITORY_LIST(room);
 	sector_data *old_sect = SECT(room), *st = sector_proto(sect);
-	struct empire_territory_data *ter;
 	struct map_data *map, *temp;
 	crop_data *new_crop = NULL;
 	empire_data *emp;
@@ -229,14 +227,6 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	// did it become unclaimable?
 	if (emp && SECT_FLAGGED(st, SECTF_NO_CLAIM)) {
 		abandon_room(room);
-	}
-	else if (emp && belongs != BELONGS_IN_TERRITORY_LIST(room)) {	// do we need to add/remove the territory entry?
-		if (belongs && (ter = find_territory_entry(emp, room))) {	// losing
-			delete_territory_entry(emp, ter);
-		}
-		else if (!belongs && !find_territory_entry(emp, room)) {	// adding
-			create_territory_entry(emp, room);
-		}
 	}
 }
 
@@ -1080,6 +1070,8 @@ void annual_update_vehicle(vehicle_data *veh) {
 * This runs once a mud year to update the world.
 */
 void annual_world_update(void) {
+	void check_ruined_cities();
+	
 	vehicle_data *veh, *next_veh;
 	descriptor_data *d;
 	room_data *room, *next_room;
@@ -1116,6 +1108,9 @@ void annual_world_update(void) {
 	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		annual_update_vehicle(veh);
 	}
+	
+	// crumble cities that lost their buildings
+	check_ruined_cities();
 	
 	// rename islands
 	update_island_names();
@@ -1489,7 +1484,7 @@ void reset_one_room(room_data *room) {
 			case 'V': {	// variable assignment
 				if (reset->arg1 == MOB_TRIGGER && tmob) {
 					if (!SCRIPT(tmob)) {
-						log("SYSERR: Attempt to give variable to scriptless mobile");
+						create_script_data(tmob, MOB_TRIGGER);
 					}
 					else {
 						add_var(&(SCRIPT(tmob)->global_vars), reset->sarg1, reset->sarg2, reset->arg3);
@@ -1497,10 +1492,10 @@ void reset_one_room(room_data *room) {
 				}
 				else if (reset->arg1 == WLD_TRIGGER) {
 					if (!room->script) {
-						log("SYSERR: Attempt to give variable to scriptless object");
+						create_script_data(room, WLD_TRIGGER);
 					}
 					else {
-						add_var(&(room->script->global_vars), reset->sarg1, reset->sarg2, reset->arg2);
+						add_var(&(room->script->global_vars), reset->sarg1, reset->sarg2, reset->arg3);
 					}
 				}
 				break;
@@ -1622,6 +1617,8 @@ void perform_change_base_sect(room_data *loc, struct map_data *map, sector_data 
 * @param sector_data *sect The type to change it to.
 */
 void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect) {
+	bool belongs = (SECT(loc) && BELONGS_IN_TERRITORY_LIST(loc));
+	struct empire_territory_data *ter;
 	bool was_large, was_in_city, junk;
 	struct sector_index_type *idx;
 	sector_data *old_sect;
@@ -1678,24 +1675,34 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	}
 	
 	// check for territory updates
-	if (loc && ROOM_OWNER(loc) && was_large != ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS)) {
-		struct empire_island *eisle = get_empire_island(ROOM_OWNER(loc), GET_ISLAND_ID(loc));
-		if (was_large && was_in_city && !is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
-			// changing from in-city to not
-			EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) -= 1;
-			eisle->city_terr -= 1;
-			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) += 1;
-			eisle->outside_terr += 1;
+	if (loc && ROOM_OWNER(loc)) {
+		if (was_large != ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS)) {
+			struct empire_island *eisle = get_empire_island(ROOM_OWNER(loc), GET_ISLAND_ID(loc));
+			if (was_large && was_in_city && !is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
+				// changing from in-city to not
+				EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) -= 1;
+				eisle->city_terr -= 1;
+				EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) += 1;
+				eisle->outside_terr += 1;
+			}
+			else if (ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
+				// changing from outside-territory to in-city
+				EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) += 1;
+				eisle->city_terr -= 1;
+				EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) -= 1;
+				eisle->outside_terr += 1;
+			}
+			else {
+				// no relevant change
+			}
 		}
-		else if (ROOM_SECT_FLAGGED(loc, SECTF_LARGE_CITY_RADIUS) && !was_in_city && is_in_city_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk)) {
-			// changing from outside-territory to in-city
-			EMPIRE_CITY_TERRITORY(ROOM_OWNER(loc)) += 1;
-			eisle->city_terr -= 1;
-			EMPIRE_OUTSIDE_TERRITORY(ROOM_OWNER(loc)) -= 1;
-			eisle->outside_terr += 1;
-		}
-		else {
-			// no relevant change
+		if (belongs != BELONGS_IN_TERRITORY_LIST(loc)) {	// do we need to add/remove the territory entry?
+			if (belongs && (ter = find_territory_entry(ROOM_OWNER(loc), loc))) {	// losing
+				delete_territory_entry(ROOM_OWNER(loc), ter);
+			}
+			else if (!belongs && !find_territory_entry(ROOM_OWNER(loc), loc)) {	// adding
+				create_territory_entry(ROOM_OWNER(loc), loc);
+			}
 		}
 	}
 }
@@ -1911,10 +1918,14 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 				ter->marked = TRUE;
 				
 				if (IS_COMPLETE(iter)) {
-					isle = get_empire_island(e, GET_ISLAND_ID(iter));
+					if (!GET_ROOM_VEHICLE(iter)) {
+						isle = get_empire_island(e, GET_ISLAND_ID(iter));
+					}
 					for (npc = ter->npcs; npc; npc = npc->next) {
 						EMPIRE_POPULATION(e) += 1;
-						isle->population += 1;
+						if (!GET_ROOM_VEHICLE(iter)) {
+							isle->population += 1;
+						}
 					}
 				}
 			}
@@ -2114,6 +2125,11 @@ static void evolve_one_map_tile(struct map_data *tile) {
 			// If the new sector has crop data, we should store the original (e.g. a desert that randomly grows into a crop)
 			if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && BASE_SECT(room) == SECT(room)) {
 				change_base_sector(room, original);
+			}
+			
+			if (ROOM_OWNER(room)) {
+				void deactivate_workforce_room(empire_data *emp, room_data *room);
+				deactivate_workforce_room(ROOM_OWNER(room), room);
 			}
 		}
 	}

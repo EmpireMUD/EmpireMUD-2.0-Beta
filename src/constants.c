@@ -493,6 +493,7 @@ const char *preference_bits[] = {
 	"AUTONOTES",
 	"AUTODISMOUNT",
 	"!EMPIRE",
+	"CLEARMETERS",
 	"\n"
 };
 
@@ -556,6 +557,7 @@ const struct toggle_data_type toggle_data[] = {
 	{ "autodismount", TOG_ONOFF, PRF_AUTODISMOUNT, 0, NULL },
 	
 	{ "no-empire", TOG_ONOFF, PRF_NOEMPIRE, 0, NULL },
+	{ "clearmeters", TOG_ONOFF, PRF_CLEARMETERS, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
@@ -1239,12 +1241,13 @@ const bool apply_never_scales[] = {
 
 // STRENGTH, etc (part 1)
 struct attribute_data_type attributes[NUM_ATTRIBUTES] = {
-	{ "Strength", "Strength improves your melee damage and lets you chop trees faster" },
-	{ "Dexterity", "Dexterity helps you hit opponents and dodge hits" },
-	{ "Charisma", "Charisma improves your success with Stealth abilities" },
-	{ "Greatness", "Greatness determines how much territory your empire can claim" },
-	{ "Intelligence", "Intelligence improves your magical damage and healing" },
-	{ "Wits", "Wits improves your speed and effectiveness in combat" }
+	// Label, Description, low-stat error
+	{ "Strength", "Strength improves your melee damage and lets you chop trees faster", "too weak" },
+	{ "Dexterity", "Dexterity helps you hit opponents and dodge hits", "not agile enough" },
+	{ "Charisma", "Charisma improves your success with Stealth abilities", "not charming enough" },
+	{ "Greatness", "Greatness determines how much territory your empire can claim", "not great enough" },
+	{ "Intelligence", "Intelligence improves your magical damage and healing", "not clever" },
+	{ "Wits", "Wits improves your speed and effectiveness in combat", "too slow" }
 };
 
 // STRENGTH, etc (part 2)
@@ -1708,7 +1711,7 @@ const char *item_types[] = {
 	"*",
 	"PORTAL",
 	"*BOARD",
-	"*CORPSE",
+	"CORPSE",
 	"COINS",
 	"*",
 	"*",
@@ -1716,8 +1719,8 @@ const char *item_types[] = {
 	"WEALTH",
 	"*CART",
 	"*SHIP",
-	"*HELM",
-	"*WINDOW",
+	"*",
+	"*",
 	"MISSILE_WEAPON",
 	"ARROW",
 	"INSTRUMENT",
@@ -3304,9 +3307,9 @@ const bitvector_t mtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// door
 	TRIG_ARG_PERCENT,	// leave-all
 	NOBITS,	// charmed modifier
-	TRIG_ARG_PERCENT,	// start-quest
-	TRIG_ARG_PERCENT,	// finish-quest
-	TRIG_ARG_PERCENT,	// player-in-room
+	NOBITS,	// start-quest
+	NOBITS,	// finish-quest
+	NOBITS,	// player-in-room
 	NOBITS,	// reboot
 };
 
@@ -3362,9 +3365,9 @@ const bitvector_t otrig_argument_types[] = {
 	NOBITS,	// 
 	TRIG_ARG_PERCENT,	// consume
 	TRIG_ARG_PERCENT,	// finish
-	TRIG_ARG_PERCENT,	// start-quest
-	TRIG_ARG_PERCENT,	// finish-quest
-	TRIG_ARG_PERCENT,	// player-in-room
+	NOBITS,	// start-quest
+	NOBITS,	// finish-quest
+	NOBITS,	// player-in-room
 	NOBITS,	// reboot
 };
 
@@ -3421,9 +3424,9 @@ const bitvector_t vtrig_argument_types[] = {
 	NOBITS,	// 17
 	NOBITS,	// 18
 	NOBITS,	// 19
-	TRIG_ARG_PERCENT,	// start-quest
-	TRIG_ARG_PERCENT,	// finish-quest
-	TRIG_ARG_PERCENT,	// player-in-room
+	NOBITS,	// start-quest
+	NOBITS,	// finish-quest
+	NOBITS,	// player-in-room
 	NOBITS,	// reboot
 };
 
@@ -3479,9 +3482,9 @@ const bitvector_t wtrig_argument_types[] = {
 	TRIG_ARG_PERCENT,	// door
 	NOBITS,	// dismantle
 	NOBITS,	// 19
-	TRIG_ARG_PERCENT,	// start-quest
-	TRIG_ARG_PERCENT,	// finish-quest
-	TRIG_ARG_PERCENT,	// player-in-room
+	NOBITS,	// start-quest
+	NOBITS,	// finish-quest
+	NOBITS,	// player-in-room
 	NOBITS,	// reboot
 };
 
@@ -3535,6 +3538,7 @@ const char *fill_words[] = {
 	"on",
 	"at",
 	"to",
+	"into",
 	"\n"
 };
 
@@ -3742,5 +3746,6 @@ const char *vehicle_flags[] = {
 	"SIEGE-WEAPONS",
 	"ON-FIRE",
 	"!LOAD-ONTO-VEHICLE",
+	"VISIBLE-IN-DARK",	// 20
 	"\n"
 };

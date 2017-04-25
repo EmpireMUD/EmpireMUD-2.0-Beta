@@ -343,8 +343,10 @@ EEDIT(eedit_banner) {
 
 EEDIT(eedit_change_leader) {
 	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
+	player_index_data *index;
 	bool file = FALSE;
 	char_data *victim = NULL;
+	int old_leader;
 	
 	one_argument(argument, arg);
 	
@@ -364,6 +366,9 @@ EEDIT(eedit_change_leader) {
 		msg_to_char(ch, "That person is not in the empire.\r\n");
 	}
 	else {
+		old_leader = EMPIRE_LEADER(emp);
+		
+		// promote new leader
 		GET_RANK(victim) = EMPIRE_NUM_RANKS(emp);
 		EMPIRE_LEADER(emp) = GET_IDNUM(victim);
 
@@ -384,6 +389,26 @@ EEDIT(eedit_change_leader) {
 		}
 		else {
 			SAVE_CHAR(victim);
+		}
+		
+		// demote old leader (at least, in lore)
+		if ((index = find_player_index_by_idnum(old_leader)) && (victim = find_or_load_player(index->name, &file))) {
+			if (GET_LOYALTY(victim) == emp) {
+				remove_lore(victim, LORE_PROMOTED);
+				add_lore(victim, LORE_PROMOTED, "Stepped down as leader of %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+			
+				// save now
+				if (file) {
+					store_loaded_char(victim);
+					file = FALSE;
+				}
+				else {
+					SAVE_CHAR(victim);
+				}
+			}
+			else if (file) {
+				free_char(victim);
+			}
 		}
 	}
 	
@@ -484,6 +509,9 @@ EEDIT(eedit_name) {
 	}
 	else if (!*argument) {
 		msg_to_char(ch, "Set the empire name to what?\r\n");
+	}
+	else if (!isalpha(*argument)) {
+		msg_to_char(ch, "Empire names must begin with a letter.\r\n");
 	}
 	else if (color_code_length(argument) > 0 || strchr(argument, '&') != NULL) {
 		msg_to_char(ch, "Empire names may not contain color codes or ampersands. Set the banner instead.\r\n");

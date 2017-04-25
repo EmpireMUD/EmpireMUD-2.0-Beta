@@ -150,6 +150,10 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Loot quality flags set");
 		problem = TRUE;
 	}
+	if (OBJ_FLAGGED(obj, OBJ_TWO_HANDED) && CAN_WEAR(obj, ITEM_WEAR_HOLD)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "2-handed + holdable");
+		problem = TRUE;
+	}
 	if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "KEEP flag");
 		problem = TRUE;
@@ -1343,6 +1347,9 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 * @param obj_data *new_proto The olc object being saved as the new prototype.
 */
 void update_live_obj_from_olc(obj_data *to_update, obj_data *old_proto, obj_data *new_proto) {
+	// NOTE: If you ever choose to update flags here, some flags like LIGHT
+	// also require updates to the light counts in the world.
+	
 	// strings
 	if (GET_OBJ_KEYWORDS(to_update) == GET_OBJ_KEYWORDS(old_proto)) {
 		GET_OBJ_KEYWORDS(to_update) = GET_OBJ_KEYWORDS(new_proto);
@@ -1633,6 +1640,10 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		case ITEM_COINS: {
 			sprintf(storage + strlen(storage), "<&ycoinamount&0> %d\r\n", GET_COINS_AMOUNT(obj));
 			// empire number is not supported -- it will always use OTHER_COIN
+			break;
+		}
+		case ITEM_CORPSE: {
+			sprintf(storage + strlen(storage), "<&ycorpseof&0> %d %s\r\n", GET_CORPSE_NPC_VNUM(obj), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
 			break;
 		}
 		case ITEM_WEAPON: {
@@ -2212,6 +2223,26 @@ OLC_MODULE(oedit_contents) {
 }
 
 
+OLC_MODULE(oedit_corpseof) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	mob_vnum old = GET_CORPSE_NPC_VNUM(obj);
+	
+	if (!IS_CORPSE(obj)) {
+		msg_to_char(ch, "You can only set this on a corpse.\r\n");
+	}
+	else {
+		GET_OBJ_VAL(obj, VAL_CORPSE_IDNUM) = olc_process_number(ch, argument, "corpse of", "corpseof", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_CORPSE_IDNUM));
+		if (!mob_proto(GET_CORPSE_NPC_VNUM(obj))) {
+			GET_OBJ_VAL(obj, VAL_CORPSE_IDNUM) = old;
+			msg_to_char(ch, "There is no mobile with that vnum. Old value restored.\r\n");
+		}
+		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			msg_to_char(ch, "It is now the corpse of: %s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
+		}
+	}
+}
+
+
 OLC_MODULE(oedit_custom) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *msgstr;
@@ -2377,7 +2408,7 @@ OLC_MODULE(oedit_damage) {
 		msg_to_char(ch, "You can't set damage on this type of object.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, slot) = olc_process_number(ch, argument, "damage", "damage", -100, 100, GET_OBJ_VAL(obj, slot));
+		GET_OBJ_VAL(obj, slot) = olc_process_number(ch, argument, "damage", "damage", -10000, 10000, GET_OBJ_VAL(obj, slot));
 		if (showdps) {
 			msg_to_char(ch, "It now has %.2f base dps.\r\n", get_base_dps(obj));
 		}

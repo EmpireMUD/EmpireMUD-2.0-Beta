@@ -770,7 +770,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		}
 	}
 	
-	if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS) && IS_NPC(i)) {
+	if (PRF_FLAGGED(ch, PRF_ROOMFLAGS) && IS_NPC(i)) {
 		msg_to_char(ch, "[%d] %s", GET_MOB_VNUM(i), SCRIPT(i) ? "[TRIG] " : "");
 	}
 	
@@ -916,7 +916,7 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	if (VEH_OWNER(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "<%s> ", EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
 	}
-	if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+	if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "[%d] %s", VEH_VNUM(veh), SCRIPT(veh) ? "[TRIG] " : "");
 	}
 	size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", VEH_LONG_DESC(veh));
@@ -1011,6 +1011,10 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	
 	if (GET_LOYALTY(i) && !disguise) {
 		sprintf(buf, "$E is a member of %s%s\t0.", EMPIRE_BANNER(GET_LOYALTY(i)), EMPIRE_NAME(GET_LOYALTY(i)));
+		act(buf, FALSE, ch, NULL, i, TO_CHAR);
+	}
+	if (ROOM_OWNER(IN_ROOM(i)) && disguise) {
+		sprintf(buf, "$E is a member of %s%s\t0.", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(i))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(i))));
 		act(buf, FALSE, ch, NULL, i, TO_CHAR);
 	}
 	if (IS_NPC(i) && MOB_FACTION(i)) {
@@ -1229,7 +1233,7 @@ bool inventory_store_building(char_data *ch, room_data *room, empire_data *emp) 
 	}
 	
 	if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT)) {
-		msg_to_char(ch, "\r\nVault: %d coin%s, %d treasure (%d total)\r\n", EMPIRE_COINS(emp), (EMPIRE_COINS(emp) != 1 ? "s" : ""), EMPIRE_WEALTH(emp), GET_TOTAL_WEALTH(emp));
+		msg_to_char(ch, "\r\nVault: %.1f coin%s, %d treasure (%d total)\r\n", EMPIRE_COINS(emp), (EMPIRE_COINS(emp) != 1.0 ? "s" : ""), EMPIRE_WEALTH(emp), (int) GET_TOTAL_WEALTH(emp));
 	}
 
 	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
@@ -1583,17 +1587,20 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	
 	// shortlist ends here
 	if (shortlist) {
+		// append invis even in short list
+		if (GET_INVIS_LEV(ch)) {
+			size += snprintf(out + size, sizeof(out) - size, " (i%d)", GET_INVIS_LEV(ch));
+		}
+		else if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+			size += snprintf(out + size, sizeof(out) - size, " (inc)");
+		}
+		
+		// determine length to show
 		num = color_code_length(out);
 		sprintf(buf, "%%-%d.%ds", 35 + num, 35 + num);
 		strcpy(buf1, out);
 		
 		size = snprintf(out, sizeof(out), buf, buf1);
-		
-		// append invis even in short list
-		if (GET_INVIS_LEV(ch)) {
-			size += snprintf(out + size, sizeof(out) - size, " (i%d)", GET_INVIS_LEV(ch));
-		}
-		
 		return out;
 	}
 	
@@ -1706,7 +1713,6 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 			continue;
 
 		// show one char
-		++count;
 		CREATE(entry, struct who_entry, 1);
 		entry->access_level = GET_ACCESS_LEVEL(tch);
 		entry->computed_level = GET_COMPUTED_LEVEL(tch);
@@ -1721,6 +1727,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 	for (entry = list; entry; entry = next_entry) {
 		next_entry = entry->next;
 		
+		++count;
 		size += snprintf(whobuf + size, sizeof(whobuf) - size, "%s", entry->string);
 		
 		// columnar spacing
@@ -2711,7 +2718,7 @@ ACMD(do_score) {
 	one_argument(argument, arg);
 
 	if (IS_IMMORTAL(ch) && *arg) {
-		if (!(victim = get_char_vis(ch, arg, FIND_CHAR_WORLD)))
+		if (!(victim = get_player_vis(ch, arg, FIND_CHAR_WORLD)))
 			send_config_msg(ch, "no_person");
 		else if (IS_NPC(victim))
 			msg_to_char(ch, "You can't get a score sheet for an NPC.\r\n");

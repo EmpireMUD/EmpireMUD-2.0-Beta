@@ -1247,6 +1247,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 	
 	const char *i = NULL;
 	char *buf, lbuf[MAX_STRING_LENGTH], *dg_arg = NULL;
+	bool real_ch = FALSE, real_vict = FALSE;
 	char_data *dg_victim = NULL;
 	obj_data *dg_target = NULL;
 	bool show, any;
@@ -1331,38 +1332,40 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 		if (*orig == '$') {
 			switch (*(++orig)) {
 				case 'n':
-					i = PERS(ch, (char_data*)to, 0);
+					i = PERS(ch, (char_data*)to, FALSE);
 					break;
 				case 'N':
-					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj,(char_data*)to, 0));
+					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj,(char_data*)to, FALSE));
 					dg_victim = (char_data*) vict_obj;
 					break;
 				case 'o':
-					i = PERS(ch, (char_data*)to, 1);
+					i = PERS(ch, (char_data*)to, TRUE);
+					real_ch = TRUE;
 					break;
 				case 'O':
-					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj, (char_data*)to, 1));
+					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj, (char_data*)to, TRUE));
 					dg_victim = (char_data*) vict_obj;
+					real_vict = TRUE;
 					break;
 				case 'm':
-					i = HMHR(ch);
+					i = real_ch ? REAL_HMHR(ch) : HMHR(ch);
 					break;
 				case 'M':
-					CHECK_NULL(vict_obj, HMHR((char_data*) vict_obj));
+					CHECK_NULL(vict_obj, (real_vict ? REAL_HMHR((char_data*) vict_obj) : HMHR((char_data*) vict_obj)));
 					dg_victim = (char_data*) vict_obj;
 					break;
 				case 's':
-					i = HSHR(ch);
+					i = real_ch ? REAL_HSHR(ch) : HSHR(ch);
 					break;
 				case 'S':
-					CHECK_NULL(vict_obj, HSHR((char_data*) vict_obj));
+					CHECK_NULL(vict_obj, (real_vict ? REAL_HSHR((char_data*) vict_obj) : HSHR((char_data*) vict_obj)));
 					dg_victim = (char_data*) vict_obj;
 					break;
 				case 'e':
-					i = HSSH(ch);
+					i = real_ch ? REAL_HSSH(ch) : HSSH(ch);
 					break;
 				case 'E':
-					CHECK_NULL(vict_obj, HSSH((char_data*) vict_obj));
+					CHECK_NULL(vict_obj, (real_vict ? REAL_HSSH((char_data*) vict_obj) : HSSH((char_data*) vict_obj)));
 					dg_victim = (char_data*) vict_obj;
 					break;
 				case 'p':
@@ -2490,7 +2493,7 @@ static int process_output(descriptor_data *t) {
 		strcat(osb, "**OVERFLOW**\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
 
 	/* add the extra CRLF if the person isn't in compact mode */
-	if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT) && !t->pProtocol->WriteOOB)
+	if (STATE(t) == CON_PLAYING && t->character && !REAL_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT) && !t->pProtocol->WriteOOB)
 		strcat(osb, "\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
 
 	// add prompt

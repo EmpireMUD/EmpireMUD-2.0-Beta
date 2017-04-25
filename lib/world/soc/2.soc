@@ -698,4 +698,23 @@ $n cheers you on!~
 M5
 Cheer for whom?~
 S
+#244
+High Five~
+highfive~
+0 5 5
+M0
+You were arrested for illegal longbow use and only have 4 fingers.~
+M2
+You raise your hand and high-five $N triumphantly.~
+M3
+$n raises $s hand and high-fives $N triumphantly.~
+M4
+$n raises $s hand and high-fives you triumphantly.~
+M5
+They left you hanging.~
+M6
+You high-five yourself smugly.~
+M7
+$n high-fives $mself, looking smug.~
+S
 $

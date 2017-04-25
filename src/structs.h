@@ -1701,6 +1701,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_AUTONOTES  BIT(28)	// Player login syslogs automatically show notes
 #define PRF_AUTODISMOUNT  BIT(29)	// will dismount while moving instead of seeing an error
 #define PRF_NOEMPIRE  BIT(30)	// the game will not automatically create an empire
+#define PRF_CLEARMETERS  BIT(31)	// automatically clears the damage meters before a new fight
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -1870,6 +1871,7 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_SIEGE_WEAPONS  BIT(17)	// r. can be used to besiege
 #define VEH_ON_FIRE  BIT(18)	// s. currently on fire
 #define VEH_NO_LOAD_ONTO_VEHICLE  BIT(19)	// t. cannot be loaded onto a vehicle
+#define VEH_VISIBLE_IN_DARK  BIT(20)	// u. can be seen at night
 
 // The following vehicle flags are saved to file rather than read from the
 // prototype. Flags which are NOT included in this list can be altered with
@@ -2069,7 +2071,7 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_RANKS  20	// Max levels in an empire
 #define MAX_RANK_LENGTH  20	// length limit
 #define MAX_RAW_INPUT_LENGTH  1536  // Max size of *raw* input
-#define MAX_REFERRED_BY_LENGTH  32
+#define MAX_REFERRED_BY_LENGTH  80
 #define MAX_RESOURCES_REQUIRED  10	// how many resources a recipe can need
 #define MAX_REWARDS_PER_DAY  5	//  number of times a player can be rewarded
 #define MAX_ROOM_DESCRIPTION  4000
@@ -3309,7 +3311,7 @@ struct char_data {
 	obj_data *carrying;	// head of list
 	descriptor_data *desc;	// NULL for mobiles
 
-	int id;	// used by DG triggers - unique id
+	int script_id;	// used by DG triggers - unique id
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct script_data *script;	// script info for the object
 	struct script_memory *memory;	// for mob memory triggers
@@ -3457,6 +3459,7 @@ struct action_data_struct {
 struct attribute_data_type {
 	char *name;
 	char *creation_description;	// shown if players need help during creation
+	char *low_error;	// You are "too weak" to use that item.
 };
 
 
@@ -3646,7 +3649,7 @@ struct empire_trade_data {
 	int type;	// TRADE_x
 	obj_vnum vnum;	// item type
 	int limit;	// min (export), max (import)
-	int cost;	// min (export), max (import)
+	double cost;	// min (export), max (import)
 	
 	struct empire_trade_data *next;
 };
@@ -3699,7 +3702,7 @@ struct empire_data {
 	char *rank[MAX_RANKS];	// Name of each rank
 	
 	bitvector_t frontier_traits;	// ETRAIT_x
-	int coins;	// total coins (always in local currency)
+	double coins;	// total coins (always in local currency)
 
 	byte priv[NUM_PRIVILEGES];	// The rank at which you can use a command
 
@@ -3903,7 +3906,7 @@ struct obj_data {
 	obj_data *in_obj;	// In what object NULL when none
 	obj_data *contains;	// Contains objects
 
-	int id;	// used by DG triggers - unique id
+	int script_id;	// used by DG triggers - unique id
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct script_data *script;	// script info for the object
 
@@ -4163,7 +4166,7 @@ struct vehicle_data {
 	char_data *driver;	// person driving it
 	
 	// scripting
-	int id;	// used by DG triggers - unique id
+	int script_id;	// used by DG triggers - unique id
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct script_data *script;	// script info for the object
 	

@@ -224,6 +224,10 @@ struct alias_data {
 #define SCMD_LIBRARY  0
 #define SCMD_BOOKEDIT  1
 
+// do_empire_inventory
+#define SCMD_EINVENTORY	0
+#define SCMD_EIDENTIFY	1
+
 // do_toggle
 #define TOG_ONOFF  0
 #define TOG_OFFON  1
@@ -234,7 +238,7 @@ struct alias_data {
 #define MOVE_NORMAL  0	// Normal move message
 #define MOVE_LEAD  1	// Leading message
 #define MOVE_FOLLOW  2	// Follower message
-	#define MOVE_UNUSED  3
+#define MOVE_CIRCLE  3	// circling
 #define MOVE_EARTHMELD  4
 #define MOVE_SWIM  5	// swim skill
 

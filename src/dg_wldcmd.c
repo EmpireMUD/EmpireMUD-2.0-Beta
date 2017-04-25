@@ -412,7 +412,7 @@ WCMD(do_wdoor) {
 		return;
 	}
 
-	if ((dir = search_block(direction, dirs, FALSE)) == NOTHING) {
+	if ((dir = search_block(direction, dirs, FALSE)) == NO_DIR && (dir = search_block(direction, alt_dirs, FALSE)) == NO_DIR) {
 		wld_log(room, "wdoor: invalid direction");
 		return;
 	}
@@ -979,7 +979,7 @@ WCMD(do_wpurge) {
 	// purge vehicle
 	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_room(room, arg))) {
 		if (*argument) {
-			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_ROOM);
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}
 		extract_vehicle(veh);
 	}
@@ -987,7 +987,7 @@ WCMD(do_wpurge) {
 	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_in_room(room, arg))) {
 		if (*argument) {
 			room_data *room = obj_room(obj);
-			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, obj, NULL, TO_ROOM);
+			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, obj, NULL, TO_CHAR | TO_ROOM);
 		}
 		extract_obj(obj);
 	}

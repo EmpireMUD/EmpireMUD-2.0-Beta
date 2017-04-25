@@ -77,12 +77,24 @@ ACMD(do_assist) {
 			send_to_char("You join the fight!\r\n", ch);
 			act("$N assists you!", 0, helpee, 0, ch, TO_CHAR);
 			act("$n assists $N.", FALSE, ch, 0, helpee, TO_NOTVICT);
-			hit(ch, opponent, GET_EQ(ch, WEAR_WIELD), FALSE);
+			hit(ch, opponent, GET_EQ(ch, WEAR_WIELD), TRUE);
 		}
 		else {
 			act("You can't attack $N!", FALSE, ch, 0, opponent, TO_CHAR);
 		}
 	}
+}
+
+
+ACMD(do_clearmeters) {
+	void reset_combat_meters(char_data *ch);
+	void stop_combat_meters(char_data *ch);
+	
+	if (!IS_NPC(ch)) {
+		reset_combat_meters(ch);
+		GET_COMBAT_METERS(ch).over = TRUE;
+	}
+	send_config_msg(ch, "ok_string");
 }
 
 
@@ -291,7 +303,7 @@ ACMD(do_hit) {
 			command_lag(ch, WAIT_OTHER);
 		}
 		else {
-			hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
+			hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FIGHTING(ch) ? FALSE : TRUE);	// count as exp only if not already fighting
 			// ensure hitting
 			if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && FIGHTING(ch) && FIGHTING(ch) != vict) {
 				FIGHTING(ch) = vict;
@@ -714,5 +726,10 @@ ACMD(do_throw) {
 			sprintf(buf, "$p is hurled in from the %s and falls to the ground at your feet!", dirs[get_direction_for_char(vict, rev_dir[dir])]);
 			act(buf, FALSE, vict, obj, 0, TO_CHAR);
 		}
+	}
+	
+	// throwing item abuse log
+	if (IS_IMMORTAL(ch)) {
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s threw %s from %s to %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), room_log_identifier(IN_ROOM(ch)), room_log_identifier(to_room));
 	}
 }

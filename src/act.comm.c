@@ -132,13 +132,13 @@ int is_tell_ok(char_data *ch, char_data *vict) {
 		// can always tell immortals
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!REAL_NPC(ch) && PRF_FLAGGED(ch, PRF_NOTELL))
+	else if (PRF_FLAGGED(ch, PRF_NOTELL))
 		msg_to_char(ch, "You can't tell other people while you have notell on.\r\n");
 	else if (!REAL_NPC(vict) && !vict->desc)        /* linkless */
 		act("$E's linkless at the moment.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
 	else if (PLR_FLAGGED(vict, PLR_WRITING))
 		act("$E's writing a message right now; try again later.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
-	else if ((!REAL_NPC(vict) && PRF_FLAGGED(vict, PRF_NOTELL)))
+	else if (PRF_FLAGGED(vict, PRF_NOTELL))
 		act("$E can't hear you.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
 	else if (is_ignoring(ch, vict)) {
 		msg_to_char(ch, "You cannot send a tell to someone you're ignoring.\r\n");
@@ -181,7 +181,7 @@ void perform_tell(char_data *ch, char_data *vict, char *arg) {
 		add_to_channel_history(vict->desc, CHANNEL_HISTORY_TELLS, lbuf);
 	}
 
-	if (!REAL_NPC(ch) && PRF_FLAGGED(ch, PRF_NOREPEAT))
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT))
 		send_config_msg(ch, "ok_string");
 	else {
 		// for channel history
@@ -341,7 +341,7 @@ ACMD(do_pub_comm) {
 		if (level > pub_comm[subcmd].min_level) {
 			sprintf(level_string, " <%d>", level);
 		}
-		if (GET_INVIS_LEV(ch) > 0) {
+		if (!IS_NPC(ch) && GET_INVIS_LEV(ch) > 0) {
 			sprintf(invis_string, " (i%d)", GET_INVIS_LEV(ch));
 		}
 		
@@ -1281,7 +1281,7 @@ ACMD(do_say) {
 			}
 		}
 		
-		if (!REAL_NPC(ch) && PRF_FLAGGED(ch, PRF_NOREPEAT))
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT))
 			send_config_msg(ch, "ok_string");
 		else {
 			delete_doubledollar(argument);
@@ -1305,8 +1305,10 @@ ACMD(do_say) {
 
 
 ACMD(do_spec_comm) {
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	char_data *vict;
 	const char *action_sing, *action_plur, *action_others;
+	char color;
 
 	switch (subcmd) {
 		case SCMD_WHISPER: {
@@ -1348,17 +1350,37 @@ ACMD(do_spec_comm) {
 		act("$E is ignoring you.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
 	}
 	else {
-		sprintf(buf, "$n %s you, '%s'", action_plur, buf2);
-		act(buf, FALSE, ch, 0, vict, TO_VICT);
-
+		// msg to victim
+		if (vict->desc) {
+			clear_last_act_message(vict->desc);
+		}
+		color = (!IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_SAY)) ? GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_SAY) : '0';
+		sprintf(buf, "$n %s you, '%s\t%c'\t0", action_plur, buf2, color);
+		if (color != '0') {
+			msg_to_char(vict, "\t%c", color);
+		}
+		act(buf, FALSE, ch, NULL, vict, TO_VICT);
+		// channel history
+		if (vict->desc && vict->desc->last_act_message) {
+			// the message was sent via act(), we can retrieve it from the desc
+			sprintf(buf, "\t%c%s", color, vict->desc->last_act_message);
+			add_to_channel_history(vict->desc, CHANNEL_HISTORY_SAY, buf);
+		}
+		
+		// msg to char
 		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			send_config_msg(ch, "ok_string");
 		}
 		else {
-			msg_to_char(ch, "You %s %s, '%s'\r\n", action_sing, PERS(vict, ch, 0), buf2);
+			color = (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_SAY)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_SAY) : '0';
+			sprintf(buf, "\t%cYou %s %s, '%s\t%c'\t0", color, action_sing, PERS(vict, ch, FALSE), buf2, color);
+			msg_to_char(ch, "%s\r\n", buf);
+			if (ch->desc) {
+				add_to_channel_history(ch->desc, CHANNEL_HISTORY_SAY, buf);
+			}
 		}
 
-		act(action_others, FALSE, ch, 0, vict, TO_NOTVICT);
+		act(action_others, FALSE, ch, NULL, vict, TO_NOTVICT);
 	}
 }
 

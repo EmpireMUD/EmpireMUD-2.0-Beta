@@ -73,6 +73,7 @@ const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
 void adjust_building_tech(empire_data *emp, room_data *room, bool add);
+void check_delayed_load(char_data *ch);
 void extract_trigger(trig_data *trig);
 void scale_item_to_level(obj_data *obj, int level);
 
@@ -604,7 +605,7 @@ void affect_total(char_data *ch) {
 	extern const int base_player_pools[NUM_POOLS];
 
 	struct affected_type *af;
-	int i, iter;
+	int i, iter, level;
 	empire_data *emp = GET_LOYALTY(ch);
 	struct obj_apply *apply;
 	int health, move, mana;
@@ -615,6 +616,7 @@ void affect_total(char_data *ch) {
 	health = GET_HEALTH(ch);
 	move = GET_MOVE(ch);
 	mana = GET_MANA(ch);
+	level = get_approximate_level(ch);
 	
 	// only update greatness if ch is in a room (playing)
 	if (!IS_NPC(ch) && emp && IN_ROOM(ch)) {
@@ -674,13 +676,13 @@ void affect_total(char_data *ch) {
 	}
 	
 	if (HAS_BONUS_TRAIT(ch, BONUS_HEALTH)) {
-		GET_MAX_HEALTH(ch) += pool_bonus_amount;
+		GET_MAX_HEALTH(ch) += pool_bonus_amount * (1 + (level / 25));
 	}
 	if (HAS_BONUS_TRAIT(ch, BONUS_MOVES)) {
-		GET_MAX_MOVE(ch) += pool_bonus_amount;
+		GET_MAX_MOVE(ch) += pool_bonus_amount * (1 + (level / 25));
 	}
 	if (HAS_BONUS_TRAIT(ch, BONUS_MANA)) {
-		GET_MAX_MANA(ch) += pool_bonus_amount;
+		GET_MAX_MANA(ch) += pool_bonus_amount * (1 + (level / 25));
 	}
 
 	// ability-based modifiers
@@ -1366,6 +1368,25 @@ char_data *find_mob_in_room_by_vnum(room_data *room, mob_vnum vnum) {
 
 
 /**
+* Checks if any mortal is present, and returns the first one if so.
+*
+* @param room_data *room The room to check.
+* @return char_data* The mortal found, or NULL if none.
+*/
+char_data *find_mortal_in_room(room_data *room) {
+	char_data *iter;
+	
+	LL_FOREACH(ROOM_PEOPLE(room), iter) {
+		if (!IS_NPC(iter) && !IS_IMMORTAL(iter) && !IS_GOD(iter)) {
+			return iter;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
 * search a room for a char, and return a pointer if found..
 * This has no source character, so does not rely on visibility.
 *
@@ -1834,13 +1855,13 @@ obj_data *create_money(empire_data *type, int amount) {
 /**
 * Gets the value of a currency when converted to another empire.
 *
-* @param int amount How much money.
+* @param double amount How much money.
 * @param empire_data *convert_from Empire whose currency it was.
 * @param empire_data *convert_to The empire to exchange to.
-* @return int The new value of the money.
+* @return double The new value of the money.
 */
-int exchange_coin_value(int amount, empire_data *convert_from, empire_data *convert_to) {
-	return (int)round(amount * exchange_rate(convert_from, convert_to));
+double exchange_coin_value(double amount, empire_data *convert_from, empire_data *convert_to) {
+	return (amount * exchange_rate(convert_from, convert_to));
 }
 
 
@@ -2398,32 +2419,20 @@ struct empire_trade_data *find_trade_entry(empire_data *emp, int type, obj_vnum 
 * @param int amount How much to +/-.
 * @return int The new coin total of the empire.
 */
-int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, int amount) {
-	int curr, local;
+int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, double amount) {
+	double local;
 	
 	// who??
 	if (!emp_gaining) {
 		return 0;
 	}
 	
-	curr = EMPIRE_COINS(emp_gaining);
-		
 	if (amount < 0) {
-		EMPIRE_COINS(emp_gaining) = MAX(0, curr + amount);
-		
-		// validate to prevent overflow
-		if (EMPIRE_COINS(emp_gaining) > curr) {
-			EMPIRE_COINS(emp_gaining) = 0;
-		}
+		SAFE_ADD(EMPIRE_COINS(emp_gaining), amount, 0, MAX_COIN, FALSE);
 	}
 	else {
 		if ((local = exchange_coin_value(amount, coin_empire, emp_gaining)) > 0) {
-			EMPIRE_COINS(emp_gaining) = MIN(MAX_COIN, curr + local);
-		
-			// validate to prevent overflow
-			if (EMPIRE_COINS(emp_gaining) < curr) {
-				EMPIRE_COINS(emp_gaining) = MAX_COIN;
-			}
+			SAFE_ADD(EMPIRE_COINS(emp_gaining), local, 0, MAX_COIN, FALSE);
 		}
 	}
 
@@ -3299,8 +3308,6 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 * @param ... printf-style args for str.
 */
 void add_lore(char_data *ch, int type, const char *str, ...) {
-	void check_delayed_load(char_data *ch);
-	
 	struct lore_data *new, *lore;
 	char text[MAX_STRING_LENGTH];
 	va_list tArgList;
@@ -3354,6 +3361,9 @@ void clean_lore(char_data *ch) {
 	
 	int remove_lore_after_years = config_get_int("remove_lore_after_years");
 	int starting_year = config_get_int("starting_year");
+	
+	// need the old lore, in case the player is offline
+	check_delayed_load(ch);
 
 	if (!IS_NPC(ch)) {
 		for (lore = GET_LORE(ch); lore; lore = next_lore) {
@@ -3390,6 +3400,9 @@ void remove_lore(char_data *ch, int type) {
 
 	if (IS_NPC(ch))
 		return;
+	
+	// need the old lore, in case the player is offline
+	check_delayed_load(ch);
 
 	for (lore = GET_LORE(ch); lore; lore = next_lore) {
 		next_lore = lore->next;
@@ -3883,7 +3896,10 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 		add_obj_binding(bind->idnum, &OBJ_BOUND_TO(new));
 	}
 	
-	GET_OBJ_TIMER(new) = GET_OBJ_TIMER(obj);
+	if (GET_OBJ_TIMER(obj) != UNLIMITED && GET_OBJ_TIMER(proto) != UNLIMITED) {
+		// only change if BOTH are unlimited. Otherwise, this trait was changed and we should inherit it.
+		GET_OBJ_TIMER(new) = GET_OBJ_TIMER(obj);
+	}
 	GET_AUTOSTORE_TIMER(new) = GET_AUTOSTORE_TIMER(obj);
 	new->stolen_timer = obj->stolen_timer;
 	GET_STOLEN_FROM(new) = GET_STOLEN_FROM(obj);

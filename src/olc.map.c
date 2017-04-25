@@ -33,6 +33,7 @@ extern bool world_map_needs_save;
 
 // external funcs
 void complete_building(room_data *room);
+void deactivate_workforce_room(empire_data *emp, room_data *room);
 extern crop_data *get_potential_crop_for_location(room_data *location);
 
 
@@ -168,6 +169,9 @@ OLC_MODULE(mapedit_terrain) {
 		if (sect) {
 			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
 			msg_to_char(ch, "This room is now %s %s.\r\n", AN(GET_SECT_NAME(sect)), GET_SECT_NAME(sect));
+			if (ROOM_OWNER(IN_ROOM(ch))) {
+				deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
+			}
 		}
 		else if (cp) {
 			if (!(sect = find_first_matching_sector(SECTF_CROP, NOBITS))) {
@@ -178,6 +182,9 @@ OLC_MODULE(mapedit_terrain) {
 				change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
 				set_crop_type(IN_ROOM(ch), cp);
 				msg_to_char(ch, "This room is now %s.\r\n", GET_CROP_NAME(cp));
+				if (ROOM_OWNER(IN_ROOM(ch))) {
+					deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
+				}
 			}
 		}
 				
@@ -543,6 +550,9 @@ OLC_MODULE(mapedit_naturalize) {
 				if (ROOM_PEOPLE(room)) {
 					act("The area is naturalized!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 				}
+				if (ROOM_OWNER(room)) {
+					deactivate_workforce_room(ROOM_OWNER(room), room);
+				}
 			}
 			else {
 				perform_change_sect(NULL, map, map->natural_sector);
@@ -575,6 +585,9 @@ OLC_MODULE(mapedit_naturalize) {
 	else {	// normal processing for 1 room
 		map = &(world_map[FLAT_X_COORD(IN_ROOM(ch))][FLAT_Y_COORD(IN_ROOM(ch))]);
 		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(map->natural_sector));
+		if (ROOM_OWNER(IN_ROOM(ch))) {
+			deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
+		}
 		
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has set naturalized the sector at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 		msg_to_char(ch, "You have naturalized the sector for this tile.\r\n");

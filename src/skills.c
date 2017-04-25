@@ -1541,7 +1541,7 @@ ACMD(do_skills) {
 					continue;
 				}
 				
-				if (IS_IMMORTAL(ch) || get_skill_resets(ch, SKILL_VNUM(skill)) > 0) {
+				if (get_skill_resets(ch, SKILL_VNUM(skill)) > 0) {
 					msg_to_char(ch, "%s%s", (found ? ", " : ""), SKILL_NAME(skill));
 					if (get_skill_resets(ch, SKILL_VNUM(skill)) > 1) {
 						msg_to_char(ch, " (%d)", get_skill_resets(ch, SKILL_VNUM(skill)));
@@ -3327,16 +3327,16 @@ OLC_MODULE(skilledit_tree) {
 	extern ability_data *find_ability_on_skill(char *name, skill_data *skill);
 
 	skill_data *skill = GET_OLC_SKILL(ch->desc);
-	char cmd_arg[MAX_INPUT_LENGTH], abil_arg[MAX_INPUT_LENGTH], sub_arg[MAX_INPUT_LENGTH];
+	char cmd_arg[MAX_INPUT_LENGTH], abil_arg[MAX_INPUT_LENGTH], sub_arg[MAX_INPUT_LENGTH], req_arg[MAX_INPUT_LENGTH];
 	struct skill_ability *skab, *next_skab, *change;
 	ability_data *abil = NULL, *requires = NULL;
 	bool all = FALSE, found, found_prq;
 	int level;
 	
 	argument = any_one_arg(argument, cmd_arg);
-	argument = any_one_arg(argument, abil_arg);
+	argument = any_one_word(argument, abil_arg);
 	argument = any_one_arg(argument, sub_arg);	// may be level or type
-	skip_spaces(&argument);	// may be requires ability or "new value"
+	argument = any_one_word(argument, req_arg);	// may be requires ability or "new value"
 	
 	// check for "all" arg
 	if (!str_cmp(abil_arg, "all")) {
@@ -3359,8 +3359,8 @@ OLC_MODULE(skilledit_tree) {
 		else if (!*sub_arg || !isdigit(*sub_arg) || (level = atoi(sub_arg)) < 0) {
 			msg_to_char(ch, "Add the ability at what level?\r\n");
 		}
-		else if (*argument && str_cmp(argument, "none") && !(requires = find_ability(argument))) {
-			msg_to_char(ch, "Invalid pre-requisite ability '%s'.\r\n", argument);
+		else if (*req_arg && str_cmp(req_arg, "none") && !(requires = find_ability(req_arg))) {
+			msg_to_char(ch, "Invalid pre-requisite ability '%s'.\r\n", req_arg);
 		}
 		else if (abil == requires) {
 			msg_to_char(ch, "It cannot require itself.\r\n");

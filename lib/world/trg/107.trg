@@ -368,29 +368,34 @@ end
 wait 1 sec
 if (%actor.room% != %room% || %actor.position% != Standing)
   %send% %actor% You stop building the snowman.
+  halt
 end
 %echo% A sudden flurry of snow comes from the sky, creating a large pile nearby.
 wait 1 sec
 if (%actor.room% != %room% || %actor.position% != Standing)
   %send% %actor% You stop building the snowman.
+  halt
 end
 %send% %actor% You start rolling the snow into a large ball...
 %echoaround% %actor% %actor.name% starts rolling the snow into a large ball...
 wait 3 sec
 if (%actor.room% != %room% || %actor.position% != Standing)
   %send% %actor% You stop building the snowman.
+  halt
 end
 %send% %actor% You finish the snowman's body and start rummaging through your belongings...
 %echoaround% %actor% %actor.name% finishes the snowman's body and starts rummaging through %actor.hisher% belongings...
 wait 1 sec
 if (%actor.room% != %room% || %actor.position% != Standing)
   %send% %actor% You stop building the snowman.
+  halt
 end
 %send% %actor% You find a carrot and some sticks, and add them to your snowman...
 %echoaround% %actor% %actor.name% finds a carrot and some sticks, and adds them to %actor.hisher% snowman...
 wait 1 sec
 if (%actor.room% != %room% || %actor.position% != Standing)
   %send% %actor% You stop building the snowman.
+  halt
 end
 %send% %actor% You finish your snowman and step back to admire your work.
 %echoaround% %actor% %actor.name% finishes %actor.hisher% snowman and steps back with a satisfied nod.

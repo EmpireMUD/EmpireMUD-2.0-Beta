@@ -574,7 +574,7 @@ OCMD(do_otransform) {
 		tmpobj.worn_on = obj->worn_on;
 		tmpobj.in_obj = obj->in_obj;
 		tmpobj.contains = obj->contains;
-		tmpobj.id = obj->id;
+		tmpobj.script_id = obj->script_id;
 		tmpobj.proto_script = obj->proto_script;
 		tmpobj.script = obj->script;
 		tmpobj.next_content = obj->next_content;
@@ -821,7 +821,7 @@ OCMD(do_opurge) {
 	// purge vehicle
 	else if ((veh = get_vehicle_by_obj(obj, arg))) {
 		if (*argument) {
-			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_ROOM);
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}
 		extract_vehicle(veh);
 	}
@@ -832,7 +832,7 @@ OCMD(do_opurge) {
 		}
 		if (*argument) {
 			room_data *room = obj_room(o);
-			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, o, NULL, TO_ROOM);
+			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, o, NULL, TO_CHAR | TO_ROOM);
 		}
 		extract_obj(o);
 	}
@@ -1403,7 +1403,7 @@ OCMD(do_odoor) {
 		return;
 	}
 
-	if ((dir = search_block(direction, dirs, FALSE)) == NOTHING) {
+	if ((dir = search_block(direction, dirs, FALSE)) == NO_DIR && (dir = search_block(direction, alt_dirs, FALSE)) == NO_DIR) {
 		obj_log(obj, "odoor: invalid direction");
 		return;
 	}

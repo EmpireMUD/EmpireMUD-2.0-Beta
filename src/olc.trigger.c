@@ -287,6 +287,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	room_data *room, *next_room;
 	char_data *mob, *next_mob;
 	descriptor_data *dsc;
+	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
 	bld_data *bld, *next_bld;
 	bool found;
@@ -331,6 +332,13 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 			remove_live_script_by_vnum(SCRIPT(room), vnum);
 		}
 		delete_from_proto_list_by_vnum(&(room->proto_script), vnum);
+	}
+	
+	// remove from adventures
+	HASH_ITER(hh, adventure_table, adv, next_adv) {
+		if (delete_from_proto_list_by_vnum(&GET_ADV_SCRIPTS(adv), vnum)) {
+			save_library_file_for_vnum(DB_BOOT_ADV, GET_ADV_VNUM(adv));
+		}
 	}
 	
 	// update building protos
@@ -382,6 +390,9 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	
 	// update olc editors
 	for (dsc = descriptor_list; dsc; dsc = dsc->next) {
+		if (GET_OLC_ADVENTURE(dsc) && delete_from_proto_list_by_vnum(&GET_ADV_SCRIPTS(GET_OLC_ADVENTURE(dsc)), vnum)) {
+			msg_to_char(dsc->character, "A trigger attached to the adventure you're editing was deleted.\r\n");
+		}
 		if (GET_OLC_BUILDING(dsc) && delete_from_proto_list_by_vnum(&GET_BLD_SCRIPTS(GET_OLC_BUILDING(dsc)), vnum)) {
 			msg_to_char(dsc->character, "A trigger attached to the building you're editing was deleted.\r\n");
 		}
@@ -429,11 +440,11 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 void olc_fullsearch_trigger(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count, lookup, only_attaches = NOTHING;
-	bitvector_t only_types = NOBITS;
+	bitvector_t mob_types = NOBITS, obj_types = NOBITS, wld_types = NOBITS, veh_types = NOBITS;
 	trig_data *trig, *next_trig;
 	struct cmdlist_element *cmd;
+	bool any_types = FALSE, any;
 	size_t size;
-	bool any;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP TEDIT FULLSEARCH for syntax.\r\n");
@@ -455,12 +466,27 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 		}
 		else if (is_abbrev(type_arg, "-types")) {
 			argument = any_one_word(argument, val_arg);
-			if ((lookup = search_block(val_arg, trig_types, FALSE)) == NOTHING && (lookup = search_block(val_arg, otrig_types, FALSE)) == NOTHING && (lookup = search_block(val_arg, vtrig_types, FALSE)) == NOTHING && (lookup = search_block(val_arg, wtrig_types, FALSE)) == NOTHING) {
+			any = FALSE;
+			if ((lookup = search_block(val_arg, trig_types, FALSE)) != NOTHING) {
+				mob_types |= BIT(lookup);
+				any_types = any = TRUE;
+			}
+			if ((lookup = search_block(val_arg, otrig_types, FALSE)) != NOTHING) {
+				obj_types |= BIT(lookup);
+				any_types = any = TRUE;
+			}
+			if ((lookup = search_block(val_arg, vtrig_types, FALSE)) != NOTHING) {
+				veh_types |= BIT(lookup);
+				any_types = any = TRUE;
+			}
+			if ((lookup = search_block(val_arg, wtrig_types, FALSE)) != NOTHING) {
+				wld_types |= BIT(lookup);
+				any_types = any = TRUE;
+			}
+			
+			if (!any) {
 				msg_to_char(ch, "Invalid trigger type '%s'.\r\n", val_arg);
 				return;
-			}
-			else {
-				only_types |= BIT(lookup);
 			}
 		}
 		else {	// not sure what to do with it? treat it like a keyword
@@ -479,7 +505,29 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 		if (only_attaches != NOTHING && trig->attach_type != only_attaches) {
 			continue;
 		}
-		if (only_types && (GET_TRIG_TYPE(trig) & only_types) != only_types) {
+		// x_TRIGGER:
+		if (mob_types && trig->attach_type == MOB_TRIGGER && (GET_TRIG_TYPE(trig) & mob_types) != mob_types) {
+			continue;
+		}
+		if (obj_types && trig->attach_type == OBJ_TRIGGER && (GET_TRIG_TYPE(trig) & obj_types) != obj_types) {
+			continue;
+		}
+		if (wld_types && (trig->attach_type == WLD_TRIGGER || trig->attach_type == ADV_TRIGGER || trig->attach_type == RMT_TRIGGER || trig->attach_type == BLD_TRIGGER) && (GET_TRIG_TYPE(trig) & wld_types) != wld_types) {
+			continue;
+		}
+		if (veh_types && trig->attach_type == VEH_TRIGGER && (GET_TRIG_TYPE(trig) & veh_types) != veh_types) {
+			continue;
+		}
+		if (any_types && trig->attach_type == MOB_TRIGGER && !mob_types) {
+			continue;
+		}
+		if (any_types && trig->attach_type == OBJ_TRIGGER && !obj_types) {
+			continue;
+		}
+		if (any_types && (trig->attach_type == WLD_TRIGGER || trig->attach_type == ADV_TRIGGER || trig->attach_type == RMT_TRIGGER || trig->attach_type == BLD_TRIGGER) && !wld_types) {
+			continue;
+		}
+		if (any_types && trig->attach_type == VEH_TRIGGER && !veh_types) {
 			continue;
 		}
 		if (*find_keywords) {
@@ -539,6 +587,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 	room_template *rmt, *next_rmt;
 	vehicle_data *veh, *next_veh;
 	char_data *mob, *next_mob;
+	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
 	bld_data *bld, *next_bld;
 	int size, found;
@@ -551,6 +600,18 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of trigger %d (%s):\r\n", vnum, GET_TRIG_NAME(proto));
+	
+	// adventure scripts
+	HASH_ITER(hh, adventure_table, adv, next_adv) {
+		any = FALSE;
+		for (trig = GET_ADV_SCRIPTS(adv); trig && !any; trig = trig->next) {
+			if (trig->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "ADV [%5d] %s\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+			}
+		}
+	}
 	
 	// buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {

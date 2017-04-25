@@ -103,7 +103,7 @@ obj_data *get_obj_in_list(char *name, obj_data *list) {
 		id = atoi(name + 1);
 
 		for (i = list; i; i = i->next_content)
-			if (id == GET_ID(i))
+			if (id == obj_script_id(i))
 				return i;
 	}
 	else {
@@ -127,7 +127,7 @@ obj_data *get_object_in_equip(char_data *ch, char *name) {
 
 		for (j = 0; j < NUM_WEARS; j++)
 			if ((obj = GET_EQ(ch, j)))
-				if (id == GET_ID(obj))
+				if (id == obj_script_id(obj))
 					return (obj);
 	}
 	else if (is_number(name)) {
@@ -430,7 +430,7 @@ obj_data *get_obj_near_obj(obj_data *obj, char *name) {
 		if (*name == UID_CHAR) {
 			id = atoi(name + 1);
 
-			if (id == GET_ID(obj->in_obj))
+			if (id == obj_script_id(obj->in_obj))
 				return obj->in_obj;
 		}
 		else if (isname(name, obj->in_obj->name))
@@ -768,7 +768,7 @@ obj_data *get_obj_in_room(room_data *room, char *name) {
 	if (*name == UID_CHAR) {
 		id = atoi(name + 1);
 		for (obj = room->contents; obj; obj = obj->next_content)
-			if (id == GET_ID(obj)) 
+			if (id == obj_script_id(obj)) 
 				return obj;
 	}
 	else {
@@ -946,7 +946,7 @@ int item_in_list(char *item, obj_data *list) {
 		id = atoi(item + 1);
 
 		for (i = list; i; i = i->next_content) {
-			if (id == GET_ID(i)) {
+			if (id == obj_script_id(i)) {
 				count ++;
 				break;
 			}
@@ -1041,6 +1041,9 @@ void script_trigger_check(void) {
 			case MOB_TRIGGER: {
 				mob = (char_data *)sc->attached_to;
 				in_room = IN_ROOM(mob);
+				if (GET_POS(mob) < POS_SLEEPING || IS_DEAD(mob) || EXTRACTED(mob) || AFF_FLAGGED(mob, AFF_STUNNED) || IS_INJURED(mob, INJ_TIED) || GET_FED_ON_BY(mob)) {
+					fail = TRUE;
+				}
 				if (AFF_FLAGGED(mob, AFF_CHARM) && !TRIGGER_CHECK(trig, MTRIG_CHARMED)) {
 					fail = TRUE;	// can't do while charmed
 				}
@@ -1094,7 +1097,7 @@ void script_trigger_check(void) {
 			}
 			default: {	// all world trigger types
 				union script_driver_data_u sdd;
-				ADD_ROOM_UID_VAR(buf, trig, room, "room", 0);
+				ADD_UID_VAR(buf, trig, room_script_id(room), "room", 0);
 				sdd.r = room;
 				script_driver(&sdd, trig, WLD_TRIGGER, TRIG_NEW);
 				break;
@@ -1876,27 +1879,25 @@ void free_var_el(struct trig_var_data *var) {
 
 /*
 * remove var name from var_list
-* returns 1 if found, else 0
+*
+* @param struct trig_var_data **var_list Pointer to the list of vars.
+* @param char *name The name of the var to remove.
+* @param int context The context to remove (will also remove context=0 no matter what)
+* @return int 1 if found, else 0
 */
-int remove_var(struct trig_var_data **var_list, char *name) {
-	struct trig_var_data *i, *j;
-
-	for (j = NULL, i = *var_list; i && str_cmp(name, i->name); j = i, i = i->next);
-
-	if (i) {
-		if (j) {
-			j->next = i->next;
-			free_var_el(i);
+int remove_var(struct trig_var_data **var_list, char *name, int context) {
+	struct trig_var_data *iter, *next_iter;
+	bool any = FALSE;
+	
+	LL_FOREACH_SAFE(*var_list, iter, next_iter) {
+		if (!str_cmp(name, iter->name) && (iter->context == context || iter->context == 0)) {
+			LL_DELETE(*var_list, iter);
+			free_var_el(iter);
+			any = TRUE;
 		}
-		else {
-			*var_list = i->next;
-			free_var_el(i);
-		}
-
-	return 1;      
 	}
-
-	return 0;
+	
+	return (any ? 1 : 0);
 }
 
 
@@ -2195,10 +2196,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			if (!str_cmp(var, "self"))
 				switch (type) {
 					case MOB_TRIGGER:
-						snprintf(str, slen, "%c%d", UID_CHAR, GET_ID((char_data*) go));
+						snprintf(str, slen, "%c%d", UID_CHAR, char_script_id((char_data*) go));
 						break;
 					case OBJ_TRIGGER:
-						snprintf(str, slen, "%c%d", UID_CHAR, GET_ID((obj_data*) go));
+						snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id((obj_data*) go));
 						break;
 					case WLD_TRIGGER:
 					case RMT_TRIGGER:
@@ -2207,7 +2208,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM((room_data*)go) + ROOM_ID_BASE);
 						break;
 					case VEH_TRIGGER: {
-						snprintf(str, slen, "%c%d", UID_CHAR, GET_ID((vehicle_data*) go));
+						snprintf(str, slen, "%c%d", UID_CHAR, veh_script_id((vehicle_data*) go));
 						break;
 					}
 				}
@@ -2436,7 +2437,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						
 						if (found_mob) {
-							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(found_mob));
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(found_mob));
 						}
 						else {
 							*str = '\0';
@@ -2458,8 +2459,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 				}
 				else {
-					// no field
-					snprintf(str, slen, "%d", inst->id);
+					// bad field
+					script_log("Trigger: %s, VNum %d, unknown instance field: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), field);
 				}
 				return;
 			}
@@ -2517,7 +2518,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 
 					if (rndm)
-						snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(rndm));
+						snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(rndm));
 					else
 						*str = '\0';
 				}
@@ -2796,7 +2797,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						*str = '\0';	// default to no-target
 						if (subfield && *subfield) {
 							if ((targ = get_char_room_vis(c, subfield))) {
-								snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(targ));
+								snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(targ));
 							}
 						}
 					}
@@ -2956,7 +2957,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else if ((pos = find_eq_pos_script(subfield)) < 0 || !GET_EQ(c, pos))
 							strcpy(str,"");
 						else
-							snprintf(str, slen, "%c%d",UID_CHAR, GET_ID(GET_EQ(c, pos)));
+							snprintf(str, slen, "%c%d",UID_CHAR, obj_script_id(GET_EQ(c, pos)));
 					}
 					break;
 				}
@@ -2971,7 +2972,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "fighting")) {
 						if (FIGHTING(c))
-							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(FIGHTING(c)));
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(FIGHTING(c)));
 						else 
 							*str = '\0';
 					}
@@ -2989,7 +2990,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (!c->followers || !c->followers->follower)
 							*str = '\0';
 						else
-							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(c->followers->follower));
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(c->followers->follower));
 					}
 					break;
 				}
@@ -3129,7 +3130,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'i': {	// char.i*
 					if (!str_cmp(field, "id"))
-						snprintf(str, slen, "%d", GET_ID(c));
+						snprintf(str, slen, "%d", char_script_id(c));
 
 					else if (!str_cmp(field, "is_name")) {
 						if (subfield && *subfield && MATCH_CHAR_NAME(subfield, c)) {
@@ -3152,7 +3153,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if(subfield && *subfield) {
 							for (obj = c->carrying;obj;obj=obj->next_content) {
 								if(GET_OBJ_VNUM(obj)==atoi(subfield)) {
-									snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(obj)); /* arg given, found */
+									snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(obj)); /* arg given, found */
 									return;
 								}
 							}
@@ -3161,7 +3162,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else { /* no arg given */
 							if (c->carrying) {
-								snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(c->carrying));
+								snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(c->carrying));
 							}
 							else {
 								strcpy(str, "");
@@ -3263,7 +3264,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (!c->master)
 							strcpy(str, "");
 						else
-							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(c->master));
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(c->master));
 					}
 					else if (!str_cmp(field, "mob_flagged")) {
 						if (subfield && *subfield && IS_NPC(c)) {
@@ -3297,12 +3298,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						
 						// attempt to prevent extracted people from showing in lists
 						temp_ch = c->next_in_room;
-						while (temp_ch && EXTRACTED(temp_ch)) {
+						while (temp_ch && (EXTRACTED(temp_ch) || AFF_FLAGGED(temp_ch, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM))) {
 							temp_ch = temp_ch->next_in_room;
 						}
 						
 						if (temp_ch) {
-							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(temp_ch));
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(temp_ch));
 						}
 						else {
 							strcpy(str, "");
@@ -3331,7 +3332,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						*str = '\0';	// default to no-target
 						if (subfield && *subfield) {
 							if ((targ = get_obj_in_list_vis(c, subfield, c->carrying)) || (targ = get_obj_in_list_vis(c, subfield, ROOM_CONTENTS(IN_ROOM(c))))) {
-								snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(targ));
+								snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(targ));
 							}
 						}
 					}
@@ -3340,7 +3341,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						*str = '\0';	// default to no-target
 						if (subfield && *subfield) {
 							if ((targ = get_obj_in_list_vis(c, subfield, c->carrying))) {
-								snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(targ));
+								snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(targ));
 							}
 						}
 					}
@@ -3677,14 +3678,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'c': {	// obj.c*
 					if (!str_cmp(field, "carried_by")) {
 						if (o->carried_by)
-							snprintf(str, slen,"%c%d",UID_CHAR, GET_ID(o->carried_by));
+							snprintf(str, slen,"%c%d",UID_CHAR, char_script_id(o->carried_by));
 						else
 							strcpy(str,"");
 					}
 
 					else if (!str_cmp(field, "contents")) {
 						if (o->contains)
-							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(o->contains));
+							snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(o->contains));
 						else
 							strcpy(str, "");
 					}
@@ -3767,7 +3768,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'i': {	// obj.i*
 					if (!str_cmp(field, "id"))
-						snprintf(str, slen, "%d", GET_ID(o));
+						snprintf(str, slen, "%d", obj_script_id(o));
 
 					else if (!str_cmp(field, "is_flagged")) {
 						if (subfield && *subfield) {
@@ -3820,7 +3821,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 
 					else if (!str_cmp(field, "next_in_list")) {
 						if (o->next_content)
-							snprintf(str, slen,"%c%d",UID_CHAR, GET_ID(o->next_content));
+							snprintf(str, slen,"%c%d",UID_CHAR, obj_script_id(o->next_content));
 						else
 							strcpy(str,"");
 					}
@@ -3879,7 +3880,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'w': {	// obj.w*
 					if (!str_cmp(field, "worn_by")) {
 						if (o->worn_by)
-							snprintf(str, slen,"%c%d",UID_CHAR, GET_ID(o->worn_by));
+							snprintf(str, slen,"%c%d",UID_CHAR, char_script_id(o->worn_by));
 						else
 							strcpy(str,"");
 					}
@@ -3970,7 +3971,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							for (obj = ROOM_CONTENTS(r); obj; obj = obj->next_content) {
 								if (GET_OBJ_VNUM(obj) == atoi(subfield)) {
 									/* arg given, found */
-									snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(obj)); 
+									snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(obj)); 
 									return;
 								}
 							}
@@ -3979,7 +3980,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else { /* no arg given */
 							if (ROOM_CONTENTS(r)) {
-								snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(ROOM_CONTENTS(r)));
+								snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(ROOM_CONTENTS(r)));
 							}
 							else {
 								strcpy(str, "");
@@ -4101,7 +4102,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "in_vehicle")) {
 						if (GET_ROOM_VEHICLE(r)) {
-							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(GET_ROOM_VEHICLE(r)));
+							snprintf(str, slen, "%c%d", UID_CHAR, veh_script_id(GET_ROOM_VEHICLE(r)));
 						}
 						else {
 							*str = '\0';
@@ -4131,12 +4132,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				
 						// attempt to prevent extracted people from showing in lists
 						temp_ch = ROOM_PEOPLE(r);
-						while (temp_ch && EXTRACTED(temp_ch)) {
+						while (temp_ch && (EXTRACTED(temp_ch) || AFF_FLAGGED(temp_ch, AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM))) {
 							temp_ch = temp_ch->next_in_room;
 						}
 				
 						if (temp_ch) {
-							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(temp_ch));
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(temp_ch));
 						}
 						else {
 							*str = '\0';
@@ -4185,7 +4186,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'v': {	// room.v*
 					if (!str_cmp(field, "vehicles")) {
 						if (ROOM_VEHICLES(r)) {
-							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(ROOM_VEHICLES(r)));
+							snprintf(str, slen, "%c%d", UID_CHAR, veh_script_id(ROOM_VEHICLES(r)));
 						}
 						else {
 							*str = '\0';
@@ -4271,7 +4272,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "contents")) {
 						if (VEH_FLAGGED(v, VEH_CONTAINER) && VEH_CONTAINS(v)) {
-							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(VEH_CONTAINS(v)));
+							snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(VEH_CONTAINS(v)));
 						}
 						else {
 							*str = '\0';
@@ -4302,7 +4303,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'd': {	// veh.d*
 					if (!str_cmp(field, "driver")) {
 						if (VEH_DRIVER(v)) {
-							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(VEH_DRIVER(v)));
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(VEH_DRIVER(v)));
 						}
 						else {
 							*str = '\0';
@@ -4402,7 +4403,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'i': {	// veh.i*
 					if (!str_cmp(field, "id")) {
-						snprintf(str, slen, "%d", GET_ID(v));
+						snprintf(str, slen, "%d", veh_script_id(v));
 					}
 					else if (!str_cmp(field, "in_on")) {
 						snprintf(str, slen, "%s", IN_OR_ON(v));
@@ -4443,7 +4444,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'l': {	// veh.l*
 					if (!str_cmp(field, "led_by")) {
 						if (VEH_LED_BY(v)) {
-							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(VEH_LED_BY(v)));
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(VEH_LED_BY(v)));
 						}
 						else {
 							*str = '\0';
@@ -4477,7 +4478,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "next_in_room")) {
 						if (v->next_in_room) {
-							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(v->next_in_room));
+							snprintf(str, slen, "%c%d", UID_CHAR, veh_script_id(v->next_in_room));
 						}
 						else {
 							strcpy(str, "");
@@ -4500,7 +4501,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "sitting_on") || !str_cmp(field, "sitting_in")) {
 						if (VEH_SITTING_ON(v)) {
-							snprintf(str, slen, "%c%d", UID_CHAR, GET_ID(VEH_SITTING_ON(v)));
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(VEH_SITTING_ON(v)));
 						}
 						else {
 							*str = '\0';
@@ -4570,7 +4571,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'c': {	// emp.c*
 					if (!str_cmp(field, "coins")) {
-						snprintf(str, slen, "%d", EMPIRE_COINS(emp));
+						snprintf(str, slen, "%d", (int) EMPIRE_COINS(emp));
 					}
 					break;
 				}
@@ -4693,7 +4694,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'w': {	// emp.w*
 					if (!str_cmp(field, "wealth")) {
-						snprintf(str, slen, "%d", GET_TOTAL_WEALTH(emp));
+						snprintf(str, slen, "%d", (int) GET_TOTAL_WEALTH(emp));
 					}
 					break;
 				}
@@ -5494,7 +5495,7 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 				}
 			}
 			if (c) 
-				snprintf(uid, sizeof(uid), "%c%d", UID_CHAR, GET_ID(c));
+				snprintf(uid, sizeof(uid), "%c%d", UID_CHAR, char_script_id(c));
 		}
 		else if (is_abbrev(arg, "obj")) {
 			obj_data *o = NULL;
@@ -5518,7 +5519,7 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 				}
 			}
 			if (o)
-				snprintf(uid, sizeof(uid), "%c%d", UID_CHAR, GET_ID(o));
+				snprintf(uid, sizeof(uid), "%c%d", UID_CHAR, obj_script_id(o));
 		}
 		else if (is_abbrev(arg, "room")) {
 			room_data *r = NULL;
@@ -5580,7 +5581,7 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 				}
 			}
 			if (v) {
-				snprintf(uid, sizeof(uid), "%c%d", UID_CHAR, GET_ID(v));
+				snprintf(uid, sizeof(uid), "%c%d", UID_CHAR, veh_script_id(v));
 			}
 		}
 		else {
@@ -5626,8 +5627,8 @@ void process_unset(struct script_data *sc, trig_data *trig, char *cmd) {
 		return;
 	}
 
-	if (!remove_var(&(sc->global_vars), var))
-		remove_var(&GET_TRIG_VARS(trig), var);
+	if (!remove_var(&(sc->global_vars), var, sc->context))
+		remove_var(&GET_TRIG_VARS(trig), var, sc->context);
 }
 
 
@@ -5900,7 +5901,7 @@ void process_global(struct script_data *sc, trig_data *trig, char *cmd, int id) 
 	}    
 
 	add_var(&(sc->global_vars), vd->name, vd->value, id);
-	remove_var(&GET_TRIG_VARS(trig), vd->name);
+	remove_var(&GET_TRIG_VARS(trig), vd->name, id);
 }
 
 

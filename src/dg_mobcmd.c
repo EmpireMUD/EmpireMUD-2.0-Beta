@@ -54,6 +54,7 @@
 #include "vnums.h"
 
 // external vars
+extern const char *alt_dirs[];
 extern const char *damage_types[];
 extern const char *dirs[];
 extern struct instance_data *quest_instance_global;
@@ -186,7 +187,7 @@ ACMD(do_maggro) {
 	
 	// attempt victim first
 	if (victim && can_fight(ch, victim)) {
-		hit(ch, victim, GET_EQ(ch, WEAR_WIELD), FALSE);
+		hit(ch, victim, GET_EQ(ch, WEAR_WIELD), TRUE);
 		
 		// ensure hitting the right person (in this case only)
 		if (victim && !EXTRACTED(victim) && !IS_DEAD(victim) && FIGHTING(ch) && FIGHTING(ch) != victim) {
@@ -211,7 +212,7 @@ ACMD(do_maggro) {
 		}
 		
 		// success!
-		hit(ch, iter, GET_EQ(ch, WEAR_WIELD), FALSE);
+		hit(ch, iter, GET_EQ(ch, WEAR_WIELD), TRUE);
 		return;
 	}
 	
@@ -225,7 +226,7 @@ ACMD(do_maggro) {
 		}
 		
 		// success!
-		hit(ch, iter, GET_EQ(ch, WEAR_WIELD), FALSE);
+		hit(ch, iter, GET_EQ(ch, WEAR_WIELD), TRUE);
 		return;
 	}
 }
@@ -312,7 +313,7 @@ ACMD(do_mkill) {
 	}
 
 	// start fight!
-	hit(ch, victim, GET_EQ(ch, WEAR_WIELD), FALSE);
+	hit(ch, victim, GET_EQ(ch, WEAR_WIELD), TRUE);
 	
 	// ensure hitting the right person
 	if (victim && !EXTRACTED(victim) && !IS_DEAD(victim) && FIGHTING(ch) && FIGHTING(ch) != victim) {
@@ -924,7 +925,7 @@ ACMD(do_mpurge) {
 	// purge vehicle
 	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_in_room_vis(ch, arg))) {
 		if (*argument) {
-			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_ROOM);
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}
 		extract_vehicle(veh);
 	}
@@ -932,7 +933,7 @@ ACMD(do_mpurge) {
 	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_vis(ch, arg))) {
 		if (*argument) {
 			room_data *room = obj_room(obj);
-			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, obj, NULL, TO_ROOM);
+			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, obj, NULL, TO_CHAR | TO_ROOM);
 		}
 		extract_obj(obj);
 	}
@@ -1738,7 +1739,7 @@ ACMD(do_mremember) {
 	}
 
 	/* fill in the structure */
-	mem->id = GET_ID(victim);
+	mem->id = char_script_id(victim);
 	if (argument && *argument) {
 		mem->cmd = strdup(argument);
 	}
@@ -1783,7 +1784,7 @@ ACMD(do_mforget) {
 	mem = SCRIPT_MEM(ch);
 	prev = NULL;
 	while (mem) {
-		if (mem->id == GET_ID(victim)) {
+		if (mem->id == char_script_id(victim)) {
 			if (mem->cmd)
 				free(mem->cmd);
 			if (prev==NULL) {
@@ -1930,7 +1931,7 @@ ACMD(do_mtransform) {
 		char_to_room(m, IN_ROOM(ch));
 
 		memcpy(&tmpmob, m, sizeof(*m));
-		tmpmob.id = ch->id;
+		tmpmob.script_id = ch->script_id;
 		tmpmob.affected = ch->affected;
 		tmpmob.carrying = ch->carrying;
 		tmpmob.proto_script = ch->proto_script;
@@ -2006,7 +2007,7 @@ ACMD(do_mdoor) {
 		return;
 	}
 
-	if ((dir = search_block(direction, dirs, FALSE)) == NO_DIR) {
+	if ((dir = search_block(direction, dirs, FALSE)) == NO_DIR && (dir = search_block(direction, alt_dirs, FALSE)) == NO_DIR) {
 		mob_log(ch, "mdoor: invalid direction");
 		return;
 	}

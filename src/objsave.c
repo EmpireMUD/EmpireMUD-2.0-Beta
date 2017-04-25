@@ -369,6 +369,16 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						GET_OBJ_VAL(obj, 2) = i_in[0];
 					}
 				}
+				else if (OBJ_FILE_TAG(line, "Variable:", length)) {
+					if (sscanf(line + length + 1, "%s %d", s_in, &i_in[0]) != 2 || !get_line(fl, line)) {
+						log("SYSERR: Bad variable format in Obj_load_from_file: #%d", GET_OBJ_VNUM(obj));
+						exit(1);
+					}
+					if (!SCRIPT(obj)) {
+						create_script_data(obj, OBJ_TRIGGER);
+					}
+					add_var(&(SCRIPT(obj)->global_vars), s_in, line, i_in[0]);
+				}
 				else if (OBJ_FILE_TAG(line, "Version:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0])) {
 						OBJ_VERSION(obj) = i_in[0];
@@ -456,6 +466,7 @@ void Crash_save(obj_data *obj, FILE *fp, int location) {
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	char temp[MAX_STRING_LENGTH];
 	struct extra_descr_data *ex;
+	struct trig_var_data *tvd;
 	struct obj_binding *bind;
 	struct obj_apply *apply;
 	obj_data *proto;
@@ -570,7 +581,13 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 			fprintf(fl, "Trigger: %d\n", GET_TRIG_VNUM(trig));
 		}
 		
-		// TODO could save SCRIPT(obj)->global_vars here too
+		LL_FOREACH (SCRIPT(obj)->global_vars, tvd) {
+			if (*tvd->name == '-') { // don't save if it begins with -
+				continue;
+			}
+			
+			fprintf(fl, "Variable: %s %ld\n%s\n", tvd->name, tvd->context, tvd->value);
+		}
 	}
 	
 	fprintf(fl, "End\n");

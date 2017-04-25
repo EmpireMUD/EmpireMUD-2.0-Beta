@@ -351,10 +351,12 @@ void taste_blood(char_data *ch, char_data *vict) {
 		if (GET_BLOOD(vict) != GET_MAX_BLOOD(vict)) {
 			sprintf(buf, "$E is missing about %d%% of $S blood.", (GET_MAX_BLOOD(vict) - GET_BLOOD(vict)) * 100 / GET_MAX_BLOOD(vict));
 			act(buf, FALSE, ch, 0, vict, TO_CHAR);
-			}
-
-		sprintf(buf, "$E is about %d years old.", GET_AGE(vict) + number(-1, 1));
-		act(buf, FALSE, ch, 0, vict, TO_CHAR);
+		}
+		
+		if (!IS_NPC(vict)) {
+			sprintf(buf, "$E is about %d years old.", GET_AGE(vict) + number(-1, 1));
+			act(buf, FALSE, ch, 0, vict, TO_CHAR);
+		}
 		
 		command_lag(ch, WAIT_ABILITY);
 		if (can_gain_exp_from(ch, vict)) {
@@ -450,6 +452,9 @@ void update_biting_char(char_data *ch) {
 		GET_BLOOD(victim) = 0;
 
 		if (!IS_NPC(victim) && !PRF_FLAGGED(ch, PRF_AUTOKILL)) {
+			// give back a little blood
+			GET_BLOOD(victim) = 1;
+			GET_BLOOD(ch) -= 1;
 			do_bite(ch, "", 0, 0);
 			return;
 		}
@@ -681,7 +686,7 @@ ACMD(do_bite) {
 					
 					command_lag(ch, WAIT_COMBAT_ABILITY);
 					if (!FIGHTING(victim)) {
-						hit(victim, ch, GET_EQ(victim, WEAR_WIELD), FALSE);
+						hit(victim, ch, GET_EQ(victim, WEAR_WIELD), TRUE);
 					}
 					return;
 				}

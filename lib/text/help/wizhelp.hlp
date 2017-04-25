@@ -73,6 +73,16 @@ Examples:
 
 See also: GRANT, WIZLOCK
 #d
+BREAKREPLY "BREAK REPLY"
+
+Usage:  breakreply
+
+This command cancels the "reply-to" data for all players in the game who are
+lower level than you. It's useful it you want to be invisible and don't want
+players to be able to see that you're online using "reply".
+
+See also: REPLY
+#d
 CLEARABILITIES
 
 Usage:  clearabilities <player> <skill | all>
@@ -300,6 +310,7 @@ Most of the grant names correspond to actual commands, but some are special:
  empires - Allows eedit, edelete, moveeinv, and more.
  olc - Allows .olc, vnum, and vstat.
  olc-controls - Allows .setflags, .setminvnum, and .setmaxvnum.
+ transfer - Allows moving mortals with commands like transfer and portal.
 
 Try 'helpsearch grantable' to find grantable commands.
 
@@ -321,7 +332,7 @@ who doesn't want to be interfered with.
 
 See also: TOGGLE
 #d
-HOLYLIGHT
+HOLYLIGHT "TOGGLE HOLYLIGHT"
 
 Usage:  toggle holylight
 
@@ -708,7 +719,7 @@ RETURN returns you to your regular body if you are switched into a mob.
 
 See also: SWITCH
 #d
-ROOMFLAGS
+ROOMFLAGS "TOGGLE ROOMFLAGS" "ROOM FLAGS"
 
 Usage:  toggle roomflags
 

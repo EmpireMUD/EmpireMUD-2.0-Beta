@@ -265,8 +265,12 @@ void string_add(descriptor_data *d, char *str) {
 		}
 		else if (STATE(d) == CON_PLAYING && d->mail_to >= BOARD_MAGIC) {
 			Board_save_board(d->mail_to - BOARD_MAGIC);
-			if (action == STRINGADD_ABORT)
+			if (action == STRINGADD_ABORT) {
 				SEND_TO_Q("Post not aborted, use REMOVE <post #>.\r\n", d);
+			}
+			else {
+				SEND_TO_Q("Post complete.\r\n", d);
+			}
 		}
 		else if (d->notes_id > 0) {
 			if (action != STRINGADD_ABORT) {
@@ -1095,7 +1099,7 @@ int format_script(struct descriptor_data *d) {
 
 
 void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen) {
-	int line_chars, startlen, cap_next = TRUE, cap_next_next = FALSE;
+	int line_chars, startlen, len, cap_next = TRUE, cap_next_next = FALSE;
 	char *flow, *start = NULL, temp;
 	char formatted[MAX_STRING_LENGTH];
 
@@ -1171,7 +1175,14 @@ void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int m
 			}
 		}
 	}
-
+	
+	// prevent trailing double-crlf by removing all trailing space
+	len = strlen(formatted);
+	while (len > 0 && strchr("\n\r\f\t\v ", formatted[len-1])) {
+		formatted[--len] = '\0';
+	}
+	
+	// re-add a crlf
 	strcat(formatted, "\r\n");
 
 	if (strlen(formatted) + 1 > maxlen)

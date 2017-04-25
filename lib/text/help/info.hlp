@@ -109,7 +109,7 @@ There is also currently a maximum rating of 15 in these attributes.
 
 See also: DODGE, DPS, EMPIRE GREATNESS, SPEED, TO-HIT
 #
-AUTORECALL "AUTO-RECALL" "AUTO RECALL"
+AUTORECALL "AUTO-RECALL" "AUTO RECALL" "TOGGLE AUTORECALL"
 
 Usage:  toggle autorecall
 
@@ -252,7 +252,7 @@ twice.
 Available traits:
  More Strength, Dexterity, Charisma, Greatness, Intelligence, or Wits - +1
  Extra health, moves, or mana - +15
- Faster health, move, or mana regeneration - +1
+ Faster health, move, or mana regeneration - 1 + (level/20)
  Faster chores - chopping, digging, and other chores go faster
  Extra daily bonus experience - 5 extra daily bonus experience points
  Larger inventory - Carry 5 more small items (or 2 more large items)
@@ -302,7 +302,7 @@ This will let you cook food, brew potions, or craft pottery.
 You can also cook in a Kitchen, Alchemist, Pottery, or Laboratory. If you have
 the Touch of Flame ability, you don't need a fire at all.
 
-See also: LIGHT, TOUCH OF FLAME
+See also: DOUSE, LIGHT, TOUCH OF FLAME
 #
 CHAMELEON
 
@@ -334,7 +334,7 @@ Local channels
 say - in-character speech
 oocsay - out-of-character speech
 
-See also: TOGGLE, SLASH-CHANNELS
+See also: TOGGLE, SAY, SLASH-CHANNELS
 #
 COIN COINS COINAGE CURRENCY GOLD
 
@@ -517,6 +517,17 @@ Physical and poison DoTs can be removed by firstaid and cleanse. Magical and
 fire DoTs can be removed by dispel.
 
 See also: AFFECTS, CLEANSE, DISPEL, FIRSTAID, SCORE
+#
+DRUNK DRUNKENNESS ALCOHOL SOBER "SOBERING UP" "WHY WON'T THE WORLD STOP SPINNING"
+
+If you find yourself with a pint of ale or some other lubricating libation,
+you may also notice the world beginning to spin. This is perfectly normal, and
+you can get off the ride at any time just by casting a 'cleanse' spell on
+yourself.
+
+You can also sober up faster by sleeping it off.
+
+See also: CLEANSE, SLEEP, TAVERN
 #
 FARMING CROPS ORCHARDS AGRICULTURE APPLES WHEAT CORN HOPS COTTON BARLEY PEACHES CHERRIES ORANGES RICE OLIVES PEAS GOURDS PLANTAINS TOMATOES BANANAS COCONUTS GRAPES PEPPERS POTATOES PLUMS STRAWBERRIES MANGOES BLUEBERRIES COFFEE OATS WATERMELONS
 
@@ -807,7 +818,7 @@ If you have the Navigation ability, this will also include the location.
 You can specify what type of thing to look (cities, adventures, starting
 locations) if you want a shorter list.
 #
-PLAYERKILLING "PLAYER KILLING" PK PVP
+PLAYERKILLING "PLAYER KILLING" PK PVP "TOGGLE PVP"
 
 EmpireMUD player-killing rules
 
@@ -831,6 +842,22 @@ If you want free and open PVP, you can turn this on with "toggle pvp". This
 flag will remain active for 5 minutes after you shut it off.
 
 See also: TOGGLE
+#
+POSITIONS
+
+Your character's position determines which commands you can use, whether you
+can move, or how injured you are. The following positions are available:
+  &cStanding&0 - Able to move, fight, and act (the default position).
+  &cFighting&0 - Engaged in combat.
+  &cSitting&0 - Slightly boosted regen, still able to interact.
+  &cResting&0 - Slightly boosted regen, still able to interact.
+  &cSleeping&0 - Very fast regen, unable to see or do anything.
+  &cStunned&0 - Injured in battle, but will recover.
+  &cIncapacitated&0 - Slowly dying, but we're all dying at different speeds.
+  &cMortally wounded&0 - The Usain Bolt of dying.
+  &cDead&0 - The final position.
+
+See also: RESPAWN, REST, SIT, STAND, WAKE
 #
 "QUEST ITEM" "QUEST OBJECT" "QUEST FLAG"
 

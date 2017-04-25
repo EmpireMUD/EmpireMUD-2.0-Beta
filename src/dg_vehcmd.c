@@ -634,7 +634,7 @@ VCMD(do_vpurge) {
 	else if ((o = get_obj_by_vehicle(veh, arg))) {
 		if (*argument) {
 			room_data *room = obj_room(o);
-			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, o, NULL, TO_ROOM);
+			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, o, NULL, TO_CHAR | TO_ROOM);
 		}
 		extract_obj(o);
 	}
@@ -643,7 +643,7 @@ VCMD(do_vpurge) {
 			dg_owner_purged = 1;
 		}
 		if (*argument) {
-			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(v)), NULL, v, TO_ROOM);
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(v)), NULL, v, TO_CHAR | TO_ROOM);
 		}
 		extract_vehicle(v);
 	}
@@ -1219,7 +1219,7 @@ VCMD(do_vdoor) {
 		return;
 	}
 
-	if ((dir = search_block(direction, dirs, FALSE)) == NOTHING) {
+	if ((dir = search_block(direction, dirs, FALSE)) == NO_DIR && (dir = search_block(direction, alt_dirs, FALSE)) == NO_DIR) {
 		veh_log(veh, "vdoor: invalid direction");
 		return;
 	}

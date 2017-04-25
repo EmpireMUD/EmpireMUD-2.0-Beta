@@ -298,7 +298,8 @@ int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board) 
 		send_to_char("You try but fail to understand the holy words.\r\n", ch);
 		return (1);
 	}
-	act("$n studies the board.", TRUE, ch, 0, 0, TO_ROOM);
+	// this results in a double message with "$n looks at $p."
+	//act("$n studies the board.", TRUE, ch, 0, 0, TO_ROOM);
 
 	strcpy(buf,
 		"This is a bulletin board. Usage: READ/REMOVE <messg #>, WRITE <header>.\r\n"

@@ -35,6 +35,9 @@
 
 // external vars
 
+// external funcs
+void check_combat_start(char_data *ch);
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
@@ -296,6 +299,10 @@ ACMD(do_damage_spell) {
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
 	}
+	
+	// start meters now, to track direct damage()
+	check_combat_start(ch);
+	check_combat_start(vict);
 	
 	// special-casing damage (done AFTER cost); requires vict
 	if (damage_spell[type].ability == ABIL_SUNSHOCK && IS_VAMPIRE(vict)) {

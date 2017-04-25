@@ -78,6 +78,7 @@ ACMD(do_blind);
 ACMD(do_bloodsweat);
 ACMD(do_board);
 ACMD(do_boost);
+ACMD(do_breakreply);
 ACMD(do_build);
 ACMD(do_butcher);
 
@@ -92,6 +93,7 @@ ACMD(do_class);
 ACMD(do_claws);
 ACMD(do_cleanse);
 ACMD(do_clearabilities);
+ACMD(do_clearmeters);
 ACMD(do_coins);
 ACMD(do_collapse);
 ACMD(do_colorburst);
@@ -578,6 +580,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "boost", POS_RESTING, do_boost, NO_MIN, CTYPE_UTIL, ABIL_BOOST ),
 	SCMD_CMD( "bookedit", POS_STANDING, do_library, NO_MIN, CTYPE_UTIL, SCMD_BOOKEDIT ),
 	STANDARD_CMD( "brew", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_BREW, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	SIMPLE_CMD( "breakreply", POS_DEAD, do_breakreply, LVL_START_IMM, CTYPE_IMMORTAL ),
 	SCMD_CMD( "bug", POS_DEAD, do_gen_write, NO_MIN, CTYPE_COMM, SCMD_BUG ),
 	ABILITY_CMD( "butcher", POS_STANDING, do_butcher, NO_MIN, CTYPE_SKILL, ABIL_BUTCHER ),
 
@@ -596,6 +599,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "claws", POS_RESTING, do_claws, NO_MIN, CTYPE_SKILL, ABIL_CLAWS ),
 	ABILITY_CMD( "cleanse", POS_FIGHTING, do_cleanse, NO_MIN, CTYPE_SKILL, ABIL_CLEANSE ),
 	SCMD_CMD( "clear", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_CLEAR ),
+	SIMPLE_CMD( "clearmeters", POS_DEAD, do_clearmeters, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "clearabilities", POS_DEAD, do_clearabilities, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_CLEARABILITIES ),
 	SCMD_CMD( "close", POS_SITTING, do_gen_door, NO_MIN, CTYPE_MOVE, SCMD_CLOSE ),
 	SCMD_CMD( "cls", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_CLEAR ),
@@ -659,8 +663,10 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "efind", POS_SLEEPING, do_efind, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "elog", POS_DEAD, do_elog, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "empires", POS_DEAD, do_empires, NO_MIN, CTYPE_EMPIRE ),
-	SIMPLE_CMD( "empireinventory", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE ),
-	SIMPLE_CMD( "einventory", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE ),
+	SCMD_CMD( "empireidentify", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EIDENTIFY ),
+	SCMD_CMD( "eidentify", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EIDENTIFY ),
+	SCMD_CMD( "empireinventory", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EINVENTORY ),
+	SCMD_CMD( "einventory", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EINVENTORY ),
 	SIMPLE_CMD( "emotd", POS_DEAD, do_emotd, NO_MIN, CTYPE_EMPIRE ),
 	SCMD_CMD( "emote", POS_RESTING, do_echo, NO_MIN, CTYPE_COMM, SCMD_EMOTE ),
 	SCMD_CMD( ":", POS_RESTING, do_echo, NO_MIN, CTYPE_COMM, SCMD_EMOTE ),
@@ -1007,7 +1013,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "vstat", POS_DEAD, do_vstat, LVL_START_IMM, CTYPE_IMMORTAL, GRANT_OLC ),
 
 	SIMPLE_CMD( "wake", POS_SLEEPING, do_wake, NO_MIN, CTYPE_MOVE ),
-	SIMPLE_CMD( "warehouse", POS_RESTING, do_warehouse, NO_MIN, CTYPE_MOVE ),
+	SIMPLE_CMD( "warehouse", POS_DEAD, do_warehouse, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "wear", POS_RESTING, do_wear, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "weaken", POS_FIGHTING, do_weaken, NO_MIN, CTYPE_COMBAT, ABIL_WEAKEN ),
 	SIMPLE_CMD( "weather", POS_RESTING, do_weather, NO_MIN, CTYPE_UTIL ),
@@ -2544,7 +2550,10 @@ void nanny(descriptor_data *d, char *arg) {
 			SEND_TO_Q("\r\n*** Press ENTER: ", d);
 			STATE(d) = CON_RMOTD;
 
-			syslog(SYS_LOGIN, 0, TRUE, "NEW: %s [%s] (%s/%s)", GET_NAME(d->character), d->host, GET_PROMO_ID(d->character) > 0 ? promo_codes[GET_PROMO_ID(d->character)].code : "no promo", (GET_REFERRED_BY(d->character) && *GET_REFERRED_BY(d->character)) ? GET_REFERRED_BY(d->character) : "no referral");
+			syslog(SYS_LOGIN, 0, TRUE, "NEW: %s [%s] (promo: %s)", GET_NAME(d->character), d->host, GET_PROMO_ID(d->character) > 0 ? promo_codes[GET_PROMO_ID(d->character)].code : "none");
+			if (GET_REFERRED_BY(d->character) && *GET_REFERRED_BY(d->character)) {
+				syslog(SYS_LOGIN, 0, FALSE, "Referral: %s", GET_REFERRED_BY(d->character));
+			}
 			break;
 		}
 

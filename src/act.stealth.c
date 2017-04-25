@@ -36,6 +36,7 @@
 extern const int rev_dir[];
 
 // external funcs
+void check_combat_start(char_data *ch);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 void scale_item_to_level(obj_data *obj, int level);
 
@@ -649,6 +650,10 @@ ACMD(do_backstab) {
 	}
 	else {
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_BACKSTAB, 9, WAIT_COMBAT_ABILITY);
+	
+		// start meters now, to track direct damage()
+		check_combat_start(ch);
+		check_combat_start(vict);
 
 		success = !AWAKE(vict) || !CAN_SEE(vict, ch) || skill_check(ch, ABIL_BACKSTAB, DIFF_EASY);
 
@@ -1214,6 +1219,9 @@ ACMD(do_pickpocket) {
 	}
 	else if (ch_emp && vict_emp && GET_RANK(ch) < EMPIRE_PRIV(ch_emp, PRIV_STEALTH) && !has_relationship(ch_emp, vict_emp, DIPL_WAR)) {
 		msg_to_char(ch, "You don't have permission to steal that -- you could start a war!\r\n");
+	}
+	else if (ch_emp && vict_emp && !PRF_FLAGGED(ch, PRF_STEALTHABLE) && !has_relationship(ch_emp, vict_emp, DIPL_WAR)) {
+		msg_to_char(ch, "You cannot pickpocket that target because your 'stealthable' toggle is off.\r\n");
 	}
 	else if (FIGHTING(vict)) {
 		msg_to_char(ch, "You can't steal from someone who's fighting.\r\n");

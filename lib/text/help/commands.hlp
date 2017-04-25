@@ -313,6 +313,16 @@ sides by walls. You can circle up to three closed buildings in a row.
 
 You cannot circle onto water tiles or rough terrain.
 #
+CLEARMETERS "CLEAR METERS" "TOGGLE CLEARMETERS"
+
+Usage:  clearmeters
+        toggle clearmeters
+
+This command clears your combat meters so you can get fresh data. Or, you can
+use the toggle to automatically clear meters whenever you start a new fight.
+
+See also: METERS, TOGGLE
+#
 CLS
 
 Usage:  cls
@@ -493,7 +503,7 @@ If your empire has a workforce, the fire brigade can also put out fires for
 you. They will always succeed if left alone. However, they do so very slowly
 and are easy targets for enemy players at war.
 
-See also: WORKFORCE
+See also: COOKING FIRE, LIGHT, WORKFORCE
 #
 DRAG
 
@@ -544,6 +554,11 @@ Usage:  eat <item>
 If you're hungry or thirsty, these commands are for you! You can drink from
 wells, fountains, and the edge of nearby rivers, too.
 
+Being hungry or thirsty causes you to regenerate health, moves, and mana more
+slowly. It will also slow down any action you take, such as chopping or
+sailing. If you can no longer regenerate moves due to hunger, try sleeping.
+
+Examples:
   > eat bread
   > taste bread
   > drink from cup
@@ -804,6 +819,8 @@ This command provides detailed information about an item or vehicle.
 
 Tip: When trying to identify an item in your inventory that has the same name
 as something you are wearing, try using "1.name".
+
+See also: EIDENTIFY
 #
 INFORMATIVE "TOGGLE INFORMATIVE"
 
@@ -1029,7 +1046,11 @@ METERS "COMBAT METERS"
 
 Usage:  meters
 
-This shows your combat meters from your current or most recent fight.
+This shows your combat meters from your recent fights. If you turn on the
+"clearmeters" toggle, your meters will clear before every new fight. You can
+also type "clearmeters" to clear them at any time.
+
+See also: CLEARMETERS
 #
 MORTLOG
 
@@ -1068,7 +1089,7 @@ a slow connection or if it just annoys you.
 
 See also: TOGGLE
 #
-NOTELL "NO TELL"
+NOTELL "NO TELL" "TOGGLE TELL"
 
 Usage:  toggle tell
 
@@ -1076,7 +1097,7 @@ Use this toggle if you wish to prevent other players from using "tell" to
 communicate with you. (notell) will appear after your name in the WHO list if
 you have notell on.
 
-See also: IGNORE, TELL, WHO
+See also: IGNORE, TELL, TOGGLE, WHO
 #
 OPEN CLOSE
 
@@ -1346,6 +1367,7 @@ Someone tells you, 'I am your secret admirer.'
 You tell someone, 'Who are you?'
 
 See also: IGNORE, TELL, NOTELL
+Immortals see also: BREAKREPLY
 #
 ROADSIGN "ROAD SIGN" SIGN "BLANK SIGN"
 
@@ -1439,7 +1461,7 @@ You can use ' as a shorthand for say, and " for oocsay, as in:
 
   > 'hello there.
 
-See also: GSAY, IGNORE, NOREPEAT, NOTELL, REPLY, SLASH CHANNELS
+See also: CHANNELS, GSAY, IGNORE, NOREPEAT, NOTELL, REPLY, SLASH CHANNELS
 #
 SAYHISTORY
 
@@ -1767,7 +1789,7 @@ Handy time-conversion chart:
  - 1 regeneration tick in-game = 5 seconds
  - 1 hour in-game = 75 seconds
  - 1 day in-game = 30 minutes
- - 1 year in-game = 7 days
+ - 1 year in-game = 7.5 days
 #
 TITLE
 
@@ -1811,6 +1833,7 @@ Toggles:
   stealthable - if off, you will be prevented from accidentally stealing
   autodismount - will dismount you while moving, if necessary
   no-empire - will not create a new empire when you try to claim or build
+  clearmeters - automatically clears your meters between combats
 
 Immortal toggles:
   wiznet - shuts off the immortal channel
@@ -1822,7 +1845,7 @@ Immortal toggles:
   wizhide - if on, the immortal can't be seen in rooms but is not invisible
   autonotes - automatically show notes on accounts when players log in
 
-See also: FIGHT MESSAGES
+See also: FIGHT MESSAGES, TOGGLE <type>
 #
 "TOGGLE NO-EMPIRE" "TOGGLE NOEMPIRE" NOEMPIRE NO-EMPIRE
 
