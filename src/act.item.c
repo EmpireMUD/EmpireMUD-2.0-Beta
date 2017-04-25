@@ -261,7 +261,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	struct custom_message *ocm;
 	player_index_data *index;
 	struct obj_apply *apply;
-	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH], *temp;
 	crop_data *cp;
 	bld_data *bld;
 	int found;
@@ -388,8 +388,24 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		case ITEM_CORPSE:
 			msg_to_char(ch, "Corpse of ");
 
-			if (mob_proto(GET_CORPSE_NPC_VNUM(obj)))
-				msg_to_char(ch, "%s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
+			if (mob_proto(GET_CORPSE_NPC_VNUM(obj))) {
+				strcpy(lbuf, get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
+				if (strstr(lbuf, "#n") || strstr(lbuf, "#a") || strstr(lbuf, "#e")) {
+					// #n
+					temp = str_replace("#n", "<name>", lbuf);
+					strcpy(lbuf, temp);
+					free(temp);
+					// #e
+					temp = str_replace("#e", "<empire>", lbuf);
+					strcpy(lbuf, temp);
+					free(temp);
+					// #a
+					temp = str_replace("#a", "<empire>", lbuf);
+					strcpy(lbuf, temp);
+					free(temp);
+				}
+				msg_to_char(ch, "%s\r\n", lbuf);
+			}
 			else if (IS_NPC_CORPSE(obj))
 				msg_to_char(ch, "nothing.\r\n");
 			else
