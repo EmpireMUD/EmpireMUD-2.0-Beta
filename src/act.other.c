@@ -1409,8 +1409,8 @@ ACMD(do_confirm) {
 		return;
 	}
 
-	if (reboot_control.time == -1) {
-		msg_to_char(ch, "No reboot has been set!\r\n");
+	if (reboot_control.time == -1 || reboot_control.time > 15) {
+		msg_to_char(ch, "There is no upcoming reboot to confirm for!\r\n");
 		return;
 	}
 
