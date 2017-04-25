@@ -254,7 +254,7 @@ void check_pointless_fight(char_data *mob) {
 	}
 	
 	any = FALSE;
-	LL_FOREACH(ROOM_PEOPLE(IN_ROOM(mob)), iter) {
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(mob)), iter, next_in_room) {
 		if (iter == mob || FIGHTING(iter) != mob) {
 			continue;	// only care about people fighting mob
 		}
@@ -270,7 +270,7 @@ void check_pointless_fight(char_data *mob) {
 		stop_fighting(mob);
 		
 		// stop everyone hitting mob
-		LL_FOREACH(ROOM_PEOPLE(IN_ROOM(mob)), iter) {
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(mob)), iter, next_in_room) {
 			if (FIGHTING(iter) == mob) {
 				stop_fighting(iter);
 			}

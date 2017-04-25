@@ -1376,7 +1376,7 @@ char_data *find_mob_in_room_by_vnum(room_data *room, mob_vnum vnum) {
 char_data *find_mortal_in_room(room_data *room) {
 	char_data *iter;
 	
-	LL_FOREACH(ROOM_PEOPLE(room), iter) {
+	LL_FOREACH2(ROOM_PEOPLE(room), iter, next_in_room) {
 		if (!IS_NPC(iter) && !IS_IMMORTAL(iter) && !IS_GOD(iter)) {
 			return iter;
 		}
