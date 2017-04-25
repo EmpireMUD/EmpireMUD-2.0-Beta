@@ -1663,6 +1663,10 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 			return FALSE;
 		}
 	}
+	else if (find_city_by_name(GET_LOYALTY(ch), argument)) {
+		msg_to_char(ch, "You need to purchase the City Teleportation ability to do that.\r\n");
+		return FALSE;
+	}
 	else {
 		msg_to_char(ch, "That's not a valid place to teleport.\r\n");
 		return FALSE;
