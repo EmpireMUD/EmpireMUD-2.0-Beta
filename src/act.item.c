@@ -4635,6 +4635,10 @@ ACMD(do_pour) {
 			send_to_char("You can't pour anything into that.\r\n", ch);
 			return;
 		}
+		if (GET_DRINK_CONTAINER_CONTENTS(to_obj) >= GET_DRINK_CONTAINER_CAPACITY(to_obj)) {
+			act("$p is already full.", FALSE, ch, to_obj, NULL, TO_CHAR);
+			return;
+		}
 	}
 	if (to_obj == from_obj) {
 		send_to_char("A most unproductive effort.\r\n", ch);
