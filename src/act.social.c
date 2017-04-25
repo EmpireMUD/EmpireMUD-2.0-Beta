@@ -28,6 +28,8 @@
 */
 
 // external funcs
+void add_to_channel_history(descriptor_data *desc, int type, char *message);
+void clear_last_act_message(descriptor_data *desc);
 extern bool validate_social_requirements(char_data *ch, social_data *soc);
 
 // locals
@@ -321,7 +323,9 @@ ACMD(do_insult) {
 ACMD(do_point) {
 	extern const char *dirs[];
 	
+	char buf[MAX_STRING_LENGTH];
 	char_data *vict, *next_vict;
+	char color;
 	int dir;
 	
 	one_argument(argument, arg);
@@ -330,14 +334,30 @@ ACMD(do_point) {
 		msg_to_char(ch, "Point at what?\r\n");
 	}
 	else if ((dir = parse_direction(ch, arg)) != NO_DIR && dir != DIR_RANDOM) {
-		msg_to_char(ch, "You point %s.\r\n", dirs[get_direction_for_char(ch, dir)]);
+		color = (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0';
+		
+		sprintf(buf, "\t%cYou point %s.\t0\r\n", color, dirs[get_direction_for_char(ch, dir)]);
+		send_to_char(buf, ch);
+		if (ch->desc) {
+			add_to_channel_history(ch->desc, CHANNEL_HISTORY_SAY, buf);
+		}
 		
 		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = next_vict) {
 			next_vict = vict->next_in_room;
 			
 			if (vict != ch && CAN_SEE(vict, ch) && AWAKE(vict)) {
-				sprintf(buf, "$n points %s.", dirs[get_direction_for_char(vict, dir)]);
+				if (vict->desc) {
+					clear_last_act_message(vict->desc);
+				}
+				
+				color = (!IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_EMOTE) : '0';
+				sprintf(buf, "\t%c$n points %s.\t0", color, dirs[get_direction_for_char(vict, dir)]);
 				act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_NOT_IGNORING);
+				
+				// channel history
+				if (vict->desc && vict->desc->last_act_message) {
+					add_to_channel_history(vict->desc, CHANNEL_HISTORY_SAY, vict->desc->last_act_message);
+				}
 			}
 		}
 	}
