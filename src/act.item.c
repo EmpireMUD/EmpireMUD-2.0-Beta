@@ -392,15 +392,15 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 				strcpy(lbuf, get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
 				if (strstr(lbuf, "#n") || strstr(lbuf, "#a") || strstr(lbuf, "#e")) {
 					// #n
-					temp = str_replace("#n", "<name>", lbuf);
+					temp = str_replace("#n", "somebody", lbuf);
 					strcpy(lbuf, temp);
 					free(temp);
 					// #e
-					temp = str_replace("#e", "<empire>", lbuf);
+					temp = str_replace("#e", "the empire", lbuf);
 					strcpy(lbuf, temp);
 					free(temp);
 					// #a
-					temp = str_replace("#a", "<empire>", lbuf);
+					temp = str_replace("#a", "imperial", lbuf);
 					strcpy(lbuf, temp);
 					free(temp);
 				}
