@@ -3641,6 +3641,8 @@ const char *requirement_types[] = {
 	"HAVE-ABILITY",	// 15
 	"REP-OVER",
 	"REP-UNDER",
+	"WEARING",
+	"WEARING-OR-HAS",
 	"\n",
 };
 
@@ -3665,6 +3667,8 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NONE,	// have ability
 	REQ_AMT_REPUTATION,	// faction-over
 	REQ_AMT_REPUTATION,	// faction-under
+	REQ_AMT_NONE,	// wearing
+	REQ_AMT_NONE,	// wearing-or-has
 };
 
 
@@ -3688,6 +3692,8 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// have ability
 	FALSE,	// faction-over
 	FALSE,	// faction-under
+	FALSE,	// wearing
+	FALSE,	// wearing-or-has
 };
 
 

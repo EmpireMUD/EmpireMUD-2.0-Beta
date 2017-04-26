@@ -618,6 +618,9 @@ void do_stat_social(char_data *ch, social_data *soc) {
 	sprintbit(SOC_FLAGS(soc), social_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
 	
+	get_requirement_display(SOC_REQUIREMENTS(soc), part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Requirements:\r\n%s", *part ? part : " none\r\n");
+	
 	size += snprintf(buf + size, sizeof(buf) - size, "Messages:\r\n");
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
 		size += snprintf(buf + size, sizeof(buf) - size, "\tc%s\t0: %s\r\n", social_message_types[iter][0], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");

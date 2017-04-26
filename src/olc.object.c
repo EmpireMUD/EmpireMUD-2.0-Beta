@@ -663,6 +663,10 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		found |= delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_OBJECT, vnum);
 		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_GET_OBJECT, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_GET_OBJECT, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_WEARING, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_WEARING, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_WEARING_OR_HAS, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_WEARING_OR_HAS, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
@@ -808,6 +812,10 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_OBJECT, vnum);
 			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_GET_OBJECT, vnum);
 			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_GET_OBJECT, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_WEARING, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_WEARING, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_WEARING_OR_HAS, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_WEARING_OR_HAS, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
@@ -1277,6 +1285,10 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_OBJECT, vnum);
 		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_GET_OBJECT, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_GET_OBJECT, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_WEARING, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_WEARING, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_WEARING_OR_HAS, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_WEARING_OR_HAS, vnum);
 		
 		if (any) {
 			++found;

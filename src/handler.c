@@ -5498,6 +5498,46 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				break;
 			}
+			case REQ_WEARING: {
+				bool found = FALSE;
+				int iter;
+				
+				for (iter = 0; iter < NUM_WEARS; ++iter) {
+					if (GET_EQ(ch, iter) && GET_OBJ_VNUM(GET_EQ(ch, iter)) == req->vnum) {
+						found = TRUE;
+						break;
+					}
+				}
+				
+				if (!found) {
+					return FALSE;
+				}
+				
+				break;
+			}
+			case REQ_WEARING_OR_HAS: {
+				struct resource_data *res = NULL;
+				bool found = FALSE;
+				int iter;
+				
+				for (iter = 0; iter < NUM_WEARS; ++iter) {
+					if (GET_EQ(ch, iter) && GET_OBJ_VNUM(GET_EQ(ch, iter)) == req->vnum) {
+						found = TRUE;
+						break;
+					}
+				}
+				
+				if (!found) {
+					// check inventory
+					add_to_resource_list(&res, RES_OBJECT, req->vnum, req->needed, 0);
+					if (!has_resources(ch, res, FALSE, FALSE)) {
+						return FALSE;
+					}
+					free_resource_list(res);
+				}
+				
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -5620,6 +5660,14 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_REP_UNDER: {
 			snprintf(output, sizeof(output), "%s%s not over %s", vnum, get_faction_name_by_vnum(req->vnum), get_reputation_name(req->needed));
+			break;
+		}
+		case REQ_WEARING: {
+			snprintf(output, sizeof(output), "Wearing object: %s%s", vnum, get_obj_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_WEARING_OR_HAS: {
+			snprintf(output, sizeof(output), "Wearing or has object: %s%s", vnum, get_obj_name_by_proto(req->vnum));
 			break;
 		}
 		default: {

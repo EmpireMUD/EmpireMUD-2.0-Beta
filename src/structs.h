@@ -354,6 +354,8 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_HAVE_ABILITY  15
 #define REQ_REP_OVER  16
 #define REQ_REP_UNDER  17
+#define REQ_WEARING  18
+#define REQ_WEARING_OR_HAS  19
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
