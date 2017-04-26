@@ -261,7 +261,9 @@ void free_social(social_data *soc) {
 		}
 	}
 	
-	free_requirements(SOC_REQUIREMENTS(soc));
+	if (SOC_REQUIREMENTS(soc) && (!proto || SOC_REQUIREMENTS(soc) != SOC_REQUIREMENTS(proto))) {
+		free_requirements(SOC_REQUIREMENTS(soc));
+	}
 	
 	free(soc);
 }
