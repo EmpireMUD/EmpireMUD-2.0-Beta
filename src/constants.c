@@ -2358,53 +2358,6 @@ const char *quest_reward_types[] = {
 };
 
 
-// QT_x (1/2): quest tracker types
-const char *quest_tracker_types[] = {
-	"COMPLETED-QUEST",	// 0
-	"GET-COMPONENT",
-	"GET-OBJECT",
-	"KILL-MOB",
-	"KILL-MOB-FLAGGED",
-	"NOT-COMPLETED-QUEST",	// 5
-	"NOT-ON-QUEST",
-	"OWN-BUILDING",
-	"OWN-VEHICLE",
-	"SKILL-LEVEL-OVER",
-	"SKILL-LEVEL-UNDER",	// 10
-	"TRIGGERED",
-	"VISIT-BUILDING",
-	"VISIT-ROOM-TEMPLATE",
-	"VISIT-SECTOR",
-	"HAVE-ABILITY",	// 15
-	"REP-OVER",
-	"REP-UNDER",
-	"\n",
-};
-
-
-// QT_x (2/2): quest tracker types that take a numeric arg
-const bool quest_tracker_amt_type[] = {
-	QT_AMT_NONE,	// completed quest
-	QT_AMT_NUMBER,	// get component
-	QT_AMT_NUMBER,	// get object
-	QT_AMT_NUMBER,	// kill mob
-	QT_AMT_NUMBER,	// kill mob flagged
-	QT_AMT_NONE,	// not completed quest
-	QT_AMT_NONE,	// not on quest
-	QT_AMT_NUMBER,	// own building
-	QT_AMT_NUMBER,	// own vehicle
-	QT_AMT_THRESHOLD,	// skill over
-	QT_AMT_THRESHOLD,	// skill under
-	QT_AMT_NONE,	// triggered
-	QT_AMT_NONE,	// visit building
-	QT_AMT_NONE,	// visit rmt
-	QT_AMT_NONE,	// visit sect
-	QT_AMT_NONE,	// have ability
-	QT_AMT_REPUTATION,	// faction-over
-	QT_AMT_REPUTATION,	// faction-under
-};
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// ROOM/WORLD CONSTANTS ////////////////////////////////////////////////////
 
@@ -3665,6 +3618,76 @@ const char *morph_flags[] = {
 	"CONSUME-OBJ",	// 10
 	"!FASTMORPH",
 	"\n"
+};
+
+
+// REQ_x (1/3): types of requirements (e.g. quest tasks)
+const char *requirement_types[] = {
+	"COMPLETED-QUEST",	// 0
+	"GET-COMPONENT",
+	"GET-OBJECT",
+	"KILL-MOB",
+	"KILL-MOB-FLAGGED",
+	"NOT-COMPLETED-QUEST",	// 5
+	"NOT-ON-QUEST",
+	"OWN-BUILDING",
+	"OWN-VEHICLE",
+	"SKILL-LEVEL-OVER",
+	"SKILL-LEVEL-UNDER",	// 10
+	"TRIGGERED",
+	"VISIT-BUILDING",
+	"VISIT-ROOM-TEMPLATE",
+	"VISIT-SECTOR",
+	"HAVE-ABILITY",	// 15
+	"REP-OVER",
+	"REP-UNDER",
+	"\n",
+};
+
+
+// REQ_x (2/3): requirement types that take a numeric arg
+const bool requirement_amt_type[] = {
+	REQ_AMT_NONE,	// completed quest
+	REQ_AMT_NUMBER,	// get component
+	REQ_AMT_NUMBER,	// get object
+	REQ_AMT_NUMBER,	// kill mob
+	REQ_AMT_NUMBER,	// kill mob flagged
+	REQ_AMT_NONE,	// not completed quest
+	REQ_AMT_NONE,	// not on quest
+	REQ_AMT_NUMBER,	// own building
+	REQ_AMT_NUMBER,	// own vehicle
+	REQ_AMT_THRESHOLD,	// skill over
+	REQ_AMT_THRESHOLD,	// skill under
+	REQ_AMT_NONE,	// triggered
+	REQ_AMT_NONE,	// visit building
+	REQ_AMT_NONE,	// visit rmt
+	REQ_AMT_NONE,	// visit sect
+	REQ_AMT_NONE,	// have ability
+	REQ_AMT_REPUTATION,	// faction-over
+	REQ_AMT_REPUTATION,	// faction-under
+};
+
+
+// REQ_x (3/3): types that require a quest tracker (can't be determined in realtime)
+const bool requirement_needs_tracker[] = {
+	FALSE,	// completed quest
+	FALSE,	// get component
+	FALSE,	// get object
+	TRUE,	// kill mob
+	TRUE,	// kill mob flagged
+	FALSE,	// not completed quest
+	FALSE,	// not on quest
+	FALSE,	// own building
+	FALSE,	// own vehicle
+	FALSE,	// skill over
+	FALSE,	// skill under
+	TRUE,	// triggered
+	TRUE,	// visit building
+	TRUE,	// visit rmt
+	TRUE,	// visit sect
+	FALSE,	// have ability
+	FALSE,	// faction-over
+	FALSE,	// faction-under
 };
 
 

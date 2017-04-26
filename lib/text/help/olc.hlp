@@ -4672,42 +4672,6 @@ quest in that trigger.
 
 See also: %QUEST%, OLC QUESTS
 #d
-"QEDIT TASKS" "QEDIT PREREQS" "QEDIT PREREQUISITES" "QEDIT PRE-REQS" "QEDIT PRE-REQUISITES"
-
-Usage:  .<prereqs/tasks> add <type> <vnum>
-        .<prereqs/tasks> change <number> vnum <value>
-        .<prereqs/tasks> copy <from type> <from vnum> [tasks/prereqs]
-        .<prereqs/tasks> remove <number | all>
-
-You can set certain requirements for a task to be obtained or completed. The
-prereqs are things required before the player can obtain the quest. The tasks
-are requirements to complete the quest and turn it in. All requirements must
-be met.
-
-Available tasks:
- COMPLETED-QUEST - Must complete a certain quest.
- GET-COMPONENT - Must have components.
- GET-OBJECT - Must have items.
- KILL-MOB &r*&0 - Must kill a certain mob.
- KILL-MOB-FLAGGED &r*&0 - Must kill mobs with certain flags.
- NOT-COMPLETED-QUEST - Has not completed a certain quest.
- NOT-ON-QUEST - Is not currently on a certain quest.
- OWN-BUILDING - Empire has a certain building.
- OWN-VEHICLE - Empire has a certain vehicle.
- SKILL-LEVEL-OVER - Player has a certain skill at least this high.
- SKILL-LEVEL-UNDER - Player has a certain skill no higher than this.
- TRIGGERED &r*&0 - Activated by a %quest% command in a trigger.
- VISIT-BUILDING &r*&0 - Player must go to a certain building/room.
- VISIT-ROOM-TEMPLATE &r*&0 - Player must go to a certain room template.
- VISIT-SECTOR &r*&0 - Player must go to a certain terrain.
- HAVE-ABILITY - Player must have a certain ability.
- REP-OVER - Player must have at least this faction reputation.
- REP-UNDER - Player must be at or below this faction reputation.
-
-&r*&0 Some types cannot be used as prereqs, only as tasks.
-
-See also: COMPONENT FLAGS, MEDIT FLAG, %QUEST%, OLC QUESTS
-#d
 "REDIT DESCRIPTION"
 
 Usage:  .description
@@ -4808,6 +4772,42 @@ each copy of this adventure zone can have 3 of the thing at a time.
 This is different from the spawn data set on crops, sectors, and buildings.
 
 See also: OLC ROOM TEMPLATES, ADVEDIT RESET TIME, VNUM
+#d
+REQUIREMENTS "QEDIT TASKS" "QEDIT PREREQS" "QEDIT PREREQUISITES" "SOCEDIT REQUIREMENTS"
+
+Usage:  .<field> add <type> <vnum>
+        .<field> change <number> vnum <value>
+        .<field> copy <from type> <from vnum> [tasks/prereqs]
+        .<field> remove <number | all>
+
+Requirement lists are used to determine if a character is eligible for some-
+thing, or if they have completed it. Examples include quest prerequisites and
+tasks. All requirements in the list must be met in order for the player to
+qualify.
+
+Available tasks:
+ COMPLETED-QUEST - Must complete a certain quest.
+ GET-COMPONENT - Must have components.
+ GET-OBJECT - Must have items.
+ KILL-MOB &r*&0 - Must kill a certain mob.
+ KILL-MOB-FLAGGED &r*&0 - Must kill mobs with certain flags.
+ NOT-COMPLETED-QUEST - Has not completed a certain quest.
+ NOT-ON-QUEST - Is not currently on a certain quest.
+ OWN-BUILDING - Empire has a certain building.
+ OWN-VEHICLE - Empire has a certain vehicle.
+ SKILL-LEVEL-OVER - Player has a certain skill at least this high.
+ SKILL-LEVEL-UNDER - Player has a certain skill no higher than this.
+ TRIGGERED &r*&0 - Activated by a %quest% command in a trigger.
+ VISIT-BUILDING &r*&0 - Player must go to a certain building/room.
+ VISIT-ROOM-TEMPLATE &r*&0 - Player must go to a certain room template.
+ VISIT-SECTOR &r*&0 - Player must go to a certain terrain.
+ HAVE-ABILITY - Player must have a certain ability.
+ REP-OVER - Player must have at least this faction reputation.
+ REP-UNDER - Player must be at or below this faction reputation.
+
+&r*&0 Some types require a trackable quest, and cannot be used as prereqs.
+
+See also: COMPONENT FLAGS, MEDIT FLAG, %QUEST%
 #d
 "SECTEDIT BUILDFLAGS"
 

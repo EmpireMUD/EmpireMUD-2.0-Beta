@@ -292,7 +292,7 @@ bool match_one_exit(char_data *ch, room_template *add_exit_to, room_template *or
 */
 void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
-	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
+	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	void remove_room_template_from_table(room_template *rmt);
 	
 	quest_data *quest, *next_quest;
@@ -323,8 +323,8 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	HASH_ITER(hh, quest_table, quest, next_quest) {
 		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_ROOM_TEMPLATE, vnum);
 		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_ROOM_TEMPLATE, vnum);
-		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_VISIT_ROOM_TEMPLATE, vnum);
-		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_VISIT_ROOM_TEMPLATE, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_VISIT_ROOM_TEMPLATE, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_VISIT_ROOM_TEMPLATE, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
@@ -352,8 +352,8 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		if (GET_OLC_QUEST(desc)) {
 			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_ROOM_TEMPLATE, vnum);
 			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_ROOM_TEMPLATE, vnum);
-			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_VISIT_ROOM_TEMPLATE, vnum);
-			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_VISIT_ROOM_TEMPLATE, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_VISIT_ROOM_TEMPLATE, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_VISIT_ROOM_TEMPLATE, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
@@ -381,7 +381,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 */
 void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char buf[MAX_STRING_LENGTH];
 	room_template *rmt = room_template_proto(vnum), *iter, *next_iter;
@@ -414,8 +414,8 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 		}
 		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_ROOM_TEMPLATE, vnum);
 		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_ROOM_TEMPLATE, vnum);
-		any |= find_quest_task_in_list(QUEST_TASKS(quest), QT_VISIT_ROOM_TEMPLATE, vnum);
-		any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_VISIT_ROOM_TEMPLATE, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_VISIT_ROOM_TEMPLATE, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_VISIT_ROOM_TEMPLATE, vnum);
 		
 		if (any) {
 			++found;

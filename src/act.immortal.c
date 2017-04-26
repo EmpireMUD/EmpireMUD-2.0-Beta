@@ -2466,7 +2466,7 @@ SHOW(show_terrain) {
 
 
 SHOW(show_uses) {
-	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	craft_data *craft, *next_craft;
@@ -2569,8 +2569,8 @@ SHOW(show_uses) {
 			if (size >= sizeof(buf)) {
 				break;
 			}
-			any = find_quest_task_in_list(QUEST_TASKS(quest), QT_GET_COMPONENT, type);
-			any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_GET_COMPONENT, type);
+			any = find_requirement_in_list(QUEST_TASKS(quest), REQ_GET_COMPONENT, type);
+			any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_GET_COMPONENT, type);
 		
 			if (any) {
 				size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));

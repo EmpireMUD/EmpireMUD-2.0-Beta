@@ -1036,7 +1036,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	int length, i_in[7], iter, num;
 	struct slash_channel *slash;
 	struct cooldown_data *cool;
-	struct quest_task *task;
+	struct req_data *task;
 	account_data *acct;
 	bitvector_t bit_in;
 	bool end = FALSE;
@@ -1680,7 +1680,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				}
 				else if (PFILE_TAG(line, "Quest-task:", length)) {
 					if (last_plrq && sscanf(line + length + 1, "%d %d %lld %d %d", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3]) == 5) {
-						CREATE(task, struct quest_task, 1);
+						CREATE(task, struct req_data, 1);
 						task->type = i_in[0];
 						task->vnum = i_in[1];
 						task->misc = bit_in;
@@ -2434,7 +2434,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	struct player_quest *plrq;
 	struct alias_data *alias;
 	struct offer_data *offer;
-	struct quest_task *task;
+	struct req_data *task;
 	struct coin_data *coin;
 	struct lore_data *lore;
 	int iter;

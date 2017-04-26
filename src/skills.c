@@ -2326,7 +2326,7 @@ char *list_one_skill(skill_data *skill, bool detail) {
 */
 void olc_search_skill(char_data *ch, any_vnum vnum) {
 	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char buf[MAX_STRING_LENGTH];
 	skill_data *skill = find_skill_by_vnum(vnum);
@@ -2376,10 +2376,10 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 		any = find_quest_reward_in_list(QUEST_REWARDS(quest), QR_SET_SKILL, vnum);
 		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_SKILL_EXP, vnum);
 		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_SKILL_LEVELS, vnum);
-		any |= find_quest_task_in_list(QUEST_TASKS(quest), QT_SKILL_LEVEL_OVER, vnum);
-		any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_SKILL_LEVEL_OVER, vnum);
-		any |= find_quest_task_in_list(QUEST_TASKS(quest), QT_SKILL_LEVEL_UNDER, vnum);
-		any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_SKILL_LEVEL_UNDER, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_SKILL_LEVEL_OVER, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_SKILL_LEVEL_OVER, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_SKILL_LEVEL_UNDER, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_SKILL_LEVEL_UNDER, vnum);
 		
 		if (any) {
 			++found;
@@ -2757,7 +2757,7 @@ skill_data *create_skill_table_entry(any_vnum vnum) {
 */
 void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
-	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
+	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	extern bool remove_vnum_from_class_skill_reqs(struct class_skill_req **list, any_vnum vnum);
 	
 	struct player_skill_data *plsk, *next_plsk;
@@ -2819,10 +2819,10 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 		found = delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_SET_SKILL, vnum);
 		found |= delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_SKILL_EXP, vnum);
 		found |= delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_SKILL_LEVELS, vnum);
-		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_SKILL_LEVEL_OVER, vnum);
-		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_SKILL_LEVEL_OVER, vnum);
-		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_SKILL_LEVEL_UNDER, vnum);
-		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_SKILL_LEVEL_UNDER, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_SKILL_LEVEL_OVER, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_SKILL_LEVEL_OVER, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_SKILL_LEVEL_UNDER, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_SKILL_LEVEL_UNDER, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
@@ -2872,10 +2872,10 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 			found = delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_SET_SKILL, vnum);
 			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_SKILL_EXP, vnum);
 			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_SKILL_LEVELS, vnum);
-			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_SKILL_LEVEL_OVER, vnum);
-			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_SKILL_LEVEL_OVER, vnum);
-			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_SKILL_LEVEL_UNDER, vnum);
-			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_SKILL_LEVEL_UNDER, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_SKILL_LEVEL_OVER, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_SKILL_LEVEL_OVER, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_SKILL_LEVEL_UNDER, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_SKILL_LEVEL_UNDER, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);

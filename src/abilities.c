@@ -277,7 +277,7 @@ char *list_one_ability(ability_data *abil, bool detail) {
 * @param any_vnum vnum The ability vnum.
 */
 void olc_search_ability(char_data *ch, any_vnum vnum) {
-	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char buf[MAX_STRING_LENGTH];
 	ability_data *abil = find_ability_by_vnum(vnum);
@@ -358,9 +358,9 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		if (size >= sizeof(buf)) {
 			break;
 		}
-		// QR_x, QT_x: quest types
-		any = find_quest_task_in_list(QUEST_TASKS(quest), QT_HAVE_ABILITY, vnum);
-		any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_HAVE_ABILITY, vnum);
+		// REQ_x: quest types
+		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_HAVE_ABILITY, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_HAVE_ABILITY, vnum);
 		
 		if (any) {
 			++found;
@@ -648,7 +648,7 @@ ability_data *create_ability_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_ability(char_data *ch, any_vnum vnum) {
-	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
+	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	extern bool remove_vnum_from_class_abilities(struct class_ability **list, any_vnum vnum);
 	extern bool remove_vnum_from_skill_abilities(struct skill_ability **list, any_vnum vnum);
 	
@@ -727,8 +727,8 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	
 	// update quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		found = delete_quest_task_from_list(&QUEST_TASKS(quest), QT_HAVE_ABILITY, vnum);
-		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_HAVE_ABILITY, vnum);
+		found = delete_requirement_from_list(&QUEST_TASKS(quest), REQ_HAVE_ABILITY, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_HAVE_ABILITY, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
@@ -799,8 +799,8 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			}
 		}
 		if (GET_OLC_QUEST(desc)) {
-			found = delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_HAVE_ABILITY, vnum);
-			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_HAVE_ABILITY, vnum);
+			found = delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_HAVE_ABILITY, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_HAVE_ABILITY, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
