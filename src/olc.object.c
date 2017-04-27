@@ -1755,7 +1755,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		}
 		case ITEM_BOOK: {
 			book = book_proto(GET_BOOK_ID(obj));
-			sprintf(storage + strlen(storage), "<&ybook&0> [%d] %s\r\n", GET_BOOK_ID(obj), (book ? book->title : "not set"));
+			sprintf(storage + strlen(storage), "<&ytext&0> [%d] %s\r\n", GET_BOOK_ID(obj), (book ? book->title : "not set"));
 			break;
 		}
 		case ITEM_WEALTH: {
@@ -2152,20 +2152,21 @@ OLC_MODULE(oedit_automint) {
 }
 
 
-OLC_MODULE(oedit_book) {
+// formerly oedit_book, which had a name conflict with ".book"
+OLC_MODULE(oedit_text) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	int old = GET_OBJ_VAL(obj, VAL_BOOK_ID);
 	book_data *book;
 	
 	if (!IS_BOOK(obj)) {
-		msg_to_char(ch, "You can only set book id on a book.\r\n");
+		msg_to_char(ch, "You can only set etxt id on a book.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_BOOK_ID) = olc_process_number(ch, argument, "book id", "book", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_BOOK_ID));
+		GET_OBJ_VAL(obj, VAL_BOOK_ID) = olc_process_number(ch, argument, "text id", "text", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_BOOK_ID));
 		book = book_proto(GET_BOOK_ID(obj));
 		
 		if (!book) {
-			msg_to_char(ch, "Invalid book id. Old id %d restored.\r\n", old);
+			msg_to_char(ch, "Invalid text book vnum. Old vnum %d restored.\r\n", old);
 			GET_OBJ_VAL(obj, VAL_BOOK_ID) = old;
 		}
 	}

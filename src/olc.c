@@ -248,7 +248,6 @@ OLC_MODULE(oedit_apply);
 OLC_MODULE(oedit_armortype);
 OLC_MODULE(oedit_arrowtype);
 OLC_MODULE(oedit_automint);
-OLC_MODULE(oedit_book);
 OLC_MODULE(oedit_capacity);
 OLC_MODULE(oedit_charges);
 OLC_MODULE(oedit_coinamount);
@@ -280,6 +279,7 @@ OLC_MODULE(oedit_roomvnum);
 OLC_MODULE(oedit_script);
 OLC_MODULE(oedit_short_description);
 OLC_MODULE(oedit_storage);
+OLC_MODULE(oedit_text);
 OLC_MODULE(oedit_timer);
 OLC_MODULE(oedit_type);
 OLC_MODULE(oedit_value0);
@@ -683,7 +683,6 @@ const struct olc_command_data olc_data[] = {
 	{ "armortype", oedit_armortype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "arrowtype", oedit_arrowtype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "automint", oedit_automint, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "book", oedit_book, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "capacity", oedit_capacity, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "charges", oedit_charges, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "coinamount", oedit_coinamount, OLC_OBJECT, OLC_CF_EDITOR },
@@ -718,6 +717,7 @@ const struct olc_command_data olc_data[] = {
 	{ "storage", oedit_storage, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "store", oedit_storage, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "timer", oedit_timer, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "text", oedit_text, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "type", oedit_type, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "value0", oedit_value0, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "value1", oedit_value1, OLC_OBJECT, OLC_CF_EDITOR },

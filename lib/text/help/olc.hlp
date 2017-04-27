@@ -3266,14 +3266,17 @@ This allows a wealth item to be automatically minted into coins by Workforce.
 
 See also: OLC OBJECTS
 #d
-"OEDIT BOOK"
+"OEDIT TEXT" "OEDIT BOOK"
 
-Usage:  .book <book id>
+Usage:  .text <book vnum>
 
 You can create book objects to place in your adventure zones. Like ordinary
 books, their name will be overridden by the name set in the book editor. You
 can see the book id of any book you've written by typing "bookedit list" (it's
-the number in the [brackets]).
+the number in the [brackets]), or via "vnum book".
+
+(This field was formerly called ".book" but was changed because it conflicts
+with the book editor.)
 
 See also: BOOKEDIT, OLC OBJECTS
 #d
