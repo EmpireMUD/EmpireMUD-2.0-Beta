@@ -4804,6 +4804,9 @@ Available tasks:
  HAVE-ABILITY - Player must have a certain ability.
  REP-OVER - Player must have at least this faction reputation.
  REP-UNDER - Player must be at or below this faction reputation.
+ WEARING - Player has the item equipped
+ WEARING-OR-HAS - Player has the item either equipped or in inventory
+    (note: item will not be extracted even if EXTRACT-TASK-OBJECTS is on)
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 

@@ -4383,6 +4383,7 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 		}
 
 		affect_total(ch);
+		qt_wear_obj(ch, obj);
 	}
 }
 
@@ -4795,6 +4796,7 @@ obj_data *unequip_char(char_data *ch, int pos) {
 		}
 
 		affect_total(ch);
+		qt_remove_obj(ch, obj);
 	}
 
 	return obj;

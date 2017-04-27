@@ -496,6 +496,7 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 	quest_data *quest = quest_proto(pq->vnum);
 	struct req_data *task;
+	int iter;
 	
 	LL_FOREACH(pq->tracker, task) {
 		// REQ_x: refreshable types only
@@ -581,6 +582,28 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				struct player_faction_data *pfd = get_reputation(ch, task->vnum, FALSE);
 				faction_data *fct = find_faction_by_vnum(task->vnum);
 				task->current = (compare_reptuation((pfd ? pfd->rep : (fct ? FCT_STARTING_REP(fct) : REP_NEUTRAL)), task->needed) <= 0) ? task->needed : 0;	// full
+				break;
+			}
+			case REQ_WEARING: {
+				task->current = 0;
+				
+				for (iter = 0; iter < NUM_WEARS; ++iter) {
+					if (GET_EQ(ch, iter) && GET_OBJ_VNUM(GET_EQ(ch, iter)) == task->vnum) {
+						++(task->current);
+					}
+				}
+				break;
+			}
+			case REQ_WEARING_OR_HAS: {
+				task->current = 0;
+				
+				for (iter = 0; iter < NUM_WEARS; ++iter) {
+					if (GET_EQ(ch, iter) && GET_OBJ_VNUM(GET_EQ(ch, iter)) == task->vnum) {
+						++(task->current);
+					}
+				}
+				
+				task->current += count_quest_objects(ch, task->vnum, FALSE);
 				break;
 			}
 		}
@@ -1577,6 +1600,9 @@ void qt_drop_obj(char_data *ch, obj_data *obj) {
 			else if (task->type == REQ_GET_OBJECT && GET_OBJ_VNUM(obj) == task->vnum) {
 				--task->current;
 			}
+			else if (task->type == REQ_WEARING_OR_HAS && GET_OBJ_VNUM(obj) == task->vnum) {
+				--task->current;
+			}
 			
 			// check min
 			task->current = MAX(task->current, 0);
@@ -1683,6 +1709,9 @@ void qt_get_obj(char_data *ch, obj_data *obj) {
 				++task->current;
 			}
 			else if (task->type == REQ_GET_OBJECT && GET_OBJ_VNUM(obj) == task->vnum) {
+				++task->current;
+			}
+			else if (task->type == REQ_WEARING_OR_HAS && GET_OBJ_VNUM(obj) == task->vnum) {
 				++task->current;
 			}
 		}
@@ -1817,6 +1846,36 @@ void qt_quest_completed(char_data *ch, any_vnum vnum) {
 			else if (task->type == REQ_NOT_COMPLETED_QUEST && task->vnum == vnum) {
 				task->current = 0;
 			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: ch removes (un-wears) an item
+*
+* @param char_data *ch The player.
+* @param obj_data *obj The item.
+*/
+void qt_remove_obj(char_data *ch, obj_data *obj) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_WEARING && GET_OBJ_VNUM(obj) == task->vnum) {
+				--task->current;
+			}
+			else if (task->type == REQ_WEARING_OR_HAS && GET_OBJ_VNUM(obj) == task->vnum) {
+				--task->current;
+			}
+			
+			// check min
+			task->current = MAX(task->current, 0);
 		}
 	}
 }
@@ -1987,6 +2046,33 @@ void qt_visit_room(char_data *ch, room_data *room) {
 	}
 	if (GET_ROOM_TEMPLATE(room)) {
 		qt_visit_room_template(ch, GET_RMT_VNUM(GET_ROOM_TEMPLATE(room)));
+	}
+}
+
+
+/**
+* Quest Tracker: ch wears an item
+*
+* @param char_data *ch The player.
+* @param obj_data *obj The item.
+*/
+void qt_wear_obj(char_data *ch, obj_data *obj) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_WEARING && GET_OBJ_VNUM(obj) == task->vnum) {
+				++task->current;
+			}
+			else if (task->type == REQ_WEARING_OR_HAS && GET_OBJ_VNUM(obj) == task->vnum) {
+				++task->current;
+			}
+		}
 	}
 }
 

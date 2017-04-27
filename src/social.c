@@ -109,9 +109,20 @@ bool audit_social(social_data *soc, char_data *ch) {
 */
 char *list_one_social(social_data *soc, bool detail) {
 	static char output[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH];
+	struct req_data *req;
+	int count;
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s (%s)", SOC_VNUM(soc), SOC_NAME(soc), SOC_COMMAND(soc));
+		if (SOC_REQUIREMENTS(soc)) {
+			LL_COUNT(SOC_REQUIREMENTS(soc), req, count);
+			snprintf(buf, sizeof(buf), " [%d requirements]", count);
+		}
+		else {
+			*buf = '\0';
+		}
+		
+		snprintf(output, sizeof(output), "[%5d] %s (%s)%s%s", SOC_VNUM(soc), SOC_NAME(soc), SOC_COMMAND(soc), buf, (SOC_FLAGGED(soc, SOC_IN_DEVELOPMENT) ? " IN-DEV" : ""));
 		// TODO could show in-dev flag
 	}
 	else {
