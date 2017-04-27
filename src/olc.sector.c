@@ -139,6 +139,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	
 	sector_data *sect, *sect_iter, *next_sect, *replace_sect;
 	quest_data *quest, *next_quest;
+	social_data *soc, *next_soc;
 	descriptor_data *desc;
 	adv_data *adv, *next_adv;
 	struct map_data *map;
@@ -232,6 +233,16 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 		}
 	}
 	
+	// update socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_VISIT_SECTOR, vnum);
+		
+		if (found) {
+			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
+		}
+	}
+	
 	// olc editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		// update evolutions in olc editors
@@ -255,6 +266,14 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A sector used by the quest you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SOCIAL(desc)) {
+			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_VISIT_SECTOR, vnum);
+		
+			if (found) {
+				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A sector required by the social you are editing was deleted.\r\n");
 			}
 		}
 	}
@@ -285,6 +304,7 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 	struct evolution_data *evo;
 	sector_data *real, *sect, *next_sect;
 	quest_data *quest, *next_quest;
+	social_data *soc, *next_soc;
 	adv_data *adv, *next_adv;
 	int size, found;
 	bool any;
@@ -341,6 +361,19 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 				// only report once per sect
 				break;
 			}
+		}
+	}
+	
+	// socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_VISIT_SECTOR, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	

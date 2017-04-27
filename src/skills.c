@@ -2334,6 +2334,7 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 	quest_data *quest, *next_quest;
 	struct archetype_skill *arsk;
 	struct class_skill_req *clsk;
+	social_data *soc, *next_soc;
 	class_data *cls, *next_cls;
 	int size, found;
 	bool any;
@@ -2384,6 +2385,20 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+		}
+	}
+	
+	// socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_SKILL_LEVEL_OVER, vnum);
+		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_SKILL_LEVEL_UNDER, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -2765,6 +2780,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	archetype_data *arch, *next_arch;
 	ability_data *abil, *next_abil;
 	quest_data *quest, *next_quest;
+	social_data *soc, *next_soc;
 	class_data *cls, *next_cls;
 	descriptor_data *desc;
 	skill_data *skill;
@@ -2830,6 +2846,17 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// remove from socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_SKILL_LEVEL_OVER, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_SKILL_LEVEL_UNDER, vnum);
+		
+		if (found) {
+			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
+		}
+	}
+	
 	// remove from live players
 	LL_FOREACH(character_list, chiter) {
 		found = FALSE;
@@ -2880,6 +2907,15 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A skill used by the quest you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SOCIAL(desc)) {
+			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_SKILL_LEVEL_OVER, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_SKILL_LEVEL_UNDER, vnum);
+		
+			if (found) {
+				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A skill required by the social you are editing was deleted.\r\n");
 			}
 		}
 	}

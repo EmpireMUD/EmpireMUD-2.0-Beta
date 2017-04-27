@@ -297,6 +297,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	
 	quest_data *quest, *next_quest;
 	room_data *room, *next_room;
+	social_data *soc, *next_soc;
 	descriptor_data *desc;
 	room_template *rmt;
 	bool found;
@@ -332,6 +333,16 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		}
 	}
 	
+	// update socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_VISIT_ROOM_TEMPLATE, vnum);
+		
+		if (found) {
+			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
+		}
+	}
+	
 	// update world
 	count = 0;
 	for (room = interior_room_list; room; room = next_room) {
@@ -360,6 +371,14 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 				msg_to_desc(desc, "A room template used by the quest you are editing was deleted.\r\n");
 			}
 		}
+		if (GET_OLC_SOCIAL(desc)) {
+			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_VISIT_ROOM_TEMPLATE, vnum);
+		
+			if (found) {
+				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A room template required by the social you are editing was deleted.\r\n");
+			}
+		}
 	}
 		
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted room template %d", GET_NAME(ch), vnum);
@@ -386,6 +405,7 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	room_template *rmt = room_template_proto(vnum), *iter, *next_iter;
 	quest_data *quest, *next_quest;
+	social_data *soc, *next_soc;
 	struct exit_template *ex;
 	obj_data *obj, *next_obj;
 	int size, found;
@@ -432,6 +452,19 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
 			}
+		}
+	}
+	
+	// socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_VISIT_ROOM_TEMPLATE, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
