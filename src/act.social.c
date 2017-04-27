@@ -100,8 +100,22 @@ social_data *find_social(char_data *ch, char *name, bool exact) {
 			continue;
 		}
 		
-		// seems okay -- pick one at random
-		if (!number(0, num_found++) || !found) {
+		// seems okay:
+		
+		if (!found) {	// if we don't have one yet, pick this one...
+			found = soc;
+			num_found = 1;
+		}
+		else if (found && SOC_REQUIREMENTS(soc) && !SOC_REQUIREMENTS(found)) {
+			found = soc;	// replace the last one since this one has requirements
+			// do not increment number
+		}
+		else if (found && !SOC_REQUIREMENTS(soc) && SOC_REQUIREMENTS(found)) {
+			// skip this one entirely -- it has no requirements but we found
+			// one that does already
+		}
+		else if (!number(0, num_found++)) {
+			// equal weight, pick at random
 			found = soc;
 		}
 	}
