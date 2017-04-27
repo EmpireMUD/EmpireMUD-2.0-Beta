@@ -288,6 +288,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 	quest_data *quest, *next_quest;
 	skill_data *skill, *next_skill;
 	augment_data *aug, *next_aug;
+	social_data *soc, *next_soc;
 	class_data *cls, *next_cls;
 	struct class_ability *clab;
 	struct skill_ability *skab;
@@ -358,7 +359,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		if (size >= sizeof(buf)) {
 			break;
 		}
-		// REQ_x: quest types
+		// REQ_x: requirement search
 		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_HAVE_ABILITY, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_HAVE_ABILITY, vnum);
 		
@@ -376,6 +377,20 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 				size += snprintf(buf + size, sizeof(buf) - size, "SKL [%5d] %s\r\n", CLASS_VNUM(skill), CLASS_NAME(skill));
 				break;	// only need 1
 			}
+		}
+	}
+	
+	// socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// REQ_x: requirement search
+		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_HAVE_ABILITY, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -660,6 +675,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	quest_data *quest, *next_quest;
 	skill_data *skill, *next_skill;
 	augment_data *aug, *next_aug;
+	social_data *soc, *next_soc;
 	class_data *cls, *next_cls;
 	descriptor_data *desc;
 	char_data *chiter;
@@ -744,6 +760,16 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_HAVE_ABILITY, vnum);
+		
+		if (found) {
+			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
+		}
+	}
+	
 	// update live players
 	LL_FOREACH(character_list, chiter) {
 		found = FALSE;
@@ -811,6 +837,14 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			found = remove_vnum_from_skill_abilities(&SKILL_ABILITIES(GET_OLC_SKILL(desc)), vnum);
 			if (found) {
 				msg_to_desc(desc, "An ability has been deleted from the skill you're editing.\r\n");
+			}
+		}
+		if (GET_OLC_SOCIAL(desc)) {
+			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_HAVE_ABILITY, vnum);
+		
+			if (found) {
+				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A required ability has been deleted from the social you're editing.\r\n");
 			}
 		}
 	}

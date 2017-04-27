@@ -257,6 +257,7 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	faction_data *fct = find_faction_by_vnum(vnum);
 	faction_data *iter, *next_iter, *find;
 	quest_data *qiter, *next_qiter;
+	social_data *soc, *next_soc;
 	char_data *mob, *next_mob;
 	int size, found;
 	bool any;
@@ -301,6 +302,21 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+		}
+	}
+	
+	// check socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// REQ_x: requirements
+		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_REP_OVER, vnum);
+		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_REP_UNDER, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -945,6 +961,7 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	faction_data *fct, *iter, *next_iter, *find;
 	char_data *mob, *next_mob, *chiter;
 	quest_data *qiter, *next_qiter;
+	social_data *soc, *next_soc;
 	descriptor_data *desc;
 	bool found;
 	
@@ -999,6 +1016,18 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// remove from socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		// REQ_x: requirements
+		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_REP_OVER, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_REP_UNDER, vnum);
+		
+		if (found) {
+			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
+		}
+	}
+	
 	// remove from active editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (GET_OLC_FACTION(desc)) {
@@ -1026,6 +1055,16 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A faction used by the quest you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SOCIAL(desc)) {
+			// REQ_x: requirements
+			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_REP_OVER, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_REP_UNDER, vnum);
+		
+			if (found) {
+				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A faction required by the social you are editing was deleted.\r\n");
 			}
 		}
 	}

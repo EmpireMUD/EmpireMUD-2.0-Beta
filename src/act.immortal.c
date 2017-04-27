@@ -2473,6 +2473,7 @@ SHOW(show_uses) {
 	quest_data *quest, *next_quest;
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
+	social_data *soc, *next_soc;
 	struct resource_data *res;
 	bld_data *bld, *next_bld;
 	bitvector_t flags;
@@ -2574,6 +2575,17 @@ SHOW(show_uses) {
 		
 			if (any) {
 				size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			}
+		}
+		
+		HASH_ITER(hh, social_table, soc, next_soc) {
+			if (size >= sizeof(buf)) {
+				break;
+			}
+			any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_GET_COMPONENT, type);
+		
+			if (any) {
+				size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 			}
 		}
 		
