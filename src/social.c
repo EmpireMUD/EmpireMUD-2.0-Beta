@@ -53,6 +53,34 @@ void get_requirement_display(struct req_data *list, char *save_buffer);
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Handler for social message fields in the editor.
+*
+* @param char_data *ch The editing player.
+* @param char *argument The argument typed.
+* @param int msg Which SOCM_ const.
+*/
+void process_soc_msg_field(char_data *ch, char *argument, int msg) {
+	social_data *soc = GET_OLC_SOCIAL(ch->desc);
+	
+	if (!str_cmp(argument, "none")) {
+		if (SOC_MESSAGE(soc, msg)) {	
+			free(SOC_MESSAGE(soc, msg));
+		}
+		
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "%s message removed.\r\n", social_message_types[msg][0]);
+		}
+	}
+	else {
+		olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	}
+}
+
+
+/**
 * Checks that a character meets all requirements for a social.
 *
 * @param char_data *ch The person to check.
@@ -753,56 +781,40 @@ OLC_MODULE(socedit_targetposition) {
 
 
 OLC_MODULE(socedit_n2char) {
-	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	int msg = SOCM_NO_ARG_TO_CHAR;
-	olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	process_soc_msg_field(ch, argument, SOCM_NO_ARG_TO_CHAR);
 }
 
 
 OLC_MODULE(socedit_n2other) {
-	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	int msg = SOCM_NO_ARG_TO_OTHERS;
-	olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	process_soc_msg_field(ch, argument, SOCM_NO_ARG_TO_OTHERS);
 }
 
 
 OLC_MODULE(socedit_s2char) {
-	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	int msg = SOCM_SELF_TO_CHAR;
-	olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	process_soc_msg_field(ch, argument, SOCM_SELF_TO_CHAR);
 }
 
 
 OLC_MODULE(socedit_s2other) {
-	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	int msg = SOCM_SELF_TO_OTHERS;
-	olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	process_soc_msg_field(ch, argument, SOCM_SELF_TO_OTHERS);
 }
 
 
 OLC_MODULE(socedit_t2char) {
-	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	int msg = SOCM_TARGETED_TO_CHAR;
-	olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	process_soc_msg_field(ch, argument, SOCM_TARGETED_TO_CHAR);
 }
 
 
 OLC_MODULE(socedit_t2vict) {
-	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	int msg = SOCM_TARGETED_TO_VICTIM;
-	olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	process_soc_msg_field(ch, argument, SOCM_TARGETED_TO_VICTIM);
 }
 
 
 OLC_MODULE(socedit_t2other) {
-	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	int msg = SOCM_TARGETED_TO_OTHERS;
-	olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	process_soc_msg_field(ch, argument, SOCM_TARGETED_TO_OTHERS);
 }
 
 
 OLC_MODULE(socedit_tnotfound) {
-	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	int msg = SOCM_TARGETED_NOT_FOUND;
-	olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	process_soc_msg_field(ch, argument, SOCM_TARGETED_NOT_FOUND);
 }

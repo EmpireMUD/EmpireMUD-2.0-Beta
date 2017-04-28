@@ -5204,17 +5204,18 @@ These messages are the ones shown when the player uses the social.
 
 Messages when a social is typed without an argument ("grin"):
   No-arg to character <&yn2char&0>
-  No-arg to others <&yn2other&0>
+  No-arg to others <&yn2other&0>  - leave blank if n2char is an error message
+    about needing a target
 
 Messages when a social is typed with an argument ("grin Gaia"):
-  Targeted to character <&yt2char&0>
+  Targeted to character <&yt2char&0>  - this whole section may be blank
   Targeted to others <&yt2other&0>
   Targeted to victim <&yt2vict&0>
   Target not found <&ytnotfound&0>  - sent to the actor when target is invalid
 
 Messages when the actor targets himself ("grin self"):
-  Target-self to character <&ys2char&0>
-  Target-self to others <&ys2other&0>
+  Target-self to character <&ys2char&0>  - may be blank
+  Target-self to others <&ys2other&0>  - may be blank (s2char must be blank)
 
 See &cHELP DOLLAR SIGN CODES&0 for a list of codes that can be used in socials:
   $n, $m, $e, $s - used for the actor
