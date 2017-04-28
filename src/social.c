@@ -63,9 +63,10 @@ void process_soc_msg_field(char_data *ch, char *argument, int msg) {
 	social_data *soc = GET_OLC_SOCIAL(ch->desc);
 	
 	if (!str_cmp(argument, "none")) {
-		if (SOC_MESSAGE(soc, msg)) {	
+		if (SOC_MESSAGE(soc, msg)) {
 			free(SOC_MESSAGE(soc, msg));
 		}
+		SOC_MESSAGE(soc, msg) = NULL;
 		
 		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			send_config_msg(ch, "ok_string");
