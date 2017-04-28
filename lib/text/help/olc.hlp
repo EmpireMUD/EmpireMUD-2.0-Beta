@@ -5197,10 +5197,11 @@ See also: OLC SOCIALS
 #d
 "SOCEDIT MESSAGES" "SOCEDIT N2CHARACTER" "SOCEDIT N2OTHERS" "SOCEDIT S2CHARACTER" "SOCEDIT S2OTHERS" "SOCEDIT T2CHARACTER" "SOCEDIT T2VICTIM" "SOCEDIT T2OTHERS" "SOCEDIT TNOTFOUND"
 
-Usage:  .n2char <message>
-        .<type> <message>
+Usage:  .n2char <message | none>
+        .<type> <message | none>
 
-These messages are the ones shown when the player uses the social.
+These messages are the ones shown when the player uses the social. Some
+messages are optional and may be left blank.
 
 Messages when a social is typed without an argument ("grin"):
   No-arg to character <&yn2char&0>
