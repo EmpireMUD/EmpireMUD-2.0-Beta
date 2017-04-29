@@ -7433,6 +7433,18 @@ void write_applies_to_file(FILE *fl, struct apply_data *list) {
 
 
 /**
+* Sorts requirements by what group they are in.
+*
+* @param struct req_data *a Comparable #1.
+* @param struct req_data *a Comparable #2.
+* @return int sort instruction (-, 0, +)
+*/
+int sort_requirements_by_group(struct req_data *a, struct req_data *b) {
+	return (a->group - b->group);
+}
+
+
+/**
 * Parses a requirement, saved as:
 *
 * A
@@ -7475,6 +7487,7 @@ void parse_requirement(FILE *fl, struct req_data **list, char *error_str) {
 	req->current = 0;
 	
 	LL_APPEND(*list, req);
+	LL_SORT(*list, sort_requirements_by_group);
 }
 
 
