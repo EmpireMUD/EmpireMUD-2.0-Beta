@@ -4497,7 +4497,7 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 	
 	// anything left for a group letter?
 	skip_spaces(&argument);
-	if (*argument || str_cmp(argument, "none")) {	// ignore a "none" here, for "no group"
+	if (*argument && str_cmp(argument, "none")) {	// ignore a "none" here, for "no group"
 		if (strlen(argument) != 1 || !isalpha(*argument)) {
 			msg_to_char(ch, "Group must be a letter (or may be blank).\r\n");
 			return FALSE;
