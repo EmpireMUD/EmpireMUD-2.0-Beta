@@ -411,6 +411,7 @@ extern char *requirement_string(struct req_data *req, bool show_vnums);
 extern char *show_color_codes(char *string);
 void sort_icon_set(struct icon_data **list);
 void sort_interactions(struct interaction_item **list);
+extern int sort_requirements_by_group(struct req_data *a, struct req_data *b);
 extern bool valid_room_template_vnum(rmt_vnum vnum);
 
 // locals
@@ -4254,9 +4255,10 @@ int olc_process_number(char_data *ch, char *argument, char *name, char *command,
 * @param int *amount A variable to store the amount to.
 * @param any_vnum *vnum A variable to store the vnum to.
 * @param bitvector_t *misc A variable to store the misc value to.
+* param char *group A variable to store the group arg, if any.
 * @return bool TRUE if the arguments were provided correctly, FALSE if an error was sent.
 */
-bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool find_amount, int *amount, any_vnum *vnum, bitvector_t *misc) {
+bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool find_amount, int *amount, any_vnum *vnum, bitvector_t *misc, char *group) {
 	extern const char *action_bits[];
 	extern const char *component_flags[];
 	extern const char *component_types[];
@@ -4270,6 +4272,7 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 	*amount = 1;
 	*vnum = 0;
 	*misc = 0;
+	*group = 0;
 	
 	// REQ_x: determine which args we need
 	switch (type) {
@@ -4492,6 +4495,18 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		}
 	}
 	
+	// anything left for a group letter?
+	skip_spaces(&argument);
+	if (*argument || str_cmp(argument, "none")) {	// ignore a "none" here, for "no group"
+		if (strlen(argument) != 1 || !isalpha(*argument)) {
+			msg_to_char(ch, "Group must be a letter (or may be blank).\r\n");
+			return FALSE;
+		}
+		else {
+			*group = *argument;
+		}
+	}
+	
 	// all good
 	return TRUE;
 }
@@ -4517,6 +4532,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 	int findtype, num, type;
 	bitvector_t misc;
 	any_vnum vnum;
+	char group;
 	bool found;
 	
 	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
@@ -4615,7 +4631,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		else if ((type = search_block(type_arg, requirement_types, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
 		}
-		else if (!olc_parse_requirement_args(ch, type, argument, TRUE, &num, &vnum, &misc)) {
+		else if (!olc_parse_requirement_args(ch, type, argument, TRUE, &num, &vnum, &misc, &group)) {
 			// sends own error
 		}
 		else if (!allow_tracker_types && requirement_needs_tracker[type]) {
@@ -4627,9 +4643,11 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 			req->type = type;
 			req->vnum = vnum;
 			req->misc = misc;
+			req->group = group;
 			req->needed = num;
 		
 			LL_APPEND(*list, req);
+			LL_SORT(*list, sort_requirements_by_group);
 			msg_to_char(ch, "You add %s: %s\r\n", command, requirement_string(req, TRUE));
 		}
 	}	// end 'add'
@@ -4673,7 +4691,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		}
 		else if (is_abbrev(field_arg, "vnum")) {
 			// num is junk here
-			if (!olc_parse_requirement_args(ch, change->type, argument, FALSE, &num, &vnum, &misc)) {
+			if (!olc_parse_requirement_args(ch, change->type, argument, FALSE, &num, &vnum, &misc, &group)) {
 				// sends own error
 			}
 			else {
@@ -4682,8 +4700,24 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 				msg_to_char(ch, "Changed %s %d to: %s\r\n", command, atoi(num_arg), requirement_string(change, TRUE));
 			}
 		}
+		else if (is_abbrev(field_arg, "group")) {
+			if (!str_cmp(argument, "none")) {
+				change->group = 0;
+				LL_SORT(*list, sort_requirements_by_group);
+				msg_to_char(ch, "Changed %s %d to: %s\r\n", command, atoi(num_arg), requirement_string(change, TRUE));
+			}
+			else if (strlen(argument) != 1 || !isalpha(*argument)) {
+				msg_to_char(ch, "Group must be a letter or 'none'.\r\n");
+				return;
+			}
+			else {
+				change->group = *argument;
+				LL_SORT(*list, sort_requirements_by_group);
+				msg_to_char(ch, "Changed %s %d to: %s\r\n", command, atoi(num_arg), requirement_string(change, TRUE));
+			}
+		}
 		else {
-			msg_to_char(ch, "You can only change the amount or vnum.\r\n");
+			msg_to_char(ch, "You can only change the amount, group, or vnum.\r\n");
 		}
 	}	// end 'change'
 	else if (is_abbrev(cmd_arg, "move")) {

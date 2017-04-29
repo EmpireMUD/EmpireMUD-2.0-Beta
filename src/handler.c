@@ -5678,6 +5678,10 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 	}
 	
+	if (show_vnums && req->group) {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), " (%c)", req->group);
+	}
+	
 	return output;
 }
 

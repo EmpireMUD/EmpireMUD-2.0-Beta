@@ -4778,15 +4778,19 @@ See also: OLC ROOM TEMPLATES, ADVEDIT RESET TIME, VNUM
 #d
 REQUIREMENTS "QEDIT TASKS" "QEDIT PREREQS" "QEDIT PREREQUISITES" "SOCEDIT REQUIREMENTS"
 
-Usage:  .<field> add <type> <vnum>
-        .<field> change <number> vnum <value>
+Usage:  .<field> add <type> <vnum> [group]
+        .<field> change <number> <amount | group | vnum> <value>
         .<field> copy <from type> <from vnum> [tasks/prereqs]
         .<field> remove <number | all>
 
 Requirement lists are used to determine if a character is eligible for some-
 thing, or if they have completed it. Examples include quest prerequisites and
-tasks. All requirements in the list must be met in order for the player to
-qualify.
+tasks.
+
+A player only needs to meet 1 requirement from the list. However, you can
+create requirement groups where all conditions on a group must be met. If
+there is more than one group, the player only needs to meet all conditions from
+any 1 group. Group names are always a single case-sensitive letter.
 
 Available tasks:
  COMPLETED-QUEST - Must complete a certain quest.

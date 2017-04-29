@@ -2339,6 +2339,7 @@ struct req_data {
 	int type;	// REQ_ type
 	any_vnum vnum;
 	bitvector_t misc;	// stores flags for some types
+	char group;	// for "AND" grouping
 	
 	int needed;	// how many the player needs
 	int current;	// how many the player has (for places where this data is tracked

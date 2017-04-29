@@ -4941,6 +4941,18 @@ bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag) {
 
 
 /**
+* Sorts requirements by what group they are in.
+*
+* @param struct req_data *a Comparable #1.
+* @param struct req_data *a Comparable #2.
+* @return int sort instruction (-, 0, +)
+*/
+int sort_requirements_by_group(struct req_data *a, struct req_data *b) {
+	return (a->group - b->group);
+}
+
+
+/**
 * This re-usable function is for making tweaks to all players, for example
 * removing a player flag that's no longer used. It loads all players who aren't
 * already in-game.

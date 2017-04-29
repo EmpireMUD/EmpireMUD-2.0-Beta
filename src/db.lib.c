@@ -7448,12 +7448,20 @@ void parse_requirement(FILE *fl, struct req_data **list, char *error_str) {
 	bitvector_t misc;
 	char line[256];
 	any_vnum vnum;
+	char group;
 	
 	if (!fl || !list || !get_line(fl, line)) {
 		log("SYSERR: data error in requirement line of %s", error_str ? error_str : "UNKNOWN");
 		exit(1);
 	}
-	if (sscanf(line, "%d %d %llu %d", &type, &vnum, &misc, &needed) != 4) {
+	
+	if (sscanf(line, "%d %d %llu %d %c", &type, &vnum, &misc, &needed, &group) == 5) {
+		group = isalpha(group) ? group : 0;
+	}
+	else if (sscanf(line, "%d %d %llu %d", &type, &vnum, &misc, &needed) == 4) {
+		group = 0;
+	}
+	else {
 		log("SYSERR: format error in requirement line of %s", error_str ? error_str : "UNKNOWN");
 		exit(1);
 	}
@@ -7462,6 +7470,7 @@ void parse_requirement(FILE *fl, struct req_data **list, char *error_str) {
 	req->type = type;
 	req->vnum = vnum;
 	req->misc = misc;
+	req->group = group;
 	req->needed = needed;
 	req->current = 0;
 	
@@ -7480,6 +7489,11 @@ void write_requirements_to_file(FILE *fl, char letter, struct req_data *list) {
 	struct req_data *iter;
 	LL_FOREACH(list, iter) {
 		// NOTE: iter->current is NOT written to file (is only used for live data)
-		fprintf(fl, "%c\n%d %d %llu %d\n", letter, iter->type, iter->vnum, iter->misc, iter->needed);
+		if (iter->group) {
+			fprintf(fl, "%c\n%d %d %llu %d %c\n", letter, iter->type, iter->vnum, iter->misc, iter->needed, iter->group);
+		}
+		else {
+			fprintf(fl, "%c\n%d %d %llu %d\n", letter, iter->type, iter->vnum, iter->misc, iter->needed);
+		}
 	}
 }
