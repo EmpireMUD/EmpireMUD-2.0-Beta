@@ -307,19 +307,83 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 
 
 /**
+* Returns the complete/total numbers for the quest tasks the player is
+* closest to completing. If a quest has multiple "or" conditions, it picks
+* the best one.
+* 
 * @param struct player_quest *pq The player-quest entry to count.
 * @param int *complete A variable to store the # of complete tasks.
 * @param int *total A vartiable to store the total # of tasks.
 */
 void count_quest_tasks(struct player_quest *pq, int *complete, int *total) {
-	struct req_data *task;
+	// helper struct
+	struct count_quest_data {
+		int group;	// converted from "char"
+		int complete;	// tasks considered done
+		int total;	// total tasks in the group
+		UT_hash_handle hh;
+	};
 	
+	struct count_quest_data *cqd, *next_cqd, *cqd_list = NULL;
+	int group, best_total, best_complete;
+	struct req_data *task;
+	bool done = FALSE;
+	
+	// prepare data
 	*complete = *total = 0;
+	
 	LL_FOREACH(pq->tracker, task) {
-		++*total;
-		if (task->current >= task->needed) {
-			++*complete;
+		if (!task->group) {	// ungrouped "or" tasks
+			if (task->current >= task->needed) {
+				// found a complete "or"
+				*complete = *total = 1;
+				done = TRUE;
+				break;
+			}
 		}
+		else {	// grouped tasks
+			// find or create group tracker
+			group = (int) task->group;
+			HASH_FIND_INT(cqd_list, &group, cqd);
+			if (!cqd) {
+				CREATE(cqd, struct count_quest_data, 1);
+				cqd->group = group;
+				HASH_ADD_INT(cqd_list, group, cqd);
+			}
+			
+			cqd->total += 1;
+			if (task->current >= task->needed) {
+				cqd->complete += 1;
+			}
+		}
+	}
+	
+	// tally data
+	best_complete = 0;	// start this lower than best_total
+	best_total = 1;	// ensure this is not zero
+	
+	HASH_ITER(hh, cqd_list, cqd, next_cqd) {
+		if (!done) {	// only bother with this part if we didn't find one
+			if (cqd->complete >= cqd->total && best_complete < best_total) {
+				// found first completion
+				best_complete = cqd->complete;
+				best_total = cqd->total;
+			}
+			else if ((cqd->complete * 100 / cqd->total) > (best_complete * 100 / best_total)) {
+				// found better completion
+				best_complete = cqd->complete;
+				best_total = cqd->total;
+			}
+		}
+		
+		// clean up data
+		free(cqd);
+	}
+	
+	// update data only if we didn't already finish
+	if (!done) {
+		*complete = MAX(0, best_complete);
+		*total = MAX(1, best_total);
 	}
 }
 
