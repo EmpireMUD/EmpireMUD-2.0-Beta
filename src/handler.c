@@ -5345,10 +5345,69 @@ bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnu
 * @param struct req_data *list The items to lose (other task types are ignored).
 */
 void extract_required_items(char_data *ch, struct req_data *list) {
-	struct resource_data *res = NULL;
-	struct req_data *req;
+	// helper type
+	struct extract_items_data {
+		int group;	// cast from char
+		int complete;	// number to do
+		int tasks;	// total tasks
+		UT_hash_handle hh;
+	};
 	
+	struct extract_items_data *eid, *next_eid, *eid_list = NULL;
+	struct req_data *req, *found_req = NULL;
+	struct resource_data *res = NULL;
+	bool done = FALSE;
+	int group, which;
+	
+	// build a list of which tasks might be complete
 	LL_FOREACH(list, req) {
+		if (!req->group) {	// ungrouped requirement
+			if (req->current >= req->needed) {
+				// complete!
+				found_req = req;
+				done = TRUE;
+				break;
+			}
+		}
+		else {	// grouped req
+			// find or add data
+			group = (int)req->group;
+			HASH_FIND_INT(eid_list, &group, eid);
+			if (!eid) {
+				CREATE(eid, struct extract_items_data, 1);
+				eid->group = group;
+				HASH_ADD_INT(eid_list, group, eid);
+			}
+			
+			// compute data
+			eid->tasks += 1;
+			if (req->current >= req->needed) {
+				eid->complete += 1;
+			}
+		}
+	}
+	
+	// figure out which group
+	which = -1;
+	HASH_ITER(hh, eid_list, eid, next_eid) {
+		if (which == -1 && eid->complete >= eid->tasks) {
+			which = eid->group;
+		}
+		
+		// free data now
+		free(eid);
+	}
+	
+	// now that we know what to extract
+	LL_FOREACH(list, req) {
+		// is this one we extract from?
+		if (done && found_req != req) {
+			continue;
+		}
+		else if (!done && which != (int)req->group) {
+			continue;
+		}
+		
 		// REQ_x: types that are extractable
 		switch (req->type) {
 			case REQ_GET_COMPONENT: {
