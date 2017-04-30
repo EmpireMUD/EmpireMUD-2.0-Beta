@@ -54,7 +54,9 @@ Turn in one or more quests. You must find the correct location, person, or item
 to turn in each quest. There will be an indication if you have a quest to turn
 in somewhere.
 
-See also: QUEST
+To finish a quest, you must have finished the tasks on its tracker.
+
+See also: QUEST, QUEST TRACKER
 #
 "QUEST GROUP"
 
@@ -73,9 +75,10 @@ This displays additional information about a quest, including the quest's full
 description. It works on both quests you're on, and ones available at your
 location.
 
-When you use it on a quest you're on, you will also see the quest tracker.
+When you use it on a quest you're on, you will also see the quest tracker. See
+the quest tracker help file for more information.
 
-See also: QUEST
+See also: QUEST, QUEST TRACKER
 #
 "QUEST LIST"
 
@@ -113,7 +116,12 @@ See also: QUEST
 
 Usage:  quest tracker <name>
 
-This shows the quest tracker for a quest you're on.
+This shows the quest tracker for a quest you're on. The tracker tells you what
+tasks are required for the quest.
+
+Some quests require ALL tasks in the tracker to be complete, others only
+require some tasks. If any tasks say "or", you only need to match one of the
+ors.
 
 See also: QUEST
 #

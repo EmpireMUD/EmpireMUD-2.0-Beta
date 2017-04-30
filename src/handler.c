@@ -5413,14 +5413,42 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 	extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 	
+	// helper struct
+	struct meets_req_data {
+		int group;	// actually a char, but cast
+		bool ok;	// good until failed
+		UT_hash_handle hh;
+	};
+	
+	struct meets_req_data *mrd, *next_mrd, *mrd_list = NULL;
+	bool global_ok = FALSE, ok;
 	struct req_data *req;
+	int group;
 	
 	LL_FOREACH(list, req) {
+		// first look up or create data for this group
+		group = req->group;
+		HASH_FIND_INT(mrd_list, &group, mrd);
+		if (!mrd) {
+			CREATE(mrd, struct meets_req_data, 1);
+			mrd->group = (int)req->group;
+			mrd->ok = TRUE;	// default
+			HASH_ADD_INT(mrd_list, group, mrd);
+		}
+		
+		// shortcut if the group already failed (group=none skips this because it's an "or")
+		if (mrd->group && !mrd->ok) {
+			continue;
+		}
+		
+		// alright, true unless proven otherwise
+		ok = TRUE;
+		
 		// REQ_x: only requirements that can be prereqs (don't require a tracker)
 		switch(req->type) {
 			case REQ_COMPLETED_QUEST: {
 				if (!has_completed_quest(ch, req->vnum, instance ? instance->id : NOTHING)) {
-					return FALSE;
+					ok = FALSE;
 				}
 				break;
 			}
@@ -5428,7 +5456,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				struct resource_data *res = NULL;
 				add_to_resource_list(&res, RES_COMPONENT, req->vnum, req->needed, req->misc);
 				if (!has_resources(ch, res, FALSE, FALSE)) {
-					return FALSE;
+					ok = FALSE;
 				}
 				free_resource_list(res);
 				break;
@@ -5437,50 +5465,50 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				struct resource_data *res = NULL;
 				add_to_resource_list(&res, RES_OBJECT, req->vnum, req->needed, 0);
 				if (!has_resources(ch, res, FALSE, FALSE)) {
-					return FALSE;
+					ok = FALSE;
 				}
 				free_resource_list(res);
 				break;
 			}
 			case REQ_NOT_COMPLETED_QUEST: {
 				if (has_completed_quest(ch, req->vnum, instance ? instance->id : NOTHING)) {
-					return FALSE;
+					ok = FALSE;
 				}
 				break;
 			}
 			case REQ_NOT_ON_QUEST: {
 				if (is_on_quest(ch, req->vnum)) {
-					return FALSE;
+					ok = FALSE;
 				}
 				break;
 			}
 			case REQ_OWN_BUILDING: {
 				if (!GET_LOYALTY(ch) || count_owned_buildings(GET_LOYALTY(ch), req->vnum) < req->needed) {
-					return FALSE;
+					ok = FALSE;
 				}
 				break;
 			}
 			case REQ_OWN_VEHICLE: {
 				if (!GET_LOYALTY(ch) || count_owned_vehicles(GET_LOYALTY(ch), req->vnum) < req->needed) {
-					return FALSE;
+					ok = FALSE;
 				}
 				break;
 			}
 			case REQ_SKILL_LEVEL_OVER: {
 				if (get_skill_level(ch, req->vnum) < req->needed) {
-					return FALSE;
+					ok = FALSE;
 				}
 				break;
 			}
 			case REQ_SKILL_LEVEL_UNDER: {
 				if (get_skill_level(ch, req->vnum) > req->needed) {
-					return FALSE;
+					ok = FALSE;
 				}
 				break;
 			}
 			case REQ_HAVE_ABILITY: {
 				if (!has_ability(ch, req->vnum)) {
-					return FALSE;
+					ok = FALSE;
 				}
 				break;
 			}
@@ -5488,7 +5516,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				struct player_faction_data *pfd = get_reputation(ch, req->vnum, FALSE);
 				faction_data *fct = find_faction_by_vnum(req->vnum);
 				if (compare_reptuation((pfd ? pfd->rep : (fct ? FCT_STARTING_REP(fct) : REP_NEUTRAL)), req->needed) < 0) {
-					return FALSE;
+					ok = FALSE;
 				}
 				break;
 			}
@@ -5496,7 +5524,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				struct player_faction_data *pfd = get_reputation(ch, req->vnum, FALSE);
 				faction_data *fct = find_faction_by_vnum(req->vnum);
 				if (compare_reptuation((pfd ? pfd->rep : (fct ? FCT_STARTING_REP(fct) : REP_NEUTRAL)), req->needed) > 0) {
-					return FALSE;
+					ok = FALSE;
 				}
 				break;
 			}
@@ -5512,7 +5540,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				}
 				
 				if (!found) {
-					return FALSE;
+					ok = FALSE;
 				}
 				
 				break;
@@ -5533,7 +5561,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 					// check inventory
 					add_to_resource_list(&res, RES_OBJECT, req->vnum, req->needed, 0);
 					if (!has_resources(ch, res, FALSE, FALSE)) {
-						return FALSE;
+						ok = FALSE;
 					}
 					free_resource_list(res);
 				}
@@ -5551,10 +5579,29 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 			default: {
 				break;
 			}
+		}	// end switch
+		
+		if (!ok) {	// did we survive the switch?
+			mrd->ok = FALSE;
+		}
+		else if (ok && !mrd->group) {	// the non-grouped conditions are "OR"s
+			global_ok = TRUE;
+			break;	// exit early
 		}
 	}
 	
-	return TRUE;
+	if (!global_ok) {	// did any sub-groups succeed?
+		HASH_ITER(hh, mrd_list, mrd, next_mrd) {
+			if (mrd->ok && mrd->group) {	// only grouped requirements count here
+				global_ok = TRUE;
+			}
+			
+			// free memory
+			free(mrd);
+		}
+	}
+	
+	return global_ok;
 }
 
 

@@ -505,13 +505,25 @@ char *show_daily_quest_line(char_data *ch) {
 void show_quest_tracker(char_data *ch, struct player_quest *pq) {
 	extern const bool requirement_amt_type[];
 	
+	int lefthand, count = 0, sub = 0;
 	char buf[MAX_STRING_LENGTH];
 	struct req_data *task;
-	int lefthand;
+	char last_group = 0;
 	
 	msg_to_char(ch, "Quest Tracker:\r\n");
 	
 	LL_FOREACH(pq->tracker, task) {
+		if (last_group != task->group) {
+			if (task->group) {
+				msg_to_char(ch, "  %sAll of:\r\n", (count > 0 ? "or " : ""));
+			}
+			last_group = task->group;
+			sub = 0;
+		}
+		
+		++count;	// total iterations
+		++sub;	// iterations inside this sub-group
+		
 		// REQ_AMT_x: display based on amount type
 		switch (requirement_amt_type[task->type]) {
 			case REQ_AMT_NUMBER: {
@@ -537,7 +549,7 @@ void show_quest_tracker(char_data *ch, struct player_quest *pq) {
 				break;
 			}
 		}
-		msg_to_char(ch, "  %s%s\r\n", requirement_string(task, FALSE), buf);
+		msg_to_char(ch, "  %s%s%s%s\r\n", (task->group ? "  " : ""), (sub > 1 ? "or " : ""), requirement_string(task, FALSE), buf);
 	}
 }
 
