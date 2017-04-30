@@ -4544,7 +4544,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		argument = any_one_arg(argument, field_arg);	// tasks/prereqs field to copy
 		
 		if (!*type_arg || !*vnum_arg) {
-			msg_to_char(ch, "Usage: %ss copy <from type> <from vnum> [tasks | prereqs]\r\n", command);
+			msg_to_char(ch, "Usage: %s copy <from type> <from vnum> [tasks | prereqs]\r\n", command);
 		}
 		else if ((findtype = find_olc_type(type_arg)) == 0) {
 			msg_to_char(ch, "Unknown olc type '%s'.\r\n", type_arg);
@@ -4574,7 +4574,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 					break;
 				}
 				default: {
-					msg_to_char(ch, "You can't copy %ss from %ss.\r\n", command, buf);
+					msg_to_char(ch, "You can't copy %s from %ss.\r\n", command, buf);
 					return;
 				}
 			}
@@ -4584,7 +4584,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 			}
 			else {
 				smart_copy_requirements(list, copyfrom);
-				msg_to_char(ch, "Copied %ss from %s %d.\r\n", command, buf, vnum);
+				msg_to_char(ch, "Copied %s from %s %d.\r\n", command, buf, vnum);
 			}
 		}
 	}	// end 'copy'
@@ -4598,7 +4598,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		else if (!str_cmp(argument, "all")) {
 			free_requirements(*list);
 			*list = NULL;
-			msg_to_char(ch, "You remove all the %ss.\r\n", command);
+			msg_to_char(ch, "You remove all the %s.\r\n", command);
 		}
 		else if (!isdigit(*argument) || (num = atoi(argument)) < 1) {
 			msg_to_char(ch, "Invalid %s number.\r\n", command);
@@ -4626,7 +4626,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		argument = any_one_arg(argument, type_arg);
 		
 		if (!*type_arg) {
-			msg_to_char(ch, "Usage: %ss add <type> [amount] [vnum] (see HELP REQUIREMENTS)\r\n", command);
+			msg_to_char(ch, "Usage: %s add <type> [amount] [vnum] (see HELP REQUIREMENTS)\r\n", command);
 		}
 		else if ((type = search_block(type_arg, requirement_types, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
@@ -4658,7 +4658,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		skip_spaces(&argument);
 		
 		if (!*num_arg || !isdigit(*num_arg) || !*field_arg) {
-			msg_to_char(ch, "Usage: %ss change <number> <amount | vnum> <value>\r\n", command);
+			msg_to_char(ch, "Usage: %s change <number> <amount | vnum> <value>\r\n", command);
 			return;
 		}
 		
@@ -4730,7 +4730,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		up = is_abbrev(field_arg, "up");
 		
 		if (!*num_arg || !*field_arg) {
-			msg_to_char(ch, "Usage: %ss move <number> <up | down>\r\n", command);
+			msg_to_char(ch, "Usage: %s move <number> <up | down>\r\n", command);
 		}
 		else if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
 			msg_to_char(ch, "Invalid %s number.\r\n", command);
@@ -4790,11 +4790,11 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		}
 	}	// end 'move'
 	else {
-		msg_to_char(ch, "Usage: %ss add <type> <vnum>\r\n", command);
-		msg_to_char(ch, "Usage: %ss change <number> vnum <value>\r\n", command);
-		msg_to_char(ch, "Usage: %ss copy <from type> <from vnum> [tasks/prereqs]\r\n", command);
-		msg_to_char(ch, "Usage: %ss remove <number | all>\r\n", command);
-		msg_to_char(ch, "Usage: %ss move <number> <up | down>\r\n", command);
+		msg_to_char(ch, "Usage: %s add <type> <vnum>\r\n", command);
+		msg_to_char(ch, "Usage: %s change <number> vnum <value>\r\n", command);
+		msg_to_char(ch, "Usage: %s copy <from type> <from vnum> [tasks/prereqs]\r\n", command);
+		msg_to_char(ch, "Usage: %s remove <number | all>\r\n", command);
+		msg_to_char(ch, "Usage: %s move <number> <up | down>\r\n", command);
 	}
 }
 

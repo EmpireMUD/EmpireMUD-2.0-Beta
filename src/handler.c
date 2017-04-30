@@ -5425,6 +5425,11 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 	struct req_data *req;
 	int group;
 	
+	// shortcut
+	if (!list) {
+		return TRUE;
+	}
+	
 	LL_FOREACH(list, req) {
 		// first look up or create data for this group
 		group = req->group;
