@@ -1679,16 +1679,26 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 				}
 				else if (PFILE_TAG(line, "Quest-task:", length)) {
-					if (last_plrq && sscanf(line + length + 1, "%d %d %lld %d %d", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3]) == 5) {
-						CREATE(task, struct req_data, 1);
-						task->type = i_in[0];
-						task->vnum = i_in[1];
-						task->misc = bit_in;
-						task->needed = i_in[2];
-						task->current = i_in[3];
-						
-						LL_APPEND(last_plrq->tracker, task);
+					if (last_plrq && sscanf(line + length + 1, "%d %d %lld %d %d %c", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3], &c_in) == 6) {
+						// found group
 					}
+					else if (last_plrq && sscanf(line + length + 1, "%d %d %lld %d %d", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3]) == 5) {
+						c_in = 0;	// no group given
+					}
+					else {
+						// bad format
+						break;
+					}
+					
+					CREATE(task, struct req_data, 1);
+					task->type = i_in[0];
+					task->vnum = i_in[1];
+					task->misc = bit_in;
+					task->needed = i_in[2];
+					task->current = i_in[3];
+					task->group = c_in;
+					
+					LL_APPEND(last_plrq->tracker, task);
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -2484,7 +2494,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	LL_FOREACH(GET_QUESTS(ch), plrq) {
 		fprintf(fl, "Quest: %d %d %ld %d %d\n", plrq->vnum, plrq->version, plrq->start_time, plrq->instance_id, plrq->adventure);
 		LL_FOREACH(plrq->tracker, task) {
-			fprintf(fl, "Quest-task: %d %d %lld %d %d\n", task->type, task->vnum, task->misc, task->needed, task->current);
+			fprintf(fl, "Quest-task: %d %d %lld %d %d %c\n", task->type, task->vnum, task->misc, task->needed, task->current, task->group);
 		}
 	}
 	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), plrcom, next_plrcom) {
