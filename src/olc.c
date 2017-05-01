@@ -4573,6 +4573,13 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 					}
 					break;
 				}
+				case OLC_SOCIAL: {
+					social_data *from_soc = social_proto(vnum);
+					if (from_soc) {
+						copyfrom = SOC_REQUIREMENTS(from_soc);
+					}
+					break;
+				}
 				default: {
 					msg_to_char(ch, "You can't copy %s from %ss.\r\n", command, buf);
 					return;
