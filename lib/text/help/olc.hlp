@@ -712,7 +712,7 @@ the same object). Existing buildings may also be interior rooms, but new
 building rules require a normal map building (one without the ROOM flag).
 
 For types requiring build-on or build-facing, you should include the set of
-build flags in quotes ("plains forest") if you use more than one. For the full
+build flags in quotes ("plains desert") if you use more than one. For the full
 list of build flags, see HELP SECTEDIT BUILDFLAGS.
 
 See also: OLC ADVENTURES, SECTEDIT BUILDFLAGS, VNUM
@@ -1537,7 +1537,7 @@ The following flags are available:
  water - any ocean or river tile
  plains - a plains or a road that was built on plains
  mountain - a mountain or mountain path
- forest - an overgrown forest (^^^^)
+ full forest - an overgrown forest (^^^^) or other full forest
  desert - a desert or a road that was built on desert
  river - a river tile
  jungle - any jungle tile
@@ -1572,7 +1572,7 @@ The following flags are available:
  water - any ocean or river tile
  plains - a plains or a road that was built on plains
  mountain - a mountain or mountain path
- forest - an overgrown forest (^^^^)
+ full forest - an overgrown forest (^^^^) or other full forest
  desert - a desert or a road that was built on desert
  river - a river tile
  jungle - any jungle tile
@@ -4832,7 +4832,7 @@ Available flags:
  water - any type of water tile
  plains - a flat, temperate sector like plains
  mountain - a rough tile like a mountain
- forest - a temperate forest of various types
+ full forest - a temperate forest of various types
  desert - a flat, arid sector
  river - a fresh-water sector
  jungle - any jungle tile

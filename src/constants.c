@@ -2366,7 +2366,7 @@ const char *bld_on_flags[] = {
 	"water",
 	"plains",
 	"mountain",
-	"forest",
+	"full forest",
 	"desert",
 	"river",
 	"jungle",
