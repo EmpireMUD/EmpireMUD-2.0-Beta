@@ -612,11 +612,13 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 
 
 /**
-* Makes sure all of a player's quest objectives are current.
+* Makes sure all of a player's quest objectives are current. Also cleans up
+* bad data from deleted quests.
 *
 * @param char_data *ch The player to check.
 */
 void refresh_all_quests(char_data *ch) {
+	struct player_completed_quest *pcq, *next_pcq;
 	struct player_quest *pq, *next_pq;
 	struct instance_data *inst;
 	struct req_data *old;
@@ -626,6 +628,7 @@ void refresh_all_quests(char_data *ch) {
 		return;
 	}
 	
+	// current quests
 	LL_FOREACH_SAFE(GET_QUESTS(ch), pq, next_pq) {
 		// remove entirely
 		if (!(quest = quest_proto(pq->vnum)) || (QUEST_FLAGGED(quest, QST_IN_DEVELOPMENT) && !IS_IMMORTAL(ch))) {
@@ -648,6 +651,14 @@ void refresh_all_quests(char_data *ch) {
 		
 		// check tracker tasks now
 		refresh_one_quest_tracker(ch, pq);
+	}
+	
+	// completed quests
+	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), pcq, next_pcq) {
+		if (!quest_proto(pcq->vnum)) {
+			HASH_DEL(GET_COMPLETED_QUESTS(ch), pcq);
+			free(pcq);
+		}
 	}
 }
 
@@ -3176,6 +3187,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	quest_data *quest, *qiter, *next_qiter;
 	social_data *soc, *next_soc;
 	descriptor_data *desc;
+	char_data *chiter;
 	bool found;
 	
 	if (!(quest = quest_proto(vnum))) {
@@ -3187,14 +3199,14 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	remove_quest_from_table(quest);
 	
 	// look for people on the quest and force a refresh
-	LL_FOREACH(descriptor_list, desc) {
-		if (STATE(desc) != CON_PLAYING || !desc->character) {
+	LL_FOREACH(character_list, chiter) {
+		if (IS_NPC(chiter)) {
 			continue;
 		}
-		if (!is_on_quest(desc->character, vnum)) {
+		if (!is_on_quest(chiter, vnum)) {
 			continue;
 		}
-		refresh_all_quests(desc->character);
+		refresh_all_quests(chiter);
 	}
 	
 	// save index and quest file now
