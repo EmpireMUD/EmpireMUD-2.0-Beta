@@ -11,21 +11,21 @@ also done Sir Vivor's quest in the same adventure instance.
 ~
 You have defeated Sir Vivor and earned the dragon's favor.
 ~
-7 bc 250 300 -1
+9 bc 250 300 -1
 A
 1 10900
 P
-6 10901 0 1
+6 10901 0 1 a
 P
-5 10901 0 1
+5 10901 0 1 a
 R
 2 10901 6
 T 10920
 T 10921
 W
-3 10901 0 1
+3 10901 0 1 a
 W
-5 10901 0 1
+5 10901 0 1 a
 Z
 1 10900
 S
@@ -42,20 +42,20 @@ also done the dragon's quest in the same adventure instance.
 ~
 You have slain the dragon! Sir Vivor dances with joy.
 ~
-4 bc 250 300 -1
+6 bc 250 300 -1
 A
 1 10901
 P
-6 10900 0 1
+6 10900 0 1 a
 P
-5 10900 0 1
+5 10900 0 1 a
 R
 2 10901 6
 T 10921
 W
-3 10900 0 1
+3 10900 0 1 a
 W
-5 10900 0 1
+5 10900 0 1 a
 Z
 1 10901
 S
@@ -74,11 +74,11 @@ quest. You're not much of a thief if you have to kill the dragon to get it.
 ~
 You split the dragon's treasure with the thief!
 ~
-11 bc 250 300 -1
+12 bc 250 300 -1
 A
 1 10902
 P
-9 4 0 1
+9 4 0 1 a
 R
 2 10901 3
 R

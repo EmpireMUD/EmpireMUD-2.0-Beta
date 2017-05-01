@@ -98,7 +98,7 @@ trinkets enchanted by a class of novice sorcerers as practice.
 ~
 The High Sorcerer takes the trinkets and thanks you for your help.
 ~
-11 ef 1 75 -1
+12 ef 1 75 -1
 A
 1 228
 P
@@ -107,9 +107,9 @@ R
 0 0 1
 T 9003
 W
-2 9036 0 5
+2 9036 0 5 a
 W
-11 0 0 1
+11 0 0 1 a
 Z
 1 228
 S
@@ -122,7 +122,7 @@ experiment, he asks you to bring him the herbs.
    You give the herbs to the alchemist, who immediately criticizes your
 herb-picking technique. At least you learned something from it.
 ~
-4 def 0 0 -1
+5 def 0 0 -1
 A
 1 231
 P
@@ -132,9 +132,9 @@ R
 R
 4 5 50
 W
-2 1202 0 4
+2 1202 0 4 a
 W
-2 1205 0 4
+2 1205 0 4 a
 Z
 1 231
 S

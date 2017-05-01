@@ -93,7 +93,7 @@ spell to seal the rift.
 ~
 You found the spell to seal the rift!
 ~
-6 c 75 100 1440
+7 c 75 100 1440
 A
 2 10140
 P
@@ -118,9 +118,9 @@ R
 6 10145 1
 T 10174
 W
-12 5511 0 1
+12 5511 0 1 a
 W
-11 0 0 1
+11 0 0 1 a
 Z
 2 10142
 S
@@ -134,7 +134,7 @@ monsoon rift and type 'ritual rift' to seal it off and end the cactus invasion.
 fade and lose its hold. Almost instantly, the rift begins to collapse.
 Hopefully nobody is trapped on the wrong side of it!
 ~
-8 bc 75 100 0
+9 bc 75 100 0
 A
 2 10142
 P
@@ -164,9 +164,9 @@ R
 T 10174
 T 18259
 W
-12 10140 0 1
+12 10140 0 1 a
 W
-11 0 0 1
+11 0 0 1 a
 Z
 2 10175
 S
@@ -235,7 +235,7 @@ laundry, ties them to a pigeon, and sends it off.
    Within moments, the rift starts to close. Clearly the head druid got the
 message. You had better head out of the rift, before it collapses completely.
 ~
-9 cd 75 100 1440
+10 cd 75 100 1440
 A
 1 10145
 P
@@ -263,11 +263,11 @@ R
 T 10142
 T 18259
 W
-13 10143 0 1
+13 10143 0 1 a
 W
-11 0 0 1
+11 0 0 1 a
 W
-2 10178 0 1
+2 10178 0 1 a
 Z
 1 10145
 S
@@ -376,7 +376,7 @@ have been ravaging the countryside.
 animates the cacti begins to fade. In the distance, you can see the rift
 starting to close. You better hurry out!
 ~
-11 bc 75 100 0
+12 bc 75 100 0
 A
 2 10161
 P
@@ -406,9 +406,9 @@ R
 T 10178
 T 18259
 W
-13 10145 0 1
+13 10145 0 1 a
 W
-11 0 0 1
+11 0 0 1 a
 Z
 2 10173
 S

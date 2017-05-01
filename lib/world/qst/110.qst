@@ -15,15 +15,15 @@ do the trick. Follow these instructions to complete the quest:
 red glow and begins to crack... A huge, rust-colored roc alights above you on
 the edge of the nest as her baby breaks out of the shell.
 ~
-5 bcde 100 125 -1
+6 bcde 100 125 -1
 A
 2 11001
 P
-6 11001 0 1
+6 11001 0 1 a
 P
-6 11002 0 1
+6 11002 0 1 a
 P
-6 11003 0 1
+6 11003 0 1 a
 R
 2 11014 1
 R
@@ -47,17 +47,17 @@ Return when you've made them all.
 size of a temple alights on the edge of the nest. She looks pleased with the
 supplies you've brought.
 ~
-11 bcde 100 125 -1
+13 bcde 100 125 -1
 A
 2 11001
 P
-6 11000 0 1
+6 11000 0 1 a
 P
-6 11002 0 1
+6 11002 0 1 a
 P
-6 11003 0 1
+6 11003 0 1 a
 P
-9 6 0 15
+9 6 0 15 a
 R
 2 11014 1
 R
@@ -67,11 +67,11 @@ R
 T 11019
 T 11006
 W
-2 11055 0 2
+2 11055 0 2 a
 W
-2 11056 0 2
+2 11056 0 2 a
 W
-2 11057 0 2
+2 11057 0 2 a
 Z
 2 11001
 S
@@ -85,17 +85,17 @@ you're caught, or are in combat when the timer ends, you will fail the quest.
 ~
 You trade the egg for your rewards, relieved that you escaped safely.
 ~
-8 bce 100 125 -1
+9 bce 100 125 -1
 A
 2 11001
 P
-6 11000 0 1
+6 11000 0 1 a
 P
-6 11001 0 1
+6 11001 0 1 a
 P
-6 11003 0 1
+6 11003 0 1 a
 P
-15 143 0 1
+15 143 0 1 a
 R
 2 11013 4
 R
@@ -117,15 +117,15 @@ with the mother...
 ~
 You retrieve your rewards from the dead roc.
 ~
-8 bce 100 125 -1
+9 bce 100 125 -1
 A
 2 11001
 P
-6 11000 0 1
+6 11000 0 1 a
 P
-6 11001 0 1
+6 11001 0 1 a
 P
-6 11002 0 1
+6 11002 0 1 a
 R
 2 11013 4
 R
