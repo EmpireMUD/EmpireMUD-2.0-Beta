@@ -401,9 +401,7 @@ If you specify a skill, you'll see a breakdown of the abilities in that skill
 tree. Abilities marked with an "x" are the ones you already know. To buy a new
 ability, use "skill buy". You must have a free ability point to do this.
 
-For more information, see the help page for each skill or ability. In some
-cases, you may have to type "help skill empire" because "help empire" shows
-something else, although this is the name of a skill.
+For more information, see the help page for each skill or ability.
 
 When you hit a skill cap level (50, 75, 100) you get to reset your abilities
 in that skill. To do that, you can type "skill reset <skill>". If you type it
