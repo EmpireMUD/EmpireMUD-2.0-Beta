@@ -278,6 +278,13 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 			}
 		}
 	}
+	
+	// clear color codes for people we missed
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
+		if (!IS_NPC(c) && c->desc && !c->desc->last_act_message && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
+			send_to_char("\t0", c);
+		}
+	}
 }
 
 
