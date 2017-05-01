@@ -117,10 +117,10 @@ S
 Herbs for the Alchemist~
    The alchemist needs some herbs for his latest experiment. Since apparently
 nobody else knows what a herb looks like and he's too busy watching the
-experiment, he asks you to bring him the herbs.  
+experiment, he asks you to bring him the herbs.
 ~
    You give the herbs to the alchemist, who immediately criticizes your
-herb-picking technique. At least you learned something from it.  
+herb-picking technique. At least you learned something from it.
 ~
 4 def 0 0 -1
 A
@@ -142,18 +142,18 @@ S
 Flowers for the Alchemist~
    The alchemist is working on an experiment to prove that flowers are not
 completely useless. Since he can't leave his experiment alone, he asks you to
-pick some flowers for him.  
+pick some flowers for him.
 ~
    You hand over the flowers to the alchemist, who tosses them into a cauldron.
-Nothing appears to happen.  
+Nothing appears to happen.
 ~
-3 def 0 0 -1
+4 def 0 0 -1
 A
 1 231
 P
-9 5 0 15
+9 5 0 15 a
 P
-10 5 0 49
+10 5 0 49 a
 R
 0 0 1
 R
@@ -171,15 +171,15 @@ then return for a reward.
 ~
 The postmaster thanks you for your help.
 ~
-10 ef 0 0 -1
+11 ef 0 0 -1
 A
 1 263
 P
-7 5511 0 1
+7 5130 0 1 a
 P
-7 5130 0 1
+7 5108 0 1 a
 P
-7 5108 0 1
+7 5511 0 1 a
 R
 0 0 1
 R

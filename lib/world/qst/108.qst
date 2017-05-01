@@ -29,15 +29,15 @@ reward Empire skill levels and bonus experience.
 ~
 You have found Ranger Clara!
 ~
-10 0 0 25 -1
+11 0 0 25 -1
 A
 1 10800
 P
-10 1 0 49
+10 1 0 49 a
 P
-5 10802 0 1
+5 10802 0 1 a
 P
-6 10802 0 1
+6 10802 0 1 a
 R
 6 10800 1
 R
@@ -98,15 +98,15 @@ done, take them to Rosemary in the planning office.
 ~
 Rosemary examines the logs you've scraped off, and gives you a nod of approval.
 ~
-12 0 0 25 -1
+13 0 0 25 -1
 A
 1 10801
 P
-0 10802 0 1
+0 10802 0 1 a
 P
-9 1 0 1
+9 1 0 1 a
 P
-10 1 0 49
+10 1 0 49 a
 R
 0 0 1
 R
@@ -138,15 +138,15 @@ Rosemary wants you to take those logs and build a cabin.
 ~
 Rosemary seems pleased with your cabin.
 ~
-15 0 0 25 -1
+16 0 0 25 -1
 A
 1 10802
 P
-0 10803 0 1
+0 10803 0 1 a
 P
-9 1 0 1
+9 1 0 1 a
 P
-10 1 0 49
+10 1 0 49 a
 R
 0 0 1
 R
@@ -171,15 +171,15 @@ forest, or get them by scraping trees.
 wonders aloud whether you'll be able to carry enough of them for the next part
 of the tutorial.
 ~
-15 0 0 25 -1
+16 0 0 25 -1
 A
 1 10802
 P
-0 10804 0 1
+0 10804 0 1 a
 P
-9 1 0 1
+9 1 0 1 a
 P
-10 1 0 49
+10 1 0 49 a
 R
 0 0 1
 R
@@ -208,15 +208,15 @@ Return to the City Planner's office when you're done.
 ~
 Rosemary is proud of you for finishing so many buildings.
 ~
-16 0 0 25 -1
+17 0 0 25 -1
 A
 1 10802
 P
-0 10805 0 1
+0 10805 0 1 a
 P
-9 1 0 1
+9 1 0 1 a
 P
-10 1 0 49
+10 1 0 49 a
 R
 0 0 1
 R
@@ -250,15 +250,15 @@ done.
 ~
 Rosemary is pleased with your progress.
 ~
-16 0 0 25 -1
+17 0 0 25 -1
 A
 1 10802
 P
-0 10806 0 1
+0 10806 0 1 a
 P
-9 1 0 1
+9 1 0 1 a
 P
-10 1 0 49
+10 1 0 49 a
 R
 0 0 1
 R
@@ -288,15 +288,15 @@ some iron and smelt it into ingots, and then return to Rosemary.
 ~
 Rosemary is impressed that you got the iron so fast.
 ~
-18 0 0 25 -1
+19 0 0 25 -1
 A
 1 10802
 P
-0 10807 0 1
+0 10807 0 1 a
 P
-9 1 0 1
+9 1 0 1 a
 P
-10 1 0 49
+10 1 0 49 a
 R
 0 0 1
 R
@@ -323,15 +323,15 @@ to build the whole forge.
 ~
 Rosemary inspects your building materials, and approves.
 ~
-21 0 0 25 -1
+22 0 0 25 -1
 A
 1 10802
 P
-0 10808 0 1
+0 10808 0 1 a
 P
-9 1 0 1
+9 1 0 1 a
 P
-10 1 0 49
+10 1 0 49 a
 R
 0 0 1
 R
@@ -360,15 +360,15 @@ to Rosemary in the City Planning office when it's built.
    Rosemary congratulates you on building your forge. This is the end of the
 Empire tutorial. Now go forth, and rule the world!
 ~
-19 0 0 25 -1
+20 0 0 25 -1
 A
 1 10802
 P
-0 10809 0 1
+0 10809 0 1 a
 P
-9 1 0 1
+9 1 0 1 a
 P
-10 1 0 49
+10 1 0 49 a
 R
 0 0 2
 R
@@ -438,15 +438,15 @@ reward Trade skill levels and bonus experience.
 ~
 You've found Horation and the Museum of Early Man!
 ~
-12 0 0 25 -1
+13 0 0 25 -1
 A
 1 10825
 P
-10 6 0 49
+10 6 0 49 a
 P
-5 10827 0 1
+5 10827 0 1 a
 P
-6 10827 0 1
+6 10827 0 1 a
 R
 6 10825 1
 R
