@@ -3332,7 +3332,8 @@ void game_loop(socket_t mother_desc) {
 	/* The Main Loop.  The Big Cheese.  The Top Dog.  The Head Honcho.  The.. */
 	while (!empire_shutdown) {
 
-		/* Sleep if we don't have any connections */
+		/** Sleep if we don't have any connections
+		// This is OFF because it blocks map evolutions and workforce
 		if (descriptor_list == NULL) {
 			log("No connections. Going to sleep.");
 			FD_ZERO(&input_set);
@@ -3349,6 +3350,8 @@ void game_loop(socket_t mother_desc) {
 			}
 			gettimeofday(&last_time, (struct timezone *) 0);
 		}
+		/**
+		
 		/* Set up the input, output, and exception sets for select(). */
 		FD_ZERO(&input_set);
 		FD_ZERO(&output_set);
