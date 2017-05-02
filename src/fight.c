@@ -2578,8 +2578,12 @@ void check_auto_assist(char_data *ch) {
 		}
 		
 		// champion
-		if (iter_master == ch && FIGHTING(ch) && FIGHTING(FIGHTING(ch)) == ch && IS_NPC(ch_iter) && MOB_FLAGGED(ch_iter, MOB_CHAMPION) && FIGHT_MODE(FIGHTING(ch)) == FMODE_MELEE) {
-			perform_rescue(ch_iter, ch, FIGHTING(ch));
+		if (MOB_FLAGGED(ch_iter, MOB_CHAMPION) && iter_master == ch && FIGHTING(ch) && FIGHTING(FIGHTING(ch)) == ch && IS_NPC(ch_iter)) {
+			if (FIGHT_MODE(FIGHTING(ch)) == FMODE_MELEE) {
+				// can rescue only in melee
+				perform_rescue(ch_iter, ch, FIGHTING(ch));
+			}
+			// else { champion but not in melee? just fall through to the continue
 			continue;
 		}
 		
