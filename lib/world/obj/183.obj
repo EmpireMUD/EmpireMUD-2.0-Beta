@@ -111,7 +111,7 @@ Naqada wristguards~
 A pair of Naqada wristguards is lying on the ground.~
    These wristguards are made from fine argentine metal, inscribed with tiny
 pictures of birds, cats, and eyes. They strap to the wrists with thick straps
-that appear to be made from bloodstained crocodile leather.  
+that appear to be made from bloodstained crocodile leather.
 ~
 27 mp aj 6
 3 0 0
@@ -262,7 +262,7 @@ sandals burning dunes~
 sandals of the burning dunes~
 The sandals of the burning dunes lie here, smoldering.~
    These sandals are made from fine ibis leather, soaked in beams of moonlight
-to grant them protection from the burning sand dunes of their homeland.  
+to grant them protection from the burning sand dunes of their homeland.
 ~
 27 mp ag 6
 0 0 0
@@ -477,9 +477,9 @@ a bolt of linen~
 A bolt of linen is lying here.~
 The white linen cloth is very fine, like no other you've seen.
 ~
-3 0 a 9
+3 0 a 10
 0 0 0
-7 0
+11 0
 M
 6
 You carefully hang some linen cloth on $V.~

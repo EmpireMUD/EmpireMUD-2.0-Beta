@@ -1780,6 +1780,7 @@ const char *versions_list[] = {
 	"b4.19",
 	"b4.32",
 	"b4.36",
+	"b4.38",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2306,6 +2307,26 @@ void b4_36_study_triggers(void) {
 }
 
 
+// 4.38 needs triggers attached to towers
+void b4_38_tower_triggers(void) {
+	const any_vnum bld_tower = 5511, attach_trigger = 5511;
+	struct trig_proto_list *tpl;
+	room_data *room;
+	
+	LL_FOREACH2(interior_room_list, room, next_interior) {
+		if (!GET_BUILDING(room) || GET_BLD_VNUM(GET_BUILDING(room)) != bld_tower) {
+			continue;
+		}
+		
+		CREATE(tpl, struct trig_proto_list, 1);
+		tpl->vnum = attach_trigger;
+		LL_CONCAT(room->proto_script, tpl);
+		
+		assign_triggers(room, WLD_TRIGGER);
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -2507,6 +2528,10 @@ void check_version(void) {
 		if (MATCH_VERSION("b4.36")) {
 			log("Applying b4.36 update to studies...");
 			b4_36_study_triggers();
+		}
+		if (MATCH_VERSION("b4.38")) {
+			log("Applying b4.38 update to towers...");
+			b4_38_tower_triggers();
 		}
 	}
 	

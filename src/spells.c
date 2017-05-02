@@ -363,8 +363,8 @@ ACMD(do_ready) {
 	
 	ability_data *abil;
 	obj_data *obj;
-	int type, iter, scale_level;
-	bool found;
+	int type, iter, scale_level, ch_level = 0;
+	bool found, later = TRUE;
 	
 	one_argument(argument, arg);
 	
@@ -412,6 +412,12 @@ ACMD(do_ready) {
 		return;
 	}
 	
+	// if they are using a NON-1-use item, determine level now
+	if (GET_EQ(ch, WEAR_WIELD) && !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_SINGLE_USE)) {
+		ch_level = get_approximate_level(ch);
+		later = FALSE;
+	}
+	
 	// attempt to remove existing wield
 	if (GET_EQ(ch, WEAR_WIELD)) {
 		perform_remove(ch, WEAR_WIELD);
@@ -426,16 +432,21 @@ ACMD(do_ready) {
 		appear(ch);
 	}
 	
+	// if they are using a 1-use item, determine level at the end here
+	if (later) {
+		ch_level = get_approximate_level(ch);
+	}
+	
 	charge_ability_cost(ch, ready_magic_weapon[type].cost_pool, ready_magic_weapon[type].cost, NOTHING, 0, WAIT_SPELL);
 	
 	// load the object
 	obj = read_object(ready_magic_weapon[type].vnum, TRUE);
 	abil = find_ability_by_vnum(ready_magic_weapon[type].ability);
 	if (!abil || IS_CLASS_ABILITY(ch, ready_magic_weapon[type].ability) || ABIL_ASSIGNED_SKILL(abil) == NULL) {
-		scale_level = get_approximate_level(ch);	// class-level
+		scale_level = ch_level;	// class-level
 	}
 	else {
-		scale_level = MIN(get_approximate_level(ch), get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
+		scale_level = MIN(ch_level, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
 	}
 	scale_item_to_level(obj, scale_level);
 	

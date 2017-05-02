@@ -1062,7 +1062,6 @@ void start_dismantle_building(room_data *loc) {
 	stop_room_action(loc, ACT_MINTING, ACT_MINTING);
 	stop_room_action(loc, ACT_BATHING, NOTHING);
 	stop_room_action(loc, ACT_ESCAPING, NOTHING);
-	stop_room_action(loc, ACT_STUDYING, NOTHING);
 	stop_room_action(loc, ACT_SAWING, CHORE_SAWING);
 	stop_room_action(loc, ACT_QUARRYING, CHORE_QUARRYING);
 	stop_room_action(loc, ACT_MAINTENANCE, CHORE_MAINTENANCE);

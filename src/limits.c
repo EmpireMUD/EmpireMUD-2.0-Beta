@@ -249,7 +249,7 @@ void check_pointless_fight(char_data *mob) {
 	if (!FIGHTING(mob) || !IS_POINTLESS(mob)) {
 		return;	// mob is not pointless (or not fighting)
 	}
-	if (!IS_POINTLESS(FIGHTING(mob))) {
+	if (FIGHTING(FIGHTING(mob)) && !IS_POINTLESS(FIGHTING(mob))) {
 		return;	// mob is fighting a non-pointless enemy
 	}
 	

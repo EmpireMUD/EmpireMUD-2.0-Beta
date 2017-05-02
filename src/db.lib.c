@@ -7430,3 +7430,83 @@ void write_applies_to_file(FILE *fl, struct apply_data *list) {
 		fprintf(fl, "A\n%d %d\n", app->location, app->weight);
 	}
 }
+
+
+/**
+* Sorts requirements by what group they are in.
+*
+* @param struct req_data *a Comparable #1.
+* @param struct req_data *a Comparable #2.
+* @return int sort instruction (-, 0, +)
+*/
+int sort_requirements_by_group(struct req_data *a, struct req_data *b) {
+	return (a->group - b->group);
+}
+
+
+/**
+* Parses a requirement, saved as:
+*
+* A
+* 1 123 123456 10
+*
+* @param FILE *fl The file, having just read the letter tag.
+* @param struct req_data **list The list to append to.
+* @param char *error_str How to report if there is an error.
+*/
+void parse_requirement(FILE *fl, struct req_data **list, char *error_str) {
+	struct req_data *req;
+	int type, needed;
+	bitvector_t misc;
+	char line[256];
+	any_vnum vnum;
+	char group;
+	
+	if (!fl || !list || !get_line(fl, line)) {
+		log("SYSERR: data error in requirement line of %s", error_str ? error_str : "UNKNOWN");
+		exit(1);
+	}
+	
+	if (sscanf(line, "%d %d %llu %d %c", &type, &vnum, &misc, &needed, &group) == 5) {
+		group = isalpha(group) ? group : 0;
+	}
+	else if (sscanf(line, "%d %d %llu %d", &type, &vnum, &misc, &needed) == 4) {
+		group = 0;
+	}
+	else {
+		log("SYSERR: format error in requirement line of %s", error_str ? error_str : "UNKNOWN");
+		exit(1);
+	}
+	
+	CREATE(req, struct req_data, 1);
+	req->type = type;
+	req->vnum = vnum;
+	req->misc = misc;
+	req->group = group;
+	req->needed = needed;
+	req->current = 0;
+	
+	LL_APPEND(*list, req);
+	LL_SORT(*list, sort_requirements_by_group);
+}
+
+
+/**
+* Writes a list of 'req_data' to a data file.
+*
+* @param FILE *fl The file, open for writing.
+* @param char letter The tag letter.
+* @param struct req_data *list The list to write.
+*/
+void write_requirements_to_file(FILE *fl, char letter, struct req_data *list) {
+	struct req_data *iter;
+	LL_FOREACH(list, iter) {
+		// NOTE: iter->current is NOT written to file (is only used for live data)
+		if (iter->group) {
+			fprintf(fl, "%c\n%d %d %llu %d %c\n", letter, iter->type, iter->vnum, iter->misc, iter->needed, iter->group);
+		}
+		else {
+			fprintf(fl, "%c\n%d %d %llu %d\n", letter, iter->type, iter->vnum, iter->misc, iter->needed);
+		}
+	}
+}

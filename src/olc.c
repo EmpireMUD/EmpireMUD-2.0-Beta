@@ -248,7 +248,6 @@ OLC_MODULE(oedit_apply);
 OLC_MODULE(oedit_armortype);
 OLC_MODULE(oedit_arrowtype);
 OLC_MODULE(oedit_automint);
-OLC_MODULE(oedit_book);
 OLC_MODULE(oedit_capacity);
 OLC_MODULE(oedit_charges);
 OLC_MODULE(oedit_coinamount);
@@ -280,6 +279,7 @@ OLC_MODULE(oedit_roomvnum);
 OLC_MODULE(oedit_script);
 OLC_MODULE(oedit_short_description);
 OLC_MODULE(oedit_storage);
+OLC_MODULE(oedit_text);
 OLC_MODULE(oedit_timer);
 OLC_MODULE(oedit_type);
 OLC_MODULE(oedit_value0);
@@ -347,6 +347,7 @@ OLC_MODULE(socedit_charposition);
 OLC_MODULE(socedit_command);
 OLC_MODULE(socedit_flags);
 OLC_MODULE(socedit_name);
+OLC_MODULE(socedit_requirements);
 OLC_MODULE(socedit_targetposition);
 OLC_MODULE(socedit_n2char);
 OLC_MODULE(socedit_n2other);
@@ -399,15 +400,22 @@ extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *olc_flag_bits[];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 extern const char *pool_types[];
+extern const bool requirement_amt_type[];
+extern const char *requirement_types[];
 extern const char *resource_types[];
 extern const char *res_action_type[];
 
 // external functions
 void replace_question_color(char *input, char *color, char *output);
+extern char *requirement_string(struct req_data *req, bool show_vnums);
 extern char *show_color_codes(char *string);
 void sort_icon_set(struct icon_data **list);
 void sort_interactions(struct interaction_item **list);
+extern int sort_requirements_by_group(struct req_data *a, struct req_data *b);
 extern bool valid_room_template_vnum(rmt_vnum vnum);
+
+// locals
+void smart_copy_requirements(struct req_data **to_list, struct req_data *from_list);
 
 // prototypes
 void olc_show_ability(char_data *ch);
@@ -676,7 +684,6 @@ const struct olc_command_data olc_data[] = {
 	{ "armortype", oedit_armortype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "arrowtype", oedit_arrowtype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "automint", oedit_automint, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "book", oedit_book, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "capacity", oedit_capacity, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "charges", oedit_charges, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "coinamount", oedit_coinamount, OLC_OBJECT, OLC_CF_EDITOR },
@@ -711,6 +718,7 @@ const struct olc_command_data olc_data[] = {
 	{ "storage", oedit_storage, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "store", oedit_storage, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "timer", oedit_timer, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "text", oedit_text, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "type", oedit_type, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "value0", oedit_value0, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "value1", oedit_value1, OLC_OBJECT, OLC_CF_EDITOR },
@@ -777,6 +785,7 @@ const struct olc_command_data olc_data[] = {
 	{ "command", socedit_command, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "flags", socedit_flags, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "name", socedit_name, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "requirements", socedit_requirements, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "targetposition", socedit_targetposition, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "n2character", socedit_n2char, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "n2others", socedit_n2other, OLC_SOCIAL, OLC_CF_EDITOR },
@@ -3497,6 +3506,25 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 
 
 /**
+* Gets the display for a set of requirments (e.g. quest tasks).
+*
+* @param struct req_data *list Pointer to the start of a list of reqs.
+* @param char *save_buffer A buffer to store the result to.
+*/
+void get_requirement_display(struct req_data *list, char *save_buffer) {
+	struct req_data *req;
+	int count = 0;
+	
+	*save_buffer = '\0';
+	LL_FOREACH(list, req) {
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s\r\n", ++count, requirement_types[req->type], requirement_string(req, TRUE));
+	}
+	
+	// empty list not shown
+}
+
+
+/**
 * Gets the resource list for use in an editor or display.
 *
 * @param struct resource_data *list The list to show.
@@ -4214,6 +4242,567 @@ int olc_process_number(char_data *ch, char *argument, char *name, char *command,
 	
 	// fall-through
 	return old_value;
+}
+
+
+/**
+* Sub-processor for requirement args.
+*
+* @param char_data *ch The player using OLC.
+* @param int type REQ_ type.
+* @param char *argument The remainder of the player's args.
+* @param bool find_amount Whether or not to take the 1st arg as amount, if the type requires it.
+* @param int *amount A variable to store the amount to.
+* @param any_vnum *vnum A variable to store the vnum to.
+* @param bitvector_t *misc A variable to store the misc value to.
+* param char *group A variable to store the group arg, if any.
+* @return bool TRUE if the arguments were provided correctly, FALSE if an error was sent.
+*/
+bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool find_amount, int *amount, any_vnum *vnum, bitvector_t *misc, char *group) {
+	extern const char *action_bits[];
+	extern const char *component_flags[];
+	extern const char *component_types[];
+	
+	char arg[MAX_INPUT_LENGTH]; 
+	bool need_abil = FALSE, need_bld = FALSE, need_component = FALSE;
+	bool need_mob = FALSE, need_obj = FALSE, need_quest = FALSE;
+	bool need_rmt = FALSE, need_sect = FALSE, need_skill = FALSE;
+	bool need_veh = FALSE, need_mob_flags = FALSE, need_faction = FALSE;
+	
+	*amount = 1;
+	*vnum = 0;
+	*misc = 0;
+	*group = 0;
+	
+	// REQ_x: determine which args we need
+	switch (type) {
+		case REQ_COMPLETED_QUEST:
+		case REQ_NOT_COMPLETED_QUEST:
+		case REQ_NOT_ON_QUEST: {
+			need_quest = TRUE;
+			break;
+		}
+		case REQ_GET_COMPONENT: {
+			need_component = TRUE;
+			break;
+		}
+		case REQ_GET_OBJECT:
+		case REQ_WEARING:
+		case REQ_WEARING_OR_HAS: {
+			need_obj = TRUE;
+			break;
+		}
+		case REQ_KILL_MOB: {
+			need_mob = TRUE;
+			break;
+		}
+		case REQ_KILL_MOB_FLAGGED: {
+			need_mob_flags = TRUE;
+			break;
+		} {
+		}
+		case REQ_OWN_BUILDING: {
+			need_bld = TRUE;
+			break;
+		}
+		case REQ_OWN_VEHICLE: {
+			need_veh = TRUE;
+			break;
+		}
+		case REQ_SKILL_LEVEL_OVER:
+		case REQ_SKILL_LEVEL_UNDER: {
+			need_skill = TRUE;
+			break;
+		}
+		case REQ_TRIGGERED: {
+			break;
+		}
+		case REQ_VISIT_BUILDING: {
+			need_bld = TRUE;
+			break;
+		}
+		case REQ_VISIT_ROOM_TEMPLATE: {
+			need_rmt = TRUE;
+			break;
+		}
+		case REQ_VISIT_SECTOR: {
+			need_sect = TRUE;
+			break;
+		}
+		case REQ_HAVE_ABILITY: {
+			need_abil = TRUE;
+			break;
+		}
+		case REQ_REP_OVER: {
+			need_faction = TRUE;
+			break;
+		}
+		case REQ_REP_UNDER: {
+			need_faction = TRUE;
+			break;
+		}
+	}
+	
+	// REQ_AMT_x: possible args
+	if (requirement_amt_type[type] == REQ_AMT_REPUTATION && find_amount) {
+		argument = any_one_arg(argument, arg);
+		if (!*arg || (*amount = get_reputation_by_name(arg)) == NOTHING) {
+			msg_to_char(ch, "You must provide a reputation.\r\n");
+			return FALSE;
+		}
+	}
+	else if (requirement_amt_type[type] != REQ_AMT_NONE && find_amount) {
+		argument = any_one_arg(argument, arg);
+		if (!*arg || !isdigit(*arg) || (*amount = atoi(arg)) < 0) {
+			msg_to_char(ch, "You must provide an amount.\r\n");
+			return FALSE;
+		}
+	}
+	
+	if (need_abil) {
+		argument = any_one_arg(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide an ability vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !find_ability_by_vnum(*vnum)) {
+			msg_to_char(ch, "Invalid ability vnum '%s'.\r\n", arg);
+			return FALSE;
+		}
+	}
+	
+	if (need_bld) {
+		argument = any_one_arg(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a building vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !building_proto(*vnum)) {
+			msg_to_char(ch, "Invalid building vnum '%s'.\r\n", arg);
+			return FALSE;
+		}
+	}
+	if (need_component) {
+		argument = any_one_arg(argument, arg);
+		skip_spaces(&argument);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a component type.\r\n");
+			return FALSE;
+		}
+		if ((*vnum = search_block(arg, component_types, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid component type '%s'.\r\n", arg);
+			return FALSE;
+		}
+		if (*argument) {
+			*misc = olc_process_flag(ch, argument, "component", "", component_flags, NOBITS);
+		}
+	}
+	if (need_faction) {
+		faction_data *fct;
+		argument = any_one_word(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a faction.\r\n");
+			return FALSE;
+		}
+		if (!(fct = find_faction(arg))) {
+			msg_to_char(ch, "Invalid faction '%s'.\r\n", arg);
+			return FALSE;
+		}
+		*vnum = FCT_VNUM(fct);
+	}
+	if (need_mob) {
+		argument = any_one_arg(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a mob vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !mob_proto(*vnum)) {
+			msg_to_char(ch, "Invalid mobile vnum '%s'.\r\n", arg);
+			return FALSE;
+		}
+	}
+	if (need_mob_flags) {
+		*misc = olc_process_flag(ch, argument, "mob", "", action_bits, NOBITS);
+		if (!*misc) {
+			msg_to_char(ch, "You must provide mob flags.\r\n");
+			return FALSE;
+		}
+	}
+	if (need_obj) {
+		argument = any_one_arg(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide an object vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !obj_proto(*vnum)) {
+			msg_to_char(ch, "Invalid object vnum '%s'.\r\n", arg);
+			return FALSE;
+		}
+	}
+	if (need_quest) {
+		argument = any_one_arg(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a quest vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !quest_proto(*vnum)) {
+			msg_to_char(ch, "Invalid quest vnum '%s'.\r\n", arg);
+			return FALSE;
+		}
+	}
+	if (need_rmt) {
+		argument = any_one_arg(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a room template vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !room_template_proto(*vnum)) {
+			msg_to_char(ch, "Invalid room template vnum '%s'.\r\n", arg);
+			return FALSE;
+		}
+	}
+	if (need_sect) {
+		argument = any_one_arg(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a sector vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !sector_proto(*vnum)) {
+			msg_to_char(ch, "Invalid sector vnum '%s'.\r\n", arg);
+			return FALSE;
+		}
+	}
+	if (need_skill) {
+		argument = any_one_arg(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a skill vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !find_skill_by_vnum(*vnum)) {
+			msg_to_char(ch, "Invalid skill vnum '%s'.\r\n", arg);
+			return FALSE;
+		}
+	}
+	if (need_veh) {
+		argument = any_one_arg(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a vehicle vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !vehicle_proto(*vnum)) {
+			msg_to_char(ch, "Invalid vehicle vnum '%s'.\r\n", arg);
+			return FALSE;
+		}
+	}
+	
+	// anything left for a group letter?
+	skip_spaces(&argument);
+	if (*argument && str_cmp(argument, "none")) {	// ignore a "none" here, for "no group"
+		if (strlen(argument) != 1 || !isalpha(*argument)) {
+			msg_to_char(ch, "Group must be a letter (or may be blank).\r\n");
+			return FALSE;
+		}
+		else {
+			*group = *argument;
+		}
+	}
+	
+	// all good
+	return TRUE;
+}
+
+
+/**
+* Processing for requirements (e.g. quest tasks and pre-reqs).
+*
+* @param char_data *ch The player using OLC.
+* @param char *argument The full argument after the command.
+* @param struct req_data **list A pointer to the list we're adding/changing.
+* @param char *command The command used by the player (requirements, tasks, prereqs).
+* @param bool allow_tracker_types If TRUE, allows types that will require a quest tracker.
+*/
+void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types) {
+	extern const bool requirement_needs_tracker[];
+	extern const char *requirement_types[];
+	
+	char cmd_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];
+	char vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	struct req_data *req, *iter, *change, *copyfrom;
+	int findtype, num, type;
+	bitvector_t misc;
+	any_vnum vnum;
+	char group;
+	bool found;
+	
+	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
+	
+	if (is_abbrev(cmd_arg, "copy")) {
+		// usage: qedit * copy <from type> <from vnum> <tasks/prereqs>
+		argument = any_one_arg(argument, type_arg);	// just "quest" for now; any type with requirements
+		argument = any_one_arg(argument, vnum_arg);	// any vnum for that type
+		argument = any_one_arg(argument, field_arg);	// tasks/prereqs field to copy
+		
+		if (!*type_arg || !*vnum_arg) {
+			msg_to_char(ch, "Usage: %s copy <from type> <from vnum> [tasks | prereqs]\r\n", command);
+		}
+		else if ((findtype = find_olc_type(type_arg)) == 0) {
+			msg_to_char(ch, "Unknown olc type '%s'.\r\n", type_arg);
+		}
+		else if (!isdigit(*vnum_arg)) {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			msg_to_char(ch, "Copy from which %s?\r\n", buf);
+		}
+		else if ((vnum = atoi(vnum_arg)) < 0) {
+			msg_to_char(ch, "Invalid vnum.\r\n");
+		}
+		else {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			copyfrom = NULL;
+			
+			switch (findtype) {
+				case OLC_QUEST: {
+					// requires tasks/preqeqs
+					if (!*field_arg || (!is_abbrev(field_arg, "tasks") && !is_abbrev(field_arg, "prereqs"))) {
+						msg_to_char(ch, "Copy from the 'tasks' or 'prereqs' list?\r\n");
+						return;
+					}
+					quest_data *from_qst = quest_proto(vnum);
+					if (from_qst) {
+						copyfrom = (is_abbrev(field_arg, "tasks") ? QUEST_TASKS(from_qst) : QUEST_PREREQS(from_qst));
+					}
+					break;
+				}
+				case OLC_SOCIAL: {
+					social_data *from_soc = social_proto(vnum);
+					if (from_soc) {
+						copyfrom = SOC_REQUIREMENTS(from_soc);
+					}
+					break;
+				}
+				default: {
+					msg_to_char(ch, "You can't copy %s from %ss.\r\n", command, buf);
+					return;
+				}
+			}
+			
+			if (!copyfrom) {
+				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, vnum_arg);
+			}
+			else {
+				smart_copy_requirements(list, copyfrom);
+				msg_to_char(ch, "Copied %s from %s %d.\r\n", command, buf, vnum);
+			}
+		}
+	}	// end 'copy'
+	else if (is_abbrev(cmd_arg, "remove")) {
+		// usage: qedit * remove <number | all>
+		skip_spaces(&argument);	// only arg is number
+		
+		if (!*argument) {
+			msg_to_char(ch, "Remove which %s (number)?\r\n", command);
+		}
+		else if (!str_cmp(argument, "all")) {
+			free_requirements(*list);
+			*list = NULL;
+			msg_to_char(ch, "You remove all the %s.\r\n", command);
+		}
+		else if (!isdigit(*argument) || (num = atoi(argument)) < 1) {
+			msg_to_char(ch, "Invalid %s number.\r\n", command);
+		}
+		else {
+			found = FALSE;
+			LL_FOREACH(*list, iter) {
+				if (--num == 0) {
+					found = TRUE;
+					
+					msg_to_char(ch, "You remove the %s info for: %s\r\n", command, requirement_string(iter, TRUE));
+					LL_DELETE(*list, iter);
+					free(iter);
+					break;
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid %s number.\r\n", command);
+			}
+		}
+	}	// end 'remove'
+	else if (is_abbrev(cmd_arg, "add")) {		
+		// usage: qedit * add <type> <vnum>
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!*type_arg) {
+			msg_to_char(ch, "Usage: %s add <type> [amount] [vnum] (see HELP REQUIREMENTS)\r\n", command);
+		}
+		else if ((type = search_block(type_arg, requirement_types, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
+		}
+		else if (!olc_parse_requirement_args(ch, type, argument, TRUE, &num, &vnum, &misc, &group)) {
+			// sends own error
+		}
+		else if (!allow_tracker_types && requirement_needs_tracker[type]) {
+			msg_to_char(ch, "You can't set that type of requirement on this (it requires a quest tracker).\r\n");
+		}
+		else {
+			// success
+			CREATE(req, struct req_data, 1);
+			req->type = type;
+			req->vnum = vnum;
+			req->misc = misc;
+			req->group = group;
+			req->needed = num;
+		
+			LL_APPEND(*list, req);
+			LL_SORT(*list, sort_requirements_by_group);
+			msg_to_char(ch, "You add %s: %s\r\n", command, requirement_string(req, TRUE));
+		}
+	}	// end 'add'
+	else if (is_abbrev(cmd_arg, "change")) {
+		// usage: qedit * change <number> vnum <number>
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, field_arg);
+		skip_spaces(&argument);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*field_arg) {
+			msg_to_char(ch, "Usage: %s change <number> <amount | vnum> <value>\r\n", command);
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		LL_FOREACH(*list, iter) {
+			if (--num == 0) {
+				change = iter;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid %s number.\r\n", command);
+		}
+		else if (is_abbrev(field_arg, "amount")) {
+			if (requirement_amt_type[change->type] == REQ_AMT_REPUTATION && (num = get_reputation_by_name(argument)) == NOTHING) {
+				msg_to_char(ch, "Invalid reputation '%s'.\r\n", argument);
+				return;
+			}
+			else if (requirement_amt_type[change->type] != REQ_AMT_REPUTATION && (!isdigit(*argument) || (num = atoi(argument)) < 0)) {
+				msg_to_char(ch, "Invalid amount '%s'.\r\n", argument);
+				return;
+			}
+			else {
+				change->needed = num;
+				msg_to_char(ch, "You change %s %d to: %s\r\n", command, atoi(num_arg), requirement_string(change, TRUE));
+			}
+		}
+		else if (is_abbrev(field_arg, "vnum")) {
+			// num is junk here
+			if (!olc_parse_requirement_args(ch, change->type, argument, FALSE, &num, &vnum, &misc, &group)) {
+				// sends own error
+			}
+			else {
+				change->vnum = vnum;
+				change->misc = misc;
+				msg_to_char(ch, "Changed %s %d to: %s\r\n", command, atoi(num_arg), requirement_string(change, TRUE));
+			}
+		}
+		else if (is_abbrev(field_arg, "group")) {
+			if (!str_cmp(argument, "none")) {
+				change->group = 0;
+				LL_SORT(*list, sort_requirements_by_group);
+				msg_to_char(ch, "Changed %s %d to: %s\r\n", command, atoi(num_arg), requirement_string(change, TRUE));
+			}
+			else if (strlen(argument) != 1 || !isalpha(*argument)) {
+				msg_to_char(ch, "Group must be a letter or 'none'.\r\n");
+				return;
+			}
+			else {
+				change->group = *argument;
+				LL_SORT(*list, sort_requirements_by_group);
+				msg_to_char(ch, "Changed %s %d to: %s\r\n", command, atoi(num_arg), requirement_string(change, TRUE));
+			}
+		}
+		else {
+			msg_to_char(ch, "You can only change the amount, group, or vnum.\r\n");
+		}
+	}	// end 'change'
+	else if (is_abbrev(cmd_arg, "move")) {
+		struct req_data *to_move, *prev, *a, *b, *a_next, *b_next, iitem;
+		bool up;
+		
+		// usage: <cmd> move <number> <up | down>
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, field_arg);
+		up = is_abbrev(field_arg, "up");
+		
+		if (!*num_arg || !*field_arg) {
+			msg_to_char(ch, "Usage: %s move <number> <up | down>\r\n", command);
+		}
+		else if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid %s number.\r\n", command);
+		}
+		else if (!is_abbrev(field_arg, "up") && !is_abbrev(field_arg, "down")) {
+			msg_to_char(ch, "You must specify whether you're moving it up or down in the list.\r\n");
+		}
+		else if (up && num == 1) {
+			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
+		}
+		else {
+			// find the one to move
+			to_move = prev = NULL;
+			for (req = *list; req && !to_move; req = req->next) {
+				if (--num == 0) {
+					to_move = req;
+				}
+				else {
+					// store for next iteration
+					prev = req;
+				}
+			}
+			
+			if (!to_move) {
+				msg_to_char(ch, "Invalid %s number.\r\n", command);
+			}
+			else if (!up && !to_move->next) {
+				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
+			}
+			else {
+				// SUCCESS: "move" them by swapping data
+				if (up) {
+					a = prev;
+					b = to_move;
+				}
+				else {
+					a = to_move;
+					b = to_move->next;
+				}
+				
+				// store next pointers
+				a_next = a->next;
+				b_next = b->next;
+				
+				// swap data
+				iitem = *a;
+				*a = *b;
+				*b = iitem;
+				
+				// restore next pointers
+				a->next = a_next;
+				b->next = b_next;
+				
+				// message: re-atoi(num_arg) because we destroyed num finding our target
+				msg_to_char(ch, "You move %s %d %s.\r\n", command, atoi(num_arg), (up ? "up" : "down"));
+			}
+		}
+	}	// end 'move'
+	else {
+		msg_to_char(ch, "Usage: %s add <type> <vnum>\r\n", command);
+		msg_to_char(ch, "Usage: %s change <number> vnum <value>\r\n", command);
+		msg_to_char(ch, "Usage: %s copy <from type> <from vnum> [tasks/prereqs]\r\n", command);
+		msg_to_char(ch, "Usage: %s remove <number | all>\r\n", command);
+		msg_to_char(ch, "Usage: %s move <number> <up | down>\r\n", command);
+	}
 }
 
 
@@ -5983,6 +6572,38 @@ void smart_copy_interactions(struct interaction_item **addto, struct interaction
 			
 	// ensure these are sorted
 	sort_interactions(addto);
+}
+
+
+/**
+* Copies entries from one list into another, only if they are not already in
+* the to_list.
+*
+* @param struct req_data **to_list A pointer to the destination list.
+* @param struct req_data *from_list The list to copy from.
+*/
+void smart_copy_requirements(struct req_data **to_list, struct req_data *from_list) {
+	struct req_data *iter, *search, *req;
+	bool found;
+	
+	LL_FOREACH(from_list, iter) {
+		// ensure not already in list
+		found = FALSE;
+		LL_FOREACH(*to_list, search) {
+			if (search->type == iter->type && search->vnum == iter->vnum) {
+				found = TRUE;
+				break;
+			}
+		}
+		
+		// add it
+		if (!found) {
+			CREATE(req, struct req_data, 1);
+			*req = *iter;
+			req->next = NULL;
+			LL_APPEND(*to_list, req);
+		}
+	}
 }
 
 

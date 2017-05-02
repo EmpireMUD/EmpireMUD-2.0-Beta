@@ -1480,10 +1480,12 @@ void qt_lose_building(char_data *ch, any_vnum vnum);
 void qt_lose_quest(char_data *ch, any_vnum vnum);
 void qt_lose_vehicle(char_data *ch, any_vnum vnum);
 void qt_quest_completed(char_data *ch, any_vnum vnum);
+void qt_remove_obj(char_data *ch, obj_data *obj);
 void qt_start_quest(char_data *ch, any_vnum vnum);
 void qt_triggered_task(char_data *ch, any_vnum vnum);
 void qt_untrigger_task(char_data *ch, any_vnum vnum);
 void qt_visit_room(char_data *ch, room_data *room);
+void qt_wear_obj(char_data *ch, obj_data *obj);
 
 // utils from vehicles.c
 extern char *get_vehicle_name_by_proto(obj_vnum vnum);

@@ -387,7 +387,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	extern bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum portal_vnum);
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
-	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
+	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	void expire_trading_post_item(struct trading_post_data *tpd);
 	extern bool remove_obj_from_resource_list(struct resource_data **list, obj_vnum vnum);
 	void remove_object_from_table(obj_data *obj);
@@ -409,6 +409,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	crop_data *crop, *next_crop;
 	room_data *room, *next_room;
 	empire_data *emp, *next_emp;
+	social_data *soc, *next_soc;
 	char_data *mob, *next_mob;
 	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
@@ -661,8 +662,12 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_OBJECT, vnum);
 		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_OBJECT, vnum);
 		found |= delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_OBJECT, vnum);
-		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_GET_OBJECT, vnum);
-		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_GET_OBJECT, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_GET_OBJECT, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_GET_OBJECT, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_WEARING, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_WEARING, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_WEARING_OR_HAS, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_WEARING_OR_HAS, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
@@ -684,6 +689,18 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		found = delete_from_interaction_list(&GET_SECT_INTERACTIONS(sect), TYPE_OBJ, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_SECTOR, GET_SECT_VNUM(sect));
+		}
+	}
+	
+	// update socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_GET_OBJECT, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_WEARING, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_WEARING_OR_HAS, vnum);
+		
+		if (found) {
+			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
 	
@@ -806,8 +823,12 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_OBJECT, vnum);
 			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_OBJECT, vnum);
 			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_OBJECT, vnum);
-			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_GET_OBJECT, vnum);
-			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_GET_OBJECT, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_GET_OBJECT, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_GET_OBJECT, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_WEARING, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_WEARING, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_WEARING_OR_HAS, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_WEARING_OR_HAS, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
@@ -825,6 +846,16 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		if (GET_OLC_SECTOR(desc)) {
 			if (delete_from_interaction_list(&GET_OLC_SECTOR(desc)->interactions, TYPE_OBJ, vnum)) {
 				msg_to_char(desc->character, "One of the objects in an interaction for the sector you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SOCIAL(desc)) {
+			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_GET_OBJECT, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_WEARING, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_WEARING_OR_HAS, vnum);
+		
+			if (found) {
+				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
+				msg_to_desc(desc, "An object required by the social you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
@@ -1103,7 +1134,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	extern const byte interact_vnum_types[NUM_INTERACTS];
 	
 	char buf[MAX_STRING_LENGTH];
@@ -1119,6 +1150,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	sector_data *sect, *next_sect;
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
+	social_data *soc, *next_soc;
 	struct archetype_gear *gear;
 	crop_data *crop, *next_crop;
 	char_data *mob, *next_mob;
@@ -1275,8 +1307,12 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_OBJECT, vnum);
 		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_OBJECT, vnum);
 		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_OBJECT, vnum);
-		any |= find_quest_task_in_list(QUEST_TASKS(quest), QT_GET_OBJECT, vnum);
-		any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_GET_OBJECT, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_GET_OBJECT, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_GET_OBJECT, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_WEARING, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_WEARING, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_WEARING_OR_HAS, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_WEARING_OR_HAS, vnum);
 		
 		if (any) {
 			++found;
@@ -1312,6 +1348,21 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 			}
+		}
+	}
+	
+	// socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_GET_OBJECT, vnum);
+		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_WEARING, vnum);
+		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_WEARING_OR_HAS, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -1704,7 +1755,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		}
 		case ITEM_BOOK: {
 			book = book_proto(GET_BOOK_ID(obj));
-			sprintf(storage + strlen(storage), "<&ybook&0> [%d] %s\r\n", GET_BOOK_ID(obj), (book ? book->title : "not set"));
+			sprintf(storage + strlen(storage), "<&ytext&0> [%d] %s\r\n", GET_BOOK_ID(obj), (book ? book->title : "not set"));
 			break;
 		}
 		case ITEM_WEALTH: {
@@ -2101,20 +2152,21 @@ OLC_MODULE(oedit_automint) {
 }
 
 
-OLC_MODULE(oedit_book) {
+// formerly oedit_book, which had a name conflict with ".book"
+OLC_MODULE(oedit_text) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	int old = GET_OBJ_VAL(obj, VAL_BOOK_ID);
 	book_data *book;
 	
 	if (!IS_BOOK(obj)) {
-		msg_to_char(ch, "You can only set book id on a book.\r\n");
+		msg_to_char(ch, "You can only set etxt id on a book.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_BOOK_ID) = olc_process_number(ch, argument, "book id", "book", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_BOOK_ID));
+		GET_OBJ_VAL(obj, VAL_BOOK_ID) = olc_process_number(ch, argument, "text id", "text", 0, MAX_INT, GET_OBJ_VAL(obj, VAL_BOOK_ID));
 		book = book_proto(GET_BOOK_ID(obj));
 		
 		if (!book) {
-			msg_to_char(ch, "Invalid book id. Old id %d restored.\r\n", old);
+			msg_to_char(ch, "Invalid text book vnum. Old vnum %d restored.\r\n", old);
 			GET_OBJ_VAL(obj, VAL_BOOK_ID) = old;
 		}
 	}

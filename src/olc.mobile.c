@@ -285,7 +285,7 @@ char *list_one_mobile(char_data *mob, bool detail) {
 void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
-	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
+	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	
 	void extract_pending_chars();
 	void remove_mobile_from_table(char_data *mob);
@@ -297,6 +297,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
+	social_data *soc, *next_soc;
 	bld_data *bld, *next_bld;
 	struct mount_data *mount;
 	bool found;
@@ -389,8 +390,8 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	HASH_ITER(hh, quest_table, quest, next_quest) {
 		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_MOBILE, vnum);
 		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_MOBILE, vnum);
-		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_KILL_MOB, vnum);
-		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_KILL_MOB, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_KILL_MOB, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_KILL_MOB, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
@@ -413,6 +414,16 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		found |= delete_from_interaction_list(&GET_SECT_INTERACTIONS(sect), TYPE_MOB, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_SECTOR, GET_SECT_VNUM(sect));
+		}
+	}
+	
+	// update socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_KILL_MOB, vnum);
+		
+		if (found) {
+			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
 	
@@ -446,8 +457,8 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		if (GET_OLC_QUEST(desc)) {
 			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_MOBILE, vnum);
 			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_MOBILE, vnum);
-			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_KILL_MOB, vnum);
-			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_KILL_MOB, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_KILL_MOB, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_KILL_MOB, vnum);
 			
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
@@ -470,6 +481,14 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 				msg_to_char(desc->character, "One of the mobs in an interaction for the sector you're editing was deleted.\r\n");
 			}
 		}
+		if (GET_OLC_SOCIAL(desc)) {
+			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_KILL_MOB, vnum);
+			
+			if (found) {
+				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A mobile required by the social you are editing was deleted.\r\n");
+			}
+		}
 	}
 	
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted mobile %d", GET_NAME(ch), vnum);
@@ -488,7 +507,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char_data *proto, *mob, *next_mob;
 	char buf[MAX_STRING_LENGTH];
@@ -500,6 +519,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
+	social_data *soc, *next_soc;
 	bld_data *bld, *next_bld;
 	int size, found;
 	bool any;
@@ -585,7 +605,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 		if (size >= sizeof(buf)) {
 			break;
 		}
-		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_MOBILE, vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_MOBILE, vnum) || find_quest_task_in_list(QUEST_TASKS(quest), QT_KILL_MOB, vnum) || find_quest_task_in_list(QUEST_PREREQS(quest), QT_KILL_MOB, vnum)) {
+		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_MOBILE, vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_MOBILE, vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_KILL_MOB, vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_KILL_MOB, vnum)) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
@@ -626,6 +646,17 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 			}
+		}
+	}
+	
+	// socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		if (find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_KILL_MOB, vnum)) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	

@@ -130,7 +130,7 @@ const struct action_data_struct action_data[] = {
 	{ "filling", "is filling in the trench.", ACTF_HASTE | ACTF_FAST_CHORES, process_fillin, NULL },	// ACT_FILLING_IN
 	{ "reclaiming", "is reclaiming this acre!", NOBITS, process_reclaim, NULL },	// ACT_RECLAIMING
 	{ "escaping", "is running toward the window!", NOBITS, process_escaping, NULL },	// ACT_ESCAPING
-	{ "studying", "is reading a book.", NOBITS, perform_study, NULL },	// ACT_STUDYING
+		{ "unknown", "is doing something.", NOBITS, NULL, NULL },	// unused
 	{ "ritual", "is performing an arcane ritual.", NOBITS, perform_ritual, NULL },	// ACT_RITUAL
 	{ "sawing", "is sawing something.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_resource_list },	// ACT_SAWING
 	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_quarrying, NULL },	// ACT_QUARRYING

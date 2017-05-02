@@ -1473,7 +1473,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			return (0);
 		}
 		GET_REAL_SEX(vict) = i;
-		sprintf(output, "%s's sex is now %s", GET_NAME(vict), genders[(int) GET_REAL_SEX(vict)]);
+		sprintf(output, "%s's sex is now %s.", GET_NAME(vict), genders[(int) GET_REAL_SEX(vict)]);
 	}
 	else if SET_CASE("age") {
 		if (value < 2 || value > 95) {	/* Arbitrary limits. */
@@ -1491,7 +1491,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			if (GET_LASTNAME(vict) != NULL)
 				free(GET_LASTNAME(vict));
 			GET_LASTNAME(vict) = NULL;
-    		sprintf(output, "%s no longer has a last name", GET_NAME(vict));
+    		sprintf(output, "%s no longer has a last name.", GET_NAME(vict));
 		}
     	else {
 			if (GET_LASTNAME(vict) != NULL)
@@ -1565,7 +1565,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 		else {
 			// prepare message first (amt changes)
-			sprintf(output, "%s now has %s", GET_NAME(vict), money_amount(type, amt));
+			sprintf(output, "%s now has %s.", GET_NAME(vict), money_amount(type, amt));
 			
 			// we're going to use increase_coins, so first see if they already had some
 			if ((coin = find_coin_entry(GET_PLAYER_COINS(vict), type))) {
@@ -1633,14 +1633,14 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		if (del_rep) {
 			HASH_DEL(GET_FACTIONS(vict), pfd);
 			free(pfd);
-			sprintf(output, "%s's reputation with %s deleted", GET_NAME(vict), FCT_NAME(fct));
+			sprintf(output, "%s's reputation with %s deleted.", GET_NAME(vict), FCT_NAME(fct));
 		}
 		else {
 			pfd->value = new_val;
 			update_reputations(vict);
 			pfd = get_reputation(vict, FCT_VNUM(fct), TRUE);
 			new_rep = rep_const_to_index(pfd->rep);
-			sprintf(output, "%s's reputation with %s set to %s / %d", GET_NAME(vict), FCT_NAME(fct), reputation_levels[new_rep].name, pfd->value);
+			sprintf(output, "%s's reputation with %s set to %s / %d.", GET_NAME(vict), FCT_NAME(fct), reputation_levels[new_rep].name, pfd->value);
 		}
 	}
 	else if SET_CASE("skill") {
@@ -1670,7 +1670,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		set_skill(vict, SKILL_VNUM(skill), level);
 		update_class(vict);
 		check_ability_levels(vict, SKILL_VNUM(skill));
-		sprintf(output, "%s's %s set to %d", GET_NAME(vict), SKILL_NAME(skill), level);
+		sprintf(output, "%s's %s set to %d.", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
 
 	else if SET_CASE("account") {
@@ -1679,7 +1679,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			return 0;
 		}
 		if (!str_cmp(val_arg, "new")) {
-			sprintf(output, "%s is now associated with a new account", GET_NAME(vict));
+			sprintf(output, "%s is now associated with a new account.", GET_NAME(vict));
 			remove_player_from_account(vict);
 			create_account_for_player(vict);
 		}
@@ -1694,7 +1694,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 					return 0;
 				}
 				
-				sprintf(output, "%s is now associated with %s's account", GET_NAME(vict), GET_NAME(alt));
+				sprintf(output, "%s is now associated with %s's account.", GET_NAME(vict), GET_NAME(alt));
 				
 				remove_player_from_account(vict);
 				// does 2nd player have an account already? if not, make one
@@ -2466,13 +2466,14 @@ SHOW(show_terrain) {
 
 
 SHOW(show_uses) {
-	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
+	social_data *soc, *next_soc;
 	struct resource_data *res;
 	bld_data *bld, *next_bld;
 	bitvector_t flags;
@@ -2569,11 +2570,22 @@ SHOW(show_uses) {
 			if (size >= sizeof(buf)) {
 				break;
 			}
-			any = find_quest_task_in_list(QUEST_TASKS(quest), QT_GET_COMPONENT, type);
-			any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_GET_COMPONENT, type);
+			any = find_requirement_in_list(QUEST_TASKS(quest), REQ_GET_COMPONENT, type);
+			any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_GET_COMPONENT, type);
 		
 			if (any) {
 				size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			}
+		}
+		
+		HASH_ITER(hh, social_table, soc, next_soc) {
+			if (size >= sizeof(buf)) {
+				break;
+			}
+			any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_GET_COMPONENT, type);
+		
+			if (any) {
+				size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 			}
 		}
 		
@@ -6236,7 +6248,7 @@ ACMD(do_reboot) {
 	
 	char arg[MAX_INPUT_LENGTH];
 	descriptor_data *desc;
-	int type, time = 0;
+	int type, time = 0, var;
 	bool no_arg = FALSE;
 
 	// any number of args in any order
@@ -6277,7 +6289,8 @@ ACMD(do_reboot) {
 		msg_to_char(ch, "Rebooting momentarily...\r\n");
 	}
 	else {
-		msg_to_char(ch, "The %s is set for %d minutes (%s).\r\n", reboot_type[reboot_control.type], no_arg ? reboot_control.time : time, shutdown_types[reboot_control.level]);
+		var = (no_arg ? reboot_control.time : time);
+		msg_to_char(ch, "The %s is set for %d minute%s (%s).\r\n", reboot_type[reboot_control.type], var, PLURAL(var), shutdown_types[reboot_control.level]);
 		if (no_arg) {
 			msg_to_char(ch, "Players blocking the %s:\r\n", reboot_type[reboot_control.type]);
 			for (desc = descriptor_list; desc; desc = desc->next) {
@@ -6576,7 +6589,7 @@ ACMD(do_send) {
 	half_chop(argument, arg, buf);
 
 	if (!*arg) {
-		send_to_char("Send what to who?\r\n", ch);
+		send_to_char("Send what to whom?\r\n", ch);
 		return;
 	}
 	if (!(vict = get_char_vis(ch, arg, FIND_CHAR_WORLD))) {
@@ -6992,7 +7005,7 @@ ACMD(do_switch) {
 	if (ch->desc->original)
 		send_to_char("You're already switched.\r\n", ch);
 	else if (!*arg)
-		send_to_char("Switch with who?\r\n", ch);
+		send_to_char("Switch with whom?\r\n", ch);
 	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_WORLD)))
 		send_to_char("No such character.\r\n", ch);
 	else if (ch == victim)

@@ -1809,11 +1809,6 @@ void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, in
 		if (MOB_INSTANCE_ID(mob) != NOTHING) {
 			inst = real_instance(MOB_INSTANCE_ID(mob));
 		}
-		if (!inst && IN_ROOM(mob)) {
-			if (COMPLEX_DATA(IN_ROOM(mob))) {
-				inst = COMPLEX_DATA(IN_ROOM(mob))->instance;
-			}
-		}
 	}
 	if (!inst && room && COMPLEX_DATA(room)) {
 		inst = COMPLEX_DATA(room)->instance;
@@ -2061,12 +2056,6 @@ void scale_instance_to_level(struct instance_data *inst, int level) {
 	
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (inst->room[iter]) {
-			for (ch = ROOM_PEOPLE(inst->room[iter]); ch; ch = ch->next_in_room) {
-				if (IS_NPC(ch) && GET_CURRENT_SCALE_LEVEL(ch) != level) {
-					GET_CURRENT_SCALE_LEVEL(ch) = 0;	// force override on level
-					scale_mob_to_level(ch, level);
-				}
-			}
 			for (obj = ROOM_CONTENTS(inst->room[iter]); obj; obj = obj->next_content) {
 				if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {
 					scale_item_to_level(obj, level);
@@ -2077,6 +2066,13 @@ void scale_instance_to_level(struct instance_data *inst, int level) {
 					scale_vehicle_to_level(veh, level);
 				}
 			}
+		}
+	}
+	
+	LL_FOREACH(character_list, ch) {
+		if (IS_NPC(ch) && MOB_INSTANCE_ID(ch) == inst->id && GET_CURRENT_SCALE_LEVEL(ch) != level) {
+			GET_CURRENT_SCALE_LEVEL(ch) = 0;	// force override on level
+			scale_mob_to_level(ch, level);
 		}
 	}
 }

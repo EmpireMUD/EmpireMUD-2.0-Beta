@@ -712,7 +712,7 @@ the same object). Existing buildings may also be interior rooms, but new
 building rules require a normal map building (one without the ROOM flag).
 
 For types requiring build-on or build-facing, you should include the set of
-build flags in quotes ("plains forest") if you use more than one. For the full
+build flags in quotes ("plains desert") if you use more than one. For the full
 list of build flags, see HELP SECTEDIT BUILDFLAGS.
 
 See also: OLC ADVENTURES, SECTEDIT BUILDFLAGS, VNUM
@@ -1537,7 +1537,7 @@ The following flags are available:
  water - any ocean or river tile
  plains - a plains or a road that was built on plains
  mountain - a mountain or mountain path
- forest - an overgrown forest (^^^^)
+ full forest - an overgrown forest (^^^^) or other full forest
  desert - a desert or a road that was built on desert
  river - a river tile
  jungle - any jungle tile
@@ -1572,7 +1572,7 @@ The following flags are available:
  water - any ocean or river tile
  plains - a plains or a road that was built on plains
  mountain - a mountain or mountain path
- forest - an overgrown forest (^^^^)
+ full forest - an overgrown forest (^^^^) or other full forest
  desert - a desert or a road that was built on desert
  river - a river tile
  jungle - any jungle tile
@@ -3266,14 +3266,17 @@ This allows a wealth item to be automatically minted into coins by Workforce.
 
 See also: OLC OBJECTS
 #d
-"OEDIT BOOK"
+"OEDIT TEXT" "OEDIT BOOK"
 
-Usage:  .book <book id>
+Usage:  .text <book vnum>
 
 You can create book objects to place in your adventure zones. Like ordinary
 books, their name will be overridden by the name set in the book editor. You
 can see the book id of any book you've written by typing "bookedit list" (it's
-the number in the [brackets]).
+the number in the [brackets]), or via "vnum book".
+
+(This field was formerly called ".book" but was changed because it conflicts
+with the book editor.)
 
 See also: BOOKEDIT, OLC OBJECTS
 #d
@@ -4672,42 +4675,6 @@ quest in that trigger.
 
 See also: %QUEST%, OLC QUESTS
 #d
-"QEDIT TASKS" "QEDIT PREREQS" "QEDIT PREREQUISITES" "QEDIT PRE-REQS" "QEDIT PRE-REQUISITES"
-
-Usage:  .<prereqs/tasks> add <type> <vnum>
-        .<prereqs/tasks> change <number> vnum <value>
-        .<prereqs/tasks> copy <from type> <from vnum> [tasks/prereqs]
-        .<prereqs/tasks> remove <number | all>
-
-You can set certain requirements for a task to be obtained or completed. The
-prereqs are things required before the player can obtain the quest. The tasks
-are requirements to complete the quest and turn it in. All requirements must
-be met.
-
-Available tasks:
- COMPLETED-QUEST - Must complete a certain quest.
- GET-COMPONENT - Must have components.
- GET-OBJECT - Must have items.
- KILL-MOB &r*&0 - Must kill a certain mob.
- KILL-MOB-FLAGGED &r*&0 - Must kill mobs with certain flags.
- NOT-COMPLETED-QUEST - Has not completed a certain quest.
- NOT-ON-QUEST - Is not currently on a certain quest.
- OWN-BUILDING - Empire has a certain building.
- OWN-VEHICLE - Empire has a certain vehicle.
- SKILL-LEVEL-OVER - Player has a certain skill at least this high.
- SKILL-LEVEL-UNDER - Player has a certain skill no higher than this.
- TRIGGERED &r*&0 - Activated by a %quest% command in a trigger.
- VISIT-BUILDING &r*&0 - Player must go to a certain building/room.
- VISIT-ROOM-TEMPLATE &r*&0 - Player must go to a certain room template.
- VISIT-SECTOR &r*&0 - Player must go to a certain terrain.
- HAVE-ABILITY - Player must have a certain ability.
- REP-OVER - Player must have at least this faction reputation.
- REP-UNDER - Player must be at or below this faction reputation.
-
-&r*&0 Some types cannot be used as prereqs, only as tasks.
-
-See also: COMPONENT FLAGS, MEDIT FLAG, %QUEST%, OLC QUESTS
-#d
 "REDIT DESCRIPTION"
 
 Usage:  .description
@@ -4809,6 +4776,49 @@ This is different from the spawn data set on crops, sectors, and buildings.
 
 See also: OLC ROOM TEMPLATES, ADVEDIT RESET TIME, VNUM
 #d
+REQUIREMENTS "QEDIT TASKS" "QEDIT PREREQS" "QEDIT PREREQUISITES" "SOCEDIT REQUIREMENTS"
+
+Usage:  .<field> add <type> <vnum> [group]
+        .<field> change <number> <amount | group | vnum> <value>
+        .<field> copy <from type> <from vnum> [tasks/prereqs]
+        .<field> remove <number | all>
+
+Requirement lists are used to determine if a character is eligible for some-
+thing, or if they have completed it. Examples include quest prerequisites and
+tasks.
+
+A player only needs to meet 1 requirement from the list. However, you can
+create requirement groups where all conditions on a group must be met. If
+there is more than one group, the player only needs to meet all conditions from
+any 1 group. Group names are always a single case-sensitive letter.
+
+Available tasks:
+ COMPLETED-QUEST - Must complete a certain quest.
+ GET-COMPONENT - Must have components.
+ GET-OBJECT - Must have items.
+ KILL-MOB &r*&0 - Must kill a certain mob.
+ KILL-MOB-FLAGGED &r*&0 - Must kill mobs with certain flags.
+ NOT-COMPLETED-QUEST - Has not completed a certain quest.
+ NOT-ON-QUEST - Is not currently on a certain quest.
+ OWN-BUILDING - Empire has a certain building.
+ OWN-VEHICLE - Empire has a certain vehicle.
+ SKILL-LEVEL-OVER - Player has a certain skill at least this high.
+ SKILL-LEVEL-UNDER - Player has a certain skill no higher than this.
+ TRIGGERED &r*&0 - Activated by a %quest% command in a trigger.
+ VISIT-BUILDING &r*&0 - Player must go to a certain building/room.
+ VISIT-ROOM-TEMPLATE &r*&0 - Player must go to a certain room template.
+ VISIT-SECTOR &r*&0 - Player must go to a certain terrain.
+ HAVE-ABILITY - Player must have a certain ability.
+ REP-OVER - Player must have at least this faction reputation.
+ REP-UNDER - Player must be at or below this faction reputation.
+ WEARING - Player has the item equipped
+ WEARING-OR-HAS - Player has the item either equipped or in inventory
+    (note: item will not be extracted even if EXTRACT-TASK-OBJECTS is on)
+
+&r*&0 Some types require a trackable quest, and cannot be used as prereqs.
+
+See also: COMPONENT FLAGS, MEDIT FLAG, %QUEST%
+#d
 "SECTEDIT BUILDFLAGS"
 
 Usage:  .buildflags [add | remove] <flags>
@@ -4822,7 +4832,7 @@ Available flags:
  water - any type of water tile
  plains - a flat, temperate sector like plains
  mountain - a rough tile like a mountain
- forest - a temperate forest of various types
+ full forest - a temperate forest of various types
  desert - a flat, arid sector
  river - a fresh-water sector
  jungle - any jungle tile
@@ -5191,24 +5201,26 @@ See also: OLC SOCIALS
 #d
 "SOCEDIT MESSAGES" "SOCEDIT N2CHARACTER" "SOCEDIT N2OTHERS" "SOCEDIT S2CHARACTER" "SOCEDIT S2OTHERS" "SOCEDIT T2CHARACTER" "SOCEDIT T2VICTIM" "SOCEDIT T2OTHERS" "SOCEDIT TNOTFOUND"
 
-Usage:  .n2char <message>
-        .<type> <message>
+Usage:  .n2char <message | none>
+        .<type> <message | none>
 
-These messages are the ones shown when the player uses the social.
+These messages are the ones shown when the player uses the social. Some
+messages are optional and may be left blank.
 
 Messages when a social is typed without an argument ("grin"):
   No-arg to character <&yn2char&0>
-  No-arg to others <&yn2other&0>
+  No-arg to others <&yn2other&0>  - leave blank if n2char is an error message
+    about needing a target
 
 Messages when a social is typed with an argument ("grin Gaia"):
-  Targeted to character <&yt2char&0>
+  Targeted to character <&yt2char&0>  - this whole section may be blank
   Targeted to others <&yt2other&0>
   Targeted to victim <&yt2vict&0>
   Target not found <&ytnotfound&0>  - sent to the actor when target is invalid
 
 Messages when the actor targets himself ("grin self"):
-  Target-self to character <&ys2char&0>
-  Target-self to others <&ys2other&0>
+  Target-self to character <&ys2char&0>  - may be blank
+  Target-self to others <&ys2other&0>  - may be blank (s2char must be blank)
 
 See &cHELP DOLLAR SIGN CODES&0 for a list of codes that can be used in socials:
   $n, $m, $e, $s - used for the actor

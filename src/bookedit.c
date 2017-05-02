@@ -544,7 +544,7 @@ OLC_MODULE(booked_item_name) {
 	else if (strchrstr(argument, "%()[]\\")) {
 		msg_to_char(ch, "Book item names may not contain the following characters: %%()[]\\\r\n");
 	}
-	else if (strlen(argument) > MAX_BOOK_ITEM_NAME) {
+	else if (!IS_IMMORTAL(ch) && strlen(argument) > MAX_BOOK_ITEM_NAME) {
 		msg_to_char(ch, "Book item names may not be more than %d characters long.\r\n", MAX_BOOK_ITEM_NAME);
 	}
 	else if (!IS_IMMORTAL(ch) && !has_keyword(argument, book_name_list, TRUE)) {

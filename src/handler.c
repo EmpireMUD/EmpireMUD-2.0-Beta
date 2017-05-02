@@ -49,6 +49,7 @@
 *   Custom Message Handlers
 *   Object Targeting Handlers
 *   Offer Handlers
+*   Requirement Handlers
 *   Resource Depletion Handlers
 *   Room Handlers
 *   Room Extra Handlers
@@ -4382,6 +4383,7 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 		}
 
 		affect_total(ch);
+		qt_wear_obj(ch, obj);
 	}
 }
 
@@ -4794,6 +4796,7 @@ obj_data *unequip_char(char_data *ch, int pos) {
 		}
 
 		affect_total(ch);
+		qt_remove_obj(ch, obj);
 	}
 
 	return obj;
@@ -5277,6 +5280,520 @@ void remove_offers_by_type(char_data *ch, int type) {
 			free(offer);
 		}
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// REQUIREMENT HANDLERS ////////////////////////////////////////////////////
+
+
+/**
+* @param struct req_data *from The list to copy.
+* @return struct req_data* The copy of the list.
+*/
+struct req_data *copy_requirements(struct req_data *from) {
+	struct req_data *el, *iter, *list = NULL, *end = NULL;
+	
+	LL_FOREACH(from, iter) {
+		CREATE(el, struct req_data, 1);
+		*el = *iter;
+		el->next = NULL;
+		
+		if (end) {
+			end->next = el;
+		}
+		else {
+			list = el;
+		}
+		end = el;
+	}
+	
+	return list;
+}
+
+
+/**
+* Deletes entries by type+vnum.
+*
+* @param struct req_data **list A pointer to the list to delete from.
+* @param int type REQ_ type.
+* @param any_vnum vnum The vnum to remove.
+* @return bool TRUE if the type+vnum was removed from the list. FALSE if not.
+*/
+bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum) {
+	struct req_data *iter, *next_iter;
+	bool any = FALSE;
+	
+	LL_FOREACH_SAFE(*list, iter, next_iter) {
+		if (iter->type == type && iter->vnum == vnum) {
+			any = TRUE;
+			LL_DELETE(*list, iter);
+			free(iter);
+		}
+	}
+	
+	return any;
+}
+
+
+/**
+* Extracts items from a character, based on a list of requirements (e.g. quest
+* tasks). This function does NOT error if the character is missing some of the
+* items; it only removes them if present.
+*
+* @param char_data *ch The character losing items.
+* @param struct req_data *list The items to lose (other task types are ignored).
+*/
+void extract_required_items(char_data *ch, struct req_data *list) {
+	// helper type
+	struct extract_items_data {
+		int group;	// cast from char
+		int complete;	// number to do
+		int tasks;	// total tasks
+		UT_hash_handle hh;
+	};
+	
+	struct extract_items_data *eid, *next_eid, *eid_list = NULL;
+	struct req_data *req, *found_req = NULL;
+	struct resource_data *res = NULL;
+	bool done = FALSE;
+	int group, which;
+	
+	// build a list of which tasks might be complete
+	LL_FOREACH(list, req) {
+		if (!req->group) {	// ungrouped requirement
+			if (req->current >= req->needed) {
+				// complete!
+				found_req = req;
+				done = TRUE;
+				break;
+			}
+		}
+		else {	// grouped req
+			// find or add data
+			group = (int)req->group;
+			HASH_FIND_INT(eid_list, &group, eid);
+			if (!eid) {
+				CREATE(eid, struct extract_items_data, 1);
+				eid->group = group;
+				HASH_ADD_INT(eid_list, group, eid);
+			}
+			
+			// compute data
+			eid->tasks += 1;
+			if (req->current >= req->needed) {
+				eid->complete += 1;
+			}
+		}
+	}
+	
+	// figure out which group
+	which = -1;
+	HASH_ITER(hh, eid_list, eid, next_eid) {
+		if (which == -1 && eid->complete >= eid->tasks) {
+			which = eid->group;
+		}
+		
+		// free data now
+		free(eid);
+	}
+	
+	// now that we know what to extract
+	LL_FOREACH(list, req) {
+		// is this one we extract from?
+		if (done && found_req != req) {
+			continue;
+		}
+		else if (!done && which != (int)req->group) {
+			continue;
+		}
+		
+		// REQ_x: types that are extractable
+		switch (req->type) {
+			case REQ_GET_COMPONENT: {
+				add_to_resource_list(&res, RES_COMPONENT, req->vnum, req->needed, req->misc);
+				break;
+			}
+			case REQ_GET_OBJECT: {
+				add_to_resource_list(&res, RES_OBJECT, req->vnum, req->needed, 0);
+				break;
+			}
+		}
+	}
+	
+	if (res) {
+		extract_resources(ch, res, FALSE, NULL);
+		free_resource_list(res);
+	}
+}
+
+
+/**
+* @param struct req_data *list A list to search.
+* @param int type REQ_ type.
+* @param any_vnum vnum The vnum to look for.
+* @return bool TRUE if the type+vnum is in the list. FALSE if not.
+*/
+bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum) {
+	struct req_data *iter;
+	LL_FOREACH(list, iter) {
+		if (iter->type == type && iter->vnum == vnum) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+
+/**
+* @param struct req_data *list The list to free.
+*/
+void free_requirements(struct req_data *list) {
+	struct req_data *iter, *next_iter;
+	LL_FOREACH_SAFE(list, iter, next_iter) {
+		free(iter);
+	}
+}
+
+
+/**
+* Determines if a character meets a set of requirements. This only works on
+* requirements that can be determined in realtime, not ones that require quest
+* trackers.
+*
+* @param char_data *ch The character to check.
+* @param struct req_data *list The list of requirements.
+* @param struct instance_data *instance Optional: A related instance (e.g. for quests that only check REQ_COMPLETED_QUEST on the same instance; may be NULL).
+* @return bool TRUE if the character meets those requirements, FALSE if not.
+*/
+bool meets_requirements(char_data *ch, struct req_data *list, struct instance_data *instance) {
+	extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
+	extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
+	extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
+	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
+	
+	// helper struct
+	struct meets_req_data {
+		int group;	// actually a char, but cast
+		bool ok;	// good until failed
+		UT_hash_handle hh;
+	};
+	
+	struct meets_req_data *mrd, *next_mrd, *mrd_list = NULL;
+	bool global_ok = FALSE, ok;
+	struct req_data *req;
+	int group;
+	
+	// shortcut
+	if (!list) {
+		return TRUE;
+	}
+	
+	LL_FOREACH(list, req) {
+		// first look up or create data for this group
+		group = req->group;
+		HASH_FIND_INT(mrd_list, &group, mrd);
+		if (!mrd) {
+			CREATE(mrd, struct meets_req_data, 1);
+			mrd->group = (int)req->group;
+			mrd->ok = TRUE;	// default
+			HASH_ADD_INT(mrd_list, group, mrd);
+		}
+		
+		// shortcut if the group already failed (group=none skips this because it's an "or")
+		if (mrd->group && !mrd->ok) {
+			continue;
+		}
+		
+		// alright, true unless proven otherwise
+		ok = TRUE;
+		
+		// REQ_x: only requirements that can be prereqs (don't require a tracker)
+		switch(req->type) {
+			case REQ_COMPLETED_QUEST: {
+				if (!has_completed_quest(ch, req->vnum, instance ? instance->id : NOTHING)) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_GET_COMPONENT: {
+				struct resource_data *res = NULL;
+				add_to_resource_list(&res, RES_COMPONENT, req->vnum, req->needed, req->misc);
+				if (!has_resources(ch, res, FALSE, FALSE)) {
+					ok = FALSE;
+				}
+				free_resource_list(res);
+				break;
+			}
+			case REQ_GET_OBJECT: {
+				struct resource_data *res = NULL;
+				add_to_resource_list(&res, RES_OBJECT, req->vnum, req->needed, 0);
+				if (!has_resources(ch, res, FALSE, FALSE)) {
+					ok = FALSE;
+				}
+				free_resource_list(res);
+				break;
+			}
+			case REQ_NOT_COMPLETED_QUEST: {
+				if (has_completed_quest(ch, req->vnum, instance ? instance->id : NOTHING)) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_NOT_ON_QUEST: {
+				if (is_on_quest(ch, req->vnum)) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_OWN_BUILDING: {
+				if (!GET_LOYALTY(ch) || count_owned_buildings(GET_LOYALTY(ch), req->vnum) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_OWN_VEHICLE: {
+				if (!GET_LOYALTY(ch) || count_owned_vehicles(GET_LOYALTY(ch), req->vnum) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_SKILL_LEVEL_OVER: {
+				if (get_skill_level(ch, req->vnum) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_SKILL_LEVEL_UNDER: {
+				if (get_skill_level(ch, req->vnum) > req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_HAVE_ABILITY: {
+				if (!has_ability(ch, req->vnum)) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_REP_OVER: {
+				struct player_faction_data *pfd = get_reputation(ch, req->vnum, FALSE);
+				faction_data *fct = find_faction_by_vnum(req->vnum);
+				if (compare_reptuation((pfd ? pfd->rep : (fct ? FCT_STARTING_REP(fct) : REP_NEUTRAL)), req->needed) < 0) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_REP_UNDER: {
+				struct player_faction_data *pfd = get_reputation(ch, req->vnum, FALSE);
+				faction_data *fct = find_faction_by_vnum(req->vnum);
+				if (compare_reptuation((pfd ? pfd->rep : (fct ? FCT_STARTING_REP(fct) : REP_NEUTRAL)), req->needed) > 0) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_WEARING: {
+				bool found = FALSE;
+				int iter;
+				
+				for (iter = 0; iter < NUM_WEARS; ++iter) {
+					if (GET_EQ(ch, iter) && GET_OBJ_VNUM(GET_EQ(ch, iter)) == req->vnum) {
+						found = TRUE;
+						break;
+					}
+				}
+				
+				if (!found) {
+					ok = FALSE;
+				}
+				
+				break;
+			}
+			case REQ_WEARING_OR_HAS: {
+				struct resource_data *res = NULL;
+				bool found = FALSE;
+				int iter;
+				
+				for (iter = 0; iter < NUM_WEARS; ++iter) {
+					if (GET_EQ(ch, iter) && GET_OBJ_VNUM(GET_EQ(ch, iter)) == req->vnum) {
+						found = TRUE;
+						break;
+					}
+				}
+				
+				if (!found) {
+					// check inventory
+					add_to_resource_list(&res, RES_OBJECT, req->vnum, req->needed, 0);
+					if (!has_resources(ch, res, FALSE, FALSE)) {
+						ok = FALSE;
+					}
+					free_resource_list(res);
+				}
+				
+				break;
+			}
+			
+			// some types do not support pre-reqs
+			case REQ_KILL_MOB:
+			case REQ_KILL_MOB_FLAGGED:
+			case REQ_TRIGGERED:
+			case REQ_VISIT_BUILDING:
+			case REQ_VISIT_ROOM_TEMPLATE:
+			case REQ_VISIT_SECTOR:
+			default: {
+				break;
+			}
+		}	// end switch
+		
+		if (!ok) {	// did we survive the switch?
+			mrd->ok = FALSE;
+		}
+		else if (ok && !mrd->group) {	// the non-grouped conditions are "OR"s
+			global_ok = TRUE;
+			break;	// exit early
+		}
+	}
+	
+	if (!global_ok) {	// did any sub-groups succeed?
+		HASH_ITER(hh, mrd_list, mrd, next_mrd) {
+			if (mrd->ok && mrd->group) {	// only grouped requirements count here
+				global_ok = TRUE;
+			}
+			
+			// free memory
+			free(mrd);
+		}
+	}
+	
+	return global_ok;
+}
+
+
+/**
+* Gets standard string display like "4x lumber" for a requirement (e.g. a
+* quest task).
+*
+* @param struct req_data *req The requirement to show.
+* @param bool show_vnums If TRUE, adds [1234] at the start of the string.
+* @return char* The string display.
+*/
+char *requirement_string(struct req_data *req, bool show_vnums) {
+	extern const char *action_bits[];
+	
+	char vnum[256], lbuf[256];
+	static char output[256];
+	
+	*output = '\0';
+	if (!req) {
+		return output;
+	}
+	
+	if (show_vnums) {
+		snprintf(vnum, sizeof(vnum), "[%d] ", req->vnum);
+	}
+	else {
+		*vnum = '\0';
+	}
+	
+	// REQ_x
+	switch (req->type) {
+		case REQ_COMPLETED_QUEST: {
+			snprintf(output, sizeof(output), "Complete quest: %s%s", vnum, get_quest_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_GET_COMPONENT: {
+			snprintf(output, sizeof(output), "Get component%s: %dx %s%s", PLURAL(req->needed), req->needed, vnum, component_string(req->vnum, req->misc));
+			break;
+		}
+		case REQ_GET_OBJECT: {
+			snprintf(output, sizeof(output), "Get object%s: %dx %s%s", PLURAL(req->needed), req->needed, vnum, get_obj_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_KILL_MOB: {
+			snprintf(output, sizeof(output), "Kill %dx mob%s: %s%s", req->needed, PLURAL(req->needed), vnum, get_mob_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_KILL_MOB_FLAGGED: {
+			sprintbit(req->misc, action_bits, lbuf, TRUE);
+			// does not show vnum
+			snprintf(output, sizeof(output), "Kill %dx mob%s flagged: %s", req->needed, PLURAL(req->needed), lbuf);
+			break;
+		}
+		case REQ_NOT_COMPLETED_QUEST: {
+			snprintf(output, sizeof(output), "Not completed quest %s%s", vnum, get_quest_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_NOT_ON_QUEST: {
+			snprintf(output, sizeof(output), "Not on quest %s%s", vnum, get_quest_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_OWN_BUILDING: {
+			bld_data *bld = building_proto(req->vnum);
+			snprintf(output, sizeof(output), "Own %dx building%s: %s%s", req->needed, PLURAL(req->needed), vnum, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+			break;
+		}
+		case REQ_OWN_VEHICLE: {
+			snprintf(output, sizeof(output), "Own %dx vehicle%s: %s%s", req->needed, PLURAL(req->needed), vnum, get_vehicle_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_SKILL_LEVEL_OVER: {
+			snprintf(output, sizeof(output), "%s%s at least %d", vnum, get_skill_name_by_vnum(req->vnum), req->needed);
+			break;
+		}
+		case REQ_SKILL_LEVEL_UNDER: {
+			snprintf(output, sizeof(output), "%s%s not over %d", vnum, get_skill_name_by_vnum(req->vnum), req->needed);
+			break;
+		}
+		case REQ_TRIGGERED: {
+			strcpy(output, "Scripted condition");
+			break;
+		}
+		case REQ_VISIT_BUILDING: {
+			bld_data *bld = building_proto(req->vnum);
+			snprintf(output, sizeof(output), "Visit building: %s%s", vnum, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+			break;
+		}
+		case REQ_VISIT_ROOM_TEMPLATE: {
+			room_template *rmt = room_template_proto(req->vnum);
+			snprintf(output, sizeof(output), "Visit location: %s%s", vnum, rmt ? GET_RMT_TITLE(rmt) : "UNKNOWN");
+			break;
+		}
+		case REQ_VISIT_SECTOR: {
+			sector_data *sect = sector_proto(req->vnum);
+			snprintf(output, sizeof(output), "Visit terrain: %s%s", vnum, sect ? GET_SECT_NAME(sect) : "UNKNOWN");
+			break;
+		}
+		case REQ_HAVE_ABILITY: {
+			snprintf(output, sizeof(output), "Have ability: %s%s", vnum, get_ability_name_by_vnum(req->vnum));
+			break;
+		}
+		case REQ_REP_OVER: {
+			snprintf(output, sizeof(output), "%s%s at least %s", vnum, get_faction_name_by_vnum(req->vnum), get_reputation_name(req->needed));
+			break;
+		}
+		case REQ_REP_UNDER: {
+			snprintf(output, sizeof(output), "%s%s not over %s", vnum, get_faction_name_by_vnum(req->vnum), get_reputation_name(req->needed));
+			break;
+		}
+		case REQ_WEARING: {
+			snprintf(output, sizeof(output), "Wearing object: %s%s", vnum, get_obj_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_WEARING_OR_HAS: {
+			snprintf(output, sizeof(output), "Wearing or has object: %s%s", vnum, get_obj_name_by_proto(req->vnum));
+			break;
+		}
+		default: {
+			sprintf(buf, "Unknown condition");
+			break;
+		}
+	}
+	
+	if (show_vnums && req->group) {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), " (%c)", req->group);
+	}
+	
+	return output;
 }
 
 

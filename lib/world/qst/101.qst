@@ -13,27 +13,27 @@ quest first.
 ~
 You have defeated enough attackers to summon the final cactus...
 ~
-5 c 75 100 1440
+6 c 75 100 1440
 A
 4 10148
 P
-9 0 0 51
+9 0 0 51 a
 P
-6 10142 0 1
+6 10142 0 1 a
 P
-6 10144 0 1
+6 10144 0 1 a
 P
-6 10145 0 1
+6 10145 0 1 a
 P
-6 10147 0 1
+6 10147 0 1 a
 P
-6 10150 0 1
+6 10150 0 1 a
 P
-6 10153 0 1
+6 10153 0 1 a
 P
-6 10156 0 1
+6 10156 0 1 a
 P
-6 10157 0 1
+6 10157 0 1 a
 R
 6 10142 1
 W
@@ -50,29 +50,29 @@ cactus stirs to life... Defeat it to complete this quest and close the rift.
 immediately. You sense that the mana holding open the rift has begun to fade,
 and realize you should leave the rift immediately.
 ~
-10 bc 75 100 0
+11 bc 75 100 0
 A
 4 10148
 P
-9 0 0 51
+9 0 0 51 a
 P
-6 10141 0 1
+6 10141 0 1 a
 P
-6 10144 0 1
+6 10144 0 1 a
 P
-6 10145 0 1
+6 10145 0 1 a
 P
-6 10147 0 1
+6 10147 0 1 a
 P
-6 10150 0 1
+6 10150 0 1 a
 P
-6 10153 0 1
+6 10153 0 1 a
 P
-6 10156 0 1
+6 10156 0 1 a
 P
-6 10157 0 1
+6 10157 0 1 a
 P
-0 10141 0 1
+0 10141 0 1 a
 R
 2 10169 1
 T 10142
@@ -93,34 +93,34 @@ spell to seal the rift.
 ~
 You found the spell to seal the rift!
 ~
-5 c 75 100 1440
+7 c 75 100 1440
 A
 2 10140
 P
-9 2 0 51
+9 2 0 51 a
 P
-6 10141 0 1
+6 10141 0 1 a
 P
-6 10142 0 1
+6 10142 0 1 a
 P
-6 10145 0 1
+6 10145 0 1 a
 P
-6 10147 0 1
+6 10147 0 1 a
 P
-6 10150 0 1
+6 10150 0 1 a
 P
-6 10153 0 1
+6 10153 0 1 a
 P
-6 10156 0 1
+6 10156 0 1 a
 P
-6 10157 0 1
+6 10157 0 1 a
 R
 6 10145 1
 T 10174
 W
-12 5511 0 1
+12 5511 0 1 a
 W
-11 0 0 1
+11 0 0 1 a
 Z
 2 10142
 S
@@ -134,29 +134,29 @@ monsoon rift and type 'ritual rift' to seal it off and end the cactus invasion.
 fade and lose its hold. Almost instantly, the rift begins to collapse.
 Hopefully nobody is trapped on the wrong side of it!
 ~
-7 bc 75 100 0
+9 bc 75 100 0
 A
 2 10142
 P
-9 2 0 51
+9 2 0 51 a
 P
-6 10141 0 1
+6 10141 0 1 a
 P
-6 10142 0 1
+6 10142 0 1 a
 P
-6 10144 0 1
+6 10144 0 1 a
 P
-6 10147 0 1
+6 10147 0 1 a
 P
-6 10150 0 1
+6 10150 0 1 a
 P
-6 10153 0 1
+6 10153 0 1 a
 P
-6 10156 0 1
+6 10156 0 1 a
 P
-6 10157 0 1
+6 10157 0 1 a
 P
-0 10144 0 1
+0 10144 0 1 a
 R
 0 0 3
 R
@@ -164,9 +164,9 @@ R
 T 10174
 T 18259
 W
-12 10140 0 1
+12 10140 0 1 a
 W
-11 0 0 1
+11 0 0 1 a
 Z
 2 10175
 S
@@ -184,27 +184,27 @@ thanks you for your service to nature. Thanks to your help, the thirsty desert
 plants have the water to survive another year. You can already see the rift
 beginning to close -- better hurry back out.
 ~
-9 c 75 100 1440
+10 c 75 100 1440
 A
 1 10144
 P
-9 3 0 51
+9 3 0 51 a
 P
-6 10141 0 1
+6 10141 0 1 a
 P
-6 10142 0 1
+6 10142 0 1 a
 P
-6 10144 0 1
+6 10144 0 1 a
 P
-6 10145 0 1
+6 10145 0 1 a
 P
-6 10150 0 1
+6 10150 0 1 a
 P
-6 10153 0 1
+6 10153 0 1 a
 P
-6 10156 0 1
+6 10156 0 1 a
 P
-6 10157 0 1
+6 10157 0 1 a
 R
 0 0 3
 R
@@ -235,27 +235,27 @@ laundry, ties them to a pigeon, and sends it off.
    Within moments, the rift starts to close. Clearly the head druid got the
 message. You had better head out of the rift, before it collapses completely.
 ~
-8 cd 75 100 1440
+10 cd 75 100 1440
 A
 1 10145
 P
-9 4 0 51
+9 4 0 51 a
 P
-6 10141 0 1
+6 10141 0 1 a
 P
-6 10142 0 1
+6 10142 0 1 a
 P
-6 10144 0 1
+6 10144 0 1 a
 P
-6 10145 0 1
+6 10145 0 1 a
 P
-6 10147 0 1
+6 10147 0 1 a
 P
-6 10153 0 1
+6 10153 0 1 a
 P
-6 10156 0 1
+6 10156 0 1 a
 P
-6 10157 0 1
+6 10157 0 1 a
 R
 0 0 3
 R
@@ -263,11 +263,11 @@ R
 T 10142
 T 18259
 W
-13 10143 0 1
+13 10143 0 1 a
 W
-11 0 0 1
+11 0 0 1 a
 W
-2 10178 0 1
+2 10178 0 1 a
 Z
 1 10145
 S
@@ -287,27 +287,27 @@ the finished product back to the wandering merchant.
    You hand the merchant the herbicide. His face lights up to see so much of
 it, and you can tell he's eager to douse some of the animated cacti with it.
 ~
-9 cd 75 100 1440
+10 cd 75 100 1440
 A
 1 10146
 P
-9 6 0 51
+9 6 0 51 a
 P
-6 10141 0 1
+6 10141 0 1 a
 P
-6 10142 0 1
+6 10142 0 1 a
 P
-6 10144 0 1
+6 10144 0 1 a
 P
-6 10145 0 1
+6 10145 0 1 a
 P
-6 10147 0 1
+6 10147 0 1 a
 P
-6 10150 0 1
+6 10150 0 1 a
 P
-6 10156 0 1
+6 10156 0 1 a
 P
-6 10157 0 1
+6 10157 0 1 a
 R
 0 0 3
 R
@@ -334,27 +334,27 @@ completed the infusion. Infusing the totem will require some of your blood.
    You infuse the bat totem with some of your blood, and it takes on a reddish
 glow...
 ~
-4 c 75 100 1440
+5 c 75 100 1440
 A
 1 10147
 P
-9 7 0 51
+9 7 0 51 a
 P
-6 10141 0 1
+6 10141 0 1 a
 P
-6 10142 0 1
+6 10142 0 1 a
 P
-6 10144 0 1
+6 10144 0 1 a
 P
-6 10145 0 1
+6 10145 0 1 a
 P
-6 10147 0 1
+6 10147 0 1 a
 P
-6 10150 0 1
+6 10150 0 1 a
 P
-6 10153 0 1
+6 10153 0 1 a
 P
-6 10157 0 1
+6 10157 0 1 a
 R
 6 10157 1
 T 10178
@@ -376,29 +376,29 @@ have been ravaging the countryside.
 animates the cacti begins to fade. In the distance, you can see the rift
 starting to close. You better hurry out!
 ~
-10 bc 75 100 0
+12 bc 75 100 0
 A
 2 10161
 P
-0 10156 0 1
+0 10156 0 1 a
 P
-9 7 0 51
+9 7 0 51 a
 P
-6 10141 0 1
+6 10141 0 1 a
 P
-6 10142 0 1
+6 10142 0 1 a
 P
-6 10144 0 1
+6 10144 0 1 a
 P
-6 10145 0 1
+6 10145 0 1 a
 P
-6 10147 0 1
+6 10147 0 1 a
 P
-6 10150 0 1
+6 10150 0 1 a
 P
-6 10153 0 1
+6 10153 0 1 a
 P
-6 10156 0 1
+6 10156 0 1 a
 R
 0 0 3
 R
@@ -406,9 +406,9 @@ R
 T 10178
 T 18259
 W
-13 10145 0 1
+13 10145 0 1 a
 W
-11 0 0 1
+11 0 0 1 a
 Z
 2 10173
 S
