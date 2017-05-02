@@ -3723,6 +3723,7 @@ ACMD(do_empire_inventory) {
 
 
 ACMD(do_enroll) {
+	struct empire_island *from_isle, *next_isle, *isle;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
 	struct empire_storage_data *store, *store2;
@@ -3733,9 +3734,9 @@ ACMD(do_enroll) {
 	vehicle_data *veh, *next_veh;
 	empire_data *e, *old;
 	room_data *room, *next_room;
-	int old_store;
+	int old_store, iter;
 	char_data *targ = NULL, *victim, *mob;
-	bool file = FALSE, sub_file = FALSE;
+	bool all_zero, file = FALSE, sub_file = FALSE;
 	obj_data *obj;
 
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
@@ -3833,6 +3834,24 @@ ACMD(do_enroll) {
 			for (obj = object_list; obj; obj = obj->next) {
 				if (obj->last_empire_id == EMPIRE_VNUM(old)) {
 					obj->last_empire_id = EMPIRE_VNUM(e);
+				}
+			}
+			
+			// workforce: attempt a smart-copy
+			HASH_ITER(hh, EMPIRE_ISLANDS(old), from_isle, next_isle) {
+				isle = get_empire_island(e, from_isle->island);
+				
+				all_zero = TRUE;
+				for (iter = 0; iter < NUM_CHORES && all_zero; ++iter) {
+					if (isle->workforce_limit[iter] != 0) {
+						all_zero = FALSE;
+					}
+				}
+				
+				if (all_zero) {	// safe to copy (no previous settings)
+					for (iter = 0; iter < NUM_CHORES; ++iter) {
+						isle->workforce_limit[iter] = from_isle->workforce_limit[iter];
+					}
 				}
 			}
 			
