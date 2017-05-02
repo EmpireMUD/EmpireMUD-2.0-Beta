@@ -6588,7 +6588,7 @@ ACMD(do_send) {
 	half_chop(argument, arg, buf);
 
 	if (!*arg) {
-		send_to_char("Send what to who?\r\n", ch);
+		send_to_char("Send what to whom?\r\n", ch);
 		return;
 	}
 	if (!(vict = get_char_vis(ch, arg, FIND_CHAR_WORLD))) {
@@ -7004,7 +7004,7 @@ ACMD(do_switch) {
 	if (ch->desc->original)
 		send_to_char("You're already switched.\r\n", ch);
 	else if (!*arg)
-		send_to_char("Switch with who?\r\n", ch);
+		send_to_char("Switch with whom?\r\n", ch);
 	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_WORLD)))
 		send_to_char("No such character.\r\n", ch);
 	else if (ch == victim)

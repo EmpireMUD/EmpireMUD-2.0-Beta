@@ -270,7 +270,7 @@ ACMD(do_hit) {
 	one_argument(argument, arg);
 
 	if (!*arg)
-		send_to_char("Hit who?\r\n", ch);
+		send_to_char("Hit whom?\r\n", ch);
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
 		send_to_char("They don't seem to be here.\r\n", ch);
 	else if (vict == ch) {

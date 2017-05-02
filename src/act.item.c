@@ -1313,7 +1313,7 @@ static char_data *give_find_vict(char_data *ch, char *arg) {
 	char_data *vict;
 
 	if (!*arg)
-		send_to_char("To who?\r\n", ch);
+		send_to_char("To whom?\r\n", ch);
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (vict == ch)
@@ -4252,7 +4252,7 @@ ACMD(do_give) {
 	argument = one_argument(argument, arg);
 
 	if (!*arg)
-		send_to_char("Give what to who?\r\n", ch);
+		send_to_char("Give what to whom?\r\n", ch);
 	else if (is_number(arg)) {
 		amount = atoi(arg);
 		argument = one_argument(argument, arg);

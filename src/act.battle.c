@@ -90,7 +90,7 @@ ACMD(do_bash) {
 		if (FIGHTING(ch) && IN_ROOM(ch) == IN_ROOM(FIGHTING(ch)))
 			vict = FIGHTING(ch);
 		else {
-			send_to_char("Bash who?\r\n", ch);
+			send_to_char("Bash whom?\r\n", ch);
 			return;
 		}
 	}
