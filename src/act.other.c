@@ -1310,6 +1310,10 @@ ACMD(do_alternate) {
 			msg_to_char(ch, "That character isn't on your account.\r\n");
 			return;
 		}
+		if (newch == ch) {
+			msg_to_char(ch, "You're already playing that character.\r\n");
+			return;
+		}
 		if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0 && !IS_IMMORTAL(newch)) {
 			msg_to_char(ch, "You can't alternate again so soon.\r\n");
 			return;
