@@ -295,6 +295,9 @@ EEDIT(eedit_adjective) {
 	else if (strlen(argument) > MAX_RANK_LENGTH) {
 		msg_to_char(ch, "Adjective names are limited to %d characters.\r\n", MAX_RANK_LENGTH);
 	}
+	else if (!strcmp(argument, EMPIRE_ADJECTIVE(emp))) {
+		msg_to_char(ch, "That's already the adjective.\r\n");
+	}
 	else if (!check_unique_empire_name(emp, argument)) {
 		msg_to_char(ch, "That name is already in use.\r\n");
 	}
@@ -522,11 +525,14 @@ EEDIT(eedit_name) {
 	else if (strchr(argument, '"')) {
 		msg_to_char(ch, "Empire names may not contain a quotation mark (\").\r\n");
 	}
-	else if (!valid_empire_name(argument)) {
-		msg_to_char(ch, "Invalid empire name.\r\n");
+	else if (!strcmp(argument, EMPIRE_NAME(emp))) {
+		msg_to_char(ch, "It's already called that.\r\n");
 	}
 	else if (!check_unique_empire_name(emp, argument)) {
 		msg_to_char(ch, "That name is already in use.\r\n");
+	}
+	else if (!valid_empire_name(argument)) {
+		msg_to_char(ch, "Invalid empire name.\r\n");
 	}
 	else {
 		strcpy(buf, NULLSAFE(EMPIRE_NAME(emp)));
