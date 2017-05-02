@@ -1404,11 +1404,6 @@ If you set your own limit on a chore, the empire won't produce more than that
 limit on each island. Not all chores use the numeric limit (for example, the
 abandon-* toggles don't use the limit).
 
-You can use the "workforce no-work" command to toggle whether or not your
-citizens will work the room you're currently standing in. The "workforce where"
-will tell you how many citizens are working each task. Optionally you may also 
-use "workforce where here" to filter the workforce to your current island.
-
 You can use the "workforce copy" command to copy the workforce limit
 configuration of another island into the island you are currently in.
 
@@ -1427,7 +1422,7 @@ The Workforce ability gains experience when most workforce chores are done
 The Skilled Labor ability gains experience when skilled chores are done while
 you are online.
 
-See also: WORKFORCE CHORES
+See also: WORKFORCE CHORES, WORKFORCE WHERE, NO-WORK
 #
 "WORKFORCE CHORES" "WORKFORCE TYPES"
 
@@ -1470,5 +1465,26 @@ Workforce types:
 Items marked (skilled) require the Skilled Labor ability.
 
 See also: EXARCH CRAFTS, WORKFORCE
+#
+"WORKFORCE NO-WORK" "WORKFORCE NOWORK" NO-WORK NOWORK
+
+Usage:  workforce no-work
+
+This command toggles workforce for the map location you're standing on.
+Citizens will not perform any chores at that location.
+
+See also: WORKFORCE
+#
+"WORKFORCE WHERE"
+
+Usage:  workforce where
+        workforce where here
+
+This command will show you how many of your citizens are working on each
+active workforce chore right now.
+
+If you use the "here" argument, it will only check the island you're on.
+
+See also: WORKFORCE
 #
 $

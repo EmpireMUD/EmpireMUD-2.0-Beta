@@ -380,7 +380,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			msg_to_char(ch, "Holds %d items.\r\n", GET_MAX_CONTAINER_CONTENTS(obj));
 			break;
 		case ITEM_DRINKCON:
-			msg_to_char(ch, "Contains %d ounces of %s.\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), drinks[GET_DRINK_CONTAINER_TYPE(obj)]);
+			msg_to_char(ch, "Contains %d units of %s.\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), drinks[GET_DRINK_CONTAINER_TYPE(obj)]);
 			break;
 		case ITEM_FOOD:
 			msg_to_char(ch, "Fills for %d hours.\r\n", GET_FOOD_HOURS_OF_FULLNESS(obj));
