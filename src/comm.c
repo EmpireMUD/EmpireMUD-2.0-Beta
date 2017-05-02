@@ -2315,7 +2315,7 @@ int process_input(descriptor_data *t) {
 			bytes_read = strlen(read_point);
 
 			// check for overflow
-			if (bytes_read > space_left) {
+			if (bytes_read > 0 && bytes_read < strlen(read_buf)) {
 				char buffer[MAX_STRING_LENGTH];
 				
 				sprintf(buffer, "Line too long %ld/%ld. Truncated to:\r\n%s\r\n", bytes_read, space_left, read_point);
@@ -2323,7 +2323,7 @@ int process_input(descriptor_data *t) {
 					return (-1);
 				}
 				
-				return 0;
+				break;
 			}
 		}
 
