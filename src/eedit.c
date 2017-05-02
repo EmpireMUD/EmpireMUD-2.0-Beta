@@ -301,6 +301,9 @@ EEDIT(eedit_adjective) {
 	else if (!check_unique_empire_name(emp, argument)) {
 		msg_to_char(ch, "That name is already in use.\r\n");
 	}
+	else if (!valid_empire_name(argument)) {
+		msg_to_char(ch, "Invalid empire adjective.\r\n");
+	}
 	else {
 		if (EMPIRE_ADJECTIVE(emp)) {
 			free(EMPIRE_ADJECTIVE(emp));

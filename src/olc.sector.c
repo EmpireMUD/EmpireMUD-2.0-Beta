@@ -573,7 +573,7 @@ void olc_show_sector(char_data *ch) {
 		strcat(buf, buf1);
 	}
 	
-	sprintf(buf + strlen(buf), "<&yspawns&0> (add, remove, list)\r\n");
+	sprintf(buf + strlen(buf), "<&yspawns&0>\r\n");
 	if (GET_SECT_SPAWNS(st)) {
 		count = 0;
 		for (spawn = GET_SECT_SPAWNS(st); spawn; spawn = spawn->next) {

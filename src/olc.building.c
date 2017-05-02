@@ -770,7 +770,7 @@ void olc_show_building(char_data *ch) {
 		strcat(buf, lbuf);
 	}
 	
-	sprintf(buf + strlen(buf), "<&yspawns&0> (add, remove, list)\r\n");
+	sprintf(buf + strlen(buf), "<&yspawns&0>\r\n");
 	if (GET_BLD_SPAWNS(bdg)) {
 		count = 0;
 		for (spawn = GET_BLD_SPAWNS(bdg); spawn; spawn = spawn->next) {
