@@ -33,6 +33,9 @@ Argument type:  percent chance to execute
 
 This trigger happens when a building is completed.
 
+Variables:
+  &c%room%&0 - The room that was just completed.
+
 See also: RTRIG LOAD
 #d
 "DISMANTLE TRIGGER" "RTRIG DISMANTLE" TRIGEDIT-ROOM-DISMANTLE TRIGEDIT-DISMANTLE TRIG-DISMANTLE
@@ -100,6 +103,7 @@ magically can't usually be prevented.
 Variables:
   &c%actor%&0 - The character entering the room.
   &c%direction%&0 - The direction the character came from, if any.
+  &c%room%&0 - The room being entered.
 #d
 "RTRIG TYPES" TRIGEDIT-ROOM-TYPES "ROOM TRIGGER TYPES" "WORLD TRIGGER TYPES"
 
@@ -173,5 +177,8 @@ Argument type:  percent chance to execute
  
 Activated when the adventure zone this room belongs to is reset. For rooms
 out on the map, reset triggers are called every few minutes.
+
+Variables:
+  &c%room%&0 - The room it was activated on.
 #d
 $~

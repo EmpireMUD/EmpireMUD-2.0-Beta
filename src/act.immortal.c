@@ -6248,7 +6248,7 @@ ACMD(do_reboot) {
 	
 	char arg[MAX_INPUT_LENGTH];
 	descriptor_data *desc;
-	int type, time = 0;
+	int type, time = 0, var;
 	bool no_arg = FALSE;
 
 	// any number of args in any order
@@ -6289,7 +6289,8 @@ ACMD(do_reboot) {
 		msg_to_char(ch, "Rebooting momentarily...\r\n");
 	}
 	else {
-		msg_to_char(ch, "The %s is set for %d minutes (%s).\r\n", reboot_type[reboot_control.type], no_arg ? reboot_control.time : time, shutdown_types[reboot_control.level]);
+		var = (no_arg ? reboot_control.time : time);
+		msg_to_char(ch, "The %s is set for %d minute%s (%s).\r\n", reboot_type[reboot_control.type], var, PLURAL(var), shutdown_types[reboot_control.level]);
 		if (no_arg) {
 			msg_to_char(ch, "Players blocking the %s:\r\n", reboot_type[reboot_control.type]);
 			for (desc = descriptor_list; desc; desc = desc->next) {
