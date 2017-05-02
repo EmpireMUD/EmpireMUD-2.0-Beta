@@ -335,6 +335,36 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_BAG_ROWS	5
 
 
+// REQ_x: requirement types (used for things like quest conditions and pre-reqs)
+#define REQ_COMPLETED_QUEST  0
+#define REQ_GET_COMPONENT  1
+#define REQ_GET_OBJECT  2
+#define REQ_KILL_MOB  3
+#define REQ_KILL_MOB_FLAGGED  4
+#define REQ_NOT_COMPLETED_QUEST  5
+#define REQ_NOT_ON_QUEST  6
+#define REQ_OWN_BUILDING  7
+#define REQ_OWN_VEHICLE  8
+#define REQ_SKILL_LEVEL_OVER  9
+#define REQ_SKILL_LEVEL_UNDER  10
+#define REQ_TRIGGERED  11	// completed by a script
+#define REQ_VISIT_BUILDING  12
+#define REQ_VISIT_ROOM_TEMPLATE  13
+#define REQ_VISIT_SECTOR  14
+#define REQ_HAVE_ABILITY  15
+#define REQ_REP_OVER  16
+#define REQ_REP_UNDER  17
+#define REQ_WEARING  18
+#define REQ_WEARING_OR_HAS  19
+
+
+// REQ_AMT_x: How numbers displayed for different REQ_ types
+#define REQ_AMT_NONE  0	// show as "completed"
+#define REQ_AMT_NUMBER  1  // show as x/X
+#define REQ_AMT_THRESHOLD  2	// needs a numeric arg but shows as a threshold
+#define REQ_AMT_REPUTATION  3	// uses a faction reputation
+
+
 // for the shipping system
 #define SHIPPING_QUEUED  0	// waiting for a ship
 #define SHIPPING_EN_ROUTE  1	// waiting to deliver
@@ -1438,7 +1468,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_FILLING_IN		24
 #define ACT_RECLAIMING		25
 #define ACT_ESCAPING		26
-#define ACT_STUDYING		27
+	#define ACT_UNUSED		27
 #define ACT_RITUAL			28
 #define ACT_SAWING			29
 #define ACT_QUARRYING		30
@@ -1764,34 +1794,6 @@ typedef struct vehicle_data vehicle_data;
 #define QR_SKILL_LEVELS  5
 #define QR_QUEST_CHAIN  6
 #define QR_REPUTATION  7
-
-
-// QT_x: quest tracker types (conditions and pre-reqs)
-#define QT_COMPLETED_QUEST  0
-#define QT_GET_COMPONENT  1
-#define QT_GET_OBJECT  2
-#define QT_KILL_MOB  3
-#define QT_KILL_MOB_FLAGGED  4
-#define QT_NOT_COMPLETED_QUEST  5
-#define QT_NOT_ON_QUEST  6
-#define QT_OWN_BUILDING  7
-#define QT_OWN_VEHICLE  8
-#define QT_SKILL_LEVEL_OVER  9
-#define QT_SKILL_LEVEL_UNDER  10
-#define QT_TRIGGERED  11	// completed by a script
-#define QT_VISIT_BUILDING  12
-#define QT_VISIT_ROOM_TEMPLATE  13
-#define QT_VISIT_SECTOR  14
-#define QT_HAVE_ABILITY  15
-#define QT_REP_OVER  16
-#define QT_REP_UNDER  17
-
-
-// QT_AMT_x: How quest trackers are displayed for different QT_ types
-#define QT_AMT_NONE  0	// show as "completed"
-#define QT_AMT_NUMBER  1  // show as x/X
-#define QT_AMT_THRESHOLD  2	// needs a numeric arg but shows as a threshold
-#define QT_AMT_REPUTATION  3	// uses a faction reputation
 
 
 // indicates empire (rather than misc) coins for a reward
@@ -2329,6 +2331,20 @@ struct promo_code_list {
 	char *code;
 	bool expired;
 	PROMO_APPLY(*apply_func);
+};
+
+
+// a pre-requisite or requirement for a quest
+struct req_data {
+	int type;	// REQ_ type
+	any_vnum vnum;
+	bitvector_t misc;	// stores flags for some types
+	char group;	// for "AND" grouping
+	
+	int needed;	// how many the player needs
+	int current;	// how many the player has (for places where this data is tracked
+	
+	struct req_data *next;
 };
 
 
@@ -3944,13 +3960,13 @@ struct quest_data {
 	bitvector_t flags;	// QST_ flags
 	struct quest_giver *starts_at;	// people/things that start the quest
 	struct quest_giver *ends_at;	// people/things where you can turn it in
-	struct quest_task *tasks;	// list of objectives
+	struct req_data *tasks;	// list of objectives
 	struct quest_reward *rewards;	// linked list
 	
 	// constraints
 	int min_level;	// or 0 for no min
 	int max_level;	// or 0 for no max
-	struct quest_task *prereqs;	// linked list of prerequisites
+	struct req_data *prereqs;	// linked list of prerequisites
 	int repeatable_after;	// minutes to repeat; NOT_REPEATABLE for none
 	int daily_cycle;	// for dailies that rotate with others
 	
@@ -3989,19 +4005,6 @@ struct quest_reward {
 };
 
 
-// a pre-requisite or requirement for a quest
-struct quest_task {
-	int type;	// QT_ type
-	any_vnum vnum;
-	bitvector_t misc;	// stores flags for some types
-	
-	int needed;	// how many the player needs
-	int current;	// how many the player has
-	
-	struct quest_task *next;
-};
-
-
 // used for building a linked list of available quests
 struct quest_temp_list {
 	quest_data *quest;
@@ -4028,7 +4031,7 @@ struct player_quest {
 	ush_int version;	// for auto-updating
 	time_t start_time;	// when started
 	
-	struct quest_task *tracker;	// quest tasks to track
+	struct req_data *tracker;	// quest tasks to track
 	
 	any_vnum instance_id;	// where it was acquired (if anywhere)
 	any_vnum adventure;	// which adventure it was acquired in
@@ -4102,22 +4105,12 @@ struct social_data {
 	bitvector_t flags;	// AUG_x flags
 	int min_char_position;	// POS_ of the character
 	int min_victim_position;	// POS_ of victim
-	struct social_requirement *requirements;	// linked list
+	struct req_data *requirements;	// linked list of requirements
 	
 	char *message[NUM_SOCM_MESSAGES];	// strings
 	
 	UT_hash_handle hh;	// social_table hash
 	UT_hash_handle sorted_hh;	// sorted_socials hash
-};
-
-
-// for restrictions
-struct social_requirement {
-	int type;
-	any_vnum vnum;
-	int misc;
-	
-	struct social_requirement *next;
 };
 
 

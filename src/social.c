@@ -46,10 +46,40 @@ extern const char *social_flags[];
 extern const char *social_message_types[NUM_SOCM_MESSAGES][2];
 
 // external funcs
+void get_requirement_display(struct req_data *list, char *save_buffer);
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Handler for social message fields in the editor.
+*
+* @param char_data *ch The editing player.
+* @param char *argument The argument typed.
+* @param int msg Which SOCM_ const.
+*/
+void process_soc_msg_field(char_data *ch, char *argument, int msg) {
+	social_data *soc = GET_OLC_SOCIAL(ch->desc);
+	
+	if (!str_cmp(argument, "none")) {
+		if (SOC_MESSAGE(soc, msg)) {
+			free(SOC_MESSAGE(soc, msg));
+		}
+		SOC_MESSAGE(soc, msg) = NULL;
+		
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "%s message removed.\r\n", social_message_types[msg][0]);
+		}
+	}
+	else {
+		olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	}
+}
+
 
 /**
 * Checks that a character meets all requirements for a social.
@@ -59,7 +89,8 @@ extern const char *social_message_types[NUM_SOCM_MESSAGES][2];
 * @return bool TRUE if the character can do it, FALSE if not.
 */
 bool validate_social_requirements(char_data *ch, social_data *soc) {
-	return TRUE;
+	extern bool meets_requirements(char_data *ch, struct req_data *list, struct instance_data *instance);
+	return meets_requirements(ch, SOC_REQUIREMENTS(soc), NULL);
 }
 
 
@@ -107,9 +138,20 @@ bool audit_social(social_data *soc, char_data *ch) {
 */
 char *list_one_social(social_data *soc, bool detail) {
 	static char output[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH];
+	struct req_data *req;
+	int count;
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s (%s)", SOC_VNUM(soc), SOC_NAME(soc), SOC_COMMAND(soc));
+		if (SOC_REQUIREMENTS(soc)) {
+			LL_COUNT(SOC_REQUIREMENTS(soc), req, count);
+			snprintf(buf, sizeof(buf), " [%d requirements]", count);
+		}
+		else {
+			*buf = '\0';
+		}
+		
+		snprintf(output, sizeof(output), "[%5d] %s (%s)%s%s", SOC_VNUM(soc), SOC_NAME(soc), SOC_COMMAND(soc), buf, (SOCIAL_FLAGGED(soc, SOC_IN_DEVELOPMENT) ? " IN-DEV" : ""));
 		// TODO could show in-dev flag
 	}
 	else {
@@ -160,7 +202,7 @@ int sort_socials(social_data *a, social_data *b) {
 
 // typealphabetic sorter for sorted_socials
 int sort_socials_by_data(social_data *a, social_data *b) {
-	struct social_requirement *req;
+	struct req_data *req;
 	int a_reqs, b_reqs, diff;
 	
 	// name first
@@ -212,27 +254,6 @@ void add_social_to_table(social_data *soc) {
 
 
 /**
-* Duplicates a list of requirements.
-*
-* @param struct social_requirement *list The list to copy (may be NULL).
-* @return struct social_requirement* The copied list.
-*/
-struct social_requirement *copy_social_requirements(struct social_requirement *list) {
-	struct social_requirement *iter, *soc, *new_list = NULL;
-	
-	LL_FOREACH(list, iter) {
-		CREATE(soc, struct social_requirement, 1);
-		*soc = *iter;
-		soc->next = NULL;
-		
-		LL_APPEND(new_list, soc);
-	}
-	
-	return new_list;
-}
-
-
-/**
 * Removes a social from the hash table.
 *
 * @param social_data *soc The social data to remove from the table.
@@ -253,20 +274,6 @@ void clear_social(social_data *soc) {
 	memset((char *) soc, 0, sizeof(social_data));
 	
 	SOC_VNUM(soc) = NOTHING;
-}
-
-
-/**
-* Frees a list of social requirements.
-*
-* @param struct social_requirement *list The list to free (may be NULL).
-*/
-void free_social_requirements(struct social_requirement *list) {
-	struct social_requirement *iter, *next_iter;
-	
-	LL_FOREACH_SAFE(list, iter, next_iter) {
-		free(iter);
-	}
 }
 
 
@@ -294,41 +301,11 @@ void free_social(social_data *soc) {
 		}
 	}
 	
-	free_social_requirements(SOC_REQUIREMENTS(soc));
+	if (SOC_REQUIREMENTS(soc) && (!proto || SOC_REQUIREMENTS(soc) != SOC_REQUIREMENTS(proto))) {
+		free_requirements(SOC_REQUIREMENTS(soc));
+	}
 	
 	free(soc);
-}
-
-
-/**
-* Parses a social requirement tag (usually 'L', written by write_social_requirements_to_file().
-* This file should have just read the 'L' line, and the next line to read is its data.
-*
-* @param FILE *fl The file to read from.
-* @param struct social_requirement **list The list to append to.
-* @param char *error_str An identifier to log if there is a problem.
-*/
-void parse_social_requirement(FILE *fl, struct social_requirement **list, char *error_str) {
-	struct social_requirement *req;
-	int type, vnum, misc;
-	char line[256];
-	
-	if (!fl || !list || !get_line(fl, line)) {
-		log("SYSERR: data error in requirement line of %s", error_str ? error_str : "unknown resource");
-		exit(1);
-	}
-	
-	if (sscanf(line, "%d %d %d", &type, &vnum, &misc) != 3) {
-		log("SYSERR: format error in resource line of %s", error_str ? error_str : "unknown resource");
-		exit(1);
-	}
-	
-	CREATE(req, struct social_requirement, 1);
-	req->type = type;
-	req->vnum = vnum;
-	req->misc = misc;
-	
-	LL_APPEND(*list, req);
 }
 
 
@@ -339,6 +316,8 @@ void parse_social_requirement(FILE *fl, struct social_requirement **list, char *
 * @param any_vnum vnum The social vnum
 */
 void parse_social(FILE *fl, any_vnum vnum) {
+	void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
+	
 	char line[256], error[256], str_in[256], *ptr;
 	social_data *soc, *find;
 	int int_in[4];
@@ -383,7 +362,7 @@ void parse_social(FILE *fl, any_vnum vnum) {
 		}
 		switch (*line) {
 			case 'L': {	// requirements
-				parse_social_requirement(fl, &SOC_REQUIREMENTS(soc), error);
+				parse_requirement(fl, &SOC_REQUIREMENTS(soc), error);
 				break;
 			}
 			
@@ -448,22 +427,6 @@ void write_socials_index(FILE *fl) {
 
 
 /**
-* Writes a list of social requirements to file.
-*
-* @param FILE *fl The file, open for writing.
-* @param char letter The letter to tag in the file.
-* @param struct social_requirement *list The list to write.
-*/
-void write_social_requirements_to_file(FILE *fl, char letter, struct social_requirement *list) {
-	struct social_requirement *req;
-	
-	LL_FOREACH(list, req) {
-		fprintf(fl, "%c\n%d %d %d\n", letter, req->type, req->vnum, req->misc);
-	}
-}
-
-
-/**
 * Outputs one social item in the db file format, starting with a #VNUM and
 * ending with an S.
 *
@@ -471,6 +434,8 @@ void write_social_requirements_to_file(FILE *fl, char letter, struct social_requ
 * @param social_data *soc The thing to save.
 */
 void write_social_to_file(FILE *fl, social_data *soc) {
+	void write_requirements_to_file(FILE *fl, char letter, struct req_data *list);
+	
 	char temp[256];
 	int iter;
 	
@@ -492,7 +457,7 @@ void write_social_to_file(FILE *fl, social_data *soc) {
 	fprintf(fl, "%s %d %d\n", temp, SOC_MIN_CHAR_POS(soc), SOC_MIN_VICT_POS(soc));
 	
 	// 'L' requires
-	write_social_requirements_to_file(fl, 'L', SOC_REQUIREMENTS(soc));
+	write_requirements_to_file(fl, 'L', SOC_REQUIREMENTS(soc));
 	
 	// 'M' messages
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
@@ -595,7 +560,7 @@ void save_olc_social(descriptor_data *desc) {
 			free(SOC_MESSAGE(proto, iter));
 		}
 	}
-	free_social_requirements(SOC_REQUIREMENTS(proto));
+	free_requirements(SOC_REQUIREMENTS(proto));
 	
 	// sanity
 	if (!SOC_COMMAND(soc) || !*SOC_COMMAND(soc)) {
@@ -634,6 +599,8 @@ void save_olc_social(descriptor_data *desc) {
 * @return social_data* The copied social.
 */
 social_data *setup_olc_social(social_data *input) {
+	extern struct req_data *copy_requirements(struct req_data *from);
+	
 	social_data *new;
 	int iter;
 	
@@ -647,7 +614,7 @@ social_data *setup_olc_social(social_data *input) {
 		// copy things that are pointers
 		SOC_COMMAND(new) = SOC_COMMAND(input) ? str_dup(SOC_COMMAND(input)) : NULL;
 		SOC_NAME(new) = SOC_NAME(input) ? str_dup(SOC_NAME(input)) : NULL;
-		SOC_REQUIREMENTS(new) = copy_social_requirements(SOC_REQUIREMENTS(input));
+		SOC_REQUIREMENTS(new) = copy_requirements(SOC_REQUIREMENTS(input));
 		
 		for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
 			SOC_MESSAGE(new, iter) = SOC_MESSAGE(input, iter) ? str_dup(SOC_MESSAGE(input, iter)) : NULL;
@@ -693,6 +660,9 @@ void do_stat_social(char_data *ch, social_data *soc) {
 	sprintbit(SOC_FLAGS(soc), social_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
 	
+	get_requirement_display(SOC_REQUIREMENTS(soc), part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Requirements:\r\n%s", *part ? part : " none\r\n");
+	
 	size += snprintf(buf + size, sizeof(buf) - size, "Messages:\r\n");
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
 		size += snprintf(buf + size, sizeof(buf) - size, "\tc%s\t0: %s\r\n", social_message_types[iter][0], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
@@ -728,6 +698,9 @@ void olc_show_social(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "<\tycharposition\t0> %s (minimum)\r\n", position_types[SOC_MIN_CHAR_POS(soc)]);
 	sprintf(buf + strlen(buf), "<\tytargetposition\t0> %s (minimum)\r\n", position_types[SOC_MIN_VICT_POS(soc)]);
+	
+	get_requirement_display(SOC_REQUIREMENTS(soc), lbuf);
+	sprintf(buf + strlen(buf), "Requirements: <\tyrequirements\t0>\r\n%s", lbuf);
 	
 	sprintf(buf + strlen(buf), "Messages:\r\n");
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
@@ -794,6 +767,14 @@ OLC_MODULE(socedit_name) {
 }
 
 
+OLC_MODULE(socedit_requirements) {
+	void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
+	
+	social_data *soc = GET_OLC_SOCIAL(ch->desc);
+	olc_process_requirements(ch, argument, &SOC_REQUIREMENTS(soc), "requirements", FALSE);
+}
+
+
 OLC_MODULE(socedit_targetposition) {
 	social_data *soc = GET_OLC_SOCIAL(ch->desc);
 	SOC_MIN_VICT_POS(soc) = olc_process_type(ch, argument, "position", "targetposition", position_types, SOC_MIN_VICT_POS(soc));
@@ -801,56 +782,40 @@ OLC_MODULE(socedit_targetposition) {
 
 
 OLC_MODULE(socedit_n2char) {
-	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	int msg = SOCM_NO_ARG_TO_CHAR;
-	olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	process_soc_msg_field(ch, argument, SOCM_NO_ARG_TO_CHAR);
 }
 
 
 OLC_MODULE(socedit_n2other) {
-	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	int msg = SOCM_NO_ARG_TO_OTHERS;
-	olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	process_soc_msg_field(ch, argument, SOCM_NO_ARG_TO_OTHERS);
 }
 
 
 OLC_MODULE(socedit_s2char) {
-	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	int msg = SOCM_SELF_TO_CHAR;
-	olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	process_soc_msg_field(ch, argument, SOCM_SELF_TO_CHAR);
 }
 
 
 OLC_MODULE(socedit_s2other) {
-	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	int msg = SOCM_SELF_TO_OTHERS;
-	olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	process_soc_msg_field(ch, argument, SOCM_SELF_TO_OTHERS);
 }
 
 
 OLC_MODULE(socedit_t2char) {
-	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	int msg = SOCM_TARGETED_TO_CHAR;
-	olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	process_soc_msg_field(ch, argument, SOCM_TARGETED_TO_CHAR);
 }
 
 
 OLC_MODULE(socedit_t2vict) {
-	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	int msg = SOCM_TARGETED_TO_VICTIM;
-	olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	process_soc_msg_field(ch, argument, SOCM_TARGETED_TO_VICTIM);
 }
 
 
 OLC_MODULE(socedit_t2other) {
-	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	int msg = SOCM_TARGETED_TO_OTHERS;
-	olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	process_soc_msg_field(ch, argument, SOCM_TARGETED_TO_OTHERS);
 }
 
 
 OLC_MODULE(socedit_tnotfound) {
-	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	int msg = SOCM_TARGETED_NOT_FOUND;
-	olc_process_string(ch, argument, social_message_types[msg][0], &SOC_MESSAGE(soc, msg));
+	process_soc_msg_field(ch, argument, SOCM_TARGETED_NOT_FOUND);
 }

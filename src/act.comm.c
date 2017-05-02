@@ -884,11 +884,13 @@ ACMD(do_slash_channel) {
 		else {
 			msg_to_char(ch, "Players on \t%c/%s\tn:\r\n", chan->color, chan->name);
 			
+			Global_ignore_dark = TRUE;	// not darkness-based
 			for (desc = descriptor_list; desc; desc = desc->next) {
 				if (desc->character && !IS_NPC(desc->character) && STATE(desc) == CON_PLAYING && find_on_slash_channel(desc->character, chan->id) && CAN_SEE_NO_DARK(ch, desc->character) && INCOGNITO_OK(ch, desc->character)) {
 					msg_to_char(ch, " %s\r\n", PERS(desc->character, ch, TRUE));
 				}
 			}
+			Global_ignore_dark = FALSE;
 		}
 	}
 	else if (!str_cmp(arg, "history") || !str_cmp(arg, "hist")) {

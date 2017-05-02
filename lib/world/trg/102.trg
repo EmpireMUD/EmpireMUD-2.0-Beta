@@ -411,6 +411,13 @@ say Just watch out for the huge, primitive dragons that walk these parts. They a
 wait 3 sec
 say Oh, and watch out for Archsorcerer Malfernes. I think the chroniportation has done something to his brain!
 ~
+#10251
+Block chop, give error~
+2 c 0
+chop~
+%send% %actor% A tangle of sharp vines too thick to pass stops you from getting close enough to the trees.
+return 1
+~
 #10252
 King of the Dracosaurs grievous bite~
 0 k 7

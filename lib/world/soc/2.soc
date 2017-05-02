@@ -492,7 +492,7 @@ pet~
 M0
 Whom do you want to pet?~
 M2
-You pet their head.~
+You pet $S head.~
 M3
 $n pets $N's head.~
 M4

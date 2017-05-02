@@ -91,10 +91,11 @@ makeuid new_room room i%room_vnum%
 * Move the inside portal object to the other room
 eval item %room.contents%
 while %item%
+  eval next_item %item.next_in_list%
   if %item.vnum% == 18461
     %purge% %item%
   end
-  eval item %item.next_in_list%
+  eval item %next_item%
 done
 %at% %new_room% %load% obj 18461
 eval targ %instance.location%

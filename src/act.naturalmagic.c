@@ -1245,7 +1245,7 @@ ACMD(do_purify) {
 		msg_to_char(ch, "You cannot purify so powerful a vampire.\r\n");
 	}
 	else if (vict != ch && !IS_NPC(vict) && !PRF_FLAGGED(vict, PRF_BOTHERABLE)) {
-		act("You can't purify someone without permission (ask $M to type NOBOTHER).", FALSE, ch, NULL, vict, TO_CHAR);
+		act("You can't purify someone without permission (ask $M to type 'toggle bother').", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else if (ch != vict && AFF_FLAGGED(vict, AFF_IMMUNE_NATURAL_MAGIC)) {
 		msg_to_char(ch, "Your victim is immune to that spell.\r\n");

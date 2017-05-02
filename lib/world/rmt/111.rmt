@@ -5,7 +5,7 @@ a dank smell in the air, and the distant clatter of water. The area is cool and
 dark, and there are signs of previous visitors in the form of charred campfire
 wood.
 ~
-bd 0
+bd 0 0
 D5
 ~
 0 11101
@@ -17,7 +17,7 @@ through another entrance to the north, while the sound of water is heard louder
 from the southeast. It is obvious the area has been frequently used for
 shelter.
 ~
-0 0
+0 0 0
 D6
 ~
 0 11100
@@ -37,7 +37,7 @@ than crafted by man, with large rocks jutting out at dangerous angles.
 Navigation is cautious, but the light grows brighter as the roof and walls open
 up into a secret canyon!
 ~
-b 0
+b 0 0
 D2
 ~
 0 11101
@@ -54,7 +54,7 @@ series of switchbacks before the walls open up and the sky is revealed. The
 formerly distant sound of lapping water now echoes in their ears with a gentle
 thrum.
 ~
-b 0
+b 0 0
 D4
 ~
 0 11101
@@ -71,7 +71,7 @@ axe had split the mountain open long ago. Their sheer faces have been smoothed
 by the elements over time, and the stoney ground is pocked with shallow pools
 of stagnant water and rivulets of runoff.
 ~
-a 0
+a 0 0
 D3
 ~
 0 11102
@@ -93,7 +93,7 @@ to the east, on the farthest side of an underground lake. The water is brisk
 and deep, rimmed with detritus common to fluctuating shorelines. A few old
 boats lie among the debris.
 ~
-b 0
+b 0 0
 D8
 ~
 0 11103
@@ -111,7 +111,7 @@ too large to reach the bottom. An occasional, broad wooden archway is evidence
 that someone once attempted to prevent further collapse, but the path is
 littered with erosion debris.
 ~
-b 0
+b 0 0
 D1
 ~
 0 11108
@@ -132,7 +132,7 @@ dry from lack of replenishment. Now all that remains is a seeping trickle
 meandering its way toward a more distinct sound of falling water. You could
 slide down to the lakeshore below, but climbing back up looks impossible.
 ~
-b 0
+b 0 0
 D4
 ~
 0 11104
@@ -148,7 +148,7 @@ An Impassable Landslide~
 several hundred precarious feet almost straight-up. Even the surest footed
 climbers would be wary of trying to scale its deadly terrain.
 ~
-a 0
+a 0 0
 D3
 ~
 0 11106
@@ -162,7 +162,7 @@ lakeshore. The water is so deep, it appears impervious to light. A slight
 current ripples from the east, the result of tons of water cascading from
 somewhere in the darkness above.
 ~
-b 0
+b 0 0
 D3
 ~
 0 11105
@@ -179,7 +179,7 @@ a ledge juts out from the wall at mooring level, secured with a post indicating
 this is its intended purpose. There is a hollow rushing sound from deep behind
 the waterfall.
 ~
-b 0
+b 0 0
 D3
 ~
 0 11109
@@ -204,7 +204,7 @@ side, it's likely the groove was created from backs pressed against it for
 balance. A few old boats are lying on the path ahead, probably used to cross
 the lake below.
 ~
-0 0
+0 0 0
 D9
 ~
 0 11110
@@ -217,10 +217,10 @@ S
 #11112
 An Underground Rapids~
    The current becomes vacuous behind the waterfall, and the boat is sucked
-violently downward into a winding, whitewater rapids! Be prepared to type LEFT,
+violently downward into winding, whitewater rapids! Be prepared to type LEFT,
 RIGHT, or DUCK.
 ~
-bd 0
+bd 0 0
 T 11109
 S
 #11113
@@ -234,7 +234,7 @@ radiating outward from the lake and rushing to break against the distant walls,
 their paths split by small thickets of overgrown carrot tops, blackberry
 shrubs, and pear trees.
 ~
-adeg 0
+adeg 0 0
 D8
 ~
 0 11114
@@ -255,7 +255,7 @@ An Inclining Seam~
 gives way to scrub and then stone as the slope steepens dramatically. If you
 continue on, you will not be able to return the same way.
 ~
-g 0
+g 0 0
 D9
 ~
 0 11113
@@ -276,7 +276,7 @@ impressive. The primary origin appears to be through a wide opening to the
 north, but it is greatly reinforced by several jets erupting from fissures in
 the walls.
 ~
-b 0
+b 0 0
 D9
 ~
 0 11111
@@ -293,7 +293,7 @@ and smells. The ground underfoot is saturated to ankle deep, and threatens to
 pull a boot off with every step. Pockets of dryer land offer some refuge, but
 are almost overrun with plant life and crawling with hidden things.
 ~
-a 0
+a 0 0
 D2
 ~
 0 11115
@@ -312,7 +312,7 @@ scrubby trees and succulants, but offers little else by way of cover. Mountain
 goats have left evidence of their frequent passage, as have the mountain cats
 that hunt them.
 ~
-a 0
+a 0 0
 D9
 ~
 0 11116
@@ -332,7 +332,7 @@ clover, to the sprawling branches of leaning trees with their trunks blanketed
 in moss. The canyon walls are high, but active with birds and other climbing
 things.
 ~
-a 0
+a 0 0
 D1
 ~
 0 11117
@@ -351,7 +351,7 @@ is required to clear the ceiling. If not for the lack of forks in the journey,
 and the persistent gusts of fresh air to confirm another end to this tunnel,
 the situation would be outright dire!
 ~
-b 0
+b 0 0
 D6
 ~
 0 11106
@@ -365,7 +365,7 @@ S
 A Large Rock~
 Avoid the rock!
 ~
-0 0
+0 0 0
 T 11106
 T 11107
 T 11108
@@ -375,7 +375,7 @@ S
 A Low-slung Tree Branch~
 There's a low-slung branch ahead!
 ~
-0 0
+0 0 0
 T 11106
 T 11107
 T 11108
@@ -385,7 +385,7 @@ S
 A Sliver in the Wall~
 There's a narrow crack in the wall!
 ~
-0 0
+0 0 0
 T 11106
 T 11107
 T 11108
@@ -397,7 +397,7 @@ A Churning Pool~
 walls are bare except directly across from the falls, which has a narrow
 opening in it.
 ~
-0 0
+0 0 0
 D8
 ~
 0 11110
@@ -408,7 +408,7 @@ An Overgrown Path~
 was once a frequented destination. The woods thin beyond, and there is a stone
 marker just a short way in.
 ~
-a 0
+a 0 0
 D1
 ~
 0 11131
@@ -420,7 +420,7 @@ only a fragment of its maker's mark remains. The path broadens here to the
 width of a carriage, the ruts of countless horses and wheels now reduced to
 shadowy dips in the mossy ground.
 ~
-a 0
+a 0 0
 D3
 ~
 0 11130
@@ -446,7 +446,7 @@ disrepair. The roof, and the arch over the carriage entrance it once supported,
 collapsed long ago, allowing a large, spiny yew tree to grow through and create
 a new canopy.
 ~
-a 0
+a 0 0
 D4
 ~
 0 11131
@@ -464,7 +464,7 @@ traversing the former parkway is an exercise in caution. The otherwise stagnant
 air hums with insect activity, and the cloying humidity is overwhelmingly
 pungent.
 ~
-a 0
+a 0 0
 D5
 ~
 0 11132
@@ -481,7 +481,7 @@ almost ten feet across what must have been a steady current of water, if the
 distant mill was ever to have been useful. Unfortunately, its collapse had a
 damming effect, and the river has become a swamp.
 ~
-a 0
+a 0 0
 D7
 ~
 0 11135
@@ -499,7 +499,7 @@ time, and the stilts supporting the mill are exposed enough to take the boat
 underneath. Bands of varying shades of reddish-green stain the exposed wood,
 and yards of moss dangle from the underside of the floor.
 ~
-a 0
+a 0 0
 D4
 ~
 0 11134
@@ -518,7 +518,7 @@ A Watery Henge~
 the garden this must have been, the occasional revelation of fountainhead or
 statue forming a circuitous path toward a large stone marker in the centre.
 ~
-a 0
+a 0 0
 D5
 ~
 0 11135
@@ -545,7 +545,7 @@ chimney near the rear. From here it is easy to see where there once existed a
 sculpted parkway leading from the gatehouse, as some of the wall markers topped
 with stone birds have yet to be engulfed by desperate foliage.
 ~
-a 0
+a 0 0
 D1
 ~
 0 11138
@@ -569,7 +569,7 @@ and the stables. The U-shaped building sags slightly, and part of its inside
 wall has come down, but the staining on the remaining surfaces reveal that the
 water has never breached the second floor.
 ~
-a 0
+a 0 0
 D3
 ~
 0 11137
@@ -590,7 +590,7 @@ The stained glass chipped and warped, its colourful patters marred by missing
 panes and a patina of filth. What must this chapel have looked like, in its
 prime? Surely it was beautiful!
 ~
-a 0
+a 0 0
 D3
 ~
 0 11138
@@ -612,7 +612,7 @@ Songbirds dart through the branches, their plumage flashing iridescent shades
 of blue and violet over mottled grey, their chirps and trills contained by the
 room's leafy insulation.
 ~
-0 0
+0 0 0
 D9
 ~
 0 11132
@@ -630,7 +630,7 @@ any usefulness through relentless erosion by water and insect. Boards creek
 without influence, the walls seem more vine than rock, and every surface
 undulates from bugs or their larvae.
 ~
-0 0
+0 0 0
 D9
 ~
 0 11135
@@ -644,7 +644,7 @@ proves to be in a nearly pristine condition when viewed in contrast to the rest
 of the home. There is a bedroom suite with a crackling fireplace, and several
 of the windows have boxes flowering with herbs hanging from their sills.
 ~
-0 0
+0 0 0
 D9
 ~
 0 11137
@@ -660,7 +660,7 @@ for the stable's occupants has long since been picked over by foragers.
 Scattered by time and left to take root in the saturated floor, all that
 remains is this covert field of wild oat and wheat grasses.
 ~
-0 0
+0 0 0
 D9
 ~
 0 11138
@@ -676,7 +676,7 @@ the altar, a door in the alcove behind it. Aside from that, and the number of
 bird nests in every available elevated corner, the rest of the interior appears
 mostly unsoiled.
 ~
-0 0
+0 0 0
 D5
 ~
 0 11149
@@ -695,7 +695,7 @@ another five or six deep, their subjects obscured by mildew and running
 colours. There is a small mattress on stilts in one corner, and a desk covered
 over in books perpendicular to the fireplace.
 ~
-0 0
+0 0 0
 D0
 ~
 0 11142
@@ -716,7 +716,7 @@ interred remains have been pushed out by the intrusive foliage. There is a hole
 in the ceiling which once served as a skylight to shine down on the sarcophagus
 in the center of the floor, but it is a cascade of thick vines now.
 ~
-b 0
+b 0 0
 D6
 ~
 0 11144
@@ -731,7 +731,7 @@ of swamp life punctuates a humming drone of insects, and the rancid stench of
 rot wafts on the air. One thing is clear: This will never be a friendly place
 again.
 ~
-a 0
+a 0 0
 D3
 ~
 0 11130
@@ -745,7 +745,7 @@ and bees busy themselves as they do. The babbling of a running spring can be
 faintly heard in the distance, and the air is fragrant with healthy growth.
 The stain has been removed from this land.
 ~
-a 0
+a 0 0
 D3
 ~
 0 11130

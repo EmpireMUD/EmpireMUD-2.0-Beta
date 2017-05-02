@@ -719,13 +719,14 @@ char *list_one_vehicle(vehicle_data *veh, bool detail) {
 * @param any_vnum vnum The vehicle vnum.
 */
 void olc_search_vehicle(char_data *ch, any_vnum vnum) {
-	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh = vehicle_proto(vnum);
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	room_template *rmt, *next_rmt;
+	social_data *soc, *next_soc;
 	struct adventure_spawn *asp;
 	int size, found;
 	bool any;
@@ -751,8 +752,8 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 		if (size >= sizeof(buf)) {
 			break;
 		}
-		any = find_quest_task_in_list(QUEST_TASKS(quest), QT_OWN_VEHICLE, vnum);
-		any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_OWN_VEHICLE, vnum);
+		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_OWN_VEHICLE, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_OWN_VEHICLE, vnum);
 		
 		if (any) {
 			++found;
@@ -768,6 +769,19 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 				break;	// only need 1
 			}
+		}
+	}
+	
+	// socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_OWN_VEHICLE, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -1846,12 +1860,13 @@ vehicle_data *create_vehicle_table_entry(any_vnum vnum) {
 */
 void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
-	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
+	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	
 	vehicle_data *veh, *iter, *next_iter;
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	room_template *rmt, *next_rmt;
+	social_data *soc, *next_soc;
 	descriptor_data *desc;
 	bool found;
 	
@@ -1895,8 +1910,8 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	
 	// update quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		found = delete_quest_task_from_list(&QUEST_TASKS(quest), QT_OWN_VEHICLE, vnum);
-		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_OWN_VEHICLE, vnum);
+		found = delete_requirement_from_list(&QUEST_TASKS(quest), REQ_OWN_VEHICLE, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_OWN_VEHICLE, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
@@ -1909,6 +1924,16 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_VEH, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
+		}
+	}
+	
+	// update socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_OWN_VEHICLE, vnum);
+		
+		if (found) {
+			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
 	
@@ -1927,8 +1952,8 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 			}
 		}
 		if (GET_OLC_QUEST(desc)) {
-			found = delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_OWN_VEHICLE, vnum);
-			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_OWN_VEHICLE, vnum);
+			found = delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_OWN_VEHICLE, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_OWN_VEHICLE, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
@@ -1938,6 +1963,14 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		if (GET_OLC_ROOM_TEMPLATE(desc)) {
 			if (delete_from_spawn_template_list(&GET_OLC_ROOM_TEMPLATE(desc)->spawns, ADV_SPAWN_VEH, vnum)) {
 				msg_to_char(desc->character, "One of the vehicles that spawns in the room template you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SOCIAL(desc)) {
+			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_OWN_VEHICLE, vnum);
+		
+			if (found) {
+				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A vehicle required by the social you are editing was deleted.\r\n");
 			}
 		}
 	}

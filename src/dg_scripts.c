@@ -3432,12 +3432,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							void count_quest_tasks(struct player_quest *pq, int *complete, int *total);
 							any_vnum vnum = atoi(subfield);
 							struct player_quest *pq;
-							struct quest_task *task;
+							struct req_data *task;
 							bool any = FALSE;
 							
 							if (!IS_NPC(c) && (pq = is_on_quest(c, vnum))) {
 								LL_FOREACH(pq->tracker, task) {
-									if (task->type == QT_TRIGGERED) {
+									if (task->type == REQ_TRIGGERED) {
 										any |= (task->current >= task->needed);
 									}
 								}

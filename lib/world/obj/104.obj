@@ -601,7 +601,7 @@ a violet leopard shawl~
 A violet leopard shawl is lying here.~
 This goblincraft shawl may be the height of fashion somewhere, but not here.
 ~
-27 mo ak 2
+27 mo ak 3
 0 0 0
 7 0
 A
@@ -609,7 +609,7 @@ A
 A
 16 1 0
 C
-0 100
+0 125
 S
 #10457
 gloves wildfire pair~
@@ -618,7 +618,7 @@ A pair of wildfire gloves is lying here.~
    These gloves appear to be made from ratskins, and have the faint glow of
 wildfire.
 ~
-27 mo ah 2
+27 mo ah 3
 0 0 0
 7 0
 A
@@ -628,7 +628,7 @@ A
 A
 16 1 0
 C
-0 100
+0 125
 S
 #10458
 ring shivsper's shivspers poison~
@@ -690,7 +690,7 @@ a rat-fur cloak~
 A fur cloak is lying here.~
 This goblincraft cloak looks to be sewn from a dozen rats.
 ~
-27 mo ak 2
+27 mo ak 3
 1 0 0
 7 0
 A
@@ -698,7 +698,7 @@ A
 A
 17 2 0
 C
-0 100
+0 125
 S
 #10463
 gauntlets wooden pair~
@@ -706,7 +706,7 @@ wooden gauntlets~
 A pair of wooden gauntlets appear to have been planted here.~
 These gauntlets are unmistakably goblincraft, and smell of pine.
 ~
-27 emo ah 2
+27 emo ah 3
 1 0 0
 0 0
 A
@@ -716,7 +716,7 @@ A
 A
 17 1 0
 C
-0 100
+0 125
 S
 #10464
 ring wargreyn's wargreyns~
@@ -783,7 +783,7 @@ A mesh cloak is draped on the ground.~
    This goblincraft cloak is made from a tightly woven metal mesh. Even with a
 tongue like a goblin, you can't say that five times fast.
 ~
-27 mo ak 1
+27 mo ak 2
 3 0 0
 2 0
 A
@@ -791,7 +791,7 @@ A
 A
 24 1 0
 C
-0 100
+0 125
 S
 #10469
 gauntlets heavy goblin pair~
@@ -799,7 +799,7 @@ heavy goblin gauntlets~
 A pair of heavy gauntlets is lying here.~
 These goblincraft gauntlets are lined with coarse rat fur.
 ~
-27 mo ah 1
+27 mo ah 2
 3 0 0
 2 0
 A
@@ -807,7 +807,7 @@ A
 A
 13 1 0
 C
-0 100
+0 125
 S
 #10470
 saddle rat-fur fur~

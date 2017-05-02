@@ -241,7 +241,7 @@ while %ch%
   eval test %%ch.is_ally(%actor%)%%
   eval ch_stealth %ch.skill(Stealth)%
   eval can_gain (%ch_stealth% != 0) && (%ch_stealth% != 50) && (%ch_stealth% != 75) && (%ch_stealth% != 100)
-  if (%ch.is_pc% && %test% && %can_gain%)
+  if (%ch.is_pc% && %test% && %can_gain% && !%ch.noskill(Stealth)%)
     %send% %actor% You learn a bit about Stealth from watching %self.name% fight.
     nop %ch.gain_skill(Stealth, 1)%
   end

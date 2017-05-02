@@ -601,6 +601,13 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 		
 		remove_depletion(target, DPLTN_PICK);
 		remove_depletion(target, DPLTN_FORAGE);
+		remove_depletion(target, DPLTN_DIG);
+		remove_depletion(target, DPLTN_GATHER);
+		remove_depletion(target, DPLTN_FISH);
+		remove_depletion(target, DPLTN_QUARRY);
+		remove_depletion(target, DPLTN_PAN);
+		remove_depletion(target, DPLTN_TRAPPING);
+		remove_depletion(target, DPLTN_CHOP);
 		
 		if (ROOM_OWNER(target)) {
 			void deactivate_workforce_room(empire_data *emp, room_data *room);
@@ -632,6 +639,16 @@ void do_dg_terraform(room_data *target, sector_data *sect) {
 	if (IS_ROAD(target)) {
 		change_base_sector(target, old_sect);
 	}
+	
+	remove_depletion(target, DPLTN_PICK);
+	remove_depletion(target, DPLTN_FORAGE);
+	remove_depletion(target, DPLTN_DIG);
+	remove_depletion(target, DPLTN_GATHER);
+	remove_depletion(target, DPLTN_FISH);
+	remove_depletion(target, DPLTN_QUARRY);
+	remove_depletion(target, DPLTN_PAN);
+	remove_depletion(target, DPLTN_TRAPPING);
+	remove_depletion(target, DPLTN_CHOP);
 	
 	if (ROOM_OWNER(target)) {
 		void deactivate_workforce_room(empire_data *emp, room_data *room);

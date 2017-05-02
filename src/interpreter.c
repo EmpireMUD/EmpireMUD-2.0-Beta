@@ -384,7 +384,6 @@ ACMD(do_stop);
 ACMD(do_store);
 ACMD(do_string_editor);
 ACMD(do_struggle);
-ACMD(do_study);
 ACMD(do_summary);
 ACMD(do_summon);
 ACMD(do_survey);
@@ -664,9 +663,9 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "elog", POS_DEAD, do_elog, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "empires", POS_DEAD, do_empires, NO_MIN, CTYPE_EMPIRE ),
 	SCMD_CMD( "empireidentify", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EIDENTIFY ),
-	SCMD_CMD( "eidentify", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EIDENTIFY ),
 	SCMD_CMD( "empireinventory", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EINVENTORY ),
 	SCMD_CMD( "einventory", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EINVENTORY ),
+	SCMD_CMD( "eidentify", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EIDENTIFY ),
 	SIMPLE_CMD( "emotd", POS_DEAD, do_emotd, NO_MIN, CTYPE_EMPIRE ),
 	SCMD_CMD( "emote", POS_RESTING, do_echo, NO_MIN, CTYPE_COMM, SCMD_EMOTE ),
 	SCMD_CMD( ":", POS_RESTING, do_echo, NO_MIN, CTYPE_COMM, SCMD_EMOTE ),
@@ -952,7 +951,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "store", POS_STANDING, do_store, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "stop", POS_DEAD, do_stop, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "struggle", POS_STUNNED, do_struggle, NO_MIN, CTYPE_COMBAT ),
-	STANDARD_CMD( "study", POS_STANDING, do_study, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "summary", POS_DEAD, do_summary, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "summon", POS_STANDING, do_summon, NO_MIN, CTYPE_SKILL ),
 	STANDARD_CMD( "sunshock", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_SUNSHOCK, CTYPE_COMBAT, NOBITS, ABIL_SUNSHOCK ),

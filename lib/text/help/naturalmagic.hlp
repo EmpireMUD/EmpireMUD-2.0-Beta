@@ -698,6 +698,11 @@ While warriors fight with axes and thieves fight with daggers, most mages
 prefer to fight using magic. The Ready Fireball ability removes your main
 weapon and replaces your normal combat attacks with fireballs.
 
+The strength of your fireball will be based on your Natural Magic skill level,
+unless you have a Natural Magic over 75, in which case it will be based on
+your total composite level (if you're wielding a permanent weapon when you
+ready a fireball, this will include any levels you get from that weapon).
+
 If you wish to stop using fireballs, you can type "remove fireball" just like
 you would with a weapon.
 

@@ -240,6 +240,9 @@ extern obj_data *get_obj_world(char *name);
 extern struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data);
 void remove_offers_by_type(char_data *ch, int type);
 
+// requirement handlers
+void free_requirements(struct req_data *list);
+
 // resource depletion handlers
 void add_depletion(room_data *room, int type, bool multiple);
 extern int get_depletion(room_data *room, int type);

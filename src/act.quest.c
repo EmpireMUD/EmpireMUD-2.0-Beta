@@ -40,14 +40,14 @@ extern bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest
 extern bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list);
 extern bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
 extern bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
-extern struct quest_task *copy_quest_tasks(struct quest_task *from);
+extern struct req_data *copy_requirements(struct req_data *from);
 void free_player_quests(struct player_quest *list);
 void free_quest_temp_list(struct quest_temp_list *list);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
-extern char *quest_task_string(struct quest_task *task, bool show_vnums);
 void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq);
 void remove_quest_items_by_quest(char_data *ch, any_vnum vnum);
+extern char *requirement_string(struct req_data *task, bool show_vnums);
 void scale_item_to_level(obj_data *obj, int level);
 
 // local prototypes
@@ -138,6 +138,7 @@ const char *color_by_difficulty(char_data *ch, int level) {
 */
 void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_emp) {
 	void clear_char_abilities(char_data *ch, any_vnum skill);
+	void extract_required_items(char_data *ch, struct req_data *list);
 	
 	quest_data *quest = quest_proto(pq->vnum);
 	struct player_completed_quest *pcq;
@@ -160,27 +161,7 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	
 	// take objs if necessary
 	if (QUEST_FLAGGED(quest, QST_EXTRACT_TASK_OBJECTS)) {
-		struct resource_data *res = NULL;
-		struct quest_task *task;
-		
-		LL_FOREACH(pq->tracker, task) {
-			// QT_x: types that are extractable
-			switch (task->type) {
-				case QT_GET_COMPONENT: {
-					add_to_resource_list(&res, RES_COMPONENT, task->vnum, task->needed, task->misc);
-					break;
-				}
-				case QT_GET_OBJECT: {
-					add_to_resource_list(&res, RES_OBJECT, task->vnum, task->needed, 0);
-					break;
-				}
-			}
-		}
-		
-		if (res) {
-			extract_resources(ch, res, FALSE, NULL);
-			free_resource_list(res);
-		}
+		extract_required_items(ch, pq->tracker);
 	}
 	
 	// add quest completion
@@ -326,19 +307,83 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 
 
 /**
+* Returns the complete/total numbers for the quest tasks the player is
+* closest to completing. If a quest has multiple "or" conditions, it picks
+* the best one.
+* 
 * @param struct player_quest *pq The player-quest entry to count.
 * @param int *complete A variable to store the # of complete tasks.
 * @param int *total A vartiable to store the total # of tasks.
 */
 void count_quest_tasks(struct player_quest *pq, int *complete, int *total) {
-	struct quest_task *task;
+	// helper struct
+	struct count_quest_data {
+		int group;	// converted from "char"
+		int complete;	// tasks considered done
+		int total;	// total tasks in the group
+		UT_hash_handle hh;
+	};
 	
+	struct count_quest_data *cqd, *next_cqd, *cqd_list = NULL;
+	int group, best_total, best_complete;
+	struct req_data *task;
+	bool done = FALSE;
+	
+	// prepare data
 	*complete = *total = 0;
+	
 	LL_FOREACH(pq->tracker, task) {
-		++*total;
-		if (task->current >= task->needed) {
-			++*complete;
+		if (!task->group) {	// ungrouped "or" tasks
+			if (task->current >= task->needed) {
+				// found a complete "or"
+				*complete = *total = 1;
+				done = TRUE;
+				break;
+			}
 		}
+		else {	// grouped tasks
+			// find or create group tracker
+			group = (int) task->group;
+			HASH_FIND_INT(cqd_list, &group, cqd);
+			if (!cqd) {
+				CREATE(cqd, struct count_quest_data, 1);
+				cqd->group = group;
+				HASH_ADD_INT(cqd_list, group, cqd);
+			}
+			
+			cqd->total += 1;
+			if (task->current >= task->needed) {
+				cqd->complete += 1;
+			}
+		}
+	}
+	
+	// tally data
+	best_complete = 0;	// start this lower than best_total
+	best_total = 1;	// ensure this is not zero
+	
+	HASH_ITER(hh, cqd_list, cqd, next_cqd) {
+		if (!done) {	// only bother with this part if we didn't find one
+			if (cqd->complete >= cqd->total && best_complete < best_total) {
+				// found first completion
+				best_complete = cqd->complete;
+				best_total = cqd->total;
+			}
+			else if ((cqd->complete * 100 / cqd->total) > (best_complete * 100 / best_total)) {
+				// found better completion
+				best_complete = cqd->complete;
+				best_total = cqd->total;
+			}
+		}
+		
+		// clean up data
+		free(cqd);
+	}
+	
+	// update data only if we didn't already finish
+	if (!done) {
+		*complete = MAX(0, best_complete);
+		*total = MAX(1, best_total);
 	}
 }
 
@@ -522,27 +567,39 @@ char *show_daily_quest_line(char_data *ch) {
 * @param struct player_quest *pq The quest to show the tracker for.
 */
 void show_quest_tracker(char_data *ch, struct player_quest *pq) {
-	extern const bool quest_tracker_amt_type[];
+	extern const bool requirement_amt_type[];
 	
+	int lefthand, count = 0, sub = 0;
 	char buf[MAX_STRING_LENGTH];
-	struct quest_task *task;
-	int lefthand;
+	struct req_data *task;
+	char last_group = 0;
 	
 	msg_to_char(ch, "Quest Tracker:\r\n");
 	
 	LL_FOREACH(pq->tracker, task) {
-		// QT_AMT_x: display based on amount type
-		switch (quest_tracker_amt_type[task->type]) {
-			case QT_AMT_NUMBER: {
+		if (last_group != task->group) {
+			if (task->group) {
+				msg_to_char(ch, "  %sAll of:\r\n", (count > 0 ? "or " : ""));
+			}
+			last_group = task->group;
+			sub = 0;
+		}
+		
+		++count;	// total iterations
+		++sub;	// iterations inside this sub-group
+		
+		// REQ_AMT_x: display based on amount type
+		switch (requirement_amt_type[task->type]) {
+			case REQ_AMT_NUMBER: {
 				lefthand = task->current;
 				lefthand = MIN(lefthand, task->needed);	// may be above the amount needed
 				lefthand = MAX(0, lefthand);	// in some cases, current may be negative
 				sprintf(buf, " (%d/%d)", lefthand, task->needed);
 				break;
 			}
-			case QT_AMT_REPUTATION:
-			case QT_AMT_THRESHOLD:
-			case QT_AMT_NONE: {
+			case REQ_AMT_REPUTATION:
+			case REQ_AMT_THRESHOLD:
+			case REQ_AMT_NONE: {
 				if (task->current >= task->needed) {
 					strcpy(buf, " (complete)");
 				}
@@ -556,7 +613,7 @@ void show_quest_tracker(char_data *ch, struct player_quest *pq) {
 				break;
 			}
 		}
-		msg_to_char(ch, "  %s%s\r\n", quest_task_string(task, FALSE), buf);
+		msg_to_char(ch, "  %s%s%s%s\r\n", (task->group ? "  " : ""), (sub > 1 ? "or " : ""), requirement_string(task, FALSE), buf);
 	}
 }
 
@@ -596,7 +653,7 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
 	pq->start_time = time(0);
 	pq->instance_id = inst ? inst->id : NOTHING;
 	pq->adventure = inst ? GET_ADV_VNUM(inst->adventure) : NOTHING;
-	pq->tracker = copy_quest_tasks(QUEST_TASKS(qst));
+	pq->tracker = copy_requirements(QUEST_TASKS(qst));
 	
 	LL_PREPEND(GET_QUESTS(ch), pq);
 	refresh_one_quest_tracker(ch, pq);

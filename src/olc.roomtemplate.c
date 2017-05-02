@@ -292,11 +292,12 @@ bool match_one_exit(char_data *ch, room_template *add_exit_to, room_template *or
 */
 void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
-	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
+	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	void remove_room_template_from_table(room_template *rmt);
 	
 	quest_data *quest, *next_quest;
 	room_data *room, *next_room;
+	social_data *soc, *next_soc;
 	descriptor_data *desc;
 	room_template *rmt;
 	bool found;
@@ -323,12 +324,22 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	HASH_ITER(hh, quest_table, quest, next_quest) {
 		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_ROOM_TEMPLATE, vnum);
 		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_ROOM_TEMPLATE, vnum);
-		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_VISIT_ROOM_TEMPLATE, vnum);
-		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_VISIT_ROOM_TEMPLATE, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_VISIT_ROOM_TEMPLATE, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_VISIT_ROOM_TEMPLATE, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
+	// update socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_VISIT_ROOM_TEMPLATE, vnum);
+		
+		if (found) {
+			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
 	
@@ -352,12 +363,20 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		if (GET_OLC_QUEST(desc)) {
 			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_ROOM_TEMPLATE, vnum);
 			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_ROOM_TEMPLATE, vnum);
-			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_VISIT_ROOM_TEMPLATE, vnum);
-			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_VISIT_ROOM_TEMPLATE, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_VISIT_ROOM_TEMPLATE, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_VISIT_ROOM_TEMPLATE, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A room template used by the quest you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SOCIAL(desc)) {
+			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_VISIT_ROOM_TEMPLATE, vnum);
+		
+			if (found) {
+				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A room template required by the social you are editing was deleted.\r\n");
 			}
 		}
 	}
@@ -381,11 +400,12 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 */
 void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char buf[MAX_STRING_LENGTH];
 	room_template *rmt = room_template_proto(vnum), *iter, *next_iter;
 	quest_data *quest, *next_quest;
+	social_data *soc, *next_soc;
 	struct exit_template *ex;
 	obj_data *obj, *next_obj;
 	int size, found;
@@ -414,8 +434,8 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 		}
 		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_ROOM_TEMPLATE, vnum);
 		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_ROOM_TEMPLATE, vnum);
-		any |= find_quest_task_in_list(QUEST_TASKS(quest), QT_VISIT_ROOM_TEMPLATE, vnum);
-		any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_VISIT_ROOM_TEMPLATE, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_VISIT_ROOM_TEMPLATE, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_VISIT_ROOM_TEMPLATE, vnum);
 		
 		if (any) {
 			++found;
@@ -432,6 +452,19 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
 			}
+		}
+	}
+	
+	// socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_VISIT_ROOM_TEMPLATE, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	

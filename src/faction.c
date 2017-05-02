@@ -49,9 +49,9 @@ extern struct faction_reputation_type reputation_levels[];
 
 // external funcs
 extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
-extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
+extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 
 
  /////////////////////////////////////////////////////////////////////////////
@@ -257,6 +257,7 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	faction_data *fct = find_faction_by_vnum(vnum);
 	faction_data *iter, *next_iter, *find;
 	quest_data *qiter, *next_qiter;
+	social_data *soc, *next_soc;
 	char_data *mob, *next_mob;
 	int size, found;
 	bool any;
@@ -291,16 +292,31 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 		if (size >= sizeof(buf)) {
 			break;
 		}
-		// QR_x, QT_x: quest types
-		any = find_quest_task_in_list(QUEST_TASKS(qiter), QT_REP_OVER, vnum);
-		any |= find_quest_task_in_list(QUEST_PREREQS(qiter), QT_REP_OVER, vnum);
-		any |= find_quest_task_in_list(QUEST_TASKS(qiter), QT_REP_UNDER, vnum);
-		any |= find_quest_task_in_list(QUEST_PREREQS(qiter), QT_REP_UNDER, vnum);
+		// QR_x, REQ_x: quest types
+		any = find_requirement_in_list(QUEST_TASKS(qiter), REQ_REP_OVER, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(qiter), REQ_REP_OVER, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(qiter), REQ_REP_UNDER, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(qiter), REQ_REP_UNDER, vnum);
 		any |= find_quest_reward_in_list(QUEST_REWARDS(qiter), QR_REPUTATION, vnum);
 		
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+		}
+	}
+	
+	// check socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// REQ_x: requirements
+		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_REP_OVER, vnum);
+		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_REP_UNDER, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -945,6 +961,7 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	faction_data *fct, *iter, *next_iter, *find;
 	char_data *mob, *next_mob, *chiter;
 	quest_data *qiter, *next_qiter;
+	social_data *soc, *next_soc;
 	descriptor_data *desc;
 	bool found;
 	
@@ -986,16 +1003,28 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	
 	// remove from quests
 	HASH_ITER(hh, quest_table, qiter, next_qiter) {
-		// QT_x, QR_x: quest types
-		found = delete_quest_task_from_list(&QUEST_TASKS(qiter), QT_REP_OVER, vnum);
-		found |= delete_quest_task_from_list(&QUEST_PREREQS(qiter), QT_REP_OVER, vnum);
-		found |= delete_quest_task_from_list(&QUEST_TASKS(qiter), QT_REP_UNDER, vnum);
-		found |= delete_quest_task_from_list(&QUEST_PREREQS(qiter), QT_REP_UNDER, vnum);
+		// REQ_x, QR_x: quest types
+		found = delete_requirement_from_list(&QUEST_TASKS(qiter), REQ_REP_OVER, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(qiter), REQ_REP_OVER, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(qiter), REQ_REP_UNDER, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(qiter), REQ_REP_UNDER, vnum);
 		found |= delete_quest_reward_from_list(&QUEST_REWARDS(qiter), QR_REPUTATION, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(qiter), QST_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(qiter));
+		}
+	}
+	
+	// remove from socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		// REQ_x: requirements
+		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_REP_OVER, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_REP_UNDER, vnum);
+		
+		if (found) {
+			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
 	
@@ -1016,16 +1045,26 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 			}
 		}
 		if (GET_OLC_QUEST(desc)) {
-			// QT_x, QR_x: quest types
-			found = delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_REP_OVER, vnum);
-			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_REP_OVER, vnum);
-			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_REP_UNDER, vnum);
-			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_REP_UNDER, vnum);
+			// REQ_x, QR_x: quest types
+			found = delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_REP_OVER, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_REP_OVER, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_REP_UNDER, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_REP_UNDER, vnum);
 			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_REPUTATION, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A faction used by the quest you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SOCIAL(desc)) {
+			// REQ_x: requirements
+			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_REP_OVER, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_REP_UNDER, vnum);
+		
+			if (found) {
+				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A faction required by the social you are editing was deleted.\r\n");
 			}
 		}
 	}

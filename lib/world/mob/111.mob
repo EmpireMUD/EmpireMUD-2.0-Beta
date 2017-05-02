@@ -165,7 +165,7 @@ sleeping ivy~
 the sleeping ivy~
 The room is covered in sleeping ivy.
 ~
-0 0 bcdgzA G
+0 0 bcdgzA cG
 0 0 0 7
 T 11139
 S
@@ -174,7 +174,7 @@ carniferous yew broad~
 a carniferous yew~
 A broad, carniferous yew grows in the middle of the room.
 ~
-0 0 bdgzA G
+0 0 bdgzA cG
 0 0 0 5
 I 0 11144 100.00 1  # BUTCHER: some yew berries
 I 0 11144 100.00 1  # BUTCHER: some yew berries
@@ -205,7 +205,7 @@ mammoth catfish~
 a mammoth catfish~
 A mammoth catfish breaks the surface of the swamp nearby.
 ~
-0 0 bcdlA 0
+0 0 bcdlA c
 0 0 6 5
 I 0 11137 100.00 2  # BUTCHER: a catfish fillet
 I 4 11136 100.00 1  # LOOT: a catfish dorsal spine
@@ -235,7 +235,7 @@ darting dragonfly hovers shimmering green~
 a darting dragonfly~
 A shimmering green dragonfly darts and hovers nearby.
 ~
-0 0 abdjA 0
+0 0 abdjA c
 0 0 2 23
 I 4 11133 100.00 1  # LOOT: an opal carapace
 S

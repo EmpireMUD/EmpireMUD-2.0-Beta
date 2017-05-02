@@ -11,7 +11,7 @@ building a guildhall. The Superintendant grants you membership and you may now
 take on guild quests. Look around the guildhall for tasks you can perform to
 ingratiate yourself with the guild.
 ~
-3 0 0 0 -1
+4 0 0 0 -1
 A
 1 18212
 P
@@ -107,7 +107,7 @@ Z
 1 18209
 S
 #18258
-Monsoon Rift: Investiage the Rift~
+Monsoon Rift: Investigate the Rift~
    The Magiterranean is a dangerous place, but many adventurers get their start
 exploring its strange wilderness. The Guild needs more information about the
 rifts in the desert. Seek one out -- be careful of the cacti guarding it -- and
@@ -119,7 +119,7 @@ when you've accomplished this. (Type 'speak' when you find the druid.)
 propaganda for further study. You can now perform daily quests in the Monsoon
 Rift for the Guild of Adventurers.
 ~
-6 d 0 0 -1
+7 d 0 0 -1
 A
 1 18217
 A
@@ -183,7 +183,7 @@ corpses to a player who does.)
    Ah, these cold cuts are perfect. And it seems you have survived the
 Permafrost. You can now perform Guild daily quests in the Permafrost.
 ~
-3 d 0 0 -1
+4 d 0 0 -1
 A
 1 18219
 A
@@ -195,9 +195,9 @@ R
 R
 2 18209 1
 W
-0 10563 0 1
+0 10563 0 1 a
 W
-2 10597 0 4
+2 10597 0 4 a
 Z
 1 18219
 Z
@@ -267,14 +267,16 @@ This quest has no description.
 ~
 You have completed the quest.
 ~
-3 ade 0 0 -1
+5 ade 0 0 -1
 A
 1 18217
 A
 1 18209
 D 18265
 P
-0 18256 0 1
+0 18256 0 1 a
+P
+17 18200 0 6 a
 R
 7 18200 1
 R
@@ -292,14 +294,16 @@ This quest has no description.
 ~
 You have completed the quest.
 ~
-4 ae 0 0 -1
+6 ae 0 0 -1
 A
 1 18217
 A
 1 18209
 D 18265
 P
-0 18256 0 1
+0 18256 0 1 a
+P
+17 18200 0 6 a
 R
 7 18200 1
 R
@@ -317,24 +321,26 @@ This quest has no description.
 ~
 You have completed the quest.
 ~
-4 ae 0 0 -1
+7 ae 0 0 -1
 A
 1 18217
 A
 1 18209
 D 18267
 P
-0 18258 0 1
+0 18258 0 1 a
+P
+17 18200 0 6 a
 R
 7 18200 1
 R
 1 -1 50
 W
-3 10140 0 1
+3 10140 0 1 a
 W
-3 10141 0 1
+3 10141 0 1 a
 W
-3 10142 0 1
+3 10142 0 1 a
 Z
 1 18217
 Z
@@ -346,14 +352,16 @@ This quest has no description.
 ~
 You have completed the quest.
 ~
-2 ae 0 0 -1
+4 ae 0 0 -1
 A
 1 18217
 A
 1 18209
 D 18267
 P
-0 18258 0 1
+0 18258 0 1 a
+P
+17 18200 0 6 a
 R
 7 18200 1
 R
@@ -371,14 +379,16 @@ This quest has no description.
 ~
 You have completed the quest.
 ~
-3 ade 0 0 -1
+5 ade 0 0 -1
 A
 1 18219
 A
 1 18210
 D 18269
 P
-0 18262 0 1
+0 18262 0 1 a
+P
+17 18200 0 6 a
 R
 7 18200 1
 R
