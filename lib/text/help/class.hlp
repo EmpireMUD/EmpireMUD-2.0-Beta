@@ -2,8 +2,8 @@ CLASS "CLASS SKILLS" "CLASS ROLE" ROLE
 
 When you specialize two skills past 75, they become your "class skills" and
 you are assigned a class. Your class determines how large your health, move,
-and mana pools are. It also gives you some new abilities once you reach 100
-in both your class skills.
+and mana pools are. It also gives you some new abilities once you skill level
+100.
 
 Usage:  class [role <type>]
 
