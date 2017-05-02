@@ -2297,12 +2297,21 @@ int process_input(descriptor_data *t) {
 	space_left = MAX_RAW_INPUT_LENGTH - buf_length - 1;
 
 	do {
-		/*
 		if (space_left <= 0) {
+			char buffer[MAX_STRING_LENGTH];
+			
+			sprintf(buffer, "Line too long %ld/%ld. Truncated to:\r\n%s\r\n", bytes_read, space_left, read_point);
+			if (write_to_descriptor(t->descriptor, buffer) < 0) {
+				return (-1);
+			}
+			
+			break;
+			
+			/* formerly:
 			log("WARNING: process_input: about to close connection: input overflow");
 			return (-1);
+			*/
 		}
-		*/
 
 		bytes_read = perform_socket_read(t->descriptor, read_buf, MAX_PROTOCOL_BUFFER);
 
@@ -2313,18 +2322,6 @@ int process_input(descriptor_data *t) {
 			read_buf[bytes_read] = '\0';
 			ProtocolInput(t, read_buf, bytes_read, read_point, space_left+1);
 			bytes_read = strlen(read_point);
-
-			// check for overflow
-			if (bytes_read > 0 && bytes_read < strlen(read_buf)) {
-				char buffer[MAX_STRING_LENGTH];
-				
-				sprintf(buffer, "Line too long %ld/%ld. Truncated to:\r\n%s\r\n", bytes_read, space_left, read_point);
-				if (write_to_descriptor(t->descriptor, buffer) < 0) {
-					return (-1);
-				}
-				
-				break;
-			}
 		}
 
 		if (bytes_read == 0) {	/* Just blocking, no problems. */
