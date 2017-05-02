@@ -3350,7 +3350,7 @@ void game_loop(socket_t mother_desc) {
 			}
 			gettimeofday(&last_time, (struct timezone *) 0);
 		}
-		/**
+		*/
 		
 		/* Set up the input, output, and exception sets for select(). */
 		FD_ZERO(&input_set);
