@@ -2322,6 +2322,8 @@ int process_input(descriptor_data *t) {
 				if (write_to_descriptor(t->descriptor, buffer) < 0) {
 					return (-1);
 				}
+				
+				return 0;
 			}
 		}
 
