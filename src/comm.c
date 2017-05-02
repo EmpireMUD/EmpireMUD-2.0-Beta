@@ -2314,7 +2314,7 @@ int process_input(descriptor_data *t) {
 			ProtocolInput(t, read_buf, bytes_read, read_point, space_left+1);
 			
 			// check for overflow
-			if (strlen(read_point) < bytes_read) {
+			if (strlen(read_point)+1 < bytes_read) {
 				char buffer[MAX_STRING_LENGTH];
 				
 				sprintf(buffer, "Line too long. Truncated to:\r\n%s\r\n", read_point);
