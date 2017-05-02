@@ -2129,9 +2129,6 @@ int perform_dupe_check(descriptor_data *d) {
 	refresh_all_quests(d->character);
 	MXPSendTag(d, "<VERSION>");
 	
-	// guarantee echo is on -- no, this could lead to an echo loop
-	// ProtocolNoEcho(d, false);
-
 	return (1);
 }
 
@@ -2298,13 +2295,11 @@ void nanny(descriptor_data *d, char *arg) {
 			 * re-add the code to cut off duplicates when a player quits.  JE 6 Feb 96
 			 */
 
-			/* turn echo back on */
-			ProtocolNoEcho(d, false);
-
-			/* New echo-on eats the return on telnet. Extra space better than none. */
-			SEND_TO_Q("\r\n", d);
-
 			if (!*arg) {
+				// turn echo back on; New echo-on eats the return on telnet. Extra space better than none.
+				ProtocolNoEcho(d, false);
+				SEND_TO_Q("\r\n", d);
+				
 				SET_BIT(PLR_FLAGS(d->character), PLR_KEEP_LAST_LOGIN_INFO);	// prevent login from storing
 				STATE(d) = CON_CLOSE;
 			}
@@ -2320,10 +2315,13 @@ void nanny(descriptor_data *d, char *arg) {
 					}
 					else {
 						SEND_TO_Q("Wrong password.\r\nPassword: ", d);
-						ProtocolNoEcho(d, true);
 					}
 					return;
 				}
+				
+				// turn echo back on; New echo-on eats the return on telnet. Extra space better than none.
+				ProtocolNoEcho(d, false);
+				SEND_TO_Q("\r\n", d);
 
 				/* Password was correct. */
 				load_result = GET_BAD_PWS(d->character);
