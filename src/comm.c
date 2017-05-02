@@ -2309,7 +2309,7 @@ int process_input(descriptor_data *t) {
 		}
 		else if (bytes_read >= 0) {
 			read_buf[bytes_read] = '\0';
-			ProtocolInput(t, read_buf, bytes_read, read_point);
+			ProtocolInput(t, read_buf, bytes_read, read_point, space_left+1);
 			bytes_read = strlen(read_point);
 		}
 

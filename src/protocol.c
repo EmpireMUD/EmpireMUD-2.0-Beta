@@ -514,7 +514,7 @@ void ProtocolDestroy(protocol_t *apProtocol) {
 	free(apProtocol);
 }
 
-void ProtocolInput(descriptor_t *apDescriptor, char *apData, int aSize, char *apOut) {
+void ProtocolInput(descriptor_t *apDescriptor, char *apData, int aSize, char *apOut, int maxSize) {
 	static char CmdBuf[MAX_PROTOCOL_BUFFER+1];
 	static char IacBuf[MAX_PROTOCOL_BUFFER+1];
 	int CmdIndex = 0;
@@ -654,7 +654,8 @@ void ProtocolInput(descriptor_t *apDescriptor, char *apData, int aSize, char *ap
 	CmdBuf[CmdIndex] = '\0';
 
 	/* Copy the input buffer back to the player. */
-	strcat(apOut, CmdBuf);
+	strncat(apOut, CmdBuf, maxSize);
+	apOut[maxSize-1] = '\0';
 }
 
 const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *apLength) {
