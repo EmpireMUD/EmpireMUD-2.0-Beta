@@ -126,13 +126,19 @@ bool valid_empire_name(char *newname) {
 	extern char *invalid_list[MAX_INVALID_NAMES];
 	extern int num_invalid;
 
-	char *ptr;
+	char *ptr, buf[MAX_STRING_LENGTH];
 	char tempname[MAX_INPUT_LENGTH];
 	bool ok = TRUE;
 	int iter;
 	
 	// check for illegal & codes (anything other than &&)
 	if ((ptr = strchr(newname, '&')) && *(ptr+1) != '&') {
+		ok = FALSE;
+	}
+	
+	// check fill/reserved
+	strcpy(buf, newname);
+	if (fill_word(buf) || reserved_word(buf)) {
 		ok = FALSE;
 	}
 	
