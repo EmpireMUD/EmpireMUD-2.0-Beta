@@ -1,12 +1,12 @@
 #5511
-Sorcery Tower: Get Book~
+Sorcery Tower: Study Sorcery~
 2 c 0
 study~
 if !%arg%
   %send% %actor% Study what? (try 'study sorcery')
   halt
 end
-if %arg% != sorcery
+if %arg% /= sorcery
   return 0
   halt
 end
@@ -18,7 +18,7 @@ if !%permission%
 end
 %load% obj 5511 %actor% inv
 eval item %actor.inventory(5511)%
-%send% %actor% You take %item.shortdesc%.
+%send% %actor% You pick up %item.shortdesc%. Reading this would surely start you on the path of High Sorcery.
 %echoaround% %actor% %actor.name% takes %item.shortdesc%.
 ~
 #5512
