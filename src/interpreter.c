@@ -2295,11 +2295,10 @@ void nanny(descriptor_data *d, char *arg) {
 			 * re-add the code to cut off duplicates when a player quits.  JE 6 Feb 96
 			 */
 
+			/* New echo-on eats the return on telnet. Extra space better than none. */
+			SEND_TO_Q("\r\n", d);
+
 			if (!*arg) {
-				// turn echo back on; New echo-on eats the return on telnet. Extra space better than none.
-				ProtocolNoEcho(d, false);
-				SEND_TO_Q("\r\n", d);
-				
 				SET_BIT(PLR_FLAGS(d->character), PLR_KEEP_LAST_LOGIN_INFO);	// prevent login from storing
 				STATE(d) = CON_CLOSE;
 			}
@@ -2319,9 +2318,8 @@ void nanny(descriptor_data *d, char *arg) {
 					return;
 				}
 				
-				// turn echo back on; New echo-on eats the return on telnet. Extra space better than none.
+				// echo back on
 				ProtocolNoEcho(d, false);
-				SEND_TO_Q("\r\n", d);
 
 				/* Password was correct. */
 				load_result = GET_BAD_PWS(d->character);
