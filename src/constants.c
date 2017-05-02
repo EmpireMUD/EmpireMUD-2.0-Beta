@@ -3709,6 +3709,9 @@ const char *reserved_words[] = {
 	"of",
 	"someone",
 	"something",
+	"misc",
+	"miscellaneous",
+	"other",
 	"\n"
 };
 
