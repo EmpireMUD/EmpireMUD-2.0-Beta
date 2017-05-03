@@ -2297,8 +2297,13 @@ int process_input(descriptor_data *t) {
 	space_left = MAX_RAW_INPUT_LENGTH - buf_length - 1;
 
 	do {
-		if (space_left <= 0 && strlen(t->inbuf) > 0) {
+		if (strlen(t->inbuf) > MAX_INPUT_LENGTH || (space_left <= 0 && strlen(t->inbuf) > 0)) {
 			char buffer[MAX_STRING_LENGTH];
+			
+			// truncate to input length
+			if (strlen(t->inbuf) > MAX_INPUT_LENGTH) {
+				t->inbuf[MAX_INPUT_LENGTH-1] = '\0';
+			}
 			
 			snprintf(buffer, sizeof(buffer), "Line too long. Truncated to:\r\n%s\r\n", t->inbuf);
 			if (write_to_descriptor(t->descriptor, buffer) < 0) {
