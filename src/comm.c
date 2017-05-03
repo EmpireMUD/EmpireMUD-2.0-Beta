@@ -2301,8 +2301,8 @@ int process_input(descriptor_data *t) {
 			char buffer[MAX_STRING_LENGTH];
 			
 			// truncate to input length
-			if (strlen(t->inbuf) > MAX_INPUT_LENGTH) {
-				t->inbuf[MAX_INPUT_LENGTH-1] = '\0';
+			if (strlen(t->inbuf) >= MAX_INPUT_LENGTH) {
+				t->inbuf[MAX_INPUT_LENGTH-2] = '\0';
 			}
 			
 			snprintf(buffer, sizeof(buffer), "Line too long. Truncated to:\r\n%s\r\n", t->inbuf);
@@ -2410,13 +2410,23 @@ int process_input(descriptor_data *t) {
 		}
 
 		*write_point = '\0';
-
-		if ((space_left <= 0) && (ptr < nl_pos)) {
+		
+		if ((space_left <= 0) && (ptr < nl_pos)) {	// truncation
 			char buffer[MAX_INPUT_LENGTH + 64];
 
 			sprintf(buffer, "Line too long. Truncated to:\r\n%s\r\n", tmp);
 			if (write_to_descriptor(t->descriptor, buffer) < 0)
 				return (-1);
+		}
+		else if (strlen(input) >= MAX_INPUT_LENGTH) {	// 2nd truncation
+			char buffer[MAX_INPUT_LENGTH + 64];
+			
+			input[MAX_INPUT_LENGTH-1] = '\0';
+			
+			sprintf(buffer, "Line too long. Truncated to:\r\n%s\r\n", input);
+			if (write_to_descriptor(t->descriptor, buffer) < 0) {
+				return (-1);
+			}
 		}
 		if (t->snoop_by && *input) {
 			SEND_TO_Q("% ", t->snoop_by);
