@@ -2306,6 +2306,16 @@ int process_input(descriptor_data *t) {
 			}
 			
 			nl_pos = read_point;	// need to infer a newline
+			
+			// flush the rest of the input
+			do {
+				bytes_read = perform_socket_read(t->descriptor, read_buf, MAX_PROTOCOL_BUFFER);
+				if (bytes_read < 0) {
+					return -1;
+				}
+			} while (bytes_read > 0);
+			
+			// exit the do-while now
 			break;
 			
 			/* formerly:
