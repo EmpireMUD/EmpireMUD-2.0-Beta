@@ -2411,7 +2411,7 @@ int process_input(descriptor_data *t) {
 
 		*write_point = '\0';
 		
-		if ((space_left <= 0)) {
+		if ((space_left <= 1) && (ptr < nl_pos)) {
 			char buffer[MAX_INPUT_LENGTH + 64];
 
 			sprintf(buffer, "Line too long. Truncated to:\r\n%s\r\n", tmp);
