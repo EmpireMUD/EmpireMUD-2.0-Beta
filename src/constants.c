@@ -1963,6 +1963,7 @@ const char *drinks[] = {
 	"red wine",
 	"white wine",
 	"grog",
+	"mead",
 	"\n"
 };
 
@@ -1983,6 +1984,7 @@ const char *drinknames[] = {
 	"wine",
 	"wine",
 	"grog",
+	"mead",
 	"\n"
 };
 
@@ -2004,6 +2006,7 @@ int drink_aff[][3] = {
 	{ 4, 0, 1 },	// red wine
 	{ 3, 0, 1 },	// white wine
 	{ 2, 1, 1 },	// grog
+	{ 1, 1, 1 },	// mead
 };
 
 
@@ -2023,6 +2026,7 @@ const char *color_liquid[] = {
 	"red",
 	"clear",
 	"amber",
+	"golden",
 	"\n"
 };
 

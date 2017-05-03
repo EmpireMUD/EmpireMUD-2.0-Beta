@@ -1308,7 +1308,8 @@ typedef struct vehicle_data vehicle_data;
 #define LIQ_RED_WINE  11
 #define LIQ_WHITE_WINE  12
 #define LIQ_GROG  13
-#define NUM_LIQUIDS  14	// total
+#define LIQ_MEAD  14
+#define NUM_LIQUIDS  15	// total
 
 
 // Item materials
