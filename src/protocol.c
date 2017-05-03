@@ -1321,10 +1321,6 @@ void MSDPUpdate(descriptor_t *apDescriptor) {
 	int i; /* Loop counter */
 
 	protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
-	
-	if (apDescriptor) {
-		apDescriptor->ignore_snoop = TRUE;
-	}
 
 	for (i = eMSDP_NONE+1; i < eMSDP_MAX; ++i) {
 		if (pProtocol->pVariables[i]->bReport) {
@@ -1334,19 +1330,11 @@ void MSDPUpdate(descriptor_t *apDescriptor) {
 			}
 		}
 	}
-	
-	if (apDescriptor) {
-		apDescriptor->ignore_snoop = FALSE;
-	}
 }
 
 void MSDPFlush(descriptor_t *apDescriptor, variable_t aMSDP) {
 	if (aMSDP > eMSDP_NONE && aMSDP < eMSDP_MAX) {
 		protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
-		
-		if (apDescriptor) {
-			apDescriptor->ignore_snoop = TRUE;
-		}
 
 		if (pProtocol->pVariables[aMSDP]->bReport) {
 			if (pProtocol->pVariables[aMSDP]->bDirty) {
@@ -1354,15 +1342,15 @@ void MSDPFlush(descriptor_t *apDescriptor, variable_t aMSDP) {
 				pProtocol->pVariables[aMSDP]->bDirty = false;
 			}
 		}
-		
-		if (apDescriptor) {
-			apDescriptor->ignore_snoop = FALSE;
-		}
 	}
 }
 
 void MSDPSend(descriptor_t *apDescriptor, variable_t aMSDP) {
 	char MSDPBuffer[MAX_VARIABLE_LENGTH+1] = { '\0' };
+	
+	if (apDescriptor) {
+		apDescriptor->ignore_snoop = TRUE;
+	}
 
 	if (aMSDP > eMSDP_NONE && aMSDP < eMSDP_MAX) {
 		protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
@@ -1397,10 +1385,16 @@ void MSDPSend(descriptor_t *apDescriptor, variable_t aMSDP) {
 			Write(apDescriptor, MSDPBuffer);
 		}
 	}
+	
+	if (apDescriptor) {
+		apDescriptor->ignore_snoop = FALSE;
+	}
 }
 
 void MSDPSendPair(descriptor_t *apDescriptor, const char *apVariable, const char *apValue) {
 	char MSDPBuffer[MAX_VARIABLE_LENGTH+1] = { '\0' };
+	
+	apDescriptor->ignore_snoop = TRUE;
 
 	if (apVariable != NULL && apValue != NULL) {
 		protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
@@ -1431,10 +1425,14 @@ void MSDPSendPair(descriptor_t *apDescriptor, const char *apVariable, const char
 			Write(apDescriptor, MSDPBuffer);
 		}
 	}
+	
+	apDescriptor->ignore_snoop = FALSE;
 }
 
 void MSDPSendList(descriptor_t *apDescriptor, const char *apVariable, const char *apValue) {
 	char MSDPBuffer[MAX_VARIABLE_LENGTH+1] = { '\0' };
+	
+	apDescriptor->ignore_snoop = TRUE;
 
 	if (apVariable != NULL && apValue != NULL) {
 		protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
@@ -1473,6 +1471,8 @@ void MSDPSendList(descriptor_t *apDescriptor, const char *apVariable, const char
 			Write(apDescriptor, MSDPBuffer);
 		}
 	}
+	
+	apDescriptor->ignore_snoop = FALSE;
 }
 
 void MSDPSetNumber(descriptor_t *apDescriptor, variable_t aMSDP, int aValue) {
