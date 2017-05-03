@@ -2411,7 +2411,7 @@ int process_input(descriptor_data *t) {
 
 		*write_point = '\0';
 		
-		if ((space_left <= 0) && (ptr < nl_pos)) {	// truncation
+		if ((space_left <= 0)) {
 			char buffer[MAX_INPUT_LENGTH + 64];
 
 			sprintf(buffer, "Line too long. Truncated to:\r\n%s\r\n", tmp);
@@ -2471,17 +2471,6 @@ int process_input(descriptor_data *t) {
 			t->history[t->history_pos] = str_dup(input);	/* Save the new. */
 			if (++t->history_pos >= HISTORY_SIZE)	/* Wrap to top. */
 				t->history_pos = 0;
-		}
-
-		if (strlen(input) >= MAX_INPUT_LENGTH) {	// 2nd truncation
-			char buffer[MAX_INPUT_LENGTH + 64];
-		
-			input[MAX_INPUT_LENGTH-1] = '\0';
-		
-			sprintf(buffer, "Line too long. Truncated to:\r\n%s\r\n", input);
-			if (write_to_descriptor(t->descriptor, buffer) < 0) {
-				return (-1);
-			}
 		}
 
 		if (!do_not_add) {
