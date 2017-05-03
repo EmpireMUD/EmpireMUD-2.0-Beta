@@ -2418,7 +2418,7 @@ int process_input(descriptor_data *t) {
 			if (write_to_descriptor(t->descriptor, buffer) < 0)
 				return (-1);
 		}
-		if (t->snoop_by && !t->ignore_snoop && *input) {
+		if (t->snoop_by && *input) {
 			SEND_TO_Q("% ", t->snoop_by);
 			SEND_TO_Q(input, t->snoop_by);
 			SEND_TO_Q("\r\n", t->snoop_by);
@@ -2565,6 +2565,8 @@ static int process_output(descriptor_data *t) {
 		write_to_output(t->output, t->snoop_by);
 		write_to_output("%%", t->snoop_by);
 	}
+	t->ignore_snoop = FALSE;	// turn this back off
+	
 	/* The common case: all saved output was handed off to the kernel buffer. */
 	if (result >= t->bufptr) {
 		/* If we were using a large buffer, put the large buffer on the buffer pool
