@@ -1321,6 +1321,10 @@ void MSDPUpdate(descriptor_t *apDescriptor) {
 	int i; /* Loop counter */
 
 	protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
+	
+	if (apDescriptor) {
+		apDescriptor->ignore_snoop = TRUE;
+	}
 
 	for (i = eMSDP_NONE+1; i < eMSDP_MAX; ++i) {
 		if (pProtocol->pVariables[i]->bReport) {
@@ -1330,17 +1334,29 @@ void MSDPUpdate(descriptor_t *apDescriptor) {
 			}
 		}
 	}
+	
+	if (apDescriptor) {
+		apDescriptor->ignore_snoop = FALSE;
+	}
 }
 
 void MSDPFlush(descriptor_t *apDescriptor, variable_t aMSDP) {
 	if (aMSDP > eMSDP_NONE && aMSDP < eMSDP_MAX) {
 		protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
+		
+		if (apDescriptor) {
+			apDescriptor->ignore_snoop = TRUE;
+		}
 
 		if (pProtocol->pVariables[aMSDP]->bReport) {
 			if (pProtocol->pVariables[aMSDP]->bDirty) {
 				MSDPSend(apDescriptor, aMSDP);
 				pProtocol->pVariables[aMSDP]->bDirty = false;
 			}
+		}
+		
+		if (apDescriptor) {
+			apDescriptor->ignore_snoop = FALSE;
 		}
 	}
 }
