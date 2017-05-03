@@ -2305,6 +2305,7 @@ int process_input(descriptor_data *t) {
 				return (-1);
 			}
 			
+			nl_pos = read_point;	// need to infer a newline
 			break;
 			
 			/* formerly:
@@ -2322,10 +2323,6 @@ int process_input(descriptor_data *t) {
 			read_buf[bytes_read] = '\0';
 			ProtocolInput(t, read_buf, bytes_read, read_point, space_left+1);
 			bytes_read = strlen(read_point);
-			
-			if (bytes_read <= space_left) {
-				nl_pos = read_point + bytes_read;
-			}
 		}
 
 		if (bytes_read == 0) {	/* Just blocking, no problems. */
@@ -2406,7 +2403,7 @@ int process_input(descriptor_data *t) {
 			if (write_to_descriptor(t->descriptor, buffer) < 0)
 				return (-1);
 		}
-		if (t->snoop_by) {
+		if (t->snoop_by && *input) {
 			SEND_TO_Q("% ", t->snoop_by);
 			SEND_TO_Q(input, t->snoop_by);
 			SEND_TO_Q("\r\n", t->snoop_by);
