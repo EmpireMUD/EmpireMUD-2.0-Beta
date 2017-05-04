@@ -1347,9 +1347,6 @@ void MSDPFlush(descriptor_t *apDescriptor, variable_t aMSDP) {
 
 void MSDPSend(descriptor_t *apDescriptor, variable_t aMSDP) {
 	char MSDPBuffer[MAX_VARIABLE_LENGTH+1] = { '\0' };
-	
-	// set this; it turns itself off
-	apDescriptor->ignore_snoop = TRUE;
 
 	if (aMSDP > eMSDP_NONE && aMSDP < eMSDP_MAX) {
 		protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
@@ -1388,9 +1385,6 @@ void MSDPSend(descriptor_t *apDescriptor, variable_t aMSDP) {
 
 void MSDPSendPair(descriptor_t *apDescriptor, const char *apVariable, const char *apValue) {
 	char MSDPBuffer[MAX_VARIABLE_LENGTH+1] = { '\0' };
-	
-	// set this; it turns itself off
-	apDescriptor->ignore_snoop = TRUE;
 
 	if (apVariable != NULL && apValue != NULL) {
 		protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
@@ -1425,9 +1419,6 @@ void MSDPSendPair(descriptor_t *apDescriptor, const char *apVariable, const char
 
 void MSDPSendList(descriptor_t *apDescriptor, const char *apVariable, const char *apValue) {
 	char MSDPBuffer[MAX_VARIABLE_LENGTH+1] = { '\0' };
-	
-	// set this; it turns itself off
-	apDescriptor->ignore_snoop = TRUE;
 
 	if (apVariable != NULL && apValue != NULL) {
 		protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;

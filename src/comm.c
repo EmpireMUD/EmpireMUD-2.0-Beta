@@ -582,6 +582,45 @@ void sanity_check(void) {
 }
 
 
+/**
+* Removes any side-protocol telnet junk, e.g. for snooping.
+*
+* @param const char *str The string to strip.
+* @return char* The resulting stripped string.
+*/
+char *strip_telnet_codes(const char *str) {
+	static char output[MAX_STRING_LENGTH];
+	size_t space_left;
+	const char *iter;
+	char *pos;
+	int off;
+	
+	pos = output;
+	space_left = MAX_STRING_LENGTH - 1;
+	off = 0;
+	
+	for (iter = str; *iter && space_left > 0; ++iter) {
+		if (*iter == (char)IAC && *(iter+1) == (char)SB) {
+			++off;	// stop copying
+			++iter;
+		}
+		else if (*iter == (char)IAC && *(iter+1) == (char)SE) {
+			--off;	// start copying
+			++iter;
+		}
+		
+		// copy?
+		if (off <= 0) {
+			*pos++ = *iter;
+			--space_left;
+		}
+	}
+	*pos = '\0';	// terminate here
+	
+	return output;
+}
+
+
 /*
  * Add 2 time values.
  *
@@ -2560,12 +2599,18 @@ static int process_output(descriptor_data *t) {
 		return (0);
 
 	/* Handle snooping: prepend "% " and send to snooper. */
-	if (t->snoop_by && !t->ignore_snoop && *t->output) {
-		write_to_output("% ", t->snoop_by);
-		write_to_output(t->output, t->snoop_by);
-		write_to_output("%%", t->snoop_by);
+	if (t->snoop_by && *t->output) {
+		char stripped[MAX_STRING_LENGTH];
+		
+		strncpy(stripped, strip_telnet_codes(t->output), MAX_STRING_LENGTH);
+		stripped[MAX_STRING_LENGTH-1] = '\0';
+		
+		if (*stripped) {
+			write_to_output("% ", t->snoop_by);
+			write_to_output(stripped, t->snoop_by);
+			write_to_output("%%", t->snoop_by);
+		}
 	}
-	t->ignore_snoop = FALSE;	// turn this back off
 	
 	/* The common case: all saved output was handed off to the kernel buffer. */
 	if (result >= t->bufptr) {

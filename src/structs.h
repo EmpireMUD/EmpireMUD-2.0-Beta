@@ -2975,7 +2975,6 @@ struct descriptor_data {
 	char_data *temp_char;	// for char creation
 	descriptor_data *snooping;	// Who is this char snooping
 	descriptor_data *snoop_by;	// And who is snooping this char
-	bool ignore_snoop;	// sometimes toggled on to prevent sending data
 
 	char *last_act_message;	// stores the last thing act() sent to this desc
 	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// histories
