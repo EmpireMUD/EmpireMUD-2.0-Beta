@@ -673,8 +673,16 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 }
 
 
-void perform_remove(char_data *ch, int pos) {
-	obj_data *obj;
+/**
+* Removes an item from a wear location and gives it to the character (unless
+* it is 1-use, in which case it is extracted).
+*
+* @param char_data *ch The character.
+* @param int pos The WEAR_ to remove.
+* @return obj_data* A pointer to the object if it was removed (unless it was extracted).
+*/
+obj_data *perform_remove(char_data *ch, int pos) {
+	obj_data *obj = NULL;
 
 	if (!(obj = GET_EQ(ch, pos)))
 		log("SYSERR: perform_remove: bad pos %d passed.", pos);
@@ -683,7 +691,7 @@ void perform_remove(char_data *ch, int pos) {
 	}
 	else {
 		if (!remove_otrigger(obj, ch)) {
-			return;
+			return NULL;
 		}
 
 		// char message
@@ -703,9 +711,11 @@ void perform_remove(char_data *ch, int pos) {
 		}
 		
 		// this may extract it, or drop it
-		unequip_char_to_inventory(ch, pos);
+		obj = unequip_char_to_inventory(ch, pos);
 		determine_gear_level(ch);
 	}
+	
+	return obj;
 }
 
 
@@ -3511,23 +3521,37 @@ ACMD(do_combine) {
 
 
 ACMD(do_draw) {
-	obj_data *obj = NULL;
+	obj_data *obj = NULL, *removed = NULL;
 	int loc = 0;
 
 	one_argument(argument, arg);
 
 	if (!*arg) {
-		msg_to_char(ch, "Draw what?\r\n");
-		return;
+		// attempt to guess
+		if (GET_EQ(ch, WEAR_SHEATH_1) && !GET_EQ(ch, WEAR_SHEATH_2)) {
+			obj = GET_EQ(ch, WEAR_SHEATH_1);
+			loc = WEAR_SHEATH_1;
+		}
+		else if (GET_EQ(ch, WEAR_SHEATH_2) && !GET_EQ(ch, WEAR_SHEATH_1)) {
+			obj = GET_EQ(ch, WEAR_SHEATH_2);
+			loc = WEAR_SHEATH_2;
+		}
+		else {	// have 2 things sheathed
+			msg_to_char(ch, "Draw what?\r\n");
+			return;
+		}
 	}
-
-	if ((obj = GET_EQ(ch, WEAR_SHEATH_1)) && isname(arg, GET_OBJ_KEYWORDS(obj)))
-		loc = WEAR_SHEATH_1;
-	else if ((obj = GET_EQ(ch, WEAR_SHEATH_2)) && isname(arg, GET_OBJ_KEYWORDS(obj)))
-		loc = WEAR_SHEATH_2;
-	else {
-		msg_to_char(ch, "You have nothing by that name sheathed!\r\n");
-		return;
+	
+	// detect based on args
+	if (!obj) {
+		if ((obj = GET_EQ(ch, WEAR_SHEATH_1)) && isname(arg, GET_OBJ_KEYWORDS(obj)))
+			loc = WEAR_SHEATH_1;
+		else if ((obj = GET_EQ(ch, WEAR_SHEATH_2)) && isname(arg, GET_OBJ_KEYWORDS(obj)))
+			loc = WEAR_SHEATH_2;
+		else {
+			msg_to_char(ch, "You have nothing by that name sheathed!\r\n");
+			return;
+		}
 	}
 	
 	if (OBJ_FLAGGED(obj, OBJ_TWO_HANDED) && GET_EQ(ch, WEAR_HOLD)) {
@@ -3537,7 +3561,7 @@ ACMD(do_draw) {
 
 	// attempt to remove existing wield
 	if (GET_EQ(ch, WEAR_WIELD)) {
-		perform_remove(ch, WEAR_WIELD);
+		removed = perform_remove(ch, WEAR_WIELD);
 		
 		// did it work? if not, player got an error
 		if (GET_EQ(ch, WEAR_WIELD)) {
@@ -3549,6 +3573,11 @@ ACMD(do_draw) {
 	// do not use unequip_char_to_inventory so that we don't hit OBJ_SINGLE_USE
 	obj_to_char(unequip_char(ch, loc), ch);
 	perform_wear(ch, obj, WEAR_WIELD);
+	
+	// attempt to sheathe the removed item
+	if (removed && !GET_EQ(ch, loc)) {
+		perform_wear(ch, removed, loc);
+	}
 }
 
 

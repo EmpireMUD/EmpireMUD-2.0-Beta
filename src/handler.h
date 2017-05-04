@@ -215,8 +215,8 @@ void obj_to_room(obj_data *object, room_data *room);
 void obj_to_vehicle(obj_data *object, vehicle_data *veh);
 void swap_obj_for_obj(obj_data *old, obj_data *new);
 extern obj_data *unequip_char(char_data *ch, int pos);
-void unequip_char_to_inventory(char_data *ch, int pos);
-void unequip_char_to_room(char_data *ch, int pos);
+extern obj_data *unequip_char_to_inventory(char_data *ch, int pos);
+extern obj_data *unequip_char_to_room(char_data *ch, int pos);
 
 // custom message handlers
 extern struct custom_message *copy_custom_messages(struct custom_message *from);
@@ -322,7 +322,7 @@ extern int parse_direction(char_data *ch, char *dir);
 //// handlers from other files ///////////////////////////////////////////////
 
 // act.item.c
-void perform_remove(char_data *ch, int pos);
+extern obj_data *perform_remove(char_data *ch, int pos);
 
 // books.c
 extern book_data *book_proto(book_vnum vnum);

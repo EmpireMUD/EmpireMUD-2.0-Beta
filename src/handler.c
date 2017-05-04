@@ -4809,8 +4809,9 @@ obj_data *unequip_char(char_data *ch, int pos) {
 *
 * @param char_data *ch The person to unequip
 * @param int pos The WEAR_x slot to remove
+* @return obj_data* A pointer to the object removed IF it wasn't extracted.
 */
-void unequip_char_to_inventory(char_data *ch, int pos) {
+obj_data *unequip_char_to_inventory(char_data *ch, int pos) {
 	obj_data *obj = unequip_char(ch, pos);
 	
 	if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
@@ -4818,7 +4819,10 @@ void unequip_char_to_inventory(char_data *ch, int pos) {
 	}
 	else {
 		obj_to_char(obj, ch);
+		return obj;
 	}
+	
+	return NULL;
 }
 
 
@@ -4828,8 +4832,9 @@ void unequip_char_to_inventory(char_data *ch, int pos) {
 *
 * @param char_data *ch The person to unequip
 * @param int pos The WEAR_x position to remove
+* @return obj_data* A pointer to the obj IF it wasn't extracted.
 */
-void unequip_char_to_room(char_data *ch, int pos) {
+obj_data *unequip_char_to_room(char_data *ch, int pos) {
 	obj_data *obj = unequip_char(ch, pos);
 	
 	if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
@@ -4837,7 +4842,10 @@ void unequip_char_to_room(char_data *ch, int pos) {
 	}
 	else if (IN_ROOM(ch)) {
 		obj_to_room(obj, IN_ROOM(ch));
+		return obj;
 	}
+	
+	return NULL;
 }
 
 
