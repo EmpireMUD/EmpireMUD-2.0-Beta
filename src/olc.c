@@ -6545,7 +6545,7 @@ void smart_copy_interactions(struct interaction_item **addto, struct interaction
 		// see if an identical interaction is in the addto list
 		found = FALSE;
 		for (find = *addto; find && !found; find = find->next) {
-			if (find->type == interact->type && find->vnum == interact->vnum) {
+			if (find->type == interact->type && find->vnum == interact->vnum && find->percent == interact->percent && find->quantity == interact->quantity && find->exclusion_code == interact->exclusion_code) {
 				found = TRUE;
 			}
 		}
@@ -6590,7 +6590,7 @@ void smart_copy_requirements(struct req_data **to_list, struct req_data *from_li
 		// ensure not already in list
 		found = FALSE;
 		LL_FOREACH(*to_list, search) {
-			if (search->type == iter->type && search->vnum == iter->vnum) {
+			if (search->type == iter->type && search->vnum == iter->vnum && search->misc == iter->misc && search->group == iter->group && search->needed == iter->needed) {
 				found = TRUE;
 				break;
 			}
@@ -6678,7 +6678,7 @@ void smart_copy_spawns(struct spawn_info **addto, struct spawn_info *input) {
 		// see if an identical spawn is in the addto list
 		found = FALSE;
 		for (find = *addto; find && !found; find = find->next) {
-			if (find->vnum == spawn->vnum) {
+			if (find->vnum == spawn->vnum && find->percent == spawn->percent && find->flags == spawn->flags) {
 				found = TRUE;
 			}
 		}
@@ -6727,7 +6727,7 @@ void smart_copy_template_spawns(struct adventure_spawn **addto, struct adventure
 		// see if an identical spawn is in the addto list
 		found = FALSE;
 		for (find = *addto; find && !found; find = find->next) {
-			if (find->type == spawn->type && find->vnum == spawn->vnum) {
+			if (find->type == spawn->type && find->vnum == spawn->vnum && find->percent == spawn->percent && find->limit == spawn->limit) {
 				found = TRUE;
 			}
 		}
