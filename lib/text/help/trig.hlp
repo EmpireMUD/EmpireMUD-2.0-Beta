@@ -154,33 +154,42 @@ Mob Entry trigger: &yMTRIG ENTRY&0
 Room Enter trigger: &yRTRIG ENTER&0
 Vehicle Entry trigger: &yVTRIG ENTRY&0
 #d
-EXPRESSIONS TRIGEDIT-EXPRESSIONS INCREMENTS MATHEMATICAL /= || \
+EXPRESSIONS TRIGEDIT-EXPRESSIONS INCREMENTS MATHEMATICAL OPERATORS /= || \
 
 A FALSE expression is any expression that evaluates to 0, or an empty string.
 A TRUE expression is any expression that evaluates to anything other than a
-false expression. The following list are the recognized operators. The higher
-the operator is on the list, the higher the precedence. The expression is
-evaluated from left to right. Parenthesis can be used to group. 
+false expression. The expression is evaluated from left to right, unless one
+operator has precedence over another. Parenthesis can be used to group. 
 
 |Operator|         Name          | Examples  0=False 1=True  |
 --------------------------------------------------------------
-|   ||   | logical or            | 0 || ( ) = 0; 5 || 0 = 1  |
-|   &&&&   | logical and           | 1 &&&& 0 = 0; 5 &&&& 3 = 1    |
-|   ==   | equivalence           | 5 == 3 = 0; dog == DoG = 1| 
-|   !=   | inequality            | 0 != Z = 0; dog != d = 1  | 
+|   !    | negation              | !() = 1; !0 = 1; !dog = 0;|
+|   *    | multiplication        | 10 * 20 = 400             |
+|   /    | division              | 100 / 20 = 5              |
+|   //   | remainder             | 5 // 4 = 1                |
+|   +    | addition              | 10 + 15 = 25              |
+|   -    | subtraction           | 15 - 10 = 5               | 
 |   <    | less than             | 4 < 3 = 0; 4 < 5 = 1      |
 |   >    | greater than          | 4 > 3 = 1; 4 > 4 = 0      |
 |   <=   | less than or equal    | 4 <= 3 = 0; 4 <= 5 = 1    |
 |   >=   | greater than or equal | 4 >= 3 = 1; 4 >= 4 = 1    |
 |   /=   | abbrev                | "concatenate" /= "con"    |
 |   ~=   | substring             | "Dark Forest" ~= "Forest" |
-|   -    | subtraction           | 15 - 10 = 5               |
-|   +    | addition              | 10 + 15 = 25              |
-|   *    | multiplication        | 10 * 20 = 400             |
-|   /    | division              | 100 / 20 = 5              |
-|   //   | remainder             | 5 // 4 = 1                |
-|   !    | negation              | !() = 1; !0 = 1; !dog = 0;| 
+|   ==   | equivalence           | 5 == 3 = 0; dog == DoG = 1| 
+|   !=   | inequality            | 0 != Z = 0; dog != d = 1  |
+|   &&&&   | logical and           | 1 &&&& 0 = 0; 5 &&&& 3 = 1    |
+|   ||   | logical or            | 0 || ( ) = 0; 5 || 0 = 1  |
 --------------------------------------------------------------
+
+Operator precedence is as follows (higher items take precedence:
+   !
+   * / //
+   + -
+   <= < >= >
+   /= ~=
+   == !=
+   &&&&
+   ||
 #d
 "FINISH QUEST TRIGGER" "MTRIG FINISH QUEST" "OTRIG FINISH QUEST" "RTRIG FINISH QUEST" "VTRIG FINISH QUEST" TRIGEDIT-MOB-FINISH-QUEST TRIGEDIT-OBJ-FINISH-QUEST TRIGEDIT-ROOM-FINISH-QUEST TRIGEDIT-VEH-FINISH-QUEST "FINISH-QUEST TRIGGER"
 
