@@ -6286,7 +6286,7 @@ ACMD(do_reboot) {
 	}
 
 	if (reboot_control.immediate) {
-		msg_to_char(ch, "Rebooting momentarily...\r\n");
+		msg_to_char(ch, "Preparing for imminent %s...\r\n", reboot_type[reboot_control.type]);
 	}
 	else {
 		var = (no_arg ? reboot_control.time : time);
