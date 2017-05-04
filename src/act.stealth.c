@@ -1447,7 +1447,7 @@ ACMD(do_search) {
 		for (targ = ROOM_PEOPLE(IN_ROOM(ch)); targ; targ = targ->next_in_room) {
 			if (ch == targ)
 				continue;
-			if (!AFF_FLAGGED(targ, AFF_HIDE) || CAN_SEE(ch, targ))
+			if (!AFF_FLAGGED(targ, AFF_HIDE))
 				continue;
 			
 			if (has_ability(targ, ABIL_CLING_TO_SHADOW)) {
@@ -1461,6 +1461,7 @@ ACMD(do_search) {
 				act("You find $N!", FALSE, ch, 0, targ, TO_CHAR);
 				msg_to_char(targ, "You are discovered!\r\n");
 				REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDE);
+				affects_from_char_by_aff_flag(targ, AFF_HIDE, FALSE);
 				found = TRUE;
 			}
 

@@ -1816,13 +1816,14 @@ RITUAL_FINISH_FUNC(perform_sense_life_ritual) {
 	
 	found = FALSE;
 	for (targ = ROOM_PEOPLE(IN_ROOM(ch)); targ; targ = targ->next_in_room) {
-		if (ch != targ && AFF_FLAGGED(targ, AFF_HIDE) && !CAN_SEE(ch, targ)) {
+		if (ch != targ && AFF_FLAGGED(targ, AFF_HIDE)) {
 			SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
 
 			if (CAN_SEE(ch, targ)) {
 				act("You sense $N hiding here!", FALSE, ch, 0, targ, TO_CHAR);
 				msg_to_char(targ, "You are discovered!\r\n");
 				REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDE);
+				affects_from_char_by_aff_flag(targ, AFF_HIDE, FALSE);
 				found = TRUE;
 			}
 
