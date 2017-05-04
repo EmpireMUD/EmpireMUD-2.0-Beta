@@ -440,6 +440,16 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 	obj_to_vehicle(obj, veh);
 	act("$n puts $p in $V.", TRUE, ch, obj, veh, TO_ROOM);
 	act("You put $p in $V.", FALSE, ch, obj, veh, TO_CHAR);
+	
+	if (IS_IMMORTAL(ch)) {
+		if (VEH_OWNER(veh) && !EMPIRE_IMM_ONLY(VEH_OWNER(veh))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a vehicle owned by mortal empire (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(VEH_OWNER(veh)), room_log_identifier(IN_ROOM(veh)));
+		}
+		else if (ROOM_OWNER(IN_ROOM(veh)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(veh)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a vehicle in mortal empire (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(veh)));
+		}
+	}
+	
 	return TRUE;
 }
 

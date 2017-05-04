@@ -659,6 +659,10 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 		act("$n puts $p in $P.", TRUE, ch, obj, cont, TO_ROOM);
 
 		act("You put $p in $P.", FALSE, ch, obj, cont, TO_CHAR);
+
+		if (IS_IMMORTAL(ch) && ROOM_OWNER(IN_ROOM(ch)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a container in mortal empire (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
+		}
 	}
 	return 1;
 }
