@@ -428,6 +428,8 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 * @return bool TRUE if successful, FALSE if not.
 */
 bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh) {
+	char_data *mort;
+	
 	if (!drop_otrigger(obj, ch)) {	// also takes care of obj purging self
 		return FALSE;
 	}
@@ -447,6 +449,9 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 		}
 		else if (ROOM_OWNER(IN_ROOM(veh)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(veh)))) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a vehicle in mortal empire (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(veh)));
+		}
+		else if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a vehicle with mortal present (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_NAME(mort), room_log_identifier(IN_ROOM(ch)));
 		}
 	}
 	

@@ -631,6 +631,8 @@ static bool perform_exchange(char_data *ch, obj_data *obj, empire_data *emp) {
 * @return int 1 = success, 0 = fail
 */
 static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
+	char_data *mort;
+	
 	if (!drop_otrigger(obj, ch)) {	// also takes care of obj purging self
 		return 0;
 	}
@@ -662,6 +664,9 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 
 		if (IS_IMMORTAL(ch) && ROOM_OWNER(IN_ROOM(ch)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(ch)))) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a container in mortal empire (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
+		}
+		else if (IS_IMMORTAL(ch) && (mort = find_mortal_in_room(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a container with mortal present (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_NAME(mort), room_log_identifier(IN_ROOM(ch)));
 		}
 	}
 	return 1;
