@@ -177,7 +177,7 @@
 
 
 // basic types
-typedef char byte;
+typedef signed char byte;
 typedef signed char sbyte;
 typedef unsigned char ubyte;
 typedef signed short int sh_int;
