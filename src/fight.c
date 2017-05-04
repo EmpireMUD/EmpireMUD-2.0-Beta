@@ -2610,7 +2610,7 @@ void check_auto_assist(char_data *ch) {
 		}
 		
 		// if we got this far and hit an assist condition
-		if (assist) {
+		if (assist && can_fight(ch_iter, FIGHTING(ch))) {
 			act("You jump to $N's aid!", FALSE, ch_iter, 0, ch, TO_CHAR);
 			act("$n jumps to your aid!", FALSE, ch_iter, 0, ch, TO_VICT);
 			act("$n jumps to $N's aid!", FALSE, ch_iter, 0, ch, TO_NOTVICT);
@@ -3813,8 +3813,10 @@ void frequent_combat(int pulse) {
 			continue;
 		}
 		
-		// bring friends in no matter what
-		check_auto_assist(ch);
+		// bring friends in no matter what (on the real seconds
+		if ((pulse % (1 RL_SEC)) == 0) {
+			check_auto_assist(ch);
+		}
 		
 		// reasons you would not get a round
 		if (GET_POS(ch) < POS_SLEEPING || IS_INJURED(ch, INJ_STAKED | INJ_TIED) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_NO_TARGET_IN_ROOM | AFF_MUMMIFY | AFF_DEATHSHROUD)) {
