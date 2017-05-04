@@ -870,19 +870,18 @@ WCMD(do_wown) {
 	}
 	else {	// attempt to find a target
 		strcpy(targ_arg, type_arg);	// there was no type
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);
 		
 		if (!*targ_arg) {
 			wld_log(room, "wown: Too few arguments");
 			return;
 		}
-		else if (*targ_arg == UID_CHAR && !(vict = get_char(targ_arg)) && !(vtarg = get_vehicle(targ_arg)) && !(otarg = get_obj(targ_arg)) && !(rtarg = get_room(room, targ_arg))) {
-			wld_log(room, "wown: Unable to find target %s", targ_arg);
-			return;
+		else if (*targ_arg == UID_CHAR && ((vict = get_char(targ_arg)) || (vtarg = get_vehicle(targ_arg)) || (otarg = get_obj(targ_arg)) || (rtarg = get_room(room, targ_arg)))) {
+			// found by uid
 		}
 		else if ((vict = get_char_by_room(room, targ_arg)) || (vtarg = get_vehicle_room(room, targ_arg)) || (otarg = get_obj_by_room(room, targ_arg))) {
-			// must have been found
-			skip_spaces(&argument);
-			strcpy(emp_arg, argument);
+			// found by name
 		}
 		else {
 			wld_log(room, "wown: Invalid target");

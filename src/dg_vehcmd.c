@@ -519,19 +519,18 @@ VCMD(do_vown) {
 	}
 	else {	// attempt to find a target
 		strcpy(targ_arg, type_arg);	// there was no type
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);
 		
 		if (!*targ_arg) {
 			veh_log(veh, "vown: Too few arguments");
 			return;
 		}
-		else if (*targ_arg == UID_CHAR && !(vict = get_char(targ_arg)) && !(vtarg = get_vehicle(targ_arg)) && !(otarg = get_obj(targ_arg)) && !(rtarg = get_room(orm, targ_arg))) {
-			veh_log(veh, "vown: Unable to find target %s", targ_arg);
-			return;
+		else if (*targ_arg == UID_CHAR && ((vict = get_char(targ_arg)) || (vtarg = get_vehicle(targ_arg)) || (otarg = get_obj(targ_arg)) || (rtarg = get_room(orm, targ_arg)))) {
+			// found by uid
 		}
 		else if ((vict = get_char_near_vehicle(veh, targ_arg)) || (vtarg = get_vehicle_near_vehicle(veh, targ_arg)) || (otarg = get_obj_near_vehicle(veh, targ_arg))) {
-			// must have been found
-			skip_spaces(&argument);
-			strcpy(emp_arg, argument);
+			// found by type
 		}
 		else {
 			veh_log(veh, "vown: Invalid target");
