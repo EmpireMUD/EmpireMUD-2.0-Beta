@@ -1936,18 +1936,24 @@ void mark_instance_completed(struct instance_data *inst) {
 
 
 /**
-* Sets up instance info.
+* Sets up instance info and prunes bad instances
 */
 static void renum_instances(void) {
-	struct instance_data *inst;
+	struct instance_data *inst, *next_inst;
 	int iter;
 	
-	for (inst = instance_list; inst; inst = inst->next) {
+	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		// attach pointers
 		for (iter = 0; iter < inst->size; ++iter) {			
 			// set up instance data
 			if (inst->room[iter] && COMPLEX_DATA(inst->room[iter])) {
 				COMPLEX_DATA(inst->room[iter])->instance = inst;
 			}
+		}
+		
+		// check bad instance
+		if (!inst->location || !inst->start) {
+			delete_instance(inst);
 		}
 	}
 }
