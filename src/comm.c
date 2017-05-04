@@ -611,7 +611,7 @@ char *strip_telnet_codes(const char *str) {
 		
 		// copy?
 		if (off <= 0) {
-			*pos++ = *iter;
+			*(pos++) = *iter;
 			--space_left;
 		}
 	}
