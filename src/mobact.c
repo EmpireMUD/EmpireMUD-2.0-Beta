@@ -950,8 +950,10 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 	
 	home = HOME_ROOM(room);
 	
-	// update this now, no matter what happens
-	ROOM_LAST_SPAWN_TIME(room) = now;
+	if (!only_artisans) {
+		// update this now, no matter what happens
+		ROOM_LAST_SPAWN_TIME(room) = now;
+	}
 	
 	// never spawn idle empires at all
 	if (ROOM_OWNER(home) && EMPIRE_LAST_LOGON(ROOM_OWNER(home)) + time_to_empire_emptiness < now) {
@@ -1089,6 +1091,7 @@ void spawn_mobs_from_center(room_data *center) {
 	
 	// only bother at all if the center needs to be spawned
 	if (ROOM_LAST_SPAWN_TIME(center) >= (now - mob_spawn_interval)) {
+		spawn_one_room(center, TRUE);	// run an only-artisans spawn just in case
 		return;
 	}
 	
