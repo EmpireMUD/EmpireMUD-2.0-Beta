@@ -1343,7 +1343,7 @@ static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
 	}
 	
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch) && !IS_IMMORTAL(vict)) {
-		act("$p: you can't give away quest items.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: you can't give this item away.", FALSE, ch, obj, NULL, TO_CHAR);
 		return;
 	}
 	
