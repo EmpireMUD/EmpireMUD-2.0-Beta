@@ -5066,9 +5066,9 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 				*tokens[j] = '\0';
 				p = tokens[j] + strlen(found);
 
-				eval_expr(line, lhr, go, sc, trig, type);
-				eval_expr(p, rhr, go, sc, trig, type);
-				eval_op(found, lhr, rhr, result, go, sc, trig);
+				eval_expr(line, rhr, go, sc, trig, type);
+				eval_expr(p, lhr, go, sc, trig, type);
+				eval_op(found, rhr, lhr, result, go, sc, trig);
 
 				return 1;
 			}
