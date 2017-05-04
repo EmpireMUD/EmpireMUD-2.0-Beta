@@ -636,7 +636,7 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 		if (ROOM_OWNER(home) && !LINK_FLAGGED(rule, ADV_LINKF_CLAIMED_OK | ADV_LINKF_CITY_ONLY)) {
 			return FALSE;
 		}
-		if (ROOM_OWNER(home) && EMPIRE_IS_TIMED_OUT(ROOM_OWNER(home))) {
+		if (ROOM_OWNER(home) && (EMPIRE_LAST_LOGON(ROOM_OWNER(home)) + (config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK)) < time(0)) {
 			return FALSE;	// owner is timed out -- don't spawn here
 		}
 	
