@@ -622,6 +622,10 @@ bool is_fight_enemy(char_data *ch, char_data *frenemy) {
 	}
 	
 	if (fighting) {
+		// ch is fighting frenemy
+		if (FIGHTING(ch) == frenemy) {
+			return TRUE;
+		}
 		// frenemy is fighting ch
 		if (fighting == ch) {
 			return TRUE;
