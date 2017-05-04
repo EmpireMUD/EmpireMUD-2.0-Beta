@@ -603,10 +603,12 @@ char *strip_telnet_codes(const char *str) {
 		if (*iter == (char)IAC && *(iter+1) == (char)SB) {
 			++off;	// stop copying
 			++iter;
+			continue;
 		}
 		else if (*iter == (char)IAC && *(iter+1) == (char)SE) {
 			--off;	// start copying
 			++iter;
+			continue;
 		}
 		
 		// copy?
