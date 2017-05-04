@@ -2273,6 +2273,8 @@ ACMD(do_mown) {
 	}
 	else {	// attempt to find a target
 		strcpy(targ_arg, type_arg);	// there was no type
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);
 		
 		if (!*targ_arg) {
 			mob_log(ch, "mown: Too few arguments");
@@ -2284,8 +2286,6 @@ ACMD(do_mown) {
 		}
 		else if ((vict = get_char_room_vis(ch, targ_arg)) || (vtarg = get_vehicle_in_room_vis(ch, targ_arg)) || (otarg = get_obj_in_list_vis(ch, targ_arg, ch->carrying)) || (otarg = get_obj_in_list_vis(ch, targ_arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
 			// must have been found
-			skip_spaces(&argument);
-			strcpy(emp_arg, argument);
 		}
 		else {
 			mob_log(ch, "mown: Invalid target");
