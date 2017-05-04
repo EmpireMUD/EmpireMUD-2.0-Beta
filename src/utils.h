@@ -209,7 +209,7 @@
 #define INVIS_OK(sub, obj)  ((!AFF_FLAGGED(obj, AFF_INVISIBLE)) && (!AFF_FLAGGED((obj), AFF_HIDE) || AFF_FLAGGED((sub), AFF_SENSE_HIDE)))
 
 
-#define MORT_CAN_SEE_NO_DARK(sub, obj)  ((INVIS_OK(sub, obj)) && !AFF_FLAGGED(sub, AFF_BLIND))
+#define MORT_CAN_SEE_NO_DARK(sub, obj)  (INVIS_OK(sub, obj))
 #define MORT_CAN_SEE_LIGHT(sub, obj)  (LIGHT_OK(sub) || (IN_ROOM(sub) == IN_ROOM(obj) && has_ability((sub), ABIL_PREDATOR_VISION)))
 #define MORT_CAN_SEE(sub, obj)  (MORT_CAN_SEE_LIGHT(sub, obj) && MORT_CAN_SEE_NO_DARK(sub, obj))
 
