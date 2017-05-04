@@ -2192,6 +2192,12 @@ void nanny(descriptor_data *d, char *arg) {
 	int load_result, i, iter;
 	bool show_start = FALSE;
 	char_data *temp_char;
+	
+	// this avoids treating telnet negotiation as menu input
+	if (d->no_nanny) {
+		d->no_nanny = FALSE;
+		return;
+	}
 
 	skip_spaces(&arg);
 

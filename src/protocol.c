@@ -520,8 +520,10 @@ void ProtocolInput(descriptor_t *apDescriptor, char *apData, int aSize, char *ap
 	int CmdIndex = 0;
 	int IacIndex = 0;
 	int Index;
+	bool any;
 
 	protocol_t *pProtocol = apDescriptor ? apDescriptor->pProtocol : NULL;
+	any = (*apData ? TRUE : FALSE);
 
 	for (Index = 0; Index < aSize; ++Index) {
 		/* If we'd overflow the buffer, we just ignore the input */
@@ -656,6 +658,11 @@ void ProtocolInput(descriptor_t *apDescriptor, char *apData, int aSize, char *ap
 	/* Copy the input buffer back to the player. */
 	strncat(apOut, CmdBuf, maxSize);
 	apOut[maxSize-1] = '\0';
+	
+	if (!*CmdBuf && any) {
+		// received only telnet negotiation (no text from user)
+		apDescriptor->no_nanny = TRUE;
+	}
 }
 
 const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *apLength) {
