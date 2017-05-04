@@ -1782,7 +1782,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 			if (GET_WEAPON_DAMAGE_BONUS(obj) > 0) {
 				amt = round(this_share * GET_WEAPON_DAMAGE_BONUS(obj) * get_weapon_speed(obj));
 				if (amt > 0) {
-					points_to_give -= round(this_share * GET_WEAPON_DAMAGE_BONUS(obj));
+					points_to_give -= (this_share * GET_WEAPON_DAMAGE_BONUS(obj));
 				}
 				GET_OBJ_VAL(obj, VAL_WEAPON_DAMAGE_BONUS) = amt;
 			}
@@ -1792,7 +1792,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 		case ITEM_DRINKCON: {
 			amt = (int)round(this_share * GET_DRINK_CONTAINER_CAPACITY(obj) * config_get_double("scale_drink_capacity"));
 			if (amt > 0) {
-				points_to_give -= round(this_share * GET_DRINK_CONTAINER_CAPACITY(obj));
+				points_to_give -= (this_share * GET_DRINK_CONTAINER_CAPACITY(obj));
 			}
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CAPACITY) = amt;
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = amt;
@@ -1802,7 +1802,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 		case ITEM_COINS: {
 			amt = (int)round(this_share * GET_COINS_AMOUNT(obj) * config_get_double("scale_coin_amount"));
 			if (amt > 0) {
-				points_to_give -= round(this_share * GET_COINS_AMOUNT(obj));
+				points_to_give -= (this_share * GET_COINS_AMOUNT(obj));
 			}
 			GET_OBJ_VAL(obj, VAL_COINS_AMOUNT) = amt;
 			// this can't realistically be negative
@@ -1813,7 +1813,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 			if (GET_MISSILE_WEAPON_DAMAGE(obj) > 0) {
 				amt = round(this_share * GET_MISSILE_WEAPON_DAMAGE(obj) * get_weapon_speed(obj));
 				if (amt > 0) {
-					points_to_give -= round(this_share * GET_MISSILE_WEAPON_DAMAGE(obj));
+					points_to_give -= (this_share * GET_MISSILE_WEAPON_DAMAGE(obj));
 				}
 				GET_OBJ_VAL(obj, VAL_MISSILE_WEAPON_DAMAGE) = amt;
 			}
@@ -1824,7 +1824,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 			if (GET_ARROW_DAMAGE_BONUS(obj) > 0) {
 				amt = (int)round(this_share * GET_ARROW_DAMAGE_BONUS(obj));
 				if (amt > 0) {
-					points_to_give -= round(this_share * GET_ARROW_DAMAGE_BONUS(obj));
+					points_to_give -= (this_share * GET_ARROW_DAMAGE_BONUS(obj));
 				}
 				GET_OBJ_VAL(obj, VAL_ARROW_DAMAGE_BONUS) = amt;
 			}
@@ -1834,7 +1834,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 		case ITEM_PACK: {
 			amt = (int)round(this_share * GET_PACK_CAPACITY(obj) * config_get_double("scale_pack_size"));
 			if (amt > 0) {
-				points_to_give -= round(this_share * GET_PACK_CAPACITY(obj));
+				points_to_give -= (this_share * GET_PACK_CAPACITY(obj));
 			}
 			GET_OBJ_VAL(obj, VAL_PACK_CAPACITY) = amt;
 			// negatives aren't really possible here
@@ -1844,7 +1844,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 			// aiming for a scale of 100 at 100 -- and eliminate the wear_pos_modifier since potions are almost always WEAR_TAKE
 			amt = (int)round(this_share * GET_POTION_SCALE(obj) * (100.0 / scale_points_at_100) / wear_pos_modifier[wear_significance[ITEM_WEAR_TAKE]]);
 			if (amt > 0) {
-				points_to_give -= round(this_share * GET_POTION_SCALE(obj));
+				points_to_give -= (this_share * GET_POTION_SCALE(obj));
 			}
 			GET_OBJ_VAL(obj, VAL_POTION_SCALE) = amt;
 			// negatives aren't really possible here
@@ -1864,7 +1864,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 			if (apply->modifier > 0) {
 				// positive benefit
 				amt = round(this_share * apply->modifier * per_point);
-				points_to_give -= round(this_share * apply->modifier);
+				points_to_give -= (this_share * apply->modifier);
 				apply->modifier = amt;
 			}
 			else if (apply->modifier < 0) {
