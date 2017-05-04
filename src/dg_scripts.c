@@ -5013,30 +5013,24 @@ void eval_expr(char *line, char *result, void *go, struct script_data *sc, trig_
 int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, trig_data *trig, int type) {
 	char *p, *tokens[MAX_INPUT_LENGTH];
 	char line[MAX_INPUT_LENGTH], lhr[MAX_INPUT_LENGTH], rhr[MAX_INPUT_LENGTH];
-	int i, j;
+	int i, j, oplist;
+	char *found;
 
 	/*
 	* valid operands, in order of priority
 	* each must also be defined in eval_op()
 	*/
-	static char *ops[] = {
-		"||",
-		"&&",
-		"==",
-		"!=",
-		"<=",
-		">=",
-		"<",
-		">",
-		"/=",
-		"~=",
-		"-",
-		"+",
-		"//",
-		"/",
-		"*",
-		"!",
-		"\n"
+	#define num_op_lists  8
+	static char *ops[num_op_lists][5] = {
+		// higher in this table = higher priority
+		{ "!", "\n" },
+		{ "*", "/", "//", "\n" },	// things on same line have same precedence
+		{ "+", "-", "\n" },
+		{ "<=", "<", ">=", ">", "\n" },
+		{ "/=", "~=", "\n" },
+		{ "==", "!=", "\n" },
+		{ "&&", "\n" },
+		{ "||", "\n" }	// each list must end with "\n"
 	};
 
 	p = strcpy(line, expr);
@@ -5057,16 +5051,24 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 			p++;
 	}
 	tokens[j] = NULL;
-
-	for (i = 0; *ops[i] != '\n'; i++) {
+	
+	for (oplist = 0; oplist < num_op_lists; ++oplist) {
 		for (j = 0; tokens[j]; j++) {
-			if (!strn_cmp(ops[i], tokens[j], strlen(ops[i]))) {
+			// try to find this token in this oplist
+			found = NULL;
+			for (i = 0; !found && *ops[oplist][i] != '\n'; ++i) {
+				if (!strn_cmp(ops[oplist][i], tokens[j], strlen(ops[oplist][i]))) {
+					found = ops[oplist][i];
+				}
+			}
+	
+			if (found) {
 				*tokens[j] = '\0';
-				p = tokens[j] + strlen(ops[i]);
+				p = tokens[j] + strlen(found);
 
 				eval_expr(line, lhr, go, sc, trig, type);
 				eval_expr(p, rhr, go, sc, trig, type);
-				eval_op(ops[i], lhr, rhr, result, go, sc, trig);
+				eval_op(found, lhr, rhr, result, go, sc, trig);
 
 				return 1;
 			}
