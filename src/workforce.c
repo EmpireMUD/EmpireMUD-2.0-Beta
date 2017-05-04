@@ -264,23 +264,27 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	if (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)) {
 		return;
 	}
-	if (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK)) {
-		return;
-	}
 	if (ROOM_OWNER(IN_ROOM(veh)) && ROOM_OWNER(IN_ROOM(veh)) != emp && !has_relationship(emp, ROOM_OWNER(IN_ROOM(veh)), DIPL_ALLIED)) {
 		return;
 	}
 	
+	// FIRE
 	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		if (empire_chore_limit(emp, island, CHORE_FIRE_BRIGADE)) {
 			vehicle_chore_fire_brigade(emp, veh);
 		}
-		else {
-			// prevent other chores from firing while burning
-		}
+		// prevent other chores from firing while burning
+		return;
 	}
-	else if (VEH_IS_COMPLETE(veh) && VEH_NEEDS_RESOURCES(veh) && empire_chore_limit(emp, island, CHORE_REPAIR_VEHICLES)) {
+	// REPAIR
+	if (VEH_IS_COMPLETE(veh) && VEH_NEEDS_RESOURCES(veh) && empire_chore_limit(emp, island, CHORE_REPAIR_VEHICLES)) {
 		vehicle_chore_repair(emp, veh);
+		return;	// no further chores while repairing
+	}
+	
+	// any further chores require no no-work flag
+	if (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK)) {
+		return;
 	}
 }
 
