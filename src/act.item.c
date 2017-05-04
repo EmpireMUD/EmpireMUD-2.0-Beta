@@ -2521,6 +2521,11 @@ void trade_check(char_data *ch, char *argument) {
 		if (tpd->player != GET_IDNUM(ch)) {
 			continue;
 		}
+		// if it's just collectable coins, don't show
+		if (IS_SET(tpd->state, TPD_BOUGHT) && IS_SET(tpd->state, TPD_COINS_PENDING)) {
+			to_collect += round(tpd->buy_cost * (1.0 - trading_post_fee)) + tpd->post_cost;
+			continue;
+		}
 		if (!tpd->obj) {
 			continue;
 		}
@@ -2533,12 +2538,6 @@ void trade_check(char_data *ch, char *argument) {
 			continue;
 		}
 		if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(tpd->obj))) {
-			continue;
-		}
-		
-		// if it's just collectable coins, don't show
-		if (IS_SET(tpd->state, TPD_BOUGHT) && IS_SET(tpd->state, TPD_COINS_PENDING)) {
-			to_collect += round(tpd->buy_cost * (1.0 - trading_post_fee)) + tpd->post_cost;
 			continue;
 		}
 		
