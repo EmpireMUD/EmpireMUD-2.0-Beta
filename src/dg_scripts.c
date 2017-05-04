@@ -5052,7 +5052,7 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 	}
 	tokens[j] = NULL;
 	
-	for (oplist = 0; oplist < num_op_lists; ++oplist) {
+	for (oplist = num_op_lists - 1; oplist >= 0; --oplist) {
 		for (j = 0; tokens[j]; j++) {
 			// try to find this token in this oplist
 			found = NULL;
