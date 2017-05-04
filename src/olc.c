@@ -3985,7 +3985,7 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 		else if (IS_SET(type, OLC_VEHICLE) && !OLC_FLAGGED(ch, OLC_FLAG_NO_VEHICLES)) {
 			return TRUE;
 		}
-		else if (IS_SET(type, OLC_SECTOR) && OLC_FLAGGED(ch, OLC_FLAG_SECTORS)) {
+		else if (IS_SET(type, OLC_SECTOR) && !OLC_FLAGGED(ch, OLC_FLAG_NO_SECTORS)) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_ABILITY) && OLC_FLAGGED(ch, OLC_FLAG_ABILITIES)) {

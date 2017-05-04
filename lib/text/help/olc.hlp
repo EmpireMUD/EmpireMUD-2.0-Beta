@@ -332,6 +332,10 @@ Quests (QEDIT):
 - If multiple DAILY quests share the same 'daily cycle', only one of them is
   available per day. Any unique integer can be a daily cycle, but for the sake
   of cleanliness, you should pick the vnum of one of the quests on the cycle.
+- For tasks and prerequisites, any requirements you add are "OR" by default
+  (any matching requirement from the list lets the character pass the check).
+  If you want them to be "AND" requirements, you need to set a group letter on
+  them.
 
 Room Templates (REDIT):
 - Don't confuse room templates with the designated rooms that players can add
@@ -4136,7 +4140,7 @@ Available flags:
  - !MOBILE -- Cannot edit mobiles
  - !OBJECT -- Cannot edit objects
  - !BUILDING -- Cannot edit buildings
- - SECTORS -- CAN edit map sectors
+ - !SECTORS -- Cannot edit map sectors
  - !CROP -- Cannot edit crops
  - !TRIGGER -- Cannot edit triggers
  - !ADVENTURE -- Cannot edit adventures

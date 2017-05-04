@@ -66,7 +66,7 @@
 #define OLC_FLAG_NO_MOBILE  BIT(4)	// cannot edit mobs
 #define OLC_FLAG_NO_OBJECT  BIT(5)	// cannot edit objects
 #define OLC_FLAG_NO_BUILDING  BIT(6)	// cannot edit buildings
-#define OLC_FLAG_SECTORS  BIT(7)	// can edit sectors
+#define OLC_FLAG_NO_SECTORS  BIT(7)	// cannot edit sectors
 #define OLC_FLAG_NO_CROP  BIT(8)	// cannot edit crops
 #define OLC_FLAG_NO_TRIGGER  BIT(9)	// cannot edit triggers
 #define OLC_FLAG_NO_ADVENTURE  BIT(10)	// cannot edit adventures

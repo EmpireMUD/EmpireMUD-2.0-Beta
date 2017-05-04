@@ -2273,7 +2273,7 @@ const char *olc_flag_bits[] = {
 	"!MOBILE",
 	"!OBJECT",
 	"!BUILDING",
-	"SECTORS",
+	"!SECTORS",
 	"!CROP",
 	"!TRIGGER",
 	"!ADVENTURE",
