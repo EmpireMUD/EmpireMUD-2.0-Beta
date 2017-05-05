@@ -1570,7 +1570,7 @@ char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 			continue;
 		if (IS_SET(flags, FIND_CHAR_ROOM) && AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM))
 			continue;
-		if (!match_char_name(ch, i, name, (IS_SET(flags, FIND_CHAR_ROOM) ? MATCH_IN_ROOM : 0) | (IS_SET(flags, FIND_NO_DARK) ? MATCH_GLOBAL : 0))) {
+		if (!match_char_name(ch, i, name, (IS_SET(flags, FIND_CHAR_ROOM) ? MATCH_IN_ROOM : MATCH_GLOBAL) | (IS_SET(flags, FIND_NO_DARK) ? MATCH_GLOBAL : 0))) {
 			continue;
 		}
 		
