@@ -219,7 +219,12 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 	}
 	
 	if (ADVENTURE_FLAGGED(adv, ADV_ROTATABLE)) {
-		rotation = number(0, NUM_SIMPLE_DIRS-1);
+		if (dir != NO_DIR && dir != DIR_RANDOM) {
+			rotation = dir;
+		}
+		else {
+			rotation = number(0, NUM_SIMPLE_DIRS-1);
+		}
 	}
 	else {
 		rotation = NORTH;
@@ -720,7 +725,7 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 	int dir, iter, sub, num_found, pos;
 	sector_data *findsect = NULL;
 	bool match_buildon = FALSE;
-	bld_data *findbdg = NULL;
+	bld_data *findbdg = NULL, *bdg = NULL;
 	struct map_data *map;
 	
 	const int max_tries = 500, max_dir_tries = 10;	// for random checks
@@ -838,10 +843,14 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 				for (sub = 0; sub < max_dir_tries && !found; ++sub) {
 					dir = number(0, NUM_2D_DIRS-1);
 					
-					// matches a dir we need inside?
-					if (dir == rule->dir || rmt_has_exit(start_room, rev_dir[dir])) {
-						continue;
+					// new non-open building
+					if (rule->type == ADV_LINK_BUILDING_NEW && (bdg = building_proto(rule->value)) && !IS_SET(GET_BLD_FLAGS(bdg), BLD_OPEN)) {
+						// matches a dir we need inside?
+						if (dir == rule->dir || rmt_has_exit(start_room, rev_dir[dir])) {
+							continue;
+						}
 					}
+					
 					// need a valid map tile to face
 					if (!(shift = real_shift(loc, shift_dir[dir][0], shift_dir[dir][1]))) {
 						continue;
