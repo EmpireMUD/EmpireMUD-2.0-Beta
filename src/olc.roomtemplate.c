@@ -480,6 +480,24 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 
 
 /**
+* @param room_template *rmt The room template to check.
+* @param int dir Which direction to look for.
+* @return bool TRUE if rmt has an exit in that direction.
+*/
+bool rmt_has_exit(room_template *rmt, int dir) {
+	struct exit_template *ex;
+	
+	LL_FOREACH(GET_RMT_EXITS(rmt), ex) {
+		if (ex->dir == dir) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;
+}
+
+
+/**
 * Function to save a player's changes to a room template (or a new one).
 *
 * @param descriptor_data *desc The descriptor who is saving.

@@ -713,6 +713,7 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 */
 room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir) {
 	extern bool can_build_on(room_data *room, bitvector_t flags);
+	extern bool rmt_has_exit(room_template *rmt, int dir);
 	
 	room_template *start_room = room_template_proto(GET_ADV_START_VNUM(adv));
 	room_data *room, *next_room, *loc, *shift, *found = NULL;
@@ -837,8 +838,8 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 				for (sub = 0; sub < max_dir_tries && !found; ++sub) {
 					dir = number(0, NUM_2D_DIRS-1);
 					
-					// matches the dir we need inside?
-					if (dir == rule->dir) {
+					// matches a dir we need inside?
+					if (dir == rule->dir || rmt_has_exit(start_room, rev_dir[dir])) {
 						continue;
 					}
 					// need a valid map tile to face
