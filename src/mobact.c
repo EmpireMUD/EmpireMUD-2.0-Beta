@@ -624,7 +624,7 @@ void mobile_activity(void) {
 
 					// look in this room
 					for (vict = ROOM_PEOPLE(IN_ROOM(ch)); !found && vict; vict = vict->next_in_room) {
-						if (!IS_NPC(vict) && GET_IDNUM(vict) == purs->idnum && CAN_RECOGNIZE(ch, vict) && can_fight(ch, vict)) {
+						if (!IS_NPC(vict) && GET_IDNUM(vict) == purs->idnum && CAN_SEE(ch, vict) && CAN_RECOGNIZE(ch, vict) && can_fight(ch, vict)) {
 							found = TRUE;
 							engage_combat(ch, vict, FALSE);
 						}

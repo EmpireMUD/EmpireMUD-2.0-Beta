@@ -39,6 +39,11 @@
 #define FIND_NPC_ONLY		BIT(9)	// ignores players
 
 
+// for match_char_name()
+#define MATCH_GLOBAL  BIT(0)	// ignores dark/blind
+#define MATCH_IN_ROOM  BIT(1)	// specifically checks for things that only matter in-room
+
+
 // for the interaction handlers (returns TRUE if the character performs the interaction; FALSE if it aborts)
 #define INTERACTION_FUNC(name)	bool (name)(char_data *ch, struct interaction_item *interaction, room_data *inter_room, char_data *inter_mob, obj_data *inter_item)
 
@@ -47,9 +52,6 @@
 //// HANDLER MACROS //////////////////////////////////////////////////////////
 
 #define MATCH_ITEM_NAME(str, obj)  (isname((str), GET_OBJ_KEYWORDS(obj)) || (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0 && isname((str), drinks[GET_DRINK_CONTAINER_TYPE(obj)])))
-#define MATCH_CHAR_DISGUISED_NAME(str, ch)  ((IS_MORPHED(ch) && isname((str), MORPH_KEYWORDS(GET_MORPH(ch)))) || (IS_DISGUISED(ch) && isname((str), GET_DISGUISED_NAME(ch))))
-#define MATCH_CHAR_NAME(str, ch)  ((!IS_NPC(ch) && GET_LASTNAME(ch) && isname((str), GET_LASTNAME(ch))) || isname((str), GET_PC_NAME(ch)) || MATCH_CHAR_DISGUISED_NAME(str, ch))
-#define MATCH_CHAR_NAME_ROOM(viewer, str, target)  ((IS_DISGUISED(target) && !IS_IMMORTAL(viewer) && !SAME_EMPIRE(viewer, target)) ? MATCH_CHAR_DISGUISED_NAME(str, target) : MATCH_CHAR_NAME(str, target))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -85,6 +87,7 @@ void show_wear_off_msg(char_data *ch, int atype);
 // character handlers
 void extract_char(char_data *ch);
 void extract_char_final(char_data *ch);
+extern bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t flags);
 void perform_idle_out(char_data *ch);
 
 // character location handlers
