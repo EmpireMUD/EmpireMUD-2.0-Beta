@@ -5013,7 +5013,7 @@ void eval_expr(char *line, char *result, void *go, struct script_data *sc, trig_
 int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, trig_data *trig, int type) {
 	char *p, *tokens[MAX_INPUT_LENGTH];
 	char line[MAX_INPUT_LENGTH], lhr[MAX_INPUT_LENGTH], rhr[MAX_INPUT_LENGTH];
-	int i, j, oplist;
+	int i, j, oplist, tsize;
 	char *found;
 
 	/*
@@ -5051,16 +5051,20 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 			p++;
 	}
 	tokens[j] = NULL;
+	tsize = j;
 	
 	for (oplist = num_op_lists - 1; oplist >= 0; --oplist) {
-		for (j = 0; tokens[j]; j++) {
+		for (j = tsize - 1; j >= 0; --j) {
 			// try to find this token in this oplist
 			found = NULL;
 			for (i = 0; !found && *ops[oplist][i] != '\n'; ++i) {
 				if (!strn_cmp(ops[oplist][i], tokens[j], strlen(ops[oplist][i]))) {
 					found = ops[oplist][i];
+					// -> need to find the LAST token that's in THIS list
 				}
 			}
+			// [IMMORTAL Khufu]: if it finds a matching operator, it needs to check the rest of the array for another operator with the same precedence...
+			// why is it not working to check tokens in reverse order?
 	
 			if (found) {
 				*tokens[j] = '\0';
