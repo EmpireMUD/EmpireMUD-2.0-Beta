@@ -3789,8 +3789,6 @@ ACMD(do_enroll) {
 
 		// move data over
 		if (old && EMPIRE_LEADER(old) == GET_IDNUM(targ)) {
-			eliminate_linkdead_players();
-			
 			// attempt to estimate the new member count so cities and territory transfer correctly
 			// note: may over-estimate if some players already had alts in both empires
 			EMPIRE_MEMBERS(e) += EMPIRE_MEMBERS(old);
@@ -3817,8 +3815,11 @@ ACMD(do_enroll) {
 					GET_LOYALTY(victim) = e;
 					GET_RANK(victim) = 1;
 					update_player_index(index, victim);
-					if (sub_file) {
+					if (sub_file && victim != targ) {
 						store_loaded_char(victim);
+					}
+					else {
+						SAVE_CHAR(victim);
 					}
 				}
 			}
