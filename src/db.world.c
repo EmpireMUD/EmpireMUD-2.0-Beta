@@ -1079,7 +1079,7 @@ void annual_world_update(void) {
 	// MESSAGE TO ALL
 	for (d = descriptor_list; d; d = d->next) {
 		if (STATE(d) == CON_PLAYING && d->character) {
-			write_to_descriptor(d->descriptor, "The ground under you shakes violently!\r\n");
+			write_to_descriptor(d->descriptor, "\r\nThe ground under you shakes violently!\r\n");
 			d->has_prompt = FALSE;
 			
 			if (!IS_IMMORTAL(d->character)) {
