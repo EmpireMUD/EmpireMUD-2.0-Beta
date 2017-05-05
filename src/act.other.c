@@ -601,7 +601,7 @@ OFFER_FINISH(ofin_quest) {
 
 
 OFFER_VALIDATE(oval_rez) {
-	extern obj_data *find_obj(int n);
+	extern obj_data *find_obj(int n, bool error);
 	extern room_data *obj_room(obj_data *obj);
 	
 	room_data *loc = real_room(offer->location);
@@ -614,7 +614,7 @@ OFFER_VALIDATE(oval_rez) {
 	
 	// if already respawned, verify corpse location
 	if (!IS_DEAD(ch)) {
-		if (!(corpse = find_obj(GET_LAST_CORPSE_ID(ch))) || !IS_CORPSE(corpse)) {
+		if (!(corpse = find_obj(GET_LAST_CORPSE_ID(ch), FALSE)) || !IS_CORPSE(corpse)) {
 			msg_to_char(ch, "You can't resurrect because your corpse is gone.\r\n");
 			return FALSE;
 		}

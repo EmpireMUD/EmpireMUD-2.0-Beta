@@ -244,12 +244,18 @@ empire_data *find_empire_by_uid(int n) {
 }
 
 
-/* return object with UID n */
-obj_data *find_obj(int n) {
+/**
+* return object with UID n
+*
+* @param int n The UID to look up.
+* @param bool error If TRUE, will log if the ID is an object ID but doesn't exist.
+* @return obj_data* The found object, or NULL if it doesn't exist.
+*/
+obj_data *find_obj(int n, bool error) {
 	if (n < OBJ_ID_BASE) /* see note in dg_scripts.h */
 		return NULL;
 
-	return find_obj_by_uid_in_lookup_table(n);
+	return find_obj_by_uid_in_lookup_table(n, error);
 }
 
 /* return room with UID n */
@@ -468,7 +474,7 @@ obj_data *get_obj_near_vehicle(vehicle_data *veh, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		return find_obj(atoi(name + 1));
+		return find_obj(atoi(name + 1), TRUE);
 	}
 	if (VEH_CONTAINS(veh) && (i = get_obj_in_list(name, VEH_CONTAINS(veh)))) {
 		return i;
@@ -495,7 +501,7 @@ obj_data *get_obj(char *name)  {
 	obj_data *obj;
 
 	if (*name == UID_CHAR)
-		return find_obj(atoi(name + 1));
+		return find_obj(atoi(name + 1), TRUE);
 	else {
 		for (obj = object_list; obj; obj = obj->next)
 			if (isname(name, obj->name))
@@ -712,7 +718,7 @@ obj_data *get_obj_by_obj(obj_data *obj, char *name) {
 	room_data *rm;
 
 	if (*name == UID_CHAR) 
-		return find_obj(atoi(name + 1));
+		return find_obj(atoi(name + 1), TRUE);
 
 	if (!str_cmp(name, "self") || !str_cmp(name, "me"))
 		return obj;
@@ -747,7 +753,7 @@ obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name) {
 	obj_data *i = NULL;
 
 	if (*name == UID_CHAR) {
-		return find_obj(atoi(name + 1));
+		return find_obj(atoi(name + 1), TRUE);
 	}
 	if (VEH_CONTAINS(veh) && (i = get_obj_in_list(name, VEH_CONTAINS(veh)))) {
 		return i;
@@ -785,7 +791,7 @@ obj_data *get_obj_by_room(room_data *room, char *name) {
 	obj_data *obj;
 
 	if (*name == UID_CHAR) 
-		return find_obj(atoi(name+1));
+		return find_obj(atoi(name+1), TRUE);
 
 	for (obj = room->contents; obj; obj = obj->next_content)
 		if (isname(name, obj->name))
@@ -5284,7 +5290,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 		return;
 	}
 	
-	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id)) && !(r = find_room(id))) {
+	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id, FALSE)) && !(r = find_room(id))) {
 		script_log("Trigger: %s, VNum %d. attach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
 		return;
 	}
@@ -5365,7 +5371,7 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 	}
 	
 	// find first good match
-	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id)) && !(r = find_room(id))) {
+	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id, FALSE)) && !(r = find_room(id))) {
 		script_log("Trigger: %s, VNum %d. detach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
 		return;
 	}
@@ -5699,7 +5705,7 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 		if (!IS_NPC(mob))
 			context = 0;
 	}
-	else if ((obj = find_obj(uid))) {
+	else if ((obj = find_obj(uid, FALSE))) {
 		sc_remote = SCRIPT(obj);
 	}
 	else {
@@ -5759,7 +5765,7 @@ ACMD(do_vdelete) {
 			context = 0;
 		*/
 	}
-	else if ((obj = find_obj(uid))) {
+	else if ((obj = find_obj(uid, FALSE))) {
 		sc_remote = SCRIPT(obj);
 	}
 	else {
@@ -5847,7 +5853,7 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 			context = 0;
 		*/
 	}
-	else if ((obj = find_obj(uid))) {
+	else if ((obj = find_obj(uid, FALSE))) {
 		sc_remote = SCRIPT(obj);
 	}
 	else {
@@ -6347,7 +6353,16 @@ char_data *find_char_by_uid_in_lookup_table(int uid) {
 	return NULL;
 }
 
-obj_data *find_obj_by_uid_in_lookup_table(int uid) {
+/**
+* Determines if an object uid is in the lookup table. This provides its own
+* error suppression because it's not always an error for an object to be
+* missing.
+*
+* @param int uid The object's uid.
+* @param bool error if TRUE, logs an error if it can't find it.
+* @return obj_data* The found object, or NULL if it doesn't exist.
+*/
+obj_data *find_obj_by_uid_in_lookup_table(int uid, bool error) {
 	int bucket = (int) (uid & (BUCKET_COUNT - 1));
 	struct lookup_table_t *lt = &lookup_table[bucket];
 
@@ -6355,8 +6370,11 @@ obj_data *find_obj_by_uid_in_lookup_table(int uid) {
 
 	if (lt)
 		return (obj_data*)(lt->c);
-
-	log("find_obj_by_uid_in_lookup_table : No entity with number %d in lookup table", uid);
+	
+	if (error) {
+		log("find_obj_by_uid_in_lookup_table : No entity with number %d in lookup table", uid);
+	}
+	
 	return NULL;
 }
 
