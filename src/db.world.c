@@ -1072,14 +1072,17 @@ void annual_update_vehicle(vehicle_data *veh) {
 void annual_world_update(void) {
 	void check_ruined_cities();
 	
+	char message[MAX_STRING_LENGTH];
 	vehicle_data *veh, *next_veh;
 	descriptor_data *d;
 	room_data *room, *next_room;
 	
+	snprintf(message, sizeof(message), "\r\n%s\r\n", config_get_string("newyear_message"));
+	
 	// MESSAGE TO ALL
 	for (d = descriptor_list; d; d = d->next) {
 		if (STATE(d) == CON_PLAYING && d->character) {
-			write_to_descriptor(d->descriptor, "\r\nThe ground under you shakes violently!\r\n");
+			write_to_descriptor(d->descriptor, message);
 			d->has_prompt = FALSE;
 			
 			if (!IS_IMMORTAL(d->character)) {

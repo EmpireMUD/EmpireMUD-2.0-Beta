@@ -1608,6 +1608,7 @@ void init_config_system(void) {
 	init_config(CONFIG_GAME, "mud_name", CONFTYPE_SHORT_STRING, "name of your mud");
 	init_config(CONFIG_GAME, "mud_status", CONFTYPE_SHORT_STRING, "one of: Alpha, Closed Beta, Open Beta, Live");
 	init_config(CONFIG_GAME, "mud_website", CONFTYPE_SHORT_STRING, "your mud's website");
+	init_config(CONFIG_GAME, "newyear_message", CONFTYPE_SHORT_STRING, "text shown to players before the laggy 'new year' world update");
 	init_config(CONFIG_GAME, "starting_year", CONFTYPE_INT, "base year");
 	init_config(CONFIG_GAME, "welcome_message", CONFTYPE_SHORT_STRING, "message shown to all players on login");
 	init_config(CONFIG_GAME, "ok_string", CONFTYPE_SHORT_STRING, "simple Ok message");

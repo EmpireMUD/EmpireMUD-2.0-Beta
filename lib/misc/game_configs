@@ -16,6 +16,7 @@ mud_minimum_age
 mud_name EmpireMUD
 mud_status Live
 mud_website
+newyear_message The ground under you shakes violently!
 no_person No-one by that name here.
 ok_string Okay.
 public_logins 0
