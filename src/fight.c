@@ -2869,6 +2869,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	}
 	else if (ch != victim && GET_POS(victim) < POS_SLEEPING && !WOULD_EXECUTE(ch, victim)) {
 		stop_combat_no_autokill(victim);
+		return -1;	// prevents other damage/effects
 		// no need to message here; they already got a pos message
 	}
 	

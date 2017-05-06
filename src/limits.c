@@ -653,12 +653,12 @@ void real_update_char(char_data *ch) {
 			ATTACK_PHYSICAL_DOT
 		));
 		
-		result = damage(ch, ch, dot->damage * dot->stack, type, dot->damage_type);
-		if (result > 0 && (caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by))) {
+		caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by);
+		result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type);
+		if (result > 0 && caster) {
 			took_dot = TRUE;
-			combat_meter_damage_dealt(caster, result);
 		}
-		if (result < 0 || EXTRACTED(ch) || IS_DEAD(ch)) {
+		else if (result < 0 || EXTRACTED(ch) || IS_DEAD(ch)) {
 			return;
 		}
 		
