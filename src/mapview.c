@@ -578,7 +578,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	
 	// coloring for adventures
 	*advcolbuf = '\0';
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY) && (inst = find_instance_by_room(room, FALSE))) {
+	if ((GET_ROOM_TEMPLATE(room) || ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY)) && (inst = find_instance_by_room(room, FALSE))) {
 		level = (inst->level > 0 ? inst->level : get_approximate_level(ch));
 		strcpy(advcolbuf, color_by_difficulty((ch), pick_level_from_range(level, GET_ADV_MIN_LEVEL(inst->adventure), GET_ADV_MAX_LEVEL(inst->adventure))));
 	}
