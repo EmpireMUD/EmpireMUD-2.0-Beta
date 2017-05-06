@@ -2944,7 +2944,7 @@ void death_log(char_data *ch, char_data *killer, int type) {
 */
 void engage_combat(char_data *ch, char_data *vict, bool melee) {
 	// nope
-	if (IS_IMMORTAL(ch) || IS_IMMORTAL(vict) || !can_fight(ch, vict)) {
+	if (!can_fight(ch, vict)) {
 		return;
 	}
 
