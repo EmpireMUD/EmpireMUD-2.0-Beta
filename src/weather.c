@@ -98,7 +98,7 @@ void another_hour(int mode) {
 		}
 		else {	// not day 30
 			// check if we've missed a new year
-			lny = data_get_int(DATA_LAST_NEW_YEAR);
+			lny = data_get_long(DATA_LAST_NEW_YEAR);
 			if (lny && lny + SECS_PER_MUD_YEAR < time(0)) {
 				annual_world_update();
 			}
