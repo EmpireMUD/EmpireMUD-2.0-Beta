@@ -348,6 +348,7 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 	extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
 
 	struct room_direction_data *new;
+	struct exit_template *ex_iter;
 	room_data *to_room = NULL;
 	int iter, dir;
 	
@@ -385,6 +386,7 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 		COMPLEX_DATA(room)->exits = new;
 	}
 	
+	// build the exit
 	new->dir = dir;
 	new->to_room = GET_ROOM_VNUM(to_room);
 	new->room_ptr = to_room;
@@ -394,6 +396,16 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 		free(new->keyword);
 	}
 	new->keyword = exit->keyword ? str_dup(exit->keyword) : NULL;
+	
+	// mark this exit as done to prevent repeats
+	exit->done = TRUE;
+	
+	// check if we need a back exit
+	LL_FOREACH(GET_RMT_EXITS(GET_ROOM_TEMPLATE(to_room)), ex_iter) {
+		if (!ex_iter->done && ex_iter->target_room == ROOM_TEMPLATE_VNUM(room)) {
+			instantiate_one_exit(inst, to_room, ex_iter, rotation);
+		}
+	}
 }
 
 
@@ -484,6 +496,13 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 					COMPLEX_DATA(room_list[pos])->home_room = inst->start;
 				}
 			}
+			
+			// mark exits as non-instantiated
+			LL_FOREACH(GET_RMT_EXITS(rmt), ex) {
+				ex->done = FALSE;
+			}
+			
+			// increment pos
 			++pos;
 		}
 	}
@@ -502,7 +521,7 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (room_list[iter] && template_list[iter]) {
 			for (ex = GET_RMT_EXITS(template_list[iter]); ex; ex = ex->next) {
-				if (ex->dir != DIR_RANDOM) {
+				if (!ex->done && ex->dir != DIR_RANDOM) {
 					instantiate_one_exit(inst, room_list[iter], ex, rotation);
 				}
 			}
@@ -513,7 +532,7 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (room_list[iter] && template_list[iter]) {
 			for (ex = GET_RMT_EXITS(template_list[iter]); ex; ex = ex->next) {
-				if (ex->dir == DIR_RANDOM) {
+				if (!ex->done && ex->dir == DIR_RANDOM) {
 					instantiate_one_exit(inst, room_list[iter], ex, rotation);
 				}
 			}

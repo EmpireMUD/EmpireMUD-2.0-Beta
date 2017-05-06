@@ -2515,6 +2515,9 @@ struct exit_template {
 	sh_int exit_info;	// EX_x
 	rmt_vnum target_room;	// room template to link to
 	
+	// unsaved:
+	bool done;	// used while instantiating rooms
+	
 	struct exit_template *next;
 };
 
