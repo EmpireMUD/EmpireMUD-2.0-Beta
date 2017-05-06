@@ -2868,6 +2868,8 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 		return -1;
 	}
 	else if (ch != victim && GET_POS(victim) < POS_SLEEPING && !WOULD_EXECUTE(ch, victim)) {
+		// SHOULD this also remove DoTs etc? -paul 5/6/2017
+		
 		stop_combat_no_autokill(victim);
 		return -1;	// prevents other damage/effects
 		// no need to message here; they already got a pos message
