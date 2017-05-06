@@ -1117,6 +1117,9 @@ void annual_world_update(void) {
 	
 	// rename islands
 	update_island_names();
+	
+	// store the time now
+	data_set_int(DATA_LAST_NEW_YEAR, time(0));
 }
 
 

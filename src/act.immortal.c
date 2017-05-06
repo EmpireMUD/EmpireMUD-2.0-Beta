@@ -1876,6 +1876,52 @@ SHOW(show_components) {
 }
 
 
+// show data system
+SHOW(show_data) {
+	extern struct stored_data *data_table;
+	extern struct stored_data_type stored_data_info[];
+	
+	char output[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	struct stored_data *data, *next_data;
+	size_t size;
+	
+	size = snprintf(output, sizeof(output), "Stored data:\r\n");
+	
+	HASH_ITER(hh, data_table, data, next_data) {
+		// DATYPE_x:
+		switch (data->keytype) {
+			case DATYPE_INT: {
+				snprintf(line, sizeof(line), " %s: %d\r\n", stored_data_info[data->key].name, data_get_int(data->key));
+				break;
+			}
+			case DATYPE_LONG: {
+				snprintf(line, sizeof(line), " %s: %ld\r\n", stored_data_info[data->key].name, data_get_long(data->key));
+				break;
+			}
+			case DATYPE_DOUBLE: {
+				snprintf(line, sizeof(line), " %s: %f\r\n", stored_data_info[data->key].name, data_get_double(data->key));
+				break;
+			}
+			default: {
+				snprintf(line, sizeof(line), " %s: UNKNOWN\r\n", stored_data_info[data->key].name);
+				break;
+			}
+		}
+		
+		if (size + strlen(line) < sizeof(output)) {
+			strcat(output, line);
+		}
+		else {
+			break;
+		}
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
 SHOW(show_factions) {
 	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH];
 	struct player_faction_data *pfd, *next_pfd;
@@ -6321,6 +6367,7 @@ ACMD(do_reboot) {
 ACMD(do_reload) {
 	extern int file_to_string_alloc(const char *name, char **buf);
 	void index_boot_help();
+	void load_data_table();
 	void load_intro_screens();
 	extern char *credits;
 	extern char *motd;
@@ -6388,6 +6435,9 @@ ACMD(do_reload) {
 		}
 		top_of_helpt = 0;
 		index_boot_help();
+	}
+	else if (!str_cmp(arg, "data")) {
+		load_data_table();
 	}
 	else {
 		send_to_char("Unknown reload option.\r\n", ch);
@@ -6727,6 +6777,7 @@ ACMD(do_show) {
 		{ "uses", LVL_START_IMM, show_uses },
 		{ "factions", LVL_START_IMM, show_factions },
 		{ "dailycycle", LVL_START_IMM, show_dailycycle },
+		{ "data", LVL_CIMPL, show_data },
 
 		// last
 		{ "\n", 0, NULL }

@@ -68,7 +68,6 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 extern char *requirement_string(struct req_data *req, bool show_vnums);
 
 // external vars
-extern int daily_cycle;
 
 // local protos
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
@@ -1427,7 +1426,7 @@ bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *
 	}
 	
 	// make sure daily wasn't already done TODAY
-	if (daily && (completed = has_completed_quest_any(ch, QUEST_VNUM(quest))) && completed->last_completed >= daily_cycle) {
+	if (daily && (completed = has_completed_quest_any(ch, QUEST_VNUM(quest))) && completed->last_completed >= data_get_long(DATA_DAILY_CYCLE)) {
 		ok = FALSE;
 	}
 	

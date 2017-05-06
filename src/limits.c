@@ -39,7 +39,6 @@
 
 // external vars
 extern const char *affect_wear_off_msgs[];
-extern int daily_cycle;
 extern const char *dirs[];
 extern const char *from_dir[];
 extern const struct material_data materials[NUM_MATERIALS];
@@ -710,7 +709,7 @@ void real_update_char(char_data *ch) {
 	}
 
 	// periodic exp and skill gain
-	if (GET_DAILY_CYCLE(ch) < daily_cycle) {
+	if (GET_DAILY_CYCLE(ch) < data_get_long(DATA_DAILY_CYCLE)) {
 		// other stuff that resets daily
 		gain = compute_bonus_exp_per_day(ch);
 		if (GET_DAILY_BONUS_EXPERIENCE(ch) < gain) {
@@ -728,7 +727,7 @@ void real_update_char(char_data *ch) {
 		}
 		
 		// update to this cycle so it only happens once a day
-		GET_DAILY_CYCLE(ch) = daily_cycle;
+		GET_DAILY_CYCLE(ch) = data_get_long(DATA_DAILY_CYCLE);
 	}
 
 	/* Update conditions */
@@ -2195,7 +2194,6 @@ int move_gain(char_data *ch, bool info_only) {
 */
 void point_update(bool run_real) {
 	void clean_offers(char_data *ch);
-	void save_daily_cycle();
 	void setup_daily_quest_cycles(int only_cycle);
 	void update_players_online_stats();
 	extern int max_players_today;
@@ -2205,6 +2203,8 @@ void point_update(bool run_real) {
 	obj_data *obj, *next_obj;
 	char_data *ch, *next_ch;
 	
+	long daily_cycle = data_get_long(DATA_DAILY_CYCLE);
+	
 	// check if the skill cycle must reset (daily)
 	if (time(0) > daily_cycle + SECS_PER_REAL_DAY) {
 		// put this in a while so that it doesn't repeatedly update if the mud is down for more than a day
@@ -2212,7 +2212,7 @@ void point_update(bool run_real) {
 		while (time(0) > daily_cycle + SECS_PER_REAL_DAY) {
 			daily_cycle += SECS_PER_REAL_DAY;
 		}
-		save_daily_cycle();
+		data_set_long(DATA_DAILY_CYCLE, daily_cycle);
 		
 		// reset players seen today too
 		max_players_today = 0;

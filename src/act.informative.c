@@ -677,12 +677,10 @@ void list_char_to_char(char_data *list, char_data *ch) {
 * @param char_data *to The person to show it to.
 */
 void list_lore_to_char(char_data *ch, char_data *to) {
-	extern long load_time();
-
 	struct lore_data *lore;
 	char daystring[MAX_INPUT_LENGTH];
 	struct time_info_data t;
-	long beginning_of_time = load_time();
+	long beginning_of_time = data_get_long(DATA_WORLD_START);
 
 	msg_to_char(to, "%s's lore:\r\n", PERS(ch, ch, 1));
 

@@ -49,6 +49,7 @@
 
 // external vars
 extern struct ban_list_element *ban_list;
+extern bool data_table_needs_save;
 extern int num_invalid;
 extern char **intros;
 extern int num_intros;
@@ -897,6 +898,7 @@ void heartbeat(int heart_pulse) {
 	void run_map_evolutions();
 	void run_mob_echoes();
 	void sanity_check();
+	void save_data_table(bool force);
 	void save_marked_empires();
 	void update_actions();
 	void update_empire_npc_data();
@@ -1063,6 +1065,10 @@ void heartbeat(int heart_pulse) {
 	}
 	
 	if (HEARTBEAT(1)) {
+		if (data_table_needs_save) {
+			save_data_table(FALSE);
+			if (debug_log && HEARTBEAT(15)) { log("debug 26:\t%lld", microtime()); }
+		}
 		save_marked_empires();
 		if (debug_log && HEARTBEAT(15)) { log("debug 27:\t%lld", microtime()); }
 	}
