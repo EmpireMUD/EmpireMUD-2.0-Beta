@@ -1908,7 +1908,7 @@ SHOW(show_data) {
 			}
 		}
 		
-		if (size + strlen(line) < sizeof(output)) {
+		if ((size += strlen(line)) < sizeof(output)) {
 			strcat(output, line);
 		}
 		else {
@@ -1917,7 +1917,7 @@ SHOW(show_data) {
 	}
 	
 	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
+		page_string(ch->desc, output, TRUE);
 	}
 }
 

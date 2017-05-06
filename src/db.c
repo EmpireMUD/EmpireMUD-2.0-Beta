@@ -1779,6 +1779,7 @@ const char *versions_list[] = {
 	"b4.32",
 	"b4.36",
 	"b4.38",
+	"b4.39",
 	"\n"	// be sure the list terminates with \n
 };
 
