@@ -34,12 +34,13 @@ struct stored_data *data_table = NULL;	// key:value for global data
 bool data_table_needs_save = FALSE;	// triggers a save
 
 
-// DATA_x: stored data
+// DATA_x: stored data (in order of const)
 struct stored_data_type stored_data_info[] = {
 	// note: names MUST be all-one-word
 	{ "daily_cycle", DATYPE_LONG },	// DATA_DAILY_CYCLE
 	{ "last_new_year", DATYPE_LONG },	// DATA_LAST_NEW_YEAR
 	{ "world_start", DATYPE_LONG },	// DATA_WORLD_START
+	{ "max_players_today", DATYPE_INT },	// DATA_MAX_PLAYERS_TODAY
 	
 	{ "\n", NOTHING }	// last
 };

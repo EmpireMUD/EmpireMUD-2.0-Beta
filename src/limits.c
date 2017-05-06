@@ -2196,7 +2196,6 @@ void point_update(bool run_real) {
 	void clean_offers(char_data *ch);
 	void setup_daily_quest_cycles(int only_cycle);
 	void update_players_online_stats();
-	extern int max_players_today;
 	
 	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
@@ -2215,7 +2214,7 @@ void point_update(bool run_real) {
 		data_set_long(DATA_DAILY_CYCLE, daily_cycle);
 		
 		// reset players seen today too
-		max_players_today = 0;
+		data_set_int(DATA_MAX_PLAYERS_TODAY, 0);
 		update_players_online_stats();
 		setup_daily_quest_cycles(NOTHING);
 	}

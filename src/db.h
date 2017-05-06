@@ -174,7 +174,8 @@
 #define DATA_DAILY_CYCLE  0	// timestamp of last day-reset (bonus exp, etc)
 #define DATA_LAST_NEW_YEAR  1	// timestamp of last annual world update
 #define DATA_WORLD_START  2	// timestamp of when the mud first started up
-#define NUM_DATAS  3
+#define DATA_MAX_PLAYERS_TODAY  3	// players logged in today
+#define NUM_DATAS  4
 
 
 // DATYPE_x: types of stored data

@@ -53,7 +53,6 @@ time_t last_account_count = 0;	// timestamp of last time accounts were read
 int total_accounts = 0;	// including inactive
 int active_accounts = 0;	// not timed out (at least 1 char)
 int active_accounts_week = 0;	// just this week (at least 1 char)
-int max_players_today = 0;	// stats on max players seen
 int max_players_this_uptime = 0;
 
 
@@ -366,7 +365,7 @@ void update_account_stats(void) {
 */
 void update_players_online_stats(void) {
 	descriptor_data *d;
-	int count;
+	int count, max;
 	
 	// determine current count
 	count = 0;
@@ -383,7 +382,10 @@ void update_players_online_stats(void) {
 		++count;
 	}
 	
-	max_players_today = MAX(max_players_today, count);
+	max = data_get_int(DATA_MAX_PLAYERS_TODAY);
+	if (count > max) {
+		data_set_int(DATA_MAX_PLAYERS_TODAY, count);
+	}
 	max_players_this_uptime = MAX(max_players_this_uptime, count);
 }
 
