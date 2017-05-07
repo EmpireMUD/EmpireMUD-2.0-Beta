@@ -203,7 +203,7 @@ void string_add(descriptor_data *d, char *str) {
 			if ((d->mail_to <= 0) && STATE(d) == CON_PLAYING) {
 				free(*d->str);
 				if (d->str_on_abort) {
-					*d->str = str_on_abort;
+					*d->str = d->str_on_abort;
 					if (d->backstr) {
 						free(d->backstr);
 					}
