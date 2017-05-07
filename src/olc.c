@@ -5190,13 +5190,15 @@ void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_da
 */
 void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 	extern bool check_banner_color_string(char *str);
+	void smart_copy_icons(struct icon_data **addto, struct icon_data *input);
 	extern const char *icon_types[];
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	char lbuf[MAX_INPUT_LENGTH];
-	struct icon_data *icon, *change, *temp;
-	int iter, loc, num;
+	struct icon_data *icon, *change, *temp, *copyfrom;
+	int iter, loc, num, findtype;
+	any_vnum vnum;
 	bool found;
 	
 	half_chop(argument, arg1, arg2);
@@ -5271,6 +5273,58 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 			msg_to_char(ch, "You add %s: %s %s%s&0 %s\r\n", icon_types[loc], show_color_codes(arg3), arg3, arg4, lbuf);
 		}
 	}
+	else if (is_abbrev(arg1, "copy")) {
+		strcpy(buf, arg2);
+		half_chop(buf, arg2, arg3);
+		
+		if (!*arg2 || !*arg3) {
+			msg_to_char(ch, "Usage: icons copy <from type> <from vnum>\r\n");
+		}
+		else if ((findtype = find_olc_type(arg2)) == 0) {
+			msg_to_char(ch, "Unknown olc type '%s'.\r\n", arg2);
+		}
+		else if (!isdigit(*arg3)) {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			msg_to_char(ch, "Copy icons from which %s?\r\n", buf);
+		}
+		else if ((vnum = atoi(arg3)) < 0) {
+			msg_to_char(ch, "Invalid vnum.\r\n");
+		}
+		else {
+			copyfrom = NULL;
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			
+			// OLC_x: copyable icons
+			switch (findtype) {
+				case OLC_CROP: {
+					crop_data *crop;
+					if ((crop = crop_proto(vnum))) {
+						copyfrom = GET_CROP_ICONS(crop);
+					}
+					break;
+				}
+				case OLC_SECTOR: {
+					sector_data *sect;
+					if ((sect = sector_proto(vnum))) {
+						copyfrom = GET_SECT_ICONS(sect);
+					}
+					break;
+				}
+				default: {
+					msg_to_char(ch, "You can't copy icons from %ss.\r\n", buf);
+					return;
+				}
+			}
+			
+			if (!copyfrom) {
+				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, arg3);
+			}
+			else {
+				smart_copy_icons(list, copyfrom);
+				msg_to_char(ch, "Icons copied from %s %d.\r\n", buf, vnum);
+			}
+		}
+	}
 	else if (is_abbrev(arg1, "change")) {
 		half_chop(arg2, num_arg, arg1);
 		half_chop(arg1, type_arg, val_arg);
@@ -5332,6 +5386,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 	}
 	else {
 		msg_to_char(ch, "Usage: icons add <type> <color code> <icon>\r\n");
+		msg_to_char(ch, "Usage: icons copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "Usage: icons change <number> <type | color | icon> <value>\r\n");
 		msg_to_char(ch, "Usage: icons remove <number | all>\r\n");
 		msg_to_char(ch, "Available types:\r\n");
@@ -6520,6 +6575,49 @@ void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **
 		msg_to_char(ch, "Usage: script copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "Usage: script remove <number | all>\r\n");
 	}
+}
+
+
+/**
+* Creates a copy of an icon list.
+*
+* @param struct icon_data **addto A place to smart-copy items to.
+* @param struct icon_data *input A pointer to the start of the list to copy.
+*/
+void smart_copy_icons(struct icon_data **addto, struct icon_data *input) {
+	struct icon_data *icon, *find, *new_icon, *end;
+	bool found;
+	
+	// find end of new list (end may be NULL)
+	if ((end = *addto)) {
+		while (end->next) {
+			end = end->next;
+		}
+	}
+	
+	// copy icons in order
+	LL_FOREACH(input, icon) {
+		// see if an identical icon is in the addto list
+		found = FALSE;
+		for (find = *addto; find && !found; find = find->next) {
+			if (find->type == icon->type && !strcmp(find->color, icon->color) && !strcmp(find->icon, icon->icon)) {
+				found = TRUE;
+			}
+		}
+		
+		// don't duplicate
+		if (found) {
+			continue;
+		}
+		
+		CREATE(new_icon, struct icon_data, 1);
+		*new_icon = *icon;
+		new_icon->next = NULL;
+		
+		LL_APPEND(*addto, new_icon);
+	}
+	
+	sort_icon_set(addto);
 }
 
 
