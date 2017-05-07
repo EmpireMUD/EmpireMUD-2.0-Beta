@@ -171,6 +171,7 @@ extern bool run_room_interactions(char_data *ch, room_data *room, int type, INTE
 // lore handlers
 void add_lore(char_data *ch, int type, const char *str, ...) __attribute__((format(printf, 3, 4)));
 void remove_lore(char_data *ch, int type);
+void remove_recent_lore(char_data *ch, int type);
 
 // mob tagging handlers
 extern bool find_id_in_tag_list(int id, struct mob_tag *list);

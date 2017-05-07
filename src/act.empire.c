@@ -3785,6 +3785,8 @@ ACMD(do_enroll) {
 		remove_lore(targ, LORE_PROMOTED);
 		add_lore(targ, LORE_JOIN_EMPIRE, "Honorably accepted into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 		
+		SAVE_CHAR(targ);
+		
 		// TODO split this out into a "merge empires" func
 
 		// move data over
@@ -3804,6 +3806,7 @@ ACMD(do_enroll) {
 					if (IN_ROOM(victim)) {
 						msg_to_char(victim, "Your empire has merged with %s.\r\n", EMPIRE_NAME(e));
 					}
+					remove_lore(victim, LORE_PROMOTED);
 					add_lore(victim, LORE_JOIN_EMPIRE, "Empire merged into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 					GET_LOYALTY(victim) = e;
 					GET_RANK(victim) = 1;
@@ -3811,6 +3814,7 @@ ACMD(do_enroll) {
 					SAVE_CHAR(victim);
 				}
 				else if ((victim = find_or_load_player(index->name, &sub_file))) {
+					remove_lore(victim, LORE_PROMOTED);
 					add_lore(victim, LORE_JOIN_EMPIRE, "Empire merged into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 					GET_LOYALTY(victim) = e;
 					GET_RANK(victim) = 1;
@@ -4195,6 +4199,7 @@ ACMD(do_expel) {
 		msg_to_char(targ, "You have been expelled from the empire.\r\n");
 		
 		remove_lore(targ, LORE_PROMOTED);
+		remove_lore(targ, LORE_JOIN_EMPIRE);
 		add_lore(targ, LORE_KICKED_EMPIRE, "Dishonorably discharged from %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 
 		// save now
@@ -4927,7 +4932,7 @@ ACMD(do_promote) {
 		msg_to_char(ch, "You can't promote someone to that level.\r\n");
 	else {
 		GET_RANK(victim) = to_rank;
-		remove_lore(victim, LORE_PROMOTED);	// only save most recent
+		remove_recent_lore(victim, LORE_PROMOTED);	// only save most recent
 		add_lore(victim, LORE_PROMOTED, "Promoted to %s&0", EMPIRE_RANK(e, to_rank-1));
 
 		log_to_empire(e, ELOG_MEMBERS, "%s has been promoted to %s%s!", PERS(victim, victim, 1), EMPIRE_RANK(e, to_rank-1), EMPIRE_BANNER(e));

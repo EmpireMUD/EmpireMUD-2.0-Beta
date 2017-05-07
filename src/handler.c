@@ -3467,6 +3467,37 @@ void remove_lore(char_data *ch, int type) {
 }
 
 
+/**
+* Remove lore of a given type if it was recent, but leaves older copies. This
+* prevents spammy lore but keeps good historical data. The cutoff is 1 mud
+* year.
+*
+* @param char_data *ch The person whose lore to remove
+* @param int type The LORE_x type to remove
+*/
+void remove_recent_lore(char_data *ch, int type) {
+	struct lore_data *lore, *next_lore;
+
+	if (IS_NPC(ch))
+		return;
+	
+	// need the old lore, in case the player is offline
+	check_delayed_load(ch);
+
+	LL_FOREACH_SAFE(GET_LORE(ch), lore, next_lore) {
+		if (lore->type != type) {
+			continue;
+		}
+		if (lore->date + SECS_PER_MUD_YEAR < time(0)) {
+			continue;
+		}
+			
+		
+		remove_lore_record(ch, lore);
+	}
+}
+
+
 /* Remove specific lore */
 void remove_lore_record(char_data *ch, struct lore_data *lore) {
 	struct lore_data *temp;

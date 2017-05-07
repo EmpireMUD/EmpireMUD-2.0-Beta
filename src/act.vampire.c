@@ -251,7 +251,10 @@ void make_vampire(char_data *ch, bool lore) {
 		}
 
 		GET_BLOOD(ch) = 30;
-	
+
+		remove_lore(ch, LORE_START_VAMPIRE);
+		remove_lore(ch, LORE_SIRE_VAMPIRE);
+		remove_lore(ch, LORE_PURIFY);
 		if (lore) {
 			add_lore(ch, LORE_START_VAMPIRE, "Sired");
 		}
@@ -294,6 +297,9 @@ void sire_char(char_data *ch, char_data *victim) {
 		msg_to_char(victim, "You sit up quickly, nearly knocking over your sire!\r\n");
 		act("$n sits up quickly!", FALSE, victim, 0, 0, TO_ROOM);
 
+		remove_lore(victim, LORE_SIRE_VAMPIRE);
+		remove_lore(victim, LORE_PURIFY);
+		remove_lore(victim, LORE_START_VAMPIRE);
 		add_lore(victim, LORE_SIRE_VAMPIRE, "Sired by %s", PERS(ch, ch, TRUE));
 		add_lore(ch, LORE_MAKE_VAMPIRE, "Sired %s", PERS(victim, victim, TRUE));
 
