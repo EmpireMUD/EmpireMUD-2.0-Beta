@@ -744,7 +744,7 @@ ACMD(do_slash_channel) {
 	struct slash_channel *chan;
 	struct channel_history_data *hist;
 	struct player_slash_channel *slash, *temp;
-	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	descriptor_data *desc;
 	char_data *vict;
 	int iter;
@@ -841,7 +841,8 @@ ACMD(do_slash_channel) {
 			slash_channel_list = chan;
 			chan->id = ++top_slash_channel_id;
 			chan->name = str_dup(arg3);
-			chan->lc_name = str_dup(strtolower(arg3));
+			strcpy(buf, arg3);
+			chan->lc_name = str_dup(strtolower(buf));
 			chan->color = compute_slash_channel_color(arg3);
 		}
 		
