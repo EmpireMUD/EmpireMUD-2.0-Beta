@@ -2178,18 +2178,34 @@ ACMD(do_help) {
 
 ACMD(do_helpsearch) {	
 	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
-	int iter;
-	bool found;
-	size_t size;
-	
-	delete_doubledollar(argument);
-	one_word(argument, arg);	// this removes leading filler words, which are going to show up in a lot of helps
+	char **words = NULL;
+	int iter, wrd;
+	bool found, fail;
+	size_t size, word_size;
 	
 	if (!ch->desc) {
 		// don't bother
 		return;
 	}
-	else if (!*arg) {
+	
+	delete_doubledollar(argument);
+	word_size = 0;
+	
+	// put all the arguments into an array
+	while (*argument) {
+		argument = one_word(argument, arg);	// this removes leading filler words, which are going to show up in a lot of helps
+		
+		if (word_size > 0) {
+			RECREATE(words, char*, word_size + 1);
+		}
+		else {
+			CREATE(words, char*, word_size + 1);
+		}
+		
+		words[word_size++] = str_dup(arg);
+	}
+	
+	if (!word_size) {
 		msg_to_char(ch, "Search for help about what?\r\n");
 	}
 	else if (!help_table) {
@@ -2200,18 +2216,36 @@ ACMD(do_helpsearch) {
 		found = FALSE;
 		
 		for (iter = 0; iter <= top_of_helpt; ++iter) {
-			if (GET_ACCESS_LEVEL(ch) >= help_table[iter].level && (!help_table[iter].duplicate && str_str(help_table[iter].entry, arg))) {
-				snprintf(line, sizeof(line), " %s\r\n", help_table[iter].keyword);
-				found = TRUE;
-				
-				if (size + strlen(line) < sizeof(output)) {
-					strcat(output, line);
-					size += strlen(line);
-				}
-				else {
-					size += snprintf(output + size, sizeof(output) - size, "... and more\r\n");
+			if (GET_ACCESS_LEVEL(ch) < help_table[iter].level) {
+				continue;
+			}
+			if (help_table[iter].duplicate) {
+				continue;
+			}
+			
+			// see if it matches all words
+			fail = FALSE;
+			for (wrd = 0; wrd < word_size; ++wrd) {
+				if (!str_str(help_table[iter].entry, words[wrd])) {
+					fail = TRUE;
 					break;
 				}
+			}
+			if (fail) {
+				continue;
+			}
+			
+			// FOUND!
+			found = TRUE;
+			snprintf(line, sizeof(line), " %s\r\n", help_table[iter].keyword);
+			
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+			}
+			else {
+				size += snprintf(output + size, sizeof(output) - size, "... and more\r\n");
+				break;
 			}
 		}
 		
@@ -2222,6 +2256,16 @@ ACMD(do_helpsearch) {
 			// send it out
 			page_string(ch->desc, output, TRUE);
 		}
+	}
+	
+	// free data
+	for (wrd = 0; wrd < word_size; ++wrd) {
+		if (words[wrd]) {
+			free(words[wrd]);
+		}
+	}
+	if (words) {
+		free(words);
 	}
 }
 
