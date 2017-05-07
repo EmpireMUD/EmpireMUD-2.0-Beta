@@ -804,10 +804,11 @@ See also: COMMANDS, HELPSEARCH, SOCIALS
 #
 HELPSEARCH "HELP SEARCH" "SEARCH HELP"
 
-Usage:  helpsearch <term>
+Usage:  helpsearch <term(s)>
 
 This command lets you search the body of help files, instead of just their
-keywords.
+keywords. You can search for multiple words at a time. If a single search
+term has multiple word, put it "in quotes".
 
 See also: HELP
 #
