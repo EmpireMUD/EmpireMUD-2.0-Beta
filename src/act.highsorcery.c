@@ -1809,14 +1809,19 @@ RITUAL_FINISH_FUNC(perform_ritual_of_defense) {
 
 RITUAL_FINISH_FUNC(perform_sense_life_ritual) {
 	char_data *targ;
-	bool found;
+	bool found, earthmeld;
 	
 	msg_to_char(ch, "You finish the ritual and your eyes are opened...\r\n");
 	act("$n finishes the ritual and $s eyes flash a bright white.", FALSE, ch, NULL, NULL, TO_ROOM);
 	
-	found = FALSE;
+	found = earthmeld = FALSE;
 	for (targ = ROOM_PEOPLE(IN_ROOM(ch)); targ; targ = targ->next_in_room) {
-		if (ch != targ && AFF_FLAGGED(targ, AFF_HIDE)) {
+		if (targ == ch) {
+			continue;
+		}
+		
+		if (AFF_FLAGGED(targ, AFF_HIDE)) {
+			// hidden target
 			SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
 
 			if (CAN_SEE(ch, targ)) {
@@ -1828,6 +1833,13 @@ RITUAL_FINISH_FUNC(perform_sense_life_ritual) {
 			}
 
 			REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
+		}
+		else if (!earthmeld && AFF_FLAGGED(targ, AFF_EARTHMELD)) {
+			// earthmelded targets (only do once)
+			if (skill_check(ch, ABIL_SEARCH, DIFF_HARD) && CAN_SEE(ch, targ)) {
+				act("You sense someone earthmelded here.", FALSE, ch, NULL, NULL, TO_CHAR);
+				found = earthmeld = TRUE;
+			}
 		}
 	}
 	
