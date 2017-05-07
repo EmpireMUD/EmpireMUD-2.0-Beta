@@ -177,7 +177,7 @@ struct custom_message *pick_custom_longdesc(char_data *ch) {
 			if (ocm->type == OBJ_CUSTOM_LONGDESC_FEMALE && GET_SEX(ch) != SEX_FEMALE) {
 				continue;
 			}
-			if (ocm->type == OBJ_CUSTOM_LONGDESC_MALE && GET_SEX(ch) != SEX_MALE) {
+			if (ocm->type == OBJ_CUSTOM_LONGDESC_MALE && GET_SEX(ch) != SEX_MALE && GET_SEX(ch) != SEX_NEUTRAL) {
 				continue;
 			}
 			
