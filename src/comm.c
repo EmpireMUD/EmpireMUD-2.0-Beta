@@ -1657,6 +1657,7 @@ void close_socket(descriptor_data *d) {
 	if (d->backstr) {
 		free(d->backstr);
 	}
+	// do NOT free d->str_on_abort (is a pointer to something else)
 	
 	// other strings
 	if (d->host) {

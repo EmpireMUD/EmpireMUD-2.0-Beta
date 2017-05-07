@@ -2955,6 +2955,7 @@ struct descriptor_data {
 	
 	char **str;	// for the modify-str system
 	char *backstr;	// for the modify-str aborts
+	char *str_on_abort;	// a pointer to restore if the player aborts the editor
 	char *file_storage;	// name of where to save a file
 	bool straight_to_editor;	// if true, commands go straight to the string editor
 	size_t max_str;	// max length of editor

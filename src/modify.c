@@ -109,6 +109,7 @@ void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_
 	
 	d->str = writeto;
 	d->max_str = max_len;
+	d->str_on_abort = NULL;
 
 	if (*writeto) {
 		d->backstr = str_dup(*writeto);
@@ -201,9 +202,18 @@ void string_add(descriptor_data *d, char *str) {
 			// only if not mailing/board-writing
 			if ((d->mail_to <= 0) && STATE(d) == CON_PLAYING) {
 				free(*d->str);
-				*d->str = d->backstr;
+				if (d->str_on_abort) {
+					*d->str = str_on_abort;
+					if (d->backstr) {
+						free(d->backstr);
+					}
+				}
+				else {
+					*d->str = d->backstr;
+				}
 				d->backstr = NULL;
 				d->str = NULL;
+				d->str_on_abort = NULL;
 			}
 			break;
 		case STRINGADD_SAVE:
@@ -219,6 +229,7 @@ void string_add(descriptor_data *d, char *str) {
 			if (d->backstr)
 				free(d->backstr);
 			d->backstr = NULL;
+			d->str_on_abort = NULL;
 			break;
 	}
 

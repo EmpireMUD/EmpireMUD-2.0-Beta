@@ -774,6 +774,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 				// has proto's desc
 				VEH_LOOK_DESC(veh) = VEH_LOOK_DESC(proto) ? str_dup(VEH_LOOK_DESC(proto)) : NULL;
 				start_string_editor(ch->desc, "vehicle description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
+				d->str_on_abort = VEH_LOOK_DESC(proto);
 			}
 			
 			act("$n begins editing a vehicle description.", TRUE, ch, 0, 0, TO_ROOM);
