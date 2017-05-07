@@ -589,6 +589,10 @@ You can see chat history for various channels with the following commands:
 
 Immortals also have:
   GHISTORY - godnet, wiznet
+
+Your chat history only contains messages that you were connected and in-game
+for. History messages last for up to 24 hours, but only the last 20 messages
+are stored.
 #
 HOSTILE ROGUE THIEF
 

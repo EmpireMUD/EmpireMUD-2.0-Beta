@@ -2950,6 +2950,35 @@ void check_skills_and_abilities(char_data *ch) {
 
 
 /**
+* Deletes chat messages that are more than 24 hours old.
+*
+* @param char_data *ch The person whose history to clean.
+*/
+void clean_old_history(char_data *ch) {
+	struct channel_history_data *hist, *next_hist;
+	long now = time(0);
+	int iter;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
+		LL_FOREACH_SAFE(GET_HISTORY(ch, iter), hist, next_hist) {
+			if (hist->timestamp + (60 * 60 * 24) < now) {
+				// 24 hours old
+				if (hist->message) {
+					free(hist->message);
+				}
+				LL_DELETE(GET_HISTORY(ch, iter), hist);
+				free(hist);
+			}
+		}
+	}
+}
+
+
+/**
 * Clears certain player data, similar to clear_char() -- but not for NPCS.
 *
 * @param char_data *ch The player charater to clear.
@@ -3114,6 +3143,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 
 	reset_char(ch);
 	check_delayed_load(ch);	// ensure everything is loaded
+	clean_old_history(ch);
 	reset_combat_meters(ch);
 	GET_COMBAT_METERS(ch).over = TRUE;	// ensure no active meter
 	
