@@ -953,7 +953,7 @@ Usage:  worm <direction>
 
 Particularly powerful nature mages can move while earthmelded, worming their
 way through the ground. You cannot worm through water tiles, and you cannot
-emerge in buildings.
+emerge in buildings (except open-air buildings).
 
 Gains experience as you move around underground.
 
