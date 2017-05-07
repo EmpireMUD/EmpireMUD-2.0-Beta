@@ -802,10 +802,10 @@ ACMD(do_disguise) {
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (!IS_NPC(vict)) {
+	else if (!IS_NPC(vict) && !IS_DISGUISED(vict)) {
 		msg_to_char(ch, "You can only disguise yourself as an NPC.\r\n");
 	}
-	else if (!MOB_FLAGGED(vict, MOB_HUMAN)) {
+	else if (IS_NPC(vict) && !MOB_FLAGGED(vict, MOB_HUMAN)) {
 		act("You can't disguise yourself as $N!", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_DISGUISE)) {
