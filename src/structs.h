@@ -2402,6 +2402,7 @@ struct skill_ability {
 struct slash_channel {
 	int id;
 	char *name;
+	char *lc_name;	// lowercase name (for speed)
 	char color;
 	struct slash_channel *next;
 };
@@ -3080,8 +3081,15 @@ struct player_skill_data {
 // channels a player is on
 struct player_slash_channel {
 	int id;
-	struct channel_history_data *history;
 	struct player_slash_channel *next;
+};
+
+
+// channel histories
+struct player_slash_history {
+	char *channel;	// lowercase channel name
+	struct channel_history_data *history;
+	UT_hash_handle hh;	// hashed by channe;
 };
 
 
@@ -3143,6 +3151,7 @@ struct player_special_data {
 	struct alias_data *aliases;	// Character's aliases
 	struct offer_data *offers;	// various offers for do_accept/reject
 	struct player_slash_channel *slash_channels;	// channels the player is on
+	struct player_slash_history *slash_history;	// slash-channel histories
 	struct slash_channel *load_slash_channels;	// temporary storage between load and join
 	struct player_faction_data *factions;	// hash table of factions
 	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// histories

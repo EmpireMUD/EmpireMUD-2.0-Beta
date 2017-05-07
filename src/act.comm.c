@@ -97,6 +97,31 @@ void add_to_channel_history(char_data *ch, int type, char *message) {
 
 
 /**
+* Adds a message to a player's /history for a channel.
+*
+* @param char_data *ch The player.
+* @param struct slash_channel *chan The channel.
+* @param char *message The message to add.
+*/
+void add_to_slash_channel_history(char_data *ch, struct slash_channel *chan, char *message) {
+	struct player_slash_history *psh;
+	
+	if (!ch || IS_NPC(ch) || !chan || !message || !*message) {
+		return;	// don't bother
+	}
+	
+	HASH_FIND_STR(GET_SLASH_HISTORY(ch), chan->lc_name, psh);
+	if (!psh) {
+		CREATE(psh, struct player_slash_history, 1);
+		psh->channel = str_dup(chan->lc_name);
+		HASH_ADD_STR(GET_SLASH_HISTORY(ch), channel, psh);
+	}
+	
+	process_add_to_channel_history(&(psh->history), message);
+}
+
+
+/**
 * @param char_data *ch The player to check.
 * @param char_data *victim The person talking (potentially ignored by ch).
 * @return bool TRUE if ch is ignoring victim
@@ -685,8 +710,8 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 		}
 		act(lbuf, FALSE, ch, 0, 0, TO_CHAR | TO_SLEEP);
 		
-		if (ch->desc && ch->desc->last_act_message && (slash = find_on_slash_channel(ch, chan->id))) {
-			process_add_to_channel_history(&(slash->history), ch->desc->last_act_message);
+		if (ch->desc && ch->desc->last_act_message) {
+			add_to_slash_channel_history(ch, chan, ch->desc->last_act_message);
 		}
 	}
 
@@ -708,7 +733,7 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 		
 			// the message was sent via act(), we can retrieve it from the desc
 			if (desc->last_act_message) {
-				process_add_to_channel_history(&(slash->history), desc->last_act_message);
+				add_to_slash_channel_history(vict, chan, desc->last_act_message);
 			}
 		}
 	}
@@ -816,6 +841,7 @@ ACMD(do_slash_channel) {
 			slash_channel_list = chan;
 			chan->id = ++top_slash_channel_id;
 			chan->name = str_dup(arg3);
+			chan->lc_name = str_dup(strtolower(arg3));
 			chan->color = compute_slash_channel_color(arg3);
 		}
 		
@@ -857,15 +883,6 @@ ACMD(do_slash_channel) {
 			
 			while ((slash = find_on_slash_channel(ch, chan->id))) {
 				REMOVE_FROM_LIST(slash, GET_SLASH_CHANNELS(ch), next);
-				
-				while ((hist = slash->history)) {
-					if (hist->message) {
-						free(hist->message);
-					}
-					slash->history = hist->next;
-					free(hist);
-				}
-				
 				free(slash);
 			}
 			
@@ -907,14 +924,19 @@ ACMD(do_slash_channel) {
 			msg_to_char(ch, "You're not even on that channel.\r\n");
 		}
 		else {
-			msg_to_char(ch, "Last %d messages on \t%c/%s\tn:\r\n", MAX_RECENT_CHANNELS, chan->color, chan->name);
-	
-			for (hist = slash->history; hist; hist = hist->next) {
-				send_to_char(hist->message, ch);
+			struct player_slash_history *psh;
 			
-				// check for newline
-				if (hist->message[strlen(hist->message) - 1] != '\n') {
-					send_to_char("\r\n", ch);
+			msg_to_char(ch, "Last %d messages on \t%c/%s\tn:\r\n", MAX_RECENT_CHANNELS, chan->color, chan->name);
+			
+			HASH_FIND_STR(GET_SLASH_HISTORY(ch), chan->lc_name, psh);
+			if (psh) {
+				LL_FOREACH(psh->history, hist) {
+					send_to_char(hist->message, ch);
+			
+					// check for newline
+					if (hist->message[strlen(hist->message) - 1] != '\n') {
+						send_to_char("\r\n", ch);
+					}
 				}
 			}
 		}
