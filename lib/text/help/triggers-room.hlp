@@ -138,6 +138,7 @@ When using field - The variable returns:
 &caff_flagged(AFF)&0 - True if the room has an affect flag on it.
 &cbld_dir(dir)&0 - Rotates the given direction based on which way the building
    is facing (compared to North). Returns the same dir if no building.
+&cbld_flagged(AFF)&0 - True if the room has a building flag on it.
 &cbuilding&0 - The name of the building on the room, if any.
 &ccomplete&0 - True if the room/building is complete (finished building).
 &ccontents&0 - The id of the first obj in the room.
@@ -160,6 +161,7 @@ When using field - The variable returns:
 &cin_vehicle&0 - The vehicle the room is inside of, if any.
 &cname&0 - The name of the room.
 &cpeople&0 - The id of the first character in the room, or an empty return.
+&crmt_flagged(AFF)&0 - True if the room has a room template flag on it.
 &csector&0 - The sector type of the room.
 &ctemplate&0 - The room template vnum, if any.
 &cvehicles&0 - The id of the first vehicle in the room, if any
@@ -167,7 +169,7 @@ When using field - The variable returns:
 &cvnum&0 - The room's vnum.
 &cweather&0 - current weather: sunny, cloudy, rainy, or lightning
 
-See also: EMPIRE VARS, REDIT AFFECTS
+See also: EMPIRE VARS, REDIT AFFECTS, REDIT FLAGS, BEDIT FLAGS
 #d
 "ZONE RESET TRIGGER" "RTRIG ZONE RESET" TRIGEDIT-ROOM-ZONE-RESET TRIGEDIT-ROOM-ZRESET TRIGEDIT-ROOM-LOAD
 

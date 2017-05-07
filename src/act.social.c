@@ -28,7 +28,7 @@
 */
 
 // external funcs
-void add_to_channel_history(descriptor_data *desc, int type, char *message);
+void add_to_channel_history(char_data *ch, int type, char *message);
 void clear_last_act_message(descriptor_data *desc);
 extern bool validate_social_requirements(char_data *ch, social_data *soc);
 
@@ -133,7 +133,6 @@ social_data *find_social(char_data *ch, char *name, bool exact) {
 */
 void perform_social(char_data *ch, social_data *soc, char *argument) {
 	void clear_last_act_message(descriptor_data *desc);
-	void add_to_channel_history(descriptor_data *desc, int type, char *message);
 	
 	char buf[MAX_INPUT_LENGTH], hbuf[MAX_INPUT_LENGTH];
 	char_data *vict, *c;
@@ -165,7 +164,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 		sprintf(hbuf, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0', NULLSAFE(SOC_MESSAGE(soc, SOCM_NO_ARG_TO_CHAR)));
 		msg_to_char(ch, hbuf);
 		if (ch->desc) {
-			add_to_channel_history(ch->desc, CHANNEL_HISTORY_SAY, hbuf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, hbuf);
 		}
 		
 		act(NULLSAFE(SOC_MESSAGE(soc, SOCM_NO_ARG_TO_OTHERS)), SOC_HIDDEN(soc), ch, FALSE, FALSE, TO_ROOM | TO_NOT_IGNORING);
@@ -179,7 +178,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 			if (c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
 				sprintf(hbuf, "&%c%s", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
-				add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, hbuf);
 			}
 			if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 				// terminate color just in case
@@ -193,7 +192,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 		sprintf(hbuf, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0', NULLSAFE(SOC_MESSAGE(soc, SOCM_TARGETED_NOT_FOUND)));
 		msg_to_char(ch, hbuf);
 		if (ch->desc) {
-			add_to_channel_history(ch->desc, CHANNEL_HISTORY_SAY, hbuf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, hbuf);
 		}
 	}
 	else if (vict == ch) {
@@ -206,7 +205,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 		sprintf(hbuf, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0', NULLSAFE(SOC_MESSAGE(soc, SOCM_SELF_TO_CHAR)));
 		msg_to_char(ch, hbuf);
 		if (ch->desc) {
-			add_to_channel_history(ch->desc, CHANNEL_HISTORY_SAY, hbuf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, hbuf);
 		}
 		
 		act(NULLSAFE(SOC_MESSAGE(soc, SOCM_SELF_TO_OTHERS)), SOC_HIDDEN(soc), ch, NULL, NULL, TO_ROOM | TO_NOT_IGNORING);
@@ -220,7 +219,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 			if (c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
 				sprintf(hbuf, "&%c%s", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
-				add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, hbuf);
 			}
 			if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 				// terminate color just in case
@@ -269,7 +268,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 				if (c->desc->last_act_message) {
 					// the message was sent via act(), we can retrieve it from the desc
 					sprintf(hbuf, "&%c%s", (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE) : '0', c->desc->last_act_message);
-					add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
+					add_to_channel_history(c, CHANNEL_HISTORY_SAY, hbuf);
 				}
 				if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 					// terminate color just in case
@@ -360,7 +359,7 @@ ACMD(do_point) {
 		sprintf(buf, "\t%cYou point %s.\t0\r\n", color, dirs[get_direction_for_char(ch, dir)]);
 		send_to_char(buf, ch);
 		if (ch->desc) {
-			add_to_channel_history(ch->desc, CHANNEL_HISTORY_SAY, buf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, buf);
 		}
 		
 		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = next_vict) {
@@ -377,7 +376,7 @@ ACMD(do_point) {
 				
 				// channel history
 				if (vict->desc && vict->desc->last_act_message) {
-					add_to_channel_history(vict->desc, CHANNEL_HISTORY_SAY, vict->desc->last_act_message);
+					add_to_channel_history(vict, CHANNEL_HISTORY_SAY, vict->desc->last_act_message);
 				}
 			}
 		}

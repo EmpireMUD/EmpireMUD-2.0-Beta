@@ -2865,6 +2865,7 @@ struct account_player {
 // used in descriptor for personal channel histories -- act.comm.c
 struct channel_history_data {
 	char *message;
+	long timestamp;
 	struct channel_history_data *next;
 };
 
@@ -2981,7 +2982,6 @@ struct descriptor_data {
 	descriptor_data *snoop_by;	// And who is snooping this char
 
 	char *last_act_message;	// stores the last thing act() sent to this desc
-	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// histories
 	
 	// olc
 	int olc_type;	// OLC_OBJECT, etc -- only when an editor is open
@@ -3145,6 +3145,7 @@ struct player_special_data {
 	struct player_slash_channel *slash_channels;	// channels the player is on
 	struct slash_channel *load_slash_channels;	// temporary storage between load and join
 	struct player_faction_data *factions;	// hash table of factions
+	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// histories
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered

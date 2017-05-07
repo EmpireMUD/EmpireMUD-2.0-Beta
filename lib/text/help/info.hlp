@@ -579,6 +579,17 @@ If you're knocked out with 0 health, you will die without assistance.
 
 See also: CLASS, DEATH, ENDURANCE
 #
+HISTORY "CHANNEL HISTORY" "CHAT HISTORY"
+
+You can see chat history for various channels with the following commands:
+  SAYHISTORY - say, oocsay, gsay, emote, socials
+  TELLHISTORY - tells and replies
+  EHISTORY - etalk
+  /HISTORY <channel> - slash-channels
+
+Immortals also have:
+  GHISTORY - godnet, wiznet
+#
 HOSTILE ROGUE THIEF
 
 If you commit certain hostile or stealth acts, you may be flagged as 'hostile'.
@@ -985,7 +996,7 @@ blacksmith at a forge.
 
 See also: DIG, EXCAVATE, FORGE
 #
-"SLASH CHANNELS" SLASH-CHANNELS SLASHCHANNELS / /JOIN /CHECK /LEAVE /WHO /HISTORY HISTORY VC "VIRTUAL CHANNELS"
+"SLASH CHANNELS" SLASH-CHANNELS SLASHCHANNELS / /JOIN /CHECK /LEAVE /WHO /HISTORY VC "VIRTUAL CHANNELS"
 
 Usage:  /join <channel>
         /leave <channel>

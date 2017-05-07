@@ -4004,7 +4004,7 @@ ACMD(do_enroll) {
 
 ACMD(do_esay) {
 	void clear_last_act_message(descriptor_data *desc);
-	void add_to_channel_history(descriptor_data *desc, int type, char *message);
+	void add_to_channel_history(char_data *ch, int type, char *message);
 	extern bool is_ignoring(char_data *ch, char_data *victim);
 	
 	descriptor_data *d;
@@ -4103,7 +4103,7 @@ ACMD(do_esay) {
 		if (ch->desc && ch->desc->last_act_message) {
 			// the message was sent via act(), we can retrieve it from the desc
 			sprintf(lbuf, "%s", ch->desc->last_act_message);
-			add_to_channel_history(ch->desc, CHANNEL_HISTORY_EMPIRE, lbuf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_EMPIRE, lbuf);
 		}
 	}
 
@@ -4121,7 +4121,7 @@ ACMD(do_esay) {
 			if (d->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
 				sprintf(lbuf, "%s", d->last_act_message);
-				add_to_channel_history(d, CHANNEL_HISTORY_EMPIRE, lbuf);
+				add_to_channel_history(tch, CHANNEL_HISTORY_EMPIRE, lbuf);
 			}	
 		}
 	}

@@ -1468,7 +1468,7 @@ SAYHISTORY
 Usage:  sayhistory
 
 This command shows you the last 20 messages you saw from players in the room
-with you. It includes says, emotes, and socials.
+with you. It includes says, emotes, and socials, as well as group messages.
 
 See also: TELLHISTORY
 #

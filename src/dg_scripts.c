@@ -3958,6 +3958,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "bld_flagged")) {
+						extern const char *bld_flags[];
+						
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, bld_flags, FALSE);
+							if (pos != NOTHING) {
+								snprintf(str, slen, "%d", ROOM_BLD_FLAGGED(r, BIT(pos)) ? 1 : 0);
+							}
+							else {
+								snprintf(str, slen, "0");
+							}
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
 					else if (!str_cmp(field, "building")) {
 						if (GET_BUILDING(r)) {
 							snprintf(str, slen, "%s", GET_BLD_NAME(GET_BUILDING(r)));
@@ -4151,6 +4167,25 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "port")) {
 						direction_vars(r, PORT, subfield, str, slen);
+					}
+					break;
+				}
+				case 'r': {	// room.r*
+					if (!str_cmp(field, "rmt_flagged")) {
+						extern const char *room_template_flags[];
+						
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, room_template_flags, FALSE);
+							if (pos != NOTHING) {
+								snprintf(str, slen, "%d", RMT_FLAGGED(r, BIT(pos)) ? 1 : 0);
+							}
+							else {
+								snprintf(str, slen, "0");
+							}
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
 					}
 					break;
 				}

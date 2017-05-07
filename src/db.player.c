@@ -846,7 +846,18 @@ void free_char(char_data *ch) {
 			}
 			free(loadslash);
 		}
-	
+		
+		// free channel histories
+		for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
+			while ((history = GET_HISTORY(ch, iter))) {
+				GET_HISTORY(ch, iter) = history->next;
+				if (history->message) {
+					free(history->message);
+				}
+				free(history);
+			}
+		}
+		
 		while ((a = GET_ALIASES(ch)) != NULL) {
 			GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
 			free_alias(a);
@@ -1426,6 +1437,16 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 			case 'H': {
 				if (PFILE_TAG(line, "Highest Known Level:", length)) {
 					GET_HIGHEST_KNOWN_LEVEL(ch) = atoi(line + length + 1);
+				}
+				else if (PFILE_TAG(line, "History:", length)) {
+					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in[1]);
+					if (i_in[0] >= 0 && i_in[0] < NUM_CHANNEL_HISTORY_TYPES) {
+						struct channel_history_data *hist;
+						CREATE(hist, struct channel_history_data, 1);
+						hist->timestamp = l_in[1];
+						hist->message = fread_string(fl, error);
+						LL_APPEND(GET_HISTORY(ch, i_in[0]), hist);
+					}
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -2440,6 +2461,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	
 	struct player_completed_quest *plrcom, *next_plrcom;
 	struct player_faction_data *pfd, *next_pfd;
+	struct channel_history_data *hist;
 	struct trig_var_data *vars;
 	struct player_quest *plrq;
 	struct alias_data *alias;
@@ -2473,6 +2495,13 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	// 'F'
 	HASH_ITER(hh, GET_FACTIONS(ch), pfd, next_pfd) {
 		fprintf(fl, "Faction: %d %d\n", pfd->vnum, pfd->value);
+	}
+	
+	// 'H'
+	for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
+		LL_FOREACH(GET_HISTORY(ch, iter), hist) {
+			fprintf(fl, "History: %d %ld\n%s~\n", iter, hist->timestamp, NULLSAFE(hist->message));
+		}
 	}
 	
 	// 'L'
