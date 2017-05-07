@@ -116,12 +116,41 @@ bool audit_social(social_data *soc, char_data *ch) {
 		olc_audit_msg(ch, SOC_VNUM(soc), "No name set");
 		problem = TRUE;
 	}
-	// TODO: ensure name is one word
+	if (!SOC_COMMAND(soc) || !*SOC_COMMAND(soc) || !str_cmp(SOC_COMMAND(soc), default_social_command)) {
+		olc_audit_msg(ch, SOC_VNUM(soc), "No command set");
+		problem = TRUE;
+	}
+	if (strchr(SOC_COMMAND(soc), ' ')) {
+		olc_audit_msg(ch, SOC_VNUM(soc), "Command contains a space");
+		problem = TRUE;
+	}
 	
-	strcpy(temp, SOC_NAME(soc));
+	strcpy(temp, SOC_COMMAND(soc));
 	strtolower(temp);
-	if (strcmp(SOC_NAME(soc), temp)) {
-		olc_audit_msg(ch, SOC_VNUM(soc), "Non-lowercase name");
+	if (strcmp(SOC_COMMAND(soc), temp)) {
+		olc_audit_msg(ch, SOC_VNUM(soc), "Non-lowercase social command");
+		problem = TRUE;
+	}
+	
+	// odd combos of messages
+	if (!SOC_MESSAGE(soc, SOCM_NO_ARG_TO_CHAR)) {
+		olc_audit_msg(ch, SOC_VNUM(soc), "Social needs n2char");
+		problem = TRUE;
+	}
+	if (!SOC_MESSAGE(soc, SOCM_TARGETED_TO_CHAR) && (SOC_MESSAGE(soc, SOCM_TARGETED_TO_OTHERS) || SOC_MESSAGE(soc, SOCM_TARGETED_TO_VICTIM))) {
+		olc_audit_msg(ch, SOC_VNUM(soc), "Social has t2other/t2vict but not t2char");
+		problem = TRUE;
+	}
+	if (!SOC_MESSAGE(soc, SOCM_TARGETED_NOT_FOUND) && (SOC_MESSAGE(soc, SOCM_TARGETED_TO_CHAR) || SOC_MESSAGE(soc, SOCM_TARGETED_TO_OTHERS) || SOC_MESSAGE(soc, SOCM_TARGETED_TO_VICTIM))) {
+		olc_audit_msg(ch, SOC_VNUM(soc), "Social has t2char/t2other/t2vict but not tnotfound");
+		problem = TRUE;
+	}
+	if (SOC_MESSAGE(soc, SOCM_SELF_TO_OTHERS) && !SOC_MESSAGE(soc, SOCM_SELF_TO_CHAR)) {
+		olc_audit_msg(ch, SOC_VNUM(soc), "Social has s2other but not s2char");
+		problem = TRUE;
+	}
+	if (!SOC_MESSAGE(soc, SOCM_TARGETED_TO_CHAR) && (SOC_MESSAGE(soc, SOCM_SELF_TO_CHAR) || SOC_MESSAGE(soc, SOCM_SELF_TO_OTHERS))) {
+		olc_audit_msg(ch, SOC_VNUM(soc), "Social has s2char/s2other but not t2char (required)");
 		problem = TRUE;
 	}
 	
@@ -743,7 +772,13 @@ OLC_MODULE(socedit_charposition) {
 
 OLC_MODULE(socedit_command) {
 	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	olc_process_string(ch, argument, "command", &SOC_COMMAND(soc));
+	
+	if (strchr(argument, ' ')) {
+		msg_to_char(ch, "Social commands must be all one word.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "command", &SOC_COMMAND(soc));
+	}
 }
 
 
