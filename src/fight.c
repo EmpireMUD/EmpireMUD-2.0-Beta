@@ -48,6 +48,7 @@ ACMD(do_flee);
 bool check_scaling(char_data *mob, char_data *based_on);
 extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 extern int determine_best_scale_level(char_data *ch, bool check_group);
+void end_pursuit(char_data *ch, char_data *target);
 
 // locals
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype);
@@ -3004,6 +3005,7 @@ void heal(char_data *ch, char_data *vict, int amount) {
 	if (GET_POS(vict) < POS_SLEEPING && GET_HEALTH(vict) > 0) {
 		msg_to_char(vict, "You recover and wake up.\r\n");
 		GET_POS(vict) = IS_NPC(vict) ? POS_STANDING : POS_SITTING;
+		end_pursuit(vict, ch);	// good samaritan
 	}
 }
 
@@ -3317,8 +3319,6 @@ void out_of_blood(char_data *ch) {
 * @param int damtype DAM_x.
 */
 void perform_execute(char_data *ch, char_data *victim, int attacktype, int damtype) {
-	void end_pursuit(char_data *ch, char_data *target);
-
 	bool ok = FALSE;
 	bool revert = TRUE;
 	char_data *m;
