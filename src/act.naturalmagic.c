@@ -1031,7 +1031,7 @@ ACMD(do_heal) {
 	}
 	
 	if (!party && IS_DEAD(vict)) {
-		msg_to_char(ch, "Unfortunately you can't heal on someone who is already dead.\r\n");
+		msg_to_char(ch, "Unfortunately you can't heal someone who is already dead.\r\n");
 		return;
 	}
 	if (!party && is_fight_enemy(ch, vict)) {

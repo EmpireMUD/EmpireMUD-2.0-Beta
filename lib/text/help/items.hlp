@@ -122,6 +122,18 @@ Available generic components:
 
 See also: COMPONENT
 #
+CONVEYANCE "TRINKET OF CONVEYANCE"
+
+A trinket of conveyance can be used to teleport you back to a starting location
+(such as a Tower of Souls) from anywhere in the world. This item is single-use,
+so be sure to craft a few of them.
+
+You can't teleport out of certain locations, such as hostile territory or
+certain adventures. If you find yourself in one of these places, find a way
+out before using your trinket.
+
+See also: POTTERY, HESTIAN TRINKET
+#
 "CRAFTER ITEMS" "CRAFTING ITEMS" "CRAFT ITEMS" "CRAFTING LEVEL" "CRAFTER LEVEL" "CRAFT LEVEL"
 
 A character's crafts (forge, sew, craft, etc.) are scaled up to the character's

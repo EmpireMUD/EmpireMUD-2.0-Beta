@@ -77,19 +77,20 @@ bool audit_object(obj_data *obj, char_data *ch) {
 	char temp[MAX_STRING_LENGTH], *ptr;
 	bool problem = FALSE;
 	
-	if (!str_cmp(GET_OBJ_KEYWORDS(obj), "object new")) {
+	if (*GET_OBJ_KEYWORDS(obj) || !*GET_OBJ_KEYWORDS(obj) || !str_cmp(GET_OBJ_KEYWORDS(obj), "object new")) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Keywords not set");
 		problem = TRUE;
 	}
-	
-	ptr = GET_OBJ_KEYWORDS(obj);
-	do {
-		ptr = any_one_arg(ptr, temp);
-		if (*temp && !str_str(GET_OBJ_SHORT_DESC(obj), temp) && !str_str(GET_OBJ_LONG_DESC(obj), temp)) {
-			olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Keyword '%s' not found in strings", temp);
-			problem = TRUE;
-		}
-	} while (*ptr);
+	else {
+		ptr = GET_OBJ_KEYWORDS(obj);
+		do {
+			ptr = any_one_arg(ptr, temp);
+			if (*temp && !str_str(GET_OBJ_SHORT_DESC(obj), temp) && !str_str(GET_OBJ_LONG_DESC(obj), temp)) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Keyword '%s' not found in strings", temp);
+				problem = TRUE;
+			}
+		} while (*ptr);
+	}
 	
 	if (!str_cmp(GET_OBJ_LONG_DESC(obj), "A new object is sitting here.")) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Long desc not set");

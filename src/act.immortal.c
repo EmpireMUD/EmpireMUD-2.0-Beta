@@ -3767,6 +3767,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	struct custom_message *ocm;
 	player_index_data *index;
 	crop_data *cp;
+	bool any;
 
 	msg_to_char(ch, "Name: '&y%s&0', Aliases: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
 
@@ -3841,8 +3842,10 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		struct obj_binding *bind;
 		
 		msg_to_char(ch, "Bound to:");
+		any = FALSE;
 		for (bind = OBJ_BOUND_TO(j); bind; bind = bind->next) {
-			msg_to_char(ch, " %s", (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
+			msg_to_char(ch, "%s %s", (any ? "," : ""), (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
+			any = TRUE;
 		}
 		msg_to_char(ch, "\r\n");
 	}

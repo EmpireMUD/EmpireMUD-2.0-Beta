@@ -173,6 +173,8 @@ Cook (Trade ability)
 Command:  cook [number] <item>
           cook info <item>
 
+Speed boosts:  Faster Chores bonus
+
 The cook command (formerly "bake") allows you to make food from a variety of
 raw ingredients. To cook, you'll need a heat source: a cooking fire, a kitchen,
 a bakery, an alchemist, or a laboratory. The Touch of Flame ability also works.
@@ -769,7 +771,7 @@ An item must be in your inventory to reforge it. However, if another player
 
 See also: MASTER BLACKSMITH, MASTER TAILOR, SHARE
 #
-"SCALABLE CRAFTS" "SCALABLE CRAFTING" "CRAFTING SCALABLES"
+"SCALABLE CRAFTS" "SCALABLE CRAFTING" "CRAFTING SCALABLES" "ITEM SCALING" OBJECT SCALING"
 
 Many craftable items (including things made with brew, craft, forge, and sew)
 are scalable, which means they change in power and attributes based on the
@@ -933,6 +935,7 @@ See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, IMPERIAL ARMORS
 TAN TANNING
 
 Usage:  tan <skin>
+Speed boosts:  Faster Chores bonus
 Stored in:  Tannery
 
 You can tan skins into leather. This process will go faster at a tannery. Both

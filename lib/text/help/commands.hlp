@@ -1010,7 +1010,7 @@ seconds.
 
 See also: TOGGLE
 #
-MAIL CHECK RECEIVE SEND
+MAIL CHECK RECEIVE SEND "PIGEON MAIL"
 
 Usage:  mail check
         mail send <person>
@@ -1125,6 +1125,8 @@ Examples:
   > order cityguard sleep
 #
 PLAY INSTRUMENTS MUSIC
+
+Speed boosts:  haste
 
 You can play musical instruments with the "play" command. You must first "hold"
 the instrument. Different instruments will give different messages, but music
@@ -1339,6 +1341,7 @@ See also: GRAB, HOLD, WEAR, WIELD, SHEATH, DRAW, SWAP
 REPAIR
 
 Usage:  repair <vehicle>
+Speed boosts:  Faster Chores bonus, haste
 
 This command allows you to repair vehicles that have decayed or been damaged.
 Like building, repair happens one item at a time using materials in your

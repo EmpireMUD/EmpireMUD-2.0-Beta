@@ -266,6 +266,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	bld_data *bld;
 	int found;
 	double rating;
+	bool any;
 		
 	// sanity / don't bother
 	if (!obj || !ch || !ch->desc) {
@@ -329,8 +330,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	if (OBJ_BOUND_TO(obj)) {
 		struct obj_binding *bind;		
 		msg_to_char(ch, "Bound to:");
+		any = FALSE;
 		for (bind = OBJ_BOUND_TO(obj); bind; bind = bind->next) {
-			msg_to_char(ch, " %s", (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
+			msg_to_char(ch, "%s %s", (any ? "," : ""), (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
+			any = TRUE;
 		}
 		msg_to_char(ch, "\r\n");
 	}
