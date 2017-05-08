@@ -2762,6 +2762,7 @@ const char *room_aff_bits[] = {
 	"!DISREPAIR",
 	"*!DISMANTLE",
 	"*INCOMPLETE",	// 15
+	"!TELEPORT",
 	"\n"
 };
 

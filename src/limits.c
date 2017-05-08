@@ -1862,7 +1862,7 @@ bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner) {
 		return TRUE;
 	}
 	
-	if (RMT_FLAGGED(loc, RMT_NO_TELEPORT)) {
+	if (RMT_FLAGGED(loc, RMT_NO_TELEPORT) || ROOM_AFF_FLAGGED(loc, ROOM_AFF_NO_TELEPORT)) {
 		return FALSE;
 	}
 

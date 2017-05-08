@@ -1609,7 +1609,7 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 	int subtype = NOWHERE;
 	bool wait;
 	
-	if (!can_teleport_to(ch, IN_ROOM(ch), TRUE) || RMT_FLAGGED(IN_ROOM(ch), RMT_NO_TELEPORT)) {
+	if (!can_teleport_to(ch, IN_ROOM(ch), TRUE) || RMT_FLAGGED(IN_ROOM(ch), RMT_NO_TELEPORT) || ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_TELEPORT)) {
 		msg_to_char(ch, "You can't teleport out of here.\r\n");
 		return FALSE;
 	}

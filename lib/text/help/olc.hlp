@@ -1120,6 +1120,7 @@ Available affects:
  !FLY - flying characters cannot enter, like an enchanted wall
  !WEATHER - suppress weather messages and command
  !DISREPAIR - never falls into disrepair (caution: this prevents empire decay)
+ !TELEPORT - cannot teleport here
 
 Some affects are managed by live data and commands (do not set affects with *):
  *HAS-INSTANCE - an adventure is linked here

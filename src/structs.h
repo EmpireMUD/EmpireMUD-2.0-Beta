@@ -2008,6 +2008,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_AFF_NO_DISREPAIR  BIT(13)	// n. will not fall into disrepair
 #define ROOM_AFF_NO_DISMANTLE  BIT(14)	// o. blocks normal dismantle until turned off
 #define ROOM_AFF_INCOMPLETE  BIT(15)	// p. building is incomplete
+#define ROOM_AFF_NO_TELEPORT  BIT(16)	// q. cannot teleport
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
