@@ -2510,7 +2510,8 @@ ACMD(do_excavate) {
 	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) < 0) {
 		start_action(ch, ACT_EXCAVATING, 0);
-		msg_to_char(ch, "You begin to excavate a trench.\r\n");
+		msg_to_char(ch, "You begin to excavate the trench.\r\n");
+		act("$n begins excavating the trench.", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH)) {
 		msg_to_char(ch, "The trench is already complete!\r\n");
