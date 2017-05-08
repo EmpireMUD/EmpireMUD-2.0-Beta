@@ -2469,7 +2469,7 @@ ACMD(do_dig) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
-	else if (ROOM_IS_CLOSED(IN_ROOM(ch)) && !CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_DIG)) {
+	else if ((ROOM_IS_CLOSED(IN_ROOM(ch)) || WATER_SECT(IN_ROOM(ch))) && !CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_DIG)) {
 		send_to_char("You can't dig here.\r\n", ch);
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
