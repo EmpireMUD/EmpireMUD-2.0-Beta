@@ -2452,7 +2452,10 @@ ACMD(do_chop) {
 
 
 ACMD(do_dig) {
-	if (GET_ACTION(ch) == ACT_DIGGING) {
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs can't dig.\r\n");
+	}
+	else if (GET_ACTION(ch) == ACT_DIGGING) {
 		send_to_char("You stop digging.\r\n", ch);
 		act("$n stops digging.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
