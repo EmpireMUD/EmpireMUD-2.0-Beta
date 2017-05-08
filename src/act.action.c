@@ -1194,19 +1194,13 @@ void process_digging(char_data *ch) {
 		GET_ACTION(ch) = ACT_NONE;
 		in_room = IN_ROOM(ch);
 		
-		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, finish_digging)) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch)) && run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, finish_digging)) {
 			// success
 			gain_ability_exp(ch, ABIL_SCAVENGING, 10);
 		
 			// character is still there and not digging?
 			if (GET_ACTION(ch) == ACT_NONE && in_room == IN_ROOM(ch)) {
-				if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch))) {
-					start_digging(ch);
-				}
-				else {
-					// this results in a double-message from finish_digging:
-					// msg_to_char(ch, "There don't seem to be any other good rocks here.\r\n");
-				}
+				start_digging(ch);
 			}
 		}
 		else {
