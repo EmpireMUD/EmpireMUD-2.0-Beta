@@ -1178,6 +1178,7 @@ void process_chop(char_data *ch) {
 */
 void process_digging(char_data *ch) {
 	room_data *in_room;
+	char_data *iter;
 	
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to dig here.\r\n");
@@ -1219,6 +1220,20 @@ void process_digging(char_data *ch) {
 			send_to_char("You dig vigorously at the ground.\r\n", ch);
 		}
 		act("$n digs vigorously at the ground.", FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
+	}
+	
+	// look for earthmelders
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+		if (!AFF_FLAGGED(iter, AFF_EARTHMELD)) {
+			continue;
+		}
+		if (iter == ch || IS_IMMORTAL(iter) || IS_NPC(iter) || IS_DEAD(iter) || EXTRACTED(iter)) {
+			continue;
+		}
+		
+		// earthmeld damage
+		msg_to_char(iter, "You feel nature burning at your earthmelded form as someone digs above you!\r\n");
+		apply_dot_effect(iter, ATYPE_NATURE_BURN, 6, DAM_MAGICAL, 5, 60, iter);
 	}
 }
 
@@ -1273,6 +1288,7 @@ void process_escaping(char_data *ch) {
 */
 void process_excavating(char_data *ch) {	
 	int count, total;
+	char_data *iter;
 
 	total = 1;	// shovelfuls at once (add things that speed up excavate)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_EXCAVATING; ++count) {
@@ -1318,6 +1334,20 @@ void process_excavating(char_data *ch) {
 				stop_room_action(IN_ROOM(ch), ACT_EXCAVATING, NOTHING);
 			}
 		}
+	}
+	
+	// look for earthmelders
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+		if (!AFF_FLAGGED(iter, AFF_EARTHMELD)) {
+			continue;
+		}
+		if (iter == ch || IS_IMMORTAL(iter) || IS_NPC(iter) || IS_DEAD(iter) || EXTRACTED(iter)) {
+			continue;
+		}
+		
+		// earthmeld damage
+		msg_to_char(iter, "You feel nature burning at your earthmelded form as someone digs above you!\r\n");
+		apply_dot_effect(iter, ATYPE_NATURE_BURN, 6, DAM_MAGICAL, 5, 60, iter);
 	}
 }
 
