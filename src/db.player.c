@@ -2108,7 +2108,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	char temp[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
 	struct resource_data *res;
-	int iter;
+	int iter, deficit[NUM_POOLS], pool[NUM_POOLS];
 	
 	if (!fl || !ch) {
 		log("SYSERR: write_player_primary_data_to_file called without %s", fl ? "character" : "file");
@@ -2117,6 +2117,12 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (IS_NPC(ch)) {
 		log("SYSERR: write_player_primary_data_to_file called with NPC");
 		return;
+	}
+	
+	// save these for later, as they are sometimes changed by removing and re-adding gear
+	for (iter = 0; iter < NUM_POOLS; ++iter) {
+		deficit[iter] = GET_DEFICIT(ch, iter);
+		pool[iter] = GET_CURRENT_POOL(ch, iter);
 	}
 	
 	// unaffect the character to store raw numbers: equipment
@@ -2466,6 +2472,12 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 				}
 			#endif
 		}
+	}
+	
+	// restore pools, which may have been modified
+	for (iter = 0; iter < NUM_POOLS; ++iter) {
+		GET_CURRENT_POOL(ch, iter) = pool[iter];
+		GET_DEFICIT(ch, iter) = deficit[iter];
 	}
 	
 	// affect_total(ch); // unnecessary, I think (?)
