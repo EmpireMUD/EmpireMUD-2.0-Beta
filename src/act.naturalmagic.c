@@ -171,6 +171,11 @@ void un_earthmeld(char_data *ch) {
 			act("$n rises from the ground!", TRUE, ch, 0, 0, TO_ROOM);
 			GET_POS(ch) = POS_STANDING;
 			add_cooldown(ch, COOLDOWN_EARTHMELD, 2 * SECS_PER_REAL_MIN);
+			
+			if (affected_by_spell(ch, ATYPE_NATURE_BURN)) {
+				affect_from_char(ch, ATYPE_NATURE_BURN, TRUE);
+				command_lag(ch, WAIT_ABILITY);
+			}
 		}
 	}
 }

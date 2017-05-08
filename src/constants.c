@@ -2997,6 +2997,7 @@ const char *affect_types[] = {
 	"thornlash",	// 75
 	"arrow to the knee",
 	"hostile delay",
+	"nature burn",
 	"\n"
 	};
 
@@ -3081,6 +3082,7 @@ const char *affect_wear_off_msgs[] = {
 	"",	// 75, thornlast
 	"Your knee feels better.",
 	"Your hostile login delay ends and you are free to act.",
+	"Your nature burn eases.",
 	"\n"
 };
 

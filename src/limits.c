@@ -613,6 +613,13 @@ void real_update_char(char_data *ch) {
 		extract_char(ch);
 		return;
 	}
+	// earthmeld damage
+	if (!IS_NPC(ch) && !IS_IMMORTAL(ch) && AFF_FLAGGED(ch, AFF_EARTHMELD) && ROOM_IS_CLOSED(IN_ROOM(ch))) {
+		if (!affected_by_spell(ch, ATYPE_NATURE_BURN)) {
+			msg_to_char(ch, "You are beneath a building and begin taking nature burn as the earth you're buried in is separated from fresh air...\r\n");
+		}
+		apply_dot_effect(ch, ATYPE_NATURE_BURN, 6, DAM_MAGICAL, 5, 60, ch);
+	}
 	
 	// update affects (NPCs get this, too)
 	for (af = ch->affected; af; af = next_af) {
