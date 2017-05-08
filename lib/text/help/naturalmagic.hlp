@@ -345,7 +345,8 @@ Natural Magic. You can do nothing while interred within the earth, but it is
 often the safest place to be.
 
 However, you will take damage from nature burn if someone is digging in the
-dirt while you're earthmelded.
+dirt while you're earthmelded. You stop taking nature burn damage as soon as
+you end your earthmeld.
 
 Gains experience when you sink into the ground.
 
@@ -959,7 +960,8 @@ way through the ground. You cannot worm through water tiles, and you cannot
 emerge in buildings (except open-air buildings).
 
 Your tie to nature is important while worming. If you spend time underneath
-a closed building, you will begin to take damage from nature burn.
+a closed building, you will begin to take damage from nature burn. You stop
+taking nature burn damage as soon as you end your earthmeld.
 
 Gains experience as you move around underground.
 
