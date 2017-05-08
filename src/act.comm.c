@@ -814,6 +814,11 @@ ACMD(do_slash_channel) {
 		skip_slash(arg2);
 		any_one_arg(arg2, arg3);
 		
+		if (!*arg3) {
+			msg_to_char(ch, "What channel do you want to join?\r\n");
+			return;
+		}
+		
 		// validate name
 		ok = TRUE && *arg3;
 		for (iter = 0; ok && *invalid_channel_names[iter] != '\n'; ++iter) {

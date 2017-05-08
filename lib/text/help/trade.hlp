@@ -422,8 +422,8 @@ See also: RECIPES
 #
 IRON "IRON ORE"
 
-Used for: forge, build, manufacture
-Stored in: Foundry
+Used for:  forge, build, manufacture
+Stored in:  Foundry
 
 Iron ore is found by mining in the mountains. It is useful in building and
 forging equipment, as well as manufacturing ships.
@@ -456,6 +456,16 @@ Shield:
 Armorsmithing -> Sturdy Armors -> Imperial Armors
 
 See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, STURDY ARMORS
+#
+IMPERIUM "IMPERIUM ORE"
+
+Used for:  forge
+Stored in:  Foundry
+
+Imperium is a rare, strong metal with a bright white color. It is used to make
+powerful weapons and armor.
+
+See also: FORGE, METALS, MINE, SMELT
 #
 "IRON BLADES"
 
@@ -638,6 +648,16 @@ eventide metals, respectively.
 These metals are generally used in crafts in the 200-300 level range.
 
 See also: RARE METALS, SMELT
+#
+NOCTURNIUM "NOCTURNIUM ORE"
+
+Used for:  forge, sew
+Stored in:  Foundry
+
+Nocturnium is a pure black metal, its surface swirling with mana. It is often
+plated onto powerful magical objects.
+
+See also: FORGE, METALS, MINE, SEW, SMELT
 #
 PATTERNS "ADVENTURE CRAFTS" "CRAFTING PATTERNS"
 

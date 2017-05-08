@@ -5939,7 +5939,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			// append to end
 			LL_APPEND(*list, res);
 			
-			msg_to_char(ch, "You add a %s resource requirement.\r\n", get_resource_name(res));
+			msg_to_char(ch, "You add %s %s resource requirement.\r\n", AN(get_resource_name(res)), get_resource_name(res));
 		}
 	}
 	else if (is_abbrev(arg1, "move")) {

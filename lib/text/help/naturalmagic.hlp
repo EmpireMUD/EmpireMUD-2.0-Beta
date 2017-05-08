@@ -191,7 +191,8 @@ See also: CHANT
 
 Each Natural Magic class has its own set of familiars. These are summoned with
 the 'familiar' command, but don't require the regular Familiar ability. Some
-class roles have different familiars than other roles in the same class.
+class roles have different familiars than other roles in the same class. Like
+all class abilities, you must reach skill level 100 to use these.
 
 Werewolf:
   Spirit Wolf (tank) - Will debuff the enemy.
@@ -262,6 +263,9 @@ Using this ability multiple times on the same target and same trait will stack
 onto the same +trait buff and -Strength debuff and also reset their timer, so
 you can refresh this buff's full effect if you have the Strength to recast it
 before it expires.
+
+You can confer: block, dodge, health, health-regen, mana, mana-regen,
+  move, move-regen, resist-magical, resist-physical, to-hit
 #
 COUNTERSPELL "COUNTER SPELL"
 

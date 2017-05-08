@@ -3959,7 +3959,7 @@ OLC_MODULE(qedit_rewards) {
 			reward->vnum = vnum;
 			
 			LL_APPEND(*list, reward);
-			msg_to_char(ch, "You add a %s reward: %s\r\n", quest_reward_types[stype], quest_reward_string(reward, TRUE));
+			msg_to_char(ch, "You add %s %s reward: %s\r\n", AN(quest_reward_types[stype]), quest_reward_types[stype], quest_reward_string(reward, TRUE));
 		}
 	}	// end 'add'
 	else if (is_abbrev(cmd_arg, "change")) {
