@@ -751,7 +751,7 @@ else
   eval emp %actor.empire%
   eval veh %room.vehicles%
   if %emp%
-    %own% veh %veh% %emp%
+    %own% %veh% %emp%
   end
 end
 %send% %actor% You buy %named% for 50 coins.

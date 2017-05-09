@@ -223,6 +223,46 @@ if (!%found%)
   end
 end/f
 ~
+#10218
+Filks and Walts respawn~
+2 b 100
+~
+set filks_present 0
+set walts_present 0
+set fighting 0
+eval person %room.people%
+while %person%
+  if %person.vnum% == 10202
+    if %person.fighting%
+      set fighting 1
+    end
+    set filks_present 1
+  elseif %person.vnum% == 10203
+    if %person.fighting%
+      set fighting 1
+    end
+    set walts_present 1
+  end
+  eval person %person.next_in_room%
+done
+if %filks_present% && !%walts_present% && !%fighting%
+  * Respawn Walts
+  %load% mob 10203
+  eval new_mob %room.people%
+  if %new_mob.vnum% == 10203
+    %echo% %new_mob.name% respawns.
+    nop %new_mob.add_mob_flag(!LOOT)%
+  end
+elseif %walts_present% && !%filks_present% && !%fighting%
+  * Respawn Filks
+  %load% mob 10202
+  eval new_mob %room.people%
+  if %new_mob.vnum% == 10202
+    %echo% %new_mob.name% respawns.
+    nop %new_mob.add_mob_flag(!LOOT)%
+  end
+end
+~
 #10225
 Druid greeting~
 0 g 100
@@ -764,7 +804,7 @@ if (%self.fighting% || %self.disabled%)
   halt
 end
 %echo% %self.name% swipes %self.hisher% massive tail, and a tree goes flying!
-%load% obj 120
+%load% obj 120 room
 wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
