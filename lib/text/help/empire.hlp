@@ -102,6 +102,8 @@ Usage:  build <building> [direction]
         build <monument> <god>
         build info <building>
 
+Speed boosts:  Faster Chores bonus, haste
+
 This command is used to create buildings using raw materials. If you build a
 shrine or temple, you must specify a god to dedicate it to. Most other
 buildings require a direction that they'll face. Resources are added from left
@@ -596,6 +598,8 @@ EXCAVATE EXCAVATION TRENCH MOAT FILLIN
 Usage:  excavate
         fillin
 
+Speed boosts:  Faster Chores bonus, haste
+
 Using a shovel, your own strength, and a lot of time, you can excavate a
 trench from a desert or plains. Once the trench is complete, it will begin
 to fill with water. Eventually, it becomes a river.
@@ -900,6 +904,7 @@ See also: BUILD, GRAND MONUMENTS
 PAN
 
 Usage:  pan [direction]
+Speed boosts:  Finder ability
 
 Using a simple metal pan, you can pan for gold flakes next to the river. It's
 rare to find anything, but it's something to do. You can pan an adjacent map
@@ -1022,6 +1027,7 @@ QUARRY
 
 Command:  quarry
 Building:  |__|  Quarry  (Basic Buildings)
+Speed boosts:  Faster Chores bonus, haste
 
 A quarry must be built on plains or desert, facing a mountain. Quarries are a
 good place to dig up rocks. You can also quarry stone here using the "quarry"

@@ -3723,6 +3723,7 @@ ACMD(do_empire_inventory) {
 
 
 ACMD(do_enroll) {
+	struct empire_island *from_isle, *next_isle, *isle;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
 	struct empire_storage_data *store, *store2;
@@ -3733,9 +3734,9 @@ ACMD(do_enroll) {
 	vehicle_data *veh, *next_veh;
 	empire_data *e, *old;
 	room_data *room, *next_room;
-	int old_store;
+	int old_store, iter;
 	char_data *targ = NULL, *victim, *mob;
-	bool file = FALSE, sub_file = FALSE;
+	bool all_zero, file = FALSE, sub_file = FALSE;
 	obj_data *obj;
 
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
@@ -3784,12 +3785,12 @@ ACMD(do_enroll) {
 		remove_lore(targ, LORE_PROMOTED);
 		add_lore(targ, LORE_JOIN_EMPIRE, "Honorably accepted into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 		
+		SAVE_CHAR(targ);
+		
 		// TODO split this out into a "merge empires" func
 
 		// move data over
 		if (old && EMPIRE_LEADER(old) == GET_IDNUM(targ)) {
-			eliminate_linkdead_players();
-			
 			// attempt to estimate the new member count so cities and territory transfer correctly
 			// note: may over-estimate if some players already had alts in both empires
 			EMPIRE_MEMBERS(e) += EMPIRE_MEMBERS(old);
@@ -3805,6 +3806,7 @@ ACMD(do_enroll) {
 					if (IN_ROOM(victim)) {
 						msg_to_char(victim, "Your empire has merged with %s.\r\n", EMPIRE_NAME(e));
 					}
+					remove_lore(victim, LORE_PROMOTED);
 					add_lore(victim, LORE_JOIN_EMPIRE, "Empire merged into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 					GET_LOYALTY(victim) = e;
 					GET_RANK(victim) = 1;
@@ -3812,12 +3814,16 @@ ACMD(do_enroll) {
 					SAVE_CHAR(victim);
 				}
 				else if ((victim = find_or_load_player(index->name, &sub_file))) {
+					remove_lore(victim, LORE_PROMOTED);
 					add_lore(victim, LORE_JOIN_EMPIRE, "Empire merged into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 					GET_LOYALTY(victim) = e;
 					GET_RANK(victim) = 1;
 					update_player_index(index, victim);
-					if (sub_file) {
+					if (sub_file && victim != targ) {
 						store_loaded_char(victim);
+					}
+					else {
+						SAVE_CHAR(victim);
 					}
 				}
 			}
@@ -3833,6 +3839,24 @@ ACMD(do_enroll) {
 			for (obj = object_list; obj; obj = obj->next) {
 				if (obj->last_empire_id == EMPIRE_VNUM(old)) {
 					obj->last_empire_id = EMPIRE_VNUM(e);
+				}
+			}
+			
+			// workforce: attempt a smart-copy
+			HASH_ITER(hh, EMPIRE_ISLANDS(old), from_isle, next_isle) {
+				isle = get_empire_island(e, from_isle->island);
+				
+				all_zero = TRUE;
+				for (iter = 0; iter < NUM_CHORES && all_zero; ++iter) {
+					if (isle->workforce_limit[iter] != 0) {
+						all_zero = FALSE;
+					}
+				}
+				
+				if (all_zero) {	// safe to copy (no previous settings)
+					for (iter = 0; iter < NUM_CHORES; ++iter) {
+						isle->workforce_limit[iter] = from_isle->workforce_limit[iter];
+					}
 				}
 			}
 			
@@ -3980,7 +4004,7 @@ ACMD(do_enroll) {
 
 ACMD(do_esay) {
 	void clear_last_act_message(descriptor_data *desc);
-	void add_to_channel_history(descriptor_data *desc, int type, char *message);
+	void add_to_channel_history(char_data *ch, int type, char *message);
 	extern bool is_ignoring(char_data *ch, char_data *victim);
 	
 	descriptor_data *d;
@@ -4079,7 +4103,7 @@ ACMD(do_esay) {
 		if (ch->desc && ch->desc->last_act_message) {
 			// the message was sent via act(), we can retrieve it from the desc
 			sprintf(lbuf, "%s", ch->desc->last_act_message);
-			add_to_channel_history(ch->desc, CHANNEL_HISTORY_EMPIRE, lbuf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_EMPIRE, lbuf);
 		}
 	}
 
@@ -4097,7 +4121,7 @@ ACMD(do_esay) {
 			if (d->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
 				sprintf(lbuf, "%s", d->last_act_message);
-				add_to_channel_history(d, CHANNEL_HISTORY_EMPIRE, lbuf);
+				add_to_channel_history(tch, CHANNEL_HISTORY_EMPIRE, lbuf);
 			}	
 		}
 	}
@@ -4175,6 +4199,7 @@ ACMD(do_expel) {
 		msg_to_char(targ, "You have been expelled from the empire.\r\n");
 		
 		remove_lore(targ, LORE_PROMOTED);
+		remove_lore(targ, LORE_JOIN_EMPIRE);
 		add_lore(targ, LORE_KICKED_EMPIRE, "Dishonorably discharged from %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 
 		// save now
@@ -4907,7 +4932,7 @@ ACMD(do_promote) {
 		msg_to_char(ch, "You can't promote someone to that level.\r\n");
 	else {
 		GET_RANK(victim) = to_rank;
-		remove_lore(victim, LORE_PROMOTED);	// only save most recent
+		remove_recent_lore(victim, LORE_PROMOTED);	// only save most recent
 		add_lore(victim, LORE_PROMOTED, "Promoted to %s&0", EMPIRE_RANK(e, to_rank-1));
 
 		log_to_empire(e, ELOG_MEMBERS, "%s has been promoted to %s%s!", PERS(victim, victim, 1), EMPIRE_RANK(e, to_rank-1), EMPIRE_BANNER(e));

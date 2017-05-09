@@ -266,6 +266,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	bld_data *bld;
 	int found;
 	double rating;
+	bool any;
 		
 	// sanity / don't bother
 	if (!obj || !ch || !ch->desc) {
@@ -329,8 +330,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	if (OBJ_BOUND_TO(obj)) {
 		struct obj_binding *bind;		
 		msg_to_char(ch, "Bound to:");
+		any = FALSE;
 		for (bind = OBJ_BOUND_TO(obj); bind; bind = bind->next) {
-			msg_to_char(ch, " %s", (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
+			msg_to_char(ch, "%s %s", (any ? "," : ""), (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
+			any = TRUE;
 		}
 		msg_to_char(ch, "\r\n");
 	}
@@ -631,6 +634,8 @@ static bool perform_exchange(char_data *ch, obj_data *obj, empire_data *emp) {
 * @return int 1 = success, 0 = fail
 */
 static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
+	char_data *mort;
+	
 	if (!drop_otrigger(obj, ch)) {	// also takes care of obj purging self
 		return 0;
 	}
@@ -659,13 +664,28 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 		act("$n puts $p in $P.", TRUE, ch, obj, cont, TO_ROOM);
 
 		act("You put $p in $P.", FALSE, ch, obj, cont, TO_CHAR);
+
+		if (IS_IMMORTAL(ch) && ROOM_OWNER(IN_ROOM(ch)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a container in mortal empire (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
+		}
+		else if (IS_IMMORTAL(ch) && (mort = find_mortal_in_room(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a container with mortal present (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_NAME(mort), room_log_identifier(IN_ROOM(ch)));
+		}
 	}
 	return 1;
 }
 
 
-void perform_remove(char_data *ch, int pos) {
-	obj_data *obj;
+/**
+* Removes an item from a wear location and gives it to the character (unless
+* it is 1-use, in which case it is extracted).
+*
+* @param char_data *ch The character.
+* @param int pos The WEAR_ to remove.
+* @return obj_data* A pointer to the object if it was removed (unless it was extracted).
+*/
+obj_data *perform_remove(char_data *ch, int pos) {
+	obj_data *obj = NULL;
 
 	if (!(obj = GET_EQ(ch, pos)))
 		log("SYSERR: perform_remove: bad pos %d passed.", pos);
@@ -674,7 +694,7 @@ void perform_remove(char_data *ch, int pos) {
 	}
 	else {
 		if (!remove_otrigger(obj, ch)) {
-			return;
+			return NULL;
 		}
 
 		// char message
@@ -694,9 +714,11 @@ void perform_remove(char_data *ch, int pos) {
 		}
 		
 		// this may extract it, or drop it
-		unequip_char_to_inventory(ch, pos);
+		obj = unequip_char_to_inventory(ch, pos);
 		determine_gear_level(ch);
 	}
+	
+	return obj;
 }
 
 
@@ -1342,6 +1364,11 @@ static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
 		return;
 	}
 	
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch) && !IS_IMMORTAL(vict)) {
+		act("$p: you can't give this item away.", FALSE, ch, obj, NULL, TO_CHAR);
+		return;
+	}
+	
 	// NPCs usually have no carry limit, but 'give' is an exception because otherwise crazy ensues
 	if (!CAN_CARRY_OBJ(vict, obj)) {
 		act("$N seems to have $S hands full.", FALSE, ch, 0, vict, TO_CHAR);
@@ -1758,7 +1785,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 			if (GET_WEAPON_DAMAGE_BONUS(obj) > 0) {
 				amt = round(this_share * GET_WEAPON_DAMAGE_BONUS(obj) * get_weapon_speed(obj));
 				if (amt > 0) {
-					points_to_give -= round(this_share * GET_WEAPON_DAMAGE_BONUS(obj));
+					points_to_give -= (this_share * GET_WEAPON_DAMAGE_BONUS(obj));
 				}
 				GET_OBJ_VAL(obj, VAL_WEAPON_DAMAGE_BONUS) = amt;
 			}
@@ -1768,7 +1795,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 		case ITEM_DRINKCON: {
 			amt = (int)round(this_share * GET_DRINK_CONTAINER_CAPACITY(obj) * config_get_double("scale_drink_capacity"));
 			if (amt > 0) {
-				points_to_give -= round(this_share * GET_DRINK_CONTAINER_CAPACITY(obj));
+				points_to_give -= (this_share * GET_DRINK_CONTAINER_CAPACITY(obj));
 			}
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CAPACITY) = amt;
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = amt;
@@ -1778,7 +1805,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 		case ITEM_COINS: {
 			amt = (int)round(this_share * GET_COINS_AMOUNT(obj) * config_get_double("scale_coin_amount"));
 			if (amt > 0) {
-				points_to_give -= round(this_share * GET_COINS_AMOUNT(obj));
+				points_to_give -= (this_share * GET_COINS_AMOUNT(obj));
 			}
 			GET_OBJ_VAL(obj, VAL_COINS_AMOUNT) = amt;
 			// this can't realistically be negative
@@ -1789,7 +1816,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 			if (GET_MISSILE_WEAPON_DAMAGE(obj) > 0) {
 				amt = round(this_share * GET_MISSILE_WEAPON_DAMAGE(obj) * get_weapon_speed(obj));
 				if (amt > 0) {
-					points_to_give -= round(this_share * GET_MISSILE_WEAPON_DAMAGE(obj));
+					points_to_give -= (this_share * GET_MISSILE_WEAPON_DAMAGE(obj));
 				}
 				GET_OBJ_VAL(obj, VAL_MISSILE_WEAPON_DAMAGE) = amt;
 			}
@@ -1800,7 +1827,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 			if (GET_ARROW_DAMAGE_BONUS(obj) > 0) {
 				amt = (int)round(this_share * GET_ARROW_DAMAGE_BONUS(obj));
 				if (amt > 0) {
-					points_to_give -= round(this_share * GET_ARROW_DAMAGE_BONUS(obj));
+					points_to_give -= (this_share * GET_ARROW_DAMAGE_BONUS(obj));
 				}
 				GET_OBJ_VAL(obj, VAL_ARROW_DAMAGE_BONUS) = amt;
 			}
@@ -1810,7 +1837,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 		case ITEM_PACK: {
 			amt = (int)round(this_share * GET_PACK_CAPACITY(obj) * config_get_double("scale_pack_size"));
 			if (amt > 0) {
-				points_to_give -= round(this_share * GET_PACK_CAPACITY(obj));
+				points_to_give -= (this_share * GET_PACK_CAPACITY(obj));
 			}
 			GET_OBJ_VAL(obj, VAL_PACK_CAPACITY) = amt;
 			// negatives aren't really possible here
@@ -1820,7 +1847,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 			// aiming for a scale of 100 at 100 -- and eliminate the wear_pos_modifier since potions are almost always WEAR_TAKE
 			amt = (int)round(this_share * GET_POTION_SCALE(obj) * (100.0 / scale_points_at_100) / wear_pos_modifier[wear_significance[ITEM_WEAR_TAKE]]);
 			if (amt > 0) {
-				points_to_give -= round(this_share * GET_POTION_SCALE(obj));
+				points_to_give -= (this_share * GET_POTION_SCALE(obj));
 			}
 			GET_OBJ_VAL(obj, VAL_POTION_SCALE) = amt;
 			// negatives aren't really possible here
@@ -1840,7 +1867,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 			if (apply->modifier > 0) {
 				// positive benefit
 				amt = round(this_share * apply->modifier * per_point);
-				points_to_give -= round(this_share * apply->modifier);
+				points_to_give -= (this_share * apply->modifier);
 				apply->modifier = amt;
 			}
 			else if (apply->modifier < 0) {
@@ -2521,6 +2548,11 @@ void trade_check(char_data *ch, char *argument) {
 		if (tpd->player != GET_IDNUM(ch)) {
 			continue;
 		}
+		// if it's just collectable coins, don't show
+		if (IS_SET(tpd->state, TPD_BOUGHT) && IS_SET(tpd->state, TPD_COINS_PENDING)) {
+			to_collect += round(tpd->buy_cost * (1.0 - trading_post_fee)) + tpd->post_cost;
+			continue;
+		}
 		if (!tpd->obj) {
 			continue;
 		}
@@ -2533,12 +2565,6 @@ void trade_check(char_data *ch, char *argument) {
 			continue;
 		}
 		if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(tpd->obj))) {
-			continue;
-		}
-		
-		// if it's just collectable coins, don't show
-		if (IS_SET(tpd->state, TPD_BOUGHT) && IS_SET(tpd->state, TPD_COINS_PENDING)) {
-			to_collect += round(tpd->buy_cost * (1.0 - trading_post_fee)) + tpd->post_cost;
 			continue;
 		}
 		
@@ -3498,23 +3524,37 @@ ACMD(do_combine) {
 
 
 ACMD(do_draw) {
-	obj_data *obj = NULL;
+	obj_data *obj = NULL, *removed = NULL;
 	int loc = 0;
 
 	one_argument(argument, arg);
 
 	if (!*arg) {
-		msg_to_char(ch, "Draw what?\r\n");
-		return;
+		// attempt to guess
+		if (GET_EQ(ch, WEAR_SHEATH_1) && !GET_EQ(ch, WEAR_SHEATH_2)) {
+			obj = GET_EQ(ch, WEAR_SHEATH_1);
+			loc = WEAR_SHEATH_1;
+		}
+		else if (GET_EQ(ch, WEAR_SHEATH_2) && !GET_EQ(ch, WEAR_SHEATH_1)) {
+			obj = GET_EQ(ch, WEAR_SHEATH_2);
+			loc = WEAR_SHEATH_2;
+		}
+		else {	// have 2 things sheathed
+			msg_to_char(ch, "Draw what?\r\n");
+			return;
+		}
 	}
-
-	if ((obj = GET_EQ(ch, WEAR_SHEATH_1)) && isname(arg, GET_OBJ_KEYWORDS(obj)))
-		loc = WEAR_SHEATH_1;
-	else if ((obj = GET_EQ(ch, WEAR_SHEATH_2)) && isname(arg, GET_OBJ_KEYWORDS(obj)))
-		loc = WEAR_SHEATH_2;
-	else {
-		msg_to_char(ch, "You have nothing by that name sheathed!\r\n");
-		return;
+	
+	// detect based on args
+	if (!obj) {
+		if ((obj = GET_EQ(ch, WEAR_SHEATH_1)) && isname(arg, GET_OBJ_KEYWORDS(obj)))
+			loc = WEAR_SHEATH_1;
+		else if ((obj = GET_EQ(ch, WEAR_SHEATH_2)) && isname(arg, GET_OBJ_KEYWORDS(obj)))
+			loc = WEAR_SHEATH_2;
+		else {
+			msg_to_char(ch, "You have nothing by that name sheathed!\r\n");
+			return;
+		}
 	}
 	
 	if (OBJ_FLAGGED(obj, OBJ_TWO_HANDED) && GET_EQ(ch, WEAR_HOLD)) {
@@ -3524,7 +3564,7 @@ ACMD(do_draw) {
 
 	// attempt to remove existing wield
 	if (GET_EQ(ch, WEAR_WIELD)) {
-		perform_remove(ch, WEAR_WIELD);
+		removed = perform_remove(ch, WEAR_WIELD);
 		
 		// did it work? if not, player got an error
 		if (GET_EQ(ch, WEAR_WIELD)) {
@@ -3536,6 +3576,11 @@ ACMD(do_draw) {
 	// do not use unequip_char_to_inventory so that we don't hit OBJ_SINGLE_USE
 	obj_to_char(unequip_char(ch, loc), ch);
 	perform_wear(ch, obj, WEAR_WIELD);
+	
+	// attempt to sheathe the removed item
+	if (removed && !GET_EQ(ch, loc)) {
+		perform_wear(ch, removed, loc);
+	}
 }
 
 

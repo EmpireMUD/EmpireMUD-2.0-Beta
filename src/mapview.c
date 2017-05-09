@@ -487,6 +487,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	extern bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_list **build_list);
 	extern bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp_list **build_list);
 	extern const char *color_by_difficulty(char_data *ch, int level);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options);
 	void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
 	void list_char_to_char(char_data *list, char_data *ch);
@@ -508,6 +509,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	int first_iter, second_iter, xx, yy, magnitude, north;
 	int first_start, first_end, second_start, second_end, temp;
 	bool y_first, invert_x, invert_y, comma;
+	struct instance_data *inst;
 	player_index_data *index;
 	room_data *to_room;
 	empire_data *emp, *pcemp;
@@ -536,7 +538,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		return;
 	}
 
-	if (!look_out && AFF_FLAGGED(ch, AFF_EARTHMELD) && IS_ANY_BUILDING(IN_ROOM(ch))) {
+	if (!look_out && AFF_FLAGGED(ch, AFF_EARTHMELD) && IS_ANY_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN)) {
 		msg_to_char(ch, "You are beneath a building.\r\n");
 		return;
 	}
@@ -576,11 +578,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	
 	// coloring for adventures
 	*advcolbuf = '\0';
-	if (GET_ROOM_TEMPLATE(room) && ROOM_INSTANCE(room)) {
-		level = (ROOM_INSTANCE(room)->level > 0 ? ROOM_INSTANCE(room)->level : get_approximate_level(ch));
-		strcpy(advcolbuf, color_by_difficulty((ch), pick_level_from_range(level, GET_ADV_MIN_LEVEL(ROOM_INSTANCE(room)->adventure), GET_ADV_MAX_LEVEL(ROOM_INSTANCE(room)->adventure))));
+	if ((GET_ROOM_TEMPLATE(room) || ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY)) && (inst = find_instance_by_room(room, FALSE))) {
+		level = (inst->level > 0 ? inst->level : get_approximate_level(ch));
+		strcpy(advcolbuf, color_by_difficulty((ch), pick_level_from_range(level, GET_ADV_MIN_LEVEL(inst->adventure), GET_ADV_MAX_LEVEL(inst->adventure))));
 	}
-	
 
 	if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 		sprintbit(ROOM_AFF_FLAGS(IN_ROOM(ch)), room_aff_bits, flagbuf, TRUE);

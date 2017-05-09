@@ -733,6 +733,7 @@ void free_char(char_data *ch) {
 	struct mount_data *mount, *next_mount;
 	struct channel_history_data *history;
 	struct player_slash_channel *slash;
+	struct player_slash_history *slash_hist, *next_slash_hist;
 	struct interaction_item *interact;
 	struct pursuit_data *purs;
 	struct offer_data *offer;
@@ -844,9 +845,33 @@ void free_char(char_data *ch) {
 			if (loadslash->name) {
 				free(loadslash->name);
 			}
+			if (loadslash->lc_name) {
+				free(loadslash->lc_name);
+			}
 			free(loadslash);
 		}
-	
+		
+		// free channel histories
+		for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
+			while ((history = GET_HISTORY(ch, iter))) {
+				GET_HISTORY(ch, iter) = history->next;
+				if (history->message) {
+					free(history->message);
+				}
+				free(history);
+			}
+		}
+		HASH_ITER(hh, GET_SLASH_HISTORY(ch), slash_hist, next_slash_hist) {
+			while ((history = slash_hist->history)) {
+				slash_hist->history = history->next;
+				if (history->message) {
+					free(history->message);
+				}
+				free(history);
+			}
+			free(slash_hist);
+		}
+		
 		while ((a = GET_ALIASES(ch)) != NULL) {
 			GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
 			free_alias(a);
@@ -858,14 +883,6 @@ void free_char(char_data *ch) {
 		}
 		
 		while ((slash = GET_SLASH_CHANNELS(ch))) {
-			while ((history = slash->history)) {
-				slash->history = history->next;
-				if (history->message) {
-					free(history->message);
-				}
-				free(history);
-			}
-			
 			GET_SLASH_CHANNELS(ch) = slash->next;
 			free(slash);
 		}
@@ -1427,6 +1444,16 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				if (PFILE_TAG(line, "Highest Known Level:", length)) {
 					GET_HIGHEST_KNOWN_LEVEL(ch) = atoi(line + length + 1);
 				}
+				else if (PFILE_TAG(line, "History:", length)) {
+					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in[1]);
+					if (i_in[0] >= 0 && i_in[0] < NUM_CHANNEL_HISTORY_TYPES) {
+						struct channel_history_data *hist;
+						CREATE(hist, struct channel_history_data, 1);
+						hist->timestamp = l_in[1];
+						hist->message = fread_string(fl, error);
+						LL_APPEND(GET_HISTORY(ch, i_in[0]), hist);
+					}
+				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
@@ -1771,6 +1798,25 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					slash->next = LOAD_SLASH_CHANNELS(ch);
 					LOAD_SLASH_CHANNELS(ch) = slash;
 				}
+				else if (PFILE_TAG(line, "Slash-History:", length)) {
+					sscanf(line + length + 1, "%s %ld", str_in, &l_in[1]);
+					if (*str_in) {
+						struct player_slash_history *psh;
+						struct channel_history_data *hist;
+						
+						HASH_FIND_STR(GET_SLASH_HISTORY(ch), str_in, psh);
+						if (!psh) {
+							CREATE(psh, struct player_slash_history, 1);
+							psh->channel = str_dup(str_in);
+							HASH_ADD_STR(GET_SLASH_HISTORY(ch), channel, psh);
+						}
+						
+						CREATE(hist, struct channel_history_data, 1);
+						hist->timestamp = l_in[1];
+						hist->message = fread_string(fl, error);
+						LL_APPEND(psh->history, hist);
+					}
+				}
 				else if (PFILE_TAG(line, "Syslog Flags:", length)) {
 					SYSLOG_FLAGS(ch) = asciiflag_conv(line + length + 1);
 				}
@@ -2062,7 +2108,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	char temp[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
 	struct resource_data *res;
-	int iter;
+	int iter, deficit[NUM_POOLS], pool[NUM_POOLS];
 	
 	if (!fl || !ch) {
 		log("SYSERR: write_player_primary_data_to_file called without %s", fl ? "character" : "file");
@@ -2071,6 +2117,12 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (IS_NPC(ch)) {
 		log("SYSERR: write_player_primary_data_to_file called with NPC");
 		return;
+	}
+	
+	// save these for later, as they are sometimes changed by removing and re-adding gear
+	for (iter = 0; iter < NUM_POOLS; ++iter) {
+		deficit[iter] = GET_DEFICIT(ch, iter);
+		pool[iter] = GET_CURRENT_POOL(ch, iter);
 	}
 	
 	// unaffect the character to store raw numbers: equipment
@@ -2422,6 +2474,12 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		}
 	}
 	
+	// restore pools, which may have been modified
+	for (iter = 0; iter < NUM_POOLS; ++iter) {
+		GET_CURRENT_POOL(ch, iter) = pool[iter];
+		GET_DEFICIT(ch, iter) = deficit[iter];
+	}
+	
 	// affect_total(ch); // unnecessary, I think (?)
 }
 
@@ -2439,7 +2497,9 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	void write_mail_to_file(FILE *fl, char_data *ch);
 	
 	struct player_completed_quest *plrcom, *next_plrcom;
+	struct player_slash_history *psh, *next_psh;
 	struct player_faction_data *pfd, *next_pfd;
+	struct channel_history_data *hist;
 	struct trig_var_data *vars;
 	struct player_quest *plrq;
 	struct alias_data *alias;
@@ -2475,6 +2535,13 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Faction: %d %d\n", pfd->vnum, pfd->value);
 	}
 	
+	// 'H'
+	for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
+		LL_FOREACH(GET_HISTORY(ch, iter), hist) {
+			fprintf(fl, "History: %d %ld\n%s~\n", iter, hist->timestamp, NULLSAFE(hist->message));
+		}
+	}
+	
 	// 'L'
 	for (lore = GET_LORE(ch); lore; lore = lore->next) {
 		if (lore->text && *lore->text) {
@@ -2502,6 +2569,13 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'S'
+	HASH_ITER(hh, GET_SLASH_HISTORY(ch), psh, next_psh) {
+		LL_FOREACH(psh->history, hist) {
+			fprintf(fl, "Slash-History: %s %ld\n%s~\n", psh->channel, hist->timestamp, NULLSAFE(hist->message));
+		}
+	}
+	
+	// 'V'
 	if (SCRIPT(ch) && SCRIPT(ch)->global_vars) {
 		for (vars = SCRIPT(ch)->global_vars; vars; vars = vars->next) {
 			if (*vars->name == '-') { // don't save if it begins with -
@@ -2921,6 +2995,58 @@ void check_skills_and_abilities(char_data *ch) {
 
 
 /**
+* Deletes chat messages that are more than 24 hours old.
+*
+* @param char_data *ch The person whose history to clean.
+*/
+void clean_old_history(char_data *ch) {
+	struct channel_history_data *hist, *next_hist;
+	struct player_slash_history *psh, *next_psh;
+	long now = time(0);
+	int iter;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
+		LL_FOREACH_SAFE(GET_HISTORY(ch, iter), hist, next_hist) {
+			if (hist->timestamp + (60 * 60 * 24) < now) {
+				// 24 hours old
+				if (hist->message) {
+					free(hist->message);
+				}
+				LL_DELETE(GET_HISTORY(ch, iter), hist);
+				free(hist);
+			}
+		}
+	}
+	
+	HASH_ITER(hh, GET_SLASH_HISTORY(ch), psh, next_psh) {
+		LL_FOREACH_SAFE(psh->history, hist, next_hist) {
+			if (hist->timestamp + (60 * 60 * 24) < now) {
+				// 24 hours old
+				if (hist->message) {
+					free(hist->message);
+				}
+				LL_DELETE(psh->history, hist);
+				free(hist);
+			}
+		}
+		
+		// no more history
+		if (!psh->history) {
+			if (psh->channel) {
+				free(psh->channel);
+			}
+			HASH_DEL(GET_SLASH_HISTORY(ch), psh);
+			free(psh);
+		}
+	}
+}
+
+
+/**
 * Clears certain player data, similar to clear_char() -- but not for NPCS.
 *
 * @param char_data *ch The player charater to clear.
@@ -3085,6 +3211,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 
 	reset_char(ch);
 	check_delayed_load(ch);	// ensure everything is loaded
+	clean_old_history(ch);
 	reset_combat_meters(ch);
 	GET_COMBAT_METERS(ch).over = TRUE;	// ensure no active meter
 	
@@ -3221,6 +3348,9 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		REMOVE_FROM_LIST(load_slash, LOAD_SLASH_CHANNELS(ch), next);
 		if (load_slash->name) {
 			free(load_slash->name);
+		}
+		if (load_slash->lc_name) {
+			free(load_slash->lc_name);
 		}
 		free(load_slash);
 	}

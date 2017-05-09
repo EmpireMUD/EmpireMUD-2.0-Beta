@@ -1111,7 +1111,7 @@ end
 eval hide_again 1
 eval person %loc.people%
 while %person% && %hide_again%
-  if %person.is_pc% && ((%person.skill(Vampire)% > 50 && %self.vampire%) || (%person.skill(Stealth)% > 50 && !%self.vampire))
+  if %person.is_pc% && ((%person.skill(Vampire)% > 50 && %self.vampire%) || (%person.skill(Stealth)% > 50 && !%self.vampire%))
     eval hide_again 0
   end
   eval person %person.next_in_room%

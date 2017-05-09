@@ -89,8 +89,35 @@ bool add_ignore(char_data *ch, int idnum) {
 * @param int type CHANNEL_HISTORY_x -- structs.h
 * @param char *message full string including sender
 */
-void add_to_channel_history(descriptor_data *desc, int type, char *message) {
-	process_add_to_channel_history(&(desc->channel_history[type]), message);
+void add_to_channel_history(char_data *ch, int type, char *message) {
+	if (!REAL_NPC(ch)) {
+		process_add_to_channel_history(&GET_HISTORY(REAL_CHAR(ch), type), message);
+	}
+}
+
+
+/**
+* Adds a message to a player's /history for a channel.
+*
+* @param char_data *ch The player.
+* @param struct slash_channel *chan The channel.
+* @param char *message The message to add.
+*/
+void add_to_slash_channel_history(char_data *ch, struct slash_channel *chan, char *message) {
+	struct player_slash_history *psh;
+	
+	if (!ch || IS_NPC(ch) || !chan || !message || !*message) {
+		return;	// don't bother
+	}
+	
+	HASH_FIND_STR(GET_SLASH_HISTORY(ch), chan->lc_name, psh);
+	if (!psh) {
+		CREATE(psh, struct player_slash_history, 1);
+		psh->channel = str_dup(chan->lc_name);
+		HASH_ADD_STR(GET_SLASH_HISTORY(ch), channel, psh);
+	}
+	
+	process_add_to_channel_history(&(psh->history), message);
 }
 
 
@@ -178,7 +205,7 @@ void perform_tell(char_data *ch, char_data *vict, char *arg) {
 	if (vict->desc && vict->desc->last_act_message) {
 		// the message was sent via act(), we can retrieve it from the desc
 		sprintf(lbuf, "\t%c%s", color, vict->desc->last_act_message);
-		add_to_channel_history(vict->desc, CHANNEL_HISTORY_TELLS, lbuf);
+		add_to_channel_history(vict, CHANNEL_HISTORY_TELLS, lbuf);
 	}
 
 	if (PRF_FLAGGED(ch, PRF_NOREPEAT))
@@ -196,7 +223,7 @@ void perform_tell(char_data *ch, char_data *vict, char *arg) {
 
 		if (ch->desc && ch->desc->last_act_message) {
 			// the message was sent via act(), we can retrieve it from the desc
-			add_to_channel_history(ch->desc, CHANNEL_HISTORY_TELLS, ch->desc->last_act_message);
+			add_to_channel_history(ch, CHANNEL_HISTORY_TELLS, ch->desc->last_act_message);
 		}
 	}
 
@@ -221,6 +248,7 @@ void process_add_to_channel_history(struct channel_history_data **history, char 
 	// setup
 	CREATE(new, struct channel_history_data, 1);
 	new->message = strdup(message);
+	new->timestamp = time(0);
 	new->next = NULL;
 	
 	// find the end
@@ -379,7 +407,7 @@ ACMD(do_pub_comm) {
 			
 			// trap last act() and send to the history
 			if (ch->desc && ch->desc->last_act_message && pub_comm[subcmd].history != NO_HISTORY) {
-				add_to_channel_history(ch->desc, pub_comm[subcmd].history, ch->desc->last_act_message);
+				add_to_channel_history(ch, pub_comm[subcmd].history, ch->desc->last_act_message);
 			}
 		}
 		
@@ -450,7 +478,7 @@ ACMD(do_pub_comm) {
 									strcpy(lbuf, desc->last_act_message);
 								}
 								
-								add_to_channel_history(desc, pub_comm[subcmd].history, lbuf);
+								add_to_channel_history(desc->character, pub_comm[subcmd].history, lbuf);
 							}
 						}
 					}
@@ -682,8 +710,8 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 		}
 		act(lbuf, FALSE, ch, 0, 0, TO_CHAR | TO_SLEEP);
 		
-		if (ch->desc && ch->desc->last_act_message && (slash = find_on_slash_channel(ch, chan->id))) {
-			process_add_to_channel_history(&(slash->history), ch->desc->last_act_message);
+		if (ch->desc && ch->desc->last_act_message) {
+			add_to_slash_channel_history(ch, chan, ch->desc->last_act_message);
 		}
 	}
 
@@ -705,7 +733,7 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 		
 			// the message was sent via act(), we can retrieve it from the desc
 			if (desc->last_act_message) {
-				process_add_to_channel_history(&(slash->history), desc->last_act_message);
+				add_to_slash_channel_history(vict, chan, desc->last_act_message);
 			}
 		}
 	}
@@ -716,7 +744,7 @@ ACMD(do_slash_channel) {
 	struct slash_channel *chan;
 	struct channel_history_data *hist;
 	struct player_slash_channel *slash, *temp;
-	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	descriptor_data *desc;
 	char_data *vict;
 	int iter;
@@ -786,6 +814,11 @@ ACMD(do_slash_channel) {
 		skip_slash(arg2);
 		any_one_arg(arg2, arg3);
 		
+		if (!*arg3) {
+			msg_to_char(ch, "What channel do you want to join?\r\n");
+			return;
+		}
+		
 		// validate name
 		ok = TRUE && *arg3;
 		for (iter = 0; ok && *invalid_channel_names[iter] != '\n'; ++iter) {
@@ -813,6 +846,8 @@ ACMD(do_slash_channel) {
 			slash_channel_list = chan;
 			chan->id = ++top_slash_channel_id;
 			chan->name = str_dup(arg3);
+			strcpy(buf, arg3);
+			chan->lc_name = str_dup(strtolower(buf));
 			chan->color = compute_slash_channel_color(arg3);
 		}
 		
@@ -854,15 +889,6 @@ ACMD(do_slash_channel) {
 			
 			while ((slash = find_on_slash_channel(ch, chan->id))) {
 				REMOVE_FROM_LIST(slash, GET_SLASH_CHANNELS(ch), next);
-				
-				while ((hist = slash->history)) {
-					if (hist->message) {
-						free(hist->message);
-					}
-					slash->history = hist->next;
-					free(hist);
-				}
-				
 				free(slash);
 			}
 			
@@ -904,14 +930,19 @@ ACMD(do_slash_channel) {
 			msg_to_char(ch, "You're not even on that channel.\r\n");
 		}
 		else {
-			msg_to_char(ch, "Last %d messages on \t%c/%s\tn:\r\n", MAX_RECENT_CHANNELS, chan->color, chan->name);
-	
-			for (hist = slash->history; hist; hist = hist->next) {
-				send_to_char(hist->message, ch);
+			struct player_slash_history *psh;
 			
-				// check for newline
-				if (hist->message[strlen(hist->message) - 1] != '\n') {
-					send_to_char("\r\n", ch);
+			msg_to_char(ch, "Last %d messages on \t%c/%s\tn:\r\n", MAX_RECENT_CHANNELS, chan->color, chan->name);
+			
+			HASH_FIND_STR(GET_SLASH_HISTORY(ch), chan->lc_name, psh);
+			if (psh) {
+				LL_FOREACH(psh->history, hist) {
+					send_to_char(hist->message, ch);
+			
+					// check for newline
+					if (hist->message[strlen(hist->message) - 1] != '\n') {
+						send_to_char("\r\n", ch);
+					}
 				}
 			}
 		}
@@ -958,7 +989,7 @@ ACMD(do_gsay) {
 			delete_doubledollar(normal);
 			send_to_char(normal, ch);
 			if (ch->desc) {
-				add_to_channel_history(ch->desc, CHANNEL_HISTORY_SAY, normal);
+				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, normal);
 			}
 		}
 
@@ -987,7 +1018,7 @@ ACMD(do_gsay) {
 			}
 			
 			act(string, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
-			add_to_channel_history(desc, CHANNEL_HISTORY_SAY, desc->last_act_message);
+			add_to_channel_history(desc->character, CHANNEL_HISTORY_SAY, desc->last_act_message);
 		}
 	}
 }
@@ -1002,10 +1033,10 @@ ACMD(do_history) {
 	bool found_crlf;
 	int pos;
 	
-	if (ch->desc) {
+	if (!REAL_NPC(ch)) {
 		msg_to_char(ch, "Last %d %s:\r\n", MAX_RECENT_CHANNELS, types[subcmd]);
 	
-		for (chd_iter = ch->desc->channel_history[subcmd]; chd_iter; chd_iter = chd_iter->next) {
+		for (chd_iter = GET_HISTORY(REAL_CHAR(ch), subcmd); chd_iter; chd_iter = chd_iter->next) {
 			// verify has newline
 			pos = strlen(chd_iter->message) - 1;
 			found_crlf = FALSE;
@@ -1279,7 +1310,7 @@ ACMD(do_say) {
 			if (c->desc && c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
 				sprintf(lbuf, "\t%c%s", color, c->desc->last_act_message);
-				add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, lbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, lbuf);
 			}
 		}
 		
@@ -1292,7 +1323,7 @@ ACMD(do_say) {
 			send_to_char(lbuf, ch);
 
 			if (ch->desc) {
-				add_to_channel_history(ch->desc, CHANNEL_HISTORY_SAY, lbuf);
+				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, lbuf);
 			}
 		}
 		
@@ -1366,7 +1397,7 @@ ACMD(do_spec_comm) {
 		if (vict->desc && vict->desc->last_act_message) {
 			// the message was sent via act(), we can retrieve it from the desc
 			sprintf(buf, "\t%c%s", color, vict->desc->last_act_message);
-			add_to_channel_history(vict->desc, CHANNEL_HISTORY_SAY, buf);
+			add_to_channel_history(vict, CHANNEL_HISTORY_SAY, buf);
 		}
 		
 		// msg to char
@@ -1378,7 +1409,7 @@ ACMD(do_spec_comm) {
 			sprintf(buf, "\t%cYou %s %s, '%s\t%c'\t0", color, action_sing, PERS(vict, ch, FALSE), buf2, color);
 			msg_to_char(ch, "%s\r\n", buf);
 			if (ch->desc) {
-				add_to_channel_history(ch->desc, CHANNEL_HISTORY_SAY, buf);
+				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, buf);
 			}
 		}
 

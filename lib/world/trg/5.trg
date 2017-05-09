@@ -140,7 +140,7 @@ switch %random.4%
       halt
     end
     %send% %targ% Fire from %self.name% spreads over you, and you blaze with power!
-    %echoaround% %targ% Fire from %self.name% spreads over %targe.name%, who blazes with power!
+    %echoaround% %targ% Fire from %self.name% spreads over %targ.name%, who blazes with power!
     eval amount %self.level% / 20
     dg_affect %targ% BONUS-HEALING %amount% 30
     wait 25 sec

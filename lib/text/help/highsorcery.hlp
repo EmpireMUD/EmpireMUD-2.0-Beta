@@ -399,9 +399,11 @@ Usage:  ritual senselife
 Cost:  15 mana
 
 This spell works similar to the "search ability" and can find people hidden
-in the room with you, using simple magic.
+in the room with you, using simple magic. It also allows you to sense
+earthmelded people.
 
-Gains experience when you complete the ritual, whether or not you find anything.
+Gains experience when you complete the ritual, whether or not you find
+anything.
 
 See also: RITUAL
 #

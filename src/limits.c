@@ -39,7 +39,6 @@
 
 // external vars
 extern const char *affect_wear_off_msgs[];
-extern int daily_cycle;
 extern const char *dirs[];
 extern const char *from_dir[];
 extern const struct material_data materials[NUM_MATERIALS];
@@ -388,7 +387,6 @@ void point_update_char(char_data *ch) {
 	empire_data *emp;
 	char_data *c;
 	bool found;
-	int count;
 	
 	if (IS_NPC(ch) && FIGHTING(ch)) {
 		check_pointless_fight(ch);
@@ -402,11 +400,9 @@ void point_update_char(char_data *ch) {
 		
 		// check way over-inventory (2x overburdened)
 		if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
-			count = 0;
 			found = FALSE;
 			LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
-				count += obj_carry_size(obj);
-				if (count > 2 * GET_LARGEST_INVENTORY(ch)) {
+				if (IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
 					if (!found) {
 						found = TRUE;
 						msg_to_char(ch, "You are way overburdened and begin losing items...\r\n");
@@ -581,7 +577,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// first check location: this may move the player
-	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && !find_instance_by_room(IN_ROOM(ch), FALSE)) {
 		adventure_unsummon(ch);
 	}
 	
@@ -616,6 +612,13 @@ void real_update_char(char_data *ch) {
 		act("$N vanishes.", FALSE, ch->master, NULL, ch, TO_NOTVICT);
 		extract_char(ch);
 		return;
+	}
+	// earthmeld damage
+	if (!IS_NPC(ch) && !IS_IMMORTAL(ch) && AFF_FLAGGED(ch, AFF_EARTHMELD) && ROOM_IS_CLOSED(IN_ROOM(ch))) {
+		if (!affected_by_spell(ch, ATYPE_NATURE_BURN)) {
+			msg_to_char(ch, "You are beneath a building and begin taking nature burn as the earth you're buried in is separated from fresh air...\r\n");
+		}
+		apply_dot_effect(ch, ATYPE_NATURE_BURN, 6, DAM_MAGICAL, 5, 60, ch);
 	}
 	
 	// update affects (NPCs get this, too)
@@ -657,12 +660,12 @@ void real_update_char(char_data *ch) {
 			ATTACK_PHYSICAL_DOT
 		));
 		
-		result = damage(ch, ch, dot->damage * dot->stack, type, dot->damage_type);
-		if (result > 0 && (caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by))) {
+		caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by);
+		result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type);
+		if (result > 0 && caster) {
 			took_dot = TRUE;
-			combat_meter_damage_dealt(caster, result);
 		}
-		if (result < 0 || EXTRACTED(ch) || IS_DEAD(ch)) {
+		else if (result < 0 || EXTRACTED(ch) || IS_DEAD(ch)) {
 			return;
 		}
 		
@@ -713,7 +716,7 @@ void real_update_char(char_data *ch) {
 	}
 
 	// periodic exp and skill gain
-	if (GET_DAILY_CYCLE(ch) < daily_cycle) {
+	if (GET_DAILY_CYCLE(ch) < data_get_long(DATA_DAILY_CYCLE)) {
 		// other stuff that resets daily
 		gain = compute_bonus_exp_per_day(ch);
 		if (GET_DAILY_BONUS_EXPERIENCE(ch) < gain) {
@@ -731,7 +734,7 @@ void real_update_char(char_data *ch) {
 		}
 		
 		// update to this cycle so it only happens once a day
-		GET_DAILY_CYCLE(ch) = daily_cycle;
+		GET_DAILY_CYCLE(ch) = data_get_long(DATA_DAILY_CYCLE);
 	}
 
 	/* Update conditions */
@@ -1859,7 +1862,7 @@ bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner) {
 		return TRUE;
 	}
 	
-	if (RMT_FLAGGED(loc, RMT_NO_TELEPORT)) {
+	if (RMT_FLAGGED(loc, RMT_NO_TELEPORT) || ROOM_AFF_FLAGGED(loc, ROOM_AFF_NO_TELEPORT)) {
 		return FALSE;
 	}
 
@@ -2198,15 +2201,15 @@ int move_gain(char_data *ch, bool info_only) {
 */
 void point_update(bool run_real) {
 	void clean_offers(char_data *ch);
-	void save_daily_cycle();
 	void setup_daily_quest_cycles(int only_cycle);
 	void update_players_online_stats();
-	extern int max_players_today;
 	
 	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
 	obj_data *obj, *next_obj;
 	char_data *ch, *next_ch;
+	
+	long daily_cycle = data_get_long(DATA_DAILY_CYCLE);
 	
 	// check if the skill cycle must reset (daily)
 	if (time(0) > daily_cycle + SECS_PER_REAL_DAY) {
@@ -2215,10 +2218,10 @@ void point_update(bool run_real) {
 		while (time(0) > daily_cycle + SECS_PER_REAL_DAY) {
 			daily_cycle += SECS_PER_REAL_DAY;
 		}
-		save_daily_cycle();
+		data_set_long(DATA_DAILY_CYCLE, daily_cycle);
 		
 		// reset players seen today too
-		max_players_today = 0;
+		data_set_int(DATA_MAX_PLAYERS_TODAY, 0);
 		update_players_online_stats();
 		setup_daily_quest_cycles(NOTHING);
 	}

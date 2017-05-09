@@ -61,7 +61,7 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
 int file_to_string_alloc(const char *name, char **buf);
 void get_one_line(FILE *fl, char *buf);
 void index_boot_help();
-void save_daily_cycle();
+void reset_time();
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -112,7 +112,6 @@ struct message_list fight_messages[MAX_MESSAGES];	// fighting messages
 
 // game config
 time_t boot_time = 0;	// time of mud boot
-int daily_cycle = 0;	// this is a timestamp for the last time skills/exp reset
 int Global_ignore_dark = 0;	// For use in public channels
 int no_auto_deletes = 0;	// skip player deletes on boot?
 struct time_info_data time_info;	// the infomation about the time
@@ -273,12 +272,11 @@ void boot_db(void) {
 	void init_config_system();
 	void link_and_check_vehicles();
 	void load_banned();
-	void load_daily_cycle();
+	void load_data_table();
 	void load_intro_screens();
 	void load_fight_messages();
 	void load_tips_of_the_day();
 	void load_trading_post();
-	void reset_time();
 	int run_convert_vehicle_list();
 	void run_reboot_triggers();
 	void sort_commands();
@@ -289,7 +287,10 @@ void boot_db(void) {
 	
 	log("Loading game config system.");
 	init_config_system();
-
+	
+	log("Loading game data system.");
+	load_data_table();
+	
 	log("Resetting the game time:");
 	reset_time();
 
@@ -345,9 +346,6 @@ void boot_db(void) {
 	log("Resetting all rooms.");
 	startup_room_reset();
 
-	load_daily_cycle();
-	log("Beginning skill reset cycle at %d.", daily_cycle);
-	
 	// NOTE: check_version() updates many things that change from version to
 	// version. See the function itself for a list of one-time updates it runs
 	// on the game. This should run as late in boot_db() as possible.
@@ -1781,6 +1779,7 @@ const char *versions_list[] = {
 	"b4.32",
 	"b4.36",
 	"b4.38",
+	"b4.39",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2327,6 +2326,37 @@ void b4_38_tower_triggers(void) {
 }
 
 
+// b4.39 convert stored data from old files
+void b4_39_data_conversion(void) {
+	const char *EXP_FILE = LIB_ETC"exp_cycle";	// used prior to this patch
+	const char *TIME_FILE = LIB_ETC"time";
+	
+	long l_in;
+	int i_in;
+	FILE *fl;
+	
+	// exp cycle file
+	if ((fl = fopen(EXP_FILE, "r"))) {
+		fscanf(fl, "%d\n", &i_in);
+		data_set_long(DATA_DAILY_CYCLE, i_in);
+		log(" - imported daily cycle %ld", data_get_long(DATA_DAILY_CYCLE));
+		fclose(fl);
+		unlink(EXP_FILE);
+	}
+	
+	// time file
+	if ((fl = fopen(TIME_FILE, "r"))) {
+		fscanf(fl, "%ld\n", &l_in);
+		data_set_long(DATA_WORLD_START, l_in);
+		log(" - imported start time %ld", data_get_long(DATA_WORLD_START));
+		fclose(fl);
+		unlink(TIME_FILE);
+		
+		reset_time();
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -2533,6 +2563,10 @@ void check_version(void) {
 			log("Applying b4.38 update to towers...");
 			b4_38_tower_triggers();
 		}
+		if (MATCH_VERSION("b4.39")) {
+			log("Converting datat to b4.39 format...");
+			b4_39_data_conversion();
+		}
 	}
 	
 	write_last_boot_version(current);
@@ -2582,9 +2616,13 @@ void assign_old_workforce_chore(empire_data *emp, int chore) {
 
 /* reset the time in the game from file */
 void reset_time(void) {
-	long load_time();	// db.c
-
-	long beginning_of_time = load_time();
+	long beginning_of_time = data_get_long(DATA_WORLD_START);
+	
+	// a whole new world!
+	if (!beginning_of_time) {
+		beginning_of_time = time(0);
+		data_set_long(DATA_WORLD_START, beginning_of_time);
+	}
 
 	time_info = *mud_time_passed(time(0), beginning_of_time);
 
@@ -2655,23 +2693,6 @@ void setup_start_locations(void) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS LOADERS ///////////////////////////////////////////////////
-
-/**
-* Loads the timestamp for the daily skill gain cycle.
-*/
-void load_daily_cycle(void) {
-	FILE *fl;
-
-	if (!(fl = fopen(EXP_FILE, "r"))) {
-		daily_cycle = time(0);
-		save_daily_cycle();	// save now so we get a reset in 24 hours
-		return;
-	}
-
-	fscanf(fl, "%d\n", &daily_cycle);
-	fclose(fl);
-}
-
 
 /**
 * Loads the "messages" file, which contains damage messages for various attack
@@ -2785,29 +2806,6 @@ void load_intro_screens(void) {
 	}
 	
 	log("Loaded %d intro screens.", num_intros);
-}
-
-
-/**
-* Loads (and sometimes creates) the timestamp file that we use to compute
-* when the game "began".
-*/
-long load_time(void) {
-	long t;
-	FILE *fp;
-
-	if (!(fp = fopen(TIME_FILE, "r"))) {
-		if (!(fp = fopen(TIME_FILE, "w"))) {
-			log("SYSERR: Unable to create a beginning_of_time file!");
-			return 650336715;
-		}
-		fprintf(fp, "%ld\n", time(0));
-		fclose(fp);
-		return time(0);
-	}
-	fscanf(fp, "%ld\n", &t);
-	fclose(fp);
-	return t;
 }
 
 
@@ -2949,24 +2947,6 @@ void load_trading_post(void) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS SAVERS ////////////////////////////////////////////////////
-
-/**
-* Saves the timestamp file for the daily skill cycle.
-*/
-void save_daily_cycle(void) {
-	FILE *fl;
-
-	if (!(fl = fopen(EXP_FILE TEMP_SUFFIX, "w"))) {
-		log("Error opening daily cycle file!");
-		return;
-	}
-
-	fprintf(fl, "%d\n", daily_cycle);
-	fclose(fl);
-	
-	rename(EXP_FILE TEMP_SUFFIX, EXP_FILE);
-}
-
 
 /**
 * Save the trading post file (done after any changes).

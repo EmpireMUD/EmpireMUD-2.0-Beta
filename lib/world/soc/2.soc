@@ -532,7 +532,7 @@ You bonk $N over the head, resulting in a hollow echo.~
 M3
 $n bonks $N over the head, resulting in a hollow echo.~
 M4
-$n bonks you over the head, you hear a hollow echo.~
+$n bonks you over the head. You hear a hollow echo.~
 M5
 Who were you going to bonk, again?~
 M6
@@ -716,5 +716,22 @@ M6
 You high-five yourself smugly.~
 M7
 $n high-fives $mself, looking smug.~
+S
+#299
+Test Social~
+test~
+0 5 5
+L
+2 121 0 2
+L
+2 100 0 2
+L
+2 100 0 1 a
+L
+2 121 0 1 a
+M0
+You attempt to start a fire.~
+M1
+$n attempts to start a fire.~
 S
 $

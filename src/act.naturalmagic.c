@@ -35,7 +35,7 @@
 // external vars
 
 // external funcs
-extern obj_data *find_obj(int n);
+extern obj_data *find_obj(int n, bool error);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
 void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_vnum ability);
@@ -171,6 +171,11 @@ void un_earthmeld(char_data *ch) {
 			act("$n rises from the ground!", TRUE, ch, 0, 0, TO_ROOM);
 			GET_POS(ch) = POS_STANDING;
 			add_cooldown(ch, COOLDOWN_EARTHMELD, 2 * SECS_PER_REAL_MIN);
+			
+			if (affected_by_spell(ch, ATYPE_NATURE_BURN)) {
+				affect_from_char(ch, ATYPE_NATURE_BURN, TRUE);
+				command_lag(ch, WAIT_ABILITY);
+			}
 		}
 	}
 }
@@ -635,7 +640,7 @@ ACMD(do_earthmeld) {
 
 	if (AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 		// only check sector on rise if the person has earth mastery, otherwise they are trapped
-		if (has_ability(ch, ABIL_WORM) && IS_ANY_BUILDING(IN_ROOM(ch))) {
+		if (has_ability(ch, ABIL_WORM) && IS_ANY_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN)) {
 			msg_to_char(ch, "You can't rise from the earth here!\r\n");
 		}
 		else {
@@ -646,12 +651,12 @@ ACMD(do_earthmeld) {
 	}
 
 	// sect validation
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER | SECTF_MAP_BUILDING | SECTF_INSIDE)) {
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER | SECTF_INSIDE) || (GET_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN))) {
 		msg_to_char(ch, "You can't earthmeld without natural ground below you!\r\n");
 		return;
 	}
 	
-	if (SECT_FLAGGED(BASE_SECT(IN_ROOM(ch)), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER | SECTF_MAP_BUILDING | SECTF_INSIDE)) {
+	if (SECT_FLAGGED(BASE_SECT(IN_ROOM(ch)), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER | SECTF_INSIDE)) {
 		msg_to_char(ch, "You can't earthmeld without solid ground below you!\r\n");
 		return;
 	}
@@ -1026,7 +1031,7 @@ ACMD(do_heal) {
 	}
 	
 	if (!party && IS_DEAD(vict)) {
-		msg_to_char(ch, "Unfortunately you can't heal on someone who is already dead.\r\n");
+		msg_to_char(ch, "Unfortunately you can't heal someone who is already dead.\r\n");
 		return;
 	}
 	if (!party && is_fight_enemy(ch, vict)) {
@@ -1202,7 +1207,7 @@ ACMD(do_moonrise) {
 		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
 			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
 		}
-		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict)) || !IS_CORPSE(corpse)) {
+		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict), FALSE) || !IS_CORPSE(corpse)) {
 			// victim has died AGAIN
 			act("You can only resurrect $N using $S most recent corpse.", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
 		}
@@ -1446,7 +1451,7 @@ ACMD(do_resurrect) {
 		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
 			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
 		}
-		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict)) || !IS_CORPSE(corpse)) {
+		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict), FALSE) || !IS_CORPSE(corpse)) {
 			// victim has died AGAIN
 			act("You can't resurrect $N with that corpse.", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
 		}

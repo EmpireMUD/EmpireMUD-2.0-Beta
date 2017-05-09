@@ -1178,6 +1178,7 @@ void process_chop(char_data *ch) {
 */
 void process_digging(char_data *ch) {
 	room_data *in_room;
+	char_data *iter;
 	
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to dig here.\r\n");
@@ -1193,23 +1194,18 @@ void process_digging(char_data *ch) {
 		GET_ACTION(ch) = ACT_NONE;
 		in_room = IN_ROOM(ch);
 		
-		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, finish_digging)) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch)) && run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, finish_digging)) {
 			// success
 			gain_ability_exp(ch, ABIL_SCAVENGING, 10);
 		
 			// character is still there and not digging?
 			if (GET_ACTION(ch) == ACT_NONE && in_room == IN_ROOM(ch)) {
-				if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch))) {
-					start_digging(ch);
-				}
-				else {
-					// this results in a double-message from finish_digging:
-					// msg_to_char(ch, "There don't seem to be any other good rocks here.\r\n");
-				}
+				start_digging(ch);
 			}
 		}
 		else {
 			msg_to_char(ch, "You don't seem to be able to find anything to dig for.\r\n");
+			start_digging(ch);
 		}
 	}
 	else {
@@ -1218,6 +1214,20 @@ void process_digging(char_data *ch) {
 			send_to_char("You dig vigorously at the ground.\r\n", ch);
 		}
 		act("$n digs vigorously at the ground.", FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
+	}
+	
+	// look for earthmelders
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+		if (!AFF_FLAGGED(iter, AFF_EARTHMELD)) {
+			continue;
+		}
+		if (iter == ch || IS_IMMORTAL(iter) || IS_NPC(iter) || IS_DEAD(iter) || EXTRACTED(iter)) {
+			continue;
+		}
+		
+		// earthmeld damage
+		msg_to_char(iter, "You feel nature burning at your earthmelded form as someone digs above you!\r\n");
+		apply_dot_effect(iter, ATYPE_NATURE_BURN, 6, DAM_MAGICAL, 5, 60, iter);
 	}
 }
 
@@ -1272,6 +1282,7 @@ void process_escaping(char_data *ch) {
 */
 void process_excavating(char_data *ch) {	
 	int count, total;
+	char_data *iter;
 
 	total = 1;	// shovelfuls at once (add things that speed up excavate)
 	for (count = 0; count < total && GET_ACTION(ch) == ACT_EXCAVATING; ++count) {
@@ -1317,6 +1328,20 @@ void process_excavating(char_data *ch) {
 				stop_room_action(IN_ROOM(ch), ACT_EXCAVATING, NOTHING);
 			}
 		}
+	}
+	
+	// look for earthmelders
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+		if (!AFF_FLAGGED(iter, AFF_EARTHMELD)) {
+			continue;
+		}
+		if (iter == ch || IS_IMMORTAL(iter) || IS_NPC(iter) || IS_DEAD(iter) || EXTRACTED(iter)) {
+			continue;
+		}
+		
+		// earthmeld damage
+		msg_to_char(iter, "You feel nature burning at your earthmelded form as someone digs above you!\r\n");
+		apply_dot_effect(iter, ATYPE_NATURE_BURN, 6, DAM_MAGICAL, 5, 60, iter);
 	}
 }
 
@@ -2427,7 +2452,10 @@ ACMD(do_chop) {
 
 
 ACMD(do_dig) {
-	if (GET_ACTION(ch) == ACT_DIGGING) {
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs can't dig.\r\n");
+	}
+	else if (GET_ACTION(ch) == ACT_DIGGING) {
 		send_to_char("You stop digging.\r\n", ch);
 		act("$n stops digging.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
@@ -2438,7 +2466,7 @@ ACMD(do_dig) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
-	else if (!CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_DIG)) {
+	else if ((ROOM_IS_CLOSED(IN_ROOM(ch)) || WATER_SECT(IN_ROOM(ch))) && !CAN_INTERACT_ROOM(IN_ROOM(ch), INTERACT_DIG)) {
 		send_to_char("You can't dig here.\r\n", ch);
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
@@ -2482,7 +2510,8 @@ ACMD(do_excavate) {
 	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) < 0) {
 		start_action(ch, ACT_EXCAVATING, 0);
-		msg_to_char(ch, "You begin to excavate a trench.\r\n");
+		msg_to_char(ch, "You begin to excavate the trench.\r\n");
+		act("$n begins excavating the trench.", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH)) {
 		msg_to_char(ch, "The trench is already complete!\r\n");

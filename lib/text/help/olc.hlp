@@ -332,6 +332,10 @@ Quests (QEDIT):
 - If multiple DAILY quests share the same 'daily cycle', only one of them is
   available per day. Any unique integer can be a daily cycle, but for the sake
   of cleanliness, you should pick the vnum of one of the quests on the cycle.
+- For tasks and prerequisites, any requirements you add are "OR" by default
+  (any matching requirement from the list lets the character pass the check).
+  If you want them to be "AND" requirements, you need to set a group letter on
+  them.
 
 Room Templates (REDIT):
 - Don't confuse room templates with the designated rooms that players can add
@@ -1116,6 +1120,7 @@ Available affects:
  !FLY - flying characters cannot enter, like an enchanted wall
  !WEATHER - suppress weather messages and command
  !DISREPAIR - never falls into disrepair (caution: this prevents empire decay)
+ !TELEPORT - cannot teleport here
 
 Some affects are managed by live data and commands (do not set affects with *):
  *HAS-INSTANCE - an adventure is linked here
@@ -3646,6 +3651,7 @@ Available liquids are:
   red wine
   white wine
   grog
+  mead
 
 See also: OLC OBJECTS
 #d
@@ -4135,7 +4141,7 @@ Available flags:
  - !MOBILE -- Cannot edit mobiles
  - !OBJECT -- Cannot edit objects
  - !BUILDING -- Cannot edit buildings
- - SECTORS -- CAN edit map sectors
+ - !SECTORS -- Cannot edit map sectors
  - !CROP -- Cannot edit crops
  - !TRIGGER -- Cannot edit triggers
  - !ADVENTURE -- Cannot edit adventures
@@ -4944,6 +4950,7 @@ See also: OLC SECTORS
 "SECTEDIT ICONS" "CROPEDIT ICONS"
 
 Usage:  .icons add <type> <color code> <icon>
+        .icons copy <from type> <from vnum>
         .icons change <number> <type | color | icon> <value>
         .icons remove <number | all>
 

@@ -1068,13 +1068,13 @@ $n shoots a lightning bolt at $N, but misses.
 * Physical DoT
 M
  61
-#
+$N bleeds out from $s open wounds, and dies.
 You bleed out from your open wounds and die.
 $N bleeds out from $s open wounds, and dies.
 #
 #
 #
-#
+$N winces in pain from $s open wounds.
 You wince in pain from your open wounds.
 $N winces in pain from $s open wounds.
 #
@@ -1082,13 +1082,13 @@ $N winces in pain from $s open wounds.
 #
 M
  61
-#
+$N succumbs to $s open wounds, and dies.
 You succumb to your open wounds and die.
 $N succumbs to $s open wounds, and dies.
 #
 #
 #
-#
+$N bleeds from open wounds.
 You bleed from open wounds.
 $N bleeds from open wounds.
 #
@@ -1130,13 +1130,13 @@ $N basks in the glow of $n's sunshock.
 * Magical DoT
 M
  64
-#
+The searing magical pain proves too much for $N, and $E falls over dead!
 The searing magical pain proves too much, and you fall over dead!
 The searing magical pain proves too much for $N, and $E falls over dead!
 #
 #
 #
-#
+$N twitches as magical pain sears through $M!
 You twitch as magical pain sears through you!
 $N twitches as magical pain sears through $M!
 #
@@ -1144,13 +1144,13 @@ $N twitches as magical pain sears through $M!
 #
 M
  64
-#
+The residual magic flowing through $N proves too much, and $E falls over dead!
 The residual magic flowing through you proves too much, and you fall over dead!
 The residual magic flowing through $N proves too much, and $E falls over dead!
 #
 #
 #
-#
+$N seems to be burning on the inside as magical pain courses through $M!
 You're burning from the inside as magical pain courses through you!
 $N seems to be burning on the inside as magical pain courses through $M!
 #
@@ -1160,13 +1160,13 @@ $N seems to be burning on the inside as magical pain courses through $M!
 * Fire DoT
 M
  65
-#
+The fire overtakes $N and $E burns to death!
 The fire overtakes you and you burn to death!
 The fire overtakes $N and $E burns to death!
 #
 #
 #
-#
+$N shouts in pain as the fire scorches $S flesh!
 You shout in pain as the fire scorches your flesh!
 $N shouts in pain as the fire scorches $S flesh!
 #
@@ -1174,13 +1174,13 @@ $N shouts in pain as the fire scorches $S flesh!
 #
 M
  65
-#
+$N falls over dead, burnt to a crisp!
 You fall over dead, burnt to a crisp!
 $N falls over dead, burnt to a crisp!
 #
 #
 #
-#
+$N is on fire, $S flesh sizzles and $E appears to be in agony!
 You are on fire! Your flesh sizzles with agony!
 $N is on fire, $S flesh sizzles and $E appears to be in agony!
 #
@@ -1190,13 +1190,13 @@ $N is on fire, $S flesh sizzles and $E appears to be in agony!
 * Poison DoT
 M
  66
-#
+The poison reaches $N's heart and $E crumples to the ground, dead!
 The poison reaches your heart and you crumple to the ground, dead!
 The poison reaches $N's heart and $E crumples to the ground, dead!
 #
 #
 #
-#
+$N winces in pain as poison courses through $S blood!
 You wince in pain as poison courses through your blood!
 $N winces in pain as poison courses through $S blood!
 #
@@ -1204,13 +1204,13 @@ $N winces in pain as poison courses through $S blood!
 #
 M
  66
-#
+$N suddenly falls over, dead from poison!
 The poison hits your brain. Your vision fades to black and you fall down dead!
 $N suddenly falls over, dead from poison!
 #
 #
 #
-#
+$N acts like $E's burning from the inside as poison flows through $S veins!
 You burn from the inside out as poison flows through your veins!
 $N acts like $E's burning from the inside as poison flows through $S veins!
 #

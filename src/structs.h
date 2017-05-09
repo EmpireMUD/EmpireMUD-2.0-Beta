@@ -177,7 +177,7 @@
 
 
 // basic types
-typedef char byte;
+typedef signed char byte;
 typedef signed char sbyte;
 typedef unsigned char ubyte;
 typedef signed short int sh_int;
@@ -1055,7 +1055,7 @@ typedef struct vehicle_data vehicle_data;
 
 // Variables for the output buffering system
 #define MAX_SOCK_BUF  (24 * 1024)	// Size of kernel's sock buf
-#define MAX_PROMPT_LENGTH  256	// Max length of rendered prompt
+#define MAX_PROMPT_LENGTH  275	// Max length of rendered prompt
 #define GARBAGE_SPACE  32	// Space for **OVERFLOW** etc
 #define SMALL_BUFSIZE  8192	// Static output buffer size
 // Max amount of output that can be buffered
@@ -1308,7 +1308,8 @@ typedef struct vehicle_data vehicle_data;
 #define LIQ_RED_WINE  11
 #define LIQ_WHITE_WINE  12
 #define LIQ_GROG  13
-#define NUM_LIQUIDS  14	// total
+#define LIQ_MEAD  14
+#define NUM_LIQUIDS  15	// total
 
 
 // Item materials
@@ -2007,6 +2008,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_AFF_NO_DISREPAIR  BIT(13)	// n. will not fall into disrepair
 #define ROOM_AFF_NO_DISMANTLE  BIT(14)	// o. blocks normal dismantle until turned off
 #define ROOM_AFF_INCOMPLETE  BIT(15)	// p. building is incomplete
+#define ROOM_AFF_NO_TELEPORT  BIT(16)	// q. cannot teleport
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
@@ -2401,6 +2403,7 @@ struct skill_ability {
 struct slash_channel {
 	int id;
 	char *name;
+	char *lc_name;	// lowercase name (for speed)
 	char color;
 	struct slash_channel *next;
 };
@@ -2513,6 +2516,9 @@ struct exit_template {
 	char *keyword;	// name if it will be closable
 	sh_int exit_info;	// EX_x
 	rmt_vnum target_room;	// room template to link to
+	
+	// unsaved:
+	bool done;	// used while instantiating rooms
 	
 	struct exit_template *next;
 };
@@ -2861,6 +2867,7 @@ struct account_player {
 // used in descriptor for personal channel histories -- act.comm.c
 struct channel_history_data {
 	char *message;
+	long timestamp;
 	struct channel_history_data *next;
 };
 
@@ -2945,9 +2952,11 @@ struct descriptor_data {
 	
 	protocol_t *pProtocol; // see protocol.c
 	struct color_reducer color;
+	bool no_nanny;	// skips interpreting player input if only a telnet negotiation sequence was sent
 	
 	char **str;	// for the modify-str system
 	char *backstr;	// for the modify-str aborts
+	char *str_on_abort;	// a pointer to restore if the player aborts the editor
 	char *file_storage;	// name of where to save a file
 	bool straight_to_editor;	// if true, commands go straight to the string editor
 	size_t max_str;	// max length of editor
@@ -2976,7 +2985,6 @@ struct descriptor_data {
 	descriptor_data *snoop_by;	// And who is snooping this char
 
 	char *last_act_message;	// stores the last thing act() sent to this desc
-	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// histories
 	
 	// olc
 	int olc_type;	// OLC_OBJECT, etc -- only when an editor is open
@@ -3075,8 +3083,15 @@ struct player_skill_data {
 // channels a player is on
 struct player_slash_channel {
 	int id;
-	struct channel_history_data *history;
 	struct player_slash_channel *next;
+};
+
+
+// channel histories
+struct player_slash_history {
+	char *channel;	// lowercase channel name
+	struct channel_history_data *history;
+	UT_hash_handle hh;	// hashed by channe;
 };
 
 
@@ -3138,8 +3153,10 @@ struct player_special_data {
 	struct alias_data *aliases;	// Character's aliases
 	struct offer_data *offers;	// various offers for do_accept/reject
 	struct player_slash_channel *slash_channels;	// channels the player is on
+	struct player_slash_history *slash_history;	// slash-channel histories
 	struct slash_channel *load_slash_channels;	// temporary storage between load and join
 	struct player_faction_data *factions;	// hash table of factions
+	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// histories
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered

@@ -1963,6 +1963,7 @@ const char *drinks[] = {
 	"red wine",
 	"white wine",
 	"grog",
+	"mead",
 	"\n"
 };
 
@@ -1983,6 +1984,7 @@ const char *drinknames[] = {
 	"wine",
 	"wine",
 	"grog",
+	"mead",
 	"\n"
 };
 
@@ -2004,6 +2006,7 @@ int drink_aff[][3] = {
 	{ 4, 0, 1 },	// red wine
 	{ 3, 0, 1 },	// white wine
 	{ 2, 1, 1 },	// grog
+	{ 1, 1, 1 },	// mead
 };
 
 
@@ -2023,6 +2026,7 @@ const char *color_liquid[] = {
 	"red",
 	"clear",
 	"amber",
+	"golden",
 	"\n"
 };
 
@@ -2269,7 +2273,7 @@ const char *olc_flag_bits[] = {
 	"!MOBILE",
 	"!OBJECT",
 	"!BUILDING",
-	"SECTORS",
+	"!SECTORS",
 	"!CROP",
 	"!TRIGGER",
 	"!ADVENTURE",
@@ -2758,6 +2762,7 @@ const char *room_aff_bits[] = {
 	"!DISREPAIR",
 	"*!DISMANTLE",
 	"*INCOMPLETE",	// 15
+	"!TELEPORT",
 	"\n"
 };
 
@@ -2993,6 +2998,7 @@ const char *affect_types[] = {
 	"thornlash",	// 75
 	"arrow to the knee",
 	"hostile delay",
+	"nature burn",
 	"\n"
 	};
 
@@ -3077,6 +3083,7 @@ const char *affect_wear_off_msgs[] = {
 	"",	// 75, thornlast
 	"Your knee feels better.",
 	"Your hostile login delay ends and you are free to act.",
+	"Your nature burn eases.",
 	"\n"
 };
 
@@ -3709,6 +3716,9 @@ const char *reserved_words[] = {
 	"of",
 	"someone",
 	"something",
+	"misc",
+	"miscellaneous",
+	"other",
 	"\n"
 };
 

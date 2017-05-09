@@ -137,6 +137,7 @@
 
 // misc files (user-modifiable libs)
 #define CONFIG_FILE  LIB_MISC"game_configs"  // config.c system
+#define DATA_FILE  LIB_MISC"game_data"	// data.c system
 #define IDEA_FILE  LIB_MISC"ideas"	// for the 'idea'-command
 #define TYPO_FILE  LIB_MISC"typos"	//         'typo'
 #define BUG_FILE  LIB_MISC"bugs"	//         'bug'
@@ -146,8 +147,6 @@
 
 // etc files (non-user-modifiable libs)
 #define BAN_FILE  LIB_ETC"badsites"	// for the siteban system
-#define TIME_FILE  LIB_ETC"time"	// for recording the big bang
-#define EXP_FILE  LIB_ETC"exp_cycle"	// for experience cycling
 #define INSTANCE_FILE  LIB_ETC"instances"	// instanced adventures
 #define ISLAND_FILE  LIB_ETC"islands"	// island info
 #define TRADING_POST_FILE  LIB_ETC"trading_post"	// for global trade
@@ -171,10 +170,45 @@
 #define READ_SIZE 256
 
 
+// DATA_x: stored data system
+#define DATA_DAILY_CYCLE  0	// timestamp of last day-reset (bonus exp, etc)
+#define DATA_LAST_NEW_YEAR  1	// timestamp of last annual world update
+#define DATA_WORLD_START  2	// timestamp of when the mud first started up
+#define DATA_MAX_PLAYERS_TODAY  3	// players logged in today
+#define NUM_DATAS  4
+
+
+// DATYPE_x: types of stored data
+#define DATYPE_INT  0
+#define DATYPE_LONG  1
+#define DATYPE_DOUBLE  2
+
+
 // for DB_BOOT_ configs
 struct db_boot_info_type {
 	char *prefix;
 	char *suffix;
+};
+
+
+// for DATA_ configuration
+struct stored_data_type {
+	char *name;	// how it's stored in the file
+	int type;	// DATYPE_ const
+};
+
+
+// for storing data between reboots
+struct stored_data {
+	int key;	// DATA_ const
+	int keytype;	// DATYPE_ const
+	union {
+		int int_val;
+		long long_val;
+		double double_val;
+	} value;
+	
+	UT_hash_handle hh;
 };
 
 
@@ -260,6 +294,16 @@ extern craft_data *craft_proto(craft_vnum vnum);
 extern crop_data *crop_table;
 void free_crop(crop_data *cp);
 extern crop_data *crop_proto(crop_vnum vnum);
+
+// data system getters
+extern double data_get_double(int key);
+extern int data_get_int(int key);
+extern long data_get_long(int key);
+
+// data system setters
+extern double data_set_double(int key, double value);
+extern int data_set_int(int key, int value);
+extern long data_set_long(int key, long value);
 
 // descriptors
 extern descriptor_data *descriptor_list;

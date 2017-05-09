@@ -173,6 +173,8 @@ Cook (Trade ability)
 Command:  cook [number] <item>
           cook info <item>
 
+Speed boosts:  Faster Chores bonus
+
 The cook command (formerly "bake") allows you to make food from a variety of
 raw ingredients. To cook, you'll need a heat source: a cooking fire, a kitchen,
 a bakery, an alchemist, or a laboratory. The Touch of Flame ability also works.
@@ -420,8 +422,8 @@ See also: RECIPES
 #
 IRON "IRON ORE"
 
-Used for: forge, build, manufacture
-Stored in: Foundry
+Used for:  forge, build, manufacture
+Stored in:  Foundry
 
 Iron ore is found by mining in the mountains. It is useful in building and
 forging equipment, as well as manufacturing ships.
@@ -454,6 +456,16 @@ Shield:
 Armorsmithing -> Sturdy Armors -> Imperial Armors
 
 See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, STURDY ARMORS
+#
+IMPERIUM "IMPERIUM ORE"
+
+Used for:  forge
+Stored in:  Foundry
+
+Imperium is a rare, strong metal with a bright white color. It is used to make
+powerful weapons and armor.
+
+See also: FORGE, METALS, MINE, SMELT
 #
 "IRON BLADES"
 
@@ -637,6 +649,16 @@ These metals are generally used in crafts in the 200-300 level range.
 
 See also: RARE METALS, SMELT
 #
+NOCTURNIUM "NOCTURNIUM ORE"
+
+Used for:  forge, sew
+Stored in:  Foundry
+
+Nocturnium is a pure black metal, its surface swirling with mana. It is often
+plated onto powerful magical objects.
+
+See also: FORGE, METALS, MINE, SEW, SMELT
+#
 PATTERNS "ADVENTURE CRAFTS" "CRAFTING PATTERNS"
 
 Some items can be found in adventures which allow you to use crafting recipes as
@@ -769,7 +791,7 @@ An item must be in your inventory to reforge it. However, if another player
 
 See also: MASTER BLACKSMITH, MASTER TAILOR, SHARE
 #
-"SCALABLE CRAFTS" "SCALABLE CRAFTING" "CRAFTING SCALABLES"
+"SCALABLE CRAFTS" "SCALABLE CRAFTING" "CRAFTING SCALABLES" "ITEM SCALING" OBJECT SCALING"
 
 Many craftable items (including things made with brew, craft, forge, and sew)
 are scalable, which means they change in power and attributes based on the
@@ -933,6 +955,7 @@ See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, IMPERIAL ARMORS
 TAN TANNING
 
 Usage:  tan <skin>
+Speed boosts:  Faster Chores bonus
 Stored in:  Tannery
 
 You can tan skins into leather. This process will go faster at a tannery. Both

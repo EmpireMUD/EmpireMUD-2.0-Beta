@@ -48,6 +48,7 @@ ACMD(do_flee);
 bool check_scaling(char_data *mob, char_data *based_on);
 extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 extern int determine_best_scale_level(char_data *ch, bool check_group);
+void end_pursuit(char_data *ch, char_data *target);
 
 // locals
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype);
@@ -622,6 +623,10 @@ bool is_fight_enemy(char_data *ch, char_data *frenemy) {
 	}
 	
 	if (fighting) {
+		// ch is fighting frenemy
+		if (FIGHTING(ch) == frenemy) {
+			return TRUE;
+		}
 		// frenemy is fighting ch
 		if (fighting == ch) {
 			return TRUE;
@@ -1427,7 +1432,7 @@ obj_data *make_corpse(char_data *ch) {
 * @param any_vnum ability Optional (or NO_ABIL): The ability to skillup for rez_by.
 */
 void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_vnum ability) {
-	extern obj_data *find_obj(int n);
+	extern obj_data *find_obj(int n, bool error);
 
 	obj_data *corpse;
 	int exp = 15;	// overridden by some abilities
@@ -1447,7 +1452,7 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 	qt_visit_room(ch, IN_ROOM(ch));
 	
 	// take care of the corpse
-	if ((corpse = find_obj(GET_LAST_CORPSE_ID(ch))) && IS_CORPSE(corpse)) {
+	if ((corpse = find_obj(GET_LAST_CORPSE_ID(ch), FALSE)) && IS_CORPSE(corpse)) {
 		while (corpse->contains) {
 			obj_to_char(corpse->contains, ch);
 		}
@@ -1993,11 +1998,13 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 	fmsg_type = (dam > 0 ? TO_COMBAT_HIT : TO_COMBAT_MISS);
 
 	/* damage message to onlookers */
-	buf = replace_fight_string(dam_weapons[msgnum].to_room, attack_hit_info[w_type].singular, attack_hit_info[w_type].plural);
-	act(buf, FALSE, ch, NULL, victim, TO_NOTVICT | fmsg_type);
+	if (!AFF_FLAGGED(victim, AFF_NO_SEE_IN_ROOM)) {
+		buf = replace_fight_string(dam_weapons[msgnum].to_room, attack_hit_info[w_type].singular, attack_hit_info[w_type].plural);
+		act(buf, FALSE, ch, NULL, victim, TO_NOTVICT | fmsg_type);
+	}
 
 	/* damage message to damager */
-	if (ch->desc) {
+	if (ch->desc && !AFF_FLAGGED(victim, AFF_NO_SEE_IN_ROOM)) {
 		send_to_char("&y", ch);
 		buf = replace_fight_string(dam_weapons[msgnum].to_char, attack_hit_info[w_type].singular, attack_hit_info[w_type].plural);
 		act(buf, FALSE, ch, NULL, victim, TO_CHAR | fmsg_type);
@@ -2043,44 +2050,49 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype) {
 			}
 
 			if (!IS_NPC(vict) && (IS_IMMORTAL(vict) || (IS_GOD(vict) && !IS_GOD(ch)))) {
-				act(msg->god_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
+				if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
+					act(msg->god_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
+					act(msg->god_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_MISS);
+				}
 				act(msg->god_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_COMBAT_MISS);
-				act(msg->god_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_MISS);
 			}
 			else if (dam != 0) {
 				if (GET_POS(vict) == POS_DEAD) {
-					send_to_char("&y", ch);
-					act(msg->die_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
-					send_to_char("&0", ch);
-
+					if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
+						send_to_char("&y", ch);
+						act(msg->die_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
+						send_to_char("&0", ch);
+						
+						act(msg->die_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_HIT);
+					}
 					send_to_char("&r", vict);
 					act(msg->die_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_HIT);
 					send_to_char("&0", vict);
-
-					act(msg->die_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_HIT);
 				}
 				else {
-					send_to_char("&y", ch);
-					act(msg->hit_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
-					send_to_char("&0", ch);
-
+					if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
+						send_to_char("&y", ch);
+						act(msg->hit_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
+						send_to_char("&0", ch);
+						
+						act(msg->hit_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_HIT);
+					}
 					send_to_char("&r", vict);
 					act(msg->hit_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_HIT);
 					send_to_char("&0", vict);
-
-					act(msg->hit_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_HIT);
 				}
 			}
 			else if (ch != vict) {	/* Dam == 0 */
-				send_to_char("&y", ch);
-				act(msg->miss_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
-				send_to_char("&0", ch);
-
+				if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
+					send_to_char("&y", ch);
+					act(msg->miss_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
+					send_to_char("&0", ch);
+					
+					act(msg->miss_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_MISS);
+				}
 				send_to_char("&r", vict);
 				act(msg->miss_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | TO_COMBAT_MISS);
 				send_to_char("&0", vict);
-
-				act(msg->miss_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_MISS);
 			}
 			return (1);
 		}
@@ -2606,7 +2618,7 @@ void check_auto_assist(char_data *ch) {
 		}
 		
 		// if we got this far and hit an assist condition
-		if (assist) {
+		if (assist && can_fight(ch_iter, FIGHTING(ch))) {
 			act("You jump to $N's aid!", FALSE, ch_iter, 0, ch, TO_CHAR);
 			act("$n jumps to your aid!", FALSE, ch_iter, 0, ch, TO_VICT);
 			act("$n jumps to $N's aid!", FALSE, ch_iter, 0, ch, TO_NOTVICT);
@@ -2864,7 +2876,10 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 		return -1;
 	}
 	else if (ch != victim && GET_POS(victim) < POS_SLEEPING && !WOULD_EXECUTE(ch, victim)) {
+		// SHOULD this also remove DoTs etc? -paul 5/6/2017
+		
 		stop_combat_no_autokill(victim);
+		return -1;	// prevents other damage/effects
 		// no need to message here; they already got a pos message
 	}
 	
@@ -2940,7 +2955,7 @@ void death_log(char_data *ch, char_data *killer, int type) {
 */
 void engage_combat(char_data *ch, char_data *vict, bool melee) {
 	// nope
-	if (IS_IMMORTAL(ch) || IS_IMMORTAL(vict) || !can_fight(ch, vict)) {
+	if (!can_fight(ch, vict)) {
 		return;
 	}
 
@@ -2997,6 +3012,7 @@ void heal(char_data *ch, char_data *vict, int amount) {
 	if (GET_POS(vict) < POS_SLEEPING && GET_HEALTH(vict) > 0) {
 		msg_to_char(vict, "You recover and wake up.\r\n");
 		GET_POS(vict) = IS_NPC(vict) ? POS_STANDING : POS_SITTING;
+		end_pursuit(vict, ch);	// good samaritan
 	}
 }
 
@@ -3310,8 +3326,6 @@ void out_of_blood(char_data *ch) {
 * @param int damtype DAM_x.
 */
 void perform_execute(char_data *ch, char_data *victim, int attacktype, int damtype) {
-	void end_pursuit(char_data *ch, char_data *target);
-
 	bool ok = FALSE;
 	bool revert = TRUE;
 	char_data *m;
@@ -3809,8 +3823,10 @@ void frequent_combat(int pulse) {
 			continue;
 		}
 		
-		// bring friends in no matter what
-		check_auto_assist(ch);
+		// bring friends in no matter what (on the real seconds
+		if ((pulse % (1 RL_SEC)) == 0) {
+			check_auto_assist(ch);
+		}
 		
 		// reasons you would not get a round
 		if (GET_POS(ch) < POS_SLEEPING || IS_INJURED(ch, INJ_STAKED | INJ_TIED) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_NO_TARGET_IN_ROOM | AFF_MUMMIFY | AFF_DEATHSHROUD)) {

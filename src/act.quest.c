@@ -33,7 +33,6 @@
 #define QCMD(name)		void (name)(char_data *ch, char *argument)
 
 // external vars
-extern int daily_cycle;
 
 // external funcs
 extern bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_list **build_list);
@@ -178,7 +177,7 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	
 	// completion time slightly different for dailies
 	if (QUEST_FLAGGED(quest, QST_DAILY)) {
-		pcq->last_completed = daily_cycle;
+		pcq->last_completed = data_get_long(DATA_DAILY_CYCLE);
 	}
 	
 	// remove from player's tracker

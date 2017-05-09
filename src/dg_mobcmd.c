@@ -650,6 +650,7 @@ ACMD(do_mload) {
 	struct instance_data *inst = get_instance_by_mob(ch);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	int number = 0;
+	room_data *in_room;
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
 	vehicle_data *veh;
@@ -746,6 +747,22 @@ ACMD(do_mload) {
 		target = two_arguments(target, arg1, arg2); /* recycling ... */
 		skip_spaces(&target);
 		
+		// if they're picking a room, move arg2 down a slot to "target" level
+		in_room = NULL;
+		if (!str_cmp(arg1, "room")) {
+			in_room = IN_ROOM(ch);
+			target = arg2;
+		}
+		else if (*arg1 == UID_CHAR) {
+			if ((in_room = get_room(IN_ROOM(ch), arg1))) {
+				target = arg2;
+			}
+		}
+		else {	// not targeting a room
+			in_room = NULL;
+		}
+		
+		// scale based on remaining "target" arg
 		if (*target && isdigit(*target)) {
 			scale_item_to_level(object, atoi(target));
 		}
@@ -753,8 +770,14 @@ ACMD(do_mload) {
 			scale_item_to_level(object, GET_CURRENT_SCALE_LEVEL(ch));
 		}
 		
+		if (in_room) {	// load in the room
+			obj_to_room(object, in_room);
+			load_otrigger(object);
+			return;
+		}
+		
 		tch = (*arg1 == UID_CHAR) ? get_char(arg1) : get_char_room_vis(ch, arg1);
-		if (tch) {
+		if (tch) {	// load on char
 			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && can_wear_on_pos(object, pos)) {
 				equip_char(tch, object, pos);
 				load_otrigger(object);
@@ -764,8 +787,9 @@ ACMD(do_mload) {
 			load_otrigger(object);
 			return;
 		}
+		
 		cnt = (*arg1 == UID_CHAR) ? get_obj(arg1) : get_obj_vis(ch, arg1);
-		if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER) {
+		if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER) {	// load in container
 			obj_to_obj(object, cnt);
 			load_otrigger(object);
 			return;
@@ -2249,19 +2273,18 @@ ACMD(do_mown) {
 	}
 	else {	// attempt to find a target
 		strcpy(targ_arg, type_arg);	// there was no type
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);
 		
 		if (!*targ_arg) {
 			mob_log(ch, "mown: Too few arguments");
 			return;
 		}
-		else if (*targ_arg == UID_CHAR && !(vict = get_char(targ_arg)) && !(vtarg = get_vehicle(targ_arg)) && !(otarg = get_obj(targ_arg)) && !(rtarg = get_room(IN_ROOM(ch), targ_arg))) {
-			mob_log(ch, "mown: Unable to find target %s", targ_arg);
-			return;
+		else if (*targ_arg == UID_CHAR && ((vict = get_char(targ_arg)) || (vtarg = get_vehicle(targ_arg)) || (otarg = get_obj(targ_arg)) || (rtarg = get_room(IN_ROOM(ch), targ_arg)))) {
+			// found by uid
 		}
 		else if ((vict = get_char_room_vis(ch, targ_arg)) || (vtarg = get_vehicle_in_room_vis(ch, targ_arg)) || (otarg = get_obj_in_list_vis(ch, targ_arg, ch->carrying)) || (otarg = get_obj_in_list_vis(ch, targ_arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
-			// must have been found
-			skip_spaces(&argument);
-			strcpy(emp_arg, argument);
+			// found by name
 		}
 		else {
 			mob_log(ch, "mown: Invalid target");

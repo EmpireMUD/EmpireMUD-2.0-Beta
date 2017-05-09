@@ -804,10 +804,11 @@ See also: COMMANDS, HELPSEARCH, SOCIALS
 #
 HELPSEARCH "HELP SEARCH" "SEARCH HELP"
 
-Usage:  helpsearch <term>
+Usage:  helpsearch <term(s)>
 
 This command lets you search the body of help files, instead of just their
-keywords.
+keywords. You can search for multiple words at a time. If a single search
+term has multiple word, put it "in quotes".
 
 See also: HELP
 #
@@ -1009,7 +1010,7 @@ seconds.
 
 See also: TOGGLE
 #
-MAIL CHECK RECEIVE SEND
+MAIL CHECK RECEIVE SEND "PIGEON MAIL"
 
 Usage:  mail check
         mail send <person>
@@ -1124,6 +1125,8 @@ Examples:
   > order cityguard sleep
 #
 PLAY INSTRUMENTS MUSIC
+
+Speed boosts:  haste
 
 You can play musical instruments with the "play" command. You must first "hold"
 the instrument. Different instruments will give different messages, but music
@@ -1338,6 +1341,7 @@ See also: GRAB, HOLD, WEAR, WIELD, SHEATH, DRAW, SWAP
 REPAIR
 
 Usage:  repair <vehicle>
+Speed boosts:  Faster Chores bonus, haste
 
 This command allows you to repair vehicles that have decayed or been damaged.
 Like building, repair happens one item at a time using materials in your
@@ -1468,7 +1472,7 @@ SAYHISTORY
 Usage:  sayhistory
 
 This command shows you the last 20 messages you saw from players in the room
-with you. It includes says, emotes, and socials.
+with you. It includes says, emotes, and socials, as well as group messages.
 
 See also: TELLHISTORY
 #

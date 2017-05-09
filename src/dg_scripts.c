@@ -244,12 +244,18 @@ empire_data *find_empire_by_uid(int n) {
 }
 
 
-/* return object with UID n */
-obj_data *find_obj(int n) {
+/**
+* return object with UID n
+*
+* @param int n The UID to look up.
+* @param bool error If TRUE, will log if the ID is an object ID but doesn't exist.
+* @return obj_data* The found object, or NULL if it doesn't exist.
+*/
+obj_data *find_obj(int n, bool error) {
 	if (n < OBJ_ID_BASE) /* see note in dg_scripts.h */
 		return NULL;
 
-	return find_obj_by_uid_in_lookup_table(n);
+	return find_obj_by_uid_in_lookup_table(n, error);
 }
 
 /* return room with UID n */
@@ -468,7 +474,7 @@ obj_data *get_obj_near_vehicle(vehicle_data *veh, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		return find_obj(atoi(name + 1));
+		return find_obj(atoi(name + 1), TRUE);
 	}
 	if (VEH_CONTAINS(veh) && (i = get_obj_in_list(name, VEH_CONTAINS(veh)))) {
 		return i;
@@ -495,7 +501,7 @@ obj_data *get_obj(char *name)  {
 	obj_data *obj;
 
 	if (*name == UID_CHAR)
-		return find_obj(atoi(name + 1));
+		return find_obj(atoi(name + 1), TRUE);
 	else {
 		for (obj = object_list; obj; obj = obj->next)
 			if (isname(name, obj->name))
@@ -712,7 +718,7 @@ obj_data *get_obj_by_obj(obj_data *obj, char *name) {
 	room_data *rm;
 
 	if (*name == UID_CHAR) 
-		return find_obj(atoi(name + 1));
+		return find_obj(atoi(name + 1), TRUE);
 
 	if (!str_cmp(name, "self") || !str_cmp(name, "me"))
 		return obj;
@@ -747,7 +753,7 @@ obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name) {
 	obj_data *i = NULL;
 
 	if (*name == UID_CHAR) {
-		return find_obj(atoi(name + 1));
+		return find_obj(atoi(name + 1), TRUE);
 	}
 	if (VEH_CONTAINS(veh) && (i = get_obj_in_list(name, VEH_CONTAINS(veh)))) {
 		return i;
@@ -785,7 +791,7 @@ obj_data *get_obj_by_room(room_data *room, char *name) {
 	obj_data *obj;
 
 	if (*name == UID_CHAR) 
-		return find_obj(atoi(name+1));
+		return find_obj(atoi(name+1), TRUE);
 
 	for (obj = room->contents; obj; obj = obj->next_content)
 		if (isname(name, obj->name))
@@ -3133,7 +3139,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", char_script_id(c));
 
 					else if (!str_cmp(field, "is_name")) {
-						if (subfield && *subfield && MATCH_CHAR_NAME(subfield, c)) {
+						if (subfield && *subfield && match_char_name(NULL, c, subfield, NOBITS)) {
 							snprintf(str, slen, "1");
 						}
 						else {
@@ -3952,6 +3958,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "bld_flagged")) {
+						extern const char *bld_flags[];
+						
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, bld_flags, FALSE);
+							if (pos != NOTHING) {
+								snprintf(str, slen, "%d", ROOM_BLD_FLAGGED(r, BIT(pos)) ? 1 : 0);
+							}
+							else {
+								snprintf(str, slen, "0");
+							}
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
 					else if (!str_cmp(field, "building")) {
 						if (GET_BUILDING(r)) {
 							snprintf(str, slen, "%s", GET_BLD_NAME(GET_BUILDING(r)));
@@ -4145,6 +4167,25 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "port")) {
 						direction_vars(r, PORT, subfield, str, slen);
+					}
+					break;
+				}
+				case 'r': {	// room.r*
+					if (!str_cmp(field, "rmt_flagged")) {
+						extern const char *room_template_flags[];
+						
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, room_template_flags, FALSE);
+							if (pos != NOTHING) {
+								snprintf(str, slen, "%d", RMT_FLAGGED(r, BIT(pos)) ? 1 : 0);
+							}
+							else {
+								snprintf(str, slen, "0");
+							}
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
 					}
 					break;
 				}
@@ -5013,30 +5054,24 @@ void eval_expr(char *line, char *result, void *go, struct script_data *sc, trig_
 int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, trig_data *trig, int type) {
 	char *p, *tokens[MAX_INPUT_LENGTH];
 	char line[MAX_INPUT_LENGTH], lhr[MAX_INPUT_LENGTH], rhr[MAX_INPUT_LENGTH];
-	int i, j;
+	int i, j, oplist, tsize;
+	char *found;
 
 	/*
 	* valid operands, in order of priority
 	* each must also be defined in eval_op()
 	*/
-	static char *ops[] = {
-		"||",
-		"&&",
-		"==",
-		"!=",
-		"<=",
-		">=",
-		"<",
-		">",
-		"/=",
-		"~=",
-		"-",
-		"+",
-		"//",
-		"/",
-		"*",
-		"!",
-		"\n"
+	#define num_op_lists  8
+	static char *ops[num_op_lists][5] = {
+		// higher in this table = higher priority
+		{ "!", "\n" },
+		{ "*", "/", "//", "\n" },	// things on same line have same precedence
+		{ "+", "-", "\n" },
+		{ "<=", "<", ">=", ">", "\n" },
+		{ "/=", "~=", "\n" },
+		{ "==", "!=", "\n" },
+		{ "&&", "\n" },
+		{ "||", "\n" }	// each list must end with "\n"
 	};
 
 	p = strcpy(line, expr);
@@ -5057,16 +5092,28 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 			p++;
 	}
 	tokens[j] = NULL;
-
-	for (i = 0; *ops[i] != '\n'; i++) {
-		for (j = 0; tokens[j]; j++) {
-			if (!strn_cmp(ops[i], tokens[j], strlen(ops[i]))) {
+	tsize = j;
+	
+	for (oplist = num_op_lists - 1; oplist >= 0; --oplist) {
+		for (j = tsize - 1; j >= 0; --j) {
+			// try to find this token in this oplist
+			found = NULL;
+			for (i = 0; !found && *ops[oplist][i] != '\n'; ++i) {
+				if (!strn_cmp(ops[oplist][i], tokens[j], strlen(ops[oplist][i]))) {
+					found = ops[oplist][i];
+					// -> need to find the LAST token that's in THIS list
+				}
+			}
+			// [IMMORTAL Khufu]: if it finds a matching operator, it needs to check the rest of the array for another operator with the same precedence...
+			// why is it not working to check tokens in reverse order?
+	
+			if (found) {
 				*tokens[j] = '\0';
-				p = tokens[j] + strlen(ops[i]);
+				p = tokens[j] + strlen(found);
 
 				eval_expr(line, lhr, go, sc, trig, type);
 				eval_expr(p, rhr, go, sc, trig, type);
-				eval_op(ops[i], lhr, rhr, result, go, sc, trig);
+				eval_op(found, lhr, rhr, result, go, sc, trig);
 
 				return 1;
 			}
@@ -5278,7 +5325,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 		return;
 	}
 	
-	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id)) && !(r = find_room(id))) {
+	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id, FALSE)) && !(r = find_room(id))) {
 		script_log("Trigger: %s, VNum %d. attach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
 		return;
 	}
@@ -5359,7 +5406,7 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 	}
 	
 	// find first good match
-	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id)) && !(r = find_room(id))) {
+	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id, FALSE)) && !(r = find_room(id))) {
 		script_log("Trigger: %s, VNum %d. detach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
 		return;
 	}
@@ -5693,7 +5740,7 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 		if (!IS_NPC(mob))
 			context = 0;
 	}
-	else if ((obj = find_obj(uid))) {
+	else if ((obj = find_obj(uid, FALSE))) {
 		sc_remote = SCRIPT(obj);
 	}
 	else {
@@ -5753,7 +5800,7 @@ ACMD(do_vdelete) {
 			context = 0;
 		*/
 	}
-	else if ((obj = find_obj(uid))) {
+	else if ((obj = find_obj(uid, FALSE))) {
 		sc_remote = SCRIPT(obj);
 	}
 	else {
@@ -5841,7 +5888,7 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 			context = 0;
 		*/
 	}
-	else if ((obj = find_obj(uid))) {
+	else if ((obj = find_obj(uid, FALSE))) {
 		sc_remote = SCRIPT(obj);
 	}
 	else {
@@ -6341,7 +6388,16 @@ char_data *find_char_by_uid_in_lookup_table(int uid) {
 	return NULL;
 }
 
-obj_data *find_obj_by_uid_in_lookup_table(int uid) {
+/**
+* Determines if an object uid is in the lookup table. This provides its own
+* error suppression because it's not always an error for an object to be
+* missing.
+*
+* @param int uid The object's uid.
+* @param bool error if TRUE, logs an error if it can't find it.
+* @return obj_data* The found object, or NULL if it doesn't exist.
+*/
+obj_data *find_obj_by_uid_in_lookup_table(int uid, bool error) {
 	int bucket = (int) (uid & (BUCKET_COUNT - 1));
 	struct lookup_table_t *lt = &lookup_table[bucket];
 
@@ -6349,8 +6405,11 @@ obj_data *find_obj_by_uid_in_lookup_table(int uid) {
 
 	if (lt)
 		return (obj_data*)(lt->c);
-
-	log("find_obj_by_uid_in_lookup_table : No entity with number %d in lookup table", uid);
+	
+	if (error) {
+		log("find_obj_by_uid_in_lookup_table : No entity with number %d in lookup table", uid);
+	}
+	
 	return NULL;
 }
 

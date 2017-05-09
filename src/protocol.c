@@ -514,7 +514,7 @@ void ProtocolDestroy(protocol_t *apProtocol) {
 	free(apProtocol);
 }
 
-void ProtocolInput(descriptor_t *apDescriptor, char *apData, int aSize, char *apOut) {
+void ProtocolInput(descriptor_t *apDescriptor, char *apData, int aSize, char *apOut, int maxSize) {
 	static char CmdBuf[MAX_PROTOCOL_BUFFER+1];
 	static char IacBuf[MAX_PROTOCOL_BUFFER+1];
 	int CmdIndex = 0;
@@ -616,6 +616,9 @@ void ProtocolInput(descriptor_t *apDescriptor, char *apData, int aSize, char *ap
 				sprintf(MXPBuffer, "MXP version %s detected and enabled.\r\n", pProtocol->pMXPVersion);
 				InfoMessage(apDescriptor, MXPBuffer);
 			}
+			
+			// prevent treating this like a blank "enter to continue"
+			apDescriptor->no_nanny = TRUE;
 		}
 		else {	// In-band command
 			if (apData[Index] == (char)IAC) {
@@ -654,7 +657,8 @@ void ProtocolInput(descriptor_t *apDescriptor, char *apData, int aSize, char *ap
 	CmdBuf[CmdIndex] = '\0';
 
 	/* Copy the input buffer back to the player. */
-	strcat(apOut, CmdBuf);
+	strncat(apOut, CmdBuf, maxSize);
+	apOut[maxSize-1] = '\0';
 }
 
 const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *apLength) {

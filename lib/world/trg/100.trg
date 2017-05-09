@@ -252,12 +252,7 @@ done
 Rare thief despawn~
 2 f 100
 ~
-eval thief sewerrarethief
-if (!%thief% || %thief.vnum% != 10017 || %thief.fighting% || %thief.room% != %room%)
-  halt
-end
-%echo% %thief.name% vanishes into the shadows!
-%purge% %thief%
+%purge% instance mob 10017 $n vanishes into the shadows!
 ~
 #10019
 Thief recruiter passive~

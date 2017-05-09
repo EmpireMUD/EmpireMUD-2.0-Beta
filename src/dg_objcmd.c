@@ -702,19 +702,18 @@ OCMD(do_oown) {
 	}
 	else {	// attempt to find a target
 		strcpy(targ_arg, type_arg);	// there was no type
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);
 		
 		if (!*targ_arg) {
 			obj_log(obj, "oown: Too few arguments");
 			return;
 		}
-		else if (*targ_arg == UID_CHAR && !(vict = get_char(targ_arg)) && !(vtarg = get_vehicle(targ_arg)) && !(otarg = get_obj(targ_arg)) && !(rtarg = get_room(orm, targ_arg))) {
-			obj_log(obj, "oown: Unable to find target %s", targ_arg);
-			return;
+		else if (*targ_arg == UID_CHAR && ((vict = get_char(targ_arg)) || (vtarg = get_vehicle(targ_arg)) || (otarg = get_obj(targ_arg)) || (rtarg = get_room(orm, targ_arg)))) {
+			// found by uid
 		}
 		else if ((vict = get_char_near_obj(obj, targ_arg)) || (vtarg = get_vehicle_near_obj(obj, targ_arg)) || (otarg = get_obj_near_obj(obj, targ_arg))) {
-			// must have been found
-			skip_spaces(&argument);
-			strcpy(emp_arg, argument);
+			// found by name
 		}
 		else {
 			obj_log(obj, "oown: Invalid target");
@@ -1114,7 +1113,7 @@ OCMD(do_dgoload) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct instance_data *inst = NULL;
 	int number = 0;
-	room_data *room;
+	room_data *room, *in_room;
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
 	vehicle_data *veh;
@@ -1185,6 +1184,21 @@ OCMD(do_dgoload) {
 		target = two_arguments(target, arg1, arg2); /* recycling ... */
 		skip_spaces(&target);
 		
+		// if they're picking a room, move arg2 down a slot to "target" level
+		in_room = NULL;
+		if (!str_cmp(arg1, "room")) {
+			in_room = room;
+			target = arg2;
+		}
+		else if (*arg1 == UID_CHAR) {
+			if ((in_room = get_room(room, arg1))) {
+				target = arg2;
+			}
+		}
+		else {	// not targeting a room
+			in_room = NULL;
+		}
+		
 		// if there is still a target, we scale on that number, otherwise default scale
 		if (*target && isdigit(*target)) {
 			scale_item_to_level(object, atoi(target));
@@ -1192,6 +1206,12 @@ OCMD(do_dgoload) {
 		else {
 			// default
 			scale_item_to_level(object, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+		}
+		
+		if (in_room) {	// load in the room
+			obj_to_room(object, in_room); 
+			load_otrigger(object);
+			return;
 		}
 		
 		tch = get_char_near_obj(obj, arg1);

@@ -126,13 +126,19 @@ bool valid_empire_name(char *newname) {
 	extern char *invalid_list[MAX_INVALID_NAMES];
 	extern int num_invalid;
 
-	char *ptr;
+	char *ptr, buf[MAX_STRING_LENGTH];
 	char tempname[MAX_INPUT_LENGTH];
 	bool ok = TRUE;
 	int iter;
 	
 	// check for illegal & codes (anything other than &&)
 	if ((ptr = strchr(newname, '&')) && *(ptr+1) != '&') {
+		ok = FALSE;
+	}
+	
+	// check fill/reserved
+	strcpy(buf, newname);
+	if (fill_word(buf) || reserved_word(buf)) {
 		ok = FALSE;
 	}
 	
@@ -564,6 +570,7 @@ EEDIT(eedit_name) {
 			}
 			
 			if ((mem = find_or_load_player(index->name, &file))) {
+				remove_recent_lore(ch, LORE_JOIN_EMPIRE);
 				add_lore(mem, LORE_JOIN_EMPIRE, "Empire became %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 				
 				if (file) {

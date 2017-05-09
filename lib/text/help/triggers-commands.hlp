@@ -368,6 +368,7 @@ See also: EXPRESSIONS, NESTED-IFS
 %LOAD% MLOAD OLOAD VLOAD WLOAD
 
 %load% obj <vnum> [name <position>] [scale level]
+%load% obj <vnum> <room> [scale level]
 %load% mob <vnum> [ally] [scale level]
 %load% veh <vnum> [scale level]
 
@@ -381,7 +382,7 @@ thing that does the loading (when it can). However, you can specify a
 different scale level if you like. For object loading, you MUST also include
 the target to load to AND the load position before the scale level.
 
-Load an object the room:  %load% obj 1300
+Load an object to the room:  %load% obj 1300 room
 Load a scaled mob to room:  %load% mob 1300 %actor.level%
 Load obj to player inv:  %load% obj 1300 %actor% inv
 Equip obj to player:  %load% obj 1300 %actor% waist

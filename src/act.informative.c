@@ -177,7 +177,7 @@ struct custom_message *pick_custom_longdesc(char_data *ch) {
 			if (ocm->type == OBJ_CUSTOM_LONGDESC_FEMALE && GET_SEX(ch) != SEX_FEMALE) {
 				continue;
 			}
-			if (ocm->type == OBJ_CUSTOM_LONGDESC_MALE && GET_SEX(ch) != SEX_MALE) {
+			if (ocm->type == OBJ_CUSTOM_LONGDESC_MALE && GET_SEX(ch) != SEX_MALE && GET_SEX(ch) != SEX_NEUTRAL) {
 				continue;
 			}
 			
@@ -677,12 +677,10 @@ void list_char_to_char(char_data *list, char_data *ch) {
 * @param char_data *to The person to show it to.
 */
 void list_lore_to_char(char_data *ch, char_data *to) {
-	extern long load_time();
-
 	struct lore_data *lore;
 	char daystring[MAX_INPUT_LENGTH];
 	struct time_info_data t;
-	long beginning_of_time = load_time();
+	long beginning_of_time = data_get_long(DATA_WORLD_START);
 
 	msg_to_char(to, "%s's lore:\r\n", PERS(ch, ch, 1));
 
@@ -1662,7 +1660,6 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 * @return char* The who output for imms.
 */
 char *partial_who(char_data *ch, char *name_search, int low, int high, empire_data *empire_who, bool rp, bool shortlist, int type) {
-	extern int max_players_today;
 	extern int max_players_this_uptime;
 	
 	static char who_output[MAX_STRING_LENGTH];
@@ -1670,7 +1667,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 	char whobuf[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], online[MAX_STRING_LENGTH];
 	descriptor_data *d;
 	char_data *tch;
-	int iter, count = 0, size;
+	int iter, count = 0, size, max_pl;
 	
 	// WHO_x
 	const char *who_titles[] = { "Mortals", "Gods", "Immortals" };
@@ -1746,9 +1743,13 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 		
 		if (type == WHO_MORTALS) {
 			// update counts in case
-			max_players_today = MAX(max_players_today, count);
+			max_pl = data_get_int(DATA_MAX_PLAYERS_TODAY);
+			if (count > max_pl) {
+				max_pl = count;
+				data_set_int(DATA_MAX_PLAYERS_TODAY, max_pl);
+			}
 			max_players_this_uptime = MAX(max_players_this_uptime, count);
-			snprintf(online, sizeof(online), "%d online (max today %d, this uptime %d)", count, max_players_today, max_players_this_uptime);
+			snprintf(online, sizeof(online), "%d online (max today %d, this uptime %d)", count, max_pl, max_players_this_uptime);
 		}
 		else {
 			snprintf(online, sizeof(online), "%d online", count);
@@ -2177,18 +2178,34 @@ ACMD(do_help) {
 
 ACMD(do_helpsearch) {	
 	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
-	int iter;
-	bool found;
-	size_t size;
-	
-	delete_doubledollar(argument);
-	one_word(argument, arg);	// this removes leading filler words, which are going to show up in a lot of helps
+	char **words = NULL;
+	int iter, wrd;
+	bool found, fail;
+	size_t size, word_size;
 	
 	if (!ch->desc) {
 		// don't bother
 		return;
 	}
-	else if (!*arg) {
+	
+	delete_doubledollar(argument);
+	word_size = 0;
+	
+	// put all the arguments into an array
+	while (*argument) {
+		argument = one_word(argument, arg);	// this removes leading filler words, which are going to show up in a lot of helps
+		
+		if (word_size > 0) {
+			RECREATE(words, char*, word_size + 1);
+		}
+		else {
+			CREATE(words, char*, word_size + 1);
+		}
+		
+		words[word_size++] = str_dup(arg);
+	}
+	
+	if (!word_size) {
 		msg_to_char(ch, "Search for help about what?\r\n");
 	}
 	else if (!help_table) {
@@ -2199,18 +2216,36 @@ ACMD(do_helpsearch) {
 		found = FALSE;
 		
 		for (iter = 0; iter <= top_of_helpt; ++iter) {
-			if (GET_ACCESS_LEVEL(ch) >= help_table[iter].level && (!help_table[iter].duplicate && str_str(help_table[iter].entry, arg))) {
-				snprintf(line, sizeof(line), " %s\r\n", help_table[iter].keyword);
-				found = TRUE;
-				
-				if (size + strlen(line) < sizeof(output)) {
-					strcat(output, line);
-					size += strlen(line);
-				}
-				else {
-					size += snprintf(output + size, sizeof(output) - size, "... and more\r\n");
+			if (GET_ACCESS_LEVEL(ch) < help_table[iter].level) {
+				continue;
+			}
+			if (help_table[iter].duplicate) {
+				continue;
+			}
+			
+			// see if it matches all words
+			fail = FALSE;
+			for (wrd = 0; wrd < word_size; ++wrd) {
+				if (!str_str(help_table[iter].entry, words[wrd])) {
+					fail = TRUE;
 					break;
 				}
+			}
+			if (fail) {
+				continue;
+			}
+			
+			// FOUND!
+			found = TRUE;
+			snprintf(line, sizeof(line), " %s\r\n", help_table[iter].keyword);
+			
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+			}
+			else {
+				size += snprintf(output + size, sizeof(output) - size, "... and more\r\n");
+				break;
 			}
 		}
 		
@@ -2221,6 +2256,16 @@ ACMD(do_helpsearch) {
 			// send it out
 			page_string(ch->desc, output, TRUE);
 		}
+	}
+	
+	// free data
+	for (wrd = 0; wrd < word_size; ++wrd) {
+		if (words[wrd]) {
+			free(words[wrd]);
+		}
+	}
+	if (words) {
+		free(words);
 	}
 }
 

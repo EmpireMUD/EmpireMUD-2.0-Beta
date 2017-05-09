@@ -49,6 +49,7 @@
 
 // external vars
 extern struct ban_list_element *ban_list;
+extern bool data_table_needs_save;
 extern int num_invalid;
 extern char **intros;
 extern int num_intros;
@@ -582,6 +583,47 @@ void sanity_check(void) {
 }
 
 
+/**
+* Removes any side-protocol telnet junk, e.g. for snooping.
+*
+* @param const char *str The string to strip.
+* @return char* The resulting stripped string.
+*/
+char *strip_telnet_codes(const char *str) {
+	static char output[MAX_STRING_LENGTH];
+	size_t space_left;
+	const char *iter;
+	char *pos;
+	int off;
+	
+	pos = output;
+	space_left = MAX_STRING_LENGTH - 1;
+	off = 0;
+	
+	for (iter = str; *iter && space_left > 0; ++iter) {
+		if (*iter == (char)IAC && *(iter+1) == (char)SB) {
+			++off;	// stop copying
+			++iter;
+			continue;
+		}
+		else if (*iter == (char)IAC && *(iter+1) == (char)SE) {
+			--off;	// start copying
+			++iter;
+			continue;
+		}
+		
+		// copy?
+		if (off <= 0) {
+			*(pos++) = *iter;
+			--space_left;
+		}
+	}
+	*pos = '\0';	// terminate here
+	
+	return output;
+}
+
+
 /*
  * Add 2 time values.
  *
@@ -856,6 +898,7 @@ void heartbeat(int heart_pulse) {
 	void run_map_evolutions();
 	void run_mob_echoes();
 	void sanity_check();
+	void save_data_table(bool force);
 	void save_marked_empires();
 	void update_actions();
 	void update_empire_npc_data();
@@ -1022,6 +1065,10 @@ void heartbeat(int heart_pulse) {
 	}
 	
 	if (HEARTBEAT(1)) {
+		if (data_table_needs_save) {
+			save_data_table(FALSE);
+			if (debug_log && HEARTBEAT(15)) { log("debug 26:\t%lld", microtime()); }
+		}
 		save_marked_empires();
 		if (debug_log && HEARTBEAT(15)) { log("debug 27:\t%lld", microtime()); }
 	}
@@ -1544,9 +1591,7 @@ void send_to_room(const char *messg, room_data *room) {
 
 
 void close_socket(descriptor_data *d) {
-	struct channel_history_data *hist;
 	descriptor_data *temp;
-	int iter;
 
 	REMOVE_FROM_LIST(d, descriptor_list, next);
 	CLOSE_SOCKET(d->descriptor);
@@ -1612,6 +1657,7 @@ void close_socket(descriptor_data *d) {
 	if (d->backstr) {
 		free(d->backstr);
 	}
+	// do NOT free d->str_on_abort (is a pointer to something else)
 	
 	// other strings
 	if (d->host) {
@@ -1622,17 +1668,6 @@ void close_socket(descriptor_data *d) {
 	}
 	if (d->file_storage) {
 		free(d->file_storage);
-	}
-	
-	// free channel histories
-	for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
-		while ((hist = d->channel_history[iter])) {
-			d->channel_history[iter] = hist->next;
-			if (hist->message) {
-				free(hist->message);
-			}
-			free(hist);
-		}
 	}
 	
 	ProtocolDestroy(d->pProtocol);
@@ -2297,9 +2332,36 @@ int process_input(descriptor_data *t) {
 	space_left = MAX_RAW_INPUT_LENGTH - buf_length - 1;
 
 	do {
-		if (space_left <= 0) {
+		if (strlen(t->inbuf) > MAX_INPUT_LENGTH || (space_left <= 0 && strlen(t->inbuf) > 0)) {
+			char buffer[MAX_STRING_LENGTH];
+			
+			// truncate to input length
+			if (strlen(t->inbuf) >= MAX_INPUT_LENGTH) {
+				t->inbuf[MAX_INPUT_LENGTH-2] = '\0';
+			}
+			
+			snprintf(buffer, sizeof(buffer), "Line too long. Truncated to:\r\n%s\r\n", t->inbuf);
+			if (write_to_descriptor(t->descriptor, buffer) < 0) {
+				return (-1);
+			}
+			
+			nl_pos = read_point;	// need to infer a newline
+			
+			// flush the rest of the input
+			do {
+				bytes_read = perform_socket_read(t->descriptor, read_buf, MAX_PROTOCOL_BUFFER);
+				if (bytes_read < 0) {
+					return -1;
+				}
+			} while (bytes_read > 0);
+			
+			// exit the do-while now
+			break;
+			
+			/* formerly:
 			log("WARNING: process_input: about to close connection: input overflow");
 			return (-1);
+			*/
 		}
 
 		bytes_read = perform_socket_read(t->descriptor, read_buf, MAX_PROTOCOL_BUFFER);
@@ -2309,7 +2371,7 @@ int process_input(descriptor_data *t) {
 		}
 		else if (bytes_read >= 0) {
 			read_buf[bytes_read] = '\0';
-			ProtocolInput(t, read_buf, bytes_read, read_point);
+			ProtocolInput(t, read_buf, bytes_read, read_point, space_left+1);
 			bytes_read = strlen(read_point);
 		}
 
@@ -2383,15 +2445,15 @@ int process_input(descriptor_data *t) {
 		}
 
 		*write_point = '\0';
-
-		if ((space_left <= 0) && (ptr < nl_pos)) {
+		
+		if ((space_left <= 1) && (ptr < nl_pos)) {
 			char buffer[MAX_INPUT_LENGTH + 64];
 
 			sprintf(buffer, "Line too long. Truncated to:\r\n%s\r\n", tmp);
 			if (write_to_descriptor(t->descriptor, buffer) < 0)
 				return (-1);
 		}
-		if (t->snoop_by) {
+		if (t->snoop_by && *input) {
 			SEND_TO_Q("% ", t->snoop_by);
 			SEND_TO_Q(input, t->snoop_by);
 			SEND_TO_Q("\r\n", t->snoop_by);
@@ -2534,10 +2596,18 @@ static int process_output(descriptor_data *t) {
 
 	/* Handle snooping: prepend "% " and send to snooper. */
 	if (t->snoop_by && *t->output) {
-		write_to_output("% ", t->snoop_by);
-		write_to_output(t->output, t->snoop_by);
-		write_to_output("%%", t->snoop_by);
+		char stripped[MAX_STRING_LENGTH];
+		
+		strncpy(stripped, strip_telnet_codes(t->output), MAX_STRING_LENGTH);
+		stripped[MAX_STRING_LENGTH-1] = '\0';
+		
+		if (*stripped) {
+			write_to_output("% ", t->snoop_by);
+			write_to_output(stripped, t->snoop_by);
+			write_to_output("%%", t->snoop_by);
+		}
 	}
+	
 	/* The common case: all saved output was handed off to the kernel buffer. */
 	if (result >= t->bufptr) {
 		/* If we were using a large buffer, put the large buffer on the buffer pool
@@ -3332,7 +3402,8 @@ void game_loop(socket_t mother_desc) {
 	/* The Main Loop.  The Big Cheese.  The Top Dog.  The Head Honcho.  The.. */
 	while (!empire_shutdown) {
 
-		/* Sleep if we don't have any connections */
+		/** Sleep if we don't have any connections
+		// This is OFF because it blocks map evolutions and workforce
 		if (descriptor_list == NULL) {
 			log("No connections. Going to sleep.");
 			FD_ZERO(&input_set);
@@ -3349,6 +3420,8 @@ void game_loop(socket_t mother_desc) {
 			}
 			gettimeofday(&last_time, (struct timezone *) 0);
 		}
+		*/
+		
 		/* Set up the input, output, and exception sets for select(). */
 		FD_ZERO(&input_set);
 		FD_ZERO(&output_set);

@@ -1150,6 +1150,55 @@ void extract_pending_chars(void) {
 
 
 /**
+* Determines if a string matches a character name, based on things like
+* "is the target disguised" and "can ch see through that disguise?"
+*
+* @param char_data *ch Optiona: The character who is looking for someone. (may be NULL If nobody is looking)
+* @param char_data *target The potential match.
+* @param char *name The string ch typed when looking for target.
+* @param bitvector_t flags MATCH_GLOBAL, MATCH_IN_ROOM
+* @return bool TRUE if "name" is valid for "target" according to "ch", FALSE if not
+*/
+bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t flags) {
+	bool recognize, old_ignore_dark = Global_ignore_dark;
+	
+	if (IS_SET(flags, MATCH_GLOBAL)) {
+		Global_ignore_dark = TRUE;
+	}
+	
+	// visibility (shortcuts)
+	if (ch && IS_SET(flags, MATCH_IN_ROOM) && AFF_FLAGGED(target, AFF_HIDE | AFF_NO_SEE_IN_ROOM) && !CAN_SEE(ch, target)) {
+		Global_ignore_dark = old_ignore_dark;
+		return FALSE;	// hidden
+	}
+	
+	// done with this:
+	Global_ignore_dark = old_ignore_dark;
+	
+	// recognize part: things that let you recognize
+	recognize = IS_SET(flags, MATCH_GLOBAL) || (ch ? CAN_RECOGNIZE(ch, target) : TRUE);
+	
+	// name-matching part
+	if (recognize && isname(name, GET_PC_NAME(target))) {
+		return TRUE;	// name/kw match
+	}
+	else if (recognize && !IS_NPC(target) && GET_LASTNAME(target) && isname(name, GET_LASTNAME(target))) {
+		return TRUE;	// lastname match
+	}
+	else if (IS_MORPHED(target) && isname(name, MORPH_KEYWORDS(GET_MORPH(target)))) {
+		return TRUE;	// morph kw match
+	}
+	else if (IS_DISGUISED(target) && isname(name, GET_DISGUISED_NAME(target))) {
+		return TRUE;	// disguise name match
+	}
+	else {
+		// nope
+		return FALSE;
+	}
+}
+
+
+/**
 * Handles the actual extract of an idle character.
 * 
 * @param char_data *ch The player to idle out.
@@ -1311,7 +1360,9 @@ void char_to_room(char_data *ch, room_data *room) {
 
 
 /**
-* Finds the closest visible character to ch.
+* Finds the closest visible character to ch. This checks in-room visibility
+* as it is used to find VISIBLE characters (even though they are likely not
+* in the same room).
 *
 * @param char_data *ch The finder.
 * @param char *arg The argument/name.
@@ -1333,7 +1384,7 @@ char_data *find_closest_char(char_data *ch, char *arg, bool pc_only) {
 		if (!CAN_SEE(ch, vict) || !CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(vict))) {
 			continue;
 		}
-		if (!MATCH_CHAR_NAME_ROOM(ch, arg, vict)) {
+		if (!match_char_name(ch, vict, arg, MATCH_IN_ROOM)) {
 			continue;
 		}
 		
@@ -1406,7 +1457,7 @@ char_data *get_char_room(char *name, room_data *room) {
 		return (NULL);
 
 	for (i = ROOM_PEOPLE(room); i && (j <= number) && !found; i = i->next_in_room) {
-		if (MATCH_CHAR_NAME(tmp, i)) {
+		if (match_char_name(NULL, i, tmp, MATCH_IN_ROOM)) {
 			if (++j == number) {
 				found = i;
 			}
@@ -1441,7 +1492,7 @@ char_data *get_char_room_vis(char_data *ch, char *name) {
 	}
 
 	for (i = ROOM_PEOPLE(IN_ROOM(ch)); i && j <= number && !found; i = i->next_in_room) {
-		if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && MATCH_CHAR_NAME_ROOM(ch, tmp, i)) {
+		if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && match_char_name(ch, i, tmp, MATCH_IN_ROOM)) {
 			if (++j == number) {
 				found = i;
 			}
@@ -1480,10 +1531,16 @@ char_data *get_char_vis(char_data *ch, char *name, bitvector_t where) {
 		}
 
 		for (i = character_list; i && (j <= number) && !found; i = i->next) {
-			if ((CAN_SEE(ch, i) || (IS_SET(where, FIND_NO_DARK) && CAN_SEE_NO_DARK(ch, i))) && (!IS_SET(where, FIND_NPC_ONLY) || IS_NPC(i)) && MATCH_CHAR_NAME(tmp, i)) {
-				if (++j == number) {
-					found = i;
-				}
+			if (IS_SET(where, FIND_NPC_ONLY) && !IS_NPC(i)) {	
+				continue;
+			}
+			if (!match_char_name(ch, i, tmp, (IS_SET(where, FIND_NO_DARK) ? MATCH_GLOBAL : 0))) {
+				continue;
+			}
+			
+			// found
+			if (++j == number) {
+				found = i;
 			}
 		}
 	}
@@ -1513,15 +1570,10 @@ char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 			continue;
 		if (IS_SET(flags, FIND_CHAR_ROOM) && AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM))
 			continue;
-		if (IS_SET(flags, FIND_CHAR_ROOM) && !MATCH_CHAR_NAME_ROOM(ch, name, i)) {
+		if (!match_char_name(ch, i, name, (IS_SET(flags, FIND_CHAR_ROOM) ? MATCH_IN_ROOM : 0) | (IS_SET(flags, FIND_NO_DARK | FIND_CHAR_WORLD) ? MATCH_GLOBAL : 0))) {
 			continue;
 		}
-		if (!IS_SET(flags, FIND_CHAR_ROOM) && !MATCH_CHAR_NAME(name, i)) {
-			continue;
-		}
-		if (!CAN_SEE(ch, i) && (!IS_SET(flags, FIND_NO_DARK) || !CAN_SEE_NO_DARK(ch, i)))
-			continue;
-
+		
 		found = i;
 	}
 
@@ -1548,7 +1600,7 @@ char_data *get_char_world(char *name) {
 	}
 
 	for (ch = character_list; ch && (pos <= number) && !found; ch = ch->next) {
-		if ((!IS_NPC(ch) || !pc_only) && MATCH_CHAR_NAME(tmp, ch)) {
+		if ((!IS_NPC(ch) || !pc_only) && match_char_name(NULL, ch, tmp, MATCH_GLOBAL)) {
 			if (++pos == number || pc_only) {	// pc_only messes up pos
 				found = ch;
 			}
@@ -3415,6 +3467,37 @@ void remove_lore(char_data *ch, int type) {
 }
 
 
+/**
+* Remove lore of a given type if it was recent, but leaves older copies. This
+* prevents spammy lore but keeps good historical data. The cutoff is 1 mud
+* year.
+*
+* @param char_data *ch The person whose lore to remove
+* @param int type The LORE_x type to remove
+*/
+void remove_recent_lore(char_data *ch, int type) {
+	struct lore_data *lore, *next_lore;
+
+	if (IS_NPC(ch))
+		return;
+	
+	// need the old lore, in case the player is offline
+	check_delayed_load(ch);
+
+	LL_FOREACH_SAFE(GET_LORE(ch), lore, next_lore) {
+		if (lore->type != type) {
+			continue;
+		}
+		if (lore->date + SECS_PER_MUD_YEAR < time(0)) {
+			continue;
+		}
+			
+		
+		remove_lore_record(ch, lore);
+	}
+}
+
+
 /* Remove specific lore */
 void remove_lore_record(char_data *ch, struct lore_data *lore) {
 	struct lore_data *temp;
@@ -4809,8 +4892,9 @@ obj_data *unequip_char(char_data *ch, int pos) {
 *
 * @param char_data *ch The person to unequip
 * @param int pos The WEAR_x slot to remove
+* @return obj_data* A pointer to the object removed IF it wasn't extracted.
 */
-void unequip_char_to_inventory(char_data *ch, int pos) {
+obj_data *unequip_char_to_inventory(char_data *ch, int pos) {
 	obj_data *obj = unequip_char(ch, pos);
 	
 	if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
@@ -4818,7 +4902,10 @@ void unequip_char_to_inventory(char_data *ch, int pos) {
 	}
 	else {
 		obj_to_char(obj, ch);
+		return obj;
 	}
+	
+	return NULL;
 }
 
 
@@ -4828,8 +4915,9 @@ void unequip_char_to_inventory(char_data *ch, int pos) {
 *
 * @param char_data *ch The person to unequip
 * @param int pos The WEAR_x position to remove
+* @return obj_data* A pointer to the obj IF it wasn't extracted.
 */
-void unequip_char_to_room(char_data *ch, int pos) {
+obj_data *unequip_char_to_room(char_data *ch, int pos) {
 	obj_data *obj = unequip_char(ch, pos);
 	
 	if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
@@ -4837,7 +4925,10 @@ void unequip_char_to_room(char_data *ch, int pos) {
 	}
 	else if (IN_ROOM(ch)) {
 		obj_to_room(obj, IN_ROOM(ch));
+		return obj;
 	}
+	
+	return NULL;
 }
 
 

@@ -1876,6 +1876,52 @@ SHOW(show_components) {
 }
 
 
+// show data system
+SHOW(show_data) {
+	extern struct stored_data *data_table;
+	extern struct stored_data_type stored_data_info[];
+	
+	char output[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	struct stored_data *data, *next_data;
+	size_t size;
+	
+	size = snprintf(output, sizeof(output), "Stored data:\r\n");
+	
+	HASH_ITER(hh, data_table, data, next_data) {
+		// DATYPE_x:
+		switch (data->keytype) {
+			case DATYPE_INT: {
+				snprintf(line, sizeof(line), " %s: %d\r\n", stored_data_info[data->key].name, data_get_int(data->key));
+				break;
+			}
+			case DATYPE_LONG: {
+				snprintf(line, sizeof(line), " %s: %ld\r\n", stored_data_info[data->key].name, data_get_long(data->key));
+				break;
+			}
+			case DATYPE_DOUBLE: {
+				snprintf(line, sizeof(line), " %s: %f\r\n", stored_data_info[data->key].name, data_get_double(data->key));
+				break;
+			}
+			default: {
+				snprintf(line, sizeof(line), " %s: UNKNOWN\r\n", stored_data_info[data->key].name);
+				break;
+			}
+		}
+		
+		if ((size += strlen(line)) < sizeof(output)) {
+			strcat(output, line);
+		}
+		else {
+			break;
+		}
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
+	}
+}
+
+
 SHOW(show_factions) {
 	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH];
 	struct player_faction_data *pfd, *next_pfd;
@@ -3721,6 +3767,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	struct custom_message *ocm;
 	player_index_data *index;
 	crop_data *cp;
+	bool any;
 
 	msg_to_char(ch, "Name: '&y%s&0', Aliases: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
 
@@ -3795,8 +3842,10 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		struct obj_binding *bind;
 		
 		msg_to_char(ch, "Bound to:");
+		any = FALSE;
 		for (bind = OBJ_BOUND_TO(j); bind; bind = bind->next) {
-			msg_to_char(ch, " %s", (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
+			msg_to_char(ch, "%s %s", (any ? "," : ""), (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
+			any = TRUE;
 		}
 		msg_to_char(ch, "\r\n");
 	}
@@ -5002,7 +5051,7 @@ ACMD(do_distance) {
 
 // this also handles emote
 ACMD(do_echo) {
-	void add_to_channel_history(descriptor_data *desc, int type, char *message);
+	void add_to_channel_history(char_data *ch, int type, char *message);
 	void clear_last_act_message(descriptor_data *desc);
 	extern bool is_ignoring(char_data *ch, char_data *victim);
 	
@@ -5102,7 +5151,7 @@ ACMD(do_echo) {
 				*hbuf = '\0';
 			}
 			strcat(hbuf, ch->desc->last_act_message);
-			add_to_channel_history(ch->desc, CHANNEL_HISTORY_SAY, hbuf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, hbuf);
 		}
 	}
 
@@ -5131,7 +5180,7 @@ ACMD(do_echo) {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, c->desc->last_act_message);
-				add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, hbuf);
 			}
 			else if (c->desc && c != ch && c != vict) {
 				// just in case
@@ -5173,7 +5222,7 @@ ACMD(do_echo) {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, vict->desc->last_act_message);
-				add_to_channel_history(vict->desc, CHANNEL_HISTORY_SAY, hbuf);
+				add_to_channel_history(vict, CHANNEL_HISTORY_SAY, hbuf);
 			}
 		}
 	}
@@ -5203,7 +5252,7 @@ ACMD(do_echo) {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, c->desc->last_act_message);
-				add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, hbuf);
 			}
 			else if (c->desc && c != ch) {
 				// just in case
@@ -6286,7 +6335,7 @@ ACMD(do_reboot) {
 	}
 
 	if (reboot_control.immediate) {
-		msg_to_char(ch, "Rebooting momentarily...\r\n");
+		msg_to_char(ch, "Preparing for imminent %s...\r\n", reboot_type[reboot_control.type]);
 	}
 	else {
 		var = (no_arg ? reboot_control.time : time);
@@ -6321,6 +6370,7 @@ ACMD(do_reboot) {
 ACMD(do_reload) {
 	extern int file_to_string_alloc(const char *name, char **buf);
 	void index_boot_help();
+	void load_data_table();
 	void load_intro_screens();
 	extern char *credits;
 	extern char *motd;
@@ -6388,6 +6438,9 @@ ACMD(do_reload) {
 		}
 		top_of_helpt = 0;
 		index_boot_help();
+	}
+	else if (!str_cmp(arg, "data")) {
+		load_data_table();
 	}
 	else {
 		send_to_char("Unknown reload option.\r\n", ch);
@@ -6727,6 +6780,7 @@ ACMD(do_show) {
 		{ "uses", LVL_START_IMM, show_uses },
 		{ "factions", LVL_START_IMM, show_factions },
 		{ "dailycycle", LVL_START_IMM, show_dailycycle },
+		{ "data", LVL_CIMPL, show_data },
 
 		// last
 		{ "\n", 0, NULL }

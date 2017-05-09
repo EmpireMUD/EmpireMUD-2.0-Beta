@@ -69,7 +69,7 @@ void adventure_summon(char_data *ch, char *argument) {
 	if (GET_POS(ch) < POS_STANDING) {
 		msg_to_char(ch, "You can't do that right now.\r\n");
 	}
-	else if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !(inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
+	else if (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
 		msg_to_char(ch, "You can only use the adventure summon command inside an adventure.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
@@ -116,7 +116,7 @@ void adventure_summon(char_data *ch, char *argument) {
 	}
 	else {
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
-		msg_to_char(vict, "%s is trying to summon you to %s (%s) -- use 'accept/reject summon'.", PERS(ch, ch, TRUE), GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
+		msg_to_char(vict, "%s is trying to summon you to %s (%s) -- use 'accept/reject summon'.\r\n", PERS(ch, ch, TRUE), GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
 		add_offer(vict, ch, OFFER_SUMMON, SUMMON_ADVENTURE);
 		command_lag(ch, WAIT_OTHER);
 	}
@@ -601,7 +601,7 @@ OFFER_FINISH(ofin_quest) {
 
 
 OFFER_VALIDATE(oval_rez) {
-	extern obj_data *find_obj(int n);
+	extern obj_data *find_obj(int n, bool error);
 	extern room_data *obj_room(obj_data *obj);
 	
 	room_data *loc = real_room(offer->location);
@@ -614,7 +614,7 @@ OFFER_VALIDATE(oval_rez) {
 	
 	// if already respawned, verify corpse location
 	if (!IS_DEAD(ch)) {
-		if (!(corpse = find_obj(GET_LAST_CORPSE_ID(ch))) || !IS_CORPSE(corpse)) {
+		if (!(corpse = find_obj(GET_LAST_CORPSE_ID(ch), FALSE)) || !IS_CORPSE(corpse)) {
 			msg_to_char(ch, "You can't resurrect because your corpse is gone.\r\n");
 			return FALSE;
 		}

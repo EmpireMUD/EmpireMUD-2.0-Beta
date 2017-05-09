@@ -870,19 +870,18 @@ WCMD(do_wown) {
 	}
 	else {	// attempt to find a target
 		strcpy(targ_arg, type_arg);	// there was no type
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);
 		
 		if (!*targ_arg) {
 			wld_log(room, "wown: Too few arguments");
 			return;
 		}
-		else if (*targ_arg == UID_CHAR && !(vict = get_char(targ_arg)) && !(vtarg = get_vehicle(targ_arg)) && !(otarg = get_obj(targ_arg)) && !(rtarg = get_room(room, targ_arg))) {
-			wld_log(room, "wown: Unable to find target %s", targ_arg);
-			return;
+		else if (*targ_arg == UID_CHAR && ((vict = get_char(targ_arg)) || (vtarg = get_vehicle(targ_arg)) || (otarg = get_obj(targ_arg)) || (rtarg = get_room(room, targ_arg)))) {
+			// found by uid
 		}
 		else if ((vict = get_char_by_room(room, targ_arg)) || (vtarg = get_vehicle_room(room, targ_arg)) || (otarg = get_obj_by_room(room, targ_arg))) {
-			// must have been found
-			skip_spaces(&argument);
-			strcpy(emp_arg, argument);
+			// found by name
 		}
 		else {
 			wld_log(room, "wown: Invalid target");
@@ -1013,6 +1012,7 @@ WCMD(do_wload) {
 	int number = 0;
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
+	room_data *in_room;
 	vehicle_data *veh;
 	char *target;
 	int pos;
@@ -1080,6 +1080,21 @@ WCMD(do_wload) {
 		target = two_arguments(target, arg1, arg2); /* recycling ... */
 		skip_spaces(&target);
 		
+		// if they're picking a room, move arg2 down a slot to "target" level
+		in_room = NULL;
+		if (!str_cmp(arg1, "room")) {
+			in_room = room;
+			target = arg2;
+		}
+		else if (*arg1 == UID_CHAR) {
+			if ((in_room = get_room(room, arg1))) {
+				target = arg2;
+			}
+		}
+		else {	// not targeting a room
+			in_room = NULL;
+		}
+		
 		// scaling on request
 		if (*target && isdigit(*target)) {
 			scale_item_to_level(object, atoi(target));
@@ -1087,6 +1102,12 @@ WCMD(do_wload) {
 		else if ((inst = find_instance_by_room(room, FALSE)) && inst->level > 0) {
 			// scaling by locked adventure
 			scale_item_to_level(object, inst->level);
+		}
+		
+		if (in_room) {	// load in room
+			obj_to_room(object, in_room); 
+			load_otrigger(object);
+			return;
 		}
 		
 		tch = get_char_in_room(room, arg1);

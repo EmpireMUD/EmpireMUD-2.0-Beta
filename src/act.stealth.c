@@ -802,10 +802,10 @@ ACMD(do_disguise) {
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (!IS_NPC(vict)) {
+	else if (!IS_NPC(vict) && !IS_DISGUISED(vict)) {
 		msg_to_char(ch, "You can only disguise yourself as an NPC.\r\n");
 	}
-	else if (!MOB_FLAGGED(vict, MOB_HUMAN)) {
+	else if (IS_NPC(vict) && !MOB_FLAGGED(vict, MOB_HUMAN)) {
 		act("You can't disguise yourself as $N!", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_DISGUISE)) {
@@ -1427,7 +1427,7 @@ ACMD(do_sap) {
 
 ACMD(do_search) {
 	char_data *targ;
-	bool found = FALSE;
+	bool found = FALSE, earthmeld = FALSE;
 
 	if (!can_use_ability(ch, ABIL_SEARCH, NOTHING, 0, COOLDOWN_SEARCH)) {
 		// sends own message
@@ -1447,24 +1447,35 @@ ACMD(do_search) {
 		for (targ = ROOM_PEOPLE(IN_ROOM(ch)); targ; targ = targ->next_in_room) {
 			if (ch == targ)
 				continue;
-			if (!AFF_FLAGGED(targ, AFF_HIDE) || CAN_SEE(ch, targ))
-				continue;
 			
-			if (has_ability(targ, ABIL_CLING_TO_SHADOW)) {
-				gain_ability_exp(targ, ABIL_CLING_TO_SHADOW, 20);
-				continue;
+			// hidden targets
+			if (AFF_FLAGGED(targ, AFF_HIDE)) {
+					continue;
+			
+				if (has_ability(targ, ABIL_CLING_TO_SHADOW)) {
+					gain_ability_exp(targ, ABIL_CLING_TO_SHADOW, 20);
+					continue;
+				}
+
+				SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
+
+				if (skill_check(ch, ABIL_SEARCH, DIFF_HARD) && CAN_SEE(ch, targ)) {
+					act("You find $N!", FALSE, ch, 0, targ, TO_CHAR);
+					msg_to_char(targ, "You are discovered!\r\n");
+					REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDE);
+					affects_from_char_by_aff_flag(targ, AFF_HIDE, FALSE);
+					found = TRUE;
+				}
+
+				REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
 			}
-
-			SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
-
-			if (skill_check(ch, ABIL_SEARCH, DIFF_HARD) && CAN_SEE(ch, targ)) {
-				act("You find $N!", FALSE, ch, 0, targ, TO_CHAR);
-				msg_to_char(targ, "You are discovered!\r\n");
-				REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDE);
-				found = TRUE;
+			else if (!earthmeld && AFF_FLAGGED(targ, AFF_EARTHMELD)) {
+				// earthmelded targets (only do once)
+				if (skill_check(ch, ABIL_SEARCH, DIFF_HARD) && CAN_SEE(ch, targ)) {
+					act("You find signs that someone is earthmelded here.", FALSE, ch, NULL, NULL, TO_CHAR);
+					found = earthmeld = TRUE;
+				}
 			}
-
-			REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
 		}
 
 		if (!found)

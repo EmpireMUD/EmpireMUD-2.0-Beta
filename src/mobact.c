@@ -624,7 +624,7 @@ void mobile_activity(void) {
 
 					// look in this room
 					for (vict = ROOM_PEOPLE(IN_ROOM(ch)); !found && vict; vict = vict->next_in_room) {
-						if (!IS_NPC(vict) && GET_IDNUM(vict) == purs->idnum && CAN_RECOGNIZE(ch, vict) && can_fight(ch, vict)) {
+						if (!IS_NPC(vict) && GET_IDNUM(vict) == purs->idnum && CAN_SEE(ch, vict) && CAN_RECOGNIZE(ch, vict) && can_fight(ch, vict)) {
 							found = TRUE;
 							engage_combat(ch, vict, FALSE);
 						}
@@ -922,8 +922,9 @@ void despawn_mob(char_data *ch) {
 * This will update the last-spawned-time for the room.
 *
 * @param room_data *room The location to spawn.
+* @param bool only_artisans If TRUE, the room has respawned too recently and will only spawn artisans
 */
-static void spawn_one_room(room_data *room) {
+static void spawn_one_room(room_data *room, bool only_artisans) {
 	extern char *replace_npc_names(const char *str, const char *name, const char *empire_name, const char *empire_adjective);
 	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
 	
@@ -936,6 +937,7 @@ static void spawn_one_room(room_data *room) {
 	time_t now = time(0);
 	bool in_city, junk;
 	crop_data *cp;
+	mob_vnum artisan = NOTHING;
 	
 	int time_to_empire_emptiness = config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK;
 	
@@ -944,10 +946,14 @@ static void spawn_one_room(room_data *room) {
 		return;
 	}
 	
+	artisan = (GET_BUILDING(room) ? GET_BLD_ARTISAN(GET_BUILDING(room)) : NOTHING);
+	
 	home = HOME_ROOM(room);
 	
-	// update this now, no matter what happens
-	ROOM_LAST_SPAWN_TIME(room) = now;
+	if (!only_artisans) {
+		// update this now, no matter what happens
+		ROOM_LAST_SPAWN_TIME(room) = now;
+	}
 	
 	// never spawn idle empires at all
 	if (ROOM_OWNER(home) && EMPIRE_LAST_LOGON(ROOM_OWNER(home)) + time_to_empire_emptiness < now) {
@@ -957,10 +963,14 @@ static void spawn_one_room(room_data *room) {
 	// spawn empire npcs who live here first
 	if (ROOM_OWNER(home) && (ter = find_territory_entry(ROOM_OWNER(home), room))) {
 		for (npc = ter->npcs; npc; npc = npc->next) {
-			// check if the mob is already spawned
-			if (!npc->mob) {
-				spawn_empire_npc_to_room(ROOM_OWNER(home), npc, room, NOTHING);
+			if (npc->mob) {
+				continue;	// check if the mob is already spawned
 			}
+			if (only_artisans && npc->vnum != artisan) {
+				continue;	// not spawning this now
+			}
+			
+			spawn_empire_npc_to_room(ROOM_OWNER(home), npc, room, NOTHING);
 		}
 	}
 	
@@ -972,77 +982,76 @@ static void spawn_one_room(room_data *room) {
 		}
 	}
 	
-	if (count >= config_get_int("spawn_limit_per_room")) {
-		return;
-	}
-	
-	// find a spawn list
-	list = NULL;
-	if (GET_BUILDING(room)) {
-		// only find a spawn list here if the building is complete; otherwise no list = no spawn
-		if (IS_COMPLETE(room)) {
-			list = GET_BLD_SPAWNS(GET_BUILDING(room));
+	// normal spawn list
+	if (!only_artisans && count < config_get_int("spawn_limit_per_room")) {
+		// find a spawn list
+		list = NULL;
+		if (GET_BUILDING(room)) {
+			// only find a spawn list here if the building is complete; otherwise no list = no spawn
+			if (IS_COMPLETE(room)) {
+				list = GET_BLD_SPAWNS(GET_BUILDING(room));
+			}
 		}
-	}
-	else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
-		list = GET_CROP_SPAWNS(cp);
-	}
-	else {
-		list = GET_SECT_SPAWNS(SECT(room));
-	}
+		else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
+			list = GET_CROP_SPAWNS(cp);
+		}
+		else {
+			list = GET_SECT_SPAWNS(SECT(room));
+		}
 	
-	// anything to spawn?
-	if (list) {
-		// set up data for faster checking
-		x_coord = X_COORD(room);
-		y_coord = Y_COORD(room);
-		in_city = (ROOM_OWNER(home) && is_in_city_for_empire(room, ROOM_OWNER(home), TRUE, &junk)) ? TRUE : FALSE;
+		// anything to spawn?
+		if (list) {
+			// set up data for faster checking
+			x_coord = X_COORD(room);
+			y_coord = Y_COORD(room);
+			in_city = (ROOM_OWNER(home) && is_in_city_for_empire(room, ROOM_OWNER(home), TRUE, &junk)) ? TRUE : FALSE;
 	
-		for (spawn = list; spawn; spawn = spawn->next) {
-			// validate flags
-			if (IS_SET(spawn->flags, SPAWN_NOCTURNAL) && weather_info.sunlight != SUN_DARK && weather_info.sunlight != SUN_SET)
-				continue;
-			if (IS_SET(spawn->flags, SPAWN_DIURNAL) && weather_info.sunlight != SUN_LIGHT && weather_info.sunlight != SUN_RISE)
-				continue;
-			if (IS_SET(spawn->flags, SPAWN_CLAIMED) && !ROOM_OWNER(home))
-				continue;
-			if (IS_SET(spawn->flags, SPAWN_UNCLAIMED) && ROOM_OWNER(home))
-				continue;
-			if (IS_SET(spawn->flags, SPAWN_CITY) && !in_city)
-				continue;
-			if (IS_SET(spawn->flags, SPAWN_OUT_OF_CITY) && in_city)
-				continue;
-			if (IS_SET(spawn->flags, SPAWN_NORTHERN) && y_coord < (MAP_HEIGHT / 2))
-				continue;
-			if (IS_SET(spawn->flags, SPAWN_SOUTHERN) && y_coord >= (MAP_HEIGHT / 2))
-				continue;
-			if (IS_SET(spawn->flags, SPAWN_EASTERN) && x_coord < (MAP_WIDTH / 2))
-				continue;
-			if (IS_SET(spawn->flags, SPAWN_WESTERN) && x_coord >= (MAP_WIDTH / 2))
-				continue;
+			for (spawn = list; spawn; spawn = spawn->next) {
+				// validate flags
+				if (IS_SET(spawn->flags, SPAWN_NOCTURNAL) && weather_info.sunlight != SUN_DARK && weather_info.sunlight != SUN_SET)
+					continue;
+				if (IS_SET(spawn->flags, SPAWN_DIURNAL) && weather_info.sunlight != SUN_LIGHT && weather_info.sunlight != SUN_RISE)
+					continue;
+				if (IS_SET(spawn->flags, SPAWN_CLAIMED) && !ROOM_OWNER(home))
+					continue;
+				if (IS_SET(spawn->flags, SPAWN_UNCLAIMED) && ROOM_OWNER(home))
+					continue;
+				if (IS_SET(spawn->flags, SPAWN_CITY) && !in_city)
+					continue;
+				if (IS_SET(spawn->flags, SPAWN_OUT_OF_CITY) && in_city)
+					continue;
+				if (IS_SET(spawn->flags, SPAWN_NORTHERN) && y_coord < (MAP_HEIGHT / 2))
+					continue;
+				if (IS_SET(spawn->flags, SPAWN_SOUTHERN) && y_coord >= (MAP_HEIGHT / 2))
+					continue;
+				if (IS_SET(spawn->flags, SPAWN_EASTERN) && x_coord < (MAP_WIDTH / 2))
+					continue;
+				if (IS_SET(spawn->flags, SPAWN_WESTERN) && x_coord >= (MAP_WIDTH / 2))
+					continue;
 
-			// check percent
-			if (number(1, 10000) > (int)(100 * spawn->percent)) {
-				continue;
-			}
+				// check percent
+				if (number(1, 10000) > (int)(100 * spawn->percent)) {
+					continue;
+				}
 		
-			// passed! let's spawn
-			mob = read_mobile(spawn->vnum, TRUE);
+				// passed! let's spawn
+				mob = read_mobile(spawn->vnum, TRUE);
 		
-			// ensure loyalty
-			if (ROOM_OWNER(home) && MOB_FLAGGED(mob, MOB_HUMAN | MOB_EMPIRE | MOB_CITYGUARD)) {
-				GET_LOYALTY(mob) = ROOM_OWNER(home);
-			}
+				// ensure loyalty
+				if (ROOM_OWNER(home) && MOB_FLAGGED(mob, MOB_HUMAN | MOB_EMPIRE | MOB_CITYGUARD)) {
+					GET_LOYALTY(mob) = ROOM_OWNER(home);
+				}
 
-			// in case of generic names
-			setup_generic_npc(mob, ROOM_OWNER(home), NOTHING, NOTHING);
+				// in case of generic names
+				setup_generic_npc(mob, ROOM_OWNER(home), NOTHING, NOTHING);
 		
-			// enforce spawn data
-			SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
+				// enforce spawn data
+				SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
 				
-			// put in the room
-			char_to_room(mob, room);
-			load_mtrigger(mob);
+				// put in the room
+				char_to_room(mob, room);
+				load_mtrigger(mob);
+			}
 		}
 	}
 
@@ -1052,7 +1061,7 @@ static void spawn_one_room(room_data *room) {
 			next_iter = iter->next_interior;
 			
 			if (HOME_ROOM(iter) == room && iter != room) {
-				spawn_one_room(iter);
+				spawn_one_room(iter, only_artisans);
 			}
 		}
 	}
@@ -1082,6 +1091,7 @@ void spawn_mobs_from_center(room_data *center) {
 	
 	// only bother at all if the center needs to be spawned
 	if (ROOM_LAST_SPAWN_TIME(center) >= (now - mob_spawn_interval)) {
+		spawn_one_room(center, TRUE);	// run an only-artisans spawn just in case
 		return;
 	}
 	
@@ -1090,9 +1100,7 @@ void spawn_mobs_from_center(room_data *center) {
 			to_room = real_shift(center, x_iter, y_iter);
 
 			if (to_room && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_UNCLAIMABLE)) {
-				if (ROOM_LAST_SPAWN_TIME(to_room) < (now - mob_spawn_interval)) {
-					spawn_one_room(to_room);
-				}
+				spawn_one_room(to_room, ROOM_LAST_SPAWN_TIME(to_room) >= (now - mob_spawn_interval));
 			}
 		}
 	}

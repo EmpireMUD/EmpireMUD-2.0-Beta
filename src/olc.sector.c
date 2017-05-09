@@ -740,7 +740,7 @@ OLC_MODULE(sectedit_evolution) {
 				st->evolution = evo;
 				sort_evolutions(st);
 				
-				msg_to_char(ch, "You add a %s%s evolution at %.2f%%: %d %s\r\n", evo_types[evo_type], valstr, prc, GET_SECT_VNUM(to_sect), GET_SECT_NAME(to_sect));
+				msg_to_char(ch, "You add %s %s%s evolution at %.2f%%: %d %s\r\n", AN(evo_types[evo_type]), evo_types[evo_type], valstr, prc, GET_SECT_VNUM(to_sect), GET_SECT_NAME(to_sect));
 			}
 		}
 	}

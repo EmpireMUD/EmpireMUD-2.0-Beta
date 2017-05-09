@@ -39,6 +39,11 @@
 #define FIND_NPC_ONLY		BIT(9)	// ignores players
 
 
+// for match_char_name()
+#define MATCH_GLOBAL  BIT(0)	// ignores dark/blind
+#define MATCH_IN_ROOM  BIT(1)	// specifically checks for things that only matter in-room
+
+
 // for the interaction handlers (returns TRUE if the character performs the interaction; FALSE if it aborts)
 #define INTERACTION_FUNC(name)	bool (name)(char_data *ch, struct interaction_item *interaction, room_data *inter_room, char_data *inter_mob, obj_data *inter_item)
 
@@ -47,9 +52,6 @@
 //// HANDLER MACROS //////////////////////////////////////////////////////////
 
 #define MATCH_ITEM_NAME(str, obj)  (isname((str), GET_OBJ_KEYWORDS(obj)) || (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0 && isname((str), drinks[GET_DRINK_CONTAINER_TYPE(obj)])))
-#define MATCH_CHAR_DISGUISED_NAME(str, ch)  ((IS_MORPHED(ch) && isname((str), MORPH_KEYWORDS(GET_MORPH(ch)))) || (IS_DISGUISED(ch) && isname((str), GET_DISGUISED_NAME(ch))))
-#define MATCH_CHAR_NAME(str, ch)  ((!IS_NPC(ch) && GET_LASTNAME(ch) && isname((str), GET_LASTNAME(ch))) || isname((str), GET_PC_NAME(ch)) || MATCH_CHAR_DISGUISED_NAME(str, ch))
-#define MATCH_CHAR_NAME_ROOM(viewer, str, target)  ((IS_DISGUISED(target) && !IS_IMMORTAL(viewer) && !SAME_EMPIRE(viewer, target)) ? MATCH_CHAR_DISGUISED_NAME(str, target) : MATCH_CHAR_NAME(str, target))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -85,6 +87,7 @@ void show_wear_off_msg(char_data *ch, int atype);
 // character handlers
 void extract_char(char_data *ch);
 void extract_char_final(char_data *ch);
+extern bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t flags);
 void perform_idle_out(char_data *ch);
 
 // character location handlers
@@ -168,6 +171,7 @@ extern bool run_room_interactions(char_data *ch, room_data *room, int type, INTE
 // lore handlers
 void add_lore(char_data *ch, int type, const char *str, ...) __attribute__((format(printf, 3, 4)));
 void remove_lore(char_data *ch, int type);
+void remove_recent_lore(char_data *ch, int type);
 
 // mob tagging handlers
 extern bool find_id_in_tag_list(int id, struct mob_tag *list);
@@ -215,8 +219,8 @@ void obj_to_room(obj_data *object, room_data *room);
 void obj_to_vehicle(obj_data *object, vehicle_data *veh);
 void swap_obj_for_obj(obj_data *old, obj_data *new);
 extern obj_data *unequip_char(char_data *ch, int pos);
-void unequip_char_to_inventory(char_data *ch, int pos);
-void unequip_char_to_room(char_data *ch, int pos);
+extern obj_data *unequip_char_to_inventory(char_data *ch, int pos);
+extern obj_data *unequip_char_to_room(char_data *ch, int pos);
 
 // custom message handlers
 extern struct custom_message *copy_custom_messages(struct custom_message *from);
@@ -322,7 +326,7 @@ extern int parse_direction(char_data *ch, char *dir);
 //// handlers from other files ///////////////////////////////////////////////
 
 // act.item.c
-void perform_remove(char_data *ch, int pos);
+extern obj_data *perform_remove(char_data *ch, int pos);
 
 // books.c
 extern book_data *book_proto(book_vnum vnum);

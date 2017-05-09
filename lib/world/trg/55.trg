@@ -6,13 +6,18 @@ if !%arg%
   %send% %actor% Study what? (try 'study sorcery')
   halt
 end
-if %arg% /= sorcery
+if !(sorcery /= %arg%)
   return 0
   halt
 end
 eval permission %%actor.canuseroom_guest(%room%)%%
 if !%permission%
   %send% %actor% You don't have permission to study here!
+  return 1
+  halt
+end
+if %actor.has_item(5511)%
+  %send% %actor% You already have a High Sorcery textbook.
   return 1
   halt
 end

@@ -428,6 +428,8 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 * @return bool TRUE if successful, FALSE if not.
 */
 bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh) {
+	char_data *mort;
+	
 	if (!drop_otrigger(obj, ch)) {	// also takes care of obj purging self
 		return FALSE;
 	}
@@ -440,6 +442,19 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 	obj_to_vehicle(obj, veh);
 	act("$n puts $p in $V.", TRUE, ch, obj, veh, TO_ROOM);
 	act("You put $p in $V.", FALSE, ch, obj, veh, TO_CHAR);
+	
+	if (IS_IMMORTAL(ch)) {
+		if (VEH_OWNER(veh) && !EMPIRE_IMM_ONLY(VEH_OWNER(veh))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a vehicle owned by mortal empire (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(VEH_OWNER(veh)), room_log_identifier(IN_ROOM(veh)));
+		}
+		else if (ROOM_OWNER(IN_ROOM(veh)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(veh)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a vehicle in mortal empire (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(veh)));
+		}
+		else if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a vehicle with mortal present (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_NAME(mort), room_log_identifier(IN_ROOM(ch)));
+		}
+	}
+	
 	return TRUE;
 }
 
@@ -759,6 +774,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 				// has proto's desc
 				VEH_LOOK_DESC(veh) = VEH_LOOK_DESC(proto) ? str_dup(VEH_LOOK_DESC(proto)) : NULL;
 				start_string_editor(ch->desc, "vehicle description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
+				ch->desc->str_on_abort = VEH_LOOK_DESC(proto);
 			}
 			
 			act("$n begins editing a vehicle description.", TRUE, ch, 0, 0, TO_ROOM);

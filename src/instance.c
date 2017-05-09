@@ -219,7 +219,12 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 	}
 	
 	if (ADVENTURE_FLAGGED(adv, ADV_ROTATABLE)) {
-		rotation = number(0, NUM_SIMPLE_DIRS-1);
+		if (dir != NO_DIR && dir != DIR_RANDOM) {
+			rotation = dir;
+		}
+		else {
+			rotation = number(0, NUM_SIMPLE_DIRS-1);
+		}
 	}
 	else {
 		rotation = NORTH;
@@ -343,6 +348,7 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 	extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
 
 	struct room_direction_data *new;
+	struct exit_template *ex_iter;
 	room_data *to_room = NULL;
 	int iter, dir;
 	
@@ -380,6 +386,7 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 		COMPLEX_DATA(room)->exits = new;
 	}
 	
+	// build the exit
 	new->dir = dir;
 	new->to_room = GET_ROOM_VNUM(to_room);
 	new->room_ptr = to_room;
@@ -389,6 +396,16 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 		free(new->keyword);
 	}
 	new->keyword = exit->keyword ? str_dup(exit->keyword) : NULL;
+	
+	// mark this exit as done to prevent repeats
+	exit->done = TRUE;
+	
+	// check if we need a back exit
+	LL_FOREACH(GET_RMT_EXITS(GET_ROOM_TEMPLATE(to_room)), ex_iter) {
+		if (!ex_iter->done && ex_iter->target_room == ROOM_TEMPLATE_VNUM(room)) {
+			instantiate_one_exit(inst, to_room, ex_iter, rotation);
+		}
+	}
 }
 
 
@@ -479,6 +496,13 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 					COMPLEX_DATA(room_list[pos])->home_room = inst->start;
 				}
 			}
+			
+			// mark exits as non-instantiated
+			LL_FOREACH(GET_RMT_EXITS(rmt), ex) {
+				ex->done = FALSE;
+			}
+			
+			// increment pos
 			++pos;
 		}
 	}
@@ -497,7 +521,7 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (room_list[iter] && template_list[iter]) {
 			for (ex = GET_RMT_EXITS(template_list[iter]); ex; ex = ex->next) {
-				if (ex->dir != DIR_RANDOM) {
+				if (!ex->done && ex->dir != DIR_RANDOM) {
 					instantiate_one_exit(inst, room_list[iter], ex, rotation);
 				}
 			}
@@ -508,7 +532,7 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (room_list[iter] && template_list[iter]) {
 			for (ex = GET_RMT_EXITS(template_list[iter]); ex; ex = ex->next) {
-				if (ex->dir == DIR_RANDOM) {
+				if (!ex->done && ex->dir == DIR_RANDOM) {
 					instantiate_one_exit(inst, room_list[iter], ex, rotation);
 				}
 			}
@@ -636,7 +660,7 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 		if (ROOM_OWNER(home) && !LINK_FLAGGED(rule, ADV_LINKF_CLAIMED_OK | ADV_LINKF_CITY_ONLY)) {
 			return FALSE;
 		}
-		if (ROOM_OWNER(home) && EMPIRE_IS_TIMED_OUT(ROOM_OWNER(home))) {
+		if (ROOM_OWNER(home) && (EMPIRE_LAST_LOGON(ROOM_OWNER(home)) + (config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK)) < time(0)) {
 			return FALSE;	// owner is timed out -- don't spawn here
 		}
 	
@@ -713,13 +737,14 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 */
 room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir) {
 	extern bool can_build_on(room_data *room, bitvector_t flags);
+	extern bool rmt_has_exit(room_template *rmt, int dir);
 	
 	room_template *start_room = room_template_proto(GET_ADV_START_VNUM(adv));
 	room_data *room, *next_room, *loc, *shift, *found = NULL;
 	int dir, iter, sub, num_found, pos;
 	sector_data *findsect = NULL;
 	bool match_buildon = FALSE;
-	bld_data *findbdg = NULL;
+	bld_data *findbdg = NULL, *bdg = NULL;
 	struct map_data *map;
 	
 	const int max_tries = 500, max_dir_tries = 10;	// for random checks
@@ -837,10 +862,14 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 				for (sub = 0; sub < max_dir_tries && !found; ++sub) {
 					dir = number(0, NUM_2D_DIRS-1);
 					
-					// matches the dir we need inside?
-					if (dir == rule->dir) {
-						continue;
+					// new non-open building
+					if (rule->type == ADV_LINK_BUILDING_NEW && (bdg = building_proto(rule->value)) && !IS_SET(GET_BLD_FLAGS(bdg), BLD_OPEN)) {
+						// matches a dir we need inside?
+						if (dir == rule->dir || rmt_has_exit(start_room, rev_dir[dir])) {
+							continue;
+						}
 					}
+					
 					// need a valid map tile to face
 					if (!(shift = real_shift(loc, shift_dir[dir][0], shift_dir[dir][1]))) {
 						continue;
@@ -1761,9 +1790,11 @@ struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom
 	}
 	
 	// check if it's the location for one
-	for (inst = instance_list; inst; inst = inst->next) {
-		if (inst->location == room || (check_homeroom && HOME_ROOM(inst->location) == room)) {
-			return inst;
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) || (check_homeroom && ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_HAS_INSTANCE))) {
+		for (inst = instance_list; inst; inst = inst->next) {
+			if (inst->location == room || (check_homeroom && HOME_ROOM(inst->location) == room)) {
+				return inst;
+			}
 		}
 	}
 	
@@ -1936,18 +1967,24 @@ void mark_instance_completed(struct instance_data *inst) {
 
 
 /**
-* Sets up instance info.
+* Sets up instance info and prunes bad instances
 */
 static void renum_instances(void) {
-	struct instance_data *inst;
+	struct instance_data *inst, *next_inst;
 	int iter;
 	
-	for (inst = instance_list; inst; inst = inst->next) {
+	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		// attach pointers
 		for (iter = 0; iter < inst->size; ++iter) {			
 			// set up instance data
 			if (inst->room[iter] && COMPLEX_DATA(inst->room[iter])) {
 				COMPLEX_DATA(inst->room[iter])->instance = inst;
 			}
+		}
+		
+		// check bad instance
+		if (!inst->location || !inst->start) {
+			delete_instance(inst);
 		}
 	}
 }
