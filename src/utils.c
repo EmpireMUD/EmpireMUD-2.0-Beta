@@ -1641,20 +1641,20 @@ char *any_one_word(char *argument, char *first_arg) {
 
 	if (*argument == '\"') {
 		++argument;
-		do {
+		while (*argument && *argument != '\"') {
 			*(first_arg++) = *argument;
 			++argument;
-		} while (*argument && *argument != '\"');
+		}
 		if (*argument) {
 			++argument;
 		}
 	}
 	else if (*argument == '(') {
 		++argument;
-		do {
+		while (*argument && *argument != ')') {
 			*(first_arg++) = *argument;
 			++argument;
-		} while (*argument && *argument != ')');
+		}
 		if (*argument) {
 			++argument;
 		}
