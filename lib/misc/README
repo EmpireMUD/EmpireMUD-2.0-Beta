@@ -2,6 +2,7 @@ This directory contains some data files, all ascii:
 
 bugs - Player-submitted bugs ('bug', 'show bugs' in-game).
 game_configs - The in-game 'config' system data.
+game_data - Persistent data stored by the game's 'data' system.
 ideas - Player-submitted ideas ('idea', 'show ideas' in-game).
 messages - Fight messages matching the TYPE_x consts in the code.
 tips - Tip-a-day entries.
