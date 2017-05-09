@@ -4394,7 +4394,8 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			return FALSE;
 		}
 		if (*argument) {
-			*misc = olc_process_flag(ch, argument, "component", "", component_flags, NOBITS);
+			argument = any_one_word(argument, arg);
+			*misc = olc_process_flag(ch, arg, "component", "", component_flags, NOBITS);
 		}
 	}
 	if (need_faction) {

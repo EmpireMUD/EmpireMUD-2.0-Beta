@@ -4800,27 +4800,31 @@ there is more than one group, the player only needs to meet all conditions from
 any 1 group. Group names are always a single case-sensitive letter.
 
 Available tasks:
- COMPLETED-QUEST - Must complete a certain quest.
- GET-COMPONENT - Must have components.
- GET-OBJECT - Must have items.
- KILL-MOB &r*&0 - Must kill a certain mob.
- KILL-MOB-FLAGGED &r*&0 - Must kill mobs with certain flags.
- NOT-COMPLETED-QUEST - Has not completed a certain quest.
- NOT-ON-QUEST - Is not currently on a certain quest.
- OWN-BUILDING - Empire has a certain building.
- OWN-VEHICLE - Empire has a certain vehicle.
- SKILL-LEVEL-OVER - Player has a certain skill at least this high.
- SKILL-LEVEL-UNDER - Player has a certain skill no higher than this.
- TRIGGERED &r*&0 - Activated by a %quest% command in a trigger.
- VISIT-BUILDING &r*&0 - Player must go to a certain building/room.
- VISIT-ROOM-TEMPLATE &r*&0 - Player must go to a certain room template.
- VISIT-SECTOR &r*&0 - Player must go to a certain terrain.
- HAVE-ABILITY - Player must have a certain ability.
- REP-OVER - Player must have at least this faction reputation.
- REP-UNDER - Player must be at or below this faction reputation.
- WEARING - Player has the item equipped
- WEARING-OR-HAS - Player has the item either equipped or in inventory
-    (note: item will not be extracted even if EXTRACT-TASK-OBJECTS is on)
+ &cCOMPLETED-QUEST&0 - Must complete a certain quest.
+ &cGET-COMPONENT&0 - Must have components.
+   Note: If you use multiple component flags, they must be in quotes:
+         .requirement add get-component 3 skin "large basic"
+         If you want to add a [group], you MUST provide flags even if empty:
+         .requirement add get-component 3 skin "" a
+ &cGET-OBJECT&0 - Must have items.
+ &cKILL-MOB &r*&0&0 - Must kill a certain mob.
+ &cKILL-MOB-FLAGGED &r*&0&0 - Must kill mobs with certain flags.
+ &cNOT-COMPLETED-QUEST&0 - Has not completed a certain quest.
+ &cNOT-ON-QUEST&0 - Is not currently on a certain quest.
+ &cOWN-BUILDING&0 - Empire has a certain building.
+ &cOWN-VEHICLE&0 - Empire has a certain vehicle.
+ &cSKILL-LEVEL-OVER&0 - Player has a certain skill at least this high.
+ &cSKILL-LEVEL-UNDER&0 - Player has a certain skill no higher than this.
+ &cTRIGGERED &r*&0&0 - Activated by a %quest% command in a trigger.
+ &cVISIT-BUILDING &r*&0&0 - Player must go to a certain building/room.
+ &cVISIT-ROOM-TEMPLATE &r*&0&0 - Player must go to a certain room template.
+ &cVISIT-SECTOR &r*&0&0 - Player must go to a certain terrain.
+ &cHAVE-ABILITY&0 - Player must have a certain ability.
+ &cREP-OVER&0 - Player must have at least this faction reputation.
+ &cREP-UNDER&0 - Player must be at or below this faction reputation.
+ &cWEARING&0 - Player has the item equipped
+ &cWEARING-OR-HAS&0 - Player has the item either equipped or in inventory
+    Note: item will not be extracted even if EXTRACT-TASK-OBJECTS is on
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 
