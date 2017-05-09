@@ -1809,7 +1809,7 @@ int item_wear_to_wear[] = {
 
 // OBJ_x (extra bits), part 1
 const char *extra_bits[] = {
-	"*",
+	"UNIQUE",
 	"PLANTABLE",
 	"LIGHT",
 	"SUPERIOR",
@@ -1840,7 +1840,7 @@ const char *extra_bits[] = {
 
 // OBJ_x (extra bits), part 2 -- shown in inventory/equipment list as flags
 const char *extra_bits_inv_flags[] = {
-	"",	// chair
+	"(unique)",	// unique
 	"",	// plantable
 	"(light)",
 	"(superior)",
@@ -1871,7 +1871,7 @@ const char *extra_bits_inv_flags[] = {
 
 // OBJ_x (extra bits), part 3 -- the amount a flag modifies scale level by (1.0 = no mod)
 const double obj_flag_scaling_bonus[] = {
-	1.0,	// OBJ_CHAIR
+	1.1,	// OBJ_UNIQUE
 	1.0,	// OBJ_PLANTABLE
 	1.0,	// OBJ_LIGHT
 	1.3333,	// OBJ_SUPERIOR

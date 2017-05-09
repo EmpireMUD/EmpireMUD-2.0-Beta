@@ -1334,7 +1334,7 @@ typedef struct vehicle_data vehicle_data;
 
 
 // Extra object flags -- OBJ_FLAGGED(obj, f)
-	#define OBJ_UNUSED  BIT(0)	// formerly "chair"
+#define OBJ_UNIQUE  BIT(0)	// a. can only use 1 at a time
 #define OBJ_PLANTABLE  BIT(1)	// b. Uses val 2 to set a crop type
 #define OBJ_LIGHT  BIT(2)	// c. Lights until timer pops
 #define OBJ_SUPERIOR  BIT(3)	// d. Item is of superior quality
@@ -2656,7 +2656,7 @@ struct augment_type_data {
 	int apply_type;	// APPLY_TYPE_x
 	bitvector_t default_flags;	// AUG_x always applied
 	int greater_abil;	// ABIL_x that boosts the scale points, or NO_ABIL
-	bitvector_t use_obj_flag;	// OBJ_x: optional; used by enchants
+	bitvector_t use_obj_flag;	// OBJ_: optional; used by enchants
 };
 
 

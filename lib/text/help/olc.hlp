@@ -3524,7 +3524,7 @@ Object flags allow additional properties to be set on objects, with various
 effects. Never set a flag marked with an * (asterisk).
 
 Available flags:
- * - do not set
+ UNIQUE - can only equip 1 at a time
  PLANTABLE - can be planted as a crop (see OEDIT PLANTS)
  LIGHT - lights up the room at night
  SUPERIOR - crafted by a master craftsman, adds the (superior) tag

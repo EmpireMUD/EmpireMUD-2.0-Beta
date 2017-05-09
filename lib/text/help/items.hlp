@@ -739,6 +739,12 @@ a total of 13 coins.
 
 See also: TRADE COMMAND, TRADE BUY, TRADE CHECK, TRADE COLLECT
 #
+UNIQUE "UNIQUE ITEM" "UNIQUE OBJECT" (UNIQUE)
+
+The (unique) flag means you can only use one copy of an item at a time.
+
+See also: IDENTIFY
+#
 VAULT
 
 Building:  Vault (designated)
