@@ -121,6 +121,8 @@ S
 0 0 bd nD
 1 2 0 15
 F 18200
+T 18226
+T 18227
 S
 #18209
 #n shadows umbramancer~
@@ -271,6 +273,42 @@ $n's jade-green shell shimmers hypnotically...~
 T 9901
 T 9902
 S
+#18228
+monstrosity sanguine~
+a sanguine monstrosity~
+A sanguine monstrosity is dripping along the ground.
+~
+100 125 de 0
+0 0 10 27
+T 18240
+S
+#18230
+warg umbral~
+an umbral warg~
+An umbral warg stalks from shadow to shadow.
+~
+100 125 de 0
+0 0 9 9
+T 18240
+S
+#18232
+steed clockwork~
+a clockwork steed~
+A clockwork steed is munching on some rocks.
+~
+100 125 de 0
+0 0 12 9
+T 18240
+S
+#18234
+bear imperium-clad clad~
+an imperium-clad bear~
+An imperium-clad bear rears up on its hind legs!
+~
+100 125 de 0
+0 0 26 10
+T 18240
+S
 #18235
 mount cool~
 a cool mount~
@@ -278,7 +316,6 @@ A cool mount is here.
 ~
 0 0 bdejo 0
 0 0 0 15
-T 18235
 S
 #18236
 patrons group~
