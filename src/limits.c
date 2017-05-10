@@ -174,7 +174,7 @@ void check_expired_cooldowns(void) {
 	descriptor_data *d;
 	
 	for (d = descriptor_list; d; d = d->next) {
-		if (STATE(d) == CON_PLAYING && (ch = d->character) && !PLR_FLAGGED(ch, PLR_WRITING)) {
+		if (STATE(d) == CON_PLAYING && (ch = d->character)) {
 			for (cool = ch->cooldowns; cool; cool = next_cool) {
 				next_cool = cool->next;
 				
@@ -2013,7 +2013,7 @@ void gain_condition(char_data *ch, int condition, int value) {
 		affect_from_char(ch, ATYPE_WELL_FED, TRUE);
 	}
 
-	if (PLR_FLAGGED(ch, PLR_WRITING) || !gain_cond_messsage) {
+	if (!gain_cond_messsage) {
 		return;
 	}
 

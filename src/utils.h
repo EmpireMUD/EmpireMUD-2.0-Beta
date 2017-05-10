@@ -970,7 +970,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define IS_GRANTED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_GRANT_FLAGS(ch), (flag)))
 #define IS_MORPHED(ch)  (GET_MORPH(ch) != NULL)
 #define IS_PVP_FLAGGED(ch)  (!IS_NPC(ch) && (PRF_FLAGGED((ch), PRF_ALLOW_PVP) || get_cooldown_time((ch), COOLDOWN_PVP_FLAG) > 0))
-#define IS_WRITING(ch)  (PLR_FLAGGED(ch, PLR_WRITING))
 #define MOUNT_FLAGGED(ch, flag)  (!IS_NPC(ch) && IS_SET(GET_MOUNT_FLAGS(ch), (flag)))
 #define NOHASSLE(ch)  (!IS_NPC(ch) && IS_IMMORTAL(ch) && PRF_FLAGGED((ch), PRF_NOHASSLE))
 #define PLR_FLAGGED(ch, flag)  (!REAL_NPC(ch) && IS_SET(PLR_FLAGS(ch), (flag)))
@@ -994,7 +993,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define IS_BLOOD_STARVED(ch)  (IS_VAMPIRE(ch) && GET_BLOOD(ch) <= config_get_int("blood_starvation_level"))
 
 // for act() and act-like things (requires to_sleeping and is_spammy set to true/false)
-#define SENDOK(ch)  (((ch)->desc || SCRIPT_CHECK((ch), MTRIG_ACT)) && (to_sleeping || AWAKE(ch)) && (!PRF_FLAGGED(ch, PRF_NOSPAM) || !is_spammy) && (IS_NPC(ch) || !PLR_FLAGGED((ch), PLR_WRITING)))
+#define SENDOK(ch)  (((ch)->desc || SCRIPT_CHECK((ch), MTRIG_ACT)) && (to_sleeping || AWAKE(ch)) && (!PRF_FLAGGED(ch, PRF_NOSPAM) || !is_spammy))
 
 
  //////////////////////////////////////////////////////////////////////////////

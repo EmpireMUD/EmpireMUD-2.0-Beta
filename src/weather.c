@@ -46,7 +46,7 @@ void another_hour(int mode) {
 			case 7:
 				weather_info.sunlight = SUN_RISE;
 				for (d = descriptor_list; d; d = d->next) {
-					if (STATE(d) == CON_PLAYING && !HAS_INFRA(d->character) && !PRF_FLAGGED(d->character, PRF_HOLYLIGHT) && AWAKE(d->character) && IS_OUTDOORS(d->character) && !IS_WRITING(d->character)) {
+					if (STATE(d) == CON_PLAYING && !HAS_INFRA(d->character) && !PRF_FLAGGED(d->character, PRF_HOLYLIGHT) && AWAKE(d->character) && IS_OUTDOORS(d->character)) {
 						look_at_room(d->character);
 						msg_to_char(d->character, "\r\n");
 					}
@@ -73,7 +73,7 @@ void another_hour(int mode) {
 			case 20:
 				weather_info.sunlight = SUN_DARK;
 				for (d = descriptor_list; d; d = d->next)
-					if (STATE(d) == CON_PLAYING && !HAS_INFRA(d->character) && !PRF_FLAGGED(d->character, PRF_HOLYLIGHT) &&  AWAKE(d->character) && IS_OUTDOORS(d->character) && !IS_WRITING(d->character)) {
+					if (STATE(d) == CON_PLAYING && !HAS_INFRA(d->character) && !PRF_FLAGGED(d->character, PRF_HOLYLIGHT) &&  AWAKE(d->character) && IS_OUTDOORS(d->character)) {
 						look_at_room(d->character);
 						msg_to_char(d->character, "\r\n");
 					}

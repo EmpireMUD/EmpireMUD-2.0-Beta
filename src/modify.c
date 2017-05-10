@@ -339,7 +339,7 @@ void string_add(descriptor_data *d, char *str) {
 		}
 		d->file_storage = NULL;
 		if (d->character && !IS_NPC(d->character)) {
-			REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
+			REMOVE_BIT(PLR_FLAGS(d->character), PLR_MAILING);
 		}
 	}
 	else if (strlen(*d->str) <= (d->max_str-3))

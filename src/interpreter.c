@@ -2102,7 +2102,7 @@ int perform_dupe_check(descriptor_data *d) {
 	d->character->desc = d;
 	d->original = NULL;
 	d->character->char_specials.timer = 0;
-	REMOVE_BIT(PLR_FLAGS(d->character), PLR_MAILING | PLR_WRITING);
+	REMOVE_BIT(PLR_FLAGS(d->character), PLR_MAILING);
 	STATE(d) = CON_PLAYING;
 
 	if (PLR_FLAGGED(d->character, PLR_IPMASK))
@@ -2232,7 +2232,7 @@ void nanny(descriptor_data *d, char *arg) {
 					check_delayed_load(d->character);
 					
 					/* undo it just in case they are set */
-					REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
+					REMOVE_BIT(PLR_FLAGS(d->character), PLR_MAILING);
 
 					SEND_TO_Q("Password: ", d);
 					ProtocolNoEcho(d, true);

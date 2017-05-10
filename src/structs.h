@@ -1679,7 +1679,7 @@ typedef struct vehicle_data vehicle_data;
 
 // PLR_x: Player flags: used by char_data.char_specials.act
 #define PLR_APPROVED	BIT(0)	// player is approved to play the full game
-#define PLR_WRITING		BIT(1)	/* Player writing (board/mail)			*/
+	#define PLR_UNUSED1		BIT(1)
 #define PLR_MAILING		BIT(2)	/* Player is writing mail				*/
 #define PLR_DONTSET		BIT(3)	/* Don't EVER set (ISNPC bit)			*/
 	#define PLR_UNUSED2		BIT(4)

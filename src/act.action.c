@@ -265,7 +265,7 @@ void update_actions(void) {
 			cancel_action(ch);
 			continue;
 		}
-		if (FIGHTING(ch) || IS_WRITING(ch)) {
+		if (FIGHTING(ch)) {
 			cancel_action(ch);
 			continue;
 		}

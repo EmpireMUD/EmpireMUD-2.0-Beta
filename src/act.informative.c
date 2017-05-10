@@ -828,8 +828,6 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 			strcat(buf, " (hidden)");
 		if (!IS_NPC(i) && !i->desc)
 			strcat(buf, " (linkless)");
-		if (!IS_NPC(i) && PLR_FLAGGED(i, PLR_WRITING))
-			strcat(buf, " (writing)");
 		
 		// send it
 		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
@@ -1630,9 +1628,6 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	}
 	else if (AFF_FLAGGED(ch, AFF_INVISIBLE)) {
 		size += snprintf(out + size, sizeof(out) - size, " (invis)");
-	}
-	if (PLR_FLAGGED(ch, PLR_WRITING)) {
-		size += snprintf(out + size, sizeof(out) - size, " &c(writing)&0");
 	}
 	if (PRF_FLAGGED(ch, PRF_DEAF)) {
 		size += snprintf(out + size, sizeof(out) - size, " (deaf)");

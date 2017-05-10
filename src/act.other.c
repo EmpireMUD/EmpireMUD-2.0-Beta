@@ -1336,7 +1336,7 @@ ACMD(do_alternate) {
 		}
 		
 		// in case
-		REMOVE_BIT(PLR_FLAGS(newch), PLR_WRITING | PLR_MAILING);
+		REMOVE_BIT(PLR_FLAGS(newch), PLR_MAILING);
 				
 		// ensure legal switch
 		if (GET_ACCOUNT(newch) != GET_ACCOUNT(ch)) {
