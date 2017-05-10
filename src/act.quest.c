@@ -612,7 +612,7 @@ void show_quest_tracker(char_data *ch, struct player_quest *pq) {
 				break;
 			}
 		}
-		msg_to_char(ch, "  %s%s%s%s\r\n", (task->group ? "  " : ""), (sub > 1 ? "or " : ""), requirement_string(task, FALSE), buf);
+		msg_to_char(ch, "  %s%s%s%s\r\n", (task->group ? "  " : ""), ((sub > 1 && !task->group) ? "or " : ""), requirement_string(task, FALSE), buf);
 	}
 }
 
