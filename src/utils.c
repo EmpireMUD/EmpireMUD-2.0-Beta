@@ -1499,8 +1499,6 @@ void log_to_empire(empire_data *emp, int type, const char *str, ...) {
 		for (i = descriptor_list; i; i = i->next) {
 			if (STATE(i) != CON_PLAYING || IS_NPC(i->character))
 				continue;
-			if (PLR_FLAGGED(i->character, PLR_WRITING))
-				continue;
 			if (GET_LOYALTY(i->character) != emp)
 				continue;
 
@@ -1525,7 +1523,7 @@ void mortlog(const char *str, ...) {
 	vsprintf(output, str, tArgList);
 
 	for (i = descriptor_list; i; i = i->next) {
-		if (STATE(i) == CON_PLAYING && i->character && !PLR_FLAGGED(i->character, PLR_WRITING) && PRF_FLAGGED(i->character, PRF_MORTLOG)) {
+		if (STATE(i) == CON_PLAYING && i->character && PRF_FLAGGED(i->character, PRF_MORTLOG)) {
 			msg_to_char(i->character, "&c[ %s ]&0\r\n", output);
 		}
 	}
@@ -1578,7 +1576,7 @@ void syslog(bitvector_t type, int level, bool file, const char *str, ...) {
 	level = MAX(level, LVL_START_IMM);
 
 	for (i = descriptor_list; i; i = i->next) {
-		if (STATE(i) == CON_PLAYING && i->character && !IS_NPC(i->character) && !PLR_FLAGGED(i->character, PLR_WRITING) && GET_ACCESS_LEVEL(i->character) >= level) {
+		if (STATE(i) == CON_PLAYING && i->character && !IS_NPC(i->character) && GET_ACCESS_LEVEL(i->character) >= level) {
 			if (IS_SET(SYSLOG_FLAGS(REAL_CHAR(i->character)), type)) {
 				if (level > LVL_START_IMM) {
 					msg_to_char(i->character, "&g[ (i%d) %s ]&0\r\n", level, output);
@@ -1641,20 +1639,20 @@ char *any_one_word(char *argument, char *first_arg) {
 
 	if (*argument == '\"') {
 		++argument;
-		do {
+		while (*argument && *argument != '\"') {
 			*(first_arg++) = *argument;
 			++argument;
-		} while (*argument && *argument != '\"');
+		}
 		if (*argument) {
 			++argument;
 		}
 	}
 	else if (*argument == '(') {
 		++argument;
-		do {
+		while (*argument && *argument != ')') {
 			*(first_arg++) = *argument;
 			++argument;
-		} while (*argument && *argument != ')');
+		}
 		if (*argument) {
 			++argument;
 		}

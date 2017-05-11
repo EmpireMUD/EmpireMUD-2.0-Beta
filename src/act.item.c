@@ -754,6 +754,16 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 	
 	// some checks are only needed when the slot counts for stats
 	if (wear_data[where].count_stats) {
+		// check uniqueness
+		if (OBJ_FLAGGED(obj, OBJ_UNIQUE)) {
+			for (iter = 0; iter < NUM_WEARS; ++iter) {
+				if (GET_EQ(ch, iter) && GET_OBJ_VNUM(GET_EQ(ch, iter)) == GET_OBJ_VNUM(obj)) {
+					act("You are already using another of $p (unique).", FALSE, ch, obj, NULL, TO_CHAR);
+					return;
+				}
+			}
+		}
+	
 		// check weakness (check all applies first, in case they contradict like -1str +2str)
 		for (iter = 0; primary_attributes[iter] != NOTHING; ++iter) {
 			type = primary_attributes[iter];

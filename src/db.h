@@ -147,6 +147,7 @@
 
 // etc files (non-user-modifiable libs)
 #define BAN_FILE  LIB_ETC"badsites"	// for the siteban system
+#define DAILY_QUEST_FILE  LIB_ETC"daily_quests"	// which quests are on/off
 #define INSTANCE_FILE  LIB_ETC"instances"	// instanced adventures
 #define ISLAND_FILE  LIB_ETC"islands"	// island info
 #define TRADING_POST_FILE  LIB_ETC"trading_post"	// for global trade

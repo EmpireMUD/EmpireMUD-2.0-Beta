@@ -163,8 +163,6 @@ int is_tell_ok(char_data *ch, char_data *vict) {
 		msg_to_char(ch, "You can't tell other people while you have notell on.\r\n");
 	else if (!REAL_NPC(vict) && !vict->desc)        /* linkless */
 		act("$E's linkless at the moment.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
-	else if (PLR_FLAGGED(vict, PLR_WRITING))
-		act("$E's writing a message right now; try again later.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
 	else if (PRF_FLAGGED(vict, PRF_NOTELL))
 		act("$E can't hear you.", FALSE, ch, 0, vict, TO_CHAR | TO_SLEEP);
 	else if (is_ignoring(ch, vict)) {
@@ -444,7 +442,7 @@ ACMD(do_pub_comm) {
 		
 		for (desc = descriptor_list; desc; desc = desc->next) {
 			// basic qualifications
-			if (STATE(desc) == CON_PLAYING && desc != ch->desc && desc->character && !is_ignoring(desc->character, ch) && !PLR_FLAGGED(desc->character, PLR_WRITING) && GET_REAL_LEVEL(desc->character) >= level) {
+			if (STATE(desc) == CON_PLAYING && desc != ch->desc && desc->character && !is_ignoring(desc->character, ch) && GET_REAL_LEVEL(desc->character) >= level) {
 				// can hear the channel?
 				if (pub_comm[subcmd].ignore_flag == NOBITS || !PRF_FLAGGED(desc->character, pub_comm[subcmd].ignore_flag)) {
 					// distance?
@@ -519,7 +517,7 @@ void announce_to_slash_channel(struct slash_channel *chan, const char *messg, ..
 		sprintf(lbuf, "[\t%c/%s\tn] %s\tn\r\n", chan->color, chan->name, output);
 
 		for (d = descriptor_list; d; d = d->next) {
-			if (d->character && STATE(d) == CON_PLAYING && !PLR_FLAGGED(d->character, PLR_WRITING) && !PRF_FLAGGED(d->character, PRF_NO_CHANNEL_JOINS)) {
+			if (d->character && STATE(d) == CON_PLAYING && !PRF_FLAGGED(d->character, PRF_NO_CHANNEL_JOINS)) {
 				if ((slash = find_on_slash_channel(d->character, chan->id))) {
 					SEND_TO_Q(lbuf, d);
 					// no longer putting announcements on history
@@ -716,7 +714,7 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 	}
 
 	for (desc = descriptor_list; desc; desc = desc->next) {
-		if (STATE(desc) == CON_PLAYING && (vict = desc->character) && !IS_NPC(vict) && vict != ch && !is_ignoring(vict, ch) && !PLR_FLAGGED(vict, PLR_WRITING) && (slash = find_on_slash_channel(vict, chan->id))) {
+		if (STATE(desc) == CON_PLAYING && (vict = desc->character) && !IS_NPC(vict) && vict != ch && !is_ignoring(vict, ch) && (slash = find_on_slash_channel(vict, chan->id))) {
 			// for channel history
 			clear_last_act_message(desc);
 

@@ -83,6 +83,7 @@ struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void update_mob_quest_lookups(mob_vnum vnum);
 void update_obj_quest_lookups(obj_vnum vnum);
+void write_daily_quest_file();
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -779,6 +780,9 @@ void setup_daily_quest_cycles(int only_cycle) {
 	HASH_ITER(hh, list, entry, next_entry) {
 		free(entry);
 	}
+	
+	// save to file
+	write_daily_quest_file();
 }
 
 
@@ -2863,6 +2867,44 @@ void free_quest(quest_data *quest) {
 
 
 /**
+* Loads data from the daily quest file and activates the correct daily quests.
+*/
+void load_daily_quest_file(void) {
+	char line[MAX_INPUT_LENGTH];
+	quest_data *qst, *next_qst;
+	any_vnum vnum;
+	FILE *fl;
+	
+	if (!(fl = fopen(DAILY_QUEST_FILE, "r"))) {
+		// there just isn't a file -- that's ok, we'll generate it
+		setup_daily_quest_cycles(NOTHING);
+		return;
+	}
+	
+	// turn off all dailies
+	HASH_ITER(hh, quest_table, qst, next_qst) {
+		if (QUEST_FLAGGED(qst, QST_DAILY) && QUEST_DAILY_CYCLE(qst) != NOTHING) {
+			QUEST_DAILY_ACTIVE(qst) = FALSE;
+		}
+	}
+	
+	while (get_line(fl, line)) {
+		if (*line == 'S') {
+			break;	// end
+		}
+		else if (isdigit(*line) && (vnum = atoi(line)) != NOTHING) {
+			if ((qst = quest_proto(vnum))) {
+				// activate it
+				QUEST_DAILY_ACTIVE(qst) = TRUE;
+			}
+		}
+	}
+	
+	fclose(fl);
+}
+
+
+/**
 * Parses a quest giver, saved as:
 *
 * A
@@ -3025,6 +3067,37 @@ void parse_quest(FILE *fl, any_vnum vnum) {
 			}
 		}
 	}
+}
+
+
+/**
+* Saves a list of which "cycled" daily quests are on.
+*/
+void write_daily_quest_file(void) {
+	quest_data *qst, *next_qst;
+	FILE *fl;
+	
+	if (!(fl = fopen(DAILY_QUEST_FILE TEMP_SUFFIX, "w"))) {
+		log("SYSERR: Unable to write %s", DAILY_QUEST_FILE TEMP_SUFFIX);
+		return;
+	}
+	
+	HASH_ITER(hh, quest_table, qst, next_qst) {
+		if (!QUEST_FLAGGED(qst, QST_DAILY) || QUEST_DAILY_CYCLE(qst) == NOTHING) {
+			continue; // not a cycled daily
+		}
+		
+		// write if on
+		if (QUEST_DAILY_ACTIVE(qst)) {
+			fprintf(fl, "%d\n", QUEST_VNUM(qst));
+		}
+	}
+	
+	// end
+	fprintf(fl, "S\n");
+	fclose(fl);
+	
+	rename(DAILY_QUEST_FILE TEMP_SUFFIX, DAILY_QUEST_FILE);
 }
 
 

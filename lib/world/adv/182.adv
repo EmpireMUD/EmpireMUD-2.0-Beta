@@ -5,7 +5,7 @@ Paul Clarke and Owen Morris~
 treetops and adventure. Bolted to its back is a huge platform, upon which
 someone has built a grand tavern. You have heard rumors that the Guild of
 Adventurers uses a tortoise like this one as its base of operations. What else
-might await inside the tavern?  
+might await inside the tavern?
 
 Notes for implementors:
 - This adventure uses fixed-location instances.
@@ -19,7 +19,7 @@ Notes for implementors:
 - Remove the IN-DEV flag from the adventure.
 ~
 18200 18299 0-0
-1 60 ad 0
+1 60 d 0
 L
 0 0
 18200 -1 -1

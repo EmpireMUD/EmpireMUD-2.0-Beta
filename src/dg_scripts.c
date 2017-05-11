@@ -1924,8 +1924,6 @@ void script_vlog(const char *format, va_list args) {
 			continue;
 		if (GET_ACCESS_LEVEL(i->character) < LVL_BUILDER)
 			continue;
-		if (PLR_FLAGGED(i->character, PLR_WRITING))
-			continue;
 		if (!IS_SET(SYSLOG_FLAGS(REAL_CHAR(i->character)), SYS_SCRIPT)) {
 			continue;
 		}

@@ -2004,7 +2004,7 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 	}
 
 	/* damage message to damager */
-	if (ch->desc && !AFF_FLAGGED(victim, AFF_NO_SEE_IN_ROOM)) {
+	if (ch->desc && ch != victim && !AFF_FLAGGED(victim, AFF_NO_SEE_IN_ROOM)) {
 		send_to_char("&y", ch);
 		buf = replace_fight_string(dam_weapons[msgnum].to_char, attack_hit_info[w_type].singular, attack_hit_info[w_type].plural);
 		act(buf, FALSE, ch, NULL, victim, TO_CHAR | fmsg_type);
@@ -2051,7 +2051,9 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype) {
 
 			if (!IS_NPC(vict) && (IS_IMMORTAL(vict) || (IS_GOD(vict) && !IS_GOD(ch)))) {
 				if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
-					act(msg->god_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
+					if (ch != vict) {
+						act(msg->god_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
+					}
 					act(msg->god_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_MISS);
 				}
 				act(msg->god_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_COMBAT_MISS);
@@ -2059,9 +2061,11 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype) {
 			else if (dam != 0) {
 				if (GET_POS(vict) == POS_DEAD) {
 					if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
-						send_to_char("&y", ch);
-						act(msg->die_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
-						send_to_char("&0", ch);
+						if (ch != vict) {
+							send_to_char("&y", ch);
+							act(msg->die_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
+							send_to_char("&0", ch);
+						}
 						
 						act(msg->die_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_HIT);
 					}
@@ -2071,9 +2075,11 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype) {
 				}
 				else {
 					if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
-						send_to_char("&y", ch);
-						act(msg->hit_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
-						send_to_char("&0", ch);
+						if (ch != vict) {
+							send_to_char("&y", ch);
+							act(msg->hit_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_HIT);
+							send_to_char("&0", ch);
+						}
 						
 						act(msg->hit_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_HIT);
 					}
@@ -2084,9 +2090,11 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype) {
 			}
 			else if (ch != vict) {	/* Dam == 0 */
 				if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
-					send_to_char("&y", ch);
-					act(msg->miss_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
-					send_to_char("&0", ch);
+					if (ch != vict) {
+						send_to_char("&y", ch);
+						act(msg->miss_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR | TO_COMBAT_MISS);
+						send_to_char("&0", ch);
+					}
 					
 					act(msg->miss_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT | TO_COMBAT_MISS);
 				}

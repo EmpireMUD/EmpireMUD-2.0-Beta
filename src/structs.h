@@ -1309,7 +1309,8 @@ typedef struct vehicle_data vehicle_data;
 #define LIQ_WHITE_WINE  12
 #define LIQ_GROG  13
 #define LIQ_MEAD  14
-#define NUM_LIQUIDS  15	// total
+#define LIQ_STOUT  15
+#define NUM_LIQUIDS  16	// total
 
 
 // Item materials
@@ -1333,7 +1334,7 @@ typedef struct vehicle_data vehicle_data;
 
 
 // Extra object flags -- OBJ_FLAGGED(obj, f)
-	#define OBJ_UNUSED  BIT(0)	// formerly "chair"
+#define OBJ_UNIQUE  BIT(0)	// a. can only use 1 at a time
 #define OBJ_PLANTABLE  BIT(1)	// b. Uses val 2 to set a crop type
 #define OBJ_LIGHT  BIT(2)	// c. Lights until timer pops
 #define OBJ_SUPERIOR  BIT(3)	// d. Item is of superior quality
@@ -1678,7 +1679,7 @@ typedef struct vehicle_data vehicle_data;
 
 // PLR_x: Player flags: used by char_data.char_specials.act
 #define PLR_APPROVED	BIT(0)	// player is approved to play the full game
-#define PLR_WRITING		BIT(1)	/* Player writing (board/mail)			*/
+	#define PLR_UNUSED1		BIT(1)
 #define PLR_MAILING		BIT(2)	/* Player is writing mail				*/
 #define PLR_DONTSET		BIT(3)	/* Don't EVER set (ISNPC bit)			*/
 	#define PLR_UNUSED2		BIT(4)
@@ -2655,7 +2656,7 @@ struct augment_type_data {
 	int apply_type;	// APPLY_TYPE_x
 	bitvector_t default_flags;	// AUG_x always applied
 	int greater_abil;	// ABIL_x that boosts the scale points, or NO_ABIL
-	bitvector_t use_obj_flag;	// OBJ_x: optional; used by enchants
+	bitvector_t use_obj_flag;	// OBJ_: optional; used by enchants
 };
 
 

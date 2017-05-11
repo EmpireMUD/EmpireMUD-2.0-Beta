@@ -602,7 +602,10 @@ ACMD(do_mregionecho) {
 		
 		if (center) {			
 			for (desc = descriptor_list; desc; desc = desc->next) {
-				if (STATE(desc) != CON_PLAYING || !(targ = desc->character) || PLR_FLAGGED(targ, PLR_WRITING)) {
+				if (STATE(desc) != CON_PLAYING || !(targ = desc->character)) {
+					continue;
+				}
+				if (RMT_FLAGGED(IN_ROOM(targ), RMT_NO_LOCATION)) {
 					continue;
 				}
 				if (compute_distance(center, IN_ROOM(targ)) > radius) {

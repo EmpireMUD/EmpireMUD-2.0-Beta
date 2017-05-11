@@ -1563,7 +1563,7 @@ void send_to_outdoor(bool weather, const char *messg, ...) {
 	for (i = descriptor_list; i; i = i->next) {
 		if (STATE(i) != CON_PLAYING || i->character == NULL)
 			continue;
-		if (!AWAKE(i->character) || !IS_OUTDOORS(i->character) || IS_WRITING(i->character))
+		if (!AWAKE(i->character) || !IS_OUTDOORS(i->character))
 			continue;
 		if (weather && ROOM_AFF_FLAGGED(IN_ROOM(i->character), ROOM_AFF_NO_WEATHER)) {
 			continue;
@@ -3892,7 +3892,7 @@ void reboot_recover(void) {
 				
 		d->character = load_player(name, TRUE);
 		if (d->character) {
-			REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
+			REMOVE_BIT(PLR_FLAGS(d->character), PLR_MAILING);
 			d->character->desc = d;
 		}
 		else {
