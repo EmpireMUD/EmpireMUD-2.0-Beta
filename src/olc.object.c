@@ -77,7 +77,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 	char temp[MAX_STRING_LENGTH], *ptr;
 	bool problem = FALSE;
 	
-	if (*GET_OBJ_KEYWORDS(obj) || !*GET_OBJ_KEYWORDS(obj) || !str_cmp(GET_OBJ_KEYWORDS(obj), "object new")) {
+	if (!GET_OBJ_KEYWORDS(obj) || !*GET_OBJ_KEYWORDS(obj) || !str_cmp(GET_OBJ_KEYWORDS(obj), "object new")) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Keywords not set");
 		problem = TRUE;
 	}
