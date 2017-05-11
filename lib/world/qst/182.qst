@@ -109,7 +109,7 @@ the captured wildling back here for further study.
    You drop the net with your captured wildling. You can now perform daily
 quests in The Grove for the Guild of Adventurers.
 ~
-3 d 0 0 -1
+4 d 0 0 -1
 A
 1 18217
 A
@@ -117,7 +117,7 @@ A
 P
 16 18200 0 6
 R
-7 18200 2
+7 18200 1
 R
 2 18209 1
 T 18257
@@ -141,7 +141,7 @@ when you've accomplished this. (Type 'speak' when you find the druid.)
 propaganda for further study. You can now perform daily quests in the Monsoon
 Rift for the Guild of Adventurers.
 ~
-7 d 0 0 -1
+9 d 0 0 -1
 A
 1 18217
 A
@@ -149,13 +149,13 @@ A
 P
 16 18200 0 6
 R
-7 18200 2
+7 18200 1
 R
 2 18209 1
 W
-2 18258 0 1
-W
 11 0 0 1
+W
+2 18258 0 1 a
 Z
 1 18217
 Z
@@ -173,7 +173,7 @@ buy a ticket to the "Goblin Gala". Type 'buy ticket' when you find Dryleef.
 laughs. 'At least now we shouldn't have to worry about the goblins stealing
 from the city,' he says.
 ~
-4 d 0 0 -1
+5 d 0 0 -1
 A
 1 18219
 A
@@ -181,7 +181,7 @@ A
 P
 16 18200 0 6
 R
-7 18200 2
+7 18200 1
 R
 2 18209 1
 T 18261
@@ -205,7 +205,7 @@ corpses to a player who does.)
    Ah, these cold cuts are perfect. And it seems you have survived the
 Permafrost. You can now perform Guild daily quests in the Permafrost.
 ~
-4 d 0 0 -1
+5 d 0 0 -1
 A
 1 18219
 A
@@ -213,7 +213,7 @@ A
 P
 16 18200 0 6
 R
-7 18200 2
+7 18200 1
 R
 2 18209 1
 W
@@ -235,7 +235,7 @@ the thieves' den inside, and report back to the Guild.
    Your report on the thieves and their hideout in the ruins has helped the
 Guild, and you can now perform daily quests in that adventure.
 ~
-2 0 0 0 -1
+3 0 0 0 -1
 A
 1 18218
 A
@@ -243,7 +243,7 @@ A
 P
 16 18200 0 6
 R
-7 18200 2
+7 18200 1
 R
 2 18209 1
 W
@@ -265,7 +265,7 @@ totem so that we can analyze its mana source.
    You hand over the ratskin totem. You can now perform daily quests for the
 Guild of Adventurers in Ratskins's sewer.
 ~
-2 d 0 0 -1
+3 d 0 0 -1
 A
 1 18218
 A
@@ -273,7 +273,7 @@ A
 P
 16 18200 0 6
 R
-7 18200 2
+7 18200 1
 R
 2 18209 1
 W
@@ -447,7 +447,7 @@ return the siphoned frost power to the guild.
 ~
 You hand over the siphon and the frosty power it contains.
 ~
-12 e 0 0 -1
+13 e 0 0 -1
 A
 1 18210
 A
@@ -462,6 +462,8 @@ R
 R
 1 -1 50
 T 18261
+W
+11 0 0 1
 Z
 1 18210
 Z
@@ -470,7 +472,7 @@ S
 #18271
 Thieves: Dues Unpaid~
    The Adventurers have a somewhat strained relationship with the thieves
-guild. They do a job for us, we pay them. We do a job for them, they pay us. 
+guild. They do a job for us, we pay them. We do a job for them, they pay us.
 Except sometimes they forget that last part, and now we must send a clear
 message about what happens when they decide to steal from us instead. Track
 down a group of thieves and make sure they get the message.

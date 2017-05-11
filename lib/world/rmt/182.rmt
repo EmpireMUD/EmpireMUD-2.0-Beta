@@ -2,7 +2,7 @@
 Turtle Spawn Room~
 You shouldn't be in here.
 ~
-g 0
+g 0 0
 M 0 18200 100.00 1
 S
 #18201
@@ -13,7 +13,7 @@ plods so slowly across the land that its shell has overgrown with moss and
 shrubs. Still, you can see most of the countryside from here.
 Commands: &cdisembark, enter tavern, look out&0
 ~
-cgi 0
+cgi 0 0
 M 1 18200 100.00 1
 T 18204
 T 18205
@@ -26,7 +26,7 @@ portraits. The tavern shakes back and forth as the tortoise walks, but the sway
 of the building actually makes for a more comfortable ride than on the shell.
 Commands: &cexit&0
 ~
-cgi 0
+cgi 0 0
 D10
 ~
 0 18203
@@ -36,6 +36,9 @@ D12
 D8
 ~
 0 18206
+D11
+~
+0 18205
 E
 walls mahogany~
    The walls appear to have been made of rich, red, straight-grained mahogany.
@@ -102,7 +105,7 @@ platform, built out over the head of the tortoise, which provides a beautiful
 view of the surrounding land as, down below, the tortoise moves.
 Commands: &clook out&0
 ~
-acgi 0
+acgi 0 0
 D13
 ~
 0 18202
@@ -114,7 +117,7 @@ The Back Room~
 are empty and there is no sign of a desk. Instead, a wrestling mat covers much
 of the room and people are placing bets in the corner.
 ~
-cgi 0
+cgi 0 0
 D11
 ~
 0 18202
@@ -133,21 +136,34 @@ M 0 18203 100.00 4
 T 18211
 S
 #18205
-The Turtleback Shop~
+The Tipsy Tortoise Giftshop~
+   The giftshop is little more than an alcove behind a table and some
+barstools, but there are some interesting items on the shelf. However, a sign
+on the wall clearly says 'Adventurers Only'.
 ~
-cgi 0
+cgi 0 0
 D12
 ~
 0 18202
+E
+sign~
+"Adventurers Only"
+~
+E
+items shelves shelf interesting~
+   You see several species of pet turtles on the shelf, as well as a rolled up
+parchment and an oversized egg.
+~
+M 0 18213 100.00 1
 S
 #18206
 A Spiral Staircase~
    A narrow staircase in the corner of the Tipsy Tortoise leads you up to a
 small second-floor landing, with a door leading toward the back of the
 tortoise. A large golden plaque declares this the headquarters of the Guild of
-Adventurers.  
+Adventurers.
 ~
-cgi 0
+cgi 0 0
 D9
 ~
 0 18202
@@ -172,9 +188,9 @@ The Guild of Adventurers~
    The lobby of the guildhall is surprisingly well-kept compared to the rustic
 Tipsy Tortoise downstairs. The walls are made of fine stained cherry wood, and
 are covered in exotic trophies of all types. Overstuffed chairs encircle a
-strange firepit in the center of the room.  
+strange firepit in the center of the room.
 ~
-cgi 0
+cgi 0 0
 D10
 ~
 0 18206
@@ -198,13 +214,13 @@ trophies trophy walls heads~
    The walls are covered in rich cherry wood, and trimmed in dark ironwood that
 has been carved to depict tiny adventure scenes. The walls are adorned with
 trophies including a selection of exotic horns, a manticore's tail, a row of
-giant scorpions, a griffin's pelt, and a dracosaur tail.  
+giant scorpions, a griffin's pelt, and a dracosaur tail.
 ~
 E
 exotic horns~
    This wall is covered in the horns of various animals, each on a plaque with
 the animal's name and who defeated it. The horns include a dragon, a unicorn, a
-dracosaur, and a demon-goat.  
+dracosaur, and a demon-goat.
 ~
 E
 manticore's tail~
@@ -213,7 +229,7 @@ The three-pronged tail of a manticore has been mounted over the door.
 E
 giant scorpions~
    The giant scorpions range in size from the size of your hand to the size of
-your arm!  
+your arm!
 ~
 E
 griffin's pelt~
@@ -222,7 +238,7 @@ The griffin's pelt is huge, and covers most of one wall.
 E
 dracosaur tail~
    The long tail of a massive dracosaur is mounted on one wall, and on part of
-the wall next to it.  
+the wall next to it.
 ~
 M 0 18211 100.00 1
 M 1 18204 100.00 1
@@ -233,16 +249,16 @@ The Alchemy Alcove~
    Tucked into an alcove off of the guildhall's lobby you find a full
 alchemist's workbench and study. A shelf of books, indexed by herb, takes up
 much of the space in the alcove. Locked display cases show a variety of potions
-in various shades of red.  
+in various shades of red.
 ~
-cgi 0
+cgi 0 0
 D11
 ~
 0 18207
 E
 shelf books~
    You pick a book from the shelf, but are dismayed to find you aren't familiar
-with the language it was written in.  
+with the language it was written in.
 ~
 E
 workbench study~
@@ -251,7 +267,7 @@ This area is well-stocked for alchemy.
 E
 display cases potions~
    All of the potions are some shade of red, and a few of the bottles appear to
-be bleeding.  
+be bleeding.
 ~
 M 0 18208 100.00 1
 S
@@ -260,9 +276,9 @@ A Shadowy Corner~
    The shadows nearly obscure this alcove off of the lobby. As you approach it,
 a plush sofa and a strange fountain appear, as well as walls covered in arcane
 tomes. A black carpet across the floor seems to undulate in a nonexistent
-breeze.  
+breeze.
 ~
-cgi 0
+cgi 0 0
 D12
 ~
 0 18207
@@ -273,7 +289,7 @@ You pick up a tome from the shelf, but find you cannot read its text.
 E
 carpet floor breeze black~
    The carpet is pitch black and, on closer inspection, appears to be made of
-tiny shadow tentacles. You adjust your boots and step off of the carpet.  
+tiny shadow tentacles. You adjust your boots and step off of the carpet.
 ~
 M 0 18209 100.00 1
 M 1 18203 100.00 1
@@ -283,9 +299,9 @@ A Noisy Loft~
    You climb up into the loft, which has been converted into a mechanical
 workshop. Clockwork arms, legs, wings, and other parts you can't identify are
 strewn about the cramped corners. Exotic weapons sit on several workbenches, as
-well as strange, oversized rings.  
+well as strange, oversized rings.
 ~
-cgi 0
+cgi 0 0
 D9
 ~
 0 18207

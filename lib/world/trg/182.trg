@@ -138,7 +138,7 @@ eval person %room.people%
 %purge% %self%
 ~
 #18208
-Jungle temple tokens count~
+Chelonian pouch count~
 1 c 2
 count~
 eval test %%actor.obj_target(%arg%)%%
@@ -556,15 +556,15 @@ eval tortoise %room.vehicles%
 return 0
 %purge% %self%
 ~
-#18226
+#18227
 Alchemist shop list - healer items~
 0 c 0
 list~
-%send% %actor% Alchemist shop:
-%send% %actor% ESTEEMED: the chelonian ring of extrication (1 token)
-%send% %actor% ESTEEMED: the sanguine monstrosity (1 token)
+%send% %actor% %self.name% sells:
+%send% %actor% - chelonian ring of extrication (1 token, Esteemed, healer, unique)
+%send% %actor% - sanguine monstrosity (1 token, Liked, mount)
 ~
-#18227
+#18228
 Alchemist shop buy - healer items~
 0 c 0
 buy~
@@ -604,7 +604,7 @@ elseif sanguine monstrosity /= %arg%
   eval vnum 18228
   eval cost 1
   set named a sanguine monstrosity whistle
-  set min_rep 2
+  set min_rep 1
 else
   %send% %actor% They don't seem to sell '%arg%' here.
   halt
@@ -636,9 +636,14 @@ if !%test%
   %send% %actor% %self.name% tells you, 'You'll need %cost% %correct_noun% to buy that.'
   halt
 end
-eval new_tokens %actor.adventureguild_chelonian_tokens% - %cost%
+eval adventureguild_chelonian_tokens %actor.adventureguild_chelonian_tokens% - %cost%
 remote adventureguild_chelonian_tokens %actor.id%
-%load% obj %vnum% %actor% inv %actor.level%
+if %actor.level% >= 100
+  eval level %actor.level% + 50
+else
+  eval level %actor.level%
+end
+%load% obj %vnum% %actor% inv %level%
 %send% %actor% You buy %named% for %cost% %correct_noun%.
 %echoaround% %actor% %actor.name% buys %named%.
 if %buy_once%
@@ -646,48 +651,16 @@ if %buy_once%
   remote bought_%vnum% %actor.id%
 end
 ~
-#18233
-Adventurer guildmaster shop list - tank items~
+#18229
+Shadowmage shop list - caster items~
 0 c 0
 list~
-* Convert reputation into a convenient 0~4 scale
-eval rep 0
-eval test %%actor.has_reputation(%self.allegiance%, Liked)%%
-if %test%
-  eval rep 1
-end
-eval test %%actor.has_reputation(%self.allegiance%, Esteemed)%%
-if %test%
-  eval rep 2
-end
-eval test %%actor.has_reputation(%self.allegiance%, Venerated)%%
-if %test%
-  eval rep 3
-end
-eval test %%actor.has_reputation(%self.allegiance%, Revered)%%
-if %test%
-  eval rep 4
-end
-if %rep% < 2
-  %send% %actor% %self.name% has nothing to sell you. Raise your reputation with %self.faction_name% first.
-  halt
-end
-%send% %actor% %self.name% sells the following items:
-%send% %actor% - Guild of Adventurers charter (1000 coins, 1-use building pattern)
-if %rep% == 2
-  * List of items
-  %send% %actor% Since you are Esteemed, %self.name% also sells:
-end
-if %rep% >= 3
-  * List of items
-  %send% %actor% Since you are Venerated or Revered, %self.name% also sells:
-end
-if %rep% == 4
-  %send% %actor% Since you are Revered, %self.name% also sells:
-end
+%send% %actor% %self.name% sells:
+%send% %actor% - terrapin ring of acerbity (1 token, Esteemed, caster, unique)
+%send% %actor% - umbral warg (1 token, Liked, mount)
 ~
-#18234
-Adventurer guildmaster shop buy - tank items~
+#18230
+Shadowmage shop buy - caster items~
 0 c 0
 buy~
 * Convert reputation into a convenient 0~3 scale
@@ -717,21 +690,22 @@ if (!%arg%)
   halt
   * Disambiguate
   * Mounts and pets etc
-elseif Guild of Adventurers charter /= %arg%
-  eval vnum 18217
-  eval cost 1000
-  set named a Guild of Adventurers charter
+elseif terrapin ring of acerbity /= %arg%
+  eval vnum 18238
+  eval cost 1
+  set named a terrapin ring of acerbity
   set min_rep 2
-  set max_rep 4
+elseif umbral warg /= %arg%
+  eval vnum 18230
+  eval cost 1
+  set named a umbral warg whistle
+  set min_rep 1
 else
   %send% %actor% They don't seem to sell '%arg%' here.
   halt
 end
 if %rep% < %min_rep%
   %send% %actor% Your reputation is insufficient to buy that.
-  halt
-elseif %rep% > %max_rep%
-  %send% %actor% Your reputation is too high to buy %named%.
   halt
 end
 if %buy_once%
@@ -744,28 +718,236 @@ if %buy_once%
     end
   end
 end
-eval test %%actor.can_afford(%cost%)%%
-eval correct_noun coins
+eval test %actor.varexists(adventureguild_chelonian_tokens)%
+if !%test%
+  %send% %actor% You have no chelonian shell tokens.
+  return 1
+end
+eval correct_noun tokens
 if %cost% == 1
-  eval correct_noun coin
+  eval correct_noun token
 end
 if !%test%
   %send% %actor% %self.name% tells you, 'You'll need %cost% %correct_noun% to buy that.'
   halt
 end
-eval cost_op %%actor.charge_coins(%cost%)%%
-nop %cost_op%
-if %mob_instead%
-  %load% mob %vnum%
+eval adventureguild_chelonian_tokens %actor.adventureguild_chelonian_tokens% - %cost%
+remote adventureguild_chelonian_tokens %actor.id%
+if %actor.level% >= 100
+  eval level %actor.level% + 50
 else
-  %load% obj %vnum% %actor% inv %actor.level%
+  eval level %actor.level%
 end
+%load% obj %vnum% %actor% inv %level%
 %send% %actor% You buy %named% for %cost% %correct_noun%.
 %echoaround% %actor% %actor.name% buys %named%.
 if %buy_once%
   eval bought_%vnum% 1
   remote bought_%vnum% %actor.id%
 end
+~
+#18231
+Tinker shop list - melee items~
+0 c 0
+list~
+%send% %actor% %self.name% sells:
+%send% %actor% - testudinal ring of courage (1 token, Esteemed, melee, unique)
+%send% %actor% - clockwork steed whistle (1 token, Liked, mount)
+~
+#18232
+Tinker shop buy - melee items~
+0 c 0
+buy~
+* Convert reputation into a convenient 0~3 scale
+eval rep 0
+eval test %%actor.has_reputation(%self.allegiance%, Liked)%%
+if %test%
+  eval rep 1
+end
+eval test %%actor.has_reputation(%self.allegiance%, Esteemed)%%
+if %test%
+  eval rep 2
+end
+eval test %%actor.has_reputation(%self.allegiance%, Venerated)%%
+if %test%
+  eval rep 3
+end
+eval test %%actor.has_reputation(%self.allegiance%, Revered)%%
+if %test%
+  eval rep 4
+end
+eval vnum -1
+eval cost 0
+eval buy_once 0
+set named a thing
+if (!%arg%)
+  %send% %actor% Type 'list' to see what's available.
+  halt
+  * Disambiguate
+  * Mounts and pets etc
+elseif testudinal ring of courage /= %arg%
+  eval vnum 18237
+  eval cost 1
+  set named a testudinal ring of courage
+  set min_rep 2
+elseif clockwork steed /= %arg%
+  eval vnum 18232
+  eval cost 1
+  set named a clockwork steed whistle
+  set min_rep 1
+else
+  %send% %actor% They don't seem to sell '%arg%' here.
+  halt
+end
+if %rep% < %min_rep%
+  %send% %actor% Your reputation is insufficient to buy that.
+  halt
+end
+if %buy_once%
+  eval test %%actor.varexists(bought_%vnum%)%%
+  if %test%
+    eval test %%actor.bought_%vnum%%%
+    if %test%
+      %send% %actor% You can only buy %named% once, and you've already bought one.
+      halt
+    end
+  end
+end
+eval test %actor.varexists(adventureguild_chelonian_tokens)%
+if !%test%
+  %send% %actor% You have no chelonian shell tokens.
+  return 1
+end
+eval correct_noun tokens
+if %cost% == 1
+  eval correct_noun token
+end
+if !%test%
+  %send% %actor% %self.name% tells you, 'You'll need %cost% %correct_noun% to buy that.'
+  halt
+end
+eval adventureguild_chelonian_tokens %actor.adventureguild_chelonian_tokens% - %cost%
+remote adventureguild_chelonian_tokens %actor.id%
+if %actor.level% >= 100
+  eval level %actor.level% + 50
+else
+  eval level %actor.level%
+end
+%load% obj %vnum% %actor% inv %level%
+%send% %actor% You buy %named% for %cost% %correct_noun%.
+%echoaround% %actor% %actor.name% buys %named%.
+if %buy_once%
+  eval bought_%vnum% 1
+  remote bought_%vnum% %actor.id%
+end
+~
+#18233
+Leader shop list - tank items~
+0 c 0
+list~
+%send% %actor% %self.name% sells:
+%send% %actor% - tortoiseshell ring of mettle (1 token, Esteemed, tank, unique)
+%send% %actor% - imperium-clad bear whistle (1 token, Liked, mount)
+~
+#18234
+Leader shop buy - tank items~
+0 c 0
+buy~
+* Convert reputation into a convenient 0~3 scale
+eval rep 0
+eval test %%actor.has_reputation(%self.allegiance%, Liked)%%
+if %test%
+  eval rep 1
+end
+eval test %%actor.has_reputation(%self.allegiance%, Esteemed)%%
+if %test%
+  eval rep 2
+end
+eval test %%actor.has_reputation(%self.allegiance%, Venerated)%%
+if %test%
+  eval rep 3
+end
+eval test %%actor.has_reputation(%self.allegiance%, Revered)%%
+if %test%
+  eval rep 4
+end
+eval vnum -1
+eval cost 0
+eval buy_once 0
+set named a thing
+set bearname imperium-clad bear
+if (!%arg%)
+  %send% %actor% Type 'list' to see what's available.
+  halt
+  * Disambiguate
+  * Mounts and pets etc
+elseif tortoiseshell ring of mettle /= %arg%
+  eval vnum 18236
+  eval cost 1
+  set named a tortoiseshell ring of mettle
+  set min_rep 2
+elseif %bearname% /= %arg%
+  eval vnum 18234
+  eval cost 1
+  set named a imperium-clad bear whistle
+  set min_rep 1
+else
+  %send% %actor% They don't seem to sell '%arg%' here.
+  halt
+end
+if %rep% < %min_rep%
+  %send% %actor% Your reputation is insufficient to buy that.
+  halt
+end
+if %buy_once%
+  eval test %%actor.varexists(bought_%vnum%)%%
+  if %test%
+    eval test %%actor.bought_%vnum%%%
+    if %test%
+      %send% %actor% You can only buy %named% once, and you've already bought one.
+      halt
+    end
+  end
+end
+eval test %actor.varexists(adventureguild_chelonian_tokens)%
+if !%test%
+  %send% %actor% You have no chelonian shell tokens.
+  return 1
+end
+eval correct_noun tokens
+if %cost% == 1
+  eval correct_noun token
+end
+if !%test%
+  %send% %actor% %self.name% tells you, 'You'll need %cost% %correct_noun% to buy that.'
+  halt
+end
+eval adventureguild_chelonian_tokens %actor.adventureguild_chelonian_tokens% - %cost%
+remote adventureguild_chelonian_tokens %actor.id%
+if %actor.level% >= 100
+  eval level %actor.level% + 50
+else
+  eval level %actor.level%
+end
+%load% obj %vnum% %actor% inv %level%
+%send% %actor% You buy %named% for %cost% %correct_noun%.
+%echoaround% %actor% %actor.name% buys %named%.
+if %buy_once%
+  eval bought_%vnum% 1
+  remote bought_%vnum% %actor.id%
+end
+~
+#18236
+Turtle shop list - general items~
+0 c 0
+list~
+%send% %actor% %self.name% sells:
+%send% %actor% - baby tortoise whistle (1 token, Esteemed, minipet)
+%send% %actor% - ninja tortoise whistle (2 tokens, Venerated, minipet)
+%send% %actor% - tortoise trinket (2 tokens, Venerated, return teleport trinket)
+%send% %actor% - dragon turtle whistle (2 tokens, Revered, minipet)
+%send% %actor% - Guild of Adventurers charter (3 tokens, Revered, build another guildhall)
+%send% %actor% - atlasian egg (5 tokens, Revered, hatch your own giant tortoise)
 ~
 #18237
 Turtle shop buy - general items~
@@ -812,7 +994,7 @@ elseif tortoise trinket /= %arg%
   eval vnum 18214
   eval cost 2
   set named a tortoise trinket
-  set min_rep 3 
+  set min_rep 3
 elseif dragon turtle whistle /= %arg%
   eval vnum 18227
   eval cost 2
@@ -859,9 +1041,10 @@ if !%test%
   %send% %actor% %self.name% tells you, 'You'll need %cost% %correct_noun% to buy that.'
   halt
 end
-eval new_tokens %actor.adventureguild_chelonian_tokens% - %cost%
+eval adventureguild_chelonian_tokens %actor.adventureguild_chelonian_tokens% - %cost%
 remote adventureguild_chelonian_tokens %actor.id%
-%load% obj %vnum% %actor% inv %actor.level%
+eval level %actor.level% + 50
+%load% obj %vnum% %actor% inv %level%
 %send% %actor% You buy %named% for %cost% %correct_noun%.
 %echoaround% %actor% %actor.name% buys %named%.
 if %buy_once%
@@ -950,7 +1133,7 @@ if !%arg%
 end
 eval target %%actor.char_target(%arg%)%%
 if !%target%
-  %send% %actor% They must have ran away when you started waving %self.name% around, because they're not here.
+  %send% %actor% They must have ran away when you started waving %self.shortdesc% around, because they're not here.
   return 1
   halt
 end
@@ -1116,6 +1299,10 @@ if %questvnum% == 18260
 elseif %questvnum% == 18272
   %load% obj 18272 %actor% inv
 elseif %questvnum% == 18270
+  set guild_siphoned_10551 0
+  set guild_siphoned_10552 0
+  remote guild_siphoned_10551 %actor.id%
+  remote guild_siphoned_10552 %actor.id%
   %load% obj 18270 %actor% inv
 end
 ~
@@ -1173,7 +1360,7 @@ if (%target.vnum% != 228 && %target.vnum% != 237)
   return 0
   halt
 end
-if %actor.inventory(18210)% || !%actor.on_quest(18271)%
+if %actor.inventory(18210)% || !%actor.on_quest(18272)%
   * Don't need the trinket
   return 0
   halt

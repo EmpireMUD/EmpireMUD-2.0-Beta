@@ -101,9 +101,11 @@ S
 pouch chelonian shell token~
 a chelonian shell token pouch~
 A chelonian shell token pouch is lying here.~
-This pouch holds chelonian shell tokens from the Guild of Adventurers.
+   This pouch holds chelonian shell tokens from the Guild of Adventurers. You
+can spend these tokens at the guildmasters' shops in the Tipsy Tortoise Tavern.
+Type 'list' at any of the guildmasters there, and use 'buy' to make a purchase.
 ~
-3 p a 2
+3 p a 3
 0 0 0
 7 0
 T 18208
@@ -120,13 +122,13 @@ These tokens are used in the shop aboard the Tipsy Tortoise Tavern.
 T 18209
 S
 #18210
-bauble friovolous~
+bauble frivolous~
 a frivolous bauble~
 A frivolous bauble is floating here.~
    You're not sure what this is, but that sorcerer seemed to think it was
 important.
 ~
-3 j a 1
+3 j a 2
 0 0 0
 10 0
 A
@@ -179,7 +181,7 @@ an atlasian egg~
 An atlasian egg is here.~
    This massive, leathery egg could only have come from an atlasian tortoise.
 It's so large that you can feel its heartbeat through shell. 'Plant' the egg in
-the plains or desert and perhaps with some care, you can get it to hatch. 
+the plains or desert and perhaps with some care, you can get it to hatch.
 Raising an atlasian tortoise is notoriously difficult, though, and you recall
 reading somewhere in the guildhall that caring for an atlasian egg requires
 many rare materials such as magewood, wild fire, violet gems, molten essence,
@@ -470,14 +472,14 @@ see if they're interested in it.
 Q 18260
 S
 #18270
-siphon frost~
+siphon syphon frost~
 a frost siphon~
 A frost siphon is lying on the ground.~
    This unusual contraption appears to be made from sparkling magewood and
 enchanted eventide. You've never seen anything like it before, but at least the
 instructions are clearly labeled: use siphon <target>
 ~
-3 j a 2
+3 j a 3
 0 0 0
 10 0
 Q 18270
