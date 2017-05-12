@@ -804,6 +804,7 @@ OLC_MODULE(advedit_cascade) {
 		else {
 			GET_OBJ_MIN_SCALE_LEVEL(obj) = GET_ADV_MIN_LEVEL(adv);
 			GET_OBJ_MAX_SCALE_LEVEL(obj) = GET_ADV_MAX_LEVEL(adv);
+			OBJ_VERSION(obj) += 1;
 			snprintf(line, sizeof(line), "updated");
 			save_objs = TRUE;
 		}
@@ -824,6 +825,10 @@ OLC_MODULE(advedit_cascade) {
 				save_library_file_for_vnum(DB_BOOT_OBJ, iter);
 			}
 		}
+	}
+	
+	if (save_objs || save_mobs) {
+		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s cascaded levels for adventure [%d] %s", GET_NAME(ch), GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 	}
 }
 
