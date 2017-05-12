@@ -2336,6 +2336,7 @@ const char *quest_flags[] = {
 	"EXTRACT-TASK-OBJECTS",
 	"DAILY",
 	"EMPIRE-ONLY",
+	"NO-GUESTS",
 	"\n"
 };
 

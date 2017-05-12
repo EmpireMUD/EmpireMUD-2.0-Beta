@@ -1776,6 +1776,7 @@ typedef struct vehicle_data vehicle_data;
 #define QST_EXTRACT_TASK_OBJECTS  BIT(3)	// takes away items required by the task
 #define QST_DAILY  BIT(4)	// counts toward dailies; repeats each "day"
 #define QST_EMPIRE_ONLY  BIT(5)	// only available if quest giver and player are in the same empire
+#define QST_NO_GUESTS  BIT(6)	// quest start/finish use MEMBERS_ONLY
 
 
 // QG_x: quest giver types

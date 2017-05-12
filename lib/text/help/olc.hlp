@@ -4586,6 +4586,7 @@ The following quest flags are available:
  DAILY - Quest counts as a daily.
  EMPIRE-ONLY - Can only start/finish with mob/room of matching empire (or
     matching not-in-empire).
+ NO-GUESTS - Checks actual ownership on the room when you start/finish a quest.
 
 See also: OLC QUESTS, DAILY QUEST
 #d
