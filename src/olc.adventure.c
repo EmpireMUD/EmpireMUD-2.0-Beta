@@ -798,6 +798,9 @@ OLC_MODULE(advedit_cascade) {
 		else if (!player_can_olc_edit(ch, OLC_OBJECT, GET_OBJ_VNUM(obj))) {
 			snprintf(line, sizeof(line), "no permission");
 		}
+		else if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+			snprintf(line, sizeof(line), "not scalable");
+		}
 		else {
 			GET_OBJ_MIN_SCALE_LEVEL(obj) = GET_ADV_MIN_LEVEL(adv);
 			GET_OBJ_MAX_SCALE_LEVEL(obj) = GET_ADV_MAX_LEVEL(adv);

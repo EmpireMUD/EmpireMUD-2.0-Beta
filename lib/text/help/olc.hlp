@@ -523,7 +523,7 @@ This command will apply the adventure's min/max levels to all the mobs and
 objects in the adventure that don't already have them.
 
 This command will ignore any mob/item that already has either a min or max
-level.
+level. It also ignores objects that don't have the SCALABLE flag.
 
 See also: OLC ADVENTURES
 #d
