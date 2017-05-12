@@ -515,6 +515,18 @@ give credit to the original builder.
 
 See also: OLC ADVENTURES
 #d
+"ADVEDIT CASCADE"
+
+Usage:  .adv cascade <adventure vnum>
+
+This command will apply the adventure's min/max levels to all the mobs and
+objects in the adventure that don't already have them.
+
+This command will ignore any mob/item that already has either a min or max
+level.
+
+See also: OLC ADVENTURES
+#d
 "ADVEDIT DESCRIPTION"
 
 Usage:  .description
@@ -734,7 +746,10 @@ Adventures whose minimum level is over 25 will not spawn on newbie islands.
 
 The OLC LEVELS help file has additional notes on how to choose levels.
 
-See also: OLC ADVENTURES, OLC LEVELS
+You can use the 'cascade' editor command to copy levels from the adventure to
+its mobs and objects.
+
+See also: OLC ADVENTURES, OLC LEVELS, ADVEDIT CASCADE
 #d
 "ADVEDIT NAME"
 
@@ -3589,7 +3604,7 @@ Fields:
   &c-interaction&0 - has a specific type, see HELP OEDIT INTERACTION
   &c-level&0 - matches anything where this level is within the range
      (note: will not account for objects whose levels are inherited from mobs
-     or adventures)
+     or adventures, see ADVEDIT CASCADE for help)
   &c-material&0 - see OEDIT MATERIAL
   &c-type&0 - see HELP OEDIT TYPE
   &c-wear&0 - see HELP OEDIT WEAR

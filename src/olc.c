@@ -54,6 +54,7 @@ OLC_MODULE(abiledit_name);
 
 // adventure zone modules
 OLC_MODULE(advedit_author);
+OLC_MODULE(advedit_cascade);
 OLC_MODULE(advedit_description);
 OLC_MODULE(advedit_endvnum);
 OLC_MODULE(advedit_flags);
@@ -502,6 +503,9 @@ const struct olc_command_data olc_data[] = {
 	{ "reset", advedit_reset, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "script", advedit_script, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "startvnum", advedit_startvnum, OLC_ADVENTURE, OLC_CF_EDITOR },
+	
+	// adventures: special
+	{ "cascade", advedit_cascade, OLC_ADVENTURE, NOBITS },
 	
 	// archetypes
 	{ "attribute", archedit_attribute, OLC_ARCHETYPE, OLC_CF_EDITOR },
