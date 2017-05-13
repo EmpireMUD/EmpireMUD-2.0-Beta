@@ -402,6 +402,9 @@ Triggers and Scripts (TRIGEDIT):
   room template. It only works for room templates in the same adventure zone.
 - If a script loads an object or mob, and it's not in a level-locked adventure
   zone, the script may also need to scale the obj's/mob's level itself.
+- Do not put a "%quest% finish" in a trigger that's attached to an object
+  that requires that quest. The object will be extracted during the "finish"
+  and it will interrupt the execution of your trigger.
 
 Vehicles (VEDIT):
 - Keywords should always have the most significant word first (the noun). This
