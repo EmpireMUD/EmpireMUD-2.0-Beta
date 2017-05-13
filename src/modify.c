@@ -463,7 +463,7 @@ void page_string(descriptor_data *d, char *str, int keep_internal) {
 		return;
 
 	// determine if it will be too long after parsing color codes
-	length = strlen(str) + (color_code_length(str) * 1.5);
+	length = strlen(str) + (color_code_length(str) * 2);
 
 	if (d->character && PRF_FLAGGED(d->character, PRF_SCROLLING) && length < MAX_STRING_LENGTH) {
 		send_to_char(str, d->character);
