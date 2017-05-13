@@ -454,13 +454,18 @@ void paginate_string(char *str, descriptor_data *d) {
 
 /* The call that gets the paging ball rolling... */
 void page_string(descriptor_data *d, char *str, int keep_internal) {
+	int length;
+	
 	if (!d)
 		return;
 
 	if (!str || !*str)
 		return;
-
-	if (d->character && PRF_FLAGGED(d->character, PRF_SCROLLING) && strlen(str) < MAX_STRING_LENGTH) {
+	
+	// determine if it will be too long after parsing color codes
+	length = MAX_STRING_LENGTH - (color_code_length(str) * 5 / 2);
+	
+	if (d->character && PRF_FLAGGED(d->character, PRF_SCROLLING) && length < MAX_STRING_LENGTH) {
 		send_to_char(str, d->character);
 		return;
 	}
