@@ -121,4 +121,22 @@ You can use 'fmessages' to turn off spammy combat text.
 You can use 'fprompt' to set a different prompt for combat.
 You can write your own books at the library.
 You can have more than one mount, but you have to switch them at a stable.
+You can abbreviate most things include commands and names.
+If you've typed too many commands and are waiting for them to happen, you can use + to insert a command at the front of the list.
+If you've typed too many commands and are waiting for them to happen, you can type -- to clear them all out of the queue.
+The only way to remove seeded fields is with Devastation Ritual.
+You can't use your tomb to respawn if it's on fire.
+You can turn off workforce for a tile or building by typing 'workforce no-work'.
+You can use 'cede' to transfer land ownership to someone else.
+You can't gain experience from using abilities on mobs that are way below your level.
+You can summon your friends to help you with an adventure using 'adventure summon'.
+You can use the 'alias' command to make handy shortcuts.
+If it's dark, you usually can't see mobs or items in the room with you.
+If you think someone is earthmelded beneath you, try using search or dig.
+Some cooked foods give you attribute buffs when you eat them.
+Sleeping causes your health, moves, and mana to refresh in one minute (or faster if you're in a bedroom).
+If mining doesn't pan out, try panning for gold.
+If you 'toggle autorecall', you'll appear at your home (or tomb) if you're logged out for an hour.
+Sick of being told you can't go there while mounted? Try 'toggle autodismount'.
+You can irrigate the desert by digging trenches next to your rivers.
 $~
