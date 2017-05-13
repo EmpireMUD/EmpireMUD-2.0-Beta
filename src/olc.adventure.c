@@ -780,7 +780,7 @@ OLC_MODULE(advedit_cascade) {
 			save_mobs = TRUE;
 		}
 		
-		msg_to_char(ch, "MOB [%d] %s\r\n", GET_MOB_VNUM(mob), line);
+		msg_to_char(ch, "MOB [%d] %s - %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob), line);
 	}
 	
 	// objs second
@@ -809,7 +809,7 @@ OLC_MODULE(advedit_cascade) {
 			save_objs = TRUE;
 		}
 		
-		msg_to_char(ch, "OBJ [%d] %s\r\n", GET_OBJ_VNUM(obj), line);
+		msg_to_char(ch, "OBJ [%d] %s - %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), line);
 	}
 	
 	// saves
@@ -1311,5 +1311,107 @@ OLC_MODULE(advedit_startvnum) {
 			msg_to_char(ch, "New value %d is inside adventure [%d] %s; old value restored.\r\n", GET_ADV_START_VNUM(adv), GET_ADV_VNUM(temp), GET_ADV_NAME(temp));
 			GET_ADV_START_VNUM(adv) = old;
 		}
+	}
+}
+
+
+// removes min/max levels from mobs/objs if those are the same as for the adventure itself
+OLC_MODULE(advedit_uncascade) {
+	bool save_mobs = FALSE, save_objs = FALSE;
+	char line[MAX_STRING_LENGTH];
+	char_data *mob, *next_mob;
+	obj_data *obj, *next_obj;
+	adv_data *adv;
+	int iter, last;
+	
+	// validation
+	if (!*argument || !isdigit(*argument)) {
+		msg_to_char(ch, "Uncascade levels for which adventure?\r\n");
+		return;
+	}
+	else if (!(adv = adventure_proto(atoi(argument)))) {
+		msg_to_char(ch, "Unknown adventure '%s'.\r\n", argument);
+		return;
+	}
+	else if (!player_can_olc_edit(ch, OLC_ADVENTURE, GET_ADV_VNUM(adv))) {
+		msg_to_char(ch, "You don't have permission to edit that adventure.\r\n");
+		return;
+	}
+	else if (GET_ADV_MIN_LEVEL(adv) == 0 && GET_ADV_MAX_LEVEL(adv) == 0) {
+		msg_to_char(ch, "That adventure has no scaling constraints.\r\n");
+		return;
+	}
+	
+	// mobs first
+	HASH_ITER(hh, mobile_table, mob, next_mob) {
+		if (GET_MOB_VNUM(mob) < GET_ADV_START_VNUM(adv) || GET_MOB_VNUM(mob) > GET_ADV_END_VNUM(adv)) {
+			continue;	// not in this adventure
+		}
+		
+		// READY TO ATTEMPT (will report errors after this
+		*line = '\0';
+		
+		if (GET_MIN_SCALE_LEVEL(mob) != GET_ADV_MIN_LEVEL(adv) || GET_MAX_SCALE_LEVEL(mob) != GET_ADV_MAX_LEVEL(adv)) {
+			snprintf(line, sizeof(line), "has levels %d-%d", GET_MIN_SCALE_LEVEL(mob), GET_MAX_SCALE_LEVEL(mob));
+		}
+		else if (!player_can_olc_edit(ch, OLC_MOBILE, GET_MOB_VNUM(mob))) {
+			snprintf(line, sizeof(line), "no permission");
+		}
+		else {
+			GET_MIN_SCALE_LEVEL(mob) = 0;
+			GET_MAX_SCALE_LEVEL(mob) = 0;
+			snprintf(line, sizeof(line), "removed");
+			save_mobs = TRUE;
+		}
+		
+		msg_to_char(ch, "MOB [%d] %s - %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob), line);
+	}
+	
+	// objs second
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		if (GET_OBJ_VNUM(obj) < GET_ADV_START_VNUM(adv) || GET_OBJ_VNUM(obj) > GET_ADV_END_VNUM(adv)) {
+			continue;	// not in this adventure
+		}
+		
+		// READY TO ATTEMPT (will report errors after this
+		*line = '\0';
+		
+		if (GET_OBJ_MIN_SCALE_LEVEL(obj) != GET_ADV_MIN_LEVEL(adv) || GET_OBJ_MAX_SCALE_LEVEL(obj) != GET_ADV_MAX_LEVEL(adv)) {
+			snprintf(line, sizeof(line), "has levels %d-%d", GET_OBJ_MIN_SCALE_LEVEL(obj), GET_OBJ_MAX_SCALE_LEVEL(obj));
+		}
+		else if (!player_can_olc_edit(ch, OLC_OBJECT, GET_OBJ_VNUM(obj))) {
+			snprintf(line, sizeof(line), "no permission");
+		}
+		else if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
+			snprintf(line, sizeof(line), "not scalable");
+		}
+		else {
+			GET_OBJ_MIN_SCALE_LEVEL(obj) = 0;
+			GET_OBJ_MAX_SCALE_LEVEL(obj) = 0;
+			OBJ_VERSION(obj) += 1;
+			snprintf(line, sizeof(line), "updated");
+			save_objs = TRUE;
+		}
+		
+		msg_to_char(ch, "OBJ [%d] %s - %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), line);
+	}
+	
+	// saves
+	last = -1;
+	for (iter = GET_ADV_START_VNUM(adv); iter <= GET_ADV_END_VNUM(adv); ++iter) {
+		if ((int)(iter / 100) != last) {
+			last = iter / 100;	// once per 100 vnum block in the adventure
+			
+			if (save_mobs) {
+				save_library_file_for_vnum(DB_BOOT_MOB, iter);
+			}
+			if (save_objs) {
+				save_library_file_for_vnum(DB_BOOT_OBJ, iter);
+			}
+		}
+	}
+	
+	if (save_objs || save_mobs) {
+		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s un-cascaded levels for adventure [%d] %s", GET_NAME(ch), GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 	}
 }

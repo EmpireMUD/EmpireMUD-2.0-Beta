@@ -67,6 +67,7 @@ OLC_MODULE(advedit_playerlimit);
 OLC_MODULE(advedit_reset);
 OLC_MODULE(advedit_script);
 OLC_MODULE(advedit_startvnum);
+OLC_MODULE(advedit_uncascade);
 
 // archetype modules
 OLC_MODULE(archedit_attribute);
@@ -506,6 +507,7 @@ const struct olc_command_data olc_data[] = {
 	
 	// adventures: special
 	{ "cascade", advedit_cascade, OLC_ADVENTURE, NOBITS },
+	{ "uncascade", advedit_uncascade, OLC_ADVENTURE, NOBITS },
 	
 	// archetypes
 	{ "attribute", archedit_attribute, OLC_ARCHETYPE, OLC_CF_EDITOR },

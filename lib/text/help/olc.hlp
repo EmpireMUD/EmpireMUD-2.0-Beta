@@ -515,15 +515,19 @@ give credit to the original builder.
 
 See also: OLC ADVENTURES
 #d
-"ADVEDIT CASCADE"
+"ADVEDIT CASCADE" "ADVEDIT UNCASCADE" CASCADE UNCASCADE
 
 Usage:  .adv cascade <adventure vnum>
+        .adv uncascade <adventure vnum>
 
-This command will apply the adventure's min/max levels to all the mobs and
-objects in the adventure that don't already have them.
+The cascade command will apply the adventure's min/max levels to all the mobs
+and objects in the adventure that don't already have their own min/max. This
+command will ignore any mob/item that already has either a min or max level.
 
-This command will ignore any mob/item that already has either a min or max
-level. It also ignores objects that don't have the SCALABLE flag.
+The uncascade command removes the min/max level from all mobs and objects whose
+min/max are identical to the adventure's own settings.
+
+Both commands ignore objects that don't have the SCALABLE flag.
 
 See also: OLC ADVENTURES
 #d
