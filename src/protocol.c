@@ -1145,7 +1145,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 		else {	// Just copy the character normally
 			// display and flush color codes
 			const char *temp = flush_reduced_color_codes(apDescriptor);
-			while (*temp != '\0' && i < MAX_OUTPUT_BUFFER) {
+			while (*temp != '\0' && i < MAX_OUTPUT_BUFFER-1) {
 				Result[i++] = *temp++;
 			}
 			
@@ -1154,9 +1154,11 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 		}
 	}
 
-	/* If we'd overflow the buffer, we don't send any output */
+	// truncate and overflow
 	if (i >= MAX_OUTPUT_BUFFER) {
-		i = 0;
+		const char *overflow = "**OVERFLOW**\r\n";
+		strcpy(Result + (MAX_OUTPUT_BUFFER - (strlen(overflow) + 1)), overflow);
+		i = MAX_OUTPUT_BUFFER - 1;
 		ReportBug("ProtocolOutput: Too much outgoing data to store in the buffer.\n");
 	}
 
