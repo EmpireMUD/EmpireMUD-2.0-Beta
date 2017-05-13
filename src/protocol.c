@@ -738,10 +738,10 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 					want_reduced_color_codes(apDescriptor, s_BoldCyan, NULL);
 					break;
 				case 'w': /* dark white */
-					want_reduced_color_codes(apDescriptor, s_DarkWhite, NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F222", s_DarkWhite), NULL);
 					break;
 				case 'W': /* light white */
-					want_reduced_color_codes(apDescriptor, s_BoldWhite, NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F555", s_BoldWhite), NULL);
 					break;
 				case 'a': /* dark azure */
 					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F014", s_DarkBlue), NULL);
@@ -1021,10 +1021,10 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 					want_reduced_color_codes(apDescriptor, s_BoldCyan, NULL);
 					break;
 				case 'w': /* dark white */
-					want_reduced_color_codes(apDescriptor, s_DarkWhite, NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F222", s_DarkWhite), NULL);
 					break;
 				case 'W': /* light white */
-					want_reduced_color_codes(apDescriptor, s_BoldWhite, NULL);
+					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F555", s_BoldWhite), NULL);
 					break;
 				case 'a': /* dark azure */
 					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F014", s_DarkBlue), NULL);
