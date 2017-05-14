@@ -393,7 +393,7 @@ static void want_reduced_color_underline(descriptor_data *desc) {
 * @return char* The string of rendered color codes to send.
 */
 char *flush_reduced_color_codes(descriptor_data *desc) {
-	static char output[COLREDUC_SIZE * 3 + 1];	// guarantee enough room
+	static char output[COLREDUC_SIZE * 4 + 1];	// guarantee enough room
 	*output = '\0';
 	
 	if (!desc) {
@@ -401,8 +401,10 @@ char *flush_reduced_color_codes(descriptor_data *desc) {
 	}
 	
 	if (desc->color.want_clean) {
-		strcat(output, s_Clean);
-		desc->color.is_clean = TRUE;
+		if (!desc->color.is_clean) {
+			strcat(output, s_Clean);
+			desc->color.is_clean = TRUE;
+		}
 		desc->color.want_clean = FALSE;
 		desc->color.is_underline = FALSE;
 		*desc->color.last_fg = '\0';
@@ -422,8 +424,10 @@ char *flush_reduced_color_codes(descriptor_data *desc) {
 		desc->color.is_clean = FALSE;
 	}
 	if (desc->color.want_underline) {
-		strcat(output, s_Underline);
-		desc->color.is_underline = TRUE;
+		if (!desc->color.is_underline) {
+			strcat(output, s_Underline);
+			desc->color.is_underline = TRUE;
+		}
 		desc->color.want_underline = FALSE;
 		desc->color.is_clean = FALSE;
 	}
