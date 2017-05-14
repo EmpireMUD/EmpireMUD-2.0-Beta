@@ -434,14 +434,27 @@ ACMD(do_roll) {
 	}
 	
 	if (num == 1) {
-		msg_to_char(ch, "You roll a %d-sided die and get: %d\r\n", size, total);
+		snprintf(buf, sizeof(buf), "You roll a %d-sided die and get: %d\r\n", size, total);
+		send_to_char(buf, ch);
+		if (ch->desc) {
+			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, buf);
+		}
+		
 		snprintf(buf, sizeof(buf), "$n rolls a %d-sided die and gets: %d", size, total);
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		if (GROUP(ch)) {
 			for (mem = GROUP(ch)->members; mem; mem = mem->next) {
 				if (mem->member != ch && (IN_ROOM(mem->member) != IN_ROOM(ch) || !AWAKE(mem->member))) {
+					if (mem->member->desc) {
+						clear_last_act_message(mem->member->desc);
+					}
+					
 					act(buf, FALSE, ch, NULL, mem->member, TO_VICT | TO_SLEEP);
+					
+					if (mem->member->desc && mem->member->desc->last_act_message) {
+						add_to_channel_history(mem->member, CHANNEL_HISTORY_SAY, mem->member->desc->last_act_message);
+					}
 				}
 			}
 		}
@@ -454,7 +467,15 @@ ACMD(do_roll) {
 		if (GROUP(ch)) {
 			for (mem = GROUP(ch)->members; mem; mem = mem->next) {
 				if (mem->member != ch && (IN_ROOM(mem->member) != IN_ROOM(ch) || !AWAKE(mem->member))) {
+					if (mem->member->desc) {
+						clear_last_act_message(mem->member->desc);
+					}
+					
 					act(buf, FALSE, ch, NULL, mem->member, TO_VICT | TO_SLEEP);
+					
+					if (mem->member->desc && mem->member->desc->last_act_message) {
+						add_to_channel_history(mem->member, CHANNEL_HISTORY_SAY, mem->member->desc->last_act_message);
+					}
 				}
 			}
 		}
