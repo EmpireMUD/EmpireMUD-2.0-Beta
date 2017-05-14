@@ -872,7 +872,7 @@ void olc_show_trigger(char_data *ch) {
 	
 	trig_data *trig = GET_OLC_TRIGGER(ch->desc);
 	bitvector_t trig_arg_types = compile_argument_types_for_trigger(trig);
-	char trgtypes[256];
+	char trgtypes[256], buf[MAX_STRING_LENGTH * 4];	// that HAS to be long enough, right?
 	
 	if (!trig) {
 		return;
