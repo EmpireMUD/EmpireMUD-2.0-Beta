@@ -809,7 +809,7 @@ struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_stor
 	struct cmdlist_element *c;
 	struct trig_data *new;
 	
-	CREATE(*cmdlist_storage, char, MAX_CMD_LENGTH);
+	CREATE(*cmdlist_storage, char, MAX_CMD_LENGTH * 2);
 	CREATE(new, struct trig_data, 1);
 	trig_data_init(new);
 	
