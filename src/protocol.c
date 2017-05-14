@@ -349,7 +349,7 @@ static void want_reduced_color_codes(descriptor_data *desc, const char *fg, cons
 			desc->color.want_clean = FALSE;
 		}
 		// this happens even if the last one triggered
-		if (strcmp(bg, desc->color.want_bg) && (*desc->color.want_bg || strcmp(bg, desc->color.last_bg) || desc->color.want_clean)) {
+		if (strcmp(bg, desc->color.want_bg) && (*desc->color.want_bg || strcmp(bg, desc->color.last_bg) || desc->color.want_clean || (*desc->color.want_fg && strstr(desc->color.want_fg, "[0;")))) {
 			snprintf(desc->color.want_bg, COLREDUC_SIZE, "%s", bg);
 		}
 	}
