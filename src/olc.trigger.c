@@ -806,10 +806,10 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 * @return struct trig_data* The copied trigger.
 */
 struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_storage) {
-	char storage[MAX_STRING_LENGTH * 3];
 	struct cmdlist_element *c;
 	struct trig_data *new;
 	
+	CREATE(*cmdlist_storage, char, MAX_CMD_LENGTH);
 	CREATE(new, struct trig_data, 1);
 	trig_data_init(new);
 	
@@ -830,20 +830,13 @@ struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_stor
 
 		// convert cmdlist to a char string
 		c = input->cmdlist;
-		strcpy(storage, "");
+		strcpy(*cmdlist_storage, "");
 
 		while (c) {
-			if (strlen(storage) + strlen(c->cmd) + 2 >= sizeof(storage)) {
-				log("SYSERR: trigger %d command list too long to edit", GET_TRIG_VNUM(input));
-				break;
-			}
-			
-			strcat(storage, c->cmd);
-			strcat(storage, "\r\n");
+			strcat(*cmdlist_storage, c->cmd);
+			strcat(*cmdlist_storage, "\r\n");
 			c = c->next;
 		}
-		
-		*cmdlist_storage = str_dup(storage);
 		// now the cmdlist is something to pass to the text editor
 		// it will be converted back to a real cmdlist_element list later
 	}
