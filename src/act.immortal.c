@@ -5813,7 +5813,7 @@ ACMD(do_island) {
 		}
 	}
 	else {
-		msg_to_char(ch, "Usage: island list\r\n");
+		msg_to_char(ch, "Usage: island list [keywords]\r\n");
 		msg_to_char(ch, "       island rename <id> <name>\r\n");
 		msg_to_char(ch, "       island flags <id> [add | remove] [flags]\r\n");
 	}
