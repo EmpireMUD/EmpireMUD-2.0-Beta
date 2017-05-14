@@ -5134,7 +5134,7 @@ ACMD(do_echo) {
 			clear_last_act_message(ch->desc);
 		}
 		
-		if (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) {
+		if (subcmd == SCMD_EMOTE && !IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) {
 			msg_to_char(ch, "&%c", GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE));
 		}
 		
@@ -5144,7 +5144,7 @@ ACMD(do_echo) {
 		// channel history
 		if (ch->desc && ch->desc->last_act_message) {
 			// the message was sent via act(), we can retrieve it from the desc			
-			if (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) {
+			if (subcmd == SCMD_EMOTE && !IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) {
 				sprintf(hbuf, "&%c", GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE));
 			}
 			else {
@@ -5161,7 +5161,7 @@ ACMD(do_echo) {
 			if (c->desc && c != ch && c != vict) {
 				clear_last_act_message(c->desc);
 				
-				if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
+				if (subcmd == SCMD_EMOTE && !IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 					msg_to_char(c, "&%c", GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE));
 				}
 			}
@@ -5173,7 +5173,7 @@ ACMD(do_echo) {
 		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
 			if (c->desc && c != ch && c != vict && !is_ignoring(c, ch) && c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
-				if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
+				if (subcmd == SCMD_EMOTE && !IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 					sprintf(hbuf, "&%c", GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE));
 				}
 				else {
@@ -5203,7 +5203,7 @@ ACMD(do_echo) {
 				clear_last_act_message(vict->desc);
 			}
 			
-			if (!IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_EMOTE)) {
+			if (subcmd == SCMD_EMOTE && !IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_EMOTE)) {
 				msg_to_char(vict, "&%c", GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_EMOTE));
 			}
 		
@@ -5215,7 +5215,7 @@ ACMD(do_echo) {
 			// channel history
 			if (vict->desc && vict->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc			
-				if (!IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_EMOTE)) {
+				if (subcmd == SCMD_EMOTE && !IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_EMOTE)) {
 					sprintf(hbuf, "&%c", GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_EMOTE));
 				}
 				else {
@@ -5232,7 +5232,7 @@ ACMD(do_echo) {
 			if (c->desc && c != ch) {
 				clear_last_act_message(c->desc);
 							
-				if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
+				if (subcmd == SCMD_EMOTE && !IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 					msg_to_char(c, "&%c", GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE));
 				}
 			}
@@ -5245,7 +5245,7 @@ ACMD(do_echo) {
 		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
 			if (c->desc && c != ch && !is_ignoring(c, ch) && c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc			
-				if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
+				if (subcmd == SCMD_EMOTE && !IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 					sprintf(hbuf, "&%c", GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE));
 				}
 				else {
