@@ -1212,7 +1212,7 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 		if (cmd_list->cmd)
 			len += snprintf(sb + len, sizeof(sb)-len, "%s\r\n", show_color_codes(cmd_list->cmd));
 
-		if (len>MAX_STRING_LENGTH-80) {
+		if (len > MAX_CMD_LENGTH) {
 			len += snprintf(sb + len, sizeof(sb)-len, "*** Overflow - script too long! ***\r\n");
 			break;
 		}

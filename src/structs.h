@@ -2050,7 +2050,7 @@ typedef struct vehicle_data vehicle_data;
 #define COLREDUC_SIZE  80	// how many characters long a color_reducer string can be
 #define MAX_ADMIN_NOTES_LENGTH  2400
 #define MAX_AFFECT  32
-#define MAX_CMD_LENGTH  MAX_STRING_LENGTH	// can't go bigger than this, altho DG Scripts wanted 16k
+#define MAX_CMD_LENGTH  (MAX_STRING_LENGTH-80)	// can't go bigger than this, altho DG Scripts wanted 16k
 #define MAX_COIN  2140000000	// 2.14b (< MAX_INT)
 #define MAX_COIN_TYPES  10	// don't store more than this many different coin types
 #define MAX_CONDITION  750	// FULL, etc
