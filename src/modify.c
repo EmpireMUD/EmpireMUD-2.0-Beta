@@ -107,6 +107,11 @@ void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_
 		return;
 	}
 	
+	if (max_len > MAX_STRING_LENGTH) {
+		log("SYSERR: start_string_editor called with max length %zu (cap is %d)", max_len, MAX_STRING_LENGTH);
+		max_len = MAX_STRING_LENGTH;
+	}
+	
 	d->str = writeto;
 	d->max_str = max_len;
 	d->str_on_abort = NULL;
