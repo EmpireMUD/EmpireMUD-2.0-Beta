@@ -3658,8 +3658,8 @@ char *show_color_codes(char *string) {
 	char *ptr;
 	
 	ptr = str_replace("&", "\t&", string);
-	strncpy(value, ptr, MAX_STRING_LENGTH);
-	value[MAX_STRING_LENGTH-1] = '\0';	// safety
+	strncpy(value, ptr, sizeof(value));
+	value[sizeof(value)-1] = '\0';	// safety
 	free(ptr);
 	
 	return value;
