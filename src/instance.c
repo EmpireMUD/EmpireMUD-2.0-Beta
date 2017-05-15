@@ -30,6 +30,7 @@
 */
 
 // external consts
+extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
 extern const int rev_dir[];
 
@@ -85,8 +86,9 @@ const bool is_location_rule[] = {
 * @param struct adventure_link_rule *rule The rule we're using to set it up.
 * @param room_data *loc The pre-validated world location.
 * @param int dir The chosen direction, IF required (may be DIR_RANDOM or NO_DIR, too).
+* @param int rotation The rotatable direction, if applicable (NO_DIR for none).
 */
-static void build_instance_entrance(struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir) {
+static void build_instance_entrance(struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation) {
 	void special_building_setup(char_data *ch, room_data *room);
 	void complete_building(room_data *room);
 	
@@ -152,6 +154,9 @@ static void build_instance_entrance(struct instance_data *inst, struct adventure
 		case ADV_LINK_BUILDING_EXISTING:
 		case ADV_LINK_BUILDING_NEW: {
 			my_dir = (rule->dir != DIR_RANDOM ? rule->dir : determine_random_exit(inst->adventure, loc, inst->start));
+			if (ADVENTURE_FLAGGED(inst->adventure, ADV_ROTATABLE) && rotation != NO_DIR && my_dir != NO_DIR) {
+				my_dir = confused_dirs[rotation][0][my_dir];
+			}
 			if (my_dir != NO_DIR) {
 				create_exit(loc, inst->start, my_dir, TRUE);
 			}
@@ -518,7 +523,7 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 	
 	// attach the instance to the world (do this before adding dirs, because it may take up a random dir slot)
 	// do not rotate this dir; it was pre-validated for building
-	build_instance_entrance(inst, rule, loc, dir);
+	build_instance_entrance(inst, rule, loc, dir, rotation);
 
 	// exits: non-random first
 	for (iter = 0; iter < inst->size; ++iter) {
