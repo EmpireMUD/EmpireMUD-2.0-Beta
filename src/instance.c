@@ -30,6 +30,7 @@
 */
 
 // external consts
+extern const char *dirs[];
 extern const int rev_dir[];
 
 // external funcs
@@ -200,6 +201,8 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 	if (!loc) {
 		return NULL;
 	}
+	
+	log("Debug: Instantiating %d %s at %s (%s)", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), room_log_identifier(loc), dir == NO_DIR ? "no-dir" : dirs[dir]);
 	
 	// make an instance
 	CREATE(inst, struct instance_data, 1);
