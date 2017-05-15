@@ -325,7 +325,7 @@ The following channels are available on EmpireMUD:
 
 Global channels:
 &Y/ooc&0 - General chat
-&g/newbie&0 - Newbie channel
+&j/newbie&0 - Newbie channel
 &R/recruit&0 - Empire recruitment channel
 &o/trade&0 - Global trade channel
 &yshout&0 - an in-character channel limited to 50 map tiles distance
