@@ -62,7 +62,7 @@ struct mappc_data_container {
 
 
 // external vars
-extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
+extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
 extern const char *orchard_commands;
 

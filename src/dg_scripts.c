@@ -38,7 +38,7 @@ extern const char *action_bits[];
 extern const char *affected_bits[];
 extern const char *affect_types[];
 extern const char *alt_dirs[];
-extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
+extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
 extern const char *drinks[];
 extern const char *extra_bits[];

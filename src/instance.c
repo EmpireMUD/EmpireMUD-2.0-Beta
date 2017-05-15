@@ -30,7 +30,7 @@
 */
 
 // external consts
-extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
+extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
 extern const int rev_dir[];
 
@@ -353,8 +353,6 @@ static int determine_random_exit(adv_data *adv, room_data *from, room_data *to) 
 * @param int rotation The whole-zone rotation direction (e.g. NORTH).
 */
 static void instantiate_one_exit(struct instance_data *inst, room_data *room, struct exit_template *exit, int rotation) {
-	extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
-
 	struct room_direction_data *new;
 	struct exit_template *ex_iter;
 	room_data *to_room = NULL;
