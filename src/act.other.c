@@ -1282,6 +1282,15 @@ ACMD(do_alternate) {
 	else if (!str_cmp(arg, "import")) {
 		do_alt_import(ch, argument);
 	}
+	else if (IN_HOSTILE_TERRITORY(ch)) {
+		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
+	}
+	else if (GET_POS(ch) < POS_RESTING) {
+		msg_to_char(ch, "You can't alternate right now.\r\n");
+	}
+	else if (GET_POS(ch) == POS_FIGHTING || FIGHTING(ch)) {
+		msg_to_char(ch, "You can't switch characters while fighting!\r\n");
+	}
 	else if (ch->desc->str) {
 		msg_to_char(ch, "You can't alternate while editing text (use ,/save or ,/abort first).\r\n");
 	}
@@ -1291,14 +1300,8 @@ ACMD(do_alternate) {
 	else if (GET_OLC_TYPE(ch->desc) != 0) {
 		msg_to_char(ch, "You can't alternate with an editor open (use .save or .abort first).\r\n");
 	}
-	else if (IN_HOSTILE_TERRITORY(ch)) {
-		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
-	}
 	else if (get_cooldown_time(ch, COOLDOWN_PVP_QUIT_TIMER) > 0 && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't alternate so soon after fighting!\r\n");
-	}
-	else if (GET_POS(ch) == POS_FIGHTING || FIGHTING(ch)) {
-		msg_to_char(ch, "You can't switch characters while fighting!\r\n");
 	}
 	else if (!(index = find_player_index_by_name(arg))) {
 		msg_to_char(ch, "Unknown character.\r\n");
