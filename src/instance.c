@@ -207,7 +207,12 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 		return NULL;
 	}
 	
-	// make an instance
+	// import dir from existing building
+	if (rule->type == ADV_LINK_BUILDING_EXISTING && dir == NO_DIR && !ROOM_BLD_FLAGGED(loc, BLD_OPEN | BLD_ROOM)) {
+		dir = rev_dir[BUILDING_ENTRANCE(loc)];
+	}
+	
+ 	// make an instance
 	CREATE(inst, struct instance_data, 1);
 	inst->id = get_new_instance_id();
 	inst->adventure = adv;
