@@ -393,6 +393,7 @@ ACMD(do_roll) {
 	char numarg[MAX_INPUT_LENGTH], sizearg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	int num, size, total, iter;
 	struct group_member_data *mem;
+	char_data *vict;
 	
 	int max_num = 1000;
 	
@@ -433,6 +434,13 @@ ACMD(do_roll) {
 		total += number(1, size);
 	}
 	
+	// clear room last-act
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+		if (vict->desc) {
+			clear_last_act_message(vict->desc);
+		}
+	}
+	
 	if (num == 1) {
 		snprintf(buf, sizeof(buf), "You roll a %d-sided die and get: %d\r\n", size, total);
 		send_to_char(buf, ch);
@@ -461,6 +469,8 @@ ACMD(do_roll) {
 	}
 	else {
 		msg_to_char(ch, "You roll %dd%d and get: %d\r\n", num, size, total);
+		// local hist
+		
 		snprintf(buf, sizeof(buf), "$n rolls %dd%d and gets: %d", num, size, total);
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		
@@ -478,6 +488,13 @@ ACMD(do_roll) {
 					}
 				}
 			}
+		}
+	}
+	
+	// save room last-act
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+		if (vict != ch && vict->desc && vict->desc->last_act_message) {
+			add_to_channel_history(vict, CHANNEL_HISTORY_SAY, vict->desc->last_act_message);
 		}
 	}
 }
