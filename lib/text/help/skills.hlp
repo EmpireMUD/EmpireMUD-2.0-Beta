@@ -38,6 +38,8 @@ See also: CRAFT
 #
 CHOP
 
+Chop (Chores ability)
+
 Usage:  chop
 Speed boosts:  Faster Chores bonus, haste, higher axe damage
 
@@ -48,7 +50,7 @@ more damage, or if you have haste.
 Different types of forest give different qualities and quantities of trees.
 Some trees can be scraped, sawed, or lit on fire.
 
-See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW, LIGHT
+See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW, LIGHT, CHORES
 #
 "DAILY EXPERIENCE BONUS POINTS" "DAILY SKILLS" "BONUS EXPERIENCE POINTS" "DAILY BONUS EXPERIENCE POINTS"
 
@@ -104,6 +106,8 @@ See also: BUILD, STORAGE
 #
 DIG
 
+Dig (Scavenging ability)
+
 Usage:  dig
 Speed boosts:  Faster Chores bonus, Finder ability, haste, shovel
 
@@ -113,7 +117,7 @@ things that may be found, rocks, flint, and clay are the most common.
 Using a shovel or having the Finder ability will each cut your dig time in
 half.
 
-See also: DEPLETION, ROCKS, FLINT, CLAY, FINDER, SHOVEL
+See also: DEPLETION, ROCKS, FLINT, CLAY, FINDER, SHOVEL, SCAVENGING
 #
 DISMANTLE
 
@@ -142,6 +146,8 @@ See also: DIG, LIGHT, ROCK COMPONENT
 #
 GATHER
 
+Gather (Scavenging ability)
+
 Usage:  gather
 Speed boosts:  Faster Chores bonus, Finder ability, Haste
 
@@ -150,7 +156,7 @@ how many different sticks you can use and thus how quickly you gather enough.
 
 You can also gather apples in an orchard.
 
-See also: DEPLETION, STICKS, APPLES, ORCHARD, FOREST
+See also: DEPLETION, STICKS, APPLES, ORCHARD, FOREST, SCAVENGING
 #
 HARNESS UNHARNESS
 
@@ -173,6 +179,8 @@ See also: DRAG, LEAD
 #
 HARVEST HARVESTING
 
+Harvest (Chores ability)
+
 Usage:  harvest
 Speed boosts:  Faster Chores bonus, haste
 
@@ -180,7 +188,7 @@ Allows you to harvest a crop. Be careful that you also replant some,
 otherwise you'll run out of that crop quickly. You must be wielding a slashing
 or slicing weapon (sword or axe) to harvest crops.
 
-See also: PLANT
+See also: PLANT, CHORES
 #
 HERD HERDING
 
@@ -223,6 +231,8 @@ container to hold the milk. Cows can be milked once or twice per day.
 #
 MILL MILLING
 
+Mill (Chores ability)
+
 Building:  (MM)  Mill  (Basic Buildings)
 Stored at the mill:  cornmeal, flour
 Command:  mill [number] <item>
@@ -234,9 +244,11 @@ You can mill:
 
 You must do this at a Mill building.
 
-See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, CHORES
 #
 MINE MINES
+
+Mine (Chores ability)
 
 Building:  &y/&0[]&y\&0  Mine  (Basic Buildings)
 Speed boosts:  Faster Chores bonus, haste, higher pick damage
@@ -267,9 +279,11 @@ Types of mines:
   imperium - only found with Rare Metals
   moonstone - only found with Rare Metals
 
-See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS
+See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS, CHORES
 #
 MINT
+
+Mint (Chores ability)
 
 Building:  [MM]  Mint  (Commerce ability)
 Fame:  5
@@ -280,7 +294,7 @@ The mint building allows you to mint valuable metals into coins. Each building
 can only mint coins for the empire it belongs to. The mint command will auto-
 repeat; stopping the action will give you back the item you were minting.
 
-See also: COINS, COMMERCE, STOP
+See also: COINS, COMMERCE, STOP, CHORES
 #
 MORPH MORPHING SHAPESHIFTING FASTMORPH
 
@@ -310,6 +324,8 @@ See also: SKILLS
 #
 PLANT
 
+Plant (Chores ability)
+
 Usage:  plant <seed/food>
 Speed boosts:  Faster Chores bonus, haste
 
@@ -329,9 +345,11 @@ Jungle: light jungle
 Light jungle is jungle which has been partially chopped, but not reduced to
 plains.
 
-See also: CROPS, HARVEST, PICK
+See also: CROPS, HARVEST, PICK, CHORES
 #
 PRESS PRESSING OILMAKING "OIL MAKING"
+
+Press (Chores ability)
 
 Command:  press [number] <item>
           press info <item>
@@ -341,7 +359,7 @@ You can press:
 
 You must do this at an Oilmaker building.
 
-See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL, CHORES
 #
 READY
 
@@ -373,6 +391,8 @@ Example:
 #
 SAW
 
+Saw (Chores ability)
+
 Usage:  saw <item>
 Speed boosts:  Faster Chores bonus, haste
 
@@ -381,9 +401,11 @@ will go faster if you have the Woodworking ability.
 
 Not all types of trees can be sawed.
 
-See also: TREES, LOGS, LUMBER
+See also: TREES, LOGS, LUMBER, CHORES
 #
 SCRAPE
+
+Scrape (Chores ability)
 
 Usage:  scrape <item>
 Speed boosts:  Faster Chores bonus, haste
@@ -392,7 +414,7 @@ This skill is used to process some types of trees into logs.
 
 The Woodworking ability increases how fast you can scrape.
 
-See also: TREES, SAW, WOODWORKING, PILLAR
+See also: TREES, SAW, WOODWORKING, PILLAR, CHORES
 #
 SHEAR SHEARING
 
@@ -523,6 +545,8 @@ See also: SKILL CAPS, SPECIALIZE, SKILLS
 #
 SMELT MELT
 
+Smelt (Chores ability)
+
 Usage:  smelt [number] <type of ingot/bar>
 Speed boosts:  Faster Chores bonus
 
@@ -536,7 +560,7 @@ than their raw form. To return bars to their ingot form, use 'separate'.
 Typing "smelt" by itself will list things you can smelt with the ore available
 in your inventory.
 
-See also: METAL, SEPARATE, WEALTH
+See also: METAL, SEPARATE, WEALTH, CHORES
 #
 SPECIALIZE SPECIALTY
 

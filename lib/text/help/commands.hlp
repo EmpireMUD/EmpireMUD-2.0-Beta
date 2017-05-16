@@ -949,7 +949,8 @@ build things facing roads, and can usually build right over a road -- but the
 road underneath will be lost. Roads count as in-city territory as far away as
 3x a city's normal radius.
 
-Gain experience when you lay a road, but not on mountains.
+Gain experience when you lay a road (but not on mountains) or put down a
+road sign.
 
 See also: CHANT OF ILLUSIONS, EMPIRE, PATHFINDING, ROADSIGN
 #
@@ -1386,6 +1387,8 @@ The message on the sign can be no longer than 70 characters, and you can only
 set up a sign on a road, bridge, swamp walk, or mountain path. If the road is
 removed, the sign will be lost. Each road tile can only have one sign at a
 time, and using this ability again will replace the old sign.
+
+Gain Roads experience when you place a road sign.
 
 See also: ROADS, WOODWORKING
 #

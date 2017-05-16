@@ -272,7 +272,9 @@ Gains experience when you lay mountain roads.
 
 See also: ROADS
 #
-PICK 
+PICK
+
+Pick (Scavenging ability)
 
 Usage:  pick 
 Speed boosts:  Faster Chores bonus, Finder ability, haste
@@ -282,7 +284,7 @@ need is to be standing in one of these places and pick.
 
 You can find more if you have the right ability...
 
-See also: DEPLETION, FIND HERBS
+See also: DEPLETION, FIND HERBS, SCAVENGING
 #
 "RESIST POISON" "POISON IMMUNITY"
 

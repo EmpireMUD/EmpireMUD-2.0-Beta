@@ -850,7 +850,7 @@ main island if the ship is left alone at sea.
 Ships can also be used to transport resources automatically using the ship
 command.
 
-See also: BOARD, DISEMBARK, SAIL, SHIPBUILDING, SHIPPING
+See also: BOARD, DISEMBARK, SAIL, SHIPBUILDING, SHIPPING, DISPATCH
 #
 SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "SHIP LIST"
 
@@ -911,7 +911,7 @@ Possible results from skinning and example animals:
   shark skin: shark
   snakeskin: any snake
   fox fur: fox
-  big cat pelt: tiger, jaguar
+  big cat pelt: tiger, jaguar, leopard
 
 See also: SKINS, SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN
 #

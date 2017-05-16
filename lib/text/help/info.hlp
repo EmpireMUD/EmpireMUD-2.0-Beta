@@ -1060,6 +1060,18 @@ head, and then crafting the spear from the spearhead and the handle.
 
 See also: CRAFT, CHIP, FISH
 #
+STUN STUNNED "STUN IMMUNITY"
+
+A character who is stunned, for instance by the Bash ability, cannot type
+commands or attack. Stuns are usually brief, and when they expire, you become
+temporarily immune to other stuns.
+
+There is also a "stunned" condition for people who are reduced to 0 health.
+Characters will normally recover from this through normal regeneration.
+
+Note: Some scripting NPCs can stun characters even while they have stun
+immunity. This is part of the combat script.
+#
 TAGS "MOB TAGS" TAGGING "MOB TAGGING"
 
 When a player damages a mob, that mob becomes tagged by the player and his or

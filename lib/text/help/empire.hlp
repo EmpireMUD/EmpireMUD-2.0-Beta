@@ -250,13 +250,27 @@ will remove the city center and refund the city point. This helps keep the map
 clean, and you can prevent it by making sure there is at least one building in
 your city.
 
-Types of cities:
- -C1-  Outpost (5)
- -C2-  Village (10)
- -C3-  City (15)
- -C4-  Capital (25)
+See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, PROMINENCE, TECHNOLOGY,
+  TERRITORY, WEALTH
+#
+"CITY TYPES" OUTPOST VILLAGE CAPITAL
 
-See also: CITY COMMANDS, CITY TRAITS, PROMINENCE, TECHNOLOGY, TERRITORY, WEALTH
+There are four sizes of city available. The only difference between them is
+the radius of the city.
+
+ -C1-  Outpost (radius 5)
+ -C2-  Village (radius 10)
+ -C3-  City (radius 15)
+ -C4-  Capital (radius 25)
+
+Some buildings, such as mines, count as in-city territory at a much larger
+radius -- 3x the normal distance from the city center.
+
+You can see the city radius by typing 'toggle political' and looking at the
+background highlight (on the visual map), or you can use the 'mark' command
+to measure distances from the center if you're using a screenreader.
+
+See also: MARK, CITY INFORMATION, CITY COMMANDS
 #
 "CITY LIGHTS"
 
@@ -1025,6 +1039,8 @@ See also: CLAIM, CEDE, ABANDON, UNPUBLICIZE, HOSTILE
 #
 QUARRY
 
+Quarry (Chores ability)
+
 Command:  quarry
 Building:  |__|  Quarry  (Basic Buildings)
 Speed boosts:  Faster Chores bonus, haste
@@ -1039,7 +1055,7 @@ have a quarry.
 
 Quarries count as in-city territory as far away as 3x a city's normal radius.
 
-See also: DEPLETION, DIG
+See also: DEPLETION, DIG, CHORES
 #
 RADIANCE
 
