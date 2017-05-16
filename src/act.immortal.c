@@ -3878,7 +3878,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			msg_to_char(ch, "Contains: %d/%d drinks of %s\r\n", GET_DRINK_CONTAINER_CONTENTS(j), GET_DRINK_CONTAINER_CAPACITY(j), drinks[GET_DRINK_CONTAINER_TYPE(j)]);
 			break;
 		case ITEM_FOOD:
-			msg_to_char(ch, "Fills for: %d hours\r\n", GET_FOOD_HOURS_OF_FULLNESS(j));
+			msg_to_char(ch, "Fills for: %d hour%s\r\n", GET_FOOD_HOURS_OF_FULLNESS(j), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(j)));
 			break;
 		case ITEM_CORPSE:
 			msg_to_char(ch, "Corpse of: ");

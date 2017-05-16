@@ -6119,7 +6119,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 				// if there are no changes, they should have gotten an error message
 				if (misc != change->misc) {
 					change->misc = misc;
-					msg_to_char(ch, "You change resource %d's component to %s.", atoi(arg2), component_string(change->vnum, misc));
+					msg_to_char(ch, "You change resource %d's component to %s.\r\n", atoi(arg2), component_string(change->vnum, misc));
 				}
 			}
 		}

@@ -1459,7 +1459,7 @@ take damage.
 
 See HELP OLC RESOURCES for more information.
 
-See also: BEDIT HITPOINTS, OLC BUILDINGS, MAINTAIN
+See also: BEDIT HITPOINTS, OLC BUILDINGS, MAINTAIN, RESOURCE ACTIONS
 #d
 "BEDIT ROOMS" "BEDIT ROOMS" "BEDIT EXTRA ROOMS"
 
@@ -1754,7 +1754,7 @@ of the used resources, rounded down.
 
 See HELP OLC RESOURCES for more information.
 
-See also: OLC CRAFTS
+See also: OLC CRAFTS, RESOURCE ACTIONS
 #d
 "CEDIT TIME"
 
@@ -5879,7 +5879,7 @@ even 1 year of decay will destroy them.
 
 See HELP OLC RESOURCES for more information.
 
-See also: VEDIT HITPOINTS, OLC VEHICLES, REPAIR
+See also: VEDIT HITPOINTS, OLC VEHICLES, REPAIR, RESOURCE ACTIONS
 #d
 "VEDIT SHORTDESCRIPTION" "VEDIT SHORT DESCRIPTION"
 

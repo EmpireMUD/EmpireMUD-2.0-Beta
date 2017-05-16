@@ -386,7 +386,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			msg_to_char(ch, "Contains %d units of %s.\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), drinks[GET_DRINK_CONTAINER_TYPE(obj)]);
 			break;
 		case ITEM_FOOD:
-			msg_to_char(ch, "Fills for %d hours.\r\n", GET_FOOD_HOURS_OF_FULLNESS(obj));
+			msg_to_char(ch, "Fills for %d hour%s.\r\n", GET_FOOD_HOURS_OF_FULLNESS(obj), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(obj)));
 			break;
 		case ITEM_CORPSE:
 			msg_to_char(ch, "Corpse of ");
@@ -3017,7 +3017,7 @@ void trade_post(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can't set the time for less than 1 hour.\r\n");
 	}
 	else if (length > config_get_int("trading_post_max_hours")) {
-		msg_to_char(ch, "The longest you can set it is %d hours.\r\n", config_get_int("trading_post_max_hours"));
+		msg_to_char(ch, "The longest you can set it is %d hour%s.\r\n", config_get_int("trading_post_max_hours"), PLURAL(config_get_int("trading_post_max_hours")));
 	}
 	else if (!can_afford_coins(ch, GET_LOYALTY(ch), (post_cost = MAX(1, (int)rate_item(obj))))) {
 		msg_to_char(ch, "You need %s to post that.\r\n", money_amount(GET_LOYALTY(ch), post_cost));

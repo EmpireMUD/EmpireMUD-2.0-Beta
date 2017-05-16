@@ -1744,7 +1744,11 @@ ACMD(do_group) {
 	}
 	else if (is_abbrev(buf, "invite")) {
 		skip_spaces(&argument);
-		if (!(vict = get_player_vis(ch, argument, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+		if (GROUP(ch) && GROUP_LEADER(GROUP(ch)) != ch) {
+			msg_to_char(ch, "Only the group's leader can invite members.\r\n");
+			return;
+		}
+		else if (!(vict = get_player_vis(ch, argument, FIND_CHAR_WORLD | FIND_NO_DARK))) {
 			msg_to_char(ch, "Invite whom?\r\n");
 			return;
 		}
@@ -1758,10 +1762,6 @@ ACMD(do_group) {
 		}
 		else if (GROUP(vict)) {
 			msg_to_char(ch, "Your target is already in a group.\r\n");
-			return;
-		}
-		else if (GROUP(ch) && GROUP_LEADER(GROUP(ch)) != ch) {
-			msg_to_char(ch, "Only the group's leader can invite members.\r\n");
 			return;
 		}
 		else if (GROUP(ch) && count_group_members(GROUP(ch)) >= MAX_GROUP_SIZE) {

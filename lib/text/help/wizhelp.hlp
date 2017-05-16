@@ -474,6 +474,8 @@ LOAD is used to create instances of mobs, objects, and vehicles. The first
 argument specifies what type you are trying to load; the second is the virtual
 number. This command is grantable.
 
+(For the mortal command, try LOAD VEHICLE.)
+
 You can load: mob, obj, vehicle
 
 Example:

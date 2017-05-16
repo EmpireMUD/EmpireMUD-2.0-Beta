@@ -349,8 +349,8 @@ When using field  - The variable returns:
 &ccan_afford(amt)&0 - Checks if the actor has enough coins of any converted type.
 &ccan_gain_new_skills&0 - Checks if the character can gain a new skill from 0.
 &ccan_start_quest(vnum)&0 - Whether or not the character can start a quest.
-&ccanbeseen&0 - True if the actor can be seen by the mob (always true 
-   for non-mob triggers).
+&ccanbeseen&0 - True if the actor can be seen by the mob with the script
+   (always true for non-mob triggers).
 &ccancel_adventure_summon&0 - Call this if a script teleports a player around, to
    prevent them from being teleported again if they were adventure-summoned.
 &ccanuseroom_ally(room)&0 - Character can use the room as a member or ally (with
