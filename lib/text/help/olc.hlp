@@ -169,8 +169,8 @@ Crafts (CEDIT):
   craft's requiresobject field. The player will only be able to see and use
   the craft if they have the item in their inventory. You can still also choose
   to require an Ability, for example an armor pattern that requires Armor-
-  smithing. You should consider mentioning the recipe in the recipe item's
-  lookdescription.
+  smithing. You should mention the recipe by name in the item's look
+  description.
 - To make an item that can be combined with another item, for example a spear-
   head that can be crafted into a spear, create a craft and set its requires-
   object to the spearhead (just like a recipe item, above). Then, also set the

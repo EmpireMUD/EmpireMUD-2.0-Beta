@@ -509,7 +509,7 @@ Dodge cap:
 
 See also: AFFECTS, SCORE, TO-HIT
 #
-DOT "DOT EFFECT" "DAMAGE OVER TIME" DAMAGE-OVER-TIME
+DOT "DOT EFFECT" "DAMAGE OVER TIME" DAMAGE-OVER-TIME STACKS STACKING
 
 A DoT (Damage over Time) effect is one that continues to deal damage. These
 come from spells, abilities, scripts, and other sources. They deal damage every
@@ -518,7 +518,8 @@ five seconds until they expire.
 Some DoT effects can stack multiple times. The damage shown on your score or
 affects command is the total damage per 5 seconds (base multiplied by stacks),
 and the number at the end (example: 1/5) is the current and maximum number of
-stacks.
+stacks. If you re-cast a DoT effect before it expires, it will refresh the
+timer and add one to the stack count (up to the maximum).
 
 Physical and poison DoTs can be removed by firstaid and cleanse. Magical and
 fire DoTs can be removed by dispel.

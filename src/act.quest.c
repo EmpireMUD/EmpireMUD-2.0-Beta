@@ -887,7 +887,7 @@ QCMD(qcmd_info) {
 		// title
 		if (pq) {
 			count_quest_tasks(pq, &complete, &total);
-			msg_to_char(ch, "%s%s\t0 (%d/%d tasks)\r\n", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), complete, total);
+			msg_to_char(ch, "%s%s\t0 (%d/%d task%s)\r\n", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), complete, total, PLURAL(total));
 		}
 		else {
 			msg_to_char(ch, "%s%s\t0 (not on quest)\r\n", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
@@ -945,7 +945,7 @@ QCMD(qcmd_list) {
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		count_quest_tasks(pq, &count, &total);
 		if ((proto = quest_proto(pq->vnum))) {
-			size += snprintf(buf + size, sizeof(buf) - size, "  %s%s\t0 (%d/%d tasks%s)\r\n", QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), count, total, QUEST_FLAGGED(proto, QST_DAILY) ? "; daily" : "");
+			size += snprintf(buf + size, sizeof(buf) - size, "  %s%s\t0 (%d/%d task%s%s)\r\n", QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), count, total, PLURAL(total), QUEST_FLAGGED(proto, QST_DAILY) ? "; daily" : "");
 		}
 	}
 	
@@ -1190,9 +1190,14 @@ ACMD(do_quest) {
 	
 	// check pos
 	if (GET_POS(ch) < quest_cmd[type].min_pos) {
-		strcpy(buf, position_types[quest_cmd[type].min_pos]);
-		*buf = LOWER(*buf);	// they are Capitalized
-		msg_to_char(ch, "You need to at least be %s.\r\n", buf);
+		if (FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) {
+			msg_to_char(ch, "You can't do that while fighting!\r\n");
+		}
+		else {
+			strcpy(buf, position_types[quest_cmd[type].min_pos]);
+			*buf = LOWER(*buf);	// they are Capitalized
+			msg_to_char(ch, "You need to at least be %s.\r\n", buf);
+		}
 		return;
 	}
 	

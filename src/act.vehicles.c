@@ -1811,7 +1811,7 @@ ACMD(do_fire) {
 	
 	// find what to fire with
 	else if (!(veh = get_vehicle_in_room_vis(ch, veh_arg)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(veh_arg, VEH_KEYWORDS(veh)))) {
-		msg_to_char(ch, "You don't see %s %s here to fire.\r\n", AN(arg), arg);
+		msg_to_char(ch, "You don't see %s %s here to fire.\r\n", AN(veh_arg), veh_arg);
 	}
 	else if (!VEH_FLAGGED(veh, VEH_SIEGE_WEAPONS)) {
 		act("$V has no siege weapons.", FALSE, ch, NULL, veh, TO_CHAR);
