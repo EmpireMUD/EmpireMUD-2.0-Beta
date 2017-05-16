@@ -4114,7 +4114,12 @@ ACMD(do_esay) {
 			clear_last_act_message(d);
 			
 			sprintf(color, "%s\t%c", EXPLICIT_BANNER_TERMINATOR(e), GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) : '0');
-			sprintf(output, buf, color, color);
+			if (extra_color) {
+				sprintf(output, buf, color, color, color);
+			}
+			else {
+				sprintf(output, buf, color, color);
+			}
 			act(output, FALSE, ch, 0, tch, TO_VICT | TO_SLEEP | TO_NODARK);
 			
 			// channel history
