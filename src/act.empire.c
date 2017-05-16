@@ -3170,7 +3170,12 @@ ACMD(do_diplomacy) {
 	
 	// empire validation
 	else if (!*emp_arg) {
-		msg_to_char(ch, "Which empire would you like to offer %s?\r\n", fname(diplo_option[type].keywords));
+		if (cancel) {
+			msg_to_char(ch, "With which empire would you like to cancel your %s offer?\r\n", fname(diplo_option[type].keywords));
+		}
+		else {
+			msg_to_char(ch, "Which empire would you like to offer %s?\r\n", fname(diplo_option[type].keywords));
+		}
 	}
 	else if (!(vict_emp = get_empire_by_name(emp_arg))) {
 		msg_to_char(ch, "Unknown empire '%s'.\r\n", emp_arg);

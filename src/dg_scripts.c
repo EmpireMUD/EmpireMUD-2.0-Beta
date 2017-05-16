@@ -1651,7 +1651,8 @@ ACMD(do_tdetach) {
 	one_argument(argument, arg3);
 
 	if (!*arg1 || !*arg2) {
-		msg_to_char(ch, "Usage: tdetach <type> <target> <trigger | 'all'>\r\n");
+		msg_to_char(ch, "Usage:  tdetach [mob|obj|vehicle] <target name> <trigger name/vnum | all>\r\n");
+		msg_to_char(ch, "        tdetach room <target vnum | .> <trigger name/vnum | all>\r\n");
 		return;
 	}
 

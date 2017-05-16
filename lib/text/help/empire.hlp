@@ -1247,19 +1247,22 @@ TREE TREES LOGS
 
 Stored at: Lumber Yard
 
-Get a tree using the chop command.
-Get a log using the scrape command.
+Get a tree using the chop command. Get a log using the scrape command.
 
 Trees are found by chopping down forests. They are used in most buildings,
 but you must scrape them first. Forests will regrow if you don't chop down all
 four trees on a tile, and they also spread from overgrown forests to adjacent
 plains. Desert groves are different, and will spring up anywhere in the desert.
 
+Different terrains will yield different types of trees, which in turn have
+their own type of logs and lumber. Not all trees can be scraped or sawed. Try
+looking at the tree; its description might tell you what to do with it.
+
 You can stop the spread of trees by chopping them all down, by building a
 fence, or by laying a road. Chant of Nature can be used to grow trees on bare
 plains.
 
-See also: CHANT OF NATURE, CHOP, BUILD, SCRAPE
+See also: CHANT OF NATURE, CHOP, BUILD, SCRAPE, PILLAR, LUMBER
 #
 TECHNOLOGY TECHNOLOGIES "EMPIRE TECHNOLOGY"
 

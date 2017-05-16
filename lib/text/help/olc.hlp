@@ -4049,9 +4049,9 @@ concurrently.
 
 Only items set TAKE can be picked up off the ground.
 
-Weapons can often by set WIELD and HOLD and used in both positions.
+Weapons can often be set WIELD and HOLD and used in both positions.
 
-Missile weapons and instruments must be set HOLD.
+Missile weapons must be set RANGED and instruments must be set HOLD.
 
 Wear flags:
    TAKE        FINGER        NECK

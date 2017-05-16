@@ -311,7 +311,7 @@ The "chameleon" trait is the property of some buildings to be invisible at a
 distance. Instead of seeing the building and its owner's banner, you see only
 normal terrain.
 #
-CHANNELS SHOUT /OOC /NEWBIE /RECRUIT /TRADE
+CHANNEL CHANNELS SHOUT /OOC /NEWBIE /RECRUIT /TRADE
 
 Usage:  shout <message>
 

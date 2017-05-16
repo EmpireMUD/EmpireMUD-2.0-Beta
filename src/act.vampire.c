@@ -283,7 +283,7 @@ void sire_char(char_data *ch, char_data *victim) {
 
 	act("$N drops limply from your fangs...", FALSE, ch, 0, victim, TO_CHAR);
 	act("$N drops limply from $n's fangs...", FALSE, ch, 0, victim, TO_NOTVICT);
-	act("You fall limply to the ground. In the distance, you think you see a light...", FALSE, ch, 0, victim, TO_VICT);
+	act("You fall to the ground. In the distance, you think you see a light...", FALSE, ch, 0, victim, TO_VICT);
 	
 	if (CAN_GAIN_NEW_SKILLS(victim) && noskill_ok(victim, SKILL_VAMPIRE)) {
 		make_vampire(victim, FALSE);

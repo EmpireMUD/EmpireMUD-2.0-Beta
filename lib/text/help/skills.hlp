@@ -45,7 +45,10 @@ This command allows you to chop trees in the forest. Beware, trees are a
 limited resource. You can chop faster if you are stronger, if your axe deals
 more damage, or if you have haste.
 
-See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW
+Different types of forest give different qualities and quantities of trees.
+Some trees can be scraped, sawed, or lit on fire.
+
+See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW, LIGHT
 #
 "DAILY EXPERIENCE BONUS POINTS" "DAILY SKILLS" "BONUS EXPERIENCE POINTS" "DAILY BONUS EXPERIENCE POINTS"
 
@@ -373,8 +376,10 @@ SAW
 Usage:  saw <item>
 Speed boosts:  Faster Chores bonus, haste
 
-You can saw trees and logs into lumber. You must be in a lumber yard. This
+You can saw most trees and logs into lumber. You must be in a lumber yard. This
 will go faster if you have the Woodworking ability.
+
+Not all types of trees can be sawed.
 
 See also: TREES, LOGS, LUMBER
 #
@@ -383,11 +388,11 @@ SCRAPE
 Usage:  scrape <item>
 Speed boosts:  Faster Chores bonus, haste
 
-This skill is used to process trees into logs.
+This skill is used to process some types of trees into logs.
 
 The Woodworking ability increases how fast you can scrape.
 
-See also: TREES, SAW, WOODWORKING
+See also: TREES, SAW, WOODWORKING, PILLAR
 #
 SHEAR SHEARING
 

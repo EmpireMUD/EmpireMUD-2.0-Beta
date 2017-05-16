@@ -31,16 +31,16 @@ With Advanced Ships you can manufacture:
     Type: Exploration ship (house boat)
     Capacity: 400
     Health: 96
-    Extra rooms: 8
+    Rooms: 8
   Brigantine
     Type: Warship (siege weapons)
     Health: 128
-    Extra rooms: 4
+    Rooms: 4
   Hulk
     Type: Cargo ship (shipping)
     Capacity: 1000
     Health: 64
-    Extra rooms: 4
+    Rooms: 4
 
 See also: SHIPBUILDING, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE
 #
@@ -871,19 +871,19 @@ With basic Shipbuilding you can manufacture:
     Type: Exploration ship (shipping)
     Capacity: 150
     Health: 32
-    Extra rooms: 2
+    Rooms: 2
   Longship
     Type: Warship (siege weapons)
     Health: 64
-    Extra rooms: 2
+    Rooms: 2
   Cog
     Type: Cargo ship (shipping)
     Capacity: 450
     Health: 32
-    Extra rooms: 1
+    Rooms: 1
 
 See also: CRAFT INFO, ADVANCED SHIPS, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS,
-   UPGRADE, RESOURCES, KEEP
+   UPGRADE, RESOURCES, KEEP, SCRAP, VEHICLE
 #
 SIEGEWORKS "SIEGE WORKS"
 

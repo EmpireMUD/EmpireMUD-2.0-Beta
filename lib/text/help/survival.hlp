@@ -21,10 +21,6 @@ Butcher (Survival ability)
 Usage:  butcher <corpse>
 
 With a little practice, you can butcher a corpse into smaller cuts of meat.
-If you butcher a corpse on the ground, its contents will end up on the ground.
-If you butcher one in your inventory, you will have its contents in your
-inventory.
-
 This ability can fail at low skill levels, giving you less meat (or none).
 
 Gains experience when you butcher something.
