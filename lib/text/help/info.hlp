@@ -482,6 +482,11 @@ Helpful hint: Set an alias to display your favorite set of info.
 
 See also: ALIAS, PROMPT
 #
+DISTRACTED
+
+When a character is distracted, he or she can't perform timed actions such as
+chopping or chanting.
+#
 DODGE "DODGE CAP"
 
 Your Dodge rating, shown on 'score', determines how much To-Hit your opponent

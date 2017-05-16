@@ -95,8 +95,8 @@ See also: GRANT, SET
 #d
 CONFIG
 
-Usage:  config <set> [-v]
-        config <set> <key> [value]
+Usage:  config <type> [-v]
+        config <type> <key> [value]
 
 This privileged command controls many global game configurations. You can get
 view explanations for the configs using the -v option with any set of configs.
