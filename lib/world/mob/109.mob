@@ -36,12 +36,23 @@ I 4 10919 7.69 1 g  # LOOT: a crimson dragon girdle
 I 4 10920 7.70 1 g  # LOOT: a burning dragonsteel waistband
 I 4 10921 7.70 1 g  # LOOT: a flaming draconic cincture
 I 4 10922 7.70 1 g  # LOOT: a burning dragoncloth sash
+M
+0
+$n coils around her hoard.~
+M
+0
+Wisps of smoke trail from $n's nostrils.~
+M
+0
+$n picks a scorched tower shield out of her teeth.~
+M
+0
+The cave shakes as $n grumbles something that sounds like 'vivor'.~
 T 10905
 T 10906
 T 10908
 T 10915
 T 10919
-T 10907
 T 10909
 S
 #10901
@@ -82,9 +93,20 @@ I 4 10902 25.00 3 s  # LOOT: a red dragon hide
 I 4 10902 25.00 4 s  # LOOT: a red dragon hide
 I 4 10006 75.00 1 t  # LOOT: a dragon scale
 I 4 10006 25.00 2 t  # LOOT: a dragon scale
+M
+1
+Mama said there'd be dragons like this...~
+M
+0
+$n mumbles, 'I just don't think I was cut out to do the fighting part.'~
+M
+0
+$n polishes some tokens with an oil cloth.~
+M
+0
+$n proudly shows you a list of dragons whose deaths he has been partially responsible for.~
 T 10910
 T 10908
-T 10912
 T 10911
 T 10909
 S

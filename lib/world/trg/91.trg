@@ -32,6 +32,7 @@ remote last_phrase %self.id%
 Great Horned Owl Animation~
 0 bw 3
 ~
+* This script is no longer used. It was replaced by custom strings.
 * Great Horned Owl Animation (9133)
 if (%random.2% == 1)
   %echo% %self.name% hoots loudly.
@@ -43,6 +44,7 @@ end
 Songbird Animation~
 0 bw 3
 ~
+* This script is no longer used. It was replaced by custom strings.
 * songbird Animation (9148)
 * Works for 148 and 149
 eval room %self.room%
@@ -54,6 +56,7 @@ end
 woodpecker animation~
 0 bw 3
 ~
+* This script is no longer used. It was replaced by custom strings.
 * Woodpecker Animation (9150)
 eval room %self.room%
 if ((%room.sector% /= Forest) || (%room.sector% /= Orchard))

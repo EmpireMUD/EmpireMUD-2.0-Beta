@@ -310,6 +310,7 @@ end
 Donkey Animation~
 0 bw 3
 ~
+* This script is no longer used. It was replaced by custom strings.
 * Donkey Animation (9021)
 %echo% %self.name% brays loudly.
 ~
@@ -317,6 +318,7 @@ Donkey Animation~
 Black Cat Animation~
 0 bw 3
 ~
+* This script is no longer used. It was replaced by custom strings.
 * Black Cat Animation (9022)
 switch (%random.3%)
   case 1
@@ -345,6 +347,7 @@ done
 Eagle Animation~
 0 bw 3
 ~
+* This script is no longer used. It was replaced by custom strings.
 * Eagle Animation (9025)
 eval room %self.room%
 if (%room.sector% == River)
@@ -469,6 +472,7 @@ end
 Horse Animation~
 0 bw 3
 ~
+* This script is no longer used. It was replaced by custom strings.
 * Horse Animation (9034)
 switch (%random.3%)
   case 1

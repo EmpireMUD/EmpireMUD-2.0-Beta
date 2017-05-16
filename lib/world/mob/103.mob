@@ -20,8 +20,19 @@ I 4 10304 19.00 1 a  # LOOT: the dragon's breath charm
 I 4 10305 19.00 1 a  # LOOT: the dragon's ferocity charm
 I 4 10306 19.00 1 a  # LOOT: the dragon's courage charm
 I 4 10307 19.00 1 a  # LOOT: the dragon's wind charm
+M
+0
+$n spurts fire into the air.~
+M
+0
+$n curls up and begins puffing clouds of smoke.~
+M
+0
+$n hunkers down and starts coughing out bits of ash.~
+M
+0
+$n coughs up some charred bone fragments.~
 T 10300
-T 10304
 T 10303
 T 10302
 S

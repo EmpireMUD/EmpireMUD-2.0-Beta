@@ -269,7 +269,18 @@ gossiper #n~
 I 4 2015 40.00 1  # LOOT: a tunic
 I 4 2021 40.00 1  # LOOT: a cloth mantle
 I 4 2023 40.00 1  # LOOT: fine cloth gloves
-T 10030
+M
+1
+I visited the Tower Skycleave and all I got was this skystone!~
+M
+1
+Have you heard about this traveling sorcery tower?~
+M
+1
+I swear that Skycleave barista re-heated my coffee with a wand.~
+M
+1
+I can't believe the Tower Skycleave is finally here!~
 S
 #10031
 page bustling~
@@ -281,7 +292,18 @@ A page is bustling past you.
 I 4 10036 100.00 1  # LOOT: a small skystone
 I 4 10043 10.00 1 X  # LOOT: page robes
 I 4 10042 10.00 1 X  # LOOT: bustling shoes
-T 10031
+M
+1
+Gosh, let's see, I found the skystones for Celiya and that old book for Barrosh. Now where did I put the breakers for the Grand High Sorcerer?~
+M
+0
+$n looks like $e's in a hurry.~
+M
+1
+Oh, muggle forks! I've ripped another shoe. Oh, well. Cobbellus!~
+M
+0
+$n vanishes briefly and then reappears with an armful of scrolls.~
 T 10046
 S
 #10032
@@ -355,10 +377,21 @@ The goblin wrangler snaps his whip at a cage.
 ~
 50 70 bdvxA 0
 1 0 0 7
+I 4 10036 100.00 1  # LOOT: a small skystone
 I 4 10047 10.00 1 X  # LOOT: goblin wrangler pants
 I 4 10046 10.00 1 X  # LOOT: a goblin wrangler whip
-I 4 10036 100.00 1  # LOOT: a small skystone
-T 10038
+M
+0
+$n adjusts $s wrangler pants.~
+M
+1
+We've got a real wild crop of goblins this time.~
+M
+0
+$n wraps $s whip around the light fixture and swings back and forth across the room.~
+M
+1
+Sometimes I worry we'll have too many goblins to control.~
 T 10039
 S
 #10039
@@ -461,10 +494,12 @@ A huge otherworlder is chained to the floor!
 ~
 50 90 bdyz 0
 1 0 0 5
+I 4 10036 100.00 1  # LOOT: a small skystone
 I 4 10060 10.00 1 X  # LOOT: the otherworlder's wristbands
 I 4 10059 10.00 1 X  # LOOT: the otherworlder's gauntlet
-I 4 10036 100.00 1  # LOOT: a small skystone
-T 10049
+M
+0
+$n pulls at its chains and lets out a shout.~
 T 10050
 S
 #10048
@@ -509,10 +544,18 @@ An escaped experiment is running past you!
 ~
 30 100 dy 0
 0 0 0 15
+I 4 10036 100.00 1  # LOOT: a small skystone
 I 4 10077 50.00 1 X  # LOOT: experimental handwraps
 I 4 10078 50.00 1 X  # LOOT: an experimental aura
-I 4 10036 100.00 1  # LOOT: a small skystone
-T 10064
+M
+0
+$n flickers, as if $e isn't real!~
+M
+0
+$n seems to be growing...~
+M
+0
+$n seems to be growing spikes.~
 T 10065
 S
 #10052
