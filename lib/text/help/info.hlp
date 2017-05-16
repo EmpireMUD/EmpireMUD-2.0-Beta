@@ -839,6 +839,9 @@ If you have the Navigation ability, this will also include the location.
 
 You can specify what type of thing to look (cities, adventures, starting
 locations) if you want a shorter list.
+
+Certain adventures won't show up on 'nearby', usually because of the
+adventure's design.
 #
 PLAYERKILLING "PLAYER KILLING" PK PVP "TOGGLE PVP"
 

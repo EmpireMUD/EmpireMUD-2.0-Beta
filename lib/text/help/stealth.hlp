@@ -251,7 +251,9 @@ not remove items you see in their inventories, only "pocket items". The result
 is largely random but often includes coins. Each NPC can only be pickpocketed
 once.
 
-Pickpocketing citizens of another empire counts as an act of hostility.
+Pickpocketing citizens of another empire counts as an act of hostility. Any
+empire coins you receive from pickpocketing came from the empire's treasury,
+including when you pickpocket your own citizens.
 
 NPCs more than 50 levels above you will always catch you if you try to
 pickpocket them.
