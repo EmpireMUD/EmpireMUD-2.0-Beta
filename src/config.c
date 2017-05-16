@@ -1835,8 +1835,8 @@ ACMD(do_config) {
 	
 	// no set provided, or invalid set?
 	if (!*setarg || (set = search_block(setarg, config_groups, FALSE)) == NOTHING) {
-		msg_to_char(ch, "Usage: config <set [-v]> [key] [value]\r\n");
-		msg_to_char(ch, "Valid sets:");
+		msg_to_char(ch, "Usage: config <type [-v]> [key] [value]\r\n");
+		msg_to_char(ch, "Valid types:");
 		for (iter = 0; *config_groups[iter] != '\n'; ++iter) {
 			msg_to_char(ch, "%s%s", (iter > 0 ? ", " : " "), config_groups[iter]);
 		}

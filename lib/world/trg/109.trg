@@ -228,6 +228,7 @@ end
 Colossal Red Dragon environmental~
 0 bw 10
 ~
+* This script is no longer used. It was replaced by custom strings.
 if %self.fighting%
   halt
 end
@@ -408,6 +409,7 @@ end
 Sir Vivor environmental~
 0 bw 10
 ~
+* This script is no longer used. It was replaced by custom strings.
 if %self.fighting%
   halt
 end

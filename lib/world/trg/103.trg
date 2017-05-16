@@ -65,6 +65,7 @@ end
 Flame Dragon environmental~
 0 bw 5
 ~
+* This script is no longer used. It was replaced by custom strings.
 if (%self.fighting% || %self.disabled%)
   halt
 end

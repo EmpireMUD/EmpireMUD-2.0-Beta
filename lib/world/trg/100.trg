@@ -409,6 +409,7 @@ eval person %self.people%
 Gossipers~
 0 bw 10
 ~
+* This script is no longer used. It was replaced by custom strings.
 switch %random.4%
   case 1
     say I visited the Tower Skycleave and all I got was this skystone!
@@ -428,6 +429,7 @@ done
 Bustling Page~
 0 bw 10
 ~
+* This script is no longer used. It was replaced by custom strings.
 switch %random.4%
   case 1
     say Gosh, let's see, I found the skystones for Celiya and that old book for Barrosh. Now where did I put the breakers for the Grand High Sorcerer?
@@ -670,6 +672,7 @@ nop %charge%
 Goblin Wrangler passive~
 0 bw 5
 ~
+* This script is no longer used. It was replaced by custom strings.
 switch %random.4%
   case 1
     %echo% %self.name% adjusts %self.hisher% wrangler pants.
@@ -988,6 +991,7 @@ remote msg_pos %self.id%
 Otherworlder prisoner passive~
 0 bw 5
 ~
+* This script is no longer used. It was replaced by custom strings.
 %echo% %self.name% pulls at its chains and lets out a shout.
 ~
 #10050
@@ -1366,6 +1370,7 @@ nop %charge%
 Escaped experiment passive~
 0 bw 5
 ~
+* This script is no longer used. It was replaced by custom strings.
 switch %random.3%
   case 1
     %echo% %self.name% flickers, as if %self.heshe% isn't real!

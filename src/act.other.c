@@ -1282,6 +1282,15 @@ ACMD(do_alternate) {
 	else if (!str_cmp(arg, "import")) {
 		do_alt_import(ch, argument);
 	}
+	else if (IN_HOSTILE_TERRITORY(ch)) {
+		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
+	}
+	else if (GET_POS(ch) < POS_RESTING) {
+		msg_to_char(ch, "You can't alternate right now.\r\n");
+	}
+	else if (GET_POS(ch) == POS_FIGHTING || FIGHTING(ch)) {
+		msg_to_char(ch, "You can't switch characters while fighting!\r\n");
+	}
 	else if (ch->desc->str) {
 		msg_to_char(ch, "You can't alternate while editing text (use ,/save or ,/abort first).\r\n");
 	}
@@ -1291,14 +1300,8 @@ ACMD(do_alternate) {
 	else if (GET_OLC_TYPE(ch->desc) != 0) {
 		msg_to_char(ch, "You can't alternate with an editor open (use .save or .abort first).\r\n");
 	}
-	else if (IN_HOSTILE_TERRITORY(ch)) {
-		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
-	}
 	else if (get_cooldown_time(ch, COOLDOWN_PVP_QUIT_TIMER) > 0 && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't alternate so soon after fighting!\r\n");
-	}
-	else if (GET_POS(ch) == POS_FIGHTING || FIGHTING(ch)) {
-		msg_to_char(ch, "You can't switch characters while fighting!\r\n");
 	}
 	else if (!(index = find_player_index_by_name(arg))) {
 		msg_to_char(ch, "Unknown character.\r\n");
@@ -1741,7 +1744,11 @@ ACMD(do_group) {
 	}
 	else if (is_abbrev(buf, "invite")) {
 		skip_spaces(&argument);
-		if (!(vict = get_player_vis(ch, argument, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+		if (GROUP(ch) && GROUP_LEADER(GROUP(ch)) != ch) {
+			msg_to_char(ch, "Only the group's leader can invite members.\r\n");
+			return;
+		}
+		else if (!(vict = get_player_vis(ch, argument, FIND_CHAR_WORLD | FIND_NO_DARK))) {
 			msg_to_char(ch, "Invite whom?\r\n");
 			return;
 		}
@@ -1755,10 +1762,6 @@ ACMD(do_group) {
 		}
 		else if (GROUP(vict)) {
 			msg_to_char(ch, "Your target is already in a group.\r\n");
-			return;
-		}
-		else if (GROUP(ch) && GROUP_LEADER(GROUP(ch)) != ch) {
-			msg_to_char(ch, "Only the group's leader can invite members.\r\n");
 			return;
 		}
 		else if (GROUP(ch) && count_group_members(GROUP(ch)) >= MAX_GROUP_SIZE) {

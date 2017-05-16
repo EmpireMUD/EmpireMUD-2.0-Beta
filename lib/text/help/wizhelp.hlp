@@ -95,8 +95,8 @@ See also: GRANT, SET
 #d
 CONFIG
 
-Usage:  config <set> [-v]
-        config <set> <key> [value]
+Usage:  config <type> [-v]
+        config <type> <key> [value]
 
 This privileged command controls many global game configurations. You can get
 view explanations for the configs using the -v option with any set of configs.
@@ -473,6 +473,8 @@ Usage:  load <type> <virtual number>
 LOAD is used to create instances of mobs, objects, and vehicles. The first
 argument specifies what type you are trying to load; the second is the virtual
 number. This command is grantable.
+
+(For the mortal command, try LOAD VEHICLE.)
 
 You can load: mob, obj, vehicle
 

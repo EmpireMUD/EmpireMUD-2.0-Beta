@@ -54,6 +54,7 @@ OLC_MODULE(abiledit_name);
 
 // adventure zone modules
 OLC_MODULE(advedit_author);
+OLC_MODULE(advedit_cascade);
 OLC_MODULE(advedit_description);
 OLC_MODULE(advedit_endvnum);
 OLC_MODULE(advedit_flags);
@@ -66,6 +67,7 @@ OLC_MODULE(advedit_playerlimit);
 OLC_MODULE(advedit_reset);
 OLC_MODULE(advedit_script);
 OLC_MODULE(advedit_startvnum);
+OLC_MODULE(advedit_uncascade);
 
 // archetype modules
 OLC_MODULE(archedit_attribute);
@@ -502,6 +504,10 @@ const struct olc_command_data olc_data[] = {
 	{ "reset", advedit_reset, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "script", advedit_script, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "startvnum", advedit_startvnum, OLC_ADVENTURE, OLC_CF_EDITOR },
+	
+	// adventures: special
+	{ "cascade", advedit_cascade, OLC_ADVENTURE, NOBITS },
+	{ "uncascade", advedit_uncascade, OLC_ADVENTURE, NOBITS },
 	
 	// archetypes
 	{ "attribute", archedit_attribute, OLC_ARCHETYPE, OLC_CF_EDITOR },
@@ -6113,7 +6119,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 				// if there are no changes, they should have gotten an error message
 				if (misc != change->misc) {
 					change->misc = misc;
-					msg_to_char(ch, "You change resource %d's component to %s.", atoi(arg2), component_string(change->vnum, misc));
+					msg_to_char(ch, "You change resource %d's component to %s.\r\n", atoi(arg2), component_string(change->vnum, misc));
 				}
 			}
 		}

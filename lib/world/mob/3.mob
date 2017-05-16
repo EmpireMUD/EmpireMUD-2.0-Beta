@@ -11,6 +11,15 @@ I 4 175 100.00 4  # LOOT: an iron ingot
 I 4 175 75.00 2  # LOOT: an iron ingot
 I 4 175 50.00 2  # LOOT: an iron ingot
 I 4 175 50.00 2  # LOOT: an iron ingot
+M
+0
+$n neighs loudly.~
+M
+0
+$n stomps $s hoof.~
+M
+0
+$n's ears prick forward as though listening for danger...~
 S
 #301
 warunicorn unicorn armored~
@@ -96,7 +105,9 @@ I 4 175 100.00 4  # LOOT: an iron ingot
 I 4 175 75.00 2  # LOOT: an iron ingot
 I 4 175 50.00 2  # LOOT: an iron ingot
 I 4 175 50.00 2  # LOOT: an iron ingot
-T 9021
+M
+0
+$n brays loudly.~
 S
 #306
 warox war ox armored~

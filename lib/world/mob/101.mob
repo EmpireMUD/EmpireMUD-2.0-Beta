@@ -10,7 +10,18 @@ I 4 10101 5.00 1 X  # LOOT: the hag's stench
 I 4 10102 5.00 1 X  # LOOT: the hag's stench
 I 4 10103 5.00 1 X  # LOOT: the hag's stench
 I 4 10104 5.00 1 X  # LOOT: a fistful of firebird feathers
-T 10101
+M
+0
+$n rocks in $s chair.~
+M
+0
+$n grinds a pile of bones using a huge mortar and pestle.~
+M
+0
+$n plucks out one of $s eyes, cleans it on $s shirt, then pops it back in.~
+M
+0
+$n gurgles the words, 'Something wicked this way is.'~
 T 10102
 T 10103
 S

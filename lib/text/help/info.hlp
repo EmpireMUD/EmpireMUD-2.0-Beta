@@ -300,7 +300,7 @@ See also: SCORE
 You can create a cooking fire by lighting a tree or log, using a flint set.
 This will let you cook food, brew potions, or craft pottery.
 
-You can also cook in a Kitchen, Alchemist, Pottery, or Laboratory. If you have
+You can also cook in a Kitchen, Alchemist, Potter, or Laboratory. If you have
 the Touch of Flame ability, you don't need a fire at all.
 
 See also: DOUSE, LIGHT, TOUCH OF FLAME
@@ -325,7 +325,7 @@ The following channels are available on EmpireMUD:
 
 Global channels:
 &Y/ooc&0 - General chat
-&g/newbie&0 - Newbie channel
+&j/newbie&0 - Newbie channel
 &R/recruit&0 - Empire recruitment channel
 &o/trade&0 - Global trade channel
 &yshout&0 - an in-character channel limited to 50 map tiles distance
@@ -419,6 +419,7 @@ The 'keep' command can be used to prevent items in your inventory from being
 used for your craft and building commands.
 
 See also: BUILD, CRAFT, DISMANTLE, FORGE, IDENTIFY, KEEP, COMPONENT TYPES
+  RESOURCE ACTIONS
 #
 COOLDOWNS "COOL DOWNS" CD
 
@@ -482,6 +483,11 @@ Helpful hint: Set an alias to display your favorite set of info.
 
 See also: ALIAS, PROMPT
 #
+DISTRACTED
+
+When a character is distracted, he or she can't perform timed actions such as
+chopping or chanting.
+#
 DODGE "DODGE CAP"
 
 Your Dodge rating, shown on 'score', determines how much To-Hit your opponent
@@ -544,7 +550,7 @@ Temperate crops (plains):
  &gxgxx&0  Grapes              &g::::&0  Hops                 &Tiiii&0  Oats
  &Y^o^^&0  Peaches             &G....&0  Peas                 &g^^&vo&g^&0  Plums
  &gnnnn&0  Potatoes            &gn&Rv&gnn&0  Strawberries         &Ro&g88&Ro&0  Tomatoes
- &Y;;;;&0  Wheat
+ &Y;;;;&0  Wheat               &G@@@@&0  Lettuce
 
 Arid crops (desert):
  &y.&g/&to&y.&0  Coconuts            &0::::&0  Cotton               &Y.&G^o&G.&0  Olives
@@ -833,6 +839,20 @@ If you have the Navigation ability, this will also include the location.
 
 You can specify what type of thing to look (cities, adventures, starting
 locations) if you want a shorter list.
+
+Certain adventures won't show up on 'nearby', usually because of the
+adventure's design.
+#
+"NEWBIE ISLANDS"
+
+Newbie islands are a safe place for newbies to learn and practice the game.
+Depending on the settings for this EmpireMUD, some of the following things
+may happen on newbie islands:
+- Empires lose most claimed land on a newbie island after a week.
+- The map returns to its natural state each week on the newbie island.
+- Hostile mobs like the highwayman won't attack you on a newbie island.
+
+See also: INFO, GETTING STARTED
 #
 PLAYERKILLING "PLAYER KILLING" PK PVP "TOGGLE PVP"
 

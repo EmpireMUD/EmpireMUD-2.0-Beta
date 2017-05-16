@@ -21,6 +21,7 @@ done
 Swamp Hag passive~
 0 bw 5
 ~
+* This script is no longer used. It was replaced by custom strings.
 switch %random.4%
   case 1
     %echo% %self.name% rocks in %self.hisher% chair.

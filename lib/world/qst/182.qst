@@ -11,16 +11,45 @@ building a guildhall. The Superintendant grants you membership and you may now
 take on guild quests. Look around the guildhall for tasks you can perform to
 ingratiate yourself with the guild.
 ~
-4 0 0 0 -1
+5 0 0 0 -1
 A
 1 18212
 P
-17 18200 0 5
+6 18201 0 1 a
+P
+17 18200 0 5 a
 R
 7 18200 20
 T 18217
 W
-7 18216 0 1
+17 18200 0 5 a
+W
+7 18216 0 1 a
+Z
+1 18219
+S
+#18201
+Here to Sign Up~
+   The superintendant looks up at you, stands up from his desk, and claps you
+on the shoulders with both hands. 'Here to sign up? ' he asks, jovially. 'All
+members of the empire are welcome here, whether you're a ratcatcher or a... 
+Dragoncatcher, I suppose!'
+~
+You sign your name to the guild roster.
+~
+6 f 0 0 -1
+A
+1 18219
+P
+6 18200 0 1 a
+P
+17 18200 0 5 a
+R
+7 18200 20
+W
+17 18200 0 5 a
+W
+7 18216 0 1 a
 Z
 1 18219
 S

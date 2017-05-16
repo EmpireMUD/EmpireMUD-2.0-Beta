@@ -107,6 +107,11 @@ void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_
 		return;
 	}
 	
+	if (max_len > MAX_STRING_LENGTH) {
+		log("SYSERR: start_string_editor called with max length %zu (cap is %d)", max_len, MAX_STRING_LENGTH);
+		max_len = MAX_STRING_LENGTH;
+	}
+	
 	d->str = writeto;
 	d->max_str = max_len;
 	d->str_on_abort = NULL;
@@ -454,13 +459,18 @@ void paginate_string(char *str, descriptor_data *d) {
 
 /* The call that gets the paging ball rolling... */
 void page_string(descriptor_data *d, char *str, int keep_internal) {
+	int length;
+	
 	if (!d)
 		return;
 
 	if (!str || !*str)
 		return;
 
-	if (d->character && PRF_FLAGGED(d->character, PRF_SCROLLING) && strlen(str) < MAX_STRING_LENGTH) {
+	// determine if it will be too long after parsing color codes
+	length = strlen(str) + (color_code_length(str) * 3);
+
+	if (d->character && PRF_FLAGGED(d->character, PRF_SCROLLING) && length < MAX_STRING_LENGTH) {
 		send_to_char(str, d->character);
 		return;
 	}
@@ -651,7 +661,8 @@ void parse_action(int command, char *string, descriptor_data *d) {
 	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
 	extern int format_script(descriptor_data *d);
 	extern int replace_str(char **string, char *pattern, char *replacement, int rep_all, unsigned int max_size);
-
+	
+	char buf[MAX_STRING_LENGTH * 3];	// should be big enough
 	int indent = 0, rep_all = 0, flags = 0, replaced, i, line_low, line_high, j = 0;
 	unsigned int total_len;
 	char *s, *t, temp;
@@ -835,14 +846,17 @@ void parse_action(int command, char *string, descriptor_data *d) {
 					total_len++;
 					s++;
 				}
-			if (s) {
-				temp = *s;
-				*s = '\0';
-				strcat(buf, t);
-				*s = temp;
+			if (strlen(buf) + strlen(t) < sizeof(buf)) {
+				if (s) {
+					temp = *s;
+					*s = '\0';
+					strcat(buf, t);
+					*s = temp;
+				}
+				else {
+					strcat(buf, t);
+				}
 			}
-			else
-				strcat(buf, t);
 			sprintf(buf + strlen(buf), "\r\n%d line%sshown.\r\n", total_len, total_len != 1 ? "s " : " ");
 			page_string(d, (command == PARSE_LIST_COLOR) ? buf : show_color_codes(buf), TRUE);
 			break;
@@ -893,19 +907,26 @@ void parse_action(int command, char *string, descriptor_data *d) {
 					s++;
 					temp = *s;
 					*s = '\0';
-					sprintf(buf, "%s%4d:\r\n", buf, (i-1));
-					strcat(buf, t);
+					if (strlen(buf) + 7 < sizeof(buf)) {
+						sprintf(buf + strlen(buf), "%4d:\r\n", (i-1));
+					}
+					if (strlen(buf) + strlen(t) < sizeof(buf)) {
+						strcat(buf, t);
+					}
 					*s = temp;
 					t = s;
 				}
-			if (s && t) {
-				temp = *s;
-				*s = '\0';
-				strcat(buf, t);
-				*s = temp;
+			if (strlen(buf) + strlen(t) < sizeof(buf)) {
+				if (s && t) {
+					temp = *s;
+					*s = '\0';
+					strcat(buf, t);
+					*s = temp;
+				}
+				else if (t) {
+					strcat(buf, t);
+				}
 			}
-			else if (t)
-				strcat(buf, t);
 
 			page_string(d, show_color_codes(buf), TRUE);
 			break;

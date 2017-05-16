@@ -1654,7 +1654,7 @@ ACMD(do_land) {
 
 ACMD(do_move) {
 	extern int get_north_for_char(char_data *ch);
-	extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
+	extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 	
 	// this blocks normal moves but not flee
 	if (is_fighting(ch)) {

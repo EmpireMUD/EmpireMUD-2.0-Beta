@@ -321,7 +321,9 @@ A grey donkey is standing here.
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 3 305 100.00 1 X  # BARDE: a wardonkey
-T 9021
+M
+0
+$n brays loudly.~
 S
 #9022
 cat black~
@@ -331,6 +333,15 @@ A black cat is cleaning itself.
 5 15 djoz c
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+M
+0
+$n leaps from the shadows and dashes across your path!~
+M
+0
+$n meows.~
+M
+0
+$n walks in circles around you, rubbing against your leg and purring.~
 T 9002
 S
 #9023
@@ -360,6 +371,15 @@ A majestic eagle is soaring overhead.
 5 15 djoz m
 0 0 2 10
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+M
+0
+$n suddenly dives, then takes off again, a rabbit in $s talons.~
+M
+0
+$n suddenly dives, then takes off again, a mouse in $s talons.~
+M
+0
+$n suddenly dives, then takes off again, a squirrel in $s talons.~
 S
 #9026
 camel lumbering~
@@ -414,6 +434,15 @@ A brown horse is standing here.
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 3 300 100.00 1 X  # BARDE: an armored warhorse
+M
+0
+$n neighs loudly.~
+M
+0
+$n stomps $s hoof.~
+M
+0
+$n's ears prick forward as though listening for danger...~
 S
 #9034
 horse paint pinto brown white~
@@ -425,6 +454,15 @@ A brown and white paint horse is standing here.
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 3 300 100.00 1 X  # BARDE: an armored warhorse
+M
+0
+$n neighs loudly.~
+M
+0
+$n stomps $s hoof.~
+M
+0
+$n's ears prick forward as though listening for danger...~
 S
 #9035
 horse blue roan~
@@ -436,6 +474,15 @@ A blue roan horse is standing here.
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 3 300 100.00 1 X  # BARDE: an armored warhorse
+M
+0
+$n neighs loudly.~
+M
+0
+$n stomps $s hoof.~
+M
+0
+$n's ears prick forward as though listening for danger...~
 S
 #9036
 horse appaloosa apaloosa spotted~
@@ -447,6 +494,15 @@ A spotted appaloosa horse is standing here.
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 3 300 100.00 1 X  # BARDE: an armored warhorse
+M
+0
+$n neighs loudly.~
+M
+0
+$n stomps $s hoof.~
+M
+0
+$n's ears prick forward as though listening for danger...~
 S
 #9037
 horse palomino golden~
@@ -458,6 +514,15 @@ A golden palomino horse is standing here.
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 3 300 100.00 1 X  # BARDE: an armored warhorse
+M
+0
+$n neighs loudly.~
+M
+0
+$n stomps $s hoof.~
+M
+0
+$n's ears prick forward as though listening for danger...~
 S
 #9038
 horse chestnut stunning~
@@ -469,6 +534,15 @@ A stunning chestnut horse is standing here.
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 3 300 100.00 1 X  # BARDE: an armored warhorse
+M
+0
+$n neighs loudly.~
+M
+0
+$n stomps $s hoof.~
+M
+0
+$n's ears prick forward as though listening for danger...~
 S
 #9039
 horse bay tall~
@@ -480,6 +554,15 @@ A tall bay horse is standing here.
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 3 300 100.00 1 X  # BARDE: an armored warhorse
+M
+0
+$n neighs loudly.~
+M
+0
+$n stomps $s hoof.~
+M
+0
+$n's ears prick forward as though listening for danger...~
 S
 #9040
 unicorn majestic white~

@@ -3654,12 +3654,12 @@ char *reverse_strstr(char *haystack, char *needle) {
 * @return char* The string with color codes shown.
 */
 char *show_color_codes(char *string) {
-	static char value[MAX_STRING_LENGTH];
+	static char value[MAX_STRING_LENGTH * 3];	// reserve extra space
 	char *ptr;
 	
 	ptr = str_replace("&", "\t&", string);
-	strncpy(value, ptr, MAX_STRING_LENGTH);
-	value[MAX_STRING_LENGTH-1] = '\0';	// safety
+	strncpy(value, ptr, sizeof(value));
+	value[sizeof(value)-1] = '\0';	// safety
 	free(ptr);
 	
 	return value;

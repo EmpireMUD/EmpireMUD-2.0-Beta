@@ -853,10 +853,10 @@ Typing "ignore" with no argument will list who you're ignoring. You can't
 choose to ignore an immortal player, and immortals cannot use the ignore
 feature at all.
 #
-INFO POLICY VERSION
+INFO POLICY VERSION RULES
 
-These commands show you important information about EmpireMUD. It is a good
-idea to read them every once in a while.
+Type these commands to see you important information about EmpireMUD. It is a
+good idea to read them every once in a while.
 
    info     - quickstart information for new players
    policy   - policies and rules
@@ -878,7 +878,7 @@ checks the stored items there.
 You can also search your inventory by keyword, or use the following flags:
   &c-i&0 - Identify items (e.g. levels).
   &c-k&0 - Only show items marked (keep).
-  &c-k&0 - Omit items marked (keep).
+  &c-n&0 - Omit items marked (keep).
   &c-c&0 - Show items of component type (e.g. 'lumber', 'large, single block').
   &c-w&0 - Show items which can be worn in a given slot (e.g. 'finger').
   &c-t&0 - Show items of a given type (e.g. 'weapon').

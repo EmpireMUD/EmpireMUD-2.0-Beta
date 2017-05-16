@@ -38,7 +38,7 @@ extern const char *action_bits[];
 extern const char *affected_bits[];
 extern const char *affect_types[];
 extern const char *alt_dirs[];
-extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
+extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
 extern const char *drinks[];
 extern const char *extra_bits[];
@@ -1212,7 +1212,7 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 		if (cmd_list->cmd)
 			len += snprintf(sb + len, sizeof(sb)-len, "%s\r\n", show_color_codes(cmd_list->cmd));
 
-		if (len>MAX_STRING_LENGTH-80) {
+		if (len > MAX_CMD_LENGTH) {
 			len += snprintf(sb + len, sizeof(sb)-len, "*** Overflow - script too long! ***\r\n");
 			break;
 		}
@@ -3983,7 +3983,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'c': {	// room.c*
-					if (!str_cmp(field, "complete")) {
+					if (!str_cmp(field, "can_build")) {
+						extern const char *bld_on_flags[];
+						
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, bld_on_flags, FALSE);
+							if (pos != NOTHING) {
+								snprintf(str, slen, "%d", IS_SET(GET_SECT_BUILD_FLAGS(SECT(r)), BIT(pos)) ? 1 : 0);
+							}
+							else {
+								snprintf(str, slen, "0");
+							}
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
+					else if (!str_cmp(field, "complete")) {
 						snprintf(str, slen, "%d", IS_COMPLETE(r) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "contents")) {

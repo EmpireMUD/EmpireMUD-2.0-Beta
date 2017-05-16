@@ -140,6 +140,7 @@ When using field - The variable returns:
    is facing (compared to North). Returns the same dir if no building.
 &cbld_flagged(AFF)&0 - True if the room has a building flag on it.
 &cbuilding&0 - The name of the building on the room, if any.
+&ccan_build(FLAG)&0 - True if the room has the given build flags.
 &ccomplete&0 - True if the room/building is complete (finished building).
 &ccontents&0 - The id of the first obj in the room.
 &ccoords&0 - The (x, y) location of the room on the map.
@@ -169,7 +170,8 @@ When using field - The variable returns:
 &cvnum&0 - The room's vnum.
 &cweather&0 - current weather: sunny, cloudy, rainy, or lightning
 
-See also: EMPIRE VARS, REDIT AFFECTS, REDIT FLAGS, BEDIT FLAGS
+See also: EMPIRE VARS, REDIT AFFECTS, REDIT FLAGS, BEDIT FLAGS,
+  SECTEDIT BUILDFLAGS
 #d
 "ZONE RESET TRIGGER" "RTRIG ZONE RESET" TRIGEDIT-ROOM-ZONE-RESET TRIGEDIT-ROOM-ZRESET TRIGEDIT-ROOM-LOAD
 

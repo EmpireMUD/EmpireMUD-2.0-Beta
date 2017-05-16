@@ -567,7 +567,7 @@ void perform_unload_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont
 */
 void process_driving(char_data *ch) {
 	extern int get_north_for_char(char_data *ch);
-	extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
+	extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 	
 	int dir = GET_ACTION_VNUM(ch, 0), subcmd = GET_ACTION_VNUM(ch, 2);
 	vehicle_data *veh;

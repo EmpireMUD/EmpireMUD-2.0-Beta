@@ -1225,7 +1225,7 @@ while %cycles_left% >= 0
     break
     case 0
       %echoaround% %actor% %self.name% fishes a pamphlet out of %self.hisher% robe and gives it to %actor.name%.
-      %send% %actor% You finish your conversation with %self.name%, who gives you a pamplet from %self.hisher% robe.
+      %send% %actor% You finish your conversation with %self.name%, who gives you a pamphlet from %self.hisher% robe.
       * Quest complete
       %load% obj 18258 %actor% inv
       %send% %actor% You must still find a way to close the monsoon rift to finish your quest.
@@ -1340,7 +1340,7 @@ if %valid%
   remote guild_siphoned_%target.vnum% %actor.id%
 end
 * Check quest completion
-if %guild_siphoned_10551% && %guild_siphoned_10552%
+if %actor.guild_siphoned_10551% && %actor.guild_siphoned_10552%
   %send% %actor% You have siphoned both apprentices.
   %quest% %actor% trigger 18270
 end

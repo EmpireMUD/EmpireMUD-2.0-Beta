@@ -299,7 +299,7 @@ room, then makes him look to see the description:
   %teleport% %actor% 3001
   %force% %actor% look
 #d
-"GLOBAL VARIABLES" GLOBALS GLOBAL-VARIABLES GLOBAL-VARS GVARS
+"GLOBAL VARIABLES" GLOBAL GLOBALS GLOBAL-VARIABLES GLOBAL-VARS GVARS
 
 Usage:  global <variablename>
 
@@ -601,7 +601,7 @@ See also: HALT, WAIT
 #d
 %SCALE% MSCALE OSCALE VSCALE WSCALE
 
-%scale% <instancevictim/object/vehicle> [level]
+%scale% <instance/victim/object/vehicle> [level]
 
 This scales (or re-scales) a target NPC, object, or vehicle to a given level.
 If no level is provided, the script will attempt to use the scale of the

@@ -64,6 +64,7 @@ extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum v
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 void get_requirement_display(struct req_data *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
+extern room_data *obj_room(obj_data *obj);
 void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
 extern char *requirement_string(struct req_data *req, bool show_vnums);
 
@@ -1078,6 +1079,9 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_lis
 		if (QUEST_FLAGGED(ql->quest, QST_EMPIRE_ONLY) && GET_LOYALTY(mob) != GET_LOYALTY(ch)) {
 			continue;
 		}
+		if (!can_use_room(ch, IN_ROOM(ch), QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
+			continue;	// room permissions
+		}
 		// already on quest?
 		if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
 			continue;
@@ -1111,8 +1115,6 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_lis
 * @return bool TRUE if the obj has a quest the character can get; FALSE otherwise.
 */
 bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list) {
-	extern room_data *obj_room(obj_data *obj);
-	
 	struct instance_data *inst;
 	struct quest_lookup *ql;
 	bool any = FALSE;
@@ -1138,9 +1140,15 @@ bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list
 		if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
 			continue;
 		}
+		room = obj_room(obj);
+		if (QUEST_FLAGGED(ql->quest, QST_EMPIRE_ONLY) && !obj->carried_by && room && ROOM_OWNER(room) != GET_LOYALTY(ch)) {
+			continue;	// matching empire
+		}
+		if (room && !obj->carried_by && !can_use_room(ch, room, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
+			continue;	// room permissions
+		}
 		
 		// success
-		room = obj_room(obj);
 		inst = (room ? find_instance_by_room(room, FALSE) : NULL);
 		
 		// pre-reqs?
@@ -1201,6 +1209,9 @@ bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_l
 			if (QUEST_FLAGGED(ql->quest, QST_EMPIRE_ONLY) && ROOM_OWNER(room) != GET_LOYALTY(ch)) {
 				continue;
 			}
+			if (!can_use_room(ch, room, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
+				continue;	// room permissions
+			}
 			// already on quest?
 			if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
 				continue;
@@ -1253,6 +1264,9 @@ bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_l
 		if (QUEST_FLAGGED(ql->quest, QST_EMPIRE_ONLY) && GET_LOYALTY(mob) != GET_LOYALTY(ch)) {
 			continue;
 		}
+		if (!can_use_room(ch, IN_ROOM(ch), QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
+			continue;	// room permissions
+		}
 		// are they on quest?
 		if (!(pq = is_on_quest(ch, QUEST_VNUM(ql->quest)))) {
 			continue;
@@ -1289,6 +1303,7 @@ bool can_turn_quest_in_to_obj(char_data *ch, obj_data *obj, struct quest_temp_li
 	struct quest_lookup *ql;
 	int complete, total;
 	bool any = FALSE;
+	room_data *room;
 	
 	if (IS_NPC(ch) || !GET_OBJ_QUEST_LOOKUPS(obj) || !CAN_SEE_OBJ(ch, obj) || !bind_ok(obj, ch)) {
 		return FALSE;
@@ -1302,6 +1317,13 @@ bool can_turn_quest_in_to_obj(char_data *ch, obj_data *obj, struct quest_temp_li
 		// are they on quest?
 		if (!(pq = is_on_quest(ch, QUEST_VNUM(ql->quest)))) {
 			continue;
+		}
+		room = obj_room(obj);
+		if (QUEST_FLAGGED(ql->quest, QST_EMPIRE_ONLY) && !obj->carried_by && room && ROOM_OWNER(room) != GET_LOYALTY(ch)) {
+			continue;	// matching empire
+		}
+		if (room && !obj->carried_by && !can_use_room(ch, room, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
+			continue;	// room permissions
 		}
 		
 		count_quest_tasks(pq, &complete, &total);
@@ -1356,6 +1378,9 @@ bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp
 			// matching empire
 			if (QUEST_FLAGGED(ql->quest, QST_EMPIRE_ONLY) && ROOM_OWNER(room) != GET_LOYALTY(ch)) {
 				continue;
+			}
+			if (!can_use_room(ch, room, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
+				continue;	// room permissions
 			}
 			// are they on quest?
 			if (!(pq = is_on_quest(ch, QUEST_VNUM(ql->quest)))) {

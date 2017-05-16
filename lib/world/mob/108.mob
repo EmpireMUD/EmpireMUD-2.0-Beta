@@ -52,8 +52,19 @@ The curator is dusting the shelves.
 ~
 0 0 bdv nD
 1 0 0 15
+M
+1
+Maybe I should hire some skeletons to stand around and chat with visitors.~
+M
+0
+$n sprinkles some authentic-looking dust on the shelves.~
+M
+0
+$n rubs a piece of leather in the dirt, then heaps it on a shelf.~
+M
+0
+$n jingles a jar labeled 'Admissions', but it sounds empty.~
 T 10826
-T 10828
 S
 #10827
 Horation curator~
@@ -62,8 +73,19 @@ Curator Horation stands proudly next to the exhibit.
 ~
 0 0 bdv nD
 1 0 0 15
+M
+1
+Maybe I should hire some skeletons to stand around and chat with visitors.~
+M
+0
+$n sprinkles some authentic-looking dust on the shelves.~
+M
+0
+$n rubs a piece of leather in the dirt, then heaps it on a shelf.~
+M
+0
+$n jingles a jar labeled 'Admissions', but it sounds empty.~
 T 10826
-T 10828
 S
 #10851
 spirit order~

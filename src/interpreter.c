@@ -555,7 +555,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "advance", POS_DEAD, do_advance, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_ADVANCE ),
 	SIMPLE_CMD( "alias", POS_DEAD, do_alias, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "alacrity", POS_RESTING, do_alacrity, NO_MIN, CTYPE_SKILL, ABIL_ALACRITY ),
-	SIMPLE_CMD( "alternate", POS_RESTING, do_alternate, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "alternate", POS_DEAD, do_alternate, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "affects", POS_DEAD, do_affects, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "approve", POS_DEAD, do_approve, LVL_CIMPL, GRANT_APPROVE, SCMD_APPROVE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 	STANDARD_CMD( "arclight", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_ARCLIGHT, CTYPE_COMBAT, NOBITS, ABIL_ARCLIGHT ),
