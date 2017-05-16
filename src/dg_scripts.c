@@ -3983,7 +3983,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'c': {	// room.c*
-					if (!str_cmp(field, "complete")) {
+					if (!str_cmp(field, "can_build")) {
+						extern const char *bld_on_flags[];
+						
+						if (subfield && *subfield) {
+							bitvector_t pos = search_block(subfield, bld_on_flags, FALSE);
+							if (pos != NOTHING) {
+								snprintf(str, slen, "%d", IS_SET(GET_SECT_BUILD_FLAGS(SECT(r)), BIT(pos)) ? 1 : 0);
+							}
+							else {
+								snprintf(str, slen, "0");
+							}
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
+					else if (!str_cmp(field, "complete")) {
 						snprintf(str, slen, "%d", IS_COMPLETE(r) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "contents")) {
