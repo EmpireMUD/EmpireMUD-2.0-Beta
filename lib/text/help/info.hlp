@@ -843,6 +843,17 @@ locations) if you want a shorter list.
 Certain adventures won't show up on 'nearby', usually because of the
 adventure's design.
 #
+"NEWBIE ISLANDS"
+
+Newbie islands are a safe place for newbies to learn and practice the game.
+Depending on the settings for this EmpireMUD, some of the following things
+may happen on newbie islands:
+- Empires lose most claimed land on a newbie island after a week.
+- The map returns to its natural state each week on the newbie island.
+- Hostile mobs like the highwayman won't attack you on a newbie island.
+
+See also: INFO, GETTING STARTED
+#
 PLAYERKILLING "PLAYER KILLING" PK PVP "TOGGLE PVP"
 
 EmpireMUD player-killing rules

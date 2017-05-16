@@ -182,6 +182,7 @@ All-Terrain Riding (Survival ability)
 Usage:  dismount
         mount [animal]
         mount <list | swap> <keyword(s)>
+        mount release
 
 Once you have learned to Ride, travel becomes faster and easier. With All-
 Terrain Riding, you can coax your mount across rivers and mountains, too.
@@ -316,7 +317,8 @@ STABLEMASTER "STABLE MASTER"
 
 Stablemaster (Survival ability)
 
-Usage:  mount <swap | release> <keyword(s)>
+Usage:  mount <swap | list> <keyword(s)>
+        mount release
 
 Stablemaster allows you to change your active mount anywhere. It also lets you
 release your active mount so that it can be traded to others. Gains experience
