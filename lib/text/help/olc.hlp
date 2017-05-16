@@ -4879,6 +4879,10 @@ Available flags:
  any forest - a broader category of forests usually used for 'buildfacing'
  open building - does not apply to buildflags -- do not use
 
+Note: When adding these flags to adventure linking rules, they all have to
+be added in one line, so you can't type multiple words. Try abbreviating them
+to one word, such as: "plains full desert" (the full stands for 'full forest').
+
 See also: CEDIT BUILDON, CEDIT BUILDFACING, OLC SECTORS
 #d
 "SECTEDIT COMMANDS"
