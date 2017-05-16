@@ -300,7 +300,7 @@ See also: SCORE
 You can create a cooking fire by lighting a tree or log, using a flint set.
 This will let you cook food, brew potions, or craft pottery.
 
-You can also cook in a Kitchen, Alchemist, Pottery, or Laboratory. If you have
+You can also cook in a Kitchen, Alchemist, Potter, or Laboratory. If you have
 the Touch of Flame ability, you don't need a fire at all.
 
 See also: DOUSE, LIGHT, TOUCH OF FLAME
@@ -549,7 +549,7 @@ Temperate crops (plains):
  &gxgxx&0  Grapes              &g::::&0  Hops                 &Tiiii&0  Oats
  &Y^o^^&0  Peaches             &G....&0  Peas                 &g^^&vo&g^&0  Plums
  &gnnnn&0  Potatoes            &gn&Rv&gnn&0  Strawberries         &Ro&g88&Ro&0  Tomatoes
- &Y;;;;&0  Wheat
+ &Y;;;;&0  Wheat               &G@@@@&0  Lettuce
 
 Arid crops (desert):
  &y.&g/&to&y.&0  Coconuts            &0::::&0  Cotton               &Y.&G^o&G.&0  Olives
