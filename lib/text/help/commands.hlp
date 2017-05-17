@@ -853,7 +853,7 @@ Typing "ignore" with no argument will list who you're ignoring. You can't
 choose to ignore an immortal player, and immortals cannot use the ignore
 feature at all.
 #
-INFO POLICY VERSION RULES
+INFO POLICY VERSION RULES CREDITS
 
 Type these commands to see you important information about EmpireMUD. It is a
 good idea to read them every once in a while.

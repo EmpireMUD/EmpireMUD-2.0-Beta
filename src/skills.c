@@ -1854,7 +1854,7 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	
 	if (abil != NO_ABIL && !has_ability(ch, abil)) {
 		if (send_messages) {
-			snprintf(buf, sizeof(buf), "You must purchase the %s ability to use $p.", get_ability_name_by_vnum(abil));
+			snprintf(buf, sizeof(buf), "You require the %s ability to use $p.", get_ability_name_by_vnum(abil));
 			act(buf, FALSE, ch, item, NULL, TO_CHAR);
 		}
 		return FALSE;
@@ -1869,7 +1869,7 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	}
 	if (honed && !has_ability(ch, ABIL_HONE)) {
 		if (send_messages) {
-			snprintf(buf, sizeof(buf), "You must purchase the %s ability to use $p.", get_ability_name_by_vnum(ABIL_HONE));
+			snprintf(buf, sizeof(buf), "You require the %s ability to use $p.", get_ability_name_by_vnum(ABIL_HONE));
 			act(buf, FALSE, ch, item, NULL, TO_CHAR);
 		}
 		return FALSE;

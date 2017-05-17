@@ -244,7 +244,7 @@ You can mill:
 
 You must do this at a Mill building.
 
-See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, CHORES
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, CHORES, RECIPES
 #
 MINE MINES
 
@@ -359,7 +359,8 @@ You can press:
 
 You must do this at an Oilmaker building.
 
-See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL, CHORES
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL, CHORES, CRAFT INFO,
+  RECIPES
 #
 READY
 
@@ -560,7 +561,7 @@ than their raw form. To return bars to their ingot form, use 'separate'.
 Typing "smelt" by itself will list things you can smelt with the ore available
 in your inventory.
 
-See also: METAL, SEPARATE, WEALTH, CHORES
+See also: CRAFT INFO, METAL, SEPARATE, WEALTH, CHORES, RECIPES
 #
 SPECIALIZE SPECIALTY
 
