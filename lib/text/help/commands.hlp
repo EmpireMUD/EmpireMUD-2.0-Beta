@@ -133,7 +133,7 @@ The special variable $* represents the entire input line after an alias:
 
 See also: !, ^, SUGGESTED ALIASES
 #
-ALT ALTERNATE "ALT LIST"
+ALT ALTERNATE "ALT LIST" ALTS
 
 Usage:  alt <name>
         alt list

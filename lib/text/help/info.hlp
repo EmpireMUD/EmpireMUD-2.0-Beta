@@ -104,6 +104,8 @@ Mental attributes:
   Intelligence (active) - Affects magic strength and magic weapon dps.
   Wits (passive) - Affects combat speed (rate of attack) and damage.
 
+You can find more information in the help file for each attribute.
+
 The active attribute in each category cannot go below 1 from equipment; you
 will not be able to use any item that lowers your active attributes below 1.
 There is also currently a maximum rating of 15 in these attributes.
@@ -129,7 +131,7 @@ vast, open world. All items left on the ground or in containers may be stored
 or cleaned up automatically.
 
 The auto-store/auto-clean system engages when an item has been left alone for
-three hours, and will not trigger if a player is present.
+three hours, but will not trigger if a player is present.
 
 If the location is claimed by an empire, NPCs store the items to that empire's
 inventory (if possible). If items can't be stored, they remain on the ground
@@ -140,15 +142,11 @@ enchanted or superior cannot be stored.
 If the land is not claimed, animals and stray humans make off with the items,
 never to be seen again.
 
-Items which can't be picked up, like carts, are not normally affected by this
-system. However, items left inside of carts will be stored or cleaned up. This
-also applies to personal chests.
+Items which can't be picked up, like signs, are not normally affected by this
+system. However, items left inside of vehicles will be stored or cleaned up.
+This also applies to personal chests, if the item is storable.
 
-(EmpireMUD used to let you keep storable items in personal chests, but revoked
-this due to players using chests to abuse limitations on Workforce.)
-
-Do not attempt to circumvent the auto-store system. If you think you found a
-way to keep items from auto-storing, please report it as a bug.
+Bound items and other non-storables are safe to keep in your home or chest.
 #
 AXE
 
@@ -337,6 +335,20 @@ oocsay - out-of-character speech
 
 See also: TOGGLE, SAY, SLASH-CHANNELS
 #
+CHARISMA CHA
+
+Charisma (social attribute)
+Type:  active (you can't drop below 1)
+
+Charisma is a measure of your character's charm and ability to manipulate a
+situation.
+
+Charisma is used for:
+ - Improving your fishing ability.
+ - Many Stealth abilities.
+
+See also: ATTRIBUTES
+#
 COIN COINS COINAGE CURRENCY GOLD
 
 Commands:  coins
@@ -462,6 +474,21 @@ replenish unless you dismantle them completely.
 Forests will spread at their edges over time, creating more trees to chop.
 Desert Groves re-grow on their own, at random.
 #
+DEXTERITY DEX
+
+Dexterity (physical attribute)
+Type:  passive (you can go as low as 0)
+
+Dexterity is a measure of how well your character moves, and affects how you
+function in combat.
+
+Dexterity is used for:
+ - A core attribute for the melee, caster, and tank class roles.
+ - Increases your chance to hit in combat.
+ - Increases your chance to dodge in combat.
+
+See also: ATTRIBUTES, MELEE, CASTER, TANK, TO-HIT, DODGE
+#
 "DIMINISHING RETURNS"
 
 Diminishing returns are numbers that increase quickly at low levels, but more
@@ -568,6 +595,25 @@ Most crops are used to make food and drink. Some, like cotton, have other uses.
 
 See also: CHOP, COOK, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE
 #
+GREATNESS GRT
+
+Greatness (social attribute)
+Type:  passive (you can go as low as 0)
+
+Greatness is a measure of the majesty your character portrays, as well as how
+others perceive you.
+
+Greatness is used for:
+ - Increasing the amount of territory your empire can control.
+ - Increasing your empire's score and ranking.
+ - Certain class abilities such as Noble Bearing.
+
+Empires also have a Greatness rating, equal to the total Greatness of their
+members. However, if you have multiple alts (your other characters) in the same
+empire, only the highest Greatness is counted.
+
+See also: ALTS, ATTRIBUTES, ESCORE, TERRITORY, NOBLE BEARING
+#
 HAMMER
 
 A hammer is required in order to forge gear out of metal. You can make a simple
@@ -662,6 +708,22 @@ same adventure may have different level requirements. The 'adventure' command
 is a good way to see what level (or level range) an instance is scaled to.
 
 See also: ADVENTURE
+#
+INTELLIGENCE INT
+
+Intelligence (mental attribute)
+Type:  passive (you can't drop below 1)
+
+Intelligence is the measure of your character's cunning and wisdom, used to
+enhance magical spells and damage.
+
+Intelligence is used for:
+ - A core attribute for the caster and healer class roles.
+ - Increasing the DPS (damage per second) from magical weapons.
+ - Increasing the power of healing spells.
+ - Increasing the effect of many other spells.
+
+See also: ATTRIBUTES, CASTER, HEALER
 #
 LEVEL LEVELS "GEAR LEVELS" "SKILL LEVEL"
 
@@ -1060,6 +1122,23 @@ head, and then crafting the spear from the spearhead and the handle.
 
 See also: CRAFT, CHIP, FISH
 #
+STRENGTH STR
+
+Strength (physical attribute)
+Type:  active (you can't drop below 1)
+
+Strength is a measure of your character's brawn, his (or her) raw muscle.
+Unlike some games, Strength does not affect how much you can carry (all players
+have the same base inventory size).
+
+Strength is used for:
+ - A core attribute for the melee class role.
+ - Increasing melee DPS (damage per second) from physical weapons.
+ - Chopping and mining faster.
+ - Wearing heavy armor (tank armor sometimes has -STRENGTH).
+
+See also: ATTRIBUTES, MELEE DPS, CHOP, MINE
+#
 STUN STUNNED "STUN IMMUNITY"
 
 A character who is stunned, for instance by the Bash ability, cannot type
@@ -1149,5 +1228,19 @@ available when you type "look", but this version shows only the room name and
 coordinates (if applicable).
 
 See also: LOOK
+#
+WITS WIT
+
+Wits (mental attribute)
+Type:  passive (you can go as low as 0)
+
+Wits is the measure of your character's awareness and ability to think on his
+or her feet.
+
+Wits is used for:
+ - Improving your combat speed (except for healers).
+ - Reducing the casting time of non-combat spells, for healers.
+
+See also: ATTRIBUTES, FASTCASTING, HEALER, SPEED
 #
 $
