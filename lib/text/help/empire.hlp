@@ -519,7 +519,7 @@ This shows you your empire's MOTD (Message Of The Day). It is set in eedit.
 
 See also: EEDIT
 #
-EMPIREIDENTIFY EIDENTIFY
+EMPIREIDENTIFY EIDENTIFY EID
 
 Usage:  empireidentify <item>
         eidentify <item>
@@ -534,7 +534,7 @@ quotation marks.
 
 See also: EFIND, WORKFORCE, EINVENTORY, IDENTIFY
 #
-EMPIREINVENTORY EINVENTORY
+EMPIREINVENTORY EINVENTORY EINV
 
 Usage:  empireinventory [item | all]
         einventory [item | all]
