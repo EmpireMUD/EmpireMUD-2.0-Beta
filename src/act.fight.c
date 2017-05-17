@@ -125,7 +125,7 @@ ACMD(do_consider) {
 		if (!IS_IMMORTAL(ch)) {
 			check_scaling(vict, ch);
 		}
-		diff = determine_best_scale_level(ch, FALSE) - determine_best_scale_level(vict, FALSE);
+		diff = get_approximate_level(ch) - determine_best_scale_level(vict, FALSE);
 				
 		act("You consider your chances against $N.", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n considers $s chances against $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
