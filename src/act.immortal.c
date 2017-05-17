@@ -866,8 +866,8 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 	}
 	
 	if (count > 0) {
-		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted %d instances of %s", GET_REAL_NAME(ch), count, GET_ADV_NAME(adv));
-		msg_to_char(ch, "%d instances of '%s' deleted.\r\n", count, GET_ADV_NAME(adv));
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted %d instance%s of %s", GET_REAL_NAME(ch), count, PLURAL(count), GET_ADV_NAME(adv));
+		msg_to_char(ch, "%d instance%s of '%s' deleted.\r\n", count, PLURAL(count), GET_ADV_NAME(adv));
 	}
 	else {
 		msg_to_char(ch, "No instances of '%s' found.\r\n", GET_ADV_NAME(adv));

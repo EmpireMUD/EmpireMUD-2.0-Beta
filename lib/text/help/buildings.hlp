@@ -687,7 +687,9 @@ When you're done with the shelter, be sure to dismantle and abandon it.
 #
 RUINS "DECAYING RUINS"
 
-../]  [\..  |\\..  ../|  .-.]  [.-.  [__]
+../]  [\..  |\..  ../|  .-.]  [.-.  [__]
+
+._i.  .[..  ..v.  ./].  .(\.  .}\.  ..}.
 
 Decaying Ruins
 
@@ -790,7 +792,7 @@ The swamp walk, though never very stable, makes travel through the swamp
 much easier. Swamp animals may still harass you, but you will avoid random
 attacks by crocodilians.
 
-See also: BUILDING
+See also: BUILDING, SWAMP ENGINEERING
 #
 SWAMPHUT "SWAMP HUT"
 
@@ -801,7 +803,7 @@ Citizens:  2
 
 A swamp hut is a good-sized home supported on stilts above the swamp.
 
-See also: DESIGNATE
+See also: DESIGNATE, SWAMP ENGINEERING
 #
 SWAMPMANOR "SWAMP MANOR"
 
@@ -813,7 +815,7 @@ Citizens:  4
 The swamp manor is a grand house that is built only in the swamp. It is fire-
 proof and comparable to a large house.
 
-See also: DESIGNATE
+See also: DESIGNATE, SWAMP ENGINEERING
 #
 SWAMPCOMPLEX "SWAMP COMPLEX"
 
@@ -826,7 +828,7 @@ Chameleon: &c~~~~&0
 A swamp complex is a well-hidden, large home that can only be built in the
 swamp. It is designed to be difficult to see from a distance.
 
-See also: DESIGNATE
+See also: DESIGNATE, SWAMP ENGINEERING
 #
 SWAMPPLATFORM "SWAMP PLATFORM"
 
@@ -836,6 +838,8 @@ By building a sturdy platform on top of swampland, you can effectively build
 "plains-only" buildings in the swamp. Once complete, the platform becomes an
 ordinary plains. If you don't build on it soon, though, the swamp will re-claim
 it.
+
+See also: SWAMP ENGINEERING
 #
 TAILOR
 

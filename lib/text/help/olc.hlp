@@ -615,9 +615,10 @@ cases, you must also specify the type(s) of terrain it must be built facing.
 Both of these are the same as the "buildon" and "buildfacing" flags from the
 craft and sector editors; see &yHELP SECTEDIT BUILDFLAGS&0.
 
-CAUTION: this will NOT work well with "open"-style buildings, such as
-fountains, because they can't have normal exits. If you want to connect an
-adventure to an open building, use PORTAL-BDG-NEW instead.
+CAUTION: If you use this with an "open" building such as a fountain, there will
+be no entrance to the interior templated rooms. This is usually undesirable
+(use PORTAL-BDG-NEW instead), but it can also be used to create map-only
+adventures.
 
 CAUTION: You must not use designated rooms (or any "building" with the ROOM
 flag) for this, because they can't be built on the map.
@@ -1369,18 +1370,26 @@ Available functions:
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
-"BEDIT HITPOINTS"
+"BEDIT HITPOINTS" "BEDIT HEALTH"
 
 Usage:  .hitpoints <value>
 
 This number is how much damage a building can take from a catapult or siege
-ritual before it is destroyed.
+ritual before it is destroyed. Buildings with the ROOM flag do not need this.
 
 Catapults deal 8 damage per 100 levels, per shot. Siege rituals deal
-Intelligence + 1 damage.
+Intelligence + 1 damage. You can determine how many hitpoints to give a
+building based on this.
 
 If a building takes more than 10% of its hitpoints in damage from an attack,
 it will also need its yearly maintenance resources to be fixed.
+
+Common hitpoint levels:
+ house: 8-24
+ wall: 32
+ castle: 64
+ mountain building: 128
+ adventure: 1000 (to discourage sieging)
 
 See also: BEDIT YEARLY MAINTENANCE, FIRE, OLC BUILDINGS, SIEGE RITUAL
 #d
@@ -1533,7 +1542,7 @@ Examples:
 
 See also: OLC BUILDINGS
 #d
-"BEDIT UGPRADESTO" "BEDIT UPGRADES TO"
+"BEDIT UPGRADESTO" "BEDIT UPGRADES TO"
 
 Usage:  .upgradesto <building vnum>
         .upgradesto none
@@ -2775,7 +2784,7 @@ Message types:
 Note: The 'echo' and 'say' types share the same random interval, and the mob
 will only do one or the other each time.
 
-See also: OLC MOBILES
+See also: OLC MOBILES, DOLLAR SIGN CODES
 #d
 "MEDIT FLAGS"
 
@@ -2805,7 +2814,7 @@ Available mob flags:
  CHAMPION - Will rescue its master in combat.
  EMPIRE - Will not be saved through reboots.
  FAMILIAR - Will not be saved through reboots; players may only have one familiar follower at a time.
- PICKPOCKETED - Has already been pickpocketed; cannot be pickpocketed again.
+ *PICKPOCKETED - Has already been pickpocketed; cannot be pickpocketed again.
  CITYGUARD - Will assist allies from the same empire. This will only work if it is spawned by the empire system.
  PURSUE - Will purse players who flee in combat.
  HUMAN - Counts as a human for various commands.
@@ -3022,6 +3031,21 @@ Examples:
 
 See also: MEDIT LONG DESCRIPTION
 #d
+MINIPET MINI-PET "MINI PET" "PET WHISTLE"
+
+Mini-pets are a common cosmetic reward from adventure zones. They are summoned
+from a reusable item, and the player may get that item from a loot drop or a
+shop.
+
+To create a pet whistle (or other summoner item), attach script 9900 (Mini-pet
+Use) to an object and set its <value0> to the mini-pet mob's vnum.
+
+Mini-pet mobs should have the following traits:
+ - Flags: SENTINEL SPAWNED !LOOT (and ISNPC)
+ - Affects: !ATTACK
+ - Scripts: 9901 (Dismissable), 9902 (Lonely Despawn)
+ - Adorable custom messages (optional)
+#d
 MORPHEDIT "OLC MORPHS" "MORPH EDITOR"
 
 Usage:  .morph <command>
@@ -3200,6 +3224,21 @@ Examples:
  a mongoose
 
 See also: MORPHEDIT LONG DESCRIPTION, OLC MORPHS
+#d
+"MOUNT WHISTLE" WHISTLE "MOUNT REWARD"
+
+Mount whistles (or other similar items) are used to reward players with mounts
+using the loot drop table of an NPC. Players seem to prefer receiving their
+new mount as an item, because it's easier to get it out of the adventure if
+they can't mount it right away.
+
+If you load a mount directly into the room in an adventure, players will often
+kill it without realizing what it is. Another problem is that if the player
+leads a mount out of the adventure, the mount may despawn when the adventure
+despawns.
+
+To create a mount whistle, attach script 10263 (Mount whistle use) to an
+object, and set the object's <value0> field to the vnum of the mount.
 #d
 "OEDIT AFFECTS"
 
@@ -3491,7 +3530,7 @@ Message types:
  &clongdesc-female&0 - Same as longdesc but only for females.
  &clongdesc-male&0 - Same as longdesc but only for males.
 
-See also: OLC OBJECTS
+See also: OLC OBJECTS, DOLLAR SIGN CODES
 #d
 "OEDIT DAMAGE"
 
@@ -4489,7 +4528,7 @@ Examples:
  > .o search 1413
  > .t search 12
 #d
-"OLC SECTORS" SECTEDIT SECTOREDIT "SECTORS OLC" "SECTOR OLC" SECTEDIT
+"OLC SECTORS" SECTEDIT SECTOREDIT "SECTORS OLC" "SECTOR OLC"
 
 Usage:  .sect <command>
         .<command>
@@ -4539,7 +4578,7 @@ For notes on the mud's building rules, see HELP BUILDING GUIDE.
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 See also: TRIGEDIT-TYPES
 #d
-"OLC VEHICLES" VEDIT
+"OLC VEHICLES" VEDIT "VEHICLE EDITOR" "VEHICLE OLC"
 
 Usage:  .v <command>
         .<command>
@@ -5716,7 +5755,7 @@ commands.
 
 See also: OLC VEHICLES
 #d
-"VEDIT HITPOINTS"
+"VEDIT HITPOINTS" "VEDIT HEALTH"
 
 Usage:  .hitpoints <value>
 
@@ -5724,11 +5763,20 @@ This number is how much damage a vehicle can take from a catapult or other
 sources, before it is destroyed.
 
 Vehicles like catapults deal 8 damage per 100 levels, per shot. Siege rituals
-deal Intelligence + 1 damage.
+deal Intelligence + 1 damage. You can determine how many hitpoints to give a
+building based on this.
 
 Any damage over 10% of a vehicle's health will also add "1 year" of required
 maintenance to the vehicle (or nails, if the vehicle requires no yearly work).
 The repair command can be used to restore hitpoints.
+
+Common hitpoint levels:
+ furniture: 1 (if it requires no maintenance)
+ small cart: 5
+ large cart: 25
+ small ship: 32
+ medium ship: 96
+ large ship: 128
 
 See also: VEDIT YEARLY MAINTENANCE, FIRE, OLC VEHICLES, REPAIR, SIEGE RITUAL
 #d
