@@ -5863,7 +5863,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			// RES_x: validate arg4/arg5 based on type
 			switch (type) {
 				case RES_OBJECT: {
-					if (!*arg4) {
+					if (!*arg4 || !isdigit(*arg4)) {
 						msg_to_char(ch, "Usage: resource add object <quantity> <vnum>\r\n");
 						return;
 					}
