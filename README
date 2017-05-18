@@ -189,6 +189,7 @@ need at least 50 MB of disk space, but you'll need more if you are generating
 PNG images of your world map, and other utilities.
 
 Futher steps once you are logged into EmpireMUD:
+- A more detailed guide is available in doc/getting-started.txt
 - Set up starting locations using the '.map' editor.
 - Review settings with the 'config' command.
 - Set up the PHP utilities on your website by symlinking them into a web
