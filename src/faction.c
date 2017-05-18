@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: faction.c                                       EmpireMUD 2.0b4 *
+*   File: faction.c                                       EmpireMUD 2.0b5 *
 *  Usage: code related to factions, including DB and OLC                  *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

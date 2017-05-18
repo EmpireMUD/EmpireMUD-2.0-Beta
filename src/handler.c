@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: handler.c                                       EmpireMUD 2.0b4 *
+*   File: handler.c                                       EmpireMUD 2.0b5 *
 *  Usage: internal funcs: moving and finding chars/objs                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

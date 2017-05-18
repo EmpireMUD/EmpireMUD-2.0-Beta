@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: plrconv-20b1-to-20b2.c                          EmpireMUD 2.0b4 *
+*   File: plrconv-20b1-to-20b2.c                          EmpireMUD 2.0b5 *
 *  Usage: convert player file structures without wiping                   *
 *                                                                         *
 *  This converter updates playerfiles which were running 2.0b1 to the     *

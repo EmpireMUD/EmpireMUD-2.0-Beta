@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: db.player.c                                     EmpireMUD 2.0b4 *
+*   File: db.player.c                                     EmpireMUD 2.0b5 *
 *  Usage: Database functions related to players and the player table      *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

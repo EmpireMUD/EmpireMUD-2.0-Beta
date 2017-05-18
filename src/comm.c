@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: comm.c                                          EmpireMUD 2.0b4 *
+*   File: comm.c                                          EmpireMUD 2.0b5 *
 *  Usage: Communication, socket handling, main(), central game loop       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

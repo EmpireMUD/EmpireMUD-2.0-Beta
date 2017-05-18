@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.survival.c                                  EmpireMUD 2.0b4 *
+*   File: act.survival.c                                  EmpireMUD 2.0b5 *
 *  Usage: code related to the Survival skill and its abilities            *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

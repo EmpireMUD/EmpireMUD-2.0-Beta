@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.map.c                                       EmpireMUD 2.0b4 *
+*   File: olc.map.c                                       EmpireMUD 2.0b5 *
 *  Usage: OLC for the map and map-building rooms                          *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

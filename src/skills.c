@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: skills.c                                        EmpireMUD 2.0b4 *
+*   File: skills.c                                        EmpireMUD 2.0b5 *
 *  Usage: code related to skills, including DB and OLC                    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

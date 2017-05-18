@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.quest.c                                     EmpireMUD 2.0b4 *
+*   File: act.quest.c                                     EmpireMUD 2.0b5 *
 *  Usage: commands related to questing                                    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

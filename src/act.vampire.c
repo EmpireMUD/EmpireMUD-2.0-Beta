@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.vampire.c                                   EmpireMUD 2.0b4 *
+*   File: act.vampire.c                                   EmpireMUD 2.0b5 *
 *  Usage: Code related to the Vampire ability and its commands            *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

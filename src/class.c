@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: class.c                                         EmpireMUD 2.0b4 *
+*   File: class.c                                         EmpireMUD 2.0b5 *
 *  Usage: code related to classes, including DB and OLC                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

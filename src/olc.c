@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.c                                           EmpireMUD 2.0b4 *
+*   File: olc.c                                           EmpireMUD 2.0b5 *
 *  Usage: On-Line Creation at player level                                *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
