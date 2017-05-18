@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: objsave.c                                       EmpireMUD 2.0b4 *
+*   File: objsave.c                                       EmpireMUD 2.0b5 *
 *  Usage: loading/saving player objects for rent and crash-save           *
 *                                                                         *
 *  Note: ITEM_CART is deprecated but this will still put items inside of  *

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: mobact.c                                        EmpireMUD 2.0b4 *
+*   File: mobact.c                                        EmpireMUD 2.0b5 *
 *  Usage: Functions for generating intelligent (?) behavior in mobiles    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

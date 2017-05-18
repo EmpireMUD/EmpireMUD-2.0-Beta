@@ -1304,4 +1304,9 @@ Examples:
 
 See also: NOWIZ, GHISTORY
 #d
+XNAME XNAMES "XNAME FILE"
+
+The lib/misc/xnames file contains a list of forbidden names. Any entry that
+begins with a % (percent) will match partial names as well.
+#d
 $

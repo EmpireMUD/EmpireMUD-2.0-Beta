@@ -281,7 +281,8 @@ Poisons only work with sharp weapons. Poisons also count as Stealth debuffs,
 and some NPCs are immune.
 
 Both abilities gain experience any time you attempt to apply poison, even if it
-is resisted.
+is resisted. You need to have these abilities in order both to create and to
+use the poisons.
 
 Basic Poisons:
   searing  +5 damage
@@ -299,7 +300,7 @@ Deadly Poisons:
   slow  slower combat rate
   heartstop  vampires can't spend blood
 
-See also: CRAFTING LEVEL, RESIST POISON, RESOURCES, KEEP
+See also: CRAFTING LEVEL, RESIST POISON, RESOURCES, KEEP, CRAFT INFO, RECIPES
 #
 PRICK
 

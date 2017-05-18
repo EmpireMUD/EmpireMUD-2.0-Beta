@@ -226,6 +226,19 @@ or split).
 
 See also: COMPONENT, COOK, CROPS
 #
+FURNITURE FURNISHINGS
+
+Characters with the Trade skill can craft furniture such as chairs and thrones,
+which you can sit on. In game terms, furniture is a special type of vehicle,
+and all commands that work on vehicles will also work on furniture.
+
+You can move furniture around by dragging it, including dragging it through
+portals.
+
+Furniture is cosmetic and provides no particular game function.
+
+See also: DRAG, WOODWORKING
+#
 FURS "FUR COMPONENT"
 
 Fur (component)
@@ -370,6 +383,8 @@ Used for:  building, crafting
 Lumber is a component type created by sawing logs or trees at a lumber yard. It
 is used for many buildings. If a recipe calls for lumber, any type of lumber is
 usually fine.
+
+Not all types of trees can be sawed into lumber.
 
 See also: COMPONENT, CHOP, MAGEWOOD, SAW
 #
@@ -575,14 +590,14 @@ Usage:  store <item>
 
 It is recommended that you keep most of your extra resources stored. Items left
 on the ground in claimed territory will eventually be stored by the empire's
-citizens.
+citizens. Drink containers are usually emptied out when you store them.
 
 If you don't have the "storage" empire privilege, you can store items, but
 can't retrieve them.
 
-Unique, enchanted, superior, or otherwise-modified items can't be stored in
-regular storage buildings, but you can store them with the "warehouse" command
-in a warehouse or vault.
+Unique, enchanted, superior, leveled, or otherwise-modified items can't be
+stored in regular storage buildings, but you can store them with the
+"warehouse" command in a warehouse or vault. 
 
 If you're visiting another empire, you can store and retrieve your own items
 on credit from their public (or allied) buildings, IF you have a trade pact.
@@ -619,10 +634,11 @@ Bolt of cloth (resource)
 Used for:  sewing, crafting, building, vehicles
 Stored in:  Tailor, Carpenter
 
-You can weave cotton or wool into cloth. It will go faster if you're at a Tailor.
+You can weave cotton or wool into cloth. It will go faster if you're at a
+Tailor.
 
-You can use any type of cloth if a recipe calls for a (textile), but some recipes
-may need a specific type.
+You can use any type of cloth if a recipe calls for a (textile), but some
+recipes may need a specific type.
 
 See also: COMPONENT, CLOTH, COTTON, HERBCLOTH WEAVING, TAILOR, WEAVE, WOOL
 #

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: social.c                                        EmpireMUD 2.0b4 *
+*   File: social.c                                        EmpireMUD 2.0b5 *
 *  Usage: social loading, saving, OLC, and processing                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

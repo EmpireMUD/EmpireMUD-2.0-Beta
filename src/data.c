@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: data.c                                          EmpireMUD 2.0b4 *
+*   File: data.c                                          EmpireMUD 2.0b5 *
 *  Usage: Related to saving/loading/using the global game data system     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

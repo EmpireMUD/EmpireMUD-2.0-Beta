@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: archetypes.c                                    EmpireMUD 2.0b4 *
+*   File: archetypes.c                                    EmpireMUD 2.0b5 *
 *  Usage: DB and OLC for character creation archetype                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

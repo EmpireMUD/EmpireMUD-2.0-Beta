@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.fight.c                                     EmpireMUD 2.0b4 *
+*   File: act.fight.c                                     EmpireMUD 2.0b5 *
 *  Usage: non-skill commands and functions related to the fight system    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -125,14 +125,14 @@ ACMD(do_consider) {
 		if (!IS_IMMORTAL(ch)) {
 			check_scaling(vict, ch);
 		}
-		diff = determine_best_scale_level(ch, FALSE) - determine_best_scale_level(vict, FALSE);
+		diff = get_approximate_level(ch) - determine_best_scale_level(vict, FALSE);
 				
 		act("You consider your chances against $N.", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n considers $s chances against $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
 		act("$n considers $s chances against you.", FALSE, ch, NULL, vict, TO_VICT);
 		
 		if (diff != 0) {
-			snprintf(buf, sizeof(buf), "$E is %d levels %s you.", ABSOLUTE(diff), diff > 0 ? "below" : "above");
+			snprintf(buf, sizeof(buf), "$E is %d level%s %s you.", ABSOLUTE(diff), PLURAL(ABSOLUTE(diff)), diff > 0 ? "below" : "above");
 			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
 		}
 		

@@ -1,4 +1,8 @@
 Additional documentation for the mud.
 
+changelog.txt - Updates in the current version.
+crashing.txt - Tips for recovering from crashes.
+getting-started.txt - What to do when you start a new EmpireMUD.
 license.doc - The EmpireMUD license.
+update-* - Notes for upgrading from one version of EmpireMUD to another.
 vnums.txt - An index of vnum blocks for included content.

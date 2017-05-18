@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: sysdep.h                                        EmpireMUD 2.0b4 *
+*   File: sysdep.h                                        EmpireMUD 2.0b5 *
 *  Usage: machine-specific defs based on values in conf.h (from configure)*
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

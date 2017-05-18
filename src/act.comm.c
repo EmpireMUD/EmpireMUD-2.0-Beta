@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.comm.c                                      EmpireMUD 2.0b4 *
+*   File: act.comm.c                                      EmpireMUD 2.0b5 *
 *  Usage: Player-level communication commands                             *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

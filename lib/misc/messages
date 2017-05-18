@@ -174,7 +174,7 @@ M
  4
 You stab $N through the heart!  Instant death!
 $n drives a stab at you, it pierces your heart!  RIP!
-$n stabs brutally at $N, killing $M as $E is impaled by $n!
+$n stabs brutally at $N, killing $M as $E is impaled!
 You stab at $N, missing!
 $n misses a particularily nasty stab in your direction!
 $n stabs at $N, but $e misses!
@@ -972,7 +972,7 @@ $n falls face down in some mud created by $N.
 * Bash
 M
  55
-$N doesn't recover from your bash! -- $E is dead.
+$N doesn't recover from your bash -- $E is dead!
 As $n bashes at you, you give up living and die...
 $N dies after $n has bashed $M!
 As $N avoids your bash, you topple over and fall to the ground!

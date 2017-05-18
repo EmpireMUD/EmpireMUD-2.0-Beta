@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: map.c                                           EmpireMUD 2.0b4 *
+*   File: map.c                                           EmpireMUD 2.0b5 *
 *  Usage: procedural map generator for EmpireMUD                          *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -28,7 +28,7 @@
 *  5. when you're happy with it, start up the mud
 *
 *  NOTE: A new version of the map generator which creates the base_map file
-*  itself is planned for EmpireMUD 2.0b4.
+*  itself is planned for EmpireMUD 2.0b5.
 *
 * Bonus feature: shift an existing map east/west
 *  1. generate a new map (do NOT use this on a live game map)

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: building.c                                      EmpireMUD 2.0b4 *
+*   File: building.c                                      EmpireMUD 2.0b5 *
 *  Usage: Miscellaneous player-level commands                             *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -1504,7 +1504,7 @@ void do_customize_room(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else if (!has_ability(ch, ABIL_CUSTOMIZE_BUILDING)) {
-		msg_to_char(ch, "You must purchase Customize Building to do that.\r\n");
+		msg_to_char(ch, "You require the Customize Building ability to do that.\r\n");
 	}
 	else if (!emp || ROOM_OWNER(IN_ROOM(ch)) != emp) {
 		msg_to_char(ch, "You must own the tile to do this.\r\n");

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.item.c                                      EmpireMUD 2.0b4 *
+*   File: act.item.c                                      EmpireMUD 2.0b5 *
 *  Usage: object handling routines -- get/drop and container handling     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -1562,7 +1562,7 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 			return;
 		}
 		else if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_BREWING_TIME) > 0) {
-			msg_to_char(ch, "The tavern is brewing up a new batch. Try back later.\r\n");
+			msg_to_char(ch, "The tavern is brewing up a new batch. Try again later.\r\n");
 			return;
 		}
 		else {
@@ -5106,7 +5106,7 @@ ACMD(do_roadsign) {
 		msg_to_char(ch, "You need the Roads ability and an Empire skill of at least %d to set up road signs.\r\n", BASIC_SKILL_CAP+1);
 	}
 	else if (!has_ability(ch, ABIL_ROADS)) {
-		msg_to_char(ch, "You must purchase the Roads ability to set up road signs.\r\n");
+		msg_to_char(ch, "You require the Roads ability to set up road signs.\r\n");
 	}
 	else if (!IS_ROAD(IN_ROOM(ch)) || !IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can only put up a roadsign on finished roads.\r\n");

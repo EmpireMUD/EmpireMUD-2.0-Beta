@@ -1,0 +1,56 @@
+CRASHING: HOW TO RECOVER FROM A CRASH
+
+EmpireMUD endeavors to provide a stable, reliable server for your MUD. However,
+there is always the risk of an unknown crash bug that suddenly rears its head.
+This document helps explain what to do to recover from a crash, and how to
+debug it.
+
+1. Your MUD Doesn't Even Boot Up
+-------------------------------
+In this worst-case scenario, first make sure the MUD server is still trying
+to run. You can use the 'top' command in your server shell and be sure you see
+the 'autorun' and the 'empire' in the list of processes (in the COMMAND column)
+and, if not, your MUD may not even be trying to run.
+
+If your MUD is trying to run but crashing during startup, you should read the
+'syslog.CRASH' file in the MUD's directory. This is the tail of the last syslog
+and should always have an error message that explains why the MUD failed to
+start up.
+
+The most common cause for a crash during startup is a bad library file. The
+syslog.CRASH should indicate which one. For example, an error with "mob 12345"
+will be found in lib/world/mob/123.mob and you can check that file for apparent
+errors. If you can't see the problem with the file, consider restoring a
+backup if you have one. Or, compare the faulty mob to a good one and see
+what might be missing.
+
+2. Your Problem Isn't In The syslog.CRASH File
+------------------------------------------------
+Startup crashes are almost always in the syslog.CRASH, but most other types
+of crashes won't leave any logs. If you haven't been changing your own
+EmpireMUD code, there's not much else you can do. But if you're a programmer,
+you can get valuable information from the 'core' file. If you aren't familiar
+with crash cores, you should search the Internet and read a little about them.
+It will help a lot.
+
+Crash cores will appear in your 'lib' directory and are generally named 'core'
+or 'core.#####' with the process ID (pid). If you don't see a crash core there,
+try an Internet search for 'why am I not getting a core file'. Once you get
+your MUD to drop core files, you'll have to cause the crash again to get one.
+
+You will also need GDB installed. This is a common debugger and is already
+installed on many servers. If you don't have it, your sysadmin should be able
+to help you install it.
+
+Using a debugger:
+> cd empireMUD
+> gdb bin/empire lib/core  (or the name of your core file)
+> backtrace
+
+This should indicate exactly where your code crashed. This helps fix almost any
+crash you might have. But here are some additional caveats:
+- If you've recompiled the MUD, you won't see useful info in GDB.
+- If the crash was due to a memory corruption (like a buffer overrun), your
+  debugger output will be useless.
+
+For further assistance, contact Paul Clarke at: paul@empiremud.net

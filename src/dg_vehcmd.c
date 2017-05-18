@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_vehcmd.c                                     EmpireMUD 2.0b4 *
+*   File: dg_vehcmd.c                                     EmpireMUD 2.0b5 *
 *  Usage: contains the command_interpreter for vehicles, vehicle commands *
 *                                                                         *
 *  DG Scripts code by galion, 1996/08/04 23:10:16, revision 3.8           *

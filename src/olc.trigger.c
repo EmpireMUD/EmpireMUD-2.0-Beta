@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.trigger.c                                   EmpireMUD 2.0b4 *
+*   File: olc.trigger.c                                   EmpireMUD 2.0b5 *
 *  Usage: OLC for triggers                                                *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
