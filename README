@@ -106,6 +106,12 @@ Compiling and Running EmpireMUD
     also want to edit 'util/map.c' and check out the map generator config-
     urations. You'll be using that to generate a map in step 5.
     
+    Note:
+    We recommend lowering the TARGET_LAND_SIZE in src/utils/map.c because
+    EmpireMUD's performance is heavily affected by the amount of land on the
+    map, moreso than the MAP_HEIGHT and MAP_WIDTH numbers (which can also
+    safely be lowered).
+    
     If you plan to use any of the included PHP utilities, you should edit them
     (in the 'empireMUD/php' directory) and change the text "/path/to..." to
     the correct absolute path to your mud, html document root, or wherever it
