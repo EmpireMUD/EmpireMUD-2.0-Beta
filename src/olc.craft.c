@@ -645,6 +645,9 @@ OLC_MODULE(cedit_liquid) {
 			msg_to_char(ch, "Invalid liquid generic vnum %d. Old value restored.\r\n", GET_CRAFT_OBJECT(craft));
 			GET_CRAFT_OBJECT(craft) = old;
 		}
+		else {
+			msg_to_char(ch, "It now creates %s.\r\n", get_generic_string_by_vnum(GET_CRAFT_OBJECT(craft), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+		}
 	}
 }
 

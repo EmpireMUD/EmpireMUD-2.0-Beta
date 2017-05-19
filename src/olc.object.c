@@ -2520,6 +2520,9 @@ OLC_MODULE(oedit_liquid) {
 			msg_to_char(ch, "Invalid liquid generic vnum %d. Old value restored.\r\n", GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE));
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = old;
 		}
+		else {
+			msg_to_char(ch, "It now contains %s.\r\n", get_generic_string_by_vnum(GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+		}
 	}
 }
 
