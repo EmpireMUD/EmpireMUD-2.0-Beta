@@ -5306,7 +5306,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	char line[256];
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social", "faction" };
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social", "faction", "generic" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -5368,6 +5368,11 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 				case DB_BOOT_FCT: {
 					void parse_faction(FILE *fl, int nr);
 					parse_faction(fl, nr);
+					break;
+				}
+				case DB_BOOT_GEN: {
+					void parse_generic(FILE *fl, int nr);
+					parse_generic(fl, nr);
 					break;
 				}
 				case DB_BOOT_GLB: {
@@ -5485,7 +5490,7 @@ void index_boot(int mode) {
 
 	if (!rec_count) {
 		// DB_BOOT_x: some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL || mode == DB_BOOT_VEH || mode == DB_BOOT_MORPH || mode == DB_BOOT_QST || mode == DB_BOOT_SOC || mode == DB_BOOT_FCT) {
+		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL || mode == DB_BOOT_VEH || mode == DB_BOOT_MORPH || mode == DB_BOOT_QST || mode == DB_BOOT_SOC || mode == DB_BOOT_FCT || mode == DB_BOOT_GEN) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -5563,6 +5568,11 @@ void index_boot(int mode) {
 		case DB_BOOT_FCT: {
 			size[0] = sizeof(faction_data) * rec_count;
 			log("   %d factions, %d bytes in factions table.", rec_count, size[0]);
+			break;
+		}
+		case DB_BOOT_GEN: {
+			size[0] = sizeof(generic_data) * rec_count;
+			log("   %d generics, %d bytes in generics table.", rec_count, size[0]);
 			break;
 		}
 		case DB_BOOT_GLB: {
@@ -5644,6 +5654,7 @@ void index_boot(int mode) {
 			case DB_BOOT_CRAFT:
 			case DB_BOOT_CROP:
 			case DB_BOOT_FCT:
+			case DB_BOOT_GEN:
 			case DB_BOOT_GLB:
 			case DB_BOOT_OBJ:
 			case DB_BOOT_MOB:
@@ -5803,6 +5814,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, faction_table, fct, next_fct) {
 				if (FCT_VNUM(fct) >= (zone * 100) && FCT_VNUM(fct) <= (zone * 100 + 99)) {
 					write_faction_to_file(fl, fct);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_GEN: {
+			void write_generic_to_file(FILE *fl, generic_data *gen);
+			generic_data *gen, *next_gen;
+			HASH_ITER(hh, generic_table, gen, next_gen) {
+				if (GEN_VNUM(gen) >= (zone * 100) && GEN_VNUM(gen) <= (zone * 100 + 99)) {
+					write_generic_to_file(fl, gen);
 				}
 			}
 			break;
@@ -6185,6 +6206,11 @@ void save_index(int type) {
 		case DB_BOOT_FCT: {
 			void write_faction_index(FILE *fl);
 			write_faction_index(fl);
+			break;
+		}
+		case DB_BOOT_GEN: {
+			void write_generic_index(FILE *fl);
+			write_generic_index(fl);
 			break;
 		}
 		case DB_BOOT_GLB: {

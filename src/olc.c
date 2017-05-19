@@ -174,6 +174,17 @@ OLC_MODULE(fedit_name);
 OLC_MODULE(fedit_relation);
 OLC_MODULE(fedit_startingreputation);
 
+// generic modules
+OLC_MODULE(genedit_flags);
+OLC_MODULE(genedit_name);
+OLC_MODULE(genedit_type);
+OLC_MODULE(genedit_alias);
+OLC_MODULE(genedit_color);
+OLC_MODULE(genedit_drunk);
+OLC_MODULE(genedit_hunger);
+OLC_MODULE(genedit_liquid);
+OLC_MODULE(genedit_thirst);
+
 // global modules
 OLC_MODULE(gedit_ability);
 OLC_MODULE(gedit_capacity);
@@ -430,6 +441,7 @@ void olc_show_class(char_data *ch);
 void olc_show_craft(char_data *ch);
 void olc_show_crop(char_data *ch);
 void olc_show_faction(char_data *ch);
+void olc_show_generic(char_data *ch);
 void olc_show_global(char_data *ch);
 void olc_show_mobile(char_data *ch);
 void olc_show_morph(char_data *ch);
@@ -451,6 +463,7 @@ extern class_data *setup_olc_class(class_data *input);
 extern craft_data *setup_olc_craft(craft_data *input);
 extern crop_data *setup_olc_crop(crop_data *input);
 extern faction_data *setup_olc_faction(faction_data *input);
+extern generic_data *setup_olc_generic(generic_data *input);
 extern struct global_data *setup_olc_global(struct global_data *input);
 extern char_data *setup_olc_mobile(char_data *input);
 extern morph_data *setup_olc_morph(morph_data *input);
@@ -468,16 +481,16 @@ extern bool validate_icon(char *icon);
 // master olc command structure
 const struct olc_command_data olc_data[] = {
 	// OLC_x: main commands
-	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SKILL | OLC_SOCIAL | OLC_VEHICLE, NOBITS },
-	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
+	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SKILL | OLC_SOCIAL | OLC_VEHICLE, NOBITS },
+	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
-	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	
 	// admin
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
@@ -614,6 +627,18 @@ const struct olc_command_data olc_data[] = {
 	{ "name", fedit_name, OLC_FACTION, OLC_CF_EDITOR },
 	{ "relationship", fedit_relation, OLC_FACTION, OLC_CF_EDITOR },
 	{ "startingreputation", fedit_startingreputation, OLC_FACTION, OLC_CF_EDITOR },
+	
+	// generic commands
+	{ "flags", genedit_flags, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "name", genedit_name, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "type", genedit_type, OLC_GENERIC, OLC_CF_EDITOR },
+	// generic: liquids
+	{ "alias", genedit_alias, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "color", genedit_color, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "drunk", genedit_drunk, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "hunger", genedit_hunger, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "liquid", genedit_liquid, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "thirst", genedit_thirst, OLC_GENERIC, OLC_CF_EDITOR },
 	
 	// globals commands
 	{ "capacity", gedit_capacity, OLC_GLOBAL, OLC_CF_EDITOR },
@@ -996,6 +1021,11 @@ OLC_MODULE(olc_abort) {
 				GET_OLC_FACTION(ch->desc) = NULL;
 				break;
 			}
+			case OLC_GENERIC: {
+				free_generic(GET_OLC_GENERIC(ch->desc));
+				GET_OLC_GENERIC(ch->desc) = NULL;
+				break;
+			}
 			case OLC_GLOBAL: {
 				free_global(GET_OLC_GLOBAL(ch->desc));
 				GET_OLC_GLOBAL(ch->desc) = NULL;
@@ -1182,6 +1212,16 @@ OLC_MODULE(olc_audit) {
 				HASH_ITER(hh, faction_table, fct, next_fct) {
 					if (FCT_VNUM(fct) >= from_vnum && FCT_VNUM(fct) <= to_vnum) {
 						found |= audit_faction(fct, ch);
+					}
+				}
+				break;
+			}
+			case OLC_GENERIC: {
+				extern bool audit_generic(generic_data *gen, char_data *ch);
+				generic_data *gen, *next_gen;
+				HASH_ITER(hh, generic_table, gen, next_gen) {
+					if (GEN_VNUM(gen) >= from_vnum && GEN_VNUM(gen) <= to_vnum) {
+						found |= audit_generic(gen, ch);
 					}
 				}
 				break;
@@ -1403,6 +1443,11 @@ OLC_MODULE(olc_copy) {
 			exists = (find_faction_by_vnum(from_vnum) != NULL);
 			break;
 		}
+		case OLC_GENERIC: {
+			found = (find_generic_by_vnum(vnum) != NULL);
+			exists = (find_generic_by_vnum(from_vnum) != NULL);
+			break;
+		}
 		case OLC_GLOBAL: {
 			found = (global_proto(vnum) != NULL);
 			exists = (global_proto(from_vnum) != NULL);
@@ -1567,6 +1612,12 @@ OLC_MODULE(olc_copy) {
 			GET_OLC_FACTION(ch->desc)->vnum = vnum;
 			SET_BIT(FCT_FLAGS(GET_OLC_FACTION(ch->desc)), FCT_IN_DEVELOPMENT);	// ensure flag
 			olc_show_faction(ch);
+			break;
+		}
+		case OLC_GENERIC: {
+			GET_OLC_GENERIC(ch->desc) = setup_olc_generic(find_generic_by_vnum(from_vnum));
+			GET_OLC_GENERIC(ch->desc)->vnum = vnum;
+			olc_show_generic(ch);
 			break;
 		}
 		case OLC_GLOBAL: {
@@ -1754,6 +1805,11 @@ OLC_MODULE(olc_delete) {
 			olc_delete_faction(ch, vnum);
 			break;
 		}
+		case OLC_GENERIC: {
+			void olc_delete_generic(char_data *ch, any_vnum vnum);
+			olc_delete_generic(ch, vnum);
+			break;
+		}
 		case OLC_GLOBAL: {
 			olc_delete_global(ch, vnum);
 			break;
@@ -1848,6 +1904,10 @@ OLC_MODULE(olc_display) {
 		}
 		case OLC_FACTION: {
 			olc_show_faction(ch);
+			break;
+		}
+		case OLC_GENERIC: {
+			olc_show_generic(ch);
 			break;
 		}
 		case OLC_GLOBAL: {
@@ -2030,6 +2090,13 @@ OLC_MODULE(olc_edit) {
 			olc_show_faction(ch);
 			break;
 		}
+		case OLC_GENERIC: {
+			// this will set up from existing OR new automatically based on find_generic_by_vnum
+			GET_OLC_GENERIC(ch->desc) = setup_olc_generic(find_generic_by_vnum(vnum));
+			GET_OLC_GENERIC(ch->desc)->vnum = vnum;			
+			olc_show_generic(ch);
+			break;
+		}
 		case OLC_GLOBAL: {
 			// this will set up from existing OR new automatically based on global_proto
 			GET_OLC_GLOBAL(ch->desc) = setup_olc_global(global_proto(vnum));
@@ -2189,6 +2256,10 @@ OLC_MODULE(olc_free) {
 				}
 				case OLC_FACTION: {
 					free = (find_faction_by_vnum(iter) == NULL);
+					break;
+				}
+				case OLC_GENERIC: {
+					free = (find_generic_by_vnum(iter) == NULL);
 					break;
 				}
 				case OLC_GLOBAL: {
@@ -2484,6 +2555,20 @@ OLC_MODULE(olc_list) {
 					if (FCT_VNUM(fct) >= from_vnum && FCT_VNUM(fct) <= to_vnum) {
 						++count;
 						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_faction(fct, show_details));
+					}
+				}
+				break;
+			}
+			case OLC_GENERIC: {
+				extern char *list_one_generic(generic_data *gen, bool detail);
+				generic_data *gen, *next_gen;
+				HASH_ITER(hh, generic_table, gen, next_gen) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (GEN_VNUM(gen) >= from_vnum && GEN_VNUM(gen) <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_generic(gen, show_details));
 					}
 				}
 				break;
@@ -3049,6 +3134,13 @@ OLC_MODULE(olc_save) {
 				GET_OLC_FACTION(ch->desc) = NULL;
 				break;
 			}
+			case OLC_GENERIC: {
+				void save_olc_generic(descriptor_data *desc);
+				save_olc_generic(ch->desc);
+				free_generic(GET_OLC_GENERIC(ch->desc));
+				GET_OLC_GENERIC(ch->desc) = NULL;
+				break;
+			}
 			case OLC_GLOBAL: {
 				save_olc_global(ch->desc);
 				free_global(GET_OLC_GLOBAL(ch->desc));
@@ -3199,6 +3291,11 @@ OLC_MODULE(olc_search) {
 			case OLC_FACTION: {
 				void olc_search_faction(char_data *ch, any_vnum vnum);
 				olc_search_faction(ch, vnum);
+				break;
+			}
+			case OLC_GENERIC: {
+				void olc_search_generic(char_data *ch, any_vnum vnum);
+				olc_search_generic(ch, vnum);
 				break;
 			}
 			case OLC_GLOBAL: {
@@ -3962,6 +4059,9 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_FACTION) && !OLC_FLAGGED(ch, OLC_FLAG_NO_FACTIONS)) {
+			return TRUE;
+		}
+		else if (IS_SET(type, OLC_GENERIC) && !OLC_FLAGGED(ch, OLC_FLAG_NO_GENERICS)) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_GLOBAL) && !OLC_FLAGGED(ch, OLC_FLAG_NO_GLOBAL)) {

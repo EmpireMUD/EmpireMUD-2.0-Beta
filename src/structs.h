@@ -28,6 +28,7 @@
 *     Empire Defines
 *     Faction Defines
 *     Game Defines
+*     Generic Defines
 *     Mobile Defines
 *     Object Defines
 *     Player Defines
@@ -56,6 +57,7 @@
 *     Faction Structs
 *     Fight Structs
 *     Game Structs
+*     Generic Structs
 *     Object Structs
 *     Quest Structs
 *     Sector Structs
@@ -223,6 +225,7 @@ typedef struct crop_data crop_data;
 typedef struct descriptor_data descriptor_data;
 typedef struct empire_data empire_data;
 typedef struct faction_data faction_data;
+typedef struct generic_data generic_data;
 typedef struct index_data index_data;
 typedef struct morph_data morph_data;
 typedef struct obj_data obj_data;
@@ -1066,6 +1069,26 @@ typedef struct vehicle_data vehicle_data;
 #define SHUTDOWN_NORMAL  0	// comes up normally
 #define SHUTDOWN_PAUSE  1	// writes a pause file which must be removed
 #define SHUTDOWN_DIE  2	// kills the autorun
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// GENERIC DEFINES /////////////////////////////////////////////////////////
+
+// GENERIC_x: generic types
+#define GENERIC_UNKNOWN  0	// dummy
+#define GENERIC_LIQUID  1	// for drink containers
+#define GENERIC_CURRENCY  2	// for shops (future)
+
+
+// GEN_x: generic flags
+// #define GEN_...  BIT(0)	// a. no flags are implemented
+
+
+// how many strings a generic stores (can be safely raised with no updates)
+#define NUM_GENERIC_STRINGS  3
+
+// how many ints a generic stores (update write_generic_to_file if you change this)
+#define NUM_GENERIC_VALUES  4
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -3007,6 +3030,7 @@ struct descriptor_data {
 	bld_data *olc_building;	// building being edited
 	crop_data *olc_crop;	// crop being edited
 	faction_data *olc_faction;	// faction being edited
+	generic_data *olc_generic;	// generic being edited
 	struct global_data *olc_global;	// global being edited
 	quest_data *olc_quest;	// quest being edited
 	room_template *olc_room_template;	// rmt being edited
@@ -3874,6 +3898,25 @@ struct reboot_control_data {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// GENERIC STRUCTS /////////////////////////////////////////////////////////
+
+// generic data for currency, liquids, etc
+struct generic_data {
+	any_vnum vnum;
+	
+	char *name;	// for internal labeling
+	int type;
+	bitvector_t flags;	// GEN_ flags
+	
+	// data depends on type
+	int value[NUM_GENERIC_VALUES];
+	char *string[NUM_GENERIC_STRINGS];	// this can be expanded
+	
+	UT_hash_handle hh;	// generic_table hash
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// OBJECT STRUCTS //////////////////////////////////////////////////////////
 
 // used for binding objects to players
@@ -4121,7 +4164,7 @@ struct social_data {
 	char *name;	// for internal labeling
 	char *command;	// as seen/typed by the player
 	
-	bitvector_t flags;	// AUG_x flags
+	bitvector_t flags;	// SOC_ flags
 	int min_char_position;	// POS_ of the character
 	int min_victim_position;	// POS_ of victim
 	struct req_data *requirements;	// linked list of requirements

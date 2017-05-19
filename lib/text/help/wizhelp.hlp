@@ -1222,7 +1222,7 @@ specified name. If you specify more than one keyword, it will find things
 that match ALL of those keywords.
 
 Valid types are: adventure, ability, archetype, augment, book, building, craft,
-                 class, crop, faction, global, mob, morph, obj, quest,
+                 class, crop, faction, global, generic, mob, morph, obj, quest,
                  roomtemplate, sector, skill, social, trigger, vehicle
 
 Examples:
@@ -1244,7 +1244,7 @@ Usage:  vstat <type> <vnum>
 Used to stat a prototypical object by virtual number.
 
 Valid types are: adventure, ability, archetype, augment, building, book, craft,
-                 class, crop, faction, global, mob, morph, obj, quest,
+                 class, crop, faction, global, generic, mob, morph, obj, quest,
                  roomtemplate, sector, skill, social, trigger, vehicle
 
 Examples:

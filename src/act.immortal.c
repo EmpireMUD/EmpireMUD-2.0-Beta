@@ -7511,9 +7511,15 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No factions by that name.\r\n");
 		}
 	}
-	else if (is_abbrev(buf, "global")) {
+	else if (is_abbrev(buf, "global")) {	// takes precedence on 'g'
 		if (!vnum_global(buf2, ch)) {
 			msg_to_char(ch, "No globals by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "generic")) {
+		extern int vnum_generic(char *searchname, char_data *ch);
+		if (!vnum_generic(buf2, ch)) {
+			msg_to_char(ch, "No generic by that name.\r\n");
 		}
 	}
 	else if (is_abbrev(buf, "morph")) {
@@ -7668,13 +7674,22 @@ ACMD(do_vstat) {
 		}
 		do_stat_faction(ch, fct);
 	}
-	else if (is_abbrev(buf, "global")) {
+	else if (is_abbrev(buf, "global")) {	// precedence on 'g'
 		struct global_data *glb = global_proto(number);
 		if (!glb) {
 			msg_to_char(ch, "There is no global with that number.\r\n");
 			return;
 		}
 		do_stat_global(ch, glb);
+	}
+	else if (is_abbrev(buf, "generic")) {
+		void do_stat_generic(char_data *ch, generic_data *gen);
+		generic_data *gen = find_generic_by_vnum(number);
+		if (!gen) {
+			msg_to_char(ch, "There is no generic with that number.\r\n");
+			return;
+		}
+		do_stat_generic(ch, gen);
 	}
 	else if (is_abbrev(buf, "mobile")) {
 		if (!mob_proto(number)) {

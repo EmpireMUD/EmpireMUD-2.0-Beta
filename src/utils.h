@@ -29,6 +29,7 @@
 *   Empire Utils
 *   Faction Utils
 *   Fight Utils
+*   Generic Utils
 *   Global Utils
 *   Map Utils
 *   Memory Utils
@@ -446,6 +447,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_CRAFT(desc)  ((desc)->olc_craft)
 #define GET_OLC_CROP(desc)  ((desc)->olc_crop)
 #define GET_OLC_FACTION(desc)  ((desc)->olc_faction)
+#define GET_OLC_GENERIC(desc)  ((desc)->olc_generic)
 #define GET_OLC_GLOBAL(desc)  ((desc)->olc_global)
 #define GET_OLC_MOBILE(desc)  ((desc)->olc_mobile)
 #define GET_OLC_MORPH(desc)  ((desc)->olc_morph)
@@ -539,6 +541,33 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 //// FIGHT UTILS /////////////////////////////////////////////////////////////
 
 #define SHOULD_APPEAR(ch)  AFF_FLAGGED(ch, AFF_HIDE | AFF_INVISIBLE)
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// GENERIC UTILS ///////////////////////////////////////////////////////////
+
+#define GEN_VNUM(gen)  ((gen)->vnum)
+#define GEN_FLAGS(gen)  ((gen)->flags)
+#define GEN_NAME(gen)  ((gen)->name)
+#define GEN_STRING(gen, pos)  ((gen)->string[(pos)])
+#define GEN_TYPE(gen)  ((gen)->type)
+#define GEN_VALUE(gen, pos)  ((gen)->value[(pos)])
+
+
+// helpers
+#define GEN_FLAGGED(gen, flag)  IS_SET(GEN_FLAGS(gen), (flag))
+
+
+// GENERIC_LIQUID
+#define GSTR_LIQUID_NAME  0
+#define GSTR_LIQUID_ALIAS  1
+#define GSTR_LIQUID_COLOR  2
+#define GET_LIQUID_NAME(gen)  GEN_STRING((gen), GSTR_LIQUID_NAME)
+#define GET_LIQUID_ALIAS(gen)  GEN_STRING((gen), GSTR_LIQUID_ALIAS)
+#define GET_LIQUID_COLOR(gen)  GEN_STRING((gen), GSTR_LIQUID_COLOR)
+#define GET_LIQUID_DRUNK(gen)  GEN_VALUE((gen), DRUNK)
+#define GET_LIQUID_FULL(gen)  GEN_VALUE((gen), FULL)
+#define GET_LIQUID_THIRST(gen)  GEN_VALUE((gen), THIRST)
 
 
  //////////////////////////////////////////////////////////////////////////////

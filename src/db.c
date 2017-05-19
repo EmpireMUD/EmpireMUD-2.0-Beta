@@ -119,6 +119,9 @@ struct weather_data weather_info;	// the infomation about the weather
 int wizlock_level = 0;	// level of game restriction
 char *wizlock_message = NULL;	// Message sent to people trying to connect
 
+// generics
+generic_data *generic_table = NULL;	// hash table (hh)
+
 // global stuff
 struct global_data *globals_table = NULL;	// hash table of global_data
 
@@ -249,6 +252,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ QST_PREFIX, QST_SUFFIX },	// DB_BOOT_QST
 	{ SOC_PREFIX, SOC_SUFFIX },	// DB_BOOT_SOC
 	{ FCT_PREFIX, FCT_SUFFIX },	// DB_BOOT_FCT
+	{ GEN_PREFIX, GEN_SUFFIX },	// DB_BOOT_GEN
 };
 
 
@@ -424,6 +428,9 @@ void boot_world(void) {
 	extern int sort_socials_by_data(social_data *a, social_data *b);
 
 	// DB_BOOT_x search: boot new types in this function
+	
+	log("Loading generics.");
+	index_boot(DB_BOOT_GEN);
 	
 	log("Loading abilities.");
 	index_boot(DB_BOOT_ABIL);

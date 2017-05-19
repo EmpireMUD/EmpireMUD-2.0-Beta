@@ -1712,6 +1712,9 @@ void close_socket(descriptor_data *d) {
 	if (d->olc_faction) {
 		free_faction(d->olc_faction);
 	}
+	if (d->olc_generic) {
+		free_generic(d->olc_generic);
+	}
 	if (d->olc_global) {
 		free_global(d->olc_global);
 	}

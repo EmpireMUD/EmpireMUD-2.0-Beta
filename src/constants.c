@@ -33,6 +33,7 @@
 *   Craft Recipe Constants
 *   Empire Constants
 *   Faction Constants
+*   Generic Constants
 *   Mob Constants
 *   Item Contants
 *   OLC Constants
@@ -1554,6 +1555,25 @@ struct faction_reputation_type reputation_levels[] = {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// GENERIC CONSTANTS ///////////////////////////////////////////////////////
+
+// GENERIC_x: generic types
+const char *generic_types[] = {
+	"UNKNOWN",
+	"LIQUID",
+	"CURRENCY",
+	"\n"
+};
+
+
+// GEN_x: generic flags
+const char *generic_flags[] = {
+	// none yet defined
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// MOB CONSTANTS ///////////////////////////////////////////////////////////
 
 /* MOB_x */
@@ -2311,6 +2331,7 @@ const char *olc_flag_bits[] = {
 	"!QUESTS",
 	"!SOCIALS",
 	"!FACTIONS",
+	"!GENERICS",
 	"\n"
 };
 
@@ -2339,6 +2360,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"quest",
 	"social",
 	"faction",
+	"generic",
 	"\n"
 };
 
