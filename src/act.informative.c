@@ -312,7 +312,6 @@ void look_at_target(char_data *ch, char *arg) {
 * @param char *arg The typed argument (usually obj name).
 */
 void look_in_obj(char_data *ch, char *arg) {
-	extern const char *color_liquid[];
 	extern const char *fullness[];
 	vehicle_data *veh = NULL;
 	obj_data *obj = NULL;
@@ -369,8 +368,7 @@ void look_in_obj(char_data *ch, char *arg) {
 				}
 				else {
 					amt = (GET_DRINK_CONTAINER_CONTENTS(obj) * 3) / GET_DRINK_CONTAINER_CAPACITY(obj);
-					sprinttype(GET_DRINK_CONTAINER_TYPE(obj), color_liquid, buf2);
-					sprintf(buf, "It's %sfull of a %s liquid.\r\n", fullness[amt], buf2);
+					sprintf(buf, "It's %sfull of a %s liquid.\r\n", fullness[amt], get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_COLOR));
 				}
 				send_to_char(buf, ch);
 			}
@@ -1151,7 +1149,6 @@ void show_character_affects(char_data *ch, char_data *to) {
 * @param int mode OBJ_DESC_SHORT, OBJ_DESC_LONG
 */
 char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
-	extern const char *drinks[];
 	extern const struct material_data materials[NUM_MATERIALS];
 
 	static char output[MAX_STRING_LENGTH];
@@ -1163,7 +1160,7 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 	*sdesc = '\0';
 
 	if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
-		sprintf(sdesc, "%s of %s", GET_OBJ_SHORT_DESC(obj), drinks[GET_DRINK_CONTAINER_TYPE(obj)]);
+		sprintf(sdesc, "%s of %s", GET_OBJ_SHORT_DESC(obj), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 	}
 	else if (IS_ARROW(obj)) {
 		sprintf(sdesc, "%s (%d)", GET_OBJ_SHORT_DESC(obj), MAX(1, GET_ARROW_QUANTITY(obj)));

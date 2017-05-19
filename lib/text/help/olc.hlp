@@ -4468,7 +4468,7 @@ other pools), coins, and liquids.
 Specific syntaxes for adding:
   .resource add object <quantity> <vnum>
   .resource add component <quantity> <component type> [component flags]
-  .resource add liquid <number of units> <liquid name>
+  .resource add liquid <number of units> <liquid vnum>
   .resource add coins <amount>
   .resource add pool <number of points> <pool type>
   .resource add action <amount> <type>

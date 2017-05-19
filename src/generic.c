@@ -50,6 +50,50 @@ extern const char *generic_types[];
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
+/**
+* Quick, safe lookup for a generic string. This checks that it's the expected
+* type, and will return UNKNOWN if anything is out of place.
+*
+* @param any_vnum vnum The generic vnum to look up.
+* @param int type Any GENERIC_ const that must match the vnum's type.
+* @param int pos Which string position to fetch.
+* @return const char* The string from the generic.
+*/
+const char *get_generic_string_by_vnum(any_vnum vnum, int type, int pos) {
+	generic_data *gen = find_generic_by_vnum(vnum);
+	
+	if (!gen || GEN_TYPE(gen) != type || pos < 0 || pos >= NUM_GENERIC_STRINGS) {
+		return "UNKNOWN";	// sanity
+	}
+	else if (!GEN_STRING(gen, pos)) {
+		return "(null)";
+	}
+	else {
+		return GEN_STRING(gen, pos);
+	}
+}
+
+
+/**
+* Quick, safe lookup for a generic value. This checks that it's the expected
+* type, and will return 0 if anything is out of place.
+*
+* @param any_vnum vnum The generic vnum to look up.
+* @param int type Any GENERIC_ const that must match the vnum's type.
+* @param int pos Which value position to fetch.
+* @return int The value from the generic.
+*/
+int get_generic_value_by_vnum(any_vnum vnum, int type, int pos) {
+	generic_data *gen = find_generic_by_vnum(vnum);
+	
+	if (!gen || GEN_TYPE(gen) != type || pos < 0 || pos >= NUM_GENERIC_VALUES) {
+		return 0;	// sanity
+	}
+	else {
+		return GEN_VALUE(gen, pos);
+	}
+}
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
@@ -531,7 +575,7 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0, Type: \tc%s\t0\r\n", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
+	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0, Type: \tc%s\t0\r\n", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
 	
 	sprintbit(GEN_FLAGS(gen), generic_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
@@ -539,7 +583,7 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 	// GENERIC_x
 	switch (GEN_TYPE(gen)) {
 		case GENERIC_LIQUID: {
-			size += snprintf(buf + size, sizeof(buf) - size, "Liquid: \ty%s\t0, Alias: \ty%s\t0, Color: \ty%s\t0\r\n", NULLSAFE(GET_LIQUID_NAME(gen)), NULLSAFE(GET_LIQUID_ALIAS(gen)), NULLSAFE(GET_LIQUID_COLOR(gen)));
+			size += snprintf(buf + size, sizeof(buf) - size, "Liquid: \ty%s\t0, Color: \ty%s\t0\r\n", NULLSAFE(GET_LIQUID_NAME(gen)), NULLSAFE(GET_LIQUID_COLOR(gen)));
 			size += snprintf(buf + size, sizeof(buf) - size, "Hunger: [\tc%d\t0], Thirst: [\tc%d\t0], Drunk: [\tc%d\t0]\r\n", GET_LIQUID_FULL(gen), GET_LIQUID_THIRST(gen), GET_LIQUID_DRUNK(gen));
 			break;
 		}
@@ -580,7 +624,6 @@ void olc_show_generic(char_data *ch) {
 	switch (GEN_TYPE(gen)) {
 		case GENERIC_LIQUID: {
 			sprintf(buf + strlen(buf), "<\tyliquid\t0> %s\r\n", GET_LIQUID_NAME(gen) ? GET_LIQUID_NAME(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<\tyalias\t0> %s\r\n", GET_LIQUID_ALIAS(gen) ? GET_LIQUID_ALIAS(gen) : "(none)");
 			sprintf(buf + strlen(buf), "<\tycolor\t0> %s\r\n", GET_LIQUID_COLOR(gen) ? GET_LIQUID_COLOR(gen) : "(none)");
 			sprintf(buf + strlen(buf), "<\tyhunger\t0> %d hour%s\r\n", GET_LIQUID_FULL(gen), PLURAL(GET_LIQUID_FULL(gen)));
 			sprintf(buf + strlen(buf), "<\tythirst\t0> %d hour%s\r\n", GET_LIQUID_THIRST(gen), PLURAL(GET_LIQUID_THIRST(gen)));
@@ -655,18 +698,6 @@ OLC_MODULE(genedit_type) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// LIQUID OLC MODULES //////////////////////////////////////////////////////
-
-OLC_MODULE(genedit_alias) {
-	generic_data *gen = GET_OLC_GENERIC(ch->desc);
-	
-	if (GEN_TYPE(gen) != GENERIC_LIQUID) {
-		msg_to_char(ch, "You can only change that on a LIQUID generic.\r\n");
-	}
-	else {
-		olc_process_string(ch, argument, "alias", &GEN_STRING(gen, GSTR_LIQUID_ALIAS));
-	}
-}
-
 
 OLC_MODULE(genedit_color) {
 	generic_data *gen = GET_OLC_GENERIC(ch->desc);

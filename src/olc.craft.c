@@ -33,7 +33,6 @@ extern const char *apply_types[];
 extern const char *bld_on_flags[];
 extern const char *craft_flags[];
 extern const char *craft_types[];
-extern const char *drinks[];
 extern const char *road_types[];
 
 // external funcs
@@ -426,7 +425,7 @@ void olc_show_craft(char_data *ch) {
 		sprintf(buf + strlen(buf), "<&ybuildfacing&0> %s\r\n", buf1);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP)) {
-		sprintf(buf + strlen(buf), "<&yliquid&0> [%d] %s\r\n", GET_CRAFT_OBJECT(craft), GET_CRAFT_OBJECT(craft) == NOTHING ? "none" : drinks[GET_CRAFT_OBJECT(craft)]);
+		sprintf(buf + strlen(buf), "<&yliquid&0> [%d] %s\r\n", GET_CRAFT_OBJECT(craft), get_generic_string_by_vnum(GET_CRAFT_OBJECT(craft), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 		sprintf(buf + strlen(buf), "<&yvolume&0> %d drink%s\r\n", GET_CRAFT_QUANTITY(craft), (GET_CRAFT_QUANTITY(craft) != 1 ? "s" : ""));
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_VEHICLE)) {
@@ -632,12 +631,20 @@ OLC_MODULE(cedit_levelrequired) {
 
 OLC_MODULE(cedit_liquid) {
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
+	generic_data *gen;
+	any_vnum old;
 	
 	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD || !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP)) {
 		msg_to_char(ch, "You can only set the liquid type on a soup.\r\n");
 	}
 	else {
-		GET_CRAFT_OBJECT(craft) = olc_process_type(ch, argument, "liquid", "liquid", drinks, GET_CRAFT_OBJECT(craft));
+		old = GET_CRAFT_OBJECT(craft);
+		GET_CRAFT_OBJECT(craft) = olc_process_number(ch, argument, "liquid vnum", "liquid", 0, MAX_VNUM, GET_CRAFT_OBJECT(craft));
+		
+		if (!(gen = find_generic_by_vnum(GET_CRAFT_OBJECT(craft))) || GEN_TYPE(gen) != GENERIC_LIQUID) {
+			msg_to_char(ch, "Invalid liquid generic vnum %d. Old value restored.\r\n", GET_CRAFT_OBJECT(craft));
+			GET_CRAFT_OBJECT(craft) = old;
+		}
 	}
 }
 

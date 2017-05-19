@@ -37,7 +37,6 @@ extern const char *armor_types[NUM_ARMOR_TYPES+1];
 extern const char *component_flags[];
 extern const char *component_types[];
 extern const char *container_bits[];
-extern const char *drinks[];
 extern const char *extra_bits[];
 extern const char *interact_types[];
 extern const char *item_types[];
@@ -1713,7 +1712,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		case ITEM_DRINKCON: {
 			sprintf(storage + strlen(storage), "<&ycapacity&0> %d drink%s\r\n", GET_DRINK_CONTAINER_CAPACITY(obj), PLURAL(GET_DRINK_CONTAINER_CAPACITY(obj)));
 			sprintf(storage + strlen(storage), "<&ycontents&0> %d drink%s\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), PLURAL(GET_DRINK_CONTAINER_CONTENTS(obj)));
-			sprintf(storage + strlen(storage), "<&yliquid&0> %s\r\n", drinks[GET_DRINK_CONTAINER_TYPE(obj)]);
+			sprintf(storage + strlen(storage), "<&yliquid&0> %s\r\n", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 			break;
 		}
 		case ITEM_FOOD: {
@@ -2507,12 +2506,20 @@ OLC_MODULE(oedit_keywords) {
 
 OLC_MODULE(oedit_liquid) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	generic_data *gen;
+	any_vnum old;
 	
 	if (!IS_DRINK_CONTAINER(obj)) {
 		msg_to_char(ch, "You can only set liquid on a drink container.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = olc_process_type(ch, argument, "liquid", "liquid", drinks, GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE));
+		old = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE);
+		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = olc_process_number(ch, argument, "liquid vnum", "liquid", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE));
+
+		if (!(gen = find_generic_by_vnum(GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE))) || GEN_TYPE(gen) != GENERIC_LIQUID) {
+			msg_to_char(ch, "Invalid liquid generic vnum %d. Old value restored.\r\n", GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE));
+			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = old;
+		}
 	}
 }
 

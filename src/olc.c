@@ -178,7 +178,6 @@ OLC_MODULE(fedit_startingreputation);
 OLC_MODULE(genedit_flags);
 OLC_MODULE(genedit_name);
 OLC_MODULE(genedit_type);
-OLC_MODULE(genedit_alias);
 OLC_MODULE(genedit_color);
 OLC_MODULE(genedit_drunk);
 OLC_MODULE(genedit_hunger);
@@ -405,8 +404,6 @@ OLC_MODULE(vedit_shortdescription);
 // externs
 extern const char *component_flags[];
 extern const char *component_types[];
-extern const char *drinks[];
-extern const char *drinknames[];
 extern const char *interact_types[];
 extern const int interact_attach_types[NUM_INTERACTS];
 extern const byte interact_vnum_types[NUM_INTERACTS];
@@ -633,7 +630,6 @@ const struct olc_command_data olc_data[] = {
 	{ "name", genedit_name, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "type", genedit_type, OLC_GENERIC, OLC_CF_EDITOR },
 	// generic: liquids
-	{ "alias", genedit_alias, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "color", genedit_color, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "drunk", genedit_drunk, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "hunger", genedit_hunger, OLC_GENERIC, OLC_CF_EDITOR },
@@ -3655,7 +3651,7 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 				break;
 			}
 			case RES_LIQUID: {
-				sprintf(line, "%d units %s", res->amount, drinks[res->vnum]);
+				sprintf(line, "%d units %s", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
 				break;
 			}
@@ -5901,6 +5897,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 	char arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH];
 	struct resource_data *res, *next_res, *prev_res, *prev_prev, *change, *temp;
 	int num, type, misc;
+	generic_data *gen;
 	any_vnum vnum;
 	bool found;
 	
@@ -5998,8 +5995,8 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 						msg_to_char(ch, "Usage: resource add liquid <units> <name>\r\n");
 						return;
 					}
-					if ((vnum = search_block(arg4, drinks, FALSE)) == NOTHING && (vnum = search_block(arg4, drinknames, FALSE)) == NOTHING) {
-						msg_to_char(ch, "Unknown liquid type '%s'.\r\n", arg4);
+					if (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_LIQUID) {
+						msg_to_char(ch, "Invalid liquid generic vnum %d.\r\n", vnum);
 						return;
 					}
 					break;
@@ -6149,18 +6146,21 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			}
 		}
 		else if (is_abbrev(arg3, "vnum")) {
-			if (change->type != RES_OBJECT) {
-				msg_to_char(ch, "You can't change the vnum on a resource that isn't an object.\r\n");
+			if (change->type != RES_OBJECT && change->type != RES_LIQUID) {
+				msg_to_char(ch, "You can't change the vnum on a resource that isn't an object or liquid.\r\n");
 			}
-			else if (!obj_proto(vnum)) {
+			else if (change->type == RES_OBJECT && !obj_proto(vnum)) {
 				msg_to_char(ch, "There is no such object vnum %d.\r\n", vnum);
+			}
+			else if (change->type == RES_LIQUID && (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_LIQUID)) {
+				msg_to_char(ch, "Invalid liquid generic vnum %d.\r\n", vnum);
 			}
 			else {
 				change->vnum = vnum;
 				msg_to_char(ch, "You change resource %d's vnum to [%d] %s.\r\n", atoi(arg2), vnum, get_obj_name_by_proto(vnum));
 			}
 		}
-		else if (is_abbrev(arg3, "name") || is_abbrev(arg3, "component") || is_abbrev(arg3, "liquid") || is_abbrev(arg3, "pool")) {
+		else if (is_abbrev(arg3, "name") || is_abbrev(arg3, "component") || is_abbrev(arg3, "pool")) {
 			// RES_x: some resource types support "change name"
 			switch (change->type) {
 				case RES_COMPONENT: {
@@ -6172,16 +6172,6 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					change->vnum = vnum;
 					
 					msg_to_char(ch, "You change resource %d's component to %s.\r\n", atoi(arg2), component_string(vnum, change->misc));
-					break;
-				}
-				case RES_LIQUID: {
-					if ((vnum = search_block(arg4, drinks, FALSE)) == NOTHING && (vnum = search_block(arg4, drinknames, FALSE)) == NOTHING) {
-						msg_to_char(ch, "Unknown liquid type '%s'.\r\n", arg4);
-						return;
-					}
-					
-					change->vnum = vnum;
-					msg_to_char(ch, "You change resource %d's liquid to %s.\r\n", atoi(arg2), drinks[vnum]);
 					break;
 				}
 				case RES_POOL: {

@@ -560,10 +560,8 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 
 // GENERIC_LIQUID
 #define GSTR_LIQUID_NAME  0
-#define GSTR_LIQUID_ALIAS  1
-#define GSTR_LIQUID_COLOR  2
+#define GSTR_LIQUID_COLOR  1
 #define GET_LIQUID_NAME(gen)  GEN_STRING((gen), GSTR_LIQUID_NAME)
-#define GET_LIQUID_ALIAS(gen)  GEN_STRING((gen), GSTR_LIQUID_ALIAS)
 #define GET_LIQUID_COLOR(gen)  GEN_STRING((gen), GSTR_LIQUID_COLOR)
 #define GET_LIQUID_DRUNK(gen)  GEN_VALUE((gen), DRUNK)
 #define GET_LIQUID_FULL(gen)  GEN_VALUE((gen), FULL)
