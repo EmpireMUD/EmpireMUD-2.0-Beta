@@ -2484,28 +2484,28 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 			
 			switch (msg_type) {
 				case APPLY_RES_BUILD: {
-					if (!messaged_char && gen) {
+					if (!messaged_char && gen && GSTR_ACTION_BUILD_TO_CHAR) {
 						act(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR), FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
 					}
-					if (!messaged_room) {
+					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM)) {
 						act(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM), FALSE, ch, use_obj, NULL, TO_ROOM | TO_SPAMMY);
 					}
 					break;
 				}
 				case APPLY_RES_CRAFT: {
-					if (!messaged_char) {
+					if (!messaged_char && gen && GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR)) {
 						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
 					}
-					if (!messaged_room) {
+					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM)) {
 						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
 					}
 					break;
 				}
 				case APPLY_RES_REPAIR: {
-					if (!messaged_char) {
+					if (!messaged_char && gen && GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR)) {
 						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
 					}
-					if (!messaged_room) {
+					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM)) {
 						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
 					}
 					break;
