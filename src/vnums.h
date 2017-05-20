@@ -197,3 +197,16 @@
 #define VEHICLE_REPAIRMAN  273
 #define OVERSEER  274
 #define PRESS_WORKER  276
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// OTHER ///////////////////////////////////////////////////////////////
+
+// LIQ_x: Some different kind of liquids (vnums of GENERIC_LIQUID)
+#define LIQ_WATER  0
+#define LIQ_LAGER  1
+#define LIQ_WHEATBEER  2
+#define LIQ_ALE  3
+#define LIQ_CIDER  4
+#define LIQ_MILK  5
+#define LIQ_BLOOD  6

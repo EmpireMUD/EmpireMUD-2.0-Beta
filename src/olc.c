@@ -183,6 +183,12 @@ OLC_MODULE(genedit_drunk);
 OLC_MODULE(genedit_hunger);
 OLC_MODULE(genedit_liquid);
 OLC_MODULE(genedit_thirst);
+OLC_MODULE(genedit_build2char);
+OLC_MODULE(genedit_build2room);
+OLC_MODULE(genedit_craft2char);
+OLC_MODULE(genedit_craft2room);
+OLC_MODULE(genedit_repair2char);
+OLC_MODULE(genedit_repair2room);
 
 // global modules
 OLC_MODULE(gedit_ability);
@@ -629,6 +635,13 @@ const struct olc_command_data olc_data[] = {
 	{ "flags", genedit_flags, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "name", genedit_name, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "type", genedit_type, OLC_GENERIC, OLC_CF_EDITOR },
+	// generic: actions
+	{ "build2char", genedit_build2char, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "build2room", genedit_build2room, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "craft2char", genedit_craft2char, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "craft2room", genedit_craft2room, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "repair2char", genedit_repair2char, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "repair2room", genedit_repair2room, OLC_GENERIC, OLC_CF_EDITOR },
 	// generic: liquids
 	{ "color", genedit_color, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "drunk", genedit_drunk, OLC_GENERIC, OLC_CF_EDITOR },

@@ -1561,7 +1561,7 @@ struct faction_reputation_type reputation_levels[] = {
 const char *generic_types[] = {
 	"UNKNOWN",
 	"LIQUID",
-	"CURRENCY",
+	"ACTION",
 	"\n"
 };
 

@@ -567,6 +567,14 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_LIQUID_FULL(gen)  GEN_VALUE((gen), FULL)
 #define GET_LIQUID_THIRST(gen)  GEN_VALUE((gen), THIRST)
 
+// GENERIC_ACTION
+#define GSTR_ACTION_BUILD_TO_CHAR  0
+#define GSTR_ACTION_BUILD_TO_ROOM  1
+#define GSTR_ACTION_CRAFT_TO_CHAR  2
+#define GSTR_ACTION_CRAFT_TO_ROOM  3
+#define GSTR_ACTION_REPAIR_TO_CHAR  4
+#define GSTR_ACTION_REPAIR_TO_ROOM  5
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// GLOBAL UTILS ////////////////////////////////////////////////////////////

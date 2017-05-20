@@ -54,6 +54,7 @@ void init_craft(craft_data *craft);
 bool audit_craft(craft_data *craft, char_data *ch) {
 	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;
+	generic_data *gen;
 	int count;
 
 	if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING && GET_CRAFT_ABILITY(craft) == NO_ABIL) {
@@ -106,11 +107,9 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			problem = TRUE;
 		}
 	}
-	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {	// soups only
-		if (GET_CRAFT_OBJECT(craft) < 0 || GET_CRAFT_OBJECT(craft) > NUM_LIQUIDS) {
-			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Invalid liquid type on soup recipe");
-			problem = TRUE;
-		}
+	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP) && (!(gen = find_generic_by_vnum(GET_CRAFT_OBJECT(craft))) || GEN_TYPE(gen) != GENERIC_LIQUID)) {	// soups only
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Invalid liquid type on soup recipe");
+		problem = TRUE;
 	}
 	else {	// normal craft (not special type))
 		if (GET_CRAFT_OBJECT(craft) == NOTHING || !obj_proto(GET_CRAFT_OBJECT(craft))) {

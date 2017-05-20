@@ -1077,7 +1077,7 @@ typedef struct vehicle_data vehicle_data;
 // GENERIC_x: generic types
 #define GENERIC_UNKNOWN  0	// dummy
 #define GENERIC_LIQUID  1	// for drink containers
-#define GENERIC_CURRENCY  2	// for shops (future)
+#define GENERIC_ACTION  2	// for resource actions
 
 
 // GEN_x: generic flags
@@ -1085,7 +1085,7 @@ typedef struct vehicle_data vehicle_data;
 
 
 // how many strings a generic stores (can be safely raised with no updates)
-#define NUM_GENERIC_STRINGS  3
+#define NUM_GENERIC_STRINGS  6
 
 // how many ints a generic stores (update write_generic_to_file if you change this)
 #define NUM_GENERIC_VALUES  4
@@ -1316,26 +1316,6 @@ typedef struct vehicle_data vehicle_data;
 #define ITEM_WEAR_SADDLE  BIT(18)	// s. Saddle
 
 
-// LIQ_x: Some different kind of liquids for use in values of drink containers
-#define LIQ_WATER  0
-#define LIQ_LAGER  1
-#define LIQ_WHEATBEER  2
-#define LIQ_ALE  3
-#define LIQ_CIDER  4
-#define LIQ_MILK  5
-#define LIQ_BLOOD  6
-#define LIQ_HONEY  7
-#define LIQ_BEAN_SOUP  8
-#define LIQ_COFFEE  9
-#define LIQ_GREEN_TEA  10
-#define LIQ_RED_WINE  11
-#define LIQ_WHITE_WINE  12
-#define LIQ_GROG  13
-#define LIQ_MEAD  14
-#define LIQ_STOUT  15
-#define NUM_LIQUIDS  16	// total
-
-
 // Item materials
 #define MAT_WOOD  0	// Made from wood
 #define MAT_ROCK  1	// ...rock
@@ -1407,7 +1387,7 @@ typedef struct vehicle_data vehicle_data;
 // RES_x: resource requirement types
 #define RES_OBJECT  0	// specific obj (vnum= obj vnum, misc= scale level [refunds only])
 #define RES_COMPONENT  1	// an obj of a given generic type (vnum= CMP_ type, misc= CMPF_ flags)
-#define RES_LIQUID  2	// a volume of a given liquid (vnum= LIQ_ type)
+#define RES_LIQUID  2	// a volume of a given liquid (vnum= LIQ_ vnum)
 #define RES_COINS  3	// an amount of coins (vnum= empire id of coins)
 #define RES_POOL  4	// health, mana, etc (vnum= HEALTH, etc)
 #define RES_ACTION  5	// flavorful action strings (take time but not resources)

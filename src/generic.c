@@ -33,6 +33,7 @@
 *   OLC Handlers
 *   Displays
 *   Generic OLC Modules
+*   Action OLC Modules
 *   Liquid OLC Modules
 */
 
@@ -587,7 +588,13 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Hunger: [\tc%d\t0], Thirst: [\tc%d\t0], Drunk: [\tc%d\t0]\r\n", GET_LIQUID_FULL(gen), GET_LIQUID_THIRST(gen), GET_LIQUID_DRUNK(gen));
 			break;
 		}
-		case GENERIC_CURRENCY: {
+		case GENERIC_ACTION: {
+			size += snprintf(buf + size, sizeof(buf) - size, "Build-to-Char: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR)));
+			size += snprintf(buf + size, sizeof(buf) - size, "Build-to-Room: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM)));
+			size += snprintf(buf + size, sizeof(buf) - size, "Craft-to-Char: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR)));
+			size += snprintf(buf + size, sizeof(buf) - size, "Craft-to-Room: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM)));
+			size += snprintf(buf + size, sizeof(buf) - size, "Repair-to-Char: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR)));
+			size += snprintf(buf + size, sizeof(buf) - size, "Repair-to-Room: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM)));
 			break;
 		}
 	}
@@ -630,7 +637,13 @@ void olc_show_generic(char_data *ch) {
 			sprintf(buf + strlen(buf), "<\tydrunk\t0> %d hour%s\r\n", GET_LIQUID_DRUNK(gen), PLURAL(GET_LIQUID_DRUNK(gen)));
 			break;
 		}
-		case GENERIC_CURRENCY: {
+		case GENERIC_ACTION: {
+			sprintf(buf + strlen(buf), "<\tybuild2char\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR) : "(none)");
+			sprintf(buf + strlen(buf), "<\tybuild2room\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM) : "(none)");
+			sprintf(buf + strlen(buf), "<\tycraft2char\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR) : "(none)");
+			sprintf(buf + strlen(buf), "<\tycraft2room\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) : "(none)");
+			sprintf(buf + strlen(buf), "<\tyrepair2char\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) : "(none)");
+			sprintf(buf + strlen(buf), "<\tyrepair2room\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) : "(none)");
 			break;
 		}
 	}
@@ -692,6 +705,81 @@ OLC_MODULE(genedit_type) {
 				GEN_STRING(gen, iter) = NULL;
 			}
 		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ACTION OLC MODULES //////////////////////////////////////////////////////
+
+OLC_MODULE(genedit_build2char) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	
+	if (GEN_TYPE(gen) != GENERIC_ACTION) {
+		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "build2char", &GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR));
+	}
+}
+
+
+OLC_MODULE(genedit_build2room) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	
+	if (GEN_TYPE(gen) != GENERIC_ACTION) {
+		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "build2room", &GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM));
+	}
+}
+
+
+OLC_MODULE(genedit_craft2char) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	
+	if (GEN_TYPE(gen) != GENERIC_ACTION) {
+		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "craft2char", &GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR));
+	}
+}
+
+
+OLC_MODULE(genedit_craft2room) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	
+	if (GEN_TYPE(gen) != GENERIC_ACTION) {
+		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "craft2room", &GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM));
+	}
+}
+
+
+OLC_MODULE(genedit_repair2char) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	
+	if (GEN_TYPE(gen) != GENERIC_ACTION) {
+		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "repair2char", &GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR));
+	}
+}
+
+
+OLC_MODULE(genedit_repair2room) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	
+	if (GEN_TYPE(gen) != GENERIC_ACTION) {
+		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "repair2room", &GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM));
 	}
 }
 
