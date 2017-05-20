@@ -3664,7 +3664,7 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 			}
 			case RES_LIQUID: {
 				sprintf(line, "%d units %s", res->amount, get_generic_name_by_vnum(res->vnum));
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s", num, res->vnum, line);
 				break;
 			}
 			case RES_COINS: {
@@ -3678,7 +3678,7 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 			}
 			case RES_ACTION: {
 				sprintf(line, "%dx [%s]", res->amount, get_generic_name_by_vnum(res->vnum));
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s", num, res->vnum, line);
 				break;
 			}
 			default: {
