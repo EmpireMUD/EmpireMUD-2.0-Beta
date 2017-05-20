@@ -120,13 +120,13 @@ directly to your corrupted talon count, which is stored as a script variable.
 T 11005
 S
 #11008
-bag seeds wispy~
+bag seeds wispy zephyr cattails~
 a bag of wispy seeds~
 A bag of wispy seeds blows in the wind.~
    This mesh bag barely contains strange, fluffy seeds that blow away so easily
 on the wind. The clasp on the bag appears to be part of a bird's talon.
 ~
-3 b a 2
+3 b a 4
 0 11008 0
 0 0
 S
@@ -731,10 +731,10 @@ S
 caps finger roc quill set~
 roc quill finger caps~
 A set of roc quill finger caps is strewn on the ground.~
-   These finger caps are made from the quills of roc feathers, and act are said
-to channel the life-giving magic of the air in which the roc flew.
+   These finger caps are made from the quills of roc feathers, and are said to
+channel the life-giving magic of the air in which the roc flew.
 ~
-27 moy ah 18
+27 moy ah 19
 0 0 0
 7 0
 A

@@ -27,7 +27,7 @@ and a cooking fire.
 F
 wG
 R
-3 1 5 0
+1003 1 5 0
 S
 #10924
 Dragon Cave~
@@ -44,7 +44,7 @@ a front porch. It looks like someone has made this cave into a house. Colossal
 claw marks just beyond the porch suggest a dragon once called this cave home.
 ~
 R
-2 1 5 0
+1002 1 5 0
 S
 #10925
 Dragonslayer Statue~
@@ -55,7 +55,7 @@ A Dragonslayer Statue~
 C
 dedicate~
 R
-1 1 5 0
+1001 1 5 0
 T 10925
 S
 #10926
@@ -76,7 +76,7 @@ laboratory.
 F
 l
 R
-2 1 5 0
+1002 1 5 0
 T 10926
 S
 $

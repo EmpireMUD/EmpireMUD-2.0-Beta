@@ -1,0 +1,154 @@
+#1000
+dig~
+2 0
+0 0 0 0
+T0
+You dig at the ground.~
+T1
+$n digs at the ground.~
+T2
+You dig underneath $V.~
+T3
+$n digs underneath $V.~
+T4
+You dig underneath $V.~
+T5
+$n digs underneath $V.~
+S
+#1001
+clear terrain~
+2 0
+0 0 0 0
+T0
+You clear the area of debris.~
+T1
+$n clears the area of debris.~
+T2
+You clear the area around $V.~
+T3
+$n clears the area around $V.~
+T4
+You clear the area around $V.~
+T5
+$n clears the area around $V.~
+S
+#1002
+tidy up~
+2 0
+0 0 0 0
+T0
+You tidy up the area.~
+T1
+$n tidies up the area.~
+T2
+You tidy up around $V.~
+T3
+$n tidies up around $V.~
+T4
+You tidy up $V.~
+T5
+$n tidies up $V.~
+S
+#1003
+repair~
+2 0
+0 0 0 0
+T0
+You repair the building.~
+T1
+$n repairs the building.~
+T2
+You repair $V.~
+T3
+$n repairs $V.~
+T4
+You repair $V.~
+T5
+$n repairs $V.~
+S
+#1004
+scout area~
+2 0
+0 0 0 0
+T0
+You scout the area.~
+T1
+$n scouts the area.~
+T2
+You scout the area.~
+T3
+$n scouts the area.~
+T4
+You scout the area around $V.~
+T5
+$n scouts the area around $V.~
+S
+#1005
+block water~
+2 0
+0 0 0 0
+T0
+You block off the water.~
+T1
+$n blocks off the water.~
+T2
+You block off the water around $V.~
+T3
+$n blocks off the water around $V.~
+T4
+You block off the water around $V.~
+T5
+$n blocks off the water around $V.~
+S
+#1006
+engrave~
+2 0
+0 0 0 0
+T0
+You engrave the building.~
+T1
+$n engraves the building.~
+T2
+You engrave $V.~
+T3
+$n engraves $V.~
+T4
+You engrave $V.~
+T5
+$n engraves $V.~
+S
+#1007
+magic words~
+2 0
+0 0 0 0
+T0
+You speak some magic words.~
+T1
+$n speaks some magic words.~
+T2
+You speak some magic words.~
+T3
+$n speaks some magic words.~
+T4
+You speak some magic words.~
+T5
+$n speaks some magic words.~
+S
+#1008
+organize~
+2 0
+0 0 0 0
+T0
+You organize the building.~
+T1
+$n organizes the building.~
+T2
+You organize $V.~
+T3
+$n organizes $V.~
+T4
+You organize $V.~
+T5
+$n organizes $V.~
+S
+$

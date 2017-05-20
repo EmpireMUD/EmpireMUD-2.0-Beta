@@ -717,6 +717,7 @@ else
   * Take the egg and set the steal quest complete.
   %quest% %actor% trigger 11002
   %send% %actor% %mob.name% takes the egg from you.
+  %send% %actor% Type 'quest finish Steal the Egg' to complete the quest.
   %purge% %self%
   halt
 end

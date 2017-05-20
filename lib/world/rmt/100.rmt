@@ -6,7 +6,7 @@ thick canopy drowns out the sun, except for a few stray rays. A thick fog keeps
 you from seeing more than fifty feet in any direction, and the call of animals
 tells you that you are not alone.
 ~
-ad 0
+ad 0 0
 D14
 ~
 0 10001
@@ -37,7 +37,7 @@ sometimes hard to move. In the corner of your eye, shadows dart between trees.
 Behind the fog, you can hear the cackle of wildlings and the chants of their
 druid masters.
 ~
-ad 0
+ad 0 0
 D14
 ~
 0 10000
@@ -72,7 +72,7 @@ A Strange Grove~
 not grow here. There are no squirrels or rabbits. In the distance, you can hear
 the call of wildlings. Above you, something rustles in the trees.
 ~
-abd 0
+abd 0 0
 D14
 ~
 0 10001
@@ -109,7 +109,7 @@ as if in tune with the primal movements of the plants around them. The fog in
 the distance seems to glow redder and redder as you press deeper into the
 Grove.
 ~
-abd 0
+abd 0 0
 D14
 ~
 0 10002
@@ -147,7 +147,7 @@ druids of the Grove are mysterious, and you can't tell if this bonfire is part
 of a festival or instead if these are merely the remains of the last
 adventurers who trespassed in the Grove of the Magiterranean.
 ~
-acd 0
+acd 0 0
 D14
 ~
 0 10003
@@ -184,7 +184,7 @@ the brambles of plants in a location that was carefully selected to keep
 interlopers out. It is unwise to stay long, as the wildlings who made the nest
 are likely to return.
 ~
-ad 0
+ad 0 0
 D14
 thicket~
 ab 10004
@@ -216,7 +216,7 @@ of the cave is dominated by a huge nest, apparently made from whole trees. No
 creature but a red dragon builds a nest so large. To the side, you can see
 charred bits of armor, perhaps returned from the dragon's sensitive stomach.
 ~
-b 0
+b 0 0
 M 0 10006 100.00 1
 S
 #10011
@@ -225,7 +225,7 @@ The City Sewers~
 sewer grate, which shines a column of light from the city above. A narrow ledge
 is all that separates you from the stream of human waste that flows past.
 ~
-c 0
+c 0 0
 D3
 ~
 0 10012
@@ -244,7 +244,7 @@ The City Sewers~
 the far wall. The ledge is wider here, allowing for access on both sides.
 Bricks have been removed from the back wall and someone has dug a small tunnel.
 ~
-b 0
+b 0 0
 D1
 ~
 0 10011
@@ -263,7 +263,7 @@ dirt tunnel. The floor and walls are mostly bare earth. On one end of the
 tunnel is the sewers; the other appears to lead to a large chamber which,
 fortunately, appears to be lit by torches.
 ~
-b 0
+b 0 0
 D2
 ~
 0 10012
@@ -280,7 +280,7 @@ torches and a few storage crates are stacked in one corner. A bed of straw and
 furs takes up most of the tiny space, and a small window near the ceiling vents
 lets in fresh air that almost - almost - overtakes the smell of sewage.
 ~
-c 0
+c 0 0
 D2
 ~
 0 10013
@@ -293,7 +293,7 @@ The City Sewers~
 some sort of access tunnel. The overpowering smell of the river of raw human
 waste gives you good reason to hold onto the wall as you pass.
 ~
-b 0
+b 0 0
 D3
 ~
 0 10011
@@ -314,7 +314,7 @@ The City Sewers~
 nevertheless see what appears to be a young boy duck into the shadows in the
 distance. The ledge is wider here, at least, because you nearly lose your grip.
 ~
-b 0
+b 0 0
 D3
 ~
 0 10015
@@ -333,7 +333,7 @@ this point, apparently to reach a small tunnel on the other side. As you move
 along the ledge, you find yourself covering your face with cloth, though it
 does little good against the powerful odor of human waste.
 ~
-b 0
+b 0 0
 D3
 ~
 0 10016
@@ -355,7 +355,7 @@ rats, thieves, and the occasional corpse that finds its way into these sewers.
 Life on the surface almost seems like a rose-scented gift by comparison. The
 shadows seem to hide a small cubby in the wall.
 ~
-b 0
+b 0 0
 D3
 ~
 0 10017
@@ -376,7 +376,7 @@ The City Sewers~
 river of sewage flows inexorably past. At the base, it looks like the rats have
 been gnawing on the iron grate, but they seem to have made no progress.
 ~
-b 0
+b 0 0
 D3
 ~
 0 10018
@@ -394,7 +394,7 @@ where it leads. Any glimmer of light from the city is gone here, though the low
 ceiling shows the familiar burn marks of torches, so the area must certainly be
 well-traveled.
 ~
-b 0
+b 0 0
 D0
 ~
 0 10015
@@ -411,7 +411,7 @@ A Sewer Tunnel~
 marred by thousands of tiny claws. One of the walls is etched with words
 reading "No rates back hear", but there's no indication of what it means.
 ~
-b 0
+b 0 0
 D0
 ~
 0 10020
@@ -429,7 +429,7 @@ lumber of the support pillars and the earthen walls. The dirt appears to have
 been scraped out by the tiny claws of rats, as the ceiling is low and the
 walkway is narrow.
 ~
-b 0
+b 0 0
 D0
 ~
 0 10021
@@ -449,7 +449,7 @@ looks like dozens of rats have been nesting here - perhaps hundreds - for
 generations. It also looks like you're not the first person to come looking for
 rats at this foulest part of the sewer.
 ~
-b 0
+b 0 0
 D0
 ~
 0 10022
@@ -465,7 +465,7 @@ forgotten, has been lined with bolts of unsewn cloth and bits of hay, as if
 someone has been living here. It's difficult to imagine someone living in these
 conditions.
 ~
-b 0
+b 0 0
 D0
 ~
 0 10018
@@ -478,7 +478,7 @@ A Side Tunnel~
 than the others. Fresh air seems to come from the end of the tunnel, and a
 slight breeze actually seems to push away the stench of sewage and waste.
 ~
-b 0
+b 0 0
 D2
 ~
 0 10017
@@ -495,7 +495,7 @@ A Sewer Tunnel~
 There are fewer rat droppings compared to much of the sewer. Perhaps someone
 has been in to sweep out the tunnel recently.
 ~
-b 0
+b 0 0
 D2
 ~
 0 10025
@@ -510,7 +510,7 @@ to a little fire. Near the ceiling, an iron grate lets in a cool breeze. The
 tunnel appears to continue further, but it is blocked by another giant grate
 like the ones used to block access throughout the sewer.
 ~
-c 0
+c 0 0
 D1
 ~
 0 10026
@@ -523,7 +523,7 @@ would be hard to estimate the cost of the ebony wood. The foyer seems larger
 than is possible, based on the tower's appearance from the outside, but with
 the nocturnium construction, it's possible the inside is simply larger.
 ~
-cdh 0
+cdh 0 0
 D0
 ~
 0 10058
@@ -539,7 +539,7 @@ The Ground Floor~
 here on the ground floor. The view above you is the cascading spiral of the
 underside of the stairs above. An archway in the wall leads to a small cafe.
 ~
-ch 0
+ch 0 0
 D1
 ~
 0 10048
@@ -558,7 +558,7 @@ how busy it seems to get in here. Even the brick walls are immaculate, perhaps
 due to a spell cast by the sorcerers. A sign next to the door here reads 'Quiet
 - Class in Session'.
 ~
-ch 0
+ch 0 0
 D7
 ~
 0 10031
@@ -576,7 +576,7 @@ The Base of the Staircase~
 floor hallway becomes a staircase. A large archway just at the start of the
 stairs leads to the gift shoppe, which happily trades in skystones.
 ~
-ch 0
+ch 0 0
 D5
 ~
 0 10032
@@ -596,7 +596,7 @@ to some illusion. The floors on the second level are wood, and echoes less than
 the brick staircase. It does nothing, however, to muffle the shrieks of goblins
 in the distance.
 ~
-cdh 0
+cdh 0 0
 D9
 ~
 0 10033
@@ -611,7 +611,7 @@ masters, from the first to the last. The frames are interrupted by a large door
 marked 'Caution: Goblins', from which you can hear strange, small, high-pitched
 shrieks.
 ~
-ch 0
+ch 0 0
 D4
 ~
 0 10034
@@ -630,7 +630,7 @@ Skycleave. You can't see the outside from here, but the door marked 'Pixy
 Races' is covered in glowing yellow dust, sometimes in a shape resembling a
 small bird, which must have smacked into it.
 ~
-ch 0
+ch 0 0
 D6
 ~
 0 10035
@@ -650,7 +650,7 @@ apprentices practice their experiments and conduct their research, hoping to
 join the upper echelons of Skycleave's hierarchy. As if to inspire them, the
 wall is lined with portraits of former masters of the tower.
 ~
-ch 0
+ch 0 0
 D7
 ~
 0 10036
@@ -668,7 +668,7 @@ the Tower Skycleave's former masters comes to an apparent end here at the
 stairs, where its current leaders, Knezz, Barrosh, and Celiya occupy the final
 three frames.
 ~
-ch 0
+ch 0 0
 D5
 ~
 0 10037
@@ -683,7 +683,7 @@ and wooden walls paneled over the brick structure of the Tower Skycleave.
 Though the curved hallway is long, you hardly feel tired. At times, the curve
 is so subtle that it just seems like one endless, ascending hallway.
 ~
-cdh 0
+cdh 0 0
 D9
 ~
 0 10038
@@ -698,7 +698,7 @@ Residents - sorcerers who have earned their place in the upper echelon, but
 who are still working to master the magical sciences. Most of the doors are
 shut and locked, and perhaps mystically muffled.
 ~
-ch 0
+ch 0 0
 D4
 ~
 0 10039
@@ -714,7 +714,7 @@ The Third Floor~
 but it isn't having much luck. The sorcerer who enchanted it must be too busy
 to pay attention.
 ~
-ch 0
+ch 0 0
 D6
 ~
 0 10040
@@ -733,7 +733,7 @@ The Third Floor~
 emanating from the door marked 'Lich Labs'. As you listen carefully, you manage
 to make out a low wailing coming from behind the door.
 ~
-ch 0
+ch 0 0
 D7
 ~
 0 10041
@@ -752,7 +752,7 @@ The Base of the Staircase~
 staircase. There are windows here, unlike much of the hallway, and you suddenly
 remember how high you've climbed up the long spiral of the Tower Skycleave.
 ~
-ch 0
+ch 0 0
 D5
 ~
 0 10042
@@ -767,7 +767,7 @@ find the floor's tiles change to a mosaic of soft, wooden shapes that form an
 entrancing pattern. The windows next to the stairs show off the tower's immense
 height, and you can see much of the countryside.
 ~
-cdh 0
+cdh 0 0
 D9
 ~
 0 10043
@@ -783,7 +783,7 @@ Celiya, who oversees the tower's residency program. Her desk is made of sturdy
 oak, and the walls are covered in locked glass cases displaying relics,
 trophies, and books of all kinds.
 ~
-ch 0
+ch 0 0
 D4
 ~
 0 10044
@@ -799,7 +799,7 @@ uncomfortable chair. The only book is on a pedestal, and is blank, perhaps a
 work in progress. The floor has small piles of dust, perhaps the remnants of
 former pieces of furniture, or Barrosh's most recent experiment.
 ~
-ch 0
+ch 0 0
 D6
 ~
 0 10045
@@ -817,7 +817,7 @@ of the year for nearly a century, meaning all those portraits of former masters
 on the second floor must be ancient indeed. The office is lined in black
 nocturnium, which seems to glow from some angles.
 ~
-ch 0
+ch 0 0
 D7
 ~
 0 10046
@@ -830,10 +830,16 @@ hallway. The walls here have been papered over with pictures of birds and
 flowers. There is a wooden bar with several strange machines that burble and
 steam. A sign indicates that you can buy coffee or wine.
 ~
-ch 0
+ch 0 0
 D3
 ~
 0 10031
+E
+sign menu~
+The sign indicates that you can buy:
+  coffee (5 coins)
+  wine (15 coins)
+~
 M 0 10032 100.00 1
 M 0 10033 33.33 2
 S
@@ -843,7 +849,7 @@ The Tower Skycleave Study Hall~
 wooden desks. The room is otherwise fairly stark except for a large blackboard.
 Across the top of the board, chalkmarks spell out a strange, magical alphabet.
 ~
-c 0
+c 0 0
 D2
 ~
 0 10032
@@ -857,7 +863,7 @@ perhaps in part due to tiny bubbles that float through the air, from nowhere in
 particular. The brick walls are covered in shelves, each loaded with assorted
 merchandise. A sign instructs you to type 'list' or 'buy'.
 ~
-c 0
+c 0 0
 D1
 ~
 0 10033
@@ -870,7 +876,7 @@ in any way messy, and it's messy in a big way. The wall is lined with goblin
 cages, most of which emit loud rattles and shrieks as their occupants voice
 ceaseless opinions about their captivity.
 ~
-c 0
+c 0 0
 D0
 ~
 0 10035
@@ -887,7 +893,7 @@ enough to have their cage in front of a window, but most never see daylight. A
 foul-smelling bin suggests not all of the goblin experiments go well, but you
 can't bring yourself to lift the latch and open it.
 ~
-c 0
+c 0 0
 D3
 ~
 0 10051
@@ -902,7 +908,7 @@ center of the chamber is a low table covered in a glass done with a tiny,
 pixy-sized track inside. To the side of it is a coin slot, enchanted to handle
 wagers and payouts.
 ~
-ch 0
+ch 0 0
 D3
 ~
 0 10036
@@ -918,7 +924,7 @@ A Resident's Lab~
 and iron form debris piles against the walls. The room's sole defining feature
 is a large platform with strong, enchanted chains attached to its floor.
 ~
-c 0
+c 0 0
 D3
 ~
 0 10041
@@ -933,7 +939,7 @@ through arches on both sides, are not quite so clean. Crackling beams of light
 cover the archways, but they only appear to stop the undead from passing, as
 lab assistants have no trouble as they come and go.
 ~
-c 0
+c 0 0
 D2
 ~
 0 10042
@@ -951,7 +957,7 @@ The Experimentation Chamber~
 room are blocked by stacks of rotting caskets. It looks as if someone has been
 digging up old graves, and they give off a powerful stench.
 ~
-c 0
+c 0 0
 D1
 ~
 0 10055
@@ -966,7 +972,7 @@ them apparently very old. Some are under glass domes, and others locked in
 cases, and some of those appear to be rattling and shaking. Some of the objects
 hover above their shelves, as if possessed by some unearthly soul.
 ~
-c 0
+c 0 0
 D3
 ~
 0 10055
@@ -981,7 +987,7 @@ primarily to tourists. The second floor is where the apprentices conduct their
 experiments. The third floor has more advanced research, while the top floor
 holds the offices of the tower's masters.
 ~
-cdh 0
+cdh 0 0
 D5
 ~
 0 10031
