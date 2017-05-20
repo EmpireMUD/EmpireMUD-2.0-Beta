@@ -1789,6 +1789,7 @@ const char *versions_list[] = {
 	"b4.36",
 	"b4.38",
 	"b4.39",
+	"b5.1",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2365,6 +2366,65 @@ void b4_39_data_conversion(void) {
 	}
 }
 
+// b5.1 convert resource action vnums (all resource actions += 1000)
+void b5_1_resource_action_update(void) {
+	craft_data *craft, *next_craft;
+	bld_data *bld, *next_bld;
+	vehicle_data *veh, *next_veh;
+	room_data *room, *next_room;
+	struct resource_data *res;
+	
+	// crafts
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		LL_FOREACH(GET_CRAFT_RESOURCES(craft), res) {
+			if (res->type == RES_ACTION && res->vnum < 100) {
+				res->vnum += 1000;
+				save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
+			}
+		}
+	}
+	
+	// buildings
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		LL_FOREACH(GET_BLD_YEARLY_MAINTENANCE(bld), res) {
+			if (res->type == RES_ACTION && res->vnum < 100) {
+				res->vnum += 1000;
+				save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
+			}
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		LL_FOREACH(VEH_YEARLY_MAINTENANCE(veh), res) {
+			if (res->type == RES_ACTION && res->vnum < 100) {
+				res->vnum += 1000;
+				save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
+			}
+		}
+	}
+	
+	// live rooms
+	HASH_ITER(hh, world_table, room, next_room) {
+		LL_FOREACH(BUILDING_RESOURCES(room), res) {
+			if (res->type == RES_ACTION && res->vnum < 100) {
+				res->vnum += 1000;
+			}
+		}
+	}
+	
+	// live vehicles
+	LL_FOREACH(vehicle_list, veh) {
+		LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
+			if (res->type == RES_ACTION && res->vnum < 100) {
+				res->vnum += 1000;
+			}
+		}
+	}
+	
+	save_whole_world();
+}
+
 
 /**
 * Performs some auto-updates when the mud detects a new version.
@@ -2573,8 +2633,13 @@ void check_version(void) {
 			b4_38_tower_triggers();
 		}
 		if (MATCH_VERSION("b4.39")) {
-			log("Converting datat to b4.39 format...");
+			log("Converting data to b4.39 format...");
 			b4_39_data_conversion();
+		}
+		// beta5
+		if (MATCH_VERSION("b5.1")) {
+			log("Updating resource actions to b5.1 vnums...");
+			b5_1_resource_action_update();
 		}
 	}
 	

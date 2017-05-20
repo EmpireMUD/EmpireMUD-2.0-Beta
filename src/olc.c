@@ -419,7 +419,6 @@ extern const char *pool_types[];
 extern const bool requirement_amt_type[];
 extern const char *requirement_types[];
 extern const char *resource_types[];
-extern const char *res_action_type[];
 
 // external functions
 void replace_question_color(char *input, char *color, char *output);
@@ -3664,7 +3663,7 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 				break;
 			}
 			case RES_LIQUID: {
-				sprintf(line, "%d units %s", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
+				sprintf(line, "%d units %s", res->amount, get_generic_name_by_vnum(res->vnum));
 				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
 				break;
 			}
@@ -3678,7 +3677,7 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 				break;
 			}
 			case RES_ACTION: {
-				sprintf(line, "%dx [%s]", res->amount, res_action_type[res->vnum]);
+				sprintf(line, "%dx [%s]", res->amount, get_generic_name_by_vnum(res->vnum));
 				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
 				break;
 			}
@@ -6036,14 +6035,15 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 						strcat(arg4, arg5);
 					}
 					
-					if (!*arg4) {
-						msg_to_char(ch, "Usage: resource add action <amount> <type>\r\n");
+					if (!*arg4 || !isdigit(*arg4)) {
+						msg_to_char(ch, "Usage: resource add action <amount> <generic action vnum>\r\n");
 						return;
 					}
-					if ((vnum = search_block(arg4, res_action_type, FALSE)) == NOTHING) {
-						msg_to_char(ch, "Unknown action type '%s' (see HELP RESOURCE ACTIONS).\r\n", arg4);
+					if ((vnum = atoi(arg4)) < 0 || !(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_ACTION) {
+						msg_to_char(ch, "Invalid generic action vnum '%s'.\r\n", arg4);
 						return;
 					}
+					break;
 				}
 			}
 			
@@ -6159,8 +6159,8 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			}
 		}
 		else if (is_abbrev(arg3, "vnum")) {
-			if (change->type != RES_OBJECT && change->type != RES_LIQUID) {
-				msg_to_char(ch, "You can't change the vnum on a resource that isn't an object or liquid.\r\n");
+			if (change->type != RES_OBJECT && change->type != RES_LIQUID && change->type != RES_ACTION) {
+				msg_to_char(ch, "You can't change the vnum on a resource that isn't an action, object, or liquid.\r\n");
 			}
 			else if (change->type == RES_OBJECT && !obj_proto(vnum)) {
 				msg_to_char(ch, "There is no such object vnum %d.\r\n", vnum);
@@ -6168,9 +6168,12 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			else if (change->type == RES_LIQUID && (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_LIQUID)) {
 				msg_to_char(ch, "Invalid liquid generic vnum %d.\r\n", vnum);
 			}
+			else if (change->type == RES_ACTION && (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_ACTION)) {
+				msg_to_char(ch, "Invalid generic action vnum %d.\r\n", vnum);
+			}
 			else {
 				change->vnum = vnum;
-				msg_to_char(ch, "You change resource %d's vnum to [%d] %s.\r\n", atoi(arg2), vnum, get_obj_name_by_proto(vnum));
+				msg_to_char(ch, "You change resource %d's vnum to [%d] %s.\r\n", atoi(arg2), vnum, get_resource_name(change));
 			}
 		}
 		else if (is_abbrev(arg3, "name") || is_abbrev(arg3, "component") || is_abbrev(arg3, "pool")) {
@@ -6195,15 +6198,6 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					
 					change->vnum = vnum;
 					msg_to_char(ch, "You change resource %d's pool to %s.\r\n", atoi(arg2), pool_types[vnum]);
-					break;
-				}
-				case RES_ACTION: {
-					if ((vnum = search_block(arg4, res_action_type, FALSE)) == NOTHING) {
-						msg_to_char(ch, "Unknown action type '%s' (see HELP RESOURCE ACTIONS).\r\n", arg4);
-						return;
-					}
-					change->vnum = vnum;
-					msg_to_char(ch, "You change resource %d's action to %s.\r\n", atoi(arg2), res_action_type[vnum]);
 					break;
 				}
 				default: {

@@ -424,7 +424,7 @@ void olc_show_craft(char_data *ch) {
 		sprintf(buf + strlen(buf), "<&ybuildfacing&0> %s\r\n", buf1);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP)) {
-		sprintf(buf + strlen(buf), "<&yliquid&0> [%d] %s\r\n", GET_CRAFT_OBJECT(craft), get_generic_string_by_vnum(GET_CRAFT_OBJECT(craft), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+		sprintf(buf + strlen(buf), "<&yliquid&0> [%d] %s\r\n", GET_CRAFT_OBJECT(craft), get_generic_name_by_vnum(GET_CRAFT_OBJECT(craft)));
 		sprintf(buf + strlen(buf), "<&yvolume&0> %d drink%s\r\n", GET_CRAFT_QUANTITY(craft), (GET_CRAFT_QUANTITY(craft) != 1 ? "s" : ""));
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_VEHICLE)) {
@@ -645,7 +645,7 @@ OLC_MODULE(cedit_liquid) {
 			GET_CRAFT_OBJECT(craft) = old;
 		}
 		else {
-			msg_to_char(ch, "It now creates %s.\r\n", get_generic_string_by_vnum(GET_CRAFT_OBJECT(craft), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+			msg_to_char(ch, "It now creates %s.\r\n", get_generic_name_by_vnum(GET_CRAFT_OBJECT(craft)));
 		}
 	}
 }

@@ -52,6 +52,24 @@ extern const char *generic_types[];
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Gets a generic's name by vnum, safely.
+*
+* @param any_vnum vnum The generic vnum to look up.
+* @return const char* The name, or UNKNOWN if none.
+*/
+const char *get_generic_name_by_vnum(any_vnum vnum) {
+	generic_data *gen = find_generic_by_vnum(vnum);
+	
+	if (!gen) {
+		return "UNKNOWN";	// sanity
+	}
+	else {
+		return GEN_NAME(gen);
+	}
+}
+
+
+/**
 * Quick, safe lookup for a generic string. This checks that it's the expected
 * type, and will return UNKNOWN if anything is out of place.
 *

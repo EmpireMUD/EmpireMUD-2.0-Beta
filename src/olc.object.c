@@ -1712,7 +1712,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		case ITEM_DRINKCON: {
 			sprintf(storage + strlen(storage), "<&ycapacity&0> %d drink%s\r\n", GET_DRINK_CONTAINER_CAPACITY(obj), PLURAL(GET_DRINK_CONTAINER_CAPACITY(obj)));
 			sprintf(storage + strlen(storage), "<&ycontents&0> %d drink%s\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), PLURAL(GET_DRINK_CONTAINER_CONTENTS(obj)));
-			sprintf(storage + strlen(storage), "<&yliquid&0> %s\r\n", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+			sprintf(storage + strlen(storage), "<&yliquid&0> %s\r\n", get_generic_name_by_vnum(GET_DRINK_CONTAINER_TYPE(obj)));
 			break;
 		}
 		case ITEM_FOOD: {
@@ -2521,7 +2521,7 @@ OLC_MODULE(oedit_liquid) {
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = old;
 		}
 		else {
-			msg_to_char(ch, "It now contains %s.\r\n", get_generic_string_by_vnum(GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+			msg_to_char(ch, "It now contains %s.\r\n", get_generic_name_by_vnum(GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE)));
 		}
 	}
 }
