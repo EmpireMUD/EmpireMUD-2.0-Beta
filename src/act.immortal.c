@@ -4474,6 +4474,8 @@ int vnum_crop(char *searchname, char_data *ch) {
 * @return int The number of matches shown.
 */
 int vnum_global(char *searchname, char_data *ch) {
+	extern const char *global_types[];
+	
 	struct global_data *iter, *next_iter;
 	char flags[MAX_STRING_LENGTH];
 	int found = 0;
@@ -4484,16 +4486,16 @@ int vnum_global(char *searchname, char_data *ch) {
 			switch (GET_GLOBAL_TYPE(iter)) {
 				case GLOBAL_MOB_INTERACTIONS: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), action_bits, flags, TRUE);
-					msg_to_char(ch, "%3d. [%5d] %s (%s) %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags);
+					msg_to_char(ch, "%3d. [%5d] %s (%s) %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags, global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 				case GLOBAL_MINE_DATA: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), sector_flags, flags, TRUE);
-					msg_to_char(ch, "%3d. [%5d] %s - %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags);
+					msg_to_char(ch, "%3d. [%5d] %s - %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 				default: {
-					msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter));
+					msg_to_char(ch, "%3d. [%5d] %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 			}

@@ -683,7 +683,7 @@ int vnum_generic(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, generic_table, iter, next_iter) {
 		if (multi_isname(searchname, GEN_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GEN_VNUM(iter), GEN_NAME(iter));
+			msg_to_char(ch, "%3d. [%5d] %s (%s)\r\n", ++found, GEN_VNUM(iter), GEN_NAME(iter), generic_types[GEN_TYPE(iter)]);
 		}
 	}
 	
