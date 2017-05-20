@@ -1483,7 +1483,7 @@ Tower of Souls~
 A Tower of Souls~
 '.' 0 0 1 fo 0
 C
-nearby, transport~
+adventure, nearby, quest, transport~
 D1
 */\*~
 &y~

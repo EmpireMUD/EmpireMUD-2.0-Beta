@@ -4,19 +4,20 @@ An Interdimensional Whirlwind~
 violent storm, you see glimpses of many worlds -- of home, of the countryside,
 and of strange realms beyond the knowledge of mortal men.
 ~
-ag 0
+ag 0 0
 M 0 10500 100.00 3
 S
 #10550
 A Frozen River~
    Steep glaciers rise up above the edges of the river, which itself has frozen
 over completely. Above you, high above the glaciers, the skies are a strange
-shade of indigo. The sun is up and there isn't a cloud in sight, but it's at
-least twenty degrees lower here than outside the portal. The sparkling sky
-belies the true nature of this place: you have found yourself back in the
-Magiterranean, the secret realm of nature mages.
+shade of indigo. It's bright as day and there isn't a cloud in sight, but
+there's no sun in the sky and it's at least twenty degrees lower here than
+outside the portal. The sparkling sky belies the true nature of this place: you
+have found yourself back in the Magiterranean, the secret realm of nature
+mages.
 ~
-ch 0
+ch 0 0
 D0
 ~
 0 10551
@@ -42,7 +43,7 @@ portal. But in this realm, nothing borders it but eternal ice. You must have
 entered the Permafrost, one of the most notorious and dangerous realms of the
 Magiterranean, where a wary wanderer could find himself frozen to death.
 ~
-c 0
+c 0 0
 D2
 ~
 0 10550
@@ -67,7 +68,7 @@ can still see the portal out of this forsaken place. The glacier shakes around
 you, threatening to collapse at any second. But for now, at least, it seems to
 be holding.
 ~
-cd 0
+cd 0 0
 D2
 ~
 0 10550
@@ -95,7 +96,7 @@ A Rising Path up the Glacier~
 enough for a break. The path is winding, and the only thing you can see besides
 the ice walls is the indigo sky above.
 ~
-c 0
+c 0 0
 D14
 ~
 0 10552
@@ -128,7 +129,7 @@ steep, but you must be approaching the top. A small trickle of meltwater has
 begun to wash away the stairs you are climbing, and you realize this glacier
 may not last.
 ~
-c 0
+c 0 0
 D9
 ~
 0 10553
@@ -161,7 +162,7 @@ Now that you have a clear view of the countryside, you see it is far different
 than you remember it on the outside of the portal. Frost covers every treetop
 that pokes out from the endless sea of rolling snow.
 ~
-cd 0
+cd 0 0
 D9
 ~
 0 10554
@@ -196,7 +197,7 @@ deep snow so that you can hardly tell what's ahead. A steady stream of
 meltwater runs along the path, giving you cause to think the glacier has
 already begun to melt.
 ~
-c 0
+c 0 0
 D14
 ~
 0 10555
@@ -228,7 +229,7 @@ A Rising Path up the Glacier~
 You hear the howl of strange animals, punctuated by louder howls from the
 fierce winds that threaten to tear you from the path.
 ~
-c 0
+c 0 0
 D14
 ~
 0 10552
@@ -260,7 +261,7 @@ A Rising Path up the Glacier~
 drilled into the glacier for stability. As you turn the corner on the ledge,
 the platform widens only slightly, before leading to another staircase.
 ~
-c 0
+c 0 0
 D9
 ~
 0 10557
@@ -293,7 +294,7 @@ it exits onto the top of the glacier. In the center of the cave, a violet fire
 burns atop blue logs of ice. No heat seems to come from the fire -- at least,
 none that you can feel.
 ~
-cd 0
+cd 0 0
 D9
 ~
 0 10558
@@ -325,7 +326,7 @@ A Tunnel Through the Snow~
 been placed in such a way as to provide a steady path through it. You still
 seem to be at the top of the glacier, although you can't see the sky from here.
 ~
-c 0
+c 0 0
 D14
 ~
 0 10559
@@ -359,7 +360,7 @@ similar to the world outside the portal, despite being covered in glaciers and
 a sea of snow. Torches of cold, violet fire illuminate the entire altar, and
 cast eerie shadows that are, somehow, colder than the ice.
 ~
-cd 0
+cd 0 0
 D14
 ~
 0 10556

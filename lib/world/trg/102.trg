@@ -588,10 +588,10 @@ if (%actor.position% != Standing)
   halt
 end
 %load% m %self.val0%
-%send% %actor% You use %self.shortdesc% and a new mount appears!
-%echoaround% %actor% %actor.name% uses %self.shortdesc% and a new mount appears!
 eval room_var %self.room%
 eval mob %room_var.people%
+%send% %actor% You use %self.shortdesc% and %mob.name% appears!
+%echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
 if (%mob% && %mob.vnum% == %self.val0%)
   nop %mob.unlink_instance%
 end
