@@ -2058,7 +2058,6 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_COIN  2140000000	// 2.14b (< MAX_INT)
 #define MAX_COIN_TYPES  10	// don't store more than this many different coin types
 #define MAX_CONDITION  750	// FULL, etc
-#define MAX_COOLDOWNS  32
 #define MAX_EMPIRE_DESCRIPTION  2000
 #define MAX_FACTION_DESCRIPTION  4000
 #define MAX_GROUP_SIZE  4	// how many members a group allows
@@ -3374,9 +3373,9 @@ struct char_data {
 };
 
 
-// cooldown info
+// cooldown info (cooldowns are defined by generics)
 struct cooldown_data {
-	sh_int type;	// any COOLDOWN_ const
+	any_vnum type;	// any COOLDOWN_ const or vnum
 	time_t expire_time;	// time at which the cooldown has expired
 	
 	struct cooldown_data *next;	// linked list

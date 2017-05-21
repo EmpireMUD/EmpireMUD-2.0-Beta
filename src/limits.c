@@ -165,11 +165,9 @@ void check_death_respawn(void) {
 * only runs on players who are connected. Nobody else, including mobs, needs
 * to know.
 */
-void check_expired_cooldowns(void) {
-	extern const char *cooldown_types[];
-	
+void check_expired_cooldowns(void) {	
 	struct cooldown_data *cool, *next_cool;
-	char lbuf[MAX_STRING_LENGTH];
+	generic_data *gen;
 	char_data *ch;
 	descriptor_data *d;
 	
@@ -179,8 +177,9 @@ void check_expired_cooldowns(void) {
 				next_cool = cool->next;
 				
 				if ((cool->expire_time - time(0)) <= 0) {
-					sprinttype(cool->type, cooldown_types, lbuf);
-					msg_to_char(ch, "&%cYour %s cooldown has ended.&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', lbuf);
+					if ((gen = find_generic_by_vnum(cool->type)) && GEN_TYPE(gen) == GENERIC_COOLDOWN && GET_COOLDOWN_WEAR_OFF(gen)) {
+						msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_COOLDOWN_WEAR_OFF(gen));
+					}
 					remove_cooldown(ch, cool);
 				}
 			}

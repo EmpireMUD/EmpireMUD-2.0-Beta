@@ -3289,7 +3289,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 	extern const char *account_flags[];
 	extern const char *class_role[];
-	extern const char *cooldown_types[];
 	extern const char *damage_types[];
 	extern const double hit_per_dex;
 	extern const char *mob_custom_types[];
@@ -3510,8 +3509,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			diff = cool->expire_time - time(0);
 			
 			if (diff > 0) {
-				sprinttype(cool->type, cooldown_types, buf);
-				msg_to_char(ch, "%s&c%s&0 %d:%02d", (found ? ", ": ""), buf, (diff / 60), (diff % 60));
+				msg_to_char(ch, "%s&c%s&0 %d:%02d", (found ? ", ": ""), get_generic_name_by_vnum(cool->type), (diff / 60), (diff % 60));
 				
 				found = TRUE;
 			}

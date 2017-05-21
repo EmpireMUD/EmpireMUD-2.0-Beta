@@ -2234,12 +2234,17 @@ int total_coins(char_data *ch) {
 * two durations is kept.
 *
 * @param char_data *ch The character.
-* @param int type Any COOLDOWN_.
+* @param any_vnum type Any cooldown vnum.
 * @param int seconds_duration How long it lasts.
 */
-void add_cooldown(char_data *ch, int type, int seconds_duration) {
+void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 	struct cooldown_data *cool;
 	bool found = FALSE;
+	
+	if (!find_generic_by_vnum(type)) {
+		log("SYSERR: add_cooldown called with invalid cooldown vnum %d", type);
+		return;
+	}
 	
 	// check for existing
 	for (cool = ch->cooldowns; cool && !found; cool = cool->next) {
@@ -2265,10 +2270,10 @@ void add_cooldown(char_data *ch, int type, int seconds_duration) {
 * does not have that ability on cooldown.
 *
 * @param char_data *ch The character.
-* @param int type Any COOLDOWN_.
+* @param any_vnum type Any cooldown vnum.
 * @return int The time remaining on the cooldown (in seconds), or 0.
 */
-int get_cooldown_time(char_data *ch, int type) {
+int get_cooldown_time(char_data *ch, any_vnum type) {
 	struct cooldown_data *cool;
 	int remain = 0;
 	
@@ -2300,9 +2305,9 @@ void remove_cooldown(char_data *ch, struct cooldown_data *cool) {
 * Removes any cooldowns of a given type from the character.
 *
 * @param char_data *ch The character.
-* @param int type Any COOLDOWN_.
+* @param any_vnum type Any cooldown vnum.
 */
-void remove_cooldown_by_type(char_data *ch, int type) {
+void remove_cooldown_by_type(char_data *ch, any_vnum type) {
 	struct cooldown_data *cool, *next_cool;
 	
 	for (cool = ch->cooldowns; cool; cool = next_cool) {

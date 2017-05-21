@@ -1871,9 +1871,7 @@ ACMD(do_coins) {
 }
 
 
-ACMD(do_cooldowns) {
-	extern const char *cooldown_types[];
-	
+ACMD(do_cooldowns) {	
 	struct cooldown_data *cool;
 	int diff;
 	bool found = FALSE;
@@ -1884,8 +1882,7 @@ ACMD(do_cooldowns) {
 		// only show if not expired (in case it wasn't cleaned up yet due to close timing)
 		diff = cool->expire_time - time(0);
 		if (diff > 0) {
-			sprinttype(cool->type, cooldown_types, buf);
-			msg_to_char(ch, " &c%s&0 %d:%02d\r\n", buf, (diff / 60), (diff % 60));
+			msg_to_char(ch, " &c%s&0 %d:%02d\r\n", get_generic_name_by_vnum(cool->type), (diff / 60), (diff % 60));
 
 			found = TRUE;
 		}

@@ -150,8 +150,16 @@ char *list_one_generic(generic_data *gen, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		
-		snprintf(output, sizeof(output), "[%5d] %s (%s)", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
+		switch (GEN_TYPE(gen)) {
+			case GENERIC_COOLDOWN: {
+				snprintf(output, sizeof(output), "[%5d] %s (%s): %s", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)], NULLSAFE(GET_COOLDOWN_WEAR_OFF(gen)));
+				break;
+			}
+			default: {
+				snprintf(output, sizeof(output), "[%5d] %s (%s)", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
+				break;
+			}
+		}
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s (%s)", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);

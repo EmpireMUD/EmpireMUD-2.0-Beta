@@ -122,10 +122,10 @@ extern const char *money_desc(empire_data *type, int amount);
 extern int total_coins(char_data *ch);
 
 // cooldown handlers
-void add_cooldown(char_data *ch, int type, int seconds_duration);
-extern int get_cooldown_time(char_data *ch, int type);
+void add_cooldown(char_data *ch, any_vnum type, int seconds_duration);
+extern int get_cooldown_time(char_data *ch, any_vnum type);
 void remove_cooldown(char_data *ch, struct cooldown_data *cool);
-void remove_cooldown_by_type(char_data *ch, int type);
+void remove_cooldown_by_type(char_data *ch, any_vnum type);
 
 // empire handlers
 void abandon_room(room_data *room);
