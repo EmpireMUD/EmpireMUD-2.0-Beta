@@ -389,7 +389,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
 	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	void expire_trading_post_item(struct trading_post_data *tpd);
-	extern bool remove_obj_from_resource_list(struct resource_data **list, obj_vnum vnum);
+	extern bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);
 	void remove_object_from_table(obj_data *obj);
 	void save_trading_post();
 
@@ -454,10 +454,10 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		
 		if (GET_BUILT_WITH(room)) {
-			remove_obj_from_resource_list(&GET_BUILT_WITH(room), vnum);
+			remove_thing_from_resource_list(&GET_BUILT_WITH(room), RES_OBJECT, vnum);
 		}
 		if (GET_BUILDING_RESOURCES(room)) {
-			remove_obj_from_resource_list(&GET_BUILDING_RESOURCES(room), vnum);
+			remove_thing_from_resource_list(&GET_BUILDING_RESOURCES(room), RES_OBJECT, vnum);
 			
 			if (!GET_BUILDING_RESOURCES(room)) {
 				// removing this resource finished the building
@@ -474,7 +474,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// remove from live resource lists: vehicle maintenance
 	LL_FOREACH(vehicle_list, veh) {
 		if (VEH_NEEDS_RESOURCES(veh)) {
-			remove_obj_from_resource_list(&VEH_NEEDS_RESOURCES(veh), vnum);
+			remove_thing_from_resource_list(&VEH_NEEDS_RESOURCES(veh), RES_OBJECT, vnum);
 			
 			if (!VEH_NEEDS_RESOURCES(veh)) {
 				// removing the resource finished the vehicle
@@ -572,7 +572,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			found = TRUE;
 		}
 		
-		found |= remove_obj_from_resource_list(&GET_AUG_RESOURCES(aug), vnum);
+		found |= remove_thing_from_resource_list(&GET_AUG_RESOURCES(aug), RES_OBJECT, vnum);
 		
 		if (found) {
 			SET_BIT(GET_AUG_FLAGS(aug), AUG_IN_DEVELOPMENT);
@@ -583,7 +583,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(bld), TYPE_OBJ, vnum);
-		found |= remove_obj_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(bld), vnum);
+		found |= remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(bld), RES_OBJECT, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
@@ -602,7 +602,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			found = TRUE;
 		}
 		
-		found |= remove_obj_from_resource_list(&GET_CRAFT_RESOURCES(craft), vnum);
+		found |= remove_thing_from_resource_list(&GET_CRAFT_RESOURCES(craft), RES_OBJECT, vnum);
 		
 		if (found) {
 			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
@@ -706,7 +706,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	
 	// update vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
-		found = remove_obj_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), vnum);
+		found = remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), RES_OBJECT, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
@@ -715,7 +715,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// olc editor updates
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (desc->character && !IS_NPC(desc->character) && GET_ACTION_RESOURCES(desc->character)) {
-			remove_obj_from_resource_list(&GET_ACTION_RESOURCES(desc->character), vnum);
+			remove_thing_from_resource_list(&GET_ACTION_RESOURCES(desc->character), RES_OBJECT, vnum);
 		}
 		
 		if (GET_OLC_ADVENTURE(desc)) {
@@ -750,7 +750,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				found = TRUE;
 			}
 			
-			found |= remove_obj_from_resource_list(&GET_AUG_RESOURCES(GET_OLC_AUGMENT(desc)), vnum);
+			found |= remove_thing_from_resource_list(&GET_AUG_RESOURCES(GET_OLC_AUGMENT(desc)), RES_OBJECT, vnum);
 			
 			if (found) {
 				SET_BIT(GET_AUG_FLAGS(GET_OLC_AUGMENT(desc)), AUG_IN_DEVELOPMENT);
@@ -760,7 +760,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		if (GET_OLC_BUILDING(desc)) {
 			found = delete_from_interaction_list(&GET_OLC_BUILDING(desc)->interactions, TYPE_OBJ, vnum);
-			found |= remove_obj_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(GET_OLC_BUILDING(desc)), vnum);
+			found |= remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(GET_OLC_BUILDING(desc)), RES_OBJECT, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the objects used in the building you're editing was deleted.\r\n");
 			}
@@ -777,7 +777,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				found = TRUE;
 			}
 			
-			found |= remove_obj_from_resource_list(&GET_OLC_CRAFT(desc)->resources, vnum);
+			found |= remove_thing_from_resource_list(&GET_OLC_CRAFT(desc)->resources, RES_OBJECT, vnum);
 		
 			if (found) {
 				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
@@ -859,7 +859,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
-			found = remove_obj_from_resource_list(&VEH_YEARLY_MAINTENANCE(GET_OLC_VEHICLE(desc)), vnum);
+			found = remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(GET_OLC_VEHICLE(desc)), RES_OBJECT, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the objects used for maintenance for the vehicle you're editing was deleted.\r\n");
 			}

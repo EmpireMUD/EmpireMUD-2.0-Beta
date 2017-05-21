@@ -276,17 +276,18 @@ void olc_search_craft(char_data *ch, craft_vnum vnum) {
 * Removes any entries of an obj vnum from a resource list.
 *
 * @param struct resource_data **list A pointer to a resource list.
-* @param obj_vnum vnum The vnum to remove.
+* @param int type Any RES_ type, such as RES_OBJECT.
+* @param any_vnum vnum The vnum to remove.
 * @return bool TRUE if any were removed.
 */
-bool remove_obj_from_resource_list(struct resource_data **list, obj_vnum vnum) {
+bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum) {
 	struct resource_data *res, *next_res, *temp;
 	int removed = 0;
 	
 	for (res = *list; res; res = next_res) {
 		next_res = res->next;
 		
-		if (res->type == RES_OBJECT && res->vnum == vnum) {
+		if (res->type == type && res->vnum == vnum) {
 			REMOVE_FROM_LIST(res, *list, next);
 			free(res);
 			++removed;

@@ -23,6 +23,8 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "dg_scripts.h"
+#include "vnums.h"
 
 
 /**
@@ -46,6 +48,7 @@ extern const char *generic_flags[];
 extern const char *generic_types[];
 
 // external funcs
+extern bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -188,7 +191,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, augment_table, aug, next_aug) {
 		any = FALSE;
 		for (res = GET_AUG_RESOURCES(aug); res && !any; res = res->next) {
-			if (GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION && res->vnum == vnum) {
+			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID))) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
@@ -200,12 +203,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		any = FALSE;
 		for (res = GET_BLD_YEARLY_MAINTENANCE(bld); res && !any; res = res->next) {
-			if (GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION && res->vnum == vnum) {
-				any = TRUE;
-				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
-			}
-			else if (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID && res->vnum == vnum) {
+			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID))) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
@@ -217,12 +215,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		any = FALSE;
 		for (res = GET_CRAFT_RESOURCES(craft); res && !any; res = res->next) {
-			if (GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION && res->vnum == vnum) {
-				any = TRUE;
-				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
-			}
-			else if (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID && res->vnum == vnum) {
+			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID))) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
@@ -242,12 +235,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		any = FALSE;
 		for (res = VEH_YEARLY_MAINTENANCE(veh); res && !any; res = res->next) {
-			if (GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION && res->vnum == vnum) {
-				any = TRUE;
-				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
-			}
-			else if (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID && res->vnum == vnum) {
+			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID))) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
@@ -545,11 +533,75 @@ generic_data *create_generic_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_generic(char_data *ch, any_vnum vnum) {
+	void complete_building(room_data *room);
+	
+	craft_data *craft, *next_craft;
+	augment_data *aug, *next_aug;
+	vehicle_data *veh, *next_veh;
+	room_data *room, *next_room;
+	bld_data *bld, *next_bld;
+	obj_data *obj, *next_obj;
+	descriptor_data *desc;
 	generic_data *gen;
+	int res_type;
 	
 	if (!(gen = find_generic_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such generic %d.\r\n", vnum);
 		return;
+	}
+	
+	switch (GEN_TYPE(gen)) {
+		case GENERIC_ACTION: {
+			res_type = RES_ACTION;
+			break;
+		}
+		case GENERIC_LIQUID: {
+			res_type = RES_LIQUID;
+			break;
+		}
+		default: {
+			res_type = NOTHING;
+			break;
+		}
+	}
+	
+	// remove from live resource lists: room resources
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (!COMPLEX_DATA(room)) {
+			continue;
+		}
+		
+		if (GET_BUILT_WITH(room)) {
+			remove_thing_from_resource_list(&GET_BUILT_WITH(room), res_type, vnum);
+		}
+		if (GET_BUILDING_RESOURCES(room)) {
+			remove_thing_from_resource_list(&GET_BUILDING_RESOURCES(room), res_type, vnum);
+			
+			if (!GET_BUILDING_RESOURCES(room)) {
+				// removing this resource finished the building
+				if (IS_DISMANTLING(room)) {
+					disassociate_building(room);
+				}
+				else {
+					complete_building(room);
+				}
+			}
+		}
+	}
+	
+	// remove from live resource lists: vehicle maintenance
+	LL_FOREACH(vehicle_list, veh) {
+		if (VEH_NEEDS_RESOURCES(veh)) {
+			remove_thing_from_resource_list(&VEH_NEEDS_RESOURCES(veh), res_type, vnum);
+			
+			if (!VEH_NEEDS_RESOURCES(veh)) {
+				// removing the resource finished the vehicle
+				if (VEH_FLAGGED(veh, VEH_INCOMPLETE)) {
+					REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
+					load_vtrigger(veh);
+				}
+			}
+		}
 	}
 	
 	// remove it from the hash table first
@@ -558,6 +610,82 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	// save index and generic file now
 	save_index(DB_BOOT_GEN);
 	save_library_file_for_vnum(DB_BOOT_GEN, vnum);
+	
+	// now remove from prototypes
+	
+	// update augments
+	HASH_ITER(hh, augment_table, aug, next_aug) {
+		if (remove_thing_from_resource_list(&GET_AUG_RESOURCES(aug), res_type, vnum)) {
+			SET_BIT(GET_AUG_FLAGS(aug), AUG_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_AUG, GET_AUG_VNUM(aug));
+		}
+	}
+	
+	// update buildings
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		if (remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(bld), res_type, vnum)) {
+			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
+		}
+	}
+	
+	// update crafts
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		if (remove_thing_from_resource_list(&GET_CRAFT_RESOURCES(craft), res_type, vnum)) {
+			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
+		}
+	}
+	
+	// update objs
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == vnum) {
+			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
+		}
+	}
+	
+	// update vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		if (remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), res_type, vnum)) {
+			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
+		}
+	}
+	
+	// olc editor updates
+	LL_FOREACH(descriptor_list, desc) {
+		if (desc->character && !IS_NPC(desc->character) && GET_ACTION_RESOURCES(desc->character)) {
+			remove_thing_from_resource_list(&GET_ACTION_RESOURCES(desc->character), res_type, vnum);
+		}
+		
+		if (GET_OLC_AUGMENT(desc)) {
+			if (remove_thing_from_resource_list(&GET_AUG_RESOURCES(GET_OLC_AUGMENT(desc)), res_type, vnum)) {
+				SET_BIT(GET_AUG_FLAGS(GET_OLC_AUGMENT(desc)), AUG_IN_DEVELOPMENT);
+				msg_to_char(desc->character, "One of the resources used in the augment you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_BUILDING(desc)) {
+			if (remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(GET_OLC_BUILDING(desc)), res_type, vnum)) {
+				msg_to_char(desc->character, "One of the resources used in the building you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_CRAFT(desc)) {
+			if (remove_thing_from_resource_list(&GET_OLC_CRAFT(desc)->resources, res_type, vnum)) {
+				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
+				msg_to_char(desc->character, "One of the resources used in the craft you're editing was deleted.\r\n");
+			}	
+		}
+		if (GET_OLC_OBJECT(desc)) {
+			if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(GET_OLC_OBJECT(desc)) && GET_DRINK_CONTAINER_TYPE(GET_OLC_OBJECT(desc)) == vnum) {
+				GET_OBJ_VAL(GET_OLC_OBJECT(desc), VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+				msg_to_char(desc->character, "The liquid used by the object you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_VEHICLE(desc)) {
+			if (remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(GET_OLC_VEHICLE(desc)), res_type, vnum)) {
+				msg_to_char(desc->character, "One of the resources used for maintenance for the vehicle you're editing was deleted.\r\n");
+			}
+		}
+	}
 	
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted generic %d", GET_NAME(ch), vnum);
 	msg_to_char(ch, "Generic %d deleted.\r\n", vnum);
