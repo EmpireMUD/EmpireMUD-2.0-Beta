@@ -183,17 +183,20 @@ See also: TATTACH, TDETACH, TRIG-ATTACH
 #d
 DG_AFFECT DG_AFFECTS
 
-Usage:  dg_affect <target> <property> <value> <duration>
+Usage:  dg_affect [#affect vnum] <target> <property> <value> <duration>
 
 Puts an affection or apply on the target. Durations must be non-zero. You can
 use -1 for infinite duration ONLY if the target is an NPC.
+
+The affect vnum arg is optional, and requires a # if you're going to use it.
+For example, #3001 uses the "fly" generic affect.
 
 Examples:
   dg_affect %actor% HASTE on 20  -- Sets haste on actor for 20 seconds.
   dg_affect %actor% DODGE 100 20  -- Sets dodge on actor +100 for 20 seconds.
   dg_affect %actor% STRENGTH off  -- Removes any STRENGTH affects
 
-See also: APPLIES, AFFECTS
+See also: APPLIES, AFFECTS, GENERIC AFFECTS
 #d
 DG_AFFECT_ROOM
 
