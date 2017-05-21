@@ -214,6 +214,11 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	// crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		any = FALSE;
+		if (CRAFT_FLAGGED(craft, CRAFT_SOUP) && GET_CRAFT_OBJECT(craft) == vnum) {
+			any = TRUE;
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		}
 		for (res = GET_CRAFT_RESOURCES(craft); res && !any; res = res->next) {
 			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID))) {
 				any = TRUE;
@@ -544,6 +549,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	descriptor_data *desc;
 	generic_data *gen;
 	int res_type;
+	bool found;
 	
 	if (!(gen = find_generic_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such generic %d.\r\n", vnum);
@@ -630,7 +636,13 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	
 	// update crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
-		if (remove_thing_from_resource_list(&GET_CRAFT_RESOURCES(craft), res_type, vnum)) {
+		found = FALSE;
+		if (CRAFT_FLAGGED(craft, CRAFT_SOUP) && GET_CRAFT_OBJECT(craft) == vnum) {
+			GET_CRAFT_OBJECT(craft) = LIQ_WATER;
+			found |= TRUE;
+		}
+		found |= remove_thing_from_resource_list(&GET_CRAFT_RESOURCES(craft), res_type, vnum);
+		if (found) {
 			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
 		}
@@ -669,7 +681,13 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			}
 		}
 		if (GET_OLC_CRAFT(desc)) {
-			if (remove_thing_from_resource_list(&GET_OLC_CRAFT(desc)->resources, res_type, vnum)) {
+			found = FALSE;
+			if (CRAFT_FLAGGED(GET_OLC_CRAFT(desc), CRAFT_SOUP) && GET_CRAFT_OBJECT(GET_OLC_CRAFT(desc)) == vnum) {
+				GET_CRAFT_OBJECT(GET_OLC_CRAFT(desc)) = LIQ_WATER;
+				found |= TRUE;
+			}
+			found |= remove_thing_from_resource_list(&GET_OLC_CRAFT(desc)->resources, res_type, vnum);
+			if (found) {
 				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
 				msg_to_char(desc->character, "One of the resources used in the craft you're editing was deleted.\r\n");
 			}	
