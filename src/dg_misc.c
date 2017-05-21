@@ -105,6 +105,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	any_vnum atype = ATYPE_DG_AFFECT;
 	bitvector_t i = 0, type = 0;
 	struct affected_type af;
+	generic_data *gen;
 
 	half_chop(cmd, junk, cmd);
 	half_chop(cmd, charname, cmd);
@@ -112,7 +113,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	if (*charname == '#') {
 		atype = atoi(charname+1);
 		half_chop(cmd, charname, cmd);
-		if (!find_generic_by_vnum(atype)) {
+		if (!(gen = find_generic_by_vnum(atype)) || GEN_TYPE(gen) != GENERIC_AFFECT) {
 			atype = ATYPE_DG_AFFECT;
 		}
 	}
@@ -212,6 +213,7 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 	int atype = ATYPE_DG_AFFECT;
 	struct affected_type af;
 	room_data *room = NULL;
+	generic_data *gen;
 	int duration = 0;
 
 	half_chop(cmd, junk, cmd);
@@ -220,7 +222,7 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 	if (*roomname == '#') {
 		atype = atoi(roomname+1);
 		half_chop(cmd, roomname, cmd);
-		if (!find_generic_by_vnum(atype)) {
+		if (!(gen = find_generic_by_vnum(atype)) || GEN_TYPE(gen) != GENERIC_AFFECT) {
 			atype = ATYPE_DG_AFFECT;
 		}
 	}
