@@ -540,16 +540,19 @@ generic_data *create_generic_table_entry(any_vnum vnum) {
 void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	void complete_building(room_data *room);
 	
+	struct trading_post_data *tpd, *next_tpd;
+	struct empire_unique_storage *eus;
 	craft_data *craft, *next_craft;
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
+	empire_data *emp, *next_emp;
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
 	generic_data *gen;
+	bool found, save;
 	int res_type;
-	bool found;
 	
 	if (!(gen = find_generic_by_vnum(vnum))) {
 		msg_to_char(ch, "There is no such generic %d.\r\n", vnum);
@@ -568,6 +571,42 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		default: {
 			res_type = NOTHING;
 			break;
+		}
+	}
+	
+	// remove from live lists: drink containers
+	LL_FOREACH(object_list, obj) {
+		if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == vnum) {
+			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+		}
+	}
+	
+	// remove from live lists: trading post drink containers
+	for (tpd = trading_list; tpd; tpd = next_tpd) {
+		next_tpd = tpd->next;
+		if (!tpd->obj) {
+			continue;
+		}
+		
+		if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(tpd->obj) && GET_DRINK_CONTAINER_TYPE(tpd->obj) == vnum) {
+			GET_OBJ_VAL(tpd->obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+		}
+	}
+	
+	// remove from live lists: unique storage of drink containers
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		save = FALSE;
+		LL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+			if (!eus->obj) {
+				continue;
+			}
+			if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(eus->obj) && GET_DRINK_CONTAINER_TYPE(eus->obj) == vnum) {
+				GET_OBJ_VAL(eus->obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+			}
+		}
+		
+		if (save) {
+			save_empire(emp);
 		}
 	}
 	
