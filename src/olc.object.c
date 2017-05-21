@@ -1201,7 +1201,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 		}
 		for (res = GET_AUG_RESOURCES(aug); res && !any; res = res->next) {
-			if (res->vnum == vnum) {
+			if (res->type == RES_OBJECT && res->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
@@ -1217,6 +1217,13 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "BDG [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+			}
+		}
+		for (res = GET_BLD_YEARLY_MAINTENANCE(bld); res && !any; res = res->next) {
+			if (res->type == RES_OBJECT && res->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
 		}
 	}
@@ -1235,7 +1242,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		}
 		for (res = GET_CRAFT_RESOURCES(craft); res && !any; res = res->next) {
-			if (res->vnum == vnum) {
+			if (res->type == RES_OBJECT && res->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
@@ -1370,7 +1377,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		any = FALSE;
 		for (res = VEH_YEARLY_MAINTENANCE(veh); res && !any; res = res->next) {
-			if (res->vnum == vnum) {
+			if (res->type == RES_OBJECT && res->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));

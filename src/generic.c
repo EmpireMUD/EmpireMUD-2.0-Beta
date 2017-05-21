@@ -167,7 +167,14 @@ char *list_one_generic(generic_data *gen, bool detail) {
 void olc_search_generic(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	generic_data *gen = find_generic_by_vnum(vnum);
+	craft_data *craft, *next_craft;
+	augment_data *aug, *next_aug;
+	vehicle_data *veh, *next_veh;
+	struct resource_data *res;
+	bld_data *bld, *next_bld;
+	obj_data *obj, *next_obj;
 	int size, found;
+	bool any;
 	
 	if (!gen) {
 		msg_to_char(ch, "There is no generic %d.\r\n", vnum);
@@ -177,7 +184,76 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of generic %d (%s):\r\n", vnum, GEN_NAME(gen));
 	
-	// generics are not actually used anywhere else
+	// augments
+	HASH_ITER(hh, augment_table, aug, next_aug) {
+		any = FALSE;
+		for (res = GET_AUG_RESOURCES(aug); res && !any; res = res->next) {
+			if (GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION && res->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
+			}
+		}
+	}
+	
+	// buildings
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		any = FALSE;
+		for (res = GET_BLD_YEARLY_MAINTENANCE(bld); res && !any; res = res->next) {
+			if (GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION && res->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+			}
+			else if (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID && res->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+			}
+		}
+	}
+	
+	// crafts
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		any = FALSE;
+		for (res = GET_CRAFT_RESOURCES(craft); res && !any; res = res->next) {
+			if (GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION && res->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+			}
+			else if (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID && res->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+			}
+		}
+	}
+	
+	// objects
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		any = FALSE;
+		for (res = VEH_YEARLY_MAINTENANCE(veh); res && !any; res = res->next) {
+			if (GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION && res->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+			}
+			else if (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID && res->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+			}
+		}
+	}
 	
 	if (found > 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
