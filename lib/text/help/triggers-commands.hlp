@@ -200,11 +200,14 @@ See also: APPLIES, AFFECTS, GENERIC AFFECTS
 #d
 DG_AFFECT_ROOM
 
-Usage:  dg_affect_room <room> <affect> <on|off> <duration>
+Usage:  dg_affect_room [#affect vnum] <room> <affect> <on|off> <duration>
 
 Puts a room affect onto the target room. Durations must be non-zero, and you
 can use -1 for infinite duration if you're not on the map. Infinite affects
 can't be added to map locations.
+
+The affect vnum arg is optional, and requires a # if you're going to use it.
+For example, #3001 uses the "fly" generic affect.
 
 Examples:
   dg_affect_room %room% !WEATHER on

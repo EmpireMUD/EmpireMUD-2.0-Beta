@@ -209,18 +209,27 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 	char roomname[MAX_INPUT_LENGTH], property[MAX_INPUT_LENGTH];
 	char value_p[MAX_INPUT_LENGTH], duration_p[MAX_INPUT_LENGTH];
 	bitvector_t i = 0, type = 0;
+	int atype = ATYPE_DG_AFFECT;
 	struct affected_type af;
 	room_data *room = NULL;
 	int duration = 0;
 
 	half_chop(cmd, junk, cmd);
 	half_chop(cmd, roomname, cmd);
+	// sometimes roomname is an affect vnum
+	if (*roomname == '#') {
+		atype = atoi(roomname+1);
+		half_chop(cmd, roomname, cmd);
+		if (!find_generic_by_vnum(atype)) {
+			atype = ATYPE_DG_AFFECT;
+		}
+	}
 	half_chop(cmd, property, cmd);
 	half_chop(cmd, value_p, duration_p);
 
 	/* make sure all parameters are present */
 	if (!*roomname || !*property || !*value_p || !*duration_p) {
-		script_log("Trigger: %s, VNum %d. dg_affect_room usage: <room> <property> <on|off> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+		script_log("Trigger: %s, VNum %d. dg_affect_room usage: [#affect vnum] <room> <property> <on|off> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		return;
 	}
 	
@@ -254,12 +263,12 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 	}
 
 	if (!str_cmp(value_p, "off")) {
-		affect_from_room_by_bitvector(room, ATYPE_DG_AFFECT, BIT(i), FALSE);
+		affect_from_room_by_bitvector(room, atype, BIT(i), FALSE);
 		return;
 	}
 
 	/* add the affect */
-	af.type = ATYPE_DG_AFFECT;
+	af.type = atype;
 	af.cast_by = (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
 	af.duration = (duration == -1 ? UNLIMITED : ceil((double)duration / SECS_PER_MUD_HOUR));
 	af.modifier = 0;
