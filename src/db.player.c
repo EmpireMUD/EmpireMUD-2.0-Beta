@@ -2141,12 +2141,11 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// unaffect: affects
 	af_list = NULL;
 	while ((af = ch->affected)) {
-		if (af->type > ATYPE_RESERVED && af->type < NUM_ATYPES) {
-			CREATE(new_af, struct affected_type, 1);
-			*new_af = *af;
-			new_af->next = af_list;
-			af_list = new_af;
-		}
+		CREATE(new_af, struct affected_type, 1);
+		*new_af = *af;
+		new_af->next = af_list;
+		af_list = new_af;
+		
 		affect_remove(ch, af);
 	}
 	

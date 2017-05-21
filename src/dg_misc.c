@@ -26,6 +26,7 @@
 #include "dg_event.h"
 #include "db.h"
 #include "skills.h"
+#include "vnums.h"
 
 // external funcs
 void combat_meter_damage_dealt(char_data *ch, int amt);

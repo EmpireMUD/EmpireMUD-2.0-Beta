@@ -152,7 +152,7 @@ act.stealth.o: act.stealth.c conf.h sysdep.h structs.h uthash.h utils.h \
   comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
 	$(CC) -c $(CFLAGS) act.stealth.c
 act.survival.o: act.survival.c conf.h sysdep.h structs.h uthash.h utils.h \
-  comm.h interpreter.h handler.h db.h skills.h dg_scripts.h
+  comm.h interpreter.h handler.h db.h skills.h dg_scripts.h vnums.h
 	$(CC) -c $(CFLAGS) act.survival.c
 act.trade.o: act.trade.c conf.h sysdep.h structs.h uthash.h utils.h \
   comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
@@ -224,7 +224,7 @@ dg_handler.o: dg_handler.c conf.h sysdep.h structs.h uthash.h \
   dg_scripts.h utils.h comm.h db.h handler.h dg_event.h
 	$(CC) -c $(CFLAGS) dg_handler.c
 dg_misc.o: dg_misc.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
-  utils.h comm.h interpreter.h handler.h dg_event.h db.h skills.h
+  utils.h comm.h interpreter.h handler.h dg_event.h db.h skills.h vnums.h
 	$(CC) -c $(CFLAGS) dg_misc.c
 dg_mobcmd.o: dg_mobcmd.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
   db.h utils.h handler.h interpreter.h comm.h skills.h vnums.h
