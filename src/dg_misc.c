@@ -132,7 +132,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 		type = APPLY_TYPE;
 	}
 
-	if (!type) { /* search affect_types now */
+	if (!type) { /* search affect_bits now */
 		if ((i = search_block(property, affected_bits, TRUE)) != NOTHING) {
 			type = AFFECT_TYPE;
 		}

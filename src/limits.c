@@ -38,7 +38,6 @@
 */
 
 // external vars
-extern const char *affect_wear_off_msgs[];
 extern const char *dirs[];
 extern const char *from_dir[];
 extern const struct material_data materials[NUM_MATERIALS];
@@ -1611,6 +1610,7 @@ void point_update_room(room_data *room) {
 	obj_data *o, *next_o;
 	struct track_data *track, *next_track, *temp;
 	struct affected_type *af, *next_af;
+	generic_data *gen;
 	empire_data *emp;
 	time_t now = time(0);
 	bool junk;
@@ -1760,8 +1760,8 @@ void point_update_room(room_data *room) {
 		else if (af->duration != UNLIMITED) {
 			if ((af->type > 0)) {
 				if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
-					if (*affect_wear_off_msgs[af->type] && ROOM_PEOPLE(room)) {
-						act(affect_wear_off_msgs[af->type], FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
+					if ((gen = find_generic_by_vnum(af->type)) && GET_AFFECT_WEAR_OFF(gen) && ROOM_PEOPLE(room)) {
+						act(GET_AFFECT_WEAR_OFF(gen), FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
 					}
 				}
 			}

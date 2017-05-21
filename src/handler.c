@@ -65,7 +65,6 @@
 */
 
 // externs
-extern const char *affect_wear_off_msgs[];
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern int get_north_for_char(char_data *ch);
 extern struct complex_room_data *init_complex_data();
@@ -92,10 +91,10 @@ static int extractions_pending = 0;
 * Call affect_remove with every af of "type"
 *
 * @param char_data *ch The person to remove affects from.
-* @param int type Any ATYPE_ const
+* @param any_vnum type Any ATYPE_ const/vnum
 * @param bool show_msg If TRUE, will show the wears-off message.
 */
-void affect_from_char(char_data *ch, int type, bool show_msg) {
+void affect_from_char(char_data *ch, any_vnum type, bool show_msg) {
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *hjp, *next;
 	bool shown = FALSE;
@@ -129,11 +128,11 @@ void affect_from_char(char_data *ch, int type, bool show_msg) {
 * Calls affect_remove on every affect of type "type" with location "apply".
 *
 * @param char_data *ch The person to remove affects from.
-* @param int type Any ATYPE_ const to match.
+* @param any_vnum type Any ATYPE_ const/vnum to match.
 * @param int apply Any APPLY_ const to match.
 * @param bool show_msg If TRUE, will show the wears-off message.
 */
-void affect_from_char_by_apply(char_data *ch, int type, int apply, bool show_msg) {
+void affect_from_char_by_apply(char_data *ch, any_vnum type, int apply, bool show_msg) {
 	struct affected_type *aff, *next_aff;
 	bool shown = FALSE;
 
@@ -154,11 +153,11 @@ void affect_from_char_by_apply(char_data *ch, int type, int apply, bool show_msg
 * Calls affect_remove on every affect of type "type" that sets AFF flag "bits".
 *
 * @param char_data *ch The person to remove affects from.
-* @param int type Any ATYPE_ const to match.
+* @param any_vnum type Any ATYPE_ const/vnum to match.
 * @param bitvector_t bits Any AFF_ bit(s) to match.
 * @param bool show_msg If TRUE, will show the wears-off message.
 */
-void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits, bool show_msg) {
+void affect_from_char_by_bitvector(char_data *ch, any_vnum type, bitvector_t bits, bool show_msg) {
 	struct affected_type *aff, *next_aff;
 	bool shown = FALSE;
 
@@ -179,11 +178,11 @@ void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits, bo
 * Calls affect_remove on every affect of type "type" with location "apply".
 *
 * @param char_data *ch The person to remove affects from.
-* @param int type Any ATYPE_ const to match.
+* @param any_vnum type Any ATYPE_ const/vnum to match.
 * @param char_data *caster The person whose affects to remove.
 * @param bool show_msg If TRUE, will send the wears-off message.
 */
-void affect_from_char_by_caster(char_data *ch, int type, char_data *caster, bool show_msg) {
+void affect_from_char_by_caster(char_data *ch, any_vnum type, char_data *caster, bool show_msg) {
 	struct affected_type *aff, *next_aff;
 	bool shown = FALSE;
 	
@@ -226,9 +225,9 @@ void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag, bool sho
 * Call affect_remove_room to remove all effects of "type"
 *
 * @param room_data *room The location to remove affects from.
-* @param int type Any ATYPE_ const
+* @param any_vnum type Any ATYPE_ const/vnum
 */
-void affect_from_room(room_data *room, int type) {
+void affect_from_room(room_data *room, any_vnum type) {
 	struct affected_type *hjp, *next;
 
 	for (hjp = ROOM_AFFECTS(room); hjp; hjp = next) {
@@ -245,19 +244,20 @@ void affect_from_room(room_data *room, int type) {
 * "bits".
 *
 * @param room_data *rom The room to remove affects from.
-* @param int type Any ATYPE_ const to match.
+* @param any_vnum type Any ATYPE_ const/vnum to match.
 * @param bitvector_t bits Any AFF_ bit(s) to match.
 * @param bool show_msg If TRUE, shows the wear-off message.
 */
-void affect_from_room_by_bitvector(room_data *room, int type, bitvector_t bits, bool show_msg) {
+void affect_from_room_by_bitvector(room_data *room, any_vnum type, bitvector_t bits, bool show_msg) {
 	struct affected_type *aff, *next_aff;
+	generic_data *gen;
 	bool shown = FALSE;
 	
 	LL_FOREACH_SAFE(ROOM_AFFECTS(room), aff, next_aff) {
 		if (aff->type == type && IS_SET(aff->bitvector, bits)) {
-			if (show_msg && !shown) {
-				if (*affect_wear_off_msgs[aff->type] && ROOM_PEOPLE(room)) {
-					act(affect_wear_off_msgs[aff->type], FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+			if (show_msg && !shown && (gen = find_generic_by_vnum(aff->type))) {
+				if (GET_AFFECT_WEAR_OFF(gen) && ROOM_PEOPLE(room)) {
+					act(GET_AFFECT_WEAR_OFF(gen), FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 				}
 				shown = TRUE;
 			}
@@ -728,10 +728,10 @@ void affect_total(char_data *ch) {
 
 /**
 * @param char_data *ch The person to check
-* @param int type Any ATYPE_ const
+* @param any_vnum type Any ATYPE_ const/vnum
 * @return bool TRUE if ch is affected by anything with matching type
 */
-bool affected_by_spell(char_data *ch, int type) {
+bool affected_by_spell(char_data *ch, any_vnum type) {
 	struct over_time_effect_type *dot;
 	struct affected_type *hjp;
 	bool found = FALSE;
@@ -757,11 +757,11 @@ bool affected_by_spell(char_data *ch, int type) {
 * Matches both an ATYPE_ and an APPLY_ on an effect.
 *
 * @param char_data *ch The character to check
-* @param int type the ATYPE_ flag
+* @param any_vnum type the ATYPE_ const/vnum
 * @param int apply the APPLY_ flag
 * @return bool TRUE if an effect matches both conditions
 */
-bool affected_by_spell_and_apply(char_data *ch, int type, int apply) {
+bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply) {
 	struct affected_type *hjp;
 	bool found = FALSE;
 
@@ -778,7 +778,7 @@ bool affected_by_spell_and_apply(char_data *ch, int type, int apply) {
 /**
 * Create an affect that modifies a trait.
 *
-* @param int type ATYPE_
+* @param any_vnum type ATYPE_ const/vnum
 * @param int duration in 5-second ticks
 * @param int location APPLY_
 * @param int modifier +/- amount
@@ -786,7 +786,7 @@ bool affected_by_spell_and_apply(char_data *ch, int type, int apply) {
 * @param char_data *cast_by The caster who made the effect (may be NULL; use the person themselves for penalty effects as those won't cleanse).
 * @return struct affected_type* The created af
 */
-struct affected_type *create_aff(int type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by) {
+struct affected_type *create_aff(any_vnum type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by) {
 	struct affected_type *af;
 	
 	CREATE(af, struct affected_type, 1);
@@ -803,14 +803,14 @@ struct affected_type *create_aff(int type, int duration, int location, int modif
 
 /**
 * @param char_data *ch Person receiving the DoT.
-* @param sh_int type ATYPE_ spell that caused it.
+* @param any_vnum type ATYPE_ const/vnum that caused it.
 * @param sh_int duration Affect time, in 5-second intervals.
 * @param sh_int damage_type DAM_ type.
 * @param sh_int damage How much damage to do per 5-seconds.
 * @param sh_int max_stack Number of times this can stack when re-applied before it expires.
 * @param sh_int char_data *cast_by The caster.
 */
-void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by) {
+void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by) {
 	struct over_time_effect_type *iter, *dot;
 	bool found = FALSE;
 	int id = (cast_by ? CAST_BY_ID(cast_by) : 0);
@@ -859,10 +859,10 @@ void dot_remove(char_data *ch, struct over_time_effect_type *dot) {
 
 /**
 * @param room_data *room The room to check
-* @param int type Any ATYPE_ const
+* @param any_vnum type Any ATYPE_ const/vnum
 * @return bool TRUE if the room is affected by the spell
 */
-bool room_affected_by_spell(room_data *room, int type) {
+bool room_affected_by_spell(room_data *room, any_vnum type) {
 	struct affected_type *hjp;
 	bool found = FALSE;
 
@@ -880,11 +880,12 @@ bool room_affected_by_spell(room_data *room, int type) {
 * Shows the affect-wear-off message for a given type.
 *
 * @param char_data *ch The person wearing off of.
-* @param int atype The ATYPE_ affect type.
+* @param any_vnum atype The ATYPE_ affect type.
 */
-void show_wear_off_msg(char_data *ch, int atype) {
-	if (*affect_wear_off_msgs[atype] && ch->desc) {
-		msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', affect_wear_off_msgs[atype]);
+void show_wear_off_msg(char_data *ch, any_vnum atype) {
+	generic_data *gen = find_generic_by_vnum(atype);
+	if (gen && GET_AFFECT_WEAR_OFF(gen) && ch->desc) {
+		msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_AFFECT_WEAR_OFF(gen));
 	}
 }
 

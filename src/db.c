@@ -121,6 +121,7 @@ char *wizlock_message = NULL;	// Message sent to people trying to connect
 
 // generics
 generic_data *generic_table = NULL;	// hash table (hh)
+generic_data *sorted_generics = NULL;	// hash table (sorted_hh)
 
 // global stuff
 struct global_data *globals_table = NULL;	// hash table of global_data
@@ -2366,6 +2367,26 @@ void b4_39_data_conversion(void) {
 	}
 }
 
+
+// b5.1 changes the values of ATYPE_x consts and this updates existing affects
+PLAYER_UPDATE_FUNC(b5_1_update_players) {
+	struct over_time_effect_type *dot;
+	struct affected_type *af;
+	
+	LL_FOREACH(ch->affected, af) {
+		if (af->type < 3000) {
+			af->type += 3000;
+		}
+	}
+	
+	LL_FOREACH(ch->over_time_effects, dot) {
+		if (dot->type < 3000) {
+			dot->type += 3000;
+		}
+	}
+}
+
+
 // b5.1 convert resource action vnums (all resource actions += 1000)
 void b5_1_resource_action_update(void) {
 	craft_data *craft, *next_craft;
@@ -2423,6 +2444,8 @@ void b5_1_resource_action_update(void) {
 	}
 	
 	save_whole_world();
+	
+	update_all_players(NULL, b5_1_update_players);
 }
 
 
@@ -2638,7 +2661,7 @@ void check_version(void) {
 		}
 		// beta5
 		if (MATCH_VERSION("b5.1")) {
-			log("Updating resource actions to b5.1 vnums...");
+			log("Updating actions/affects to b5.1 vnums...");
 			b5_1_resource_action_update();
 		}
 	}

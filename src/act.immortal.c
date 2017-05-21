@@ -39,7 +39,6 @@
 
 // external vars
 extern const char *action_bits[];
-extern const char *affect_types[];
 extern const char *affected_bits[];
 extern const char *apply_types[];
 extern const char *bld_on_flags[];
@@ -3535,7 +3534,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 				sprintf(lbuf, "%.1fmin", ((double)(aff->duration + 1) * SECS_PER_REAL_UPDATE / 60.0));
 			}
 
-			sprintf(buf, "TYPE: (%s) &c%s&0 ", lbuf, affect_types[aff->type]);
+			sprintf(buf, "TYPE: (%s) &c%s&0 ", lbuf, get_generic_name_by_vnum(aff->type));
 
 			if (aff->modifier) {
 				sprintf(buf2, "%+d to %s", aff->modifier, apply_types[(int) aff->location]);
@@ -3562,7 +3561,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			sprintf(lbuf, "%.1fmin", ((double)(dot->duration + 1) * SECS_PER_REAL_UPDATE / 60.0));
 		}
 		
-		msg_to_char(ch, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)\r\n", lbuf, affect_types[dot->type], dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
+		msg_to_char(ch, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)\r\n", lbuf, get_generic_name_by_vnum(dot->type), dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
 
 	/* check mobiles for a script */
@@ -4215,7 +4214,7 @@ void do_stat_room(char_data *ch) {
 		for (aff = ROOM_AFFECTS(IN_ROOM(ch)); aff; aff = aff->next) {
 			*buf2 = '\0';
 
-			sprintf(buf, "Affect: (%3dhr) &c%s&0 ", aff->duration + 1, affect_types[aff->type]);
+			sprintf(buf, "Affect: (%3dhr) &c%s&0 ", aff->duration + 1, get_generic_name_by_vnum(aff->type));
 
 			if (aff->modifier) {
 				sprintf(buf2, "%+d to %s", aff->modifier, apply_types[(int) aff->location]);

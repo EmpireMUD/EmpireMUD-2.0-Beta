@@ -274,6 +274,17 @@ int sort_generics(generic_data *a, generic_data *b) {
 }
 
 
+// for sorted_generics
+int sort_generics_by_data(generic_data *a, generic_data *b) {
+	if (GEN_TYPE(a) != GEN_TYPE(b)) {
+		return GEN_TYPE(a) - GEN_TYPE(b);
+	}
+	else {
+		return str_cmp(GEN_NAME(a), GEN_NAME(b));
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DATABASE ////////////////////////////////////////////////////////////////
 
@@ -292,6 +303,7 @@ void add_generic_to_table(generic_data *gen) {
 		if (!find) {
 			HASH_ADD_INT(generic_table, vnum, gen);
 			HASH_SORT(generic_table, sort_generics);
+			HASH_SORT(sorted_generics, sort_generics_by_data);
 		}
 	}
 }
@@ -431,6 +443,31 @@ void parse_generic(FILE *fl, any_vnum vnum) {
 			}
 		}
 	}
+}
+
+
+/**
+* @param int type Any GENERIC_ type.
+* @param char *name The name to search.
+* @param bool exact Can only abbreviate if FALSE.
+* @return generic_data* The generic, or NULL if it doesn't exist
+*/
+generic_data *find_generic_by_name(int type, char *name, bool exact) {
+	generic_data *gen, *next_gen, *abbrev = FALSE;
+	
+	HASH_ITER(sorted_hh, sorted_generics, gen, next_gen) {
+		if (GEN_TYPE(gen) != type) {
+			continue;
+		}
+		if (!str_cmp(name, GEN_NAME(gen))) {
+			return gen;	// exact match
+		}
+		else if (!exact && !abbrev && is_abbrev(name, GEN_NAME(gen))) {
+			abbrev = gen;	// partial match
+		}
+	}
+	
+	return abbrev;	// if any
 }
 
 
@@ -768,7 +805,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 void save_olc_generic(descriptor_data *desc) {	
 	generic_data *proto, *gen = GET_OLC_GENERIC(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
-	UT_hash_handle hh;
+	UT_hash_handle hh, sorted_hh;
 	int iter;
 
 	// have a place to save it?
@@ -801,13 +838,18 @@ void save_olc_generic(descriptor_data *desc) {
 	}
 	
 	// save data back over the proto-type
-	hh = proto->hh;	// save old hash handle
+	hh = proto->hh;	// save old hash handles
+	sorted_hh = proto->sorted_hh;
 	*proto = *gen;	// copy over all data
 	proto->vnum = vnum;	// ensure correct vnum
-	proto->hh = hh;	// restore old hash handle
+	proto->hh = hh;	// restore old hash handles
+	proto->sorted_hh = sorted_hh;
 		
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_GEN, vnum);
+	
+	// and resort
+	HASH_SORT(sorted_generics, sort_generics_by_data);
 }
 
 

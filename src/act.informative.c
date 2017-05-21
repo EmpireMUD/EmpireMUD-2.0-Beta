@@ -1088,7 +1088,6 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 */
 void show_character_affects(char_data *ch, char_data *to) {
 	extern const char *apply_types[];
-	extern const char *affect_types[];
 	extern const char *affected_bits[];
 	extern const char *damage_types[];
 
@@ -1109,7 +1108,7 @@ void show_character_affects(char_data *ch, char_data *to) {
 		}
 		
 		// main entry
-		sprintf(buf, "   &c%s&0 (%s) ", affect_types[aff->type], lbuf);
+		sprintf(buf, "   &c%s&0 (%s) ", get_generic_name_by_vnum(aff->type), lbuf);
 
 		if (aff->modifier) {
 			sprintf(buf2, "- %+d to %s", aff->modifier, apply_types[(int) aff->location]);
@@ -1136,7 +1135,7 @@ void show_character_affects(char_data *ch, char_data *to) {
 		}
 		
 		// main body
-		msg_to_char(to, "  &r%s&0 (%s) %d %s damage (%d/%d)\r\n", affect_types[dot->type], lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
+		msg_to_char(to, "  &r%s&0 (%s) %d %s damage (%d/%d)\r\n", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
 }
 

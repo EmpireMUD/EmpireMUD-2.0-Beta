@@ -341,7 +341,9 @@ void free_faction(faction_data *fct);
 
 // generics
 extern generic_data *generic_table;
+extern generic_data *sorted_generics;
 void free_generic(generic_data *gen);
+extern generic_data *find_generic_by_name(int type, char *name, bool exact);
 extern generic_data *find_generic_by_vnum(any_vnum vnum);
 extern const char *get_generic_name_by_vnum(any_vnum vnum);
 extern const char *get_generic_string_by_vnum(any_vnum vnum, int type, int pos);

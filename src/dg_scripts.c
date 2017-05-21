@@ -37,7 +37,6 @@ extern unsigned long pulse;
 /* other external vars */
 extern const char *action_bits[];
 extern const char *affected_bits[];
-extern const char *affect_types[];
 extern const char *alt_dirs[];
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
@@ -2684,15 +2683,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					*/
 					else if (!str_cmp(field, "affect")) {
 						if (subfield && *subfield) {
-							int spell = search_block(subfield, affect_types, FALSE);
-
-							if (affected_by_spell(c, spell))
-								snprintf(str, slen, "1");
-							else 
+							generic_data *gen;
+							
+							if (isdigit(*subfield) && (gen = find_generic_by_vnum(atoi(subfield)))) {
+								snprintf(str, slen, "%d", affected_by_spell(c, GEN_VNUM(gen)) ? 1 : 0);
+							}
+							else if ((gen = find_generic_by_name(GENERIC_AFFECT, subfield, TRUE))) {
+								snprintf(str, slen, "%d", affected_by_spell(c, GEN_VNUM(gen)) ? 1 : 0);
+							}
+							else {
 								snprintf(str, slen, "0");
+							}
 						}
-						else
+						else {
 							snprintf(str, slen, "0");
+						}
 					}
 					break;
 				}

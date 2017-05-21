@@ -2147,7 +2147,7 @@ struct apply_data {
 
 // Simple affect structure
 struct affected_type {
-	sh_int type;	// The type of spell that caused this
+	any_vnum type;	// The type of spell that caused this
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// For how long its effects will last
 	int modifier;	// This is added to apropriate ability
@@ -3385,7 +3385,7 @@ struct cooldown_data {
 
 // for damage-over-time (DoTs)
 struct over_time_effect_type {
-	sh_int type;	// ATYPE_
+	any_vnum type;	// ATYPE_
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// time in 5-second real-updates
 	sh_int damage_type;	// DAM_x type
@@ -3531,13 +3531,13 @@ struct poison_data_type {
 	char *name;
 	any_vnum ability;
 	
-	int atype;	// ATYPE_
+	any_vnum atype;	// ATYPE_
 	int apply;	// APPLY_
 	int mod;	// +/- value
 	bitvector_t aff;
 	
 	// dot affect
-	int dot_type;	// ATYPE_, -1 for none
+	any_vnum dot_type;	// ATYPE_, -1 for none
 	int dot_duration;	// time for the dot
 	int dot_damage_type;	// DAM_ for the dot
 	int dot_damage;	// damage for the dot
@@ -3551,7 +3551,7 @@ struct poison_data_type {
 // see act.naturalmagic.c
 struct potion_data_type {
 	char *name;	// name for olc, etc
-	int atype;	// ATYPE_
+	any_vnum atype;	// ATYPE_
 	int apply;	// APPLY_
 	bitvector_t aff;
 	int spec;	// POTION_SPEC_
@@ -3894,6 +3894,7 @@ struct generic_data {
 	char *string[NUM_GENERIC_STRINGS];	// this can be expanded
 	
 	UT_hash_handle hh;	// generic_table hash
+	UT_hash_handle sorted_hh;	// sorted_generics hash
 };
 
 
