@@ -1182,7 +1182,7 @@ OLC_MODULE(genedit_quick_cooldown) {
 	}
 	
 	// OLC_x: see if there's something to create and set it up
-	switch (type) {
+	switch (from_type) {
 		case OLC_ABILITY: {
 			ability_data *abil = find_ability_by_vnum(vnum);
 			if (!abil) {
