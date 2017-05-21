@@ -1287,6 +1287,19 @@ OLC_MODULE(genedit_quick_cooldown) {
 			}
 			break;
 		}
+		case OLC_TRIGGER: {
+			trig_data *trig = real_trigger(vnum);
+			if (!trig) {
+				msg_to_char(ch, "There is no trigger by that vnum.\r\n");
+				return;
+			}
+			else {
+				GET_OLC_GENERIC(ch->desc) = setup_olc_generic(NULL);
+				free(GEN_NAME(GET_OLC_GENERIC(ch->desc)));
+				GEN_NAME(GET_OLC_GENERIC(ch->desc)) = str_dup(NULLSAFE(GET_TRIG_NAME(trig)));
+			}
+			break;
+		}
 		case OLC_VEHICLE: {
 			vehicle_data *veh = vehicle_proto(vnum);
 			if (!veh) {
