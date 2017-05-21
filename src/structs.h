@@ -1078,6 +1078,7 @@ typedef struct vehicle_data vehicle_data;
 #define GENERIC_UNKNOWN  0	// dummy
 #define GENERIC_LIQUID  1	// for drink containers
 #define GENERIC_ACTION  2	// for resource actions
+#define GENERIC_COOLDOWN  3	// for cooldowns!
 
 
 // GEN_x: generic flags

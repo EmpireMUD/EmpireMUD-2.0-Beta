@@ -558,6 +558,8 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GEN_FLAGGED(gen, flag)  IS_SET(GEN_FLAGS(gen), (flag))
 
 
+// GENERIC_x: value definitions and getters
+
 // GENERIC_LIQUID
 #define GSTR_LIQUID_NAME  0
 #define GSTR_LIQUID_COLOR  1
@@ -574,6 +576,10 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GSTR_ACTION_CRAFT_TO_ROOM  3
 #define GSTR_ACTION_REPAIR_TO_CHAR  4
 #define GSTR_ACTION_REPAIR_TO_ROOM  5
+
+// GENERIC_COOLDOWN
+#define GSTR_COOLDOWN_WEAR_OFF  0
+#define GET_COOLDOWN_WEAR_OFF(gen)  GEN_STRING((gen), GSTR_COOLDOWN_WEAR_OFF)
 
 
  //////////////////////////////////////////////////////////////////////////////

@@ -876,8 +876,11 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Repair-to-Room: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM)));
 			break;
 		}
+		case GENERIC_COOLDOWN: {
+			size += snprintf(buf + size, sizeof(buf) - size, "Wear-off: %s\r\n", GET_COOLDOWN_WEAR_OFF(gen) ? GET_COOLDOWN_WEAR_OFF(gen) : "(none)");
+			break;
+		}
 	}
-
 
 	page_string(ch->desc, buf, TRUE);
 }
@@ -923,6 +926,11 @@ void olc_show_generic(char_data *ch) {
 			sprintf(buf + strlen(buf), "<\tycraft2room\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) : "(none)");
 			sprintf(buf + strlen(buf), "<\tyrepair2char\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) : "(none)");
 			sprintf(buf + strlen(buf), "<\tyrepair2room\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) : "(none)");
+			break;
+		}
+		case GENERIC_COOLDOWN: {
+			sprintf(buf + strlen(buf), "<\tywearoff\t0> %s\r\n", GET_COOLDOWN_WEAR_OFF(gen) ? GET_COOLDOWN_WEAR_OFF(gen) : "(none)");
+			sprintf(buf + strlen(buf), "<\tystandardwearoff\t0> (to add a basic wear-off message based on the name)\r\n");
 			break;
 		}
 	}
@@ -997,6 +1005,13 @@ OLC_MODULE(genedit_build2char) {
 	if (GEN_TYPE(gen) != GENERIC_ACTION) {
 		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
 	}
+	else if (!str_cmp(arg, "none")) {
+		if (GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR)) {
+			free(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR));
+		}
+		GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR) = NULL;
+		msg_to_char(ch, "Build2char messsage removed.\r\n");
+	}
 	else {
 		olc_process_string(ch, argument, "build2char", &GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR));
 	}
@@ -1008,6 +1023,13 @@ OLC_MODULE(genedit_build2room) {
 	
 	if (GEN_TYPE(gen) != GENERIC_ACTION) {
 		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
+	}
+	else if (!str_cmp(arg, "none")) {
+		if (GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM)) {
+			free(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM));
+		}
+		GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM) = NULL;
+		msg_to_char(ch, "Build2room messsage removed.\r\n");
 	}
 	else {
 		olc_process_string(ch, argument, "build2room", &GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM));
@@ -1021,6 +1043,13 @@ OLC_MODULE(genedit_craft2char) {
 	if (GEN_TYPE(gen) != GENERIC_ACTION) {
 		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
 	}
+	else if (!str_cmp(arg, "none")) {
+		if (GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR)) {
+			free(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR));
+		}
+		GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR) = NULL;
+		msg_to_char(ch, "Craft2char messsage removed.\r\n");
+	}
 	else {
 		olc_process_string(ch, argument, "craft2char", &GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR));
 	}
@@ -1032,6 +1061,13 @@ OLC_MODULE(genedit_craft2room) {
 	
 	if (GEN_TYPE(gen) != GENERIC_ACTION) {
 		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
+	}
+	else if (!str_cmp(arg, "none")) {
+		if (GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM)) {
+			free(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM));
+		}
+		GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) = NULL;
+		msg_to_char(ch, "Craft2room messsage removed.\r\n");
 	}
 	else {
 		olc_process_string(ch, argument, "craft2room", &GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM));
@@ -1045,6 +1081,13 @@ OLC_MODULE(genedit_repair2char) {
 	if (GEN_TYPE(gen) != GENERIC_ACTION) {
 		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
 	}
+	else if (!str_cmp(arg, "none")) {
+		if (GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR)) {
+			free(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR));
+		}
+		GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) = NULL;
+		msg_to_char(ch, "Repair2char messsage removed.\r\n");
+	}
 	else {
 		olc_process_string(ch, argument, "repair2char", &GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR));
 	}
@@ -1057,8 +1100,61 @@ OLC_MODULE(genedit_repair2room) {
 	if (GEN_TYPE(gen) != GENERIC_ACTION) {
 		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
 	}
+	else if (!str_cmp(arg, "none")) {
+		if (GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM)) {
+			free(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM));
+		}
+		GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) = NULL;
+		msg_to_char(ch, "Repair2room messsage removed.\r\n");
+	}
 	else {
 		olc_process_string(ch, argument, "repair2room", &GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM));
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// COOLDOWN OLC MODULES ////////////////////////////////////////////////////
+
+OLC_MODULE(genedit_standardwearoff) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	char buf[MAX_STRING_LENGTH];
+	
+	if (GEN_TYPE(gen) != GENERIC_COOLDOWN) {
+		msg_to_char(ch, "You can only change that on an COOLDOWN generic.\r\n");
+	}
+	else {
+		snprintf(buf, sizeof(buf), "Your %s cooldown has ended.", GEN_NAME(gen));
+		if (GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF)) {
+			free(GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF));
+		}
+		GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF) = str_dup(buf);
+
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "Wear-off messsage changed to: %s\r\n", buf);
+		}
+	}
+}
+
+
+OLC_MODULE(genedit_wearoff) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	
+	if (GEN_TYPE(gen) != GENERIC_COOLDOWN) {
+		msg_to_char(ch, "You can only change that on an COOLDOWN generic.\r\n");
+	}
+	else if (!str_cmp(arg, "none")) {
+		if (GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF)) {
+			free(GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF));
+		}
+		GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF) = NULL;
+		msg_to_char(ch, "Wear-off messsage removed.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "wearoff", &GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF));
 	}
 }
 

@@ -1562,6 +1562,7 @@ const char *generic_types[] = {
 	"UNKNOWN",
 	"LIQUID",
 	"ACTION",
+	"COOLDOWN",
 	"\n"
 };
 

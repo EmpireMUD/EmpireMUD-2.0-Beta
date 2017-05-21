@@ -189,6 +189,8 @@ OLC_MODULE(genedit_craft2char);
 OLC_MODULE(genedit_craft2room);
 OLC_MODULE(genedit_repair2char);
 OLC_MODULE(genedit_repair2room);
+OLC_MODULE(genedit_standardwearoff);
+OLC_MODULE(genedit_wearoff);
 
 // global modules
 OLC_MODULE(gedit_ability);
@@ -641,6 +643,9 @@ const struct olc_command_data olc_data[] = {
 	{ "craft2room", genedit_craft2room, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "repair2char", genedit_repair2char, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "repair2room", genedit_repair2room, OLC_GENERIC, OLC_CF_EDITOR },
+	// generic: cooldowns
+	{ "standardwearoff", genedit_standardwearoff, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "wearoff", genedit_wearoff, OLC_GENERIC, OLC_CF_EDITOR },
 	// generic: liquids
 	{ "color", genedit_color, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "drunk", genedit_drunk, OLC_GENERIC, OLC_CF_EDITOR },
