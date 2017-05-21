@@ -46,6 +46,7 @@ const char *default_generic_name = "Unnamed Generic";
 // external consts
 extern const char *generic_flags[];
 extern const char *generic_types[];
+extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
 // external funcs
 extern bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);
@@ -1123,6 +1124,205 @@ OLC_MODULE(genedit_repair2room) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// COOLDOWN OLC MODULES ////////////////////////////////////////////////////
+
+// creates a new cooldown with pre-filled fields
+OLC_MODULE(genedit_quick_cooldown) {
+	char type_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH], typename[42], buf[MAX_STRING_LENGTH];
+	descriptor_data *desc;
+	int from_type;
+	any_vnum vnum;
+	bool found;
+	
+	sprintbit(GET_OLC_TYPE(ch->desc) != 0 ? GET_OLC_TYPE(ch->desc) : type, olc_type_bits, typename, FALSE);
+		
+	// check that they're not already editing something
+	if (GET_OLC_VNUM(ch->desc) != NOTHING) {
+		if (*argument) {
+			msg_to_char(ch, "You are already editing a %s.\r\n", typename);
+		}
+		else {
+			msg_to_char(ch, "You are currently editing %s %d.\r\n", typename, GET_OLC_VNUM(ch->desc));
+		}
+		return;
+	}
+	
+	two_arguments(argument, type_arg, vnum_arg);
+	
+	if (!*type_arg || !*vnum_arg) {
+		msg_to_char(ch, "Usage: .quickcooldown <type> <vnum>\r\n");
+		return;
+	}
+	if (!(from_type = find_olc_type(type_arg))) {
+		msg_to_char(ch, "Invalid olc type '%s'.\r\n", type_arg);
+		return;
+	}
+	if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0 || vnum > MAX_VNUM) {
+		msg_to_char(ch, "You must pick a valid vnum between 0 and %d.\r\n", MAX_VNUM);
+		return;
+	}
+	if (!player_can_olc_edit(ch, OLC_GENERIC, vnum)) {
+		msg_to_char(ch, "You don't have permission to edit a generic with that vnum.\r\n");
+		return;
+	}
+	if (find_generic_by_vnum(vnum)) {
+		msg_to_char(ch, "There is already a generic with that vnum.\r\n");
+		return;
+	}
+	
+	// make sure nobody else is already editing it
+	found = FALSE;
+	for (desc = descriptor_list; desc && !found; desc = desc->next) {
+		if (GET_OLC_TYPE(desc) == OLC_GENERIC && GET_OLC_VNUM(desc) == vnum) {
+			found = TRUE;
+		}
+	}
+	if (found) {
+		msg_to_char(ch, "Someone else is already editing that generic.\r\n");
+		return;
+	}
+	
+	// OLC_x: see if there's something to create and set it up
+	switch (type) {
+		case OLC_ABILITY: {
+			ability_data *abil = find_ability_by_vnum(vnum);
+			if (!abil) {
+				msg_to_char(ch, "There is no ability by that vnum.\r\n");
+				return;
+			}
+			else {
+				GET_OLC_GENERIC(ch->desc) = setup_olc_generic(NULL);
+				free(GEN_NAME(GET_OLC_GENERIC(ch->desc)));
+				GEN_NAME(GET_OLC_GENERIC(ch->desc)) = str_dup(NULLSAFE(ABIL_NAME(abil)));
+			}
+			break;
+		}
+		case OLC_AUGMENT: {
+			augment_data *aug = augment_proto(vnum);
+			if (!aug) {
+				msg_to_char(ch, "There is no augment by that vnum.\r\n");
+				return;
+			}
+			else {
+				GET_OLC_GENERIC(ch->desc) = setup_olc_generic(NULL);
+				free(GEN_NAME(GET_OLC_GENERIC(ch->desc)));
+				GEN_NAME(GET_OLC_GENERIC(ch->desc)) = str_dup(NULLSAFE(GET_AUG_NAME(aug)));
+			}
+			break;
+		}
+		case OLC_BUILDING: {
+			bld_data *bld = building_proto(vnum);
+			if (!bld) {
+				msg_to_char(ch, "There is no building by that vnum.\r\n");
+				return;
+			}
+			else {
+				GET_OLC_GENERIC(ch->desc) = setup_olc_generic(NULL);
+				free(GEN_NAME(GET_OLC_GENERIC(ch->desc)));
+				GEN_NAME(GET_OLC_GENERIC(ch->desc)) = str_dup(NULLSAFE(GET_BLD_NAME(bld)));
+			}
+			break;
+		}
+		case OLC_CRAFT: {
+			craft_data *cft = craft_proto(vnum);
+			if (!cft) {
+				msg_to_char(ch, "There is no craft by that vnum.\r\n");
+				return;
+			}
+			else {
+				GET_OLC_GENERIC(ch->desc) = setup_olc_generic(NULL);
+				free(GEN_NAME(GET_OLC_GENERIC(ch->desc)));
+				GEN_NAME(GET_OLC_GENERIC(ch->desc)) = str_dup(NULLSAFE(GET_CRAFT_NAME(cft)));
+			}
+			break;
+		}
+		case OLC_MOBILE: {
+			char_data *mob = mob_proto(vnum);
+			if (!mob) {
+				msg_to_char(ch, "There is no mobile by that vnum.\r\n");
+				return;
+			}
+			else {
+				GET_OLC_GENERIC(ch->desc) = setup_olc_generic(NULL);
+				free(GEN_NAME(GET_OLC_GENERIC(ch->desc)));
+				GEN_NAME(GET_OLC_GENERIC(ch->desc)) = str_dup(skip_filler(NULLSAFE(GET_SHORT_DESC(mob))));
+			}
+			break;
+		}
+		case OLC_MORPH: {
+			morph_data *morph = morph_proto(vnum);
+			if (!morph) {
+				msg_to_char(ch, "There is no morph by that vnum.\r\n");
+				return;
+			}
+			else {
+				GET_OLC_GENERIC(ch->desc) = setup_olc_generic(NULL);
+				free(GEN_NAME(GET_OLC_GENERIC(ch->desc)));
+				GEN_NAME(GET_OLC_GENERIC(ch->desc)) = str_dup(skip_filler(NULLSAFE(MORPH_SHORT_DESC(morph))));
+			}
+			break;
+		}
+		case OLC_OBJECT: {
+			obj_data *obj = obj_proto(vnum);
+			if (!obj) {
+				msg_to_char(ch, "There is no object by that vnum.\r\n");
+				return;
+			}
+			else {
+				GET_OLC_GENERIC(ch->desc) = setup_olc_generic(NULL);
+				free(GEN_NAME(GET_OLC_GENERIC(ch->desc)));
+				GEN_NAME(GET_OLC_GENERIC(ch->desc)) = str_dup(skip_filler(NULLSAFE(GET_OBJ_SHORT_DESC(obj))));
+			}
+			break;
+		}
+		case OLC_SKILL: {
+			skill_data *skl = find_skill_by_vnum(vnum);
+			if (!skl) {
+				msg_to_char(ch, "There is no skill by that vnum.\r\n");
+				return;
+			}
+			else {
+				GET_OLC_GENERIC(ch->desc) = setup_olc_generic(NULL);
+				free(GEN_NAME(GET_OLC_GENERIC(ch->desc)));
+				GEN_NAME(GET_OLC_GENERIC(ch->desc)) = str_dup(NULLSAFE(SKILL_NAME(skl)));
+			}
+			break;
+		}
+		case OLC_VEHICLE: {
+			vehicle_data *veh = vehicle_proto(vnum);
+			if (!veh) {
+				msg_to_char(ch, "There is no vehicle by that vnum.\r\n");
+				return;
+			}
+			else {
+				GET_OLC_GENERIC(ch->desc) = setup_olc_generic(NULL);
+				free(GEN_NAME(GET_OLC_GENERIC(ch->desc)));
+				GEN_NAME(GET_OLC_GENERIC(ch->desc)) = str_dup(skip_filler(NULLSAFE(VEH_SHORT_DESC(veh))));
+			}
+			break;
+		}
+		default: {
+			msg_to_char(ch, "Quickcooldown is not supported for that type.\r\n");
+			return;
+		}
+	}
+	
+	// SUCCESS
+	msg_to_char(ch, "You create a quick cooldown %s %d:\r\n", typename, vnum);
+	GET_OLC_TYPE(ch->desc) = OLC_GENERIC;
+	GET_OLC_VNUM(ch->desc) = vnum;
+	
+	// ensure some data
+	GEN_VNUM(GET_OLC_GENERIC(ch->desc)) = vnum;
+	GEN_TYPE(GET_OLC_GENERIC(ch->desc)) = GENERIC_COOLDOWN;
+	snprintf(buf, sizeof(buf), "Your %s cooldown has ended.", GEN_NAME(GET_OLC_GENERIC(ch->desc)));
+	if (GEN_STRING(GET_OLC_GENERIC(ch->desc), GSTR_COOLDOWN_WEAR_OFF)) {
+		free(GEN_STRING(GET_OLC_GENERIC(ch->desc), GSTR_COOLDOWN_WEAR_OFF));
+	}
+	GEN_STRING(GET_OLC_GENERIC(ch->desc), GSTR_COOLDOWN_WEAR_OFF) = str_dup(buf);
+	
+	olc_show_generic(ch);
+}
+
 
 OLC_MODULE(genedit_standardwearoff) {
 	generic_data *gen = GET_OLC_GENERIC(ch->desc);

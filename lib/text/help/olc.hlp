@@ -2270,6 +2270,20 @@ usually be added within an adventure zone's vnums.
 
 See also: OLC GENERICS, DOLLAR SIGN CODES
 #d
+"GENERIC COOLDOWN" "COOLDOWN EDITOR" "COOLDOWN GENERICS" "GENEDIT WEAROFF" "GENEDIT STANDARDWEAROFF"
+
+Generic 'cooldowns' are used to track time limits on players' abilities, as
+well as in scripts.
+
+Cooldowns have 1 optional property:
+  <&ywearoff&0> An optional message shown when the cooldown ends.
+
+You can use <&ystandardwearoff&0> to add the normal wear-off message.
+
+You can also create quick cooldowns with: .gen quickcooldown <type> <vnum>
+
+See also: GENEDIT QUICKCOOLDOWN
+#d
 "GENERIC LIQUIDS" "LIQUID GENERICS" "LIQUID EDITOR" "GENEDIT LIQUID" "GENEDIT COLOR" "GENEDIT HUNGER" "GENEDIT THIRST" "GENEDIT DRUNK"
 
 The 'liquid' generic type is used in drink containers and resource lists.
@@ -2304,6 +2318,16 @@ types, like liquids, the name is never shown to players. However, other types
 such as actions do appear to the player.
 
 Action names should be lowercase unless they are proper nouns.
+
+See also: OLC GENERICS
+#d
+"GENEDIT QUICKCOOLDOWN"
+
+Usage:  .gen quickcooldown <type> <vnum>
+
+This creates a new generic cooldown based on the type/vnum you pick. For
+example, using it on an object named "a puppy whistle" results in a new
+cooldown named "puppy whistle" and with the standard wear-off message.
 
 See also: OLC GENERICS
 #d

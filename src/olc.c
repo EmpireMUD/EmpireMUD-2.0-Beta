@@ -189,6 +189,7 @@ OLC_MODULE(genedit_craft2char);
 OLC_MODULE(genedit_craft2room);
 OLC_MODULE(genedit_repair2char);
 OLC_MODULE(genedit_repair2room);
+OLC_MODULE(genedit_quick_cooldown);
 OLC_MODULE(genedit_standardwearoff);
 OLC_MODULE(genedit_wearoff);
 
@@ -644,6 +645,7 @@ const struct olc_command_data olc_data[] = {
 	{ "repair2char", genedit_repair2char, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "repair2room", genedit_repair2room, OLC_GENERIC, OLC_CF_EDITOR },
 	// generic: cooldowns
+	{ "quickcooldown", genedit_quick_cooldown, OLC_GENERIC, NOBITS },
 	{ "standardwearoff", genedit_standardwearoff, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "wearoff", genedit_wearoff, OLC_GENERIC, OLC_CF_EDITOR },
 	// generic: liquids
