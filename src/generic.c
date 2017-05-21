@@ -889,6 +889,10 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Wear-off: %s\r\n", GET_COOLDOWN_WEAR_OFF(gen) ? GET_COOLDOWN_WEAR_OFF(gen) : "(none)");
 			break;
 		}
+		case GENERIC_AFFECT: {
+			size += snprintf(buf + size, sizeof(buf) - size, "Wear-off: %s\r\n", GET_AFFECT_WEAR_OFF(gen) ? GET_AFFECT_WEAR_OFF(gen) : "(none)");
+			break;
+		}
 	}
 
 	page_string(ch->desc, buf, TRUE);
@@ -939,6 +943,11 @@ void olc_show_generic(char_data *ch) {
 		}
 		case GENERIC_COOLDOWN: {
 			sprintf(buf + strlen(buf), "<\tywearoff\t0> %s\r\n", GET_COOLDOWN_WEAR_OFF(gen) ? GET_COOLDOWN_WEAR_OFF(gen) : "(none)");
+			sprintf(buf + strlen(buf), "<\tystandardwearoff\t0> (to add a basic wear-off message based on the name)\r\n");
+			break;
+		}
+		case GENERIC_AFFECT: {
+			sprintf(buf + strlen(buf), "<\tywearoff\t0> %s\r\n", GET_AFFECT_WEAR_OFF(gen) ? GET_AFFECT_WEAR_OFF(gen) : "(none)");
 			sprintf(buf + strlen(buf), "<\tystandardwearoff\t0> (to add a basic wear-off message based on the name)\r\n");
 			break;
 		}
@@ -1123,7 +1132,7 @@ OLC_MODULE(genedit_repair2room) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// COOLDOWN OLC MODULES ////////////////////////////////////////////////////
+//// COOLDOWN/AFFECT OLC MODULES /////////////////////////////////////////////
 
 // creates a new cooldown with pre-filled fields
 OLC_MODULE(genedit_quick_cooldown) {
@@ -1340,42 +1349,67 @@ OLC_MODULE(genedit_quick_cooldown) {
 OLC_MODULE(genedit_standardwearoff) {
 	generic_data *gen = GET_OLC_GENERIC(ch->desc);
 	char buf[MAX_STRING_LENGTH];
+	int pos = 0;
 	
-	if (GEN_TYPE(gen) != GENERIC_COOLDOWN) {
-		msg_to_char(ch, "You can only change that on an COOLDOWN generic.\r\n");
+	switch (GEN_TYPE(gen)) {
+		case GENERIC_COOLDOWN: {
+			snprintf(buf, sizeof(buf), "Your %s cooldown has ended.", GEN_NAME(gen));
+			pos = GSTR_COOLDOWN_WEAR_OFF;
+			break;
+		}
+		case GENERIC_AFFECT: {
+			snprintf(buf, sizeof(buf), "Your %s wears off.", GEN_NAME(gen));
+			pos = GSTR_AFFECT_WEAR_OFF;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can only change that on an AFFECT or COOLDOWN generic.\r\n");
+			return;
+		}
+	}
+	
+	if (GEN_STRING(gen, pos)) {
+		free(GEN_STRING(gen, pos));
+	}
+	GEN_STRING(gen, pos) = str_dup(buf);
+
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		send_config_msg(ch, "ok_string");
 	}
 	else {
-		snprintf(buf, sizeof(buf), "Your %s cooldown has ended.", GEN_NAME(gen));
-		if (GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF)) {
-			free(GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF));
-		}
-		GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF) = str_dup(buf);
-
-		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
-			send_config_msg(ch, "ok_string");
-		}
-		else {
-			msg_to_char(ch, "Wear-off messsage changed to: %s\r\n", buf);
-		}
+		msg_to_char(ch, "Wear-off messsage changed to: %s\r\n", buf);
 	}
 }
 
 
 OLC_MODULE(genedit_wearoff) {
 	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	int pos = 0;
 	
-	if (GEN_TYPE(gen) != GENERIC_COOLDOWN) {
-		msg_to_char(ch, "You can only change that on an COOLDOWN generic.\r\n");
-	}
-	else if (!str_cmp(arg, "none")) {
-		if (GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF)) {
-			free(GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF));
+	switch (GEN_TYPE(gen)) {
+		case GENERIC_COOLDOWN: {
+			pos = GSTR_COOLDOWN_WEAR_OFF;
+			break;
 		}
-		GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF) = NULL;
+		case GENERIC_AFFECT: {
+			pos = GSTR_AFFECT_WEAR_OFF;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can only change that on an AFFECT or COOLDOWN generic.\r\n");
+			return;
+		}
+	}
+	
+	if (!str_cmp(arg, "none")) {
+		if (GEN_STRING(gen, pos)) {
+			free(GEN_STRING(gen, pos));
+		}
+		GEN_STRING(gen, pos) = NULL;
 		msg_to_char(ch, "Wear-off messsage removed.\r\n");
 	}
 	else {
-		olc_process_string(ch, argument, "wearoff", &GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF));
+		olc_process_string(ch, argument, "wearoff", &GEN_STRING(gen, pos));
 	}
 }
 

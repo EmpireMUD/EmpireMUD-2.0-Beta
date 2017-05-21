@@ -10,6 +10,16 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+// NOTE: These numbers match things created with the OLC editors and stored
+// in data files. When you add a definition in this file, you must first find
+// a free vnum in your EmpireMUD, and create the item/building/etc.
+
+// Note on VNUMS:
+// You do NOT need to be sequential with other numbers in this file. You should
+// almost always add new content in the vnum range of your own adventures, or 
+// pick a high starting vnum to avoid conflicting with stock content.
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// BUILDINGS ///////////////////////////////////////////////////////////////
 
@@ -203,9 +213,6 @@
 
 
 // GENERIC_COOLDOWN entires used by the code
-
-
-// cooldowns -- see COOLDOWN_x in constants.c
 #define COOLDOWN_DEATH_RESPAWN  2001
 #define COOLDOWN_LEFT_EMPIRE  2002
 #define COOLDOWN_HOSTILE_FLAG  2003

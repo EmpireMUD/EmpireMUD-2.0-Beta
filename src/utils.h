@@ -563,11 +563,11 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 // GENERIC_LIQUID
 #define GSTR_LIQUID_NAME  0
 #define GSTR_LIQUID_COLOR  1
-#define GET_LIQUID_NAME(gen)  GEN_STRING((gen), GSTR_LIQUID_NAME)
-#define GET_LIQUID_COLOR(gen)  GEN_STRING((gen), GSTR_LIQUID_COLOR)
-#define GET_LIQUID_DRUNK(gen)  GEN_VALUE((gen), DRUNK)
-#define GET_LIQUID_FULL(gen)  GEN_VALUE((gen), FULL)
-#define GET_LIQUID_THIRST(gen)  GEN_VALUE((gen), THIRST)
+#define GET_LIQUID_NAME(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_STRING((gen), GSTR_LIQUID_NAME) : "")
+#define GET_LIQUID_COLOR(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_STRING((gen), GSTR_LIQUID_COLOR) : "")
+#define GET_LIQUID_DRUNK(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), DRUNK) : 0)
+#define GET_LIQUID_FULL(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), FULL) : 0)
+#define GET_LIQUID_THIRST(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), THIRST) : 0)
 
 // GENERIC_ACTION
 #define GSTR_ACTION_BUILD_TO_CHAR  0
@@ -579,7 +579,11 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 
 // GENERIC_COOLDOWN
 #define GSTR_COOLDOWN_WEAR_OFF  0
-#define GET_COOLDOWN_WEAR_OFF(gen)  GEN_STRING((gen), GSTR_COOLDOWN_WEAR_OFF)
+#define GET_COOLDOWN_WEAR_OFF(gen)  (GEN_TYPE(gen) == GENERIC_COOLDOWN ? GEN_STRING((gen), GSTR_COOLDOWN_WEAR_OFF) : NULL)
+
+// GENERIC_AFFECT
+#define GSTR_AFFECT_WEAR_OFF  0
+#define GET_AFFECT_WEAR_OFF(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF) : NULL)
 
 
  //////////////////////////////////////////////////////////////////////////////
