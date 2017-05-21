@@ -335,8 +335,8 @@ When using field  - The variable returns:
 &cadd_mob_flag(FLG)&0 - Adds a mob flag to the mob. Also, remove_mob_flag().
 &cadd_resources(vnum,amt)&0 - Gives a person <amt> of object <vnum>.
 &caff_flagged(FLG)&0 - Checks if the actor has an AFF flag (e.g. ENTANGLED).
-&caffect(name)&0 - Checks the actor for the affect (by name) in the subfield.
-   This is the name that shows on your affects/score command when using active.
+&caffect(vnum/name)&0 - Checks the actor for the affect (by name or generic 
+   affect vnum) in the subfield.
 &calias&0 - The list of aliases (keywords) of the mob or the player name.
 &callegiance(faction)&0 - Returns a mob's faction vnum, or changes the faction
    to a different one (or 'none').
