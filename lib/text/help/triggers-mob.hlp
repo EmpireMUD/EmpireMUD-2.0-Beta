@@ -370,6 +370,7 @@ When using field  - The variable returns:
 &cclass&0 - The actor's class, as a string.
 &ccompleted_quest(vnum)&0 - Whether or not the player has completed and
    turned in that quest vnum.
+&ccooldown(vnum)&0 - Gets the character's current cooldown time (seconds).
 &ccrafting_level&0 - The actor's crafting level.
 &cdex&0 - The actor's Dexterity.
 &cdir(name)&0 - Gives the name of the character's perceived direction
@@ -457,7 +458,8 @@ When using field  - The variable returns:
 &cresist_physical&0 - Returns the amount of physical resistance the player has.
 &cresist_poison&0 - Returns TRUE if the player has Resist Poison.
 &criding&0 - TRUE if the character is currently mounted.
-&croom&0 - The room the actor is in as a room variable. 
+&croom&0 - The room the actor is in as a room variable.
+&cset_cooldown(vnum, seconds)&0 - Sets the character's cooldown time.
 &cset_skill(name,level)&0 - Change a player's skill level, also gain_skill()
 &csex&0 - The actor's sex, as a string: MALE, FEMALE, or NEUTRAL.
 &cskill(name)&0 - The player's level in the given skill.

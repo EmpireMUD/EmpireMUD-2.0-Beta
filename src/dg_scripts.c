@@ -2877,6 +2877,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 					}
+					else if (!str_cmp(field, "cooldown")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							snprintf(str, slen, "%d", get_cooldown_time(c, atoi(subfield)));
+						}
+					}
 					else if (!str_cmp(field, "crafting_level")) {
 						extern int get_crafting_level(char_data *ch);
 						snprintf(str, slen, "%d", get_crafting_level(c));
@@ -3500,7 +3505,33 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 's': {	// char.s*
-					if (!str_cmp(field, "sex"))
+					if (!str_cmp(field, "set_cooldown")) {
+						if (subfield && *subfield) {
+							char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+							generic_data *gen;
+							int val;
+							
+							comma_args(subfield, arg1, arg2);
+							
+							if (!*arg1 || !*arg2 || !isdigit(*arg1) || !isdigit(*arg2) || !(gen = find_generic_by_vnum(atoi(arg1))) || GEN_TYPE(gen) != GENERIC_COOLDOWN) {
+								script_log("Trigger: %s, VNum %d. bad arguments to set_cooldown(%s, %s)", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), arg1, arg2);
+								strcpy(str, "0");
+							}
+							else {
+								val = atoi(arg2);
+								if (val > 0) {
+									add_cooldown(c, GEN_VNUM(gen), val);
+								}
+								else {
+									remove_cooldown_by_type(c, GEN_VNUM(gen));
+								}
+								
+								// success
+								strcpy(str, "1");
+							}
+						}
+					}
+					else if (!str_cmp(field, "sex"))
 						snprintf(str, slen, "%s", genders[(int)GET_SEX(c)]);
 
 					else if (!str_cmp(field, "str") || !str_cmp(field, "strength"))
