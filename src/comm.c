@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "dg_scripts.h"
 #include "dg_event.h"
+#include "vnums.h"
 
 /**
 * Contents:

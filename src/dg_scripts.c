@@ -25,6 +25,7 @@
 #include "db.h"
 #include "olc.h"
 #include "skills.h"
+#include "vnums.h"
 
 #define PULSES_PER_MUD_HOUR     (SECS_PER_MUD_HOUR*PASSES_PER_SEC)
 #define player_script_radius  25	// map tiles away that players may be for scripts to trigger
