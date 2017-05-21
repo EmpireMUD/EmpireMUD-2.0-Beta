@@ -1,0 +1,545 @@
+#3001
+fly~
+4 0
+0 0 0 0
+T0
+You land quickly as your magical flight wears off.~
+S
+#3002
+entrancement~
+4 0
+0 0 0 0
+T0
+You no longer feel entranced.~
+S
+#3003
+darkness~
+4 0
+0 0 0 0
+T0
+The blanket of darkness dissipates.~
+S
+#3004
+poisoned~
+4 0
+0 0 0 0
+T0
+Poison fades from your system.~
+S
+#3005
+boost~
+4 0
+0 0 0 0
+T0
+You suddenly feel weaker.~
+S
+#3006
+cut deep~
+4 0
+0 0 0 0
+T0
+You're no longer bleeding from your deep cuts.~
+S
+#3007
+sap~
+4 0
+0 0 0 0
+T0
+You are no longer stunned.~
+S
+#3008
+mana shield~
+4 0
+0 0 0 0
+T0
+Your mana shield fades.~
+S
+#3009
+foresight~
+4 0
+0 0 0 0
+T0
+Your foresight ends.~
+S
+#3010
+earthmeld~
+4 0
+0 0 0 0
+T0
+You rise from the ground!~
+S
+#3011
+mummify~
+4 0
+0 0 0 0
+T0
+Your flesh returns to normal.~
+S
+#3012
+earth armor~
+4 0
+0 0 0 0
+T0
+Your plating of earth armor fades.~
+S
+#3013
+bestow vigor~
+4 0
+0 0 0 0
+T0
+Your heightened Fortitude fades.~
+S
+#3014
+weakness~
+4 0
+0 0 0 0
+T0
+Your weakness fades.~
+S
+#3015
+colorburst~
+4 0
+0 0 0 0
+T0
+You are no longer distracted by colorburst.~
+S
+#3016
+heartstop~
+4 0
+0 0 0 0
+T0
+Your vitae is no longer hindered.~
+S
+#3017
+phoenix rite~
+4 0
+0 0 0 0
+T0
+Your phoenix rite expires.~
+S
+#3018
+disarm~
+4 0
+0 0 0 0
+T0
+You recover and are no longer disarmed.~
+S
+#3019
+shocked~
+4 0
+0 0 0 0
+T0
+The lightning shock wears off.~
+S
+#3020
+skybrand~
+4 0
+0 0 0 0
+T0
+The skybrand fades.~
+S
+#3021
+counterspell~
+4 0
+0 0 0 0
+T0
+Your counterspell expires.~
+S
+#3022
+hasten~
+4 0
+0 0 0 0
+T0
+Your haste fades.~
+S
+#3023
+rejuvenate~
+4 0
+0 0 0 0
+T0
+The rejuvenation effect ends.~
+S
+#3024
+entangle~
+4 0
+0 0 0 0
+T0
+You are no longer entangled in vines.~
+S
+#3025
+radiance~
+4 0
+0 0 0 0
+T0
+Your radiant aura fades.~
+S
+#3026
+inspire~
+4 0
+0 0 0 0
+T0
+Your inspiration fades.~
+S
+#3027
+jabbed~
+4 0
+0 0 0 0
+T0
+Your jab wound stops bleeding.~
+S
+#3028
+blind~
+4 0
+0 0 0 0
+T0
+You are no longer blinded by sand.~
+S
+#3029
+healing potion~
+4 0
+0 0 0 0
+T0
+Your healing potion effect ends.~
+S
+#3030
+nature potion~
+4 0
+0 0 0 0
+T0
+Your nature potion effect ends.~
+S
+#3031
+vigor~
+4 0
+0 0 0 0
+T0
+Your vigor penalty ends.~
+S
+#3032
+enervate~
+4 0
+0 0 0 0
+T0
+Your stamina begins to return.~
+S
+#3033
+enervate~
+4 0
+0 0 0 0
+T0
+You are no longer gaining stamina from enervate.~
+S
+#3034
+siphon~
+4 0
+0 0 0 0
+T0
+You are no longer receiving mana from the siphon.~
+S
+#3035
+slow~
+4 0
+0 0 0 0
+T0
+You no longer feel lethargic.~
+S
+#3036
+sunshock~
+4 0
+0 0 0 0
+T0
+You are no longer blinded by the light.~
+S
+#3037
+tripping~
+4 0
+0 0 0 0
+T0
+Stuff isn't doing that thing anymore.~
+S
+#3038
+siphoned~
+4 0
+0 0 0 0
+T0
+Your mana is no longer siphoned.~
+S
+#3039
+affect~
+4 0
+0 0 0 0
+T0
+none~
+S
+#3040
+claws~
+4 0
+0 0 0 0
+T0
+Your claws retract.~
+S
+#3041
+deathshroud~
+4 0
+0 0 0 0
+T0
+Your deathshroud fades.~
+S
+#3042
+soulmask~
+4 0
+0 0 0 0
+T0
+Your soulmask fades.~
+S
+#3043
+majesty~
+4 0
+0 0 0 0
+T0
+You are no longer so majestic.~
+S
+#3044
+alacrity~
+4 0
+0 0 0 0
+T0
+Your alacrity fades.~
+S
+#3045
+nightsight~
+4 0
+0 0 0 0
+T0
+Your nightsight fades.~
+S
+#3046
+death penalty~
+4 0
+0 0 0 0
+T0
+Your death penalty ends.~
+S
+#3047
+bash~
+4 0
+0 0 0 0
+T0
+You are no longer stunned by that bash.~
+S
+#3048
+terrify~
+4 0
+0 0 0 0
+T0
+You are no longer terrified.~
+S
+#3049
+stunning blow~
+4 0
+0 0 0 0
+T0
+You are no longer dazed by that stunning blow.~
+S
+#3050
+stun immunity~
+4 0
+0 0 0 0
+T0
+Your stun immunity expires.~
+S
+#3051
+war delay~
+4 0
+0 0 0 0
+T0
+Your war delay ends and you are free to act.~
+S
+#3052
+unburdened~
+4 0
+0 0 0 0
+T0
+You feel the weight of the world return.~
+S
+#3053
+shadow kick~
+4 0
+0 0 0 0
+T0
+You are no longer weakened by the shadow kick.~
+S
+#3054
+stagger jab~
+4 0
+0 0 0 0
+T0
+You are no longer weakened by the stagger jab.~
+S
+#3055
+shadowcage~
+4 0
+0 0 0 0
+T0
+The shadowcage fades and your focus returns.~
+S
+#3056
+howl~
+4 0
+0 0 0 0
+T0
+The terrifying howl fades from your mind.~
+S
+#3057
+crucial jab~
+4 0
+0 0 0 0
+T0
+You are no longer weakened by the crucial jab.~
+S
+#3058
+shadow jab~
+4 0
+0 0 0 0
+T0
+You are no longer distracted by the diversion.~
+S
+#3059
+Unnamed Generic~
+0 0
+0 0 0 0
+S
+#3060
+confer~
+4 0
+0 0 0 0
+T0
+The power you were conferred has faded.~
+S
+#3061
+conferred~
+4 0
+0 0 0 0
+T0
+Your conferred strength returns.~
+S
+#3062
+morph~
+4 0
+0 0 0 0
+T0
+none~
+S
+#3063
+whisperstride~
+4 0
+0 0 0 0
+T0
+Your whisperstride fades.~
+S
+#3064
+well-fed~
+4 0
+0 0 0 0
+T0
+You no longer feel well-fed.~
+S
+#3065
+ablate~
+4 0
+0 0 0 0
+T0
+The ablation fades.~
+S
+#3066
+acidblast~
+4 0
+0 0 0 0
+T0
+The acid blast wears off.~
+S
+#3067
+astralclaw~
+4 0
+0 0 0 0
+T0
+none~
+S
+#3068
+chronoblast~
+4 0
+0 0 0 0
+T0
+Time speeds back up to normal.~
+S
+#3069
+dispirit~
+4 0
+0 0 0 0
+T0
+Your wits return.~
+S
+#3070
+erode~
+4 0
+0 0 0 0
+T0
+none~
+S
+#3071
+scour~
+4 0
+0 0 0 0
+T0
+none~
+S
+#3072
+shadowlash~
+4 0
+0 0 0 0
+T0
+Your vision returns.~
+S
+#3073
+shadowlash~
+4 0
+0 0 0 0
+T0
+none~
+S
+#3074
+soulchain~
+4 0
+0 0 0 0
+T0
+Your soul is unchained.~
+S
+#3075
+thornlash~
+4 0
+0 0 0 0
+T0
+none~
+S
+#3076
+arrow to the knee~
+4 0
+0 0 0 0
+T0
+Your knee feels better.~
+S
+#3077
+hostile delay~
+4 0
+0 0 0 0
+T0
+Your hostile login delay ends and you are free to act.~
+S
+#3078
+nature burn~
+4 0
+0 0 0 0
+T0
+Your nature burn eases.~
+S
+$
