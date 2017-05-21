@@ -2469,6 +2469,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				return;
 			}
+			else if (!str_cmp(var, "cooldown")) {
+				if (field && *field && isdigit(*field)) {
+					generic_data *gen = find_generic_by_vnum(atoi(field));
+					if (gen && GEN_TYPE(gen) == GENERIC_COOLDOWN) {
+						snprintf(str, slen, "%s", GEN_NAME(gen));
+					}
+					else {
+						strcpy(str, "UNKNOWN");
+					}
+				}
+				else {
+					strcpy(str, "UNKNOWN");
+				}
+			}
 			else if (!str_cmp(var, "random")) {
 				if (!str_cmp(field, "char") || !str_cmp(field, "ally") || !str_cmp(field, "enemy")) {
 					bool ally = (!str_cmp(field, "ally") ? TRUE : FALSE);
