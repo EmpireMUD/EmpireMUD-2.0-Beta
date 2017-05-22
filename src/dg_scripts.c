@@ -5173,7 +5173,7 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 	
 	// symbols used in operators
 	const char *opsymbols = "!/*+-<>=~&|";
-	
+  
 	p = strcpy(line, expr);
 
 	/*
