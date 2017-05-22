@@ -4999,7 +4999,8 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, void *go, struct scri
 	for (--p; isspace(*p) && (p > lhs); *p-- = '\0');
 	for (p = rhs; *p; p++);
 	for (--p; isspace(*p) && (p > rhs); *p-- = '\0');  
-
+	
+	log("Debug: op='%s', lhs='%s', rhs='%s'", op, lhs, rhs);
 
 	/* find the op, and figure out the value */
 	if (!strcmp("||", op)) {
@@ -5163,7 +5164,7 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 	static char *ops[num_op_lists][5] = {
 		// higher in this table = higher priority
 		{ "!", "\n" },
-		{ "*", "//", "/", "\n" },	// things on same line have same precedence
+		{ "*", "/", "//", "\n" },	// things on same line have same precedence
 		{ "+", "-", "\n" },
 		{ "<=", "<", ">=", ">", "\n" },
 		{ "/=", "~=", "\n" },
