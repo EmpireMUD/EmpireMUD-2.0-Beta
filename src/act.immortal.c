@@ -2849,10 +2849,10 @@ SHOW(show_learned) {
 	argument = one_argument(argument, arg);
 	skip_spaces(&argument);
 	
-	if (!*argument) {
+	if (!*arg) {
 		msg_to_char(ch, "Usage: show learned <player>\r\n");
 	}
-	else if (!(plr = find_or_load_player(argument, &file))) {
+	else if (!(plr = find_or_load_player(arg, &file))) {
 		send_to_char("There is no such player.\r\n", ch);
 	}
 	else {
