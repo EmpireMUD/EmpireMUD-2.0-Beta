@@ -35,6 +35,7 @@
 
 // external vars
 extern const struct augment_type_data augment_info[];
+extern const char *craft_types[];
 extern struct gen_craft_data_t gen_craft_data[];
 
 // external functions
@@ -1549,6 +1550,114 @@ ACMD(do_gen_craft) {
 }
 
 
+ACMD(do_learn) {
+	void add_learned_craft(char_data *ch, any_vnum vnum);
+	extern bool has_learned_craft(char_data *ch, any_vnum vnum);
+	
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	craft_data *recipe;
+	obj_data *obj;
+	
+	one_argument(argument, arg);
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "Mobs never learn.\r\n");
+	}
+	else if (!*argument) {
+		msg_to_char(ch, "Learn what?\r\n");
+	}
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+	}
+	else if (!bind_ok(obj, ch)) {
+		msg_to_char(ch, "That recipe is bound to someone else.\r\n");
+	}
+	else if (!IS_RECIPE(obj)) {
+		msg_to_char(ch, "You can only learn a recipe object.\r\n");
+	}
+	else if (GET_RECIPE_VNUM(obj) <= 0 || !(recipe = craft_proto(GET_RECIPE_VNUM(obj)))) {
+		msg_to_char(ch, "You can't learn that!\r\n");
+	}
+	else if (has_learned_craft(ch, GET_RECIPE_VNUM(obj))) {
+		msg_to_char(ch, "You already know that recipe.\r\n");
+	}
+	
+	// validate the player's ability to MAKE the recipe
+	else if (IS_SET(GET_CRAFT_FLAGS(recipe), CRAFT_IN_DEVELOPMENT)) {
+		msg_to_char(ch, "That recipe is not currently available to learn.\r\n");
+	}
+	else if (GET_CRAFT_ABILITY(recipe) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(recipe))) {
+		msg_to_char(ch, "You require the %s ability to learn that recipe.\r\n", get_ability_name_by_vnum(GET_CRAFT_ABILITY(recipe)));
+	}
+	
+	// seems ok!
+	else {
+		add_learned_craft(ch, GET_RECIPE_VNUM(obj));
+		msg_to_char(ch, "You learn how to make: %s!\r\n", GET_CRAFT_NAME(recipe));
+		snprintf(buf, sizeof(buf), "$n learns how to make: %s!", GET_CRAFT_NAME(recipe));
+		act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
+		
+		extract_obj(obj);
+	}
+}
+
+
+ACMD(do_learned) {
+	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct player_craft_data *pcd, *next_pcd;
+	craft_data *craft;
+	size_t size, count;
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "Mobs never learn.\r\n");
+		return;
+	}
+	
+	skip_spaces(&argument);
+	if (*argument) {
+		size = snprintf(output, sizeof(output), "Learned recipes matching '%s':\r\n", argument);
+	}
+	else {
+		size = snprintf(output, sizeof(output), "Learned recipes:\r\n");
+	}
+	
+	count = 0;
+	HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
+		if (!(craft = craft_proto(pcd->vnum))) {
+			continue;	// no craft?
+		}
+		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
+			continue;	// in-dev
+		}
+		if (*argument && !multi_isname(argument, GET_CRAFT_NAME(craft))) {
+			continue;	// searched
+		}
+		
+		// show it
+		snprintf(line, sizeof(line), " %s (%s)\r\n", GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
+		if (size + strlen(line) < sizeof(output)) {
+			strcat(output, line);
+			size += strlen(line);
+			++count;
+		}
+		else {
+			if (size + 10 < sizeof(output)) {
+				strcat(output, "OVERFLOW\r\n");
+			}
+			break;
+		}
+	}
+	
+	if (!count) {
+		strcat(output, "  none\r\n");	// space reserved for this for sure
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
+	}
+}
+
+
 ACMD(do_recipes) {
 	int last_type = NOTHING;
 	craft_data *craft, *next_craft;
@@ -1583,6 +1692,9 @@ ACMD(do_recipes) {
 			
 			if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(craft), ch->carrying)) {
 				continue;
+			}
+			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
+				continue;	// not learned
 			}
 			
 			// is the item used to make it?
