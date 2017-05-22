@@ -49,7 +49,6 @@
 */
 
 // external vars
-extern const char *drinks[];
 extern const char *pool_types[];
 
 // external funcs
@@ -2316,8 +2315,6 @@ void add_to_resource_list(struct resource_data **list, int type, any_vnum vnum, 
 * @param struct resource_data **build_used_list Optional: If you need to track the actual resources used, pass a pointer to that list.
 */
 void apply_resource(char_data *ch, struct resource_data *res, struct resource_data **list, obj_data *use_obj, int msg_type, vehicle_data *crafting_veh, struct resource_data **build_used_list) {
-	extern const char *res_action_messages[][NUM_APPLY_RES_TYPES][2];
-	
 	bool messaged_char = FALSE, messaged_room = FALSE;
 	char buf[MAX_STRING_LENGTH];
 	int amt;
@@ -2483,11 +2480,36 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 			break;
 		}
 		case RES_ACTION: {
-			if (*res_action_messages[res->vnum][msg_type][0]) {
-				act(res_action_messages[res->vnum][msg_type][0], FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
-			}
-			if (*res_action_messages[res->vnum][msg_type][1]) {
-				act(res_action_messages[res->vnum][msg_type][1], FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
+			generic_data *gen = find_generic_by_vnum(res->vnum);
+			
+			switch (msg_type) {
+				case APPLY_RES_BUILD: {
+					if (!messaged_char && gen && GSTR_ACTION_BUILD_TO_CHAR) {
+						act(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR), FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+					}
+					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM)) {
+						act(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM), FALSE, ch, use_obj, NULL, TO_ROOM | TO_SPAMMY);
+					}
+					break;
+				}
+				case APPLY_RES_CRAFT: {
+					if (!messaged_char && gen && GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR)) {
+						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
+					}
+					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM)) {
+						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
+					}
+					break;
+				}
+				case APPLY_RES_REPAIR: {
+					if (!messaged_char && gen && GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR)) {
+						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
+					}
+					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM)) {
+						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
+					}
+					break;
+				}
 			}
 			
 			res->amount -= 1;	// only 1 at a time
@@ -2779,9 +2801,7 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 * @param sturct resource_data *res The resource to display.
 * @return char* A short string including quantity and type.
 */
-char *get_resource_name(struct resource_data *res) {
-	extern const char *res_action_type[];
-	
+char *get_resource_name(struct resource_data *res) {	
 	static char output[MAX_STRING_LENGTH];
 	
 	*output = '\0';
@@ -2797,7 +2817,7 @@ char *get_resource_name(struct resource_data *res) {
 			break;
 		}
 		case RES_LIQUID: {
-			snprintf(output, sizeof(output), "%d unit%s of %s", res->amount, PLURAL(res->amount), drinks[res->vnum]);
+			snprintf(output, sizeof(output), "%d unit%s of %s", res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 			break;
 		}
 		case RES_COINS: {
@@ -2809,7 +2829,7 @@ char *get_resource_name(struct resource_data *res) {
 			break;
 		}
 		case RES_ACTION: {
-			snprintf(output, sizeof(output), "%dx [%s]", res->amount, res_action_type[res->vnum]);
+			snprintf(output, sizeof(output), "%dx [%s]", res->amount, get_generic_name_by_vnum(res->vnum));
 			break;
 		}
 		default: {
@@ -3056,7 +3076,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 									break;
 								}
 								case RES_LIQUID: {
-									msg_to_char(ch, "%s %d more unit%s of %s", (ok ? "You need" : ","), res->amount - total, PLURAL(res->amount - total), drinks[res->vnum]);
+									msg_to_char(ch, "%s %d more unit%s of %s", (ok ? "You need" : ","), res->amount - total, PLURAL(res->amount - total), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 									break;
 								}
 							}

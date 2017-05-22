@@ -39,7 +39,6 @@
 
 // external vars
 extern const char *action_bits[];
-extern const char *affect_types[];
 extern const char *affected_bits[];
 extern const char *apply_types[];
 extern const char *bld_on_flags[];
@@ -47,8 +46,8 @@ extern const char *bonus_bits[];
 extern const char *climate_types[];
 extern const char *component_flags[];
 extern const char *component_types[];
+extern const char *craft_types[];
 extern const char *dirs[];
-extern const char *drinks[];
 extern const char *extra_bits[];
 extern const char *function_flags[];
 extern const char *genders[];
@@ -2272,7 +2271,7 @@ SHOW(show_stats) {
 	msg_to_char(ch, "  %6d classes          %6d skills\r\n", HASH_COUNT(class_table), HASH_COUNT(skill_table));
 	msg_to_char(ch, "  %6d abilities        %6d factions\r\n", HASH_COUNT(ability_table), HASH_COUNT(faction_table));
 	msg_to_char(ch, "  %6d globals          %6d morphs\r\n", HASH_COUNT(globals_table), HASH_COUNT(morph_table));
-	msg_to_char(ch, "  %6d socials\r\n", HASH_COUNT(social_table));
+	msg_to_char(ch, "  %6d socials          %6d generics\r\n", HASH_COUNT(social_table), HASH_COUNT(generic_table));
 	msg_to_char(ch, "  %6d large bufs       %6d buf switches\r\n", buf_largecount, buf_switches);
 	msg_to_char(ch, "  %6d overflows\r\n", buf_overflows);
 }
@@ -2839,6 +2838,73 @@ SHOW(show_ignoring) {
 }
 
 
+SHOW(show_learned) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct player_craft_data *pcd, *next_pcd;
+	char_data *plr = NULL;
+	size_t size, count;
+	craft_data *craft;
+	bool file = FALSE;
+	
+	argument = one_argument(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show learned <player>\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Learned recipes matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Learned recipes for %s:\r\n", GET_NAME(plr));
+		}
+		
+		count = 0;
+		HASH_ITER(hh, GET_LEARNED_CRAFTS(plr), pcd, next_pcd) {
+			if (!(craft = craft_proto(pcd->vnum))) {
+				continue;	// no craft?
+			}
+			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
+				continue;	// in-dev
+			}
+			if (*argument && !multi_isname(argument, GET_CRAFT_NAME(craft))) {
+				continue;	// searched
+			}
+		
+			// show it
+			snprintf(line, sizeof(line), " %s (%s)\r\n", GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+				++count;
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+	
+		if (!count) {
+			strcat(output, "  none\r\n");	// space reserved for this for sure
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
 SHOW(show_workforce) {
 	void show_workforce_setup_to_char(empire_data *emp, char_data *ch);
 	
@@ -3290,7 +3356,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 	extern const char *account_flags[];
 	extern const char *class_role[];
-	extern const char *cooldown_types[];
 	extern const char *damage_types[];
 	extern const double hit_per_dex;
 	extern const char *mob_custom_types[];
@@ -3511,8 +3576,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			diff = cool->expire_time - time(0);
 			
 			if (diff > 0) {
-				sprinttype(cool->type, cooldown_types, buf);
-				msg_to_char(ch, "%s&c%s&0 %d:%02d", (found ? ", ": ""), buf, (diff / 60), (diff % 60));
+				msg_to_char(ch, "%s&c%s&0 %d:%02d", (found ? ", ": ""), get_generic_name_by_vnum(cool->type), (diff / 60), (diff % 60));
 				
 				found = TRUE;
 			}
@@ -3538,7 +3602,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 				sprintf(lbuf, "%.1fmin", ((double)(aff->duration + 1) * SECS_PER_REAL_UPDATE / 60.0));
 			}
 
-			sprintf(buf, "TYPE: (%s) &c%s&0 ", lbuf, affect_types[aff->type]);
+			sprintf(buf, "TYPE: (%s) &c%s&0 ", lbuf, get_generic_name_by_vnum(aff->type));
 
 			if (aff->modifier) {
 				sprintf(buf2, "%+d to %s", aff->modifier, apply_types[(int) aff->location]);
@@ -3565,7 +3629,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			sprintf(lbuf, "%.1fmin", ((double)(dot->duration + 1) * SECS_PER_REAL_UPDATE / 60.0));
 		}
 		
-		msg_to_char(ch, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)\r\n", lbuf, affect_types[dot->type], dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
+		msg_to_char(ch, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)\r\n", lbuf, get_generic_name_by_vnum(dot->type), dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
 
 	/* check mobiles for a script */
@@ -3597,7 +3661,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 void do_stat_craft(char_data *ch, craft_data *craft) {
 	extern const char *craft_flags[];
-	extern const char *craft_types[];
 	
 	ability_data *abil;
 	bld_data *bld;
@@ -3613,7 +3676,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 		msg_to_char(ch, "Creates Vehicle: [&c%d&0] %s\r\n", GET_CRAFT_OBJECT(craft), (GET_CRAFT_OBJECT(craft) == NOTHING ? "NOTHING" : get_vehicle_name_by_proto(GET_CRAFT_OBJECT(craft))));
 	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {
-		msg_to_char(ch, "Creates Volume: [&g%d drink%s&0], Liquid: [&g%d&0] %s\r\n", GET_CRAFT_QUANTITY(craft), PLURAL(GET_CRAFT_QUANTITY(craft)), GET_CRAFT_OBJECT(craft), (GET_CRAFT_OBJECT(craft) == NOTHING ? "NOTHING" : drinks[GET_CRAFT_OBJECT(craft)]));
+		msg_to_char(ch, "Creates Volume: [&g%d drink%s&0], Liquid: [&g%d&0] %s\r\n", GET_CRAFT_QUANTITY(craft), PLURAL(GET_CRAFT_QUANTITY(craft)), GET_CRAFT_OBJECT(craft), get_generic_string_by_vnum(GET_CRAFT_OBJECT(craft), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 	}
 	else {
 		msg_to_char(ch, "Creates Quantity: [&g%d&0], Item: [&c%d&0] %s\r\n", GET_CRAFT_QUANTITY(craft), GET_CRAFT_OBJECT(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)));
@@ -3849,7 +3912,8 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		}
 		msg_to_char(ch, "\r\n");
 	}
-
+	
+	// ITEM_X: stat obj
 	switch (GET_OBJ_TYPE(j)) {
 		case ITEM_BOOK: {
 			book_data *book = book_proto(GET_BOOK_ID(j));
@@ -3859,6 +3923,11 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		case ITEM_POISON: {
 			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(j)].name);
 			msg_to_char(ch, "Charges remaining: %d\r\n", GET_POISON_CHARGES(j));
+			break;
+		}
+		case ITEM_RECIPE: {
+			craft_data *cft = craft_proto(GET_RECIPE_VNUM(j));
+			msg_to_char(ch, "Teaches craft: %d %s (%s)\r\n", GET_RECIPE_VNUM(j), cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?");
 			break;
 		}
 		case ITEM_WEAPON:
@@ -3875,7 +3944,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			msg_to_char(ch, "Flags: %s\r\n", buf);
 			break;
 		case ITEM_DRINKCON:
-			msg_to_char(ch, "Contains: %d/%d drinks of %s\r\n", GET_DRINK_CONTAINER_CONTENTS(j), GET_DRINK_CONTAINER_CAPACITY(j), drinks[GET_DRINK_CONTAINER_TYPE(j)]);
+			msg_to_char(ch, "Contains: %d/%d drinks of %s\r\n", GET_DRINK_CONTAINER_CONTENTS(j), GET_DRINK_CONTAINER_CAPACITY(j), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(j), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 			break;
 		case ITEM_FOOD:
 			msg_to_char(ch, "Fills for: %d hour%s\r\n", GET_FOOD_HOURS_OF_FULLNESS(j), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(j)));
@@ -4218,7 +4287,7 @@ void do_stat_room(char_data *ch) {
 		for (aff = ROOM_AFFECTS(IN_ROOM(ch)); aff; aff = aff->next) {
 			*buf2 = '\0';
 
-			sprintf(buf, "Affect: (%3dhr) &c%s&0 ", aff->duration + 1, affect_types[aff->type]);
+			sprintf(buf, "Affect: (%3dhr) &c%s&0 ", aff->duration + 1, get_generic_name_by_vnum(aff->type));
 
 			if (aff->modifier) {
 				sprintf(buf2, "%+d to %s", aff->modifier, apply_types[(int) aff->location]);
@@ -4475,6 +4544,8 @@ int vnum_crop(char *searchname, char_data *ch) {
 * @return int The number of matches shown.
 */
 int vnum_global(char *searchname, char_data *ch) {
+	extern const char *global_types[];
+	
 	struct global_data *iter, *next_iter;
 	char flags[MAX_STRING_LENGTH];
 	int found = 0;
@@ -4485,16 +4556,16 @@ int vnum_global(char *searchname, char_data *ch) {
 			switch (GET_GLOBAL_TYPE(iter)) {
 				case GLOBAL_MOB_INTERACTIONS: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), action_bits, flags, TRUE);
-					msg_to_char(ch, "%3d. [%5d] %s (%s) %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags);
+					msg_to_char(ch, "%3d. [%5d] %s (%s) %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags, global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 				case GLOBAL_MINE_DATA: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), sector_flags, flags, TRUE);
-					msg_to_char(ch, "%3d. [%5d] %s - %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags);
+					msg_to_char(ch, "%3d. [%5d] %s - %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 				default: {
-					msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter));
+					msg_to_char(ch, "%3d. [%5d] %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 			}
@@ -6781,6 +6852,7 @@ ACMD(do_show) {
 		{ "factions", LVL_START_IMM, show_factions },
 		{ "dailycycle", LVL_START_IMM, show_dailycycle },
 		{ "data", LVL_CIMPL, show_data },
+		{ "learned", LVL_START_IMM, show_learned },
 
 		// last
 		{ "\n", 0, NULL }
@@ -7511,9 +7583,15 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No factions by that name.\r\n");
 		}
 	}
-	else if (is_abbrev(buf, "global")) {
+	else if (is_abbrev(buf, "global")) {	// takes precedence on 'g'
 		if (!vnum_global(buf2, ch)) {
 			msg_to_char(ch, "No globals by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "generic")) {
+		extern int vnum_generic(char *searchname, char_data *ch);
+		if (!vnum_generic(buf2, ch)) {
+			msg_to_char(ch, "No generic by that name.\r\n");
 		}
 	}
 	else if (is_abbrev(buf, "morph")) {
@@ -7668,13 +7746,22 @@ ACMD(do_vstat) {
 		}
 		do_stat_faction(ch, fct);
 	}
-	else if (is_abbrev(buf, "global")) {
+	else if (is_abbrev(buf, "global")) {	// precedence on 'g'
 		struct global_data *glb = global_proto(number);
 		if (!glb) {
 			msg_to_char(ch, "There is no global with that number.\r\n");
 			return;
 		}
 		do_stat_global(ch, glb);
+	}
+	else if (is_abbrev(buf, "generic")) {
+		void do_stat_generic(char_data *ch, generic_data *gen);
+		generic_data *gen = find_generic_by_vnum(number);
+		if (!gen) {
+			msg_to_char(ch, "There is no generic with that number.\r\n");
+			return;
+		}
+		do_stat_generic(ch, gen);
 	}
 	else if (is_abbrev(buf, "mobile")) {
 		if (!mob_proto(number)) {

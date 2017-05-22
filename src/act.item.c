@@ -40,8 +40,6 @@
 */
 
 // extern variables
-extern const char *drinks[];
-extern int drink_aff[][3];
 extern const char *extra_bits[];
 extern const char *mob_move_types[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
@@ -251,7 +249,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *apply_type_names[];
 	extern const char *climate_types[];
-	extern const char *drinks[];
+	extern const char *craft_types[];
 	extern const char *affected_bits[];
 	extern const char *apply_types[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
@@ -364,11 +362,17 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		msg_to_char(ch, "Affects: %s\r\n", buf);
 	}
 	
+	// ITEM_x: identify obj
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_POISON: {
 			extern const struct poison_data_type poison_data[];
 			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(obj)].name);
 			msg_to_char(ch, "Has %d charges remaining.\r\n", GET_POISON_CHARGES(obj));
+			break;
+		}
+		case ITEM_RECIPE: {
+			craft_data *cft = craft_proto(GET_RECIPE_VNUM(obj));
+			msg_to_char(ch, "Teaches craft: %s (%s)\r\n", cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?");
 			break;
 		}
 		case ITEM_WEAPON:
@@ -383,7 +387,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			msg_to_char(ch, "Holds %d items.\r\n", GET_MAX_CONTAINER_CONTENTS(obj));
 			break;
 		case ITEM_DRINKCON:
-			msg_to_char(ch, "Contains %d units of %s.\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), drinks[GET_DRINK_CONTAINER_TYPE(obj)]);
+			msg_to_char(ch, "Contains %d units of %s.\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 			break;
 		case ITEM_FOOD:
 			msg_to_char(ch, "Fills for %d hour%s.\r\n", GET_FOOD_HOURS_OF_FULLNESS(obj), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(obj)));
@@ -1510,7 +1514,7 @@ static void drink_message(char_data *ch, obj_data *obj, byte type, int subcmd, i
 		case drink_OBJ:
 			sprintf(buf, "$n %s from $p.", subcmd == SCMD_SIP ? "sips" : "drinks");
 			act(buf, TRUE, ch, obj, 0, TO_ROOM);
-			msg_to_char(ch, "You %s the %s.\r\n", subcmd == SCMD_SIP ? "sip" : "drink", drinks[GET_DRINK_CONTAINER_TYPE(obj)]);
+			msg_to_char(ch, "You %s the %s.\r\n", subcmd == SCMD_SIP ? "sip" : "drink", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 
 			*liq = GET_DRINK_CONTAINER_TYPE(obj);
 			break;
@@ -1522,7 +1526,7 @@ static void drink_message(char_data *ch, obj_data *obj, byte type, int subcmd, i
 	}
 
 	if (subcmd == SCMD_SIP) {
-		msg_to_char(ch, "It tastes like %s.\r\n", drinks[*liq]);
+		msg_to_char(ch, "It tastes like %s.\r\n", get_generic_string_by_vnum(*liq, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 	}
 }
 
@@ -3699,14 +3703,14 @@ ACMD(do_drink) {
 		// drinking blood?
 		amount = GET_MAX_BLOOD(ch) - GET_BLOOD(ch);
 	}
-	else if ((drink_aff[liquid][THIRST] > 0 && GET_COND(ch, THIRST) == UNLIMITED) || (drink_aff[liquid][FULL] > 0 && GET_COND(ch, FULL) == UNLIMITED) || (drink_aff[liquid][DRUNK] > 0 && GET_COND(ch, DRUNK) == UNLIMITED)) {
+	else if ((get_generic_value_by_vnum(liquid, GENERIC_LIQUID, THIRST) > 0 && GET_COND(ch, THIRST) == UNLIMITED) || (get_generic_value_by_vnum(liquid, GENERIC_LIQUID, FULL) > 0 && GET_COND(ch, FULL) == UNLIMITED) || (get_generic_value_by_vnum(liquid, GENERIC_LIQUID, DRUNK) > 0 && GET_COND(ch, DRUNK) == UNLIMITED)) {
 		// if theirs is unlimited
 		amount = 1;
 	}
 	else {
 		// how many hours of thirst I have, divided by how much thirst it gives per hour
-		thirst_amt = GET_COND(ch, THIRST) == UNLIMITED ? 1 : (((double) GET_COND(ch, THIRST) / REAL_UPDATES_PER_MUD_HOUR) / (double) drink_aff[liquid][THIRST]);
-		hunger_amt = GET_COND(ch, FULL) == UNLIMITED ? 1 : (((double) GET_COND(ch, FULL) / REAL_UPDATES_PER_MUD_HOUR) / (double) drink_aff[liquid][FULL]);
+		thirst_amt = GET_COND(ch, THIRST) == UNLIMITED ? 1 : (((double) GET_COND(ch, THIRST) / REAL_UPDATES_PER_MUD_HOUR) / (double) get_generic_value_by_vnum(liquid, GENERIC_LIQUID, THIRST));
+		hunger_amt = GET_COND(ch, FULL) == UNLIMITED ? 1 : (((double) GET_COND(ch, FULL) / REAL_UPDATES_PER_MUD_HOUR) / (double) get_generic_value_by_vnum(liquid, GENERIC_LIQUID, FULL));
 		
 		// poor man's round-up
 		if (((int)(thirst_amt * 10)) % 10 > 0) {
@@ -3721,7 +3725,7 @@ ACMD(do_drink) {
 		amount = MAX((int)thirst_amt, (int)hunger_amt);
 	
 		// if it causes drunkenness, minimum of 1
-		if (drink_aff[liquid][DRUNK] > 0) {
+		if (get_generic_value_by_vnum(liquid, GENERIC_LIQUID, DRUNK) > 0) {
 			amount = MAX(1, amount);
 		}
 	}
@@ -3739,19 +3743,19 @@ ACMD(do_drink) {
 	}
 	
 	// -1 to remove condition, amount = number of gulps
-	gain_condition(ch, THIRST, -1 * drink_aff[liquid][THIRST] * REAL_UPDATES_PER_MUD_HOUR * amount);
-	gain_condition(ch, FULL, -1 * drink_aff[liquid][FULL] * REAL_UPDATES_PER_MUD_HOUR * amount);
+	gain_condition(ch, THIRST, -1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, THIRST) * REAL_UPDATES_PER_MUD_HOUR * amount);
+	gain_condition(ch, FULL, -1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, FULL) * REAL_UPDATES_PER_MUD_HOUR * amount);
 	// drunk goes positive instead of negative
-	gain_condition(ch, DRUNK, 1 * drink_aff[liquid][DRUNK] * REAL_UPDATES_PER_MUD_HOUR * amount);
+	gain_condition(ch, DRUNK, 1 * get_generic_value_by_vnum(liquid, GENERIC_LIQUID, DRUNK) * REAL_UPDATES_PER_MUD_HOUR * amount);
 
 	// messages based on what changed
-	if (GET_COND(ch, DRUNK) > 150 && drink_aff[liquid][DRUNK] != 0) {
+	if (GET_COND(ch, DRUNK) > 150 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, DRUNK) != 0) {
 		send_to_char("You feel drunk.\r\n", ch);
 	}
-	if (GET_COND(ch, THIRST) < 75 && drink_aff[liquid][THIRST] != 0) {
+	if (GET_COND(ch, THIRST) < 75 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, THIRST) != 0) {
 		send_to_char("You don't feel thirsty any more.\r\n", ch);
 	}
-	if (GET_COND(ch, FULL) < 75 && drink_aff[liquid][FULL] != 0) {
+	if (GET_COND(ch, FULL) < 75 && get_generic_value_by_vnum(liquid, GENERIC_LIQUID, FULL) != 0) {
 		send_to_char("You are full.\r\n", ch);
 	}
 
@@ -4724,7 +4728,7 @@ ACMD(do_pour) {
 		return;
 	}
 	if (subcmd == SCMD_POUR) {
-		sprintf(buf, "You pour the %s into %s.", drinks[GET_DRINK_CONTAINER_TYPE(from_obj)], GET_OBJ_SHORT_DESC(to_obj));
+		sprintf(buf, "You pour the %s into %s.", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(from_obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), GET_OBJ_SHORT_DESC(to_obj));
 		send_to_char(buf, ch);
 	}
 	if (subcmd == SCMD_FILL) {

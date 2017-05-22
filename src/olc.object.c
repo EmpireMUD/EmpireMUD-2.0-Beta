@@ -37,7 +37,6 @@ extern const char *armor_types[NUM_ARMOR_TYPES+1];
 extern const char *component_flags[];
 extern const char *component_types[];
 extern const char *container_bits[];
-extern const char *drinks[];
 extern const char *extra_bits[];
 extern const char *interact_types[];
 extern const char *item_types[];
@@ -244,6 +243,17 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			}
 			break;
 		}
+		case ITEM_RECIPE: {
+			craft_data *craft = craft_proto(GET_RECIPE_VNUM(obj));
+			if (GET_RECIPE_VNUM(obj) <= 0 || !craft) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Invalid recipe vnum");
+				problem = TRUE;
+			}
+			if (craft && !CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Recipe is not set LEARNED");
+				problem = TRUE;
+			}
+		}
 		case ITEM_BOOK: {
 			if (!book_proto(GET_BOOK_ID(obj))) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Book type invalid");
@@ -390,7 +400,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
 	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	void expire_trading_post_item(struct trading_post_data *tpd);
-	extern bool remove_obj_from_resource_list(struct resource_data **list, obj_vnum vnum);
+	extern bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);
 	void remove_object_from_table(obj_data *obj);
 	void save_trading_post();
 
@@ -455,10 +465,10 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		
 		if (GET_BUILT_WITH(room)) {
-			remove_obj_from_resource_list(&GET_BUILT_WITH(room), vnum);
+			remove_thing_from_resource_list(&GET_BUILT_WITH(room), RES_OBJECT, vnum);
 		}
 		if (GET_BUILDING_RESOURCES(room)) {
-			remove_obj_from_resource_list(&GET_BUILDING_RESOURCES(room), vnum);
+			remove_thing_from_resource_list(&GET_BUILDING_RESOURCES(room), RES_OBJECT, vnum);
 			
 			if (!GET_BUILDING_RESOURCES(room)) {
 				// removing this resource finished the building
@@ -475,7 +485,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// remove from live resource lists: vehicle maintenance
 	LL_FOREACH(vehicle_list, veh) {
 		if (VEH_NEEDS_RESOURCES(veh)) {
-			remove_obj_from_resource_list(&VEH_NEEDS_RESOURCES(veh), vnum);
+			remove_thing_from_resource_list(&VEH_NEEDS_RESOURCES(veh), RES_OBJECT, vnum);
 			
 			if (!VEH_NEEDS_RESOURCES(veh)) {
 				// removing the resource finished the vehicle
@@ -573,7 +583,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			found = TRUE;
 		}
 		
-		found |= remove_obj_from_resource_list(&GET_AUG_RESOURCES(aug), vnum);
+		found |= remove_thing_from_resource_list(&GET_AUG_RESOURCES(aug), RES_OBJECT, vnum);
 		
 		if (found) {
 			SET_BIT(GET_AUG_FLAGS(aug), AUG_IN_DEVELOPMENT);
@@ -584,7 +594,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(bld), TYPE_OBJ, vnum);
-		found |= remove_obj_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(bld), vnum);
+		found |= remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(bld), RES_OBJECT, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
@@ -603,7 +613,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			found = TRUE;
 		}
 		
-		found |= remove_obj_from_resource_list(&GET_CRAFT_RESOURCES(craft), vnum);
+		found |= remove_thing_from_resource_list(&GET_CRAFT_RESOURCES(craft), RES_OBJECT, vnum);
 		
 		if (found) {
 			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
@@ -707,7 +717,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	
 	// update vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
-		found = remove_obj_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), vnum);
+		found = remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), RES_OBJECT, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
@@ -716,7 +726,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// olc editor updates
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (desc->character && !IS_NPC(desc->character) && GET_ACTION_RESOURCES(desc->character)) {
-			remove_obj_from_resource_list(&GET_ACTION_RESOURCES(desc->character), vnum);
+			remove_thing_from_resource_list(&GET_ACTION_RESOURCES(desc->character), RES_OBJECT, vnum);
 		}
 		
 		if (GET_OLC_ADVENTURE(desc)) {
@@ -751,7 +761,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				found = TRUE;
 			}
 			
-			found |= remove_obj_from_resource_list(&GET_AUG_RESOURCES(GET_OLC_AUGMENT(desc)), vnum);
+			found |= remove_thing_from_resource_list(&GET_AUG_RESOURCES(GET_OLC_AUGMENT(desc)), RES_OBJECT, vnum);
 			
 			if (found) {
 				SET_BIT(GET_AUG_FLAGS(GET_OLC_AUGMENT(desc)), AUG_IN_DEVELOPMENT);
@@ -761,7 +771,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		if (GET_OLC_BUILDING(desc)) {
 			found = delete_from_interaction_list(&GET_OLC_BUILDING(desc)->interactions, TYPE_OBJ, vnum);
-			found |= remove_obj_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(GET_OLC_BUILDING(desc)), vnum);
+			found |= remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(GET_OLC_BUILDING(desc)), RES_OBJECT, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the objects used in the building you're editing was deleted.\r\n");
 			}
@@ -778,7 +788,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				found = TRUE;
 			}
 			
-			found |= remove_obj_from_resource_list(&GET_OLC_CRAFT(desc)->resources, vnum);
+			found |= remove_thing_from_resource_list(&GET_OLC_CRAFT(desc)->resources, RES_OBJECT, vnum);
 		
 			if (found) {
 				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
@@ -860,7 +870,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
-			found = remove_obj_from_resource_list(&VEH_YEARLY_MAINTENANCE(GET_OLC_VEHICLE(desc)), vnum);
+			found = remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(GET_OLC_VEHICLE(desc)), RES_OBJECT, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the objects used for maintenance for the vehicle you're editing was deleted.\r\n");
 			}
@@ -1202,7 +1212,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 		}
 		for (res = GET_AUG_RESOURCES(aug); res && !any; res = res->next) {
-			if (res->vnum == vnum) {
+			if (res->type == RES_OBJECT && res->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
@@ -1218,6 +1228,13 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "BDG [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+			}
+		}
+		for (res = GET_BLD_YEARLY_MAINTENANCE(bld); res && !any; res = res->next) {
+			if (res->type == RES_OBJECT && res->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
 		}
 	}
@@ -1236,7 +1253,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		}
 		for (res = GET_CRAFT_RESOURCES(craft); res && !any; res = res->next) {
-			if (res->vnum == vnum) {
+			if (res->type == RES_OBJECT && res->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
@@ -1371,7 +1388,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		any = FALSE;
 		for (res = VEH_YEARLY_MAINTENANCE(veh); res && !any; res = res->next) {
-			if (res->vnum == vnum) {
+			if (res->type == RES_OBJECT && res->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
@@ -1713,7 +1730,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		case ITEM_DRINKCON: {
 			sprintf(storage + strlen(storage), "<&ycapacity&0> %d drink%s\r\n", GET_DRINK_CONTAINER_CAPACITY(obj), PLURAL(GET_DRINK_CONTAINER_CAPACITY(obj)));
 			sprintf(storage + strlen(storage), "<&ycontents&0> %d drink%s\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), PLURAL(GET_DRINK_CONTAINER_CONTENTS(obj)));
-			sprintf(storage + strlen(storage), "<&yliquid&0> %s\r\n", drinks[GET_DRINK_CONTAINER_TYPE(obj)]);
+			sprintf(storage + strlen(storage), "<&yliquid&0> %s\r\n", get_generic_name_by_vnum(GET_DRINK_CONTAINER_TYPE(obj)));
 			break;
 		}
 		case ITEM_FOOD: {
@@ -1748,6 +1765,11 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		case ITEM_POISON: {
 			sprintf(storage + strlen(storage), "<&ypoison&0> %s\r\n", poison_data[GET_POISON_TYPE(obj)].name);
 			sprintf(storage + strlen(storage), "<&ycharges&0> %d\r\n", GET_POISON_CHARGES(obj));
+			break;
+		}
+		case ITEM_RECIPE: {
+			craft_data *cft = craft_proto(GET_RECIPE_VNUM(obj));
+			sprintf(storage + strlen(storage), "<&yrecipe&0> %d %s\r\n", GET_RECIPE_VNUM(obj), cft ? GET_CRAFT_NAME(cft) : "none");
 			break;
 		}
 		case ITEM_ARMOR: {
@@ -2507,12 +2529,23 @@ OLC_MODULE(oedit_keywords) {
 
 OLC_MODULE(oedit_liquid) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	generic_data *gen;
+	any_vnum old;
 	
 	if (!IS_DRINK_CONTAINER(obj)) {
 		msg_to_char(ch, "You can only set liquid on a drink container.\r\n");
 	}
 	else {
-		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = olc_process_type(ch, argument, "liquid", "liquid", drinks, GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE));
+		old = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE);
+		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = olc_process_number(ch, argument, "liquid vnum", "liquid", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE));
+
+		if (!(gen = find_generic_by_vnum(GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE))) || GEN_TYPE(gen) != GENERIC_LIQUID) {
+			msg_to_char(ch, "Invalid liquid generic vnum %d. Old value restored.\r\n", GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE));
+			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = old;
+		}
+		else {
+			msg_to_char(ch, "It now contains %s.\r\n", get_generic_name_by_vnum(GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE)));
+		}
 	}
 }
 
@@ -2682,6 +2715,24 @@ OLC_MODULE(oedit_quantity) {
 	}
 	else {
 		GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY) = olc_process_number(ch, argument, "quantity", "quantity", 0, 100, GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY));
+	}
+}
+
+
+OLC_MODULE(oedit_recipe) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	any_vnum old = GET_RECIPE_VNUM(obj);
+	craft_data *cft;
+	
+	if (!IS_RECIPE(obj)) {
+		msg_to_char(ch, "You can only set that on a recipe object.\r\n");
+	}
+	else {
+		GET_OBJ_VAL(obj, VAL_RECIPE_VNUM) = olc_process_number(ch, argument, "recipe vnum", "recipe", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_RECIPE_VNUM));
+		if (GET_RECIPE_VNUM(obj) != old && (!(cft = craft_proto(GET_RECIPE_VNUM(obj))) || !CRAFT_FLAGGED(cft, CRAFT_LEARNED))) {
+			msg_to_char(ch, "%d is not a learned recipe. Old value restored.\r\n", GET_RECIPE_VNUM(obj));
+			GET_OBJ_VAL(obj, VAL_RECIPE_VNUM) = old;
+		}
 	}
 }
 

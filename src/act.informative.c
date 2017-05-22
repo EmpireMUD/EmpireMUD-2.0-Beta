@@ -22,6 +22,7 @@
 #include "utils.h"
 #include "skills.h"
 #include "dg_scripts.h"
+#include "vnums.h"
 
 /**
 * Contents:
@@ -312,7 +313,6 @@ void look_at_target(char_data *ch, char *arg) {
 * @param char *arg The typed argument (usually obj name).
 */
 void look_in_obj(char_data *ch, char *arg) {
-	extern const char *color_liquid[];
 	extern const char *fullness[];
 	vehicle_data *veh = NULL;
 	obj_data *obj = NULL;
@@ -369,8 +369,7 @@ void look_in_obj(char_data *ch, char *arg) {
 				}
 				else {
 					amt = (GET_DRINK_CONTAINER_CONTENTS(obj) * 3) / GET_DRINK_CONTAINER_CAPACITY(obj);
-					sprinttype(GET_DRINK_CONTAINER_TYPE(obj), color_liquid, buf2);
-					sprintf(buf, "It's %sfull of a %s liquid.\r\n", fullness[amt], buf2);
+					sprintf(buf, "It's %sfull of a %s liquid.\r\n", fullness[amt], get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_COLOR));
 				}
 				send_to_char(buf, ch);
 			}
@@ -1089,7 +1088,6 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 */
 void show_character_affects(char_data *ch, char_data *to) {
 	extern const char *apply_types[];
-	extern const char *affect_types[];
 	extern const char *affected_bits[];
 	extern const char *damage_types[];
 
@@ -1110,7 +1108,7 @@ void show_character_affects(char_data *ch, char_data *to) {
 		}
 		
 		// main entry
-		sprintf(buf, "   &c%s&0 (%s) ", affect_types[aff->type], lbuf);
+		sprintf(buf, "   &c%s&0 (%s) ", get_generic_name_by_vnum(aff->type), lbuf);
 
 		if (aff->modifier) {
 			sprintf(buf2, "- %+d to %s", aff->modifier, apply_types[(int) aff->location]);
@@ -1137,7 +1135,7 @@ void show_character_affects(char_data *ch, char_data *to) {
 		}
 		
 		// main body
-		msg_to_char(to, "  &r%s&0 (%s) %d %s damage (%d/%d)\r\n", affect_types[dot->type], lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
+		msg_to_char(to, "  &r%s&0 (%s) %d %s damage (%d/%d)\r\n", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
 }
 
@@ -1151,7 +1149,6 @@ void show_character_affects(char_data *ch, char_data *to) {
 * @param int mode OBJ_DESC_SHORT, OBJ_DESC_LONG
 */
 char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
-	extern const char *drinks[];
 	extern const struct material_data materials[NUM_MATERIALS];
 
 	static char output[MAX_STRING_LENGTH];
@@ -1163,7 +1160,7 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 	*sdesc = '\0';
 
 	if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
-		sprintf(sdesc, "%s of %s", GET_OBJ_SHORT_DESC(obj), drinks[GET_DRINK_CONTAINER_TYPE(obj)]);
+		sprintf(sdesc, "%s of %s", GET_OBJ_SHORT_DESC(obj), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 	}
 	else if (IS_ARROW(obj)) {
 		sprintf(sdesc, "%s (%d)", GET_OBJ_SHORT_DESC(obj), MAX(1, GET_ARROW_QUANTITY(obj)));
@@ -1874,9 +1871,7 @@ ACMD(do_coins) {
 }
 
 
-ACMD(do_cooldowns) {
-	extern const char *cooldown_types[];
-	
+ACMD(do_cooldowns) {	
 	struct cooldown_data *cool;
 	int diff;
 	bool found = FALSE;
@@ -1887,8 +1882,7 @@ ACMD(do_cooldowns) {
 		// only show if not expired (in case it wasn't cleaned up yet due to close timing)
 		diff = cool->expire_time - time(0);
 		if (diff > 0) {
-			sprinttype(cool->type, cooldown_types, buf);
-			msg_to_char(ch, " &c%s&0 %d:%02d\r\n", buf, (diff / 60), (diff % 60));
+			msg_to_char(ch, " &c%s&0 %d:%02d\r\n", get_generic_name_by_vnum(cool->type), (diff / 60), (diff % 60));
 
 			found = TRUE;
 		}

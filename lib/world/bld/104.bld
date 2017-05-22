@@ -29,7 +29,7 @@ hides, and badly damaged armor. A roaring fire burns in the center of the tent.
 F
 G
 R
-3 1 5 0
+1003 1 5 0
 S
 #10480
 Goblin Message Post~
@@ -47,7 +47,7 @@ hawks as letter carriers!
 F
 m
 R
-3 1 5 0
+1003 1 5 0
 S
 #10481
 Goblin Lab Tent~
@@ -66,7 +66,7 @@ but only marginally.
 F
 aG
 R
-3 1 5 0
+1003 1 5 0
 S
 #10482
 Goblin Dolmen~
@@ -84,6 +84,6 @@ weeds and rubble cover the surface.
 F
 B
 R
-1 1 5 0
+1001 1 5 0
 S
 $

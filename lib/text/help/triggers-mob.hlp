@@ -332,11 +332,12 @@ All mob scripts provide the &c%self%&0 variable.
 
 When using field  - The variable returns:
 &cability(name)&0 - Returns whether or not the player knows the ability.
+&cadd_learned(vnum)&0 - Adds a learnable recipe to the actor.
 &cadd_mob_flag(FLG)&0 - Adds a mob flag to the mob. Also, remove_mob_flag().
 &cadd_resources(vnum,amt)&0 - Gives a person <amt> of object <vnum>.
 &caff_flagged(FLG)&0 - Checks if the actor has an AFF flag (e.g. ENTANGLED).
-&caffect(name)&0 - Checks the actor for the affect (by name) in the subfield.
-   This is the name that shows on your affects/score command when using active.
+&caffect(vnum/name)&0 - Checks the actor for the affect (by name or generic 
+   affect vnum) in the subfield.
 &calias&0 - The list of aliases (keywords) of the mob or the player name.
 &callegiance(faction)&0 - Returns a mob's faction vnum, or changes the faction
    to a different one (or 'none').
@@ -370,6 +371,7 @@ When using field  - The variable returns:
 &cclass&0 - The actor's class, as a string.
 &ccompleted_quest(vnum)&0 - Whether or not the player has completed and
    turned in that quest vnum.
+&ccooldown(vnum)&0 - Gets the character's current cooldown time (seconds).
 &ccrafting_level&0 - The actor's crafting level.
 &cdex&0 - The actor's Dexterity.
 &cdir(name)&0 - Gives the name of the character's perceived direction
@@ -420,6 +422,7 @@ When using field  - The variable returns:
 &cis_pc&0 - Checks if the actor is a player. Useful when you want a trigger
    to fire on players and not mobs.
 &clastname&0 - The actor's last name (empty for mobs).
+&clearned(vnum)&0 - Whether the actor has learned a recipe vnum.
 &clevel&0 - The actor's computed level (or scaled level, for mobs).
 &cmana&0 - The current mana points of the actor.
 &cmana(amount)&0 - Add/subtract mana on the actor.
@@ -452,12 +455,14 @@ When using field  - The variable returns:
    tasks completed.
 &cquest_triggered(vnum)&0 - TRUE if the player is on the quest and that quest
    has a 'triggered' task that has already been completed.
+&cremove_learned(vnum)&0 - Removes a learnable recipe from the actor.
 &cremove_mob_flag(FLG)&0 - Removes a mob flag from the mob. Also, add_mob_flag().
 &cresist_magical&0 - Returns the amount of magic resistance the player has.
 &cresist_physical&0 - Returns the amount of physical resistance the player has.
 &cresist_poison&0 - Returns TRUE if the player has Resist Poison.
 &criding&0 - TRUE if the character is currently mounted.
-&croom&0 - The room the actor is in as a room variable. 
+&croom&0 - The room the actor is in as a room variable.
+&cset_cooldown(vnum, seconds)&0 - Sets the character's cooldown time.
 &cset_skill(name,level)&0 - Change a player's skill level, also gain_skill()
 &csex&0 - The actor's sex, as a string: MALE, FEMALE, or NEUTRAL.
 &cskill(name)&0 - The player's level in the given skill.

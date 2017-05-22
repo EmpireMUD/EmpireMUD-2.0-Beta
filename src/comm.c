@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "dg_scripts.h"
 #include "dg_event.h"
+#include "vnums.h"
 
 /**
 * Contents:
@@ -293,8 +294,6 @@ static void msdp_update(void) {
 	extern int pick_season(room_data *room);
 	extern int total_bonus_healing(char_data *ch);
 	extern int get_total_score(empire_data *emp);
-	extern const char *affect_types[];
-	extern const char *cooldown_types[];
 	extern const char *damage_types[];
 	extern const double hit_per_dex;
 	extern const char *seasons[];
@@ -336,7 +335,7 @@ static void msdp_update(void) {
 			*buf = '\0';
 			buf_size = 0;
 			for (aff = ch->affected; aff; aff = aff->next) {
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%d", (char)MSDP_VAR, affect_types[aff->type], (char)MSDP_VAL, (aff->duration == UNLIMITED ? -1 : (aff->duration * SECS_PER_REAL_UPDATE)));
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%d", (char)MSDP_VAR, get_generic_name_by_vnum(aff->type), (char)MSDP_VAL, (aff->duration == UNLIMITED ? -1 : (aff->duration * SECS_PER_REAL_UPDATE)));
 			}
 			MSDPSetTable(d, eMSDP_AFFECTS, buf);
 			
@@ -345,7 +344,7 @@ static void msdp_update(void) {
 			buf_size = 0;
 			for (dot = ch->over_time_effects; dot; dot = dot->next) {
 				// each dot has a sub-table
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, affect_types[dot->type], (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, get_generic_name_by_vnum(dot->type), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
 				
 				
 				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDURATION%c%d", (char)MSDP_VAR, (char)MSDP_VAL, (dot->duration == UNLIMITED ? -1 : (dot->duration * SECS_PER_REAL_UPDATE)));
@@ -363,7 +362,7 @@ static void msdp_update(void) {
 			buf_size = 0;
 			for (cool = ch->cooldowns; cool; cool = cool->next) {
 				if (cool->expire_time > time(0)) {
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, cooldown_types[cool->type], (char)MSDP_VAL, cool->expire_time - time(0));
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(cool->type), (char)MSDP_VAL, cool->expire_time - time(0));
 				}
 			}
 			MSDPSetTable(d, eMSDP_COOLDOWNS, buf);
@@ -1711,6 +1710,9 @@ void close_socket(descriptor_data *d) {
 	}
 	if (d->olc_faction) {
 		free_faction(d->olc_faction);
+	}
+	if (d->olc_generic) {
+		free_generic(d->olc_generic);
 	}
 	if (d->olc_global) {
 		free_global(d->olc_global);

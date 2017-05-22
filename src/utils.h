@@ -29,6 +29,7 @@
 *   Empire Utils
 *   Faction Utils
 *   Fight Utils
+*   Generic Utils
 *   Global Utils
 *   Map Utils
 *   Memory Utils
@@ -446,6 +447,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_CRAFT(desc)  ((desc)->olc_craft)
 #define GET_OLC_CROP(desc)  ((desc)->olc_crop)
 #define GET_OLC_FACTION(desc)  ((desc)->olc_faction)
+#define GET_OLC_GENERIC(desc)  ((desc)->olc_generic)
 #define GET_OLC_GLOBAL(desc)  ((desc)->olc_global)
 #define GET_OLC_MOBILE(desc)  ((desc)->olc_mobile)
 #define GET_OLC_MORPH(desc)  ((desc)->olc_morph)
@@ -539,6 +541,51 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 //// FIGHT UTILS /////////////////////////////////////////////////////////////
 
 #define SHOULD_APPEAR(ch)  AFF_FLAGGED(ch, AFF_HIDE | AFF_INVISIBLE)
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// GENERIC UTILS ///////////////////////////////////////////////////////////
+
+#define GEN_VNUM(gen)  ((gen)->vnum)
+#define GEN_FLAGS(gen)  ((gen)->flags)
+#define GEN_NAME(gen)  ((gen)->name)
+#define GEN_STRING(gen, pos)  ((gen)->string[(pos)])
+#define GEN_TYPE(gen)  ((gen)->type)
+#define GEN_VALUE(gen, pos)  ((gen)->value[(pos)])
+
+
+// helpers
+#define GEN_FLAGGED(gen, flag)  IS_SET(GEN_FLAGS(gen), (flag))
+
+
+// GENERIC_x: value definitions and getters
+
+// GENERIC_LIQUID
+#define GSTR_LIQUID_NAME  0
+#define GSTR_LIQUID_COLOR  1
+#define GET_LIQUID_NAME(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_STRING((gen), GSTR_LIQUID_NAME) : "")
+#define GET_LIQUID_COLOR(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_STRING((gen), GSTR_LIQUID_COLOR) : "")
+#define GET_LIQUID_DRUNK(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), DRUNK) : 0)
+#define GET_LIQUID_FULL(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), FULL) : 0)
+#define GET_LIQUID_THIRST(gen)  (GEN_TYPE(gen) == GENERIC_LIQUID ? GEN_VALUE((gen), THIRST) : 0)
+
+// GENERIC_ACTION
+#define GSTR_ACTION_BUILD_TO_CHAR  0
+#define GSTR_ACTION_BUILD_TO_ROOM  1
+#define GSTR_ACTION_CRAFT_TO_CHAR  2
+#define GSTR_ACTION_CRAFT_TO_ROOM  3
+#define GSTR_ACTION_REPAIR_TO_CHAR  4
+#define GSTR_ACTION_REPAIR_TO_ROOM  5
+
+// GENERIC_COOLDOWN
+#define GSTR_COOLDOWN_WEAR_OFF  0
+#define GET_COOLDOWN_WEAR_OFF(gen)  (GEN_TYPE(gen) == GENERIC_COOLDOWN ? GEN_STRING((gen), GSTR_COOLDOWN_WEAR_OFF) : NULL)
+
+// GENERIC_AFFECT
+#define GSTR_AFFECT_WEAR_OFF_TO_CHAR  0
+#define GSTR_AFFECT_WEAR_OFF_TO_ROOM  1
+#define GET_AFFECT_WEAR_OFF_TO_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF_TO_CHAR) : NULL)
+#define GET_AFFECT_WEAR_OFF_TO_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF_TO_ROOM) : NULL)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -745,6 +792,12 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_POISON_TYPE(obj)  (IS_POISON(obj) ? GET_OBJ_VAL((obj), VAL_POISON_TYPE) : NOTHING)
 #define GET_POISON_CHARGES(obj)  (IS_POISON(obj) ? GET_OBJ_VAL((obj), VAL_POISON_CHARGES) : 0)
 
+// ITEM_RECIPE
+#define IS_RECIPE(obj)  (GET_OBJ_TYPE(obj) == ITEM_RECIPE)
+#define VAL_RECIPE_VNUM  0
+#define GET_RECIPE_VNUM(obj)  (IS_RECIPE(obj) ? GET_OBJ_VAL((obj), VAL_RECIPE_VNUM) : NOTHING)
+
+
 // ITEM_WEAPON
 #define IS_WEAPON(obj)  (GET_OBJ_TYPE(obj) == ITEM_WEAPON)
 #define VAL_WEAPON_DAMAGE_BONUS  1
@@ -922,6 +975,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_LAST_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_room))
 #define GET_LAST_TELL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_tell))
 #define GET_LAST_TIP(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_tip))
+#define GET_LEARNED_CRAFTS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->learned_crafts))
 #define GET_LOADROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->load_room))
 #define GET_LOAD_ROOM_CHECK(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->load_room_check))
 #define GET_MAIL_PENDING(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->mail_pending))

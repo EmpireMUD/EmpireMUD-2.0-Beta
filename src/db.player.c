@@ -30,6 +30,7 @@
 *   Core Player DB
 *   Autowiz Wizlist Generator
 *   Helpers
+*   Learned Crafts
 *   Empire Player Management
 *   Promo Codes
 */
@@ -52,6 +53,8 @@ ACMD(do_slash_channel);
 void update_class(char_data *ch);
 
 // local protos
+void add_learned_craft(char_data *ch, any_vnum vnum);
+void check_learned_crafts(char_data *ch);
 void clear_player(char_data *ch);
 void delete_player_character(char_data *ch);
 static bool member_is_timed_out(time_t created, time_t last_login, double played_hours);
@@ -734,6 +737,7 @@ void free_char(char_data *ch) {
 	struct channel_history_data *history;
 	struct player_slash_channel *slash;
 	struct player_slash_history *slash_hist, *next_slash_hist;
+	struct player_craft_data *pcd, *next_pcd;
 	struct interaction_item *interact;
 	struct pursuit_data *purs;
 	struct offer_data *offer;
@@ -904,6 +908,10 @@ void free_char(char_data *ch) {
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
 			HASH_DEL(GET_ABILITY_HASH(ch), abil);
 			free(abil);
+		}
+		HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
+			HASH_DEL(GET_LEARNED_CRAFTS(ch), pcd);
+			free(pcd);
 		}
 		HASH_ITER(hh, GET_MOUNT_LIST(ch), mount, next_mount) {
 			HASH_DEL(GET_MOUNT_LIST(ch), mount);
@@ -1518,6 +1526,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (PFILE_TAG(line, "Last Corpse Id:", length)) {
 					GET_LAST_CORPSE_ID(ch) = atoi(line + length + 1);
 				}
+				else if (PFILE_TAG(line, "Learned Craft:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
+						add_learned_craft(ch, i_in[0]);
+					}
+				}
 				else if (PFILE_TAG(line, "Load Room:", length)) {
 					GET_LOADROOM(ch) = atoi(line + length + 1);
 				}
@@ -2099,6 +2112,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct affected_type *af, *new_af, *next_af, *af_list;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
+	struct player_craft_data *pcd, *next_pcd;
 	struct mount_data *mount, *next_mount;
 	struct player_slash_channel *slash;
 	struct over_time_effect_type *dot;
@@ -2141,12 +2155,11 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// unaffect: affects
 	af_list = NULL;
 	while ((af = ch->affected)) {
-		if (af->type > ATYPE_RESERVED && af->type < NUM_ATYPES) {
-			CREATE(new_af, struct affected_type, 1);
-			*new_af = *af;
-			new_af->next = af_list;
-			af_list = new_af;
-		}
+		CREATE(new_af, struct affected_type, 1);
+		*new_af = *af;
+		new_af->next = af_list;
+		af_list = new_af;
+		
 		affect_remove(ch, af);
 	}
 	
@@ -2343,6 +2356,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	if (GET_LASTNAME(ch)) {
 		fprintf(fl, "Lastname: %s\n", GET_LASTNAME(ch));
+	}
+	HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
+		fprintf(fl, "Learned Craft: %d\n", pcd->vnum);
 	}
 	fprintf(fl, "Load Room: %d\n", GET_LOADROOM(ch));
 	fprintf(fl, "Load Room Check: %d\n", GET_LOAD_ROOM_CHECK(ch));
@@ -3438,8 +3454,9 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
 	update_player_index(index, ch);
 	
-	// ensure quests are up-to-date
+	// ensure data is up-to-date
 	refresh_all_quests(ch);
+	check_learned_crafts(ch);
 	
 	// break last reply if invis
 	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {
@@ -3909,6 +3926,92 @@ void start_new_character(char_data *ch) {
 	
 	// prevent a repeat
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_NEEDS_NEWBIE_SETUP);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// LEARNED CRAFTS //////////////////////////////////////////////////////////
+
+/**
+* Adds a craft vnum to a player's learned list.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The craft vnum to learn.
+*/
+void add_learned_craft(char_data *ch, any_vnum vnum) {
+	struct player_craft_data *pcd;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_FIND_INT(GET_LEARNED_CRAFTS(ch), &vnum, pcd);
+	if (!pcd) {
+		CREATE(pcd, struct player_craft_data, 1);
+		pcd->vnum = vnum;
+		HASH_ADD_INT(GET_LEARNED_CRAFTS(ch), vnum, pcd);
+	}
+}
+
+
+/**
+* Checks that all a player's learned crafts are valid.
+*
+* @param char_data *ch The player to check.
+*/
+void check_learned_crafts(char_data *ch) {
+	void remove_learned_craft(char_data *ch, any_vnum vnum);
+	
+	struct player_craft_data *pcd, *next_pcd;
+	craft_data *craft;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+
+	HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
+		if (!(craft = craft_proto(pcd->vnum)) || !CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
+			remove_learned_craft(ch, pcd->vnum);
+		}
+	}
+}
+
+
+/**
+* @param char_data *ch The player.
+* @param any_vnum vnum The craft vnum to check.
+* @return bool TRUE if the player has learned it.
+*/
+bool has_learned_craft(char_data *ch, any_vnum vnum) {
+	struct player_craft_data *pcd;
+	
+	if (IS_NPC(ch)) {
+		return TRUE;
+	}
+	
+	HASH_FIND_INT(GET_LEARNED_CRAFTS(ch), &vnum, pcd);
+	return pcd ? TRUE : FALSE;
+}
+
+
+/**
+* Removes a craft vnum from a player's learned list.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The craft vnum to forget.
+*/
+void remove_learned_craft(char_data *ch, any_vnum vnum) {
+	struct player_craft_data *pcd;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_FIND_INT(GET_LEARNED_CRAFTS(ch), &vnum, pcd);
+	if (pcd) {
+		HASH_DEL(GET_LEARNED_CRAFTS(ch), pcd);
+		free(pcd);
+	}
 }
 
 

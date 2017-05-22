@@ -1351,11 +1351,21 @@ OCMD(do_oaoe) {
 
 OCMD(do_odot) {
 	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], stackarg[MAX_INPUT_LENGTH];
+	any_vnum atype = ATYPE_DG_AFFECT;
+	generic_data *gen;
 	double modifier = 1.0;
 	char_data *ch;
 	int type, max_stacks;
 
 	argument = one_argument(argument, name);
+	// sometimes name is an affect vnum
+	if (*name == '#') {
+		atype = atoi(name+1);
+		argument = one_argument(argument, name);
+		if (!(gen = find_generic_by_vnum(atype)) || GEN_TYPE(gen) != GENERIC_AFFECT) {
+			atype = ATYPE_DG_AFFECT;
+		}
+	}
 	argument = one_argument(argument, modarg);
 	argument = one_argument(argument, durarg);
 	argument = one_argument(argument, typearg);	// optional, default: physical
@@ -1390,7 +1400,7 @@ OCMD(do_odot) {
 	}
 	
 	max_stacks = (*stackarg ? atoi(stackarg) : 1);
-	script_damage_over_time(ch, get_obj_scale_level(obj, ch), type, modifier, atoi(durarg), max_stacks, NULL);
+	script_damage_over_time(ch, atype, get_obj_scale_level(obj, ch), type, modifier, atoi(durarg), max_stacks, NULL);
 }
 
 

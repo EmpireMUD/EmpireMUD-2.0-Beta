@@ -33,6 +33,7 @@
 *   Craft Recipe Constants
 *   Empire Constants
 *   Faction Constants
+*   Generic Constants
 *   Mob Constants
 *   Item Contants
 *   OLC Constants
@@ -1316,6 +1317,7 @@ const char *craft_flags[] = {
 	"VEHICLE",
 	"SHIPYARD",
 	"BLD-UPGRADED",
+	"LEARNED",
 	"\n"
 };
 
@@ -1338,6 +1340,7 @@ const char *craft_flag_for_info[] = {
 	"",	// vehicle
 	"requires shipyard",
 	"requires upgrade",
+	"",	// learned
 	"\n"
 };
 
@@ -1554,6 +1557,27 @@ struct faction_reputation_type reputation_levels[] = {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// GENERIC CONSTANTS ///////////////////////////////////////////////////////
+
+// GENERIC_x: generic types
+const char *generic_types[] = {
+	"UNKNOWN",
+	"LIQUID",
+	"ACTION",
+	"COOLDOWN",
+	"AFFECT",
+	"\n"
+};
+
+
+// GEN_x: generic flags
+const char *generic_flags[] = {
+	// none yet defined
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// MOB CONSTANTS ///////////////////////////////////////////////////////////
 
 /* MOB_x */
@@ -1726,7 +1750,7 @@ const char *item_types[] = {
 	"CONTAINER",
 	"DRINKCON",
 	"FOOD",
-	"*",
+	"RECIPE",
 	"PORTAL",
 	"*BOARD",
 	"CORPSE",
@@ -1965,94 +1989,6 @@ const char *container_bits[] = {
 };
 
 
-/* LIQ_x */
-const char *drinks[] = {
-	"water",
-	"lager",
-	"wheat beer",
-	"ale",
-	"cider",
-	"milk",
-	"blood",
-	"honey",
-	"bean soup",
-	"coffee",
-	"green tea",
-	"red wine",
-	"white wine",
-	"grog",
-	"mead",
-	"stout",
-	"\n"
-};
-
-
-/* LIQ_x one-word alias for each drink */
-const char *drinknames[] = {
-	"water",
-	"lager",
-	"wheatbeer",
-	"ale",
-	"cider",
-	"milk",
-	"blood",
-	"honey",
-	"soup",
-	"coffee",
-	"tea",
-	"wine",
-	"wine",
-	"grog",
-	"mead",
-	"stout",
-	"\n"
-};
-
-
-// LIQ_x: this table is amount per "drink", in mud hours of thirst cured, etc
-// effect on DRUNK, FULL, THIRST
-int drink_aff[][3] = {
-	{ 0, 0, 3 },	/* water	*/
-	{ 2, 1, 1 },	/* larger	*/
-	{ 3, 1, 1 },	/* wheatbeer	*/
-	{ 2, 1, 1 },	/* ale		*/
-	{ 3, 1, 1 },	/* cider	*/
-	{ 0, 2, 2 },	/* milk		*/
-	{ 0, 0, -1 },	/* blood	*/
-	{ 0, 0, 1 },	/* honey	*/
-	{ 0, 4, 0 },	// bean soup
-	{ 0, 0, 1 },	// coffee
-	{ 0, 0, 1 },	// green tea
-	{ 4, 0, 1 },	// red wine
-	{ 3, 0, 1 },	// white wine
-	{ 2, 1, 1 },	// grog
-	{ 1, 1, 1 },	// mead
-	{ 3, 2, 1 },	// stout
-};
-
-
-// LIQ_x: color of the various drinks
-const char *color_liquid[] = {
-	"clear",
-	"brown",
-	"golden white",
-	"golden",
-	"golden",
-	"white",
-	"red",
-	"golden",
-	"soupy",
-	"brown",
-	"green",
-	"red",
-	"clear",
-	"amber",
-	"golden",
-	"black",
-	"\n"
-};
-
-
 // CMP_x: component types
 const char *component_types[] = {
 	"none",
@@ -2133,73 +2069,6 @@ const char *resource_types[] = {
 	"pool",
 	"action",
 	"\n"
-};
-
-
-// NOTE: these match up with 'res_action_messages', and you must add entries to both
-const char *res_action_type[] = {
-	"dig",
-	"clear terrain",
-	"tidy up",
-	"repair",	// 3: used in vnums.h
-	"scout area",
-	"block water",
-	"engrave",
-	"magic words",
-	"organize",
-	"\n"
-};
-
-
-// these match up with 'res_action_type'; all message pairs are to-char, to-room; vehicles use $V
-const char *res_action_messages[][NUM_APPLY_RES_TYPES][2] = {
-	#define RES_ACTION_MESSAGE(build_to_char, build_to_room, veh_to_char, veh_to_room, repair_to_char, repair_to_room)  {{"",""},{build_to_char,build_to_room},{veh_to_char,veh_to_room},{repair_to_char,repair_to_room}}
-	
-	RES_ACTION_MESSAGE(	// dig
-		"You dig at the ground.", "$n digs at the ground.",	// building/maintaining
-		"You dig underneath $V.", "$n digs underneath $V.",	// craft vehicle
-		"You dig underneath $V.", "$n digs underneath $V."	// repair vehicle
-	),
-	RES_ACTION_MESSAGE(	// clear terrain
-		"You clear the area of debris.", "$n clears the area of debris.",
-		"You clear the area around $V.", "$n clears the area around $V.",
-		"You clear the area around $V.", "$n clears the area around $V."
-	),
-	RES_ACTION_MESSAGE(	// tidy up
-		"You tidy up the area.", "$n tidies up the area.",
-		"You tidy up around $V.", "$n tidies up around $V.",
-		"You tidy up $V.", "$n tidies up $V."
-	),
-	RES_ACTION_MESSAGE(	// repair
-		"You repair the building.", "$n repairs the building.",
-		"You repair $V.", "$n repairs $V.",
-		"You repair $V.", "$n repairs $V."
-	),
-	RES_ACTION_MESSAGE(	// scout area
-		"You scout the area.", "$n scouts the area.",
-		"You scout the area.", "$n scouts the area.",
-		"You scout the area around $V.", "$n scouts the area around $V."
-	),
-	RES_ACTION_MESSAGE(	// block water
-		"You block off the water.", "$n blocks off the water.",
-		"You block off the water around $V.", "$n blocks off the water around $V.",
-		"You block off the water around $V.", "$n blocks off the water around $V."
-	),
-	RES_ACTION_MESSAGE(	// engrave
-		"You engrave the building.", "$n engraves the building.",
-		"You engrave $V.", "$n engraves $V.",
-		"You engrave $V.", "$n engraves $V."
-	),
-	RES_ACTION_MESSAGE(	// magic words
-		"You speak some magic words.", "$n speaks some magic words.",
-		"You speak some magic words.", "$n speaks some magic words.",
-		"You speak some magic words.", "$n speaks some magic words."
-	),
-	RES_ACTION_MESSAGE(	// organize
-		"You organize the building.", "$n organizes the building.",
-		"You organize $V.", "$n organizes $V.",
-		"You organize $V.", "$n organizes $V."
-	),
 };
 
 
@@ -2311,6 +2180,7 @@ const char *olc_flag_bits[] = {
 	"!QUESTS",
 	"!SOCIALS",
 	"!FACTIONS",
+	"!GENERICS",
 	"\n"
 };
 
@@ -2339,6 +2209,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"quest",
 	"social",
 	"faction",
+	"generic",
 	"\n"
 };
 
@@ -2937,250 +2808,6 @@ const char *weather_types[] = {
 // ABILF_x: ability flags
 const char *ability_flags[] = {
 	"*",
-	"\n"
-};
-
-
-/* ATYPE_x */
-const char *affect_types[] = {
-	"!RESERVED!",	// 0
-	"fly",
-	"entrancement",
-	"darkness",
-	"poisoned",
-	"boost",	// 5
-	"cut deep",
-	"sap",
-	"mana shield",
-	"foresight",
-	"earthmeld",	// 10
-	"mummify",
-	"earth armor",
-	"bestow vigor",
-	"weakness",
-	"colorburst",	// 15
-	"heartstop",
-	"phoenix rite",
-	"disarm",
-	"shocked",
-	"skybrand",  // 20
-	"counterspell",
-	"hasten",
-	"rejuvenate",
-	"entangle",
-	"radiance",	// 25
-	"inspire",
-	"jabbed",
-	"blind",
-	"healing potion",
-	"nature potion",	// 30
-	"vigor",
-	"enervate",
-	"enervate",
-	"siphon",
-	"slow",	// 35
-	"sunshock",
-	"tripping",
-	"siphoned",
-	"affect",	// 39 -- DG Scripts affect
-	"claws",	// 40
-	"deathshroud",
-	"soulmask",
-	"majesty",
-	"alacrity",
-	"nightsight", // 45
-	"death penalty",
-	"bash",
-	"terrify",
-	"stunning blow",
-	"stun immunity",	// 50
-	"war delay",
-	"unburdened",
-	"shadow kick",
-	"stagger jab",
-	"shadowcage",	// 55
-	"howl",
-	"crucial jab",
-	"diversion",
-	"shadow jab",
-	"confer",	// 60
-	"conferred",
-	"morph",
-	"whisperstride",
-	"well-fed",
-	"ablate",	// 65
-	"acidblast",
-	"astralclaw",
-	"chronoblast",
-	"dispirit",
-	"erode",	// 70
-	"scour",
-	"shadowlash",	// blind
-	"shadowlash",	// dot
-	"soulchain",
-	"thornlash",	// 75
-	"arrow to the knee",
-	"hostile delay",
-	"nature burn",
-	"\n"
-	};
-
-
-// ATYPE_x -- empty string will send no message at all
-const char *affect_wear_off_msgs[] = {
-	"!RESERVED!",	// 0
-	"You land quickly as your magical flight wears off.",
-	"You no longer feel entranced.",
-	"The blanket of darkness dissipates.",
-	"Poison fades from your system.",
-	"You suddenly feel weaker.",	// 5
-	"You're no longer bleeding from your deep cuts.",
-	"You are no longer stunned.",
-	"Your mana shield fades.",
-	"Your foresight ends.",
-	"You rise from the ground!",	// 10
-	"Your flesh returns to normal.",
-	"Your plating of earth armor fades.",
-	"Your heightened Fortitude fades.",
-	"Your weakness fades.",
-	"You are no longer distracted by colorburst.",	// 15
-	"Your vitae is no longer hindered.",
-	"Your phoenix rite expires.",
-	"You recover and are no longer disarmed.",
-	"The lightning shock wears off.",
-	"The skybrand fades.",  // 20
-	"Your counterspell expires.",
-	"Your haste fades.",
-	"The rejuvenation effect ends.",
-	"You are no longer entangled in vines.",
-	"Your radiant aura fades.",	// 25
-	"Your inspiration fades.",
-	"Your jab wound stops bleeding.",
-	"You are no longer blinded by sand.",
-	"Your healing potion effect ends.",
-	"Your nature potion effect ends.",	// 30
-	"Your vigor penalty ends.",
-	"Your stamina begins to return.",
-	"You are no longer gaining stamina from enervate.",
-	"You are no longer receiving mana from the siphon.",
-	"You no longer feel lethargic.",	// 35
-	"You are no longer blinded by the light.",
-	"Stuff isn't doing that thing anymore.",
-	"Your mana is no longer siphoned.",
-	"",	// 39 -- DG Scripts affect
-	"Your claws retract.",	// 40
-	"Your deathshroud fades.",
-	"Your soulmask fades.",
-	"You are no longer so majestic.",
-	"Your alacrity fades.",
-	"Your nightsight fades.",	// 45
-	"Your death penalty ends.",
-	"You are no longer stunned by that bash.",
-	"You are no longer terrified.",
-	"You are no longer dazed by that stunning blow.",
-	"Your stun immunity expires.",	// 50
-	"Your war delay ends and you are free to act.",
-	"You feel the weight of the world return.",
-	"You are no longer weakened by the shadow kick.",
-	"You are no longer weakened by the stagger jab.",
-	"The shadowcage fades and your focus returns.",	// 55
-	"The terrifying howl fades from your mind.",
-	"You are no longer weakened by the crucial jab.",
-	"You are no longer distracted by the diversion.",
-	"You are no longer weakened by the shadow jab.",
-	"The power you were conferred has faded.",	// 60
-	"Your conferred strength returns.",
-	"",	// morph stats -- no wear-off message
-	"Your whisperstride fades.",
-	"You no longer feel well-fed.",
-	"The ablation fades.",	// 65
-	"The acid blast wears off.",
-	"",	// astral claw
-	"Time speeds back up to normal.",
-	"Your wits return.",
-	"",	// 70, erode
-	"",	// scour
-	"Your vision returns.",
-	"",	// shadowlash-dot
-	"Your soul is unchained.",
-	"",	// 75, thornlast
-	"Your knee feels better.",
-	"Your hostile login delay ends and you are free to act.",
-	"Your nature burn eases.",
-	"\n"
-};
-
-
-// COOLDOWN_x
-const char *cooldown_types[] = {
-	"!RESERVED!",	// 0
-	"respawn",
-	"left empire",
-	"hostile flag",
-	"pvp flag",
-	"pvp quit timer",	// 5
-	"milk",
-	"shear",
-	"disarm",
-	"outrage",
-	"rescue",	// 10
-	"kick",
-	"bash",
-	"colorburst",
-	"enervate",
-	"slow",	// 15
-	"siphon",
-	"mirrorimage",
-	"sunshock",
-	"teleport home",
-	"city teleportation",	// 20
-	"rejuvenate",
-	"cleanse",
-	"lightningbolt",
-	"skybrand",
-	"entangle",	// 25
-	"heartstop",
-	"summon humans",
-	"summon animals",
-	"summon guards",
-	"summon bodyguard",	// 30
-	"summon thug",
-	"summon swift",
-	"reward",
-	"search",
-	"terrify",	// 35
-	"darkness",
-	"shadowstep",
-	"backstab",
-	"jab",
-	"blind",	// 40
-	"sap",
-	"prick",
-	"weaken",
-	"moonrise",
-	"alternate",	// 45
-	"dispel",
-	"bloodsweat",
-	"earthmeld",
-	"shadowcage",
-	"howl",	// 50
-	"diversion",
-	"rogue flag",
-	"portal sickness",
-	"whisperstride",
-	"ablate",	// 55
-	"acidblast",
-	"arclight",
-	"astralclaw",
-	"chronoblast",
-	"deathtouch",	// 60
-	"dispirit",
-	"erode",
-	"scour",
-	"shadowlash",
-	"soulchain",	// 65
-	"starstrike",
-	"thornlash",	// 67
 	"\n"
 };
 

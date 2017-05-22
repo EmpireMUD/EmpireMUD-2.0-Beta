@@ -33,7 +33,6 @@ extern const char *apply_types[];
 extern const char *bld_on_flags[];
 extern const char *craft_flags[];
 extern const char *craft_types[];
-extern const char *drinks[];
 extern const char *road_types[];
 
 // external funcs
@@ -55,6 +54,7 @@ void init_craft(craft_data *craft);
 bool audit_craft(craft_data *craft, char_data *ch) {
 	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;
+	generic_data *gen;
 	int count;
 
 	if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING && GET_CRAFT_ABILITY(craft) == NO_ABIL) {
@@ -107,11 +107,9 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			problem = TRUE;
 		}
 	}
-	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {	// soups only
-		if (GET_CRAFT_OBJECT(craft) < 0 || GET_CRAFT_OBJECT(craft) > NUM_LIQUIDS) {
-			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Invalid liquid type on soup recipe");
-			problem = TRUE;
-		}
+	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP) && (!(gen = find_generic_by_vnum(GET_CRAFT_OBJECT(craft))) || GEN_TYPE(gen) != GENERIC_LIQUID)) {	// soups only
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Invalid liquid type on soup recipe");
+		problem = TRUE;
 	}
 	else {	// normal craft (not special type))
 		if (GET_CRAFT_OBJECT(craft) == NOTHING || !obj_proto(GET_CRAFT_OBJECT(craft))) {
@@ -207,6 +205,8 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	void cancel_gen_craft(char_data *ch);
 	void remove_craft_from_table(craft_data *craft);
 	
+	obj_data *obj, *next_obj;
+	descriptor_data *desc;
 	craft_data *craft;
 	char_data *iter;
 	
@@ -235,6 +235,24 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	save_index(DB_BOOT_CRAFT);
 	save_library_file_for_vnum(DB_BOOT_CRAFT, vnum);
 	
+	// update objs
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == vnum) {
+			GET_OBJ_VAL(obj, VAL_RECIPE_VNUM) = 0;
+			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
+		}
+	}
+	
+	// olc editor updates
+	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (GET_OLC_OBJECT(desc)) {
+			if (IS_RECIPE(GET_OLC_OBJECT(desc)) && GET_RECIPE_VNUM(GET_OLC_OBJECT(desc)) == vnum) {
+				GET_OBJ_VAL(GET_OLC_OBJECT(desc), VAL_RECIPE_VNUM) = 0;
+				msg_to_char(desc->character, "The recipe used by the item you're editing was deleted.\r\n");
+			}
+		}
+	}
+	
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted craft recipe %d", GET_NAME(ch), vnum);
 	msg_to_char(ch, "Craft recipe %d deleted.\r\n", vnum);
 	
@@ -251,6 +269,7 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 void olc_search_craft(char_data *ch, craft_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	craft_data *craft = craft_proto(vnum);
+	obj_data *obj, *next_obj;
 	int size, found;
 	
 	if (!craft) {
@@ -260,8 +279,14 @@ void olc_search_craft(char_data *ch, craft_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of craft %d (%s):\r\n", vnum, GET_CRAFT_NAME(craft));
-	
-	// crafts are not found anywhere in the world yet
+
+	// objects
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		}
+	}
 	
 	if (found > 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
@@ -278,17 +303,18 @@ void olc_search_craft(char_data *ch, craft_vnum vnum) {
 * Removes any entries of an obj vnum from a resource list.
 *
 * @param struct resource_data **list A pointer to a resource list.
-* @param obj_vnum vnum The vnum to remove.
+* @param int type Any RES_ type, such as RES_OBJECT.
+* @param any_vnum vnum The vnum to remove.
 * @return bool TRUE if any were removed.
 */
-bool remove_obj_from_resource_list(struct resource_data **list, obj_vnum vnum) {
+bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum) {
 	struct resource_data *res, *next_res, *temp;
 	int removed = 0;
 	
 	for (res = *list; res; res = next_res) {
 		next_res = res->next;
 		
-		if (res->type == RES_OBJECT && res->vnum == vnum) {
+		if (res->type == type && res->vnum == vnum) {
 			REMOVE_FROM_LIST(res, *list, next);
 			free(res);
 			++removed;
@@ -426,7 +452,7 @@ void olc_show_craft(char_data *ch) {
 		sprintf(buf + strlen(buf), "<&ybuildfacing&0> %s\r\n", buf1);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP)) {
-		sprintf(buf + strlen(buf), "<&yliquid&0> [%d] %s\r\n", GET_CRAFT_OBJECT(craft), GET_CRAFT_OBJECT(craft) == NOTHING ? "none" : drinks[GET_CRAFT_OBJECT(craft)]);
+		sprintf(buf + strlen(buf), "<&yliquid&0> [%d] %s\r\n", GET_CRAFT_OBJECT(craft), get_generic_name_by_vnum(GET_CRAFT_OBJECT(craft)));
 		sprintf(buf + strlen(buf), "<&yvolume&0> %d drink%s\r\n", GET_CRAFT_QUANTITY(craft), (GET_CRAFT_QUANTITY(craft) != 1 ? "s" : ""));
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_VEHICLE)) {
@@ -632,12 +658,23 @@ OLC_MODULE(cedit_levelrequired) {
 
 OLC_MODULE(cedit_liquid) {
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
+	generic_data *gen;
+	any_vnum old;
 	
 	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD || !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP)) {
 		msg_to_char(ch, "You can only set the liquid type on a soup.\r\n");
 	}
 	else {
-		GET_CRAFT_OBJECT(craft) = olc_process_type(ch, argument, "liquid", "liquid", drinks, GET_CRAFT_OBJECT(craft));
+		old = GET_CRAFT_OBJECT(craft);
+		GET_CRAFT_OBJECT(craft) = olc_process_number(ch, argument, "liquid vnum", "liquid", 0, MAX_VNUM, GET_CRAFT_OBJECT(craft));
+		
+		if (!(gen = find_generic_by_vnum(GET_CRAFT_OBJECT(craft))) || GEN_TYPE(gen) != GENERIC_LIQUID) {
+			msg_to_char(ch, "Invalid liquid generic vnum %d. Old value restored.\r\n", GET_CRAFT_OBJECT(craft));
+			GET_CRAFT_OBJECT(craft) = old;
+		}
+		else {
+			msg_to_char(ch, "It now creates %s.\r\n", get_generic_name_by_vnum(GET_CRAFT_OBJECT(craft)));
+		}
 	}
 }
 

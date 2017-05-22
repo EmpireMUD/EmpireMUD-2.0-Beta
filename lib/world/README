@@ -8,6 +8,8 @@ bld - Buildings and designated rooms
 class - Player classes
 craft - Craft (forge, sew, etc) and build recipes
 crop - Crops
+fct - Factions
+gen - Generics
 glb - Global data
 mob - Mobiles/NPCs
 morph - Morphs
@@ -16,6 +18,7 @@ qst - Quests
 rmt - Room templates (for adventures)
 sect - Sectors (map terrain types)
 skill - Player skills
+soc - Socials
 trg - DG Scripts triggers
 veh - Vehicles (ships, carts)
 

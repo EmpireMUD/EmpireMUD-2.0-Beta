@@ -174,6 +174,26 @@ OLC_MODULE(fedit_name);
 OLC_MODULE(fedit_relation);
 OLC_MODULE(fedit_startingreputation);
 
+// generic modules
+OLC_MODULE(genedit_flags);
+OLC_MODULE(genedit_name);
+OLC_MODULE(genedit_type);
+OLC_MODULE(genedit_color);
+OLC_MODULE(genedit_drunk);
+OLC_MODULE(genedit_hunger);
+OLC_MODULE(genedit_liquid);
+OLC_MODULE(genedit_thirst);
+OLC_MODULE(genedit_build2char);
+OLC_MODULE(genedit_build2room);
+OLC_MODULE(genedit_craft2char);
+OLC_MODULE(genedit_craft2room);
+OLC_MODULE(genedit_repair2char);
+OLC_MODULE(genedit_repair2room);
+OLC_MODULE(genedit_quick_cooldown);
+OLC_MODULE(genedit_standardwearoff);
+OLC_MODULE(genedit_wearoff);
+OLC_MODULE(genedit_wearoff2room);
+
 // global modules
 OLC_MODULE(gedit_ability);
 OLC_MODULE(gedit_capacity);
@@ -276,6 +296,7 @@ OLC_MODULE(oedit_poison);
 OLC_MODULE(oedit_potion);
 OLC_MODULE(oedit_potionscale);
 OLC_MODULE(oedit_quantity);
+OLC_MODULE(oedit_recipe);
 OLC_MODULE(oedit_requiresquest);
 OLC_MODULE(oedit_roomvnum);
 OLC_MODULE(oedit_script);
@@ -394,8 +415,6 @@ OLC_MODULE(vedit_shortdescription);
 // externs
 extern const char *component_flags[];
 extern const char *component_types[];
-extern const char *drinks[];
-extern const char *drinknames[];
 extern const char *interact_types[];
 extern const int interact_attach_types[NUM_INTERACTS];
 extern const byte interact_vnum_types[NUM_INTERACTS];
@@ -405,7 +424,6 @@ extern const char *pool_types[];
 extern const bool requirement_amt_type[];
 extern const char *requirement_types[];
 extern const char *resource_types[];
-extern const char *res_action_type[];
 
 // external functions
 void replace_question_color(char *input, char *color, char *output);
@@ -430,6 +448,7 @@ void olc_show_class(char_data *ch);
 void olc_show_craft(char_data *ch);
 void olc_show_crop(char_data *ch);
 void olc_show_faction(char_data *ch);
+void olc_show_generic(char_data *ch);
 void olc_show_global(char_data *ch);
 void olc_show_mobile(char_data *ch);
 void olc_show_morph(char_data *ch);
@@ -451,6 +470,7 @@ extern class_data *setup_olc_class(class_data *input);
 extern craft_data *setup_olc_craft(craft_data *input);
 extern crop_data *setup_olc_crop(crop_data *input);
 extern faction_data *setup_olc_faction(faction_data *input);
+extern generic_data *setup_olc_generic(generic_data *input);
 extern struct global_data *setup_olc_global(struct global_data *input);
 extern char_data *setup_olc_mobile(char_data *input);
 extern morph_data *setup_olc_morph(morph_data *input);
@@ -468,16 +488,16 @@ extern bool validate_icon(char *icon);
 // master olc command structure
 const struct olc_command_data olc_data[] = {
 	// OLC_x: main commands
-	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SKILL | OLC_SOCIAL | OLC_VEHICLE, NOBITS },
-	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
+	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SKILL | OLC_SOCIAL | OLC_VEHICLE, NOBITS },
+	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
-	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	
 	// admin
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
@@ -615,6 +635,29 @@ const struct olc_command_data olc_data[] = {
 	{ "relationship", fedit_relation, OLC_FACTION, OLC_CF_EDITOR },
 	{ "startingreputation", fedit_startingreputation, OLC_FACTION, OLC_CF_EDITOR },
 	
+	// generic commands
+	{ "flags", genedit_flags, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "name", genedit_name, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "type", genedit_type, OLC_GENERIC, OLC_CF_EDITOR },
+	// generic: actions
+	{ "build2char", genedit_build2char, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "build2room", genedit_build2room, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "craft2char", genedit_craft2char, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "craft2room", genedit_craft2room, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "repair2char", genedit_repair2char, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "repair2room", genedit_repair2room, OLC_GENERIC, OLC_CF_EDITOR },
+	// generic: cooldowns
+	{ "quickcooldown", genedit_quick_cooldown, OLC_GENERIC, NOBITS },
+	{ "standardwearoff", genedit_standardwearoff, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "wearoff", genedit_wearoff, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "wearoff2room", genedit_wearoff2room, OLC_GENERIC, OLC_CF_EDITOR },
+	// generic: liquids
+	{ "color", genedit_color, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "drunk", genedit_drunk, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "hunger", genedit_hunger, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "liquid", genedit_liquid, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "thirst", genedit_thirst, OLC_GENERIC, OLC_CF_EDITOR },
+	
 	// globals commands
 	{ "capacity", gedit_capacity, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "flags", gedit_flags, OLC_GLOBAL, OLC_CF_EDITOR },
@@ -717,6 +760,7 @@ const struct olc_command_data olc_data[] = {
 	{ "potion", oedit_potion, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "potionscale", oedit_potionscale, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "quantity", oedit_quantity, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "recipe", oedit_recipe, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "requiresquest", oedit_requiresquest, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "roomvnum", oedit_roomvnum, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "script", oedit_script, OLC_OBJECT, OLC_CF_EDITOR },
@@ -996,6 +1040,11 @@ OLC_MODULE(olc_abort) {
 				GET_OLC_FACTION(ch->desc) = NULL;
 				break;
 			}
+			case OLC_GENERIC: {
+				free_generic(GET_OLC_GENERIC(ch->desc));
+				GET_OLC_GENERIC(ch->desc) = NULL;
+				break;
+			}
 			case OLC_GLOBAL: {
 				free_global(GET_OLC_GLOBAL(ch->desc));
 				GET_OLC_GLOBAL(ch->desc) = NULL;
@@ -1182,6 +1231,16 @@ OLC_MODULE(olc_audit) {
 				HASH_ITER(hh, faction_table, fct, next_fct) {
 					if (FCT_VNUM(fct) >= from_vnum && FCT_VNUM(fct) <= to_vnum) {
 						found |= audit_faction(fct, ch);
+					}
+				}
+				break;
+			}
+			case OLC_GENERIC: {
+				extern bool audit_generic(generic_data *gen, char_data *ch);
+				generic_data *gen, *next_gen;
+				HASH_ITER(hh, generic_table, gen, next_gen) {
+					if (GEN_VNUM(gen) >= from_vnum && GEN_VNUM(gen) <= to_vnum) {
+						found |= audit_generic(gen, ch);
 					}
 				}
 				break;
@@ -1403,6 +1462,11 @@ OLC_MODULE(olc_copy) {
 			exists = (find_faction_by_vnum(from_vnum) != NULL);
 			break;
 		}
+		case OLC_GENERIC: {
+			found = (find_generic_by_vnum(vnum) != NULL);
+			exists = (find_generic_by_vnum(from_vnum) != NULL);
+			break;
+		}
 		case OLC_GLOBAL: {
 			found = (global_proto(vnum) != NULL);
 			exists = (global_proto(from_vnum) != NULL);
@@ -1567,6 +1631,12 @@ OLC_MODULE(olc_copy) {
 			GET_OLC_FACTION(ch->desc)->vnum = vnum;
 			SET_BIT(FCT_FLAGS(GET_OLC_FACTION(ch->desc)), FCT_IN_DEVELOPMENT);	// ensure flag
 			olc_show_faction(ch);
+			break;
+		}
+		case OLC_GENERIC: {
+			GET_OLC_GENERIC(ch->desc) = setup_olc_generic(find_generic_by_vnum(from_vnum));
+			GET_OLC_GENERIC(ch->desc)->vnum = vnum;
+			olc_show_generic(ch);
 			break;
 		}
 		case OLC_GLOBAL: {
@@ -1754,6 +1824,11 @@ OLC_MODULE(olc_delete) {
 			olc_delete_faction(ch, vnum);
 			break;
 		}
+		case OLC_GENERIC: {
+			void olc_delete_generic(char_data *ch, any_vnum vnum);
+			olc_delete_generic(ch, vnum);
+			break;
+		}
 		case OLC_GLOBAL: {
 			olc_delete_global(ch, vnum);
 			break;
@@ -1848,6 +1923,10 @@ OLC_MODULE(olc_display) {
 		}
 		case OLC_FACTION: {
 			olc_show_faction(ch);
+			break;
+		}
+		case OLC_GENERIC: {
+			olc_show_generic(ch);
 			break;
 		}
 		case OLC_GLOBAL: {
@@ -2030,6 +2109,13 @@ OLC_MODULE(olc_edit) {
 			olc_show_faction(ch);
 			break;
 		}
+		case OLC_GENERIC: {
+			// this will set up from existing OR new automatically based on find_generic_by_vnum
+			GET_OLC_GENERIC(ch->desc) = setup_olc_generic(find_generic_by_vnum(vnum));
+			GET_OLC_GENERIC(ch->desc)->vnum = vnum;			
+			olc_show_generic(ch);
+			break;
+		}
 		case OLC_GLOBAL: {
 			// this will set up from existing OR new automatically based on global_proto
 			GET_OLC_GLOBAL(ch->desc) = setup_olc_global(global_proto(vnum));
@@ -2189,6 +2275,10 @@ OLC_MODULE(olc_free) {
 				}
 				case OLC_FACTION: {
 					free = (find_faction_by_vnum(iter) == NULL);
+					break;
+				}
+				case OLC_GENERIC: {
+					free = (find_generic_by_vnum(iter) == NULL);
 					break;
 				}
 				case OLC_GLOBAL: {
@@ -2484,6 +2574,20 @@ OLC_MODULE(olc_list) {
 					if (FCT_VNUM(fct) >= from_vnum && FCT_VNUM(fct) <= to_vnum) {
 						++count;
 						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_faction(fct, show_details));
+					}
+				}
+				break;
+			}
+			case OLC_GENERIC: {
+				extern char *list_one_generic(generic_data *gen, bool detail);
+				generic_data *gen, *next_gen;
+				HASH_ITER(hh, generic_table, gen, next_gen) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (GEN_VNUM(gen) >= from_vnum && GEN_VNUM(gen) <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_generic(gen, show_details));
 					}
 				}
 				break;
@@ -3049,6 +3153,13 @@ OLC_MODULE(olc_save) {
 				GET_OLC_FACTION(ch->desc) = NULL;
 				break;
 			}
+			case OLC_GENERIC: {
+				void save_olc_generic(descriptor_data *desc);
+				save_olc_generic(ch->desc);
+				free_generic(GET_OLC_GENERIC(ch->desc));
+				GET_OLC_GENERIC(ch->desc) = NULL;
+				break;
+			}
 			case OLC_GLOBAL: {
 				save_olc_global(ch->desc);
 				free_global(GET_OLC_GLOBAL(ch->desc));
@@ -3199,6 +3310,11 @@ OLC_MODULE(olc_search) {
 			case OLC_FACTION: {
 				void olc_search_faction(char_data *ch, any_vnum vnum);
 				olc_search_faction(ch, vnum);
+				break;
+			}
+			case OLC_GENERIC: {
+				void olc_search_generic(char_data *ch, any_vnum vnum);
+				olc_search_generic(ch, vnum);
 				break;
 			}
 			case OLC_GLOBAL: {
@@ -3558,8 +3674,8 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 				break;
 			}
 			case RES_LIQUID: {
-				sprintf(line, "%d units %s", res->amount, drinks[res->vnum]);
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
+				sprintf(line, "%d units %s", res->amount, get_generic_name_by_vnum(res->vnum));
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s", num, res->vnum, line);
 				break;
 			}
 			case RES_COINS: {
@@ -3572,8 +3688,8 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 				break;
 			}
 			case RES_ACTION: {
-				sprintf(line, "%dx [%s]", res->amount, res_action_type[res->vnum]);
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
+				sprintf(line, "%dx [%s]", res->amount, get_generic_name_by_vnum(res->vnum));
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s", num, res->vnum, line);
 				break;
 			}
 			default: {
@@ -3962,6 +4078,9 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_FACTION) && !OLC_FLAGGED(ch, OLC_FLAG_NO_FACTIONS)) {
+			return TRUE;
+		}
+		else if (IS_SET(type, OLC_GENERIC) && !OLC_FLAGGED(ch, OLC_FLAG_NO_GENERICS)) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_GLOBAL) && !OLC_FLAGGED(ch, OLC_FLAG_NO_GLOBAL)) {
@@ -5801,6 +5920,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 	char arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH];
 	struct resource_data *res, *next_res, *prev_res, *prev_prev, *change, *temp;
 	int num, type, misc;
+	generic_data *gen;
 	any_vnum vnum;
 	bool found;
 	
@@ -5898,8 +6018,8 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 						msg_to_char(ch, "Usage: resource add liquid <units> <name>\r\n");
 						return;
 					}
-					if ((vnum = search_block(arg4, drinks, FALSE)) == NOTHING && (vnum = search_block(arg4, drinknames, FALSE)) == NOTHING) {
-						msg_to_char(ch, "Unknown liquid type '%s'.\r\n", arg4);
+					if (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_LIQUID) {
+						msg_to_char(ch, "Invalid liquid generic vnum %d.\r\n", vnum);
 						return;
 					}
 					break;
@@ -5926,14 +6046,15 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 						strcat(arg4, arg5);
 					}
 					
-					if (!*arg4) {
-						msg_to_char(ch, "Usage: resource add action <amount> <type>\r\n");
+					if (!*arg4 || !isdigit(*arg4)) {
+						msg_to_char(ch, "Usage: resource add action <amount> <generic action vnum>\r\n");
 						return;
 					}
-					if ((vnum = search_block(arg4, res_action_type, FALSE)) == NOTHING) {
-						msg_to_char(ch, "Unknown action type '%s' (see HELP RESOURCE ACTIONS).\r\n", arg4);
+					if ((vnum = atoi(arg4)) < 0 || !(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_ACTION) {
+						msg_to_char(ch, "Invalid generic action vnum '%s'.\r\n", arg4);
 						return;
 					}
+					break;
 				}
 			}
 			
@@ -6049,18 +6170,24 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			}
 		}
 		else if (is_abbrev(arg3, "vnum")) {
-			if (change->type != RES_OBJECT) {
-				msg_to_char(ch, "You can't change the vnum on a resource that isn't an object.\r\n");
+			if (change->type != RES_OBJECT && change->type != RES_LIQUID && change->type != RES_ACTION) {
+				msg_to_char(ch, "You can't change the vnum on a resource that isn't an action, object, or liquid.\r\n");
 			}
-			else if (!obj_proto(vnum)) {
+			else if (change->type == RES_OBJECT && !obj_proto(vnum)) {
 				msg_to_char(ch, "There is no such object vnum %d.\r\n", vnum);
+			}
+			else if (change->type == RES_LIQUID && (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_LIQUID)) {
+				msg_to_char(ch, "Invalid liquid generic vnum %d.\r\n", vnum);
+			}
+			else if (change->type == RES_ACTION && (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_ACTION)) {
+				msg_to_char(ch, "Invalid generic action vnum %d.\r\n", vnum);
 			}
 			else {
 				change->vnum = vnum;
-				msg_to_char(ch, "You change resource %d's vnum to [%d] %s.\r\n", atoi(arg2), vnum, get_obj_name_by_proto(vnum));
+				msg_to_char(ch, "You change resource %d's vnum to [%d] %s.\r\n", atoi(arg2), vnum, get_resource_name(change));
 			}
 		}
-		else if (is_abbrev(arg3, "name") || is_abbrev(arg3, "component") || is_abbrev(arg3, "liquid") || is_abbrev(arg3, "pool")) {
+		else if (is_abbrev(arg3, "name") || is_abbrev(arg3, "component") || is_abbrev(arg3, "pool")) {
 			// RES_x: some resource types support "change name"
 			switch (change->type) {
 				case RES_COMPONENT: {
@@ -6074,16 +6201,6 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					msg_to_char(ch, "You change resource %d's component to %s.\r\n", atoi(arg2), component_string(vnum, change->misc));
 					break;
 				}
-				case RES_LIQUID: {
-					if ((vnum = search_block(arg4, drinks, FALSE)) == NOTHING && (vnum = search_block(arg4, drinknames, FALSE)) == NOTHING) {
-						msg_to_char(ch, "Unknown liquid type '%s'.\r\n", arg4);
-						return;
-					}
-					
-					change->vnum = vnum;
-					msg_to_char(ch, "You change resource %d's liquid to %s.\r\n", atoi(arg2), drinks[vnum]);
-					break;
-				}
 				case RES_POOL: {
 					if ((vnum = search_block(arg4, pool_types, FALSE)) == NOTHING) {
 						msg_to_char(ch, "Unknown pool type '%s'.\r\n", arg4);
@@ -6092,15 +6209,6 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					
 					change->vnum = vnum;
 					msg_to_char(ch, "You change resource %d's pool to %s.\r\n", atoi(arg2), pool_types[vnum]);
-					break;
-				}
-				case RES_ACTION: {
-					if ((vnum = search_block(arg4, res_action_type, FALSE)) == NOTHING) {
-						msg_to_char(ch, "Unknown action type '%s' (see HELP RESOURCE ACTIONS).\r\n", arg4);
-						return;
-					}
-					change->vnum = vnum;
-					msg_to_char(ch, "You change resource %d's action to %s.\r\n", atoi(arg2), res_action_type[vnum]);
 					break;
 				}
 				default: {

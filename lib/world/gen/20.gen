@@ -1,0 +1,470 @@
+#2001
+respawn~
+3 0
+0 0 0 0
+T0
+Your respawn cooldown has ended.~
+S
+#2002
+left empire~
+3 0
+0 0 0 0
+T0
+You can now join an empire again.~
+S
+#2003
+hostile flag~
+3 0
+0 0 0 0
+T0
+Your hostile flag has expired.~
+S
+#2004
+pvp flag~
+3 0
+0 0 0 0
+T0
+Your pvp flag has expired.~
+S
+#2005
+pvp quit timer~
+3 0
+0 0 0 0
+T0
+Your pvp quit timer has ended.~
+S
+#2006
+milk~
+3 0
+0 0 0 0
+T0
+Your milk cooldown has ended.~
+S
+#2007
+shear~
+3 0
+0 0 0 0
+T0
+Your shear cooldown has ended.~
+S
+#2008
+disarm~
+3 0
+0 0 0 0
+T0
+Your disarm cooldown has ended.~
+S
+#2009
+outrage~
+3 0
+0 0 0 0
+T0
+Your outrage cooldown has ended.~
+S
+#2010
+rescue~
+3 0
+0 0 0 0
+T0
+Your rescue cooldown has ended.~
+S
+#2011
+kick~
+3 0
+0 0 0 0
+T0
+Your kick cooldown has ended.~
+S
+#2012
+bash~
+3 0
+0 0 0 0
+T0
+Your bash cooldown has ended.~
+S
+#2013
+colorburst~
+3 0
+0 0 0 0
+T0
+Your colorburst cooldown has ended.~
+S
+#2014
+enervate~
+3 0
+0 0 0 0
+T0
+Your enervate cooldown has ended.~
+S
+#2015
+slow~
+3 0
+0 0 0 0
+T0
+Your slow cooldown has ended.~
+S
+#2016
+siphon~
+3 0
+0 0 0 0
+T0
+Your siphon cooldown has ended.~
+S
+#2017
+mirrorimage~
+3 0
+0 0 0 0
+T0
+Your mirrorimage cooldown has ended.~
+S
+#2018
+sunshock~
+3 0
+0 0 0 0
+T0
+Your sunshock cooldown has ended.~
+S
+#2019
+teleport home~
+3 0
+0 0 0 0
+T0
+Your teleport home cooldown has ended.~
+S
+#2020
+city teleportation~
+3 0
+0 0 0 0
+T0
+Your city teleportation cooldown has ended.~
+S
+#2021
+rejuvenate~
+3 0
+0 0 0 0
+T0
+Your rejuvenate cooldown has ended.~
+S
+#2022
+cleanse~
+3 0
+0 0 0 0
+T0
+Your cleanse cooldown has ended.~
+S
+#2023
+lightningbolt~
+3 0
+0 0 0 0
+T0
+Your lightningbolt cooldown has ended.~
+S
+#2024
+skybrand~
+3 0
+0 0 0 0
+T0
+Your skybrand cooldown has ended.~
+S
+#2025
+entangle~
+3 0
+0 0 0 0
+T0
+Your entangle cooldown has ended.~
+S
+#2026
+heartstop~
+3 0
+0 0 0 0
+T0
+Your heartstop cooldown has ended.~
+S
+#2027
+summon humans~
+3 0
+0 0 0 0
+T0
+Your summon humans cooldown has ended.~
+S
+#2028
+summon animals~
+3 0
+0 0 0 0
+T0
+Your summon animals cooldown has ended.~
+S
+#2029
+summon guards~
+3 0
+0 0 0 0
+T0
+Your summon guards cooldown has ended.~
+S
+#2030
+summon bodyguard~
+3 0
+0 0 0 0
+T0
+Your summon bodyguard cooldown has ended.~
+S
+#2031
+summon thug~
+3 0
+0 0 0 0
+T0
+Your summon thug cooldown has ended.~
+S
+#2032
+summon swift~
+3 0
+0 0 0 0
+T0
+Your summon swift cooldown has ended.~
+S
+#2033
+reward~
+3 0
+0 0 0 0
+T0
+Your reward cooldown has ended.~
+S
+#2034
+search~
+3 0
+0 0 0 0
+T0
+Your search cooldown has ended.~
+S
+#2035
+terrify~
+3 0
+0 0 0 0
+T0
+Your terrify cooldown has ended.~
+S
+#2036
+darkness~
+3 0
+0 0 0 0
+T0
+Your darkness cooldown has ended.~
+S
+#2037
+shadowstep~
+3 0
+0 0 0 0
+T0
+Your shadowstep cooldown has ended.~
+S
+#2038
+backstab~
+3 0
+0 0 0 0
+T0
+Your backstab cooldown has ended.~
+S
+#2039
+jab~
+3 0
+0 0 0 0
+T0
+Your jab cooldown has ended.~
+S
+#2040
+blind~
+3 0
+0 0 0 0
+T0
+Your blind cooldown has ended.~
+S
+#2041
+sap~
+3 0
+0 0 0 0
+T0
+Your sap cooldown has ended.~
+S
+#2042
+prick~
+3 0
+0 0 0 0
+T0
+Your prick cooldown has ended.~
+S
+#2043
+weaken~
+3 0
+0 0 0 0
+T0
+Your weaken cooldown has ended.~
+S
+#2044
+moonrise~
+3 0
+0 0 0 0
+T0
+Your moonrise cooldown has ended.~
+S
+#2045
+alternate~
+3 0
+0 0 0 0
+T0
+You can now alternate again.~
+S
+#2046
+dispel~
+3 0
+0 0 0 0
+T0
+Your dispel cooldown has ended.~
+S
+#2047
+bloodsweat~
+3 0
+0 0 0 0
+T0
+Your bloodsweat cooldown has ended.~
+S
+#2048
+earthmeld~
+3 0
+0 0 0 0
+T0
+Your earthmeld cooldown has ended.~
+S
+#2049
+shadowcage~
+3 0
+0 0 0 0
+T0
+Your shadowcage cooldown has ended.~
+S
+#2050
+howl~
+3 0
+0 0 0 0
+T0
+Your howl cooldown has ended.~
+S
+#2051
+diversion~
+3 0
+0 0 0 0
+T0
+Your diversion cooldown has ended.~
+S
+#2052
+rogue flag~
+3 0
+0 0 0 0
+T0
+Your rogue flag has expired.~
+S
+#2053
+portal sickness~
+3 0
+0 0 0 0
+T0
+Your portal sickness has ended.~
+S
+#2054
+whisperstride~
+3 0
+0 0 0 0
+T0
+Your whisperstride cooldown has ended.~
+S
+#2055
+ablate~
+3 0
+0 0 0 0
+T0
+Your ablate cooldown has ended.~
+S
+#2056
+acidblast~
+3 0
+0 0 0 0
+T0
+Your acidblast cooldown has ended.~
+S
+#2057
+arclight~
+3 0
+0 0 0 0
+T0
+Your arclight cooldown has ended.~
+S
+#2058
+astralclaw~
+3 0
+0 0 0 0
+T0
+Your astralclaw cooldown has ended.~
+S
+#2059
+chronoblast~
+3 0
+0 0 0 0
+T0
+Your chronoblast cooldown has ended.~
+S
+#2060
+deathtouch~
+3 0
+0 0 0 0
+T0
+Your deathtouch cooldown has ended.~
+S
+#2061
+dispirit~
+3 0
+0 0 0 0
+T0
+Your dispirit cooldown has ended.~
+S
+#2062
+erode~
+3 0
+0 0 0 0
+T0
+Your erode cooldown has ended.~
+S
+#2063
+scour~
+3 0
+0 0 0 0
+T0
+Your scour cooldown has ended.~
+S
+#2064
+shadowlash~
+3 0
+0 0 0 0
+T0
+Your shadowlash cooldown has ended.~
+S
+#2065
+soulchain~
+3 0
+0 0 0 0
+T0
+Your soulchain cooldown has ended.~
+S
+#2066
+starstrike~
+3 0
+0 0 0 0
+T0
+Your starstrike cooldown has ended.~
+S
+#2067
+thornlash~
+3 0
+0 0 0 0
+T0
+Your thornlash cooldown has ended.~
+S
+$

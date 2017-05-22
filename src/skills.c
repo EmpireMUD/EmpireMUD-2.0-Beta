@@ -519,7 +519,7 @@ bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_am
 		msg_to_char(ch, "You need %d %s point%s to do that.\r\n", cost_amount, pool_types[cost_pool], PLURAL(cost_amount));
 		return FALSE;
 	}
-	if (cooldown_type > COOLDOWN_RESERVED && (time = get_cooldown_time(ch, cooldown_type)) > 0) {
+	if ((time = get_cooldown_time(ch, cooldown_type)) > 0) {
 		snprintf(buf, sizeof(buf), "%s is still on cooldown for %d second%s.\r\n", get_ability_name_by_vnum(ability), time, (time != 1 ? "s" : ""));
 		CAP(buf);
 		send_to_char(buf, ch);
@@ -548,7 +548,7 @@ void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cool
 	}
 	
 	// only npcs get cooldowns here
-	if (cooldown_type > COOLDOWN_RESERVED && cooldown_time > 0 && !IS_NPC(ch)) {
+	if (cooldown_time > 0 && !IS_NPC(ch)) {
 		add_cooldown(ch, cooldown_type, cooldown_time);
 	}
 	

@@ -10,6 +10,16 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+// NOTE: These numbers match things created with the OLC editors and stored
+// in data files. When you add a definition in this file, you must first find
+// a free vnum in your EmpireMUD, and create the item/building/etc.
+
+// Note on VNUMS:
+// You do NOT need to be sequential with other numbers in this file. You should
+// almost always add new content in the vnum range of your own adventures, or 
+// pick a high starting vnum to avoid conflicting with stock content.
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// BUILDINGS ///////////////////////////////////////////////////////////////
 
@@ -45,10 +55,6 @@
 
 #define RTYPE_BEDROOM  5601
 #define RTYPE_TUNNEL  5612	// for mine complex, tunnel
-
-
-// special resource action used by the siege system
-#define RES_ACTION_REPAIR  3
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -197,3 +203,171 @@
 #define VEHICLE_REPAIRMAN  273
 #define OVERSEER  274
 #define PRESS_WORKER  276
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// GENERICS ////////////////////////////////////////////////////////////////
+
+// GENERIC_ACTION used by the siege system
+#define RES_ACTION_REPAIR  1003
+
+
+// GENERIC_AFFECTS (ATYPE_x) for affects/dots
+#define ATYPE_FLY  3001
+#define ATYPE_ENTRANCEMENT  3002
+#define ATYPE_DARKNESS  3003
+#define ATYPE_POISON  3004
+#define ATYPE_BOOST  3005
+#define ATYPE_CUT_DEEP  3006
+#define ATYPE_SAP  3007
+#define ATYPE_MANASHIELD  3008
+#define ATYPE_FORESIGHT  3009
+#define ATYPE_EARTHMELD  3010
+#define ATYPE_MUMMIFY  3011
+#define ATYPE_EARTHARMOR  3012
+#define ATYPE_BESTOW_VIGOR  3013	// NOTE: not used
+#define ATYPE_WEAKEN  3014
+#define ATYPE_COLORBURST  3015
+#define ATYPE_HEARTSTOP  3016
+#define ATYPE_PHOENIX_RITE  3017
+#define ATYPE_DISARM  3018
+#define ATYPE_SHOCKED  3019
+#define ATYPE_SKYBRAND  3020
+#define ATYPE_COUNTERSPELL  3021
+#define ATYPE_HASTEN  3022
+#define ATYPE_REJUVENATE  3023
+#define ATYPE_ENTANGLE  3024
+#define ATYPE_RADIANCE  3025
+#define ATYPE_INSPIRE  3026
+#define ATYPE_JABBED  3027
+#define ATYPE_BLIND  3028
+#define ATYPE_REGEN_POTION  3029
+#define ATYPE_NATURE_POTION  3030
+#define ATYPE_VIGOR  3031
+#define ATYPE_ENERVATE  3032
+#define ATYPE_ENERVATE_GAIN  3033
+#define ATYPE_SIPHON  3034
+#define ATYPE_SLOW  3035
+#define ATYPE_SUNSHOCK  3036
+#define ATYPE_TRIPPING  3037
+#define ATYPE_SIPHON_DRAIN  3038
+#define ATYPE_DG_AFFECT  3039
+#define ATYPE_CLAWS  3040
+#define ATYPE_DEATHSHROUD  3041
+#define ATYPE_SOULMASK  3042
+#define ATYPE_MAJESTY  3043
+#define ATYPE_ALACRITY  3044
+#define ATYPE_NIGHTSIGHT  3045
+#define ATYPE_DEATH_PENALTY  3046
+#define ATYPE_BASH  3047
+#define ATYPE_TERRIFY  3048
+#define ATYPE_STUNNING_BLOW  3049
+#define ATYPE_STUN_IMMUNITY  3050
+#define ATYPE_WAR_DELAY  3051
+#define ATYPE_UNBURDENED  3052
+#define ATYPE_SHADOW_KICK  3053
+#define ATYPE_STAGGER_JAB  3054
+#define ATYPE_SHADOWCAGE  3055
+#define ATYPE_HOWL  3056
+#define ATYPE_CRUCIAL_JAB  3057
+#define ATYPE_DIVERSION  3058
+#define ATYPE_SHADOW_JAB  3059
+#define ATYPE_CONFER  3060
+#define ATYPE_CONFERRED  3061
+#define ATYPE_MORPH  3062
+#define ATYPE_WHISPERSTRIDE  3063
+#define ATYPE_WELL_FED  3064
+#define ATYPE_ABLATE  3065
+#define ATYPE_ACIDBLAST  3066
+#define ATYPE_ASTRALCLAW  3067
+#define ATYPE_CHRONOBLAST  3068
+#define ATYPE_DISPIRIT  3069
+#define ATYPE_ERODE  3070
+#define ATYPE_SCOUR  3071
+#define ATYPE_SHADOWLASH_BLIND  3072
+#define ATYPE_SHADOWLASH_DOT  3073
+#define ATYPE_SOULCHAIN  3074
+#define ATYPE_THORNLASH  3075
+#define ATYPE_ARROW_TO_THE_KNEE  3076
+#define ATYPE_HOSTILE_DELAY  3077
+#define ATYPE_NATURE_BURN  3078
+
+
+// GENERIC_COOLDOWN entires used by the code
+#define COOLDOWN_DEATH_RESPAWN  2001
+#define COOLDOWN_LEFT_EMPIRE  2002
+#define COOLDOWN_HOSTILE_FLAG  2003
+#define COOLDOWN_PVP_FLAG  2004
+#define COOLDOWN_PVP_QUIT_TIMER  2005
+#define COOLDOWN_MILK  2006
+#define COOLDOWN_SHEAR  2007
+#define COOLDOWN_DISARM  2008
+#define COOLDOWN_OUTRAGE  2009
+#define COOLDOWN_RESCUE  2010
+#define COOLDOWN_KICK  2011
+#define COOLDOWN_BASH  2012
+#define COOLDOWN_COLORBURST  2013
+#define COOLDOWN_ENERVATE  2014
+#define COOLDOWN_SLOW  2015
+#define COOLDOWN_SIPHON  2016
+#define COOLDOWN_MIRRORIMAGE  2017
+#define COOLDOWN_SUNSHOCK  2018
+#define COOLDOWN_TELEPORT_HOME  2019
+#define COOLDOWN_TELEPORT_CITY  2020
+#define COOLDOWN_REJUVENATE  2021
+#define COOLDOWN_CLEANSE  2022
+#define COOLDOWN_LIGHTNINGBOLT  2023
+#define COOLDOWN_SKYBRAND  2024
+#define COOLDOWN_ENTANGLE  2025
+#define COOLDOWN_HEARTSTOP  2026
+#define COOLDOWN_SUMMON_HUMANS  2027
+#define COOLDOWN_SUMMON_ANIMALS  2028
+#define COOLDOWN_SUMMON_GUARDS  2029
+#define COOLDOWN_SUMMON_BODYGUARD  2030
+#define COOLDOWN_SUMMON_THUG  2031
+#define COOLDOWN_SUMMON_SWIFT  2032
+#define COOLDOWN_REWARD  2033
+#define COOLDOWN_SEARCH  2034
+#define COOLDOWN_TERRIFY  2035
+#define COOLDOWN_DARKNESS  2036
+#define COOLDOWN_SHADOWSTEP  2037
+#define COOLDOWN_BACKSTAB  2038
+#define COOLDOWN_JAB  2039
+#define COOLDOWN_BLIND  2040
+#define COOLDOWN_SAP  2041
+#define COOLDOWN_PRICK  2042
+#define COOLDOWN_WEAKEN  2043
+#define COOLDOWN_MOONRISE  2044
+#define COOLDOWN_ALTERNATE  2045
+#define COOLDOWN_DISPEL  2046
+#define COOLDOWN_BLOODSWEAT  2047
+#define COOLDOWN_EARTHMELD  2048
+#define COOLDOWN_SHADOWCAGE  2049
+#define COOLDOWN_HOWL  2050
+#define COOLDOWN_DIVERSION  2051
+#define COOLDOWN_ROGUE_FLAG  2052
+#define COOLDOWN_PORTAL_SICKNESS  2053
+#define COOLDOWN_WHISPERSTRIDE  2054
+#define COOLDOWN_ABLATE  2055
+#define COOLDOWN_ACIDBLAST  2056
+#define COOLDOWN_ARCLIGHT  2057
+#define COOLDOWN_ASTRALCLAW  2058
+#define COOLDOWN_CHRONOBLAST  2059
+#define COOLDOWN_DEATHTOUCH  2060
+#define COOLDOWN_DISPIRIT  2061
+#define COOLDOWN_ERODE  2062
+#define COOLDOWN_SCOUR  2063
+#define COOLDOWN_SHADOWLASH  2064
+#define COOLDOWN_SOULCHAIN  2065
+#define COOLDOWN_STARSTRIKE  2066
+#define COOLDOWN_THORNLASH  2067
+
+
+// LIQ_x: Some different kind of liquids (vnums of GENERIC_LIQUID)
+#define LIQ_WATER  0
+#define LIQ_LAGER  1
+#define LIQ_WHEATBEER  2
+#define LIQ_ALE  3
+#define LIQ_CIDER  4
+#define LIQ_MILK  5
+#define LIQ_BLOOD  6

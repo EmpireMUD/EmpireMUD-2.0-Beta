@@ -954,6 +954,20 @@ road sign.
 
 See also: CHANT OF ILLUSIONS, EMPIRE, PATHFINDING, ROADSIGN
 #
+LEARN LEARNED LEARNING
+
+Usage:  learn <recipe>
+        learned [search terms]
+
+You can learn a recipe (including patterns, schematics, and designs) from an
+item that teaches it. This gives you permanent access to that craft recipe
+(although you must still meet any skill and level requirements).
+
+You can see your learned recipes with the 'learned' command and, optionally,
+can filter the results.
+
+See also: RECIPES
+#
 LOAD LOADVEHICLE "LOAD VEHICLE" BOATLOAD "BOAT LOAD"
 
 Usage:  load <mob | vehicle | all> <onto vehicle>

@@ -25,6 +25,7 @@
 #include "db.h"
 #include "olc.h"
 #include "skills.h"
+#include "vnums.h"
 
 #define PULSES_PER_MUD_HOUR     (SECS_PER_MUD_HOUR*PASSES_PER_SEC)
 #define player_script_radius  25	// map tiles away that players may be for scripts to trigger
@@ -36,11 +37,9 @@ extern unsigned long pulse;
 /* other external vars */
 extern const char *action_bits[];
 extern const char *affected_bits[];
-extern const char *affect_types[];
 extern const char *alt_dirs[];
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
-extern const char *drinks[];
 extern const char *extra_bits[];
 extern const char *item_types[];
 extern const char *genders[];
@@ -2469,6 +2468,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				return;
 			}
+			else if (!str_cmp(var, "cooldown")) {
+				if (field && *field && isdigit(*field)) {
+					generic_data *gen = find_generic_by_vnum(atoi(field));
+					if (gen && GEN_TYPE(gen) == GENERIC_COOLDOWN) {
+						snprintf(str, slen, "%s", GEN_NAME(gen));
+					}
+					else {
+						strcpy(str, "UNKNOWN");
+					}
+				}
+				else {
+					strcpy(str, "UNKNOWN");
+				}
+			}
 			else if (!str_cmp(var, "random")) {
 				if (!str_cmp(field, "char") || !str_cmp(field, "ally") || !str_cmp(field, "enemy")) {
 					bool ally = (!str_cmp(field, "ally") ? TRUE : FALSE);
@@ -2583,6 +2596,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					
+					else if (!str_cmp(field, "add_learned")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							void add_learned_craft(char_data *ch, any_vnum vnum);
+							craft_data *cft = craft_proto(atoi(subfield));
+							if (cft && CRAFT_FLAGGED(cft, CRAFT_LEARNED) && !CRAFT_FLAGGED(cft, CRAFT_IN_DEVELOPMENT)) {
+								add_learned_craft(c, GET_CRAFT_VNUM(cft));
+							}
+							else {
+								script_log("Trigger: %s, VNum %d, attempting to add invalid learned craft: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+							}
+						}
+						
+						strcpy(str, "0");
+					}
+					
 					else if (!str_cmp(field, "add_mob_flag")) {
 						if (subfield && *subfield && IS_NPC(c)) {
 							bitvector_t pos = search_block(subfield, action_bits, FALSE);
@@ -2670,15 +2698,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					*/
 					else if (!str_cmp(field, "affect")) {
 						if (subfield && *subfield) {
-							int spell = search_block(subfield, affect_types, FALSE);
-
-							if (affected_by_spell(c, spell))
-								snprintf(str, slen, "1");
-							else 
+							generic_data *gen;
+							
+							if (isdigit(*subfield) && (gen = find_generic_by_vnum(atoi(subfield)))) {
+								snprintf(str, slen, "%d", affected_by_spell(c, GEN_VNUM(gen)) ? 1 : 0);
+							}
+							else if ((gen = find_generic_by_name(GENERIC_AFFECT, subfield, TRUE))) {
+								snprintf(str, slen, "%d", affected_by_spell(c, GEN_VNUM(gen)) ? 1 : 0);
+							}
+							else {
 								snprintf(str, slen, "0");
+							}
 						}
-						else
+						else {
 							snprintf(str, slen, "0");
+						}
 					}
 					break;
 				}
@@ -2875,6 +2909,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							else {
 								strcpy(str, "0");
 							}
+						}
+					}
+					else if (!str_cmp(field, "cooldown")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							snprintf(str, slen, "%d", get_cooldown_time(c, atoi(subfield)));
 						}
 					}
 					else if (!str_cmp(field, "crafting_level")) {
@@ -3226,6 +3265,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "lastname")) {
 						snprintf(str, slen, "%s", IS_NPC(c) ? "" : GET_LASTNAME(c)); 
 					}
+					else if (!str_cmp(field, "learned")) {
+						extern bool has_learned_craft(char_data *ch, any_vnum vnum);
+						
+						if (subfield && *subfield && isdigit(*subfield) && has_learned_craft(c, atoi(subfield))) {
+							strcpy(str, "1");
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
 					else if (!str_cmp(field, "level")) {
 						snprintf(str, slen, "%d", get_approximate_level(c)); 
 					}
@@ -3461,7 +3510,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'r': {	// char.r*
-					if (!str_cmp(field, "remove_mob_flag")) {
+					if (!str_cmp(field, "remove_learned")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							void remove_learned_craft(char_data *ch, any_vnum vnum);
+							remove_learned_craft(c, atoi(subfield));
+						}
+						
+						strcpy(str, "0");
+					}
+					else if (!str_cmp(field, "remove_mob_flag")) {
 						if (subfield && *subfield && IS_NPC(c)) {
 							bitvector_t pos = search_block(subfield, action_bits, FALSE);
 							if (pos != NOTHING) {
@@ -3500,7 +3557,33 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 's': {	// char.s*
-					if (!str_cmp(field, "sex"))
+					if (!str_cmp(field, "set_cooldown")) {
+						if (subfield && *subfield) {
+							char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+							generic_data *gen;
+							int val;
+							
+							comma_args(subfield, arg1, arg2);
+							
+							if (!*arg1 || !*arg2 || !isdigit(*arg1) || !isdigit(*arg2) || !(gen = find_generic_by_vnum(atoi(arg1))) || GEN_TYPE(gen) != GENERIC_COOLDOWN) {
+								script_log("Trigger: %s, VNum %d. bad arguments to set_cooldown(%s, %s)", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), arg1, arg2);
+								strcpy(str, "0");
+							}
+							else {
+								val = atoi(arg2);
+								if (val > 0) {
+									add_cooldown(c, GEN_VNUM(gen), val);
+								}
+								else {
+									remove_cooldown_by_type(c, GEN_VNUM(gen));
+								}
+								
+								// success
+								strcpy(str, "1");
+							}
+						}
+					}
+					else if (!str_cmp(field, "sex"))
 						snprintf(str, slen, "%s", genders[(int)GET_SEX(c)]);
 
 					else if (!str_cmp(field, "str") || !str_cmp(field, "strength"))
@@ -4917,7 +5000,6 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, void *go, struct scri
 	for (p = rhs; *p; p++);
 	for (--p; isspace(*p) && (p > rhs); *p-- = '\0');  
 
-
 	/* find the op, and figure out the value */
 	if (!strcmp("||", op)) {
 		if ((!*lhs || (*lhs == '0')) && (!*rhs || (*rhs == '0')))
@@ -5091,7 +5173,7 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 	
 	// symbols used in operators
 	const char *opsymbols = "!/*+-<>=~&|";
-
+  
 	p = strcpy(line, expr);
 
 	/*

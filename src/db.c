@@ -119,6 +119,10 @@ struct weather_data weather_info;	// the infomation about the weather
 int wizlock_level = 0;	// level of game restriction
 char *wizlock_message = NULL;	// Message sent to people trying to connect
 
+// generics
+generic_data *generic_table = NULL;	// hash table (hh)
+generic_data *sorted_generics = NULL;	// hash table (sorted_hh)
+
 // global stuff
 struct global_data *globals_table = NULL;	// hash table of global_data
 
@@ -249,6 +253,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ QST_PREFIX, QST_SUFFIX },	// DB_BOOT_QST
 	{ SOC_PREFIX, SOC_SUFFIX },	// DB_BOOT_SOC
 	{ FCT_PREFIX, FCT_SUFFIX },	// DB_BOOT_FCT
+	{ GEN_PREFIX, GEN_SUFFIX },	// DB_BOOT_GEN
 };
 
 
@@ -424,6 +429,9 @@ void boot_world(void) {
 	extern int sort_socials_by_data(social_data *a, social_data *b);
 
 	// DB_BOOT_x search: boot new types in this function
+	
+	log("Loading generics.");
+	index_boot(DB_BOOT_GEN);
 	
 	log("Loading abilities.");
 	index_boot(DB_BOOT_ABIL);
@@ -1782,6 +1790,7 @@ const char *versions_list[] = {
 	"b4.36",
 	"b4.38",
 	"b4.39",
+	"b5.1",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2359,6 +2368,87 @@ void b4_39_data_conversion(void) {
 }
 
 
+// b5.1 changes the values of ATYPE_x consts and this updates existing affects
+PLAYER_UPDATE_FUNC(b5_1_update_players) {
+	struct over_time_effect_type *dot;
+	struct affected_type *af;
+	
+	LL_FOREACH(ch->affected, af) {
+		if (af->type < 3000) {
+			af->type += 3000;
+		}
+	}
+	
+	LL_FOREACH(ch->over_time_effects, dot) {
+		if (dot->type < 3000) {
+			dot->type += 3000;
+		}
+	}
+}
+
+
+// b5.1 convert resource action vnums (all resource actions += 1000)
+void b5_1_resource_action_update(void) {
+	craft_data *craft, *next_craft;
+	bld_data *bld, *next_bld;
+	vehicle_data *veh, *next_veh;
+	room_data *room, *next_room;
+	struct resource_data *res;
+	
+	// crafts
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		LL_FOREACH(GET_CRAFT_RESOURCES(craft), res) {
+			if (res->type == RES_ACTION && res->vnum < 100) {
+				res->vnum += 1000;
+				save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
+			}
+		}
+	}
+	
+	// buildings
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		LL_FOREACH(GET_BLD_YEARLY_MAINTENANCE(bld), res) {
+			if (res->type == RES_ACTION && res->vnum < 100) {
+				res->vnum += 1000;
+				save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
+			}
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		LL_FOREACH(VEH_YEARLY_MAINTENANCE(veh), res) {
+			if (res->type == RES_ACTION && res->vnum < 100) {
+				res->vnum += 1000;
+				save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
+			}
+		}
+	}
+	
+	// live rooms
+	HASH_ITER(hh, world_table, room, next_room) {
+		LL_FOREACH(BUILDING_RESOURCES(room), res) {
+			if (res->type == RES_ACTION && res->vnum < 100) {
+				res->vnum += 1000;
+			}
+		}
+	}
+	
+	// live vehicles
+	LL_FOREACH(vehicle_list, veh) {
+		LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
+			if (res->type == RES_ACTION && res->vnum < 100) {
+				res->vnum += 1000;
+			}
+		}
+	}
+	
+	save_whole_world();
+	
+	update_all_players(NULL, b5_1_update_players);
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -2566,8 +2656,13 @@ void check_version(void) {
 			b4_38_tower_triggers();
 		}
 		if (MATCH_VERSION("b4.39")) {
-			log("Converting datat to b4.39 format...");
+			log("Converting data to b4.39 format...");
 			b4_39_data_conversion();
+		}
+		// beta5
+		if (MATCH_VERSION("b5.1")) {
+			log("Updating actions/affects to b5.1 vnums...");
+			b5_1_resource_action_update();
 		}
 	}
 	

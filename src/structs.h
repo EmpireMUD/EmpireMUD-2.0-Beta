@@ -28,6 +28,7 @@
 *     Empire Defines
 *     Faction Defines
 *     Game Defines
+*     Generic Defines
 *     Mobile Defines
 *     Object Defines
 *     Player Defines
@@ -56,6 +57,7 @@
 *     Faction Structs
 *     Fight Structs
 *     Game Structs
+*     Generic Structs
 *     Object Structs
 *     Quest Structs
 *     Sector Structs
@@ -223,6 +225,7 @@ typedef struct crop_data crop_data;
 typedef struct descriptor_data descriptor_data;
 typedef struct empire_data empire_data;
 typedef struct faction_data faction_data;
+typedef struct generic_data generic_data;
 typedef struct index_data index_data;
 typedef struct morph_data morph_data;
 typedef struct obj_data obj_data;
@@ -790,6 +793,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_VEHICLE  BIT(13)	// creates a vehicle instead of an object
 #define CRAFT_SHIPYARD  BIT(14)	// requires a shipyard
 #define CRAFT_BLD_UPGRADED  BIT(15)	// requires a building with the upgraded flag
+#define CRAFT_LEARNED  BIT(16)	// cannot use unless learned
 
 // list of above craft flags that require a building in some way
 #define CRAFT_FLAGS_REQUIRING_BUILDINGS  (CRAFT_GLASSBLOWER | CRAFT_CARPENTER | CRAFT_ALCHEMY | CRAFT_SHIPYARD)
@@ -1069,6 +1073,28 @@ typedef struct vehicle_data vehicle_data;
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// GENERIC DEFINES /////////////////////////////////////////////////////////
+
+// GENERIC_x: generic types
+#define GENERIC_UNKNOWN  0	// dummy
+#define GENERIC_LIQUID  1	// for drink containers
+#define GENERIC_ACTION  2	// for resource actions
+#define GENERIC_COOLDOWN  3	// for cooldowns (COOLDOWN_*)!
+#define GENERIC_AFFECT  4	// for affects (ATYPE_*)
+
+
+// GEN_x: generic flags
+// #define GEN_...  BIT(0)	// a. no flags are implemented
+
+
+// how many strings a generic stores (can be safely raised with no updates)
+#define NUM_GENERIC_STRINGS  6
+
+// how many ints a generic stores (update write_generic_to_file if you change this)
+#define NUM_GENERIC_VALUES  4
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// MOBILE DEFINES //////////////////////////////////////////////////////////
 
 // MOB_x: Mobile flags 
@@ -1238,7 +1264,7 @@ typedef struct vehicle_data vehicle_data;
 #define CORPSE_SKINNED  BIT(1)	// The corpse has been skinned
 #define CORPSE_HUMAN  BIT(2)	// a person
 
-// Item types
+// ITEM_x: Item types
 #define ITEM_UNDEFINED  0
 #define ITEM_WEAPON  1	// item is a weapon
 #define ITEM_WORN  2	// wearable equipment
@@ -1246,7 +1272,7 @@ typedef struct vehicle_data vehicle_data;
 #define ITEM_CONTAINER  4	// item is a container
 #define ITEM_DRINKCON  5	// item is a drink container
 #define ITEM_FOOD  6	// item is food
-	#define ITEM_UNUSED1  7
+#define ITEM_RECIPE  7	// can be learned for a craft
 #define ITEM_PORTAL  8  // a portal
 #define ITEM_BOARD  9	// message board
 #define ITEM_CORPSE  10	// a corpse, pc or npc
@@ -1293,26 +1319,6 @@ typedef struct vehicle_data vehicle_data;
 #define ITEM_WEAR_SADDLE  BIT(18)	// s. Saddle
 
 
-// LIQ_x: Some different kind of liquids for use in values of drink containers
-#define LIQ_WATER  0
-#define LIQ_LAGER  1
-#define LIQ_WHEATBEER  2
-#define LIQ_ALE  3
-#define LIQ_CIDER  4
-#define LIQ_MILK  5
-#define LIQ_BLOOD  6
-#define LIQ_HONEY  7
-#define LIQ_BEAN_SOUP  8
-#define LIQ_COFFEE  9
-#define LIQ_GREEN_TEA  10
-#define LIQ_RED_WINE  11
-#define LIQ_WHITE_WINE  12
-#define LIQ_GROG  13
-#define LIQ_MEAD  14
-#define LIQ_STOUT  15
-#define NUM_LIQUIDS  16	// total
-
-
 // Item materials
 #define MAT_WOOD  0	// Made from wood
 #define MAT_ROCK  1	// ...rock
@@ -1333,7 +1339,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_MATERIALS  16	// Total number of matierals
 
 
-// Extra object flags -- OBJ_FLAGGED(obj, f)
+// OBJ_x: Extra object flags -- OBJ_FLAGGED(obj, f)
 #define OBJ_UNIQUE  BIT(0)	// a. can only use 1 at a time
 #define OBJ_PLANTABLE  BIT(1)	// b. Uses val 2 to set a crop type
 #define OBJ_LIGHT  BIT(2)	// c. Lights until timer pops
@@ -1384,7 +1390,7 @@ typedef struct vehicle_data vehicle_data;
 // RES_x: resource requirement types
 #define RES_OBJECT  0	// specific obj (vnum= obj vnum, misc= scale level [refunds only])
 #define RES_COMPONENT  1	// an obj of a given generic type (vnum= CMP_ type, misc= CMPF_ flags)
-#define RES_LIQUID  2	// a volume of a given liquid (vnum= LIQ_ type)
+#define RES_LIQUID  2	// a volume of a given liquid (vnum= LIQ_ vnum)
 #define RES_COINS  3	// an amount of coins (vnum= empire id of coins)
 #define RES_POOL  4	// health, mana, etc (vnum= HEALTH, etc)
 #define RES_ACTION  5	// flavorful action strings (take time but not resources)
@@ -2054,7 +2060,6 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_COIN  2140000000	// 2.14b (< MAX_INT)
 #define MAX_COIN_TYPES  10	// don't store more than this many different coin types
 #define MAX_CONDITION  750	// FULL, etc
-#define MAX_COOLDOWNS  32
 #define MAX_EMPIRE_DESCRIPTION  2000
 #define MAX_FACTION_DESCRIPTION  4000
 #define MAX_GROUP_SIZE  4	// how many members a group allows
@@ -2143,7 +2148,7 @@ struct apply_data {
 
 // Simple affect structure
 struct affected_type {
-	sh_int type;	// The type of spell that caused this
+	any_vnum type;	// The type of spell that caused this
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// For how long its effects will last
 	int modifier;	// This is added to apropriate ability
@@ -3007,6 +3012,7 @@ struct descriptor_data {
 	bld_data *olc_building;	// building being edited
 	crop_data *olc_crop;	// crop being edited
 	faction_data *olc_faction;	// faction being edited
+	generic_data *olc_generic;	// generic being edited
 	struct global_data *olc_global;	// global being edited
 	quest_data *olc_quest;	// quest being edited
 	room_template *olc_room_template;	// rmt being edited
@@ -3055,6 +3061,13 @@ struct mount_data {
 	bitvector_t flags;	// stored MOUNT_ flags
 	
 	UT_hash_handle hh;	// hash handle for GET_MOUNT_LIST(ch)
+};
+
+
+// for permanently learning crafts
+struct player_craft_data {
+	any_vnum vnum;	// vnum of the learned craft
+	UT_hash_handle hh;	// player's learned_crafts hash
 };
 
 
@@ -3205,6 +3218,7 @@ struct player_special_data {
 	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to CLASS_SKILL_CAP
 	ubyte class_role;	// ROLE_ chosen by the player
 	class_data *character_class;  // character's class as determined by top skills
+	struct player_craft_data *learned_crafts;	// crafts learned from patterns
 	
 	// tracking for specific skills
 	byte confused_dir;  // people without Navigation think this dir is north
@@ -3369,9 +3383,9 @@ struct char_data {
 };
 
 
-// cooldown info
+// cooldown info (cooldowns are defined by generics)
 struct cooldown_data {
-	sh_int type;	// any COOLDOWN_ const
+	any_vnum type;	// any COOLDOWN_ const or vnum
 	time_t expire_time;	// time at which the cooldown has expired
 	
 	struct cooldown_data *next;	// linked list
@@ -3380,7 +3394,7 @@ struct cooldown_data {
 
 // for damage-over-time (DoTs)
 struct over_time_effect_type {
-	sh_int type;	// ATYPE_
+	any_vnum type;	// ATYPE_
 	int cast_by;	// player ID (positive) or mob vnum (negative)
 	sh_int duration;	// time in 5-second real-updates
 	sh_int damage_type;	// DAM_x type
@@ -3526,13 +3540,13 @@ struct poison_data_type {
 	char *name;
 	any_vnum ability;
 	
-	int atype;	// ATYPE_
+	any_vnum atype;	// ATYPE_
 	int apply;	// APPLY_
 	int mod;	// +/- value
 	bitvector_t aff;
 	
 	// dot affect
-	int dot_type;	// ATYPE_, -1 for none
+	any_vnum dot_type;	// ATYPE_, -1 for none
 	int dot_duration;	// time for the dot
 	int dot_damage_type;	// DAM_ for the dot
 	int dot_damage;	// damage for the dot
@@ -3546,7 +3560,7 @@ struct poison_data_type {
 // see act.naturalmagic.c
 struct potion_data_type {
 	char *name;	// name for olc, etc
-	int atype;	// ATYPE_
+	any_vnum atype;	// ATYPE_
 	int apply;	// APPLY_
 	bitvector_t aff;
 	int spec;	// POTION_SPEC_
@@ -3874,6 +3888,26 @@ struct reboot_control_data {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// GENERIC STRUCTS /////////////////////////////////////////////////////////
+
+// generic data for currency, liquids, etc
+struct generic_data {
+	any_vnum vnum;
+	
+	char *name;	// for internal labeling
+	int type;
+	bitvector_t flags;	// GEN_ flags
+	
+	// data depends on type
+	int value[NUM_GENERIC_VALUES];
+	char *string[NUM_GENERIC_STRINGS];	// this can be expanded
+	
+	UT_hash_handle hh;	// generic_table hash
+	UT_hash_handle sorted_hh;	// sorted_generics hash
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// OBJECT STRUCTS //////////////////////////////////////////////////////////
 
 // used for binding objects to players
@@ -4121,7 +4155,7 @@ struct social_data {
 	char *name;	// for internal labeling
 	char *command;	// as seen/typed by the player
 	
-	bitvector_t flags;	// AUG_x flags
+	bitvector_t flags;	// SOC_ flags
 	int min_char_position;	// POS_ of the character
 	int min_victim_position;	// POS_ of victim
 	struct req_data *requirements;	// linked list of requirements
