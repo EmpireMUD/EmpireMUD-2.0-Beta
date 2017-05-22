@@ -106,6 +106,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	bitvector_t i = 0, type = 0;
 	struct affected_type af;
 	generic_data *gen;
+	bool all_off = FALSE;
 
 	half_chop(cmd, junk, cmd);
 	half_chop(cmd, charname, cmd);
@@ -122,37 +123,48 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	half_chop(cmd, value_p, duration_p);
 
 	/* make sure all parameters are present */
-	if (!*charname || !*property || !*value_p) {
+	if (!*charname || !*property) {
 		script_log("Trigger: %s, VNum %d. dg_affect usage: [#affect vnum] <target> <property> <value> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		return;
 	}
-	if (str_cmp(value_p, "off") && !*duration_p) {
-		script_log("Trigger: %s, VNum %d. dg_affect missing duration", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
-		return;
+	
+	if (!str_cmp(property, "off")) {
+		all_off = TRUE;
+		// this is good -- no mor args
 	}
-
-	value = atoi(value_p);
-	duration = atoi(duration_p);
-	if (duration == 0 || duration < -1) {
-		script_log("Trigger: %s, VNum %d. dg_affect: need positive duration!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
-		script_log("Line was: dg_affect %s %s %s %s (%d)", charname, property, value_p, duration_p, duration);
-		return;
-	}
-
-	/* find the property -- first search apply_types */
-	if ((i = search_block(property, apply_types, TRUE)) != NOTHING) {
-		type = APPLY_TYPE;
-	}
-
-	if (!type) { /* search affect_bits now */
-		if ((i = search_block(property, affected_bits, TRUE)) != NOTHING) {
-			type = AFFECT_TYPE;
+	else {
+		if (!*value_p) {
+			script_log("Trigger: %s, VNum %d. dg_affect usage: [#affect vnum] <target> <property> <value> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+			return;
 		}
-	}
+		else if (str_cmp(value_p, "off") && !*duration_p) {
+			script_log("Trigger: %s, VNum %d. dg_affect missing duration", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+			return;
+		}
 
-	if (!type) { /* property not found */
-		script_log("Trigger: %s, VNum %d. dg_affect: unknown property '%s'!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), property);
-		return;
+		value = atoi(value_p);
+		duration = atoi(duration_p);
+		if (duration == 0 || duration < -1) {
+			script_log("Trigger: %s, VNum %d. dg_affect: need positive duration!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+			script_log("Line was: dg_affect %s %s %s %s (%d)", charname, property, value_p, duration_p, duration);
+			return;
+		}
+
+		/* find the property -- first search apply_types */
+		if ((i = search_block(property, apply_types, TRUE)) != NOTHING) {
+			type = APPLY_TYPE;
+		}
+
+		if (!type) { /* search affect_bits now */
+			if ((i = search_block(property, affected_bits, TRUE)) != NOTHING) {
+				type = AFFECT_TYPE;
+			}
+		}
+
+		if (!type) { /* property not found */
+			script_log("Trigger: %s, VNum %d. dg_affect: unknown property '%s'!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), property);
+			return;
+		}
 	}
 
 	/* locate the target */
@@ -170,13 +182,20 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 		script_log("Trigger: %s, VNum %d. dg_affect: cannot use infinite duration on player target", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		return;
 	}
-
+	
+	// are we just removing the whole thing?
+	if (all_off) {
+		affect_from_char(ch, atype, TRUE);
+		return;
+	}
+	
+	// removing one type?
 	if (!str_cmp(value_p, "off")) {
 		if (type == APPLY_TYPE) {
-			affect_from_char_by_apply(ch, atype, i, FALSE);
+			affect_from_char_by_apply(ch, atype, i, TRUE);
 		}
 		else {
-			affect_from_char_by_bitvector(ch, atype, BIT(i), FALSE);
+			affect_from_char_by_bitvector(ch, atype, BIT(i), TRUE);
 		}
 		return;
 	}
@@ -213,6 +232,7 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 	int atype = ATYPE_DG_AFFECT;
 	struct affected_type af;
 	room_data *room = NULL;
+	bool all_off = FALSE;
 	generic_data *gen;
 	int duration = 0;
 
@@ -230,26 +250,37 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 	half_chop(cmd, value_p, duration_p);
 
 	/* make sure all parameters are present */
-	if (!*roomname || !*property || !*value_p || !*duration_p) {
+	if (!*roomname || !*property) {
 		script_log("Trigger: %s, VNum %d. dg_affect_room usage: [#affect vnum] <room> <property> <on|off> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		return;
 	}
 	
-	duration = atoi(duration_p);
-	if (duration == 0 || duration < -1) {
-		script_log("Trigger: %s, VNum %d. dg_affect_room: need positive duration!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
-		script_log("Line was: dg_affect_room %s %s %s %s (%d)", roomname, property, value_p, duration_p, duration);
-		return;
+	if (!str_cmp(property, "off")) {
+		all_off = TRUE;
+		// simple mode
 	}
+	else {
+		if (!*value_p || !*duration_p) {
+			script_log("Trigger: %s, VNum %d. dg_affect_room usage: [#affect vnum] <room> <property> <on|off> <duration>", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+			return;
+		}
+	
+		duration = atoi(duration_p);
+		if (duration == 0 || duration < -1) {
+			script_log("Trigger: %s, VNum %d. dg_affect_room: need positive duration!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+			script_log("Line was: dg_affect_room %s %s %s %s (%d)", roomname, property, value_p, duration_p, duration);
+			return;
+		}
 
-	// find the property -- search room_aff_bits
-	if ((i = search_block(property, room_aff_bits, TRUE)) != NOTHING) {
-		type = AFFECT_TYPE;
-	}
+		// find the property -- search room_aff_bits
+		if ((i = search_block(property, room_aff_bits, TRUE)) != NOTHING) {
+			type = AFFECT_TYPE;
+		}
 
-	if (!type) { // property not found
-		script_log("Trigger: %s, VNum %d. dg_affect_room: unknown property '%s'!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), property);
-		return;
+		if (!type) { // property not found
+			script_log("Trigger: %s, VNum %d. dg_affect_room: unknown property '%s'!", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), property);
+			return;
+		}
 	}
 
 	/* locate the target */
@@ -263,8 +294,13 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 		script_log("Trigger: %s, VNum %d. dg_affect_room: cannot use infinite duration on map tile target", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		return;
 	}
+	
+	if (all_off) {	// removing all matching types
+		affect_from_room(room, atype);
+		return;
+	}
 
-	if (!str_cmp(value_p, "off")) {
+	if (!str_cmp(value_p, "off")) {	// remove by bit
 		affect_from_room_by_bitvector(room, atype, BIT(i), FALSE);
 		return;
 	}
