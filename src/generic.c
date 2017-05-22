@@ -1114,7 +1114,7 @@ OLC_MODULE(genedit_build2char) {
 	if (GEN_TYPE(gen) != GENERIC_ACTION) {
 		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
 	}
-	else if (!str_cmp(arg, "none")) {
+	else if (!str_cmp(argument, "none")) {
 		if (GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR)) {
 			free(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR));
 		}
@@ -1133,7 +1133,7 @@ OLC_MODULE(genedit_build2room) {
 	if (GEN_TYPE(gen) != GENERIC_ACTION) {
 		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
 	}
-	else if (!str_cmp(arg, "none")) {
+	else if (!str_cmp(argument, "none")) {
 		if (GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM)) {
 			free(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM));
 		}
@@ -1152,7 +1152,7 @@ OLC_MODULE(genedit_craft2char) {
 	if (GEN_TYPE(gen) != GENERIC_ACTION) {
 		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
 	}
-	else if (!str_cmp(arg, "none")) {
+	else if (!str_cmp(argument, "none")) {
 		if (GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR)) {
 			free(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR));
 		}
@@ -1171,7 +1171,7 @@ OLC_MODULE(genedit_craft2room) {
 	if (GEN_TYPE(gen) != GENERIC_ACTION) {
 		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
 	}
-	else if (!str_cmp(arg, "none")) {
+	else if (!str_cmp(argument, "none")) {
 		if (GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM)) {
 			free(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM));
 		}
@@ -1190,7 +1190,7 @@ OLC_MODULE(genedit_repair2char) {
 	if (GEN_TYPE(gen) != GENERIC_ACTION) {
 		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
 	}
-	else if (!str_cmp(arg, "none")) {
+	else if (!str_cmp(argument, "none")) {
 		if (GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR)) {
 			free(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR));
 		}
@@ -1209,7 +1209,7 @@ OLC_MODULE(genedit_repair2room) {
 	if (GEN_TYPE(gen) != GENERIC_ACTION) {
 		msg_to_char(ch, "You can only change that on an ACTION generic.\r\n");
 	}
-	else if (!str_cmp(arg, "none")) {
+	else if (!str_cmp(argument, "none")) {
 		if (GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM)) {
 			free(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM));
 		}
@@ -1492,7 +1492,7 @@ OLC_MODULE(genedit_wearoff) {
 		}
 	}
 	
-	if (!str_cmp(arg, "none")) {
+	if (!str_cmp(argument, "none")) {
 		if (GEN_STRING(gen, pos)) {
 			free(GEN_STRING(gen, pos));
 		}
@@ -1520,7 +1520,7 @@ OLC_MODULE(genedit_wearoff2room) {
 		}
 	}
 	
-	if (!str_cmp(arg, "none")) {
+	if (!str_cmp(argument, "none")) {
 		if (GEN_STRING(gen, pos)) {
 			free(GEN_STRING(gen, pos));
 		}
