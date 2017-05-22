@@ -1653,7 +1653,7 @@ const char *ColourRGB(descriptor_t *apDescriptor, const char *apRGB, const char 
 		return ansiBackup;
 	}
 
-	if (pProtocol && pProtocol->pVariables[eMSDP_ANSI_COLORS]->ValueInt && (!apDescriptor->character || !PRF_FLAGGED(REAL_CHAR(apDescriptor->character), PRF_SCREEN_READER))) {
+	if (pProtocol && pProtocol->pVariables[eMSDP_ANSI_COLORS]->ValueInt) {
 		if (IsValidColour(apRGB)) {
 			bool_t bBackground = (tolower(apRGB[0]) == 'b');
 			int Red = apRGB[1] - '0';
