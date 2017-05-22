@@ -792,6 +792,12 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_POISON_TYPE(obj)  (IS_POISON(obj) ? GET_OBJ_VAL((obj), VAL_POISON_TYPE) : NOTHING)
 #define GET_POISON_CHARGES(obj)  (IS_POISON(obj) ? GET_OBJ_VAL((obj), VAL_POISON_CHARGES) : 0)
 
+// ITEM_RECIPE
+#define IS_RECIPE(obj)  (GET_OBJ_TYPE(obj) == ITEM_RECIPE)
+#define VAL_RECIPE_VNUM  0
+#define GET_RECIPE_VNUM(obj)  (IS_RECIPE(obj) ? GET_OBJ_VAL((obj), VAL_RECIPE_VNUM) : NOTHING)
+
+
 // ITEM_WEAPON
 #define IS_WEAPON(obj)  (GET_OBJ_TYPE(obj) == ITEM_WEAPON)
 #define VAL_WEAPON_DAMAGE_BONUS  1

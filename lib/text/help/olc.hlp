@@ -170,12 +170,10 @@ Crafts (CEDIT):
 - Soups are made using the COOK type and the SOUP flag. Instead of choosing an
   item to make, you choose a liquid, and the recipe will require a container
   of water to make the soup in.
-- To make a recipe item, build an item ("an old recipe") and set it in a
-  craft's requiresobject field. The player will only be able to see and use
-  the craft if they have the item in their inventory. You can still also choose
-  to require an Ability, for example an armor pattern that requires Armor-
-  smithing. You should mention the recipe by name in the item's look
-  description.
+- To make a recipe item, build an item ("an old recipe") of type RECIPE, and
+  set its recipe vnum to the craft. Your craft must have the LEARNED flag.
+  Players must still meet other requirements, such as requiresability, to make
+  the craft once they have learned it.
 - To make an item that can be combined with another item, for example a spear-
   head that can be crafted into a spear, create a craft and set its requires-
   object to the spearhead (just like a recipe item, above). Then, also set the
@@ -4080,6 +4078,15 @@ This sets how many arrows are available from a given ARROW object.
 
 See also: OLC OBJECTS
 #d
+"OEDIT RECIPE"
+
+Usage:  .recipe <craft vnum>
+
+This sets the craft recipe that a RECIPE item teaches. You must specify the
+vnum of a craft that has the LEARNED flag.
+
+See also: OLC OBJECTS, OLC CRAFTS, CEDIT FLAGS
+#d
 "OEDIT ROOMVNUM"
 
 Usage:  .roomvnum <vnum>
@@ -5799,6 +5806,12 @@ If you do set your potion as scalable, you only need to set the potionscale to
 1 and it will scale to the correct level.
 
 Potions can only be used once, and then are lost.
+#d
+"RECIPE ITEM" "RECIPE OBJECT"
+
+Recipes are single-use items that permanently teach a player a new craft. You
+must also create the craft entry, which must have the LEARNED flag. Only
+players who learn the recipe from an item can make that craft.
 #d
 "RESOURCE ACTIONS" "RESOURCE ACTION TYPES"
 

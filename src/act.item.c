@@ -249,6 +249,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *apply_type_names[];
 	extern const char *climate_types[];
+	extern const char *craft_types[];
 	extern const char *affected_bits[];
 	extern const char *apply_types[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
@@ -361,11 +362,17 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		msg_to_char(ch, "Affects: %s\r\n", buf);
 	}
 	
+	// ITEM_x: identify obj
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_POISON: {
 			extern const struct poison_data_type poison_data[];
 			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(obj)].name);
 			msg_to_char(ch, "Has %d charges remaining.\r\n", GET_POISON_CHARGES(obj));
+			break;
+		}
+		case ITEM_RECIPE: {
+			craft_data *cft = craft_proto(GET_RECIPE_VNUM(obj));
+			msg_to_char(ch, "Teaches craft: %s (%s)\r\n", cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?");
 			break;
 		}
 		case ITEM_WEAPON:

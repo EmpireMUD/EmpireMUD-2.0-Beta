@@ -243,6 +243,17 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			}
 			break;
 		}
+		case ITEM_RECIPE: {
+			craft_data *craft = craft_proto(GET_RECIPE_VNUM(obj));
+			if (GET_RECIPE_VNUM(obj) <= 0 || !craft) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Invalid recipe vnum");
+				problem = TRUE;
+			}
+			if (craft && !CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Recipe is not set LEARNED");
+				problem = TRUE;
+			}
+		}
 		case ITEM_BOOK: {
 			if (!book_proto(GET_BOOK_ID(obj))) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Book type invalid");
@@ -1756,6 +1767,11 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			sprintf(storage + strlen(storage), "<&ycharges&0> %d\r\n", GET_POISON_CHARGES(obj));
 			break;
 		}
+		case ITEM_RECIPE: {
+			craft_data *cft = craft_proto(GET_RECIPE_VNUM(obj));
+			sprintf(storage + strlen(storage), "<&yrecipe&0> %d %s\r\n", GET_RECIPE_VNUM(obj), cft ? GET_CRAFT_NAME(cft) : "none");
+			break;
+		}
 		case ITEM_ARMOR: {
 			sprintf(storage + strlen(storage), "<&yarmortype&0> %s\r\n", armor_types[GET_ARMOR_TYPE(obj)]);
 			break;
@@ -2699,6 +2715,24 @@ OLC_MODULE(oedit_quantity) {
 	}
 	else {
 		GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY) = olc_process_number(ch, argument, "quantity", "quantity", 0, 100, GET_OBJ_VAL(obj, VAL_ARROW_QUANTITY));
+	}
+}
+
+
+OLC_MODULE(oedit_recipe) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	any_vnum old = GET_RECIPE_VNUM(obj);
+	craft_data *cft;
+	
+	if (!IS_RECIPE(obj)) {
+		msg_to_char(ch, "You can only set that on a recipe object.\r\n");
+	}
+	else {
+		GET_OBJ_VAL(obj, VAL_RECIPE_VNUM) = olc_process_number(ch, argument, "recipe vnum", "recipe", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_RECIPE_VNUM));
+		if (GET_RECIPE_VNUM(obj) != old && (!(cft = craft_proto(GET_RECIPE_VNUM(obj))) || !CRAFT_FLAGGED(cft, CRAFT_LEARNED))) {
+			msg_to_char(ch, "%d is not a learned recipe. Old value restored.\r\n", GET_RECIPE_VNUM(obj));
+			GET_OBJ_VAL(obj, VAL_RECIPE_VNUM) = old;
+		}
 	}
 }
 

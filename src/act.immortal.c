@@ -46,6 +46,7 @@ extern const char *bonus_bits[];
 extern const char *climate_types[];
 extern const char *component_flags[];
 extern const char *component_types[];
+extern const char *craft_types[];
 extern const char *dirs[];
 extern const char *extra_bits[];
 extern const char *function_flags[];
@@ -3593,7 +3594,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 void do_stat_craft(char_data *ch, craft_data *craft) {
 	extern const char *craft_flags[];
-	extern const char *craft_types[];
 	
 	ability_data *abil;
 	bld_data *bld;
@@ -3845,7 +3845,8 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		}
 		msg_to_char(ch, "\r\n");
 	}
-
+	
+	// ITEM_X: stat obj
 	switch (GET_OBJ_TYPE(j)) {
 		case ITEM_BOOK: {
 			book_data *book = book_proto(GET_BOOK_ID(j));
@@ -3855,6 +3856,11 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		case ITEM_POISON: {
 			msg_to_char(ch, "Poison type: %s\r\n", poison_data[GET_POISON_TYPE(j)].name);
 			msg_to_char(ch, "Charges remaining: %d\r\n", GET_POISON_CHARGES(j));
+			break;
+		}
+		case ITEM_RECIPE: {
+			craft_data *cft = craft_proto(GET_RECIPE_VNUM(j));
+			msg_to_char(ch, "Teaches craft: %d %s (%s)\r\n", GET_RECIPE_VNUM(j), cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?");
 			break;
 		}
 		case ITEM_WEAPON:

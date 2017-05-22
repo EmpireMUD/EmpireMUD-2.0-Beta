@@ -296,6 +296,7 @@ OLC_MODULE(oedit_poison);
 OLC_MODULE(oedit_potion);
 OLC_MODULE(oedit_potionscale);
 OLC_MODULE(oedit_quantity);
+OLC_MODULE(oedit_recipe);
 OLC_MODULE(oedit_requiresquest);
 OLC_MODULE(oedit_roomvnum);
 OLC_MODULE(oedit_script);
@@ -759,6 +760,7 @@ const struct olc_command_data olc_data[] = {
 	{ "potion", oedit_potion, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "potionscale", oedit_potionscale, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "quantity", oedit_quantity, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "recipe", oedit_recipe, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "requiresquest", oedit_requiresquest, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "roomvnum", oedit_roomvnum, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "script", oedit_script, OLC_OBJECT, OLC_CF_EDITOR },
