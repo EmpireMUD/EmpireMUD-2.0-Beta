@@ -5173,6 +5173,8 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 		{ "||", "\n" }	// each list must end with "\n"
 	};
 	
+	const char *opsymbols = "!/*+-<>=~&|";
+	
 	log("Debug: starting: %s", expr);
 
 	p = strcpy(line, expr);
@@ -5187,8 +5189,8 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 			p = matching_paren(p) + 1;
 		else if (*p == '"')
 			p = matching_quote(p) + 1;
-		else if (isalnum(*p))
-			for (p++; *p && (isalnum(*p) || isspace(*p)); p++);
+		else if (isalnum(*p) || strchr(opsymbols, *p))
+			for (p++; *p && (isalnum(*p) || isspace(*p) || strchr(opsymbols, *p)); p++);
 		else
 			p++;
 	}
