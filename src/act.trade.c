@@ -41,6 +41,7 @@ extern struct gen_craft_data_t gen_craft_data[];
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
 extern bool has_cooking_fire(char_data *ch);
+extern bool has_learned_craft(char_data *ch, any_vnum vnum);
 extern obj_data *has_sharp_tool(char_data *ch);
 void scale_item_to_level(obj_data *obj, int level);
 extern bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug, bool send_messages);
@@ -232,6 +233,9 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 		}
 		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(craft), ch->carrying)) {
 			continue;
+		}
+		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
+			continue;	// not learned
 		}
 		
 		if (!str_cmp(argument, GET_CRAFT_NAME(craft))) {
@@ -1377,24 +1381,31 @@ ACMD(do_gen_craft) {
 	// if there was an arg, find a matching craft_table entry (type)
 	if (*arg) {
 		HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
-			if (GET_CRAFT_TYPE(craft) == subcmd) {
-				if (!IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) || IS_IMMORTAL(ch)) {
-					if (GET_CRAFT_ABILITY(craft) == NO_ABIL || has_ability(ch, GET_CRAFT_ABILITY(craft))) {
-						if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING || get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(craft), ch->carrying)) {
-							// match so far...
-							
-							if (!str_cmp(arg, GET_CRAFT_NAME(craft))) {
-								// exact match!
-								type = craft;
-								break;
-							}
-							else if (!abbrev_match && is_abbrev(arg, GET_CRAFT_NAME(craft))) {
-								// found! maybe
-								abbrev_match = craft;
-							}
-						}
-					}
-				}
+			if (GET_CRAFT_TYPE(craft) != subcmd) {
+				continue;	// wrong craft type
+			}	
+			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+				continue;	// in-dev
+			}
+			if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+				continue;	// missing ability
+			}
+			if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(craft), ch->carrying)) {
+				continue;	// missing requiresobj
+			}
+			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
+				continue;	// not learned
+			}
+			
+			// match so far...
+			if (!str_cmp(arg, GET_CRAFT_NAME(craft))) {
+				// exact match!
+				type = craft;
+				break;
+			}
+			else if (!abbrev_match && is_abbrev(arg, GET_CRAFT_NAME(craft))) {
+				// found! maybe
+				abbrev_match = craft;
 			}
 		}
 		
@@ -1424,18 +1435,31 @@ ACMD(do_gen_craft) {
 		*buf = '\0';
 		
 		HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
-			if (GET_CRAFT_TYPE(craft) == subcmd && (!IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) || IS_IMMORTAL(ch)) && (GET_CRAFT_ABILITY(craft) == NO_ABIL || has_ability(ch, GET_CRAFT_ABILITY(craft)))) {
-				if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING || get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(craft), ch->carrying)) {
-					if (strlen(buf) + strlen(GET_CRAFT_NAME(craft)) + 2 >= 80) {
-						this_line = FALSE;
-						msg_to_char(ch, "%s\r\n", buf);
-						*buf = '\0';
-					}
-					sprintf(buf + strlen(buf), "%s%s", (this_line ? ", " : " "), GET_CRAFT_NAME(craft));
-					this_line = TRUE;
-					found = TRUE;
-				}
+			if (GET_CRAFT_TYPE(craft) != subcmd) {
+				continue;	// wrong craft type
 			}
+			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+				continue;	// in-dev
+			}
+			if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+				continue;	// no abil
+			}
+			if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(craft), ch->carrying)) {
+				continue;	// missing obj
+			}
+			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
+				continue;	// not learned
+			}
+			
+			// valid:
+			if (strlen(buf) + strlen(GET_CRAFT_NAME(craft)) + 2 >= 80) {
+				this_line = FALSE;
+				msg_to_char(ch, "%s\r\n", buf);
+				*buf = '\0';
+			}
+			sprintf(buf + strlen(buf), "%s%s", (this_line ? ", " : " "), GET_CRAFT_NAME(craft));
+			this_line = TRUE;
+			found = TRUE;
 		}
 		if (!found) {
 			msg_to_char(ch, " nothing\r\n");
@@ -1455,6 +1479,9 @@ ACMD(do_gen_craft) {
 	}
 	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && !(found_obj = get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(type), ch->carrying))) {
 		msg_to_char(ch, "You need %s to make that.\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(type)));
+	}
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(type))) {
+		msg_to_char(ch, "You have not learned that recipe.\r\n");
 	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to %s anything.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);

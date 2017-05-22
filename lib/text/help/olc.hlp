@@ -1688,6 +1688,7 @@ Available flags:
  VEHICLE - creates a vehicle instead of an item, see CRAFT VEHICLES
  SHIPYARD - requires being at a shipyard
  BLD-UPGRADED - requires being at a building with the UPGRADED flag
+ LEARNED - requires the player 'learn' a recipe to use it
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d
@@ -4167,7 +4168,7 @@ Available types:
  CONTAINER - a chest, holds items on the ground (never set wear TAKE)
  DRINKCON - a drink container, like a flask
  FOOD - edible
- * - unused
+ RECIPE - can be 'learned' to give a craft
  PORTAL - transports a player to another place (never set .wear TAKE)
  *BOARD - a message board
  CORPSE - a corpse

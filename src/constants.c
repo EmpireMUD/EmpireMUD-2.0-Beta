@@ -1317,6 +1317,7 @@ const char *craft_flags[] = {
 	"VEHICLE",
 	"SHIPYARD",
 	"BLD-UPGRADED",
+	"LEARNED",
 	"\n"
 };
 
@@ -1339,6 +1340,7 @@ const char *craft_flag_for_info[] = {
 	"",	// vehicle
 	"requires shipyard",
 	"requires upgrade",
+	"",	// learned
 	"\n"
 };
 
@@ -1748,7 +1750,7 @@ const char *item_types[] = {
 	"CONTAINER",
 	"DRINKCON",
 	"FOOD",
-	"*",
+	"RECIPE",
 	"PORTAL",
 	"*BOARD",
 	"CORPSE",

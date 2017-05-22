@@ -793,6 +793,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_VEHICLE  BIT(13)	// creates a vehicle instead of an object
 #define CRAFT_SHIPYARD  BIT(14)	// requires a shipyard
 #define CRAFT_BLD_UPGRADED  BIT(15)	// requires a building with the upgraded flag
+#define CRAFT_LEARNED  BIT(16)	// cannot use unless learned
 
 // list of above craft flags that require a building in some way
 #define CRAFT_FLAGS_REQUIRING_BUILDINGS  (CRAFT_GLASSBLOWER | CRAFT_CARPENTER | CRAFT_ALCHEMY | CRAFT_SHIPYARD)
@@ -1263,7 +1264,7 @@ typedef struct vehicle_data vehicle_data;
 #define CORPSE_SKINNED  BIT(1)	// The corpse has been skinned
 #define CORPSE_HUMAN  BIT(2)	// a person
 
-// Item types
+// ITEM_x: Item types
 #define ITEM_UNDEFINED  0
 #define ITEM_WEAPON  1	// item is a weapon
 #define ITEM_WORN  2	// wearable equipment
@@ -1271,7 +1272,7 @@ typedef struct vehicle_data vehicle_data;
 #define ITEM_CONTAINER  4	// item is a container
 #define ITEM_DRINKCON  5	// item is a drink container
 #define ITEM_FOOD  6	// item is food
-	#define ITEM_UNUSED1  7
+#define ITEM_RECIPE  7	// can be learned for a craft
 #define ITEM_PORTAL  8  // a portal
 #define ITEM_BOARD  9	// message board
 #define ITEM_CORPSE  10	// a corpse, pc or npc
@@ -1338,7 +1339,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_MATERIALS  16	// Total number of matierals
 
 
-// Extra object flags -- OBJ_FLAGGED(obj, f)
+// OBJ_x: Extra object flags -- OBJ_FLAGGED(obj, f)
 #define OBJ_UNIQUE  BIT(0)	// a. can only use 1 at a time
 #define OBJ_PLANTABLE  BIT(1)	// b. Uses val 2 to set a crop type
 #define OBJ_LIGHT  BIT(2)	// c. Lights until timer pops
@@ -3063,6 +3064,13 @@ struct mount_data {
 };
 
 
+// for permanently learning crafts
+struct player_craft_data {
+	any_vnum vnum;	// vnum of the learned craft
+	UT_hash_handle hh;	// player's learned_crafts hash
+};
+
+
 // used in player_special_data
 struct player_ability_data {
 	any_vnum vnum;	// ABIL_ or ability vnum
@@ -3210,6 +3218,7 @@ struct player_special_data {
 	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to CLASS_SKILL_CAP
 	ubyte class_role;	// ROLE_ chosen by the player
 	class_data *character_class;  // character's class as determined by top skills
+	struct player_craft_data *learned_crafts;	// crafts learned from patterns
 	
 	// tracking for specific skills
 	byte confused_dir;  // people without Navigation think this dir is north
