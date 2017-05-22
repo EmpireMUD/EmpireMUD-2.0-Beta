@@ -9,9 +9,9 @@ little goblin could wield this massive axe. It's a bit awkward even for you.
 0 1 2
 2 0
 A
-2 -1
+2 -1 0
 A
-9 -1
+9 -1 0
 S
 #18101
 brew goblin lumberjack vial~
@@ -35,7 +35,7 @@ goblin sandals seems to be falling apart before your eyes.
 0 0 0
 7 0
 A
-6 1
+6 1 0
 S
 #18103
 cap wooden crude~
@@ -48,7 +48,7 @@ Natural selection eventually developed these thick wooden caps.
 0 0 0
 0 0
 A
-1 1
+1 1 0
 S
 #18104
 pauldrons lumberjack goblin~
@@ -60,7 +60,7 @@ These wooden shoulder plates will deflect up to at least 50% of falling trees!
 0 0 0
 0 0
 A
-15 1
+15 1 0
 S
 #18105
 leggings lumberjack goblin~
@@ -73,7 +73,7 @@ a warg. Or maybe a rat. It's hard to tell.
 0 0 0
 7 0
 A
-11 1
+11 1 0
 S
 #18106
 goblins retreating~
@@ -81,7 +81,7 @@ the retreating goblins~
 The goblins are retreating!~
 This item tracks the time left before the camp disappears.
 ~
-3 0 0 2
+3 0 0 6
 0 0 0
 0 6
 T 18106

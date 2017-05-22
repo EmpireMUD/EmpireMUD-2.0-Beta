@@ -214,6 +214,10 @@ end
 Detect swim~
 0 c 0
 swim~
+if !%self.varexists(running)%
+  set running 0
+  remote running %self.id%
+end
 if !%self.running%
   %send% %actor% There's nothing to swim in right now.
   return 1
