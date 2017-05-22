@@ -54,6 +54,7 @@ void update_class(char_data *ch);
 
 // local protos
 void add_learned_craft(char_data *ch, any_vnum vnum);
+void check_learned_crafts(char_data *ch);
 void clear_player(char_data *ch);
 void delete_player_character(char_data *ch);
 static bool member_is_timed_out(time_t created, time_t last_login, double played_hours);
@@ -3453,8 +3454,9 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
 	update_player_index(index, ch);
 	
-	// ensure quests are up-to-date
+	// ensure data is up-to-date
 	refresh_all_quests(ch);
+	check_learned_crafts(ch);
 	
 	// break last reply if invis
 	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {
@@ -3948,6 +3950,29 @@ void add_learned_craft(char_data *ch, any_vnum vnum) {
 		CREATE(pcd, struct player_craft_data, 1);
 		pcd->vnum = vnum;
 		HASH_ADD_INT(GET_LEARNED_CRAFTS(ch), vnum, pcd);
+	}
+}
+
+
+/**
+* Checks that all a player's learned crafts are valid.
+*
+* @param char_data *ch The player to check.
+*/
+void check_learned_crafts(char_data *ch) {
+	void remove_learned_craft(char_data *ch, any_vnum vnum);
+	
+	struct player_craft_data *pcd, *next_pcd;
+	craft_data *craft;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+
+	HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
+		if (!(craft = craft_proto(pcd->vnum)) || !CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
+			remove_learned_craft(ch, pcd->vnum);
+		}
 	}
 }
 
