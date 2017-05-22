@@ -582,8 +582,10 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_COOLDOWN_WEAR_OFF(gen)  (GEN_TYPE(gen) == GENERIC_COOLDOWN ? GEN_STRING((gen), GSTR_COOLDOWN_WEAR_OFF) : NULL)
 
 // GENERIC_AFFECT
-#define GSTR_AFFECT_WEAR_OFF  0
-#define GET_AFFECT_WEAR_OFF(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF) : NULL)
+#define GSTR_AFFECT_WEAR_OFF_TO_CHAR  0
+#define GSTR_AFFECT_WEAR_OFF_TO_ROOM  1
+#define GET_AFFECT_WEAR_OFF_TO_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF_TO_CHAR) : NULL)
+#define GET_AFFECT_WEAR_OFF_TO_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF_TO_ROOM) : NULL)
 
 
  //////////////////////////////////////////////////////////////////////////////

@@ -2270,7 +2270,22 @@ usually be added within an adventure zone's vnums.
 
 See also: OLC GENERICS, DOLLAR SIGN CODES
 #d
-"GENERIC COOLDOWN" "COOLDOWN EDITOR" "COOLDOWN GENERICS" "GENEDIT WEAROFF" "GENEDIT STANDARDWEAROFF"
+"GENERIC AFFECTS" "AFFECTS EDITOR" "AFFECT EDITOR" "AFFECT GENERICS"
+
+Generic 'affects' are used by spells, abilities, and scripts to show names on
+the affect list, and to show messages when these effects wear off.
+
+Affects have 2 properties:
+  <&ywearoff&0> An optional message shown to the character.
+  <&ywearoff2room&0> An optional message shown to the rest of the room.
+
+You can use <&ystandardwearoff&0> to add the normal wear-off message. This only
+adds a message for the character -- normal effects don't show anything to the
+room when they end.
+
+See also: AFFECTS, OLC GENERICS
+#d
+"GENERIC COOLDOWN" "COOLDOWN EDITOR" "COOLDOWN GENERICS"
 
 Generic 'cooldowns' are used to track time limits on players' abilities, as
 well as in scripts.
@@ -2282,7 +2297,7 @@ You can use <&ystandardwearoff&0> to add the normal wear-off message.
 
 You can also create quick cooldowns with: .gen quickcooldown <type> <vnum>
 
-See also: GENEDIT QUICKCOOLDOWN
+See also: GENEDIT QUICKCOOLDOWN, OLC GENERICS
 #d
 "GENERIC LIQUIDS" "LIQUID GENERICS" "LIQUID EDITOR" "GENEDIT LIQUID" "GENEDIT COLOR" "GENEDIT HUNGER" "GENEDIT THIRST" "GENEDIT DRUNK"
 
@@ -2331,6 +2346,15 @@ cooldown named "puppy whistle" and with the standard wear-off message.
 
 See also: OLC GENERICS
 #d
+"GENEDIT STANDARDWEAROFF"
+
+Usage:  .standardwearoff
+
+This sets the 'wearoff' property to a standard message based on the name of
+the generic.
+
+See also: OLC GENERICS, GENERIC AFFECTS, GENERIC COOLDOWNS, GENEDIT WEAROFF
+#d
 "GENEDIT TYPE"
 
 Usage:  .type <type>
@@ -2341,6 +2365,26 @@ for each type:
  LIQUID - Drinkables for use in items (GENERIC LIQUIDS)
 
 See also: OLC GENERICS
+#d
+"GENEDIT WEAROFF"
+
+Usage:  .wearoff <message | none>
+
+The wearoff message is sent to the player when the cooldown/affect ends. This
+message is optional.
+
+See also: OLC GENERICS, GENERIC AFFECTS, GENERIC COOLDOWNS,
+GENEDIT STANDARDWEAROFF
+#d
+"GENEDIT WEAROFF2ROOM"
+
+Usage:  .wearoff2room <message | none>
+
+The wearoff message is sent to the rest of the room when a player's affect
+ends. It will only be shown to players who can see that person. This message
+is optional.
+
+See also: OLC GENERICS, GENERIC AFFECTS
 #d
 "GEDIT FLAGS"
 

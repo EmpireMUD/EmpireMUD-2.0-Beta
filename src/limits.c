@@ -1760,8 +1760,8 @@ void point_update_room(room_data *room) {
 		else if (af->duration != UNLIMITED) {
 			if ((af->type > 0)) {
 				if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
-					if ((gen = find_generic_by_vnum(af->type)) && GET_AFFECT_WEAR_OFF(gen) && ROOM_PEOPLE(room)) {
-						act(GET_AFFECT_WEAR_OFF(gen), FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
+					if ((gen = find_generic_by_vnum(af->type)) && GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ROOM_PEOPLE(room)) {
+						act(GET_AFFECT_WEAR_OFF_TO_CHAR(gen), FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
 					}
 				}
 			}

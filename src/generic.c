@@ -932,7 +932,8 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 			break;
 		}
 		case GENERIC_AFFECT: {
-			size += snprintf(buf + size, sizeof(buf) - size, "Wear-off: %s\r\n", GET_AFFECT_WEAR_OFF(gen) ? GET_AFFECT_WEAR_OFF(gen) : "(none)");
+			size += snprintf(buf + size, sizeof(buf) - size, "Wear-off: %s\r\n", GET_AFFECT_WEAR_OFF_TO_CHAR(gen) ? GET_AFFECT_WEAR_OFF_TO_CHAR(gen) : "(none)");
+			size += snprintf(buf + size, sizeof(buf) - size, "Wear-off to room: %s\r\n", GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
 			break;
 		}
 	}
@@ -989,8 +990,9 @@ void olc_show_generic(char_data *ch) {
 			break;
 		}
 		case GENERIC_AFFECT: {
-			sprintf(buf + strlen(buf), "<\tywearoff\t0> %s\r\n", GET_AFFECT_WEAR_OFF(gen) ? GET_AFFECT_WEAR_OFF(gen) : "(none)");
+			sprintf(buf + strlen(buf), "<\tywearoff\t0> %s\r\n", GET_AFFECT_WEAR_OFF_TO_CHAR(gen) ? GET_AFFECT_WEAR_OFF_TO_CHAR(gen) : "(none)");
 			sprintf(buf + strlen(buf), "<\tystandardwearoff\t0> (to add a basic wear-off message based on the name)\r\n");
+			sprintf(buf + strlen(buf), "<\tywearoff2room\t0> %s\r\n", GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
 			break;
 		}
 	}
@@ -1401,7 +1403,7 @@ OLC_MODULE(genedit_standardwearoff) {
 		}
 		case GENERIC_AFFECT: {
 			snprintf(buf, sizeof(buf), "Your %s wears off.", GEN_NAME(gen));
-			pos = GSTR_AFFECT_WEAR_OFF;
+			pos = GSTR_AFFECT_WEAR_OFF_TO_CHAR;
 			break;
 		}
 		default: {
@@ -1434,7 +1436,7 @@ OLC_MODULE(genedit_wearoff) {
 			break;
 		}
 		case GENERIC_AFFECT: {
-			pos = GSTR_AFFECT_WEAR_OFF;
+			pos = GSTR_AFFECT_WEAR_OFF_TO_CHAR;
 			break;
 		}
 		default: {
@@ -1452,6 +1454,34 @@ OLC_MODULE(genedit_wearoff) {
 	}
 	else {
 		olc_process_string(ch, argument, "wearoff", &GEN_STRING(gen, pos));
+	}
+}
+
+
+OLC_MODULE(genedit_wearoff2room) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	int pos = 0;
+	
+	switch (GEN_TYPE(gen)) {
+		case GENERIC_AFFECT: {
+			pos = GSTR_AFFECT_WEAR_OFF_TO_ROOM;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can only change that on an AFFECT generic.\r\n");
+			return;
+		}
+	}
+	
+	if (!str_cmp(arg, "none")) {
+		if (GEN_STRING(gen, pos)) {
+			free(GEN_STRING(gen, pos));
+		}
+		GEN_STRING(gen, pos) = NULL;
+		msg_to_char(ch, "Wear-off-to-room messsage removed.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "wearoff2room", &GEN_STRING(gen, pos));
 	}
 }
 

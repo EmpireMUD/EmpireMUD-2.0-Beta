@@ -256,8 +256,8 @@ void affect_from_room_by_bitvector(room_data *room, any_vnum type, bitvector_t b
 	LL_FOREACH_SAFE(ROOM_AFFECTS(room), aff, next_aff) {
 		if (aff->type == type && IS_SET(aff->bitvector, bits)) {
 			if (show_msg && !shown && (gen = find_generic_by_vnum(aff->type))) {
-				if (GET_AFFECT_WEAR_OFF(gen) && ROOM_PEOPLE(room)) {
-					act(GET_AFFECT_WEAR_OFF(gen), FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+				if (GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ROOM_PEOPLE(room)) {
+					act(GET_AFFECT_WEAR_OFF_TO_CHAR(gen), FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 				}
 				shown = TRUE;
 			}
@@ -884,8 +884,11 @@ bool room_affected_by_spell(room_data *room, any_vnum type) {
 */
 void show_wear_off_msg(char_data *ch, any_vnum atype) {
 	generic_data *gen = find_generic_by_vnum(atype);
-	if (gen && GET_AFFECT_WEAR_OFF(gen) && ch->desc) {
-		msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_AFFECT_WEAR_OFF(gen));
+	if (gen && GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ch->desc) {
+		msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_AFFECT_WEAR_OFF_TO_CHAR(gen));
+	}
+	if (gen && GET_AFFECT_WEAR_OFF_TO_ROOM(gen)) {
+		act(GET_AFFECT_WEAR_OFF_TO_ROOM(gen), TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 
