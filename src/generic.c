@@ -136,6 +136,53 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	// GENERIC_x: auditing by type
+	switch (GEN_TYPE(gen)) {
+		case GENERIC_LIQUID: {
+			if (!GET_LIQUID_NAME(gen)) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "Liquid not set");
+				problem = TRUE;
+			}
+			if (GET_LIQUID_COLOR(gen)) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "Color not set");
+				problem = TRUE;
+			}
+			break;
+		}
+		case GENERIC_ACTION: {
+			if (!GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR)) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "Build-to-char not set");
+				problem = TRUE;
+			}
+			if (!GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM)) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "Build-to-room not set");
+				problem = TRUE;
+			}
+			if (!GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR)) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "Craft-to-char not set");
+				problem = TRUE;
+			}
+			if (!GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM)) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "Craft-to-room not set");
+				problem = TRUE;
+			}
+			if (!GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR)) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "Repair-to-char not set");
+				problem = TRUE;
+			}
+			if (!GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM)) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "Repair-to-room not set");
+				problem = TRUE;
+			}
+			break;
+		}
+		case GENERIC_AFFECT:
+		case GENERIC_COOLDOWN: {
+			// everything here is optional
+			break;
+		}
+	}
+	
 	return problem;
 }
 
