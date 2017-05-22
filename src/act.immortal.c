@@ -1164,6 +1164,7 @@ struct set_struct {
 		{ "grants",		LVL_CIMPL,	PC,		MISC },
 		{ "skill", LVL_START_IMM, PC, MISC },
 		{ "faction", LVL_START_IMM, PC, MISC },
+		{ "learned", LVL_START_IMM, PC, MISC },
 
 		{ "strength",	LVL_START_IMM,	BOTH,	NUMBER },
 		{ "dexterity",	LVL_START_IMM,	BOTH,	NUMBER },
@@ -1670,6 +1671,36 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		update_class(vict);
 		check_ability_levels(vict, SKILL_VNUM(skill));
 		sprintf(output, "%s's %s set to %d.", GET_NAME(vict), SKILL_NAME(skill), level);
+	}
+	else if SET_CASE("learned") {
+		void add_learned_craft(char_data *ch, any_vnum vnum);
+		void remove_learned_craft(char_data *ch, any_vnum vnum);
+		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
+		craft_data *cft;
+		
+		half_chop(val_arg, vnum_arg, onoff_arg);
+		
+		if (!*vnum_arg || !isdigit(*vnum_arg) || !*onoff_arg) {
+			msg_to_char(ch, "Usage: set <name> learned <craft vnum> <on | off>\r\n");
+			return 0;
+		}
+		if (!(cft = craft_proto(atoi(vnum_arg))) || !CRAFT_FLAGGED(cft, CRAFT_LEARNED) || CRAFT_FLAGGED(cft, CRAFT_IN_DEVELOPMENT)) {
+			msg_to_char(ch, "Invalid craft (must be LEARNED and not IN-DEV).\r\n");
+			return 0;
+		}
+		
+		if (!str_cmp(onoff_arg, "on")) {
+			add_learned_craft(ch, GET_CRAFT_VNUM(cft));
+			sprintf(output, "%s learned craft %d %s.", GET_NAME(vict), GET_CRAFT_VNUM(cft), GET_CRAFT_NAME(cft));
+		}
+		else if (!str_cmp(onoff_arg, "off")) {
+			remove_learned_craft(ch, GET_CRAFT_VNUM(cft));
+			sprintf(output, "%s un-learned craft %d %s.", GET_NAME(vict), GET_CRAFT_VNUM(cft), GET_CRAFT_NAME(cft));
+		}
+		else {
+			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
+			return 0;
+		}
 	}
 
 	else if SET_CASE("account") {

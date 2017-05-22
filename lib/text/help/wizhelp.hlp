@@ -760,6 +760,7 @@ faction        PC      MISC         Change faction reputations (SET FACTION)
 grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
 lastname       PC      STRING       Player's last name, or off
+learned        PC      MISC         Turns learned recipes on/off
 level          PC      NUMBER       Player's immortal level
 loadroom       PC      MISC         Player always starts here
 name           PC      STRING       Change a player's name
@@ -814,6 +815,15 @@ level (e.g. "Revered") or specific point value.
 You can delete a reputation entirely by setting it to 'none'.
 
 See also: FACTION, SHOW FACTIONS
+#d
+"SET LEARNED"
+
+Usage:  set [file] <player> learned <craft vnum> <on | off>
+
+This lets you give (or revoke) learned crafts. The craft must have the
+LEARNED flag.
+
+See also: LEARN, LEARNED
 #d
 SHOW
 
