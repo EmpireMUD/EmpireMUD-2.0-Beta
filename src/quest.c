@@ -2911,6 +2911,9 @@ void load_daily_quest_file(void) {
 		if (QUEST_FLAGGED(qst, QST_DAILY) && QUEST_DAILY_CYCLE(qst) != NOTHING) {
 			QUEST_DAILY_ACTIVE(qst) = FALSE;
 		}
+		else {
+			QUEST_DAILY_ACTIVE(qst) = TRUE;
+		}
 	}
 	
 	while (get_line(fl, line)) {
