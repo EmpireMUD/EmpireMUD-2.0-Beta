@@ -268,8 +268,6 @@ S
 affect~
 4 0
 0 0 0 0
-T0
-none~
 S
 #3040
 claws~
@@ -427,8 +425,6 @@ S
 morph~
 4 0
 0 0 0 0
-T0
-none~
 S
 #3063
 whisperstride~
@@ -462,8 +458,6 @@ S
 astralclaw~
 4 0
 0 0 0 0
-T0
-none~
 S
 #3068
 chronoblast~
@@ -483,15 +477,11 @@ S
 erode~
 4 0
 0 0 0 0
-T0
-none~
 S
 #3071
 scour~
 4 0
 0 0 0 0
-T0
-none~
 S
 #3072
 shadowlash~
@@ -504,8 +494,6 @@ S
 shadowlash~
 4 0
 0 0 0 0
-T0
-none~
 S
 #3074
 soulchain~
@@ -518,8 +506,6 @@ S
 thornlash~
 4 0
 0 0 0 0
-T0
-none~
 S
 #3076
 arrow to the knee~
