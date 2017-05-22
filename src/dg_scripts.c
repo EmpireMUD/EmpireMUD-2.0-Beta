@@ -4999,8 +4999,6 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, void *go, struct scri
 	for (--p; isspace(*p) && (p > lhs); *p-- = '\0');
 	for (p = rhs; *p; p++);
 	for (--p; isspace(*p) && (p > rhs); *p-- = '\0');  
-	
-	log("Debug: op='%s', lhs='%s', rhs='%s'", op, lhs, rhs);
 
 	/* find the op, and figure out the value */
 	if (!strcmp("||", op)) {
@@ -5173,10 +5171,9 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 		{ "||", "\n" }	// each list must end with "\n"
 	};
 	
+	// symbols used in operators
 	const char *opsymbols = "!/*+-<>=~&|";
 	
-	log("Debug: starting: %s", expr);
-
 	p = strcpy(line, expr);
 
 	/*
@@ -5209,7 +5206,6 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 			found = NULL;
 			for (i = 0; !found && *ops[oplist][i] != '\n'; ++i) {
 				if (!strn_cmp(ops[oplist][i], tokens[j], strlen(ops[oplist][i]))) {
-					log("Matched token '%s' to '%s'", tokens[j], ops[oplist][i]);
 					found = ops[oplist][i];
 					// -> need to find the LAST token that's in THIS list
 				}
