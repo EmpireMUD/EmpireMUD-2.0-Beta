@@ -2596,6 +2596,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					
+					else if (!str_cmp(field, "add_learned")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							void add_learned_craft(char_data *ch, any_vnum vnum);
+							craft_data *cft = craft_proto(atoi(subfield));
+							if (cft && CRAFT_FLAGGED(cft, CRAFT_LEARNED) && !CRAFT_FLAGGED(cft, CRAFT_IN_DEVELOPMENT)) {
+								add_learned_craft(c, GET_CRAFT_VNUM(cft));
+							}
+							else {
+								script_log("Trigger: %s, VNum %d, attempting to add invalid learned craft: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+							}
+						}
+						
+						strcpy(str, "0");
+					}
+					
 					else if (!str_cmp(field, "add_mob_flag")) {
 						if (subfield && *subfield && IS_NPC(c)) {
 							bitvector_t pos = search_block(subfield, action_bits, FALSE);
@@ -3250,6 +3265,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "lastname")) {
 						snprintf(str, slen, "%s", IS_NPC(c) ? "" : GET_LASTNAME(c)); 
 					}
+					else if (!str_cmp(field, "learned")) {
+						extern bool has_learned_craft(char_data *ch, any_vnum vnum);
+						
+						if (subfield && *subfield && isdigit(*subfield) && has_learned_craft(c, atoi(subfield))) {
+							strcpy(str, "1");
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
 					else if (!str_cmp(field, "level")) {
 						snprintf(str, slen, "%d", get_approximate_level(c)); 
 					}
@@ -3485,7 +3510,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'r': {	// char.r*
-					if (!str_cmp(field, "remove_mob_flag")) {
+					if (!str_cmp(field, "remove_learned")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							void remove_learned_craft(char_data *ch, any_vnum vnum);
+							remove_learned_craft(c, atoi(subfield));
+						}
+						
+						strcpy(str, "0");
+					}
+					else if (!str_cmp(field, "remove_mob_flag")) {
 						if (subfield && *subfield && IS_NPC(c)) {
 							bitvector_t pos = search_block(subfield, action_bits, FALSE);
 							if (pos != NOTHING) {
