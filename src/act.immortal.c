@@ -2838,6 +2838,73 @@ SHOW(show_ignoring) {
 }
 
 
+SHOW(show_learned) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct player_craft_data *pcd, *next_pcd;
+	char_data *plr = NULL;
+	size_t size, count;
+	craft_data *craft;
+	bool file = FALSE;
+	
+	argument = one_argument(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*argument) {
+		msg_to_char(ch, "Usage: show learned <player>\r\n");
+	}
+	else if (!(plr = find_or_load_player(argument, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Learned recipes matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Learned recipes for %s:\r\n", GET_NAME(plr));
+		}
+		
+		count = 0;
+		HASH_ITER(hh, GET_LEARNED_CRAFTS(plr), pcd, next_pcd) {
+			if (!(craft = craft_proto(pcd->vnum))) {
+				continue;	// no craft?
+			}
+			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
+				continue;	// in-dev
+			}
+			if (*argument && !multi_isname(argument, GET_CRAFT_NAME(craft))) {
+				continue;	// searched
+			}
+		
+			// show it
+			snprintf(line, sizeof(line), " %s (%s)\r\n", GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+				++count;
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+	
+		if (!count) {
+			strcat(output, "  none\r\n");	// space reserved for this for sure
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
 SHOW(show_workforce) {
 	void show_workforce_setup_to_char(empire_data *emp, char_data *ch);
 	
@@ -6785,6 +6852,7 @@ ACMD(do_show) {
 		{ "factions", LVL_START_IMM, show_factions },
 		{ "dailycycle", LVL_START_IMM, show_dailycycle },
 		{ "data", LVL_CIMPL, show_data },
+		{ "learned", LVL_START_IMM, show_learned },
 
 		// last
 		{ "\n", 0, NULL }

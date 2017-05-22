@@ -832,6 +832,7 @@ dailycycle Immort   Shows daily quests with a given cycle id.
 factions   Immort   Shows a player's faction levels.
 ignoring   Immort   Shows you who a player has on their ignore list.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
+learned    Immort   Shows you learned recipes.
 notes      Immort   Show notes on a player.
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
@@ -911,6 +912,12 @@ The immortal version of the 'islands' command; useful for MOVEEINV. You can use
 an empire's leaderboard rank in place of its name, but not vnum.
 
 See also: ISLANDS, MOVEEINV
+#e
+"SHOW LEARNED"
+
+Usage:  show learned <player> [search phrase]
+
+Shows you the recipes learned by a player.
 #e
 "SHOW NOTES"
 
