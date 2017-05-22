@@ -212,7 +212,7 @@ For example, #3001 uses the "fly" generic affect.
 Examples:
   dg_affect_room %room% !WEATHER on
 
-See also: REDIT AFFECTS
+See also: REDIT AFFECTS, GENERIC AFFECTS
 #d
 DG_CAST
 
@@ -241,9 +241,12 @@ property of the door is being changed. Valid fields are:
 #d
 %DOT% MDOT ODOT VDOT WDOT
 
-%dot% <victim> <modifier> <duration> [damage type] [max stacks]
+%dot% [#affect vnum] <victim> <modifier> <duration> [damage type] [max stacks]
 
 Adds a scaled DoT -- Damage-Over-Time -- effect to the target.
+
+The affect vnum arg is optional, and requires a # if you're going to use it.
+For example, #3001 uses the "fly" generic affect.
 
 You can optionally specify a damage type (physical, magical, fire, poison,
 direct).
@@ -256,7 +259,7 @@ not stack (max 1).
 
 NOTE: If you want to use max stacks, you must also provide the damage type.
 
-See also: %DAMAGE%, %AOE%, %SIEGE%
+See also: %DAMAGE%, %AOE%, %SIEGE%, GENERIC AFFECTS
 #d
 EVAL
 

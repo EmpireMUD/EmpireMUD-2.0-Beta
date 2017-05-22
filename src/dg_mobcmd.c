@@ -1553,7 +1553,9 @@ ACMD(do_maoe) {
 
 ACMD(do_mdot) {
 	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], stackarg[MAX_INPUT_LENGTH];
+	any_vnum atype = ATYPE_DG_AFFECT;
 	double modifier = 1.0;
+	generic_data *gen;
 	char_data *vict;
 	int type, max_stacks;
 
@@ -1564,8 +1566,16 @@ ACMD(do_mdot) {
 
 	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
-
+	
 	argument = one_argument(argument, name);
+	// sometimes name is an affect vnum
+	if (*name == '#') {
+		atype = atoi(name+1);
+		argument = one_argument(argument, name);
+		if (!(gen = find_generic_by_vnum(atype)) || GEN_TYPE(gen) != GENERIC_AFFECT) {
+			atype = ATYPE_DG_AFFECT;
+		}
+	}
 	argument = one_argument(argument, modarg);
 	argument = one_argument(argument, durarg);
 	argument = one_argument(argument, typearg);	// optional, default physical
@@ -1604,7 +1614,7 @@ ACMD(do_mdot) {
 	}
 	
 	max_stacks = (*stackarg ? atoi(stackarg) : 1);
-	script_damage_over_time(vict, get_approximate_level(ch), type, modifier, atoi(durarg), max_stacks, ch);
+	script_damage_over_time(vict, atype, get_approximate_level(ch), type, modifier, atoi(durarg), max_stacks, ch);
 }
 
 

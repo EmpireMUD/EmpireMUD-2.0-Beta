@@ -851,6 +851,7 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 * victim.
 *
 * @param char_data *vict The person receiving the DoT.
+* @param any_vnum atype The ATYPE_ const or vnum for the affect.
 * @param int level The level to scale damage to.
 * @param int dam_type A DAM_x type.
 * @param double modifier An amount to modify the damage by (1.0 = full damage).
@@ -858,7 +859,7 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 * @param int max_stacks Number of times this DoT can stack (minimum/default 1).
 * @param char_data *cast_by The caster, if any, for tracking on the effect (may be NULL).
 */
-void script_damage_over_time(char_data *vict, int level, int dam_type, double modifier, int dur_seconds, int max_stacks, char_data *cast_by) {
+void script_damage_over_time(char_data *vict, any_vnum atype, int level, int dam_type, double modifier, int dur_seconds, int max_stacks, char_data *cast_by) {
 	double dam;
 	
 	if (modifier <= 0 || dur_seconds <= 0) {
@@ -879,5 +880,5 @@ void script_damage_over_time(char_data *vict, int level, int dam_type, double mo
 	}
 
 	// add the affect
-	apply_dot_effect(vict, ATYPE_DG_AFFECT, ceil((double)dur_seconds / SECS_PER_REAL_UPDATE), dam_type, (int) dam, MAX(1, max_stacks), cast_by);
+	apply_dot_effect(vict, atype, ceil((double)dur_seconds / SECS_PER_REAL_UPDATE), dam_type, (int) dam, MAX(1, max_stacks), cast_by);
 }
