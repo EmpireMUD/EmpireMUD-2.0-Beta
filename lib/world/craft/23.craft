@@ -469,7 +469,7 @@ S
 #2351
 alchemical filter~
 2351 1
-2 244 0 24 2347
+2 244 q 24 -1
 L
 200
 R
@@ -503,7 +503,7 @@ S
 #2353
 concealed pouches~
 2353 1
-4 245 0 24 2349
+4 245 q 24 -1
 L
 200
 R
@@ -520,7 +520,7 @@ S
 #2354
 tinker harness~
 2354 1
-1 246 0 24 2350
+1 246 q 24 -1
 L
 200
 R
@@ -583,7 +583,7 @@ S
 #2363
 smuggled Olympian laurel branch~
 2363 1
-2 245 0 12 2359
+2 245 q 12 -1
 L
 300
 R
@@ -603,7 +603,7 @@ S
 #2365
 Amazonian leather~
 2365 1
-2 247 0 12 2361
+2 247 q 12 -1
 L
 300
 R
@@ -614,7 +614,7 @@ S
 #2366
 guild-forged hammer head~
 2366 1
-1 242 0 12 2362
+1 242 q 12 -1
 L
 300
 R

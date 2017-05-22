@@ -527,11 +527,9 @@ pattern spiked wooden breastplate~
 the spiked wooden breastplate pattern~
 The pattern for a spiked wooden breastplate is lying here.~
 This is the pattern for a spiked wooden breastplate.
-
-Craft (Advanced Woodworking): spiked wooden breastplate
 ~
-3 0 a 2
-0 0 0
+7 0 a 3
+10240 0 0
 0 0
 S
 #10242
@@ -556,11 +554,9 @@ pattern sword cactus~
 the cactus sword pattern~
 The pattern for a cactus sword is lying here.~
 This is the recipe for the cactus sword.
-
-Craft (Advanced Woodworking): cactus sword
 ~
-3 0 a 2
-0 0 0
+7 0 a 3
+10242 0 0
 0 0
 S
 #10244
@@ -833,11 +829,9 @@ the primordial axe pattern~
 The pattern for a primordial axe is lying here.~
 This pattern allows you to craft the primordial axe, a powerful weapon from
 the dawn of time.
-
-Forge (requires Deadly Weapons): primordial axe
 ~
-3 0 a 2
-0 0 0
+7 0 a 3
+10268 0 0
 0 0
 S
 #10270
@@ -862,11 +856,9 @@ the dracosaur bone spear pattern~
 The pattern for a dracosaur bone spear is lying here.~
 This pattern allows you to craft the dracosaur bone spear, a strong tanking
 weapon from the Primeval age.
-
-Forge (requires Deadly Weapons): dracosaur bone spear
 ~
-3 0 a 2
-0 0 0
+7 0 a 3
+10270 0 0
 0 0
 S
 #10272
@@ -893,11 +885,9 @@ the jeweled bone staff pattern~
 The pattern for a jeweled bone staff is lying here.~
 This pattern allows you to craft the jeweled bone staff, a great magical weapon
 from the prehistoric era.
-
-Craft (requires Powerful Staves): jeweled bone staff
 ~
-3 0 a 2
-0 0 0
+7 0 a 3
+10272 0 0
 0 0
 S
 #10274
@@ -925,11 +915,9 @@ the dracosaur scale robe pattern~
 The pattern for a dracosaur scale robe is lying here.~
 This pattern allows you to sew the dracosaur scale robe, a powerful healing
 robe from the Primeval period.
-
-Sew (requires Magical Vestments): dracosaur scale robe
 ~
-3 0 a 2
-0 0 0
+7 0 a 3
+10274 0 0
 0 0
 S
 #10276
@@ -956,11 +944,9 @@ the dracosaur scale boots pattern~
 The pattern for some dracosaur scale boots is lying here.~
 This pattern allows you to forge the dracosaur scale boots, medium armor well-
 suited to mucking through pre-history.
-
-Forge (requires Imperial Armors): dracosaur scale boots
 ~
-3 0 a 2
-0 0 0
+7 0 a 3
+10276 0 0
 0 0
 S
 #10278
@@ -989,11 +975,9 @@ the primordial boots pattern~
 The pattern for the primordial boots is lying here.~
 This pattern allows you to forge the primordial boots, some of the best tanking
 boots in all of history.
-
-Forge (requires Imperial Armors): primordial boots
 ~
-3 0 a 2
-0 0 0
+7 0 a 3
+10278 0 0
 0 0
 S
 #10280
@@ -1019,11 +1003,9 @@ the dracosaur scale gauntlets pattern~
 The pattern for the dracosaur scale gauntlets is lying here.~
 This pattern allows you to sew the dracosaur scale gauntlets, dangerous leather
 gloves from beyond the Primeval portal.
-
-Sew (requires Dangerous Leathers): dracosaur scale gauntlets
 ~
-3 0 a 2
-0 0 0
+7 0 a 3
+10280 0 0
 0 0
 S
 #10282
@@ -1082,11 +1064,9 @@ the bone crown pattern~
 The pattern for the bone crown of the primeval is lying here.~
 This pattern allows you to craft the bone crown of the primeval, an ancient
 symbol of kings from a less civilized age.
-
-Craft (requires Jewelry): bone crown of the primeval
 ~
-3 0 a 2
-0 0 0
+7 0 a 3
+10284 0 0
 0 0
 S
 #10286
