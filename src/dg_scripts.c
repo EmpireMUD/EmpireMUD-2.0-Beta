@@ -5164,7 +5164,7 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 	static char *ops[num_op_lists][5] = {
 		// higher in this table = higher priority
 		{ "!", "\n" },
-		{ "*", "/", "//", "\n" },	// things on same line have same precedence
+		{ "//", "*", "/", "\n" },	// things on same line have same precedence
 		{ "+", "-", "\n" },
 		{ "<=", "<", ">=", ">", "\n" },
 		{ "/=", "~=", "\n" },
@@ -5199,7 +5199,7 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 			found = NULL;
 			for (i = 0; !found && *ops[oplist][i] != '\n'; ++i) {
 				if (!strn_cmp(ops[oplist][i], tokens[j], strlen(ops[oplist][i]))) {
-					log("Matched token '%s'", ops[oplist][i]);
+					log("Matched token '%s' to '%s'", tokens[j], ops[oplist][i]);
 					found = ops[oplist][i];
 					// -> need to find the LAST token that's in THIS list
 				}
