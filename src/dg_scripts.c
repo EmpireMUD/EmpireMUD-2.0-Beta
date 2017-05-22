@@ -5190,7 +5190,10 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 		else if (*p == '"')
 			p = matching_quote(p) + 1;
 		else if (isalnum(*p))
-			for (p++; *p && (isalnum(*p) || isspace(*p) || strchr(opsymbols, *p)); p++);
+			for (p++; *p && (isalnum(*p) || isspace(*p)); p++);
+		else if (strchr(opsymbols, *p)) {
+			for (p++; *p && strchr(opsymbols, *p); ++p);
+		}
 		else
 			p++;
 	}
