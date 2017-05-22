@@ -205,6 +205,8 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	void cancel_gen_craft(char_data *ch);
 	void remove_craft_from_table(craft_data *craft);
 	
+	obj_data *obj, *next_obj;
+	descriptor_data *desc;
 	craft_data *craft;
 	char_data *iter;
 	
@@ -233,6 +235,24 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	save_index(DB_BOOT_CRAFT);
 	save_library_file_for_vnum(DB_BOOT_CRAFT, vnum);
 	
+	// update objs
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == vnum) {
+			GET_OBJ_VAL(obj, VAL_RECIPE_VNUM) = 0;
+			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
+		}
+	}
+	
+	// olc editor updates
+	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (GET_OLC_OBJECT(desc)) {
+			if (IS_RECIPE(GET_OLC_OBJECT(desc)) && GET_RECIPE_VNUM(GET_OLC_OBJECT(desc)) == vnum) {
+				GET_OBJ_VAL(GET_OLC_OBJECT(desc), VAL_RECIPE_VNUM) = 0;
+				msg_to_char(desc->character, "The recipe used by the item you're editing was deleted.\r\n");
+			}
+		}
+	}
+	
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted craft recipe %d", GET_NAME(ch), vnum);
 	msg_to_char(ch, "Craft recipe %d deleted.\r\n", vnum);
 	
@@ -249,6 +269,7 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 void olc_search_craft(char_data *ch, craft_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	craft_data *craft = craft_proto(vnum);
+	obj_data *obj, *next_obj;
 	int size, found;
 	
 	if (!craft) {
@@ -258,8 +279,14 @@ void olc_search_craft(char_data *ch, craft_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of craft %d (%s):\r\n", vnum, GET_CRAFT_NAME(craft));
-	
-	// crafts are not found anywhere in the world yet
+
+	// objects
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		}
+	}
 	
 	if (found > 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
