@@ -5172,6 +5172,8 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 		{ "&&", "\n" },
 		{ "||", "\n" }	// each list must end with "\n"
 	};
+	
+	log("Debug: starting: %s", expr);
 
 	p = strcpy(line, expr);
 
