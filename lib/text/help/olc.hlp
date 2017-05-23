@@ -173,7 +173,8 @@ Crafts (CEDIT):
 - To make a recipe item, build an item ("an old recipe") of type RECIPE, and
   set its recipe vnum to the craft. Your craft must have the LEARNED flag.
   Players must still meet other requirements, such as requiresability, to make
-  the craft once they have learned it.
+  the craft once they have learned it. If you want to constrain the level of
+  the item it makes, put min/max levels on the item.
 - To make an item that can be combined with another item, for example a spear-
   head that can be crafted into a spear, create a craft and set its requires-
   object to the spearhead (just like a recipe item, above). Then, also set the

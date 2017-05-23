@@ -222,6 +222,8 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 	craft_data *unknown_abbrev = NULL;
 	craft_data *known_abbrev = NULL;
 	craft_data *craft, *next_craft;
+	obj_data *obj;
+	bool found;
 	
 	skip_spaces(&argument);
 	
@@ -236,7 +238,17 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 			continue;
 		}
 		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
-			continue;	// not learned
+			// are they holding a recipe?
+			found = FALSE;
+			LL_FOREACH2(ch->carrying, obj, next_content) {
+				if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == GET_CRAFT_VNUM(craft)) {
+					found = TRUE;
+					break;
+				}
+			}
+			if (!found) {
+				continue;	// not learned
+			}
 		}
 		
 		if (!str_cmp(argument, GET_CRAFT_NAME(craft))) {
@@ -411,6 +423,10 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 			if (GET_OBJ_MIN_SCALE_LEVEL(req) > 0) {
 				level = MAX(level, GET_OBJ_MIN_SCALE_LEVEL(req));
 			}
+		}
+		else if (CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
+			// learned recipes would be constrained by the created obj, if anything
+			level = get_crafting_level(ch);
 		}
 		else {
 			if (!(abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft)))) {
@@ -651,6 +667,10 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	
 	if (GET_CRAFT_MIN_LEVEL(craft) > 0) {
 		msg_to_char(ch, "Requires: crafting level %d\r\n", GET_CRAFT_MIN_LEVEL(craft));
+	}
+	
+	if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
+		msg_to_char(ch, "&rYou haven't learned this recipe.&0\r\n");
 	}
 	
 	prettier_sprintbit(GET_CRAFT_FLAGS(craft), craft_flag_for_info, part);
@@ -1554,7 +1574,7 @@ ACMD(do_learn) {
 	void add_learned_craft(char_data *ch, any_vnum vnum);
 	extern bool has_learned_craft(char_data *ch, any_vnum vnum);
 	
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH];
 	craft_data *recipe;
 	obj_data *obj;
 	
@@ -1593,10 +1613,8 @@ ACMD(do_learn) {
 	// seems ok!
 	else {
 		add_learned_craft(ch, GET_RECIPE_VNUM(obj));
-		msg_to_char(ch, "You learn how to make: %s!\r\n", GET_CRAFT_NAME(recipe));
-		snprintf(buf, sizeof(buf), "$n learns how to make: %s!", GET_CRAFT_NAME(recipe));
-		act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
-		
+		act("You commit $p to memory.", FALSE, ch, obj, NULL, TO_ROOM);
+		act("$n commits $p to memory.", TRUE, ch, obj, NULL, TO_ROOM);
 		extract_obj(obj);
 	}
 }
@@ -1629,7 +1647,7 @@ ACMD(do_learned) {
 		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
 			continue;	// in-dev
 		}
-		if (*argument && !multi_isname(argument, GET_CRAFT_NAME(craft))) {
+		if (*argument && !multi_isname(argument, GET_CRAFT_NAME(craft)) && !str_cmp(craft_types[GET_CRAFT_TYPE(craft)], argument)) {
 			continue;	// searched
 		}
 		

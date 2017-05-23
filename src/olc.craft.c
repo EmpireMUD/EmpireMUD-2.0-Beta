@@ -57,8 +57,8 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 	generic_data *gen;
 	int count;
 
-	if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING && GET_CRAFT_ABILITY(craft) == NO_ABIL) {
-		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft requires no object or ability");
+	if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING && GET_CRAFT_ABILITY(craft) == NO_ABIL && !CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft requires no object, ability, or recipe");
 		problem = TRUE;
 	}
 	if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT)) {
