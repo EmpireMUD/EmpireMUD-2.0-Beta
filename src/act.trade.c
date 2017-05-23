@@ -669,10 +669,6 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		msg_to_char(ch, "Requires: crafting level %d\r\n", GET_CRAFT_MIN_LEVEL(craft));
 	}
 	
-	if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
-		msg_to_char(ch, "&rYou haven't learned this recipe.&0\r\n");
-	}
-	
 	prettier_sprintbit(GET_CRAFT_FLAGS(craft), craft_flag_for_info, part);
 	msg_to_char(ch, "Notes: %s\r\n", part);
 	
@@ -687,6 +683,10 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	
 	show_resource_list(GET_CRAFT_RESOURCES(craft), buf);
 	msg_to_char(ch, "Resources: %s\r\n", buf);	
+	
+	if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
+		msg_to_char(ch, "&rYou haven't learned this recipe.&0\r\n");
+	}
 }
 
 
@@ -1613,7 +1613,7 @@ ACMD(do_learn) {
 	// seems ok!
 	else {
 		add_learned_craft(ch, GET_RECIPE_VNUM(obj));
-		act("You commit $p to memory.", FALSE, ch, obj, NULL, TO_ROOM);
+		act("You commit $p to memory.", FALSE, ch, obj, NULL, TO_CHAR);
 		act("$n commits $p to memory.", TRUE, ch, obj, NULL, TO_ROOM);
 		extract_obj(obj);
 	}
