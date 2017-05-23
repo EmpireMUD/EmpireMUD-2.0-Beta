@@ -2788,7 +2788,7 @@ OLC_MODULE(oedit_quick_recipe) {
 	
 	// look desc
 	strcpy(cmd, craft_types[GET_CRAFT_TYPE(cft)]);
-	snprintf(buf, sizeof(buf), "This %s will teach you to %s %s.\r\n", (*argument ? argument : "recipe"), strtolower(cmd), GET_CRAFT_NAME(cft));
+	snprintf(buf, sizeof(buf), "This %s will teach you to %s: %s.\r\n", (*argument ? argument : "recipe"), strtolower(cmd), GET_CRAFT_NAME(cft));
 	if (GET_OBJ_ACTION_DESC(obj)) {
 		free(GET_OBJ_ACTION_DESC(obj));
 	}

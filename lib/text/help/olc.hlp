@@ -4079,6 +4079,24 @@ This sets how many arrows are available from a given ARROW object.
 
 See also: OLC OBJECTS
 #d
+"OEDIT QUICKRECIPE" "OEDIT QUICK RECIPE" QUICKRECIPE "QUICK RECIPE"
+
+Usage:  .o quickrecipe <new obj vnum> <craft vnum> [pattern | design | etc]
+
+This command generates a quick 'recipe' item for a given craft. The craft
+must be set LEARNABLE. You can optionally give it a word like "pattern",
+"schematic", etc if you don't want the default name "recipe".
+
+It sets the following properties:
+keywords: recipe <craft name>
+shortdescription: the <craft name> recipe
+longdescription: The <craft name> recipe is on the ground.
+lookdescription: This recipe will teach you to <command>: <craft name>.
+type: RECIPE
+recipe vnum: <craft vnum>
+
+See also: OLC OBJECTS, LEARN, RECIPE ITEM
+#d
 "OEDIT RECIPE"
 
 Usage:  .recipe <craft vnum>
@@ -4086,7 +4104,9 @@ Usage:  .recipe <craft vnum>
 This sets the craft recipe that a RECIPE item teaches. You must specify the
 vnum of a craft that has the LEARNED flag.
 
-See also: OLC OBJECTS, OLC CRAFTS, CEDIT FLAGS
+You can make recipes even faster with the quickrecipe command.
+
+See also: OLC OBJECTS, OLC CRAFTS, CEDIT FLAGS, OEDIT QUICKRECIPE
 #d
 "OEDIT ROOMVNUM"
 
@@ -5813,6 +5833,10 @@ Potions can only be used once, and then are lost.
 Recipes are single-use items that permanently teach a player a new craft. You
 must also create the craft entry, which must have the LEARNED flag. Only
 players who learn the recipe from an item can make that craft.
+
+You can make recipes even faster with the quickrecipe command.
+
+See also: OEDIT QUICKRECIPE
 #d
 "RESOURCE ACTIONS" "RESOURCE ACTION TYPES"
 
