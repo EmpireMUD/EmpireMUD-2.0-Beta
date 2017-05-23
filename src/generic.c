@@ -177,6 +177,17 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 			}
 			break;
 		}
+		case GENERIC_CURRENCY: {
+			if (!GEN_STRING(gen, GSTR_CURRENCY_SINGULAR)) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "No singular name set");
+				problem = TRUE;
+			}
+			if (!GEN_STRING(gen, GSTR_CURRENCY_PLURAL)) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "No plural name set");
+				problem = TRUE;
+			}
+			break;
+		}
 		case GENERIC_AFFECT:
 		case GENERIC_COOLDOWN: {
 			// everything here is optional
@@ -984,6 +995,11 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Wear-off to room: %s\r\n", GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
 			break;
 		}
+		case GENERIC_CURRENCY: {
+			size += snprintf(buf + size, sizeof(buf) - size, "Singular: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_SINGULAR)));
+			size += snprintf(buf + size, sizeof(buf) - size, "Plural: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_PLURAL)));
+			break;
+		}
 	}
 
 	page_string(ch->desc, buf, TRUE);
@@ -1024,12 +1040,12 @@ void olc_show_generic(char_data *ch) {
 			break;
 		}
 		case GENERIC_ACTION: {
-			sprintf(buf + strlen(buf), "<\tybuild2char\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR) : "(none)");
-			sprintf(buf + strlen(buf), "<\tybuild2room\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM) : "(none)");
-			sprintf(buf + strlen(buf), "<\tycraft2char\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR) : "(none)");
-			sprintf(buf + strlen(buf), "<\tycraft2room\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) : "(none)");
-			sprintf(buf + strlen(buf), "<\tyrepair2char\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) : "(none)");
-			sprintf(buf + strlen(buf), "<\tyrepair2room\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) : "(none)");
+			sprintf(buf + strlen(buf), "<\tybuild2char\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR) : "(not set)");
+			sprintf(buf + strlen(buf), "<\tybuild2room\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM) : "(not set)");
+			sprintf(buf + strlen(buf), "<\tycraft2char\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR) : "(not set)");
+			sprintf(buf + strlen(buf), "<\tycraft2room\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) : "(not set)");
+			sprintf(buf + strlen(buf), "<\tyrepair2char\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) : "(not set)");
+			sprintf(buf + strlen(buf), "<\tyrepair2room\t0> %s\r\n", GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) : "(not set)");
 			break;
 		}
 		case GENERIC_COOLDOWN: {
@@ -1041,6 +1057,11 @@ void olc_show_generic(char_data *ch) {
 			sprintf(buf + strlen(buf), "<\tywearoff\t0> %s\r\n", GET_AFFECT_WEAR_OFF_TO_CHAR(gen) ? GET_AFFECT_WEAR_OFF_TO_CHAR(gen) : "(none)");
 			sprintf(buf + strlen(buf), "<\tystandardwearoff\t0> (to add a basic wear-off message based on the name)\r\n");
 			sprintf(buf + strlen(buf), "<\tywearoff2room\t0> %s\r\n", GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
+			break;
+		}
+		case GENERIC_CURRENCY: {
+			sprintf(buf + strlen(buf), "<\tysingular\t0> %s\r\n", GEN_STRING(gen, GSTR_CURRENCY_SINGULAR) ? GEN_STRING(gen, GSTR_CURRENCY_SINGULAR) : "(not set)");
+			sprintf(buf + strlen(buf), "<\typlural\t0> %s\r\n", GEN_STRING(gen, GSTR_CURRENCY_PLURAL) ? GEN_STRING(gen, GSTR_CURRENCY_PLURAL) : "(not set)");
 			break;
 		}
 	}
@@ -1219,6 +1240,33 @@ OLC_MODULE(genedit_repair2room) {
 	}
 	else {
 		olc_process_string(ch, argument, "repair2room", &GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM));
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CURRENCY OLC MODULES ////////////////////////////////////////////////////
+
+OLC_MODULE(genedit_plural) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	
+	if (GEN_TYPE(gen) != GENERIC_CURRENCY) {
+		msg_to_char(ch, "You can only change that on an CURRENCY generic.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "plural", &GEN_STRING(gen, GSTR_CURRENCY_PLURAL));
+	}
+}
+
+
+OLC_MODULE(genedit_singular) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	
+	if (GEN_TYPE(gen) != GENERIC_CURRENCY) {
+		msg_to_char(ch, "You can only change that on an CURRENCY generic.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "singular", &GEN_STRING(gen, GSTR_CURRENCY_SINGULAR));
 	}
 }
 

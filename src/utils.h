@@ -587,6 +587,12 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_AFFECT_WEAR_OFF_TO_CHAR(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF_TO_CHAR) : NULL)
 #define GET_AFFECT_WEAR_OFF_TO_ROOM(gen)  (GEN_TYPE(gen) == GENERIC_AFFECT ? GEN_STRING((gen), GSTR_AFFECT_WEAR_OFF_TO_ROOM) : NULL)
 
+// GENERIC_CURRENCY
+#define GSTR_CURRENCY_SINGULAR  0
+#define GSTR_CURRENCY_PLURAL  1
+#define GET_CURRENCY_SINGULAR(gen)  (GEN_TYPE(gen) == GENERIC_CURRENCY ? GEN_STRING((gen), GSTR_CURRENCY_SINGULAR) : NULL)
+#define GET_CURRENCY_PLURAL(gen)  (GEN_TYPE(gen) == GENERIC_CURRENCY ? GEN_STRING((gen), GSTR_CURRENCY_PLURAL) : NULL)
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// GLOBAL UTILS ////////////////////////////////////////////////////////////

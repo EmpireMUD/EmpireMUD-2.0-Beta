@@ -220,6 +220,8 @@ Generics (GENEDIT):
   be in the vnum block of the adventure that adds them.
 - Core liquids are in the 0-99 vnum range.
 - Core resource actions are in the 1000-1099 vnum range.
+- Core cooldowns are in the 2000-2999 vnum range.
+- Core affects are in the 3000-3999 range.
 
 Globals (GEDIT):
 - All global tables must be approved by the head builder, because they apply
@@ -2229,7 +2231,8 @@ braces>. You can get help on any of these commands by typing &yHELP GENEDIT
 <COMMAND>&0.
 
 Each type of generic provides a different function, and has its own help file.
-See: GENERIC LIQUID, GENERIC ACTION
+See: GENERIC LIQUID, GENERIC ACTION, GENERIC COOLDOWN, GENERIC AFFECT,
+  GENERIC CURRENCY
 
 You can close an open editor with .abort or .save.
 
@@ -2298,6 +2301,18 @@ You can use <&ystandardwearoff&0> to add the normal wear-off message.
 You can also create quick cooldowns with: .gen quickcooldown <type> <vnum>
 
 See also: GENEDIT QUICKCOOLDOWN, OLC GENERICS
+#d
+"GENERIC CURRENCY" "CURRENCY GENERICS" "CURRENCY EDITOR" "GENEDIT SINGULAR" "GENEDIT PLURAL"
+
+The 'currency' generic type is used to create money for use in shops and in
+scripts. This is separate from player-minted coins. The most common type of
+currency included in stock content is adventure-specific tokens.
+
+You must set 2 properties on currency:
+  <&ysingular&0> the money's name (e.g. dragon token)
+  <&yplural&0> a name to show when there's more than one (e.g. dragon tokens)
+
+See also: OLC GENERICS
 #d
 "GENERIC LIQUIDS" "LIQUID GENERICS" "LIQUID EDITOR" "GENEDIT LIQUID" "GENEDIT COLOR" "GENEDIT HUNGER" "GENEDIT THIRST" "GENEDIT DRUNK"
 

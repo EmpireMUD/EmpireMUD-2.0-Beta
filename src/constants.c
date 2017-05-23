@@ -1566,6 +1566,7 @@ const char *generic_types[] = {
 	"ACTION",
 	"COOLDOWN",
 	"AFFECT",
+	"CURRENCY",
 	"\n"
 };
 

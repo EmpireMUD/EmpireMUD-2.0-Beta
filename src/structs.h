@@ -1081,6 +1081,7 @@ typedef struct vehicle_data vehicle_data;
 #define GENERIC_ACTION  2	// for resource actions
 #define GENERIC_COOLDOWN  3	// for cooldowns (COOLDOWN_*)!
 #define GENERIC_AFFECT  4	// for affects (ATYPE_*)
+#define GENERIC_CURRENCY  5	// tokens, for shops
 
 
 // GEN_x: generic flags
