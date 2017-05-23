@@ -1987,6 +1987,8 @@ OLC_MODULE(olc_edit) {
 	bool ok = TRUE;
 	any_vnum vnum;
 	
+	sprintbit(GET_OLC_TYPE(ch->desc) != 0 ? GET_OLC_TYPE(ch->desc) : type, olc_type_bits, typename, FALSE);
+	
 	if (!*argument) {
 		msg_to_char(ch, "Edit which %s (vnum)?\r\n", typename);
 		return;

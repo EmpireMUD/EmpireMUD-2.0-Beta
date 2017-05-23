@@ -1228,7 +1228,7 @@ OLC_MODULE(genedit_repair2room) {
 
 // creates a new cooldown with pre-filled fields
 OLC_MODULE(genedit_quick_cooldown) {
-	char type_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH], typename[42], buf[MAX_STRING_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	int from_type;
 	any_vnum vnum;
 	
@@ -1393,7 +1393,7 @@ OLC_MODULE(genedit_quick_cooldown) {
 	}
 	
 	// SUCCESS
-	msg_to_char(ch, "You create a quick cooldown %s %d:\r\n", typename, vnum);
+	msg_to_char(ch, "You create a quick cooldown generic %d:\r\n", vnum);
 	GET_OLC_TYPE(ch->desc) = OLC_GENERIC;
 	GET_OLC_VNUM(ch->desc) = vnum;
 	
