@@ -43,9 +43,11 @@ S
 portal vibrantly colored soulstream stream~
 the Soulstream~
 A vibrantly colored portal draws light down from the sky!~
-The portal whips and churns as it spills light in every color of the rainbow.
+   The portal whips and churns as it spills light in every color of the
+rainbow. If you're new here, try using 'quest start' to begin the tutorial
+quests.
 ~
-8 0 0 1
+8 0 0 2
 -1 0 0
 10 0
 S
@@ -94,7 +96,7 @@ a stone scythe~
 A stone scythe is lying on the ground.~
    This flaked stone scythe looks like it won't last very long, but it should
 be good for at least one harvest. Wield the scythe and type 'harvest' on a crop
-tile.  
+tile.
 ~
 1 0 an 3
 0 1 1

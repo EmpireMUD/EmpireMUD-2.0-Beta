@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.other.c                                     EmpireMUD 2.0b4 *
+*   File: act.other.c                                     EmpireMUD 2.0b5 *
 *  Usage: Miscellaneous player-level commands                             *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -116,6 +116,7 @@ void adventure_summon(char_data *ch, char *argument) {
 	}
 	else {
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
+		act("$n starts summoning $N...", FALSE, ch, NULL, vict, TO_ROOM);
 		msg_to_char(vict, "%s is trying to summon you to %s (%s) -- use 'accept/reject summon'.\r\n", PERS(ch, ch, TRUE), GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
 		add_offer(vict, ch, OFFER_SUMMON, SUMMON_ADVENTURE);
 		command_lag(ch, WAIT_OTHER);

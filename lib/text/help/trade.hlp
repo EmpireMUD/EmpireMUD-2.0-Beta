@@ -31,16 +31,16 @@ With Advanced Ships you can manufacture:
     Type: Exploration ship (house boat)
     Capacity: 400
     Health: 96
-    Extra rooms: 8
+    Rooms: 8
   Brigantine
     Type: Warship (siege weapons)
     Health: 128
-    Extra rooms: 4
+    Rooms: 4
   Hulk
     Type: Cargo ship (shipping)
     Capacity: 1000
     Health: 64
-    Extra rooms: 4
+    Rooms: 4
 
 See also: SHIPBUILDING, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE
 #
@@ -205,7 +205,7 @@ You can cook:
 There are also more recipes to find.
 
 See also: COOKING FIRE, FAMILY RECIPES, GOURMET CHEF, CRAFTING LEVEL, MILL,
-   BAKERY, RESOURCES, KEEP, RECIPES, COOK INFO
+   BAKERY, RESOURCES, KEEP, RECIPES, COOK INFO, RECIPES
 #
 "CRAFT INFO" "FORGE INFO" "SEW INFO" "BUILD INFO" "MANUFACTURE INFO" "COOK INFO"
 
@@ -350,7 +350,7 @@ With the basic Forge skill, you can create:
 
 See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, SMELT, WEAPONCRAFTING,
   ARMORSMITHING, JEWELRY, MASTER BLACKSMITH, IRON BLADES, STURDY ARMORS,
-  DEADLY WEAPONS, IMPERIAL ARMORS
+  DEADLY WEAPONS, IMPERIAL ARMORS, RECIPES
 #
 "GOURMET CHEF"
 
@@ -710,7 +710,7 @@ Primitive crafts:
 With Archery, you can craft:
   arrows
 
-See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP,
+See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP, RECIPES,
 BASIC CRAFTS
 #
 "PRISMATIC CRYSTALS" "PRISMATIC CRYSTAL"
@@ -834,7 +834,7 @@ Additional sewing items are available from other abilities in the Trade skill,
 as well as patterns and crafts hidden around the world.
 
 See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, LEATHERWORKING,
-   RAWHIDE STITCHING
+   RAWHIDE STITCHING, RECIPES
 #
 SHIP SHIPS 
 
@@ -850,7 +850,7 @@ main island if the ship is left alone at sea.
 Ships can also be used to transport resources automatically using the ship
 command.
 
-See also: BOARD, DISEMBARK, SAIL, SHIPBUILDING, SHIPPING
+See also: BOARD, DISEMBARK, SAIL, SHIPBUILDING, SHIPPING, DISPATCH
 #
 SHIPBUILDING "SHIP BUILDING" MANUFACTURE SHIPYARDS "SHIP LIST"
 
@@ -871,19 +871,19 @@ With basic Shipbuilding you can manufacture:
     Type: Exploration ship (shipping)
     Capacity: 150
     Health: 32
-    Extra rooms: 2
+    Rooms: 2
   Longship
     Type: Warship (siege weapons)
     Health: 64
-    Extra rooms: 2
+    Rooms: 2
   Cog
     Type: Cargo ship (shipping)
     Capacity: 450
     Health: 32
-    Extra rooms: 1
+    Rooms: 1
 
 See also: CRAFT INFO, ADVANCED SHIPS, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS,
-   UPGRADE, RESOURCES, KEEP
+   UPGRADE, RESOURCES, KEEP, SCRAP, VEHICLE, RECIPES
 #
 SIEGEWORKS "SIEGE WORKS"
 
@@ -911,7 +911,7 @@ Possible results from skinning and example animals:
   shark skin: shark
   snakeskin: any snake
   fox fur: fox
-  big cat pelt: tiger, jaguar
+  big cat pelt: tiger, jaguar, leopard
 
 See also: SKINS, SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN
 #
@@ -1019,7 +1019,7 @@ Using the Sew ability:
   
 (Wool cloth and cotton cloth are used for the same things.)
 
-See also: SHEAR, RESOURCES, KEEP
+See also: SHEAR, RESOURCES, KEEP, RECIPES, CRAFT INFO
 #
 WOODWORKING "WOOD WORKING"
 

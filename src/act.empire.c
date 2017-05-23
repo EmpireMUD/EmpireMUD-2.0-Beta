@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.empire.c                                    EmpireMUD 2.0b4 *
+*   File: act.empire.c                                    EmpireMUD 2.0b5 *
 *  Usage: stores all of the empire-related commands                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -3170,7 +3170,12 @@ ACMD(do_diplomacy) {
 	
 	// empire validation
 	else if (!*emp_arg) {
-		msg_to_char(ch, "Which empire would you like to offer %s?\r\n", fname(diplo_option[type].keywords));
+		if (cancel) {
+			msg_to_char(ch, "With which empire would you like to cancel your %s offer?\r\n", fname(diplo_option[type].keywords));
+		}
+		else {
+			msg_to_char(ch, "Which empire would you like to offer %s?\r\n", fname(diplo_option[type].keywords));
+		}
 	}
 	else if (!(vict_emp = get_empire_by_name(emp_arg))) {
 		msg_to_char(ch, "Unknown empire '%s'.\r\n", emp_arg);
@@ -4114,7 +4119,12 @@ ACMD(do_esay) {
 			clear_last_act_message(d);
 			
 			sprintf(color, "%s\t%c", EXPLICIT_BANNER_TERMINATOR(e), GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) : '0');
-			sprintf(output, buf, color, color);
+			if (extra_color) {
+				sprintf(output, buf, color, color, color);
+			}
+			else {
+				sprintf(output, buf, color, color);
+			}
 			act(output, FALSE, ch, 0, tch, TO_VICT | TO_SLEEP | TO_NODARK);
 			
 			// channel history

@@ -152,7 +152,8 @@ For more information on building your first house, see HELP HOUSING GUIDE.
 
 See also: BUILD INFO, RESOURCES, KEEP, EMPIRE, ARTISANS, LUXURY, MONUMENTS,
    SEAFARING, GRAND MONUMENTS, HOUSING, LOCKSMITHING, RAISE ARMIES, DISMANTLE,
-   ADVANCED TACTICS, ROADS, HAVENS, SWAMP ENGINEERING, GREAT WALLS, DESIGNATE 
+   ADVANCED TACTICS, ROADS, HAVENS, SWAMP ENGINEERING, GREAT WALLS, DESIGNATE,
+   RECIPES
 #
 CEDE
 
@@ -250,13 +251,27 @@ will remove the city center and refund the city point. This helps keep the map
 clean, and you can prevent it by making sure there is at least one building in
 your city.
 
-Types of cities:
- -C1-  Outpost (5)
- -C2-  Village (10)
- -C3-  City (15)
- -C4-  Capital (25)
+See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, PROMINENCE, TECHNOLOGY,
+  TERRITORY, WEALTH
+#
+"CITY TYPES" OUTPOST VILLAGE CAPITAL
 
-See also: CITY COMMANDS, CITY TRAITS, PROMINENCE, TECHNOLOGY, TERRITORY, WEALTH
+There are four sizes of city available. The only difference between them is
+the radius of the city.
+
+ -C1-  Outpost (radius 5)
+ -C2-  Village (radius 10)
+ -C3-  City (radius 15)
+ -C4-  Capital (radius 25)
+
+Some buildings, such as mines, count as in-city territory at a much larger
+radius -- 3x the normal distance from the city center.
+
+You can see the city radius by typing 'toggle political' and looking at the
+background highlight (on the visual map), or you can use the 'mark' command
+to measure distances from the center if you're using a screenreader.
+
+See also: MARK, CITY INFORMATION, CITY COMMANDS
 #
 "CITY LIGHTS"
 
@@ -291,6 +306,7 @@ influence. The empire can now gain additional territory from its Wealth, up to
 3x its normal limit (for a total of 4x). Only one member of the empire must have
 this ability to gain the benefit. There is no additional benefit to more members
 having it.
+
 
 Commerce also allows you to build the mint building, and mint your own coins:
 
@@ -503,7 +519,7 @@ This shows you your empire's MOTD (Message Of The Day). It is set in eedit.
 
 See also: EEDIT
 #
-EMPIREIDENTIFY EIDENTIFY
+EMPIREIDENTIFY EIDENTIFY EID
 
 Usage:  empireidentify <item>
         eidentify <item>
@@ -518,7 +534,7 @@ quotation marks.
 
 See also: EFIND, WORKFORCE, EINVENTORY, IDENTIFY
 #
-EMPIREINVENTORY EINVENTORY
+EMPIREINVENTORY EINVENTORY EINV
 
 Usage:  empireinventory [item | all]
         einventory [item | all]
@@ -1025,6 +1041,8 @@ See also: CLAIM, CEDE, ABANDON, UNPUBLICIZE, HOSTILE
 #
 QUARRY
 
+Quarry (Chores ability)
+
 Command:  quarry
 Building:  |__|  Quarry  (Basic Buildings)
 Speed boosts:  Faster Chores bonus, haste
@@ -1039,7 +1057,7 @@ have a quarry.
 
 Quarries count as in-city territory as far away as 3x a city's normal radius.
 
-See also: DEPLETION, DIG
+See also: DEPLETION, DIG, CHORES
 #
 RADIANCE
 
@@ -1247,19 +1265,22 @@ TREE TREES LOGS
 
 Stored at: Lumber Yard
 
-Get a tree using the chop command.
-Get a log using the scrape command.
+Get a tree using the chop command. Get a log using the scrape command.
 
 Trees are found by chopping down forests. They are used in most buildings,
 but you must scrape them first. Forests will regrow if you don't chop down all
 four trees on a tile, and they also spread from overgrown forests to adjacent
 plains. Desert groves are different, and will spring up anywhere in the desert.
 
+Different terrains will yield different types of trees, which in turn have
+their own type of logs and lumber. Not all trees can be scraped or sawed. Try
+looking at the tree; its description might tell you what to do with it.
+
 You can stop the spread of trees by chopping them all down, by building a
 fence, or by laying a road. Chant of Nature can be used to grow trees on bare
 plains.
 
-See also: CHANT OF NATURE, CHOP, BUILD, SCRAPE
+See also: CHANT OF NATURE, CHOP, BUILD, SCRAPE, PILLAR, LUMBER
 #
 TECHNOLOGY TECHNOLOGIES "EMPIRE TECHNOLOGY"
 
@@ -1367,8 +1388,8 @@ An empire's Wealth is determined by the amount of precious metal and coins in
 its vaults (or secret cache).
 
 With the Commerce ability, this wealth adds to the empire's territory at a
-rate of 1 territory per 10 wealth. This additional territory is subject to
-diminishing returns.
+rate of 1 territory per 10 wealth, up to 3x its normal limit (for a total of
+4x).
 
 See also: COMMERCE, EXCHANGE, MINT, VAULT, SECRET CACHE
 #

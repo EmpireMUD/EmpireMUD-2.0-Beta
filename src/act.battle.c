@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.battle.c                                    EmpireMUD 2.0b4 *
+*   File: act.battle.c                                    EmpireMUD 2.0b5 *
 *  Usage: commands and functions related to the Battle skill              *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

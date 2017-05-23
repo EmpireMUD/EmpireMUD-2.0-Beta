@@ -3,11 +3,13 @@ See Hugo For Advice~
    Go see Royal Adviser Hugo for some free advice on empire management. You can
 only complete this quest if your Empire skill is under 15. If you still have
 the quest after that, type 'quest drop See Hugo' to get rid of it.
-   Note: Make sure you don't have Empire noskilled.
+   Note: Make sure you don't have Empire noskilled. You can only turn in this
+quest if your Empire skill is still below 15. If you pass that level, you can
+drop this quest by typing 'quest drop The Perfect Rock'.
 ~
 Hugo gives you some empire advice.
 ~
-10 0 0 25 0
+12 0 0 25 0
 P
 10 1 0 14
 R
@@ -410,13 +412,15 @@ The Perfect Rock~
 needs to be slightly gray or brown, between the size of a pea and the size of
 your fist, and either smooth or rough. Basically, any rock will do. You never
 know which one it will be.
-   Note: Make sure you don't have Trade noskilled.
+   Notes: Make sure you don't have Trade noskilled. You can only turn in this
+quest if your Trade skill is still below 15. If you pass that level, you can
+drop this quest by typing 'quest drop The Perfect Rock'.
 ~
    Horation looks at the rock you've brought him. He measures it with fine
 brass calipers, weighs it on the scale, and even tastes the top of it. But,
 this just isn't the right rock, so he tells you to keep it.
 ~
-13 0 0 25 0
+14 0 0 25 0
 P
 10 6 0 14
 R

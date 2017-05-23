@@ -696,21 +696,21 @@ dg_affect %target% STUNNED on 15
 dg_affect %self% STUNNED on 15
 %damage% %target% 50
 wait 5 sec
-if !%target% || !self || !%self.fighting%
+if !%target% || !%self% || !%self.fighting%
   halt
 end
 %send% %target% %self.name% constricts and crushes you!
 %echoaround% %target% %self.name% constricts and crushes %target.name%!
 %damage% %target% 50
 wait 5 sec
-if !%target% || !self || !%self.fighting%
+if !%target% || !%self% || !%self.fighting%
   halt
 end
 %send% %target% %self.name% constricts and crushes you!
 %echoaround% %target% %self.name% constricts and crushes %target.name%!
 %damage% %target% 50
 wait 5 sec
-if !%target% || !self || !%self.fighting%
+if !%target% || !%self% || !%self.fighting%
   halt
 end
 %send% %target% %self.name% releases you!

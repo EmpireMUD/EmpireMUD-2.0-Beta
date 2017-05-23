@@ -133,7 +133,7 @@ The special variable $* represents the entire input line after an alias:
 
 See also: !, ^, SUGGESTED ALIASES
 #
-ALT ALTERNATE "ALT LIST"
+ALT ALTERNATE "ALT LIST" ALTS
 
 Usage:  alt <name>
         alt list
@@ -853,7 +853,7 @@ Typing "ignore" with no argument will list who you're ignoring. You can't
 choose to ignore an immortal player, and immortals cannot use the ignore
 feature at all.
 #
-INFO POLICY VERSION RULES
+INFO POLICY VERSION RULES CREDITS
 
 Type these commands to see you important information about EmpireMUD. It is a
 good idea to read them every once in a while.
@@ -949,7 +949,8 @@ build things facing roads, and can usually build right over a road -- but the
 road underneath will be lost. Roads count as in-city territory as far away as
 3x a city's normal radius.
 
-Gain experience when you lay a road, but not on mountains.
+Gain experience when you lay a road (but not on mountains) or put down a
+road sign.
 
 See also: CHANT OF ILLUSIONS, EMPIRE, PATHFINDING, ROADSIGN
 #
@@ -1386,6 +1387,8 @@ The message on the sign can be no longer than 70 characters, and you can only
 set up a sign on a road, bridge, swamp walk, or mountain path. If the road is
 removed, the sign will be lost. Each road tile can only have one sign at a
 time, and using this ability again will replace the old sign.
+
+Gain Roads experience when you place a road sign.
 
 See also: ROADS, WOODWORKING
 #

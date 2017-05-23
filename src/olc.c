@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.c                                           EmpireMUD 2.0b4 *
+*   File: olc.c                                           EmpireMUD 2.0b5 *
 *  Usage: On-Line Creation at player level                                *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -5863,7 +5863,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			// RES_x: validate arg4/arg5 based on type
 			switch (type) {
 				case RES_OBJECT: {
-					if (!*arg4) {
+					if (!*arg4 || !isdigit(*arg4)) {
 						msg_to_char(ch, "Usage: resource add object <quantity> <vnum>\r\n");
 						return;
 					}

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: quest.c                                         EmpireMUD 2.0b4 *
+*   File: quest.c                                         EmpireMUD 2.0b5 *
 *  Usage: quest loading, saving, OLC, and processing                      *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -2911,6 +2911,9 @@ void load_daily_quest_file(void) {
 		if (QUEST_FLAGGED(qst, QST_DAILY) && QUEST_DAILY_CYCLE(qst) != NOTHING) {
 			QUEST_DAILY_ACTIVE(qst) = FALSE;
 		}
+		else {
+			QUEST_DAILY_ACTIVE(qst) = TRUE;
+		}
 	}
 	
 	while (get_line(fl, line)) {
@@ -3932,7 +3935,12 @@ OLC_MODULE(qedit_rewards) {
 				if (--num == 0) {
 					found = TRUE;
 					
-					msg_to_char(ch, "You remove the reward for %dx %s %d.\r\n", iter->amount, quest_reward_types[iter->type], iter->vnum);
+					if (iter->vnum > 0) {
+						msg_to_char(ch, "You remove the reward for %dx %s %d.\r\n", iter->amount, quest_reward_types[iter->type], iter->vnum);
+					}
+					else {
+						msg_to_char(ch, "You remove the reward for %dx %s.\r\n", iter->amount, quest_reward_types[iter->type]);
+					}
 					LL_DELETE(*list, iter);
 					free(iter);
 					break;

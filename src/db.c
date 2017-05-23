@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: db.c                                            EmpireMUD 2.0b4 *
+*   File: db.c                                            EmpireMUD 2.0b5 *
 *  Usage: Loading/saving chars, booting/resetting world, internal funcs   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

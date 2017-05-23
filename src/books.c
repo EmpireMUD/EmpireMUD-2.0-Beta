@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: books.c                                         EmpireMUD 2.0b4 *
+*   File: books.c                                         EmpireMUD 2.0b5 *
 *  Usage: data and functions for libraries and books                      *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

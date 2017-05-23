@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: boards.c                                        EmpireMUD 2.0b4 *
+*   File: boards.c                                        EmpireMUD 2.0b5 *
 *  Usage: handling of multiple bulletin boards                            *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

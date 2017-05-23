@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: comm.h                                          EmpireMUD 2.0b4 *
+*   File: comm.h                                          EmpireMUD 2.0b5 *
 *  Usage: header file: prototypes of public communication functions       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: class.c                                         EmpireMUD 2.0b4 *
+*   File: class.c                                         EmpireMUD 2.0b5 *
 *  Usage: code related to classes, including DB and OLC                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -1525,8 +1525,11 @@ ACMD(do_class) {
 		else if (!*arg2) {
 			msg_to_char(ch, "Your class role is currently set to: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
 		}
+		else if (FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) {
+			msg_to_char(ch, "You can't do that while fighting!\r\n");
+		}
 		else if (GET_POS(ch) < POS_STANDING) {
-			msg_to_char(ch, "You can't change your class role right now!\r\n");
+			msg_to_char(ch, "You need to stand up first.\r\n");
 		}
 		else if ((found = search_block(arg2, class_role, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Unknown role '%s'.\r\n", arg2);

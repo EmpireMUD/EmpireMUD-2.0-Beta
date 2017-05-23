@@ -1,0 +1,113 @@
+=======================================
+Updating EmpireMUD from 2.0b4 to 2.0b5:
+=======================================
+
+MAJOR FEATURES:
+
+- New adventures: Guild of Adventurers, Permafrost, Monsoon Rift, Colossal Red
+  Dragon (full update), Hidden Chamber of Neferkare, Volcano, That Damned River,
+  Unstable Portal, and Lost Temple.
+- Overhauled parts of the skill system including the option of adding minor
+  skill trees, trees that can't be dropped, and a change to the low end of the
+  Vampire skill to make it work more like other skills.
+- Many new abilities including class abilities and skill abilities. Players now
+  get an additional ability point.
+- Skill swap allows two full sets of ability choices on each character.
+- Zero-level abilities replace systems that formerly gave direct skill gain
+  without using an ability, simplifying the skill system.
+- New optional approval system for players.
+- Multiple archetype categories to support features like Race or Culture.
+- The fight code was updated with combat meters, togglable messages, and
+  improvements to timing.
+- Major improvements to the scripting system.
+- Reduced game lag with overhauls to territory management and map evolution.
+- New data system stores important generic data between uptimes.
+- OLC editor for socials.
+- Major improvements to the quest engine.
+- Better logging for immortal commands.
+- More complex resources and building maintenance.
+- Newbie islands can now be "naturalized" automatically each year (this
+  defaults to off).
+- Eliminated virtually all of the known bugs, including major crash bugs.
+- Added repeatable daily quests (including ones that appear around a player's
+  city).
+- Improved how the scripting system assigns unique IDs to things, to increase
+  the time until the mud runs out of ID-space each uptime.
+
+
+ACCESS LEVELS:
+
+The code no longer uses access levels 1 = Unapproved and 2 = Approved, so all
+access levels went down by 1. This is handled automatically by the auto-updater
+when you start up your EmpireMUD.
+
+If you are using the god system (level 3 before, 2 now) your gods will be
+automatically demoted to mortal level and you will have to re-promote them.
+This is due to changes in how non-mortal levels are tracked.
+
+
+ADVENTURES:
+
+Many adventures received updates and fixes in this patch. When you first boot
+up beta5, you should use the "instance deleteall" command to delete your
+instances of each adventure, and let the adventures respawn.
+
+
+APPROVAL:
+
+When the game boots up with beta5, it will automatically approve all players
+if auto_approve is on. If you intend to require approval for your existing
+players, you MUST change the auto_approve (and approve_per_character, if you
+want each character to require approval rather than each account) BEFORE you
+start up your game. Edit them directly in lib/misc/game_configs. The rest of
+the approval configs can be changed in-game with "config approval -v".
+
+
+CARRACKS:
+
+Carracks that were already built before the beta5 patch will not automatically
+be changed. You can use ".map roomtype 5522" in the main interior room of
+carracks to convert them to the version that can be used as a player home.
+
+
+CONFIGS:
+
+My game_configs file conflicted when I ran this update, since there are new
+lines is right next to lines I had changed. Beware of conflicts when running
+this update on a live EmpireMUD; contact me if you don't know how to resolve a
+conflict.
+
+
+SOCIALS:
+
+This patch moves socials to in-game editors. If you had any custom socials,
+you may need to add them in the new social editor. Or, you can look at the file
+format for the new socials in lib/world/soc/ and add them there manually.
+
+
+STEP BY STEP INSTRUCTIONS:
+
+1. Shut down your EmpireMUD using "shutdown die".
+
+2. Create a backup of your MUD.
+
+3. Update your code to 2.0b5 using git, or by creating a patch on the GitHub
+site. (Usually you should "git stash", "git pull", then "git stash pop").
+
+4. You will need to re-create your Makefile by running the ./configure script
+again.
+
+   NOTE: If you made changes to the Makefile yourself, running configure again
+   will lose your changes. Instead of running configure again, you can copy
+   the information for new files from Makefile.in. You'll also need to do this
+   for the src/util/ directory, which has its own Makefile.
+
+5. Compile your MUD using "make all".
+
+6. Start up your MUD.
+
+
+For help with this update, contact us:
+
+  Email: paul@empiremud.net
+  Forums: http://empiremud.net/forums/

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: mail.c                                          EmpireMUD 2.0b4 *
+*   File: mail.c                                          EmpireMUD 2.0b5 *
 *  Usage: Internal funcs and handlers of mud-mail system                  *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *

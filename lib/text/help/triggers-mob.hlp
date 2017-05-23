@@ -380,7 +380,7 @@ When using field  - The variable returns:
 &cempire&0 - The character's empire, if any.
 &ceq()&0 - This will return the identifier (id) for the object equipped in
    position, if any. The specified position may be either a position number
-   (0-18) or the name of the location * checks all positions. &yHELP POSITIONS&0
+   (0-18) or the name of the location * checks all positions. &yHELP %LOAD%&0
 &cfaction_name&0 - The name of the mob's 'allegiance' faction, if any.
 &cfighting&0 - The unique id of the mob fighting the actor.
 &cfirstname&0 - The actor's first name (or first keyword, for mobs).
@@ -458,8 +458,8 @@ When using field  - The variable returns:
 &cresist_poison&0 - Returns TRUE if the player has Resist Poison.
 &criding&0 - TRUE if the character is currently mounted.
 &croom&0 - The room the actor is in as a room variable. 
-&csex&0 - The actor's sex, as a string: MALE, FEMALE, or NEUTRAL.
 &cset_skill(name,level)&0 - Change a player's skill level, also gain_skill()
+&csex&0 - The actor's sex, as a string: MALE, FEMALE, or NEUTRAL.
 &cskill(name)&0 - The player's level in the given skill.
 &cstr&0 - The actor's Strength.
 &ctitle()&0 - The actor's title. Subfield sets. Not used for mobs.

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_scripts.c                                    EmpireMUD 2.0b4 *
+*   File: dg_scripts.c                                    EmpireMUD 2.0b5 *
 *  Usage: contains general functions for using scripts.                   *
 *                                                                         *
 *  DG Scripts code by egreen, 1996/09/24 03:48:42, revision 3.25          *
@@ -1651,7 +1651,8 @@ ACMD(do_tdetach) {
 	one_argument(argument, arg3);
 
 	if (!*arg1 || !*arg2) {
-		msg_to_char(ch, "Usage: tdetach <type> <target> <trigger | 'all'>\r\n");
+		msg_to_char(ch, "Usage:  tdetach [mob|obj|vehicle] <target name> <trigger name/vnum | all>\r\n");
+		msg_to_char(ch, "        tdetach room <target vnum | .> <trigger name/vnum | all>\r\n");
 		return;
 	}
 
@@ -5079,7 +5080,7 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 	static char *ops[num_op_lists][5] = {
 		// higher in this table = higher priority
 		{ "!", "\n" },
-		{ "*", "/", "//", "\n" },	// things on same line have same precedence
+		{ "//", "*", "/", "\n" },	// things on same line have same precedence
 		{ "+", "-", "\n" },
 		{ "<=", "<", ">=", ">", "\n" },
 		{ "/=", "~=", "\n" },
@@ -5087,6 +5088,9 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 		{ "&&", "\n" },
 		{ "||", "\n" }	// each list must end with "\n"
 	};
+	
+	// symbols used in operators
+	const char *opsymbols = "!/*+-<>=~&|";
 
 	p = strcpy(line, expr);
 
@@ -5102,6 +5106,9 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 			p = matching_quote(p) + 1;
 		else if (isalnum(*p))
 			for (p++; *p && (isalnum(*p) || isspace(*p)); p++);
+		else if (strchr(opsymbols, *p)) {
+			for (p++; *p && strchr(opsymbols, *p); ++p);
+		}
 		else
 			p++;
 	}
