@@ -2752,6 +2752,10 @@ OLC_MODULE(oedit_quick_recipe) {
 		msg_to_char(ch, "There is no craft with that vnum.\r\n");
 		return;
 	}
+	if (!CRAFT_FLAGGED(cft, CRAFT_LEARNED)) {
+		msg_to_char(ch, "The craft must have the LEARNED flag to do that.\r\n");
+		return;
+	}
 	if (!can_start_olc_edit(ch, OLC_OBJECT, new_vnum)) {
 		return;	// sends own message
 	}

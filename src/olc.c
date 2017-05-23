@@ -779,7 +779,7 @@ const struct olc_command_data olc_data[] = {
 	{ "weapontype", oedit_weapontype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "wear", oedit_wear, OLC_OBJECT, OLC_CF_EDITOR },
 	// oedit: special
-	{ "quickrecipe", oedit_quick_recipe, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "quickrecipe", oedit_quick_recipe, OLC_OBJECT, NOBITS },
 	
 	// quest commands
 	{ "completemessage", qedit_completemessage, OLC_QUEST, OLC_CF_EDITOR },
