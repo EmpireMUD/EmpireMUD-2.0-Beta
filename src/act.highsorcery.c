@@ -541,9 +541,11 @@ void summon_materials(char_data *ch, char *argument) {
 			}
 			
 			while (count < total && store->amount > 0) {
-				++count;
-				if (!retrieve_resource(ch, emp, store, FALSE)) {
-					break;
+				if (retrieve_resource(ch, emp, store, FALSE)) {
+					++count;
+				}
+				else {
+					break;	// no more
 				}
 			}
 		}
