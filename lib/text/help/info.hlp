@@ -88,7 +88,7 @@ the adventure summon. (Except random-teleport.)
 
 See also: ACCEPT, GROUP, NEARBY
 #
-ATTRIBUTES STATS STRENGTH DEXTERITY CHARISMA GREATNESS GRT INTELLIGENCE INTELLECT WITS
+ATTRIBUTES STATS
 
 Current stat implementations are as follows:
 
@@ -709,7 +709,7 @@ is a good way to see what level (or level range) an instance is scaled to.
 
 See also: ADVENTURE
 #
-INTELLIGENCE INT
+INTELLIGENCE INT INTELLECT
 
 Intelligence (mental attribute)
 Type:  passive (you can't drop below 1)
