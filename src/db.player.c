@@ -738,6 +738,7 @@ void free_char(char_data *ch) {
 	struct player_slash_channel *slash;
 	struct player_slash_history *slash_hist, *next_slash_hist;
 	struct player_craft_data *pcd, *next_pcd;
+	struct player_currency *cur, *next_cur;
 	struct interaction_item *interact;
 	struct pursuit_data *purs;
 	struct offer_data *offer;
@@ -908,6 +909,10 @@ void free_char(char_data *ch) {
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
 			HASH_DEL(GET_ABILITY_HASH(ch), abil);
 			free(abil);
+		}
+		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
+			HASH_DEL(GET_CURRENCIES(ch), cur);
+			free(cur);
 		}
 		HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
 			HASH_DEL(GET_LEARNED_CRAFTS(ch), pcd);
@@ -1344,6 +1349,15 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					if ((num = search_block(str_in, custom_color_types, TRUE)) != NOTHING) {
 						GET_CUSTOM_COLOR(ch, num) = c_in;
 					}
+				}
+				else if (PFILE_TAG(line, "Currency:", length)) {
+					struct player_currency *cur;
+					sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]);
+					
+					CREATE(cur, struct player_currency, 1);
+					cur->vnum = i_in[0];
+					cur->amount = i_in[1];
+					HASH_ADD_INT(GET_CURRENCIES(ch), vnum, cur);
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -2113,6 +2127,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
 	struct player_craft_data *pcd, *next_pcd;
+	struct player_currency *cur, *next_cur;
 	struct mount_data *mount, *next_mount;
 	struct player_slash_channel *slash;
 	struct over_time_effect_type *dot;
@@ -2284,6 +2299,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	if (GET_CREATION_HOST(ch)) {
 		fprintf(fl, "Creation Host: %s\n", GET_CREATION_HOST(ch));
+	}
+	HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
+		fprintf(fl, "Currency: %d %d\n", cur->vnum, cur->amount);
 	}
 	
 	// 'D'

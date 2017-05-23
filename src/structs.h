@@ -3072,6 +3072,14 @@ struct player_craft_data {
 };
 
 
+// adventure currencies
+struct player_currency {
+	any_vnum vnum;	// generic vnum
+	int amount;
+	UT_hash_handle hh;	// GET_PLAYER_CURRENCY()
+};
+
+
 // used in player_special_data
 struct player_ability_data {
 	any_vnum vnum;	// ABIL_ or ability vnum
@@ -3166,6 +3174,7 @@ struct player_special_data {
 	
 	// various lists
 	struct coin_data *coins;	// linked list of coin data
+	struct player_currency *currencies;	// hash table of adventure currencies
 	struct alias_data *aliases;	// Character's aliases
 	struct offer_data *offers;	// various offers for do_accept/reject
 	struct player_slash_channel *slash_channels;	// channels the player is on

@@ -1861,12 +1861,36 @@ ACMD(do_affects) {
 
 
 ACMD(do_coins) {
-	if (!IS_NPC(ch)) {
-		coin_string(GET_PLAYER_COINS(ch), buf);
-		msg_to_char(ch, "You have %s.\r\n", buf);
-	}
-	else {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct player_currency *cur, *next_cur;
+	size_t size;
+	
+	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs don't carry coins.\r\n");
+		return;
+	}
+	
+	coin_string(GET_PLAYER_COINS(ch), line);
+	size = snprintf(buf, sizeof(buf), "You have %s.\r\n", line);
+	
+	if (GET_CURRENCIES(ch)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "You also have:\r\n");
+		
+		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
+			snprintf(line, sizeof(line), " %d %s\r\n", cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, (cur->amount == 1) ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
+			
+			if (size + strlen(line) < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+			}
+			else {
+				break;
+			}
+		}
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
 	}
 }
 
