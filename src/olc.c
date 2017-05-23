@@ -296,6 +296,7 @@ OLC_MODULE(oedit_poison);
 OLC_MODULE(oedit_potion);
 OLC_MODULE(oedit_potionscale);
 OLC_MODULE(oedit_quantity);
+OLC_MODULE(oedit_quick_recipe);
 OLC_MODULE(oedit_recipe);
 OLC_MODULE(oedit_requiresquest);
 OLC_MODULE(oedit_roomvnum);
@@ -777,6 +778,8 @@ const struct olc_command_data olc_data[] = {
 	{ "wealth", oedit_wealth, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "weapontype", oedit_weapontype, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "wear", oedit_wear, OLC_OBJECT, OLC_CF_EDITOR },
+	// oedit: special
+	{ "quickrecipe", oedit_quick_recipe, OLC_OBJECT, OLC_CF_EDITOR },
 	
 	// quest commands
 	{ "completemessage", qedit_completemessage, OLC_QUEST, OLC_CF_EDITOR },

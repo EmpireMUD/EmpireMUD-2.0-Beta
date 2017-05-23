@@ -2719,6 +2719,88 @@ OLC_MODULE(oedit_quantity) {
 }
 
 
+OLC_MODULE(oedit_quick_recipe) {
+	extern bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
+	extern const char *craft_types[];
+	
+	char new_vnum_arg[MAX_INPUT_LENGTH], from_vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], cmd[256];
+	any_vnum new_vnum, from_vnum;
+	craft_data *cft;
+	obj_data *obj;
+	
+	argument = any_one_arg(argument, new_vnum_arg);
+	argument = any_one_arg(argument, from_vnum_arg);
+	skip_spaces(&argument);
+	
+	if (!*new_vnum_arg || !*from_vnum_arg) {
+		msg_to_char(ch, "Usage: .quickrecipe <new vnum> <craft vnum> [pattern | design | etc]\r\n");
+		return;
+	}
+	if (!isdigit(*new_vnum_arg) || (new_vnum = atoi(new_vnum_arg)) < 0 || new_vnum > MAX_VNUM) {
+		msg_to_char(ch, "You must pick a valid vnum between 0 and %d.\r\n", MAX_VNUM);
+		return;
+	}
+	if (obj_proto(new_vnum)) {
+		msg_to_char(ch, "There is already an object with that vnum.\r\n");
+		return;
+	}
+	if (!isdigit(*from_vnum_arg) || (from_vnum = atoi(from_vnum_arg)) < 0 || from_vnum > MAX_VNUM) {
+		msg_to_char(ch, "You must pick a valid vnum between 0 and %d.\r\n", MAX_VNUM);
+		return;
+	}
+	if (!(cft = craft_proto(from_vnum))) {
+		msg_to_char(ch, "There is no craft with that vnum.\r\n");
+		return;
+	}
+	if (!can_start_olc_edit(ch, OLC_OBJECT, new_vnum)) {
+		return;	// sends own message
+	}
+	
+	// create it
+	obj = GET_OLC_OBJECT(ch->desc) = setup_olc_object(NULL);
+	GET_OBJ_TYPE(obj) = ITEM_RECIPE;
+	GET_OBJ_VAL(obj, VAL_RECIPE_VNUM) = GET_CRAFT_VNUM(cft);
+	
+	// keywords
+	snprintf(buf, sizeof(buf), "%s %s", (*argument ? argument : "recipe"), GET_CRAFT_NAME(cft));
+	if (GET_OBJ_KEYWORDS(obj)) {
+		free(GET_OBJ_KEYWORDS(obj));
+	}
+	GET_OBJ_KEYWORDS(obj) = str_dup(buf);
+	
+	// short desc
+	snprintf(buf, sizeof(buf), "the %s %s", GET_CRAFT_NAME(cft), *argument ? argument : "recipe");
+	if (GET_OBJ_SHORT_DESC(obj)) {
+		free(GET_OBJ_SHORT_DESC(obj));
+	}
+	GET_OBJ_SHORT_DESC(obj) = str_dup(buf);
+	
+	// long desc
+	snprintf(buf, sizeof(buf), "The %s %s is on the ground.", GET_CRAFT_NAME(cft), *argument ? argument : "recipe");
+	if (GET_OBJ_LONG_DESC(obj)) {
+		free(GET_OBJ_LONG_DESC(obj));
+	}
+	GET_OBJ_LONG_DESC(obj) = str_dup(buf);
+	
+	// look desc
+	strcpy(cmd, craft_types[GET_CRAFT_TYPE(cft)]);
+	snprintf(buf, sizeof(buf), "This %s will teach you to %s %s.\r\n", (*argument ? argument : "recipe"), strtolower(cmd), GET_CRAFT_NAME(cft));
+	if (GET_OBJ_ACTION_DESC(obj)) {
+		free(GET_OBJ_ACTION_DESC(obj));
+	}
+	GET_OBJ_ACTION_DESC(obj) = str_dup(buf);
+	
+	// SUCCESS
+	msg_to_char(ch, "You create a quick recipe %d:\r\n", new_vnum);
+	GET_OLC_TYPE(ch->desc) = OLC_OBJECT;
+	GET_OLC_VNUM(ch->desc) = new_vnum;
+	
+	// ensure some data
+	GET_OBJ_VNUM(GET_OLC_OBJECT(ch->desc)) = new_vnum;
+	olc_show_object(ch);
+}
+
+
 OLC_MODULE(oedit_recipe) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	any_vnum old = GET_RECIPE_VNUM(obj);
