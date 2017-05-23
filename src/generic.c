@@ -49,6 +49,7 @@ extern const char *generic_types[];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
 // external funcs
+extern bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
 extern bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);
 
 
@@ -1228,23 +1229,8 @@ OLC_MODULE(genedit_repair2room) {
 // creates a new cooldown with pre-filled fields
 OLC_MODULE(genedit_quick_cooldown) {
 	char type_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH], typename[42], buf[MAX_STRING_LENGTH];
-	descriptor_data *desc;
 	int from_type;
 	any_vnum vnum;
-	bool found;
-	
-	sprintbit(GET_OLC_TYPE(ch->desc) != 0 ? GET_OLC_TYPE(ch->desc) : type, olc_type_bits, typename, FALSE);
-		
-	// check that they're not already editing something
-	if (GET_OLC_VNUM(ch->desc) != NOTHING) {
-		if (*argument) {
-			msg_to_char(ch, "You are already editing a %s.\r\n", typename);
-		}
-		else {
-			msg_to_char(ch, "You are currently editing %s %d.\r\n", typename, GET_OLC_VNUM(ch->desc));
-		}
-		return;
-	}
 	
 	two_arguments(argument, type_arg, vnum_arg);
 	
@@ -1260,25 +1246,12 @@ OLC_MODULE(genedit_quick_cooldown) {
 		msg_to_char(ch, "You must pick a valid vnum between 0 and %d.\r\n", MAX_VNUM);
 		return;
 	}
-	if (!player_can_olc_edit(ch, OLC_GENERIC, vnum)) {
-		msg_to_char(ch, "You don't have permission to edit a generic with that vnum.\r\n");
-		return;
-	}
 	if (find_generic_by_vnum(vnum)) {
 		msg_to_char(ch, "There is already a generic with that vnum.\r\n");
 		return;
 	}
-	
-	// make sure nobody else is already editing it
-	found = FALSE;
-	for (desc = descriptor_list; desc && !found; desc = desc->next) {
-		if (GET_OLC_TYPE(desc) == OLC_GENERIC && GET_OLC_VNUM(desc) == vnum) {
-			found = TRUE;
-		}
-	}
-	if (found) {
-		msg_to_char(ch, "Someone else is already editing that generic.\r\n");
-		return;
+	if (!can_start_olc_edit(ch, OLC_GENERIC, vnum)) {
+		return;	// sends own message
 	}
 	
 	// OLC_x: see if there's something to create and set it up

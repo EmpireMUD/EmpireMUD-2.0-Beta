@@ -435,6 +435,7 @@ extern int sort_requirements_by_group(struct req_data *a, struct req_data *b);
 extern bool valid_room_template_vnum(rmt_vnum vnum);
 
 // locals
+bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
 void smart_copy_requirements(struct req_data **to_list, struct req_data *from_list);
 
 // prototypes
@@ -1982,23 +1983,9 @@ OLC_MODULE(olc_display) {
 
 
 OLC_MODULE(olc_edit) {	
-	descriptor_data *desc;
 	char typename[42];
-	bool found, ok = TRUE;
+	bool ok = TRUE;
 	any_vnum vnum;
-	
-	sprintbit(GET_OLC_TYPE(ch->desc) != 0 ? GET_OLC_TYPE(ch->desc) : type, olc_type_bits, typename, FALSE);
-		
-	// check that they're not already editing something
-	if (GET_OLC_VNUM(ch->desc) != NOTHING) {
-		if (*argument) {
-			msg_to_char(ch, "You are already editing a %s.\r\n", typename);
-		}
-		else {
-			msg_to_char(ch, "You are currently editing %s %d.\r\n", typename, GET_OLC_VNUM(ch->desc));
-		}
-		return;
-	}
 	
 	if (!*argument) {
 		msg_to_char(ch, "Edit which %s (vnum)?\r\n", typename);
@@ -2008,28 +1995,8 @@ OLC_MODULE(olc_edit) {
 		msg_to_char(ch, "You must pick a valid %s vnum between 0 and %d.\r\n", typename, MAX_VNUM);
 		return;
 	}
-	
-	if (!player_can_olc_edit(ch, type, vnum)) {
-		msg_to_char(ch, "You don't have permission to edit that vnum.\r\n");
-		return;
-	}
-	
-	if (type == OLC_ROOM_TEMPLATE && !valid_room_template_vnum(vnum)) {
-		msg_to_char(ch, "Invalid room template: may be outside any adventure zone.\r\n");
-		return;
-	}
-	
-	// make sure nobody else is already editing it
-	found = FALSE;
-	for (desc = descriptor_list; desc && !found; desc = desc->next) {
-		if (GET_OLC_TYPE(desc) == type && GET_OLC_VNUM(desc) == vnum) {
-			found = TRUE;
-		}
-	}
-	
-	if (found) {
-		msg_to_char(ch, "Someone else is already editing that %s.\r\n", typename);
-		return;
+	if (!can_start_olc_edit(ch, type, vnum)) {
+		return;	// sends own message
 	}
 	
 	// SUCCESS
@@ -3888,6 +3855,57 @@ bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Pre-checks several requirements for opening a new OLC editor.
+*
+* @param char_data *ch The person trying to edit.
+* @param int type Any OLC_ type.
+* @param any_vnum vnum The vnum the player wants to edit.
+*/
+bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum) {
+	descriptor_data *desc;
+	char typename[42];
+	bool found;
+	
+	if (IS_NPC(ch) || !ch->desc) {
+		return FALSE;
+	}
+	
+	sprintbit(GET_OLC_TYPE(ch->desc) != 0 ? GET_OLC_TYPE(ch->desc) : type, olc_type_bits, typename, FALSE);
+		
+	// check that they're not already editing something
+	if (GET_OLC_VNUM(ch->desc) != NOTHING) {
+		msg_to_char(ch, "You are currently editing %s %d.\r\n", typename, GET_OLC_VNUM(ch->desc));
+		return FALSE;
+	}
+	
+	if (!player_can_olc_edit(ch, type, vnum)) {
+		msg_to_char(ch, "You don't have permission to edit that vnum.\r\n");
+		return FALSE;
+	}
+	
+	if (type == OLC_ROOM_TEMPLATE && !valid_room_template_vnum(vnum)) {
+		msg_to_char(ch, "Invalid room template: may not be outside any adventure zone.\r\n");
+		return FALSE;
+	}
+	
+	// make sure nobody else is already editing it
+	found = FALSE;
+	for (desc = descriptor_list; desc && !found; desc = desc->next) {
+		if (GET_OLC_TYPE(desc) == type && GET_OLC_VNUM(desc) == vnum) {
+			found = TRUE;
+		}
+	}
+	
+	if (found) {
+		msg_to_char(ch, "Someone else is already editing that %s.\r\n", typename);
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
 
 /**
 * Creates a copy of a set of icons.
