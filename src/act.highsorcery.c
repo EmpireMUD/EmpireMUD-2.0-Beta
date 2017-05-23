@@ -551,10 +551,10 @@ void summon_materials(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (found && count < total) {
+	if (found && count < total && count > 0) {
 		msg_to_char(ch, "There weren't enough, but you managed to summon %d.\r\n", count);
 	}
-
+	
 	// result messages
 	if (!found) {
 		msg_to_char(ch, "Nothing like that is stored around here.\r\n");

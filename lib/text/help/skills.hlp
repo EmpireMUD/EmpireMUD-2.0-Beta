@@ -41,14 +41,11 @@ CHOP
 Chop (Chores ability)
 
 Usage:  chop
-Speed boosts:  Faster Chores bonus, haste, higher axe damage
+Speed boosts:  Faster Chores bonus, haste, higher axe damage, higher Strength
 
 This command allows you to chop trees in the forest. Beware, trees are a
-limited resource. You can chop faster if you are stronger, if your axe deals
-more damage, or if you have haste.
-
-Different types of forest give different qualities and quantities of trees.
-Some trees can be scraped, sawed, or lit on fire.
+limited resource. Different types of forest give different qualities and
+quantities of trees. Some trees can be scraped, sawed, or lit on fire.
 
 See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW, LIGHT, CHORES
 #
@@ -251,14 +248,13 @@ MINE MINES
 Mine (Chores ability)
 
 Building:  &y/&0[]&y\&0  Mine  (Basic Buildings)
-Speed boosts:  Faster Chores bonus, haste, higher pick damage
+Speed boosts:  Faster Chores bonus, haste, higher pick damage, higher Strength
 Command:  mine
 
 "Mine" is both a building type, and the command to work in that building. Mines
 must be built on mountains, and can only be entered from one side even before
 you complete them. To work in a mine, you need a pick of some kind, although a
-simple handaxe will also work. A better mining tool and more Strength will help
-you mine faster, as will haste.
+simple handaxe will also work.
 
 Mines have a limited amount of ore, and do not replenish. However, if you fully
 dismantle a mine, its mountain will reset when the MUD celebrates a new year
