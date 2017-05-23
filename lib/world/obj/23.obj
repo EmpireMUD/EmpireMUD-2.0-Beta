@@ -720,11 +720,9 @@ the antiquated device design~
 The antiquated device design is lying here.~
    An antiquarian could use this design to create antique device parts, used to
 make an antiquated arcane apparatus, a level 200-300 crafting offhand.
-
-Forge (requires Antiquarian Crafts and crafting 200): antique device parts
 ~
-3 o a 9
-0 0 0
+7 0 a 10
+2352 0 0
 0 0
 S
 #2349
@@ -882,12 +880,11 @@ the Olympic silk recipe~
 The Olympic silk recipe is lying here.~
    On one side of this white marble slab is engraved the alchemical formulae
 for the creation of Olympic silk. The other side bears patterns for Olympian
-robes. The robe of the Olympians is a tier 3 crafting item.
-
-Weave (Alchemist Crafts, level 300): Olympic silk
+robes. The robe of the Olympians is a tier 3 crafting item. You can weave the
+Olympic silk from magic cloth.
 ~
-3 o a 8
-0 0 0
+7 0 a 9
+2364 0 0
 1 0
 S
 #2361

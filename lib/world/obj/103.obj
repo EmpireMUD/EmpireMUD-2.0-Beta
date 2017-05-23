@@ -195,44 +195,40 @@ S
 pattern leggings dragonscale~
 the dragonscale leggings pattern~
 The dragonscale leggings pattern is sitting here.~
-Sew (requires Magical Vestments and a fire): dragonscale leggings
+This pattern teaches you to sew dragonscale leggings.
 ~
-3 0 a 4
-0 0 0
+7 0 a 5
+10308 0 0
 0 0
 S
 #10313
 pattern stockings dragonweave~
 the dragonweave stockings pattern~
 The dragonweave stockings pattern is sitting here.~
-Sew (requires Magical Vestments and a fire): dragonweave stockings
+This pattern teaches you to sew dragonweave stockings.
 ~
-3 0 a 5
-0 0 0
+7 0 a 6
+10309 0 0
 0 0
 S
 #10314
 pattern dragonplate breeches~
 the dragonplate breeches pattern~
 The dragonplate breeches pattern is sitting here.~
-Forge (requires Imperial Armors and a fire): dragonplate breeches
-  3x dragon scale
-  4x large piece of leather
-  6x red bloodstone
-  8x imperium ingot
+This pattern teaches you to forge dragonplate breeches.
 ~
-3 0 a 5
-0 0 0
+7 0 a 6
+10310 0 0
 0 0
 S
 #10315
 pattern dragonmail chaps~
 the dragonmail chaps pattern~
 The dragonmail chaps pattern is sitting here.~
-Craft (requires Dangerous Leathers and a fire): dragonmail chaps
+This pattern teaches you to craft dragonmail chaps.
 ~
-3 0 a 7
-0 0 0
+7 0 a 8
+10311 0 0
 0 0
 S
 #10316
@@ -372,10 +368,10 @@ S
 pattern wristguard dragonscale~
 the dragonscale wristguard pattern~
 The dragonscale wristguard pattern is lying here.~
-Forge (Imperial Armors): dragonscale wristguard  [125-200]
+This pattern teaches you to forge dragonscale wristguards.
 ~
-3 0 a 3
-0 0 0
+7 0 a 4
+10341 0 0
 0 0
 S
 #10343
@@ -401,10 +397,10 @@ S
 pattern bangles dragonscale~
 the dragonscale bangles pattern~
 The dragonscale bangles pattern is here.~
-Craft (Magical Vestments): dragonscale bangles  [125-200]
+This pattern teaches you to craft dragonscale bangles.
 ~
-3 0 a 4
-0 0 0
+7 0 a 5
+10343 0 0
 0 0
 S
 #10345
@@ -430,10 +426,10 @@ S
 pattern dragonscale bracers~
 the dragonscale bracers pattern~
 The dragonscale bracers pattern is here.~
-Sew (Dangerous Leathers): dragonscale bracers  [125-200]
+This pattern teaches you to sew dragonscale bracers.
 ~
-3 0 a 5
-0 0 0
+7 0 a 6
+10345 0 0
 0 0
 S
 #10347
@@ -456,10 +452,10 @@ S
 pattern dragonscale saddle~
 the dragonscale saddle pattern~
 The dragonscale saddle pattern is here.~
-Sew (Dangerous Leathers): dragonscale saddle  [125-200]
+This pattern teaches you to sew a dragonscale saddle.
 ~
-3 0 a 4
-0 0 0
+7 0 a 5
+10347 0 0
 0 0
 S
 #10349

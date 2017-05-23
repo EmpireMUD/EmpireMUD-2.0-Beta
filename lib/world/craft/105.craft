@@ -154,7 +154,7 @@ S
 #10571
 whipping winds of the North~
 10571 1
-4 182 g 12 10572
+4 182 gq 12 -1
 R
 177 4 0 0
 R
@@ -167,7 +167,7 @@ S
 #10573
 frozen pykrete sword~
 10573 1
-1 196 0 12 10574
+1 196 q 12 -1
 R
 177 6 0 0
 R
@@ -182,7 +182,7 @@ S
 #10575
 icy star of winter~
 10575 1
-2 203 g 12 10576
+2 203 gq 12 -1
 R
 176 8 0 0
 R
@@ -193,7 +193,7 @@ S
 #10577
 glacial staff of the Maelstrom~
 10577 1
-2 203 0 12 10578
+2 203 q 12 -1
 R
 176 8 0 0
 R

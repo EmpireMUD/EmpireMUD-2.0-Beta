@@ -576,11 +576,9 @@ recipe aloe~
 an aloe recipe~
 An aloe recipe has been left here.~
 This is the recipe for the soothing aloe elixir.
-
-Brew (Healing Elixirs): soothing aloe elixir
 ~
-3 0 a 2
-0 0 0
+7 0 a 3
+10244 0 0
 0 0
 S
 #10250
@@ -1031,13 +1029,11 @@ S
 schematic tome primordium primordial~
 the Tome of the Primordium schematic~
 The schematic for the Tome of the Primordium is lying here.~
-This pattern allows you to craft the tome of the primordium, a powerful magical
-relic from a bygone era.
-
-Craft (requires Master Craftsman): tome of the primordium
+   This pattern allows you to craft the tome of the primordium, a powerful
+magical relic from a bygone era.
 ~
-3 0 a 3
-0 0 0
+7 0 a 4
+10282 0 0
 0 0
 S
 #10284

@@ -924,11 +924,11 @@ S
 pattern winds whipping north~
 the whipping winds of the North pattern~
 The whipping winds of the North pattern is lying here.~
-This looks complicated to do...
-Sew (Dangerous Leathers): whipping winds of the North
+   This looks complicated to do... This pattern teaches you to sew the whipping
+winds of the North.
 ~
-3 0 a 2
-0 0 0
+7 0 a 3
+10571 0 0
 0 0
 S
 #10573
@@ -953,11 +953,11 @@ S
 pattern frozen pykrete sword~
 the frozen pykrete sword pattern~
 The frozen pykrete sword is lying here.~
-Forging is easy. Forging ice without shattering it is a lot harder.
-Forge (Deadly Weapons): frozen pykrete sword
+   Forging is easy. Forging ice without shattering it is a lot harder. This
+pattern teaches you to forge a frozen pykrete sword.
 ~
-3 0 a 1
-0 0 0
+7 0 a 2
+10573 0 0
 0 0
 S
 #10575
@@ -985,11 +985,10 @@ pattern icy star winter~
 the icy star of winter pattern~
 The icy star of winter pattern is lying here.~
    Cutting ice is basically like cutting gems. The tricky bit is trapping a
-star inside it.
-Craft (Master Craftsman): icy star of winter
+star inside it. This pattern teaches you to craft the icy star of winter.
 ~
-3 0 a 1
-0 0 0
+7 0 a 2
+10575 0 0
 0 0
 S
 #10577
@@ -1019,11 +1018,10 @@ the glacial staff of the Maelstrom pattern~
 The glacial staff of the Maelstrom pattern is lying here.~
    The methods used in crafting and enchanting this staff are natural magic,
 anathema to high sorcerers, so normal staffmaking skill isn't required to craft
-it.
-Craft (Master Craftsman): glacial staff of the Maelstrom
+it. This pattern teaches you to craft a glacial staff of the Maelstrom.
 ~
-3 0 a 1
-0 0 0
+7 0 a 2
+10577 0 0
 0 0
 S
 #10579
