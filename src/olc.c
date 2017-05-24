@@ -3671,6 +3671,11 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s", num, res->vnum, line);
 				break;
 			}
+			case RES_CURRENCY: {
+				sprintf(line, "%dx %s", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, res->vnum == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
+				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s", num, res->vnum, line);
+				break;
+			}
 			default: {
 				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, "???");
 			}
@@ -6103,6 +6108,17 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					}
 					break;
 				}
+				case RES_CURRENCY: {
+					if (!*arg4 || !isdigit(*arg4)) {
+						msg_to_char(ch, "Usage: resource add currency <quantity> <vnum>\r\n");
+						return;
+					}
+					if (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_CURRENCY) {
+						msg_to_char(ch, "There is no such generic currency vnum %d.\r\n", vnum);
+						return;
+					}
+					break;
+				}
 			}
 			
 			CREATE(res, struct resource_data, 1);
@@ -6217,22 +6233,45 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			}
 		}
 		else if (is_abbrev(arg3, "vnum")) {
-			if (change->type != RES_OBJECT && change->type != RES_LIQUID && change->type != RES_ACTION) {
-				msg_to_char(ch, "You can't change the vnum on a resource that isn't an action, object, or liquid.\r\n");
+			// RES_x: ones that support change vnum
+			switch (change->type) {
+				case RES_OBJECT: {
+					if (!obj_proto(vnum)) {
+						msg_to_char(ch, "There is no such object vnum %d.\r\n", vnum);
+						return;
+					}
+					break;
+				}
+				case RES_LIQUID: {
+					if (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_LIQUID) {
+						msg_to_char(ch, "Invalid liquid generic vnum %d.\r\n", vnum);
+						return;
+					}
+					break;
+				}
+				case RES_ACTION: {
+					if (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_ACTION) {
+						msg_to_char(ch, "Invalid generic action vnum %d.\r\n", vnum);
+						return;
+					}
+					break;
+				}
+				case RES_CURRENCY: {
+					if (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_CURRENCY) {
+						msg_to_char(ch, "Invalid generic currency vnum %d.\r\n", vnum);
+						return;
+					}
+					break;
+				}
+				default: {
+					msg_to_char(ch, "You can't change the vnum on a resource of that type.\r\n");
+					return;
+				}
 			}
-			else if (change->type == RES_OBJECT && !obj_proto(vnum)) {
-				msg_to_char(ch, "There is no such object vnum %d.\r\n", vnum);
-			}
-			else if (change->type == RES_LIQUID && (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_LIQUID)) {
-				msg_to_char(ch, "Invalid liquid generic vnum %d.\r\n", vnum);
-			}
-			else if (change->type == RES_ACTION && (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_ACTION)) {
-				msg_to_char(ch, "Invalid generic action vnum %d.\r\n", vnum);
-			}
-			else {
-				change->vnum = vnum;
-				msg_to_char(ch, "You change resource %d's vnum to [%d] %s.\r\n", atoi(arg2), vnum, get_resource_name(change));
-			}
+			
+			// ok
+			change->vnum = vnum;
+			msg_to_char(ch, "You change resource %d's vnum to [%d] %s.\r\n", atoi(arg2), vnum, get_resource_name(change));
 		}
 		else if (is_abbrev(arg3, "name") || is_abbrev(arg3, "component") || is_abbrev(arg3, "pool")) {
 			// RES_x: some resource types support "change name"

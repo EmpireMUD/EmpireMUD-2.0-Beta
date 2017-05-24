@@ -2323,7 +2323,7 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 		return;	// nothing to do
 	}
 	
-	// APPLPY_RES_x: send custom messages (only) now
+	// APPLY_RES_x: send custom messages (only) now
 	if (use_obj) {
 		switch (msg_type) {
 			case APPLY_RES_BUILD: {
@@ -2452,6 +2452,19 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 			
 			charge_coins(ch, coin_emp, res->amount, build_used_list);
 			res->amount = 0;	// cost paid in full
+			break;
+		}
+		case RES_CURRENCY: {
+			if (!messaged_char && msg_type != APPLY_RES_SILENT) {
+				snprintf(buf, sizeof(buf), "You spend %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, res->amount == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
+				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+			}
+			if (!messaged_room && msg_type != APPLY_RES_SILENT) {
+				snprintf(buf, sizeof(buf), "$n spends %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, res->amount == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
+				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+			}
+			add_currency(ch, res->vnum, -(res->amount));
+			res->amount = 0;	// paid all at once
 			break;
 		}
 		case RES_POOL: {
@@ -2661,6 +2674,10 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 					charge_coins(ch, real_empire(res->vnum), res->amount, build_used_list);
 					break;
 				}
+				case RES_CURRENCY: {
+					add_currency(ch, res->vnum, -(res->amount));
+					break;
+				}
 				case RES_POOL: {
 					if (build_used_list) {
 						add_to_resource_list(build_used_list, RES_POOL, res->vnum, res->amount, 0);
@@ -2767,6 +2784,12 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 				}
 				break;
 			}
+			case RES_CURRENCY: {
+				if (get_currency(ch, res->vnum) >= res->amount) {
+					return res;
+				}
+				break;
+			}
 			case RES_POOL: {
 				// special rule: require that blood or health costs not reduce player below 1
 				amt = res->amount + ((res->vnum == HEALTH || res->vnum == BLOOD) ? 1 : 0);
@@ -2822,6 +2845,10 @@ char *get_resource_name(struct resource_data *res) {
 		}
 		case RES_COINS: {
 			snprintf(output, sizeof(output), money_amount(real_empire(res->vnum), res->amount));
+			break;
+		}
+		case RES_CURRENCY: {
+			snprintf(output, sizeof(output), "%d %s", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, res->amount == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
 			break;
 		}
 		case RES_POOL: {
@@ -2919,6 +2946,11 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 			}
 			case RES_COINS: {
 				increase_coins(ch, real_empire(res->vnum), res->amount / (split ? 2 : 1));
+				last = FALSE;	// cause next obj to refund
+				break;
+			}
+			case RES_CURRENCY: {
+				add_currency(ch, res->vnum, res->amount);
 				last = FALSE;	// cause next obj to refund
 				break;
 			}
@@ -3091,6 +3123,13 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 						if (send_msgs) {
 							msg_to_char(ch, "%s %s", (ok ? "You need" : ","), money_amount(coin_emp, res->amount));
 						}
+						ok = FALSE;
+					}
+					break;
+				}
+				case RES_CURRENCY: {
+					if (get_currency(ch, res->vnum) < res->amount) {
+						snprintf(buf, sizeof(buf), "You need %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, res->amount == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
 						ok = FALSE;
 					}
 					break;

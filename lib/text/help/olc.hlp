@@ -4708,6 +4708,7 @@ Specific syntaxes for adding:
   .resource add coins <amount>
   .resource add pool <number of points> <pool type>
   .resource add action <amount> <type>
+  .resource add currency <amount> <currency vnum>
 
 Valid pools are: health, mana, move, blood.
 

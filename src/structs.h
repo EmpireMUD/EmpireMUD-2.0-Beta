@@ -1396,6 +1396,7 @@ typedef struct vehicle_data vehicle_data;
 #define RES_COINS  3	// an amount of coins (vnum= empire id of coins)
 #define RES_POOL  4	// health, mana, etc (vnum= HEALTH, etc)
 #define RES_ACTION  5	// flavorful action strings (take time but not resources)
+#define RES_CURRENCY  6	// adventure currencies (generics)
 
 
 // storage flags (for obj storage locations)

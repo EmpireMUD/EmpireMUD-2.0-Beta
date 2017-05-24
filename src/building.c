@@ -819,7 +819,7 @@ void process_dismantling(char_data *ch, room_data *room) {
 	if (res) {
 		// RES_x: messaging
 		switch (res->type) {
-			// RES_COMPONENT and RES_ACTION aren't possible here
+			// RES_COMPONENT, RES_ACTION, and RES_CURRENCY aren't possible here
 			case RES_OBJECT: {
 				snprintf(buf, sizeof(buf), "You carefully remove %s from the structure.", get_obj_name_by_proto(res->vnum));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
@@ -845,6 +845,13 @@ void process_dismantling(char_data *ch, room_data *room) {
 				snprintf(buf, sizeof(buf), "You regain %d %s point%s from the structure.", res->amount, pool_types[res->vnum], PLURAL(res->amount));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
 				snprintf(buf, sizeof(buf), "$n retrieves %s from the structure.", pool_types[res->vnum]);
+				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				break;
+			}
+			case RES_CURRENCY: {
+				snprintf(buf, sizeof(buf), "You retrieve %d %s from the structure.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, res->amount == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
+				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+				snprintf(buf, sizeof(buf), "$n retrieves %d %s from the structure.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, res->amount == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}

@@ -2069,6 +2069,7 @@ const char *resource_types[] = {
 	"coins",
 	"pool",
 	"action",
+	"currency",
 	"\n"
 };
 
