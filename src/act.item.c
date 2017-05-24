@@ -202,18 +202,33 @@ int find_eq_pos(char_data *ch, obj_data *obj, char *arg) {
 * @param obj_data *obj The item being picked up.
 */
 void get_check_money(char_data *ch, obj_data *obj) {
-	int value = GET_COINS_AMOUNT(obj);
 	empire_data *emp = real_empire(GET_COINS_EMPIRE_ID(obj));
+	int value;
 
 	// npcs will keep the obj version
-	if (IS_NPC(ch) || GET_OBJ_TYPE(obj) != ITEM_COINS || value <= 0) {
+	if (IS_NPC(ch)) {
 		return;
 	}
-
+	
+	switch (GET_OBJ_TYPE(obj)) {
+		case ITEM_COINS: {
+			value = GET_COINS_AMOUNT(obj);
+			increase_coins(ch, emp, value);
+			msg_to_char(ch, "There %s %s.\r\n", (value == 1 ? "was" : "were"), money_amount(emp, value));
+			break;
+		}
+		case ITEM_CURRENCY: {
+			value = GET_CURRENCY_AMOUNT(obj);
+			add_currency(ch, GET_CURRENCY_VNUM(obj), value);
+			break;
+		}
+		default: {
+			return;	// nope
+		}
+	}
+	
+	// made it this far
 	extract_obj(obj);
-	increase_coins(ch, emp, value);
-
-	msg_to_char(ch, "There %s %s.\r\n", (value == 1 ? "was" : "were"), money_amount(emp, value));
 }
 
 
