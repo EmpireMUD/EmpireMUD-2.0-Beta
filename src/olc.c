@@ -461,6 +461,7 @@ void olc_show_object(char_data *ch);
 void olc_show_quest(char_data *ch);
 void olc_show_room_template(char_data *ch);
 void olc_show_sector(char_data *ch);
+void olc_show_shop(char_data *ch);
 void olc_show_skill(char_data *ch);
 void olc_show_social(char_data *ch);
 void olc_show_trigger(char_data *ch);
@@ -483,6 +484,7 @@ extern obj_data *setup_olc_object(obj_data *input);
 extern quest_data *setup_olc_quest(quest_data *input);
 extern room_template *setup_olc_room_template(room_template *input);
 extern sector_data *setup_olc_sector(sector_data *input);
+extern shop_data *setup_olc_shop(shop_data *input);
 extern skill_data *setup_olc_skill(skill_data *input);
 extern social_data *setup_olc_social(social_data *input);
 extern struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_storage);
@@ -493,16 +495,16 @@ extern bool validate_icon(char *icon);
 // master olc command structure
 const struct olc_command_data olc_data[] = {
 	// OLC_x: main commands
-	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SKILL | OLC_SOCIAL | OLC_VEHICLE, NOBITS },
-	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
+	{ "abort", olc_abort, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "audit", olc_audit, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_VEHICLE, NOBITS },
+	{ "copy", olc_copy, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "delete", olc_delete, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_NO_ABBREV },
 	// "display" command uses the shortcut "." or "olc" with no args, and is in the do_olc function
-	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
-	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
-	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "edit", olc_edit, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "free", olc_free, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "list", olc_list, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
+	{ "save", olc_save, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, OLC_CF_EDITOR | OLC_CF_NO_ABBREV },
+	{ "search", olc_search, OLC_ABILITY | OLC_ARCHETYPE | OLC_AUGMENT | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	
 	// admin
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
@@ -1091,6 +1093,11 @@ OLC_MODULE(olc_abort) {
 				GET_OLC_SECTOR(ch->desc) = NULL;
 				break;
 			}
+			case OLC_SHOP: {
+				free_shop(GET_OLC_SHOP(ch->desc));
+				GET_OLC_SHOP(ch->desc) = NULL;
+				break;
+			}
 			case OLC_SKILL: {
 				free_skill(GET_OLC_SKILL(ch->desc));
 				GET_OLC_SKILL(ch->desc) = NULL;
@@ -1331,6 +1338,16 @@ OLC_MODULE(olc_audit) {
 				break;
 			}
 			*/
+			case OLC_SHOP: {
+				extern bool audit_shop(shop_data *shop, char_data *ch);
+				shop_data *shop, *next_shop;
+				HASH_ITER(hh, shop_table, shop, next_shop) {
+					if (SHOP_VNUM(shop) >= from_vnum && SHOP_VNUM(shop) <= to_vnum) {
+						found |= audit_shop(shop, ch);
+					}
+				}
+				break;
+			}
 			case OLC_SKILL: {
 				extern bool audit_skill(skill_data *skill, char_data *ch);
 				skill_data *skill, *next_skill;
@@ -1511,6 +1528,11 @@ OLC_MODULE(olc_copy) {
 		case OLC_SECTOR: {
 			found = (sector_proto(vnum) != NULL);
 			exists = (sector_proto(from_vnum) != NULL);
+			break;
+		}
+		case OLC_SHOP: {
+			found = (real_shop(vnum) != NULL);
+			exists = (real_shop(from_vnum) != NULL);
 			break;
 		}
 		case OLC_SKILL: {
@@ -1697,6 +1719,12 @@ OLC_MODULE(olc_copy) {
 			olc_show_sector(ch);
 			break;
 		}
+		case OLC_SHOP: {
+			GET_OLC_SHOP(ch->desc) = setup_olc_shop(real_shop(from_vnum));
+			GET_OLC_SHOP(ch->desc)->vnum = vnum;
+			olc_show_shop(ch);
+			break;
+		}
 		case OLC_SKILL: {
 			GET_OLC_SKILL(ch->desc) = setup_olc_skill(find_skill_by_vnum(from_vnum));
 			GET_OLC_SKILL(ch->desc)->vnum = vnum;
@@ -1869,6 +1897,11 @@ OLC_MODULE(olc_delete) {
 			olc_delete_sector(ch, vnum);
 			break;
 		}
+		case OLC_SHOP: {
+			void olc_delete_shop(char_data *ch, any_vnum vnum);
+			olc_delete_shop(ch, vnum);
+			break;
+		}
 		case OLC_SKILL: {
 			olc_delete_skill(ch, vnum);
 			break;
@@ -1966,6 +1999,10 @@ OLC_MODULE(olc_display) {
 		}
 		case OLC_SECTOR: {
 			olc_show_sector(ch);
+			break;
+		}
+		case OLC_SHOP: {
+			olc_show_shop(ch);
 			break;
 		}
 		case OLC_SKILL: {
@@ -2144,6 +2181,13 @@ OLC_MODULE(olc_edit) {
 			olc_show_sector(ch);
 			break;
 		}
+		case OLC_SHOP: {
+			// this will set up from existing OR new automatically based on real_shop
+			GET_OLC_SHOP(ch->desc) = setup_olc_shop(real_shop(vnum));
+			GET_OLC_SHOP(ch->desc)->vnum = vnum;			
+			olc_show_shop(ch);
+			break;
+		}
 		case OLC_SKILL: {
 			// this sets up either new or existing automatically
 			GET_OLC_SKILL(ch->desc) = setup_olc_skill(find_skill_by_vnum(vnum));
@@ -2286,6 +2330,10 @@ OLC_MODULE(olc_free) {
 				}
 				case OLC_SECTOR: {
 					free = (sector_proto(iter) == NULL);
+					break;
+				}
+				case OLC_SHOP: {
+					free = (real_shop(iter) == NULL);
 					break;
 				}
 				case OLC_SKILL: {
@@ -2669,6 +2717,20 @@ OLC_MODULE(olc_list) {
 				}
 				break;
 			}
+			case OLC_SHOP: {
+				extern char *list_one_shop(shop_data *shop, bool detail);
+				shop_data *shop, *next_shop;
+				HASH_ITER(hh, shop_table, shop, next_shop) {
+					if (len >= sizeof(buf)) {
+						break;
+					}
+					if (SHOP_VNUM(shop) >= from_vnum && SHOP_VNUM(shop) <= to_vnum) {
+						++count;
+						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_shop(shop, show_details));
+					}
+				}
+				break;
+			}
 			case OLC_SKILL: {
 				extern char *list_one_skill(skill_data *skill, bool detail);
 				skill_data *skill, *next_skill;
@@ -2752,6 +2814,7 @@ OLC_MODULE(olc_removeindev) {
 	faction_data *fct, *next_fct;
 	social_data *soc, *next_soc;
 	augment_data *aug, *next_aug;
+	shop_data *shop, *next_shop;
 	class_data *cls, *next_cls;
 	adv_data *adv = NULL;
 	descriptor_data *desc;
@@ -2939,6 +3002,23 @@ OLC_MODULE(olc_removeindev) {
 			REMOVE_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 			msg_to_char(ch, "Removed IN-DEV flag from quest [%d] %s.\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			any = TRUE;
+		}
+		
+		HASH_ITER(hh, shop_table, shop, next_shop) {
+			if (SHOP_VNUM(shop) < from || SHOP_VNUM(shop) > to) {
+				continue;
+			}
+			if (!IS_SET(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (!player_can_olc_edit(ch, OLC_SHOP, SHOP_VNUM(shop))) {
+				continue;
+			}
+			
+			REMOVE_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
+			msg_to_char(ch, "Removed IN-DEV flag from shop [%d] %s.\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
 			any = TRUE;
 		}
 		
@@ -3182,6 +3262,13 @@ OLC_MODULE(olc_save) {
 				GET_OLC_SECTOR(ch->desc) = NULL;
 				break;
 			}
+			case OLC_SHOP: {
+				void save_olc_shop(descriptor_data *desc);
+				save_olc_shop(ch->desc);
+				free_shop(GET_OLC_SHOP(ch->desc));
+				GET_OLC_SHOP(ch->desc) = NULL;
+				break;
+			}
 			case OLC_SKILL: {
 				save_olc_skill(ch->desc);
 				free_skill(GET_OLC_SKILL(ch->desc));
@@ -3323,6 +3410,11 @@ OLC_MODULE(olc_search) {
 			}
 			case OLC_SECTOR: {
 				olc_search_sector(ch, vnum);
+				break;
+			}
+			case OLC_SHOP: {
+				void olc_search_shop(char_data *ch, any_vnum vnum);
+				olc_search_shop(ch, vnum);
 				break;
 			}
 			case OLC_SKILL: {
@@ -4134,6 +4226,9 @@ bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_ROOM_TEMPLATE) && !OLC_FLAGGED(ch, OLC_FLAG_NO_ROOM_TEMPLATE)) {
+			return TRUE;
+		}
+		else if (IS_SET(type, OLC_SHOP) && !OLC_FLAGGED(ch, OLC_FLAG_NO_SHOPS)) {
 			return TRUE;
 		}
 		else if (IS_SET(type, OLC_SOCIAL) && !OLC_FLAGGED(ch, OLC_FLAG_NO_SOCIALS)) {
