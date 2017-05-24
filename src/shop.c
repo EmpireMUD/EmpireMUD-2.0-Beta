@@ -686,7 +686,14 @@ OLC_MODULE(shopedit_allegiance) {
 
 OLC_MODULE(shopedit_flags) {
 	shop_data *shop = GET_OLC_SHOP(ch->desc);
+	bool had_indev = IS_SET(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT) ? TRUE : FALSE;
 	SHOP_FLAGS(shop) = olc_process_flag(ch, argument, "shop", "flags", shop_flags, SHOP_FLAGS(shop));
+		
+	// validate removal of IN-DEVELOPMENT
+	if (had_indev && !SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT) && GET_ACCESS_LEVEL(ch) < LVL_UNRESTRICTED_BUILDER && !OLC_FLAGGED(ch, OLC_FLAG_CLEAR_IN_DEV)) {
+		msg_to_char(ch, "You don't have permission to remove the IN-DEVELOPMENT flag.\r\n");
+		SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+	}
 }
 
 
