@@ -4421,6 +4421,7 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 	bool need_mob = FALSE, need_obj = FALSE, need_quest = FALSE;
 	bool need_rmt = FALSE, need_sect = FALSE, need_skill = FALSE;
 	bool need_veh = FALSE, need_mob_flags = FALSE, need_faction = FALSE;
+	bool need_currency = FALSE;
 	
 	*amount = 1;
 	*vnum = 0;
@@ -4494,6 +4495,9 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			need_faction = TRUE;
 			break;
 		}
+		case REQ_GET_CURRENCY: {
+			need_currency = TRUE;
+		}
 	}
 	
 	// REQ_AMT_x: possible args
@@ -4550,6 +4554,19 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			argument = any_one_word(argument, arg);
 			*misc = olc_process_flag(ch, arg, "component", "", component_flags, NOBITS);
 		}
+	}
+	if (need_currency) {
+		generic_data *gen;
+		argument = any_one_word(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a generic currency vnum.\r\n");
+			return FALSE;
+		}
+		if (!(gen = find_generic_by_vnum(atoi(arg))) || GEN_TYPE(gen) != GENERIC_CURRENCY) {
+			msg_to_char(ch, "Invalid generic currency '%s'.\r\n", arg);
+			return FALSE;
+		}
+		*vnum = GEN_VNUM(gen);
 	}
 	if (need_faction) {
 		faction_data *fct;

@@ -359,6 +359,7 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_REP_UNDER  17
 #define REQ_WEARING  18
 #define REQ_WEARING_OR_HAS  19
+#define REQ_GET_CURRENCY  20
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -1804,6 +1805,7 @@ typedef struct vehicle_data vehicle_data;
 #define QR_SKILL_LEVELS  5
 #define QR_QUEST_CHAIN  6
 #define QR_REPUTATION  7
+#define QR_CURRENCY  8
 
 
 // indicates empire (rather than misc) coins for a reward

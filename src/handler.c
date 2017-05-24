@@ -2356,6 +2356,7 @@ int add_currency(char_data *ch, any_vnum vnum, int amount) {
 	}
 	
 	SAFE_ADD(cur->amount, amount, 0, INT_MAX, FALSE);
+	qt_change_currency(ch, vnum, cur->amount);
 	
 	// housecleaning
 	if (cur->amount == 0) {
@@ -5644,6 +5645,10 @@ void extract_required_items(char_data *ch, struct req_data *list) {
 				add_to_resource_list(&res, RES_OBJECT, req->vnum, req->needed, 0);
 				break;
 			}
+			case REQ_GET_CURRENCY: {
+				add_currency(ch, req->vnum, req->needed);
+				break;
+			}
 		}
 	}
 	
@@ -5738,6 +5743,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 		switch(req->type) {
 			case REQ_COMPLETED_QUEST: {
 				if (!has_completed_quest(ch, req->vnum, instance ? instance->id : NOTHING)) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_GET_CURRENCY: {
+				if (get_currency(ch, req->vnum) < req->needed) {
 					ok = FALSE;
 				}
 				break;
@@ -5933,6 +5944,10 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_GET_OBJECT: {
 			snprintf(output, sizeof(output), "Get object%s: %dx %s%s", PLURAL(req->needed), req->needed, vnum, get_obj_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_GET_CURRENCY: {
+			snprintf(output, sizeof(output), "Get currency: %d %s%s", req->needed, vnum, get_generic_string_by_vnum(req->vnum, GENERIC_CURRENCY, req->needed == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
 			break;
 		}
 		case REQ_KILL_MOB: {

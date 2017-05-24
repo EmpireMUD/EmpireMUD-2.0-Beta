@@ -2253,6 +2253,7 @@ const char *quest_reward_types[] = {
 	"SKILL-LEVELS",	// 5
 	"QUEST-CHAIN",
 	"REPUTATION",
+	"CURRENCY",
 	"\n",
 };
 
@@ -3301,6 +3302,7 @@ const char *requirement_types[] = {
 	"REP-UNDER",
 	"WEARING",
 	"WEARING-OR-HAS",
+	"GET-CURRENCY",	// 20
 	"\n",
 };
 
@@ -3327,6 +3329,7 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_REPUTATION,	// faction-under
 	REQ_AMT_NONE,	// wearing
 	REQ_AMT_NONE,	// wearing-or-has
+	REQ_AMT_NUMBER,	// currency
 };
 
 
@@ -3352,6 +3355,7 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// faction-under
 	FALSE,	// wearing
 	FALSE,	// wearing-or-has
+	FALSE,	// currency
 };
 
 

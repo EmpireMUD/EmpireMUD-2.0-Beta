@@ -452,6 +452,10 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 			snprintf(output, sizeof(output), "%d %s coin%s", reward->amount, reward->vnum == OTHER_COIN ? "misc" : "empire", PLURAL(reward->amount));
 			break;
 		}
+		case QR_CURRENCY: {
+			snprintf(output, sizeof(output), "%d %s", reward->amount, get_generic_string_by_vnum(reward->vnum, GENERIC_CURRENCY, reward->amount == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
+			break;
+		}
 		case QR_OBJECT: {
 			snprintf(output, sizeof(output), "%s%dx %s", vnum, reward->amount, skip_filler(get_obj_name_by_proto(reward->vnum)));
 			break;
@@ -605,6 +609,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				}
 				
 				task->current += count_quest_objects(ch, task->vnum, FALSE);
+				break;
+			}
+			case REQ_GET_CURRENCY: {
+				task->current = get_currency(ch, task->vnum);
 				break;
 			}
 		}
@@ -1676,6 +1684,31 @@ void qt_empire_players(empire_data *emp, void (*func)(char_data *ch, any_vnum vn
 		
 		// call it
 		(func)(ch, vnum);
+	}
+}
+
+
+/**
+* Quest Tracker: ch gains/loses currency
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The generic currency vnum.
+* @param int total The new value of the currency.
+*/
+void qt_change_currency(char_data *ch, any_vnum vnum, int total) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_GET_CURRENCY && task->vnum == vnum) {
+				task->current = total;
+			}
+		}
 	}
 }
 
@@ -3864,6 +3897,7 @@ OLC_MODULE(qedit_rewards) {
 	struct quest_reward **list = &QUEST_REWARDS(quest);
 	int findtype, num, stype;
 	faction_data *fct;
+	generic_data *gen;
 	bool found, ok;
 	any_vnum vnum;
 	
@@ -3991,6 +4025,20 @@ OLC_MODULE(qedit_rewards) {
 						return;
 					}
 					break;	
+				}
+				case QR_CURRENCY: {
+					if (!*vnum_arg) {
+						msg_to_char(ch, "Usage: rewards add currency <amount> <generic vnum>\r\n");
+						return;
+					}
+					if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+						msg_to_char(ch, "Invalid generic vnum '%s'.\r\n", vnum_arg);
+						return;
+					}
+					if ((gen = find_generic_by_vnum(vnum)) && GEN_TYPE(gen) == GENERIC_CURRENCY) {
+						ok = TRUE;
+					}
+					break;
 				}
 				case QR_OBJECT: {
 					if (!*vnum_arg) {
@@ -4125,6 +4173,16 @@ OLC_MODULE(qedit_rewards) {
 						return;
 					}
 					break;	
+				}
+				case QR_CURRENCY: {
+					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+						msg_to_char(ch, "Invalid currency vnum '%s'.\r\n", vnum_arg);
+						return;
+					}
+					if ((gen = find_generic_by_vnum(vnum)) && GEN_TYPE(gen) == GENERIC_CURRENCY) {
+						ok = TRUE;
+					}
+					break;
 				}
 				case QR_OBJECT: {
 					if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
