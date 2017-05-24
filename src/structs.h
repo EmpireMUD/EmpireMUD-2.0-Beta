@@ -4178,7 +4178,7 @@ struct shop_data {
 	char *name;	// internal use
 	
 	bitvector_t flags;	// SHOP_ flags
-	any_vnum allegiance;	// faction, if any
+	faction_data *allegiance;	// faction, if any
 	int open_time;	// 0-23, if any
 	int close_time;
 	

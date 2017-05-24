@@ -39,9 +39,13 @@
 const char *default_shop_name = "Unnamed Shop";
 
 // external consts
+extern struct faction_reputation_type reputation_levels[];
 extern const char *shop_flags[];
 
 // external funcs
+extern struct quest_giver *copy_quest_givers(struct quest_giver *from);
+void free_quest_givers(struct quest_giver *list);
+void get_quest_giver_display(struct quest_giver *list, char *save_buffer);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -178,6 +182,45 @@ void clear_shop(shop_data *shop) {
 
 
 /**
+* @param struct shop_item *from The list to copy.
+* @return struct shop_item* The copy of the list.
+*/
+struct shop_item *copy_shop_item_list(struct shop_item *from) {
+	struct shop_item *el, *iter, *list = NULL, *end = NULL;
+	
+	LL_FOREACH(from, iter) {
+		CREATE(el, struct shop_item, 1);
+		*el = *iter;
+		el->next = NULL;
+		
+		if (end) {
+			end->next = el;
+		}
+		else {
+			list = el;
+		}
+		end = el;
+	}
+	
+	return list;
+}
+
+
+/**
+* Frees a set of shop items.
+*
+* @param struct shop_item *list The list to free.
+*/
+void free_shop_item_list(struct shop_item *list) {
+	struct shop_item *iter;
+	while ((iter = list)) {
+		list = iter->next;
+		free(iter);
+	}
+}
+
+
+/**
 * frees up memory for a shop data item.
 *
 * See also: olc_delete_shop
@@ -191,6 +234,13 @@ void free_shop(shop_data *shop) {
 		free(SHOP_NAME(shop));
 	}
 	
+	if (SHOP_ITEMS(shop) && (!proto || SHOP_ITEMS(shop) != SHOP_ITEMS(proto))) {
+		free_shop_item_list(SHOP_ITEMS(shop));
+	}
+	if (SHOP_LOCATIONS(shop) && (!proto || SHOP_LOCATIONS(shop) != SHOP_LOCATIONS(proto))) {
+		free_quest_givers(SHOP_LOCATIONS(shop));
+	}
+	
 	free(shop);
 }
 
@@ -202,9 +252,10 @@ void free_shop(shop_data *shop) {
 * @param any_vnum vnum The shop vnum
 */
 void parse_shop(FILE *fl, any_vnum vnum) {
-	void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
+	void parse_quest_giver(FILE *fl, struct quest_giver **list, char *error_str);
 	
 	char line[256], error[256], str_in[256];
+	struct shop_item *item;
 	shop_data *shop, *find;
 	int int_in[4];
 	
@@ -231,7 +282,7 @@ void parse_shop(FILE *fl, any_vnum vnum) {
 		exit(1);
 	}
 	
-	SHOP_ALLEGIANCE(shop) = int_in[0];
+	SHOP_ALLEGIANCE(shop) = find_faction_by_vnum(int_in[0]);
 	SHOP_OPEN_TIME(shop) = int_in[1];
 	SHOP_CLOSE_TIME(shop) = int_in[2];
 	SHOP_FLAGS(shop) = asciiflag_conv(str_in);
@@ -242,7 +293,27 @@ void parse_shop(FILE *fl, any_vnum vnum) {
 			log("SYSERR: Format error in %s, expecting alphabetic flags", error);
 			exit(1);
 		}
-		switch (*line) {			
+		switch (*line) {
+			case 'I': {	// item
+				if (sscanf(line, "I %d %d %d %d\n", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
+					log("SYSERR: Format error in I line of %s", error);
+					exit(1);
+				}
+				
+				CREATE(item, struct shop_item, 1);
+				item->vnum = int_in[0];
+				item->cost = int_in[1];
+				item->currency = int_in[2];
+				item->min_rep = int_in[3];
+				
+				LL_APPEND(SHOP_ITEMS(shop), item);
+				break;
+			}
+			case 'L': {	// locations
+				parse_quest_giver(fl, &SHOP_LOCATIONS(shop), error);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -299,6 +370,9 @@ void write_shop_index(FILE *fl) {
 * @param shop_data *shop The thing to save.
 */
 void write_shop_to_file(FILE *fl, shop_data *shop) {
+	void write_quest_givers_to_file(FILE *fl, char letter, struct quest_giver *list);
+	
+	struct shop_item *item;
 	char temp[256];
 	
 	if (!fl || !shop) {
@@ -313,7 +387,15 @@ void write_shop_to_file(FILE *fl, shop_data *shop) {
 	
 	// 2. allegiance open close flags
 	strcpy(temp, bitv_to_alpha(SHOP_FLAGS(shop)));
-	fprintf(fl, "%d %d %d %s\n", SHOP_ALLEGIANCE(shop), SHOP_OPEN_TIME(shop), SHOP_CLOSE_TIME(shop), temp);
+	fprintf(fl, "%d %d %d %s\n", SHOP_ALLEGIANCE(shop) ? FCT_VNUM(SHOP_ALLEGIANCE(shop)) : NOTHING, SHOP_OPEN_TIME(shop), SHOP_CLOSE_TIME(shop), temp);
+	
+	// 'I' items
+	LL_FOREACH(SHOP_ITEMS(shop), item) {
+		fprintf(fl, "I %d %d %d %d\n", item->vnum, item->cost, item->currency, item->min_rep);
+	}
+	
+	// 'L' locations
+	write_quest_givers_to_file(fl, 'L', SHOP_LOCATIONS(shop));
 	
 	// end
 	fprintf(fl, "S\n");
@@ -405,6 +487,8 @@ void save_olc_shop(descriptor_data *desc) {
 	if (SHOP_NAME(proto)) {
 		free(SHOP_NAME(proto));
 	}
+	free_shop_item_list(SHOP_ITEMS(proto));
+	free_quest_givers(SHOP_LOCATIONS(proto));
 	
 	// sanity
 	if (!SHOP_NAME(shop) || !*SHOP_NAME(shop)) {
@@ -445,6 +529,8 @@ shop_data *setup_olc_shop(shop_data *input) {
 		
 		// copy things that are pointers
 		SHOP_NAME(new) = SHOP_NAME(input) ? str_dup(SHOP_NAME(input)) : NULL;
+		SHOP_ITEMS(new) = copy_shop_item_list(SHOP_ITEMS(input));
+		SHOP_LOCATIONS(new) = copy_quest_givers(SHOP_LOCATIONS(input));
 	}
 	else {
 		// brand new: some defaults
@@ -458,6 +544,34 @@ shop_data *setup_olc_shop(shop_data *input) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
+
+/**
+* Gets the display for a set of shop items.
+*
+* @param shop_data *shop The shop being shown.
+* @param struct shop_item *list Pointer to the start of a list of shop items.
+* @param char *save_buffer A buffer to store the result to.
+*/
+void get_shop_items_display(shop_data *shop, char *save_buffer) {
+	char buf[MAX_STRING_LENGTH];
+	struct shop_item *item;
+	int count = 0;
+	
+	*save_buffer = '\0';
+	LL_FOREACH(SHOP_ITEMS(shop), item) {
+		if (SHOP_ALLEGIANCE(shop)) {
+			snprintf(buf, sizeof(buf), " (%s)", reputation_levels[rep_const_to_index(item->min_rep)].name);
+		}
+		else {
+			*buf = '\0';
+		}
+		
+		sprintf(save_buffer + strlen(save_buffer), "%2d. [%5d] %s for %d %s%s\r\n", ++count, item->vnum, get_obj_name_by_proto(item->vnum), item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, item->cost == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL)), buf);
+	}
+	
+	// empty list not shown
+}
+
 
 /**
 * For vstat.
@@ -504,6 +618,16 @@ void olc_show_shop(char_data *ch) {
 	
 	sprintbit(SHOP_FLAGS(shop), shop_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
+	
+	sprintf(buf + strlen(buf), "<\tyopens\t0> %d%s\r\n", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)));
+	sprintf(buf + strlen(buf), "<\tycloses\t0> %d%s\r\n", TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
+	sprintf(buf + strlen(buf), "<\tyallegiance\t0> %s\r\n", SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
+	
+	get_quest_giver_display(SHOP_LOCATIONS(shop), lbuf);
+	sprintf(buf + strlen(buf), "Locations: <\tylocations\t0>\r\n%s", lbuf);
+	
+	get_shop_items_display(shop, lbuf);
+	sprintf(buf + strlen(buf), "Items: <\tyitems\t0>\r\n%s", lbuf);
 	
 	page_string(ch->desc, buf, TRUE);
 }

@@ -1601,6 +1601,11 @@ extern char *get_vehicle_name_by_proto(obj_vnum vnum);
 #define ABSOLUTE(x)  ((x < 0) ? ((x) * -1) : (x))
 
 
+// time: converts 0-23 to 1-12am, 1-12pm
+#define TIME_TO_12H(time)  ((time) > 12 ? (time) - 12 : ((time) == 0 ? 12 : (time)))
+#define AM_PM(time)  (time < 12 ? "am" : "pm")
+
+
 /* undefine MAX and MIN so that our macros are used instead */
 #ifdef MAX
 #undef MAX
