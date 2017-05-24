@@ -184,12 +184,11 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_CURRENCY: {
-			generic_data *gen;
 			if (GET_CURRENCY_AMOUNT(obj) == 0) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Currency amount not set");
 				problem = TRUE;
 			}
-			if (!(gen = find_generic_by_vnum(GET_CURRENCY_VNUM(obj))) || GEN_TYPE(gen) != GENERIC_CURRENCY) {
+			if (!find_generic(GET_CURRENCY_VNUM(obj), GENERIC_CURRENCY)) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Currency vnum not set");
 				problem = TRUE;
 			}
@@ -2349,14 +2348,13 @@ OLC_MODULE(oedit_corpseof) {
 OLC_MODULE(oedit_currency) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	any_vnum old = GET_CURRENCY_VNUM(obj);
-	generic_data *gen;
 	
 	if (!IS_CURRENCY(obj)) {
 		msg_to_char(ch, "You can only set that on a currency object.\r\n");
 	}
 	else {
 		GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM) = olc_process_number(ch, argument, "currency vnum", "currency", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM));
-		if (GET_CURRENCY_VNUM(obj) != old && (!(gen = find_generic_by_vnum(GET_CURRENCY_VNUM(obj))) || GEN_TYPE(gen) != GENERIC_CURRENCY)) {
+		if (GET_CURRENCY_VNUM(obj) != old && !find_generic(GET_CURRENCY_VNUM(obj), GENERIC_CURRENCY)) {
 			msg_to_char(ch, "%d is not a currency generic. Old value restored.\r\n", GET_CURRENCY_VNUM(obj));
 			GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM) = old;
 		}
@@ -2575,7 +2573,6 @@ OLC_MODULE(oedit_keywords) {
 
 OLC_MODULE(oedit_liquid) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	generic_data *gen;
 	any_vnum old;
 	
 	if (!IS_DRINK_CONTAINER(obj)) {
@@ -2585,7 +2582,7 @@ OLC_MODULE(oedit_liquid) {
 		old = GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE);
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = olc_process_number(ch, argument, "liquid vnum", "liquid", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE));
 
-		if (!(gen = find_generic_by_vnum(GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE))) || GEN_TYPE(gen) != GENERIC_LIQUID) {
+		if (!find_generic(GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE), GENERIC_LIQUID)) {
 			msg_to_char(ch, "Invalid liquid generic vnum %d. Old value restored.\r\n", GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE));
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = old;
 		}

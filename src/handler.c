@@ -257,7 +257,7 @@ void affect_from_room_by_bitvector(room_data *room, any_vnum type, bitvector_t b
 	
 	LL_FOREACH_SAFE(ROOM_AFFECTS(room), aff, next_aff) {
 		if (aff->type == type && IS_SET(aff->bitvector, bits)) {
-			if (show_msg && !shown && (gen = find_generic_by_vnum(aff->type))) {
+			if (show_msg && !shown && (gen = find_generic(aff->type, GENERIC_AFFECT))) {
 				if (GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ROOM_PEOPLE(room)) {
 					act(GET_AFFECT_WEAR_OFF_TO_CHAR(gen), FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 				}
@@ -885,7 +885,7 @@ bool room_affected_by_spell(room_data *room, any_vnum type) {
 * @param any_vnum atype The ATYPE_ affect type.
 */
 void show_wear_off_msg(char_data *ch, any_vnum atype) {
-	generic_data *gen = find_generic_by_vnum(atype);
+	generic_data *gen = find_generic(atype, GENERIC_AFFECT);
 	if (gen && GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ch->desc) {
 		msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_AFFECT_WEAR_OFF_TO_CHAR(gen));
 	}
@@ -2247,7 +2247,7 @@ void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 	struct cooldown_data *cool;
 	bool found = FALSE;
 	
-	if (!find_generic_by_vnum(type)) {
+	if (!find_generic(type, GENERIC_COOLDOWN)) {
 		log("SYSERR: add_cooldown called with invalid cooldown vnum %d", type);
 		return;
 	}
@@ -2339,9 +2339,8 @@ void remove_cooldown_by_type(char_data *ch, any_vnum type) {
 */
 int add_currency(char_data *ch, any_vnum vnum, int amount) {
 	struct player_currency *cur;
-	generic_data *gen;
 	
-	if (IS_NPC(ch) || !(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_CURRENCY) {
+	if (IS_NPC(ch) || !find_generic(vnum, GENERIC_CURRENCY)) {
 		return 0;
 	}
 	if (amount == 0) {

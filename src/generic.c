@@ -67,7 +67,7 @@ extern bool remove_thing_from_resource_list(struct resource_data **list, int typ
 * @return const char* The name, or UNKNOWN if none.
 */
 const char *get_generic_name_by_vnum(any_vnum vnum) {
-	generic_data *gen = find_generic_by_vnum(vnum);
+	generic_data *gen = real_generic(vnum);
 	
 	if (!gen) {
 		return "UNKNOWN";	// sanity
@@ -88,9 +88,9 @@ const char *get_generic_name_by_vnum(any_vnum vnum) {
 * @return const char* The string from the generic.
 */
 const char *get_generic_string_by_vnum(any_vnum vnum, int type, int pos) {
-	generic_data *gen = find_generic_by_vnum(vnum);
+	generic_data *gen = find_generic(vnum, type);
 	
-	if (!gen || GEN_TYPE(gen) != type || pos < 0 || pos >= NUM_GENERIC_STRINGS) {
+	if (!gen || pos < 0 || pos >= NUM_GENERIC_STRINGS) {
 		return "UNKNOWN";	// sanity
 	}
 	else if (!GEN_STRING(gen, pos)) {
@@ -112,9 +112,9 @@ const char *get_generic_string_by_vnum(any_vnum vnum, int type, int pos) {
 * @return int The value from the generic.
 */
 int get_generic_value_by_vnum(any_vnum vnum, int type, int pos) {
-	generic_data *gen = find_generic_by_vnum(vnum);
+	generic_data *gen = find_generic(vnum, type);
 	
-	if (!gen || GEN_TYPE(gen) != type || pos < 0 || pos >= NUM_GENERIC_VALUES) {
+	if (!gen || pos < 0 || pos >= NUM_GENERIC_VALUES) {
 		return 0;	// sanity
 	}
 	else {
@@ -241,7 +241,7 @@ char *list_one_generic(generic_data *gen, bool detail) {
 */
 void olc_search_generic(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
-	generic_data *gen = find_generic_by_vnum(vnum);
+	generic_data *gen = real_generic(vnum);
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	augment_data *aug, *next_aug;
@@ -428,7 +428,7 @@ void clear_generic(generic_data *gen) {
 * @param generic_data *gen The generic data to free.
 */
 void free_generic(generic_data *gen) {
-	generic_data *proto = find_generic_by_vnum(GEN_VNUM(gen));
+	generic_data *proto = real_generic(GEN_VNUM(gen));
 	int iter;
 	
 	if (GEN_NAME(gen) && (!proto || GEN_NAME(gen) != GEN_NAME(proto))) {
@@ -535,6 +535,25 @@ void parse_generic(FILE *fl, any_vnum vnum) {
 
 
 /**
+* Version of real_generic() that also checks typesafety.
+*
+* @param any_vnum vnum Any generic vnum
+* @param int type The GENERIC_ type to find.
+* @return generic_data* The generic, or NULL if it doesn't exist or has the wrong type.
+*/
+generic_data *find_generic(any_vnum vnum, int type) {
+	generic_data *gen = real_generic(vnum);
+	
+	if (gen && GEN_TYPE(gen) == type) {
+		return gen;
+	}
+	else {
+		return NULL;
+	}
+}
+
+
+/**
 * @param int type Any GENERIC_ type.
 * @param char *name The name to search.
 * @param bool exact Can only abbreviate if FALSE.
@@ -563,7 +582,7 @@ generic_data *find_generic_by_name(int type, char *name, bool exact) {
 * @param any_vnum vnum Any generic vnum
 * @return generic_data* The generic, or NULL if it doesn't exist
 */
-generic_data *find_generic_by_vnum(any_vnum vnum) {
+generic_data *real_generic(any_vnum vnum) {
 	generic_data *gen;
 	
 	if (vnum < 0 || vnum == NOTHING) {
@@ -646,9 +665,9 @@ generic_data *create_generic_table_entry(any_vnum vnum) {
 	generic_data *gen;
 	
 	// sanity
-	if (find_generic_by_vnum(vnum)) {
+	if (real_generic(vnum)) {
 		log("SYSERR: Attempting to insert generic at existing vnum %d", vnum);
-		return find_generic_by_vnum(vnum);
+		return real_generic(vnum);
 	}
 	
 	CREATE(gen, generic_data, 1);
@@ -691,7 +710,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	bool found, save;
 	int res_type;
 	
-	if (!(gen = find_generic_by_vnum(vnum))) {
+	if (!(gen = real_generic(vnum))) {
 		msg_to_char(ch, "There is no such generic %d.\r\n", vnum);
 		return;
 	}
@@ -954,7 +973,7 @@ void save_olc_generic(descriptor_data *desc) {
 	int iter;
 
 	// have a place to save it?
-	if (!(proto = find_generic_by_vnum(vnum))) {
+	if (!(proto = real_generic(vnum))) {
 		proto = create_generic_table_entry(vnum);
 	}
 	
@@ -1108,7 +1127,7 @@ void olc_show_generic(char_data *ch) {
 	
 	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !find_generic_by_vnum(GEN_VNUM(gen)) ? "new generic" : GEN_NAME(find_generic_by_vnum(GEN_VNUM(gen))));
+	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !real_generic(GEN_VNUM(gen)) ? "new generic" : GEN_NAME(real_generic(GEN_VNUM(gen))));
 	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(GEN_NAME(gen)));
 	sprintf(buf + strlen(buf), "<\tytype\t0> %s\r\n", generic_types[GEN_TYPE(gen)]);
 	
@@ -1380,7 +1399,7 @@ OLC_MODULE(genedit_quick_cooldown) {
 		msg_to_char(ch, "You must pick a valid vnum between 0 and %d.\r\n", MAX_VNUM);
 		return;
 	}
-	if (find_generic_by_vnum(vnum)) {
+	if (real_generic(vnum)) {
 		msg_to_char(ch, "There is already a generic with that vnum.\r\n");
 		return;
 	}

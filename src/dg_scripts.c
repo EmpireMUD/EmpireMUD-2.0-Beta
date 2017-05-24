@@ -2470,8 +2470,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			}
 			else if (!str_cmp(var, "cooldown")) {
 				if (field && *field && isdigit(*field)) {
-					generic_data *gen = find_generic_by_vnum(atoi(field));
-					if (gen && GEN_TYPE(gen) == GENERIC_COOLDOWN) {
+					generic_data *gen;
+					if ((gen = find_generic(atoi(field), GENERIC_COOLDOWN))) {
 						snprintf(str, slen, "%s", GEN_NAME(gen));
 					}
 					else {
@@ -2485,10 +2485,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			else if (!str_cmp(var, "currency")) {
 				// %currency.<vnum>(<amt>)% gets the name for that currency
 				if (field && *field && isdigit(*field)) {
-					generic_data *gen = find_generic_by_vnum(atoi(field));
+					generic_data *gen;
 					int amt = subfield ? atoi(subfield) : 1;
 					
-					if (gen && GEN_TYPE(gen) == GENERIC_CURRENCY) {
+					if ((gen = find_generic(atoi(field), GENERIC_CURRENCY))) {
 						snprintf(str, slen, "%s", amt == 1 ? GEN_STRING(gen, GSTR_CURRENCY_SINGULAR) : GEN_STRING(gen, GSTR_CURRENCY_PLURAL));
 					}
 					else {
@@ -2717,7 +2717,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							generic_data *gen;
 							
-							if (isdigit(*subfield) && (gen = find_generic_by_vnum(atoi(subfield)))) {
+							if (isdigit(*subfield) && (gen = find_generic(atoi(subfield), GENERIC_AFFECT))) {
 								snprintf(str, slen, "%d", affected_by_spell(c, GEN_VNUM(gen)) ? 1 : 0);
 							}
 							else if ((gen = find_generic_by_name(GENERIC_AFFECT, subfield, TRUE))) {
@@ -3610,7 +3610,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							
 							comma_args(subfield, arg1, arg2);
 							
-							if (!*arg1 || !*arg2 || !isdigit(*arg1) || !isdigit(*arg2) || !(gen = find_generic_by_vnum(atoi(arg1))) || GEN_TYPE(gen) != GENERIC_COOLDOWN) {
+							if (!*arg1 || !*arg2 || !isdigit(*arg1) || !isdigit(*arg2) || !(gen = find_generic(atoi(arg1), GENERIC_COOLDOWN))) {
 								script_log("Trigger: %s, VNum %d. bad arguments to set_cooldown(%s, %s)", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), arg1, arg2);
 								strcpy(str, "0");
 							}

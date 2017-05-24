@@ -3897,7 +3897,6 @@ OLC_MODULE(qedit_rewards) {
 	struct quest_reward **list = &QUEST_REWARDS(quest);
 	int findtype, num, stype;
 	faction_data *fct;
-	generic_data *gen;
 	bool found, ok;
 	any_vnum vnum;
 	
@@ -4035,7 +4034,7 @@ OLC_MODULE(qedit_rewards) {
 						msg_to_char(ch, "Invalid generic vnum '%s'.\r\n", vnum_arg);
 						return;
 					}
-					if ((gen = find_generic_by_vnum(vnum)) && GEN_TYPE(gen) == GENERIC_CURRENCY) {
+					if (find_generic(vnum, GENERIC_CURRENCY)) {
 						ok = TRUE;
 					}
 					break;
@@ -4179,7 +4178,7 @@ OLC_MODULE(qedit_rewards) {
 						msg_to_char(ch, "Invalid currency vnum '%s'.\r\n", vnum_arg);
 						return;
 					}
-					if ((gen = find_generic_by_vnum(vnum)) && GEN_TYPE(gen) == GENERIC_CURRENCY) {
+					if (find_generic(vnum, GENERIC_CURRENCY)) {
 						ok = TRUE;
 					}
 					break;

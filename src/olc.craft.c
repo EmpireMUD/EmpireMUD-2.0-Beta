@@ -54,7 +54,6 @@ void init_craft(craft_data *craft);
 bool audit_craft(craft_data *craft, char_data *ch) {
 	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;
-	generic_data *gen;
 	int count;
 
 	if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING && GET_CRAFT_ABILITY(craft) == NO_ABIL && !CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
@@ -107,7 +106,7 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			problem = TRUE;
 		}
 	}
-	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP) && (!(gen = find_generic_by_vnum(GET_CRAFT_OBJECT(craft))) || GEN_TYPE(gen) != GENERIC_LIQUID)) {	// soups only
+	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP) && !find_generic(GET_CRAFT_OBJECT(craft), GENERIC_LIQUID)) {	// soups only
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Invalid liquid type on soup recipe");
 		problem = TRUE;
 	}
@@ -658,7 +657,6 @@ OLC_MODULE(cedit_levelrequired) {
 
 OLC_MODULE(cedit_liquid) {
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
-	generic_data *gen;
 	any_vnum old;
 	
 	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD || !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP)) {
@@ -668,7 +666,7 @@ OLC_MODULE(cedit_liquid) {
 		old = GET_CRAFT_OBJECT(craft);
 		GET_CRAFT_OBJECT(craft) = olc_process_number(ch, argument, "liquid vnum", "liquid", 0, MAX_VNUM, GET_CRAFT_OBJECT(craft));
 		
-		if (!(gen = find_generic_by_vnum(GET_CRAFT_OBJECT(craft))) || GEN_TYPE(gen) != GENERIC_LIQUID) {
+		if (!find_generic(GET_CRAFT_OBJECT(craft), GENERIC_LIQUID)) {
 			msg_to_char(ch, "Invalid liquid generic vnum %d. Old value restored.\r\n", GET_CRAFT_OBJECT(craft));
 			GET_CRAFT_OBJECT(craft) = old;
 		}

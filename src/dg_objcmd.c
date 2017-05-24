@@ -1352,7 +1352,6 @@ OCMD(do_oaoe) {
 OCMD(do_odot) {
 	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], stackarg[MAX_INPUT_LENGTH];
 	any_vnum atype = ATYPE_DG_AFFECT;
-	generic_data *gen;
 	double modifier = 1.0;
 	char_data *ch;
 	int type, max_stacks;
@@ -1362,7 +1361,7 @@ OCMD(do_odot) {
 	if (*name == '#') {
 		atype = atoi(name+1);
 		argument = one_argument(argument, name);
-		if (!(gen = find_generic_by_vnum(atype)) || GEN_TYPE(gen) != GENERIC_AFFECT) {
+		if (!find_generic(atype, GENERIC_AFFECT)) {
 			atype = ATYPE_DG_AFFECT;
 		}
 	}

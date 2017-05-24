@@ -2493,11 +2493,11 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 			break;
 		}
 		case RES_ACTION: {
-			generic_data *gen = find_generic_by_vnum(res->vnum);
+			generic_data *gen = find_generic(res->vnum, GENERIC_ACTION);
 			
 			switch (msg_type) {
 				case APPLY_RES_BUILD: {
-					if (!messaged_char && gen && GSTR_ACTION_BUILD_TO_CHAR) {
+					if (!messaged_char && gen && GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR)) {
 						act(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR), FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
 					}
 					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM)) {

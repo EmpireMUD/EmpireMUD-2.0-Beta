@@ -176,7 +176,7 @@ void check_expired_cooldowns(void) {
 				next_cool = cool->next;
 				
 				if ((cool->expire_time - time(0)) <= 0) {
-					if ((gen = find_generic_by_vnum(cool->type)) && GEN_TYPE(gen) == GENERIC_COOLDOWN && GET_COOLDOWN_WEAR_OFF(gen)) {
+					if ((gen = find_generic(cool->type, GENERIC_COOLDOWN)) && GET_COOLDOWN_WEAR_OFF(gen)) {
 						msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_COOLDOWN_WEAR_OFF(gen));
 					}
 					remove_cooldown(ch, cool);
@@ -1760,7 +1760,7 @@ void point_update_room(room_data *room) {
 		else if (af->duration != UNLIMITED) {
 			if ((af->type > 0)) {
 				if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
-					if ((gen = find_generic_by_vnum(af->type)) && GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ROOM_PEOPLE(room)) {
+					if ((gen = find_generic(af->type, GENERIC_AFFECT)) && GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ROOM_PEOPLE(room)) {
 						act(GET_AFFECT_WEAR_OFF_TO_CHAR(gen), FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
 					}
 				}

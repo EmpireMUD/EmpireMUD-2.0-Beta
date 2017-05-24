@@ -3019,14 +3019,13 @@ void check_learned_crafts(char_data *ch) {
 */
 void check_currencies(char_data *ch) {
 	struct player_currency *cur, *next_cur;
-	generic_data *gen;
 	
 	if (IS_NPC(ch)) {
 		return;
 	}
 	
 	HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
-		if (!(gen = find_generic_by_vnum(cur->vnum)) || GEN_TYPE(gen) != GENERIC_CURRENCY) {
+		if (!find_generic(cur->vnum, GENERIC_CURRENCY)) {
 			HASH_DEL(GET_CURRENCIES(ch), cur);
 			free(cur);
 		}

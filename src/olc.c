@@ -1474,8 +1474,8 @@ OLC_MODULE(olc_copy) {
 			break;
 		}
 		case OLC_GENERIC: {
-			found = (find_generic_by_vnum(vnum) != NULL);
-			exists = (find_generic_by_vnum(from_vnum) != NULL);
+			found = (real_generic(vnum) != NULL);
+			exists = (real_generic(from_vnum) != NULL);
 			break;
 		}
 		case OLC_GLOBAL: {
@@ -1645,7 +1645,7 @@ OLC_MODULE(olc_copy) {
 			break;
 		}
 		case OLC_GENERIC: {
-			GET_OLC_GENERIC(ch->desc) = setup_olc_generic(find_generic_by_vnum(from_vnum));
+			GET_OLC_GENERIC(ch->desc) = setup_olc_generic(real_generic(from_vnum));
 			GET_OLC_GENERIC(ch->desc)->vnum = vnum;
 			olc_show_generic(ch);
 			break;
@@ -2089,8 +2089,8 @@ OLC_MODULE(olc_edit) {
 			break;
 		}
 		case OLC_GENERIC: {
-			// this will set up from existing OR new automatically based on find_generic_by_vnum
-			GET_OLC_GENERIC(ch->desc) = setup_olc_generic(find_generic_by_vnum(vnum));
+			// this will set up from existing OR new automatically based on real_generic
+			GET_OLC_GENERIC(ch->desc) = setup_olc_generic(real_generic(vnum));
 			GET_OLC_GENERIC(ch->desc)->vnum = vnum;			
 			olc_show_generic(ch);
 			break;
@@ -2257,7 +2257,7 @@ OLC_MODULE(olc_free) {
 					break;
 				}
 				case OLC_GENERIC: {
-					free = (find_generic_by_vnum(iter) == NULL);
+					free = (real_generic(iter) == NULL);
 					break;
 				}
 				case OLC_GLOBAL: {
@@ -4569,7 +4569,7 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			msg_to_char(ch, "You must provide a generic currency vnum.\r\n");
 			return FALSE;
 		}
-		if (!(gen = find_generic_by_vnum(atoi(arg))) || GEN_TYPE(gen) != GENERIC_CURRENCY) {
+		if (!(gen = find_generic(atoi(arg), GENERIC_CURRENCY))) {
 			msg_to_char(ch, "Invalid generic currency '%s'.\r\n", arg);
 			return FALSE;
 		}
@@ -5972,7 +5972,6 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 	char arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH];
 	struct resource_data *res, *next_res, *prev_res, *prev_prev, *change, *temp;
 	int num, type, misc;
-	generic_data *gen;
 	any_vnum vnum;
 	bool found;
 	
@@ -6061,16 +6060,11 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					break;
 				}
 				case RES_LIQUID: {
-					if (*arg5) {
-						// reattach the rest of the arg, for two-word liquids (arg5 isn't used)
-						sprintf(arg4 + strlen(arg4), " %s", arg5);
-					}
-					
 					if (!*arg4) {
-						msg_to_char(ch, "Usage: resource add liquid <units> <name>\r\n");
+						msg_to_char(ch, "Usage: resource add liquid <units> <vnum>\r\n");
 						return;
 					}
-					if (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_LIQUID) {
+					if (!find_generic(vnum, GENERIC_LIQUID)) {
 						msg_to_char(ch, "Invalid liquid generic vnum %d.\r\n", vnum);
 						return;
 					}
@@ -6092,17 +6086,11 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					break;
 				}
 				case RES_ACTION: {
-					// need to re-integrate arg4 and arg5
-					if (*arg5) {
-						strcat(arg4, " ");
-						strcat(arg4, arg5);
-					}
-					
 					if (!*arg4 || !isdigit(*arg4)) {
 						msg_to_char(ch, "Usage: resource add action <amount> <generic action vnum>\r\n");
 						return;
 					}
-					if ((vnum = atoi(arg4)) < 0 || !(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_ACTION) {
+					if (!find_generic(vnum, GENERIC_ACTION)) {
 						msg_to_char(ch, "Invalid generic action vnum '%s'.\r\n", arg4);
 						return;
 					}
@@ -6113,7 +6101,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 						msg_to_char(ch, "Usage: resource add currency <quantity> <vnum>\r\n");
 						return;
 					}
-					if (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_CURRENCY) {
+					if (!find_generic(vnum, GENERIC_CURRENCY)) {
 						msg_to_char(ch, "There is no such generic currency vnum %d.\r\n", vnum);
 						return;
 					}
@@ -6243,21 +6231,21 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					break;
 				}
 				case RES_LIQUID: {
-					if (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_LIQUID) {
+					if (!find_generic(vnum, GENERIC_LIQUID)) {
 						msg_to_char(ch, "Invalid liquid generic vnum %d.\r\n", vnum);
 						return;
 					}
 					break;
 				}
 				case RES_ACTION: {
-					if (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_ACTION) {
+					if (!find_generic(vnum, GENERIC_ACTION)) {
 						msg_to_char(ch, "Invalid generic action vnum %d.\r\n", vnum);
 						return;
 					}
 					break;
 				}
 				case RES_CURRENCY: {
-					if (!(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_CURRENCY) {
+					if (!find_generic(vnum, GENERIC_CURRENCY)) {
 						msg_to_char(ch, "Invalid generic currency vnum %d.\r\n", vnum);
 						return;
 					}

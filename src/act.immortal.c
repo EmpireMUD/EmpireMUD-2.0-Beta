@@ -1714,7 +1714,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			msg_to_char(ch, "Usage: set <name> currency <vnum> <amount>\r\n");
 			return 0;
 		}
-		if (!(gen = find_generic_by_vnum(atoi(vnum_arg))) || GEN_TYPE(gen) != GENERIC_CURRENCY) {
+		if (!(gen = find_generic(atoi(vnum_arg), GENERIC_CURRENCY))) {
 			msg_to_char(ch, "Invalid currency vnum.\r\n");
 			return 0;
 		}
@@ -7863,7 +7863,7 @@ ACMD(do_vstat) {
 	}
 	else if (is_abbrev(buf, "generic")) {
 		void do_stat_generic(char_data *ch, generic_data *gen);
-		generic_data *gen = find_generic_by_vnum(number);
+		generic_data *gen = real_generic(number);
 		if (!gen) {
 			msg_to_char(ch, "There is no generic with that number.\r\n");
 			return;
