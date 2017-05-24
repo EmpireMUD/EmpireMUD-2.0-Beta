@@ -34,12 +34,14 @@
 *   Character Targeting Handlers
 *   Coin Handlers
 *   Cooldown Handlers
+*   Currency Handlers
 *   Empire Handlers
 *   Empire Targeting Handlers
 *   Follow Handlers
 *   Group Handlers
 *   Help Handlers
 *   Interaction Handlers
+*   Learned Craft Handlers
 *   Lore Handlers
 *   Mob Tagging Handlers
 *   Mount Handlers
@@ -3416,6 +3418,69 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	}
 	
 	return success;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// LEARNED CRAFT HANDLERS //////////////////////////////////////////////////
+
+/**
+* Adds a craft vnum to a player's learned list.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The craft vnum to learn.
+*/
+void add_learned_craft(char_data *ch, any_vnum vnum) {
+	struct player_craft_data *pcd;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_FIND_INT(GET_LEARNED_CRAFTS(ch), &vnum, pcd);
+	if (!pcd) {
+		CREATE(pcd, struct player_craft_data, 1);
+		pcd->vnum = vnum;
+		HASH_ADD_INT(GET_LEARNED_CRAFTS(ch), vnum, pcd);
+	}
+}
+
+
+/**
+* @param char_data *ch The player.
+* @param any_vnum vnum The craft vnum to check.
+* @return bool TRUE if the player has learned it.
+*/
+bool has_learned_craft(char_data *ch, any_vnum vnum) {
+	struct player_craft_data *pcd;
+	
+	if (IS_NPC(ch)) {
+		return TRUE;
+	}
+	
+	HASH_FIND_INT(GET_LEARNED_CRAFTS(ch), &vnum, pcd);
+	return pcd ? TRUE : FALSE;
+}
+
+
+/**
+* Removes a craft vnum from a player's learned list.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The craft vnum to forget.
+*/
+void remove_learned_craft(char_data *ch, any_vnum vnum) {
+	struct player_craft_data *pcd;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_FIND_INT(GET_LEARNED_CRAFTS(ch), &vnum, pcd);
+	if (pcd) {
+		HASH_DEL(GET_LEARNED_CRAFTS(ch), pcd);
+		free(pcd);
+	}
 }
 
 

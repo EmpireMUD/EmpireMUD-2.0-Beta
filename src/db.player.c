@@ -30,7 +30,6 @@
 *   Core Player DB
 *   Autowiz Wizlist Generator
 *   Helpers
-*   Learned Crafts
 *   Empire Player Management
 *   Promo Codes
 */
@@ -49,12 +48,11 @@ extern int top_account_id;
 extern int top_idnum;
 
 // external funcs
+void add_learned_craft(char_data *ch, any_vnum vnum);
 ACMD(do_slash_channel);
 void update_class(char_data *ch);
 
 // local protos
-void add_learned_craft(char_data *ch, any_vnum vnum);
-void check_learned_crafts(char_data *ch);
 void clear_player(char_data *ch);
 void delete_player_character(char_data *ch);
 static bool member_is_timed_out(time_t created, time_t last_login, double played_hours);
@@ -2992,6 +2990,29 @@ void announce_login(char_data *ch) {
 
 
 /**
+* Checks that all a player's learned crafts are valid.
+*
+* @param char_data *ch The player to check.
+*/
+void check_learned_crafts(char_data *ch) {
+	void remove_learned_craft(char_data *ch, any_vnum vnum);
+	
+	struct player_craft_data *pcd, *next_pcd;
+	craft_data *craft;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+
+	HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
+		if (!(craft = craft_proto(pcd->vnum)) || !CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
+			remove_learned_craft(ch, pcd->vnum);
+		}
+	}
+}
+
+
+/**
 * Checks that all a player's currencies are valid.
 *
 * @param char_data *ch The player to check.
@@ -3967,92 +3988,6 @@ void start_new_character(char_data *ch) {
 	
 	// prevent a repeat
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_NEEDS_NEWBIE_SETUP);
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// LEARNED CRAFTS //////////////////////////////////////////////////////////
-
-/**
-* Adds a craft vnum to a player's learned list.
-*
-* @param char_data *ch The player.
-* @param any_vnum vnum The craft vnum to learn.
-*/
-void add_learned_craft(char_data *ch, any_vnum vnum) {
-	struct player_craft_data *pcd;
-	
-	if (IS_NPC(ch)) {
-		return;
-	}
-	
-	HASH_FIND_INT(GET_LEARNED_CRAFTS(ch), &vnum, pcd);
-	if (!pcd) {
-		CREATE(pcd, struct player_craft_data, 1);
-		pcd->vnum = vnum;
-		HASH_ADD_INT(GET_LEARNED_CRAFTS(ch), vnum, pcd);
-	}
-}
-
-
-/**
-* Checks that all a player's learned crafts are valid.
-*
-* @param char_data *ch The player to check.
-*/
-void check_learned_crafts(char_data *ch) {
-	void remove_learned_craft(char_data *ch, any_vnum vnum);
-	
-	struct player_craft_data *pcd, *next_pcd;
-	craft_data *craft;
-	
-	if (IS_NPC(ch)) {
-		return;
-	}
-
-	HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
-		if (!(craft = craft_proto(pcd->vnum)) || !CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
-			remove_learned_craft(ch, pcd->vnum);
-		}
-	}
-}
-
-
-/**
-* @param char_data *ch The player.
-* @param any_vnum vnum The craft vnum to check.
-* @return bool TRUE if the player has learned it.
-*/
-bool has_learned_craft(char_data *ch, any_vnum vnum) {
-	struct player_craft_data *pcd;
-	
-	if (IS_NPC(ch)) {
-		return TRUE;
-	}
-	
-	HASH_FIND_INT(GET_LEARNED_CRAFTS(ch), &vnum, pcd);
-	return pcd ? TRUE : FALSE;
-}
-
-
-/**
-* Removes a craft vnum from a player's learned list.
-*
-* @param char_data *ch The player.
-* @param any_vnum vnum The craft vnum to forget.
-*/
-void remove_learned_craft(char_data *ch, any_vnum vnum) {
-	struct player_craft_data *pcd;
-	
-	if (IS_NPC(ch)) {
-		return;
-	}
-	
-	HASH_FIND_INT(GET_LEARNED_CRAFTS(ch), &vnum, pcd);
-	if (pcd) {
-		HASH_DEL(GET_LEARNED_CRAFTS(ch), pcd);
-		free(pcd);
-	}
 }
 
 
