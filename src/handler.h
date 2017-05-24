@@ -127,6 +127,10 @@ extern int get_cooldown_time(char_data *ch, any_vnum type);
 void remove_cooldown(char_data *ch, struct cooldown_data *cool);
 void remove_cooldown_by_type(char_data *ch, any_vnum type);
 
+// currency handlers
+extern int add_currency(char_data *ch, any_vnum vnum, int amount);
+extern int get_currency(char_data *ch, any_vnum vnum);
+
 // empire handlers
 void abandon_room(room_data *room);
 void claim_room(room_data *room, empire_data *emp);

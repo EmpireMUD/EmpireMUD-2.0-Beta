@@ -2325,6 +2325,68 @@ void remove_cooldown_by_type(char_data *ch, any_vnum type) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// CURRENCY HANDLERS ///////////////////////////////////////////////////////
+
+/**
+* Adds (or removes) adventure currencies for the player.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The currency (generic) vnum.
+* @param int amount The amount to add (or remove).
+* @return int The player's new total.
+*/
+int add_currency(char_data *ch, any_vnum vnum, int amount) {
+	struct player_currency *cur;
+	generic_data *gen;
+	
+	if (IS_NPC(ch) || !(gen = find_generic_by_vnum(vnum)) || GEN_TYPE(gen) != GENERIC_CURRENCY) {
+		return 0;
+	}
+	if (amount == 0) {
+		return get_currency(ch, vnum);
+	}
+	
+	HASH_FIND_INT(GET_CURRENCIES(ch), &vnum, cur);
+	if (!cur) {
+		CREATE(cur, struct player_currency, 1);
+		cur->vnum = vnum;
+		HASH_ADD_INT(GET_CURRENCIES(ch), vnum, cur);
+	}
+	
+	SAFE_ADD(cur->amount, amount, 0, INT_MAX, FALSE);
+	
+	// housecleaning
+	if (cur->amount == 0) {
+		HASH_DEL(GET_CURRENCIES(ch), cur);
+		free(cur);
+		return 0;
+	}
+	else {
+		return cur->amount;
+	}
+}
+
+
+/**
+* Checks a player's adventure currency.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The currency (generic) vnum.
+* @return int The amount the player has.
+*/
+int get_currency(char_data *ch, any_vnum vnum) {
+	struct player_currency *cur;
+	
+	if (IS_NPC(ch)) {
+		return 0;
+	}
+	
+	HASH_FIND_INT(GET_CURRENCIES(ch), &vnum, cur);
+	return cur ? cur->amount : 0;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE HANDLERS /////////////////////////////////////////////////////////
 
 /**

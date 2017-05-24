@@ -2869,6 +2869,53 @@ SHOW(show_ignoring) {
 }
 
 
+SHOW(show_currency) {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct player_currency *cur, *next_cur;
+	char_data *plr = NULL;
+	bool file = FALSE;
+	size_t size;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show currency <player>\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+	
+		coin_string(GET_PLAYER_COINS(ch), line);
+		size = snprintf(buf, sizeof(buf), "%s has %s.\r\n", GET_NAME(plr), line);
+	
+		if (GET_CURRENCIES(plr)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "Currencies:\r\n");
+		
+			HASH_ITER(hh, GET_CURRENCIES(plr), cur, next_cur) {
+				snprintf(line, sizeof(line), " %d %s\r\n", cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, (cur->amount == 1) ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
+			
+				if (size + strlen(line) < sizeof(buf)) {
+					strcat(buf, line);
+					size += strlen(line);
+				}
+				else {
+					break;
+				}
+			}
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
 SHOW(show_learned) {
 	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct player_craft_data *pcd, *next_pcd;
@@ -6884,6 +6931,7 @@ ACMD(do_show) {
 		{ "dailycycle", LVL_START_IMM, show_dailycycle },
 		{ "data", LVL_CIMPL, show_data },
 		{ "learned", LVL_START_IMM, show_learned },
+		{ "currency", LVL_START_IMM, show_currency },
 
 		// last
 		{ "\n", 0, NULL }

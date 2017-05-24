@@ -838,6 +838,7 @@ Mode       Level    Description
 stats      God      Shows game stats including prototypes.
 arrowtypes Immort   Shows the 'arrow type' setting for all bows and arrows.
 components Immort   Shows all items matching a component type (and flags).
+currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
 factions   Immort   Shows a player's faction levels.
 ignoring   Immort   Shows you who a player has on their ignore list.
@@ -888,6 +889,12 @@ If you specify any flags, all those flags must match the output.
 
 For a list of component types, see: HELP COMPONENT TYPES
 For a list of component flags, see: HELP COMPONENT FLAGS
+#e
+"SHOW CURRENCY" "SHOW CURRENCIES"
+
+Usage:  show currency <player>
+
+This shows all the coins and adventure currencies owned by the player.
 #e
 "SHOW DAILYCYCLE" "SHOW DAILY CYCLE"
 

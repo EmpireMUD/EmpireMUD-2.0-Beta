@@ -2992,6 +2992,28 @@ void announce_login(char_data *ch) {
 
 
 /**
+* Checks that all a player's currencies are valid.
+*
+* @param char_data *ch The player to check.
+*/
+void check_currencies(char_data *ch) {
+	struct player_currency *cur, *next_cur;
+	generic_data *gen;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
+		if (!(gen = find_generic_by_vnum(cur->vnum)) || GEN_TYPE(gen) != GENERIC_CURRENCY) {
+			HASH_DEL(GET_CURRENCIES(ch), cur);
+			free(cur);
+		}
+	}
+}
+
+
+/**
 * Ensures that all of a player's skills and abilities exist, and updates their
 * class. This should be called on login.
 */
@@ -3475,6 +3497,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// ensure data is up-to-date
 	refresh_all_quests(ch);
 	check_learned_crafts(ch);
+	check_currencies(ch);
 	
 	// break last reply if invis
 	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {
