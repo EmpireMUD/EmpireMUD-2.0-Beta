@@ -866,6 +866,13 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_COINS_AMOUNT(obj)  (IS_COINS(obj) ? GET_OBJ_VAL((obj), VAL_COINS_AMOUNT) : 0)
 #define GET_COINS_EMPIRE_ID(obj)  (IS_COINS(obj) ? GET_OBJ_VAL((obj), VAL_COINS_EMPIRE_ID) : 0)
 
+// ITEM_CURRENCY
+#define IS_CURRENCY(obj)  (GET_OBJ_TYPE(obj) == ITEM_CURRENCY)
+#define VAL_CURRENCY_AMOUNT  0
+#define VAL_CURRENCY_VNUM  1
+#define GET_CURRENCY_AMOUNT(obj)  (IS_CURRENCY(obj) ? GET_OBJ_VAL((obj), VAL_CURRENCY_AMOUNT) : 0)
+#define GET_CURRENCY_VNUM(obj)  (IS_CURRENCY(obj) ? GET_OBJ_VAL((obj), VAL_CURRENCY_VNUM) : 0)
+
 // ITEM_MAIL
 
 // ITEM_WEALTH

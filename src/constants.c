@@ -1756,7 +1756,7 @@ const char *item_types[] = {
 	"*BOARD",
 	"CORPSE",
 	"COINS",
-	"*",
+	"CURRENCY",
 	"*",
 	"*MAIL",
 	"WEALTH",

@@ -1279,7 +1279,7 @@ typedef struct vehicle_data vehicle_data;
 #define ITEM_BOARD  9	// message board
 #define ITEM_CORPSE  10	// a corpse, pc or npc
 #define ITEM_COINS  11	// stack of coins
-	#define ITEM_UNUSED2  12
+#define ITEM_CURRENCY  12	// adventure currency item
 	#define ITEM_UNUSED3  13
 #define ITEM_MAIL  14	// mail
 #define ITEM_WEALTH  15	// item provides wealth

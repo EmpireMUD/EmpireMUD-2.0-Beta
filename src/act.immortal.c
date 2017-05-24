@@ -4068,6 +4068,10 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			msg_to_char(ch, "Amount: %s\r\n", money_amount(real_empire(GET_COINS_EMPIRE_ID(j)), GET_COINS_AMOUNT(j)));
 			break;
 		}
+		case ITEM_CURRENCY: {
+			msg_to_char(ch, "Amount: %d %s\r\n", GET_CURRENCY_AMOUNT(j), get_generic_string_by_vnum(GET_CURRENCY_VNUM(j), GENERIC_CURRENCY, GET_CURRENCY_AMOUNT(j) == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
+			break;
+		}
 		case ITEM_MISSILE_WEAPON:
 			msg_to_char(ch, "Speed: %.2f\r\n", missile_weapon_speed[GET_MISSILE_WEAPON_SPEED(j)]);
 			msg_to_char(ch, "Damage: %d\r\n", GET_MISSILE_WEAPON_DAMAGE(j));

@@ -183,6 +183,18 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			}
 			break;
 		}
+		case ITEM_CURRENCY: {
+			generic_data *gen;
+			if (GET_CURRENCY_AMOUNT(obj) == 0) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Currency amount not set");
+				problem = TRUE;
+			}
+			if (!(gen = find_generic_by_vnum(GET_CURRENCY_VNUM(obj))) || GEN_TYPE(gen) != GENERIC_CURRENCY) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Currency vnum not set");
+				problem = TRUE;
+			}
+			break;
+		}
 		case ITEM_WEAPON: {
 			if (GET_WEAPON_TYPE(obj) == TYPE_RESERVED) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Weapon type not set");
@@ -1711,6 +1723,11 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			// empire number is not supported -- it will always use OTHER_COIN
 			break;
 		}
+		case ITEM_CURRENCY: {
+			sprintf(storage + strlen(storage), "<&ycurrency&0> %d %s\r\n", GET_CURRENCY_VNUM(obj), get_generic_name_by_vnum(GET_CURRENCY_VNUM(obj)));
+			sprintf(storage + strlen(storage), "<&ycoinamount&0> %d\r\n", GET_CURRENCY_AMOUNT(obj));
+			break;
+		}
 		case ITEM_CORPSE: {
 			sprintf(storage + strlen(storage), "<&ycorpseof&0> %d %s\r\n", GET_CORPSE_NPC_VNUM(obj), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
 			break;
@@ -2239,13 +2256,24 @@ OLC_MODULE(oedit_charges) {
 
 OLC_MODULE(oedit_coinamount) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	int pos;
 	
-	if (!IS_COINS(obj)) {
-		msg_to_char(ch, "You can only set this on coins.\r\n");
+	switch (GET_OBJ_TYPE(obj)) {
+		case ITEM_COINS: {
+			pos = VAL_COINS_AMOUNT;
+			break;
+		}
+		case ITEM_CURRENCY: {
+			pos = VAL_CURRENCY_AMOUNT;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can only set this on coins or currency.\r\n");
+			return;
+		}
 	}
-	else {
-		GET_OBJ_VAL(obj, VAL_COINS_AMOUNT) = olc_process_number(ch, argument, "coin amount", "coinamount", 0, MAX_COIN, GET_OBJ_VAL(obj, VAL_COINS_AMOUNT));
-	}
+	
+	GET_OBJ_VAL(obj, pos) = olc_process_number(ch, argument, "coin amount", "coinamount", 0, MAX_COIN, GET_OBJ_VAL(obj, pos));
 }
 
 
@@ -2313,6 +2341,24 @@ OLC_MODULE(oedit_corpseof) {
 		}
 		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			msg_to_char(ch, "It is now the corpse of: %s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
+		}
+	}
+}
+
+
+OLC_MODULE(oedit_currency) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	any_vnum old = GET_CURRENCY_VNUM(obj);
+	generic_data *gen;
+	
+	if (!IS_CURRENCY(obj)) {
+		msg_to_char(ch, "You can only set that on a currency object.\r\n");
+	}
+	else {
+		GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM) = olc_process_number(ch, argument, "currency vnum", "currency", 0, MAX_VNUM, GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM));
+		if (GET_CURRENCY_VNUM(obj) != old && (!(gen = find_generic_by_vnum(GET_CURRENCY_VNUM(obj))) || GEN_TYPE(gen) != GENERIC_CURRENCY)) {
+			msg_to_char(ch, "%d is not a currency generic. Old value restored.\r\n", GET_CURRENCY_VNUM(obj));
+			GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM) = old;
 		}
 	}
 }
@@ -3041,6 +3087,10 @@ OLC_MODULE(oedit_type) {
 			case ITEM_COINS: {
 				GET_OBJ_VAL(obj, VAL_COINS_AMOUNT) = 0;
 				GET_OBJ_VAL(obj, VAL_COINS_EMPIRE_ID) = OTHER_COIN;
+				break;
+			}
+			case ITEM_CURRENCY: {
+				GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM) = NOTHING;
 				break;
 			}
 			case ITEM_PORTAL: {

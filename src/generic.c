@@ -50,6 +50,10 @@ extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
 // external funcs
 extern bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
+extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
+extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
+extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
+extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 extern bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);
 
 
@@ -239,6 +243,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	generic_data *gen = find_generic_by_vnum(vnum);
 	craft_data *craft, *next_craft;
+	quest_data *quest, *next_quest;
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
 	struct resource_data *res;
@@ -301,6 +306,22 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		}
+	}
+	
+	// check quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// QR_x, REQ_x: quest types
+		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_GET_CURRENCY, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_GET_CURRENCY, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_CURRENCY, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -648,6 +669,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	struct trading_post_data *tpd, *next_tpd;
 	struct empire_unique_storage *eus;
 	craft_data *craft, *next_craft;
+	quest_data *quest, *next_quest;
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
@@ -800,6 +822,19 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// remove from quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		// REQ_x, QR_x: quest types
+		found = delete_requirement_from_list(&QUEST_TASKS(quest), REQ_GET_CURRENCY, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_GET_CURRENCY, vnum);
+		found |= delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_CURRENCY, vnum);
+		
+		if (found) {
+			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
 	// update vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		if (remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), res_type, vnum)) {
@@ -840,6 +875,17 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(GET_OLC_OBJECT(desc)) && GET_DRINK_CONTAINER_TYPE(GET_OLC_OBJECT(desc)) == vnum) {
 				GET_OBJ_VAL(GET_OLC_OBJECT(desc), VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
 				msg_to_char(desc->character, "The liquid used by the object you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_QUEST(desc)) {
+			// REQ_x, QR_x: quest types
+			found = delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_GET_CURRENCY, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_GET_CURRENCY, vnum);
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_CURRENCY, vnum);
+		
+			if (found) {
+				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A currency used by the quest you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {

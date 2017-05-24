@@ -3572,11 +3572,12 @@ See also: OLC OBJECTS
 
 Usage:  .coinamount <number>
 
-This sets how many coins are in a COINS-type object. You can't set what empire
-the coins belong to; they will always be "other".
+Coins: This sets how many coins are in a COINS-type object. You can't set what
+empire the coins belong to; they will always be "other". For SCALABLE objects,
+thus number is a scalable value if it is set to a number other than 0.
 
-For SCALABLE objects, thus number is a scalable value if it is set to a number
-other than 0.
+Currency: This sets the amount of adventure currency the object gives. This is
+not scalable.
 
 See also: ITEM SCALING, OEDIT TYPE, OLC OBJECTS
 #d
@@ -3696,6 +3697,14 @@ of your mobs.
 All corpse items must be the corpse of something (for skin/butcher data).
 
 See also: VNUM
+#d
+"OEDIT CURRENCY"
+
+Usage:  .currency <vnum>
+
+This sets the vnum of the adventure currency (a generic).
+
+See also: GENERIC CURRENCY
 #d
 "OEDIT CUSTOM" "CUSTOM MESSAGES"
 
@@ -4216,6 +4225,7 @@ Available types:
  *BOARD - a message board
  CORPSE - a corpse
  COINS - a pile of coins
+ CURRENCY - a pile of adventure currency
  *MAIL - a letter
  WEALTH - adds to empire wealth when stored
  *CART - use vehicles instead
@@ -5713,7 +5723,7 @@ then assigning their book ID to a book object in your adventure zone. The
 data from the book editor will override your short description, long desc-
 ription, and look description.
 #d
-"COINS ITEM" "COINS OBJECT"
+"COINS ITEM" "COINS OBJECT" "COIN ITEM" "COIN OBJECT"
 
 The COINS type represents a pile of coins and will be converted from an object
 to "real" coins when a player picks it up. Coins dropped by adventures should
@@ -5740,6 +5750,13 @@ objects. You can use the CONTAINER item type if you don't set it as take-able,
 or else you can use OTHER but won't be able to put items inside the corpse.
 
 This item type itself is reserved for code use.
+#d
+"CURRENCY ITEM" "CURRENCY OBJECT"
+
+Currency items represent a pile of adventure currency. The name of the currency
+is defined by a generic.
+
+See also: GENERIC CURRENCY
 #d
 "DRINKCON ITEM" "DRINKCON OBJECT" "DRINK ITEM" "DRINK OBJECT" "DRINK CONTAINER ITEM" "DRINK CONTAINER OBJECT"
 

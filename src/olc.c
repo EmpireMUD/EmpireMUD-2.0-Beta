@@ -280,6 +280,7 @@ OLC_MODULE(oedit_component);
 OLC_MODULE(oedit_containerflags);
 OLC_MODULE(oedit_contents);
 OLC_MODULE(oedit_corpseof);
+OLC_MODULE(oedit_currency);
 OLC_MODULE(oedit_custom);
 OLC_MODULE(oedit_damage);
 OLC_MODULE(oedit_extra_desc);
@@ -748,6 +749,7 @@ const struct olc_command_data olc_data[] = {
 	{ "containerflags", oedit_containerflags, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "contents", oedit_contents, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "corpseof", oedit_corpseof, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "currency", oedit_currency, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "custom", oedit_custom, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "damage", oedit_damage, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "extra", oedit_extra_desc, OLC_OBJECT, OLC_CF_EDITOR },
