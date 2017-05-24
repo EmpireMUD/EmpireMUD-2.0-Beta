@@ -596,8 +596,16 @@ void do_stat_shop(char_data *ch, shop_data *shop) {
 	// first line
 	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
 	
+	size += snprintf(buf + size, sizeof(buf) - size, "Opens at: [\tc%d%s\t0], Closes at: [\tc%d%s\t0], Faction allegiance: [\ty%s\t0]\r\n", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)), SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
+	
 	sprintbit(SHOP_FLAGS(shop), shop_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	
+	get_quest_giver_display(SHOP_LOCATIONS(shop), part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Locations:\r\n%s", part);
+	
+	get_shop_items_display(shop, part);
+	sprintf(buf + strlen(buf), "Items:\r\n%s", part);
 	
 	page_string(ch->desc, buf, TRUE);
 }
