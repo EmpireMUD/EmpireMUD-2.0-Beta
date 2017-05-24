@@ -419,6 +419,8 @@ Special Variables When using field - The variable returns:
 &cself&0 - The mob, item, or room running the script. Normal fields may be 
                 used with this.
 &ccooldown.<vnum>&0 - Get the name of a cooldown, by vnum.
+&ccurrency.<vnum>(amt)&0 - Gets the currency name. The amt is used to determine
+   whether to use the singular or plural name.
 &cinstance.id&0 - Unique id of the adventure instance, if any.
 &cinstance.location&0 - The map/linked location of the instance, if any.
 &cinstance.mob(vnum)&0 - Finds a copy of a mob belonging to the instance.

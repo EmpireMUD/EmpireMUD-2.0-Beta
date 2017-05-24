@@ -2482,6 +2482,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					strcpy(str, "UNKNOWN");
 				}
 			}
+			else if (!str_cmp(var, "currency")) {
+				// %currency.<vnum>(<amt>)% gets the name for that currency
+				if (field && *field && isdigit(*field)) {
+					generic_data *gen = find_generic_by_vnum(atoi(field));
+					int amt = subfield ? atoi(subfield) : 1;
+					
+					if (gen && GEN_TYPE(gen) == GENERIC_CURRENCY) {
+						snprintf(str, slen, "%s", amt == 1 ? GEN_STRING(gen, GSTR_CURRENCY_SINGULAR) : GEN_STRING(gen, GSTR_CURRENCY_PLURAL));
+					}
+					else {
+						strcpy(str, "UNKNOWN");
+					}
+				}
+				else {
+					strcpy(str, "UNKNOWN");
+				}
+			}
 			else if (!str_cmp(var, "random")) {
 				if (!str_cmp(field, "char") || !str_cmp(field, "ally") || !str_cmp(field, "enemy")) {
 					bool ally = (!str_cmp(field, "ally") ? TRUE : FALSE);
@@ -2846,6 +2863,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "charge_currency")) {
+						if (subfield && isdigit(*subfield)) {
+							char arg1[256], arg2[256];
+							comma_args(subfield, arg1, arg2);
+							if (*arg1 && *arg2) {
+								add_currency(c, atoi(arg1), -atoi(arg2));
+							}
+							*str = '\0';
+						}
+					}
 					else if (!str_cmp(field, "canbeseen")) {
 						if ((type == MOB_TRIGGER) && !CAN_SEE(((char_data*)go), c))
 							snprintf(str, slen, "0");
@@ -2919,6 +2946,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "crafting_level")) {
 						extern int get_crafting_level(char_data *ch);
 						snprintf(str, slen, "%d", get_crafting_level(c));
+					}
+					else if (!str_cmp(field, "currency")) {
+						if (subfield && *subfield) {
+							snprintf(str, slen, "%d", get_currency(c, atoi(subfield)));
+						}
+						else {
+							strcpy(str, "0");
+						}
 					}
 
 					break;
@@ -3081,6 +3116,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "give_coins")) {
 						if (subfield && isdigit(*subfield)) {
 							increase_coins(c, (type == MOB_TRIGGER) ? GET_LOYALTY((char_data*)go) : REAL_OTHER_COIN, atoi(subfield));
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "give_currency")) {
+						if (subfield && isdigit(*subfield)) {
+							char arg1[256], arg2[256];
+							comma_args(subfield, arg1, arg2);
+							if (*arg1 && *arg2) {
+								add_currency(c, atoi(arg1), atoi(arg2));
+							}
 							*str = '\0';
 						}
 					}

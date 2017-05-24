@@ -368,11 +368,13 @@ When using field  - The variable returns:
 &ccha&0 - The actor's Charisma.
 &cchar_target(name)&0 - Finds a visible target character in the room, by name.
 &ccharge_coins(amt)&0 - Charges the actor a number of coins.
+&ccharge_currency(vnum, amt)&0 - Takes away an amount of adventure currency.
 &cclass&0 - The actor's class, as a string.
 &ccompleted_quest(vnum)&0 - Whether or not the player has completed and
    turned in that quest vnum.
 &ccooldown(vnum)&0 - Gets the character's current cooldown time (seconds).
 &ccrafting_level&0 - The actor's crafting level.
+&ccurrency(vnum)&0 - The amount of an adventure currency that a player has.
 &cdex&0 - The actor's Dexterity.
 &cdir(name)&0 - Gives the name of the character's perceived direction
    ('name' is the real direction), which is useful for people without
@@ -390,6 +392,7 @@ When using field  - The variable returns:
 &cgain_skill(sk,amt)&0 - Gives the player points in a skill, or takes them.
 &cgain_reputation(faction,amt)&0 - Gives the player faction rep (or takes).
 &cgive_coins(amt)&0 - Gives the actor a number of coins.
+&cgive_currency(vnum, amt)&0 - Gives an amount of adventure currency.
 &cgive_skill_reset(sk)&0 - Grants the player a free skill reset in that skill.
 &cgrt&0 - The actor's Greatness.
 &chas_item()&0 - Checks if the actor has a object (inventory, equipped and
