@@ -1165,6 +1165,7 @@ struct set_struct {
 		{ "skill", LVL_START_IMM, PC, MISC },
 		{ "faction", LVL_START_IMM, PC, MISC },
 		{ "learned", LVL_START_IMM, PC, MISC },
+		{ "currency", LVL_START_IMM, PC, MISC },
 
 		{ "strength",	LVL_START_IMM,	BOTH,	NUMBER },
 		{ "dexterity",	LVL_START_IMM,	BOTH,	NUMBER },
@@ -1701,6 +1702,29 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
 			return 0;
 		}
+	}
+	else if SET_CASE("currency") {
+		char vnum_arg[MAX_INPUT_LENGTH], amt_arg[MAX_INPUT_LENGTH];
+		generic_data *gen;
+		int amt;
+		
+		half_chop(val_arg, vnum_arg, amt_arg);
+		
+		if (!*vnum_arg || !isdigit(*vnum_arg) || !*amt_arg) {
+			msg_to_char(ch, "Usage: set <name> currency <vnum> <amount>\r\n");
+			return 0;
+		}
+		if (!(gen = find_generic_by_vnum(atoi(vnum_arg))) || GEN_TYPE(gen) != GENERIC_CURRENCY) {
+			msg_to_char(ch, "Invalid currency vnum.\r\n");
+			return 0;
+		}
+		if (!isdigit(*amt_arg) || (amt = atoi(amt_arg)) < 0) {
+			msg_to_char(ch, "You must set it to zero or greater.\r\n");
+			return 0;
+		}
+		
+		amt = add_currency(vict, GEN_VNUM(gen), amt - get_currency(vict, GEN_VNUM(gen)));
+		sprintf(output, "%s's %d %s set to %d.", GET_NAME(vict), GEN_VNUM(gen), GEN_NAME(gen), amt);
 	}
 
 	else if SET_CASE("account") {

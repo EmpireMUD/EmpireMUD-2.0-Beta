@@ -756,6 +756,7 @@ age            BOTH    NUMBER       Player age
 bonustrait     PC      MISC         Set bonus traits for player
 bonusexp       PC      NUMBER       Set daily bonus exp for the player
 coins          PC      MISC         Sets coins on-hand for player
+currency       PC      MISC         Sets amounts of adventure currencies
 faction        PC      MISC         Change faction reputations (SET FACTION)
 grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
@@ -804,6 +805,14 @@ scale          NPC     NUMBER       Rescales a mob to a given level
 
 See also: GRANT, STAT
 #d
+"SET CURRENCY" "SET CURRENCIES"
+
+Usage:  set [file] <player> currency <vnum> <amount>
+
+This allows you to change the amount of an adventure currency the player has.
+
+See also: COINS, SHOW CURRENCY
+#d
 "SET FACTION"
 
 Usage:  set [file] <player> faction <name/vnum> <rep/value>
@@ -823,7 +832,7 @@ Usage:  set [file] <player> learned <craft vnum> <on | off>
 This lets you give (or revoke) learned crafts. The craft must have the
 LEARNED flag.
 
-See also: LEARN, LEARNED
+See also: LEARN, LEARNED, SHOW LEARNED
 #d
 SHOW
 
@@ -895,6 +904,8 @@ For a list of component flags, see: HELP COMPONENT FLAGS
 Usage:  show currency <player>
 
 This shows all the coins and adventure currencies owned by the player.
+
+See also: SET CURRENCY
 #e
 "SHOW DAILYCYCLE" "SHOW DAILY CYCLE"
 
@@ -935,6 +946,8 @@ See also: ISLANDS, MOVEEINV
 Usage:  show learned <player> [search phrase]
 
 Shows you the recipes learned by a player.
+
+See also: SET LEARNED
 #e
 "SHOW NOTES"
 
