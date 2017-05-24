@@ -1860,6 +1860,7 @@ ACMD(do_affects) {
 }
 
 
+// will show all currencies if the subcmd == TRUE
 ACMD(do_coins) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct player_currency *cur, *next_cur;
@@ -1873,7 +1874,7 @@ ACMD(do_coins) {
 	coin_string(GET_PLAYER_COINS(ch), line);
 	size = snprintf(buf, sizeof(buf), "You have %s.\r\n", line);
 	
-	if (GET_CURRENCIES(ch)) {
+	if (GET_CURRENCIES(ch) && subcmd) {
 		size += snprintf(buf + size, sizeof(buf) - size, "You also have:\r\n");
 		
 		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
@@ -2290,7 +2291,7 @@ ACMD(do_inventory) {
 		empire_data *ch_emp, *room_emp;
 		
 		if (!IS_NPC(ch)) {
-			do_coins(ch, "", 0, 0);
+			do_coins(ch, "", 0, FALSE);
 		}
 
 		msg_to_char(ch, "You are carrying %d/%d items:\r\n", IS_CARRYING_N(ch), CAN_CARRY_N(ch));

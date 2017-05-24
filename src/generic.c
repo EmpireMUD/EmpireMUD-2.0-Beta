@@ -303,7 +303,15 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	
 	// objects
 	HASH_ITER(hh, object_table, obj, next_obj) {
+		any = FALSE;
 		if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == vnum) {
+			any = TRUE;
+		}
+		if (GEN_TYPE(gen) == GENERIC_CURRENCY && IS_CURRENCY(obj) && GET_CURRENCY_VNUM(obj) == vnum) {
+			any = TRUE;
+		}
+		
+		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
@@ -667,6 +675,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	void complete_building(room_data *room);
 	
 	struct trading_post_data *tpd, *next_tpd;
+	struct player_currency *cur, *next_cur;
 	struct empire_unique_storage *eus;
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
@@ -678,6 +687,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
 	generic_data *gen;
+	char_data *chiter;
 	bool found, save;
 	int res_type;
 	
@@ -698,6 +708,20 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		default: {
 			res_type = NOTHING;
 			break;
+		}
+	}
+	
+	// remove from live lists: player currencies
+	LL_FOREACH(character_list, chiter) {
+		if (IS_NPC(chiter)) {
+			continue;
+		}
+		
+		HASH_ITER(hh, GET_CURRENCIES(chiter), cur, next_cur) {
+			if (cur->vnum == vnum) {
+				HASH_DEL(GET_CURRENCIES(chiter), cur);
+				free(cur);
+			}
 		}
 	}
 	
@@ -816,7 +840,15 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	
 	// update objs
 	HASH_ITER(hh, object_table, obj, next_obj) {
+		found = FALSE;
 		if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == vnum) {
+			found = TRUE;
+		}
+		if (GEN_TYPE(gen) == GENERIC_CURRENCY && IS_CURRENCY(obj) && GET_CURRENCY_VNUM(obj) == vnum) {
+			found = TRUE;
+		}
+		
+		if (found) {
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
 			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
@@ -872,7 +904,15 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			}	
 		}
 		if (GET_OLC_OBJECT(desc)) {
+			found = FALSE;
 			if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(GET_OLC_OBJECT(desc)) && GET_DRINK_CONTAINER_TYPE(GET_OLC_OBJECT(desc)) == vnum) {
+				found = TRUE;
+			}
+			if (GEN_TYPE(gen) == GENERIC_CURRENCY && IS_CURRENCY(GET_OLC_OBJECT(desc)) && GET_CURRENCY_VNUM(GET_OLC_OBJECT(desc)) == vnum) {
+				found = TRUE;
+			}
+			
+			if (found) {
 				GET_OBJ_VAL(GET_OLC_OBJECT(desc), VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
 				msg_to_char(desc->character, "The liquid used by the object you're editing was deleted.\r\n");
 			}

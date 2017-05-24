@@ -5126,7 +5126,7 @@ Available tasks:
  &cWEARING&0 - Player has the item equipped
  &cWEARING-OR-HAS&0 - Player has the item either equipped or in inventory
     Note: item will not be extracted even if EXTRACT-TASK-OBJECTS is on
- &CGET-CURRENCY&0 - Player must have an amount of adventure currency.
+ &cGET-CURRENCY&0 - Player must have an amount of adventure currency.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 
