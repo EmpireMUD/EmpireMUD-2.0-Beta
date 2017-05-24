@@ -4684,7 +4684,11 @@ The following types will have IN-DEVELOPMENT flags removed in the vnum range:
 - augments
 - classes
 - crafts
+- factions
 - globals
+- morphs
+- quests
+- shops
 - skills
 - socials
 
