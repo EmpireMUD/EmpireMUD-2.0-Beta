@@ -1726,6 +1726,9 @@ void close_socket(descriptor_data *d) {
 	if (d->olc_sector) {
 		free_sector(d->olc_sector);
 	}
+	if (d->olc_shop) {
+		free_shop(d->olc_shop);
+	}
 	if (d->olc_social) {
 		free_social(d->olc_social);
 	}

@@ -50,7 +50,8 @@
 #define OLC_SOCIAL  BIT(20)
 #define OLC_FACTION  BIT(21)
 #define OLC_GENERIC  BIT(22)
-#define NUM_OLC_TYPES  23
+#define OLC_SHOP  BIT(23)
+#define NUM_OLC_TYPES  24
 
 
 // olc command flags
@@ -84,6 +85,7 @@
 #define OLC_FLAG_NO_SOCIALS  BIT(20)	// cannot edit socials
 #define OLC_FLAG_NO_FACTIONS  BIT(21)	// cannot edit factions
 #define OLC_FLAG_NO_GENERICS  BIT(21)	// cannot edit generics
+#define OLC_FLAG_NO_SHOPS  BIT(22)	// cannot edit shops
 
 
 // for trigger editing

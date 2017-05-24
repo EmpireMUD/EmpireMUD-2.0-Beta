@@ -1260,7 +1260,7 @@ that match ALL of those keywords.
 
 Valid types are: adventure, ability, archetype, augment, book, building, craft,
                  class, crop, faction, global, generic, mob, morph, obj, quest,
-                 roomtemplate, sector, skill, social, trigger, vehicle
+                 roomtemplate, sector, shop, skill, social, trigger, vehicle
 
 Examples:
 
@@ -1282,7 +1282,7 @@ Used to stat a prototypical object by virtual number.
 
 Valid types are: adventure, ability, archetype, augment, building, book, craft,
                  class, crop, faction, global, generic, mob, morph, obj, quest,
-                 roomtemplate, sector, skill, social, trigger, vehicle
+                 roomtemplate, sector, shop, skill, social, trigger, vehicle
 
 Examples:
 

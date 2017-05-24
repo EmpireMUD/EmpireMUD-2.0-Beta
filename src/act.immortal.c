@@ -7698,7 +7698,7 @@ ACMD(do_vnum) {
 	else if (is_abbrev(buf, "generic")) {
 		extern int vnum_generic(char *searchname, char_data *ch);
 		if (!vnum_generic(buf2, ch)) {
-			msg_to_char(ch, "No generic by that name.\r\n");
+			msg_to_char(ch, "No generics by that name.\r\n");
 		}
 	}
 	else if (is_abbrev(buf, "morph")) {
@@ -7721,6 +7721,12 @@ ACMD(do_vnum) {
 	else if (is_abbrev(buf, "sector")) {
 		if (!vnum_sector(buf2, ch)) {
 			msg_to_char(ch, "No sectors by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "shop")) {
+		extern int vnum_shop(char *searchname, char_data *ch);
+		if (!vnum_shop(buf2, ch)) {
+			msg_to_char(ch, "No shops by that name.\r\n");
 		}
 	}
 	else if (is_abbrev(buf, "skill")) {
@@ -7923,6 +7929,15 @@ ACMD(do_vstat) {
 			return;
 		}
 		do_stat_sector(ch, sect);
+	}
+	else if (is_abbrev(buf, "shop")) {
+		void do_stat_shop(char_data *ch, shop_data *shop);
+		shop_data *shop = real_shop(number);
+		if (!shop) {
+			msg_to_char(ch, "There is no shop with that number.\r\n");
+			return;
+		}
+		do_stat_shop(ch, shop);
 	}
 	else if (is_abbrev(buf, "skill")) {
 		void do_stat_skill(char_data *ch, skill_data *skill);

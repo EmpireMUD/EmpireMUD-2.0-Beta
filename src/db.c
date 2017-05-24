@@ -172,6 +172,9 @@ struct map_data *last_evo_tile = NULL;	// for resuming map evolutions
 sector_data *last_evo_sect = NULL;	// for resuming map evolutions
 int evos_per_hour = 1;	// how many map tiles evolve per hour (for load-balancing)
 
+// shops
+shop_data *shop_table = NULL;	// hash table of shops (hh)
+
 // skills
 skill_data *skill_table = NULL;	// main skills hash (hh)
 skill_data *sorted_skills = NULL;	// alpha hash (sorted_hh)
@@ -254,6 +257,7 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ SOC_PREFIX, SOC_SUFFIX },	// DB_BOOT_SOC
 	{ FCT_PREFIX, FCT_SUFFIX },	// DB_BOOT_FCT
 	{ GEN_PREFIX, GEN_SUFFIX },	// DB_BOOT_GEN
+	{ SHOP_PREFIX, SHOP_SUFFIX },	// DB_BOOT_SHOP
 };
 
 
@@ -501,6 +505,9 @@ void boot_world(void) {
 	
 	log("Loading craft recipes.");
 	index_boot(DB_BOOT_CRAFT);
+	
+	log("Loading shops.");
+	index_boot(DB_BOOT_SHOP);
 	
 	log("Loading quests.");
 	index_boot(DB_BOOT_QST);

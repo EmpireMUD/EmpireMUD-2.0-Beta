@@ -37,7 +37,8 @@
 #define DB_BOOT_SOC  23
 #define DB_BOOT_FCT  24
 #define DB_BOOT_GEN  25
-#define NUM_DB_BOOT_TYPES  26	// total
+#define DB_BOOT_SHOP  26
+#define NUM_DB_BOOT_TYPES  27	// total
 
 
 // library sub-dirs
@@ -90,6 +91,7 @@
 #define QST_PREFIX  LIB_WORLD"qst/"	// quests
 #define RMT_PREFIX  LIB_WORLD"rmt/"	// room templates
 #define SECTOR_PREFIX  LIB_WORLD"sect/"	// sect definitions
+#define SHOP_PREFIX  LIB_WORLD"shop/"	// shops
 #define SKILL_PREFIX  LIB_WORLD"skill/"	// player skills
 #define SOC_PREFIX  LIB_WORLD"soc/"	// socials
 #define TRG_PREFIX  LIB_WORLD"trg/"	// trigger files
@@ -120,6 +122,7 @@
 #define QST_SUFFIX  ".qst"	// quest file
 #define RMT_SUFFIX  ".rmt"	// room template suffix
 #define SECTOR_SUFFIX  ".sect"	// sector file suffix
+#define SHOP_SUFFIX  ".shop"	// shop file suffix
 #define SKILL_SUFFIX  ".skill"	// player skills
 #define SOC_SUFFIX  ".soc"	// social file suffix
 #define TRG_SUFFIX  ".trg"	// trigger file suffix
@@ -428,6 +431,11 @@ void free_sector(struct sector_data *st);
 void perform_change_base_sect(room_data *loc, struct map_data *map, sector_data *sect);
 void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect);
 extern sector_data *sector_proto(sector_vnum vnum);
+
+// shops
+extern shop_data *shop_table;
+void free_shop(shop_data *shop);
+extern shop_data *real_shop(any_vnum vnum);
 
 // skills
 extern skill_data *skill_table;

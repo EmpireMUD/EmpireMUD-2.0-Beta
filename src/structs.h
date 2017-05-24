@@ -34,6 +34,7 @@
 *     Player Defines
 *     Quest Defines
 *     Sector Defines
+*     Shop Defines
 *     Social Defines
 *     Vehicle Defines
 *     Weather and Season Defines
@@ -61,6 +62,7 @@
 *     Object Structs
 *     Quest Structs
 *     Sector Structs
+*     Shop Structs
 *     Social Structs
 *     Trigger Structs
 *     Vehicle Structs
@@ -234,6 +236,7 @@ typedef struct quest_data quest_data;
 typedef struct room_data room_data;
 typedef struct room_template room_template;
 typedef struct sector_data sector_data;
+typedef struct shop_data shop_data;
 typedef struct social_data social_data;
 typedef struct skill_data skill_data;
 typedef struct trig_data trig_data;
@@ -1843,6 +1846,13 @@ typedef struct vehicle_data vehicle_data;
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// SHOP DEFINES ////////////////////////////////////////////////////////////
+
+// SHOP_x: shop flags
+#define SHOP_IN_DEVELOPMENT  BIT(0)	// a. shop is not available to mortals
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// SOCIAL DEFINES //////////////////////////////////////////////////////////
 
 // SOC_x: Social flags
@@ -3021,6 +3031,7 @@ struct descriptor_data {
 	quest_data *olc_quest;	// quest being edited
 	room_template *olc_room_template;	// rmt being edited
 	struct sector_data *olc_sector;	// sector being edited
+	shop_data *olc_shop;	// shop being edited
 	social_data *olc_social;	// social being edited
 	skill_data *olc_skill;	// skill being edited
 	struct trig_data *olc_trigger;	// trigger being edited
@@ -4156,6 +4167,35 @@ struct sector_index_type {
 	int base_count;	// number of rooms with it as the base sect
 	
 	UT_hash_handle hh;	// sector_index hash handle
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SHOP STRUCTS ////////////////////////////////////////////////////////////
+
+struct shop_data {
+	any_vnum vnum;
+	char *name;	// internal use
+	
+	bitvector_t flags;	// SHOP_ flags
+	any_vnum allegiance;	// faction, if any
+	int open_time;	// 0-23, if any
+	int close_time;
+	
+	struct quest_giver *locations;	// shop locs
+	struct shop_item *items;	// for sale
+	
+	UT_hash_handle hh;	// shop_table hash handle
+};
+
+
+// individual item in a shop
+struct shop_item {
+	obj_vnum vnum;	// the item
+	int cost;
+	any_vnum currency;	// generic vnum or NOTHING for coins
+	int min_rep;	// reputation requirement if any (if a faction shop)
+	struct shop_item *next;	// LL
 };
 
 

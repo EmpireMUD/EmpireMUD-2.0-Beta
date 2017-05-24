@@ -42,6 +42,7 @@
 *   Room Utils
 *   Room Template Utils
 *   Sector Utils
+*   Shop Utils
 *   Skill Utils
 *   Social Utils
 *   String Utils
@@ -455,6 +456,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_OLC_QUEST(desc)  ((desc)->olc_quest)
 #define GET_OLC_ROOM_TEMPLATE(desc)  ((desc)->olc_room_template)
 #define GET_OLC_SECTOR(desc)  ((desc)->olc_sector)
+#define GET_OLC_SHOP(desc)  ((desc)->olc_shop)
 #define GET_OLC_SKILL(desc)  ((desc)->olc_skill)
 #define GET_OLC_SOCIAL(desc)  ((desc)->olc_social)
 #define GET_OLC_TRIGGER(desc)  ((desc)->olc_trigger)
@@ -1241,6 +1243,22 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 
 // utils
 #define SECT_FLAGGED(sct, flg)  (IS_SET(GET_SECT_FLAGS(sct), (flg)))
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SHOP UTILS //////////////////////////////////////////////////////////////
+
+#define SHOP_VNUM(shop)  ((shop)->vnum)
+#define SHOP_ALLEGIANCE(shop)  ((shop)->allegiance)
+#define SHOP_CLOSE_TIME(shop)  ((shop)->close_time)
+#define SHOP_FLAGS(shop)  ((shop)->flags)
+#define SHOP_ITEMS(shop)  ((shop)->items)
+#define SHOP_LOCATIONS(shop)  ((shop)->locations)
+#define SHOP_NAME(shop)  ((shop)->name)
+#define SHOP_OPEN_TIME(shop)  ((shop)->open_time)
+
+// helpers
+#define SHOP_FLAGGED(shop, flag)  IS_SET(SHOP_FLAGS(shop), (flag))
 
 
  //////////////////////////////////////////////////////////////////////////////

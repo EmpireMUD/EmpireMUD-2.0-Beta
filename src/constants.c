@@ -39,6 +39,7 @@
 *   OLC Constants
 *   Quest Constants
 *   Room/World Constants
+*   Shop Constants
 *   Skill Constants
 *   Social Constants
 *   Trigger Constants
@@ -238,7 +239,7 @@ const struct augment_type_data augment_info[] = {
 
 // AUG_x: augment flags
 const char *augment_flags[] = {
-	"IN-DEV",
+	"IN-DEVELOPMENT",
 	"SELF-ONLY",
 	"ARMOR",
 	"SHIELD",
@@ -2183,6 +2184,7 @@ const char *olc_flag_bits[] = {
 	"!SOCIALS",
 	"!FACTIONS",
 	"!GENERICS",
+	"!SHOPS",
 	"\n"
 };
 
@@ -2212,6 +2214,7 @@ const char *olc_type_bits[NUM_OLC_TYPES+1] = {
 	"social",
 	"faction",
 	"generic",
+	"shop",
 	"\n"
 };
 
@@ -2801,6 +2804,16 @@ const char *weather_types[] = {
 	"cloudy",
 	"raining",
 	"lightning",
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SHOP CONSTANTS //////////////////////////////////////////////////////////
+
+// SHOP_x: shop flags
+const char *shop_flags[] = {
+	"IN-DEVELOPMENT",	// 0
 	"\n"
 };
 

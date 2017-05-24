@@ -495,10 +495,6 @@ void parse_generic(FILE *fl, any_vnum vnum) {
 	GEN_VALUE(gen, 2) = int_in[2];
 	GEN_VALUE(gen, 3) = int_in[3];
 	
-	// end
-	fprintf(fl, "S\n");
-
-	
 	// optionals
 	for (;;) {
 		if (!get_line(fl, line)) {
