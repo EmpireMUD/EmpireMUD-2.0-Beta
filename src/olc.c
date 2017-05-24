@@ -360,6 +360,12 @@ OLC_MODULE(sectedit_roadsideicon);
 OLC_MODULE(sectedit_spawns);
 OLC_MODULE(sectedit_title);
 
+// shops
+OLC_MODULE(shopedit_allegiance);
+OLC_MODULE(shopedit_flags);
+OLC_MODULE(shopedit_locations);
+OLC_MODULE(shopedit_name);
+
 // skill modules
 OLC_MODULE(skilledit_abbrev);
 OLC_MODULE(skilledit_description);
@@ -833,6 +839,12 @@ const struct olc_command_data olc_data[] = {
 	{ "roadsideicon", sectedit_roadsideicon, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "spawns", sectedit_spawns, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "title", sectedit_title, OLC_SECTOR, OLC_CF_EDITOR },
+	
+	// shop commands
+	{ "allegiance", shopedit_allegiance, OLC_SHOP, OLC_CF_EDITOR },
+	{ "flags", shopedit_flags, OLC_SHOP, OLC_CF_EDITOR },
+	{ "locations", shopedit_locations, OLC_SHOP, OLC_CF_EDITOR },
+	{ "name", shopedit_name, OLC_SHOP, OLC_CF_EDITOR },
 	
 	// skill commands
 	{ "abbrev", skilledit_abbrev, OLC_SKILL, OLC_CF_EDITOR },
@@ -1722,6 +1734,7 @@ OLC_MODULE(olc_copy) {
 		case OLC_SHOP: {
 			GET_OLC_SHOP(ch->desc) = setup_olc_shop(real_shop(from_vnum));
 			GET_OLC_SHOP(ch->desc)->vnum = vnum;
+			SET_BIT(SHOP_FLAGS(GET_OLC_SHOP(ch->desc)), SHOP_IN_DEVELOPMENT);	// ensure flag
 			olc_show_shop(ch);
 			break;
 		}

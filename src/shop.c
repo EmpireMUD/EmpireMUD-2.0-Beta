@@ -65,6 +65,11 @@ void get_quest_giver_display(struct quest_giver *list, char *save_buffer);
 bool audit_shop(shop_data *shop, char_data *ch) {
 	bool problem = FALSE;
 	
+	if (SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT)) {
+		olc_audit_msg(ch, SHOP_VNUM(shop), "IN-DEVELOPMENT");
+		problem = TRUE;
+	}
+	
 	if (!SHOP_NAME(shop) || !*SHOP_NAME(shop) || !str_cmp(SHOP_NAME(shop), default_shop_name)) {
 		olc_audit_msg(ch, SHOP_VNUM(shop), "No name set");
 		problem = TRUE;
@@ -535,6 +540,7 @@ shop_data *setup_olc_shop(shop_data *input) {
 	else {
 		// brand new: some defaults
 		SHOP_NAME(new) = str_dup(default_shop_name);
+		SHOP_FLAGS(new) = SHOP_IN_DEVELOPMENT;
 	}
 	
 	// done
@@ -657,9 +663,38 @@ int vnum_shop(char *searchname, char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// SHOP OLC MODULES ////////////////////////////////////////////////////////
 
+OLC_MODULE(shopedit_allegiance) {
+	shop_data *shop = GET_OLC_SHOP(ch->desc);
+	faction_data *fct;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Set the shop's allegiance to which faction (or 'none')?\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		msg_to_char(ch, "You set its allegience to 'none'.\r\n");
+		SHOP_ALLEGIANCE(shop) = NULL;
+	}
+	else if (!(fct = find_faction(argument))) {
+		msg_to_char(ch, "Unknown faction '%s'.\r\n", argument);
+	}
+	else {
+		SHOP_ALLEGIANCE(shop) = fct;
+		msg_to_char(ch, "You set its allegiance to %s.\r\n", FCT_NAME(fct));
+	}
+}
+
+
 OLC_MODULE(shopedit_flags) {
 	shop_data *shop = GET_OLC_SHOP(ch->desc);
 	SHOP_FLAGS(shop) = olc_process_flag(ch, argument, "shop", "flags", shop_flags, SHOP_FLAGS(shop));
+}
+
+
+OLC_MODULE(shopedit_locations) {
+	void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_giver **list, char *command);
+	
+	shop_data *shop = GET_OLC_SHOP(ch->desc);
+	qedit_process_quest_givers(ch, argument, &SHOP_LOCATIONS(shop), "locations");
 }
 
 
@@ -667,3 +702,7 @@ OLC_MODULE(shopedit_name) {
 	shop_data *shop = GET_OLC_SHOP(ch->desc);
 	olc_process_string(ch, argument, "name", &SHOP_NAME(shop));
 }
+
+// opens
+// closes
+// items
