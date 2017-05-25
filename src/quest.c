@@ -2456,6 +2456,13 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 					}
 					break;
 				}
+				case OLC_SHOP: {
+					shop_data *from_shp = real_shop(vnum);
+					if (from_shp) {
+						copyfrom = SHOP_LOCATIONS(from_shp);
+					}
+					break;
+				}
 				default: {
 					msg_to_char(ch, "You can't copy '%s' from %ss.\r\n", command, buf);
 					return;

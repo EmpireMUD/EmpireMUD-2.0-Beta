@@ -362,9 +362,12 @@ OLC_MODULE(sectedit_title);
 
 // shops
 OLC_MODULE(shopedit_allegiance);
+OLC_MODULE(shopedit_closes);
 OLC_MODULE(shopedit_flags);
+OLC_MODULE(shopedit_items);
 OLC_MODULE(shopedit_locations);
 OLC_MODULE(shopedit_name);
+OLC_MODULE(shopedit_opens);
 
 // skill modules
 OLC_MODULE(skilledit_abbrev);
@@ -842,9 +845,12 @@ const struct olc_command_data olc_data[] = {
 	
 	// shop commands
 	{ "allegiance", shopedit_allegiance, OLC_SHOP, OLC_CF_EDITOR },
+	{ "closes", shopedit_closes, OLC_SHOP, OLC_CF_EDITOR },
 	{ "flags", shopedit_flags, OLC_SHOP, OLC_CF_EDITOR },
+	{ "items", shopedit_items, OLC_SHOP, OLC_CF_EDITOR },
 	{ "locations", shopedit_locations, OLC_SHOP, OLC_CF_EDITOR },
 	{ "name", shopedit_name, OLC_SHOP, OLC_CF_EDITOR },
+	{ "opens", shopedit_opens, OLC_SHOP, OLC_CF_EDITOR },
 	
 	// skill commands
 	{ "abbrev", skilledit_abbrev, OLC_SKILL, OLC_CF_EDITOR },

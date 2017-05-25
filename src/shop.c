@@ -39,6 +39,7 @@
 const char *default_shop_name = "Unnamed Shop";
 
 // external consts
+extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 extern struct faction_reputation_type reputation_levels[];
 extern const char *shop_flags[];
 
@@ -50,6 +51,37 @@ void get_quest_giver_display(struct quest_giver *list, char *save_buffer);
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Copies entries from one list into another, only if they are not already in
+* the to_list.
+*
+* @param struct shop_item **to_list A pointer to the destination list.
+* @param struct shop_item *from_list The list to copy from.
+*/
+void smart_copy_shop_items(struct shop_item **to_list, struct shop_item *from_list) {
+	struct shop_item *iter, *search, *item;
+	bool found;
+	
+	LL_FOREACH(from_list, iter) {
+		// ensure not already in list
+		found = FALSE;
+		LL_FOREACH(*to_list, search) {
+			if (search->vnum == iter->vnum && search->cost == iter->cost && search->currency == iter->currency && search->min_rep == iter->min_rep) {
+				found = TRUE;
+				break;
+			}
+		}
+		
+		// add it
+		if (!found) {
+			CREATE(item, struct shop_item, 1);
+			*item = *iter;
+			item->next = NULL;
+			LL_APPEND(*to_list, item);
+		}
+	}
+}
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -638,10 +670,10 @@ void olc_show_shop(char_data *ch) {
 	sprintf(buf + strlen(buf), "<\tyallegiance\t0> %s\r\n", SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
 	
 	get_quest_giver_display(SHOP_LOCATIONS(shop), lbuf);
-	sprintf(buf + strlen(buf), "Locations: <\tylocations\t0>\r\n%s", lbuf);
+	sprintf(buf + strlen(buf), "Locations: <\tylocation\t0>\r\n%s", lbuf);
 	
 	get_shop_items_display(shop, lbuf);
-	sprintf(buf + strlen(buf), "Items: <\tyitems\t0>\r\n%s", lbuf);
+	sprintf(buf + strlen(buf), "Items: <\tyitem\t0>\r\n%s", lbuf);
 	
 	page_string(ch->desc, buf, TRUE);
 }
@@ -692,6 +724,34 @@ OLC_MODULE(shopedit_allegiance) {
 }
 
 
+OLC_MODULE(shopedit_closes) {
+	shop_data *shop = GET_OLC_SHOP(ch->desc);
+	int hour;
+	
+	if (!isdigit(*argument) || (hour = atoi(argument)) < 0 || hour > 23) {
+		msg_to_char(ch, "Time must be an hour between 0 and 23, or 1-12am or pm.\r\n");
+		return;
+	}
+	
+	if (strstr(argument, "am") && hour >= 1 && hour <= 12) {
+		SHOP_CLOSE_TIME(shop) = (hour == 12 ? 0 : hour);
+	}
+	else if (strstr(argument, "pm") && hour >= 1 && hour <= 12) {
+		SHOP_CLOSE_TIME(shop) = (hour == 12 ? hour : (hour + 12));
+	}
+	else {
+		SHOP_CLOSE_TIME(shop) = hour;
+	}
+	
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		send_config_msg(ch, "ok_string");
+	}
+	else {
+		msg_to_char(ch, "It now closes at %d%s.\r\n", TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
+	}
+}
+
+
 OLC_MODULE(shopedit_flags) {
 	shop_data *shop = GET_OLC_SHOP(ch->desc);
 	bool had_indev = IS_SET(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT) ? TRUE : FALSE;
@@ -701,6 +761,221 @@ OLC_MODULE(shopedit_flags) {
 	if (had_indev && !SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT) && GET_ACCESS_LEVEL(ch) < LVL_UNRESTRICTED_BUILDER && !OLC_FLAGGED(ch, OLC_FLAG_CLEAR_IN_DEV)) {
 		msg_to_char(ch, "You don't have permission to remove the IN-DEVELOPMENT flag.\r\n");
 		SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+	}
+}
+
+
+OLC_MODULE(shopedit_items) {
+	shop_data *shop = GET_OLC_SHOP(ch->desc);
+
+	char cmd_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
+	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];
+	char vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char cost_arg[MAX_INPUT_LENGTH], cur_arg[MAX_INPUT_LENGTH];
+	char rep_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	struct shop_item *item, *iter, *change, *copyfrom;
+	int findtype, num, cost, rep;
+	any_vnum vnum, cur_vnum;
+	bool found;
+	
+	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
+	
+	if (is_abbrev(cmd_arg, "copy")) {
+		// usage: qedit starts/ends copy <from type> <from vnum> <starts/ends>
+		argument = any_one_arg(argument, type_arg);	// just "quest" for now
+		argument = any_one_arg(argument, vnum_arg);	// any vnum for that type
+		
+		if (!*type_arg || !*vnum_arg) {
+			msg_to_char(ch, "Usage: item copy <from type> <from vnum>\r\n");
+		}
+		else if ((findtype = find_olc_type(type_arg)) == 0) {
+			msg_to_char(ch, "Unknown olc type '%s'.\r\n", type_arg);
+		}
+		else if (!isdigit(*vnum_arg)) {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			msg_to_char(ch, "Copy from which %s?\r\n", buf);
+		}
+		else if ((vnum = atoi(vnum_arg)) < 0) {
+			msg_to_char(ch, "Invalid vnum.\r\n");
+		}
+		else {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			copyfrom = NULL;
+			
+			switch (findtype) {
+				case OLC_SHOP: {
+					shop_data *find = real_shop(vnum);
+					if (find) {
+						copyfrom = SHOP_ITEMS(find);
+					}
+					break;
+				}
+				default: {
+					msg_to_char(ch, "You can't copy items from %ss.\r\n", buf);
+					return;
+				}
+			}
+			
+			if (!copyfrom) {
+				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, vnum_arg);
+			}
+			else {
+				smart_copy_shop_items(&SHOP_ITEMS(shop), copyfrom);
+				msg_to_char(ch, "Copied items from %s %d.\r\n", buf, vnum);
+			}
+		}
+	}	// end 'copy'
+	else if (is_abbrev(cmd_arg, "remove")) {
+		// usage: qedit starts|ends remove <number | all>
+		skip_spaces(&argument);	// only arg is number
+		
+		if (!*argument) {
+			msg_to_char(ch, "Remove which item (number)?\r\n");
+		}
+		else if (!str_cmp(argument, "all")) {
+			free_shop_item_list(SHOP_ITEMS(shop));
+			SHOP_ITEMS(shop) = NULL;
+			msg_to_char(ch, "You remove all the items.\r\n");
+		}
+		else if (!isdigit(*argument) || (num = atoi(argument)) < 1) {
+			msg_to_char(ch, "Invalid item number.\r\n");
+		}
+		else {
+			found = FALSE;
+			LL_FOREACH(SHOP_ITEMS(shop), iter) {
+				if (--num == 0) {
+					found = TRUE;
+					
+					msg_to_char(ch, "You remove the item: %d %s.\r\n", iter->vnum, get_obj_name_by_proto(iter->vnum));
+					LL_DELETE(SHOP_ITEMS(shop), iter);
+					free(iter);
+					break;
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid item number.\r\n");
+			}
+		}
+	}	// end 'remove'
+	else if (is_abbrev(cmd_arg, "add")) {
+		// usage: qedit starts|ends add <type> <vnum>
+		argument = any_one_arg(argument, vnum_arg);
+		argument = any_one_arg(argument, cost_arg);
+		argument = any_one_arg(argument, cur_arg);
+		argument = any_one_arg(argument, rep_arg);
+		cur_vnum = NOTHING;	// defaults to this if coins
+		rep = REP_NONE;	// does not require rep
+		
+		if (!*vnum_arg || !*cost_arg || !*cur_arg) {
+			msg_to_char(ch, "Usage: item add <vnum> <cost> <currency vnum | coins> [min reputation]\r\n");
+		}
+		else if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0 || !obj_proto(vnum)) {
+			msg_to_char(ch, "Invalid vnum '%s'.\r\n", vnum_arg);
+		}
+		else if (!isdigit(*cost_arg) || (cost = atoi(cost_arg)) < 1) {
+			msg_to_char(ch, "Invalid cost '%s'.\r\n", cost_arg);
+		}
+		else if (str_cmp(cur_arg, "coins") || (cur_vnum = atoi(cur_arg)) < 0 || !find_generic(cur_vnum, GENERIC_CURRENCY)) {
+			msg_to_char(ch, "Invalid currency '%s'. Specify a currency vnum or 'coins'.\r\n", cur_arg);
+		}
+		else if (*rep_arg && (rep = get_reputation_by_name(rep_arg)) == NOTHING) {
+			msg_to_char(ch, "Invalid minimum reputation '%s'.\r\n", rep_arg);
+		}
+		else {
+			// success
+			CREATE(item, struct shop_item, 1);
+			item->vnum = vnum;
+			item->cost = cost;
+			item->currency = cur_vnum;
+			item->min_rep = rep;
+			
+			LL_APPEND(SHOP_ITEMS(shop), item);
+			
+			if (rep) {
+				sprintf(buf, " (%s)", reputation_levels[rep_const_to_index(item->min_rep)].name);
+			}
+			else {
+				*buf = '\0';
+			}
+			msg_to_char(ch, "You add item: [%d] %s for %d %s%s\r\n", vnum, get_obj_name_by_proto(vnum), cost, cur_vnum == NOTHING ? "coins" : get_generic_string_by_vnum(cur_vnum, GENERIC_CURRENCY, cost == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL), buf);
+		}
+	}	// end 'add'
+	else if (is_abbrev(cmd_arg, "change")) {
+		// usage: qedit starts|ends change <number> vnum <number>
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, field_arg);
+		argument = any_one_arg(argument, val_arg);
+		
+		if (!*num_arg || !isdigit(*num_arg) || !*field_arg || !*val_arg) {
+			msg_to_char(ch, "Usage: item change <number> <vnum | cost | currency | reputation> <value>\r\n");
+			return;
+		}
+		
+		// find which one to change
+		num = atoi(num_arg);
+		change = NULL;
+		LL_FOREACH(SHOP_ITEMS(shop), iter) {
+			if (--num == 0) {
+				change = iter;
+				break;
+			}
+		}
+		
+		if (!change) {
+			msg_to_char(ch, "Invalid item number.\r\n");
+		}
+		else if (is_abbrev(field_arg, "vnum")) {
+			if (!isdigit(*val_arg) || (vnum = atoi(val_arg)) < 0 || !obj_proto(vnum)) {
+				msg_to_char(ch, "Invalid vnum '%s'.\r\n", val_arg);
+				return;
+			}
+			
+			change->vnum = vnum;
+			msg_to_char(ch, "Changed item %d to: %d %s\r\n", atoi(num_arg), vnum, get_obj_name_by_proto(vnum));
+		}
+		else if (is_abbrev(field_arg, "cost")) {
+			if (!isdigit(*val_arg) || (cost = atoi(val_arg)) < 1) {
+				msg_to_char(ch, "Invalid cost '%s'.\r\n", val_arg);
+				return;
+			}
+			
+			change->cost = cost;
+			msg_to_char(ch, "Changed item %d's cost to: %d\r\n", atoi(num_arg), cost);
+		}
+		else if (is_abbrev(field_arg, "currency")) {
+			if (!str_cmp(val_arg, "coins")) {
+				cur_vnum = NOTHING;
+			}
+			else if (!isdigit(*val_arg) || (cur_vnum = atoi(val_arg)) < 0 || !find_generic(cur_vnum, GENERIC_CURRENCY)) {
+				msg_to_char(ch, "Invalid currency vnum '%s'.\r\n", val_arg);
+				return;
+			}
+			
+			change->currency = cur_vnum;
+			msg_to_char(ch, "Changed item %d's currency to: %d %s\r\n", atoi(num_arg), cur_vnum, get_generic_name_by_vnum(cur_vnum));
+		}
+		else if (is_abbrev(field_arg, "reputation")) {
+			if (!str_cmp(val_arg, "none")) {
+				rep = REP_NONE;
+			}
+			else if (!isdigit(*val_arg) || (rep = get_reputation_by_name(val_arg)) == NOTHING) {
+				msg_to_char(ch, "Invalid reputation '%s'.\r\n", val_arg);
+				return;
+			}
+			
+			change->min_rep = rep;
+			msg_to_char(ch, "Changed item %d's minimum reputation to: %s\r\n", atoi(num_arg), rep == REP_NONE ? "none" : reputation_levels[rep_const_to_index(rep)].name);
+		}
+		else {
+			msg_to_char(ch, "You can only change the vnum, cost, currency, or reputation.\r\n");
+		}
+	}	// end 'change'
+	else {
+		msg_to_char(ch, "Usage: item add <vnum> <cost> <currency vnum | coins> [min reputation]\r\n");
+		msg_to_char(ch, "Usage: item change <number> vnum <value>\r\n");
+		msg_to_char(ch, "Usage: item copy <from type> <from vnum> [starts/ends]\r\n");
+		msg_to_char(ch, "Usage: item remove <number | all>\r\n");
 	}
 }
 
@@ -718,6 +993,30 @@ OLC_MODULE(shopedit_name) {
 	olc_process_string(ch, argument, "name", &SHOP_NAME(shop));
 }
 
-// opens
-// closes
-// items
+
+OLC_MODULE(shopedit_opens) {
+	shop_data *shop = GET_OLC_SHOP(ch->desc);
+	int hour;
+	
+	if (!isdigit(*argument) || (hour = atoi(argument)) < 0 || hour > 23) {
+		msg_to_char(ch, "Time must be an hour between 0 and 23, or 1-12am or pm.\r\n");
+		return;
+	}
+	
+	if (strstr(argument, "am") && hour >= 1 && hour <= 12) {
+		SHOP_OPEN_TIME(shop) = (hour == 12 ? 0 : hour);
+	}
+	else if (strstr(argument, "pm") && hour >= 1 && hour <= 12) {
+		SHOP_OPEN_TIME(shop) = (hour == 12 ? hour : (hour + 12));
+	}
+	else {
+		SHOP_OPEN_TIME(shop) = hour;
+	}
+	
+	if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		send_config_msg(ch, "ok_string");
+	}
+	else {
+		msg_to_char(ch, "It now opens at %d%s.\r\n", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)));
+	}
+}
