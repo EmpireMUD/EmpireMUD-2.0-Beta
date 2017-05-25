@@ -979,9 +979,67 @@ OLC_MODULE(shopedit_items) {
 			msg_to_char(ch, "You can only change the vnum, cost, currency, or reputation.\r\n");
 		}
 	}	// end 'change'
+
+	else if (is_abbrev(cmd_arg, "move")) {
+		struct shop_item *to_move, *prev, *next;
+		bool up;
+		
+		// usage: item move <number> <up | down>
+		argument = any_one_arg(argument, num_arg);
+		argument = any_one_arg(argument, field_arg);
+		up = is_abbrev(field_arg, "up");
+		
+		if (!*num_arg || !*field_arg) {
+			msg_to_char(ch, "Usage: item move <number> <up | down>\r\n");
+		}
+		else if (!isdigit(*num_arg) || (num = atoi(num_arg)) < 1) {
+			msg_to_char(ch, "Invalid item number.\r\n");
+		}
+		else if (!is_abbrev(field_arg, "up") && !is_abbrev(field_arg, "down")) {
+			msg_to_char(ch, "You must specify whether you're moving it up or down in the list.\r\n");
+		}
+		else if (up && num == 1) {
+			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
+		}
+		else {
+			// find the one to move
+			to_move = prev = NULL;
+			for (item = SHOP_ITEMS(shop); item && !to_move; item = item->next) {
+				if (--num == 0) {
+					to_move = item;
+				}
+				else {
+					// store for next iteration
+					prev = item;
+				}
+			}
+			
+			if (!to_move) {
+				msg_to_char(ch, "Invalid item number.\r\n");
+			}
+			else if (!up && !to_move->next) {
+				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
+			}
+			else {
+				// SUCCESS: "move" them by swapping data
+				if (up) {
+					LL_PREPEND_ELEM(SHOP_ITEMS(shop), prev, to_move);
+				}
+				else {
+					next = to_move->next;
+					LL_DELETE(SHOP_ITEMS(shop), to_move);
+					LL_APPEND_ELEM(SHOP_ITEMS(shop), next, to_move);
+				}
+				
+				// message: re-atoi(num_arg) because we destroyed num finding our target
+				msg_to_char(ch, "You move item %d %s.\r\n", atoi(num_arg), (up ? "up" : "down"));
+			}
+		}
+	}	// end 'move'
 	else {
 		msg_to_char(ch, "Usage: item add <vnum> <cost> <currency vnum | coins> [min reputation]\r\n");
 		msg_to_char(ch, "Usage: item change <number> vnum <value>\r\n");
+		msg_to_char(ch, "Usage: item move <number> <up | down>\r\n");
 		msg_to_char(ch, "Usage: item copy <from type> <from vnum> [starts/ends]\r\n");
 		msg_to_char(ch, "Usage: item remove <number | all>\r\n");
 	}
