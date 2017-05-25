@@ -25,9 +25,9 @@ Available types are:
  .m - mobiles                    .map - map tiles/interiors
  .morph - morphs                 .o - objects
  .q - quests                     .r - room templates
- .sect - map sectors             .skill - skills
- .soc - socials                  .t - scripts/triggers
- .v - vehicles
+ .sect - map sectors             .shop - shops
+ .skill - skills                 .soc - socials
+ .t - scripts/triggers           .v - vehicles
 
 Basic commands:
  . - typing '.' by itself shows your current editor
@@ -49,7 +49,8 @@ Examples:
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
  
 See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC FACTIONS,
-   OLC GLOBALS, OLC MOBILES, OLC OBJECTS, OLC SECTORS, MAP OLC, OLC GENERICS
+   OLC GLOBALS, OLC MOBILES, OLC OBJECTS, OLC SECTORS, MAP OLC, OLC GENERICS,
+   OLC SHOPS
 See also: OLC ABORT, OLC AUDIT, OLC COPY, OLC DELETE, OLC EDIT, OLC FREE, 
    OLC LIST, OLC SAVE, OLC SEARCH, OLC LICENSE, TEXT EDITOR, VNUM
 #d
@@ -76,6 +77,7 @@ obj - object
 qst - quest
 rmt - room template
 sct - sector/terrain
+shop - shop
 skl - skill
 soc - social
 trg - trigger
@@ -374,6 +376,9 @@ Sectors (SECTEDIT):
   do anything.
 - Please provide a useful list of commands for any new sector. For example, if
   you add any DIG interaction, put "dig" on the commands list.
+
+Shops (SHOPEDIT):
+- no tips yet
 
 Skills (SKILLEDIT):
 - See HELP ABILITY POINTS for a breakdown of how many points a player gets in
@@ -2909,14 +2914,18 @@ always active on the mob, as if a spell had been cast on them.
 
 See also: AFFECT FLAGS, OLC MOBILES
 #d
-"MEDIT ALLEGIANCE"
+"MEDIT ALLEGIANCE" "SHOPEDIT ALLEGIANCE"
 
 Usage:  .allegiance <none | vnum | name>
 
-This sets a mob to be a member of a faction. For some factions, this will cause
-reputation gain if a player kills the mob.
+This sets a mob or shop to be a member of a faction.
 
-See also: FACTION, OLC FACTIONS, OLC MOBILES
+For some factions, this will cause reputation gain if a player kills the mob.
+
+The faction allegiance of a shop only matters for items that have a reputation
+requirement to purchase.
+
+See also: FACTION, OLC FACTIONS, SHOPEDIT ITEM, OLC MOBILES, OLC SHOPS
 #d
 "MEDIT ATTACK" "ATTACK TYPES"
 
@@ -5346,6 +5355,109 @@ punctuation at the end, and should be a reasonably short description of the
 sector.
 
 See also: OLC SECTORS
+#d
+SHOPEDIT "OLC SHOPS" "SHOP OLC"
+
+Usage:  .shop <command>
+        .command
+
+The .olc shop editor allows you to configure shops, which can be attached to
+mobs, objects, room templates, and buildings. Shops can sell items for coins
+or for various adventure currencies (generics). However, shops are not
+currently able to buy items.
+
+All commands in the editor arg highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP SHOPEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .shop edit 123
+> .name Test Shop
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"SHOPEDIT CLOSES" "SHOPEDIT OPENS"
+
+Usage:  .opens <hour>
+        .closes <hour>
+
+These commands allow you to set when the shop opens or closes. You can use
+either 12- or 24-hour time ('4pm' or '16'). If a shop has the same time for
+both opening and closing, it will be open all the time.
+
+If the opening time is later than the closing time, the shop will be open
+overnight: e.g. if it opens at 6pm and closes at 4am.
+
+See also: OLC SHOPS
+#d
+"SHOPEDIT FLAGS" "SHOP FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Shop flags set various properties on shops.
+
+Available flags:
+ IN-DEVELOPMENT - Players can't use the shop.
+
+See also: OLC SHOPS, OLC REMOVEINDEV
+#d
+"SHOPEDIT ITEMS"
+Usage: .item add <vnum> <cost> <currency vnum | coins> [min reputation]
+       .item change <number> vnum <value>
+       .item move <number> <up | down>
+       .item copy <from type> <from vnum>
+       .item remove <number | all>
+
+The shop's item list determines what it sells. Shops have an infinite number
+of each item, and do not run out. Shopkeepers do not receive the coins or
+currency that are paid to them; this is always lost.
+
+The parameters for add/copy are:
+- vnum: The object vnum to sell.
+- cost: The number of coins/currency.
+- currency: Either the word 'coins' or the vnum of a generic currency. Coins
+  will always be miscellaneous coins unless the shop's mob/room belong to an
+  empire, in which case it will be empire coins.
+- min reputation: If the shop has allegiance to a faction, this is the lowest
+  reputation that can buy the item (optional).
+
+See also: SHOPEDIT ALLEGIANCE, OLC SHOPS, GENERIC CURRENCY, VNUM
+#d
+"SHOPEDIT LOCATIONS"
+
+Usage:  .location add <type> <vnum>
+        .location change <number> vnum <value>
+        .location copy <from type> <from vnum>
+        .location remove <number | all>
+
+Locations are places where the shop appears. The same shop can have multiple
+shopkeepers.
+
+Available location types:
+ BUILDING - Any copy of this building (or designated room) has the shop.
+ MOBILE - A mob has the shop, wherever that mob is.
+ OBJECT - An object has the shop. Be careful; this will work even if the object
+   is in the player's inventory.
+ ROOM-TEMPLATE - The shop is in a room template in an adventure.
+
+Shop locations use the same system as the start/end locations of a quest, and
+you can copy from those fields (and vice versa) with this syntax:
+> .location copy quest <vnum> starts
+
+See also: OLC QUESTS, OLC SHOPS
+#d
+"SHOPEDIT NAME"
+
+Usage:  .name <name>
+
+A shop's name is only used for internal purposes, such as 'vnum' or '.list'.
+Players do not see the name. You should use something descriptive.
+
+See also: OLC SHOPS
 #d
 SKILLEDIT "OLC SKILLS" "SKILL OLC"
 

@@ -1438,7 +1438,7 @@ OLC_MODULE(shopedit_items) {
 		msg_to_char(ch, "Usage: item add <vnum> <cost> <currency vnum | coins> [min reputation]\r\n");
 		msg_to_char(ch, "Usage: item change <number> vnum <value>\r\n");
 		msg_to_char(ch, "Usage: item move <number> <up | down>\r\n");
-		msg_to_char(ch, "Usage: item copy <from type> <from vnum> [starts/ends]\r\n");
+		msg_to_char(ch, "Usage: item copy <from type> <from vnum>\r\n");
 		msg_to_char(ch, "Usage: item remove <number | all>\r\n");
 	}
 }

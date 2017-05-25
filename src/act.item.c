@@ -3566,7 +3566,7 @@ ACMD(do_buy) {
 	// now show any shops available
 	LL_FOREACH(shop_list, stl) {		
 		// the nopes
-		if (SHOP_FLAGGED(stl->shop, SHOP_IN_DEVELOPMENT)) {
+		if (SHOP_FLAGGED(stl->shop, SHOP_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
 			continue;	// in-dev
 		}
 		
@@ -4753,7 +4753,7 @@ ACMD(do_list) {
 		this = FALSE;
 		
 		// the nopes
-		if (SHOP_FLAGGED(stl->shop, SHOP_IN_DEVELOPMENT)) {
+		if (SHOP_FLAGGED(stl->shop, SHOP_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
 			continue;	// in-dev
 		}
 		
