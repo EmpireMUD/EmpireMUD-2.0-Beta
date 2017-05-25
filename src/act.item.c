@@ -3547,6 +3547,10 @@ ACMD(do_buy) {
 	skip_spaces(&argument);	// optional filter
 	number = get_number(&argument);	// x.name syntax
 	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs don't buy.\r\n");
+		return;
+	}
 	if (FIGHTING(ch)) {
 		msg_to_char(ch, "You can't do that right now!\r\n");
 		return;
