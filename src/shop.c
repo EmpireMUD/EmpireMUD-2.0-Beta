@@ -626,9 +626,18 @@ void do_stat_shop(char_data *ch, shop_data *shop) {
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0, Times: ", SHOP_VNUM(shop), SHOP_NAME(shop));
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Opens at: [\tc%d%s\t0], Closes at: [\tc%d%s\t0], Faction allegiance: [\ty%s\t0]\r\n", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)), SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
+	// same line
+	if (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "[\tcalways open\t0]");
+	}
+	else {
+		size += snprintf(buf + size, sizeof(buf) - size, "[\tc%d%s\t0 - \tc%d%s\t0]", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
+	}
+	
+	// still same line
+	size += snprintf(buf + size, sizeof(buf) - size, ", Faction allegiance: [\ty%s\t0]\r\n", SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
 	
 	sprintbit(SHOP_FLAGS(shop), shop_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
@@ -665,7 +674,7 @@ void olc_show_shop(char_data *ch) {
 	sprintbit(SHOP_FLAGS(shop), shop_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
 	
-	sprintf(buf + strlen(buf), "<\tyopens\t0> %d%s\r\n", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)));
+	sprintf(buf + strlen(buf), "<\tyopens\t0> %d%s%s\r\n", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) ? " (always open)" : "");
 	sprintf(buf + strlen(buf), "<\tycloses\t0> %d%s\r\n", TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
 	sprintf(buf + strlen(buf), "<\tyallegiance\t0> %s\r\n", SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
 	
