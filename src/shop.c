@@ -46,6 +46,7 @@ extern const char *shop_flags[];
 
 // external funcs
 extern struct quest_giver *copy_quest_givers(struct quest_giver *from);
+extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 void free_quest_givers(struct quest_giver *list);
 void get_quest_giver_display(struct quest_giver *list, char *save_buffer);
 
@@ -253,12 +254,125 @@ void add_shop_lookup(struct shop_lookup **list, shop_data *shop) {
 
 
 /**
+* Adds a shop to a temporary shop list (don't forget to free the list later).
+*
+* @param struct shop_temp_list **shop_list A pointer to the list to add to.
+* @param shop_data *shop The shop to add (will check duplicates automatically).
+*/
+void add_temp_shop(struct shop_temp_list **shop_list, shop_data *shop) {
+	struct shop_temp_list *stl;
+	bool found = FALSE;
+	
+	// ensure it's not already in the list
+	LL_FOREACH(*shop_list, stl) {
+		if (stl->shop == shop) {
+			found = TRUE;
+			break;
+		}
+	}
+	
+	if (!found) {
+		CREATE(stl, struct shop_temp_list, 1);
+		stl->shop = shop;
+		LL_APPEND(*shop_list, stl);
+	}
+}
+
+
+/**
 * Builds all the shop lookup tables on startup.
 */
 void build_all_shop_lookups(void) {
 	shop_data *shop, *next_shop;
 	HASH_ITER(hh, shop_table, shop, next_shop) {
 		add_or_remove_all_shop_lookups_for(shop, TRUE);
+	}
+}
+
+
+/**
+* Finds all available shops at a character's location. You should use
+* free_shop_temp_list() when you're done with this list.
+*
+* @param char_data *ch The player looking for shops.
+* @return struct shop_temp_list* The shop list.
+*/
+struct shop_temp_list *build_available_shop_list(char_data *ch) {
+	struct shop_temp_list *shop_list = NULL;
+	struct shop_lookup *sl;
+	char_data *mob;
+	obj_data *obj;
+	
+	// mobs
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
+		if (!IS_NPC(mob) || EXTRACTED(mob) || !CAN_SEE(ch, mob) || FIGHTING(mob) || GET_POS(mob) < POS_RESTING || IS_DEAD(mob)) {
+			continue;
+		}
+		LL_FOREACH(MOB_SHOP_LOOKUPS(mob), sl) {
+			if (find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_MOBILE, GET_MOB_VNUM(mob))) {
+				add_temp_shop(&shop_list, sl->shop);
+			}
+		}
+	}
+	
+	// search in inventory
+	LL_FOREACH2(ch->carrying, obj, next_content) {
+		if (!CAN_SEE_OBJ(ch, obj)) {
+			continue;
+		}
+		LL_FOREACH(GET_OBJ_SHOP_LOOKUPS(obj), sl) {
+			if (find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_OBJECT, GET_OBJ_VNUM(obj))) {
+				add_temp_shop(&shop_list, sl->shop);
+			}
+		}
+	}
+	
+	// objs in room
+	LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+		if (!CAN_SEE_OBJ(ch, obj)) {
+			continue;
+		}
+		LL_FOREACH(GET_OBJ_SHOP_LOOKUPS(obj), sl) {
+			if (find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_OBJECT, GET_OBJ_VNUM(obj))) {
+				add_temp_shop(&shop_list, sl->shop);
+			}
+		}
+	}
+	
+	// rooms
+	if (CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		// search room: building
+		if (GET_BUILDING(IN_ROOM(ch))) {
+			LL_FOREACH(GET_BLD_SHOP_LOOKUPS(GET_BUILDING(IN_ROOM(ch))), sl) {
+				if (find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_BUILDING, GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))))) {
+					add_temp_shop(&shop_list, sl->shop);
+				}
+			}
+		}
+		
+		// search room: template
+		if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
+			LL_FOREACH(GET_RMT_SHOP_LOOKUPS(GET_ROOM_TEMPLATE(IN_ROOM(ch))), sl) {
+				if (find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_ROOM_TEMPLATE, GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))))) {
+					add_temp_shop(&shop_list, sl->shop);
+				}
+			}
+		}
+	}
+	
+	return shop_list;
+}
+
+
+/**
+* Frees a temporary shop list.
+*
+* @param struct shop_temp_list *list The list to free.
+*/
+void free_shop_temp_list(struct shop_temp_list *list) {
+	struct shop_temp_list *stl, *next_stl;
+	LL_FOREACH_SAFE(list, stl, next_stl) {
+		free(stl);
 	}
 }
 

@@ -42,12 +42,15 @@
 // extern variables
 extern const char *extra_bits[];
 extern const char *mob_move_types[];
+extern struct faction_reputation_type reputation_levels[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // extern functions
+extern struct shop_temp_list *build_available_shop_list(char_data *ch);
 extern bool can_steal(char_data *ch, empire_data *emp);
 extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 void expire_trading_post_item(struct trading_post_data *tpd);
+void free_shop_temp_list(struct shop_temp_list *list);
 extern char *get_room_name(room_data *room, bool color);
 extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 void read_vault(empire_data *emp);
@@ -4611,6 +4614,75 @@ ACMD(do_light) {
 		run_interactions(ch, obj->interactions, INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, light_obj_interact);
 		extract_obj(obj);
 		command_lag(ch, WAIT_OTHER);
+	}
+}
+
+
+ACMD(do_list) {
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], rep[256];
+	struct shop_temp_list *stl, *shop_list = NULL;
+	struct shop_item *item;
+	obj_data *obj;
+	size_t size;
+	bool any;
+	
+	skip_spaces(&argument);	// optional filter
+	
+	// find shops
+	shop_list = build_available_shop_list(ch);
+	any = FALSE;
+	
+	if (*argument) {
+		size = snprintf(buf, sizeof(buf), "Items available matching '%s':\r\n", argument);
+	}
+	else {
+		size = snprintf(buf, sizeof(buf), "Items available here:\r\n");
+	}
+
+	// now show any shops available
+	LL_FOREACH(shop_list, stl) {
+		// the nopes
+		if (SHOP_FLAGGED(stl->shop, SHOP_IN_DEVELOPMENT)) {
+			continue;	// in-dev
+		}
+		
+		// list of items
+		LL_FOREACH(SHOP_ITEMS(stl->shop), item) {
+			if (!(obj = obj_proto(item->vnum))) {
+				continue;	// no obj
+			}
+			if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(obj))) {
+				continue;	// search option
+			}
+			
+			if (SHOP_ALLEGIANCE(stl->shop) && item->min_rep != REP_NONE) {
+				snprintf(rep, sizeof(rep), ", %s reputation", reputation_levels[rep_const_to_index(item->min_rep)].name);
+			}
+			else {
+				*rep = '\0';
+			}
+			
+			snprintf(line, sizeof(line), " %s (%d %s%s)\r\n", GET_OBJ_SHORT_DESC(obj), item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, item->cost == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL)), rep);
+			
+			if (size + strlen(line) < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+				any = TRUE;
+			}
+			else {
+				break;
+			}
+		}
+	}
+
+	if (!any) {
+		size += snprintf(buf + size, sizeof(buf) - size, " none");
+	}
+
+	free_shop_temp_list(shop_list);
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
 	}
 }
 
