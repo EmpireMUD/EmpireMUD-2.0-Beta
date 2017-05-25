@@ -3534,6 +3534,103 @@ void warehouse_store(char_data *ch, char *argument) {
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
+ACMD(do_buy) {
+	struct shop_temp_list *stl, *shop_list = NULL;
+	empire_data *coin_emp = NULL;
+	char buf[MAX_STRING_LENGTH];
+	struct shop_item *item;
+	obj_data *obj;
+	int number;
+	
+	skip_spaces(&argument);	// optional filter
+	number = get_number(&argument);	// x.name syntax
+	
+	if (FIGHTING(ch)) {
+		msg_to_char(ch, "You can't do that right now!\r\n");
+		return;
+	}
+	if (!*argument) {
+		msg_to_char(ch, "Buy what?\r\n");
+		return;
+	}
+	
+	// find shops: MUST free this before returning
+	shop_list = build_available_shop_list(ch);
+	
+	// now show any shops available
+	LL_FOREACH(shop_list, stl) {		
+		// the nopes
+		if (SHOP_FLAGGED(stl->shop, SHOP_IN_DEVELOPMENT)) {
+			continue;	// in-dev
+		}
+		
+		// list of items
+		LL_FOREACH(SHOP_ITEMS(stl->shop), item) {
+			if (!(obj = obj_proto(item->vnum))) {
+				continue;	// no obj
+			}
+			if (!multi_isname(argument, GET_OBJ_KEYWORDS(obj))) {
+				continue;
+			}
+			if (--number > 0) {
+				continue;
+			}
+			
+			// we have validated which object. Now try to afford it:
+			if (SHOP_ALLEGIANCE(stl->shop) && item->min_rep != REP_NONE && !has_reputation(ch, FCT_VNUM(SHOP_ALLEGIANCE(stl->shop)), item->min_rep)) {
+				msg_to_char(ch, "You must be at least %s by %s to buy %s.\r\n", reputation_levels[rep_const_to_index(item->min_rep)].name, FCT_NAME(SHOP_ALLEGIANCE(stl->shop)), GET_OBJ_SHORT_DESC(obj));
+				free_shop_temp_list(shop_list);
+				return;
+			}
+			if (item->currency == NOTHING) {
+				coin_emp = (stl->from_mob ? GET_LOYALTY(stl->from_mob) : (stl->from_room ? ROOM_OWNER(stl->from_room) : NULL));
+				if (!can_afford_coins(ch, coin_emp, item->cost)) {
+					msg_to_char(ch, "You need %s to buy %s.\r\n", money_amount(coin_emp, item->cost), GET_OBJ_SHORT_DESC(obj));
+					free_shop_temp_list(shop_list);
+					return;
+				}
+			}
+			else if (item->currency != NOTHING && get_currency(ch, item->currency) < item->cost) {
+				msg_to_char(ch, "You need %d %s to buy %s.\r\n", item->cost, get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost)), GET_OBJ_SHORT_DESC(obj));
+				free_shop_temp_list(shop_list);
+				return;
+			}
+			else if (!CAN_CARRY_OBJ(ch, obj)) {
+				msg_to_char(ch, "Your arms are already full!\r\n");
+				free_shop_temp_list(shop_list);
+				return;
+			}
+			
+			// VALID!
+			obj = read_object(item->vnum, TRUE);
+			obj_to_char(obj, ch);
+			scale_item_to_level(obj, get_approximate_level(ch));
+			
+			if (item->currency == NOTHING) {
+				charge_coins(ch, coin_emp, item->cost, NULL);
+				sprintf(buf, "You buy $p for %s.", money_amount(coin_emp, item->cost));
+			}
+			else {
+				add_currency(ch, item->currency, -(item->cost));
+				sprintf(buf, "You buy $p for %d %s.", item->cost, get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost)));
+			}
+			
+			act(buf, FALSE, ch, obj, NULL, TO_ROOM);
+			act("$n buys $p.", FALSE, ch, obj, NULL, TO_ROOM);
+			
+			load_otrigger(obj);
+			
+			free_shop_temp_list(shop_list);
+			return;	// done now
+		}
+	}
+	
+	// did we make it this far?
+	msg_to_char(ch, "You don't see any %s for sale here.\r\n", argument);
+	free_shop_temp_list(shop_list);
+}
+
+
 ACMD(do_combine) {
 	char arg[MAX_INPUT_LENGTH];
 	obj_data *obj;
@@ -4619,7 +4716,7 @@ ACMD(do_light) {
 
 
 ACMD(do_list) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], rep[256], matching[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], rep[256], tmp[256], matching[MAX_INPUT_LENGTH];
 	struct shop_temp_list *stl, *shop_list = NULL;
 	struct shop_item *item;
 	bool any, this;
@@ -4675,16 +4772,16 @@ ACMD(do_list) {
 				this = TRUE;
 				
 				if (stl->from_mob) {
-					snprintf(line, sizeof(line), "%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), PERS(stl->from_mob, ch, FALSE), matching);
+					strcpy(tmp, PERS(stl->from_mob, ch, FALSE));
+					snprintf(line, sizeof(line), "%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), CAP(tmp), matching);
 				}
 				else if (stl->from_obj) {
-					snprintf(line, sizeof(line), "%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), GET_OBJ_SHORT_DESC(stl->from_obj), matching);
+					strcpy(tmp, GET_OBJ_SHORT_DESC(stl->from_obj));
+					snprintf(line, sizeof(line), "%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), CAP(tmp), matching);
 				}
 				else {
 					snprintf(line, sizeof(line), "%sYou can %sbuy%s:\r\n", (*buf ? "\r\n" : ""), (*buf ? "also " : ""), matching);
 				}
-				
-				CAP(line);	// ensure uppercase
 				
 				if (size + strlen(line) < sizeof(buf)) {
 					strcat(buf, line);
