@@ -298,6 +298,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	quest_data *quest, *next_quest;
 	room_data *room, *next_room;
 	social_data *soc, *next_soc;
+	shop_data *shop, *next_shop;
 	descriptor_data *desc;
 	room_template *rmt;
 	bool found;
@@ -330,6 +331,16 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
+	// update shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		found = delete_quest_giver_from_list(&SHOP_LOCATIONS(shop), QG_ROOM_TEMPLATE, vnum);
+		
+		if (found) {
+			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
 		}
 	}
 	
@@ -371,6 +382,14 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 				msg_to_desc(desc, "A room template used by the quest you are editing was deleted.\r\n");
 			}
 		}
+		if (GET_OLC_SHOP(desc)) {
+			found = delete_quest_giver_from_list(&SHOP_LOCATIONS(GET_OLC_SHOP(desc)), QG_ROOM_TEMPLATE, vnum);
+		
+			if (found) {
+				SET_BIT(SHOP_FLAGS(GET_OLC_SHOP(desc)), SHOP_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A room template used by the shop you are editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_SOCIAL(desc)) {
 			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_VISIT_ROOM_TEMPLATE, vnum);
 		
@@ -406,6 +425,7 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 	room_template *rmt = room_template_proto(vnum), *iter, *next_iter;
 	quest_data *quest, *next_quest;
 	social_data *soc, *next_soc;
+	shop_data *shop, *next_shop;
 	struct exit_template *ex;
 	obj_data *obj, *next_obj;
 	int size, found;
@@ -440,6 +460,19 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+		}
+	}
+	
+	// shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_ROOM_TEMPLATE, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 

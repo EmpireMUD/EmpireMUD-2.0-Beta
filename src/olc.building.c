@@ -198,6 +198,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
 	social_data *soc, *next_soc;
+	shop_data *shop, *next_shop;
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
@@ -297,6 +298,16 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		}
 	}
 	
+	// shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		found = delete_quest_giver_from_list(&SHOP_LOCATIONS(shop), QG_BUILDING, vnum);
+		
+		if (found) {
+			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
+		}
+	}
+	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_OWN_BUILDING, vnum);
@@ -367,6 +378,14 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 				msg_to_desc(desc, "A building used by the quest you are editing was deleted.\r\n");
 			}
 		}
+		if (GET_OLC_SHOP(desc)) {
+			found = delete_quest_giver_from_list(&SHOP_LOCATIONS(GET_OLC_SHOP(desc)), QG_BUILDING, vnum);
+		
+			if (found) {
+				SET_BIT(SHOP_FLAGS(GET_OLC_SHOP(desc)), SHOP_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A building used by the shop you are editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_SOCIAL(desc)) {
 			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_OWN_BUILDING, vnum);
 			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_VISIT_BUILDING, vnum);
@@ -416,6 +435,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	quest_data *quest, *next_quest;
 	vehicle_data *veh, *next_veh;
 	social_data *soc, *next_soc;
+	shop_data *shop, *next_shop;
 	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
@@ -492,6 +512,17 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_BUILDING, vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_BUILDING, vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_OWN_BUILDING, vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_OWN_BUILDING, vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_VISIT_BUILDING, vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_VISIT_BUILDING, vnum)) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+		}
+	}
+	
+	// shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		if (find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_BUILDING, vnum)) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	

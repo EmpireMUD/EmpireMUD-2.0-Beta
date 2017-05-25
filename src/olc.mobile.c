@@ -297,6 +297,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
+	shop_data *shop, *next_shop;
 	social_data *soc, *next_soc;
 	bld_data *bld, *next_bld;
 	struct mount_data *mount;
@@ -417,6 +418,16 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		}
 	}
 	
+	// update shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		found = delete_quest_giver_from_list(&SHOP_LOCATIONS(shop), QG_MOBILE, vnum);
+		
+		if (found) {
+			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
+		}
+	}
+	
 	// update socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_KILL_MOB, vnum);
@@ -473,6 +484,14 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 				msg_to_char(desc->character, "One of the mobs in an interaction for the room template you're editing was deleted.\r\n");
 			}
 		}
+		if (GET_OLC_SHOP(desc)) {
+			found = delete_quest_giver_from_list(&SHOP_LOCATIONS(GET_OLC_SHOP(desc)), QG_MOBILE, vnum);
+			
+			if (found) {
+				SET_BIT(SHOP_FLAGS(GET_OLC_SHOP(desc)), SHOP_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A mobile used by the shop you are editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_SECTOR(desc)) {
 			if (delete_mob_from_spawn_list(&GET_OLC_SECTOR(desc)->spawns, vnum)) {
 				msg_to_char(desc->character, "One of the mobs that spawns in the sector you're editing was deleted.\r\n");
@@ -519,6 +538,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
+	shop_data *shop, *next_shop;
 	social_data *soc, *next_soc;
 	bld_data *bld, *next_bld;
 	int size, found;
@@ -646,6 +666,17 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 			}
+		}
+	}
+	
+	// shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		if (find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_MOBILE, vnum)) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	

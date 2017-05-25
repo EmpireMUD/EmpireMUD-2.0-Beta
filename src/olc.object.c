@@ -430,6 +430,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	vehicle_data *veh, *next_veh;
 	crop_data *crop, *next_crop;
 	room_data *room, *next_room;
+	shop_data *shop, *next_shop;
 	empire_data *emp, *next_emp;
 	social_data *soc, *next_soc;
 	char_data *mob, *next_mob;
@@ -714,6 +715,16 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// update shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		found = delete_quest_giver_from_list(&SHOP_LOCATIONS(shop), QG_OBJECT, vnum);
+		
+		if (found) {
+			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
+		}
+	}
+	
 	// update socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_GET_OBJECT, vnum);
@@ -868,6 +879,14 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		if (GET_OLC_SECTOR(desc)) {
 			if (delete_from_interaction_list(&GET_OLC_SECTOR(desc)->interactions, TYPE_OBJ, vnum)) {
 				msg_to_char(desc->character, "One of the objects in an interaction for the sector you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SHOP(desc)) {
+			found = delete_quest_giver_from_list(&SHOP_LOCATIONS(GET_OLC_SHOP(desc)), QG_OBJECT, vnum);
+			
+			if (found) {
+				SET_BIT(SHOP_FLAGS(GET_OLC_SHOP(desc)), SHOP_IN_DEVELOPMENT);
+				msg_to_desc(desc, "An object used by the shop you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_SOCIAL(desc)) {
@@ -1175,6 +1194,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	social_data *soc, *next_soc;
 	struct archetype_gear *gear;
 	crop_data *crop, *next_crop;
+	shop_data *shop, *next_shop;
 	char_data *mob, *next_mob;
 	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
@@ -1377,6 +1397,19 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 			}
+		}
+	}
+	
+	// shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_OBJECT, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	

@@ -2341,6 +2341,7 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 	quest_data *quest = quest_proto(vnum);
 	quest_data *qiter, *next_qiter;
 	social_data *soc, *next_soc;
+	shop_data *shop, *next_shop;
 	int size, found;
 	bool any;
 	
@@ -2371,6 +2372,20 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+		}
+	}
+	
+	// on other shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		// QG_x: shop types
+		any = find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_QUEST, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
@@ -3326,6 +3341,7 @@ quest_data *create_quest_table_entry(any_vnum vnum) {
 void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	quest_data *quest, *qiter, *next_qiter;
 	social_data *soc, *next_soc;
+	shop_data *shop, *next_shop;
 	descriptor_data *desc;
 	char_data *chiter;
 	bool found;
@@ -3375,6 +3391,17 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		// QG_x: quest types
+		found = delete_quest_giver_from_list(&SHOP_LOCATIONS(shop), QG_QUEST, vnum);
+		
+		if (found) {
+			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
+		}
+	}
+	
 	// update socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		// REQ_x: quest types
@@ -3405,6 +3432,15 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
 				msg_to_desc(desc, "Another quest used by the quest you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SHOP(desc)) {
+			// QG_x: quest types
+			found = delete_quest_giver_from_list(&SHOP_LOCATIONS(GET_OLC_SHOP(desc)), QG_QUEST, vnum);
+		
+			if (found) {
+				SET_BIT(SHOP_FLAGS(GET_OLC_SHOP(desc)), SHOP_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A quest used by the shop you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_SOCIAL(desc)) {
