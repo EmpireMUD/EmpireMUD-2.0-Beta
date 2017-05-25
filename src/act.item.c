@@ -4692,7 +4692,7 @@ ACMD(do_list) {
 				*rep = '\0';
 			}
 			
-			snprintf(line, sizeof(line), " %s (%d %s%s)\r\n", GET_OBJ_SHORT_DESC(obj), item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), rep);
+			snprintf(line, sizeof(line), "  %s (%d %s%s)\r\n", GET_OBJ_SHORT_DESC(obj), item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), rep);
 			
 			if (size + strlen(line) < sizeof(buf)) {
 				strcat(buf, line);
