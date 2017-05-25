@@ -4213,6 +4213,11 @@ struct shop_lookup {
 // used for building a linked list of local shops
 struct shop_temp_list {
 	shop_data *shop;
+	
+	char_data *from_mob;	// may
+	obj_data *from_obj;	// be any
+	room_data *from_room;	// of these
+	
 	struct shop_temp_list *next;
 };
 

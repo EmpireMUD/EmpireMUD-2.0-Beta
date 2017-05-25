@@ -258,8 +258,11 @@ void add_shop_lookup(struct shop_lookup **list, shop_data *shop) {
 *
 * @param struct shop_temp_list **shop_list A pointer to the list to add to.
 * @param shop_data *shop The shop to add (will check duplicates automatically).
+* @param char_data *mob The mob vendor, IF any.
+* @param obj_data *obj The obj vendor, IF any.
+* @param room_data *room The room vendor, IF any.
 */
-void add_temp_shop(struct shop_temp_list **shop_list, shop_data *shop) {
+void add_temp_shop(struct shop_temp_list **shop_list, shop_data *shop, char_data *mob, obj_data *obj, room_data *room) {
 	struct shop_temp_list *stl;
 	bool found = FALSE;
 	
@@ -274,6 +277,9 @@ void add_temp_shop(struct shop_temp_list **shop_list, shop_data *shop) {
 	if (!found) {
 		CREATE(stl, struct shop_temp_list, 1);
 		stl->shop = shop;
+		stl->from_mob = mob;
+		stl->from_obj = obj;
+		stl->from_room = room;
 		LL_APPEND(*shop_list, stl);
 	}
 }
@@ -310,7 +316,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 		}
 		LL_FOREACH(MOB_SHOP_LOOKUPS(mob), sl) {
 			if (find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_MOBILE, GET_MOB_VNUM(mob))) {
-				add_temp_shop(&shop_list, sl->shop);
+				add_temp_shop(&shop_list, sl->shop, mob, NULL, NULL);
 			}
 		}
 	}
@@ -322,7 +328,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 		}
 		LL_FOREACH(GET_OBJ_SHOP_LOOKUPS(obj), sl) {
 			if (find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_OBJECT, GET_OBJ_VNUM(obj))) {
-				add_temp_shop(&shop_list, sl->shop);
+				add_temp_shop(&shop_list, sl->shop, NULL, obj, NULL);
 			}
 		}
 	}
@@ -334,7 +340,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 		}
 		LL_FOREACH(GET_OBJ_SHOP_LOOKUPS(obj), sl) {
 			if (find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_OBJECT, GET_OBJ_VNUM(obj))) {
-				add_temp_shop(&shop_list, sl->shop);
+				add_temp_shop(&shop_list, sl->shop, NULL, obj, NULL);
 			}
 		}
 	}
@@ -345,7 +351,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 		if (GET_BUILDING(IN_ROOM(ch))) {
 			LL_FOREACH(GET_BLD_SHOP_LOOKUPS(GET_BUILDING(IN_ROOM(ch))), sl) {
 				if (find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_BUILDING, GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))))) {
-					add_temp_shop(&shop_list, sl->shop);
+					add_temp_shop(&shop_list, sl->shop, NULL, NULL, IN_ROOM(ch));
 				}
 			}
 		}
@@ -354,7 +360,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 		if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
 			LL_FOREACH(GET_RMT_SHOP_LOOKUPS(GET_ROOM_TEMPLATE(IN_ROOM(ch))), sl) {
 				if (find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_ROOM_TEMPLATE, GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))))) {
-					add_temp_shop(&shop_list, sl->shop);
+					add_temp_shop(&shop_list, sl->shop, NULL, NULL, IN_ROOM(ch));
 				}
 			}
 		}
