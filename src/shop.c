@@ -626,17 +626,16 @@ void do_stat_shop(char_data *ch, shop_data *shop) {
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0, Times: ", SHOP_VNUM(shop), SHOP_NAME(shop));
+	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
 	
-	// same line
+	// 2nd line
 	if (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "[\tcalways open\t0]");
+		size += snprintf(buf + size, sizeof(buf) - size, "Times: [\tcalways open\t0]");
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, "[\tc%d%s\t0 - \tc%d%s\t0]", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
+		size += snprintf(buf + size, sizeof(buf) - size, "Times: [\tc%d%s\t0 - \tc%d%s\t0]", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
 	}
-	
-	// still same line
+	// still 2nd line
 	size += snprintf(buf + size, sizeof(buf) - size, ", Faction allegiance: [\ty%s\t0]\r\n", SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
 	
 	sprintbit(SHOP_FLAGS(shop), shop_flags, part, TRUE);
