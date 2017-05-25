@@ -740,7 +740,7 @@ void save_olc_shop(descriptor_data *desc) {
 	proto->hh = hh;	// restore old hash handles
 	
 	// re-add lookups
-	add_or_remove_all_quest_lookups_for(proto, TRUE);
+	add_or_remove_all_shop_lookups_for(proto, TRUE);
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_SHOP, vnum);
