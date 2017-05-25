@@ -885,7 +885,7 @@ OLC_MODULE(shopedit_items) {
 		else if (!isdigit(*cost_arg) || (cost = atoi(cost_arg)) < 1) {
 			msg_to_char(ch, "Invalid cost '%s'.\r\n", cost_arg);
 		}
-		else if (str_cmp(cur_arg, "coins") || (cur_vnum = atoi(cur_arg)) < 0 || !find_generic(cur_vnum, GENERIC_CURRENCY)) {
+		else if (str_cmp(cur_arg, "coins") && ((cur_vnum = atoi(cur_arg)) < 0 || !find_generic(cur_vnum, GENERIC_CURRENCY))) {
 			msg_to_char(ch, "Invalid currency '%s'. Specify a currency vnum or 'coins'.\r\n", cur_arg);
 		}
 		else if (*rep_arg && (rep = get_reputation_by_name(rep_arg)) == NOTHING) {
