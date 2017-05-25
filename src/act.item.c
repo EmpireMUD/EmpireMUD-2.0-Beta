@@ -203,14 +203,15 @@ int find_eq_pos(char_data *ch, obj_data *obj, char *arg) {
 *
 * @param char_data *ch The person getting obj.
 * @param obj_data *obj The item being picked up.
+* @return bool TRUE if the obj was extracted, FALSE if it stays.
 */
-void get_check_money(char_data *ch, obj_data *obj) {
+bool get_check_money(char_data *ch, obj_data *obj) {
 	empire_data *emp = real_empire(GET_COINS_EMPIRE_ID(obj));
 	int value;
 
 	// npcs will keep the obj version
 	if (IS_NPC(ch)) {
-		return;
+		return FALSE;
 	}
 	
 	switch (GET_OBJ_TYPE(obj)) {
@@ -226,12 +227,13 @@ void get_check_money(char_data *ch, obj_data *obj) {
 			break;
 		}
 		default: {
-			return;	// nope
+			return FALSE;	// nope
 		}
 	}
 	
 	// made it this far
 	extract_obj(obj);
+	return TRUE;
 }
 
 
@@ -3615,10 +3617,12 @@ ACMD(do_buy) {
 				sprintf(buf, "You buy $p for %d %s.", item->cost, get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost)));
 			}
 			
-			act(buf, FALSE, ch, obj, NULL, TO_ROOM);
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 			act("$n buys $p.", FALSE, ch, obj, NULL, TO_ROOM);
 			
-			load_otrigger(obj);
+			if (!get_check_money(ch, obj)) {
+				load_otrigger(obj);
+			}
 			
 			free_shop_temp_list(shop_list);
 			return;	// done now

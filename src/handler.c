@@ -4016,7 +4016,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 * @param obj_data *obj The object to empty.
 */
 void empty_obj_before_extract(obj_data *obj) {
-	void get_check_money(char_data *ch, obj_data *obj);
+	bool get_check_money(char_data *ch, obj_data *obj);
 	
 	obj_data *jj, *next_thing;
 	
