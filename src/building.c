@@ -849,9 +849,9 @@ void process_dismantling(char_data *ch, room_data *room) {
 				break;
 			}
 			case RES_CURRENCY: {
-				snprintf(buf, sizeof(buf), "You retrieve %d %s from the structure.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, res->amount == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
+				snprintf(buf, sizeof(buf), "You retrieve %d %s from the structure.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				snprintf(buf, sizeof(buf), "$n retrieves %d %s from the structure.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, res->amount == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
+				snprintf(buf, sizeof(buf), "$n retrieves %d %s from the structure.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}

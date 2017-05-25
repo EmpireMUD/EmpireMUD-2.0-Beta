@@ -2456,11 +2456,11 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 		}
 		case RES_CURRENCY: {
 			if (!messaged_char && msg_type != APPLY_RES_SILENT) {
-				snprintf(buf, sizeof(buf), "You spend %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, res->amount == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
+				snprintf(buf, sizeof(buf), "You spend %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
 			}
 			if (!messaged_room && msg_type != APPLY_RES_SILENT) {
-				snprintf(buf, sizeof(buf), "$n spends %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, res->amount == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
+				snprintf(buf, sizeof(buf), "$n spends %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 			}
 			add_currency(ch, res->vnum, -(res->amount));
@@ -2848,7 +2848,7 @@ char *get_resource_name(struct resource_data *res) {
 			break;
 		}
 		case RES_CURRENCY: {
-			snprintf(output, sizeof(output), "%d %s", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, res->amount == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
+			snprintf(output, sizeof(output), "%d %s", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 			break;
 		}
 		case RES_POOL: {
@@ -3129,7 +3129,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 				}
 				case RES_CURRENCY: {
 					if (get_currency(ch, res->vnum) < res->amount) {
-						snprintf(buf, sizeof(buf), "You need %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, res->amount == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
+						snprintf(buf, sizeof(buf), "You need %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 						ok = FALSE;
 					}
 					break;

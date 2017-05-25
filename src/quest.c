@@ -453,7 +453,7 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 			break;
 		}
 		case QR_CURRENCY: {
-			snprintf(output, sizeof(output), "%d %s", reward->amount, get_generic_string_by_vnum(reward->vnum, GENERIC_CURRENCY, reward->amount == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
+			snprintf(output, sizeof(output), "%d %s", reward->amount, get_generic_string_by_vnum(reward->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(reward->amount)));
 			break;
 		}
 		case QR_OBJECT: {

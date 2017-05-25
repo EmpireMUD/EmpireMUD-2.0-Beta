@@ -441,7 +441,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_CURRENCY: {
-			msg_to_char(ch, "Amount: %d %s\r\n", GET_CURRENCY_AMOUNT(obj), get_generic_string_by_vnum(GET_CURRENCY_VNUM(obj), GENERIC_CURRENCY, GET_CURRENCY_AMOUNT(obj) == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
+			msg_to_char(ch, "Amount: %d %s\r\n", GET_CURRENCY_AMOUNT(obj), get_generic_string_by_vnum(GET_CURRENCY_VNUM(obj), GENERIC_CURRENCY, WHICH_CURRENCY(GET_CURRENCY_AMOUNT(obj))));
 			break;
 		}
 		case ITEM_MISSILE_WEAPON:
@@ -4692,7 +4692,7 @@ ACMD(do_list) {
 				*rep = '\0';
 			}
 			
-			snprintf(line, sizeof(line), " %s (%d %s%s)\r\n", GET_OBJ_SHORT_DESC(obj), item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, item->cost == 1 ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL)), rep);
+			snprintf(line, sizeof(line), " %s (%d %s%s)\r\n", GET_OBJ_SHORT_DESC(obj), item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), rep);
 			
 			if (size + strlen(line) < sizeof(buf)) {
 				strcat(buf, line);
@@ -4711,7 +4711,7 @@ ACMD(do_list) {
 		}
 	}
 	else {
-		msg_to_char(ch, "There's nothing for sale here.\r\n");
+		msg_to_char(ch, "There's nothing for sale here%s.\r\n", (*argument ? " by that name" : ""));
 	}
 
 	free_shop_temp_list(shop_list);

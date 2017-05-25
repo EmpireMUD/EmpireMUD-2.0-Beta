@@ -2489,7 +2489,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					int amt = subfield ? atoi(subfield) : 1;
 					
 					if ((gen = find_generic(atoi(field), GENERIC_CURRENCY))) {
-						snprintf(str, slen, "%s", amt == 1 ? GEN_STRING(gen, GSTR_CURRENCY_SINGULAR) : GEN_STRING(gen, GSTR_CURRENCY_PLURAL));
+						snprintf(str, slen, "%s", GEN_STRING(gen, WHICH_CURRENCY(amt)));
 					}
 					else {
 						strcpy(str, "UNKNOWN");

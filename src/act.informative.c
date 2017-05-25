@@ -1878,7 +1878,7 @@ ACMD(do_coins) {
 		size += snprintf(buf + size, sizeof(buf) - size, "You also have:\r\n");
 		
 		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
-			snprintf(line, sizeof(line), " %d %s\r\n", cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, (cur->amount == 1) ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL));
+			snprintf(line, sizeof(line), " %d %s\r\n", cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
 			
 			if (size + strlen(line) < sizeof(buf)) {
 				strcat(buf, line);

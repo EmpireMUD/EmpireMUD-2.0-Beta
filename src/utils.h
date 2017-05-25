@@ -595,6 +595,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GSTR_CURRENCY_PLURAL  1
 #define GET_CURRENCY_SINGULAR(gen)  (GEN_TYPE(gen) == GENERIC_CURRENCY ? GEN_STRING((gen), GSTR_CURRENCY_SINGULAR) : NULL)
 #define GET_CURRENCY_PLURAL(gen)  (GEN_TYPE(gen) == GENERIC_CURRENCY ? GEN_STRING((gen), GSTR_CURRENCY_PLURAL) : NULL)
+#define WHICH_CURRENCY(amt)  (((amt) == 1) ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL)
 
 
  //////////////////////////////////////////////////////////////////////////////
