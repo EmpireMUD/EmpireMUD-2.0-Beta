@@ -1196,7 +1196,7 @@ OLC_MODULE(shopedit_items) {
 			}
 			
 			change->vnum = vnum;
-			msg_to_char(ch, "Changed item %d to: %d %s\r\n", atoi(num_arg), vnum, get_obj_name_by_proto(vnum));
+			msg_to_char(ch, "Changed item %d to: [%d] %s\r\n", atoi(num_arg), vnum, get_obj_name_by_proto(vnum));
 		}
 		else if (is_abbrev(field_arg, "cost")) {
 			if (!isdigit(*val_arg) || (cost = atoi(val_arg)) < 1) {
@@ -1217,7 +1217,7 @@ OLC_MODULE(shopedit_items) {
 			}
 			
 			change->currency = cur_vnum;
-			msg_to_char(ch, "Changed item %d's currency to: %d %s\r\n", atoi(num_arg), cur_vnum, get_generic_name_by_vnum(cur_vnum));
+			msg_to_char(ch, "Changed item %d's currency to: [%d] %s\r\n", atoi(num_arg), cur_vnum, get_generic_name_by_vnum(cur_vnum));
 		}
 		else if (is_abbrev(field_arg, "reputation")) {
 			if (!str_cmp(val_arg, "none")) {
