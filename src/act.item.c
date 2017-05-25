@@ -4779,16 +4779,23 @@ ACMD(do_list) {
 			if (!this) {
 				this = TRUE;
 				
+				if (SHOP_ALLEGIANCE(stl->shop)) {
+					snprintf(rep, sizeof(rep), " (%s)", FCT_NAME(SHOP_ALLEGIANCE(stl->shop)));
+				}
+				else {
+					*rep = '\0';
+				}
+				
 				if (stl->from_mob) {
 					strcpy(tmp, PERS(stl->from_mob, ch, FALSE));
-					snprintf(line, sizeof(line), "%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), CAP(tmp), matching);
+					snprintf(line, sizeof(line), "%s%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), CAP(tmp), rep, matching);
 				}
 				else if (stl->from_obj) {
 					strcpy(tmp, GET_OBJ_SHORT_DESC(stl->from_obj));
-					snprintf(line, sizeof(line), "%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), CAP(tmp), matching);
+					snprintf(line, sizeof(line), "%s%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), CAP(tmp), rep, matching);
 				}
 				else {
-					snprintf(line, sizeof(line), "%sYou can %sbuy%s:\r\n", (*buf ? "\r\n" : ""), (*buf ? "also " : ""), matching);
+					snprintf(line, sizeof(line), "%sYou can %sbuy%s%s:\r\n", (*buf ? "\r\n" : ""), (*buf ? "also " : ""), rep, matching);
 				}
 				
 				if (size + strlen(line) < sizeof(buf)) {
