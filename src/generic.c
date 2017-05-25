@@ -52,6 +52,7 @@ extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 extern bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
 extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
 extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
+extern bool find_currency_in_shop_item_list(struct shop_item *list, any_vnum vnum);
 extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
 extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 extern bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);
@@ -246,6 +247,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	quest_data *quest, *next_quest;
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
+	shop_data *shop, *next_shop;
 	struct resource_data *res;
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
@@ -330,6 +332,16 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+		}
+	}
+	
+	// shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		any = find_currency_in_shop_item_list(SHOP_ITEMS(shop), vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
@@ -698,6 +710,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
 	empire_data *emp, *next_emp;
+	shop_data *shop, *next_shop;
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
@@ -882,6 +895,14 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update shops
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		if (find_currency_in_shop_item_list(SHOP_ITEMS(shop), vnum)) {
+			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SHOP, SHOP_VNUM(shop));
+		}
+	}
+	
 	// update vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		if (remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), res_type, vnum)) {
@@ -941,6 +962,11 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A currency used by the quest you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SHOP(desc)) {
+			if (find_currency_in_shop_item_list(SHOP_ITEMS(GET_OLC_SHOP(desc)), vnum)) {
+				msg_to_char(desc->character, "One of the currencies used for the shop you're editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {

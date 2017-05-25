@@ -60,6 +60,61 @@ void update_obj_shop_lookups(obj_vnum vnum);
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
+* Deletes entries by type+vnum.
+*
+* @param struct shop_item **list A pointer to the list to delete from.
+* @param any_vnum vnum The obj vnum to remove.
+* @return bool TRUE if the type+vnum was removed from the list. FALSE if not.
+*/
+bool delete_shop_item_from_list(struct shop_item **list, any_vnum vnum) {
+	struct shop_item *iter, *next_iter;
+	bool any = FALSE;
+	
+	LL_FOREACH_SAFE(*list, iter, next_iter) {
+		if (iter->vnum == vnum) {
+			any = TRUE;
+			LL_DELETE(*list, iter);
+			free(iter);
+		}
+	}
+	
+	return any;
+}
+
+
+/**
+* @param struct shop_item *list A list to search.
+* @param any_vnum vnum The currency vnum to look for.
+* @return bool TRUE if the type+vnum is in the list. FALSE if not.
+*/
+bool find_currency_in_shop_item_list(struct shop_item *list, any_vnum vnum) {
+	struct shop_item *iter;
+	LL_FOREACH(list, iter) {
+		if (iter->currency == vnum) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+
+/**
+* @param struct shop_item *list A list to search.
+* @param any_vnum vnum The obj vnum to look for.
+* @return bool TRUE if the type+vnum is in the list. FALSE if not.
+*/
+bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum) {
+	struct shop_item *iter;
+	LL_FOREACH(list, iter) {
+		if (iter->vnum == vnum) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+
+/**
 * Copies entries from one list into another, only if they are not already in
 * the to_list.
 *

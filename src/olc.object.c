@@ -410,6 +410,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
 	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
+	extern bool delete_shop_item_from_list(struct shop_item **list, any_vnum vnum);
 	void expire_trading_post_item(struct trading_post_data *tpd);
 	extern bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);
 	void remove_object_from_table(obj_data *obj);
@@ -718,6 +719,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update shops
 	HASH_ITER(hh, shop_table, shop, next_shop) {
 		found = delete_quest_giver_from_list(&SHOP_LOCATIONS(shop), QG_OBJECT, vnum);
+		found |= delete_shop_item_from_list(&SHOP_ITEMS(shop), vnum);
 		
 		if (found) {
 			SET_BIT(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT);
@@ -883,6 +885,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		if (GET_OLC_SHOP(desc)) {
 			found = delete_quest_giver_from_list(&SHOP_LOCATIONS(GET_OLC_SHOP(desc)), QG_OBJECT, vnum);
+			found |= delete_shop_item_from_list(&SHOP_ITEMS(GET_OLC_SHOP(desc)), vnum);
 			
 			if (found) {
 				SET_BIT(SHOP_FLAGS(GET_OLC_SHOP(desc)), SHOP_IN_DEVELOPMENT);
@@ -1176,6 +1179,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
 	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
+	extern bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum);
 	extern const byte interact_vnum_types[NUM_INTERACTS];
 	
 	char buf[MAX_STRING_LENGTH];
@@ -1406,6 +1410,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			break;
 		}
 		any = find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_OBJECT, vnum);
+		any |= find_shop_item_in_list(SHOP_ITEMS(shop), vnum);
 		
 		if (any) {
 			++found;
