@@ -1364,7 +1364,7 @@ OLC_MODULE(shopedit_items) {
 			if (!str_cmp(val_arg, "none")) {
 				rep = REP_NONE;
 			}
-			else if (!isdigit(*val_arg) || (rep = get_reputation_by_name(val_arg)) == NOTHING) {
+			else if ((rep = get_reputation_by_name(val_arg)) == NOTHING) {
 				msg_to_char(ch, "Invalid reputation '%s'.\r\n", val_arg);
 				return;
 			}
