@@ -4664,13 +4664,13 @@ ACMD(do_list) {
 				this = TRUE;
 				
 				if (stl->from_mob) {
-					snprintf(line, sizeof(line), "%s sells%s:\r\n", PERS(stl->from_mob, ch, FALSE), matching);
+					snprintf(line, sizeof(line), "%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), PERS(stl->from_mob, ch, FALSE), matching);
 				}
 				else if (stl->from_obj) {
-					snprintf(line, sizeof(line), "%s sells%s:\r\n", GET_OBJ_SHORT_DESC(stl->from_obj), matching);
+					snprintf(line, sizeof(line), "%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), GET_OBJ_SHORT_DESC(stl->from_obj), matching);
 				}
 				else {
-					snprintf(line, sizeof(line), "You can %sbuy%s:\r\n", (*buf ? "also " : ""), matching);
+					snprintf(line, sizeof(line), "%sYou can %sbuy%s:\r\n", (*buf ? "\r\n" : ""), (*buf ? "also " : ""), matching);
 				}
 				
 				CAP(line);	// ensure uppercase
@@ -4692,7 +4692,7 @@ ACMD(do_list) {
 				*rep = '\0';
 			}
 			
-			snprintf(line, sizeof(line), "  %s (%d %s%s)\r\n", GET_OBJ_SHORT_DESC(obj), item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), rep);
+			snprintf(line, sizeof(line), " - %s (%d %s%s)\r\n", GET_OBJ_SHORT_DESC(obj), item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), rep);
 			
 			if (size + strlen(line) < sizeof(buf)) {
 				strcat(buf, line);
