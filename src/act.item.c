@@ -4633,7 +4633,7 @@ ACMD(do_list) {
 	any = FALSE;
 	
 	if (*argument) {
-		snprintf(matching, sizeof(matching), " items matching '%s':\r\n", argument);
+		snprintf(matching, sizeof(matching), " items matching '%s'", argument);
 	}
 	else {
 		*matching = '\0';
