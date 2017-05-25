@@ -541,18 +541,20 @@ void summon_materials(char_data *ch, char *argument) {
 			}
 			
 			while (count < total && store->amount > 0) {
-				++count;
-				if (!retrieve_resource(ch, emp, store, FALSE)) {
-					break;
+				if (retrieve_resource(ch, emp, store, FALSE)) {
+					++count;
+				}
+				else {
+					break;	// no more
 				}
 			}
 		}
 	}
 	
-	if (found && count < total) {
+	if (found && count < total && count > 0) {
 		msg_to_char(ch, "There weren't enough, but you managed to summon %d.\r\n", count);
 	}
-
+	
 	// result messages
 	if (!found) {
 		msg_to_char(ch, "Nothing like that is stored around here.\r\n");
