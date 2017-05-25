@@ -4625,6 +4625,7 @@ ACMD(do_list) {
 	bool any, this;
 	obj_data *obj;
 	size_t size;
+	bool ok;
 	
 	skip_spaces(&argument);	// optional filter
 	
@@ -4656,8 +4657,18 @@ ACMD(do_list) {
 			if (!(obj = obj_proto(item->vnum))) {
 				continue;	// no obj
 			}
-			if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(obj))) {
-				continue;	// search option
+			if (*argument) {	// search option
+				ok = multi_isname(argument, GET_OBJ_KEYWORDS(obj));
+				if (!ok) {
+					ok = (item->currency == NOTHING && !str_cmp(argument, "coins"));
+				}
+				if (!ok) {
+					ok = multi_isname(argument, get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost)));
+				}
+				
+				if (!ok) {
+					continue;	// search option
+				}
 			}
 			
 			if (!this) {
