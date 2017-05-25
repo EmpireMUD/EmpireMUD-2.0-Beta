@@ -800,6 +800,8 @@ Islands can be differentiated (on new EmpireMUDS; existing ones will not get
 this update automatically).
 - Islands: No longer shows empty islands. No longer shows "No Island" in the
 list.
+- Load: Fixed an error where it showed the wrong vehicle name when failing to
+load one vehicle onto another.
 - Long descriptions: Modified how player long descriptions are displayed to
 accommodate custom long descriptions from equipment.
 - Long strings: The game will no longer drop letters from very-long-strings it
@@ -1021,7 +1023,9 @@ triggers.
 numbers but was taking precedence over the correct one.
 - Sorting: Changed how help files are sorted so that immortal helps like 'load'
 aren't blocked by mortal helps like 'load'.
+- Speech triggers: Added notes on how to use a wildcard.
 - Stun: Added a help file explaining stuns and stun immunity.
+- Utility shed: Clarified which tools store here.
 - Various: Fixes, updates, typo corrections, and minor updates. Some OLC help
 files were updated to contain lists such as object materials.
 - Workforce: Split the no-work and "workforce where" options into their own
