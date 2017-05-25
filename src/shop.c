@@ -1023,6 +1023,7 @@ OLC_MODULE(shopedit_items) {
 			else {
 				// SUCCESS: "move" them by swapping data
 				if (up) {
+					LL_DELETE(SHOP_ITEMS(shop), to_move);
 					LL_PREPEND_ELEM(SHOP_ITEMS(shop), prev, to_move);
 				}
 				else {
