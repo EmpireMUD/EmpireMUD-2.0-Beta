@@ -27,7 +27,7 @@ See also: CLAIM, PLEDGE, ENROLL, PROMOTE, TERRITORY, CITIES, CITY COMMAND,
 #
 ABANDON
 
-Usage:  abandon [target]
+Usage:  abandon [target/coordinates]
 
 This command allows you to abandon a building or acre of land which your 
 empire no longer wants. This falls under the cede privilege.

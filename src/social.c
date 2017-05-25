@@ -379,10 +379,6 @@ void parse_social(FILE *fl, any_vnum vnum) {
 	SOC_MIN_CHAR_POS(soc) = int_in[0];
 	SOC_MIN_VICT_POS(soc) = int_in[1];
 	
-	// end
-	fprintf(fl, "S\n");
-
-	
 	// optionals
 	for (;;) {
 		if (!get_line(fl, line)) {
