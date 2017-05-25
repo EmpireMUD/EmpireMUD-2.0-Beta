@@ -2596,6 +2596,7 @@ struct room_template {
 	
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;
+	struct shop_lookup *shop_lookups;
 	
 	UT_hash_handle hh;	// room_template_table hash
 };
@@ -2761,6 +2762,7 @@ struct bld_data {
 	
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;
+	struct shop_lookup *shop_lookups;
 	
 	UT_hash_handle hh;	// building_table hash handle
 };
@@ -3402,6 +3404,7 @@ struct char_data {
 	
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;
+	struct shop_lookup *shop_lookups;
 	
 	UT_hash_handle hh;	// mobile_table
 };
@@ -4008,6 +4011,7 @@ struct obj_data {
 	
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;
+	struct shop_lookup *shop_lookups;
 	bool search_mark;
 	
 	UT_hash_handle hh;	// object_table hash
@@ -4196,6 +4200,13 @@ struct shop_item {
 	any_vnum currency;	// generic vnum or NOTHING for coins
 	int min_rep;	// reputation requirement if any (if a faction shop)
 	struct shop_item *next;	// LL
+};
+
+
+// reverse-lookups for shops
+struct shop_lookup {
+	shop_data *shop;
+	struct shop_lookup *next;
 };
 
 

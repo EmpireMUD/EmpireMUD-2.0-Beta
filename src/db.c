@@ -272,6 +272,7 @@ void boot_db(void) {
 	void Read_Invalid_List();
 	void boot_world();
 	void build_all_quest_lookups();
+	void build_all_shop_lookups();
 	void build_player_index();
 	void check_ruined_cities();
 	void check_version();
@@ -378,6 +379,9 @@ void boot_db(void) {
 	
 	log("Building quest lookup hints.");
 	build_all_quest_lookups();
+	
+	log("Building shop lookup hints.");
+	build_all_shop_lookups();
 	
 	// figure out how often to evolve what (do this late)
 	detect_evos_per_hour();

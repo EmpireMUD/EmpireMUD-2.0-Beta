@@ -683,6 +683,7 @@ void save_olc_mobile(descriptor_data *desc) {
 	mob_vnum vnum = GET_OLC_VNUM(desc);
 	struct interaction_item *interact;
 	struct quest_lookup *ql;
+	struct shop_lookup *sl;
 	UT_hash_handle hh;
 	bool changed;
 	
@@ -771,12 +772,14 @@ void save_olc_mobile(descriptor_data *desc) {
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
 	ql = proto->quest_lookups;	// save lookups
+	sl = proto->shop_lookups;
 	
 	*proto = *mob;
 	proto->vnum = vnum;	// ensure correct vnum
 	
 	proto->hh = hh;	// restore hash handle
 	proto->quest_lookups = ql;	// restore lookups
+	proto->shop_lookups = sl;
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_MOB, vnum);

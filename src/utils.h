@@ -200,6 +200,7 @@
 #define GET_BLD_SPAWNS(bld)  ((bld)->spawns)
 #define GET_BLD_INTERACTIONS(bld)  ((bld)->interactions)
 #define GET_BLD_QUEST_LOOKUPS(bld)  ((bld)->quest_lookups)
+#define GET_BLD_SHOP_LOOKUPS(bld)  ((bld)->shop_lookups)
 #define GET_BLD_YEARLY_MAINTENANCE(bld)  ((bld)->yearly_maintenance)
 
 
@@ -699,6 +700,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define MOB_TO_DODGE(ch)  ((ch)->mob_specials.to_dodge)
 #define MOB_TO_HIT(ch)  ((ch)->mob_specials.to_hit)
 #define MOB_QUEST_LOOKUPS(ch)  ((ch)->quest_lookups)
+#define MOB_SHOP_LOOKUPS(ch)  ((ch)->shop_lookups)
 
 // helpers
 #define IS_MOB(ch)  (IS_NPC(ch) && GET_MOB_VNUM(ch) != NOTHING)
@@ -748,6 +750,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OBJ_MAX_SCALE_LEVEL(obj)  ((obj)->obj_flags.max_scale_level)
 #define GET_OBJ_MIN_SCALE_LEVEL(obj)  ((obj)->obj_flags.min_scale_level)
 #define GET_OBJ_QUEST_LOOKUPS(obj)  ((obj)->quest_lookups)
+#define GET_OBJ_SHOP_LOOKUPS(obj)  ((obj)->shop_lookups)
 #define GET_OBJ_REQUIRES_QUEST(obj)  ((obj)->obj_flags.requires_quest)
 #define GET_OBJ_SHORT_DESC(obj)  ((obj)->short_description)
 #define GET_OBJ_TIMER(obj)  ((obj)->obj_flags.timer)
@@ -1220,6 +1223,7 @@ void SET_ISLAND_ID(room_data *room, int island);	// formerly a #define and a roo
 #define GET_RMT_EXITS(rmt)  ((rmt)->exits)
 #define GET_RMT_INTERACTIONS(rmt)  ((rmt)->interactions)
 #define GET_RMT_QUEST_LOOKUPS(rmt)  ((rmt)->quest_lookups)
+#define GET_RMT_SHOP_LOOKUPS(rmt)  ((rmt)->shop_lookups)
 #define GET_RMT_SCRIPTS(rmt)  ((rmt)->proto_script)
 
 

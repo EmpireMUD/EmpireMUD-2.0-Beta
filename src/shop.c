@@ -28,6 +28,7 @@
 /**
 * Contents:
 *   Helpers
+*   Lookup Handlers
 *   Utilities
 *   Database
 *   OLC Handlers
@@ -47,6 +48,12 @@ extern const char *shop_flags[];
 extern struct quest_giver *copy_quest_givers(struct quest_giver *from);
 void free_quest_givers(struct quest_giver *list);
 void get_quest_giver_display(struct quest_giver *list, char *save_buffer);
+
+// local funcs
+void add_shop_lookup(struct shop_lookup **list, shop_data *shop);
+bool remove_shop_lookup(struct shop_lookup **list, shop_data *shop);
+void update_mob_shop_lookups(mob_vnum vnum);
+void update_obj_shop_lookups(obj_vnum vnum);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -79,6 +86,191 @@ void smart_copy_shop_items(struct shop_item **to_list, struct shop_item *from_li
 			*item = *iter;
 			item->next = NULL;
 			LL_APPEND(*to_list, item);
+		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// LOOKUP HANDLERS /////////////////////////////////////////////////////////
+
+/**
+* Processes all the shop into lookup hint tables.
+*
+* @param shop_data *shop The shop to update hints for.
+* @param bool add If TRUE, adds shop lookup hints. If FALSE, removes them.
+*/
+void add_or_remove_all_shop_lookups_for(shop_data *shop, bool add) {
+	struct quest_giver *giver;
+	room_template *rmt;
+	char_data *mob;
+	bld_data *bld;
+	obj_data *obj;
+	
+	if (!shop) {	// somehow
+		return;
+	}
+	
+	LL_FOREACH(SHOP_LOCATIONS(shop), giver) {
+		// QG_x -- except trigger, quest
+		switch (giver->type) {
+			case QG_BUILDING: {
+				if ((bld = building_proto(giver->vnum))) {
+					if (add) {
+						add_shop_lookup(&GET_BLD_SHOP_LOOKUPS(bld), shop);
+					}
+					else {
+						remove_shop_lookup(&GET_BLD_SHOP_LOOKUPS(bld), shop);
+					}
+					// does not require live update
+				}
+				break;
+			}
+			case QG_MOBILE: {
+				if ((mob = mob_proto(giver->vnum))) {
+					if (add) {
+						add_shop_lookup(&MOB_SHOP_LOOKUPS(mob), shop);
+					}
+					else {
+						remove_shop_lookup(&MOB_SHOP_LOOKUPS(mob), shop);
+					}
+					update_mob_shop_lookups(GET_MOB_VNUM(mob));
+				}
+				break;
+			}
+			case QG_OBJECT: {
+				if ((obj = obj_proto(giver->vnum))) {
+					if (add) {
+						add_shop_lookup(&GET_OBJ_SHOP_LOOKUPS(obj), shop);
+					}
+					else {
+						remove_shop_lookup(&GET_OBJ_SHOP_LOOKUPS(obj), shop);
+					}
+					update_obj_shop_lookups(GET_OBJ_VNUM(obj));
+				}
+				break;
+			}
+			case QG_ROOM_TEMPLATE: {
+				if ((rmt = room_template_proto(giver->vnum))) {
+					if (add) {
+						add_shop_lookup(&GET_RMT_SHOP_LOOKUPS(rmt), shop);
+					}
+					else {
+						remove_shop_lookup(&GET_RMT_SHOP_LOOKUPS(rmt), shop);
+					}
+					// does not require live update
+				}
+				break;
+			}
+		}
+	}
+}
+
+
+/**
+* Adds a shop lookup hint to a list (e.g. on a mob).
+*
+* Note: For mob/obj shops, run update_mob_shop_lookups() or
+* update_obj_shop_lookups() after this.
+*
+* @param struct shop_lookup **list A pointer to the list to add to.
+* @param shop_data *shop The shop to add.
+*/
+void add_shop_lookup(struct shop_lookup **list, shop_data *shop) {
+	struct shop_lookup *sl;
+	bool found = FALSE;
+	
+	if (list && shop) {
+		// no dupes
+		LL_FOREACH(*list, sl) {
+			if (sl->shop == shop) {
+				found = TRUE;
+			}
+		}
+		
+		if (!found) {
+			CREATE(sl, struct shop_lookup, 1);
+			sl->shop = shop;
+			LL_PREPEND(*list, sl);
+		}
+	}
+}
+
+
+/**
+* Builds all the shop lookup tables on startup.
+*/
+void build_all_shop_lookups(void) {
+	shop_data *shop, *next_shop;
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		add_or_remove_all_shop_lookups_for(shop, TRUE);
+	}
+}
+
+
+/**
+* Adds a shop lookup hint to a list (e.g. on a mob).
+*
+* Note: For mob/obj shop, run update_mob_shop_lookups() or
+* update_obj_shop_lookups() after this.
+*
+* @param struct shop_lookup **list A pointer to the list to add to.
+* @param shop_data *shop The shop to add.
+* @return bool TRUE if it removed an entry, FALSE for no matches.
+*/
+bool remove_shop_lookup(struct shop_lookup **list, shop_data *shop) {
+	struct shop_lookup *sl, *next_sl;
+	bool any = FALSE;
+	
+	if (list && *list && shop) {
+		LL_FOREACH_SAFE(*list, sl, next_sl) {
+			if (sl->shop == shop) {
+				LL_DELETE(*list, sl);
+				free(sl);
+				any = TRUE;
+			}
+		}
+	}
+	
+	return any;
+}
+
+
+/**
+* Fixes shop lookup pointers on live copies of mobs -- this should ALWAYS
+* point to the proto.
+*/
+void update_mob_shop_lookups(mob_vnum vnum) {
+	char_data *proto, *mob;
+	
+	if (!(proto = mob_proto(vnum))) {
+		return;
+	}
+	
+	LL_FOREACH(character_list, mob) {
+		if (IS_NPC(mob) && GET_MOB_VNUM(mob) == vnum) {
+			// re-set the pointer
+			MOB_SHOP_LOOKUPS(mob) = MOB_SHOP_LOOKUPS(proto);
+		}
+	}
+}
+
+
+/**
+* Fixes shop lookup pointers on live copies of objs -- this should ALWAYS
+* point to the proto.
+*/
+void update_obj_shop_lookups(obj_vnum vnum) {
+	obj_data *proto, *obj;
+	
+	if (!(proto = obj_proto(vnum))) {
+		return;
+	}
+	
+	LL_FOREACH(object_list, obj) {
+		if (GET_OBJ_VNUM(obj) == vnum) {
+			// re-set the pointer
+			GET_OBJ_SHOP_LOOKUPS(obj) = GET_OBJ_SHOP_LOOKUPS(proto);
 		}
 	}
 }
@@ -496,6 +688,9 @@ void olc_delete_shop(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_SHOP);
 	save_library_file_for_vnum(DB_BOOT_SHOP, vnum);
 	
+	// delete from lookups
+	add_or_remove_all_shop_lookups_for(shop, FALSE);
+	
 	// removing from prototypes goes here
 	
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted shop %d", GET_NAME(ch), vnum);
@@ -535,11 +730,17 @@ void save_olc_shop(descriptor_data *desc) {
 		SHOP_NAME(shop) = str_dup(default_shop_name);
 	}
 	
+	// delete from lookups
+	add_or_remove_all_shop_lookups_for(proto, FALSE);
+	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handles
 	*proto = *shop;	// copy over all data
 	proto->vnum = vnum;	// ensure correct vnum
 	proto->hh = hh;	// restore old hash handles
+	
+	// re-add lookups
+	add_or_remove_all_quest_lookups_for(proto, TRUE);
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_SHOP, vnum);
