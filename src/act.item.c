@@ -4619,12 +4619,12 @@ ACMD(do_light) {
 
 
 ACMD(do_list) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], rep[256];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], rep[256], matching[MAX_INPUT_LENGTH];
 	struct shop_temp_list *stl, *shop_list = NULL;
 	struct shop_item *item;
+	bool any, this;
 	obj_data *obj;
 	size_t size;
-	bool any;
 	
 	skip_spaces(&argument);	// optional filter
 	
@@ -4633,14 +4633,19 @@ ACMD(do_list) {
 	any = FALSE;
 	
 	if (*argument) {
-		size = snprintf(buf, sizeof(buf), "Items available matching '%s':\r\n", argument);
+		snprintf(matching, sizeof(matching), " items matching '%s':\r\n", argument);
 	}
 	else {
-		size = snprintf(buf, sizeof(buf), "Items available here:\r\n");
+		*matching = '\0';
 	}
+	
+	size = 0;
+	*buf = '\0';
 
 	// now show any shops available
 	LL_FOREACH(shop_list, stl) {
+		this = FALSE;
+		
 		// the nopes
 		if (SHOP_FLAGGED(stl->shop, SHOP_IN_DEVELOPMENT)) {
 			continue;	// in-dev
@@ -4653,6 +4658,31 @@ ACMD(do_list) {
 			}
 			if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(obj))) {
 				continue;	// search option
+			}
+			
+			if (!this) {
+				this = TRUE;
+				
+				if (stl->from_mob) {
+					snprintf(line, sizeof(line), "%s sells%s:\r\n", PERS(stl->from_mob, ch, FALSE), matching);
+				}
+				else if (stl->from_obj) {
+					snprintf(line, sizeof(line), "%s sells%s:\r\n", GET_OBJ_SHORT_DESC(stl->from_obj), matching);
+				}
+				else {
+					snprintf(line, sizeof(line), "You can %sbuy%s:\r\n", (*buf ? "also " : ""), matching);
+				}
+				
+				CAP(line);	// ensure uppercase
+				
+				if (size + strlen(line) < sizeof(buf)) {
+					strcat(buf, line);
+					size += strlen(line);
+					any = TRUE;
+				}
+				else {
+					break;
+				}
 			}
 			
 			if (SHOP_ALLEGIANCE(stl->shop) && item->min_rep != REP_NONE) {
@@ -4675,15 +4705,16 @@ ACMD(do_list) {
 		}
 	}
 
-	if (!any) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none");
+	if (any) {
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+	else {
+		msg_to_char(ch, "There's nothing for sale here.\r\n");
 	}
 
 	free_shop_temp_list(shop_list);
-	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
 }
 
 
