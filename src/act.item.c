@@ -3619,7 +3619,7 @@ ACMD(do_buy) {
 				return;
 			}
 			
-			// finish the purchase			
+			// finish the purchase
 			if (item->currency == NOTHING) {
 				charge_coins(ch, coin_emp, item->cost, NULL);
 				sprintf(buf, "You buy $p for %s.", money_amount(coin_emp, item->cost));
