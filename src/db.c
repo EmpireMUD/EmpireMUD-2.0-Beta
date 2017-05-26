@@ -2381,8 +2381,23 @@ void b4_39_data_conversion(void) {
 
 // b5.1 changes the values of ATYPE_x consts and this updates existing affects
 PLAYER_UPDATE_FUNC(b5_1_update_players) {
+	void check_delayed_load(char_data *ch);
+	void free_var_el(struct trig_var_data *var);
+	
+	struct trig_var_data *var, *next_var;
 	struct over_time_effect_type *dot;
 	struct affected_type *af;
+	bool delete;
+	
+	// some variables from the stock game content
+	const int jungletemple_tokens = 18500;
+	const int roc_tokens_evil = 11003;
+	const int roc_tokens_good = 11004;
+	const int dragtoken_128 = 10900;
+	const int permafrost_tokens_104 = 10550;
+	const int adventureguild_chelonian_tokens = 18200;
+	
+	check_delayed_load(ch);
 	
 	LL_FOREACH(ch->affected, af) {
 		if (af->type < 3000) {
@@ -2393,6 +2408,59 @@ PLAYER_UPDATE_FUNC(b5_1_update_players) {
 	LL_FOREACH(ch->over_time_effects, dot) {
 		if (dot->type < 3000) {
 			dot->type += 3000;
+		}
+	}
+	
+	if (SCRIPT(ch) && SCRIPT(ch)->global_vars) {
+		LL_FOREACH_SAFE(SCRIPT(ch)->global_vars, var, next_var) {
+			// things just being deleted (now using cooldowns)
+			if (!strncmp(var->name, "minipet", 7)) {
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "last_hestian_time")) {
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "last_conveyance_time")) {
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "last_skycleave_trinket_time")) {
+				delete = TRUE;
+			}
+			
+			// things converting to currencies
+			else if (!strcmp(var->name, "jungletemple_tokens")) {
+				add_currency(ch, jungletemple_tokens, atoi(var->value));
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "roc_tokens_evil")) {
+				add_currency(ch, roc_tokens_evil, atoi(var->value));
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "roc_tokens_good")) {
+				add_currency(ch, roc_tokens_good, atoi(var->value));
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "dragtoken_128")) {
+				add_currency(ch, dragtoken_128, atoi(var->value));
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "permafrost_tokens_104")) {
+				add_currency(ch, permafrost_tokens_104, atoi(var->value));
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "adventureguild_chelonian_tokens")) {
+				add_currency(ch, adventureguild_chelonian_tokens, atoi(var->value));
+				delete = TRUE;
+			}
+			else {
+				delete = FALSE;
+			}
+			
+			// if requested, delete it
+			if (delete) {
+				LL_DELETE(SCRIPT(ch)->global_vars, var);
+				free_var_el(var);
+			}
 		}
 	}
 }
