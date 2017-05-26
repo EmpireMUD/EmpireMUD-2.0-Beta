@@ -382,6 +382,8 @@ When using field  - The variable returns:
    navigation.
 &cdisabled&0 - Returns TRUE if the actor is stunned or otherwise disabled.
 &cdodge&0 - The character's dodge rating.
+&cdrunk&0 or &cdrunk(hours)&0 - Get a character's drunk level, or add/subtract
+   hours of drunkenness. A character behaves drunk if this passes 24 hours.
 &cempire&0 - The character's empire, if any.
 &ceq()&0 - This will return the identifier (id) for the object equipped in
    position, if any. The specified position may be either a position number
@@ -407,6 +409,8 @@ When using field  - The variable returns:
 &chimher&0 - Returns the correct pronoun (him/her/it).
 &chisher&0 - Returns the correct pronoun (his/her/its).
 &chome&0 - Room id of the player's home, if any.
+&chunger&0 or &chunger(hours)&0 - Returns how hungry the player is, or makes
+   them more or less hungry (0 is not hungry).
 &cid&0 - The unique id of the actor.
 &cint&0 - The actor's intelligence.
 &cinventory()&0 - Returns the id of the first item in the actors inventory or 
@@ -471,6 +475,8 @@ When using field  - The variable returns:
 &csex&0 - The actor's sex, as a string: MALE, FEMALE, or NEUTRAL.
 &cskill(name)&0 - The player's level in the given skill.
 &cstr&0 - The actor's Strength.
+&cthirst&0 or &cthirst(hours)&0 - Returns how thirsty the player is, or makes
+   them more or less thirsty (0 is not thirsty).
 &ctitle()&0 - The actor's title. Subfield sets. Not used for mobs.
 &ctohit&0 - The player's to-hit rating.
 &ctrigger_counterspell&0 - Fires the character's counterspell and returns 1 if

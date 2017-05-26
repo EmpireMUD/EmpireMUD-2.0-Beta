@@ -2995,6 +2995,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
 						snprintf(str, slen, "%d", get_dodge_modifier(c, NULL, FALSE));
 					}
+					else if (!str_cmp(field, "drunk")) {
+						if (subfield && *subfield) {
+							gain_condition(ch, DRUNK, atoi(subfield) * REAL_UPDATES_PER_MUD_HOUR);
+						}
+						snprintf(str, slen, "%d", GET_COND(ch, DRUNK) / REAL_UPDATES_PER_MUD_HOUR);
+					}
 					break;
 				}
 				case 'e': {	// char.e*
@@ -3213,6 +3219,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else {
 							*str = '\0';
 						}
+					}
+					else if (!str_cmp(field, "hunger")) {
+						if (subfield && *subfield) {
+							gain_condition(ch, FULL, atoi(subfield) * REAL_UPDATES_PER_MUD_HOUR);
+						}
+						snprintf(str, slen, "%d", GET_COND(ch, FULL) / REAL_UPDATES_PER_MUD_HOUR);
 					}
 						
 					break;
@@ -3668,7 +3680,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 't': {	// char.t*
-					if (!str_cmp(field, "tohit")) {
+					if (!str_cmp(field, "thirst")) {
+						if (subfield && *subfield) {
+							gain_condition(ch, THIRST, atoi(subfield) * REAL_UPDATES_PER_MUD_HOUR);
+						}
+						snprintf(str, slen, "%d", GET_COND(ch, THIRST) / REAL_UPDATES_PER_MUD_HOUR);
+					}
+					else if (!str_cmp(field, "tohit")) {
 						extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 						snprintf(str, slen, "%d", get_to_hit(c, NULL, FALSE, FALSE));
 					}
