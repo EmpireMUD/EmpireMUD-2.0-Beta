@@ -483,6 +483,7 @@ void update_obj_shop_lookups(obj_vnum vnum) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_shop(shop_data *shop, char_data *ch) {
+	struct shop_item *item, *dupe;
 	bool problem = FALSE;
 	
 	if (SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT)) {
@@ -495,7 +496,43 @@ bool audit_shop(shop_data *shop, char_data *ch) {
 		problem = TRUE;
 	}
 	
-	// TODO more audits
+	if (!SHOP_LOCATIONS(shop)) {
+		olc_audit_msg(ch, SHOP_VNUM(shop), "No locations");
+		problem = TRUE;
+	}
+	
+	LL_FOREACH(SHOP_ITEMS(shop), item) {
+		if (!obj_proto(item->vnum)) {
+			olc_audit_msg(ch, SHOP_VNUM(shop), "Bad item vnum %d", item->vnum);
+			problem = TRUE;
+			continue;	// only relevant error
+		}
+		if (item->currency != NOTHING && !find_generic(item->currency, GENERIC_CURRENCY)) {
+			olc_audit_msg(ch, SHOP_VNUM(shop), "Bad currency vnum %d", item->currency);
+			problem = TRUE;
+		}
+		if (item->min_rep != REP_NONE && !SHOP_ALLEGIANCE(shop)) {
+			olc_audit_msg(ch, SHOP_VNUM(shop), "Minimum reputation set with no allegiance (%s)", get_obj_name_by_proto(item->vnum));
+			problem = TRUE;
+		}
+		
+		// duplicate check
+		LL_FOREACH(SHOP_ITEMS(shop), dupe) {
+			if (dupe->vnum != item->vnum) {
+				continue;	// looking for same vnum
+			}
+			if (dupe == item) {
+				continue;	// but not same item
+			}
+			
+			// so it's basically a full duplicate
+			if (dupe->currency == item->currency) {
+				olc_audit_msg(ch, SHOP_VNUM(shop), "Possible duplicate item %d %s", item->vnum, get_obj_name_by_proto(item->vnum));
+				problem = TRUE;
+				break;
+			}
+		}
+	}
 	
 	return problem;
 }
