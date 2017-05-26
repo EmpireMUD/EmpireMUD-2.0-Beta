@@ -2426,6 +2426,15 @@ PLAYER_UPDATE_FUNC(b5_1_update_players) {
 			else if (!strcmp(var->name, "last_skycleave_trinket_time")) {
 				delete = TRUE;
 			}
+			else if (!strcmp(var->name, "last_tortoise_time")) {
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "tomb10770")) {
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "summon_10728")) {
+				delete = TRUE;
+			}
 			
 			// things converting to currencies
 			else if (!strcmp(var->name, "jungletemple_tokens")) {
