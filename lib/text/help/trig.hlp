@@ -60,9 +60,13 @@ to a mob, obj, or room.
 Variables:
   &c%actor%&0 - The person who is trying to buy.
   &c%shopkeeper%&0 - The mob who runs the shop, if any (may be empty).
-  &c%obj%&0 - The object the player is buying (may be altered in the script).
+  &c%obj%&0 - The object the player is buying.
   &c%cost%&0 - The numeric value of the purchase.
   &c%currency%&0 - The currency vnum of the purchase, or "coins" if it's coins.
+
+Note: The %obj% is already in the player's inventory when the script runs. You
+   can change its properties in your script but you should NEVER purge it in
+   the script. Returning 0 will block the purchase and purge the object. 
 #d
 "COMMAND TRIGGER" "MTRIG COMMAND" "OTRIG COMMAND" "RTRIG COMMAND" "VTRIG COMMAND" TRIGEDIT-MOB-COMMAND TRIGEDIT-OBJ-COMMAND TRIGEDIT-ROOM-COMMAND TRIGEDIT-VEH-COMMAND
 
