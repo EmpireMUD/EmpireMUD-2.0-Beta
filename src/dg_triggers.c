@@ -350,7 +350,7 @@ int entry_mtrigger(char_data *ch) {
 * @param obj_data *buying The item being bought.
 * @param int cost The amount to be charged.
 * @param any_vnum currency The currency type (NOTHING for coins).
-* @return int 1 if a trigger blocked the buy (stop); 0 if not (ok to continue).
+* @return int 0 if a trigger blocked the buy (stop); 1 if not (ok to continue).
 */
 int buy_mtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency) {
 	union script_driver_data_u sdd;
@@ -360,7 +360,7 @@ int buy_mtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 	
 	// gods not affected
 	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
-		return 0;
+		return 1;
 	}
 	
 	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(actor)), ch, ch_next, next_in_room) {
@@ -381,6 +381,7 @@ int buy_mtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 			
 			// vars
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+			ADD_UID_VAR(buf, t, obj_script_id(buying), "obj", 0);
 			if (shopkeeper) {
 				ADD_UID_VAR(buf, t, char_script_id(shopkeeper), "shopkeeper", 0);
 			}
@@ -401,13 +402,13 @@ int buy_mtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 			
 			// run it:
 			sdd.c = ch;
-			if (script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW)) {
-				return 1;
+			if (!script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW)) {
+				return 0;
 			}
 		}
 	}
 
-	return 0;
+	return 1;
 }
 
 
@@ -885,7 +886,7 @@ int get_otrigger(obj_data *obj, char_data *actor) {
 * @param int cost The amount to be charged.
 * @param any_vnum currency The currency type (NOTHING for coins).
 * @param int type Location: OCMD_EQUIP, etc.
-* @return int 1 if a trigger blocked the buy (stop); 0 if not (ok to continue).
+* @return int 0 if a trigger blocked the buy (stop); 1 if not (ok to continue).
 */
 int buy_otrig(obj_data *obj, char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency, int type) {
 	union script_driver_data_u sdd;
@@ -893,7 +894,7 @@ int buy_otrig(obj_data *obj, char_data *actor, char_data *shopkeeper, obj_data *
 	trig_data *t;
 
 	if (!obj || !SCRIPT_CHECK(obj, OTRIG_BUY)) {
-		return 0;
+		return 1;
 	}
 	
 	LL_FOREACH(TRIGGERS(SCRIPT(obj)), t) {
@@ -906,6 +907,7 @@ int buy_otrig(obj_data *obj, char_data *actor, char_data *shopkeeper, obj_data *
 
 		// vars
 		ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+		ADD_UID_VAR(buf, t, obj_script_id(buying), "obj", 0);
 		if (shopkeeper) {
 			ADD_UID_VAR(buf, t, char_script_id(shopkeeper), "shopkeeper", 0);
 		}
@@ -926,12 +928,12 @@ int buy_otrig(obj_data *obj, char_data *actor, char_data *shopkeeper, obj_data *
 		
 		// run it
 		sdd.o = obj;
-		if (script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW)) {
-			return 1;
+		if (!script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW)) {
+			return 0;
 		}
 	}
 
-	return 0;
+	return 1;
 }
 
 
@@ -943,7 +945,7 @@ int buy_otrig(obj_data *obj, char_data *actor, char_data *shopkeeper, obj_data *
 * @param obj_data *buying The item being bought.
 * @param int cost The amount to be charged.
 * @param any_vnum currency The currency type (NOTHING for coins).
-* @return int 1 if a trigger blocked the buy (stop); 0 if not (ok to continue).
+* @return int 0 if a trigger blocked the buy (stop); 1 if not (ok to continue).
 */
 int buy_otrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency) {
 	obj_data *obj;
@@ -951,28 +953,28 @@ int buy_otrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 	
 	// gods not affected
 	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
-		return 0;
+		return 1;
 	}
 	
 	for (iter = 0; iter < NUM_WEARS; iter++) {
-		if (buy_otrig(GET_EQ(actor, iter), actor, shopkeeper, buying, cost, currency, OCMD_EQUIP)) {
-			return 1;
+		if (!buy_otrig(GET_EQ(actor, iter), actor, shopkeeper, buying, cost, currency, OCMD_EQUIP)) {
+			return 0;
 		}
 	}
 	
 	LL_FOREACH2(actor->carrying, obj, next_content) {
-		if (buy_otrig(obj, actor, shopkeeper, buying, cost, currency, OCMD_INVEN)) {
-			return 1;
+		if (!buy_otrig(obj, actor, shopkeeper, buying, cost, currency, OCMD_INVEN)) {
+			return 0;
 		}
 	}
 
 	LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_content) {
-		if (buy_otrig(obj, actor, shopkeeper, buying, cost, currency, OCMD_ROOM)) {
-			return 1;
+		if (!buy_otrig(obj, actor, shopkeeper, buying, cost, currency, OCMD_ROOM)) {
+			return 0;
 		}
 	}
 
-	return 0;
+	return 1;
 }
 
 
@@ -1536,7 +1538,7 @@ int enter_wtrigger(room_data *room, char_data *actor, int dir) {
 * @param obj_data *buying The item being bought.
 * @param int cost The amount to be charged.
 * @param any_vnum currency The currency type (NOTHING for coins).
-* @return int 1 if a trigger blocked the buy (stop); 0 if not (ok to continue).
+* @return int 0 if a trigger blocked the buy (stop); 1 if not (ok to continue).
 */
 int buy_wtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency) {
 	room_data *room = IN_ROOM(actor);
@@ -1545,10 +1547,10 @@ int buy_wtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 	trig_data *t;
 
 	if (!SCRIPT_CHECK(IN_ROOM(actor), WTRIG_BUY)) {
-		return 0;
+		return 1;
 	}
 	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
-		return 0;	// gods not affected
+		return 1;	// gods not affected
 	}
 	
 	LL_FOREACH(TRIGGERS(SCRIPT(room)), t) {
@@ -1559,6 +1561,7 @@ int buy_wtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 		// vars
 		ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
 		ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+		ADD_UID_VAR(buf, t, obj_script_id(buying), "obj", 0);
 		if (shopkeeper) {
 			ADD_UID_VAR(buf, t, char_script_id(shopkeeper), "shopkeeper", 0);
 		}
@@ -1579,10 +1582,12 @@ int buy_wtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 		
 		// run it
 		sdd.r = room;
-		return script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW);
+		if (!script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW)) {
+			return 0;
+		}
 	}
 	
-	return 0;
+	return 1;
 }
 
 
@@ -1812,19 +1817,19 @@ void reboot_wtrigger(room_data *room) {
 * @param obj_data *buying The item being bought.
 * @param int cost The amount to be charged.
 * @param any_vnum currency The currency type (NOTHING for coins).
-* @return bool TRUE means hit-trigger/stop; FALSE means continue buying.
+* @return bool FALSE means hit-trigger/stop; TRUE means continue buying.
 */
 bool check_buy_trigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency) {
-	int cont = 0;
+	int cont = 1;
 	
 	cont = buy_wtrigger(actor, shopkeeper, buying, cost, currency);	// world trigs
-	if (!cont) {
+	if (cont) {
 		cont = buy_mtrigger(actor, shopkeeper, buying, cost, currency);	// mob trigs
 	}
-	if (!cont) {
+	if (cont) {
 		cont = buy_otrigger(actor, shopkeeper, buying, cost, currency);	// obj trigs
 	}
-	if (!cont) {
+	if (cont) {
 		cont = buy_vtrigger(actor, shopkeeper, buying, cost, currency);	// vehicles
 	}
 	return cont;
@@ -1877,7 +1882,7 @@ bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode
 * @param obj_data *buying The item being bought.
 * @param int cost The amount to be charged.
 * @param any_vnum currency The currency type (NOTHING for coins).
-* @return int 1 if a trigger blocked the buy (stop); 0 if not (ok to continue).
+* @return int 0 if a trigger blocked the buy (stop); 1 if not (ok to continue).
 */
 int buy_vtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency) {
 	union script_driver_data_u sdd;
@@ -1887,7 +1892,7 @@ int buy_vtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 
 	// gods not affected
 	if (!valid_dg_target(actor, DG_ALLOW_GODS)) {
-		return 0;
+		return 1;
 	}
 	
 	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
@@ -1902,6 +1907,7 @@ int buy_vtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 			
 			// vars
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
+			ADD_UID_VAR(buf, t, obj_script_id(buying), "obj", 0);
 			if (shopkeeper) {
 				ADD_UID_VAR(buf, t, char_script_id(shopkeeper), "shopkeeper", 0);
 			}
@@ -1922,13 +1928,13 @@ int buy_vtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 			
 			// run it
 			sdd.v = veh;
-			if (script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW)) {
-				return 1;
+			if (!script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW)) {
+				return 0;
 			}
 		}
 	}
 
-	return 0;
+	return 1;
 }
 
 

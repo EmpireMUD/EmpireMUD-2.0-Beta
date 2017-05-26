@@ -50,8 +50,8 @@ See also: MTRIG CHARMED
 Buy (trigger type)
 
 Argument type:  location of the item to trigger (obj triggers only)
-Return value:  return 0 to proceed with the purchase
-               return 1 (default) to block the purchase
+Return value:  return 1 (default) to proceed with the purchase
+               return 0 to block the purchase
 
 Buy triggers let you intercept a player attempting to buy from a shop. All
 buy triggers in the room will run, regardless of whether the shop is attached
@@ -60,6 +60,7 @@ to a mob, obj, or room.
 Variables:
   &c%actor%&0 - The person who is trying to buy.
   &c%shopkeeper%&0 - The mob who runs the shop, if any (may be empty).
+  &c%obj%&0 - The object the player is buying (may be altered in the script).
   &c%cost%&0 - The numeric value of the purchase.
   &c%currency%&0 - The currency vnum of the purchase, or "coins" if it's coins.
 #d
