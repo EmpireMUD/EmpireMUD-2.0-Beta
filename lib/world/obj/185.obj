@@ -622,22 +622,9 @@ A jungle temple token is lying here.~
    This token, redeemable for rewards at the Lost Temple adventure's shop, will
 be automatically stored in your pouch when taken.
 ~
-3 p a 9
-0 0 0
+12 p a 10
+1 18500 0
 7 0
-T 18542
-S
-#18543
-pouch jungle temple tokens~
-a pouch of jungle temple tokens~
-A pouch of jungle temple tokens is lying here.~
-   This pouch holds tokens redeemable for rewards at the Lost Temple adventure's
-shop. Use 'count tokens' to count them.
-~
-3 p a 8
-0 0 0
-7 0
-T 18543
 S
 #18544
 chance boss loot~

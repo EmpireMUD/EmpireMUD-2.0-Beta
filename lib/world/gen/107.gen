@@ -33,6 +33,13 @@ toy soldier whistle~
 T0
 Your toy soldier whistle cooldown has ended.~
 S
+#10728
+magical coal lumps~
+3 0
+0 0 0 0
+T0
+You can build a snowman again.~
+S
 #10744
 bell on a blue ribbon~
 3 0
@@ -46,5 +53,12 @@ spider egg~
 0 0 0 0
 T0
 Your spider egg cooldown has ended.~
+S
+#10770
+goblin coffin~
+3 0
+0 0 0 0
+T0
+You can build another goblin coffin now.~
 S
 $

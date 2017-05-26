@@ -675,18 +675,6 @@ meltwater is pouring from them.
 9 48
 T 10555
 S
-#10556
-tokens permafrost pouch~
-a pouch of permafrost tokens~
-A pouch of permafrost tokens is lying here.~
-   This pouch holds tokens redeemable for rewards at the Permafrost adventure's
-shop. Use 'count tokens' to count them.
-~
-3 p a 7
-0 0 0
-7 0
-T 10556
-S
 #10557
 token permafrost~
 a permafrost token~
@@ -694,10 +682,9 @@ A permafrost token is lying here.~
    This token, redeemable for rewards at the Permafrost adventure's shop, will
 be automatically stored in your pouch when taken.
 ~
-3 p a 6
-0 0 0
+12 p a 7
+1 10550 0
 7 0
-T 10557
 S
 #10558
 tree spruce fallen~

@@ -3,7 +3,7 @@ gardener hooded magiterranean~
 the Magiterranean gardener~
 A hooded gardener is poking at the ground.
 ~
-5 80 dv coB
+5 80 dv cnoB
 0 2 0 22
 T 10501
 S
@@ -419,8 +419,6 @@ M
 1
 Have you ever seen such fine goods? Surely you have not!~
 T 10560
-T 10567
-T 10568
 T 10569
 S
 $

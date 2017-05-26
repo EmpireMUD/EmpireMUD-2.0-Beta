@@ -5,6 +5,18 @@ An adorable puppy is whining at you.
 ~
 1 1 bdoD n
 0 0 0 9
+M
+0
+$n wags $s tail and yips.~
+M
+0
+$n trips over $s own paws and does a little roll.~
+M
+0
+$n sniffs inquisitively at your ankles.~
+M
+0
+$n runs in circles, chasing $s own tail.~
 T 9901
 T 9902
 S
@@ -25,6 +37,15 @@ A tiny pixie is flitting around.
 ~
 1 1 bdoD mn
 0 0 18 22
+M
+0
+$n twirls in the air like a ballerina.~
+M
+0
+$n flies in quick circles around you, trailing sparkles.~
+M
+0
+$n stares at you with bright, inquisitive eyes...~
 T 9901
 T 9902
 S
@@ -75,6 +96,12 @@ A colorful butterfly is fluttering around here.
 ~
 1 1 bdoD mn
 0 0 18 22
+M
+0
+$n flaps its wings, and you wonder if $e's causing a storm on the other side of the world.~
+M
+0
+Light reflects off $n's wings, and they shine with all the colors of the rainbow.~
 T 9901
 T 9902
 S

@@ -1,25 +1,12 @@
-#10900
-tokens dragon pouch~
-a pouch of dragon tokens~
-A pouch of dragon tokens is lying here.~
-   This leather pouch holds tokens redeemable for rewards from the new Red
-Dragon adventure. Use 'count tokens' to count them.
-~
-3 p a 5
-0 0 0
-7 0
-T 10900
-S
 #10901
 token dragon~
 a dragon token~
 A dragon token is lying here.~
-You shouldn't actually be seeing this.
+This token can be used to buy items from the colossal red dragon token shop.
 ~
-3 p a 3
-0 0 0
+12 p a 4
+1 10900 0
 7 0
-T 10901
 S
 #10902
 hide dragon red pile~

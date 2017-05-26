@@ -67,57 +67,27 @@ O
 R
 5119 0
 S
-#11004
-pouch talons golden~
-a pouch of golden talons~
-A pouch of golden talons is sitting here.~
-   This simple leather pouch holds golden talons, redeemable for rewards from
-the Gigantic Nest adventure. You can type 'count talons' to see how many you
-have. Complete one of the helpful quests in the nest to summon the roc who
-trades talons for rewards.
-~
-3 p a 7
-0 0 0
-14 0
-T 11004
-S
 #11005
 talon golden~
 a golden talon~
 A golden talon is lying here.~
-   You shouldn't actually be seeing this. The script on this item should add
-directly to your golden talon count, which is stored as a script variable.
+   These are used to buy items in the golden talon shop after completing a
+helpful roc quest.
 ~
-3 p a 10
-0 0 0
+12 p a 11
+1 11004 0
 14 0
-T 11005
-S
-#11006
-pouch talons corrupted~
-a pouch of corrupted talons~
-A pouch of corrupted talons is sitting here.~
-   This simple leather pouch holds corrupted talons, redeemable for rewards
-from the Gigantic Nest adventure. You can type 'count talons' to see how many
-you have. Complete one of the harmful quests in the nest to summon the person
-who trades talons for rewards.
-~
-3 p a 8
-0 0 0
-14 0
-T 11004
 S
 #11007
 talon corrupted~
 a corrupted talon~
 A corrupted talon is lying here.~
-   You shouldn't actually be seeing this. The script on this item should add
-directly to your corrupted talon count, which is stored as a script variable.
+   These are used to buy items in the corrupted talon shop after completing a
+harmful roc quest.
 ~
-3 p a 9
-0 0 0
+12 p a 10
+1 11003 0
 14 0
-T 11005
 S
 #11008
 bag seeds wispy zephyr cattails~

@@ -937,4 +937,15 @@ it. It's in poor condition and doesn't look like it will last very long
 0 288
 T 10771
 S
+#10772
+replacer goblin raft~
+a goblin raft~
+A goblin raft replacer has bugged out.~
+This is supposed to purge itself and spawn a goblin raft. Evidently it didn't.
+~
+3 0 0 2
+0 0 0
+0 1
+T 10773
+S
 $
