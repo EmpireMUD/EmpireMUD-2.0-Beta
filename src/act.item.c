@@ -3537,14 +3537,15 @@ void warehouse_store(char_data *ch, char *argument) {
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_buy) {
+	char buf[MAX_STRING_LENGTH], orig_arg[MAX_INPUT_LENGTH];
 	struct shop_temp_list *stl, *shop_list = NULL;
 	empire_data *coin_emp = NULL;
-	char buf[MAX_STRING_LENGTH];
 	struct shop_item *item;
 	obj_data *obj;
 	int number;
 	
 	skip_spaces(&argument);	// optional filter
+	strcpy(orig_arg, argument);
 	number = get_number(&argument);	// x.name syntax
 	
 	if (IS_NPC(ch)) {
@@ -3634,7 +3635,7 @@ ACMD(do_buy) {
 	}
 	
 	// did we make it this far?
-	msg_to_char(ch, "You don't see any %s for sale here.\r\n", argument);
+	msg_to_char(ch, "You don't see any %s for sale here.\r\n", orig_arg);
 	free_shop_temp_list(shop_list);
 }
 
