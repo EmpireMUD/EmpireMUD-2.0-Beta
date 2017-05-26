@@ -930,7 +930,7 @@ void olc_show_trigger(char_data *ch) {
 		sprintbit(trig->narg, trig_arg_obj_where, buf1, TRUE);
 		sprintf(buf + strlen(buf), "<&ylocation&0> %s\r\n", trig->narg ? buf1 : "none");
 	}
-	if (IS_SET(trig_arg_types, TRIG_ARG_COMMAND | TRIG_ARG_PHRASE_OR_WORDLIST | TRIG_ARG_OBJ_WHERE)) {
+	if (IS_SET(trig_arg_types, TRIG_ARG_COMMAND | TRIG_ARG_PHRASE_OR_WORDLIST)) {
 		sprintf(buf + strlen(buf), "<&ystring&0> %s\r\n", NULLSAFE(trig->arglist));
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_COST)) {
@@ -1036,7 +1036,7 @@ OLC_MODULE(tedit_string) {
 	trig_data *trig = GET_OLC_TRIGGER(ch->desc);
 	bitvector_t trig_arg_types = compile_argument_types_for_trigger(trig);
 	
-	if (!IS_SET(trig_arg_types, TRIG_ARG_COMMAND | TRIG_ARG_PHRASE_OR_WORDLIST | TRIG_ARG_OBJ_WHERE)) {
+	if (!IS_SET(trig_arg_types, TRIG_ARG_COMMAND | TRIG_ARG_PHRASE_OR_WORDLIST)) {
 		msg_to_char(ch, "You can't set that property on this trigger.\r\n");
 	}
 	else {

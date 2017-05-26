@@ -2976,7 +2976,7 @@ const char *otrig_types[] = {
 const bitvector_t otrig_argument_types[] = {
 	NOBITS,	// global
 	TRIG_ARG_PERCENT,	// random
-	TRIG_ARG_OBJ_WHERE,	// command
+	TRIG_ARG_COMMAND | TRIG_ARG_OBJ_WHERE,	// command
 	NOBITS,	//
 	NOBITS,	//
 	NOBITS,	// timer
