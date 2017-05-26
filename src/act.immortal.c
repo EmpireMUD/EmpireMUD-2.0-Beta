@@ -5020,6 +5020,208 @@ ACMD(do_at) {
 }
 
 
+ACMD(do_automessage) {
+	extern int new_automessage_id();
+	void free_automessage(struct automessage *msg);
+	void save_automessages(void);
+	extern const char *automessage_types[];
+	extern struct automessage *automessages;
+	
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char cmd_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], id_arg[MAX_STRING_LENGTH];
+	struct automessage *msg, *next_msg;
+	int id, iter, type, interval;
+	player_index_data *plr;
+	size_t size;
+	
+	argument = any_one_arg(argument, cmd_arg);
+	
+	if (is_abbrev(cmd_arg, "list")) {
+		size = snprintf(buf, sizeof(buf), "Automessages:\r\n");
+		
+		HASH_ITER(hh, automessages, msg, next_msg) {
+			switch (msg->timing) {
+				case AUTOMSG_REPEATING: {
+					snprintf(part, sizeof(part), "%s (%dm)", automessage_types[msg->timing], msg->interval);
+					break;
+				}
+				default: {
+					strcpy(part, automessage_types[msg->timing]);
+					break;
+				}
+			}
+			
+			plr = find_player_index_by_idnum(msg->author);
+			snprintf(line, sizeof(line), "%d. %s (%s): %s\r\n", msg->id, part, plr->name, msg->msg);
+			
+			if (size + strlen(line) < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+				break;
+			}
+		}
+		
+		if (!automessages) {
+			size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		}
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+	else if (is_abbrev(cmd_arg, "add")) {
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!*type_arg) {
+			msg_to_char(ch, "Usage: automessage add <type> [interval] <msg>\r\n");
+			return;
+		}
+		if ((type = search_block(type_arg, automessage_types, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid message type '%s'.\r\n", type_arg);
+			return;
+		}
+		
+		// special handling for repeats
+		if (type == AUTOMSG_REPEATING) {
+			argument = any_one_arg(argument, type_arg);
+			if (!*type_arg) {
+				msg_to_char(ch, "Usage: automessage add <type> [interval] <msg>\r\n");
+				return;
+			}
+			if (!isdigit(*type_arg) || (interval = atoi(type_arg)) < 1) {
+				msg_to_char(ch, "Invalid repeating interval '%s'.\r\n", type_arg);
+				return;
+			}
+		}
+		
+		skip_spaces(&argument);
+		if (!*argument) {
+			msg_to_char(ch, "Usage: automessage add <type> [interval] <msg>\r\n");
+			return;
+		}
+		
+		// ready!
+		CREATE(msg, struct automessage, 1);
+		msg->id = new_automessage_id();
+		msg->timestamp = time(0);
+		msg->author = GET_IDNUM(ch);
+		msg->timing = type;
+		msg->interval = interval;
+		msg->msg = str_dup(argument);
+		
+		HASH_ADD_INT(automessages, id, msg);
+		
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s added automessage %d: %s", GET_NAME(ch), msg->id, msg->msg);
+		msg_to_char(ch, "You create a new message %d: %s\r\n", msg->id, NULLSAFE(msg->msg));
+		
+		save_automessages();
+	}
+	else if (is_abbrev(cmd_arg, "change")) {
+		argument = any_one_arg(argument, id_arg);
+		
+		if (!*id_arg || !isdigit(*id_arg) || (id = atoi(id_arg)) < 0) {
+			msg_to_char(ch, "Usage: automessage change <id> <property> <value>\r\n");
+			return;
+		}
+		
+		HASH_FIND_INT(automessages, &id, msg);
+		if (!msg) {
+			msg_to_char(ch, "Invalid message id %d.\r\n", id);
+			return;
+		}
+		
+		argument = any_one_arg(argument, type_arg);
+		skip_spaces(&argument);
+		
+		if (is_abbrev(type_arg, "type")) {
+			if (!*argument) {
+				msg_to_char(ch, "Change the type to what?\r\n");
+				return;
+			}
+			if ((type = search_block(argument, automessage_types, FALSE)) == NOTHING) {
+				msg_to_char(ch, "Invalid message type '%s'.\r\n", type_arg);
+				return;
+			}
+			
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s changed automessage %d's type to %s", GET_NAME(ch), msg->id, automessage_types[type]);
+			msg_to_char(ch, "You change automessage %d's type to %s\r\n", msg->id, automessage_types[type]);
+			if (type == AUTOMSG_REPEATING && type != msg->timing) {
+				msg->interval = 5;	// safe default
+			}
+			msg->timing = type;
+			save_automessages();
+		}
+		else if (is_abbrev(type_arg, "interval")) {
+			if (msg->timing != AUTOMSG_REPEATING) {
+				msg_to_char(ch, "You can only change that on a repeating message.\r\n");
+				return;
+			}
+			if (!*argument || !isdigit(*argument) || (interval = atoi(argument)) < 1) {
+				msg_to_char(ch, "Invalid interval.\r\n");
+				return;
+			}
+			
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s changed automessage %d's interval to %d minute%s", GET_NAME(ch), msg->id, interval, PLURAL(interval));
+			msg_to_char(ch, "You change automessage %d's interval to %d minute%s\r\n", msg->id, interval, PLURAL(interval));
+			msg->interval = interval;
+			save_automessages();
+		}
+		else if (is_abbrev(type_arg, "message")) {
+			if (!*argument) {
+				msg_to_char(ch, "Change the message to what?\r\n");
+				return;
+			}
+			
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s changed automessage %d to: %s", GET_NAME(ch), msg->id, argument);
+			msg_to_char(ch, "You change automessage %d from: %s\r\nTo: %s\r\n", msg->id, NULLSAFE(msg->msg), argument);
+			
+			if (msg->msg) {
+				free(msg->msg);
+			}
+			msg->msg = str_dup(argument);
+			save_automessages();
+		}
+		else {
+			msg_to_char(ch, "You can change the type, interval, or message.\r\n");
+			return;
+		}
+	}
+	else if (is_abbrev(cmd_arg, "delete")) {
+		skip_spaces(&argument);
+		if (!*argument) {
+			msg_to_char(ch, "Delete which automessage (id)?\r\n");
+			return;
+		}
+		
+		id = atoi(argument);
+		HASH_FIND_INT(automessages, &id, msg);
+		if (!msg) {
+			msg_to_char(ch, "No such message id to delete.\r\n");
+			return;
+		}
+		
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted automessage %d: %s", GET_NAME(ch), msg->id, msg->msg);
+		msg_to_char(ch, "You delete message %d: %s\r\n", msg->id, NULLSAFE(msg->msg));
+		HASH_DEL(automessages, msg);
+		free_automessage(msg);
+		save_automessages();
+	}
+	else {
+		msg_to_char(ch, "Usage: automessage list\r\n");
+		msg_to_char(ch, "       automessage add <type> [interval] <msg>\r\n");
+		msg_to_char(ch, "       automessage change <id> <property> <new val>\r\n");
+		msg_to_char(ch, "       automessage delete <id>\r\n");
+		msg_to_char(ch, "Types: ");
+		for (iter = 0; *automessage_types[iter] != '\n'; ++iter) {
+			msg_to_char(ch, "%s%s", (iter > 0 ? ", " : ""), automessage_types[iter]);
+		}
+		msg_to_char(ch, "\r\n");
+	}
+}
+
+
 ACMD(do_autostore) {
 	void read_vault(empire_data *emp);
 	obj_data *obj, *next_obj;

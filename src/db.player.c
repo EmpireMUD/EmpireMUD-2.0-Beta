@@ -1060,6 +1060,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct mail_data *mail, *last_mail = NULL;
 	struct player_completed_quest *plrcom;
 	struct player_ability_data *abildata;
+	struct player_automessage *automsg;
 	struct player_skill_data *skdata;
 	int length, i_in[7], iter, num;
 	struct slash_channel *slash;
@@ -1257,6 +1258,13 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 							break;
 						}
 					}
+				}
+				else if (PFILE_TAG(line, "Automessage:", length)) {
+					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in[0]);
+					CREATE(automsg, struct player_automessage, 1);
+					automsg->id = i_in[0];
+					automsg->timestamp = l_in[0];
+					HASH_ADD_INT(GET_AUTOMESSAGES(ch), id, automsg);
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -2529,6 +2537,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	void write_mail_to_file(FILE *fl, char_data *ch);
 	
 	struct player_completed_quest *plrcom, *next_plrcom;
+	struct player_automessage *automsg, *next_automsg;
 	struct player_slash_history *psh, *next_psh;
 	struct player_faction_data *pfd, *next_pfd;
 	struct channel_history_data *hist;
@@ -2555,6 +2564,9 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	// 'A'
 	for (alias = GET_ALIASES(ch); alias; alias = alias->next) {
 		fprintf(fl, "Alias: %d %ld %ld\n%s\n%s\n", alias->type, strlen(alias->alias), strlen(alias->replacement)-1, alias->alias, alias->replacement + 1);
+	}
+	HASH_ITER(hh, GET_AUTOMESSAGES(ch), automsg, next_automsg) {
+		fprintf(fl, "Automessage: %d %ld\n", automsg->id, automsg->timestamp);
 	}
 	
 	// 'C'

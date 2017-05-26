@@ -284,6 +284,12 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_BLOOD_UPKEEP  26	// vampire blood requirement
 
 
+// AUTOMSG_x: automessage types
+#define AUTOMSG_ONE_TIME  0
+#define AUTOMSG_ON_LOGIN  1
+#define AUTOMSG_REPEATING  2
+
+
 // don't change these
 #define BAN_NOT  0
 #define BAN_NEW  1
@@ -1644,6 +1650,7 @@ typedef struct vehicle_data vehicle_data;
 #define GRANT_OSET  BIT(36)
 #define GRANT_PLAYERDELETE  BIT(37)
 #define GRANT_UNQUEST  BIT(38)
+#define GRANT_AUTOMESSAGE  BIT(39)
 
 
 // Lore types
@@ -2170,6 +2177,21 @@ struct affected_type {
 	bitvector_t bitvector;	// Tells which bits to set - AFF_
 
 	struct affected_type *next;
+};
+
+
+// global messages
+struct automessage {
+	int id;
+	int author;	// player id
+	long timestamp;
+	
+	char *msg;	// the text
+	
+	int timing;	// AUTOMSG_ types
+	int interval;	// minutes, for repeating
+	
+	UT_hash_handle hh;	// hash handle (automessages, by id)
 };
 
 
@@ -3081,6 +3103,14 @@ struct mount_data {
 };
 
 
+// records when a player saw an automessage
+struct player_automessage {
+	int id;
+	long timestamp;
+	UT_hash_handle hh;	// GET_AUTOMESSAGES(ch)
+};
+
+
 // for permanently learning crafts
 struct player_craft_data {
 	any_vnum vnum;	// vnum of the learned craft
@@ -3198,6 +3228,7 @@ struct player_special_data {
 	struct slash_channel *load_slash_channels;	// temporary storage between load and join
 	struct player_faction_data *factions;	// hash table of factions
 	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// histories
+	struct player_automessage *automessages;	// hash of seen messages
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered

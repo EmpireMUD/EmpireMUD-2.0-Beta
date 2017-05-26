@@ -152,6 +152,7 @@
 #define XNAME_FILE  LIB_MISC"xnames"	// invalid name substrings
 
 // etc files (non-user-modifiable libs)
+#define AUTOMESSAGE_FILE  LIB_ETC"automessages"	// the automessage system
 #define BAN_FILE  LIB_ETC"badsites"	// for the siteban system
 #define DAILY_QUEST_FILE  LIB_ETC"daily_quests"	// which quests are on/off
 #define INSTANCE_FILE  LIB_ETC"instances"	// instanced adventures

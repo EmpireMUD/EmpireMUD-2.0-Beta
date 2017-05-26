@@ -26,6 +26,7 @@
 /**
 * Contents:
 *   Adventure Lib
+*   Automessages Lib
 *   Building Lib
 *   Craft Lib
 *   Crop Lib
@@ -52,8 +53,10 @@
 */
 
 // external variables
+extern struct automessage *automessages;
 extern struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES];
 extern struct player_special_data dummy_mob;
+extern int max_automessage_id;
 extern bool world_is_sorted;
 
 // external funcs
@@ -332,6 +335,217 @@ void write_adventure_to_file(FILE *fl, adv_data *adv) {
 	
 	// end
 	fprintf(fl, "S\n");
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// AUTOMESSAGES LIB ////////////////////////////////////////////////////////
+
+/**
+* Formats and sends an auto-message.
+*/
+void show_automessage_to_char(char_data *ch, struct automessage *msg) {
+	if (msg->msg && *msg->msg) {
+		msg_to_char(ch, "[MESSAGE] %s\r\n", msg->msg);
+	}
+}
+
+
+// quick-sorter by id
+int sort_automessage_by_id(struct automessage *a, struct automessage *b) {
+	return a->id - b->id;
+}
+
+
+/**
+* Checks if anybody needs an automessage, and sends it.
+*/
+void display_automessages(void) {
+	struct automessage *msg, *next_msg;
+	struct player_automessage *pam;
+	descriptor_data *desc;
+	time_t now = time(0);
+	char_data *ch;
+	int id;
+	
+	HASH_ITER(hh, automessages, msg, next_msg) {
+		id = msg->id;
+		
+		if (msg->timing == AUTOMSG_ON_LOGIN) {
+			continue;	// we don't show these now
+		}
+		if (msg->timestamp > now - (2 * SECS_PER_REAL_MIN)) {
+			continue;	// don't show messages newer than 2 minutes (grace period)
+		}
+		
+		LL_FOREACH(descriptor_list, desc) {
+			if (STATE(desc) != CON_PLAYING || !(ch = desc->character) || IS_NPC(ch)) {
+				continue;	// not playing
+			}
+			
+			// have/should they see/n it
+			HASH_FIND_INT(GET_AUTOMESSAGES(ch), &id, pam);
+			if (pam && msg->timing == AUTOMSG_ONE_TIME) {
+				continue;	// seen
+			}
+			else if (pam && msg->timing == AUTOMSG_REPEATING && (now - pam->timestamp) < (msg->interval * SECS_PER_REAL_MIN)) {
+				continue;	// too soon
+			}
+			
+			// validated!
+			show_automessage_to_char(ch, msg);
+			
+			// update or add player data
+			if (!pam) {
+				CREATE(pam, struct player_automessage, 1);
+				pam->id = id;
+				HASH_ADD_INT(GET_AUTOMESSAGES(ch), id, pam);
+			}
+			pam->timestamp = now;
+		}
+	}
+}
+
+
+/**
+* Looks for on-login messages to send to a player who just logged in.
+*
+* @param char_data *ch The player.
+*/
+void display_automessages_on_login(char_data *ch) {
+	struct automessage *msg, *next_msg;
+	
+	HASH_ITER(hh, automessages, msg, next_msg) {
+		if (msg->timing != AUTOMSG_ON_LOGIN) {
+			continue;	// only showing 1 type
+		}
+		show_automessage_to_char(ch, msg);
+	}
+}
+
+
+/**
+* Frees up an automessage.
+*
+* @param struct automessage *msg The message to free.
+*/
+void free_automessage(struct automessage *msg) {
+	if (msg->msg) {
+		free(msg->msg);
+	}
+	free(msg);
+}
+
+
+void load_automessages(void) {
+	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH];
+	int id, author, timing, interval, version;
+	struct automessage *msg, *find;
+	bool end = FALSE;
+	char *tmp;
+	FILE *fl;
+	long ts;
+	
+	version = 1;	// default (makes for easier alternate parsing to have version numbers)
+	
+	if (!(fl = fopen(AUTOMESSAGE_FILE, "r"))) {
+		return;	// there are no messages
+	}
+	
+	snprintf(error, sizeof(error), "automessage file");
+	
+	while (!end) {
+		if (!get_line(fl, line)) {
+			log("SYSERR: Unexpected end of automessage file");
+			break;
+		}
+		
+		if (*line == '$') {
+			end = TRUE;
+		}
+		else if (!strn_cmp(line, "Automessage:", 12)) {
+			version = atoi(line+13);
+		}
+		else if (!strn_cmp(line, "Index:", 6)) {
+			max_automessage_id = atoi(line+7);
+		}
+		else if (!strn_cmp(line, "Message:", 8)) {
+			if (sscanf(line + 12, " %d %d %ld %d %d", &id, &author, &ts, &timing, &interval) != 5) {
+				log("SYSERR: Bad format in automessage file. Skipping message.");
+				tmp = fread_string(fl, error);
+				if (tmp) {	// skip a line
+					free(tmp);
+				}
+				continue;
+			}
+			
+			CREATE(msg, struct automessage, 1);
+			msg->id = id;
+			msg->author = author;
+			msg->timestamp = ts;
+			msg->timing = timing;
+			msg->interval = interval;
+			msg->msg = fread_string(fl, error);
+			
+			HASH_FIND_INT(automessages, &id, find);
+			if (find) {
+				log("SYSERR: Duplicate automessage id %d found in file", id);
+				HASH_DEL(automessages, find);
+				free_automessage(find);
+			}
+			
+			HASH_ADD_INT(automessages, id, msg);
+		}
+	}
+	
+	fclose(fl);
+}
+
+
+int new_automessage_id(void) {
+	struct automessage *msg, *next_msg;
+	int last = 0;
+	
+	if (max_automessage_id < MAX_INT) {
+		return ++max_automessage_id;
+	}
+	else {
+		// whaaaa? find the first free id
+		HASH_SORT(automessages, sort_automessage_by_id);
+		HASH_ITER(hh, automessages, msg, next_msg) {
+			if (msg->id > last + 1) {
+				return last + 1;
+			}
+			last = msg->id;
+		}
+	}
+	
+	// did we get here?
+	log("SYSERR: No free automessage id (somehow)");
+	return 1;
+}
+
+
+void save_automessages(void) {
+	struct automessage *msg, *next_msg;
+	FILE *fl;
+	
+	if (!(fl = fopen(AUTOMESSAGE_FILE TEMP_SUFFIX, "w"))) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Unable to write %s", AUTOMESSAGE_FILE TEMP_SUFFIX);
+		return;
+	}
+	
+	// header
+	fprintf(fl, "Automessage: 1\n");	// version tag
+	fprintf(fl, "Index: %d\n", max_automessage_id);
+	
+	HASH_ITER(hh, automessages, msg, next_msg) {
+		fprintf(fl, "Message: %d %d %ld %d %d\n%s~\n", msg->id, msg->author, msg->timestamp, msg->timing, msg->interval, NULLSAFE(msg->msg));
+	}
+	
+	fprintf(fl, "$~\n");
+	fclose(fl);
+	rename(AUTOMESSAGE_FILE TEMP_SUFFIX, AUTOMESSAGE_FILE);	
 }
 
 

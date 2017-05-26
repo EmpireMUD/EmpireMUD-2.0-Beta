@@ -882,6 +882,7 @@ void heartbeat(int heart_pulse) {
 	void check_wars();
 	void chore_update();
 	void detect_evos_per_hour();
+	void display_automessages();
 	void extract_pending_chars();
 	void frequent_combat(int pulse);
 	void generate_adventure_instances();
@@ -1015,11 +1016,15 @@ void heartbeat(int heart_pulse) {
 
 	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
 		update_reboot();
+		if (debug_log && HEARTBEAT(15)) { log("debug 19a:\t%lld", microtime()); }
 		if (++mins_since_crashsave >= 5) {
 			mins_since_crashsave = 0;
 			save_all_players();
-			if (debug_log && HEARTBEAT(15)) { log("debug 19:\t%lld", microtime()); }
+			if (debug_log && HEARTBEAT(15)) { log("debug 19b:\t%lld", microtime()); }
 		}
+		
+		display_automessages();
+		if (debug_log && HEARTBEAT(15)) { log("debug 19c:\t%lld", microtime()); }
 	}
 	
 	if (HEARTBEAT(12 * SECS_PER_REAL_HOUR)) {

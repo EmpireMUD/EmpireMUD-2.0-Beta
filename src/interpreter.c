@@ -64,6 +64,7 @@ ACMD(do_alternate);
 ACMD(do_approve);
 ACMD(do_assist);
 ACMD(do_at);
+ACMD(do_automessage);
 ACMD(do_autostore);
 ACMD(do_autowiz);
 ACMD(do_avoid);
@@ -258,6 +259,7 @@ ACMD(do_manashield);
 ACMD(do_mapout);
 ACMD(do_mapsize);
 ACMD(do_mark);
+ACMD(do_messages);
 ACMD(do_meters);
 ACMD(do_milk);
 ACMD(do_mine);
@@ -567,6 +569,8 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "ask", POS_RESTING, do_spec_comm, NO_MIN, CTYPE_COMM, SCMD_ASK ),
 	STANDARD_CMD( "astralclaw", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_ASTRALCLAW, CTYPE_COMBAT, NOBITS, ABIL_ASTRALCLAW ),
 	SIMPLE_CMD( "autostore", POS_RESTING, do_autostore, LVL_CIMPL, CTYPE_IMMORTAL ),
+	GRANT_CMD( "automessage", POS_DEAD, do_automessage, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_AUTOMESSAGE),
+	GRANT_CMD( "automsg", POS_DEAD, do_automessage, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_AUTOMESSAGE),
 	SIMPLE_CMD( "autowiz", POS_DEAD, do_autowiz, LVL_CIMPL, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "avoid", POS_STANDING, do_avoid, NO_MIN, CTYPE_MOVE ),
 
@@ -802,6 +806,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "mark", POS_RESTING, do_mark, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "meters", POS_DEAD, do_meters, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "melt", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_SMELT, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	SIMPLE_CMD( "messages", POS_DEAD, do_messages, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "mine", POS_STANDING, do_mine, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "mill", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_MILL, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "milk", POS_STANDING, do_milk, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
@@ -2183,6 +2188,7 @@ int _parse_name(char *arg, char *name) {
 */
 void nanny(descriptor_data *d, char *arg) {
 	void check_delayed_load(char_data *ch);
+	void display_automessages_on_login(char_data *ch);
 	void display_tip_to_char(char_data *ch);
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	extern int isbanned(char *hostname);
@@ -2685,6 +2691,8 @@ void nanny(descriptor_data *d, char *arg) {
 			if (GET_LOYALTY(d->character) && EMPIRE_MOTD(GET_LOYALTY(d->character))) {
 				msg_to_char(d->character, "Empire MOTD:\r\n%s\r\n", EMPIRE_MOTD(GET_LOYALTY(d->character)));
 			}
+			
+			display_automessages_on_login(d->character);
 			
 			display_tip_to_char(d->character);
 			

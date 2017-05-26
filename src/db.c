@@ -82,6 +82,10 @@ archetype_data *sorted_archetypes = NULL;	// sorted hash (sorted_hh)
 augment_data *augment_table = NULL;	// master augment hash table
 augment_data *sorted_augments = NULL;	// alphabetic version // sorted_hh
 
+// automessage system
+struct automessage *automessages = NULL;	// hash table (hh, by id)
+int max_automessage_id = 0;	// read from file, permanent max id
+
 // buildings
 bld_data *building_table = NULL;	// building hash table
 
@@ -281,6 +285,7 @@ void boot_db(void) {
 	void detect_evos_per_hour();
 	void init_config_system();
 	void link_and_check_vehicles();
+	void load_automessages();
 	void load_banned();
 	void load_data_table();
 	void load_intro_screens();
@@ -319,6 +324,9 @@ void boot_db(void) {
 
 	// Load the world!
 	boot_world();
+	
+	log("Loading automessages.");
+	load_automessages();
 
 	log("Loading help entries.");
 	index_boot_help();

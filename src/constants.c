@@ -422,6 +422,7 @@ const char *grant_bits[] = {
 	"oset",
 	"playerdelete",
 	"unquest",
+	"automessage",
 	"\n"
 };
 
@@ -3162,6 +3163,15 @@ const bitvector_t *trig_argument_type_list[] = {
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISC CONSTANTS //////////////////////////////////////////////////////////
+
+// AUTOMSG_x: automessage types
+const char *automessage_types[] = {
+	"one-time",
+	"on-login",
+	"repeating",
+	"\n"
+};
+
 
 // for command-interpreting
 const char *fill_words[] = {

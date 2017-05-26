@@ -2572,6 +2572,55 @@ ACMD(do_mark) {
 }
 
 
+ACMD(do_messages) {
+	extern struct automessage *automessages;
+	
+	struct automessage *msg, *next_msg;
+	char buf[MAX_STRING_LENGTH * 2];
+	struct player_automessage *pam;
+	time_t now = time(0);
+	int id, count = 0;
+	size_t size;
+	
+	size = snprintf(buf, sizeof(buf), "Recent messages:\r\n");
+	
+	HASH_ITER(hh, automessages, msg, next_msg) {
+		if (msg->msg && (msg->timing == AUTOMSG_ON_LOGIN || msg->timestamp > (now - (24 * SECS_PER_REAL_HOUR)))) {
+			if (size + strlen(msg->msg) + 2 < sizeof(buf)) {
+				++count;
+				strcat(buf, msg->msg);
+				strcat(buf, "\r\n");
+				size += strlen(msg->msg) + 2;
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+				break;
+			}
+			
+			// mark seen
+			if (msg->timing != AUTOMSG_ON_LOGIN) {
+				id = msg->id;
+				HASH_FIND_INT(GET_AUTOMESSAGES(ch), &id, pam);
+				if (!pam) {
+					CREATE(pam, struct player_automessage, 1);
+					pam->id = id;
+					HASH_ADD_INT(GET_AUTOMESSAGES(ch), id, pam);
+				}
+				pam->timestamp = now;
+			}
+		}
+	}
+	
+	if (!count) {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
 ACMD(do_mudstats) {
 	void mudstats_empires(char_data *ch, char *argument);
 	int iter, pos;
