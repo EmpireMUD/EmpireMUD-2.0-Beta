@@ -45,6 +45,24 @@ Mob and object triggers also provide:
 
 See also: MTRIG CHARMED
 #d
+"BUY TRIGGER" "MTRIG BUY" "OTRIG BUY" "RTRIG BUY" "VTRIG BUY" TRIGEDIT-MOB-BUY TRIGEDIT-OBJ-BUY TRIGEDIT-ROOM-BUY TRIGEDIT-VEH-BUY
+
+Buy (trigger type)
+
+Argument type:  location of the item to trigger (obj triggers only)
+Return value:  return 0 to proceed with the purchase
+               return 1 (default) to block the purchase
+
+Buy triggers let you intercept a player attempting to buy from a shop. All
+buy triggers in the room will run, regardless of whether the shop is attached
+to a mob, obj, or room.
+
+Variables:
+  &c%actor%&0 - The person who is trying to buy.
+  &c%shopkeeper%&0 - The mob who runs the shop, if any (may be empty).
+  &c%cost%&0 - The numeric value of the purchase.
+  &c%currency%&0 - The currency vnum of the purchase, or "coins" if it's coins.
+#d
 "COMMAND TRIGGER" "MTRIG COMMAND" "OTRIG COMMAND" "RTRIG COMMAND" "VTRIG COMMAND" TRIGEDIT-MOB-COMMAND TRIGEDIT-OBJ-COMMAND TRIGEDIT-ROOM-COMMAND TRIGEDIT-VEH-COMMAND
 
 Command (trigger type)

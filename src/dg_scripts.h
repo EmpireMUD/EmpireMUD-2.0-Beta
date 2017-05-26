@@ -35,7 +35,7 @@
  */
 #define NO_EXTRANEOUS_TRIGGERS
 
-/* mob trigger types */
+// MTRIG_x: mob trigger types
 #define MTRIG_GLOBAL           BIT(0)      // check even if no players nearby
 #define MTRIG_RANDOM           BIT(1)      /* checked randomly           */
 #define MTRIG_COMMAND          BIT(2)	   /* character types a command  */
@@ -60,9 +60,10 @@
 #define MTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 #define MTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
 #define MTRIG_REBOOT           BIT(23)	// after the mud reboots
+#define MTRIG_BUY              BIT(24)	// attempting a purchase
 
 
-/* obj trigger types */
+// OTRIG_x: obj trigger types
 #define OTRIG_GLOBAL           BIT(0)	// NOT actually used, currently
 #define OTRIG_RANDOM           BIT(1)	     /* checked randomly           */
 #define OTRIG_COMMAND          BIT(2)      /* character types a command  */
@@ -85,6 +86,7 @@
 #define OTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 #define OTRIG_PLAYER_IN_ROOM   BIT(22)	// NOT actually used, currently
 #define OTRIG_REBOOT           BIT(23)	// after the mud reboots
+#define OTRIG_BUY              BIT(24)	// attempting a purchase
 
 
 // VTRIG_x: vehicle trigger types
@@ -106,9 +108,10 @@
 #define VTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 #define VTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
 #define VTRIG_REBOOT           BIT(23)	// after the mud reboots
+#define VTRIG_BUY              BIT(24)	// attempting a purchase in the room
 
 
-/* wld trigger types */
+// WTRIG_x: wld trigger types
 #define WTRIG_GLOBAL           BIT(0)      /* check even if zone empty   */
 #define WTRIG_RANDOM           BIT(1)	     /* checked randomly           */
 #define WTRIG_COMMAND          BIT(2)	     /* character types a command  */
@@ -129,6 +132,7 @@
 #define WTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
 #define WTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
 #define WTRIG_REBOOT           BIT(23)	// after the mud reboots
+#define WTRIG_BUY              BIT(24)	// attempting a purchase
 
 
 // list of global trigger types (for random_triggers linked list)
@@ -256,6 +260,7 @@ int remove_otrigger(obj_data *obj, char_data *actor);
 int command_mtrigger(char_data *actor, char *cmd, char *argument, int mode);
 int command_otrigger(char_data *actor, char *cmd, char *argument, int mode);
 int command_wtrigger(char_data *actor, char *cmd, char *argument, int mode);
+bool check_buy_trigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency);
 bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode);
 int death_mtrigger(char_data *ch, char_data *actor);
 void fight_mtrigger(char_data *ch);

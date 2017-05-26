@@ -2907,7 +2907,8 @@ const char *trig_types[] = {
 	"Start-Quest",	// 20
 	"Finish-Quest",
 	"Player-in-Room",
-	"Reboot",	// 23
+	"Reboot",
+	"Buy",	// 24
 	"\n"
 };
 
@@ -2937,6 +2938,7 @@ const bitvector_t mtrig_argument_types[] = {
 	NOBITS,	// finish-quest
 	NOBITS,	// player-in-room
 	NOBITS,	// reboot
+	NOBITS,	// buy
 };
 
 
@@ -2965,7 +2967,8 @@ const char *otrig_types[] = {
 	"Start-Quest",	// 20
 	"Finish-Quest",
 	"Player-in-Room",
-	"Reboot",	// 23
+	"Reboot",
+	"Buy",	// 24
 	"\n"
 };
 
@@ -2995,6 +2998,7 @@ const bitvector_t otrig_argument_types[] = {
 	NOBITS,	// finish-quest
 	NOBITS,	// player-in-room
 	NOBITS,	// reboot
+	TRIG_ARG_OBJ_WHERE,	// buy
 };
 
 
@@ -3023,7 +3027,8 @@ const char *vtrig_types[] = {
 	"Start-Quest",	// 20
 	"Finish-Quest",
 	"Player-in-Room",
-	"Reboot",	// 23
+	"Reboot",
+	"Buy",	// 24
 	"\n"
 };
 
@@ -3054,6 +3059,7 @@ const bitvector_t vtrig_argument_types[] = {
 	NOBITS,	// finish-quest
 	NOBITS,	// player-in-room
 	NOBITS,	// reboot
+	NOBITS,	// buy
 };
 
 
@@ -3082,7 +3088,8 @@ const char *wtrig_types[] = {
 	"Start-Quest",	// 20
 	"Finish-Quest",
 	"Player-in-Room",
-	"Reboot",	// 23
+	"Reboot",
+	"Buy",	// 24
 	"\n"
 };
 
@@ -3112,6 +3119,7 @@ const bitvector_t wtrig_argument_types[] = {
 	NOBITS,	// finish-quest
 	NOBITS,	// player-in-room
 	NOBITS,	// reboot
+	NOBITS,	// buy
 };
 
 
