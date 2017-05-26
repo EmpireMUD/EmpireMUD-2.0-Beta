@@ -3608,11 +3608,18 @@ ACMD(do_buy) {
 				return;
 			}
 			
-			// VALID!
+			// load the object before the buy trigger, in case
 			obj = read_object(item->vnum, TRUE);
 			obj_to_char(obj, ch);
 			scale_item_to_level(obj, get_approximate_level(ch));
 			
+			if (check_buy_trigger(ch, stl->from_mob, obj, item->cost, item->currency)) {
+				// triggered: purchase failed
+				extract_obj(obj);
+				return;
+			}
+			
+			// finish the purchase			
 			if (item->currency == NOTHING) {
 				charge_coins(ch, coin_emp, item->cost, NULL);
 				sprintf(buf, "You buy $p for %s.", money_amount(coin_emp, item->cost));
