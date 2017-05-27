@@ -365,7 +365,7 @@ int sort_automessage_by_data(struct automessage *a, struct automessage *b) {
 			return -1;
 		}
 		if (b->timing == AUTOMSG_ONE_TIME) {
-			return -1;
+			return 1;
 		}
 	}
 	
