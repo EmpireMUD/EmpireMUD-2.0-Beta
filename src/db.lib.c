@@ -481,7 +481,7 @@ void load_automessages(void) {
 			max_automessage_id = atoi(line+7);
 		}
 		else if (!strn_cmp(line, "Message:", 8)) {
-			if (sscanf(line + 12, " %d %d %ld %d %d", &id, &author, &ts, &timing, &interval) != 5) {
+			if (sscanf(line + 8, " %d %d %ld %d %d", &id, &author, &ts, &timing, &interval) != 5) {
 				log("SYSERR: Bad format in automessage file. Skipping message.");
 				tmp = fread_string(fl, error);
 				if (tmp) {	// skip a line
