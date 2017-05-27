@@ -54,6 +54,7 @@ room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum v
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type);
 any_vnum get_new_instance_id(void);
 void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
+void link_instance_entrance(struct instance_data *inst);
 void reset_instance(struct instance_data *inst);
 void scale_instance_to_level(struct instance_data *inst, int level);
 void unlink_instance_entrance(room_data *room, struct instance_data *inst);
@@ -80,30 +81,25 @@ const bool is_location_rule[] = {
 //// INSTANCE-BUILDING ///////////////////////////////////////////////////////
 
 /**
-* Sets up the world entrance for an instanced adventure zone.
+* Sets up the map tile for an instance (without the interior). The instance
+* already has all the data it needs to do this.
 *
-* @param struct instance_data *inst The instance we're instantiating.
-* @param struct adventure_link_rule *rule The rule we're using to set it up.
-* @param room_data *loc The pre-validated world location.
-* @param int dir The chosen direction, IF required (may be DIR_RANDOM or NO_DIR, too).
-* @param int rotation The rotatable direction, if applicable (NO_DIR for none).
+* @param struct instance_data *inst The instance.
 */
-static void build_instance_entrance(struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation) {
+void build_instance_exterior(struct instance_data *inst) {
 	void special_building_setup(char_data *ch, room_data *room);
 	void complete_building(room_data *room);
 	
 	char_data *mob, *next_mob;
-	obj_data *portal;
 	bld_data *bdg;
-	int my_dir;
 	
-	// nothing to link to!
-	if (!inst->start) {
+	// nerp
+	if (!inst->location) {
 		return;
 	}
 	
 	// purge mobs in the room
-	for (mob = ROOM_PEOPLE(loc); mob; mob = next_mob) {
+	for (mob = ROOM_PEOPLE(inst->location); mob; mob = next_mob) {
 		next_mob = mob->next_in_room;
 		
 		if (IS_NPC(mob)) {
@@ -111,81 +107,42 @@ static void build_instance_entrance(struct instance_data *inst, struct adventure
 		}
 	}
 	
-	// ADV_LINK_x part 1: things that need buildings added
-	switch (rule->type) {
+	// ADV_LINK_x: things that need buildings added
+	switch (inst->rule->type) {
 		case ADV_LINK_BUILDING_NEW:
 		case ADV_LINK_PORTAL_BUILDING_NEW: {
-			if (!(bdg = building_proto(rule->value))) {
+			if (!(bdg = building_proto(inst->rule->value))) {
 				log("SYSERR: Error instantiating adventure #%d: invalid building in link rule", GET_ADV_VNUM(inst->adventure));
 				return;
 			}
 			
 			// make the building
-			disassociate_building(loc);
-			construct_building(loc, GET_BLD_VNUM(bdg));
-			special_building_setup(NULL, loc);
+			disassociate_building(inst->location);
+			construct_building(inst->location, GET_BLD_VNUM(bdg));
+			special_building_setup(NULL, inst->location);
 			
 			// exit?
-			if (dir != NO_DIR && ROOM_IS_CLOSED(loc)) {
-				create_exit(loc, SHIFT_DIR(loc, dir), dir, FALSE);
-
-				COMPLEX_DATA(loc)->entrance = rev_dir[dir];
+			if (inst->dir != NO_DIR && ROOM_IS_CLOSED(inst->location)) {
+				create_exit(inst->location, SHIFT_DIR(inst->location, inst->dir), inst->dir, FALSE);
+				COMPLEX_DATA(inst->location)->entrance = rev_dir[inst->dir];
 			}
 			
-			complete_building(loc);
+			complete_building(inst->location);
 			
 			// set these so it can be cleaned up later
-			SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_TEMPORARY);
-			SET_BIT(ROOM_AFF_FLAGS(loc), ROOM_AFF_TEMPORARY);			
+			SET_BIT(ROOM_BASE_FLAGS(inst->location), ROOM_AFF_TEMPORARY);
+			SET_BIT(ROOM_AFF_FLAGS(inst->location), ROOM_AFF_TEMPORARY);			
 			break;
 		}
 	}
 	
 	// small tweaks to room
-	SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_HAS_INSTANCE);
-	SET_BIT(ROOM_AFF_FLAGS(loc), ROOM_AFF_HAS_INSTANCE);
+	SET_BIT(ROOM_BASE_FLAGS(inst->location), ROOM_AFF_HAS_INSTANCE);
+	SET_BIT(ROOM_AFF_FLAGS(inst->location), ROOM_AFF_HAS_INSTANCE);
 	
 	// and the home room
-	SET_BIT(ROOM_BASE_FLAGS(HOME_ROOM(loc)), ROOM_AFF_HAS_INSTANCE);
-	SET_BIT(ROOM_AFF_FLAGS(HOME_ROOM(loc)), ROOM_AFF_HAS_INSTANCE);
-	
-	// ADV_LINK_x part 2: portal or direction
-	switch (rule->type) {
-		case ADV_LINK_BUILDING_EXISTING:
-		case ADV_LINK_BUILDING_NEW: {
-			my_dir = (rule->dir != DIR_RANDOM ? rule->dir : determine_random_exit(inst->adventure, loc, inst->start));
-			if (ADVENTURE_FLAGGED(inst->adventure, ADV_ROTATABLE) && rotation != NO_DIR && my_dir != NO_DIR) {
-				my_dir = confused_dirs[rotation][0][my_dir];
-			}
-			if (my_dir != NO_DIR) {
-				create_exit(loc, inst->start, my_dir, TRUE);
-			}
-			break;
-		}
-		case ADV_LINK_PORTAL_WORLD:
-		case ADV_LINK_PORTAL_BUILDING_EXISTING:
-		case ADV_LINK_PORTAL_BUILDING_NEW: {
-			if (obj_proto(rule->portal_in)) {
-				portal = read_object(rule->portal_in, TRUE);
-				GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(inst->start);
-				obj_to_room(portal, loc);
-				if (ROOM_PEOPLE(IN_ROOM(portal))) {
-					act("$p spins open!", FALSE, ROOM_PEOPLE(IN_ROOM(portal)), portal, NULL, TO_CHAR | TO_ROOM);
-				}
-				load_otrigger(portal);
-			}
-			if (obj_proto(rule->portal_out)) {
-				portal = read_object(rule->portal_out, TRUE);
-				GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(loc);
-				obj_to_room(portal, inst->start);
-				if (ROOM_PEOPLE(IN_ROOM(portal))) {
-					act("$p spins open!", FALSE, ROOM_PEOPLE(IN_ROOM(portal)), portal, NULL, TO_CHAR | TO_ROOM);
-				}
-				load_otrigger(portal);
-			}
-			break;
-		}
-	}
+	SET_BIT(ROOM_BASE_FLAGS(HOME_ROOM(inst->location)), ROOM_AFF_HAS_INSTANCE);
+	SET_BIT(ROOM_AFF_FLAGS(HOME_ROOM(inst->location)), ROOM_AFF_HAS_INSTANCE);
 }
 
 
@@ -251,6 +208,13 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 	inst->start = NULL;
 	inst->size = 0;
 	
+	// store data on instantiation
+	inst->dir = dir;
+	inst->rotation = rotation;
+	CREATE(inst->rule, struct adventure_link_rule, 1);
+	*inst->rule = *rule;	// COPY the rule
+	inst->rule->next = NULL;
+	
 	// check for players
 	present = FALSE;
 	LL_FOREACH2(ROOM_PEOPLE(loc), ch, next_in_room) {
@@ -259,21 +223,17 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 			break;
 		}
 	}
-
+	
+	// set up the outside
+	build_instance_exterior(inst);
+	
 	if (IS_SET(GET_ADV_FLAGS(adv), ADV_CAN_DELAY_LOAD) && !present) {
 		SET_BIT(inst->flags, INST_NEEDS_LOAD);
-		inst->dir = dir;
-		inst->rotation = rotation;
-		
-		// COPY the rule
-		CREATE(inst->rule, struct adventure_link_rule, 1);
-		*inst->rule = *rule;
-		inst->rule->next = NULL;
 	}
 	else {	// normal instantiation
 		// make sure it is in the instance_list BEFORE adding rooms (for create_room updates)
 		instantiate_rooms(adv, inst, rule, loc, dir, rotation);
-	
+		
 		// reset instance (spawns)
 		reset_instance(inst);
 	}
@@ -547,8 +507,8 @@ void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventu
 	
 	// attach the instance to the world (do this before adding dirs, because it may take up a random dir slot)
 	// do not rotate this dir; it was pre-validated for building
-	build_instance_entrance(inst, rule, loc, dir, rotation);
-
+	link_instance_entrance(inst);
+	
 	// exits: non-random first
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (room_list[iter] && template_list[iter]) {
@@ -582,6 +542,61 @@ void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventu
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (room_list[iter]) {
 			load_wtrigger(room_list[iter]);
+		}
+	}
+}
+
+
+/**
+* Links the instance entrance to the already-existing interior. The instance
+* already has all the data it needs to do this.
+*
+* @param struct instance_data *inst The instance.
+*/
+void link_instance_entrance(struct instance_data *inst) {
+	obj_data *portal;
+	int my_dir;
+	
+	// wut
+	if (!inst->location || !inst->start || !inst->rule) {
+		return;
+	}
+	
+	// ADV_LINK_x: link exits by type
+	switch (inst->rule->type) {
+		case ADV_LINK_BUILDING_EXISTING:
+		case ADV_LINK_BUILDING_NEW: {
+			my_dir = (inst->rule->dir != DIR_RANDOM ? inst->rule->dir : determine_random_exit(inst->adventure, inst->location, inst->start));
+			if (ADVENTURE_FLAGGED(inst->adventure, ADV_ROTATABLE) && inst->rotation != NO_DIR && my_dir != NO_DIR) {
+				my_dir = confused_dirs[inst->rotation][0][my_dir];
+			}
+			if (my_dir != NO_DIR) {
+				create_exit(inst->location, inst->start, my_dir, TRUE);
+			}
+			break;
+		}
+		case ADV_LINK_PORTAL_WORLD:
+		case ADV_LINK_PORTAL_BUILDING_EXISTING:
+		case ADV_LINK_PORTAL_BUILDING_NEW: {
+			if (obj_proto(inst->rule->portal_in)) {
+				portal = read_object(inst->rule->portal_in, TRUE);
+				GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(inst->start);
+				obj_to_room(portal, inst->location);
+				if (ROOM_PEOPLE(IN_ROOM(portal))) {
+					act("$p spins open!", FALSE, ROOM_PEOPLE(IN_ROOM(portal)), portal, NULL, TO_CHAR | TO_ROOM);
+				}
+				load_otrigger(portal);
+			}
+			if (obj_proto(inst->rule->portal_out)) {
+				portal = read_object(inst->rule->portal_out, TRUE);
+				GET_OBJ_VAL(portal, VAL_PORTAL_TARGET_VNUM) = GET_ROOM_VNUM(inst->location);
+				obj_to_room(portal, inst->start);
+				if (ROOM_PEOPLE(IN_ROOM(portal))) {
+					act("$p spins open!", FALSE, ROOM_PEOPLE(IN_ROOM(portal)), portal, NULL, TO_CHAR | TO_ROOM);
+				}
+				load_otrigger(portal);
+			}
+			break;
 		}
 	}
 }
@@ -1942,7 +1957,7 @@ static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {
 			exit(1);
 		}
 		switch (*line) {
-			case 'D': {	// delayed load data
+			case 'D': {	// direction data
 				if (sscanf(line, "D %d %d", &i_in[0], &i_in[1]) != 2) {
 					log("SYSERR: Format error in D line of instance, got %s", line);
 					exit(1);
@@ -1953,7 +1968,7 @@ static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {
 				
 				break;
 			}
-			case 'L': {	// delayed linking rule
+			case 'L': {	// the linking rule that was used
 				parse_link_rule(fl, &inst->rule, "instance");
 				break;
 			}
@@ -2111,12 +2126,12 @@ void save_instances(void) {
 		fprintf(fl, "%d %d %d %s\n", GET_ADV_VNUM(inst->adventure), inst->location ? GET_ROOM_VNUM(inst->location) : NOWHERE, inst->start ? GET_ROOM_VNUM(inst->start) : NOWHERE, bitv_to_alpha(inst->flags));
 		fprintf(fl, "%d %ld %ld\n", inst->level, inst->created, inst->last_reset);
 		
-		// 'D' delayed load data
+		// 'D' direction data
 		if (inst->dir || inst->rotation) {
 			fprintf(fl, "D %d %d\n", inst->dir, inst->rotation);
 		}
 		
-		// 'L' delayed linking rule
+		// 'L' the linking rule that built the instance (a copy of the one from the adv)
 		write_linking_rules_to_file(fl, 'L', inst->rule);
 		
 		// 'R' rooms
