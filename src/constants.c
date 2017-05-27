@@ -119,6 +119,7 @@ const char *adventure_flags[] = {
 	"NEWBIE-ONLY",
 	"NO-MOB-CLEANUP",
 	"EMPTY-RESET-ONLY",
+	"CAN-DELAY-LOAD",
 	"\n"
 };
 
@@ -1779,7 +1780,7 @@ const char *item_types[] = {
 };
 
 
-// ITEM_WEAR_ (wear bitvector) -- also see wear_significance
+// ITEM_WEAR_x (wear bitvector) -- also see wear_significance
 const char *wear_bits[] = {
 	"TAKE",
 	"FINGER",
