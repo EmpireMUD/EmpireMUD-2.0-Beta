@@ -1312,7 +1312,7 @@ void char_to_room(char_data *ch, room_data *room) {
 	
 	int pos;
 	obj_data *obj;
-	struct instance_data *inst;
+	struct instance_data *inst = NULL;
 
 	if (!ch || !room) {
 		log("SYSERR: Illegal value(s) passed to char_to_room. (Room :%p, Ch: %p)", room, ch);
