@@ -77,6 +77,7 @@ void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part
 void parse_generic_name_file(FILE *fl, char *err_str);
 void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part);
 void parse_interaction(char *line, struct interaction_item **list, char *error_part);
+void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part);
 void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 int sort_empires(empire_data *a, empire_data *b);
 int sort_room_templates(room_template *a, room_template *b);
@@ -84,6 +85,7 @@ void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message 
 void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list);
 void write_interactions_to_file(FILE *fl, struct interaction_item *list);
+void write_linking_rules_to_file(FILE *fl, char letter, struct adventure_link_rule *list);
 void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
 void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 
@@ -231,44 +233,7 @@ void parse_adventure(FILE *fl, adv_vnum vnum) {
 		}
 		switch (*line) {
 			case 'L': {	// linking rule
-				CREATE(link, struct adventure_link_rule, 1);
-				link->next = NULL;
-				if (last_link) {
-					last_link->next = link;
-				}
-				else {
-					GET_ADV_LINKING(adv) = link;
-				}
-				last_link = link;
-				
-				// line 1: type flags
-				if (!get_line(fl, line) || sscanf(line, "%d %s", &int_in[0], str_in) != 2) {
-					log("SYSERR: Format error in L line 1 of %s", buf2);
-					exit(1);
-				}
-				
-				link->type = int_in[0];
-				link->flags = asciiflag_conv(str_in);
-				
-				// line 2: value portal_in portal_out
-				if (!get_line(fl, line) || sscanf(line, "%d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
-					log("SYSERR: Format error in L line 2 of %s", buf2);
-					exit(1);
-				}
-				
-				link->value = int_in[0];
-				link->portal_in = int_in[1];
-				link->portal_out = int_in[2];
-				
-				// line 3: dir bld_on bld_facing
-				if (!get_line(fl, line) || sscanf(line, "%d %s %s", &int_in[0], str_in, str_in2) != 3) {
-					log("SYSERR: Format error in L line 3 of %s", buf2);
-					exit(1);
-				}
-				
-				link->dir = int_in[0];
-				link->bld_on = asciiflag_conv(str_in);
-				link->bld_facing = asciiflag_conv(str_in2);
+				parse_link_rule(fl, &GET_ADV_LINKING(adv), buf2);
 				break;
 			}
 
@@ -320,15 +285,7 @@ void write_adventure_to_file(FILE *fl, adv_data *adv) {
 	fprintf(fl, "%d %d %s %d\n", GET_ADV_MAX_INSTANCES(adv), GET_ADV_RESET_TIME(adv), bitv_to_alpha(GET_ADV_FLAGS(adv)), GET_ADV_PLAYER_LIMIT(adv));
 
 	// L: linking rules
-	for (link = GET_ADV_LINKING(adv); link; link = link->next) {
-		fprintf(fl, "L\n");
-		fprintf(fl, "%d %s\n", link->type, bitv_to_alpha(link->flags));
-		fprintf(fl, "%d %d %d\n", link->value, link->portal_in, link->portal_out);
-		
-		strcpy(temp, bitv_to_alpha(link->bld_on));
-		strcpy(temp2, bitv_to_alpha(link->bld_facing));
-		fprintf(fl, "%d %s %s\n", link->dir, temp, temp2);
-	}
+	write_linking_rules_to_file(fl, 'L', GET_ADV_LINKING(adv));
 	
 	// T: triggers
 	write_trig_protos_to_file(fl, 'T', GET_ADV_SCRIPTS(adv));
@@ -7718,6 +7675,53 @@ void parse_generic_name_file(FILE *fl, char *err_str) {
 
 
 /**
+* Parse one linking rule and assign it to the end of the given list.
+* This function will trigger an exit(1) if it errors.
+*
+* @param FILE *fl The file, open for reading, right after the letter tag (usually L).
+* @param struct adventure_link_rule **list A reference to the start of the list to assign to.
+* @param char *error_part A string containing e.g. "mob #1234", describing where the error occurred, if one happens.
+*/
+void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part) {
+	char line[MAX_INPUT_LENGTH], str_in[MAX_INPUT_LENGTH], str_in2[MAX_INPUT_LENGTH];
+	struct adventure_link_rule *link;
+	int int_in[3];
+	
+	CREATE(link, struct adventure_link_rule, 1);
+	LL_APPEND(*list, link);
+	
+	// line 1: type flags
+	if (!get_line(fl, line) || sscanf(line, "%d %s", &int_in[0], str_in) != 2) {
+		log("SYSERR: Format error in link rule line 1 of %s", buf2);
+		exit(1);
+	}
+	
+	link->type = int_in[0];
+	link->flags = asciiflag_conv(str_in);
+	
+	// line 2: value portal_in portal_out
+	if (!get_line(fl, line) || sscanf(line, "%d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
+		log("SYSERR: Format error in link rule line 2 of %s", buf2);
+		exit(1);
+	}
+	
+	link->value = int_in[0];
+	link->portal_in = int_in[1];
+	link->portal_out = int_in[2];
+	
+	// line 3: dir bld_on bld_facing
+	if (!get_line(fl, line) || sscanf(line, "%d %s %s", &int_in[0], str_in, str_in2) != 3) {
+		log("SYSERR: Format error in link rule line 3 of %s", buf2);
+		exit(1);
+	}
+	
+	link->dir = int_in[0];
+	link->bld_on = asciiflag_conv(str_in);
+	link->bld_facing = asciiflag_conv(str_in2);
+}
+
+
+/**
 * Writes the A tag for any apply_data list.
 *
 * @param FILE *fl The file to write to.
@@ -7788,6 +7792,29 @@ void parse_requirement(FILE *fl, struct req_data **list, char *error_str) {
 	
 	LL_APPEND(*list, req);
 	LL_SORT(*list, sort_requirements_by_group);
+}
+
+
+/**
+* Saves linking rule data (usually 'L' tag) to a db file.
+*
+* @param FILE *fl The open file to write to.
+* @param char letter The letter to tag in the file.
+* @param struct adventure_link_rule *list The list to write.
+*/
+void write_linking_rules_to_file(FILE *fl, char letter, struct adventure_link_rule *list) {
+	struct adventure_link_rule *link;
+	char temp[256], temp2[256];
+	
+	LL_FOREACH(list, link) {
+		fprintf(fl, "%c\n", letter);
+		fprintf(fl, "%d %s\n", link->type, bitv_to_alpha(link->flags));
+		fprintf(fl, "%d %d %d\n", link->value, link->portal_in, link->portal_out);
+		
+		strcpy(temp, bitv_to_alpha(link->bld_on));
+		strcpy(temp2, bitv_to_alpha(link->bld_facing));
+		fprintf(fl, "%d %s %s\n", link->dir, temp, temp2);
+	}
 }
 
 

@@ -423,6 +423,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_NEWBIE_ONLY  BIT(7)	// only spawns on newbie islands
 #define ADV_NO_MOB_CLEANUP  BIT(8)	// won't despawn mobs that escaped the instance
 #define ADV_EMPTY_RESET_ONLY  BIT(9)	// won't reset while players are inside
+#define ADV_CAN_DELAY_LOAD  BIT(10)	// can save memory by not instantiating till a player appears
 
 
 // adventure link rule types
@@ -447,8 +448,9 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_SPAWN_VEH  2
 
 
-// instance flags
+// INST_x: instance flags
 #define INST_COMPLETED  BIT(0)	// instance is done and can be cleaned up
+#define INST_NEEDS_LOAD  BIT(1)	// instance is not loaded yet
 
 
 // RMT_X: room template flags
@@ -2572,12 +2574,17 @@ struct instance_data {
 	any_vnum id;	// instance id
 	adv_data *adventure;	// which adventure this is an instance of
 	
-	bitvector_t flags;	// INST_x
+	bitvector_t flags;	// INST_ flags
 	room_data *location;	// map room linked from
 	room_data *start;	// starting interior room (first room of zone)
 	int level;	// locked, scaled level
 	time_t created;	// when instantiated
 	time_t last_reset;	// for reset timers
+	
+	// data stored ONLY for delayed load
+	int dir;	// any (or no) direction the adventure might face
+	int rotation;	// any direction the adventure is rotated, if applicable
+	struct adventure_link_rule *rule;
 	
 	// unstored data
 	int size;	// size of room arrays

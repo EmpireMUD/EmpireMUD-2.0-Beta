@@ -158,6 +158,7 @@ const char *adventure_spawn_types[] = {
 // INST_x
 const char *instance_flags[] = {
 	"COMPLETED",
+	"NEEDS-LOAD",
 	"\n"
 };
 

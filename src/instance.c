@@ -53,7 +53,7 @@ struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom
 room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type);
 any_vnum get_new_instance_id(void);
-static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
+void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
 void reset_instance(struct instance_data *inst);
 void scale_instance_to_level(struct instance_data *inst, int level);
 void unlink_instance_entrance(room_data *room, struct instance_data *inst);
@@ -200,7 +200,9 @@ static void build_instance_entrance(struct instance_data *inst, struct adventure
 */
 struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir) {
 	struct instance_data *inst, *temp;
+	char_data *ch;
 	int rotation;
+	bool present;
 	
 	// basic sanitation
 	if (!loc) {
@@ -249,11 +251,32 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 	inst->start = NULL;
 	inst->size = 0;
 	
-	// make sure it is in the instance_list BEFORE adding rooms (for create_room updates)
-	instantiate_rooms(adv, inst, rule, loc, dir, rotation);
+	// check for players
+	present = FALSE;
+	LL_FOREACH2(ROOM_PEOPLE(loc), ch, next_in_room) {
+		if (!IS_NPC(ch)) {
+			present = TRUE;
+			break;
+		}
+	}
+
+	if (IS_SET(GET_ADV_FLAGS(adv), ADV_CAN_DELAY_LOAD) && !present) {
+		SET_BIT(inst->flags, INST_NEEDS_LOAD);
+		inst->dir = dir;
+		inst->rotation = rotation;
+		
+		// COPY the rule
+		CREATE(inst->rule, struct adventure_link_rule, 1);
+		*inst->rule = *rule;
+		inst->rule->next = NULL;
+	}
+	else {	// normal instantiation
+		// make sure it is in the instance_list BEFORE adding rooms (for create_room updates)
+		instantiate_rooms(adv, inst, rule, loc, dir, rotation);
 	
-	// reset instance (spawns)
-	reset_instance(inst);
+		// reset instance (spawns)
+		reset_instance(inst);
+	}
 	
 	return inst;
 }
@@ -468,7 +491,7 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 * @param int dir A direction, for rules that need it.
 * @param int rotation The direction the instance "faces", e.g. NORTH.
 */
-static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation) {
+void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation) {
 	void sort_exits(struct room_direction_data **list);
 	
 	room_data **room_list = NULL;
@@ -975,6 +998,7 @@ void delete_instance(struct instance_data *inst) {
 	void relocate_players(room_data *room, room_data *to_room);
 	
 	struct instance_mob *im, *next_im;
+	struct adventure_link_rule *rule;
 	vehicle_data *veh, *next_veh;
 	struct instance_data *temp;
 	char_data *mob, *next_mob;
@@ -1042,6 +1066,11 @@ void delete_instance(struct instance_data *inst) {
 	// other stuff to free
 	HASH_ITER(hh, inst->mob_counts, im, next_im) {
 		free(im);
+	}
+	
+	while ((rule = inst->rule)) {
+		inst->rule = rule->next;
+		free(rule);
 	}
 	
 	free(inst);
@@ -1222,7 +1251,7 @@ void reset_instances(void) {
 void prune_instances(void) {
 	struct instance_data *inst, *next_inst;
 	struct adventure_link_rule *rule;
-	bool save = FALSE;
+	bool delayed, save = FALSE;
 	room_data *room, *next_room;
 	
 	// look for dead instances
@@ -1230,9 +1259,10 @@ void prune_instances(void) {
 		next_inst = inst->next;
 		
 		rule = get_link_rule_by_type(inst->adventure, ADV_LINK_TIME_LIMIT);
+		delayed = IS_SET(inst->flags, INST_NEEDS_LOAD) ? TRUE : FALSE;
 		
 		// look for completed or orphaned instances
-		if (INSTANCE_FLAGGED(inst, INST_COMPLETED) || !inst->start || !inst->location || inst->size == 0 || (rule && (inst->created + 60 * rule->value) < time(0))) {
+		if (INSTANCE_FLAGGED(inst, INST_COMPLETED) || (!inst->start && !delayed) || !inst->location || (inst->size == 0 && !delayed) || (rule && (inst->created + 60 * rule->value) < time(0))) {
 			// well, only if empty
 			if (count_players_in_instance(inst, TRUE, NULL) == 0) {
 				delete_instance(inst);
@@ -1870,7 +1900,9 @@ void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, in
 * @param any_vnum idnum The instance id.
 * @return struct instance_data* The instance.
 */
-static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {	
+static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {
+	void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part);
+	
 	struct instance_data *inst;
 	char line[256], str_in[256];
 	int i_in[3];
@@ -1910,9 +1942,24 @@ static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'D': {	// delayed load data
+				if (sscanf(line, "D %d %d", &i_in[0], &i_in[1]) != 2) {
+					log("SYSERR: Format error in D line of instance, got %s", line);
+					exit(1);
+				}
+				
+				inst->dir = i_in[0];
+				inst->rotation = i_in[1];
+				
+				break;
+			}
+			case 'L': {	// delayed linking rule
+				parse_link_rule(fl, &inst->rule, "instance");
+				break;
+			}
 			case 'R': {
 				if (sscanf(line, "R %d", &i_in[0]) != 1) {
-					log("SYSERR: Format error in R line of instance, gotL %s", line);
+					log("SYSERR: Format error in R line of instance, got %s", line);
 					exit(1);
 				}
 				
@@ -1992,7 +2039,7 @@ static void renum_instances(void) {
 		}
 		
 		// check bad instance
-		if (!inst->location || !inst->start) {
+		if (!inst->location || (!inst->start && !IS_SET(inst->flags, INST_NEEDS_LOAD))) {
 			delete_instance(inst);
 		}
 	}
@@ -2043,6 +2090,8 @@ void load_instances(void) {
 * Writes all instances to the instance file.
 */
 void save_instances(void) {
+	void write_linking_rules_to_file(FILE *fl, char letter, struct adventure_link_rule *list);
+	
 	struct instance_data *inst;
 	FILE *fl;
 	int iter;
@@ -2061,6 +2110,16 @@ void save_instances(void) {
 		fprintf(fl, "#%d\n", inst->id);
 		fprintf(fl, "%d %d %d %s\n", GET_ADV_VNUM(inst->adventure), inst->location ? GET_ROOM_VNUM(inst->location) : NOWHERE, inst->start ? GET_ROOM_VNUM(inst->start) : NOWHERE, bitv_to_alpha(inst->flags));
 		fprintf(fl, "%d %ld %ld\n", inst->level, inst->created, inst->last_reset);
+		
+		// 'D' delayed load data
+		if (inst->dir || inst->rotation) {
+			fprintf(fl, "D %d %d\n", inst->dir, inst->rotation);
+		}
+		
+		// 'L' delayed linking rule
+		write_linking_rules_to_file(fl, 'L', inst->rule);
+		
+		// 'R' rooms
 		for (iter = 0; iter < inst->size; ++iter) {
 			if (inst->room[iter]) {
 				fprintf(fl, "R %d\n", GET_ROOM_VNUM(inst->room[iter]));

@@ -593,6 +593,8 @@ The following adventure flags are available:
  NEWBIE-ONLY - Only spawns on newbie islands.
  NO-MOB-CLEANUP - Won't despawn mobs that got out of the instance on cleanup.
  EMPTY-RESET-ONLY - Won't reset while players are inside.
+ CAN-DELAY-LOAD - Saves memory by not loading until a player arrives for the
+    first time.
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
