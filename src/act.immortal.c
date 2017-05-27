@@ -5052,7 +5052,7 @@ ACMD(do_automessage) {
 			}
 			
 			plr = find_player_index_by_idnum(msg->author);
-			snprintf(line, sizeof(line), "%d. %s (%s): %s\r\n", msg->id, part, plr->name, msg->msg);
+			snprintf(line, sizeof(line), "%d. %s (%s): %s\r\n", msg->id, part, plr->fullname, msg->msg);
 			
 			if (size + strlen(line) < sizeof(buf)) {
 				strcat(buf, line);
