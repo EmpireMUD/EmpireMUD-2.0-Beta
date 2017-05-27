@@ -53,12 +53,15 @@ Usage: automessage list
        automessage delete <id>
 
 The automessage system allows you to set messages that will display to all
-players at a set time.
+players at a set time. When you add a one-time or repeating message, there is
+a short "grace period" before the message starts displaying. This gives you
+time to edit typoes or change your mind and delete the message.
 
 Available types are:
   one-time - Displayed once to each player.
   login - Displayed every time a player logs in.
-  repeating - Displayed to each player ever <interval> minutes.
+  repeating - Displayed to each player every <interval> minutes. Players do not
+     necessarily all see repeating messages at the same time.
 
 The message will begin with your mud's name in brackets. You can configure the
 color of this header with the 'automessage_color' game config.
