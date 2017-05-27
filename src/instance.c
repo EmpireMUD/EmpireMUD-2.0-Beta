@@ -1300,7 +1300,7 @@ void prune_instances(void) {
 		
 		// scan only non-map rooms for orphaned instance rooms
 		if (IS_ADVENTURE_ROOM(room) && (!COMPLEX_DATA(room) || !COMPLEX_DATA(room)->instance)) {
-			log("Deleting room %d due to missing instance.", GET_ROOM_VNUM(room));
+			log("Deleting room %d (template %d) due to missing instance.", GET_ROOM_VNUM(room), GET_ROOM_TEMPLATE(room) ? GET_RMT_VNUM(GET_ROOM_TEMPLATE(room)) : NOTHING);
 			delete_room(room, FALSE);	// must call check_all_exits
 			save = TRUE;
 		}
