@@ -414,11 +414,19 @@ void display_automessages(void) {
 */
 void display_automessages_on_login(char_data *ch) {
 	struct automessage *msg, *next_msg;
+	bool once = FALSE;
 	
 	HASH_ITER(hh, automessages, msg, next_msg) {
 		if (msg->timing != AUTOMSG_ON_LOGIN) {
 			continue;	// only showing 1 type
 		}
+		
+		// leading crlf
+		if (!once) {
+			msg_to_char(ch, "\r\n");
+			once = TRUE;
+		}
+		
 		show_automessage_to_char(ch, msg);
 	}
 }
@@ -447,6 +455,9 @@ void load_automessages(void) {
 	long ts;
 	
 	version = 1;	// default (makes for easier alternate parsing to have version numbers)
+	if (version < 0) {
+		// nothing to do here, but it prevents a compiler warning until version is used
+	}
 	
 	if (!(fl = fopen(AUTOMESSAGE_FILE, "r"))) {
 		return;	// there are no messages

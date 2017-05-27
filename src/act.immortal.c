@@ -5030,7 +5030,7 @@ ACMD(do_automessage) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	char cmd_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], id_arg[MAX_STRING_LENGTH];
 	struct automessage *msg, *next_msg;
-	int id, iter, type, interval;
+	int id, iter, type, interval = 5;
 	player_index_data *plr;
 	size_t size;
 	

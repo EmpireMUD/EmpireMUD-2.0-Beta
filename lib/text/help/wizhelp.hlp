@@ -45,6 +45,23 @@ Examples:
 
 See also: GOTO
 #d
+AUTOMESSAGE AUTOMSG
+
+Usage: automessage list
+       automessage add <type> [interval] <msg>
+       automessage change <id> <property> <new val>
+       automessage delete <id>
+
+The automessage system allows you to set messages that will display to all
+players at a set time.
+
+Available types are:
+  one-time - Displayed once to each player.
+  on-login - Displayed every time a player logs in.
+  repeating - Displayed to each player ever <interval> minutes.
+
+See also: MESSAGES
+#d
 AUTOWIZ
 
 Usage:  autowiz

@@ -1060,6 +1060,13 @@ Workforce.
 
 See also: WORKFORCE
 #
+MESSAGES
+
+Usage:  messages
+
+This displays any system messages from the last 24 hours, plus any messages
+that are set to show on login or on auto-repeat.
+#
 METERS "COMBAT METERS"
 
 Usage:  meters
