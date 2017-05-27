@@ -180,8 +180,7 @@ void init_adventure(adv_data *adv) {
 */
 void parse_adventure(FILE *fl, adv_vnum vnum) {
 	int int_in[4];
-	char line[256], str_in[256], str_in2[256];
-	struct adventure_link_rule *link, *last_link = NULL;
+	char line[256], str_in[256];
 	adv_data *adv, *find;
 
 	CREATE(adv, adv_data, 1);
@@ -264,8 +263,7 @@ void parse_adventure(FILE *fl, adv_vnum vnum) {
 * @param adv_data *adv The thing to save.
 */
 void write_adventure_to_file(FILE *fl, adv_data *adv) {
-	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
-	struct adventure_link_rule *link;
+	char temp[MAX_STRING_LENGTH];
 	
 	if (!fl || !adv) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_adventure_to_file called without %s", !fl ? "file" : "adventure");
