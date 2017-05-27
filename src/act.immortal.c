@@ -5024,6 +5024,7 @@ ACMD(do_automessage) {
 	extern int new_automessage_id();
 	void free_automessage(struct automessage *msg);
 	void save_automessages(void);
+	extern int sort_automessage_by_data(struct automessage *a, struct automessage *b);
 	extern const char *automessage_types[];
 	extern struct automessage *automessages;
 	
@@ -5116,6 +5117,7 @@ ACMD(do_automessage) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s added automessage %d: %s", GET_NAME(ch), msg->id, msg->msg);
 		msg_to_char(ch, "You create a new message %d: %s\r\n", msg->id, NULLSAFE(msg->msg));
 		
+		HASH_SORT(automessages, sort_automessage_by_data);
 		save_automessages();
 	}
 	else if (is_abbrev(cmd_arg, "change")) {
@@ -5151,6 +5153,7 @@ ACMD(do_automessage) {
 				msg->interval = 5;	// safe default
 			}
 			msg->timing = type;
+			HASH_SORT(automessages, sort_automessage_by_data);
 			save_automessages();
 		}
 		else if (is_abbrev(type_arg, "interval")) {

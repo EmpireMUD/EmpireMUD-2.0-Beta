@@ -357,6 +357,23 @@ int sort_automessage_by_id(struct automessage *a, struct automessage *b) {
 }
 
 
+// quick-sorter by type/time
+int sort_automessage_by_data(struct automessage *a, struct automessage *b) {
+	// sort one-time to the top
+	if (a->timing != b->timing) {
+		if (a->timing == AUTOMSG_ONE_TIME) {
+			return -1;
+		}
+		if (b->timing == AUTOMSG_ONE_TIME) {
+			return -1;
+		}
+	}
+	
+	// otherwise sort by timestamp
+	return a->timestamp - b->timestamp;
+}
+
+
 /**
 * Checks if anybody needs an automessage, and sends it.
 */
@@ -515,7 +532,7 @@ void load_automessages(void) {
 
 int new_automessage_id(void) {
 	struct automessage *msg, *next_msg;
-	int last = 0;
+	int last = 0, found = 0;
 	
 	if (max_automessage_id < MAX_INT) {
 		return ++max_automessage_id;
@@ -525,9 +542,15 @@ int new_automessage_id(void) {
 		HASH_SORT(automessages, sort_automessage_by_id);
 		HASH_ITER(hh, automessages, msg, next_msg) {
 			if (msg->id > last + 1) {
-				return last + 1;
+				found = last + 1;
 			}
 			last = msg->id;
+		}
+		
+		// sort back
+		HASH_SORT(automessages, sort_automessage_by_data);
+		if (found) {
+			return found;
 		}
 	}
 	
