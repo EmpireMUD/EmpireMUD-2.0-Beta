@@ -2500,7 +2500,7 @@ void b5_1_global_update(void) {
 		if (IS_SET(GET_ADV_FLAGS(adv), ADV_IN_DEVELOPMENT)) {
 			continue;	// skip in-dev
 		}
-		if (IS_SET(GET_ADV_FLAGS(adv), ADV_CAN_DELAY_LOAD)) {
+		if (!IS_SET(GET_ADV_FLAGS(adv), ADV_CAN_DELAY_LOAD)) {
 			continue;	// only want delayables
 		}
 		
