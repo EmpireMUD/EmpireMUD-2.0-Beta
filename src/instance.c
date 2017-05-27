@@ -460,6 +460,12 @@ void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventu
 	struct exit_template *ex;
 	int iter, pos;
 	
+	REMOVE_BIT(inst->flags, INST_NEEDS_LOAD);
+	
+	if (!inst->location) {
+		return;
+	}
+	
 	// this is sometimes larger than it needs to be (and that's ok)
 	inst->size = (GET_ADV_END_VNUM(adv) - GET_ADV_START_VNUM(adv)) + 1;
 	CREATE(room_list, room_data*, inst->size);
