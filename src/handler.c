@@ -1319,7 +1319,7 @@ void char_to_room(char_data *ch, room_data *room) {
 	}
 	else {
 		// check if it needs an instance setup
-		if ((inst = find_instance_by_room(room, FALSE)) && IS_SET(inst->flags, INST_NEEDS_LOAD)) {
+		if (!IS_NPC(ch) && (inst = find_instance_by_room(room, FALSE)) && IS_SET(inst->flags, INST_NEEDS_LOAD)) {
 			instantiate_rooms(inst->adventure, inst, inst->rule, room, inst->dir, inst->rotation);
 			reset_instance(inst);
 		}
