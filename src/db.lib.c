@@ -346,7 +346,7 @@ void write_adventure_to_file(FILE *fl, adv_data *adv) {
 */
 void show_automessage_to_char(char_data *ch, struct automessage *msg) {
 	if (msg->msg && *msg->msg) {
-		msg_to_char(ch, "[MESSAGE] %s\r\n", msg->msg);
+		msg_to_char(ch, "[%s%s&0] %s\r\n", config_get_string("automessage_color"), config_get_string("mud_name"), msg->msg);
 	}
 }
 

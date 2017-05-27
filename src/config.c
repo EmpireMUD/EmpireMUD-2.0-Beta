@@ -1596,6 +1596,7 @@ void init_config_system(void) {
 
 	// game configs
 	init_config(CONFIG_GAME, "allow_extended_color_codes", CONFTYPE_BOOL, "if on, players can use \t&[F000] and \t&[B000]");
+	init_config(CONFIG_GAME, "automessage_color", CONFTYPE_SHORT_STRING, "color code for automessage (like &&c)");
 	init_config(CONFIG_GAME, "hiring_builders", CONFTYPE_BOOL, "whether the mud is hiring builders");
 	init_config(CONFIG_GAME, "hiring_coders", CONFTYPE_BOOL, "whether the mud is hiring coders");
 	init_config(CONFIG_GAME, "mud_contact", CONFTYPE_SHORT_STRING, "email address of an admin");
