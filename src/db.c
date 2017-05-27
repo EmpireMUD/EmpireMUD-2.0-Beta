@@ -2484,12 +2484,33 @@ PLAYER_UPDATE_FUNC(b5_1_update_players) {
 
 
 // b5.1 convert resource action vnums (all resource actions += 1000)
-void b5_1_resource_action_update(void) {
+void b5_1_global_update(void) {
+	void delete_instance(struct instance_data *inst);	// instance.c
+	
+	struct instance_data *inst, *next_inst;
 	craft_data *craft, *next_craft;
+	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
 	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
 	struct resource_data *res;
+	
+	// adventures
+	HASH_ITER(hh, adventure_table, adv, next_adv) {
+		if (IS_SET(GET_ADV_FLAGS(adv), ADV_IN_DEVELOPMENT)) {
+			continue;	// skip in-dev
+		}
+		if (IS_SET(GET_ADV_FLAGS(adv), ADV_CAN_DELAY_LOAD)) {
+			continue;	// only want delayables
+		}
+		
+		// delete 'em
+		LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+			if (inst->adventure == adv) {
+				delete_instance(inst);
+			}
+		}
+	}
 	
 	// crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
@@ -2757,8 +2778,8 @@ void check_version(void) {
 		}
 		// beta5
 		if (MATCH_VERSION("b5.1")) {
-			log("Updating actions/affects to b5.1 vnums...");
-			b5_1_resource_action_update();
+			log("Updating to b5.1...");
+			b5_1_global_update();
 		}
 	}
 	
