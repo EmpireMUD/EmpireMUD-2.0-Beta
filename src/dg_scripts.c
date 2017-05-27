@@ -3831,7 +3831,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						extern const char *wear_bits[];
 						int pos;
 						if (subfield && *subfield && (pos = search_block(subfield, wear_bits, FALSE))) {
-							snprintf(str, slen, "%d", CAN_WEAR(obj, BIT(pos)) ? 1 : 0);
+							snprintf(str, slen, "%d", CAN_WEAR(o, BIT(pos)) ? 1 : 0);
 						}
 						else {
 							strcpy(str, "0");
@@ -4040,7 +4040,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'w': {	// obj.w*
 					if (!str_cmp(field, "wearable")) {
-						snprintf(str, slen, "%d", (GET_OBJ_WEAR(obj) & ~ITEM_WEAR_TAKE) ? 1 : 0);
+						snprintf(str, slen, "%d", (GET_OBJ_WEAR(o) & ~ITEM_WEAR_TAKE) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "worn_by")) {
 						if (o->worn_by)
