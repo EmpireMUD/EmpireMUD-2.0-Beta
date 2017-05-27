@@ -57,7 +57,7 @@ players at a set time.
 
 Available types are:
   one-time - Displayed once to each player.
-  on-login - Displayed every time a player logs in.
+  login - Displayed every time a player logs in.
   repeating - Displayed to each player ever <interval> minutes.
 
 See also: MESSAGES

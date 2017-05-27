@@ -408,26 +408,26 @@ void display_automessages(void) {
 
 
 /**
-* Looks for on-login messages to send to a player who just logged in.
+* Looks for login messages to send to a player who just logged in.
 *
 * @param char_data *ch The player.
 */
 void display_automessages_on_login(char_data *ch) {
 	struct automessage *msg, *next_msg;
-	bool once = FALSE;
+	bool any = FALSE;
 	
 	HASH_ITER(hh, automessages, msg, next_msg) {
 		if (msg->timing != AUTOMSG_ON_LOGIN) {
 			continue;	// only showing 1 type
 		}
 		
-		// leading crlf
-		if (!once) {
-			msg_to_char(ch, "\r\n");
-			once = TRUE;
-		}
-		
 		show_automessage_to_char(ch, msg);
+		any = TRUE;
+	}
+		
+	// trailing crlf
+	if (any) {
+		msg_to_char(ch, "\r\n");
 	}
 }
 

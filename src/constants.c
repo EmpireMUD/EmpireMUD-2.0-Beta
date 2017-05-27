@@ -3167,7 +3167,7 @@ const bitvector_t *trig_argument_type_list[] = {
 // AUTOMSG_x: automessage types
 const char *automessage_types[] = {
 	"one-time",
-	"on-login",
+	"login",
 	"repeating",
 	"\n"
 };
