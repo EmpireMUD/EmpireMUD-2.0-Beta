@@ -60,7 +60,10 @@ Available types are:
   login - Displayed every time a player logs in.
   repeating - Displayed to each player ever <interval> minutes.
 
-See also: MESSAGES
+The message will begin with your mud's name in brackets. You can configure the
+color of this header with the 'automessage_color' game config.
+
+See also: CONFIGURE, MESSAGES
 #d
 AUTOWIZ
 
