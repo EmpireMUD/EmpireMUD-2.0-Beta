@@ -108,22 +108,31 @@ void free_varlist(struct trig_var_data *vd) {
 * shutting down.
 */
 void free_trigger(trig_data *trig) {
-	if (trig->name) {
-		free(trig->name);
-		trig->name = NULL;
-	}
-
-	if (trig->arglist) {
-		free(trig->arglist);
-		trig->arglist = NULL;
-	}
-	if (trig->var_list) {
-		free_varlist(trig->var_list);
-		trig->var_list = NULL;
-	}
-	if (GET_TRIG_WAIT(trig))
+	trig_data *proto = real_trigger(GET_TRIG_VNUM(trig));
+	struct cmdlist_element *cmd, *next_cmd;
+	
+	if (GET_TRIG_WAIT(trig)) {
 		event_cancel(GET_TRIG_WAIT(trig));
-
+	}
+	
+	if (trig->name && (!proto || trig->name != proto->name)) {
+		free(trig->name);
+	}
+	if (trig->arglist && (!proto || trig->arglist != proto->arglist)) {
+		free(trig->arglist);
+	}
+	if (trig->var_list && (!proto || trig->var_list != proto->var_list)) {
+		free_varlist(trig->var_list);
+	}
+	if (trig->cmdlist && (!proto || trig->cmdlist != proto->cmdlist)) {
+		LL_FOREACH_SAFE(trig->cmdlist, cmd, next_cmd) {
+			if (cmd->cmd) {
+				free(cmd->cmd);
+			}
+			free(cmd);
+		}
+	}
+	
 	free(trig);
 }
 

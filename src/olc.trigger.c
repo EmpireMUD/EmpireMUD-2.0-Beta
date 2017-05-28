@@ -750,7 +750,7 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 	
 	trig_data *proto, *live_trig, *next_trig, *find, *trig = GET_OLC_TRIGGER(desc);
 	trig_vnum vnum = GET_OLC_VNUM(desc);
-	struct cmdlist_element *cmd, *next_cmd;
+	struct cmdlist_element *cmd, *next_cmd, *cmdlist;
 	struct script_data *sc;
 	bool free_text = FALSE;
 	UT_hash_handle hh;
@@ -761,18 +761,33 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 		proto = create_trigger_table_entry(vnum);
 	}
 	
-	// find any 'waiting' copies and kill them
+	// build new cmdlist
+	cmdlist = compile_command_list(script_text);
+	
+	// update live triggers
 	LL_FOREACH_SAFE2(trigger_list, live_trig, next_trig, next_in_world) {
 		if (GET_TRIG_VNUM(live_trig) != vnum) {
 			continue;	// wrong trigger
 		}
 		
+		// find any 'waiting' copies and kill them
 		if (GET_TRIG_WAIT(live_trig)) {
 			event_cancel(GET_TRIG_WAIT(live_trig));
 			GET_TRIG_WAIT(live_trig) = NULL;
 			GET_TRIG_DEPTH(live_trig) = 0;
 			free_varlist(GET_TRIG_VARS(live_trig));
 			GET_TRIG_VARS(live_trig) = NULL;
+		}
+		
+		// check pointers
+		if (live_trig->name == proto->name) {
+			live_trig->name = trig->name;
+		}
+		if (live_trig->arglist == proto->arglist) {
+			live_trig->arglist = trig->arglist;
+		}
+		if (live_trig->cmdlist == proto->cmdlist) {
+			live_trig->cmdlist = cmdlist;
 		}
 	}
 	
@@ -791,6 +806,9 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 	if (proto->name) {
 		free(proto->name);
 	}
+	if (proto->var_list) {
+		free_varlist(proto->var_list);
+	}
 	
 	if (!*script_text) {
 		// do not free old script text
@@ -799,7 +817,7 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 	}
 	
 	// Recompile the command list from the new script
-	trig->cmdlist = compile_command_list(script_text);
+	trig->cmdlist = cmdlist;
 	
 	if (free_text) {
 		free(script_text);
@@ -808,9 +826,9 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 
 	// make the prorotype look like what we have
 	hh = proto->hh;	// preserve hash handle
-	trig_data_copy(proto, trig);
+	*proto = *trig;
 	proto->hh = hh;
-	proto->vnum = vnum;	// ensure correct vnu,
+	proto->vnum = vnum;	// ensure correct vnum
 	
 	// remove and reattach existing copies of this trigger
 	LL_FOREACH_SAFE2(trigger_list, live_trig, next_trig, next_in_world) {
