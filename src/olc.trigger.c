@@ -761,6 +761,18 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 		proto = create_trigger_table_entry(vnum);
 	}
 	
+	// find any 'waiting' copies and kill them
+	LL_FOREACH_SAFE2(trigger_list, live_trig, next_trig, next_in_world) {
+		if (GET_TRIG_VNUM(live_trig) != vnum) {
+			continue;	// wrong trigger
+		}
+		
+		if (GET_TRIG_WAIT(live_trig)) {
+			event_cancel(GET_TRIG_WAIT(live_trig));
+			GET_TRIG_WAIT(live_trig) = NULL;
+		}
+	}
+	
 	// free existing commands
 	for (cmd = proto->cmdlist; cmd; cmd = next_cmd) { 
 		next_cmd = cmd->next;
