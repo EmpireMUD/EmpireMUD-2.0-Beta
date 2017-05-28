@@ -1302,12 +1302,11 @@ void char_from_room(char_data *ch) {
 * @param room_data *room The place to put 'em
 */
 void char_to_room(char_data *ch, room_data *room) {
+	void check_instance_is_loaded(struct instance_data *inst);
 	extern int determine_best_scale_level(char_data *ch, bool check_group);
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
-	void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
 	extern int lock_instance_level(room_data *room, int level);
 	void msdp_update_room(char_data *ch);
-	void reset_instance(struct instance_data *inst);
 	void spawn_mobs_from_center(room_data *center);
 	
 	int pos;
@@ -1318,10 +1317,9 @@ void char_to_room(char_data *ch, room_data *room) {
 		log("SYSERR: Illegal value(s) passed to char_to_room. (Room :%p, Ch: %p)", room, ch);
 	}
 	else {
-		// check if it needs an instance setup
-		if (!IS_NPC(ch) && (inst = find_instance_by_room(room, FALSE)) && IS_SET(inst->flags, INST_NEEDS_LOAD)) {
-			instantiate_rooms(inst->adventure, inst, inst->rule, room, inst->dir, inst->rotation);
-			reset_instance(inst);
+		// check if it needs an instance setup (before putting the character there)
+		if (!IS_NPC(ch) && (inst = find_instance_by_room(room, FALSE))) {
+			check_instance_is_loaded(inst);
 		}
 		
 		// sanitation: remove them from the old room first

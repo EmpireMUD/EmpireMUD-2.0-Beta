@@ -2420,14 +2420,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					snprintf(str, slen, "%d", inst->id);
 				}
 				else if (!str_cmp(field, "load")) {
-					void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
-					void reset_instance(struct instance_data *inst);
-					
-					if (IS_SET(inst->flags, INST_NEEDS_LOAD) && inst->location) {
-						instantiate_rooms(inst->adventure, inst, inst->rule, inst->location, inst->dir, inst->rotation);
-						reset_instance(inst);
-					}
+					void check_instance_is_loaded(struct instance_data *inst);
+					check_instance_is_loaded(inst);
 					strcpy(str, "1");
+				}
+				else if (!str_cmp(field, "loaded")) {
+					snprintf(str, slen, "%d", IS_SET(inst->flags, INST_NEEDS_LOAD) ? 0 : 1);
 				}
 				else if (!str_cmp(field, "level")) {
 					extern int lock_instance_level(room_data *room, int level);

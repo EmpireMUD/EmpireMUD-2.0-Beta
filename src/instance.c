@@ -1467,6 +1467,22 @@ bool can_instance(adv_data *adv) {
 
 
 /**
+* Checks if the instance needs a delayed-load and, if so, does it.
+*
+* @param struct instance_data *inst The instance to check/load.
+*/
+void check_instance_is_loaded(struct instance_data *inst) {
+	void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
+	void reset_instance(struct instance_data *inst);
+	
+	if (IS_SET(inst->flags, INST_NEEDS_LOAD) && inst->location) {
+		instantiate_rooms(inst->adventure, inst, inst->rule, inst->location, inst->dir, inst->rotation);
+		reset_instance(inst);
+	}
+}
+
+
+/**
 * @param adv_data *adv The adventure to count.
 * @return int The number of active instances of that adventure.
 */
@@ -1618,6 +1634,7 @@ room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum) {
 	}
 	
 	if (closest) {
+		check_instance_is_loaded(closest);
 		return find_room_template_in_instance(closest, vnum);
 	}
 	else {
