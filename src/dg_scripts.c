@@ -4004,6 +4004,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					break;
 				}
+				case 'q': {	// obj.q*
+					if (!str_cmp(field, "quest")) {
+						snprintf(str, slen, "%d", GET_OBJ_REQUIRES_QUEST(obj) > 0 ? GET_OBJ_REQUIRES_QUEST(obj) : 0);
+					}
+					break;
+				}
 				case 'r': {	// obj.r*
 					if (!str_cmp(field, "room")) {
 						if (obj_room(o))

@@ -169,6 +169,7 @@ When using field  - The variable returns:
 &cname&0 - The list of key words of the object.
 &cnext_in_list&0 - The id of the next object in the inventory/room, or an
    empty return
+&cquest&0 - If it's a quest obj, this gives the quest vnum (0 if not).
 &croom&0 - Returns the room id the object is in.
 &cshortdesc&0 - The name of the object that players see.
 &csize&0 - Inventory size of the object.
