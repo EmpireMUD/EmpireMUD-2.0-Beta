@@ -774,6 +774,9 @@ if !%instance.location%
   halt
 end
 mgoto %instance.location%
+mmove
+mmove
+mmove
 ~
 #10561
 Frost flower fake plant~

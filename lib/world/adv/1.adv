@@ -104,7 +104,7 @@ or in groups of up to four. All gear looted from this adventure will be higher
 quality on harder difficulties.
 ~
 10550 10599 75-125
-25 0 cg 4
+25 0 cgk 4
 L
 4 0
 10550 10550 10550
@@ -282,7 +282,7 @@ and from Bangles the thief. Collect dragon tokens to spend at the vendor who
 appears when you finish any of the quests.
 ~
 10900 10949 250-300
-5 0 k 4
+5 0 0 4
 L
 5 0
 1440 -1 -1
@@ -409,7 +409,7 @@ tower are designed for different level ranges, so use the 'consider' command
 judiciously before you attack things.
 ~
 10030 10099 30-200
-1 240 0 0
+1 240 k 0
 L
 1 0
 10030 -1 -1
@@ -464,6 +464,22 @@ L
 1 a
 10400 -1 -1
 0 de de
+S
+#171
+Midgourd~
+CircleMUD, DikuMUD, Paul Clarke~
+Add notes on how to link this adventure; ship it with IN-DEV
+~
+10600 10699 0-0
+1 15 0 0
+L
+3 0
+10600 10605 10606
+-1 0 0
+L
+5 0
+10080 -1 -1
+-1 0 0
 S
 #180
 Misplaced Mother Goose~
