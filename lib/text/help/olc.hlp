@@ -113,6 +113,10 @@ Abilities (ABILEDIT):
   (superior). Do not apply mastery abilities to abilities that don't need this.
 
 Adventures (ADVEDIT):
+- You should use the CAN-DELAY-LOAD flag whenever possible. This will reduce
+  work (and lag) from having many copies of the adventure by not loading the
+  interior until a player arrives. However, some types of adventures won't work
+  correctly if they don't load immediately (like the Magiterranean Whirlwind).
 - When you set a min/max level for the adventure, mobs and items that don't
   have their own level limits will inherit the limits from the adventure.
 - If you plan to use obj/room scripts that will do scaled damage, you should

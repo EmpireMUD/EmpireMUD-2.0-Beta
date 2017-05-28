@@ -2419,6 +2419,24 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				else if (!str_cmp(field, "id")) {
 					snprintf(str, slen, "%d", inst->id);
 				}
+				else if (!str_cmp(field, "load")) {
+					void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
+					void reset_instance(struct instance_data *inst);
+					
+					if (IS_SET(inst->flags, INST_NEEDS_LOAD) && inst->location) {
+						instantiate_rooms(inst->adventure, inst, inst->rule, inst->location, inst->dir, inst->rotation);
+						reset_instance(inst);
+					}
+					strcpy(str, "1");
+				}
+				else if (!str_cmp(field, "level")) {
+					extern int lock_instance_level(room_data *room, int level);
+					
+					if (subfield && *subfield && inst->start && atoi(subfield) > 0) {
+						lock_instance_level(inst->start, atoi(subfield));
+					}
+					snprintf(subfield, slen, "%d", inst->level);
+				}
 				else if (!str_cmp(field, "location")) {
 					if (inst->location) {
 						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(inst->location) + ROOM_ID_BASE);
