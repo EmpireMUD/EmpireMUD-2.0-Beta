@@ -307,6 +307,9 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	for (mob = character_list; mob; mob = mob->next) {
 		if (IS_NPC(mob) && SCRIPT(mob)) {
 			remove_live_script_by_vnum(SCRIPT(mob), vnum);
+			if (!TRIGGERS(SCRIPT(mob))) {
+				extract_script(mob, MOB_TRIGGER);
+			}
 		}
 	}
 	
@@ -314,6 +317,9 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	for (obj = object_list; obj; obj = obj->next) {
 		if (SCRIPT(obj)) {
 			remove_live_script_by_vnum(SCRIPT(obj), vnum);
+			if (!TRIGGERS(SCRIPT(obj))) {
+				extract_script(obj, OBJ_TRIGGER);
+			}
 		}
 	}
 	
@@ -321,19 +327,25 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	LL_FOREACH(vehicle_list, veh) {
 		if (SCRIPT(veh)) {
 			remove_live_script_by_vnum(SCRIPT(veh), vnum);
+			if (!TRIGGERS(SCRIPT(veh))) {
+				extract_script(veh, VEH_TRIGGER);
+			}
 		}
 	}
-	
-	// remove from hash table (AFTER deleting live copies)
-	remove_trigger_from_table(trig);
 	
 	// look for live rooms with this trigger
 	HASH_ITER(hh, world_table, room, next_room) {
 		if (SCRIPT(room)) {
 			remove_live_script_by_vnum(SCRIPT(room), vnum);
+			if (!TRIGGERS(SCRIPT(room))) {
+				extract_script(room, WLD_TRIGGER);
+			}
 		}
 		delete_from_proto_list_by_vnum(&(room->proto_script), vnum);
 	}
+	
+	// remove from hash table (AFTER deleting live copies)
+	remove_trigger_from_table(trig);
 	
 	// remove from adventures
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
