@@ -2146,7 +2146,7 @@ ACMD(do_load_vehicle) {
 		}
 		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
 			snprintf(buf, sizeof(buf), "You can't load $v %sto anything.", IN_OR_ON(cont));
-			act(buf, FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
+			act(buf, FALSE, ch, veh, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
 		}
 		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
 			msg_to_char(ch, "You can't load that %sto vehicles.\r\n", IN_OR_ON(cont));

@@ -106,7 +106,7 @@ Cooldown:  30 seconds
 
 This power purges a vampire's blood of any poisons, by sweating them out.
 #
-"READY BLOOD WEAPONS" BLOODMACE BLOODSKEAN BLOODSPEAR BLOODSWORD
+"READY BLOOD WEAPONS" BLOODMACE BLOODSKEAN BLOODSPEAR BLOODSWORD BLOODSTAFF
 
 Ready Blood Weapons (Vampire ability)
 
@@ -174,8 +174,8 @@ to do simple tasks. The task can be just one word, which must be spoken aloud
 by the vampire and understood by the victim. Optionally, the word can be hidden
 in a sentence.
 
-This power only works on human NPCs, but won't work on hard/group mobs. It also
-won't work on mobs who are more powerful than you.
+This power only works on human NPCs, but won't work on hard/group mobs. You
+must be 25 levels above the target in order to command them.
 
 Gains experience when you issue commands.
 #

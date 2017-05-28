@@ -407,7 +407,12 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			msg_to_char(ch, "Holds %d items.\r\n", GET_MAX_CONTAINER_CONTENTS(obj));
 			break;
 		case ITEM_DRINKCON:
-			msg_to_char(ch, "Contains %d units of %s.\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+			if (GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
+				msg_to_char(ch, "Contains %d units of %s.\r\n", GET_DRINK_CONTAINER_CONTENTS(obj), drinks[GET_DRINK_CONTAINER_TYPE(obj)]);
+			}
+			else {
+				msg_to_char(ch, "It is empty.\r\n");
+			}
 			break;
 		case ITEM_FOOD:
 			msg_to_char(ch, "Fills for %d hour%s.\r\n", GET_FOOD_HOURS_OF_FULLNESS(obj), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(obj)));

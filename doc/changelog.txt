@@ -2,7 +2,7 @@ EmpireMUD 2.0 beta Change Log
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-== 2.0 b5 (May, 2017) ==
+== 2.0 b5 (May 30, 2017) ==
 
 Abilities:
 - Ablate: New Battlemage spell with direct damage and a resist-physical debuff.
@@ -162,6 +162,11 @@ when you attack with weapons.
 begin taking stacking DoT damage while under a closed building.
 
 Adventures:
+- 52 Tutorial Quests: Now requires the quest to enter the Soulstream,
+hopefully reducing confusion. Soulstream mobs now have the !EXP flag so they
+can't be used for easy experience gain. Updated the Tower of Souls, the
+adventure description, and the portal into the Soulstream to help newbies
+figure out how to start the tutorials.
 - 100 Magiterranean: The Grove: Changed how this adventure appears on the map.
 The archdruid will now always appear, instead of sometimes not being present.
 - 101 Magiterranean: The Hidden Garden: Updated the token combine trigger to
@@ -208,6 +213,8 @@ sells an item that teleports you to Skycleave. Added missing sign description.
 flee trigger. The King now loads the tree he knocks over into the room, rather
 than trying to carry it in his tiny tiny arms.
 - 170 Hamlet of the Undead: Fiendclaw is now made from bone instead of wood.
+Renamed the trash spawners so they give a better echo when they appear during
+a reset.
 - 180 Misplaced Mother Goose: Jill now resumes following Jack after a reboot.
 - 181 Goblin Mines: A new goblin now sells a coffin which can be used to build
 instant, temporary gravesites with a 6-hour cooldown. Another new goblin now
@@ -240,9 +247,6 @@ instead of max-health.
 items. Typo fixes.
 - 282 Goblin Logging Camp: Fixed an issue where killing the goblins was not
 loading the despawner for the instance.
-- 52 Tutorial Quests: Now requires the quest to enter the Soulstream,
-hopefully reducing confusion. Soulstream mobs now have the !EXP flag so they
-can't be used for easy experience gain.
 - All: Applied the new Player-in-Room type modifier to all scripts that needed
 it.
 - Cleanup: Updated how adventure instances are deleted to correctly relocate
@@ -282,6 +286,8 @@ commands.
 adventure is linked, in addition to the "inside".
 - Timed-out empires: Adventures will no longer spawn on tiles owned by empires
 that are timed out.
+- Tutorials: Added a note on dropping the repeatable quests (The Perfect Rock,
+See Hugo For Advice) if you pass above 15 skill.
 - Various: Added the !drink-blood flag to NPCs that have no blood. Added the
 desert, temperate, and tropical component flags to all fruits and vegetables.
 Boss enrage scripts were updated. Fixed small typoes. Fixed how some loot
@@ -296,7 +302,8 @@ typoes. Updated craft recipes with new abilities. Updated crops with new
 harvest quantities. Updates to building and vehicle health and maintenance
 lists. Updated how loot-replacement objects (e.g. Permafrost high-difficulty
 boss loot) set their binding, to allow group-binding. Also updated 'trinket'-
-type items to be distractable.
+type items to be distractable. Mount whistles now give the name of the mount
+when summoning it.
 
 Affects:
 - DISTRACTED: A new affect type that interrupts timed actions until it wears
@@ -582,6 +589,8 @@ that need maintenance. It can also now target a location or island to show you
 the resources needed for maintenance there.
 - Group: Rearranged the errors so that not being leader of the group is more
 important than other reasons you can't invite someone to a group.
+- Harvest: Fixed a previously unknown crash bug related to logging out while
+harvesting.
 - Helpsearch: Now accepts quotes to search for a "whole phrase". Now supports
 multiple search terms, for a more refined search.
 - Herd: You can no longer herd mobs onto a wall tile. You can no longer herd
@@ -742,6 +751,8 @@ rather than the tokens "$m" and "$e".
 - Commands: The "commands" and "wizhelp" commands now correctly show abilities
 from grants.
 - Confirm: Added an error message if you confirm with no upcoming reboot.
+- Consider: Fixed a bug where players who were under 100 skill level, but over
+100 composite level, saw the wrong level difference on consider.
 - Craft info: Now shows whether an attribute on crafter gear will be positive
 or negative (Awkens).
 - Custom long descriptions: Equipment that gives custom long-descs for male
@@ -764,6 +775,8 @@ from" directions when outside).
 - Esay: Fixed a bug in the double_percents() function that caused, among other
 things, strange behavior when using esay with a % at the end of the string.
 - Excavate: Now displays a message when someone resumes excavating.
+- Etalk: Fixed a bug where the color code was inserted incorrectly in the
+message to other players when using the #rank syntax .
 - Forest: The "build on forest" requirement is now called "full forest" to
 avoid naming confusion.
 - Gender: Certain logs and messages will now show a character's real male/
@@ -789,6 +802,8 @@ Islands can be differentiated (on new EmpireMUDS; existing ones will not get
 this update automatically).
 - Islands: No longer shows empty islands. No longer shows "No Island" in the
 list.
+- Load: Fixed an error where it showed the wrong vehicle name when failing to
+load one vehicle onto another.
 - Long descriptions: Modified how player long descriptions are displayed to
 accommodate custom long descriptions from equipment.
 - Long strings: The game will no longer drop letters from very-long-strings it
@@ -812,6 +827,8 @@ configurable.
 display long prompts, which could (rarely) exceed the limit.
 - Purify: Permissions error now correctly says "toggle bother" rather than
 "nobother".
+- Screenreader: Having this toggle on no longer shuts off color codes, for
+sighted players who sometimes use screenreader mode for various reasons.
 - Sit: Trying to sit while mounted now gives a clearer error message.
 - Skin: Added a missing question mark to "What would you like to skin."
 - Strings of Unusual Length: Fixed a bug where it was possible to see no output
@@ -847,6 +864,13 @@ will also now show (inc) when an immortal is incognito.
 - Workforce: Screenreader users will now get workforce output on separate lines
 instead of in columns. Workforce now better displays the on/off/part status
 based on claims on an island.
+
+Documentation:
+- Changelog: Updated the changelog with all of the b4.x patchnotes.
+- Crashing: Added a doc file for how to deal with crashes.
+- Getting-Started: Added a doc file for setting up a new EmpireMUD.
+- Updating: Wrote a document about updating from b4 to b5.
+- Version number: Updated the code comments and displays to beta5.
 
 Empires:
 - Auto-distrust: Fixed a bug where one-shotting a mob with a special ability
@@ -987,17 +1011,23 @@ ordering.
 Help files:
 - Actions: Added speed boost notes to the help files for timed actions, and
 updated the timed action help file.
+- Attributes: Each attribute now has its own help file.
 - Crops: Added lettuce.
 - Distracted: Added help for this effect.
 - Drunk: Added a new help file for people looking for ways to sober up faster.
 - History: Added a help file that lists chat history commands.
 - Hone: Clarified that you must have the ability to use honed gear.
+- Immortals: Added help files explaining how to make mount and mini-pet
+whistles.
 - Room triggers: Added the %room% variable to help files for room-specific
 triggers.
 - Shadowcage: Removed a duplicate Shadowcage help file that had incorrect
 numbers but was taking precedence over the correct one.
 - Sorting: Changed how help files are sorted so that immortal helps like 'load'
 aren't blocked by mortal helps like 'load'.
+- Speech triggers: Added notes on how to use a wildcard.
+- Stun: Added a help file explaining stuns and stun immunity.
+- Utility shed: Clarified which tools store here.
 - Various: Fixes, updates, typo corrections, and minor updates. Some OLC help
 files were updated to contain lists such as object materials.
 - Workforce: Split the no-work and "workforce where" options into their own
@@ -1199,8 +1229,10 @@ matching superior/hard/group flags when scaled.
 timer changed to/from unlimited. Previously it would always keep its old timer.
 - Bows: Updated the look description to match modern ranged combat systems.
 - Canoe: Added better usage notes to the description of the canoe.
+- Chemist's cleansing cap: Updated the recipe name to match the item name.
 - Cloth: The cloth items are now made from cloth instead of flesh.
 - Coif: Now has correct material type.
+- Coin mill: Removed the confusing adjective 'heavy'.
 - Crafter items: Added tier 3 crafter items, which drop from level 275-374
 "group" mobs. Tier 2's range was updated to 175-274/group. Added missing BoE
 flags to the tier 2 patterns.
@@ -1295,6 +1327,8 @@ locations now show a vnum in the editor.
 wearing-or-has. This allows quests (and socials) to require equipped items.
 Requirements also now support "or" conditions, so quests/socials can have
 different items or tasks that all qualify a player for that quest/social.
+- Resources: Fixed a strange error where commands like ".res add obj 1 foo"
+resulted in adding 1x "bug".
 - Sectors: Inverted the SECTORS olc control flag to !SECTORS to match most of
 the other flags. Builders can now edit sectors by default.
 - Skill trees: Ability names in the tree editor can now be in "quotes".
