@@ -303,9 +303,6 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 		return;
 	}
 	
-	// remove from hash table
-	remove_trigger_from_table(trig);
-	
 	// look for live mobs with this script and remove
 	for (mob = character_list; mob; mob = mob->next) {
 		if (IS_NPC(mob) && SCRIPT(mob)) {
@@ -326,6 +323,9 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 			remove_live_script_by_vnum(SCRIPT(veh), vnum);
 		}
 	}
+	
+	// remove from hash table (AFTER deleting live copies)
+	remove_trigger_from_table(trig);
 	
 	// look for live rooms with this trigger
 	HASH_ITER(hh, world_table, room, next_room) {
