@@ -71,6 +71,7 @@ Vehicles can trigger on the following events:
 &cFinish-Quest&0 - Triggers when a player tries to turn in a quest.
 &cPlayer-in-Room&0 - Modifier: trigger requires a player present.
 &cReboot&0 - Triggers when the mud starts up.
+&cBuy&0 - Triggers when someone tries to buy in the room.
 
 For each type, there is a help file named &yVTRIG <type>&0.
 #d

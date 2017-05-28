@@ -221,17 +221,9 @@ if %veh%
   end
 end
 * once per 30 minutes
-if %actor.varexists(last_hestian_time)%
-  if (%timestamp% - %actor.last_hestian_time%) < 1800
-    eval diff (%actor.last_hestian_time% - %timestamp%) + 1800
-    eval diff2 %diff%/60
-    eval diff %diff%//60
-    if %diff%<10
-      set diff 0%diff%
-    end
-    %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc% again.
-    halt
-  end
+if %actor.cooldown(256)%
+  %send% %actor% %self.shortdesc% is on cooldown.
+  halt
 end
 eval room_var %actor.room%
 %send% %actor% You shake %self.shortdesc% and it begins to swirl with light...
@@ -250,8 +242,7 @@ end
 %teleport% %actor% %actor.home%
 %force% %actor% look
 %echoaround% %actor% %actor.name% appears in a flurry of snow!
-eval last_hestian_time %timestamp%
-remote last_hestian_time %actor.id%
+nop %actor.set_cooldown(256, 1800)%
 nop %actor.cancel_adventure_summon%
 ~
 #10713
@@ -336,20 +327,11 @@ if (%actor.position% != Standing)
   halt
 end
 eval varname summon_%self.vnum%
-eval test %%actor.varexists(%varname%)%%
+eval test %actor.cooldown(10728)%
 * Cooldown
 if %test%
-  eval tt %%actor.%varname%%%
-  if (%timestamp% - %tt%) < 180
-    eval diff (%tt% - %timestamp%) + 180
-    eval diff2 %diff%/60
-    eval diff %diff%//60
-    if %diff%<10
-      set diff 0%diff%
-    end
-    %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc% again.
-    halt
-  end
+  %send% %actor% %self.shortdesc% is on cooldown.
+  halt
 end
 eval ch %room.people%
 while %ch% && !%found%
@@ -399,8 +381,7 @@ if (%actor.room% != %room% || %actor.position% != Standing)
 end
 %send% %actor% You finish your snowman and step back to admire your work.
 %echoaround% %actor% %actor.name% finishes %actor.hisher% snowman and steps back with a satisfied nod.
-eval %varname% %timestamp%
-remote %varname% %actor.id%
+nop %actor.set_cooldown(10728, 180)%
 %load% m 10728
 eval room_var %self.room%
 eval mob %room_var.people%
@@ -928,33 +909,14 @@ if %command% != build
   halt
 end
 eval varname tomb%self.vnum%
-* once per 5 minutes
-eval test %%actor.varexists(%varname%)%%
+* once per 6 hours
+eval test %%actor.cooldown(%self.vnum%)%%
 if %test%
-  eval var %%actor.%varname%%%
-  if (%timestamp% - %var%) < 21600
-    eval diff (%var% - %timestamp%) + 21600
-    eval diff2 %diff%/60
-    eval diff %diff%//60
-    eval diff3 %diff2%/60
-    eval diff2 %diff2% // 60
-    if %diff%<10
-      set diff 0%diff%
-    end
-    if %diff3% == 0
-      %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc% again.
-    else
-      if %diff2% < 10
-        set diff2 0%diff2%
-      end
-      %send% %actor% You must wait %diff3%:%diff2%:%diff% to use %self.shortdesc% again.
-    end
-    return 0
-    halt
-  end
+  %send% %actor% You must wait before using %self.shortdesc% again.
+  return 1
+  halt
 end
-eval %varname% %timestamp%
-remote %varname% %actor.id%
+eval cooldown %%actor.set_cooldown(%self.vnum%, 21600)%
 return 1
 ~
 #10771
@@ -979,5 +941,12 @@ while %obj%
   eval obj %next%
 done
 %load% obj 10771
+~
+#10773
+Goblin raft replacer~
+1 n 100
+~
+%load% veh 10771
+%purge% %self%
 ~
 $

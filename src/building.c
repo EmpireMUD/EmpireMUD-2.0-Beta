@@ -43,6 +43,7 @@ extern struct resource_data *copy_resource_list(struct resource_data *input);
 void delete_room_npcs(room_data *room, struct empire_territory_data *ter);
 void free_complex_data(struct complex_room_data *data);
 extern room_data *create_room();
+extern bool has_learned_craft(char_data *ch, any_vnum vnum);
 void scale_item_to_level(obj_data *obj, int level);
 void stop_room_action(room_data *room, int action, int chore);
 
@@ -795,7 +796,6 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 * @param room_data *room The location being dismantled.
 */
 void process_dismantling(char_data *ch, room_data *room) {
-	extern const char *drinks[];
 	extern const char *pool_types[];
 	
 	struct resource_data *res, *find_res, *next_res, *copy;
@@ -819,7 +819,7 @@ void process_dismantling(char_data *ch, room_data *room) {
 	if (res) {
 		// RES_x: messaging
 		switch (res->type) {
-			// RES_COMPONENT and RES_ACTION aren't possible here
+			// RES_COMPONENT, RES_ACTION, and RES_CURRENCY aren't possible here
 			case RES_OBJECT: {
 				snprintf(buf, sizeof(buf), "You carefully remove %s from the structure.", get_obj_name_by_proto(res->vnum));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
@@ -828,9 +828,9 @@ void process_dismantling(char_data *ch, room_data *room) {
 				break;
 			}
 			case RES_LIQUID: {
-				snprintf(buf, sizeof(buf), "You carefully retrieve %d unit%s of %s from the structure.", res->amount, PLURAL(res->amount), drinks[res->vnum]);
+				snprintf(buf, sizeof(buf), "You carefully retrieve %d unit%s of %s from the structure.", res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				snprintf(buf, sizeof(buf), "$n retrieves some %s from the structure.", drinks[res->vnum]);
+				snprintf(buf, sizeof(buf), "$n retrieves some %s from the structure.", get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
@@ -845,6 +845,13 @@ void process_dismantling(char_data *ch, room_data *room) {
 				snprintf(buf, sizeof(buf), "You regain %d %s point%s from the structure.", res->amount, pool_types[res->vnum], PLURAL(res->amount));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
 				snprintf(buf, sizeof(buf), "$n retrieves %s from the structure.", pool_types[res->vnum]);
+				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				break;
+			}
+			case RES_CURRENCY: {
+				snprintf(buf, sizeof(buf), "You retrieve %d %s from the structure.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+				snprintf(buf, sizeof(buf), "$n retrieves %d %s from the structure.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
@@ -1121,7 +1128,7 @@ ACMD(do_build) {
 	bool junk, wait;
 	
 	// simple rules for ch building a given craft
-	#define CHAR_CAN_BUILD(ch, ttype)  (GET_CRAFT_TYPE((ttype)) == CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)) && (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || has_ability((ch), GET_CRAFT_ABILITY((ttype)))) && (GET_CRAFT_REQUIRES_OBJ(ttype) == NOTHING || get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(ttype), ch->carrying)))
+	#define CHAR_CAN_BUILD(ch, ttype)  (GET_CRAFT_TYPE((ttype)) == CRAFT_TYPE_BUILD && (!IS_SET(GET_CRAFT_FLAGS(ttype), CRAFT_LEARNED) || has_learned_craft(ch, GET_CRAFT_VNUM(ttype))) && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)) && (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || has_ability((ch), GET_CRAFT_ABILITY((ttype)))) && (GET_CRAFT_REQUIRES_OBJ(ttype) == NOTHING || get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(ttype), ch->carrying)))
 	
 	skip_spaces(&argument);
 	

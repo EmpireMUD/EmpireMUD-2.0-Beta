@@ -82,6 +82,10 @@ archetype_data *sorted_archetypes = NULL;	// sorted hash (sorted_hh)
 augment_data *augment_table = NULL;	// master augment hash table
 augment_data *sorted_augments = NULL;	// alphabetic version // sorted_hh
 
+// automessage system
+struct automessage *automessages = NULL;	// hash table (hh, by id)
+int max_automessage_id = 0;	// read from file, permanent max id
+
 // buildings
 bld_data *building_table = NULL;	// building hash table
 
@@ -118,6 +122,10 @@ struct time_info_data time_info;	// the infomation about the time
 struct weather_data weather_info;	// the infomation about the weather
 int wizlock_level = 0;	// level of game restriction
 char *wizlock_message = NULL;	// Message sent to people trying to connect
+
+// generics
+generic_data *generic_table = NULL;	// hash table (hh)
+generic_data *sorted_generics = NULL;	// hash table (sorted_hh)
 
 // global stuff
 struct global_data *globals_table = NULL;	// hash table of global_data
@@ -167,6 +175,9 @@ struct sector_index_type *sector_index = NULL;	// index lists
 struct map_data *last_evo_tile = NULL;	// for resuming map evolutions
 sector_data *last_evo_sect = NULL;	// for resuming map evolutions
 int evos_per_hour = 1;	// how many map tiles evolve per hour (for load-balancing)
+
+// shops
+shop_data *shop_table = NULL;	// hash table of shops (hh)
 
 // skills
 skill_data *skill_table = NULL;	// main skills hash (hh)
@@ -249,6 +260,8 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ QST_PREFIX, QST_SUFFIX },	// DB_BOOT_QST
 	{ SOC_PREFIX, SOC_SUFFIX },	// DB_BOOT_SOC
 	{ FCT_PREFIX, FCT_SUFFIX },	// DB_BOOT_FCT
+	{ GEN_PREFIX, GEN_SUFFIX },	// DB_BOOT_GEN
+	{ SHOP_PREFIX, SHOP_SUFFIX },	// DB_BOOT_SHOP
 };
 
 
@@ -263,6 +276,7 @@ void boot_db(void) {
 	void Read_Invalid_List();
 	void boot_world();
 	void build_all_quest_lookups();
+	void build_all_shop_lookups();
 	void build_player_index();
 	void check_ruined_cities();
 	void check_version();
@@ -271,6 +285,7 @@ void boot_db(void) {
 	void detect_evos_per_hour();
 	void init_config_system();
 	void link_and_check_vehicles();
+	void load_automessages();
 	void load_banned();
 	void load_data_table();
 	void load_intro_screens();
@@ -309,6 +324,9 @@ void boot_db(void) {
 
 	// Load the world!
 	boot_world();
+	
+	log("Loading automessages.");
+	load_automessages();
 
 	log("Loading help entries.");
 	index_boot_help();
@@ -370,6 +388,9 @@ void boot_db(void) {
 	log("Building quest lookup hints.");
 	build_all_quest_lookups();
 	
+	log("Building shop lookup hints.");
+	build_all_shop_lookups();
+	
 	// figure out how often to evolve what (do this late)
 	detect_evos_per_hour();
 	
@@ -424,6 +445,9 @@ void boot_world(void) {
 	extern int sort_socials_by_data(social_data *a, social_data *b);
 
 	// DB_BOOT_x search: boot new types in this function
+	
+	log("Loading generics.");
+	index_boot(DB_BOOT_GEN);
 	
 	log("Loading abilities.");
 	index_boot(DB_BOOT_ABIL);
@@ -493,6 +517,9 @@ void boot_world(void) {
 	
 	log("Loading craft recipes.");
 	index_boot(DB_BOOT_CRAFT);
+	
+	log("Loading shops.");
+	index_boot(DB_BOOT_SHOP);
 	
 	log("Loading quests.");
 	index_boot(DB_BOOT_QST);
@@ -1782,6 +1809,7 @@ const char *versions_list[] = {
 	"b4.36",
 	"b4.38",
 	"b4.39",
+	"b5.1",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2359,6 +2387,185 @@ void b4_39_data_conversion(void) {
 }
 
 
+// b5.1 changes the values of ATYPE_x consts and this updates existing affects
+PLAYER_UPDATE_FUNC(b5_1_update_players) {
+	void check_delayed_load(char_data *ch);
+	void free_var_el(struct trig_var_data *var);
+	
+	struct trig_var_data *var, *next_var;
+	struct over_time_effect_type *dot;
+	struct affected_type *af;
+	bool delete;
+	
+	// some variables from the stock game content
+	const int jungletemple_tokens = 18500;
+	const int roc_tokens_evil = 11003;
+	const int roc_tokens_good = 11004;
+	const int dragtoken_128 = 10900;
+	const int permafrost_tokens_104 = 10550;
+	const int adventureguild_chelonian_tokens = 18200;
+	
+	check_delayed_load(ch);
+	
+	LL_FOREACH(ch->affected, af) {
+		if (af->type < 3000) {
+			af->type += 3000;
+		}
+	}
+	
+	LL_FOREACH(ch->over_time_effects, dot) {
+		if (dot->type < 3000) {
+			dot->type += 3000;
+		}
+	}
+	
+	if (SCRIPT(ch) && SCRIPT(ch)->global_vars) {
+		LL_FOREACH_SAFE(SCRIPT(ch)->global_vars, var, next_var) {
+			// things just being deleted (now using cooldowns)
+			if (!strncmp(var->name, "minipet", 7)) {
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "last_hestian_time")) {
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "last_conveyance_time")) {
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "last_skycleave_trinket_time")) {
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "last_tortoise_time")) {
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "tomb10770")) {
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "summon_10728")) {
+				delete = TRUE;
+			}
+			
+			// things converting to currencies
+			else if (!strcmp(var->name, "jungletemple_tokens")) {
+				add_currency(ch, jungletemple_tokens, atoi(var->value));
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "roc_tokens_evil")) {
+				add_currency(ch, roc_tokens_evil, atoi(var->value));
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "roc_tokens_good")) {
+				add_currency(ch, roc_tokens_good, atoi(var->value));
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "dragtoken_128")) {
+				add_currency(ch, dragtoken_128, atoi(var->value));
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "permafrost_tokens_104")) {
+				add_currency(ch, permafrost_tokens_104, atoi(var->value));
+				delete = TRUE;
+			}
+			else if (!strcmp(var->name, "adventureguild_chelonian_tokens")) {
+				add_currency(ch, adventureguild_chelonian_tokens, atoi(var->value));
+				delete = TRUE;
+			}
+			else {
+				delete = FALSE;
+			}
+			
+			// if requested, delete it
+			if (delete) {
+				LL_DELETE(SCRIPT(ch)->global_vars, var);
+				free_var_el(var);
+			}
+		}
+	}
+}
+
+
+// b5.1 convert resource action vnums (all resource actions += 1000)
+void b5_1_global_update(void) {
+	void delete_instance(struct instance_data *inst);	// instance.c
+	
+	struct instance_data *inst, *next_inst;
+	craft_data *craft, *next_craft;
+	adv_data *adv, *next_adv;
+	bld_data *bld, *next_bld;
+	vehicle_data *veh, *next_veh;
+	room_data *room, *next_room;
+	struct resource_data *res;
+	
+	// adventures
+	HASH_ITER(hh, adventure_table, adv, next_adv) {
+		if (IS_SET(GET_ADV_FLAGS(adv), ADV_IN_DEVELOPMENT)) {
+			continue;	// skip in-dev
+		}
+		if (!IS_SET(GET_ADV_FLAGS(adv), ADV_CAN_DELAY_LOAD)) {
+			continue;	// only want delayables
+		}
+		
+		// delete 'em
+		LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+			if (inst->adventure == adv) {
+				delete_instance(inst);
+			}
+		}
+	}
+	
+	// crafts
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		LL_FOREACH(GET_CRAFT_RESOURCES(craft), res) {
+			if (res->type == RES_ACTION && res->vnum < 100) {
+				res->vnum += 1000;
+				save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
+			}
+		}
+	}
+	
+	// buildings
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		LL_FOREACH(GET_BLD_YEARLY_MAINTENANCE(bld), res) {
+			if (res->type == RES_ACTION && res->vnum < 100) {
+				res->vnum += 1000;
+				save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
+			}
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		LL_FOREACH(VEH_YEARLY_MAINTENANCE(veh), res) {
+			if (res->type == RES_ACTION && res->vnum < 100) {
+				res->vnum += 1000;
+				save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
+			}
+		}
+	}
+	
+	// live rooms
+	HASH_ITER(hh, world_table, room, next_room) {
+		LL_FOREACH(BUILDING_RESOURCES(room), res) {
+			if (res->type == RES_ACTION && res->vnum < 100) {
+				res->vnum += 1000;
+			}
+		}
+	}
+	
+	// live vehicles
+	LL_FOREACH(vehicle_list, veh) {
+		LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
+			if (res->type == RES_ACTION && res->vnum < 100) {
+				res->vnum += 1000;
+			}
+		}
+	}
+	
+	save_whole_world();
+	
+	update_all_players(NULL, b5_1_update_players);
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -2566,8 +2773,13 @@ void check_version(void) {
 			b4_38_tower_triggers();
 		}
 		if (MATCH_VERSION("b4.39")) {
-			log("Converting datat to b4.39 format...");
+			log("Converting data to b4.39 format...");
 			b4_39_data_conversion();
+		}
+		// beta5
+		if (MATCH_VERSION("b5.1")) {
+			log("Updating to b5.1...");
+			b5_1_global_update();
 		}
 	}
 	

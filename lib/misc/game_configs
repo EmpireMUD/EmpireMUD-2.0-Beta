@@ -3,6 +3,7 @@
 *
 * Game configs
 allow_extended_color_codes 0
+automessage_color &y
 hiring_builders 0
 hiring_coders 0
 huh_string Huh?!?

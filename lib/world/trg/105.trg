@@ -10,10 +10,62 @@ dg_affect %actor% INFRA on 300
 ~
 #10501
 Magiterranean Terracrop~
-0 ab 15
+0 in 100
 ~
-if (%self.fighting% || %self.disabled%)
+* pick a crop -- use start of time as jan 1, 2015: 1420070400
+* 2628288 seconds in a month
+eval month ((%timestamp% - 1420070400) / 2628288) // 12
+eval vnum -1
+switch (%month% + 1)
+  case 1
+    eval vnum 10501
+  break
+  case 2
+    eval vnum 10508
+  break
+  case 3
+    eval vnum 10504
+  break
+  case 4
+    eval vnum 10505
+  break
+  case 5
+    eval vnum 10511
+  break
+  case 6
+    eval vnum 10503
+  break
+  case 7
+    eval vnum 10507
+  break
+  case 8
+    eval vnum 10509
+  break
+  case 9
+    eval vnum 10500
+  break
+  case 10
+    eval vnum 10502
+  break
+  case 11
+    eval vnum 10510
+  break
+  case 12
+    eval vnum 10506
+  break
+done
+if (%vnum% == -1)
   halt
+end
+* month change detection
+if %self.varexists(starting_crop_vnum)%
+  if %self.starting_crop_vnum% != %vnum%
+    * Uh-oh
+    set month_change 1
+  end
+else
+  eval starting_crop_vnum %vnum%
+  remote starting_crop_vnum %self.id%
 end
 eval room %self.room%
 if !%instance.location%
@@ -27,67 +79,26 @@ if (%room.template% == 10500 || %dist% > 3 || %room.building% == Fence || %room.
   mgoto %instance.location%
   %echo% %self.name% appears in a swirl of leaf-green mana!
   * Flag for despawn if distance was too far
-  if (%dist% > 3)
-    nop %self.add_mob_flag(SPAWNED)%
-  end
 elseif (%room.empire_id% || (%room.sector% != Plains && %room.sector% != Crop && %room.sector% != Seeded Field && %room.sector% != Jungle Crop && %room.sector% != Jungle Field && !(%room.sector% ~= Forest) && !(%room.sector% ~= Jungle)))
   * No Work
-  halt
+  set no_work 1
 elseif (%room.sector% ~= Crop && (%room.crop% == glowkra || %room.crop% == spadebrush || %room.crop% == magic mushrooms || %room.crop% == pudding figs || %room.crop% == dragonsteeth || %room.crop% == giant beanstalks))
   * No Work -- split in 2 parts for line length limit
-  halt
+  set no_work 1
 elseif (%room.sector% ~= Crop && (%room.crop% == axeroot || %room.crop% == puppy plants || %room.crop% == gemfruit || %room.crop% == bladegrass || %room.crop% == pickthorn || %room.crop% == vigilant vines))
   * No Work -- split in 2 parts for line length limit
-  halt
-else
-  * pick a crop -- use start of time as jan 1, 2015: 1420070400
-  * 2628288 seconds in a month
-  eval month ((%timestamp% - 1420070400) / 2628288) // 12
-  eval vnum -1
-  switch (%month% + 1)
-    case 1
-      eval vnum 10501
-    break
-    case 2
-      eval vnum 10508
-    break
-    case 3
-      eval vnum 10504
-    break
-    case 4
-      eval vnum 10505
-    break
-    case 5
-      eval vnum 10511
-    break
-    case 6
-      eval vnum 10503
-    break
-    case 7
-      eval vnum 10507
-    break
-    case 8
-      eval vnum 10509
-    break
-    case 9
-      eval vnum 10500
-    break
-    case 10
-      eval vnum 10502
-    break
-    case 11
-      eval vnum 10510
-    break
-    case 12
-      eval vnum 10506
-    break
-  done
-  if (%vnum% == -1)
-    halt
-  end
+  set no_work 1
+end
+if !%no_work%
   * do!
-  %terracrop% %room% %vnum%
-  %echo% %self.name% spreads mana over the land and crops begin to grow!
+  if !%month_change%
+    %terracrop% %room% %vnum%
+    %echo% %self.name% spreads mana over the land and crops begin to grow!
+  end
+end
+if %month_change%
+  %at% %instance.location% %echo% The whirlwind collapses in on itself, leaving behind crops!
+  %terracrop% %instance.location% %starting_crop_vnum%
 end
 ~
 #10502
@@ -337,6 +348,9 @@ end
 Aquilo Combat~
 0 k 100
 ~
+if %self.cooldown(10560)%
+  halt
+end
 if %self.affect(BLIND)%
   %echo% %self.name%'s eyes flash blue, and %self.hisher% vision clears!
   dg_affect %self% BLIND off 1
@@ -351,9 +365,9 @@ eval heroic_mode %self.mob_flagged(GROUP)%
 %send% %actor% &r%self.name%'s icy blasts leave a lingering cold which chills you to the bone...
 %echoaround% %actor% %actor.name% shivers under %self.name%'s icy onslaught.
 if %heroic_mode%
-  %dot% %actor% 75 75 magical 10
+  %dot% #10551 %actor% 75 75 magical 10
 else
-  %dot% %actor% 25 75 magical 5
+  %dot% #10551 %actor% 25 75 magical 5
 end
 wait 1 s
 switch %random.3%
@@ -371,9 +385,9 @@ switch %random.3%
     while %person%
       eval test %%person.is_enemy(%self%)%%
       if %test%
-        dg_affect %person% SLOW on 20
+        dg_affect #10552 %person% SLOW on 20
         if %heroic_mode%
-          dg_affect %person% STUNNED on 5
+          dg_affect #10552 %person% STUNNED on 5
         else
           %echo% The ice shatters, but leaves a lingering chill...
         end
@@ -395,7 +409,7 @@ switch %random.3%
     if %heroic_mode%
       %aoe% 100 physical
       %damage% %actor% 400 physical
-      dg_affect %actor% STUNNED on 10
+      dg_affect #10553 %actor% STUNNED on 10
     else
       %aoe% 50 physical
       %damage% %actor% 200 physical
@@ -422,12 +436,15 @@ switch %random.3%
     end
   break
 done
-wait 30 sec
+nop %self.set_cooldown(10560, 30)%
 ~
 #10551
 Permafrost Cryomancer combat~
 0 k 100
 ~
+if %self.cooldown(10560)%
+  halt
+end
 eval heroic_mode %self.mob_flagged(GROUP)%
 switch %random.3%
   case 1
@@ -450,10 +467,10 @@ switch %random.3%
         if %heroic_mode%
           %send% %person% &rYou are chilled to the bone, and can barely see!
           %dot% %person% 50 20 magical
-          dg_affect %person% TO-HIT -%magnitude% 20
+          dg_affect #10554 %person% TO-HIT -%magnitude% 20
         else
           %send% %person% The snow makes it hard to see!
-          dg_affect %person% TO-HIT -%magnitude% 20
+          dg_affect #10554 %person% TO-HIT -%magnitude% 20
         end
       end
       eval person %person.next_in_room%
@@ -470,12 +487,12 @@ switch %random.3%
     if %heroic_mode%
       %send% %actor% You attempt to dig yourself out of the deep, painfully cold snowdrift!
       %dot% %actor% 50 20 magical
-      dg_affect %actor% BLIND on 20
-      dg_affect %actor% STUNNED on 20
+      dg_affect #10555 %actor% BLIND on 20
+      dg_affect #10555 %actor% STUNNED on 20
     else
       %send% %actor% You scramble to pull yourself out of the pile of snow.
-      dg_affect %actor% BLIND on 5
-      dg_affect %actor% STUNNED on 5
+      dg_affect #10555 %actor% BLIND on 5
+      dg_affect #10555 %actor% STUNNED on 5
     end
   break
   case 3
@@ -497,12 +514,15 @@ switch %random.3%
     end
   break
 done
-wait 30 s
+nop %self.set_cooldown(10560, 30)%
 ~
 #10552
 Permafrost Rime Mage Combat~
 0 k 100
 ~
+if %self.cooldown(10560)%
+  halt
+end
 eval heroic_mode %self.mob_flagged(GROUP)%
 switch %random.3%
   case 1
@@ -511,12 +531,12 @@ switch %random.3%
     * Group/Boss: Stun[5]+slow[20]+dot[100%]
     %send% %actor% %self.name% makes an arcane gesture at you, and hoar frost suddenly encases you!
     %echoaround% %actor% %self.name% makes an arcane gesture at %actor.name%, and hoar frost suddenly encases %actor.himher%!
-    dg_affect %actor% SLOW on 20
+    dg_affect #10557 %actor% SLOW on 20
     if %heroic_mode%
-      dg_affect %actor% STUNNED on 5
-      %dot% %actor% 100 20 magical
+      dg_affect #10556 %actor% STUNNED on 5
+      %dot% #10557 %actor% 100 20 magical
     else
-      %dot% %actor% 75 20 magical
+      %dot% #10557 %actor% 75 20 magical
     end
   break
   case 2
@@ -537,7 +557,7 @@ switch %random.3%
         eval test %%person.is_enemy(%self%)%%
         if %test%
           %send% %person% You receive dozens of painful, bleeding wounds!
-          %dot% %person% 100 20 physical
+          %dot% #10558 %person% 100 20 physical
         end
         eval person %person.next_in_room%
       done
@@ -545,7 +565,7 @@ switch %random.3%
       %send% %actor% &rThe rime blades slash you, opening dozens of painful, bleeding wounds!
       %echoaround% %actor% The rime blades slash %actor.name%, opening dozens of bleeding wounds!
       %damage% %actor% 150 physical
-      %dot% %actor% 100 20 physical
+      %dot% #10558 %actor% 100 20 physical
     end
   break
   case 3
@@ -558,18 +578,18 @@ switch %random.3%
     %send% %actor% &r%self.name% lashes out at you with a whip of violet fire, which clings to you and draws your heat away!
     %echoaround% %actor% %self.name% lashes out at %actor.name% with a whip of violet fire! %actor.name% bursts into cold violet flames!
     if %heroic_mode%
-      %dot% %actor% 100 20 magical
+      %dot% #10559 %actor% 100 20 magical
       eval magnitude %actor.level%/10
-      dg_affect %self% HEAL-OVER-TIME %magnitude% 20
+      dg_affect #10559 %self% HEAL-OVER-TIME %magnitude% 20
     else
-      %dot% %actor% 50 20 magical
+      %dot% #10559 %actor% 50 20 magical
       eval magnitude %actor.level%/20
-      dg_affect %self% HEAL-OVER-TIME %magnitude% 20
+      dg_affect #10559 %self% HEAL-OVER-TIME %magnitude% 20
     end
   break
 done
 * Universal cooldown - Fight trigger can't run again until this amount of time has passed.
-wait 30 s
+nop %self.set_cooldown(10560, 30)%
 ~
 #10553
 Permafrost trash combat~
@@ -707,63 +727,6 @@ Frosty delayed despawn~
 ~
 %adventurecomplete%
 ~
-#10556
-Frosty tokens count~
-1 c 2
-count~
-eval test %%actor.obj_target(%arg%)%%
-if %self% != %test%
-  return 0
-  halt
-end
-eval var_name permafrost_tokens_104
-%send% %actor% You count %self.shortdesc%.
-eval test %%actor.varexists(%var_name%)%%
-%echoaround% %actor% %actor.name% counts %self.shortdesc%.
-if %test%
-  eval count %%actor.%var_name%%%
-  if %count% == 1
-    %send% %actor% You have one token.
-  else
-    %send% %actor% You have %count% tokens.
-  end
-else
-  %send% %actor% You have no tokens.
-end
-~
-#10557
-Frosty token load/purge~
-1 gn 100
-~
-eval var_name permafrost_tokens_104
-if !%actor%
-  eval actor %self.carried_by%
-else
-  %send% %actor% You take %self.shortdesc%.
-  %echoaround% %actor% %actor.name% takes %self.shortdesc%.
-  return 0
-end
-if %actor%
-  if %actor.is_npc%
-    * Oops
-    halt
-  end
-  if !%actor.inventory(10556)%
-    %load% obj 10556 %actor% inv
-    %send% %actor% You find a pouch to store your permafrost tokens in.
-  end
-  eval test %%actor.varexists(%var_name%)%%
-  if %test%
-    eval val %%actor.%var_name%%%
-    eval %var_name% %val%+1
-    remote %var_name% %actor.id%
-  else
-    eval %var_name% 1
-    remote %var_name% %actor.id%
-  end
-  %purge% %self%
-end
-~
 #10558
 Frosty trash block higher template id~
 0 s 100
@@ -811,6 +774,9 @@ if !%instance.location%
   halt
 end
 mgoto %instance.location%
+mmove
+mmove
+mmove
 ~
 #10561
 Frost flower fake plant~
@@ -843,7 +809,6 @@ return 1
 Permafrost boss death~
 0 f 100
 ~
-eval var_name permafrost_tokens_104
 * It's a token party and everyone's invited! ...No, not toking.
 eval room %self.room%
 eval person %room.people%
@@ -852,19 +817,7 @@ while %person%
     * You get a token, and you get a token, and YOU get a token!
     %send% %person% As %self.name% dies, %self.hisher% power crystallizes, creating a permafrost token!
     %send% %person% You take the newly created token.
-    if !%person.inventory(10556)%
-      %load% obj 10556 %person% inv
-      %send% %person% You find a pouch to store your permafrost tokens in.
-    end
-    eval test %%person.varexists(%var_name%)%%
-    if %test%
-      eval val %%person.%var_name%%%
-      eval %var_name% %val%+1
-      remote %var_name% %person.id%
-    else
-      eval %var_name% 1
-      remote %var_name% %person.id%
-    end
+    nop %person.give_currency(10550, 1)%
   end
   eval person %person.next_in_room%
 done
@@ -938,117 +891,6 @@ if (!%inter.fore%)
 end
 detach 10566 %self.id%
 ~
-#10567
-Permafrost shop list - vested walrus~
-0 c 0
-list~
-* Are we hidden?
-if %self.aff_flagged(HIDE)%
-  %send% %actor% There's no shop visible here.
-  return 1
-  halt
-end
-* List of items
-%send% %actor% %self.name% sells the following items for permafrost tokens:
-%send% %actor% - polar bear charm (14 tokens, land mount)
-%send% %actor% - penguin charm (16 tokens, aquatic mount)
-%send% %actor% - wyvern charm (40 tokens, flying mount)
-%send% %actor% - polar cub whistle (24 tokens, minipet)
-%send% %actor% - yeti charm (18 tokens, yeti morph)
-%send% %actor% - gossamer sails of the Polar Wind (26 tokens, unique upgraded carrack)
-%send% %actor% - whipping winds of the North pattern (20 tokens, tank weapon)
-%send% %actor% - frozen pykrete sword pattern (20 tokens, melee weapon)
-%send% %actor% - icy star of winter pattern (20 tokens, healer weapon)
-%send% %actor% - glacial staff of the Maelstrom pattern (20 tokens, caster weapon)
-~
-#10568
-Permafrost shop buy - vested walrus~
-0 c 0
-buy~
-* Are we hidden?
-if %self.aff_flagged(HIDE)%
-  %send% %actor% Nobody here is selling anything...
-  return 1
-  halt
-end
-eval vnum -1
-eval cost 0
-set named a thing
-eval currency permafrost_tokens_104
-eval test %%actor.varexists(%currency%)%%
-if !%test%
-  %send% %actor% You don't have any of this shop's currency!
-  halt
-end
-if (!%arg%)
-  %send% %actor% Type 'list' to see what's available.
-  halt
-  * Disambiguate
-elseif polar /= %arg%
-  %send% %actor% Polar bear charm or polar cub whistle?
-  halt
-  * Mounts and pets etc
-elseif polar bear charm /= %arg%
-  eval vnum 10564
-  eval cost 14
-  set named a polar bear charm
-elseif penguin charm /= %arg%
-  eval vnum 10565
-  eval cost 16
-  set named a penguin charm
-elseif wyvern charm /= %arg%
-  eval vnum 10566
-  eval cost 40
-  set named a wyvern charm
-elseif polar cub whistle /= %arg%
-  eval vnum 10567
-  eval cost 24
-  set named a polar cub whistle
-elseif yeti charm /= %arg%
-  eval vnum 10568
-  eval cost 18
-  set named yeti charm
-  * Crafts
-elseif (gossamer sails of the Polar Wind /= %arg%)
-  eval vnum 10569
-  eval cost 26
-  set named the gossamer sails of the Polar Wind
-elseif whipping winds of the North pattern /= %arg%
-  eval vnum 10572
-  eval cost 20
-  set named the whipping winds of the North pattern
-elseif frozen pykrete sword pattern /= %arg%
-  eval vnum 10574
-  eval cost 20
-  set named the frozen pykrete sword pattern
-elseif icy star of winter pattern /= %arg%
-  eval vnum 10576
-  eval cost 20
-  set named the icy star of winter pattern
-elseif glacial staff of the Maelstrom pattern /= %arg%
-  eval vnum 10578
-  eval cost 20
-  set named the glacial staff of the Maelstrom pattern
-else
-  %send% %actor% They don't seem to sell '%arg%' here.
-  halt
-end
-eval var %%actor.%currency%%%
-eval test %var% >= %cost%
-eval correct_noun tokens
-if %cost% == 1
-  eval correct_noun token
-end
-if !%test%
-  %send% %actor% %self.name% tells you, 'You'll need %cost% permafrost %correct_noun% to buy that.'
-  halt
-end
-eval %currency% %var%-%cost%
-remote %currency% %actor.id%
-%load% obj %vnum% %actor% inv %actor.level%
-%send% %actor% You buy %named% for %cost% permafrost %correct_noun%.
-%echoaround% %actor% %actor.name% buys %named%.
-~
 #10569
 Permafrost store appear-check~
 0 hw 100
@@ -1057,10 +899,7 @@ eval cheapest_item_cost 14
 if !%actor.is_pc%
   halt
 end
-if !%actor.varexists(permafrost_tokens_104)%
-  halt
-end
-if %actor.permafrost_tokens_104% < %cheapest_item_cost%
+if %actor.currency(10550)% < %cheapest_item_cost%
   halt
 end
 nop %self.remove_mob_flag(SILENT)%

@@ -34,7 +34,7 @@ switch %random.4%
     %send% %targ% %self.name% shines brightly at you, and you feel re-energized!
     %echoaround% %targ% %self.name% shines brightly at %targ.name%, who looks re-energized!
     eval amount %self.level% / 10
-    dg_affect %targ% MANA-REGEN %amount% 30
+    dg_affect #505 %targ% MANA-REGEN %amount% 30
     wait 25 sec
   break
   case 3
@@ -47,8 +47,8 @@ switch %random.4%
       eval test %%self.is_ally(%ch%)%%
       if %test%
         %send% %ch% You bask in %self.name%'s glow!
-        dg_affect %ch% RESIST-PHYSICAL %amount% 30
-        dg_affect %ch% RESIST-MAGICAL %amount% 30
+        dg_affect #505 %ch% RESIST-PHYSICAL %amount% 30
+        dg_affect #505 %ch% RESIST-MAGICAL %amount% 30
       end
       eval ch %ch.next_in_room%
     done
@@ -70,8 +70,8 @@ switch %random.4%
     %send% %targ% %self.name% shines brightly at you, and you feel the moon's protection!
     %echoaround% %targ% %self.name% shines brightly at %targ.name%, protecting %targ.himher%!
     eval amount %self.level% / 5
-    dg_affect %targ% RESIST-PHYSICAL %amount% 30
-    dg_affect %targ% RESIST-MAGICAL %amount% 30
+    dg_affect #505 %targ% RESIST-PHYSICAL %amount% 30
+    dg_affect #505 %targ% RESIST-MAGICAL %amount% 30
     wait 25 sec
   break
 done
@@ -88,13 +88,13 @@ if !%targ%
   %echo% You feel a chill as %self.name%'s howl echoes out through the air!
   halt
 end
-switch %random.4%
+switch 4
   case 1
     * Dexterity debuff on enemy
     %send% %targ% %self.name% flashes brightly and shoots a bolt of lightning at you!
     %echoaround% %targ% %self.name% flashes brightly and shoots a bolt of lightning at %targ.name%!
     eval amount %self.level% / 100
-    dg_affect %targ% DEXTERITY -%amount% 30
+    dg_affect #507 %targ% DEXTERITY -%amount% 30
     wait 25 sec
   break
   case 2
@@ -102,7 +102,7 @@ switch %random.4%
     %send% %targ% %self.name% howls, followed by a clap of thunder, deafening your ears!
     %echoaround% %targ% %self.name% howls, followed by a clap of thunder, and %targ.name% looks deafened!
     eval amount 15 + %self.level% / 25
-    dg_affect %targ% DODGE -%amount% 30
+    dg_affect #507 %targ% DODGE -%amount% 30
     wait 25 sec
   break
   case 3
@@ -110,7 +110,7 @@ switch %random.4%
     %send% %targ% %self.name% barks at you, and your vision begins to blur!
     %echoaround% %targ% %self.name% barks at %targ.name%, who squints as if %targ.heshe%'s having trouble seeing!
     eval amount 15 + %self.level% / 25
-    dg_affect %targ% TO-HIT -%amount% 30
+    dg_affect #507 %targ% TO-HIT -%amount% 30
     wait 25 sec
   break
   case 4
@@ -119,7 +119,7 @@ switch %random.4%
     %echoaround% %targ% %self.name% bites into %targ.name%, %targ.hisher% skin sizzling from the ghost energy!
     * Damage is scaled by the script engine, no need to mess with it
     eval amount 100
-    %dot% %targ% %amount% 30 magical 1
+    %dot% #508 %targ% %amount% 30 magical 1
     wait 25 sec
   break
 done
@@ -142,7 +142,7 @@ switch %random.4%
     %send% %targ% Fire from %self.name% spreads over you, and you blaze with power!
     %echoaround% %targ% Fire from %self.name% spreads over %targ.name%, who blazes with power!
     eval amount %self.level% / 20
-    dg_affect %targ% BONUS-HEALING %amount% 30
+    dg_affect #509 %targ% BONUS-HEALING %amount% 30
     wait 25 sec
   break
   case 2
@@ -198,8 +198,8 @@ switch %random.4%
       eval test %%self.is_ally(%ch%)%%
       if %test%
         %send% %ch% You feel inspired by %self.name%'s fire!
-        dg_affect %ch% BONUS-MAGICAL %amount% 30
-        dg_affect %ch% BONUS-PHYSICAL %amount% 30
+        dg_affect #509 %ch% BONUS-MAGICAL %amount% 30
+        dg_affect #509 %ch% BONUS-PHYSICAL %amount% 30
       end
       eval ch %ch.next_in_room%
     done
@@ -231,7 +231,7 @@ switch %random.4%
     %send% %targ% %master.name%'s scorpion shadow stings you with a creeping venom!
     %send% %master% Your scorpion shadow stings %targ.name% with a creeping venom!
     %echoneither% %targ% %master% %master.name%'s scorpion shadow stings %targ.name% with a creeping venom!
-    dg_affect %targ% SLOW ON 30
+    dg_affect #510 %targ% SLOW ON 30
     wait 25 sec
   break
   case 2
@@ -240,8 +240,8 @@ switch %random.4%
     %send% %master% Your scorpion shadow stings %targ.name% with shadow venom!
     %echoneither% %targ% %master% %master.name%'s scorpion shadow stings %targ.name% with shadow venom!
     eval amount %self.level% / 20
-    dg_affect %targ% BONUS-PHYSICAL -%amount% 30
-    dg_affect %targ% BONUS-MAGICAL -%amount% 30
+    dg_affect #510 %targ% BONUS-PHYSICAL -%amount% 30
+    dg_affect #510 %targ% BONUS-MAGICAL -%amount% 30
     wait 25 sec
   break
   case 3
@@ -250,7 +250,7 @@ switch %random.4%
     %send% %master% Your scorpion shadow stings %targ.name% with a numbing venom!
     %echoneither% %targ% %master% %master.name%'s scorpion shadow stings %targ.name% with numbing venom!
     eval amount 2 + %self.level% / 100
-    dg_affect %targ% WITS -%amount% 30
+    dg_affect #510 %targ% WITS -%amount% 30
     wait 25 sec
   break
   case 4
@@ -258,7 +258,7 @@ switch %random.4%
     %send% %targ% %master.name%'s scorpion shadow stings you with agonizing venom!
     %send% %master% Your scorpion shadow stings %targ.name% with agonizing venom!
     %echoneither% %targ% %master% %master.name%'s scorpion shadow stings %targ.name% with agonizing venom!
-    %dot% %targ% 100 30 poison 1
+    %dot% #510 %targ% 100 30 poison 1
     wait 25 sec
   break
 done
@@ -299,7 +299,7 @@ if (%type% == 4)
   end
   %echoneither% %targ% %master% %master.name%'s owl shadow wraps its dark wings around %targ.name%, protecting %targ.himher%!
   eval amount 15 + %self.level% / 25
-  dg_affect %targ% DODGE %amount% 30
+  dg_affect #511 %targ% DODGE %amount% 30
   wait 25 sec
   halt
 end
@@ -317,7 +317,7 @@ while %ch%
         * Rejuvenate all allies
         %send% %ch% You feel the healing darkness cure your injuries!
         eval amount %self.level% / 20
-        dg_affect %ch% HEAL-OVER-TIME %amount% 30
+        dg_affect #511 %ch% HEAL-OVER-TIME %amount% 30
       break
       case 2
         * Restore move on all allies
@@ -333,7 +333,7 @@ while %ch%
         * Wits buff on all allies
         %send% %ch% You feel the brilliant darkness boost your speed!
         eval amount 1 + %self.level% / 100
-        dg_affect %ch% WITS %amount% 30
+        dg_affect #511 %ch% WITS %amount% 30
       break
     done
   end
@@ -371,7 +371,7 @@ if (%type% == 4)
   %send% %targ% %self.name% unleases its marble gaze upon you, hardening your form against attacks!
   %echoaround% %targ% %self.name% unleashes its marble gaze upon %targ.name%, hardening %targ.hisher% form against attacks!
   eval amount 15 + %self.level% / 50
-  dg_affect %targ% BLOCK %amount% 30
+  dg_affect #512 %targ% BLOCK %amount% 30
   wait 25 sec
   halt
 end
@@ -387,8 +387,8 @@ switch %type%
     %send% %targ% %self.name% unleashes its quartzite gaze upon you, turning you partially to stone!
     %echoaround% %targ% %self.name% unleashes its quartzite gaze upon %targ.name%, turning %targ.himher% partially to stone!
     eval amount -1 * %self.level% / 20
-    dg_affect %targ% BONUS-PHYSICAL %amount% 30
-    dg_affect %targ% BONUS-MAGICAL %amount% 30
+    dg_affect #512 %targ% BONUS-PHYSICAL %amount% 30
+    dg_affect #512 %targ% BONUS-MAGICAL %amount% 30
     wait 25 sec
   break
   case 2
@@ -396,7 +396,7 @@ switch %type%
     %send% %targ% %self.name% unleashes its basalt gaze upon you, turning you partially to stone!
     %echoaround% %targ% %self.name% unleashes its basalt gaze upon %targ.name%, turning %targ.himher% partially to stone!
     eval amount 2 + %self.level% / 100
-    dg_affect %targ% WITS -%amount% 30
+    dg_affect #512 %targ% WITS -%amount% 30
     wait 25 sec
   break
   case 3
@@ -404,7 +404,7 @@ switch %type%
     %send% %targ% %self.name% unleashes its granite gaze upon you, turning you partially to stone!
     %echoaround% %targ% %self.name% unleashes its granite gaze upon %targ.name%, turning %targ.himher% partially to stone!
     eval amount 15 + %self.level% / 25
-    dg_affect %targ% TO-HIT -%amount% 30
+    dg_affect #512 %targ% TO-HIT -%amount% 30
     wait 25 sec
   break
 done
@@ -427,7 +427,7 @@ switch %random.4%
     %send% %targ% %self.name% coils around you, granting Alchemist's Fire to your healing spells!
     %echoaround% %targ% %self.name% coils around %targ.name%, granting %targ.himher% Alchemist's Fire!
     eval amount %self.level% / 4
-    dg_affect %targ% BONUS-HEALING %amount% 10
+    dg_affect #513 %targ% BONUS-HEALING %amount% 10
     wait 25 sec
   break
   case 2
@@ -446,7 +446,7 @@ switch %random.4%
     %send% %targ% %self.name% breathes its soothing flames upon you, and your wounds begin to heal!
     %echoaround% %targ% %self.name% breathes its soothing flames upon %targ.name%, whose wounds begin to heal!
     eval amount %self.level% / 2
-    dg_affect %targ% HEAL-OVER-TIME %amount% 10
+    dg_affect #513 %targ% HEAL-OVER-TIME %amount% 10
     wait 25 sec
   break
   case 3
@@ -465,7 +465,7 @@ switch %random.4%
     %send% %targ% %self.name% breathes its guardian flames upon you, protecting you!
     %echoaround% %targ% %self.name% breathes its guardian flames upon %targ.name%, protecting %targ.himher%!
     eval amount 15 + %self.level% / 25
-    dg_affect %targ% DODGE %amount% 30
+    dg_affect #513 %targ% DODGE %amount% 30
     wait 25 sec
   break
   case 4
@@ -478,8 +478,8 @@ switch %random.4%
       eval test %%self.is_ally(%ch%)%%
       if %test%
         %send% %ch% You feel yourself surge in the embers' glow!
-        dg_affect %ch% BONUS-MAGICAL %amount% 30
-        dg_affect %ch% BONUS-PHYSICAL %amount% 30
+        dg_affect #513 %ch% BONUS-MAGICAL %amount% 30
+        dg_affect #513 %ch% BONUS-PHYSICAL %amount% 30
       end
       eval ch %ch.next_in_room%
     done
@@ -524,18 +524,18 @@ while %ch%
     %send% %ch% You feel the banshee's wail strike deep into your heart!
     switch %type%
       case 1
-        dg_affect %ch% RESIST-MAGICAL %amount% 30
-        dg_affect %ch% RESIST-PHYSICAL %amount% 30
+        dg_affect #515 %ch% RESIST-MAGICAL %amount% 30
+        dg_affect #515 %ch% RESIST-PHYSICAL %amount% 30
       break
       case 2
-        dg_affect %ch% TO-HIT -%amount% 30
+        dg_affect #515 %ch% TO-HIT -%amount% 30
       break
       case 3
-        dg_affect %ch% BONUS-MAGICAL %amount% 30
-        dg_affect %ch% BONUS-PHYSICAL %amount% 30
+        dg_affect #515 %ch% BONUS-MAGICAL %amount% 30
+        dg_affect #515 %ch% BONUS-PHYSICAL %amount% 30
       break
       case 4
-        %dot% %ch% 50 30 magical 1
+        %dot% #515 %ch% 50 30 magical 1
       break
     done
   end

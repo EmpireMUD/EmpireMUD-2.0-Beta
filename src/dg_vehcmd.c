@@ -1166,11 +1166,20 @@ VCMD(do_vaoe) {
 
 VCMD(do_vdot) {
 	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], durarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], stackarg[MAX_INPUT_LENGTH];
+	any_vnum atype = ATYPE_DG_AFFECT;
 	double modifier = 1.0;
 	char_data *ch;
 	int type, max_stacks;
 
 	argument = one_argument(argument, name);
+	// sometimes name is an affect vnum
+	if (*name == '#') {
+		atype = atoi(name+1);
+		argument = one_argument(argument, name);
+		if (!find_generic(atype, GENERIC_AFFECT)) {
+			atype = ATYPE_DG_AFFECT;
+		}
+	}
 	argument = one_argument(argument, modarg);
 	argument = one_argument(argument, durarg);
 	argument = one_argument(argument, typearg);	// optional, default: physical
@@ -1205,7 +1214,7 @@ VCMD(do_vdot) {
 	}
 	
 	max_stacks = (*stackarg ? atoi(stackarg) : 1);
-	script_damage_over_time(ch, get_vehicle_scale_level(veh, ch), type, modifier, atoi(durarg), max_stacks, NULL);
+	script_damage_over_time(ch, atype, get_vehicle_scale_level(veh, ch), type, modifier, atoi(durarg), max_stacks, NULL);
 }
 
 

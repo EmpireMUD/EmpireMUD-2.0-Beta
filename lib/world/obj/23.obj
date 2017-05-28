@@ -709,11 +709,9 @@ the alchemical filter pattern~
 The alchemical filter pattern is lying here.~
    An alchemist could use this pattern to create an alchemical filter, used in
 the creation of a chemist's cleansing cap, a level 200-300 crafting headpiece.
-
-Craft (requires Alchemist Crafts and crafting 200): alchemical filter
 ~
-3 o a 9
-0 0 0
+7 0 a 11
+2351 0 0
 0 0
 S
 #2348
@@ -722,11 +720,9 @@ the antiquated device design~
 The antiquated device design is lying here.~
    An antiquarian could use this design to create antique device parts, used to
 make an antiquated arcane apparatus, a level 200-300 crafting offhand.
-
-Forge (requires Antiquarian Crafts and crafting 200): antique device parts
 ~
-3 o a 9
-0 0 0
+7 0 a 10
+2352 0 0
 0 0
 S
 #2349
@@ -735,11 +731,9 @@ the concealed pouch pattern~
 The concealed pouch pattern is lying here.~
    A smuggler could use this design to create concealed silk pouches, used in
 the creation of a superb smuggling sash, a level 200-300 crafting belt.
-
-Sew (requires Smuggler Crafts and crafting 200): concealed silk pouches
 ~
-3 o a 7
-0 0 0
+7 0 a 8
+2353 0 0
 0 0
 S
 #2350
@@ -748,11 +742,9 @@ the tinker's harness pattern~
 The tinker's harness pattern is lying here.~
    A tinker could use this pattern to create a tinker's harness, used to make
 traveling tinker's trappings, a set of level 200-300 crafting clothes.
-
-Forge (requires Tinker Crafts and crafting 200): tinker harness
 ~
-3 o a 6
-0 0 0
+7 0 a 7
+2354 0 0
 0 0
 S
 #2351
@@ -877,11 +869,9 @@ the smuggled Olympian laurel branch pattern~
 The smuggled Olympian laurel branch pattern is lying here.~
    This pattern shows you how to make the Olympian laurel branch that is
 required for the tier 3 crafting headpiece, the laurel crown of Olympus.
-
-Craft (Smuggler Crafts, level 300): smuggled Olympian laurel branch
 ~
-3 o a 6
-0 0 0
+7 0 a 7
+2363 0 0
 1 0
 S
 #2360
@@ -890,12 +880,11 @@ the Olympic silk recipe~
 The Olympic silk recipe is lying here.~
    On one side of this white marble slab is engraved the alchemical formulae
 for the creation of Olympic silk. The other side bears patterns for Olympian
-robes. The robe of the Olympians is a tier 3 crafting item.
-
-Weave (Alchemist Crafts, level 300): Olympic silk
+robes. The robe of the Olympians is a tier 3 crafting item. You can weave the
+Olympic silk from magic cloth.
 ~
-3 o a 8
-0 0 0
+7 0 a 9
+2364 0 0
 1 0
 S
 #2361
@@ -905,11 +894,9 @@ The pattern for Amazonian leather is lying here.~
    This pattern shows how to craft leather in the ancient Amazonian style. As
 such, it can only be done by an Antiquarian. This leather is used to craft the
 regal girdle of Hippolyta, a tier 3 crafting item.
-
-Craft (Antiquarian Crafts, level 300): Amazonian leather
 ~
-3 o a 7
-0 0 0
+7 0 a 8
+2365 0 0
 1 0
 S
 #2362
@@ -920,11 +907,9 @@ The guild-forged hammer head pattern is lying here.~
 lines. It gives rough instructions for forging the hammer of Hephaestus, a tier
 3 crafting item. The only problem is that you need an entire guild of smiths to
 forge the head...
-
-Forge (Guildsman Crafts, level 300): guild-forged hammer head
 ~
-3 o a 7
-0 0 0
+7 0 a 8
+2366 0 0
 1 0
 S
 #2363

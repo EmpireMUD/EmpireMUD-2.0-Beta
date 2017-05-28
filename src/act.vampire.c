@@ -51,8 +51,6 @@ ACMD(do_bite);
 * @param char_data *ch The vampire paying upkeeps.
 */
 void cancel_blood_upkeeps(char_data *ch) {
-	extern const char *affect_types[];
-	
 	char buf[MAX_STRING_LENGTH];
 	struct affected_type *aff;
 	struct obj_apply *app;
@@ -76,8 +74,8 @@ void cancel_blood_upkeeps(char_data *ch) {
 					break;
 				}
 				
-				msg_to_char(ch, "Your %s effect fades.\r\n", affect_types[aff->type]);
-				snprintf(buf, sizeof(buf), "$n's %s effect fades.", affect_types[aff->type]);
+				msg_to_char(ch, "Your %s effect fades.\r\n", get_generic_name_by_vnum(aff->type));
+				snprintf(buf, sizeof(buf), "$n's %s effect fades.", get_generic_name_by_vnum(aff->type));
 				act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 				
 				affect_from_char(ch, aff->type, FALSE);

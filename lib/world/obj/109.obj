@@ -1,25 +1,12 @@
-#10900
-tokens dragon pouch~
-a pouch of dragon tokens~
-A pouch of dragon tokens is lying here.~
-   This leather pouch holds tokens redeemable for rewards from the new Red
-Dragon adventure. Use 'count tokens' to count them.
-~
-3 p a 5
-0 0 0
-7 0
-T 10900
-S
 #10901
 token dragon~
 a dragon token~
 A dragon token is lying here.~
-You shouldn't actually be seeing this.
+This token can be used to buy items from the colossal red dragon token shop.
 ~
-3 p a 3
-0 0 0
+12 p a 4
+1 10900 0
 7 0
-T 10901
 S
 #10902
 hide dragon red pile~
@@ -100,7 +87,7 @@ a raw dragon steak~
 A huge dragon steak is lying on the ground.~
    This dragon steak is huge! You can cook it into a dragon roast, which is
 long-lasting and very filling. Or, if you're a Gourmet Chef, you can make a
-roast dragon feast and boost the party's damage significantly.  
+roast dragon feast and boost the party's damage significantly.
 ~
 3 0 a 7
 0 0 0
@@ -466,7 +453,7 @@ a dragonstone hearth~
 A dragonstone hearth is lying here.~
    The dragonstone hearth is huge, and allows you to make a colossal cave home
 for yourself. Type 'build dragoncave <direction>' to set up this great house in
-the mountainside. You need the Luxury ability to start building it.  
+the mountainside. You need the Luxury ability to start building it.
 ~
 3 e a 4
 0 0 0
@@ -585,8 +572,8 @@ The dragonsteel warhammer schematic is lying here.~
 weapon. You require Mythic Forge (Steelsmith or Guildsman) to forge this
 weapon.
 ~
-3 o a 3
-0 0 0
+7 0 a 4
+10910 0 0
 0 0
 S
 #10932
@@ -597,8 +584,8 @@ The dragonsteel claymore schematic is lying here.~
 weapon. You require Mythic Forge (Steelsmith or Guildsman) to forge this
 weapon.
 ~
-3 o a 4
-0 0 0
+7 0 a 5
+10911 0 0
 0 0
 S
 #10933
@@ -608,8 +595,8 @@ The dragonbone mace schematic is lying here.~
    This schematic makes a dragonbone mace, a strong tank weapon. You require
 Mythic Forge (Steelsmith or Guildsman) to forge this weapon.
 ~
-3 o a 5
-0 0 0
+7 0 a 6
+10912 0 0
 0 0
 S
 #10934
@@ -619,8 +606,8 @@ The draconic wand schematic is lying here.~
    This schematic makes a flaming draconic wand, a powerful healer's weapon.
 You need Lore Crafts (Artificer or Tinker) to craft this weapon.
 ~
-3 o a 6
-0 0 0
+7 0 a 7
+10913 0 0
 0 0
 S
 #10935
@@ -630,8 +617,8 @@ The dragonbone staff schematic is lying here.~
    This schematic makes a flaming dragonbone staff, a powerful caster weapon.
 You need Lore Crafts (Artificer or Tinker) to craft this weapon.
 ~
-3 o a 7
-0 0 0
+7 0 a 8
+10914 0 0
 0 0
 S
 #10936
@@ -642,8 +629,8 @@ The dragonbone wristblade design is lying here.~
 melee warriors. You require Mythic Forge (Steelsmith or Guildsman) to forge
 this off-hand weapon.
 ~
-3 o a 8
-0 0 0
+7 0 a 9
+10915 0 0
 0 0
 S
 #10937
@@ -653,8 +640,8 @@ The dragonbone tower shield design is lying here.~
    This design is for a dragonbone tower shield, a strong shield for tanks.
 You require Mythic Forge (Steelsmith or Guildsman) to forge this shield.
 ~
-3 o a 9
-0 0 0
+7 0 a 10
+10916 0 0
 0 0
 S
 #10938
@@ -665,8 +652,8 @@ The red dragon charm design is lying here.~
 item. You need Lore Crafts (Artificer or Tinker) to craft this off-hand
 trinket.
 ~
-3 o a 10
-0 0 0
+7 0 a 11
+10917 0 0
 0 0
 S
 #10939
@@ -676,8 +663,8 @@ The dragonkind tome design is lying here.~
    This design creates the tome of dragonkind, a powerful caster off-hand item.
 You need Lore Crafts (Artificer or Tinker) to craft this off-hand tome.
 ~
-3 o a 11
-0 0 0
+7 0 a 12
+10918 0 0
 0 0
 S
 #10940
@@ -688,8 +675,8 @@ The crimson dragon girdle pattern is lying here.~
 waistband for melee warriors. You need Fabled Hides (Antiquarian or Alchemist)
 to sew this belt.
 ~
-3 o a 12
-0 0 0
+7 0 a 13
+10919 0 0
 0 0
 S
 #10941
@@ -700,8 +687,8 @@ The burning dragonsteel waistband pattern is lying here.~
 tanking belt. You need Fabled Hides (Antiquarian or Alchemist) to sew this
 belt.
 ~
-3 o a 13
-0 0 0
+7 0 a 14
+10920 0 0
 0 0
 S
 #10942
@@ -712,8 +699,8 @@ The flaming draconic cincture pattern is lying here.~
 for healers. You need Legendary Stitching (Artificer or Smuggler) to sew this
 belt.
 ~
-3 o a 15
-0 0 0
+7 0 a 16
+10921 0 0
 0 0
 S
 #10943
@@ -724,8 +711,8 @@ The burning dragoncloth sash pattern is lying here.~
 for casters. You need Legendary Stitching (Artificer or Smuggler) to sew this
 belt.
 ~
-3 o a 15
-0 0 0
+7 0 a 16
+10922 0 0
 0 0
 S
 #10944
@@ -791,8 +778,8 @@ The magnificent dragon bracelet schematic is lying here.~
 wrist item that brings Greatness to your empire! You require Fabled Hides
 (Antiquarian or Alchemist) to sew this item.
 ~
-3 o a 5
-0 0 0
+7 0 a 6
+10946 0 0
 0 0
 S
 $

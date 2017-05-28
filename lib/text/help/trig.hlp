@@ -45,6 +45,29 @@ Mob and object triggers also provide:
 
 See also: MTRIG CHARMED
 #d
+"BUY TRIGGER" "MTRIG BUY" "OTRIG BUY" "RTRIG BUY" "VTRIG BUY" TRIGEDIT-MOB-BUY TRIGEDIT-OBJ-BUY TRIGEDIT-ROOM-BUY TRIGEDIT-VEH-BUY
+
+Buy (trigger type)
+
+Argument type:  location of the item to trigger (obj triggers only)
+Return value:  return 1 (default) to proceed with the purchase
+               return 0 to block the purchase
+
+Buy triggers let you intercept a player attempting to buy from a shop. All
+buy triggers in the room will run, regardless of whether the shop is attached
+to a mob, obj, or room.
+
+Variables:
+  &c%actor%&0 - The person who is trying to buy.
+  &c%shopkeeper%&0 - The mob who runs the shop, if any (may be empty).
+  &c%obj%&0 - The object the player is buying.
+  &c%cost%&0 - The numeric value of the purchase.
+  &c%currency%&0 - The currency vnum of the purchase, or "coins" if it's coins.
+
+Note: The %obj% is already in the player's inventory when the script runs. You
+   can change its properties in your script but you should NEVER purge it in
+   the script. Returning 0 will block the purchase and purge the object. 
+#d
 "COMMAND TRIGGER" "MTRIG COMMAND" "OTRIG COMMAND" "RTRIG COMMAND" "VTRIG COMMAND" TRIGEDIT-MOB-COMMAND TRIGEDIT-OBJ-COMMAND TRIGEDIT-ROOM-COMMAND TRIGEDIT-VEH-COMMAND
 
 Command (trigger type)
@@ -418,7 +441,17 @@ Special Variables When using field - The variable returns:
  
 &cself&0 - The mob, item, or room running the script. Normal fields may be 
                 used with this.
+&ccooldown.<vnum>&0 - Get the name of a cooldown, by vnum.
+&ccurrency.<vnum>(amt)&0 - Gets the currency name. The amt is used to determine
+   whether to use the singular or plural name.
 &cinstance.id&0 - Unique id of the adventure instance, if any.
+&cinstance.level&0 - Get the locked level of the instance (if it has one of the
+   LOCK-LEVEL-* flags).
+&cinstance.level(lvl)&0 - Lock the instance at a given level, if it isn't
+   already locked.
+&instance.loaded&0 - Checks if the instance has been fully loaded or not.
+&cinstance.load&0 - Forces loading an instance with the CAN-DELAY-LOAD. However,
+   this happens automatically when a player arrives.
 &cinstance.location&0 - The map/linked location of the instance, if any.
 &cinstance.mob(vnum)&0 - Finds a copy of a mob belonging to the instance.
 &cinstance.name&0 - Name of the adventure instance, if any.

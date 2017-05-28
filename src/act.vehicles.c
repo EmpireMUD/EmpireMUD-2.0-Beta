@@ -390,7 +390,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 */
 bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, int mode) {
 	extern bool can_take_obj(char_data *ch, obj_data *obj);
-	void get_check_money(char_data *ch, obj_data *obj);
+	bool get_check_money(char_data *ch, obj_data *obj);
 
 	if (!bind_ok(obj, ch)) {
 		act("$p: item is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR);

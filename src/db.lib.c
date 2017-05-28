@@ -26,6 +26,7 @@
 /**
 * Contents:
 *   Adventure Lib
+*   Automessages Lib
 *   Building Lib
 *   Craft Lib
 *   Crop Lib
@@ -52,8 +53,10 @@
 */
 
 // external variables
+extern struct automessage *automessages;
 extern struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES];
 extern struct player_special_data dummy_mob;
+extern int max_automessage_id;
 extern bool world_is_sorted;
 
 // external funcs
@@ -74,6 +77,7 @@ void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part
 void parse_generic_name_file(FILE *fl, char *err_str);
 void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part);
 void parse_interaction(char *line, struct interaction_item **list, char *error_part);
+void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part);
 void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 int sort_empires(empire_data *a, empire_data *b);
 int sort_room_templates(room_template *a, room_template *b);
@@ -81,6 +85,7 @@ void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message 
 void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list);
 void write_interactions_to_file(FILE *fl, struct interaction_item *list);
+void write_linking_rules_to_file(FILE *fl, char letter, struct adventure_link_rule *list);
 void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
 void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 
@@ -175,8 +180,7 @@ void init_adventure(adv_data *adv) {
 */
 void parse_adventure(FILE *fl, adv_vnum vnum) {
 	int int_in[4];
-	char line[256], str_in[256], str_in2[256];
-	struct adventure_link_rule *link, *last_link = NULL;
+	char line[256], str_in[256];
 	adv_data *adv, *find;
 
 	CREATE(adv, adv_data, 1);
@@ -228,44 +232,7 @@ void parse_adventure(FILE *fl, adv_vnum vnum) {
 		}
 		switch (*line) {
 			case 'L': {	// linking rule
-				CREATE(link, struct adventure_link_rule, 1);
-				link->next = NULL;
-				if (last_link) {
-					last_link->next = link;
-				}
-				else {
-					GET_ADV_LINKING(adv) = link;
-				}
-				last_link = link;
-				
-				// line 1: type flags
-				if (!get_line(fl, line) || sscanf(line, "%d %s", &int_in[0], str_in) != 2) {
-					log("SYSERR: Format error in L line 1 of %s", buf2);
-					exit(1);
-				}
-				
-				link->type = int_in[0];
-				link->flags = asciiflag_conv(str_in);
-				
-				// line 2: value portal_in portal_out
-				if (!get_line(fl, line) || sscanf(line, "%d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
-					log("SYSERR: Format error in L line 2 of %s", buf2);
-					exit(1);
-				}
-				
-				link->value = int_in[0];
-				link->portal_in = int_in[1];
-				link->portal_out = int_in[2];
-				
-				// line 3: dir bld_on bld_facing
-				if (!get_line(fl, line) || sscanf(line, "%d %s %s", &int_in[0], str_in, str_in2) != 3) {
-					log("SYSERR: Format error in L line 3 of %s", buf2);
-					exit(1);
-				}
-				
-				link->dir = int_in[0];
-				link->bld_on = asciiflag_conv(str_in);
-				link->bld_facing = asciiflag_conv(str_in2);
+				parse_link_rule(fl, &GET_ADV_LINKING(adv), buf2);
 				break;
 			}
 
@@ -296,8 +263,7 @@ void parse_adventure(FILE *fl, adv_vnum vnum) {
 * @param adv_data *adv The thing to save.
 */
 void write_adventure_to_file(FILE *fl, adv_data *adv) {
-	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
-	struct adventure_link_rule *link;
+	char temp[MAX_STRING_LENGTH];
 	
 	if (!fl || !adv) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_adventure_to_file called without %s", !fl ? "file" : "adventure");
@@ -317,21 +283,258 @@ void write_adventure_to_file(FILE *fl, adv_data *adv) {
 	fprintf(fl, "%d %d %s %d\n", GET_ADV_MAX_INSTANCES(adv), GET_ADV_RESET_TIME(adv), bitv_to_alpha(GET_ADV_FLAGS(adv)), GET_ADV_PLAYER_LIMIT(adv));
 
 	// L: linking rules
-	for (link = GET_ADV_LINKING(adv); link; link = link->next) {
-		fprintf(fl, "L\n");
-		fprintf(fl, "%d %s\n", link->type, bitv_to_alpha(link->flags));
-		fprintf(fl, "%d %d %d\n", link->value, link->portal_in, link->portal_out);
-		
-		strcpy(temp, bitv_to_alpha(link->bld_on));
-		strcpy(temp2, bitv_to_alpha(link->bld_facing));
-		fprintf(fl, "%d %s %s\n", link->dir, temp, temp2);
-	}
+	write_linking_rules_to_file(fl, 'L', GET_ADV_LINKING(adv));
 	
 	// T: triggers
 	write_trig_protos_to_file(fl, 'T', GET_ADV_SCRIPTS(adv));
 	
 	// end
 	fprintf(fl, "S\n");
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// AUTOMESSAGES LIB ////////////////////////////////////////////////////////
+
+/**
+* Formats and sends an auto-message.
+*/
+void show_automessage_to_char(char_data *ch, struct automessage *msg) {
+	if (msg->msg && *msg->msg) {
+		msg_to_char(ch, "[%s%s&0] %s\r\n", config_get_string("automessage_color"), config_get_string("mud_name"), msg->msg);
+	}
+}
+
+
+// quick-sorter by id
+int sort_automessage_by_id(struct automessage *a, struct automessage *b) {
+	return a->id - b->id;
+}
+
+
+// quick-sorter by type/time
+int sort_automessage_by_data(struct automessage *a, struct automessage *b) {
+	// sort one-time to the top
+	if (a->timing != b->timing) {
+		if (a->timing == AUTOMSG_ONE_TIME) {
+			return -1;
+		}
+		if (b->timing == AUTOMSG_ONE_TIME) {
+			return 1;
+		}
+	}
+	
+	// otherwise sort by timestamp
+	return a->timestamp - b->timestamp;
+}
+
+
+/**
+* Checks if anybody needs an automessage, and sends it.
+*/
+void display_automessages(void) {
+	struct automessage *msg, *next_msg;
+	struct player_automessage *pam;
+	descriptor_data *desc;
+	time_t now = time(0);
+	char_data *ch;
+	int id;
+	
+	HASH_ITER(hh, automessages, msg, next_msg) {
+		id = msg->id;
+		
+		if (msg->timing == AUTOMSG_ON_LOGIN) {
+			continue;	// we don't show these now
+		}
+		if (msg->timestamp > now - (2 * SECS_PER_REAL_MIN)) {
+			continue;	// don't show messages newer than 2 minutes (grace period)
+		}
+		
+		LL_FOREACH(descriptor_list, desc) {
+			if (STATE(desc) != CON_PLAYING || !(ch = desc->character) || IS_NPC(ch)) {
+				continue;	// not playing
+			}
+			
+			// have/should they see/n it
+			HASH_FIND_INT(GET_AUTOMESSAGES(ch), &id, pam);
+			if (pam && msg->timing == AUTOMSG_ONE_TIME) {
+				continue;	// seen
+			}
+			else if (pam && msg->timing == AUTOMSG_REPEATING && (now - pam->timestamp) < (msg->interval * SECS_PER_REAL_MIN)) {
+				continue;	// too soon
+			}
+			
+			// validated!
+			show_automessage_to_char(ch, msg);
+			
+			// update or add player data
+			if (!pam) {
+				CREATE(pam, struct player_automessage, 1);
+				pam->id = id;
+				HASH_ADD_INT(GET_AUTOMESSAGES(ch), id, pam);
+			}
+			pam->timestamp = now;
+		}
+	}
+}
+
+
+/**
+* Looks for login messages to send to a player who just logged in.
+*
+* @param char_data *ch The player.
+*/
+void display_automessages_on_login(char_data *ch) {
+	struct automessage *msg, *next_msg;
+	bool any = FALSE;
+	
+	HASH_ITER(hh, automessages, msg, next_msg) {
+		if (msg->timing != AUTOMSG_ON_LOGIN) {
+			continue;	// only showing 1 type
+		}
+		
+		show_automessage_to_char(ch, msg);
+		any = TRUE;
+	}
+		
+	// trailing crlf
+	if (any) {
+		msg_to_char(ch, "\r\n");
+	}
+}
+
+
+/**
+* Frees up an automessage.
+*
+* @param struct automessage *msg The message to free.
+*/
+void free_automessage(struct automessage *msg) {
+	if (msg->msg) {
+		free(msg->msg);
+	}
+	free(msg);
+}
+
+
+void load_automessages(void) {
+	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH];
+	int id, author, timing, interval, version;
+	struct automessage *msg, *find;
+	bool end = FALSE;
+	char *tmp;
+	FILE *fl;
+	long ts;
+	
+	version = 1;	// default (makes for easier alternate parsing to have version numbers)
+	if (version < 0) {
+		// nothing to do here, but it prevents a compiler warning until version is used
+	}
+	
+	if (!(fl = fopen(AUTOMESSAGE_FILE, "r"))) {
+		return;	// there are no messages
+	}
+	
+	snprintf(error, sizeof(error), "automessage file");
+	
+	while (!end) {
+		if (!get_line(fl, line)) {
+			log("SYSERR: Unexpected end of automessage file");
+			break;
+		}
+		
+		if (*line == '$') {
+			end = TRUE;
+		}
+		else if (!strn_cmp(line, "Automessage:", 12)) {
+			version = atoi(line+13);
+		}
+		else if (!strn_cmp(line, "Index:", 6)) {
+			max_automessage_id = atoi(line+7);
+		}
+		else if (!strn_cmp(line, "Message:", 8)) {
+			if (sscanf(line + 8, " %d %d %ld %d %d", &id, &author, &ts, &timing, &interval) != 5) {
+				log("SYSERR: Bad format in automessage file. Skipping message.");
+				tmp = fread_string(fl, error);
+				if (tmp) {	// skip a line
+					free(tmp);
+				}
+				continue;
+			}
+			
+			CREATE(msg, struct automessage, 1);
+			msg->id = id;
+			msg->author = author;
+			msg->timestamp = ts;
+			msg->timing = timing;
+			msg->interval = interval;
+			msg->msg = fread_string(fl, error);
+			
+			HASH_FIND_INT(automessages, &id, find);
+			if (find) {
+				log("SYSERR: Duplicate automessage id %d found in file", id);
+				HASH_DEL(automessages, find);
+				free_automessage(find);
+			}
+			
+			HASH_ADD_INT(automessages, id, msg);
+		}
+	}
+	
+	fclose(fl);
+}
+
+
+int new_automessage_id(void) {
+	struct automessage *msg, *next_msg;
+	int last = 0, found = 0;
+	
+	if (max_automessage_id < MAX_INT) {
+		return ++max_automessage_id;
+	}
+	else {
+		// whaaaa? find the first free id
+		HASH_SORT(automessages, sort_automessage_by_id);
+		HASH_ITER(hh, automessages, msg, next_msg) {
+			if (msg->id > last + 1) {
+				found = last + 1;
+			}
+			last = msg->id;
+		}
+		
+		// sort back
+		HASH_SORT(automessages, sort_automessage_by_data);
+		if (found) {
+			return found;
+		}
+	}
+	
+	// did we get here?
+	log("SYSERR: No free automessage id (somehow)");
+	return 1;
+}
+
+
+void save_automessages(void) {
+	struct automessage *msg, *next_msg;
+	FILE *fl;
+	
+	if (!(fl = fopen(AUTOMESSAGE_FILE TEMP_SUFFIX, "w"))) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Unable to write %s", AUTOMESSAGE_FILE TEMP_SUFFIX);
+		return;
+	}
+	
+	// header
+	fprintf(fl, "Automessage: 1\n");	// version tag
+	fprintf(fl, "Index: %d\n", max_automessage_id);
+	
+	HASH_ITER(hh, automessages, msg, next_msg) {
+		fprintf(fl, "Message: %d %d %ld %d %d\n%s~\n", msg->id, msg->author, msg->timestamp, msg->timing, msg->interval, NULLSAFE(msg->msg));
+	}
+	
+	fprintf(fl, "$~\n");
+	fclose(fl);
+	rename(AUTOMESSAGE_FILE TEMP_SUFFIX, AUTOMESSAGE_FILE);	
 }
 
 
@@ -5306,7 +5509,7 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 	char line[256];
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
-	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social", "faction" };
+	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social", "faction", "generic", "shop" };
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -5370,6 +5573,11 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 					parse_faction(fl, nr);
 					break;
 				}
+				case DB_BOOT_GEN: {
+					void parse_generic(FILE *fl, int nr);
+					parse_generic(fl, nr);
+					break;
+				}
 				case DB_BOOT_GLB: {
 					parse_global(fl, nr);
 					break;
@@ -5404,6 +5612,11 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 				}
 				case DB_BOOT_SECTOR: {
 					parse_sector(fl, nr);
+					break;
+				}
+				case DB_BOOT_SHOP: {
+					void parse_shop(FILE *fl, int nr);
+					parse_shop(fl, nr);
 					break;
 				}
 				case DB_BOOT_SKILL: {
@@ -5485,7 +5698,7 @@ void index_boot(int mode) {
 
 	if (!rec_count) {
 		// DB_BOOT_x: some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL || mode == DB_BOOT_VEH || mode == DB_BOOT_MORPH || mode == DB_BOOT_QST || mode == DB_BOOT_SOC || mode == DB_BOOT_FCT) {
+		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL || mode == DB_BOOT_VEH || mode == DB_BOOT_MORPH || mode == DB_BOOT_QST || mode == DB_BOOT_SOC || mode == DB_BOOT_FCT || mode == DB_BOOT_GEN || mode == DB_BOOT_SHOP) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -5565,6 +5778,11 @@ void index_boot(int mode) {
 			log("   %d factions, %d bytes in factions table.", rec_count, size[0]);
 			break;
 		}
+		case DB_BOOT_GEN: {
+			size[0] = sizeof(generic_data) * rec_count;
+			log("   %d generics, %d bytes in generics table.", rec_count, size[0]);
+			break;
+		}
 		case DB_BOOT_GLB: {
 			size[0] = sizeof(struct global_data) * rec_count;
 			log("   %d globals, %d bytes in globals table.", rec_count, size[0]);
@@ -5601,6 +5819,11 @@ void index_boot(int mode) {
 		case DB_BOOT_SECTOR: {
 			size[0] = sizeof(sector_data) * rec_count;
 			log("   %d sectors, %d bytes in sector.", rec_count, size[0]);
+			break;
+		}
+		case DB_BOOT_SHOP: {
+			size[0] = sizeof(shop_data) * rec_count;
+			log("   %d shops, %d bytes in shops table.", rec_count, size[0]);
 			break;
 		}
 		case DB_BOOT_SKILL: {
@@ -5644,6 +5867,7 @@ void index_boot(int mode) {
 			case DB_BOOT_CRAFT:
 			case DB_BOOT_CROP:
 			case DB_BOOT_FCT:
+			case DB_BOOT_GEN:
 			case DB_BOOT_GLB:
 			case DB_BOOT_OBJ:
 			case DB_BOOT_MOB:
@@ -5653,6 +5877,7 @@ void index_boot(int mode) {
 			case DB_BOOT_QST:
 			case DB_BOOT_RMT:
 			case DB_BOOT_SECTOR:
+			case DB_BOOT_SHOP:
 			case DB_BOOT_SKILL:
 			case DB_BOOT_SOC:
 			case DB_BOOT_TRG:
@@ -5807,6 +6032,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			}
 			break;
 		}
+		case DB_BOOT_GEN: {
+			void write_generic_to_file(FILE *fl, generic_data *gen);
+			generic_data *gen, *next_gen;
+			HASH_ITER(hh, generic_table, gen, next_gen) {
+				if (GEN_VNUM(gen) >= (zone * 100) && GEN_VNUM(gen) <= (zone * 100 + 99)) {
+					write_generic_to_file(fl, gen);
+				}
+			}
+			break;
+		}
 		case DB_BOOT_GLB: {
 			struct global_data *glb, *next_glb;
 			HASH_ITER(hh, globals_table, glb, next_glb) {
@@ -5868,6 +6103,16 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 			HASH_ITER(hh, sector_table, sect, next_sect) {
 				if (GET_SECT_VNUM(sect) >= (zone * 100) && GET_SECT_VNUM(sect) <= (zone * 100 + 99)) {
 					write_sector_to_file(fl, sect);
+				}
+			}
+			break;
+		}
+		case DB_BOOT_SHOP: {
+			void write_shop_to_file(FILE *fl, shop_data *shop);
+			shop_data *shop, *next_shop;
+			HASH_ITER(hh, shop_table, shop, next_shop) {
+				if (SHOP_VNUM(shop) >= (zone * 100) && SHOP_VNUM(shop) <= (zone * 100 + 99)) {
+					write_shop_to_file(fl, shop);
 				}
 			}
 			break;
@@ -6187,6 +6432,11 @@ void save_index(int type) {
 			write_faction_index(fl);
 			break;
 		}
+		case DB_BOOT_GEN: {
+			void write_generic_index(FILE *fl);
+			write_generic_index(fl);
+			break;
+		}
 		case DB_BOOT_GLB: {
 			write_globals_index(fl);
 			break;
@@ -6215,6 +6465,11 @@ void save_index(int type) {
 		}
 		case DB_BOOT_SECTOR: {
 			write_sector_index(fl);
+			break;
+		}
+		case DB_BOOT_SHOP: {
+			void write_shop_index(FILE *fl);
+			write_shop_index(fl);
 			break;
 		}
 		case DB_BOOT_SKILL: {
@@ -7418,6 +7673,53 @@ void parse_generic_name_file(FILE *fl, char *err_str) {
 
 
 /**
+* Parse one linking rule and assign it to the end of the given list.
+* This function will trigger an exit(1) if it errors.
+*
+* @param FILE *fl The file, open for reading, right after the letter tag (usually L).
+* @param struct adventure_link_rule **list A reference to the start of the list to assign to.
+* @param char *error_part A string containing e.g. "mob #1234", describing where the error occurred, if one happens.
+*/
+void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part) {
+	char line[MAX_INPUT_LENGTH], str_in[MAX_INPUT_LENGTH], str_in2[MAX_INPUT_LENGTH];
+	struct adventure_link_rule *link;
+	int int_in[3];
+	
+	CREATE(link, struct adventure_link_rule, 1);
+	LL_APPEND(*list, link);
+	
+	// line 1: type flags
+	if (!get_line(fl, line) || sscanf(line, "%d %s", &int_in[0], str_in) != 2) {
+		log("SYSERR: Format error in link rule line 1 of %s", buf2);
+		exit(1);
+	}
+	
+	link->type = int_in[0];
+	link->flags = asciiflag_conv(str_in);
+	
+	// line 2: value portal_in portal_out
+	if (!get_line(fl, line) || sscanf(line, "%d %d %d", &int_in[0], &int_in[1], &int_in[2]) != 3) {
+		log("SYSERR: Format error in link rule line 2 of %s", buf2);
+		exit(1);
+	}
+	
+	link->value = int_in[0];
+	link->portal_in = int_in[1];
+	link->portal_out = int_in[2];
+	
+	// line 3: dir bld_on bld_facing
+	if (!get_line(fl, line) || sscanf(line, "%d %s %s", &int_in[0], str_in, str_in2) != 3) {
+		log("SYSERR: Format error in link rule line 3 of %s", buf2);
+		exit(1);
+	}
+	
+	link->dir = int_in[0];
+	link->bld_on = asciiflag_conv(str_in);
+	link->bld_facing = asciiflag_conv(str_in2);
+}
+
+
+/**
 * Writes the A tag for any apply_data list.
 *
 * @param FILE *fl The file to write to.
@@ -7488,6 +7790,29 @@ void parse_requirement(FILE *fl, struct req_data **list, char *error_str) {
 	
 	LL_APPEND(*list, req);
 	LL_SORT(*list, sort_requirements_by_group);
+}
+
+
+/**
+* Saves linking rule data (usually 'L' tag) to a db file.
+*
+* @param FILE *fl The open file to write to.
+* @param char letter The letter to tag in the file.
+* @param struct adventure_link_rule *list The list to write.
+*/
+void write_linking_rules_to_file(FILE *fl, char letter, struct adventure_link_rule *list) {
+	struct adventure_link_rule *link;
+	char temp[256], temp2[256];
+	
+	LL_FOREACH(list, link) {
+		fprintf(fl, "%c\n", letter);
+		fprintf(fl, "%d %s\n", link->type, bitv_to_alpha(link->flags));
+		fprintf(fl, "%d %d %d\n", link->value, link->portal_in, link->portal_out);
+		
+		strcpy(temp, bitv_to_alpha(link->bld_on));
+		strcpy(temp2, bitv_to_alpha(link->bld_facing));
+		fprintf(fl, "%d %s %s\n", link->dir, temp, temp2);
+	}
 }
 
 

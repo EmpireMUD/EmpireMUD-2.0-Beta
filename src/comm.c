@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "dg_scripts.h"
 #include "dg_event.h"
+#include "vnums.h"
 
 /**
 * Contents:
@@ -293,8 +294,6 @@ static void msdp_update(void) {
 	extern int pick_season(room_data *room);
 	extern int total_bonus_healing(char_data *ch);
 	extern int get_total_score(empire_data *emp);
-	extern const char *affect_types[];
-	extern const char *cooldown_types[];
 	extern const char *damage_types[];
 	extern const double hit_per_dex;
 	extern const char *seasons[];
@@ -336,7 +335,7 @@ static void msdp_update(void) {
 			*buf = '\0';
 			buf_size = 0;
 			for (aff = ch->affected; aff; aff = aff->next) {
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%d", (char)MSDP_VAR, affect_types[aff->type], (char)MSDP_VAL, (aff->duration == UNLIMITED ? -1 : (aff->duration * SECS_PER_REAL_UPDATE)));
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%d", (char)MSDP_VAR, get_generic_name_by_vnum(aff->type), (char)MSDP_VAL, (aff->duration == UNLIMITED ? -1 : (aff->duration * SECS_PER_REAL_UPDATE)));
 			}
 			MSDPSetTable(d, eMSDP_AFFECTS, buf);
 			
@@ -345,7 +344,7 @@ static void msdp_update(void) {
 			buf_size = 0;
 			for (dot = ch->over_time_effects; dot; dot = dot->next) {
 				// each dot has a sub-table
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, affect_types[dot->type], (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, get_generic_name_by_vnum(dot->type), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
 				
 				
 				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDURATION%c%d", (char)MSDP_VAR, (char)MSDP_VAL, (dot->duration == UNLIMITED ? -1 : (dot->duration * SECS_PER_REAL_UPDATE)));
@@ -363,7 +362,7 @@ static void msdp_update(void) {
 			buf_size = 0;
 			for (cool = ch->cooldowns; cool; cool = cool->next) {
 				if (cool->expire_time > time(0)) {
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, cooldown_types[cool->type], (char)MSDP_VAL, cool->expire_time - time(0));
+					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(cool->type), (char)MSDP_VAL, cool->expire_time - time(0));
 				}
 			}
 			MSDPSetTable(d, eMSDP_COOLDOWNS, buf);
@@ -883,6 +882,7 @@ void heartbeat(int heart_pulse) {
 	void check_wars();
 	void chore_update();
 	void detect_evos_per_hour();
+	void display_automessages();
 	void extract_pending_chars();
 	void frequent_combat(int pulse);
 	void generate_adventure_instances();
@@ -1016,11 +1016,15 @@ void heartbeat(int heart_pulse) {
 
 	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
 		update_reboot();
+		if (debug_log && HEARTBEAT(15)) { log("debug 19a:\t%lld", microtime()); }
 		if (++mins_since_crashsave >= 5) {
 			mins_since_crashsave = 0;
 			save_all_players();
-			if (debug_log && HEARTBEAT(15)) { log("debug 19:\t%lld", microtime()); }
+			if (debug_log && HEARTBEAT(15)) { log("debug 19b:\t%lld", microtime()); }
 		}
+		
+		display_automessages();
+		if (debug_log && HEARTBEAT(15)) { log("debug 19c:\t%lld", microtime()); }
 	}
 	
 	if (HEARTBEAT(12 * SECS_PER_REAL_HOUR)) {
@@ -1712,6 +1716,9 @@ void close_socket(descriptor_data *d) {
 	if (d->olc_faction) {
 		free_faction(d->olc_faction);
 	}
+	if (d->olc_generic) {
+		free_generic(d->olc_generic);
+	}
 	if (d->olc_global) {
 		free_global(d->olc_global);
 	}
@@ -1723,6 +1730,9 @@ void close_socket(descriptor_data *d) {
 	}
 	if (d->olc_sector) {
 		free_sector(d->olc_sector);
+	}
+	if (d->olc_shop) {
+		free_shop(d->olc_shop);
 	}
 	if (d->olc_social) {
 		free_social(d->olc_social);

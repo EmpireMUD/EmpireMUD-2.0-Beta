@@ -25,6 +25,7 @@
 #include "db.h"
 #include "olc.h"
 #include "skills.h"
+#include "vnums.h"
 
 #define PULSES_PER_MUD_HOUR     (SECS_PER_MUD_HOUR*PASSES_PER_SEC)
 #define player_script_radius  25	// map tiles away that players may be for scripts to trigger
@@ -36,11 +37,9 @@ extern unsigned long pulse;
 /* other external vars */
 extern const char *action_bits[];
 extern const char *affected_bits[];
-extern const char *affect_types[];
 extern const char *alt_dirs[];
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
-extern const char *drinks[];
 extern const char *extra_bits[];
 extern const char *item_types[];
 extern const char *genders[];
@@ -2420,6 +2419,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				else if (!str_cmp(field, "id")) {
 					snprintf(str, slen, "%d", inst->id);
 				}
+				else if (!str_cmp(field, "load")) {
+					void check_instance_is_loaded(struct instance_data *inst);
+					check_instance_is_loaded(inst);
+					strcpy(str, "1");
+				}
+				else if (!str_cmp(field, "loaded")) {
+					snprintf(str, slen, "%d", IS_SET(inst->flags, INST_NEEDS_LOAD) ? 0 : 1);
+				}
+				else if (!str_cmp(field, "level")) {
+					extern int lock_instance_level(room_data *room, int level);
+					
+					if (subfield && *subfield && inst->start && atoi(subfield) > 0) {
+						lock_instance_level(inst->start, atoi(subfield));
+					}
+					snprintf(subfield, slen, "%d", inst->level);
+				}
 				else if (!str_cmp(field, "location")) {
 					if (inst->location) {
 						snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(inst->location) + ROOM_ID_BASE);
@@ -2468,6 +2483,37 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					script_log("Trigger: %s, VNum %d, unknown instance field: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), field);
 				}
 				return;
+			}
+			else if (!str_cmp(var, "cooldown")) {
+				if (field && *field && isdigit(*field)) {
+					generic_data *gen;
+					if ((gen = find_generic(atoi(field), GENERIC_COOLDOWN))) {
+						snprintf(str, slen, "%s", GEN_NAME(gen));
+					}
+					else {
+						strcpy(str, "UNKNOWN");
+					}
+				}
+				else {
+					strcpy(str, "UNKNOWN");
+				}
+			}
+			else if (!str_cmp(var, "currency")) {
+				// %currency.<vnum>(<amt>)% gets the name for that currency
+				if (field && *field && isdigit(*field)) {
+					generic_data *gen;
+					int amt = subfield ? atoi(subfield) : 1;
+					
+					if ((gen = find_generic(atoi(field), GENERIC_CURRENCY))) {
+						snprintf(str, slen, "%s", GEN_STRING(gen, WHICH_CURRENCY(amt)));
+					}
+					else {
+						strcpy(str, "UNKNOWN");
+					}
+				}
+				else {
+					strcpy(str, "UNKNOWN");
+				}
 			}
 			else if (!str_cmp(var, "random")) {
 				if (!str_cmp(field, "char") || !str_cmp(field, "ally") || !str_cmp(field, "enemy")) {
@@ -2583,6 +2629,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					
+					else if (!str_cmp(field, "add_learned")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							void add_learned_craft(char_data *ch, any_vnum vnum);
+							craft_data *cft = craft_proto(atoi(subfield));
+							if (cft && CRAFT_FLAGGED(cft, CRAFT_LEARNED) && !CRAFT_FLAGGED(cft, CRAFT_IN_DEVELOPMENT)) {
+								add_learned_craft(c, GET_CRAFT_VNUM(cft));
+							}
+							else {
+								script_log("Trigger: %s, VNum %d, attempting to add invalid learned craft: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+							}
+						}
+						
+						strcpy(str, "0");
+					}
+					
 					else if (!str_cmp(field, "add_mob_flag")) {
 						if (subfield && *subfield && IS_NPC(c)) {
 							bitvector_t pos = search_block(subfield, action_bits, FALSE);
@@ -2670,15 +2731,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					*/
 					else if (!str_cmp(field, "affect")) {
 						if (subfield && *subfield) {
-							int spell = search_block(subfield, affect_types, FALSE);
-
-							if (affected_by_spell(c, spell))
-								snprintf(str, slen, "1");
-							else 
+							generic_data *gen;
+							
+							if (isdigit(*subfield) && (gen = find_generic(atoi(subfield), GENERIC_AFFECT))) {
+								snprintf(str, slen, "%d", affected_by_spell(c, GEN_VNUM(gen)) ? 1 : 0);
+							}
+							else if ((gen = find_generic_by_name(GENERIC_AFFECT, subfield, TRUE))) {
+								snprintf(str, slen, "%d", affected_by_spell(c, GEN_VNUM(gen)) ? 1 : 0);
+							}
+							else {
 								snprintf(str, slen, "0");
+							}
 						}
-						else
+						else {
 							snprintf(str, slen, "0");
+						}
 					}
 					break;
 				}
@@ -2812,6 +2879,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "charge_currency")) {
+						if (subfield && isdigit(*subfield)) {
+							char arg1[256], arg2[256];
+							comma_args(subfield, arg1, arg2);
+							if (*arg1 && *arg2) {
+								add_currency(c, atoi(arg1), -atoi(arg2));
+							}
+							*str = '\0';
+						}
+					}
 					else if (!str_cmp(field, "canbeseen")) {
 						if ((type == MOB_TRIGGER) && !CAN_SEE(((char_data*)go), c))
 							snprintf(str, slen, "0");
@@ -2877,9 +2954,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 					}
+					else if (!str_cmp(field, "cooldown")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							snprintf(str, slen, "%d", get_cooldown_time(c, atoi(subfield)));
+						}
+					}
 					else if (!str_cmp(field, "crafting_level")) {
 						extern int get_crafting_level(char_data *ch);
 						snprintf(str, slen, "%d", get_crafting_level(c));
+					}
+					else if (!str_cmp(field, "currency")) {
+						if (subfield && *subfield) {
+							snprintf(str, slen, "%d", get_currency(c, atoi(subfield)));
+						}
+						else {
+							strcpy(str, "0");
+						}
 					}
 
 					break;
@@ -2920,6 +3010,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "dodge")) {
 						extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
 						snprintf(str, slen, "%d", get_dodge_modifier(c, NULL, FALSE));
+					}
+					else if (!str_cmp(field, "drunk")) {
+						if (subfield && *subfield) {
+							gain_condition(ch, DRUNK, atoi(subfield) * REAL_UPDATES_PER_MUD_HOUR);
+						}
+						snprintf(str, slen, "%d", GET_COND(ch, DRUNK) / REAL_UPDATES_PER_MUD_HOUR);
 					}
 					break;
 				}
@@ -3045,6 +3141,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "give_currency")) {
+						if (subfield && isdigit(*subfield)) {
+							char arg1[256], arg2[256];
+							comma_args(subfield, arg1, arg2);
+							if (*arg1 && *arg2) {
+								add_currency(c, atoi(arg1), atoi(arg2));
+							}
+							*str = '\0';
+						}
+					}
 					else if (!str_cmp(field, "give_skill_reset")) {
 						skill_data *sk = find_skill(subfield);
 						struct player_skill_data *skdata;
@@ -3129,6 +3235,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else {
 							*str = '\0';
 						}
+					}
+					else if (!str_cmp(field, "hunger")) {
+						if (subfield && *subfield) {
+							gain_condition(ch, FULL, atoi(subfield) * REAL_UPDATES_PER_MUD_HOUR);
+						}
+						snprintf(str, slen, "%d", GET_COND(ch, FULL) / REAL_UPDATES_PER_MUD_HOUR);
 					}
 						
 					break;
@@ -3225,6 +3337,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'l': {	// char.l*
 					if (!str_cmp(field, "lastname")) {
 						snprintf(str, slen, "%s", IS_NPC(c) ? "" : GET_LASTNAME(c)); 
+					}
+					else if (!str_cmp(field, "learned")) {
+						extern bool has_learned_craft(char_data *ch, any_vnum vnum);
+						
+						if (subfield && *subfield && isdigit(*subfield) && has_learned_craft(c, atoi(subfield))) {
+							strcpy(str, "1");
+						}
+						else {
+							strcpy(str, "0");
+						}
 					}
 					else if (!str_cmp(field, "level")) {
 						snprintf(str, slen, "%d", get_approximate_level(c)); 
@@ -3461,7 +3583,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'r': {	// char.r*
-					if (!str_cmp(field, "remove_mob_flag")) {
+					if (!str_cmp(field, "remove_learned")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							void remove_learned_craft(char_data *ch, any_vnum vnum);
+							remove_learned_craft(c, atoi(subfield));
+						}
+						
+						strcpy(str, "0");
+					}
+					else if (!str_cmp(field, "remove_mob_flag")) {
 						if (subfield && *subfield && IS_NPC(c)) {
 							bitvector_t pos = search_block(subfield, action_bits, FALSE);
 							if (pos != NOTHING) {
@@ -3500,7 +3630,33 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 's': {	// char.s*
-					if (!str_cmp(field, "sex"))
+					if (!str_cmp(field, "set_cooldown")) {
+						if (subfield && *subfield) {
+							char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+							generic_data *gen;
+							int val;
+							
+							comma_args(subfield, arg1, arg2);
+							
+							if (!*arg1 || !*arg2 || !isdigit(*arg1) || !isdigit(*arg2) || !(gen = find_generic(atoi(arg1), GENERIC_COOLDOWN))) {
+								script_log("Trigger: %s, VNum %d. bad arguments to set_cooldown(%s, %s)", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), arg1, arg2);
+								strcpy(str, "0");
+							}
+							else {
+								val = atoi(arg2);
+								if (val > 0) {
+									add_cooldown(c, GEN_VNUM(gen), val);
+								}
+								else {
+									remove_cooldown_by_type(c, GEN_VNUM(gen));
+								}
+								
+								// success
+								strcpy(str, "1");
+							}
+						}
+					}
+					else if (!str_cmp(field, "sex"))
 						snprintf(str, slen, "%s", genders[(int)GET_SEX(c)]);
 
 					else if (!str_cmp(field, "str") || !str_cmp(field, "strength"))
@@ -3540,7 +3696,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 't': {	// char.t*
-					if (!str_cmp(field, "tohit")) {
+					if (!str_cmp(field, "thirst")) {
+						if (subfield && *subfield) {
+							gain_condition(ch, THIRST, atoi(subfield) * REAL_UPDATES_PER_MUD_HOUR);
+						}
+						snprintf(str, slen, "%d", GET_COND(ch, THIRST) / REAL_UPDATES_PER_MUD_HOUR);
+					}
+					else if (!str_cmp(field, "tohit")) {
 						extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 						snprintf(str, slen, "%d", get_to_hit(c, NULL, FALSE, FALSE));
 					}
@@ -3681,7 +3843,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'c': {	// obj.c*
-					if (!str_cmp(field, "carried_by")) {
+					if (!str_cmp(field, "can_wear")) {
+						extern const char *wear_bits[];
+						int pos;
+						if (subfield && *subfield && (pos = search_block(subfield, wear_bits, FALSE))) {
+							snprintf(str, slen, "%d", CAN_WEAR(o, BIT(pos)) ? 1 : 0);
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
+					else if (!str_cmp(field, "carried_by")) {
 						if (o->carried_by)
 							snprintf(str, slen,"%c%d",UID_CHAR, char_script_id(o->carried_by));
 						else
@@ -3832,6 +4004,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					break;
 				}
+				case 'q': {	// obj.q*
+					if (!str_cmp(field, "quest")) {
+						snprintf(str, slen, "%d", GET_OBJ_REQUIRES_QUEST(obj) > 0 ? GET_OBJ_REQUIRES_QUEST(obj) : 0);
+					}
+					break;
+				}
 				case 'r': {	// obj.r*
 					if (!str_cmp(field, "room")) {
 						if (obj_room(o))
@@ -3883,7 +4061,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'w': {	// obj.w*
-					if (!str_cmp(field, "worn_by")) {
+					if (!str_cmp(field, "wearable")) {
+						snprintf(str, slen, "%d", (GET_OBJ_WEAR(o) & ~ITEM_WEAR_TAKE) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "worn_by")) {
 						if (o->worn_by)
 							snprintf(str, slen,"%c%d",UID_CHAR, char_script_id(o->worn_by));
 						else
@@ -4917,7 +5098,6 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, void *go, struct scri
 	for (p = rhs; *p; p++);
 	for (--p; isspace(*p) && (p > rhs); *p-- = '\0');  
 
-
 	/* find the op, and figure out the value */
 	if (!strcmp("||", op)) {
 		if ((!*lhs || (*lhs == '0')) && (!*rhs || (*rhs == '0')))
@@ -5091,7 +5271,7 @@ int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, 
 	
 	// symbols used in operators
 	const char *opsymbols = "!/*+-<>=~&|";
-
+	
 	p = strcpy(line, expr);
 
 	/*

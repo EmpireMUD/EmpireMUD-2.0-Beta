@@ -21,10 +21,11 @@ Available types are:
  .b - buildings                  .book - books
  .c - crafts                     .class - classes
  .crop - crops                   .f - factions
- .g - globals                    .m - mobiles
- .map - map tiles/interiors      .morph - morphs
- .o - objects                    .q - quests
- .r - room templates             .sect - map sectors
+ .g - globals                    .gen - generics
+ .m - mobiles                    .map - map tiles/interiors
+ .morph - morphs                 .o - objects
+ .q - quests                     .r - room templates
+ .sect - map sectors             .shop - shops
  .skill - skills                 .soc - socials
  .t - scripts/triggers           .v - vehicles
 
@@ -35,6 +36,9 @@ Basic commands:
  delete <vnum> - deletes a vnum from the database, with all copies of it
  edit <vnum> - loads that vnum into the editor
  list <from vnum> <to vnum> - lists everything in that vnum range
+ search <vnum> - see where a thing is used by other things
+ fullsearch <args> - a deeper search provided for some tyepes
+ audit <vnum/range> - find common errors automatically
  save - save your open editor and close it
 
 Examples:
@@ -45,7 +49,8 @@ Examples:
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
  
 See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC FACTIONS,
-   OLC GLOBALS, OLC MOBILES, OLC OBJECTS, OLC SECTORS, MAP OLC
+   OLC GLOBALS, OLC MOBILES, OLC OBJECTS, OLC SECTORS, MAP OLC, OLC GENERICS,
+   OLC SHOPS
 See also: OLC ABORT, OLC AUDIT, OLC COPY, OLC DELETE, OLC EDIT, OLC FREE, 
    OLC LIST, OLC SAVE, OLC SEARCH, OLC LICENSE, TEXT EDITOR, VNUM
 #d
@@ -62,7 +67,8 @@ bld (or bdg) - building (these include designated rooms)
 cft - craft
 cls - class
 crp - crop
-fct - factions
+fct - faction
+gen - generic
 glb - global
 mob - mobile/npc
 mph - morph
@@ -71,6 +77,7 @@ obj - object
 qst - quest
 rmt - room template
 sct - sector/terrain
+shop - shop
 skl - skill
 soc - social
 trg - trigger
@@ -106,6 +113,10 @@ Abilities (ABILEDIT):
   (superior). Do not apply mastery abilities to abilities that don't need this.
 
 Adventures (ADVEDIT):
+- You should use the CAN-DELAY-LOAD flag whenever possible. This will reduce
+  work (and lag) from having many copies of the adventure by not loading the
+  interior until a player arrives. However, some types of adventures won't work
+  correctly if they don't load immediately (like the Magiterranean Whirlwind).
 - When you set a min/max level for the adventure, mobs and items that don't
   have their own level limits will inherit the limits from the adventure.
 - If you plan to use obj/room scripts that will do scaled damage, you should
@@ -165,12 +176,11 @@ Crafts (CEDIT):
 - Soups are made using the COOK type and the SOUP flag. Instead of choosing an
   item to make, you choose a liquid, and the recipe will require a container
   of water to make the soup in.
-- To make a recipe item, build an item ("an old recipe") and set it in a
-  craft's requiresobject field. The player will only be able to see and use
-  the craft if they have the item in their inventory. You can still also choose
-  to require an Ability, for example an armor pattern that requires Armor-
-  smithing. You should mention the recipe by name in the item's look
-  description.
+- To make a recipe item, build an item ("an old recipe") of type RECIPE, and
+  set its recipe vnum to the craft. Your craft must have the LEARNED flag.
+  Players must still meet other requirements, such as requiresability, to make
+  the craft once they have learned it. If you want to constrain the level of
+  the item it makes, put min/max levels on the item.
 - To make an item that can be combined with another item, for example a spear-
   head that can be crafted into a spear, create a craft and set its requires-
   object to the spearhead (just like a recipe item, above). Then, also set the
@@ -210,6 +220,14 @@ Factions (FEDIT):
   Hated/Venerated. Despised/Revered don't have ranges, and players can 'bump
   out' of those ranges by gaining/losing even 1 reputation point.
 - See HELP FACTION SCRIPTING for tips on writing scripts.
+
+Generics (GENEDIT):
+- Core content appears in low-numbered vnums, but new generics should usually
+  be in the vnum block of the adventure that adds them.
+- Core liquids are in the 0-99 vnum range.
+- Core resource actions are in the 1000-1099 vnum range.
+- Core cooldowns are in the 2000-2999 vnum range.
+- Core affects are in the 3000-3999 range.
 
 Globals (GEDIT):
 - All global tables must be approved by the head builder, because they apply
@@ -362,6 +380,9 @@ Sectors (SECTEDIT):
   do anything.
 - Please provide a useful list of commands for any new sector. For example, if
   you add any DIG interaction, put "dig" on the commands list.
+
+Shops (SHOPEDIT):
+- no tips yet
 
 Skills (SKILLEDIT):
 - See HELP ABILITY POINTS for a breakdown of how many points a player gets in
@@ -576,6 +597,8 @@ The following adventure flags are available:
  NEWBIE-ONLY - Only spawns on newbie islands.
  NO-MOB-CLEANUP - Won't despawn mobs that got out of the instance on cleanup.
  EMPTY-RESET-ONLY - Won't reset while players are inside.
+ CAN-DELAY-LOAD - Saves memory by not loading until a player arrives for the
+    first time.
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
@@ -1677,6 +1700,7 @@ Available flags:
  VEHICLE - creates a vehicle instead of an item, see CRAFT VEHICLES
  SHIPYARD - requires being at a shipyard
  BLD-UPGRADED - requires being at a building with the UPGRADED flag
+ LEARNED - requires the player 'learn' a recipe to use it
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d
@@ -2204,6 +2228,190 @@ a faction but lose reputation over time.
 
 See also: OLC FACTIONS, OLC LEVELS, REPUTATIONS
 #d
+GENEDIT GENERICEDIT "OLC GENERICS "GENERIC OLC" "GENERIC EDIT"
+
+Usage:  .generic <comman>
+        .<command>
+
+The .olc generics editor allows you to add, edit, or delete generics from
+the system. It provides an in-game menu for controlling features like liquids
+and resource actions.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on any of these commands by typing &yHELP GENEDIT
+<COMMAND>&0.
+
+Each type of generic provides a different function, and has its own help file.
+See: GENERIC LIQUID, GENERIC ACTION, GENERIC COOLDOWN, GENERIC AFFECT,
+  GENERIC CURRENCY
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .gen edit 123
+ > .name My Generic
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"GENERIC ACTIONS" "ACTION EDITOR" "ACTION GENERICS" "GENEDIT BUILD2CHAR" "GENEDIT BUILD2ROOM" "GENEDIT CRAFT2CHAR" "GENEDIT CRAFT2ROOM" "GENEDIT REPAIR2CHAR" "GENEDIT REAPIR2ROOM"
+
+Generic 'actions' are used in resource lists, and are free tasks that players
+perform while building or making a vehicle. Normal crafts don't support the
+action-type resources, nor do augments.
+
+Actions require 6 properties:
+  <&ybuild2char&0> Sent to the character when building a building
+    Example: You dig at the ground.
+  <&ybuild2room&0> Sent to the room when building a building
+    Example: $n digs at the ground.
+  <&ycraft2char&0> Sent to the character when crafting a vehicle
+    Example: You dig underneath $V.
+  <&ycraft2room&0> Sent to the room when crafting a vehicle
+    Example: $n digs underneath $V.
+  <&yrepair2char&0> Sent to the character when repairing a vehicle
+    Example: You dig underneath $V.
+  <&yrepair2room&0> Sent to the room when repairing a vehicle
+    Example: $n digs underneath $V.
+
+These messages support codes like $n for the actor and $V for a vehicle
+being crafted/repaired.
+
+Stock actions can be found in the 1000-1099 vnum block, but new actions should
+usually be added within an adventure zone's vnums.
+
+See also: OLC GENERICS, DOLLAR SIGN CODES
+#d
+"GENERIC AFFECTS" "AFFECTS EDITOR" "AFFECT EDITOR" "AFFECT GENERICS"
+
+Generic 'affects' are used by spells, abilities, and scripts to show names on
+the affect list, and to show messages when these effects wear off.
+
+Affects have 2 properties:
+  <&ywearoff&0> An optional message shown to the character.
+  <&ywearoff2room&0> An optional message shown to the rest of the room.
+
+You can use <&ystandardwearoff&0> to add the normal wear-off message. This only
+adds a message for the character -- normal effects don't show anything to the
+room when they end.
+
+See also: AFFECTS, OLC GENERICS
+#d
+"GENERIC COOLDOWN" "COOLDOWN EDITOR" "COOLDOWN GENERICS"
+
+Generic 'cooldowns' are used to track time limits on players' abilities, as
+well as in scripts.
+
+Cooldowns have 1 optional property:
+  <&ywearoff&0> An optional message shown when the cooldown ends.
+
+You can use <&ystandardwearoff&0> to add the normal wear-off message.
+
+You can also create quick cooldowns with: .gen quickcooldown <type> <vnum>
+
+See also: GENEDIT QUICKCOOLDOWN, OLC GENERICS
+#d
+"GENERIC CURRENCY" "CURRENCY GENERICS" "CURRENCY EDITOR" "GENEDIT SINGULAR" "GENEDIT PLURAL"
+
+The 'currency' generic type is used to create money for use in shops and in
+scripts. This is separate from player-minted coins. The most common type of
+currency included in stock content is adventure-specific tokens.
+
+You must set 2 properties on currency:
+  <&ysingular&0> the money's name (e.g. dragon token)
+  <&yplural&0> a name to show when there's more than one (e.g. dragon tokens)
+
+See also: OLC GENERICS
+#d
+"GENERIC LIQUIDS" "LIQUID GENERICS" "LIQUID EDITOR" "GENEDIT LIQUID" "GENEDIT COLOR" "GENEDIT HUNGER" "GENEDIT THIRST" "GENEDIT DRUNK"
+
+The 'liquid' generic type is used in drink containers and resource lists.
+
+You must set 5 properties on liquids:
+  <&yliquid&0> the name as it appears in descriptions (a bottle of 'water')
+  <&ycolor&0> the color of the liquid when the player looks in the bottle
+  <&yhunger&0> number of hours to satiate hunger per unit of liquid
+  <&ythirst&0> number of hours to satiate thirst per unit
+  <&ydrunk&0> number of hours to cause drunknness per unit
+
+Stock liquids can be found in the 0-99 vnum block, but new liquids should
+usually be added within an adventure zone's vnums.
+
+See also: OLC GENERICS
+#d
+"GENEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+This set of flags applies to the generic. There are currently no flags
+available.
+
+See also: OLC GENERICS
+#d
+"GENEDIT NAME"
+
+Usage:  .name <name>
+
+The name of a generic has various rules based on the generic type. On some
+types, like liquids, the name is never shown to players. However, other types
+such as actions do appear to the player.
+
+Action names should be lowercase unless they are proper nouns.
+
+See also: OLC GENERICS
+#d
+"GENEDIT QUICKCOOLDOWN"
+
+Usage:  .gen quickcooldown <type> <vnum>
+
+This creates a new generic cooldown based on the type/vnum you pick. For
+example, using it on an object named "a puppy whistle" results in a new
+cooldown named "puppy whistle" and with the standard wear-off message.
+
+See also: OLC GENERICS
+#d
+"GENEDIT STANDARDWEAROFF"
+
+Usage:  .standardwearoff
+
+This sets the 'wearoff' property to a standard message based on the name of
+the generic.
+
+See also: OLC GENERICS, GENERIC AFFECTS, GENERIC COOLDOWNS, GENEDIT WEAROFF
+#d
+"GENEDIT TYPE"
+
+Usage:  .type <type>
+
+Each generic type has its own requirements and features. See the help file
+for each type:
+ ACTION - Simple echoes performed during building (GENERIC ACTIONS)
+ LIQUID - Drinkables for use in items (GENERIC LIQUIDS)
+
+See also: OLC GENERICS
+#d
+"GENEDIT WEAROFF"
+
+Usage:  .wearoff <message | none>
+
+The wearoff message is sent to the player when the cooldown/affect ends. This
+message is optional.
+
+See also: OLC GENERICS, GENERIC AFFECTS, GENERIC COOLDOWNS,
+GENEDIT STANDARDWEAROFF
+#d
+"GENEDIT WEAROFF2ROOM"
+
+Usage:  .wearoff2room <message | none>
+
+The wearoff message is sent to the rest of the room when a player's affect
+ends. It will only be shown to players who can see that person. This message
+is optional.
+
+See also: OLC GENERICS, GENERIC AFFECTS
+#d
 "GEDIT FLAGS"
 
 Usage:  .flags [add | remove] <flags>
@@ -2712,14 +2920,18 @@ always active on the mob, as if a spell had been cast on them.
 
 See also: AFFECT FLAGS, OLC MOBILES
 #d
-"MEDIT ALLEGIANCE"
+"MEDIT ALLEGIANCE" "SHOPEDIT ALLEGIANCE"
 
 Usage:  .allegiance <none | vnum | name>
 
-This sets a mob to be a member of a faction. For some factions, this will cause
-reputation gain if a player kills the mob.
+This sets a mob or shop to be a member of a faction.
 
-See also: FACTION, OLC FACTIONS, OLC MOBILES
+For some factions, this will cause reputation gain if a player kills the mob.
+
+The faction allegiance of a shop only matters for items that have a reputation
+requirement to purchase.
+
+See also: FACTION, OLC FACTIONS, SHOPEDIT ITEM, OLC MOBILES, OLC SHOPS
 #d
 "MEDIT ATTACK" "ATTACK TYPES"
 
@@ -3375,11 +3587,12 @@ See also: OLC OBJECTS
 
 Usage:  .coinamount <number>
 
-This sets how many coins are in a COINS-type object. You can't set what empire
-the coins belong to; they will always be "other".
+Coins: This sets how many coins are in a COINS-type object. You can't set what
+empire the coins belong to; they will always be "other". For SCALABLE objects,
+thus number is a scalable value if it is set to a number other than 0.
 
-For SCALABLE objects, thus number is a scalable value if it is set to a number
-other than 0.
+Currency: This sets the amount of adventure currency the object gives. This is
+not scalable.
 
 See also: ITEM SCALING, OEDIT TYPE, OLC OBJECTS
 #d
@@ -3499,6 +3712,14 @@ of your mobs.
 All corpse items must be the corpse of something (for skin/butcher data).
 
 See also: VNUM
+#d
+"OEDIT CURRENCY"
+
+Usage:  .currency <vnum>
+
+This sets the vnum of the adventure currency (a generic).
+
+See also: GENERIC CURRENCY
 #d
 "OEDIT CUSTOM" "CUSTOM MESSAGES"
 
@@ -3897,6 +4118,35 @@ This sets how many arrows are available from a given ARROW object.
 
 See also: OLC OBJECTS
 #d
+"OEDIT QUICKRECIPE" "OEDIT QUICK RECIPE" QUICKRECIPE "QUICK RECIPE"
+
+Usage:  .o quickrecipe <new obj vnum> <craft vnum> [pattern | design | etc]
+
+This command generates a quick 'recipe' item for a given craft. The craft
+must be set LEARNABLE. You can optionally give it a word like "pattern",
+"schematic", etc if you don't want the default name "recipe".
+
+It sets the following properties:
+keywords: recipe <craft name>
+shortdescription: the <craft name> recipe
+longdescription: The <craft name> recipe is on the ground.
+lookdescription: This recipe will teach you to <command>: <craft name>.
+type: RECIPE
+recipe vnum: <craft vnum>
+
+See also: OLC OBJECTS, LEARN, RECIPE ITEM
+#d
+"OEDIT RECIPE"
+
+Usage:  .recipe <craft vnum>
+
+This sets the craft recipe that a RECIPE item teaches. You must specify the
+vnum of a craft that has the LEARNED flag.
+
+You can make recipes even faster with the quickrecipe command.
+
+See also: OLC OBJECTS, OLC CRAFTS, CEDIT FLAGS, OEDIT QUICKRECIPE
+#d
 "OEDIT ROOMVNUM"
 
 Usage:  .roomvnum <vnum>
@@ -3985,11 +4235,12 @@ Available types:
  CONTAINER - a chest, holds items on the ground (never set wear TAKE)
  DRINKCON - a drink container, like a flask
  FOOD - edible
- * - unused
+ RECIPE - can be 'learned' to give a craft
  PORTAL - transports a player to another place (never set .wear TAKE)
  *BOARD - a message board
  CORPSE - a corpse
  COINS - a pile of coins
+ CURRENCY - a pile of adventure currency
  *MAIL - a letter
  WEALTH - adds to empire wealth when stored
  *CART - use vehicles instead
@@ -4448,7 +4699,11 @@ The following types will have IN-DEVELOPMENT flags removed in the vnum range:
 - augments
 - classes
 - crafts
+- factions
 - globals
+- morphs
+- quests
+- shops
 - skills
 - socials
 
@@ -4468,10 +4723,11 @@ other pools), coins, and liquids.
 Specific syntaxes for adding:
   .resource add object <quantity> <vnum>
   .resource add component <quantity> <component type> [component flags]
-  .resource add liquid <number of units> <liquid name>
+  .resource add liquid <number of units> <liquid vnum>
   .resource add coins <amount>
   .resource add pool <number of points> <pool type>
   .resource add action <amount> <type>
+  .resource add currency <amount> <currency vnum>
 
 Valid pools are: health, mana, move, blood.
 
@@ -4715,6 +4971,7 @@ Available reward types:
  QUEST-CHAIN - Starts a player on another quest, if they meet the pre-reqs and
     are not already on it.
  REPUTATION - Gain/lose faction reputation.
+ CURRENCY - Gives generic currency (e.g. tokens).
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.
@@ -4889,6 +5146,7 @@ Available tasks:
  &cWEARING&0 - Player has the item equipped
  &cWEARING-OR-HAS&0 - Player has the item either equipped or in inventory
     Note: item will not be extracted even if EXTRACT-TASK-OBJECTS is on
+ &cGET-CURRENCY&0 - Player must have an amount of adventure currency.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 
@@ -5103,6 +5361,109 @@ punctuation at the end, and should be a reasonably short description of the
 sector.
 
 See also: OLC SECTORS
+#d
+SHOPEDIT "OLC SHOPS" "SHOP OLC"
+
+Usage:  .shop <command>
+        .command
+
+The .olc shop editor allows you to configure shops, which can be attached to
+mobs, objects, room templates, and buildings. Shops can sell items for coins
+or for various adventure currencies (generics). However, shops are not
+currently able to buy items.
+
+All commands in the editor arg highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP SHOPEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .shop edit 123
+> .name Test Shop
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"SHOPEDIT CLOSES" "SHOPEDIT OPENS"
+
+Usage:  .opens <hour>
+        .closes <hour>
+
+These commands allow you to set when the shop opens or closes. You can use
+either 12- or 24-hour time ('4pm' or '16'). If a shop has the same time for
+both opening and closing, it will be open all the time.
+
+If the opening time is later than the closing time, the shop will be open
+overnight: e.g. if it opens at 6pm and closes at 4am.
+
+See also: OLC SHOPS
+#d
+"SHOPEDIT FLAGS" "SHOP FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Shop flags set various properties on shops.
+
+Available flags:
+ IN-DEVELOPMENT - Players can't use the shop.
+
+See also: OLC SHOPS, OLC REMOVEINDEV
+#d
+"SHOPEDIT ITEMS"
+Usage: .item add <vnum> <cost> <currency vnum | coins> [min reputation]
+       .item change <number> vnum <value>
+       .item move <number> <up | down>
+       .item copy <from type> <from vnum>
+       .item remove <number | all>
+
+The shop's item list determines what it sells. Shops have an infinite number
+of each item, and do not run out. Shopkeepers do not receive the coins or
+currency that are paid to them; this is always lost.
+
+The parameters for add/copy are:
+- vnum: The object vnum to sell.
+- cost: The number of coins/currency.
+- currency: Either the word 'coins' or the vnum of a generic currency. Coins
+  will always be miscellaneous coins unless the shop's mob/room belong to an
+  empire, in which case it will be empire coins.
+- min reputation: If the shop has allegiance to a faction, this is the lowest
+  reputation that can buy the item (optional).
+
+See also: SHOPEDIT ALLEGIANCE, OLC SHOPS, GENERIC CURRENCY, VNUM
+#d
+"SHOPEDIT LOCATIONS"
+
+Usage:  .location add <type> <vnum>
+        .location change <number> vnum <value>
+        .location copy <from type> <from vnum>
+        .location remove <number | all>
+
+Locations are places where the shop appears. The same shop can have multiple
+shopkeepers.
+
+Available location types:
+ BUILDING - Any copy of this building (or designated room) has the shop.
+ MOBILE - A mob has the shop, wherever that mob is.
+ OBJECT - An object has the shop. Be careful; this will work even if the object
+   is in the player's inventory.
+ ROOM-TEMPLATE - The shop is in a room template in an adventure.
+
+Shop locations use the same system as the start/end locations of a quest, and
+you can copy from those fields (and vice versa) with this syntax:
+> .location copy quest <vnum> starts
+
+See also: OLC QUESTS, OLC SHOPS
+#d
+"SHOPEDIT NAME"
+
+Usage:  .name <name>
+
+A shop's name is only used for internal purposes, such as 'vnum' or '.list'.
+Players do not see the name. You should use something descriptive.
+
+See also: OLC SHOPS
 #d
 SKILLEDIT "OLC SKILLS" "SKILL OLC"
 
@@ -5485,7 +5846,7 @@ then assigning their book ID to a book object in your adventure zone. The
 data from the book editor will override your short description, long desc-
 ription, and look description.
 #d
-"COINS ITEM" "COINS OBJECT"
+"COINS ITEM" "COINS OBJECT" "COIN ITEM" "COIN OBJECT"
 
 The COINS type represents a pile of coins and will be converted from an object
 to "real" coins when a player picks it up. Coins dropped by adventures should
@@ -5512,6 +5873,13 @@ objects. You can use the CONTAINER item type if you don't set it as take-able,
 or else you can use OTHER but won't be able to put items inside the corpse.
 
 This item type itself is reserved for code use.
+#d
+"CURRENCY ITEM" "CURRENCY OBJECT"
+
+Currency items represent a pile of adventure currency. The name of the currency
+is defined by a generic.
+
+See also: GENERIC CURRENCY
 #d
 "DRINKCON ITEM" "DRINKCON OBJECT" "DRINK ITEM" "DRINK OBJECT" "DRINK CONTAINER ITEM" "DRINK CONTAINER OBJECT"
 
@@ -5616,6 +5984,16 @@ If you do set your potion as scalable, you only need to set the potionscale to
 1 and it will scale to the correct level.
 
 Potions can only be used once, and then are lost.
+#d
+"RECIPE ITEM" "RECIPE OBJECT"
+
+Recipes are single-use items that permanently teach a player a new craft. You
+must also create the craft entry, which must have the LEARNED flag. Only
+players who learn the recipe from an item can make that craft.
+
+You can make recipes even faster with the quickrecipe command.
+
+See also: OEDIT QUICKRECIPE
 #d
 "RESOURCE ACTIONS" "RESOURCE ACTION TYPES"
 

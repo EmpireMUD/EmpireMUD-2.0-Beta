@@ -38,7 +38,6 @@
 */
 
 // external vars
-extern const char *affect_wear_off_msgs[];
 extern const char *dirs[];
 extern const char *from_dir[];
 extern const struct material_data materials[NUM_MATERIALS];
@@ -165,11 +164,9 @@ void check_death_respawn(void) {
 * only runs on players who are connected. Nobody else, including mobs, needs
 * to know.
 */
-void check_expired_cooldowns(void) {
-	extern const char *cooldown_types[];
-	
+void check_expired_cooldowns(void) {	
 	struct cooldown_data *cool, *next_cool;
-	char lbuf[MAX_STRING_LENGTH];
+	generic_data *gen;
 	char_data *ch;
 	descriptor_data *d;
 	
@@ -179,8 +176,9 @@ void check_expired_cooldowns(void) {
 				next_cool = cool->next;
 				
 				if ((cool->expire_time - time(0)) <= 0) {
-					sprinttype(cool->type, cooldown_types, lbuf);
-					msg_to_char(ch, "&%cYour %s cooldown has ended.&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', lbuf);
+					if ((gen = find_generic(cool->type, GENERIC_COOLDOWN)) && GET_COOLDOWN_WEAR_OFF(gen)) {
+						msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', GET_COOLDOWN_WEAR_OFF(gen));
+					}
 					remove_cooldown(ch, cool);
 				}
 			}
@@ -1612,6 +1610,7 @@ void point_update_room(room_data *room) {
 	obj_data *o, *next_o;
 	struct track_data *track, *next_track, *temp;
 	struct affected_type *af, *next_af;
+	generic_data *gen;
 	empire_data *emp;
 	time_t now = time(0);
 	bool junk;
@@ -1761,8 +1760,8 @@ void point_update_room(room_data *room) {
 		else if (af->duration != UNLIMITED) {
 			if ((af->type > 0)) {
 				if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
-					if (*affect_wear_off_msgs[af->type] && ROOM_PEOPLE(room)) {
-						act(affect_wear_off_msgs[af->type], FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
+					if ((gen = find_generic(af->type, GENERIC_AFFECT)) && GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ROOM_PEOPLE(room)) {
+						act(GET_AFFECT_WEAR_OFF_TO_CHAR(gen), FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
 					}
 				}
 			}

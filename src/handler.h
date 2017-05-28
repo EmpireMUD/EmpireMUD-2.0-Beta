@@ -51,20 +51,20 @@
  //////////////////////////////////////////////////////////////////////////////
 //// HANDLER MACROS //////////////////////////////////////////////////////////
 
-#define MATCH_ITEM_NAME(str, obj)  (isname((str), GET_OBJ_KEYWORDS(obj)) || (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0 && isname((str), drinks[GET_DRINK_CONTAINER_TYPE(obj)])))
+#define MATCH_ITEM_NAME(str, obj)  (isname((str), GET_OBJ_KEYWORDS(obj)) || (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0 && isname((str), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME))))
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// handler.c protos ////////////////////////////////////////////////////////
 
 // affect handlers
-void affect_from_char(char_data *ch, int type, bool show_msg);
-void affect_from_char_by_apply(char_data *ch, int type, int apply, bool show_msg);
-void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits, bool show_msg);
-void affect_from_char_by_caster(char_data *ch, int type, char_data *caster, bool show_msg);
+void affect_from_char(char_data *ch, any_vnum type, bool show_msg);
+void affect_from_char_by_apply(char_data *ch, any_vnum type, int apply, bool show_msg);
+void affect_from_char_by_bitvector(char_data *ch, any_vnum type, bitvector_t bits, bool show_msg);
+void affect_from_char_by_caster(char_data *ch, any_vnum type, char_data *caster, bool show_msg);
 void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag, bool show_msg);
-void affect_from_room(room_data *room, int type);
-void affect_from_room_by_bitvector(room_data *room, int type, bitvector_t bits, bool show_msg);
+void affect_from_room(room_data *room, any_vnum type);
+void affect_from_room_by_bitvector(room_data *room, any_vnum type, bitvector_t bits, bool show_msg);
 void affect_join(char_data *ch, struct affected_type *af, int flags);
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add);
 void affect_remove(char_data *ch, struct affected_type *af);
@@ -72,12 +72,12 @@ void affect_remove_room(room_data *room, struct affected_type *af);
 void affect_to_char(char_data *ch, struct affected_type *af);
 void affect_to_room(room_data *room, struct affected_type *af);
 void affect_total(char_data *ch);
-extern bool affected_by_spell(char_data *ch, int type);
-extern bool affected_by_spell_and_apply(char_data *ch, int type, int apply);
-extern struct affected_type *create_aff(int type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by);
-void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
+extern bool affected_by_spell(char_data *ch, any_vnum type);
+extern bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply);
+extern struct affected_type *create_aff(any_vnum type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by);
+void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
 void dot_remove(char_data *ch, struct over_time_effect_type *dot);
-extern bool room_affected_by_spell(room_data *room, int type);
+extern bool room_affected_by_spell(room_data *room, any_vnum type);
 void show_wear_off_msg(char_data *ch, int atype);
 
 // affect shortcut macros
@@ -122,10 +122,14 @@ extern const char *money_desc(empire_data *type, int amount);
 extern int total_coins(char_data *ch);
 
 // cooldown handlers
-void add_cooldown(char_data *ch, int type, int seconds_duration);
-extern int get_cooldown_time(char_data *ch, int type);
+void add_cooldown(char_data *ch, any_vnum type, int seconds_duration);
+extern int get_cooldown_time(char_data *ch, any_vnum type);
 void remove_cooldown(char_data *ch, struct cooldown_data *cool);
-void remove_cooldown_by_type(char_data *ch, int type);
+void remove_cooldown_by_type(char_data *ch, any_vnum type);
+
+// currency handlers
+extern int add_currency(char_data *ch, any_vnum vnum, int amount);
+extern int get_currency(char_data *ch, any_vnum vnum);
 
 // empire handlers
 void abandon_room(room_data *room);

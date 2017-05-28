@@ -65,17 +65,9 @@ if %veh%
   end
 end
 * once per 60 minutes
-if %actor.varexists(last_hestian_time)%
-  if (%timestamp% - %actor.last_hestian_time%) < 3600
-    eval diff (%actor.last_hestian_time% - %timestamp%) + 3600
-    eval diff2 %diff%/60
-    eval diff %diff%//60
-    if %diff%<10
-      set diff 0%diff%
-    end
-    %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc% again.
-    halt
-  end
+if %actor.cooldown(256)%
+  %send% %actor% Your %cooldown.256% is on cooldown!
+  halt
 end
 eval room_var %actor.room%
 %send% %actor% You touch %self.shortdesc% and it begins to swirl with light...
@@ -94,8 +86,7 @@ end
 %teleport% %actor% %actor.home%
 %force% %actor% look
 %echoaround% %actor% %actor.name% appears in a flash of light!
-eval last_hestian_time %timestamp%
-remote last_hestian_time %actor.id%
+nop %actor.set_cooldown(256, 3600)%
 nop %actor.cancel_adventure_summon%
 ~
 #258
@@ -142,17 +133,9 @@ if !%actor.can_teleport_room% || !%actor.canuseroom_guest%
   halt
 end
 * once per 30 minutes
-if %actor.varexists(last_conveyance_time)%
-  if (%timestamp% - %actor.last_conveyance_time%) < 1800
-    eval diff (%actor.last_conveyance_time% - %timestamp%) + 1800
-    eval diff2 %diff%/60
-    eval diff %diff%//60
-    if %diff%<10
-      set diff 0%diff%
-    end
-    %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc%.
-    halt
-  end
+if %actor.cooldown(262)%
+  %send% %actor% Your %cooldown.262% is still on cooldown!
+  halt
 end
 eval room_var %actor.room%
 %send% %actor% You touch %self.shortdesc% and it begins to swirl with light...
@@ -171,8 +154,7 @@ end
 %teleport% %actor% %startloc%
 %force% %actor% look
 %echoaround% %actor% %actor.name% appears in a flourish of yellow light!
-eval last_conveyance_time %timestamp%
-remote last_conveyance_time %actor.id%
+nop %actor.set_cooldown(262, 1800)%
 nop %actor.cancel_adventure_summon%
 %purge% %self%
 ~

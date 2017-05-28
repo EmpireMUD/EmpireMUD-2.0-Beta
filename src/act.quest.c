@@ -199,6 +199,14 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 				increase_coins(ch, coin_emp, reward->amount);
 				break;
 			}
+			case QR_CURRENCY: {
+				generic_data *gen;
+				if ((gen = find_generic(reward->vnum, GENERIC_CURRENCY))) {
+					msg_to_char(ch, "\tyYou receive %d %s!\t0\r\n", reward->amount, reward->amount != 1 ? GET_CURRENCY_PLURAL(gen) : GET_CURRENCY_SINGULAR(gen));
+					add_currency(ch, reward->vnum, reward->amount);
+				}
+				break;
+			}
 			case QR_OBJECT: {
 				obj_data *obj = NULL;
 				int iter;

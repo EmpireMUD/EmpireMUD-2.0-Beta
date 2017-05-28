@@ -7,7 +7,7 @@ The grove is but a small part of the greater realm, and can be found in deep
 forests.
 ~
 10000 10005 1-75
-50 0 0 0
+50 0 k 0
 L
 5 0
 4320 -1 -1
@@ -27,7 +27,7 @@ druids! You can do this quest alone or with friends, but there's no combat
 here. This adventure is for farmers and gardeners.
 ~
 10225 10249 15-0
-5 0 0 0
+5 0 k 0
 L
 3 a
 5179 10225 10225
@@ -104,7 +104,7 @@ or in groups of up to four. All gear looted from this adventure will be higher
 quality on harder difficulties.
 ~
 10550 10599 75-125
-25 0 cg 4
+25 0 cgk 4
 L
 4 0
 10550 10550 10550
@@ -146,7 +146,7 @@ dilapidated, and surrounded by unfriendly swamp creatures. What sort of person
 would live like this?
 ~
 10100 10104 75-150
-15 0 0 0
+15 0 k 0
 L
 1 0
 10100 -1 -1
@@ -164,7 +164,7 @@ hideout of infamous bandits Berk, Jorr, and Tranc! These three are not renowned
 for fighting fair, but if you're lucky, maybe only one of them is home.
 ~
 10105 10109 100-200
-20 0 cd 0
+20 0 cdk 0
 L
 0 ac
 5007 -1 -1
@@ -187,7 +187,7 @@ quite valuable, so it's safe to assume the person camping here is not the legal
 owner of any of these things.
 ~
 10110 10129 25-75
-20 0 c 0
+20 0 ck 0
 L
 5 0
 2880 -1 -1
@@ -212,7 +212,7 @@ This adventure locks its level when you start combat, so check if it's already
 locked before you start.
 ~
 10200 10224 50-150
-50 0 c 4
+50 0 ck 4
 L
 0 ac
 5007 -1 -1
@@ -353,7 +353,7 @@ the foul stench of mankind's unmentionable waste out of sight, and out of mind.
 But the sewer attracts two more of society's unwanted: the poor, and the rats.
 ~
 10011 10027 1-50
-30 30 be 0
+30 30 bek 0
 L
 2 ab
 9 10011 10012
@@ -381,7 +381,7 @@ patterns and 4 unique buildings. You can also fight the goblins solo or in
 pairs, to earn their prized gear.
 ~
 10450 10499 50-100
-30 120 0 2
+30 120 k 2
 L
 2 ab
 9 10450 10451
@@ -409,7 +409,7 @@ tower are designed for different level ranges, so use the 'consider' command
 judiciously before you attack things.
 ~
 10030 10099 30-200
-1 240 0 0
+1 240 k 0
 L
 1 0
 10030 -1 -1
@@ -429,7 +429,7 @@ But beware, because it's easy to get lost and you make a delicious snack for
 the dracosaurs.
 ~
 10250 10299 75-100
-10 0 f 4
+10 0 fk 4
 L
 5 0
 1440 -1 -1
@@ -455,7 +455,7 @@ This adventure has three wings:
  Temple Street: Groups
 ~
 10400 10449 175-225
-10 360 0 4
+10 360 k 4
 L
 5 0
 1440 -1 -1
@@ -531,7 +531,7 @@ from this adventure during the Christmas season, and re-add
 the flag when you're ready to shut the adventure off again.
 ~
 10700 10729 0-300
-3 0 ace 0
+3 0 acek 0
 L
 5 0
 60 -1 -1
