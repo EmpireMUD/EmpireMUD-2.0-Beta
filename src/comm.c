@@ -884,6 +884,7 @@ void heartbeat(int heart_pulse) {
 	void detect_evos_per_hour();
 	void display_automessages();
 	void extract_pending_chars();
+	void free_freeable_triggers();
 	void frequent_combat(int pulse);
 	void generate_adventure_instances();
 	void output_map_to_file();
@@ -1084,6 +1085,7 @@ void heartbeat(int heart_pulse) {
 
 	/* Every pulse! Don't want them to stink the place up... */
 	extract_pending_chars();
+	free_freeable_triggers();
 
 	/* Turn this off */
 	gain_cond_messsage = FALSE;

@@ -23,6 +23,9 @@
 #include "handler.h"
 #include "dg_event.h"
 
+// locals
+void actually_free_trigger(trig_data *trig);
+
 
 /**
 * Ensures the "attach_to" thing (also called "go" in some scripting code)
@@ -86,6 +89,23 @@ struct script_data *create_script_data(void *attach_to, int type) {
 }
 
 
+/**
+* Triggers are temporarily stored in a list and then freed after everything has
+* finished running, so that their data is still available if they e.g. detach
+* themselves from something -- they can't free mid-execution. This fixes a bug
+* from stock DG Scripts where a trigger could free itself mid-execution and
+* still try to reference freed memory. -pc 5/29/2017
+*/
+void free_freeable_triggers(void) {
+	trig_data *trig, *next_trig;
+	
+	LL_FOREACH_SAFE(free_trigger_list, trig, next_trig) {
+		actually_free_trigger(trig);
+	}
+	free_trigger_list = NULL;
+}
+
+
 /* release memory allocated for a variable list */
 void free_varlist(struct trig_var_data *vd) {
 	void free_var_el(struct trig_var_data *var);
@@ -96,12 +116,27 @@ void free_varlist(struct trig_var_data *vd) {
 }
 
 
-/* 
-* Return memory used by a trigger
-* The command list is free'd when changed and when
-* shutting down.
+/**
+* Prepares to free a trigger. The actual freeing is done on a short delay to
+* ensure no script is running at the time.
+*
+* @param trig_data *trig The trigger to free.
 */
 void free_trigger(trig_data *trig) {
+	if (GET_TRIG_WAIT(trig)) {
+		event_cancel(GET_TRIG_WAIT(trig));
+		GET_TRIG_WAIT(trig) = NULL;
+	}
+	
+	LL_PREPEND(free_trigger_list, trig);
+}
+
+
+/* 
+* Performs the actual freeing of a trigger, which is always done on a delay so
+* that they can't be extracted while their own script is running. -pc 5/29/2017
+*/
+void actually_free_trigger(trig_data *trig) {
 	trig_data *proto = real_trigger(GET_TRIG_VNUM(trig));
 	struct cmdlist_element *cmd, *next_cmd;
 	
@@ -121,7 +156,7 @@ void free_trigger(trig_data *trig) {
 		// TODO: If this is not there, the mud goddamn crashes when a script detaches itself.
 		// This means it is still using this trigger's data despite being freed.
 		// Need a system to delay-free trigs by putting them in a to-free list.
-		trig->var_list = NULL;
+		// trig->var_list = NULL;
 	}
 	if (trig->cmdlist && (!proto || trig->cmdlist != proto->cmdlist)) {
 		LL_FOREACH_SAFE(trig->cmdlist, cmd, next_cmd) {

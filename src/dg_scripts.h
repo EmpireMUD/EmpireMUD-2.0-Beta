@@ -206,6 +206,8 @@ struct trig_data {
 	struct trig_data *prev_in_random_triggers;	// DLL: random_triggers
 	struct trig_data *next_in_random_triggers;	// DLL: random_triggers
 	
+	struct trig_data *next_to_free;	// LL: free_trigger_list
+	
 	UT_hash_handle hh;	// trigger_table hash handle
 };
 
