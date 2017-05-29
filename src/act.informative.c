@@ -2585,7 +2585,15 @@ ACMD(do_messages) {
 	size = snprintf(buf, sizeof(buf), "Recent messages:\r\n");
 	
 	HASH_ITER(hh, automessages, msg, next_msg) {
-		if (msg->msg && (msg->timing == AUTOMSG_ON_LOGIN || msg->timestamp > (now - (24 * SECS_PER_REAL_HOUR)))) {
+		if (!msg->msg) {
+			continue;	// somehow
+		}
+		
+		// look up player message for time detection
+		id = msg->id;
+		HASH_FIND_INT(GET_AUTOMESSAGES(ch), &id, pam);
+	
+		if (msg->timing == AUTOMSG_ON_LOGIN || msg->timestamp > (now - (24 * SECS_PER_REAL_HOUR)) || (pam && pam->timestamp > (now - 24 * SECS_PER_REAL_HOUR))) {
 			if (size + strlen(msg->msg) + 2 < sizeof(buf)) {
 				++count;
 				strcat(buf, msg->msg);
@@ -2599,8 +2607,6 @@ ACMD(do_messages) {
 			
 			// mark seen
 			if (msg->timing != AUTOMSG_ON_LOGIN) {
-				id = msg->id;
-				HASH_FIND_INT(GET_AUTOMESSAGES(ch), &id, pam);
 				if (!pam) {
 					CREATE(pam, struct player_automessage, 1);
 					pam->id = id;
