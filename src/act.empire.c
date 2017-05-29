@@ -2756,6 +2756,9 @@ ACMD(do_cede) {
 		msg_to_char(ch, "You can't seem to cede land to %s.\r\n", REAL_HMHR(targ));
 	else if (f == e)
 		msg_to_char(ch, "You can't cede land to your own empire!\r\n");
+	else if (GET_RANK(targ) < EMPIRE_PRIV(GET_LOYALTY(targ), PRIV_CLAIM)) {
+		act("You can't cede to $M because $E doesn't have the claim privilege.", FALSE, ch, NULL, targ, TO_CHAR);
+	}
 	else if (EMPIRE_CITY_TERRITORY(f) + EMPIRE_OUTSIDE_TERRITORY(f) >= land_can_claim(f, FALSE))
 		msg_to_char(ch, "You can't cede land to %s, %s empire can't own any more land.\r\n", REAL_HMHR(targ), REAL_HSHR(targ));
 	else if (!is_in_city_for_empire(room, f, FALSE, &junk) && EMPIRE_OUTSIDE_TERRITORY(f) >= land_can_claim(f, TRUE)) {
