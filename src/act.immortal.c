@@ -1140,7 +1140,7 @@ struct set_struct {
 		{ "drunk",		LVL_START_IMM, 	BOTH, 	MISC },
 		{ "hunger",		LVL_START_IMM, 	BOTH, 	MISC },
 		{ "thirst",		LVL_START_IMM, 	BOTH, 	MISC },
-		{ "level",		LVL_CIMPL, 	PC, 	NUMBER },
+		{ "access",		LVL_CIMPL, 	PC, 	NUMBER },
 		{ "siteok",		LVL_START_IMM, 	PC, 	BINARY },
 		{ "nowizlist", 	LVL_START_IMM, 	PC, 	BINARY },
 		{ "loadroom", 	LVL_START_IMM, 	PC, 	MISC },
@@ -1399,7 +1399,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			return (0);
 		}
 	}
-	else if SET_CASE("level") {
+	else if SET_CASE("access") {
 		if (value > GET_ACCESS_LEVEL(ch) || value > LVL_IMPL) {
 			send_to_char("You can't do that.\r\n", ch);
 			return (0);

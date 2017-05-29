@@ -1,3 +1,20 @@
+"ACCESS LEVEL"
+
+Access levels determine what commands a player can use. This is mainly used for
+immortals. Here is a breakdown of the access levels:
+
+ 1 - Mortal: players
+ 2 - God: an unused system for advanced players
+ 3 - Immortal: the base admin level
+ 4 - Assistant
+ 5 - Co-Implementor: can use virtually all commands and privileges
+ 6 - Implementor: the top access level
+
+Immortals and Assistants don't have access to most of the admin commands.
+Instead, they can be given specific commands with the grant system.
+
+See also: GOD SYSTEM, GRANT
+#d
 ADVANCE
 
 Usage:  advance <victim> <access level>
@@ -294,6 +311,22 @@ This is the history command for the immortal and god channels.
 
 See also: WIZNET, GODNET
 #d
+GOD "GOD SYSTEM"
+
+The god system (access level 2) was originally a group of players who could
+teleport around the map and create items. Gods were empowered by items that
+mortals sacrificed to them, and could only create items using raw materials
+from the sacrifices.
+
+There have been no changes, maintenance, or improvements to the god system in
+EmpireMUD 2.0 and it is not considered operational. Concerns that would have
+to be addressed include:
+ - It's currently possible to get infinite resources by creating items that can
+   be broken down or crafted into multiple other items, then sacrificing those
+   items again.
+ - Gods can't be hurt by anyone other than gods, so adventures would be far too
+   easy.
+#
 GODNET
 
 The gods' communication channel.
@@ -325,11 +358,14 @@ Examples:
 
 See also: GRANT, POOFIN, POOFOUT, WIZAT
 #d
-GRANTS
+GRANT GRANTS
+
+Usage:  set <name> grants [add | remove] <grants>
 
 Grants allow a player to use commands that are above his or her privilege
 level. Grants can be added or removed using the "set" command. Mortals can also
 be granted access to some immortal commands, but this isn't always a good idea.
+You can see a person's grants by using 'stat' on them.
 
 Most of the grant names correspond to actual commands, but some are special:
  empires - Allows eedit, edelete, moveeinv, and more.
@@ -337,7 +373,8 @@ Most of the grant names correspond to actual commands, but some are special:
  olc-controls - Allows .setflags, .setminvnum, and .setmaxvnum.
  transfer - Allows moving mortals with commands like transfer and portal.
 
-Try 'helpsearch grantable' to find grantable commands.
+Try 'helpsearch grantable' to find grantable commands. You can also type
+'set <name> grants' with no other arguments to see a list of grants.
 
 See also: OLC-CONTROLS
 #d
@@ -440,15 +477,15 @@ INVIS INVISIBLE
 Usage:  invis [level]
 
 INVIS sets your invisibility level. With no argument, invis toggles between
-making you fully visible and fully invisible. If you specify a level, only
-people at and above the level you specify will be able to see you.
+making you fully visible and fully invisible. If you specify an access level,
+only people at and above the level you specify will be able to see you.
 
 Examples:
 
   > invis
   > invis 3
 
-See also: INCOGNITO, INVSTART, VISIBLE, WIZHIDE
+See also: ACCESS LEVEL, INCOGNITO, INVSTART, VISIBLE, WIZHIDE
 #d
 INVSTART INVISSTART "INVIS START" "INV START" "START INVISIBLE"
 
@@ -787,7 +824,7 @@ grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
 lastname       PC      STRING       Player's last name, or off
 learned        PC      MISC         Turns learned recipes on/off
-level          PC      NUMBER       Player's immortal level
+access         PC      NUMBER       Player's immortal access level
 loadroom       PC      MISC         Player always starts here
 name           PC      STRING       Change a player's name
 password       PC      STRING       Change password
@@ -828,7 +865,7 @@ wizhide        PC      BINARY       Turns on/off wizhide
 
 scale          NPC     NUMBER       Rescales a mob to a given level
 
-See also: GRANT, STAT
+See also: ACCESS LEVEL, GRANT, STAT
 #d
 "SET CURRENCY" "SET CURRENCIES"
 
