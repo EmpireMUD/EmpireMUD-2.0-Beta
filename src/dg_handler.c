@@ -88,16 +88,10 @@ struct script_data *create_script_data(void *attach_to, int type) {
 
 /* release memory allocated for a variable list */
 void free_varlist(struct trig_var_data *vd) {
-	struct trig_var_data *i, *j;
-
-	for (i = vd; i;) {
-		j = i;
-		i = i->next;
-		if (j->name)
-			free(j->name);
-		if (j->value)
-			free(j->value);
-		free(j);
+	void free_var_el(struct trig_var_data *var);
+	struct trig_var_data *var, *next_var;
+	LL_FOREACH_SAFE(vd, var, next_var) {
+		free_var_el(var);
 	}
 }
 

@@ -4006,7 +4006,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'q': {	// obj.q*
 					if (!str_cmp(field, "quest")) {
-						snprintf(str, slen, "%d", GET_OBJ_REQUIRES_QUEST(obj) > 0 ? GET_OBJ_REQUIRES_QUEST(obj) : 0);
+						snprintf(str, slen, "%d", GET_OBJ_REQUIRES_QUEST(o) > 0 ? GET_OBJ_REQUIRES_QUEST(o) : 0);
 					}
 					break;
 				}
@@ -6449,6 +6449,8 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 			break;
 		}
 	}
+	
+	// TODO why does this only free vars if there's still a script? Is there a possibility of getting here with vars unfreed? If not, isn't it safe to try to free them again?
 	if (sc)
 		free_varlist(GET_TRIG_VARS(trig));
 	GET_TRIG_VARS(trig) = NULL;
