@@ -681,8 +681,12 @@ int sort_archetypes(archetype_data *a, archetype_data *b) {
 
 // typealphabetic sorter for sorted_archetypes
 int sort_archetypes_by_data(archetype_data *a, archetype_data *b) {
-	// TODO what to sort by other than name?
-	return strcmp(NULLSAFE(GET_ARCH_NAME(a)), NULLSAFE(GET_ARCH_NAME(b)));
+	if (GET_ARCH_TYPE(a) != GET_ARCH_TYPE(b)) {
+		return GET_ARCH_TYPE(a) - GET_ARCH_TYPE(b);
+	}
+	else {
+		return strcmp(NULLSAFE(GET_ARCH_NAME(a)), NULLSAFE(GET_ARCH_NAME(b)));
+	}
 }
 
 

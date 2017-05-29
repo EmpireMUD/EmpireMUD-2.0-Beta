@@ -3942,6 +3942,7 @@ void add_to_object_list(obj_data *obj) {
 obj_data *copy_warehouse_obj(obj_data *input) {
 	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
 
+	struct trig_var_data *var, *copy;
 	obj_data *obj, *proto;
 	trig_data *trig;
 	int iter;
@@ -3976,7 +3977,13 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 			add_trigger(SCRIPT(obj), read_trigger(GET_TRIG_VNUM(trig)), -1);
 		}
 		
-		// TODO should also copy variables, if they have been made to save to file yet
+		LL_FOREACH(SCRIPT(input)->global_vars, var) {
+			CREATE(copy, struct trig_var_data, 1);
+			copy->name = str_dup(var->name);
+			copy->value = str_dup(var->value);
+			copy->context = var->context;
+			LL_APPEND(SCRIPT(obj)->global_vars, copy);
+		}
 	}
 	
 	// pointer copies

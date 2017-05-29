@@ -1510,7 +1510,6 @@ ACMD(do_gen_craft) {
 	else if (!check_can_craft(ch, type)) {
 		// sends its own messages
 	}
-	// TODO: move this above requires_obj and make sure it only requires the obj to START
 	else if (CRAFT_FLAGGED(type, CRAFT_VEHICLE)) {
 		// vehicles pass off at this point
 		do_gen_craft_vehicle(ch, type);

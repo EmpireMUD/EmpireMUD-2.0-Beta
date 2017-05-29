@@ -196,6 +196,7 @@
 struct db_boot_info_type {
 	char *prefix;
 	char *suffix;
+	bool allow_zero;
 };
 
 

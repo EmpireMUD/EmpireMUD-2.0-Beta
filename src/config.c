@@ -23,7 +23,7 @@
 #include "olc.h"
 
 // TODO convert more of these configs to the in-game config system
-// TODO add string-array config type (default channels)
+// TODO add string-array config type (default channels, could have add/remove)
 // TODO add long-string type (fread_string; text editor)
 // TODO add double-array (empire score levels)
 

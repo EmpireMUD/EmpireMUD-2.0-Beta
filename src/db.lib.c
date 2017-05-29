@@ -5697,8 +5697,7 @@ void index_boot(int mode) {
 	}
 
 	if (!rec_count) {
-		// DB_BOOT_x: some types don't matter TODO could move this into a config
-		if (mode == DB_BOOT_EMP || mode == DB_BOOT_BOOKS || mode == DB_BOOT_CRAFT || mode == DB_BOOT_BLD || mode == DB_BOOT_ADV || mode == DB_BOOT_RMT || mode == DB_BOOT_WLD || mode == DB_BOOT_GLB || mode == DB_BOOT_ACCT || mode == DB_BOOT_AUG || mode == DB_BOOT_ARCH || mode == DB_BOOT_ABIL || mode == DB_BOOT_CLASS || mode == DB_BOOT_SKILL || mode == DB_BOOT_VEH || mode == DB_BOOT_MORPH || mode == DB_BOOT_QST || mode == DB_BOOT_SOC || mode == DB_BOOT_FCT || mode == DB_BOOT_GEN || mode == DB_BOOT_SHOP) {
+		if (db_boot_info[mode].allow_zero) {
 			// types that don't require any entries and exit early if none
 			return;
 		}
@@ -5711,10 +5710,7 @@ void index_boot(int mode) {
 			exit(1);
 		}
 	}
-
-	/* Any idea why you put this here Jeremy? */
-	rec_count++;
-
+	
 	/*
 	 * DB_BOOT_x:
 	 * NOTE: "bytes" does _not_ include strings or other later malloc'd things.
