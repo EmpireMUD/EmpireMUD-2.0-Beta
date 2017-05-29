@@ -4106,8 +4106,10 @@ void extract_obj(obj_data *obj) {
 * @return obj_data* The new object.
 */
 obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
+	struct trig_var_data *var, *copy;
 	struct obj_binding *bind;
 	obj_data *proto, *new;
+	trig_data *trig;
 	int iter;
 	
 	if (!obj || !(proto = obj_proto(GET_OBJ_VNUM(obj)))) {
@@ -4184,6 +4186,24 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 		}
 	}
 	
+	// copy only existing scripts
+	if (SCRIPT(obj)) {
+		if (!SCRIPT(new)) {
+			create_script_data(new, OBJ_TRIGGER);
+		}
+
+		for (trig = TRIGGERS(SCRIPT(obj)); trig; trig = trig->next) {
+			add_trigger(SCRIPT(new), read_trigger(GET_TRIG_VNUM(trig)), -1);
+		}
+		
+		LL_FOREACH(SCRIPT(obj)->global_vars, var) {
+			CREATE(copy, struct trig_var_data, 1);
+			copy->name = str_dup(var->name);
+			copy->value = str_dup(var->value);
+			copy->context = var->context;
+			LL_APPEND(SCRIPT(new)->global_vars, copy);
+		}
+	}
 
 	if (scale_level > 0) {
 		scale_item_to_level(new, scale_level);
