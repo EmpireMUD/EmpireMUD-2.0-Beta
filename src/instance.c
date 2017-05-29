@@ -2077,7 +2077,7 @@ static void renum_instances(void) {
 		}
 		
 		// check bad instance
-		if (!inst->location || (!inst->start && !IS_SET(inst->flags, INST_NEEDS_LOAD))) {
+		if (!inst->adventure || !inst->location || (!inst->start && !IS_SET(inst->flags, INST_NEEDS_LOAD))) {
 			delete_instance(inst);
 		}
 	}
