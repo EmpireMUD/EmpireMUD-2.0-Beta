@@ -1283,7 +1283,7 @@ void prune_instances(void) {
 		delayed = IS_SET(inst->flags, INST_NEEDS_LOAD) ? TRUE : FALSE;
 		
 		// look for completed or orphaned instances
-		if (INSTANCE_FLAGGED(inst, INST_COMPLETED) || (!inst->start && !delayed) || !inst->location || (inst->size == 0 && !delayed) || (rule && (inst->created + 60 * rule->value) < time(0))) {
+		if (!inst->adventure || INSTANCE_FLAGGED(inst, INST_COMPLETED) || (!inst->start && !delayed) || !inst->location || (inst->size == 0 && !delayed) || (rule && (inst->created + 60 * rule->value) < time(0))) {
 			// well, only if empty
 			if (count_players_in_instance(inst, TRUE, NULL) == 0) {
 				delete_instance(inst);
