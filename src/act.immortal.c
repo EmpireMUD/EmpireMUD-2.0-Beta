@@ -4412,10 +4412,10 @@ void do_stat_room(char_data *ch) {
 		}
 	}
 	
-	if (IN_ROOM(ch)->extra_data) {
+	if (ROOM_EXTRA_DATA(IN_ROOM(ch))) {
 		msg_to_char(ch, "Extra data:\r\n");
 		
-		HASH_ITER(hh, IN_ROOM(ch)->extra_data, red, next_red) {
+		HASH_ITER(hh, ROOM_EXTRA_DATA(IN_ROOM(ch)), red, next_red) {
 			sprinttype(red->type, room_extra_types, buf);
 			msg_to_char(ch, " %s: %d\r\n", buf, red->value);
 		}

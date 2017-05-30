@@ -1100,18 +1100,14 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // basic room data
 #define GET_ROOM_VNUM(room)  ((room)->vnum)
-#define ROOM_AFF_FLAGS(room)  ((room)->affects)
 #define ROOM_AFFECTS(room)  ((room)->af)
-#define ROOM_BASE_FLAGS(room)  ((room)->base_affects)
 #define ROOM_CONTENTS(room)  ((room)->contents)
 #define ROOM_CROP(room)  ((room)->crop_type)
-#define ROOM_DEPLETION(room)  ((room)->depletion)
 #define ROOM_LAST_SPAWN_TIME(room)  ((room)->last_spawn_time)
 #define ROOM_LIGHTS(room)  ((room)->light)
 #define BASE_SECT(room)  ((room)->base_sector)
 #define ROOM_OWNER(room)  ((room)->owner)
 #define ROOM_PEOPLE(room)  ((room)->people)
-#define ROOM_TRACKS(room)  ((room)->tracks)
 #define ROOM_VEHICLES(room)  ((room)->vehicles)
 #define SECT(room)  ((room)->sector_type)
 #define GET_EXITS_HERE(room)  ((room)->exits_here)
@@ -1137,6 +1133,18 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define ROOM_INSTANCE(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->instance : NULL)
 
 
+// shared data
+#define SHARED_DATA(room)  ((room)->shared)
+#define ROOM_AFF_FLAGS(room)  (SHARED_DATA(room)->affects)
+#define ROOM_BASE_FLAGS(room)  (SHARED_DATA(room)->base_affects)
+#define ROOM_CUSTOM_DESCRIPTION(room)  (SHARED_DATA(room)->description)
+#define ROOM_CUSTOM_ICON(room)  (SHARED_DATA(room)->icon)
+#define ROOM_CUSTOM_NAME(room)  (SHARED_DATA(room)->name)
+#define ROOM_DEPLETION(room)  (SHARED_DATA(room)->depletion)
+#define ROOM_EXTRA_DATA(room)  (SHARED_DATA(room)->extra_data)
+#define ROOM_TRACKS(room)  (SHARED_DATA(room)->tracks)
+
+
 // exits
 #define CAN_GO(ch, ex) (ex->room_ptr && !EXIT_FLAGGED(ex, EX_CLOSED))
 #define EXIT_FLAGGED(exit, flag)  (IS_SET((exit)->exit_info, (flag)))
@@ -1144,11 +1152,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 // building data by room
 #define BLD_MAX_ROOMS(room)  (GET_BUILDING(HOME_ROOM(room)) ? GET_BLD_EXTRA_ROOMS(GET_BUILDING(HOME_ROOM(room))) : 0)
 #define BLD_BASE_AFFECTS(room)  (GET_BUILDING(HOME_ROOM(room)) ? GET_BLD_BASE_AFFECTS(GET_BUILDING(HOME_ROOM(room))) : NOBITS)
-
-// customs
-#define ROOM_CUSTOM_NAME(room)  ((room)->name)
-#define ROOM_CUSTOM_ICON(room)  ((room)->icon)
-#define ROOM_CUSTOM_DESCRIPTION(room)  ((room)->description)
 
 // definitions
 #define BLD_ALLOWS_MOUNTS(room)  (ROOM_IS_CLOSED(room) ? (ROOM_BLD_FLAGGED((room), BLD_ALLOW_MOUNTS | BLD_OPEN) || RMT_FLAGGED((room), RMT_OUTDOOR)) : TRUE)

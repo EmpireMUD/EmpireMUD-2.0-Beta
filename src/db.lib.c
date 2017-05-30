@@ -87,6 +87,7 @@ void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list);
 void write_interactions_to_file(FILE *fl, struct interaction_item *list);
 void write_linking_rules_to_file(FILE *fl, char letter, struct adventure_link_rule *list);
 void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
+void write_shared_room_data(FILE *fl, struct shared_room_data *dat);
 void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 
 
@@ -4315,9 +4316,11 @@ void parse_room(FILE *fl, room_vnum vnum) {
 
 	char line[256], line2[256], error_buf[256], error_log[MAX_STRING_LENGTH], str1[256], str2[256];
 	double dbl_in;
+	long l_in;
 	int t[10];
 	struct depletion_data *dep;
 	struct reset_com *reset, *last_reset = NULL;
+	struct track_data *track;
 	room_data *room, *find;
 	bool error = FALSE;
 	char *ptr;
@@ -4328,6 +4331,14 @@ void parse_room(FILE *fl, room_vnum vnum) {
 	
 	// basic setup: things that don't default to 0/NULL
 	room->vnum = vnum;
+	
+	// attach/create shared data
+	if (vnum < MAP_SIZE) {
+		SHARED_DATA(room) = world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)].shared;
+	}
+	else {
+		CREATE(SHARED_DATA(room), struct shared_room_data, 1);
+	}
 	
 	HASH_FIND_INT(world_table, &vnum, find);
 	if (find) {
@@ -4479,8 +4490,8 @@ void parse_room(FILE *fl, room_vnum vnum) {
 					break;
 				}
 
-				room->base_affects = asciiflag_conv(line2);
-				room->affects = room->base_affects;
+				ROOM_BASE_FLAGS(room) = asciiflag_conv(line2);
+				ROOM_AFF_FLAGS(room) = ROOM_BASE_FLAGS(room);
 				break;
 			}
 			case 'H': {	// home_room
@@ -4494,18 +4505,24 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				break;
 			}
 			case 'I': {	// icon
-				sprintf(error_buf, "room vnum %d", vnum);
-				room->icon = fread_string(fl, error_buf);
+				if (ROOM_CUSTOM_ICON(room)) {
+					free(ROOM_CUSTOM_ICON(room));
+				}
+				ROOM_CUSTOM_ICON(room) = fread_string(fl, error_buf);
 				break;
 			}
 			case 'M': {	// description
-				sprintf(error_buf, "room vnum %d", vnum);
-				room->description = fread_string(fl, error_buf);
+				if (ROOM_CUSTOM_DESCRIPTION(room)) {
+					free(ROOM_CUSTOM_DESCRIPTION(room));
+				}
+				ROOM_CUSTOM_DESCRIPTION(room) = fread_string(fl, error_buf);
 				break;
 			}
 			case 'N': {	// name
-				sprintf(error_buf, "room vnum %d", vnum);
-				room->name = fread_string(fl, error_buf);
+				if (ROOM_CUSTOM_NAME(room)) {
+					free(ROOM_CUSTOM_NAME(room));
+				}
+				ROOM_CUSTOM_NAME(room) = fread_string(fl, error_buf);
 				break;
 			}
 			case 'O': {	// owner (empire_vnum)
@@ -4562,6 +4579,22 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				break;
 			}
 			
+			case 'Y': {	// tracks
+				if (!get_line(fl, line2) || sscanf(line2, "%d %d %ld %d", &t[0], &t[1], &l_in, &t[2]) != 4) {
+					log("SYSERR: Bad formatting in Y section of room #%d", vnum);
+					exit(1);
+				}
+				
+				CREATE(track, struct track_data, 1);
+				track->player_id = t[0];
+				track->mob_num = t[1];
+				track->timestamp = l_in;
+				track->dir = t[2];
+				
+				LL_PREPEND(ROOM_TRACKS(room), track);
+				break;
+			}
+			
 			case 'Z': {	// extra data
 				if (!get_line(fl, line2) || sscanf(line2, "%d %d", &t[0], &t[1]) != 2) {
 					log("SYSERR: Bad formatting in Z section of room #%d", vnum);
@@ -4594,9 +4627,6 @@ void parse_room(FILE *fl, room_vnum vnum) {
 void write_room_to_file(FILE *fl, room_data *room) {
 	extern bool objpack_save_room(room_data *room);
 	
-	char temp[MAX_STRING_LENGTH];
-	struct room_extra_data *red, *next_red;
-	struct depletion_data *dep;
 	struct cooldown_data *cool;
 	struct trig_var_data *tvd;
 	trig_data *trig;
@@ -4686,32 +4716,10 @@ void write_room_to_file(FILE *fl, room_data *room) {
 			}
 		}
 	}
-
-	// E affects
-	if (ROOM_BASE_FLAGS(room)) {
-		fprintf(fl, "E\n%d\n", ROOM_BASE_FLAGS(room));
-	}
 	
 	// H home room
 	if (HOME_ROOM(room) != room) {
 		fprintf(fl, "H%d\n", GET_ROOM_VNUM(HOME_ROOM(room)));
-	}
-	
-	// I icon
-	if (ROOM_CUSTOM_ICON(room)) {
-		fprintf(fl, "I\n%s~\n", ROOM_CUSTOM_ICON(room));
-	}
-	
-	// M description
-	if (ROOM_CUSTOM_DESCRIPTION(room)) {
-		strcpy(temp, ROOM_CUSTOM_DESCRIPTION(room));
-		strip_crlf(temp);
-		fprintf(fl, "M\n%s~\n", temp);
-	}
-	
-	// N name
-	if (ROOM_CUSTOM_NAME(room)) {
-		fprintf(fl, "N\n%s~\n", ROOM_CUSTOM_NAME(room));
 	}
 	
 	// O owner
@@ -4727,11 +4735,6 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	// R resource
 	if (COMPLEX_DATA(room) && BUILDING_RESOURCES(room)) {
 		write_resources_to_file(fl, 'R', BUILDING_RESOURCES(room));
-	}
-	
-	// X depletion
-	for (dep = ROOM_DEPLETION(room); dep; dep = dep->next) {
-		fprintf(fl, "X\n%d %d\n", dep->type, dep->count);
 	}
 
 	// D door
@@ -4758,9 +4761,9 @@ void write_room_to_file(FILE *fl, room_data *room) {
 		write_resources_to_file(fl, 'W', GET_BUILT_WITH(room));
 	}
 	
-	// Z: extra data
-	HASH_ITER(hh, room->extra_data, red, next_red) {
-		fprintf(fl, "Z\n%d %d\n", red->type, red->value);
+	// Things that we prefer to save to the base map
+	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
+		write_shared_room_data(fl, SHARED_DATA(room));
 	}
 	
 	// end
@@ -7829,5 +7832,56 @@ void write_requirements_to_file(FILE *fl, char letter, struct req_data *list) {
 		else {
 			fprintf(fl, "%c\n%d %d %llu %d\n", letter, iter->type, iter->vnum, iter->misc, iter->needed);
 		}
+	}
+}
+
+
+/**
+* Saves the 'shared' portion of a room or map tile to file.
+*
+* @param FILE *fl The file already open for writing.
+* @param struct shared_room_data *dat The shared data to write.
+*/
+void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
+	struct room_extra_data *red, *next_red;
+	char temp[MAX_STRING_LENGTH];
+	struct depletion_data *dep;
+	struct track_data *track;
+	
+	// E affects
+	if (dat->base_affects) {
+		fprintf(fl, "E\n%llu\n", dat->base_affects);
+	}
+
+	// I icon
+	if (dat->icon) {
+		fprintf(fl, "I\n%s~\n", dat->icon);
+	}
+
+	// M description
+	if (dat->description) {
+		strcpy(temp, dat->description);
+		strip_crlf(temp);
+		fprintf(fl, "M\n%s~\n", temp);
+	}
+
+	// N name
+	if (dat->name) {
+		fprintf(fl, "N\n%s~\n", dat->name);
+	}
+	
+	// X depletion
+	LL_FOREACH(dat->depletion, dep) {
+		fprintf(fl, "X\n%d %d\n", dep->type, dep->count);
+	}
+	
+	// Y tracks
+	LL_FOREACH(dat->tracks, track) {
+		fprintf(fl, "Y\n%d %d %ld %d\n", track->player_id, track->mob_num, track->timestamp, track->dir);
+	}
+
+	// Z: extra data
+	HASH_ITER(hh, dat->extra_data, red, next_red) {
+		fprintf(fl, "Z\n%d %d\n", red->type, red->value);
 	}
 }

@@ -6323,7 +6323,7 @@ void add_to_room_extra_data(room_data *room, int type, int add_value) {
 */
 struct room_extra_data *find_room_extra_data(room_data *room, int type) {
 	struct room_extra_data *red;
-	HASH_FIND_INT(room->extra_data, &type, red);
+	HASH_FIND_INT(ROOM_EXTRA_DATA(room), &type, red);
 	return red;
 }
 
@@ -6372,7 +6372,7 @@ void multiply_room_extra_data(room_data *room, int type, double multiplier) {
 void remove_room_extra_data(room_data *room, int type) {
 	struct room_extra_data *red = find_room_extra_data(room, type);
 	if (red) {
-		HASH_DEL(room->extra_data, red);
+		HASH_DEL(ROOM_EXTRA_DATA(room), red);
 		free(red);
 	}
 }
@@ -6392,7 +6392,7 @@ void set_room_extra_data(room_data *room, int type, int value) {
 	if (!red) {
 		CREATE(red, struct room_extra_data, 1);
 		red->type = type;
-		HASH_ADD_INT(room->extra_data, type, red);
+		HASH_ADD_INT(ROOM_EXTRA_DATA(room), type, red);
 	}
 	
 	red->value = value;

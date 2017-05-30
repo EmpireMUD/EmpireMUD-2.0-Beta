@@ -440,15 +440,6 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	// free some crap
-	decustomize_room(room);
-	while ((dep = ROOM_DEPLETION(room))) {
-		ROOM_DEPLETION(room) = dep->next;
-		free(dep);
-	}
-	while ((track = ROOM_TRACKS(room))) {
-		ROOM_TRACKS(room) = track->next;
-		free(track);
-	}
 	if (COMPLEX_DATA(room)) {
 		free_complex_data(COMPLEX_DATA(room));
 		COMPLEX_DATA(room) = NULL;
@@ -472,10 +463,6 @@ void delete_room(room_data *room, bool check_exits) {
 	while ((af = ROOM_AFFECTS(room))) {
 		ROOM_AFFECTS(room) = af->next;
 		free(af);
-	}
-	HASH_ITER(hh, room->extra_data, room_ex, next_room_ex) {
-		HASH_DEL(room->extra_data, room_ex);
-		free(room_ex);
 	}
 
 	if (check_exits) {
@@ -566,6 +553,27 @@ void delete_room(room_data *room, bool check_exits) {
 	// check for start location changes?
 	if (ROOM_SECT_FLAGGED(room, SECTF_START_LOCATION)) {
 		setup_start_locations();
+	}
+	
+	// only have to free this info if not on the map (map rooms have a pointer to the map)
+	// this would be called free_shared_room_data() if it were a function
+	if (GET_ROOM_VNUM(room) >= MAP_SIZE && SHARED_DATA(room)) {
+		decustomize_room(room);
+		
+		while ((dep = ROOM_DEPLETION(room))) {
+			ROOM_DEPLETION(room) = dep->next;
+			free(dep);
+		}
+		HASH_ITER(hh, ROOM_EXTRA_DATA(room), room_ex, next_room_ex) {
+			HASH_DEL(ROOM_EXTRA_DATA(room), room_ex);
+			free(room_ex);
+		}
+		while ((track = ROOM_TRACKS(room))) {
+			ROOM_TRACKS(room) = track->next;
+			free(track);
+		}
+		
+		free(SHARED_DATA(room));
 	}
 	
 	// free the room
@@ -2357,6 +2365,8 @@ room_data *load_map_room(room_vnum vnum) {
 	room->vnum = vnum;
 	add_room_to_world_tables(room);
 	
+	SHARED_DATA(room) = map->shared;	// point to map
+	
 	// do not use perform_change_sect here because we're only loading from the existing data
 	SECT(room) = map->sector_type;
 	BASE_SECT(room) = map->base_sector;
@@ -2599,6 +2609,14 @@ void init_room(room_data *room, room_vnum vnum) {
 	}
 	
 	room->vnum = vnum;
+	
+	if (vnum < MAP_SIZE) {
+		// this should NEVER happen... but just in case!
+		SHARED_DATA(room) = world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)].shared;
+	}
+	else {
+		CREATE(SHARED_DATA(room), struct shared_room_data, 1);
+	}
 
 	room->owner = NULL;
 	
@@ -2607,14 +2625,8 @@ void init_room(room_data *room, room_vnum vnum) {
 	
 	COMPLEX_DATA(room) = init_complex_data();	// no type at this point
 	room->light = 0;
-	
-	room->name = NULL;
-	room->description = NULL;
-	room->icon = NULL;
-	
+		
 	room->af = NULL;
-	room->affects = 0;
-	room->base_affects = 0;
 	
 	room->last_spawn_time = 0;
 
@@ -2957,9 +2969,13 @@ void build_world_map(void) {
 * run after sectors are loaded, and before the .wld files are read in.
 */
 void load_world_map_from_file(void) {
-	struct map_data *map;
+	char line[256], line2[256], error_buf[MAX_STRING_LENGTH];
+	struct map_data *map, *last = NULL;
+	struct room_extra_data *red;
+	struct depletion_data *dep;
+	struct track_data *track;
 	int var[7], x, y;
-	char line[256];
+	long l_in;
 	FILE *fl;
 	
 	// init
@@ -2967,6 +2983,7 @@ void load_world_map_from_file(void) {
 	for (x = 0; x < MAP_WIDTH; ++x) {
 		for (y = 0; y < MAP_HEIGHT; ++y) {
 			world_map[x][y].vnum = (y * MAP_WIDTH) + x;
+			CREATE(world_map[x][y].shared, struct shared_room_data, 1);
 			world_map[x][y].island = NO_ISLAND;
 			world_map[x][y].sector_type = NULL;
 			world_map[x][y].base_sector = NULL;
@@ -2981,31 +2998,123 @@ void load_world_map_from_file(void) {
 		return;
 	}
 	
+	sprintf(error_buf, "map tile %d", last->vnum);
+	
 	// optionals
 	while (get_line(fl, line)) {
 		if (*line == '$') {
 			break;
 		}
 		
-		// x y island sect base natural crop
-		if (sscanf(line, "%d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6]) != 7) {
-			log("Encountered bad line in world map file: %s", line);
-			continue;
+		// new room
+		if (isdigit(*line)) {
+			// x y island sect base natural crop
+			if (sscanf(line, "%d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6]) != 7) {
+				log("Encountered bad line in world map file: %s", line);
+				continue;
+			}
+			if (var[0] < 0 || var[0] >= MAP_WIDTH || var[1] < 0 || var[1] >= MAP_HEIGHT) {
+				log("Encountered bad location in world map file: (%d, %d)", var[0], var[1]);
+				continue;
+			}
+		
+			map = &(world_map[var[0]][var[1]]);
+		
+			map->island = var[2];
+		
+			// these will be validated later
+			map->sector_type = sector_proto(var[3]);
+			map->base_sector = sector_proto(var[4]);
+			map->natural_sector = sector_proto(var[5]);
+			map->crop_type = crop_proto(var[6]);
+			
+			last = map;	// store in case of more data
 		}
-		if (var[0] < 0 || var[0] >= MAP_WIDTH || var[1] < 0 || var[1] >= MAP_HEIGHT) {
-			log("Encountered bad location in world map file: (%d, %d)", var[0], var[1]);
-			continue;
+		else if (last) {
+			switch (*line) {
+				case 'E': {	// affects
+					if (!get_line(fl, line2)) {
+						log("SYSERR: Unable to get E line for map tile #%d", last->vnum);
+						break;
+					}
+
+					last->shared->base_affects = asciiflag_conv(line2);
+					last->shared->affects = map->shared->base_affects;
+					break;
+				}
+				case 'I': {	// icon
+					if (last->shared->icon) {
+						free(last->shared->icon);
+					}
+					last->shared->icon = fread_string(fl, error_buf);
+					break;
+				}
+				case 'M': {	// description
+					if (last->shared->description) {
+						free(last->shared->description);
+					}
+					last->shared->description = fread_string(fl, error_buf);
+					break;
+				}
+				case 'N': {	// name
+					if (last->shared->name) {
+						free(last->shared->name);
+					}
+					last->shared->name = fread_string(fl, error_buf);
+					break;
+				}
+				case 'X': {	// resource depletion
+					if (!get_line(fl, line2)) {
+						log("SYSERR: Unable to read depletion line of map tile #%d", last->vnum);
+						exit(1);
+					}
+					if ((sscanf(line2, "%d %d", &var[0], &var[1])) != 2) {
+						log("SYSERR: Format in depletion line of map tile #%d", last->vnum);
+						exit(1);
+					}
+				
+					CREATE(dep, struct depletion_data, 1);
+					dep->type = var[0];
+					dep->count = var[1];
+					LL_PREPEND(last->shared->depletion, dep);
+					break;
+				}
+				case 'Y': {	// tracks
+					if (!get_line(fl, line2) || sscanf(line2, "%d %d %ld %d", &var[0], &var[1], &l_in, &var[2]) != 4) {
+						log("SYSERR: Bad formatting in Y section of map tile #%d", last->vnum);
+						exit(1);
+					}
+					
+					CREATE(track, struct track_data, 1);
+					track->player_id = var[0];
+					track->mob_num = var[1];
+					track->timestamp = l_in;
+					track->dir = var[2];
+					
+					LL_PREPEND(last->shared->tracks, track);
+					break;
+				}
+				case 'Z': {	// extra data
+					if (!get_line(fl, line2) || sscanf(line2, "%d %d", &var[0], &var[1]) != 2) {
+						log("SYSERR: Bad formatting in Z section of map tile #%d", last->vnum);
+						exit(1);
+					}
+					
+					HASH_FIND_INT(last->shared->extra_data, &var[0], red);
+					if (!red) {
+						CREATE(red, struct room_extra_data, 1);
+						red->type = var[0];
+						HASH_ADD_INT(last->shared->extra_data, type, red);
+					}
+					red->value = var[1];
+					break;
+				}
+			}
 		}
-		
-		map = &(world_map[var[0]][var[1]]);
-		
-		map->island = var[2];
-		
-		// these will be validated later
-		map->sector_type = sector_proto(var[3]);
-		map->base_sector = sector_proto(var[4]);
-		map->natural_sector = sector_proto(var[5]);
-		map->crop_type = crop_proto(var[6]);
+		else {
+			log("Junk data found in base_map file: %s", line);
+			exit(0);
+		}
 	}
 	
 	fclose(fl);
@@ -3015,7 +3124,9 @@ void load_world_map_from_file(void) {
 /**
 * Outputs the land portion of the world map to the map file.
 */
-void save_world_map_to_file(void) {	
+void save_world_map_to_file(void) {
+	void write_shared_room_data(FILE *fl, struct shared_room_data *dat);	
+	
 	struct map_data *iter;
 	FILE *fl;
 	
@@ -3033,6 +3144,7 @@ void save_world_map_to_file(void) {
 	for (iter = land_map; iter; iter = iter->next) {
 		// x y island sect base natural crop
 		fprintf(fl, "%d %d %d %d %d %d %d\n", MAP_X_COORD(iter->vnum), MAP_Y_COORD(iter->vnum), iter->island, (iter->sector_type ? GET_SECT_VNUM(iter->sector_type) : -1), (iter->base_sector ? GET_SECT_VNUM(iter->base_sector) : -1), (iter->natural_sector ? GET_SECT_VNUM(iter->natural_sector) : -1), (iter->crop_type ? GET_CROP_VNUM(iter->crop_type) : -1));
+		write_shared_room_data(fl, iter->shared);
 	}
 	
 	fclose(fl);

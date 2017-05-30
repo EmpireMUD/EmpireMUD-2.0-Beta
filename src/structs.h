@@ -127,10 +127,8 @@
 	!ROOM_SECT_FLAGGED(room, TILE_KEEP_FLAGS) && \
 	!ROOM_OWNER(room) && !ROOM_CONTENTS(room) && !ROOM_PEOPLE(room) && \
 	!ROOM_VEHICLES(room) && \
-	!ROOM_DEPLETION(room) && !ROOM_CUSTOM_NAME(room) && \
-	!ROOM_CUSTOM_ICON(room) && !ROOM_CUSTOM_DESCRIPTION(room) && \
-	!ROOM_AFFECTS(room) && ROOM_BASE_FLAGS(room) == NOBITS && \
-	!(room)->extra_data && !(room)->script \
+	!ROOM_AFFECTS(room) && \
+	!(room)->script \
 )	// end CAN_UNLOAD_MAP_ROOM()
 
 
@@ -4402,26 +4400,14 @@ struct room_data {
 	crop_data *crop_type;	// if this room has a crop, this is it
 	
 	struct complex_room_data *complex; // for rooms that are buildings, inside, adventures, etc
+	struct shared_room_data *shared;	// data that could be local OR from the map tile
 	byte light;  // number of light sources
 	int exits_here;	// number of rooms that have complex->exits to this one
 	
-	struct depletion_data *depletion;	// resource depletion
-
-	// custom data
-	char *name;  // room name may be set
-	char *description;  // so may a description
-	char *icon;  // same with map icon
-
 	struct affected_type *af;  // room affects
-	unsigned int affects;  // affect bitvector (modified)
-	unsigned int base_affects;  // base affects
-	
-	struct track_data *tracks;	// for tracking
 	
 	time_t last_spawn_time;  // used to spawn npcs
 	
-	struct room_extra_data *extra_data;	// hash of misc storage
-
 	struct trig_proto_list *proto_script;	/* list of default triggers  */
 	struct script_data *script;	/* script info for the room           */
 
@@ -4461,6 +4447,23 @@ struct complex_room_data {
 	
 	byte burning;  // if burning, the burn value
 	double damage;  // for catapulting
+};
+
+
+// data that could be from the map tile (for map rooms) or local (non-map rooms)
+struct shared_room_data {
+	// custom data
+	char *name;  // room name may be set
+	char *description;  // so may a description
+	char *icon;  // same with map icon
+	
+	bitvector_t affects;  // affect bitvector (modified)
+	bitvector_t base_affects;  // base affects
+	
+	// lists
+	struct depletion_data *depletion;	// resource depletion
+	struct room_extra_data *extra_data;	// hash of misc storage
+	struct track_data *tracks;	// for tracking
 };
 
 
@@ -4521,7 +4524,7 @@ struct room_extra_data {
 	int type;	// ROOM_EXTRA_x
 	int value;
 	
-	UT_hash_handle hh;	// room->extra_data hash
+	UT_hash_handle hh;	// room->shared->extra_data hash
 };
 
 
@@ -4547,6 +4550,7 @@ struct map_data {
 	sector_data *base_sector;	// underlying current sector (e.g. plains under building)
 	sector_data *natural_sector;	// sector at time of map generation
 	
+	struct shared_room_data *shared;	// for map tiles' room_data*, they point to this
 	crop_data *crop_type;	// possible crop type
 	
 	// lists
