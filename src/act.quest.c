@@ -152,6 +152,12 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 		return;
 	}
 	
+	// take objs if necessary
+	if (QUEST_FLAGGED(quest, QST_EXTRACT_TASK_OBJECTS)) {
+		extract_required_items(ch, pq->tracker);
+	}
+	remove_quest_items_by_quest(ch, QUEST_VNUM(quest));
+	
 	qt_quest_completed(ch, pq->vnum);
 	qt_lose_quest(ch, pq->vnum);
 	
@@ -280,13 +286,6 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 			}
 		}
 	}
-	
-	// take objs if necessary
-	if (QUEST_FLAGGED(quest, QST_EXTRACT_TASK_OBJECTS)) {
-		extract_required_items(ch, pq->tracker);
-	}
-	
-	remove_quest_items_by_quest(ch, QUEST_VNUM(quest));
 	
 	// dailies:
 	if (QUEST_FLAGGED(quest, QST_DAILY)) {
