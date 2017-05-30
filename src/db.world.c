@@ -2998,7 +2998,7 @@ void load_world_map_from_file(void) {
 		return;
 	}
 	
-	sprintf(error_buf, "map tile %d", last->vnum);
+	strcpy(error_buf, "map file");
 	
 	// optionals
 	while (get_line(fl, line)) {
@@ -3019,6 +3019,7 @@ void load_world_map_from_file(void) {
 			}
 		
 			map = &(world_map[var[0]][var[1]]);
+			sprintf(error_buf, "map tile %d", map->vnum);
 		
 			map->island = var[2];
 		
