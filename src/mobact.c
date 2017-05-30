@@ -633,6 +633,7 @@ void mobile_activity(void) {
 
 					// track to next room
 					for (track = ROOM_TRACKS(IN_ROOM(ch)); !found && track; track = track->next) {
+						// don't bother checking track lifespan here -- just let mobs follow it till it gets removed
 						if (track->player_id == purs->idnum) {
 							found = TRUE;
 							dir = track->dir;
