@@ -3039,7 +3039,7 @@ void load_world_map_from_file(void) {
 					}
 
 					last->shared->base_affects = asciiflag_conv(line2);
-					last->shared->affects = map->shared->base_affects;
+					last->shared->affects = last->shared->base_affects;
 					break;
 				}
 				case 'I': {	// icon
