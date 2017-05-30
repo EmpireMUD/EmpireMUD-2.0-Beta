@@ -263,12 +263,20 @@ void attach_template_to_room(room_template *rmt, room_data *room);
 void detach_building_from_room(room_data *room);
 
 // room extra data handlers
-void add_to_room_extra_data(room_data *room, int type, int add_value);
-extern struct room_extra_data *find_room_extra_data(room_data *room, int type);
-extern int get_room_extra_data(room_data *room, int type);
-void multiply_room_extra_data(room_data *room, int type, double multiplier);
-void remove_room_extra_data(room_data *room, int type);
-void set_room_extra_data(room_data *room, int type, int value);
+void add_to_extra_data(struct room_extra_data **list, int type, int add_value);
+extern struct room_extra_data *find_extra_data(struct room_extra_data *list, int type);
+extern int get_extra_data(struct room_extra_data *list, int type);
+void multiply_extra_data(struct room_extra_data **list, int type, double multiplier);
+void remove_extra_data(struct room_extra_data **list, int type);
+void set_extra_data(struct room_extra_data **list, int type, int value);
+
+// room extra data helpers (backwards-compatibility and shortcuts)
+#define add_to_room_extra_data(room, type, add_value)  add_to_extra_data(&ROOM_EXTRA_DATA(room), type, add_value)
+#define find_room_extra_data(room, type)  find_extra_data(ROOM_EXTRA_DATA(room), type)
+#define get_room_extra_data(room, type)  get_extra_data(ROOM_EXTRA_DATA(room), type)
+#define multiply_room_extra_data(room, type, multiplier)  multiply_extra_data(&ROOM_EXTRA_DATA(room), type, multiplier);
+#define remove_room_extra_data(room, type)  remove_extra_data(&ROOM_EXTRA_DATA(room), type)
+#define set_room_extra_data(room, type, value)  set_extra_data(&ROOM_EXTRA_DATA(room), type, value)
 
 // room targeting handlers
 extern room_data *find_target_room(char_data *ch, char *rawroomstr);

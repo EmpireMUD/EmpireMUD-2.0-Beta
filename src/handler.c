@@ -6293,70 +6293,69 @@ void detach_building_from_room(room_data *room) {
 /**
 * Adds to (or creates) a room extra data value.
 *
-* @param room_data *room The room to modify data on.
+* @param room_extra_data **list The extra data list to modify.
 * @param int type The ROOM_EXTRA_x type to update.
 * @param int add_value The amount to add (or subtract) to the value.
 */
-void add_to_room_extra_data(room_data *room, int type, int add_value) {
+void add_to_extra_data(struct room_extra_data **list, int type, int add_value) {
 	struct room_extra_data *red;
 	
-	if ((red = find_room_extra_data(room, type))) {
+	if ((red = find_extra_data(*list, type))) {
 		SAFE_ADD(red->value, add_value, INT_MIN, INT_MAX, TRUE);
 		
 		// delete zeroes for cleanliness
 		if (red->value == 0) {
-			remove_room_extra_data(room, type);
+			remove_extra_data(list, type);
 		}
 	}
 	else {
-		set_room_extra_data(room, type, add_value);
+		set_extra_data(list, type, add_value);
 	}
 }
 
 
 /**
-* Finds an extra data object by type.
+* Finds an extra data ptr by type.
 *
-* @param room_data *room The room to check.
+* @param struct room_extra_data *list The list of extra data to check.
 * @param int type Any ROOM_EXTRA_x type.
 * @return struct room_extra_data* The matching entry, or NULL.
 */
-struct room_extra_data *find_room_extra_data(room_data *room, int type) {
+struct room_extra_data *find_extra_data(struct room_extra_data *list, int type) {
 	struct room_extra_data *red;
-	HASH_FIND_INT(ROOM_EXTRA_DATA(room), &type, red);
+	HASH_FIND_INT(list, &type, red);
 	return red;
 }
 
 
 /**
-* Gets the value of an extra data type for a room; defaults to 0 if none is set.
+* Gets the value of an extra data type; defaults to 0 if none is set.
 *
-* @param room_data *room The room to check.
+* @param struct room_extra_data *list The list to get data from.
 * @param int type The ROOM_EXTRA_x type to check.
 * @return int The value of that type (default: 0).
 */
-int get_room_extra_data(room_data *room, int type) {
-	struct room_extra_data *red = find_room_extra_data(room, type);
+int get_extra_data(struct room_extra_data *list, int type) {
+	struct room_extra_data *red = find_extra_data(list, type);
 	return (red ? red->value : 0);
 }
 
-
 /**
-* Multiplies an existing room extra data value by a number.
+* Multiplies an existing extra data value by a number.
 *
-* @param room_data *room The room to modify data on.
+* @param struct room_extra_data **list The list to multiple an entry in.
 * @param int type The ROOM_EXTRA_x type to update.
 * @param double multiplier How much to multiply the value by.
 */
-void multiply_room_extra_data(room_data *room, int type, double multiplier) {
+void multiply_extra_data(struct room_extra_data **list, int type, double multiplier) {
 	struct room_extra_data *red;
 	
-	if ((red = find_room_extra_data(room, type))) {
+	if ((red = find_extra_data(*list, type))) {
 		red->value = (int) (multiplier * red->value);
 		
 		// delete zeroes for cleanliness
 		if (red->value == 0) {
-			remove_room_extra_data(room, type);
+			remove_extra_data(list, type);
 		}
 	}
 	// does nothing if it doesn't exist; 0*X=0
@@ -6364,15 +6363,15 @@ void multiply_room_extra_data(room_data *room, int type, double multiplier) {
 
 
 /**
-* Removes any extra data of a given type from the room.
+* Removes any extra data of a given type from the list.
 *
-* @param room_data *room The room to remove from.
+* @param struct room_extra_data **list The list to remove from.
 * @param int type The ROOM_EXTRA_x type to remove.
 */
-void remove_room_extra_data(room_data *room, int type) {
-	struct room_extra_data *red = find_room_extra_data(room, type);
+void remove_extra_data(struct room_extra_data **list, int type) {
+	struct room_extra_data *red = find_extra_data(*list, type);
 	if (red) {
-		HASH_DEL(ROOM_EXTRA_DATA(room), red);
+		HASH_DEL(*list, red);
 		free(red);
 	}
 }
@@ -6381,18 +6380,18 @@ void remove_room_extra_data(room_data *room, int type) {
 /**
 * Sets an extra data value to a specific number, overriding any old value.
 *
-* @param room_data *room The room to set.
+* @param struct room_extra_data **list The list to set data in.
 * @param int type Any ROOM_EXTRA_x type.
 * @param int value The value to set it to.
 */
-void set_room_extra_data(room_data *room, int type, int value) {
-	struct room_extra_data *red = find_room_extra_data(room, type);
+void set_extra_data(struct room_extra_data **list, int type, int value) {
+	struct room_extra_data *red = find_extra_data(*list, type);
 	
 	// create if needed
 	if (!red) {
 		CREATE(red, struct room_extra_data, 1);
 		red->type = type;
-		HASH_ADD_INT(ROOM_EXTRA_DATA(room), type, red);
+		HASH_ADD_INT(*list, type, red);
 	}
 	
 	red->value = value;

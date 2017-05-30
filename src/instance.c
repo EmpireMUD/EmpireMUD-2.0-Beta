@@ -883,8 +883,8 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 			pos = number(0, MAP_SIZE-1);
 			map = &(world_map[MAP_X_COORD(pos)][MAP_Y_COORD(pos)]);
 			
-			// shortcut: skip BASIC_OCEAN
-			if (GET_SECT_VNUM(map->sector_type) == BASIC_OCEAN) {
+			// shortcut: skip !SECT_IS_LAND_MAP
+			if (!SECT_IS_LAND_MAP(map->sector_type)) {
 				continue;
 			}
 			

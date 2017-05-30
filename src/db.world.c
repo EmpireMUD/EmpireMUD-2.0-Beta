@@ -73,7 +73,7 @@ room_vnum find_free_vnum();
 crop_data *get_potential_crop_for_location(room_data *location);
 void grow_crop(room_data *room);
 void init_room(room_data *room, room_vnum vnum);
-void naturalize_newbie_islands();
+int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
 void ruin_one_building(room_data *room);
 void save_world_map_to_file();
 extern int sort_empire_islands(struct empire_island *a, struct empire_island *b);
@@ -207,14 +207,14 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	}
 	
 	// need land-map update?
-	if (st != old_sect) {
+	if (st != old_sect && SECT_IS_LAND_MAP(st) != SECT_IS_LAND_MAP(old_sect)) {
 		map = &(world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)]);
-		if (GET_SECT_VNUM(old_sect) == BASIC_OCEAN) {
+		if (SECT_IS_LAND_MAP(st)) {
 			// add to land_map (at the start is fine)
 			map->next = land_map;
 			land_map = map;
 		}
-		else if (GET_SECT_VNUM(st) == BASIC_OCEAN) {
+		else {
 			// remove from land_map
 			REMOVE_FROM_LIST(map, land_map, next);
 			// do NOT free map -- it's a pointer to something in world_map
@@ -919,75 +919,118 @@ void update_world(void) {
  //////////////////////////////////////////////////////////////////////////////
 //// ANNUAL MAP UPDATE ///////////////////////////////////////////////////////
 
-// process map-only annual updates
-void annual_update_map_tile(room_data *room) {
+/**
+* Updates a set of depletions (halves them each year).
+*
+* @param struct depletion_data **list The list to update.
+*/
+void annual_update_depletions(struct depletion_data **list) {
+	struct depletion_data *dep, *next_dep;
+	
+	LL_FOREACH_SAFE(*list, dep, next_dep) {
+		// halve each year
+		dep->count /= 2;
+
+		if (dep->count < 10) {
+			// at this point just remove it to save space, or it will take years to hit 0
+			LL_DELETE(*list, dep);
+			free(dep);
+		}
+	}
+}
+
+
+/**
+* Process map-only annual updates on one map tile.
+* Note: This is not called on OCEAN tiles (ones that don't go in the land map).
+*
+* @param struct map_data *tile The map tile to update.
+*/
+void annual_update_map_tile(struct map_data *tile) {
 	extern char *get_room_name(room_data *room, bool color);
 	
 	struct resource_data *old_list;
 	int trenched, amount;
 	empire_data *emp;
+	room_data *room;
 	double dmg;
 	
-	if (IS_RUINS(room)) {
-		// roughly 2 real years for average chance for ruins to be gone
-		if (!number(0, 89)) {
-			disassociate_building(room);
-			abandon_room(room);
+	// actual room is optional
+	room = real_real_room(tile->vnum);
+	
+	// updates that only matter if there's a room:
+	if (room) {
+		if (IS_RUINS(room)) {
+			// roughly 2 real years for average chance for ruins to be gone
+			if (!number(0, 89)) {
+				disassociate_building(room);
+				abandon_room(room);
 			
-			if (ROOM_PEOPLE(room)) {
-				act("The ruins finally crumble to dust!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
-			}
-		}
-	}
-	else if (GET_BUILDING(room) && !IS_CITY_CENTER(room) && HOME_ROOM(room) == room && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_TEMPORARY) && (!ROOM_OWNER(room) || !EMPIRE_IMM_ONLY(ROOM_OWNER(room)))) {
-		// normal building decay:						TODO: City center building could be given the no-disrepair affect, but existing muds would need a patch-updater
-		
-		// determine damage to do each year
-		if (IS_COMPLETE(room)) {
-			dmg = (double) GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) / (double) config_get_int("disrepair_limit");
-		}
-		else {
-			dmg = (double) GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) / (double) config_get_int("disrepair_limit_unfinished");
-		}
-		dmg = MAX(1.0, dmg);
-		
-		// apply damage
-		COMPLEX_DATA(room)->damage += dmg;
-		
-		// apply maintenance resources (if any, and if it's not being dismantled)
-		if (GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)) && !IS_DISMANTLING(room)) {
-			old_list = GET_BUILDING_RESOURCES(room);
-			GET_BUILDING_RESOURCES(room) = combine_resources(old_list, GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)));
-			free_resource_list(old_list);
-		}
-		
-		// check high decay (damage) -- only if there is no instance
-		if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && BUILDING_DAMAGE(room) >= GET_BLD_MAX_DAMAGE(GET_BUILDING(room))) {
-			emp = ROOM_OWNER(room);
-			abandon_room(room);
-			
-			// 50% of the time we just abandon, the rest we also decay to ruins
-			if (!number(0, 1)) {
-				if (emp) {
-					log_to_empire(emp, ELOG_TERRITORY, "%s (%d, %d) has crumbled to ruin", get_room_name(room, FALSE), X_COORD(room), Y_COORD(room));
+				if (ROOM_PEOPLE(room)) {
+					act("The ruins finally crumble to dust!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 				}
-				ruin_one_building(room);
 			}
-			else if (emp) {
-				log_to_empire(emp, ELOG_TERRITORY, "%s (%d, %d) has been abandoned due to decay", get_room_name(room, FALSE), X_COORD(room), Y_COORD(room));
+		}
+		else if (GET_BUILDING(room) && !IS_CITY_CENTER(room) && HOME_ROOM(room) == room && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_TEMPORARY) && (!ROOM_OWNER(room) || !EMPIRE_IMM_ONLY(ROOM_OWNER(room)))) {
+			// normal building decay:						TODO: City center building could be given the no-disrepair affect, but existing muds would need a patch-updater
+		
+			// determine damage to do each year
+			if (IS_COMPLETE(room)) {
+				dmg = (double) GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) / (double) config_get_int("disrepair_limit");
 			}
+			else {
+				dmg = (double) GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) / (double) config_get_int("disrepair_limit_unfinished");
+			}
+			dmg = MAX(1.0, dmg);
+		
+			// apply damage
+			COMPLEX_DATA(room)->damage += dmg;
+		
+			// apply maintenance resources (if any, and if it's not being dismantled)
+			if (GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)) && !IS_DISMANTLING(room)) {
+				old_list = GET_BUILDING_RESOURCES(room);
+				GET_BUILDING_RESOURCES(room) = combine_resources(old_list, GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)));
+				free_resource_list(old_list);
+			}
+		
+			// check high decay (damage) -- only if there is no instance
+			if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && BUILDING_DAMAGE(room) >= GET_BLD_MAX_DAMAGE(GET_BUILDING(room))) {
+				emp = ROOM_OWNER(room);
+				abandon_room(room);
+			
+				// 50% of the time we just abandon, the rest we also decay to ruins
+				if (!number(0, 1)) {
+					if (emp) {
+						log_to_empire(emp, ELOG_TERRITORY, "%s (%d, %d) has crumbled to ruin", get_room_name(room, FALSE), X_COORD(room), Y_COORD(room));
+					}
+					ruin_one_building(room);
+				}
+				else if (emp) {
+					log_to_empire(emp, ELOG_TERRITORY, "%s (%d, %d) has been abandoned due to decay", get_room_name(room, FALSE), X_COORD(room), Y_COORD(room));
+				}
+			}
+		}
+		
+		// destroy roads -- randomly over time
+		if (IS_ROAD(room) && !ROOM_OWNER(room) && number(1, 100) <= 2) {
+			// this will tear it back down to its base type
+			disassociate_building(room);
 		}
 	}
 	
 	// fill in trenches slightly
-	if (ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH) && !ROOM_OWNER(room) && (trenched = get_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS)) < 0) {
+	if (SECT_FLAGGED(tile->sector_type, SECTF_IS_TRENCH) && (!room || !ROOM_OWNER(room)) && (trenched = get_extra_data(tile->shared->extra_data, ROOM_EXTRA_TRENCH_PROGRESS)) < 0) {
 		// move halfway toward initial: remember initial value is negative
 		amount = (config_get_int("trench_initial_value") - trenched) / 2;
 		trenched += amount;
 		if (trenched > config_get_int("trench_initial_value") + 10) {
-			set_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS, trenched);
+			set_extra_data(&tile->shared->extra_data, ROOM_EXTRA_TRENCH_PROGRESS, trenched);
 		}
 		else {
+			if (!room) {
+				room = real_room(tile->vnum);	// need room in memory
+			}
+			
 			// untrench
 			untrench_room(room);
 			if (ROOM_PEOPLE(room)) {
@@ -996,37 +1039,11 @@ void annual_update_map_tile(room_data *room) {
 		}
 	}
 	
-	// destroy roads -- randomly over time
-	if (IS_ROAD(room) && !ROOM_OWNER(room) && number(1, 100) <= 2) {
-		// this will tear it back down to its base type
-		disassociate_building(room);
-	}
-		
 	// clean mine data from anything that's not currently a mine
-	if (!HAS_FUNCTION(room, FNC_MINE)) {
-		remove_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM);
-		remove_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT);
-		remove_room_extra_data(room, ROOM_EXTRA_PROSPECT_EMPIRE);
-	}
-}
-
-
-// process annual_world_update for 1 room (map or interior)
-static void annual_update_room(room_data *room) {
-	struct depletion_data *dep, *next_dep, *temp;
-	
-	// depletions
-	for (dep = ROOM_DEPLETION(room); dep; dep = next_dep) {
-		next_dep = dep->next;
-		
-		// halve each year
-		dep->count /= 2;
-		
-		if (dep->count < 10) {
-			// at this point just remove it to save space, or it will take years to hit 0
-			REMOVE_FROM_LIST(dep, ROOM_DEPLETION(room), next);
-			free(dep);
-		}
+	if (!room || !HAS_FUNCTION(room, FNC_MINE)) {
+		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_GLB_VNUM);
+		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_AMOUNT);
+		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_PROSPECT_EMPIRE);
 	}
 }
 
@@ -1084,6 +1101,11 @@ void annual_world_update(void) {
 	vehicle_data *veh, *next_veh;
 	descriptor_data *d;
 	room_data *room, *next_room;
+	struct map_data *tile;
+	int x, y, newb_count = 0;
+	
+	bool naturalize_newbie_islands = config_get_bool("naturalize_newbie_islands");
+	bool naturalize_unclaimable = config_get_bool("naturalize_unclaimable");
 	
 	snprintf(message, sizeof(message), "\r\n%s\r\n", config_get_string("newyear_message"));
 	
@@ -1106,14 +1128,27 @@ void annual_world_update(void) {
 		}
 	}
 	
-	// reset newbie islands before doing rooms
-	naturalize_newbie_islands();
-	
-	HASH_ITER(hh, world_table, room, next_room) {
-		if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-			annual_update_map_tile(room);
+	// update ALL map tiles
+	for (y = 0; y < MAP_HEIGHT; ++y) {
+		for (x = 0; x < MAP_WIDTH; ++x) {
+			tile = &(world_map[x][y]);
+			
+			if (SECT_IS_LAND_MAP(tile->sector_type)) {	// not ocean
+				if (naturalize_newbie_islands) {
+					newb_count += naturalize_newbie_island(tile, naturalize_unclaimable);
+				}
+				
+				annual_update_map_tile(tile);
+			}
+			
+			// updates for all tiles including ocean
+			annual_update_depletions(&tile->shared->depletion);
 		}
-		annual_update_room(room);
+	}
+	
+	// interiors (not map tiles)
+	LL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
+		annual_update_depletions(&ROOM_DEPLETION(room));
 	}
 	
 	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
@@ -1129,81 +1164,75 @@ void annual_world_update(void) {
 	
 	// store the time now
 	data_set_long(DATA_LAST_NEW_YEAR, time(0));
+	
+	if (newb_count) {
+		log("New year: naturalized %d tile%s on newbie islands.", newb_count, PLURAL(newb_count));
+		world_map_needs_save = TRUE;
+	}
 }
 
 
 /**
-* Restores the newbie islands to nature at the end of the year, if the
+* Restores a newbie island island to nature at the end of the year, if the
 * "naturalize_newbie_islands" option is configured on.
 *
+* @param struct map_data *tile The map tile to try to naturalize.
+* @param bool do_unclaim If FALSE, skips unclaimable rooms.
+* @return int 1 if the tile was naturalized (for counting), 0 if not.
 */
-void naturalize_newbie_islands(void) {
-	struct island_info *isle = NULL;
-	int count = 0, last_isle = -1;
-	struct map_data *map;
+int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
+	static struct island_info *isle = NULL;
+	static int last_isle = -1;
 	room_data *room;
-	bool do_unclaim;
 	
-	if (!config_get_bool("naturalize_newbie_islands")) {
-		return;
+	// simple checks
+	if (tile->sector_type == tile->natural_sector) {
+		return 0;	// already same
 	}
 	
-	do_unclaim = config_get_bool("naturalize_unclaimable");
+	// check island
+	if (!isle || last_isle != tile->island) {
+		isle = get_island(tile->island, TRUE);
+		last_isle = tile->island;
+	}
+	if (!IS_SET(isle->flags, ISLE_NEWBIE)) {
+		return 0;
+	}
 	
-	LL_FOREACH(land_map, map) {
-		// simple checks
-		if (map->sector_type == map->natural_sector) {
-			continue;	// already same
+	// checks needed if the room exists
+	if ((room = real_real_room(tile->vnum))) {
+		if (ROOM_OWNER(room)) {
+			return 0;	// owned rooms don't naturalize
 		}
+		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
+			return 0;	// these flags also prevent it
+		}
+		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE) && !do_unclaim) {
+			return 0;
+		}
+	}
+	
+	// looks good: naturalize it
+	if (room) {
+		change_terrain(room, GET_SECT_VNUM(tile->natural_sector));
+		if (ROOM_PEOPLE(room)) {
+			act("The area returns to nature!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+		}
+	}
+	else {
+		perform_change_sect(NULL, tile, tile->natural_sector);
+		perform_change_base_sect(NULL, tile, tile->natural_sector);
 		
-		// check island
-		if (!isle || last_isle != map->island) {
-			isle = get_island(map->island, TRUE);
-			last_isle = map->island;
-		}
-		if (!IS_SET(isle->flags, ISLE_NEWBIE)) {
-			continue;
-		}
-		
-		// checks needed if the room exists
-		if ((room = real_real_room(map->vnum))) {
-			if (ROOM_OWNER(room)) {
-				continue;
-			}
-			if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
-				continue;
-			}
-			if (ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE) && !do_unclaim) {
-				continue;
-			}
-		}
-		
-		// looks good: naturalize it
-		if (room) {
-			change_terrain(room, GET_SECT_VNUM(map->natural_sector));
-			if (ROOM_PEOPLE(room)) {
-				act("The area returns to nature!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
-			}
+		if (SECT_FLAGGED(tile->natural_sector, SECTF_HAS_CROP_DATA)) {
+			room = real_room(tile->vnum);	// need it loaded after all
+			set_crop_type(room, get_potential_crop_for_location(room));
 		}
 		else {
-			perform_change_sect(NULL, map, map->natural_sector);
-			perform_change_base_sect(NULL, map, map->natural_sector);
-			
-			if (SECT_FLAGGED(map->natural_sector, SECTF_HAS_CROP_DATA)) {
-				room = real_room(map->vnum);	// need it loaded after all
-				set_crop_type(room, get_potential_crop_for_location(room));
-			}
-			else {
-				map->crop_type = NULL;
-			}
+			tile->crop_type = NULL;
 		}
-		++count;
 	}
 	
-	if (count) {
-		log("New year: naturalized %d tile%s on newbie islands.", count, PLURAL(count));
-		world_map_needs_save = TRUE;
-	}
+	return 1;
 }
 
 
@@ -2188,7 +2217,7 @@ void run_map_evolutions(void) {
 			}
 			
 			// other basic validation
-			if (GET_SECT_VNUM(sect) == BASIC_OCEAN) {
+			if (!SECT_IS_LAND_MAP(sect)) {
 				continue;	// always skip
 			}
 			if (!has_over_time_evo(sect)) {
@@ -2971,7 +3000,6 @@ void build_world_map(void) {
 void load_world_map_from_file(void) {
 	char line[256], line2[256], error_buf[MAX_STRING_LENGTH];
 	struct map_data *map, *last = NULL;
-	struct room_extra_data *red;
 	struct depletion_data *dep;
 	struct track_data *track;
 	int var[7], x, y;
@@ -3101,13 +3129,7 @@ void load_world_map_from_file(void) {
 						exit(1);
 					}
 					
-					HASH_FIND_INT(last->shared->extra_data, &var[0], red);
-					if (!red) {
-						CREATE(red, struct room_extra_data, 1);
-						red->type = var[0];
-						HASH_ADD_INT(last->shared->extra_data, type, red);
-					}
-					red->value = var[1];
+					set_extra_data(&last->shared->extra_data, var[0], var[1]);
 					break;
 				}
 			}

@@ -6659,7 +6659,7 @@ ACMD(do_random) {
 	// looks for a random non-ocean location
 	for (tries = 0; tries < 100; ++tries) {
 		roll = number(0, MAP_SIZE - 1);
-		loc = real_real_room(roll);	// use real_real_room to skip BASIC_OCEAN
+		loc = real_real_room(roll);	// use real_real_room to skip !SECT_IS_LAND_MAP
 		
 		if (loc && !ROOM_IS_CLOSED(loc) && !ROOM_SECT_FLAGGED(loc, SECTF_OCEAN)) {
 			perform_goto(ch, loc);

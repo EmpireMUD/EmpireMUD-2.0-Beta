@@ -131,6 +131,9 @@
 	!(room)->script \
 )	// end CAN_UNLOAD_MAP_ROOM()
 
+// defines what belongs in the land_map table
+#define SECT_IS_LAND_MAP(sect)  (GET_SECT_VNUM(sect) != BASIC_OCEAN)
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// BASIC TYPES AND CONSTS //////////////////////////////////////////////////
