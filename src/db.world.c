@@ -1102,7 +1102,7 @@ void annual_world_update(void) {
 	descriptor_data *d;
 	room_data *room, *next_room;
 	struct map_data *tile;
-	int x, y, newb_count = 0;
+	int newb_count = 0;
 	
 	bool naturalize_newbie_islands = config_get_bool("naturalize_newbie_islands");
 	bool naturalize_unclaimable = config_get_bool("naturalize_unclaimable");
@@ -1129,21 +1129,13 @@ void annual_world_update(void) {
 	}
 	
 	// update ALL map tiles
-	for (y = 0; y < MAP_HEIGHT; ++y) {
-		for (x = 0; x < MAP_WIDTH; ++x) {
-			tile = &(world_map[x][y]);
-			
-			if (SECT_IS_LAND_MAP(tile->sector_type)) {	// not ocean
-				if (naturalize_newbie_islands) {
-					newb_count += naturalize_newbie_island(tile, naturalize_unclaimable);
-				}
-				
-				annual_update_map_tile(tile);
-			}
-			
-			// updates for all tiles including ocean
-			annual_update_depletions(&tile->shared->depletion);
+	LL_FOREACH(land_map, tile) {
+		if (naturalize_newbie_islands) {
+			newb_count += naturalize_newbie_island(tile, naturalize_unclaimable);
 		}
+		
+		annual_update_map_tile(tile);
+		annual_update_depletions(&tile->shared->depletion);
 	}
 	
 	// interiors (not map tiles)
@@ -3145,13 +3137,19 @@ void load_world_map_from_file(void) {
 
 
 /**
-* Outputs the land portion of the world map to the map file.
+* Outputs the land portion of the world map to the map file. This function also
+* does a small amount of updating (e.g. removes stale tracks) since it is
+* iterating the whole world anyway.
 */
 void save_world_map_to_file(void) {
-	void write_shared_room_data(FILE *fl, struct shared_room_data *dat);	
+	void write_shared_room_data(FILE *fl, struct shared_room_data *dat);
 	
+	struct track_data *track, *next_track;
 	struct map_data *iter;
+	long now = time(0);
 	FILE *fl;
+	
+	int tracks_lifespan = config_get_int("tracks_lifespan");
 	
 	// shortcut
 	if (!world_map_needs_save) {
@@ -3165,7 +3163,15 @@ void save_world_map_to_file(void) {
 	
 	// only bother with ones that aren't base ocean
 	for (iter = land_map; iter; iter = iter->next) {
-		// x y island sect base natural crop
+		// free some junk while we're here anyway
+		LL_FOREACH_SAFE(iter->shared->tracks, track, next_track) {
+			if (now - track->timestamp > tracks_lifespan * SECS_PER_REAL_MIN) {
+				LL_DELETE(iter->shared->tracks, track);
+				free(track);
+			}
+		}
+		
+		// SAVE: x y island sect base natural crop
 		fprintf(fl, "%d %d %d %d %d %d %d\n", MAP_X_COORD(iter->vnum), MAP_Y_COORD(iter->vnum), iter->island, (iter->sector_type ? GET_SECT_VNUM(iter->sector_type) : -1), (iter->base_sector ? GET_SECT_VNUM(iter->base_sector) : -1), (iter->natural_sector ? GET_SECT_VNUM(iter->natural_sector) : -1), (iter->crop_type ? GET_CROP_VNUM(iter->crop_type) : -1));
 		write_shared_room_data(fl, iter->shared);
 	}

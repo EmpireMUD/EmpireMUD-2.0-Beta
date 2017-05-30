@@ -766,6 +766,8 @@ ACMD(do_track) {
 	bool found = FALSE;
 	byte dir = NO_DIR;
 	
+	int tracks_lifespan = config_get_int("tracks_lifespan");
+	
 	one_argument(argument, arg);
 	
 	if (!can_use_ability(ch, ABIL_TRACK, NOTHING, 0, NOTHING)) {
@@ -784,6 +786,11 @@ ACMD(do_track) {
 	}
 
 	for (track = ROOM_TRACKS(IN_ROOM(ch)); !found && track; track = track->next) {
+		// skip already-expired tracks
+		if (time(0) - track->timestamp > tracks_lifespan * SECS_PER_REAL_MIN) {
+			continue;
+		}
+		
 		if (track->player_id != NOTHING && (vict = is_playing(track->player_id))) {
 			// TODO: this is pretty similar to the MATCH macro in handler.c and could be converted to use it
 			if (isname(arg, GET_PC_NAME(vict)) || isname(arg, PERS(vict, vict, 0)) || isname(arg, PERS(vict, vict, 1)) || (!IS_NPC(vict) && GET_LASTNAME(vict) && isname(arg, GET_LASTNAME(vict)))) {

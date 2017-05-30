@@ -1608,11 +1608,9 @@ void point_update_room(room_data *room) {
 
 	char_data *ch, *next_ch, *sub_ch, *next_sub;
 	obj_data *o, *next_o;
-	struct track_data *track, *next_track, *temp;
 	struct affected_type *af, *next_af;
 	generic_data *gen;
 	empire_data *emp;
-	time_t now = time(0);
 	bool junk;
 	int count;
 	
@@ -1712,16 +1710,6 @@ void point_update_room(room_data *room) {
 	}
 
 	// WHOLE WORLD:
-	
-	// check tracks
-	for (track = ROOM_TRACKS(room); track; track = next_track) {
-		next_track = track->next;
-		
-		if (now - track->timestamp > config_get_int("tracks_lifespan") * SECS_PER_REAL_MIN) {
-			REMOVE_FROM_LIST(track, ROOM_TRACKS(room), next);
-			free(track);
-		}
-	}
 	
 	// check mob crowding
 	if (HAS_FUNCTION(room, FNC_STABLE)) {
