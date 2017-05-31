@@ -42,7 +42,7 @@ const char *default_vehicle_long_desc = "An unnamed vehicle is parked here.";
 // local protos
 void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 void clear_vehicle(vehicle_data *veh);
-extern room_data *create_room();
+extern room_data *create_room(room_data *home);
 
 // external consts
 extern const char *designate_flags[];
@@ -167,7 +167,7 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	}
 	
 	// otherwise, create the interior
-	room = create_room();
+	room = create_room(NULL);
 	attach_building_to_room(bld, room, TRUE);
 	COMPLEX_DATA(room)->home_room = NULL;
 	SET_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_IN_VEHICLE);
@@ -177,6 +177,12 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	COMPLEX_DATA(room)->vehicle = veh;
 	VEH_INTERIOR_HOME_ROOM(veh) = room;
 	add_room_to_vehicle(room, veh);
+	
+	// initial island data
+	if (IN_ROOM(veh)) {
+		GET_ISLAND_ID(room) = GET_ISLAND_ID(IN_ROOM(veh));
+		GET_ISLAND(room) = GET_ISLAND(IN_ROOM(veh));
+	}
 	
 	if (VEH_OWNER(veh)) {
 		claim_room(room, VEH_OWNER(veh));

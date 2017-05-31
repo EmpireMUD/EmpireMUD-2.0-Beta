@@ -479,7 +479,7 @@ void summon_materials(char_data *ch, char *argument) {
 		return;
 	}
 	
-	if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND) {
+	if (!GET_ISLAND(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't summon materials here.\r\n");
 		return;
 	}

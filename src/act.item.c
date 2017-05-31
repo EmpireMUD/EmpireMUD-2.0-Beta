@@ -2256,7 +2256,7 @@ vehicle_data *find_ship_by_shipping_id(empire_data *emp, int shipping_id) {
 * @return room_data* The ship holding pen.
 */
 room_data *get_ship_pen(void) {
-	extern room_data *create_room();
+	extern room_data *create_room(room_data *home);
 
 	room_data *room, *iter;
 	
@@ -2267,8 +2267,10 @@ room_data *get_ship_pen(void) {
 	}
 	
 	// did not find -- make one
-	room = create_room();
+	room = create_room(NULL);
 	attach_building_to_room(building_proto(RTYPE_SHIP_HOLDING_PEN), room, TRUE);
+	GET_ISLAND_ID(room) = NO_ISLAND;
+	GET_ISLAND(room) = NULL;
 	
 	return room;
 }

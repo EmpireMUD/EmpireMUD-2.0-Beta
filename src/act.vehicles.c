@@ -1393,7 +1393,7 @@ ACMD(do_dispatch) {
 	}
 	
 	// destination validation
-	else if (GET_ISLAND_ID(IN_ROOM(veh)) == NO_ISLAND) {
+	else if (!GET_ISLAND(IN_ROOM(veh))) {
 		msg_to_char(ch, "You can't automatically dispatch ships that are out at sea.\r\n");
 	}
 	else if (!(to_isle = get_island_by_name(ch, argument)) && !(to_isle = get_island_by_coords(argument))) {

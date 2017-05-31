@@ -55,19 +55,18 @@ extern const char *affected_bits[];
 room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
 	void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
-	extern room_data *create_room();
+	extern room_data *create_room(room_data *home);
 	void sort_world_table();
 	
 	room_data *home = HOME_ROOM(from), *new;
 	
 	// create the new room
-	new = create_room();
+	new = create_room(home);
 	create_exit(from, new, dir, TRUE);
 	if (bld) {
 		attach_building_to_room(bld, new, TRUE);
 	}
 
-	COMPLEX_DATA(new)->home_room = home;
 	COMPLEX_DATA(home)->inside_rooms++;
 	
 	if (GET_ROOM_VEHICLE(from)) {

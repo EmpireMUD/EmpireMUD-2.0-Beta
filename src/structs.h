@@ -4455,6 +4455,9 @@ struct complex_room_data {
 
 // data that could be from the map tile (for map rooms) or local (non-map rooms)
 struct shared_room_data {
+	int island_id;	// the island id (may be NO_ISLAND)
+	struct island_info *island_ptr;	// pointer to the island (may be NULL)
+	
 	// custom data
 	char *name;  // room name may be set
 	char *description;  // so may a description
@@ -4546,7 +4549,6 @@ struct track_data {
 // data for the world map (world_map, land_map)
 struct map_data {
 	room_vnum vnum;	// corresponding room vnum (coordinates can be derived from here)
-	int island;	// the island id
 	
 	// three basic sector types
 	sector_data *sector_type;	// current sector

@@ -4426,7 +4426,7 @@ room_data *find_load_room(char_data *ch) {
 	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch)))) {
 		// does not require last room but if there is one, it must be the same island
 		rl_last_room = real_room(GET_LAST_ROOM(ch));
-		if (room_has_function_and_city_ok(rl, FNC_TOMB) && (!rl_last_room || GET_ISLAND_ID(rl) == GET_ISLAND_ID(rl_last_room)) && can_use_room(ch, rl, GUESTS_ALLOWED) && !BUILDING_BURNING(rl)) {
+		if (room_has_function_and_city_ok(rl, FNC_TOMB) && (!rl_last_room || GET_ISLAND(rl) == GET_ISLAND(rl_last_room)) && can_use_room(ch, rl, GUESTS_ALLOWED) && !BUILDING_BURNING(rl)) {
 			return rl;
 		}
 	}
@@ -4704,41 +4704,6 @@ int get_direction_to(room_data *from, room_data *to) {
 
 
 /**
-* Fetch the island id based on the map location of the room. This was a macro,
-* but get_map_location_for() can return a NULL.
-*
-* @param room_data *room The room to check.
-* @return int The island ID, or NO_ISLAND if none.
-*/
-int GET_ISLAND_ID(room_data *room) {
-	room_data *map = get_map_location_for(room);
-	
-	if (map && GET_ROOM_VNUM(map) < MAP_SIZE) {
-		return world_map[FLAT_X_COORD(map)][FLAT_Y_COORD(map)].island;
-	}
-	else {
-		return NO_ISLAND;
-	}
-}
-
-
-/**
-* Changes the island id of a room.
-*
-* @param room_data *room The room to change the island on.
-* @param int island The island ID to set it to.
-*/
-void SET_ISLAND_ID(room_data *room, int island) {
-	extern bool world_map_needs_save;
-	
-	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-		world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].island = island;
-		world_map_needs_save = TRUE;
-	}
-}
-
-
-/**
 * @param room_data *room A room that has existing mine data
 * @return TRUE if the room has a deep mine set up
 */
@@ -4767,7 +4732,7 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 		return;
 	}
 
-	if (!(icon = use_icon)) {	
+	if (!(icon = use_icon)) {
 		season = pick_season(room);
 		icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), season);
 	}

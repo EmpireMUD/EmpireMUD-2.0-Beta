@@ -410,7 +410,7 @@ OLC_MODULE(mapedit_ruin) {
 
 OLC_MODULE(mapedit_exits) {
 	void add_room_to_vehicle(room_data *room, vehicle_data *veh);
-	extern room_data *create_room();
+	extern room_data *create_room(room_data *home);
 	extern const char *dirs[];
 	extern room_vnum find_free_vnum();
 	extern const int rev_dir[];
@@ -442,7 +442,7 @@ OLC_MODULE(mapedit_exits) {
 		msg_to_char(ch, "An exit already exists in that direction in the target room.\r\n");
 	else {
 		if (new) {
-			to_room = create_room();
+			to_room = create_room(HOME_ROOM(IN_ROOM(ch)));
 			attach_building_to_room(building_proto(config_get_int("default_interior")), to_room, TRUE);
 			
 			// TODO this is done in several different things that add rooms, and could be moved to a function -paul 7/14/2016
@@ -452,8 +452,6 @@ OLC_MODULE(mapedit_exits) {
 				add_room_to_vehicle(to_room, GET_ROOM_VEHICLE(IN_ROOM(ch)));
 			}
 			COMPLEX_DATA(HOME_ROOM(IN_ROOM(ch)))->inside_rooms++;
-			
-			COMPLEX_DATA(to_room)->home_room = HOME_ROOM(IN_ROOM(ch));
 			
 			if (ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)))) {
 				perform_claim_room(to_room, ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))));
@@ -530,7 +528,7 @@ OLC_MODULE(mapedit_naturalize) {
 		LL_FOREACH(land_map, map) {
 			room = real_real_room(map->vnum);	// may or may not exist
 			
-			if (island && map->island != island_id) {
+			if (island && map->shared->island_id != island_id) {
 				continue;
 			}
 			if (room && ROOM_OWNER(room)) {
@@ -650,7 +648,7 @@ OLC_MODULE(mapedit_remember) {
 		
 		// check all land tiles
 		LL_FOREACH(land_map, map) {
-			if (map->island != island_id) {
+			if (map->shared->island_id != island_id) {
 				continue;
 			}
 			if (SECT_FLAGGED(map->sector_type, SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE)) {

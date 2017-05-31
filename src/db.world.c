@@ -296,9 +296,10 @@ struct room_direction_data *create_exit(room_data *from, room_data *to, int dir,
 * Creates a new room, initializes it, inserts it in the world, and returns
 * its pointer.
 *
+* @param room_data *home The home room to attach to, if any.
 * @return room_data* the new room
 */
-room_data *create_room(void) {
+room_data *create_room(room_data *home) {
 	room_data *room;
 	
 	// to start
@@ -323,6 +324,10 @@ room_data *create_room(void) {
 	if (!CAN_UNLOAD_MAP_ROOM(room)) {
 		need_world_index = TRUE;
 	}
+	
+	COMPLEX_DATA(room)->home_room = home;
+	GET_ISLAND_ID(room) = home ? GET_ISLAND_ID(home) : NO_ISLAND;
+	GET_ISLAND(room) = home ? GET_ISLAND(home) : NULL;
 	
 	return room;
 }
@@ -1130,12 +1135,11 @@ void annual_world_update(void) {
 	
 	// update ALL map tiles
 	LL_FOREACH(land_map, tile) {
+		annual_update_map_tile(tile);
+		annual_update_depletions(&tile->shared->depletion);
 		if (naturalize_newbie_islands) {
 			newb_count += naturalize_newbie_island(tile, naturalize_unclaimable);
 		}
-		
-		annual_update_map_tile(tile);
-		annual_update_depletions(&tile->shared->depletion);
 	}
 	
 	// interiors (not map tiles)
@@ -1173,22 +1177,17 @@ void annual_world_update(void) {
 * @return int 1 if the tile was naturalized (for counting), 0 if not.
 */
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
-	static struct island_info *isle = NULL;
-	static int last_isle = -1;
 	room_data *room;
 	
 	// simple checks
 	if (tile->sector_type == tile->natural_sector) {
 		return 0;	// already same
 	}
-	
-	// check island
-	if (!isle || last_isle != tile->island) {
-		isle = get_island(tile->island, TRUE);
-		last_isle = tile->island;
+	if (!tile->shared->island_ptr) {
+		return 0;	// no bother
 	}
-	if (!IS_SET(isle->flags, ISLE_NEWBIE)) {
-		return 0;
+	if (!IS_SET(tile->shared->island_ptr->flags, ISLE_NEWBIE)) {
+		return 0;	// not newbie
 	}
 	
 	// checks needed if the room exists
@@ -2391,7 +2390,6 @@ room_data *load_map_room(room_vnum vnum) {
 	// do not use perform_change_sect here because we're only loading from the existing data
 	SECT(room) = map->sector_type;
 	BASE_SECT(room) = map->base_sector;
-	SET_ISLAND_ID(room, map->island);
 	
 	ROOM_CROP(room) = map->crop_type;
 	
@@ -2523,7 +2521,7 @@ crop_data *get_potential_crop_for_location(room_data *location) {
 		}
 		if (CROP_FLAGGED(crop, CROPF_NO_NEWBIE | CROPF_NEWBIE_ONLY)) {
 			if (!isle) {
-				isle = get_island(GET_ISLAND_ID(location), TRUE);
+				isle = GET_ISLAND(location);
 			}
 			if (CROP_FLAGGED(crop, CROPF_NO_NEWBIE) && IS_SET(isle->flags, ISLE_NEWBIE)) {
 				continue;
@@ -2966,7 +2964,10 @@ void build_world_map(void) {
 		x = FLAT_X_COORD(room);
 		y = FLAT_Y_COORD(room);
 		
-		world_map[x][y].island = GET_ISLAND_ID(room);
+		if (world_map[x][y].shared->island_id != GET_ISLAND_ID(room)) {
+			world_map[x][y].shared->island_id = GET_ISLAND_ID(room);
+			world_map[x][y].shared->island_ptr = (world_map[x][y].shared->island_id != NOTHING) ? get_island(world_map[x][y].shared->island_id, TRUE) : NULL;
+		}
 		
 		if (SECT(room)) {
 			world_map[x][y].sector_type = SECT(room);
@@ -3004,7 +3005,8 @@ void load_world_map_from_file(void) {
 		for (y = 0; y < MAP_HEIGHT; ++y) {
 			world_map[x][y].vnum = (y * MAP_WIDTH) + x;
 			CREATE(world_map[x][y].shared, struct shared_room_data, 1);
-			world_map[x][y].island = NO_ISLAND;
+			world_map[x][y].shared->island_id = NO_ISLAND;
+			world_map[x][y].shared->island_ptr = NULL;
 			world_map[x][y].sector_type = NULL;
 			world_map[x][y].base_sector = NULL;
 			world_map[x][y].natural_sector = NULL;
@@ -3041,7 +3043,7 @@ void load_world_map_from_file(void) {
 			map = &(world_map[var[0]][var[1]]);
 			sprintf(error_buf, "map tile %d", map->vnum);
 		
-			map->island = var[2];
+			map->shared->island_id = var[2];
 		
 			// these will be validated later
 			map->sector_type = sector_proto(var[3]);
@@ -3172,7 +3174,7 @@ void save_world_map_to_file(void) {
 		}
 		
 		// SAVE: x y island sect base natural crop
-		fprintf(fl, "%d %d %d %d %d %d %d\n", MAP_X_COORD(iter->vnum), MAP_Y_COORD(iter->vnum), iter->island, (iter->sector_type ? GET_SECT_VNUM(iter->sector_type) : -1), (iter->base_sector ? GET_SECT_VNUM(iter->base_sector) : -1), (iter->natural_sector ? GET_SECT_VNUM(iter->natural_sector) : -1), (iter->crop_type ? GET_CROP_VNUM(iter->crop_type) : -1));
+		fprintf(fl, "%d %d %d %d %d %d %d\n", MAP_X_COORD(iter->vnum), MAP_Y_COORD(iter->vnum), iter->shared->island_id, (iter->sector_type ? GET_SECT_VNUM(iter->sector_type) : -1), (iter->base_sector ? GET_SECT_VNUM(iter->base_sector) : -1), (iter->natural_sector ? GET_SECT_VNUM(iter->natural_sector) : -1), (iter->crop_type ? GET_CROP_VNUM(iter->crop_type) : -1));
 		write_shared_room_data(fl, iter->shared);
 	}
 	

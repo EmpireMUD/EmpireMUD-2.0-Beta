@@ -129,7 +129,7 @@ void copy_workforce_limits_into_current_island(char_data *ch, struct island_info
 	int iter;
 	empire_data *emp = GET_LOYALTY(ch); //This method should only be called if ch belongs to an empire, so this should never return null here.
 	
-	ch_current_island = get_island(GET_ISLAND_ID(IN_ROOM(ch)), false);
+	ch_current_island = GET_ISLAND(IN_ROOM(ch));
 	
 	//Error validation
 	if (!ch_current_island || ch_current_island->id == NO_ISLAND) {
@@ -183,7 +183,7 @@ void do_customize_island(char_data *ch, char *argument) {
 	// check cities ahead of time
 	if (GET_LOYALTY(ch)) {
 		LL_FOREACH(EMPIRE_CITY_LIST(GET_LOYALTY(ch)), city) {
-			if (GET_ISLAND_ID(city->location) == GET_ISLAND_ID(IN_ROOM(ch)) && (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) < time(0))) {
+			if (GET_ISLAND(city->location) == GET_ISLAND(IN_ROOM(ch)) && (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) < time(0))) {
 				has_city = TRUE;
 				break;
 			}
@@ -202,7 +202,7 @@ void do_customize_island(char_data *ch, char *argument) {
 	else if (!has_permission(ch, PRIV_CUSTOMIZE)) {
 		msg_to_char(ch, "You don't have permission to customize anything.\r\n");
 	}
-	else if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND || !(island = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE)) || !(eisle = get_empire_island(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch))))) {
+	else if (!(island = GET_ISLAND(IN_ROOM(ch))) || !(eisle = get_empire_island(GET_LOYALTY(ch), island->id))) {
 		msg_to_char(ch, "You can't do that here.\r\n");
 	}
 	else if (IS_SET(island->flags, ISLE_NO_CUSTOMIZE)) {
@@ -714,7 +714,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		return;
 	}
 	
-	if (GET_ISLAND_ID(IN_ROOM(ch)) == NOTHING && !IS_IMMORTAL(ch)) {
+	if (!GET_ISLAND(IN_ROOM(ch)) && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't check any empire inventory here.\r\n");
 		return;
 	}
@@ -902,7 +902,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here) {
 			continue;
 		}
 		
-		if ( here && requesters_island != GET_ISLAND_ID(IN_ROOM(ch_iter))) {
+		if (here && requesters_island != GET_ISLAND_ID(IN_ROOM(ch_iter))) {
 			continue;
 		}
 		
@@ -1261,7 +1261,7 @@ void found_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't have permission to found cities.\r\n");
 		return;
 	}
-	if ((isle = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE)) && IS_SET(isle->flags, ISLE_NEWBIE) && !config_get_bool("cities_on_newbie_islands")) {
+	if ((isle = GET_ISLAND(IN_ROOM(ch))) && IS_SET(isle->flags, ISLE_NEWBIE) && !config_get_bool("cities_on_newbie_islands")) {
 		msg_to_char(ch, "You can't found a city on a newbie island.\r\n");
 		return;
 	}
@@ -1438,7 +1438,7 @@ void list_cities(char_data *ch, char *argument) {
 		found = TRUE;
 		rl = city->location;
 		prettier_sprintbit(city->traits, empire_trait_types, buf);
-		isle = get_island(GET_ISLAND_ID(rl), TRUE);
+		isle = GET_ISLAND(rl);
 		
 		pending = (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + (config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN) > time(0));			
 		msg_to_char(ch, "%d. (%*d, %*d) %s, on %s (%s/%d), traits: %s%s\r\n", ++count, X_PRECISION, X_COORD(rl), Y_PRECISION, Y_COORD(rl), city->name, get_island_name_for(isle->id, ch), city_type[city->type].name, city_type[city->type].radius, buf, pending ? " &r(new)&0" : "");
@@ -4312,7 +4312,7 @@ ACMD(do_findmaintenance) {
 		if ((!IS_COMPLETE(ter->room) || !BUILDING_RESOURCES(ter->room)) && !HAS_MINOR_DISREPAIR(ter->room)) {
 			continue;
 		}
-		if (find_island && GET_ISLAND_ID(ter->room) != find_island->id) {
+		if (find_island && GET_ISLAND(ter->room) != find_island) {
 			continue;
 		}
 		
@@ -5553,7 +5553,7 @@ ACMD(do_workforce) {
 		
 		// island arg
 		if (!*island_arg) {
-			if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND) {
+			if (!GET_ISLAND(IN_ROOM(ch))) {
 				msg_to_char(ch, "You can't set local workforce options when you're not on any island.\r\n");
 				return;
 			}

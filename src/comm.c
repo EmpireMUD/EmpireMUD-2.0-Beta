@@ -217,9 +217,9 @@ void msdp_update_room(char_data *ch) {
 	char buf[MAX_STRING_LENGTH], area_name[128], exits[256];
 	struct empire_city_data *city;
 	struct instance_data *inst;
+	struct island_info *island;
 	size_t buf_size, ex_size;
 	descriptor_data *desc;
-	int isle_id;
 	
 	// no work
 	if (!ch || !(desc = ch->desc)) {
@@ -233,8 +233,8 @@ void msdp_update_room(char_data *ch) {
 	else if ((city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
 		snprintf(area_name, sizeof(area_name), "%s", city->name);
 	}
-	else if ((isle_id = GET_ISLAND_ID(IN_ROOM(ch))) != NO_ISLAND) {
-		snprintf(area_name, sizeof(area_name), "%s", get_island_name_for(isle_id, ch));
+	else if ((island = GET_ISLAND(IN_ROOM(ch)))) {
+		snprintf(area_name, sizeof(area_name), "%s", island->name);
 	}
 	else {
 		snprintf(area_name, sizeof(area_name), "Unknown");

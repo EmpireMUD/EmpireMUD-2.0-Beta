@@ -1729,7 +1729,7 @@ ACMD(do_portal) {
 				
 				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s (%s%s&0)", get_room_name(room, FALSE), EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
 				
-				if ((dist > max_out_of_city_portal && (!ch_in_city || !there_in_city)) || (!has_ability(ch, ABIL_PORTAL_MASTER) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND_ID(IN_ROOM(ch)) != GET_ISLAND_ID(target))) {
+				if ((dist > max_out_of_city_portal && (!ch_in_city || !there_in_city)) || (!has_ability(ch, ABIL_PORTAL_MASTER) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(target))) {
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, " &r(too far)&0");
 				}
 				
@@ -1786,7 +1786,7 @@ ACMD(do_portal) {
 		msg_to_char(ch, "You don't have permission to open a portal to that location.\r\n");
 		return;
 	}
-	if (!has_ability(ch, ABIL_PORTAL_MASTER) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND_ID(IN_ROOM(ch)) != GET_ISLAND_ID(target)) {
+	if (!has_ability(ch, ABIL_PORTAL_MASTER) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(target)) {
 		msg_to_char(ch, "You can't open a portal to another land without a portal master in your empire.\r\n");
 		return;
 	}

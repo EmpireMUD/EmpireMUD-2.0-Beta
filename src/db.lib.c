@@ -3322,12 +3322,7 @@ struct island_info *get_island_by_coords(char *coords) {
 		return NULL;
 	}
 	
-	if (GET_ISLAND_ID(room) == NO_ISLAND) {
-		return NULL;
-	}
-	else {
-		return get_island(GET_ISLAND_ID(room), TRUE);
-	}
+	return GET_ISLAND(room);
 }
 
 
@@ -4360,9 +4355,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 		exit(1);
 	}
 	
-	if (t[0] != NOTHING) {
-		SET_ISLAND_ID(room, t[0]);
-	}
+	GET_ISLAND_ID(room) = t[0];
 	room->sector_type = sector_proto(t[1]);
 	room->base_sector = sector_proto(t[2]);
 
@@ -4641,8 +4634,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	fprintf(fl, "#%d\n", GET_ROOM_VNUM(room));
 	
 	// both sector and original-sector must save vnums
-	// NOTE: does not need an island id if it's not on the map
-	fprintf(fl, "%d %d %d\n", (GET_ROOM_VNUM(room) < MAP_SIZE) ? GET_ISLAND_ID(room) : -1, GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(BASE_SECT(room)));
+	fprintf(fl, "%d %d %d\n", GET_ISLAND_ID(room), GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(BASE_SECT(room)));
 	
 	// B building data
 	if (COMPLEX_DATA(room)) {

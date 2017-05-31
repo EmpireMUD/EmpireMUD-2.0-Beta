@@ -42,7 +42,7 @@ extern bool can_claim(char_data *ch);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 void delete_room_npcs(room_data *room, struct empire_territory_data *ter);
 void free_complex_data(struct complex_room_data *data);
-extern room_data *create_room();
+extern room_data *create_room(room_data *home);
 extern bool has_learned_craft(char_data *ch, any_vnum vnum);
 void scale_item_to_level(obj_data *obj, int level);
 void stop_room_action(room_data *room, int action, int chore);
@@ -282,9 +282,8 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 
 	// now the length of the tunnel
 	for (iter = 0; iter < length; ++iter) {
-		new_room = create_room();
+		new_room = create_room((iter <= length/2) ? entrance : exit);
 		attach_building_to_room(building_proto(RTYPE_TUNNEL), new_room, TRUE);
-		COMPLEX_DATA(new_room)->home_room = (iter <= length/2) ? entrance : exit;
 		GET_BUILDING_RESOURCES(new_room) = copy_resource_list(resources);
 		SET_BIT(ROOM_BASE_FLAGS(new_room), ROOM_AFF_INCOMPLETE);
 		SET_BIT(ROOM_AFF_FLAGS(new_room), ROOM_AFF_INCOMPLETE);
@@ -1746,11 +1745,10 @@ ACMD(do_designate) {
 		}
 		else {
 			// create the new room
-			new = create_room();
+			new = create_room(home);
 			create_exit(IN_ROOM(ch), new, dir, TRUE);
 			attach_building_to_room(type, new, TRUE);
 
-			COMPLEX_DATA(new)->home_room = home;
 			COMPLEX_DATA(home)->inside_rooms++;
 			
 			if (veh) {

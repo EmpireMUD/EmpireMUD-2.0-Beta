@@ -409,7 +409,7 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 * @return room_data* The new room.
 */
 static room_data *instantiate_one_room(struct instance_data *inst, room_template *rmt) {
-	extern room_data *create_room();
+	extern room_data *create_room(room_data *home);
 	
 	const bitvector_t default_affs = ROOM_AFF_UNCLAIMABLE;
 	
@@ -420,7 +420,7 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 		return NULL;
 	}
 	
-	room = create_room();
+	room = create_room(NULL);
 	attach_template_to_room(rmt, room);
 	sect = sector_proto(config_get_int("default_adventure_sect"));
 	perform_change_sect(room, NULL, sect);
@@ -489,9 +489,16 @@ void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventu
 			if (room_list[pos]) {
 				if (!inst->start) {
 					inst->start = room_list[pos];
+					
+					if (inst->location) {
+						GET_ISLAND_ID(inst->start) = GET_ISLAND_ID(inst->location);
+						GET_ISLAND(inst->start) = GET_ISLAND(inst->location);
+					}
 				}
 				else {
 					COMPLEX_DATA(room_list[pos])->home_room = inst->start;
+					GET_ISLAND_ID(room_list[pos]) = GET_ISLAND_ID(inst->start);
+					GET_ISLAND(room_list[pos]) = GET_ISLAND(inst->start);
 				}
 			}
 			
@@ -742,7 +749,7 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 	}
 	
 	// newbie island checks
-	island_id = map ? map->island : GET_ISLAND_ID(loc);
+	island_id = map ? map->shared->island_id : GET_ISLAND_ID(loc);
 	if (island_id != NO_ISLAND) {
 		isle = get_island(island_id, TRUE);
 		if (IS_SET(isle->flags, ISLE_NEWBIE)) {	// is newbie island

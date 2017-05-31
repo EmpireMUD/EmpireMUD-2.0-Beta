@@ -934,6 +934,9 @@ void renum_world(void) {
 				if (GET_ROOM_VEHICLE(home)) {
 					++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(home));
 				}
+				
+				GET_ISLAND_ID(room) = GET_ISLAND_ID(home);
+				GET_ISLAND(room) = GET_ISLAND(home);
 			}
 		}
 	}
@@ -1339,7 +1342,7 @@ void push_island(struct map_data *loc) {
 void check_newbie_islands(void) {
 	struct island_info *isle = NULL, *ii, *next_ii;
 	room_data *room, *next_room;
-	int num_newbie_isles, last_isle = -1;
+	int num_newbie_isles;
 	empire_data *emp;
 	empire_vnum vnum;
 	
@@ -1360,18 +1363,13 @@ void check_newbie_islands(void) {
 	}
 	
 	HASH_ITER(hh, world_table, room, next_room) {
-		if (GET_ROOM_VNUM(room) >= MAP_SIZE || GET_ISLAND_ID(room) == NO_ISLAND) {
+		if (GET_ROOM_VNUM(room) >= MAP_SIZE || !(isle = GET_ISLAND(room))) {
 			continue;
 		}
 		
 		// ensure ownership and that the empire is "not new"
 		if (!(emp = ROOM_OWNER(room)) || (EMPIRE_CREATE_TIME(emp) + (config_get_int("newbie_island_day_limit") * SECS_PER_REAL_DAY)) > time(0)) {
 			continue;
-		}
-		
-		// usually see many of the same island in a row, so this reduces lookups
-		if (last_isle == -1 || GET_ISLAND_ID(room) != last_isle) {
-			isle = get_island(GET_ISLAND_ID(room), TRUE);
 		}
 		
 		// apply newbie rules?
@@ -1413,14 +1411,8 @@ void check_newbie_islands(void) {
 void number_island(struct map_data *map, int island) {
 	int x, y, new_x, new_y;
 	struct map_data *tile;
-	room_data *room;
 	
-	map->island = island;
-	
-	// if there's a real room
-	if ((room = real_real_room(map->vnum))) {
-		SET_ISLAND_ID(room, island);
-	}
+	map->shared->island_id = island;
 	
 	// check neighboring tiles
 	for (x = -1; x <= 1; ++x) {
@@ -1433,7 +1425,7 @@ void number_island(struct map_data *map, int island) {
 			if (get_coord_shift(MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum), x, y, &new_x, &new_y)) {
 				tile = &(world_map[new_x][new_y]);
 				
-				if (!SECT_FLAGGED(tile->sector_type, SECTF_NON_ISLAND) && tile->island <= 0) {
+				if (!SECT_FLAGGED(tile->sector_type, SECTF_NON_ISLAND) && tile->shared->island_id <= 0) {
 					// add to stack
 					push_island(tile);
 				}
@@ -1465,6 +1457,7 @@ void number_and_count_islands(bool reset) {
 	struct island_read_data *data, *next_data, *list = NULL;
 	bool re_empire = (top_island_num != -1);
 	struct island_num_data_t *item;
+	struct instance_data *inst;
 	struct island_info *isle;
 	struct map_data *map;
 	room_data *room;
@@ -1474,10 +1467,10 @@ void number_and_count_islands(bool reset) {
 	top_island_num = -1;
 	for (map = land_map; map; map = map->next) {
 		if (reset || SECT_FLAGGED(map->sector_type, SECTF_NON_ISLAND)) {
-			map->island = NO_ISLAND;
+			map->shared->island_id = NO_ISLAND;
 		}
 		else {
-			top_island_num = MAX(top_island_num, map->island);
+			top_island_num = MAX(top_island_num, map->shared->island_id);
 		}
 	}
 	
@@ -1486,11 +1479,11 @@ void number_and_count_islands(bool reset) {
 	// 1. expand EXISTING islands
 	if (!reset) {
 		for (map = land_map; map; map = map->next) {
-			if (map->island == NO_ISLAND) {
+			if (map->shared->island_id == NO_ISLAND) {
 				continue;
 			}
 			
-			use_id = map->island;
+			use_id = map->shared->island_id;
 			push_island(map);
 			
 			while ((item = pop_island())) {
@@ -1502,7 +1495,7 @@ void number_and_count_islands(bool reset) {
 	
 	// 2. look for places that have no island id but need one -- and also measure islands while we're here
 	for (map = land_map; map; map = map->next) {
-		if (map->island == NO_ISLAND && !SECT_FLAGGED(map->sector_type, SECTF_NON_ISLAND)) {
+		if (map->shared->island_id == NO_ISLAND && !SECT_FLAGGED(map->sector_type, SECTF_NON_ISLAND)) {
 			use_id = ++top_island_num;
 			push_island(map);
 			
@@ -1512,7 +1505,7 @@ void number_and_count_islands(bool reset) {
 			}
 		}
 		else {
-			use_id = map->island;
+			use_id = map->shared->island_id;
 		}
 		
 		HASH_FIND_INT(list, &use_id, data);
@@ -1568,6 +1561,35 @@ void number_and_count_islands(bool reset) {
 		// and free
 		HASH_DEL(list, data);
 		free(data);
+	}
+	
+	// update all island pointers
+	LL_FOREACH(land_map, map) {
+		map->shared->island_ptr = (map->shared->island_id != NO_ISLAND) ? get_island(map->shared->island_id, TRUE) : NULL;
+	}
+	
+	// update instance island pointers (only ones without home rooms)
+	LL_FOREACH(instance_list, inst) {
+		if (inst->start && inst->location && HOME_ROOM(inst->location) == inst->location) {
+			GET_ISLAND_ID(inst->start) = GET_ISLAND_ID(HOME_ROOM(inst->location));
+			GET_ISLAND(inst->start) = GET_ISLAND(HOME_ROOM(inst->location));
+		}
+	}
+	
+	// update interior island pointers (by home room)
+	LL_FOREACH2(interior_room_list, room, next_interior) {
+		if (HOME_ROOM(room) != room) {
+			GET_ISLAND_ID(room) = GET_ISLAND_ID(HOME_ROOM(room));
+			GET_ISLAND(room) = GET_ISLAND(HOME_ROOM(room));
+		}
+	}
+	
+	// update instance island pointers (only ones WITH home rooms now that the interior rooms are assigned)
+	LL_FOREACH(instance_list, inst) {
+		if (inst->start && inst->location && HOME_ROOM(inst->location) != inst->location) {
+			GET_ISLAND_ID(inst->start) = GET_ISLAND_ID(HOME_ROOM(inst->location));
+			GET_ISLAND(inst->start) = GET_ISLAND(HOME_ROOM(inst->location));
+		}
 	}
 	
 	// lastly
@@ -2821,9 +2843,9 @@ void assign_old_workforce_chore(empire_data *emp, int chore) {
 		
 		// only bother if different from the last island found
 		map = &(world_map[MAP_X_COORD(trd->vnum)][MAP_Y_COORD(trd->vnum)]);
-		if (map->island != NO_ISLAND && last_isle != map->island) {
-			set_workforce_limit(emp, map->island, chore, WORKFORCE_UNLIMITED);
-			last_isle = map->island;
+		if (map->shared->island_id != NO_ISLAND && last_isle != map->shared->island_id) {
+			set_workforce_limit(emp, map->shared->island_id, chore, WORKFORCE_UNLIMITED);
+			last_isle = map->shared->island_id;
 		}
 	}
 }
