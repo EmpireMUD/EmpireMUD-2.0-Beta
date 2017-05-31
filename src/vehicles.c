@@ -178,12 +178,6 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	VEH_INTERIOR_HOME_ROOM(veh) = room;
 	add_room_to_vehicle(room, veh);
 	
-	// initial island data
-	if (IN_ROOM(veh)) {
-		GET_ISLAND_ID(room) = GET_ISLAND_ID(IN_ROOM(veh));
-		GET_ISLAND(room) = GET_ISLAND(IN_ROOM(veh));
-	}
-	
 	if (VEH_OWNER(veh)) {
 		claim_room(room, VEH_OWNER(veh));
 	}
@@ -492,6 +486,12 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 	CREATE(vrl, struct vehicle_room_list, 1);
 	vrl->room = room;
 	LL_APPEND(VEH_ROOM_LIST(veh), vrl);
+	
+	// initial island data
+	if (IN_ROOM(veh)) {
+		GET_ISLAND_ID(room) = GET_ISLAND_ID(IN_ROOM(veh));
+		GET_ISLAND(room) = GET_ISLAND(IN_ROOM(veh));
+	}
 }
 
 

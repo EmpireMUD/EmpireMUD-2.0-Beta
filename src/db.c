@@ -1569,7 +1569,7 @@ void number_and_count_islands(bool reset) {
 	
 	// update all interior rooms
 	LL_FOREACH2(interior_room_list, room, next_interior) {
-		if (!(maploc = get_map_location_for(room)) || (maploc == room)) {
+		if (!(maploc = get_map_location_for(room))) {
 			continue;
 		}
 		
