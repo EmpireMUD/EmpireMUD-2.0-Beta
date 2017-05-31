@@ -166,6 +166,7 @@ trading_post_fee 0.050000
 trading_post_max_hours 72
 *
 * War configs
+burn_down_time 600
 death_release_minutes 5
 deaths_before_penalty 5
 deaths_before_penalty_war 0

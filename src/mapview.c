@@ -917,7 +917,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		msg_to_char(ch, "Remaining to %s: %s\r\n", (IS_DISMANTLING(room) ? "Dismantle" : (IS_INCOMPLETE(room) ? "Completion" : "Maintain")), partialbuf);
 	}
 	
-	if (BUILDING_BURNING(room)) {
+	if (IS_BURNING(room)) {
 		msg_to_char(ch, "%sThe building is on fire!&0\r\n", BACKGROUND_RED);
 	}
 	if (GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_ON_FIRE)) {
@@ -1444,7 +1444,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 
 	// buf now contains the tile with preliminary color codes including &?
 
-	if (BUILDING_BURNING(to_room)) {
+	if (IS_BURNING(to_room)) {
 		strcpy(buf1, strip_color(buf));
 		sprintf(buf, "&0%s%s", BACKGROUND_RED, buf1);
 		need_color_terminator = TRUE;

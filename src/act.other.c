@@ -1504,6 +1504,7 @@ ACMD(do_dismiss) {
 
 ACMD(do_douse) {
 	void do_douse_vehicle(char_data *ch, vehicle_data *veh, obj_data *cont);
+	void stop_burning(room_data *room);
 	
 	room_data *room = HOME_ROOM(IN_ROOM(ch));
 	obj_data *obj = NULL, *iter;
@@ -1511,8 +1512,6 @@ ACMD(do_douse) {
 	vehicle_data *veh;
 	byte amount;
 	
-	int fire_extinguish_value = config_get_int("fire_extinguish_value");
-
 	// this loop finds a water container and sets obj
 	LL_FOREACH2(ch->carrying, iter, next_content) {
 		if (GET_DRINK_CONTAINER_TYPE(iter) == LIQ_WATER && GET_DRINK_CONTAINER_CONTENTS(iter) > 0) {
@@ -1541,19 +1540,19 @@ ACMD(do_douse) {
 	else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_ON_FIRE)) {
 		do_douse_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj);
 	}
-	else if (!IS_ANY_BUILDING(IN_ROOM(ch)) || !BUILDING_BURNING(room))
+	else if (!IS_ANY_BUILDING(IN_ROOM(ch)) || !IS_BURNING(room))
 		msg_to_char(ch, "There's no fire here!\r\n");
 	else {
 		amount = GET_DRINK_CONTAINER_CONTENTS(obj);
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
-
-		COMPLEX_DATA(room)->burning = MIN(fire_extinguish_value, BUILDING_BURNING(room) + amount);
+		
+		add_to_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, -amount);
 		act("You throw some water from $p onto the flames!", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n throws some water from $p onto the flames!", FALSE, ch, obj, 0, TO_ROOM);
 
-		if (BUILDING_BURNING(room) >= fire_extinguish_value) {
+		if (get_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING) <= 0) {
 			act("The flames have been extinguished!", FALSE, ch, 0, 0, TO_CHAR | TO_ROOM);
-			COMPLEX_DATA(room)->burning = 0;
+			stop_burning(room);
 		}
 	}
 }

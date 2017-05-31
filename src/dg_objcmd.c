@@ -481,7 +481,7 @@ OCMD(do_orestore) {
 			free_resource_list(GET_BUILDING_RESOURCES(room));
 			GET_BUILDING_RESOURCES(room) = NULL;
 			COMPLEX_DATA(room)->damage = 0;
-			COMPLEX_DATA(room)->burning = 0;
+			COMPLEX_DATA(room)->burn_down_time = 0;
 		}
 	}
 }

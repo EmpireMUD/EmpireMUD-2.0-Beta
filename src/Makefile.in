@@ -203,13 +203,13 @@ db.o: db.c conf.h sysdep.h structs.h uthash.h utils.h db.h comm.h \
   handler.h interpreter.h skills.h olc.h vnums.h dg_scripts.h
 	$(CC) -c $(CFLAGS) db.c
 db.lib.o: db.lib.c conf.h sysdep.h structs.h uthash.h utils.h db.h comm.h \
-  handler.h skills.h olc.h dg_scripts.h vnums.h
+  handler.h skills.h olc.h dg_scripts.h dg_event.h vnums.h
 	$(CC) -c $(CFLAGS) db.lib.c
 db.player.o: db.player.c conf.h sysdep.h structs.h uthash.h utils.h db.h \
   comm.h handler.h skills.h interpreter.h dg_scripts.h
 	$(CC) -c $(CFLAGS) db.player.c
 db.world.o: db.world.c conf.h sysdep.h structs.h uthash.h utils.h db.h \
-  comm.h handler.h skills.h dg_scripts.h vnums.h
+  comm.h handler.h skills.h dg_scripts.h dg_event.h vnums.h
 	$(CC) -c $(CFLAGS) db.world.c
 dg_comm.o: dg_comm.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
   utils.h comm.h handler.h db.h skills.h

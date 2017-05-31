@@ -538,7 +538,17 @@ void point_update_char(char_data *ch) {
 			}
 		}
 	}
-
+	
+	// warn about burning
+	if (IS_BURNING(IN_ROOM(ch))) {
+		if (ROOM_IS_CLOSED(IN_ROOM(ch))) {
+			act("The walls crackle and crisp as they burn!", FALSE, ch, NULL, NULL, TO_CHAR);
+		}
+		else {
+			act("The fire rages as the building burns!", FALSE, ch, NULL, NULL, TO_CHAR);
+		}
+	}
+	
 	// check all cooldowns -- ignore chars with descriptors, as they'll want
 	// the OTHER function to remove this (it sends messages; this one includes
 	// NPCs and doesn't)
@@ -1579,6 +1589,8 @@ void point_update_obj(obj_data *obj) {
 * @param obj_data *obj The object to update.
 */
 void real_update_obj(obj_data *obj) {
+	void start_burning(room_data *room);
+	
 	struct empire_political_data *pol;
 	empire_data *emp, *enemy;
 	room_data *home;
@@ -1586,7 +1598,7 @@ void real_update_obj(obj_data *obj) {
 	// burny
 	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && IN_ROOM(obj) && IS_ANY_BUILDING(IN_ROOM(obj))) {
 		home = HOME_ROOM(IN_ROOM(obj));
-		if (ROOM_BLD_FLAGGED(home, BLD_BURNABLE) && !BUILDING_BURNING(home)) {
+		if (ROOM_BLD_FLAGGED(home, BLD_BURNABLE) && !IS_BURNING(home)) {
 			// only items with an empire id are considered: you can't burn stuff down by accident (unless the building is unowned)
 			if (obj->last_empire_id != NOTHING || !ROOM_OWNER(home)) {
 				// check that the empire is at war
@@ -1595,15 +1607,10 @@ void real_update_obj(obj_data *obj) {
 				
 				// check for war
 				if (!emp || (enemy && (pol = find_relation(enemy, emp)) && IS_SET(pol->type, DIPL_WAR))) {
-					// TODO magic number -- this should be a config
-					COMPLEX_DATA(home)->burning = number(4, 12);
-					if (ROOM_PEOPLE(home)) {
-						act("A stray ember from $p ignites the room!", FALSE, ROOM_PEOPLE(home), obj, 0, TO_CHAR | TO_ROOM);
-
-						// ensure no building or dismantling
-						stop_room_action(home, ACT_BUILDING, CHORE_BUILDING);
-						stop_room_action(home, ACT_DISMANTLING, CHORE_BUILDING);
+					if (ROOM_PEOPLE(IN_ROOM(obj))) {
+						act("A stray ember from $p ignites the room!", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM);
 					}
+					start_burning(home);
 				}
 			}
 		}
@@ -1623,12 +1630,8 @@ void point_update_room(room_data *room) {
 	void death_log(char_data *ch, char_data *killer, int type);
 	void fill_trench(room_data *room);
 
-	char_data *ch, *next_ch;
-	obj_data *o, *next_o;
 	struct affected_type *af, *next_af;
 	generic_data *gen;
-	empire_data *emp;
-	bool junk;
 
 	// map-only portion
 	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
@@ -1652,74 +1655,6 @@ void point_update_room(room_data *room) {
 			affect_from_room(room, ATYPE_DARKNESS);
 			if (ROOM_PEOPLE(room))
 				act("The darkness dissipates.", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-		}
-
-		if (COMPLEX_DATA(room) && HOME_ROOM(room) == room && BUILDING_BURNING(room)) {
-			/* Reduce by one tick */
-			--COMPLEX_DATA(room)->burning;
-		
-			emp = ROOM_OWNER(room);
-			if (emp) {
-				log_to_empire(emp, ELOG_HOSTILITY, "Building on fire at (%d, %d) -- douse it quickly", X_COORD(room), Y_COORD(room));
-			}
-
-			/* Time's up! */
-			if (BUILDING_BURNING(room) == 0) {
-				if (ROOM_IS_CLOSED(room)) {
-					if (ROOM_PEOPLE(room)) {
-						act("The building collapses in flames around you!", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-					}
-					for (ch = ROOM_PEOPLE(room); ch; ch = next_ch) {
-						next_ch = ch->next_in_room;
-						
-						if (!IS_NPC(ch)) {
-							death_log(ch, ch, TYPE_SUFFERING);
-						}
-						die(ch, ch);
-					}
-				}
-				else {
-					// not closed
-					if (ROOM_PEOPLE(room)) {
-						act("The building burns to the ground!", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-					}
-				}
-			
-				disassociate_building(room);
-				
-				// auto-abandon if not in city
-				if (emp && !is_in_city_for_empire(room, emp, TRUE, &junk)) {
-					// does check the city time limit for abandon protection
-					abandon_room(room);
-				}
-
-				/* Destroy 50% of the objects */
-				for (o = ROOM_CONTENTS(room); o; o = next_o) {
-					next_o = o->next_content;
-					if (!number(0, 1)) {
-						extract_obj(o);
-					}
-				}
-
-				return;
-			}
-
-			/* Otherwise, just send a message */
-			if (ROOM_PEOPLE(room)) {
-				if (ROOM_IS_CLOSED(room)) {
-					act("The walls crackle and crisp as they burn!", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-				}
-				else {
-					act("The fire rages as the building burns!", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-				}
-			}
-		}
-	}
-
-	// For remaining interior rooms, make sure everyone knows the place is crispy
-	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
-		if (HOME_ROOM(room) != room && BUILDING_BURNING(room) && ROOM_PEOPLE(room)) {
-			act("The walls crackle and crisp as they burn!", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
 		}
 	}
 

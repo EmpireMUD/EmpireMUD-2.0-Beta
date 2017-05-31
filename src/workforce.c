@@ -137,7 +137,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	#define CHORE_ACTIVE(chore)  (empire_chore_limit(emp, island, (chore)) != 0)
 	
 	// fire!
-	if (BUILDING_BURNING(room) > 0 && CHORE_ACTIVE(CHORE_FIRE_BRIGADE)) {
+	if (IS_BURNING(room) && CHORE_ACTIVE(CHORE_FIRE_BRIGADE)) {
 		do_chore_fire_brigade(emp, room);
 		return;
 	}
@@ -1580,24 +1580,25 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 
 
 void do_chore_fire_brigade(empire_data *emp, room_data *room) {
-	int fire_extinguish_value = config_get_int("fire_extinguish_value");
+	void stop_burning(room_data *room);
+	
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_FIRE_BRIGADE].mob);
 	
-	if (worker && BUILDING_BURNING(room) > 0) {
+	if (worker && IS_BURNING(room)) {
 		act("$n throws a bucket of water to douse the flames!", FALSE, worker, NULL, NULL, TO_ROOM);
+		
+		add_to_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, number(-6, -2));
 
-		COMPLEX_DATA(room)->burning = MIN(fire_extinguish_value, BUILDING_BURNING(room) + number(2, 6));
-
-		if (BUILDING_BURNING(room) >= fire_extinguish_value) {
+		if (get_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING) <= 0) {
 			act("The flames have been extinguished!", FALSE, worker, 0, 0, TO_ROOM);
-			COMPLEX_DATA(room)->burning = 0;
+			stop_burning(room);
 			
 			// despawn
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 			empire_skillup(emp, ABIL_WORKFORCE, 10);	// special case: does not use exp_from_workforce
 		}		
 	}
-	else if (BUILDING_BURNING(room) > 0) {
+	else if (IS_BURNING(room)) {
 		worker = place_chore_worker(emp, CHORE_FIRE_BRIGADE, room);
 	}
 	else if (worker) {

@@ -375,6 +375,7 @@ void disassociate_building(room_data *room) {
 	}
 	
 	// some extra data safely clears now
+	remove_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING);
 	remove_room_extra_data(room, ROOM_EXTRA_RUINS_ICON);
 	remove_room_extra_data(room, ROOM_EXTRA_GARDEN_WORKFORCE_PROGRESS);
 	remove_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS);
@@ -1196,7 +1197,7 @@ ACMD(do_build) {
 			if (GET_ACTION(ch) != ACT_NONE) {
 				msg_to_char(ch, "You're kinda busy right now.\r\n");
 			}
-			else if (BUILDING_BURNING(IN_ROOM(ch))) {
+			else if (IS_BURNING(IN_ROOM(ch))) {
 				msg_to_char(ch, "You can't work on a burning building!\r\n");
 			}
 			else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
@@ -1424,7 +1425,7 @@ ACMD(do_dismantle) {
 		return;
 	}
 	
-	if (BUILDING_BURNING(IN_ROOM(ch))) {
+	if (IS_BURNING(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't dismantle a burning building!\r\n");
 		return;
 	}
@@ -2002,7 +2003,7 @@ ACMD(do_maintain) {
 	else if (IS_DISMANTLING(IN_ROOM(ch))) {
 		msg_to_char(ch, "This building is being dismantled. Use 'dismantle' to continue instead.\r\n");
 	}
-	else if (BUILDING_BURNING(IN_ROOM(ch))) {
+	else if (IS_BURNING(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't maintain a building that's on fire!\r\n");
 	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {

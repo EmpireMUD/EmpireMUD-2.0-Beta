@@ -4276,7 +4276,14 @@ void do_stat_room(char_data *ch) {
 		if (GET_INSIDE_ROOMS(home) > 0) {
 			msg_to_char(ch, "Designated rooms: %d\r\n", GET_INSIDE_ROOMS(home));
 		}
-		msg_to_char(ch, "Burning: %d, Damage: %d/%d\r\n", BUILDING_BURNING(home), (int) BUILDING_DAMAGE(home), GET_BUILDING(home) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) : 0);
+		
+		if (IS_BURNING(home)) {
+			sprintf(buf2, "Burns down in: %ld seconds", BUILDING_BURN_DOWN_TIME(home) - time(0));
+		}
+		else {
+			strcpy(buf2, "Not on fire");
+		}
+		msg_to_char(ch, "%s, Damage: %d/%d\r\n", buf2, (int) BUILDING_DAMAGE(home), GET_BUILDING(home) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) : 0);
 	}
 
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE)) {

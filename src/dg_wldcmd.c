@@ -1434,7 +1434,7 @@ WCMD(do_wrestore) {
 			free_resource_list(GET_BUILDING_RESOURCES(rtarg));
 			GET_BUILDING_RESOURCES(rtarg) = NULL;
 			COMPLEX_DATA(rtarg)->damage = 0;
-			COMPLEX_DATA(rtarg)->burning = 0;
+			COMPLEX_DATA(rtarg)->burn_down_time = 0;
 		}
 	}
 }

@@ -6294,7 +6294,7 @@ void detach_building_from_room(room_data *room) {
 * Adds to (or creates) a room extra data value.
 *
 * @param room_extra_data **list The extra data list to modify.
-* @param int type The ROOM_EXTRA_x type to update.
+* @param int type The ROOM_EXTRA_ type to update.
 * @param int add_value The amount to add (or subtract) to the value.
 */
 void add_to_extra_data(struct room_extra_data **list, int type, int add_value) {
@@ -6318,7 +6318,7 @@ void add_to_extra_data(struct room_extra_data **list, int type, int add_value) {
 * Finds an extra data ptr by type.
 *
 * @param struct room_extra_data *list The list of extra data to check.
-* @param int type Any ROOM_EXTRA_x type.
+* @param int type Any ROOM_EXTRA_ type.
 * @return struct room_extra_data* The matching entry, or NULL.
 */
 struct room_extra_data *find_extra_data(struct room_extra_data *list, int type) {
@@ -6332,7 +6332,7 @@ struct room_extra_data *find_extra_data(struct room_extra_data *list, int type) 
 * Gets the value of an extra data type; defaults to 0 if none is set.
 *
 * @param struct room_extra_data *list The list to get data from.
-* @param int type The ROOM_EXTRA_x type to check.
+* @param int type The ROOM_EXTRA_ type to check.
 * @return int The value of that type (default: 0).
 */
 int get_extra_data(struct room_extra_data *list, int type) {
@@ -6344,7 +6344,7 @@ int get_extra_data(struct room_extra_data *list, int type) {
 * Multiplies an existing extra data value by a number.
 *
 * @param struct room_extra_data **list The list to multiple an entry in.
-* @param int type The ROOM_EXTRA_x type to update.
+* @param int type The ROOM_EXTRA_ type to update.
 * @param double multiplier How much to multiply the value by.
 */
 void multiply_extra_data(struct room_extra_data **list, int type, double multiplier) {
@@ -6366,7 +6366,7 @@ void multiply_extra_data(struct room_extra_data **list, int type, double multipl
 * Removes any extra data of a given type from the list.
 *
 * @param struct room_extra_data **list The list to remove from.
-* @param int type The ROOM_EXTRA_x type to remove.
+* @param int type The ROOM_EXTRA_ type to remove.
 */
 void remove_extra_data(struct room_extra_data **list, int type) {
 	struct room_extra_data *red = find_extra_data(*list, type);
@@ -6381,7 +6381,7 @@ void remove_extra_data(struct room_extra_data **list, int type) {
 * Sets an extra data value to a specific number, overriding any old value.
 *
 * @param struct room_extra_data **list The list to set data in.
-* @param int type Any ROOM_EXTRA_x type.
+* @param int type Any ROOM_EXTRA_ type.
 * @param int value The value to set it to.
 */
 void set_extra_data(struct room_extra_data **list, int type, int value) {

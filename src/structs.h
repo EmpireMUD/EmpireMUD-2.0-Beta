@@ -55,6 +55,7 @@
 *     Crop Structs
 *     Data Structs
 *     Empire Structs
+*     Event Structs
 *     Faction Structs
 *     Fight Structs
 *     Game Structs
@@ -2049,7 +2050,7 @@ typedef struct vehicle_data vehicle_data;
 // and *especially* a place they are removed. -pc
 #define ROOM_EXTRA_PROSPECT_EMPIRE  0
 #define ROOM_EXTRA_MINE_AMOUNT  1
-	#define ROOM_EXTRA_UNUSED2  2
+#define ROOM_EXTRA_FIRE_REMAINING  2
 #define ROOM_EXTRA_SEED_TIME  3
 #define ROOM_EXTRA_TAVERN_TYPE  4
 #define ROOM_EXTRA_TAVERN_BREWING_TIME  5
@@ -3864,6 +3865,15 @@ struct empire_data {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// EVENT STRUCTS ///////////////////////////////////////////////////////////
+
+// data for the event when a building is burning
+struct burning_event_data {
+	room_data *room;
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// FACTION STRUCTS /////////////////////////////////////////////////////////
 
 struct faction_data {
@@ -4448,7 +4458,11 @@ struct complex_room_data {
 	
 	int private_owner;	// for privately-owned houses
 	
-	byte burning;  // if burning, the burn value
+	time_t burn_down_time;	// if >0, the timestamp when this building will burn down
+							// NOTE: burn_down_time could be moved to extra data if you
+							// needed its spot in the .wld file.
+	struct event *burn_event;	// if burning
+	
 	double damage;  // for catapulting
 };
 
@@ -4528,7 +4542,7 @@ struct room_direction_data {
 
 // for storing misc vals to the room
 struct room_extra_data {
-	int type;	// ROOM_EXTRA_x
+	int type;	// ROOM_EXTRA_
 	int value;
 	
 	UT_hash_handle hh;	// room->shared->extra_data hash

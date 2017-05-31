@@ -22,6 +22,7 @@
 #include "handler.h"
 #include "skills.h"
 #include "dg_scripts.h"
+#include "dg_event.h"
 #include "vnums.h"
 
 /**
@@ -29,6 +30,7 @@
 *   World-Changers
 *   Management
 *   Annual Map Update
+*   Burning Buildings
 *   City Lib
 *   Room Resets
 *   Sector Indexing
@@ -63,6 +65,7 @@ void save_and_close_world_file(FILE *fl, int block);
 void setup_start_locations();
 void sort_exits(struct room_direction_data **list);
 void sort_world_table();
+void stop_room_action(room_data *room, int action, int chore);
 void write_room_to_file(FILE *fl, room_data *room);
 
 // locals
@@ -723,8 +726,6 @@ void init_mine(room_data *room, char_data *ch) {
 * @param room_data *room The trench to convert back.
 */
 void untrench_room(room_data *room) {
-	void stop_room_action(room_data *room, int action, int chore);
-	
 	sector_data *to_sect = NULL;
 	struct map_data *map;
 	
@@ -1286,6 +1287,139 @@ void update_island_names(void) {
 				isle->name = str_dup(eisle->name);
 				save_island_table();
 			}
+		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// BURNING BUILDINGS ///////////////////////////////////////////////////////
+
+// see dg_event.c/h
+EVENTFUNC(burn_down_event) {
+	void death_log(char_data *ch, char_data *killer, int type);
+	extern obj_data *die(char_data *ch, char_data *killer);
+	
+	struct burning_event_data *burn_data = (struct burning_event_data *)event_obj;
+	obj_data *obj, *next_obj;
+	char_data *ch, *next_ch;
+	empire_data *emp;
+	room_data *room;
+	bool junk;
+	
+	// grab data and free it
+	room = burn_data->room;
+	emp = ROOM_OWNER(room);
+	free(burn_data);
+	
+	// cancel this first
+	if (COMPLEX_DATA(room)) {
+		COMPLEX_DATA(room)->burn_event = NULL;
+	}
+	else {
+		// no complex data? nothing to burn
+		return 0;
+	}
+	
+	if (ROOM_IS_CLOSED(room)) {
+		if (ROOM_PEOPLE(room)) {
+			act("The building collapses in flames around you!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+		}
+		LL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
+			if (!IS_NPC(ch)) {
+				death_log(ch, ch, TYPE_SUFFERING);
+			}
+			die(ch, ch);
+		}
+	}
+	else {
+		// not closed
+		if (ROOM_PEOPLE(room)) {
+			act("The building burns to the ground!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+		}
+	}
+	
+	// inform
+	if (emp) {
+		log_to_empire(emp, ELOG_HOSTILITY, "Your %s has burned down at (%d, %d)", (GET_BUILDING(room) ? GET_BLD_NAME(GET_BUILDING(room)) : "building"), X_COORD(room), Y_COORD(room));
+	}
+	
+	// auto-abandon if not in city
+	if (emp && !is_in_city_for_empire(room, emp, TRUE, &junk)) {
+		// does check the city time limit for abandon protection
+		abandon_room(room);
+	}
+	
+	disassociate_building(room);
+
+	// Destroy 50% of the objects
+	LL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
+		if (!number(0, 1)) {
+			extract_obj(obj);
+		}
+	}
+	
+	// do not reenqueue
+	return 0;
+}
+
+
+/**
+* Takes a building that already has a burning timer, and schedules the burn-
+* down event for it.
+*
+* @param room_data *room The room to burn.
+*/
+void schedule_burn_down(room_data *room) {
+	struct burning_event_data *burn_data;
+	
+	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->burn_down_time > 0) {
+		// create the event
+		CREATE(burn_data, struct burning_event_data, 1);
+		burn_data->room = room;
+		
+		COMPLEX_DATA(room)->burn_event = event_create(burn_down_event, burn_data, (COMPLEX_DATA(room)->burn_down_time - time(0)) * PASSES_PER_SEC);
+	}
+}
+
+
+/**
+* Starts a room on fire. This sends no messages. Only the "home room" matters
+* for burning, so this sets the data there.
+*
+* @param room_data *room The room to burn.
+*/
+void start_burning(room_data *room) {
+	room = HOME_ROOM(room);	// burning is always on the home room
+	
+	if (!COMPLEX_DATA(room)) {
+		return;	// nothing to burn
+	}
+	
+	set_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, config_get_int("fire_extinguish_value"));
+	COMPLEX_DATA(room)->burn_down_time = time(0) + config_get_int("burn_down_time");
+	schedule_burn_down(room);
+	
+	// ensure no building or dismantling
+	stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
+	stop_room_action(room, ACT_DISMANTLING, CHORE_BUILDING);
+}
+
+
+/**
+* Turns the fire off.
+*
+* @param room_data *room The room that might be burning.
+*/
+void stop_burning(room_data *room) {
+	room = HOME_ROOM(room);	// always
+	
+	if (COMPLEX_DATA(room)) {
+		COMPLEX_DATA(room)->burn_down_time = 0;
+		if (COMPLEX_DATA(room)->burn_event) {
+			event_cancel(COMPLEX_DATA(room)->burn_event);
+			COMPLEX_DATA(room)->burn_event = NULL;
+			remove_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING);
 		}
 	}
 }

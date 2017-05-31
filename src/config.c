@@ -1764,6 +1764,7 @@ void init_config_system(void) {
 	init_config(CONFIG_TRADE, "trading_post_fee", CONFTYPE_DOUBLE, "% cut of the sale price");
 	
 	// war
+	init_config(CONFIG_WAR, "burn_down_time", CONFTYPE_INT, "seconds it takes to burn down a building");
 	init_config(CONFIG_WAR, "fire_extinguish_value", CONFTYPE_INT, "douse this value and the fire goes out");
 	init_config(CONFIG_WAR, "pvp_timer", CONFTYPE_INT, "minutes from when you shut off pvp flag, until it's off");
 	init_config(CONFIG_WAR, "stolen_object_timer", CONFTYPE_INT, "minutes an object is considered stolen");

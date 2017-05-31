@@ -899,6 +899,8 @@ void process_temporary_room_data(void) {
 
 /* resolve all vnums in the world */
 void renum_world(void) {
+	void schedule_burn_down(room_data *room);
+	
 	room_data *room, *next_room, *home;
 	struct room_direction_data *ex, *next_ex, *temp;
 	
@@ -906,8 +908,12 @@ void renum_world(void) {
 
 	// exits
 	HASH_ITER(hh, world_table, room, next_room) {
-		// exits
 		if (COMPLEX_DATA(room)) {
+			// events
+			if (COMPLEX_DATA(room)->burn_down_time > 0 && !COMPLEX_DATA(room)->burn_event) {
+				schedule_burn_down(room);
+			}
+			
 			// exit targets
 			for (ex = COMPLEX_DATA(room)->exits; ex; ex = next_ex) {
 				next_ex = ex->next;
