@@ -1570,9 +1570,12 @@ void number_and_count_islands(bool reset) {
 	
 	// update instance island pointers (only ones without home rooms)
 	LL_FOREACH(instance_list, inst) {
-		if (inst->start && inst->location && HOME_ROOM(inst->location) == inst->location) {
-			GET_ISLAND_ID(inst->start) = GET_ISLAND_ID(HOME_ROOM(inst->location));
-			GET_ISLAND(inst->start) = GET_ISLAND(HOME_ROOM(inst->location));
+		if (!inst->location || HOME_ROOM(inst->location) != inst->location) {
+			continue;
+		}
+		for (iter = 0; iter < inst->size; ++iter) {
+			GET_ISLAND_ID(inst->room[iter]) = GET_ISLAND_ID(HOME_ROOM(inst->location));
+			GET_ISLAND(inst->room[iter]) = GET_ISLAND(HOME_ROOM(inst->location));
 		}
 	}
 	
@@ -1586,9 +1589,12 @@ void number_and_count_islands(bool reset) {
 	
 	// update instance island pointers (only ones WITH home rooms now that the interior rooms are assigned)
 	LL_FOREACH(instance_list, inst) {
-		if (inst->start && inst->location && HOME_ROOM(inst->location) != inst->location) {
-			GET_ISLAND_ID(inst->start) = GET_ISLAND_ID(HOME_ROOM(inst->location));
-			GET_ISLAND(inst->start) = GET_ISLAND(HOME_ROOM(inst->location));
+		if (!inst->location || HOME_ROOM(inst->location) == inst->location) {
+			continue;
+		}
+		for (iter = 0; iter < inst->size; ++iter) {
+			GET_ISLAND_ID(inst->room[iter]) = GET_ISLAND_ID(HOME_ROOM(inst->location));
+			GET_ISLAND(inst->room[iter]) = GET_ISLAND(HOME_ROOM(inst->location));
 		}
 	}
 	
