@@ -382,12 +382,29 @@ void point_update_char(char_data *ch) {
 	struct cooldown_data *cool, *next_cool;
 	struct instance_data *inst;
 	obj_data *obj, *next_obj;
+	char_data *c, *chiter;
 	empire_data *emp;
-	char_data *c;
 	bool found;
+	int count;
 	
 	if (IS_NPC(ch) && FIGHTING(ch)) {
 		check_pointless_fight(ch);
+	}
+	
+	// check mob crowding (for npcs in stables)
+	if (IS_NPC(ch) && !ch->desc && HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE)) {
+		count = 1;	// me
+		LL_FOREACH(ROOM_PEOPLE(IN_ROOM(ch)), chiter) {
+			if (ch != chiter && IS_NPC(chiter) && GET_MOB_VNUM(chiter) == GET_MOB_VNUM(ch)) {
+				++count;
+			}
+		}
+		
+		if (count > config_get_int("num_duplicates_in_stable")) {
+			act("$n is feeling overcrowded, and leaves.", TRUE, ch, NULL, NULL, TO_ROOM);
+			extract_char(ch);
+			return;
+		}
 	}
 	
 	if (!IS_NPC(ch)) {
@@ -1606,15 +1623,12 @@ void point_update_room(room_data *room) {
 	void death_log(char_data *ch, char_data *killer, int type);
 	void fill_trench(room_data *room);
 
-	char_data *ch, *next_ch, *sub_ch, *next_sub;
+	char_data *ch, *next_ch;
 	obj_data *o, *next_o;
 	struct affected_type *af, *next_af;
 	generic_data *gen;
 	empire_data *emp;
 	bool junk;
-	int count;
-	
-	int allowed_animals = config_get_int("num_duplicates_in_stable");
 
 	// map-only portion
 	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
@@ -1710,34 +1724,6 @@ void point_update_room(room_data *room) {
 	}
 
 	// WHOLE WORLD:
-	
-	// check mob crowding
-	if (HAS_FUNCTION(room, FNC_STABLE)) {
-		for (ch = ROOM_PEOPLE(room); ch; ch = next_ch) {
-			next_ch = ch->next_in_room;
-			
-			// skip non-npcs and familiars
-			if (!IS_NPC(ch) || MOB_FLAGGED(ch, MOB_FAMILIAR)) {
-				continue;
-			}
-			
-			// look for more here than allowed
-			count = 1;
-			for (sub_ch = ch->next_in_room; sub_ch; sub_ch = next_sub) {
-				next_sub = sub_ch->next_in_room;
-				
-				// only looking for dupes
-				if (!IS_NPC(sub_ch) || sub_ch->desc || GET_MOB_VNUM(sub_ch) != GET_MOB_VNUM(ch)) {
-					continue;
-				}
-				
-				if (count++ >= allowed_animals) {
-					act("$n is feeling overcrowded, and leaves.", TRUE, sub_ch, NULL, NULL, TO_ROOM);
-					extract_char(sub_ch);
-				}
-			}
-		}
-	}
 
 	// update room ffects
 	for (af = ROOM_AFFECTS(room); af; af = next_af) {
