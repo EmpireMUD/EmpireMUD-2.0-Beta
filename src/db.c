@@ -1457,10 +1457,9 @@ void number_and_count_islands(bool reset) {
 	struct island_read_data *data, *next_data, *list = NULL;
 	bool re_empire = (top_island_num != -1);
 	struct island_num_data_t *item;
-	struct instance_data *inst;
 	struct island_info *isle;
+	room_data *room, *maploc;
 	struct map_data *map;
-	room_data *room;
 	int iter, use_id;
 	
 	// find top island id (and reset if requested)
@@ -1568,34 +1567,14 @@ void number_and_count_islands(bool reset) {
 		map->shared->island_ptr = (map->shared->island_id != NO_ISLAND) ? get_island(map->shared->island_id, TRUE) : NULL;
 	}
 	
-	// update instance island pointers (only ones without home rooms)
-	LL_FOREACH(instance_list, inst) {
-		if (!inst->location || HOME_ROOM(inst->location) != inst->location) {
-			continue;
-		}
-		for (iter = 0; iter < inst->size; ++iter) {
-			GET_ISLAND_ID(inst->room[iter]) = GET_ISLAND_ID(HOME_ROOM(inst->location));
-			GET_ISLAND(inst->room[iter]) = GET_ISLAND(HOME_ROOM(inst->location));
-		}
-	}
-	
-	// update interior island pointers (by home room)
+	// update all interior rooms
 	LL_FOREACH2(interior_room_list, room, next_interior) {
-		if (HOME_ROOM(room) != room) {
-			GET_ISLAND_ID(room) = GET_ISLAND_ID(HOME_ROOM(room));
-			GET_ISLAND(room) = GET_ISLAND(HOME_ROOM(room));
-		}
-	}
-	
-	// update instance island pointers (only ones WITH home rooms now that the interior rooms are assigned)
-	LL_FOREACH(instance_list, inst) {
-		if (!inst->location || HOME_ROOM(inst->location) == inst->location) {
+		if (!(maploc = get_map_location_for(room)) || (maploc == room)) {
 			continue;
 		}
-		for (iter = 0; iter < inst->size; ++iter) {
-			GET_ISLAND_ID(inst->room[iter]) = GET_ISLAND_ID(HOME_ROOM(inst->location));
-			GET_ISLAND(inst->room[iter]) = GET_ISLAND(HOME_ROOM(inst->location));
-		}
+		
+		GET_ISLAND_ID(room) = GET_ISLAND_ID(maploc);
+		GET_ISLAND(room) = GET_ISLAND(maploc);
 	}
 	
 	// lastly
