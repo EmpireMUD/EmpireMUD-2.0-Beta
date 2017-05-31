@@ -493,12 +493,14 @@ void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventu
 					if (inst->location) {
 						GET_ISLAND_ID(inst->start) = GET_ISLAND_ID(inst->location);
 						GET_ISLAND(inst->start) = GET_ISLAND(inst->location);
+						GET_MAP_LOC(inst->start) = GET_MAP_LOC(inst->location);
 					}
 				}
 				else {
 					COMPLEX_DATA(room_list[pos])->home_room = inst->start;
 					GET_ISLAND_ID(room_list[pos]) = GET_ISLAND_ID(inst->start);
 					GET_ISLAND(room_list[pos]) = GET_ISLAND(inst->start);
+					GET_MAP_LOC(room_list[pos]) = GET_MAP_LOC(inst->location);
 				}
 			}
 			
@@ -2084,6 +2086,7 @@ static void renum_instances(void) {
 				if (inst->location) {
 					GET_ISLAND_ID(inst->room[iter]) = GET_ISLAND_ID(inst->location);
 					GET_ISLAND(inst->room[iter]) = GET_ISLAND(inst->location);
+					GET_MAP_LOC(inst->room[iter]) = GET_MAP_LOC(inst->location);
 				}
 			}
 		}

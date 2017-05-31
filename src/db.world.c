@@ -3007,6 +3007,7 @@ void load_world_map_from_file(void) {
 			CREATE(world_map[x][y].shared, struct shared_room_data, 1);
 			world_map[x][y].shared->island_id = NO_ISLAND;
 			world_map[x][y].shared->island_ptr = NULL;
+			world_map[x][y].shared->map_loc = &(world_map[x][y]);
 			world_map[x][y].sector_type = NULL;
 			world_map[x][y].base_sector = NULL;
 			world_map[x][y].natural_sector = NULL;

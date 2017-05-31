@@ -2472,7 +2472,7 @@ ACMD(do_look) {
 			look_at_room(ch);
 		}
 		else if (!str_cmp(arg, "out")) {
-			if (!(map = get_map_location_for(IN_ROOM(ch)))) {
+			if (!(map = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL))) {
 				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
 			else if (map == IN_ROOM(ch) && !ROOM_IS_CLOSED(IN_ROOM(ch))) {

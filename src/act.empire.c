@@ -2307,6 +2307,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dir, dist, mapsize, total, x, y, check_x, check_y;
 	char output[MAX_STRING_LENGTH], line[128];
+	struct map_data *map_loc;
 	room_data *map, *room;
 	size_t size, lsize;
 	vehicle_data *veh;
@@ -2322,7 +2323,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 		msg_to_char(ch, "Scan for what?\r\n");
 		return;
 	}
-	if (!(map = get_map_location_for(IN_ROOM(ch)))) {
+	if ((map_loc = GET_MAP_LOC(IN_ROOM(ch))) || !(map = real_room(map_loc->vnum))) {
 		msg_to_char(ch, "You can't scan for anything here.\r\n");
 		return;
 	}

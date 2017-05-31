@@ -491,6 +491,7 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 	if (IN_ROOM(veh)) {
 		GET_ISLAND_ID(room) = GET_ISLAND_ID(IN_ROOM(veh));
 		GET_ISLAND(room) = GET_ISLAND(IN_ROOM(veh));
+		GET_MAP_LOC(room) = GET_MAP_LOC(IN_ROOM(veh));
 	}
 }
 

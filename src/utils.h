@@ -1142,9 +1142,10 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define ROOM_CUSTOM_NAME(room)  (SHARED_DATA(room)->name)
 #define ROOM_DEPLETION(room)  (SHARED_DATA(room)->depletion)
 #define ROOM_EXTRA_DATA(room)  (SHARED_DATA(room)->extra_data)
+#define ROOM_TRACKS(room)  (SHARED_DATA(room)->tracks)
 #define GET_ISLAND(room)  (SHARED_DATA(room)->island_ptr)
 #define GET_ISLAND_ID(room)  (SHARED_DATA(room)->island_id)
-#define ROOM_TRACKS(room)  (SHARED_DATA(room)->tracks)
+#define GET_MAP_LOC(room)  (SHARED_DATA(room)->map_loc)
 
 
 // exits

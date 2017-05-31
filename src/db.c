@@ -937,6 +937,7 @@ void renum_world(void) {
 				
 				GET_ISLAND_ID(room) = GET_ISLAND_ID(home);
 				GET_ISLAND(room) = GET_ISLAND(home);
+				GET_MAP_LOC(room) = GET_MAP_LOC(home);
 			}
 		}
 	}
@@ -1569,12 +1570,13 @@ void number_and_count_islands(bool reset) {
 	
 	// update all interior rooms
 	LL_FOREACH2(interior_room_list, room, next_interior) {
-		if (!(maploc = get_map_location_for(room))) {
+		if (!(maploc = get_map_location_for(room)) || (maploc == room)) {
 			continue;
 		}
 		
 		GET_ISLAND_ID(room) = GET_ISLAND_ID(maploc);
 		GET_ISLAND(room) = GET_ISLAND(maploc);
+		GET_MAP_LOC(room) = (GET_ROOM_VNUM(maploc) < MAP_SIZE ? &(world_map[FLAT_X_COORD(maploc)][FLAT_Y_COORD(maploc)]) : NULL);
 	}
 	
 	// lastly

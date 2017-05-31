@@ -7643,6 +7643,7 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 		GET_ISLAND_ID(vrl->room) = GET_ISLAND_ID(room);
 		GET_ISLAND(vrl->room) = GET_ISLAND(room);
+		GET_MAP_LOC(vrl->room) = GET_MAP_LOC(room);
 	
 	}
 }

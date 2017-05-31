@@ -953,7 +953,9 @@ void do_instance_nearby(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct instance_data *inst;
 	int num = 0, count = 0, distance = 50, size;
-	room_data *inst_loc, *loc = get_map_location_for(IN_ROOM(ch));
+	room_data *inst_loc, *loc;
+	
+	loc = GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL;
 	
 	if (*argument && (!isdigit(*argument) || (distance = atoi(argument)) < 0)) {
 		msg_to_char(ch, "Invalid distance '%s'.\r\n", argument);

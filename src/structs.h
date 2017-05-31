@@ -4457,6 +4457,7 @@ struct complex_room_data {
 struct shared_room_data {
 	int island_id;	// the island id (may be NO_ISLAND)
 	struct island_info *island_ptr;	// pointer to the island (may be NULL)
+	struct map_data *map_loc;	// map location if any
 	
 	// custom data
 	char *name;  // room name may be set
