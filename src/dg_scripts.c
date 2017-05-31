@@ -1112,6 +1112,13 @@ void script_trigger_check(void) {
 }
 
 
+// frees memory when a waited trigger is canceled
+EVENT_CANCEL_FUNC(cancel_wait_event) {
+	struct wait_event_data *wait_event_obj = (struct wait_event_data *)event_obj;
+	free(wait_event_obj);
+}
+
+
 EVENTFUNC(trig_wait_event) {
 	struct wait_event_data *wait_event_obj = (struct wait_event_data *)event_obj;
 	trig_data *trig;

@@ -1364,6 +1364,13 @@ EVENTFUNC(burn_down_event) {
 }
 
 
+// frees memory when burning is canceled
+EVENT_CANCEL_FUNC(cancel_burn_event) {
+	struct burning_event_data *burn_data = (struct burning_event_data *)event_obj;
+	free(burn_data);
+}
+
+
 /**
 * Takes a building that already has a burning timer, and schedules the burn-
 * down event for it.
@@ -1417,7 +1424,7 @@ void stop_burning(room_data *room) {
 	if (COMPLEX_DATA(room)) {
 		COMPLEX_DATA(room)->burn_down_time = 0;
 		if (COMPLEX_DATA(room)->burn_event) {
-			event_cancel(COMPLEX_DATA(room)->burn_event);
+			event_cancel(COMPLEX_DATA(room)->burn_event, cancel_burn_event);
 			COMPLEX_DATA(room)->burn_event = NULL;
 			remove_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING);
 		}

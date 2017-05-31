@@ -21,6 +21,7 @@
 /********** Event related section *********/
 
 #define EVENTFUNC(name) long (name)(void *event_obj)
+#define EVENT_CANCEL_FUNC(name) void (name)(void *event_obj)
 
 
 /*
@@ -53,7 +54,7 @@ struct q_element {
 /* - events - function protos need by other modules */
 void event_init(void);
 struct event *event_create(EVENTFUNC(*func), void *event_obj, long when);
-void event_cancel(struct event *event);
+void event_cancel(struct event *event, EVENT_CANCEL_FUNC(*func));
 void event_process(void);
 long event_time(struct event *event);
 void event_free_all(void);

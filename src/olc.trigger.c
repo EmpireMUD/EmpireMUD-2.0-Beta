@@ -757,6 +757,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 * @param descriptor_data *desc The descriptor who is saving.
 */
 void save_olc_trigger(descriptor_data *desc, char *script_text) {
+	EVENT_CANCEL_FUNC(cancel_wait_event);
 	extern struct cmdlist_element *compile_command_list(char *input);
 	void free_varlist(struct trig_var_data *vd);
 	
@@ -784,7 +785,7 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 		
 		// find any 'waiting' copies and kill them
 		if (GET_TRIG_WAIT(live_trig)) {
-			event_cancel(GET_TRIG_WAIT(live_trig));
+			event_cancel(GET_TRIG_WAIT(live_trig), cancel_wait_event);
 			GET_TRIG_WAIT(live_trig) = NULL;
 			GET_TRIG_DEPTH(live_trig) = 0;
 			free_varlist(GET_TRIG_VARS(live_trig));

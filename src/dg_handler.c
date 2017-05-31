@@ -23,6 +23,9 @@
 #include "handler.h"
 #include "dg_event.h"
 
+// external funcs
+EVENT_CANCEL_FUNC(cancel_wait_event);
+
 // locals
 void actually_free_trigger(trig_data *trig);
 
@@ -124,7 +127,7 @@ void free_varlist(struct trig_var_data *vd) {
 */
 void free_trigger(trig_data *trig) {
 	if (GET_TRIG_WAIT(trig)) {
-		event_cancel(GET_TRIG_WAIT(trig));
+		event_cancel(GET_TRIG_WAIT(trig), cancel_wait_event);
 		GET_TRIG_WAIT(trig) = NULL;
 	}
 	
@@ -141,7 +144,7 @@ void actually_free_trigger(trig_data *trig) {
 	struct cmdlist_element *cmd, *next_cmd;
 	
 	if (GET_TRIG_WAIT(trig)) {
-		event_cancel(GET_TRIG_WAIT(trig));
+		event_cancel(GET_TRIG_WAIT(trig), cancel_wait_event);
 	}
 	
 	if (trig->name && (!proto || trig->name != proto->name)) {
@@ -169,7 +172,7 @@ void actually_free_trigger(trig_data *trig) {
 /* remove a single trigger from a mob/obj/room */
 void extract_trigger(trig_data *trig) {
 	if (GET_TRIG_WAIT(trig)) {
-		event_cancel(GET_TRIG_WAIT(trig));
+		event_cancel(GET_TRIG_WAIT(trig), cancel_wait_event);
 		GET_TRIG_WAIT(trig) = NULL;
 	}
 

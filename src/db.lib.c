@@ -7533,6 +7533,8 @@ struct complex_room_data *init_complex_data() {
 * @param struct complex_room_data *data The building data to delete.
 */
 void free_complex_data(struct complex_room_data *data) {
+	EVENT_CANCEL_FUNC(cancel_burn_event);
+	
 	struct room_direction_data *ex;
 	
 	while ((ex = data->exits)) {
@@ -7550,7 +7552,7 @@ void free_complex_data(struct complex_room_data *data) {
 	free_resource_list(data->built_with);
 	
 	if (data->burn_event) {
-		event_cancel(data->burn_event);
+		event_cancel(data->burn_event, cancel_burn_event);
 	}
 	
 	free(data);
