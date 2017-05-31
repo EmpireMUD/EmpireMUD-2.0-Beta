@@ -2080,6 +2080,11 @@ static void renum_instances(void) {
 			// set up instance data
 			if (inst->room[iter] && COMPLEX_DATA(inst->room[iter])) {
 				COMPLEX_DATA(inst->room[iter])->instance = inst;
+				
+				if (inst->location) {
+					GET_ISLAND_ID(inst->room[iter]) = GET_ISLAND_ID(inst->location);
+					GET_ISLAND(inst->room[iter]) = GET_ISLAND(inst->location);
+				}
 			}
 		}
 		
