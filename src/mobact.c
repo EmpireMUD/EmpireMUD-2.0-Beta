@@ -1084,7 +1084,7 @@ void spawn_mobs_from_center(room_data *center) {
 	int mob_spawn_radius = config_get_int("mob_spawn_radius");
 	
 	// always start on the map
-	center = get_map_location_for(center);
+	center = (GET_MAP_LOC(center) ? real_room(GET_MAP_LOC(center)->vnum) : NULL);
 	
 	// skip if we didn't find a map location
 	if (!center || GET_ROOM_VNUM(center) >= MAP_SIZE) {

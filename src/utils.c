@@ -4484,10 +4484,10 @@ bool find_flagged_sect_within_distance_from_char(char_data *ch, bitvector_t with
 */
 bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t with_flags, bitvector_t without_flags, int distance) {
 	int x, y;
-	room_data *shift, *real = get_map_location_for(room);
+	room_data *shift, *real;
 	bool found = FALSE;
 	
-	if (!real) {	// no map location
+	if (!(real = (GET_MAP_LOC(room) ? real_room(GET_MAP_LOC(room)->vnum) : NULL))) {	// no map location
 		return FALSE;
 	}
 	
@@ -4534,13 +4534,13 @@ bool find_sect_within_distance_from_char(char_data *ch, sector_vnum sect, int di
 * @return bool TRUE if the sect is found
 */
 bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int distance) {
-	room_data *real = get_map_location_for(room);
+	room_data *real;
 	sector_data *find = sector_proto(sect);
 	bool found = FALSE;
 	room_data *shift;
 	int x, y;
 	
-	if (!real) {	// no map location
+	if (!(real = (GET_MAP_LOC(room) ? real_room(GET_MAP_LOC(room)->vnum) : NULL))) {	// no map location
 		return FALSE;
 	}
 	
@@ -4759,7 +4759,7 @@ room_data *real_shift(room_data *origin, int x_shift, int y_shift) {
 		return NULL;
 	}
 	
-	map = get_map_location_for(origin);
+	map = (GET_MAP_LOC(origin) ? real_room(GET_MAP_LOC(origin)->vnum) : NULL);
 	
 	// are we somehow not on the map? if not, don't shift
 	if (!map || GET_ROOM_VNUM(map) >= MAP_SIZE) {
@@ -4878,9 +4878,8 @@ room_data *straight_line(room_data *origin, room_data *destination, int iter) {
 * @return int The x-coordinate, or -1 if none.
 */
 int X_COORD(room_data *room) {
-	room_data *map = get_map_location_for(room);
-	if (map) {
-		return FLAT_X_COORD(map);
+	if (GET_MAP_LOC(room)) {
+		return MAP_X_COORD(GET_MAP_LOC(room)->vnum);
 	}
 	else {
 		return -1;
@@ -4896,9 +4895,8 @@ int X_COORD(room_data *room) {
 * @return int The y-coordinate, or -1 if none.
 */
 int Y_COORD(room_data *room) {
-	room_data *map = get_map_location_for(room);
-	if (map) {
-		return FLAT_Y_COORD(map);
+	if (GET_MAP_LOC(room)) {
+		return MAP_Y_COORD(GET_MAP_LOC(room)->vnum);
 	}
 	else {
 		return -1;

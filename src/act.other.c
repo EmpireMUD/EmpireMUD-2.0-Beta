@@ -147,7 +147,7 @@ void adventure_unsummon(char_data *ch) {
 	
 	act("$n vanishes in a wisp of smoke!", TRUE, ch, NULL, NULL, TO_ROOM);
 	
-	if (room && map && map == get_map_location_for(room)) {
+	if (room && map && GET_ROOM_VNUM(map) == (GET_MAP_LOC(room) ? GET_MAP_LOC(room)->vnum : NOTHING)) {
 		char_to_room(ch, room);
 	}
 	else {
@@ -673,14 +673,15 @@ OFFER_VALIDATE(oval_summon) {
 }
 
 OFFER_FINISH(ofin_summon) {
-	room_data *loc = real_room(offer->location), *map;
+	room_data *loc = real_room(offer->location);
 	int type = offer->data;
+	struct map_data *map;
 	
 	if (type == SUMMON_ADVENTURE) {
 		SET_BIT(PLR_FLAGS(ch), PLR_ADVENTURE_SUMMONED);
 		GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
-		map = get_map_location_for(IN_ROOM(ch));
-		GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = map ? GET_ROOM_VNUM(map) : NOWHERE;
+		map = GET_MAP_LOC(IN_ROOM(ch));
+		GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = map ? map->vnum : NOWHERE;
 	}
 	else {
 		// if they accept a normal summon out of an adventure, cancel their group summon

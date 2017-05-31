@@ -1622,7 +1622,7 @@ room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum) {
 	if (!adv) {
 		return NULL;	// no such adventure
 	}
-	if (!(map = get_map_location_for(from))) {
+	if (!(map = (GET_MAP_LOC(from) ? real_room(GET_MAP_LOC(from)->vnum) : NULL))) {
 		return NULL;	// does not work if no map loc
 	}
 	

@@ -4206,9 +4206,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "coords")) {
-						room_data *map = get_map_location_for(r);
-						if (map) {
-							snprintf(str, slen, "(%d, %d)", FLAT_X_COORD(map), FLAT_Y_COORD(map));
+						if (GET_MAP_LOC(r)) {
+							snprintf(str, slen, "(%d, %d)", MAP_X_COORD(GET_MAP_LOC(r)->vnum), MAP_Y_COORD(GET_MAP_LOC(r)->vnum));
 						}
 						else {
 							snprintf(str, slen, "(%s, %s)", "???", "???");

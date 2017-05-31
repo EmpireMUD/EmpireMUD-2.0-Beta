@@ -1973,7 +1973,7 @@ void remove_player_from_table(player_index_data *plr) {
 void save_char(char_data *ch, room_data *load_room) {
 	char filename[256], tempname[256];
 	player_index_data *index;
-	room_data *map;
+	struct map_data *map;
 	FILE *fl;
 
 	if (IS_NPC(ch)) {
@@ -1984,8 +1984,8 @@ void save_char(char_data *ch, room_data *load_room) {
 	if (!PLR_FLAGGED(ch, PLR_LOADROOM)) {
 		if (load_room) {
 			GET_LOADROOM(ch) = GET_ROOM_VNUM(load_room);
-			map = get_map_location_for(load_room);
-			GET_LOAD_ROOM_CHECK(ch) = (map ? GET_ROOM_VNUM(map) : NOWHERE);
+			map = GET_MAP_LOC(load_room);
+			GET_LOAD_ROOM_CHECK(ch) = (map ? map->vnum : NOWHERE);
 		}
 		else {
 			GET_LOADROOM(ch) = NOWHERE;
@@ -3289,7 +3289,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 
 	struct slash_channel *load_slash, *next_slash, *temp;
 	bool stop_action = FALSE, try_home = FALSE;
-	room_data *load_room = NULL, *map_loc;
+	room_data *load_room = NULL;
 	char_data *ch = d->character, *repl;
 	char lbuf[MAX_STRING_LENGTH];
 	struct affected_type *af;
@@ -3347,8 +3347,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		
 		// this verifies they are still in the same map location as where they logged out
 		if (load_room && !PLR_FLAGGED(ch, PLR_LOADROOM)) {
-			map_loc = get_map_location_for(load_room);
-			if (GET_LOAD_ROOM_CHECK(ch) == NOWHERE || !map_loc || GET_ROOM_VNUM(map_loc) != GET_LOAD_ROOM_CHECK(ch)) {
+			if (GET_LOAD_ROOM_CHECK(ch) == NOWHERE || !GET_MAP_LOC(load_room) || GET_MAP_LOC(load_room)->vnum != GET_LOAD_ROOM_CHECK(ch)) {
 				// ensure they are on the same continent they used to be when it finds them a new loadroom
 				GET_LAST_ROOM(ch) = GET_LOAD_ROOM_CHECK(ch);
 				load_room = NULL;
