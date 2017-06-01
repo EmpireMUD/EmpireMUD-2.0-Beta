@@ -606,9 +606,21 @@ void fill_trench(room_data *room) {
 */
 void finish_trench(room_data *room) {
 	remove_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS);
-	set_room_extra_data(room, ROOM_EXTRA_TRENCH_FILL_TIME, time(0) + config_get_int("trench_fill_time"));
-	if (GET_MAP_LOC(room)) {	// can this BE null here?
-		schedule_trench_fill(GET_MAP_LOC(room));
+	
+	if (!ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH)) {
+		return;	// wat
+	}
+	
+	
+	// check for adjacent water
+	if (find_flagged_sect_within_distance_from_room(room, SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER, NOBITS, 1)) {
+		fill_trench(room);
+	}
+	else {	// otherwise schedule filling
+		set_room_extra_data(room, ROOM_EXTRA_TRENCH_FILL_TIME, time(0) + config_get_int("trench_fill_time"));
+		if (GET_MAP_LOC(room)) {	// can this BE null here?
+			schedule_trench_fill(GET_MAP_LOC(room));
+		}
 	}
 }
 
