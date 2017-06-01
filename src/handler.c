@@ -937,7 +937,7 @@ void schedule_room_affect_expire(room_data *room, struct affected_type *af) {
 		expire_data->room = room;
 		expire_data->affect = af;
 		
-		af->expire_event = event_create(room_affect_expire_event, expire_data, (af->duration - time(0)) * PASSES_PER_SEC);
+		af->expire_event = event_create(room_affect_expire_event, (void*)expire_data, (af->duration - time(0)) * PASSES_PER_SEC);
 	}
 	
 	log("Debug 1: [%d] %d %ld %x", GET_ROOM_VNUM(room), af->type, af->duration, (unsigned int) af->expire_event);
