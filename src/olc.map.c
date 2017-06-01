@@ -123,6 +123,7 @@ OLC_MODULE(mapedit_decay) {
 OLC_MODULE(mapedit_terrain) {
 	extern crop_data *get_crop_by_name(char *name);
 	extern sector_data *get_sect_by_name(char *name);
+	void finish_trench(room_data *room);
 	
 	struct empire_city_data *city, *temp;
 	empire_data *emp;
@@ -191,6 +192,10 @@ OLC_MODULE(mapedit_terrain) {
 		// preserve old original sect for roads -- TODO this is a special-case
 		if (IS_ROAD(IN_ROOM(ch))) {
 			change_base_sector(IN_ROOM(ch), old_sect);
+		}
+		
+		if (sect && SECT_FLAGGED(sect, SECTF_IS_TRENCH)) {
+			finish_trench(IN_ROOM(ch));
 		}
 	}
 }

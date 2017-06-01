@@ -81,6 +81,7 @@ void init_room(room_data *room, room_vnum vnum);
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
 void ruin_one_building(room_data *room);
 void save_world_map_to_file();
+void schedule_trench_fill(struct map_data *map);
 extern int sort_empire_islands(struct empire_island *a, struct empire_island *b);
 void update_island_names();
 void update_tavern(room_data *room);
@@ -594,6 +595,20 @@ void fill_trench(room_data *room) {
 		}
 		change_terrain(room, evo->becomes);
 		remove_room_extra_data(room, ROOM_EXTRA_TRENCH_FILL_TIME);
+	}
+}
+
+
+/**
+* Marks a trench complete and starts filling it.
+*
+* @param room_data *room The room to fill.
+*/
+void finish_trench(room_data *room) {
+	remove_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS);
+	set_room_extra_data(room, ROOM_EXTRA_TRENCH_FILL_TIME, time(0) + config_get_int("trench_fill_time"));
+	if (GET_MAP_LOC(room)) {	// can this BE null here?
+		schedule_trench_fill(GET_MAP_LOC(room));
 	}
 }
 

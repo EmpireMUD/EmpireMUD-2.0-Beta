@@ -680,6 +680,8 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 * @param sector_data *sect The sector to change it to.
 */
 void do_dg_terraform(room_data *target, sector_data *sect) {
+	void finish_trench(room_data *room);
+	
 	sector_data *old_sect;
 	
 	if (!target || !sect) {
@@ -708,6 +710,10 @@ void do_dg_terraform(room_data *target, sector_data *sect) {
 	if (ROOM_OWNER(target)) {
 		void deactivate_workforce_room(empire_data *emp, room_data *room);
 		deactivate_workforce_room(ROOM_OWNER(target), target);
+	}
+	
+	if (SECT_FLAGGED(sect, SECTF_IS_TRENCH)) {
+		finish_trench(target);
 	}
 }
 
