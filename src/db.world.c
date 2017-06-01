@@ -1316,11 +1316,9 @@ EVENTFUNC(burn_down_event) {
 	emp = ROOM_OWNER(room);
 	free(burn_data);
 	
-	// cancel this first
-	if (COMPLEX_DATA(room)) {
-		COMPLEX_DATA(room)->burn_event = NULL;
-	}
-	else {
+	// remove this first
+	delete_stored_event_room(room, SEV_BURN_DOWN);
+	if (!COMPLEX_DATA(room)) {
 		// no complex data? nothing to burn
 		return 0;
 	}
@@ -1383,13 +1381,15 @@ EVENT_CANCEL_FUNC(cancel_burn_event) {
 */
 void schedule_burn_down(room_data *room) {
 	struct room_event_data *burn_data;
+	struct event *ev;
 	
 	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->burn_down_time > 0) {
 		// create the event
 		CREATE(burn_data, struct room_event_data, 1);
 		burn_data->room = room;
 		
-		COMPLEX_DATA(room)->burn_event = event_create(burn_down_event, burn_data, (COMPLEX_DATA(room)->burn_down_time - time(0)) * PASSES_PER_SEC);
+		ev = event_create(burn_down_event, burn_data, (COMPLEX_DATA(room)->burn_down_time - time(0)) * PASSES_PER_SEC);
+		add_stored_event_room(room, SEV_BURN_DOWN, ev);
 	}
 }
 
@@ -1427,11 +1427,8 @@ void stop_burning(room_data *room) {
 	
 	if (COMPLEX_DATA(room)) {
 		COMPLEX_DATA(room)->burn_down_time = 0;
-		if (COMPLEX_DATA(room)->burn_event) {
-			event_cancel(COMPLEX_DATA(room)->burn_event, cancel_burn_event);
-			COMPLEX_DATA(room)->burn_event = NULL;
-			remove_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING);
-		}
+		cancel_stored_event_room(room, SEV_BURN_DOWN);
+		remove_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING);
 	}
 }
 
@@ -2524,7 +2521,7 @@ EVENTFUNC(check_unload_room) {
 	
 	if (CAN_UNLOAD_MAP_ROOM(room)) {
 		free(data);
-		delete_stored_event(&SHARED_DATA(room)->events, SEV_CHECK_UNLOAD);	// delete first so it doesn't free/cancel
+		delete_stored_event_room(room, SEV_CHECK_UNLOAD);	// delete first so it doesn't free/cancel
 		delete_room(room, FALSE);	// no need to check exits (CAN_UNLOAD_MAP_ROOM checks them)
 		return 0;	// do not reenqueue
 	}
@@ -2974,12 +2971,12 @@ void schedule_check_unload(room_data *room) {
 	struct room_event_data *data;
 	struct event *ev;
 	
-	if (!find_stored_event(SHARED_DATA(room)->events, SEV_CHECK_UNLOAD)) {
+	if (!find_stored_event_room(room, SEV_CHECK_UNLOAD)) {
 		CREATE(data, struct room_event_data, 1);
 		data->room = room;
 		
 		ev = event_create(check_unload_room, (void*)data, (10 * 60) RL_SEC);
-		add_stored_event(&SHARED_DATA(room)->events, SEV_CHECK_UNLOAD, ev);
+		add_stored_event_room(room, SEV_CHECK_UNLOAD, ev);
 	}
 }
 

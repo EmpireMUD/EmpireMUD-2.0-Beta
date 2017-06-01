@@ -922,7 +922,7 @@ void renum_world(void) {
 		
 		if (COMPLEX_DATA(room)) {
 			// events
-			if (COMPLEX_DATA(room)->burn_down_time > 0 && !COMPLEX_DATA(room)->burn_event) {
+			if (COMPLEX_DATA(room)->burn_down_time > 0 && !find_stored_event_room(room, SEV_BURN_DOWN)) {
 				schedule_burn_down(room);
 			}
 			

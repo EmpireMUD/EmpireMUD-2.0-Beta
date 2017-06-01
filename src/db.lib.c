@@ -5421,6 +5421,7 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 //// STORED EVENT LIB ////////////////////////////////////////////////////////
 
 // cancel func externs
+EVENT_CANCEL_FUNC(cancel_burn_event);
 EVENT_CANCEL_FUNC(cancel_room_event);
 EVENT_CANCEL_FUNC(cancel_trench_fill_event);
 
@@ -5429,6 +5430,7 @@ EVENT_CANCEL_FUNC(cancel_trench_fill_event);
 struct stored_event_info_t stored_event_info[] = {
 	{ cancel_trench_fill_event },	// SEV_TRENCH_FILL
 	{ cancel_room_event },	// SEV_CHECK_UNLOAD
+	{ cancel_burn_event },	// SEV_BURN_DOWN
 };
 
 
@@ -7662,8 +7664,6 @@ struct complex_room_data *init_complex_data() {
 * @param struct complex_room_data *data The building data to delete.
 */
 void free_complex_data(struct complex_room_data *data) {
-	EVENT_CANCEL_FUNC(cancel_burn_event);
-	
 	struct room_direction_data *ex;
 	
 	while ((ex = data->exits)) {
@@ -7679,10 +7679,6 @@ void free_complex_data(struct complex_room_data *data) {
 	
 	free_resource_list(data->to_build);
 	free_resource_list(data->built_with);
-	
-	if (data->burn_event) {
-		event_cancel(data->burn_event, cancel_burn_event);
-	}
 	
 	free(data);
 }

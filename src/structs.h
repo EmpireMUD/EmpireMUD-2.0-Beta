@@ -976,6 +976,7 @@ typedef struct vehicle_data vehicle_data;
 // SEV_x: stored event types
 #define SEV_TRENCH_FILL  0
 #define SEV_CHECK_UNLOAD  1
+#define SEV_BURN_DOWN  2
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -4507,7 +4508,6 @@ struct complex_room_data {
 	time_t burn_down_time;	// if >0, the timestamp when this building will burn down
 							// NOTE: burn_down_time could be moved to extra data if you
 							// needed its spot in the .wld file.
-	struct event *burn_event;	// if burning
 	
 	double damage;  // for catapulting
 };

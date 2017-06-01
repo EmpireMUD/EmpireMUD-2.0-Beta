@@ -461,6 +461,12 @@ void cancel_stored_event(struct stored_event **list, int type);
 void delete_stored_event(struct stored_event **list, int type);
 extern struct stored_event *find_stored_event(struct stored_event *list, int type);
 
+// stored event helpers
+#define add_stored_event_room(room, type, ev)  add_stored_event(&SHARED_DATA(room)->events, type, ev)
+#define cancel_stored_event_room(room, type)  cancel_stored_event(&SHARED_DATA(room)->events, type)
+#define delete_stored_event_room(room, type)  delete_stored_event(&SHARED_DATA(room)->events, type)
+#define find_stored_event_room(room, type)  find_stored_event(SHARED_DATA(room)->events, type)
+
 // triggers
 extern trig_data *trigger_table;
 extern trig_data *trigger_list;
