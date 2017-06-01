@@ -918,10 +918,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 	
 	if (IS_BURNING(room)) {
-		msg_to_char(ch, "\t[B600]The building is on fire!\t0\r\n");
+		msg_to_char(ch, "\t[B300]The building is on fire!\t0\r\n");
 	}
 	if (GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_ON_FIRE)) {
-		msg_to_char(ch, "\t[B600]The %s has caught on fire!\t0\r\n", skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(room))));
+		msg_to_char(ch, "\t[B300]The %s has caught on fire!\t0\r\n", skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(room))));
 	}
 
 	if (!AFF_FLAGGED(ch, AFF_EARTHMELD)) {
@@ -1446,7 +1446,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 
 	if (IS_BURNING(to_room)) {
 		strcpy(buf1, strip_color(buf));
-		sprintf(buf, "\t0\t[B600]%s", buf1);
+		sprintf(buf, "\t0\t[B300]%s", buf1);
 		need_color_terminator = TRUE;
 	}
 	else if (PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) || show_dark) {
