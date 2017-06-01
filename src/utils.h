@@ -1111,6 +1111,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define ROOM_VEHICLES(room)  ((room)->vehicles)
 #define SECT(room)  ((room)->sector_type)
 #define GET_EXITS_HERE(room)  ((room)->exits_here)
+#define GET_MAP_LOC(room)  ((room)->map_loc)
 
 
 // room->complex data
@@ -1146,7 +1147,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define ROOM_TRACKS(room)  (SHARED_DATA(room)->tracks)
 #define GET_ISLAND(room)  (SHARED_DATA(room)->island_ptr)
 #define GET_ISLAND_ID(room)  (SHARED_DATA(room)->island_id)
-#define GET_MAP_LOC(room)  (SHARED_DATA(room)->map_loc)
 
 
 // exits

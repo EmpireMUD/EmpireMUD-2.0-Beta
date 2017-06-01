@@ -59,6 +59,7 @@ void complete_building(room_data *room);
 void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter);
 extern struct complex_room_data *init_complex_data();
 void free_complex_data(struct complex_room_data *bld);
+void free_shared_room_data(struct shared_room_data *data);
 extern FILE *open_world_file(int block);
 void remove_room_from_world_tables(room_data *room);
 void save_and_close_world_file(FILE *fl, int block);
@@ -355,14 +356,11 @@ void delete_room(room_data *room, bool check_exits) {
 	void remove_room_from_vehicle(room_data *room, vehicle_data *veh);
 
 	struct room_direction_data *ex, *next_ex, *temp;
-	struct room_extra_data *room_ex, *next_room_ex;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_city_data *city, *next_city;
 	room_data *rm_iter, *next_rm, *home;
 	vehicle_data *veh, *next_veh;
 	struct instance_data *inst;
-	struct depletion_data *dep;
-	struct track_data *track;
 	struct affected_type *af;
 	struct reset_com *reset;
 	char_data *c, *next_c;
@@ -570,22 +568,7 @@ void delete_room(room_data *room, bool check_exits) {
 	// only have to free this info if not on the map (map rooms have a pointer to the map)
 	// this would be called free_shared_room_data() if it were a function
 	if (GET_ROOM_VNUM(room) >= MAP_SIZE && SHARED_DATA(room)) {
-		decustomize_room(room);
-		
-		while ((dep = ROOM_DEPLETION(room))) {
-			ROOM_DEPLETION(room) = dep->next;
-			free(dep);
-		}
-		HASH_ITER(hh, ROOM_EXTRA_DATA(room), room_ex, next_room_ex) {
-			HASH_DEL(ROOM_EXTRA_DATA(room), room_ex);
-			free(room_ex);
-		}
-		while ((track = ROOM_TRACKS(room))) {
-			ROOM_TRACKS(room) = track->next;
-			free(track);
-		}
-		
-		free(SHARED_DATA(room));
+		free_shared_room_data(SHARED_DATA(room));
 	}
 	
 	// free the room
@@ -1835,6 +1818,27 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 		world_map_needs_save = TRUE;
 	}
 	
+	if (old_sect && GET_SECT_VNUM(old_sect) == BASIC_OCEAN && GET_SECT_VNUM(sect) != BASIC_OCEAN && map->shared == &ocean_shared_data) {
+		// converting from ocean to non-ocean
+		map->shared = NULL;	// unlink ocean share
+		CREATE(map->shared, struct shared_room_data, 1);
+		
+		map->shared->island_id = NO_ISLAND;	// it definitely was before, must still be
+		map->shared->island_ptr = NULL;
+		
+		if (loc) {
+			SHARED_DATA(loc) = map->shared;
+		}
+	}
+	else if (GET_SECT_VNUM(sect) == BASIC_OCEAN && map->shared != &ocean_shared_data) {
+		free_shared_room_data(map->shared);
+		map->shared = &ocean_shared_data;
+		
+		if (loc) {
+			SHARED_DATA(loc) = map->shared;
+		}
+	}
+	
 	// old index
 	if (old_sect) {	// does not exist at first instantiation/set
 		idx = find_sector_index(GET_SECT_VNUM(old_sect));
@@ -2528,9 +2532,8 @@ room_data *load_map_room(room_vnum vnum) {
 	
 	CREATE(room, room_data, 1);
 	room->vnum = vnum;
-	add_room_to_world_tables(room);
-	
 	SHARED_DATA(room) = map->shared;	// point to map
+	add_room_to_world_tables(room);
 	
 	// do not use perform_change_sect here because we're only loading from the existing data
 	SECT(room) = map->sector_type;
@@ -3144,15 +3147,26 @@ void load_world_map_from_file(void) {
 	long l_in;
 	FILE *fl;
 	
+	// initialize ocean_shared_data
+	ocean_shared_data.island_id = NO_ISLAND;
+	ocean_shared_data.island_ptr = NULL;
+	ocean_shared_data.name = NULL;
+	ocean_shared_data.description = NULL;
+	ocean_shared_data.icon = NULL;
+	ocean_shared_data.affects = NOBITS;
+	ocean_shared_data.base_affects = NOBITS;
+	ocean_shared_data.depletion = NULL;
+	ocean_shared_data.extra_data = NULL;
+	ocean_shared_data.tracks = NULL;
+	
 	// init
 	land_map = NULL;
 	for (x = 0; x < MAP_WIDTH; ++x) {
 		for (y = 0; y < MAP_HEIGHT; ++y) {
 			world_map[x][y].vnum = (y * MAP_WIDTH) + x;
-			CREATE(world_map[x][y].shared, struct shared_room_data, 1);
+			world_map[x][y].shared = &ocean_shared_data;
 			world_map[x][y].shared->island_id = NO_ISLAND;
 			world_map[x][y].shared->island_ptr = NULL;
-			world_map[x][y].shared->map_loc = &(world_map[x][y]);
 			world_map[x][y].sector_type = NULL;
 			world_map[x][y].base_sector = NULL;
 			world_map[x][y].natural_sector = NULL;
@@ -3188,6 +3202,11 @@ void load_world_map_from_file(void) {
 		
 			map = &(world_map[var[0]][var[1]]);
 			sprintf(error_buf, "map tile %d", map->vnum);
+			
+			if (var[3] != BASIC_OCEAN) {
+				map->shared = NULL;	// unlink basic ocean
+				CREATE(map->shared, struct shared_room_data, 1);
+			}
 		
 			map->shared->island_id = var[2];
 		

@@ -7584,6 +7584,42 @@ void free_complex_data(struct complex_room_data *data) {
 
 
 /**
+* Frees the memory for shared room data.
+*
+* @param struct shared_room_data *data The data to free.
+*/
+void free_shared_room_data(struct shared_room_data *data) {
+	struct room_extra_data *room_ex, *next_room_ex;
+	struct depletion_data *dep;
+	struct track_data *track;
+	
+	if (data->name) {
+		free(data->name);
+	}
+	if (data->icon) {
+		free(data->icon);
+	}
+	if (data->description) {
+		free(data->description);
+	}
+	
+	while ((dep = data->depletion)) {
+		data->depletion = dep->next;
+		free(dep);
+	}
+	HASH_ITER(hh, data->extra_data, room_ex, next_room_ex) {
+		free(room_ex);
+	}
+	while ((track = data->tracks)) {
+		data->tracks = track->next;
+		free(track);
+	}
+	
+	free(data);
+}
+
+
+/**
 * Parses an 'A' apply tag, written by write_applies_to_file(). This file
 * should have just read the 'A' line, and the next line to read is its data.
 *

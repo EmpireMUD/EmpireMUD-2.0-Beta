@@ -4421,6 +4421,7 @@ struct room_data {
 	sector_data *base_sector;  // for when built-over -- ^
 	crop_data *crop_type;	// if this room has a crop, this is it
 	
+	struct map_data *map_loc;	// map location if any
 	struct complex_room_data *complex; // for rooms that are buildings, inside, adventures, etc
 	struct shared_room_data *shared;	// data that could be local OR from the map tile
 	byte light;  // number of light sources
@@ -4480,7 +4481,6 @@ struct complex_room_data {
 struct shared_room_data {
 	int island_id;	// the island id (may be NO_ISLAND)
 	struct island_info *island_ptr;	// pointer to the island (may be NULL)
-	struct map_data *map_loc;	// map location if any
 	
 	// custom data
 	char *name;  // room name may be set

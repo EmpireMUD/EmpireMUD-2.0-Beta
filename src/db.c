@@ -231,6 +231,7 @@ bool need_world_index = TRUE;	// used to trigger world index saving (always save
 struct island_info *island_table = NULL; // hash table for all the islands
 struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];	// master world map
 struct map_data *land_map = NULL;	// linked list of non-ocean
+struct shared_room_data ocean_shared_data;	// for BASIC_OCEAN tiles
 bool world_map_needs_save = TRUE;	// always do at least 1 save
 
 
