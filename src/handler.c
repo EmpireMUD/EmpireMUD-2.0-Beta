@@ -105,7 +105,6 @@ EVENTFUNC(room_affect_expire_event) {
 	
 	// cancel this first
 	af->expire_event = NULL;
-	log("Debug 2: [%d] %d %ld", GET_ROOM_VNUM(room), af->type, af->duration);
 	
 	if ((af->type > 0)) {
 		if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
@@ -936,7 +935,6 @@ void schedule_room_affect_expire(room_data *room, struct affected_type *af) {
 		CREATE(expire_data, struct room_expire_event_data, 1);
 		expire_data->room = room;
 		expire_data->affect = af;
-		log("Debug 1: [%d] %d %ld", GET_ROOM_VNUM(room), af->type, af->duration);
 		
 		af->expire_event = event_create(room_affect_expire_event, (void*)expire_data, (af->duration - time(0)) * PASSES_PER_SEC);
 	}
