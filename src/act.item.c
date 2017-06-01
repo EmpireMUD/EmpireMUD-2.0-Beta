@@ -4949,6 +4949,7 @@ ACMD(do_pour) {
 				if (SHARED_DATA(IN_ROOM(ch))->trench_event) {
 					EVENT_CANCEL_FUNC(cancel_trench_fill_event);
 					event_cancel(SHARED_DATA(IN_ROOM(ch))->trench_event, cancel_trench_fill_event);
+					SHARED_DATA(IN_ROOM(ch))->trench_event = NULL;
 				}
 				if (GET_MAP_LOC(IN_ROOM(ch))) {	// can this be null?
 					void schedule_trench_fill(struct map_data *map);
