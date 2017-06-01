@@ -4316,6 +4316,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 	int t[10];
 	struct depletion_data *dep;
 	struct reset_com *reset, *last_reset = NULL;
+	struct affected_type *af;
 	struct track_data *track;
 	room_data *room, *find;
 	bool error = FALSE;
@@ -4374,6 +4375,23 @@ void parse_room(FILE *fl, room_vnum vnum) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'A': {	// affects
+				if (!get_line(fl, line2) || sscanf(line2, "%d %d %ld %d %d %s", &t[0], &t[1], &l_in, &t[3], &t[4], str1) != 6) {
+					log("SYSERR: Format error in A line of room #%d", vnum);
+					exit(1);
+				}
+				
+				CREATE(af, struct affected_type, 1);
+				af->type = t[0];
+				af->cast_by = t[1];
+				af->duration = l_in;
+				af->modifier = t[3];
+				af->location = t[4];
+				af->bitvector = asciiflag_conv(str1);
+				
+				LL_PREPEND(ROOM_AFFECTS(room), af);
+				break;
+			}
 			case 'B': {	// building data
 				if (!get_line(fl, line2) || sscanf(line2, "%d %d %d %d %ld %lf %d %d", &t[0], &t[1], &t[2], &t[3], &l_in, &dbl_in, &t[6], &t[7]) != 8) {
 					log("SYSERR: Format error in B line of room #%d", vnum);
@@ -4623,6 +4641,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	
 	struct cooldown_data *cool;
 	struct trig_var_data *tvd;
+	struct affected_type *af;
 	trig_data *trig;
 	char_data *mob;
 	
@@ -4636,6 +4655,11 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	
 	// both sector and original-sector must save vnums
 	fprintf(fl, "%d %d %d\n", GET_ISLAND_ID(room), GET_SECT_VNUM(SECT(room)), GET_SECT_VNUM(BASE_SECT(room)));
+	
+	// A affects
+	LL_FOREACH(ROOM_AFFECTS(room), af) {
+		fprintf(fl, "A\n%d %d %ld %d %d %s\n", af->type, af->cast_by, af->duration, af->modifier, af->location, bitv_to_alpha(af->bitvector));
+	}
 	
 	// B building data
 	if (COMPLEX_DATA(room)) {
