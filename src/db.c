@@ -1475,7 +1475,7 @@ void number_and_count_islands(bool reset) {
 	bool re_empire = (top_island_num != -1);
 	struct island_num_data_t *item;
 	struct island_info *isle;
-	room_data *room, *maploc;
+	room_data *room, *next_room, *maploc;
 	struct map_data *map;
 	int iter, use_id;
 	
@@ -1585,7 +1585,7 @@ void number_and_count_islands(bool reset) {
 	}
 	
 	// update all interior rooms
-	LL_FOREACH2(interior_room_list, room, next_interior) {
+	HASH_ITER(hh, world_table, room, next_room) {
 		if (!(maploc = get_map_location_for(room)) || (maploc == room)) {
 			continue;
 		}
