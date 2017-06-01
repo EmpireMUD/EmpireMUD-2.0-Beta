@@ -4337,6 +4337,10 @@ void parse_room(FILE *fl, room_vnum vnum) {
 		CREATE(SHARED_DATA(room), struct shared_room_data, 1);
 	}
 	
+	if (vnum < MAP_SIZE) {
+		GET_MAP_LOC(room) = &(world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)]);
+	}
+	
 	HASH_FIND_INT(world_table, &vnum, find);
 	if (find) {
 		log("WARNING: Duplicate room vnum #%d", vnum);
