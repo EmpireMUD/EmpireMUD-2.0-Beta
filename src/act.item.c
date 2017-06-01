@@ -4946,10 +4946,8 @@ ACMD(do_pour) {
 			/* If it's a trench, fill her up */
 			if (GET_DRINK_CONTAINER_TYPE(from_obj) == LIQ_WATER && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_TRENCH) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) >= 0) {
 				add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_FILL_TIME, -10 * GET_DRINK_CONTAINER_CONTENTS(from_obj));
-				if (SHARED_DATA(IN_ROOM(ch))->trench_event) {
-					EVENT_CANCEL_FUNC(cancel_trench_fill_event);
-					event_cancel(SHARED_DATA(IN_ROOM(ch))->trench_event, cancel_trench_fill_event);
-					SHARED_DATA(IN_ROOM(ch))->trench_event = NULL;
+				if (find_stored_event(SHARED_DATA(IN_ROOM(ch))->events, SEV_TRENCH_FILL)) {
+					cancel_stored_event(&SHARED_DATA(IN_ROOM(ch))->events, SEV_TRENCH_FILL);
 				}
 				if (GET_MAP_LOC(IN_ROOM(ch))) {	// can this be null?
 					void schedule_trench_fill(struct map_data *map);

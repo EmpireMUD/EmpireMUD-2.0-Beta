@@ -20,10 +20,6 @@
 
 /********** Event related section *********/
 
-#define EVENTFUNC(name) long (name)(void *event_obj)
-#define EVENT_CANCEL_FUNC(name) void (name)(void *event_obj)
-
-
 /*
 ** define event related structures
 */

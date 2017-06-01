@@ -2227,7 +2227,7 @@ EVENTFUNC(trench_fill_event) {
 	free(trench_data);
 	
 	// cancel this first
-	map->shared->trench_event = NULL;
+	delete_stored_event(&map->shared->events, SEV_TRENCH_FILL);
 	
 	// check if trenchy
 	if (!SECT_FLAGGED(map->sector_type, SECTF_IS_TRENCH)) {
@@ -2257,12 +2257,14 @@ EVENT_CANCEL_FUNC(cancel_trench_fill_event) {
 void schedule_trench_fill(struct map_data *map) {
 	long when = get_extra_data(map->shared->extra_data, ROOM_EXTRA_TRENCH_FILL_TIME);
 	struct trench_event_data *trench_data;
+	struct event *ev;
 	
-	if (!map->shared->trench_event) {
+	if (!find_stored_event(map->shared->events, SEV_TRENCH_FILL)) {
 		CREATE(trench_data, struct trench_event_data, 1);
 		trench_data->map = map;
 		
-		map->shared->trench_event = event_create(trench_fill_event, (void*)trench_data, (when > 0 ? ((when - time(0)) * PASSES_PER_SEC) : 1));
+		ev = event_create(trench_fill_event, (void*)trench_data, (when > 0 ? ((when - time(0)) * PASSES_PER_SEC) : 1));
+		add_stored_event(&map->shared->events, SEV_TRENCH_FILL, ev);
 	}
 }
 

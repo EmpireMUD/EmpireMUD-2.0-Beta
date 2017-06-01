@@ -26,6 +26,7 @@
 *     Craft Defines
 *     Crop Defines
 *     Empire Defines
+*     Event Defines
 *     Faction Defines
 *     Game Defines
 *     Generic Defines
@@ -962,6 +963,18 @@ typedef struct vehicle_data vehicle_data;
 #define GUESTS_ALLOWED  0
 #define MEMBERS_ONLY  1
 #define MEMBERS_AND_ALLIES  2
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EVENT DEFINES ///////////////////////////////////////////////////////////
+
+// function types
+#define EVENTFUNC(name) long (name)(void *event_obj)
+#define EVENT_CANCEL_FUNC(name) void (name)(void *event_obj)
+
+
+// SEV_x: stored event types
+#define SEV_TRENCH_FILL  0
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -3883,6 +3896,21 @@ struct room_expire_event_data {
 };
 
 
+// for lists of stored events on things
+struct stored_event {
+	struct event *ev;
+	int type;	// SEV_ type
+	
+	UT_hash_handle hh;	// hashed by type
+};
+
+
+// data for SEV_ consts
+struct stored_event_info_t {
+	EVENT_CANCEL_FUNC(*cancel);	// which function cancels it
+};
+
+
 // for trench filling
 struct trench_event_data {
 	struct map_data *map;
@@ -4503,7 +4531,7 @@ struct shared_room_data {
 	struct track_data *tracks;	// for tracking
 	
 	// events
-	struct event *trench_event;	// if filling
+	struct stored_event *events;	// hash table (by type) of stored events
 };
 
 

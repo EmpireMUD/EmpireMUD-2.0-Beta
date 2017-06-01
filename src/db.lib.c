@@ -44,6 +44,7 @@
 *   Room Lib
 *   Room Template Lib
 *   Sector Lib
+*   Stored Event Lib
 *   Trigger Lib
 *   Core Lib Functions
 *   Index Saving
@@ -5417,6 +5418,97 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// STORED EVENT LIB ////////////////////////////////////////////////////////
+
+// cancel func externs
+EVENT_CANCEL_FUNC(cancel_trench_fill_event);
+
+
+// SEV_x: list of cancel functions
+struct stored_event_info_t stored_event_info[] = {
+	{ cancel_trench_fill_event },	// SEV_TRENCH_FILL
+};
+
+
+/**
+* Adds a stored event to a list. If there's already one of the same type in
+* the list, it will be replaced.
+*
+* @param struct stored_event **list The list to add to.
+* @param int type The SEV_ type to add the event as.
+* @param struct event *event The event to store.
+*/
+void add_stored_event(struct stored_event **list, int type, struct event *event) {
+	struct stored_event *sev;
+	
+	if (!event) {
+		return;
+	}
+	
+	// ensure no duplicate entries
+	sev = find_stored_event(*list, type);
+	if (!sev) {
+		CREATE(sev, struct stored_event, 1);
+		sev->type = type;
+		HASH_ADD_INT(*list, type, sev);
+	}
+	
+	sev->ev = event;
+}
+
+
+/**
+* Cancels an event that was stored, and deletes the entry.
+*
+* @param struct stored_event **list The list to cancel out of.
+* @param int type The SEV_ type to cancel.
+*/
+void cancel_stored_event(struct stored_event **list, int type) {
+	struct stored_event *sev = find_stored_event(*list, type);
+	
+	if (sev && sev->ev) {
+		(stored_event_info[type].cancel)(sev->ev);	// cancel func
+		sev->ev = NULL;
+	}
+	
+	if (sev) {
+		HASH_DEL(*list, sev);
+		free(sev);
+	}
+}
+
+
+/**
+* Deletes a stored event without canceling it.
+*
+* @param struct stored_event **list The list to delete from.
+* @param int type The SEV_ type to cancel.
+*/
+void delete_stored_event(struct stored_event **list, int type) {
+	struct stored_event *sev = find_stored_event(*list, type);
+	if (sev) {
+		HASH_DEL(*list, sev);
+		free(sev);
+	}
+}
+
+
+/**
+* Finds a stored event in a list of them.
+*
+* @param struct stored_event *list The list to search in.
+* @param int type Any SEV_ const.
+* @return struct stored_event* The found event if any, or NULL.
+*/
+struct stored_event *find_stored_event(struct stored_event *list, int type) {
+	struct stored_event *find;
+	
+	HASH_FIND_INT(list, &type, find);
+	return find;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// TRIGGER LIB /////////////////////////////////////////////////////////////
 
 /**
@@ -7596,6 +7688,7 @@ void free_shared_room_data(struct shared_room_data *data) {
 	EVENT_CANCEL_FUNC(cancel_trench_fill_event);
 	
 	struct room_extra_data *room_ex, *next_room_ex;
+	struct stored_event *ev, *next_ev;
 	struct depletion_data *dep;
 	struct track_data *track;
 	
@@ -7621,8 +7714,8 @@ void free_shared_room_data(struct shared_room_data *data) {
 		free(track);
 	}
 	
-	if (data->trench_event) {
-		event_cancel(data->trench_event, cancel_trench_fill_event);
+	HASH_ITER(hh, data->events, ev, next_ev) {
+		cancel_stored_event(&data->events, ev->type);
 	}
 	
 	free(data);

@@ -455,6 +455,12 @@ extern social_data *sorted_socials;
 extern social_data *social_proto(any_vnum vnum);
 void free_social(social_data *soc);
 
+// stored event libs
+void add_stored_event(struct stored_event **list, int type, struct event *event);
+void cancel_stored_event(struct stored_event **list, int type);
+void delete_stored_event(struct stored_event **list, int type);
+extern struct stored_event *find_stored_event(struct stored_event *list, int type);
+
 // triggers
 extern trig_data *trigger_table;
 extern trig_data *trigger_list;
