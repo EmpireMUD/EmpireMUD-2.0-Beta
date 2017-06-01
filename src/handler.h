@@ -72,6 +72,7 @@ void affect_remove_room(room_data *room, struct affected_type *af);
 void affect_to_char(char_data *ch, struct affected_type *af);
 void affect_to_room(room_data *room, struct affected_type *af);
 void affect_total(char_data *ch);
+void affect_total_room(room_data *room);
 extern bool affected_by_spell(char_data *ch, any_vnum type);
 extern bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply);
 extern struct affected_type *create_aff(any_vnum type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by);

@@ -586,11 +586,11 @@ void affect_remove_room(room_data *room, struct affected_type *af) {
 	}
 	
 	REMOVE_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
-	// restore base flags, in case we removed one of them
-	SET_BIT(ROOM_AFF_FLAGS(room), ROOM_BASE_FLAGS(room));
-
+	
 	REMOVE_FROM_LIST(af, ROOM_AFFECTS(room), next);
 	free(af);
+	
+	affect_total_room(room);
 }
 
 
@@ -636,6 +636,8 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 	
 	SET_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
 	schedule_room_affect_expire(room, affected_alloc);
+	
+	affect_total_room(room);
 }
 
 
@@ -768,6 +770,21 @@ void affect_total(char_data *ch) {
 	
 	// this is to prevent weird quirks because GET_MAX_BLOOD is a function
 	GET_MAX_POOL(ch, BLOOD) = GET_MAX_BLOOD(ch);
+}
+
+
+/**
+* Ensures a room's affects are up-to-date.
+*
+* @param room_data *room The room to check.
+*/
+void affect_total_room(room_data *room) {
+	struct affected_type *af;
+	
+	ROOM_AFF_FLAGS(room) = ROOM_BASE_FLAGS(room);
+	LL_FOREACH(ROOM_AFFECTS(room), af) {
+		SET_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
+	}
 }
 
 

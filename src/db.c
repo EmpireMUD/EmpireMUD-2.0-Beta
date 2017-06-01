@@ -952,6 +952,9 @@ void renum_world(void) {
 				GET_MAP_LOC(room) = GET_MAP_LOC(home);
 			}
 		}
+		
+		// ensure affects
+		affect_total_room(room);
 	}
 }
 
