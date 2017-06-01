@@ -611,7 +611,6 @@ void finish_trench(room_data *room) {
 		return;	// wat
 	}
 	
-	
 	// check for adjacent water
 	if (find_flagged_sect_within_distance_from_room(room, SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER, NOBITS, 1)) {
 		fill_trench(room);
