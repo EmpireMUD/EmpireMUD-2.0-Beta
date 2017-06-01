@@ -255,6 +255,7 @@ void free_requirements(struct req_data *list);
 // resource depletion handlers
 void add_depletion(room_data *room, int type, bool multiple);
 extern int get_depletion(room_data *room, int type);
+void remove_depletion_from_list(struct depletion_data **list, int type);
 void remove_depletion(room_data *room, int type);
 void set_depletion(room_data *room, int type, int value);
 

@@ -44,7 +44,7 @@ mining_timer 45
 panning_timer 10
 pick_base_timer 4
 pick_depletion 14
-planting_base_timer 120
+planting_base_timer 9000
 shear_growth_time 6
 short_depletion 25
 tan_timer 12

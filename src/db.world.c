@@ -61,6 +61,7 @@ void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter)
 extern struct complex_room_data *init_complex_data();
 void free_complex_data(struct complex_room_data *bld);
 void free_shared_room_data(struct shared_room_data *data);
+void grow_crop(struct map_data *map);
 extern FILE *open_world_file(int block);
 void remove_room_from_world_tables(room_data *room);
 void save_and_close_world_file(FILE *fl, int block);
@@ -76,7 +77,6 @@ struct empire_territory_data *create_territory_entry(empire_data *emp, room_data
 void decustomize_room(room_data *room);
 room_vnum find_free_vnum();
 crop_data *get_potential_crop_for_location(room_data *location);
-void grow_crop(room_data *room);
 void init_room(room_data *room, room_vnum vnum);
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
 void ruin_one_building(room_data *room);
@@ -917,9 +917,6 @@ void update_world(void) {
 			// type-specific updates
 			if (room_has_function_and_city_ok(iter, FNC_TAVERN)) {
 				update_tavern(iter);
-			}
-			if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && get_room_extra_data(iter, ROOM_EXTRA_SEED_TIME)) {
-				grow_crop(iter);
 			}
 		}
 	}
@@ -2202,7 +2199,7 @@ void reread_empire_tech(empire_data *emp) {
 EVENTFUNC(trench_fill_event) {
 	void fill_trench(room_data *room);
 	
-	struct trench_event_data *trench_data = (struct trench_event_data *)event_obj;
+	struct map_event_data *trench_data = (struct map_event_data *)event_obj;
 	struct map_data *map;
 	room_data *room;
 	
@@ -2227,13 +2224,6 @@ EVENTFUNC(trench_fill_event) {
 }
 
 
-// frees memory when room expiry is canceled
-EVENT_CANCEL_FUNC(cancel_trench_fill_event) {
-	struct trench_event_data *data = (struct trench_event_data *)event_obj;
-	free(data);
-}
-
-
 /**
 * Schedules the event handler for trench filling.
 *
@@ -2241,11 +2231,11 @@ EVENT_CANCEL_FUNC(cancel_trench_fill_event) {
 */
 void schedule_trench_fill(struct map_data *map) {
 	long when = get_extra_data(map->shared->extra_data, ROOM_EXTRA_TRENCH_FILL_TIME);
-	struct trench_event_data *trench_data;
+	struct map_event_data *trench_data;
 	struct event *ev;
 	
 	if (!find_stored_event(map->shared->events, SEV_TRENCH_FILL)) {
-		CREATE(trench_data, struct trench_event_data, 1);
+		CREATE(trench_data, struct map_event_data, 1);
 		trench_data->map = map;
 		
 		ev = event_create(trench_fill_event, (void*)trench_data, (when > 0 ? ((when - time(0)) * PASSES_PER_SEC) : 1));
@@ -2802,6 +2792,24 @@ crop_data *get_potential_crop_for_location(room_data *location) {
 }
 
 
+EVENTFUNC(grow_crop_event) {
+	struct map_event_data *data = (struct map_event_data *)event_obj;
+	struct map_data *map;
+	
+	// grab data and free it
+	map = data->map;
+	free(data);
+	
+	// remove this first
+	delete_stored_event(&map->shared->events, SEV_GROW_CROP);
+	
+	grow_crop(map);
+	
+	// do not reenqueue
+	return 0;
+}
+
+
 /**
 * @return room_vnum The first unused world vnum available.
 */
@@ -2833,34 +2841,29 @@ room_vnum find_free_vnum(void) {
 
 
 /**
-* Processes crop growth on a tile.
+* Finishes crop growth on a tile.
 *
-* @aram room_data *room The location to grow.
+* @aram struct map_data *map The map location to grow.
 */
-void grow_crop(room_data *room) {
+void grow_crop(struct map_data *map) {
 	struct evolution_data *evo;
-	sector_data *stored;
+	sector_data *stored, *becomes;
 	
 	// nothing to grow
-	if (!ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) || !(evo = get_evolution_by_type(SECT(room), EVO_CROP_GROWS)) || !sector_proto(evo->becomes)) {
+	if (!SECT_FLAGGED(map->sector_type, SECTF_HAS_CROP_DATA) || !(evo = get_evolution_by_type(map->sector_type, EVO_CROP_GROWS)) || !(becomes = sector_proto(evo->becomes))) {
 		return;
 	}
 	
 	// only going to use the original sect if it was different -- this preserves the stored sect
-	stored = (BASE_SECT(room) != SECT(room)) ? BASE_SECT(room) : NULL;
+	stored = (map->base_sector != map->sector_type) ? map->base_sector : NULL;
 	
-	// update seed growth time
-	add_to_room_extra_data(room, ROOM_EXTRA_SEED_TIME, -1);
+	perform_change_sect(NULL, map, becomes);
 	
-	// done?
-	if (get_room_extra_data(room, ROOM_EXTRA_SEED_TIME) <= 0) {
-		change_terrain(room, evo->becomes);
-		if (stored) {
-			change_base_sector(room, stored);
-		}
-		remove_depletion(room, DPLTN_PICK);
-		remove_depletion(room, DPLTN_FORAGE);
+	if (stored) {
+		perform_change_base_sect(NULL, map, stored);
 	}
+	remove_depletion_from_list(&map->shared->depletion, DPLTN_PICK);
+	remove_depletion_from_list(&map->shared->depletion, DPLTN_FORAGE);
 }
 
 
@@ -2977,6 +2980,32 @@ void schedule_check_unload(room_data *room) {
 		
 		ev = event_create(check_unload_room, (void*)data, (10 * 60) RL_SEC);
 		add_stored_event_room(room, SEV_CHECK_UNLOAD, ev);
+	}
+}
+
+
+/**
+* Schedules the crop growth.
+*
+* @param struct map_data *map The map location to setup growth for.
+*/
+void schedule_crop_growth(struct map_data *map) {
+	struct map_event_data *data;
+	struct event *ev;
+	long when;
+	
+	// cancel any existing event
+	cancel_stored_event(&map->shared->events, SEV_GROW_CROP);
+	
+	when = get_extra_data(map->shared->extra_data, ROOM_EXTRA_SEED_TIME);
+	
+	if (SECT_FLAGGED(map->sector_type, SECTF_HAS_CROP_DATA) && when > 0) {
+		// create the event
+		CREATE(data, struct map_event_data, 1);
+		data->map = map;
+		
+		ev = event_create(grow_crop_event, data, (when - time(0)) * PASSES_PER_SEC);
+		add_stored_event(&map->shared->events, SEV_GROW_CROP, ev);
 	}
 }
 

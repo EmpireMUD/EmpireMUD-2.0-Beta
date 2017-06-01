@@ -5422,15 +5422,16 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 
 // cancel func externs
 EVENT_CANCEL_FUNC(cancel_burn_event);
+EVENT_CANCEL_FUNC(cancel_map_event);
 EVENT_CANCEL_FUNC(cancel_room_event);
-EVENT_CANCEL_FUNC(cancel_trench_fill_event);
 
 
 // SEV_x: list of cancel functions
 struct stored_event_info_t stored_event_info[] = {
-	{ cancel_trench_fill_event },	// SEV_TRENCH_FILL
+	{ cancel_map_event },	// SEV_TRENCH_FILL
 	{ cancel_room_event },	// SEV_CHECK_UNLOAD
 	{ cancel_burn_event },	// SEV_BURN_DOWN
+	{ cancel_map_event },	// SEV_GROW_CROP
 };
 
 
@@ -5509,6 +5510,13 @@ struct stored_event *find_stored_event(struct stored_event *list, int type) {
 	
 	HASH_FIND_INT(list, &type, find);
 	return find;
+}
+
+
+// frees memory when a map event is canceled
+EVENT_CANCEL_FUNC(cancel_map_event) {
+	struct map_event_data *data = (struct map_event_data *)event_obj;
+	free(data);
 }
 
 
@@ -7690,8 +7698,6 @@ void free_complex_data(struct complex_room_data *data) {
 * @param struct shared_room_data *data The data to free.
 */
 void free_shared_room_data(struct shared_room_data *data) {
-	EVENT_CANCEL_FUNC(cancel_trench_fill_event);
-	
 	struct room_extra_data *room_ex, *next_room_ex;
 	struct stored_event *ev, *next_ev;
 	struct depletion_data *dep;

@@ -6213,16 +6213,26 @@ int get_depletion(room_data *room, int type) {
 * @param room_data *room where
 * @param int type DPLTN_
 */
-void remove_depletion(room_data *room, int type) {
-	struct depletion_data *dep, *next_dep, *temp;
+void remove_depletion_from_list(struct depletion_data **list, int type) {
+	struct depletion_data *dep, *next_dep;
 	
-	for (dep = ROOM_DEPLETION(room); dep; dep = next_dep) {
-		next_dep = dep->next;
-		
+	LL_FOREACH_SAFE(*list, dep, next_dep) {
 		if (dep->type == type) {
-			REMOVE_FROM_LIST(dep, ROOM_DEPLETION(room), next);
+			LL_DELETE(*list, dep);
+			free(dep);
 		}
 	}
+}
+
+
+/**
+* Removes all depletion data for a certain type from the room.
+*
+* @param room_data *room where
+* @param int type DPLTN_
+*/
+void remove_depletion(room_data *room, int type) {
+	remove_depletion_from_list(&ROOM_DEPLETION(room), type);
 }
 
 

@@ -977,6 +977,7 @@ typedef struct vehicle_data vehicle_data;
 #define SEV_TRENCH_FILL  0
 #define SEV_CHECK_UNLOAD  1
 #define SEV_BURN_DOWN  2
+#define SEV_GROW_CROP  3
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -3885,6 +3886,12 @@ struct empire_data {
  //////////////////////////////////////////////////////////////////////////////
 //// EVENT STRUCTS ///////////////////////////////////////////////////////////
 
+// for map events
+struct map_event_data {
+	struct map_data *map;
+};
+
+
 // data for the event when a building is burning
 struct room_event_data {
 	room_data *room;
@@ -3910,12 +3917,6 @@ struct stored_event {
 // data for SEV_ consts
 struct stored_event_info_t {
 	EVENT_CANCEL_FUNC(*cancel);	// which function cancels it
-};
-
-
-// for trench filling
-struct trench_event_data {
-	struct map_data *map;
 };
 
 

@@ -1537,9 +1537,8 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 						// sly-convert back to what it was grown from ... not using change_terrain
 						perform_change_sect(room, NULL, old_sect);
 				
-						// we are keeping the original sect the same as it was
-						// TODO un-magic-number this
-						set_room_extra_data(room, ROOM_EXTRA_SEED_TIME, 60);
+						// we are keeping the original sect the same as it was; set the time to half the normal time
+						set_room_extra_data(room, ROOM_EXTRA_SEED_TIME, time(0) + config_get_int("planting_base_timer") / 2);
 					}
 					else {
 						// do we have a stored original sect?
