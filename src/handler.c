@@ -636,7 +636,7 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 	ROOM_AFFECTS(room) = affected_alloc;
 	
 	SET_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
-	schedule_room_affect_expire(room, af);
+	schedule_room_affect_expire(room, affected_alloc);
 }
 
 
@@ -936,11 +936,10 @@ void schedule_room_affect_expire(room_data *room, struct affected_type *af) {
 		CREATE(expire_data, struct room_expire_event_data, 1);
 		expire_data->room = room;
 		expire_data->affect = af;
+		log("Debug 1: [%d] %d %ld", GET_ROOM_VNUM(room), af->type, af->duration);
 		
 		af->expire_event = event_create(room_affect_expire_event, (void*)expire_data, (af->duration - time(0)) * PASSES_PER_SEC);
 	}
-	
-	log("Debug 1: [%d] %d %ld %x", GET_ROOM_VNUM(room), af->type, af->duration, (unsigned int) af->expire_event);
 }
 
 
