@@ -1280,7 +1280,9 @@ void process_escaping(char_data *ch) {
 *
 * @param char_data *ch The excavator.
 */
-void process_excavating(char_data *ch) {	
+void process_excavating(char_data *ch) {
+	void schedule_trench_fill(struct map_data *map);
+	
 	int count, total;
 	char_data *iter;
 
@@ -1323,6 +1325,12 @@ void process_excavating(char_data *ch) {
 			if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) >= 0) {
 				msg_to_char(ch, "You finish excavating the trench!\r\n");
 				act("$n finishes excavating the trench!", FALSE, ch, 0, 0, TO_ROOM);
+				
+				remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS);
+				set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_FILL_TIME, time(0) + config_get_int("trench_fill_time"));
+				if (GET_MAP_LOC(IN_ROOM(ch))) {	// can this BE null here?
+					schedule_trench_fill(GET_MAP_LOC(IN_ROOM(ch)));
+				}
 				
 				// this also stops ch
 				stop_room_action(IN_ROOM(ch), ACT_EXCAVATING, NOTHING);

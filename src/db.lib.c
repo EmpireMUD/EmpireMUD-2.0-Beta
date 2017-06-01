@@ -7593,6 +7593,8 @@ void free_complex_data(struct complex_room_data *data) {
 * @param struct shared_room_data *data The data to free.
 */
 void free_shared_room_data(struct shared_room_data *data) {
+	EVENT_CANCEL_FUNC(cancel_trench_fill_event);
+	
 	struct room_extra_data *room_ex, *next_room_ex;
 	struct depletion_data *dep;
 	struct track_data *track;
@@ -7617,6 +7619,10 @@ void free_shared_room_data(struct shared_room_data *data) {
 	while ((track = data->tracks)) {
 		data->tracks = track->next;
 		free(track);
+	}
+	
+	if (data->trench_event) {
+		event_cancel(data->trench_event, cancel_trench_fill_event);
 	}
 	
 	free(data);

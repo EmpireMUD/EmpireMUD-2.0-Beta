@@ -2066,6 +2066,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_EXTRA_REDESIGNATE_TIME  15
 #define ROOM_EXTRA_CEDED  16	// used to mark that a room was ceded to someone and never used by the empire, to prevent cede+steal
 #define ROOM_EXTRA_MINE_GLB_VNUM  17
+#define ROOM_EXTRA_TRENCH_FILL_TIME  18  // when the trench will be filled
 
 
 // number of different appearances
@@ -3882,6 +3883,12 @@ struct room_expire_event_data {
 };
 
 
+// for trench filling
+struct trench_event_data {
+	struct map_data *map;
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// FACTION STRUCTS /////////////////////////////////////////////////////////
 
@@ -4494,6 +4501,9 @@ struct shared_room_data {
 	struct depletion_data *depletion;	// resource depletion
 	struct room_extra_data *extra_data;	// hash of misc storage
 	struct track_data *tracks;	// for tracking
+	
+	// events
+	struct event *trench_event;	// if filling
 };
 
 

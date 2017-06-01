@@ -2690,6 +2690,7 @@ const char *room_extra_types[] = {
 	"redesignate time",
 	"ceded",
 	"mine global vnum",
+	"trench fill time",
 	"\n"
 };
 

@@ -1621,37 +1621,6 @@ void real_update_obj(obj_data *obj) {
  //////////////////////////////////////////////////////////////////////////////
 //// ROOM LIMITS /////////////////////////////////////////////////////////////
 
-/**
-* Point update (per mud hour / 75 seconds) for each room.
-*
-* @param room_data *room The room to update.
-*/
-void point_update_room(room_data *room) {
-	void fill_trench(room_data *room);
-
-	// map-only portion
-	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-		if (ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH) && get_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS) >= 0) {
-			if (weather_info.sky >= SKY_RAINING) {
-				add_to_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS, config_get_int("trench_gain_from_rain"));
-				if (get_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS) >= config_get_int("trench_full_value")) {
-					fill_trench(room);
-				}
-			}
-			
-			// still a trench? (may have been filled by rain)
-			if (ROOM_SECT_FLAGGED(room, SECTF_IS_TRENCH)) {
-				if (find_flagged_sect_within_distance_from_room(room, SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER, NOBITS, 1)) {
-					fill_trench(room);
-				}
-			}
-		}
-	}
-	
-	// ensure these are up to date
-	SET_BIT(ROOM_AFF_FLAGS(room), ROOM_BASE_FLAGS(room));
-}
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// VEHICLE LIMITS //////////////////////////////////////////////////////////
@@ -2083,7 +2052,6 @@ void point_update(bool run_real) {
 	void update_players_online_stats();
 	
 	vehicle_data *veh, *next_veh;
-	room_data *room, *next_room;
 	obj_data *obj, *next_obj;
 	char_data *ch, *next_ch;
 	
@@ -2137,11 +2105,6 @@ void point_update(bool run_real) {
 		
 		real_update_obj(obj);
 		point_update_obj(obj);
-	}
-	
-	// rooms
-	HASH_ITER(hh, world_table, room, next_room) {
-		point_update_room(room);
 	}
 }
 

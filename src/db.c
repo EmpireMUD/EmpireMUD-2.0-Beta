@@ -898,14 +898,19 @@ void process_temporary_room_data(void) {
 }
 
 
-/* resolve all vnums in the world */
+/**
+* resolve all vnums in the world and schedules some events that can't be
+* scheduled until this point.
+*/
 void renum_world(void) {
 	void schedule_burn_down(room_data *room);
 	void schedule_room_affect_expire(room_data *room, struct affected_type *af);
+	void schedule_trench_fill(struct map_data *map);
 	
 	room_data *room, *next_room, *home;
 	struct room_direction_data *ex, *next_ex, *temp;
 	struct affected_type *af;
+	struct map_data *map;
 	
 	process_temporary_room_data();
 	
@@ -956,6 +961,13 @@ void renum_world(void) {
 		
 		// ensure affects
 		affect_total_room(room);
+	}
+	
+	// schedule map events
+	LL_FOREACH(land_map, map) {
+		if (get_extra_data(map->shared->extra_data, ROOM_EXTRA_TRENCH_FILL_TIME) > 0) {
+			schedule_trench_fill(map);
+		}
 	}
 }
 

@@ -1642,10 +1642,13 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "tavern_timer", CONFTYPE_INT, "# of 5-minute updates for tavern resource cost");
 	init_config(CONFIG_ACTIONS, "trench_initial_value", CONFTYPE_INT, "negative starting value for excavate -- done when it counts up to 0");
 	init_config(CONFIG_ACTIONS, "trench_gain_from_rain", CONFTYPE_INT, "amount of rain water per room update added to a trench");
-	init_config(CONFIG_ACTIONS, "trench_full_value", CONFTYPE_INT, "amount of water needed to fill a trench");
+	init_config(CONFIG_ACTIONS, "trench_fill_time", CONFTYPE_INT, "seconds before a trench is full");
 	init_config(CONFIG_ACTIONS, "max_chore_resource", CONFTYPE_INT, "max items workforce will collect");
 	init_config(CONFIG_ACTIONS, "max_chore_resource_over_total", CONFTYPE_INT, "how much of a resource workers will gather if over the total cap");
 	init_config(CONFIG_ACTIONS, "max_chore_resource_skilled", CONFTYPE_INT, "workforce cap for skilled labor");
+	
+	// TODO: deprecated
+	init_config(CONFIG_ACTIONS, "trench_full_value", CONFTYPE_INT, "deprecated: do not set");
 
 	// cities
 	init_config(CONFIG_CITY, "players_per_city_point", CONFTYPE_INT, "how many members you need to earn each city point");
@@ -1799,7 +1802,7 @@ void init_config_system(void) {
 	init_config(CONFIG_WORLD, "tropics_percent", CONFTYPE_DOUBLE, "what percent of the middle of the map is tropics");
 	
 	// TODO note: deprecated
-	init_config(CONFIG_WORLD, "ocean_pool_size", CONFTYPE_INT, "how many spare ocean tiles to keep on-hand");
+	init_config(CONFIG_WORLD, "ocean_pool_size", CONFTYPE_INT, "deprecated: do not set");
 	
 	// TODO sector types should be audited on startup to ensure they exist -pc
 	init_config(CONFIG_WORLD, "default_building_sect", CONFTYPE_INT, "vnum of sector used by build command");

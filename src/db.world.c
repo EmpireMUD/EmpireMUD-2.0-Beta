@@ -35,6 +35,7 @@
 *   Room Resets
 *   Sector Indexing
 *   Territory
+*   Trench Filling
 *   Evolutions
 *   Helpers
 *   Map Output
@@ -188,6 +189,7 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	remove_room_extra_data(room, ROOM_EXTRA_HARVEST_PROGRESS);
 	remove_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS);
 	remove_room_extra_data(room, ROOM_EXTRA_SEED_TIME);
+	remove_room_extra_data(room, ROOM_EXTRA_TRENCH_FILL_TIME);
 	
 	// always reset some depletions
 	remove_depletion(room, DPLTN_CHOP);
@@ -591,6 +593,7 @@ void fill_trench(room_data *room) {
 			act(lbuf, FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
 		}
 		change_terrain(room, evo->becomes);
+		remove_room_extra_data(room, ROOM_EXTRA_TRENCH_FILL_TIME);
 	}
 }
 
@@ -2178,6 +2181,63 @@ void reread_empire_tech(empire_data *emp) {
 	
 	// trigger a re-sort now
 	resort_empires(FALSE);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// TRENCH FILLING //////////////////////////////////////////////////////////
+
+// fills trench when complete
+EVENTFUNC(trench_fill_event) {
+	void fill_trench(room_data *room);
+	
+	struct trench_event_data *trench_data = (struct trench_event_data *)event_obj;
+	struct map_data *map;
+	room_data *room;
+	
+	// grab data and free it
+	map = trench_data->map;
+	room = real_room(map->vnum);
+	free(trench_data);
+	
+	// cancel this first
+	map->shared->trench_event = NULL;
+	
+	// check if trenchy
+	if (!SECT_FLAGGED(map->sector_type, SECTF_IS_TRENCH)) {
+		return 0;
+	}
+	
+	// fill mctrenchy
+	fill_trench(room);
+	
+	// do not reenqueue
+	return 0;
+}
+
+
+// frees memory when room expiry is canceled
+EVENT_CANCEL_FUNC(cancel_trench_fill_event) {
+	struct trench_event_data *data = (struct trench_event_data *)event_obj;
+	free(data);
+}
+
+
+/**
+* Schedules the event handler for trench filling.
+*
+* @param struct map_data *map The map tile to schedule it on.
+*/
+void schedule_trench_fill(struct map_data *map) {
+	long when = get_extra_data(map->shared->extra_data, ROOM_EXTRA_TRENCH_FILL_TIME);
+	struct trench_event_data *trench_data;
+	
+	if (!map->shared->trench_event) {
+		CREATE(trench_data, struct trench_event_data, 1);
+		trench_data->map = map;
+		
+		map->shared->trench_event = event_create(trench_fill_event, (void*)trench_data, (when > 0 ? ((when - time(0)) * PASSES_PER_SEC) : 1));
+	}
 }
 
 
