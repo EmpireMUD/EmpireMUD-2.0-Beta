@@ -81,6 +81,7 @@ void init_room(room_data *room, room_vnum vnum);
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
 void ruin_one_building(room_data *room);
 void save_world_map_to_file();
+void schedule_check_unload(room_data *room);
 void schedule_trench_fill(struct map_data *map);
 extern int sort_empire_islands(struct empire_island *a, struct empire_island *b);
 void update_island_names();
@@ -893,7 +894,6 @@ void update_world(void) {
 	static int last_save_group = -1;
 
 	room_data *iter, *next_iter;
-	bool deleted = FALSE;
 	
 	// update save group
 	++last_save_group;
@@ -908,14 +908,7 @@ void update_world(void) {
 		}
 		
 		// skip unload-able map rooms COMPLETELY
-		if (CAN_UNLOAD_MAP_ROOM(iter)) {
-			// unload it while we're here?
-			if (!number(0, 4)) {
-				delete_room(iter, FALSE);
-				// deleted = TRUE;	// no need to check exits?
-			}
-		}
-		else {
+		if (!CAN_UNLOAD_MAP_ROOM(iter)) {
 			// reset non-adventures (adventures reset themselves)
 			if (!IS_ADVENTURE_ROOM(iter)) {
 				reset_wtrigger(iter);
@@ -929,11 +922,6 @@ void update_world(void) {
 				grow_crop(iter);
 			}
 		}
-	}
-	
-	// not currently bothering with this	
-	if (deleted) {
-		check_all_exits();
 	}
 }
 
@@ -1316,7 +1304,7 @@ EVENTFUNC(burn_down_event) {
 	void death_log(char_data *ch, char_data *killer, int type);
 	extern obj_data *die(char_data *ch, char_data *killer);
 	
-	struct burning_event_data *burn_data = (struct burning_event_data *)event_obj;
+	struct room_event_data *burn_data = (struct room_event_data *)event_obj;
 	obj_data *obj, *next_obj;
 	char_data *ch, *next_ch;
 	empire_data *emp;
@@ -1382,7 +1370,7 @@ EVENTFUNC(burn_down_event) {
 
 // frees memory when burning is canceled
 EVENT_CANCEL_FUNC(cancel_burn_event) {
-	struct burning_event_data *burn_data = (struct burning_event_data *)event_obj;
+	struct room_event_data *burn_data = (struct room_event_data *)event_obj;
 	free(burn_data);
 }
 
@@ -1394,11 +1382,11 @@ EVENT_CANCEL_FUNC(cancel_burn_event) {
 * @param room_data *room The room to burn.
 */
 void schedule_burn_down(room_data *room) {
-	struct burning_event_data *burn_data;
+	struct room_event_data *burn_data;
 	
 	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->burn_down_time > 0) {
 		// create the event
-		CREATE(burn_data, struct burning_event_data, 1);
+		CREATE(burn_data, struct room_event_data, 1);
 		burn_data->room = room;
 		
 		COMPLEX_DATA(room)->burn_event = event_create(burn_down_event, burn_data, (COMPLEX_DATA(room)->burn_down_time - time(0)) * PASSES_PER_SEC);
@@ -2526,6 +2514,26 @@ void check_all_exits(void) {
 }
 
 
+// checks if the room can be unloaded, and does it
+EVENTFUNC(check_unload_room) {
+	struct room_event_data *data = (struct room_event_data *)event_obj;
+	room_data *room;
+	
+	// grab data but don't free
+	room = data->room;
+	
+	if (CAN_UNLOAD_MAP_ROOM(room)) {
+		free(data);
+		delete_stored_event(&SHARED_DATA(room)->events, SEV_CHECK_UNLOAD);	// delete first so it doesn't free/cancel
+		delete_room(room, FALSE);	// no need to check exits (CAN_UNLOAD_MAP_ROOM checks them)
+		return 0;	// do not reenqueue
+	}
+	else {
+		return (10 * 60) RL_SEC;	// reenqueue for 10 minutes
+	}
+}
+
+
 /**
 * clears ROOM_PRIVATE_OWNER for id
 *
@@ -2634,6 +2642,9 @@ room_data *load_map_room(room_vnum vnum) {
 	if (!CAN_UNLOAD_MAP_ROOM(room)) {
 		need_world_index = TRUE;
 	}
+	
+	// checks if it's unloadable, and unloads it
+	schedule_check_unload(room);
 	
 	return room;
 }
@@ -2950,6 +2961,25 @@ void ruin_one_building(room_data *room) {
 		
 		// run completion on the ruins
 		complete_building(room);
+	}
+}
+
+
+/**
+* Schedules the event handler for unloading a map event.
+*
+* @param struct map_data *map The map tile to schedule it on.
+*/
+void schedule_check_unload(room_data *room) {
+	struct room_event_data *data;
+	struct event *ev;
+	
+	if (!find_stored_event(SHARED_DATA(room)->events, SEV_CHECK_UNLOAD)) {
+		CREATE(data, struct room_event_data, 1);
+		data->room = room;
+		
+		ev = event_create(check_unload_room, (void*)data, (10 * 60) RL_SEC);
+		add_stored_event(&SHARED_DATA(room)->events, SEV_CHECK_UNLOAD, ev);
 	}
 }
 

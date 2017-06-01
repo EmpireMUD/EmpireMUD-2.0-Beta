@@ -5421,12 +5421,14 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 //// STORED EVENT LIB ////////////////////////////////////////////////////////
 
 // cancel func externs
+EVENT_CANCEL_FUNC(cancel_room_event);
 EVENT_CANCEL_FUNC(cancel_trench_fill_event);
 
 
 // SEV_x: list of cancel functions
 struct stored_event_info_t stored_event_info[] = {
 	{ cancel_trench_fill_event },	// SEV_TRENCH_FILL
+	{ cancel_room_event },	// SEV_CHECK_UNLOAD
 };
 
 
@@ -5505,6 +5507,13 @@ struct stored_event *find_stored_event(struct stored_event *list, int type) {
 	
 	HASH_FIND_INT(list, &type, find);
 	return find;
+}
+
+
+// generic canceller for room events) {
+EVENT_CANCEL_FUNC(cancel_room_event) {
+	struct room_event_data *data = (struct room_event_data *)event_obj;
+	free(data);
 }
 
 

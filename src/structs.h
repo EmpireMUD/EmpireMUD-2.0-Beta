@@ -975,6 +975,7 @@ typedef struct vehicle_data vehicle_data;
 
 // SEV_x: stored event types
 #define SEV_TRENCH_FILL  0
+#define SEV_CHECK_UNLOAD  1
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -3884,7 +3885,7 @@ struct empire_data {
 //// EVENT STRUCTS ///////////////////////////////////////////////////////////
 
 // data for the event when a building is burning
-struct burning_event_data {
+struct room_event_data {
 	room_data *room;
 };
 
