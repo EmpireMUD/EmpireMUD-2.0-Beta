@@ -2849,6 +2849,8 @@ void grow_crop(struct map_data *map) {
 	struct evolution_data *evo;
 	sector_data *stored, *becomes;
 	
+	remove_extra_data(&map->shared->extra_data, ROOM_EXTRA_SEED_TIME);
+	
 	// nothing to grow
 	if (!SECT_FLAGGED(map->sector_type, SECTF_HAS_CROP_DATA) || !(evo = get_evolution_by_type(map->sector_type, EVO_CROP_GROWS)) || !(becomes = sector_proto(evo->becomes))) {
 		return;
