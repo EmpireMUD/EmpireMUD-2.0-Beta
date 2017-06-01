@@ -1588,9 +1588,9 @@ void do_chore_fire_brigade(empire_data *emp, room_data *room) {
 	if (worker && IS_BURNING(room)) {
 		act("$n throws a bucket of water to douse the flames!", FALSE, worker, NULL, NULL, TO_ROOM);
 		
-		// compute how many in order to put it out before it burns down
-		total_ticks = (int)(config_get_int("burn_down_time") / SECS_PER_MUD_HOUR) - 1;
-		per_hour = ceil(config_get_int("fire_extinguish_value") / total_ticks);
+		// compute how many in order to put it out before it burns down (giving the mob an hour to spawn)
+		total_ticks = (int)(config_get_int("burn_down_time") / SECS_PER_MUD_HOUR) - 2;
+		per_hour = ceil(config_get_int("fire_extinguish_value") / total_ticks) + 1;
 		
 		add_to_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, -per_hour);
 
