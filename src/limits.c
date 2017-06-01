@@ -1650,12 +1650,6 @@ void point_update_room(room_data *room) {
 				}
 			}
 		}
-
-		if (room_affected_by_spell(room, ATYPE_DARKNESS) && weather_info.sunlight != SUN_DARK && !number(0, 1)) {
-			affect_from_room(room, ATYPE_DARKNESS);
-			if (ROOM_PEOPLE(room))
-				act("The darkness dissipates.", FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-		}
 	}
 
 	// WHOLE WORLD:
