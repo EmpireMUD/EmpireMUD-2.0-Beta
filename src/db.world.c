@@ -566,14 +566,13 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	// only have to free this info if not on the map (map rooms have a pointer to the map)
-	// this would be called free_shared_room_data() if it were a function
 	if (GET_ROOM_VNUM(room) >= MAP_SIZE && SHARED_DATA(room)) {
 		free_shared_room_data(SHARED_DATA(room));
 	}
 	
 	// free the room
 	free(room);
-		
+	
 	// maybe
 	// world_is_sorted = FALSE;
 	need_world_index = TRUE;
