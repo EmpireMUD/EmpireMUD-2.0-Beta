@@ -347,6 +347,7 @@ room_data *create_room(room_data *home) {
 * @param bool check_exits If TRUE, updates all world exits right away*.
 */
 void delete_room(room_data *room, bool check_exits) {
+	EVENT_CANCEL_FUNC(cancel_room_expire_event);
 	void extract_pending_chars();
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
@@ -470,6 +471,9 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	while ((af = ROOM_AFFECTS(room))) {
 		ROOM_AFFECTS(room) = af->next;
+		if (af->expire_event) {
+			event_cancel(af->expire_event, cancel_room_expire_event);
+		}
 		free(af);
 	}
 

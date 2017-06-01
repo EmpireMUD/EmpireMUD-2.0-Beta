@@ -1071,7 +1071,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	bool end = FALSE;
 	obj_data *obj;
 	double dbl_in;
-	long l_in[2];
+	long l_in[3];
 	char c_in;
 	
 	// allocate player if we didn't receive one
@@ -1204,11 +1204,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = atoi(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Affect:", length)) {
-					sscanf(line + length + 1, "%d %d %d %d %d %s", &i_in[0], &i_in[1], &i_in[2], &i_in[3], &i_in[4], str_in);
+					sscanf(line + length + 1, "%d %d %ld %d %d %s", &i_in[0], &i_in[1], &l_in[2], &i_in[3], &i_in[4], str_in);
 					CREATE(af, struct affected_type, 1);
 					af->type = i_in[0];
 					af->cast_by = i_in[1];
-					af->duration = i_in[2];
+					af->duration = l_in[2];
 					af->modifier = i_in[3];
 					af->location = i_in[4];
 					af->bitvector = asciiflag_conv(str_in);
@@ -1399,11 +1399,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 				}
 				else if (PFILE_TAG(line, "DoT Effect:", length)) {
-					sscanf(line + length + 1, "%d %d %d %d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3], &i_in[4], &i_in[5], &i_in[6]);
+					sscanf(line + length + 1, "%d %d %ld %d %d %d %d", &i_in[0], &i_in[1], &l_in[2], &i_in[3], &i_in[4], &i_in[5], &i_in[6]);
 					CREATE(dot, struct over_time_effect_type, 1);
 					dot->type = i_in[0];
 					dot->cast_by = i_in[1];
-					dot->duration = i_in[2];
+					dot->duration = l_in[2];
 					dot->damage_type = i_in[3];
 					dot->damage = i_in[4];
 					dot->stack = i_in[5];
@@ -2256,7 +2256,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Adventure Summon Map: %d\n", GET_ADVENTURE_SUMMON_RETURN_MAP(ch));
 	}
 	for (af = af_list; af; af = af->next) {	// stored earlier
-		fprintf(fl, "Affect: %d %d %d %d %d %s\n", af->type, af->cast_by, af->duration, af->modifier, af->location, bitv_to_alpha(af->bitvector));
+		fprintf(fl, "Affect: %d %d %ld %d %d %s\n", af->type, af->cast_by, af->duration, af->modifier, af->location, bitv_to_alpha(af->bitvector));
 	}
 	fprintf(fl, "Affect Flags: %s\n", bitv_to_alpha(AFF_FLAGS(ch)));
 	if (GET_APPARENT_AGE(ch)) {
@@ -2325,7 +2325,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Disguised Sex: %s\n", genders[(int) GET_DISGUISED_SEX(ch)]);
 	}
 	for (dot = ch->over_time_effects; dot; dot = dot->next) {
-		fprintf(fl, "DoT Effect: %d %d %d %d %d %d %d\n", dot->type, dot->cast_by, dot->duration, dot->damage_type, dot->damage, dot->stack, dot->max_stack);
+		fprintf(fl, "DoT Effect: %d %d %ld %d %d %d %d\n", dot->type, dot->cast_by, dot->duration, dot->damage_type, dot->damage, dot->stack, dot->max_stack);
 	}
 	
 	// 'E'

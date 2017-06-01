@@ -900,14 +900,20 @@ void process_temporary_room_data(void) {
 /* resolve all vnums in the world */
 void renum_world(void) {
 	void schedule_burn_down(room_data *room);
+	void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 	
 	room_data *room, *next_room, *home;
 	struct room_direction_data *ex, *next_ex, *temp;
+	struct affected_type *af;
 	
 	process_temporary_room_data();
-
-	// exits
+	
 	HASH_ITER(hh, world_table, room, next_room) {
+		// affects
+		LL_FOREACH(ROOM_AFFECTS(room), af) {
+			schedule_room_affect_expire(room, af);
+		}
+		
 		if (COMPLEX_DATA(room)) {
 			// events
 			if (COMPLEX_DATA(room)->burn_down_time > 0 && !COMPLEX_DATA(room)->burn_event) {

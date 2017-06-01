@@ -24,6 +24,7 @@
 #include "interpreter.h"
 #include "skills.h"
 #include "dg_scripts.h"
+#include "dg_event.h"
 #include "vnums.h"
 
 /**
@@ -81,6 +82,7 @@ void scale_item_to_level(obj_data *obj, int level);
 // locals
 static void add_obj_binding(int idnum, struct obj_binding **list);
 void remove_lore_record(char_data *ch, struct lore_data *lore);
+void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 
 // local file scope variables
 static int extractions_pending = 0;
@@ -88,6 +90,42 @@ static int extractions_pending = 0;
 
  //////////////////////////////////////////////////////////////////////////////
 //// AFFECT HANDLERS /////////////////////////////////////////////////////////
+
+// expiry event handler for rooms
+EVENTFUNC(room_affect_expire_event) {
+	struct room_expire_event_data *expire_data = (struct room_expire_event_data *)event_obj;
+	struct affected_type *af;
+	generic_data *gen;
+	room_data *room;
+	
+	// grab data and free it
+	room = expire_data->room;
+	af = expire_data->affect;
+	free(expire_data);
+	
+	// cancel this first
+	af->expire_event = NULL;
+	
+	if ((af->type > 0)) {
+		if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
+			if ((gen = find_generic(af->type, GENERIC_AFFECT)) && GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ROOM_PEOPLE(room)) {
+				act(GET_AFFECT_WEAR_OFF_TO_CHAR(gen), FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
+			}
+		}
+	}
+	affect_remove_room(room, af);
+	
+	// do not reenqueue
+	return 0;
+}
+
+
+// frees memory when room expiry is canceled
+EVENT_CANCEL_FUNC(cancel_room_expire_event) {
+	struct room_expire_event_data *data = (struct room_expire_event_data *)event_obj;
+	free(data);
+}
+
 
 /**
 * Call affect_remove with every af of "type"
@@ -542,7 +580,11 @@ void affect_remove_room(room_data *room, struct affected_type *af) {
 	if (ROOM_AFFECTS(room) == NULL) {
 		return;
 	}
-
+	
+	if (af->expire_event) {
+		event_cancel(af->expire_event, cancel_room_expire_event);
+	}
+	
 	REMOVE_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
 	// restore base flags, in case we removed one of them
 	SET_BIT(ROOM_AFF_FLAGS(room), ROOM_BASE_FLAGS(room));
@@ -591,8 +633,9 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 	*affected_alloc = *af;
 	affected_alloc->next = ROOM_AFFECTS(room);
 	ROOM_AFFECTS(room) = affected_alloc;
-
+	
 	SET_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
+	schedule_room_affect_expire(room, af);
 }
 
 
@@ -875,6 +918,26 @@ bool room_affected_by_spell(room_data *room, any_vnum type) {
 	}
 
 	return found;
+}
+
+
+/**
+* Schedules the event handler for a room's affect expiration.
+*
+* @param room_data *room The room with the effect on it.
+* @param struct affected_type *af The affect (already on the room) to set up expiry for.
+*/
+void schedule_room_affect_expire(room_data *room, struct affected_type *af) {
+	struct room_expire_event_data *expire_data;
+	
+	if (!af->expire_event && af->duration != UNLIMITED) {
+		// create the event
+		CREATE(expire_data, struct room_expire_event_data, 1);
+		expire_data->room = room;
+		expire_data->affect = af;
+		
+		af->expire_event = event_create(room_affect_expire_event, expire_data, (af->duration - time(0)) * PASSES_PER_SEC);
+	}
 }
 
 

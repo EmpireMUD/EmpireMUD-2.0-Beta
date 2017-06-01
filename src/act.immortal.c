@@ -4403,7 +4403,7 @@ void do_stat_room(char_data *ch) {
 		for (aff = ROOM_AFFECTS(IN_ROOM(ch)); aff; aff = aff->next) {
 			*buf2 = '\0';
 
-			sprintf(buf, "Affect: (%3dhr) &c%s&0 ", aff->duration + 1, get_generic_name_by_vnum(aff->type));
+			sprintf(buf, "Affect: (%3ldsec) &c%s&0 ", (aff->duration - time(0)), get_generic_name_by_vnum(aff->type));
 
 			if (aff->modifier) {
 				sprintf(buf2, "%+d to %s", aff->modifier, apply_types[(int) aff->location]);

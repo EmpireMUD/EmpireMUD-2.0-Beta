@@ -2175,11 +2175,13 @@ struct apply_data {
 struct affected_type {
 	any_vnum type;	// The type of spell that caused this
 	int cast_by;	// player ID (positive) or mob vnum (negative)
-	sh_int duration;	// For how long its effects will last
+	long duration;	// For how long its effects will last. NOTE: for room affects, this is expire timestamp (for players it's time in hours)
 	int modifier;	// This is added to apropriate ability
 	byte location;	// Tells which ability to change - APPLY_
 	bitvector_t bitvector;	// Tells which bits to set - AFF_
-
+	
+	struct event *expire_event;	// SOMETIMES these have scheduled events
+	
 	struct affected_type *next;
 };
 
@@ -3463,7 +3465,7 @@ struct cooldown_data {
 struct over_time_effect_type {
 	any_vnum type;	// ATYPE_
 	int cast_by;	// player ID (positive) or mob vnum (negative)
-	sh_int duration;	// time in 5-second real-updates
+	long duration;	// time in 5-second real-updates
 	sh_int damage_type;	// DAM_x type
 	sh_int damage;	// amount
 	sh_int stack;	// damage is multiplied by this
@@ -3870,6 +3872,13 @@ struct empire_data {
 // data for the event when a building is burning
 struct burning_event_data {
 	room_data *room;
+};
+
+
+// for room affect expiration
+struct room_expire_event_data {
+	room_data *room;
+	struct affected_type *affect;
 };
 
 

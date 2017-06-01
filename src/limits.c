@@ -1627,11 +1627,7 @@ void real_update_obj(obj_data *obj) {
 * @param room_data *room The room to update.
 */
 void point_update_room(room_data *room) {
-	void death_log(char_data *ch, char_data *killer, int type);
 	void fill_trench(room_data *room);
-
-	struct affected_type *af, *next_af;
-	generic_data *gen;
 
 	// map-only portion
 	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
@@ -1649,26 +1645,6 @@ void point_update_room(room_data *room) {
 					fill_trench(room);
 				}
 			}
-		}
-	}
-
-	// WHOLE WORLD:
-
-	// update room ffects
-	for (af = ROOM_AFFECTS(room); af; af = next_af) {
-		next_af = af->next;
-		if (af->duration >= 1) {
-			af->duration--;
-		}
-		else if (af->duration != UNLIMITED) {
-			if ((af->type > 0)) {
-				if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
-					if ((gen = find_generic(af->type, GENERIC_AFFECT)) && GET_AFFECT_WEAR_OFF_TO_CHAR(gen) && ROOM_PEOPLE(room)) {
-						act(GET_AFFECT_WEAR_OFF_TO_CHAR(gen), FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
-					}
-				}
-			}
-			affect_remove_room(room, af);
 		}
 	}
 	

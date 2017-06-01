@@ -259,7 +259,7 @@ generic.o: generic.c conf.h sysdep.h structs.h protocol.h uthash.h \
   vnums.h
 	$(CC) -c $(CFLAGS) generic.c
 handler.o: handler.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
-  db.h handler.h interpreter.h skills.h dg_scripts.h vnums.h
+  db.h handler.h interpreter.h skills.h dg_scripts.h dg_event.h vnums.h
 	$(CC) -c $(CFLAGS) handler.c
 instance.o: instance.c conf.h sysdep.h structs.h uthash.h utils.h db.h \
   comm.h handler.h dg_scripts.h
