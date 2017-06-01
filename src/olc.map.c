@@ -217,12 +217,11 @@ OLC_MODULE(mapedit_complete_room) {
 
 
 OLC_MODULE(mapedit_grow) {
-	sector_data *new_sect, *preserve;
+	sector_data *preserve;
 	struct evolution_data *evo;
 	
 	// percentage is checked in the evolution data
 	if ((evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_MAGIC_GROWTH))) {
-		new_sect = sector_proto(evo->becomes);
 		preserve = (BASE_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) ? BASE_SECT(IN_ROOM(ch)) : NULL;
 		
 		// messaging based on whether or not it's choppable
