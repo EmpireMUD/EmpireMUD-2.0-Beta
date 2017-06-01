@@ -2791,6 +2791,14 @@ building.
 
 See also: MAP OLC
 #d
+"MAPEDIT GROW"
+
+Usage:  .map grow
+
+Triggers immediate growth, similar to chant of nature.
+
+See also: MAP OLC
+#d
 "MAPEDIT ICON"
 
 Usage:  .map icon <icon>

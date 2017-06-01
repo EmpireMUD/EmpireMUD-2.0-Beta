@@ -237,6 +237,7 @@ OLC_MODULE(mapedit_decustomize);
 OLC_MODULE(mapedit_delete_exit);
 OLC_MODULE(mapedit_delete_room);
 OLC_MODULE(mapedit_exits);
+OLC_MODULE(mapedit_grow);
 OLC_MODULE(mapedit_icon);
 OLC_MODULE(mapedit_maintain);
 OLC_MODULE(mapedit_naturalize);
@@ -719,6 +720,7 @@ const struct olc_command_data olc_data[] = {
 	{ "deleteroom", mapedit_delete_room, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "description", mapedit_room_description, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "exit", mapedit_exits, OLC_MAP, OLC_CF_MAP_EDIT },
+	{ "grow", mapedit_grow, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "icon", mapedit_icon, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "maintain", mapedit_maintain, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "name", mapedit_room_name, OLC_MAP, OLC_CF_MAP_EDIT },

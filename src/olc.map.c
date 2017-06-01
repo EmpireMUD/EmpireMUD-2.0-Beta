@@ -216,6 +216,33 @@ OLC_MODULE(mapedit_complete_room) {
 }
 
 
+OLC_MODULE(mapedit_grow) {
+	sector_data *new_sect, *preserve;
+	struct evolution_data *evo;
+	
+	// percentage is checked in the evolution data
+	if ((evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_MAGIC_GROWTH))) {
+		new_sect = sector_proto(evo->becomes);
+		preserve = (BASE_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) ? BASE_SECT(IN_ROOM(ch)) : NULL;
+		
+		// messaging based on whether or not it's choppable
+		msg_to_char(ch, "You cause the room to grow around you.\r\n");
+		act("$n causes the room to grow around you.", FALSE, ch, NULL, NULL, TO_ROOM);
+		
+		change_terrain(IN_ROOM(ch), evo->becomes);
+		if (preserve) {
+			change_base_sector(IN_ROOM(ch), preserve);
+		}
+		
+		remove_depletion(IN_ROOM(ch), DPLTN_PICK);
+		remove_depletion(IN_ROOM(ch), DPLTN_FORAGE);
+	}
+	else {
+		msg_to_char(ch, "There's nothing to grow here (or a random growth chance failed).\r\n");
+	}
+}
+
+
 OLC_MODULE(mapedit_maintain) {
 	void finish_maintenance(char_data *ch, room_data *room);
 	
