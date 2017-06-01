@@ -6165,6 +6165,11 @@ void add_depletion(room_data *room, int type, bool multiple) {
 	struct depletion_data *dep;
 	bool found = FALSE;
 	
+	// shortcut: oceans are undepletable
+	if (SHARED_DATA(room) == &ocean_shared_data) {
+		return;
+	}
+	
 	for (dep = ROOM_DEPLETION(room); dep && !found; dep = dep->next) {
 		if (dep->type == type) {
 			dep->count += 1 + ((multiple && !number(0, 3)) ? 1 : 0);
@@ -6231,6 +6236,11 @@ void remove_depletion(room_data *room, int type) {
 void set_depletion(room_data *room, int type, int value) {
 	struct depletion_data *dep;
 	bool found = FALSE;
+	
+	// shortcut: oceans are undepletable
+	if (SHARED_DATA(room) == &ocean_shared_data) {
+		return;
+	}
 	
 	// shortcut
 	if (value <= 0) {
