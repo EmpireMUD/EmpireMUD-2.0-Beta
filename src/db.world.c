@@ -330,6 +330,7 @@ room_data *create_room(room_data *home) {
 	}
 	
 	COMPLEX_DATA(room)->home_room = home;
+	GET_MAP_LOC(room) = home ? GET_MAP_LOC(home) : NULL;
 	GET_ISLAND_ID(room) = home ? GET_ISLAND_ID(home) : NO_ISLAND;
 	GET_ISLAND(room) = home ? GET_ISLAND(home) : NULL;
 	
@@ -2532,6 +2533,7 @@ room_data *load_map_room(room_vnum vnum) {
 	CREATE(room, room_data, 1);
 	room->vnum = vnum;
 	SHARED_DATA(room) = map->shared;	// point to map
+	GET_MAP_LOC(room) = map;
 	add_room_to_world_tables(room);
 	
 	// do not use perform_change_sect here because we're only loading from the existing data
