@@ -1583,11 +1583,16 @@ void do_chore_fire_brigade(empire_data *emp, room_data *room) {
 	void stop_burning(room_data *room);
 	
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_FIRE_BRIGADE].mob);
+	int total_ticks, per_hour;
 	
 	if (worker && IS_BURNING(room)) {
 		act("$n throws a bucket of water to douse the flames!", FALSE, worker, NULL, NULL, TO_ROOM);
 		
-		add_to_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, number(-6, -2));
+		// compute how many in order to put it out before it burns down
+		total_ticks = (int)(config_get_int("burn_down_time") / SECS_PER_MUD_HOUR) - 1;
+		per_hour = ceil(config_get_int("fire_extinguish_value") / total_ticks);
+		
+		add_to_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, -per_hour);
 
 		if (get_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING) <= 0) {
 			act("The flames have been extinguished!", FALSE, worker, 0, 0, TO_ROOM);
