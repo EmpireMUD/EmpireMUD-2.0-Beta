@@ -2507,14 +2507,12 @@ EVENTFUNC(check_unload_room) {
 	room = data->room;
 	
 	if (CAN_UNLOAD_MAP_ROOM(room)) {
-		log("Check-unload (%d,%d) deleting", FLAT_X_COORD(room), FLAT_Y_COORD(room));
 		free(data);
 		delete_stored_event_room(room, SEV_CHECK_UNLOAD);	// delete first so it doesn't free/cancel
 		delete_room(room, FALSE);	// no need to check exits (CAN_UNLOAD_MAP_ROOM checks them)
 		return 0;	// do not reenqueue
 	}
 	else {
-		log("Check-unload (%d,%d) postponing", FLAT_X_COORD(room), FLAT_Y_COORD(room));
 		return (5 * 60) RL_SEC;	// reenqueue for 10 minutes
 	}
 }
