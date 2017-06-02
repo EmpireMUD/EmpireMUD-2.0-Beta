@@ -2749,10 +2749,12 @@ EVENTFUNC(run_reset_triggers) {
 * it and schedules the event. If not, it clears that data.
 *
 * @param room_data *room The room to check for tavernness.
+* @param bool random_offest If TRUE, throws in some random in the 1st timer.
 */
-void check_reset_trigger_event(room_data *room) {
+void check_reset_trigger_event(room_data *room, bool random_offset) {
 	struct room_event_data *data;
 	struct event *ev;
+	int mins;
 	
 	if (!IS_ADVENTURE_ROOM(room) && SCRIPT_CHECK(room, WTRIG_RESET)) {
 		if (!find_stored_event_room(room, SEV_RESET_TRIGGER)) {
@@ -2760,7 +2762,8 @@ void check_reset_trigger_event(room_data *room) {
 			data->room = room;
 		
 			// schedule every 7.5 minutes
-			ev = event_create(run_reset_triggers, (void*)data, (7.5 * 60) RL_SEC);
+			mins = 7.5 - (random_offset ? number(0,6) : 0);
+			ev = event_create(run_reset_triggers, (void*)data, (mins * 60) RL_SEC);
 			add_stored_event_room(room, SEV_RESET_TRIGGER, ev);
 		}
 	}

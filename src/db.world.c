@@ -383,6 +383,7 @@ void delete_room(room_data *room, bool check_exits) {
 		dg_owner_room = NULL;
 	}
 	
+	// delete this first
 	cancel_stored_event_room(room, SEV_CHECK_UNLOAD);
 	
 	// ensure not owned
