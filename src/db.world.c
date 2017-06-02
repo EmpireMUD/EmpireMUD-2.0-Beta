@@ -796,72 +796,38 @@ void set_crop_type(room_data *room, crop_data *cp) {
 //// MANAGEMENT //////////////////////////////////////////////////////////////
 
 /**
-* Save a fresh index file for the world.
-*/
-void save_world_index(void) {
-	char filename[64], tempfile[64];
-	room_data *iter, *next_iter;
-	room_vnum vnum;
-	int this, last;
-	FILE *fl;
-	
-	// we only need this if the size of the world changed
-	if (!need_world_index) {
-		return;
-	}
-	
-	sort_world_table();
-	
-	sprintf(filename, "%s%s", WLD_PREFIX, INDEX_FILE);
-	strcpy(tempfile, filename);
-	strcat(tempfile, TEMP_SUFFIX);
-	
-	if (!(fl = fopen(tempfile, "w"))) {
-		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Unable to write index file '%s': %s", filename, strerror(errno));
-		return;
-	}
-	
-	last = -1;
-	HASH_ITER(hh, world_table, iter, next_iter) {
-		vnum = GET_ROOM_VNUM(iter);
-		this = GET_WORLD_BLOCK(vnum);
-		
-		if (this != last) {
-			fprintf(fl, "%d%s\n", this, WLD_SUFFIX);
-			last = this;
-		}
-	}
-	
-	fprintf(fl, "$\n");
-	fclose(fl);
-	
-	// and move the temp file over
-	rename(tempfile, filename);
-	need_world_index = FALSE;
-}
-
-
-/**
 * Executes a full-world save.
 */
 void save_whole_world(void) {
 	void save_instances();
 	
+	FILE *fl = NULL, *index = NULL;
 	room_data *iter, *next_iter;
 	room_vnum vnum;
 	int block, last;
-	FILE *fl = NULL;
 	
 	last = -1;
 	
 	// must sort first
 	sort_world_table();
 	
+	// open index file
+	if (need_world_index) {
+		if (!(index = fopen(WLD_PREFIX INDEX_FILE TEMP_SUFFIX, "w"))) {
+			syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Unable to write index file '%s': %s", WLD_PREFIX INDEX_FILE TEMP_SUFFIX, strerror(errno));
+			return;
+		}
+	}
+	
 	HASH_ITER(hh, world_table, iter, next_iter) {
 		vnum = GET_ROOM_VNUM(iter);
 		block = GET_WORLD_BLOCK(vnum);
 		
 		if (block != last || !fl) {
+			if (index) {
+				fprintf(index, "%d%s\n", block, WLD_SUFFIX);
+			}
+			
 			if (fl) {
 				save_and_close_world_file(fl, last);
 				fl = NULL;
@@ -880,9 +846,14 @@ void save_whole_world(void) {
 	if (fl) {
 		save_and_close_world_file(fl, last);
 	}
+	if (index) {
+		fprintf(index, "$\n");
+		fclose(index);
+		rename(WLD_PREFIX INDEX_FILE TEMP_SUFFIX, WLD_PREFIX INDEX_FILE);
+		need_world_index = FALSE;
+	}
 	
 	// ensure this
-	save_world_index();
 	save_instances();
 	save_world_map_to_file();
 }
