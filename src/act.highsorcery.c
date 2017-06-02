@@ -1705,6 +1705,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 		if (rand_room && !ROOM_IS_CLOSED(rand_room) && can_teleport_to(ch, rand_room, TRUE)) {
 			to_room = rand_room;
 		}
+		++tries;
 	}
 	
 	if (!to_room || !can_teleport_to(ch, to_room, TRUE) || !(map = get_map_location_for(to_room))) {
