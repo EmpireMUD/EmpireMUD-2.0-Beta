@@ -2760,7 +2760,7 @@ void check_reset_trigger_event(room_data *room, bool random_offset) {
 		if (!find_stored_event_room(room, SEV_RESET_TRIGGER)) {
 			CREATE(data, struct room_event_data, 1);
 			data->room = room;
-		
+			
 			// schedule every 7.5 minutes
 			mins = 7.5 - (random_offset ? number(0,6) : 0);
 			ev = event_create(run_reset_triggers, (void*)data, (mins * 60) RL_SEC);

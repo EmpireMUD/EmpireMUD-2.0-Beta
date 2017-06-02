@@ -5476,7 +5476,7 @@ void cancel_stored_event(struct stored_event **list, int type) {
 	struct stored_event *sev = find_stored_event(*list, type);
 	
 	if (sev && sev->ev) {
-		(stored_event_info[type].cancel)(sev->ev);	// cancel func
+		event_cancel(sev->ev, stored_event_info[type].cancel);
 		sev->ev = NULL;
 	}
 	
