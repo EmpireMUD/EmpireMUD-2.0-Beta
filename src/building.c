@@ -385,7 +385,12 @@ void disassociate_building(room_data *room) {
 	remove_room_extra_data(room, ROOM_EXTRA_BUILD_RECIPE);
 	remove_room_extra_data(room, ROOM_EXTRA_FOUND_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_REDESIGNATE_TIME);
-
+	
+	// some event types must be canceled
+	cancel_stored_event_room(room, SEV_BURN_DOWN);
+	cancel_stored_event_room(room, SEV_TAVERN);
+	cancel_stored_event_room(room, SEV_RESET_TRIGGER);
+	
 	// disassociate inside rooms
 	for (iter = interior_room_list; iter; iter = next_iter) {
 		next_iter = iter->next_interior;
