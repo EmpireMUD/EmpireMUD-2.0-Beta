@@ -34,7 +34,7 @@ struct event {
 /***** Queue related info ******/
 
 /* number of queues to use (reduces enqueue cost) */
-#define NUM_EVENT_QUEUES    100
+#define NUM_EVENT_QUEUES    250
 
 struct queue {
 	struct q_element *head[NUM_EVENT_QUEUES], *tail[NUM_EVENT_QUEUES];

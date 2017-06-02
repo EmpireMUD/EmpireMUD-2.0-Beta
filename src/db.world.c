@@ -3006,7 +3006,7 @@ void schedule_check_unload(room_data *room, bool offset) {
 		
 		mins = 5;
 		if (offset) {
-			mins += number(-30, 30) / 10.0;
+			mins += number(-300, 300) / 100.0;
 		}
 		ev = event_create(check_unload_room, (void*)data, (mins * 60) RL_SEC);
 		add_stored_event_room(room, SEV_CHECK_UNLOAD, ev);
