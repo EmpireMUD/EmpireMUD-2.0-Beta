@@ -560,7 +560,7 @@ void summon_materials(char_data *ch, char *argument) {
 		msg_to_char(ch, "Nothing like that is stored around here.\r\n");
 	}
 	else if (count == 0) {
-		msg_to_char(ch, "There is nothing stored in your empire nearby.\r\n");
+		// they must have gotten an error message
 	}
 	else {
 		// save the empire
@@ -1705,6 +1705,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 		if (rand_room && !ROOM_IS_CLOSED(rand_room) && can_teleport_to(ch, rand_room, TRUE)) {
 			to_room = rand_room;
 		}
+		++tries;
 	}
 	
 	if (!to_room || !can_teleport_to(ch, to_room, TRUE) || !(map = get_map_location_for(to_room))) {
