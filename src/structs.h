@@ -979,6 +979,7 @@ typedef struct vehicle_data vehicle_data;
 #define SEV_BURN_DOWN  2
 #define SEV_GROW_CROP  3
 #define SEV_TAVERN  4
+#define SEV_RESET_TRIGGER  5
 
 
  //////////////////////////////////////////////////////////////////////////////

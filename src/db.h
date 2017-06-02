@@ -166,9 +166,8 @@
 #define POLITICAL_MAP_FILE  DATA_DIR"map-political.txt"	// for political map
 #define CITY_DATA_FILE  DATA_DIR"map-cities.txt"	// for cities on the website
 
-// world blocks: the world is split into chunks for saving and updating
+// world blocks: the world is split into chunks for saving
 #define WORLD_BLOCK_SIZE  (MAP_WIDTH * 5)	// number of rooms per .wld file
-#define NUM_WORLD_BLOCK_UPDATES  15	// world is divided into this many updates, and one fires per 30 seconds
 #define GET_WORLD_BLOCK(roomvnum)  (roomvnum == NOWHERE ? NOWHERE : (int)(roomvnum / WORLD_BLOCK_SIZE))
 
 // additional files

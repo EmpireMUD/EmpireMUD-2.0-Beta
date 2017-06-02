@@ -237,7 +237,8 @@ dg_scripts.o: dg_scripts.c conf.h sysdep.h structs.h uthash.h \
   olc.h skills.h vnums.h
 	$(CC) -c $(CFLAGS) dg_scripts.c
 dg_triggers.o: dg_triggers.c conf.h sysdep.h structs.h uthash.h \
-  dg_scripts.h utils.h comm.h interpreter.h handler.h db.h skills.h olc.h
+  dg_scripts.h utils.h comm.h interpreter.h handler.h db.h skills.h olc.h \
+  dg_event.h
 	$(CC) -c $(CFLAGS) dg_triggers.c
 dg_vehcmd.o: dg_vehcmd.c conf.h sysdep.h structs.h uthash.h dg_scripts.h \
   utils.h comm.h interpreter.h handler.h db.h skills.h vnums.h

@@ -887,39 +887,6 @@ void save_whole_world(void) {
 }
 
 
-/**
-* Handles non-adventure reset triggers and other periodicals, on part of the
-* world every 30 seconds. The world is only actually saved every 30 minutes --
-* once per mud day.
-*/
-void update_world(void) {
-	static int last_save_group = -1;
-
-	room_data *iter, *next_iter;
-	
-	// update save group
-	++last_save_group;
-	if (last_save_group >= NUM_WORLD_BLOCK_UPDATES) {
-		last_save_group = 0;
-	}
-	
-	HASH_ITER(hh, world_table, iter, next_iter) {
-		// only do certain blocks
-		if ((GET_WORLD_BLOCK(GET_ROOM_VNUM(iter)) % NUM_WORLD_BLOCK_UPDATES) != last_save_group) {
-			continue;
-		}
-		
-		// skip unload-able map rooms COMPLETELY
-		if (!CAN_UNLOAD_MAP_ROOM(iter)) {
-			// reset non-adventures (adventures reset themselves)
-			if (!IS_ADVENTURE_ROOM(iter)) {
-				reset_wtrigger(iter);
-			}
-		}
-	}
-}
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// ANNUAL MAP UPDATE ///////////////////////////////////////////////////////
 

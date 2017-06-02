@@ -24,6 +24,7 @@
 #include "db.h"
 #include "skills.h"
 #include "olc.h"
+#include "dg_event.h"
 
 
 extern const char *cmd_door[];
@@ -2718,4 +2719,52 @@ int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct insta
 		}
 	}
 	return val;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// RESET TRIGGER HELPER ////////////////////////////////////////////////////
+
+// runs room reset triggers on a loop
+EVENTFUNC(run_reset_triggers) {
+	struct room_event_data *data = (struct room_event_data *)event_obj;
+	room_data *room;
+	
+	// grab data but don't free (we usually reschedule this)
+	room = data->room;
+	
+	// still have any?
+	if (IS_ADVENTURE_ROOM(room) || !SCRIPT_CHECK(room, WTRIG_RESET)) {
+		free(data);
+		return 0;
+	}
+	
+	reset_wtrigger(room);
+	return (7.5 * 60) RL_SEC;	// reenqueue for the original time
+}
+
+
+/**
+* Checks if a building is a tavern and can run. If so, sets up the data for
+* it and schedules the event. If not, it clears that data.
+*
+* @param room_data *room The room to check for tavernness.
+*/
+void check_reset_trigger_event(room_data *room) {
+	struct room_event_data *data;
+	struct event *ev;
+	
+	if (!IS_ADVENTURE_ROOM(room) && SCRIPT_CHECK(room, WTRIG_RESET)) {
+		if (!find_stored_event_room(room, SEV_RESET_TRIGGER)) {
+			CREATE(data, struct room_event_data, 1);
+			data->room = room;
+		
+			// schedule every 7.5 minutes
+			ev = event_create(run_reset_triggers, (void*)data, (7.5 * 60) RL_SEC);
+			add_stored_event_room(room, SEV_RESET_TRIGGER, ev);
+		}
+	}
+	else {
+		cancel_stored_event_room(room, SEV_RESET_TRIGGER);
+	}
 }
