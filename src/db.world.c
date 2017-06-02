@@ -82,7 +82,7 @@ void init_room(room_data *room, room_vnum vnum);
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
 void ruin_one_building(room_data *room);
 void save_world_map_to_file();
-void schedule_check_unload(room_data *room);
+void schedule_check_unload(room_data *room, bool offset);
 void schedule_trench_fill(struct map_data *map);
 extern int sort_empire_islands(struct empire_island *a, struct empire_island *b);
 void update_island_names();
@@ -2653,7 +2653,7 @@ room_data *load_map_room(room_vnum vnum) {
 	}
 	
 	// checks if it's unloadable, and unloads it
-	schedule_check_unload(room);
+	schedule_check_unload(room, FALSE);
 	
 	return room;
 }
@@ -2993,16 +2993,22 @@ void ruin_one_building(room_data *room) {
 * Schedules the event handler for unloading a map event.
 *
 * @param struct map_data *map The map tile to schedule it on.
+* @param bool offset If TRUE, offsets the time to reduce how many are scheduled at once.
 */
-void schedule_check_unload(room_data *room) {
+void schedule_check_unload(room_data *room, bool offset) {
 	struct room_event_data *data;
 	struct event *ev;
+	double mins;
 	
 	if (!find_stored_event_room(room, SEV_CHECK_UNLOAD)) {
 		CREATE(data, struct room_event_data, 1);
 		data->room = room;
 		
-		ev = event_create(check_unload_room, (void*)data, (5 * 60) RL_SEC);
+		mins = 5;
+		if (offset) {
+			mins += number(-30, 30) / 10.0;
+		}
+		ev = event_create(check_unload_room, (void*)data, (mins * 60) RL_SEC);
 		add_stored_event_room(room, SEV_CHECK_UNLOAD, ev);
 	}
 }
