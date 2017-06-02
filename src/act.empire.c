@@ -4600,6 +4600,8 @@ ACMD(do_islands) {
 
 
 ACMD(do_tavern) {
+	void check_tavern_setup(room_data *room);
+	
 	int iter, type = NOTHING, pos, old;
 	
 	one_argument(argument, arg);
@@ -4650,6 +4652,7 @@ ACMD(do_tavern) {
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_BREWING_TIME, config_get_int("tavern_brew_time"));
 			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
 			msg_to_char(ch, "This tavern will now brew %s.\r\n", tavern_data[type].name);
+			check_tavern_setup(IN_ROOM(ch));
 		}
 		else {
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE, old);

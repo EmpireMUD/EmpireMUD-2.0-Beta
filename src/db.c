@@ -903,6 +903,7 @@ void process_temporary_room_data(void) {
 * scheduled until this point.
 */
 void renum_world(void) {
+	void check_tavern_setup(room_data *room);
 	void schedule_burn_down(room_data *room);
 	void schedule_crop_growth(struct map_data *map);
 	void schedule_room_affect_expire(room_data *room, struct affected_type *af);
@@ -959,6 +960,9 @@ void renum_world(void) {
 				GET_MAP_LOC(room) = GET_MAP_LOC(home);
 			}
 		}
+		
+		// other room setup
+		check_tavern_setup(room);
 		
 		// ensure affects
 		affect_total_room(room);

@@ -2658,6 +2658,7 @@ int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, do
 * @param room_data *room The room to abandon.
 */
 void perform_abandon_room(room_data *room) {
+	void check_tavern_setup(room_data *room);
 	void deactivate_workforce_room(empire_data *emp, room_data *room);
 	void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter);
 	
@@ -2705,6 +2706,9 @@ void perform_abandon_room(room_data *room) {
 	// if a city center is abandoned, destroy it
 	if (IS_CITY_CENTER(room)) {
 		disassociate_building(room);
+	}
+	else {	// other building types
+		check_tavern_setup(room);
 	}
 }
 

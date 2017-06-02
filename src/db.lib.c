@@ -4310,6 +4310,7 @@ void remove_room_from_world_tables(room_data *room) {
 void parse_room(FILE *fl, room_vnum vnum) {
 	void add_trd_home_room(room_vnum vnum, room_vnum home_room);
 	void add_trd_owner(room_vnum vnum, empire_vnum owner);
+	void schedule_check_unload(room_data *room);
 
 	char line[256], line2[256], error_buf[256], error_log[MAX_STRING_LENGTH], str1[256], str2[256];
 	double dbl_in;
@@ -4333,6 +4334,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 	// attach/create shared data
 	if (vnum < MAP_SIZE) {
 		SHARED_DATA(room) = world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)].shared;
+		schedule_check_unload(room);
 	}
 	else {
 		CREATE(SHARED_DATA(room), struct shared_room_data, 1);
@@ -5432,6 +5434,7 @@ struct stored_event_info_t stored_event_info[] = {
 	{ cancel_room_event },	// SEV_CHECK_UNLOAD
 	{ cancel_burn_event },	// SEV_BURN_DOWN
 	{ cancel_map_event },	// SEV_GROW_CROP
+	{ cancel_room_event },	// SEV_TAVERN
 };
 
 

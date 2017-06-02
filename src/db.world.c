@@ -34,6 +34,7 @@
 *   City Lib
 *   Room Resets
 *   Sector Indexing
+*   Taverns
 *   Territory
 *   Trench Filling
 *   Evolutions
@@ -85,7 +86,6 @@ void schedule_check_unload(room_data *room);
 void schedule_trench_fill(struct map_data *map);
 extern int sort_empire_islands(struct empire_island *a, struct empire_island *b);
 void update_island_names();
-void update_tavern(room_data *room);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1901,6 +1901,92 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// TAVERNS /////////////////////////////////////////////////////////////////
+
+EVENTFUNC(tavern_update) {
+	extern bool extract_tavern_resources(room_data *room);
+	
+	struct room_event_data *data = (struct room_event_data *)event_obj;
+	room_data *room;
+	
+	// grab data but don't free (we usually reschedule this)
+	room = data->room;
+	
+	// still a tavern?
+	if (!ROOM_OWNER(room) || !room_has_function_and_city_ok(room, FNC_TAVERN)) {
+		// remove data and cancel event
+		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
+		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
+		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
+		free(data);
+		return 0;
+	}
+	
+	if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME) > 0) {
+		add_to_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME, -1);
+		if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME) == 0) {
+			// brew's ready!
+			set_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, config_get_int("tavern_timer"));
+		}
+	}
+	else if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME) >= 0) {
+		// count down to re-brew
+		add_to_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, -1);
+		
+		if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME) <= 0) {
+			// enough to go again?
+			if (extract_tavern_resources(room)) {
+				set_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, config_get_int("tavern_timer"));
+			}
+			else {
+				// can't afford to keep brewing
+				remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
+				remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
+				remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
+				
+				// free up data and cancel the event (it'll be rescheduled if they set a brew
+				free(data);
+				return 0;
+			}
+		}
+	}
+
+	return (7.5 * 60) RL_SEC;	// reenqueue for the original time
+}
+
+
+/**
+* Checks if a building is a tavern and can run. If so, sets up the data for
+* it and schedules the event. If not, it clears that data.
+*
+* @param room_data *room The room to check for tavernness.
+*/
+void check_tavern_setup(room_data *room) {
+	struct room_event_data *data;
+	struct event *ev;
+	
+	if (!ROOM_OWNER(room) || !room_has_function_and_city_ok(room, FNC_TAVERN)) {
+		// not a tavern or not set up
+		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
+		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
+		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
+		cancel_stored_event_room(room, SEV_TAVERN);
+		return;
+	}
+	
+	// otherwise, it IS a tavern and we'll just let the event function handle it
+	if (!find_stored_event_room(room, SEV_TAVERN)) {
+		CREATE(data, struct room_event_data, 1);
+		data->room = room;
+		
+		// schedule every 7.5 minutes -- the same frequency this ran under the old system
+		ev = event_create(tavern_update, (void*)data, (7.5 * 60) RL_SEC);
+		add_stored_event_room(room, SEV_TAVERN, ev);
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// TERRITORY ///////////////////////////////////////////////////////////////
 
 /**
@@ -2513,7 +2599,7 @@ EVENTFUNC(check_unload_room) {
 		return 0;	// do not reenqueue
 	}
 	else {
-		return (5 * 60) RL_SEC;	// reenqueue for 10 minutes
+		return (5 * 60) RL_SEC;	// reenqueue for 5 minutes
 	}
 }
 
@@ -3012,40 +3098,6 @@ void schedule_crop_growth(struct map_data *map) {
 // Simple sorter for empire islands
 int sort_empire_islands(struct empire_island *a, struct empire_island *b) {
 	return a->island - b->island;
-}
-
-
-/**
-* Runs the tavern resources on a location.
-*
-* @param room_data *room The tavern's room.
-*/
-void update_tavern(room_data *room) {
-	extern bool extract_tavern_resources(room_data *room);
-	
-	if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME) > 0) {
-		add_to_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME, -1);
-		if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME) == 0) {
-			// brew's ready!
-			set_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, config_get_int("tavern_timer"));
-		}
-	}
-	else if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME) >= 0) {
-		// count down to re-brew
-		add_to_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, -1);
-		
-		if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME) <= 0) {
-			// enough to go again?
-			if (extract_tavern_resources(room)) {
-				set_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, config_get_int("tavern_timer"));
-			}
-			else {
-				// can't afford to keep brewing
-				set_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE, BREW_NONE);
-				set_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME, config_get_int("tavern_brew_time"));
-			}
-		}
-	}
 }
 
 
