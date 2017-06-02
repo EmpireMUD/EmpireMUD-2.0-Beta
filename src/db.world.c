@@ -531,18 +531,20 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	// update instances (if it wasn't deleted already earlier)
-	for (inst = instance_list; inst; inst = inst->next) {
-		if (inst->location == room) {
-			SET_BIT(inst->flags, INST_COMPLETED);
-			inst->location = NULL;
-		}
-		if (inst->start == room) {
-			SET_BIT(inst->flags, INST_COMPLETED);
-			inst->start = NULL;
-		}
-		for (iter = 0; iter < inst->size; ++iter) {
-			if (inst->room[iter] == room) {
-				inst->room[iter] = NULL;
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) || (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance)) {
+		for (inst = instance_list; inst; inst = inst->next) {
+			if (inst->location == room) {
+				SET_BIT(inst->flags, INST_COMPLETED);
+				inst->location = NULL;
+			}
+			if (inst->start == room) {
+				SET_BIT(inst->flags, INST_COMPLETED);
+				inst->start = NULL;
+			}
+			for (iter = 0; iter < inst->size; ++iter) {
+				if (inst->room[iter] == room) {
+					inst->room[iter] = NULL;
+				}
 			}
 		}
 	}

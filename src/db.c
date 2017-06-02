@@ -905,6 +905,7 @@ void process_temporary_room_data(void) {
 void renum_world(void) {
 	void check_tavern_setup(room_data *room);
 	void schedule_burn_down(room_data *room);
+	void schedule_check_unload(room_data *room, bool offset);
 	void schedule_crop_growth(struct map_data *map);
 	void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 	void schedule_trench_fill(struct map_data *map);
@@ -963,6 +964,11 @@ void renum_world(void) {
 		
 		// other room setup
 		check_tavern_setup(room);
+		
+		// set up unload event
+		if (GET_ROOM_VNUM(room) < MAP_SIZE && !ROOM_OWNER(room)) {
+			schedule_check_unload(room, TRUE);
+		}
 		
 		// ensure affects
 		affect_total_room(room);

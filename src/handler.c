@@ -2661,6 +2661,7 @@ void perform_abandon_room(room_data *room) {
 	void check_tavern_setup(room_data *room);
 	void deactivate_workforce_room(empire_data *emp, room_data *room);
 	void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter);
+	void schedule_check_unload(room_data *room, bool offset);
 	
 	empire_data *emp = ROOM_OWNER(room);
 	struct empire_territory_data *ter;
@@ -2701,6 +2702,11 @@ void perform_abandon_room(room_data *room) {
 
 	if (ROOM_PRIVATE_OWNER(room) != NOBODY) {
 		COMPLEX_DATA(room)->private_owner = NOBODY;
+	}
+	
+	// reschedule unload check now that it's unowned
+	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+		schedule_check_unload(room, FALSE);
 	}
 	
 	// if a city center is abandoned, destroy it
@@ -2750,6 +2756,9 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
 		qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
 	}
+	
+	// claimed rooms are never unloadable anyway
+	cancel_stored_event_room(room, SEV_CHECK_UNLOAD);
 }
 
 
