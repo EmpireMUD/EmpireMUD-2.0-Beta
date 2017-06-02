@@ -278,6 +278,7 @@ bool delete_from_proto_list_by_vnum(struct trig_proto_list **list, trig_vnum vnu
 */
 void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
+	void free_freeable_triggers();
 	void remove_trigger_from_table(trig_data *trig);
 	
 	trig_data *trig;
@@ -343,6 +344,9 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 		}
 		delete_from_proto_list_by_vnum(&(room->proto_script), vnum);
 	}
+	
+	// free them before continuing (or risk memory error doom)
+	free_freeable_triggers();
 	
 	// remove from hash table (AFTER deleting live copies)
 	remove_trigger_from_table(trig);
