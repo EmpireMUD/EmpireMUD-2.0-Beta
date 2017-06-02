@@ -560,7 +560,7 @@ void summon_materials(char_data *ch, char *argument) {
 		msg_to_char(ch, "Nothing like that is stored around here.\r\n");
 	}
 	else if (count == 0) {
-		msg_to_char(ch, "There is nothing stored in your empire nearby.\r\n");
+		// they must have gotten an error message
 	}
 	else {
 		// save the empire
