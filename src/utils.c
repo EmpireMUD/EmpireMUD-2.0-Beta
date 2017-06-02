@@ -4417,7 +4417,7 @@ room_data *get_map_location_for(room_data *room) {
 room_data *find_load_room(char_data *ch) {
 	extern room_data *find_starting_location();
 	
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
 	room_data *rl, *rl_last_room, *found = NULL;
 	int num_found = 0;
 	sh_int island;
@@ -4434,7 +4434,7 @@ room_data *find_load_room(char_data *ch) {
 	// first: look for graveyard
 	if (!IS_NPC(ch) && (rl = real_room(GET_LAST_ROOM(ch))) && GET_LOYALTY(ch)) {
 		island = GET_ISLAND_ID(rl);
-		for (ter = EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)); ter; ter = ter->next) {
+		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)), ter, next_ter) {
 			if (room_has_function_and_city_ok(ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island && !IS_BURNING(ter->room)) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {

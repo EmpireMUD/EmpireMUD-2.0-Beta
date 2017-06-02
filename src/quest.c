@@ -195,14 +195,14 @@ void copy_quest_progress(struct req_data *to_list, struct req_data *from_list) {
 * @return int The number of completed buildings with that vnum, owned by emp.
 */
 int count_owned_buildings(empire_data *emp, bld_vnum vnum) {
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
 	int count = 0;	// ah ah ah
 	
 	if (!emp || vnum == NOTHING) {
 		return count;
 	}
 	
-	LL_FOREACH(EMPIRE_TERRITORY_LIST(emp), ter) {
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (!IS_COMPLETE(ter->room) || !GET_BUILDING(ter->room)) {
 			continue;
 		}

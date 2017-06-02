@@ -3770,6 +3770,7 @@ struct empire_storage_data {
 
 // list of rooms and buildings owned
 struct empire_territory_data {
+	room_vnum vnum;	// vnum of the room, for hashing
 	room_data *room;	// pointer to territory location
 	int population_timer;	// time to re-populate
 	
@@ -3777,7 +3778,7 @@ struct empire_territory_data {
 	
 	bool marked;	// for checking that rooms still exist
 	
-	struct empire_territory_data *next;	// linked list
+	UT_hash_handle hh;	// emp->territory_list hash
 };
 
 
@@ -3852,7 +3853,7 @@ struct empire_data {
 	struct empire_log_data *logs;
 	
 	// unsaved data
-	struct empire_territory_data *territory_list;	// linked list of buildings/rooms
+	struct empire_territory_data *territory_list;	// hash table by vnum
 	struct empire_city_data *city_list;	// linked list of cities
 	struct empire_workforce_tracker *ewt_tracker;	// workforce tracker
 	

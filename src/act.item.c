@@ -2099,13 +2099,13 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 * @return room_data* The found docks room, or NULL for none.
 */
 room_data *find_docks(empire_data *emp, int island_id) {
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
 	
 	if (!emp || island_id == NO_ISLAND) {
 		return NULL;
 	}
 	
-	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (GET_ISLAND_ID(ter->room) != island_id) {
 			continue;
 		}
@@ -2131,7 +2131,7 @@ room_data *find_docks(empire_data *emp, int island_id) {
 * @return vehicle_data* A ship, or NULL if none.
 */
 vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
 	struct shipping_data *iter;
 	bool already_used;
 	vehicle_data *veh;
@@ -2141,7 +2141,7 @@ vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 		return NULL;
 	}
 	
-	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (GET_ISLAND_ID(ter->room) != shipd->from_island) {
 			continue;
 		}

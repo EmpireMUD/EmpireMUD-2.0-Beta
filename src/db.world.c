@@ -361,7 +361,7 @@ void delete_room(room_data *room, bool check_exits) {
 	void remove_room_from_vehicle(room_data *room, vehicle_data *veh);
 
 	struct room_direction_data *ex, *next_ex, *temp;
-	struct empire_territory_data *ter, *next_ter;
+	struct empire_territory_data *ter;
 	struct empire_city_data *city, *next_city;
 	room_data *rm_iter, *next_rm, *home;
 	vehicle_data *veh, *next_veh;
@@ -370,7 +370,7 @@ void delete_room(room_data *room, bool check_exits) {
 	struct reset_com *reset;
 	char_data *c, *next_c;
 	obj_data *o, *next_o;
-	empire_data *emp, *next_emp;
+	empire_data *emp;
 	int iter;
 
 	if (!room || (GET_ROOM_VNUM(room) < MAP_SIZE && !CAN_UNLOAD_MAP_ROOM(room))) {
@@ -386,9 +386,24 @@ void delete_room(room_data *room, bool check_exits) {
 	// delete this first
 	cancel_stored_event_room(room, SEV_CHECK_UNLOAD);
 	
-	// ensure not owned
-	if (ROOM_OWNER(room)) {
-		perform_abandon_room(room);
+	// ensure not owned (and update empire stuff if so)
+	if ((emp = ROOM_OWNER(room))) {
+		if ((ter = find_territory_entry(emp, room))) {
+			delete_territory_entry(emp, ter);
+		}
+		
+		// update all empire cities
+		LL_FOREACH_SAFE(EMPIRE_CITY_LIST(emp), city, next_city) {
+			if (city->location == room) {
+				// ... this should not be possible, but just in case ...
+				perform_abandon_city(emp, city, FALSE);
+			}
+		}
+		
+		// still owned?
+		if (ROOM_OWNER(room)) {
+			perform_abandon_room(room);
+		}
 	}
 	
 	// delete any open instance here
@@ -545,27 +560,6 @@ void delete_room(room_data *room, bool check_exits) {
 				if (inst->room[iter] == room) {
 					inst->room[iter] = NULL;
 				}
-			}
-		}
-	}
-
-	// update empires
-	HASH_ITER(hh, empire_table, emp, next_emp) {
-		// update empire territory
-		for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = next_ter) {
-			next_ter = ter->next;
-			
-			if (ter->room == room) {
-				delete_territory_entry(emp, ter);
-			}
-		}
-		
-		// update all empire cities
-		for (city = EMPIRE_CITY_LIST(emp); city; city = next_city) {
-			next_city = city->next;
-			if (city->location == room) {
-				// ... this should not be possible, but just in case ...
-				perform_abandon_city(emp, city, FALSE);
 			}
 		}
 	}
@@ -2022,15 +2016,19 @@ void clear_empire_techs(empire_data *emp) {
 */
 struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room) {
 	struct empire_territory_data *ter;
+	room_vnum vnum = GET_ROOM_VNUM(room);
 	
-	CREATE(ter, struct empire_territory_data, 1);
-	ter->room = room;
-	ter->population_timer = config_get_int("building_population_timer");
-	ter->npcs = NULL;
-	ter->marked = FALSE;
-	
-	// put it at the end
-	LL_APPEND(EMPIRE_TERRITORY_LIST(emp), ter);
+	// only add if not already in there
+	HASH_FIND_INT(EMPIRE_TERRITORY_LIST(emp), &vnum, ter);
+	if (!ter) {
+		CREATE(ter, struct empire_territory_data, 1);
+		ter->room = room;
+		ter->population_timer = config_get_int("building_population_timer");
+		ter->npcs = NULL;
+		ter->marked = FALSE;
+		
+		HASH_ADD_INT(EMPIRE_TERRITORY_LIST(emp), vnum, ter);
+	}
 	
 	return ter;
 }
@@ -2048,13 +2046,13 @@ void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter)
 	
 	// prevent loss
 	if (ter == global_next_territory_entry) {
-		global_next_territory_entry = ter->next;
+		global_next_territory_entry = ter->hh.next;
 	}
 
 	delete_room_npcs(NULL, ter);
 	ter->npcs = NULL;
 	
-	LL_DELETE(EMPIRE_TERRITORY_LIST(emp), ter);
+	HASH_DEL(EMPIRE_TERRITORY_LIST(emp), ter);
 	free(ter);
 }
 
@@ -2091,7 +2089,7 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 			read_vault(e);
 
 			// reset marks to check for dead territory
-			for (ter = EMPIRE_TERRITORY_LIST(e); ter; ter = ter->next) {
+			HASH_ITER(hh, EMPIRE_TERRITORY_LIST(e), ter, next_ter) {
 				ter->marked = FALSE;
 			}
 			
@@ -2154,7 +2152,7 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 	// remove any territory that wasn't marked ... in case there is any
 	HASH_ITER(hh, empire_table, e, next_e) {
 		if (e == emp || !emp) {
-			LL_FOREACH_SAFE(EMPIRE_TERRITORY_LIST(e), ter, next_ter) {
+			HASH_ITER(hh, EMPIRE_TERRITORY_LIST(e), ter, next_ter) {
 				if (!ter->marked) {
 					delete_territory_entry(e, ter);
 				}

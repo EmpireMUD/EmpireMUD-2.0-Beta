@@ -1694,7 +1694,7 @@ void free_empire(empire_data *emp) {
 	struct empire_island *isle, *next_isle;
 	struct empire_storage_data *store;
 	struct empire_unique_storage *eus;
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
 	struct empire_city_data *city;
 	struct empire_political_data *pol;
 	struct empire_trade_data *trade;
@@ -1763,9 +1763,9 @@ void free_empire(empire_data *emp) {
 	}
 	
 	// free territory
-	while ((ter = emp->territory_list)) {
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (ter == global_next_territory_entry) {
-			global_next_territory_entry = ter->next;
+			global_next_territory_entry = ter->hh.next;
 		}
 		
 		// free npcs
@@ -1773,7 +1773,6 @@ void free_empire(empire_data *emp) {
 			delete_territory_npc(ter, ter->npcs);
 		}
 		
-		emp->territory_list = ter->next;
 		free(ter);
 	}
 	
@@ -2239,7 +2238,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 void write_empire_to_file(FILE *fl, empire_data *emp) {
 	struct empire_island *isle, *next_isle;
 	struct empire_political_data *emp_pol;
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
 	struct empire_trade_data *trade;
 	struct empire_city_data *city;
 	struct empire_log_data *elog;
@@ -2316,8 +2315,8 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 		fprintf(fl, "R%d\n%s~\n", iter, EMPIRE_RANK(emp, iter));
 
 	// T: territory buildings
-	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
-		fprintf(fl, "T %d %d\n", GET_ROOM_VNUM(ter->room), ter->population_timer);
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+		fprintf(fl, "T %d %d\n", ter->vnum, ter->population_timer);
 	
 		// npcs who live there
 		for (npc = ter->npcs; npc; npc = npc->next) {
@@ -2619,9 +2618,7 @@ void update_empire_npc_data(void) {
 		}
 		
 		// each territory spot
-		for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = next_ter) {
-			next_ter = ter->next;
-			
+		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 			if (--ter->population_timer <= 0) {
 				populate_npc(ter->room, ter);
 			}
@@ -2687,9 +2684,7 @@ void kill_empire_npc(char_data *ch) {
 	}
 	
 	// find and remove the entry
-	for (ter = EMPIRE_TERRITORY_LIST(emp); ter && !found; ter = ter_next) {
-		ter_next = ter->next;
-		
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, ter_next) {
 		for (npc = ter->npcs; npc && !found; npc = npc_next) {
 			npc_next = npc->next;
 			
@@ -2698,9 +2693,12 @@ void kill_empire_npc(char_data *ch) {
 				
 				// reset the population timer
 				ter->population_timer = building_population_timer;
-				
 				found = TRUE;
 			}
+		}
+		
+		if (found) {
+			break;
 		}
 	}
 	

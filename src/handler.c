@@ -2587,17 +2587,15 @@ struct empire_political_data *find_relation(empire_data *from, empire_data *to) 
 * @return struct empire_territory_data* the territory data, or NULL if not found
 */
 struct empire_territory_data *find_territory_entry(empire_data *emp, room_data *room) {
-	struct empire_territory_data *found = NULL, *ter_iter;
+	struct empire_territory_data *ter;
+	room_vnum vnum = GET_ROOM_VNUM(room);
 	
 	if (emp) {
-		for (ter_iter = EMPIRE_TERRITORY_LIST(emp); ter_iter && !found; ter_iter = ter_iter->next) {
-			if (ter_iter->room == room) {
-				found = ter_iter;
-			}
-		}
+		HASH_FIND_INT(EMPIRE_TERRITORY_LIST(emp), &vnum, ter);
+		return ter;	// if any
 	}
 	
-	return found;
+	return NULL;
 }
 
 

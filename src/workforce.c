@@ -577,7 +577,7 @@ bool can_gain_chore_resource_from_interaction(empire_data *emp, room_data *room,
 void chore_update(void) {
 	void ewt_free_tracker(struct empire_workforce_tracker **tracker);
 	
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
 	vehicle_data *veh, *next_veh;
 	empire_data *emp, *next_emp;
 	
@@ -593,10 +593,12 @@ void chore_update(void) {
 			// sort einv now to ensure it's in a useful order (most quantity first)
 			LL_SORT(EMPIRE_STORAGE(emp), sort_einv);
 			
+			// this uses a global next to avoid an issue where territory is freed mid-execution
 			global_next_territory_entry = NULL;
-			for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = global_next_territory_entry) {
-				global_next_territory_entry = ter->next;
+			HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+				global_next_territory_entry = next_ter;
 				process_one_chore(emp, ter->room);
+				next_ter = global_next_territory_entry;
 			}
 			
 			LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
@@ -761,8 +763,8 @@ char_data *find_chore_worker_in_room(room_data *room, mob_vnum vnum) {
 * @return struct empire_npc_data* The npc who will help, or NULL.
 */
 struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc) {
-	struct empire_territory_data *ter_iter;
-	struct empire_npc_data *found = NULL, *backup = NULL, *npc_iter;
+	struct empire_territory_data *ter_iter, *next_ter;
+	struct empire_npc_data *backup = NULL, *npc_iter;
 	room_data *rm;
 
 	int chore_distance = config_get_int("chore_distance");
@@ -772,12 +774,12 @@ struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc
 	}
 	
 	// massive iteration to try to find one
-	for (ter_iter = EMPIRE_TERRITORY_LIST(emp); ter_iter && !found; ter_iter = ter_iter->next) {
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter_iter, next_ter) {
 		// only bother checking anything if npcs live here
 		if (ter_iter->npcs) {			
 			if ((rm = ter_iter->room) && GET_ISLAND_ID(loc) == GET_ISLAND_ID(rm) && compute_distance(loc, rm) <= chore_distance) {
 				// iterate over population
-				for (npc_iter = ter_iter->npcs; npc_iter && !found; npc_iter = npc_iter->next) {
+				for (npc_iter = ter_iter->npcs; npc_iter; npc_iter = npc_iter->next) {
 					// only use citizens for laber
 					if (npc_iter->vnum == CITIZEN_MALE || npc_iter->vnum == CITIZEN_FEMALE) {
 						if (!backup && npc_iter->mob && GET_MOB_VNUM(npc_iter->mob) == npc_iter->vnum && !FIGHTING(npc_iter->mob)) {
@@ -785,7 +787,7 @@ struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc
 							backup = npc_iter;
 						}
 						else if (!npc_iter->mob) {
-							found = npc_iter;
+							return npc_iter;
 						}
 					}
 				}
@@ -793,10 +795,7 @@ struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc
 		}
 	}
 	
-	if (found) {
-		return found;
-	}
-	else if (backup) {
+	if (backup) {
 		if (backup->mob) {
 			act("$n leaves to go to work.", TRUE, backup->mob, NULL, NULL, TO_ROOM);
 			extract_char(backup->mob);

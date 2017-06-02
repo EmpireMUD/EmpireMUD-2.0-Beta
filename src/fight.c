@@ -1824,12 +1824,12 @@ void process_tower(room_data *room) {
 * Iterates over empires, finds guard towers, and tries to shoot with them.
 */
 void update_guard_towers(void) {
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *ter_next;
 	room_data *tower;
 	empire_data *emp, *next_emp;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
+		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, ter_next) {
 			tower = ter->room;
 			
 			if (room_has_function_and_city_ok(tower, FNC_GUARD_TOWER)) {

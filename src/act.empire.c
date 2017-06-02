@@ -2189,7 +2189,7 @@ bool extract_tavern_resources(room_data *room) {
 */
 void show_tavern_status(char_data *ch) {
 	empire_data *emp = GET_LOYALTY(ch);
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
 	bool found = FALSE;
 	
 	if (!emp) {
@@ -2198,7 +2198,7 @@ void show_tavern_status(char_data *ch) {
 	
 	msg_to_char(ch, "Your taverns:\r\n");
 	
-	for (ter = EMPIRE_TERRITORY_LIST(emp); ter; ter = ter->next) {
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (room_has_function_and_city_ok(ter->room, FNC_TAVERN)) {
 			found = TRUE;
 			
@@ -3945,20 +3945,16 @@ ACMD(do_enroll) {
 			}
 
 			// territory data
-			for (ter = EMPIRE_TERRITORY_LIST(old); ter; ter = next_ter) {
-				next_ter = ter->next;
-				
+			HASH_ITER(hh, EMPIRE_TERRITORY_LIST(old), ter, next_ter) {
 				// switch npc allegiance
 				for (npc = ter->npcs; npc; npc = npc->next) {
 					npc->empire_id = EMPIRE_VNUM(e);
 				}
 				
 				// move territory over
-				ter->next = EMPIRE_TERRITORY_LIST(e);
-				EMPIRE_TERRITORY_LIST(e) = ter;
+				HASH_DEL(EMPIRE_TERRITORY_LIST(old), ter);
+				HASH_ADD_INT(EMPIRE_TERRITORY_LIST(e), vnum, ter);
 			}
-			
-			EMPIRE_TERRITORY_LIST(old) = NULL;
 			
 			// move territory over
 			HASH_ITER(hh, world_table, room, next_room) {
@@ -4244,7 +4240,7 @@ ACMD(do_findmaintenance) {
 	struct resource_data *old_res, *total_list = NULL;
 	struct island_info *find_island = NULL;
 	empire_data *emp = GET_LOYALTY(ch);
-	struct empire_territory_data *ter;
+	struct empire_territory_data *ter, *next_ter;
 	room_data *find_room = NULL;
 	int total = 0;
 	
@@ -4305,7 +4301,7 @@ ACMD(do_findmaintenance) {
 	}
 	
 	// check all the territory
-	LL_FOREACH(EMPIRE_TERRITORY_LIST(emp), ter) {
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		// validate the tile
 		if (GET_ROOM_VNUM(ter->room) >= MAP_SIZE) {
 			continue;
