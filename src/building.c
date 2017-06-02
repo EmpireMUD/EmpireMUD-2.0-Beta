@@ -170,7 +170,7 @@ void complete_building(room_data *room) {
 	
 	herd_animals_out(room);
 	
-	// lastly
+	// final setup
 	if ((emp = ROOM_OWNER(room))) {
 		adjust_building_tech(emp, room, TRUE);
 		

@@ -383,6 +383,8 @@ void delete_room(room_data *room, bool check_exits) {
 		dg_owner_room = NULL;
 	}
 	
+	cancel_stored_event_room(room, SEV_CHECK_UNLOAD);
+	
 	// ensure not owned
 	if (ROOM_OWNER(room)) {
 		perform_abandon_room(room);
@@ -912,11 +914,6 @@ void update_world(void) {
 			// reset non-adventures (adventures reset themselves)
 			if (!IS_ADVENTURE_ROOM(iter)) {
 				reset_wtrigger(iter);
-			}
-			
-			// type-specific updates
-			if (room_has_function_and_city_ok(iter, FNC_TAVERN)) {
-				update_tavern(iter);
 			}
 		}
 	}

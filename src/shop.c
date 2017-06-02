@@ -903,8 +903,6 @@ shop_data *create_shop_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_shop(char_data *ch, any_vnum vnum) {
-	void complete_building(room_data *room);
-	
 	shop_data *shop;
 	
 	if (!(shop = real_shop(vnum))) {
