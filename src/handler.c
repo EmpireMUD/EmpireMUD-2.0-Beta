@@ -2683,7 +2683,7 @@ void perform_abandon_room(room_data *room) {
 			}
 		}
 		// territory list
-		if (BELONGS_IN_TERRITORY_LIST(room) && (ter = find_territory_entry(emp, room))) {
+		if ((ter = find_territory_entry(emp, room))) {
 			delete_territory_entry(emp, ter);
 		}
 		
