@@ -264,6 +264,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Recipe is not set LEARNED");
 				problem = TRUE;
 			}
+			break;
 		}
 		case ITEM_BOOK: {
 			if (!book_proto(GET_BOOK_ID(obj))) {
