@@ -576,8 +576,8 @@ void affect_remove(char_data *ch, struct affected_type *af) {
 void affect_remove_room(room_data *room, struct affected_type *af) {
 	struct affected_type *temp;
 
-	// no effects on the room?
-	if (ROOM_AFFECTS(room) == NULL) {
+	// only prevent basic errors
+	if (!room || !af) {
 		return;
 	}
 	
@@ -634,7 +634,7 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 	affected_alloc->next = ROOM_AFFECTS(room);
 	ROOM_AFFECTS(room) = affected_alloc;
 	
-	SET_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
+	SET_BIT(ROOM_AFF_FLAGS(room), affected_alloc->bitvector);
 	schedule_room_affect_expire(room, affected_alloc);
 	
 	affect_total_room(room);

@@ -2735,6 +2735,7 @@ EVENTFUNC(run_reset_triggers) {
 	
 	// still have any?
 	if (IS_ADVENTURE_ROOM(room) || !SCRIPT_CHECK(room, WTRIG_RESET)) {
+		delete_stored_event_room(room, SEV_RESET_TRIGGER);
 		free(data);
 		return 0;
 	}

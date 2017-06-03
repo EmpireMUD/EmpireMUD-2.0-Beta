@@ -1853,6 +1853,7 @@ EVENTFUNC(tavern_update) {
 		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
 		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
 		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
+		delete_stored_event_room(room, SEV_TAVERN);
 		free(data);
 		return 0;
 	}
@@ -1879,7 +1880,8 @@ EVENTFUNC(tavern_update) {
 				remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
 				remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
 				
-				// free up data and cancel the event (it'll be rescheduled if they set a brew
+				// free up data and cancel the event (it'll be rescheduled if they set a brew)
+				delete_stored_event_room(room, SEV_TAVERN);
 				free(data);
 				return 0;
 			}
