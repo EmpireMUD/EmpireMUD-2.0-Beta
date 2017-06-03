@@ -2026,6 +2026,7 @@ struct empire_territory_data *create_territory_entry(empire_data *emp, room_data
 	HASH_FIND_INT(EMPIRE_TERRITORY_LIST(emp), &vnum, ter);
 	if (!ter) {
 		CREATE(ter, struct empire_territory_data, 1);
+		ter->vnum = GET_ROOM_VNUM(room);
 		ter->room = room;
 		ter->population_timer = config_get_int("building_population_timer");
 		ter->npcs = NULL;
