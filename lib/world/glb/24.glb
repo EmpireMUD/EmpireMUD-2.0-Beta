@@ -1,0 +1,129 @@
+#2400
+Tier 1 Global Recipe: Normal~
+0 0 0 AB 100-199
+E
+-1 0.50
+0 0 0
+I 4 2401 4.00 1 l  # LOOT: the imperial eagle plate armor pattern
+I 4 2403 4.00 1 l  # LOOT: the imperial eagle helm pattern
+I 4 2405 4.00 1 l  # LOOT: the imperial eagle vambraces pattern
+I 4 2407 4.00 1 l  # LOOT: the imperial eagle shield design
+I 4 2501 4.00 1 l  # LOOT: the imperial raiment of the bear pattern
+I 4 2503 4.00 1 l  # LOOT: the imperial bear cowl pattern
+I 4 2505 4.00 1 l  # LOOT: the imperial bearclaw armband design
+I 4 2507 4.00 1 l  # LOOT: the imperial totem of the bear design
+I 4 2601 4.00 1 l  # LOOT: the imperial serpent scale mail pattern
+I 4 2603 4.00 1 l  # LOOT: the imperial serpent hood pattern
+I 4 2605 4.00 1 l  # LOOT: the imperial serpent coil design
+I 4 2607 4.00 1 l  # LOOT: the imperial serpent stiletto design
+I 4 2701 4.00 1 l  # LOOT: the imperial raven robes pattern
+I 4 2703 4.00 1 l  # LOOT: the imperial raven crown design
+I 4 2705 4.00 1 l  # LOOT: the imperial raven wings design
+I 4 2707 4.00 1 l  # LOOT: the imperial raven effigy design
+I 4 2801 4.00 1 l  # LOOT: the imperial fox chain mail pattern
+I 4 2803 4.00 1 l  # LOOT: the imperial fox helmet pattern
+I 4 2805 4.00 1 l  # LOOT: the imperial fox armguards pattern
+I 4 2807 4.00 1 l  # LOOT: the imperial fox shield design
+I 4 2901 4.00 1 l  # LOOT: the imperial traveling pack pattern
+I 4 2903 4.00 1 l  # LOOT: the prismatic imperial pack pattern
+I 4 2905 4.00 1 l  # LOOT: the winged imperial shoes pattern
+I 4 2907 4.00 1 l  # LOOT: the imperial griffin egg design
+I 4 2908 4.00 1 l  # LOOT: the imperial carriage schematic
+S
+#2401
+Tier 1 Global Recipe: Hard~
+0 0 A B 100-199
+E
+-1 1.00
+0 0 0
+I 4 2401 4.00 1 l  # LOOT: the imperial eagle plate armor pattern
+I 4 2403 4.00 1 l  # LOOT: the imperial eagle helm pattern
+I 4 2405 4.00 1 l  # LOOT: the imperial eagle vambraces pattern
+I 4 2407 4.00 1 l  # LOOT: the imperial eagle shield design
+I 4 2501 4.00 1 l  # LOOT: the imperial raiment of the bear pattern
+I 4 2503 4.00 1 l  # LOOT: the imperial bear cowl pattern
+I 4 2505 4.00 1 l  # LOOT: the imperial bearclaw armband design
+I 4 2507 4.00 1 l  # LOOT: the imperial totem of the bear design
+I 4 2601 4.00 1 l  # LOOT: the imperial serpent scale mail pattern
+I 4 2603 4.00 1 l  # LOOT: the imperial serpent hood pattern
+I 4 2605 4.00 1 l  # LOOT: the imperial serpent coil design
+I 4 2607 4.00 1 l  # LOOT: the imperial serpent stiletto design
+I 4 2701 4.00 1 l  # LOOT: the imperial raven robes pattern
+I 4 2703 4.00 1 l  # LOOT: the imperial raven crown design
+I 4 2705 4.00 1 l  # LOOT: the imperial raven wings design
+I 4 2707 4.00 1 l  # LOOT: the imperial raven effigy design
+I 4 2801 4.00 1 l  # LOOT: the imperial fox chain mail pattern
+I 4 2803 4.00 1 l  # LOOT: the imperial fox helmet pattern
+I 4 2805 4.00 1 l  # LOOT: the imperial fox armguards pattern
+I 4 2807 4.00 1 l  # LOOT: the imperial fox shield design
+I 4 2901 4.00 1 l  # LOOT: the imperial traveling pack pattern
+I 4 2903 4.00 1 l  # LOOT: the prismatic imperial pack pattern
+I 4 2905 4.00 1 l  # LOOT: the winged imperial shoes pattern
+I 4 2907 4.00 1 l  # LOOT: the imperial griffin egg design
+I 4 2908 4.00 1 l  # LOOT: the imperial carriage schematic
+S
+#2402
+Tier 1 Global Recipe: Group~
+0 0 B A 100-199
+E
+-1 2.00
+0 0 0
+I 4 2401 4.00 1 l  # LOOT: the imperial eagle plate armor pattern
+I 4 2403 4.00 1 l  # LOOT: the imperial eagle helm pattern
+I 4 2405 4.00 1 l  # LOOT: the imperial eagle vambraces pattern
+I 4 2407 4.00 1 l  # LOOT: the imperial eagle shield design
+I 4 2501 4.00 1 l  # LOOT: the imperial raiment of the bear pattern
+I 4 2503 4.00 1 l  # LOOT: the imperial bear cowl pattern
+I 4 2505 4.00 1 l  # LOOT: the imperial bearclaw armband design
+I 4 2507 4.00 1 l  # LOOT: the imperial totem of the bear design
+I 4 2601 4.00 1 l  # LOOT: the imperial serpent scale mail pattern
+I 4 2603 4.00 1 l  # LOOT: the imperial serpent hood pattern
+I 4 2605 4.00 1 l  # LOOT: the imperial serpent coil design
+I 4 2607 4.00 1 l  # LOOT: the imperial serpent stiletto design
+I 4 2701 4.00 1 l  # LOOT: the imperial raven robes pattern
+I 4 2703 4.00 1 l  # LOOT: the imperial raven crown design
+I 4 2705 4.00 1 l  # LOOT: the imperial raven wings design
+I 4 2707 4.00 1 l  # LOOT: the imperial raven effigy design
+I 4 2801 4.00 1 l  # LOOT: the imperial fox chain mail pattern
+I 4 2803 4.00 1 l  # LOOT: the imperial fox helmet pattern
+I 4 2805 4.00 1 l  # LOOT: the imperial fox armguards pattern
+I 4 2807 4.00 1 l  # LOOT: the imperial fox shield design
+I 4 2901 4.00 1 l  # LOOT: the imperial traveling pack pattern
+I 4 2903 4.00 1 l  # LOOT: the prismatic imperial pack pattern
+I 4 2905 4.00 1 l  # LOOT: the winged imperial shoes pattern
+I 4 2907 4.00 1 l  # LOOT: the imperial griffin egg design
+I 4 2908 4.00 1 l  # LOOT: the imperial carriage schematic
+S
+#2403
+Tier 1 Global Recipe: Boss~
+0 0 AB 0 100-199
+E
+-1 4.00
+0 0 0
+I 4 2401 4.00 1 l  # LOOT: the imperial eagle plate armor pattern
+I 4 2403 4.00 1 l  # LOOT: the imperial eagle helm pattern
+I 4 2405 4.00 1 l  # LOOT: the imperial eagle vambraces pattern
+I 4 2407 4.00 1 l  # LOOT: the imperial eagle shield design
+I 4 2501 4.00 1 l  # LOOT: the imperial raiment of the bear pattern
+I 4 2503 4.00 1 l  # LOOT: the imperial bear cowl pattern
+I 4 2505 4.00 1 l  # LOOT: the imperial bearclaw armband design
+I 4 2507 4.00 1 l  # LOOT: the imperial totem of the bear design
+I 4 2601 4.00 1 l  # LOOT: the imperial serpent scale mail pattern
+I 4 2603 4.00 1 l  # LOOT: the imperial serpent hood pattern
+I 4 2605 4.00 1 l  # LOOT: the imperial serpent coil design
+I 4 2607 4.00 1 l  # LOOT: the imperial serpent stiletto design
+I 4 2701 4.00 1 l  # LOOT: the imperial raven robes pattern
+I 4 2703 4.00 1 l  # LOOT: the imperial raven crown design
+I 4 2705 4.00 1 l  # LOOT: the imperial raven wings design
+I 4 2707 4.00 1 l  # LOOT: the imperial raven effigy design
+I 4 2801 4.00 1 l  # LOOT: the imperial fox chain mail pattern
+I 4 2803 4.00 1 l  # LOOT: the imperial fox helmet pattern
+I 4 2805 4.00 1 l  # LOOT: the imperial fox armguards pattern
+I 4 2807 4.00 1 l  # LOOT: the imperial fox shield design
+I 4 2901 4.00 1 l  # LOOT: the imperial traveling pack pattern
+I 4 2903 4.00 1 l  # LOOT: the prismatic imperial pack pattern
+I 4 2905 4.00 1 l  # LOOT: the winged imperial shoes pattern
+I 4 2907 4.00 1 l  # LOOT: the imperial griffin egg design
+I 4 2908 4.00 1 l  # LOOT: the imperial carriage schematic
+S
+$

@@ -1,0 +1,140 @@
+#2500
+raiment imperial bear~
+the imperial raiment of the bear~
+The imperial raiment of the bear is hanging here.~
+   This impressive robe looks like bearskin on the surface, but a closer
+inspection shows it is actually woven from fine threads of nocturnium. As you
+run your fingers along the fur, it emits a low roar.
+~
+27 emo aq 4
+0 0 0
+2 0
+A
+12 -1 0
+A
+24 -1 0
+A
+8 1 0
+A
+16 1 0
+A
+7 3 0
+A
+23 2 0
+A
+5 1 3
+C
+100 200
+S
+#2501
+pattern imperial raiment of the bear~
+the imperial raiment of the bear pattern~
+The imperial raiment of the bear pattern is on the ground.~
+This pattern will teach you to sew: imperial raiment of the bear.
+~
+7 0 a 1
+2500 0 0
+0 0
+S
+#2502
+cowl bear imperial~
+an imperial bear cowl~
+An imperial bear cowl is lying on the ground.~
+   This fearsome cowl has the shape of a bear's face and ears, though its fur
+looks as if it was sewn from fine nocturnium fibers. Despite how heavy it feels
+in your hands, it's lighter than air when you put it on your head.
+~
+27 mo ae 6
+0 0 0
+2 0
+A
+12 -1 0
+A
+24 -1 0
+A
+16 1 0
+A
+7 2 0
+A
+23 3 0
+A
+9 1 0
+A
+5 1 3
+C
+100 200
+S
+#2503
+pattern imperial bear cowl~
+the imperial bear cowl pattern~
+The imperial bear cowl pattern is on the ground.~
+This pattern will teach you to sew: imperial bear cowl.
+~
+7 0 a 1
+2502 0 0
+0 0
+S
+#2504
+armband bearclaw claw imperial~
+an imperial bearclaw armband~
+An imperial bearclaw armband is lying on the ground.~
+   This armband is made from inky black bear claws, woven together by fine
+strands of nocturnium. The claws exude a raw magical energy that roars through
+them from somewhere beyond the pale physical world. Now you truly have the
+right to bear armband.
+~
+27 mo ai 7
+0 0 0
+2 0
+A
+12 -1 0
+A
+24 -1 0
+A
+16 1 0
+A
+7 2 0
+A
+23 2 0
+C
+100 200
+S
+#2505
+design imperial bearclaw armband~
+the imperial bearclaw armband design~
+The imperial bearclaw armband design is on the ground.~
+This design will teach you to sew: imperial bearclaw armband.
+~
+7 0 a 1
+2504 0 0
+0 0
+S
+#2506
+totem bear imperial~
+the imperial totem of the bear~
+An imperial bear totem is lying here.~
+   This strange totem is made from gems bound with nocturnium thread in the
+shape of a bear. Though it's small, it is heavier than it looks, weighed down
+by the force of the mana that roars just beneath its surface.
+~
+3 mo ao 7
+0 0 0
+2 0
+A
+7 2 0
+A
+23 2 0
+C
+100 200
+S
+#2507
+design imperial totem of the bear~
+the imperial totem of the bear design~
+The imperial totem of the bear design is on the ground.~
+This design will teach you to craft: imperial totem of the bear.
+~
+7 0 a 1
+2506 0 0
+0 0
+S
+$

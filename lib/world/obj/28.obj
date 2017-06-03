@@ -1,0 +1,129 @@
+#2800
+mail chain fox imperial~
+imperial fox chain mail~
+A suit of imperial fox chain mail is hanging on a rack.~
+   This fine suit of chain mail has been dyed orange and carefully shaped to
+resemble a fox. It is both strong and lithe, and bestows these properties on
+the wearer.
+~
+27 emo aq 5
+2 0 0
+2 0
+A
+17 1 0
+A
+18 1 0
+A
+21 2 0
+A
+13 1 0
+A
+5 1 3
+C
+100 200
+S
+#2801
+pattern imperial fox chain mail~
+the imperial fox chain mail pattern~
+The imperial fox chain mail pattern is on the ground.~
+This pattern will teach you to forge: imperial fox chain mail.
+~
+7 0 a 1
+2800 0 0
+0 0
+S
+#2802
+helmet fox imperial~
+an imperial fox helmet~
+An imperial fox helmet lies empty on the ground.~
+   This clever helmet is made from imperium but shaped like a fox, with fur
+both inside and out.
+~
+27 mo ae 5
+2 0 0
+2 0
+A
+2 1 0
+A
+12 1 0
+A
+24 1 0
+A
+17 2 0
+A
+21 2 0
+A
+5 1 3
+C
+100 200
+S
+#2803
+pattern imperial fox helmet~
+the imperial fox helmet pattern~
+The imperial fox helmet pattern is on the ground.~
+This pattern will teach you to forge: imperial fox helmet.
+~
+7 0 a 1
+2802 0 0
+0 0
+S
+#2804
+armguards guards imperial fox pair~
+imperial fox armguards~
+A pair of imperial fox armguards is lying here.~
+   These armguards are made from imperium but lined with fox fur, offering both
+protection and comfort in battle.
+~
+27 emo ai 4
+2 0 0
+2 0
+A
+18 1 0
+A
+17 1 0
+A
+21 2 0
+C
+100 200
+S
+#2805
+pattern imperial fox armguards~
+the imperial fox armguards pattern~
+The imperial fox armguards pattern is on the ground.~
+This pattern will teach you to forge: imperial fox armguards.
+~
+7 0 a 1
+2804 0 0
+0 0
+S
+#2806
+shield fox imperial~
+an imperial fox shield~
+An imperial fox shield is propped up on the ground.~
+   This round shield has the face of a fox hammered into its imperium shell. 
+Its edges are razor sharp so though it is difficult to wield, it's even more
+difficult to fight against.
+~
+23 emo ao 6
+0 0 0
+2 0
+A
+13 4 0
+A
+17 3 0
+A
+9 1 0
+C
+100 200
+S
+#2807
+design imperial fox shield~
+the imperial fox shield design~
+The imperial fox shield design is on the ground.~
+This design will teach you to forge: imperial fox shield.
+~
+7 0 a 1
+2806 0 0
+0 0
+S
+$

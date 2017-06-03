@@ -1,0 +1,138 @@
+#2600
+armor scale mail imperial serpent~
+imperial serpent scale mail~
+A suit of imperial serpent scale armor is lying here.~
+   This suit of armor is made from carefully constructed scales of imperium,
+stitched onto hard leather and then covered in serpent scales. It's a suit you
+would be proud to hang in your home, and prouder still to wear into battle.
+~
+27 emo aq 6
+1 0 0
+2 0
+A
+18 -2 0
+A
+1 1 0
+A
+9 1 0
+A
+17 2 0
+A
+21 4 0
+A
+5 1 3
+C
+100 200
+S
+#2601
+pattern imperial serpent scale mail~
+the imperial serpent scale mail pattern~
+The imperial serpent scale mail pattern is on the ground.~
+This pattern will teach you to sew: imperial serpent scale mail.
+~
+7 0 a 1
+2600 0 0
+0 0
+S
+#2602
+hood serpent imperial~
+an imperial serpent hood~
+An imperial serpent hood is lying here.~
+   This fearsome hood flares at the side, like a cobra. It is spined with ribs
+of imperium, and covered in fine serpent scales. Few would want to face you in
+battle while you wear this.
+~
+27 mo ae 7
+1 0 0
+2 0
+A
+18 -1 0
+A
+2 1 0
+A
+17 3 0
+A
+21 2 0
+A
+5 1 3
+C
+100 200
+S
+#2603
+pattern imperial serpent hood~
+the imperial serpent hood pattern~
+The imperial serpent hood pattern is on the ground.~
+This pattern will teach you to sew: imperial serpent hood.
+~
+7 0 a 1
+2602 0 0
+0 0
+S
+#2604
+coil serpent imperial~
+an imperial serpent coil~
+An imperial serpent coil is lying here.~
+   You see a coil of imperium in the shape of a serpent, meant to be worn
+around your biceps. The snake's eyes glow red like bloodstones.
+~
+27 mo ai 7
+1 0 0
+2 0
+A
+18 -1 0
+A
+2 1 0
+A
+1 1 0
+A
+9 1 0
+A
+21 4 0
+C
+100 200
+S
+#2605
+design imperial serpent coil~
+the imperial serpent coil design~
+The imperial serpent coil design is on the ground.~
+This design will teach you to sew: imperial serpent coil.
+~
+7 0 a 1
+2604 0 0
+0 0
+S
+#2606
+stiletto serpent imperial~
+an imperial serpent stiletto~
+An imperial serpent stiletto is staked in the sand.~
+   This long, thin dagger has a handle in the shape of a snake. A thin groove
+runs from the snake's mouth at the hilt, down to the end of the blade, perhaps
+for holding a bead of poison as it is driven into the hearts of your enemies.
+~
+1 mo ano 8
+0 1 4
+2 0
+A
+18 -2 0
+A
+13 -1 0
+A
+1 1 0
+A
+17 6 0
+A
+21 4 0
+C
+100 200
+S
+#2607
+design imperial serpent stiletto~
+the imperial serpent stiletto design~
+The imperial serpent stiletto design is on the ground.~
+This design will teach you to forge: imperial serpent stiletto.
+~
+7 0 a 1
+2606 0 0
+0 0
+S
+$
