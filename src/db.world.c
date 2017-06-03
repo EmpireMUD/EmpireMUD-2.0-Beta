@@ -529,7 +529,7 @@ void delete_room(room_data *room, bool check_exits) {
 			}
 		}
 	}
-	else {
+	else if (GET_INSIDE_ROOMS(room)) {
 		// just check home rooms of interiors
 		for (rm_iter = interior_room_list; rm_iter; rm_iter = next_rm) {
 			next_rm = rm_iter->next_interior;
