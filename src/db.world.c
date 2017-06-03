@@ -470,10 +470,6 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	// free some crap
-	if (COMPLEX_DATA(room)) {
-		free_complex_data(COMPLEX_DATA(room));
-		COMPLEX_DATA(room) = NULL;
-	}
 	if (SCRIPT(room)) {
 		extract_script(room, WLD_TRIGGER);
 	}
@@ -567,6 +563,12 @@ void delete_room(room_data *room, bool check_exits) {
 	// check for start location changes?
 	if (ROOM_SECT_FLAGGED(room, SECTF_START_LOCATION)) {
 		setup_start_locations();
+	}
+	
+	// free complex data late
+	if (COMPLEX_DATA(room)) {
+		free_complex_data(COMPLEX_DATA(room));
+		COMPLEX_DATA(room) = NULL;
 	}
 	
 	// only have to free this info if not on the map (map rooms have a pointer to the map)
