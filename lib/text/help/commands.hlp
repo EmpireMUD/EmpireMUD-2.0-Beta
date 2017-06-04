@@ -1864,6 +1864,7 @@ Toggles:
   autodismount - will dismount you while moving, if necessary
   no-empire - will not create a new empire when you try to claim or build
   clearmeters - automatically clears your meters between combats
+  tutorials - you won't see available tutorial quests if this is off
 
 Immortal toggles:
   wiznet - shuts off the immortal channel
