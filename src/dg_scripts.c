@@ -52,6 +52,7 @@ extern const char *otrig_types[];
 extern struct instance_data *quest_instance_global;
 extern const char *trig_attach_types[];
 extern const char *trig_types[];
+extern const char *vtrig_types[];
 extern const char *wtrig_types[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
@@ -1195,18 +1196,32 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 	}
 
 	len += snprintf(sb, sizeof(sb), "Name: '&y%s&0',  VNum: [&g%5d&0]\r\n", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
-
-	if (trig->attach_type==OBJ_TRIGGER) {
-		len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Objects\r\n");
-		sprintbit(GET_TRIG_TYPE(trig), otrig_types, buf, TRUE);
-	}
-	else if (trig->attach_type == WLD_TRIGGER || trig->attach_type == RMT_TRIGGER || trig->attach_type == BLD_TRIGGER || trig->attach_type == ADV_TRIGGER) {
-		len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Rooms\r\n");
-		sprintbit(GET_TRIG_TYPE(trig), wtrig_types, buf, TRUE);
-	}
-	else {
-		len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Mobiles\r\n");
-		sprintbit(GET_TRIG_TYPE(trig), trig_types, buf, TRUE);
+	
+	// x_TRIGGER
+	switch (trig->attach_type) {
+		case OBJ_TRIGGER: {
+			len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Objects\r\n");
+			sprintbit(GET_TRIG_TYPE(trig), otrig_types, buf, TRUE);
+			break;
+		}
+		case WLD_TRIGGER:
+		case RMT_TRIGGER:
+		case BLD_TRIGGER:
+		case ADV_TRIGGER: {
+			len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Rooms\r\n");
+			sprintbit(GET_TRIG_TYPE(trig), wtrig_types, buf, TRUE);
+			break;
+		}
+		case MOB_TRIGGER: {
+			len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Mobiles\r\n");
+			sprintbit(GET_TRIG_TYPE(trig), trig_types, buf, TRUE);
+			break;
+		}
+		case VEH_TRIGGER: {
+			len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Vehicles\r\n");
+			sprintbit(GET_TRIG_TYPE(trig), vtrig_types, buf, TRUE);
+			break;
+		}
 	}
 
 	len += snprintf(sb + len, sizeof(sb)-len, "Trigger Type: %s, Numeric Arg: %d, Arg list: %s\r\n", buf, GET_TRIG_NARG(trig), ((GET_TRIG_ARG(trig) && *GET_TRIG_ARG(trig)) ? GET_TRIG_ARG(trig) : "None"));
