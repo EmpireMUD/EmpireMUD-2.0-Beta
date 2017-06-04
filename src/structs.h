@@ -1775,6 +1775,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_AUTODISMOUNT  BIT(29)	// will dismount while moving instead of seeing an error
 #define PRF_NOEMPIRE  BIT(30)	// the game will not automatically create an empire
 #define PRF_CLEARMETERS  BIT(31)	// automatically clears the damage meters before a new fight
+#define PRF_NO_TUTORIALS  BIT(32)	// shuts off new tutorial quests
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -1818,6 +1819,7 @@ typedef struct vehicle_data vehicle_data;
 #define QST_DAILY  BIT(4)	// counts toward dailies; repeats each "day"
 #define QST_EMPIRE_ONLY  BIT(5)	// only available if quest giver and player are in the same empire
 #define QST_NO_GUESTS  BIT(6)	// quest start/finish use MEMBERS_ONLY
+#define QST_TUTORIAL  BIT(7)	// quest can be blocked by 'toggle tutorial'
 
 
 // QG_x: quest giver types

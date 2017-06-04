@@ -1079,6 +1079,10 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_lis
 		if (!find_quest_giver_in_list(QUEST_STARTS_AT(ql->quest), QG_MOBILE, GET_MOB_VNUM(mob))) {
 			continue;
 		}
+		// hide tutorials
+		if (QUEST_FLAGGED(ql->quest, QST_TUTORIAL) && PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
+			continue;
+		}
 		// hide dailies
 		if (QUEST_FLAGGED(ql->quest, QST_DAILY) && !dailies) {
 			continue;
@@ -1138,6 +1142,10 @@ bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list
 	LL_FOREACH(GET_OBJ_QUEST_LOOKUPS(obj), ql) {
 		// make sure they're a giver
 		if (!find_quest_giver_in_list(QUEST_STARTS_AT(ql->quest), QG_OBJECT, GET_OBJ_VNUM(obj))) {
+			continue;
+		}
+		// hide tutorials
+		if (QUEST_FLAGGED(ql->quest, QST_TUTORIAL) && PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
 			continue;
 		}
 		// hide dailies
@@ -1204,6 +1212,10 @@ bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_l
 		LL_FOREACH(list[iter], ql) {
 			// make sure they're a giver
 			if (iter == 0 && !find_quest_giver_in_list(QUEST_STARTS_AT(ql->quest), QG_BUILDING, GET_BLD_VNUM(GET_BUILDING(room)))) {
+				continue;
+			}
+			// hide tutorials
+			if (QUEST_FLAGGED(ql->quest, QST_TUTORIAL) && PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
 				continue;
 			}
 			if (iter == 1 && !find_quest_giver_in_list(QUEST_STARTS_AT(ql->quest), QG_ROOM_TEMPLATE, GET_RMT_VNUM(GET_ROOM_TEMPLATE(room)))) {

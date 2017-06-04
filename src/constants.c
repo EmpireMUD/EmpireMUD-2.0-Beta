@@ -499,6 +499,7 @@ const char *preference_bits[] = {
 	"AUTODISMOUNT",
 	"!EMPIRE",
 	"CLEARMETERS",
+	"!TUTORIALS",
 	"\n"
 };
 
@@ -563,6 +564,7 @@ const struct toggle_data_type toggle_data[] = {
 	
 	{ "no-empire", TOG_ONOFF, PRF_NOEMPIRE, 0, NULL },
 	{ "clearmeters", TOG_ONOFF, PRF_CLEARMETERS, 0, NULL },
+	{ "tutorials",	TOG_OFFON, PRF_NO_TUTORIALS, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
@@ -2234,6 +2236,7 @@ const char *quest_flags[] = {
 	"DAILY",
 	"EMPIRE-ONLY",
 	"NO-GUESTS",
+	"TUTORIAL",
 	"\n"
 };
 

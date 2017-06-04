@@ -50,7 +50,7 @@ struct {
 	char *color;	// color code, e.g. \ty
 	int type;	// PUB_COMM_x
 	int min_level;	// absolute minimum
-	bitvector_t ignore_flag;	// PRF_x flag for ignoring this channel
+	bitvector_t ignore_flag;	// PRF_ flag for ignoring this channel
 	int history;
 } pub_comm[NUM_CHANNELS] = {
 	{ "shout", "\ty", PUB_COMM_SHORT_RANGE, 0, PRF_DEAF, CHANNEL_HISTORY_SAY },
