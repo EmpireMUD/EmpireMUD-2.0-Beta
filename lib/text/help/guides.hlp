@@ -15,7 +15,7 @@ Are you a vampire? Try HELP VAMPIRE GUIDE.
 Are you using a screen reader? There's more info on HELP SCREEN READERS.
 Having trouble finding help on a topic? Try HELPSEARCH.
 
-See also: DEPLETION, LEVELS, SKILL CAPS, DAILY BONUS EXPERIENCE
+See also: DEPLETION, LEVELS, SKILL CAPS, DAILY BONUS EXPERIENCE, TUTORIAL
 #
 "EMPIRE GUIDE"
 
@@ -188,6 +188,21 @@ making. FORGE PICK to help you MINE, FORGE SHOVEL to help when you DIG, and you
 can even FORGE AXE to replace that stone age one you've been using.
 
 Type INFO for other getting-started tips.
+#
+TUTORIAL TUTORIALS
+
+EmpireMUD offers tutorial quests to help you learn the game. Most of these
+quests reward you with some bonus experience.
+
+If you aren't interested in tutorials, you can turn them off by typing
+'toggle tutorials'.
+
+You can also find tutorial zones at the following locations:
+ - The Soulstream (general) at any Tower of Souls.
+ - The Royal Planning Office (Empire skill) on the newbie island.
+ - The Museum of Early Man (Trade skill) on the newbie island.
+
+See also: NEARBY, QUEST, TOGGLE
 #
 "VAMPIRE GUIDE"
 

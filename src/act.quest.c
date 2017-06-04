@@ -732,19 +732,6 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 		}
 		return FALSE;
 	}
-	if (!can_turn_in_quest_at(ch, IN_ROOM(ch), quest, &giver_emp)) {
-		if (show_errors) {
-			msg_to_char(ch, "You can't turn that quest in here.\r\n");
-		}
-		return FALSE;
-	}
-	if (QUEST_FLAGGED(quest, QST_DAILY) && GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
-		if (show_errors) {
-			msg_to_char(ch, "You can't finish any more daily quests today.\r\n");
-		}
-		return FALSE;
-	}
-	
 	
 	// preliminary completeness check
 	count_quest_tasks(pq, &complete, &total);
@@ -755,7 +742,21 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 		return FALSE;
 	}
 	
-	// 2nd check after refreshing tasks
+	// 2nd checks: completability
+	if (QUEST_FLAGGED(quest, QST_DAILY) && GET_DAILY_QUESTS(ch) >= config_get_int("dailies_per_day")) {
+		if (show_errors) {
+			msg_to_char(ch, "You can't finish any more daily quests today.\r\n");
+		}
+		return FALSE;
+	}
+	if (!can_turn_in_quest_at(ch, IN_ROOM(ch), quest, &giver_emp)) {
+		if (show_errors) {
+			msg_to_char(ch, "You can't turn that quest in here.\r\n");
+		}
+		return FALSE;
+	}
+	
+	// 3rd check after refreshing tasks
 	refresh_one_quest_tracker(ch, pq);
 	count_quest_tasks(pq, &complete, &total);
 	if (complete < total) {
