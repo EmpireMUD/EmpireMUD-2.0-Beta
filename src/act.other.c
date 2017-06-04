@@ -1367,6 +1367,59 @@ ACMD(do_alternate) {
 }
 
 
+ACMD(do_beckon) {
+	extern bool is_ignoring(char_data *ch, char_data *victim);
+	
+	char arg[MAX_INPUT_LENGTH];
+	char_data *vict;
+	bool any;
+	
+	one_argument(argument, arg);
+	if (!*arg || !str_cmp(arg, "all")) {
+		any = FALSE;
+		// beckon all
+		LL_FOREACH(ROOM_PEOPLE(IN_ROOM(ch)), vict) {
+			if (vict == ch || IS_NPC(vict) || is_ignoring(vict, ch) || vict->master) {
+				continue;	// nopes
+			}
+			
+			if (!IS_NPC(vict)) {
+				GET_BECKONED_BY(vict) = GET_IDNUM(REAL_CHAR(ch));	// real: may be switched imm
+			}
+			any = TRUE;
+		}
+		
+		if (any) {
+			msg_to_char(ch, "You beckon for everyone to follow you.\r\n");
+			act("$n beckons for everyone to follow $m.", FALSE, ch, NULL, NULL, TO_ROOM);
+		}
+		else {
+			msg_to_char(ch, "There is nobody here to beckon.\r\n");
+		}
+	}
+	else if (!(vict = get_char_room_vis(ch, buf))) {
+		send_config_msg(ch, "no_person");
+	}
+	else if (!IS_NPC(vict) && GET_BECKONED_BY(vict) == GET_IDNUM(REAL_CHAR(ch))) {
+		act("You already beckoned $M.", FALSE, ch, NULL, vict, TO_CHAR);
+	}
+	else if (!IS_NPC(vict) && is_ignoring(vict, ch)) {
+		act("You can't beckon $M.", FALSE, ch, NULL, vict, TO_CHAR);
+	}
+	else if (vict->master) {
+		act("$E is already following someone else.", FALSE, ch, NULL, vict, TO_CHAR);
+	}
+	else {
+		if (!IS_NPC(vict)) {
+			GET_BECKONED_BY(vict) = GET_IDNUM(REAL_CHAR(ch));	// real: may be switched imm
+		}
+		act("You beckon for $N to follow you.", FALSE, ch, NULL, vict, TO_CHAR);
+		act("$n beckons for you to follow $m.", FALSE, ch, NULL, vict, TO_VICT);
+		act("$n beckons for $N to follow $m.", FALSE, ch, NULL, vict, TO_NOTVICT);
+	}
+}
+
+
 ACMD(do_changepass) {
 	char oldpass[MAX_INPUT_LENGTH], new1[MAX_INPUT_LENGTH], new2[MAX_INPUT_LENGTH];
 	// changepass OLD NEW NEW
@@ -1785,6 +1838,10 @@ ACMD(do_group) {
 		}
 		
 		GET_GROUP_INVITE(vict) = GET_IDNUM(ch);
+		if (!vict->master) {
+			// auto-beckon
+			GET_BECKONED_BY(vict) = GET_IDNUM(REAL_CHAR(ch));
+		}
 	}
 	else if (is_abbrev(buf, "join")) {
 		if (!(vict = is_playing(GET_GROUP_INVITE(ch)))) {

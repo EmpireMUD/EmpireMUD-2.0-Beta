@@ -74,6 +74,7 @@ ACMD(do_ban);
 ACMD(do_barde);
 ACMD(do_bash);
 ACMD(do_bathe);
+ACMD(do_beckon);
 ACMD(do_bite);
 ACMD(do_blind);
 ACMD(do_bloodsweat);
@@ -580,6 +581,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "barde", POS_STANDING, do_barde, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_SKILL, CMD_NO_ANIMALS, ABIL_BARDE ),
 	ABILITY_CMD( "bash", POS_FIGHTING, do_bash, NO_MIN, CTYPE_COMBAT, ABIL_BASH ),
 	SIMPLE_CMD( "bathe", POS_STANDING, do_bathe, NO_MIN, CTYPE_MOVE ),
+	SIMPLE_CMD( "beckon", POS_RESTING, do_beckon, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "bite", POS_FIGHTING, do_bite, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, ABIL_BITE ),
 	ABILITY_CMD( "blind", POS_FIGHTING, do_blind, NO_MIN, CTYPE_COMBAT, ABIL_BLIND ),
 	ABILITY_CMD( "bloodsweat", POS_SLEEPING, do_bloodsweat, NO_MIN, CTYPE_SKILL, ABIL_BLOODSWEAT ),

@@ -1544,7 +1544,7 @@ ACMD(do_enter) {
 
 ACMD(do_follow) {
 	bool circle_follow(char_data *ch, char_data *victim);
-	char_data *leader;
+	char_data *leader, *chiter;
 
 	one_argument(argument, buf);
 
@@ -1555,8 +1555,27 @@ ACMD(do_follow) {
 		}
 	}
 	else {
-		send_to_char("Whom do you wish to follow?\r\n", ch);
-		return;
+		// check for beckon
+		if (!IS_NPC(ch) && GET_BECKONED_BY(ch) > 0) {
+			leader = NULL;
+			LL_FOREACH(ROOM_PEOPLE(IN_ROOM(ch)), chiter) {
+				if (!REAL_NPC(chiter) && GET_IDNUM(REAL_CHAR(chiter)) == GET_BECKONED_BY(ch)) {
+					leader = chiter;
+					break;
+				}
+			}
+			
+			if (!leader) {
+				msg_to_char(ch, "Follow whom? The person who beckoned you isn't here.\r\n");
+				return;
+			}
+			
+			// found leader if we got here
+		}
+		else {	// not beckoned
+			send_to_char("Whom do you wish to follow?\r\n", ch);
+			return;
+		}
 	}
 
 	if (ch->master == leader) {
@@ -1583,6 +1602,9 @@ ACMD(do_follow) {
 			}
 
 			add_follower(ch, leader, TRUE);
+			if (!IS_NPC(ch)) {
+				GET_BECKONED_BY(ch) = 0;
+			}
 		}
 	}
 }

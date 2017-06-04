@@ -956,6 +956,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_APPARENT_AGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->apparent_age))
 #define GET_AUTOMESSAGES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->automessages))
 #define GET_BAD_PWS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->bad_pws))
+#define GET_BECKONED_BY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->beckoned_by))
 #define GET_BONUS_TRAITS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->bonus_traits))
 #define GET_CLASS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->character_class))
 #define GET_CLASS_PROGRESSION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->class_progression))

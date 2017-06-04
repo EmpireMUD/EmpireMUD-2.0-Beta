@@ -3330,6 +3330,7 @@ struct player_special_data {
 	byte create_points;	// Used in character creation
 	int group_invite_by;	// idnum of the last player to invite this one
 	time_t move_time[TRACK_MOVE_TIMES];	// timestamp of last X moves
+	int beckoned_by;	// idnum of player who beckoned (for follow)
 	
 	struct combat_meters meters;	// combat meter data
 	
