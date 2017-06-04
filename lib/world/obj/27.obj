@@ -134,4 +134,139 @@ This design will teach you to craft: imperial raven effigy.
 2706 0 0
 0 0
 S
+#2708
+armor pegasus heroic suit~
+heroic pegasus armor~
+A suit of heroic pegasus armor is hanging here.~
+   This armor is made from sparkfiber, bound with rings of eventide, in the
+shape of a pegasus, complete with wings standing proudly behind you. Despite
+its size, it's surprisingly light and agile in combat.
+~
+27 emo aq 6
+0 0 0
+2 0
+A
+12 -1 0
+A
+24 -1 0
+A
+8 1 0
+A
+16 1 0
+A
+17 3 0
+A
+22 2 0
+A
+5 1 3
+C
+200 300
+S
+#2709
+pattern heroic pegasus armor~
+the heroic pegasus armor pattern~
+The heroic pegasus armor pattern is on the ground.~
+This pattern will teach you to sew: heroic pegasus armor.
+~
+7 0 a 1
+2708 0 0
+0 0
+S
+#2710
+hood pegasus heroic~
+a heroic pegasus hood~
+A heroic pegasus hood is hanging here.~
+   This black sparkfiber hood is hardened in the shape of a pegasus's head,
+highlighted by gleaming black eventide metal.
+~
+27 mo ae 8
+0 0 0
+2 0
+A
+12 -1 0
+A
+24 -1 0
+A
+9 1 0
+A
+2 1 0
+A
+17 2 0
+A
+22 4 0
+A
+5 1 3
+C
+200 300
+S
+#2711
+pattern heroic pegasus hood~
+the heroic pegasus hood pattern~
+The heroic pegasus hood pattern is on the ground.~
+This pattern will teach you to sew: heroic pegasus hood.
+~
+7 0 a 1
+2710 0 0
+0 0
+S
+#2712
+bands blessing heroic pegasus's~
+heroic bands of the pegasus's blessing~
+Heroic bands of the pegasus's blessing are lying here.~
+   These bands are made from sparkfiber and eventide, but the metal is etched
+with a blessing in a language you don't understand, perhaps the language of the
+pegasus itself.
+~
+27 mo ai 8
+0 0 0
+2 0
+A
+18 -2 0
+A
+16 1 0
+A
+17 3 0
+A
+22 3 0
+C
+200 300
+S
+#2713
+pattern heroic bands of the pegasus's blessing~
+the heroic bands of the pegasus's blessing pattern~
+The heroic bands of the pegasus's blessing pattern is on the ground.~
+This pattern will teach you to sew: heroic bands of the pegasus's blessing.
+~
+7 0 a 1
+2712 0 0
+0 0
+S
+#2714
+shoe pegasus heroic~
+a heroic pegasus shoe~
+A heroic pegasus shoe is lying in the dirt.~
+   This horseshoe is made from well-forged eventide nocturnium, with trailing
+strands of sparkfiber cloth. No horse could run wearing this, but one would
+certainly look majestic flying with it.
+~
+3 mo ao 9
+0 0 0
+2 0
+A
+17 1 0
+A
+22 4 0
+C
+200 300
+S
+#2715
+design heroic pegasus shoe~
+the heroic pegasus shoe design~
+The heroic pegasus shoe design is on the ground.~
+This design will teach you to craft: heroic pegasus shoe.
+~
+7 0 a 1
+2714 0 0
+0 0
+S
 $

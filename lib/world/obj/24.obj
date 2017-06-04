@@ -125,4 +125,132 @@ This design will teach you to forge: imperial eagle shield.
 2406 0 0
 0 0
 S
+#2408
+mail plate griffin heroic suit~
+heroic griffin plate mail~
+A suit of heroic griffin plate mail is hanging here.~
+   This suit of argentine plates has been expertly assembled to look like the
+beak and claws of a griffin, the mythical beast that combines a lion and an
+eagle.
+~
+27 emo aq 5
+3 0 0
+2 0
+A
+9 -2 0
+A
+1 -1 0
+A
+18 1 0
+A
+13 1 0
+A
+15 2 0
+A
+5 1 3
+C
+200 300
+S
+#2409
+pattern heroic griffin plate mail~
+the heroic griffin plate mail pattern~
+The heroic griffin plate mail pattern is on the ground.~
+This pattern will teach you to forge: heroic griffin plate mail.
+~
+7 0 a 1
+2408 0 0
+0 0
+S
+#2410
+helm griffin heroic~
+a heroic griffin helm~
+A heroic griffin helm is hung nearby.~
+   This argentine helm has been hammered into the shape of a griffin's head,
+with feathers made of briar hide and eyes made from prismatic crystals.
+~
+27 mo ae 5
+3 0 0
+2 0
+A
+9 -2 0
+A
+2 1 0
+A
+12 3 0
+A
+24 3 0
+A
+5 1 3
+C
+200 300
+S
+#2411
+pattern heroic griffin helm~
+the heroic griffin helm pattern~
+The heroic griffin helm pattern is on the ground.~
+This pattern will teach you to forge: heroic griffin helm.
+~
+7 0 a 1
+2410 0 0
+0 0
+S
+#2412
+bracers heroic griffin pair~
+heroic griffin bracers~
+A pair of heroic griffin bracers lies on the ground.~
+   These bracers are made in the shape of feathers, alternating between
+argentine imperium and briar hide, and give you the look of a fearsome griffin.
+~
+27 emo ai 4
+3 0 0
+2 0
+A
+9 -2 0
+A
+13 2 0
+A
+12 1 0
+A
+24 1 0
+A
+15 2 0
+C
+200 300
+S
+#2413
+pattern heroic griffin bracers~
+the heroic griffin bracers pattern~
+The heroic griffin bracers pattern is on the ground.~
+This pattern will teach you to forge: heroic griffin bracers.
+~
+7 0 a 1
+2412 0 0
+0 0
+S
+#2414
+shield tower griffin-shaped heroic~
+a heroic griffin shield~
+A griffin-shaped tower shield stands before you.~
+   This magnificent tower shield has the shape of a whole griffin, nearly
+life-sized, posed as though it is attacking your foe. It's tremendously heavy,
+but worth its weight.
+~
+23 emo ao 6
+0 0 0
+2 0
+A
+13 1 0
+C
+200 300
+S
+#2415
+design heroic griffin shield~
+the heroic griffin shield design~
+The heroic griffin shield design is on the ground.~
+This design will teach you to forge: heroic griffin shield.
+~
+7 0 a 1
+2414 0 0
+0 0
+S
 $

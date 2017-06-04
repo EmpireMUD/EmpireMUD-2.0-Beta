@@ -66,4 +66,62 @@ R
 R
 170 1 0 0
 S
+#2708
+heroic pegasus armor~
+2708 1
+4 199 gq 42 -1
+L
+200
+R
+612 12 0 0
+R
+611 8 0 0
+R
+11 1 1 4160
+R
+170 1 0 0
+R
+171 1 0 0
+S
+#2710
+heroic pegasus hood~
+2710 1
+4 199 gq 42 -1
+L
+200
+R
+612 12 0 0
+R
+611 8 0 0
+R
+11 1 1 4160
+S
+#2712
+heroic bands of the pegasus's blessing~
+2712 1
+4 199 gq 42 -1
+L
+200
+R
+612 12 0 0
+R
+611 8 0 0
+R
+11 1 1 4160
+S
+#2714
+heroic pegasus shoe~
+2714 1
+2 203 aq 42 -1
+L
+200
+R
+611 4 0 0
+R
+612 2 0 0
+R
+13 1 1 64
+R
+171 1 0 0
+S
 $

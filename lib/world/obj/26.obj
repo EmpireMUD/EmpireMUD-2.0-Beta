@@ -135,4 +135,139 @@ This design will teach you to forge: imperial serpent stiletto.
 2606 0 0
 0 0
 S
+#2608
+armor scale naga heroic suit~
+heroic naga scale armor~
+A suit of heroic naga scale armor is hanging on a rack.~
+   This spectacular suit of armor is made from scales of absinthian leather and
+argentine imperium. It has the characteristic iridescence of naga hide, perhaps
+imbued by the combination of magical leather and exotic metal.
+~
+27 emo aq 7
+1 0 0
+2 0
+A
+18 -2 0
+A
+1 1 0
+A
+9 1 0
+A
+17 2 0
+A
+21 4 0
+A
+5 1 3
+C
+200 300
+S
+#2609
+pattern heroic naga scale armor~
+the heroic naga scale armor pattern~
+The heroic naga scale armor pattern is on the ground.~
+This pattern will teach you to sew: heroic naga scale armor.
+~
+7 0 a 1
+2608 0 0
+0 0
+S
+#2610
+hood heroic naga~
+a heroic naga hood~
+A heroic naga hood is hanging here.~
+   The hood is shaped like the head of a naga, complete with long, hollow teeth
+at the front. From the back, the absinthian leather scales absorb most of the
+light, but from the front they are prismatic and dazzling.
+~
+27 mo ae 8
+1 0 0
+2 0
+A
+18 -1 0
+A
+2 1 0
+A
+17 3 0
+A
+21 2 0
+A
+5 1 3
+C
+200 300
+S
+#2611
+pattern heroic naga hood~
+the heroic naga hood pattern~
+The heroic naga hood pattern is on the ground.~
+This pattern will teach you to sew: heroic naga hood.
+~
+7 0 a 1
+2610 0 0
+0 0
+S
+#2612
+armband heroic naga~
+a heroic naga armband~
+A heroic naga armband is lying on the ground.~
+   This sleek armband looks like a coiled naga, forged from argentine imperium
+and wrapped in absinthian leather.
+~
+27 mo ai 8
+1 0 0
+2 0
+A
+18 -1 0
+A
+2 1 0
+A
+1 1 0
+A
+9 1 0
+A
+21 4 0
+C
+200 300
+S
+#2613
+pattern heroic naga armband~
+the heroic naga armband pattern~
+The heroic naga armband pattern is on the ground.~
+This pattern will teach you to sew: heroic naga armband.
+~
+7 0 a 1
+2612 0 0
+0 0
+S
+#2614
+fang heroic naga~
+a heroic naga fang~
+A heroic naga fang is sticking out of the ground.~
+   What appears to be a naga's fang is actually a thin dagger forged from
+argentine imperium. Like a true naga, the dagger is hollow -- perhaps a place
+to put your poison.
+~
+1 mo ano 9
+0 2 4
+2 0
+A
+18 -2 0
+A
+13 -1 0
+A
+17 6 0
+A
+21 4 0
+C
+200 300
+S
+#2615
+design heroic naga fang~
+the heroic naga fang design~
+The heroic naga fang design is on the ground.~
+This design will teach you to forge: heroic naga fang.
+~
+7 0 a 1
+2614 0 0
+0 0
+S
 $

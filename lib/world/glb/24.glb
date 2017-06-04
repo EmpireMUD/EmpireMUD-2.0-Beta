@@ -126,4 +126,132 @@ I 4 2905 4.00 1 l  # LOOT: the winged imperial shoes pattern
 I 4 2907 4.00 1 l  # LOOT: the imperial griffin egg design
 I 4 2908 4.00 1 l  # LOOT: the imperial carriage schematic
 S
+#2410
+Tier 2 Global Recipe: Normal~
+0 0 0 AB 200-299
+E
+-1 0.50
+0 0 0
+I 4 2409 4.00 1 l  # LOOT: the heroic griffin plate mail pattern
+I 4 2411 4.00 1 l  # LOOT: the heroic griffin helm pattern
+I 4 2413 4.00 1 l  # LOOT: the heroic griffin bracers pattern
+I 4 2415 4.00 1 l  # LOOT: the heroic griffin shield design
+I 4 2509 4.00 1 l  # LOOT: the heroic unicorn armor pattern
+I 4 2511 4.00 1 l  # LOOT: the heroic unicorn circlet pattern
+I 4 2513 4.00 1 l  # LOOT: the heroic strands of unicorn's blessing pattern
+I 4 2515 4.00 1 l  # LOOT: the heroic unicorn wand of healing design
+I 4 2609 4.00 1 l  # LOOT: the heroic naga scale armor pattern
+I 4 2611 4.00 1 l  # LOOT: the heroic naga hood pattern
+I 4 2613 4.00 1 l  # LOOT: the heroic naga armband pattern
+I 4 2615 4.00 1 l  # LOOT: the heroic naga fang design
+I 4 2709 4.00 1 l  # LOOT: the heroic pegasus armor pattern
+I 4 2711 4.00 1 l  # LOOT: the heroic pegasus hood pattern
+I 4 2713 4.00 1 l  # LOOT: the heroic bands of the pegasus's blessing pattern
+I 4 2715 4.00 1 l  # LOOT: the heroic pegasus shoe design
+I 4 2809 4.00 1 l  # LOOT: the heroic cerberus armor pattern
+I 4 2811 4.00 1 l  # LOOT: the heroic cerberus helm pattern
+I 4 2813 4.00 1 l  # LOOT: the heroic cerberus vambraces pattern
+I 4 2815 4.00 1 l  # LOOT: the heroic cerberus shield design
+I 4 2911 4.00 1 l  # LOOT: the heroic adventuring pack pattern
+I 4 2913 4.00 1 l  # LOOT: the heroic boots of seven strides pattern
+I 4 2915 4.00 1 l  # LOOT: the heroic changeling stone design
+I 4 2916 4.00 1 l  # LOOT: the heroic caravan schematic
+I 4 2917 4.00 1 l  # LOOT: the heroic galleon schematic
+S
+#2411
+Tier 2 Global Recipe: Hard~
+0 0 A B 200-299
+E
+-1 1.00
+0 0 0
+I 4 2409 4.00 1 l  # LOOT: the heroic griffin plate mail pattern
+I 4 2411 4.00 1 l  # LOOT: the heroic griffin helm pattern
+I 4 2413 4.00 1 l  # LOOT: the heroic griffin bracers pattern
+I 4 2415 4.00 1 l  # LOOT: the heroic griffin shield design
+I 4 2509 4.00 1 l  # LOOT: the heroic unicorn armor pattern
+I 4 2511 4.00 1 l  # LOOT: the heroic unicorn circlet pattern
+I 4 2513 4.00 1 l  # LOOT: the heroic strands of unicorn's blessing pattern
+I 4 2515 4.00 1 l  # LOOT: the heroic unicorn wand of healing design
+I 4 2609 4.00 1 l  # LOOT: the heroic naga scale armor pattern
+I 4 2611 4.00 1 l  # LOOT: the heroic naga hood pattern
+I 4 2613 4.00 1 l  # LOOT: the heroic naga armband pattern
+I 4 2615 4.00 1 l  # LOOT: the heroic naga fang design
+I 4 2709 4.00 1 l  # LOOT: the heroic pegasus armor pattern
+I 4 2711 4.00 1 l  # LOOT: the heroic pegasus hood pattern
+I 4 2713 4.00 1 l  # LOOT: the heroic bands of the pegasus's blessing pattern
+I 4 2715 4.00 1 l  # LOOT: the heroic pegasus shoe design
+I 4 2809 4.00 1 l  # LOOT: the heroic cerberus armor pattern
+I 4 2811 4.00 1 l  # LOOT: the heroic cerberus helm pattern
+I 4 2813 4.00 1 l  # LOOT: the heroic cerberus vambraces pattern
+I 4 2815 4.00 1 l  # LOOT: the heroic cerberus shield design
+I 4 2911 4.00 1 l  # LOOT: the heroic adventuring pack pattern
+I 4 2913 4.00 1 l  # LOOT: the heroic boots of seven strides pattern
+I 4 2915 4.00 1 l  # LOOT: the heroic changeling stone design
+I 4 2916 4.00 1 l  # LOOT: the heroic caravan schematic
+I 4 2917 4.00 1 l  # LOOT: the heroic galleon schematic
+S
+#2412
+Tier 2 Global Recipe: Group~
+0 0 B A 200-299
+E
+-1 2.00
+0 0 0
+I 4 2409 4.00 1 l  # LOOT: the heroic griffin plate mail pattern
+I 4 2411 4.00 1 l  # LOOT: the heroic griffin helm pattern
+I 4 2413 4.00 1 l  # LOOT: the heroic griffin bracers pattern
+I 4 2415 4.00 1 l  # LOOT: the heroic griffin shield design
+I 4 2509 4.00 1 l  # LOOT: the heroic unicorn armor pattern
+I 4 2511 4.00 1 l  # LOOT: the heroic unicorn circlet pattern
+I 4 2513 4.00 1 l  # LOOT: the heroic strands of unicorn's blessing pattern
+I 4 2515 4.00 1 l  # LOOT: the heroic unicorn wand of healing design
+I 4 2609 4.00 1 l  # LOOT: the heroic naga scale armor pattern
+I 4 2611 4.00 1 l  # LOOT: the heroic naga hood pattern
+I 4 2613 4.00 1 l  # LOOT: the heroic naga armband pattern
+I 4 2615 4.00 1 l  # LOOT: the heroic naga fang design
+I 4 2709 4.00 1 l  # LOOT: the heroic pegasus armor pattern
+I 4 2711 4.00 1 l  # LOOT: the heroic pegasus hood pattern
+I 4 2713 4.00 1 l  # LOOT: the heroic bands of the pegasus's blessing pattern
+I 4 2715 4.00 1 l  # LOOT: the heroic pegasus shoe design
+I 4 2809 4.00 1 l  # LOOT: the heroic cerberus armor pattern
+I 4 2811 4.00 1 l  # LOOT: the heroic cerberus helm pattern
+I 4 2813 4.00 1 l  # LOOT: the heroic cerberus vambraces pattern
+I 4 2815 4.00 1 l  # LOOT: the heroic cerberus shield design
+I 4 2911 4.00 1 l  # LOOT: the heroic adventuring pack pattern
+I 4 2913 4.00 1 l  # LOOT: the heroic boots of seven strides pattern
+I 4 2915 4.00 1 l  # LOOT: the heroic changeling stone design
+I 4 2916 4.00 1 l  # LOOT: the heroic caravan schematic
+I 4 2917 4.00 1 l  # LOOT: the heroic galleon schematic
+S
+#2413
+Tier 2 Global Recipe: Boss~
+0 0 AB 0 200-299
+E
+-1 4.00
+0 0 0
+I 4 2409 4.00 1 l  # LOOT: the heroic griffin plate mail pattern
+I 4 2411 4.00 1 l  # LOOT: the heroic griffin helm pattern
+I 4 2413 4.00 1 l  # LOOT: the heroic griffin bracers pattern
+I 4 2415 4.00 1 l  # LOOT: the heroic griffin shield design
+I 4 2509 4.00 1 l  # LOOT: the heroic unicorn armor pattern
+I 4 2511 4.00 1 l  # LOOT: the heroic unicorn circlet pattern
+I 4 2513 4.00 1 l  # LOOT: the heroic strands of unicorn's blessing pattern
+I 4 2515 4.00 1 l  # LOOT: the heroic unicorn wand of healing design
+I 4 2609 4.00 1 l  # LOOT: the heroic naga scale armor pattern
+I 4 2611 4.00 1 l  # LOOT: the heroic naga hood pattern
+I 4 2613 4.00 1 l  # LOOT: the heroic naga armband pattern
+I 4 2615 4.00 1 l  # LOOT: the heroic naga fang design
+I 4 2709 4.00 1 l  # LOOT: the heroic pegasus armor pattern
+I 4 2711 4.00 1 l  # LOOT: the heroic pegasus hood pattern
+I 4 2713 4.00 1 l  # LOOT: the heroic bands of the pegasus's blessing pattern
+I 4 2715 4.00 1 l  # LOOT: the heroic pegasus shoe design
+I 4 2809 4.00 1 l  # LOOT: the heroic cerberus armor pattern
+I 4 2811 4.00 1 l  # LOOT: the heroic cerberus helm pattern
+I 4 2813 4.00 1 l  # LOOT: the heroic cerberus vambraces pattern
+I 4 2815 4.00 1 l  # LOOT: the heroic cerberus shield design
+I 4 2911 4.00 1 l  # LOOT: the heroic adventuring pack pattern
+I 4 2913 4.00 1 l  # LOOT: the heroic boots of seven strides pattern
+I 4 2915 4.00 1 l  # LOOT: the heroic changeling stone design
+I 4 2916 4.00 1 l  # LOOT: the heroic caravan schematic
+I 4 2917 4.00 1 l  # LOOT: the heroic galleon schematic
+S
 $

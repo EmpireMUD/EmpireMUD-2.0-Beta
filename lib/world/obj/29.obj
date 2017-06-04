@@ -87,9 +87,11 @@ An imperial griffin egg is lying here.~
    This strange egg looks like it's actually just been magicked together from
 gold and gems. Nevertheless, you can use it to summon a non-combat pet.
 ~
-3 o a 3
+3 o a 4
 2906 0 0
 10 0
+C
+100 200
 T 9900
 S
 #2907
@@ -110,6 +112,100 @@ This schematic will teach you to craft: imperial carriage.
 ~
 7 0 a 1
 2908 0 0
+0 0
+S
+#2910
+pack heroic adventuring~
+a heroic adventuring pack~
+A heroic adventuring pack is sitting here.~
+This pack is so massive that it has its own monopod for support.
+~
+24 emo ar 3
+1 0 0
+11 0
+C
+200 300
+S
+#2911
+pattern heroic adventuring pack~
+the heroic adventuring pack pattern~
+The heroic adventuring pack pattern is on the ground.~
+This pattern will teach you to sew: heroic adventuring pack.
+~
+7 0 a 1
+2910 0 0
+0 0
+S
+#2912
+boots seven strides heroic~
+heroic boots of seven strides~
+The heroic boots of seven strides are stopped here.~
+   These boots are finely crafted and etched with arcane symbols that allow
+their bearer greatly improved movement. In fact, each stride is like taking
+seven.
+~
+2 mo ag 2
+0 0 0
+2 0
+A
+11 3 0
+A
+6 2 0
+C
+100 200
+S
+#2913
+pattern heroic boots of seven strides~
+the heroic boots of seven strides pattern~
+The heroic boots of seven strides pattern is on the ground.~
+This pattern will teach you to sew: heroic boots of seven strides.
+~
+7 0 a 1
+2912 0 0
+0 0
+S
+#2914
+stone heroic changeling~
+a heroic changeling stone~
+A heroic changeling stone is lying here.~
+   This odd stone is made mostly from magic, and glows with arcane symbols. It
+looks like you could use it to summon a mini-pet.
+~
+3 o a 6
+2914 0 0
+10 0
+C
+200 300
+T 9900
+S
+#2915
+design heroic changeling stone~
+the heroic changeling stone design~
+The heroic changeling stone design is on the ground.~
+This design will teach you to forge: heroic changeling stone.
+~
+7 0 a 1
+2914 0 0
+0 0
+S
+#2916
+schematic heroic caravan~
+the heroic caravan schematic~
+The heroic caravan schematic is on the ground.~
+This schematic will teach you to craft: heroic caravan.
+~
+7 0 a 1
+2916 0 0
+0 0
+S
+#2917
+schematic heroic galleon~
+the heroic galleon schematic~
+The heroic galleon schematic is on the ground.~
+This schematic will teach you to manufacture: heroic galleon.
+~
+7 0 a 1
+2917 0 0
 0 0
 S
 $
