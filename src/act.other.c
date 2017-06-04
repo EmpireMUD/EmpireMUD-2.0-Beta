@@ -1397,7 +1397,7 @@ ACMD(do_beckon) {
 			msg_to_char(ch, "There is nobody here to beckon.\r\n");
 		}
 	}
-	else if (!(vict = get_char_room_vis(ch, buf))) {
+	else if (!(vict = get_char_room_vis(ch, arg))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (!IS_NPC(vict) && GET_BECKONED_BY(vict) == GET_IDNUM(REAL_CHAR(ch))) {
