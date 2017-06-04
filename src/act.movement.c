@@ -1558,7 +1558,7 @@ ACMD(do_follow) {
 		// check for beckon
 		if (!IS_NPC(ch) && GET_BECKONED_BY(ch) > 0) {
 			leader = NULL;
-			LL_FOREACH(ROOM_PEOPLE(IN_ROOM(ch)), chiter) {
+			LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
 				if (!REAL_NPC(chiter) && GET_IDNUM(REAL_CHAR(chiter)) == GET_BECKONED_BY(ch)) {
 					leader = chiter;
 					break;

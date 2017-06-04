@@ -1378,8 +1378,8 @@ ACMD(do_beckon) {
 	if (!*arg || !str_cmp(arg, "all")) {
 		any = FALSE;
 		// beckon all
-		LL_FOREACH(ROOM_PEOPLE(IN_ROOM(ch)), vict) {
-			if (vict == ch || IS_NPC(vict) || is_ignoring(vict, ch) || vict->master) {
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+			if (vict == ch || is_ignoring(vict, ch) || vict->master) {
 				continue;	// nopes
 			}
 			
