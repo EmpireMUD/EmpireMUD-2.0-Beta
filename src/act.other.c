@@ -1406,6 +1406,9 @@ ACMD(do_beckon) {
 	else if (!IS_NPC(vict) && is_ignoring(vict, ch)) {
 		act("You can't beckon $M.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
+	else if (vict->master == ch) {
+		act("$E is already following you.", FALSE, ch, NULL, vict, TO_CHAR);
+	}
 	else if (vict->master) {
 		act("$E is already following someone else.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
