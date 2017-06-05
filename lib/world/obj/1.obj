@@ -6,12 +6,12 @@ A rock is lying on the ground.~
 crafting component, or as catapult shot. They are also used to lay roads and
 build some buildings.
 ~
-1 il ano 4
+1 il ano 5
 0 2 5
 1 0
 I 19 180 100.00 1  # CHIP: a chipped rock
 O
-22 0
+22 u
 R
 5117 0
 S
@@ -21,11 +21,11 @@ a pile of clay~
 Some clay is lumped here.~
 You can mold clay into pottery.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 6 0
 O
-4 0
+4 u
 R
 5110 0
 S
@@ -35,11 +35,11 @@ a flint stone~
 A piece of flint is lying on the ground.~
 You can craft a flint set and use that to light torches.
 ~
-1 il ano 2
+1 il ano 3
 0 1 5
 5 0
 O
-22 0
+22 u
 R
 5117 0
 S
@@ -49,11 +49,11 @@ a yellow lightning stone~
 A translucent yellow lightning stone is lying here.~
 The lightning stone can be used for certain crafts and enchantments.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 1 0
 O
-11 g
+11 gu
 R
 5164 0
 R
@@ -65,11 +65,11 @@ a red bloodstone~
 A red bloodstone is sitting on the ground.~
 The bloodstone can be used for certain crafts and enchantments.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 1 0
 O
-11 g
+11 gu
 R
 5164 0
 R
@@ -81,7 +81,7 @@ a huge stone block~
 A huge stone block is sitting here.~
 The stone block is used in monumental architecture.
 ~
-3 el a 2
+3 el a 4
 0 0 0
 1 0
 M
@@ -91,7 +91,7 @@ M
 1
 $n heaves a huge stone block into place.~
 O
-3 fn
+3 nu
 R
 5117 0
 S
@@ -127,12 +127,12 @@ a stick~
 A stick has fallen on the ground.~
 You can craft a handle from a stick, or use it for building.
 ~
-1 l ano 2
+1 l ano 3
 0 2 5
 0 0
 I 11 184 100.00 1  # LIGHT: a torch
 O
-25 n
+25 nu
 R
 5118 0
 S
@@ -142,7 +142,7 @@ some rough wood~
 Some rough wood is stacked here.~
    This scraggly wood looks like it came from more than one type of desert
 tree. You can saw it into boards, and might even be able to salvage some
-sticks.  
+sticks.
 ~
 3 e a 5
 0 0 0
@@ -173,7 +173,7 @@ a heavy log~
 A heavy log has been left here.~
 Logs are used in construction.
 ~
-3 el a 4
+3 el a 5
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -185,7 +185,7 @@ M
 6
 You hoist a log onto $V.~
 O
-21 0
+21 u
 R
 5118 0
 S
@@ -195,7 +195,7 @@ a stack of lumber~
 Some lumber is stacked on the ground.~
 Lumber is used in building construction.
 ~
-3 el a 3
+3 el a 4
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -212,7 +212,7 @@ M
 7
 $n positions some lumber on the frame of $V.~
 O
-16 0
+16 u
 R
 5118 0
 R
@@ -224,7 +224,7 @@ some rough boards~
 There are rough boards stacked here.~
 Lumber is used in building construction.
 ~
-3 e a 4
+3 e a 5
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -241,7 +241,7 @@ M
 7
 $n attaches some rough boards to the frame of $V.~
 O
-16 0
+16 u
 R
 5118 0
 R
@@ -251,10 +251,10 @@ S
 column wooden bound~
 a bound wooden column~
 A bound column of wood is lying on the ground.~
-   It looks as though someone has tied bound some lumber and sticks to make a
-structural support. This could be used in place of logs for building.  
+   It looks as though someone has bound some lumber and sticks to make a
+structural support. This could be used in place of logs for building.
 ~
-3 e a 5
+3 e a 7
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -271,7 +271,7 @@ M
 7
 $n hoists a bound wooden column onto $V.~
 O
-21 0
+21 u
 R
 5118 0
 S
@@ -280,7 +280,7 @@ tree massive jungle~
 a massive jungle tree~
 A massive tree is lying on its side.~
    You can use a sharp tool to shape this exotic tree into a pillar, or you can
-saw it into lumber.  
+saw it into lumber.
 ~
 3 e a 5
 0 0 0
@@ -298,7 +298,7 @@ a fine wooden pillar~
 A fine wooden pillar is lying here.~
 This pillar can be used in construction, or sawn into lumber.
 ~
-3 e a 5
+3 e a 6
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -317,7 +317,7 @@ M
 7
 $n hoists a fine wooden pillar onto $V.~
 O
-21 0
+21 u
 R
 5118 0
 R
@@ -328,9 +328,9 @@ lumber fine tropical~
 some fine tropical lumber~
 Some fine tropical lumber is stacked here.~
    This exotic lumber looks like it was cut from the darkest of jungles. It can
-be used for construction and exquisite crafts.  
+be used for construction and exquisite crafts.
 ~
-3 e a 5
+3 e a 6
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -347,7 +347,7 @@ M
 7
 $n positions some lumber on the frame of $V.~
 O
-16 0
+16 u
 R
 5118 0
 R
@@ -487,9 +487,9 @@ S
 copperore ore copper pile~
 some copper ore~
 Some copper ore is piled on the ground.~
-Copper ore can be minted into coins.
+Copper ore can be smelted into ingots and bars.
 ~
-3 l a 1
+3 l a 2
 0 0 0
 13 0
 R
@@ -585,11 +585,11 @@ an iron ingot~
 An iron ingot is sitting on the ground.~
 Iron is used for forging and building.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 2 0
 O
-18 s
+18 su
 R
 5115 0
 S
@@ -639,11 +639,11 @@ a copper ingot~
 A copper ingot is sitting here.~
 Copper ingots can be forged into useful things.
 ~
-3 l a 2
+3 l a 3
 0 0 0
 13 0
 O
-18 s
+18 su
 R
 5115 0
 S
@@ -672,12 +672,12 @@ a chipped rock~
 A chipped rock is lying on the ground.~
 Keep chipping the rock.
 ~
-1 ikl ano 3
+1 ikl ano 4
 0 2 5
 1 0
 I 19 181 100.00 1  # CHIP: a handaxe
 O
-22 0
+22 u
 S
 #181
 handaxe axe~
@@ -716,7 +716,7 @@ a torch~
 A torch has been dropped here.~
 A torch is important when you're out at night.
 ~
-1 chl ao 1
+1 chl ano 2
 0 2 12
 0 8
 S

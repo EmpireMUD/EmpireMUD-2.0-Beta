@@ -137,6 +137,27 @@ Variables:
   
 See also: MTRIG CHARMED
 #d
+MAGGRO %AGGRO%
+
+Usage:  %aggro% [victim]
+
+This will cause the mob to attempt to attack the victim, similar to the AGGR
+flag. If the victim cannot be attacked, the mob will then attempt to hit allies
+of that victim, or someone else (including an NPC) present in the room.
+
+If the mob is already fighting, %aggro% will still cause it to hit the victim
+and change focus to that victim (similar to mkill). If the victim isn't a valid
+target, the mob will still try to hit someone else but WON'T change focus to
+them.
+
+Calling %aggro% with no argument will simply attempt to attack someone in the
+room with the mob, similar to the AGGR flag.
+
+No error is sent if the mob cannot find a valid target in the room.
+
+Example:
+  %aggro% %actor%
+#d
 MFOLLOW %FOLLOW% TRIG-FOLLOW
 
 Usage:  mfollow <victim>
@@ -236,9 +257,11 @@ Mobs can use any normal player commands in their triggers (except a few which
 are player-only), in addition to some special commands:
 
 &c%adventurecomplete%&0 - Triggers completion of the mob's adventure.
+&c%aggro%&0 - Mob attempts to aggro a person, their allies, or someone present.
 &c%aoe%&0 - Deals scaled damage to all people in the room.
 &c%asound%&0 - Echoes to rooms around the mob (but not its own).
 &c%at%&0 - Performs an action in another room, without moving the mob.
+&c%build%&0 - Adds or removes a building on the map.
 &c%buildingecho%&0 - Sends a message to everyone in a building.
 &c%damage%&0 - Deals scaled damage to a person.
 &c%door%&0 - Various functions for changing doors and exits.
@@ -253,6 +276,7 @@ are player-only), in addition to some special commands:
 &c%purge%&0 - Purges a mob, object, etc.
 &c%quest%&0 - Modifies a player's quests.
 &c%regionecho%&0 - Sends a message to a whole map region.
+&c%restore%&0 - Heals/repairs someone or something.
 &c%scale%&0 - Re-scales the target to a different level.
 &c%send%&0 - Sends a message to one person.
 &c%siege%&0 - Deals siege damage to a vehicle or building.
@@ -297,6 +321,8 @@ Mobs can trigger on the following events:
 &cFight-Charmed&0 - Triggers during combat rounds even when charmed.
 &cStart-Quest&0 - Triggers when a player tries to start a quest.
 &cFinish-Quest&0 - Triggers when a player tries to turn in a quest.
+&cPlayer-in-Room&0 - Modifier: trigger requires a player present.
+&cReboot&0 - Triggers when the mud starts up.
 
 For each type, there is a help file named &yMTRIG <type>&0.
 #d
@@ -309,9 +335,11 @@ When using field  - The variable returns:
 &cadd_mob_flag(FLG)&0 - Adds a mob flag to the mob. Also, remove_mob_flag().
 &cadd_resources(vnum,amt)&0 - Gives a person <amt> of object <vnum>.
 &caff_flagged(FLG)&0 - Checks if the actor has an AFF flag (e.g. ENTANGLED).
-&calias&0 - The list of aliases (keywords) of the mob or the player name.
 &caffect(name)&0 - Checks the actor for the affect (by name) in the subfield.
    This is the name that shows on your affects/score command when using active.
+&calias&0 - The list of aliases (keywords) of the mob or the player name.
+&callegiance(faction)&0 - Returns a mob's faction vnum, or changes the faction
+   to a different one (or 'none').
 &cblock&0 - Player's block rating.
 &cblood(amt)&0 - Returns current blood, or adds/removes blood if amt is set.
 &cbonus_exp(amt)&0 - Returns the player's bonus exp (adds to it if amt given)
@@ -320,23 +348,27 @@ When using field  - The variable returns:
 &cbonus_physical&0 - Character's Bonus-Physical damage trait.
 &ccan_afford(amt)&0 - Checks if the actor has enough coins of any converted type.
 &ccan_gain_new_skills&0 - Checks if the character can gain a new skill from 0.
+&ccan_start_quest(vnum)&0 - Whether or not the character can start a quest.
+&ccanbeseen&0 - True if the actor can be seen by the mob with the script
+   (always true for non-mob triggers).
 &ccancel_adventure_summon&0 - Call this if a script teleports a player around, to
    prevent them from being teleported again if they were adventure-summoned.
-&ccharge_coins(amt)&0 - Charges the actor a number of coins.
-&ccanbeseen&0 - True if the actor can be seen by the mob (always true 
-   for non-mob triggers).
 &ccanuseroom_ally(room)&0 - Character can use the room as a member or ally (with
    no arg, defaults to current room).
 &ccanuseroom_guest(room)&0 - Character can use the room as a guest (with no arg,
    defaults to current room).
 &ccanuseroom_member(room)&0 - Character can use the room as a member (with no arg,
    defaults to current room).
+&ccan_enter_instance(room)&0 - Determines if a player can enter the instance
+   that a room is in (e.g. due to player limits).
 &ccan_teleport_room(room)&0 - Character can legally teleport in/out of the room
    (defaults to current room).
 &ccarrying&0 - Size of character's inventory (items carried).
 &ccha&0 - The actor's Charisma.
+&cchar_target(name)&0 - Finds a visible target character in the room, by name.
+&ccharge_coins(amt)&0 - Charges the actor a number of coins.
 &cclass&0 - The actor's class, as a string.
-&ccompleted_quest(vnum)% - Whether or not the player has completed and
+&ccompleted_quest(vnum)&0 - Whether or not the player has completed and
    turned in that quest vnum.
 &ccrafting_level&0 - The actor's crafting level.
 &cdex&0 - The actor's Dexterity.
@@ -348,22 +380,26 @@ When using field  - The variable returns:
 &cempire&0 - The character's empire, if any.
 &ceq()&0 - This will return the identifier (id) for the object equipped in
    position, if any. The specified position may be either a position number
-   (0-18) or the name of the location * checks all positions. &yHELP POSITIONS&0
+   (0-18) or the name of the location * checks all positions. &yHELP %LOAD%&0
+&cfaction_name&0 - The name of the mob's 'allegiance' faction, if any.
 &cfighting&0 - The unique id of the mob fighting the actor.
 &cfirstname&0 - The actor's first name (or first keyword, for mobs).
 &cfollower(name)&0 - The follower of the actor (as an id) with name supplied.
 &cgain_skill(sk,amt)&0 - Gives the player points in a skill, or takes them.
+&cgain_reputation(faction,amt)&0 - Gives the player faction rep (or takes).
 &cgive_coins(amt)&0 - Gives the actor a number of coins.
 &cgive_skill_reset(sk)&0 - Grants the player a free skill reset in that skill.
 &cgrt&0 - The actor's Greatness.
 &chas_item()&0 - Checks if the actor has a object (inventory, equipped and
    in containers) by subfield name/var/vnum.
+&chas_reputation(faction,rep)&0 - Whether or not the player has at least that
+   much reputation with the given faction.
 &chas_resources(vnum,amt)&0 - Whether or not the player has <amt> of object <vnum>
    available in the inventory/room.
+&chealth&0 - The current hit points of the actor.
 &cheshe&0 - Returns the correct pronoun (he/she/it).
 &chimher&0 - Returns the correct pronoun (him/her/it).
 &chisher&0 - Returns the correct pronoun (his/her/its).
-&chealth&0 - The current hit points of the actor.      
 &chome&0 - Room id of the player's home, if any.
 &cid&0 - The unique id of the actor.
 &cint&0 - The actor's intelligence.
@@ -397,12 +433,17 @@ When using field  - The variable returns:
 &cmorph&0 - The vnum of the person's morph form (if morphed) or 0 if not morphed.
 &cmove&0 - The movement points of the actor.
 &cmove(amount)&0 - Add/subtract movement points on the actor.
+&cmovetype&0 - The "walks" verb for this mob/player.
 &cname&0 - The actor's name (the short description for mobs).
 &cnext_in_room&0 - The next actor in the room as a variable (id) nice to use
    for loops, or an empty return.
 &cnohassle&0 - If TRUE, the player is an immortal with !HASSLE on.
 &cnoskill(Skill)&0 - TRUE if the player has 'noskilled' that skill.
+&cobj_target(name)&0 - Finds a targeted object the character can see/has.
+&cobj_target_inv(name)&0 - Finds a targeted object in the character's inventory.
 &con_quest(vnum)&0 - TRUE if the player is currently on that quest.
+&cparse_dir(dir)&0 - Gets the real direction that the char thinks is 'dir',
+   based on whether or not they have Navigation/alcohol.
 &cpc_name&0 - Player's name or mob's keyword list, rather than short desc
 &cplr_flagged(FLAG)&0 - Returns TRUE if the player has the given flag (VAMPIRE).
 &cpoison_immunity&0 - Returns TRUE if the player has Poison Immunity.
@@ -417,14 +458,17 @@ When using field  - The variable returns:
 &cresist_poison&0 - Returns TRUE if the player has Resist Poison.
 &criding&0 - TRUE if the character is currently mounted.
 &croom&0 - The room the actor is in as a room variable. 
-&csex&0 - The actor's sex, as a string: MALE, FEMALE, or NEUTRAL.
 &cset_skill(name,level)&0 - Change a player's skill level, also gain_skill()
+&csex&0 - The actor's sex, as a string: MALE, FEMALE, or NEUTRAL.
 &cskill(name)&0 - The player's level in the given skill.
 &cstr&0 - The actor's Strength.
 &ctitle()&0 - The actor's title. Subfield sets. Not used for mobs.
 &ctohit&0 - The player's to-hit rating.
 &ctrigger_counterspell&0 - Fires the character's counterspell and returns 1 if
    so, or returns 0 if there was no counterspell.
+&cunlink_instance&0 - Disconnects the mob from any adventure instance, meaning
+   it will not be cleaned up when the instance closes (e.g. player gets to keep
+   a mob that was loaded inside an instance).
 &cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
    Useful when dealing with remote vars on players.
 &cvampire(on/off)&0 - Can change whether a player/mob is a vampire if on/off

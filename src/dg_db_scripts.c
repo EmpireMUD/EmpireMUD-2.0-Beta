@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_db_scripts.c                                 EmpireMUD 2.0b4 *
+*   File: dg_db_scripts.c                                 EmpireMUD 2.0b5 *
 *  Usage: Contains routines to handle db functions for scripts and trigs  *
 *                                                                         *
 *  DG Scripts code by egreen, 1996/09/30 21:27:54, revision 3.7           *
@@ -23,11 +23,21 @@
 #include "dg_event.h"
 #include "comm.h"
 #include "olc.h"
+#include "interpreter.h"
 
+// external vars
+extern int max_mob_id;
+extern int max_obj_id;
+extern int max_vehicle_id;
+extern struct reboot_control_data reboot_control;
+
+// external fucs
+extern void half_chop(char *string, char *arg1, char *arg2);
+
+// locals
 void trig_data_copy(trig_data *this_data, const trig_data *trg);
 void free_trigger(trig_data *trig);
 
-extern void half_chop(char *string, char *arg1, char *arg2);
 
 /**
 * Uses strtok() to compile a list of trigger commands.
@@ -245,8 +255,9 @@ void assign_triggers(void *i, int type) {
 					syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: trigger #%d non-existant, for mob #%d", trg_proto->vnum, GET_MOB_VNUM(mob));
 				}
 				else {
-					if (!SCRIPT(mob))
-						CREATE(SCRIPT(mob), struct script_data, 1);
+					if (!SCRIPT(mob)) {
+						create_script_data(mob, MOB_TRIGGER);
+					}
 					add_trigger(SCRIPT(mob), read_trigger(trg_proto->vnum), -1);
 				}
 				trg_proto = trg_proto->next;
@@ -261,8 +272,9 @@ void assign_triggers(void *i, int type) {
 					log("SYSERR: trigger #%d non-existant, for obj #%d", trg_proto->vnum, obj->vnum);
 				}
 				else {
-					if (!SCRIPT(obj))
-						CREATE(SCRIPT(obj), struct script_data, 1);
+					if (!SCRIPT(obj)) {
+						create_script_data(obj, OBJ_TRIGGER);
+					}
 					add_trigger(SCRIPT(obj), read_trigger(trg_proto->vnum), -1);
 				}
 				trg_proto = trg_proto->next;
@@ -281,8 +293,9 @@ void assign_triggers(void *i, int type) {
 					trg_proto->vnum, GET_ROOM_VNUM(room));
 				}
 				else {
-					if (!SCRIPT(room))
-						CREATE(SCRIPT(room), struct script_data, 1);
+					if (!SCRIPT(room)) {
+						create_script_data(room, WLD_TRIGGER);
+					}
 					add_trigger(SCRIPT(room), read_trigger(trg_proto->vnum), -1);
 				}
 				trg_proto = trg_proto->next;
@@ -297,8 +310,9 @@ void assign_triggers(void *i, int type) {
 					syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: trigger #%d non-existant, for vehicle #%d", trg_proto->vnum, VEH_VNUM(veh));
 				}
 				else {
-					if (!SCRIPT(veh))
-						CREATE(SCRIPT(veh), struct script_data, 1);
+					if (!SCRIPT(veh)) {
+						create_script_data(veh, VEH_TRIGGER);
+					}
 					add_trigger(SCRIPT(veh), read_trigger(trg_proto->vnum), -1);
 				}
 				trg_proto = trg_proto->next;
@@ -309,4 +323,69 @@ void assign_triggers(void *i, int type) {
 			syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: unknown type for assign_triggers()");
 			break;
 	}
+}
+
+
+/**
+* Fetches the char's script id -- may also set it here if it's not set yet.
+*
+* @param char_data *ch The character.
+* @return int The unique ID.
+*/
+int char_script_id(char_data *ch) {
+	if (ch->script_id == 0) {
+		ch->script_id = max_mob_id++;
+		add_to_lookup_table(ch->script_id, (void *)ch);
+		
+		if (max_mob_id >= EMPIRE_ID_BASE && reboot_control.time > 16) {
+			reboot_control.time = 16;
+			reboot_control.type = SCMD_REBOOT;
+			syslog(SYS_ERROR, 0, TRUE, "SYSERR: Script IDs for mobiles has exceeded the limit, scheduling an auto-reboot");
+		}
+	}
+	return ch->script_id;
+}
+
+
+/**
+* Fetches the object's script id -- may also set it here if it's not set yet.
+*
+* @param obj_data *obj The object.
+* @return int The unique ID.
+*/
+int obj_script_id(obj_data *obj) {
+	if (obj->script_id == 0) {
+		obj->script_id = max_obj_id++;
+		add_to_lookup_table(obj->script_id, (void *)obj);
+		
+		/* objs don't run out of idspace, currently
+		if (max_obj_id > x && reboot_control.time > 16) {
+			reboot_control.time = 16;
+			reboot_control.type = SCMD_REBOOT;
+			syslog(SYS_ERROR, 0, TRUE, "SYSERR: Script IDs for objects has exceeded the limit, scheduling an auto-reboot");
+		}
+		*/
+	}
+	return obj->script_id;
+}
+
+
+/**
+* Fetches the vehicle's script id -- may also set it here if it's not set yet.
+*
+* @param vehicle_data *veh The vehicle.
+* @return int The unique ID.
+*/
+int veh_script_id(vehicle_data *veh) {
+	if (veh->script_id == 0) {
+		veh->script_id = max_vehicle_id++;
+		add_to_lookup_table(veh->script_id, (void *)veh);
+		
+		if (max_vehicle_id >= OBJ_ID_BASE && reboot_control.time > 16) {
+			reboot_control.time = 16;
+			reboot_control.type = SCMD_REBOOT;
+			syslog(SYS_ERROR, 0, TRUE, "SYSERR: Script IDs for vehicles has exceeded the limit, scheduling an auto-reboot");
+		}
+	}
+	return veh->script_id;
 }

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: instance.c                                      EmpireMUD 2.0b4 *
+*   File: instance.c                                      EmpireMUD 2.0b5 *
 *  Usage: code related to instantiating adventure zones                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -30,6 +30,8 @@
 */
 
 // external consts
+extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
+extern const char *dirs[];
 extern const int rev_dir[];
 
 // external funcs
@@ -44,22 +46,23 @@ bool can_instance(adv_data *adv);
 int count_instances(adv_data *adv);
 int count_mobs_in_instance(struct instance_data *inst, mob_vnum vnum);
 int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum);
-int count_players_in_instance(struct instance_data *inst, bool include_imms);
+int count_players_in_instance(struct instance_data *inst, bool include_imms, char_data *ignore_ch);
 int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum);
 static int determine_random_exit(adv_data *adv, room_data *from, room_data *to);
+struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type);
 any_vnum get_new_instance_id(void);
 static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
-struct instance_data *real_instance(any_vnum instance_id);
 void reset_instance(struct instance_data *inst);
-static void scale_instance_to_level(struct instance_data *inst, int level);
-void unlink_instance_entrance(room_data *room);
+void scale_instance_to_level(struct instance_data *inst, int level);
+void unlink_instance_entrance(room_data *room, struct instance_data *inst);
 
 
 // local globals
 struct instance_data *instance_list = NULL;	// global instance list
 bool instance_save_wait = FALSE;	// prevents repeated instance saving
+struct instance_data *quest_instance_global = NULL;	// passes instances through to some quest triggers
 
 // ADV_LINK_x: whether or not a rule specifies a possible location (other types are for limits)
 const bool is_location_rule[] = {
@@ -83,8 +86,9 @@ const bool is_location_rule[] = {
 * @param struct adventure_link_rule *rule The rule we're using to set it up.
 * @param room_data *loc The pre-validated world location.
 * @param int dir The chosen direction, IF required (may be DIR_RANDOM or NO_DIR, too).
+* @param int rotation The rotatable direction, if applicable (NO_DIR for none).
 */
-static void build_instance_entrance(struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir) {
+static void build_instance_entrance(struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation) {
 	void special_building_setup(char_data *ch, room_data *room);
 	void complete_building(room_data *room);
 	
@@ -150,6 +154,9 @@ static void build_instance_entrance(struct instance_data *inst, struct adventure
 		case ADV_LINK_BUILDING_EXISTING:
 		case ADV_LINK_BUILDING_NEW: {
 			my_dir = (rule->dir != DIR_RANDOM ? rule->dir : determine_random_exit(inst->adventure, loc, inst->start));
+			if (ADVENTURE_FLAGGED(inst->adventure, ADV_ROTATABLE) && rotation != NO_DIR && my_dir != NO_DIR) {
+				my_dir = confused_dirs[rotation][0][my_dir];
+			}
 			if (my_dir != NO_DIR) {
 				create_exit(loc, inst->start, my_dir, TRUE);
 			}
@@ -200,7 +207,12 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 		return NULL;
 	}
 	
-	// make an instance
+	// import dir from existing building
+	if (rule->type == ADV_LINK_BUILDING_EXISTING && dir == NO_DIR && !ROOM_BLD_FLAGGED(loc, BLD_OPEN | BLD_ROOM)) {
+		dir = rev_dir[BUILDING_ENTRANCE(loc)];
+	}
+	
+ 	// make an instance
 	CREATE(inst, struct instance_data, 1);
 	inst->id = get_new_instance_id();
 	inst->adventure = adv;
@@ -218,7 +230,12 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 	}
 	
 	if (ADVENTURE_FLAGGED(adv, ADV_ROTATABLE)) {
-		rotation = number(0, NUM_SIMPLE_DIRS-1);
+		if (dir != NO_DIR && dir != DIR_RANDOM) {
+			rotation = dir;
+		}
+		else {
+			rotation = number(0, NUM_SIMPLE_DIRS-1);
+		}
 	}
 	else {
 		rotation = NORTH;
@@ -339,9 +356,8 @@ static int determine_random_exit(adv_data *adv, room_data *from, room_data *to) 
 * @param int rotation The whole-zone rotation direction (e.g. NORTH).
 */
 static void instantiate_one_exit(struct instance_data *inst, room_data *room, struct exit_template *exit, int rotation) {
-	extern const int confused_dirs[NUM_SIMPLE_DIRS][2][NUM_OF_DIRS];
-
 	struct room_direction_data *new;
+	struct exit_template *ex_iter;
 	room_data *to_room = NULL;
 	int iter, dir;
 	
@@ -379,6 +395,7 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 		COMPLEX_DATA(room)->exits = new;
 	}
 	
+	// build the exit
 	new->dir = dir;
 	new->to_room = GET_ROOM_VNUM(to_room);
 	new->room_ptr = to_room;
@@ -388,6 +405,16 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 		free(new->keyword);
 	}
 	new->keyword = exit->keyword ? str_dup(exit->keyword) : NULL;
+	
+	// mark this exit as done to prevent repeats
+	exit->done = TRUE;
+	
+	// check if we need a back exit
+	LL_FOREACH(GET_RMT_EXITS(GET_ROOM_TEMPLATE(to_room)), ex_iter) {
+		if (!ex_iter->done && ex_iter->target_room == ROOM_TEMPLATE_VNUM(room)) {
+			instantiate_one_exit(inst, to_room, ex_iter, rotation);
+		}
+	}
 }
 
 
@@ -403,6 +430,7 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 	
 	const bitvector_t default_affs = ROOM_AFF_UNCLAIMABLE;
 	
+	sector_data *sect;
 	room_data *room;
 	
 	if (!rmt) {
@@ -411,7 +439,9 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 	
 	room = create_room();
 	attach_template_to_room(rmt, room);
-	BASE_SECT(room) = SECT(room) = sector_proto(config_get_int("default_adventure_sect"));
+	sect = sector_proto(config_get_int("default_adventure_sect"));
+	perform_change_sect(room, NULL, sect);
+	perform_change_base_sect(room, NULL, sect);
 	SET_BIT(ROOM_BASE_FLAGS(room), GET_RMT_BASE_AFFECTS(rmt) | default_affs);
 	SET_BIT(ROOM_AFF_FLAGS(room), GET_RMT_BASE_AFFECTS(rmt) | default_affs);
 	
@@ -475,6 +505,13 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 					COMPLEX_DATA(room_list[pos])->home_room = inst->start;
 				}
 			}
+			
+			// mark exits as non-instantiated
+			LL_FOREACH(GET_RMT_EXITS(rmt), ex) {
+				ex->done = FALSE;
+			}
+			
+			// increment pos
 			++pos;
 		}
 	}
@@ -487,13 +524,13 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 	
 	// attach the instance to the world (do this before adding dirs, because it may take up a random dir slot)
 	// do not rotate this dir; it was pre-validated for building
-	build_instance_entrance(inst, rule, loc, dir);
+	build_instance_entrance(inst, rule, loc, dir, rotation);
 
 	// exits: non-random first
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (room_list[iter] && template_list[iter]) {
 			for (ex = GET_RMT_EXITS(template_list[iter]); ex; ex = ex->next) {
-				if (ex->dir != DIR_RANDOM) {
+				if (!ex->done && ex->dir != DIR_RANDOM) {
 					instantiate_one_exit(inst, room_list[iter], ex, rotation);
 				}
 			}
@@ -504,7 +541,7 @@ static void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct 
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (room_list[iter] && template_list[iter]) {
 			for (ex = GET_RMT_EXITS(template_list[iter]); ex; ex = ex->next) {
-				if (ex->dir == DIR_RANDOM) {
+				if (!ex->done && ex->dir == DIR_RANDOM) {
 					instantiate_one_exit(inst, room_list[iter], ex, rotation);
 				}
 			}
@@ -632,6 +669,9 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 		if (ROOM_OWNER(home) && !LINK_FLAGGED(rule, ADV_LINKF_CLAIMED_OK | ADV_LINKF_CITY_ONLY)) {
 			return FALSE;
 		}
+		if (ROOM_OWNER(home) && (EMPIRE_LAST_LOGON(ROOM_OWNER(home)) + (config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK)) < time(0)) {
+			return FALSE;	// owner is timed out -- don't spawn here
+		}
 	
 		// certain room flags are always no-gos
 		if ((ROOM_AFF_FLAGGED(loc, no_no_flags) || ROOM_AFF_FLAGGED(home, no_no_flags))) {
@@ -706,13 +746,14 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 */
 room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir) {
 	extern bool can_build_on(room_data *room, bitvector_t flags);
+	extern bool rmt_has_exit(room_template *rmt, int dir);
 	
 	room_template *start_room = room_template_proto(GET_ADV_START_VNUM(adv));
 	room_data *room, *next_room, *loc, *shift, *found = NULL;
 	int dir, iter, sub, num_found, pos;
 	sector_data *findsect = NULL;
 	bool match_buildon = FALSE;
-	bld_data *findbdg = NULL;
+	bld_data *findbdg = NULL, *bdg = NULL;
 	struct map_data *map;
 	
 	const int max_tries = 500, max_dir_tries = 10;	// for random checks
@@ -830,10 +871,14 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 				for (sub = 0; sub < max_dir_tries && !found; ++sub) {
 					dir = number(0, NUM_2D_DIRS-1);
 					
-					// matches the dir we need inside?
-					if (dir == rule->dir) {
-						continue;
+					// new non-open building
+					if (rule->type == ADV_LINK_BUILDING_NEW && (bdg = building_proto(rule->value)) && !IS_SET(GET_BLD_FLAGS(bdg), BLD_OPEN)) {
+						// matches a dir we need inside?
+						if (dir == rule->dir || rmt_has_exit(start_room, rev_dir[dir])) {
+							continue;
+						}
 					}
+					
 					// need a valid map tile to face
 					if (!(shift = real_shift(loc, shift_dir[dir][0], shift_dir[dir][1]))) {
 						continue;
@@ -929,6 +974,8 @@ void delete_instance(struct instance_data *inst) {
 	void extract_pending_chars();
 	void relocate_players(room_data *room, room_data *to_room);
 	
+	struct instance_mob *im, *next_im;
+	vehicle_data *veh, *next_veh;
 	struct instance_data *temp;
 	char_data *mob, *next_mob;
 	room_data *room;
@@ -943,12 +990,17 @@ void delete_instance(struct instance_data *inst) {
 		// remove any players inside
 		for (iter = 0; iter < inst->size; ++iter) {
 			if (inst->room[iter]) {
+				// get rid of vehicles first (helps relocate players inside)
+				LL_FOREACH_SAFE2(ROOM_VEHICLES(inst->room[iter]), veh, next_veh, next_in_room) {
+					extract_vehicle(veh);
+				}
+	
 				relocate_players(inst->room[iter], room);
 			}
 		}
 	
 		// unlink from location:
-		unlink_instance_entrance(inst->location);
+		unlink_instance_entrance(inst->location, inst);
 	}
 	
 	// any portal in will be cleaned up by delete_room
@@ -961,6 +1013,7 @@ void delete_instance(struct instance_data *inst) {
 			if (ADVENTURE_FLAGGED(inst->adventure, ADV_NO_MOB_CLEANUP)) {
 				// just disassociate
 				MOB_INSTANCE_ID(mob) = NOTHING;
+				// shouldn't need this: subtract_instance_mob(inst, GET_MOB_VNUM(mob));
 			}
 			else {
 				act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
@@ -985,6 +1038,12 @@ void delete_instance(struct instance_data *inst) {
 	if (inst->room) {
 		free(inst->room);
 	}
+	
+	// other stuff to free
+	HASH_ITER(hh, inst->mob_counts, im, next_im) {
+		free(im);
+	}
+	
 	free(inst);
 	
 	// re-enable instance saving
@@ -1068,12 +1127,13 @@ static void reset_instance_room(struct instance_data *inst, room_data *room) {
 					if (mob_proto(spawn->vnum) && count_mobs_in_instance(inst, spawn->vnum) < spawn->limit) {
 						mob = read_mobile(spawn->vnum, TRUE);
 						MOB_INSTANCE_ID(mob) = inst->id;
+						add_instance_mob(inst, GET_MOB_VNUM(mob));
 						setup_generic_npc(mob, NULL, NOTHING, NOTHING);
 						char_to_room(mob, room);
 						if (inst->level > 0) {
 							scale_mob_to_level(mob, inst->level);
 						}
-						act("$n arrives.", FALSE, mob, NULL, NULL, TO_ROOM);
+						act("$n arrives.", TRUE, mob, NULL, NULL, TO_ROOM);
 						load_mtrigger(mob);
 					}
 					break;
@@ -1146,6 +1206,10 @@ void reset_instances(void) {
 		if (inst->last_reset + (60 * GET_ADV_RESET_TIME(inst->adventure)) > time(0)) {
 			continue;
 		}
+		// needs to be empty?
+		if (ADVENTURE_FLAGGED(inst->adventure, ADV_EMPTY_RESET_ONLY) && count_players_in_instance(inst, FALSE, NULL) > 0) {
+			continue;
+		}
 		
 		reset_instance(inst);
 	}
@@ -1170,7 +1234,7 @@ void prune_instances(void) {
 		// look for completed or orphaned instances
 		if (INSTANCE_FLAGGED(inst, INST_COMPLETED) || !inst->start || !inst->location || inst->size == 0 || (rule && (inst->created + 60 * rule->value) < time(0))) {
 			// well, only if empty
-			if (count_players_in_instance(inst, TRUE) == 0) {
+			if (count_players_in_instance(inst, TRUE, NULL) == 0) {
 				delete_instance(inst);
 				save = TRUE;
 			}
@@ -1205,26 +1269,14 @@ void prune_instances(void) {
 * served as the link for an adventure instance.
 *
 * @param room_data *room The map (or interior) location that was the anchor for an instance.
+* @param struct instance_data *inst The instance being cleaned up.
 */
-void unlink_instance_entrance(room_data *room) {
+void unlink_instance_entrance(room_data *room, struct instance_data *inst) {
 	extern bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum);
 	
+	adv_data *adv = inst->adventure;
 	struct trig_proto_list *tpl;
 	trig_data *proto, *trig;
-	adv_data *adv = NULL;
-	
-	// detect adventure
-	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
-		adv = COMPLEX_DATA(room)->instance->adventure;
-	}
-	
-	// exits to it will be cleaned up by delete_room
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY)) {
-		if (ROOM_PEOPLE(room)) {
-			act("The adventure vanishes around you!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
-		}
-		disassociate_building(room);
-	}
 	
 	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_HAS_INSTANCE);
 	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_HAS_INSTANCE);
@@ -1249,7 +1301,7 @@ void unlink_instance_entrance(room_data *room) {
 				continue;
 			}
 			if (!SCRIPT(room)) {
-				CREATE(SCRIPT(room), struct script_data, 1);
+				create_script_data(room, WLD_TRIGGER);
 			}
 			add_trigger(SCRIPT(room), trig, -1);
 		}
@@ -1272,11 +1324,45 @@ void unlink_instance_entrance(room_data *room) {
 			}
 		}
 	}
+	
+	// exits to it will be cleaned up by delete_room
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY)) {
+		if (ROOM_PEOPLE(room)) {
+			act("The adventure vanishes around you!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+		}
+		disassociate_building(room);
+	}
 }
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// INSTANCE UTILS //////////////////////////////////////////////////////////
+
+/**
+* Marks a mob as belonging to an instance (for counting purposes).
+*
+* @param struct instance_data *inst The instance.
+* @param mob_vnum vnum Which mob vnum to add to.
+*/
+void add_instance_mob(struct instance_data *inst, mob_vnum vnum) {
+	struct instance_mob *im;
+	
+	if (!inst || vnum == NOTHING) {
+		return;
+	}
+	
+	// find or create
+	HASH_FIND_INT(inst->mob_counts, &vnum, im);
+	if (!im) {
+		CREATE(im, struct instance_mob, 1);
+		im->vnum = vnum;
+		HASH_ADD_INT(inst->mob_counts, vnum, im);
+	}
+	
+	// add
+	im->count += 1;
+}
+
 
 /**
 * Determines if a player is eligible to enter an instance in any way.
@@ -1291,7 +1377,7 @@ bool can_enter_instance(char_data *ch, struct instance_data *inst) {
 		return TRUE;
 	}
 	
-	if (GET_ADV_PLAYER_LIMIT(inst->adventure) > 0 && count_players_in_instance(inst, FALSE) >= GET_ADV_PLAYER_LIMIT(inst->adventure)) {
+	if (GET_ADV_PLAYER_LIMIT(inst->adventure) > 0 && count_players_in_instance(inst, FALSE, ch) >= GET_ADV_PLAYER_LIMIT(inst->adventure)) {
 		return FALSE;
 	}
 	else {
@@ -1348,25 +1434,27 @@ int count_instances(adv_data *adv) {
 
 
 /**
-* @param struct instance_data *inst The instance to check.
-* @param mob_vnum vnum Mob vnum to look for.
-* @return int Total number of that mob in the instance.
+* Returns how many of a mob are live in the world, who originated from the
+* instance.
+*
+* @param struct instance_data *inst The instance.
+* @param mob_vnum vnum Which mob vnum to count.
+* @return int The number of that mob from the instance.
 */
 int count_mobs_in_instance(struct instance_data *inst, mob_vnum vnum) {
-	int iter, count = 0;
-	char_data *ch;
+	struct instance_mob *im;
 	
-	for (iter = 0; iter < inst->size; ++iter) {
-		if (inst->room[iter]) {
-			for (ch = ROOM_PEOPLE(inst->room[iter]); ch; ch = ch->next_in_room) {
-				if (IS_NPC(ch) && GET_MOB_VNUM(ch) == vnum) {
-					++count;
-				}
-			}
-		}
+	if (!inst || vnum == NOTHING) {
+		return 0;
 	}
 	
-	return count;
+	HASH_FIND_INT(inst->mob_counts, &vnum, im);
+	if (im) {
+		return im->count;
+	}
+	else {
+		return 0;
+	}
 }
 
 
@@ -1396,16 +1484,17 @@ int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum) {
 /**
 * @param struct instance_data *inst The instance to check.
 * @param bool count_imms If TRUE, includes immortals (who don't normally contribute to player limits).
+* @param char_data *ignore_ch Optional: A character not to count, e.g. someone trying to enter the instance (to prevent counting them against their own entry) (may be NULL).
 * @return int Total number of players in the instance.
 */
-int count_players_in_instance(struct instance_data *inst, bool count_imms) {
+int count_players_in_instance(struct instance_data *inst, bool count_imms, char_data *ignore_ch) {
 	int iter, count = 0;
 	char_data *ch;
 	
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (inst->room[iter]) {
 			for (ch = ROOM_PEOPLE(inst->room[iter]); ch; ch = ch->next_in_room) {
-				if (!IS_NPC(ch) && (count_imms || !IS_IMMORTAL(ch))) {
+				if (ch != ignore_ch && !IS_NPC(ch) && (count_imms || !IS_IMMORTAL(ch))) {
 					++count;
 				}
 			}
@@ -1436,6 +1525,53 @@ int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum) {
 	}
 	
 	return count;
+}
+
+
+/**
+* Finds the closest instance with a given room template, and returns the
+* instantiated room location.
+*
+* @param room_data *from Our "closest to" starting point.
+* @param rmt_vnum vnum Which room template vnum to look for.
+*/
+room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum) {
+	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
+	
+	adv_data *adv = get_adventure_for_vnum(vnum);
+	struct instance_data *inst, *closest = NULL;
+	int this, dist = 0;
+	room_data *map;
+	
+	if (!adv) {
+		return NULL;	// no such adventure
+	}
+	if (!(map = get_map_location_for(from))) {
+		return NULL;	// does not work if no map loc
+	}
+	
+	LL_FOREACH(instance_list, inst) {
+		if (inst->adventure != adv) {
+			continue;	// wrong adv
+		}
+		if (IS_SET(inst->flags, INST_COMPLETED)) {
+			continue;	// do not pick a completed adventure
+		}
+		
+		// this could work
+		this = compute_distance(map, inst->location);
+		if (!closest || this < dist) {
+			closest = inst;	// save for later
+			dist = this;
+		}
+	}
+	
+	if (closest) {
+		return find_room_template_in_instance(closest, vnum);
+	}
+	else {
+		return NULL;
+	}
 }
 
 
@@ -1506,6 +1642,60 @@ struct instance_data *get_instance_by_mob(char_data *mob) {
 }
 
 
+/*
+* Try to find the relevant instance for a script.
+*
+* @param int go_type _TRIGGER type for 'go'
+* @param void *go A pointer to the thing the script is running on.
+* @return struct instance_data* The matching instance for where the script is running, or NULL if none.
+*/
+struct instance_data *get_instance_for_script(int go_type, void *go) {
+	extern room_data *obj_room(obj_data *obj);
+	
+	struct instance_data *inst = NULL;
+	room_data *orm;
+	
+	// prefer global instance if any (e.g. from a quest trigger)
+	if (quest_instance_global) {
+		inst = quest_instance_global;
+	}
+	if (!inst) {
+		switch (go_type) {
+			case MOB_TRIGGER: {
+				// try mob first
+				if (MOB_INSTANCE_ID((char_data*)go) != NOTHING) {
+					inst = get_instance_by_id(MOB_INSTANCE_ID((char_data*)go));
+				}
+				if (!inst) {
+					inst = find_instance_by_room(IN_ROOM((char_data*)go), FALSE);
+				}
+				break;
+			}
+			case OBJ_TRIGGER: {
+				if ((orm = obj_room((obj_data*)go))) {
+					inst = find_instance_by_room(orm, FALSE);
+				}
+				break;
+			}
+			case WLD_TRIGGER:
+			case RMT_TRIGGER:
+			case BLD_TRIGGER:
+			case ADV_TRIGGER: {
+				inst = find_instance_by_room((room_data*)go, FALSE);
+				break;
+			}
+			case VEH_TRIGGER: {
+				inst = find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE);
+				break;
+			}
+		}
+	}
+	
+	// may or may not have found one
+	return inst;
+}
+
+
 /**
 * @return any_vnum Finds the first free instance id.
 */
@@ -1563,6 +1753,31 @@ struct instance_data *real_instance(any_vnum instance_id) {
 }
 
 
+/**
+* Removes a mob from the instance's count (e.g. when it dies).
+*
+* @param struct instance_data *inst The instance.
+* @param mob_vnum vnum Which mob vnum to subtract.
+*/
+void subtract_instance_mob(struct instance_data *inst, mob_vnum vnum) {
+	struct instance_mob *im;
+	
+	if (!inst || vnum == NOTHING) {
+		return;
+	}
+	
+	// find
+	HASH_FIND_INT(inst->mob_counts, &vnum, im);
+	if (im) {
+		im->count -= 1;
+		if (im->count <= 0) {
+			HASH_DEL(inst->mob_counts, im);
+			free(im);
+		}
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// INSTANCE FILE UTILS /////////////////////////////////////////////////////
 
@@ -1584,9 +1799,11 @@ struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom
 	}
 	
 	// check if it's the location for one
-	for (inst = instance_list; inst; inst = inst->next) {
-		if (inst->location == room || (check_homeroom && HOME_ROOM(inst->location) == room)) {
-			return inst;
+	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) || (check_homeroom && ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_HAS_INSTANCE))) {
+		for (inst = instance_list; inst; inst = inst->next) {
+			if (inst->location == room || (check_homeroom && HOME_ROOM(inst->location) == room)) {
+				return inst;
+			}
 		}
 	}
 	
@@ -1631,11 +1848,6 @@ void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, in
 	if (mob) {
 		if (MOB_INSTANCE_ID(mob) != NOTHING) {
 			inst = real_instance(MOB_INSTANCE_ID(mob));
-		}
-		if (!inst && IN_ROOM(mob)) {
-			if (COMPLEX_DATA(IN_ROOM(mob))) {
-				inst = COMPLEX_DATA(IN_ROOM(mob))->instance;
-			}
 		}
 	}
 	if (!inst && room && COMPLEX_DATA(room)) {
@@ -1740,13 +1952,6 @@ int lock_instance_level(room_data *room, int level) {
 	
 	if (IS_ADVENTURE_ROOM(room) && COMPLEX_DATA(room) && (inst = COMPLEX_DATA(room)->instance)) {
 		if (inst->level <= 0) {
-			if (GET_ADV_MIN_LEVEL(inst->adventure) > 0) {
-				level = MAX(level, GET_ADV_MIN_LEVEL(inst->adventure));
-			}
-			if (GET_ADV_MAX_LEVEL(inst->adventure) > 0) {
-				level = MIN(level, GET_ADV_MAX_LEVEL(inst->adventure));
-			}
-			
 			scale_instance_to_level(inst, level);
 		}
 		else {
@@ -1771,18 +1976,24 @@ void mark_instance_completed(struct instance_data *inst) {
 
 
 /**
-* Sets up instance info.
+* Sets up instance info and prunes bad instances
 */
 static void renum_instances(void) {
-	struct instance_data *inst;
+	struct instance_data *inst, *next_inst;
 	int iter;
 	
-	for (inst = instance_list; inst; inst = inst->next) {
+	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		// attach pointers
 		for (iter = 0; iter < inst->size; ++iter) {			
 			// set up instance data
 			if (inst->room[iter] && COMPLEX_DATA(inst->room[iter])) {
 				COMPLEX_DATA(inst->room[iter])->instance = inst;
 			}
+		}
+		
+		// check bad instance
+		if (!inst->location || !inst->start) {
+			delete_instance(inst);
 		}
 	}
 }
@@ -1872,7 +2083,7 @@ void save_instances(void) {
 * @param struct instance_data *inst The instance to scale.
 * @param int level A pre-validated level.
 */
-static void scale_instance_to_level(struct instance_data *inst, int level) {	
+void scale_instance_to_level(struct instance_data *inst, int level) {	
 	void scale_vehicle_to_level(vehicle_data *veh, int level);
 	
 	int iter;
@@ -1880,15 +2091,17 @@ static void scale_instance_to_level(struct instance_data *inst, int level) {
 	char_data *ch;
 	obj_data *obj;
 	
+	if (GET_ADV_MIN_LEVEL(inst->adventure) > 0) {
+		level = MAX(level, GET_ADV_MIN_LEVEL(inst->adventure));
+	}
+	if (GET_ADV_MAX_LEVEL(inst->adventure) > 0) {
+		level = MIN(level, GET_ADV_MAX_LEVEL(inst->adventure));
+	}
+	
 	inst->level = level;
 	
 	for (iter = 0; iter < inst->size; ++iter) {
 		if (inst->room[iter]) {
-			for (ch = ROOM_PEOPLE(inst->room[iter]); ch; ch = ch->next_in_room) {
-				if (IS_NPC(ch) && GET_CURRENT_SCALE_LEVEL(ch) == 0) {
-					scale_mob_to_level(ch, level);
-				}
-			}
 			for (obj = ROOM_CONTENTS(inst->room[iter]); obj; obj = obj->next_content) {
 				if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {
 					scale_item_to_level(obj, level);
@@ -1899,6 +2112,13 @@ static void scale_instance_to_level(struct instance_data *inst, int level) {
 					scale_vehicle_to_level(veh, level);
 				}
 			}
+		}
+	}
+	
+	LL_FOREACH(character_list, ch) {
+		if (IS_NPC(ch) && MOB_INSTANCE_ID(ch) == inst->id && GET_CURRENT_SCALE_LEVEL(ch) != level) {
+			GET_CURRENT_SCALE_LEVEL(ch) = 0;	// force override on level
+			scale_mob_to_level(ch, level);
 		}
 	}
 }

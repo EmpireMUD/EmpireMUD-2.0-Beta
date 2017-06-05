@@ -1,0 +1,32 @@
+#10700
+deer reindeer~
+a reindeer~
+A reindeer raises its head from grazing.~
+cej 9 0 100 0
+2 25 215 10719
+A
+6 2
+A
+11 1
+A
+1 -1
+A
+8 -1
+S
+#10701
+snowman large~
+a large snowman~
+A large snowman stands nearby.~
+cijl 15 9 100 nrG
+1 0 -1 10719
+A
+11 -5
+S
+#10702
+elf christmas~
+a Christmas elf~
+A Christmas elf is dancing about.~
+0 15 0 0 0
+1 0 -1 10719
+S
+$

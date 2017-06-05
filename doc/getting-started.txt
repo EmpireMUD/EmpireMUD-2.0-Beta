@@ -1,0 +1,132 @@
+This document will help you set up and configure your new EmpireMUD. Everything
+in this document is just a suggestion. It's your world. Run it however you
+like.
+
+CONTENTS:
+
+  A. World Setup
+  B. Configuration
+  C. Adventures
+  D. Staff
+  E. Adding Content
+
+
+=================
+ A. WORLD SETUP:
+-----------------
+
+Before you start up your EmpireMUD for the first time, generate a map using
+the directions in the README file that came with EmpireMUD.
+
+By default, the map generator places 1 starting location (a Tower of Souls) on
+the new map. After you start up your EmpireMUD, you should select a few good
+locations for more starting locations. You may remove the first one, since the
+location that's chosen automatically is not always a good one.
+
+You should create 1 or more newbie islands -- safe places for new players to
+learn the game. Choose any small island either by generating a graphical 
+version of your map, or using the 'island list' command to find small islands.
+
+A newbie island usually needs these things:
+ 1. A Tower of Souls (starting location):  .map terrain Tower of Souls
+ 2. Set the area around the Tower of Souls unclaimable:  .map unclaimable 4
+ 3. Set the island flags:  island flags <island id> add <flags>
+    Suggested flags:
+      NEWBIE  - enables newbie adventures and protections
+      !AGGRO  - prevents aggro mobs from attacking players
+      !CUSTOMIZE  - prevents players from renaming the island
+
+Additional tools:
+ - 'show startlocs' - Lists the starting locations.
+ - 'config world naturalize_newbie_islands true' - If you want to automatically
+   clean up the newbie islands each year.
+
+
+==================
+ B. CONFIGURATION
+------------------
+
+Many parts of EmpireMUD can be configured to different settings, for games
+that have different sets of rules and limits.
+
+The 'config' command allows you to change these settings in-game. It is split
+into multiple categories. You can type 'config world' to see the world configs,
+and 'config world -v' if you want an explanation of what they all do.
+
+Suggested configs to set right away:
+
+config game:
+ mud_contact - email address of the game admin
+ mud_created - set to the current year
+ mud_hostname - your domain
+ mud_ip - your IP address
+ mud_name - the name of your copy of EmpireMUD
+ mud_website - a website, if you have one
+
+config approval (if you want to require character approval)
+ approve_per_character - each character would require approval, instead of
+   each account
+ auto_approve - turn this off if you want to require approval
+ * - the rest of this category controls which commands require approval
+
+
+================
+ C. ADVENTURES:
+----------------
+
+Some adventures require setup once your game is running. Each of these
+adventures has notes in its description. You can use 'vstat adv <vnum>' to
+see the notes, and you can delete those notes once you finish setup.
+
+The following adventures require setup:
+	[   50] Tutorial: Royal Planning Office
+	[   51] Tutorial: Museum of Early Man
+	[   52] Tutorial Quests
+	[  180] Misplaced Mother Goose
+	[  181] Goblin Mines
+	[18200] The Guild of Adventurers
+
+
+==========
+ D. STAFF
+----------
+
+Here are some useful tips about adding staff members:
+
+Advance: You can promote someone to immortal level using 'advance <name> 3'.
+The default immortals levels are 3-6.
+
+Restore: You should always 'restore' new immortal staff members, including
+yourself. This gives the player all skills and turns off hunger/thirst.
+
+Set: You may want some of the following settings on your staff members:
+ multi-ip - Allows multiple accounts to log in from the same IP address.
+ multi-char - Allows multiple characters to log in from the same account.
+ noidleout - Turns off the automatic logout for being idle.
+
+Grants: You can give lower-level immortals additional powers by giving them
+'grants' using 'set <name> grants [add | remove] <flags>'. To see a list of
+available grants, type 'set <name> grants' with no other arguments. Most grants
+give access to a single command, but type 'help grants' for more information.
+
+OLC: If your staff members will be building content, you can control their
+access to this system. More information is available on 'help olc controls'.
+
+
+===================
+ E. ADDING CONTENT
+-------------------
+
+EmpireMUD 2.0 includes a full suite of OLC (OnLine Creation) editors that allow
+you to edit all facets of the game. You should familiarize yourself with the
+following commands and help files:
+
+  . (olc) - The . command controls all the OLC functions.
+  vnum - Look up an item/mob/etc by name.
+  vstat - Get stats on something by vnum (virtual number).
+  BUILDING GUIDE - A help file with general tips on all the editors.
+  instance - Control instances of adventures.
+
+If you plan to add new content, you should pick vnums starting at 100000 or
+higher, to avoid conflicting with any new stock content that might appear in
+future updates.

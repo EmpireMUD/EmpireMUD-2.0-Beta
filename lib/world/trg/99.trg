@@ -1,9 +1,10 @@
 #9900
 Mini-pet Use~
-1 c 2
+1 c 3
 use~
+eval targ %%actor.obj_target(%arg%)%%
 eval test %%self.is_name(%arg%)%%
-if !%test%
+if %targ% != %self% && !(%test% && %self.worn_by%)
   return 0
   halt
 end
@@ -52,6 +53,8 @@ elseif %mobs% > 4
 else
   %send% %actor% You use %self.shortdesc%...
   %echoaround% %actor% %actor.name% uses %self.shortdesc%...
+  eval bind %%self.bind(%actor%)%%
+  nop %bind%
   %load% m %self.val0%
   eval pet %room_var.people%
   if (%pet% && %pet.vnum% == %self.val0%)
@@ -60,6 +63,8 @@ else
     eval %varname% %timestamp%
     remote %varname% %actor.id%
     dg_affect %pet% *CHARM on -1
+    nop %pet.add_mob_flag(!EXP)%
+    nop %pet.unlink_instance%
   end
 end
 ~
@@ -67,8 +72,8 @@ end
 Dismissable~
 0 ct 0
 dismiss~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+eval test %%actor.char_target(%arg%)%%
+if %test% != %self%
   return 0
   halt
 end
@@ -77,8 +82,9 @@ if (%self.master% && %self.master% == %actor%)
   %echoaround %actor% %actor.name% dismisses %self.name%.
   %purge% %self%
 else
-  * ordinary dismiss error
-  return 0
+  %send% %actor% That's not your pet.
+  return 1
+  halt
 end
 ~
 #9902

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.stealth.c                                   EmpireMUD 2.0b4 *
+*   File: act.stealth.c                                   EmpireMUD 2.0b5 *
 *  Usage: code related to non-offensive skills and abilities              *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -36,6 +36,7 @@
 extern const int rev_dir[];
 
 // external funcs
+void check_combat_start(char_data *ch);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 void scale_item_to_level(obj_data *obj, int level);
 
@@ -66,6 +67,11 @@ bool can_infiltrate(char_data *ch, empire_data *emp) {
 	
 	if (emp == chemp) {
 		msg_to_char(ch, "You can't infiltrate your own empire!\r\n");
+		return FALSE;
+	}
+	
+	if (EMPIRE_IMM_ONLY(emp)) {
+		msg_to_char(ch, "You cannot infiltrate immortal empires.\r\n");
 		return FALSE;
 	}
 	
@@ -262,7 +268,7 @@ void trigger_distrust_from_stealth(char_data *ch, empire_data *emp) {
 		pol->type = DIPL_DISTRUST;
 		
 		log_to_empire(chemp, ELOG_DIPLOMACY, "%s now distrusts this empire due to stealth activity (%s)", EMPIRE_NAME(emp), PERS(ch, ch, TRUE));
-		save_empire(chemp);
+		EMPIRE_NEEDS_SAVE(chemp) = TRUE;
 	}
 	
 	// check emp->chemp politics
@@ -274,7 +280,7 @@ void trigger_distrust_from_stealth(char_data *ch, empire_data *emp) {
 		pol->type = DIPL_DISTRUST;
 		
 		log_to_empire(emp, ELOG_DIPLOMACY, "This empire now officially distrusts %s due to stealth activity", EMPIRE_NAME(chemp));
-		save_empire(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 	
 	// spawn guards?
@@ -294,6 +300,28 @@ void undisguise(char_data *ch) {
 		msg_to_char(ch, "You take off your disguise.\r\n");
 		act(lbuf, TRUE, ch, NULL, NULL, TO_ROOM);
 	}
+}
+
+
+/**
+* Determines if a room qualifies for Unseen Passing (indoors/in-city).
+*
+* @param room_data *room Where to check.
+* @return bool TRUE if Unseen Passing works here.
+*/
+bool valid_unseen_passing(room_data *room) {
+	if (IS_ADVENTURE_ROOM(room)) {
+		return FALSE;	// adventures do not trigger this ability
+	}
+	if (ROOM_OWNER(room) && find_city(ROOM_OWNER(room), room)) {
+		return TRUE;	// IS inside a city (even if wilderness)
+	}
+	if (IS_OUTDOOR_TILE(room) && !IS_ROAD(room) && !IS_ANY_BUILDING(room)) {
+		return FALSE;	// outdoors; this goes after the city check
+	}
+	
+	// all other cases?
+	return TRUE;
 }
 
 
@@ -622,8 +650,12 @@ ACMD(do_backstab) {
 	}
 	else {
 		charge_ability_cost(ch, MOVE, cost, COOLDOWN_BACKSTAB, 9, WAIT_COMBAT_ABILITY);
+	
+		// start meters now, to track direct damage()
+		check_combat_start(ch);
+		check_combat_start(vict);
 
-		success = skill_check(ch, ABIL_BACKSTAB, DIFF_EASY);
+		success = !AWAKE(vict) || !CAN_SEE(vict, ch) || skill_check(ch, ABIL_BACKSTAB, DIFF_EASY);
 
 		if (!success) {
 			damage(ch, vict, 0, ATTACK_BACKSTAB, DAM_PHYSICAL);
@@ -732,7 +764,7 @@ ACMD(do_darkness) {
 		CREATE(af, struct affected_type, 1);
 		af->type = ATYPE_DARKNESS;
 		af->cast_by = CAST_BY_ID(ch);
-		af->duration = 6;
+		af->duration = 1;
 		af->modifier = 0;
 		af->location = APPLY_NONE;
 		af->bitvector = ROOM_AFF_DARK;
@@ -770,10 +802,10 @@ ACMD(do_disguise) {
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (!IS_NPC(vict)) {
+	else if (!IS_NPC(vict) && !IS_DISGUISED(vict)) {
 		msg_to_char(ch, "You can only disguise yourself as an NPC.\r\n");
 	}
-	else if (!MOB_FLAGGED(vict, MOB_HUMAN)) {
+	else if (IS_NPC(vict) && !MOB_FLAGGED(vict, MOB_HUMAN)) {
 		act("You can't disguise yourself as $N!", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_DISGUISE)) {
@@ -885,6 +917,9 @@ ACMD(do_escape) {
 	}
 	else if (!IS_INSIDE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't need to escape from here.\r\n");
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to try to escape from here.\r\n");
 	}
 	else {
 		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_VEHICLE_IN_ROOM(IN_ROOM(ch)) != IN_ROOM(ch) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN)) {
@@ -1185,14 +1220,17 @@ ACMD(do_pickpocket) {
 	else if (ch_emp && vict_emp && GET_RANK(ch) < EMPIRE_PRIV(ch_emp, PRIV_STEALTH) && !has_relationship(ch_emp, vict_emp, DIPL_WAR)) {
 		msg_to_char(ch, "You don't have permission to steal that -- you could start a war!\r\n");
 	}
+	else if (ch_emp && vict_emp && !PRF_FLAGGED(ch, PRF_STEALTHABLE) && !has_relationship(ch_emp, vict_emp, DIPL_WAR)) {
+		msg_to_char(ch, "You cannot pickpocket that target because your 'stealthable' toggle is off.\r\n");
+	}
 	else if (FIGHTING(vict)) {
 		msg_to_char(ch, "You can't steal from someone who's fighting.\r\n");
 	}
-	else if (MOB_FLAGGED(vict, MOB_PICKPOCKETED | MOB_NO_LOOT)) {
-		act("$E doesn't appear to be carrying anything in $S pockets.", FALSE, ch, NULL, vict, TO_CHAR);
-	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_PICKPOCKET)) {
 		return;
+	}
+	else if (MOB_FLAGGED(vict, MOB_PICKPOCKETED | MOB_NO_LOOT) || (AFF_FLAGGED(vict, AFF_NO_ATTACK) && !!has_interaction(vict->interactions, INTERACT_PICKPOCKET))) {
+		act("$E doesn't appear to be carrying anything in $S pockets.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else {
 		check_scaling(vict, ch);
@@ -1230,6 +1268,11 @@ ACMD(do_pickpocket) {
 			}
 		}
 		else {
+			// oops... put these back
+			if (coins > 0 && GET_LOYALTY(vict)) {
+				EMPIRE_COINS(GET_LOYALTY(vict)) += coins;
+			}
+			
 			if (!AWAKE(vict)) {
 				wake_and_stand(vict);
 			}
@@ -1384,7 +1427,7 @@ ACMD(do_sap) {
 
 ACMD(do_search) {
 	char_data *targ;
-	bool found = FALSE;
+	bool found = FALSE, earthmeld = FALSE;
 
 	if (!can_use_ability(ch, ABIL_SEARCH, NOTHING, 0, COOLDOWN_SEARCH)) {
 		// sends own message
@@ -1404,24 +1447,35 @@ ACMD(do_search) {
 		for (targ = ROOM_PEOPLE(IN_ROOM(ch)); targ; targ = targ->next_in_room) {
 			if (ch == targ)
 				continue;
-			if (!AFF_FLAGGED(targ, AFF_HIDE) || CAN_SEE(ch, targ))
-				continue;
 			
-			if (has_ability(targ, ABIL_CLING_TO_SHADOW)) {
-				gain_ability_exp(targ, ABIL_CLING_TO_SHADOW, 20);
-				continue;
+			// hidden targets
+			if (AFF_FLAGGED(targ, AFF_HIDE)) {
+					continue;
+			
+				if (has_ability(targ, ABIL_CLING_TO_SHADOW)) {
+					gain_ability_exp(targ, ABIL_CLING_TO_SHADOW, 20);
+					continue;
+				}
+
+				SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
+
+				if (skill_check(ch, ABIL_SEARCH, DIFF_HARD) && CAN_SEE(ch, targ)) {
+					act("You find $N!", FALSE, ch, 0, targ, TO_CHAR);
+					msg_to_char(targ, "You are discovered!\r\n");
+					REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDE);
+					affects_from_char_by_aff_flag(targ, AFF_HIDE, FALSE);
+					found = TRUE;
+				}
+
+				REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
 			}
-
-			SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
-
-			if (skill_check(ch, ABIL_SEARCH, DIFF_HARD) && CAN_SEE(ch, targ)) {
-				act("You find $N!", FALSE, ch, 0, targ, TO_CHAR);
-				msg_to_char(targ, "You are discovered!\r\n");
-				REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDE);
-				found = TRUE;
+			else if (!earthmeld && AFF_FLAGGED(targ, AFF_EARTHMELD)) {
+				// earthmelded targets (only do once)
+				if (skill_check(ch, ABIL_SEARCH, DIFF_HARD) && CAN_SEE(ch, targ)) {
+					act("You find signs that someone is earthmelded here.", FALSE, ch, NULL, NULL, TO_CHAR);
+					found = earthmeld = TRUE;
+				}
 			}
-
-			REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
 		}
 
 		if (!found)
@@ -1483,7 +1537,7 @@ ACMD(do_shadowcage) {
 ACMD(do_shadowstep) {
 	bool can_infiltrate(char_data *ch, empire_data *emp);
 
-	char_data *vict;
+	char_data *vict = NULL;
 	empire_data *emp = NULL;
 	int cost = 50;
 	bool infil = FALSE;
@@ -1503,7 +1557,12 @@ ACMD(do_shadowstep) {
 	}
 	else if (!*argument)
 		msg_to_char(ch, "Shadowstep to whom?\r\n");
-	else if (!(vict = find_closest_char(ch, argument, FALSE)) || compute_distance(IN_ROOM(ch), IN_ROOM(vict)) > 7) {
+	else if (!isdigit(*argument) && (!(vict = find_closest_char(ch, argument, FALSE)) || compute_distance(IN_ROOM(ch), IN_ROOM(vict)) > 7)) {
+		// simple targeting: find closest
+		msg_to_char(ch, "Nobody by that name within range.\r\n");
+	}
+	else if (!vict && isdigit(*argument) && (!(vict = get_char_vis(ch, arg, FIND_CHAR_WORLD)) || compute_distance(IN_ROOM(ch), IN_ROOM(vict)) > 7)) {
+		// number targeting: find by name
 		msg_to_char(ch, "Nobody by that name within range.\r\n");
 	}
 	else if (ch == vict) {
@@ -1628,13 +1687,13 @@ ACMD(do_sneak) {
 		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	}
 
-	// Delay after sneaking -- on top of normal move lag
-	GET_WAIT_STATE(ch) += 1 RL_SEC;
-
 	if (perform_move(ch, dir, FALSE, 0)) {	// should be MOVE_NORMAL
 		gain_ability_exp(ch, ABIL_SNEAK, 5);
 	}
-
+	
+	// Delay after sneaking -- on top of normal move lag
+	GET_WAIT_STATE(ch) += 1 RL_SEC;
+	
 	if (!sneaking) {
 		REMOVE_BIT(AFF_FLAGS(ch), AFF_SNEAK);
 	}
@@ -1710,7 +1769,7 @@ ACMD(do_steal) {
 					}
 
 					// save the empire
-					save_empire(emp);
+					EMPIRE_NEEDS_SAVE(emp) = TRUE;
 					read_vault(emp);
 				
 					GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait

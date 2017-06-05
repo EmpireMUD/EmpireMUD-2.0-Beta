@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: eedit.c                                         EmpireMUD 2.0b4 *
+*   File: eedit.c                                         EmpireMUD 2.0b5 *
 *  Usage: empire editor code                                              *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -94,6 +94,31 @@ bool check_banner_color_string(char *str) {
 
 
 /**
+* Makes sure a potential name is unique.
+*
+* @param empire_data *for_emp The empire to be named (may be NULL) -- so we don't disqualify it for already having that name.
+* @param char *name The name to check.
+* @return bool TRUE if the name is valid/unique and FALSE if not.
+*/
+bool check_unique_empire_name(empire_data *for_emp, char *name) {
+	empire_data *emp, *next_emp;
+	
+	// check empires for same name
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (emp == for_emp) {
+			continue;
+		}
+		
+		if (!str_cmp(EMPIRE_NAME(emp), name) || !str_cmp(EMPIRE_ADJECTIVE(emp), name)) {
+			return FALSE;
+		}
+	}
+	
+	return TRUE;	// all good
+}
+
+
+/**
 * @param char *newname The proposed empire name.
 * @return bool TRUE if the name is ok.
 */
@@ -101,23 +126,20 @@ bool valid_empire_name(char *newname) {
 	extern char *invalid_list[MAX_INVALID_NAMES];
 	extern int num_invalid;
 
-	char *ptr;
+	char *ptr, buf[MAX_STRING_LENGTH];
 	char tempname[MAX_INPUT_LENGTH];
 	bool ok = TRUE;
-	empire_data *emp, *next_emp;
 	int iter;
 	
 	// check for illegal & codes (anything other than &&)
 	if ((ptr = strchr(newname, '&')) && *(ptr+1) != '&') {
 		ok = FALSE;
 	}
-
-	// check empires for same name
-	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (!str_cmp(EMPIRE_NAME(emp), newname)) {
-			ok = FALSE;
-			break;
-		}
+	
+	// check fill/reserved
+	strcpy(buf, newname);
+	if (fill_word(buf) || reserved_word(buf)) {
+		ok = FALSE;
 	}
 	
 	// banned names
@@ -227,7 +249,10 @@ ACMD(do_eedit) {
 		}
 	}
 	
-	if (IS_NPC(ch) || !emp) {
+	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (IS_NPC(ch) || !emp) {
 		msg_to_char(ch, "You are not in any empire.\r\n");
 	}
 	else if (!imm_access && GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) {
@@ -256,8 +281,13 @@ ACMD(do_eedit) {
 //// EDITOR COMMANDS /////////////////////////////////////////////////////////
 
 EEDIT(eedit_adjective) {
+	argument = trim(argument);
+	
 	if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
 		msg_to_char(ch, "You are not allowed to change the empire's adjective.\r\n");
+	}
+	else if (is_at_war(emp)) {
+		msg_to_char(ch, "You can't rename your empire while at war.\r\n");
 	}
 	else if (!*argument) {
 		msg_to_char(ch, "Set the empire's adjective form to what?\r\n");
@@ -271,6 +301,15 @@ EEDIT(eedit_adjective) {
 	else if (strlen(argument) > MAX_RANK_LENGTH) {
 		msg_to_char(ch, "Adjective names are limited to %d characters.\r\n", MAX_RANK_LENGTH);
 	}
+	else if (!strcmp(argument, EMPIRE_ADJECTIVE(emp))) {
+		msg_to_char(ch, "That's already the adjective.\r\n");
+	}
+	else if (!check_unique_empire_name(emp, argument)) {
+		msg_to_char(ch, "That name is already in use.\r\n");
+	}
+	else if (!valid_empire_name(argument)) {
+		msg_to_char(ch, "Invalid empire adjective.\r\n");
+	}
 	else {
 		if (EMPIRE_ADJECTIVE(emp)) {
 			free(EMPIRE_ADJECTIVE(emp));
@@ -279,6 +318,10 @@ EEDIT(eedit_adjective) {
 		
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the empire's adjective form to %s", PERS(ch, ch, TRUE), EMPIRE_ADJECTIVE(emp));
 		msg_to_char(ch, "The empire's adjective form is now: %s\r\n", EMPIRE_ADJECTIVE(emp));
+		
+		if (emp != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's adjective form to %s", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_ADJECTIVE(emp));
+		}
 	}
 }
 
@@ -297,17 +340,25 @@ EEDIT(eedit_banner) {
 			free(EMPIRE_BANNER(emp));
 		}
 		EMPIRE_BANNER(emp) = str_dup(argument);
+		
+		EMPIRE_BANNER_HAS_UNDERLINE(emp) = (strstr(EMPIRE_BANNER(emp), "&u") ? TRUE : FALSE);
 
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the banner color", PERS(ch, ch, TRUE));
 		msg_to_char(ch, "The empire's banner is now: %s%s&0\r\n", EMPIRE_BANNER(emp), show_color_codes(EMPIRE_BANNER(emp)));
+		
+		if (emp != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's banner to %s%s&0", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_BANNER(emp), show_color_codes(EMPIRE_BANNER(emp)));
+		}
 	}
 }
 
 
 EEDIT(eedit_change_leader) {
 	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
+	player_index_data *index;
 	bool file = FALSE;
 	char_data *victim = NULL;
+	int old_leader;
 	
 	one_argument(argument, arg);
 	
@@ -327,6 +378,9 @@ EEDIT(eedit_change_leader) {
 		msg_to_char(ch, "That person is not in the empire.\r\n");
 	}
 	else {
+		old_leader = EMPIRE_LEADER(emp);
+		
+		// promote new leader
 		GET_RANK(victim) = EMPIRE_NUM_RANKS(emp);
 		EMPIRE_LEADER(emp) = GET_IDNUM(victim);
 
@@ -335,6 +389,10 @@ EEDIT(eedit_change_leader) {
 		
 		remove_lore(victim, LORE_PROMOTED);
 		add_lore(victim, LORE_PROMOTED, "Became leader of %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		
+		if (emp != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's leader to %s", GET_NAME(ch), EMPIRE_NAME(emp), GET_NAME(victim));
+		}
 
 		// save now
 		if (file) {
@@ -343,6 +401,26 @@ EEDIT(eedit_change_leader) {
 		}
 		else {
 			SAVE_CHAR(victim);
+		}
+		
+		// demote old leader (at least, in lore)
+		if ((index = find_player_index_by_idnum(old_leader)) && (victim = find_or_load_player(index->name, &file))) {
+			if (GET_LOYALTY(victim) == emp) {
+				remove_lore(victim, LORE_PROMOTED);
+				add_lore(victim, LORE_PROMOTED, "Stepped down as leader of %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+			
+				// save now
+				if (file) {
+					store_loaded_char(victim);
+					file = FALSE;
+				}
+				else {
+					SAVE_CHAR(victim);
+				}
+			}
+			else if (file) {
+				free_char(victim);
+			}
 		}
 	}
 	
@@ -375,7 +453,8 @@ EEDIT(eedit_description) {
 	}
 	
 	sprintf(buf, "description for %s", EMPIRE_NAME(emp));
-	start_string_editor(ch->desc, buf, &EMPIRE_DESCRIPTION(emp), MAX_EMPIRE_DESCRIPTION);
+	start_string_editor(ch->desc, buf, &EMPIRE_DESCRIPTION(emp), MAX_EMPIRE_DESCRIPTION, TRUE);
+	ch->desc->save_empire = EMPIRE_VNUM(emp);
 }
 
 
@@ -390,6 +469,10 @@ EEDIT(eedit_frontiertraits) {
 	if (EMPIRE_FRONTIER_TRAITS(emp) != old_traits) {
 		prettier_sprintbit(EMPIRE_FRONTIER_TRAITS(emp), empire_trait_types, buf);
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the frontier traits to %s", PERS(ch, ch, TRUE), buf);
+		
+		if (emp != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's frontier traits to %s", GET_NAME(ch), EMPIRE_NAME(emp), buf);
+		}
 	}
 }
 
@@ -416,20 +499,31 @@ EEDIT(eedit_motd) {
 	}
 	
 	sprintf(buf, "motd for %s", EMPIRE_NAME(emp));
-	start_string_editor(ch->desc, buf, &EMPIRE_MOTD(emp), MAX_MOTD_LENGTH);
+	start_string_editor(ch->desc, buf, &EMPIRE_MOTD(emp), MAX_MOTD_LENGTH, TRUE);
+	ch->desc->save_empire = EMPIRE_VNUM(emp);
 }
 
 
 EEDIT(eedit_name) {
 	player_index_data *index, *next_index;
+	char buf[MAX_STRING_LENGTH];
 	bool file = FALSE;
 	char_data *mem;
+	
+	argument = trim(argument);
+	CAP(argument);
 	
 	if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
 		msg_to_char(ch, "You are not allowed to change the empire's name.\r\n");
 	}
+	else if (is_at_war(emp)) {
+		msg_to_char(ch, "You can't rename your empire while at war.\r\n");
+	}
 	else if (!*argument) {
 		msg_to_char(ch, "Set the empire name to what?\r\n");
+	}
+	else if (!isalpha(*argument)) {
+		msg_to_char(ch, "Empire names must begin with a letter.\r\n");
 	}
 	else if (color_code_length(argument) > 0 || strchr(argument, '&') != NULL) {
 		msg_to_char(ch, "Empire names may not contain color codes or ampersands. Set the banner instead.\r\n");
@@ -440,23 +534,34 @@ EEDIT(eedit_name) {
 	else if (strchr(argument, '"')) {
 		msg_to_char(ch, "Empire names may not contain a quotation mark (\").\r\n");
 	}
+	else if (!strcmp(argument, EMPIRE_NAME(emp))) {
+		msg_to_char(ch, "It's already called that.\r\n");
+	}
+	else if (!check_unique_empire_name(emp, argument)) {
+		msg_to_char(ch, "That name is already in use.\r\n");
+	}
 	else if (!valid_empire_name(argument)) {
 		msg_to_char(ch, "Invalid empire name.\r\n");
 	}
 	else {
+		strcpy(buf, NULLSAFE(EMPIRE_NAME(emp)));
 		if (EMPIRE_NAME(emp)) {
 			free(EMPIRE_NAME(emp));
 		}
-		EMPIRE_NAME(emp) = str_dup(CAP(argument));
+		EMPIRE_NAME(emp) = str_dup(argument);
 		
 		if (EMPIRE_ADJECTIVE(emp)) {
 			free(EMPIRE_ADJECTIVE(emp));
 		}
-		EMPIRE_ADJECTIVE(emp) = str_dup(CAP(argument));
+		EMPIRE_ADJECTIVE(emp) = str_dup(argument);
 		
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the empire name to %s", PERS(ch, ch, TRUE), EMPIRE_NAME(emp));
 		msg_to_char(ch, "The empire's name is now: %s\r\n", EMPIRE_NAME(emp));
 		msg_to_char(ch, "The adjective form was also changed (use 'eedit adjective' to change it).\r\n");
+		
+		if (emp != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's empire name to %s", GET_NAME(ch), buf, EMPIRE_NAME(emp));
+		}
 		
 		// update lore for members
 		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
@@ -465,6 +570,7 @@ EEDIT(eedit_name) {
 			}
 			
 			if ((mem = find_or_load_player(index->name, &file))) {
+				remove_recent_lore(ch, LORE_JOIN_EMPIRE);
 				add_lore(mem, LORE_JOIN_EMPIRE, "Empire became %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 				
 				if (file) {
@@ -502,6 +608,10 @@ EEDIT(eedit_privilege) {
 
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the %s privilege to rank %s%s (%d)", PERS(ch, ch, TRUE), priv[pr], EMPIRE_RANK(emp, rnk), EMPIRE_BANNER(emp), rnk+1);
 		msg_to_char(ch, "You set the %s privilege to rank %s&0 (%d).\r\n", priv[pr], EMPIRE_RANK(emp, rnk), rnk+1);
+		
+		if (emp != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's %s privilege to rank %s&0 (%d)", GET_NAME(ch), EMPIRE_NAME(emp), priv[pr], EMPIRE_RANK(emp, rnk), rnk+1);
+		}
 	}
 }
 
@@ -513,7 +623,8 @@ EEDIT(eedit_rank) {
 	bool file;
 
 	argument = any_one_word(argument, arg);
-	skip_spaces(&argument);
+	argument = trim(argument);
+	CAP(argument);
 	
 	if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
 		msg_to_char(ch, "You are not allowed to change the empire's rank names.\r\n");
@@ -541,6 +652,9 @@ EEDIT(eedit_rank) {
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed rank %d to %s%s", PERS(ch, ch, TRUE), rnk+1, EMPIRE_RANK(emp, rnk), EMPIRE_BANNER(emp));
 		msg_to_char(ch, "You have changed rank %d to %s&0.\r\n", rnk+1, EMPIRE_RANK(emp, rnk));
 		
+		if (emp != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's rank %d to %s&0", GET_NAME(ch), EMPIRE_NAME(emp), rnk+1, EMPIRE_RANK(emp, rnk));
+		}
 		
 		// update lore for members
 		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
@@ -616,7 +730,7 @@ EEDIT(eedit_num_ranks) {
 			EMPIRE_RANK(emp, iter) = NULL;
 		}
 		
-		arch = archetype_proto(CREATION_ARCHETYPE(ch));
+		arch = archetype_proto(CREATION_ARCHETYPE(ch, ARCHT_ORIGIN));
 		if (!arch) {
 			arch = archetype_proto(0);	// default
 		}
@@ -640,5 +754,9 @@ EEDIT(eedit_num_ranks) {
 		
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the number of ranks", PERS(ch, ch, TRUE));
 		msg_to_char(ch, "The empire now has %d ranks.\r\n", EMPIRE_NUM_RANKS(emp));
+		
+		if (emp != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's number of ranks to %d", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_NUM_RANKS(emp));
+		}
 	}
 }

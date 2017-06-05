@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.vampire.c                                   EmpireMUD 2.0b4 *
+*   File: act.vampire.c                                   EmpireMUD 2.0b5 *
 *  Usage: Code related to the Vampire ability and its commands            *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -80,7 +80,7 @@ void cancel_blood_upkeeps(char_data *ch) {
 				snprintf(buf, sizeof(buf), "$n's %s effect fades.", affect_types[aff->type]);
 				act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 				
-				affect_from_char(ch, aff->type);
+				affect_from_char(ch, aff->type, FALSE);
 				any = TRUE;
 				break;	// this removes multiple affs so it's not safe to continue on the list
 			}
@@ -167,7 +167,7 @@ bool check_vampire_sun(char_data *ch, bool message) {
 // for do_alacrity
 void end_alacrity(char_data *ch) {
 	if (affected_by_spell(ch, ATYPE_ALACRITY)) {
-		affect_from_char(ch, ATYPE_ALACRITY);
+		affect_from_char(ch, ATYPE_ALACRITY, FALSE);
 		msg_to_char(ch, "Your supernatural alacrity fades.\r\n");
 		if (!AFF_FLAGGED(ch, AFF_HASTE)) {
 			act("$n seems to slow down.", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -184,7 +184,7 @@ void end_alacrity(char_data *ch) {
 void end_boost(char_data *ch) {
 	if (affected_by_spell(ch, ATYPE_BOOST)) {
 		msg_to_char(ch, "Your boost fades.\r\n");
-		affect_from_char(ch, ATYPE_BOOST);
+		affect_from_char(ch, ATYPE_BOOST, FALSE);
 	}
 }
 
@@ -192,7 +192,7 @@ void end_boost(char_data *ch) {
 // for do_majesty: shuts off majesty
 void end_majesty(char_data *ch) {
 	if (AFF_FLAGGED(ch, AFF_MAJESTY)) {
-		affects_from_char_by_aff_flag(ch, AFF_MAJESTY);
+		affects_from_char_by_aff_flag(ch, AFF_MAJESTY, FALSE);
 		if (!AFF_FLAGGED(ch, AFF_MAJESTY)) {
 			msg_to_char(ch, "You reduce your supernatural majesty.\r\n");
 			act("$n seems less majestic now.", TRUE, ch, 0, 0, TO_ROOM);
@@ -238,18 +238,23 @@ int GET_MAX_BLOOD(char_data *ch) {
 void make_vampire(char_data *ch, bool lore) {
 	void set_skill(char_data *ch, any_vnum skill, int level);
 	
-	if (!IS_NPC(ch)) {	
+	if (!noskill_ok(ch, SKILL_VAMPIRE)) {
+		return;
+	}
+	
+	if (!IS_NPC(ch)) {
 		/* set BEFORE set as a vampire! */
 		GET_APPARENT_AGE(ch) = GET_AGE(ch);
-
-		SET_BIT(PLR_FLAGS(ch), PLR_VAMPIRE);
-	
+		
 		if (get_skill_level(ch, SKILL_VAMPIRE) < 1) {
 			gain_skill(ch, find_skill_by_vnum(SKILL_VAMPIRE), 1);
 		}
 
 		GET_BLOOD(ch) = 30;
-	
+
+		remove_lore(ch, LORE_START_VAMPIRE);
+		remove_lore(ch, LORE_SIRE_VAMPIRE);
+		remove_lore(ch, LORE_PURIFY);
 		if (lore) {
 			add_lore(ch, LORE_START_VAMPIRE, "Sired");
 		}
@@ -262,7 +267,7 @@ void make_vampire(char_data *ch, bool lore) {
 // for do_claws
 void retract_claws(char_data *ch) {
 	if (AFF_FLAGGED(ch, AFF_CLAWS)) {
-		affects_from_char_by_aff_flag(ch, AFF_CLAWS);
+		affects_from_char_by_aff_flag(ch, AFF_CLAWS, FALSE);
 		if (!AFF_FLAGGED(ch, AFF_CLAWS)) {
 			msg_to_char(ch, "Your claws meld back into your fingers!\r\n");
 			act("$n's claws meld back into $s fingers!", TRUE, ch, 0, 0, TO_ROOM);
@@ -278,9 +283,9 @@ void sire_char(char_data *ch, char_data *victim) {
 
 	act("$N drops limply from your fangs...", FALSE, ch, 0, victim, TO_CHAR);
 	act("$N drops limply from $n's fangs...", FALSE, ch, 0, victim, TO_NOTVICT);
-	act("You fall limply to the ground. In the distance, you think you see a light...", FALSE, ch, 0, victim, TO_VICT);
-
-	if (CAN_GAIN_NEW_SKILLS(victim)) {
+	act("You fall to the ground. In the distance, you think you see a light...", FALSE, ch, 0, victim, TO_VICT);
+	
+	if (CAN_GAIN_NEW_SKILLS(victim) && noskill_ok(victim, SKILL_VAMPIRE)) {
 		make_vampire(victim, FALSE);
 		GET_BLOOD(ch) -= 10;
 
@@ -292,6 +297,9 @@ void sire_char(char_data *ch, char_data *victim) {
 		msg_to_char(victim, "You sit up quickly, nearly knocking over your sire!\r\n");
 		act("$n sits up quickly!", FALSE, victim, 0, 0, TO_ROOM);
 
+		remove_lore(victim, LORE_SIRE_VAMPIRE);
+		remove_lore(victim, LORE_PURIFY);
+		remove_lore(victim, LORE_START_VAMPIRE);
 		add_lore(victim, LORE_SIRE_VAMPIRE, "Sired by %s", PERS(ch, ch, TRUE));
 		add_lore(ch, LORE_MAKE_VAMPIRE, "Sired %s", PERS(victim, victim, TRUE));
 
@@ -349,10 +357,12 @@ void taste_blood(char_data *ch, char_data *vict) {
 		if (GET_BLOOD(vict) != GET_MAX_BLOOD(vict)) {
 			sprintf(buf, "$E is missing about %d%% of $S blood.", (GET_MAX_BLOOD(vict) - GET_BLOOD(vict)) * 100 / GET_MAX_BLOOD(vict));
 			act(buf, FALSE, ch, 0, vict, TO_CHAR);
-			}
-
-		sprintf(buf, "$E is about %d years old.", GET_AGE(vict) + number(-1, 1));
-		act(buf, FALSE, ch, 0, vict, TO_CHAR);
+		}
+		
+		if (!IS_NPC(vict)) {
+			sprintf(buf, "$E is about %d years old.", GET_AGE(vict) + number(-1, 1));
+			act(buf, FALSE, ch, 0, vict, TO_CHAR);
+		}
 		
 		command_lag(ch, WAIT_ABILITY);
 		if (can_gain_exp_from(ch, vict)) {
@@ -369,7 +379,7 @@ void taste_blood(char_data *ch, char_data *vict) {
 */
 void un_mummify(char_data *ch) {
 	if (AFF_FLAGGED(ch, AFF_MUMMIFY)) {
-		affects_from_char_by_aff_flag(ch, AFF_MUMMIFY);
+		affects_from_char_by_aff_flag(ch, AFF_MUMMIFY, FALSE);
 		if (!AFF_FLAGGED(ch, AFF_MUMMIFY)) {
 			msg_to_char(ch, "Your flesh softens and the mummified layers flake off!\r\n");
 			act("$n sheds a layer of skin and appears normal again!", TRUE, ch, 0, 0, TO_ROOM);
@@ -386,7 +396,7 @@ void un_mummify(char_data *ch) {
 */
 void un_deathshroud(char_data *ch) {
 	if (AFF_FLAGGED(ch, AFF_DEATHSHROUD)) {
-		affects_from_char_by_aff_flag(ch, AFF_DEATHSHROUD);
+		affects_from_char_by_aff_flag(ch, AFF_DEATHSHROUD, FALSE);
 		if (!AFF_FLAGGED(ch, AFF_DEATHSHROUD)) {
 			msg_to_char(ch, "Your flesh returns to normal!\r\n");
 			act("$n appears normal again!", TRUE, ch, 0, 0, TO_ROOM);
@@ -402,8 +412,8 @@ void un_vampire(char_data *ch) {
 
 	if (!IS_NPC(ch)) {
 		add_lore(ch, LORE_PURIFY, "Purified");
-		REMOVE_BIT(PLR_FLAGS(ch), PLR_VAMPIRE);
 		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+		set_skill(ch, SKILL_VAMPIRE, 0);
 		clear_char_abilities(ch, SKILL_VAMPIRE);
 		SAVE_CHAR(ch);
 	}
@@ -448,6 +458,9 @@ void update_biting_char(char_data *ch) {
 		GET_BLOOD(victim) = 0;
 
 		if (!IS_NPC(victim) && !PRF_FLAGGED(ch, PRF_AUTOKILL)) {
+			// give back a little blood
+			GET_BLOOD(victim) = 1;
+			GET_BLOOD(ch) -= 1;
 			do_bite(ch, "", 0, 0);
 			return;
 		}
@@ -471,6 +484,8 @@ void update_biting_char(char_data *ch) {
 		GET_FED_ON_BY(victim) = NULL;
 		GET_FEEDING_FROM(ch) = NULL;
 
+		check_scaling(victim, ch);	// ensure scaling
+		tag_mob(victim, ch);	// ensures loot binding if applicable
 		corpse = die(victim, ch);
 		
 		// tag corpse
@@ -495,9 +510,7 @@ void update_biting_char(char_data *ch) {
 	
 	gain_ability_exp(ch, ABIL_SANGUINE_RESTORATION, 2);
 	gain_ability_exp(ch, ABIL_UNNATURAL_THIRST, 2);
-	if (get_skill_level(ch, SKILL_VAMPIRE) < EMPIRE_CHORE_SKILL_CAP) {
-		gain_skill_exp(ch, SKILL_VAMPIRE, 5);
-	}
+	gain_ability_exp(ch, ABIL_BITE, 5);
 }
 
 
@@ -553,7 +566,7 @@ void update_vampire_sun(char_data *ch) {
 			sun_message(ch);
 		}
 		found = TRUE;
-		affect_from_char(ch, ATYPE_BOOST);
+		affect_from_char(ch, ATYPE_BOOST, FALSE);
 	}
 	
 	// lastly
@@ -642,6 +655,9 @@ ACMD(do_bite) {
 	else if (IS_DEAD(victim)) {
 		msg_to_char(ch, "Your victim seems to be dead.\r\n");
 	}
+	else if (AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD)) {
+		act("You can't drink blood from $N.", FALSE, ch, NULL, victim, TO_CHAR);
+	}
 	else if ((IS_NPC(victim) || !PRF_FLAGGED(victim, PRF_BOTHERABLE)) && !can_fight(ch, victim))
 		act("You can't attack $N!", FALSE, ch, 0, victim, TO_CHAR);
 	else if (check_scaling(victim, ch) && !PRF_FLAGGED(victim, PRF_BOTHERABLE) && AWAKE(victim) && GET_HEALTH(victim) > MAX(5, GET_MAX_HEALTH(victim)/20)) {
@@ -676,7 +692,7 @@ ACMD(do_bite) {
 					
 					command_lag(ch, WAIT_COMBAT_ABILITY);
 					if (!FIGHTING(victim)) {
-						hit(victim, ch, GET_EQ(victim, WEAR_WIELD), FALSE);
+						hit(victim, ch, GET_EQ(victim, WEAR_WIELD), TRUE);
 					}
 					return;
 				}
@@ -727,7 +743,7 @@ ACMD(do_bloodsweat) {
 		}
 		
 		if (affected_by_spell(ch, ATYPE_POISON)) {
-			affect_from_char(ch, ATYPE_POISON);
+			affect_from_char(ch, ATYPE_POISON, FALSE);
 			any = TRUE;
 		}
 		
@@ -741,61 +757,6 @@ ACMD(do_bloodsweat) {
 		msg_to_char(ch, "You sweat blood through your pores, and poison with it!\r\n");
 		act("$n begins sweating blood.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
-}
-
-
-ACMD(do_bloodsword) {
-	void scale_item_to_level(obj_data *obj, int level);
-
-	obj_data *obj;
-	int scale_level;
-	int cost = 40;
-
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot use bloodsword.\r\n");
-		return;
-	}
-	if (!check_vampire_ability(ch, ABIL_BLOODSWORD, BLOOD, cost, NOTHING)) {
-		return;
-	}
-	if (!check_vampire_sun(ch, TRUE)) {
-		return;
-	}
-	
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_BLOODSWORD)) {
-		return;
-	}
-	
-	// attempt to remove existing wield
-	if (GET_EQ(ch, WEAR_WIELD)) {
-		perform_remove(ch, WEAR_WIELD);
-		
-		// did it work? if not, player got an error
-		if (GET_EQ(ch, WEAR_WIELD)) {
-			return;
-		}
-	}
-	
-	charge_ability_cost(ch, BLOOD, cost, NOTHING, 0, WAIT_ABILITY);
-	obj = read_object(o_BLOODSWORD, TRUE);
-	
-	if (IS_CLASS_ABILITY(ch, ABIL_BLOODSWORD)) {
-		scale_level = get_approximate_level(ch);
-	}
-	else {
-		scale_level = MIN(get_approximate_level(ch), get_skill_level(ch, SKILL_VAMPIRE));
-	}
-	
-	scale_item_to_level(obj, scale_level);
-	
-	act("You drain blood from your wrist and mold it into $p.", FALSE, ch, obj, NULL, TO_CHAR);
-	act("$n twists and molds $s own blood into $p.", TRUE, ch, obj, NULL, TO_ROOM);
-	
-	equip_char(ch, obj, WEAR_WIELD);
-	determine_gear_level(ch);
-	
-	gain_ability_exp(ch, ABIL_BLOODSWORD, 20);
-	load_otrigger(obj);
 }
 
 
@@ -980,7 +941,7 @@ ACMD(do_command) {
 	}
 	else if (!MOB_FLAGGED(victim, MOB_HUMAN))
 		msg_to_char(ch, "You can only give commands to humans.\r\n");
-	else if (MOB_FLAGGED(victim, MOB_HARD | MOB_GROUP)) {
+	else if (MOB_FLAGGED(victim, MOB_HARD | MOB_GROUP) || AFF_FLAGGED(victim, AFF_NO_ATTACK)) {
 		act("You can't command $N.", FALSE, ch, NULL, victim, TO_CHAR);
 	}
 	else if (IS_VAMPIRE(victim) && (IS_NPC(victim) || get_skill_level(victim, SKILL_VAMPIRE) > get_skill_level(ch, SKILL_VAMPIRE)))
@@ -1093,6 +1054,8 @@ ACMD(do_feed) {
 		msg_to_char(ch, "You can't give THAT much blood.\r\n");
 	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
+	else if ( ch == victim )
+		msg_to_char(ch, "What would be the point in that?\r\n");
 	else if (IS_DEAD(victim)) {
 		act("It would do no good for $M now -- $E's dead!", FALSE, ch, NULL, victim, TO_CHAR);
 	}
@@ -1377,7 +1340,7 @@ ACMD(do_soulmask) {
 
 	if (affected_by_spell(ch, ATYPE_SOULMASK)) {
 		msg_to_char(ch, "You turn off your soulmask.\r\n");
-		affect_from_char(ch, ATYPE_SOULMASK);
+		affect_from_char(ch, ATYPE_SOULMASK, FALSE);
 		command_lag(ch, WAIT_OTHER);
 		return;
 	}
@@ -1475,7 +1438,7 @@ ACMD(do_weaken) {
 		msg_to_char(ch, "You wouldn't want to do that to yourself...\r\n");
 	else if (IS_GOD(victim) || IS_IMMORTAL(victim))
 		msg_to_char(ch, "You cannot use this power on so godly a target!\r\n");
-	else if (affected_by_spell(victim, ATYPE_WEAKEN) || GET_STRENGTH(victim) <= 1)
+	else if (affected_by_spell(victim, ATYPE_WEAKEN) || (GET_STRENGTH(victim) <= 1 && GET_INTELLIGENCE(victim) <= 1))
 		act("$E is already weak!", FALSE, ch, 0, victim, TO_CHAR);
 	else if (!can_fight(ch, victim))
 		act("You can't attack $M!", FALSE, ch, 0, victim, TO_CHAR);
@@ -1495,6 +1458,8 @@ ACMD(do_weaken) {
 
 		if (!AFF_FLAGGED(victim, AFF_IMMUNE_VAMPIRE)) {
 			af = create_mod_aff(ATYPE_WEAKEN, 1 MUD_HOURS, APPLY_STRENGTH, -1 * MIN(2, GET_STRENGTH(victim)-1), ch);
+			affect_join(victim, af, 0);
+			af = create_mod_aff(ATYPE_WEAKEN, 1 MUD_HOURS, APPLY_INTELLIGENCE, -1 * MIN(2, GET_INTELLIGENCE(victim)-1), ch);
 			affect_join(victim, af, 0);
 			msg_to_char(victim, "You feel weak!\r\n");
 			act("$n hunches over in pain!", TRUE, victim, 0, 0, TO_ROOM);

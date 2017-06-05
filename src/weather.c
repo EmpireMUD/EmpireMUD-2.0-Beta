@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: weather.c                                       EmpireMUD 2.0b4 *
+*   File: weather.c                                       EmpireMUD 2.0b5 *
 *  Usage: functions handling time and the weather                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -37,6 +37,7 @@ void another_hour(int mode) {
 	void process_shipping();
 
 	descriptor_data *d;
+	long lny;
 
 	time_info.hours++;
 
@@ -45,26 +46,26 @@ void another_hour(int mode) {
 			case 7:
 				weather_info.sunlight = SUN_RISE;
 				for (d = descriptor_list; d; d = d->next) {
-					if (STATE(d) == CON_PLAYING && !HAS_INFRA(d->character) && !PRF_FLAGGED(d->character, PRF_HOLYLIGHT) && AWAKE(d->character) && IS_OUTDOORS(d->character) && !IS_WRITING(d->character)) {
+					if (STATE(d) == CON_PLAYING && !HAS_INFRA(d->character) && !PRF_FLAGGED(d->character, PRF_HOLYLIGHT) && AWAKE(d->character) && IS_OUTDOORS(d->character)) {
 						look_at_room(d->character);
 						msg_to_char(d->character, "\r\n");
 					}
 				}
-				send_to_outdoor("The sun rises over the horizon.\r\n");
+				send_to_outdoor(FALSE, "The sun rises over the horizon.\r\n");
 				
 				// 7am shipment
 				process_shipping();
 				break;
 			case 8:
 				weather_info.sunlight = SUN_LIGHT;
-				send_to_outdoor("The day has begun.\r\n");
+				send_to_outdoor(FALSE, "The day has begun.\r\n");
 				break;
 			case 12:
 				// noon
 				break;
 			case 19:
 				weather_info.sunlight = SUN_SET;
-				send_to_outdoor("The sun slowly disappears beneath the horizon.\r\n");
+				send_to_outdoor(FALSE, "The sun slowly disappears beneath the horizon.\r\n");
 				
 				// 7pm shipment
 				process_shipping();
@@ -72,11 +73,11 @@ void another_hour(int mode) {
 			case 20:
 				weather_info.sunlight = SUN_DARK;
 				for (d = descriptor_list; d; d = d->next)
-					if (STATE(d) == CON_PLAYING && !HAS_INFRA(d->character) && !PRF_FLAGGED(d->character, PRF_HOLYLIGHT) &&  AWAKE(d->character) && IS_OUTDOORS(d->character) && !IS_WRITING(d->character)) {
+					if (STATE(d) == CON_PLAYING && !HAS_INFRA(d->character) && !PRF_FLAGGED(d->character, PRF_HOLYLIGHT) &&  AWAKE(d->character) && IS_OUTDOORS(d->character)) {
 						look_at_room(d->character);
 						msg_to_char(d->character, "\r\n");
 					}
-				send_to_outdoor("The night has begun.\r\n");
+				send_to_outdoor(FALSE, "The night has begun.\r\n");
 				break;
 		}
 	}
@@ -92,6 +93,13 @@ void another_hour(int mode) {
 				time_info.month = 0;
 				time_info.year++;
 				
+				annual_world_update();
+			}
+		}
+		else {	// not day 30
+			// check if we've missed a new year
+			lny = data_get_long(DATA_LAST_NEW_YEAR);
+			if (lny && lny + SECS_PER_MUD_YEAR < time(0)) {
 				annual_world_update();
 			}
 		}
@@ -167,27 +175,27 @@ void weather_change(void) {
 
 	switch (change) {
 		case 1:
-			send_to_outdoor("The sky starts to get cloudy.\r\n");
+			send_to_outdoor(TRUE, "The sky starts to get cloudy.\r\n");
 			weather_info.sky = SKY_CLOUDY;
 			break;
 		case 2:
-			send_to_outdoor("It starts to rain.\r\n");
+			send_to_outdoor(TRUE, "It starts to rain.\r\n");
 			weather_info.sky = SKY_RAINING;
 			break;
 		case 3:
-			send_to_outdoor("The clouds disappear.\r\n");
+			send_to_outdoor(TRUE, "The clouds disappear.\r\n");
 			weather_info.sky = SKY_CLOUDLESS;
 			break;
 		case 4:
-			send_to_outdoor("Lightning starts to show in the sky.\r\n");
+			send_to_outdoor(TRUE, "Lightning starts to show in the sky.\r\n");
 			weather_info.sky = SKY_LIGHTNING;
 			break;
 		case 5:
-			send_to_outdoor("The rain stops.\r\n");
+			send_to_outdoor(TRUE, "The rain stops.\r\n");
 			weather_info.sky = SKY_CLOUDY;
 			break;
 		case 6:
-			send_to_outdoor("The lightning stops.\r\n");
+			send_to_outdoor(TRUE, "The lightning stops.\r\n");
 			weather_info.sky = SKY_RAINING;
 			break;
 	}

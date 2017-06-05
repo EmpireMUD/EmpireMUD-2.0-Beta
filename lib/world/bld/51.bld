@@ -2,7 +2,7 @@
 Hut~
 A Small Hut~
 .&0()&?.~
-5 0 pR 0
+4 0 pR 0
 0 1 0 -1
 D
    You are standing inside a small hut. The walls and ceiling are constructed
@@ -11,12 +11,16 @@ branches. The hut itself looks as though it could be dismantled with a
 moment's notice and moved to another location. It also doesn't seem to offer
 much protection against the elements.
 ~
+R
+2 1 5 0
+R
+25 2 1 0
 S
 #5101
 Cabin~
 A Log Cabin~
 &0(--)~
-10 0 pR em
+8 0 pR em
 0 2 0 -1
 D
    You are huddled inside a cozy log cabin. It is made of large, stripped
@@ -24,12 +28,16 @@ trees from the forest and seems much stronger than the smaller huts found
 elsewhere. The cabin is also more permanent than the huts, it can't be taken
 down. It is, however, still susceptible to fire.
 ~
+R
+2 1 5 0
+R
+25 2 1 0
 S
 #5102
 Small House~
 A Small House~
 &0(==)~
-10 0 pR em
+8 0 pR em
 2 2 0 -1
 D
    You are standing inside a small, cozy house. The walls are made of wood
@@ -37,24 +45,32 @@ and the ceiling offers superb protection from the rain. It's also warmer in
 here than outside because the better construction traps heat. Even the ground
 is planked with wood to trap in heat.
 ~
+R
+19 1 1 0
+R
+3 1 5 0
 S
 #5103
 Mud Hut~
 A Mud Hut~
 .&0()&?.~
-10 0 pR 0
+4 0 pR 0
 0 1 0 -1
 D
    The walls flake around; this hut has a feeling of instability. It is made
 of mud and rocks and designed to withstand heavy desert heat. It can't be
 burned down, but provides little defense against invaders.
 ~
+R
+0 1 5 0
+R
+25 2 1 0
 S
 #5104
 Pueblo~
 A Pueblo~
 .&0[]&?.~
-15 0 R em
+8 0 R em
 2 2 0 -1
 D
    Made of rocks and mud with logs for support, the pueblo is one of the
@@ -62,12 +78,16 @@ desert's finest structures. It endures all seasons and conditions and is
 difficult to destroy. It is the favored home of the desert-dwellers as
 pueblos can be very large.
 ~
+R
+2 1 5 0
+R
+21 1 1 0
 S
 #5105
 Cliff Dwelling~
 A Cliff Dwelling~
 [==]~
-50 0 efR dem
+8 0 efR dem
 3 2 0 -1
 D
    An entire home is etched into the side of the cliff! This construction
@@ -75,12 +95,16 @@ rivals the pueblos of the desert and the houses of the plains both in
 magnitude and design. In fact, it is nearly indestructible, save for an act
 of god.
 ~
+R
+19 1 1 0
+R
+3 1 5 0
 S
 #5106
 Well~
 A Well~
 &0(&c~~&0)~
-10 0 d 0
+4 0 d 0
 0 0 0 -1
 C
 drink, fill~
@@ -116,12 +140,14 @@ M
 201 5.00 bce
 M
 237 5.00 ce
+R
+0 2 5 0
 S
 #5107
 Mine~
 A Mine Shaft~
 /&0[]&?\~
-60 0 bem 0
+128 0 beim 0
 0 0 0 -1
 C
 mine~
@@ -137,12 +163,14 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 M
 232 5.00 c
+R
+0 2 5 0
 S
 #5108
 Forge~
 A Hot Forge~
 &0(FF)~
-20 0 pR 0
+10 0 pR 0
 0 0 0 212
 C
 forge, smelt~
@@ -156,12 +184,16 @@ F
 hv
 M
 241 15.00 ce
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5109
 Mill~
 The Mill~
 &0(MM)~
-15 0 pR 0
+10 0 pR 0
 0 0 0 210
 C
 inventory, mill, retrieve, store~
@@ -174,12 +206,16 @@ F
 n
 M
 234 10.00 ce
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5110
 Potter~
 A Potter's Hut~
 &0(PP)~
-15 0 pR 0
+10 0 pR 0
 0 0 0 211
 C
 craft, retrieve, store, inventory~
@@ -193,12 +229,16 @@ F
 rG
 M
 241 15.00 ce
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5111
 Stable~
 A Noisy Stable~
 &0(SS)~
-15 0 bgpR 0
+10 0 bgpR 0
 0 0 0 213
 C
 harness, herd, inventory, milk, mount, retrieve, shear, store~
@@ -216,26 +256,38 @@ M
 233 10.00 ce
 M
 233 10.00 ce
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5112
 Fence~
 A Wooden Fence~
 @u&0vv@v~
-1 0 djmp 0
+4 0 dijmp 0
 0 0 0 -1
+R
+3 1 5 0
+R
+25 2 1 0
 S
 #5113
 Gate~
 A Wooden Gate~
 @u&0xx@v~
-5 0 djp 0
+4 0 dijp 0
 0 0 0 -1
+R
+3 1 5 0
+R
+25 2 1 0
 S
 #5114
 Cannery~
 A Cannery~
 &0{CC}~
-10 0 bpR 0
+8 0 bpR 0
 0 0 0 -1
 C
 inventory, retrieve, store~
@@ -245,12 +297,16 @@ apples and other fruit are lined up on the tables around the room. There are
 shelves lining the walls of this building for storing jars and cans of
 assorted fruit. Some empty jars have been left on one of the tables.
 ~
+R
+2 1 5 0
+R
+25 1 1 0
 S
 #5115
 Foundry~
 A Foundry~
 &0{FF}~
-10 0 bR 0
+8 0 bR 0
 0 0 0 -1
 C
 inventory, retrieve, smelt, store~
@@ -261,12 +317,16 @@ the storage. The foundry helps empires to clean up their untidy land.
 ~
 F
 v
+R
+2 1 5 0
+R
+25 1 1 0
 S
 #5116
 Granary~
 A Tall Granary~
 &0{GG}~
-10 0 bpR 0
+8 0 bpR 0
 0 0 0 -1
 C
 inventory, retrieve, store~
@@ -278,12 +338,16 @@ the bottom of each slatted wall is a small door that can be opened for access
 to the grains that are stored here. A large rat is munching on some stray
 corn kernels.
 ~
+R
+2 1 5 0
+R
+25 1 1 0
 S
 #5117
 Gravel Pit~
 A Gravel Pit~
 &0{PP}~
-10 0 bdp 0
+8 0 bdp 0
 0 0 0 -1
 C
 inventory, retrieve, store~
@@ -295,12 +359,16 @@ There are make-shift carts sitting around full of rock and large storage bins
 are scattered all around the place. A pick that's so worn it looks more like
 a mace is lying at your feet.
 ~
+R
+2 1 5 0
+R
+25 1 1 0
 S
 #5118
 Lumber Yard~
 A Lumber Yard~
 &0{LL}~
-10 0 bdp 0
+8 0 bdp 0
 0 0 0 -1
 C
 inventory, retrieve, saw, store~
@@ -313,12 +381,16 @@ scattered around your feet.
 ~
 F
 t
+R
+2 1 5 0
+R
+25 1 1 0
 S
 #5119
 Smokehouse~
 The Smokehouse~
 &0{SS}~
-15 0 bR 0
+8 0 bR 0
 0 0 0 -1
 C
 retrieve, store~
@@ -331,12 +403,16 @@ ready to cook with them.
 ~
 F
 G
+R
+2 1 5 0
+R
+25 1 1 0
 S
 #5120
 Tannery~
 The Tannery~
 &0{TT}~
-15 0 bpR 0
+10 0 bpR 0
 0 0 0 -1
 C
 inventory, retrieve, store~
@@ -349,12 +425,16 @@ F
 z
 M
 241 15.00 ce
+R
+2 1 5 0
+R
+25 1 1 0
 S
 #5121
 Utility Shed~
 The Utility Shed~
 &0{UU}~
-15 0 bpR 0
+10 0 bpR 0
 0 0 0 -1
 C
 inventory, retrieve, store~
@@ -364,12 +444,16 @@ is more or less just thrown together, however it serves its purpose. It can
 hold anything from a scythe for harvesting to a hammer for building! The
 hooks are even labelled with a small picture to tell you which goes where.
 ~
+R
+2 1 5 0
+R
+25 1 1 0
 S
 #5122
 Quarry~
 A Quarry~
 &0|__|~
-50 0 dmL 0
+4 0 dmL 0
 0 0 0 -1
 C
 dig, quarry~
@@ -378,12 +462,14 @@ f
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 23 105 100.00 1  # QUARRY: a huge stone block
+R
+0 1 5 0
 S
 #5123
 Clay Pit~
 A Clay Pit~
 &y|__|~
-50 0 dmL 0
+4 0 dmL 0
 0 0 0 -1
 C
 dig~
@@ -391,12 +477,14 @@ F
 f
 I 5 100 9.00 1 X  # DIG: a rock
 I 5 101 100.00 1 X  # DIG: a pile of clay
+R
+0 1 5 0
 S
 #5124
 Stone House~
 A Stone House~
 &0[--]~
-15 0 R em
+16 0 R em
 3 2 0 -1
 D
    You are standing in the entrance to a stone house. While its supporting
@@ -404,12 +492,16 @@ beams and ceiling are made from wood, most of the house is stone. This offers
 protection from fire, a feature which lesser buildings could never produce.
 The house seems somehow colder, though. Nevertheless, it is very inviting.
 ~
+R
+3 1 5 0
+R
+19 1 1 0
 S
 #5125
 Large House~
 A Large Brick House~
 &0[==]~
-15 0 R em
+24 0 R em
 5 4 0 -1
 D
    You are standing inside a rather large house. It's made of brick,
@@ -417,12 +509,16 @@ creating a very strong, very protective structure. This house is tall and
 robust, capable of supporting an entire family or more. It is ideal for the
 head of a plantation or as the seat of a small empire.
 ~
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5126
 Tree House~
 A High Tree House~
 ^&0()&?^~
-20 0 pR fm
+16 0 pR fm
 3 2 0 -1
 A
 d
@@ -432,12 +528,16 @@ shrouded from the world below and very difficult to spot. It is a favorite
 hideout of the forest-dwellers, though easily found by those who know what to
 look for.
 ~
+R
+19 1 1 0
+R
+3 1 5 0
 S
 #5127
 Tree Complex~
 A Complex of Trees~
 ^&0[]&?^~
-20 0 fR fm
+24 0 fR fm
 7 4 0 -1
 A
 d
@@ -447,12 +547,16 @@ structure which rivals any on the ground. Its fatal flaw is that it is made
 of wood and easily burnt, but it has the advantage of being very difficult to
 spot from afar.
 ~
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5128
 Underground Complex~
 An Underground Passage~
 .&0()&?.~
-20 0 ef dem
+48 0 ef dem
 7 4 0 -1
 A
 d
@@ -462,24 +566,32 @@ of underground tunnels which rival land-based structures both in size and
 elegance. The entrance is easily obscured and difficult to find, except at
 night when light spills out.
 ~
+R
+21 1 1 0
+R
+19 1 1 0
 S
 #5129
 Mine Complex~
 The Entrance to an Old Mine Complex~
 /&0[]&?\~
-60 0 ef dem
+128 0 ef dem
 7 4 0 -1
 D
    This mine has been expanded to create a complex which rivals those of the
 desert and plains both in complexity and durability. Nearly indestructible,
 this is a mountain dweller's dream fortress.
 ~
+R
+21 1 1 0
+R
+19 1 1 0
 S
 #5130
 Alchemist~
 The Alchemist~
 &0(AA)~
-15 0 pR 0
+10 0 pR 0
 0 0 0 231
 C
 brew, mix, retrieve, store~
@@ -494,12 +606,16 @@ F
 aG
 M
 241 15.00 ce
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5131
 Apiary~
 An Apiary~
 &0{BB}~
-15 0 pR 0
+10 0 pR 0
 0 0 0 218
 D
    The room is hot and you begin sweating as soon as you enter. Bees swarm
@@ -510,12 +626,16 @@ F
 b
 M
 241 15.00 ce
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5132
 Bakery~
 The Bakery~
 &0(BB)~
-15 0 pR 0
+10 0 pR 0
 0 0 0 214
 C
 cook~
@@ -529,22 +649,32 @@ F
 G
 M
 241 15.00 ce
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5133
 Bridge~
 A Bridge Over the River~
 &c~&0--&c~~
-10 0 dmD 0
+16 0 dmD 0
 0 0 0 -1
+R
+21 1 1 0
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5134
 Carpenter~
 The Carpenter~
 &0(CC)~
-15 0 bpR 0
+10 0 bpR 0
 0 0 0 217
 C
-craft, harness~
+craft, harness, inventory, retrieve, store~
 D
    The building reeks of carpenters' stains and several unfamiliar preserving
 agents. All around you are incomplete objects which are waiting to be
@@ -553,12 +683,16 @@ furniture, as well as other things.
 ~
 F
 e
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5135
 Glass Blower~
 The Glass Blower~
 &0(GG)~
-15 0 pR 0
+10 0 pR 0
 0 0 0 215
 C
 craft~
@@ -572,12 +706,16 @@ F
 i
 M
 241 15.00 ce
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5136
 Pigeon Post~
 The Pigeon Post~
 &0[PP]~
-15 0 pR 0
+10 0 pR 0
 0 0 0 263
 C
 mail check, mail receive, mail send~
@@ -593,12 +731,16 @@ M
 9193 5.00 c
 M
 9024 20.00 0
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5137
 Tailor~
 The Tailor~
 &0(TT)~
-15 0 pR 0
+10 0 pR 0
 0 0 0 219
 C
 retrieve, sew, store~
@@ -612,12 +754,16 @@ F
 y
 M
 241 15.00 ce
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5138
 Tavern~
 The Tavern~
 &0[TT]~
-15 0 pR 0
+10 0 pR 0
 0 0 0 220
 C
 fill, tavern~
@@ -652,13 +798,17 @@ M
 233 1.00 ce
 M
 232 1.00 ce
+R
+16 1 1 0
+R
+19 1 1 0
 T 5138
 S
 #5139
 Warehouse~
 A Warehouse~
 &0{WW}~
-15 0 bpR 0
+10 0 bpR 0
 0 0 0 -1
 C
 warehouse~
@@ -671,28 +821,38 @@ many different and curious items.
 ~
 F
 E
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5140
 Steps~
 On The Steps~
 .&0==&?.~
-5 0 do 0
+4 0 dio 0
 0 0 0 -1
+R
+2 1 5 0
 S
 #5141
 Statue~
 A Statue~
 .&0}{&?.~
-20 2 dh 0
+18 2 dh 0
 0 0 0 -1
 C
 dedicate~
+R
+1 1 5 0
+R
+3 1 1 0
 S
 #5142
 Henge~
 A Stone Henge~
 &0<<>>~
-60 4 d 0
+128 4 d 0
 0 0 0 -1
 C
 chant~
@@ -700,19 +860,27 @@ F
 k
 M
 243 30.00 c
+R
+1 1 5 0
+R
+3 1 1 0
 S
 #5143
 Megalith~
 A Gigantic Megalith~
 .&0||&?.~
-20 1 d 0
+48 1 d 0
 0 0 0 -1
+R
+1 1 5 0
+R
+3 1 1 0
 S
 #5144
 Cemetery~
 A Gloomy Cemetery~
 .&0i&?.&0i~
-20 0 d 0
+16 0 d 0
 0 0 0 -1
 C
 tomb~
@@ -728,19 +896,23 @@ M
 9198 2.00 0
 M
 9199 2.00 0
+R
+2 1 5 0
 S
 #5145
 Park~
 A Park~
 .&g^&?.&co~
-20 0 d 0
+10 0 di 0
 0 0 0 -1
+R
+2 1 5 0
 S
 #5146
 Tomb~
 A Large Tomb~
 &0[oo]~
-25 1 e 0
+48 1 e 0
 0 0 0 -1
 C
 tomb~
@@ -762,12 +934,14 @@ M
 9198 2.00 0
 M
 9199 2.00 0
+R
+2 1 5 0
 S
 #5147
 Shrine~
 A Shrine~
 &0.{}.~
-15 1 hR 0
+16 1 hR 0
 0 0 0 -1
 C
 dedicate~
@@ -777,12 +951,16 @@ itself, a small stick figure atop an altar, is stained with the blood of many
 sacrifices. That same activity leaves a horrid stench in the air, but that
 stench is what attracts patron gods.
 ~
+R
+2 1 5 0
+R
+19 1 1 0
 S
 #5148
 Temple~
 A Temple~
 &0[[]]~
-15 4 hR 0
+24 4 hR 0
 0 0 0 -1
 C
 dedicate~
@@ -794,12 +972,16 @@ down into the earth below.
 ~
 M
 244 20.00 c
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5149
 Library~
 A Grand Library~
 &0[^^]~
-25 10 R 0
+24 10 R 0
 0 0 0 -1
 C
 library, bookedit~
@@ -814,12 +996,16 @@ F
 l
 M
 9198 2.00 0
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5150
 High Temple~
 The High Temple~
 &0[||]~
-25 10 fhR de
+48 10 fhR de
 5 0 0 -1
 C
 dedicate~
@@ -831,12 +1017,18 @@ state mandated by any god worthy of a temple of such stature.
 ~
 M
 244 20.00 c
+R
+16 1 1 0
+R
+19 1 1 0
+R
+3 1 1 0
 S
 #5151
 Pyramid~
 The Great Pyramid~
 &y/^^\~
-60 15 h 0
+128 15 h 0
 0 0 0 -1
 C
 dedicate, tomb~
@@ -857,12 +1049,18 @@ M
 9199 2.00 0
 M
 9197 2.00 0
+R
+16 1 1 0
+R
+19 1 1 0
+R
+3 1 1 0
 S
 #5152
 Docks~
 The Docks~
 @w&0==@e~
-20 0 bdpD 0
+10 0 bdpD 0
 0 0 0 -1
 C
 board, load, unload~
@@ -873,12 +1071,16 @@ of larger pieces of equipment into the ship's hold.
 ~
 F
 g
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5153
 Shipyard~
 The Shipyard~
 @w&0()@e~
-40 0 bdp 0
+16 0 bdp 0
 0 0 0 216
 C
 board, manufacture, upgrade~
@@ -890,6 +1092,10 @@ animals. Ships may also not be brought back in once they leave.
 ~
 F
 u
+R
+16 1 1 0
+R
+19 1 1 0
 U
 5154
 S
@@ -897,7 +1103,7 @@ S
 Great Shipyard~
 A Great Shipyard~
 @w&0[]@e~
-40 4 bdU 0
+48 4 bdU 0
 0 0 0 216
 C
 board, manufacture~
@@ -909,27 +1115,39 @@ animals. Ships may also not be brought back in once they leave.
 ~
 F
 u
+R
+16 1 1 0
+R
+21 1 1 0
+R
+19 1 1 0
 S
 #5155
 Swamp Walk~
 A Rickety Swamp Walk~
 &c~&0--&c~~
-1 0 dmp 0
+10 0 dmp 0
 0 0 0 -1
+R
+5 1 5 0
 S
 #5156
 Platform~
 A Platform in the Swamp~
 ~&0__&?~~
-1 0 dp 0
+4 0 dp 0
 0 0 0 -1
+R
+5 1 5 0
+R
+25 1 1 0
 T 5156
 S
 #5157
 Swamp Hut~
 A Swamp Hut~
 ~&0/\&?~~
-15 0 pR em
+4 0 pR em
 3 2 0 -1
 D
    This hut, crude though it looks from the outside, seems to keep out the
@@ -938,12 +1156,16 @@ and the ceiling is made of sticks and pitch. Compared to the swamp outside, the
 hut is actually warm and inviting -- if you're the type that likes to live in
 a swamp.
 ~
+R
+2 1 5 0
+R
+25 2 1 0
 S
 #5158
 Swamp Manor~
 A Manor House~
 ~&0[]&?~~
-15 0 R em
+16 0 R em
 5 4 0 -1
 D
    The manor house is large and elegant, perhaps a relic of earlier days.
@@ -951,12 +1173,16 @@ Despite its home in the swamp, it has all the grandeur of any house in a big
 city. The roof is made of sticks and pitch, but the manor has been fireproofed
 and built to last.
 ~
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5159
 Swamp Complex~
 A Complex in the Swamp~
 ~&0()&?~~
-20 0 fR em
+24 0 fR em
 7 4 0 -1
 A
 d
@@ -965,19 +1191,25 @@ D
 rotting trees and guarded by crocodiles. Inside, you find it well-constructed,
 safe, and delightfully far from civilization.
 ~
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5160
 Courtyard~
 The Courtyard~
 ....~
-5 0 d 0
+10 0 di 0
 0 0 0 -1
+R
+2 1 5 0
 S
 #5161
 Trapper~
 The Trapper's Post~
 &g^/\^~
-15 0 bpR 0
+10 0 bpR 0
 0 0 0 -1
 D
    The trapper's post is little more than a cabin and some tents surrounded
@@ -990,12 +1222,16 @@ M
 9194 5.00 c
 M
 9195 5.00 c
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5162
 Baths~
 The Baths~
 &0[&b~~&0]~
-20 0 R 0
+16 0 R 0
 0 0 0 -1
 C
 bathe~
@@ -1011,6 +1247,10 @@ M
 236 10.00 ce
 M
 236 10.00 ce
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5163
 Fountain~
@@ -1052,12 +1292,14 @@ M
 201 5.00 bce
 M
 237 5.00 ce
+R
+3 1 1 0
 S
 #5164
 Tower of Sorcery~
 The Tower of Sorcery~
 .&b||&?.~
-50 1 R eflm
+128 1 R eflm
 2 1 0 -1
 C
 inventory, retrieve, store~
@@ -1071,13 +1313,19 @@ is supporting the stairs.
 ~
 M
 237 20.00 ce
+R
+16 1 1 0
+R
+19 1 1 0
+R
+3 1 1 0
 T 5164
 S
 #5165
 Portcullis~
 A Great Portcullis~
 @U&0[]@V~
-60 0 foR abeghijkm
+64 0 foR abeghijkm
 30 0 0 -1
 D
    You are standing beneath a great portcullis. This is the entrance to a
@@ -1089,12 +1337,16 @@ E
 portcullis gate~
 The portcullis is massive. It must take 5 men to close it.
 ~
+R
+16 2 1 0
+R
+19 2 1 0
 S
 #5166
 Great Hall~
 The Great Hall~
 &0[**]~
-60 0 fR abeghijkm
+64 0 fR abeghijkm
 30 0 0 -1
 D
    This is the Great Hall, a room lined with magnificent suits of armor and
@@ -1102,12 +1354,16 @@ decorated with the best gold available. The Great Hall is often one of the
 most important parts of the castle as it shows the wealth of the king. It
 also leads to the throne room.
 ~
+R
+16 2 1 0
+R
+19 2 1 0
 S
 #5167
 Guard Tower~
 A Guard Tower~
 @U&0TT@V~
-15 0 bpR 0
+16 0 blpR 0
 0 0 0 -1
 C
 upgrade~
@@ -1122,6 +1378,10 @@ F
 j
 M
 251 5.00 ce
+R
+16 1 1 0
+R
+19 1 1 0
 U
 5168
 S
@@ -1129,7 +1389,7 @@ S
 Advanced Guard Tower~
 An Advanced Guard Tower~
 &0'TT'~
-15 0 bpRU 0
+24 0 blpRU 0
 0 0 0 -1
 C
 upgrade~
@@ -1144,6 +1404,10 @@ F
 j
 M
 251 5.00 ce
+R
+16 1 1 0
+R
+19 1 1 0
 U
 5169
 S
@@ -1151,7 +1415,7 @@ S
 Superior Guard Tower~
 A Superior Guard Tower~
 &0"TT"~
-20 0 bRU 0
+64 0 blRU 0
 0 0 0 -1
 D
    This is a well-constructed guard tower. It is tall, allowing it to see
@@ -1163,12 +1427,18 @@ F
 j
 M
 251 5.00 ce
+R
+16 1 1 0
+R
+19 1 1 0
+R
+18 1 1 262144
 S
 #5170
 Outpost~
 An Outpost in the Mountains~
 .&0/\&?.~
-50 0 eR 0
+64 0 eR 0
 0 0 5 -1
 D
    Mountain outposts such as this are quickly constructed for mountain
@@ -1178,12 +1448,14 @@ making it very durable and safe.
 ~
 M
 252 33.00 c
+R
+3 2 1 0
 S
 #5171
 Barracks~
 The Barracks~
 &0[BB]~
-40 0 fR ehm
+128 0 fR ehm
 10 0 20 -1
 D
    These are the military barracks, where soldiers are housed and trained. The
@@ -1191,12 +1463,14 @@ sleeping quarters are lined with cots and hammocks, and the scent of roasted
 meat wafts from the kitchen at all hours. So long as the troops are well-fed
 and well-trained, there is little need for the empire to fear.
 ~
+R
+3 2 1 0
 S
 #5172
 Training Yard~
 The Training Yard~
 &0[  ]~
-40 0 fR ehm
+128 0 fR ehm
 10 0 20 -1
 D
    The yard is filled with practice dummies and bales of hay, some spattered
@@ -1204,12 +1478,14 @@ with the blood of overworked soldiers. This is the place where the empire's
 finest troops hone their combat skills and square off against each other for
 pride and glory, lest they be unprepared when war comes.
 ~
+R
+3 2 1 0
 S
 #5173
 Gatehouse~
 The Gatehouse~
 @U&0||@V~
-20 0 bcgoR 0
+32 0 bcgoR 0
 0 0 0 -1
 D
    The gatehouse is a welcoming sight for weary travellers. It signifies the
@@ -1218,13 +1494,21 @@ infiltrators, it prevents access by common men and animals.
 ~
 M
 251 33.00 ce
+R
+3 1 1 0
+R
+3 1 5 0
 S
 #5174
 Wall~
 A Stone Wall~
-@U&VVV@V~
-10 0 djk 0
+@U&#VV@V~
+32 0 djk 0
 0 0 0 -1
+R
+3 1 1 0
+R
+3 1 5 0
 S
 #5175
 Intentionally Left Blank~
@@ -1240,7 +1524,7 @@ S
 River Gate~
 A River Gate~
 @U&0||@V~
-40 0 bcDR 0
+32 0 bcDR 0
 0 0 0 -1
 D
    The river has been fortified against intrusion. This massive structure
@@ -1248,63 +1532,87 @@ actually allows the river to be closed off against ships, canoes, and even
 swimmers. Guards stand post along the walls of the gate, and strong laborers
 turn cranks to open and close the doors.
 ~
+R
+3 1 1 0
+R
+3 1 5 0
 S
 #5177
 Terraced Garden~
 A Terraced Garden~
 /&r##&?\~
-15 0 d 0
+32 0 di 0
 0 0 0 -1
 C
 pick~
 I 7 1202 100.00 1  # FIND-HERB: a twig of redthorn
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5178
 Raft Garden~
 A Garden Made of Rafts~
 ~&b##&?~~
-15 0 dD 0
+10 0 diD 0
 0 0 0 -1
 C
 pick~
 I 7 1205 100.00 1  # FIND-HERB: some bileberries
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5179
 Oasis Garden~
 An Oasis Garden~
 &g^&C##&g^~
-15 0 d 0
+10 0 di 0
 0 0 0 -1
 C
 pick~
 I 7 1204 50.00 1 X  # FIND-HERB: a daggerbite frond
 I 7 1203 100.00 1 X  # FIND-HERB: some magewhisper sepals
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5180
 Estuary Garden~
 An Estuary Garden~
 ~&0##&?~~
-15 0 dD 0
+10 0 diD 0
 0 0 0 -1
 C
 pick~
 I 7 1200 100.00 1  # FIND-HERB: a handful of whitegrass
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5181
 Shady Garden~
 A Shady Garden~
 &g|&y##&g|~
-15 0 d 0
+10 0 di 0
 0 0 0 -1
 C
 pick~
 I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5182
 Mint~
 The Mint~
 &0[MM]~
-20 5 R 0
+64 5 R 0
 0 0 0 -1
 C
 exchange, mint~
@@ -1320,12 +1628,18 @@ M
 254 100.00 e
 M
 254 100.00 e
+R
+16 1 1 0
+R
+19 1 1 0
+R
+3 1 1 0
 S
 #5183
 Trading Post~
 The Trading Post~
 &0[$$]~
-15 0 pR 0
+10 0 pR 0
 0 0 0 -1
 C
 trade <check | list | buy | cancel | collect | identify | post>~
@@ -1338,12 +1652,16 @@ reads 'No Bartering'.
 ~
 F
 C
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5184
 Secret Cache~
 A Secret Cache~
 .&0{}&?.~
-60 0 0 0
+128 0 0 0
 0 0 0 -1
 A
 d
@@ -1359,12 +1677,18 @@ F
 D
 M
 254 33.00 c
+R
+16 1 1 0
+R
+19 1 1 0
+R
+3 1 1 0
 S
 #5185
 Portal~
 A Mystical Portal~
 ~&b][&?~~
-20 1 bdp 0
+24 1 bdp 0
 0 0 0 -1
 C
 collapse, enter, portal~
@@ -1376,12 +1700,16 @@ power that flows through this place.
 ~
 F
 q
+R
+3 1 1 0
+R
+7 1 5 0
 S
 #5186
 Rickety House~
 A Rickety Old House~
 .&0[]&?.~
-25 0 R aem
+32 0 R aem
 6 1 0 -1
 D
    You're in the entrance to a rickety old house. The place is in poor
@@ -1391,13 +1719,19 @@ the house, though it looks very dark and uninviting.
 ~
 M
 235 10.00 c
+R
+4 1 5 0
+R
+16 1 1 0
+R
+19 1 1 0
 T 5186
 S
 #5187
 Strange Burrow~
 A Strange Burrow~
 ^&0[]&?^~
-25 0 R adem
+32 0 R adem
 6 1 0 -1
 A
 d
@@ -1409,13 +1743,19 @@ hollow echo follows you through the passage.
 ~
 M
 235 10.00 c
+R
+4 1 5 0
+R
+16 1 1 0
+R
+19 1 1 0
 T 5187
 S
 #5188
 Old Pueblo~
 An Old Pueblo~
 .&0[]&?.~
-25 0 R aem
+32 0 R aem
 6 1 0 -1
 D
    The dry, caked sides of the pueblo have begun to crumble. Parts of the
@@ -1426,13 +1766,19 @@ uncomfortable.
 ~
 M
 235 10.00 c
+R
+4 1 5 0
+R
+16 1 1 0
+R
+19 1 1 0
 T 5186
 S
 #5189
 Obscure Cave~
 An Obscure Cave~
 /&0()&?\~
-25 0 R adem
+48 0 R adem
 6 1 0 -1
 A
 d
@@ -1444,32 +1790,46 @@ breeze flows from inside, sending the hair on your neck to full attention.
 ~
 M
 235 10.00 c
+R
+4 1 5 0
+R
+16 1 1 0
+R
+19 1 1 0
 T 5187
 S
 #5190
 Astral Nexus~
 An Astral Nexus~
 ..&C*&?.~
-5 0 bdp 0
+24 0 bdp 0
 0 0 0 -1
 C
 summon player <name>~
 F
 x
+R
+3 1 1 0
+R
+7 1 5 0
 S
 #5191
 Draining Oasis~
 A Draining Oasis~
 .&c__&?.~
-1 0 dp 0
+4 0 dp 0
 0 0 0 -1
+R
+5 1 5 0
+R
+25 1 1 0
 T 5191
 S
 #5192
 Oilmaker~
 The Oilmaker~
 &0(OO)~
-15 0 pR 0
+10 0 pR 0
 0 0 0 275
 C
 inventory, press, retrieve, store~
@@ -1480,12 +1840,16 @@ heavy stone press in the other corner extracts the precious oil.
 ~
 F
 s
+R
+16 1 1 0
+R
+19 1 1 0
 S
 #5193
 Cabinet of Curiosities~
 A Cabinet of Curiosities~
 &0[CC]~
-15 0 pR 0
+10 0 pR 0
 0 0 0 -1
 C
 inventory, retrieve, store~
@@ -1496,5 +1860,34 @@ this room is fairly large -- at least, before the shelves. It appears to be a
 collection of the spoils of many an adventure, though you can barely see it as
 the dusty air blocks what little light sneaks in between the relics.
 ~
+R
+2 1 5 0
+R
+16 1 1 0
+R
+19 1 1 0
+S
+#5194
+Family Gravesite~
+A Family Gravesite~
+..&0x&?.~
+10 0 dilp 0
+0 0 0 -1
+C
+tomb~
+F
+B
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9191 2.00 0
+M
+9198 2.00 0
+M
+9199 2.00 0
+R
+2 1 5 0
 S
 $

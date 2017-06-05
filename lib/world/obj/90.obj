@@ -1,0 +1,125 @@
+#9009
+horseshoe shoe~
+a horseshoe~
+A horseshoe is lying here.~
+Your empire's stablemaster may have a use for this newly forged horseshoe.
+~
+3 p a 1
+0 0 0
+2 0
+Q 9009
+S
+#9010
+pattern horseshoe~
+the horseshoe pattern~
+The horseshoe pattern is lying here.~
+   This pattern, received from the stablemaster, can be used to make horseshoes
+as long as you're on his quest.
+~
+3 p a 1
+0 0 0
+2 0
+Q 9009
+S
+#9030
+head mighty beast severed~
+the head of a mighty beast~
+The severed head of a mighty beast has been left here.~
+The barkeep in your empire wants this.
+~
+3 0 a 2
+0 0 0
+0 0
+Q 9030
+S
+#9031
+knife barkeep's barkeeps~
+the barkeep's knife~
+The barkeep's knife has been left here.~
+   The barkeep asked you to use this knife to butcher a wolf or bear and bring
+back its head.  
+~
+1 p ano 3
+0 1 1
+0 0
+C
+1 25
+Q 9030
+T 9030
+S
+#9033
+trinket stolen~
+a stolen trinket~
+A stolen trinket lies here.~
+Return this to the guildmaster.
+~
+3 p a 2
+0 0 0
+0 0
+Q 9033
+S
+#9034
+picture trinket~
+a picture of the trinket~
+A picture of a trinket is lying here.~
+You'll need this to identify the trinket the guildmaster wants you to steal.
+~
+3 0 a 2
+0 0 0
+0 0
+Q 9033
+T 9033
+S
+#9036
+trinket useless~
+a useless trinket~
+A useless trinket is sitting here.~
+   These useless trinkets are used by novice sorcerers to practice enchanting.
+The High Sorcerer wants them disenchanted so they can be reused.
+~
+3 jp a 4
+0 0 0
+8 0
+Q 9036
+T 9036
+S
+#9042
+letter smith undelivered~
+a letter for the smith~
+An undelivered letter is lying here.~
+   This letter needs to be delivered to the smith in your empire... But maybe
+you could take a peek.
+~
+3 0 a 2
+0 0 0
+0 0
+Q 9042
+T 9043
+S
+#9043
+letter high sorcerer undelivered~
+a letter for the High Sorcerer~
+An undelivered letter is lying here.~
+   This letter needs to be delivered to the High Sorcerer in your empire...
+But maybe you could take a peek.
+~
+3 0 a 2
+0 0 0
+0 0
+Q 9042
+T 9043
+S
+#9044
+letter alchemist undelivered~
+a letter for the alchemist~
+An undelivered letter is lying here.~
+   This letter needs to be delivered to the Alchemist in your empire... But
+maybe you could take a peek.
+~
+3 0 a 3
+0 0 0
+0 0
+Q 9042
+T 9043
+S
+$

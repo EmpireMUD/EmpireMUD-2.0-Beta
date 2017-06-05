@@ -1,0 +1,80 @@
+#18450
+Beaver Lodge~
+A Beaver Lodge~
+&t#&y##&t#~
+60 0 d 0
+0 0 0 -1
+M
+9156 50.00 0
+S
+#18451
+Beaver Dam~
+A Beaver Dam~
+&t####~
+1 0 dip 0
+0 0 0 -1
+M
+9156 10.00 0
+R
+3 1 5 0
+S
+#18491
+Strange Chariot~
+Inside the Strange Silver Chariot~
+&0[  ]~
+1 0 a 0
+0 0 0 -1
+C
+disembark~
+D
+   Climbing inside the short silver chariot, you find its plush seats to be
+among the most comfortable you have ever sat upon. The rest of the interior is
+rather small, and every part of it is covered in strange wires and glowing
+script. The windows are made from fine glass, in panes so large they must have
+cost a fortune. As you sit in silence, you realize the chariot is making a low
+growl, though it is pulled by no animal. Truly you have never seen anything
+like this before.
+~
+E
+glowing script~
+   The strange, glowing text appears to be numbers, although you cannot discern
+their significance.
+~
+E
+plaque~
+The blue plaque reads:
+   This unstable portal easter egg is dedicated to the "Back to the Future"
+series by Robert Zemeckis and Bob Gale. Wacky time machines like the DeLorean
+inspired many adventures like this one.
+~
+S
+#18492
+A Massive Chamber~
+A Massive Control Room~
+&0[  ]~
+1 0 a 0
+0 0 0 -1
+C
+disembark~
+D
+   Stepping inside the strange blue box, you find it is much, much bigger on
+the inside. In fact, you step out for a moment and then step inside again to be
+sure you weren't dreaming. The copper walls have an almost organic shape to
+them, and the ceiling is supported by almost tree-like tendrils of cool cyan.
+At the center of the room is some sort of console, though you aren't sure what
+it does.
+~
+E
+console center The console is round, and covered with switches and levers. It attaches to the ceiling via a tall tube, which pulses rhythmically.~
+Nothing.
+~
+E
+plaque~
+The blue plaque reads:
+   This unstable portal easter egg is dedicated to "Doctor Who", a science
+fiction series which has influenced generations of actors, viewers, and other
+works of fiction. The amazing adventures of the TARDIS, which can land in any
+time or place, have inspired many adventures just like this one.
+~
+S
+$

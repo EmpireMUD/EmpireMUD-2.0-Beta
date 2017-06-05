@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.global.c                                    EmpireMUD 2.0b4 *
+*   File: olc.global.c                                    EmpireMUD 2.0b5 *
 *  Usage: OLC for globals                                                 *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -58,6 +58,10 @@ bool audit_global(struct global_data *glb, char_data *ch) {
 
 	if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
 		olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "IN-DEVELOPMENT");
+		problem = TRUE;
+	}
+	if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) && IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CHOOSE_LAST)) {
+		olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Has both CUMULATIVE-PRC and CHOOSE-LAST");
 		problem = TRUE;
 	}
 	if (GET_GLOBAL_MIN_LEVEL(glb) > GET_GLOBAL_MAX_LEVEL(glb)) {

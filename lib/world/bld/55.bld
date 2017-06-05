@@ -163,7 +163,7 @@ The Top of the Tower~
 0 0 aR l
 0 0 0 228
 C
-inventory, retrieve, store, study~
+study sorcery~
 D
    From the top floor of the tower, you can look down over the world, as the
 sorcerers who live here like to do. The walls are lined with heavy bookshelves
@@ -173,6 +173,7 @@ powerful occupants, and a winding staircase leads back to the ground floor.
 ~
 M
 237 20.00 ce
+T 5511
 S
 #5512
 Aftercastle~
@@ -334,5 +335,19 @@ E
 windows out~
 The windows are too dirty to see much.
 ~
+S
+#5522
+On Deck~
+On Deck~
+~
+0 0 aHR 0
+0 1 0 -1
+C
+disembark, sail~
+D
+You're standing on deck, looking out over this side of the ship.
+~
+M
+255 20.00 c
 S
 $

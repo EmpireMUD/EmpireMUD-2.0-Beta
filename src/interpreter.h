@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: interpreter.h                                   EmpireMUD 2.0b4 *
+*   File: interpreter.h                                   EmpireMUD 2.0b5 *
 *  Usage: header file: public procs, macro defs, subcommand defines       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -20,6 +20,7 @@ void command_interpreter(char_data *ch, char *argument);
 char lower( char c );
 void nanny(descriptor_data *d, char *arg);
 int find_command(const char *command);
+void send_low_pos_msg(char_data *ch);
 
 
 struct command_info {
@@ -88,6 +89,10 @@ struct alias_data {
 // for do_accept
 #define SCMD_ACCEPT  0
 #define SCMD_REJECT  1
+
+// for do_approve
+#define SCMD_APPROVE  0
+#define SCMD_UNAPPROVE  1
 
 // do_board
 #define SCMD_BOARD  0
@@ -219,6 +224,10 @@ struct alias_data {
 #define SCMD_LIBRARY  0
 #define SCMD_BOOKEDIT  1
 
+// do_empire_inventory
+#define SCMD_EINVENTORY	0
+#define SCMD_EIDENTIFY	1
+
 // do_toggle
 #define TOG_ONOFF  0
 #define TOG_OFFON  1
@@ -229,7 +238,7 @@ struct alias_data {
 #define MOVE_NORMAL  0	// Normal move message
 #define MOVE_LEAD  1	// Leading message
 #define MOVE_FOLLOW  2	// Follower message
-	#define MOVE_UNUSED  3
+#define MOVE_CIRCLE  3	// circling
 #define MOVE_EARTHMELD  4
 #define MOVE_SWIM  5	// swim skill
 

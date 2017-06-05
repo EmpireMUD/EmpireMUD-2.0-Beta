@@ -13,6 +13,19 @@ Example:
 
 See also: GRANT, SET
 #d
+APPROVE UNAPPROVE AUTHORIZED AUTHORIZATION APPROVAL
+
+Usage:  approve <name>
+        unapprove <name>
+
+If the mud is configured to require approval for players/characters, the
+'approve' command gives that approval, and the 'unapprove' command revokes it.
+This command is grantable.
+
+The command "config approval -v" will show the current configuration.
+
+See also: CONFIG, GRANT
+#d
 AT WIZAT
 
 Usage:  at <room | coords | item | mob | player name> <command> <arguments>
@@ -31,20 +44,6 @@ Examples:
   > at (0,0) bark  -- There must be no spaces in the coordinates
 
 See also: GOTO
-#d
-AUTHORIZE
-
-Usage:  authorize <name>
-
-This command is used if the mud requires character authorization. Authorization
-is configured via the "config game" command. If it's shut off, players will
-automatically authorize during character creation. This command is grantable.
-
-If you wish to use authorization on your EmpireMUD, you should turn on the
-'require_auth' game config and then either use the 'authorize' command
-manually, or set up an automatic system.
-
-See also: GRANT
 #d
 AUTOWIZ
 
@@ -74,6 +73,16 @@ Examples:
 
 See also: GRANT, WIZLOCK
 #d
+BREAKREPLY "BREAK REPLY"
+
+Usage:  breakreply
+
+This command cancels the "reply-to" data for all players in the game who are
+lower level than you. It's useful it you want to be invisible and don't want
+players to be able to see that you're online using "reply".
+
+See also: REPLY
+#d
 CLEARABILITIES
 
 Usage:  clearabilities <player> <skill | all>
@@ -86,8 +95,8 @@ See also: GRANT, SET
 #d
 CONFIG
 
-Usage:  config <set> [-v]
-        config <set> <key> [value]
+Usage:  config <type> [-v]
+        config <type> <key> [value]
 
 This privileged command controls many global game configurations. You can get
 view explanations for the configs using the -v option with any set of configs.
@@ -166,11 +175,12 @@ Usage:  edelete <empire>
 
 Immortal tool to delete an empire.
 #d
-EDITNOTES ADDNOTES NOTES "PLAYER NOTES" "ADMIN NOTES" "EDIT NOTES" "ADD NOTES" "SHOW NOTES"
+EDITNOTES ADDNOTES NOTES "PLAYER NOTES" "ADMIN NOTES" "EDIT NOTES" "ADD NOTES" "SHOW NOTES" AUTONOTES "AUTO NOTES" "TOGGLE AUTONOTES"
 
 Usage:  editnotes <player>
         addnotes <player> <text>
         show notes <player>
+        toggle autonotes
 
 You can edit and leave notes about a player, to help inform other immortals
 of disciplinary issues or unusual authorizations. Any immortal can see the
@@ -180,6 +190,10 @@ below his own level. Editnotes command is grantable, and includes addnotes.
 Editnotes opens a text editor; addnotes just adds a line to the existing notes.
 Notes have a 240-character limit; raising this requires converting the player
 file.
+
+The autonotes toggle will cause an immortal player to see the "notes" on player
+accounts as they log into the game. It shows up immediately after the syslog
+for entering the game, only if there are any notes to show.
 
 See also: GRANT
 #d
@@ -296,6 +310,7 @@ Most of the grant names correspond to actual commands, but some are special:
  empires - Allows eedit, edelete, moveeinv, and more.
  olc - Allows .olc, vnum, and vstat.
  olc-controls - Allows .setflags, .setminvnum, and .setmaxvnum.
+ transfer - Allows moving mortals with commands like transfer and portal.
 
 Try 'helpsearch grantable' to find grantable commands.
 
@@ -317,7 +332,7 @@ who doesn't want to be interfered with.
 
 See also: TOGGLE
 #d
-HOLYLIGHT
+HOLYLIGHT "TOGGLE HOLYLIGHT"
 
 Usage:  toggle holylight
 
@@ -424,7 +439,7 @@ See also: INVIS, VISIBLE, SET
 #d
 ISLAND "ISLAND COMMAND"
 
-Usage:  island list
+Usage:  island list [keywords]
         island rename <id> <name>
         island flags <id> [add | remove] <flags>
 
@@ -458,6 +473,8 @@ Usage:  load <type> <virtual number>
 LOAD is used to create instances of mobs, objects, and vehicles. The first
 argument specifies what type you are trying to load; the second is the virtual
 number. This command is grantable.
+
+(For the mortal command, try LOAD VEHICLE.)
 
 You can load: mob, obj, vehicle
 
@@ -494,6 +511,15 @@ use most communication channels until he/she is unmuted. This command is
 grantable.
 
 See also: FLAGS, GRANT
+#d
+NOCUSTOMIZE !CUSTOMIZE "NO CUSTOMIZE"
+
+Usage:  set <name> nocustomize <on | off>
+
+This setting prevents a player from using the 'customize' command, if they have
+been abusing it. This is an account-wide setting.
+
+See also: SET
 #d
 NOTITLE
 
@@ -656,6 +682,7 @@ Valid files are:
   policy     (/mud_dir/lib/text/policies)
   wizlist    (/mud_dir/lib/text/wizlist)
   xhelp      (/mud_dir/lib/text/help/*)
+  data       (/mud_dir/lib/misc/game_data)
 
 See also: GRANT
 #d
@@ -682,9 +709,10 @@ Usage:  restore <player | mobile>
 RESTORE restores a player or mobile to full hit, mana, and movement points.
 It also resets all cooldowns. This command is grantable.
 
-If used on immortals, it also sets all skill levels to 100%.
+If used on immortals, it also sets all skill levels to 100 and grants all
+abilities (on the first skill set only).
 
-See also: GRANT
+See also: GRANT, SKILL SWAP
 #d
 RETURN
 
@@ -694,7 +722,7 @@ RETURN returns you to your regular body if you are switched into a mob.
 
 See also: SWITCH
 #d
-ROOMFLAGS
+ROOMFLAGS "TOGGLE ROOMFLAGS" "ROOM FLAGS"
 
 Usage:  toggle roomflags
 
@@ -728,6 +756,7 @@ age            BOTH    NUMBER       Player age
 bonustrait     PC      MISC         Set bonus traits for player
 bonusexp       PC      NUMBER       Set daily bonus exp for the player
 coins          PC      MISC         Sets coins on-hand for player
+faction        PC      MISC         Change faction reputations (SET FACTION)
 grants         PC      MISC         Set grants for player
 invstart       PC      BINARY       Invisible @ Start
 lastname       PC      STRING       Player's last name, or off
@@ -762,6 +791,7 @@ ipmask         PC      BINARY       IP address is hidden
 multi-ip       PC      BINARY       Can log in more than 1 account per IP
 multi-char     PC      BINARY       Can log in more than 1 char per account
 muted          PC      BINARY       Player is muted
+nocustomize    PC      BINARY       Player cannot use 'customize'
 nodelete       PC      BINARY       Can't be deleted
 noidleout      PC      BINARY       Won't idle out
 notitle        PC      BINARY       Can't change title
@@ -772,6 +802,18 @@ wizhide        PC      BINARY       Turns on/off wizhide
 scale          NPC     NUMBER       Rescales a mob to a given level
 
 See also: GRANT, STAT
+#d
+"SET FACTION"
+
+Usage:  set [file] <player> faction <name/vnum> <rep/value>
+        set [file] <player> faction <name/vnum> none
+
+This allows you to change a player's faction reputation to any reputation
+level (e.g. "Revered") or specific point value.
+
+You can delete a reputation entirely by setting it to 'none'.
+
+See also: FACTION, SHOW FACTIONS
 #d
 SHOW
 
@@ -786,6 +828,8 @@ Mode       Level    Description
 stats      God      Shows game stats including prototypes.
 arrowtypes Immort   Shows the 'arrow type' setting for all bows and arrows.
 components Immort   Shows all items matching a component type (and flags).
+dailycycle Immort   Shows daily quests with a given cycle id.
+factions   Immort   Shows a player's faction levels.
 ignoring   Immort   Shows you who a player has on their ignore list.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
 notes      Immort   Show notes on a player.
@@ -804,6 +848,7 @@ variables  Immort   Shows script variables on a player character.
 commons    Asst     Shows players currently connected from duplicate sites.
 site       Asst     Shows all players with a specific site segment.
 account    Co-Impl  Shows all the alts associated with a given player.
+data       Co-Impl  Shows data stored in the global data system
 
 Each of these commands has its own help file (for example, HELP SHOW STATS)
 
@@ -832,6 +877,23 @@ If you specify any flags, all those flags must match the output.
 
 For a list of component types, see: HELP COMPONENT TYPES
 For a list of component flags, see: HELP COMPONENT FLAGS
+#e
+"SHOW DAILYCYCLE" "SHOW DAILY CYCLE"
+
+Usage:  show dailycycle <number>
+
+This command will find all daily quests that share a certain cycle id.
+
+See also:  QEDIT DAILYCYCLE
+#e
+"SHOW FACTIONS"
+
+Usage:  show factions <player> [filter]
+
+This command shows you all of a player's faction reputation levels. It can
+be filtered by name.
+
+See also: FACTION, SET FACTION
 #e
 "SHOW IGNORING"
 
@@ -881,9 +943,10 @@ path to their inventory data, hence the name.
 #e
 "SHOW SKILLS"
 
-Usage:  show skills <player name>
+Usage:  show skills <player name> [swap]
 
-Shows the target player's skills and abilities.
+Shows the target player's skills and abilities. The optional "swap" argument
+shows the player's alternate set of abilities.
 #e
 "SHOW SPAWNS"
 
@@ -916,8 +979,8 @@ all listed together under 'Building'.
 
 Usage:  show uses <type> [flags]
 
-This command looks up crafts, vehicles, and augments that require a given
-component type. If you specify any flags, all those flags must match the
+This command looks up buildings, crafts, vehicles, and augments that require a
+given component type. If you specify any flags, all those flags must match the
 output.
 
 For a list of component types, see: HELP COMPONENT TYPES
@@ -1133,21 +1196,22 @@ This is a generic command that houses several simple utilities for immortals.
 They generally have no game effect, but can help with testing.
 
 Available utilities:
- b318buildings - Finds buildings using flags that were deprecated in 2.0b3.18.
- clearroles - Clears the class roles and class abilities of all players.
- diminish <number> <scale> - Applies the game's diminishing returns formula,
+ &cb318buildings&0 - Finds buildings using flags that were deprecated in 2.0b3.18.
+ &cclearroles&0 - Clears the class roles and class abilities of all players.
+ &cdiminish <number> <scale>&0 - Applies the game's diminishing returns formula,
     and returns the result.
- islandsize - Counts and displays tile counts for all islands.
- playerdump - Outputs a data file with tab-separated lines for all players with
+ &cislandsize&0 - Counts and displays tile counts for all islands.
+ &cplayerdump&0 - Outputs a data file with tab-separated lines for all players with
     account, playtime, and host.
- randtest [number] [size] - Generates a large number of random numbers, and
+ &crandtest [number] [size]&0 - Generates a large number of random numbers, and
     reports the results.
- redoislands - Renumbers all the islands (requires confirmation; may rearrange
+ &credoislands&0 - Renumbers all the islands (requires confirmation; may rearrange
     empire inventories).
- rescan <empire | all> - Rereads territory and members, which can fix issues.
- resetbuildingtriggers <vnum | all> - Reattaches triggers to buildings/rooms,
+ &crescan <empire | all>&0 - Rereads territory and members, which can fix issues.
+ &cresetbuildingtriggers <vnum | all>&0 - Reattaches triggers to buildings/rooms,
     e.g. if you made a change in OLC and want live buildings updated.
- strlen - Give various measures of string length.
+ &cstrlen&0 - Give various measures of string length.
+ &cyearly&0 - Runs a full annual update on the world.
 #d
 VNUM
 
@@ -1158,8 +1222,8 @@ specified name. If you specify more than one keyword, it will find things
 that match ALL of those keywords.
 
 Valid types are: adventure, ability, archetype, augment, book, building, craft,
-                 class, crop, global, mob, morph, obj, quest, roomtemplate,
-                 sector, skill, vehicle
+                 class, crop, faction, global, mob, morph, obj, quest,
+                 roomtemplate, sector, skill, social, trigger, vehicle
 
 Examples:
 
@@ -1180,8 +1244,8 @@ Usage:  vstat <type> <vnum>
 Used to stat a prototypical object by virtual number.
 
 Valid types are: adventure, ability, archetype, augment, building, book, craft,
-                 class, crop, global, mob, morph, obj, quest, roomtemplate,
-                 sector, skill, vehicle
+                 class, crop, faction, global, mob, morph, obj, quest,
+                 roomtemplate, sector, skill, social, trigger, vehicle
 
 Examples:
 
@@ -1239,5 +1303,10 @@ Examples:
   > ; #7 <text> - sends text only to people level 7 or higher
 
 See also: NOWIZ, GHISTORY
+#d
+XNAME XNAMES "XNAME FILE"
+
+The lib/misc/xnames file contains a list of forbidden names. Any entry that
+begins with a % (percent) will match partial names as well.
 #d
 $

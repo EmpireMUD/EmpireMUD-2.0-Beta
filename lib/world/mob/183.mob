@@ -1,0 +1,133 @@
+#18300
+Neferkare pharaoh pharoah linen-wrapped wrapped~
+Pharaoh Neferkare~
+A linen-wrapped pharaoh climbs out of his sarcophagus.
+~
+0 0 bdxyzAB c
+1 0 13 7
+I 0 18324 100.00 8  # BUTCHER: a bolt of linen
+I 0 3306 25.00 2 b  # BUTCHER: a pouch of jerky
+I 0 3306 25.00 3 b  # BUTCHER: a pouch of jerky
+I 0 3306 25.00 4 b  # BUTCHER: a pouch of jerky
+I 0 3306 25.00 5 b  # BUTCHER: a pouch of jerky
+I 4 18305 100.00 1  # LOOT: a bonus item
+I 4 18307 12.00 1 a  # LOOT: Khufu's pharaonic wristbands
+I 4 18312 12.00 1 a  # LOOT: Khufu's leather sandals
+I 4 18317 12.00 1 a  # LOOT: the aura of Nekhbet
+I 4 18309 12.00 1 a  # LOOT: golden bangles
+I 4 18314 12.00 1 a  # LOOT: sandals of the burning dunes
+I 4 18319 12.00 1 a  # LOOT: the aura of Thoth
+I 4 18315 12.00 1 a  # LOOT: the mummy's linen footwraps
+I 4 18326 12.00 1 a  # LOOT: a sacred bell
+I 4 18302 1.00 1 a  # LOOT: Cult of Anubis garments
+I 4 18303 1.00 1 a  # LOOT: Cult of Horus garments
+I 4 18329 1.00 1 a  # LOOT: the Solar Disk of Ra
+I 4 18327 1.00 1 a  # LOOT: a crocodile whistle
+I 4 18306 12.00 1 b  # LOOT: Naqada wristguards
+I 4 18311 12.00 1 b  # LOOT: a pair of plated sandals
+I 4 18316 12.00 1 b  # LOOT: the aura of Geb
+I 4 18308 12.00 1 b  # LOOT: a papyrus charm
+I 4 18313 12.00 1 b  # LOOT: sacred lotus sandals
+I 4 18318 12.00 1 b  # LOOT: the aura of Osiris
+I 4 18310 12.00 1 b  # LOOT: a jeweled scarab charm
+I 4 18320 12.00 1 b  # LOOT: the aura of Khufu
+I 4 18300 1.00 1 b  # LOOT: Cult of Sobek garments
+I 4 18301 1.00 1 b  # LOOT: Cult of Bastet garments
+I 4 18325 1.00 1 b  # LOOT: the ankh of Hedj-Wer
+I 4 18328 1.00 1 b  # LOOT: a falcon whistle
+M
+0
+$n lets out an eerie groan.~
+M
+0
+$n nearly trips over a loose wrapping.~
+M
+0
+$n stares at you with cold, glowing eyes.~
+T 18306
+T 18303
+T 18300
+T 18302
+S
+#18301
+jackal fierce~
+a fierce jackal~
+A fierce jackal is leaving.
+~
+0 0 bdhjo c
+0 0 14 9
+T 18301
+S
+#18302
+scarabs swarm~
+a swarm of scarabs~
+A swarm of scarabs is leaving.
+~
+0 0 bdhoyz cm
+0 0 2 23
+T 18308
+T 18301
+S
+#18309
+mummy reanimated~
+what's left of the mummy~
+Most of a reanimated mummy shambles past you.
+~
+250 300 adgh G
+1 0 13 5
+I 4 18324 100.00 4  # LOOT: a bolt of linen
+I 4 18322 100.00 1  # LOOT: a sack of flaxseed
+M
+0
+$n groans slowly.~
+M
+0
+$n tries to tie up $s loose bandages.~
+M
+0
+$n stares at you with cold, dead eyes.~
+M
+0
+$n drops a finger.~
+T 18309
+T 18310
+S
+#18326
+cat sacred~
+a sacred cat~
+A sacred cat is cleaning its paw.
+~
+1 1 bdoD n
+0 0 0 10
+M
+0
+You stoop to pet $n.~
+M
+0
+You realize $n is your superior.~
+M
+0
+$n licks its paw.~
+M
+0
+$n mews.~
+T 9901
+T 9902
+S
+#18327
+crocodile enormous~
+an enormous crocodile~
+An enormous crocodile practically surrounds you!
+~
+100 125 dej 0
+0 0 9 9
+S
+#18328
+falcon great~
+a great falcon~
+A great falcon stands ready to fly.
+~
+100 125 de m
+0 0 2 27
+S
+$

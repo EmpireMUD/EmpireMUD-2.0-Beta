@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.other.c                                     EmpireMUD 2.0b4 *
+*   File: act.other.c                                     EmpireMUD 2.0b5 *
 *  Usage: Miscellaneous player-level commands                             *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -31,12 +31,14 @@
 * Contents:
 *   Helpers
 *   Accept/Reject Helpers
+*   Alt Import
 *   Toggle Callbacks
 *   Commands
 */
 
 // external prototypes
 extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
+void check_delayed_load(char_data *ch);
 extern bool check_scaling(char_data *mob, char_data *attacker);
 extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
 extern char *get_room_name(room_data *room, bool color);
@@ -58,7 +60,7 @@ extern char *show_color_codes(char *string);
 void adventure_summon(char_data *ch, char *argument) {
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH];
 	struct instance_data *inst;
 	char_data *vict;
 	
@@ -67,7 +69,7 @@ void adventure_summon(char_data *ch, char *argument) {
 	if (GET_POS(ch) < POS_STANDING) {
 		msg_to_char(ch, "You can't do that right now.\r\n");
 	}
-	else if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !(inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
+	else if (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
 		msg_to_char(ch, "You can only use the adventure summon command inside an adventure.\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
@@ -104,7 +106,7 @@ void adventure_summon(char_data *ch, char *argument) {
 		msg_to_char(ch, "Your target can't enter this instance.\r\n");
 	}
 	else if (!can_teleport_to(vict, IN_ROOM(vict), TRUE)) {
-		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", HSHR(vict));
+		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", REAL_HSHR(vict));
 	}
 	else if (!can_teleport_to(vict, IN_ROOM(ch), FALSE)) {
 		msg_to_char(ch, "Your target can't be summoned here.\r\n");
@@ -114,8 +116,8 @@ void adventure_summon(char_data *ch, char *argument) {
 	}
 	else {
 		act("You start summoning $N...", FALSE, ch, NULL, vict, TO_CHAR);
-		snprintf(buf, sizeof(buf), "$o is trying to summon you to %s (%s) -- use 'accept/reject summon'.", GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
-		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
+		act("$n starts summoning $N...", FALSE, ch, NULL, vict, TO_ROOM);
+		msg_to_char(vict, "%s is trying to summon you to %s (%s) -- use 'accept/reject summon'.\r\n", PERS(ch, ch, TRUE), GET_ADV_NAME(inst->adventure), get_room_name(IN_ROOM(ch), FALSE));
 		add_offer(vict, ch, OFFER_SUMMON, SUMMON_ADVENTURE);
 		command_lag(ch, WAIT_OTHER);
 	}
@@ -189,6 +191,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	void start_new_character(char_data *ch);
 	extern char *START_MESSG;
+	extern const char *unapproved_login_message;
 	extern bool global_mute_slash_channel_joins;
 	
 	char sys[MAX_STRING_LENGTH], mort_in[MAX_STRING_LENGTH], mort_out[MAX_STRING_LENGTH], mort_alt[MAX_STRING_LENGTH], temp[256];
@@ -196,14 +199,11 @@ void perform_alternate(char_data *old, char_data *new) {
 	bool show_start = FALSE;
 	int invis_lev, old_invis, last_tell;
 	empire_data *old_emp;
-	bool was_imm;
 	
 	if (!old || !new || !old->desc || new->desc) {
 		log("SYSERR: Attempting invalid peform_alternate with %s, %s, %s, %s", old ? "ok" : "no old", new ? "ok" : "no new", old->desc ? "ok" : "no old desc", new->desc ? "new desc" : "ok");
 		return;
 	}
-	
-	was_imm = IS_IMMORTAL(old);
 
 	/*
 	 * kill off all sockets connected to the same player as the one who is
@@ -239,6 +239,13 @@ void perform_alternate(char_data *old, char_data *new) {
 	
 	// save this to switch over replies
 	last_tell = GET_LAST_TELL(old);
+	
+	// switch over replies for immortals, too
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) == CON_PLAYING && desc->character && IS_IMMORTAL(desc->character) && GET_LAST_TELL(desc->character) == GET_IDNUM(old)) {
+			GET_LAST_TELL(desc->character) = GET_IDNUM(new);
+		}
+	}
 	
 	// move desc (do this AFTER saving)
 	new->desc = old->desc;
@@ -305,11 +312,14 @@ void perform_alternate(char_data *old, char_data *new) {
 		send_to_char("&rYou have mail waiting.&0\r\n", new);
 	}
 	
+	if (!IS_APPROVED(new)) {
+		send_to_char(unapproved_login_message, new);
+	}
 	if (show_start) {
 		send_to_char(START_MESSG, new);
 	}
 	
-	if (!IS_IMMORTAL(new) && !was_imm) {
+	if (!IS_IMMORTAL(new)) {
 		add_cooldown(new, COOLDOWN_ALTERNATE, SECS_PER_REAL_MIN);
 	}
 	GET_LAST_TELL(new) = last_tell;
@@ -463,7 +473,7 @@ void summon_player(char_data *ch, char *argument) {
 	
 	one_argument(argument, arg);
 	
-	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_SUMMON_PLAYER)) {
+	if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_SUMMON_PLAYER)) {
 		msg_to_char(ch, "You can't summon players here.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -491,7 +501,7 @@ void summon_player(char_data *ch, char *argument) {
 		msg_to_char(ch, "You cannot summon the dead like that.\r\n");
 	}
 	else if (!can_teleport_to(vict, IN_ROOM(vict), TRUE)) {
-		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", HSHR(vict));
+		msg_to_char(ch, "Your target can't be summoned from %s current location.\r\n", REAL_HSHR(vict));
 	}
 	else if (!can_teleport_to(vict, IN_ROOM(ch), FALSE)) {
 		msg_to_char(ch, "Your target can't be summoned here.\r\n");
@@ -592,7 +602,7 @@ OFFER_FINISH(ofin_quest) {
 
 
 OFFER_VALIDATE(oval_rez) {
-	extern obj_data *find_obj(int n);
+	extern obj_data *find_obj(int n, bool error);
 	extern room_data *obj_room(obj_data *obj);
 	
 	room_data *loc = real_room(offer->location);
@@ -605,7 +615,7 @@ OFFER_VALIDATE(oval_rez) {
 	
 	// if already respawned, verify corpse location
 	if (!IS_DEAD(ch)) {
-		if (!(corpse = find_obj(GET_LAST_CORPSE_ID(ch))) || !IS_CORPSE(corpse)) {
+		if (!(corpse = find_obj(GET_LAST_CORPSE_ID(ch), FALSE)) || !IS_CORPSE(corpse)) {
 			msg_to_char(ch, "You can't resurrect because your corpse is gone.\r\n");
 			return FALSE;
 		}
@@ -630,6 +640,10 @@ OFFER_VALIDATE(oval_summon) {
 	room_data *loc = real_room(offer->location);
 	int type = offer->data;
 	
+	if (!IS_APPROVED(ch) && config_get_bool("travel_approval")) {
+		send_config_msg(ch, "need_approval_string");
+		return FALSE;
+	}
 	if (!loc) {
 		msg_to_char(ch, "Summon location invalid.\r\n");
 		return FALSE;
@@ -683,6 +697,311 @@ OFFER_FINISH(ofin_summon) {
 	act("$n appears in a swirl of light!", TRUE, ch, NULL, NULL, TO_ROOM);
 	
 	return TRUE;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// ALT IMPORT //////////////////////////////////////////////////////////////
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
+void alt_import_aliases(char_data *ch, char_data *alt) {
+	struct alias_data *al, *iter, *newl;
+	bool found, imported = FALSE;
+	
+	// may have been loaded from file
+	check_delayed_load(alt);
+	
+	LL_FOREACH(GET_ALIASES(alt), al) {
+		// ensure not already aliased
+		found = FALSE;
+		LL_FOREACH(GET_ALIASES(ch), iter) {
+			if (!str_cmp(al->alias, iter->alias)) {
+				found = TRUE;
+				break;
+			}
+		}
+		if (found) {
+			continue;	// already aliased
+		}
+		
+		CREATE(newl, struct alias_data, 1);
+		newl->alias = str_dup(al->alias);
+		newl->replacement = str_dup(al->replacement);
+		newl->type = al->type;
+		
+		newl->next = GET_ALIASES(ch);
+		GET_ALIASES(ch) = newl;
+		
+		msg_to_char(ch, "Imported alias '%s'.\r\n", newl->alias);
+		imported = TRUE;
+	}
+	
+	if (!imported) {
+		msg_to_char(ch, "No aliases to import.\r\n");
+	}
+}
+
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
+void alt_import_fmessages(char_data *ch, char_data *alt) {
+	GET_FIGHT_MESSAGES(ch) = GET_FIGHT_MESSAGES(alt);
+	msg_to_char(ch, "Imported fight message settings.\r\n");
+}
+
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
+void alt_import_fprompt(char_data *ch, char_data *alt) {
+	if (GET_FIGHT_PROMPT(alt) && *GET_FIGHT_PROMPT(alt)) {
+		if (GET_FIGHT_PROMPT(ch)) {
+			free(GET_FIGHT_PROMPT(ch));
+		}
+		GET_FIGHT_PROMPT(ch) = str_dup(GET_FIGHT_PROMPT(alt));
+		msg_to_char(ch, "Imported fprompt.\r\n");
+	}
+	else {
+		msg_to_char(ch, "No fprompt to import.\r\n");
+	}
+}
+
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
+void alt_import_ignores(char_data *ch, char_data *alt) {
+	bool found, imported = FALSE, full = FALSE;
+	int iter, sub;
+	
+	for (iter = 0; iter < MAX_IGNORES && !full; ++iter) {
+		if (GET_IGNORE_LIST(alt, iter) <= 0) {
+			continue;	// no ignore to copy
+		}
+		
+		// ensure not already ignoring
+		found = FALSE;
+		for (sub = 0; sub < MAX_IGNORES; ++sub) {
+			if (GET_IGNORE_LIST(ch, sub) == GET_IGNORE_LIST(alt, iter)) {
+				found = TRUE;
+				break;
+			}
+		}
+		if (found) {
+			continue;	// no need to copy
+		}
+		
+		// attempt to copy
+		found = FALSE;
+		for (sub = 0; sub < MAX_IGNORES; ++sub) {
+			if (GET_IGNORE_LIST(ch, sub) <= 0) {
+				GET_IGNORE_LIST(ch, sub) = GET_IGNORE_LIST(alt, iter);
+				imported = TRUE;
+				found = TRUE;
+				break;
+			}
+		}
+		
+		if (!found) {
+			// nowhere to insert!
+			full = TRUE;
+			break;
+		}
+	}
+	
+	if (imported) {
+		msg_to_char(ch, "Imported ignores.\r\n");
+	}
+	if (full) {
+		msg_to_char(ch, "Your ignore list is too full to add more.\r\n");
+	}
+	if (!imported && !full) {
+		msg_to_char(ch, "No ignores to import.\r\n");
+	}
+}
+
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
+void alt_import_preferences(char_data *ch, char_data *alt) {
+	bitvector_t set;
+	
+	// prf flags to import
+	bitvector_t prfs = PRF_COMPACT | PRF_DEAF | PRF_NOTELL | PRF_MORTLOG | PRF_NOREPEAT | PRF_NOMAPCOL | PRF_NO_CHANNEL_JOINS | PRF_SCROLLING | PRF_BRIEF | PRF_AUTORECALL | PRF_NOSPAM | PRF_SCREEN_READER;
+	
+	// add flags
+	set = PRF_FLAGS(alt) & prfs;
+	if (set) {
+		SET_BIT(PRF_FLAGS(ch), set);
+	}
+	
+	// remove any missing flags
+	set = ~PRF_FLAGS(alt) & prfs;
+	if (set) {
+		REMOVE_BIT(PRF_FLAGS(ch), set);
+	}
+	
+	// non-toggle prefs
+	GET_MAPSIZE(ch) = GET_MAPSIZE(alt);
+	
+	msg_to_char(ch, "Imported preferences.\r\n");
+}
+
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
+void alt_import_prompt(char_data *ch, char_data *alt) {
+	if (GET_PROMPT(alt) && *GET_PROMPT(alt)) {
+		if (GET_PROMPT(ch)) {
+			free(GET_PROMPT(ch));
+		}
+		GET_PROMPT(ch) = str_dup(GET_PROMPT(alt));
+		msg_to_char(ch, "Imported prompt.\r\n");
+	}
+	else {
+		msg_to_char(ch, "No prompt to import.\r\n");
+	}
+}
+
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
+void alt_import_recolors(char_data *ch, char_data *alt) {
+	int iter;
+	
+	for (iter = 0; iter < NUM_CUSTOM_COLORS; ++iter) {
+		GET_CUSTOM_COLOR(ch, iter) = GET_CUSTOM_COLOR(alt, iter);
+	}
+	
+	msg_to_char(ch, "Imported recolors.\r\n");
+}
+
+
+/**
+* @param char_data *ch Player to import to.
+* @param char_data *alt Player to import from.
+*/
+void alt_import_slash_channels(char_data *ch, char_data *alt) {
+	extern struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
+	extern struct slash_channel *find_slash_channel_by_id(int id);
+	extern struct slash_channel *find_slash_channel_by_name(char *name, bool exact);
+	ACMD(do_slash_channel);
+	
+	struct slash_channel *chan, *load_slash;
+	struct player_slash_channel *iter;
+	char buf[MAX_STRING_LENGTH];
+	bool imported = FALSE;
+	
+	// if not in the game, slash channels are here
+	LL_FOREACH(LOAD_SLASH_CHANNELS(alt), load_slash) {
+		if ((chan = find_slash_channel_by_name(load_slash->name, TRUE)) && !find_on_slash_channel(ch, chan->id)) {
+			snprintf(buf, sizeof(buf), "join %s", chan->name);
+			do_slash_channel(ch, buf, 0, 0);
+			imported = TRUE;
+		}
+	}
+	
+	// if in-game, slash channels are here
+	LL_FOREACH(GET_SLASH_CHANNELS(alt), iter) {
+		if (!find_on_slash_channel(ch, iter->id) && (chan = find_slash_channel_by_id(iter->id))) {
+			snprintf(buf, sizeof(buf), "join %s", chan->name);
+			do_slash_channel(ch, buf, 0, 0);
+			imported = TRUE;
+		}
+	}
+	
+	if (!imported) {
+		msg_to_char(ch, "No channels to import.\r\n");
+	}
+}
+
+
+/**
+* Sub-processor for "alt import".
+*
+* @param char_data *ch The player.
+* @param char *argument Remaining args.
+*/
+void do_alt_import(char_data *ch, char *argument) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	char_data *alt = NULL;
+	bool file = FALSE;
+	
+	static const char *valid_fields = "Valid fields: aliases, prompt, fprompt, preferences, fightmessages, recolors, slash-channels, ignores, all\r\n";
+	
+	two_arguments(argument, arg1, arg2);
+	
+	// validate
+	if (!*arg1 || !*arg2) {
+		msg_to_char(ch, "Usage: alt import <name> <field | all>\r\n");
+		msg_to_char(ch, valid_fields);
+	}
+	else if (!(alt = find_or_load_player(arg1, &file))) {
+		msg_to_char(ch, "Unknown alt '%s'.\r\n", arg1);
+	}
+	else if (GET_ACCOUNT(ch) != GET_ACCOUNT(alt)) {
+		msg_to_char(ch, "That's not even your alt!\r\n");
+	}
+	
+	// process import
+	else if (is_abbrev(arg2, "aliases")) {
+		alt_import_aliases(ch, alt);
+	}
+	else if (is_abbrev(arg2, "prompt")) {
+		alt_import_prompt(ch, alt);
+	}
+	else if (is_abbrev(arg2, "fprompt")) {
+		alt_import_fprompt(ch, alt);
+	}
+	else if (is_abbrev(arg2, "preferences")) {
+		alt_import_preferences(ch, alt);
+	}
+	else if (is_abbrev(arg2, "fmessages") || is_abbrev(arg2, "fightmessages")) {
+		alt_import_fmessages(ch, alt);
+	}
+	else if (is_abbrev(arg2, "recolors")) {
+		alt_import_recolors(ch, alt);
+	}
+	else if (is_abbrev(arg2, "slash-channels")) {
+		alt_import_slash_channels(ch, alt);
+	}
+	else if (is_abbrev(arg2, "ignores")) {
+		alt_import_ignores(ch, alt);
+	}
+	
+	// last
+	else if (!str_cmp(arg2, "all")) {
+		alt_import_aliases(ch, alt);
+		alt_import_prompt(ch, alt);
+		alt_import_fprompt(ch, alt);
+		alt_import_preferences(ch, alt);
+		alt_import_fmessages(ch, alt);
+		alt_import_recolors(ch, alt);
+		alt_import_ignores(ch, alt);
+		alt_import_slash_channels(ch, alt);
+	}
+	else {
+		msg_to_char(ch, "Uknown field '%s'.\r\n", arg2);
+		msg_to_char(ch, valid_fields);
+	}
+
+	// cleanup	
+	if (alt && file) {
+		free_char(alt);
+	}
 }
 
 
@@ -900,7 +1219,7 @@ ACMD(do_alternate) {
 	int days, hours;
 	size_t size;
 	
-	any_one_arg(argument, arg);
+	argument = any_one_arg(argument, arg);
 	
 	if (!ch->desc) {
 		msg_to_char(ch, "You can't do anything without a player controlling you. Who's even reading this?\r\n");
@@ -910,7 +1229,7 @@ ACMD(do_alternate) {
 	}
 	else if (!*arg) {
 		msg_to_char(ch, "This command lets you switch which character you're logged in with.\r\n");
-		msg_to_char(ch, "Usage: alternate <character name>\r\n");
+		msg_to_char(ch, "Usage: alternate <character name | list | import>\r\n");
 	}
 	else if (!str_cmp(arg, "list")) {
 		size = snprintf(buf, sizeof(buf), "Account characters:\r\n");
@@ -961,6 +1280,18 @@ ACMD(do_alternate) {
 		}
 		command_lag(ch, WAIT_OTHER);
 	}
+	else if (!str_cmp(arg, "import")) {
+		do_alt_import(ch, argument);
+	}
+	else if (IN_HOSTILE_TERRITORY(ch)) {
+		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
+	}
+	else if (GET_POS(ch) < POS_RESTING) {
+		msg_to_char(ch, "You can't alternate right now.\r\n");
+	}
+	else if (GET_POS(ch) == POS_FIGHTING || FIGHTING(ch)) {
+		msg_to_char(ch, "You can't switch characters while fighting!\r\n");
+	}
 	else if (ch->desc->str) {
 		msg_to_char(ch, "You can't alternate while editing text (use ,/save or ,/abort first).\r\n");
 	}
@@ -970,17 +1301,8 @@ ACMD(do_alternate) {
 	else if (GET_OLC_TYPE(ch->desc) != 0) {
 		msg_to_char(ch, "You can't alternate with an editor open (use .save or .abort first).\r\n");
 	}
-	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't alternate in hostile territory.\r\n");
-	}
-	else if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0 && !IS_IMMORTAL(ch)) {
-		msg_to_char(ch, "You can't alternate again so soon.\r\n");
-	}
 	else if (get_cooldown_time(ch, COOLDOWN_PVP_QUIT_TIMER) > 0 && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't alternate so soon after fighting!\r\n");
-	}
-	else if (GET_POS(ch) == POS_FIGHTING || FIGHTING(ch)) {
-		msg_to_char(ch, "You can't switch characters while fighting!\r\n");
 	}
 	else if (!(index = find_player_index_by_name(arg))) {
 		msg_to_char(ch, "Unknown character.\r\n");
@@ -990,6 +1312,14 @@ ACMD(do_alternate) {
 		
 		if (GET_ACCOUNT(newch) != GET_ACCOUNT(ch)) {
 			msg_to_char(ch, "That character isn't on your account.\r\n");
+			return;
+		}
+		if (newch == ch) {
+			msg_to_char(ch, "You're already playing that character.\r\n");
+			return;
+		}
+		if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0 && !IS_IMMORTAL(newch)) {
+			msg_to_char(ch, "You can't alternate again so soon.\r\n");
 			return;
 		}
 		if (newch->desc || !IN_ROOM(newch)) {
@@ -1010,11 +1340,16 @@ ACMD(do_alternate) {
 		}
 		
 		// in case
-		REMOVE_BIT(PLR_FLAGS(newch), PLR_WRITING | PLR_MAILING);
+		REMOVE_BIT(PLR_FLAGS(newch), PLR_MAILING);
 				
 		// ensure legal switch
 		if (GET_ACCOUNT(newch) != GET_ACCOUNT(ch)) {
 			msg_to_char(ch, "That character isn't on your account.\r\n");
+			free_char(newch);
+			return;
+		}
+		if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0 && !IS_IMMORTAL(newch)) {
+			msg_to_char(ch, "You can't alternate again so soon.\r\n");
 			free_char(newch);
 			return;
 		}
@@ -1058,7 +1393,7 @@ ACMD(do_changepass) {
 		GET_PASSWD(ch) = str_dup(CRYPT(new1, PASSWORD_SALT));
 		SAVE_CHAR(ch);
 		
-		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "%s has changed %s password using changepass", GET_NAME(ch), HSHR(ch));
+		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "%s has changed %s password using changepass", GET_NAME(ch), REAL_HSHR(ch));
 		if (ch->desc && ch->desc->snoop_by) {
 			syslog(SYS_INFO, MIN(LVL_TOP, MAX(GET_INVIS_LEV(ch), GET_ACCESS_LEVEL(ch) + 1)), TRUE, "WARNING: %s changed password while being snooped", GET_NAME(ch));
 		}
@@ -1082,8 +1417,8 @@ ACMD(do_confirm) {
 		return;
 	}
 
-	if (reboot_control.time == -1) {
-		msg_to_char(ch, "No reboot has been set!\r\n");
+	if (reboot_control.time == -1 || reboot_control.time > 15) {
+		msg_to_char(ch, "There is no upcoming reboot to confirm for!\r\n");
 		return;
 	}
 
@@ -1103,17 +1438,24 @@ ACMD(do_confirm) {
 
 ACMD(do_customize) {
 	void do_customize_room(char_data *ch, char *argument);
+	void do_customize_island(char_data *ch, char *argument);
 	void do_customize_vehicle(char_data *ch, char *argument);
 
 	char arg2[MAX_INPUT_LENGTH];
 	
 	half_chop(argument, arg, arg2);
 	
-	if (!*arg) {
+	if (ACCOUNT_FLAGGED(ch, ACCT_NOCUSTOMIZE)) {
+		msg_to_char(ch, "You are not allowed to customize anything anymore.\r\n");
+	}
+	else if (!*arg) {
 		msg_to_char(ch, "What do you want to customize? (See HELP CUSTOMIZE)\r\n");
 	}
 	else if (is_abbrev(arg, "building") || is_abbrev(arg, "room")) {
 		do_customize_room(ch, arg2);
+	}
+	else if (is_abbrev(arg, "island") || is_abbrev(arg, "isle")) {
+		do_customize_island(ch, arg2);
 	}
 	else if (is_abbrev(arg, "vehicle") || is_abbrev(arg, "ship")) {
 		do_customize_vehicle(ch, arg2);
@@ -1212,6 +1554,76 @@ ACMD(do_douse) {
 			act("The flames have been extinguished!", FALSE, ch, 0, 0, TO_CHAR | TO_ROOM);
 			COMPLEX_DATA(room)->burning = 0;
 		}
+	}
+}
+
+
+ACMD(do_fightmessages) {
+	extern const char *combat_message_types[];
+
+	bool screenreader = PRF_FLAGGED(ch, PRF_SCREEN_READER);
+	int iter, type = NOTHING, count;
+	bool on;
+	
+	// detect possible type
+	skip_spaces(&argument);
+	if (*argument) {
+		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
+			if (is_multiword_abbrev(argument, combat_message_types[iter])) {
+				type = iter;
+				break;
+			}
+		}
+	}
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs do not have fight message toggles.\r\n");
+	}
+	else if (!*argument) {
+		msg_to_char(ch, "Fight message toggles:\r\n");
+		
+		count = 0;
+		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
+			on = SHOW_FIGHT_MESSAGES(ch, BIT(iter));
+			if (screenreader) {
+				msg_to_char(ch, "%s: %s\r\n", combat_message_types[iter], on ? "on" : "off");
+			}
+			else {
+				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", combat_message_types[iter], (!(++count % 2) ? "\r\n" : ""));
+			}
+		}
+		
+		if (count % 2 && !screenreader) {
+			send_to_char("\r\n", ch);
+		}
+	}
+	else if (!str_cmp(argument, "all on")) {
+		// turn ON all bits that have names
+		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
+			SET_BIT(GET_FIGHT_MESSAGES(ch), BIT(iter));
+		}
+		msg_to_char(ch, "You toggle all fight messages \tgon\t0.\r\n");
+	}
+	else if (!str_cmp(argument, "all off")) {
+		// turn ON all bits that have names
+		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
+			REMOVE_BIT(GET_FIGHT_MESSAGES(ch), BIT(iter));
+		}
+		msg_to_char(ch, "You toggle all fight messages \troff\t0.\r\n");
+	}
+	else if (type == NOTHING) {
+		msg_to_char(ch, "Unknown fight message type '%s'.\r\n", argument);
+	}
+	else {
+		on = !SHOW_FIGHT_MESSAGES(ch, BIT(type));
+		if (on) {
+			SET_BIT(GET_FIGHT_MESSAGES(ch), BIT(type));
+		}
+		else {
+			REMOVE_BIT(GET_FIGHT_MESSAGES(ch), BIT(type));
+		}
+		
+		msg_to_char(ch, "You toggle '%s' %s\t0.\r\n", combat_message_types[type], on ? "\tgon" : "\troff");
 	}
 }
 
@@ -1333,7 +1745,11 @@ ACMD(do_group) {
 	}
 	else if (is_abbrev(buf, "invite")) {
 		skip_spaces(&argument);
-		if (!(vict = get_player_vis(ch, argument, FIND_CHAR_WORLD | FIND_NO_DARK))) {
+		if (GROUP(ch) && GROUP_LEADER(GROUP(ch)) != ch) {
+			msg_to_char(ch, "Only the group's leader can invite members.\r\n");
+			return;
+		}
+		else if (!(vict = get_player_vis(ch, argument, FIND_CHAR_WORLD | FIND_NO_DARK))) {
 			msg_to_char(ch, "Invite whom?\r\n");
 			return;
 		}
@@ -1349,10 +1765,6 @@ ACMD(do_group) {
 			msg_to_char(ch, "Your target is already in a group.\r\n");
 			return;
 		}
-		else if (GROUP(ch) && GROUP_LEADER(GROUP(ch)) != ch) {
-			msg_to_char(ch, "Only the group's leader can invite members.\r\n");
-			return;
-		}
 		else if (GROUP(ch) && count_group_members(GROUP(ch)) >= MAX_GROUP_SIZE) {
 			msg_to_char(ch, "The group is already full.\r\n");
 			return;
@@ -1363,7 +1775,7 @@ ACMD(do_group) {
 			create_group(ch);
 		}
 
-		msg_to_char(ch, "You have invited %s to the group.\r\n", GET_NAME(vict));
+		msg_to_char(ch, "You have invited %s to the group.\r\n", PERS(vict, vict, FALSE));
 		
 		if (!IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_GSAY)) {
 			msg_to_char(vict, "&%c[group] %s has invited you to join a group.&0\r\n", GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_GSAY), GET_NAME(ch));
@@ -1509,6 +1921,9 @@ ACMD(do_herd) {
 	else if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_HARD | MOB_GROUP | MOB_AGGRESSIVE)) {
 		act("You can't herd $N!", FALSE, ch, NULL, victim, TO_CHAR);
 	}
+	else if (GET_POS(victim) < POS_STANDING || MOB_FLAGGED(victim, MOB_TIED)) {
+		act("You can't herd $M right now.", FALSE, ch, NULL, victim, TO_CHAR);
+	}
 	else if ((dir = parse_direction(ch, buf)) == NO_DIR || !(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1])))
 		msg_to_char(ch, "That's not a direction!\r\n");
 	else if (!ROOM_IS_CLOSED(IN_ROOM(ch)) && dir >= NUM_2D_DIRS) {
@@ -1521,7 +1936,7 @@ ACMD(do_herd) {
 		msg_to_char(ch, "You don't have permission to herd here.\r\n");
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_ROUGH))
 		msg_to_char(ch, "You find it difficult to do that here.\r\n");
-	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_ROUGH))
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_ROUGH) || ROOM_BLD_FLAGGED(to_room, BLD_BARRIER))
 		msg_to_char(ch, "You find that difficult to do.\r\n");
 	else if (GET_LED_BY(victim) && IN_ROOM(GET_LED_BY(victim)) == IN_ROOM(victim))
 		msg_to_char(ch, "You can't herd someone who is being led by someone else.\r\n");
@@ -1557,7 +1972,7 @@ ACMD(do_milk) {
 
 	two_arguments(argument, arg, buf);
 
-	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE))
+	if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE))
 		msg_to_char(ch, "You can't milk animals here!\r\n");
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to finish building the stable before you can milk anything.\r\n");
@@ -1667,6 +2082,9 @@ ACMD(do_morph) {
 	else if (morph && MORPH_FLAGGED(morph, MORPHF_VAMPIRE_ONLY) && !IS_VAMPIRE(ch)) {
 		msg_to_char(ch, "You must be a vampire to do that.\r\n");
 	}
+	else if (morph && subcmd == SCMD_FASTMORPH && MORPH_FLAGGED(morph, MORPHF_NO_FASTMORPH)) {
+		msg_to_char(ch, "You cannot fastmorph into that form.\r\n");
+	}
 	else {
 		// charge costs
 		if (morph) {
@@ -1709,7 +2127,7 @@ ACMD(do_mydescription) {
 			msg_to_char(ch, "You are already editing text.\r\n");
 		}
 		else {
-			start_string_editor(ch->desc, "your description", &(GET_LONG_DESC(ch)), MAX_PLAYER_DESCRIPTION);
+			start_string_editor(ch->desc, "your description", &(GET_LONG_DESC(ch)), MAX_PLAYER_DESCRIPTION, TRUE);
 		}
 	}
 	else {
@@ -1861,7 +2279,7 @@ ACMD(do_quit) {
 		msg_to_char(ch, "You can't quit with fangs in your neck!\r\n");
 	else if (GET_FEEDING_FROM(ch))
 		msg_to_char(ch, "You can't quit while drinking blood!\r\n");
-	else if (ROOM_OWNER(IN_ROOM(ch)) && empire_is_hostile(ROOM_OWNER(IN_ROOM(ch)), GET_LOYALTY(ch), IN_ROOM(ch)) && !IS_IMMORTAL(ch)) {
+	else if (IN_HOSTILE_TERRITORY(ch)) {
 		msg_to_char(ch, "You can't quit in hostile territory.\r\n");
 	}
 	else {
@@ -1953,7 +2371,7 @@ ACMD(do_selfdelete) {
 	else {
 		
 		// logs and messaging
-		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "DEL: %s (lev %d) has self-deleted.", GET_NAME(ch), GET_ACCESS_LEVEL(ch));
+		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "DEL: %s (lev %d/%d) has self-deleted.", GET_NAME(ch), GET_COMPUTED_LEVEL(ch), GET_ACCESS_LEVEL(ch));
 		if (!GET_INVIS_LEV(ch)) {
 			act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);
 		}
@@ -1981,8 +2399,14 @@ ACMD(do_shear) {
 
 	one_argument(argument, arg);
 
-	if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch))) {
+	if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to be in a stable to shear anything.\r\n");
+	}
+	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're a bit busy right now.\r\n");
@@ -2023,8 +2447,11 @@ ACMD(do_skin) {
 
 	one_argument(argument, arg);
 
-	if (!*arg)
-		msg_to_char(ch, "What would you like to skin.\r\n");
+	if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!*arg)
+		msg_to_char(ch, "What would you like to skin?\r\n");
 	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))
 		msg_to_char(ch, "You don't seem to have anything like that.\r\n");
 	else if (!IS_CORPSE(obj))
@@ -2058,7 +2485,7 @@ ACMD(do_summon) {
 	char_data *mob;
 	int vnum = NOTHING, ability = NO_ABIL, iter, max = 1, cost = 0;
 	empire_data *emp = NULL;
-	bool follow = FALSE, familiar = FALSE, charm = FALSE;
+	bool follow = FALSE, familiar = FALSE, charm = FALSE, local = FALSE;
 	int count, cooldown = NOTHING, cooldown_time = 0, cost_type = MOVE, gain = 20;
 	
 	const int animal_vnums[] = { DOG, CHICKEN, QUAIL };
@@ -2098,9 +2525,9 @@ ACMD(do_summon) {
 		cooldown_time = 5 * SECS_PER_REAL_MIN;
 	}
 	else if (is_abbrev(arg, "thugs")) {
-		ability = ABIL_SUMMON_THUGS;
-		cooldown = COOLDOWN_SUMMON_THUGS;
-		cooldown_time = 3 * SECS_PER_REAL_MIN;
+		ability = ABIL_SUMMON_THUG;
+		cooldown = COOLDOWN_SUMMON_THUG;
+		cooldown_time = 30;
 	}
 	else if (is_abbrev(arg, "swift")) {
 		ability = ABIL_SUMMON_SWIFT;
@@ -2164,7 +2591,7 @@ ACMD(do_summon) {
 
 			charm = TRUE;
 			vnum = animal_vnums[number(0, num_animal_vnums-1)];
-			max = ceil(GET_WITS(ch) / 3.0);
+			max = ceil(GET_CHARISMA(ch) / 3.0);
 			break;
 		}
 		case ABIL_SUMMON_SWIFT: {
@@ -2209,8 +2636,8 @@ ACMD(do_summon) {
 			max = 1;
 			break;
 		}
-		case ABIL_SUMMON_THUGS: {
-			cost = 10;
+		case ABIL_SUMMON_THUG: {
+			cost = 50;
 			cost_type = MOVE;
 			
 			if (!can_use_ability(ch, ability, cost_type, cost, cooldown)) {
@@ -2218,8 +2645,9 @@ ACMD(do_summon) {
 			}
 			
 			vnum = THUG;
-			max = ceil(GET_CHARISMA(ch) / 3.0);
-			follow = TRUE;
+			max = 1;
+			follow = FALSE;
+			local = TRUE;
 			break;
 		}
 		case ABIL_SUMMON_GUARDS: {
@@ -2295,6 +2723,9 @@ ACMD(do_summon) {
 			mob = read_mobile(vnum, TRUE);
 			if (IS_NPC(ch)) {
 				MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
+				if (MOB_INSTANCE_ID(mob) != NOTHING) {
+					add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
+				}
 			}
 			
 			SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE);	// never gain exp
@@ -2309,7 +2740,6 @@ ACMD(do_summon) {
 			
 			// spawn data
 			SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED | MOB_NO_LOOT);
-			MOB_SPAWN_TIME(mob) = time(0);
 			
 			char_to_room(mob, IN_ROOM(ch));
 			act("$n approaches!", FALSE, mob, 0, 0, TO_ROOM);
@@ -2328,6 +2758,11 @@ ACMD(do_summon) {
 				SET_BIT(MOB_FLAGS(mob), MOB_SENTINEL);
 			}
 			
+			// mob empire attachment
+			if (local) {
+				GET_LOYALTY(mob) = ROOM_OWNER(IN_ROOM(ch));
+			}
+			
 			load_mtrigger(mob);
 		}
 	}
@@ -2344,6 +2779,9 @@ ACMD(do_title) {
 
 	if (IS_NPC(ch))
 		send_to_char("Your title is fine... go away.\r\n", ch);
+	else if (!IS_APPROVED(ch) && config_get_bool("title_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
 		send_to_char("You can't title yourself -- you shouldn't have abused it!\r\n", ch);
 	}
@@ -2385,7 +2823,7 @@ ACMD(do_toggle) {
 		}
 	}
 	
-	if (!*argument || type == NOTHING) {
+	if (!*argument) {
 		msg_to_char(ch, "Toggles:\r\n");
 		
 		for (iter = count = 0; *toggle_data[iter].name != '\n'; ++iter) {
@@ -2405,7 +2843,10 @@ ACMD(do_toggle) {
 			send_to_char("\r\n", ch);
 		}
 	}
-	else if (type != NOTHING) {
+	else if (type == NOTHING) {
+		msg_to_char(ch, "Unknown toggle '%s'.\r\n", argument);
+	}
+	else {
 		on = PRF_TOG_CHK(ch, toggle_data[type].bit);
 		on = PRF_FLAGGED(ch, toggle_data[type].bit) ? 1 : 0;
 		

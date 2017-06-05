@@ -2,7 +2,1743 @@ EmpireMUD 2.0 beta Change Log
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-== 2.0 b4 (May 3, 2015) ==
+== 2.0 b5 (June 5, 2017) ==
+
+Abilities:
+- Ablate: New Battlemage spell with direct damage and a resist-physical debuff.
+- Acidblast: New Alchemist spell with direct damage and a resist-magical debuff.
+- Archery: Fixed a bug where losing this ability did not immediately unequip
+the player's bow.
+- Arclight: New Archmage spell with high direct damage.
+- Astralclaw: New Werewolf spell with direct damage and a physical DoT.
+- Backstab: Can no longer fail if the mob is incapacitated or can't see you.
+- Barde: Fixed a minor bug where barded mobs inherited the wrong instance id.
+- Basic Buildings: New zero-level ability in Empire containing buildings that
+did not previously require any ability and used to give Empire experience
+directly. Added 'familygravesite', an in-city-only tomb.
+- Basic Crafts: Added a raft made from desert wood, so players do not get
+trapped on desert islands.
+- Bite: Ensured that mobs killed by 'bite' have the correct level and loot
+bindings.
+- Bite: New low-level Vampire ability that allows you to bite enemies to gain
+blood and gain Vampire experience at low levels.
+- Bloodsword: This ability is now called "Ready Blood Weapons". It now gains
+experience while fighting and uses the "ready" command instead of its own
+command. Five different blood weapons are now available under this same
+ability: stabbing, jabbing, slashing, pounding, and a staff.
+- Chores: New zero-level ability in Empire which gains experience from
+chopping, sawing, milling, and other tasks that used to give Empire experience
+directly.
+- Chronoblast: New Artificer spell with direct damage and a slow effect.
+- Command: Mobs that cannot be attacked can no longer be commanded either.
+- Confer: Updated to prevent abuse by logging one character out until the timer
+expires.
+- Cook: New zero-level ability in Trade that now contains all the basic food
+recipes. Most of these cooked foods also gained small buffs and had their
+'fullness' values adjusted.
+- Customize Building: Now causes normal ability-length command lag, to reduce
+the rate at which you can spam it.
+- Darkness: Reconciled the duration on Darkness with its help file — the effect
+is shorter than it was, but the duration listed in the help file is now longer
+than THAT was.
+- Deathtouch: New Necromancer spell with a low cooldown and direct damage.
+- Devastation Ritual: Fixed a bug where crops were giving up to 4x too many
+items.
+- Disguise: You can now disguise yourself as another disguised player (but not
+an undisguised player). This prevents 'disguise' from being used to detect who
+is or is not a real NPC.
+- Dispirit: New Shadow Wolf spell with direct damage and a Wits debuff.
+- Eartharmor: Can now be cast while resting.
+- Earthmeld: Now works in open buildings. Earthmelded players now begin
+stacking DoT damage if someone is digging or excavating above them. Players no
+longer get the "sleeping" regen bonus while using Earthmeld (this was an
+error).
+- Equipment abilities: Fixed a bug where automatically removing gear due to
+losing abilities did not adjust the player's gear level immediately.
+- Erode: New Luminary spell with direct damage and a DoT effect.
+- Evasion: New zero-level ability in Battle which gains experience when you
+are attacked.
+- Exarch Crafts: Workforce now correctly gives Skilled Labor experience when
+crafting nexus crystals.
+- Familiar: Fixed the messaging on the owl shadow familiar. Vampires can no
+longer drink blood from familiars. Also applied the missing !RESCALE flag to
+the familiars. The buff/debuff familiars received better scripts and scaling
+improvements.
+- Fish: You can now change directions without interrupting fishing (the tim
+er will still reset). You can also now fish while sitting (e.g. in a canoe).
+- Forage: Can no longer be used while performing a timed action (such as
+chopping).
+- Foresight: Fixed a bug in the requirements for gaining experience from this
+ability.
+- Hasten: Can now be cast while resting.
+- Heal Party: No longer allows you to cast it with no effect when not in a
+party (Awkens).
+- Hone: Fixed a bug where players without Hone could use honed gear.
+- Infiltrate: You can no longer infiltrate buildings belonging to immortals.
+- Lightningbolt: Improved damage and cost based on level, role, and traits.
+- Master Survivalist: Fixed a bug where this ability was not triggering skill
+gain for the user.
+- Mirror Image: Fixed a bug that allowed mirror images to be healed during
+battle in some cases. Mirror images now have more health (based on caster
+level). They no longer count as familiars (they were never really familiars).
+People attacking the caster no longer see the mirrorimage activation message
+(everyone else sees it and is not fooled). Mirror images can no longer be
+healed (directly), no longer attack, and are no longer animals for some
+reason. It now costs 20% of your max mana. You can no longer drink blood from
+mirror images. Improved gender detection in the mirror to match the player's
+gender at the time of using the ability (e.g. when disguised). Improved mirror
+image long descriptions.
+- No Trace: Changed how this ability works, which was not quite as-described in
+the help file. It now correctly functions on tiles that are not buildings or
+roads. It no longer works inside adventure zones at all.
+- Pickpocket: Fixed a serious bug where failing to pickpocket a mob from your
+empire would still charge your empire the coins, but nobody would get those
+coins. Now checks your "stealthable" toggle to prevent accidental empire
+distrust. Rearranged the logic in this ability slightly, to allow repeatable
+pickpocket triggers. Previously, a mob that had been pickpocketed already would
+not reach the ability triggers stage. You can no longer pickpocket mobs who are
+unattackable (unless they have their own pickpocket lists). This prevents an
+exploit for training pickpocket on generic mobs who won't attack you.
+- Poisons/Deadly Poisons: Fixed an issue where all poisons only required the
+basic Poisons ability. Some now correctly require Deadly Poisons.
+- Primitive Crafts: New zero-level ability in Trade containing things that
+previously didn't require an ability and used to give Trade experience
+directly.
+- Prospect: This ability is now instant (with command lag) if your empire was
+the last one to prospect the tile this year.
+- Ready *: Rewrote the "ready" command to support other cost types (like
+blood), and to scale the item instead of just changing its damage. Updated the
+fireball item to reflect this (it now does slightly more damage at level 100).
+Scaling on readied weapons now includes levels you got from the weapon you were
+using, if it was a permanent weapon (rather than a single-use weapon).
+- Refashion/reforge: Now preserves the "keep" flag.
+- Ride: If you are somewhere that doesn't allow mounts, the game will now
+auto-dismount you.
+- Ride: Players can now have more than one mount, and can switch their active
+mount at any stable. You will now automatically dismount if you're mounted on
+a water tile without a valid mount.
+- Ritual of Teleportation: You can no longer teleport home if your home is
+parked in someone else's territory and you don't at least have guest access
+there. This also applies to home trinkets. You can now teleport home while
+riding.
+- Scavenging: New zero-level ability in Survival which gives experience for
+digging, gathering, and picking.
+- Scour: New Exarch spell with direct damage and a DoT.
+- Search and Sense Life Ritual: Now reveals hidden people even if you can
+already see them due to immortal flags like HOLYLIGHT, and more reliably
+removes HIDE effects. They also now both detect Earthmeld.
+- Shadowlash: New Occultist spell with direct damage, a DoT, and blind effect.
+- Shadowstep: Improved the targeting on shadowstep to better find the closest
+character.
+- Skybrand: Increased the raw damage on skybrand based on level and added
+bonus-magical damage to its DoT. Cost is now based on damage.
+- Sneak: Fixed a bug where sneak always had a command lag of 1 second, instead
+of adding 1 second to however much command lag the player incurred from
+movement.
+- Soulchain: New Lich spell with direct damage and an Intelligence debuff.
+- Stablemaster: New ability allows players to release their mount as a mob (for
+trading with other players), and lets them swap mounts anywhere.
+- Starstrike: New Feral spell with high direct damage.
+- Summon Animals: Now uses Charisma instead of Wits.
+- Summon Thug: Reworked this ability to function better as a distraction.
+Thugs are now summoned one at a time (the cooldown was reduced) and do not
+follow the summoner. Thugs belong to the empire that owns the tile on which
+they were summoned.
+- Sunshock: Improved main damage and cost based on level, role, and traits.
+Now only gets 1.5x damage against vampires, but this does not factor into the
+cost.
+- Taste Blood: No longer shows age for non-players.
+- Thornlash: New Theurge spell with direct damage and a poison DoT.
+- Unseen Passing: Changed this ability similar to No Trace. It now correctly
+functions in all buildings, on roads, and all claimed city tiles. It also no
+longer works inside adventure zones.
+- Various: Updated backstab, bash, kick, and damage spells (lightingbolt, et
+al) to start combat meters early, so that they track damage from the opening
+hit.
+- Weaken: Now drains both Strength and Intelligence.
+- Weapon Proficiency: New zero-level ability in Battle which gains experience
+when you attack with weapons.
+- Worm: Can now see the map from an open building tile. Worming players now
+begin taking stacking DoT damage while under a closed building.
+
+Adventures:
+- 52 Tutorial Quests: Now requires the quest to enter the Soulstream,
+hopefully reducing confusion. Soulstream mobs now have the !EXP flag so they
+can't be used for easy experience gain. Updated the Tower of Souls, the
+adventure description, and the portal into the Soulstream to help newbies
+figure out how to start the tutorials.
+- 100 Magiterranean: The Grove: Changed how this adventure appears on the map.
+The archdruid will now always appear, instead of sometimes not being present.
+- 101 Magiterranean: The Hidden Garden: Updated the token combine trigger to
+account for the "keep" flag and to stop blocking the normal combine command.
+- 102 Magiterranean: Interdimensional Whirlwind: Changed mushrooms' trigger to
+a food buff. Crops from this adventure should now also give their plantable
+seed item when harvested. Fixed level caps on several crafted items so they can
+be used at level 100. Fixed object text. Fixed the scaling level on the
+dragonstooth sceptre. Gemfruits no longer produce gems when held by NPCs; 
+updated the decay message on them. Pickthorn is now storable. The spade-axe and
+pick-and-pan can both now be used in the "hold" slot. Some of the craft recipes
+are now mentioned on more item descriptions. Updated the dragonstooth sceptre
+so that it can only be used in your own territory.
+- 103 Magiterranean: Monsoon Rift: New 75-100 adventure with multiple
+skill-based solutions and map attack mobs.
+- 104 Magiterranean: Permafrost: New adventure for levels 75-125.
+- 121 The Swamp Hag: Fixed the swamp hag's skill reward.
+- 122 Ruins: Three Banditos: The hound-summoning should no longer continually
+summon dog clones.
+- 123 Ruins: Thieves: Added missing description to the talismanic shiv. Removed
+the DPS flag from the extra thief.
+- 125 Ruins: The Goblin Challenge: New scripts control how Filk/Walts spawn so
+that if one of them is blind, it doesn't spawn extra copies of the other.
+- 126 Mountain Cave: Flame Dragon: Fixed typo in dragonweave stockings. Updated
+scorched sectors with new evolution chances.
+- 128 Colossal Red Dragon: New adventure (levels 250-300) replaces adventure
+120 with many updates. This adventure also adds abilities to several Trade
+classes. De-activated (but didn't remove) the old version.
+- 129 A Gigantic Nest: New repeatable solo adventure in the 100-125 range, with
+crafting patterns up to level 150.
+- 130 Volcano: A new non-venture that spews lava onto the map from random
+mountain locations.
+- 140 The Sewer: Ratskins: Reworked the despawn script for the rare thief. It
+should now be more reliable. Updated the stealth guildmaster to be in the level
+range of the adventure and have a more distinct name. Changed how mini-bosses
+spawn to ensure there's always exactly 1. Also fixed the skill reward from the
+rare thief. Vial of sewage now has proper scaling. Noskill now correctly
+prevents the stealth skill gain. Fixed the rare thief spawn trigger.
+- 141 The Sewer: Goblin Outpost: Updated crafted item levels to be 25 higher
+than the adventure (like all other adventure crafts).
+- 160 The Tower Skycleave: Fixed a bug in the pixy race script. The shop now
+sells an item that teleports you to Skycleave. Added missing sign description.
+- 161 Portal to the Primeval: Added an explicit error message for "chop". Fixed
+flee trigger. The King now loads the tree he knocks over into the room, rather
+than trying to carry it in his tiny tiny arms.
+- 170 Hamlet of the Undead: Fiendclaw is now made from bone instead of wood.
+Renamed the trash spawners so they give a better echo when they appear during
+a reset.
+- 180 Misplaced Mother Goose: Jill now resumes following Jack after a reboot.
+- 181 Goblin Mines: A new goblin now sells a coffin which can be used to build
+instant, temporary gravesites with a 6-hour cooldown. Another new goblin now
+sells a raft. The other mobs in this adventure had their old emote scripts
+moved to custom messages. This adventure now resets after 10 minutes, if empty
+and incomplete, to respawn spiders. Adjusted the difficulty on the widow spider
+boss.
+- 18200 The Guild of Adventurers, Part 1: A new faction of NPCs who celebrate
+everything adventure-related. Seek out the roaming guildhall to get started.
+This includes only tier 1 attunements and daily quests, along with the Esteemed
+reputation rewards.
+- 18300 Pyramid: Hidden Chamber of Neferkare: New level 250-300 short combat
+adventure for 2-4 players.
+- 18450 That Dammed River: A new non-venture where beavers dam up the rivers.
+- 18460 Unstable Portal: A new non-venture (semi-venture) with fun places to
+visit and adorably contagious new mini-pets to collect. See your local Tower of
+Sorcery.
+- 18500 The Lost Temple: A new adventure in the jungle.
+- 190 Winter Wonderland: New updates to this seasonal adventure, from Yvain.
+Added storage to the chestnuts so that workforce will work them. Fixed the
+snowman script.
+- 200 Burrow Canyons: Added component flags to the harvested and foraged crop
+items. Script error fixes from Yvain.
+- 201 The Cursed Chalice of Mill Manor: Added INFRA flag to mobs so they can
+aggro at night. Changed the butcher chances on the yew berries, to help groups
+where someone with low Survival skill has an auto-butcher trigger. Fixed the
+name of the dorsal spine mace. Titanaconda jacket now gives resist-physical
+instead of max-health.
+- 281 Mountain Valley: Molten Fiend: Added a shop for trading in unwanted
+items. Typo fixes.
+- 282 Goblin Logging Camp: Fixed an issue where killing the goblins was not
+loading the despawner for the instance.
+- All: Applied the new Player-in-Room type modifier to all scripts that needed
+it.
+- Cleanup: Updated how adventure instances are deleted to correctly relocate
+players who are in vehicles inside adventures.
+- Decay: Buildings added by adventures will no longer decay.
+- Destruction: If the tile an adventure is linked to gets destroyed (siege,
+terraform, etc) it will now delete the instance immediately, instead of just
+setting the instance as completed. This will trigger immediate cleanup of
+instance mobs.
+- EMPTY-RESET-ONLY: New adventure flag prevents instances from resetting while
+players are inside.
+- Entrance: Buildings that are entrances to adventure will now have a colored
+room title based on the adventure difficulty, just like the adventure itself
+has, in most cases.
+- Functions: Room templates in adventures now support the 'function' flags that
+regular buildings use, expanding what players can do in them.
+- Instancer: Now checks the first room of an adventure for exits before
+choosing a direction to face the instance. Also updated how exits are added
+when an instance is constructed, to fix a bug where certain configurations can
+result in illogical exits when three rooms have random exits in a chain.
+- Mob counts: Changed how mobs are counted in an instance, as used by the
+spawn-limiting system. Counts are now maintained as mobs are loaded and purged,
+rather than counting mobs on-request. This allows instances to track mobs who
+have left the instance entirely.
+- Rotatable: Adventures that support whole-zone-rotation now match the building
+direction if they link to a new or existing building that has a direction.
+- Scaling constraints: Fixed a bug where an item with incomplete scaling
+constraints could use either its own min- or max-level, but inherit the other
+from the room, leading to items that scale much higher or lower than intended.
+Also applied this fix to mobs.
+- Startup: The game now checks for bad adventure instances (e.g. rare cases
+like world file reversion) on startup, and deletes them.
+- Stock adventures: Many objects that have command triggers (such as trinkets
+and mirrors) were updated to allow the "#.name" syntax on their trigger
+commands.
+- Summon: You can now adventure-summon someone to the room/tile where the
+adventure is linked, in addition to the "inside".
+- Timed-out empires: Adventures will no longer spawn on tiles owned by empires
+that are timed out.
+- Tutorials: Added a note on dropping the repeatable quests (The Perfect Rock,
+See Hugo For Advice) if you pass above 15 skill.
+- Various: Added the !drink-blood flag to NPCs that have no blood. Added the
+desert, temperate, and tropical component flags to all fruits and vegetables.
+Boss enrage scripts were updated. Fixed small typoes. Fixed how some loot
+replacement triggers bind to players. Updated the minipet whistle script.
+Converted most emotive triggers to mob custom strings. Enrage timer resets now
+%restore% the mob. Changed mkill to %aggro% in many combat scripts. Mount and
+mini-pet summoning scripts were updated to ensure the mob they summon doesn't
+get cleaned up if it was summoned inside an adventure. Quests were updated with
+new grouping flags on their tasks and pre-requisites, where necessary. Some
+clothing items received new custom long descriptions. Text updates to fix
+typoes. Updated craft recipes with new abilities. Updated crops with new
+harvest quantities. Updates to building and vehicle health and maintenance
+lists. Updated how loot-replacement objects (e.g. Permafrost high-difficulty
+boss loot) set their binding, to allow group-binding. Also updated 'trinket'-
+type items to be distractable. Mount whistles now give the name of the mount
+when summoning it.
+
+Affects:
+- DISTRACTED: A new affect type that interrupts timed actions until it wears
+off.
+
+Approval:
+- Approval: Updated the old EmpireMUD 1.0 authorization system to allow
+EmpireMUDs to require player approval.
+- Command: The approve and unapprove commands toggle player approval.
+- Configs: Implementors can "config approval -v" to see available
+configurations. Approval can be configured as per-account or per-character, and
+various commands can be turned on and off.
+- Login message: config.c contains a string that is displayed to players who
+log in while unapproved.
+- Various commands: Updated commands that need to check new approval configs.
+
+Archetypes:
+- Attributes: Archetypes now add to existing attributes, instead of SETTING the
+value of attributes. This allows them to stack.
+- Hobbies: New types of archetypes that give 5 bonus skills.
+- Origins: Existing archetypes were all labeled with the Origins category.
+- Skills: Archetypes now add to existing skills, instead of SETTING the value
+of skills. This allows them to stack.
+- Types: EmpireMUD now supports multiple "types" of archetypes. Players choose
+one of each during character creation.
+
+Buildings:
+- !RUINS: New building flag that leaves no corpse when the building decays.
+- Artisans: Fixed a bug where building artisans could despawn and fail to
+respawn due to precise timing. Artisans can now spawn even if their spawn timer
+isn't up.
+- Carpenter: Updated commands list to indicate you can store and retrieve.
+- Chameleon: Improved how chameleon buildings are hidden to some users.
+- Damage: Maintaining a building now removes damage.
+- Dismantle: Starting to dismantle a building now stops all the room-based
+player/npc chores.
+- Disrepair: Buildings no longer use the 'disrepair' attribute. Instead, they
+take damage each year (based on configs, default 10% max damage per year,
+doubled if unfinished).
+- Hitpoints: All buildings got updated hitpoints to bring them in line with
+scaled damage from siege vehicles and rituals. Some buildings have less than 10
+hitpoints and can now decay in less than 10 years. Building hitpoints are now
+stored with decimal values to make decay rates more reliable when they take 10%
+of max health each year.
+- IN-CITY-ONLY: Added this new flag for buildings, which blocks their normal
+function if the building is not in an established city. Many code functions
+received updates to accommodate this.
+- Incomplete bridges: Incomplete water buildings no longer block sailing on
+rivers.
+- Informative view: Now shows when a building is damaged instead of showing the
+old 'disrepair' attribute.
+- Maintenance: Building maintenance now uses (basic lumber) and (basic nails)
+components, to prevent it from accidentally using magewood or other future
+premium components. Workforce maintenance also got this update.
+- Ruins: Buildings now have a 50% chance to fall into ruins each year when at
+full damage. They will be abandoned at that point even if they don't become
+ruins (making empire decay more consistent). Empires now receive logs when a
+building is abandoned or ruined due to decay. Ruins are now called Small,
+Large, or Flooded Ruins (rather than Ruins Open, Ruins Closed, and Ruins
+Flooded). Small ruins has a new set of random icons. Ruins will also now
+receive custom names based on which building they used to be.
+- Study: This designatable room now uses a script instead of code to add/remove
+its board.
+- Walls: Walls marked "unclaimable" now behave like claimed walls, where you
+cannot move onto the wall tile. (Immortals using ".map passwalls" can still
+enter.)
+- Yearly maintenance: Buildings now have their own maintenance lists instead of
+all requiring 1 lumber and 1 nails per year.
+
+Characters:
+- Lore: Some types of lore will now overwrite themselves if you gain them in a
+short amount of time, reducing the amount of junk in players' lore. Also added
+some more places where lore is removed if it's no longer relevant.
+- Saving: Fixed a major bug where, in the right circumstances, saving your
+character (manually or automatically) would trigger a near-full heal (as well
+as moves/mana).
+- Targeting: Overhauled the code responsible for name-based targeting, moving
+it from a slurry of macros, to a proper function. It now accounts for
+disguise/morph and recognizability. A person who is not in your group and
+empire will no longer be able to target you by your real name while in a
+disguise or an animal morph. Non-animal morphs do not hide your real name. Be
+on the lookout for cases where you can't target a disguised/morphed player.
+
+Cities:
+- Auto-abandon: Fixed a bug in the automatic "abandon as ruins" code that
+ignored buildings that were directly north, south, east, or west of the city
+center. It was only counting buildings not on those two lines when checking for
+non-ruined buildings inside the city.
+
+Classes:
+- Auto-verify: Missing abilities are no longer considered fatal errors and will
+no longer result in the class being deactivated.
+
+Code Changes:
+- Book editor: Fixed a crash bug caused by buffer overflows from too many
+paragraphs.
+- fill_words: Added "into" to the list of fill words (words ignored by most
+commands, e.g. "put the hat into the chest").
+- Game sleep: Disabled the CircleMUD feature that puts the MUD to sleep while
+no players are connected. This feature prevents workforce and map updates when
+no players are connected.
+- IS_WATER_SECT(): This macro, which was slightly different from WATER_SECT(),
+has been removed. All by 1 of its locations have been changed to use
+WATER_SECT(); the other also needed a check for shallow water (swamp/oasis).
+- Input overflow: Fixed a crash bug when the player overloads the input buffer.
+It now correctly truncates the text, outputs it to the player, and flushes the
+rest of the input buffer.
+- Map Rotations: Added diagonal rotation data, specifically for adventure
+instances. (The map still only rotates north-south-east-west.)
+- Quests: Rearranged the order of operations for removing items at the end of
+a quest, to prevent certain errors caused by removing them at the wrong time.
+- Sector indexing: Map sector types now have linked lists of all world
+locations using that type so they can be iterated individually. Portions of the
+code related to changing sectors or base sectors were updated for this.
+- String editor: Added an option to restore a prototype's pointer when a player
+aborts the text editor. This is currently used only for custom vehicle
+descriptions.
+- Workforce: Fixed a spot where old workforce code was stripping quotes off of
+island names incorrectly.
+- Writing: Removed the (writing) tag, also called PLR_WRITING, which still
+appeared in the code despite being set nowhere and having no function since the
+new string editor in late alpha.
+- Xnames: The forbidden name list (lib/misc/xnames) now supports both
+substrings (like before) and whole-name matches (for words like "someone" or
+"who"). Substring matches must now begin with %.
+- any_one_word: Fixed a bug in this function where it couldn't handle "" or ()
+with nothing in between.
+- byte: Changed the typedef to 'typedef signed char byte'. CircleMUD originally
+provided it as 'typedef char byte', but the code strongly assumes this type is
+signed (it isn't signed on some compilers).
+- extract_char_final: Prevented a rare case where it can try to access a 
+character after freeing them.
+- parse_direction: Passing a character is now optional.
+- send_to_outdoor(): Added 'weather' parameter to indicate that a global
+message is weather-related.
+
+Combat:
+- Allies/Enemies: Attempted improvements to the ally/enemy detection, including
+cases where you are following the mob you're fighting.
+- Auto-assist: Fixed the timing on auto-assist (it was checking way too often)
+and also fixed a bug it will attempt to auto-assist even if it can't succeed
+(e.g. target can't be attacked). Mobs no longer auto-assist merely because they
+are in the same party (this was a bug). Charmed mobs and city guards will still
+assist like normal. Updated the engage_combat() function, which guarantees two
+people are fighting each other (if possible). It no longer fails if either
+party is an immortal (I'm not sure why it was set that way in the first place).
+- Autokill: Fixed a bug where, if an attack or special ability put a mob
+directly into the "incapacitated" state, no-autokill would fail and the player
+would automatically kill the mob. Mobs that are following players (e.g.
+familiars) should now respect their master's autokill settings. Improved the
+removal of DoTs when autokill is off, which only sometimes happened correctly
+before.
+- Bonus-Physical/Magical: These now apply to the average speed of 2.0, and are
+adjusted based on attacks being faster/slower than that. This means Bonus-* is
+now worth 0.5 DPS for all attacks.
+- Champions: Mobs that have the champion flag, such as some familiars, will no
+longer do a plain auto-assist when they can't rescue. Instead, they will wait
+to join combat until they can rescue. (You can order them to attack if you want
+them to join sooner.)
+- Coins: When a mob drops coins on its corpse, these now drop last (are at the
+top of the list) so they pick up before other loot items.
+- DPS: Strength/intelligence now add to DPS rather than base damage. Wits and
+other speed modifiers now also modify damage bonuses (strength, bonus-physical,
+etc.) so that speeding up will correctly give more damage. Slow effects will
+lower those bonuses.
+- Death: Updated the code to ensure that players have negative health while
+dead.
+- DoTs: Damage dealt by DoTs is now dealt "by the caster" if they are present,
+rather than "dealt by self". This should fix an issue with autokill. You will
+no longer regenerate health while you are still being damaged by a DoT effect
+after combat ends.
+- Dodge: Fixed a bug where negative dodge could make a mob unhittable.
+- Experience: More things now count as combat rounds for the purposes of
+gaining experience.
+- Fmessages: New command lets you toggle some combat messages on and off.
+- Follow: If you damage another character, you will now automatically stop
+following them. (This already happened if you damaged someone who was following
+you.)
+- Gear: While in combat, you will no longer automatically stop using gear if
+your attributes drop too low to use it. It will wait until combat ends to
+unequip.
+- Meters: Fights now track combat data including hits, misses, damage, and
+heals.
+- Pointless fights: The game now periodically checks for mobs locked in
+pointless combat, for example where no party can attack, and cancels combat.
+- Ranged combat: When you are the first one to run into melee range after
+ranged combat, you now receive a half-round bonus on your next swing time,
+instead of waiting the full time for your next swing.
+- Resist-Physical/Magical: Resistance now has penalties when it is negative,
+causing an increase in damage taken. There is also no longer a minimum
+resistance to be effective, and resistance is a measure of the percentage of
+the cap you have.
+- Rounds: If the mud is lagging, it will now only process 1 combat round when
+it resumes, instead of making up every lost round. Player attacks have been
+changed to use last-swing-time to ensure everyone gets a hit when it resumes,
+rather than checking for specific timed pulses.
+- Siege: Fixed a problem in all siege systems where you could only siege a
+building through its entrance, not from the side (this bug was probably live
+since the vehicle overhaul).
+- Start of combat: Since combat auto-attacks are now based on the time of the
+last swing rather than an internal counter, timing of attacks at the beginning
+of combat is no longer pre-determined. Now, after the attacker gets their free
+initial hit (or spell — the thing that starts combat), they will get their next
+auto-attack after their normal combat speed (as seen in the score). The victim
+(if they weren't already in combat) will get their first auto-attack based on
+HALF their combat speed, essentially putting their attack half a round after
+they were hit.
+
+Commands:
+- +: Fixed a bug where using '+' to insert a command at the head of your
+command queue would result in an unexpected reversal of commands if you sent
+more than one command at a time, even if only the first one had the '+'.
+- Abandon: Can now be used remotely. Also gives you better output information
+when abandoning remotely.
+- Ablate/abandon: Fixed command priority on abandon, which was suspiciously low
+in the "a" section.
+- Accept: Prevented a bug in accepting resurrection while inside a player-
+limited adventure (in general, players themselves no longer count against the
+player limit for whether or not they can enter an adventure).
+- Aliases: Fixed a bug where the first letter of an alias was case-sensitive.
+Using an alias like "kick $1" will now correctly target your current opponent
+if typed without an argument.
+- Alt import: You can now import aliases and preferences from one alt to
+another.
+- Alternate: The "alt list" and "alt import" commands now work even if you're
+sleeping or dead. Also rearranged some of the error messages into a more useful
+order.
+- Ask: Now uses the 'say' recolor and shows up in sayhistory.
+- Autodismount: Now triggers on more sector types, such as mountains and ocean.
+- Bite: If you drain someone's blood with autokill off, it now gives back 1
+blood point so they don't die immediately after the bite ends anyway. Mobs will
+no longer regenerate and stand up while you are biting them.
+- Build: Fixed a bug where building recipes worked different than other crafts
+when requiring an item to use the recipe; it was failing to find the correct
+recipe if two had the same name but different item requirements. Build now
+gives an error message if you type it with an argument in an incomplete
+building, and better error messages in other types of buildings.
+- Cede: Can no longer be used remotely. Fixed an ancient and rare bug in cede
+that could cause the game to crash when certain arguments were given.
+- Circle: Fixed a bug where some valid targets were only circle-able in one
+direction (Awkens).
+- Circle: Now immediately cancels actions that don't allow movement, such as
+chop. Also now gives movement-based ability experience (e.g. Ride).
+- Clearmeters: This command can be used to clear them at any time. There is now
+a "clearmeters" toggle that restores the old behavior.
+- Customize: Can now be used to name islands. Island names must be
+alphanumeric, will be auto-capped, and auto-trimmed.
+- Darkness: Being in a dark room now prevents the following commands: build,
+chip, chop, craft (forge, etc.), dismantle, escape, fish, forage, harvest,
+maintain, mine, mint, pan, quarry, repair, saw, scrape, tan, track.
+- Dig: No longer auto-cancels when you find nothing useful (because it can be
+used to damage earthmelded players). Now works in most outdoor tiles. Fixed a
+bug where NPCs could be ordered to dig (although it wouldn't do anything
+useful).
+- Dismantle: Now gives an error message if you type an argument, in case you
+were trying to 'dismantle boat' or similar, and ended up dismantling the room.
+You can no longer assist in a dismantle without permission to use the tile, as
+this would result in the empire's resources going to your own inventory.
+- Drag: Now works on shallow water tiles (such as oasis).
+- Draw: No longer requires an argument if you only have one weapon sheathed.
+When you draw a weapon from a sheath, it will now put your previous weapon into
+that sheath rather than into your inventory.
+- Drink: You can now drink from containers that are in the room, if you have
+permission to use the room.
+- Drive/sail/pilot: Improved the error message when you use an invalid
+argument.
+- Efind: No longer requires you to be standing to use.
+- Einventory: Now takes precedence on the 'ei' abbreviation again.
+- Emote: You can no longer use the $O symbol in emotes, which could reveal the
+real name of morphed or disguised players.
+- Estats: New command that gets short info on an empire (defaults to your own).
+- Excavate: Now only needs guest permissions to assist, instead of member/ally.
+Still requires member permissions to start a fresh excavation. You can now only
+excavate on claimed land.
+- Feed: Vampires can no longer feed themselves from themselves (Awkens).
+- Fillin: There is now a 1-minute waiting period before filling in a finished
+river tile, to reduce fillin-trolling. Trenches no longer automatically fillin
+each year if the tile is claimed. Fillin only requires guest permissions to
+assist, but member permissions to start. You can now only fillin on claimed
+land.
+- Findmaintenance: Now finds any building that is damaged, in addition to ones
+that need maintenance. It can also now target a location or island to show you
+the resources needed for maintenance there.
+- Group: Rearranged the errors so that not being leader of the group is more
+important than other reasons you can't invite someone to a group.
+- Harvest: Fixed a previously unknown crash bug related to logging out while
+harvesting.
+- Helpsearch: Now accepts quotes to search for a "whole phrase". Now supports
+multiple search terms, for a more refined search.
+- Herd: You can no longer herd mobs onto a wall tile. You can no longer herd
+mobs that are unconscious, sitting, or tied up.
+- History commands: The various chat history commands now save between logins
+and reboots.
+- Home set: Rearranged the error messages because some circumstances led to the
+wrong message.
+- Identify: You can now identify while resting or sitting. Other players are
+now notified when you identify something.
+- Ignore: You can no longer ignore yourself, no matter how hard you try. You
+can now un-ignore by abbreviation rather than re-adding people repeatedly.
+- Inventory: You can now filter your inventory with various argument.
+- Islands: This command now tells how many tiles you have claimed on the
+island.
+- Lead: You can no longer lead animals out of other people's territory.
+- Maintain: Now happens over time like building, instead of instantly. It also
+repairs damage (when complete), in addition to yearly decay.
+- Meters: Shows your combat meters.
+- Mount: Added "mount list", "mount swap", and "mount release".
+- Nearby: Cleaned up the output on nearby, and added the ability to filter by
+"cities", "adventures", and "starting locations".
+- Pan: Fixed a typo in the default gold panning chance, which was 0.05% instead
+of 5%.
+- Pick: You can no longer pick anything in an incomplete building.
+- Plant: Rearranged error messages to give more useful output (Awkens).
+- Portal: Now immediately cancels actions that don't allow movement, such as
+chop.
+- Pour: Now warns you when trying to pour into a full container.
+- Quarry: Now correctly requires that the quarry is complete.
+- Quit: You can now quit while the RP flag is on.
+- Recipes: No longer shows ALL recipes when used on non-prototyped objects like
+letters.
+- Redesignate: Now removes NPCs who lived in the room that was redesignated.
+- Roll: Your rolls will now show on sayhistory.
+- Roster: Now filters out players who are timed out, unless you use
+"roster -a".
+- Say: Fixed a bug that made 'say' immune to 'ignore'.
+- Scan: No longer shows chameleon tiles if you're out of range.
+- Slash-channels: Fixed a bug where a leading '/' would be deleted from things
+you tried to say on slash-channels.
+- Socials: Fixed a bug where the first letter of socials were case-sensitive.
+Vampires can no longer use socials while feeding on someone (or vice versa).
+- Summary: You no longer have to be standing/fighting to use this command.
+- Throw: You can no longer throw quest items. Throwing also now checks room
+capacity.
+- Title: Now trims extra spaces from the title.
+- Toggle autodismount: New toggle will let you enter buildings without having
+to type dismount.
+- Warehouse store: Fixed a big where trying to store 1 item resulted in
+storing all of that item.
+- Warehouse: You can now check warehouse inventory while sleeping/dead.
+- Whisper: Now uses the 'say' recolor and shows up in sayhistory.
+- Workforce where: You can now add the 'here' argument to see only workers on
+your current island (from Awkens). Fixed a bug where numbers larger
+than maxint resulted in negative limits. You can now copy settings from one
+island to another using "workforce copy" (Awkens).
+- build/craft: All crafting commands that support the "craft info <recipe>"
+syntax now allow you to get info while sleeping.
+
+Config changes:
+- New (all default to 1/true): build_approval, chat_approval, craft_approval,
+gather_approval, join_empire_approval, manage_empire_approval, quest_approval,
+skill_gain_approval, tell_approval, terraform_approval, title_approval,
+travel_approval, write_approval
+- New default: default_interior 1, a new room added for ".map 
+- New default: disrepair_major 60 (is now a percent)
+- New default: disrepair_minor 20 (is now a percent)
+- New: approve_per_character 0
+- New: auto_approve 1
+- New: dailies_per_day 5
+- New: hostile_login_delay 30
+- New: max_map_while_moving 5
+- New: naturalize_newbie_islands 0
+- New: naturalize_unclaimable 1
+- New: need_approval_string You must be approved before you can do that.
+- New: newyear_message The ground under you shakes violently!
+- New: skill_swap_allowed 1
+- New: skill_swap_min_level 100
+- Removed: require_auth — not used by the new approval system.exit".
+
+Crafts:
+- Jams: The jam recipes no longer require jars. Instead, they require the
+glassblowing tech in the empire.
+- Overburdened: You can no longer begin a craft while overburdened.
+- Unskilled crafts: Most crafts (and buildings) that formerly required no
+abilities now require zero-level abilities like Primitive Crafts and Basic
+Buildings. This is part of the change to low-level skill gains.
+- Vehicles: Players can now assist building vehicles they don't know the
+recipes for. Players can also resume a vehicle once started, even if the
+required object was consumed.
+
+Crops:
+- Component flags: Added the desert, temperate, and tropical flags to all
+fruits and vegetables.
+- Flags: Added NEWBIE-ONLY and !NEWBIE flags for wild crops.
+- Harvest: Changed how harvest works to allow crops to give out more than one
+item per harvest. Harvest now better respects the number given by the
+interaction, and Master Farmer always doubles it. All existing crops had their
+quantities updated.
+- Hops: Now has a forage item (handful of grain).
+- Lettuce: Added a new crop for newbie islands, to ensure there's something
+harvestable (i.e. not just orchards) for the tutorials.
+
+Data:
+- New system: Added a new generic data-storage system that can save simple,
+arbitrary data between mud uptimes.
+- Experience cycle: Moved the daily experience reset cycle to this system.
+- Game time: Moved the game's time data to this system (which keeps game time
+consistent).
+- Max Players Today: The player count on the "who" display now saves between
+uptimes.
+- New year: Added code to ensure the game doesn't miss any new years, using
+this system. The whole world now saves during a new year update, to help ensure
+this data doesn't become out-of-sync if the game crashes.
+
+Displays:
+- !SEE: This flag now also automatically includes sneak.
+- /join: Improved the error message if you don't type a channel.
+- /who: Darkness no longer affects who you can see on /who. Now ignores
+darkness when showing players' names.
+- Adventure summon: Added missing linebreak on the summon message. Now always
+shows the name of the summoner.
+- Affect wear-off: Added the option to show a wear-off message to all the
+functions that remove affects from characters. Losing an ability that gave you
+an affect will now show the wear-off message.
+- Alternate: Improved the error message when you try to alternate to yourself.
+- Annual map update: Fixed a bug where no prompt appears after the earthquake
+message.
+- Archetype info: Will no longer show the attributes or skills sections if
+empty.
+- Bad password: Typoing your password no longer results in double-echoes on
+clients that have local echo and no typing buffer.
+- Binding: Added missing commas to the list of who an item is bound to.
+- Blindness: Things that ignore darkness now also ignore blindness (e.g.
+slash-channels).
+- Boards: Players now receive a confirmation message after saving a post on a
+bulletin board. Removed double message to the room when someone looks at a
+board.
+- Build/maintain: Fixed a bug where it was possible to be stuck in a loop of
+"You complete the maintenance" displays (Awkens).
+- Channel joins: Players will no longer see a double message when joining
+slash-channels. They will see either the join announcement, or a "you join"
+message if there is no announcement to them.
+- Chop: Changed the message for swinging back your axe. It no longer attempts
+to modify the short description (leading to gibberish like "You swing back your
+else's axe").
+- City Teleportation: Added a better error message when you try to teleport to
+a city without this ability.
+- Colors: The basic colors (red, blue, green, yellow, magenta, cyan) now send
+shorter standard ANSI codes, rather than the longer codes used by extended
+colors. This fixes an issue where MUD clients wouldn't let you change those
+colors (most clients let you change the ANSI colors). Fixed a bug in the color-
+code-reducer where the combination of foreground, background, and underline
+would sometimes skip the background if repeated.
+- Combat messages: Fixed several messages that used the words "him" and "he"
+rather than the tokens "$m" and "$e".
+- Commands: The "commands" and "wizhelp" commands now correctly show abilities
+from grants.
+- Confirm: Added an error message if you confirm with no upcoming reboot.
+- Consider: Fixed a bug where players who were under 100 skill level, but over
+100 composite level, saw the wrong level difference on consider.
+- Craft info: Now shows whether an attribute on crafter gear will be positive
+or negative (Awkens).
+- Custom long descriptions: Equipment that gives custom long-descs for male
+players will now also work for gender-neutral players (under the theory that
+the male version of the description is more likely to fit than a female
+description would).
+- Custom object messages: Objects will no longer show their custom messages
+when used in the sheath or share slots.
+- Dig: Removed a double completion message when the ground runs out of rocks.
+- Disguise: Improved how fake empire names show up on disguised players.
+- Display: This command will no longer double any dollar signs you type.
+- Drunk: Fixed an issue where the map-rotation was triggering at a different
+level of drunkenness than other drunk indicators.
+- Echo: Immortal echoes no longer recolor like emotes.
+- Einventory: Using "einv all" will now also include items that are being
+shipped but are not in storage anywhere.
+- Empires: The empire list now paginates (Awkens).
+- Entry: Characters now walk "in from" directions when indoors (but still "up
+from" directions when outside).
+- Esay: Fixed a bug in the double_percents() function that caused, among other
+things, strange behavior when using esay with a % at the end of the string.
+- Excavate: Now displays a message when someone resumes excavating.
+- Etalk: Fixed a bug where the color code was inserted incorrectly in the
+message to other players when using the #rank syntax .
+- Forest: The "build on forest" requirement is now called "full forest" to
+avoid naming confusion.
+- Gender: Certain logs and messages will now show a character's real male/
+female/neuter gender rather than the one they are morphed/disguised as.
+Examples include empire logs, certain invitations, and any action string where
+a $e follows an $o instead of an $n.
+- Group: Inviting a player to join a group no longer shows you his/her real
+name while disguised/morphed.
+- Gsay: Fixed an issue where the speaker would see a double $$ if they typed
+one.
+- Hide: It will now indicate that a person is hidden, if you can see them in
+the room.
+- Identify: No longer lists liquid quantities in "ounces" (this was the only
+place that did that).
+- Identify: Will now show an item's level in more cases. Identifying the corpse
+of a named citizen no longer says "Corpse of feller #n" — it now replaces the
+#n/#e/#a codes with placeholders.
+- Info: Updated the basic info command.
+- Instance reset: Hidden mobs will no longer show "Someone arrives." when they
+respawn.
+- Island names: The default island name now includes a number so the Unexplored
+Islands can be differentiated (on new EmpireMUDS; existing ones will not get
+this update automatically).
+- Islands: No longer shows empty islands. No longer shows "No Island" in the
+list.
+- Load: Fixed an error where it showed the wrong vehicle name when failing to
+load one vehicle onto another.
+- Long descriptions: Modified how player long descriptions are displayed to
+accommodate custom long descriptions from equipment.
+- Long strings: The game will no longer drop letters from very-long-strings it
+reads from files.
+- Look at character: Changed how empires display slightly, and colored the
+banner.
+- MOTD: Using MXP will no longer cause you to bypass the MOTD.
+- Mapsize: When moving very fast on the map, your mapsize will now
+automatically start to decrease (to save processing time rendering a lot of
+huge maps in a short period of time). This effect diminishes over time, or can
+be reset by manually typing 'look' or 'scan'.
+- Mortlog: Players will no longer see a double mortlog when a new player joins
+the game while public_logins is on (Awkens).
+- Mount: Fixed a typo in one error message.
+- Namelists: Fixed the capitalization on "EAmon".
+- New Year: Added a newline before the annual new year message, so it won't
+show up on the same line as somebody's prompt. This message is now also
+configurable.
+- Pick: Fixed a typo where quantities were listed as (d#) instead of (x#).
+- Prompt: Increased the space for the prompt to ensure there's enough room to
+display long prompts, which could (rarely) exceed the limit.
+- Purify: Permissions error now correctly says "toggle bother" rather than
+"nobother".
+- Screenreader: Having this toggle on no longer shuts off color codes, for
+sighted players who sometimes use screenreader mode for various reasons.
+- Sit: Trying to sit while mounted now gives a clearer error message.
+- Skin: Added a missing question mark to "What would you like to skin."
+- Strings of Unusual Length: Fixed a bug where it was possible to see no output
+from certain commands if the string was a specific length. This fix includes
+two changes: 1. If the mud would send too-long output, it truncates it and adds
+the **OVERFLOW** text similar to what it did before the KaVir's Protocol
+Snippet was added. And 2. It now accounts for color codes when determining if a
+string is too long for the 'scrolling' preference, and sends the output to the
+pager instead.
+- Summon materials: Now tells you if you didn't summon as many as you
+requested.
+- Survey: If an island has been renamed by the empire, Survey will now show
+both names.
+- Tips: Revised and added some more tips.
+- Toggle: Typing a bad argument with 'toggle' now gives an error message
+instead of the list of toggles.
+- Trade check: Fixed a bug where the number of coins to collect did not show
+up.
+- Various: Minor text updates and corrections throughout.
+- Wall coloring: Changed the &V "special color code" for wall coloring, to &#.
+The 'V' conflicted with the violet color code and made it impossible to use
+violet in map tiles. One stock building that used this code was updated.
+- Wall linking: Fixed a bug where where chameleon buildings were revealed by
+linked walls on adjacent tiles, and another bug where very specific wall
+conditions could result in a full crash (Awkens).
+- Warehouse inventory: Now shows scale level and relevant flags on the item.
+- Weapon damage: Now shows as: Damage: 123 (Strength+30.75 dps) due to strength
+being added to DPS rather than base damage.
+- Whereami: No longer displays coordinates if you are in a !LOCATION room.
+- Who: The "who -s" display now correctly puts people into columns, and shows
+the (i5) invis indicator next to the name instead of way off to the right. It
+will also now show (inc) when an immortal is incognito.
+- Workforce: Screenreader users will now get workforce output on separate lines
+instead of in columns. Workforce now better displays the on/off/part status
+based on claims on an island.
+
+Documentation:
+- Changelog: Updated the changelog with all of the b4.x patchnotes.
+- Crashing: Added a doc file for how to deal with crashes.
+- Getting-Started: Added a doc file for setting up a new EmpireMUD.
+- Updating: Wrote a document about updating from b4 to b5.
+- Version number: Updated the code comments and displays to beta5.
+
+Empires:
+- Auto-distrust: Fixed a bug where one-shotting a mob with a special ability
+(rather than regular attack) would not trigger auto-distrust.
+- Banner: The mud now tracks if an empire's banner has an underline, in order
+to better terminate the underline code and prevent leaks.
+- Cede: You can no longer cede land to players who have 'bother' toggled off.
+- Change leader: The old leader now receives lore when the leader is changed.
+- Cities: All cities are now checked for ruins during the new year earthquake
+and are auto-abandoned if they contain no claimed buildings.
+- Cities: You can now found a city on a shallow water tile like an oasis due to
+the WATER_SECT change.
+- Coins: Empire coins are now stored to 1 decimal place. Depositing small
+amounts of money with low exchange rates now preserves this decimal value.
+Import and export rules can now have decimal costs. Taking away empire coins to
+give to a mob for pickpocket/loot now correctly triggers a save of the empire.
+- Distrust: Fighting/killing an NPC will no longer trigger distrust with its
+empire if you are fighting it on a tile your empire owns, e.g. if a hostile
+scout wanders onto your land and aggros you.
+- Eedit: Editing the description or motd now correctly triggers an empire save.
+Improved error messages when setting the name/adjective. It also now warns that
+you're trying to set it to the same thing, rather than allowing you to keep
+renaming the empire to the same thing.
+- Eidentify: New command allows you to identify items in your einv and also see
+what islands they are stored on.
+- Empire inventory: An empire's workforce will now organize (sort) the empire's
+inventory to make it easier to find the component they have the most of, so all
+chores will prefer resources you have more of. Inventory is sorted at the start
+of the chore cycle.
+- Enroll: Fixed a bug where very specific circumstances could cause the game to
+crash while enrolling a character in an empire.
+- Esay: No longer leaks an underline color code from the banner.
+- Fame and Military: Fixed a bug where these two attributes weren't resetting
+and would increase each time the empire is re-scanned. Also changed the startup
+order to ensure accurate empire stats at startup. Fixed a bug where these fame
+and military numbers could be zeroed out by inadvertently skipping part of the
+re-scan after modifying a city.
+- Follow: You can no longer get into a room without permission by following an
+NPC.
+- Guard towers: Increased the damage on guard towers slightly, as a temporary
+measure until empire progress and guard tower scaling can be designed and
+implemented. Players will now also be slowed briefly after being hit by a guard
+tower. Players who are hit by guard towers will now also cancel any action they
+were performing. Guard towers also apply the DISTRACTED effect, briefly.
+- Homes: Removing the private owner on a home will now reset the autostore
+timers of items inside it, so they don't auto-junk right away.
+- Hostile territory: Players who log in on claimed land that isn't public now
+have a short delay before they can act. Also improved how the game detects
+hostile players for quit/alternate to include rogue-flagged players who have no
+empire.
+- Island names: Empires may now name any island where they have an established
+city. If the island was not named before, or if they are the only empire with a
+city on the island, their name will become the island's "official" name during
+the MUD's "new year" update.
+- Members: Fixed how the game re-reads empire members while running, to allow
+it to detect whole-empire timeouts as well as changes to immortal members (this
+is required due to level changes in this patch). Improved the MUD's ability to
+detect a re-activated member when an empire has been timed out (preventing
+members=0 with players online).
+- Merging: Updated empire merging so that it attempts to estimate the new
+member count before transferring cities and territory, to prevent losing cities
+that there will be enough points for after the merge. When two empires merge,
+they will now copy workforce settings from any island that the old empire had
+settings for, but the new one didn't.
+- NPC Population: Split out the code that handles NPCs populating buildings,
+and cleaned it up slightly.
+- Names: Empire names must begin with a letter.
+- Naming: Added "misc", "miscellaneous", and "other" to the list of reserved
+words, blocking them from being used as empire names/adjectives (they interfere
+with coins). Also fixed a problem where empire names weren't checking the
+fill/reserve word lists. Improved the functions that guarantee empires have
+unique names. They also now require unique adjectives. When a new player gets
+an automatic empire, that name is also now guaranteed to be unique.
+- Population: Mobs living on ships now never count toward island population
+(they were counting for the island they were on when the empire last updated).
+- Saving: Added a delayed-save mechanism to reduce lag from functions that save
+empires repeatedly, such as spammy elogs.
+- Ships: Fixed a bug where ships counted against territory on startup (they
+were fixed by the first re-scan but could result in territory loss first).
+- Stealing: The game now tracks who the original owner of stolen items was.
+Players can now pick up items that were stolen from their empire, even on
+claimed land. Items now lose their stolen status if someone from the original
+empire picks them up. Stolen items can no longer be stored until their "stolen"
+flag wears off. Also fixed a major bug that caused unpredictable and horrific
+behavior when a player died with stolen items on their person.
+- Storage: The game will now automatically remove non-storable items from the
+einventory on startup, to clean up data that is no longer any good.
+- Territory: Completely overhauled how territory is counted and tracked. It now
+updates as territory changes, rather than requiring a world re-scan for most
+changes. All code related to changing ownership was updated. This should reduce
+game lag. Changed which function adds/removes a tile to an empire's workable-
+territory-list to fix an issue where tiles could sometimes get out of sync,
+resulting in workers spawning on tiles that are not workable. The game 
+now keeps track of an empire's claimed tiles on each island, in addition to a
+total for the whole empire.
+- Toggle no-empire: New toggle prevents you from automatically creating an
+empire from commands like claim, cede, and build.
+- Trading: Imports now prefer trading partners with lower costs (ties go to the
+highest-ranked empire). This involved a full rewrite of the import handler.
+- War: Players can no longer respawn at a burning tomb (Awkens).
+- War: You can no longer rename your empire while at war. This prevents
+misleading exploits.
+- Workforce Maintenance: Now works over time at a rate of 1 resource per hour,
+like building.
+- Workforce Oilmaking: Fixed a bug where oilmaking had a strict skill
+requirement and was not making any oil.
+- Workforce: Fixed a bug where many chores could process resources that are not
+storable. Dismantle will now also skip non-storable items. Fixed a bug where
+milling was unable to mill any items since the recent low-level skill update.
+Fixed a bug where workers weren't able to perform repairs on vehicles if those
+repairs were basic (free) actions. If a player finishes mining a tile,
+workforce will also now correctly stop themselves from mining it. Rewrote the
+Farming chore to fix several bugs including farming going at double-speed if
+there are two harvestable items from the tile. Workforce will now automatically
+deactivate itself when terrain type is changed in most ways (e.g. by immortals,
+by lay road, by chant of nature, etc.) instead of getting stuck.
+
+Factions:
+- Aggro: Mobs with the AGGR flag will ignore players who are at least Liked by
+the mob's faction (if any).
+- Command: Players can type 'factions [name]' to view faction reputations and
+info.
+- Look at character: Mobs will show their faction on 'look <name>'.
+- OLC: Full editor suite for factions and for assigning mobs to factions.
+- Quests: Faction reputation can now appear as quest tasks, prereqs, and
+rewards.
+- Scripting: Added %ch.allegiance()%, %ch.faction_name%,
+%ch.gain_reputation()%, and %ch.has_reputation()%.
+- Set faction: Immortals can change a player's faction levels.
+- Show factions: Immortals can view player faction levels (filterable).
+
+Globals:
+- Choose-Last: Added a new flag that causes a global to work as a "failsafe"
+only if no other global is chosen. This will be used e.g. to make sure iron is
+the last mine type, and allows other mine types to be added regardless of vnum
+ordering.
+
+Help files:
+- Actions: Added speed boost notes to the help files for timed actions, and
+updated the timed action help file.
+- Attributes: Each attribute now has its own help file.
+- Crops: Added lettuce.
+- Distracted: Added help for this effect.
+- Drunk: Added a new help file for people looking for ways to sober up faster.
+- History: Added a help file that lists chat history commands.
+- Hone: Clarified that you must have the ability to use honed gear.
+- Immortals: Added help files explaining how to make mount and mini-pet
+whistles.
+- Room triggers: Added the %room% variable to help files for room-specific
+triggers.
+- Shadowcage: Removed a duplicate Shadowcage help file that had incorrect
+numbers but was taking precedence over the correct one.
+- Sorting: Changed how help files are sorted so that immortal helps like 'load'
+aren't blocked by mortal helps like 'load'.
+- Speech triggers: Added notes on how to use a wildcard.
+- Stun: Added a help file explaining stuns and stun immunity.
+- Utility shed: Clarified which tools store here.
+- Various: Fixes, updates, typo corrections, and minor updates. Some OLC help
+files were updated to contain lists such as object materials.
+- Workforce: Split the no-work and "workforce where" options into their own
+help files.
+- Yvain: Special thanks for many help file updates.
+
+Immortals:
+- Addnotes: Fixed a bug where addnotes didn't force an account save.
+- Alternate: When a player switches to an alt, immortals who are in-game and
+connected will have their "reply" command updated automatically if they were
+talking to that player. Immortals can now always alternate TO their immortal
+character despite their cooldown, rather than not gaining a cooldown when
+alternating FROM an immortal character.
+- Autonotes: New toggle causes an immortal to see player notes automatically on
+login.
+- Breakreply: New immortal command that cancels players' reply-to data, e.g. if
+the immortal wants to go invisible and be undisturbed.
+- Buildings: Stat building and the building editor now correctly show icons
+whose color codes include &?.
+- Class: Added a new 'Immortal' class that only immortal players will qualify
+for, so they don't all say 'Duke'.
+- Delete logs: A player's correct level is now shown on the log when they
+self-delete.
+- Drop: Now logs abuse when an immortal drops an item on a claimed tile.
+- Eedit: Editing other people's empires now triggers a syslog.
+- Forgive: Fixed a typo in the forgive message.
+- Goto: Can no longer goto a wizhide immortal if you're not also wizhide or
+invisible.
+- Hostile territory: Immortals are now affected by hostile-territory checks for
+commands like quitting.
+- Incognito: Now blocks you from channel join/leave announcements.
+- Invis level: Fixed a bug where immortals can stay invisible above their own
+access level if they end up that way in the first place.
+- Island flags: Islands may now be set !CUSTOMIZE in order to prevent players
+from renaming them.
+- Island list: Can now filter the island list by keywords.
+- Load: Now logs abuse when an immortal loads a mob or vehicle around a mortal
+or claimed tile.
+- Mobs: You can now see mob hit/dodge/damage on "stat <mob>".
+- Nocustomize: New account setting prevents a player from using any 'customize'
+command.
+- Portal: Immortals now require the "transfer" grant (or CIMPL level) in order
+to use immortal-style portals.
+- Purge: Fixed an issue where purging a player could duplicate their items by
+leaving a copy on the ground.
+- Put: Added abuse logs when an immortal puts something into a container of
+vehicle that belongs to a mortal empire.
+- Random encounters: Immortals using wizinvis or wizhide are now immune to
+random encounters.
+- Reboot: Changing from a scheduled 'shutdown' to a 'reboot' no longer keeps
+the pause/die command associated with the shutdown.
+- Referrals: Player referrals are now shown on their own syslog line during
+creation, and can now be up to 80 characters long.
+- Reload: Now has a syslog.
+- Remember/naturalize: You can now remember/naturalize unclaimable tiles if the
+naturalize_unclaimable config is on.
+- Reply: When a player logs in, his/her reply-to person will be cleared if that
+person is online, immortal, and invisible/incognito.
+- Restore: Changed the order of operations in the restore command so that
+restoring an immortal will correctly fill their pools after they acquire
+abilities that increase the size of pools like mana or blood, rather than
+before. Now only grants all abilities on the first of the two skill sets (see
+skill swap).
+- Reward mini-pets: Added two typo-based reward mini-pets to the 9900 block.
+- Score: This command will no longer attempt to target NPCs only to tell you
+that you can't use it on an NPC.
+- Set account: Immortals can no longer add/remove players to/from accounts if
+any character on the account has a higher access level than them.
+- Set name: Fixed a bug where changing a player's name did not cause an account
+save.
+- Set skill: No longer clears abilities when used to lower someone's skill
+level. It now only sells back abilities that are out of the new range, similar
+to "skill drop".
+- Set skill: Updated how abilities are removed when skill level goes down.
+- Set: Added some missing periods to the log/confirmation messages from the set
+command.
+- Show skills: Added an optional "swap" argument for seeing a player's second
+set of abilities.
+- Show stats: Added additional stats.
+- Show variables: Fixed a bug where offline players were not loading variables.
+- Shutdown: No longer says "Rebooting momentarily…" when doing a
+"shutdown now".
+- Siege damage: Immortals no longer have a chance to die from siege damage.
+- Skill resets: Typing "skill reset" will no longer show immortals that they
+have resets available in every skill, but they can still reset skills for free
+at any time. (This reconciles other places where no resets were shown.)
+- Skill sell: Fixed an issue where "skill sell" could change empire techs
+incorrectly.
+- Snoop: Fixed an issue where snooping some clients resulted in a LOT of
+empty-line spam.
+- Stat room: Now lists vehicles in the room. Now shows instance name, location,
+and flags. Now shows natural sector type on the map.
+- Stat: The "stat mob <name>" syntax now ignores players.
+- Switch: Fixed a bug where typing "score" while switched into a mob that has
+empire loyalty would crash the game.
+- Throw: Now triggers an abuse log when used by an immortal.
+- Util: Added the 'yearly' tool to run a full map update.
+- Where: Now shows room vnums to immortals.
+- Wizhide: Now protects against 'where' and location-targeting abilities such
+as goto and at.
+
+Map:
+- Naturalize: Fixed a bug where crop data was retained if a tile was
+naturalized from crop to non-crop.
+- Output: Fixed a bug where sectors that are not crops could sometimes still
+show as crops on the graphical map output, if there was stray crop data
+attached to them.
+
+Mobiles:
+- !ATTACK: Mobs that cannot be attacked are no longer prevented from using
+skill commands like 'cleanse' in the same way a player would be.
+- !Drink-Blood: New affect flag prevents vampires from biting/siring. Some
+existing mobs were upgraded with this feature, and the wandering vampire NPC
+will not bite anybody who has it.
+- !rescale: New flag prevents mobs from rescaling once scaled.
+- 612 Bunny: Fixed a major flaw in the trigger that was duplicating bunnies
+until there were so many tens of thousands of them that the server locked up
+and then crashed.
+- Blood: Added the no-drink-blood to several arthropods that were missing it.
+- Catch-up: Mobs will no longer run multiple activity cycles (moves, aggros,
+etc) when the mud is catching up from lag. They will run just 1 cycle no matter
+how long the lag was.
+- Cats: Can no longer be herded effectively.
+- Custom messages: Added new custom message fields to mobs. Custom echoes are
+periodically echoed to players in the room with the mob, and custom says work
+similarly. These two types replace the use of scripts for normal mob animation,
+which should reduce lag caused by a large number of scripts in the world.
+- Disarm: Updated the list of attack types that are disarmable on mobs. Mobs
+that cannot be disarmed will deal 30% less damage automatically.
+- Echoes: Fixed a bug where mob custom strings were firing incorrectly, and
+generally failing.
+- Healing: Mobs will now automatically stand up if they are healed from the
+incapacitated state.
+- Health: Raised scaled mob health to go with higher player DPS.
+- Level-locking: When a level-locking adventure (e.g. Goblin Challenge) locks,
+it will now attempt to force mobs inside to scale, even if they were already
+scaled.
+- Llama: This animal can now be sheared (shorn?).
+- Map animals: Converted the rest of the environmental triggers to custom
+messages.
+- Messages: Fixed a bug where $ tokens were not processed correctly.
+- Miller's daughter: Removed "girl" from keyword list.
+- Move types: Added shuffles and marches.
+- Movement: Added "leaves" move type.
+- Pursuit: Ensured mobs don't wander randomly while they should be pursuing. If
+a mob is pursuing you and becomes incapacitated, then you heal it, it will stop
+pursuing you (instead of attacking you immediately).
+- Reset: Mobs that are not from locked adventures will now reset their scaling
+if they are out of combat long enough.
+- SILENT: New flag prevents echoing custom messages.
+- Scaling: Fixed a bug where a chain of "NPC following player, who is following
+an NPC" could result in incorrect scaled levels in certain rare cases. Fixed a
+second bug where mobs who are not missing any health/moves/mana would also not
+de-scale or de-tag when out of combat. Fixed an issue where familiars and
+script-scaled mobs could still rescale if out of combat. Lowered mob health
+scaling. Made small tweaks to the tank and dps flag scaling values. Mobs that
+aren't part of an instance are no longer affected by its scaling constraints
+(this was affecting familiars in some cases). More tweaks to mob scaling
+including higher damage from the dps/hard/group flags, and more health from the
+tank/hard/group flags.
+- Scripts: Some mobs that had environmental/animation scripts now have custom
+messages instead. The old scripts are still included with the game, but were
+updated to mention they are unassigned.
+- Sheep: Fixed a typo in the sheep's custom messages.
+- Spawn time: Ensured all mobs have spawn time set, regardless of how they
+spawned.
+- Tie: Mobs that are tied up (bound and gagged) no longer run events like
+aggro.
+- Vampires: Removed automatic blood loss for vampire NPCs.
+- Wandering vampire: Updated stock mob trigger.
+
+Morphs:
+- Fastmorph: Added the !FASTMORPH flag. Some forms no longer allow fastmorph,
+for game balance reasons. Some morphs were not considered when fastmorph was
+added.
+
+MSDP:
+- Button 3: Fixed an issue where button 3 was labeled Score but sent "help".
+- Location: The COORDS property no longer gets data when you're in a room with
+no location (e.g. certain adventures).
+- New variables: OPPONENT_FOCUS_HEALTH, OPPONENT_FOCUS_HEALTH_MAX,
+OPPONENT_FOCUS_NAME (Awkens).
+- Room VNUMs: No longer shows room VNUMs to non-immortal players.
+- Room data: Now updates on login, not just when you move. It also now updates
+when a vehicle moves with players inside.
+- Snoop: MSDP data will no longer be sent to someone who is snooping a player.
+This fixes both spammy blank snoop output, and also a bug where the snooper's
+MSDP data is replaced by what he gets from the snoopee.
+
+Natural Magic:
+- Chant of Nature: Added chant text.
+
+Objects:
+- Affects: Fixed a bug where items that granted affect flags were not doing so
+if they did not also have attribute applies.
+- Applies: Added new apply types that will only appear on an item if it has
+matching superior/hard/group flags when scaled.
+- Auto-updater: Now correctly inherits a new 'timer' if the prototype had its
+timer changed to/from unlimited. Previously it would always keep its old timer.
+- Bows: Updated the look description to match modern ranged combat systems.
+- Canoe: Added better usage notes to the description of the canoe.
+- Chemist's cleansing cap: Updated the recipe name to match the item name.
+- Cloth: The cloth items are now made from cloth instead of flesh.
+- Coif: Now has correct material type.
+- Coin mill: Removed the confusing adjective 'heavy'.
+- Crafter items: Added tier 3 crafter items, which drop from level 275-374
+"group" mobs. Tier 2's range was updated to 175-274/group. Added missing BoE
+flags to the tier 2 patterns.
+- Custom messages: Objects can now give players a custom long description when
+worn (including male-only and female-only options).
+- Drinks: Added a "mead" liquid type.
+- Dyes: The orange and violet dyes are no longer needed for any craft recipes.
+These were part of a system that never got used much, and never provided
+anything interesting.
+- Free crafts: Candles, flasks, and other free crafts are no longer storable.
+- Gold Bracelet: Now gives charisma.
+- Grave Marker: The graves are now burnable.
+- Inventory: Players who reach 2x their inventory capacity will now auto-junk
+older items in their inventory.
+- Llama wool: Added missing storage.
+- Magewood: Now has a custom fire type when lit.
+- Overburden: Will now attempt to drop items when severely overburdened, rather
+than junk them. The game now remembers the largest inventory size you ever had,
+and only auto-drops when you go over 2x that amount.
+- Plum: Fixed the combine interaction quantity on plums.
+- Quest items: You can no longer give quest items to random NPCs.
+- Quests: Items marked (quest) no longer require any inventory space.
+- Scaler: Fixed a major bug in how point costs are computed in the object
+scaler. This was causing some items to scale lower when they had higher-quality
+loot flags.
+- Scaling: Added missing scaling to 'retrieve' and 'mine'.
+- Sinking: Items without the TAKE flag will no longer sink or drift.
+- Spear: The basic spear now has a fixed level of 1.
+- Staves: Added missing STAFF flag to some staves.
+- Stock objects: Many objects that have command triggers (such as trinkets and
+mirrors) were updated to allow the "#.name" syntax on their trigger commands.
+- Stolen: You can no longer junk or sacrifice stolen items until the stolen
+timer expires.
+- Stout: New liquid type.
+- Torch: The basic torch is now wieldable.
+- Trinkets: Added "appears" messages that were missing on the trinkets.
+- Unique: New object flag that prevents you from using two copies at once.
+- Wax: Now has a custom decay message.
+
+OLC:
+- .map naturalize: New map tool that can be used to return a tile, island, or
+whole world to its natural state.
+- .map populate: New map OLC command forces an NPC to attempt to move into the
+current building or room.
+- .map remember: New map tool that stores the current sector of a room (or
+island) as its "natural" sector, e.g. allowing immortals to make permanent
+changes on newbie islands.
+- .mapedit decay: New map editor that causes 1 year of decay on a tile.
+- .mapedit maintain: Instantly maintains a building.
+- .oedit damage: You can now set damage from -10000 to 10000, rather than
+-100 to 100.
+- .removeindev: This command now warns if someone has an open editor with an
+IN-DEV flag in that range.
+- .trigger fullsearch: Now correctly distinguishes between trigger types on
+mob/obj/wld/veh triggers.
+- Book editor: Immortals are no longer constrained by the item name length
+limits.
+- Book objects: Changed the object editor's ".book" field to ".text" because it
+conflicted with the ".book" editor.
+- Cascade: Added a new command (.adv cascade) that copies the adventure's
+min/max level to all of its mobs and items.
+- Class editor: Rearranged maxmove and maxmana since the ".maxm" hits them
+alphabetically.
+- Copy: Smart-copiers for things like interactions now correctly copy multiple
+items with different percents (and other traits) even if they have the same
+vnums. Previously, some items would fail to copy if they were partial-
+duplicates but not identical.
+- Corpses: You can now create real mob corpses in OLC, with the new <corpseof>
+field.
+- Crop/Sector editor: The .icons field now supports "copy".
+- Custom messages: Fixed a bug in changing custom messages where the $ was
+duplicated.
+- Deleteroom: Now messages people when players appear after being transferred
+from a room deleted by map OLC..
+- Fullsearch: Added fullsearch options for objects and triggers, for easier
+lookups.
+- Icons: Fixed a bug in the icon-validator where it miscounted @ signs if they
+weren't part of special icon codes.
+- Mobs: Fixed a bug in .search/.delete where buildings' artisans were not
+checked for the mob.
+- Object editor: Viewing the 'type' menu will no longer clear object values
+unless you change the type.
+- Object values: Changed "value1, value2, value3" to "value0, value1, value2"
+in the object editor, to match its use in both scripting and in the code.
+Previously, this was extremely ambiguous and made it hard to write scripts.
+- Objects: Fixed a small bug in deleting an object that's used in the
+maintenance list for a vehicle that is currently being edited. Storage
+locations now show a vnum in the editor.
+- Quest list: Now shows (daily) flag.
+- Quest prereqs: Fixed a bug where you could copy tasks but not prereqs.
+- Requirements: Added two new types of requirements: wearing, and
+wearing-or-has. This allows quests (and socials) to require equipped items.
+Requirements also now support "or" conditions, so quests/socials can have
+different items or tasks that all qualify a player for that quest/social.
+- Resources: Fixed a strange error where commands like ".res add obj 1 foo"
+resulted in adding 1x "bug".
+- Sectors: Inverted the SECTORS olc control flag to !SECTORS to match most of
+the other flags. Builders can now edit sectors by default.
+- Skill trees: Ability names in the tree editor can now be in "quotes".
+- Social editor: Now allows "none" to remove messages.
+- Socials: Improved the social auditor.
+- Spawns: The <spawn> tag no longer has a partial command list next to it.
+- Trigger editor: Fixed a buffer overflow issue where long scripts could cause
+the trigger editor to be way too long. Changed how live triggers are updated
+when a trigger is saved. The game now detaches any live copies of the trigger,
+and re-attaches fresh copies in the same positions in the script lists. This
+will cancel any trigger currently firing, but will ensure better updating when
+a trigger is saved.
+- Triggers: Now searches adventure scripts during a trigger search/delete.
+- Uncascade: new command (.adv uncascade) that removes min/max levels from all
+mobs/objs in the adventure whose levels are the same as the adventure's own
+level limits.
+
+PHP:
+- map-viewer.php: Fixed the city location math so that cities appear in the
+correct place when the map is scaled down. Fixed a minor issue where the name
+variables at the top were not used correctly in the file.
+
+Players:
+- Accounts: Trying to log in two characters from the same account will now
+disconnect the first one, rather than bouncing the second one. (For people who
+don't have the MULTI-CHAR account flag.)
+- Affects: Fixed a bug triggered by affects being read out of the playerfile
+before things they were affecting, sometimes causing attributes like age to
+change permanently if you logged out with an age-modifying affect.
+- Base level: Updated the definition of "level 1" to "35 skill points", since
+new "Hobby" archetypes raised the number of starting skills.
+- Bonus Pools: The health/move/mana pool bonus traits now give significantly
+larger bonuses.
+- Bonus Regens: The health/move/mana-regen bonus traits now give considerably
+more regen bonus.
+- Daily bonus experience: If players have gained extra bonus exp and are over
+their normal daily amount, they will no longer lose this overage when it
+resets.
+- Drunkenness: Sleeping will now cause your drunk level to go down faster.
+- Frozen: Players who are frozen can no longer trigger command triggers
+(whoops).
+- Half-Death: Fixed a bug where dying players could, rarely, get stuck in a
+state where they were bleeding out very slowly, unable to move for 15 minutes
+or more.
+- Idling: Fixed a bug where link-dead players would not idle out while also
+regular-dead.
+- Last login: If a player idles out during their first login, the game no
+longer loses their connection info.
+- Timed actions: When the mud experiences lag, timed actions will no longer do
+multiple update cycles as the lag resolves.
+- Xnames: Added "import" and a few other terms to the list of forbidden names
+(lib/misc/xnames).
+
+Quests:
+- %quest%: Added the 'untrigger' option so scripts can cancel a triggered
+condition on a quest.
+- City dailies: Added some daily quests which appear in buildings around player
+cities. To try the new dailies and give feedback, visit the Mill (Empire),
+Stable (Trade), Tavern (Stealth), Tower of Sorcery (High Sorcery), Pigeon Post
+(requires Alchemist, Forge, and Tower of Sorcery).
+- Color: Quests available from the room you are in, are now colored to make
+them distinguishable from the room description.
+- Dailies: New type of quest with a max-per-day limit. Players automatically
+fail remaining 'daily' quests when they hit their limit or when the daily cycle
+resets. Daily quests also have special 'repeat' rules.  Added a new 'daily
+cycle' field to quests, allowing a group of daily quests to share the same
+cycle, where only one of those quests is available each day, at random.
+- Deleted quests: Updated the code that removes deleted quests from a player's
+list of completed quest, and from their current quests, to be more reliable.
+- Empire-only: New quest flag restricts the quest to the same empire as the
+quest-giver.
+- Level limits: You can no longer start a quest that is more than 50 levels
+above you.
+- Morphs/Disguise: Expanded the list of conditions that prevent you from
+starting/finishing quests to include invulnerable morphs and all disguises.
+- No-Guests: New flag changes the room requirement from "guests allowed" to
+"members only" on start/finishing quests.
+- Permissions: Players must now have at least "guest" permission in a room to
+start/finish quests there (if it is claimed). Quests starting from objects now
+also check the Empire-Only flag if the object is not carried by the player.
+- Prerequisites/tasks: Made the quest task data a generic type so that it could
+be used for requirements on other systems (such as socials).
+- Quest finish: Improved the error message when no argument is typed. You can
+no longer finish quests in an animal form.
+- Quest givers: Added "quest" as a type for the starts-/ends-at data, strictly
+to make it easier to look up where you acquire a quest.
+- Quest info: Improved the error message when no argument is typed.
+- Quest start: Removed the 'quest check' command; typing 'quest start' with no
+arguments will list quests available. You can no longer start quests in an
+animal form.
+- Quest tracker: Improved how incomplete objectives are displayed.
+- Repeats-per-instance: Updated this flag to better support the has-completed
+and not-completed quest tasks.
+- Room templates: Fixed a bug where you could see, but not start, quests
+available from the room you are in.
+- Turn in at: Added code to replace #n, #e, and #a in mob names for the
+turn-in-at section of quest info.
+
+Resources:
+- 200-300 resources: Added new sectors, items, crafts, mobs, and abilities to
+introduce a new tier of cloth, metal, leather, wood, and gems in the 200-300
+level range.
+- Actions: Resource lists (maintenance, building costs, etc) can now include
+"actions". These take a normal build/maintain tick, and show a message, but
+cost nothing.
+- Basic: Added the "basic" component flag and assigned it to all the tier-1
+resources (ordinary lumber, metal, nails, etc.).
+- Blocks: Removed the "large" flag from all blocks/bricks, to (hopefully) make
+this resource less confusing. All items and recipes were updated.
+- Cloth: The basic cloths gained the 'mundane' component flag, to distinguish
+them from magic cloth.
+- Enchanted Forest: These tiles no longer allow chant of nature to regrow trees
+once chopped.
+- Resources: Fixed a set of bugs where the same item could count for multiple
+requirements in a resource list (such as a craft), leading to the mud requiring
+fewer items than expected (although it would usually still take enough items if
+you had them). It now finds/takes specific items before components.
+
+Rooms:
+- !Teleport: Added a new room affect flag blocking teleport.
+- !Weather: Added a new flag that suppresses weather messages and the weather
+command.
+- Deletion: Fixed a bug where deleting a room which contains a vehicle that
+contains a player would cause a crash, as the player was not relocated in time.
+- Functions: Room templates (for adventures) now have function flags. Converted
+two old RMT flags on existing rooms.
+
+Scripting:
+- %adventurecomplete%: Improved how this command detects the correct instance
+to complete.
+- %aggro%: New mob command for smart-aggroing a group, even if the leader is
+immune.
+- %build%: New script command for adding/removing buildings.
+- %ch.can_enter_instance(room)% – New script function to determine if a player
+can enter the instance a room is in, e.g. due to player limits.
+- %char.can_start_quest(vnum)%: New variable to determine whether a person can
+start a quest or not. (%quest% can still override this.)
+- %char.disabled%: Now checks if the character is in the 'extracted' state,
+which should definitely count as disabled.
+- %char.unlink_instance%: New character operator for removing the mob-instance
+associate that would cause a mob to be cleaned up when the adventure completes.
+- %damage%: Using this command to heal an incapacitated character now correctly
+un-incapacitates them.
+- %door%: Now accepts alternate direction names ("ne" for "northeast").
+- %instance%: Fixed a bug where this variable did not work correctly without a
+%instance.field% (field). Now gives an error message if an invalid field like
+%instance.foo% is called.
+- %instance.*%: Made the instance variable available to quest start/finish
+triggers that are run outside the instance.
+- %instance.mob(vnum)%: Fixed a bug where this could return purged mobs, thus
+getting stuck in a loop if it tried to purge multiple mobs this way.
+- %instance.nearest_rmt(vnum)% – New script function to locate the nearest
+available copy of a room template.
+- %load%: Now supports a room as an argument (either "room" to target the room
+the script is running in, or "%room%" to target a specific one).
+- %mob.movetype%: Getter for the mob's move verb (also gives walks/flies for
+players).
+- %obj.val0%: You can now change the three object values by passing an argument
+like %obj.val0(15)%.
+- %own%: Fixed a bug where you could not target things directly with a %var%
+reference unless you also provided a type (%own% vehicle %veh% %emp% — instead
+of: %own% %veh% %emp%).
+- %purge%: Added "%purge% instance mob <vnum>" syntax for purging all mobs of a
+given vnum from the instance. Also added an optional [message] argument to all
+%purge% options, which echoes the message each time it purges something.
+- %quest%: Can no longer operate on IN-DEV quests.
+- %regionecho%: Fixed a bug where !LOCATION rooms were seeing region echoes.
+- %restore%: New script command that fixes health, damage, DoTs, negative
+effects, burning, and maintenance.
+- %scale%: Can now rescale an instance.
+- Adventure cleanup scripts: Changed the order these run in so that they still
+have access to the building/instance as they run.
+- Adventure cleanup: Fixed a bug where cleanup scripts didn't run correctly.
+- Buildings: Fixed a bug where buildings/rooms could only get 1 script attached
+to them, ignoring scripts after the first. Buildings now reliably remove their
+scripts when they change or are removed.
+- Coins: Fixed a problem with dropping coins where a script that returns 0
+resulted in the coins being extracted, even if the script purged them. This
+will no longer crash but can result in a situation where the coins end up as an
+item in a player's inventory if the script cancels the drop but doesn't purge
+the coins.
+- Command triggers: Added the ability for 1 trigger to take multiple commands
+(e.g. ritual and rite) using space-separated strings for the trigger ("ritual
+rite"). Prevented command triggers from firing twice if you typed out the full
+command (not abbreviated) and the script returned 0.
+- Commands: Fixed a bug where a mob's script commands would un-hide the mob,
+like normal commands do.
+- Consume trigger: Objects that are required for a build/craft recipe (such as
+an armor pattern or a tent) now fire Consume triggers before allowing the
+craft/building to start, and can prevent it.
+- Context: Fixed a bug where both "unset" and "global" were ignoring context,
+e.g. if two variables had the same name but different context.
+- Damage: Fixed a bug where script damage with no character source would cause
+a crash when tallying damage meters. Scripts will scale both the scripted mob
+and the victim before dealing damage. People with !ATTACK affects (earthmeld,
+hidden mobs, etc) are now immune to script damage.
+- Destroy vehicle trigger: Automatically return 0 if the vehicle is purged.
+- Enemy detection: Fixed a bug where attacking something that isn't attacking
+you back would not count it as an enemy, for scripting.
+- Entry triggers: Portal entry can now be blocked correctly by scripts.
+- Finish-Quest trigger: No longer needs a percent argument.
+- IDs: Mobs, objects, and vehicles now delay when they get their script IDs,
+until the first time the ID is requested. This should prevent (or greatly
+delay) map-spawning mobs from overrunning the ID space when a lot of players
+are moving around on the map.
+- Messages: Now skips color codes when capitalizing script messages like %send%
+and %echo%.
+- Mini-pets: The generic mini-pet script now automatically adds the !EXP flag
+to prevent certain exploitive experience gains.
+- Mobs: Can no longer run random triggers while dead, stunned, incapacitated,
+tied, etc.
+- Mount whistle trigger: Updated targeting on this commonly-used trigger to
+support the "2.whistle" syntax.
+- Object auditor: Now checks for TWO-HANDED + HOLD on items.
+- Object binding: Scripts can now copy an object's binding list directly, for
+loot replacement.
+- Object lookups: Added a way to suppress the error log when looking up an
+object by UID. This prevents a common case where an object doesn't exist but
+it's not an error if not.
+- Objects: Added %obj.bind(person)% to bind/unbind items via script. Added
+%obj.level% var to get the current scaled level.
+- Order of Operations: Corrected the DG Scripts version of "order of
+operations" to properly handle mathematical expressions. You would not believe
+how wrong this code was.
+- Player-in-Room: New trigger type (modifier) that applies random triggers ONLY
+if someone is present. Updated all the stock scripts that need this flag.
+- Random triggers: Rewrote the system that runs random triggers. The game now
+keeps a list of trigger instances that are random, and iterates over that list
+only, rather than iterating over the lists of mobs, objects, vehicles, and
+rooms. This should speed this system, and now allows triggers on map rooms to
+fire just as often, rather than only 1/6 of the time.
+- Reboot: Added a new trigger type that is called when the mud starts up,
+allowing complex adventures to repair any setup that wouldn't survive a reboot.
+- Remote variables: Fixed a bug where new players had no SCRIPT() property and
+so could not receive remote variables until they had logged out at least one
+time.
+- Room people: The %room.people% and %char.next_in_room% fields now ignore
+players who have the !TARGET or !SEE-IN-ROOM flags (e.g. earthmeld, hidden
+spawner mobs, etc).
+- Room vars: Added %room.bld_flagged()% and %room.rmt_flagged()% getters. Added
+the %room.aff_flagged()% getter.
+- Start-Quest trigger: No longer needs a percent argument.
+- Targeting: Added three character vars: %char.obj_target(name)% and
+%char.obj_target_inv(name)% help detect if the character is targeting an object
+in command triggers. %char.char_target(name)% detects a visible character being
+targeted in the room.
+- Terraform/terracrop: Now removes more depletions on the tile.
+- Variables: Rooms, mobs, items, and vehicles now all correctly store global
+variables from their triggers through a reboot.
+- Wizinvis/Wizhide: The following triggers now ignore immortals who are
+invisible: enter, great, leave, memory.
+- can_build: Added %room.can_build(FLAGS)% for checking if a map location is
+buildable.
+- dg_affect: Clarified how this can be used to remove affects, and improved the
+syntax.
+- dg_affect: No longer affects dead people (which was causing a problem).
+- dg_affect_room: New script command for applying an affect to a room.
+- parse_dir: Added a new character variable that checks their
+Navigation/alcohol status.
+- wdoor: Fixed a bug where new exits could only be added by vnum (other
+versions of %door% did not have this bug).
+
+Sectors:
+- Evolutions: Changed evolutions to run on 1/24th of the sectors per game hour,
+iterating only over the sector's tile list. This should alleviate the lag from
+evolutions, which were running all at once. All stock sectors had evolutions
+updated based on the new 30-minute timer (formerly 7.5).
+- Evolutions: Changed how sector evolutions are done, again, to balance
+evolvable tiles over the number of game hours.
+- Overgrown Forest: Base movement cost reduced from 6 to 5.
+
+Skills:
+- Ability points: Added an additional ability point at level 75, raising the
+total to 16.
+- Drop: Updated how abilities are removed when a skill is dropped to a lower
+level.
+- High Sorcery: Removed the hard-coded 'study' action. It has been replaced
+with a trigger that gives you a book to read, and that book grants level 1
+High Sorcery. This only works on enchanted copies of the book. While you CAN
+shelve the book, it's no longer magic if you make a copy of it from your own
+library.
+- Level zero abilities: Skills can now have abilities at level 0, which are
+given to all players regardless of level. These do not count as purchases and
+cannot be dropped.
+- Low-level gains: Skills can no longer be raised without using abilities,
+which was previously possible up to level 15 in about half the stock skills.
+They now behave consistently at all levels. Some skills can be started using
+zero-level abilities.
+- Max Level: Skills can now have a max level between 1 and 100, allowing "minor
+skills" with a lower cap.
+- Min Drop Level: Skills can now have a minimum "drop" level other than zero,
+including 100 to make them undroppable.
+- Skill Drop: Fixed a bug where players who were at level 100 and spent all
+ability points on low-level abilities, could skill drop to 50 or 75 and have
+too many abilities.
+- Swap: Players over level 100 can now have 2 full sets of ability purchases,
+and alternate between them using "skill swap".
+- Trees: Rearranged low-level abilities in skill trees to accommodate
+zero-level abilities and low-level skill gain changes.
+
+Socials:
+- Color: Fixed an issue with custom colors bleeding over to additional lines
+when certain socials are used.
+- Commands: Rewrote the social-handling commands and functions.
+- Converter: Imported old socials into the new system in the 100-299 vnum
+block.
+- Data: Socials now have a hash table and dynamic data, and can be added and
+removed from within the game.
+- Editor: Added the missing minimum-position fields to the editor. Fixed a bug
+where dollar signs were duplicated.
+- Highfive: New social from Yvain.
+- List: Updated what's shown on the detailed ".social list" for immortals.
+- OLC: Socials now have a full-featured editor.
+- Requirements: Added the ability to have requirements on a social, e.g. a
+'tip' social that requires a tophat. When choosing a social, the game now
+prefers one that has requirements over one that doesn't, so a "smile" attached
+to a mask would override a normal "smile" social.
+
+Text Editor:
+- Color codes: Accounted for longer strings in the code that makes color codes
+visible.
+- Empty strings: Some strings are now allowed to be null/empty instead of
+always adding a "Nothing."
+- Formatting: The /f and /fi formatters should no longer add a blank line at
+the end when the final line is long.
+- Length: Fixed a bug where unusually long strings could lead to crashes if
+the /n code was used.
+- Triggers: Fixed an issue where the maximum script length was longer than the
+maximum string length.
+
+Vampires:
+- Definition: Players are now vampires when their Vampire skill is above 0.
+It no longer uses a flag separate from skill level.
+- Drop: Can no longer be manually dropped below 1.
+- Noskill: Siring a person who has noskilled Vampire will now simply kill them.
+- Purify: Now drops the Vampire skill.
+- Sunny: Corrected the definition of "sunny" room to include "outdoor"
+adventure rooms during the day time. This also affects Solar Power.
+
+Vehicles:
+- Autostore: Fixed a bug where items could autostore very fast if they were put
+into a vehicle which hasn't moved recently.
+- Canoe: Fixed the long description so it no longer lies on its side. No longer
+requires items for maintenance.
+- Carrack: Can no longer be used for shipping. Can now be set as a home.
+- Cede: You can no longer attempt to cede the interior room(s) of a vehicle.
+- Custom Description: Now properly restores the prototype's description if you
+abort the editor.
+- Customize: Adding a custom name to a vehicle will now automatically add it to
+the long description, if the long description hasn't been changed yet. This
+averts a problem where players can forget what they named their ship if they
+didn't also set a long description. Vehicles will also now retain their "main
+keyword" when renamed. Also improved the syntax display. Fixed an issue where
+customizing vehicles that don't have look-descriptions could have caused a
+crash.
+- Drive/sail: You can no longer drive/sail one tile on a vehicle you couldn't
+otherwise move. Drunk players will now find themselves driving/sailing in
+circles based on random map rotation.
+- Flags: Vehicles now only save a subset of their vehicle flags to data files,
+so that the rest of the flags can be updated in OLC.
+- Hitpoints: Some vehicles got updated hitpoints to balance them differently
+now that the system has been live for a while, and also due to building
+hitpoint changes. Some vehicles have less than 10 hitpoints and can now decay
+in less than 10 years. Hitpoints are now stored with decimal values to make
+decay rates more reliable when they take 10% of max health each year.
+- Home set: It is now possible to set vehicles as your home, with the same
+requirements as houses (that they have at least 1 citizen slot).
+- Hulk: Typo fix.
+- Interior: You can now "look in <vehicle>" and "identify <vehicle>" from
+inside (this already worked for other look commands). The triggers that set up
+vehicle interiors now remove themselves when done.
+- Look: The vehicle name is now displayed when you look at the vehicle.
+- No-work: Setting the interior of a vehicle as "workforce no-work" will no
+longer block the repair-vehicles or fire-brigade chores on that vehicle.
+- Sit: You can no longer sit in/on a vehicle (or furniture) without the correct
+permissions.
+- Visibility: A player can now always see a vehicle if he is in/on it, leading
+it, or driving it.
+- Visible-in-Dark: New vehicle flag makes some vehicles visible even without a
+light. Many existing vehicles received this flag.
+
+World:
+- Newbie islands: When the annual earthquake resets the world, it will now
+fully restore the newbie islands to nature if the "naturalize_newbie_islands"
+config is on. Any unclaimed tiles will be returned to their original state.
+
+Miscellaneous:
+- Coordinates: Location-targeting commands like portal will now accept a space
+in a set of coordinates such as ( 450, 100), which fixes a copy-paste issue
+where some commands format the X-coordinate to 4 digits and copying their
+output led to an invalid target.
+- Earthquake: You will now auto-dismount if you are knocked to the ground
+during the annual earthquake.
+- Lore: Fixed a small possible issue where some lore functions
+(e.g. remove_lore) did not ensure the player was fully loaded from file before
+trying to remove the lore.
+- Mob ranks: Gave mobs a default empire rank of 1 because of the occasional bug
+where some code incorrectly tries to get name of the empire rank of a mob, and
+crashes.
+- Preferences: Removed some "is npc" checks on preferences that resulted in
+unsual behavior (e.g. immortals who switched into NPCs lost their "compact"
+preference).
+- is_number: Fixed a bug where empty strings were considered to be numbers.
+- skills.h: Removed some unused structs.
+
+== end of 2.0 b5 ==
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+== 2.0 b4 (May 3, 2016) ==
 
 Abilities:
 - Advanced Woodworking: Now requires Trade 55.
@@ -1081,7 +2817,6 @@ vehicles.
 workforce, not on water, and not on land belonging to someone else (except an
 ally).
 - ships.c: Removed now-empty code file that supported the old ship system.
-
 
 == end of 2.0 b4 ==
 

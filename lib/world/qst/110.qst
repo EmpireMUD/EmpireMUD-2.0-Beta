@@ -1,0 +1,141 @@
+#11000
+Hatch the Egg~
+   This giant egg needs help with the final stage of its incubation, and the
+mother is nowhere to be seen. A special salve made from zephyr cattails would
+do the trick. Follow these instructions to complete the quest:
+1. Take the zephyr cattail seeds (provided if you don't have any).
+2. Plant the seeds along the river. Be sure to claim the crop.
+3. Grow enough zephyr cattails for the quest. If you need more, grind
+   a bundle of cattails into more seeds.
+4. Light the cattails to prepare them for the salve.
+5. Mill the burnt cattails into a zephyr salve.
+6. Return to the egg to complete the quest.
+~
+   You apply the zephyr salve to the egg, which immediately takes on a bright
+red glow and begins to crack... A huge, rust-colored roc alights above you on
+the edge of the nest as her baby breaks out of the shell.
+~
+6 bcde 100 125 -1
+A
+2 11001
+P
+6 11001 0 1 a
+P
+6 11002 0 1 a
+P
+6 11003 0 1 a
+R
+2 11014 1
+R
+2 11013 4
+R
+2 11005 2
+T 11008
+T 11006
+W
+2 11016 0 4
+Z
+2 11001
+S
+#11001
+Protect the Hatchling~
+   The gigantic egg is about to hatch, but the chick inside will need some
+supplies if it's going to survive. You receive a supply list for the nest.
+Return when you've made them all.
+~
+   You arrive with supplies just as the egg hatches. A rust-colored roc the
+size of a temple alights on the edge of the nest. She looks pleased with the
+supplies you've brought.
+~
+13 bcde 100 125 -1
+A
+2 11001
+P
+6 11000 0 1 a
+P
+6 11002 0 1 a
+P
+6 11003 0 1 a
+P
+9 6 0 15 a
+R
+2 11014 1
+R
+2 11013 4
+R
+2 11005 2
+T 11019
+T 11006
+W
+2 11055 0 2 a
+W
+2 11056 0 2 a
+W
+2 11057 0 2 a
+Z
+2 11001
+S
+#11002
+Steal the Egg~
+   An egg like this is worth a fortune on the black market, and you know just
+who to sell it to. When you start this quest, you will automatically grab the
+egg and flee the nest. The egg's mother will surely be right on your tail, so
+flee as fast as you can and hide out until your buyer appears (5 minutes). If
+you're caught, or are in combat when the timer ends, you will fail the quest.
+~
+You trade the egg for your rewards, relieved that you escaped safely.
+~
+9 bce 100 125 -1
+A
+2 11001
+P
+6 11000 0 1 a
+P
+6 11001 0 1 a
+P
+6 11003 0 1 a
+P
+15 143 0 1 a
+R
+2 11013 4
+R
+2 11007 1
+R
+2 11052 1
+T 11018
+W
+11 0 0 1
+Z
+1 11003
+S
+#11003
+Smash the Egg~
+   These fearsome rocs have been killing farm animals in this region. You can
+put a stop to it now! You smash the egg, preventing future generations of the
+legendary bird from terrorizing the countryside. Now you merely need to contend
+with the mother...
+~
+You retrieve your rewards from the dead roc.
+~
+9 bce 100 125 -1
+A
+2 11001
+P
+6 11000 0 1 a
+P
+6 11001 0 1 a
+P
+6 11002 0 1 a
+R
+2 11013 4
+R
+2 11007 1
+R
+2 11052 1
+T 11003
+W
+3 11000 0 1
+Z
+1 11001
+S
+$

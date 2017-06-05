@@ -21,6 +21,21 @@ See also: CHANT, CHANT OF NATURE, HEAL, CLEANSE, PURIFY, EARTHARMOR,
     SOLAR POWER, EARTHMELD, WORM, FLY, GIFT OF NATURE, SUMMON ANIMALS,
     TOUCH OF FLAME, ANIMAL FORMS
 #
+ACIDBLAST "ACID BLAST"
+
+Acidblast
+Class ability:  Alchemist
+
+Usage:  acidblast [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+Debuff type:  Natural Magic
+
+An alchemist can create a magical acid blast, injuring her victim as well as
+decreasing the victim's magical resistance.
+
+See also: ALCHEMIST CLASS
+#
 "ANCESTRAL HEALING"
 
 Ancestral Healing
@@ -58,6 +73,22 @@ This ability gains experience when you finish morphing into one of these forms.
 
 See also: MORPH
 #
+ASTRALCLAW "ASTRAL CLAW"
+
+Astralclaw
+Class ability:  Werewolf
+
+Usage:  astralclaw [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+Debuff type:  Natural Magic
+
+By striking out with astral claws, the werewolf deals magical damage at a
+distance. These claw strikes also rip open the victim's flesh, dealing physical
+damage over time. This DoT effect stacks up to 3 times.
+
+See also: DOT, WEREWOLF CLASS
+#
 "BANSHEE FAMILIAR"
 
 Banshee
@@ -66,7 +97,7 @@ Familiar type:  debuff
 
 The banshee familiar will use the following abilities in combat:
 - Soul-shattering wail: -(level/20) Resist-Physical/Magical on enemies (30 sec)
-- Terrifying wail: -10 To-Hit on enemies (30 sec)
+- Terrifying wail: -(5+level/50) To-Hit on enemies (30 sec)
 - Heart-wrenching wail: -(level/30) Bonus-Physical/Magical on enemies (30 sec)
 - Blood-curdling wail: Magical DoT on enemies (30 sec)
 
@@ -91,10 +122,10 @@ Class ability:  Feral
 Familiar type:  debuff
 
 The basilisk familiar will use the following abilities in combat:
-- Marble gaze: +20 Block on the tank (30 sec)
+- Marble gaze: +(15+level/50) Block on the tank (30 sec)
 - Quartzite gaze: -(level/20) Bonus-Physical/Magical on enemy (30 sec)
-- Basalt gaze: -4 Wits on enemy (30 sec)
-- Granite gaze: -20 To-Hit on enemy (30 sec)
+- Basalt gaze: -(2+level/100) Wits on enemy (30 sec)
+- Granite gaze: -(15+level/25) To-Hit on enemy (30 sec)
 
 See also: DEBUFF, FAMILIAR, FERAL CLASS
 #
@@ -111,7 +142,8 @@ To brew potions you will require:
  - glass: an alchemist shop, laboratory, or an empire that has glassblowing
  - herbs
 
-See also: CRAFTING LEVEL, RESOURCES, KEEP, HEALING POTIONS, NATURE POTIONS
+See also: CRAFTING LEVEL, RESOURCES, KEEP, HEALING POTIONS, NATURE POTIONS,
+RECIPES
 #
 CHANT
 
@@ -160,7 +192,8 @@ See also: CHANT
 
 Each Natural Magic class has its own set of familiars. These are summoned with
 the 'familiar' command, but don't require the regular Familiar ability. Some
-class roles have different familiars than other roles in the same class.
+class roles have different familiars than other roles in the same class. Like
+all class abilities, you must reach skill level 100 to use these.
 
 Werewolf:
   Spirit Wolf (tank) - Will debuff the enemy.
@@ -173,7 +206,7 @@ Luminary:
 
 Archmage:
   Phoenix (healer) - Buffs the party.
-  Caster has no familiar, but Mirror Image counts as one.
+  Caster has no familiar of its own.
 
 Shadow Wolf:
   Scorpion Shadow (melee) - Debuffs the enemy.
@@ -231,6 +264,9 @@ Using this ability multiple times on the same target and same trait will stack
 onto the same +trait buff and -Strength debuff and also reset their timer, so
 you can refresh this buff's full effect if you have the Strength to recast it
 before it expires.
+
+You can confer: block, dodge, health, health-regen, mana, mana-regen,
+  move, move-regen, resist-magical, resist-physical, to-hit
 #
 COUNTERSPELL "COUNTER SPELL"
 
@@ -246,6 +282,20 @@ it deflects a spell. You can only have one counterspell active at a time.
 
 This ability gains experience when your counterspell is triggered.
 #
+DEATHTOUCH "DEATH TOUCH"
+
+Deathtouch
+Class ability:  Necromancer
+
+Usage:  deathtouch [victim]
+Cooldown:  6 seconds
+Cost:  based on damage
+
+This fast spell deals instant damage to your victim, as the very essence of
+death seeps into him.
+
+See also: NECROMANCER CLASS
+#
 "DIRE WOLF FAMILIAR"
 
 Dire Wolf
@@ -256,6 +306,20 @@ The dire wolf will assist you in combat, adding to the damage against your
 enemy.
 
 See also: FAMILIAR, WEREWOLF CLASS
+#
+DISPIRIT DESPIRIT
+
+Dispirit
+Class ability:  Shadow Wolf
+
+Usage:  dispirit [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+Debuff type:  Natural Magic
+
+Dispirit drains the opponent's wits, causing him pain and anguish as it does.
+
+See also: SHADOW WOLF CLASS
 #
 EARTHARMOR "EARTH ARMOR"
 
@@ -283,7 +347,11 @@ Cost:  50 mana
 
 This command lets you sink into the earth, or rise again, using the power of
 Natural Magic. You can do nothing while interred within the earth, but it is
-a safe place -- nothing can hurt you.
+often the safest place to be.
+
+However, you will take damage from nature burn if someone is digging in the
+dirt while you're earthmelded. You stop taking nature burn damage as soon as
+you end your earthmeld.
 
 Gains experience when you sink into the ground.
 
@@ -310,6 +378,22 @@ second person will release the first one.
 
 Gain experience when you cast this spell.
 #
+ERODE
+
+Erode
+Class ability:  Luminary
+
+Usage:  erode [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+Debuff type:  Natural Magic
+
+Erode causes the victim's skin to dry up and shed, like a cliffside in the
+wind. It causes great pain immediately, then continues to deal magical damage
+over time. This DoT effect stacks up to 3 times.
+
+See also: DOT, LUMINARY CLASS
+#
 FAMILIAR
 
 Familiar (Natural Magic ability)
@@ -322,7 +406,7 @@ the point where they can summon the aid of a familiar animal. When you call
 a familiar, it appears, follows you, and prepares to take orders.
 
 The power and abilities of the familiar are based on your prowess in Natural
-Magic.
+Magic and your total level.
 
 This ability gains experience when you summon these familiars.
 
@@ -480,12 +564,13 @@ Lightningbolt (Natural Magic ability)
 Usage:  lightningbolt [target]
 Cooldown:  9 seconds
 DoT Duration:  15 seconds
-Cost:  25 mana
+Cost:  based on damage
 Debuff type:  Natural Magic
 
 A powerful nature mage can shoot bolts of lightning from her fingertips,
 causing massive trauma to the target, and leaving them shocked. Victims con-
-tinue to take damage for several seconds.
+tinue to take damage for several seconds. Damage is based on level, role, and
+traits.
 
 If you cast this spell without a target, it will hit the person you are
 fighting.
@@ -510,10 +595,10 @@ Class ability:  Werewolf (healer)
 Familiar type:  buff
 
 The moon rabbit familiar will use the following abilities in combat:
-- Replenish: +(level/3) Mana to master (instant)
-- Re-energize: +(level/20) Mana-Regen to master (30 sec)
+- Replenish: +(level*2/3) Mana to master (instant)
+- Re-energize: +(level/10) Mana-Regen to master (30 sec)
 - Bright as the moon: +(level/20) Resist-Physical/Magical on party (30 sec)
-- Moon's protection: +(level/10) Resist-Physical/Magical on the tank (30 sec)
+- Moon's protection: +(level/5) Resist-Physical/Magical on the tank (30 sec)
 
 See also: BUFF, FAMILIAR, WEREWOLF CLASS
 #
@@ -561,10 +646,10 @@ Class ability:  Shadow Wolf (healer)
 Familiar type:  buff
 
 The owl shadow familiar will use the following abilities in combat:
-- Dark Wings: +20 Dodge on tank (30 sec)
+- Dark Wings: +(15+level/25) Dodge on tank (30 sec)
 - Healing Darkness: +(level/20) Heal-Over-Time on party (30 sec)
 - Invigorating Darkness: +(level/5) Move points on party (instant)
-- Brilliant Darkness: +2 Wits on party (30 sec)
+- Brilliant Darkness: +(1+level/100) Wits on party (30 sec)
 
 See also: BUFF, FAMILIAR, SHADOW WOLF CLASS
 #
@@ -593,9 +678,7 @@ Purify is used by Natural Magic casters to wipe away serious curses such as
 Vampirism. However, it doesn't work on daywalking vampires. You can cast this
 spell on those not affected by such curses, but it will have no effect.
 
-This spell cures vampirism and removes all vampiric abilities, but doesn't
-remove levels of the Vampire skill - use 'skill drop' for that. ('skill drop'
-cannot cure vampirism on its own.)
+This spell cures vampirism and removes all vampiric abilities and skill.
 
 Because this power could be used to harass other players, they must enable
 the "bother" toggle before you can use it on them. 
@@ -624,6 +707,11 @@ While warriors fight with axes and thieves fight with daggers, most mages
 prefer to fight using magic. The Ready Fireball ability removes your main
 weapon and replaces your normal combat attacks with fireballs.
 
+The strength of your fireball will be based on your Natural Magic skill level,
+unless you have a Natural Magic over 75, in which case it will be based on
+your total composite level (if you're wielding a permanent weapon when you
+ready a fireball, this will include any levels you get from that weapon).
+
 If you wish to stop using fireballs, you can type "remove fireball" just like
 you would with a weapon.
 
@@ -635,7 +723,7 @@ Rejuvenate (Natural Magic ability)
 
 Usage:  rejuvenate [target]
 Cooldown:  15 seconds
-Cost:  25+ mana (based on amount healed)
+Cost:  (based on amount healed)
 
 By blessing a person with rejuvenation, a nature mage can cause that person's
 wounds to heal themselves over time. This spell heals the target every 5
@@ -690,7 +778,7 @@ Familiar type:  buff
 The salamander familiar will use the following abilities in combat:
 - Alchemist's Fire: +(level/4) Bonus-Healing on master (10 sec)
 - Soothing flames: +(level/4) Heal-Over-Time on tank (10 sec)
-- Guardian flames: +20 Dodge on tank (10 sec)
+- Guardian flames: +(15+level/25) Dodge on tank (10 sec)
 - Ember surge: +(level/30) Bonus-Physical/Magical on party (30 sec)
 
 See also: BUFF, FAMILIAR, ALCHEMIST CLASS
@@ -716,7 +804,7 @@ Familiar type:  debuff
 The scorpion shadow familiar will use the following abilities in combat:
 - Creeping Venom: slows an enemy (30 sec)
 - Shadow Venom: -(level/20) bonus physical/magical damage on enemy (30 sec)
-- Numbing Venom: -4 Wits on enemy (30 sec)
+- Numbing Venom: -(2+level/100) Wits on enemy (30 sec)
 - Agonizing Venom: Poison DoT on enemy (30 sec)
 
 See also: DEBUFF, FAMILIAR, SHADOW WOLF CLASS
@@ -738,16 +826,22 @@ Skybrand (Natural Magic ability)
 
 Usage:  skybrand [target]
 Cooldown:  6 seconds
-Cost:  30 mana
+Cost:  based on damage and skill level
 Debuff type:  Natural Magic
 
 A nature mage can mark a target with the Skybrand, causing the victim to take
 damage for several seconds. This ability stacks up to 3 times.
 
+In caster or solo role, damage is based on total level, Intelligence, and
+Bonus-Magical damage. In all other roles, it is based on skill level and
+Intelligence only.
+
 If you cast this spell with no target, it will target the person you are
 fighting.
 
 Gains experience when you cast this spell.
+
+See also: CASTER, SOLO
 #
 "SOLAR POWER"
 
@@ -758,7 +852,8 @@ ability, mana regeneration doubles as long as it's sunny. This ability scales
 with your Natural Magic skill, and as a class skill it works even without the
 sun.
 
-Solar Power gains experience every time you benefit from its effect.
+Solar Power gains experience every time you benefit from its effect. The sun
+is up from 7am to 7pm each day (every other 15 minutes of gameplay).
 #
 SOULSIGHT "SOUL SIGHT"
 
@@ -784,9 +879,9 @@ Class ability:  Werewolf (tank)
 Familiar type:  debuff
 
 The spirit wolf familiar will use the following abilities in combat:
-- Bolt of Lightning: -2 Dexterity on enemy (30 sec)
-- Clap of Thunder: -20 Dodge on enemy (30 sec)
-- Bark/Blurred Vision: -20 To-Hit on enemy (30 sec)
+- Bolt of Lightning: -(level/100) Dexterity on enemy (30 sec)
+- Clap of Thunder: -(15+level/25) Dodge on enemy (30 sec)
+- Bark/Blurred Vision: -(15+level/25) To-Hit on enemy (30 sec)
 - Bite/Ghost Energy: Magical DoT on enemy (30 sec)
 
 See also: DEBUFF, FAMILIAR, WEREWOLF CLASS
@@ -799,13 +894,27 @@ Usage:  summon animals
 Cooldown:  30 seconds
 Cost:  10 mana
 
-This ability allows you to summon up to (Wits / 3, rounded up) animals from
+This ability allows you to summon up to (Charisma / 3, rounded up) animals from
 the surrounding area. These animals will follow you as their leader, and will
 take simple orders.
 
 Summon Animals gains experience when you use it, even if no animals appear.
 
 See also: ORDER
+#
+STARSTRIKE "STAR STRIKE"
+
+Starstrike
+Class ability:  Feral
+
+Usage:  starstrike [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+
+Starstrike calls down meteors from the heavens, dealing incredible damage to
+your victim!
+
+See also: FERAL CLASS
 #
 "TOUCH OF FLAME"
 
@@ -854,7 +963,11 @@ Usage:  worm <direction>
 
 Particularly powerful nature mages can move while earthmelded, worming their
 way through the ground. You cannot worm through water tiles, and you cannot
-emerge in buildings.
+emerge in buildings (except open-air buildings).
+
+Your tie to nature is important while worming. If you spend time underneath
+a closed building, you will begin to take damage from nature burn. You stop
+taking nature burn damage as soon as you end your earthmeld.
 
 Gains experience as you move around underground.
 

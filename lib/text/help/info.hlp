@@ -36,7 +36,7 @@ Full multiplaying rules are found by typing POLICY.
 
 See also: ALTERNATE
 #
-ACTION ACTIONS CHORE CHORES "TIMED ACTION"
+ACTION ACTIONS "TIMED ACTIONS"
 
 EmpireMUD uses timed actions for most chores. These are things that happen
 over time until complete. Some of them will also automatically repeat when
@@ -49,13 +49,22 @@ messages for starting and stopping the action, plus any resources you get.
 
 The following things will speed up various chores:
 - Faster chores (bonus): dig, gather, chop, build, dismantle, harvest, plant,
-   mine, mint, repair, chip, excavate, pick, scrape, fillin, saw, quarry, tan
+   mine, mint, repair, chip, excavate, pick, scrape, fillin, saw, quarry, tan,
+   cook, smelt
 - Finder: dig, gather, pan, pick
 - Haste: dig, gather, chop, build, dismantle, harvest, plant, mine, repair,
    play (music), excavate, pick, scrape, fillin, saw, quarry
 - Shovel: dig
+- Weapon damage: chop, pick
 
 See also: BONUS TRAITS, FINDER, SHOVEL, TOGGLE
+#
+APPROVAL AUTHORIZATION AUTHORIZED APPROVED
+
+If this MUD is configured to require player approval, you need to contact the
+game's staff to find out how to become approved. Or, check the MOTD or website.
+
+Implementors: update this help file in: lib/text/help/info.hlp
 #
 ADVENTURE "ADVENTURE ZONE" ZONE "ADVENTURE SUMMON"
 
@@ -79,12 +88,12 @@ the adventure summon. (Except random-teleport.)
 
 See also: ACCEPT, GROUP, NEARBY
 #
-ATTRIBUTES STATS STRENGTH DEXTERITY CHARISMA GREATNESS GRT INTELLIGENCE INTELLECT WITS
+ATTRIBUTES STATS
 
 Current stat implementations are as follows:
 
 Physical attributes:
-  Strength (active) - Affects melee weapon damage (except magic weapons).
+  Strength (active) - Affects melee weapon dps (except magic weapons).
   Dexterity (passive) - Affects to-hit and dodge chances.
 
 Social attributes:
@@ -92,16 +101,18 @@ Social attributes:
   Greatness (passive) - Affects empire score and total available territory.
 
 Mental attributes: 
-  Intelligence (active) - Affects magic strength and magic weapon damage.
-  Wits (passive) - Affects combat speed (rate of attack).
+  Intelligence (active) - Affects magic strength and magic weapon dps.
+  Wits (passive) - Affects combat speed (rate of attack) and damage.
+
+You can find more information in the help file for each attribute.
 
 The active attribute in each category cannot go below 1 from equipment; you
 will not be able to use any item that lowers your active attributes below 1.
 There is also currently a maximum rating of 15 in these attributes.
 
-See also: DODGE, EMPIRE GREATNESS, SPEED, TO-HIT
+See also: DODGE, DPS, EMPIRE GREATNESS, SPEED, TO-HIT
 #
-AUTORECALL "AUTO-RECALL" "AUTO RECALL"
+AUTORECALL "AUTO-RECALL" "AUTO RECALL" "TOGGLE AUTORECALL"
 
 Usage:  toggle autorecall
 
@@ -120,7 +131,7 @@ vast, open world. All items left on the ground or in containers may be stored
 or cleaned up automatically.
 
 The auto-store/auto-clean system engages when an item has been left alone for
-three hours, and will not trigger if a player is present.
+three hours, but will not trigger if a player is present.
 
 If the location is claimed by an empire, NPCs store the items to that empire's
 inventory (if possible). If items can't be stored, they remain on the ground
@@ -131,15 +142,11 @@ enchanted or superior cannot be stored.
 If the land is not claimed, animals and stray humans make off with the items,
 never to be seen again.
 
-Items which can't be picked up, like carts, are not normally affected by this
-system. However, items left inside of carts will be stored or cleaned up. This
-also applies to personal chests.
+Items which can't be picked up, like signs, are not normally affected by this
+system. However, items left inside of vehicles will be stored or cleaned up.
+This also applies to personal chests, if the item is storable.
 
-(EmpireMUD used to let you keep storable items in personal chests, but revoked
-this due to players using chests to abuse limitations on Workforce.)
-
-Do not attempt to circumvent the auto-store system. If you think you found a
-way to keep items from auto-storing, please report it as a bug.
+Bound items and other non-storables are safe to keep in your home or chest.
 #
 AXE
 
@@ -244,7 +251,7 @@ twice.
 Available traits:
  More Strength, Dexterity, Charisma, Greatness, Intelligence, or Wits - +1
  Extra health, moves, or mana - +15
- Faster health, move, or mana regeneration - +1
+ Faster health, move, or mana regeneration - 1 + (level/20)
  Faster chores - chopping, digging, and other chores go faster
  Extra daily bonus experience - 5 extra daily bonus experience points
  Larger inventory - Carry 5 more small items (or 2 more large items)
@@ -266,7 +273,10 @@ The BONUS-MAGICAL gear stat, also shown on your score page as "Magical +X",
 is an amount added to any magical damage you deal, including Intelligence-based
 melee attacks (like Ready Fireball) and spells.
 
-It is added to damage in the same way as Intelligence.
+Bonus-Magical is applied to an average speed of 4.0, meaning if your weapon
+is faster than that, a smaller amount may be added to your damage -- and the
+opposite if it's slower. It is worth 0.25 damage per second. Speed boosts like
+Wits and Haste will increase the percentage of bonus damage added.
 
 See also: SCORE
 #
@@ -276,7 +286,10 @@ The BONUS-PHYSICAL gear stat, also shown on your score page as "Physical +X",
 is an amount added to any physical damage you deal. This includes melee combat
 and physical abilities.
 
-It is added to damage in the same way as Strength.
+Bonus-Physical is applied to an average speed of 4.0, meaning if your weapon
+is faster than that, a smaller amount may be added to your damage -- and the
+opposite if it's slower. It is worth 0.25 damage per second. Speed boosts like
+Wits and Haste will increase the percentage of bonus damage added.
 
 See also: SCORE
 #
@@ -285,10 +298,10 @@ See also: SCORE
 You can create a cooking fire by lighting a tree or log, using a flint set.
 This will let you cook food, brew potions, or craft pottery.
 
-You can also cook in a Kitchen, Alchemist, Pottery, or Laboratory. If you have
+You can also cook in a Kitchen, Alchemist, Potter, or Laboratory. If you have
 the Touch of Flame ability, you don't need a fire at all.
 
-See also: LIGHT, TOUCH OF FLAME
+See also: DOUSE, LIGHT, TOUCH OF FLAME
 #
 CHAMELEON
 
@@ -296,7 +309,7 @@ The "chameleon" trait is the property of some buildings to be invisible at a
 distance. Instead of seeing the building and its owner's banner, you see only
 normal terrain.
 #
-CHANNELS SHOUT /OOC /NEWBIE /RECRUIT /TRADE
+CHANNEL CHANNELS SHOUT /OOC /NEWBIE /RECRUIT /TRADE
 
 Usage:  shout <message>
 
@@ -310,7 +323,7 @@ The following channels are available on EmpireMUD:
 
 Global channels:
 &Y/ooc&0 - General chat
-&g/newbie&0 - Newbie channel
+&j/newbie&0 - Newbie channel
 &R/recruit&0 - Empire recruitment channel
 &o/trade&0 - Global trade channel
 &yshout&0 - an in-character channel limited to 50 map tiles distance
@@ -320,7 +333,21 @@ Local channels
 say - in-character speech
 oocsay - out-of-character speech
 
-See also: TOGGLE, SLASH-CHANNELS
+See also: TOGGLE, SAY, SLASH-CHANNELS
+#
+CHARISMA CHA
+
+Charisma (social attribute)
+Type:  active (you can't drop below 1)
+
+Charisma is a measure of your character's charm and ability to manipulate a
+situation.
+
+Charisma is used for:
+ - Improving your fishing ability.
+ - Many Stealth abilities.
+
+See also: ATTRIBUTES
 #
 COIN COINS COINAGE CURRENCY GOLD
 
@@ -391,6 +418,10 @@ different types of resources:
    craft, you must have the entire pool cost available at once. You can't spend
    your last health or blood point in this way, but be warned: you can get
    dangerously close to death if the resource requirement is health or blood.
+   
+&cTasks&0 - Some recipes (especially for maintenance) just need a bit more work.
+   Tasks are written in square brackets like "1x [dig]". They take time like
+   adding any other resource, but don't use any materials.
 
 When you dismantle a building, you get back half of the resources you used to
 build it -- but only items (including generic components). Canceling a craft
@@ -399,7 +430,8 @@ before it's finished will refund the entire cost including coins and pools.
 The 'keep' command can be used to prevent items in your inventory from being
 used for your craft and building commands.
 
-See also: BUILD, CRAFT, DISMANTLE, FORGE, IDENTIFY, KEEP
+See also: BUILD, CRAFT, DISMANTLE, FORGE, IDENTIFY, KEEP, COMPONENT TYPES
+  RESOURCE ACTIONS
 #
 COOLDOWNS "COOL DOWNS" CD
 
@@ -442,6 +474,21 @@ replenish unless you dismantle them completely.
 Forests will spread at their edges over time, creating more trees to chop.
 Desert Groves re-grow on their own, at random.
 #
+DEXTERITY DEX
+
+Dexterity (physical attribute)
+Type:  passive (you can go as low as 0)
+
+Dexterity is a measure of how well your character moves, and affects how you
+function in combat.
+
+Dexterity is used for:
+ - A core attribute for the melee, caster, and tank class roles.
+ - Increases your chance to hit in combat.
+ - Increases your chance to dodge in combat.
+
+See also: ATTRIBUTES, MELEE, CASTER, TANK, TO-HIT, DODGE
+#
 "DIMINISHING RETURNS"
 
 Diminishing returns are numbers that increase quickly at low levels, but more
@@ -462,6 +509,11 @@ See the prompt help file for information on available display codes.
 Helpful hint: Set an alias to display your favorite set of info.
 
 See also: ALIAS, PROMPT
+#
+DISTRACTED
+
+When a character is distracted, he or she can't perform timed actions such as
+chopping or chanting.
 #
 DODGE "DODGE CAP"
 
@@ -484,7 +536,7 @@ Dodge cap:
 
 See also: AFFECTS, SCORE, TO-HIT
 #
-DOT "DOT EFFECT" "DAMAGE OVER TIME" DAMAGE-OVER-TIME
+DOT "DOT EFFECT" "DAMAGE OVER TIME" DAMAGE-OVER-TIME STACKS STACKING
 
 A DoT (Damage over Time) effect is one that continues to deal damage. These
 come from spells, abilities, scripts, and other sources. They deal damage every
@@ -493,12 +545,24 @@ five seconds until they expire.
 Some DoT effects can stack multiple times. The damage shown on your score or
 affects command is the total damage per 5 seconds (base multiplied by stacks),
 and the number at the end (example: 1/5) is the current and maximum number of
-stacks.
+stacks. If you re-cast a DoT effect before it expires, it will refresh the
+timer and add one to the stack count (up to the maximum).
 
 Physical and poison DoTs can be removed by firstaid and cleanse. Magical and
 fire DoTs can be removed by dispel.
 
 See also: AFFECTS, CLEANSE, DISPEL, FIRSTAID, SCORE
+#
+DRUNK DRUNKENNESS ALCOHOL SOBER "SOBERING UP" "WHY WON'T THE WORLD STOP SPINNING"
+
+If you find yourself with a pint of ale or some other lubricating libation,
+you may also notice the world beginning to spin. This is perfectly normal, and
+you can get off the ride at any time just by casting a 'cleanse' spell on
+yourself.
+
+You can also sober up faster by sleeping it off.
+
+See also: CLEANSE, SLEEP, TAVERN
 #
 FARMING CROPS ORCHARDS AGRICULTURE APPLES WHEAT CORN HOPS COTTON BARLEY PEACHES CHERRIES ORANGES RICE OLIVES PEAS GOURDS PLANTAINS TOMATOES BANANAS COCONUTS GRAPES PEPPERS POTATOES PLUMS STRAWBERRIES MANGOES BLUEBERRIES COFFEE OATS WATERMELONS
 
@@ -514,7 +578,7 @@ Temperate crops (plains):
  &gxgxx&0  Grapes              &g::::&0  Hops                 &Tiiii&0  Oats
  &Y^o^^&0  Peaches             &G....&0  Peas                 &g^^&vo&g^&0  Plums
  &gnnnn&0  Potatoes            &gn&Rv&gnn&0  Strawberries         &Ro&g88&Ro&0  Tomatoes
- &Y;;;;&0  Wheat
+ &Y;;;;&0  Wheat               &G@@@@&0  Lettuce
 
 Arid crops (desert):
  &y.&g/&to&y.&0  Coconuts            &0::::&0  Cotton               &Y.&G^o&G.&0  Olives
@@ -530,6 +594,25 @@ River crops (plains near river):
 Most crops are used to make food and drink. Some, like cotton, have other uses.
 
 See also: CHOP, COOK, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE
+#
+GREATNESS GRT
+
+Greatness (social attribute)
+Type:  passive (you can go as low as 0)
+
+Greatness is a measure of the majesty your character portrays, as well as how
+others perceive you.
+
+Greatness is used for:
+ - Increasing the amount of territory your empire can control.
+ - Increasing your empire's score and ranking.
+ - Certain class abilities such as Noble Bearing.
+
+Empires also have a Greatness rating, equal to the total Greatness of their
+members. However, if you have multiple alts (your other characters) in the same
+empire, only the highest Greatness is counted.
+
+See also: ALTS, ATTRIBUTES, ESCORE, TERRITORY, NOBLE BEARING
 #
 HAMMER
 
@@ -549,6 +632,21 @@ Your base health at level 100 is based on your class.
 If you're knocked out with 0 health, you will die without assistance.
 
 See also: CLASS, DEATH, ENDURANCE
+#
+HISTORY "CHANNEL HISTORY" "CHAT HISTORY"
+
+You can see chat history for various channels with the following commands:
+  SAYHISTORY - say, oocsay, gsay, emote, socials
+  TELLHISTORY - tells and replies
+  EHISTORY - etalk
+  /HISTORY <channel> - slash-channels
+
+Immortals also have:
+  GHISTORY - godnet, wiznet
+
+Your chat history only contains messages that you were connected and in-game
+for. History messages last for up to 24 hours, but only the last 20 messages
+are stored.
 #
 HOSTILE ROGUE THIEF
 
@@ -610,6 +708,22 @@ same adventure may have different level requirements. The 'adventure' command
 is a good way to see what level (or level range) an instance is scaled to.
 
 See also: ADVENTURE
+#
+INTELLIGENCE INT INTELLECT
+
+Intelligence (mental attribute)
+Type:  passive (you can't drop below 1)
+
+Intelligence is the measure of your character's cunning and wisdom, used to
+enhance magical spells and damage.
+
+Intelligence is used for:
+ - A core attribute for the caster and healer class roles.
+ - Increasing the DPS (damage per second) from magical weapons.
+ - Increasing the power of healing spells.
+ - Increasing the effect of many other spells.
+
+See also: ATTRIBUTES, CASTER, HEALER
 #
 LEVEL LEVELS "GEAR LEVELS" "SKILL LEVEL"
 
@@ -741,6 +855,9 @@ EmpireMUD supports the following MSDP variables:
  OPPONENT_HEALTH_MAX - Always 100 (when in combat)
  OPPONENT_LEVEL - In combat, the opponent's level
  OPPONENT_NAME - In combat, the opponent's name
+ OPPONENT_FOCUS_NAME - In combat, the opponent's focus' name
+ OPPONENT_FOCUS_HEALTH - In combat, the opponent's focus' health
+ OPPONENT_FOCUS_HEALTH_MAX - In combat, the opponent's focus' max health
 
  AREA_NAME - The name of the adventure, city, or island the player is in
  ROOM - The room data array, see http://tintin.sourceforge.net/msdp/index.php
@@ -775,15 +892,32 @@ See also: ALTERNATE
 #
 NEARBY
 
-Usage:  nearby
+Usage:  nearby [type]
 
 This command lists nearby starting locations and cities, with the distances to
 them. This can help you figure out where to found a new city. It can also find
 some adventure zones.
 
 If you have the Navigation ability, this will also include the location.
+
+You can specify what type of thing to look (cities, adventures, starting
+locations) if you want a shorter list.
+
+Certain adventures won't show up on 'nearby', usually because of the
+adventure's design.
 #
-PLAYERKILLING "PLAYER KILLING" PK PVP
+"NEWBIE ISLANDS"
+
+Newbie islands are a safe place for newbies to learn and practice the game.
+Depending on the settings for this EmpireMUD, some of the following things
+may happen on newbie islands:
+- Empires lose most claimed land on a newbie island after a week.
+- The map returns to its natural state each week on the newbie island.
+- Hostile mobs like the highwayman won't attack you on a newbie island.
+
+See also: INFO, GETTING STARTED
+#
+PLAYERKILLING "PLAYER KILLING" PK PVP "TOGGLE PVP"
 
 EmpireMUD player-killing rules
 
@@ -807,6 +941,22 @@ If you want free and open PVP, you can turn this on with "toggle pvp". This
 flag will remain active for 5 minutes after you shut it off.
 
 See also: TOGGLE
+#
+POSITIONS
+
+Your character's position determines which commands you can use, whether you
+can move, or how injured you are. The following positions are available:
+  &cStanding&0 - Able to move, fight, and act (the default position).
+  &cFighting&0 - Engaged in combat.
+  &cSitting&0 - Slightly boosted regen, still able to interact.
+  &cResting&0 - Slightly boosted regen, still able to interact.
+  &cSleeping&0 - Very fast regen, unable to see or do anything.
+  &cStunned&0 - Injured in battle, but will recover.
+  &cIncapacitated&0 - Slowly dying, but we're all dying at different speeds.
+  &cMortally wounded&0 - The Usain Bolt of dying.
+  &cDead&0 - The final position.
+
+See also: RESPAWN, REST, SIT, STAND, WAKE
 #
 "QUEST ITEM" "QUEST OBJECT" "QUEST FLAG"
 
@@ -833,6 +983,8 @@ of the attacker's level. (You need 50 resistance to reach the cap against a
 level 100 mob.) Magical resistance is the second number in the 'Resist' section
 of your score.
 
+If your resistance is negative, you will take increased damage.
+
 Note that fire from magical sources (like the Ready Fireball ability) is
 reduced by this, but fire from physical sources (like a torch weapon) falls
 under physical resistance instead.
@@ -850,6 +1002,8 @@ The amount of resistance required to hit the 25% reduction cap is equal to half
 of the attacker's level. (You need 50 resistance to reach the cap against a
 level 100 mob.) Physical resistance is the first number in the 'Resist' section
 of your score.
+
+If your resistance is negative, you will take increased damage.
 
 Physical resistance includes resistance to fire damage (but not magical fire;
 that's magic resistance). This trait is similar to the "soak" trait from older
@@ -888,7 +1042,7 @@ building, or vehicle name. It will scan a distance up to your mapsize.
 
 Example:
  > scan southwest
- southwest: River, River, River, Swamp, Overgrown Forest, Road, Overgrown Forest, Jungle, Jungle
+ southwest: 3x River, Swamp, Overgrown Forest, Road, Overgrown Forest, 2x Jungle
 
 See also: MAPSIZE, SCREEN-READERS
 #
@@ -912,7 +1066,7 @@ Ship designate types:
  Bow (outdoors)
  Bunk Room - bedroom
  Captain's Cabin - bedroom
- Cargo Hold (outdoors)
+ Cargo Hold
  Crow's Nest (outdoors)
  Forecastle (outdoors)
  Helm (outdoors)
@@ -930,7 +1084,7 @@ blacksmith at a forge.
 
 See also: DIG, EXCAVATE, FORGE
 #
-"SLASH CHANNELS" SLASH-CHANNELS SLASHCHANNELS / /JOIN /CHECK /LEAVE /WHO /HISTORY HISTORY VC "VIRTUAL CHANNELS"
+"SLASH CHANNELS" SLASH-CHANNELS SLASHCHANNELS / /JOIN /CHECK /LEAVE /WHO /HISTORY VC "VIRTUAL CHANNELS"
 
 Usage:  /join <channel>
         /leave <channel>
@@ -967,6 +1121,35 @@ handle, chipping a rock until it is a handaxe, then again until it is a spear-
 head, and then crafting the spear from the spearhead and the handle.
 
 See also: CRAFT, CHIP, FISH
+#
+STRENGTH STR
+
+Strength (physical attribute)
+Type:  active (you can't drop below 1)
+
+Strength is a measure of your character's brawn, his (or her) raw muscle.
+Unlike some games, Strength does not affect how much you can carry (all players
+have the same base inventory size).
+
+Strength is used for:
+ - A core attribute for the melee class role.
+ - Increasing melee DPS (damage per second) from physical weapons.
+ - Chopping and mining faster.
+ - Wearing heavy armor (tank armor sometimes has -STRENGTH).
+
+See also: ATTRIBUTES, MELEE DPS, CHOP, MINE
+#
+STUN STUNNED "STUN IMMUNITY"
+
+A character who is stunned, for instance by the Bash ability, cannot type
+commands or attack. Stuns are usually brief, and when they expire, you become
+temporarily immune to other stuns.
+
+There is also a "stunned" condition for people who are reduced to 0 health.
+Characters will normally recover from this through normal regeneration.
+
+Note: Some scripting NPCs can stun characters even while they have stun
+immunity. This is part of the combat script.
 #
 TAGS "MOB TAGS" TAGGING "MOB TAGGING"
 
@@ -1045,5 +1228,19 @@ available when you type "look", but this version shows only the room name and
 coordinates (if applicable).
 
 See also: LOOK
+#
+WITS WIT
+
+Wits (mental attribute)
+Type:  passive (you can go as low as 0)
+
+Wits is the measure of your character's awareness and ability to think on his
+or her feet.
+
+Wits is used for:
+ - Improving your combat speed (except for healers).
+ - Reducing the casting time of non-combat spells, for healers.
+
+See also: ATTRIBUTES, FASTCASTING, HEALER, SPEED
 #
 $

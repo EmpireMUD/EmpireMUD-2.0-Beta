@@ -1,0 +1,527 @@
+#18450
+Inside the Beaver Dam~
+You shouldn't be able to get in here.
+~
+gi 0 0
+M 0 18450 100.00 1
+M 0 18451 100.00 1
+S
+#18460
+An Unstable Portal~
+   The torrentuous swirl of the portal's magical currents make it impossible to
+see where you are, or where you're going! You can still hear the sorcerers back
+in the tower, but you're not sure what lies beyond the portal.
+~
+cdgi 0 0
+T 18460
+S
+#18461
+Farther from the Portal~
+You've traveled too far from the portal and this reality is fading...
+~
+cdgi 0 0
+D8
+~
+0 18460
+S
+#18462
+Inside a Cupboard~
+   You find yourself inside a large cupboard. A small mattress on the bottom
+suggests someone has been living here, and the shelves are decorated with small
+figurines and other items. The top of the cupboard is stepped, suggesting this
+cupboard is underneath a staircase.
+~
+cgi 0 0
+D1
+~
+0 18461
+E
+shelves figurines items~
+   Two shelves are hung along the edge of the cupboard, above the head of the
+mattress. A set of small toy figurines is the only hint that this might be a
+child's bedroom. Other items on the shelves include brushes, jars, and bags.
+In fact, it looks like this poor child shares his bedroom with the household
+storage. A blue plaque is mounted under the shelf.
+~
+E
+plaque~
+The blue plaque reads:
+   This unstable portal is dedicated to the "Harry Potter" series by British
+author J.K. Rowling.
+~
+T 18461
+T 18463
+T 18462
+T 18496
+S
+#18463
+The Temple Of Midgaard~
+   You are in the southern end of the temple hall in the Temple of Midgaard.
+The temple has been constructed from giant marble blocks, eternal in
+appearance, and most of the walls are covered by ancient wall paintings
+picturing Gods, giants and peasants.
+   Large steps lead down through the grand temple gate, descending the huge
+mound upon which the temple is built and ends on the temple square below.
+To the west, you see the Reading Room.  The donation room is in a small
+alcove to your east.
+~
+cgi 0 0
+D0
+~
+0 18461
+D1
+~
+0 18461
+D2
+~
+0 18461
+D3
+~
+0 18461
+E
+paintings ancient wall peasants gods giants~
+   The paintings are numerous in style and quality.  But, they all have the same
+surreal quality that tugs at the mind to become lost in their depth and detail.
+A blue plaque hangs next to the paintings.
+~
+E
+plaque~
+The blue plaque reads:
+   This unstable portal is dedicated to "Midgaard", the home city on games in
+the DikuMUD family, including CircleMUD.
+~
+T 18461
+T 18462
+T 18483
+T 18496
+T 18492
+S
+#18464
+Cornfields of Popcorn~
+   You find yourself standing in the middle of a cornfield that has gone
+unharvested long past its prime. The brown stalks are twisted and bent by the
+wind, and the ears of corn have dried out and burst in the sun, littering the
+ground in a heavy snow of popped corn. In the distance you can faintly see a
+manor house.
+~
+acgi 0 0
+D0
+~
+0 18461
+D1
+~
+0 18461
+D2
+~
+0 18461
+D3
+~
+0 18461
+E
+manor house~
+   The manor house looks to be in the same state of disrepair as the cornfield.
+Truly this is a tragic kingdom. A blue plaque is mounted on the side of the
+house.
+~
+E
+plaque~
+The blue plaque reads:
+   This unstable portal is dedicated to the Scarecrow from L. Frank Baum's
+"The Wizard of Oz", to the 1939 film by that name, and to the song "Tragic
+Kingdom" by No Doubt.
+~
+I 6 18484 100.00 1  # FORAGE: a handful of popcorn
+I 7 18485 100.00 1  # FIND-HERB: a bag of popcorn
+M 0 18485 100.00 1
+T 18461
+T 18462
+T 18491
+T 18496
+S
+#18465
+Twisty Little Passages~
+You are in a maze of twisty little passages, all alike.
+~
+cgi 0 0
+D0
+~
+0 18461
+D1
+~
+0 18461
+D2
+~
+0 18461
+D3
+~
+0 18461
+E
+plaque~
+The blue plaque reads:
+   This unstable portal is dedicated to the 1976 game "Colossal Cave
+Adventure" by Will Crowther, a game considered to be the first text-based
+adventure game and the precursor to all other adventure games.
+~
+T 18461
+T 18462
+T 18465
+T 18464
+T 18496
+T 18492
+S
+#18466
+The Unstable~
+   You are in a strange stable. The entire building twists and warps dizzyingly
+from moment to moment. Bizarre beasts populate the stalls, and rather than
+running straight along the bottom, the straw-covered floor twists around to the
+ceiling like a corkscrew.
+~
+cgi 0 w
+D2
+~
+0 18461
+E
+plaque~
+The blue plaque reads:
+   This unstable portal is dedicated to puns, the highest form of humor.
+Because you can't have an unstable portal without an unstable stable.
+~
+M 0 18486 100.00 1
+M 0 18487 100.00 1
+T 18461
+T 18462
+T 18466
+T 18492
+T 18496
+S
+#18467
+A Hobbit Hole~
+   You find yourself in a tiny house, with a ceiling so low that you can barely
+stand. The doors and archways are perfectly round, like nothing you've ever
+seen before. The house is filled with knick knacks, tchotchkes, and kitsch of
+all kinds. The smell of pipe smoke wafts in from the garden.
+~
+cgi 0 0
+D0
+~
+0 18461
+D1
+~
+0 18461
+D2
+~
+0 18461
+D3
+~
+0 18461
+E
+knick knacks knicknacks tchotchkes kitsch~
+   The house is absolutely littered with trinkets. You wouldn't even know where
+to start. The only thing that catches your eye is a blue plaque on the wall.
+
+~
+E
+plaque~
+The blue plaque reads:
+   This unstable portal is dedicated to J.R.R. Tolkien's "The Hobbit" and
+"The Lord of the Rings", which are the basis for many, many fantasy settings.
+~
+T 18461
+T 18462
+T 18467
+T 18496
+S
+#18468
+A Vast Field (88, 200)~
++------------------------------------------------------------+
+|....&Y/\/\/[]\/\/\&0...."TT"...."TT"&Y/\/\/\/\/\/\/\/\/\/\/\/\&g^^^^&0|
+|....&Y/\/\/\/\/\/\&0....[==]............&Y/\/\/\/\/\/\/\/\&g^^^^^^^^&0|
+|....&Y/\/\/\/\/\/\&0...."TT"...."TT"....&Y/\/\/\/\/\/\/\/\&g^^^^^^^^&0|
+|........&Y/\/\/\/\/\/\&0............&Y/\/\/\/\/\/\/\/\/[]\/\/\&g^^^^&0|
+|............&Y/\/\/\/\/\/\/\/\/[]\/\/\/\/\&0{PP}&g^^^^&Y/[]\/\/\/\/\&0|
+|................&Y/\/\/\/\/\/\/\/\/\/\&g^^^^^^^^&0{GG}{FF}&Y/\/\/\/\&0|
+|"TT"[=||===]....&y::::::::&Y/\/\/\/\&0(&b~~&0)(CC)(MM)&g^^^^&0(PP)&g^^^^&Y/\/\&0|
+|"TT"[======]"TT"&y::::::::&0.==.<oo>&g^^^^^^^^^^^^^^^^^^^^^^^^&b~~~~&0|
+|&Y/\/\/\/\/\/\/\/\/\/\/[]\&0"TT"&g^^^^&0{BB}&g^^^^^^^^&0.VV.&b~&0==&b~&0.VV.&b~~~~&0|
+|&Y/\/\/\/\/\/\/\/\/\/\/\/\/\/\&0{LL}/====||====\.()&b~~~~~&y::::&b~~~~&0|
+|&b~~~~&Y/\/\/\/\/\/\/\/\/\/\/\/\/\/\&0|          |&b~~~~~~~~~~~~~~~~&0|
+|&b~~~~&0................&Y/\/\/\/\/\/\&0\==========/&b~~~~~~~~~~~~~~~~&0|
+|&b~~~~~~~~~~~~&0....&b~~~~&Y/\/\/\/\/\/\&0.VVVVVV.&b~~~~~~~~~~~~~~~~~~~~&0|
+|&b~~~~~~~~~~~~&0....&b~~~~&Y/\/\/\/\/\/\&b~~~~~~~~~~~~~~~~~~~~~~~~~~~~&0|
+|&b~~~~~~~~~~~~~~~~~~~~~~~~~~~~&0....&b~~~~~~~~~~~~~~~~~~~~~~~~~~~~&0|
++------------------------------------------------------------+
+~
+acgi 0 0
+D0
+~
+0 18461
+D1
+~
+0 18461
+D2
+~
+0 18461
+D3
+~
+0 18461
+E
+plaque~
+The blue plaque reads:
+   This unstable portal is dedicated to EmpireMUD 1.0, the game whose enduring
+popularity with its fans led to the creation of EmpireMUD 2.0 fifteen years
+after the original.
+~
+T 18461
+T 18462
+T 18488
+T 18491
+T 18496
+S
+#18469
+The Coat Closet~
+The closet is a dark, cramped space.  It appears  to be very crowded in here;
+ you keep bumping into what feels like coats,  boots, and other people
+ (apparently sleeping).  One useful thing that you've  discovered in your
+ bumbling about is a metal doorknob set at waist level into  what might be a
+ door.  Next to it is a spring lever labeled 'QUIET!'.
+~
+cgi 0 0
+E
+coat coats~
+A generic coat. Right out of the closet.
+Coat is decorated with a picture of Richard M. Nixon on the front, and the
+ text I AM NOT A CROOK in bold letters across the back., compliments of
+ SkyWriter.
+~
+E
+plaque~
+The blue plaque reads:
+   This unstable portal is dedicated to LambdaMOO, an online community founded
+by Pavel Curtis in 1990, which is now the longest-running MOO on the Internet.
+Typoes found in this room are kept intact from LambdaMOO's entry room.
+~
+T 18461
+T 18462
+T 18496
+S
+#18470
+A Massive Steel Vault~
+   You find yourself in a strange room, forged entirely of metal. A bridge
+stretches toward the exit: a huge steel gear painted with the number 111. You
+can see no way to open the gear, which is fixed firmly in place.
+~
+cgi 0 0
+D0
+~
+0 18461
+E
+plaque~
+The blue plaque reads:
+   This unstable portal is dedicated to the retrofuturistic "Fallout" series
+by Interplay and Bethesda, a series which set the gold standard for post-
+apocalyptic gaming.
+~
+M 0 18494 100.00 1
+T 18461
+T 18462
+T 18496
+T 18492
+S
+#18471
+A Long Row of Glass Shops (5th, Main)~
+   You find yourself standing on a cement walkway next to a long row of strange
+and extravagant shops. The front of each shop is made from a huge pane of glass
+which must have cost a fortune, as each pane is crystal clear and free from
+defects. The items in the shop window are like nothing you have ever seen, but
+the bustling crowd of people seem eager to buy them. (Type 'list')
+~
+acgi 0 0
+D0
+~
+0 18461
+D1
+~
+0 18461
+D2
+~
+0 18461
+D3
+~
+0 18461
+E
+plaque~
+The blue plaque reads:
+   This unstable portal is a parody of modern life, and is dedicated to every
+vapid statement you've ever overheard in public. The "sparkle" effect in
+particular is dedicated to the "Twilight" series by Stephenie Meyer.
+~
+E
+glass windows shops~
+   The glass windows are enormous, each made from a single pane and each
+completely flawless. You cannot imagine the skill of the glassblower who
+created these. A blue plaque hangs on the wall between the shops.
+~
+M 0 18490 100.00 1
+T 18461
+T 18462
+T 18471
+T 18487
+T 18491
+T 18492
+T 18496
+S
+#18472
+A Long, Dusty Trail~
+            Date: May 5
+         Weather: hot
+          Health: poor
+            Food: 136 pounds
+   Next landmark: 22 miles
+  Miles traveled: 736 miles
+~
+cgi 0 0
+D1
+~
+0 18461
+D3
+~
+0 18461
+E
+plaque~
+The blue plaque reads:
+   This unstable portal is dedicated to "The Oregon Trail", a game developed by
+Don Rawitsch, Bill Heinemann, and Paul Dillenberger. The Oregon Trail was among
+the first educational computer games, and introduced an entire generation of
+children to digital gaming and the harsh realities of dysentery.
+~
+M 1 18494 100.00 1
+M 2 18472 100.00 1
+T 18461
+T 18462
+T 18472
+T 18496
+T 18491
+S
+#18473
+Portal 12~
+tba
+~
+cgi 0 0
+D0
+~
+0 18461
+D1
+~
+0 18461
+D2
+~
+0 18461
+D3
+~
+0 18461
+T 18461
+T 18462
+T 18496
+S
+#18474
+Portal 13~
+tba
+~
+cgi 0 0
+D0
+~
+0 18461
+D1
+~
+0 18461
+D2
+~
+0 18461
+D3
+~
+0 18461
+T 18461
+T 18462
+T 18496
+S
+#18475
+Portal 14~
+tba
+~
+cgi 0 0
+D0
+~
+0 18461
+D1
+~
+0 18461
+D2
+~
+0 18461
+D3
+~
+0 18461
+T 18461
+T 18462
+S
+#18476
+Portal 15~
+tba
+~
+cgi 0 0
+D0
+~
+0 18461
+D1
+~
+0 18461
+D2
+~
+0 18461
+D3
+~
+0 18461
+T 18461
+T 18462
+S
+#18477
+Portal 16~
+tba
+~
+cgi 0 0
+D0
+~
+0 18461
+D1
+~
+0 18461
+D2
+~
+0 18461
+D3
+~
+0 18461
+T 18461
+T 18462
+S
+#18478
+Portal 17~
+tba
+~
+cgi 0 0
+D0
+~
+0 18461
+D1
+~
+0 18461
+D2
+~
+0 18461
+D3
+~
+0 18461
+T 18461
+T 18462
+S
+$

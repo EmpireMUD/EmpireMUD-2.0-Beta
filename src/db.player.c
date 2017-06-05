@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: db.player.c                                     EmpireMUD 2.0b4 *
+*   File: db.player.c                                     EmpireMUD 2.0b5 *
 *  Usage: Database functions related to players and the player table      *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -132,6 +132,23 @@ player_index_data *find_player_index_by_name(char *name) {
 	strtolower(dupe);
 	HASH_FIND(name_hh, player_table_by_name, dupe, strlen(dupe), plr);
 	return plr;
+}
+
+
+/**
+* @param room_data *room The room to search in.
+* @param int id A player id.
+* @return char_data* if the player is in the room, or NULL otherwise.
+*/
+char_data *find_player_in_room_by_id(room_data *room, int id) {
+	char_data *ch;
+	
+	LL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
+		if (!IS_NPC(ch) && GET_IDNUM(ch) == id && !EXTRACTED(ch)) {
+			return ch;
+		}
+	}
+	return NULL;
 }
 
 
@@ -673,6 +690,8 @@ void build_player_index(void) {
 * @param char_data *ch The player to finish loading.
 */
 void check_delayed_load(char_data *ch) {
+	void update_reputations(char_data *ch);
+	
 	char filename[256];
 	FILE *fl;
 	
@@ -695,6 +714,8 @@ void check_delayed_load(char_data *ch) {
 	
 	ch = read_player_from_file(fl, GET_PC_NAME(ch), FALSE, ch);
 	fclose(fl);	
+	
+	update_reputations(ch);
 }
 
 
@@ -709,8 +730,10 @@ void free_char(char_data *ch) {
 	struct slash_channel *loadslash, *next_loadslash;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
+	struct mount_data *mount, *next_mount;
 	struct channel_history_data *history;
 	struct player_slash_channel *slash;
+	struct player_slash_history *slash_hist, *next_slash_hist;
 	struct interaction_item *interact;
 	struct pursuit_data *purs;
 	struct offer_data *offer;
@@ -822,9 +845,33 @@ void free_char(char_data *ch) {
 			if (loadslash->name) {
 				free(loadslash->name);
 			}
+			if (loadslash->lc_name) {
+				free(loadslash->lc_name);
+			}
 			free(loadslash);
 		}
-	
+		
+		// free channel histories
+		for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
+			while ((history = GET_HISTORY(ch, iter))) {
+				GET_HISTORY(ch, iter) = history->next;
+				if (history->message) {
+					free(history->message);
+				}
+				free(history);
+			}
+		}
+		HASH_ITER(hh, GET_SLASH_HISTORY(ch), slash_hist, next_slash_hist) {
+			while ((history = slash_hist->history)) {
+				slash_hist->history = history->next;
+				if (history->message) {
+					free(history->message);
+				}
+				free(history);
+			}
+			free(slash_hist);
+		}
+		
 		while ((a = GET_ALIASES(ch)) != NULL) {
 			GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
 			free_alias(a);
@@ -836,14 +883,6 @@ void free_char(char_data *ch) {
 		}
 		
 		while ((slash = GET_SLASH_CHANNELS(ch))) {
-			while ((history = slash->history)) {
-				slash->history = history->next;
-				if (history->message) {
-					free(history->message);
-				}
-				free(history);
-			}
-			
 			GET_SLASH_CHANNELS(ch) = slash->next;
 			free(slash);
 		}
@@ -865,6 +904,10 @@ void free_char(char_data *ch) {
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
 			HASH_DEL(GET_ABILITY_HASH(ch), abil);
 			free(abil);
+		}
+		HASH_ITER(hh, GET_MOUNT_LIST(ch), mount, next_mount) {
+			HASH_DEL(GET_MOUNT_LIST(ch), mount);
+			free(mount);
 		}
 		
 		free_player_completed_quests(&GET_COMPLETED_QUESTS(ch));
@@ -903,13 +946,18 @@ void free_char(char_data *ch) {
 			free(interact);
 		}
 	}
-
+	if (MOB_CUSTOM_MSGS(ch) && (!proto || MOB_CUSTOM_MSGS(ch) != MOB_CUSTOM_MSGS(proto))) {
+		free_custom_messages(MOB_CUSTOM_MSGS(ch));
+	}
+	
 	if (ch->desc) {
 		ch->desc->character = NULL;
 	}
 
 	/* find_char helper */
-	remove_from_lookup_table(GET_ID(ch));
+	if (ch->script_id > 0) {
+		remove_from_lookup_table(ch->script_id);
+	}
 
 	free(ch);
 }
@@ -992,6 +1040,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	int account_id = NOTHING, ignore_pos = 0, reward_pos = 0;
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	struct over_time_effect_type *dot, *last_dot = NULL;
+	struct affected_type *af, *next_af, *af_list = NULL;
 	struct player_quest *plrq, *last_plrq = NULL;
 	struct offer_data *offer, *last_offer = NULL;
 	struct alias_data *alias, *last_alias = NULL;
@@ -1004,8 +1053,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	int length, i_in[7], iter, num;
 	struct slash_channel *slash;
 	struct cooldown_data *cool;
-	struct affected_type *af;
-	struct quest_task *task;
+	struct req_data *task;
 	account_data *acct;
 	bitvector_t bit_in;
 	bool end = FALSE;
@@ -1018,7 +1066,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	if (!ch) {
 		CREATE(ch, char_data, 1);
 		clear_char(ch);
-		CREATE(ch->player_specials, struct player_special_data, 1);
+		init_player_specials(ch);
 		clear_player(ch);
 	
 		// this is now
@@ -1027,7 +1075,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	
 	// ensure script allocation
 	if (!SCRIPT(ch)) {
-		CREATE(SCRIPT(ch), struct script_data, 1);
+		create_script_data(ch, MOB_TRIGGER);
 	}
 	
 	// some parts may already be added, so find the end of lists:
@@ -1081,10 +1129,21 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 			}
 			case 'A': {
 				if (PFILE_TAG(line, "Ability:", length)) {
-					sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]);
-					if ((abildata = get_ability_data(ch, i_in[0], TRUE))) {
-						abildata->purchased = i_in[1] ? TRUE : FALSE;
-						abildata->levels_gained = i_in[2];
+					if (sscanf(line + length + 1, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
+						// post-b4.5 version
+						if ((abildata = get_ability_data(ch, i_in[0], TRUE))) {
+							abildata->levels_gained = i_in[1];
+							// note: NUM_SKILL_SETS is not used for this, and 2 are assumed
+							abildata->purchased[0] = i_in[2] ? TRUE : FALSE;
+							abildata->purchased[1] = i_in[3] ? TRUE : FALSE;
+						}
+					}
+					else if (sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]) == 3) {
+						// backwards-compatibility
+						if ((abildata = get_ability_data(ch, i_in[0], TRUE))) {
+							abildata->purchased[0] = i_in[1] ? TRUE : FALSE;
+							abildata->levels_gained = i_in[2];
+						}
 					}
 				}
 				else if (PFILE_TAG(line, "Access Level:", length)) {
@@ -1141,9 +1200,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					af->modifier = i_in[3];
 					af->location = i_in[4];
 					af->bitvector = asciiflag_conv(str_in);
-
-					affect_to_char(ch, af);
-					free(af);
+					
+					// store for later
+					LL_APPEND(af_list, af);
 				}
 				else if (PFILE_TAG(line, "Affect Flags:", length)) {
 					AFF_FLAGS(ch) = asciiflag_conv(line + length + 1);
@@ -1175,7 +1234,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					GET_APPARENT_AGE(ch) = atoi(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Archetype:", length)) {
-					CREATION_ARCHETYPE(ch) = atoi(line + length + 1);
+					// NOTE: This tag is outdated and these are now stored as 'Creation Archetype'
+					CREATION_ARCHETYPE(ch, ARCHT_ORIGIN) = atoi(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Attribute:", length)) {
 					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
@@ -1253,6 +1313,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					CREATE(cool, struct cooldown_data, 1);
 					add_cooldown(ch, i_in[0], l_in[0] - time(0));
 				}
+				else if (PFILE_TAG(line, "Creation Archetype:", length)) {
+					sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]);
+					if (i_in[0] >= 0 && i_in[0] < NUM_ARCHETYPE_TYPES) {
+						CREATION_ARCHETYPE(ch, i_in[0]) = i_in[1];
+					}
+				}
 				else if (PFILE_TAG(line, "Creation Host:", length)) {
 					if (GET_CREATION_HOST(ch)) {
 						free(GET_CREATION_HOST(ch));
@@ -1277,6 +1343,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 			case 'D': {
 				if (PFILE_TAG(line, "Daily Cycle:", length)) {
 					GET_DAILY_CYCLE(ch) = atoi(line + length + 1);
+				}
+				else if (PFILE_TAG(line, "Daily Quests:", length)) {
+					GET_DAILY_QUESTS(ch) = atoi(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Deficit:", length)) {
 					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
@@ -1345,7 +1414,17 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'F': {
-				if (PFILE_TAG(line, "Fight Prompt:", length)) {
+				if (PFILE_TAG(line, "Faction:", length)) {
+					struct player_faction_data *pfd;
+					sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]);
+					if ((pfd = get_reputation(ch, i_in[0], TRUE))) {
+						pfd->value = i_in[1];
+					}
+				}
+				else if (PFILE_TAG(line, "Fight Messages:", length)) {
+					GET_FIGHT_MESSAGES(ch) = asciiflag_conv(line + length + 1);
+				}
+				else if (PFILE_TAG(line, "Fight Prompt:", length)) {
 					if (GET_FIGHT_PROMPT(ch)) {
 						free(GET_FIGHT_PROMPT(ch));
 					}
@@ -1364,6 +1443,16 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 			case 'H': {
 				if (PFILE_TAG(line, "Highest Known Level:", length)) {
 					GET_HIGHEST_KNOWN_LEVEL(ch) = atoi(line + length + 1);
+				}
+				else if (PFILE_TAG(line, "History:", length)) {
+					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in[1]);
+					if (i_in[0] >= 0 && i_in[0] < NUM_CHANNEL_HISTORY_TYPES) {
+						struct channel_history_data *hist;
+						CREATE(hist, struct channel_history_data, 1);
+						hist->timestamp = l_in[1];
+						hist->message = fread_string(fl, error);
+						LL_APPEND(GET_HISTORY(ch, i_in[0]), hist);
+					}
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -1390,7 +1479,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'L': {
-				if (PFILE_TAG(line, "Lastname:", length)) {
+				if (PFILE_TAG(line, "Largest Inventory:", length)) {
+					GET_LARGEST_INVENTORY(ch) = atoi(line + length + 1);
+				}
+				else if (PFILE_TAG(line, "Lastname:", length)) {
 					if (GET_LASTNAME(ch)) {
 						free(GET_LASTNAME(ch));
 					}
@@ -1481,6 +1573,13 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				}
 				else if (PFILE_TAG(line, "Morph:", length)) {
 					GET_MORPH(ch) = morph_proto(atoi(line + length + 1));
+				}
+				else if (PFILE_TAG(line, "Mount:", length)) {
+					sscanf(line + length + 1, "%d %s", &i_in[0], str_in);
+					// only if mob exists
+					if (mob_proto(i_in[0])) {
+						add_mount(ch, i_in[0], asciiflag_conv(str_in));
+					}
 				}
 				else if (PFILE_TAG(line, "Mount Flags:", length)) {
 					GET_MOUNT_FLAGS(ch) = asciiflag_conv(line + length + 1);
@@ -1607,16 +1706,26 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 				}
 				else if (PFILE_TAG(line, "Quest-task:", length)) {
-					if (last_plrq && sscanf(line + length + 1, "%d %d %lld %d %d", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3]) == 5) {
-						CREATE(task, struct quest_task, 1);
-						task->type = i_in[0];
-						task->vnum = i_in[1];
-						task->misc = bit_in;
-						task->needed = i_in[2];
-						task->current = i_in[3];
-						
-						LL_APPEND(last_plrq->tracker, task);
+					if (last_plrq && sscanf(line + length + 1, "%d %d %lld %d %d %c", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3], &c_in) == 6) {
+						// found group
 					}
+					else if (last_plrq && sscanf(line + length + 1, "%d %d %lld %d %d", &i_in[0], &i_in[1], &bit_in, &i_in[2], &i_in[3]) == 5) {
+						c_in = 0;	// no group given
+					}
+					else {
+						// bad format
+						break;
+					}
+					
+					CREATE(task, struct req_data, 1);
+					task->type = i_in[0];
+					task->vnum = i_in[1];
+					task->misc = bit_in;
+					task->needed = i_in[2];
+					task->current = i_in[3];
+					task->group = c_in;
+					
+					LL_APPEND(last_plrq->tracker, task);
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -1676,6 +1785,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (PFILE_TAG(line, "Skill Level:", length)) {
 					GET_SKILL_LEVEL(ch) = atoi(line + length + 1);
 				}
+				else if (PFILE_TAG(line, "Skill Set:", length)) {
+					GET_CURRENT_SKILL_SET(ch) = atoi(line + length + 1);
+					GET_CURRENT_SKILL_SET(ch) = MAX(0, GET_CURRENT_SKILL_SET(ch));
+					GET_CURRENT_SKILL_SET(ch) = MIN(NUM_SKILL_SETS-1, GET_CURRENT_SKILL_SET(ch));
+				}
 				else if (PFILE_TAG(line, "Slash-channel:", length)) {
 					CREATE(slash, struct slash_channel, 1);
 					slash->name = str_dup(trim(line + length + 1));
@@ -1683,6 +1797,25 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					// append to start (it reverses them on-join anyway)
 					slash->next = LOAD_SLASH_CHANNELS(ch);
 					LOAD_SLASH_CHANNELS(ch) = slash;
+				}
+				else if (PFILE_TAG(line, "Slash-History:", length)) {
+					sscanf(line + length + 1, "%s %ld", str_in, &l_in[1]);
+					if (*str_in) {
+						struct player_slash_history *psh;
+						struct channel_history_data *hist;
+						
+						HASH_FIND_STR(GET_SLASH_HISTORY(ch), str_in, psh);
+						if (!psh) {
+							CREATE(psh, struct player_slash_history, 1);
+							psh->channel = str_dup(str_in);
+							HASH_ADD_STR(GET_SLASH_HISTORY(ch), channel, psh);
+						}
+						
+						CREATE(hist, struct channel_history_data, 1);
+						hist->timestamp = l_in[1];
+						hist->message = fread_string(fl, error);
+						LL_APPEND(psh->history, hist);
+					}
 				}
 				else if (PFILE_TAG(line, "Syslog Flags:", length)) {
 					SYSLOG_FLAGS(ch) = asciiflag_conv(line + length + 1);
@@ -1767,12 +1900,20 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		}
 	}
 	
+	// apply affects
+	LL_FOREACH_SAFE(af_list, af, next_af) {
+		affect_to_char(ch, af);
+		free(af);
+	}
+	
 	// safety
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_EXTRACTED | PLR_DONTSET);
 	
 	// Players who have been out for 1 hour get a free restore
 	RESTORE_ON_LOGIN(ch) = (((int) (time(0) - ch->prev_logon)) >= 1 * SECS_PER_REAL_HOUR);
-	REREAD_EMPIRE_TECH_ON_LOGIN(ch) = member_is_timed_out(ch->player.time.birth, ch->prev_logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR);
+	if (GET_LOYALTY(ch)) {
+		REREAD_EMPIRE_TECH_ON_LOGIN(ch) = (EMPIRE_MEMBERS(GET_LOYALTY(ch)) < 1 || member_is_timed_out(ch->player.time.birth, ch->prev_logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR));
+	}
 	
 	return ch;
 }
@@ -1958,6 +2099,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct affected_type *af, *new_af, *next_af, *af_list;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
+	struct mount_data *mount, *next_mount;
 	struct player_slash_channel *slash;
 	struct over_time_effect_type *dot;
 	struct slash_channel *loadslash;
@@ -1966,7 +2108,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	char temp[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
 	struct resource_data *res;
-	int iter;
+	int iter, deficit[NUM_POOLS], pool[NUM_POOLS];
 	
 	if (!fl || !ch) {
 		log("SYSERR: write_player_primary_data_to_file called without %s", fl ? "character" : "file");
@@ -1975,6 +2117,12 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (IS_NPC(ch)) {
 		log("SYSERR: write_player_primary_data_to_file called with NPC");
 		return;
+	}
+	
+	// save these for later, as they are sometimes changed by removing and re-adding gear
+	for (iter = 0; iter < NUM_POOLS; ++iter) {
+		deficit[iter] = GET_DEFICIT(ch, iter);
+		pool[iter] = GET_CURRENT_POOL(ch, iter);
 	}
 	
 	// unaffect the character to store raw numbers: equipment
@@ -2055,9 +2203,8 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	
 	// 'A'
 	HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
-		if (abil->purchased || abil->levels_gained > 0) {
-			fprintf(fl, "Ability: %d %d %d\n", abil->vnum, abil->purchased ? 1 : 0, abil->levels_gained);
-		}
+		// Note: NUM_SKILL_SETS isn't used here but last 2 args are sets 0 and 1
+		fprintf(fl, "Ability: %d %d %d %d\n", abil->vnum, abil->levels_gained, abil->purchased[0] ? 1 : 0, abil->purchased[1] ? 1 : 0);
 	}
 	fprintf(fl, "Access Level: %d\n", GET_ACCESS_LEVEL(ch));
 	if (GET_ACTION(ch) != ACT_NONE) {
@@ -2081,7 +2228,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (GET_APPARENT_AGE(ch)) {
 		fprintf(fl, "Apparent Age: %d\n", GET_APPARENT_AGE(ch));
 	}
-	fprintf(fl, "Archetype: %d\n", CREATION_ARCHETYPE(ch));
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		fprintf(fl, "Attribute: %s %d\n", attributes[iter].name, GET_REAL_ATT(ch, iter));
 	}
@@ -2120,12 +2266,16 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	for (cool = ch->cooldowns; cool; cool = cool->next) {
 		fprintf(fl, "Cooldown: %d %ld\n", cool->type, cool->expire_time);
 	}
+	for (iter = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
+		fprintf(fl, "Creation Archetype: %d %d\n", iter, CREATION_ARCHETYPE(ch, iter));
+	}
 	if (GET_CREATION_HOST(ch)) {
 		fprintf(fl, "Creation Host: %s\n", GET_CREATION_HOST(ch));
 	}
 	
 	// 'D'
 	fprintf(fl, "Daily Cycle: %d\n", GET_DAILY_CYCLE(ch));
+	fprintf(fl, "Daily Quests: %d\n", GET_DAILY_QUESTS(ch));
 	if (GET_LONG_DESC(ch)) {
 		strcpy(temp, NULLSAFE(GET_LONG_DESC(ch)));
 		strip_crlf(temp);
@@ -2149,6 +2299,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'F'
+	fprintf(fl, "Fight Messages: %s\n", bitv_to_alpha(GET_FIGHT_MESSAGES(ch)));
 	if (GET_FIGHT_PROMPT(ch)) {
 		fprintf(fl, "Fight Prompt: %s\n", GET_FIGHT_PROMPT(ch));
 	}
@@ -2176,6 +2327,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'L'
+	fprintf(fl, "Largest Inventory: %d\n", GET_LARGEST_INVENTORY(ch));
 	if (GET_LAST_CORPSE_ID(ch) > 0) {
 		fprintf(fl, "Last Corpse Id: %d\n", GET_LAST_CORPSE_ID(ch));
 	}
@@ -2204,6 +2356,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	if (IS_MORPHED(ch)) {
 		fprintf(fl, "Morph: %d\n", MORPH_VNUM(GET_MORPH(ch)));
+	}
+	HASH_ITER(hh, GET_MOUNT_LIST(ch), mount, next_mount) {
+		fprintf(fl, "Mount: %d %s\n", mount->vnum, bitv_to_alpha(mount->flags));
 	}
 	if (GET_MOUNT_FLAGS(ch) != NOBITS) {
 		fprintf(fl, "Mount Flags: %s\n", bitv_to_alpha(GET_MOUNT_FLAGS(ch)));
@@ -2263,6 +2418,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		}
 	}
 	fprintf(fl, "Skill Level: %d\n", GET_SKILL_LEVEL(ch));
+	fprintf(fl, "Skill Set: %d\n", GET_CURRENT_SKILL_SET(ch));
 	for (slash = GET_SLASH_CHANNELS(ch); slash; slash = slash->next) {
 		if ((channel = find_slash_channel_by_id(slash->id))) {
 			fprintf(fl, "Slash-channel: %s\n", channel->name);
@@ -2318,6 +2474,12 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		}
 	}
 	
+	// restore pools, which may have been modified
+	for (iter = 0; iter < NUM_POOLS; ++iter) {
+		GET_CURRENT_POOL(ch, iter) = pool[iter];
+		GET_DEFICIT(ch, iter) = deficit[iter];
+	}
+	
 	// affect_total(ch); // unnecessary, I think (?)
 }
 
@@ -2335,11 +2497,14 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	void write_mail_to_file(FILE *fl, char_data *ch);
 	
 	struct player_completed_quest *plrcom, *next_plrcom;
+	struct player_slash_history *psh, *next_psh;
+	struct player_faction_data *pfd, *next_pfd;
+	struct channel_history_data *hist;
 	struct trig_var_data *vars;
 	struct player_quest *plrq;
 	struct alias_data *alias;
 	struct offer_data *offer;
-	struct quest_task *task;
+	struct req_data *task;
 	struct coin_data *coin;
 	struct lore_data *lore;
 	int iter;
@@ -2365,6 +2530,18 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Coin: %d %d %ld\n", coin->amount, coin->empire_id, coin->last_acquired);
 	}
 	
+	// 'F'
+	HASH_ITER(hh, GET_FACTIONS(ch), pfd, next_pfd) {
+		fprintf(fl, "Faction: %d %d\n", pfd->vnum, pfd->value);
+	}
+	
+	// 'H'
+	for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
+		LL_FOREACH(GET_HISTORY(ch, iter), hist) {
+			fprintf(fl, "History: %d %ld\n%s~\n", iter, hist->timestamp, NULLSAFE(hist->message));
+		}
+	}
+	
 	// 'L'
 	for (lore = GET_LORE(ch); lore; lore = lore->next) {
 		if (lore->text && *lore->text) {
@@ -2384,7 +2561,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	LL_FOREACH(GET_QUESTS(ch), plrq) {
 		fprintf(fl, "Quest: %d %d %ld %d %d\n", plrq->vnum, plrq->version, plrq->start_time, plrq->instance_id, plrq->adventure);
 		LL_FOREACH(plrq->tracker, task) {
-			fprintf(fl, "Quest-task: %d %d %lld %d %d\n", task->type, task->vnum, task->misc, task->needed, task->current);
+			fprintf(fl, "Quest-task: %d %d %lld %d %d %c\n", task->type, task->vnum, task->misc, task->needed, task->current, task->group);
 		}
 	}
 	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), plrcom, next_plrcom) {
@@ -2392,6 +2569,13 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'S'
+	HASH_ITER(hh, GET_SLASH_HISTORY(ch), psh, next_psh) {
+		LL_FOREACH(psh->history, hist) {
+			fprintf(fl, "Slash-History: %s %ld\n%s~\n", psh->channel, hist->timestamp, NULLSAFE(hist->message));
+		}
+	}
+	
+	// 'V'
 	if (SCRIPT(ch) && SCRIPT(ch)->global_vars) {
 		for (vars = SCRIPT(ch)->global_vars; vars; vars = vars->next) {
 			if (*vars->name == '-') { // don't save if it begins with -
@@ -2730,11 +2914,40 @@ void check_autowiz(char_data *ch) {
 * @param char_data *ch The person logging in.
 */
 void announce_login(char_data *ch) {
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+	descriptor_data *desc;
+	int iter;
+	
 	syslog(SYS_LOGIN, GET_INVIS_LEV(ch), TRUE, "%s has entered the game", GET_NAME(ch));
+	
+	// auto-notes
+	if (GET_ACCOUNT(ch) && GET_ACCOUNT(ch)->notes) {
+		LL_FOREACH(descriptor_list, desc) {
+			if (STATE(desc) != CON_PLAYING || !desc->character) {
+				continue;
+			}
+			if (!IS_IMMORTAL(desc->character) || !PRF_FLAGGED(desc->character, PRF_AUTONOTES)) {
+				continue;
+			}
+			if (GET_ACCESS_LEVEL(desc->character) < GET_ACCESS_LEVEL(ch)) {
+				continue;
+			}
+			
+			snprintf(buf, sizeof(buf), "(%s account notes)", GET_NAME(ch));
+			msg_to_char(desc->character, "%s- %s ", GET_ACCOUNT(ch)->notes, buf);
+			
+			// rest of the divider
+			for (iter = 0; iter < 79 - (3 + strlen(buf)); ++iter) {
+				buf2[iter] = '-';
+			}
+			buf2[iter] = '\0';	// terminate
+			msg_to_char(desc->character, "%s\r\n", buf2);
+		}
+	}
 	
 	// mortlog
 	if (GET_INVIS_LEV(ch) == 0) {
-		if (config_get_bool("public_logins")) {
+		if (config_get_bool("public_logins") && !PLR_FLAGGED(ch, PLR_NEEDS_NEWBIE_SETUP)) {
 			mortlog("%s has entered the game", PERS(ch, ch, TRUE));
 		}
 		else if (GET_LOYALTY(ch)) {
@@ -2749,6 +2962,8 @@ void announce_login(char_data *ch) {
 * class. This should be called on login.
 */
 void check_skills_and_abilities(char_data *ch) {
+	void check_ability_levels(char_data *ch, any_vnum skill);
+	
 	struct player_ability_data *plab, *next_plab;
 	struct player_skill_data *plsk, *next_plsk;
 	
@@ -2766,9 +2981,68 @@ void check_skills_and_abilities(char_data *ch) {
 		if (!plsk->ptr) {
 			HASH_DEL(GET_SKILL_HASH(ch), plsk);
 			free(plsk);
+			continue;
+		}
+		
+		// check skill level cap
+		if (plsk->level > SKILL_MAX_LEVEL(plsk->ptr)) {
+			plsk->level = SKILL_MAX_LEVEL(plsk->ptr);
 		}
 	}
 	update_class(ch);
+	check_ability_levels(ch, NOTHING);
+}
+
+
+/**
+* Deletes chat messages that are more than 24 hours old.
+*
+* @param char_data *ch The person whose history to clean.
+*/
+void clean_old_history(char_data *ch) {
+	struct channel_history_data *hist, *next_hist;
+	struct player_slash_history *psh, *next_psh;
+	long now = time(0);
+	int iter;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
+		LL_FOREACH_SAFE(GET_HISTORY(ch, iter), hist, next_hist) {
+			if (hist->timestamp + (60 * 60 * 24) < now) {
+				// 24 hours old
+				if (hist->message) {
+					free(hist->message);
+				}
+				LL_DELETE(GET_HISTORY(ch, iter), hist);
+				free(hist);
+			}
+		}
+	}
+	
+	HASH_ITER(hh, GET_SLASH_HISTORY(ch), psh, next_psh) {
+		LL_FOREACH_SAFE(psh->history, hist, next_hist) {
+			if (hist->timestamp + (60 * 60 * 24) < now) {
+				// 24 hours old
+				if (hist->message) {
+					free(hist->message);
+				}
+				LL_DELETE(psh->history, hist);
+				free(hist);
+			}
+		}
+		
+		// no more history
+		if (!psh->history) {
+			if (psh->channel) {
+				free(psh->channel);
+			}
+			HASH_DEL(GET_SLASH_HISTORY(ch), psh);
+			free(psh);
+		}
+	}
 }
 
 
@@ -2918,21 +3192,28 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void clean_lore(char_data *ch);
 	extern room_data *find_home(char_data *ch);
 	extern room_data *find_load_room(char_data *ch);
+	void give_level_zero_abilities(char_data *ch);
+	void msdp_update_room(char_data *ch);
 	void refresh_all_quests(char_data *ch);
+	void reset_combat_meters(char_data *ch);
 	
 	extern bool global_mute_slash_channel_joins;
 
 	struct slash_channel *load_slash, *next_slash, *temp;
 	bool stop_action = FALSE, try_home = FALSE;
 	room_data *load_room = NULL, *map_loc;
-	char_data *ch = d->character;
+	char_data *ch = d->character, *repl;
 	char lbuf[MAX_STRING_LENGTH];
+	struct affected_type *af;
 	player_index_data *index;
 	empire_data *emp;
-	int iter;
+	int iter, duration;
 
 	reset_char(ch);
 	check_delayed_load(ch);	// ensure everything is loaded
+	clean_old_history(ch);
+	reset_combat_meters(ch);
+	GET_COMBAT_METERS(ch).over = TRUE;	// ensure no active meter
 	
 	// remove this now
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);
@@ -2957,11 +3238,17 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	if (GET_IMMORTAL_LEVEL(ch) > -1) {
 		GET_ACCESS_LEVEL(ch) = LVL_TOP - GET_IMMORTAL_LEVEL(ch);
-		GET_ACCESS_LEVEL(ch) = MAX(GET_ACCESS_LEVEL(ch), LVL_START_IMM);
+		GET_ACCESS_LEVEL(ch) = MAX(GET_ACCESS_LEVEL(ch), LVL_GOD);
+	}
+	else {	// not an imm/god
+		GET_ACCESS_LEVEL(ch) = MIN(GET_ACCESS_LEVEL(ch), LVL_MORTAL);
 	}
 	
-	if (PLR_FLAGGED(ch, PLR_INVSTART))
+	// set (and correct) invis level
+	if (PLR_FLAGGED(ch, PLR_INVSTART)) {
 		GET_INVIS_LEV(ch) = GET_ACCESS_LEVEL(ch);
+	}
+	GET_INVIS_LEV(ch) = MIN(GET_INVIS_LEV(ch), GET_ACCESS_LEVEL(ch));
 
 	/*
 	 * We have to place the character in a room before equipping them
@@ -2989,7 +3276,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 		
 	// long logout and in somewhere hostile
-	if (load_room && RESTORE_ON_LOGIN(ch) && ROOM_OWNER(load_room) && empire_is_hostile(ROOM_OWNER(load_room), GET_LOYALTY(ch), load_room)) {
+	if (load_room && RESTORE_ON_LOGIN(ch) && ROOM_OWNER(load_room) && ROOM_OWNER(load_room) != GET_LOYALTY(ch) && (IS_HOSTILE(ch) || empire_is_hostile(ROOM_OWNER(load_room), GET_LOYALTY(ch), load_room))) {
 		load_room = NULL;	// re-detect
 		try_home = TRUE;
 	}
@@ -3020,8 +3307,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// add to lists
 	ch->next = character_list;
 	character_list = ch;
-	GET_ID(ch) = GET_IDNUM(ch);
-	add_to_lookup_table(GET_ID(ch), (void *)ch);
+	ch->script_id = GET_IDNUM(ch);
+	add_to_lookup_table(ch->script_id, (void *)ch);
 	
 	// place character
 	char_to_room(ch, load_room);
@@ -3030,7 +3317,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// verify morph stats
 	if (!IS_MORPHED(ch)) {
-		affect_from_char(ch, ATYPE_MORPH);
+		affect_from_char(ch, ATYPE_MORPH, FALSE);
 	}
 	
 	if (dolog) {
@@ -3062,6 +3349,9 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		if (load_slash->name) {
 			free(load_slash->name);
 		}
+		if (load_slash->lc_name) {
+			free(load_slash->lc_name);
+		}
 		free(load_slash);
 	}
 	global_mute_slash_channel_joins = FALSE;
@@ -3086,7 +3376,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		
 		// clear this for long logout
 		GET_RECENT_DEATH_COUNT(ch) = 0;
-		affect_from_char(ch, ATYPE_DEATH_PENALTY);
+		affect_from_char(ch, ATYPE_DEATH_PENALTY, FALSE);
 		
 		RESTORE_ON_LOGIN(ch) = FALSE;
 		clean_lore(ch);
@@ -3123,12 +3413,20 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// verify abils -- TODO should this remove/re-add abilities for the empire? do class abilities affect that?
 	assign_class_abilities(ch, NULL, NOTHING);
+	give_level_zero_abilities(ch);
 	
-	// ensure player has penalty if at war
-	if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch))) {
-		int duration = config_get_int("war_login_delay") / SECS_PER_REAL_UPDATE;
-		struct affected_type *af = create_flag_aff(ATYPE_WAR_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED, ch);
-		affect_join(ch, af, ADD_DURATION);
+	if (!IS_IMMORTAL(ch)) {
+		// ensure player has penalty if at war
+		if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch)) && (duration = config_get_int("war_login_delay") / SECS_PER_REAL_UPDATE) > 0) {
+			af = create_flag_aff(ATYPE_WAR_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED, ch);
+			affect_join(ch, af, ADD_DURATION);
+			msg_to_char(ch, "\trYou are stunned for %d second%s because your empire is at war.\r\n", duration, PLURAL(duration));
+		}
+		else if (fresh && IN_HOSTILE_TERRITORY(ch) && (duration = config_get_int("hostile_login_delay") / SECS_PER_REAL_UPDATE) > 0) {
+			af = create_flag_aff(ATYPE_HOSTILE_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_STUNNED, ch);
+			affect_join(ch, af, ADD_DURATION);
+			msg_to_char(ch, "\trYou are stunned for %d second%s because you logged in in hostile territory.\r\n", duration, PLURAL(duration));
+		}
 	}
 
 	// script/trigger stuff
@@ -3143,8 +3441,31 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// ensure quests are up-to-date
 	refresh_all_quests(ch);
 	
+	// break last reply if invis
+	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {
+		GET_LAST_TELL(ch) = NOBODY;
+	}
+	
+	msdp_update_room(ch);
+	
 	// now is a good time to save and be sure we have a good save file
 	SAVE_CHAR(ch);
+}
+
+
+/**
+* @param account_data *acct Which account to check.
+* @return int The highest access level of any character on that account.
+*/
+int get_highest_access_level(account_data *acct) {
+	struct account_player *plr;
+	int highest = 0;
+	
+	LL_FOREACH(acct->players, plr) {
+		highest = MAX(highest, plr->player->access_level);
+	}
+	
+	return highest;
 }
 
 
@@ -3200,11 +3521,12 @@ void init_player(char_data *ch) {
 	player_index_data *index;
 	int account_id = NOTHING;
 	account_data *acct;
+	bool first = FALSE;
 	int i, iter;
 
 	// create a player_special structure, if needed
 	if (ch->player_specials == NULL) {
-		CREATE(ch->player_specials, struct player_special_data, 1);
+		init_player_specials(ch);
 	}
 	
 	// store temporary account id (may be overwritten by clear_player)
@@ -3218,6 +3540,8 @@ void init_player(char_data *ch) {
 
 	/* *** if this is our first player --- he be God *** */
 	if (HASH_CNT(idnum_hh, player_table_by_idnum) == 0) {
+		first = TRUE;
+		
 		GET_ACCESS_LEVEL(ch) = LVL_TOP;
 		GET_IMMORTAL_LEVEL(ch) = 0;			/* Initialize it to 0, meaning Implementor */
 
@@ -3230,6 +3554,7 @@ void init_player(char_data *ch) {
 		ch->real_attributes[INTELLIGENCE] = att_max(ch);
 		ch->real_attributes[WITS] = att_max(ch);
 		
+		SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
 		SET_BIT(PRF_FLAGS(ch), PRF_HOLYLIGHT | PRF_ROOMFLAGS | PRF_NOHASSLE);
 		
 		// turn on all syslogs
@@ -3281,10 +3606,24 @@ void init_player(char_data *ch) {
 		}
 	}
 	
+	// hold-over from earlier; needed account
+	if (first) {
+		SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_APPROVED);
+		SAVE_ACCOUNT(GET_ACCOUNT(ch));
+		update_player_index(index, ch);
+	}
+	
 	ch->char_specials.affected_by = 0;
+	GET_FIGHT_MESSAGES(ch) = DEFAULT_FIGHT_MESSAGES;
 
-	for (i = 0; i < NUM_CONDS; i++)
+	for (i = 0; i < NUM_CONDS; i++) {
 		GET_COND(ch, i) = (GET_ACCESS_LEVEL(ch) == LVL_IMPL ? UNLIMITED : 0);
+	}
+	
+	// script allocation
+	if (!SCRIPT(ch)) {
+		create_script_data(ch, MOB_TRIGGER);
+	}
 }
 
 
@@ -3341,6 +3680,9 @@ void set_title(char_data *ch, char *title) {
 
 	if (title == NULL)
 		title = "the newbie";
+	else {
+		title = trim(title);
+	}
 
 	if (GET_TITLE(ch) != NULL)
 		free(GET_TITLE(ch));
@@ -3370,16 +3712,18 @@ void start_new_character(char_data *ch) {
 	void set_skill(char_data *ch, any_vnum skill, int level);
 	extern const char *default_channels[];
 	extern bool global_mute_slash_channel_joins;
+	extern const int primary_attributes[];
 	extern struct promo_code_list promo_codes[];
 	extern int tips_of_the_day_size;
 	
 	char lbuf[MAX_INPUT_LENGTH];
-	struct global_data *glb, *next_glb;
-	int cumulative_prc, iter;
+	struct global_data *glb, *next_glb, *choose_last;
+	int arch_iter, cumulative_prc, iter, level;
 	bool done_cumulative = FALSE;
 	struct archetype_gear *gear;
 	struct archetype_skill *sk;
 	archetype_data *arch;
+	bool found;
 	
 	// announce to existing players that we have a newbie
 	mortlog("%s has joined the game", PERS(ch, ch, TRUE));
@@ -3398,11 +3742,16 @@ void start_new_character(char_data *ch) {
 	}
 	GET_CREATION_HOST(ch) = ch->desc ? str_dup(ch->desc->host) : NULL;
 	
-	// level
-	if (GET_ACCESS_LEVEL(ch) < LVL_APPROVED && !config_get_bool("require_auth")) {
-		GET_ACCESS_LEVEL(ch) = LVL_APPROVED;
+	// access level: set to LVL_MORTAL
+	if (GET_ACCESS_LEVEL(ch) < LVL_MORTAL) {
+		GET_ACCESS_LEVEL(ch) = LVL_MORTAL;
 	}
-
+	// auto-authorization
+	if (!IS_APPROVED(ch) && config_get_bool("auto_approve")) {
+		// only approve the character automatically
+		SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
+	}
+	
 	GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
 	GET_MOVE(ch) = GET_MAX_MOVE(ch);
 	GET_MANA(ch) = GET_MAX_MANA(ch);
@@ -3442,19 +3791,33 @@ void start_new_character(char_data *ch) {
 		do_slash_channel(ch, lbuf, 0, 0);
 	}
 	global_mute_slash_channel_joins = FALSE;
+	
+	// zero out attributes before applying archetypes
+	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+		ch->real_attributes[iter] = 0;
+	}
 
 	// archetype setup
-	if ((arch = archetype_proto(CREATION_ARCHETYPE(ch))) || (arch = archetype_proto(0))) {
+	for (arch_iter = 0; arch_iter < NUM_ARCHETYPE_TYPES; ++arch_iter) {
+		if (!(arch = archetype_proto(CREATION_ARCHETYPE(ch, arch_iter))) && !(arch = archetype_proto(0))) {
+			continue;	// couldn't find an archetype
+		}
+		if (GET_ARCH_TYPE(arch) != arch_iter) {
+			continue;	// found archetype does not match this category
+		}
+		
+		// Assign it:
+		
 		// attributes
 		for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-			ch->real_attributes[iter] = GET_ARCH_ATTRIBUTE(arch, iter);
+			ch->real_attributes[iter] += GET_ARCH_ATTRIBUTE(arch, iter);
 		}
 	
 		// skills
 		for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
-			if (get_skill_level(ch, sk->skill) < sk->level) {
-				set_skill(ch, sk->skill, sk->level);
-			}
+			level = get_skill_level(ch, sk->skill) + sk->level;
+			level = MIN(level, CLASS_SKILL_CAP);
+			set_skill(ch, sk->skill, level);
 			
 			// special case for vampire
 			if (sk->skill == SKILL_VAMPIRE && !IS_VAMPIRE(ch)) {
@@ -3467,44 +3830,71 @@ void start_new_character(char_data *ch) {
 		for (gear = GET_ARCH_GEAR(arch); gear; gear = gear->next) {
 			give_newbie_gear(ch, gear->vnum, gear->wear);
 		}
-		
-		// global newbie gear
-		cumulative_prc = number(1, 10000);
-		HASH_ITER(hh, globals_table, glb, next_glb) {
-			if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR || IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
-				continue;
-			}
-			if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !has_ability(ch, GET_GLOBAL_ABILITY(glb))) {
-				continue;
-			}
-			
-			// percent checks last
-			if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT)) {
-				if (done_cumulative) {
-					continue;
-				}
-				cumulative_prc -= (int)(GET_GLOBAL_PERCENT(glb) * 100);
-				if (cumulative_prc <= 0) {
-					done_cumulative = TRUE;
-				}
-				else {
-					continue;	// not this time
-				}
-			}
-			else if (number(1, 10000) > (int)(GET_GLOBAL_PERCENT(glb) * 100)) {
-				// normal not-cumulative percent
-				continue;
-			}
-		
-			// success!
-			for (gear = GET_GLOBAL_GEAR(glb); gear; gear = gear->next) {
-				give_newbie_gear(ch, gear->vnum, gear->wear);
-			}
+	}
+	
+	// guarantee minimum of 1 for active attributes
+	for (iter = 0; primary_attributes[iter] != NOTHING; ++iter) {
+		if (ch->real_attributes[primary_attributes[iter]] < 1) {
+			ch->real_attributes[primary_attributes[iter]] = 1;
+		}
+	}
+	
+	// global newbie gear -- TODO there must be a better, more generic way to run globals -pc 5/24/2016
+	cumulative_prc = number(1, 10000);
+	choose_last = NULL;
+	found = FALSE;
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR || IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !has_ability(ch, GET_GLOBAL_ABILITY(glb))) {
+			continue;
 		}
 		
-		determine_gear_level(ch);
-		add_archetype_lore(ch);
+		// percent checks last
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT)) {
+			if (done_cumulative) {
+				continue;
+			}
+			cumulative_prc -= (int)(GET_GLOBAL_PERCENT(glb) * 100);
+			if (cumulative_prc <= 0) {
+				done_cumulative = TRUE;
+			}
+			else {
+				continue;	// not this time
+			}
+		}
+		else if (number(1, 10000) > (int)(GET_GLOBAL_PERCENT(glb) * 100)) {
+			// normal not-cumulative percent
+			continue;
+		}
+	
+		// success!
+		
+		// check choose-last
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CHOOSE_LAST)) {
+			if (!choose_last) {
+				choose_last = glb;
+			}
+			continue;
+		}
+		
+		// safe to apply
+		for (gear = GET_GLOBAL_GEAR(glb); gear; gear = gear->next) {
+			give_newbie_gear(ch, gear->vnum, gear->wear);
+		}
+		found = TRUE;
 	}
+	// do the choose-last
+	if (choose_last && !found) {
+		for (gear = GET_GLOBAL_GEAR(choose_last); gear; gear = gear->next) {
+			give_newbie_gear(ch, gear->vnum, gear->wear);
+		}
+	}
+	
+	// basic updates
+	determine_gear_level(ch);
+	add_archetype_lore(ch);
 	
 	// apply any bonus traits that needed it
 	apply_bonus_trait(ch, GET_BONUS_TRAITS(ch), TRUE);
@@ -3643,7 +4033,7 @@ bool member_is_timed_out_ch(char_data *ch) {
 * @param bool read_techs if TRUE, will add techs based on players (usually only during startup)
 */
 void read_empire_members(empire_data *only_empire, bool read_techs) {
-	void resort_empires();
+	void resort_empires(bool force);
 	bool should_delete_empire(empire_data *emp);
 	
 	struct empire_member_reader_data *account_list = NULL, *emrd;
@@ -3660,6 +4050,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			EMPIRE_GREATNESS(emp) = 0;
 			EMPIRE_TOTAL_PLAYTIME(emp) = 0;
 			EMPIRE_LAST_LOGON(emp) = 0;
+			EMPIRE_IMM_ONLY(emp) = 0;
 		}
 	}
 	
@@ -3690,7 +4081,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			EMPIRE_TOTAL_MEMBER_COUNT(e) += 1;
 			
 			// only count players who have logged on in recent history
-			if (!member_is_timed_out_ch(ch)) {
+			if (!is_file || !member_is_timed_out_ch(ch)) {
 				add_to_account_list(&account_list, e, GET_ACCOUNT(ch)->id, GET_GREATNESS(ch));
 				
 				// not account-restricted
@@ -3730,7 +4121,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 	
 	// re-sort now only if we aren't reading techs (this hints that we're also reading territory)
 	if (!read_techs) {
-		resort_empires();
+		resort_empires(FALSE);
 	}
 }
 

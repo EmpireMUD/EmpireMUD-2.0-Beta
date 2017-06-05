@@ -65,6 +65,21 @@ Example:
 
 See also: DETACH, TATTACH, TDETACH
 #d
+%BUILD% MBUILD OBUILD VBUILD WBUILD
+
+Usage:  %build% <location> <vnum [dir] | ruin | demolish>
+
+This allows you to place a building on the map, or remove or ruin one. It is
+usually a bad idea to %build% tiles by coordinates. It's almost always
+safest to do this on the map tile the script is running in.
+
+Example:
+  if (%room.sector% ~= Forest)
+    %build% %room% 1100
+  end
+
+See also: %TERRAFORM%, %TERRACROP%
+#d
 %BUILDINGECHO% %ECHO% %ECHOAROUND% %ECHONEITHER% %VEHICLEECHO% %SEND% BUILDINGECHO VEHICLEECHO %ZECHOAROUND% ECHOAROUND TRIG-SEND
 
 &c%echo% <message>&0
@@ -176,8 +191,22 @@ use -1 for infinite duration ONLY if the target is an NPC.
 Examples:
   dg_affect %actor% HASTE on 20  -- Sets haste on actor for 20 seconds.
   dg_affect %actor% DODGE 100 20  -- Sets dodge on actor +100 for 20 seconds.
+  dg_affect %actor% STRENGTH off  -- Removes any STRENGTH affects
 
 See also: APPLIES, AFFECTS
+#d
+DG_AFFECT_ROOM
+
+Usage:  dg_affect_room <room> <affect> <on|off> <duration>
+
+Puts a room affect onto the target room. Durations must be non-zero, and you
+can use -1 for infinite duration if you're not on the map. Infinite affects
+can't be added to map locations.
+
+Examples:
+  dg_affect_room %room% !WEATHER on
+
+See also: REDIT AFFECTS
 #d
 DG_CAST
 
@@ -270,7 +299,7 @@ room, then makes him look to see the description:
   %teleport% %actor% 3001
   %force% %actor% look
 #d
-"GLOBAL VARIABLES" GLOBALS GLOBAL-VARIABLES GLOBAL-VARS GVARS
+"GLOBAL VARIABLES" GLOBAL GLOBALS GLOBAL-VARIABLES GLOBAL-VARS GVARS
 
 Usage:  global <variablename>
 
@@ -339,6 +368,7 @@ See also: EXPRESSIONS, NESTED-IFS
 %LOAD% MLOAD OLOAD VLOAD WLOAD
 
 %load% obj <vnum> [name <position>] [scale level]
+%load% obj <vnum> <room> [scale level]
 %load% mob <vnum> [ally] [scale level]
 %load% veh <vnum> [scale level]
 
@@ -352,7 +382,7 @@ thing that does the loading (when it can). However, you can specify a
 different scale level if you like. For object loading, you MUST also include
 the target to load to AND the load position before the scale level.
 
-Load an object the room:  %load% obj 1300
+Load an object to the room:  %load% obj 1300 room
 Load a scaled mob to room:  %load% mob 1300 %actor.level%
 Load obj to player inv:  %load% obj 1300 %actor% inv
 Equip obj to player:  %load% obj 1300 %actor% waist
@@ -446,12 +476,25 @@ See also: EMPIRE VARS
 #d
 %PURGE% MPURGE OPURGE VPURGE WPURGE
 
-Usage:  %purge% <victim | obj | vehicle>
+Usage:  %purge% <victim | obj | vehicle> [message]
+        %purge% instance mob <vnum> [message]
 
 Purge removes objects, mobs, or vehicles from the game. If no argument is
 given, then all objects and mobs (but not vehicles) in the room will be
 removed. If there is an argument, only that thing will be  purged. Players
 cannot be purged.
+
+The "purge instance" feature lets you purge ALL mobs by vnum in an instance.
+In the future, other types may be supported for this. Request one if you need
+it for your scripts.
+
+The optional [message] argument echoes a message for each thing extracted.
+If using "purge instance", you must use "dollar sign codes" rather than script
+variables in the messages (script variables are processed before the %purge%
+command is executed).
+  $n $e $s $m - For a mob being purged.
+  $p $a - For an object being purged.
+  $V - For a vehicle being purged (note the capital V).
 
 Examples: 
   %purge% %self%
@@ -473,12 +516,13 @@ Quest commands:
     person meets the requirements -- check %char.quest_finished(vnum)% first.
   &cstart&0 - Will give the player the quest, whether or not they meet the
     prerequisites, if they are not already on it. Consider checking
-    %char.completed_quest(vnum)% first.
+    %char.completed_quest(vnum)% or %char.can_start_quest(vnum)% first.
   &ctrigger&0 - Activate any 'triggered' quest task, if the player is on that
     quest. You can check %char.quest_triggered(vnum)% to see if the condition
     is already triggered.
+  &cuntrigger&0 - Cancels a 'triggered' quest task, if the player has it.
 
-See also: QUEST
+See also: CHAR-VAR, QUEST
 #d
 RDELETE
 
@@ -529,6 +573,18 @@ Example:
 
 See also: CONTEXT, MTRIG VARS, RDELETE, VDELETE, TRIG-SET
 #d
+%RESTORE% MRESTORE ORESTORE VRESTORE WRESTORE
+
+Usage:  %restore% [target]
+
+This command heals/restores/fixes the target. Specifically:
+ mobs/players: health, DoTs, negative effects
+ vehicles: burning, damage, maintenance
+ rooms/buildings: burning, damage, maintenance
+ objects: no current function
+
+Without an argument, this command restores the thing running the script.
+#d
 "RETURN STATEMENT" TRIG-RETURN
  
 Usage:  return 0
@@ -545,7 +601,7 @@ See also: HALT, WAIT
 #d
 %SCALE% MSCALE OSCALE VSCALE WSCALE
 
-%scale% <victim/object/vehicle> [level]
+%scale% <instance/victim/object/vehicle> [level]
 
 This scales (or re-scales) a target NPC, object, or vehicle to a given level.
 If no level is provided, the script will attempt to use the scale of the
@@ -559,6 +615,7 @@ If you scale an item that is already scaled, a fresh copy will be loaded and
 scaled. This would result in the original item being purged.
 
 Examples: 
+  %scale% instance 125
   %scale% bag 100
   %scale% sword %actor.level%
 #d
@@ -707,7 +764,7 @@ Examples:
 #d
 %TERRACROP% MTERRACROP OTERRACROP VTERRACROP WTERRACROP
 
-%terracrop% [location] <crop vnum>
+Usage:  %terracrop% [location] <crop vnum>
 
 This command allows you to make changes to the map, one tile at a time. It is
 usually a bad idea to terracrop tiles by coordinates. It's almost always
@@ -720,11 +777,11 @@ Example:
     %terracrop% %room% 4900
   end
 
-See also: %TERRAFORM%
+See also: %BUILD%, %TERRAFORM%
 #d
 %TERRAFORM% MTERRAFORM OTERRAFORM VTERRAFORM WTERRAFORM
 
-%terraform% [location] <sector vnum>
+Usage:  %terraform% [location] <sector vnum>
 
 This command allows you to make changes to the map, one tile at a time. It is
 usually a bad idea to terraform tiles by coordinates. It's almost always
@@ -737,14 +794,14 @@ Example:
     %terraform% %room% 4412
   end
 
-See also: %TERRACROP%
+See also: %BUILD%, %TERRACROP%
 #d
 %TRANSFORM% TRANSFORM MTRANSFORM OTRANSFORM
 
 &rNOTE: This functionality is disabled and not currently supported by EmpireMUD.
 If you have a use for it, send a request for it to be implemented.&0
 
-%transform% <vnum|-vnum>
+Usage:  %transform% <vnum|-vnum>
 
 This command causes the executing mob or object to transform into another 
 mob or object, based on the vnum argument supplied. The transformation is 

@@ -17,17 +17,23 @@ D4
 ....~
 &0~
 E
-2 28 0.20 27
+2 10565 0.04 10562
 E
-2 29 0.20 27
+2 604 0.04 602
 E
-2 4 0.20 1
+2 28 0.80 27
 E
-3 29 0.20 29
+2 29 0.80 27
 E
-3 28 0.50 27
+2 4 0.80 1
 E
-3 4 0.50 1
+3 29 0.80 29
+E
+3 10565 2.00 10562
+E
+3 28 2.00 27
+E
+3 4 2.00 1
 E
 5 0 100.00 17
 E
@@ -177,9 +183,9 @@ D4
 E
 0 1 100.00 0
 E
-3 29 0.20 29
+3 29 0.80 29
 E
-4 0 0.20 2
+4 0 0.80 2
 E
 9 0 50.00 2
 I 5 102 9.00 1 X  # DIG: a flint stone
@@ -321,9 +327,9 @@ Y.Y.~
 E
 0 1 100.00 1
 E
-3 29 0.20 29
+3 29 0.80 29
 E
-4 0 0.20 3
+4 0 0.80 3
 E
 9 0 50.00 3
 I 5 102 9.00 1 X  # DIG: a flint stone
@@ -523,7 +529,7 @@ S
 #4
 Overgrown Forest~
 An Overgrown Forest~
-'^' 14 1 6 dl dn
+'^' 14 1 5 dl dn
 C
 chop, dig, gather, pick~
 D1
@@ -565,7 +571,11 @@ YYYY~
 E
 0 1 100.00 3
 E
-3 29 0.20 29
+2 10565 0.01 10565
+E
+3 10565 0.04 10565
+E
+3 29 0.80 29
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 100 100.00 1 X  # DIG: a rock
@@ -672,7 +682,7 @@ I 21 1304 5.00 1 f  # FISH: some sea junk
 I 21 1311 25.00 1 f  # FISH: a spotted eel
 I 21 1313 25.00 1 f  # FISH: a bright red leaping fish
 I 21 1312 100.00 1 f  # FISH: a speckled trout
-I 22 174 0.05 1  # PAN: a small flake of gold
+I 22 174 5.00 1  # PAN: a small flake of gold
 M
 9025 5.00 d
 M
@@ -1473,7 +1483,7 @@ Tower of Souls~
 A Tower of Souls~
 '.' 0 0 1 fo 0
 C
-nearby, transport~
+adventure, nearby, quest, transport~
 D1
 */\*~
 &y~
@@ -1506,15 +1516,15 @@ D4
 ....~
 &y~
 E
-2 21 0.50 26
+2 21 2.00 26
 E
-3 20 0.07 26
+3 20 0.28 26
 E
-3 20 0.07 12
+3 20 0.28 12
 E
 5 0 100.00 22
 E
-7 5 1.00 70
+7 5 4.00 70
 E
 8 0 100.00 14
 E
@@ -1628,9 +1638,9 @@ D4
 .&c~~&?.~
 &y~
 E
-2 6 1.00 5
+2 6 4.00 5
 E
-2 5 1.00 5
+2 5 4.00 5
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
@@ -1765,7 +1775,7 @@ D0
 E
 0 1 100.00 20
 E
-7 5 0.20 71
+7 5 0.80 71
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
@@ -1848,8 +1858,8 @@ M
 9064 0.90 ad
 S
 #27
-Light Jungle~
-The Jungle~
+Partial Jungle~
+The Jungle, Partially Cleared~
 '^' 12 3 6 d g
 C
 chop, gather~
@@ -1870,9 +1880,9 @@ E
 E
 0 1 100.00 27
 E
-4 0 0.20 28
+4 0 0.80 28
 E
-7 5 0.50 29
+7 5 2.00 29
 E
 8 0 100.00 15
 E
@@ -1972,7 +1982,7 @@ E
 E
 0 1 100.00 28
 E
-7 5 0.50 29
+7 5 2.00 29
 I 6 3017 100.00 1  # FORAGE: a plump fig
 I 9 121 100.00 1  # GATHER: a stick
 I 20 128 100.00 1  # CHOP: a massive jungle tree
@@ -2064,7 +2074,7 @@ D0
 E
 9 0 25.00 27
 E
-11 5 1.00 27
+11 5 4.00 27
 I 6 3310 100.00 1  # FORAGE: a wood ear mushroom
 I 10 9114 1.00 1  # ENCOUNTER: a massive crocodile
 I 21 1300 20.00 1 f  # FISH: a glowing green seashell
@@ -2210,15 +2220,15 @@ D4
 ....~
 &0~
 E
-2 4 0.20 71
+2 4 0.80 71
 E
-2 29 0.20 72
+2 29 0.80 72
 E
-2 28 0.20 72
+2 28 0.80 72
 E
-3 4 0.50 71
+3 4 2.00 71
 E
-3 28 0.50 72
+3 28 2.00 72
 E
 5 0 100.00 17
 E
@@ -2226,7 +2236,7 @@ E
 E
 9 0 50.00 71
 E
-11 5 1.00 20
+11 5 4.00 20
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
@@ -2352,7 +2362,7 @@ D4
 E
 0 1 100.00 70
 E
-11 5 1.00 26
+11 5 4.00 26
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
@@ -2465,7 +2475,7 @@ E
 E
 0 1 100.00 70
 E
-11 5 1.00 26
+11 5 4.00 26
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a pile of clay
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone

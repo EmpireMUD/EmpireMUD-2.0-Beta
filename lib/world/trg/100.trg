@@ -56,7 +56,7 @@ end
 ~
 #10005
 Magiterranean Grove environment~
-2 b 10
+2 bw 10
 ~
 switch %random.4%
   case 1
@@ -122,7 +122,7 @@ end
 ~
 #10011
 Sewer Environment~
-2 b 5
+2 bw 5
 ~
 switch %random.4%
   case 1
@@ -141,7 +141,7 @@ done
 ~
 #10012
 Ratskins's request~
-0 b 15
+0 bw 15
 ~
 say I could use some more rat skins, if you have any.
 %echo% (Type 'trade' to exchange 15 rat skins.)
@@ -234,10 +234,15 @@ end
 Rare thief death~
 0 f 100
 ~
+eval room %self.room%
 eval ch %room.people%
 while %ch%
-  eval test %%self.is_enemy(%ch%)%%
-  if (%ch.is_pc% && %test%)
+  * Combat is ended by the thief's death, so is_enemy doesn't actually work
+  eval test %%ch.is_ally(%actor%)%%
+  eval ch_stealth %ch.skill(Stealth)%
+  eval can_gain (%ch_stealth% != 0) && (%ch_stealth% != 50) && (%ch_stealth% != 75) && (%ch_stealth% != 100)
+  if (%ch.is_pc% && %test% && %can_gain% && !%ch.noskill(Stealth)%)
+    %send% %actor% You learn a bit about Stealth from watching %self.name% fight.
     nop %ch.gain_skill(Stealth, 1)%
   end
   eval ch %ch.next_in_room%
@@ -247,16 +252,11 @@ done
 Rare thief despawn~
 2 f 100
 ~
-eval thief sewerrarethief
-if (!%thief% || %thief.vnum% != 10017 || %thief.fighting% || %thief.room% != %room%)
-  halt
-end
-%echo% %thief.name% vanishes into the shadows!
-%purge% %thief%
+%purge% instance mob 10017 $n vanishes into the shadows!
 ~
 #10019
 Thief recruiter passive~
-0 b 5
+0 bw 5
 ~
 set room_var %self.room%
 set target_char %room_var.people%
@@ -270,7 +270,7 @@ done
 ~
 #10021
 City Official says~
-0 b 15
+0 bw 15
 ~
 switch %random.4%
   case 1
@@ -289,7 +289,7 @@ done
 ~
 #10022
 City Official rewards~
-0 b 30
+0 bw 30
 ~
 * Rewards some gold when a player has ratskins in their inventory.
 eval target %random%
@@ -384,9 +384,10 @@ wait 2 sec
 %purge% %self.name%
 ~
 #10027
-Nest de-spawn~
+Nest miniboss spawn/despawn~
 2 f 100
 ~
+* Get rid of the old miniboss
 eval ch %room.people%
 while %ch%
   eval next_ch %ch.next_in_room%
@@ -398,11 +399,17 @@ while %ch%
   end
   eval ch %next_ch%
 done
+* Spawn a new one
+eval vnum 10017+%random.3%
+%load% mob %vnum%
+eval person %self.people%
+%echo% %person.name% arrives.
 ~
 #10030
 Gossipers~
-0 b 10
+0 bw 10
 ~
+* This script is no longer used. It was replaced by custom strings.
 switch %random.4%
   case 1
     say I visited the Tower Skycleave and all I got was this skystone!
@@ -420,8 +427,9 @@ done
 ~
 #10031
 Bustling Page~
-0 b 10
+0 bw 10
 ~
+* This script is no longer used. It was replaced by custom strings.
 switch %random.4%
   case 1
     say Gosh, let's see, I found the skystones for Celiya and that old book for Barrosh. Now where did I put the breakers for the Grand High Sorcerer?
@@ -440,7 +448,7 @@ done
 ~
 #10032
 Barista passive~
-0 b 5
+0 bw 5
 ~
 switch %random.4%
   case 1
@@ -498,7 +506,7 @@ nop %charge%
 ~
 #10034
 Teacher passive~
-0 b 5
+0 bw 5
 ~
 eval room_var %self.room%
 context %room_var.vnum%
@@ -576,10 +584,11 @@ eval lesson_running 0
 global lesson_running
 ~
 #10036
-Cashier list~
+Skycleave Cashier list~
 0 c 0
 list~
 %send% %actor% %self.name% sells:
+%send% %actor%  - a skycleaver trinket ('buy trinket', 10 greater skystones)
 %send% %actor%  - a skycleaver belt ('buy belt', 8 skystones)
 %send% %actor%  - skycleaver gloves ('buy gloves', 5 skystones)
 %send% %actor%  - skycleaver armor ('buy armor', 14 skystones)
@@ -590,11 +599,13 @@ list~
 %send% %actor%  - a glowing green seashell ('buy seashell', 2 skystones)
 ~
 #10037
-Cashier purchase~
+Skycleave Cashier purchase~
 0 c 0
 buy~
 eval vnum -1
 eval cost 0
+set currency skystones
+set currency_vnum 10036
 eval named a thing
 eval keyw skycleaver
 if (!%arg%)
@@ -636,25 +647,32 @@ elseif seashell /= %arg%
   eval cost 2
   eval named a glowing green seashell
   eval keyw seashell
+elseif trinket /= %arg%
+  eval vnum 10079
+  eval cost 10
+  eval named a skycleaver trinket
+  set currency greater skystones
+  set currency_vnum 10037
 else
   %send% %actor% They don't seem to sell '%arg%' here.
   halt
 end
-eval test %%actor.has_resources(10036,%cost%)%%
+eval test %%actor.has_resources(%currency_vnum%,%cost%)%%
 if !%test%
-  %send% %actor% %self.name% tells you, 'You'll need %cost% skystones to buy that.'
+  %send% %actor% %self.name% tells you, 'You'll need %cost% %currency% to buy that.'
   halt
 end
-eval charge %%actor.add_resources(10036,-%cost%)%%
+eval charge %%actor.add_resources(%currency_vnum%,-%cost%)%%
 nop %charge%
 %load% obj %vnum% %actor% inv %actor.level%
-%send% %actor% You buy %named% for %cost% skystones.
+%send% %actor% You buy %named% for %cost% %currency%.
 %echoaround% %actor% %actor.name% buys %named%.
 ~
 #10038
 Goblin Wrangler passive~
-0 b 5
+0 bw 5
 ~
+* This script is no longer used. It was replaced by custom strings.
 switch %random.4%
   case 1
     %echo% %self.name% adjusts %self.hisher% wrangler pants.
@@ -691,7 +709,7 @@ switch %random.4%
     makeuid goblin mob goblin
     if %goblin%
       %echo% %self.name% opens a cage and lets %goblin.name% out!
-      %force% %goblin% mkill %actor%
+      %force% %goblin% %aggro% %actor%
     end
   break
 done
@@ -712,7 +730,7 @@ end
 ~
 #10041
 Pixy race passive~
-2 b 100
+2 bw 100
 ~
 context %instance.id%
 if %pixy_race_running%
@@ -785,11 +803,12 @@ nop %charge%
 ~
 #10043
 Pixy race~
-2 b 100
+2 bw 100
 ~
 context %instance.id%
 if !%pixy_race_running% || (%race_stage% && %race_stage% > 0)
   return 0
+  halt
 end
 eval race_stage 1
 global race_stage
@@ -888,7 +907,7 @@ unset pixy_race_running
 ~
 #10045
 Apprentice passive~
-0 b 5
+0 bw 5
 ~
 switch %random.4%
   case 1
@@ -941,7 +960,7 @@ end
 ~
 #10048
 Otherworlder guard passive~
-0 b 5
+0 bw 5
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos%
@@ -970,8 +989,9 @@ remote msg_pos %self.id%
 ~
 #10049
 Otherworlder prisoner passive~
-0 b 5
+0 bw 5
 ~
+* This script is no longer used. It was replaced by custom strings.
 %echo% %self.name% pulls at its chains and lets out a shout.
 ~
 #10050
@@ -986,7 +1006,7 @@ end
 ~
 #10051
 Lich passive~
-0 b 5
+0 bw 5
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos%
@@ -1047,7 +1067,7 @@ else
       makeuid skelly mob skeleton
       if %skelly%
         %echo% %skelly.name% rises from the floor!
-        %force% %skelly% mkill %actor%
+        %force% %skelly% %aggro% %actor%
       end
     break
   done
@@ -1070,7 +1090,7 @@ dg_affect %actor% ENTANGLED on 20
 ~
 #10055
 Celiya passive~
-0 b 5
+0 bw 5
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos%
@@ -1151,7 +1171,7 @@ nop %charge%
 ~
 #10058
 Barrosh passive~
-0 b 5
+0 bw 5
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos%
@@ -1246,7 +1266,7 @@ nop %charge%
 ~
 #10061
 Knezz passive~
-0 b 5
+0 bw 5
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos%
@@ -1348,8 +1368,9 @@ nop %charge%
 ~
 #10064
 Escaped experiment passive~
-0 b 5
+0 bw 5
 ~
+* This script is no longer used. It was replaced by custom strings.
 switch %random.3%
   case 1
     %echo% %self.name% flickers, as if %self.heshe% isn't real!
@@ -1422,5 +1443,87 @@ Tower Skycleave announcement~
 if %random.3% == 3
   %regionecho% %room% 100 The Tower Skycleave has appeared in the region %room.coords%.
 end
+~
+#10079
+Skycleaver Trinket teleport~
+1 c 2
+use~
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
+  return 0
+  halt
+end
+eval room_var %self.room%
+* once per 60 minutes
+if %actor.varexists(last_skycleave_trinket_time)%
+  if (%timestamp% - %actor.last_skycleave_trinket_time%) < 3600
+    eval diff (%actor.last_skycleave_trinket_time% - %timestamp%) + 3600
+    eval diff2 %diff%/60
+    eval diff %diff%//60
+    if %diff%<10
+      set diff 0%diff%
+    end
+    %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc% again.
+    halt
+  end
+end
+eval cycle 0
+while %cycle% >= 0
+  * Repeats until break
+  eval loc %instance.nearest_rmt(10030)%
+  * Rather than setting error in 10 places, just assume there's an error and clear it if there isn't
+  eval error 1
+  if %actor.fighting%
+    %send% %actor% You can't use %self.name% during combat.
+  elseif %actor.position% != Standing
+    %send% %actor% You need to be standing up to use %self.name%.
+  elseif !%actor.can_teleport_room%
+    %send% %actor% You can't teleport out of here.
+  elseif !%loc%
+    %send% %actor% There is no valid location to teleport to.
+  elseif %actor.aff_flagged(DISTRACTED)%
+    %send% %actor% You are too distracted to use %self.shortdesc%!
+  else
+    eval error 0
+  end
+  * Doing this AFTER checking loc exists
+  eval limit_check %%actor.can_enter_instance(%loc%)%%
+  if !%limit_check%
+    %send% %actor% The destination is too busy.
+    eval error 1
+  end
+  if %actor.room% != %room_var% || %self.carried_by% != %actor% || %gave_error%
+    if %cycle% > 0
+      %send% %actor% %self.shortdesc% sparks and fizzles.
+      %echoaround% %actor% %actor.name%'s trinket sparks and fizzles.
+    end
+    halt
+  end
+  switch %cycle%
+    case 0
+      %send% %actor% You touch %self.shortdesc% and the glyphs carved into it light up...
+      %echoaround% %actor% %actor.name% touches %self.shortdesc% and the glyphs carved into it light up...
+    break
+    case 1
+      %send% %actor% The glyphs on %self.shortdesc% glow a deep blue and the light begins to envelop you!
+      %echoaround% %actor% The glyphs on %self.shortdesc% glow a deep blue and the light begins to envelop %actor.name%!
+    break
+    case 2
+      %echoaround% %actor% %actor.name% vanishes in a flash of blue light!
+      %teleport% %actor% %loc%
+      %force% %actor% look
+      %echoaround% %actor% %actor.name% appears in a flash of blue light!
+      eval last_skycleave_trinket_time %timestamp%
+      remote last_skycleave_trinket_time %actor.id%
+      nop %actor.cancel_adventure_summon%
+      eval bind %%self.bind(%actor%)%%
+      nop %bind%
+      halt
+    break
+  done
+  wait 5 sec
+  eval cycle %cycle% + 1
+done
+%echo% Something went wrong.
 ~
 $

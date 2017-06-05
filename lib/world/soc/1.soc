@@ -1,0 +1,1615 @@
+#100
+boggle~
+boggle~
+b 5 0
+M0
+You boggle at the loonies around you.~
+M1
+$n boggles about the loonies around $m.~
+M2
+You boggle at $M.~
+M3
+$n boggles at $N.~
+M4
+$n boggles at you.~
+M5
+You sure are boggley, aren't you?~
+S
+#101
+whap~
+whap~
+0 5 5
+M0
+You look around for someone to whap.~
+M1
+$n looks around for someone to whap.~
+M2
+You whap $N with a fluffy pillow. WHAP!!!~
+M3
+$n whaps $N with a fluffy pillow. WHAP!!!~
+M4
+With a glint in $s eye, $n whaps you with a pillow. WHAP!!!~
+M5
+Umm... you might try somebody in the same room. It's time for your nap, dear.~
+M6
+You try to whap yourself, ending up looking stupid.~
+M7
+$n looks stupid as $e tries to whap $mself with a pillow.~
+S
+#102
+kiss~
+kiss~
+b 5 0
+M0
+You making kissy faces at everyone.~
+M1
+$n makes a kissy face.~
+M2
+You kiss $N right on the lips!~
+M3
+$n kisses $N right on the lips!~
+M4
+$n kisses you right on the lips! YUCK!~
+M5
+You must be so lonely -- there's nobody like that around.~
+S
+#103
+ogle~
+ogle~
+b 5 0
+M0
+You ogle everyone in the room.~
+M1
+$n ogles you right along with everyone else.~
+M2
+You ogle $S equipment.~
+M3
+$n quite visibly ogles $N. Hmm, interesting... This could be gossip!~
+M4
+$n ogles you boldly.~
+M5
+Stop that! -- You might hurt yourself.~
+M6
+You ogle yourself. Do you do that often?~
+M7
+$n ogles $mself. That should be done in private...~
+S
+#104
+sneer~
+sneer~
+b 5 0
+M0
+You sneer at everyone in general.~
+M1
+$n sneers contemptuously at everyone present.~
+M2
+You sneer contemptuously at $N.~
+M3
+$n sneers at $N. There might be a fight soon...~
+M4
+$n gives you a haughty sneer.~
+M5
+You try to sneer at someone who isn't here. Don't carry grudges, mister.~
+M6
+You sneer at yourself.~
+M7
+$n sneers at himself. "They're coming to take me away, haha!"~
+S
+#105
+smooch~
+smooch~
+0 5 0
+M0
+You look around for someone to smooch.~
+M1
+$n looks around for someone to smooch.~
+M2
+You kiss $N passionately. The kiss seems to go on forever...~
+M3
+$n kisses $N passionately, their bodies pressed tightly together.~
+M4
+$n kisses you passionately, entwining $s body around yours.~
+M5
+Never around when required.~
+M6
+You try to smooch yourself.~
+M7
+$n appears to be quite narcissistic, attempting to smooch $mself.~
+S
+#106
+hum~
+hum~
+0 5 0
+M0
+You hum innocently.~
+M1
+$n hums innocently.~
+S
+#107
+mmm~
+mmm~
+0 5 0
+M0
+You go, 'Mmmmmmmm.'~
+M1
+$n goes, 'Mmmmmmmmm.'~
+M2
+You look at $M and say, 'Mmmmmmmmm.'~
+M3
+$n looks at $N and says, 'Mmmmmmmmm.'~
+M4
+$n looks at you and says, 'Mmmmmmmmm.'~
+M5
+Mmm... no?~
+S
+#108
+mutter~
+mutter~
+0 5 0
+M0
+You mutter something under your breath.~
+M1
+$n mutters something under $s breath.~
+M2
+You mutter something about $N under $s breath.~
+M3
+$n mutters something about $N under $s breath.~
+M4
+$n mutters something about you under $s breath.~
+M5
+Like they care. They aren't even around!~
+M6
+You mutter about your senility under your breath.~
+M7
+$n mutters about $s senility under $s breath. Maybe you should look into a nursing home.~
+S
+#109
+sniffle~
+sniffle~
+0 5 0
+M0
+You sniffle sadly.~
+M1
+$n sniffles sadly.~
+M2
+You sniffle at the way $E treats you.~
+M3
+$n sniffles sadly at $N.~
+M4
+$n sniffles sadly at you.~
+M5
+That's sniffle, not snapple.~
+M6
+You sniffle to yourself.~
+M7
+$n sniffles to $mself.~
+S
+#110
+accuse~
+accuse~
+0 5 5
+M0
+You look around for someone to blame.~
+M1
+$n looks around accusingly for someone to blame.~
+M2
+You look accusingly at $M.~
+M3
+$n looks accusingly at $N.~
+M4
+$n looks accusingly at you.~
+M5
+Try accusing somebody WITHOUT an alibi.~
+M6
+You accuse yourself.~
+M7
+$n seems to have a guilty conscience.~
+S
+#111
+applaud~
+applaud~
+0 5 5
+M0
+You give a round of applause.~
+M1
+$n gives a round of applause.~
+M2
+You applaud $M for $S performance.~
+M3
+$n applauds $N for $S performance.~
+M4
+$n applauds you for your performance.~
+M5
+That's APPLAUSE, not Apple Sauce.~
+M6
+Someone like you deserves a big award.~
+M7
+$n applauds $mself, and encourages you to do the same.~
+S
+#112
+beg~
+beg~
+0 5 5
+M0
+You beg the gods for mercy. (No way you're gonna get it!)~
+M1
+The gods fall down laughing at $n's request for mercy.~
+M2
+You beg $M for a favor.~
+M3
+$n begs $N for a favor.~
+M4
+$n begs you for a favor.~
+M5
+Your money-lender seems to be out for the moment.~
+M6
+You beg yourself to quit your whining.~
+M7
+$n drops to $s knees and begs.~
+S
+#113
+bleed~
+bleed~
+0 5 0
+M0
+You bleed profusely, making an awful mess.~
+M1
+$n bleeds profusely, making an awful mess.~
+M2
+You generously cover $N in your own sticky blood.~
+M3
+$n pours some of $s blood onto $N.~
+M4
+$n splatters blood all over you.~
+M5
+Give up on them, go find a hospital!~
+M6
+You set your handy-dandy pet leech on your forehead.~
+M7
+$n sticks $s pet leech on $s forehead to suck out the evil.~
+S
+#114
+blush~
+blush~
+b 5 0
+M0
+You blush nervously.~
+M1
+$n blushes.~
+M2
+$N *always* makes you blush like this!~
+M3
+$n blushes at $N like a coy little minx.~
+M4
+$n blushes at you.~
+M5
+They made you blush and must have just left.~
+M6
+You turn redder than a beet at your inner thoughts.~
+M7
+$n turns a lovely shade of deep red.~
+S
+#115
+bounce~
+bounce~
+0 8 8
+M0
+BOIINNNNNNGG!~
+M1
+$n bounces around happily.~
+M2
+You grab $M and bounce and around the room together!~
+M3
+$n grabs $N and bounces $m around the room.~
+M4
+$n takes you for a joyous bounce around the room!~
+M5
+I'm afraid you'll have to bounce this one alone, amigo.~
+M6
+And I awoke, and faintly bouncing around the room, the echo of whomever spoke.~
+M7
+You hear the name '$n' bounce throughout the MUD...~
+S
+#116
+bow~
+bow~
+0 8 5
+M0
+You bow deeply.~
+M1
+$n bows deeply.~
+M2
+You bow before $M.~
+M3
+$n bows before $N.~
+M4
+$n bows before you.~
+M5
+Mudder-san, you have missed them, young grasshopper.~
+M6
+You kiss your toes.~
+M7
+$n folds up like a jackknife and kisses $s own toes.~
+S
+#117
+brb~
+brb~
+0 5 0
+M0
+Come back soon!~
+M1
+$n will be right back!~
+M2
+You promise $M you'll be right back!~
+M3
+$n assures $N that $e will be right back!~
+M4
+$n mentions to you that $E will be right back.~
+M5
+See if you can find that person while you're gone.~
+M6
+You attempt to find a reboot button behind your right ear.~
+M7
+$n tries to reboot $s brain and tune back in to reality.~
+S
+#118
+burp~
+burp~
+0 5 0
+M0
+You burp loudly.~
+M1
+$n burps loudly.~
+M2
+You burp loudly in $S face. I'm sure they appreciate it.~
+M3
+$n burps loudly in $N's face.~
+M4
+$n burps loudly in your face... hmm, maybe onions?~
+M5
+They are not here to receive your gift.~
+M6
+You quickly stifle a bit of gas.~
+M7
+$n burps quietly to $mself like a polite young lady.~
+S
+#119
+cackle~
+cackle~
+0 5 0
+M0
+You cackle gleefully.~
+M1
+$n throws back $s head and cackles with insane glee!~
+M2
+You cackle satanically at $M.~
+M3
+$n cackles satanically at $N.~
+M4
+$n cackles satanically at you.~
+M5
+You don't seem to see them here.~
+M6
+You lean back your head and cackle satanically.~
+M7
+$n leans back $s head and cackles satanically.~
+S
+#120
+chuckle~
+chuckle~
+0 5 0
+M0
+You chuckle politely.~
+M1
+$n chuckles politely.~
+M2
+You chuckle politely at $M.~
+M3
+$n chuckles politely at $N.~
+M4
+$n chuckles politely at you.~
+M5
+Hey chuckles, try someone who's here.~
+M6
+You chuckle at yourself and your wit.~
+M7
+$n ostentatiously chuckles at $s own wit.~
+S
+#121
+clap~
+clap~
+0 5 0
+M0
+You clap your hands together.~
+M1
+$n shows $s approval by clapping $s hands together.~
+M2
+You clap at $S accomplishment.~
+M3
+$n claps at $N's accomplishment.~
+M4
+$n claps at your accomplishment.~
+M5
+If they were here, they would have dodged your hands anyway.~
+M6
+You gently clap the palm of your hand.~
+M7
+$n says 'golf clap?' then nods and says 'golf clap' and gently claps $s palm.~
+S
+#122
+comb~
+comb~
+b 5 0
+M0
+You comb your hair -- perfect.~
+M1
+$n combs $s hair, what a dashing specimen!~
+M2
+You patiently untangle $N's hair -- what a mess!~
+M3
+$n tries patiently to untangle $N's hair.~
+M4
+$n pulls your hair in an attempt to comb it.~
+M5
+Back to cosmetic school with you. Their head isn't here.~
+M6
+You comb your hair - perfect.~
+M7
+$n combs $s hair. Oh yes--perfect.~
+S
+#123
+comfort~
+comfort~
+0 5 5
+M0
+You reach out for love and some kind words.~
+M1
+$n reaches out for some affection and comfort.~
+M2
+You comfort $M.~
+M3
+$n comforts $N.~
+M4
+$n comforts you.~
+M5
+You are kind, but blind.~
+M6
+You make a vain attempt to comfort yourself.~
+M7
+$n mumbles some reassuring words to $mself.~
+S
+#124
+cough~
+cough~
+0 5 0
+M0
+Yuck, try to cover your mouth next time!~
+M1
+$n coughs loudly.~
+S
+#125
+cringe~
+cringe~
+b 5 0
+M0
+You cringe in terror.~
+M1
+$n cringes in terror!~
+M2
+You cringe away from $M.~
+M3
+$n cringes away from $N in mortal terror.~
+M4
+$n cringes away from you.~
+M5
+I don't see anyone by that name here... what are you afraid of?~
+M6
+I beg your pardon?~
+S
+#126
+cry~
+cry~
+b 5 5
+M0
+You burst into tears.~
+M1
+$n bursts into tears.~
+M2
+You cry on $S shoulder.~
+M3
+$n cries on $N's shoulder.~
+M4
+$n cries on your shoulder.~
+M5
+Who's that?~
+M6
+You cry to yourself.~
+M7
+$n sobs quietly to $mself.~
+S
+#127
+cuddle~
+cuddle~
+b 5 5
+M0
+Who do you feel like cuddling today?~
+M2
+You cuddle $M.~
+M3
+$n cuddles $N.~
+M4
+$n cuddles you.~
+M5
+They aren't here.~
+M6
+You must feel very cuddly indeed...~
+M7
+$n cuddles $meslf in the corner.~
+S
+#128
+curse~
+curse~
+0 5 0
+M0
+You swear loudly for a long time.~
+M1
+$n swears: #@*"*&^$$%@*&!!!!!!~
+S
+#129
+curtsey~
+curtsey~
+b 8 0
+M0
+You curtsey to your audience.~
+M1
+$n curtseys gracefully.~
+S
+#130
+dance~
+dance~
+b 8 8
+M0
+Feels silly, doesn't it?~
+M1
+$n tries to breakdance but nearly breaks $s neck!~
+M2
+You lead $M to the dancefloor.~
+M3
+$n sends $N across the dancefloor.~
+M4
+$n sends you across the dancefloor.~
+M5
+Eh, WHOM?~
+M6
+You skip and dance around by yourself.~
+M7
+$n skips a light Fandango.~
+S
+#131
+daydream~
+daydream~
+b 5 0
+M0
+You dream of better times.~
+M1
+$n looks absent-minded, $s eyes staring into space.~
+S
+#132
+doh~
+doh~
+0 5 0
+M0
+You slap your forehead and shout DOH!~
+M1
+$n slaps $s forehead and exclaims, DOH!~
+S
+#133
+drool~
+drool~
+b 5 0
+M0
+You start to drool.~
+M1
+$n starts to drool.~
+M2
+You drool all over $N.~
+M3
+$n drools all over $N.~
+M4
+$n drools all over you.~
+M5
+Pardon??~
+M6
+Sure, go ahead and drool... yuck!~
+M7
+$n drools on $mself. What a sight.~
+S
+#134
+fart~
+fart~
+0 5 0
+M0
+Where are your manners?~
+M1
+$n lets off a real rip-roarer!~
+S
+#135
+flip~
+flip~
+0 8 0
+M0
+You flip head over heels.~
+M1
+$n flips head over heels.~
+S
+#136
+flirt~
+flirt~
+0 5 5
+M0
+You flirt outrageously.~
+M1
+$n flirts outrageously.~
+M2
+You flirt outrageously with $N.~
+M3
+$n flirts outrageously with $N.~
+M4
+$n flirts outrageously with you.~
+M5
+Sorry, your dearly beloved is not around.~
+M6
+You flirt with yourself. Must look stupid.~
+M7
+$n thinks $e is the most wonderful person in the world.~
+S
+#137
+fondle~
+fondle~
+0 5 5
+M0
+Who needs to be fondled?~
+M2
+You fondly fondle $M.~
+M3
+$n fondly fondles $N.~
+M4
+$n fondly fondles you.~
+M5
+You fondly try to fondle someone not in the room, but who cares.~
+M6
+You fondly fondle yourself, feels funny doesn't it?~
+M7
+$n fondly fondles $mself -- this is going too far!!~
+S
+#138
+french~
+french~
+0 5 5
+M0
+French whom??~
+M2
+You give $N a long and passionate kiss, it seems to take forever...~
+M3
+$n kisses $N passionately.~
+M4
+$n gives you a long and passionate kiss, it seems to take forever...~
+M5
+Your heart is filled with despair as that person is not here.~
+M6
+You gather yourself in your arms and try to kiss yourself.~
+M7
+$n makes an attempt at kissing $mself.~
+S
+#139
+frown~
+frown~
+b 5 0
+M0
+What's bothering you?~
+M1
+$n frowns.~
+S
+#140
+fume~
+fume~
+b 5 5
+M0
+Take it easy now! Count to ten, very slowly.~
+M1
+$n grits $s teeth and fumes with rage.~
+M2
+You stare at $M, fuming.~
+M3
+$n stares at $N, fuming with rage.~
+M4
+$n stares at you, fuming with rage!~
+M5
+Fume away... they ain't here.~
+M6
+That's right - hate yourself!~
+M7
+$n clenches $s fists and stomps $s feet, fuming with anger.~
+S
+#141
+gasp~
+gasp~
+b 5 0
+M0
+You gasp in astonishment.~
+M1
+$n gasps in astonishment.~
+S
+#142
+giggle~
+giggle~
+0 5 0
+M0
+You giggle.~
+M1
+$n giggles.~
+S
+#143
+glare~
+glare~
+b 5 5
+M0
+You glare at nothing in particular.~
+M1
+$n glares around $m.~
+M2
+You glare icily at $M.~
+M3
+$n glares at $N.~
+M4
+$n glares icily at you, you feel cold to your bones.~
+M5
+You try to glare at somebody who is not present.~
+M6
+You glare icily at your feet, they are suddenly very cold.~
+M7
+$n glares at $s feet, what is bothering $m?~
+S
+#144
+greet~
+greet~
+0 5 5
+M0
+Greet whom?~
+M2
+You greet $M with a light kiss on $S cheek.~
+M3
+$n greets $N with a light kiss on $S cheek.~
+M4
+$n greets you with a light kiss on your cheek.~
+M5
+Please -- try someone who is here?~
+M6
+So, you've finally discovered yourself!~
+M7
+$n greets $mself... $e always was a strange one.~
+S
+#145
+grin~
+grin~
+b 5 0
+M0
+You grin evilly.~
+M1
+$n grins evilly.~
+S
+#146
+groan~
+groan~
+b 5 0
+M0
+You groan loudly.~
+M1
+$n groans loudly.~
+S
+#147
+grope~
+grope~
+0 5 5
+M0
+Whom do you wish to grope??~
+M2
+You grope $M.~
+M3
+$n gropes $N.~
+M4
+$n gropes you.~
+M5
+Try someone who's here.~
+M6
+You grope yourself -- YUCK.~
+M7
+$n gropes $mself -- YUCK.~
+S
+#148
+grovel~
+grovel~
+b 5 0
+M0
+You grovel in the dirt.~
+M1
+$n grovels in the dirt.~
+M2
+You grovel before $M.~
+M3
+$n grovels in the dirt before $N.~
+M4
+$n grovels in the dirt before you.~
+M5
+Whom?~
+M6
+That seems a little silly to me...~
+S
+#149
+growl~
+growl~
+0 5 0
+M0
+Grrrrrrrrrr...~
+M1
+$n growls.~
+S
+#150
+hiccup~
+hiccup~
+0 5 0
+M0
+*HIC*~
+M1
+$n hiccups.~
+S
+#151
+hug~
+hug~
+0 5 5
+M0
+Hug whom?~
+M2
+You hug $M.~
+M3
+$n hugs $N.~
+M4
+$n hugs you.~
+M5
+Sorry, friend, I can't see that person here.~
+M6
+You hug yourself.~
+M7
+$n hugs $mself.~
+S
+#152
+laugh~
+laugh~
+0 5 0
+M0
+You laugh.~
+M1
+$n laughs.~
+M2
+You laugh at $M.~
+M3
+$n laughs at $N.~
+M4
+$n laughs at you.~
+M5
+They must have gotten sick of your laugh.~
+S
+#153
+lick~
+lick~
+b 5 0
+M0
+You lick your mouth and smile.~
+M1
+$n licks $s mouth and smiles.~
+M2
+You lick $M.~
+M3
+$n licks $N.~
+M4
+$n licks you.~
+M5
+Lick away, nobody's here with that name.~
+M6
+You lick yourself.~
+M7
+$n licks $mself -- YUCK.~
+S
+#154
+love~
+love~
+0 5 5
+M0
+You love the whole world.~
+M1
+$n loves everybody in the world.~
+M2
+You tell your true feelings to $N.~
+M3
+$n whispers softly to $N.~
+M4
+$n whispers to you sweet words of love.~
+M5
+Alas, your love is not present...~
+M6
+Well, we already know you love yourself. (Lucky someone does!)~
+M7
+$n loves $mself, can you believe it?~
+S
+#155
+massage~
+massage~
+0 5 0
+M0
+Massage what, thin air?~
+M2
+You gently massage $N's shoulders.~
+M3
+$n massages $N's shoulders.~
+M4
+$n gently massages your shoulders... ahhhhhhhhhh...~
+M5
+You can only massage someone in the same room as you.~
+M6
+You practise yoga as you try to massage yourself.~
+M7
+$n gives a show on yoga-positions, trying to massage $mself.~
+S
+#156
+moan~
+moan~
+0 5 0
+M0
+You start to moan.~
+M1
+$n starts moaning.~
+S
+#157
+nibble~
+nibble~
+0 5 0
+M0
+Nibble on whom?~
+M2
+You nibble on $N's ear.~
+M3
+$n nibbles on $N's ear.~
+M4
+$n nibbles on your ear.~
+M5
+Sorry, not here, better go back to dreaming about it.~
+M6
+You nibble on your OWN ear???????????????????~
+M7
+$n nibbles on $s OWN ear. (I wonder how it is done!!)~
+S
+#158
+nod~
+nod~
+b 5 0
+M0
+You nod.~
+M1
+$n nods.~
+S
+#159
+nudge~
+nudge~
+0 5 0
+M0
+Nudge? Nudge??? The HELL you say!!!!~
+M2
+You nudge $M with your elbow.~
+M3
+$n nudges $N suggestively with $s elbow.~
+M4
+$n nudges you suggestively. You two have an understanding.~
+M5
+Eh? That person isn't here, you know.~
+M6
+Well, just nudge yourself, but how do you get your elbow in that position?~
+M7
+$n nudges $mself with $s elbows, making $m look like a large chicken.~
+S
+#160
+nuzzle~
+nuzzle~
+0 5 5
+M0
+Nuzzle whom??~
+M2
+You nuzzle $S neck softly.~
+M3
+$n softly nuzzles $N's neck.~
+M4
+$n softly nuzzles your neck.~
+M5
+No... they aren't here...~
+M6
+I'm sorry, friend, but that's impossible.~
+S
+#161
+pat~
+pat~
+0 5 0
+M0
+Pat whom??~
+M2
+You pat $N on $S head.~
+M3
+$n pats $N on $S head.~
+M4
+$n pats you on your head.~
+M5
+Who, where, what??~
+M6
+You pat yourself on your head, very reassuring.~
+M7
+$n pats $mself on the head.~
+S
+#162
+peer~
+peer~
+b 5 0
+M0
+You peer around you, uncertain that what you see is actually true.~
+M1
+$n peers around, looking as if $e has trouble seeing everything clearly.~
+S
+#163
+point~
+point~
+b 5 0
+M0
+You point whereto?~
+M1
+$n points in all directions, seemingly confused.~
+M2
+You point at $M -- $E DOES look funny.~
+M3
+$n muffles a laugh, pointing at $N.~
+M4
+$n points at you... how rude!~
+M5
+You must have a VERY long index-finger...~
+M6
+You point at yourself. Insinuating something?~
+M7
+$n points at $mself, suggesting that the center of matters is $e.~
+S
+#164
+poke~
+poke~
+0 5 0
+M0
+Poke whom??~
+M2
+You poke $M in the ribs.~
+M3
+$n pokes $N in the ribs.~
+M4
+$n pokes you in the ribs.~
+M5
+You can't poke someone who's not here!~
+M6
+You poke yourself in the ribs, feeling very silly.~
+M7
+$n pokes $mself in the ribs, looking very sheepish.~
+S
+#165
+ponder~
+ponder~
+b 5 0
+M0
+You ponder over matters as they appear to you at this moment.~
+M1
+$n sinks deeply into $s own thoughts.~
+S
+#166
+pout~
+pout~
+b 5 0
+M0
+Ah, don't take it so hard.~
+M1
+$n pouts.~
+S
+#167
+pray~
+pray~
+b 5 0
+M0
+You feel righteous, and maybe a little foolish.~
+M1
+$n begs and grovels to the powers that be.~
+M2
+You crawl in the dust before $M.~
+M3
+$n falls down and grovels in the dirt before $N.~
+M4
+$n kisses the dirt at your feet.~
+M5
+No such person around; your prayers vanish into the endless voids.~
+M6
+Talk about narcissism...~
+M7
+$n performs some strange yoga-exercises and mumbles a prayer to $mself.~
+S
+#168
+puke~
+puke~
+0 5 0
+M0
+You puke.~
+M1
+$n pukes.~
+M2
+You puke on $M.~
+M3
+$n pukes on $N.~
+M4
+$n pukes on your clothes!~
+M5
+Once again?~
+M6
+You puke on yourself.~
+M7
+$n pukes on $s clothes.~
+S
+#169
+punch~
+punch~
+0 5 0
+M0
+Punch the air? Sure, go ahead, fine by me...~
+M1
+$n starts shadow-boxing.~
+M2
+You punch $M right in the face! Yuck, the BLOOD!~
+M3
+$n punches weakly at $N, missing by miles.~
+M4
+$n tries a punch at you but misses by a good quarter-mile...~
+M5
+Punch whom?~
+M6
+You punch yourself in the face resulting in your own nose being bloodied.~
+M7
+$n punches $mself in the face, looking kind of stupid.~
+S
+#170
+purr~
+purr~
+0 5 0
+M0
+You purr contentedly.~
+M1
+$n purrs contentedly.~
+S
+#171
+rofl~
+rofl~
+0 5 0
+M0
+You roll on the floor laughing hysterically!~
+M1
+$n rolls on the floor laughing hysterically.~
+M2
+You roll around on the floor, laughing hysterically at $S feet.~
+M3
+$n rolls around on the floor, laughing at $N's feet.~
+M4
+$n rolls around on the floor, laughing hysterically at your feet.~
+M5
+Just when they're at their funniest, they aren't even here!~
+M6
+That's so funny, you die in order to commemorate it.~
+M7
+$n laughs so hard and so long, $e falls down and dies.~
+S
+#172
+lol~
+lol~
+0 5 0
+M0
+You laugh out loud.~
+M1
+$n laughs out loud.~
+S
+#173
+roll~
+roll~
+b 5 0
+M0
+You roll your eyes in disgust.~
+M1
+$n rolls $s eyes in disgust.~
+M2
+You look at $M and roll your eyes in disgust.~
+M3
+$n looks at $N in contempt and rolls $s eyes with disgust.~
+M4
+$n stares at you and rolls $s eyes in disgust.~
+M5
+Um... whom?~
+M6
+You roll your eyes, disgusted with your own incompetence.~
+M7
+$n rolls $s eyes, disgusted with $mself.~
+S
+#174
+ruffle~
+ruffle~
+0 5 0
+M0
+You've got to ruffle SOMEONE.~
+M2
+You ruffle $N's hair playfully.~
+M3
+$n ruffles $N's hair playfully.~
+M4
+$n ruffles your hair playfully.~
+M5
+Might be a bit difficult.~
+M6
+You ruffle your hair, wondering how far you can go before the rest think you're crazy.~
+M7
+$n ruffles $s hair -- weirdo!~
+S
+#175
+scream~
+scream~
+0 5 0
+M0
+ARRRRRRRRRRGH!!!!!~
+M1
+$n screams loudly!~
+S
+#176
+scratch~
+scratch~
+0 5 0
+M0
+You scratch your head in pensive thought.~
+M1
+$n scratches $s head pensively.~
+M2
+You fiercely claw at $N tooth and nail.~
+M3
+$n goes berserk and claws fiercely at $N.~
+M4
+$n rabidly attempts to claw your eyes out of their sockets.~
+M5
+You attempt to scratch someone who ran after seeing you.~
+M6
+You incise a small scratch into your belt to remember this victorious moment.~
+M7
+$n scratches another victorious notch into $s belt.~
+S
+#177
+shake~
+shake~
+0 5 5
+M0
+You shake your head.~
+M1
+$n shakes $s head.~
+M2
+You shake $S hand.~
+M3
+$n shakes $N's hand.~
+M4
+$n shakes your hand.~
+M5
+Sorry good buddy, but that person doesn't seem to be here.~
+M6
+You are shaken by yourself.~
+M7
+$n shakes and quivers like a bowlful of jelly.~
+S
+#178
+shiver~
+shiver~
+b 5 0
+M0
+Brrrrrrrrr.~
+M1
+$n shivers uncomfortably.~
+S
+#179
+shrug~
+shrug~
+b 5 0
+M0
+You shrug.~
+M1
+$n shrugs helplessly.~
+S
+#180
+sigh~
+sigh~
+0 5 0
+M0
+You sigh.~
+M1
+$n sighs loudly.~
+S
+#181
+sing~
+sing~
+0 5 0
+M0
+You raise your clear (?) voice towards the sky.~
+M1
+You hear glass shatter as $n begins to sing.~
+S
+#182
+slap~
+slap~
+0 5 0
+M0
+Normally you slap SOMEBODY.~
+M2
+You slap $N.~
+M3
+$n slaps $N.~
+M4
+You are slapped by $n.~
+M5
+How about slapping someone in the same room as you??~
+M6
+You slap yourself, silly you.~
+M7
+$n slaps $mself, really strange...~
+S
+#183
+smile~
+smile~
+b 5 0
+M0
+You smile happily.~
+M1
+$n smiles happily.~
+M2
+You smile at $M.~
+M3
+$n beams a smile at $N.~
+M4
+$n smiles at you.~
+M5
+There's no one by that name around.~
+M6
+You smile at yourself.~
+M7
+$n smiles at $mself.~
+S
+#184
+smirk~
+smirk~
+0 5 0
+M0
+You smirk mischievously.~
+M1
+$n smirks mischievously.~
+M2
+You smirk at $M.~
+M3
+$n smirks at $N.~
+M4
+$n smirks at you.~
+M5
+Erm, whom?~
+S
+#185
+snap~
+snap~
+0 5 0
+M0
+You snap your fingers.~
+M1
+$n snaps $s fingers.~
+S
+#186
+snarl~
+snarl~
+0 5 0
+M0
+You snarl like a vicious animal.~
+M1
+$n snarls like a cornered, vicious animal.~
+M2
+You snarl at $M angrily. Control yourself!~
+M3
+$n snarls angrily at $N. $e seems incapable of controlling $mself.~
+M4
+$n snarls viciously at you. $s self-control seems to have gone bananas.~
+M5
+Eh? Whom? Not here, my friend.~
+M6
+You snarl at yourself, obviously suffering from schizophrenia.~
+M7
+$n snarls at $mself, and suddenly looks very frightened.~
+S
+#187
+sneeze~
+sneeze~
+0 5 0
+M0
+Gesundheit!~
+M1
+$n sneezes.~
+S
+#188
+snicker~
+snicker~
+0 5 0
+M0
+You snicker softly.~
+M1
+$n snickers softly.~
+S
+#189
+sniff~
+sniff~
+0 5 0
+M0
+You sniff sadly. *SNIFF*~
+M1
+$n sniffs sadly.~
+S
+#190
+snore~
+snore~
+0 5 0
+M0
+Zzzzzzzzzzzzzzzzz.~
+M1
+$n snores loudly.~
+S
+#191
+snuggle~
+snuggle~
+0 5 5
+M0
+Whom did you want to snuggle?~
+M2
+you snuggle $M.~
+M3
+$n snuggles up to $N.~
+M4
+$n snuggles up to you.~
+M5
+They aren't here.~
+M6
+Hmmm...~
+S
+#192
+spank~
+spank~
+0 5 8
+M0
+You spank WHOM? Eh? How? Naaah, you'd never do THAT in public.~
+M2
+You spank $M vigorously, long and hard. Your hand hurts.~
+M3
+$n spanks $N over $s knee. It hurts to even watch.~
+M4
+$n spanks you long and hard. You feel like a naughty child.~
+M5
+Are you sure about this? I mean, that person isn't even here!~
+M6
+What you do in your free time is none of our business.~
+S
+#193
+spit~
+spit~
+0 5 0
+M0
+You spit over your left shoulder.~
+M1
+$n spits over $s left shoulder.~
+M2
+You spit on $M.~
+M3
+$n spits in $N's face.~
+M4
+$n spits in your face.~
+M5
+Can you spit that far?~
+M6
+You drool down your front.~
+M7
+$n drools down $s front.~
+S
+#194
+squeeze~
+squeeze~
+0 5 0
+M0
+Where, what, how, WHOM???~
+M2
+You squeeze $M fondly.~
+M3
+$n squeezes $N fondly.~
+M4
+$n squeezes you fondly.~
+M5
+Where, what, how, WHOM???~
+M6
+You squeeze yourself -- try to relax a little!~
+M7
+$n squeezes $mself.~
+S
+#195
+stare~
+stare~
+b 5 5
+M0
+You stare at the sky.~
+M1
+$n stares at the sky.~
+M2
+You stare dreamily at $N, completely lost in $S eyes...~
+M3
+$n stares dreamily at $N.~
+M4
+$n stares dreamily at you, completely lost in your eyes.~
+M5
+You stare and stare but can't see that person anywhere...~
+M6
+You stare dreamily at yourself - enough narcissism for now.~
+M7
+$n stares dreamily at $mself - NARCISSIST!~
+S
+#196
+steam~
+steam~
+b 5 0
+M0
+You let out some steam, much to the others' relief (and your own)!~
+M1
+$n lets out a lot of steam, much to your relief.~
+S
+#197
+stroke~
+stroke~
+0 5 0
+M0
+Whose thigh would you like to stroke?~
+M2
+You gently stroke $S inner thigh.~
+M3
+$n gently strokes $N's inner thigh... hmm...~
+M4
+$n gently strokes your inner thigh with feathery touches.~
+M5
+That person is not within reach.~
+M6
+You are about to do something you would rather not be caught doing.~
+M7
+$n starts to do something disgusting and then stops.~
+S
+#198
+strut~
+strut~
+b 5 0
+M0
+Strut your stuff.~
+M1
+$n struts proudly.~
+S
+#199
+sulk~
+sulk~
+b 5 0
+M0
+You sulk.~
+M1
+$n sulks in the corner.~
+S
+$

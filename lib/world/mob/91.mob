@@ -209,6 +209,7 @@ A curious bobcat is sitting here, waiting.
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1350 100.00 1  # SKIN: a small skin
+T 9002
 S
 #9120
 coyote lanky~
@@ -349,6 +350,12 @@ A great-horned owl is surveying the ground.
 5 15 djo m
 0 0 2 10
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+M
+0
+$n hoots loudly.~
+M
+0
+$n dives, then takes to the air again with a mouse held in $s talons.~
 S
 #9134
 peccary collared javelina~
@@ -459,6 +466,9 @@ A llama is looking at you.
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
+I 2 1361 100.00 1  # SHEAR: a bag of soft llama wool
+I 2 1361 50.00 1  # SHEAR: a bag of soft llama wool
+I 2 1361 5.00 1  # SHEAR: a bag of soft llama wool
 S
 #9143
 leopard snow~
@@ -515,8 +525,11 @@ a bluebird~
 A bluebird is pecking at the ground.
 ~
 1 5 djo m
-0 0 2 10
+0 0 2 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+M
+0
+$n sings sweetly from a near by tree.~
 S
 #9149
 finch bird small~
@@ -524,8 +537,11 @@ a small finch~
 A small finch is perched here.
 ~
 1 5 djo m
-0 0 2 10
+0 0 2 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+M
+0
+$n sings sweetly from a near by tree.~
 S
 #9150
 woodpecker pecker bird~
@@ -533,8 +549,17 @@ a woodpecker~
 A woodpecker is hammering away at a tree.
 ~
 1 5 djo m
-0 0 2 10
+0 0 2 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+M
+0
+$n hammers loudly at a nearby tree.~
+M
+0
+$n squawks loudly from the trees.~
+M
+0
+$n hammers into a tree with its beak, looking for food.~
 S
 #9151
 bird paradise~
@@ -542,7 +567,7 @@ a bird of paradise~
 A bird of paradise is displaying its feathers.
 ~
 10 20 djo m
-0 0 2 10
+0 0 2 26
 I 0 3200 100.00 1  # BUTCHER: a cut of poultry
 S
 #9152
@@ -556,7 +581,15 @@ I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
-T 9009
+M
+0
+$n moos contentedly.~
+M
+0
+$n eats some grass.~
+M
+0
+$n chews $s cud.~
 S
 #9153
 ox~
@@ -654,7 +687,7 @@ Someone is lurking behind a tree!
 ~
 75 100 cdov c
 1 0 0 4
-I 4 170 20.00 1  # LOOT: a silver disc
+I 4 170 20.00 1  # LOOT: a silver ingot
 S
 #9163
 manatee~
@@ -1005,7 +1038,7 @@ spider~
 a spider~
 A spider scurries by.
 ~
-1 5 bdjo c
+1 5 bdjo cG
 0 0 7 9
 T 9188
 S
@@ -1014,7 +1047,7 @@ spider large~
 a large spider~
 A large spider creeps by.
 ~
-1 5 djo c
+1 5 djo cG
 0 0 9 9
 T 9188
 S
@@ -1026,6 +1059,13 @@ A tabby cat purrs nearby.
 5 15 djoz c
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+M
+0
+$n meows.~
+M
+0
+$n walks in circles around you, rubbing against your leg and purring.~
+T 9002
 S
 #9193
 cat tabby~
@@ -1035,6 +1075,10 @@ A tabby cat arches and hisses at you.
 5 15 djoz c
 0 0 0 10
 I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+M
+0
+$n hisses and arches $s back at you.~
+T 9002
 S
 #9194
 hound dog~
@@ -1076,7 +1120,7 @@ moth~
 a moth~
 A moth flutters nearby.
 ~
-1 5 bdjo c
+1 5 bdjo cG
 0 0 2 15
 T 9198
 S

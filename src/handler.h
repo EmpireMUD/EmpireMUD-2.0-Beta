@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: handler.h                                       EmpireMUD 2.0b4 *
+*   File: handler.h                                       EmpireMUD 2.0b5 *
 *  Usage: header file: prototypes of handling and utility functions       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -33,8 +33,15 @@
 #define FIND_OBJ_ROOM		BIT(3)
 #define FIND_OBJ_WORLD		BIT(4)
 #define FIND_OBJ_EQUIP		BIT(5)
-#define FIND_NO_DARK		BIT(6)
+#define FIND_NO_DARK		BIT(6)	// ignores light
 #define FIND_VEHICLE_ROOM	BIT(7)
+#define FIND_VEHICLE_INSIDE	BIT(8)
+#define FIND_NPC_ONLY		BIT(9)	// ignores players
+
+
+// for match_char_name()
+#define MATCH_GLOBAL  BIT(0)	// ignores dark/blind
+#define MATCH_IN_ROOM  BIT(1)	// specifically checks for things that only matter in-room
 
 
 // for the interaction handlers (returns TRUE if the character performs the interaction; FALSE if it aborts)
@@ -45,20 +52,19 @@
 //// HANDLER MACROS //////////////////////////////////////////////////////////
 
 #define MATCH_ITEM_NAME(str, obj)  (isname((str), GET_OBJ_KEYWORDS(obj)) || (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0 && isname((str), drinks[GET_DRINK_CONTAINER_TYPE(obj)])))
-#define MATCH_CHAR_DISGUISED_NAME(str, ch)  ((IS_MORPHED(ch) && isname((str), MORPH_KEYWORDS(GET_MORPH(ch)))) || (IS_DISGUISED(ch) && isname((str), GET_DISGUISED_NAME(ch))))
-#define MATCH_CHAR_NAME(str, ch)  ((!IS_NPC(ch) && GET_LASTNAME(ch) && isname((str), GET_LASTNAME(ch))) || isname((str), GET_PC_NAME(ch)) || MATCH_CHAR_DISGUISED_NAME(str, ch))
-#define MATCH_CHAR_NAME_ROOM(viewer, str, target)  ((IS_DISGUISED(target) && !IS_IMMORTAL(viewer) && !SAME_EMPIRE(viewer, target)) ? MATCH_CHAR_DISGUISED_NAME(str, target) : MATCH_CHAR_NAME(str, target))
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// handler.c protos ////////////////////////////////////////////////////////
 
 // affect handlers
-void affect_from_char(char_data *ch, int type);
-void affect_from_char_by_apply(char_data *ch, int type, int apply);
-void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits);
-void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag);
+void affect_from_char(char_data *ch, int type, bool show_msg);
+void affect_from_char_by_apply(char_data *ch, int type, int apply, bool show_msg);
+void affect_from_char_by_bitvector(char_data *ch, int type, bitvector_t bits, bool show_msg);
+void affect_from_char_by_caster(char_data *ch, int type, char_data *caster, bool show_msg);
+void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag, bool show_msg);
 void affect_from_room(room_data *room, int type);
+void affect_from_room_by_bitvector(room_data *room, int type, bitvector_t bits, bool show_msg);
 void affect_join(char_data *ch, struct affected_type *af, int flags);
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add);
 void affect_remove(char_data *ch, struct affected_type *af);
@@ -72,6 +78,7 @@ extern struct affected_type *create_aff(int type, int duration, int location, in
 void apply_dot_effect(char_data *ch, sh_int type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
 void dot_remove(char_data *ch, struct over_time_effect_type *dot);
 extern bool room_affected_by_spell(room_data *room, int type);
+void show_wear_off_msg(char_data *ch, int atype);
 
 // affect shortcut macros
 #define create_flag_aff(type, duration, bit, cast_by)  create_aff((type), (duration), APPLY_NONE, 0, (bit), (cast_by))
@@ -80,9 +87,8 @@ extern bool room_affected_by_spell(room_data *room, int type);
 // character handlers
 void extract_char(char_data *ch);
 void extract_char_final(char_data *ch);
-void perform_dismount(char_data *ch);
+extern bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t flags);
 void perform_idle_out(char_data *ch);
-void perform_mount(char_data *ch, char_data *mount);
 
 // character location handlers
 void char_from_room(char_data *ch);
@@ -91,6 +97,7 @@ void char_to_room(char_data *ch, room_data *room);
 // character targeting handlers
 extern char_data *find_closest_char(char_data *ch, char *arg, bool pc);
 extern char_data *find_mob_in_room_by_vnum(room_data *room, mob_vnum vnum);
+extern char_data *find_mortal_in_room(room_data *room);
 extern char_data *get_char_room(char *name, room_data *room);
 extern char_data *get_char_room_vis(char_data *ch, char *name);
 extern char_data *get_char_vis(char_data *ch, char *name, bitvector_t where);
@@ -105,7 +112,7 @@ void cleanup_coins(char_data *ch);
 void coin_string(struct coin_data *list, char *storage);
 extern obj_data *create_money(empire_data *type, int amount);
 #define decrease_coins(ch, emp, amount)  increase_coins(ch, emp, -1 * amount)
-extern int exchange_coin_value(int amount, empire_data *convert_from, empire_data *convert_to);
+extern double exchange_coin_value(double amount, empire_data *convert_from, empire_data *convert_to);
 double exchange_rate(empire_data *from, empire_data *to);
 extern char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, bool assume_coins);
 extern struct coin_data *find_coin_entry(struct coin_data *list, empire_data *emp);
@@ -128,9 +135,10 @@ extern int find_rank_by_name(empire_data *emp, char *name);
 extern struct empire_political_data *find_relation(empire_data *from, empire_data *to);
 extern struct empire_territory_data *find_territory_entry(empire_data *emp, room_data *room);
 struct empire_trade_data *find_trade_entry(empire_data *emp, int type, obj_vnum vnum);
-extern int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, int amount);
+extern int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, double amount);
 #define decrease_empire_coins(emp_gaining, coin_empire, amount)  increase_empire_coins((emp_gaining), (coin_empire), -1 * (amount))
 void perform_abandon_room(room_data *room);
+void perform_claim_room(room_data *room, empire_data *emp);
 
 // empire targeting handlers
 extern struct empire_city_data *find_city(empire_data *emp, room_data *loc);
@@ -163,12 +171,20 @@ extern bool run_room_interactions(char_data *ch, room_data *room, int type, INTE
 // lore handlers
 void add_lore(char_data *ch, int type, const char *str, ...) __attribute__((format(printf, 3, 4)));
 void remove_lore(char_data *ch, int type);
+void remove_recent_lore(char_data *ch, int type);
 
 // mob tagging handlers
 extern bool find_id_in_tag_list(int id, struct mob_tag *list);
 void expand_mob_tags(char_data *mob);
 void free_mob_tags(struct mob_tag **list);
 void tag_mob(char_data *mob, char_data *player);
+
+// mount handlers
+void add_mount(char_data *ch, mob_vnum vnum, bitvector_t flags);
+extern bitvector_t get_mount_flags_by_mob(char_data *mob);
+extern struct mount_data *find_mount_data(char_data *ch, mob_vnum vnum);
+void perform_dismount(char_data *ch);
+void perform_mount(char_data *ch, char_data *mount);
 
 // object handlers
 void add_to_object_list(obj_data *obj);
@@ -177,6 +193,7 @@ void empty_obj_before_extract(obj_data *obj);
 void extract_obj(obj_data *obj);
 extern obj_data *fresh_copy_obj(obj_data *obj, int scale_level);
 extern bool objs_are_identical(obj_data *obj_a, obj_data *obj_b);
+extern bool parse_component(char *str, int *type, bitvector_t *flags);
 void remove_from_object_list(obj_data *obj);
 
 // object binding handlers
@@ -202,10 +219,12 @@ void obj_to_room(obj_data *object, room_data *room);
 void obj_to_vehicle(obj_data *object, vehicle_data *veh);
 void swap_obj_for_obj(obj_data *old, obj_data *new);
 extern obj_data *unequip_char(char_data *ch, int pos);
-void unequip_char_to_inventory(char_data *ch, int pos);
-void unequip_char_to_room(char_data *ch, int pos);
+extern obj_data *unequip_char_to_inventory(char_data *ch, int pos);
+extern obj_data *unequip_char_to_room(char_data *ch, int pos);
 
-// object message handlers
+// custom message handlers
+extern struct custom_message *copy_custom_messages(struct custom_message *from);
+void free_custom_messages(struct custom_message *mes);
 extern char *get_custom_message(obj_data *obj, int type);
 extern bool has_custom_message(obj_data *obj, int type);
 
@@ -225,6 +244,9 @@ extern obj_data *get_obj_world(char *name);
 extern struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data);
 void remove_offers_by_type(char_data *ch, int type);
 
+// requirement handlers
+void free_requirements(struct req_data *list);
+
 // resource depletion handlers
 void add_depletion(room_data *room, int type, bool multiple);
 extern int get_depletion(room_data *room, int type);
@@ -234,6 +256,7 @@ void set_depletion(room_data *room, int type, int value);
 // room handlers
 void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers);
 void attach_template_to_room(room_template *rmt, room_data *room);
+void detach_building_from_room(room_data *room);
 
 // room extra data handlers
 void add_to_room_extra_data(room_data *room, int type, int add_value);
@@ -303,7 +326,7 @@ extern int parse_direction(char_data *ch, char *dir);
 //// handlers from other files ///////////////////////////////////////////////
 
 // act.item.c
-void perform_remove(char_data *ch, int pos);
+extern obj_data *perform_remove(char_data *ch, int pos);
 
 // books.c
 extern book_data *book_proto(book_vnum vnum);
@@ -318,6 +341,15 @@ extern int config_get_int(char *key);
 extern int *config_get_int_array(char *key, int *array_size);
 extern const char *config_get_string(char *key);
 
+// faction.c
+extern int compare_reptuation(int rep_a, int rep_b);
+void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, bool cascade);
+extern struct player_faction_data *get_reputation(char_data *ch, any_vnum vnum, bool create);
+extern int get_reputation_by_name(char *name);
+extern int get_reputation_value(char_data *ch, any_vnum vnum);
+extern bool has_reputation(char_data *ch, any_vnum faction, int rep);
+extern int rep_const_to_index(int rep_const);
+
 // fight.c
 void appear(char_data *ch);
 extern bool can_fight(char_data *ch, char_data *victim);
@@ -329,6 +361,11 @@ extern bool is_fighting(char_data *ch);
 void set_fighting(char_data *ch, char_data *victim, byte mode);
 void stop_fighting(char_data *ch);
 void update_pos(char_data *victim);
+
+// instance.c
+void add_instance_mob(struct instance_data *inst, mob_vnum vnum);
+extern struct instance_data *real_instance(any_vnum instance_id);
+void subtract_instance_mob(struct instance_data *inst, mob_vnum vnum);
 
 // limits.c
 extern int limit_crowd_control(char_data *victim, int atype);

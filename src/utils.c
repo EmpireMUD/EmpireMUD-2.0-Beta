@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: utils.c                                         EmpireMUD 2.0b4 *
+*   File: utils.c                                         EmpireMUD 2.0b5 *
 *  Usage: various internal functions of a utility nature                  *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -30,6 +30,7 @@
 * Contents:
 *   Basic Utils
 *   Empire Utils
+*   Empire Trade Utils
 *   Empire Diplomacy Utils
 *   Empire Permissions Utils
 *   File Utils
@@ -60,6 +61,7 @@ void send_char_pos(char_data *ch, int dam);
 bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
 bool is_trading_with(empire_data *emp, empire_data *partner);
 void score_empires();
+void unmark_items_for_char(char_data *ch, bool ground);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -438,207 +440,18 @@ int get_total_score(empire_data *emp) {
 
 
 /**
-* Runs imports from one empire. By the time this function is called, we only
-* know they are active empires and trading partners.
-*
-* @param empire_data *emp The empire importing.
-* @param empire_data *partner The trading partner.
-* @param int *limit Pointer to the number imported so far today -- to limit the total.
-*/
-void process_import_pair(empire_data *emp, empire_data *partner, int *limit) {
-	extern int get_main_island(empire_data *emp);
-	
-	struct empire_trade_data *trade, *p_trade, **trade_list = NULL, **partner_list = NULL;
-	int *trade_list_cost = NULL, *trade_list_count = NULL;
-	double rate = exchange_rate(emp, partner);
-	int my_amt, their_amt, found_island, iter, trade_list_size = 0, owed;
-	bool found_any;
-	obj_data *orn;
-	
-	int imports_per_day = config_get_int("imports_per_day");
-	
-	// could we even afford them?
-	if (rate < 0.01) {
-		return;
-	}
-	
-	// find items to trade with this empire: construct a list of valid trades
-	for (trade = EMPIRE_TRADE(emp); trade; trade = trade->next) {
-		if (trade->type != TRADE_IMPORT) {
-			continue;
-		}
-		
-		// do we need it?
-		my_amt = get_total_stored_count(emp, trade->vnum, TRUE);	// count shipping
-		if (my_amt >= trade->limit) {
-			continue;
-		}
-		
-		// do THEY have it?
-		if (!(p_trade = find_trade_entry(partner, TRADE_EXPORT, trade->vnum))) {
-			continue;
-		}
-		
-		// do they have enough?
-		their_amt = get_total_stored_count(partner, trade->vnum, FALSE);	// don't count shipping -- it's not tradable
-		if (their_amt <= p_trade->limit) {
-			continue;
-		}
-		
-		// will we pay that much? (we compare this at *imports_per_day on both sides because the cost-per-one may have misleading rounding
-		if ((int) round(p_trade->cost * imports_per_day * (1/rate)) > trade->cost * imports_per_day) {
-			continue;
-		}
-		
-		// possible trade! add to list
-		if (trade_list_size > 0) {
-			RECREATE(trade_list, struct empire_trade_data*, trade_list_size+1);
-			RECREATE(partner_list, struct empire_trade_data*, trade_list_size+1);
-		}
-		else {
-			CREATE(trade_list, struct empire_trade_data*, trade_list_size+1);
-			CREATE(partner_list, struct empire_trade_data*, trade_list_size+1);
-		}
-		
-		trade_list[trade_list_size] = trade;
-		partner_list[trade_list_size] = p_trade;
-		
-		++trade_list_size;
-	}
-	
-	// set up costs so we know what to log later
-	if (trade_list_size > 0) {
-		CREATE(trade_list_cost, int, trade_list_size);
-		CREATE(trade_list_count, int, trade_list_size);
-		for (iter = 0; iter < trade_list_size; ++iter) {
-			trade_list_cost[iter] = 0;
-			trade_list_count[iter] = 0;
-		}
-	}
-	
-	// did we find any?
-	owed = 0;
-	do {
-		found_any = FALSE;
-		for (iter = 0; iter < trade_list_size && *limit < imports_per_day; ++iter) {
-			// do they still have any?
-			their_amt = get_total_stored_count(partner, trade_list[iter]->vnum, FALSE);	// don't count shipping; it's not tradable
-			if (their_amt <= partner_list[iter]->limit) {
-				continue;
-			}
-
-			// do we still it?
-			my_amt = get_total_stored_count(emp, trade_list[iter]->vnum, TRUE);	// do count shipping
-			if (my_amt >= trade_list[iter]->limit) {
-				continue;
-			}
-			
-			// can afford? (comparing total owed because low values may not rate-convert correctly)
-			if (EMPIRE_COINS(emp) < (int) round((owed + partner_list[iter]->cost) * (1/rate))) {
-				continue;
-			}
-			
-			// trade ok
-			owed += partner_list[iter]->cost;
-			
-			// only store it if we did find an island to store to
-			if ((found_island = get_main_island(emp)) != NO_ISLAND) {
-				add_to_empire_storage(emp, found_island, trade_list[iter]->vnum, 1);
-				charge_stored_resource(partner, ANY_ISLAND, trade_list[iter]->vnum, 1);
-			
-				trade_list_cost[iter] += partner_list[iter]->cost;
-				++trade_list_count[iter];
-			
-				// one trade done
-				*limit += 1;
-				found_any = TRUE;
-			}
-		}
-	} while (found_any);
-	
-	// settle up
-	if (owed > 0) {
-		decrease_empire_coins(emp, emp, (int)round(owed * (1/rate)));
-		increase_empire_coins(partner, partner, owed);
-	}
-	
-	// anything to log?
-	for (iter = 0; iter < trade_list_size; ++iter) {
-		if (trade_list_count[iter] > 0) {
-			orn = obj_proto(trade_list[iter]->vnum);
-			log_to_empire(emp, ELOG_TRADE, "Imported %s x%d from %s for %d coins", GET_OBJ_SHORT_DESC(orn), trade_list_count[iter], EMPIRE_NAME(partner), (int)round(trade_list_cost[iter] * (1/rate)));
-			log_to_empire(partner, ELOG_TRADE, "Exported %s x%d to %s for %d coins", GET_OBJ_SHORT_DESC(orn), trade_list_count[iter], EMPIRE_NAME(emp), trade_list_cost[iter]);
-		}
-	}
-	
-	if (trade_list) {
-		free(trade_list);
-	}
-	if (partner_list) {
-		free(partner_list);
-	}
-	if (trade_list_cost) {
-		free(trade_list_cost);
-	}
-	if (trade_list_count) {
-		free(trade_list_count);
-	}
-}
-
-
-// runs daily imports
-void process_imports(void) {
-	void read_vault(empire_data *emp);
-	
-	empire_data *emp, *next_emp, *partner, *next_partner;
-	int limit;
-	
-	int imports_per_day = config_get_int("imports_per_day");
-	int time_to_empire_emptiness = config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK;
-	
-	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (EMPIRE_IMM_ONLY(emp)) {
-			continue;
-		}
-		if (!EMPIRE_HAS_TECH(emp, TECH_TRADE_ROUTES)) {
-			continue;
-		}
-		if (EMPIRE_LAST_LOGON(emp) + time_to_empire_emptiness < time(0)) {
-			continue;
-		}
-		
-		// for periodic trade limit
-		limit = 0;
-		
-		// find trading partners in order of empire rank
-		HASH_ITER(hh, empire_table, partner, next_partner) {
-			if (limit >= imports_per_day) {
-				break;
-			}
-			
-			if (!is_trading_with(emp, partner)) {
-				continue;
-			}
-			
-			process_import_pair(emp, partner, &limit);
-		}
-		
-		read_vault(emp);
-	}
-}
-
-
-/**
 * Trigger a score update and re-sort of the empires.
+*
+* @param bool force Overrides the time limit on resorting.
 */
-void resort_empires(void) {
+void resort_empires(bool force) {
 	extern int sort_empires(empire_data *a, empire_data *b);
 	
 	static time_t last_sort_time = 0;
 	static int last_sort_size = 0;
 
 	// prevent constant re-sorting by limiting this to once per minute
-	if (last_sort_size != HASH_COUNT(empire_table) || last_sort_time + (60 * 1) < time(0)) {
+	if (force || last_sort_size != HASH_COUNT(empire_table) || last_sort_time + (60 * 1) < time(0)) {
 		// better score them first
 		score_empires();
 		HASH_SORT(empire_table, sort_empires);
@@ -768,6 +581,212 @@ void score_empires(void) {
 			// assign permanent score
 			EMPIRE_SORT_VALUE(emp) += EMPIRE_SCORE(emp, iter);
 			EMPIRE_SCORE(emp, iter) = num;
+		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EMPIRE TRADE UTILS //////////////////////////////////////////////////////
+
+
+// helper type for short list of empires
+struct partner_list_type {
+	empire_data *emp;
+	double rate;
+	
+	struct partner_list_type *next;	// doubly-linked list
+	struct partner_list_type *prev;
+};
+
+
+// helper type for cost sorting
+struct import_pair_type {
+	empire_data *emp;	// trading partner
+	int amount;	// how many (up to the amt we want)
+	double cost;	// cost each
+	double rate;	// the rate we paid
+	
+	struct import_pair_type *next;	// doubly-linked list
+	struct import_pair_type *prev;
+};
+
+
+// simple sorter for cost of partners (ascending order of cost)
+int sort_import_partners(struct import_pair_type *a, struct import_pair_type *b) {
+	return (a->cost > b->cost) - (a->cost < b->cost);
+}
+
+
+/**
+* Attempts to import goods into the empire from trading partners. We have
+* already checked TECH_TRADE_ROUTES before this, and that the empire is not
+* timed out.
+*
+* @param empire_data *emp The empire to import to.
+* @return bool TRUE if any items moved
+*/
+bool process_import_one(empire_data *emp) {
+	extern int get_main_island(empire_data *emp);
+	
+	struct partner_list_type *plt, *next_plt, *partner_list = NULL;
+	struct import_pair_type *pair, *next_pair, *pair_list;
+	int my_amt, their_amt, trade_amt, found_island = NO_ISLAND;
+	struct empire_trade_data *trade, *p_trade;
+	empire_data *partner, *next_partner;
+	int limit = config_get_int("imports_per_day");
+	bool any = FALSE;
+	obj_data *orn;
+	double cost;
+	
+	// find trading partners
+	HASH_ITER(hh, empire_table, partner, next_partner) {
+		if (is_trading_with(emp, partner)) {
+			CREATE(plt, struct partner_list_type, 1);
+			plt->emp = partner;
+			plt->rate = exchange_rate(emp, partner);
+			DL_APPEND(partner_list, plt);	// NOTE: reverses order of the partner list
+		}
+	}
+	
+	// find items to trade
+	LL_FOREACH(EMPIRE_TRADE(emp), trade) {
+		if (limit <= 0) {
+			break;	// done!
+		}
+		
+		if (trade->type != TRADE_IMPORT) {
+			continue;	// not an import
+		}
+		if ((my_amt = get_total_stored_count(emp, trade->vnum, TRUE)) >= trade->limit) {
+			continue;	// don't need any of it
+		}
+		
+		// build a list of trading partners who have it
+		pair_list = NULL;
+		DL_FOREACH(partner_list, plt) {
+			if (!(p_trade = find_trade_entry(plt->emp, TRADE_EXPORT, trade->vnum))) {
+				continue;	// not trading this item
+			}
+			if ((p_trade->cost * (1.0/plt->rate)) > trade->cost) {
+				continue;	// too expensive
+			}
+			if ((their_amt = get_total_stored_count(plt->emp, trade->vnum, FALSE)) <= p_trade->limit) {
+				continue;	// they don't have enough (don't count shipping -- it's not tradable)
+			}
+			
+			// compute real amounts:
+			their_amt -= p_trade->limit;	// how much they have available to trade
+			their_amt = MIN((trade->limit - my_amt), their_amt);	// how many we actually need
+			
+			// seems valid!
+			if (their_amt > 0) {
+				CREATE(pair, struct import_pair_type, 1);
+				pair->emp = plt->emp;
+				pair->amount = their_amt;
+				pair->rate = plt->rate;
+				pair->cost = p_trade->cost * (1.0/plt->rate);
+				DL_APPEND(pair_list, pair);
+			}
+		}
+		
+		// anything to trade?
+		if (!pair_list) {
+			continue;
+		}
+		
+		// sort the list
+		DL_SORT(pair_list, sort_import_partners);
+		
+		// attempt to trade up to the limit
+		DL_FOREACH(pair_list, pair) {
+			if (limit <= 0) {
+				break;	// done!
+			}
+			
+			// amount to actually trade now:
+			trade_amt = trade->limit - my_amt;	// amount we need
+			trade_amt = MIN(trade_amt, pair->amount);	// amount available
+			trade_amt = MIN(trade_amt, limit);	// amount we can import
+			if (trade_amt < 1) {
+				break; // don't neeed anymore?
+			}
+			
+			// compute cost for this trade (pair->cost is already rate-exchanged)
+			cost = trade_amt * pair->cost;
+			
+			// can we afford it?
+			if (EMPIRE_COINS(emp) < cost) {
+				trade_amt = EMPIRE_COINS(emp) / pair->cost;	// reduce to how many we can afford
+				cost = trade_amt * pair->cost;
+				if (trade_amt < 1) {
+					continue;	// can't afford any
+				}
+			}
+			
+			// only store it if we did find an island to store to
+			if (found_island != NO_ISLAND || (found_island = get_main_island(emp)) != NO_ISLAND) {
+				// items
+				add_to_empire_storage(emp, found_island, trade->vnum, trade_amt);
+				charge_stored_resource(pair->emp, ANY_ISLAND, trade->vnum, trade_amt);
+				
+				// money
+				decrease_empire_coins(emp, emp, cost);
+				increase_empire_coins(pair->emp, pair->emp, cost * pair->rate);
+				
+				// update limit
+				limit -= trade_amt;
+				any = TRUE;
+				
+				// log
+				orn = obj_proto(trade->vnum);
+				log_to_empire(emp, ELOG_TRADE, "Imported %s x%d from %s for %.1f coins", GET_OBJ_SHORT_DESC(orn), trade_amt, EMPIRE_NAME(pair->emp), cost);
+				log_to_empire(pair->emp, ELOG_TRADE, "Exported %s x%d to %s for %.1f coins", GET_OBJ_SHORT_DESC(orn), trade_amt, EMPIRE_NAME(emp), cost * pair->rate);
+			}
+		}
+		
+		// free this partner list
+		DL_FOREACH_SAFE(pair_list, pair, next_pair) {
+			DL_DELETE(pair_list, pair);
+			free(pair);
+		}
+	}
+	
+	// cleaup
+	DL_FOREACH_SAFE(partner_list, plt, next_plt) {
+		DL_DELETE(partner_list, plt);
+		free(plt);
+	}
+	
+	return any;
+}
+
+
+// runs daily imports
+void process_imports(void) {
+	void read_vault(empire_data *emp);
+	
+	empire_data *emp, *next_emp;
+	int amount;
+	
+	int time_to_empire_emptiness = config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (EMPIRE_IMM_ONLY(emp)) {
+			continue;
+		}
+		if (!EMPIRE_HAS_TECH(emp, TECH_TRADE_ROUTES)) {
+			continue;
+		}
+		if (EMPIRE_LAST_LOGON(emp) + time_to_empire_emptiness < time(0)) {
+			continue;
+		}
+		
+		// ok go
+		amount = process_import_one(emp);
+		
+		if (amount > 0) {
+			read_vault(emp);
 		}
 	}
 }
@@ -1373,8 +1392,10 @@ int get_line(FILE *fl, char *buf) {
 		}
 		lines++;
 	} while (*temp == '*' || *temp == '\n');
-
-	temp[strlen(temp) - 1] = '\0';
+	
+	if (temp[strlen(temp) - 1] == '\n') {
+		temp[strlen(temp) - 1] = '\0';
+	}
 	strcpy(buf, temp);
 	return (lines);
 }
@@ -1470,15 +1491,13 @@ void log_to_empire(empire_data *emp, int type, const char *str, ...) {
 			EMPIRE_LOGS(emp) = elog;
 		}
 		
-		save_empire(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 	
 	// show to players
 	if (show_empire_log_type[type] == TRUE) {
 		for (i = descriptor_list; i; i = i->next) {
 			if (STATE(i) != CON_PLAYING || IS_NPC(i->character))
-				continue;
-			if (PLR_FLAGGED(i->character, PLR_WRITING))
 				continue;
 			if (GET_LOYALTY(i->character) != emp)
 				continue;
@@ -1504,7 +1523,7 @@ void mortlog(const char *str, ...) {
 	vsprintf(output, str, tArgList);
 
 	for (i = descriptor_list; i; i = i->next) {
-		if (STATE(i) == CON_PLAYING && i->character && !PLR_FLAGGED(i->character, PLR_WRITING) && PRF_FLAGGED(i->character, PRF_MORTLOG)) {
+		if (STATE(i) == CON_PLAYING && i->character && PRF_FLAGGED(i->character, PRF_MORTLOG)) {
 			msg_to_char(i->character, "&c[ %s ]&0\r\n", output);
 		}
 	}
@@ -1557,7 +1576,7 @@ void syslog(bitvector_t type, int level, bool file, const char *str, ...) {
 	level = MAX(level, LVL_START_IMM);
 
 	for (i = descriptor_list; i; i = i->next) {
-		if (STATE(i) == CON_PLAYING && i->character && !IS_NPC(i->character) && !PLR_FLAGGED(i->character, PLR_WRITING) && GET_ACCESS_LEVEL(i->character) >= level) {
+		if (STATE(i) == CON_PLAYING && i->character && !IS_NPC(i->character) && GET_ACCESS_LEVEL(i->character) >= level) {
 			if (IS_SET(SYSLOG_FLAGS(REAL_CHAR(i->character)), type)) {
 				if (level > LVL_START_IMM) {
 					msg_to_char(i->character, "&g[ (i%d) %s ]&0\r\n", level, output);
@@ -1620,20 +1639,20 @@ char *any_one_word(char *argument, char *first_arg) {
 
 	if (*argument == '\"') {
 		++argument;
-		do {
+		while (*argument && *argument != '\"') {
 			*(first_arg++) = *argument;
 			++argument;
-		} while (*argument && *argument != '\"');
+		}
 		if (*argument) {
 			++argument;
 		}
 	}
 	else if (*argument == '(') {
 		++argument;
-		do {
+		while (*argument && *argument != ')') {
 			*(first_arg++) = *argument;
 			++argument;
-		} while (*argument && *argument != ')');
+		}
 		if (*argument) {
 			++argument;
 		}
@@ -1779,6 +1798,10 @@ bool is_multiword_abbrev(const char *arg, const char *phrase) {
 * @return int TRUE if str is a number, FALSE if it contains anything else.
 */
 int is_number(const char *str) {
+	if (!*str) {
+		return (0);
+	}
+	
 	// allow leading negative
 	if (*str == '-') {
 		str++;
@@ -2293,6 +2316,8 @@ void add_to_resource_list(struct resource_data **list, int type, any_vnum vnum, 
 * @param struct resource_data **build_used_list Optional: If you need to track the actual resources used, pass a pointer to that list.
 */
 void apply_resource(char_data *ch, struct resource_data *res, struct resource_data **list, obj_data *use_obj, int msg_type, vehicle_data *crafting_veh, struct resource_data **build_used_list) {
+	extern const char *res_action_messages[][NUM_APPLY_RES_TYPES][2];
+	
 	bool messaged_char = FALSE, messaged_room = FALSE;
 	char buf[MAX_STRING_LENGTH];
 	int amt;
@@ -2457,6 +2482,17 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 			res->amount = 0;	// cost paid in full
 			break;
 		}
+		case RES_ACTION: {
+			if (*res_action_messages[res->vnum][msg_type][0]) {
+				act(res_action_messages[res->vnum][msg_type][0], FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
+			}
+			if (*res_action_messages[res->vnum][msg_type][1]) {
+				act(res_action_messages[res->vnum][msg_type][1], FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
+			}
+			
+			res->amount -= 1;	// only 1 at a time
+			break;
+		}
 	}
 	
 	// now possibly remove the resource, if it hit zero
@@ -2507,101 +2543,120 @@ char *component_string(int type, bitvector_t flags) {
 * @param struct resource_data **build_used_list Optional: if not NULL, will build a resource list of the specifc things extracted.
 */
 void extract_resources(char_data *ch, struct resource_data *list, bool ground, struct resource_data **build_used_list) {
+	int diff, liter, remaining, cycle;
 	obj_data *obj, *next_obj;
-	int diff, liter, remaining;
 	struct resource_data *res;
 	
-	LL_FOREACH(list, res) {
-		// RES_x: extract resources by type
-		switch (res->type) {
-			case RES_OBJECT:
-			case RES_COMPONENT:
-			case RES_LIQUID: {	// these 3 types check objects
-				obj_data *search_list[2];
-				search_list[0] = ch->carrying;
-				search_list[1] = ground ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+	// This is done in 2 phases (to ensure specific objs are used before components):
+	#define EXRES_OBJS  (cycle == 0)	// check/mark specific objs
+	#define EXRES_OTHER  (cycle == 1)	// check/mark components
+	#define NUM_EXRES_CYCLES  2
+	
+	for (cycle = 0; cycle < NUM_EXRES_CYCLES; ++cycle) {
+		LL_FOREACH(list, res) {
+			// only RES_OBJECT is checked in the first cycle
+			if (EXRES_OBJS && res->type != RES_OBJECT) {
+				continue;
+			}
+			else if (EXRES_OTHER && res->type == RES_OBJECT) {
+				continue;
+			}
+		
+			// RES_x: extract resources by type
+			switch (res->type) {
+				case RES_OBJECT:
+				case RES_COMPONENT:
+				case RES_LIQUID: {	// these 3 types check objects
+					obj_data *search_list[2];
+					search_list[0] = ch->carrying;
+					search_list[1] = ground ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
 				
-				remaining = res->amount;
+					remaining = res->amount;
 				
-				// up to two places to search
-				for (liter = 0; liter < 2 && remaining > 0; ++liter) {
-					LL_FOREACH_SAFE2(search_list[liter], obj, next_obj, next_content) {
-						// skip keeps
-						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
-							continue;
-						}
-						if (!CAN_SEE_OBJ(ch, obj)) {
-							continue;
-						}
+					// up to two places to search
+					for (liter = 0; liter < 2 && remaining > 0; ++liter) {
+						LL_FOREACH_SAFE2(search_list[liter], obj, next_obj, next_content) {
+							// skip keeps
+							if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+								continue;
+							}
+							if (!CAN_SEE_OBJ(ch, obj)) {
+								continue;
+							}
 						
-						// RES_x: just types that need objects
-						switch (res->type) {
-							case RES_OBJECT: {
-								if (GET_OBJ_VNUM(obj) == res->vnum) {
-									if (build_used_list) {
-										add_to_resource_list(build_used_list, RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-									}
+							// RES_x: just types that need objects
+							switch (res->type) {
+								case RES_OBJECT: {
+									if (GET_OBJ_VNUM(obj) == res->vnum) {
+										if (build_used_list) {
+											add_to_resource_list(build_used_list, RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+										}
 									
-									--remaining;
-									extract_obj(obj);
+										--remaining;
+										extract_obj(obj);
+									}
+									break;
 								}
-								break;
-							}
-							case RES_COMPONENT: {
-								// require full match on cmp flags
-								if (GET_OBJ_CMP_TYPE(obj) == res->vnum && (GET_OBJ_CMP_FLAGS(obj) & res->misc) == res->misc) {
-									if (build_used_list) {
-										add_to_resource_list(build_used_list, RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-									}
+								case RES_COMPONENT: {
+									// require full match on cmp flags
+									if (GET_OBJ_CMP_TYPE(obj) == res->vnum && (GET_OBJ_CMP_FLAGS(obj) & res->misc) == res->misc) {
+										if (build_used_list) {
+											add_to_resource_list(build_used_list, RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+										}
 									
-									--remaining;
-									extract_obj(obj);
+										--remaining;
+										extract_obj(obj);
+									}
+									break;
 								}
-								break;
-							}
-							case RES_LIQUID: {
-								if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == res->vnum) {
-									diff = MIN(remaining, GET_DRINK_CONTAINER_CONTENTS(obj));
-									remaining -= diff;
-									GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) -= diff;
+								case RES_LIQUID: {
+									if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == res->vnum) {
+										diff = MIN(remaining, GET_DRINK_CONTAINER_CONTENTS(obj));
+										remaining -= diff;
+										GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) -= diff;
 									
-									if (GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) == 0) {
-										GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
-									}
+										if (GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) == 0) {
+											GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+										}
 									
-									if (build_used_list) {
-										add_to_resource_list(build_used_list, RES_LIQUID, res->vnum, diff, 0);
+										if (build_used_list) {
+											add_to_resource_list(build_used_list, RES_LIQUID, res->vnum, diff, 0);
+										}
 									}
+									break;
 								}
-								break;
 							}
-						}
 						
-						// ok to break out early if we found enough
-						if (remaining <= 0) {
-							break;
+							// ok to break out early if we found enough
+							if (remaining <= 0) {
+								break;
+							}
 						}
 					}
+					break;
 				}
-				break;
-			}
-			case RES_COINS: {
-				charge_coins(ch, real_empire(res->vnum), res->amount, build_used_list);
-				break;
-			}
-			case RES_POOL: {
-				if (build_used_list) {
-					add_to_resource_list(build_used_list, RES_POOL, res->vnum, res->amount, 0);
+				case RES_COINS: {
+					charge_coins(ch, real_empire(res->vnum), res->amount, build_used_list);
+					break;
 				}
+				case RES_POOL: {
+					if (build_used_list) {
+						add_to_resource_list(build_used_list, RES_POOL, res->vnum, res->amount, 0);
+					}
 				
-				GET_CURRENT_POOL(ch, res->vnum) -= res->amount;
-				GET_CURRENT_POOL(ch, res->vnum) = MAX(0, GET_CURRENT_POOL(ch, res->vnum));
+					GET_CURRENT_POOL(ch, res->vnum) -= res->amount;
+					GET_CURRENT_POOL(ch, res->vnum) = MAX(0, GET_CURRENT_POOL(ch, res->vnum));
 				
-				if (res->vnum == HEALTH) {
-					update_pos(ch);
-					send_char_pos(ch, 0);
+					if (res->vnum == HEALTH) {
+						update_pos(ch);
+						send_char_pos(ch, 0);
+					}
+					break;
 				}
-				break;
+				case RES_ACTION: {
+					// nothing to do
+					break;
+				}
 			}
 		}
 	}
@@ -2701,6 +2756,10 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 				}
 				break;
 			}
+			case RES_ACTION: {
+				// always good
+				return res;
+			}
 		}
 		
 		// if they requested left-to-right, we never pass the first resource in the list
@@ -2721,6 +2780,8 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 * @return char* A short string including quantity and type.
 */
 char *get_resource_name(struct resource_data *res) {
+	extern const char *res_action_type[];
+	
 	static char output[MAX_STRING_LENGTH];
 	
 	*output = '\0';
@@ -2745,6 +2806,10 @@ char *get_resource_name(struct resource_data *res) {
 		}
 		case RES_POOL: {
 			snprintf(output, sizeof(output), "%d %s point%s", res->amount, pool_types[res->vnum], PLURAL(res->amount));
+			break;
+		}
+		case RES_ACTION: {
+			snprintf(output, sizeof(output), "%dx [%s]", res->amount, res_action_type[res->vnum]);
 			break;
 		}
 		default: {
@@ -2773,8 +2838,9 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 	LL_FOREACH(list, res) {
 		// RES_x: give resources by type
 		switch (res->type) {
-			case RES_COMPONENT: {
-				// nothing to do -- we can't refund a generic component
+			case RES_COMPONENT:
+			case RES_ACTION: {
+				// nothing to do -- we can't refund these
 				break;
 			}
 			case RES_OBJECT: {
@@ -2895,109 +2961,137 @@ void halve_resource_list(struct resource_data **list, bool remove_nonrefundables
 * @param bool send_msgs If TRUE, will alert the character as to what they need. FALSE runs silently.
 */
 bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs) {	
+	int total, amt, liter, cycle;
 	struct resource_data *res;
-	int total, amt, liter;
 	bool ok = TRUE;
 	obj_data *obj;
 	
-	LL_FOREACH(list, res) {
-		total = 0;
-		
-		// RES_x: check resources by type
-		switch (res->type) {
-			case RES_OBJECT:
-			case RES_COMPONENT:
-			case RES_LIQUID: {	// these 3 types check objects
-				obj_data *search_list[2];
-				search_list[0] = ch->carrying;
-				search_list[1] = ground ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
-				
-				// more than one place to search...
-				for (liter = 0; liter < 2 && total < res->amount; ++liter) {
-					LL_FOREACH2(search_list[liter], obj, next_content) {
-						// skip keeps
-						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
-							continue;
-						}
-						if (!CAN_SEE_OBJ(ch, obj)) {
-							continue;
-						}
-						
-						// RES_x: just types that need objects
-						switch (res->type) {
-							case RES_OBJECT: {
-								if (GET_OBJ_VNUM(obj) == res->vnum) {
-									++total;
-								}
-								break;
-							}
-							case RES_COMPONENT: {
-								// require full match on cmp flags
-								if (GET_OBJ_CMP_TYPE(obj) == res->vnum && (GET_OBJ_CMP_FLAGS(obj) & res->misc) == res->misc) {
-									++total;
-								}
-								break;
-							}
-							case RES_LIQUID: {
-								if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == res->vnum) {
-									// add the volume of liquid
-									total += GET_DRINK_CONTAINER_CONTENTS(obj);
-								}
-								break;
-							}
-						}
-						
-						// ok to break out early if we found enough
-						if (total >= res->amount) {
-							break;
-						}
-					}
-				}
+	unmark_items_for_char(ch, ground);
 
-				if (total < res->amount) {
-					if (send_msgs) {
-						// RES_x: just types that need objects
-						switch (res->type) {
-							case RES_OBJECT: {
-								msg_to_char(ch, "%s %d more of %s", (ok ? "You need" : ","), res->amount - total, skip_filler(get_obj_name_by_proto(res->vnum)));
-								break;
+	// This is done in 2 phases (to ensure specific objs are used before components):
+	#define HASRES_OBJS  (cycle == 0)	// check/mark specific objs
+	#define HASRES_OTHER  (cycle == 1)	// check/mark components
+	#define NUM_HASRES_CYCLES  2
+	
+	for (cycle = 0; cycle < NUM_HASRES_CYCLES; ++cycle) {
+		LL_FOREACH(list, res) {
+			// only RES_OBJECT is checked in the first cycle
+			if (HASRES_OBJS && res->type != RES_OBJECT) {
+				continue;
+			}
+			else if (HASRES_OTHER && res->type == RES_OBJECT) {
+				continue;
+			}
+			
+			total = 0;
+		
+			// RES_x: check resources by type
+			switch (res->type) {
+				case RES_OBJECT:
+				case RES_COMPONENT:
+				case RES_LIQUID: {	// these 3 types check objects
+					obj_data *search_list[2];
+					search_list[0] = ch->carrying;
+					search_list[1] = ground ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+				
+					// now search the list(s)
+					for (liter = 0; liter < 2 && total < res->amount; ++liter) {
+						LL_FOREACH2(search_list[liter], obj, next_content) {
+							// skip already-used items
+							if (obj->search_mark) {
+								continue;
 							}
-							case RES_COMPONENT: {
-								msg_to_char(ch, "%s %d more (%s)", (ok ? "You need" : ","), res->amount - total, component_string(res->vnum, res->misc));
-								break;
+							// skip keeps
+							if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+								continue;
 							}
-							case RES_LIQUID: {
-								msg_to_char(ch, "%s %d more unit%s of %s", (ok ? "You need" : ","), res->amount - total, PLURAL(res->amount - total), drinks[res->vnum]);
+							if (!CAN_SEE_OBJ(ch, obj)) {
+								continue;
+							}
+						
+							// RES_x: just types that need objects
+							switch (res->type) {
+								case RES_OBJECT: {
+									if (GET_OBJ_VNUM(obj) == res->vnum) {
+										++total;
+										obj->search_mark = TRUE;
+									}
+									break;
+								}
+								case RES_COMPONENT: {
+									// require full match on cmp flags
+									if (GET_OBJ_CMP_TYPE(obj) == res->vnum && (GET_OBJ_CMP_FLAGS(obj) & res->misc) == res->misc) {
+										++total;
+										obj->search_mark = TRUE;
+									}
+									break;
+								}
+								case RES_LIQUID: {
+									if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == res->vnum) {
+										// add the volume of liquid
+										total += GET_DRINK_CONTAINER_CONTENTS(obj);
+										obj->search_mark = TRUE;
+									}
+									break;
+								}
+							}
+						
+							// ok to break out early if we found enough
+							if (total >= res->amount) {
 								break;
 							}
 						}
 					}
-					ok = FALSE;
-				}
-				break;
-			}
-			case RES_COINS: {
-				empire_data *coin_emp = real_empire(res->vnum);
-				if (!can_afford_coins(ch, coin_emp, res->amount)) {
-					if (send_msgs) {
-						msg_to_char(ch, "%s %s", (ok ? "You need" : ","), money_amount(coin_emp, res->amount));
+
+					if (total < res->amount) {
+						if (send_msgs) {
+							// RES_x: just types that need objects
+							switch (res->type) {
+								case RES_OBJECT: {
+									msg_to_char(ch, "%s %d more of %s", (ok ? "You need" : ","), res->amount - total, skip_filler(get_obj_name_by_proto(res->vnum)));
+									break;
+								}
+								case RES_COMPONENT: {
+									msg_to_char(ch, "%s %d more (%s)", (ok ? "You need" : ","), res->amount - total, component_string(res->vnum, res->misc));
+									break;
+								}
+								case RES_LIQUID: {
+									msg_to_char(ch, "%s %d more unit%s of %s", (ok ? "You need" : ","), res->amount - total, PLURAL(res->amount - total), drinks[res->vnum]);
+									break;
+								}
+							}
+						}
+						ok = FALSE;
 					}
-					ok = FALSE;
+					break;
 				}
-				break;
-			}
-			case RES_POOL: {
-				// special rule: require that blood or health costs not reduce player below 1
-				amt = res->amount + ((res->vnum == HEALTH || res->vnum == BLOOD) ? 1 : 0);
+				case RES_COINS: {
+					empire_data *coin_emp = real_empire(res->vnum);
+					if (!can_afford_coins(ch, coin_emp, res->amount)) {
+						if (send_msgs) {
+							msg_to_char(ch, "%s %s", (ok ? "You need" : ","), money_amount(coin_emp, res->amount));
+						}
+						ok = FALSE;
+					}
+					break;
+				}
+				case RES_POOL: {
+					// special rule: require that blood or health costs not reduce player below 1
+					amt = res->amount + ((res->vnum == HEALTH || res->vnum == BLOOD) ? 1 : 0);
 	
-				// more player checks
-				if (amt >= 0 && GET_CURRENT_POOL(ch, res->vnum) < amt) {
-					if (send_msgs) {
-						msg_to_char(ch, "%s %d more %s point%s", (ok ? "You need" : ","), amt - GET_CURRENT_POOL(ch, res->vnum), pool_types[res->vnum], PLURAL(amt - GET_CURRENT_POOL(ch, res->vnum)));
+					// more player checks
+					if (amt >= 0 && GET_CURRENT_POOL(ch, res->vnum) < amt) {
+						if (send_msgs) {
+							msg_to_char(ch, "%s %d more %s point%s", (ok ? "You need" : ","), amt - GET_CURRENT_POOL(ch, res->vnum), pool_types[res->vnum], PLURAL(amt - GET_CURRENT_POOL(ch, res->vnum)));
+						}
+						ok = FALSE;
 					}
-					ok = FALSE;
+					break;
 				}
-				break;
+				case RES_ACTION: {
+					// always has these
+					break;
+				}
 			}
 		}
 	}
@@ -3029,6 +3123,30 @@ void show_resource_list(struct resource_data *list, char *save_buffer) {
 	
 	if (!*save_buffer) {
 		strcpy(save_buffer, "nothing");
+	}
+}
+
+
+/**
+* Removes the XX mark on items that will be used for functions that search for
+* a list of items.
+*
+* @param char_data *ch The person who's searching lists of items (e.g. inventory).
+* @param bool ground If TRUE, also hits items on the ground.
+*/
+void unmark_items_for_char(char_data *ch, bool ground) {
+	obj_data *search_list[2];
+	obj_data *obj;
+	int iter;
+	
+	// 2 places to look
+	search_list[0] = ch->carrying;
+	search_list[1] = ground ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+	
+	for (iter = 0; iter < 2; ++iter) {
+		LL_FOREACH2(search_list[iter], obj, next_content) {
+			obj->search_mark = FALSE;
+		}
 	}
 }
 
@@ -3251,9 +3369,11 @@ int color_code_length(const char *str) {
 * @return int the number of @ codes.
 */
 int count_icon_codes(char *string) {
+	const char *icon_codes = ".ewuUvV";
+	
 	int iter, count = 0, len = strlen(string);
 	for (iter = 0; iter < len - 1; ++iter) {
-		if (string[iter] == '@' && string[iter+1] != '@') {
+		if (string[iter] == '@' && strchr(icon_codes, string[iter+1])) {
 			++count;
 			++iter;	// advance past the color code
 		}
@@ -3286,7 +3406,7 @@ const char *double_percents(const char *string) {
 	}
 	
 	// terminate/ensure terminator
-	output[MIN(pos++, (MAX_STRING_LENGTH*2)-1)] = '\0';
+	output[MIN(pos, (MAX_STRING_LENGTH*2)-1)] = '\0';
 	return (const char*)output;
 }
 
@@ -3534,12 +3654,12 @@ char *reverse_strstr(char *haystack, char *needle) {
 * @return char* The string with color codes shown.
 */
 char *show_color_codes(char *string) {
-	static char value[MAX_STRING_LENGTH];
+	static char value[MAX_STRING_LENGTH * 3];	// reserve extra space
 	char *ptr;
 	
 	ptr = str_replace("&", "\t&", string);
-	strncpy(value, ptr, MAX_STRING_LENGTH);
-	value[MAX_STRING_LENGTH-1] = '\0';	// safety
+	strncpy(value, ptr, sizeof(value));
+	value[sizeof(value)-1] = '\0';	// safety
 	free(ptr);
 	
 	return value;
@@ -3595,7 +3715,7 @@ const char *skip_filler(char *string) {
  * to cast a non-const array as const than to cast a const one as non-const.
  * Doesn't really matter since this function doesn't change the array though.
  */
-void sprintbit(bitvector_t bitvector, const char *names[], char *result, byte space) {
+void sprintbit(bitvector_t bitvector, const char *names[], char *result, bool space) {
 	long nr;
 
 	*result = '\0';
@@ -4032,7 +4152,7 @@ sector_data *get_sect_by_name(char *name) {
 * @return bool TRUE if it's sunny there.
 */
 bool check_sunny(room_data *room) {
-	bool sun_sect = !ROOM_IS_CLOSED(room);
+	bool sun_sect = !ROOM_IS_CLOSED(room) || (IS_ADVENTURE_ROOM(room) && RMT_FLAGGED(room, RMT_OUTDOOR));
 	return (sun_sect && weather_info.sunlight != SUN_DARK && !ROOM_AFF_FLAGGED(room, ROOM_AFF_DARK));
 }
 
@@ -4247,7 +4367,7 @@ room_data *find_load_room(char_data *ch) {
 	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch)))) {
 		// does not require last room but if there is one, it must be the same island
 		rl_last_room = real_room(GET_LAST_ROOM(ch));
-		if (HAS_FUNCTION(rl, FNC_TOMB) && (!rl_last_room || GET_ISLAND_ID(rl) == GET_ISLAND_ID(rl_last_room)) && can_use_room(ch, rl, GUESTS_ALLOWED)) {
+		if (room_has_function_and_city_ok(rl, FNC_TOMB) && (!rl_last_room || GET_ISLAND_ID(rl) == GET_ISLAND_ID(rl_last_room)) && can_use_room(ch, rl, GUESTS_ALLOWED) && !BUILDING_BURNING(rl)) {
 			return rl;
 		}
 	}
@@ -4256,7 +4376,7 @@ room_data *find_load_room(char_data *ch) {
 	if (!IS_NPC(ch) && (rl = real_room(GET_LAST_ROOM(ch))) && GET_LOYALTY(ch)) {
 		island = GET_ISLAND_ID(rl);
 		for (ter = EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)); ter; ter = ter->next) {
-			if (HAS_FUNCTION(ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island) {
+			if (room_has_function_and_city_ok(ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island && !BUILDING_BURNING(ter->room)) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = ter->room;
@@ -4793,6 +4913,28 @@ unsigned long long microtime(void) {
 	
 	gettimeofday(&time, NULL);
 	return ((unsigned long long)time.tv_sec * 1000000) + time.tv_usec;
+}
+
+
+/**
+* Determines if a room both has a function flag, and passes any necessary
+* in-city requirements. (If the room does not have BLD_IN_CITY_ONLY, this only
+* checks the function.)
+*
+* @param room_data *room The room to check.
+* @param bitvector_t fnc_flag Any FNC_ flag.
+* @return bool TRUE if the room has the function and passed the city check, FALSE if not.
+*/
+bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag) {
+	if (!HAS_FUNCTION(room, fnc_flag) || !IS_COMPLETE(room)) {
+		return FALSE;
+	}
+	if (!check_in_city_requirement(room, TRUE)) {
+		return FALSE;
+	}
+	
+	// oh okay
+	return TRUE;
 }
 
 

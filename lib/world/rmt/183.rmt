@@ -1,0 +1,59 @@
+#18300
+A Collapsed Passageway~
+   You enter a tight stone passageway, which looks like it collapsed long ago.
+The walls were once carved with intricate writing, but are now too badly
+damaged to make out any of it. The rubble is partially cleared, and may have
+been knocked free by a recent earthquake.  
+~
+bd 0 0
+D9
+~
+0 18301
+M 0 18309 100.00 1
+S
+#18301
+A Sloping Passage~
+   The passage slopes down beneath the rubble, deeper into the pyramid. As you
+explore its depths, you come to what appears to be a solid wall, blocking
+further passage.  
+~
+b 0 0
+D8
+~
+0 18300
+M 1 18304 100.00 1
+S
+#18302
+A Sloping Passage~
+   The passage slopes down beneath the rubble, deeper into the pyramid. In the
+middle of the passage, a well-decorated wall has been pushed open, leading to a
+bright chamber beyond the darkness.  
+~
+b 0 0
+D8
+~
+0 18300
+D14
+~
+0 18303
+E
+wall symbols strange well-decorated~
+   The wall is marked with strange symbols in an ancient language. It looks
+like someone picked the correct symbol, because the wall has been pushed open.
+~
+S
+#18303
+A Hidden Burial Chamber~
+   Despite the condition of the rest of the pyramid, this grand chamber is
+well-preserved. The walls are covered in ancient symbols, each painted in gold.
+The center of the room contains a glimmering sarcophagus on a dais. No light
+from the outside reaches this chamber, but the lavish gold embellishments seem
+to shine on their own.  
+~
+cg 0 0
+D14
+~
+0 18302
+M 0 18300 100.00 1
+S
+$

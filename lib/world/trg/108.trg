@@ -56,7 +56,7 @@ end
 ~
 #10828
 Curator environment~
-0 b 5
+0 bw 5
 ~
 switch %random.4%
   case 1
@@ -131,7 +131,8 @@ Detect Heal~
 0 c 0
 heal~
 eval test %%self.is_name(%arg%)%%
-if (!%test% || !%actor.ability(Heal)% || !%actor.on_quest(10854)%)
+eval test2 %%actor.char_target(%arg%)%%
+if ((!%test% && %test2% != %self%) || !%actor.ability(Heal)% || !%actor.on_quest(10854)%)
   return 0
   halt
 end
@@ -177,15 +178,28 @@ eval bloodamt %actor.blood%
 remote bloodamt %actor.id%
 ~
 #10858
-Detect Full Blood~
+Detect Full Blood + Soulstream Entry~
 2 g 100
 ~
-if (!%actor.on_quest(10857)% || !%actor.varexists(bloodamt)%)
-  halt
+* Detect full blood
+if (%actor.on_quest(10857)% && %actor.varexists(bloodamt)%)
+  if %actor.blood% > %actor.bloodamt%
+    %quest% %actor% trigger 10857
+    rdelete bloodamt %actor.id%
+  end
 end
-if %actor.blood% > %actor.bloodamt%
-  %quest% %actor% trigger 10857
-  rdelete bloodamt %actor.id%
+* Detect soulstream entry
+if %room.template% == 10850
+  if (%direction% != none || %actor.nohassle%)
+    * Not a portal entry - or an immortal with hassle off
+    return 1
+    halt
+  end
+  if (!%actor.on_quest(10850)% && !%actor.completed_quest(10850)%)
+    %send% %actor% You must start the quest 'Enter the Soulstream' before entering.
+    %send% %actor% Use 'quest start Enter' to begin the quest.
+    return 0
+  end
 end
 ~
 $

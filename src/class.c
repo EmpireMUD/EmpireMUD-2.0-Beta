@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: class.c                                         EmpireMUD 2.0b4 *
+*   File: class.c                                         EmpireMUD 2.0b5 *
 *  Usage: code related to classes, including DB and OLC                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -142,9 +142,11 @@ void check_classes(void) {
 		LL_FOREACH_SAFE(CLASS_ABILITIES(cls), clab, next_clab) {
 			if (!find_ability_by_vnum(clab->vnum)) {
 				log("- Class [%d] %s has invalid ability %d", CLASS_VNUM(cls), CLASS_NAME(cls), clab->vnum);
-				error = TRUE;
 				LL_DELETE(CLASS_ABILITIES(cls), clab);
 				free(clab);
+				
+				// missing ability isn't considered fatal
+				// error = TRUE;
 			}
 		}
 		
@@ -263,7 +265,7 @@ class_data *find_class_by_vnum(any_vnum vnum) {
 */
 void update_class(char_data *ch) {
 	#define NUM_BEST  3
-	#define IGNORE_BOTTOM_SKILL_POINTS  30	// amount newbies should start with
+	#define IGNORE_BOTTOM_SKILL_POINTS  35	// amount newbies should start with
 	#define BEST_SUM_REQUIRED_FOR_100  (2 * CLASS_SKILL_CAP + SPECIALTY_SKILL_CAP)
 	#define CLASS_LEVEL_BUFFER  24	// allows the class when still this much under the final level requirement
 	
@@ -1231,8 +1233,8 @@ void olc_show_class(char_data *ch) {
 	sprintf(buf + strlen(buf), "Skills required: <\tyrequires\t0>\r\n%s", CLASS_SKILL_REQUIREMENTS(cls) ? lbuf : "");
 	
 	sprintf(buf + strlen(buf), "<\tymaxhealth\t0> %d\r\n", CLASS_POOL(cls, HEALTH));
-	sprintf(buf + strlen(buf), "<\tymaxmoves\t0> %d\r\n", CLASS_POOL(cls, MOVE));
 	sprintf(buf + strlen(buf), "<\tymaxmana\t0> %d\r\n", CLASS_POOL(cls, MANA));
+	sprintf(buf + strlen(buf), "<\tymaxmoves\t0> %d\r\n", CLASS_POOL(cls, MOVE));
 	
 	get_class_ability_display(CLASS_ABILITIES(cls), lbuf, NULL);
 	sprintf(buf + strlen(buf), "Class roles and abilities: <\tyrole\t0>\r\n%s%s", lbuf, *lbuf ? "\r\n" : "");
@@ -1523,8 +1525,11 @@ ACMD(do_class) {
 		else if (!*arg2) {
 			msg_to_char(ch, "Your class role is currently set to: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
 		}
+		else if (FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) {
+			msg_to_char(ch, "You can't do that while fighting!\r\n");
+		}
 		else if (GET_POS(ch) < POS_STANDING) {
-			msg_to_char(ch, "You can't change your class role right now!\r\n");
+			msg_to_char(ch, "You need to stand up first.\r\n");
 		}
 		else if ((found = search_block(arg2, class_role, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Unknown role '%s'.\r\n", arg2);

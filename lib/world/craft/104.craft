@@ -5,8 +5,6 @@ violet leopard shawl~
 R
 1353 6 0 0
 R
-1307 3 0 0
-R
 10013 6 0 0
 R
 176 4 0 0
@@ -19,8 +17,6 @@ wildfire gloves~
 4 199 g 25 10474
 R
 10013 6 0 0
-R
-1307 2 0 0
 R
 10001 1 0 0
 R
@@ -83,7 +79,7 @@ S
 #10479
 goblinwartent~
 -1 0
-8 -1 0 1 10479
+8 289 0 1 10479
 B
 10479 be bdeklmno
 R
@@ -96,7 +92,7 @@ S
 #10480
 goblinmessagepost~
 -1 0
-8 -1 0 1 10480
+8 289 0 1 10480
 B
 10480 bdel 0
 R
@@ -105,7 +101,7 @@ S
 #10481
 goblinlabtent~
 -1 0
-8 -1 0 1 10481
+8 289 0 1 10481
 B
 10481 be bdeklmno
 R
@@ -116,11 +112,11 @@ S
 #10482
 goblindolmen~
 -1 0
-8 -1 0 1 10482
+8 289 0 1 10482
 B
 10482 be bdeklmno
 R
-3 3 1 8224
+3 3 1 8192
 R
 22 10 1 0
 S

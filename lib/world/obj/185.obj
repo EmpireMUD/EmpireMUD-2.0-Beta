@@ -1,0 +1,686 @@
+#18500
+papayas basket~
+a basket of papayas~
+A basket of papayas has been left here.~
+You can eat this fleshy pink fruit, or plant it.
+~
+6 bl a 7
+24 18500 0
+7 168
+I 15 18501 100.00 4 x  # SEPARATE: a single papaya
+O
+9 br
+R
+5114 0
+S
+#18501
+papaya single~
+a single papaya~
+Someone has dropped a single papaya here.~
+This is just one papaya, not enough to plant but enough to eat.
+~
+6 0 a 6
+6 0 0
+7 48
+I 14 18500 100.00 4 x  # COMBINE: a basket of papayas
+O
+9 nr
+S
+#18506
+coins ancient pile~
+a pile of ancient coins~
+A pile of ancient coins is lying here.~
+Money!
+~
+11 m a 1
+1 -1 0
+4 0
+C
+125 175
+S
+#18507
+orb huge emerald-green green~
+the emerald-green orb~
+A huge emerald-green orb is half-embedded in the door.~
+   It looks fragile; you could probably break it with a solid blow from your
+weapon. But how hard should you hit it?
+Usage:  difficulty <hard | boss>
+~
+3 0 0 9
+0 0 0
+10 0
+T 18514
+S
+#18508
+light green eerie~
+an eerie green light~
+An eerie green light fills the temple.~
+   It looks like it's very slowly fading away. You should probably finish
+exploring this place before it does...
+~
+3 0 0 10
+0 0 0
+10 72
+T 18515
+S
+#18509
+idol jade small~
+the jade idol~
+A small jade idol of a serpent is displayed here.~
+This ancient idol is carved from a single gemstone! It looks valuable!
+~
+15 0 a 6
+10 0 0
+12 0
+R
+5184 a
+R
+5611 a
+T 18509
+S
+#18510
+passageway secret~
+a secret passageway~
+A secret passageway has opened up nearby!~
+It looks like a shortcut to somewhere else in the area.
+~
+8 0 0 3
+18504 0 0
+0 0
+S
+#18511
+spawner~
+the jungle temple trash spawner~
+The jungle temple trash spawner isn't working.~
+This item spawns a mob and then purges itself.
+~
+3 0 0 2
+0 0 0
+0 0
+T 18511
+S
+#18512
+whistle jaguar riding~
+a riding jaguar whistle~
+A riding jaguar whistle is lying on the ground.~
+This whistle can be used just once, to summon a riding jaguar mount.
+~
+3 0 a 3
+18512 0 0
+14 0
+T 10263
+S
+#18513
+whistle sea serpent~
+a sea serpent whistle~
+A sea serpent whistle is lying on the ground.~
+This whistle can be used just once, to summon a sea serpent mount.
+~
+3 0 a 3
+18513 0 0
+14 0
+T 10263
+S
+#18514
+whistle feathered serpent~
+the feathered serpent whistle~
+A feathered serpent whistle is lying on the ground here.~
+This whistle can be used just once, to summon a feathered serpent mount.
+~
+3 0 a 6
+18514 0 0
+14 0
+T 10263
+S
+#18515
+whistle jaguar cub~
+a jaguar cub whistle~
+A jaguar cub whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 7
+18515 0 0
+2 0
+T 9900
+S
+#18516
+totem jaguar~
+a jaguar totem~
+A jaguar totem is lying here.~
+This primitive totem is carved from a dark greenish stone.
+
+'morph jaguar' (requires Animal Forms): Improved tropical disguise morph.
+~
+3 p a 2
+0 0 0
+1 0
+S
+#18517
+armor jaguar fearsome suit~
+fearsome jaguar armor~
+A suit of fearsome jaguar armor is arranged on the ground.~
+   This suit of armor gives its wearer the hair-raising appearance of a jaguar
+from head to foot. The characteristic spotted coat of the jaguar is accentuated
+with huge, sharp teeth and long, colorful feathers.
+~
+27 emo aq 1
+3 0 0
+7 0
+A
+1 -1 0
+A
+9 -1 0
+A
+2 1 0
+A
+18 3 0
+A
+13 1 0
+C
+0 200
+M
+8
+A low growl reverberates through the air as you don the fearsome jaguar armor.~
+M
+9
+A low growl reverberates through the air as $n dons a suit of fearsome jaguar armor.~
+S
+#18518
+pattern fearsome jaguar armor~
+a fearsome jaguar armor pattern~
+A fearsome jaguar armor pattern is lying here.~
+   You can use this to make a suit of armor that will let you fight with the
+ferocity and stamina of a jaguar.
+Forge (Imperial Armors, crafting level 125): fearsome jaguar armor
+~
+3 o a 3
+0 0 0
+0 0
+S
+#18519
+armor coyote red suit~
+red coyote armor~
+A suit of red coyote armor is stacked on the ground.~
+   This odd suit of armor is made from light, interlocking wooden plates and is
+covered with the hide of a coyote. The top of the armor is made to look like a
+coyote's head, with its sly, calculating eyes and upturned ears.
+~
+27 emo aq 2
+1 0 0
+7 0
+A
+18 -2 0
+A
+9 1 0
+A
+2 1 0
+A
+1 1 0
+A
+21 2 0
+C
+0 200
+M
+8
+A high-pitched howl pierces the air as you put on the red coyote armor.~
+M
+9
+A high-pitched howl pierces the air as $n puts on a suit of red coyote armor.~
+S
+#18520
+pattern red coyote armor~
+a red coyote armor pattern~
+A red coyote armor pattern is lying here.~
+Unleash your inner coyote and prowl the night with your pack!
+Sew (Dangerous Leathers, crafting level 125): red coyote armor
+~
+3 o a 4
+0 0 0
+0 0
+S
+#18521
+armor serpent feathered suit~
+feathered serpent armor~
+A suit of feathered serpent armor is nestled in the corner.~
+   This bright green feathered suit of armor looks at first like a bird. But
+the huge fangs and swirling eyes tell a different story. With the golden
+jewelry and highlights of red feathers, it is clear that this armor represents
+some powerful jungle deity.
+~
+27 emo aq 4
+0 0 0
+7 0
+A
+22 -2 0
+A
+9 1 0
+A
+8 1 0
+A
+7 2 0
+A
+23 1 0
+C
+0 200
+M
+8
+Wind hisses through the air as you don the feathered serpent armor.~
+M
+9
+Wind hisses through the air as $n dons a suit of feathered serpent armor.~
+S
+#18522
+pattern feathered serpent armor~
+a feathered serpent armor pattern~
+A feathered serpent armor pattern is lying here.~
+   You can use this to craft a set of armor based on the great feathered
+serpent deity of the jungle. It won't help you fly, but it will give your magic
+a light touch, like the wind.
+Sew (Magical Vestments, crafting level 125): feathered serpent armor
+~
+3 o a 5
+0 0 0
+0 0
+S
+#18523
+armor warrior eagle suit~
+eagle warrior armor~
+A suit of eagle warrior armor is nestled in the corner.~
+   This suit of armor is made from eagle feathers sewn into a padded cotton
+kit. Long green feathers drape from the arms, tail, and head to give the armor
+a fearsome appearance.
+~
+27 emo aq 5
+0 0 0
+7 0
+A
+23 -2 0
+A
+9 1 0
+A
+8 1 0
+A
+2 1 0
+A
+22 2 0
+C
+0 200
+M
+8
+A shrill screech pierces the air as you don the eagle warrior armor.~
+M
+9
+A shrill screech pierces the air as $n dons a suit of eagle warrior armor.~
+S
+#18524
+pattern eagle warrior armor~
+an eagle warrior armor pattern~
+An eagle warrior armor pattern is lying here.~
+   You can use these instructions to craft a set of armor fit for a powerful
+war shaman! Unfortunately, it won't help you fly.
+Sew (Magical Vestments, crafting level 125): eagle warrior armor
+~
+3 o a 6
+0 0 0
+0 0
+S
+#18525
+armor chameleon blue suit~
+blue chameleon armor~
+A suit of blue chameleon armor is hidden in the corner.~
+   This shimmering blue suit of armor has the general shape of a chameleon from
+its head to its tail. Huge, spiral eyes seem to follow you wherever you stand.
+The chameleon scales are actually small rings of dark metal and, though blue in
+color, they seem to reflect the greens and browns around them.
+~
+27 emo aq 6
+2 0 0
+7 0
+A
+17 2 0
+A
+18 2 0
+A
+1 1 0
+A
+12 1 0
+A
+24 1 0
+C
+0 200
+M
+8
+You strap on the blue chameleon armor and hunch low to the ground.~
+M
+9
+$n straps on a suit of blue chameleon armor and begins to blend in with $s surroundings.~
+S
+#18526
+pattern blue chameleon armor~
+a blue chameleon armor pattern~
+A blue chameleon armor pattern is lying here.~
+   You can use this pattern to craft a suit of combat armor based on a
+chameleon! It probably won't make you invisible, but at least it will look
+cool.
+Forge (Imperial Armors, crafting level 125): blue chameleon armor
+~
+3 o a 6
+0 0 0
+0 0
+S
+#18527
+ring jaguar claw~
+a jaguar claw ring~
+A jaguar claw ring is poking up from the ground.~
+   This ring is made from the claw and finger bone of a jaguar, and painted to
+resemble the jaguar's spots.
+~
+2 mp ab 2
+0 0 0
+14 0
+A
+24 1 0
+A
+12 1 0
+S
+#18528
+ring coyote obsidian~
+an obsidian coyote ring~
+An obsidian coyote ring is stuck into the ground.~
+   This ring is shaped like the finger bones and claw of a large coyote, but it
+has been carved from pure obsidian. Every edge is sharp to the touch, and it
+cuts your skin as you try to test it.
+~
+2 mp ab 5
+0 0 0
+14 0
+A
+21 1 0
+A
+17 1 0
+S
+#18529
+ring serpent fang~
+a serpent fang ring~
+A serpent fang ring is stuck in the ground.~
+   This ring is made from the fang and skull of a small serpent. Where the fang
+contacts your skin, your finger seems to have gone numb.
+~
+2 mp ab 4
+0 0 0
+14 0
+A
+23 1 0
+A
+7 1 0
+S
+#18530
+ring eagle talon~
+an eagle talon ring~
+An eagle talon ring is sticking up out of the ground.~
+   This ring is made from the talon and toe of an eagle, and decorated with a
+pair of feathers.
+~
+2 mp ab 5
+0 0 0
+14 0
+A
+22 1 0
+A
+17 1 0
+S
+#18531
+ring chameleon tail~
+a chameleon tail ring~
+A chameleon tail is ringed up on the floor.~
+   This ring is actually just the bright green tail of a chameleon, wrapped to
+the size of your finger.
+~
+2 mp ab 7
+0 0 0
+14 0
+A
+17 2 0
+A
+12 1 0
+A
+24 1 0
+S
+#18532
+gauntlets pair plated jaguar~
+plated jaguar gauntlets~
+A pair of plated jaguar gauntlets is lying here.~
+   These gauntlets look like oversized jaguar paws, forged from solid metal.
+The exotic fur of a jaguar adorns the back of the gauntlets, which are
+surprisingly comfortable for such heavy plate.
+~
+27 mp ah 4
+3 0 0
+2 0
+A
+2 1 0
+A
+13 4 0
+S
+#18533
+gauntlets pair coyote claw~
+coyote claw gauntlets~
+A pair of coyote claw gauntlets is lying here.~
+   These gauntlets are made from fine leather, but covered in the fur and claws
+of coyotes in order to imbue them with the power of nature's greatest
+tricksters.
+~
+27 mp ah 4
+1 0 0
+7 0
+A
+2 1 0
+A
+21 4 0
+S
+#18534
+gloves sparkling feathered pair~
+sparkling feathered gloves~
+A pair of sparkling feathered gloves is lying here.~
+   These gloves are made from the smooth, scaly skin of an exotic serpent.
+From there, long green, red, and yellow feathers have been sewn in, making the
+gloves appear larger but surprisingly light.
+~
+27 mp ah 3
+0 0 0
+7 0
+A
+9 1 0
+A
+23 4 0
+S
+#18535
+gloves eagle talon pair~
+eagle talon gloves~
+A pair of eagle talon gloves is lying here.~
+   These fine gloves are made from eagle leather, and bound with long golden
+eagle feathers. A strange, serene energy flows through your fingertips as you
+touch them, and the punctuated screech of an eagle fills your ears.
+~
+27 mp ah 3
+0 0 0
+7 0
+A
+2 1 0
+A
+22 4 0
+S
+#18536
+gauntlets pair shifting chameleon~
+shifting chameleon gauntlets~
+A pair of shifting chameleon gauntlets is lying here.~
+   These gauntlets are made from the green-brown skin of a chameleon, but they
+seem to shimmer and shift in the light. The gauntlets are soft and pliable to
+the touch, but when you punch or block, they instantly harden as if they were
+made from argentine imperium.
+~
+27 mp ah 3
+2 0 0
+7 0
+A
+2 1 0
+A
+17 2 0
+A
+18 2 0
+S
+#18537
+roar jaguar~
+the roar of the jaguar~
+The roar of the jaguar lingers in the air.~
+   As you approach, you hear the guttural roar of a jaguar, as if the majestic
+beast is pouncing on you from just out of sight! But when you turn to look, it
+is gone.
+~
+27 mp ak 3
+3 0 0
+10 0
+A
+24 1 0
+A
+12 1 0
+S
+#18538
+howl coyote~
+the howl of the coyote~
+The howl of the coyote pierces the air.~
+   You stop in your tracks as the shrill howl of a coyote pierces the air.
+Then another howl. And another. Just as it seems that a pack of hungry coyotes
+is bearing down on you, you turn... And the howls fade into the wind.
+~
+27 mp ak 3
+1 0 0
+10 0
+A
+17 1 0
+A
+21 1 0
+S
+#18539
+wind serpent feathered~
+the wind of the feathered serpent~
+The wind of the feathered serpent whistles through the air.~
+   The air is perfectly still in one instant, and whistling past your ear the
+next. A faint hiss approaches you from the grass, then another from the air.
+You feel something brush against your ankle, and your neck. But just as the
+little hairs on your arms and neck begin to stand up, the feeling is gone, like
+the wind itself.
+~
+27 mp ak 3
+0 0 0
+10 0
+A
+7 1 0
+A
+23 1 0
+S
+#18540
+call eagle~
+the call of the eagle~
+The call of the eagle cuts through the air on razor talons.~
+   A sharp, cackling cry fills the air. You look up, but there is no bird.
+Then another eagle calls to you from another direction, and another. You feel
+the oppressive burst of air from a raptor swooping over you, but you turn to
+look and there is nothing.
+~
+27 mp ak 3
+0 0 0
+10 0
+A
+17 1 0
+A
+22 1 0
+S
+#18541
+shadow chameleon~
+the shadow of the chameleon~
+The shadow of the chameleon fades into the background.~
+   The room dims as something blocks your light. When you turn to look at it,
+you're blinded. There's nothing there. Another shadow creeps past you, but when
+you glance toward it, it is gone.
+~
+27 mp ak 3
+2 0 0
+10 0
+A
+2 1 0
+A
+9 1 0
+A
+17 1 0
+A
+18 1 0
+S
+#18542
+token jungle temple~
+a jungle temple token~
+A jungle temple token is lying here.~
+   This token, redeemable for rewards at the Lost Temple adventure's shop, will
+be automatically stored in your pouch when taken.
+~
+3 p a 9
+0 0 0
+7 0
+T 18542
+S
+#18543
+pouch jungle temple tokens~
+a pouch of jungle temple tokens~
+A pouch of jungle temple tokens is lying here.~
+   This pouch holds tokens redeemable for rewards at the Lost Temple adventure's
+shop. Use 'count tokens' to count them.
+~
+3 p a 8
+0 0 0
+7 0
+T 18543
+S
+#18544
+chance boss loot~
+a chance of boss loot~
+Some boss loot has bugged out.~
+   This item purges itself and spawns an actual boss-kill reward. But only on
+Group and Boss difficulties.
+~
+3 p a 8
+0 0 0
+10 0
+T 18544
+S
+#18545
+raiment solar~
+the solar raiment~
+The solar raiment lies folded here.~
+   This shining green-and-gold robe once belonged to the god-king of an
+ancient, continent-spanning empire. Wear it, and bring a light into the dark
+places of the world!
+~
+2 o ad 12
+0 0 0
+11 0
+A
+5 1 0
+B
+c
+C
+0 125
+M
+9
+$n puts on $p and glows with an aura of majesty.~
+M
+8
+You put on $p and are filled with the warmth of the sun.~
+M
+13
+$n the Sun Queen is standing here.~
+M
+14
+$n the Sun King is standing here.~
+S
+$

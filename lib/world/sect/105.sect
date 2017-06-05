@@ -1,0 +1,575 @@
+#10550
+Frozen River~
+A Frozen River~
+'~' 2 0 25 0 0
+D0
+~~~~~
+&W~
+E
+4 0 5.00 5
+E
+9 0 100.00 5
+I 6 10562 95.00 1 F  # FORAGE: a handful of red and green seeds
+I 6 10563 5.00 1 F  # FORAGE: a seed of pure ice
+M
+9172 5.00 g
+M
+9173 5.00 ag
+M
+9177 5.00 g
+M
+9178 0.03 g
+M
+9179 15.00 g
+M
+9182 5.00 g
+M
+9186 5.00 0
+M
+9171 5.00 0
+M
+9185 5.00 h
+M
+10556 5.00 0
+M
+10557 5.00 0
+M
+10558 5.00 0
+S
+#10562
+Thin Evergreen Forest~
+A Thin Evergreen Forest~
+'.' 33 1 3 dl n
+C
+chop, dig, gather, pick~
+D1
+.&j^&?..~
+&g~
+D2
+.&j^&?..~
+&g~
+D3
+.&j^&?..~
+&g~
+D4
+.^..~
+&0~
+E
+0 1 100.00 0
+E
+4 0 0.80 10563
+E
+9 0 50.00 10563
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 10552 100.00 1  # FORAGE: some arctic brambleberries
+I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 9 121 100.00 1  # GATHER: a stick
+I 20 10558 100.00 1  # CHOP: a spruce tree
+M
+9140 1.00 dh
+M
+9139 5.00 dh
+M
+9138 5.00 dh
+M
+9135 5.00 adh
+M
+9134 5.00 bdh
+M
+9037 5.00 dh
+M
+9038 5.00 dh
+M
+9036 5.00 dh
+M
+9006 5.00 dg
+M
+9141 5.00 dg
+M
+9137 5.00 dg
+M
+9128 5.00 dg
+M
+9121 5.00 dg
+M
+9132 5.00 dg
+M
+9007 5.00 dg
+M
+9120 15.00 adg
+M
+9002 5.00 adg
+M
+9013 5.00 bdg
+M
+9039 5.00 dg
+M
+9035 5.00 dg
+M
+9033 5.00 dg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9024 5.00 d
+M
+9023 5.00 d
+M
+9034 5.00 d
+M
+9133 5.00 ad
+M
+9116 5.00 ad
+M
+9022 5.00 ad
+M
+9032 1.00 bd
+M
+9031 1.00 bd
+M
+9030 1.00 bd
+M
+9029 1.00 bd
+M
+9025 5.00 bd
+M
+9011 5.00 bd
+M
+9021 5.00 bd
+M
+9020 5.00 bd
+M
+9009 10.00 bd
+M
+9012 10.00 bd
+M
+9010 5.00 bd
+M
+9004 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9154 10.00 bc
+M
+9153 10.00 bc
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+M
+9172 5.00 g
+M
+9177 5.00 g
+M
+9179 15.00 g
+M
+9171 5.00 0
+M
+10556 5.00 0
+M
+10557 5.00 0
+M
+10558 5.00 0
+S
+#10563
+Evergreen Forest~
+An Evergreen Forest~
+'^' 33 1 4 dl n
+C
+chop, dig, gather, pick~
+D1
+&j^^&?..~
+&g~
+D1
+.&j^^&?.~
+&g~
+D1
+..&j^^~
+&g~
+D2
+&j^^&?..~
+&g~
+D2
+.&j^^&?.~
+&g~
+D2
+..&j^^~
+&g~
+D3
+&j^^&?..~
+&g~
+D3
+.&j^^&?.~
+&g~
+D3
+..&j^^~
+&g~
+D4
+^^..~
+&0~
+D4
+.^^.~
+&0~
+D4
+..^^~
+&0~
+E
+0 1 100.00 10562
+E
+4 0 0.80 10564
+E
+9 0 50.00 10564
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 10552 100.00 1  # FORAGE: some arctic brambleberries
+I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 9 121 100.00 1  # GATHER: a stick
+I 20 10558 100.00 1  # CHOP: a spruce tree
+M
+9109 10.00 dh
+M
+9145 5.00 adh
+M
+9147 5.00 bdh
+M
+9007 5.00 dg
+M
+9006 5.00 dg
+M
+9141 5.00 dg
+M
+9146 5.00 adg
+M
+9144 5.00 adg
+M
+9002 5.00 adg
+M
+9003 5.00 dg
+M
+9136 5.00 bdg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9150 5.00 d
+M
+9149 5.00 d
+M
+9148 5.00 d
+M
+9023 5.00 d
+M
+9008 5.00 d
+M
+9133 5.00 ad
+M
+9116 5.00 ad
+M
+9022 5.00 ad
+M
+9032 5.00 bd
+M
+9031 5.00 bd
+M
+9030 5.00 bd
+M
+9029 5.00 bd
+M
+9025 5.00 bd
+M
+9020 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9154 10.00 bc
+M
+9153 10.00 bc
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+M
+9172 5.00 g
+M
+9177 5.00 g
+M
+9179 15.00 g
+M
+9171 5.00 0
+M
+10556 5.00 0
+M
+10557 5.00 0
+M
+10558 5.00 0
+S
+#10564
+Overgrown Evergreen Forest~
+An Overgrown Evergreen Forest~
+'^' 33 1 5 dl n
+C
+chop, dig, gather, pick~
+D1
+&j^^&?.&j^~
+&g~
+D2
+&j^^&?.&j^~
+&g~
+D3
+&j^^&?.&j^~
+&g~
+D4
+^^.^~
+&0~
+E
+0 1 100.00 10563
+E
+4 0 0.20 10565
+E
+9 0 50.00 10565
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 10552 100.00 1  # FORAGE: some arctic brambleberries
+I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 9 121 100.00 1  # GATHER: a stick
+I 20 10558 100.00 1  # CHOP: a spruce tree
+M
+9109 10.00 dh
+M
+9145 5.00 adh
+M
+9147 5.00 bdh
+M
+9007 5.00 dg
+M
+9006 5.00 dg
+M
+9141 5.00 dg
+M
+9146 5.00 adg
+M
+9144 5.00 adg
+M
+9002 5.00 adg
+M
+9001 10.00 dg
+M
+9136 5.00 bdg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9017 5.00 d
+M
+9150 5.00 d
+M
+9149 5.00 d
+M
+9148 5.00 d
+M
+9008 5.00 d
+M
+9133 5.00 ad
+M
+9116 5.00 ad
+M
+9025 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9154 10.00 bc
+M
+9153 10.00 bc
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+M
+9172 5.00 g
+M
+9177 5.00 g
+M
+9179 15.00 g
+M
+9171 5.00 0
+M
+10556 5.00 0
+M
+10557 5.00 0
+M
+10558 5.00 0
+S
+#10565
+Thick Evergreen Forest~
+A Thick Evergreen Forest~
+'^' 33 1 6 dl dn
+C
+chop, dig, gather, pick~
+D1
+^^^^~
+&j~
+D2
+^^^^~
+&j~
+D3
+^^^^~
+&j~
+D4
+^^^^~
+&0~
+E
+0 1 100.00 10564
+I 5 102 9.00 1 X  # DIG: a flint stone
+I 5 100 100.00 1 X  # DIG: a rock
+I 6 10552 100.00 1  # FORAGE: some arctic brambleberries
+I 7 1201 100.00 1  # FIND-HERB: some fiveleaf
+I 9 121 100.00 1  # GATHER: a stick
+I 20 10558 100.00 1  # CHOP: a spruce tree
+M
+9040 0.01 d
+M
+9056 0.01 d
+M
+9109 10.00 dh
+M
+9145 5.00 adh
+M
+9147 5.00 bdh
+M
+9007 5.00 dg
+M
+9006 5.00 dg
+M
+9141 5.00 dg
+M
+9146 5.00 adg
+M
+9144 5.00 adg
+M
+9002 5.00 adg
+M
+9001 10.00 dg
+M
+9136 5.00 bdg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9017 5.00 d
+M
+9150 5.00 d
+M
+9149 5.00 d
+M
+9148 5.00 d
+M
+9008 5.00 d
+M
+9133 5.00 ad
+M
+9116 5.00 ad
+M
+9025 5.00 bd
+M
+253 10.00 cf
+M
+240 6.00 bc
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9154 10.00 bc
+M
+9153 10.00 bc
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9064 0.90 ad
+M
+9172 5.00 g
+M
+9177 5.00 g
+M
+9179 15.00 g
+M
+9171 5.00 0
+M
+10556 5.00 0
+M
+10557 5.00 0
+M
+10558 5.00 0
+S
+$

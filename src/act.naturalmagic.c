@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.naturalmagic.c                              EmpireMUD 2.0b4 *
+*   File: act.naturalmagic.c                              EmpireMUD 2.0b5 *
 *  Usage: implementation for natural magic abilities                      *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -35,7 +35,7 @@
 // external vars
 
 // external funcs
-extern obj_data *find_obj(int n);
+extern obj_data *find_obj(int n, bool error);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
 void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_vnum ability);
@@ -165,12 +165,17 @@ void report_healing(char_data *healed, int amount, char_data *report_to) {
 */
 void un_earthmeld(char_data *ch) {
 	if (AFF_FLAGGED(ch, AFF_EARTHMELD)) {
-		affects_from_char_by_aff_flag(ch, AFF_EARTHMELD);
+		affects_from_char_by_aff_flag(ch, AFF_EARTHMELD, FALSE);
 		if (!AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 			msg_to_char(ch, "You rise from the ground!\r\n");
 			act("$n rises from the ground!", TRUE, ch, 0, 0, TO_ROOM);
 			GET_POS(ch) = POS_STANDING;
 			add_cooldown(ch, COOLDOWN_EARTHMELD, 2 * SECS_PER_REAL_MIN);
+			
+			if (affected_by_spell(ch, ATYPE_NATURE_BURN)) {
+				affect_from_char(ch, ATYPE_NATURE_BURN, TRUE);
+				command_lag(ch, WAIT_ABILITY);
+			}
 		}
 	}
 }
@@ -239,7 +244,7 @@ void apply_potion(char_data *ch, int type, int scale) {
 	// atype
 	if (potion_data[type].atype > 0) {
 		// remove any old effect
-		affect_from_char(ch, potion_data[type].atype);
+		affect_from_char(ch, potion_data[type].atype, FALSE);
 		
 		if (potion_data[type].apply != APPLY_NONE) {
 			double points = config_get_double("potion_apply_per_100") * scale / 100.0;
@@ -369,7 +374,7 @@ ACMD(do_confer) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct affected_type *aff, *aff_iter;
 	bool any, found_existing, found_ch;
-	int amt, iter, abbrev, type;
+	int amt, iter, abbrev, type, conferred_amt, avail_str;
 	int match_duration = 0;
 	char_data *vict = ch;
 	
@@ -421,6 +426,24 @@ ACMD(do_confer) {
 	// optional 2nd arg
 	if (*arg2 && !(vict = get_char_vis(ch, arg2, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
+		return;
+	}
+	
+	// compute max confer
+	conferred_amt = 0;
+	LL_FOREACH(vict->affected, aff) {
+		if (aff->type == ATYPE_CONFER && aff->cast_by == GET_IDNUM(ch)) {
+			conferred_amt += apply_values[(int) aff->location] / apply_values[APPLY_STRENGTH];
+		}
+	}
+	avail_str = GET_STRENGTH(ch);
+	LL_FOREACH(ch->affected, aff) {
+		if (aff->type == ATYPE_CONFERRED && aff->location == APPLY_STRENGTH) {
+			avail_str += (-1 * aff->modifier);
+		}
+	}
+	if (conferred_amt >= avail_str || conferred_amt >= att_max(ch)) {
+		msg_to_char(ch, "You cannot confer any more strength on %s.\r\n", (ch == vict) ? "yourself" : PERS(vict, vict, FALSE));
 		return;
 	}
 	
@@ -617,7 +640,7 @@ ACMD(do_earthmeld) {
 
 	if (AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 		// only check sector on rise if the person has earth mastery, otherwise they are trapped
-		if (has_ability(ch, ABIL_WORM) && IS_ANY_BUILDING(IN_ROOM(ch))) {
+		if (has_ability(ch, ABIL_WORM) && IS_ANY_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN)) {
 			msg_to_char(ch, "You can't rise from the earth here!\r\n");
 		}
 		else {
@@ -628,12 +651,12 @@ ACMD(do_earthmeld) {
 	}
 
 	// sect validation
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER | SECTF_MAP_BUILDING | SECTF_INSIDE)) {
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER | SECTF_INSIDE) || (GET_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN))) {
 		msg_to_char(ch, "You can't earthmeld without natural ground below you!\r\n");
 		return;
 	}
 	
-	if (SECT_FLAGGED(BASE_SECT(IN_ROOM(ch)), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER | SECTF_MAP_BUILDING | SECTF_INSIDE)) {
+	if (SECT_FLAGGED(BASE_SECT(IN_ROOM(ch)), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_SHALLOW_WATER | SECTF_INSIDE)) {
 		msg_to_char(ch, "You can't earthmeld without solid ground below you!\r\n");
 		return;
 	}
@@ -849,6 +872,9 @@ ACMD(do_familiar) {
 	SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE);
 	if (IS_NPC(ch)) {
 		MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
+		if (MOB_INSTANCE_ID(mob) != NOTHING) {
+			add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
+		}
 	}
 	setup_generic_npc(mob, GET_LOYALTY(ch), NOTHING, NOTHING);
 	
@@ -881,7 +907,7 @@ ACMD(do_fly) {
 	if (affected_by_spell(ch, ATYPE_FLY)) {
 		msg_to_char(ch, "You stop flying and your wings fade away.\r\n");
 		act("$n lands and $s wings fade away.", TRUE, ch, NULL, NULL, TO_ROOM);
-		affect_from_char(ch, ATYPE_FLY);
+		affect_from_char(ch, ATYPE_FLY, FALSE);
 		command_lag(ch, WAIT_OTHER);
 		return;
 	}
@@ -1005,11 +1031,15 @@ ACMD(do_heal) {
 	}
 	
 	if (!party && IS_DEAD(vict)) {
-		msg_to_char(ch, "Unfortunately you can't heal on someone who is already dead.\r\n");
+		msg_to_char(ch, "Unfortunately you can't heal someone who is already dead.\r\n");
 		return;
 	}
 	if (!party && is_fight_enemy(ch, vict)) {
 		msg_to_char(ch, "You can't heal an enemy like that.\r\n");
+		return;
+	}
+	if (party && !GROUP(ch)) {
+		msg_to_char(ch, "You need to be in a group in order to do this.\r\n");
 		return;
 	}
 	
@@ -1177,7 +1207,7 @@ ACMD(do_moonrise) {
 		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
 			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
 		}
-		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict)) || !IS_CORPSE(corpse)) {
+		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict), FALSE) || !IS_CORPSE(corpse)) {
 			// victim has died AGAIN
 			act("You can only resurrect $N using $S most recent corpse.", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
 		}
@@ -1220,7 +1250,7 @@ ACMD(do_purify) {
 		msg_to_char(ch, "You cannot purify so powerful a vampire.\r\n");
 	}
 	else if (vict != ch && !IS_NPC(vict) && !PRF_FLAGGED(vict, PRF_BOTHERABLE)) {
-		act("You can't purify someone without permission (ask $M to type NOBOTHER).", FALSE, ch, NULL, vict, TO_CHAR);
+		act("You can't purify someone without permission (ask $M to type 'toggle bother').", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else if (ch != vict && AFF_FLAGGED(vict, AFF_IMMUNE_NATURAL_MAGIC)) {
 		msg_to_char(ch, "Your victim is immune to that spell.\r\n");
@@ -1421,7 +1451,7 @@ ACMD(do_resurrect) {
 		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
 			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
 		}
-		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict)) || !IS_CORPSE(corpse)) {
+		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict), FALSE) || !IS_CORPSE(corpse)) {
 			// victim has died AGAIN
 			act("You can't resurrect $N with that corpse.", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
 		}
@@ -1442,7 +1472,23 @@ ACMD(do_resurrect) {
 
 ACMD(do_skybrand) {
 	char_data *vict = NULL;
-	int cost = 30;
+	int cost;
+	int dur = 6;	// ticks
+	int dmg;
+	
+	double cost_mod[] = { 2.0, 1.5, 1.1 };
+	
+	// determine damage (which determines cost
+	dmg = get_ability_level(ch, ABIL_SKYBRAND) / 24;	// skill level base
+	if ((IS_NPC(ch) || GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+		dmg = MAX(dmg, (get_approximate_level(ch) / 24));	// total level base
+		dmg += GET_BONUS_MAGICAL(ch) / dur;
+	}
+	
+	dmg += GET_INTELLIGENCE(ch) / dur;	// always add int
+	
+	// determine cost
+	cost = round(dmg * CHOOSE_BY_ABILITY_LEVEL(cost_mod, ch, ABIL_SKYBRAND));
 	
 	if (!can_use_ability(ch, ABIL_SKYBRAND, MANA, cost, COOLDOWN_SKYBRAND)) {
 		return;
@@ -1490,8 +1536,8 @@ ACMD(do_skybrand) {
 		act("You mark $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n marks you with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_VICT);
 		act("$n marks $N with a glowing blue skybrand!", FALSE, ch, NULL, vict, TO_NOTVICT);
-	
-		apply_dot_effect(vict, ATYPE_SKYBRAND, 6, DAM_MAGICAL, get_ability_level(ch, ABIL_SKYBRAND) / 24, 3, ch);
+		
+		apply_dot_effect(vict, ATYPE_SKYBRAND, 6, DAM_MAGICAL, dmg, 3, ch);
 		engage_combat(ch, vict, FALSE);
 	}
 	

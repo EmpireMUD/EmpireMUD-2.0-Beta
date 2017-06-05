@@ -1,0 +1,415 @@
+#10141
+The Spiny End~
+   Dark clouds loom on the horizon, and animated cacti have begun attacking the
+arid countryside! Fight and defeat the magical invaders until you have defeated
+enough of them to summon their leader. Then, enter the monsoon rift, find the
+saguaro cactus on the hilltop, and prepare to fight it.
+   Killing the jumping cactus, barbary fig, and creeping devil cactus NPCs
+will contribute to your progress on this quest. When the 'scripted condition'
+is complete, turn in this quest inside the rift to start the final combat.
+   Note: You can't start other Monsoon Rift quests while you're on this one,
+so if you want to complete the adventure a different way, you must drop this
+quest first.
+~
+You have defeated enough attackers to summon the final cactus...
+~
+6 c 75 100 1440
+A
+4 10148
+P
+9 0 0 51 a
+P
+6 10142 0 1 a
+P
+6 10144 0 1 a
+P
+6 10145 0 1 a
+P
+6 10147 0 1 a
+P
+6 10150 0 1 a
+P
+6 10153 0 1 a
+P
+6 10156 0 1 a
+P
+6 10157 0 1 a
+R
+6 10142 1
+W
+11 0 0 1
+Z
+2 10171
+S
+#10142
+Straight to the Point~
+   Sensing that you have been slaying the enchanted cacti, the giant saguaro
+cactus stirs to life... Defeat it to complete this quest and close the rift.
+~
+   You have defeated the final invader and the heavy rains slow almost
+immediately. You sense that the mana holding open the rift has begun to fade,
+and realize you should leave the rift immediately.
+~
+11 bc 75 100 0
+A
+4 10148
+P
+9 0 0 51 a
+P
+6 10141 0 1 a
+P
+6 10144 0 1 a
+P
+6 10145 0 1 a
+P
+6 10147 0 1 a
+P
+6 10150 0 1 a
+P
+6 10153 0 1 a
+P
+6 10156 0 1 a
+P
+6 10157 0 1 a
+P
+0 10141 0 1 a
+R
+2 10169 1
+T 10142
+T 10168
+T 18259
+W
+3 10143 0 1
+Z
+3 10145
+S
+#10144
+Spell Search~
+   This strange rift appears to lead to the Magiterranean, the plane of druids.
+Surely this is the source of the cacti that have been attacking people in the
+countryside. You draw a quick sketch of the rift and take some notes. Find a
+Tower of Sorcery, climb to the top, and type 'study monsoon' to look for a
+spell to seal the rift.
+~
+You found the spell to seal the rift!
+~
+7 c 75 100 1440
+A
+2 10140
+P
+9 2 0 51 a
+P
+6 10141 0 1 a
+P
+6 10142 0 1 a
+P
+6 10145 0 1 a
+P
+6 10147 0 1 a
+P
+6 10150 0 1 a
+P
+6 10153 0 1 a
+P
+6 10156 0 1 a
+P
+6 10157 0 1 a
+R
+6 10145 1
+T 10174
+W
+12 5511 0 1 a
+W
+11 0 0 1 a
+Z
+2 10142
+S
+#10145
+The Rift Ritual~
+   You grab a fresh piece of scrolled parchment and write out the ritual for
+sealing a rift. It looks like this will be fairly easy. Head back to the
+monsoon rift and type 'ritual rift' to seal it off and end the cactus invasion.
+~
+   As you complete the rift ritual, the mana holding open the rift seems to
+fade and lose its hold. Almost instantly, the rift begins to collapse.
+Hopefully nobody is trapped on the wrong side of it!
+~
+9 bc 75 100 0
+A
+2 10142
+P
+9 2 0 51 a
+P
+6 10141 0 1 a
+P
+6 10142 0 1 a
+P
+6 10144 0 1 a
+P
+6 10147 0 1 a
+P
+6 10150 0 1 a
+P
+6 10153 0 1 a
+P
+6 10156 0 1 a
+P
+6 10157 0 1 a
+P
+0 10144 0 1 a
+R
+0 0 3
+R
+2 10169 1
+T 10174
+T 18259
+W
+12 10140 0 1 a
+W
+11 0 0 1 a
+Z
+2 10175
+S
+#10147
+Quench the Desert~
+   The druids have opened this monsoon rift to bring life-giving rain to the
+desert, but the chaotic Magiterranean stormclouds are impossible to control
+from this side. Travel back through the rift into your native plane, and use
+the monsoon chant to bring water to the thirsty desert.
+   Use the command 'chant monsoon' to summon a storm cloud on 6 different
+desert map tiles, then return to the head druid inside the rift.
+~
+   You have brought the monsoon rains to part of the desert, and the head druid
+thanks you for your service to nature. Thanks to your help, the thirsty desert
+plants have the water to survive another year. You can already see the rift
+beginning to close -- better hurry back out.
+~
+10 c 75 100 1440
+A
+1 10144
+P
+9 3 0 51 a
+P
+6 10141 0 1 a
+P
+6 10142 0 1 a
+P
+6 10144 0 1 a
+P
+6 10145 0 1 a
+P
+6 10150 0 1 a
+P
+6 10153 0 1 a
+P
+6 10156 0 1 a
+P
+6 10157 0 1 a
+R
+0 0 3
+R
+2 10169 1
+T 10147
+T 10142
+T 18259
+W
+11 0 0 1
+Z
+1 10144
+S
+#10150
+Dirt on the Druids~
+   The monsoon rift is causing a problem, and the Magiterranean druids are
+behind it. The head druid is protected by powerful magic, but a clever thief
+might be able to find the right leverage to convince the druids to move the
+rift.
+   Head down the path and toward the stone circle, and infiltrate the head
+druid's tent. Once inside, use 'search' to find some incriminating evidence
+that could be used to blackmail the druids into closing this rift. Once you've
+found it, return to the thief.
+~
+   You give the druid's dirty laundry to the thief, who quickly determines that
+these robes actually belong to a city sorcerer. This is exactly the evidence
+needed to blackmail the druids. The thief bundles a note with a scrap of the
+laundry, ties them to a pigeon, and sends it off.
+   Within moments, the rift starts to close. Clearly the head druid got the
+message. You had better head out of the rift, before it collapses completely.
+~
+10 cd 75 100 1440
+A
+1 10145
+P
+9 4 0 51 a
+P
+6 10141 0 1 a
+P
+6 10142 0 1 a
+P
+6 10144 0 1 a
+P
+6 10145 0 1 a
+P
+6 10147 0 1 a
+P
+6 10153 0 1 a
+P
+6 10156 0 1 a
+P
+6 10157 0 1 a
+R
+0 0 3
+R
+2 10169 1
+T 10142
+T 18259
+W
+13 10143 0 1 a
+W
+11 0 0 1 a
+W
+2 10178 0 1 a
+Z
+1 10145
+S
+#10153
+The Brewing Storm~
+   The wandering merchant tells you a long tale of woe about how profitable
+this trade route was before the monsoon rift opened nearby and the waves of
+invading cacti started coming through. Now a narrow escape from a jumping
+cactus has cost him the last of his wares, and he needs someone to help deal
+with the invaders.
+   The merchant hands you a list of supplies with a recipe for some potent
+herbicide. Once you've made enough herbicide for him, he'll be able to
+clear out the cacti and, presumably, the rift will seal itself.
+   Take the supply list and brew the herbicide. Let it age and then bring
+the finished product back to the wandering merchant.
+~
+   You hand the merchant the herbicide. His face lights up to see so much of
+it, and you can tell he's eager to douse some of the animated cacti with it.
+~
+10 cd 75 100 1440
+A
+1 10146
+P
+9 6 0 51 a
+P
+6 10141 0 1 a
+P
+6 10142 0 1 a
+P
+6 10144 0 1 a
+P
+6 10145 0 1 a
+P
+6 10147 0 1 a
+P
+6 10150 0 1 a
+P
+6 10156 0 1 a
+P
+6 10157 0 1 a
+R
+0 0 3
+R
+2 10169 1
+T 10142
+T 10173
+T 18259
+W
+2 10177 0 3
+Z
+1 10146
+S
+#10156
+Enemy of the Sun~
+   The pale man talks at length about the invasive plants conjured by the
+druids to attack the countryside. He describes the plants as soldiers of the
+sun, the natural enemy of vampires. A powerful vampire such as yourself could
+channel ancient blood magicks inside the Magiterranean rift, in order to cut
+off the source of the plants' power.
+   First, take this bat totem to an oasis and 'infuse totem' during the night,
+while the sun is down. Further instructions will be provided after you have
+completed the infusion. Infusing the totem will require some of your blood.
+~
+   You infuse the bat totem with some of your blood, and it takes on a reddish
+glow...
+~
+5 c 75 100 1440
+A
+1 10147
+P
+9 7 0 51 a
+P
+6 10141 0 1 a
+P
+6 10142 0 1 a
+P
+6 10144 0 1 a
+P
+6 10145 0 1 a
+P
+6 10147 0 1 a
+P
+6 10150 0 1 a
+P
+6 10153 0 1 a
+P
+6 10157 0 1 a
+R
+6 10157 1
+T 10178
+W
+11 0 0 1
+Z
+2 10161
+S
+#10157
+Eclipsing the Rift~
+   Now that your bat totem is infused with blood, return to the monsoon rift
+and find the rocky hilltop inside the rift. Wait until the sun is high in the
+sky, and perform the eclipse ritual using the command 'ritual eclipse'.
+   If you've performed it correctly, it should temporarily extinguish the
+power of the sun and drain the magical energy from the animated cacti that
+have been ravaging the countryside.
+~
+   The eclipse takes hold and the mana that powers the monsoon rift and
+animates the cacti begins to fade. In the distance, you can see the rift
+starting to close. You better hurry out!
+~
+12 bc 75 100 0
+A
+2 10161
+P
+0 10156 0 1 a
+P
+9 7 0 51 a
+P
+6 10141 0 1 a
+P
+6 10142 0 1 a
+P
+6 10144 0 1 a
+P
+6 10145 0 1 a
+P
+6 10147 0 1 a
+P
+6 10150 0 1 a
+P
+6 10153 0 1 a
+P
+6 10156 0 1 a
+R
+0 0 3
+R
+2 10169 1
+T 10178
+T 18259
+W
+13 10145 0 1 a
+W
+11 0 0 1 a
+Z
+2 10173
+S
+$

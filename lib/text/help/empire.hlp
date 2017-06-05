@@ -23,11 +23,11 @@ Empire is a skill, a command, and a grouping of people and land.
 You can learn about founding and managing empires on HELP EMPIRE GUIDE.
 
 See also: CLAIM, PLEDGE, ENROLL, PROMOTE, TERRITORY, CITIES, CITY COMMAND,
-    ROSTER, ESCORE, EMPIRE TRAITS, ELOG, EEDIT, ETALK
+    ROSTER, ESCORE, EMPIRE TRAITS, ELOG, EEDIT, ESTATS, ETALK
 #
 ABANDON
 
-Usage:  abandon [target]
+Usage:  abandon [target/coordinates]
 
 This command allows you to abandon a building or acre of land which your 
 empire no longer wants. This falls under the cede privilege.
@@ -96,11 +96,13 @@ Gain experience when you barde something.
 
 See also: RIDE, STABLE
 #
-BUILD BUILDING
+BUILD BUILDING "BASIC BUILDINGS"
 
 Usage:  build <building> [direction]
         build <monument> <god>
         build info <building>
+
+Speed boosts:  Faster Chores bonus, haste
 
 This command is used to create buildings using raw materials. If you build a
 shrine or temple, you must specify a god to dedicate it to. Most other
@@ -117,53 +119,75 @@ Until a building is completed, you can walk into and out of it freely, and you
 can't build any additional rooms inside. Once finished, nobody who is not
 loyal to your empire will be able to enter.
 
-All buildings give experience as you add materials to their construction. If
-they require an ability they will give experience for that ability. Otherwise,
-they just give Empire experience and only up to Empire 15.
+All buildings give experience as you add materials to their construction.
 
-&g.&0()&g.&0 hut
-&y.&0()&y.&0 mudhut
-(--) cabin
-(==) house
-&y.&0[]&y.&0 pueblo
-&y[==]&0 cliffdwelling
-(&c~~&0) well
-&y/&0[]&y\&0 mine
-(FF) forge
-(MM) mill
-(PP) potter
-(SS) stable
-vvvv fence
-vxvv gate
-{CC} cannery -- store fruits
-{FF} foundry -- store metals
-{GG} granary -- store grains
-{PP} gravelpit -- store rocks
-{LL} lumberyard -- store lumber
-{SS} smokehouse -- store meats
-{TT} tannery -- store skins
-{UU} utilityshed -- store tools
-|__| quarry -- must be on flat land facing a mountain
-&y|__|&0 claypit -- must be on flat land facing water
+Basic buildings:
+  &g.&0()&g.&0 hut
+  &y.&0()&y.&0 mudhut
+  (--) cabin
+  (==) house
+  &y.&0[]&y.&0 pueblo
+  &y[==]&0 cliffdwelling
+  (&c~~&0) well
+  &y/&0[]&y\&0 mine
+  (FF) forge
+  (MM) mill
+  (PP) potter
+  (SS) stable
+  vvvv fence
+  vxvv gate
+  {CC} cannery -- store fruits
+  {FF} foundry -- store metals
+  {GG} granary -- store grains
+  {PP} gravelpit -- store rocks
+  {LL} lumberyard -- store lumber
+  {SS} smokehouse -- store meats
+  {TT} tannery -- store skins
+  {UU} utilityshed -- store tools
+  |__| quarry -- must be on flat land facing a mountain
+  &y|__|&0 claypit -- must be on flat land facing water
+  ..x. familygravesite -- used as a respawn point (city only)
 
 For more information on building your first house, see HELP HOUSING GUIDE.
 
-See also: RESOURCES, KEEP, EMPIRE, ARTISANS, LUXURY, MONUMENTS, SEAFARING,
-   GRAND MONUMENTS, HOUSING, LOCKSMITHING, RAISE ARMIES, ADVANCED TACTICS,
-   ROADS, HAVENS, SWAMP ENGINEERING, GREAT WALLS, DESIGNATE, DISMANTLE
+See also: BUILD INFO, RESOURCES, KEEP, EMPIRE, ARTISANS, LUXURY, MONUMENTS,
+   SEAFARING, GRAND MONUMENTS, HOUSING, LOCKSMITHING, RAISE ARMIES, DISMANTLE,
+   ADVANCED TACTICS, ROADS, HAVENS, SWAMP ENGINEERING, GREAT WALLS, DESIGNATE,
+   RECIPES
 #
 CEDE
 
-Usage:  cede <person> (x, y)
+Usage:  cede <person>
 
-This is used to cede one acre of land to anyone else currently in the game. 
-If you do not include an (x, y) coordinate, it will cede the land you're on. 
-You can only cede land owned by your empire. Ceding land to a god or immortal
-so that you can claim more land may get you in trouble.
+This is used to cede one acre of land to anyone else currently in the game. You
+can only cede the map tile you're standing on, and it must be owned by your
+empire. Ceding land to a god or immortal so that you can claim more land may
+get you in trouble.
 
-You can't cede land to an empire that is at war.
+Your target must have the 'bother' toggle turned on. You can't cede land to an
+empire that is at war.
 
-See also: CLAIM, POLICY, PRIVILEGE, ABANDON
+See also: CLAIM, POLICY, PRIVILEGE, ABANDON, TOGGLE
+#
+CHORES CHORE
+
+Chores (Empire ability)
+
+Doing simple chores will help you raise your Empire skill at low levels.
+
+Chores include:
+  chop                      press *
+  harvest                   quarry
+  mill *                    saw
+  mine *                    scrape
+  mint                      smelt *
+  plant
+
+* Most common recipes/types give Chores experience, but some recipes may not.
+  (try 'smelt info iron ingot', for example, to see what ability it uses)
+
+See also: ACTIONS, CHOP, HARVEST, MILL, MINE, MINT, PLANT, PRESS, QUARRY, SAW,
+SCRAPE, SMELT
 #
 CITY
 
@@ -227,13 +251,27 @@ will remove the city center and refund the city point. This helps keep the map
 clean, and you can prevent it by making sure there is at least one building in
 your city.
 
-Types of cities:
- -C1-  Outpost (5)
- -C2-  Village (10)
- -C3-  City (15)
- -C4-  Capital (25)
+See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, PROMINENCE, TECHNOLOGY,
+  TERRITORY, WEALTH
+#
+"CITY TYPES" OUTPOST VILLAGE CAPITAL
 
-See also: CITY COMMANDS, CITY TRAITS, PROMINENCE, TECHNOLOGY, TERRITORY, WEALTH
+There are four sizes of city available. The only difference between them is
+the radius of the city.
+
+ -C1-  Outpost (radius 5)
+ -C2-  Village (radius 10)
+ -C3-  City (radius 15)
+ -C4-  Capital (radius 25)
+
+Some buildings, such as mines, count as in-city territory at a much larger
+radius -- 3x the normal distance from the city center.
+
+You can see the city radius by typing 'toggle political' and looking at the
+background highlight (on the visual map), or you can use the 'mark' command
+to measure distances from the center if you're using a screenreader.
+
+See also: MARK, CITY INFORMATION, CITY COMMANDS
 #
 "CITY LIGHTS"
 
@@ -268,6 +306,7 @@ influence. The empire can now gain additional territory from its Wealth, up to
 3x its normal limit (for a total of 4x). Only one member of the empire must have
 this ability to gain the benefit. There is no additional benefit to more members
 having it.
+
 
 Commerce also allows you to build the mint building, and mint your own coins:
 
@@ -315,7 +354,7 @@ the last mountain reset), otherwise your deep mines ability will have no effect.
 Mines will only display as 'deep' if, thanks to this bonus, they have more ore
 than the normal maximum.
 
-Once you have started a mine (or prospected) a given mountain tile, it will
+Once you have started a mine on (or prospected) a given mountain tile, it will
 remain a deep mine unless the mountain is reset at the end of the year. For
 more information on mountain resets, see HELP MINE.
 
@@ -448,7 +487,7 @@ You can use "efind all" to find all items on the ground in your empire. The
 Example:
  > efind cart
 
-See also: EINVENTORY, NAVIGATION
+See also: EINVENTORY, NAVIGATION, EIDENTIFY
 #
 ELOG ELOGS "EMPIRE LOGS"
 
@@ -480,7 +519,22 @@ This shows you your empire's MOTD (Message Of The Day). It is set in eedit.
 
 See also: EEDIT
 #
-EMPIREINVENTORY EINVENTORY
+EMPIREIDENTIFY EIDENTIFY EID
+
+Usage:  empireidentify <item>
+        eidentify <item>
+       
+The eidentify command identifies an item stored by your empire, showing you
+the same information that identify would as well as a listing of quantities
+of this item across the empire's islands.
+
+* Immortals may use this command on any inventory. Mortals may only use it on
+their own empire. If the empire name has more than one word, you can use
+quotation marks.
+
+See also: EFIND, WORKFORCE, EINVENTORY, IDENTIFY
+#
+EMPIREINVENTORY EINVENTORY EINV
 
 Usage:  empireinventory [item | all]
         einventory [item | all]
@@ -500,7 +554,7 @@ You can use "warehouse inventory" to see items in warehouse (unique) storage.
 their own empire. If the empire name has more than one word, you can use
 quotation marks.
 
-See also: EFIND, SHIPPING, WORKFORCE
+See also: EFIND, SHIPPING, WORKFORCE, EIDENTIFY
 #
 "EMPIRE SCORE" ESCORE
 
@@ -560,16 +614,22 @@ EXCAVATE EXCAVATION TRENCH MOAT FILLIN
 Usage:  excavate
         fillin
 
+Speed boosts:  Faster Chores bonus, haste
+
 Using a shovel, your own strength, and a lot of time, you can excavate a
 trench from a desert or plains. Once the trench is complete, it will begin
 to fill with water. Eventually, it becomes a river.
 
 The "fillin" command is the opposite of excavate: it fills trenches in until
 they are ordinary plains or desert again. It will also work on a player-created
-oasis or river.
+oasis or river. It takes 1 minute to begin a fillin on a completed trench; if
+you cancel the action or are interrupted, you must start the minute over.
 
-If you fill a desert trench, it will become an Oasis instead of a river. Oases
-convert into rivers if they are adjacent to other rivers or to oceans.
+You can only excavate and fill in on claimed land.
+
+When a desert trench fills with water, it will become an Oasis instead of a
+river. Oases convert into rivers if they are adjacent to other rivers or to
+oceans.
 
 There are three ways to fill a finished trench with water:
  - If there is more water adjacent, the trench will fill quickly.
@@ -578,7 +638,7 @@ There are three ways to fill a finished trench with water:
 
 An unfinished trench will not fill with water.
 
-See also: OASIS DRAINAGE
+See also: CLAIM, OASIS DRAINAGE
 #
 EXCHANGE
 
@@ -642,15 +702,20 @@ See also: EMPIRE SCORE
 #
 FINDMAINTENANCE "FIND MAINTENANCE"
 
-Usage:  findmaintenance
+Usage:  findmaintenance [coordinates | island]
 
-This command lists all your buildings that require at least 2 maintenance. This
-means when the new year happens and ALL buildings require maintenance, they
-won't show up on the list right away -- preventing very long lists. After two
-years without maintenance, buildings will show on the findmaintenance list.
+This command finds all the buildings in your empire that are damaged or need
+at least 2 years of maintenance. If you give it target coordinates or an island
+name, it will instead list the resources needed to repair that location or all
+buildings you own on the island.
 
 If you are using Workforce to maintain your buildings, this generally means
 that only buildings not serviced by your workforce will show up on the list.
+Only buildings that have taken at least 20% of their maximum damage or require
+any maintenance show up on the list.
+
+Immortals can give an empire name as the first argument to see maintenance
+for that empire.
 
 See also: MAINTAIN, WORKFORCE
 #
@@ -752,9 +817,13 @@ This command lists the islands your empire has territory or einventory on
 (including warehouse storage). You must have the Navigation ability. The
 coordinates for each island are the approximate center of the island.
 
+Empires can rename islands using the 'customize island' command. These names
+become global if the empire is the only one with cities on the island, or
+all empires on the island share the same custom name for it.
+
 Note: Immortals with the 'empires' grant can list the islands of any empire.
 
-See also: SURVEY
+See also: CUSTOMIZE ISLAND, SURVEY
 #
 LOCKSMITHING
 
@@ -789,14 +858,15 @@ MAINTAIN MAINTENANCE DISREPAIR
 
 Usage:  maintain
 
-Buildings fall into disrepair over time. It costs 1 pile of lumber and 1 pouch
-of nails per year of disrepair. You can also use workforce to maintain your
-buildings.
+Buildings fall into disrepair over time. Different buildings require different
+items for maintenance, which are shown beneath the building's description or
+map.
 
 It takes roughly two and a half months (realtime) for buildings to decay,
-although unfinished buildings decay faster.
+although some buildings (and all unfinished buildings) decay faster.
 
-Use findmaintenance to find buildings in need.
+Use findmaintenance to find buildings in need. You can also use workforce to
+maintain your buildings.
 
 See also: FINDMAINTENANCE, RUINS, WORKFORCE
 #
@@ -850,6 +920,7 @@ See also: BUILD, GRAND MONUMENTS
 PAN
 
 Usage:  pan [direction]
+Speed boosts:  Finder ability
 
 Using a simple metal pan, you can pan for gold flakes next to the river. It's
 rare to find anything, but it's something to do. You can pan an adjacent map
@@ -950,7 +1021,8 @@ mountain tile (since the last mountain reset), that tile will benefit from your
 Deep Mines and/or Rare Metals until the next mountain reset. For more info on
 mountain resets, see HELP MINE.
 
-Gain experience when you finish prospecting a tile.
+Gain experience when you finish prospecting a tile. Prospecting happens
+instantly if your empire was the last one to prospect the tile.
 
 See also: MINE, DEEP MINES, RARE METALS
 #
@@ -969,21 +1041,23 @@ See also: CLAIM, CEDE, ABANDON, UNPUBLICIZE, HOSTILE
 #
 QUARRY
 
+Quarry (Chores ability)
+
 Command:  quarry
-Building:  |__|  Quarry  (no skill required)
+Building:  |__|  Quarry  (Basic Buildings)
+Speed boosts:  Faster Chores bonus, haste
 
 A quarry must be built on plains or desert, facing a mountain. Quarries are a
 good place to dig up rocks. You can also quarry stone here using the "quarry"
 command. You will find more rocks before a quarry depletes, compared to digging
 anywhere else.
 
-You can gain Empire skill up to 15 by quarrying stone. This does not require
-an ability. If you have the "dig" workforce enabled, your citizens will only
-dig if you have a quarry.
+If you have the "dig" workforce enabled, your citizens will only dig if you
+have a quarry.
 
 Quarries count as in-city territory as far away as 3x a city's normal radius.
 
-See also: DEPLETION, DIG
+See also: DEPLETION, DIG, CHORES
 #
 RADIANCE
 
@@ -1063,11 +1137,15 @@ See also: BONUS EXPERIENCE POINTS
 #
 ROSTER
 
-Usage:  roster
+Usage:  roster [all]
 
 This command shows you the members of your empire and lets you know who's on-
 line and who's been gone a while. The color of the player's class name (if not
 white) indicates their role, if any: &aCaster&0, &jHealer&0, &yTank&0 or &rMelee&0.
+
+If you don't use the "all" option, you won't see members who have timed out.
+
+High-level immortals can also target other empires with this command.
 
 See also: CLASS, WHO
 #
@@ -1187,19 +1265,22 @@ TREE TREES LOGS
 
 Stored at: Lumber Yard
 
-Get a tree using the chop command.
-Get a log using the scrape command.
+Get a tree using the chop command. Get a log using the scrape command.
 
 Trees are found by chopping down forests. They are used in most buildings,
 but you must scrape them first. Forests will regrow if you don't chop down all
 four trees on a tile, and they also spread from overgrown forests to adjacent
 plains. Desert groves are different, and will spring up anywhere in the desert.
 
+Different terrains will yield different types of trees, which in turn have
+their own type of logs and lumber. Not all trees can be scraped or sawed. Try
+looking at the tree; its description might tell you what to do with it.
+
 You can stop the spread of trees by chopping them all down, by building a
 fence, or by laying a road. Chant of Nature can be used to grow trees on bare
 plains.
 
-See also: CHANT OF NATURE, CHOP, BUILD, SCRAPE
+See also: CHANT OF NATURE, CHOP, BUILD, SCRAPE, PILLAR, LUMBER
 #
 TECHNOLOGY TECHNOLOGIES "EMPIRE TECHNOLOGY"
 
@@ -1307,8 +1388,8 @@ An empire's Wealth is determined by the amount of precious metal and coins in
 its vaults (or secret cache).
 
 With the Commerce ability, this wealth adds to the empire's territory at a
-rate of 1 territory per 10 wealth. This additional territory is subject to
-diminishing returns.
+rate of 1 territory per 10 wealth, up to 3x its normal limit (for a total of
+4x).
 
 See also: COMMERCE, EXCHANGE, MINT, VAULT, SECRET CACHE
 #
@@ -1328,7 +1409,8 @@ Workforce, Skilled Labor (Empire abilities)
 
 Usage:  workforce [chore] [on | off | <limit>] [island name | all]
         workforce no-work
-        workforce where
+        workforce where [here]
+        workforce copy <island name>
 
 Once at least one member of an empire has the Workforce ability, the empire's
 citizens (NPCs) will start performing simple tasks for the empire. You can
@@ -1349,9 +1431,8 @@ If you set your own limit on a chore, the empire won't produce more than that
 limit on each island. Not all chores use the numeric limit (for example, the
 abandon-* toggles don't use the limit).
 
-You can use the "workforce no-work" command to toggle whether or not your
-citizens will work the room you're currently standing in. The "workforce where"
-will tell you how many citizens are working each task.
+You can use the "workforce copy" command to copy the workforce limit
+configuration of another island into the island you are currently in.
 
 Note: Your workforce will only do chores if your empire has less than 200 of
 the resource provided by the chore. For example, miners won't do any work in
@@ -1361,11 +1442,23 @@ is also a total cap for any given resource, which is based on the number of
 players in your empire. After passing the total cap, the locals will collect
 much less of that resource on each island.
 
+See &cHELP WORKFORCE CHORES&0 for a list of all workforce chores with descriptions.
+
+The Workforce ability gains experience when most workforce chores are done
+(including skilled ones) while you are online.
+The Skilled Labor ability gains experience when skilled chores are done while
+you are online.
+
+See also: WORKFORCE CHORES, WORKFORCE WHERE, NO-WORK
+#
+"WORKFORCE CHORES" "WORKFORCE TYPES"
+
 Workforce types:
   &ybuilding:&0 NPCs will build any building that has been started, or dismantle
             any building you've started to dismantle. They build using stored
-            empire resources, not items on the ground. Workers can't finish
-            buildings that require resources other than items/components.
+            empire resources, not items on the ground. Workers can't provide
+            coins, liquids (like water), or pools (like mana) for building. Any
+            building that requires one of these must be finished manually.
   &ychopping:&0 NPCs will chop down forests and desert groves (Not orchards - 
      use farming without replanting for that).
   &ydigging:&0 NPCs will dig for rocks in any quarry, or clay in any clay pit.
@@ -1398,11 +1491,27 @@ Workforce types:
   
 Items marked (skilled) require the Skilled Labor ability.
 
-The Workforce ability gains experience when most workforce chores are done
-(including skilled ones) while you are online.
-The Skilled Labor ability gains experience when skilled chores are done while
-you are online.
+See also: EXARCH CRAFTS, WORKFORCE
+#
+"WORKFORCE NO-WORK" "WORKFORCE NOWORK" NO-WORK NOWORK
 
-See also: EXARCH CRAFTS
+Usage:  workforce no-work
+
+This command toggles workforce for the map location you're standing on.
+Citizens will not perform any chores at that location.
+
+See also: WORKFORCE
+#
+"WORKFORCE WHERE"
+
+Usage:  workforce where
+        workforce where here
+
+This command will show you how many of your citizens are working on each
+active workforce chore right now.
+
+If you use the "here" argument, it will only check the island you're on.
+
+See also: WORKFORCE
 #
 $

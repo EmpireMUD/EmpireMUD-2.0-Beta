@@ -174,7 +174,7 @@ M
  4
 You stab $N through the heart!  Instant death!
 $n drives a stab at you, it pierces your heart!  RIP!
-$n stabs brutally at $N, killing him as $N is impaled by $n!
+$n stabs brutally at $N, killing $M as $E is impaled!
 You stab at $N, missing!
 $n misses a particularily nasty stab in your direction!
 $n stabs at $N, but $e misses!
@@ -227,7 +227,7 @@ With a loud whistle through the air, $n misses $s pounding attack upon $N!
 #
 Who are you trying to kid?
 Hmmm... I think you missed the joke that $n was trying to tell you.
-$N looks somewhat perplexed as $n tries to pound him!
+$N looks somewhat perplexed as $n tries to pound $M!
 
 * Hammer
 M
@@ -259,7 +259,7 @@ $n cracks $s whip at $N but only hits $mself in the face!
 #
 You'd better stop before $N whips your butt.
 $n is trying to whip you... how cute!
-$n tries to whip $N - isn't he cute?
+$n tries to whip $N - isn't $e cute?
 M
  7
 Your dextrous whip messily tears $N's torso right off!
@@ -297,7 +297,7 @@ M
 You sink your teeth deep into $N's neck -- blood sprays everywhere!
 $n sinks $s teeth deep into your neck, tearing your jugular vein to bits!
 $n sinks $s teeth deep into $N's neck, tearing $S jugular vein to bits!
-You snap your teeth at $N but miss him.
+You snap your teeth at $N but miss $M.
 $n snaps $s teeth at you fiercely but misses.
 $n fiercely snaps $s teeth at $N but misses the mark.
 #
@@ -966,13 +966,13 @@ Your kick hits $N in the solar plexus!
 You're hit in the solar plexus, wow, this is breathtaking!!
 $n kicks $N in the solar plexus, $N is rendered breathless!
 You attempt to kick $N but lose your balance and fall face down in some mud that has suddenly appeared.
-When $n tries to kick you, you quickly make him fall in some mud you have created.
+When $n tries to kick you, you quickly make $m fall in some mud you have created.
 $n falls face down in some mud created by $N.
 
 * Bash
 M
  55
-$N doesn't recover from your bash! -- $E is dead.
+$N doesn't recover from your bash -- $E is dead!
 As $n bashes at you, you give up living and die...
 $N dies after $n has bashed $M!
 As $N avoids your bash, you topple over and fall to the ground!
@@ -1024,13 +1024,13 @@ You shoot a bolt of fire at $N, who is incinerated!
 Your flesh is incinerated by a bolt of fire from $n's hand!
 $n shoots a bolt of fire at $N, who is incinerated!
 You shoot a bolt of fire at $N, but miss!
-$n shoots a bolt of fire from his hand, but misses you pathetically!
+$n shoots a bolt of fire from $s hand, but misses you pathetically!
 $n shoots a bolt of fire from $s hand, but misses $N!
 You shoot a bolt of fire from your fist which knocks $N back violently!
 $n shoots a bolt of fire from $s fist...  You're knocked to the ground in flames!
 $n shoots a bolt of fire from $s fist which knocks $N back violently!
 You shoot a bolt of fire at $N, but miss!
-$n shoots a bolt of fire from his hand, but misses you pathetically!
+$n shoots a bolt of fire from $s hand, but misses you pathetically!
 $n shoots a bolt of fire from $s hand, but misses $N!
 
 * Bleeding -- THIS IS NOW UNUSED
@@ -1054,7 +1054,7 @@ M
  60
 Your lightning bolt cuts straight through $N -- $E falls over dead.
 You reel in pain as $n's lightning bolt cuts straight through you, and you fall down dead.
-$N staggers as $n's lightning bolt cuts straight through him -- $E falls down dead.
+$N staggers as $n's lightning bolt cuts straight through $M -- $E falls down dead.
 You hit $N with a lightning bolt, but it doesn't seem to affect $M.
 You're hit by a lightning bolt from $n, but it doesn't seem to affect you.
 $n shoots a lightning bolt at $N, but it doesn't seem to affect $M.
@@ -1068,13 +1068,13 @@ $n shoots a lightning bolt at $N, but misses.
 * Physical DoT
 M
  61
-#
+$N bleeds out from $s open wounds, and dies.
 You bleed out from your open wounds and die.
 $N bleeds out from $s open wounds, and dies.
 #
 #
 #
-#
+$N winces in pain from $s open wounds.
 You wince in pain from your open wounds.
 $N winces in pain from $s open wounds.
 #
@@ -1082,13 +1082,13 @@ $N winces in pain from $s open wounds.
 #
 M
  61
-#
+$N succumbs to $s open wounds, and dies.
 You succumb to your open wounds and die.
 $N succumbs to $s open wounds, and dies.
 #
 #
 #
-#
+$N bleeds from open wounds.
 You bleed from open wounds.
 $N bleeds from open wounds.
 #
@@ -1130,13 +1130,13 @@ $N basks in the glow of $n's sunshock.
 * Magical DoT
 M
  64
-#
+The searing magical pain proves too much for $N, and $E falls over dead!
 The searing magical pain proves too much, and you fall over dead!
 The searing magical pain proves too much for $N, and $E falls over dead!
 #
 #
 #
-#
+$N twitches as magical pain sears through $M!
 You twitch as magical pain sears through you!
 $N twitches as magical pain sears through $M!
 #
@@ -1144,13 +1144,13 @@ $N twitches as magical pain sears through $M!
 #
 M
  64
-#
+The residual magic flowing through $N proves too much, and $E falls over dead!
 The residual magic flowing through you proves too much, and you fall over dead!
 The residual magic flowing through $N proves too much, and $E falls over dead!
 #
 #
 #
-#
+$N seems to be burning on the inside as magical pain courses through $M!
 You're burning from the inside as magical pain courses through you!
 $N seems to be burning on the inside as magical pain courses through $M!
 #
@@ -1160,13 +1160,13 @@ $N seems to be burning on the inside as magical pain courses through $M!
 * Fire DoT
 M
  65
-#
+The fire overtakes $N and $E burns to death!
 The fire overtakes you and you burn to death!
 The fire overtakes $N and $E burns to death!
 #
 #
 #
-#
+$N shouts in pain as the fire scorches $S flesh!
 You shout in pain as the fire scorches your flesh!
 $N shouts in pain as the fire scorches $S flesh!
 #
@@ -1174,13 +1174,13 @@ $N shouts in pain as the fire scorches $S flesh!
 #
 M
  65
-#
+$N falls over dead, burnt to a crisp!
 You fall over dead, burnt to a crisp!
 $N falls over dead, burnt to a crisp!
 #
 #
 #
-#
+$N is on fire, $S flesh sizzles and $E appears to be in agony!
 You are on fire! Your flesh sizzles with agony!
 $N is on fire, $S flesh sizzles and $E appears to be in agony!
 #
@@ -1190,13 +1190,13 @@ $N is on fire, $S flesh sizzles and $E appears to be in agony!
 * Poison DoT
 M
  66
-#
+The poison reaches $N's heart and $E crumples to the ground, dead!
 The poison reaches your heart and you crumple to the ground, dead!
 The poison reaches $N's heart and $E crumples to the ground, dead!
 #
 #
 #
-#
+$N winces in pain as poison courses through $S blood!
 You wince in pain as poison courses through your blood!
 $N winces in pain as poison courses through $S blood!
 #
@@ -1204,17 +1204,225 @@ $N winces in pain as poison courses through $S blood!
 #
 M
  66
-#
+$N suddenly falls over, dead from poison!
 The poison hits your brain. Your vision fades to black and you fall down dead!
 $N suddenly falls over, dead from poison!
 #
 #
 #
-#
+$N acts like $E's burning from the inside as poison flows through $S veins!
 You burn from the inside out as poison flows through your veins!
 $N acts like $E's burning from the inside as poison flows through $S veins!
 #
 #
 #
+
+* Ablate
+M
+ 67
+Your spell ablates pieces off of $N until there's not enough left to live!
+$n's spell ablates pieces off of you, leaving you in agony until you are dead!
+$n casts an ablation spell on $N, who flakes off in pieces until nothing remains.
+Your ablation falls short and doesn't seem to affect $N.
+$n casts an ablation spell at you, but it seems to miss.
+$n casts an ablation spell at $N, but it has no effect.
+You cast ablate, and pieces of $N begin to flake off!
+You scream in pain as $n's ablation spell starts to flake pieces off of you!
+$n casts ablate, and $N screams in pain as pieces begin to flake off of $M.
+You try to ablate $N, but it is futile.
+$n tries futilely to cast ablate on you.
+$n tries to ablate $N, but it has no effect.
+
+* Acidblast
+M
+ 68
+Your acid blast is too effective, and $N melts into a fleshy puddle on the ground!
+$n throws a blast of acid at you, and you scream in pain as you melt into a fleshy puddle!
+A blast of acid from $n to $N reduces $M into a dead, fleshy puddle on the ground.
+$N masterfully avoids your acid blast.
+You masterfully avoid $n's acid blast.
+$N masterfully avoids an acid blast from $n.
+Your acid blast splashes against $N and begins eating into $M.
+$n hurls an acid blast against you, which seeps into your armor and begins melting your flesh!
+$n hurls an acid blast at $N, who screams out in agony!
+Your acid blast has no effect on $N.
+$n throws an acid blast at you, to no avail.
+$n throws an acid blast at $N, but it seems to do nothing.
+
+* Arclight
+M
+ 69
+The brilliant white jets of your arclight shred $N to pieces!
+You collapse in pain as the brilliant white jets from $n's arclight shred you to pieces!
+$N screams and collapses as $n's brilliant white jets of arclight shred $M to pieces.
+Your arclight reflects off of $N.
+$n's arclight seems to reflect off of you.
+$n casts arclight, but the jets of light seem to reflect off of $N.
+Your jets of arclight pierce straight through $N!
+$n shoots jets of arclight at you, which seem to pierce straight through you!
+$n shoots jets of arclight at $N, cutting straight through $M.
+$N seems to absorb your arclight with no trouble.
+$n casts arclight at you, which you simply absorb.
+$n casts arclight at $N, but $E seems unaffected.
+
+* Astralclaw
+M
+ 70
+Your astral claws shred $N until nothing remains but a bloody pulp!
+Astral claws from $n appear around you, painfully shredding you until you die in agony!
+$n casts astral claws at $N, who is shredded until nothing remains but a bloody pulp.
+You strike out at $N with astral claws, but they fall short.
+$n's astral claws strike out at you, but fall short.
+$n slashes at the air, but $s astral claws seem to miss $N.
+You slash at the air, as the air around $N slices into $S skin!
+$n slashes at the air, and you feel invisible claws slicing into your skin!
+$n slashs at the air, and $N shouts out in pain.
+You slash at $N with astral claws, but $E doesn't even seem to notice.
+You ignore $n's futile attempts to slash you with astral claws.
+$n slashes futilely at the air in front of $N.
+
+* Chronoblast
+M
+ 71
+Your chronoblast seems to slow $N down so much that $S heart stops!
+Time seems to stop around you, as $n's chronoblast stops your heart!
+$n casts chronoblast and $N freezes completely, before toppling over, dead.
+You cast chronoblast but nothing seems to happen to $N.
+$n casts chronoblast, but you don't even feel slowed.
+$n casts chronoblast, but $N seems unfazed.
+You fire off a chronoblast at $N, who seems dazed and slows down.
+$n casts chronoblast, causing you pain and apparently speeding up the rest of the area.
+$n casts chronoblast, and $N actually appears to slow down.
+You cast chronoblast at $N, but somehow $E seems faster!
+$n casts chronoblast at you, giving you more time to enjoy the fight.
+$n casts chronoblast at $N, who seems to speed up instead of slowing down!
+
+* Deathtouch
+M
+ 72
+Your deathtouch seems to wilt $N down to nothing!
+$n touches you, and $s deathtouch is too much for your poor heart to take!
+$n touches $N, who wilts down to the ground and dies!
+You touch $N, but $E seems unaffected.
+$n grasps you with deathtouch, but you feel quite alive.
+$n grasps $N with deathtouch, to no effect.
+You grasp $N, who shouts out in pain as $S skin darkens and dies around your palm.
+$n grasps you, causing to shout out in pain as your skin begins to darken and die.
+$n grasps $N firmly, causing $M to shout out in pain as $S skin begins to darken and die.
+You grasp $N, but your deathtouch cannot harm so majestic a person.
+$n grasps your arm and you feel the tingle of a futile deathtouch.
+$n grasps $N's arm, but $s deathtouch seems futile against $N's majesty.
+
+* Dispirit
+M
+ 73
+Your dispiriting yowl seems too much for $N, who grasps $S head and crumples to the floor!
+$n lets out a dispiriting yowl, and you fall to the floor clutching your head...
+$n lets out a dispiriting yowl, and $N falls to the floor clutching $S head.
+You let out a dispiriting yowl, but $N pays no heed.
+$n lets out a dispiriting yowl in your direction, but it seems to do nothing.
+$n lets out a dispiriting yowl at $N, who seems to pay it no heed.
+You let out a dispiriting yowl at $N, who clutches $S head in pain.
+$n lets out a dispiriting yowl, and your head throbs with pain!
+$n lets out a dispiriting yowl, and $N clutches $S head in pain.
+You yowl at $N, but the only person dispirited here is you.
+$n yowls at you, but $s dispiriting cry has no effect on you.
+$n lets out a dispiriting yowl, but $N doesn't seem to mind.
+
+* Erode
+M
+ 74
+You cast erode at $N, whose skin falls off in dry chunks as $E falls down, dead.
+You fall down dead as $n's erode spell breaks off your skin in dry chunks.
+$N falls down dead as every last bit of $S skin falls off in dry chunks from $n's erode spell.
+You try to erode $N, but $E resists.
+You resist $n's erosion spell.
+$n casts erode at $N, who appears to resist.
+You shout the word 'erode!' and bits of $N begin cracking and chipping off.
+$n shouts the word 'erode!' and bits your your skin begin chipping off!
+$n shouts the word 'erode!' at $N, whose skin begins to dry out and chip off.
+You attempt to erode $N, but $E is immune.
+$n attempts to erode you, but you are immune.
+$n attempts to erode $N, who shrugs it off.
+
+* Scour
+M
+ 75
+You scour away at $N until nothing living remains!
+$n's magic scours away at you until nothing living remains!
+$n scours away at $N with $s magic, until nothing living remains!
+You cast a flurry of scouring magic at $N, which only leaves $M cleaner.
+$n casts scour at you, but $s magic only seems to clean you off.
+$n tries to magically scour $N, but $E is having none of that.
+You hurl a blast of scouring magic at $N, who yelps as it starts to take effect!
+$n hurls a blast of scouring magic at you, causing you to yelp in pain as it starts to take effect!
+$n hurls a blast of scouring magic at $N, who yelps in pain!
+You scour $N with your magic, and $E seems to appreciate it.
+You feel cleaner as $N's magic begins to scour you.
+$n magically scours $N, who actually looks cleaner afterwards.
+
+* Shadowlash
+M
+ 76
+Your shadowlash wraps around $N and consumes $M in the darkness!
+$n lashes out at you with shadows which wrap around you, smothering out the light -- and your life!
+$n's shadowlash wraps around $N, consuming $M in the darkness.
+You strike out at $N with a shadowlash, but it misses.
+Shadows whip out at you from $n, but they narrowly miss.
+Shadows whip out at $N from $n, narrowly missing $M.
+The shadows around you lash out at $N, wrapping around $S head and tearing at $S skin.
+The shadows around $n lash out at you, wrapping around your head and tearing at your skin!
+The shadows around $n lash out at $N, wrapping around $S head and tearing at $S skin.
+Your shadows lash out at $N, but are deflected by $S own shadow.
+Your shadow deflects a shadowlash from $N.
+$n's shadow lashes out at $N, but is deflected by $S own shadow.
+
+* Soulchain
+M
+ 77
+You toss a magical soulchain at $N, which seems to separate $S spirit from $S body!
+$n tosses a magical soulchain at you, separating your spirit from your body!
+$n tosses a magical soulchain at $N, separating $S spirit from $S body.
+You try to wrap a soulchain around $N, but $E dodges.
+$n tries to wrap a soulchain around you, but you dodge.
+$n tries to wrap a soulchain around $N, but $E dodges.
+You wrap a magical soulchain around $N, and watch as $E struggles in anguish!
+$n wraps a magical soulchain around you, and watches as you struggle in anguish!
+$n wraps a magical soulchain around $N, who struggles in anguish!
+Your soulchain doesn't even seem to tickle $N.
+$n casts a soulchain on you, but it doesn't seem to have any effect.
+$n tries to soulchain $N, but $N barely seems to notice.
+
+* Starstrike
+M
+ 78
+A meteor from your starstrike cuts straight through $N's heart, and $E crumples.
+You move too late as meteor from $n's starstrike cuts straight through your heart!
+$n brings down a meteoric starstrike, straight through $N's heart.
+You call down a shower of starstrikes, but none seem to hit $N.
+$n calls down a shower of starstrikes on you, but you dodge each one.
+$n calls down a shower of starstrikes on $N, who dodges them expertly.
+You summon a meteor from the stars, which blasts into $N and knocks $M back!
+$n summons a starstrike from above, blasting into you and knocking you back!
+$n summons a starstrike from above, blasting $N and knocking $M back.
+You summon a starstrike, but $N merely watches with joy as the stars fall.
+$n summons falling stars, much to your delight.
+$N watches with delight as $n's starstrike lights up the sky.
+
+* Thornlash
+M
+ 79
+Your thornlash coils tightly around $N, choking off $S airway as it rends $S flesh!
+A thornlash from $n coils tightly around you, choking off your airway as you die in pain!
+$N dies silently as a thornlash from $n coils tightly around $M and cuts off $S airway.
+You summon a thornlash, but it fails to catch hold on $N.
+$n summons a thornlash, but you dodge before it can catch on your skin.
+$n summons a thornlash, but $N dodges as it tries to wind around $M.
+Your thornlash wraps around $N and digs into $S skin!
+A thornlash from $n wraps around you and digs into your skin!
+$n casts a thornlash, which wraps around $N and digs into $S skin!
+You send a thornlash at $N, who skips rope with it.
+You skip rope with $n's thornlash.
+$n sends a thornlash at $N, who merely skips rope with it.
 
 $

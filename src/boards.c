@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: boards.c                                        EmpireMUD 2.0b4 *
+*   File: boards.c                                        EmpireMUD 2.0b5 *
 *  Usage: handling of multiple bulletin boards                            *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -142,6 +142,9 @@ ACMD(do_write) {
 		log("SYSERR:  degenerate board!  (what the hell...)");
 		msg_to_char(ch, "There's no board here.\r\n");
 	}
+	else if (!IS_APPROVED(ch) && config_get_bool("write_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if (ACCOUNT_FLAGGED(ch, ACCT_MUTED))
 		msg_to_char(ch, "You can't write on boards while muted.\r\n");
 	else if (!Board_write_message(board_type, ch, argument, board))
@@ -271,7 +274,7 @@ int Board_write_message(int board_type, char_data *ch, char *arg, obj_data *boar
 
 	act("$n starts to write a message.", TRUE, ch, 0, 0, TO_ROOM);
 
-	start_string_editor(ch->desc, "your message", &(msg_storage[NEW_MSG_INDEX(board_type).slot_num]), MAX_MESSAGE_LENGTH);
+	start_string_editor(ch->desc, "your message", &(msg_storage[NEW_MSG_INDEX(board_type).slot_num]), MAX_MESSAGE_LENGTH, FALSE);
 	ch->desc->mail_to = board_type + BOARD_MAGIC;
 
 	num_of_msgs[board_type]++;
@@ -295,7 +298,8 @@ int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board) 
 		send_to_char("You try but fail to understand the holy words.\r\n", ch);
 		return (1);
 	}
-	act("$n studies the board.", TRUE, ch, 0, 0, TO_ROOM);
+	// this results in a double message with "$n looks at $p."
+	//act("$n studies the board.", TRUE, ch, 0, 0, TO_ROOM);
 
 	strcpy(buf,
 		"This is a bulletin board. Usage: READ/REMOVE <messg #>, WRITE <header>.\r\n"
@@ -670,7 +674,7 @@ int Board_respond_message(int board_type, char_data *ch, char *arg, obj_data *bo
 	NEW_MSG_INDEX(board_type).reply_num = MSG_SLOTNUM(board_type, ind);
 	
 	act("$n starts to write a message.", TRUE, ch, 0, 0, TO_ROOM);
-	start_string_editor(ch->desc, "your message", &(msg_storage[NEW_MSG_INDEX(board_type).slot_num]), MAX_MESSAGE_LENGTH);
+	start_string_editor(ch->desc, "your message", &(msg_storage[NEW_MSG_INDEX(board_type).slot_num]), MAX_MESSAGE_LENGTH, FALSE);
 	ch->desc->mail_to = board_type + BOARD_MAGIC;
 
 	num_of_msgs[board_type]++;

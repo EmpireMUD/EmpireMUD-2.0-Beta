@@ -22,34 +22,34 @@ is on fire, and you won't be able to pass it.
 T 10407
 S
 #10402
-spawner trash market~
-Market Street trash spawner~
+spawner trash market threat new~
+a new threat~
 The Market Street trash spawner is malfunctioning.~
 This item spawns trash mobs.
 ~
-3 0 0 1
+3 0 0 2
 0 0 0
 0 0
 T 10402
 S
 #10403
-spawner trash main~
-Main Street trash spawner~
+spawner trash main threat new~
+a new threat~
 The Main Street trash spawner is malfunctioning.~
 This item spawns trash mobs.
 ~
-3 0 0 1
+3 0 0 2
 0 0 0
 0 0
 T 10403
 S
 #10404
-spawner trash temple~
-Temple Street trash spawner~
+spawner trash temple new threat~
+a new threat~
 The Temple Street trash spawner is malfunctioning.~
 This item spawns trash mobs.
 ~
-3 0 0 1
+3 0 0 2
 0 0 0
 0 0
 T 10404
@@ -149,11 +149,14 @@ a fine village dress~
 A fine village dress has been carefully draped here.~
 The dress is certainly rural, but has its own sort of charm.
 ~
-2 oy ad 1
+2 oy ad 3
 0 0 0
 11 0
 A
 4 1 0
+M
+12
+Villager $n is standing here.~
 S
 #10413
 suit village handsome~
@@ -162,11 +165,14 @@ A handsome village suit is carefully hung here.~
    The suit is nothing you'd wear to the castle on ball night. Still, it has a
 rustic, rural charm that is not soon forgotten.
 ~
-2 oy ad 1
+2 oy ad 2
 0 0 0
 11 0
 A
 4 1 0
+M
+12
+Villager $n is standing here.~
 S
 #10414
 band imperium wedding~
@@ -467,9 +473,9 @@ Fiendclaw~
 A vicious claw weapon is lying here.~
 This huge claw would fit right over your hand!
 ~
-1 mp an 1
+1 mp an 2
 0 1 10
-0 0
+14 0
 A
 15 2 0
 A
@@ -595,7 +601,7 @@ a violet leopard shawl~
 A violet leopard shawl is lying here.~
 This goblincraft shawl may be the height of fashion somewhere, but not here.
 ~
-27 mo ak 2
+27 mo ak 3
 0 0 0
 7 0
 A
@@ -603,7 +609,7 @@ A
 A
 16 1 0
 C
-0 100
+0 125
 S
 #10457
 gloves wildfire pair~
@@ -612,7 +618,7 @@ A pair of wildfire gloves is lying here.~
    These gloves appear to be made from ratskins, and have the faint glow of
 wildfire.
 ~
-27 mo ah 2
+27 mo ah 3
 0 0 0
 7 0
 A
@@ -622,7 +628,7 @@ A
 A
 16 1 0
 C
-0 100
+0 125
 S
 #10458
 ring shivsper's shivspers poison~
@@ -684,7 +690,7 @@ a rat-fur cloak~
 A fur cloak is lying here.~
 This goblincraft cloak looks to be sewn from a dozen rats.
 ~
-27 mo ak 2
+27 mo ak 3
 1 0 0
 7 0
 A
@@ -692,7 +698,7 @@ A
 A
 17 2 0
 C
-0 100
+0 125
 S
 #10463
 gauntlets wooden pair~
@@ -700,7 +706,7 @@ wooden gauntlets~
 A pair of wooden gauntlets appear to have been planted here.~
 These gauntlets are unmistakably goblincraft, and smell of pine.
 ~
-27 emo ah 2
+27 emo ah 3
 1 0 0
 0 0
 A
@@ -710,7 +716,7 @@ A
 A
 17 1 0
 C
-0 100
+0 125
 S
 #10464
 ring wargreyn's wargreyns~
@@ -777,7 +783,7 @@ A mesh cloak is draped on the ground.~
    This goblincraft cloak is made from a tightly woven metal mesh. Even with a
 tongue like a goblin, you can't say that five times fast.
 ~
-27 mo ak 1
+27 mo ak 2
 3 0 0
 2 0
 A
@@ -785,7 +791,7 @@ A
 A
 24 1 0
 C
-0 100
+0 125
 S
 #10469
 gauntlets heavy goblin pair~
@@ -793,7 +799,7 @@ heavy goblin gauntlets~
 A pair of heavy gauntlets is lying here.~
 These goblincraft gauntlets are lined with coarse rat fur.
 ~
-27 mo ah 1
+27 mo ah 2
 3 0 0
 2 0
 A
@@ -801,7 +807,7 @@ A
 A
 13 1 0
 C
-0 100
+0 125
 S
 #10470
 saddle rat-fur fur~

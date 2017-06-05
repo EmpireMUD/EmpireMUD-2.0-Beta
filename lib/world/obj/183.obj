@@ -1,0 +1,564 @@
+#18300
+garments cult sobek~
+Cult of Sobek garments~
+The garments of the Cult of Sobek lie here.~
+These finely-woven linens are topped with a large, fearsome crocodile head.
+~
+2 eo ad 6
+0 0 0
+7 0
+A
+5 1 5
+C
+0 125
+M
+14
+$n stands over you, a fearsome crocodile god.~
+M
+13
+$n stands over you, a fearsome crocodile goddess.~
+S
+#18301
+garments cult bastet~
+Cult of Bastet garments~
+The garments of the Cult of Bastet are neatly folded on the ground.~
+These finely-woven linens are topped with a large, alabaster lionness head.
+~
+2 eo ad 6
+0 0 0
+7 0
+A
+5 1 5
+C
+0 125
+M
+14
+$n stands before you, a graceful cat god.~
+M
+13
+$n stands before you, a graceful cat goddess.~
+S
+#18302
+garments cult anubis~
+Cult of Anubis garments~
+The garments of the Cult of Anubis lie here.~
+These finely-woven linens are topped with a large, onyx jackal head.
+~
+2 eo ad 5
+0 0 0
+7 0
+A
+5 1 5
+C
+0 125
+M
+14
+$n stands before you, a fearsome jackal god.~
+M
+13
+$n stands before you, a fearsome jackal goddess.~
+S
+#18303
+garments cult horus~
+Cult of Horus garments~
+The garments of the Cult of Horus lie here.~
+These fine linen garments are topped with a large, golden falcon head.
+~
+2 eo ad 4
+0 0 0
+7 0
+A
+5 1 5
+C
+0 125
+M
+14
+$n stands here, a majestic falcon god.~
+M
+13
+$n stands here, a majestic falcon goddess.~
+S
+#18304
+wall symbols strange~
+the wall~
+Strange symbols are carved into the wall.~
+   Unusual markings in the shapes of birds, hands, eyes, and flowers decorate
+the walls. It seems to be some kind of ancient language. The only symbols that
+make sense to you seem to indicate the level of danger in the tomb.
+
+Select the danger level with: difficulty <hard | group | boss>
+~
+3 0 0 4
+0 0 0
+1 0
+T 18304
+T 18305
+S
+#18305
+item bonus~
+a bonus item~
+A bonus item has not replaced itself.~
+Spawns another item (boss only), purges itself.
+~
+3 p a 3
+0 0 0
+0 0
+T 18307
+S
+#18306
+wristguards guards naqada~
+Naqada wristguards~
+A pair of Naqada wristguards is lying on the ground.~
+   These wristguards are made from fine argentine metal, inscribed with tiny
+pictures of birds, cats, and eyes. They strap to the wrists with thick straps
+that appear to be made from bloodstained crocodile leather.
+~
+27 mp aj 6
+3 0 0
+2 0
+A
+2 1 0
+A
+13 6 0
+A
+12 2 0
+A
+24 2 0
+A
+5 1 6
+S
+#18307
+wristbands pharaonic pair Khufu's khufus~
+Khufu's pharaonic wristbands~
+A pair of pharaonic wristbands is lying here.~
+   These wristbands are made from pure gold, and inlaid with lines of lapis
+lazuli. Your fingers start to blister as you touch the wristbands, as the fiery
+spirit of the desert flows through you.
+~
+27 mp aj 7
+1 0 0
+2 0
+A
+2 1 0
+A
+9 1 0
+A
+21 6 0
+A
+5 1 6
+S
+#18308
+charm papyrus~
+a papyrus charm~
+A papyrus charm has planted itself here.~
+   This little charm is woven in the shape of a fat bird, made from braided
+papyrus fibers. As you play with the charm between your fingers, you feel a
+deep, earthy connection to the plant, and its power of restoration.
+~
+27 mp aj 8
+0 0 0
+2 0
+A
+9 1 0
+A
+7 2 0
+A
+23 6 0
+A
+5 1 6
+S
+#18309
+bangles golden set~
+golden bangles~
+A set of golden bangles is lying on the ground.~
+   These bangles are made from hand-worked gold, and must have been very
+expensive. As you slip them on your wrists, you suddenly feel like dancing. As
+the energy flows through you, you realize you can channel it with your magic.
+~
+27 mp aj 8
+0 0 0
+2 0
+A
+2 1 0
+A
+9 1 0
+A
+22 6 0
+A
+5 1 6
+S
+#18310
+charm scarab jeweled~
+a jeweled scarab charm~
+A scarab charm is sitting on the ground.~
+   This little charm is made from the carapace of a shining scarab beetle,
+inlaid with lapis lazuli, and bound on a thin gold chain.
+~
+27 mp aj 10
+2 0 0
+2 0
+A
+2 1 0
+A
+9 1 0
+A
+12 2 0
+A
+24 2 0
+A
+5 1 6
+S
+#18311
+sandals plated pair~
+a pair of plated sandals~
+A pair of plated sandals is lying here.~
+   These sandals are laced to the foot with black leather, but most of the
+surface is made from gleaming argentine imperium, carved with tiny birds,
+people, and other shapes.
+~
+27 mp ag 3
+3 0 0
+2 0
+A
+24 1 0
+A
+12 1 0
+S
+#18312
+sandals khufu's khufus leather~
+Khufu's leather sandals~
+Khufu's leather sandals are lying on the ground.~
+   These sandals are made from stained crocodile leather, and little else.
+They look like little more than leather rope until laced around the foot, but
+imbue the user with incredible combat prowess.
+~
+27 mp ag 3
+1 0 0
+7 0
+A
+17 1 0
+A
+21 3 0
+S
+#18313
+sandals lotus sacred pair~
+sacred lotus sandals~
+A pair of sacred lotus sandals is lying here.~
+   These sandals appear to be woven from the violet-blue leaves of the sacred
+lotus, although it is far too delicate a flower to be so strong. As you hold
+your hand near the sandals, you feel the gentle pulse of the natural mana
+binding them together.
+~
+27 mp ag 4
+0 0 0
+7 0
+A
+7 1 0
+A
+23 3 0
+S
+#18314
+sandals burning dunes~
+sandals of the burning dunes~
+The sandals of the burning dunes lie here, smoldering.~
+   These sandals are made from fine ibis leather, soaked in beams of moonlight
+to grant them protection from the burning sand dunes of their homeland.
+~
+27 mp ag 6
+0 0 0
+7 0
+A
+17 1 0
+A
+22 3 0
+S
+#18315
+footwraps wraps mummy's mummys linen~
+the mummy's linen footwraps~
+The linen footwraps of a mummy have unraveled here.~
+   You see a long, white linen cloth, of the sort that would be used to wrap
+the feet of a royal mummy before entombment.
+~
+27 mp ag 7
+2 0 0
+7 0
+A
+17 2 0
+A
+9 1 0
+A
+12 2 0
+A
+24 2 0
+S
+#18316
+aura geb~
+the aura of Geb~
+The aura of Geb hangs in the air.~
+Geb, god of the earth, husband of Nut, bestows his powerful aura upon you.
+~
+27 mp ak 3
+3 0 0
+10 0
+A
+2 1 0
+A
+18 4 0
+A
+13 4 0
+A
+5 1 6
+M
+8
+You feel the power of Geb protect you.~
+M
+9
+$n glows with the aura of Geb.~
+S
+#18317
+aura nekhbet nekbet~
+the aura of Nekhbet~
+The aura of Nekhbet lingers around you.~
+Nekhbet, protector of the black lands, bestows her powerful aura upon you.
+~
+27 mp ak 5
+1 0 0
+10 0
+A
+1 1 0
+A
+17 4 0
+A
+9 1 0
+A
+21 2 0
+A
+5 1 6
+M
+8
+You feel the hunger of Nekhbet consume you.~
+M
+9
+$n glows with the aura of Nekhbet.~
+S
+#18318
+aura osiris~
+the aura of Osiris~
+The aura of Osiris hangs in the air.~
+Osiris, god of the afterlife, bestows his powerful aura upon you.
+~
+27 mp ak 5
+0 0 0
+10 0
+A
+8 1 0
+A
+7 4 0
+A
+9 1 0
+A
+23 2 0
+A
+5 1 6
+M
+8
+You feel the power of the resurrection of Osiris!~
+M
+9
+$n glows with the aura of Osiris.~
+S
+#18319
+aura thoth~
+the aura of Thoth~
+The aura of Thoth surrounds you.~
+Thoth, god of wisdom, blesses you with his powerful aura.
+~
+27 mp ak 6
+0 0 0
+10 0
+A
+8 1 0
+A
+17 4 0
+A
+9 1 0
+A
+22 2 0
+A
+5 1 6
+M
+8
+You feel the wisdom of Thoth surround you.~
+M
+9
+$n glows with the aura of Thoth.~
+S
+#18320
+aura khufu~
+the aura of Khufu~
+The aura of Khufu fills the room.~
+Khnum-Khufu, called Medjedu, bestows the power of his legacy upon you.
+~
+27 mp ak 7
+2 0 0
+10 0
+A
+2 1 0
+A
+17 2 0
+A
+18 2 0
+A
+12 2 0
+A
+24 2 0
+A
+5 1 6
+M
+8
+You feel the legacy of Khufu empower you!~
+M
+9
+$n glows with the aura of Khufu.~
+S
+#18321
+bundle flax fibers~
+a bundle of flax fibers~
+A bundle of flax fibers lies on the ground.~
+   The golden flax fibers have been bundled together, and could be woven into
+fine linen cloth.
+~
+3 0 a 1
+0 0 0
+0 0
+O
+7 i
+R
+5137 0
+S
+#18322
+sack flaxseed seed~
+a sack of flaxseed~
+A sack of flaxseed is sitting on the ground.~
+The small seeds aren't very good to eat, but can be pressed into linseed oil.
+~
+6 b a 3
+6 18321 0
+0 96
+O
+23 0
+R
+5116 0
+S
+#18323
+jar oil linseed~
+a jar of linseed oil~
+A jar of linseed oil is sitting here.~
+   The jar of linseed oil, which is made from flax, has been sealed for
+storage. It could be used for cooking or for vehicle maintenance.
+~
+3 0 a 7
+0 0 0
+6 168
+O
+20 u
+R
+5134 0
+R
+5192 0
+R
+5148 0
+R
+5150 0
+S
+#18324
+bolt linen~
+a bolt of linen~
+A bolt of linen is lying here.~
+The white linen cloth is very fine, like no other you've seen.
+~
+3 0 a 10
+0 0 0
+11 0
+M
+6
+You carefully hang some linen cloth on $V.~
+M
+7
+$n carefully hangs some linen cloth on $V.~
+O
+26 dh
+R
+5137 0
+R
+5134 0
+S
+#18325
+ankh hedj-wer hedjwer~
+the ankh of Hedj-Wer~
+The ankh of Hedj-Wer is lying in the dust.~
+   This ankh is actually made from the long form of a baboon, twisted around to
+form the symbol of eternal life. Its patron deity, Hedj-Wer, had the form of a
+baboon. It is said that this small totem allows you to assume the form of the
+baboon god yourself.
+~
+3 p a 1
+0 0 0
+4 0
+S
+#18326
+bell sacred~
+a sacred bell~
+A sacred bell is lying here.~
+This bell can summon a noncombat pet!
+Type 'use bell' to summon it.
+~
+3 p a 4
+18326 0 0
+2 0
+T 9900
+S
+#18327
+whistle crocodile~
+a crocodile whistle~
+A crocodile whistle is lying on the ground.~
+   This whistle has a crocodile carved in the side. If you type 'use whistle',
+it will summon a mount.
+~
+3 p a 7
+18327 0 0
+14 0
+T 10263
+S
+#18328
+whistle falcon~
+a falcon whistle~
+A falcon whistle is lying here.~
+   This whistle has a falcon carved on the top. If you type 'use whistle', it
+will summon a flying mount.
+~
+3 p a 7
+18328 0 0
+14 0
+T 10263
+S
+#18329
+disk solar ra~
+the Solar Disk of Ra~
+The Solar Disk of Ra hovers above you.~
+   This disk, made from gold-laminated wood, bears the symbol of Ra, the Sun.
+Once, long ago, these symbols decorated solar barges, ships which symbolize
+Ra's journey across the blue ocean of the sky. Take this disk to a talented
+shipbuilder, who can manufacture the solar barge.
+~
+3 e a 1
+0 0 0
+4 0
+M
+6
+You hang the solar disk in the air, and the entire ship begins to materialize around it!~
+M
+7
+$n hangs the Solar Disk of Ra in the air, and an entire ship begins to materialize around it!~
+S
+$

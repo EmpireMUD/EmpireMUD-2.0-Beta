@@ -2,7 +2,7 @@
 Grave~
 A Lone Grave~
 ..&0x&?.~
-1 0 d 0
+4 0 dip 0
 0 0 0 -1
 C
 tomb~
@@ -18,15 +18,17 @@ M
 9198 2.00 0
 M
 9199 2.00 0
+R
+2 1 5 0
 S
 #5001
 Tent~
 A Tent~
 .&0/\&?.~
-1 0 p 0
+2 0 ip 0
 0 0 0 -1
 C
-abandon, dismantle~
+abandon, dismantle, sleep~
 D
    You are inside a tent made of animal hides. It's not large, but it provides
 good shelter from the sun, wind and rain. The tent is sparse, made of only as
@@ -34,12 +36,14 @@ much material as necessary so that it can be taken down and carried in a pack.
 ~
 F
 d
+R
+3 1 5 0
 S
 #5002
 Rock Shelter~
 A Rock Shelter~
 .&0c&?..~
-5 0 pR 0
+2 0 ipR 0
 0 0 0 -1
 A
 d
@@ -52,12 +56,14 @@ fortable, but it's still shelter.
 ~
 F
 d
+R
+4 1 5 0
 S
 #5003
 Tree Shelter~
 A Tree Shelter~
 ^&0T&?^^~
-5 0 pR 0
+2 0 ipR 0
 0 0 0 -1
 A
 d
@@ -70,12 +76,14 @@ fortable, but it's still shelter.
 ~
 F
 d
+R
+4 1 5 0
 S
 #5004
 Cave Shelter~
 A Cave Shelter~
 ^&0O&?/\~
-5 0 pR 0
+2 0 ipR 0
 0 0 0 -1
 A
 d
@@ -89,12 +97,14 @@ a safe place to stay.
 ~
 F
 d
+R
+4 1 5 0
 S
 #5005
 Jungle Shelter~
 A Shelter in the Jungle~
 &G^c^^~
-5 0 pR 0
+2 0 ipR 0
 0 0 0 -1
 A
 d
@@ -107,21 +117,23 @@ ample shade and protection from the elements.
 ~
 F
 d
+R
+4 1 5 0
 S
 #5006
-Ruins Open~
+Small Ruins~
 Some Decaying Ruins~
 &y/&0..&y\~
-1 -1 d 0
+3 -1 di 0
 0 0 0 -1
 C
 dismantle~
 S
 #5007
-Ruins Closed~
+Large Ruins~
 Some Decaying Ruins~
 &y/&0..&y\~
-1 -1 eR 0
+3 -1 eiR 0
 0 0 0 -1
 C
 dismantle~
@@ -135,7 +147,7 @@ S
 Tunnel~
 A Tunnel~
 /&0OO&?\~
-60 0 befg 0
+128 0 befgi 0
 0 0 0 -1
 D
    The tunnel is cold and damp, but is the fastest way from one side of the
@@ -153,6 +165,10 @@ M
 9198 2.00 0
 M
 9199 2.00 0
+R
+0 1 5 0
+R
+21 1 1 0
 S
 #5009
 City Center~
@@ -162,10 +178,10 @@ The City Center~
 0 0 0 -1
 S
 #5010
-Ruins Flooded~
+Flooded Ruins~
 Some Flooded Ruins~
 &?~&0|\&?~~
-1 -1 dDQ 0
+3 -1 diDQ 0
 0 0 0 -1
 C
 dismantle~

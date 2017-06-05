@@ -107,7 +107,7 @@ Darkness (Stealth ability)
 
 Usage:  darkness
 Cooldown:  15 seconds
-Duration:  30 seconds
+Duration:  1 mud hour (75 seconds)
 Cost:  15 move
 
 Master the power of shadow to blanket an area in darkness. It becomes much
@@ -196,19 +196,6 @@ You let out a terrifying howl, penalizing all enemies. The first victim loses
 to-hit equal to 4x your Charisma. Each additional victim loses to-hit equal to
 2x Charisma instead.
 #
-SHADOWCAGE "SHADOW CAGE"
-
-Shadowcage
-Class ability: Occultist
-Debuff type: Stealth
-Cost: 50 move
-Cooldown: 30 seconds
-Usage:  shadowcage
-
-You create a cage of shadows, penalizing all enemies. The first victim loses
-dodge equal to 4x your Charisma. Each additional victim loses dodge equal to 2x
-Charisma instead. This effect lasts 15 seconds.
-#
 INFILTRATE "IMPROVED INFILTRATE"
 
 Infiltrate, Improved Infiltrate (Stealth abilities)
@@ -264,7 +251,9 @@ not remove items you see in their inventories, only "pocket items". The result
 is largely random but often includes coins. Each NPC can only be pickpocketed
 once.
 
-Pickpocketing citizens of another empire counts as an act of hostility.
+Pickpocketing citizens of another empire counts as an act of hostility. Any
+empire coins you receive from pickpocketing came from the empire's treasury,
+including when you pickpocket your own citizens.
 
 NPCs more than 50 levels above you will always catch you if you try to
 pickpocket them.
@@ -292,7 +281,8 @@ Poisons only work with sharp weapons. Poisons also count as Stealth debuffs,
 and some NPCs are immune.
 
 Both abilities gain experience any time you attempt to apply poison, even if it
-is resisted.
+is resisted. You need to have these abilities in order both to create and to
+use the poisons.
 
 Basic Poisons:
   searing  +5 damage
@@ -310,7 +300,7 @@ Deadly Poisons:
   slow  slower combat rate
   heartstop  vampires can't spend blood
 
-See also: CRAFTING LEVEL, RESIST POISON, RESOURCES, KEEP
+See also: CRAFTING LEVEL, RESIST POISON, RESOURCES, KEEP, CRAFT INFO, RECIPES
 #
 PRICK
 
@@ -358,6 +348,8 @@ This ability reveals people who use the hide command, although it doesn't
 always find them on the first try, and it won't find anyone who has Cling to
 Shadow.
 
+You can also find out if someone is earthmelded beneath you.
+
 Gains experience when you search a room.
 
 See also: HIDE, SENSE LIFE RITUAL
@@ -402,9 +394,10 @@ Class ability: Occultist
 Debuff type: Stealth
 Cost: 50 move
 Cooldown: 30 seconds
+Usage:  shadowcage
 
 You create a cage of shadows, penalizing all enemies. The first victim loses
-dodge equal to 5x your Charisma. Each additional victim loses dodge equal to 3x
+dodge equal to 4x your Charisma. Each additional victim loses dodge equal to 2x
 Charisma instead. This effect lasts 15 seconds.
 #
 SHADOWSTEP "SHADOW STEP"
@@ -483,15 +476,16 @@ Gains experience when you steal something.
 
 See also: VAULTCRACKING
 #
-"SUMMON THUGS"
+"SUMMON THUG"
 
-Usage:  summon thugs
-Cooldown:  3 minutes
-Cost:  10 move
+Usage:  summon thug
+Cooldown:  30 seconds
+Cost:  50 move
 
-This ability summons up to (Charisma / 3, rounded up) thugs, who will follow
-you around. This is best combined with the Disguise ability, as you can mask
-yourself as a thug.
+This ability summons a local thug who will stand around and distract whoever
+is following you. This is best combined with the Disguise ability, as you can
+mask yourself as a thug. Thugs will have the empire of the tile they are
+summoned on.
 
 Gains experience when you attempt to summon thugs.
 
@@ -518,7 +512,7 @@ Gains experience when you try to terrify someone.
 Unseen Passing (Stealth ability)
 
 When in a city or indoors, Unseen Passing makes you immune to the "where" and
-"track" commands. It doesn't work in the wilderness.
+"track" commands. It doesn't work in the wilderness or in adventures.
 
 This ability gains experience whenever it prevents you from being found with
 "where", and whenever it prevents you from leaving tracks.

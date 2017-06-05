@@ -1,0 +1,661 @@
+#10146
+saguaro cacti~
+A Giant Saguaro Cactus~
+12 2 bc
+0 100 0 100
+D1
+.&r`&j|&?.~
+&Y~
+D2
+.&j'|&?.~
+&y~
+D3
+.&j'|&?.~
+&Y~
+D4
+.&j'|&?.~
+&y~
+I 6 10147 100.00 1  # FORAGE: a spiny red fruit
+I 8 10146 33.40 2 H  # HARVEST: a basket of saguaro fruit
+I 8 10146 33.30 3 H  # HARVEST: a basket of saguaro fruit
+I 8 10146 33.30 4 H  # HARVEST: a basket of saguaro fruit
+I 20 10149 100.00 1  # CHOP: a fallen saguaro cactus
+M
+9040 0.01 d
+M
+9059 0.01 ad
+M
+9055 0.01 bd
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9121 5.00 d
+M
+9127 5.00 d
+M
+9119 5.00 d
+M
+9131 5.00 d
+M
+9128 5.00 d
+M
+9026 15.00 d
+M
+9123 5.00 d
+M
+9018 5.00 d
+M
+9120 15.00 ad
+M
+9118 15.00 ad
+M
+9130 15.00 ad
+M
+9129 15.00 ad
+M
+9116 15.00 ad
+M
+9122 5.00 bd
+M
+9117 5.00 bd
+M
+9126 5.00 bd
+M
+9125 5.00 bd
+M
+9124 5.00 bd
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9153 10.00 bc
+M
+240 6.00 bc
+M
+252 10.00 cf
+M
+251 15.00 ce
+M
+223 5.00 bce
+M
+222 5.00 bce
+M
+200 5.00 bce
+M
+201 5.00 bce
+M
+237 5.00 ce
+M
+9064 0.90 ad
+M
+10150 5.00 a
+M
+10151 5.00 0
+M
+10152 5.00 0
+M
+10153 5.00 b
+M
+10154 5.00 0
+M
+10155 5.00 0
+M
+10156 5.00 a
+M
+10161 0.40 0
+M
+10158 0.40 d
+M
+10158 3.00 c
+S
+#10150
+mesquite trees~
+A Mesquite Tree~
+13 2 bc
+0 100 0 100
+D1
+..&j^&?.~
+&Y~
+D1
+.&j^&?..~
+&Y~
+D2
+..&j^&?.~
+&y~
+D2
+.&j^&?..~
+&y~
+D3
+..&j^&?.~
+&Y~
+D3
+.&j^&?..~
+&Y~
+D4
+..&j^&?.~
+&y~
+D4
+.&j^&?..~
+&y~
+I 6 3014 100.00 1  # FORAGE: some dry beans
+I 8 10152 50.00 2 H  # HARVEST: a handful of mesquite pods
+I 8 10152 50.00 3 H  # HARVEST: a handful of mesquite pods
+I 9 121 100.00 1  # GATHER: a stick
+I 20 10151 50.00 2 c  # CHOP: a mesquite tree
+I 20 10151 50.00 1 c  # CHOP: a mesquite tree
+M
+9040 0.01 d
+M
+9059 0.01 ad
+M
+9055 0.01 bd
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9121 5.00 d
+M
+9127 5.00 d
+M
+9119 5.00 d
+M
+9131 5.00 d
+M
+9128 5.00 d
+M
+9026 15.00 d
+M
+9123 5.00 d
+M
+9018 5.00 d
+M
+9120 15.00 ad
+M
+9118 15.00 ad
+M
+9130 15.00 ad
+M
+9129 15.00 ad
+M
+9116 15.00 ad
+M
+9122 5.00 bd
+M
+9117 5.00 bd
+M
+9126 5.00 bd
+M
+9125 5.00 bd
+M
+9124 5.00 bd
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9153 10.00 bc
+M
+240 6.00 bc
+M
+252 10.00 cf
+M
+251 15.00 ce
+M
+223 5.00 bce
+M
+222 5.00 bce
+M
+200 5.00 bce
+M
+201 5.00 bce
+M
+237 5.00 ce
+M
+9064 0.90 ad
+M
+10150 5.00 a
+M
+10151 5.00 0
+M
+10152 5.00 0
+M
+10153 5.00 b
+M
+10154 5.00 0
+M
+10155 5.00 0
+M
+10156 5.00 a
+M
+10161 0.40 0
+M
+10158 0.40 d
+M
+10158 3.00 c
+S
+#10153
+alligator pears~
+A Patch of Alligator Pear Trees~
+33 2 bc
+0 100 0 100
+D0
+.&G^^&?.~
+&y~
+D0
+.&G^^&?.~
+&y~
+D0
+.&bo&G^&?.~
+&y~
+D0
+.&G^&bo&?.~
+&y~
+I 6 10154 100.00 1  # FORAGE: a ripe alligator pear
+I 8 10153 100.00 1  # HARVEST: a basket of alligator pears
+I 20 122 50.00 2 c  # CHOP: some rough wood
+I 20 122 50.00 1 c  # CHOP: some rough wood
+M
+9040 0.01 d
+M
+9059 0.01 ad
+M
+9055 0.01 bd
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9121 5.00 d
+M
+9127 5.00 d
+M
+9119 5.00 d
+M
+9131 5.00 d
+M
+9128 5.00 d
+M
+9026 15.00 d
+M
+9123 5.00 d
+M
+9018 5.00 d
+M
+9120 15.00 ad
+M
+9118 15.00 ad
+M
+9130 15.00 ad
+M
+9129 15.00 ad
+M
+9116 15.00 ad
+M
+9122 5.00 bd
+M
+9117 5.00 bd
+M
+9126 5.00 bd
+M
+9125 5.00 bd
+M
+9124 5.00 bd
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9153 10.00 bc
+M
+240 6.00 bc
+M
+252 10.00 cf
+M
+251 15.00 ce
+M
+223 5.00 bce
+M
+222 5.00 bce
+M
+200 5.00 bce
+M
+201 5.00 bce
+M
+237 5.00 ce
+M
+9064 0.90 ad
+M
+10150 5.00 a
+M
+10151 5.00 0
+M
+10152 5.00 0
+M
+10153 5.00 b
+M
+10154 5.00 0
+M
+10155 5.00 0
+M
+10156 5.00 a
+M
+10161 0.40 0
+M
+10158 0.40 d
+M
+10158 3.00 c
+S
+#10155
+limes~
+A Grove of Lime Trees~
+32 2 bc
+0 100 0 100
+D0
+.&l^^&?.~
+&y~
+D0
+.&l^^&?.~
+&y~
+D0
+.&lo^&?.~
+&y~
+D0
+.&l^o&?.~
+&y~
+I 6 10156 100.00 1  # FORAGE: a single ripe lime
+I 8 10155 100.00 1  # HARVEST: a basket of limes
+I 20 122 50.00 2 c  # CHOP: some rough wood
+I 20 122 50.00 1 c  # CHOP: some rough wood
+M
+9040 0.01 d
+M
+9059 0.01 ad
+M
+9055 0.01 bd
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9121 5.00 d
+M
+9127 5.00 d
+M
+9119 5.00 d
+M
+9131 5.00 d
+M
+9128 5.00 d
+M
+9026 15.00 d
+M
+9123 5.00 d
+M
+9018 5.00 d
+M
+9120 15.00 ad
+M
+9118 15.00 ad
+M
+9130 15.00 ad
+M
+9129 15.00 ad
+M
+9116 15.00 ad
+M
+9122 5.00 bd
+M
+9117 5.00 bd
+M
+9126 5.00 bd
+M
+9125 5.00 bd
+M
+9124 5.00 bd
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9153 10.00 bc
+M
+240 6.00 bc
+M
+252 10.00 cf
+M
+251 15.00 ce
+M
+223 5.00 bce
+M
+222 5.00 bce
+M
+200 5.00 bce
+M
+201 5.00 bce
+M
+237 5.00 ce
+M
+9064 0.90 ad
+M
+10150 5.00 a
+M
+10151 5.00 0
+M
+10152 5.00 0
+M
+10153 5.00 b
+M
+10154 5.00 0
+M
+10155 5.00 0
+M
+10156 5.00 a
+M
+10161 0.40 0
+M
+10158 0.40 d
+M
+10158 3.00 c
+S
+#10157
+firemelons~
+A Bed of Firemelons~
+3 2 c
+0 100 0 100
+D0
+wwww~
+&G~
+D0
+wwww~
+&G~
+D0
+wwww~
+&G~
+D0
+wwww~
+&G~
+D0
+&Ro&?www~
+&G~
+D0
+w&Ro&?ww~
+&G~
+D0
+ww&Ro&?w~
+&G~
+D0
+www&Ro~
+&G~
+I 6 3014 100.00 1  # FORAGE: some dry beans
+I 8 10157 16.67 2 H  # HARVEST: a maroon firemelon
+I 8 10157 16.67 3 H  # HARVEST: a maroon firemelon
+I 8 10157 16.66 4 H  # HARVEST: a maroon firemelon
+I 8 10158 16.67 2 H  # HARVEST: a crimson firemelon
+I 8 10158 16.67 3 H  # HARVEST: a crimson firemelon
+I 8 10158 16.66 4 H  # HARVEST: a crimson firemelon
+M
+9040 0.01 d
+M
+9059 0.01 ad
+M
+9055 0.01 bd
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9121 5.00 d
+M
+9127 5.00 d
+M
+9119 5.00 d
+M
+9131 5.00 d
+M
+9128 5.00 d
+M
+9026 15.00 d
+M
+9123 5.00 d
+M
+9018 5.00 d
+M
+9120 15.00 ad
+M
+9118 15.00 ad
+M
+9130 15.00 ad
+M
+9129 15.00 ad
+M
+9116 15.00 ad
+M
+9122 5.00 bd
+M
+9117 5.00 bd
+M
+9126 5.00 bd
+M
+9125 5.00 bd
+M
+9124 5.00 bd
+M
+9039 5.00 cg
+M
+9035 5.00 cg
+M
+9033 5.00 cg
+M
+9037 5.00 ch
+M
+9038 5.00 ch
+M
+9036 5.00 ch
+M
+9034 5.00 c
+M
+9153 10.00 bc
+M
+240 6.00 bc
+M
+252 10.00 cf
+M
+251 15.00 ce
+M
+223 5.00 bce
+M
+222 5.00 bce
+M
+200 5.00 bce
+M
+201 5.00 bce
+M
+237 5.00 ce
+M
+9064 0.90 ad
+M
+10150 5.00 a
+M
+10151 5.00 0
+M
+10152 5.00 0
+M
+10153 5.00 b
+M
+10154 5.00 0
+M
+10155 5.00 0
+M
+10156 5.00 a
+M
+10161 0.40 0
+M
+10158 0.40 d
+M
+10158 20.00 c
+S
+$

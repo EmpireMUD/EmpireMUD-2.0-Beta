@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: protocol.h                                      EmpireMUD 2.0b4 *
+*   File: protocol.h                                      EmpireMUD 2.0b5 *
 *  Usage: KaVir's protocol snippet header                                 *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -196,6 +196,9 @@ typedef enum {
 	eMSDP_OPPONENT_HEALTH_MAX,
 	eMSDP_OPPONENT_LEVEL,
 	eMSDP_OPPONENT_NAME,
+	eMSDP_OPPONENT_FOCUS_HEALTH,
+	eMSDP_OPPONENT_FOCUS_HEALTH_MAX,
+	eMSDP_OPPONENT_FOCUS_NAME,
 	
 	// World
 	eMSDP_AREA_NAME,
@@ -324,7 +327,7 @@ void ProtocolNoEcho(descriptor_t *apDescriptor, bool_t abOn);
  * whatever is left for the mud to parse normally.  Call this after data has 
  * been read into the input buffer, before it is used for anything else.
  */
-void ProtocolInput(descriptor_t *apDescriptor, char *apData, int aSize, char *apOut);
+void ProtocolInput(descriptor_t *apDescriptor, char *apData, int aSize, char *apOut, int maxSize);
 
 /* Function: ProtocolOutput
  *

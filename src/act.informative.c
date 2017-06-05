@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.informative.c                               EmpireMUD 2.0b4 *
+*   File: act.informative.c                               EmpireMUD 2.0b5 *
 *  Usage: Player-level commands of an informative nature                  *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -39,8 +39,11 @@ extern const char *class_role[];
 extern const char *class_role_color[];
 extern const char *dirs[];
 extern struct help_index_element *help_table;
+extern const char *item_types[];
 extern int top_of_helpt;
 extern const char *month_name[];
+extern struct faction_reputation_type reputation_levels[];
+extern const char *wear_bits[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // external functions
@@ -137,13 +140,55 @@ char *instance_level_string(struct instance_data *inst) {
 		snprintf(output, sizeof(output), "levels 1-%d", GET_ADV_MAX_LEVEL(inst->adventure));
 	}
 	else if (GET_ADV_MIN_LEVEL(inst->adventure) == GET_ADV_MAX_LEVEL(inst->adventure)) {
-		snprintf(output, sizeof(output), "level %d", GET_ADV_MAX_LEVEL(inst->adventure));
+		if (GET_ADV_MIN_LEVEL(inst->adventure) == 0) {
+			snprintf(output, sizeof(output), "any level");
+		}
+		else {
+			snprintf(output, sizeof(output), "level %d", GET_ADV_MAX_LEVEL(inst->adventure));
+		}
 	}
 	else {
 		snprintf(output, sizeof(output), "levels %d-%d", GET_ADV_MIN_LEVEL(inst->adventure), GET_ADV_MAX_LEVEL(inst->adventure));
 	}
 	
 	return output;
+}
+
+
+/**
+* Picks a random custom long description from a player's equipment.
+*
+* @param char_data *ch The player.
+* @return struct custom_message* The chosen message, or NULL.
+*/
+struct custom_message *pick_custom_longdesc(char_data *ch) {
+	struct custom_message *ocm, *found = NULL;
+	int iter, count = 0;
+	
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (!GET_EQ(ch, iter) || !wear_data[iter].allow_custom_msgs) {
+			continue;
+		}
+		
+		LL_FOREACH(GET_EQ(ch, iter)->custom_msgs, ocm) {
+			if (ocm->type != OBJ_CUSTOM_LONGDESC && ocm->type != OBJ_CUSTOM_LONGDESC_FEMALE && ocm->type != OBJ_CUSTOM_LONGDESC_MALE) {
+				continue;
+			}
+			if (ocm->type == OBJ_CUSTOM_LONGDESC_FEMALE && GET_SEX(ch) != SEX_FEMALE) {
+				continue;
+			}
+			if (ocm->type == OBJ_CUSTOM_LONGDESC_MALE && GET_SEX(ch) != SEX_MALE && GET_SEX(ch) != SEX_NEUTRAL) {
+				continue;
+			}
+			
+			// matching
+			if (!number(0, count++) || !found) {
+				found = ocm;
+			}
+		}
+	}
+	
+	return found;
 }
 
 
@@ -176,7 +221,7 @@ void look_at_target(char_data *ch, char *arg) {
 		return;
 		}
 
-	bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM | FIND_VEHICLE_ROOM, ch, &found_char, &found_obj, &found_veh);
+	bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &found_char, &found_obj, &found_veh);
 
 	/* Is the target a character? */
 	if (found_char != NULL) {
@@ -247,12 +292,6 @@ void look_at_target(char_data *ch, char *arg) {
 		}
 	}
 	
-	// look at vehicle they're in
-	if (!found && GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
-		look_at_vehicle(GET_ROOM_VEHICLE(IN_ROOM(ch)), ch);
-		found = TRUE;
-	}
-	
 	/* If an object was found back in generic_find */
 	if (bits) {
 		if (!found) {
@@ -282,11 +321,11 @@ void look_in_obj(char_data *ch, char *arg) {
 
 	if (!*arg)
 		send_to_char("Look in what?\r\n", ch);
-	else if (!(bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &dummy, &obj, &veh))) {
+	else if (!(bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &dummy, &obj, &veh))) {
 		sprintf(buf, "There doesn't seem to be %s %s here.\r\n", AN(arg), arg);
 		send_to_char(buf, ch);
 	}
-	else if (veh || (!obj && (veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && isname(arg, VEH_KEYWORDS(veh)))) {
+	else if (veh) {
 		// vehicle section
 		if (!VEH_FLAGGED(veh, VEH_CONTAINER)) {
 			act("$V isn't a container.", FALSE, ch, NULL, veh, TO_CHAR);
@@ -424,7 +463,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	struct time_info_data playing_time;
 
 
-	msg_to_char(to, " +----------------------------- EmpireMUD 2.0b4 -----------------------------+\r\n");
+	msg_to_char(to, " +----------------------------- EmpireMUD 2.0b5 -----------------------------+\r\n");
 	
 	// row 1 col 1: name
 	msg_to_char(to, "  Name: %-18.18s", PERS(ch, ch, 1));
@@ -447,7 +486,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	msg_to_char(to, "  Age: %-19.19s Play Time: %-13.13s", buf, buf1);
 	
 	// row 2 col 3: rank
-	if ((emp = GET_LOYALTY(ch))) {
+	if ((emp = GET_LOYALTY(ch)) && !IS_NPC(ch)) {
 		msg_to_char(to, " Rank: %s&0\r\n", EMPIRE_RANK(emp, GET_RANK(ch)-1));
 	}
 	else {
@@ -638,12 +677,10 @@ void list_char_to_char(char_data *list, char_data *ch) {
 * @param char_data *to The person to show it to.
 */
 void list_lore_to_char(char_data *ch, char_data *to) {
-	extern long load_time();
-
 	struct lore_data *lore;
 	char daystring[MAX_INPUT_LENGTH];
 	struct time_info_data t;
-	long beginning_of_time = load_time();
+	long beginning_of_time = data_get_long(DATA_WORLD_START);
 
 	msg_to_char(to, "%s's lore:\r\n", PERS(ch, ch, 1));
 
@@ -674,6 +711,8 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	extern bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
 	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern struct action_data_struct action_data[];
+	
+	struct custom_message *ocm;
 	
 	// POS_x
 	const char *positions[] = {
@@ -729,7 +768,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		}
 	}
 	
-	if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS) && IS_NPC(i)) {
+	if (PRF_FLAGGED(ch, PRF_ROOMFLAGS) && IS_NPC(i)) {
 		msg_to_char(ch, "[%d] %s", GET_MOB_VNUM(i), SCRIPT(i) ? "[TRIG] " : "");
 	}
 	
@@ -746,53 +785,31 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		msg_to_char(ch, GET_LONG_DESC(i));
 	}
 	else {
-		if (IS_NPC(i)) {
-			strcpy(buf, PERS(i, ch, FALSE));
-			CAP(buf);
-		}
-		else {
-			if (AFF_FLAGGED(i, AFF_INVISIBLE))
-				strcpy(buf, "*");
-			else
-				*buf = '\0';
-
-			sprintf(buf1, PERS(i, ch, 0));
-			strcat(buf, CAP(buf1));
-
-			switch (GET_SEX(i)) {
-				case SEX_MALE:		strcpy(buf1, "man");	break;
-				case SEX_FEMALE:	strcpy(buf1, "woman");	break;
-				default:			strcpy(buf1, "person");	break;
-			}
-		}
-
-		if (AFF_FLAGGED(i, AFF_HIDE))
-			strcat(buf, " (hidden)");
-		if (!IS_NPC(i) && !i->desc)
-			strcat(buf, " (linkless)");
-		if (!IS_NPC(i) && PLR_FLAGGED(i, PLR_WRITING))
-			strcat(buf, " (writing)");
-
+		*buf = '\0';
+		
 		if (GET_POS(i) != POS_FIGHTING) {
 			if (GET_SITTING_ON(i)) {
-				sprintf(buf + strlen(buf), " is sitting %s %s%s%s.", IN_OR_ON(GET_SITTING_ON(i)), get_vehicle_short_desc(GET_SITTING_ON(i), ch), (VEH_ANIMALS(GET_SITTING_ON(i)) ? ", being pulled by " : ""), (VEH_ANIMALS(GET_SITTING_ON(i)) ? list_harnessed_mobs(GET_SITTING_ON(i)) : ""));
+				sprintf(buf, "$n is sitting %s %s%s%s.", IN_OR_ON(GET_SITTING_ON(i)), get_vehicle_short_desc(GET_SITTING_ON(i), ch), (VEH_ANIMALS(GET_SITTING_ON(i)) ? ", being pulled by " : ""), (VEH_ANIMALS(GET_SITTING_ON(i)) ? list_harnessed_mobs(GET_SITTING_ON(i)) : ""));
 			}
 			else if (!IS_NPC(i) && GET_ACTION(i) != ACT_NONE) {
-				sprintf(buf + strlen(buf), " %s", action_data[GET_ACTION(i)].long_desc);
+				sprintf(buf, "$n %s", action_data[GET_ACTION(i)].long_desc);
 			}
 			else if (AFF_FLAGGED(i, AFF_DEATHSHROUD) && GET_POS(i) <= POS_RESTING) {
-				sprintf(buf + strlen(buf), " %s", positions[POS_DEAD]);
+				sprintf(buf, "$n %s", positions[POS_DEAD]);
 			}
 			else if (GET_POS(i) == POS_STANDING && AFF_FLAGGED(i, AFF_FLY)) {
-				strcat(buf, " is flying here.");
+				strcpy(buf, "$n is flying here.");
+			}
+			else if (GET_POS(i) == POS_STANDING && !IS_DISGUISED(i) && (ocm = pick_custom_longdesc(i))) {
+				strcpy(buf, ocm->msg);
 			}
 			else {	// normal positions
-				sprintf(buf + strlen(buf), " %s", positions[(int) GET_POS(i)]);
+				sprintf(buf, "$n %s", positions[(int) GET_POS(i)]);
 			}
 		}
 		else {
 			if (FIGHTING(i)) {
-				strcat(buf, " is here, fighting ");
+				strcpy(buf, "$n is here, fighting ");
 				if (FIGHTING(i) == ch)
 					strcat(buf, "YOU!");
 				else {
@@ -804,10 +821,19 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 					}
 				}
 			else			/* NIL fighting pointer */
-				strcat(buf, " is here struggling with thin air.");
+				strcpy(buf, "$n is here struggling with thin air.");
 		}
-
-		msg_to_char(ch, "%s\r\n", buf);
+		
+		if (AFF_FLAGGED(i, AFF_HIDE))
+			strcat(buf, " (hidden)");
+		if (!IS_NPC(i) && !i->desc)
+			strcat(buf, " (linkless)");
+		
+		// send it
+		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
+			msg_to_char(ch, "*");
+		}
+		act(buf, FALSE, i, NULL, ch, TO_VICT);
 	}
 	
 	if (can_get_quest_from_mob(ch, i, NULL)) {
@@ -831,6 +857,9 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		act("...$e is tied up here.", FALSE, i, 0, ch, TO_VICT);
 	if (AFF_FLAGGED(i, AFF_STUNNED)) {
 		act("...$e is stunned!", FALSE, i, 0, ch, TO_VICT);
+	}
+	if (AFF_FLAGGED(i, AFF_HIDE)) {
+		act("...$e has attempted to hide $mself.", FALSE, i, 0, ch, TO_VICT);
 	}
 	if (AFF_FLAGGED(i, AFF_BLIND))
 		act("...$e is groping around blindly!", FALSE, i, 0, ch, TO_VICT);
@@ -883,7 +912,7 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	if (VEH_OWNER(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "<%s> ", EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
 	}
-	if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+	if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "[%d] %s", VEH_VNUM(veh), SCRIPT(veh) ? "[TRIG] " : "");
 	}
 	size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", VEH_LONG_DESC(veh));
@@ -977,7 +1006,17 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	}
 	
 	if (GET_LOYALTY(i) && !disguise) {
-		sprintf(buf, "   $E is a member of %s.", EMPIRE_NAME(GET_LOYALTY(i)));
+		sprintf(buf, "$E is a member of %s%s\t0.", EMPIRE_BANNER(GET_LOYALTY(i)), EMPIRE_NAME(GET_LOYALTY(i)));
+		act(buf, FALSE, ch, NULL, i, TO_CHAR);
+	}
+	if (ROOM_OWNER(IN_ROOM(i)) && disguise) {
+		sprintf(buf, "$E is a member of %s%s\t0.", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(i))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(i))));
+		act(buf, FALSE, ch, NULL, i, TO_CHAR);
+	}
+	if (IS_NPC(i) && MOB_FACTION(i)) {
+		struct player_faction_data *pfd = get_reputation(ch, FCT_VNUM(MOB_FACTION(i)), FALSE);
+		int idx = rep_const_to_index(pfd ? pfd->rep : NOTHING);
+		sprintf(buf, "$E is a member of %s%s\t0.", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(MOB_FACTION(i)));
 		act(buf, FALSE, ch, NULL, i, TO_CHAR);
 	}
 	
@@ -1189,8 +1228,8 @@ bool inventory_store_building(char_data *ch, room_data *room, empire_data *emp) 
 		return found;
 	}
 	
-	if (HAS_FUNCTION(IN_ROOM(ch), FNC_VAULT)) {
-		msg_to_char(ch, "\r\nVault: %d coin%s, %d treasure (%d total)\r\n", EMPIRE_COINS(emp), (EMPIRE_COINS(emp) != 1 ? "s" : ""), EMPIRE_WEALTH(emp), GET_TOTAL_WEALTH(emp));
+	if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT)) {
+		msg_to_char(ch, "\r\nVault: %.1f coin%s, %d treasure (%d total)\r\n", EMPIRE_COINS(emp), (EMPIRE_COINS(emp) != 1.0 ? "s" : ""), EMPIRE_WEALTH(emp), (int) GET_TOTAL_WEALTH(emp));
 	}
 
 	for (store = EMPIRE_STORAGE(emp); store; store = store->next) {
@@ -1544,17 +1583,20 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	
 	// shortlist ends here
 	if (shortlist) {
+		// append invis even in short list
+		if (GET_INVIS_LEV(ch)) {
+			size += snprintf(out + size, sizeof(out) - size, " (i%d)", GET_INVIS_LEV(ch));
+		}
+		else if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+			size += snprintf(out + size, sizeof(out) - size, " (inc)");
+		}
+		
+		// determine length to show
 		num = color_code_length(out);
 		sprintf(buf, "%%-%d.%ds", 35 + num, 35 + num);
 		strcpy(buf1, out);
 		
 		size = snprintf(out, sizeof(out), buf, buf1);
-		
-		// append invis even in short list
-		if (GET_INVIS_LEV(ch)) {
-			size += snprintf(out + size, sizeof(out) - size, " (i%d)", GET_INVIS_LEV(ch));
-		}
-		
 		return out;
 	}
 	
@@ -1587,9 +1629,6 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	else if (AFF_FLAGGED(ch, AFF_INVISIBLE)) {
 		size += snprintf(out + size, sizeof(out) - size, " (invis)");
 	}
-	if (PLR_FLAGGED(ch, PLR_WRITING)) {
-		size += snprintf(out + size, sizeof(out) - size, " &c(writing)&0");
-	}
 	if (PRF_FLAGGED(ch, PRF_DEAF)) {
 		size += snprintf(out + size, sizeof(out) - size, " (deaf)");
 	}
@@ -1616,7 +1655,6 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 * @return char* The who output for imms.
 */
 char *partial_who(char_data *ch, char *name_search, int low, int high, empire_data *empire_who, bool rp, bool shortlist, int type) {
-	extern int max_players_today;
 	extern int max_players_this_uptime;
 	
 	static char who_output[MAX_STRING_LENGTH];
@@ -1624,7 +1662,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 	char whobuf[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], online[MAX_STRING_LENGTH];
 	descriptor_data *d;
 	char_data *tch;
-	int iter, count = 0, size;
+	int iter, count = 0, size, max_pl;
 	
 	// WHO_x
 	const char *who_titles[] = { "Mortals", "Gods", "Immortals" };
@@ -1667,7 +1705,6 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 			continue;
 
 		// show one char
-		++count;
 		CREATE(entry, struct who_entry, 1);
 		entry->access_level = GET_ACCESS_LEVEL(tch);
 		entry->computed_level = GET_COMPUTED_LEVEL(tch);
@@ -1682,6 +1719,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 	for (entry = list; entry; entry = next_entry) {
 		next_entry = entry->next;
 		
+		++count;
 		size += snprintf(whobuf + size, sizeof(whobuf) - size, "%s", entry->string);
 		
 		// columnar spacing
@@ -1700,9 +1738,13 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 		
 		if (type == WHO_MORTALS) {
 			// update counts in case
-			max_players_today = MAX(max_players_today, count);
+			max_pl = data_get_int(DATA_MAX_PLAYERS_TODAY);
+			if (count > max_pl) {
+				max_pl = count;
+				data_set_int(DATA_MAX_PLAYERS_TODAY, max_pl);
+			}
 			max_players_this_uptime = MAX(max_players_this_uptime, count);
-			snprintf(online, sizeof(online), "%d online (max today %d, this uptime %d)", count, max_players_today, max_players_this_uptime);
+			snprintf(online, sizeof(online), "%d online (max today %d, this uptime %d)", count, max_pl, max_players_this_uptime);
 		}
 		else {
 			snprintf(online, sizeof(online), "%d online", count);
@@ -1887,6 +1929,7 @@ ACMD(do_display) {
 		msg_to_char(ch, "Display what?\r\n");
 	}
 	else {
+		delete_doubledollar(argument);
 		msg_to_char(ch, "%s\r\n", replace_prompt_codes(ch, argument));
 	}
 }
@@ -1946,7 +1989,7 @@ ACMD(do_examine) {
 	}
 	look_at_target(ch, arg);
 
-	generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM, ch, &tmp_char, &tmp_object, &tmp_veh);
+	generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &tmp_object, &tmp_veh);
 
 	if (tmp_object) {
 		if ((GET_OBJ_TYPE(tmp_object) == ITEM_DRINKCON) || (GET_OBJ_TYPE(tmp_object) == ITEM_CONTAINER) || (GET_OBJ_TYPE(tmp_object) == ITEM_CORPSE)) {
@@ -1957,6 +2000,82 @@ ACMD(do_examine) {
 	if (tmp_veh && VEH_FLAGGED(tmp_veh, VEH_CONTAINER)) {
 		msg_to_char(ch, "When you look inside, you see:\r\n");
 		look_in_obj(ch, arg);
+	}
+}
+
+
+ACMD(do_factions) {
+	extern const char *relationship_descs[];
+	
+	struct player_faction_data *pfd, *next_pfd;
+	struct faction_relation *rel, *next_rel;
+	char buf[MAX_STRING_LENGTH];
+	faction_data *fct;
+	int idx = NOTHING;
+	int count = 0;
+	size_t size;
+	bool any;
+	
+	skip_spaces(&argument);
+	
+	if (*argument) {
+		if (!(fct = find_faction_by_name(argument)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
+			msg_to_char(ch, "Unknown faction '%s'.\r\n", argument);
+		}
+		else {
+			if ((pfd = get_reputation(ch, FCT_VNUM(fct), FALSE))) {
+				idx = rep_const_to_index(pfd->rep);
+			}
+			
+			msg_to_char(ch, "%s%s\t0\r\n", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(fct));
+			if (pfd && idx != NOTHING) {
+				msg_to_char(ch, "Reputation: %s / %d\r\n", reputation_levels[idx].name, pfd->value);
+			}
+			else {
+				msg_to_char(ch, "Reputation: none\r\n");
+			}
+			msg_to_char(ch, "%s", NULLSAFE(FCT_DESCRIPTION(fct)));
+			
+			// relations?
+			any = FALSE;
+			HASH_ITER(hh, FCT_RELATIONS(fct), rel, next_rel) {
+				if (IS_SET(rel->flags, FCTR_UNLISTED)) {
+					continue;
+				}
+				
+				// show it
+				if (!any) {	// header
+					any = TRUE;
+					msg_to_char(ch, "Relationships:\r\n");
+				}
+				pfd = get_reputation(ch, rel->vnum, FALSE);
+				idx = (pfd ? rep_const_to_index(pfd->rep) : NOTHING);
+				prettier_sprintbit(rel->flags, relationship_descs, buf);
+				msg_to_char(ch, " %s%s\t0 - %s\r\n", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(rel->ptr), buf);
+			}
+		}
+	}
+	else {	// no arg, show all
+		size = snprintf(buf, sizeof(buf), "Your factions:\r\n");
+		HASH_ITER(hh, GET_FACTIONS(ch), pfd, next_pfd) {
+			if (size + 10 >= sizeof(buf)) {
+				break;	// out of room
+			}
+			if (!(fct = find_faction_by_vnum(pfd->vnum))) {
+				continue;
+			}
+			
+			++count;
+			idx = rep_const_to_index(pfd->rep);
+			size += snprintf(buf + size, sizeof(buf) - size, " %s %s(%s / %d)\t0\r\n", FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value);
+		}
+		
+		if (!count) {
+			strcat(buf, " none\r\n");
+		}
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
 	}
 }
 
@@ -2054,18 +2173,34 @@ ACMD(do_help) {
 
 ACMD(do_helpsearch) {	
 	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
-	int iter;
-	bool found;
-	size_t size;
-	
-	delete_doubledollar(argument);
-	one_argument(argument, arg);	// this removes leading filler words, which are going to show up in a lot of helps
+	char **words = NULL;
+	int iter, wrd;
+	bool found, fail;
+	size_t size, word_size;
 	
 	if (!ch->desc) {
 		// don't bother
 		return;
 	}
-	else if (!*arg) {
+	
+	delete_doubledollar(argument);
+	word_size = 0;
+	
+	// put all the arguments into an array
+	while (*argument) {
+		argument = one_word(argument, arg);	// this removes leading filler words, which are going to show up in a lot of helps
+		
+		if (word_size > 0) {
+			RECREATE(words, char*, word_size + 1);
+		}
+		else {
+			CREATE(words, char*, word_size + 1);
+		}
+		
+		words[word_size++] = str_dup(arg);
+	}
+	
+	if (!word_size) {
 		msg_to_char(ch, "Search for help about what?\r\n");
 	}
 	else if (!help_table) {
@@ -2076,18 +2211,36 @@ ACMD(do_helpsearch) {
 		found = FALSE;
 		
 		for (iter = 0; iter <= top_of_helpt; ++iter) {
-			if (GET_ACCESS_LEVEL(ch) >= help_table[iter].level && (!help_table[iter].duplicate && str_str(help_table[iter].entry, arg))) {
-				snprintf(line, sizeof(line), " %s\r\n", help_table[iter].keyword);
-				found = TRUE;
-				
-				if (size + strlen(line) < sizeof(output)) {
-					strcat(output, line);
-					size += strlen(line);
-				}
-				else {
-					size += snprintf(output + size, sizeof(output) - size, "... and more\r\n");
+			if (GET_ACCESS_LEVEL(ch) < help_table[iter].level) {
+				continue;
+			}
+			if (help_table[iter].duplicate) {
+				continue;
+			}
+			
+			// see if it matches all words
+			fail = FALSE;
+			for (wrd = 0; wrd < word_size; ++wrd) {
+				if (!str_str(help_table[iter].entry, words[wrd])) {
+					fail = TRUE;
 					break;
 				}
+			}
+			if (fail) {
+				continue;
+			}
+			
+			// FOUND!
+			found = TRUE;
+			snprintf(line, sizeof(line), " %s\r\n", help_table[iter].keyword);
+			
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+			}
+			else {
+				size += snprintf(output + size, sizeof(output) - size, "... and more\r\n");
+				break;
 			}
 		}
 		
@@ -2099,31 +2252,182 @@ ACMD(do_helpsearch) {
 			page_string(ch->desc, output, TRUE);
 		}
 	}
+	
+	// free data
+	for (wrd = 0; wrd < word_size; ++wrd) {
+		if (words[wrd]) {
+			free(words[wrd]);
+		}
+	}
+	if (words) {
+		free(words);
+	}
 }
 
 
 ACMD(do_inventory) {
-	empire_data *ch_emp, *room_emp;
+	skip_spaces(&argument);
 	
-	if (!IS_NPC(ch)) {
-		do_coins(ch, "", 0, 0);
-	}
-
-	msg_to_char(ch, "You are carrying %d/%d items:\r\n", IS_CARRYING_N(ch), CAN_CARRY_N(ch));
-	list_obj_to_char(ch->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
-
-	if (IS_COMPLETE(IN_ROOM(ch)) && GET_LOYALTY(ch) && can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		ch_emp = GET_LOYALTY(ch);
-		room_emp = ROOM_OWNER(IN_ROOM(ch));
+	if (!*argument) {	// no-arg: traditional inventory
+		empire_data *ch_emp, *room_emp;
 		
-		if (!room_emp || ch_emp == room_emp || has_relationship(ch_emp, room_emp, DIPL_TRADE)) {
-			inventory_store_building(ch, IN_ROOM(ch), ch_emp);
+		if (!IS_NPC(ch)) {
+			do_coins(ch, "", 0, 0);
+		}
+
+		msg_to_char(ch, "You are carrying %d/%d items:\r\n", IS_CARRYING_N(ch), CAN_CARRY_N(ch));
+		list_obj_to_char(ch->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
+
+		if (IS_COMPLETE(IN_ROOM(ch)) && GET_LOYALTY(ch) && can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+			ch_emp = GET_LOYALTY(ch);
+			room_emp = ROOM_OWNER(IN_ROOM(ch));
+			
+			if (!room_emp || ch_emp == room_emp || has_relationship(ch_emp, room_emp, DIPL_TRADE)) {
+				inventory_store_building(ch, IN_ROOM(ch), ch_emp);
+			}
+		}
+	}
+	else {	// advanced inventory
+		char word[MAX_INPUT_LENGTH], heading[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
+		int cmp_type = NOTHING, wear_type = NOTHING, type_type = NOTHING;
+		bool kept = FALSE, not_kept = FALSE, identify = FALSE;
+		bitvector_t cmpf_type = NOBITS;
+		obj_data *obj;
+		size_t size;
+		int count;
+		
+		*heading = '\0';
+		
+		// parse flag if any
+		if (*argument == '-') {
+			switch (*(argument+1)) {
+				case 'c': {
+					strcpy(word, argument+2);
+					*argument = '\0';	// no further args
+					if (!*word) {
+						msg_to_char(ch, "Show what components?\r\n");
+						return;
+					}
+					if (!parse_component(word, &cmp_type, &cmpf_type)) {
+						msg_to_char(ch, "Unknown component type '%s'.\r\n", word);
+						return;
+					}
+					
+					snprintf(heading, sizeof(heading), "Items of type '%s':", component_string(cmp_type, cmpf_type));
+					break;
+				}
+				case 'w': {
+					half_chop(argument+2, word, argument);
+					if (!*word) {
+						msg_to_char(ch, "Show items worn on what part?\r\n");
+						return;
+					}
+					if ((wear_type = search_block(word, wear_bits, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown wear location '%s'.\r\n", word);
+						return;
+					}
+					
+					snprintf(heading, sizeof(heading), "Items worn on %s:", wear_bits[wear_type]);
+					break;
+				}
+				case 't': {
+					half_chop(argument+2, word, argument);
+					if (!*word) {
+						msg_to_char(ch, "Show items of what type?\r\n");
+						return;
+					}
+					if ((type_type = search_block(word, item_types, FALSE)) == NOTHING) {
+						msg_to_char(ch, "Unknown item type '%s'.\r\n", word);
+						return;
+					}
+					
+					snprintf(heading, sizeof(heading), "%s items:", item_types[type_type]);
+					break;
+				}
+				case 'k': {
+					strcpy(word, argument+2);
+					strcpy(argument, word);
+					kept = TRUE;
+					snprintf(heading, sizeof(heading), "Items marked (keep):");
+					break;
+				}
+				case 'n': {
+					strcpy(word, argument+2);
+					strcpy(argument, word);
+					not_kept = TRUE;
+					snprintf(heading, sizeof(heading), "Items not marked (keep):");
+					break;
+				}
+				case 'i': {
+					strcpy(word, argument+2);
+					strcpy(argument, word);
+					identify = TRUE;
+					break;
+				}
+			}
+		}
+		
+		// if we get this far, it's okay
+		skip_spaces(&argument);
+		if (!*heading && *argument) {
+			snprintf(heading, sizeof(heading), "Items matching '%s':", argument);
+		}
+		else if (!*heading && !*argument) {
+			snprintf(heading, sizeof(heading), "Items:");
+		}
+		
+		// build string
+		size = snprintf(buf, sizeof(buf), "%s\r\n", heading);
+		count = 0;
+		
+		LL_FOREACH2(ch->carrying, obj, next_content) {
+			// break out early
+			if (size + 80 > sizeof(buf)) {
+				size += snprintf(buf + size, sizeof(buf) - size, "... and more\r\n");
+				break;
+			}
+			
+			// qualify it
+			if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(obj))) {
+				continue;	// not matching keywords
+			}
+			if (cmp_type != NOTHING && GET_OBJ_CMP_TYPE(obj) != cmp_type) {
+				continue;	// not matching component type
+			}
+			if (cmpf_type != NOBITS && (GET_OBJ_CMP_FLAGS(obj) & cmpf_type) != cmpf_type) {
+				continue;	// not matching component flags
+			}
+			if (wear_type != NOTHING && !CAN_WEAR(obj, BIT(wear_type))) {
+				continue;	// not matching wear pos
+			}
+			if (type_type != NOTHING && GET_OBJ_TYPE(obj) != type_type) {
+				continue;	// not matching obj type
+			}
+			if (kept && !OBJ_FLAGGED(obj, OBJ_KEEP)) {
+				continue;	// not matching keep flag
+			}
+			if (not_kept && OBJ_FLAGGED(obj, OBJ_KEEP)) {
+				continue;	// not matching no-keep flag
+			}
+			
+			// looks okay
+			if (identify) {
+				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s (%d)\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
+			}
+		}
+		
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
 		}
 	}
 }
 
 
 ACMD(do_look) {
+	void clear_recent_moves(char_data *ch);
 	void look_in_direction(char_data *ch, int dir);
 	
 	char arg2[MAX_INPUT_LENGTH];
@@ -2144,19 +2448,23 @@ ACMD(do_look) {
 	else {
 		half_chop(argument, arg, arg2);
 
-		if (!*arg)			/* "look" alone, without an argument at all */
+		if (!*arg) {			/* "look" alone, without an argument at all */
+			clear_recent_moves(ch);
 			look_at_room(ch);
+		}
 		else if (!str_cmp(arg, "out")) {
 			if (!(map = get_map_location_for(IN_ROOM(ch)))) {
 				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
 			else if (map == IN_ROOM(ch) && !ROOM_IS_CLOSED(IN_ROOM(ch))) {
+				clear_recent_moves(ch);
 				look_at_room_by_loc(ch, map, LRR_LOOK_OUT);
 			}
 			else if (!IS_IMMORTAL(ch) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT) && !RMT_FLAGGED(IN_ROOM(ch), RMT_LOOK_OUT)) {
 				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
 			else {
+				clear_recent_moves(ch);
 				look_at_room_by_loc(ch, map, LRR_LOOK_OUT);
 			}
 		}
@@ -2291,12 +2599,14 @@ ACMD(do_mudstats) {
 
 
 ACMD(do_nearby) {
+	extern const char *alt_dirs[];
 	extern int num_of_start_locs;
 	extern int *start_locs;
 	
 	int max_dist = 50;
 	
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	bool cities = TRUE, adventures = TRUE, starts = TRUE;
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct instance_data *inst;
 	struct empire_city_data *city;
 	empire_data *emp, *next_emp;
@@ -2313,82 +2623,121 @@ ACMD(do_nearby) {
 		return;
 	}
 	
+	// argument-parsing
+	skip_spaces(&argument);
+	while (*argument == '-') {
+		++argument;
+	}
+	
+	if (is_abbrev(argument, "city") || is_abbrev(argument, "cities")) {
+		adventures = FALSE;
+		starts = FALSE;
+	}
+	else if (is_abbrev(argument, "adventures")) {
+		cities = FALSE;
+		starts = FALSE;
+	}
+	else if (is_abbrev(argument, "starting locations") || is_abbrev(argument, "starts") || is_abbrev(argument, "towers") || is_abbrev(argument, "tower of souls") || is_abbrev(argument, "tos")) {
+		cities = FALSE;
+		adventures = FALSE;
+	}
+	
+	// displaying:
 	size = snprintf(buf, sizeof(buf), "You find nearby:\r\n");
+	#define NEARBY_DIR  (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir]))
 
 	// check starting locations
-	for (iter = 0; iter <= num_of_start_locs; ++iter) {
-		loc = real_room(start_locs[iter]);
-		dist = compute_distance(IN_ROOM(ch), loc);
+	if (starts) {
+		for (iter = 0; iter <= num_of_start_locs; ++iter) {
+			loc = real_room(start_locs[iter]);
+			dist = compute_distance(IN_ROOM(ch), loc);
 		
-		if (dist <= max_dist) {
-			found = TRUE;
+			if (dist <= max_dist) {
+				found = TRUE;
 
-			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
+				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 			
-			if (has_ability(ch, ABIL_NAVIGATION)) {
-				snprintf(line, sizeof(line), " %d tile%s %s: %s (%d, %d)\r\n", dist, (dist != 1 ? "s" : ""), (dir == NO_DIR ? "away" : dirs[dir]), get_room_name(loc, FALSE), X_COORD(loc), Y_COORD(loc));
+				if (has_ability(ch, ABIL_NAVIGATION)) {
+					snprintf(line, sizeof(line), " %d %s: %s (%d, %d)\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE), X_COORD(loc), Y_COORD(loc));
+				}
+				else {
+					snprintf(line, sizeof(line), " %d %s: %s\r\n", dist, NEARBY_DIR, get_room_name(loc, FALSE));
+				}
+				
+				if (size + strlen(line) < sizeof(buf)) {
+					strcat(buf, line);
+					size += strlen(line);
+				}
 			}
-			else {
-				snprintf(line, sizeof(line), " %d tile%s %s: %s\r\n", dist, (dist != 1 ? "s" : ""), (dir == NO_DIR ? "away" : dirs[dir]), get_room_name(loc, FALSE));
-			}
-			
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
 		}
 	}
 	
 	// check cities
-	HASH_ITER(hh, empire_table, emp, next_emp) {
-		for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
-			loc = city->location;
-			dist = compute_distance(IN_ROOM(ch), loc);
+	if (cities) {
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
+				loc = city->location;
+				dist = compute_distance(IN_ROOM(ch), loc);
 
-			if (dist <= max_dist) {
-				found = TRUE;
+				if (dist <= max_dist) {
+					found = TRUE;
 				
-				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
+					dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 
-				if (has_ability(ch, ABIL_NAVIGATION)) {
-					snprintf(line, sizeof(line), " %d tile%s %s: the %s of %s (%d, %d) / %s%s&0\r\n", dist, (dist != 1 ? "s" : ""), (dir == NO_DIR ? "away" : dirs[dir]), city_type[city->type].name, city->name, X_COORD(loc), Y_COORD(loc), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+					if (has_ability(ch, ABIL_NAVIGATION)) {
+						snprintf(line, sizeof(line), " %d %s: the %s of %s (%d, %d) / %s%s&0\r\n", dist, NEARBY_DIR, city_type[city->type].name, city->name, X_COORD(loc), Y_COORD(loc), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+					}
+					else {
+						snprintf(line, sizeof(line), " %d %s: the %s of %s / %s%s&0\r\n", dist, NEARBY_DIR, city_type[city->type].name, city->name, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+					}
+					
+					if (size + strlen(line) < sizeof(buf)) {
+						strcat(buf, line);
+						size += strlen(line);
+					}
 				}
-				else {
-					snprintf(line, sizeof(line), " %d tile%s %s: the %s of %s / %s%s&0\r\n", dist, (dist != 1 ? "s" : ""), (dir == NO_DIR ? "away" : dirs[dir]), city_type[city->type].name, city->name, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
-				}
-				
-				size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
 			}
 		}
 	}
 	
 	// check instances
-	for (inst = instance_list; inst; inst = inst->next) {
-		if (!inst->location || INSTANCE_FLAGGED(inst, INST_COMPLETED)) {
-			continue;
-		}
+	if (adventures) {
+		for (inst = instance_list; inst; inst = inst->next) {
+			if (!inst->location || INSTANCE_FLAGGED(inst, INST_COMPLETED)) {
+				continue;
+			}
 		
-		if (ADVENTURE_FLAGGED(inst->adventure, ADV_NO_NEARBY)) {
-			continue;
-		}
+			if (ADVENTURE_FLAGGED(inst->adventure, ADV_NO_NEARBY)) {
+				continue;
+			}
 		
-		loc = inst->location;
-		if (!loc || (dist = compute_distance(IN_ROOM(ch), loc)) > max_dist) {
-			continue;
-		}
+			loc = inst->location;
+			if (!loc || (dist = compute_distance(IN_ROOM(ch), loc)) > max_dist) {
+				continue;
+			}
+			
+			// owner part
+			if (ROOM_OWNER(loc)) {
+				snprintf(part, sizeof(part), " / %s%s&0", EMPIRE_BANNER(ROOM_OWNER(loc)), EMPIRE_NAME(ROOM_OWNER(loc)));
+			}
+			else {
+				*part = '\0';
+			}
 		
-		// show instance
-		found = TRUE;
-		dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), inst->location));
-		if (has_ability(ch, ABIL_NAVIGATION)) {
-			snprintf(line, sizeof(line), " %d tile%s %s: %s (%d, %d) / %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), GET_ADV_NAME(inst->adventure), X_COORD(loc), Y_COORD(loc), instance_level_string(inst));
-		}
-		else {
-			snprintf(line, sizeof(line), " %d tile%s %s: %s / %s", dist, PLURAL(dist), (dir == NO_DIR ? "away" : dirs[dir]), GET_ADV_NAME(inst->adventure), instance_level_string(inst));
-		}
-		
-		if (ROOM_OWNER(loc)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s / %s%s&0\r\n", line,  EMPIRE_BANNER(ROOM_OWNER(loc)), EMPIRE_NAME(ROOM_OWNER(loc)));
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
+			// show instance
+			found = TRUE;
+			dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), inst->location));
+			if (has_ability(ch, ABIL_NAVIGATION)) {
+				snprintf(line, sizeof(line), " %d %s: %s (%d, %d) / %s%s\r\n", dist, NEARBY_DIR, GET_ADV_NAME(inst->adventure), X_COORD(loc), Y_COORD(loc), instance_level_string(inst), part);
+			}
+			else {
+				snprintf(line, sizeof(line), " %d %s: %s / %s%s\r\n", dist, NEARBY_DIR, GET_ADV_NAME(inst->adventure), instance_level_string(inst), part);
+			}
+			
+			if (size + strlen(line) < sizeof(buf)) {
+				strcat(buf, line);
+				size += strlen(line);
+			}
 		}
 	}
 	
@@ -2409,7 +2758,7 @@ ACMD(do_score) {
 	one_argument(argument, arg);
 
 	if (IS_IMMORTAL(ch) && *arg) {
-		if (!(victim = get_char_vis(ch, arg, FIND_CHAR_WORLD)))
+		if (!(victim = get_player_vis(ch, arg, FIND_CHAR_WORLD)))
 			send_config_msg(ch, "no_person");
 		else if (IS_NPC(victim))
 			msg_to_char(ch, "You can't get a score sheet for an NPC.\r\n");
@@ -2426,13 +2775,21 @@ ACMD(do_score) {
 
 ACMD(do_survey) {
 	struct empire_city_data *city;
+	struct empire_island *eisle;
 	struct island_info *island;
 	
 	msg_to_char(ch, "You survey the area:\r\n");
 	
 	if (GET_ISLAND_ID(IN_ROOM(ch)) != NO_ISLAND) {
 		island = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE);
-		msg_to_char(ch, "Location: %s%s\r\n", island->name, IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "");
+		
+		// find out if it has a local name
+		if (GET_LOYALTY(ch) && (eisle = get_empire_island(GET_LOYALTY(ch), island->id)) && eisle->name && str_cmp(eisle->name, island->name)) {
+			msg_to_char(ch, "Location: %s (%s)%s\r\n", get_island_name_for(island->id, ch), island->name, IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "");
+		}
+		else {
+			msg_to_char(ch, "Location: %s%s\r\n", get_island_name_for(island->id, ch), IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "");
+		}
 	}
 	
 	// empire
@@ -2447,11 +2804,8 @@ ACMD(do_survey) {
 	
 	// building info
 	if (COMPLEX_DATA(IN_ROOM(ch))) {
-		if (BUILDING_DISREPAIR(IN_ROOM(ch)) > config_get_int("disrepair_minor")) {
-			msg_to_char(ch, "It's in need of %s repair.\r\n", (BUILDING_DISREPAIR(IN_ROOM(ch)) > config_get_int("disrepair_major")) ? "major" : "some");
-		}
-		if (BUILDING_DAMAGE(IN_ROOM(ch)) > 0) {
-			msg_to_char(ch, "It has been damaged in a siege.\r\n");
+		if (BUILDING_DAMAGE(IN_ROOM(ch)) > 0 || (IS_COMPLETE(IN_ROOM(ch)) && BUILDING_RESOURCES(IN_ROOM(ch)))) {
+			msg_to_char(ch, "It's in need of maintenance and repair.\r\n");
 		}
 		if (BUILDING_BURNING(IN_ROOM(ch)) > 0) {
 			msg_to_char(ch, "It's on fire!\r\n");
@@ -2517,8 +2871,11 @@ ACMD(do_weather) {
 		"rainy",
 		"lit by flashes of lightning"
 		};
-
-	if (IS_OUTDOORS(ch)) {
+	
+	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_WEATHER)) {
+		msg_to_char(ch, "There's nothing interesting about the weather.\r\n");
+	}
+	else if (IS_OUTDOORS(ch)) {
 		msg_to_char(ch, "The sky is %s and %s.\r\n", sky_look[weather_info.sky], (weather_info.change >= 0 ? "you feel a warm wind from the south" : "your foot tells you bad weather is due"));
 		if (weather_info.sunlight == SUN_SET || weather_info.sunlight == SUN_DARK) {
 			list_moons_to_char(ch);
@@ -2533,7 +2890,7 @@ ACMD(do_weather) {
 
 
 ACMD(do_whereami) {	
-	if (has_ability(ch, ABIL_NAVIGATION)) {
+	if (has_ability(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
 		msg_to_char(ch, "You are at: %s (%d, %d)\r\n", get_room_name(IN_ROOM(ch), FALSE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 	}
 	else {

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.highsorcery.c                               EmpireMUD 2.0b4 *
+*   File: act.highsorcery.c                               EmpireMUD 2.0b5 *
 *  Usage: implementation for high sorcery abilities                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -32,7 +32,6 @@
 *   Commands
 *   Chants
 *   Rituals
-*   Study Stuff
 */
 
 // external vars
@@ -125,6 +124,7 @@ RITUAL_FINISH_FUNC(perform_chant_of_illusions);
 RITUAL_FINISH_FUNC(perform_chant_of_nature);
 RITUAL_SETUP_FUNC(start_chant_of_druids);
 RITUAL_SETUP_FUNC(start_chant_of_illusions);
+RITUAL_SETUP_FUNC(start_chant_of_nature);
 
 
 // SCMD_RITUAL, SCMD_CHANT
@@ -179,10 +179,10 @@ struct ritual_data_type {
 		start_ritual_of_defense,
 		perform_ritual_of_defense,
 		{{ "You begin the incantation for the Ritual of Defense.", "\t" },
-		{ "You say, 'Empower now this wall of stone'", "$n says, 'Empower now this wall of stone'" },
-		{ "You say, 'With wisdom of the sages'", "$n says, 'With wisdom of the sages'" },
-		{ "You say, 'Ward against the foes above'", "$n says, 'Ward against the foes above'" },
-		{ "You say, 'And strong, withstand the ages'", "$n says, 'And strong, withstand the ages'" },
+		{ "You say, 'Empower now this wall of stone...'", "$n says, 'Empower now this wall of stone...'" },
+		{ "You say, 'With wisdom of the sages...'", "$n says, 'With wisdom of the sages...'" },
+		{ "You say, 'Ward against the foes above...'", "$n says, 'Ward against the foes above...'" },
+		{ "You say, 'And strong, withstand the ages!'", "$n says, 'And strong, withstand the ages!'" },
 		MESSAGE_END
 	}},
 	
@@ -254,16 +254,16 @@ struct ritual_data_type {
 	
 	// 9: chant of nature
 	{ "nature", 0, ABIL_CHANT_OF_NATURE, 0, SCMD_CHANT,
-		start_simple_ritual,
+		start_chant_of_nature,
 		perform_chant_of_nature,
 		{{ "You start the chant of nature...", "$n starts the chant of nature..." },
-		{ "You chant, 'Chant of nature placeholder text.'", "$n chants, 'Chant of nature placeholder text.'" },
+		{ "You chant, 'O ancient Ash, bubbling waters, let life flow anew...'", "$n chants, 'O ancient Ash, bubbling waters, let life flow anew...'" },
 		NO_MESSAGE,
-		{ "You chant, 'Chant of nature placeholder text.'", "$n chants, 'Chant of nature placeholder text.'" },
+		{ "You chant, 'O great Ceres, mother of seeds, rise above the dew...'", "$n chants, 'O great Ceres, mother of seeds, rise above the dew...'" },
 		NO_MESSAGE,
-		{ "You chant, 'Chant of nature placeholder text.'", "$n chants, 'Chant of nature placeholder text.'" },
+		{ "You chant, 'O Viridius, greenest father, god of vines that coil...'", "$n chants, 'O Viridius, greenest father, god of vines that coil...'" },
 		NO_MESSAGE,
-		{ "You chant, 'Chant of nature placeholder text.'", "$n chants, 'Chant of nature placeholder text.'" },
+		{ "You chant, 'O Chloris, Elysian spring, lift us from the soil!'", "$n chants, 'O Chloris, Elysian spring, lift us from the soil!'" },
 		NO_MESSAGE,
 		MESSAGE_END
 	}},
@@ -317,9 +317,7 @@ bool can_use_ritual(char_data *ch, int ritual) {
 INTERACTION_FUNC(devastate_crop) {	
 	crop_data *cp = ROOM_CROP(inter_room);
 	obj_data *newobj;
-	int num;
-
-	num = number(1, 4) * interaction->quantity;
+	int num = interaction->quantity;
 	
 	msg_to_char(ch, "You devastate the %s and collect %s (x%d)!\r\n", GET_CROP_NAME(cp), get_obj_name_by_proto(interaction->vnum), num);
 	sprintf(buf, "$n's powerful ritual devastates the %s crops!", GET_CROP_NAME(cp));
@@ -543,26 +541,32 @@ void summon_materials(char_data *ch, char *argument) {
 			}
 			
 			while (count < total && store->amount > 0) {
-				++count;
-				if (!retrieve_resource(ch, emp, store, FALSE)) {
-					break;
+				if (retrieve_resource(ch, emp, store, FALSE)) {
+					++count;
+				}
+				else {
+					break;	// no more
 				}
 			}
 		}
 	}
-
+	
+	if (found && count < total && count > 0) {
+		msg_to_char(ch, "There weren't enough, but you managed to summon %d.\r\n", count);
+	}
+	
 	// result messages
 	if (!found) {
 		msg_to_char(ch, "Nothing like that is stored around here.\r\n");
 	}
 	else if (count == 0) {
-		msg_to_char(ch, "There is nothing stored in your empire nearby.\r\n");
+		// they must have gotten an error message
 	}
 	else {
 		// save the empire
 		if (found) {
 			GET_MANA(ch) -= cost * count;	// charge only the amount retrieved
-			save_empire(emp);
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			read_vault(emp);
 			gain_ability_exp(ch, ABIL_SUMMON_MATERIALS, 1);
 		}
@@ -961,7 +965,7 @@ ACMD(do_manashield) {
 	if (affected_by_spell(ch, ATYPE_MANASHIELD)) {
 		msg_to_char(ch, "You wipe the symbols off your arm and cancel your mana shield.\r\n");
 		act("$n wipes the arcane symbols off $s arm.", TRUE, ch, NULL, NULL, TO_ROOM);
-		affect_from_char(ch, ATYPE_MANASHIELD);
+		affect_from_char(ch, ATYPE_MANASHIELD, FALSE);
 	}
 	else if (!can_use_ability(ch, ABIL_MANASHIELD, MANA, cost, NOTHING)) {
 		return;
@@ -992,20 +996,36 @@ ACMD(do_manashield) {
 
 ACMD(do_mirrorimage) {
 	extern char_data *has_familiar(char_data *ch);
+	extern struct custom_message *pick_custom_longdesc(char_data *ch);
 	void scale_mob_as_familiar(char_data *mob, char_data *master);
 	
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], *tmp;
 	char_data *mob, *other;
 	obj_data *wield;
-	int cost = 40, iter;
+	int cost = GET_MAX_MANA(ch) / 5;
 	mob_vnum vnum = MIRROR_IMAGE_MOB;
+	struct custom_message *ocm;
 	bool found;
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot use mirrorimage.\r\n");
+		return;
+	}
 	
 	if (!can_use_ability(ch, ABIL_MIRRORIMAGE, MANA, cost, COOLDOWN_MIRRORIMAGE)) {
 		return;
 	}
 	
-	if (has_familiar(ch)) {
-		msg_to_char(ch, "You can't summon a mirror image while you already have a charmed follower.\r\n");
+	// limit 1
+	found = FALSE;
+	LL_FOREACH(character_list, other) {
+		if (ch != other && IS_NPC(other) && GET_MOB_VNUM(other) == vnum && other->master == ch) {
+			found = TRUE;
+			break;
+		}
+	}
+	if (found) {
+		msg_to_char(ch, "You can't summon a second mirror image.\r\n");
 		return;
 	}
 	
@@ -1024,29 +1044,72 @@ ACMD(do_mirrorimage) {
 	// restrings
 	GET_PC_NAME(mob) = str_dup(PERS(ch, ch, FALSE));
 	GET_SHORT_DESC(mob) = str_dup(GET_PC_NAME(mob));
-	sprintf(buf, "%s is standing here.\r\n", GET_SHORT_DESC(mob));
-	*buf = UPPER(*buf);
-	GET_LONG_DESC(mob) = str_dup(buf);
-
-	// stats
-	GET_REAL_SEX(mob) = GET_REAL_SEX(ch);
+	GET_REAL_SEX(mob) = GET_SEX(ch);	// need this for some desc stuff
 	
-	mob->points.max_pools[HEALTH] = MIN(100, GET_HEALTH(ch));	// NOTE lower health
-	mob->points.current_pools[HEALTH] = MIN(100, GET_HEALTH(ch));	// NOTE lower health
+	// longdesc is more complicated
+	if (GET_MORPH(ch)) {
+		sprintf(buf, "%s\r\n", MORPH_LONG_DESC(GET_MORPH(ch)));
+	}
+	else if ((ocm = pick_custom_longdesc(ch))) {
+		sprintf(buf, "%s\r\n", ocm->msg);
+		
+		// must process $n, $s, $e, $m
+		if (strstr(buf, "$n")) {
+			tmp = str_replace("$n", GET_SHORT_DESC(mob), buf);
+			strcpy(buf, tmp);
+			free(tmp);
+		}
+		if (strstr(buf, "$s")) {
+			tmp = str_replace("$s", HSHR(mob), buf);
+			strcpy(buf, tmp);
+			free(tmp);
+		}
+		if (strstr(buf, "$e")) {
+			tmp = str_replace("$e", HSSH(mob), buf);
+			strcpy(buf, tmp);
+			free(tmp);
+		}
+		if (strstr(buf, "$m")) {
+			tmp = str_replace("$m", HMHR(mob), buf);
+			strcpy(buf, tmp);
+			free(tmp);
+		}
+
+	}
+	else {
+		sprintf(buf, "%s is standing here.\r\n", GET_SHORT_DESC(mob));
+	}
+	*buf = UPPER(*buf);
+	
+	// attach rank if needed
+	if (GET_LOYALTY(ch)) {
+		sprintf(buf2, "<%s&0&y> %s", EMPIRE_RANK(GET_LOYALTY(ch), GET_RANK(ch)-1), buf);
+		GET_LONG_DESC(mob) = str_dup(buf2);
+	}
+	else {
+		GET_LONG_DESC(mob) = str_dup(buf);
+	}
+	
+	// stats
+	
+	// inherit scaled mob health
+	// mob->points.max_pools[HEALTH] = get_approximate_level(ch) * level_health_mod;
+	// mob->points.current_pools[HEALTH] = mob->points.max_pools[HEALTH];
 	mob->points.max_pools[MOVE] = GET_MAX_MOVE(ch);
 	mob->points.current_pools[MOVE] = GET_MOVE(ch);
 	mob->points.max_pools[MANA] = GET_MAX_MANA(ch);
 	mob->points.current_pools[MANA] = GET_MANA(ch);
-	mob->points.max_pools[BLOOD] = GET_MAX_BLOOD(ch);
-	mob->points.current_pools[BLOOD] = GET_BLOOD(ch);
+	mob->points.max_pools[BLOOD] = 10;	// not meant to be a blood source
+	mob->points.current_pools[BLOOD] = 10;
 	
-	for (iter = 0; iter < NUM_EXTRA_ATTRIBUTES; ++iter) {
-		GET_EXTRA_ATT(mob, iter) = GET_EXTRA_ATT(ch, iter);
-	}
-	
+	// mimic weapon
 	wield = GET_EQ(ch, WEAR_WIELD);
 	MOB_ATTACK_TYPE(mob) = wield ? GET_WEAPON_TYPE(wield) : TYPE_HIT;
-	MOB_DAMAGE(mob) = wield ? GET_WEAPON_DAMAGE_BONUS(wield) : 3;
+	MOB_DAMAGE(mob) = 3;	// deliberately low (it will miss anyway)
+	
+	// mirrors are no good at hitting or dodging
+	mob->mob_specials.to_hit = 0;
+	mob->mob_specials.to_dodge = 0;
 	
 	mob->real_attributes[STRENGTH] = GET_STRENGTH(ch);
 	mob->real_attributes[DEXTERITY] = GET_DEXTERITY(ch);
@@ -1054,12 +1117,12 @@ ACMD(do_mirrorimage) {
 	mob->real_attributes[GREATNESS] = GET_GREATNESS(ch);
 	mob->real_attributes[INTELLIGENCE] = GET_INTELLIGENCE(ch);
 	mob->real_attributes[WITS] = GET_WITS(ch);
+
 	SET_BIT(AFF_FLAGS(mob), AFF_CHARM);
-	SET_BIT(MOB_FLAGS(mob), MOB_FAMILIAR);
+	SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);
 	affect_total(mob);
 	
 	act("You create a mirror image to distract your foes!", FALSE, ch, NULL, NULL, TO_CHAR);
-	act("$n suddenly splits in two!", FALSE, ch, NULL, NULL, TO_ROOM);
 	
 	// switch at least 1 thing that's hitting ch
 	found = FALSE;
@@ -1069,6 +1132,9 @@ ACMD(do_mirrorimage) {
 				found = TRUE;
 				FIGHTING(other) = mob;
 			}
+		}
+		else if (other != ch) {	// only people not hitting ch see the split
+			act("$n suddenly splits in two!", TRUE, ch, NULL, other, TO_VICT);
 		}
 	}
 	
@@ -1401,6 +1467,10 @@ RITUAL_SETUP_FUNC(start_chant_of_druids) {
 		msg_to_char(ch, "You can't perform the chant of druids unless you are at a henge.\r\n");
 		return FALSE;
 	}
+	if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to use it.\r\n");
+		return FALSE;
+	}
 	if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to finish it before you can perform the chant of druids.\r\n");
 		return FALSE;
@@ -1412,7 +1482,7 @@ RITUAL_SETUP_FUNC(start_chant_of_druids) {
 }
 
 RITUAL_FINISH_FUNC(perform_chant_of_druids) {
-	if (CAN_GAIN_NEW_SKILLS(ch) && get_skill_level(ch, SKILL_NATURAL_MAGIC) == 0 && noskill_ok(ch, SKILL_NATURAL_MAGIC) && HAS_FUNCTION(IN_ROOM(ch), FNC_HENGE) && IS_COMPLETE(IN_ROOM(ch))) {
+	if (CAN_GAIN_NEW_SKILLS(ch) && get_skill_level(ch, SKILL_NATURAL_MAGIC) == 0 && noskill_ok(ch, SKILL_NATURAL_MAGIC) && room_has_function_and_city_ok(IN_ROOM(ch), FNC_HENGE)) {
 		msg_to_char(ch, "&gAs you finish the chant, you begin to see the weave of mana through nature...&0\r\n");
 		set_skill(ch, SKILL_NATURAL_MAGIC, 1);
 		SAVE_CHAR(ch);
@@ -1464,6 +1534,16 @@ RITUAL_FINISH_FUNC(perform_chant_of_illusions) {
 	msg_to_char(ch, "As you finish the chant, the road is cloaked in illusion!\r\n");
 }
 
+
+RITUAL_SETUP_FUNC(start_chant_of_nature) {
+	if (!IS_APPROVED(ch) && config_get_bool("terraform_approval")) {
+		send_config_msg(ch, "need_approval_string");
+		return FALSE;
+	}
+	
+	start_ritual(ch, ritual);
+	return TRUE;
+}
 
 RITUAL_FINISH_FUNC(perform_chant_of_nature) {
 	sector_data *new_sect, *preserve;
@@ -1530,12 +1610,12 @@ RITUAL_FINISH_FUNC(perform_ritual_of_burdens) {
 
 
 RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
-	room_data *room, *next_room, *to_room = NULL;
+	room_data *room, *next_room, *to_room = NULL, *map;
 	struct empire_city_data *city;
 	int subtype = NOWHERE;
 	bool wait;
 	
-	if (!can_teleport_to(ch, IN_ROOM(ch), TRUE) || RMT_FLAGGED(IN_ROOM(ch), RMT_NO_TELEPORT)) {
+	if (!can_teleport_to(ch, IN_ROOM(ch), TRUE) || RMT_FLAGGED(IN_ROOM(ch), RMT_NO_TELEPORT) || ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_TELEPORT)) {
 		msg_to_char(ch, "You can't teleport out of here.\r\n");
 		return FALSE;
 	}
@@ -1560,8 +1640,16 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 			msg_to_char(ch, "Your home teleportation is still on cooldown.\r\n");
 			return FALSE;
 		}
-		else if (IS_RIDING(ch)) {
-			msg_to_char(ch, "You can't teleport home while riding.\r\n");
+		else if (!(map = get_map_location_for(to_room))) {
+			msg_to_char(ch, "You can't teleport home right now.\r\n");
+			return FALSE;
+		}
+		else if (!can_use_room(ch, map, GUESTS_ALLOWED)) {
+			msg_to_char(ch, "You can't teleport home because your home is somewhere you don't have permission to be.\r\n");
+			return FALSE;
+		}
+		else if (!can_teleport_to(ch, map, FALSE)) {
+			msg_to_char(ch, "You can't teleport home right now.\r\n");
 			return FALSE;
 		}
 		else {
@@ -1580,6 +1668,10 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 			return FALSE;
 		}
 	}
+	else if (find_city_by_name(GET_LOYALTY(ch), argument)) {
+		msg_to_char(ch, "You need to purchase the City Teleportation ability to do that.\r\n");
+		return FALSE;
+	}
 	else {
 		msg_to_char(ch, "That's not a valid place to teleport.\r\n");
 		return FALSE;
@@ -1594,7 +1686,7 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 	void cancel_adventure_summon(char_data *ch);
 	
-	room_data *to_room, *rand_room;
+	room_data *to_room, *rand_room, *map;
 	int tries, rand_x, rand_y;
 	bool random;
 	
@@ -1613,10 +1705,14 @@ RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
 		if (rand_room && !ROOM_IS_CLOSED(rand_room) && can_teleport_to(ch, rand_room, TRUE)) {
 			to_room = rand_room;
 		}
+		++tries;
 	}
 	
-	if (!to_room || !can_teleport_to(ch, to_room, TRUE)) {
+	if (!to_room || !can_teleport_to(ch, to_room, TRUE) || !(map = get_map_location_for(to_room))) {
 		msg_to_char(ch, "Teleportation failed: you couldn't find a safe place to teleport.\r\n");
+	}
+	else if (!can_teleport_to(ch, map, FALSE)) {
+		msg_to_char(ch, "Teleportation failed: you can't seem to teleport there right now.\r\n");
 	}
 	else {
 		act("$n vanishes in a brilliant flash of light!", FALSE, ch, NULL, NULL, TO_ROOM);
@@ -1720,24 +1816,37 @@ RITUAL_FINISH_FUNC(perform_ritual_of_defense) {
 
 RITUAL_FINISH_FUNC(perform_sense_life_ritual) {
 	char_data *targ;
-	bool found;
+	bool found, earthmeld;
 	
 	msg_to_char(ch, "You finish the ritual and your eyes are opened...\r\n");
 	act("$n finishes the ritual and $s eyes flash a bright white.", FALSE, ch, NULL, NULL, TO_ROOM);
 	
-	found = FALSE;
+	found = earthmeld = FALSE;
 	for (targ = ROOM_PEOPLE(IN_ROOM(ch)); targ; targ = targ->next_in_room) {
-		if (ch != targ && AFF_FLAGGED(targ, AFF_HIDE) && !CAN_SEE(ch, targ)) {
+		if (targ == ch) {
+			continue;
+		}
+		
+		if (AFF_FLAGGED(targ, AFF_HIDE)) {
+			// hidden target
 			SET_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
 
 			if (CAN_SEE(ch, targ)) {
 				act("You sense $N hiding here!", FALSE, ch, 0, targ, TO_CHAR);
 				msg_to_char(targ, "You are discovered!\r\n");
 				REMOVE_BIT(AFF_FLAGS(targ), AFF_HIDE);
+				affects_from_char_by_aff_flag(targ, AFF_HIDE, FALSE);
 				found = TRUE;
 			}
 
 			REMOVE_BIT(AFF_FLAGS(ch), AFF_SENSE_HIDE);
+		}
+		else if (!earthmeld && AFF_FLAGGED(targ, AFF_EARTHMELD)) {
+			// earthmelded targets (only do once)
+			if (skill_check(ch, ABIL_SEARCH, DIFF_HARD) && CAN_SEE(ch, targ)) {
+				act("You sense someone earthmelded here.", FALSE, ch, NULL, NULL, TO_CHAR);
+				found = earthmeld = TRUE;
+			}
 		}
 	}
 	
@@ -1828,7 +1937,7 @@ RITUAL_SETUP_FUNC(start_siege_ritual) {
 		start_ritual(ch, ritual);
 		// action 0 is ritual #
 		GET_ACTION_VNUM(ch, 1) = room_targ ? GET_ROOM_VNUM(room_targ) : NOTHING;
-		GET_ACTION_VNUM(ch, 2) = veh_targ ? GET_ID(veh_targ) : NOTHING;
+		GET_ACTION_VNUM(ch, 2) = veh_targ ? veh_script_id(veh_targ) : NOTHING;
 		return TRUE;
 	}
 	
@@ -2011,154 +2120,4 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 	else {
 		msg_to_char(ch, "The Devastation Ritual is complete.\r\n");
 	}
-}
-
-
- ///////////////////////////////////////////////////////////////////////////////
-//// STUDY STUFF //////////////////////////////////////////////////////////////
-
-// TODO ultimately, this should be moved to triggers
-
-const char *study_strings[] = {
-	// placeholder
-	"",
-	
-	"   You sit down at a bench and open a worn old book, one that has long since\r\n"
-	"lost its gold leaf. The leather cover is faded and worn, and you can barely\r\n"
-	"make out the words through a fine layer of dust. As you blow the dust away, a\r\n"
-	"white flame flashes across the cover and sears the book's name anew. This is\r\n"
-	"The Handril Instructionary: Apprentice to Sorcery, 2nd Edition, Volumes I-II.\r\n",
-
-	"   \"Since the dawn of time, Man has wielded the primal mana which flows through\r\n"
-	"the veins of our world. In the first empires, during the Age of Destiny, the\r\n"
-	"primitive tribes of men, dwarfs, orcs, and elves drew magic from rare stones\r\n"
-	"named for the gods Vinak, Hadash, and Ma'kor. As the race of men conquered the\r\n"
-	"land, they came to wield mana directly, and so became the first druids.\"\r\n",
-
-	"   \"For many years, the druids hid themselves, and squirreled their magic away\r\n"
-	"from the world. As great cities rose and fell and rose again, and empires sank\r\n"
-	"into the mires of history, the art of magic was kept to whispers. But even the\r\n"
-	"druids could not keep this secret forever. High Sorcery begins with the druid\r\n"
-	"who left his order and founded a school to investigate the true depths of the\r\n"
-	"power of mana. For this, he was branded Warlock.\"\r\n",
-
-	"   \"High Sorcery is by nature academic magic. It is pondered and forged\r\n"
-	"where the so-called natural magic is raw and untamed. A sorcerer must learn to\r\n"
-	"focus his -- or her -- energies. This is done through study, through ritual,\r\n"
-	"and through rigorous practice. Each sorcerer is held to the highest standard,\r\n"
-	"whether at the academy or in the field. Each sorcerer swears to uphold the core\r\n"
-	"ideals of High Sorcery, even while pursuing his or her own ambitions.\"\r\n",
-
-	"   \"A sorcerer swears first to be loyal to his prince. Above all things, we\r\n"
-	"serve the empire. A sorcerer swears second to seek knowledge. Above all things,\r\n"
-	"we know that wisdom is the true source of power. A sorcerer swears third to\r\n"
-	"leave his sigil emblazoned on the pages of history. Above all things, our\r\n"
-	"greatness must wave as an unyielding banner over the whole of the world.\"\r\n",
-
-	"   You find the book is missing some pages after the oath, and begin skimming\r\n"
-	"through the sections that remain. There's a section about the origins of mana\r\n"
-	"and the proper techniques for channeling it through a staff, but that seems to\r\n"
-	"be something you could figure out on your own. Pages have been torn from that\r\n"
-	"section as well, and you flip through descriptions of some of the great spells\r\n"
-	"and rituals contained within the book.\r\n",
-
-	"   \"Once, worldly travel was restricted to horses and canoes. Even modern ships\r\n"
-	"of sail can take days or weeks to reach their destination. For this reason, the\r\n"
-	"academy of High Sorcery has begun to craft a network of portals across the\r\n"
-	"many continents. Through the proper invocations and rituals, a ring of stones\r\n"
-	"can anchor reality itself and allow even a layman to bridge two such rings.\"\r\n",
-
-	"   \"The earliest sorcerers learned to bind their magic to physical objects in\r\n"
-	"order to enhance the physical prowess of their bearers. This craft, called\r\n"
-	"Enchanting, brought the greatest emperors to the doors of the towers of sor-\r\n"
-	"cery in search of powerful artifacts. Even today, powerful artificers and\r\n"
-	"enchanters can earn a living in the service of kings.\"\r\n",
-
-	"   \"When the druids began to emerge from their ancient hiding places, it was\r\n"
-	"only to fight their successor, the academy of High Sorcery. And so ensued the\r\n"
-	"great magic wars, pitting tribe against empire, staff against staff. In this\r\n"
-	"way, the sorcerers came to train battlemages in the martial arts. Soon, these\r\n"
-	"sorcerers became the most feared warriors in the land, capable of laying waste\r\n"
-	"to whole armies with a single spell.\"\r\n",
-
-	"   \"A battlemage protects himself first by wielding a staff. This traditional\r\n"
-	"method of focus allows for powerful magic without draining the sorcerer's own\r\n"
-	"vein of mana. Many sorcerers who have suffered the loss of their staves have\r\n"
-	"also suffered the loss of their lives.\"\r\n",
-
-	"   \"A battlemage must learn to anticipate their enemy's actions using a ritual\r\n"
-	"known to some as Foresight. The truth, however, is that it does not allow the\r\n"
-	"sorcerer to see the future. Instead, this ritual seeds the air with mana to\r\n"
-	"show the path down which physical objects travel. The entire swing of a war-\r\n"
-	"rior's sword is visible even as his muscles begin to twitch, and the cleverest\r\n"
-	"sorcerer is never caught off-guard.\"\r\n",
-
-	"   You close the worn old book and set it down. Perhaps that's enough reading\r\n"
-	"for now. It's clear the path of High Sorcery is a long one, and this is only\r\n"
-	"the start of the journey. As you reflect upon the book, its illuminated pages\r\n"
-	"still fresh in your mind, you begin to wonder what else awaits you on this\r\n"
-	"path. Only time will tell.\r\n",
-
-	"\n"
-};
-
-
-// **** for do_study ****
-void perform_study(char_data *ch) {
-	void set_skill(char_data *ch, any_vnum skill, int level);
-	int pos;
-	
-	GET_ACTION_TIMER(ch) += 1;
-
-	if ((GET_ACTION_TIMER(ch) % 4) != 0) {
-		// no message to show
-		return;
-	}
-	
-	pos = GET_ACTION_TIMER(ch) / 4;
-	
-	if (*study_strings[pos] == '\n') {
-		// DONE!
-		if (CAN_GAIN_NEW_SKILLS(ch) && get_skill_level(ch, SKILL_HIGH_SORCERY) == 0 && noskill_ok(ch, SKILL_HIGH_SORCERY)) {
-			msg_to_char(ch, "&mYour mind begins to open to the ways of High Sorcery, and you are now an apprentice to this school.&0\r\n");
-			set_skill(ch, SKILL_HIGH_SORCERY, 1);
-			SAVE_CHAR(ch);
-		}
-		cancel_action(ch);
-	}
-	else {
-		send_to_char(study_strings[pos], ch);
-	}
-}
-
-
-ACMD(do_study) {
-	// just ending
-	if (GET_ACTION(ch) == ACT_STUDYING) {
-		msg_to_char(ch, "You put down the book and stop studying.\r\n");
-		act("$n puts down $s book and stops studying.", FALSE, ch, NULL, NULL, TO_ROOM);
-		cancel_action(ch);
-		return;
-	}
-	
-	if (GET_ACTION(ch) != ACT_NONE) {
-		msg_to_char(ch, "You're a little busy right now.\r\n");
-		return;
-	}
-	
-	if (BUILDING_VNUM(IN_ROOM(ch)) != RTYPE_SORCERER_TOWER) {
-		msg_to_char(ch, "You need to be in the library of a Tower of Sorcery.\r\n");
-		return;
-	}
-	
-	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to study here.\r\n");
-		return;
-	}
-	
-	// do chant
-	msg_to_char(ch, "You pick up a book to study.\r\n");
-	act("$n picks up a book to study.", FALSE, ch, NULL, NULL, TO_ROOM);
-	
-	start_action(ch, ACT_STUDYING, 0);
 }

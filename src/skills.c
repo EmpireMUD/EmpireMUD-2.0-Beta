@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: skills.c                                        EmpireMUD 2.0b4 *
+*   File: skills.c                                        EmpireMUD 2.0b5 *
 *  Usage: code related to skills, including DB and OLC                    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -47,14 +47,18 @@ const char *default_skill_desc = "New skill";
 extern const char *skill_flags[];
 
 // eternal functions
+void resort_empires(bool force);
 extern bool is_class_ability(ability_data *abil);
 void update_class(char_data *ch);
 
 // local protos
 bool can_gain_skill_from(char_data *ch, ability_data *abil);
+void clear_char_abilities(char_data *ch, any_vnum skill);
 struct skill_ability *find_skill_ability(skill_data *skill, ability_data *abil);
+int get_ability_points_available(any_vnum skill, int level);
 int get_ability_points_spent(char_data *ch, any_vnum skill);
 bool green_skill_deadend(char_data *ch, any_vnum skill);
+void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
 int sort_skill_abilities(struct skill_ability *a, struct skill_ability *b);
 
 
@@ -72,6 +76,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 	void end_majesty(char_data *ch);
 	void finish_morphing(char_data *ch, morph_data *morph);
 	void remove_armor_by_type(char_data *ch, int armor_type);
+	void remove_honed_gear(char_data *ch);
 	void retract_claws(char_data *ch);
 	void undisguise(char_data *ch);	
 	
@@ -91,6 +96,14 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			end_alacrity(ch);
 			break;
 		}
+		case ABIL_ARCHERY: {
+			if (GET_EQ(ch, WEAR_RANGED) && IS_MISSILE_WEAPON(GET_EQ(ch, WEAR_RANGED))) {
+				act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_RANGED), NULL, TO_CHAR);
+				unequip_char_to_inventory(ch, WEAR_RANGED);
+				determine_gear_level(ch);
+			}
+			break;
+		}
 		case ABIL_BANSHEE: {
 			despawn_familiar(ch, FAMILIAR_BANSHEE);
 			break;
@@ -99,12 +112,11 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			despawn_familiar(ch, FAMILIAR_BASILISK);
 			break;
 		}
-		case ABIL_BLOODSWORD: {
-			if ((obj = GET_EQ(ch, WEAR_WIELD))) {
-				if (GET_OBJ_VNUM(obj) == o_BLOODSWORD) {
-					act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR);
-					unequip_char_to_inventory(ch, WEAR_WIELD);
-				}
+		case ABIL_READY_BLOOD_WEAPONS: {
+			if ((obj = GET_EQ(ch, WEAR_WIELD)) && IS_BLOOD_WEAPON(obj)) {
+				act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR);
+				unequip_char_to_inventory(ch, WEAR_WIELD);
+				determine_gear_level(ch);
 			}
 			break;
 		}
@@ -113,7 +125,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			break;
 		}
 		case ABIL_BOOST: {
-			affect_from_char(ch, ATYPE_BOOST);
+			affect_from_char(ch, ATYPE_BOOST, TRUE);
 			break;
 		}
 		case ABIL_CHANT_OF_NATURE: {
@@ -133,7 +145,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			break;
 		}
 		case ABIL_COUNTERSPELL: {
-			affect_from_char(ch, ATYPE_COUNTERSPELL);
+			affect_from_char(ch, ATYPE_COUNTERSPELL, TRUE);
 			break;
 		}
 		case ABIL_DEATHSHROUD: {
@@ -151,6 +163,10 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			if (IS_DISGUISED(ch)) {
 				undisguise(ch);
 			}
+			break;
+		}
+		case ABIL_EARTHARMOR: {
+			affect_from_char_by_caster(ch, ATYPE_EARTHARMOR, ch, TRUE);
 			break;
 		}
 		case ABIL_EARTHMELD: {
@@ -174,19 +190,27 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			break;
 		}
 		case ABIL_FLY: {
-			affect_from_char(ch, ATYPE_FLY);
+			affect_from_char(ch, ATYPE_FLY, TRUE);
 			break;
 		}
 		case ABIL_FORESIGHT: {
-			affect_from_char(ch, ATYPE_FORESIGHT);
+			affect_from_char_by_caster(ch, ATYPE_FORESIGHT, ch, TRUE);
 			break;
 		}
 		case ABIL_GRIFFIN: {
 			despawn_familiar(ch, FAMILIAR_GRIFFIN);
 			break;
 		}
+		case ABIL_HASTEN: {
+			affect_from_char_by_caster(ch, ATYPE_HASTEN, ch, TRUE);
+			break;
+		}
 		case ABIL_HEAVY_ARMOR: {
 			remove_armor_by_type(ch, ARMOR_HEAVY);
+			break;
+		}
+		case ABIL_HONE: {
+			remove_honed_gear(ch);
 			break;
 		}
 		case ABIL_LIGHT_ARMOR: {
@@ -198,7 +222,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			break;
 		}
 		case ABIL_MANASHIELD: {
-			affect_from_char(ch, ATYPE_MANASHIELD);
+			affect_from_char(ch, ATYPE_MANASHIELD, TRUE);
 			break;
 		}
 		case ABIL_MANTICORE: {
@@ -232,7 +256,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			if (affected_by_spell(ch, ATYPE_NIGHTSIGHT)) {
 				msg_to_char(ch, "You end your nightsight.\r\n");
 				act("The glow in $n's eyes fades.", TRUE, ch, NULL, NULL, TO_ROOM);
-				affect_from_char(ch, ATYPE_NIGHTSIGHT);
+				affect_from_char(ch, ATYPE_NIGHTSIGHT, TRUE);
 			}
 			break;
 		}
@@ -245,11 +269,11 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			break;
 		}
 		case ABIL_PHOENIX_RITE: {
-			affect_from_char(ch, ATYPE_PHOENIX_RITE);
+			affect_from_char(ch, ATYPE_PHOENIX_RITE, TRUE);
 			break;
 		}
 		case ABIL_RADIANCE: {
-			affect_from_char(ch, ATYPE_RADIANCE);
+			affect_from_char(ch, ATYPE_RADIANCE, TRUE);
 			break;
 		}
 		case ABIL_READY_FIREBALL: {
@@ -257,6 +281,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 				if (GET_OBJ_VNUM(obj) == o_FIREBALL) {
 					act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR);
 					unequip_char_to_inventory(ch, WEAR_WIELD);
+					determine_gear_level(ch);
 				}
 			}
 			break;
@@ -271,7 +296,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		case ABIL_RITUAL_OF_BURDENS: {
 			if (affected_by_spell(ch, ATYPE_UNBURDENED)) {
 				msg_to_char(ch, "Your burdens return.\r\n");
-				affect_from_char(ch, ATYPE_UNBURDENED);
+				affect_from_char(ch, ATYPE_UNBURDENED, TRUE);
 			}
 			break;
 		}
@@ -287,11 +312,12 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			if ((obj = GET_EQ(ch, WEAR_HOLD)) && IS_SHIELD(obj)) {
 				act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_HOLD), NULL, TO_CHAR);
 				unequip_char_to_inventory(ch, WEAR_HOLD);
+				determine_gear_level(ch);
 			}
 			break;
 		}
 		case ABIL_SIPHON: {
-			affect_from_char(ch, ATYPE_SIPHON);
+			affect_from_char(ch, ATYPE_SIPHON, TRUE);
 			break;
 		}
 		case ABIL_SKELETAL_HULK: {
@@ -303,7 +329,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			break;
 		}
 		case ABIL_SOULMASK: {
-			affect_from_char(ch, ATYPE_SOULMASK);
+			affect_from_char(ch, ATYPE_SOULMASK, TRUE);
 			break;
 		}
 		default: {
@@ -348,21 +374,40 @@ char *ability_color(char_data *ch, ability_data *abil) {
 
 
 /**
-* Gives an ability to a player.
+* Gives an ability to a player on any of their skill sets.
+*
+* @param char_data *ch The player to check.
+* @param ability_data *abil Any valid ability.
+* @param int skill_set Which skill set number (0..NUM_SKILL_SETS-1).
+* @param bool reset_levels If TRUE, wipes out the number of levels gained from the ability.
+*/
+void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels) {
+	struct player_ability_data *data = get_ability_data(ch, ABIL_VNUM(abil), TRUE);
+	
+	if (skill_set < 0 || skill_set >= NUM_SKILL_SETS) {
+		log("SYSERR: Attempting to give ability '%s' to player '%s' on invalid skill set '%d'", GET_NAME(ch), ABIL_NAME(abil), skill_set);
+		return;
+	}
+	
+	if (data) {
+		data->purchased[skill_set] = TRUE;
+		if (reset_levels) {
+			data->levels_gained = 0;
+		}
+		qt_change_ability(ch, ABIL_VNUM(abil));
+	}
+}
+
+
+/**
+* Gives an ability to a player on their current skill set.
 *
 * @param char_data *ch The player to check.
 * @param ability_data *abil Any valid ability.
 * @param bool reset_levels If TRUE, wipes out the number of levels gained from the ability.
 */
 void add_ability(char_data *ch, ability_data *abil, bool reset_levels) {
-	struct player_ability_data *data = get_ability_data(ch, ABIL_VNUM(abil), TRUE);
-	if (data) {
-		data->purchased = TRUE;
-		if (reset_levels) {
-			data->levels_gained = 0;
-		}
-		qt_change_ability(ch, ABIL_VNUM(abil));
-	}
+	add_ability_by_set(ch, abil, GET_CURRENT_SKILL_SET(ch), reset_levels);
 }
 
 
@@ -416,7 +461,7 @@ void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add) {
 */
 bool can_gain_skill_from(char_data *ch, ability_data *abil) {
 	// must have the ability and not gained too many from it
-	if (ABIL_ASSIGNED_SKILL(abil) && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < CLASS_SKILL_CAP && has_ability(ch, ABIL_VNUM(abil)) && levels_gained_from_ability(ch, abil) < GAINS_PER_ABILITY) {
+	if (ABIL_ASSIGNED_SKILL(abil) && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < SKILL_MAX_LEVEL(ABIL_ASSIGNED_SKILL(abil)) && has_ability(ch, ABIL_VNUM(abil)) && levels_gained_from_ability(ch, abil) < GAINS_PER_ABILITY) {
 		// these limit abilities purchased under each cap to players who are still under that cap
 		if (ABIL_SKILL_LEVEL(abil) >= BASIC_SKILL_CAP || get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < BASIC_SKILL_CAP) {
 			if (ABIL_SKILL_LEVEL(abil) >= SPECIALTY_SKILL_CAP || get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < SPECIALTY_SKILL_CAP) {
@@ -440,7 +485,7 @@ bool can_gain_skill_from(char_data *ch, ability_data *abil) {
 * @param any_vnum ability Any ABIL_ const or vnum.
 * @param int cost_pool HEALTH, MANA, MOVE, BLOOD (NOTHING if no charge).
 * @param int cost_amount Mana (or whatever) amount required, if any.
-* @param int cooldown_type Any COOLDOWN_x const, or NOTHING for no cooldown check.
+* @param int cooldown_type Any COOLDOWN_ const, or NOTHING for no cooldown check.
 * @return bool TRUE if ch can use ability; FALSE if not.
 */
 bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type) {
@@ -493,7 +538,7 @@ bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_am
 * @param char_data *ch The player or NPC.
 * @param int cost_pool HEALTH, MANA, MOVE, BLOOD (NOTHING if no charge).
 * @param int cost_amount Mana (or whatever) amount required, if any.
-* @param int cooldown_type Any COOLDOWN_x const to apply (NOTHING for none).
+* @param int cooldown_type Any COOLDOWN_ const to apply (NOTHING for none).
 * @param int cooldown_time Cooldown duration, if any.
 * @param int wait_type Any WAIT_x const or WAIT_NONE for no command lag.
 */
@@ -512,14 +557,76 @@ void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cool
 
 
 /**
-* removes all abilities for a player in a given skill
+* Checks one skill for a player, and removes and abilities that are above the
+* players range. If the player is overspent on points after that, the whole
+* ability is cleared.
+*
+* @param char_data *ch the player
+* @param any_vnum skill which skill, or NO_SKILL for all
+*/
+void check_ability_levels(char_data *ch, any_vnum skill) {
+	struct player_ability_data *abil, *next_abil;
+	empire_data *emp = GET_LOYALTY(ch);
+	bool all = (skill == NO_SKILL);
+	ability_data *abd;
+	int iter;
+	
+	if (IS_NPC(ch)) {	// somehow
+		return;
+	}
+	
+	// remove ability techs -- only if playing
+	if (emp && ch->desc && STATE(ch->desc) == CON_PLAYING) {
+		adjust_abilities_to_empire(ch, emp, FALSE);
+	}
+	
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
+		abd = abil->ptr;
+		
+		// is assigned to some skill
+		if (!ABIL_ASSIGNED_SKILL(abd)) {
+			continue;
+		}
+		// matches requested skill
+		if (!all && SKILL_VNUM(ABIL_ASSIGNED_SKILL(abd)) != skill) {
+			continue;
+		}
+		
+		if (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abd))) < ABIL_SKILL_LEVEL(abd)) {
+			// whoops too low
+			for (iter = 0; iter < NUM_SKILL_SETS; ++iter) {
+				if (abil->purchased[iter]) {
+					if (iter == GET_CURRENT_SKILL_SET(ch)) {
+						check_skill_sell(REAL_CHAR(ch), abil->ptr);
+					}
+					remove_ability_by_set(ch, abil->ptr, iter, FALSE);
+				}
+			}
+		}
+	}
+	
+	// check if they have too many points spent now (e.g. got early points)
+	if (get_ability_points_available(skill, get_skill_level(ch, skill)) < get_ability_points_spent(ch, skill)) {
+		clear_char_abilities(ch, skill);
+	}
+	
+	SAVE_CHAR(ch);
+	
+	// add ability techs -- only if playing
+	if (emp && ch->desc && STATE(ch->desc) == CON_PLAYING) {
+		adjust_abilities_to_empire(ch, emp, TRUE);
+		resort_empires(FALSE);
+	}
+}
+
+
+/**
+* removes all abilities for a player in a given skill on their CURRENT skill set
 *
 * @param char_data *ch the player
 * @param any_vnum skill which skill, or NO_SKILL for all
 */
 void clear_char_abilities(char_data *ch, any_vnum skill) {
-	void resort_empires();
-	
 	struct player_ability_data *abil, *next_abil;
 	empire_data *emp = GET_LOYALTY(ch);
 	bool all = (skill == NO_SKILL);
@@ -534,7 +641,7 @@ void clear_char_abilities(char_data *ch, any_vnum skill) {
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), abil, next_abil) {
 			abd = abil->ptr;
 			if (all || (ABIL_ASSIGNED_SKILL(abd) && SKILL_VNUM(ABIL_ASSIGNED_SKILL(abd)) == skill)) {
-				if (abil->purchased) {
+				if (abil->purchased[GET_CURRENT_SKILL_SET(ch)] && ABIL_SKILL_LEVEL(abd) > 0) {
 					check_skill_sell(REAL_CHAR(ch), abil->ptr);
 					remove_ability(ch, abil->ptr, FALSE);
 				}
@@ -545,7 +652,7 @@ void clear_char_abilities(char_data *ch, any_vnum skill) {
 		// add ability techs -- only if playing
 		if (emp && ch->desc && STATE(ch->desc) == CON_PLAYING) {
 			adjust_abilities_to_empire(ch, emp, TRUE);
-			resort_empires();
+			resort_empires(FALSE);
 		}
 	}
 }
@@ -636,6 +743,10 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount) {
 	int points;
 	
 	if (!ch || IS_NPC(ch) || !skill) {
+		return FALSE;
+	}
+	
+	if (!IS_APPROVED(ch) && config_get_bool("skill_gain_approval")) {
 		return FALSE;
 	}
 	
@@ -898,9 +1009,15 @@ int get_ability_points_spent(char_data *ch, any_vnum skill) {
 	}
 	
 	LL_FOREACH(SKILL_ABILITIES(skd), skab) {
-		if (has_ability(ch, skab->vnum)) {
-			++count;
+		if (skab->level <= 0) {
+			continue;	// skip level-0 abils
 		}
+		if (!has_ability(ch, skab->vnum)) {
+			continue;	// does not have ability
+		}
+		
+		// found
+		++count;
 	}
 	
 	return count;
@@ -1107,25 +1224,103 @@ void mark_level_gained_from_ability(char_data *ch, ability_data *abil) {
 
 
 /**
-* Takes an ability away from a player.
+* Switches a player's current skill set from one to the other.
+*
+* @param char_data *ch The player to swap.
+*/
+void perform_swap_skill_sets(char_data *ch) {
+	void assign_class_abilities(char_data *ch, class_data *cls, int role);
+	
+	struct player_ability_data *plab, *next_plab;
+	int cur_set, old_set;
+	ability_data *abil;
+	
+	if (IS_NPC(ch)) { // somehow...
+		return;
+	}
+	
+	// note: if you ever raise NUM_SKILL_SETS, this is going to need an update
+	old_set = GET_CURRENT_SKILL_SET(ch);
+	cur_set = (old_set == 1) ? 0 : 1;
+	
+	// remove ability techs
+	if (GET_LOYALTY(ch)) {
+		adjust_abilities_to_empire(ch, GET_LOYALTY(ch), FALSE);
+	}
+	
+	// update skill set
+	GET_CURRENT_SKILL_SET(ch) = cur_set;
+	
+	// update abilities:
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		abil = plab->ptr;
+		
+		if (ABIL_ASSIGNED_SKILL(abil) != NULL) {	// skill ability
+			if (plab->purchased[cur_set] && !plab->purchased[old_set]) {
+				// added
+				qt_change_ability(ch, ABIL_VNUM(abil));
+			}
+			else if (plab->purchased[old_set] && !plab->purchased[cur_set]) {
+				// removed
+				check_skill_sell(ch, abil);
+				qt_change_ability(ch, ABIL_VNUM(abil));
+			}
+		}
+		else {	// class ability: just ensure it matches the old one
+			plab->purchased[cur_set] = plab->purchased[old_set];
+			qt_change_ability(ch, ABIL_VNUM(abil));	// in case
+		}
+	}
+	
+	// call this at the end just in case
+	assign_class_abilities(ch, NULL, NOTHING);
+	affect_total(ch);
+	
+	// add ability techs -- only if playing
+	if (GET_LOYALTY(ch)) {
+		adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
+		resort_empires(FALSE);
+	}
+}
+
+
+/**
+* Takes an ability away from a player, on a given skill set.
+*
+* @param char_data *ch The player to check.
+* @param ability_data *abil Any ability.
+* @param int skill_set Which skill set number (0..NUM_SKILL_SETS-1).
+* @param bool reset_levels If TRUE, wipes out the number of levels gained from the ability.
+*/
+void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels) {
+	struct player_ability_data *data = get_ability_data(ch, ABIL_VNUM(abil), FALSE);
+	
+	if (skill_set < 0 || skill_set >= NUM_SKILL_SETS) {
+		log("SYSERR: Attempting to remove ability '%s' to player '%s' on invalid skill set '%d'", GET_NAME(ch), ABIL_NAME(abil), skill_set);
+		return;
+	}
+	
+	if (data) {
+		data->purchased[skill_set] = FALSE;
+		
+		if (reset_levels) {
+			data->levels_gained = 0;
+		}
+		
+		qt_change_ability(ch, ABIL_VNUM(abil));
+	}
+}
+
+
+/**
+* Takes an ability away from a player on their CURRENT set.
 *
 * @param char_data *ch The player to check.
 * @param ability_data *abil Any ability.
 * @param bool reset_levels If TRUE, wipes out the number of levels gained from the ability.
 */
 void remove_ability(char_data *ch, ability_data *abil, bool reset_levels) {
-	struct player_ability_data *data = get_ability_data(ch, ABIL_VNUM(abil), FALSE);
-	if (data) {
-		data->purchased = FALSE;
-		
-		// if we're also resetting the levels, just wipe out the whole entry
-		if (reset_levels) {
-			HASH_DEL(GET_ABILITY_HASH(ch), data);
-			free(data);
-		}
-		
-		qt_change_ability(ch, ABIL_VNUM(abil));
-	}
+	remove_ability_by_set(ch, abil, GET_CURRENT_SKILL_SET(ch), reset_levels);
 }
 
 
@@ -1230,7 +1425,6 @@ ACMD(do_noskill) {
 
 ACMD(do_skills) {
 	void clear_char_abilities(char_data *ch, any_vnum skill);
-	void resort_empires();
 	
 	char arg2[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], outbuf[MAX_STRING_LENGTH];
 	struct player_skill_data *skdata;
@@ -1330,7 +1524,7 @@ ACMD(do_skills) {
 		// re-add empire abilities
 		if (emp) {
 			adjust_abilities_to_empire(ch, emp, TRUE);
-			resort_empires();
+			resort_empires(FALSE);
 		}
 	}
 	else if (!strn_cmp(argument, "reset", 5)) {
@@ -1347,7 +1541,7 @@ ACMD(do_skills) {
 					continue;
 				}
 				
-				if (IS_IMMORTAL(ch) || get_skill_resets(ch, SKILL_VNUM(skill)) > 0) {
+				if (get_skill_resets(ch, SKILL_VNUM(skill)) > 0) {
 					msg_to_char(ch, "%s%s", (found ? ", " : ""), SKILL_NAME(skill));
 					if (get_skill_resets(ch, SKILL_VNUM(skill)) > 1) {
 						msg_to_char(ch, " (%d)", get_skill_resets(ch, SKILL_VNUM(skill)));
@@ -1393,23 +1587,63 @@ ACMD(do_skills) {
 		else if (!(skill = find_skill_by_name(arg))) {
 			msg_to_char(ch, "Unknown skill '%s'.\r\n", arg);
 		}
+		else if (SKILL_MIN_DROP_LEVEL(skill) >= CLASS_SKILL_CAP) {
+			msg_to_char(ch, "You can't drop your skill level in %s.\r\n", SKILL_NAME(skill));
+		}
 		else if (!is_number(arg2)) {
 			msg_to_char(ch, "Invalid level.\r\n");
 		}
 		else if ((level = atoi(arg2)) >= get_skill_level(ch, SKILL_VNUM(skill))) {
 			msg_to_char(ch, "You can only drop skills to lower levels.\r\n");
 		}
-		else if (level != 0 && level != BASIC_SKILL_CAP && level != SPECIALTY_SKILL_CAP) {
-			msg_to_char(ch, "You can only drop skills to the following levels: 0, %d, %d\r\n", BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP);
+		else if (level < SKILL_MIN_DROP_LEVEL(skill)) {
+			msg_to_char(ch, "You can't drop %s lower than %d.\r\n", SKILL_NAME(skill), SKILL_MIN_DROP_LEVEL(skill));
+		}
+		else if (level != SKILL_MIN_DROP_LEVEL(skill) && level != BASIC_SKILL_CAP && level != SPECIALTY_SKILL_CAP) {
+			if (SKILL_MIN_DROP_LEVEL(skill) < BASIC_SKILL_CAP) {
+				msg_to_char(ch, "You can only drop %s to the following levels: %d, %d, %d\r\n", SKILL_NAME(skill), SKILL_MIN_DROP_LEVEL(skill), BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP);
+			}
+			else if (SKILL_MIN_DROP_LEVEL(skill) < SPECIALTY_SKILL_CAP) {
+				msg_to_char(ch, "You can only drop %s to the following levels: %d, %d\r\n", SKILL_NAME(skill), SKILL_MIN_DROP_LEVEL(skill), SPECIALTY_SKILL_CAP);
+			}
+			else {
+				msg_to_char(ch, "You can only drop %s to the following levels: %d\r\n", SKILL_NAME(skill), SKILL_MIN_DROP_LEVEL(skill));
+			}
 		}
 		else {
 			// good to go!
-			msg_to_char(ch, "You have dropped your %s skill to %d and reset its abilities.\r\n", SKILL_NAME(skill), level);
+			msg_to_char(ch, "You have dropped your %s skill to %d and reset abilities above that level.\r\n", SKILL_NAME(skill), level);
 			set_skill(ch, SKILL_VNUM(skill), level);
 			update_class(ch);
-			clear_char_abilities(ch, SKILL_VNUM(skill));
+			check_ability_levels(ch, SKILL_VNUM(skill));
 			
 			SAVE_CHAR(ch);
+		}
+	}
+	else if (!str_cmp(argument, "swap")) {
+		if (IS_IMMORTAL(ch)) {
+			perform_swap_skill_sets(ch);
+			msg_to_char(ch, "You swap skill sets.\r\n");
+		}
+		else if (!config_get_bool("skill_swap_allowed")) {
+			msg_to_char(ch, "This game does not allow skill swap.\r\n");
+		}
+		else if (get_approximate_level(ch) < config_get_int("skill_swap_min_level")) {
+			msg_to_char(ch, "You must be at least level %d to swap skill sets.\r\n", config_get_int("skill_swap_min_level"));
+		}
+		else if (GET_POS(ch) < POS_STANDING) {
+			msg_to_char(ch, "You can't swap skill sets right now.\r\n");
+		}
+		else if (GET_ACTION(ch) == ACT_SWAP_SKILL_SETS) {
+			msg_to_char(ch, "You're already doing that. Type 'stop' to cancel.\r\n");
+		}
+		else if (GET_ACTION(ch) != ACT_NONE) {
+			msg_to_char(ch, "You're too busy to swap skill sets right now.\r\n");
+		}
+		else {
+			start_action(ch, ACT_SWAP_SKILL_SETS, 3);
+			act("You prepare to swap skill sets...", FALSE, ch, NULL, NULL, TO_CHAR);
+			act("$n prepares to swap skill sets...", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 	}
 	else if (IS_IMMORTAL(ch) && !strn_cmp(argument, "sell", 4)) {
@@ -1433,19 +1667,19 @@ ACMD(do_skills) {
 		}
 		
 		// good to go
-		remove_ability(ch, abil, FALSE);
 		msg_to_char(ch, "You no longer know %s.\r\n", ABIL_NAME(abil));
-		SAVE_CHAR(ch);
 
 		if (GET_LOYALTY(ch)) {
 			adjust_abilities_to_empire(ch, GET_LOYALTY(ch), FALSE);
 		}
 
+		remove_ability(ch, abil, FALSE);
 		check_skill_sell(ch, abil);
+		SAVE_CHAR(ch);
 		
 		if (GET_LOYALTY(ch)) {
 			adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
-			resort_empires();
+			resort_empires(FALSE);
 		}
 	}
 	else {
@@ -1493,6 +1727,9 @@ ACMD(do_specialize) {
 	}
 	else if (get_skill_level(ch, SKILL_VNUM(sk)) != BASIC_SKILL_CAP && get_skill_level(ch, SKILL_VNUM(sk)) != SPECIALTY_SKILL_CAP) {
 		msg_to_char(ch, "You can only specialize skills which are at %d or %d.\r\n", BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP);
+	}
+	else if (get_skill_level(ch, SKILL_VNUM(sk)) >= SKILL_MAX_LEVEL(sk)) {
+		msg_to_char(ch, "%s cannot go above %d.\r\n", SKILL_NAME(sk), SKILL_MAX_LEVEL(sk));
 	}
 	else {
 		// check > basic
@@ -1574,7 +1811,9 @@ bool can_gain_exp_from(char_data *ch, char_data *vict) {
 bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	char buf[MAX_STRING_LENGTH];
 	any_vnum abil = NO_ABIL;
+	struct obj_apply *app;
 	int iter, level_min;
+	bool honed;
 
 	// players won't be able to use gear >= these levels if their skill level is < the level
 	int skill_level_ranges[] = { CLASS_SKILL_CAP, SPECIALTY_SKILL_CAP, BASIC_SKILL_CAP, -1 };	// terminate with -1
@@ -1615,7 +1854,22 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	
 	if (abil != NO_ABIL && !has_ability(ch, abil)) {
 		if (send_messages) {
-			snprintf(buf, sizeof(buf), "You must purchase the %s ability to use $p.", get_ability_name_by_vnum(abil));
+			snprintf(buf, sizeof(buf), "You require the %s ability to use $p.", get_ability_name_by_vnum(abil));
+			act(buf, FALSE, ch, item, NULL, TO_CHAR);
+		}
+		return FALSE;
+	}
+	
+	// check honed
+	honed = FALSE;
+	LL_FOREACH(GET_OBJ_APPLIES(item), app) {
+		if (app->apply_type == APPLY_TYPE_HONED) {
+			honed = TRUE;
+		}
+	}
+	if (honed && !has_ability(ch, ABIL_HONE)) {
+		if (send_messages) {
+			snprintf(buf, sizeof(buf), "You require the %s ability to use $p.", get_ability_name_by_vnum(ABIL_HONE));
 			act(buf, FALSE, ch, item, NULL, TO_CHAR);
 		}
 		return FALSE;
@@ -1823,6 +2077,55 @@ char *get_skill_name_by_vnum(any_vnum vnum) {
 
 
 /**
+* Ensures the player has all level-zero abilities. These are abilities that all
+* players always have.
+*
+* @param char_data *ch The character to give the abilitiies to.
+*/
+void give_level_zero_abilities(char_data *ch) {
+	ability_data *abil, *next_abil;
+	int set;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		if (!ABIL_ASSIGNED_SKILL(abil)) {
+			continue;	// must be assigned
+		}
+		if (SKILL_FLAGGED(ABIL_ASSIGNED_SKILL(abil), SKILLF_IN_DEVELOPMENT)) {
+			continue;	// skip in-dev skills
+		}
+		if (ABIL_SKILL_LEVEL(abil) > 0) {
+			continue;	// must be level-0
+		}
+		
+		// ensure the character has a skill entry for the skill
+		get_skill_data(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)), TRUE);
+		
+		// check that the player has it
+		for (set = 0; set < NUM_SKILL_SETS; ++set) {
+			if (!has_ability_in_set(ch, ABIL_VNUM(abil), set)) {
+				// if current set, need to update empire abilities
+				if (set == GET_CURRENT_SKILL_SET(ch) && GET_LOYALTY(ch)) {
+					adjust_abilities_to_empire(ch, GET_LOYALTY(ch), FALSE);
+				}
+				
+				// add the ability for this set
+				add_ability_by_set(ch, abil, set, FALSE);
+				
+				// if current set, need to update empire abilities
+				if (set == GET_CURRENT_SKILL_SET(ch) && GET_LOYALTY(ch)) {
+					adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
+				}
+			}
+		}
+	}
+}
+
+
+/**
 * @param char_data *ch
 * @return bool TRUE if the character is somewhere he can cook, else FALSE
 */
@@ -1833,10 +2136,7 @@ bool has_cooking_fire(char_data *ch) {
 		return TRUE;
 	}
 
-	if (HAS_FUNCTION(IN_ROOM(ch), FNC_COOKING_FIRE)) {	
-		return TRUE;
-	}
-	if (RMT_FLAGGED(IN_ROOM(ch), RMT_COOKING_FIRE)) {	
+	if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_COOKING_FIRE)) {	
 		return TRUE;
 	}
 	
@@ -2026,7 +2326,7 @@ char *list_one_skill(skill_data *skill, bool detail) {
 */
 void olc_search_skill(char_data *ch, any_vnum vnum) {
 	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char buf[MAX_STRING_LENGTH];
 	skill_data *skill = find_skill_by_vnum(vnum);
@@ -2034,6 +2334,7 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 	quest_data *quest, *next_quest;
 	struct archetype_skill *arsk;
 	struct class_skill_req *clsk;
+	social_data *soc, *next_soc;
 	class_data *cls, *next_cls;
 	int size, found;
 	bool any;
@@ -2076,14 +2377,28 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 		any = find_quest_reward_in_list(QUEST_REWARDS(quest), QR_SET_SKILL, vnum);
 		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_SKILL_EXP, vnum);
 		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_SKILL_LEVELS, vnum);
-		any |= find_quest_task_in_list(QUEST_TASKS(quest), QT_SKILL_LEVEL_OVER, vnum);
-		any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_SKILL_LEVEL_OVER, vnum);
-		any |= find_quest_task_in_list(QUEST_TASKS(quest), QT_SKILL_LEVEL_UNDER, vnum);
-		any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_SKILL_LEVEL_UNDER, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_SKILL_LEVEL_OVER, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_SKILL_LEVEL_OVER, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_SKILL_LEVEL_UNDER, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_SKILL_LEVEL_UNDER, vnum);
 		
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+		}
+	}
+	
+	// socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_SKILL_LEVEL_OVER, vnum);
+		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_SKILL_LEVEL_UNDER, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -2209,6 +2524,7 @@ void clear_skill(skill_data *skill) {
 	memset((char *) skill, 0, sizeof(skill_data));
 	
 	SKILL_VNUM(skill) = NOTHING;
+	SKILL_MAX_LEVEL(skill) = CLASS_SKILL_CAP;
 }
 
 
@@ -2332,6 +2648,17 @@ void parse_skill(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case 'L': {	// additional level data
+				if (sscanf(line, "L %d %d", &int_in[0], &int_in[1]) != 2) {
+					log("SYSERR: Format error in L line of %s", error);
+					exit(1);
+				}
+				
+				SKILL_MAX_LEVEL(skill) = int_in[0];
+				SKILL_MIN_DROP_LEVEL(skill) = int_in[1];
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -2394,6 +2721,9 @@ void write_skill_to_file(FILE *fl, skill_data *skill) {
 		fprintf(fl, "A %d %d %d\n", iter->vnum, iter->prerequisite, iter->level);
 	}
 	
+	// L: additional level data
+	fprintf(fl, "L %d %d\n", SKILL_MAX_LEVEL(skill), SKILL_MIN_DROP_LEVEL(skill));
+	
 	// end
 	fprintf(fl, "S\n");
 }
@@ -2442,7 +2772,7 @@ skill_data *create_skill_table_entry(any_vnum vnum) {
 */
 void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
-	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
+	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	extern bool remove_vnum_from_class_skill_reqs(struct class_skill_req **list, any_vnum vnum);
 	
 	struct player_skill_data *plsk, *next_plsk;
@@ -2450,6 +2780,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	archetype_data *arch, *next_arch;
 	ability_data *abil, *next_abil;
 	quest_data *quest, *next_quest;
+	social_data *soc, *next_soc;
 	class_data *cls, *next_cls;
 	descriptor_data *desc;
 	skill_data *skill;
@@ -2504,14 +2835,25 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 		found = delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_SET_SKILL, vnum);
 		found |= delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_SKILL_EXP, vnum);
 		found |= delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_SKILL_LEVELS, vnum);
-		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_SKILL_LEVEL_OVER, vnum);
-		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_SKILL_LEVEL_OVER, vnum);
-		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_SKILL_LEVEL_UNDER, vnum);
-		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_SKILL_LEVEL_UNDER, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_SKILL_LEVEL_OVER, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_SKILL_LEVEL_OVER, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_SKILL_LEVEL_UNDER, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_SKILL_LEVEL_UNDER, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
+	// remove from socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_SKILL_LEVEL_OVER, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_SKILL_LEVEL_UNDER, vnum);
+		
+		if (found) {
+			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
 	
@@ -2557,14 +2899,23 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 			found = delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_SET_SKILL, vnum);
 			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_SKILL_EXP, vnum);
 			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_SKILL_LEVELS, vnum);
-			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_SKILL_LEVEL_OVER, vnum);
-			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_SKILL_LEVEL_OVER, vnum);
-			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_SKILL_LEVEL_UNDER, vnum);
-			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_SKILL_LEVEL_UNDER, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_SKILL_LEVEL_OVER, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_SKILL_LEVEL_OVER, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_SKILL_LEVEL_UNDER, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_SKILL_LEVEL_UNDER, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A skill used by the quest you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SOCIAL(desc)) {
+			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_SKILL_LEVEL_OVER, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_SKILL_LEVEL_UNDER, vnum);
+		
+			if (found) {
+				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A skill required by the social you are editing was deleted.\r\n");
 			}
 		}
 	}
@@ -2591,6 +2942,7 @@ void save_olc_skill(descriptor_data *desc) {
 	skill_data *proto, *skill = GET_OLC_SKILL(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
 	UT_hash_handle hh, sorted;
+	char_data *ch_iter, *next_ch;
 
 	// have a place to save it?
 	if (!(proto = find_skill_by_vnum(vnum))) {
@@ -2643,6 +2995,13 @@ void save_olc_skill(descriptor_data *desc) {
 	// ... and update some things
 	HASH_SRT(sorted_hh, sorted_skills, sort_skills_by_data);
 	read_ability_requirements();
+	
+	// update all players in case there are new level-0 abilities
+	LL_FOREACH_SAFE(character_list, ch_iter, next_ch) {
+		if (!IS_NPC(ch_iter)) {
+			give_level_zero_abilities(ch_iter);
+		}
+	}
 }
 
 
@@ -2867,6 +3226,8 @@ void do_stat_skill(char_data *ch, skill_data *skill) {
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Description: %s\r\n", SKILL_DESC(skill));
 	
+	size += snprintf(buf + size, sizeof(buf) - size, "Minimum drop level: [\tc%d\t0], Maximum level: [\tc%d\t0]\r\n", SKILL_MIN_DROP_LEVEL(skill), SKILL_MAX_LEVEL(skill));
+	
 	sprintbit(SKILL_FLAGS(skill), skill_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
 	
@@ -2906,6 +3267,9 @@ void olc_show_skill(char_data *ch) {
 	
 	sprintbit(SKILL_FLAGS(skill), skill_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<\tyflags\t0> %s\r\n", lbuf);
+	
+	sprintf(buf + strlen(buf), "<\tymaxlevel\t0> %d\r\n", SKILL_MAX_LEVEL(skill));
+	sprintf(buf + strlen(buf), "<\tymindrop\t0> %d\r\n", SKILL_MIN_DROP_LEVEL(skill));
 	
 	LL_COUNT(SKILL_ABILITIES(skill), skab, total);
 	sprintf(buf + strlen(buf), "<\tytree\t0> %d %s\r\n", total, total == 1 ? "ability" : "abilities");
@@ -2977,6 +3341,18 @@ OLC_MODULE(skilledit_flags) {
 }
 
 
+OLC_MODULE(skilledit_maxlevel) {
+	skill_data *skill = GET_OLC_SKILL(ch->desc);
+	SKILL_MAX_LEVEL(skill) = olc_process_number(ch, argument, "maximum level", "maxlevel", 1, CLASS_SKILL_CAP, SKILL_MAX_LEVEL(skill));
+}
+
+
+OLC_MODULE(skilledit_mindrop) {
+	skill_data *skill = GET_OLC_SKILL(ch->desc);
+	SKILL_MIN_DROP_LEVEL(skill) = olc_process_number(ch, argument, "minimum drop level", "mindrop", 0, CLASS_SKILL_CAP, SKILL_MIN_DROP_LEVEL(skill));
+}
+
+
 OLC_MODULE(skilledit_name) {
 	skill_data *skill = GET_OLC_SKILL(ch->desc);
 	olc_process_string(ch, argument, "name", &SKILL_NAME(skill));
@@ -2987,16 +3363,16 @@ OLC_MODULE(skilledit_tree) {
 	extern ability_data *find_ability_on_skill(char *name, skill_data *skill);
 
 	skill_data *skill = GET_OLC_SKILL(ch->desc);
-	char cmd_arg[MAX_INPUT_LENGTH], abil_arg[MAX_INPUT_LENGTH], sub_arg[MAX_INPUT_LENGTH];
+	char cmd_arg[MAX_INPUT_LENGTH], abil_arg[MAX_INPUT_LENGTH], sub_arg[MAX_INPUT_LENGTH], req_arg[MAX_INPUT_LENGTH];
 	struct skill_ability *skab, *next_skab, *change;
 	ability_data *abil = NULL, *requires = NULL;
 	bool all = FALSE, found, found_prq;
 	int level;
 	
 	argument = any_one_arg(argument, cmd_arg);
-	argument = any_one_arg(argument, abil_arg);
+	argument = any_one_word(argument, abil_arg);
 	argument = any_one_arg(argument, sub_arg);	// may be level or type
-	skip_spaces(&argument);	// may be requires ability or "new value"
+	argument = any_one_word(argument, req_arg);	// may be requires ability or "new value"
 	
 	// check for "all" arg
 	if (!str_cmp(abil_arg, "all")) {
@@ -3019,8 +3395,8 @@ OLC_MODULE(skilledit_tree) {
 		else if (!*sub_arg || !isdigit(*sub_arg) || (level = atoi(sub_arg)) < 0) {
 			msg_to_char(ch, "Add the ability at what level?\r\n");
 		}
-		else if (*argument && str_cmp(argument, "none") && !(requires = find_ability(argument))) {
-			msg_to_char(ch, "Invalid pre-requisite ability '%s'.\r\n", argument);
+		else if (*req_arg && str_cmp(req_arg, "none") && !(requires = find_ability(req_arg))) {
+			msg_to_char(ch, "Invalid pre-requisite ability '%s'.\r\n", req_arg);
 		}
 		else if (abil == requires) {
 			msg_to_char(ch, "It cannot require itself.\r\n");

@@ -12,7 +12,7 @@ See also: SWIMMING, FORAGE, SATED THIRST, RIDE, ALL-TERRAIN RIDING, HUNT,
           BY MOONLIGHT, NIGHTSIGHT, FINDER, FIND HERBS, RESIST POISON,
           POISON IMMUNITY, FISH, FIND SHELTER, NAVIGATION, TRACK,
           MASTER TRACKER, NO TRACE, BUTCHER, MOUNTAIN CLIMBING, STAMINA,
-          PATHFINDING, HERB GARDENS, MASTER SURVIVALIST
+          PATHFINDING, HERB GARDENS, MASTER SURVIVALIST, SCAVENGING
 #
 BUTCHER
 
@@ -21,10 +21,6 @@ Butcher (Survival ability)
 Usage:  butcher <corpse>
 
 With a little practice, you can butcher a corpse into smaller cuts of meat.
-If you butcher a corpse on the ground, its contents will end up on the ground.
-If you butcher one in your inventory, you will have its contents in your
-inventory.
-
 This ability can fail at low skill levels, giving you less meat (or none).
 
 Gains experience when you butcher something.
@@ -149,7 +145,8 @@ use the gardens as well.
 &b~&0##&b~&0 estuarygarden (river facing ocean)
 &g|&y##&g|&0 shadygarden (plains or forest)
 
-Only the estuarygarden requires a direction.
+Only the estuarygarden requires a direction. Gain skill by building any of the
+gardens.
 
 See also: BUILD, FIND HERBS, WORKFORCE, SKILLED LABOR
 #
@@ -180,6 +177,8 @@ All-Terrain Riding (Survival ability)
 
 Usage:  dismount
         mount [animal]
+        mount <list | swap> <keyword(s)>
+        mount release
 
 Once you have learned to Ride, travel becomes faster and easier. With All-
 Terrain Riding, you can coax your mount across rivers and mountains, too.
@@ -187,8 +186,9 @@ Riding lowers the delay during movement, as well as the movement point cost.
 
 When you dismount, the animal you were riding is stored. You can see it on your
 affects list. If you type "mount" again without targetting a new animal, you
-will re-mount your stored ride. If you target a new animal while you already
-have a stored mount, the old one will be released.
+will re-mount your stored ride. You can store more than one mount and swap them
+at a stable. If you target a new animal while you already have a stored mount,
+the new one will be added to your stored mounts.
 
 If you have a saddle in your inventory, you will automatically equip it when
 you mount up. The saddle will be removed automatically when you dismount. You
@@ -202,7 +202,7 @@ Riding only gains experience when you cross water or mountains while mounted.
 Note: The "ride" command can also be used to get onto carts and other ridable
 vehicles; this does not require any ability.
 
-See also: AFFECTS, BASIC CRAFTS, DRAGONRIDING, MOVEMENT POINTS
+See also: AFFECTS, BASIC CRAFTS, DRAGONRIDING, MOVEMENT POINTS, STABLEMASTER
 #
 MOUNTAIN "MOUNTAIN CLIMBING"
 
@@ -252,7 +252,8 @@ See also: BY MOONLIGHT
 No trace (Survival ability)
 
 A person who has learned to leave no trace can not be found using the "track"
-or "where" commands, but this ability only functions outdoors.
+or "where" commands, but this ability only functions outdoor in the wilderness.
+It also won't work in adventures at all.
 
 See also: TRACK, WHERE, UNSEEN PASSING
 #
@@ -271,16 +272,19 @@ Gains experience when you lay mountain roads.
 
 See also: ROADS
 #
-PICK 
+PICK
+
+Pick (Scavenging ability)
 
 Usage:  pick 
+Speed boosts:  Faster Chores bonus, Finder ability, haste
 
-Pick is used to pick flowers on the plains plains or fruit from an orchard. All
-you need is to be standing in one of these places and pick.
+Pick is used to pick flowers on the plains or fruit from an orchard. All you
+need is to be standing in one of these places and pick.
 
 You can find more if you have the right ability...
 
-See also: DEPLETION, FIND HERBS
+See also: DEPLETION, FIND HERBS, SCAVENGING
 #
 "RESIST POISON" "POISON IMMUNITY"
 
@@ -292,6 +296,35 @@ gives you a partial resistance and a chance to avoid being poisoned. Resist
 Poison also allows your physical resistance trait to apply to poison damage.
 
 Both of these abilities give experience only when they trigger.
+#
+SCAVENGING SCAVENGER
+
+Scavenging (Survival ability)
+
+You can find basic survival materials using various scavenging commands, and
+this is a good way to train the Survival skill at low levels.
+
+Scavenging commands:
+  dig
+  gather
+  pick
+
+See also: DIG, GATHER, PICK
+#
+STABLEMASTER "STABLE MASTER"
+
+Stablemaster (Survival ability)
+
+Usage:  mount <swap | list> <keyword(s)>
+        mount release
+
+Stablemaster allows you to change your active mount anywhere. It also lets you
+release your active mount so that it can be traded to others. Gains experience
+passively, as long as you have at least one mount.
+
+Without Stablemaster, you can't release your mount at all.
+
+See also: MOUNT
 #
 STAMINA
 

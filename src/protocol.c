@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: protocol.c                                      EmpireMUD 2.0b4 *
+*   File: protocol.c                                      EmpireMUD 2.0b5 *
 *  Usage: KaVir's protocol snippet                                        *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -96,7 +96,7 @@ static void CompressEnd(descriptor_t *apDescriptor) {
 */
 static const char s_Button1[] = "\005\002Help\002help\006";
 static const char s_Button2[] = "\005\002Look\002look\006";
-static const char s_Button3[] = "\005\002Score\002help\006";
+static const char s_Button3[] = "\005\002Score\002score\006";
 static const char s_Button4[] = "\005\002Equipment\002equipment\006";
 static const char s_Button5[] = "\005\002Inventory\002inventory\006";
 
@@ -195,6 +195,9 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] = {
 	{ eMSDP_OPPONENT_HEALTH_MAX, "OPPONENT_HEALTH_MAX", NUMBER_READ_ONLY },
 	{ eMSDP_OPPONENT_LEVEL, "OPPONENT_LEVEL", NUMBER_READ_ONLY },
 	{ eMSDP_OPPONENT_NAME, "OPPONENT_NAME", STRING_READ_ONLY },
+	{ eMSDP_OPPONENT_FOCUS_HEALTH, "OPPONENT_FOCUS_HEALTH", NUMBER_READ_ONLY },
+	{ eMSDP_OPPONENT_FOCUS_HEALTH_MAX, "OPPONENT_FOCUS_HEALTH_MAX", NUMBER_READ_ONLY },
+	{ eMSDP_OPPONENT_FOCUS_NAME, "OPPONENT_FOCUS_NAME", STRING_READ_ONLY },
 	
 	/* World */
 	{ eMSDP_AREA_NAME, "AREA_NAME", STRING_READ_ONLY },
@@ -346,7 +349,7 @@ static void want_reduced_color_codes(descriptor_data *desc, const char *fg, cons
 			desc->color.want_clean = FALSE;
 		}
 		// this happens even if the last one triggered
-		if (strcmp(bg, desc->color.want_bg) && (*desc->color.want_bg || strcmp(bg, desc->color.last_bg) || desc->color.want_clean)) {
+		if (strcmp(bg, desc->color.want_bg) && (*desc->color.want_bg || strcmp(bg, desc->color.last_bg) || desc->color.want_clean || (*desc->color.want_fg && strstr(desc->color.want_fg, "[0;")))) {
 			snprintf(desc->color.want_bg, COLREDUC_SIZE, "%s", bg);
 		}
 	}
@@ -363,6 +366,7 @@ static void want_reduced_color_clean(descriptor_data *desc) {
 		return;
 	}
 	desc->color.want_clean = TRUE;
+	desc->color.want_underline = FALSE;
 	*desc->color.want_fg = '\0';
 	*desc->color.want_bg = '\0';
 }
@@ -389,7 +393,7 @@ static void want_reduced_color_underline(descriptor_data *desc) {
 * @return char* The string of rendered color codes to send.
 */
 char *flush_reduced_color_codes(descriptor_data *desc) {
-	static char output[COLREDUC_SIZE * 3 + 1];	// guarantee enough room
+	static char output[COLREDUC_SIZE * 4 + 1];	// guarantee enough room
 	*output = '\0';
 	
 	if (!desc) {
@@ -397,8 +401,10 @@ char *flush_reduced_color_codes(descriptor_data *desc) {
 	}
 	
 	if (desc->color.want_clean) {
-		strcat(output, s_Clean);
-		desc->color.is_clean = TRUE;
+		if (!desc->color.is_clean) {
+			strcat(output, s_Clean);
+			desc->color.is_clean = TRUE;
+		}
 		desc->color.want_clean = FALSE;
 		desc->color.is_underline = FALSE;
 		*desc->color.last_fg = '\0';
@@ -418,8 +424,10 @@ char *flush_reduced_color_codes(descriptor_data *desc) {
 		desc->color.is_clean = FALSE;
 	}
 	if (desc->color.want_underline) {
-		strcat(output, s_Underline);
-		desc->color.is_underline = TRUE;
+		if (!desc->color.is_underline) {
+			strcat(output, s_Underline);
+			desc->color.is_underline = TRUE;
+		}
 		desc->color.want_underline = FALSE;
 		desc->color.is_clean = FALSE;
 	}
@@ -511,7 +519,7 @@ void ProtocolDestroy(protocol_t *apProtocol) {
 	free(apProtocol);
 }
 
-void ProtocolInput(descriptor_t *apDescriptor, char *apData, int aSize, char *apOut) {
+void ProtocolInput(descriptor_t *apDescriptor, char *apData, int aSize, char *apOut, int maxSize) {
 	static char CmdBuf[MAX_PROTOCOL_BUFFER+1];
 	static char IacBuf[MAX_PROTOCOL_BUFFER+1];
 	int CmdIndex = 0;
@@ -613,6 +621,9 @@ void ProtocolInput(descriptor_t *apDescriptor, char *apData, int aSize, char *ap
 				sprintf(MXPBuffer, "MXP version %s detected and enabled.\r\n", pProtocol->pMXPVersion);
 				InfoMessage(apDescriptor, MXPBuffer);
 			}
+			
+			// prevent treating this like a blank "enter to continue"
+			apDescriptor->no_nanny = TRUE;
 		}
 		else {	// In-band command
 			if (apData[Index] == (char)IAC) {
@@ -651,7 +662,8 @@ void ProtocolInput(descriptor_t *apDescriptor, char *apData, int aSize, char *ap
 	CmdBuf[CmdIndex] = '\0';
 
 	/* Copy the input buffer back to the player. */
-	strcat(apOut, CmdBuf);
+	strncat(apOut, CmdBuf, maxSize);
+	apOut[maxSize-1] = '\0';
 }
 
 const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *apLength) {
@@ -695,40 +707,40 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 					want_reduced_color_underline(apDescriptor);
 					break;
 				case 'r': /* dark red */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F300", s_DarkRed), NULL);
+					want_reduced_color_codes(apDescriptor, s_DarkRed, NULL);
 					break;
 				case 'R': /* light red */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F500", s_BoldRed), NULL);
+					want_reduced_color_codes(apDescriptor, s_BoldRed, NULL);
 					break;
 				case 'g': /* dark green */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F030", s_DarkGreen), NULL);
+					want_reduced_color_codes(apDescriptor, s_DarkGreen, NULL);
 					break;
 				case 'G': /* light green */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F050", s_BoldGreen), NULL);
+					want_reduced_color_codes(apDescriptor, s_BoldGreen, NULL);
 					break;
 				case 'y': /* dark yellow */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F330", s_DarkYellow), NULL);
+					want_reduced_color_codes(apDescriptor, s_DarkYellow, NULL);
 					break;
 				case 'Y': /* light yellow */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F550", s_BoldYellow), NULL);
+					want_reduced_color_codes(apDescriptor, s_BoldYellow, NULL);
 					break;
 				case 'b': /* dark blue */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F003", s_DarkBlue), NULL);
+					want_reduced_color_codes(apDescriptor, s_DarkBlue, NULL);
 					break;
 				case 'B': /* light blue */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F005", s_BoldBlue), NULL);
+					want_reduced_color_codes(apDescriptor, s_BoldBlue, NULL);
 					break;
 				case 'm': /* dark magenta */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F303", s_DarkMagenta), NULL);
+					want_reduced_color_codes(apDescriptor, s_DarkMagenta, NULL);
 					break;
 				case 'M': /* light magenta */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F505", s_BoldMagenta), NULL);
+					want_reduced_color_codes(apDescriptor, s_BoldMagenta, NULL);
 					break;
 				case 'c': /* dark cyan */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F033", s_DarkCyan), NULL);
+					want_reduced_color_codes(apDescriptor, s_DarkCyan, NULL);
 					break;
 				case 'C': /* light cyan */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F055", s_BoldCyan), NULL);
+					want_reduced_color_codes(apDescriptor, s_BoldCyan, NULL);
 					break;
 				case 'w': /* dark white */
 					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F222", s_DarkWhite), NULL);
@@ -978,40 +990,40 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 					want_reduced_color_underline(apDescriptor);
 					break;
 				case 'r': /* dark red */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F300", s_DarkRed), NULL);
+					want_reduced_color_codes(apDescriptor, s_DarkRed, NULL);
 					break;
 				case 'R': /* light red */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F500", s_BoldRed), NULL);
+					want_reduced_color_codes(apDescriptor, s_BoldRed, NULL);
 					break;
 				case 'g': /* dark green */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F030", s_DarkGreen), NULL);
+					want_reduced_color_codes(apDescriptor, s_DarkGreen, NULL);
 					break;
 				case 'G': /* light green */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F050", s_BoldGreen), NULL);
+					want_reduced_color_codes(apDescriptor, s_BoldGreen, NULL);
 					break;
 				case 'y': /* dark yellow */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F330", s_DarkYellow), NULL);
+					want_reduced_color_codes(apDescriptor, s_DarkYellow, NULL);
 					break;
 				case 'Y': /* light yellow */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F550", s_BoldYellow), NULL);
+					want_reduced_color_codes(apDescriptor, s_BoldYellow, NULL);
 					break;
 				case 'b': /* dark blue */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F003", s_DarkBlue), NULL);
+					want_reduced_color_codes(apDescriptor, s_DarkBlue, NULL);
 					break;
 				case 'B': /* light blue */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F005", s_BoldBlue), NULL);
+					want_reduced_color_codes(apDescriptor, s_BoldBlue, NULL);
 					break;
 				case 'm': /* dark magenta */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F303", s_DarkMagenta), NULL);
+					want_reduced_color_codes(apDescriptor, s_DarkMagenta, NULL);
 					break;
 				case 'M': /* light magenta */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F505", s_BoldMagenta), NULL);
+					want_reduced_color_codes(apDescriptor, s_BoldMagenta, NULL);
 					break;
 				case 'c': /* dark cyan */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F033", s_DarkCyan), NULL);
+					want_reduced_color_codes(apDescriptor, s_DarkCyan, NULL);
 					break;
 				case 'C': /* light cyan */
-					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F055", s_BoldCyan), NULL);
+					want_reduced_color_codes(apDescriptor, s_BoldCyan, NULL);
 					break;
 				case 'w': /* dark white */
 					want_reduced_color_codes(apDescriptor, ColourRGB(apDescriptor, "F222", s_DarkWhite), NULL);
@@ -1138,7 +1150,7 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 		else {	// Just copy the character normally
 			// display and flush color codes
 			const char *temp = flush_reduced_color_codes(apDescriptor);
-			while (*temp != '\0' && i < MAX_OUTPUT_BUFFER) {
+			while (*temp != '\0' && i < MAX_OUTPUT_BUFFER-1) {
 				Result[i++] = *temp++;
 			}
 			
@@ -1147,9 +1159,11 @@ const char *ProtocolOutput(descriptor_t *apDescriptor, const char *apData, int *
 		}
 	}
 
-	/* If we'd overflow the buffer, we don't send any output */
+	// truncate and overflow
 	if (i >= MAX_OUTPUT_BUFFER) {
-		i = 0;
+		const char *overflow = "**OVERFLOW**\r\n";
+		strcpy(Result + (MAX_OUTPUT_BUFFER - (strlen(overflow) + 1)), overflow);
+		i = MAX_OUTPUT_BUFFER - 1;
 		ReportBug("ProtocolOutput: Too much outgoing data to store in the buffer.\n");
 	}
 
@@ -1639,7 +1653,7 @@ const char *ColourRGB(descriptor_t *apDescriptor, const char *apRGB, const char 
 		return ansiBackup;
 	}
 
-	if (pProtocol && pProtocol->pVariables[eMSDP_ANSI_COLORS]->ValueInt && (!apDescriptor->character || !PRF_FLAGGED(REAL_CHAR(apDescriptor->character), PRF_SCREEN_READER))) {
+	if (pProtocol && pProtocol->pVariables[eMSDP_ANSI_COLORS]->ValueInt) {
 		if (IsValidColour(apRGB)) {
 			bool_t bBackground = (tolower(apRGB[0]) == 'b');
 			int Red = apRGB[1] - '0';
@@ -2196,38 +2210,38 @@ static bool_t ConfirmNegotiation(descriptor_t *apDescriptor, negotiated_t aProto
 			if (abSendReply) {
 				switch (aProtocol) {
 					case eNEGOTIATED_TTYPE:
-						SendNegotiationSequence(apDescriptor, abWillDo ? DO : DONT, TELOPT_TTYPE);
+						SendNegotiationSequence(apDescriptor, (char) (abWillDo ? DO : DONT), TELOPT_TTYPE);
 						break;
 					case eNEGOTIATED_ECHO:
-						SendNegotiationSequence(apDescriptor, abWillDo ? WILL : WONT, TELOPT_ECHO);
+						SendNegotiationSequence(apDescriptor, (char) (abWillDo ? WILL : WONT), TELOPT_ECHO);
 						break;
 					case eNEGOTIATED_NAWS:
-						SendNegotiationSequence(apDescriptor, abWillDo ? DO : DONT, TELOPT_NAWS);
+						SendNegotiationSequence(apDescriptor, (char) (abWillDo ? DO : DONT), TELOPT_NAWS);
 						break;
 					case eNEGOTIATED_CHARSET:
-						SendNegotiationSequence(apDescriptor, abWillDo ? DO : DONT, TELOPT_CHARSET);
+						SendNegotiationSequence(apDescriptor, (char) (abWillDo ? DO : DONT), TELOPT_CHARSET);
 						break;
 					case eNEGOTIATED_MSDP:
-						SendNegotiationSequence(apDescriptor, abWillDo ? WILL : WONT, TELOPT_MSDP);
+						SendNegotiationSequence(apDescriptor, (char) (abWillDo ? WILL : WONT), TELOPT_MSDP);
 						break;
 					case eNEGOTIATED_MSSP:
-						SendNegotiationSequence(apDescriptor, abWillDo ? WILL : WONT, TELOPT_MSSP);
+						SendNegotiationSequence(apDescriptor, (char) (abWillDo ? WILL : WONT), TELOPT_MSSP);
 						break;
 					case eNEGOTIATED_ATCP:
-						SendNegotiationSequence(apDescriptor, abWillDo ? DO : DONT, (char)TELOPT_ATCP);
+						SendNegotiationSequence(apDescriptor, (char) (abWillDo ? DO : DONT), (char)TELOPT_ATCP);
 						break;
 					case eNEGOTIATED_MSP:
-						SendNegotiationSequence(apDescriptor, abWillDo ? WILL : WONT, TELOPT_MSP);
+						SendNegotiationSequence(apDescriptor, (char) (abWillDo ? WILL : WONT), TELOPT_MSP);
 						break;
 					case eNEGOTIATED_MXP:
-						SendNegotiationSequence(apDescriptor, abWillDo ? DO : DONT, TELOPT_MXP);
+						SendNegotiationSequence(apDescriptor, (char) (abWillDo ? DO : DONT), TELOPT_MXP);
 						break;
 					case eNEGOTIATED_MXP2:
-						SendNegotiationSequence(apDescriptor, abWillDo ? WILL : WONT, TELOPT_MXP);
+						SendNegotiationSequence(apDescriptor, (char) (abWillDo ? WILL : WONT), TELOPT_MXP);
 						break;
 					case eNEGOTIATED_MCCP:
 						#ifdef USING_MCCP
-							SendNegotiationSequence(apDescriptor, abWillDo ? WILL : WONT, TELOPT_MCCP);
+							SendNegotiationSequence(apDescriptor, (char) (abWillDo ? WILL : WONT), TELOPT_MCCP);
 						#endif /* USING_MCCP */
 						break;
 					default: {

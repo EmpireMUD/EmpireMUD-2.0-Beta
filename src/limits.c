@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: limits.c                                        EmpireMUD 2.0b4 *
+*   File: limits.c                                        EmpireMUD 2.0b5 *
 *  Usage: Periodic updates and limiters                                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -39,7 +39,6 @@
 
 // external vars
 extern const char *affect_wear_off_msgs[];
-extern int daily_cycle;
 extern const char *dirs[];
 extern const char *from_dir[];
 extern const struct material_data materials[NUM_MATERIALS];
@@ -50,6 +49,7 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 extern obj_data *die(char_data *ch, char_data *killer);
 void death_log(char_data *ch, char_data *killer, int type);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
+extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
@@ -85,6 +85,10 @@ void check_attribute_gear(char_data *ch) {
 	
 	// don't bother if morphed -- let them keep using gear, but not equip any more
 	if (IS_MORPHED(ch)) {
+		return;
+	}
+	// don't remove gear while fighting
+	if (FIGHTING(ch)) {
 		return;
 	}
 	
@@ -127,6 +131,10 @@ void check_attribute_gear(char_data *ch) {
 			}
 		}
 	}
+	
+	if (found) {
+		determine_gear_level(ch);
+	}
 }
 
 
@@ -166,7 +174,7 @@ void check_expired_cooldowns(void) {
 	descriptor_data *d;
 	
 	for (d = descriptor_list; d; d = d->next) {
-		if (STATE(d) == CON_PLAYING && (ch = d->character) && !PLR_FLAGGED(ch, PLR_WRITING)) {
+		if (STATE(d) == CON_PLAYING && (ch = d->character)) {
 			for (cool = ch->cooldowns; cool; cool = next_cool) {
 				next_cool = cool->next;
 				
@@ -211,7 +219,7 @@ void check_idle_passwords(void) {
 *
 * @param char_data *ch The person to check.
 */
-void check_idling(char_data *ch) {	
+void check_idling(char_data *ch) {
 	if (IS_NPC(ch)) {
 		return;
 	}
@@ -220,6 +228,90 @@ void check_idling(char_data *ch) {
 
 	if ((ch->desc && ch->char_specials.timer > config_get_int("idle_rent_time")) || (!ch->desc && ch->char_specials.timer > config_get_int("idle_linkdead_rent_time"))) {
 		perform_idle_out(ch);
+	}
+}
+
+
+/**
+* This function looks for mobs that are stuck in a pointless fight. This is
+* a fight where nobody is able to attack. If the mob is in such a state, this
+* function will cancel the fight.
+*
+* @param char_data *mob The mob to check.
+*/
+void check_pointless_fight(char_data *mob) {
+	char_data *iter;
+	bool any;
+	
+	#define IS_POINTLESS(ch)  (GET_HEALTH(ch) <= 0 || MOB_FLAGGED(ch, MOB_NO_ATTACK))
+	
+	if (!FIGHTING(mob) || !IS_POINTLESS(mob)) {
+		return;	// mob is not pointless (or not fighting)
+	}
+	if (FIGHTING(FIGHTING(mob)) && !IS_POINTLESS(FIGHTING(mob))) {
+		return;	// mob is fighting a non-pointless enemy
+	}
+	
+	any = FALSE;
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(mob)), iter, next_in_room) {
+		if (iter == mob || FIGHTING(iter) != mob) {
+			continue;	// only care about people fighting mob
+		}
+		if (!IS_POINTLESS(iter)) {
+			any = TRUE;
+			break;
+		}
+	}
+	
+	// did with find ANY non-pointless people hitting the mob?
+	if (!any) {
+		// stop mob
+		stop_fighting(mob);
+		
+		// stop everyone hitting mob
+		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(mob)), iter, next_in_room) {
+			if (FIGHTING(iter) == mob) {
+				stop_fighting(iter);
+			}
+		}
+	}
+}
+
+
+/**
+* Determines if a player can really be riding. Dismounts them if not.
+*
+* @param char_data *ch The player to check.
+*/
+void check_should_dismount(char_data *ch) {
+	ACMD(do_dismount);
+	
+	bool ok = TRUE;
+	
+	if (!IS_RIDING(ch)) {
+		return;	// nm
+	}
+	else if (IS_MORPHED(ch)) {
+		ok = FALSE;
+	}
+	else if (IS_COMPLETE(IN_ROOM(ch)) && !BLD_ALLOWS_MOUNTS(IN_ROOM(ch))) {
+		ok = FALSE;
+	}
+	else if (GET_SITTING_ON(ch)) {
+		ok = FALSE;
+	}
+	else if (MOUNT_FLAGGED(ch, MOUNT_FLYING) && !CAN_RIDE_FLYING_MOUNT(ch)) {
+		ok = FALSE;
+	}
+	else if (DEEP_WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
+		ok = FALSE;
+	}
+	else if (!has_ability(ch, ABIL_ALL_TERRAIN_RIDING) && WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
+		ok = FALSE;
+	}
+	
+	if (!ok) {
+		do_dismount(ch, "", 0, 0);
 	}
 }
 
@@ -268,8 +360,7 @@ int limit_crowd_control(char_data *victim, int atype) {
 	for (iter = ROOM_PEOPLE(IN_ROOM(victim)); iter; iter = iter->next_in_room) {
 		if (iter != victim && affected_by_spell(iter, atype)) {
 			++count;
-			affect_from_char(iter, atype);
-			act("You recover.", FALSE, iter, NULL, NULL, TO_CHAR);
+			affect_from_char(iter, atype, TRUE);	// sends message
 			act("$n recovers.", TRUE, iter, NULL, NULL, TO_ROOM);
 		}
 	}
@@ -287,18 +378,41 @@ int limit_crowd_control(char_data *victim, int atype) {
 */
 void point_update_char(char_data *ch) {
 	void despawn_mob(char_data *ch);
+	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);
 	void remove_quest_items(char_data *ch);
 	
 	struct cooldown_data *cool, *next_cool;
+	struct instance_data *inst;
+	obj_data *obj, *next_obj;
 	empire_data *emp;
 	char_data *c;
 	bool found;
+	
+	if (IS_NPC(ch) && FIGHTING(ch)) {
+		check_pointless_fight(ch);
+	}
 	
 	if (!IS_NPC(ch)) {
 		emp = GET_LOYALTY(ch);
 		
 		// check bad quest items
 		remove_quest_items(ch);
+		
+		// check way over-inventory (2x overburdened)
+		if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
+			found = FALSE;
+			LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+				if (IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
+					if (!found) {
+						found = TRUE;
+						msg_to_char(ch, "You are way overburdened and begin losing items...\r\n");
+					}
+					if (perform_drop(ch, obj, SCMD_DROP, "drop") <= 0) {
+						perform_drop(ch, obj, SCMD_JUNK, "lose");
+					}
+				}
+			}
+		}
 		
 		if (IS_BLOOD_STARVED(ch)) {
 			msg_to_char(ch, "You are starving!\r\n");
@@ -320,6 +434,10 @@ void point_update_char(char_data *ch) {
 		gain_ability_exp(ch, ABIL_COMMERCE, 2);
 		gain_ability_exp(ch, ABIL_SATED_THIRST, 2);
 		
+		if (GET_MOUNT_LIST(ch)) {
+			gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
+		}
+		
 		if (IS_VAMPIRE(ch)) {
 			gain_ability_exp(ch, ABIL_UNNATURAL_THIRST, 2);
 		}
@@ -338,7 +456,7 @@ void point_update_char(char_data *ch) {
 	}
 	
 	// check spawned
-	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && (!MOB_FLAGGED(ch, MOB_ANIMAL) || !HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE)) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN)) {
+	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && (!MOB_FLAGGED(ch, MOB_ANIMAL) || !room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE)) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN)) {
 		if (!GET_LED_BY(ch) && !GET_LEADING_MOB(ch) && !GET_LEADING_VEHICLE(ch) && !MOB_FLAGGED(ch, MOB_TIED)) {
 			if (distance_to_nearest_player(IN_ROOM(ch)) > config_get_int("mob_despawn_radius")) {
 				despawn_mob(ch);
@@ -348,7 +466,7 @@ void point_update_char(char_data *ch) {
 	}
 	
 	// bloody upkeep
-	if (IS_VAMPIRE(ch) && !IS_IMMORTAL(ch)) {
+	if (IS_VAMPIRE(ch) && !IS_IMMORTAL(ch) && !IS_NPC(ch)) {
 		GET_BLOOD(ch) -= MAX(0, GET_BLOOD_UPKEEP(ch));
 		
 		if (GET_BLOOD(ch) < 0) {
@@ -356,7 +474,7 @@ void point_update_char(char_data *ch) {
 			return;
 		}
 	}
-	else {	// not a vampire (or is imm)
+	else {	// not a vampire (or is imm/npc)
 		// don't gain blood whilst being fed upon
 		if (GET_FED_ON_BY(ch) == NULL) {
 			GET_BLOOD(ch) = MIN(GET_BLOOD(ch) + 1, GET_MAX_BLOOD(ch));
@@ -365,23 +483,33 @@ void point_update_char(char_data *ch) {
 
 	// healing for NPCs -- pcs are in real_update
 	if (IS_NPC(ch)) {
-		if (GET_POS(ch) >= POS_STUNNED) {
-			if (!FIGHTING(ch) && (GET_HEALTH(ch) < GET_MAX_HEALTH(ch) || GET_MOVE(ch) < GET_MAX_MOVE(ch) || GET_MANA(ch) < GET_MAX_MANA(ch))) {
-				// verify not fighting at all
-				for (c = ROOM_PEOPLE(IN_ROOM(ch)), found = FALSE; c && !found; c = c->next_in_room) {
-					if (FIGHTING(c) == ch) {
-						found = TRUE;
-					}
+		if (GET_POS(ch) >= POS_STUNNED && !FIGHTING(ch) && !GET_FED_ON_BY(ch)) {
+			// verify not fighting at all
+			for (c = ROOM_PEOPLE(IN_ROOM(ch)), found = FALSE; c && !found; c = c->next_in_room) {
+				if (FIGHTING(c) == ch) {
+					found = TRUE;
 				}
+			}
 			
+			if (!found) {
 				// not fighting for a tick? full health! (and reset tags)
-				if (!found) {
-					free_mob_tags(&MOB_TAGGED_BY(ch));
-					GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
-					GET_MOVE(ch) = GET_MAX_MOVE(ch);
-					GET_MANA(ch) = GET_MAX_MANA(ch);
-					if (GET_POS(ch) < POS_SLEEPING) {
-						GET_POS(ch) = POS_STANDING;
+				free_mob_tags(&MOB_TAGGED_BY(ch));
+				GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
+				GET_MOVE(ch) = GET_MAX_MOVE(ch);
+				GET_MANA(ch) = GET_MAX_MANA(ch);
+				if (GET_POS(ch) < POS_SLEEPING) {
+					GET_POS(ch) = POS_STANDING;
+				}
+				
+				// reset scaling if possible...
+				if (!MOB_FLAGGED(ch, MOB_NO_RESCALE)) {
+					inst = get_instance_by_id(MOB_INSTANCE_ID(ch));
+					if (!inst && IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+						inst = find_instance_by_room(IN_ROOM(ch), FALSE);
+					}
+					// if no instance or not level-locked
+					if (!inst || inst->level <= 0) {
+						GET_CURRENT_SCALE_LEVEL(ch) = 0;
 					}
 				}
 			}
@@ -426,27 +554,39 @@ void point_update_char(char_data *ch) {
 void real_update_char(char_data *ch) {
 	void adventure_unsummon(char_data *ch);
 	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
+	void check_combat_end(char_data *ch);
 	void check_morph_ability(char_data *ch);
+	void combat_meter_damage_dealt(char_data *ch, int amt);
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	void do_unseat_from_vehicle(char_data *ch);
-	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);	
+	extern bool fail_daily_quests(char_data *ch);
 	void random_encounter(char_data *ch);
 	void update_biting_char(char_data *ch);
 	void update_vampire_sun(char_data *ch);
 	
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *af, *next_af, *immune;
-	char_data *room_ch, *next_ch;
+	char_data *room_ch, *next_ch, *caster;
 	int result, iter, type;
 	int fol_count, gain;
+	bool found, took_dot;
+	
+	// check for end of meters (in case it was missed in the fight code)
+	if (!FIGHTING(ch)) {
+		check_combat_end(ch);
+	}
 	
 	// first check location: this may move the player
-	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && !find_instance_by_room(IN_ROOM(ch), FALSE)) {
 		adventure_unsummon(ch);
 	}
 	
 	if (!IS_NPC(ch) && IS_MORPHED(ch)) {
 		check_morph_ability(ch);
+	}
+	
+	if (!IS_NPC(ch) && IS_RIDING(ch)) {
+		check_should_dismount(ch);
 	}
 	
 	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_VEHICLE(ch))) {
@@ -473,6 +613,13 @@ void real_update_char(char_data *ch) {
 		extract_char(ch);
 		return;
 	}
+	// earthmeld damage
+	if (!IS_NPC(ch) && !IS_IMMORTAL(ch) && AFF_FLAGGED(ch, AFF_EARTHMELD) && ROOM_IS_CLOSED(IN_ROOM(ch))) {
+		if (!affected_by_spell(ch, ATYPE_NATURE_BURN)) {
+			msg_to_char(ch, "You are beneath a building and begin taking nature burn as the earth you're buried in is separated from fresh air...\r\n");
+		}
+		apply_dot_effect(ch, ATYPE_NATURE_BURN, 6, DAM_MAGICAL, 5, 60, ch);
+	}
 	
 	// update affects (NPCs get this, too)
 	for (af = ch->affected; af; af = next_af) {
@@ -483,9 +630,7 @@ void real_update_char(char_data *ch) {
 		else if (af->duration != UNLIMITED) {
 			if ((af->type > 0)) {
 				if (!af->next || (af->next->type != af->type) || (af->next->duration > 0)) {
-					if (ch->desc && *affect_wear_off_msgs[af->type]) {
-						msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', affect_wear_off_msgs[af->type]);
-					}
+					show_wear_off_msg(ch, af->type);
 				}
 			}
 			
@@ -505,6 +650,7 @@ void real_update_char(char_data *ch) {
 	}
 
 	// update DoTs (NPCs get this, too)
+	took_dot = FALSE;
 	for (dot = ch->over_time_effects; dot; dot = next_dot) {
 		next_dot = dot->next;
 		
@@ -514,8 +660,12 @@ void real_update_char(char_data *ch) {
 			ATTACK_PHYSICAL_DOT
 		));
 		
-		result = damage(ch, ch, dot->damage * dot->stack, type, dot->damage_type);
-		if (result < 0 || EXTRACTED(ch) || IS_DEAD(ch)) {
+		caster = find_player_in_room_by_id(IN_ROOM(ch), dot->cast_by);
+		result = damage(caster ? caster : ch, ch, dot->damage * dot->stack, type, dot->damage_type);
+		if (result > 0 && caster) {
+			took_dot = TRUE;
+		}
+		else if (result < 0 || EXTRACTED(ch) || IS_DEAD(ch)) {
 			return;
 		}
 		
@@ -525,8 +675,8 @@ void real_update_char(char_data *ch) {
 		}
 		else if (dot->duration != UNLIMITED) {
 			// expired
-			if (dot->type > 0 && ch->desc && *affect_wear_off_msgs[dot->type]) {
-				msg_to_char(ch, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_STATUS) : '0', affect_wear_off_msgs[dot->type]);
+			if (dot->type > 0) {
+				show_wear_off_msg(ch, dot->type);
 			}
 			dot_remove(ch, dot);
 		}
@@ -566,17 +716,25 @@ void real_update_char(char_data *ch) {
 	}
 
 	// periodic exp and skill gain
-	if (GET_DAILY_CYCLE(ch) < daily_cycle) {
+	if (GET_DAILY_CYCLE(ch) < data_get_long(DATA_DAILY_CYCLE)) {
 		// other stuff that resets daily
-		GET_DAILY_BONUS_EXPERIENCE(ch) = compute_bonus_exp_per_day(ch);
+		gain = compute_bonus_exp_per_day(ch);
+		if (GET_DAILY_BONUS_EXPERIENCE(ch) < gain) {
+			GET_DAILY_BONUS_EXPERIENCE(ch) = gain;
+		}
+		GET_DAILY_QUESTS(ch) = 0;
 		for (iter = 0; iter < MAX_REWARDS_PER_DAY; ++iter) {
 			GET_REWARDED_TODAY(ch, iter) = -1;
 		}
 		
-		msg_to_char(ch, "&yYour daily bonus experience has reset!&0\r\n");
+		msg_to_char(ch, "&yYour daily quests and bonus experience have reset!&0\r\n");
+		
+		if (fail_daily_quests(ch)) {
+			msg_to_char(ch, "Your daily quests expire.\r\n");
+		}
 		
 		// update to this cycle so it only happens once a day
-		GET_DAILY_CYCLE(ch) = daily_cycle;
+		GET_DAILY_CYCLE(ch) = data_get_long(DATA_DAILY_CYCLE);
 	}
 
 	/* Update conditions */
@@ -608,23 +766,29 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// less drunk
-	gain_condition(ch, DRUNK, -1);
+	gain_condition(ch, DRUNK, AWAKE(ch) ? -1 : -6);
 	
 	// ensure character isn't under on primary attributes
 	check_attribute_gear(ch);
 	
 	// ensure character isn't using any gear they shouldn't be
+	found = FALSE;
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (wear_data[iter].count_stats && GET_EQ(ch, iter) && !can_wear_item(ch, GET_EQ(ch, iter), TRUE)) {
 			// can_wear_item sends own message to ch
 			act("$n stops using $p.", TRUE, ch, GET_EQ(ch, iter), NULL, TO_ROOM);
 			// this may extract it
 			unequip_char_to_inventory(ch, iter);
+			found = TRUE;
 		}
+	}
+	if (found) {
+		determine_gear_level(ch);
 	}
 
 	/* moving on.. */
 	if (GET_POS(ch) < POS_STUNNED || (GET_POS(ch) == POS_STUNNED && health_gain(ch, TRUE) <= 0)) {
+		GET_HEALTH(ch) = MIN(0, GET_HEALTH(ch));	// fixing? a bug where a player whose health is positve but is in a bleeding out position, would not bleed out right away (but couldn't recover)
 		GET_HEALTH(ch) -= 1;
 		update_pos(ch);
 		if (GET_POS(ch) == POS_DEAD) {
@@ -644,9 +808,11 @@ void real_update_char(char_data *ch) {
 	}
 
 	// regenerate: do not put move_gain and mana_gain inside of MIN/MAX macros -- this will call them twice
-	gain = health_gain(ch, FALSE);
-	heal(ch, ch, gain);
-	GET_HEALTH_DEFICIT(ch) = MAX(0, GET_HEALTH_DEFICIT(ch) - gain);
+	if (!took_dot) {
+		gain = health_gain(ch, FALSE);
+		heal(ch, ch, gain);
+		GET_HEALTH_DEFICIT(ch) = MAX(0, GET_HEALTH_DEFICIT(ch) - gain);
+	}
 	
 	gain = move_gain(ch, FALSE);
 	GET_MOVE(ch) += gain;
@@ -729,7 +895,7 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 	for (x = -1 * radius; x <= radius && !found_building; ++x) {
 		for (y = -1 * radius; y <= radius && !found_building; ++y) {
 			// skip 0,0 because that is the city center
-			if (x != 0 && y != 0) {
+			if (x != 0 || y != 0) {
 				to_room = real_shift(center, x, y);
 				
 				// we skip compute_distance here so we're really checking a
@@ -751,7 +917,6 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 	if (!found_building) {
 		log_to_empire(emp, ELOG_TERRITORY, "%s (%d, %d) abandoned as ruins", city->name, X_COORD(city->location), Y_COORD(city->location));
 		perform_abandon_city(emp, city, TRUE);
-		read_empire_territory(emp);
 		return TRUE;
 	}
 	
@@ -766,21 +931,15 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 */
 void check_ruined_cities(void) {
 	struct empire_city_data *city, *next_city;
-	bool ruined_any = FALSE;
 	empire_data *emp, *next_emp;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if (!EMPIRE_IMM_ONLY(emp)) {
 			for (city = EMPIRE_CITY_LIST(emp); city; city = next_city) {
 				next_city = city->next;
-				
-				ruined_any |= check_one_city_for_ruin(emp, city);
+				check_one_city_for_ruin(emp, city);
 			}
 		}
-	}
-	
-	if (ruined_any) {
-		read_empire_territory(NULL);
 	}
 }
 
@@ -859,7 +1018,6 @@ static void reduce_city_overage_one(empire_data *emp) {
 	}
 	
 	save_empire(emp);
-	read_empire_territory(emp);
 }
 
 
@@ -943,7 +1101,6 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	if (farthest) {
 		log_to_empire(emp, ELOG_TERRITORY, "Abandoning %s (%d, %d) because too much outside territory has been claimed", get_room_name(farthest, FALSE), X_COORD(farthest), Y_COORD(farthest));
 		abandon_room(farthest);
-		read_empire_territory(emp);
 	}
 }
 
@@ -1027,7 +1184,6 @@ static void reduce_stale_empires_one(empire_data *emp) {
 	if (found_room) {
 		// this is only called on VERY stale empires (no members), so there's no real need to log this abandon
 		abandon_room(found_room);
-		read_empire_territory(emp);
 	}
 }
 
@@ -1243,7 +1399,7 @@ void point_update_obj(obj_data *obj) {
 	}
 
 	// float or sink
-	if (IN_ROOM(obj) && ROOM_SECT_FLAGGED(IN_ROOM(obj), SECTF_FRESH_WATER | SECTF_OCEAN)) {
+	if (IN_ROOM(obj) && CAN_WEAR(obj, ITEM_WEAR_TAKE) && ROOM_SECT_FLAGGED(IN_ROOM(obj), SECTF_FRESH_WATER | SECTF_OCEAN)) {
 		if (materials[GET_OBJ_MATERIAL(obj)].floats && (to_room = real_shift(IN_ROOM(obj), shift_dir[WEST][0], shift_dir[WEST][1]))) {
 			if (!number(0, 2) && !ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_IS_CLOSED(to_room)) {
 				// float-west message
@@ -1362,6 +1518,17 @@ void point_update_obj(obj_data *obj) {
 						act("$p flickers briefly, then vanishes with a poof.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR);
 					}
 					break;
+				case MAT_WAX: {
+					if (obj->carried_by)
+						act("$p melts in your hands and is gone.", FALSE, obj->carried_by, obj, 0, TO_CHAR);
+					else if (obj->worn_by)
+						act("$p melts off of you and is gone.", FALSE, obj->worn_by, obj, 0, TO_CHAR);
+					else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
+						act("$p melts and is gone.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_ROOM);
+						act("$p melts and is gone.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR);
+					}
+					break;
+				}
 				case MAT_WOOD:
 				case MAT_BONE:
 				case MAT_HAIR:
@@ -1513,7 +1680,6 @@ void point_update_room(room_data *room) {
 				if (emp && !is_in_city_for_empire(room, emp, TRUE, &junk)) {
 					// does check the city time limit for abandon protection
 					abandon_room(room);
-					read_empire_territory(emp);
 				}
 
 				/* Destroy 50% of the objects */
@@ -1696,7 +1862,7 @@ bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner) {
 		return TRUE;
 	}
 	
-	if (RMT_FLAGGED(loc, RMT_NO_TELEPORT)) {
+	if (RMT_FLAGGED(loc, RMT_NO_TELEPORT) || ROOM_AFF_FLAGGED(loc, ROOM_AFF_NO_TELEPORT)) {
 		return FALSE;
 	}
 
@@ -1844,10 +2010,10 @@ void gain_condition(char_data *ch, int condition, int value) {
 	
 	// prevent well-fed if hungry
 	if (IS_HUNGRY(ch) && value > 0) {
-		affect_from_char(ch, ATYPE_WELL_FED);
+		affect_from_char(ch, ATYPE_WELL_FED, TRUE);
 	}
 
-	if (PLR_FLAGGED(ch, PLR_WRITING) || !gain_cond_messsage) {
+	if (!gain_cond_messsage) {
 		return;
 	}
 
@@ -1898,15 +2064,15 @@ int health_gain(char_data *ch, bool info_only) {
 		gain += GET_HEALTH_REGEN(ch);
 		
 		if (HAS_BONUS_TRAIT(ch, BONUS_HEALTH_REGEN)) {
-			gain += 1;
+			gain += 1 + (get_approximate_level(ch) / 20);
 		}
 		
 		if (GET_FEEDING_FROM(ch) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
 			gain *= 4;
 		}
 		
-		if (GET_POS(ch) == POS_SLEEPING) {
-			min = round((double) GET_MAX_HEALTH(ch) / ((double) config_get_int("max_sleeping_regen_time") / (HAS_FUNCTION(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+			min = round((double) GET_MAX_HEALTH(ch) / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 		
@@ -1955,14 +2121,14 @@ int mana_gain(char_data *ch, bool info_only) {
 		}
 		
 		if (HAS_BONUS_TRAIT(ch, BONUS_MANA_REGEN)) {
-			gain += 1;
+			gain += 1 + (get_approximate_level(ch) / 20);
 		}
 		if (GET_FEEDING_FROM(ch) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
 			gain *= 4;
 		}
 		
-		if (GET_POS(ch) == POS_SLEEPING) {
-			min = round((double) GET_MAX_MANA(ch) / ((double) config_get_int("max_sleeping_regen_time") / (HAS_FUNCTION(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+			min = round((double) GET_MAX_MANA(ch) / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 		
@@ -2007,14 +2173,14 @@ int move_gain(char_data *ch, bool info_only) {
 		}
 		
 		if (HAS_BONUS_TRAIT(ch, BONUS_MOVE_REGEN)) {
-			gain += 1;
+			gain += 1 + (get_approximate_level(ch) / 20);
 		}
 		if (GET_FEEDING_FROM(ch) && has_ability(ch, ABIL_SANGUINE_RESTORATION)) {
 			gain *= 4;
 		}
 		
-		if (GET_POS(ch) == POS_SLEEPING) {
-			min = round((double) GET_MAX_MOVE(ch) / ((double) config_get_int("max_sleeping_regen_time") / (HAS_FUNCTION(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+			min = round((double) GET_MAX_MOVE(ch) / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 
@@ -2035,14 +2201,15 @@ int move_gain(char_data *ch, bool info_only) {
 */
 void point_update(bool run_real) {
 	void clean_offers(char_data *ch);
-	void save_daily_cycle();
+	void setup_daily_quest_cycles(int only_cycle);
 	void update_players_online_stats();
-	extern int max_players_today;
 	
 	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
 	obj_data *obj, *next_obj;
 	char_data *ch, *next_ch;
+	
+	long daily_cycle = data_get_long(DATA_DAILY_CYCLE);
 	
 	// check if the skill cycle must reset (daily)
 	if (time(0) > daily_cycle + SECS_PER_REAL_DAY) {
@@ -2051,11 +2218,12 @@ void point_update(bool run_real) {
 		while (time(0) > daily_cycle + SECS_PER_REAL_DAY) {
 			daily_cycle += SECS_PER_REAL_DAY;
 		}
-		save_daily_cycle();
+		data_set_long(DATA_DAILY_CYCLE, daily_cycle);
 		
 		// reset players seen today too
-		max_players_today = 0;
+		data_set_int(DATA_MAX_PLAYERS_TODAY, 0);
 		update_players_online_stats();
+		setup_daily_quest_cycles(NOTHING);
 	}
 	
 	// characters
@@ -2068,7 +2236,11 @@ void point_update(bool run_real) {
 			clean_offers(ch);
 		}
 		
-		if (EXTRACTED(ch) || IS_DEAD(ch)) {
+		if (EXTRACTED(ch)) {
+			continue;
+		}
+		if (IS_DEAD(ch)) {
+			check_idling(ch);
 			continue;
 		}
 		
@@ -2093,9 +2265,6 @@ void point_update(bool run_real) {
 	HASH_ITER(hh, world_table, room, next_room) {
 		point_update_room(room);
 	}
-	
-	// fresh empire write
-	save_all_empires();
 }
 
 

@@ -1,6 +1,6 @@
 (lib/text/credits)
                 --  E - m - p - i - r - e - M - U - D  --
-                          Version 2.0 beta 4
+                          Version 2.0 beta 5
 
 EmpireMUD 1.0 was developed from CircleMUD 3.0, bpl 17 and tbgMUD 2.4. It was
 created by Paul Clarke, a student at the University of Arizona, in 2000.
@@ -18,6 +18,7 @@ Special thanks to:
  Yvain, for numerous contributions and support
  Billy "stormdragon2976" Wolfe, animal scripting
  JL Decker, for content contributions in 2.0 alpha
+ Awkens Ryder, for bug fixes and contributions to the code
  Trisha Maelicia, public relations and encourager
  The DG Scripts authors, for a very handy scripting system
  Dr Ravi and the U of Arizona Cancer Center, for making this possible

@@ -1,0 +1,45 @@
+#10900
+A Dark, Musty Cave~
+   The cave system has many branches, but most are either collapsed or too
+small to enter. Several have massive claw marks suggesting the dragon has tried
+to pursue its prey into the side passages. There are also clear signs that
+adventurers have come this way before, but most tracks lead into the cave
+rather than out of it.  
+~
+b 0
+D14
+~
+0 10901
+D14
+~
+0 10902
+M 0 10902 100.00 1
+S
+#10901
+The Dragon's Lair~
+   You have stumbled into a dragon's lair! The mammoth cave has ended in a
+truly gigantic chamber, and it seems a dragon has made its home in it. The back
+of the cave is dominated by a huge nest, apparently made from whole trees. No
+creature but a red dragon builds a nest so large. To the side, you can see
+charred bits of armor, perhaps returned from the dragon's sensitive stomach.
+~
+b 0
+D14
+~
+0 10900
+M 0 10900 100.00 1
+S
+#10902
+A Small Side Passage~
+   This tiny side passage barely fits a small party of humans, and is far too
+small for the dragon to enter. It looks as if a knight has set up camp in here,
+perhaps to prepare to fight the dragon. Claw marks at the entrance show that
+the dragon has tried to thwart the knight more than once.  
+~
+b 0
+D14
+~
+0 10900
+M 0 10901 100.00 1
+S
+$

@@ -11,9 +11,8 @@ Sparring branch: Learn to hit faster and harder, and finish the fight.
 Big Game Hunter branch: Take on the world's monsters with no fear.
 Archery branch: Strike from afar.
 
-You can train Battle up to level 15 just by fighting.
-
-See also: REFLEXES, SPARRING, BIG GAME HUNTER, ARCHERY, FIRSTAID, FLEET
+See also: EVASION, REFLEXES, SPARRING, BIG GAME HUNTER, ARCHERY, FIRSTAID,
+FLEET, WEAPONS PROFICIENCY
 #
 AOE "AREA OF EFFECT" "AREA EFFECT" "AREA-OF-EFFECT"
 
@@ -118,6 +117,7 @@ Disarm (Battle ability)
 
 Usage:  disarm [target]
 Cooldown:  30 seconds
+Duration:  15 / 25 seconds
 Cost:  15 move
 Debuff type:  Battle
 
@@ -164,6 +164,13 @@ Gain experience when you take damage.
 
 See also: TANK
 #
+EVASION EVADE
+
+Evasion (Battle ability)
+
+This ability is part of basic combat training and improves your ability to
+fight. It gains experience whenever someone is trying to hit you in combat.
+#
 FINESSE
 
 Finesse (Battle ability)
@@ -193,6 +200,8 @@ rooms from there.
 Example:  
   > fire catapult north
   > fire brigantine 2.brigantine
+
+See also: COOKING FIRE, DOUSE, HARNESS
 #
 FIRSTAID "FIRST AID"
 
@@ -389,7 +398,7 @@ By sparring, you can learn to hit more accurately. This ability gives at least
 As a specialty ability, it adds 5% of your total level to your to-hit.
 As a class ability, it adds 10% of your total level to your to-hit.
 
-This to-hit bonus is refleced on your 'score'.
+This to-hit bonus is reflected on your 'score'.
 
 Gain experience when you attack something.
 
@@ -403,6 +412,9 @@ short your character waits between attacks.
 
 Your current speed is shown on your score display. A lower speed is better,
 since it is the time between attacks.
+
+Things that boost your speed, such as Wits and Hasten, increase your damage
+proportionally.
 
 See also: SCORE, WITS, HASTEN, SLOW
 #
@@ -448,5 +460,12 @@ albeit at a reduced rate. Your normal block chance is halved against magical
 attacks.
 
 See also: BLOCK
+#
+"WEAPON PROFICIENCY" "WEAPONS PROFICIENCY" PROFICIENCY
+
+Weapon Proficiency (Battle ability)
+
+This ability allows you to use weapons. You can gain experience with it by
+fighting with any weapon.
 #
 $

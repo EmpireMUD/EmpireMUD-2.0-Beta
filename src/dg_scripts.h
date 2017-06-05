@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_scripts.h                                    EmpireMUD 2.0b4 *
+*   File: dg_scripts.h                                    EmpireMUD 2.0b5 *
 *  Usage: header file for script structures and contstants, and           *
 *         function prototypes for dg_scripts.c                            *
 *                                                                         *
@@ -36,7 +36,7 @@
 #define NO_EXTRANEOUS_TRIGGERS
 
 /* mob trigger types */
-#define MTRIG_GLOBAL           BIT(0)      /* check even if zone empty   */
+#define MTRIG_GLOBAL           BIT(0)      // check even if no players nearby
 #define MTRIG_RANDOM           BIT(1)      /* checked randomly           */
 #define MTRIG_COMMAND          BIT(2)	   /* character types a command  */
 #define MTRIG_SPEECH           BIT(3)	   /* a char says a word/phrase  */
@@ -58,10 +58,12 @@
 #define MTRIG_CHARMED          BIT(19)	// fight/random triggers will fire even while charmed
 #define MTRIG_START_QUEST      BIT(20)	// player tries to start a quest
 #define MTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
+#define MTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
+#define MTRIG_REBOOT           BIT(23)	// after the mud reboots
 
 
 /* obj trigger types */
-#define OTRIG_GLOBAL           BIT(0)	     /* unused                     */
+#define OTRIG_GLOBAL           BIT(0)	// NOT actually used, currently
 #define OTRIG_RANDOM           BIT(1)	     /* checked randomly           */
 #define OTRIG_COMMAND          BIT(2)      /* character types a command  */
 
@@ -81,10 +83,12 @@
 #define OTRIG_FINISH           BIT(19)	// char finishes reading a book
 #define OTRIG_START_QUEST      BIT(20)	// player tries to start a quest
 #define OTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
+#define OTRIG_PLAYER_IN_ROOM   BIT(22)	// NOT actually used, currently
+#define OTRIG_REBOOT           BIT(23)	// after the mud reboots
 
 
 // VTRIG_x: vehicle trigger types
-#define VTRIG_GLOBAL  BIT(0)	// checked even if zone empty
+#define VTRIG_GLOBAL  BIT(0)	// checked even if no players are nearby
 #define VTRIG_RANDOM  BIT(1)	// checked randomly when people nearby
 #define VTRIG_COMMAND  BIT(2)	// character types a command
 #define VTRIG_SPEECH  BIT(3)	// character speaks a word or phrase
@@ -100,6 +104,8 @@
 // unuused: 17-19
 #define VTRIG_START_QUEST      BIT(20)	// player tries to start a quest
 #define VTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
+#define VTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
+#define VTRIG_REBOOT           BIT(23)	// after the mud reboots
 
 
 /* wld trigger types */
@@ -117,9 +123,18 @@
 #define WTRIG_ABILITY          BIT(15)     /* ability used in room */
 #define WTRIG_LEAVE            BIT(16)     /* character leaves the room */
 #define WTRIG_DOOR             BIT(17)     /* door manipulated in room  */
-// unused: 18, 19
+#define WTRIG_DISMANTLE        BIT(18)	// starts dismantling or redesignates
+// unused: 19
 #define WTRIG_START_QUEST      BIT(20)	// player tries to start a quest
 #define WTRIG_FINISH_QUEST     BIT(21)	// player tries to end a quest
+#define WTRIG_PLAYER_IN_ROOM   BIT(22)	// modifies some triggers to "only with players in the room"
+#define WTRIG_REBOOT           BIT(23)	// after the mud reboots
+
+
+// list of global trigger types (for random_triggers linked list)
+#define TRIG_IS_GLOBAL(trig)  (((trig)->attach_type == MOB_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), MTRIG_GLOBAL)) || ((trig)->attach_type == OBJ_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), OTRIG_GLOBAL)) || ((trig)->attach_type == VEH_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), VTRIG_GLOBAL)) || (((trig)->attach_type == WLD_TRIGGER || (trig)->attach_type == RMT_TRIGGER || (trig)->attach_type == ADV_TRIGGER || (trig)->attach_type == BLD_TRIGGER) && IS_SET(GET_TRIG_TYPE(trig), WTRIG_GLOBAL)))
+#define TRIG_IS_LOCAL(trig)  (((trig)->attach_type == MOB_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), MTRIG_PLAYER_IN_ROOM)) || ((trig)->attach_type == OBJ_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), OTRIG_PLAYER_IN_ROOM)) || ((trig)->attach_type == VEH_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), VTRIG_PLAYER_IN_ROOM)) || (((trig)->attach_type == WLD_TRIGGER || (trig)->attach_type == RMT_TRIGGER || (trig)->attach_type == ADV_TRIGGER || (trig)->attach_type == BLD_TRIGGER) && IS_SET(GET_TRIG_TYPE(trig), WTRIG_PLAYER_IN_ROOM)))
+#define TRIG_IS_RANDOM(trig)  (((trig)->attach_type == MOB_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), MTRIG_RANDOM)) || ((trig)->attach_type == OBJ_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), OTRIG_RANDOM)) || ((trig)->attach_type == VEH_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), VTRIG_RANDOM)) || (((trig)->attach_type == WLD_TRIGGER || (trig)->attach_type == RMT_TRIGGER || (trig)->attach_type == ADV_TRIGGER || (trig)->attach_type == BLD_TRIGGER) && IS_SET(GET_TRIG_TYPE(trig), WTRIG_RANDOM)))
 
 
 /* obj command trigger types */
@@ -132,6 +147,8 @@
 #define OCMD_DRINK  2
 #define OCMD_QUAFF  3
 #define OCMD_READ  4
+#define OCMD_BUILD  5
+#define OCMD_CRAFT  6
 
 #define TRIG_NEW                0	     /* trigger starts from top  */
 #define TRIG_RESTART            1	     /* trigger restarting       */
@@ -176,9 +193,14 @@ struct trig_data {
 	struct event *wait_event;   	/* event to pause the trigger      */
 	ubyte purged;			/* trigger is set to be purged     */
 	struct trig_var_data *var_list;	/* list of local vars for trigger  */
-
-	struct trig_data *next;  
+	
+	struct script_data *attached_to;	// reference to what I'm on
+	
+	struct trig_data *next;	// next on assigned SCRIPT()
 	struct trig_data *next_in_world;    /* next in the global trigger list */
+	
+	struct trig_data *prev_in_random_triggers;	// DLL: random_triggers
+	struct trig_data *next_in_random_triggers;	// DLL: random_triggers
 	
 	UT_hash_handle hh;	// trigger_table hash handle
 };
@@ -191,7 +213,10 @@ struct script_data {
 	struct trig_var_data *global_vars;	/* list of global variables   */
 	ubyte purged;				/* script is set to be purged */
 	long context;				/* current context for statics */
-
+	
+	void *attached_to;	// person/place/thing it's attached to
+	int attached_type;	// *_TRIGGER consts
+	
 	struct script_data *next;		/* used for purged_scripts    */
 };
 
@@ -238,10 +263,8 @@ void hitprcnt_mtrigger(char_data *ch);
 void bribe_mtrigger(char_data *ch, char_data *actor, int amount);
 
 void complete_wtrigger(room_data *room);
+extern int dismantle_wtrigger(room_data *room, char_data *actor, bool preventable);
 
-void random_mtrigger(char_data *ch);
-void random_otrigger(obj_data *obj);
-void random_wtrigger(room_data *ch);
 void reset_wtrigger(room_data *ch);
 
 void load_mtrigger(char_data *ch);
@@ -269,7 +292,6 @@ int entry_vtrigger(vehicle_data *veh);
 int leave_vtrigger(char_data *actor, int dir);
 void load_vtrigger(vehicle_data *veh);
 int greet_vtrigger(char_data *actor, int dir);
-void random_vtrigger(vehicle_data *veh);
 void speech_vtrigger(char_data *actor, char *str);
 
 /* function prototypes from scripts.c */
@@ -285,6 +307,7 @@ void do_sstat_room(char_data *ch);
 void do_sstat_object(char_data *ch, obj_data *j);
 void do_sstat_character(char_data *ch, char_data *k);
 
+extern struct script_data *create_script_data(void *attach_to, int type);
 void script_vlog(const char *format, va_list args);
 void script_log(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
 void script_log_by_type(int go_type, void *go, const char *format, ...) __attribute__ ((format (printf, 3, 4)));
@@ -310,6 +333,8 @@ void add_var(struct trig_var_data **var_list, char *name, char *value, int id);
 room_data *dg_room_of_obj(obj_data *obj);
 room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld);
 void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
+void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
+void dg_purge_instance(void *owner, struct instance_data *inst, char *argument);
 void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier);
 void script_damage_over_time(char_data *vict, int level, int dam_type, double modifier, int dur_seconds, int max_stacks, char_data *cast_by);
 
@@ -377,12 +402,8 @@ int valid_dg_target(char_data *ch, int bitvector);
 #define SCRIPT_CHECK(go, type)   (SCRIPT(go) && IS_SET(SCRIPT_TYPES(SCRIPT(go)), type))
 #define TRIGGER_CHECK(t, type)   (IS_SET(GET_TRIG_TYPE(t), type) && !GET_TRIG_DEPTH(t))
 
-#define ADD_UID_VAR(buf, trig, go, name, context) do { \
-			sprintf(buf, "%c%d", UID_CHAR, GET_ID(go)); \
-			add_var(&GET_TRIG_VARS(trig), name, buf, context); } while (0)
-
-#define ADD_ROOM_UID_VAR(buf, trig, go, name, context) do { \
-			sprintf(buf, "%c%d", UID_CHAR, GET_ROOM_VNUM(go) + ROOM_ID_BASE); \
+#define ADD_UID_VAR(buf, trig, id, name, context) do { \
+			sprintf(buf, "%c%d", UID_CHAR, id); \
 			add_var(&GET_TRIG_VARS(trig), name, buf, context); } while (0)
 
 
@@ -394,7 +415,7 @@ int can_wear_on_pos(obj_data *obj, int pos);
 /* find_char helpers */
 void init_lookup_table(void);
 char_data *find_char_by_uid_in_lookup_table(int uid);
-obj_data *find_obj_by_uid_in_lookup_table(int uid);
+obj_data *find_obj_by_uid_in_lookup_table(int uid, bool error);
 vehicle_data *find_vehicle_by_uid_in_lookup_table(int uid);
 void add_to_lookup_table(int uid, void *c);
 void remove_from_lookup_table(int uid);
@@ -410,3 +431,9 @@ extern char_data *dg_owner_mob;
 extern obj_data *dg_owner_obj;
 extern vehicle_data *dg_owner_veh;
 extern room_data *dg_owner_room;
+
+// id helpers
+extern int char_script_id(char_data *ch);
+extern int obj_script_id(obj_data *obj);
+extern int veh_script_id(vehicle_data *veh);
+#define room_script_id(room)  (GET_ROOM_VNUM(room) + ROOM_ID_BASE)

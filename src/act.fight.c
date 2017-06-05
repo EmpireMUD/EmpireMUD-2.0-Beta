@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.fight.c                                     EmpireMUD 2.0b4 *
+*   File: act.fight.c                                     EmpireMUD 2.0b5 *
 *  Usage: non-skill commands and functions related to the fight system    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -77,12 +77,24 @@ ACMD(do_assist) {
 			send_to_char("You join the fight!\r\n", ch);
 			act("$N assists you!", 0, helpee, 0, ch, TO_CHAR);
 			act("$n assists $N.", FALSE, ch, 0, helpee, TO_NOTVICT);
-			hit(ch, opponent, GET_EQ(ch, WEAR_WIELD), FALSE);
+			hit(ch, opponent, GET_EQ(ch, WEAR_WIELD), TRUE);
 		}
 		else {
 			act("You can't attack $N!", FALSE, ch, 0, opponent, TO_CHAR);
 		}
 	}
+}
+
+
+ACMD(do_clearmeters) {
+	void reset_combat_meters(char_data *ch);
+	void stop_combat_meters(char_data *ch);
+	
+	if (!IS_NPC(ch)) {
+		reset_combat_meters(ch);
+		GET_COMBAT_METERS(ch).over = TRUE;
+	}
+	send_config_msg(ch, "ok_string");
 }
 
 
@@ -110,15 +122,17 @@ ACMD(do_consider) {
 	}
 	else {
 		// scale first
-		check_scaling(vict, ch);
-		diff = determine_best_scale_level(ch, FALSE) - determine_best_scale_level(vict, FALSE);
+		if (!IS_IMMORTAL(ch)) {
+			check_scaling(vict, ch);
+		}
+		diff = get_approximate_level(ch) - determine_best_scale_level(vict, FALSE);
 				
 		act("You consider your chances against $N.", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n considers $s chances against $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
 		act("$n considers $s chances against you.", FALSE, ch, NULL, vict, TO_VICT);
 		
 		if (diff != 0) {
-			snprintf(buf, sizeof(buf), "$E is %d levels %s you.", ABSOLUTE(diff), diff > 0 ? "below" : "above");
+			snprintf(buf, sizeof(buf), "$E is %d level%s %s you.", ABSOLUTE(diff), PLURAL(ABSOLUTE(diff)), diff > 0 ? "below" : "above");
 			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
 		}
 		
@@ -256,7 +270,7 @@ ACMD(do_hit) {
 	one_argument(argument, arg);
 
 	if (!*arg)
-		send_to_char("Hit who?\r\n", ch);
+		send_to_char("Hit whom?\r\n", ch);
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
 		send_to_char("They don't seem to be here.\r\n", ch);
 	else if (vict == ch) {
@@ -289,7 +303,7 @@ ACMD(do_hit) {
 			command_lag(ch, WAIT_OTHER);
 		}
 		else {
-			hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FALSE);
+			hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FIGHTING(ch) ? FALSE : TRUE);	// count as exp only if not already fighting
 			// ensure hitting
 			if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && FIGHTING(ch) && FIGHTING(ch) != vict) {
 				FIGHTING(ch) = vict;
@@ -305,6 +319,53 @@ ACMD(do_hit) {
 	}
 	else {
 		act("You can't attack $N!", FALSE, ch, 0, vict, TO_CHAR);
+	}
+}
+
+
+ACMD(do_meters) {
+	struct combat_meters *mtr;
+	int length = 1;
+	double calc;
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "You have no damage meters.\r\n");
+		return;
+	}
+	
+	mtr = &GET_COMBAT_METERS(ch);
+	
+	msg_to_char(ch, "Damage meters:\r\n");
+	
+	// raw length
+	length = (mtr->over ? mtr->end : time(0)) - mtr->start;
+	msg_to_char(ch, "Fight length: %d:%02d (%d second%s)\r\n", (length/60), (length%60), length, PLURAL(length));
+	
+	// prevent divide-by-zero
+	length = MAX(1, length);
+	
+	calc = mtr->hits + mtr->misses;
+	calc = MAX(1.0, calc);	// div/0
+	msg_to_char(ch, "Hit percent: %.2f%% (%d/%d)\r\n", mtr->hits * 100.0 / calc, mtr->hits, (mtr->hits + mtr->misses));
+	
+	calc = mtr->hits_taken + mtr->dodges + mtr->blocks;
+	calc = MAX(1.0, calc);	// div/0
+	msg_to_char(ch, "Dodge percent: %.2f%% (%d/%d)\r\n", mtr->dodges * 100.0 / calc, mtr->dodges, (mtr->hits_taken + mtr->dodges + mtr->blocks));
+	msg_to_char(ch, "Block percent: %.2f%% (%d/%d)\r\n", mtr->blocks * 100.0 / calc, mtr->blocks, (mtr->hits_taken + mtr->dodges + mtr->blocks));
+	
+	msg_to_char(ch, "Damage dealt: %d (%.2f dps)\r\n", mtr->damage_dealt, (double) mtr->damage_dealt / length);
+	
+	if (mtr->pet_damage > 0) {
+		msg_to_char(ch, "Pet damage: %d (%.2f dps, %.2f total dps)\r\n", mtr->pet_damage, (double) mtr->pet_damage / length, (double) (mtr->damage_dealt + mtr->pet_damage) / length);
+	}
+	
+	msg_to_char(ch, "Damage taken: %d (%.2f dps)\r\n", mtr->damage_taken, (double) mtr->damage_taken / length);
+	
+	if (mtr->heals_dealt > 0) {
+		msg_to_char(ch, "Heals dealt: %d (%.2f hps)\r\n", mtr->heals_dealt, (double) mtr->heals_dealt / length);
+	}
+	if (mtr->heals_taken > 0) {
+		msg_to_char(ch, "Heals taken: %d (%.2f hps)\r\n", mtr->heals_taken, (double) mtr->heals_taken / length);
 	}
 }
 
@@ -588,6 +649,7 @@ ACMD(do_tie) {
 
 
 ACMD(do_throw) {
+	extern int count_objs_in_room(room_data *room);
 	extern const int rev_dir[];
 
 	int dir = NO_DIR;
@@ -633,6 +695,17 @@ ACMD(do_throw) {
 		msg_to_char(ch, "You can't throw bound items there.\r\n");
 		return;
 	}
+	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
+		msg_to_char(ch, "You can't throw quest items.\r\n");
+		return;
+	}
+	if (ROOM_BLD_FLAGGED(to_room, BLD_ITEM_LIMIT)) {
+		int size = (OBJ_FLAGGED(obj, OBJ_LARGE) ? 2 : 1);
+		if ((size + count_objs_in_room(to_room)) > config_get_int("room_item_limit")) {
+			msg_to_char(ch, "You can't throw any more items there.\r\n");
+			return;
+		}
+	}
 
 	/* If we came up with a room, lets throw! */
 
@@ -653,5 +726,10 @@ ACMD(do_throw) {
 			sprintf(buf, "$p is hurled in from the %s and falls to the ground at your feet!", dirs[get_direction_for_char(vict, rev_dir[dir])]);
 			act(buf, FALSE, vict, obj, 0, TO_CHAR);
 		}
+	}
+	
+	// throwing item abuse log
+	if (IS_IMMORTAL(ch)) {
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s threw %s from %s to %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), room_log_identifier(IN_ROOM(ch)), room_log_identifier(to_room));
 	}
 }

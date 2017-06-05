@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.building.c                                  EmpireMUD 2.0b4 *
+*   File: olc.building.c                                  EmpireMUD 2.0b5 *
 *  Usage: OLC for building prototypes                                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -40,6 +40,7 @@ extern const char *spawn_flags[];
 
 // external funcs
 void init_building(bld_data *building);
+void replace_question_color(char *input, char *color, char *output);
 void sort_interactions(struct interaction_item **list);
 
 
@@ -96,6 +97,14 @@ bool audit_building(bld_data *bld, char_data *ch) {
 	}
 	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && IS_SET(GET_BLD_FLAGS(bld), BLD_SECONDARY_TERRITORY)) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "2ND-TERRITORY flag on a non-designated building");
+		problem = TRUE;
+	}
+	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && !GET_BLD_YEARLY_MAINTENANCE(bld)) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Requires no maintenance");
+		problem = TRUE;
+	}
+	if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && GET_BLD_YEARLY_MAINTENANCE(bld)) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Interior room has yearly maintenance (will have no effect)");
 		problem = TRUE;
 	}
 	
@@ -179,7 +188,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	void check_for_bad_buildings();
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
-	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
+	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	void remove_building_from_table(bld_data *bld);
 	
 	struct obj_storage_type *store, *next_store;
@@ -188,6 +197,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	quest_data *quest, *next_quest;
 	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
+	social_data *soc, *next_soc;
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
@@ -276,14 +286,25 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	HASH_ITER(hh, quest_table, quest, next_quest) {
 		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_BUILDING, vnum);
 		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_BUILDING, vnum);
-		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_OWN_BUILDING, vnum);
-		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_OWN_BUILDING, vnum);
-		found |= delete_quest_task_from_list(&QUEST_TASKS(quest), QT_VISIT_BUILDING, vnum);
-		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_VISIT_BUILDING, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_OWN_BUILDING, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_OWN_BUILDING, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_VISIT_BUILDING, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_VISIT_BUILDING, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
+		}
+	}
+	
+	// socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_OWN_BUILDING, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_VISIT_BUILDING, vnum);
+		
+		if (found) {
+			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
 	
@@ -336,14 +357,23 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		if (GET_OLC_QUEST(desc)) {
 			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_BUILDING, vnum);
 			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_BUILDING, vnum);
-			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_OWN_BUILDING, vnum);
-			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_OWN_BUILDING, vnum);
-			found |= delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_VISIT_BUILDING, vnum);
-			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_VISIT_BUILDING, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_OWN_BUILDING, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_OWN_BUILDING, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_VISIT_BUILDING, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_VISIT_BUILDING, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A building used by the quest you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SOCIAL(desc)) {
+			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_OWN_BUILDING, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_VISIT_BUILDING, vnum);
+		
+			if (found) {
+				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A building required by the social you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
@@ -376,7 +406,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 */
 void olc_search_building(char_data *ch, bld_vnum vnum) {
 	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char buf[MAX_STRING_LENGTH];
 	bld_data *proto = building_proto(vnum);
@@ -385,6 +415,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	vehicle_data *veh, *next_veh;
+	social_data *soc, *next_soc;
 	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
@@ -458,9 +489,20 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		if (size >= sizeof(buf)) {
 			break;
 		}
-		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_BUILDING, vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_BUILDING, vnum) || find_quest_task_in_list(QUEST_TASKS(quest), QT_OWN_BUILDING, vnum) || find_quest_task_in_list(QUEST_PREREQS(quest), QT_OWN_BUILDING, vnum) || find_quest_task_in_list(QUEST_TASKS(quest), QT_VISIT_BUILDING, vnum) || find_quest_task_in_list(QUEST_PREREQS(quest), QT_VISIT_BUILDING, vnum)) {
+		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_BUILDING, vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_BUILDING, vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_OWN_BUILDING, vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_OWN_BUILDING, vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_VISIT_BUILDING, vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_VISIT_BUILDING, vnum)) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+		}
+	}
+	
+	// socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		if (find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_OWN_BUILDING, vnum) || find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_VISIT_BUILDING, vnum)) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -533,6 +575,9 @@ void save_olc_building(descriptor_data *desc) {
 		GET_BLD_SCRIPTS(proto) = trig->next;
 		free(trig);
 	}
+	if (GET_BLD_YEARLY_MAINTENANCE(proto)) {
+		free_resource_list(GET_BLD_YEARLY_MAINTENANCE(proto));
+	}
 	
 	// sanity
 	prune_extra_descs(&GET_BLD_EX_DESCS(bdg));
@@ -584,6 +629,7 @@ void save_olc_building(descriptor_data *desc) {
 */
 bld_data *setup_olc_building(bld_data *input) {
 	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
+	extern struct resource_data *copy_resource_list(struct resource_data *input);
 	
 	bld_data *new;
 	
@@ -612,6 +658,9 @@ bld_data *setup_olc_building(bld_data *input) {
 		
 		// scripts
 		GET_BLD_SCRIPTS(new) = copy_trig_protos(GET_BLD_SCRIPTS(input));
+		
+		// maintenance
+		GET_BLD_YEARLY_MAINTENANCE(new) = copy_resource_list(GET_BLD_YEARLY_MAINTENANCE(input));
 	}
 	else {
 		// brand new: some defaults
@@ -638,6 +687,7 @@ bld_data *setup_olc_building(bld_data *input) {
 void olc_show_building(char_data *ch) {
 	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
 	void get_interaction_display(struct interaction_item *list, char *save_buffer);
+	void get_resource_display(struct resource_data *list, char *save_buffer);
 	void get_script_display(struct trig_proto_list *list, char *save_buffer);
 	extern char *show_color_codes(char *string);
 	
@@ -657,7 +707,8 @@ void olc_show_building(char_data *ch) {
 	sprintf(buf + strlen(buf), "<&ytitle&0> %s\r\n", GET_BLD_TITLE(bdg));
 	
 	if (!is_room) {
-		sprintf(buf + strlen(buf), "<&yicon&0> %s&0  %s\r\n", NULLSAFE(GET_BLD_ICON(bdg)), show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
+		replace_question_color(NULLSAFE(GET_BLD_ICON(bdg)), "&0", lbuf);
+		sprintf(buf + strlen(buf), "<&yicon&0> %s&0  %s\r\n", lbuf, show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
 	}
 	sprintf(buf + strlen(buf), "<&ycommands&0> %s\r\n", GET_BLD_COMMANDS(bdg) ? GET_BLD_COMMANDS(bdg) : "");
 	sprintf(buf + strlen(buf), "<&ydescription&0>\r\n%s", GET_BLD_DESC(bdg) ? GET_BLD_DESC(bdg) : "");
@@ -704,6 +755,13 @@ void olc_show_building(char_data *ch) {
 		get_interaction_display(GET_BLD_INTERACTIONS(bdg), buf1);
 		strcat(buf, buf1);
 	}
+	
+	// maintenance resources
+	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <\tyresource\t0>\r\n");
+	if (GET_BLD_YEARLY_MAINTENANCE(bdg)) {
+		get_resource_display(GET_BLD_YEARLY_MAINTENANCE(bdg), buf1);
+		strcat(buf, buf1);
+	}
 
 	// scripts
 	sprintf(buf + strlen(buf), "Scripts: <&yscript&0>\r\n");
@@ -712,7 +770,7 @@ void olc_show_building(char_data *ch) {
 		strcat(buf, lbuf);
 	}
 	
-	sprintf(buf + strlen(buf), "<&yspawns&0> (add, remove, list)\r\n");
+	sprintf(buf + strlen(buf), "<&yspawns&0>\r\n");
 	if (GET_BLD_SPAWNS(bdg)) {
 		count = 0;
 		for (spawn = GET_BLD_SPAWNS(bdg); spawn; spawn = spawn->next) {
@@ -795,7 +853,7 @@ OLC_MODULE(bedit_description) {
 	}
 	else {
 		sprintf(buf, "description for %s", GET_BLD_NAME(bdg));
-		start_string_editor(ch->desc, buf, &(GET_BLD_DESC(bdg)), MAX_ROOM_DESCRIPTION);
+		start_string_editor(ch->desc, buf, &(GET_BLD_DESC(bdg)), MAX_ROOM_DESCRIPTION, TRUE);
 	}
 }
 
@@ -844,7 +902,7 @@ OLC_MODULE(bedit_flags) {
 
 OLC_MODULE(bedit_functions) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
-	GET_BLD_FUNCTIONS(bdg) = olc_process_flag(ch, argument, "function", "flags", function_flags, GET_BLD_FUNCTIONS(bdg));
+	GET_BLD_FUNCTIONS(bdg) = olc_process_flag(ch, argument, "function", "functions", function_flags, GET_BLD_FUNCTIONS(bdg));
 }
 
 
@@ -901,6 +959,13 @@ OLC_MODULE(bedit_name) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_BLD_NAME(bdg));
 	CAP(GET_BLD_NAME(bdg));
+}
+
+
+OLC_MODULE(bedit_resource) {
+	void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
+	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
+	olc_process_resources(ch, argument, &GET_BLD_YEARLY_MAINTENANCE(bdg));
 }
 
 

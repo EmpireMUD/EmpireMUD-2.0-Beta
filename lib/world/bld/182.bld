@@ -1,0 +1,174 @@
+#18200
+Massive Eggshell~
+A Massive Broken Eggshell~
+&y(\/)~
+500 0 bd 0
+0 0 0 -1
+E
+eggshell massive egg broken shell~
+A leathery shell this large could only belong to an atlasian tortoise!
+~
+S
+#18216
+Adventurer's Guild~
+The Adventurer's Guildhall~
+&t[&j@@&t]~
+96 10 jR 0
+0 0 0 18216
+D
+   The great room of the guildhall is spacious, but it has been filled with
+chairs and desks, for its far-flung members to use when they're passing through
+the city. The mahogany walls are windowless, but light is provided by glowing
+chandeliers. For so much clutter, the guildhall is surprisingly well-kept.
+~
+R
+8 1 5 0
+R
+2 1 5 0
+T 18216
+S
+#18217
+Guildhall Tower~
+The Guildhall Tower~
+&0[  ]~
+1 0 aR 0
+0 0 0 18217
+D
+   Rising from the dark mahogany guildhall, this brick tower gives you an
+unobstructed view of the city. Tables are strewn with strange trinkets and
+unusual potions, along with handwritten notes and scribbled drawings.
+~
+S
+#18218
+Guildhall Basement~
+The Basement~
+&0[  ]~
+1 0 a 0
+0 0 0 18218
+D
+   The stairs descend into the basement, built on a strong foundation of stone
+and supported by huge wooden pillars. The entire basement is filled with
+bookshelves, packed with copies of the guild's arcane knowledge.
+~
+S
+#18219
+Guildhall Office~
+The Office~
+&0[  ]~
+1 0 a 0
+0 0 0 18219
+D
+   Tucked behind the great room, this office is rather small. But unlike the
+rest of the guildhall, it is free of clutter. Only a desk and two chairs fill
+the room, and all decoration is restricted to the walls.
+~
+S
+#18220
+Guildhall Vault~
+The Vault~
+&0[  ]~
+1 0 a 0
+0 0 0 18220
+D
+   This vault is not very large, and this guildhall's charter is still fairly
+new, but the shelves are already lined with fascinating and exotic items. A
+small safe is tucked in the corner, and securely locked.
+~
+S
+#18221
+Strange Egg~
+A Strange Egg~
+.&yO&?..~
+10 0 bd 0
+0 0 0 -1
+E
+egg strange~
+   The egg has grown to be nearly as large as you are! And despite the cool
+weather, it seems to be warm to the touch.
+~
+R
+1 1 5 0
+S
+#18222
+Gigantic Egg~
+A Gigantic Egg~
+.&y()&?.~
+10 0 bd 0
+0 0 0 -1
+E
+egg gigantic~
+   The egg has grown to the size of a house! The heartbeat of whatever lives
+inside this egg is so strong, you can feel it pulse along the ground beneath
+your feet.
+~
+R
+1 1 5 0
+S
+#18223
+Hatching Egg~
+A Gigantic, Hatching Egg~
+.&y(`)~
+10 0 bd 0
+0 0 0 -1
+E
+egg hatching gigantic~
+The egg is nearly the size of a small castle, and has begun to tear open!
+~
+R
+1 1 5 0
+S
+#18224
+Tortoise's Back~
+On the Tortoise's Back~
+~
+0 0 aHR 0
+0 1 0 -1
+C
+disembark, drive~
+D
+You're riding on an atlasian tortoise!
+~
+S
+#18225
+Tortoise House~
+A House on the Tortoise's Back~
+&0[  ]~
+1 0 a 0
+0 0 0 -1
+D
+   This rustic home has been built on a small platform, strapped to the back of
+a young atlasian tortoise. The house is modest in size, but devoid of windows
+as it requires solid walls to survive the heavy footfalls of the tortoise. A
+cozy chair is bolted to the floor next to the hearth.
+~
+F
+G
+S
+#18226
+Tortoise Bedroom~
+A Bedroom Atop the Tortoise~
+&0[  ]~
+1 0 aH 0
+0 0 0 -1
+C
+sleep~
+D
+   Though more of an alcove off of the main house than a full room in its own
+right, this bedroom is comfortably padded and cozy enough to sleep in. Springs
+beneath the feather bed reduce the atlasian tortoise's heavy plodding to a
+calming sway.
+~
+F
+d
+S
+#18227
+Tortoise Observatory~
+The Tortoise's Observatory~
+&0[  ]~
+1 0 aHR 0
+0 0 0 -1
+D
+You can see everything from atop the atlasian tortoise.
+~
+S
+$

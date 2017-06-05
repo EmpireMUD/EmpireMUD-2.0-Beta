@@ -7,7 +7,11 @@ D0
 wwww~
 &g~
 I 6 3015 100.00 1  # FORAGE: some red berries
-I 8 10226 100.00 1  # HARVEST: a pineapple
+I 8 10226 20.00 2 H  # HARVEST: a pineapple
+I 8 10226 20.00 3 H  # HARVEST: a pineapple
+I 8 10226 20.00 4 H  # HARVEST: a pineapple
+I 8 10226 20.00 5 H  # HARVEST: a pineapple
+I 8 10226 20.00 6 H  # HARVEST: a pineapple
 M
 9061 0.01 d
 M
@@ -84,7 +88,11 @@ D0
 vvvv~
 &G~
 I 6 10231 100.00 1  # FORAGE: some desert dandelions
-I 8 10227 100.00 1  # HARVEST: an agave heart
+I 8 10227 20.00 2 H  # HARVEST: an agave heart
+I 8 10227 20.00 3 H  # HARVEST: an agave heart
+I 8 10227 20.00 4 H  # HARVEST: an agave heart
+I 8 10227 20.00 5 H  # HARVEST: an agave heart
+I 8 10227 20.00 6 H  # HARVEST: an agave heart
 M
 250 0.10 ad
 M
@@ -131,7 +139,11 @@ D0
 o88o~
 &G~
 I 6 10229 100.00 1  # FORAGE: a cactus fruit
-I 8 10228 100.00 1  # HARVEST: a stack of cactus pads
+I 8 10228 20.00 2 H  # HARVEST: a stack of cactus pads
+I 8 10228 20.00 3 H  # HARVEST: a stack of cactus pads
+I 8 10228 20.00 4 H  # HARVEST: a stack of cactus pads
+I 8 10228 20.00 5 H  # HARVEST: a stack of cactus pads
+I 8 10228 20.00 6 H  # HARVEST: a stack of cactus pads
 M
 250 0.10 ad
 M
@@ -178,7 +190,11 @@ D0
 xxxx~
 &g~
 I 6 10231 100.00 1  # FORAGE: some desert dandelions
-I 8 10230 100.00 1  # HARVEST: some thick aloe leaves
+I 8 10230 20.00 2 H  # HARVEST: some thick aloe leaves
+I 8 10230 20.00 3 H  # HARVEST: some thick aloe leaves
+I 8 10230 20.00 4 H  # HARVEST: some thick aloe leaves
+I 8 10230 20.00 5 H  # HARVEST: some thick aloe leaves
+I 8 10230 20.00 6 H  # HARVEST: some thick aloe leaves
 M
 250 0.10 ad
 M

@@ -1,0 +1,380 @@
+#18450
+beaverportal portal~
+the beaver portal~
+A beaver portal is here.~
+You shouldn't be seeing this.
+~
+8 0 a 1
+-1 0 0
+10 0
+S
+#18452
+whistle beaver~
+a beaver whistle~
+A beaver whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 4
+18452 0 0
+2 0
+T 9900
+S
+#18453
+stick gnawed gnarled walking~
+a gnawed walking stick~
+A gnawed and gnarled stick has been left here.~
+   This stick has been badly chewed by a beaver, but is still fairly long,
+straight and sturdy. It would make a good walking stick.
+~
+3 mp ao 3
+0 0 0
+0 0
+A
+6 1 0
+S
+#18460
+portal barmy blue~
+a barmy blue portal~
+A barmy, blue portal has opened in the middle of the tower.~
+   The portal is chaotic, spewing mana and churning around the center of the
+room. You can barely make out what's on the other side, but you get the feeling
+this portal must span a great distance in space... And, perhaps, in time.
+~
+8 0 0 3
+-1 0 0
+10 0
+S
+#18461
+portal barmy blue~
+a barmy blue portal~
+A barmy, blue portal leads back out to the tower.~
+   It's lucky this portal is still open. Without it, you might be stuck here
+forever.
+~
+8 0 0 3
+-1 0 0
+10 0
+S
+#18462
+whistle owl snowy~
+a snowy owl whistle~
+A snowy owl whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 4
+18462 0 0
+2 0
+T 9900
+S
+#18463
+collar fido beastly~
+a beastly fido collar~
+A beastly fido collar is lying here.~
+This collar can summon a noncombat pet!
+Type 'use collar' to summon it.
+~
+3 p a 5
+18463 0 0
+2 0
+T 9900
+S
+#18464
+whistle scarecrow~
+a scarecrow whistle~
+A scarecrow whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 5
+18464 0 0
+2 0
+T 9900
+S
+#18465
+cage little bird~
+a little bird in a cage~
+A little bird in a cage is lying here.~
+This cage can summon a noncombat pet!
+Type 'use cage' to summon it.
+~
+3 p a 5
+18465 0 0
+2 0
+T 9900
+S
+#18466
+whistle unstable~
+an unstable whistle~
+An unstable whistle is levitating here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 4
+18466 0 0
+2 0
+T 9900
+S
+#18467
+bell hobbit's hobbits~
+a hobbit's bell~
+A hobbit's bell is lying here.~
+This bell can summon a noncombat pet!
+Type 'use bell' to summon it.
+~
+3 p a 6
+18467 0 0
+2 0
+T 9900
+S
+#18468
+whistle werewolf~
+a werewolf whistle~
+A werewolf whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 5
+18468 0 0
+2 0
+T 9900
+S
+#18469
+whistle guest~
+a guest whistle~
+A guest whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 6
+18469 0 0
+2 0
+T 9900
+S
+#18470
+cap bottle bottlecap~
+a bottle cap~
+A bottle cap is lying here.~
+This bottle cap can summon a noncombat pet!
+Type 'use bottlecap' to summon it.
+~
+3 p a 7
+18470 0 0
+2 0
+T 9900
+S
+#18471
+teacup cup~
+a teacup~
+A teacup is lying here.~
+This teacup can summon a noncombat pet!
+Type 'use teacup' to summon it.
+~
+3 p a 7
+18471 0 0
+2 0
+T 9900
+S
+#18472
+whistle dysentery~
+a dysentery whistle~
+A dysentery whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 5
+18472 0 0
+2 0
+T 9900
+S
+#18484
+popcorn handful fluffy~
+a handful of popcorn~
+A handful of fluffy popcorn is scattered on the ground here.~
+If you add salt and butter to it, it tastes like salty butter.
+~
+6 0 a 2
+1 0 0
+7 336
+I 14 18485 100.00 4  # COMBINE: a bag of popcorn
+M
+4
+You munch on the popcorn.~
+M
+5
+$n munches on some popcorn.~
+S
+#18485
+popcorn bag~
+a bag of popcorn~
+A bag of popcorn has been left here by an inconsiderate guest.~
+   The popcorn is surprisingly crisp, considering how long ago it popped.
+Perhaps some strange enchantment has kept it fresh all this time. There also
+seem to be some unpopped kernels at the bottom of the bag which you could
+plant.
+~
+6 bl a 7
+4 18485 0
+7 336
+I 15 18484 100.00 4  # SEPARATE: a handful of popcorn
+M
+4
+You eat a handful of the popcorn.~
+M
+5
+$n eats a handful of popcorn.~
+R
+5116 0
+S
+#18486
+axe little dwarf's dwarfs~
+a dwarf's axe~
+There is a little axe here.~
+Sorry, but I am not allowed to give more detail.
+~
+1 m an 2
+0 1 2
+2 0
+C
+25 25
+S
+#18489
+ashes pile ashen outline vampire~
+a pile of ash~
+The ashen outline of a vampire covers the grass.~
+   The ashes have begun to stir in the wind, but they seem to have the outline
+of a person. Perhaps this poor vampire was caught out in the sun.
+~
+3 0 0 1
+0 0 0
+0 0
+S
+#18490
+clothes youth~
+clothes from your youth~
+Clothes from your youth are lying on the ground.~
+   These are the clothes you wore when you were young! It's hard to believe
+they're still in such good condition. They look as good now as they did 10
+years ago.
+~
+2 p ad 2
+0 0 0
+7 0
+A
+10 -10 0
+A
+5 1 0
+C
+55 55
+M
+12
+A younger version of $n is standing here.~
+M
+8
+You put on your old clothes and feel ten years younger!~
+M
+9
+$n puts on some old clothing and suddenly seems younger...~
+S
+#18493
+gizmo clockwork~
+a clockwork gizmo~
+A clockwork gizmo is lying here.~
+This gizmo can summon a noncombat pet!
+Type 'use gizmo' to summon it.
+~
+3 p a 8
+18493 0 0
+2 0
+T 9900
+S
+#18494
+tombstone small stone~
+the tombstone~
+A small tombstone rests by the side of the trail.~
+    ,...................................,
+   /                                     \
+  .                                       .
+  |           H E R E   L I E S           |
+  |                J O H N                |
+  |                                       |
+  |                                       |
+  |   D I E D   O F   D Y S E N T E R Y   |
+  |                                       |
+  |                                       |
+  |                                       |
+\\|//|\\|//|\\|//|\\|///|\\|//|\\|//|\\|//|//
+
+A blue plaque is attached to the back of the tombstone.
+~
+3 0 0 2
+0 0 0
+0 0
+S
+#18495
+staff space time~
+the staff of space and time~
+The staff of space and time is staked into the ground here.~
+This staff can be used to change the destinations of unstable portals.
+Usage: destination <name | vnum>
+
+Destination names (cannot be abbreviated):
+ cupboard: The Cupboard Under the Stairs
+ midgaard: The Temple of Midgaard
+ popcorn: Cornfields of Popcorn
+ cave: Twisty Little Passages
+ unstable: The Unstable
+ hobbit: A Hobbit Hole
+ empire: EmpireMUD 1.0
+ closet: The Coat Closet
+ vault: Vault 111
+ modern: Modern Era
+ trail: Oregon Trail
+~
+3 0 a 6
+0 0 0
+0 0
+T 18495
+S
+#18497
+yarn space time~
+the yarn of space and time~
+The yarn of space and time is lying here.~
+   This magical ball of yarn appears to knit together the entire timeline. As
+you run your fingers along it, you can hear the low growl of the predator of
+time, stalking you. However, you realize that if you type 'use yarn', it will
+summon a mount.
+~
+3 o a 5
+18497 0 0
+14 0
+T 10263
+S
+#18498
+stone nautilus~
+a nautilus stone~
+A nautilus stone is lying here.~
+   The stone appears to be a fossil nautilus, with its distinct spiral shell.
+The stone glows blue with magical energy, and if you type 'use nautilus', you
+can summon an aquatic mount.
+~
+3 o a 6
+18498 0 0
+14 0
+T 10263
+S
+#18499
+whistle hippogriff hippogryph~
+a hippogriff whistle~
+A hippogriff whistle is hanging in mid-air.~
+   This strange whistle is carved from a hollow bone, and inscribed with a
+beak, a claw, and a hoof. If you type 'use whistle', it will summon a flying
+mount.
+~
+3 o a 7
+18499 0 0
+14 0
+T 10263
+S
+$

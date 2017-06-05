@@ -1,0 +1,19 @@
+#11000
+Inside the Gigantic Nest~
+   You climb into the nest, aided by the roots of the massive trees that make
+up the nest's walls. Whatever creature builds such a nest must be enormous, and
+ferociously strong. It might be best not to anger it.
+~
+a 0
+E
+walls trees roots~
+   The walls of the nest are made from whole trees, some with leaves still
+attached. The tree roots make it easy to climb down from the nest.
+~
+M 1 11001 100.00 1
+M 0 11010 100.00 1
+T 11001
+T 11009
+T 11027
+S
+$

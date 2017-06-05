@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: vehicles.c                                      EmpireMUD 2.0b4 *
+*   File: vehicles.c                                      EmpireMUD 2.0b5 *
 *  Usage: DB and OLC for vehicles (including ships)                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -169,7 +169,6 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	// otherwise, create the interior
 	room = create_room();
 	attach_building_to_room(bld, room, TRUE);
-	ROOM_OWNER(room) = VEH_OWNER(veh);
 	COMPLEX_DATA(room)->home_room = NULL;
 	SET_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_IN_VEHICLE);
 	SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_IN_VEHICLE);
@@ -178,6 +177,12 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	COMPLEX_DATA(room)->vehicle = veh;
 	VEH_INTERIOR_HOME_ROOM(veh) = room;
 	add_room_to_vehicle(room, veh);
+	
+	if (VEH_OWNER(veh)) {
+		claim_room(room, VEH_OWNER(veh));
+	}
+	
+	complete_wtrigger(room);
 		
 	return room;
 }
@@ -678,8 +683,10 @@ void link_and_check_vehicles(void) {
 	// only bother this if we deleted anything
 	if (found) {
 		check_all_exits();
-		read_empire_territory(NULL);
 	}
+	
+	// need to update territory counts
+	read_empire_territory(NULL, FALSE);
 }
 
 
@@ -712,13 +719,14 @@ char *list_one_vehicle(vehicle_data *veh, bool detail) {
 * @param any_vnum vnum The vehicle vnum.
 */
 void olc_search_vehicle(char_data *ch, any_vnum vnum) {
-	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh = vehicle_proto(vnum);
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	room_template *rmt, *next_rmt;
+	social_data *soc, *next_soc;
 	struct adventure_spawn *asp;
 	int size, found;
 	bool any;
@@ -744,8 +752,8 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 		if (size >= sizeof(buf)) {
 			break;
 		}
-		any = find_quest_task_in_list(QUEST_TASKS(quest), QT_OWN_VEHICLE, vnum);
-		any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_OWN_VEHICLE, vnum);
+		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_OWN_VEHICLE, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_OWN_VEHICLE, vnum);
 		
 		if (any) {
 			++found;
@@ -761,6 +769,19 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 				break;	// only need 1
 			}
+		}
+	}
+	
+	// socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_OWN_VEHICLE, vnum);
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -784,8 +805,6 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 * @return vehicle_data* The instantiated vehicle.
 */
 vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
-	extern int max_vehicle_id;
-	
 	vehicle_data *veh, *proto;
 	
 	if (!(proto = vehicle_proto(vnum))) {
@@ -811,9 +830,7 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	IN_ROOM(veh) = NULL;
 	REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);	// ensure not marked incomplete
 	
-	// script id -- find_vehicle helper
-	GET_ID(veh) = max_vehicle_id++;
-	add_to_lookup_table(GET_ID(veh), (void *)veh);
+	veh->script_id = 0;	// initialize later
 	
 	if (with_triggers) {
 		veh->proto_script = copy_trig_protos(proto->proto_script);
@@ -865,6 +882,7 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	struct vehicle_attached_mob *vam;
 	char temp[MAX_STRING_LENGTH];
 	struct resource_data *res;
+	struct trig_var_data *tvd;
 	vehicle_data *proto;
 	
 	if (!fl || !veh) {
@@ -901,8 +919,8 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	if (VEH_SCALE_LEVEL(veh)) {
 		fprintf(fl, "Scale: %d\n", VEH_SCALE_LEVEL(veh));
 	}
-	if (VEH_HEALTH(veh) != VEH_MAX_HEALTH(veh)) {
-		fprintf(fl, "Health: %d\n", VEH_HEALTH(veh));
+	if (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh)) {
+		fprintf(fl, "Health: %.2f\n", VEH_HEALTH(veh));
 	}
 	if (VEH_INTERIOR_HOME_ROOM(veh)) {
 		fprintf(fl, "Interior-home: %d\n", GET_ROOM_VNUM(VEH_INTERIOR_HOME_ROOM(veh)));
@@ -937,7 +955,13 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 			fprintf(fl, "Trigger: %d\n", GET_TRIG_VNUM(trig));
 		}
 		
-		// TODO could save SCRIPT(obj)->global_vars here too
+		LL_FOREACH (SCRIPT(veh)->global_vars, tvd) {
+			if (*tvd->name == '-') { // don't save if it begins with -
+				continue;
+			}
+			
+			fprintf(fl, "Variable: %s %ld\n%s\n", tvd->name, tvd->context, tvd->value);
+		}
 	}
 	
 	fprintf(fl, "Vehicle-end\n");
@@ -964,6 +988,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 	any_vnum load_vnum;
 	vehicle_data *veh;
 	long long_in[2];
+	double dbl_in;
 	
 	// load based on vnum or, if NOTHING, create anonymous object
 	if (proto) {
@@ -1117,15 +1142,21 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 			case 'F': {
 				if (OBJ_FILE_TAG(line, "Flags:", length)) {
 					if (sscanf(line + length + 1, "%s", s_in)) {
-						VEH_FLAGS(veh) = asciiflag_conv(s_in);
+						if (proto) {	// prefer to keep flags from the proto
+							VEH_FLAGS(veh) = VEH_FLAGS(proto) & ~SAVABLE_VEH_FLAGS;
+							VEH_FLAGS(veh) |= asciiflag_conv(s_in) & SAVABLE_VEH_FLAGS;
+						}
+						else {	// no proto
+							VEH_FLAGS(veh) = asciiflag_conv(s_in);
+						}
 					}
 				}
 				break;
 			}
 			case 'H': {
 				if (OBJ_FILE_TAG(line, "Health:", length)) {
-					if (sscanf(line + length + 1, "%d", &i_in[0])) {
-						VEH_HEALTH(veh) = MIN(i_in[0], VEH_MAX_HEALTH(veh));
+					if (sscanf(line + length + 1, "%lf", &dbl_in)) {
+						VEH_HEALTH(veh) = MIN(dbl_in, VEH_MAX_HEALTH(veh));
 					}
 				}
 				break;
@@ -1241,12 +1272,24 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 				if (OBJ_FILE_TAG(line, "Trigger:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0]) && real_trigger(i_in[0])) {
 						if (!SCRIPT(veh)) {
-							CREATE(SCRIPT(veh), struct script_data, 1);
+							create_script_data(veh, VEH_TRIGGER);
 						}
 						add_trigger(SCRIPT(veh), read_trigger(i_in[0]), -1);
 					}
 				}
 				break;
+			}
+			case 'V': {
+				if (OBJ_FILE_TAG(line, "Variable:", length)) {
+					if (sscanf(line + length + 1, "%s %d", s_in, &i_in[0]) != 2 || !get_line(fl, line)) {
+						log("SYSERR: Bad variable format in unstore_vehicle_from_file: #%d", VEH_VNUM(veh));
+						exit(1);
+					}
+					if (!SCRIPT(veh)) {
+						create_script_data(veh, VEH_TRIGGER);
+					}
+					add_var(&(SCRIPT(veh)->global_vars), s_in, line, i_in[0]);
+				}
 			}
 		}
 	}
@@ -1817,12 +1860,13 @@ vehicle_data *create_vehicle_table_entry(any_vnum vnum) {
 */
 void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
-	extern bool delete_quest_task_from_list(struct quest_task **list, int type, any_vnum vnum);
+	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	
 	vehicle_data *veh, *iter, *next_iter;
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	room_template *rmt, *next_rmt;
+	social_data *soc, *next_soc;
 	descriptor_data *desc;
 	bool found;
 	
@@ -1866,8 +1910,8 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	
 	// update quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		found = delete_quest_task_from_list(&QUEST_TASKS(quest), QT_OWN_VEHICLE, vnum);
-		found |= delete_quest_task_from_list(&QUEST_PREREQS(quest), QT_OWN_VEHICLE, vnum);
+		found = delete_requirement_from_list(&QUEST_TASKS(quest), REQ_OWN_VEHICLE, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_OWN_VEHICLE, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
@@ -1880,6 +1924,16 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		found = delete_from_spawn_template_list(&GET_RMT_SPAWNS(rmt), ADV_SPAWN_VEH, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
+		}
+	}
+	
+	// update socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_OWN_VEHICLE, vnum);
+		
+		if (found) {
+			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
 		}
 	}
 	
@@ -1898,8 +1952,8 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 			}
 		}
 		if (GET_OLC_QUEST(desc)) {
-			found = delete_quest_task_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), QT_OWN_VEHICLE, vnum);
-			found |= delete_quest_task_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), QT_OWN_VEHICLE, vnum);
+			found = delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_OWN_VEHICLE, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_OWN_VEHICLE, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
@@ -1909,6 +1963,14 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		if (GET_OLC_ROOM_TEMPLATE(desc)) {
 			if (delete_from_spawn_template_list(&GET_OLC_ROOM_TEMPLATE(desc)->spawns, ADV_SPAWN_VEH, vnum)) {
 				msg_to_char(desc->character, "One of the vehicles that spawns in the room template you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_SOCIAL(desc)) {
+			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_OWN_VEHICLE, vnum);
+		
+			if (found) {
+				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
+				msg_to_desc(desc, "A vehicle required by the social you are editing was deleted.\r\n");
 			}
 		}
 	}
@@ -1928,6 +1990,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 void save_olc_vehicle(descriptor_data *desc) {	
 	vehicle_data *proto, *veh = GET_OLC_VEHICLE(desc), *iter;
 	any_vnum vnum = GET_OLC_VNUM(desc);
+	bitvector_t old_flags;
 	UT_hash_handle hh;
 
 	// have a place to save it?
@@ -1965,6 +2028,10 @@ void save_olc_vehicle(descriptor_data *desc) {
 		if (VEH_VNUM(iter) != vnum) {
 			continue;
 		}
+		
+		// flags (preserve the state of the savable flags only)
+		old_flags = VEH_FLAGS(iter) & SAVABLE_VEH_FLAGS;
+		VEH_FLAGS(iter) = (VEH_FLAGS(veh) & ~SAVABLE_VEH_FLAGS) | old_flags;
 		
 		// update pointers
 		if (VEH_KEYWORDS(iter) == VEH_KEYWORDS(proto)) {
@@ -2126,7 +2193,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Map Icon: %s\t0 %s\r\n", VEH_ICON(veh), show_color_codes(VEH_ICON(veh)));
 	}
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]\r\n", VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
+	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]\r\n", (int) VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
 	
 	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING || VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
 		sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, part, TRUE);
@@ -2210,7 +2277,8 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 	proto = vehicle_proto(VEH_VNUM(veh));
 	
 	if (VEH_LOOK_DESC(veh) && *VEH_LOOK_DESC(veh)) {
-		msg_to_char(ch, "%s", VEH_LOOK_DESC(veh));
+		sprintf(lbuf, "%s:\r\n%s", VEH_SHORT_DESC(veh), VEH_LOOK_DESC(veh));
+		msg_to_char(ch, "%s", CAP(lbuf));
 	}
 	else {
 		act("You look at $V but see nothing special.", FALSE, ch, NULL, veh, TO_CHAR);
@@ -2437,7 +2505,7 @@ OLC_MODULE(vedit_lookdescription) {
 	}
 	else {
 		sprintf(buf, "description for %s", VEH_SHORT_DESC(veh));
-		start_string_editor(ch->desc, buf, &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION);
+		start_string_editor(ch->desc, buf, &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
 	}
 }
 

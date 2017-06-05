@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.crop.c                                      EmpireMUD 2.0b4 *
+*   File: olc.crop.c                                      EmpireMUD 2.0b5 *
 *  Usage: OLC for crop prototypes                                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -453,7 +453,7 @@ void olc_show_crop(char_data *ch) {
 		strcat(buf, buf1);
 	}
 
-	sprintf(buf + strlen(buf), "<&yspawns&0> (add, remove, list)\r\n");
+	sprintf(buf + strlen(buf), "<&yspawns&0>\r\n");
 	if (GET_CROP_SPAWNS(cp)) {
 		count = 0;
 		for (spawn = GET_CROP_SPAWNS(cp); spawn; spawn = spawn->next) {

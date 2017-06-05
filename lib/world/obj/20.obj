@@ -79,9 +79,9 @@ a coif~
 A simple coif is sitting on the ground.~
 The coif is among the most popular hats of the day.
 ~
-2 0 ae 1
+2 0 ae 2
 0 0 0
-7 0
+11 0
 R
 5617 0
 S
@@ -91,9 +91,12 @@ a blouse~
 A ruffled blouse is draped across the ground.~
 The blouse is made of fine, expertly tailored cloth.
 ~
-2 0 ad 1
+2 0 ad 2
 0 0 0
 11 0
+M
+12
+$n stands here, wearing a ruffled blouse.~
 R
 5617 0
 S
@@ -104,9 +107,12 @@ A pleated dress has been left here.~
    The dress is made of several layers of fine cloth and is masterfully pleated
 to create a flowing effect as you walk.
 ~
-2 0 ad 1
+2 0 ad 2
 0 0 0
 11 0
+M
+12
+$n is here, in $s best dress.~
 R
 5617 0
 S
@@ -141,9 +147,12 @@ A flowing toga is draped all along the ground.~
    The toga, made from one very long piece of cloth, was once the height of
 city fashion. Now, it reminds people of an earlier time.
 ~
-2 0 ad 1
+2 0 ad 3
 0 0 0
 11 0
+M
+12
+$n stands here in $s best senatorial toga.~
 R
 5617 0
 S
@@ -218,9 +227,12 @@ A spotted robe is lying on the ground.~
 warrior. It is made from the spotted pelt of a ferocious jungle cat, and it
 retains every ounce of that animal's majesty.
 ~
-2 0 ad 1
+2 0 ad 2
 0 0 0
 7 0
+M
+12
+$n stands proudly in $s spotted fur robe.~
 R
 5617 0
 S
@@ -440,7 +452,7 @@ a length of rope~
 A rope is coiled on the ground.~
 Rope can be used to lead, tie, or harness an animal.
 ~
-3 l a 4
+3 l a 5
 0 0 0
 7 0
 M
@@ -450,7 +462,7 @@ M
 7
 $n attaches a rope to $V.~
 O
-28 0
+28 u
 R
 5121 0
 R

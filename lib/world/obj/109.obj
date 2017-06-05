@@ -1,0 +1,798 @@
+#10900
+tokens dragon pouch~
+a pouch of dragon tokens~
+A pouch of dragon tokens is lying here.~
+   This leather pouch holds tokens redeemable for rewards from the new Red
+Dragon adventure. Use 'count tokens' to count them.
+~
+3 p a 5
+0 0 0
+7 0
+T 10900
+S
+#10901
+token dragon~
+a dragon token~
+A dragon token is lying here.~
+You shouldn't actually be seeing this.
+~
+3 p a 3
+0 0 0
+7 0
+T 10901
+S
+#10902
+hide dragon red pile~
+a red dragon hide~
+A large pile of red dragon hide is lying here.~
+   This pile of thick, scaly dragon hide can be tanned into dragon leather, or
+specially treated and woven into dragon cloth. No matter what you do with it,
+it can be used to make powerful equipment.
+~
+3 e a 6
+0 0 0
+7 0
+I 18 10928 100.00 1 x  # TAN: tough dragon leather
+O
+24 fgk
+R
+5193 0
+R
+5621 0
+S
+#10903
+bone dragon colossal~
+a colossal dragon bone~
+A colossal dragon bone lies across the walkway.~
+   This dragon bone is truly colossal. It's amazing you can carry it at all,
+since it's almost as big as you are. Of course, you can also carry a lot of
+trees in that pack of yours.
+~
+3 e a 5
+0 0 0
+14 0
+O
+2 fgk
+R
+5193 0
+R
+5621 0
+S
+#10904
+egg serpent crimson~
+a crimson serpent egg~
+A crimson serpent egg is smouldering on the ground.~
+   The crimson red egg is the size of your head, and is hot to the touch. Type
+'use egg' to summon a crimson serpent mount.
+~
+3 ep a 2
+10904 0 0
+14 0
+T 10263
+S
+#10905
+egg crimson dragon~
+a crimson dragon egg~
+A crimson dragon egg is smouldering here.~
+   The crimson red egg is the size of your head, and is hot to the touch. Type
+'use egg' to summon a crimson dragon mount.
+~
+3 ep a 4
+10905 0 0
+14 0
+T 10263
+S
+#10906
+egg dragon sea~
+a sea dragon egg~
+A sea dragon egg is smouldering here.~
+   The crimson red egg is the size of your head, and is hot to the touch. Type
+'use egg' to summon a sea dragon mount.
+~
+3 ep a 5
+10906 0 0
+14 0
+T 10263
+S
+#10907
+steak dragon raw huge~
+a raw dragon steak~
+A huge dragon steak is lying on the ground.~
+   This dragon steak is huge! You can cook it into a dragon roast, which is
+long-lasting and very filling. Or, if you're a Gourmet Chef, you can make a
+roast dragon feast and boost the party's damage significantly.  
+~
+3 0 a 7
+0 0 0
+7 288
+O
+17 gl
+R
+5119 0
+S
+#10908
+roast dragon meat~
+a dragon roast~
+Some roast dragon meat has been left here.~
+This giant piece of roast meat has the pre-charred aroma of dragon.
+~
+6 0 a 5
+72 0 0
+7 288
+M
+4
+You nearly choke on a huge bite of $p.~
+M
+5
+$n nearly chokes on a huge bite of $p.~
+O
+17 g
+R
+5619 0
+R
+5119 0
+S
+#10909
+feast roast dragon~
+the roast dragon feast~
+A roast dragon feast is set out here!~
+   This feast of roast dragon meat is enough to feed the whole party. It will
+greatly increase damage in combat.
+~
+6 m 0 5
+96 0 0
+7 336
+A
+21 1 0
+A
+22 1 0
+C
+0 325
+M
+4
+You feel the dragon meat burning in your stomach!~
+S
+#10910
+warhammer hammer dragonsteel steel~
+a dragonsteel warhammer~
+A dragonsteel warhammer is stamped into the ground.~
+The hammer is forged from dragonsteel, the distilled bone of a massive dragon.
+~
+1 empy an 5
+0 1 6
+14 0
+C
+0 325
+M
+8
+You swing $p over your shoulder menacingly.~
+M
+9
+$n swings $p over $s shoulder menacingly.~
+T 10904
+S
+#10911
+claymore dragonsteel steel great~
+a dragonsteel claymore~
+A great dragonsteel claymore is stuck into the ground!~
+   The claymore is crafted from powerful dragonsteel, a metal so hard that no
+known metal can break it. Once forged, it is nearly unstoppable.
+~
+1 ehmnpy an 5
+0 1 1
+14 0
+C
+0 325
+M
+8
+You swing $p over your shoulder menacingly.~
+M
+9
+$n swings $p over $s shoulder menacingly.~
+T 10904
+S
+#10912
+mace dragonbone bone~
+a dragonbone mace~
+A dragonbone mace is lying here.~
+   The mace is made from dragonbone, wrapped in dragonsteel and lined with
+imperium make it unbreakable.
+~
+1 empy an 5
+0 1 5
+14 0
+A
+18 3 0
+A
+24 1 0
+A
+12 1 0
+C
+0 325
+M
+8
+You swing $p over your shoulder menacingly.~
+M
+9
+$n swings $p over $s shoulder menacingly.~
+T 10904
+S
+#10913
+wand draconic flaming~
+a flaming draconic wand~
+A draconic wand is sticking out of the ground.~
+   This wand is carved into the shape of a dragon's claw, and seems to burn
+with no fuel and no sign of cooling off. Only a powerful caster can even stand
+to hold it.
+~
+1 empy an 6
+0 1 16
+14 0
+A
+8 1 0
+A
+23 4 0
+C
+0 325
+M
+8
+You grasp $p, and feel the power to burn down the world!~
+M
+9
+$n grasps $p, $s whole arm suddenly on fire.~
+T 10904
+S
+#10914
+staff dragonbone bone flaming~
+a flaming dragonbone staff~
+A dragonbone staff simmers on the ground.~
+   The dragonbone staff is too large to hold, but with just the slightest touch
+of mana, it becomes effortless.
+~
+1 empy an 7
+0 1 18
+14 0
+C
+0 325
+M
+8
+You grasp $p, and feel the power to burn down the world!~
+M
+9
+$n grasps $p, $s whole arm suddenly on fire.~
+T 10904
+S
+#10915
+wristblade blade dragonbone bone~
+a dragonbone wristblade~
+A dragonbone wristblade is lying on the ground.~
+   The wristblade is sharp, and made to slide out from a sleeve and lock into
+place. Most victims would never see it coming.
+~
+1 impy ano 7
+0 1 4
+14 0
+A
+21 2 0
+A
+17 1 0
+C
+0 325
+M
+9
+$n snaps $p onto $s wrist.~
+M
+8
+You snap $p onto your wrist.~
+T 10904
+S
+#10916
+shield tower dragonbone bone~
+a dragonbone tower shield~
+A dragonbone tower shield is standing here.~
+   The tower shield, which is nearly as tall as you are, is carved from the
+bones of some colossal dragon. The front is painted to look like the dragon's
+flames.
+~
+23 empy ao 6
+0 0 0
+14 0
+A
+13 3 0
+A
+18 1 0
+C
+0 325
+M
+8
+You heave $p up in front of you and prepare for battle.~
+M
+9
+$n heaves $p up in front of $mself and prepares for battle.~
+T 10904
+S
+#10917
+charm red dragon flaming~
+a flaming red dragon charm~
+A red dragon charm is lying here.~
+   The charm is made from a large dragon scale, wrapped and prepared with
+powerful magicks. It's warm to the touch, and imbues the user with healing
+fire.
+~
+3 empy ao 8
+0 0 0
+14 0
+A
+7 4 0
+A
+9 1 0
+C
+0 325
+M
+8
+You grasp $p and feel its flames course through your blood.~
+T 10904
+S
+#10918
+tome dragonkind~
+the tome of dragonkind~
+The tome of dragonkind is sitting here.~
+   This tome is written on the flesh of dragons, bound in their bone, and no
+mortal can open it or read its pages. But in the hands of the right mage, it
+releases incredible power.
+~
+3 empy ao 10
+0 0 0
+14 0
+A
+8 1 0
+A
+9 1 0
+A
+2 1 0
+A
+22 4 0
+C
+0 325
+M
+8
+You grasp $p in your hands and feel like you could conquer the world!~
+T 10904
+S
+#10919
+girdle dragon crimson~
+a crimson dragon girdle~
+A crimson dragon girdle is draped here.~
+   The girdle is made from tough red dragon leather. It's surprisingly light
+and flexible, for how strong it is.
+~
+27 mpy al 7
+1 0 0
+7 0
+A
+1 1 0
+A
+2 1 0
+A
+9 1 0
+C
+0 325
+T 10904
+S
+#10920
+waistband dragonsteel steel burning~
+a burning dragonsteel waistband~
+A burning dragonsteel waistband is lying on the ground.~
+   The waistband is made from burning hot dragonsteel, and common weapons seem
+to melt as they strike it. The center of the waistband has the shape of a
+dragon's head, and glows bright crimson.
+~
+27 mpy al 8
+3 0 0
+14 0
+A
+12 1 0
+A
+24 1 0
+A
+18 2 0
+C
+0 325
+M
+8
+You burn your fingertips as you strap $p around your waist.~
+M
+9
+$n burns $s hands as $e straps $p around $s waist.~
+T 10904
+S
+#10921
+cincture flaming draconic~
+a flaming draconic cincture~
+A flaming draconic cincture is burning on the ground.~
+The cincture is made from dragon cloth, and is forever aflame.
+~
+27 mpy al 9
+0 0 0
+7 0
+A
+8 1 0
+A
+7 2 0
+A
+9 1 0
+A
+23 2 0
+C
+0 325
+T 10904
+S
+#10922
+sash dragoncloth cloth burning~
+a burning dragoncloth sash~
+A burning dragoncloth sash is lying here.~
+This burning sash brings the great power from the dragon it was sewn from.
+~
+27 mpy al 9
+0 0 0
+7 0
+A
+17 1 0
+A
+22 3 0
+C
+0 325
+T 10904
+S
+#10923
+block butcher dragonsflame flame~
+a dragonsflame butcher block~
+A dragonsflame butcher block is smouldering here.~
+   This butcher block is hot to the touch. You can use it to 'build butchertent
+<direction>' to make a building that is a stable with a cooking fire. Like
+regular stables, animals can be stored in it.
+~
+3 e a 2
+0 0 0
+1 0
+R
+5621 0
+R
+5193 0
+S
+#10924
+hearth dragonstone stone~
+a dragonstone hearth~
+A dragonstone hearth is lying here.~
+   The dragonstone hearth is huge, and allows you to make a colossal cave home
+for yourself. Type 'build dragoncave <direction>' to set up this great house in
+the mountainside. You need the Luxury ability to start building it.  
+~
+3 e a 4
+0 0 0
+1 0
+R
+5621 0
+R
+5193 0
+S
+#10925
+ruby dragonseye dragon's eye~
+a dragonseye ruby~
+A dragonseye ruby lying here.~
+   The dragonseye ruby is hot to the touch, and quite large. You can use it to
+make a great statue with 'build dragonstatue'. Statues add fame to the empire.
+~
+3 e a 3
+0 0 0
+12 0
+R
+5621 0
+R
+5193 0
+S
+#10926
+pen dragonquill quill~
+a dragonquill pen~
+A dragonquill pen is stabbed into the ground.~
+   This dragonquill pen is far too large to write with, but it would make a
+great decoration in a magnificent library. Type 'build dragonlibrary
+<direction>' to construct it; this library comes with an alchemy laboratory.
+~
+3 e a 4
+0 0 0
+1 0
+R
+5621 0
+R
+5193 0
+S
+#10927
+cloth dragon bolt~
+a bolt of dragon cloth~
+A bolt of dragon cloth is lying here.~
+   Dragon cloth is made by stripping fibers from dragon hide, then weaving them
+on a loom. The result is a tough, powerful, magical cloth. It is suited for
+many enchanted crafts. You can light the cloth on fire to return it to its
+original dragon hide state.
+~
+3 e a 8
+0 0 0
+7 0
+I 11 10902 100.00 1 x  # LIGHT: a red dragon hide
+O
+26 gk
+R
+5193 0
+R
+5621 0
+S
+#10928
+leather dragon tough~
+tough dragon leather~
+A pile of tough dragon leather is stacked here.~
+   This dragon leather is tough and, though heavy, is still lighter than iron.
+This could be made into powerful gear. You can light the leather on fire to
+return it to its original dragon hide state.
+~
+3 e a 8
+0 0 0
+7 0
+I 11 10902 100.00 1 x  # LIGHT: a red dragon hide
+O
+15 gk
+R
+5193 0
+R
+5621 0
+S
+#10929
+ingot dragonsteel steel~
+a dragonsteel ingot~
+A dragonsteel ingot is stacked here.~
+   The dragonsteel ingot is made from smelting an entire dragon bone, which
+liquifies like metal and then can be forged into powerful weapons and armor.
+You can light the unforged dragonsteel ingot on fire to return it to its
+original dragon bone state.
+~
+3 e a 8
+0 0 0
+14 0
+I 11 10903 100.00 1 x  # LIGHT: a colossal dragon bone
+O
+18 gk
+R
+5193 0
+R
+5621 0
+S
+#10930
+victory sense~
+the sense of victory~
+A sense of victory hangs in the air.~
+It seems that this adventure has been completed.
+~
+3 0 0 6
+0 0 0
+10 144
+T 10930
+S
+#10931
+schematic warhammer dragonsteel~
+the dragonsteel warhammer schematic~
+The dragonsteel warhammer schematic is lying here.~
+   This schematic makes a dragonsteel warhammer, a powerful 1-handed melee
+weapon. You require Mythic Forge (Steelsmith or Guildsman) to forge this
+weapon.
+~
+3 o a 3
+0 0 0
+0 0
+S
+#10932
+schematic dragonsteel claymore~
+the dragonsteel claymore schematic~
+The dragonsteel claymore schematic is lying here.~
+   This schematic makes a dragonsteel claymore, a powerful 2-handed melee
+weapon. You require Mythic Forge (Steelsmith or Guildsman) to forge this
+weapon.
+~
+3 o a 4
+0 0 0
+0 0
+S
+#10933
+schematic dragonbone mace~
+the dragonbone mace schematic~
+The dragonbone mace schematic is lying here.~
+   This schematic makes a dragonbone mace, a strong tank weapon. You require
+Mythic Forge (Steelsmith or Guildsman) to forge this weapon.
+~
+3 o a 5
+0 0 0
+0 0
+S
+#10934
+schematic wand draconic~
+the draconic wand schematic~
+The draconic wand schematic is lying here.~
+   This schematic makes a flaming draconic wand, a powerful healer's weapon.
+You need Lore Crafts (Artificer or Tinker) to craft this weapon.
+~
+3 o a 6
+0 0 0
+0 0
+S
+#10935
+schematic dragonbone staff~
+the dragonbone staff schematic~
+The dragonbone staff schematic is lying here.~
+   This schematic makes a flaming dragonbone staff, a powerful caster weapon.
+You need Lore Crafts (Artificer or Tinker) to craft this weapon.
+~
+3 o a 7
+0 0 0
+0 0
+S
+#10936
+design wristblade dragonbone~
+the dragonbone wristblade design~
+The dragonbone wristblade design is lying here.~
+   This design is for a dragonbone wristblade, a strong off-hand weapon for
+melee warriors. You require Mythic Forge (Steelsmith or Guildsman) to forge
+this off-hand weapon.
+~
+3 o a 8
+0 0 0
+0 0
+S
+#10937
+design dragonbone tower shield~
+the dragonbone tower shield design~
+The dragonbone tower shield design is lying here.~
+   This design is for a dragonbone tower shield, a strong shield for tanks.
+You require Mythic Forge (Steelsmith or Guildsman) to forge this shield.
+~
+3 o a 9
+0 0 0
+0 0
+S
+#10938
+design red dragon charm~
+the red dragon charm design~
+The red dragon charm design is lying here.~
+   This design is for a flaming red dragon charm, a powerful healer off-hand
+item. You need Lore Crafts (Artificer or Tinker) to craft this off-hand
+trinket.
+~
+3 o a 10
+0 0 0
+0 0
+S
+#10939
+design tome dragonkind~
+the dragonkind tome design~
+The dragonkind tome design is lying here.~
+   This design creates the tome of dragonkind, a powerful caster off-hand item.
+You need Lore Crafts (Artificer or Tinker) to craft this off-hand tome.
+~
+3 o a 11
+0 0 0
+0 0
+S
+#10940
+pattern dragon girdle crimson~
+the crimson dragon girdle pattern~
+The crimson dragon girdle pattern is lying here.~
+   This pattern creates a crimson dragon girdle, a powerful light armor
+waistband for melee warriors. You need Fabled Hides (Antiquarian or Alchemist)
+to sew this belt.
+~
+3 o a 12
+0 0 0
+0 0
+S
+#10941
+pattern burning dragonsteel waistband~
+the burning dragonsteel waistband pattern~
+The burning dragonsteel waistband pattern is lying here.~
+   This pattern creates a burning dragonsteel waistband, a heavy armored
+tanking belt. You need Fabled Hides (Antiquarian or Alchemist) to sew this
+belt.
+~
+3 o a 13
+0 0 0
+0 0
+S
+#10942
+pattern draconic flaming cincture~
+the flaming draconic cincture pattern~
+The flaming draconic cincture pattern is lying here.~
+   This pattern creates a flaming draconic cincture, a powerful mage armor belt
+for healers. You need Legendary Stitching (Artificer or Smuggler) to sew this
+belt.
+~
+3 o a 15
+0 0 0
+0 0
+S
+#10943
+pattern burning dragoncloth sash~
+the burning dragoncloth sash pattern~
+The burning dragoncloth sash pattern is lying here.~
+   This pattern creates a burning dragoncloth sash, a powerful mage armor belt
+for casters. You need Legendary Stitching (Artificer or Smuggler) to sew this
+belt.
+~
+3 o a 15
+0 0 0
+0 0
+S
+#10944
+stone red dragon shining~
+a shining red dragon stone~
+A shining red dragon stone is lying here.~
+   These stones are generally found in slain red dragons. Judging from the size
+of this one, it must have come from a colossal dragon! The dragon essence
+stored in this type of stone is used to craft legendary weapons and armor.
+~
+15 0 a 1
+1 0 0
+12 0
+C
+1 1
+R
+5611 a
+R
+5184 a
+R
+5621 a
+R
+5193 a
+S
+#10945
+hoard dragon's dragons red~
+the red dragon's hoard~
+The red dragon's hoard is lying here!~
+   This bundle of gleaming golden treasure is surely worth its weight in gold!
+But fencing such a rare hoard would be impossible, so you should return it to
+Bangles the thief and let him reward you.
+~
+3 0 a 1
+0 0 0
+4 0
+C
+250 300
+Q 10902
+S
+#10946
+bracelets magnificent dragon pair~
+magnificent dragon bracelets~
+A pair of magnificent dragon bracelets is lying here.~
+   These colossal bracelets are forged from the remains of a red dragon. And
+from the looks of the scales, it was a big one! These bracelets surely show off
+the majesty of your empire!
+~
+2 eo aj 1
+0 0 0
+4 0
+A
+5 2 0
+A
+19 10 0
+C
+0 125
+S
+#10947
+schematic magnificent dragon bracelets~
+the magnificent dragon bracelet schematic~
+The magnificent dragon bracelet schematic is lying here.~
+   This schematic makes a pair of magnificent dragon bracelets, a powerful
+wrist item that brings Greatness to your empire! You require Fabled Hides
+(Antiquarian or Alchemist) to sew this item.
+~
+3 o a 5
+0 0 0
+0 0
+S
+$

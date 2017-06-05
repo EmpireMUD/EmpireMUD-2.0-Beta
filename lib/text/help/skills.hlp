@@ -1,11 +1,12 @@
 "ABILITY POINTS"
 
 You earn "ability" points at certain skill levels. These points are used to
-purchase abilities from the skill's tree.
+purchase abilities from the skill's tree. Abilities that are level 0 are always
+available and do not cost ability points.
 
 You earn ability points at these levels:
  Basic: 1, 5, 10, 15, 20, 25, 30, 40, 50  (9 total)
- Specialty: 60, 70, 75  (3 total)
+ Specialty: 60, 70, 75 x2  (4 total)
  Class: 80, 90, 100  (3 total)
 
 You can buy abilities with "skill buy <ability>".
@@ -25,6 +26,7 @@ get cleaner faster than if you were to bathe in a river.
 CHIP
 
 Usage:  chip <item>
+Speed boosts:  Faster Chores bonus
 
 This lets you chip a rock down to a sharper, more refined tool. You need to be
 wielding a rock or other hammer to do this.
@@ -36,13 +38,16 @@ See also: CRAFT
 #
 CHOP
 
+Chop (Chores ability)
+
 Usage:  chop
+Speed boosts:  Faster Chores bonus, haste, higher axe damage, higher Strength
 
 This command allows you to chop trees in the forest. Beware, trees are a
-limited resource. You can chop faster if you are stronger, if your axe deals
-more damage, or if you have haste.
+limited resource. Different types of forest give different qualities and
+quantities of trees. Some trees can be scraped, sawed, or lit on fire.
 
-See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW
+See also: BUILD, DEPLETION, SCRAPE, TREES, LUMBER, SAW, LIGHT, CHORES
 #
 "DAILY EXPERIENCE BONUS POINTS" "DAILY SKILLS" "BONUS EXPERIENCE POINTS" "DAILY BONUS EXPERIENCE POINTS"
 
@@ -57,7 +62,7 @@ down by one. When they run out, the effect ends until the daily skill reset.
 You can keep yourself from accidentally spending your daily bonus experience
 in the wrong skill by using 'noskill'.
 
-See also: ABILITY POINTS, SKILLS, SKILL CAPS
+See also: ABILITY POINTS, SKILLS, SKILL CAPS, NOSKILL
 #
 DESIGNATE REDESIGNATE KITCHEN BEDROOM LABORATORY LARDER CLOSET CRYPT STUDY
 
@@ -90,6 +95,7 @@ Room types:
  tunnel - Underground hallways used in some buildings
  vault - Holds gold and silver, and sets your wealth (castle)
  crypt - Can be set as a tomb (castle)
+ trophy room - Stores some adventure rewards (castle)
 
 For more, see SHIP ROOMS.
 
@@ -97,7 +103,10 @@ See also: BUILD, STORAGE
 #
 DIG
 
+Dig (Scavenging ability)
+
 Usage:  dig
+Speed boosts:  Faster Chores bonus, Finder ability, haste, shovel
 
 This lets you claw at the ground until you find something useful. Among
 things that may be found, rocks, flint, and clay are the most common.
@@ -105,11 +114,12 @@ things that may be found, rocks, flint, and clay are the most common.
 Using a shovel or having the Finder ability will each cut your dig time in
 half.
 
-See also: DEPLETION, ROCKS, FLINT, CLAY, FINDER, SHOVEL
+See also: DEPLETION, ROCKS, FLINT, CLAY, FINDER, SHOVEL, SCAVENGING
 #
 DISMANTLE
 
 Usage:  dismantle
+Speed boosts:  Faster Chores bonus, haste
 
 This command allows you to tear down a building when you're done with it. You
 get back approximately half of the resources you spent to build it, although
@@ -133,14 +143,17 @@ See also: DIG, LIGHT, ROCK COMPONENT
 #
 GATHER
 
+Gather (Scavenging ability)
+
 Usage:  gather
+Speed boosts:  Faster Chores bonus, Finder ability, Haste
 
 Allows you to gather sticks from the ground. Your skill in this determines
 how many different sticks you can use and thus how quickly you gather enough.
 
 You can also gather apples in an orchard.
 
-See also: DEPLETION, STICKS, APPLES, ORCHARD, FOREST
+See also: DEPLETION, STICKS, APPLES, ORCHARD, FOREST, SCAVENGING
 #
 HARNESS UNHARNESS
 
@@ -163,13 +176,16 @@ See also: DRAG, LEAD
 #
 HARVEST HARVESTING
 
+Harvest (Chores ability)
+
 Usage:  harvest
+Speed boosts:  Faster Chores bonus, haste
 
 Allows you to harvest a crop. Be careful that you also replant some,
 otherwise you'll run out of that crop quickly. You must be wielding a slashing
 or slicing weapon (sword or axe) to harvest crops.
 
-See also: PLANT
+See also: PLANT, CHORES
 #
 HERD HERDING
 
@@ -212,7 +228,9 @@ container to hold the milk. Cows can be milked once or twice per day.
 #
 MILL MILLING
 
-Building:  (MM)  Mill  (no skill required)
+Mill (Chores ability)
+
+Building:  (MM)  Mill  (Basic Buildings)
 Stored at the mill:  cornmeal, flour
 Command:  mill [number] <item>
           mill info <item>
@@ -221,20 +239,22 @@ You can mill:
   wheat into flour
   corn into cornmeal
 
-You must do this at a Mill building. Milling will gain Trade skill up to 15.
+You must do this at a Mill building.
 
-See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, CHORES, RECIPES
 #
 MINE MINES
 
-Building:  &y/&0[]&y\&0  Mine  (no skill required)
+Mine (Chores ability)
+
+Building:  &y/&0[]&y\&0  Mine  (Basic Buildings)
+Speed boosts:  Faster Chores bonus, haste, higher pick damage, higher Strength
 Command:  mine
 
 "Mine" is both a building type, and the command to work in that building. Mines
 must be built on mountains, and can only be entered from one side even before
 you complete them. To work in a mine, you need a pick of some kind, although a
-simple handaxe will also work. A better mining tool and more Strength will help
-you mine faster, as will haste.
+simple handaxe will also work.
 
 Mines have a limited amount of ore, and do not replenish. However, if you fully
 dismantle a mine, its mountain will reset when the MUD celebrates a new year
@@ -253,20 +273,24 @@ Types of mines:
   gold - only found with Rare Metals
   nocturnium - only found with Rare Metals
   imperium - only found with Rare Metals
+  moonstone - only found with Rare Metals
 
-See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS
+See also: DEPLETION, DEEP MINES, PROSPECT, RARE METALS, CHORES
 #
 MINT
 
+Mint (Chores ability)
+
 Building:  [MM]  Mint  (Commerce ability)
 Fame:  5
+Speed boosts:  Faster Chores bonus
 Command:  mint <object>
 
 The mint building allows you to mint valuable metals into coins. Each building
 can only mint coins for the empire it belongs to. The mint command will auto-
 repeat; stopping the action will give you back the item you were minting.
 
-See also: COINS, COMMERCE, STOP
+See also: COINS, COMMERCE, STOP, CHORES
 #
 MORPH MORPHING SHAPESHIFTING FASTMORPH
 
@@ -278,7 +302,8 @@ Some powers allow you to change shape, using the morph command. Morphing takes
 a few seconds, but if you're in combat you can morph instantly at a 3x higher
 cost than normal (you can also morph instantly using 'fastmorph').
 
-Morphing will remove your disguise, if you have one.
+Morphing will remove your disguise, if you have one. Some forms do not allow
+you to fastmorph.
 
 See also: ANIMAL FORMS, WOLF FORM, BAT FORM, HORRID FORM, MIST FORM
 #
@@ -295,7 +320,10 @@ See also: SKILLS
 #
 PLANT
 
+Plant (Chores ability)
+
 Usage:  plant <seed/food>
+Speed boosts:  Faster Chores bonus, haste
 
 You can replant crops in open fields so that they may regrow and be harvested
 again. This is essential in keeping your crops from dying out.
@@ -313,9 +341,11 @@ Jungle: light jungle
 Light jungle is jungle which has been partially chopped, but not reduced to
 plains.
 
-See also: CROPS, HARVEST, PICK
+See also: CROPS, HARVEST, PICK, CHORES
 #
 PRESS PRESSING OILMAKING "OIL MAKING"
+
+Press (Chores ability)
 
 Command:  press [number] <item>
           press info <item>
@@ -323,10 +353,22 @@ Command:  press [number] <item>
 You can press:
   olives into olive oil
 
-You must do this at an Oilmaker building. Pressing oil will gain Trade skill up
-to 15.
+You must do this at an Oilmaker building.
 
-See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL
+See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL, CHORES, CRAFT INFO,
+  RECIPES
+#
+READY
+
+Usage:  ready <weapon type>
+
+Some abilities allow you to create a weapon from mana, blood, or other
+energies. These weapons are temporary and will disappear if you stop using
+them.
+
+See also:
+  READY FIREBALL  (Natural Magic)
+  READY BLOOD WEAPONS  (Vampire)
 #
 SACRIFICE 
 
@@ -335,31 +377,41 @@ Usage:  sacrifice <item> <god>
 Sacrifice is used to destroy an item in the favor of a specific god you
 choose. This helps you by clearing up many unwanted items and resources.
 This also may help you get favor with the god, and in turn, that god may help
-you out with a little help. The sacrifice points are increased if the
-sacrifice is performed in a shrine, temple, or high temple to that god. 
+you out with a little help.
+
+Sacrifices are worth 1.5x the normal resources if you are at a temple (or other
+monument) dedicated to the god to whom you are making the sacrifice. The value
+of a sacrifice is based on its gear level.
 
 Example:  
-
   > sacrifice stick Exar 
 #
 SAW
 
-Usage:  saw <item>
+Saw (Chores ability)
 
-You can saw trees and logs into lumber. You must be in a lumber yard. This
+Usage:  saw <item>
+Speed boosts:  Faster Chores bonus, haste
+
+You can saw most trees and logs into lumber. You must be in a lumber yard. This
 will go faster if you have the Woodworking ability.
 
-See also: TREES, LOGS, LUMBER
+Not all types of trees can be sawed.
+
+See also: TREES, LOGS, LUMBER, CHORES
 #
 SCRAPE
 
-Usage:  scrape <item>
+Scrape (Chores ability)
 
-This skill is used to process trees into logs.
+Usage:  scrape <item>
+Speed boosts:  Faster Chores bonus, haste
+
+This skill is used to process some types of trees into logs.
 
 The Woodworking ability increases how fast you can scrape.
 
-See also: TREES, SAW, WOODWORKING
+See also: TREES, SAW, WOODWORKING, PILLAR, CHORES
 #
 SHEAR SHEARING
 
@@ -390,6 +442,7 @@ Usage:  skills -- list all skills
         skill buy <ability> -- purchase an ability
         skill reset <skill> -- reset your ability points
         skill drop <skill> <level> -- lose skill levels
+        skill swap
 
 This multi-purpose command helps you understand your skills. It shows your
 progress in each skill, and the ability points you've earned.
@@ -398,19 +451,18 @@ If you specify a skill, you'll see a breakdown of the abilities in that skill
 tree. Abilities marked with an "x" are the ones you already know. To buy a new
 ability, use "skill buy". You must have a free ability point to do this.
 
-For more information, see the help page for each skill or ability. In some
-cases, you may have to type "help skill empire" because "help empire" shows
-something else, although this is the name of a skill.
+For more information, see the help page for each skill or ability.
 
 When you hit a skill cap level (50, 75, 100) you get to reset your abilities
 in that skill. To do that, you can type "skill reset <skill>". If you type it
 without the skill name, you can see which skills have free resets available.
+Resetting a skill only resets your current set (see SKILL SWAP).
 
 It also shows the range in which you can gain the skill, although you can gain
 no more than 10 points from any one ability.
 
-See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, TRAINING SKILLS, ABILITY
-POINTS
+See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, TRAINING SKILLS,
+   ABILITY POINTS, SKILL SWAP, LETHEIAN ICON
 #
 "SKILL CAPS" CAPS "MAX SKILL" "MAXIMUM SKILL" "CLASS SKILLS" "SPECIALTY SKILLS" "BASIC SKILLS"
 
@@ -421,9 +473,9 @@ your specialty or class skills, use the "specialize" command. This will get you
 a free level in the skill.
 
 * You can have two skills at 100. These are your class skills.
-  These skills will get 15 abilities each.
+  These skills will get 16 abilities each.
 * You can have one skill at 75. This is your specialty skill.
-  These skills will get 12 abilities each.
+  These skills will get 13 abilities each.
 * The rest of the skills are limited to 50. These are basic skills.
   These skills will get 9 abilities each.
 
@@ -448,15 +500,34 @@ want to try a different specialty.
 Once you use this command, those skill points are gone forever. You will also
 lose any abilities you purchased above the new level.
 
+Some skills cannot be dropped all the way to zero voluntarily.
+
 See also: SKILL
+#
+"SKILL SWAP" "SKILL SETS" MULTISPEC MULTI-SPEC "MULTI SPEC"
+
+Usage:  skill swap
+
+Players who reach level 100 can have two different sets of ability purchases
+for their skills. When you use "skill swap", all of your skills change from
+one set to the other.
+
+Swapping skill sets will reduce your moves and mana to 25% of your total.
+
+When you first change to your alternate skill set, no abilities have been
+purchased. Resetting a skill only resets your current set, not the other set.
+Your count of skill levels gained from using each ability (x/10) is shared
+between both sets.
+
+Swapping skill sets takes 15 seconds and cannot be done in combat.
+
+See also: SKILLS, SLEEP
 #
 "TRAINING SKILLS" "SKILL POINTS" "SKILL EXPERIENCE" "SKILLUPS" EXPERIENCE
 
-The two ways to gain skill levels are:
-- By using "yellow" abilities from the skill's tree (abilities that aren't at
-  max).
-- For skills under level 15, you can usually gain skill by doing "chores". See
-  the help file for each skill tree for more information on leveling it.
+You can gain skill experience and levels by using any of the "yellow" abilities
+in the skill tree (abilities that aren't at max yet). You can't gain more than
+10 skill levels from any one ability.
 
 Each skill has an experience rating, as a percentage. This is your chance to
 gain a skill level each time you use one of the skill tree's abilities -- the
@@ -471,7 +542,10 @@ See also: SKILL CAPS, SPECIALIZE, SKILLS
 #
 SMELT MELT
 
+Smelt (Chores ability)
+
 Usage:  smelt [number] <type of ingot/bar>
+Speed boosts:  Faster Chores bonus
 
 Using a forge or foundry, you can melt down metals like iron, silver, and gold
 into ingots or bars. Smelting generally requires two of the base metal (e.g.
@@ -483,7 +557,7 @@ than their raw form. To return bars to their ingot form, use 'separate'.
 Typing "smelt" by itself will list things you can smelt with the ore available
 in your inventory.
 
-See also: METAL, SEPARATE, WEALTH
+See also: CRAFT INFO, METAL, SEPARATE, WEALTH, CHORES, RECIPES
 #
 SPECIALIZE SPECIALTY
 
@@ -529,7 +603,7 @@ SUMMON GUARDS  (Empire ability)
 SUMMON HUMANS  (Vampire ability)
 SUMMON MATERIAlS  (High Sorcery ability)
 SUMMON PLAYER  (at an Astral Nexus)
-SUMMON THUGS  (Stealth ability)
+SUMMON THUG  (Stealth ability)
 ADVENTURE SUMMON  (inside an adventure)
 #
 TENT TENTS

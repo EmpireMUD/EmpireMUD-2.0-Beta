@@ -1,0 +1,193 @@
+#9000
+Grain for the Miller~
+   The miller is out of grain to make his flour. Bring 10 bushels or sacks of
+any type of grain (wheat, corn, oats, rice, or barley) to earn his gratitude.
+~
+The miller takes the grain and thanks you for your help.
+~
+4 def 1 75 -1
+A
+1 210
+P
+9 1 0 15
+R
+0 0 1
+R
+4 1 25
+W
+1 12 2 10
+Z
+1 210
+S
+#9009
+Forge Horseshoes~
+   The stablemaster needs more horseshoes for your army's mounts. Forge 8
+horseshoes for him and he will be very grateful. Note: You can only forge
+horseshoes while on this quest, and any spares left over when you hand in this
+quest will disappear.
+~
+The stablemaster takes the horseshoes and thanks you for your help.
+~
+5 def 1 75 -1
+A
+1 213
+P
+9 6 0 15
+R
+0 0 1
+R
+4 6 25
+T 9003
+W
+2 9009 0 8
+Z
+1 213
+S
+#9030
+Fetch a Trophy~
+   The barkeep wants a trophy to hang on the wall of the tavern. The head of a
+mighty beast slain by the owner is traditional, but the barkeep's not much of a
+fighter. Take his knife, slay a wolf, bear, or big cat, and butcher it to get
+its head, then return.
+~
+   You hand over the beast's severed head. The barkeep thanks you, and heads
+off to get it stuffed.
+~
+2 ef 0 0 -1
+A
+1 220
+P
+9 0 0 15
+R
+4 0 25
+R
+0 0 1
+T 9003
+W
+2 9030 0 1
+Z
+1 220
+S
+#9033
+Steal a Trinket~
+   The guildmaster wants you to show your skill by retrieving a small trinket
+which has been placed in the pocket of a citizen of the empire. Pickpocket
+random citizens until you find it, then return it to the guildmaster.
+~
+You hand over the trinket.
+~
+6 ef 0 0 -1
+A
+1 221
+P
+9 4 0 15
+R
+0 0 1
+R
+4 4 25
+T 9003
+W
+2 9033 0 1
+Z
+1 221
+S
+#9036
+Disenchant Trinkets~
+   The High Sorcerer is busy, but asks you to disenchant a set of useless
+trinkets enchanted by a class of novice sorcerers as practice.
+~
+The High Sorcerer takes the trinkets and thanks you for your help.
+~
+12 ef 1 75 -1
+A
+1 228
+P
+9 2 0 15
+R
+0 0 1
+T 9003
+W
+2 9036 0 5 a
+W
+11 0 0 1 a
+Z
+1 228
+S
+#9039
+Herbs for the Alchemist~
+   The alchemist needs some herbs for his latest experiment. Since apparently
+nobody else knows what a herb looks like and he's too busy watching the
+experiment, he asks you to bring him the herbs.
+~
+   You give the herbs to the alchemist, who immediately criticizes your
+herb-picking technique. At least you learned something from it.
+~
+5 def 0 0 -1
+A
+1 231
+P
+9 5 0 50
+R
+0 0 1
+R
+4 5 50
+W
+2 1202 0 4 a
+W
+2 1205 0 4 a
+Z
+1 231
+S
+#9040
+Flowers for the Alchemist~
+   The alchemist is working on an experiment to prove that flowers are not
+completely useless. Since he can't leave his experiment alone, he asks you to
+pick some flowers for him.
+~
+   You hand over the flowers to the alchemist, who tosses them into a cauldron.
+Nothing appears to happen.
+~
+4 def 0 0 -1
+A
+1 231
+P
+9 5 0 15 a
+P
+10 5 0 49 a
+R
+0 0 1
+R
+4 5 25
+W
+2 123 0 8
+Z
+1 231
+S
+#9042
+Deliver a Letter~
+   The postmaster's pigeons are all out and he has an urgent letter to be
+delivered! Examine the letter to check its recipient, and 'give' it to them,
+then return for a reward.
+~
+The postmaster thanks you for your help.
+~
+11 ef 0 0 -1
+A
+1 263
+P
+7 5130 0 1 a
+P
+7 5108 0 1 a
+P
+7 5511 0 1 a
+R
+0 0 1
+R
+1 -1 20
+T 9042
+W
+11 0 0 1
+Z
+1 263
+S
+$

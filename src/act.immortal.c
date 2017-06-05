@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.immortal.c                                  EmpireMUD 2.0b4 *
+*   File: act.immortal.c                                  EmpireMUD 2.0b5 *
 *  Usage: Player-level imm commands and other goodies                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -50,10 +50,12 @@ extern const char *component_types[];
 extern const char *dirs[];
 extern const char *drinks[];
 extern const char *extra_bits[];
+extern const char *function_flags[];
 extern const char *genders[];
 extern const char *grant_bits[];
 extern const char *island_bits[];
 extern const char *mapout_color_names[];
+extern struct faction_reputation_type reputation_levels[];
 extern const char *room_aff_bits[];
 extern const char *sector_flags[];
 extern const char *spawn_flags[];
@@ -67,10 +69,13 @@ void check_delayed_load(char_data *ch);
 void clear_char_abilities(char_data *ch, any_vnum skill);
 void delete_instance(struct instance_data *inst);	// instance.c
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
+extern int get_highest_access_level(account_data *acct);
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
+void get_resource_display(struct resource_data *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 extern char *get_room_name(room_data *room, bool color);
+void replace_question_color(char *input, char *color, char *output);
 void save_whole_world();
 void scale_mob_to_level(char_data *mob, int level);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
@@ -83,6 +88,31 @@ void instance_list_row(struct instance_data *inst, int number, char *save_buffer
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Removes custom data from an island (as customized by empires).
+*
+* @param int island_id The island being decustomized.
+*/
+void decustomize_island(int island_id) {
+	struct island_info *island = get_island(island_id, FALSE);
+	
+	struct empire_island *eisle;
+	empire_data *emp, *next_emp;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		HASH_FIND_INT(EMPIRE_ISLANDS(emp), &island_id, eisle);
+		if (eisle && eisle->name) {
+			log_to_empire(emp, ELOG_TERRITORY, "%s has lost its custom name and is now called %s", eisle->name, island ? island->name : "???");
+			if (eisle->name) {
+				free(eisle->name);
+			}
+			eisle->name = NULL;
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		}
+	}
+}
+
 
 /**
 * Autostores one item. Contents are emptied out to where the object was.
@@ -312,6 +342,7 @@ ADMIN_UTIL(util_rescan);
 ADMIN_UTIL(util_resetbuildingtriggers);
 ADMIN_UTIL(util_strlen);
 ADMIN_UTIL(util_tool);
+ADMIN_UTIL(util_yearly);
 
 
 struct {
@@ -330,6 +361,7 @@ struct {
 	{ "resetbuildingtriggers", LVL_CIMPL, util_resetbuildingtriggers },
 	{ "strlen", LVL_START_IMM, util_strlen },
 	{ "tool", LVL_IMPL, util_tool },
+	{ "yearly", LVL_CIMPL, util_yearly },
 
 	// last
 	{ "\n", LVL_TOP+1, NULL }
@@ -338,7 +370,16 @@ struct {
 
 // secret implementor-only util for quick changes -- util tool
 ADMIN_UTIL(util_tool) {
-	msg_to_char(ch, "Ok.\r\n");
+	// msg_to_char(ch, "Ok.\r\n");
+	trig_data *trig, *next_trig;
+	
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trig->attach_type == WLD_TRIGGER || trig->attach_type == RMT_TRIGGER || trig->attach_type == BLD_TRIGGER || trig->attach_type == ADV_TRIGGER) {
+			if (IS_SET(GET_TRIG_TYPE(trig), WTRIG_RANDOM)) {
+				msg_to_char(ch, "[%5d] %s\r\n", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+			}
+		}
+	}
 }
 
 
@@ -664,6 +705,19 @@ ADMIN_UTIL(util_strlen) {
 }
 
 
+ADMIN_UTIL(util_yearly) {
+	void annual_world_update();
+	
+	if (!*argument || str_cmp(argument, "confirm")) {
+		msg_to_char(ch, "You must type 'util yearly confirm' to do this. It will cause decay on the entire map.\r\n");
+	}
+	else {
+		send_config_msg(ch, "ok_string");
+		annual_world_update();
+	}
+}
+
+
 // main interface for admin utils
 ACMD(do_admin_util) {
 	char util[MAX_INPUT_LENGTH], larg[MAX_INPUT_LENGTH];
@@ -812,8 +866,8 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 	}
 	
 	if (count > 0) {
-		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted %d instances of %s", GET_REAL_NAME(ch), count, GET_ADV_NAME(adv));
-		msg_to_char(ch, "%d instances of '%s' deleted.\r\n", count, GET_ADV_NAME(adv));
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted %d instance%s of %s", GET_REAL_NAME(ch), count, PLURAL(count), GET_ADV_NAME(adv));
+		msg_to_char(ch, "%d instance%s of '%s' deleted.\r\n", count, PLURAL(count), GET_ADV_NAME(adv));
 	}
 	else {
 		msg_to_char(ch, "No instances of '%s' found.\r\n", GET_ADV_NAME(adv));
@@ -1075,6 +1129,7 @@ struct set_struct {
 		{ "invstart", 	LVL_START_IMM, 	PC, 	BINARY },
 		{ "title",		LVL_START_IMM, 	PC, 	MISC },
 		{ "notitle",	LVL_START_IMM,	PC, 	BINARY },
+		{ "nocustomize", LVL_START_IMM,	PC,		BINARY },
 
 		{ "health",		LVL_START_IMM, 	NPC, 	NUMBER },
 		{ "move",		LVL_START_IMM, 	NPC, 	NUMBER },
@@ -1109,6 +1164,7 @@ struct set_struct {
 		{ "bonusexp", LVL_START_IMM, PC, NUMBER },
 		{ "grants",		LVL_CIMPL,	PC,		MISC },
 		{ "skill", LVL_START_IMM, PC, MISC },
+		{ "faction", LVL_START_IMM, PC, MISC },
 
 		{ "strength",	LVL_START_IMM,	BOTH,	NUMBER },
 		{ "dexterity",	LVL_START_IMM,	BOTH,	NUMBER },
@@ -1260,6 +1316,10 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_MUTED);
 		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
+	else if SET_CASE("nocustomize") {
+		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_NOCUSTOMIZE);
+		SAVE_ACCOUNT(GET_ACCOUNT(vict));
+	}
 	else if SET_CASE("notitle") {
 		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_NOTITLE);
 		SAVE_ACCOUNT(GET_ACCOUNT(vict));
@@ -1283,8 +1343,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("vampire") {
 		if (IS_VAMPIRE(vict)) {
-			GET_BLOOD(vict) = GET_MAX_BLOOD(vict);
-			REMOVE_BIT(PLR_FLAGS(vict), PLR_VAMPIRE);
+			void un_vampire(char_data *ch);
+			un_vampire(vict);
 		}
 		else {
 			make_vampire(vict, TRUE);
@@ -1355,8 +1415,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		
 		RANGE(0, LVL_IMPL);
 		vict->player.access_level = (byte) value;
-		if (!IS_NPC(vict))
-			GET_IMMORTAL_LEVEL(vict) = IS_IMMORTAL(vict) ? LVL_TOP - GET_ACCESS_LEVEL(vict) : -1;
+		if (!IS_NPC(vict)) {
+			GET_IMMORTAL_LEVEL(vict) = (GET_ACCESS_LEVEL(vict) > LVL_MORTAL ? (LVL_TOP - GET_ACCESS_LEVEL(vict)) : -1);
+		}
 		SAVE_CHAR(vict);
 		check_autowiz(ch);
 	}
@@ -1412,7 +1473,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			return (0);
 		}
 		GET_REAL_SEX(vict) = i;
-		sprintf(output, "%s's sex is now %s", GET_NAME(vict), genders[(int) GET_REAL_SEX(vict)]);
+		sprintf(output, "%s's sex is now %s.", GET_NAME(vict), genders[(int) GET_REAL_SEX(vict)]);
 	}
 	else if SET_CASE("age") {
 		if (value < 2 || value > 95) {	/* Arbitrary limits. */
@@ -1430,7 +1491,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			if (GET_LASTNAME(vict) != NULL)
 				free(GET_LASTNAME(vict));
 			GET_LASTNAME(vict) = NULL;
-    		sprintf(output, "%s no longer has a last name", GET_NAME(vict));
+    		sprintf(output, "%s no longer has a last name.", GET_NAME(vict));
 		}
     	else {
 			if (GET_LASTNAME(vict) != NULL)
@@ -1504,7 +1565,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 		else {
 			// prepare message first (amt changes)
-			sprintf(output, "%s now has %s", GET_NAME(vict), money_amount(type, amt));
+			sprintf(output, "%s now has %s.", GET_NAME(vict), money_amount(type, amt));
 			
 			// we're going to use increase_coins, so first see if they already had some
 			if ((coin = find_coin_entry(GET_PLAYER_COINS(vict), type))) {
@@ -1513,9 +1574,79 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			increase_coins(vict, type, amt);
 		}
 	}
+	else if SET_CASE("faction") {
+		void update_reputations(char_data *ch);
+		
+		int min_idx, min_rep, max_idx, max_rep, new_rep, new_val = 0;
+		char fct_arg[MAX_INPUT_LENGTH], *fct_val;
+		struct player_faction_data *pfd;
+		bool del_rep = FALSE;
+		faction_data *fct;
+		
+		// usage: set <player> faction <name/vnum> <rep/value>
+		fct_val = any_one_word(val_arg, fct_arg);
+		skip_spaces(&fct_val);
+		
+		if (!*fct_arg || !*fct_val) {
+			msg_to_char(ch, "Usage: set <player> faction <name/vnum> <rep/value>\r\n");
+			return 0;
+		}
+		if (!(fct = find_faction(fct_arg)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
+			msg_to_char(ch, "Unknown faction '%s'.\r\n", fct_arg);
+			return 0;
+		}
+		
+		// helper data
+		min_idx = rep_const_to_index(FCT_MIN_REP(fct));
+		min_rep = (min_idx != NOTHING) ? reputation_levels[min_idx].value : MIN_REPUTATION;
+		max_idx = rep_const_to_index(FCT_MAX_REP(fct));
+		max_rep = (max_idx != NOTHING) ? reputation_levels[max_idx].value : MAX_REPUTATION;
+		
+		// parse val arg
+		if (!str_cmp(fct_val, "none")) {
+			del_rep = TRUE;
+		}
+		else if (isdigit(*fct_val) || *fct_val == '-') {
+			new_val = atoi(fct_val);
+		}
+		else if ((new_rep = get_reputation_by_name(fct_val)) == NOTHING) {
+			msg_to_char(ch, "Invalid reputation level '%s'.\r\n", fct_val);
+			return 0;
+		}
+		else {
+			new_val = reputation_levels[rep_const_to_index(new_rep)].value;
+		}
+		
+		// bounds check
+		if (!del_rep && (new_val < min_rep || new_val > max_rep)) {
+			msg_to_char(ch, "You can't set the reputation to that level. That faction has a range of %d-%d.\r\n", min_rep, max_rep);
+			return 0;
+		}
+		
+		// load data
+		if (!(pfd = get_reputation(vict, FCT_VNUM(fct), TRUE))) {
+			msg_to_char(ch, "Unable to set reputation for that player and faction.\r\n");
+			return 0;
+		}
+		
+		// and go
+		if (del_rep) {
+			HASH_DEL(GET_FACTIONS(vict), pfd);
+			free(pfd);
+			sprintf(output, "%s's reputation with %s deleted.", GET_NAME(vict), FCT_NAME(fct));
+		}
+		else {
+			pfd->value = new_val;
+			update_reputations(vict);
+			pfd = get_reputation(vict, FCT_VNUM(fct), TRUE);
+			new_rep = rep_const_to_index(pfd->rep);
+			sprintf(output, "%s's reputation with %s set to %s / %d.", GET_NAME(vict), FCT_NAME(fct), reputation_levels[new_rep].name, pfd->value);
+		}
+	}
 	else if SET_CASE("skill") {
+		void check_ability_levels(char_data *ch, any_vnum skill);
 		char skillname[MAX_INPUT_LENGTH], *skillval;
-		int level = -1, old_level;
+		int level = -1;
 		skill_data *skill;
 		
 		// set <name> skill "<name>" <level>
@@ -1536,25 +1667,34 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 
 		// victory
-		old_level = get_skill_level(vict, SKILL_VNUM(skill));
 		set_skill(vict, SKILL_VNUM(skill), level);
 		update_class(vict);
-		if (old_level > get_skill_level(vict, SKILL_VNUM(skill))) {
-			clear_char_abilities(vict, SKILL_VNUM(skill));
-		}
-		sprintf(output, "%s's %s set to %d", GET_NAME(vict), SKILL_NAME(skill), level);
+		check_ability_levels(vict, SKILL_VNUM(skill));
+		sprintf(output, "%s's %s set to %d.", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
 
-	else if SET_CASE("account") {		
+	else if SET_CASE("account") {
+		if (get_highest_access_level(GET_ACCOUNT(vict)) > GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You can't edit accounts for people above your access level.\r\n");
+			return 0;
+		}
 		if (!str_cmp(val_arg, "new")) {
-			sprintf(output, "%s is now associated with a new account", GET_NAME(vict));
+			sprintf(output, "%s is now associated with a new account.", GET_NAME(vict));
 			remove_player_from_account(vict);
 			create_account_for_player(vict);
 		}
 		else {
 			// load 2nd player
 			if ((alt = find_or_load_player(val_arg, &file))) {
-				sprintf(output, "%s is now associated with %s's account", GET_NAME(vict), GET_NAME(alt));
+				if (get_highest_access_level(GET_ACCOUNT(alt)) > GET_ACCESS_LEVEL(ch)) {
+					msg_to_char(ch, "You can't edit accounts for people above your access level.\r\n");
+					if (file) {
+						free_char(alt);
+					}
+					return 0;
+				}
+				
+				sprintf(output, "%s is now associated with %s's account.", GET_NAME(vict), GET_NAME(alt));
 				
 				remove_player_from_account(vict);
 				// does 2nd player have an account already? if not, make one
@@ -1652,6 +1792,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		rename(buf1, buf2);
 		
 		SAVE_CHAR(vict);
+		save_library_file_for_vnum(DB_BOOT_ACCT, GET_ACCOUNT(vict)->id);
 		sprintf(output, "%s's name changed to %s.", oldname, GET_NAME(vict));
 	}
 	
@@ -1660,6 +1801,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		value = MAX(GET_MIN_SCALE_LEVEL(vict), value);
 		value = MIN(GET_MAX_SCALE_LEVEL(vict), value);
 		scale_mob_to_level(vict, value);
+		SET_BIT(MOB_FLAGS(vict), MOB_NO_RESCALE);
 	}
 	
 	// this goes last, after all SET_CASE statements
@@ -1730,6 +1872,104 @@ SHOW(show_components) {
 		if (ch->desc) {
 			page_string(ch->desc, buf, TRUE);
 		}
+	}
+}
+
+
+// show data system
+SHOW(show_data) {
+	extern struct stored_data *data_table;
+	extern struct stored_data_type stored_data_info[];
+	
+	char output[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	struct stored_data *data, *next_data;
+	size_t size;
+	
+	size = snprintf(output, sizeof(output), "Stored data:\r\n");
+	
+	HASH_ITER(hh, data_table, data, next_data) {
+		// DATYPE_x:
+		switch (data->keytype) {
+			case DATYPE_INT: {
+				snprintf(line, sizeof(line), " %s: %d\r\n", stored_data_info[data->key].name, data_get_int(data->key));
+				break;
+			}
+			case DATYPE_LONG: {
+				snprintf(line, sizeof(line), " %s: %ld\r\n", stored_data_info[data->key].name, data_get_long(data->key));
+				break;
+			}
+			case DATYPE_DOUBLE: {
+				snprintf(line, sizeof(line), " %s: %f\r\n", stored_data_info[data->key].name, data_get_double(data->key));
+				break;
+			}
+			default: {
+				snprintf(line, sizeof(line), " %s: UNKNOWN\r\n", stored_data_info[data->key].name);
+				break;
+			}
+		}
+		
+		if ((size += strlen(line)) < sizeof(output)) {
+			strcat(output, line);
+		}
+		else {
+			break;
+		}
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
+	}
+}
+
+
+SHOW(show_factions) {
+	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH];
+	struct player_faction_data *pfd, *next_pfd;
+	faction_data *fct;
+	bool file = FALSE;
+	char_data *vict;
+	int count = 0;
+	size_t size;
+	int idx;
+	
+	arg2 = any_one_arg(argument, name);
+	skip_spaces(&arg2);
+	
+	if (!(vict = find_or_load_player(name, &file))) {
+		msg_to_char(ch, "No player by that name.\r\n");
+	}
+	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else {
+		check_delayed_load(vict);
+		size = snprintf(buf, sizeof(buf), "%s's factions:\r\n", GET_NAME(vict));
+		HASH_ITER(hh, GET_FACTIONS(vict), pfd, next_pfd) {
+			if (size + 10 >= sizeof(buf)) {
+				break;	// out of room
+			}
+			if (!(fct = find_faction_by_vnum(pfd->vnum))) {
+				continue;
+			}
+			if (*arg2 && !multi_isname(arg2, FCT_NAME(fct))) {
+				continue;	// filter
+			}
+			
+			++count;
+			idx = rep_const_to_index(pfd->rep);
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s %s(%s / %d)\t0\r\n", pfd->vnum, FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value);
+		}
+		
+		if (!count) {
+			strcat(buf, " none\r\n");
+		}
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+	
+	if (file) {
+		free_char(vict);
 	}
 }
 
@@ -1820,7 +2060,7 @@ SHOW(show_islands) {
 			}
 			
 			isle = get_island(cur->island, TRUE);
-			msg_to_char(ch, "%2d. %s: %d items\r\n", cur->island, isle->name, cur->count);
+			msg_to_char(ch, "%2d. %s: %d items\r\n", cur->island, get_island_name_for(isle->id, ch), cur->count);
 			// pull it out of the list to prevent unlimited iteration
 			REMOVE_FROM_LIST(cur, list, next);
 			free(cur);
@@ -1897,7 +2137,7 @@ SHOW(show_quests) {
 			return;
 		}
 		
-		size = snprintf(buf, sizeof(buf), "%s's quests:\r\n", GET_NAME(vict));
+		size = snprintf(buf, sizeof(buf), "%s's quests (%d/%d dailies):\r\n", GET_NAME(vict), GET_DAILY_QUESTS(vict), config_get_int("dailies_per_day"));
 		LL_FOREACH(GET_QUESTS(vict), pq) {
 			count_quest_tasks(pq, &count, &total);
 			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d tasks)\r\n", pq->vnum, get_quest_name_by_proto(pq->vnum), count, total);
@@ -1972,10 +2212,12 @@ SHOW(show_stats) {
 	extern int total_accounts, active_accounts, active_accounts_week;
 	
 	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_vehs = 0, num_players = 0, num_descs = 0, menu_count = 0;
+	int num_trigs = 0;
 	empire_data *emp, *next_emp;
 	descriptor_data *desc;
 	vehicle_data *veh;
 	char_data *vict;
+	trig_data *trig;
 	obj_data *obj;
 	
 	// count descriptors at menus
@@ -2001,6 +2243,7 @@ SHOW(show_stats) {
 	// other counts
 	LL_COUNT(object_list, obj, num_objs);
 	LL_COUNT(vehicle_list, veh, num_vehs);
+	LL_COUNT(trigger_list, trig, num_trigs);
 
 	// count active empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -2023,7 +2266,13 @@ SHOW(show_stats) {
 	msg_to_char(ch, "  %6d adventures       %6d total rooms\r\n", HASH_COUNT(adventure_table), HASH_COUNT(world_table));
 	msg_to_char(ch, "  %6d buildings        %6d room templates\r\n", HASH_COUNT(building_table), HASH_COUNT(room_template_table));
 	msg_to_char(ch, "  %6d sectors          %6d crops\r\n", HASH_COUNT(sector_table), HASH_COUNT(crop_table));
-	msg_to_char(ch, "  %6d triggers         %6d craft recipes\r\n", HASH_COUNT(trigger_table), HASH_COUNT(craft_table));
+	msg_to_char(ch, "  %6d triggers         %6d prototypes\r\n", num_trigs, HASH_COUNT(trigger_table));
+	msg_to_char(ch, "  %6d craft recipes    %6d quests\r\n", HASH_COUNT(craft_table), HASH_COUNT(quest_table));
+	msg_to_char(ch, "  %6d archetypes       %6d books\r\n", HASH_COUNT(archetype_table), HASH_COUNT(book_table));
+	msg_to_char(ch, "  %6d classes          %6d skills\r\n", HASH_COUNT(class_table), HASH_COUNT(skill_table));
+	msg_to_char(ch, "  %6d abilities        %6d factions\r\n", HASH_COUNT(ability_table), HASH_COUNT(faction_table));
+	msg_to_char(ch, "  %6d globals          %6d morphs\r\n", HASH_COUNT(globals_table), HASH_COUNT(morph_table));
+	msg_to_char(ch, "  %6d socials\r\n", HASH_COUNT(social_table));
 	msg_to_char(ch, "  %6d large bufs       %6d buf switches\r\n", buf_largecount, buf_switches);
 	msg_to_char(ch, "  %6d overflows\r\n", buf_overflows);
 }
@@ -2078,8 +2327,10 @@ SHOW(show_skills) {
 	skill_data *skill;
 	char_data *vict;
 	bool found, is_file = FALSE;
+	int set;
 	
 	argument = one_argument(argument, arg);
+	skip_spaces(&argument);
 	
 	if (!(vict = find_or_load_player(arg, &is_file))) {
 		send_config_msg(ch, "no_person");
@@ -2095,6 +2346,13 @@ SHOW(show_skills) {
 		return;
 	}
 	
+	// detect "swap" arg
+	set = GET_CURRENT_SKILL_SET(vict);
+	if (*argument && is_abbrev(argument, "swap")) {
+		// note: this ONLY supports 2 different sets
+		set = (!set ? 1 : 0);
+	}
+	
 	msg_to_char(ch, "Skills for %s:\r\n", PERS(vict, ch, TRUE));
 	
 	HASH_ITER(hh, GET_SKILL_HASH(vict), plsk, next_plsk) {
@@ -2106,7 +2364,7 @@ SHOW(show_skills) {
 		HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
 			abil = plab->ptr;
 			
-			if (!plab->purchased) {
+			if (!plab->purchased[set]) {
 				continue;
 			}
 			if (ABIL_ASSIGNED_SKILL(abil) != skill) {
@@ -2125,7 +2383,8 @@ SHOW(show_skills) {
 	HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
 		abil = plab->ptr;
 		
-		if (!plab->purchased) {
+		// ALWAYS use current set for class abilities
+		if (!plab->purchased[GET_CURRENT_SKILL_SET(vict)]) {
 			continue;
 		}
 		if (ABIL_ASSIGNED_SKILL(abil) != NULL) {
@@ -2161,6 +2420,37 @@ SHOW(show_commons) {
 		msg_to_char(ch, buf);
 	else
 		msg_to_char(ch, "None.\r\n");
+}
+
+
+SHOW(show_dailycycle) {
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	quest_data *qst, *next_qst;
+	size_t size;
+	int num;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg || !isdigit(*arg)) {
+		msg_to_char(ch, "Usage: show dailycycle <number>\r\n");
+	}
+	else if ((num = atoi(arg)) < 0) {
+		msg_to_char(ch, "Invalid cycle number.\r\n");
+	}
+	else {
+		size = snprintf(buf, sizeof(buf), "Daily quests with cycle id %d:\r\n", num);
+		HASH_ITER(hh, quest_table, qst, next_qst) {
+			if (!QUEST_FLAGGED(qst, QST_DAILY) || QUEST_DAILY_CYCLE(qst) != num) {
+				continue;
+			}
+			
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s%s\r\n", QUEST_VNUM(qst), QUEST_NAME(qst), QUEST_DAILY_ACTIVE(qst) ? " (active)" : "");
+		}
+		
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
 }
 
 
@@ -2222,14 +2512,16 @@ SHOW(show_terrain) {
 
 
 SHOW(show_uses) {
-	extern bool find_quest_task_in_list(struct quest_task *list, int type, any_vnum vnum);
+	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
+	social_data *soc, *next_soc;
 	struct resource_data *res;
+	bld_data *bld, *next_bld;
 	bitvector_t flags;
 	size_t size;
 	int type;
@@ -2274,6 +2566,29 @@ SHOW(show_uses) {
 			}
 		}
 		
+		HASH_ITER(hh, building_table, bld, next_bld) {
+			if (size >= sizeof(buf)) {
+				break;
+			}
+			
+			LL_FOREACH(GET_BLD_YEARLY_MAINTENANCE(bld), res) {
+				if (res->type != RES_COMPONENT || res->vnum != type) {
+					continue;
+				}
+				if (flags && (res->misc & flags) != flags) {
+					continue;
+				}
+				
+				if (res->misc) {
+					prettier_sprintbit(res->misc, component_flags, part);
+				}
+				else {
+					*part = '\0';
+				}
+				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s%s%s%s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), *part ? " (" : "", part, *part ? ")" : "");
+			}
+		}
+		
 		HASH_ITER(hh, craft_table, craft, next_craft) {
 			if (size >= sizeof(buf)) {
 				break;
@@ -2301,11 +2616,22 @@ SHOW(show_uses) {
 			if (size >= sizeof(buf)) {
 				break;
 			}
-			any = find_quest_task_in_list(QUEST_TASKS(quest), QT_GET_COMPONENT, type);
-			any |= find_quest_task_in_list(QUEST_PREREQS(quest), QT_GET_COMPONENT, type);
+			any = find_requirement_in_list(QUEST_TASKS(quest), REQ_GET_COMPONENT, type);
+			any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_GET_COMPONENT, type);
 		
 			if (any) {
 				size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			}
+		}
+		
+		HASH_ITER(hh, social_table, soc, next_soc) {
+			if (size >= sizeof(buf)) {
+				break;
+			}
+			any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_GET_COMPONENT, type);
+		
+			if (any) {
+				size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 			}
 		}
 		
@@ -2674,6 +3000,7 @@ SHOW(show_variables) {
 	}
 	else {
 		msg_to_char(ch, "Global Variables:\r\n");
+		check_delayed_load(plr);
 		
 		if (plr->script && plr->script->global_vars) {
 			/* currently, variable context for players is always 0, so it is */
@@ -2852,14 +3179,15 @@ void do_stat_book(char_data *ch, book_data *book) {
 void do_stat_building(char_data *ch, bld_data *bdg) {
 	extern const char *bld_flags[];
 	extern const char *designate_flags[];
-	extern const char *function_flags[];
 	
+	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	struct obj_storage_type *store;
-	char line[MAX_STRING_LENGTH];
 	obj_data *obj, *next_obj;
 	
 	msg_to_char(ch, "Building VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_BLD_VNUM(bdg), GET_BLD_NAME(bdg));
-	msg_to_char(ch, "Room Title: %s, Icon: %s&0\r\n", GET_BLD_TITLE(bdg), NULLSAFE(GET_BLD_ICON(bdg)));
+	
+	replace_question_color(NULLSAFE(GET_BLD_ICON(bdg)), "&0", lbuf);
+	msg_to_char(ch, "Room Title: %s, Icon: %s&0 %s&0\r\n", GET_BLD_TITLE(bdg), lbuf, show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
 	
 	if (GET_BLD_DESC(bdg) && *GET_BLD_DESC(bdg)) {
 		msg_to_char(ch, "Description:\r\n%s", GET_BLD_DESC(bdg));
@@ -2913,6 +3241,11 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 		send_to_char(buf, ch);
 	}
 	
+	if (GET_BLD_YEARLY_MAINTENANCE(bdg)) {
+		get_resource_display(GET_BLD_YEARLY_MAINTENANCE(bdg), buf);
+		msg_to_char(ch, "Yearly maintenance:\r\n%s", buf);
+	}
+	
 	// storage? reverse-lookup
 	*buf = '\0';
 	*line = '\0';
@@ -2960,6 +3293,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern const char *cooldown_types[];
 	extern const char *damage_types[];
 	extern const double hit_per_dex;
+	extern const char *mob_custom_types[];
 	extern const char *mob_move_types[];
 	extern const char *player_bits[];
 	extern const char *position_types[];
@@ -2972,11 +3306,12 @@ void do_stat_character(char_data *ch, char_data *k) {
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	struct script_memory *mem;
 	struct cooldown_data *cool;
-	int i, i2, diff, found = 0, val;
+	int count, i, i2, iter, diff, found = 0, val;
 	obj_data *j;
 	struct follow_type *fol;
 	struct over_time_effect_type *dot;
 	struct affected_type *aff;
+	archetype_data *arch;
 	
 	bool is_proto = (IS_NPC(k) && k == mob_proto(GET_MOB_VNUM(k)));
 	
@@ -2999,7 +3334,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	}
 
 	if (IS_NPC(k)) {
-		msg_to_char(ch, "Scaled level: [&c%d&0|&c%d&0-&c%d&0]\r\n", GET_CURRENT_SCALE_LEVEL(k), GET_MIN_SCALE_LEVEL(k), GET_MAX_SCALE_LEVEL(k));
+		msg_to_char(ch, "Scaled level: [&c%d&0|&c%d&0-&c%d&0], Faction: [\tt%s\t0]\r\n", GET_CURRENT_SCALE_LEVEL(k), GET_MIN_SCALE_LEVEL(k), GET_MAX_SCALE_LEVEL(k), MOB_FACTION(k) ? FCT_NAME(MOB_FACTION(k)) : "none");
 	}
 	else {	// not NPC
 		msg_to_char(ch, "Title: %s&0\r\n", (GET_TITLE(k) ? GET_TITLE(k) : "<None>"));
@@ -3012,6 +3347,14 @@ void do_stat_character(char_data *ch, char_data *k) {
 		}
 
 		msg_to_char(ch, "Access Level: [&c%d&0], Class: [&c%s&0/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0]\r\n", GET_ACCESS_LEVEL(k), SHOW_CLASS_NAME(k), class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k));
+		
+		msg_to_char(ch, "Archetypes:");
+		for (iter = 0, count = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
+			if ((arch = archetype_proto(CREATION_ARCHETYPE(k, iter)))) {
+				msg_to_char(ch, "%s%s", (count++ > 0) ? ", " : " ", GET_ARCH_NAME(arch));
+			}
+		}
+		msg_to_char(ch, "%s\r\n", count ? "" : " none");
 		
 		coin_string(GET_PLAYER_COINS(k), buf);
 		msg_to_char(ch, "Coins: %s\r\n", buf);
@@ -3060,6 +3403,11 @@ void do_stat_character(char_data *ch, char_data *k) {
 		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 		
 		if (IS_NPC(k)) {
+			sprintf(lbuf, "Mob-dmg  [%d]", MOB_DAMAGE(k));
+			sprintf(lbuf2, "Mob-hit  [%d]", MOB_TO_HIT(k));
+			sprintf(lbuf3, "Mob-dodge  [%d]", MOB_TO_DODGE(k));
+			msg_to_char(ch, "  %-24.24s %-24.24s %-24.24s\r\n", lbuf, lbuf2, lbuf3);
+			
 			msg_to_char(ch, "NPC Bare Hand Dam: %d\r\n", MOB_DAMAGE(k));
 		}
 	}
@@ -3112,6 +3460,15 @@ void do_stat_character(char_data *ch, char_data *k) {
 		send_to_char("Interactions:\r\n", ch);
 		get_interaction_display(k->interactions, buf);
 		send_to_char(buf, ch);
+	}
+	
+	if (MOB_CUSTOM_MSGS(k)) {
+		struct custom_message *mcm;
+		
+		msg_to_char(ch, "Custom messages:\r\n");
+		LL_FOREACH(MOB_CUSTOM_MSGS(k), mcm) {
+			msg_to_char(ch, " %s: %s\r\n", mob_custom_types[mcm->type], mcm->msg);
+		}
 	}
 
 	if (!IS_NPC(k)) {
@@ -3239,8 +3596,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 
 void do_stat_craft(char_data *ch, craft_data *craft) {
-	void get_resource_display(struct resource_data *list, char *save_buffer);
-
 	extern const char *craft_flags[];
 	extern const char *craft_types[];
 	
@@ -3409,9 +3764,10 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	obj_vnum vnum = GET_OBJ_VNUM(j);
 	obj_data *j2;
 	struct obj_storage_type *store;
-	struct obj_custom_message *ocm;
+	struct custom_message *ocm;
 	player_index_data *index;
 	crop_data *cp;
+	bool any;
 
 	msg_to_char(ch, "Name: '&y%s&0', Aliases: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
 
@@ -3486,8 +3842,10 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		struct obj_binding *bind;
 		
 		msg_to_char(ch, "Bound to:");
+		any = FALSE;
 		for (bind = OBJ_BOUND_TO(j); bind; bind = bind->next) {
-			msg_to_char(ch, " %s", (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
+			msg_to_char(ch, "%s %s", (any ? "," : ""), (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
+			any = TRUE;
 		}
 		msg_to_char(ch, "\r\n");
 	}
@@ -3504,12 +3862,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			break;
 		}
 		case ITEM_WEAPON:
-			msg_to_char(ch, "Speed: %.2f, Damage: %s", get_weapon_speed(j), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"));
-			if (GET_WEAPON_DAMAGE_BONUS(j) != 0)
-				msg_to_char(ch, "%+d", GET_WEAPON_DAMAGE_BONUS(j));
-			
-			msg_to_char(ch, " (%.2f base dps)\r\n", get_base_dps(j));
-
+			msg_to_char(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)\r\n", get_weapon_speed(j), GET_WEAPON_DAMAGE_BONUS(j), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
 			msg_to_char(ch, "Damage type: %s\r\n", attack_hit_info[GET_WEAPON_TYPE(j)].name);
 			break;
 		case ITEM_ARMOR:
@@ -3525,7 +3878,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			msg_to_char(ch, "Contains: %d/%d drinks of %s\r\n", GET_DRINK_CONTAINER_CONTENTS(j), GET_DRINK_CONTAINER_CAPACITY(j), drinks[GET_DRINK_CONTAINER_TYPE(j)]);
 			break;
 		case ITEM_FOOD:
-			msg_to_char(ch, "Fills for: %d hours\r\n", GET_FOOD_HOURS_OF_FULLNESS(j));
+			msg_to_char(ch, "Fills for: %d hour%s\r\n", GET_FOOD_HOURS_OF_FULLNESS(j), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(j)));
 			break;
 		case ITEM_CORPSE:
 			msg_to_char(ch, "Corpse of: ");
@@ -3673,13 +4026,16 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 /* Displays the vital statistics of IN_ROOM(ch) to ch */
 void do_stat_room(char_data *ch) {
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom);
 	extern const char *exit_bits[];
 	extern const char *depletion_type[NUM_DEPLETION_TYPES];
+	extern const char *instance_flags[];
 	extern const char *room_extra_types[];
 	
+	char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
 	struct depletion_data *dep;
 	struct empire_city_data *city;
-	int found;
+	int found, num;
 	bool comma;
 	obj_data *j;
 	char_data *k;
@@ -3690,8 +4046,9 @@ void do_stat_room(char_data *ch) {
 	player_index_data *index;
 	struct global_data *glb;
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
-
-
+	struct instance_data *inst, *inst_iter;
+	vehicle_data *veh;
+	
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
 		strcpy(buf2, GET_CROP_NAME(cp));
 		CAP(buf2);
@@ -3699,7 +4056,16 @@ void do_stat_room(char_data *ch) {
 	else {
 		strcpy(buf2, GET_SECT_NAME(SECT(IN_ROOM(ch))));
 	}
-	msg_to_char(ch, "(%d, %d) %s (&c%s&0/&c%s&0)\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE), buf2, GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
+	
+	// check for natural sect
+	if (GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE) {
+		sprintf(buf3, "/&c%s&0", GET_SECT_NAME(world_map[X_COORD(IN_ROOM(ch))][Y_COORD(IN_ROOM(ch))].natural_sector));
+	}
+	else {
+		*buf3 = '\0';
+	}
+	
+	msg_to_char(ch, "(%d, %d) %s (&c%s&0/&c%s&0%s)\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE), buf2, GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))), buf3);
 	msg_to_char(ch, "VNum: [&g%d&0], Island: [%d] %s\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(home), get_island(GET_ISLAND_ID(home), TRUE)->name);
 	
 	if (home != IN_ROOM(ch)) {
@@ -3732,16 +4098,28 @@ void do_stat_room(char_data *ch) {
 		if (GET_INSIDE_ROOMS(home) > 0) {
 			msg_to_char(ch, "Designated rooms: %d\r\n", GET_INSIDE_ROOMS(home));
 		}
-		msg_to_char(ch, "Burning: %d, Damage: %d, Disrepair: %d year%s\r\n", BUILDING_BURNING(home), BUILDING_DAMAGE(home), BUILDING_DISREPAIR(home), BUILDING_DISREPAIR(home) != 1 ? "s" : "");
+		msg_to_char(ch, "Burning: %d, Damage: %d/%d\r\n", BUILDING_BURNING(home), (int) BUILDING_DAMAGE(home), GET_BUILDING(home) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) : 0);
 	}
 
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || HAS_FUNCTION(IN_ROOM(ch), FNC_MINE)) {
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE)) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) <= 0 || !(glb = global_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM))) || GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
 			msg_to_char(ch, "This area is unmined.\r\n");
 		}
 		else {
 			msg_to_char(ch, "Mine type: %s, Amount remaining: %d\r\n", GET_GLOBAL_NAME(glb), get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT));
 		}
+	}
+	
+	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE))) {
+		num = 0;
+		LL_FOREACH(instance_list, inst_iter) {
+			++num;
+			if (inst_iter == inst) {
+				break;
+			}
+		}
+		sprintbit(inst->flags, instance_flags, buf2, TRUE);
+		msg_to_char(ch, "Instance \tc%d\t0: [\tg%d\t0] \ty%s\t0, Main Room: [\tg%d\t0], Flags: \tc%s\t0\r\n", num, GET_ADV_VNUM(inst->adventure), GET_ADV_NAME(inst->adventure), (inst->start ? GET_ROOM_VNUM(inst->start) : NOWHERE), buf2);
 	}
 
 	sprintf(buf, "Chars present:&y");
@@ -3762,7 +4140,33 @@ void do_stat_room(char_data *ch) {
 
 	if (*buf)
 		send_to_char(strcat(buf, "\r\n&0"), ch);
+	
+	if (ROOM_VEHICLES(IN_ROOM(ch))) {
+		sprintf(buf, "Vehicles:&w");
+		found = 0;
+		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			if (!CAN_SEE_VEHICLE(ch, veh)) {
+				continue;
+			}
+			sprintf(buf2, "%s %s", found++ ? "," : "", VEH_SHORT_DESC(veh));
+			strcat(buf, buf2);
+			if (strlen(buf) >= 62) {
+				if (veh->next_in_room) {
+					send_to_char(strcat(buf, ",\r\n"), ch);
+				}
+				else {
+					send_to_char(strcat(buf, "\r\n"), ch);
+				}
+				*buf = found = 0;
+			}
+		}
 
+		if (*buf) {
+			send_to_char(strcat(buf, "\r\n"), ch);
+		}
+		send_to_char("&0", ch);
+	}
+	
 	if (ROOM_CONTENTS(IN_ROOM(ch))) {
 		sprintf(buf, "Contents:&g");
 		for (found = 0, j = ROOM_CONTENTS(IN_ROOM(ch)); j; j = j->next_content) {
@@ -3871,9 +4275,12 @@ void do_stat_room_template(char_data *ch, room_template *rmt) {
 	
 	sprintbit(GET_RMT_FLAGS(rmt), room_template_flags, lbuf, TRUE);
 	msg_to_char(ch, "Flags: &g%s&0\r\n", lbuf);
+	
+	sprintbit(GET_RMT_FUNCTIONS(rmt), function_flags, lbuf, TRUE);
+	msg_to_char(ch, "Functions: &y%s&0\r\n", lbuf);
 
 	sprintbit(GET_RMT_BASE_AFFECTS(rmt), room_aff_bits, lbuf, TRUE);
-	msg_to_char(ch, "Affects: &y%s&0\r\n", lbuf);
+	msg_to_char(ch, "Affects: &g%s&0\r\n", lbuf);
 	
 	if (GET_RMT_EX_DESCS(rmt)) {
 		struct extra_descr_data *desc;
@@ -3911,7 +4318,9 @@ void do_stat_room_template(char_data *ch, room_template *rmt) {
 void do_stat_sector(char_data *ch, sector_data *st) {
 	void get_evolution_display(struct evolution_data *list, char *save_buffer);
 	
-	msg_to_char(ch, "Sector VNum: [&c%d&0], Name: '&c%s&0'\r\n", st->vnum, st->name);
+	struct sector_index_type *idx = find_sector_index(GET_SECT_VNUM(st));
+	
+	msg_to_char(ch, "Sector VNum: [&c%d&0], Name: '&c%s&0', Live Count [&c%d&0/&c%d&0]\r\n", st->vnum, st->name, idx->sect_count, idx->base_count);
 	msg_to_char(ch, "Room Title: %s\r\n", st->title);
 	
 	if (st->commands && *st->commands) {
@@ -4237,6 +4646,7 @@ ACMD(do_addnotes) {
 			free(acct->notes);
 		}
 		acct->notes = str_dup(notes);
+		SAVE_ACCOUNT(acct);
 		
 		if (index) {
 			strcpy(buf, index->fullname);
@@ -4298,7 +4708,7 @@ ACMD(do_advance) {
 	if (newlevel < GET_ACCESS_LEVEL(victim)) {
 		start_new_character(victim);
 		GET_ACCESS_LEVEL(victim) = newlevel;
-		GET_IMMORTAL_LEVEL(victim) = IS_IMMORTAL(victim) ? LVL_TOP - GET_ACCESS_LEVEL(victim) : -1;
+		GET_IMMORTAL_LEVEL(victim) = GET_ACCESS_LEVEL(victim) > LVL_MORTAL ? (LVL_TOP - GET_ACCESS_LEVEL(victim)) : -1;
 		send_to_char("You are momentarily enveloped by darkness!\r\nYou feel somewhat diminished.\r\n", victim);
 	}
 	else {
@@ -4333,9 +4743,70 @@ ACMD(do_advance) {
 	}
 
 	GET_ACCESS_LEVEL(victim) = newlevel;
-	GET_IMMORTAL_LEVEL(victim) = IS_IMMORTAL(victim) ? LVL_TOP - GET_ACCESS_LEVEL(victim) : -1;
+	GET_IMMORTAL_LEVEL(victim) = GET_ACCESS_LEVEL(victim) > LVL_MORTAL ? (LVL_TOP - GET_ACCESS_LEVEL(victim)) : -1;
 	SAVE_CHAR(victim);
 	check_autowiz(victim);
+}
+
+
+// also do_unapprove
+ACMD(do_approve) {
+	char_data *vict = NULL;
+	bool file = FALSE;
+
+	one_argument(argument, arg);
+
+	if (!*arg)
+		msg_to_char(ch, "Usage: %sapprove <character>\r\n", (subcmd == SCMD_UNAPPROVE ? "un" : ""));
+	else if (!(vict = find_or_load_player(arg, &file))) {
+		msg_to_char(ch, "Unable to find character '%s'.\r\n", arg);
+	}
+	else if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch) && ch != vict) {
+		msg_to_char(ch, "You can only %sapprove players below your access level.\r\n", (subcmd == SCMD_UNAPPROVE ? "un" : ""));
+	}
+	else if (subcmd == SCMD_APPROVE && IS_APPROVED(vict)) {
+		msg_to_char(ch, "That player is already approved.\r\n");
+	}
+	else if (subcmd == SCMD_UNAPPROVE && !IS_APPROVED(vict)) {
+		msg_to_char(ch, "That player is not even approved.\r\n");
+	}
+	else {
+		if (subcmd == SCMD_APPROVE) {
+			if (config_get_bool("approve_per_character")) {
+				SET_BIT(PLR_FLAGS(vict), PLR_APPROVED);
+			}
+			else {	// per-account (default)
+				SET_BIT(GET_ACCOUNT(vict)->flags, ACCT_APPROVED);
+				SAVE_ACCOUNT(GET_ACCOUNT(vict));
+			}
+			
+			if (GET_ACCESS_LEVEL(vict) < LVL_MORTAL) {
+				GET_ACCESS_LEVEL(vict) = LVL_MORTAL;
+			}
+		}
+		else {
+			REMOVE_BIT(GET_ACCOUNT(vict)->flags, ACCT_APPROVED);
+			SAVE_ACCOUNT(GET_ACCOUNT(vict));
+			REMOVE_BIT(PLR_FLAGS(vict), PLR_APPROVED);
+		}
+		
+		if (!file) {
+			msg_to_char(vict, "Your character %s approved.\r\n", (subcmd == SCMD_APPROVE ? "has been" : "is no longer"));
+		}
+		syslog(SYS_VALID, GET_INVIS_LEV(ch), TRUE, "VALID: %s has been %sapproved by %s", GET_PC_NAME(vict), (subcmd == SCMD_UNAPPROVE ? "un" : ""), GET_NAME(ch));
+		msg_to_char(ch, "%s %sapproved.\r\n", GET_PC_NAME(vict), (subcmd == SCMD_UNAPPROVE ? "un" : ""));
+
+		if (file) {
+			store_loaded_char(vict);
+			vict = NULL;
+			file = FALSE;
+		}
+		
+	}
+	
+	if (vict && file) {
+		free_char(vict);
+	}
 }
 
 
@@ -4367,42 +4838,6 @@ ACMD(do_at) {
 	if (IN_ROOM(ch) == location) {
 		char_from_room(ch);
 		char_to_room(ch, original_loc);
-	}
-}
-
-
-ACMD(do_authorize) {
-	char_data *vict = NULL;
-	bool file = FALSE;
-
-	one_argument(argument, arg);
-
-	if (!*arg)
-		msg_to_char(ch, "Usage: authorize <character>\r\n");
-	else if (!(vict = find_or_load_player(arg, &file))) {
-		msg_to_char(ch, "Unable to find character '%s'?\r\n", arg);
-	}
-	else {
-		if (GET_ACCESS_LEVEL(vict) < LVL_APPROVED) {
-			GET_ACCESS_LEVEL(vict) = LVL_APPROVED;
-		}
-		if (!file) {
-			msg_to_char(vict, "Your character has been authorized.\r\n");
-		}
-		mortlog("%s has been authorized!", PERS(vict, vict, TRUE));
-		syslog(SYS_VALID, GET_INVIS_LEV(ch), TRUE, "VALID: %s has been authorized by %s", GET_PC_NAME(vict), GET_NAME(ch));
-		msg_to_char(ch, "%s authorized.\r\n", GET_PC_NAME(vict));
-
-		if (file) {
-			store_loaded_char(vict);
-			vict = NULL;
-			file = FALSE;
-		}
-		
-	}
-	
-	if (vict && file) {
-		free_char(vict);
 	}
 }
 
@@ -4445,6 +4880,24 @@ ACMD(do_autostore) {
 
 ACMD(do_autowiz) {
 	check_autowiz(ch);
+}
+
+
+ACMD(do_breakreply) {
+	char_data *iter;
+	
+	LL_FOREACH(character_list, iter) {
+		if (IS_NPC(iter) || GET_ACCESS_LEVEL(iter) >= GET_ACCESS_LEVEL(ch)) {
+			continue;
+		}
+		if (GET_LAST_TELL(iter) != GET_IDNUM(ch)) {
+			continue;
+		}
+		
+		GET_LAST_TELL(iter) = NOBODY;
+	}
+	
+	send_config_msg(ch, "ok_string");
 }
 
 
@@ -4598,7 +5051,7 @@ ACMD(do_distance) {
 
 // this also handles emote
 ACMD(do_echo) {
-	void add_to_channel_history(descriptor_data *desc, int type, char *message);
+	void add_to_channel_history(char_data *ch, int type, char *message);
 	void clear_last_act_message(descriptor_data *desc);
 	extern bool is_ignoring(char_data *ch, char_data *victim);
 	
@@ -4617,6 +5070,10 @@ ACMD(do_echo) {
 
 	if (!*argument) {
 		send_to_char("Yes... but what?\r\n", ch);
+		return;
+	}
+	if (subcmd == SCMD_EMOTE && strstr(string, "$O")) {
+		msg_to_char(ch, "You can't use the $O symbol in an emote.\r\n");
 		return;
 	}
 
@@ -4677,7 +5134,7 @@ ACMD(do_echo) {
 			clear_last_act_message(ch->desc);
 		}
 		
-		if (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) {
+		if (subcmd == SCMD_EMOTE && !IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) {
 			msg_to_char(ch, "&%c", GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE));
 		}
 		
@@ -4687,14 +5144,14 @@ ACMD(do_echo) {
 		// channel history
 		if (ch->desc && ch->desc->last_act_message) {
 			// the message was sent via act(), we can retrieve it from the desc			
-			if (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) {
+			if (subcmd == SCMD_EMOTE && !IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) {
 				sprintf(hbuf, "&%c", GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE));
 			}
 			else {
 				*hbuf = '\0';
 			}
 			strcat(hbuf, ch->desc->last_act_message);
-			add_to_channel_history(ch->desc, CHANNEL_HISTORY_SAY, hbuf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, hbuf);
 		}
 	}
 
@@ -4704,7 +5161,7 @@ ACMD(do_echo) {
 			if (c->desc && c != ch && c != vict) {
 				clear_last_act_message(c->desc);
 				
-				if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
+				if (subcmd == SCMD_EMOTE && !IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 					msg_to_char(c, "&%c", GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE));
 				}
 			}
@@ -4716,14 +5173,14 @@ ACMD(do_echo) {
 		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
 			if (c->desc && c != ch && c != vict && !is_ignoring(c, ch) && c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
-				if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
+				if (subcmd == SCMD_EMOTE && !IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 					sprintf(hbuf, "&%c", GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE));
 				}
 				else {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, c->desc->last_act_message);
-				add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, hbuf);
 			}
 			else if (c->desc && c != ch && c != vict) {
 				// just in case
@@ -4746,7 +5203,7 @@ ACMD(do_echo) {
 				clear_last_act_message(vict->desc);
 			}
 			
-			if (!IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_EMOTE)) {
+			if (subcmd == SCMD_EMOTE && !IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_EMOTE)) {
 				msg_to_char(vict, "&%c", GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_EMOTE));
 			}
 		
@@ -4758,14 +5215,14 @@ ACMD(do_echo) {
 			// channel history
 			if (vict->desc && vict->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc			
-				if (!IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_EMOTE)) {
+				if (subcmd == SCMD_EMOTE && !IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_EMOTE)) {
 					sprintf(hbuf, "&%c", GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_EMOTE));
 				}
 				else {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, vict->desc->last_act_message);
-				add_to_channel_history(vict->desc, CHANNEL_HISTORY_SAY, hbuf);
+				add_to_channel_history(vict, CHANNEL_HISTORY_SAY, hbuf);
 			}
 		}
 	}
@@ -4775,7 +5232,7 @@ ACMD(do_echo) {
 			if (c->desc && c != ch) {
 				clear_last_act_message(c->desc);
 							
-				if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
+				if (subcmd == SCMD_EMOTE && !IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 					msg_to_char(c, "&%c", GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE));
 				}
 			}
@@ -4788,14 +5245,14 @@ ACMD(do_echo) {
 		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
 			if (c->desc && c != ch && !is_ignoring(c, ch) && c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc			
-				if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
+				if (subcmd == SCMD_EMOTE && !IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 					sprintf(hbuf, "&%c", GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE));
 				}
 				else {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, c->desc->last_act_message);
-				add_to_channel_history(c->desc, CHANNEL_HISTORY_SAY, hbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, hbuf);
 			}
 			else if (c->desc && c != ch) {
 				// just in case
@@ -4886,7 +5343,7 @@ ACMD(do_editnotes) {
 	else {
 		sprintf(buf, "notes for account %d", acct->id);
 	}
-	start_string_editor(ch->desc, buf, &(acct->notes), MAX_ADMIN_NOTES_LENGTH-1);
+	start_string_editor(ch->desc, buf, &(acct->notes), MAX_ADMIN_NOTES_LENGTH-1, TRUE);
 	ch->desc->notes_id = acct->id;
 
 	act("$n begins editing some notes.", TRUE, ch, FALSE, FALSE, TO_ROOM);
@@ -5083,7 +5540,7 @@ ACMD(do_forgive) {
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has forgiven %s", GET_NAME(ch), GET_NAME(vict));
 		}
 		else {
-			act("There's nothing you can forigve $N for.", FALSE, ch, NULL, vict, TO_CHAR);
+			act("There's nothing you can forgive $N for.", FALSE, ch, NULL, vict, TO_CHAR);
 		}
 	}
 }
@@ -5116,7 +5573,7 @@ ACMD(do_gecho) {
 			}
 		}
 		
-		if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			send_config_msg(ch, "ok_string");
 		}
 		else {
@@ -5128,6 +5585,7 @@ ACMD(do_gecho) {
 
 ACMD(do_goto) {
 	room_data *location;
+	char_data *iter;
 
 	one_word(argument, arg);
 	
@@ -5139,7 +5597,23 @@ ACMD(do_goto) {
 		msg_to_char(ch, "You can't teleport there.\r\n");
 		return;
 	}
-
+	
+	// wizhide safety
+	if (!PRF_FLAGGED(ch, PRF_WIZHIDE) && GET_INVIS_LEV(ch) < LVL_START_IMM) {
+		LL_FOREACH2(ROOM_PEOPLE(location), iter, next_in_room) {
+			if (ch == iter || !IS_IMMORTAL(iter)) {
+				continue;
+			}
+			if (GET_INVIS_LEV(iter) > GET_ACCESS_LEVEL(ch)) {
+				continue;	// ignore -- ch can't see them at all
+			}
+			if (PRF_FLAGGED(iter, PRF_WIZHIDE)) {
+				msg_to_char(ch, "You can't teleport there because someone there is using wizhide, and you aren't.\r\n");
+				return;
+			}
+		}
+	}
+	
 	perform_goto(ch, location);
 }
 
@@ -5150,7 +5624,7 @@ ACMD(do_hostile) {
 	one_argument(argument, arg);
 	
 	if (!*arg) {
-		msg_to_char(ch, "Mark whom hostile?r\n");
+		msg_to_char(ch, "Mark whom hostile?\r\n");
 	}
 	else if (!(vict = get_player_vis(ch, arg, FIND_CHAR_WORLD | FIND_NO_DARK))) {
 		send_config_msg(ch, "no_person");
@@ -5262,6 +5736,10 @@ ACMD(do_island) {
 		outsize = snprintf(output, sizeof(output), "Islands:\r\n");
 		
 		HASH_ITER(hh, island_table, isle, next_isle) {
+			if (*argument && !multi_isname(argument, isle->name)) {
+				continue;
+			}
+			
 			center = real_room(isle->center);
 			
 			snprintf(line, sizeof(line), "%2d. %s (%d, %d), size %d", isle->id, isle->name, (center ? FLAT_X_COORD(center) : -1), (center ? FLAT_Y_COORD(center) : -1), isle->tile_size);
@@ -5327,11 +5805,15 @@ ACMD(do_island) {
 				sprintbit(isle->flags, island_bits, flags, TRUE);
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has set island %d (%s) flags to: %s", GET_NAME(ch), isle->id, NULLSAFE(isle->name), flags);
 				save_island_table();
+				
+				if (IS_SET(isle->flags, ISLE_NO_CUSTOMIZE) && !IS_SET(old, ISLE_NO_CUSTOMIZE)) {
+					decustomize_island(isle->id);
+				}
 			}
 		}
 	}
 	else {
-		msg_to_char(ch, "Usage: island list\r\n");
+		msg_to_char(ch, "Usage: island list [keywords]\r\n");
 		msg_to_char(ch, "       island rename <id> <name>\r\n");
 		msg_to_char(ch, "       island flags <id> [add | remove] [flags]\r\n");
 	}
@@ -5372,7 +5854,7 @@ ACMD(do_load) {
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	vehicle_data *veh;
-	char_data *mob;
+	char_data *mob, *mort;
 	obj_data *obj;
 	any_vnum number;
 
@@ -5399,6 +5881,13 @@ ACMD(do_load) {
 		act("$n has created $N!", FALSE, ch, 0, mob, TO_ROOM);
 		act("You create $N.", FALSE, ch, 0, mob, TO_CHAR);
 		load_mtrigger(mob);
+		
+		if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded mob %s with mortal present (%s) at %s", GET_NAME(ch), GET_NAME(mob), GET_NAME(mort), room_log_identifier(IN_ROOM(ch)));
+		}
+		else if (ROOM_OWNER(IN_ROOM(ch)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded mob %s in mortal empire (%s) at %s", GET_NAME(ch), GET_NAME(mob), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
+		}
 	}
 	else if (is_abbrev(buf, "obj")) {
 		if (!obj_proto(number)) {
@@ -5427,6 +5916,13 @@ ACMD(do_load) {
 		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM);
 		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR);
 		load_vtrigger(veh);
+		
+		if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded vehicle %s with mortal present (%s) at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), GET_NAME(mort), room_log_identifier(IN_ROOM(ch)));
+		}
+		else if (ROOM_OWNER(IN_ROOM(ch)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded vehicle %s in mortal empire (%s) at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
+		}
 	}
 	else {
 		send_to_char("That'll have to be either 'obj', 'mob', or 'vehicle'.\r\n", ch);
@@ -5489,7 +5985,7 @@ ACMD(do_moveeinv) {
 		}
 		
 		if (count != 0) {
-			save_empire(emp);
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has moved %d einv items for %s from island %d to island %d", GET_REAL_NAME(ch), count, EMPIRE_NAME(emp), island_from, island_to);
 			msg_to_char(ch, "Moved %d items for %s%s&0 from island %d to island %d.\r\n", count, EMPIRE_BANNER(emp), EMPIRE_NAME(emp), island_from, island_to);
 		}
@@ -5728,12 +6224,14 @@ ACMD(do_purge) {
 
 			if (!REAL_NPC(vict)) {
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has purged %s.", GET_NAME(ch), GET_NAME(vict));
+				SAVE_CHAR(vict);
 				if (vict->desc) {
-					SAVE_CHAR(vict);
 					STATE(vict->desc) = CON_CLOSE;
 					vict->desc->character = NULL;
 					vict->desc = NULL;
 				}
+				
+				extract_all_items(vict);	// otherwise it duplicates items
 			}
 			extract_char(vict);
 		}
@@ -5799,7 +6297,7 @@ ACMD(do_reboot) {
 	
 	char arg[MAX_INPUT_LENGTH];
 	descriptor_data *desc;
-	int type, time = 0;
+	int type, time = 0, var;
 	bool no_arg = FALSE;
 
 	// any number of args in any order
@@ -5831,12 +6329,17 @@ ACMD(do_reboot) {
 		reboot_control.time = time + 1;	// minutes
 		reboot_control.type = subcmd;
 	}
+	
+	if (subcmd == SCMD_REBOOT) {
+		reboot_control.level = SHUTDOWN_NORMAL;	// prevent a reboot from using a shutdown type
+	}
 
 	if (reboot_control.immediate) {
-		msg_to_char(ch, "Rebooting momentarily...\r\n");
+		msg_to_char(ch, "Preparing for imminent %s...\r\n", reboot_type[reboot_control.type]);
 	}
 	else {
-		msg_to_char(ch, "The %s is set for %d minutes (%s).\r\n", reboot_type[reboot_control.type], no_arg ? reboot_control.time : time, shutdown_types[reboot_control.level]);
+		var = (no_arg ? reboot_control.time : time);
+		msg_to_char(ch, "The %s is set for %d minute%s (%s).\r\n", reboot_type[reboot_control.type], var, PLURAL(var), shutdown_types[reboot_control.level]);
 		if (no_arg) {
 			msg_to_char(ch, "Players blocking the %s:\r\n", reboot_type[reboot_control.type]);
 			for (desc = descriptor_list; desc; desc = desc->next) {
@@ -5867,6 +6370,7 @@ ACMD(do_reboot) {
 ACMD(do_reload) {
 	extern int file_to_string_alloc(const char *name, char **buf);
 	void index_boot_help();
+	void load_data_table();
 	void load_intro_screens();
 	extern char *credits;
 	extern char *motd;
@@ -5935,11 +6439,15 @@ ACMD(do_reload) {
 		top_of_helpt = 0;
 		index_boot_help();
 	}
+	else if (!str_cmp(arg, "data")) {
+		load_data_table();
+	}
 	else {
 		send_to_char("Unknown reload option.\r\n", ch);
 		return;
 	}
 
+	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has reloaded: %s", GET_NAME(ch), arg);
 	send_config_msg(ch, "ok_string");
 }
 
@@ -5969,6 +6477,7 @@ ACMD(do_rescale) {
 		}
 		else {
 			scale_mob_to_level(vict, level);
+			SET_BIT(MOB_FLAGS(vict), MOB_NO_RESCALE);
 			
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled mob %s to level %d at %s", GET_NAME(ch), PERS(vict, vict, FALSE), GET_CURRENT_SCALE_LEVEL(vict), room_log_identifier(IN_ROOM(vict)));
 			
@@ -6012,6 +6521,8 @@ ACMD(do_rescale) {
 
 
 ACMD(do_restore) {
+	void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
+	
 	ability_data *abil, *next_abil;
 	skill_data *skill, *next_skill;
 	struct cooldown_data *cool;
@@ -6025,11 +6536,6 @@ ACMD(do_restore) {
 	else if (!(vict = get_char_vis(ch, buf, FIND_CHAR_WORLD)))
 		send_config_msg(ch, "no_person");
 	else {
-		GET_HEALTH(vict) = GET_MAX_HEALTH(vict);
-		GET_MOVE(vict) = GET_MAX_MOVE(vict);
-		GET_MANA(vict) = GET_MAX_MANA(vict);
-		GET_BLOOD(vict) = GET_MAX_BLOOD(vict);
-		
 		// remove DoTs
 		while (vict->over_time_effects) {
 			dot_remove(vict, vict->over_time_effects);
@@ -6054,7 +6560,7 @@ ACMD(do_restore) {
 			}
 			
 			HASH_ITER(hh, skill_table, skill, next_skill) {
-				set_skill(vict, SKILL_VNUM(skill), 100);
+				set_skill(vict, SKILL_VNUM(skill), SKILL_MAX_LEVEL(skill));
 			}
 			update_class(vict);
 			
@@ -6065,7 +6571,8 @@ ACMD(do_restore) {
 			}
 			
 			HASH_ITER(hh, ability_table, abil, next_abil) {
-				add_ability(vict, abil, TRUE);
+				// add abilities to set 0
+				add_ability_by_set(vict, abil, 0, TRUE);
 			}
 
 			affect_total(vict);
@@ -6083,6 +6590,11 @@ ACMD(do_restore) {
 			}
 		}
 		
+		GET_HEALTH(vict) = GET_MAX_HEALTH(vict);
+		GET_MOVE(vict) = GET_MAX_MOVE(vict);
+		GET_MANA(vict) = GET_MAX_MANA(vict);
+		GET_BLOOD(vict) = GET_MAX_BLOOD(vict);
+		
 		update_pos(vict);
 		if (ch != vict) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has restored %s", GET_REAL_NAME(ch), GET_REAL_NAME(vict));
@@ -6095,7 +6607,7 @@ ACMD(do_restore) {
 
 ACMD(do_return) {
 	if (ch->desc && ch->desc->original) {
-		syslog(SYS_GC, GET_INVIS_LEV(ch->desc->original), TRUE, "GC: %s has returned to %s original body", GET_REAL_NAME(ch->desc->original), HSHR(ch->desc->original));
+		syslog(SYS_GC, GET_INVIS_LEV(ch->desc->original), TRUE, "GC: %s has returned to %s original body", GET_REAL_NAME(ch->desc->original), REAL_HSHR(ch->desc->original));
 		send_to_char("You return to your original body.\r\n", ch);
 
 		/*
@@ -6130,7 +6642,7 @@ ACMD(do_send) {
 	half_chop(argument, arg, buf);
 
 	if (!*arg) {
-		send_to_char("Send what to who?\r\n", ch);
+		send_to_char("Send what to whom?\r\n", ch);
 		return;
 	}
 	if (!(vict = get_char_vis(ch, arg, FIND_CHAR_WORLD))) {
@@ -6266,6 +6778,9 @@ ACMD(do_show) {
 		{ "components", LVL_START_IMM, show_components },
 		{ "quests", LVL_START_IMM, show_quests },
 		{ "uses", LVL_START_IMM, show_uses },
+		{ "factions", LVL_START_IMM, show_factions },
+		{ "dailycycle", LVL_START_IMM, show_dailycycle },
+		{ "data", LVL_CIMPL, show_data },
 
 		// last
 		{ "\n", 0, NULL }
@@ -6349,7 +6864,7 @@ ACMD(do_slay) {
 
 			// this would prevent the death
 			if (affected_by_spell(vict, ATYPE_PHOENIX_RITE)) {
-				affect_from_char(vict, ATYPE_PHOENIX_RITE);
+				affect_from_char(vict, ATYPE_PHOENIX_RITE, FALSE);
 			}
 
 			die(vict, ch);
@@ -6457,7 +6972,7 @@ ACMD(do_stat) {
 		if (!*buf2)
 			send_to_char("Stats on which mobile?\r\n", ch);
 		else {
-			if ((victim = get_char_vis(ch, buf2, FIND_CHAR_WORLD)) != NULL)
+			if ((victim = get_char_vis(ch, buf2, FIND_CHAR_WORLD | FIND_NPC_ONLY)) != NULL)
 				do_stat_character(ch, victim);
 			else
 				send_to_char("No such mobile around.\r\n", ch);
@@ -6544,7 +7059,7 @@ ACMD(do_switch) {
 	if (ch->desc->original)
 		send_to_char("You're already switched.\r\n", ch);
 	else if (!*arg)
-		send_to_char("Switch with who?\r\n", ch);
+		send_to_char("Switch with whom?\r\n", ch);
 	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_WORLD)))
 		send_to_char("No such character.\r\n", ch);
 	else if (ch == victim)
@@ -6641,7 +7156,7 @@ ACMD(do_tedit) {
 	}
 
 	/* set up editor stats */
-	start_string_editor(ch->desc, "file", tedit_option[l].buffer, tedit_option[l].size);
+	start_string_editor(ch->desc, "file", tedit_option[l].buffer, tedit_option[l].size, FALSE);
 	ch->desc->file_storage = str_dup(tedit_option[l].filename);
 	act("$n begins editing a file.", TRUE, ch, 0, 0, TO_ROOM);
 }
@@ -6990,6 +7505,12 @@ ACMD(do_vnum) {
 			msg_to_char(ch, "No crops by that name.\r\n");
 		}
 	}
+	else if (is_abbrev(buf, "faction")) {
+		extern int vnum_faction(char *searchname, char_data *ch);
+		if (!vnum_faction(buf2, ch)) {
+			msg_to_char(ch, "No factions by that name.\r\n");
+		}
+	}
 	else if (is_abbrev(buf, "global")) {
 		if (!vnum_global(buf2, ch)) {
 			msg_to_char(ch, "No globals by that name.\r\n");
@@ -7021,6 +7542,12 @@ ACMD(do_vnum) {
 		extern int vnum_skill(char *searchname, char_data *ch);
 		if (!vnum_skill(buf2, ch)) {
 			msg_to_char(ch, "No skills by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "social")) {
+		extern int vnum_social(char *searchname, char_data *ch);
+		if (!vnum_social(buf2, ch)) {
+			msg_to_char(ch, "No socials by that name.\r\n");
 		}
 	}
 	else if (is_abbrev(buf, "trigger")) {
@@ -7132,6 +7659,15 @@ ACMD(do_vstat) {
 		}
 		do_stat_crop(ch, crop);
 	}
+	else if (is_abbrev(buf, "faction")) {
+		void do_stat_faction(char_data *ch, faction_data *fct);
+		faction_data *fct = find_faction_by_vnum(number);
+		if (!fct) {
+			msg_to_char(ch, "There is no faction with that number.\r\n");
+			return;
+		}
+		do_stat_faction(ch, fct);
+	}
 	else if (is_abbrev(buf, "global")) {
 		struct global_data *glb = global_proto(number);
 		if (!glb) {
@@ -7202,6 +7738,15 @@ ACMD(do_vstat) {
 			return;
 		}
 		do_stat_skill(ch, skill);
+	}
+	else if (is_abbrev(buf, "social")) {
+		void do_stat_social(char_data *ch, social_data *soc);
+		social_data *soc = social_proto(number);
+		if (!soc) {
+			msg_to_char(ch, "There is no social with that number.\r\n");
+			return;
+		}
+		do_stat_social(ch, soc);
 	}
 	else if (is_abbrev(buf, "trigger")) {
 		trig_data *trig = real_trigger(number);

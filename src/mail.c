@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: mail.c                                          EmpireMUD 2.0b4 *
+*   File: mail.c                                          EmpireMUD 2.0b5 *
 *  Usage: Internal funcs and handlers of mud-mail system                  *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -150,7 +150,10 @@ ACMD(do_mail) {
 	
 	two_arguments(argument, arg, buf);
 	
-	if (!*arg) {
+	if (!IS_APPROVED(ch) && config_get_bool("write_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!*arg) {
 		msg_to_char(ch, "Usage: mail send <name>, mail check, mail receive <number>\r\n");
 	}
 	else if (is_abbrev(arg, "check")) {
@@ -202,8 +205,11 @@ ACMD(do_mail) {
 		}
 	}
 	else if (is_abbrev(arg, "send")) {
-		if (!IS_IMMORTAL(ch) && ((!HAS_FUNCTION(IN_ROOM(ch), FNC_MAIL) && !RMT_FLAGGED(IN_ROOM(ch), RMT_PIGEON_POST)) || !IS_COMPLETE(IN_ROOM(ch)))) {
+		if (!IS_IMMORTAL(ch) && (!HAS_FUNCTION(IN_ROOM(ch), FNC_MAIL) || !IS_COMPLETE(IN_ROOM(ch)))) {
 			msg_to_char(ch, "You can only send mail from a pigeon post.\r\n");
+		}
+		else if (!IS_IMMORTAL(ch) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+			msg_to_char(ch, "This building must be in a city to use it.\r\n");
 		}
 		else if (!ch->desc) {
 			msg_to_char(ch, "You can't do that.\r\n");
@@ -221,7 +227,7 @@ ACMD(do_mail) {
 			act("$n starts to write some mail.", TRUE, ch, 0, 0, TO_ROOM);
 			SET_BIT(PLR_FLAGS(ch), PLR_MAILING);
 			CREATE(write, char *, 1);
-			start_string_editor(ch->desc, "your message", write, MAX_MAIL_SIZE);
+			start_string_editor(ch->desc, "your message", write, MAX_MAIL_SIZE, FALSE);
 			ch->desc->mail_to = index->idnum;
 		}
 	}

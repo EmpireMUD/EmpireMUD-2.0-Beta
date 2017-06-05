@@ -1,0 +1,675 @@
+#600
+Enchanted Saplings~
+Some Enchanted Saplings~
+',' 35 1 2 0 0
+C
+chant nature~
+D0
+,,,,~
+&p~
+E
+9 0 100.00 604
+S
+#601
+Clear-Cut Enchanted Forest~
+A Clear-Cut Enchanted Forest~
+'.' 35 1 2 0 0
+C
+dig~
+D1
+&g.&?.&g..~
+&P~
+D1
+&g..&?.&g.~
+&P~
+D2
+&g.&?.&g..~
+&P~
+D2
+&g..&?.&g.~
+&P~
+D3
+&g.&?.&g..~
+&P~
+D3
+&g..&?.&g.~
+&P~
+D4
+&0.&?.&0..~
+&C~
+D4
+&0..&?.&0.~
+&C~
+E
+4 0 0.20 602
+I 5 103 2.00 1 d  # DIG: a yellow lightning stone
+I 5 104 2.00 1 d  # DIG: a red bloodstone
+I 5 1300 2.00 1 d  # DIG: a glowing green seashell
+I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
+I 5 102 9.00 1 d  # DIG: a flint stone
+I 5 100 83.00 1 d  # DIG: a rock
+I 6 606 100.00 1  # FORAGE: a handful of elderberries
+M
+9109 5.00 ch
+M
+9145 5.00 ach
+M
+9147 5.00 ch
+M
+9007 5.00 cg
+M
+9006 5.00 cg
+M
+9141 5.00 cg
+M
+9146 5.00 acg
+M
+9144 5.00 acg
+M
+9002 5.00 acg
+M
+9136 5.00 cg
+M
+9150 5.00 c
+M
+9149 5.00 c
+M
+9148 5.00 c
+M
+9008 5.00 c
+M
+9133 5.00 ac
+M
+9116 5.00 ac
+M
+9025 5.00 c
+M
+253 10.00 cf
+M
+9154 5.00 c
+M
+9153 5.00 c
+M
+251 15.00 ce
+M
+252 10.00 f
+M
+602 100.00 d
+S
+#602
+Enchanted Copse~
+An Enchanted Copse~
+'^' 35 1 4 d 0
+C
+chop, dig~
+D1
+&g.&?^&g..~
+&P~
+D1
+&g..&?^&g.~
+&P~
+D2
+&g.&?^&g..~
+&P~
+D2
+&g..&?^&g.~
+&P~
+D3
+&g.&?^&g..~
+&P~
+D3
+&g..&?^&g.~
+&P~
+D4
+&0.&?^&0..~
+&C~
+D4
+&0..&?^&0.~
+&C~
+E
+0 0 100.00 601
+E
+4 0 0.20 603
+I 5 103 2.00 1 d  # DIG: a yellow lightning stone
+I 5 104 2.00 1 d  # DIG: a red bloodstone
+I 5 1300 2.00 1 d  # DIG: a glowing green seashell
+I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
+I 5 102 9.00 1 d  # DIG: a flint stone
+I 5 100 83.00 1 d  # DIG: a rock
+I 6 606 100.00 1  # FORAGE: a handful of elderberries
+I 20 603 100.00 1  # CHOP: an enchanted tree
+M
+9151 3.33 c
+M
+610 5.00 c
+M
+612 5.00 c
+M
+613 5.00 c
+M
+614 3.33 c
+M
+615 3.33 c
+M
+616 0.33 c
+M
+9040 0.03 c
+M
+9109 5.00 ch
+M
+9145 5.00 ach
+M
+9147 5.00 ch
+M
+9007 5.00 cg
+M
+9006 5.00 cg
+M
+9141 5.00 cg
+M
+9146 5.00 acg
+M
+9144 5.00 acg
+M
+9002 5.00 acg
+M
+9136 5.00 cg
+M
+9150 5.00 c
+M
+9149 5.00 c
+M
+9148 5.00 c
+M
+9008 5.00 c
+M
+9133 5.00 ac
+M
+9116 5.00 ac
+M
+9025 5.00 c
+M
+253 10.00 cf
+M
+9154 5.00 c
+M
+9153 5.00 c
+M
+251 15.00 ce
+M
+252 10.00 f
+M
+602 100.00 d
+S
+#603
+Enchanted Woods~
+The Enchanted Woods~
+'^' 35 1 6 d 0
+C
+chop, dig~
+D1
+&g.&?^&g.&?^~
+&P~
+D1
+^&g.&?^&g.~
+&P~
+D1
+^&g..&?^~
+&P~
+D2
+&g.&?^&g.&?^~
+&P~
+D2
+^&g.&?^&g.~
+&P~
+D2
+^&g..&?^~
+&P~
+D3
+&g.&?^&g.&?^~
+&P~
+D3
+^&g.&?^&g.~
+&P~
+D3
+^&g..&?^~
+&P~
+D4
+&0.&?^&0.&?^~
+&C~
+D4
+^&0.&?^&0.~
+&C~
+D4
+^&0..&?^~
+&C~
+E
+0 0 100.00 602
+E
+4 0 0.20 604
+I 5 103 2.00 1 d  # DIG: a yellow lightning stone
+I 5 104 2.00 1 d  # DIG: a red bloodstone
+I 5 1300 2.00 1 d  # DIG: a glowing green seashell
+I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
+I 5 102 9.00 1 d  # DIG: a flint stone
+I 5 100 83.00 1 d  # DIG: a rock
+I 6 606 100.00 1  # FORAGE: a handful of elderberries
+I 20 603 100.00 1  # CHOP: an enchanted tree
+M
+602 100.00 d
+M
+9151 6.66 c
+M
+610 10.00 c
+M
+612 10.00 c
+M
+613 10.00 c
+M
+614 6.66 c
+M
+615 6.66 c
+M
+616 0.66 c
+M
+9040 0.06 c
+M
+9109 5.00 ch
+M
+9145 5.00 ach
+M
+9147 5.00 ch
+M
+9007 5.00 cg
+M
+9006 5.00 cg
+M
+9141 5.00 cg
+M
+9146 5.00 acg
+M
+9144 5.00 acg
+M
+9002 5.00 acg
+M
+9136 5.00 cg
+M
+9150 5.00 c
+M
+9149 5.00 c
+M
+9148 5.00 c
+M
+9008 5.00 c
+M
+9133 5.00 ac
+M
+9116 5.00 ac
+M
+9025 5.00 c
+M
+253 10.00 cf
+M
+9154 5.00 c
+M
+9153 5.00 c
+M
+251 15.00 ce
+M
+252 10.00 f
+S
+#604
+Enchanted Forest~
+The Enchanted Forest~
+'^' 35 1 8 d 0
+C
+chop, dig~
+D1
+&g.&?^^^~
+&P~
+D1
+^&g.&?^^~
+&P~
+D1
+^^&g.&?^~
+&P~
+D1
+^^^&g.~
+&P~
+D1
+&g.&?^^^~
+&P~
+D1
+^&g.&?^^~
+&P~
+D1
+^^&g.&?^~
+&P~
+D1
+^^^&g.~
+&P~
+D1
+&g.&?^^^~
+&P~
+D1
+^&g.&?^^~
+&P~
+D1
+^^&g.&?^~
+&P~
+D1
+^^^&g.~
+&P~
+D1
+^&V*&?^^~
+&P~
+D1
+^^&V*&?^~
+&P~
+D1
+^&A*&?^^~
+&P~
+D1
+^^&A*&?^~
+&P~
+D2
+&g.&?^^^~
+&P~
+D2
+^&g.&?^^~
+&P~
+D2
+^^&g.&?^~
+&P~
+D2
+^^^&g.~
+&P~
+D2
+&g.&?^^^~
+&P~
+D2
+^&g.&?^^~
+&P~
+D2
+^^&g.&?^~
+&P~
+D2
+^^^&g.~
+&P~
+D2
+&g.&?^^^~
+&P~
+D2
+^&g.&?^^~
+&P~
+D2
+^^&g.&?^~
+&P~
+D2
+^^^&g.~
+&P~
+D2
+^&V*&?^^~
+&P~
+D2
+^^&V*&?^~
+&P~
+D2
+^&A*&?^^~
+&P~
+D2
+^^&A*&?^~
+&P~
+D3
+&g.&?^^^~
+&P~
+D3
+^&g.&?^^~
+&P~
+D3
+^^&g.&?^~
+&P~
+D3
+^^^&g.~
+&P~
+D3
+&g.&?^^^~
+&P~
+D3
+^&g.&?^^~
+&P~
+D3
+^^&g.&?^~
+&P~
+D3
+^^^&g.~
+&P~
+D3
+&g.&?^^^~
+&P~
+D3
+^&g.&?^^~
+&P~
+D3
+^^&g.&?^~
+&P~
+D3
+^^^&g.~
+&P~
+D3
+^&V*&?^^~
+&P~
+D3
+^^&V*&?^~
+&P~
+D3
+^&A*&?^^~
+&P~
+D3
+^^&A*&?^~
+&P~
+D4
+&0.&?^^^~
+&C~
+D4
+^&0.&?^^~
+&C~
+D4
+^^&0.&?^~
+&C~
+D4
+^^^&0.~
+&C~
+D4
+&0.&?^^^~
+&C~
+D4
+^&0.&?^^~
+&C~
+D4
+^^&0.&?^~
+&C~
+D4
+^^^&0.~
+&C~
+D4
+&0.&?^^^~
+&C~
+D4
+^&0.&?^^~
+&C~
+D4
+^^&0.&?^~
+&C~
+D4
+^^^&0.~
+&C~
+D4
+^&L*&?^^~
+&C~
+D4
+^^&L*&?^~
+&C~
+D4
+^&O*&?^^~
+&C~
+D4
+^^&O*&?^~
+&C~
+E
+0 0 100.00 603
+I 5 103 2.00 1 d  # DIG: a yellow lightning stone
+I 5 104 2.00 1 d  # DIG: a red bloodstone
+I 5 1300 2.00 1 d  # DIG: a glowing green seashell
+I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
+I 5 102 9.00 1 d  # DIG: a flint stone
+I 5 100 83.00 1 d  # DIG: a rock
+I 6 606 100.00 1  # FORAGE: a handful of elderberries
+I 20 603 100.00 1  # CHOP: an enchanted tree
+M
+602 100.00 d
+M
+9151 10.00 c
+M
+610 15.00 c
+M
+612 15.00 c
+M
+613 15.00 c
+M
+614 10.00 c
+M
+615 10.00 c
+M
+616 1.00 c
+M
+9040 0.10 c
+M
+9109 5.00 ch
+M
+9145 5.00 ach
+M
+9147 5.00 ch
+M
+9007 5.00 cg
+M
+9006 5.00 cg
+M
+9141 5.00 cg
+M
+9146 5.00 acg
+M
+9144 5.00 acg
+M
+9002 5.00 acg
+M
+9136 5.00 cg
+M
+9150 5.00 c
+M
+9149 5.00 c
+M
+9148 5.00 c
+M
+9008 5.00 c
+M
+9133 5.00 ac
+M
+9116 5.00 ac
+M
+9025 5.00 c
+M
+253 10.00 cf
+M
+9154 5.00 c
+M
+9153 5.00 c
+M
+251 15.00 ce
+M
+252 10.00 f
+S
+#605
+Dead Forest~
+The Dead Forest~
+'^' 36 1 8 d 0
+C
+chop, dig~
+D1
+&g.&?^^^~
+&b~
+D1
+^&g.&?^^~
+&b~
+D1
+^^&g.&?^~
+&b~
+D1
+^^^&g.&?~
+&b~
+D2
+&g.&?^^^~
+&b~
+D2
+^&g.&?^^~
+&b~
+D2
+^^&g.&?^~
+&b~
+D2
+^^^&g.&?~
+&b~
+D3
+&g.&?^^^~
+&b~
+D3
+^&g.&?^^~
+&b~
+D3
+^^&g.&?^~
+&b~
+D3
+^^^&g.&?~
+&b~
+D4
+&0.&?^^^~
+&b~
+D4
+^&0.&?^^~
+&b~
+D4
+^^&0.&?^~
+&b~
+D4
+^^^&0.&?~
+&b~
+E
+0 0 100.00 0
+E
+4 0 0.80 1
+E
+9 0 50.00 3
+I 5 102 9.00 1 d  # DIG: a flint stone
+I 5 100 91.00 1 d  # DIG: a rock
+I 6 3015 100.00 1  # FORAGE: some red berries
+I 20 605 100.00 3 c  # CHOP: a pile of dead wood
+M
+9002 5.00 adg
+M
+9001 10.00 dg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+246 0.30 ad
+M
+9017 5.00 d
+M
+9116 5.00 ad
+M
+253 10.00 cf
+M
+9064 0.90 ad
+S
+$

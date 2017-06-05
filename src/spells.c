@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: spells.c                                        EmpireMUD 2.0b4 *
+*   File: spells.c                                        EmpireMUD 2.0b5 *
 *  Usage: implementation for spells                                       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -35,6 +35,9 @@
 
 // external vars
 
+// external funcs
+void check_combat_start(char_data *ch);
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
@@ -49,7 +52,7 @@
 bool trigger_counterspell(char_data *ch) {
 	if (affected_by_spell(ch, ATYPE_COUNTERSPELL)) {
 		msg_to_char(ch, "Your counterspell goes off!\r\n");
-		affect_from_char(ch, ATYPE_COUNTERSPELL);
+		affect_from_char(ch, ATYPE_COUNTERSPELL, FALSE);
 		gain_ability_exp(ch, ABIL_COUNTERSPELL, 100);
 		return TRUE;
 	}
@@ -63,42 +66,142 @@ bool trigger_counterspell(char_data *ch) {
 
 struct damage_spell_type {
 	any_vnum ability;	// ABIL_ type
-	int cost;	// mana
-	int attack_type;	// ATTACK_x
+	double cost_mod;	// mana cost as a % of normal spells (1.0 = normal)
+	int attack_type;	// ATTACK_
 	double damage_mod;	// 1.0 = normal damage, balance based on affects
-	bitvector_t aff_immunity;	// AFF_x flag making person immune
+	bitvector_t aff_immunity;	// AFF_ flag making person immune
 	
 	// affect group: all this only matters if aff_type != -1
 	int aff_type;	// ATYPE_, -1 for none
 	int duration;	// time for the affect
 	int apply;	// APPLY_, 0 for none
 	int modifier;	// +/- value, if apply != 0
-	bitvector_t aff_flag;	// AFF_x, 0 for none
+	bitvector_t aff_flag;	// AFF_, 0 for none
 	
 	// dot affect
 	int dot_type;	// ATYPE_, -1 for none
 	int dot_duration;	// time for the dot
-	int dot_damage_type;	// DAM_x for the dot
-	int dot_damage;	// damage for the dot
+	int dot_damage_type;	// DAM_ for the dot
+	double dot_dmg_mod;	// % of scaled dot damage (1.0 = normal)
 	int dot_max_stacks;	// how high the dot can stack
 	
-	int cooldown_type;	// COOLDOWN_x
+	int cooldown_type;	// COOLDOWN_
 	int cooldown_time;	// seconds
 };
 
+// shortcuts
+#define NO_SPELL_AFFECT  -1, 0, 0, 0, NOBITS
+#define NO_DOT_AFFECT  -1, 0, 0, 0, 0
+
 const struct damage_spell_type damage_spell[] = {
+	// ABIL_, cost-mod, ATTACK_, damage-mod, immunity-aff,
+	// affect (optional): ATYPE_, duration, apply, modifier, adds-aff
+	// dot (optional): ATYPE_, duration, DAM_, damage, max-stacks
+	// COOLDOWN_, cooldown
+	
 	// Lightningbolt
-	{ ABIL_LIGHTNINGBOLT, 25, ATTACK_LIGHTNINGBOLT, 0.8, AFF_IMMUNE_NATURAL_MAGIC,
-		-1, 0, 0, 0, NOBITS,
-		ATYPE_SHOCKED, 3, DAM_MAGICAL, 5, 1,
+	{ ABIL_LIGHTNINGBOLT, 1, ATTACK_LIGHTNINGBOLT, 0.8, AFF_IMMUNE_NATURAL_MAGIC,
+		NO_SPELL_AFFECT,
+		ATYPE_SHOCKED, 3, DAM_MAGICAL, 0.5, 1,
 		COOLDOWN_LIGHTNINGBOLT, 9
 	},
 	
 	// SUNSHOCK
-	{ ABIL_SUNSHOCK, 25, ATTACK_SUNSHOCK, 0.6, AFF_IMMUNE_HIGH_SORCERY,
+	{ ABIL_SUNSHOCK, 1.3, ATTACK_SUNSHOCK, 0.6, AFF_IMMUNE_HIGH_SORCERY,
 		ATYPE_SUNSHOCK, 1, APPLY_NONE, 0, AFF_BLIND,
-		-1, 0, 0, 0, 0,
+		NO_DOT_AFFECT,
 		COOLDOWN_SUNSHOCK, 9
+	},
+	
+	// ABLATE
+	{ ABIL_ABLATE, 1.33, ATTACK_ABLATE, 0.6, AFF_IMMUNE_HIGH_SORCERY,
+		ATYPE_ABLATE, 2, APPLY_RESIST_PHYSICAL, -10, NOBITS,
+		NO_DOT_AFFECT,
+		COOLDOWN_ABLATE, 9
+	},
+	
+	// SCOUR
+	{ ABIL_SCOUR, 1.1, ATTACK_SCOUR, 0.4, AFF_IMMUNE_HIGH_SORCERY,
+		NO_SPELL_AFFECT,
+		ATYPE_SCOUR, 2, DAM_MAGICAL, 1.5, 5,
+		COOLDOWN_SCOUR, 6
+	},
+	
+	// ARCLIGHT
+	{ ABIL_ARCLIGHT, 1, ATTACK_ARCLIGHT, 1.4, NOBITS,
+		NO_SPELL_AFFECT,
+		NO_DOT_AFFECT,
+		COOLDOWN_ARCLIGHT, 9
+	},
+	
+	// SHADOWLASH
+	{ ABIL_SHADOWLASH, 1.2, ATTACK_SHADOWLASH, 0.25, AFF_IMMUNE_HIGH_SORCERY,
+		ATYPE_SHADOWLASH_BLIND, 1, APPLY_NONE, 0, AFF_BLIND,
+		ATYPE_SHADOWLASH_DOT, 3, DAM_MAGICAL, 0.75, 3,
+		COOLDOWN_SHADOWLASH, 9
+	},
+	
+	// THORNLASH
+	{ ABIL_THORNLASH, 1, ATTACK_THORNLASH, 0.4, AFF_IMMUNE_HIGH_SORCERY,
+		NO_SPELL_AFFECT,
+		ATYPE_THORNLASH, 3, DAM_POISON, 1.0, 3,
+		COOLDOWN_THORNLASH, 9
+	},
+	
+	// CHRONOBLAST
+	{ ABIL_CHRONOBLAST, 1.15, ATTACK_CHRONOBLAST, 0.9, AFF_IMMUNE_HIGH_SORCERY,
+		ATYPE_CHRONOBLAST, 1, APPLY_NONE, 0, AFF_SLOW,
+		NO_DOT_AFFECT,
+		COOLDOWN_CHRONOBLAST, 6
+	},
+	
+	// SOULCHAIN
+	{ ABIL_SOULCHAIN, 1.1, ATTACK_SOULCHAIN, 0.9, AFF_IMMUNE_HIGH_SORCERY,
+		ATYPE_SOULCHAIN, 2, APPLY_INTELLIGENCE, -4, NOBITS,
+		NO_DOT_AFFECT,
+		COOLDOWN_SOULCHAIN, 9
+	},
+	
+	// ASTRALCLAW
+	{ ABIL_ASTRALCLAW, 1, ATTACK_ASTRALCLAW, 0.4, AFF_IMMUNE_NATURAL_MAGIC,
+		NO_SPELL_AFFECT,
+		ATYPE_ASTRALCLAW, 3, DAM_PHYSICAL, 1.0, 3,
+		COOLDOWN_ASTRALCLAW, 9
+	},
+	
+	// ERODE
+	{ ABIL_ERODE, 1, ATTACK_ERODE, 0.9, AFF_IMMUNE_NATURAL_MAGIC,
+		NO_SPELL_AFFECT,
+		ATYPE_ERODE, 3, DAM_MAGICAL, 0.75, 3,
+		COOLDOWN_ERODE, 9
+	},
+	
+	// DISPIRIT
+	{ ABIL_DISPIRIT, 1.1, ATTACK_DISPIRIT, 0.9, AFF_IMMUNE_NATURAL_MAGIC,
+		ATYPE_DISPIRIT, 2, APPLY_WITS, -4, NOBITS,
+		NO_DOT_AFFECT,
+		COOLDOWN_DISPIRIT, 9
+	},
+	
+	// STARSTRIKE
+	{ ABIL_STARSTRIKE, 1, ATTACK_STARSTRIKE, 1.5, AFF_IMMUNE_NATURAL_MAGIC,
+		NO_SPELL_AFFECT,
+		NO_DOT_AFFECT,
+		COOLDOWN_STARSTRIKE, 9
+	},
+	
+	// ACIDBLAST
+	{ ABIL_ACIDBLAST, 1.33, ATTACK_ACIDBLAST, 0.6, AFF_IMMUNE_NATURAL_MAGIC,
+		ATYPE_ACIDBLAST, 2, APPLY_RESIST_MAGICAL, -10, NOBITS,
+		NO_DOT_AFFECT,
+		COOLDOWN_ACIDBLAST, 9
+	},
+	
+	// DEATHTOUCH
+	{ ABIL_DEATHTOUCH, 1.05, ATTACK_DEATHTOUCH, 1.0, AFF_IMMUNE_NATURAL_MAGIC,
+		NO_SPELL_AFFECT,
+		NO_DOT_AFFECT,
+		COOLDOWN_DEATHTOUCH, 6
 	},
 	
 	{ NO_ABIL, 0, 1.0, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0 }
@@ -111,9 +214,9 @@ const struct damage_spell_type damage_spell[] = {
 ACMD(do_damage_spell) {
 	char_data *vict = NULL;
 	struct affected_type *af;
-	int iter, type = NOTHING, cost, dmg, result;
+	int iter, type = NOTHING, cost, dmg, dot_dmg, result;
 	
-	double level_mod[] = { 1.0, 1.5, 2.0 };
+	double cost_mod[] = { 1.5, 1.2, 0.9 };
 	
 	// find ability
 	for (iter = 0; damage_spell[iter].ability != NO_ABIL; ++iter) {
@@ -130,9 +233,38 @@ ACMD(do_damage_spell) {
 		return;
 	}
 	
-	// cost calculations
-	cost = damage_spell[type].cost;
+	// calculate damage in order to calculate cost
+	if ((IS_NPC(ch) || GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+		dmg = get_approximate_level(ch) / 8.0;
+		dmg += GET_BONUS_MAGICAL(ch);
+	}
+	else {	// not on a role
+		dmg = get_ability_level(ch, subcmd) / 8.0;
+	}
 	
+	dmg += GET_INTELLIGENCE(ch);	// both add this
+	dmg *= damage_spell[type].damage_mod;	// modify by the spell
+	
+	// calculate DoT damage if any
+	dot_dmg = 0;
+	if (damage_spell[type].dot_type > 0) {
+		dot_dmg = get_ability_level(ch, subcmd) / 24;	// skill level base
+		if ((IS_NPC(ch) || GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+			dot_dmg = MAX(dot_dmg, (get_approximate_level(ch) / 24));	// total level base
+			dot_dmg += GET_BONUS_MAGICAL(ch) / MAX(1, damage_spell[type].dot_duration);
+		}
+		
+		dot_dmg += GET_INTELLIGENCE(ch) / MAX(1, damage_spell[type].dot_duration);	// always add int
+		
+		// finally:
+		dot_dmg = round(dot_dmg * damage_spell[type].dot_dmg_mod);
+		dot_dmg = MAX(1, dot_dmg);
+	}
+	
+	// cost calculations
+	cost = round((dmg + dot_dmg) * CHOOSE_BY_ABILITY_LEVEL(cost_mod, ch, ABIL_SKYBRAND) * damage_spell[type].cost_mod);
+	
+	// check ability and cost
 	if (!can_use_ability(ch, subcmd, MANA, cost, damage_spell[type].cooldown_type)) {
 		return;
 	}
@@ -162,18 +294,19 @@ ACMD(do_damage_spell) {
 		return;
 	}
 	
-	dmg = get_ability_level(ch, subcmd) / 8.0 * damage_spell[type].damage_mod;
-	dmg += GET_INTELLIGENCE(ch) * CHOOSE_BY_ABILITY_LEVEL(level_mod, ch, subcmd);
-	dmg += GET_BONUS_MAGICAL(ch);
-	
-	if (damage_spell[type].ability == ABIL_SUNSHOCK && IS_VAMPIRE(vict)) {
-		dmg *= 2;
-	}
-	
 	charge_ability_cost(ch, MANA, cost, damage_spell[type].cooldown_type, damage_spell[type].cooldown_time, WAIT_COMBAT_SPELL);
 	
 	if (SHOULD_APPEAR(ch)) {
 		appear(ch);
+	}
+	
+	// start meters now, to track direct damage()
+	check_combat_start(ch);
+	check_combat_start(vict);
+	
+	// special-casing damage (done AFTER cost); requires vict
+	if (damage_spell[type].ability == ABIL_SUNSHOCK && IS_VAMPIRE(vict)) {
+		dmg *= 1.5;
 	}
 	
 	// check counterspell and then damage
@@ -186,8 +319,8 @@ ACMD(do_damage_spell) {
 				af = create_aff(damage_spell[type].aff_type, damage_spell[type].duration, damage_spell[type].apply, damage_spell[type].modifier, damage_spell[type].aff_flag, ch);
 				affect_join(vict, af, 0);
 			}
-			if (damage_spell[type].dot_type > 0) {
-				apply_dot_effect(vict, damage_spell[type].dot_type, damage_spell[type].dot_duration, damage_spell[type].dot_damage_type, damage_spell[type].dot_damage, damage_spell[type].dot_max_stacks, ch);
+			if (damage_spell[type].dot_type > 0 && dot_dmg > 0) {
+				apply_dot_effect(vict, damage_spell[type].dot_type, damage_spell[type].dot_duration, damage_spell[type].dot_damage_type, dot_dmg, damage_spell[type].dot_max_stacks, ch);
 			}
 		}
 	}
@@ -208,22 +341,30 @@ ACMD(do_damage_spell) {
 // for do_ready
 struct ready_magic_weapon_type {
 	char *name;
-	int mana;
+	int cost;
+	int cost_pool;	// MANA, etc
 	any_vnum ability;
 	obj_vnum vnum;
-	double min_dps;	// the lowest the DPS should ever go (or close to it)
-	double target_dps;	// DPS at level 100 -- will get as close to this as possible without going over
 } ready_magic_weapon[] = {
-	{ "fireball", 30, ABIL_READY_FIREBALL, o_FIREBALL, 2.0, 5.0 },
+	{ "bloodmace", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODMACE },
+	{ "bloodskean", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODSKEAN },
+	{ "bloodspear", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODSPEAR },
+	{ "bloodsword", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODSWORD },
+	{ "bloodstaff", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODSTAFF },
+	{ "fireball", 30, MANA, ABIL_READY_FIREBALL, o_FIREBALL },
 	
-	{ "\n", 0, NO_ABIL, NOTHING, 0.0, 0.0 }
+	{ "\n", 0, NO_ABIL, NOTHING }
 };
 
 
-ACMD(do_ready) {	
+ACMD(do_ready) {
+	extern bool check_vampire_sun(char_data *ch, bool message);
+	void scale_item_to_level(obj_data *obj, int level);
+	
+	ability_data *abil;
 	obj_data *obj;
-	int type, iter, cost, speed, min_damage;
-	bool found;
+	int type, iter, scale_level, ch_level = 0;
+	bool found, later = TRUE;
 	
 	one_argument(argument, arg);
 	
@@ -246,7 +387,8 @@ ACMD(do_ready) {
 		msg_to_char(ch, "%s\r\n", (found ? "" : "none"));
 		return;
 	}
-
+	
+	// lookup
 	found = FALSE;
 	for (iter = 0; *ready_magic_weapon[iter].name != '\n' && !found; ++iter) {
 		if (is_abbrev(arg, ready_magic_weapon[iter].name) && (ready_magic_weapon[iter].ability == NO_ABIL || has_ability(ch, ready_magic_weapon[iter].ability))) {
@@ -255,20 +397,25 @@ ACMD(do_ready) {
 		}
 	}
 	
+	// validate
 	if (!found) {
 		msg_to_char(ch, "You don't know how to ready that.\r\n");
 		return;
 	}
-	
-	cost = ready_magic_weapon[type].mana;
-	
-	if (GET_MANA(ch) < cost) {
-		msg_to_char(ch, "You need %d mana to do that.\r\n", cost);
+	if (!can_use_ability(ch, ready_magic_weapon[type].ability, ready_magic_weapon[type].cost_pool, ready_magic_weapon[type].cost, NOTHING)) {
+		return;
+	}
+	if (ready_magic_weapon[type].cost_pool == BLOOD && !check_vampire_sun(ch, TRUE)) {
+		return;
+	}
+	if (ABILITY_TRIGGERS(ch, NULL, NULL, ready_magic_weapon[type].ability)) {
 		return;
 	}
 	
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ready_magic_weapon[type].ability)) {
-		return;
+	// if they are using a NON-1-use item, determine level now
+	if (GET_EQ(ch, WEAR_WIELD) && !OBJ_FLAGGED(GET_EQ(ch, WEAR_WIELD), OBJ_SINGLE_USE)) {
+		ch_level = get_approximate_level(ch);
+		later = FALSE;
 	}
 	
 	// attempt to remove existing wield
@@ -285,18 +432,42 @@ ACMD(do_ready) {
 		appear(ch);
 	}
 	
-	GET_MANA(ch) -= cost;
-	obj = read_object(ready_magic_weapon[type].vnum, TRUE);
-	
-	// damage based on skill
-	if (ready_magic_weapon[type].ability != NO_ABIL) {		
-		speed = (OBJ_FLAGGED(obj, OBJ_FAST) ? SPD_FAST : (OBJ_FLAGGED(obj, OBJ_SLOW) ? SPD_SLOW : SPD_NORMAL));
-		min_damage = MAX(1, (int) ceil(ready_magic_weapon[type].min_dps * attack_hit_info[GET_WEAPON_TYPE(obj)].speed[speed]));
-		GET_OBJ_VAL(obj, VAL_WEAPON_DAMAGE_BONUS) = MAX(min_damage, (int)(ready_magic_weapon[type].target_dps * (get_ability_level(ch, ready_magic_weapon[type].ability) / 100.0) * attack_hit_info[GET_WEAPON_TYPE(obj)].speed[speed]));
+	// if they are using a 1-use item, determine level at the end here
+	if (later) {
+		ch_level = get_approximate_level(ch);
 	}
 	
-	act("Mana twists and swirls around your hand and becomes $p!", FALSE, ch, obj, 0, TO_CHAR);
-	act("Mana twists and swirls around $n's hand and becomes $p!", TRUE, ch, obj, 0, TO_ROOM);
+	charge_ability_cost(ch, ready_magic_weapon[type].cost_pool, ready_magic_weapon[type].cost, NOTHING, 0, WAIT_SPELL);
+	
+	// load the object
+	obj = read_object(ready_magic_weapon[type].vnum, TRUE);
+	abil = find_ability_by_vnum(ready_magic_weapon[type].ability);
+	if (!abil || IS_CLASS_ABILITY(ch, ready_magic_weapon[type].ability) || ABIL_ASSIGNED_SKILL(abil) == NULL) {
+		scale_level = ch_level;	// class-level
+	}
+	else {
+		scale_level = MIN(ch_level, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
+	}
+	scale_item_to_level(obj, scale_level);
+	
+	switch (ready_magic_weapon[type].cost_pool) {
+		case MANA: {
+			act("Mana twists and swirls around your hand and becomes $p!", FALSE, ch, obj, NULL, TO_CHAR);
+			act("Mana twists and swirls around $n's hand and becomes $p!", TRUE, ch, obj, NULL, TO_ROOM);
+			break;
+		}
+		case BLOOD: {
+			act("You drain blood from your wrist and mold it into $p!", FALSE, ch, obj, NULL, TO_CHAR);
+			act("$n twists and molds $s own blood into $p!", TRUE, ch, obj, NULL, TO_ROOM);
+			break;
+		}
+		// HEALTH, MOVE (these could have their own messages if they were used)
+		default: {
+			act("You pull $p from the ether!", FALSE, ch, obj, NULL, TO_CHAR);
+			act("$n pulls $p from the ether!", TRUE, ch, obj, NULL, TO_ROOM);
+			break;
+		}
+	}
 	
 	equip_char(ch, obj, WEAR_WIELD);
 	determine_gear_level(ch);
@@ -304,8 +475,6 @@ ACMD(do_ready) {
 	if (ready_magic_weapon[type].ability != NO_ABIL) {
 		gain_ability_exp(ch, ready_magic_weapon[type].ability, 15);
 	}
-
-	load_otrigger(obj);
 	
-	command_lag(ch, WAIT_SPELL);
+	load_otrigger(obj);
 }

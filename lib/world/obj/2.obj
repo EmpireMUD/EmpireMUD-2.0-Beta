@@ -56,7 +56,7 @@ a pile of clay bricks~
 Some clay bricks are piled on the ground.~
 You can use the bricks for building.
 ~
-3 el a 2
+3 el a 4
 0 0 0
 6 0
 M
@@ -66,7 +66,7 @@ M
 1
 $n puts down a layer of bricks.~
 O
-3 bf
+3 bu
 R
 5117 0
 S

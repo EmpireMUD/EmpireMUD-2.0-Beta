@@ -33,8 +33,8 @@ end
 Hestian Trinket~
 1 c 2
 use~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
   return 0
   halt
 end
@@ -46,9 +46,23 @@ if !%actor.can_teleport_room% || !%actor.canuseroom_guest%
   %send% %actor% You can't teleport out of here.
   halt
 end
-if !%actor.home%
+eval home %actor.home%
+if !%home%
   %send% %actor% You have no home to teleport back to with this trinket.
   halt
+end
+eval veh %home.in_vehicle%
+if %veh%
+  eval outside_room %veh.room%
+  eval test %%actor.canuseroom_guest(%outside_room%)%%
+  eval test2 eval test %%actor.can_teleport_room(%outside_room%)%%
+  if !%test%
+    %send% %actor% You can't teleport home to a vehicle that's parked on foreign territory you don't have permission to use!
+    halt
+  elseif !%test2%
+    %send% %actor% You can't teleport to your home's current location.
+    halt
+  end
 end
 * once per 60 minutes
 if %actor.varexists(last_hestian_time)%
@@ -67,18 +81,19 @@ eval room_var %actor.room%
 %send% %actor% You touch %self.shortdesc% and it begins to swirl with light...
 %echoaround% %actor% %actor.name% touches %self.shortdesc% and it begins to swirl with light...
 wait 5 sec
-if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor%
+if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
 end
 %send% %actor% %self.shortdesc% glows a bright blue and the light begins to envelop you!
 %echoaround% %actor% %self.shortdesc% glows a bright blue and the light begins to envelop %actor.name%!
 wait 5 sec
-if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor%
+if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
 end
 %echoaround% %actor% %actor.name% vanishes in a flash of light!
 %teleport% %actor% %actor.home%
 %force% %actor% look
+%echoaround% %actor% %actor.name% appears in a flash of light!
 eval last_hestian_time %timestamp%
 remote last_hestian_time %actor.id%
 nop %actor.cancel_adventure_summon%
@@ -93,13 +108,7 @@ if !%arg%
 end
 eval item %actor.inventory()%
 eval found 0
-while %item% && !%found
-  eval test %%item.is_name(%arg%)%%
-  if %test%
-    eval found %item%
-  end
-  eval item %item.next_in_list%
-done
+eval found %%actor.obj_target(%arg%)%%
 if !%found%
   %send% %actor% You don't seem to have that.
   halt
@@ -119,8 +128,8 @@ end
 Trinket of Conveyance~
 1 c 2
 use~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
   return 0
   halt
 end
@@ -149,18 +158,19 @@ eval room_var %actor.room%
 %send% %actor% You touch %self.shortdesc% and it begins to swirl with light...
 %echoaround% %actor% %actor.name% touches %self.shortdesc% and it begins to swirl with light...
 wait 5 sec
-if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor%
+if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
 end
 %send% %actor% Yellow light begins to whirl around you...
 %echoaround% %actor% Yellow light begins to whirl around %actor.name%...
 wait 5 sec
-if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor%
+if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
 end
 %echoaround% %actor% %actor.name% vanishes in a flourish of yellow light!
 %teleport% %actor% %startloc%
 %force% %actor% look
+%echoaround% %actor% %actor.name% appears in a flourish of yellow light!
 eval last_conveyance_time %timestamp%
 remote last_conveyance_time %actor.id%
 nop %actor.cancel_adventure_summon%
@@ -172,8 +182,8 @@ Letheian Icon use~
 use~
 eval item %arg.car%
 eval sk %arg.cdr%
-eval test %%self.is_name(%item%)%%
-if !(%test% && use /= %cmd%)
+eval test %%actor.obj_target(%item%)%%
+if (%test% != %self%) && (use /= %cmd%)
   return 0
   halt
 end

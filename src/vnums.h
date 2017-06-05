@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: vnums.h                                         EmpireMUD 2.0b4 *
+*   File: vnums.h                                         EmpireMUD 2.0b5 *
 *  Usage: stores commonly-used virtual numbers                            *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -44,8 +44,11 @@
 #define RTYPE_SORCERER_TOWER  5511
 
 #define RTYPE_BEDROOM  5601
-#define RTYPE_STUDY  5608
 #define RTYPE_TUNNEL  5612	// for mine complex, tunnel
+
+
+// special resource action used by the siege system
+#define RES_ACTION_REPAIR  3
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -90,9 +93,13 @@
 // Skill tree items
 #define o_PORTAL  1100  // could probably safely generate a NOTHING item
 #define o_BLOODSWORD  1101
+#define o_BLOODSPEAR  1102
+#define o_BLOODSKEAN  1103
+#define o_BLOODMACE  1104
 #define o_FIREBALL  1105
 #define o_IMPERIUM_SPIKE  1114
 #define o_NEXUS_CRYSTAL  1115
+#define o_BLOODSTAFF  1116
 #define o_NOCTURNIUM_SPIKE  1119
 
 // herbs

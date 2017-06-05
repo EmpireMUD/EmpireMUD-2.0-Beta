@@ -2,30 +2,39 @@ QUEST QUESTS
 
 Usage:  quest <command> <...>
 
-The following quest commands are available:
- &cquest check&0 - See what quests are available here.
- &cquest completed&0 - List quests you have finished.
- &cquest drop&0 - Cancel a quest you're on.
- &cquest finish&0 - Turn in one or more quests.
+The following quest commands are most commonly used:
+ &cquest finish&0 - &yTurn in&0 one or more quests.
+ &cquest start&0 - &yBegin&0 a quest, or see which ones are &yavailable&0.
+ &cquest tracker&0 - Show the quest &yprogress&0 tracker for one quest you're on.
+ 
+The following quest commands are also available:
+ &cquest completed&0 - List quests you have &yfinished&0.
+ &cquest drop&0 - &yCancel&0 a quest you're on.
  &cquest group&0 - See which quests you share with group members.
- &cquest info&0 - See details on a quest you're on or one available here.
+ &cquest info&0 - See &ydetails&0 on a quest you're on or one available here.
  &cquest list&0 - Show your quests and progress.
  &cquest share&0 - Offer a quest to members of your group.
- &cquest start&0 - Begin a quest.
- &cquest tracker&0 - Show the quest tracker for one quest you're on.
 
 Hint: You can abbreviate "q t", or even alias these commands if you use them
 a lot.
 
 For more information on each, see HELP QUEST <command>.
 #
-"QUEST CHECK"
+"DAILY QUEST" DAILY DAILIES
 
-Usage:  quest check
+'Dailies' are a special type of quest, which have a per-day limit. You can only
+complete 5 daily quests total, then can't do any more daily quests until the
+next reset (the same reset as bonus experience).
 
-This command shows all the quests available at your location.
+Each individual daily quest can only be completed at most once per day (based
+on the reset time, not a 24-hour counter like other quests). However, some
+daily quests may have longer repeat restrictions.
 
-See also: QUEST
+If you are still on any daily quests when the daily reset happens, you will
+fail those quests and drop them. When you finish your last daily quest, you
+will immediately fail any remaining daily quests in your quest list.
+
+See also: CITY DAILIES
 #
 "QUEST DROP"
 
@@ -45,7 +54,9 @@ Turn in one or more quests. You must find the correct location, person, or item
 to turn in each quest. There will be an indication if you have a quest to turn
 in somewhere.
 
-See also: QUEST
+To finish a quest, you must have finished the tasks on its tracker.
+
+See also: QUEST, QUEST TRACKER
 #
 "QUEST GROUP"
 
@@ -64,9 +75,10 @@ This displays additional information about a quest, including the quest's full
 description. It works on both quests you're on, and ones available at your
 location.
 
-When you use it on a quest you're on, you will also see the quest tracker.
+When you use it on a quest you're on, you will also see the quest tracker. See
+the quest tracker help file for more information.
 
-See also: QUEST
+See also: QUEST, QUEST TRACKER
 #
 "QUEST LIST"
 
@@ -89,21 +101,44 @@ offering another one.
 
 See also: ACCEPT, REJECT
 #
-"QUEST START"
+"QUEST START" "QUEST CHECK"
 
-Usage:  quest start <name | all>
+Usage:  quest start [name | all]
 
 This command starts a quest (or all quests) available at your location. There
 will be an indicator on any person, place, or thing that starts a quest.
 
-See also: QUEST, QUEST CHECK
+Typing 'quest start' with no argument will list the quests available here.
+
+See also: QUEST
 #
 "QUEST TRACKER"
 
 Usage:  quest tracker <name>
 
-This shows the quest tracker for a quest you're on.
+This shows the quest tracker for a quest you're on. The tracker tells you what
+tasks are required for the quest.
+
+Some quests require ALL tasks in the tracker to be complete, others only
+require some tasks. If any tasks say "or", you only need to match one of the
+ors.
 
 See also: QUEST
+#
+"CITY DAILIES"
+
+These basic daily quests can be completed for a little extra bonus experience.
+They can be started from an artisan in the listed building (for example, the
+miller for the mill).
+
+Grain for the Miller (Mill, requires Empire 15)
+Forge Horseshoes (Stable, requires Trade 15)
+Steal a Trinket (Tavern, requires Stealth 15)
+Disenchant Trinkets (Tower of Sorcery, requires High Sorcery 15)
+Deliver a Letter (Pigeon Post, requires Tower of Sorcery, Forge and Alchemist)
+
+You can only do these quests in your own empire.
+
+See also: DAILY QUESTS
 #
 $

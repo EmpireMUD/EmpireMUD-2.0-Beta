@@ -1,0 +1,871 @@
+#11000
+nest gigantic~
+the gigantic nest~
+A gigantic nest made from whole trees blocks the landscape!~
+   The gigantic nest is made from whole trees, some of which are so exotic that
+you've never even been to the land they were collected from. It looks like you
+can 'enter the nest' and see what's in there.
+~
+8 0 0 2
+-1 0 0
+0 0
+T 11000
+S
+#11001
+egg gigantic~
+a gigantic egg~
+A gigantic egg sits in the center of the nest.~
+   This titanic egg is warm to the touch, and when it twitches, the whole nest
+seems to shake. It must be about to hatch. You should decide which quest to
+start, before the mother gets home.
+~
+3 0 0 1
+0 0 0
+14 0
+S
+#11002
+lobster giant remains~
+a giant lobster~
+The remains of a giant lobster lie here.~
+   This lobster, though unusually large, also looks partially digested. You
+can't bring yourself to fathom what manner of creature could have eaten it
+whole.
+~
+6 e a 5
+48 0 0
+7 168
+M
+4
+You notice the half-digested lobster tastes surprisingly good.~
+M
+5
+$n looks surprised at how good a half-digested giant lobster tastes as $e eats it.~
+O
+17 lt
+R
+5119 0
+S
+#11003
+carcass dolphin~
+a dolphin carcass~
+Most of a dolphin carcass is rotting on the ground.~
+   The dolphin carcass is virtually whole, but slightly fermented and with the
+rotten smell of having been inside the stomach of a larger creature. And since
+the carcass isn't chewed, that creature must have been much larger indeed.
+~
+6 e a 5
+48 0 0
+7 168
+M
+4
+You take a nauseating bite of the half-digested dolphin.~
+M
+5
+$n makes a sour face as $e eats a half-digested dolphin.~
+O
+17 lt
+R
+5119 0
+S
+#11004
+pouch talons golden~
+a pouch of golden talons~
+A pouch of golden talons is sitting here.~
+   This simple leather pouch holds golden talons, redeemable for rewards from
+the Gigantic Nest adventure. You can type 'count talons' to see how many you
+have. Complete one of the helpful quests in the nest to summon the roc who
+trades talons for rewards.
+~
+3 p a 7
+0 0 0
+14 0
+T 11004
+S
+#11005
+talon golden~
+a golden talon~
+A golden talon is lying here.~
+   You shouldn't actually be seeing this. The script on this item should add
+directly to your golden talon count, which is stored as a script variable.
+~
+3 p a 10
+0 0 0
+14 0
+T 11005
+S
+#11006
+pouch talons corrupted~
+a pouch of corrupted talons~
+A pouch of corrupted talons is sitting here.~
+   This simple leather pouch holds corrupted talons, redeemable for rewards
+from the Gigantic Nest adventure. You can type 'count talons' to see how many
+you have. Complete one of the harmful quests in the nest to summon the person
+who trades talons for rewards.
+~
+3 p a 8
+0 0 0
+14 0
+T 11004
+S
+#11007
+talon corrupted~
+a corrupted talon~
+A corrupted talon is lying here.~
+   You shouldn't actually be seeing this. The script on this item should add
+directly to your corrupted talon count, which is stored as a script variable.
+~
+3 p a 9
+0 0 0
+14 0
+T 11005
+S
+#11008
+bag seeds wispy zephyr cattails~
+a bag of wispy seeds~
+A bag of wispy seeds blows in the wind.~
+   This mesh bag barely contains strange, fluffy seeds that blow away so easily
+on the wind. The clasp on the bag appears to be part of a bird's talon.
+~
+3 b a 4
+0 11008 0
+0 0
+S
+#11009
+cattails zephyr tails bundle~
+a bundle of zephyr cattails~
+A bundle of zephyr cattails lies on the ground.~
+   The zephyr cattails are long, green stalks tipped with the brown, tail-like
+ends for which they are named. This rare type of cattail turns to fluff that
+takes to the skies at the slightest hint of wind. If you want to plant more of
+them, mill the cattails into seeds. Or, you can burn them to get a powerful
+reagent that can be milled into a burnt zephyr salve.
+~
+3 0 a 6
+0 0 0
+0 0
+I 11 11015 100.00 1  # LIGHT: a burnt zephyr cattail
+O
+7 i
+S
+#11010
+seeds handful purple~
+a handful of purple seeds~
+Some purple seeds are scattered on the ground.~
+   These seeds are plump and purple, but you've never seen anything quite like
+them before.
+~
+6 b a 1
+6 11011 0
+0 48
+O
+23 0
+S
+#11011
+eggplant~
+an eggplant~
+An eggplant is sitting on the ground.~
+This large, fresh eggplant is a deep aubergine purple. Eggplants this large are
+prized at market, as few dishes require more than one.
+~
+6 b a 9
+24 11011 0
+7 168
+O
+27 bq
+R
+5114 0
+S
+#11012
+eggplant tiny~
+a tiny eggplant~
+A tiny eggplant is lying on the ground.~
+   This little eggplant is already a nice deep purple color, but it's barely
+the size of a tomato.
+~
+6 0 a 10
+6 0 0
+7 48
+O
+27 nq
+S
+#11013
+feather roc gigantic~
+a gigantic roc feather~
+A gigantic roc feather is blowing around.~
+   This roc feather is absolutely huge, a requirement for keeping such a large
+bird aloft. The feather is rust-colored and despite its size, it weighs next to
+nothing.
+~
+3 0 a 2
+0 0 0
+7 0
+O
+7 af
+R
+5193 0
+R
+5621 0
+S
+#11014
+feather glowing stone~
+a glowing stone feather~
+A glowing stone feather is lying here.~
+   This small feather has a faint red glow even in broad daylight. It has all
+the qualities of a fine gem, and despite being solid rock, it is surprisingly
+light.
+~
+3 0 a 1
+0 0 0
+0 0
+O
+11 g
+R
+5193 0
+R
+5621 0
+S
+#11015
+cattail tail burnt zephyr~
+a burnt zephyr cattail~
+A burnt zephyr cattail is lying on the ground.~
+This cattail looks like it has been burnt by fire.
+~
+3 0 a 3
+0 0 0
+0 0
+S
+#11016
+salve zephyr burnt~
+a burnt zephyr salve~
+A burnt zephyr salve is sitting on the ground.~
+   This odd salve is made from burnt zephyr cattails, and is hot to the touch.
+Certainly a material like this has a purpose, but you can't imagine what it
+would be.
+~
+3 0 a 1
+0 0 0
+0 0
+S
+#11017
+egg ostrich~
+an ostrich egg~
+An ostrich egg is lying on the ground.~
+This over-sized egg can be used to summon a noncombat pet!
+Type 'use egg' to summon it.
+~
+3 ep a 6
+11017 0 0
+2 0
+T 9900
+S
+#11018
+egg tawny roc~
+a tawny roc egg~
+A tawny roc egg towers over you.~
+   The tawny roc egg is as tall as you are, and quite warm. Type 'use egg' to
+summon a flying tawny roc mount.
+~
+3 ep a 4
+11018 0 0
+14 0
+T 10263
+S
+#11019
+egg ostrich lithe~
+a lithe ostrich egg~
+A lithe ostrich egg sits on the ground.~
+   The ostrich egg is large and beige, and wiggles around as you hold it. Type
+'use egg' to summon a lithe ostrich mount.
+~
+3 ep a 5
+11019 0 0
+14 0
+T 10263
+S
+#11020
+egg swan trumpeter~
+a trumpeter swan egg~
+A trumpeter swan egg is sitting here.~
+   The trumpeter swan egg is surprisingly large, but pure white. Type 'use egg'
+to summon a huge trumpeter swan, an aquatic mount.
+~
+3 ep a 6
+11020 0 0
+14 0
+T 10263
+S
+#11021
+loss sense~
+a sense of loss~
+A sense of loss looms where an egg should be.~
+There should be something here, but it's gone...
+~
+3 0 0 4
+0 0 0
+10 96
+T 11021
+T 11022
+S
+#11022
+carcass~
+a half-eaten cow carcass~
+A half-eaten cow carcass is rotting on the ground.~
+   This carcass appears to be most of a cow, although something has already
+torn off most of the meat. What remains of the cow is covered in maggots, and
+the smell is foul enough to make you retch.
+~
+3 0 0 4
+0 0 0
+7 144
+S
+#11023
+carcass~
+a rotting horse carcass~
+A rotting horse carcass is lying on the ground.~
+   What remains of the horse is lying on the ground, rotting, covered in flies
+and maggots. Something has already picked most of the meat and organs from the
+carcass, and splattered blood suggests the carcass was badly beaten -- or
+dropped from a great height.
+~
+3 0 0 3
+0 0 0
+7 144
+S
+#11024
+rucksack sack downy~
+a downy rucksack~
+A downy rucksack lies empty on the ground.~
+   This lightweight pack is made from the oversized down of a roc, the largest
+and rarest bird in the skies. The down has large, tough fibers that are also
+unbelievably soft.
+~
+24 mo ar 3
+1 0 0
+7 0
+C
+0 150
+S
+#11025
+pattern downy rucksack sack~
+the downy rucksack pattern~
+The downy rucksack pattern is lying here.~
+This pattern is used to make the downy rucksack, a great pack item.
+Sew (Magical Vestments): downy rucksack
+~
+3 o a 2
+0 0 0
+0 0
+S
+#11026
+saddle feathered elegant~
+an elegant feathered saddle~
+An elegant feathered saddle has been carefully hung here.~
+   The saddle is made from tough leather, but every part aside from the seat
+has long, rust-colored roc feathers flared out from a saddle that's fit for a
+statesman.
+~
+2 emo as 3
+0 0 0
+7 0
+A
+11 3 0
+A
+6 2 0
+C
+0 150
+S
+#11027
+pattern feathered saddle~
+the feathered saddle pattern~
+The feathered saddle pattern is lying here.~
+This pattern can be used to craft a fine saddle.
+Sew (Dangerous Leathers): feathered saddle
+~
+3 o a 3
+0 0 0
+0 0
+S
+#11028
+earrings pair roc~
+earrings of the roc~
+A pair of roc earrings is lying on the ground.~
+   These earrings are made primarily from long roc feathers, long enough that
+you could tuck them into your belt if you wanted to. The feathers are a
+majestic rust color, and would be hard to miss at any distance.
+~
+2 o am 5
+0 0 0
+7 0
+A
+5 1 0
+C
+0 150
+S
+#11029
+schematic earrings roc~
+the roc earrings schematic~
+The roc earrings schematic is lying here.~
+   This schematic can be used to make incredible earrings, which bestow
+greatness upon the wearer.
+Forge (Jewelry): roc earrings
+~
+3 o a 5
+0 0 0
+0 0
+S
+#11030
+headdress feathered magnificent~
+a magnificent feathered headdress~
+A magnificent feathered headdress is lying in a pile.~
+   This headdress is made from rust-colored feathers so long that they actually
+make your neck sore. However, they also bestow a certain greatness and
+capability upon the wearer, and look good in the process.
+~
+2 p ae 9
+0 0 0
+7 0
+A
+25 40 0
+A
+5 1 0
+C
+150 150
+S
+#11031
+magnificence roc's~
+the roc's magnificence~
+The roc's magnificence lingers in the air.~
+   This magnificence is used to craft a headdress that bestows greatness and
+crafting ability upon its wearer. You can only make this item for yourself.
+Craft (level 100): magnificent feathered headdress
+~
+3 0 a 2
+0 0 0
+10 0
+S
+#11032
+daedalus wings~
+the wings of Daedalus~
+The wings of Daedalus lie here.~
+   These wings are made from magnificent, oversized roc feathers. The skill
+with which they are stitched together is incredible. Straps hold the wings to
+the wearer's arms, and the natural magic that allows the great roc to fly is
+transferred to the wearer for a short time.
+~
+2 ejo ak 5
+0 0 0
+9 0
+B
+m
+C
+0 150
+T 11032
+S
+#11033
+schematic daedalus wings~
+the wings of Daedalus schematic~
+The wings of Daedalus schematic is lying here.~
+   This incredible schematic depicts the wings of Daedalus, an incredible
+artifact that bestows flight upon its wearer for a short time.
+Craft (Master Craftsman): wings of Daedalus
+~
+3 o a 6
+0 0 0
+0 0
+S
+#11034
+gear roc-stone stone~
+a roc-stone gear~
+A roc-stone gear is lying on the ground.~
+   This gear is carved from the stone heart of a great roc, and enables a ship
+to fly. You can manufacture the clockwork roc airship from this gear at a
+shipyard, by typing 'manufacture clockwork roc'. Or type 'manufacture info
+clockwork roc' to see the requirements.
+~
+3 ej a 2
+0 0 0
+1 0
+S
+#11035
+guards arm swift feathered pair~
+swift feathered arm guards~
+A pair of swift feathered arm guards is lying here.~
+   These arm guards are made from strong hardened leather and covered in
+carefully arranged feathers to help the arms cut through the air.
+~
+27 moy ai 14
+1 0 0
+7 0
+A
+1 1 0
+A
+17 2 0
+A
+21 2 0
+A
+12 -1 0
+C
+0 150
+S
+#11036
+pattern feathered arm guards~
+the feathered arm guards pattern~
+The feathered arm guards pattern is lying here.~
+This pattern can be used to make a great melee dps armpiece.
+Sew (Dangerous Leathers): feathered arm guards
+~
+3 o a 7
+0 0 0
+0 0
+S
+#11037
+plates arm stonefeather feather pair~
+stonefeather arm plates~
+A pair of stonefeather arm plates is lying here.~
+   These arm plates appear to be made from stone feathers, strong enough to
+shield the user from a powerful blow. They're rather heavy, but a trained
+warrior should have no trouble wearing them.
+~
+27 moy ai 14
+3 0 0
+1 0
+A
+2 1 0
+A
+18 1 0
+A
+13 2 0
+A
+24 1 0
+A
+12 1 0
+A
+9 -2 0
+A
+21 -2 0
+C
+0 150
+S
+#11038
+pattern stonefeather arm plates~
+the stonefeather arm plates pattern~
+The stonefeather arm plates pattern is lying here.~
+This pattern shows how to create a powerful tank armpiece.
+Forge (Imperial Armors): stonefeather arm plates
+~
+3 o a 8
+0 0 0
+0 0
+S
+#11039
+sleeves pair roc feather~
+roc feather sleeves~
+A pair of roc feather sleeves are lying here.~
+   These sleeves are made from the giant feathers of the roc, a terrifying bird
+rumored to eat entire farmyards in a single meal. The sleeves have a faint red
+glow, barely visible except in the dark.
+~
+27 moy ai 14
+0 0 0
+7 0
+A
+8 1 0
+A
+17 2 0
+A
+22 2 0
+A
+23 -2 0
+C
+0 150
+S
+#11040
+pattern roc feather sleeves~
+the roc feather sleeves pattern~
+The roc feather sleeves pattern is lying here.~
+This pattern shows you how to make a great caster dps armpiece.
+Sew (Magical Vestments): roc feather sleeves
+~
+3 o a 9
+0 0 0
+0 0
+S
+#11041
+sleeves downy white pair~
+downy white sleeves~
+A pair of downy white sleeves is lying here.~
+   These sleeves are made from huge tufts of down, kept in place by the finest
+of nets. The down is bright white, but has the faintest of red glows.
+~
+27 moy ai 15
+0 0 0
+7 0
+A
+8 1 0
+A
+7 2 0
+A
+9 1 0
+A
+23 3 0
+A
+22 -4 0
+C
+0 150
+S
+#11042
+pattern downy white sleeves~
+the downy white sleeves pattern~
+The downy white sleeves pattern is lying here.~
+This pattern shows you how to make a fantastic healer armpiece.
+Sew (Magical Vestments): downy white sleeves
+~
+3 o a 10
+0 0 0
+0 0
+S
+#11043
+gauntlets feather razor pair~
+razor feather gauntlets~
+A pair of razor feather gauntlets is lying here.~
+   These leather gauntlets have razor-sharp feathers sewn along the knuckles.
+The quality of the craftsmanship is exquisite, and the feathers look quite
+rare.
+~
+27 moy ah 14
+1 0 0
+7 0
+A
+9 1 0
+A
+1 1 0
+A
+21 2 0
+A
+12 -1 0
+A
+24 -1 0
+C
+0 150
+S
+#11044
+pattern razor feather gauntlets~
+the razor feather gauntlets pattern~
+The razor feather gauntlets pattern is lying here.~
+This pattern shows you how to make powerful melee dps gauntlets.
+Sew (Dangerous Leathers): razor feather gauntlets
+~
+3 o a 11
+0 0 0
+0 0
+S
+#11045
+gauntlets feathered imperium pair~
+feathered imperium gauntlets~
+A pair of feathered imperium gauntlets is lying here.~
+   This looks like a sturdy pair of imperium gauntlets that have been lined
+with giant roc feathers, for purposes that are not immediately apparent.
+Perhaps it makes the gauntlets stronger, or perhaps just more stylish.
+~
+27 moy ah 15
+3 0 0
+7 0
+A
+18 3 0
+A
+13 1 0
+A
+24 2 0
+A
+12 2 0
+A
+21 -4 0
+C
+0 150
+S
+#11046
+pattern feathered imperium gauntlets~
+the feathered imperium gauntlets pattern~
+The feathered imperium gauntlets pattern is lying here.~
+This pattern shows you how to create incredible tank gauntlets.
+Forge (Imperial Armors): feathered imperium gauntlets
+~
+3 o a 12
+0 0 0
+0 0
+S
+#11047
+gloves feather wondrous pair~
+wondrous feather gloves~
+A pair of wondrous feather gloves is lying here.~
+   These gloves have long, oversized roc feathers hanging from their backs
+which, somehow, don't seem to restrict arm movement in combat. Perhaps the roc
+feathers are naturally inclined to move through the air.
+~
+27 moy ah 16
+0 0 0
+7 0
+A
+17 1 0
+A
+9 1 0
+A
+22 4 0
+A
+23 -2 0
+C
+0 150
+S
+#11048
+pattern gloves feather wondrous~
+the wondrous feather gloves pattern~
+The wondrous feather gloves pattern is lying here.~
+This pattern shows how to make a powerful pair of caster dps gloves.
+Sew (Magical Vestments): wondrous feather gloves
+~
+3 o a 13
+0 0 0
+0 0
+S
+#11049
+caps finger roc quill set~
+roc quill finger caps~
+A set of roc quill finger caps is strewn on the ground.~
+   These finger caps are made from the quills of roc feathers, and are said to
+channel the life-giving magic of the air in which the roc flew.
+~
+27 moy ah 19
+0 0 0
+7 0
+A
+7 1 0
+A
+9 1 0
+A
+23 4 0
+A
+22 -4 0
+C
+0 150
+S
+#11050
+pattern roc quill finger caps~
+the roc quill finger caps pattern~
+The roc quill finger caps pattern is lying here.~
+This pattern shows you how to make incredible healer handgear.
+Sew (Magical Vestments): roc quill finger caps
+~
+3 o a 14
+0 0 0
+0 0
+S
+#11051
+capstone stone dome huge~
+a huge dome capstone~
+A huge capstone sits on the ground.~
+   The capstone is curved, with the edges cut into 8 sides so that it can form
+the peak of a gigantic dome. Looking at the stone, you can't imagine how big
+the final dome will be. But it's safe to say, you'll be impressed. Type 'build
+rocdome <exit direction>' to begin construction, or 'build info rocdome' to see
+the requirements.
+~
+3 e a 2
+0 0 0
+1 0
+S
+#11052
+reward incredible~
+an incredible reward~
+An incredible reward has bugged out.~
+This item purges itself and spawns an actual quest reward.
+~
+3 0 a 2
+0 0 0
+10 0
+T 11052
+S
+#11053
+egg stolen~
+a stolen egg~
+A stolen egg is sitting here.~
+   You've stolen the gigantic egg from the nest! Hurry, flee from its mother
+and wait for your buyer to appear.
+~
+3 ep a 3
+0 0 0
+14 4
+C
+100 125
+Q 11002
+T 11053
+S
+#11054
+list supply~
+a supply list for the nest~
+A supply list is lying here.~
+   The list has several items and you will need to craft two of each. You can
+only craft these items while on the quest for the gigantic nest egg. Any extra
+items you make will be donated to the nest as well. Use sew/craft/forge info to
+see the requirements to make each item.
+
+Sew (Sew ability): warm hatchling blankets (x2)
+Craft (Woodworking): nesting material (x2)
+Forge (Forge ability): protective nest traps (x2)
+~
+3 p a 2
+0 0 0
+0 0
+Q 11001
+S
+#11055
+blankets warm hatchling~
+warm hatchling blankets~
+A pile of warm blankets is sitting here.~
+   These blankets look quite warm, perfect for protecting a large, young
+hatchling in this weather. Don't make too many of the blankets; you'll lose
+them when you turn in the quest.
+~
+3 p a 1
+0 0 0
+11 0
+Q 11001
+S
+#11056
+material nesting~
+some nesting material~
+A pile of nesting material is clumped on the ground.~
+   This nesting material is really just a mass of sticks and fluff, but it
+seems like exactly the thing to get a young bird started in the world. Don't
+make too much of the nesting material; you'll lose it when you turn in the
+quest.
+~
+3 p a 2
+0 0 0
+11 0
+Q 11001
+S
+#11057
+trap nest protective~
+a protective nest trap~
+A protective nest trap is set here.~
+   You're not sure what this trap is meant to catch, but it must be large.
+Hopefully it's large enough to keep the nest safe. Don't make too many of the
+traps; you'll lose them when you turn in the quest.
+~
+3 p a 3
+0 0 0
+0 0
+Q 11001
+S
+#11058
+eggshell shards~
+some shards of eggshell~
+Some shards of eggshell are scattered here.~
+The egg that was here has hatched safely.
+~
+3 0 0 3
+0 0 0
+14 96
+T 11021
+S
+$

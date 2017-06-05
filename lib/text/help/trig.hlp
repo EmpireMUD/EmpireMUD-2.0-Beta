@@ -49,7 +49,8 @@ See also: MTRIG CHARMED
 
 Command (trigger type)
 
-Argument type:  name of the command (string)
+Argument type:  name of the command (string), * for match any command, and
+                match multiple commands by separating them with spaces
 Return value:  return 0 to proceed with normal command execution
                return 1 (default) if the trigger processed the command
 
@@ -153,33 +154,42 @@ Mob Entry trigger: &yMTRIG ENTRY&0
 Room Enter trigger: &yRTRIG ENTER&0
 Vehicle Entry trigger: &yVTRIG ENTRY&0
 #d
-EXPRESSIONS TRIGEDIT-EXPRESSIONS INCREMENTS MATHEMATICAL /= || \
+EXPRESSIONS TRIGEDIT-EXPRESSIONS INCREMENTS MATHEMATICAL OPERATORS /= || \
 
 A FALSE expression is any expression that evaluates to 0, or an empty string.
 A TRUE expression is any expression that evaluates to anything other than a
-false expression. The following list are the recognized operators. The higher
-the operator is on the list, the higher the precedence. The expression is
-evaluated from left to right. Parenthesis can be used to group. 
+false expression. The expression is evaluated from left to right, unless one
+operator has precedence over another. Parenthesis can be used to group. 
 
 |Operator|         Name          | Examples  0=False 1=True  |
 --------------------------------------------------------------
-|   ||   | logical or            | 0 || ( ) = 0; 5 || 0 = 1  |
-|   &&&&   | logical and           | 1 &&&& 0 = 0; 5 &&&& 3 = 1    |
-|   ==   | equivalence           | 5 == 3 = 0; dog == DoG = 1| 
-|   !=   | inequality            | 0 != Z = 0; dog != d = 1  | 
+|   !    | negation              | !() = 1; !0 = 1; !dog = 0;|
+|   *    | multiplication        | 10 * 20 = 400             |
+|   /    | division              | 100 / 20 = 5              |
+|   //   | remainder             | 5 // 4 = 1                |
+|   +    | addition              | 10 + 15 = 25              |
+|   -    | subtraction           | 15 - 10 = 5               | 
 |   <    | less than             | 4 < 3 = 0; 4 < 5 = 1      |
 |   >    | greater than          | 4 > 3 = 1; 4 > 4 = 0      |
 |   <=   | less than or equal    | 4 <= 3 = 0; 4 <= 5 = 1    |
 |   >=   | greater than or equal | 4 >= 3 = 1; 4 >= 4 = 1    |
 |   /=   | abbrev                | "concatenate" /= "con"    |
 |   ~=   | substring             | "Dark Forest" ~= "Forest" |
-|   -    | subtraction           | 15 - 10 = 5               |
-|   +    | addition              | 10 + 15 = 25              |
-|   *    | multiplication        | 10 * 20 = 400             |
-|   /    | division              | 100 / 20 = 5              |
-|   //   | remainder             | 5 // 4 = 1                |
-|   !    | negation              | !() = 1; !0 = 1; !dog = 0;| 
+|   ==   | equivalence           | 5 == 3 = 0; dog == DoG = 1| 
+|   !=   | inequality            | 0 != Z = 0; dog != d = 1  |
+|   &&&&   | logical and           | 1 &&&& 0 = 0; 5 &&&& 3 = 1    |
+|   ||   | logical or            | 0 || ( ) = 0; 5 || 0 = 1  |
 --------------------------------------------------------------
+
+Operator precedence is as follows (higher items take precedence:
+   !
+   * / //
+   + -
+   <= < >= >
+   /= ~=
+   == !=
+   &&&&
+   ||
 #d
 "FINISH QUEST TRIGGER" "MTRIG FINISH QUEST" "OTRIG FINISH QUEST" "RTRIG FINISH QUEST" "VTRIG FINISH QUEST" TRIGEDIT-MOB-FINISH-QUEST TRIGEDIT-OBJ-FINISH-QUEST TRIGEDIT-ROOM-FINISH-QUEST TRIGEDIT-VEH-FINISH-QUEST "FINISH-QUEST TRIGGER"
 
@@ -313,6 +323,19 @@ Example:
 
 See also: COMMAND TRIGGER
 #d
+"PLAYER-IN-ROOM TRIGGER" "PLAYER IN ROOM TRIGGER" "MTRIG PLAYER-IN-ROOM" "OTRIG PLAYER-IN-ROOM" "RTRIG PLAYER-IN-ROOM" "VTRIG PLAYER-IN-ROOM"
+
+Player-in-Room (trigger)
+
+This trigger type is not an event itself, but is instead combined with some
+other trigger types to prevent them from triggering unless a player is present.
+This generally reduces the number of triggers running when they don't need to.
+
+Supported types:
+  Random
+
+See also: RANDOM TRIGGER
+#d
 "RANDOM TRIGGER" "MTRIG RANDOM" "OTRIG RANDOM" "RTRIG RANDOM" "VTRIG RANDOM" TRIGEDIT-MOB-RANDOM TRIGEDIT-OBJ-RANDOM TRIGEDIT-ROOM-RANDOM TRIGEDIT-VEH-RANDOM RANDOM-TIMING TIMING
 
 Random (trigger type)
@@ -332,10 +355,24 @@ You can set how often the trigger fires by setting the percent to:
 
 (all times are approximate, except 100%)
 
+You can add the "Global" and "Player-in-Room" modifiers.
+
 Note: Random triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 
-See also: GLOBAL TRIGGER, MTRIG CHARMED
+See also: GLOBAL TRIGGER, MTRIG CHARMED, PLAYER-IN-ROOM TRIGGER
+#d
+"REBOOT TRIGGER" "MTRIG REBOOT" "OTRIG REBOOT" "RTRIG REBOOT" "VTRIG REBOOT" TRIGEDIT-MOB-REBOOT TRIGEDIT-OBJ-REBOOT TRIGEDIT-ROOM-REBOOT TRIGEDIT-VEH-REBOOT REBOOT-TIMING TIMING
+
+Reboot (trigger type)
+
+Return value:  return 0 to block more reboot triggers on this mob/obj/etc
+
+This type of trigger fires when the mud starts up, for example after a reboot
+or crash. This allows you to fix complex setups like a mob that should be
+following another mob, and other things that aren't saved through reboots.
+
+You can attach random triggers to mobs, objects, rooms, and vehicles.
 #d
 "SCRIPT COMMANDS" "TRIGEDIT SCRIPT COMMANDS"
 
@@ -349,6 +386,7 @@ The following is a list of special commands that can be used in triggers:
 &cdefault&0 - Part of a switch statement.
 &cdetach&0 - Removes a trigger from something.
 &cdg_affect&0 - Adds a spell effect to a person.
+&cdg_affect_room&0 - Adds a spell effect to a room.
 &cdone&0 - Ends a switch or while statement.
 &celse&0 - Part of an if/elseif/else/end series of conditions.
 &celseif&0 - Part of an if/elseif/else/end series of conditions.
@@ -374,7 +412,7 @@ See the specific help files for those commands for more information.
 
 See also: MTRIG COMMANDS, OTRIG COMMANDS, RTRIG COMMANDS, VTRIG COMMANDS
 #d
-"SPECIAL VARS" "SPEC VARS" "SPECIAL VARIABLES" TRIGEDIT-VARIABLES-SPECIALS SPEC-VARS %SELF% RANDOM %RANDOM% %TIME% %PEOPLE% TRIGEDIT-SPEC-VAR %RANDOM.CHAR% %SPEECH% 
+"SPECIAL VARS" "SPEC VARS" "SPECIAL VARIABLES" TRIGEDIT-VARIABLES-SPECIALS SPEC-VARS %SELF% %RANDOM% %TIME% %PEOPLE% TRIGEDIT-SPEC-VAR %RANDOM.CHAR% %SPEECH% 
 
 Special Variables When using field - The variable returns:
  
@@ -384,6 +422,8 @@ Special Variables When using field - The variable returns:
 &cinstance.location&0 - The map/linked location of the instance, if any.
 &cinstance.mob(vnum)&0 - Finds a copy of a mob belonging to the instance.
 &cinstance.name&0 - Name of the adventure instance, if any.
+&cinstance.nearest(rmt vnum)&0 - Finds a given room in the nearest instance
+   that has one (only works if you aren't in a !LOCATION spot).
 &cinstance.start&0 - The entry room of the instance, if any.
 &cpeople.<vnum>&0 - This variable returns the number of people in the room 
    specified via vnum.
@@ -412,7 +452,8 @@ Special Variables When using field - The variable returns:
 
 Speech (trigger type)
 
-Argument type:  the phrase (whole string) or word list to match
+Argument type:  the phrase (whole string) or word list to match, or * to match
+   any text.
 
 Speech triggers occur when someone in the room says the phrase (or one of the
 words in a word list) using the normal "say" command. This is can be used to
@@ -429,7 +470,7 @@ Variables:
 
 See also: MTRIG CHARMED
 #d
-"START QUEST TRIGGER" "MTRIG START QUEST" "OTRIG START QUEST" "RTRIG START QUEST" "VTRIG START QUEST" TRIGEDIT-MOB-START-QUEST TRIGEDIT-OBJ-START-QUEST TRIGEDIT-ROOM-START-QUEST TRIGEDIT-VEH-START-QUEST "START-QUEST TRIGGER" "MTRIG START-QUEST" "OTRIG START-QUEST" "RTRIG START-QUEST" "VTRIG START-QUEST"
+"START QUEST TRIGGER" "MTRIG START QUEST" "OTRIG START QUEST" "RTRIG START QUEST" "VTRIG START QUEST" TRIGEDIT-MOB-START-QUEST TRIGEDIT-OBJ-START-QUEST TRIGEDIT-ROOM-START-QUEST TRIGEDIT-VEH-START-QUEST "START-QUEST TRIGGER"
 
 Start Quest (trigger)
 

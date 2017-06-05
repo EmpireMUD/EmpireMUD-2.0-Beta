@@ -7,21 +7,21 @@ Vampirism is not a curse, per se, but its powers do come at a price: vampires
 must drink blood. Vampires are not harmed by the sun, but their powers do not
 function in broad daylight.
 
-Vampires at skill level 15 or below are constantly hungry, losing a blood
-point ever hour even if they have no blood powers active. At such low levels,
-these vampires gain skill just by drinking the blood of others. Higher level
-vampires have an hourly upkeep based only on which powers are active. See the
-help file on BITE for more information on drinking blood.
+Vampires at low skill levels are constantly hungry, losing a blood point ever
+hour even if they have no blood powers active. At such low levels, the easiest
+way to gain Vampire skill is to use the Bite ability to drink the blood of
+others. Higher level vampires have an hourly upkeep based only on which powers
+are active. See the help file on BITE for more information on drinking blood.
 
 To become a vampire, seek out another of their kind -- if you dare.
 
 Check out &yHELP VAMPIRE GUIDE&0 for a getting-started.
 
 See also: BITE, SIRE, FEED, BOOST, ALACRITY, BLOOD FORTITUDE, MUMMIFY,
-    TASTE BLOOD, ANCIENT BLOOD, BLOODSWORD, COMMAND, MAJESTY, SUMMON, SOULMASK,
-    DEATHSHROUD, WOLF FORM, HORRID FORM, MIST FORM, CLAWS, PREADTOR VISION,
-    REGENERATE, BUILD HAVEN, DAYWALKING, VEINTAP, WEAKEN, BAT FORM,
-    UNNATURAL THIRST, SANGUINE RESTORATION
+    TASTE BLOOD, ANCIENT BLOOD, READY BLOOD WEAPONS, COMMAND, MAJESTY, SUMMON,
+    SOULMASK, DEATHSHROUD, WOLF FORM, HORRID FORM, MIST FORM, CLAWS,
+    PREADTOR VISION, REGENERATE, BUILD HAVEN, DAYWALKING, VEINTAP, WEAKEN,
+    BAT FORM, UNNATURAL THIRST, SANGUINE RESTORATION
 #
 ALACRITY
 
@@ -47,6 +47,8 @@ directly from a live host.
 
 You will gain experience with this ability when drinking blood, more if your
 victim is drained fatally.
+
+See also: BITE
 #
 "BAT FORM"
 
@@ -63,6 +65,8 @@ Gains experience when you finish transforming into a bat.
 See also: MORPH
 #
 BITE
+
+Bite (Vampire ability)
 
 Usage:  bite <target> 
 
@@ -102,20 +106,32 @@ Cooldown:  30 seconds
 
 This power purges a vampire's blood of any poisons, by sweating them out.
 #
-BLOODSWORD BLOOD-SWORD "BLOOD SWORD"
+"READY BLOOD WEAPONS" BLOODMACE BLOODSKEAN BLOODSPEAR BLOODSWORD BLOODSTAFF
 
-Bloodsword (Vampire ability)
+Ready Blood Weapons (Vampire ability)
 
-Usage:  bloodsword
+Usage:  ready <weapon name>
 Cost:  40 blood
 
-A vampire with this ability can create a sword from its own blood. The blood-
-red sword is only as powerful as the vampire who created it.
+A vampire with this ability can create weapons from its own blood. The blood-
+red weapons are only as powerful as the vampire who created them.
 
-When you activate this power, you will automatically wield the sword, and it
-will disappear when unequipped.
+The strength of your weapons will be based on your Vampire skill level, unless
+you have a Vampire over 75, in which case it will be based on your total
+composite level (if you're wielding a permanent weapon when you ready a
+blood weapon, this will include any levels you get from that weapon).
 
-Gains experience when you create the bloodsword.
+You can create:
+  bloodmace (pound/blunt)
+  bloodskean (stab/stealth)
+  bloodspear (jab/tank)
+  bloodstaff (staff/caster)
+  bloodsword (slash)
+
+When you activate this power, you will automatically wield the weapon of your
+choice, and it will disappear when unequipped.
+
+Gains experience when you create the blood weapon, or fight with it.
 #
 BOOST
 
@@ -158,8 +174,8 @@ to do simple tasks. The task can be just one word, which must be spoken aloud
 by the vampire and understood by the victim. Optionally, the word can be hidden
 in a sentence.
 
-This power only works on human NPCs, but won't work on hard/group mobs. It also
-won't work on mobs who are more powerful than you.
+This power only works on human NPCs, but won't work on hard/group mobs. You
+must be 25 levels above the target in order to command them.
 
 Gains experience when you issue commands.
 #
@@ -221,7 +237,8 @@ Class ability: Reaper, Shade, Wight
 Usage:  morph horrid
 Cost:  30 blood (90 in combat)
 
-The vampire takes on the horrid form, a twisted bestial monstrosity.
+The vampire takes on the horrid form, a twisted bestial monstrosity. This form
+is particularly effective in melee combat.
 
 See also: MORPH
 #
@@ -420,7 +437,7 @@ Cost:  50 blood
 Debuff type:  Vampire
 
 A vampire who is learned in the ways of blood can use her own blood to drain
-the strength of others for 75 seconds.
+the strength and intelligence of others for 75 seconds.
 
 Gains experience when you attempt to weaken someone.
 #

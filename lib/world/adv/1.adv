@@ -13,9 +13,9 @@ L
 4320 -1 -1
 -1 0 0
 L
-2 0
-4 10000 10000
--1 0 0
+4 0
+10000 10000 10000
+-1 d dn
 S
 #101
 Magiterranean: The Hidden Garden~
@@ -66,15 +66,69 @@ L
 -1 0 0
 T 10507
 S
+#103
+Magiterranean: Monsoon Rift~
+Paul Clarke and Owen Morris~
+   A rift has opened in the fabric between your world and the Magiterranean,
+the druidic plane of nature magic. A vicious monsoon storm is escaping through
+the rift, but it's not the only thing: animated cacti are attacking your world!
+   You can seal the rift using your Battle, High Sorcery, Natural Magic,
+Stealth, Trade, or Vampire skill. Each skill solution can only be completed
+once per day, even if you find another rift. The invading cacti will vanish as
+soon as you close the rift.
+~
+10140 10189 75-100
+5 30 g 0
+L
+4 0
+10140 10140 10141
+-1 el 0
+L
+5 0
+4320 -1 -1
+-1 0 0
+L
+6 0
+100 -1 -1
+-1 0 0
+S
+#104
+Magiterranean: Permafrost~
+Paul Clarke and Owen Morris~
+   In a chilling turn of events, a strange portal has opened over the river and
+begun to freeze its waters. Now, the spreading frost threatens to overwhelm our
+world. You must travel into the Magiterranean and defeat the nefarious Polar
+Baron in order to end this threat once and for all.
+   This adventure features a difficulty selector so it can be completed solo,
+or in groups of up to four. All gear looted from this adventure will be higher
+quality on harder difficulties.
+~
+10550 10599 75-125
+25 0 cg 4
+L
+4 0
+10550 10550 10550
+-1 f 0
+L
+5 0
+10080 -1 -1
+-1 0 0
+L
+6 0
+50 -1 -1
+-1 0 0
+S
 #120
 Mountain Cave: Red Dragon~
 Paul Clarke~
    Enter a cavernous mountain cave and find yourself face-to-claw with a giant
 red dragon! Bring a healer and a tank, and see how you fare against the most
 dangerous of wild creatures.
+
+This adventure is deprecated. A newer version exists as adv 128.
 ~
 10006 10010 300-300
-5 1440 c 4
+5 1440 ac 4
 L
 5 0
 2880 -1 -1
@@ -215,6 +269,80 @@ L
 6 0
 100 -1 -1
 -1 0 0
+S
+#128
+Colossal Red Dragon~
+Paul Clarke and Owen Morris~
+   Enter a cavernous mountain cave and find yourself face-to-claw with a giant
+red dragon! Bring a healer and a tank, and see how you fare against the most
+dangerous of wild creatures. Or, help the dragon rid herself of the pesky
+knight who has been calling for her slaughter.
+   This adventure offers quests from the red dragon, from Sir Vivor the knight,
+and from Bangles the thief. Collect dragon tokens to spend at the vendor who
+appears when you finish any of the quests.
+~
+10900 10949 250-300
+5 0 0 4
+L
+5 0
+1440 -1 -1
+-1 0 0
+L
+1 0
+10900 -1 -1
+14 c c
+S
+#129
+A Gigantic Nest~
+Paul Clarke and Owen Morris~
+   You have stumbled across a gigantic nest, woven together from entire trees,
+perched inelegantly on the landscape. The nest's owner is nowhere to be seen,
+but a single, huge, warm egg is gently rocking in the center. It looks like the
+egg could hatch any time.
+   There are several quests to choose from each time you find one of these
+nests, but you can only do one per nest. Save up your rewards and buy new
+crafting patterns and items at the end of the quest.
+   This is a solo adventure. Only one player can enter the nest at a time.
+~
+11000 11074 100-125
+50 0 dg 1
+L
+5 0
+1440 -1 -1
+-1 0 0
+L
+6 0
+50 -1 -1
+-1 0 0
+L
+4 0
+11000 11000 11000
+-1 b bcn
+L
+4 0
+11003 11000 11000
+-1 el cejl
+L
+4 0
+11002 11000 11000
+-1 c beln
+S
+#130
+Volcano~
+Paul Clarke~
+The mountain has opened up and lava is flowing forth at the surface!
+~
+10190 10199 0-0
+1 0 dg 0
+L
+4 0
+10190 10190 10190
+-1 c 0
+L
+5 0
+30240 -1 -1
+-1 0 0
+T 10195
 S
 #140
 The Sewer: Ratskins~
@@ -368,10 +496,10 @@ S
 #181
 Goblin Mines~
 Paul Clarke~
-   The goblins have fled the mines and something tells you it's not good. 
+   The goblins have fled the mines and something tells you it's not good.
 Venture into the goblin mines and see what sends even goblins running for their
 lives! And maybe if you can find those goblins, they'll be willing to reward
-you for clearing out the mine.  
+you for clearing out the mine.
 
 Directions for implementors:
 - Increase the instance limit to the number of newbie islands in your game.
@@ -379,7 +507,7 @@ Directions for implementors:
 - Make sure your newbie islands have mountains.
 ~
 10750 10774 0-25
-1 0 eh 0
+1 10 ehj 0
 L
 5 0
 10080 -1 -1

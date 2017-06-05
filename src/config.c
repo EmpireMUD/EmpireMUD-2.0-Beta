@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: config.c                                        EmpireMUD 2.0b4 *
+*   File: config.c                                        EmpireMUD 2.0b5 *
 *  Usage: Configuration of various aspects of CircleMUD operation         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -92,6 +92,14 @@ struct promo_code_list promo_codes[] = {
 	// last
 	{ "\n", FALSE, NULL }
 };
+
+
+// Text shown to players if they are not approved on login  -- TODO add long-form strings to in-game configs
+const char *unapproved_login_message =
+"\r\n&o"
+"Your character is not yet approved to play on this MUD. You can still enter\r\n"
+"the game, but have a limited set of commands and features. Contact the game's\r\n"
+"staff to find out what you have to do to be approved.&0\r\n";
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -198,7 +206,7 @@ const int base_player_pools[NUM_POOLS] = { 50, 100, 50, 100 };
 const int primary_attributes[] = { STRENGTH, CHARISMA, INTELLIGENCE, NOTHING };
 
 // skill levels at which you gain an ability
-int master_ability_levels[] = { 1, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100, -1 };
+int master_ability_levels[] = { 1, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 75, 80, 90, 100, -1 };
 
 // universal wait (command lag) after abilities with cooldowns
 const int universal_wait = 1.25 RL_SEC;
@@ -283,6 +291,7 @@ const sector_vnum climate_default_sector[NUM_CLIMATES] = {
 #define CONFIG_TRADE  10
 #define CONFIG_WAR  11
 #define CONFIG_WORLD  12
+#define CONFIG_APPROVAL  13
 
 
 // data types of configs (search CONFTYPE_x for places to configure)
@@ -310,6 +319,7 @@ const char *config_groups[] = {
 	"Trade",
 	"War",
 	"World",
+	"Approval",
 	"\n"
 };
 
@@ -340,7 +350,7 @@ union config_data_union {
 
 // for the master config system
 struct config_type {
-	int set;	// CONFIG_x
+	int set;	// CONFIG_
 	char *key;	// string key
 	int type;	// CONFTYPE_x how to access the data
 	char *description;	// long desc for contextual help
@@ -1449,7 +1459,7 @@ int sort_configs(struct config_type *a, struct config_type *b) {
 /**
 * Set up a config element to be read from the conf file.
 *
-* @param int set CONFIG_x group.
+* @param int set CONFIG_ group.
 * @param char *key Unique string key of this config (MUST be all one word).
 * @param int type CONFTYPE_x expected data type.
 * @param char *description String for contextual help.
@@ -1565,6 +1575,24 @@ void init_config_system(void) {
 	}
 
 	// first set up all the config types
+	
+	// approval
+	init_config(CONFIG_APPROVAL, "auto_approve", CONFTYPE_BOOL, "automatically approve players when created");
+	init_config(CONFIG_APPROVAL, "approve_per_character", CONFTYPE_BOOL, "require approval for every character, rather than by account");
+	init_config(CONFIG_APPROVAL, "need_approval_string", CONFTYPE_SHORT_STRING, "error message when an unapproved player uses a command");
+	init_config(CONFIG_APPROVAL, "build_approval", CONFTYPE_BOOL, "build, upgrade, lay roads, roadsigns");
+	init_config(CONFIG_APPROVAL, "chat_approval", CONFTYPE_BOOL, "slash-channels and global channels");
+	init_config(CONFIG_APPROVAL, "craft_approval", CONFTYPE_BOOL, "all crafting commands");
+	init_config(CONFIG_APPROVAL, "gather_approval", CONFTYPE_BOOL, "all resource gathering");
+	init_config(CONFIG_APPROVAL, "join_empire_approval", CONFTYPE_BOOL, "pledge, enroll");
+	init_config(CONFIG_APPROVAL, "manage_empire_approval", CONFTYPE_BOOL, "commands related to having an empire");
+	init_config(CONFIG_APPROVAL, "quest_approval", CONFTYPE_BOOL, "quest command");
+	init_config(CONFIG_APPROVAL, "skill_gain_approval", CONFTYPE_BOOL, "gain any skill points");
+	init_config(CONFIG_APPROVAL, "tell_approval", CONFTYPE_BOOL, "sending tells (except to immortals)");
+	init_config(CONFIG_APPROVAL, "terraform_approval", CONFTYPE_BOOL, "excavate, fillin, chant of nature");
+	init_config(CONFIG_APPROVAL, "title_approval", CONFTYPE_BOOL, "set own title");
+	init_config(CONFIG_APPROVAL, "travel_approval", CONFTYPE_BOOL, "transport, portal, summon, vehicles");
+	init_config(CONFIG_APPROVAL, "write_approval", CONFTYPE_BOOL, "boards, books, mail");
 
 	// game configs
 	init_config(CONFIG_GAME, "allow_extended_color_codes", CONFTYPE_BOOL, "if on, players can use \t&[F000] and \t&[B000]");
@@ -1580,13 +1608,13 @@ void init_config_system(void) {
 	init_config(CONFIG_GAME, "mud_name", CONFTYPE_SHORT_STRING, "name of your mud");
 	init_config(CONFIG_GAME, "mud_status", CONFTYPE_SHORT_STRING, "one of: Alpha, Closed Beta, Open Beta, Live");
 	init_config(CONFIG_GAME, "mud_website", CONFTYPE_SHORT_STRING, "your mud's website");
+	init_config(CONFIG_GAME, "newyear_message", CONFTYPE_SHORT_STRING, "text shown to players before the laggy 'new year' world update");
 	init_config(CONFIG_GAME, "starting_year", CONFTYPE_INT, "base year");
 	init_config(CONFIG_GAME, "welcome_message", CONFTYPE_SHORT_STRING, "message shown to all players on login");
 	init_config(CONFIG_GAME, "ok_string", CONFTYPE_SHORT_STRING, "simple Ok message");
 	init_config(CONFIG_GAME, "no_person", CONFTYPE_SHORT_STRING, "bad target error for no person");
 	init_config(CONFIG_GAME, "huh_string", CONFTYPE_SHORT_STRING, "message for invalid command");
 	init_config(CONFIG_GAME, "public_logins", CONFTYPE_BOOL, "login/out/alt display to mortlog instead of elog");
-	init_config(CONFIG_GAME, "require_auth", CONFTYPE_BOOL, "new players will not auto-authorize");
 
 	// actions
 	init_config(CONFIG_ACTIONS, "chore_distance", CONFTYPE_INT, "tiles away from home a citizen will work");
@@ -1627,8 +1655,8 @@ void init_config_system(void) {
 	init_config(CONFIG_CITY, "min_distance_from_city_to_starting_location", CONFTYPE_INT, "tiles between a city and a starting location");
 	init_config(CONFIG_CITY, "cities_on_newbie_islands", CONFTYPE_BOOL, "whether or not cities can be founded on newbie islands");
 	init_config(CONFIG_CITY, "city_trait_radius", CONFTYPE_INT, "tiles away that a city's traits are used instead of empire traits");
-	init_config(CONFIG_CITY, "disrepair_minor", CONFTYPE_INT, "years of disrepair to show wear");
-	init_config(CONFIG_CITY, "disrepair_major", CONFTYPE_INT, "years of disrepair to show major wear");
+	init_config(CONFIG_CITY, "disrepair_minor", CONFTYPE_INT, "percent of damage to show minor disrepair");
+	init_config(CONFIG_CITY, "disrepair_major", CONFTYPE_INT, "percent of damage to show major disrepair");
 	init_config(CONFIG_CITY, "disrepair_limit", CONFTYPE_INT, "years of disrepair before collapse");
 	init_config(CONFIG_CITY, "disrepair_limit_unfinished", CONFTYPE_INT, "years of disrepair before unfinished buildings collapse");
 	init_config(CONFIG_CITY, "max_out_of_city_portal", CONFTYPE_INT, "maximum distance a portal can travel outside of a city");
@@ -1685,12 +1713,13 @@ void init_config_system(void) {
 	init_config(CONFIG_OTHER, "test_config", CONFTYPE_INT, "this is a test config");
 	
 	// players
+	init_config(CONFIG_PLAYERS, "dailies_per_day", CONFTYPE_INT, "how many daily quests a player can complete each day");
 	init_config(CONFIG_PLAYERS, "default_class_abbrev", CONFTYPE_SHORT_STRING, "abbreviation to show for unclassed players");
 	init_config(CONFIG_PLAYERS, "default_class_name", CONFTYPE_SHORT_STRING, "name to show for unclassed players");
 	init_config(CONFIG_PLAYERS, "delete_inactive_players_after", CONFTYPE_INT, "days to a player can be inactive before auto-delete (0 = never)");
 	init_config(CONFIG_PLAYERS, "delete_invalid_players_after", CONFTYPE_INT, "days to wait before deleting players with bad level data (0 = never)");
 	init_config(CONFIG_PLAYERS, "exp_level_difference", CONFTYPE_INT, "levels a player can have above a mob and still gain exp from it");
-	init_config(CONFIG_PLAYERS, "pool_bonus_amount", CONFTYPE_INT, "bonus trait amount for health/move/mana");
+	init_config(CONFIG_PLAYERS, "pool_bonus_amount", CONFTYPE_INT, "bonus trait amount for health/move/mana, multiplied by (level/25)");
 	init_config(CONFIG_PLAYERS, "num_daily_skill_points", CONFTYPE_INT, "easy skillups per day");
 	init_config(CONFIG_PLAYERS, "num_bonus_trait_daily_skills", CONFTYPE_INT, "bonus trait for skillups");
 	init_config(CONFIG_PLAYERS, "idle_rent_time", CONFTYPE_INT, "how many ticks before a player is idle-rented");
@@ -1701,6 +1730,7 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "remove_lore_after_years", CONFTYPE_INT, "game years to clean some lore types");
 	init_config(CONFIG_PLAYERS, "default_map_size", CONFTYPE_INT, "distance from the player that can be seen");
 	init_config(CONFIG_PLAYERS, "max_map_size", CONFTYPE_INT, "highest view radius a player may set");
+	init_config(CONFIG_PLAYERS, "max_map_while_moving", CONFTYPE_INT, "maximum mapsize if the player is moving quickly");
 	init_config(CONFIG_PLAYERS, "blood_starvation_level", CONFTYPE_INT, "how low blood gets before a vampire is starving");
 	init_config(CONFIG_PLAYERS, "offer_time", CONFTYPE_INT, "seconds an offer is good for, for accept/reject");
 	
@@ -1714,6 +1744,8 @@ void init_config_system(void) {
 	init_config(CONFIG_SKILLS, "must_be_vampire", CONFTYPE_SHORT_STRING, "message for doing vampire things while not a vampire");
 	init_config(CONFIG_SKILLS, "potion_heal_scale", CONFTYPE_DOUBLE, "modifier applied to potion scale, for healing");
 	init_config(CONFIG_SKILLS, "potion_apply_per_100", CONFTYPE_DOUBLE, "apply points per 100 potion scale levels");
+	init_config(CONFIG_SKILLS, "skill_swap_allowed", CONFTYPE_BOOL, "enables skill swap (immortals always can)");
+	init_config(CONFIG_SKILLS, "skill_swap_min_level", CONFTYPE_INT, "level to use multi-spec");
 	init_config(CONFIG_SKILLS, "summon_npc_limit", CONFTYPE_INT, "npc amount that blocks summons");
 
 	// system
@@ -1738,6 +1770,7 @@ void init_config_system(void) {
 	init_config(CONFIG_WAR, "death_release_minutes", CONFTYPE_INT, "minutes a person can sit without respawning");
 	init_config(CONFIG_WAR, "deaths_before_penalty", CONFTYPE_INT, "how many times you can die in a short period without being penalized");
 	init_config(CONFIG_WAR, "deaths_before_penalty_war", CONFTYPE_INT, "death limit while at war");
+	init_config(CONFIG_WAR, "hostile_login_delay", CONFTYPE_INT, "seconds a person is stunned if they log in in enemy territory");
 	init_config(CONFIG_WAR, "mutual_war_only", CONFTYPE_BOOL, "allows 'battle' but not 'war' diplomacy");
 	init_config(CONFIG_WAR, "rogue_flag_time", CONFTYPE_INT, "in minutes, acts like hostile flag but for non-empire players");
 	init_config(CONFIG_WAR, "seconds_per_death", CONFTYPE_INT, "how long the penalty lasts per death over the limit");
@@ -1751,6 +1784,8 @@ void init_config_system(void) {
 	init_config(CONFIG_WORLD, "default_interior", CONFTYPE_INT, "building room vnum to use for designate");
 		init_config_custom("default_interior", config_show_building, config_edit_building, NULL);
 	init_config(CONFIG_WORLD, "water_crop_distance", CONFTYPE_INT, "distance at which a crop marked requires-water can be planted from one");
+	init_config(CONFIG_WORLD, "naturalize_newbie_islands", CONFTYPE_BOOL, "returns the newbie islands to nature each year");
+	init_config(CONFIG_WORLD, "naturalize_unclaimable", CONFTYPE_BOOL, "if true, naturalize/remember will also work on unclaimable tiles");
 	init_config(CONFIG_WORLD, "nearby_sector_distance", CONFTYPE_INT, "distance for the near-sector evolution");
 	init_config(CONFIG_WORLD, "interlink_distance", CONFTYPE_INT, "how far apart two interlinked buildings can be");
 	init_config(CONFIG_WORLD, "interlink_river_limit", CONFTYPE_INT, "how many intervening tiles may be river");
@@ -1760,7 +1795,7 @@ void init_config_system(void) {
 	init_config(CONFIG_WORLD, "newbie_adventure_cap", CONFTYPE_INT, "highest adventure min-level that can spawn on newbie islands");
 	init_config(CONFIG_WORLD, "arctic_percent", CONFTYPE_DOUBLE, "what percent of top/bottom of the map is arctic");
 	init_config(CONFIG_WORLD, "tropics_percent", CONFTYPE_DOUBLE, "what percent of the middle of the map is tropics");
-
+	
 	// TODO note: deprecated
 	init_config(CONFIG_WORLD, "ocean_pool_size", CONFTYPE_INT, "how many spare ocean tiles to keep on-hand");
 	
@@ -1800,8 +1835,8 @@ ACMD(do_config) {
 	
 	// no set provided, or invalid set?
 	if (!*setarg || (set = search_block(setarg, config_groups, FALSE)) == NOTHING) {
-		msg_to_char(ch, "Usage: config <set [-v]> [key] [value]\r\n");
-		msg_to_char(ch, "Valid sets:");
+		msg_to_char(ch, "Usage: config <type [-v]> [key] [value]\r\n");
+		msg_to_char(ch, "Valid types:");
 		for (iter = 0; *config_groups[iter] != '\n'; ++iter) {
 			msg_to_char(ch, "%s%s", (iter > 0 ? ", " : " "), config_groups[iter]);
 		}

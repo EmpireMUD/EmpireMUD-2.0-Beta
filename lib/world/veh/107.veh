@@ -6,8 +6,21 @@ A sleek red sleigh is parked here.~
 to hold a great deal.
 ~
 &r\--|~
-bfgio 24 14 300 1
+bfgiou 24 18 300 1
 R
 19 1 1 0
+S
+#10771
+raft shoddy~
+a shoddy raft~
+A shoddy raft is barely holding itself together.~
+   The raft is made from large sticks and some very worn-out twine. You can
+'drag' the raft to the edge of the water, then 'sit' on it and type 'sail
+<direction>'.
+~
+~
+cfhlnu 3 2 0 0
+R
+3 1 5 0
 S
 $

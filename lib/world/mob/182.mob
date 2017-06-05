@@ -1,0 +1,600 @@
+#18200
+tortoise atlasian giant inn turtle~
+an atlasian tortoise~
+A giant atlasian tortoise plods past, carrying an inn on its back.
+~
+300 300 dky n
+0 0 16 9
+T 18200
+T 18201
+T 18202
+T 18203
+S
+#18201
+#n tavern patron~
+#n~
+The tavern patron #n is carousing enthusiastically here.
+~
+0 0 bdv nD
+0 0 0 15
+M
+0
+$n quaffs $s tankard of ale.~
+S
+#18203
+man waiting~
+a man waiting to fight~
+A man is waiting for his turn in the fight.
+~
+200 250 bd n
+1 0 0 15
+S
+#18204
+leon~
+Leon~
+Leon is dusting off his fists.
+~
+0 0 bdhyA G
+1 0 0 1
+M
+0
+$n takes off his mask, wipes his forehead with it, then throws it in your face!~
+M
+1
+Is that the best you've got?~
+M
+0
+$n mutters something about your mother.~
+M
+0
+$n looks ready for a fight.~
+T 18210
+S
+#18205
+raffee~
+Raffee~
+Raffee is ignoring you as he prepares for his fight.
+~
+0 0 bdhyA G
+1 0 0 3
+M
+0
+$n takes off his mask, wipes his forehead with it, then throws it in your face!~
+M
+1
+Is that the best you've got?~
+M
+0
+$n mutters something about your mother.~
+M
+0
+$n looks ready for a fight.~
+T 18210
+S
+#18206
+donnet~
+Donnet~
+Donnet is whittling a large stick.
+~
+0 0 bdhyA G
+1 0 0 5
+M
+0
+$n takes off his mask, wipes his forehead with it, then throws it in your face!~
+M
+1
+Is that the best you've got?~
+M
+0
+$n mutters something about your mother.~
+M
+0
+$n looks ready for a fight.~
+T 18210
+S
+#18207
+meek langolo~
+Meek Langolo~
+Meek Langolo is showing off on the mat.
+~
+0 0 bdhyA G
+1 0 0 11
+M
+0
+$n takes off his mask, wipes his forehead with it, then throws it in your face!~
+M
+1
+Is that the best you've got?~
+M
+0
+$n mutters something about your mother.~
+M
+0
+$n looks ready for a fight.~
+T 18210
+S
+#18208
+#n helius~
+#n of Clan Helius~
+#n pours a thick, red vial into his cauldron.
+~
+0 0 bd nD
+1 2 0 15
+F 18200
+M
+1
+Are you using all that blood?~
+M
+1
+Carpe noctem.~
+M
+1
+There is nothing but the cold, dark wasteland of eternity.~
+M
+1
+I'm flesh and blood. Well, mostly blood.~
+M
+1
+I feel dead inside.~
+M
+1
+Never, and I mean NEVER, moon a werewolf.~
+T 18227
+T 18228
+S
+#18209
+#n shadows umbramancer~
+#n the Umbramancer~
+The shadows curl around #n, guild umbramancer.
+~
+0 0 bdv nD
+0 2 0 15
+F 18200
+M
+1
+Only darkness can drive out the light.~
+M
+1
+It's better to blow out a candle than curse the light.~
+M
+1
+There's a little light inside us all and, with the right spell, you can snuff it out.~
+M
+1
+You have to stand in the sun if you want to cast a shadow.~
+M
+1
+Has anybody seen my shadow?~
+T 18230
+T 18229
+S
+#18210
+#n tinker~
+#n, guild Tinker~
+#n is working furiously at the tinker bench.
+~
+0 0 bdv nD
+0 1 0 15
+F 18200
+M
+1
+You'd be amazed at what you can make with a spanner!~
+M
+1
+I'm going to need more Frost for this...~
+M
+1
+Maybe I should have been a tailor... Or a soldier.~
+M
+1
+Now where'd I leave that ostrich?~
+M
+1
+Maybe I should've been a tailor... Or a soldier.~
+M
+1
+The next one is going to be just like the last one, except with flamethrowers.~
+M
+1
+This would go a lot faster with goggles.~
+M
+1
+I'm trying to solve the problem of how to cross the road without getting to the other side.~
+M
+1
+This new cart has a 1.2 litre engine and runs at 112 lizard power.~
+M
+1
+I'm trying to solve the problem of Maria.~
+T 18232
+T 18231
+S
+#18211
+Nostrazak incautious dragon avatar~
+Nostrazak the Incautious~
+An avatar of Nostrazak looms over you, more dragon than man.
+~
+0 0 bd nD
+1 0 0 15
+F 18200
+M
+1
+The Guild of Adventurers was founded over 700 years ago.~
+M
+1
+We have monuments of all the early Guild members and, depending on which adventure killed them, some of their remains.~
+M
+1
+The original guildhall kept getting trampled by the local atlasian tortoises, but we solved that a long time ago.~
+M
+1
+The main problem with having your guild on a tortoise is mating season.~
+M
+1
+The benefit of putting the guild on a tortoise is that you don't get the same whiplash as you do on elephants.~
+M
+1
+Welcome to the Guild!~
+M
+1
+I raised this tortoise myself, after that unpleasantness with the last one.~
+M
+0
+$n stretches $s wings, nearly knocking a vase off the shelf behind $m.~
+M
+0
+$n takes a drink from his mug, then belches a small fireball that barely misses you.~
+T 18234
+T 18233
+S
+#18212
+dwarf giant~
+the giant dwarf~
+A giant dwarf stands, arms crossed, in front of the door.
+~
+0 0 bdv nD
+1 0 0 15
+F 18200
+T 18212
+S
+#18213
+#n fancy~
+Fancy #n~
+Fancy #n stands here in a vest, hawking wares.
+~
+100 150 bdv nD
+0 0 0 19
+F 18200
+T 18236
+T 18237
+S
+#18216
+#n adventurer~
+#n the adventurer~
+#n walks along, wearing a heavy pack.
+~
+100 150 dqv 0
+0 0 0 1
+M
+1
+Brr, I thought I was going to freeze to death on that last adventure.~
+M
+0
+$n winces as $e pulls some spines out of $s leg.~
+M
+1
+Shouldn't have bought those undershorts from a goblin...~
+M
+1
+Could've sworn I had my coinpurse before I cleared out those thieves...~
+M
+1
+That boy and his rats...~
+S
+#18217
+guildmage mage #n~
+Guildmage #n~
+Guildmage #n stands at the window.
+~
+100 150 bdqv 0
+0 2 0 19
+M
+0
+$n coughs up a rat, who scurries into the bookshelf.~
+M
+0
+$n takes off $s hat, pulls out a winged rabbit, gasps, and shoves it back into the hat.~
+M
+1
+I cannot get that bibbidi-bobbidi-boo spell to work right.~
+M
+1
+Abracadabra! I think.~
+M
+1
+Alakazam! ... or similar.~
+M
+1
+I've figured out the power of the red skull... Now where did I put that gray one?~
+M
+1
+You do the hocus pocus and you turn yourself around...~
+M
+1
+Mecca lecca hi, mecca hiney ho!~
+M
+1
+All these magic words... even just the sound of them is really quite atrocious!~
+M
+1
+Avada... No! I meant, Abracadabra!~
+S
+#18218
+#n librarian~
+#n the librarian~
+#n is reshelving the disheveled books.
+~
+100 150 bdqv 0
+0 0 0 5
+M
+1
+Shh!~
+M
+0
+$n tries to shush a mouse in the corner.~
+M
+1
+Shh!~
+M
+1
+Too much noise there!~
+S
+#18219
+superintendant #n~
+Superintendant #n~
+The superintendant is sitting at his desk.
+~
+100 150 bdqv 0
+1 0 0 1
+M
+0
+$n sifts through papers on $s desk.~
+M
+1
+I'm so glad you're here.~
+M
+1
+If one more goblin asks to join the guild, I might quit.~
+M
+1
+The thieves are restless again.~
+M
+1
+One of these days I'm going to get one of those giant tortoises for myself.~
+M
+1
+Are you here on guild business?~
+M
+1
+One of the sorcerers outside was looking for his bauble.~
+M
+1
+I'm afraid we've run out of cold cuts again.~
+T 18219
+S
+#18220
+#n treasurer~
+#n the treasurer~
+#n is locking up a new treasure.
+~
+100 150 bdqv 0
+0 1 0 4
+S
+#18225
+tortoise baby~
+a baby tortoise~
+A baby tortoise is munching around on the ground.
+~
+1 1 bdoD n
+0 0 0 9
+M
+0
+$n rocks back and forth on its shell.~
+M
+0
+$n nips at bits of grass.~
+M
+0
+$n blasts water from its mouth.~
+M
+0
+$n ducks into its shell.~
+T 9901
+T 9902
+S
+#18226
+tortoise ninja tiny~
+a tiny ninja tortoise~
+A tiny ninja tortoise is lurking nearby.
+~
+1 1 bdoD n
+0 0 0 9
+M
+0
+$n leaps from the shadows!~
+M
+0
+A throwing star wizzes past your ear.~
+M
+0
+$n skates past you on tiny wheels.~
+M
+1
+Booyakasha!~
+M
+0
+$n rolls around in some ooze.~
+T 9901
+T 9902
+S
+#18227
+dragon turtle~
+a dragon turtle~
+A dragon turtle clacks its beak and puffs smoke from its nostrils.
+~
+1 1 bdoD n
+0 0 0 9
+M
+0
+$n paddles through the air.~
+M
+0
+$n belches a plume of fire.~
+M
+0
+$n steams in the corner.~
+M
+0
+$n's jade-green shell shimmers hypnotically...~
+T 9901
+T 9902
+S
+#18228
+monstrosity sanguine~
+a sanguine monstrosity~
+A sanguine monstrosity is dripping along the ground.
+~
+100 125 de 0
+0 0 10 27
+T 18240
+S
+#18230
+warg umbral~
+an umbral warg~
+An umbral warg stalks from shadow to shadow.
+~
+100 125 de 0
+0 0 9 9
+T 18240
+S
+#18232
+steed clockwork~
+a clockwork steed~
+A clockwork steed is munching on some rocks.
+~
+100 125 de 0
+0 0 12 9
+T 18240
+S
+#18234
+bear imperium-clad clad~
+an imperium-clad bear~
+An imperium-clad bear rears up on its hind legs!
+~
+100 125 de 0
+0 0 26 10
+T 18240
+S
+#18236
+patrons group~
+a group of patrons~
+A group of patrons is huddled over a table with dice and strange documents.
+~
+0 0 bd nD
+0 0 0 15
+M
+0
+One of the patrons at the table asks, 'Can I have some mountain dew?!'~
+M
+0
+One of the patrons at the table says, 'I am Galstaf, Sorcerer of Light!'~
+M
+0
+One of the patrons at the table says, 'Roll the dice to see if I'm getting drunk!'~
+M
+0
+One of the patrons at the table says, 'I wanna cast... Magic Missile!'~
+M
+0
+One of the patrons at the table says, 'I'm attacking the darkness!'~
+M
+0
+One of the patrons at the table says, 'I wanna steal his pants.'~
+M
+0
+One of the patrons at the table says, 'You're going to backstab him... with a ballista?'~
+M
+0
+One of the patrons at the table rolls a die and exclaims, 'Natural 20!'~
+S
+#18237
+Death patron tavern bony~
+Death~
+A bony tavern patron with a hooded cloak and scythe is sitting here.
+~
+0 0 bd nD
+1 0 0 15
+M
+1
+WHAT'S IT ALL ABOUT? SERIOUSLY? WHEN YOU GET RIGHT DOWN TO IT?~
+M
+1
+HOW DO HUMANS FORGET?~
+M
+1
+THERE'S NO JUSTICE. THERE'S JUST ME.~
+M
+1
+I DON'T KNOW ABOUT YOU, BUT I COULD MURDER A CURRY.~
+M
+1
+DARK IN HERE, ISN'T IT?~
+M
+0
+A small rodent skeleton on $n's shoulder says, 'SQUEAK.'~
+T 18238
+S
+#18238
+rat-man ratman~
+the rat-man~
+A rat-man in a robe is drowning his sorrows at the bar.
+~
+0 0 bd nD
+1 0 0 15
+M
+0
+$n chops some peanuts open with his hand.~
+M
+0
+$n looks at the menu and mutters, 'No pizza?'~
+M
+1
+Remember, nothing is as strong as family...~
+M
+1
+Their world can never be ours.~
+M
+1
+Beware of the shredder.~
+M
+1
+The Rat King has grown too powerful...~
+S
+#18239
+stranger mysterious patron~
+a mysterious patron~
+A mysterious stranger in a hooded cloak is lurking in a dark corner.
+~
+0 0 bd nD
+0 0 0 15
+M
+1
+Have you seen a hobbit with a magic ring?~
+M
+1
+The swallow sings at noon...~
+M
+0
+$n watches you silently.~
+S
+$

@@ -1,0 +1,18 @@
+#600
+Crystal Seed drop~
+0 0 0 D 175-299
+E
+-1 0.50
+0 0 0
+I 4 600 100.00 1  # LOOT: a strange crystal seed
+I 12 600 100.00 1  # PICKPOCKET: a strange crystal seed
+S
+#609
+moonstone mine~
+1 c v 0 0-0
+E
+133 1.50
+10 0 0
+I 13 609 100.00 1  # MINE: some moonstone ore
+S
+$

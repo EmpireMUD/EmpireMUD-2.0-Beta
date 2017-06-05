@@ -92,7 +92,7 @@ See also: DESIGNATE
 #
 CABIN
 
-(--)  Cabin  (no skill required)
+(--)  Cabin  (Basic Buildings)
 
 Citizens:  2
 
@@ -108,7 +108,7 @@ See also:  LUXURY, STORAGE, TROPHY ROOM
 #
 CANNERY
 
-{CC}  Cannery  (no skill required)
+{CC}  Cannery  (Basic Buildings)
 
 Stored here:  fruits
 
@@ -164,7 +164,7 @@ See also: STARTING LOCATION, TOMB
 #
 CLAYPIT "CLAY PIT"
 
-&y|__|&0  Clay Pit  (no skill required)
+&y|__|&0  Clay Pit  (Basic Buildings)
 
 Clay pits are reinforced areas where fresh clay can be dug deeper, safer than
 digging on unprepared ground. You can dig more clay from them before depletion.
@@ -176,7 +176,7 @@ See also: DIG
 #
 CLIFFDWELLING "CLIFF DWELLING"
 
-&y[==]&0  Cliff Dwelling  (no skill required)
+&y[==]&0  Cliff Dwelling  (Basic Buildings)
 
 Extra rooms:  3, interlink
 Citizens:  2
@@ -278,9 +278,19 @@ This building can only be built in a city.
 
 See also: DESIGNATE, PORTCULLIS, INTERLINK
 #
+FAMILYGRAVESITE "FAMILY GRAVESITE"
+
+..x.  Family Gravesite (Basic Buildings ability)
+
+The family gravesite is a small tomb (respawn point) that you can build inside
+your cities. It can't be built outside of an established city, and won't work
+if the city is removed.
+
+See also: TOMB
+#
 FENCE
 
-vvvv  Fence  (no skill required)
+vvvv  Fence  (Basic Buildings)
 
 Fences will block the movement of NPCs, but not players. They count as in-city
 territory as far away as 3x a city's normal radius.
@@ -289,7 +299,7 @@ See also: GATE
 #
 FOUNDRY
 
-{FF}  Foundry  (no skill required)
+{FF}  Foundry  (Basic Buildings)
 
 Stored here:  metals
 
@@ -311,7 +321,7 @@ See also: DRINK, FILL
 #
 GATE
 
-.xx.  vxxv  Gate  (no skill required)
+.xx.  vxxv  Gate  (Basic Buildings)
 
 A gate is an entrance for a fence. Since players are not blocked by fences,
 the gate is purely decorative.
@@ -330,7 +340,7 @@ If you want to allow all traffic through the gatehouse, publicize it.
 
 See also: INFILTRATE, PUBLICIZE, WALL
 #
-GLASSBLOWER "GLASS BLOWER"
+GLASSBLOWER "GLASS BLOWER" GLASSBLOWING "GLASS BLOWING"
 
 (GG)  Glass Blower  (Artisans ability)
 
@@ -341,7 +351,7 @@ territory of an empire that has a glass blower in order to do certain crafts.
 #
 GRANARY
 
-{GG}  Granary  (no skill required)
+{GG}  Granary  (Basic Buildings)
 
 Stored here:  grains
 
@@ -353,7 +363,7 @@ See also: STORAGE
 #
 GRAVELPIT "GRAVEL PIT"
 
-{PP}  Gravel Pit  (no skill required)
+{PP}  Gravel Pit  (Basic Buildings)
 
 Stored here:  rocks and stone
 
@@ -426,7 +436,7 @@ See also: DEDICATE
 #
 HOUSE "SMALL HOUSE"
 
-(==)  House  (no skill required)
+(==)  House  (Basic Buildings)
 
 Extra rooms:  2
 Citizens:  2
@@ -452,7 +462,7 @@ See also: DESIGNATE
 #
 HUT "SMALL HUT"
 
-&g.&0()&g.&0  Hut  (no skill required)
+&g.&0()&g.&0  Hut  (Basic Buildings)
 
 Citizens:  1
 
@@ -502,7 +512,7 @@ See also: DESIGNATE
 #
 LUMBERYARD "LUMBER YARD"
 
-{LL}  Lumber Yard  (no skill required)
+{LL}  Lumber Yard  (Basic Buildings)
 
 Stored here:  trees and wood
 
@@ -525,7 +535,7 @@ MINECOMPLEX "MINE COMPLEX"
 &y/&0[]&y\&0  Mine Complex  (Housing ability)
 
 Extra rooms:  7, interlink
-Special rooms:  tunnel, no hallway
+Special rooms:  tunnel
 Citizens:  4
 
 A mine complex looks like a mine from the surface, but is really a network of
@@ -542,7 +552,7 @@ It has no other purpose.
 #
 MUDHUT "MUD HUT"
 
-&y.&0()&y.&0  Mud Hut  (no skill required)
+&y.&0()&y.&0  Mud Hut  (Basic Buildings)
 
 Citizens:  1
 
@@ -618,7 +628,7 @@ See also: DESIGNATE, GREAT HALL, INTERLINK
 #
 PUEBLO
 
-&y.&0[]&y.&0  Pueblo  (no skill required)
+&y.&0[]&y.&0  Pueblo  (Basic Buildings)
 
 Citizens:  2
 Extra rooms:  2
@@ -687,7 +697,9 @@ When you're done with the shelter, be sure to dismantle and abandon it.
 #
 RUINS "DECAYING RUINS"
 
-../]  [\..  |\\..  ../|  .-.]  [.-.  [__]
+../]  [\..  |\..  ../|  .-.]  [.-.  [__]
+
+._i.  .[..  ..v.  ./].  .(\.  .}\.  ..}.
 
 Decaying Ruins
 
@@ -728,7 +740,7 @@ See also: DEDICATE
 #
 SMOKEHOUSE "SMOKE HOUSE"
 
-{SS}  Smoke House  (no skill required)
+{SS}  Smoke House  (Basic Buildings)
 
 Features: cooking fire
 Stored here:  meats
@@ -741,7 +753,7 @@ See also: STORAGE
 #
 STABLE
 
-(SS)  Stable  (no skill required)
+(SS)  Stable  (Basic Buildings)
 
 Stables are a safe place to keep your animals. You can also use them as a place
 to milk cows or shear sheep. This is also where you can barde horses.
@@ -790,7 +802,7 @@ The swamp walk, though never very stable, makes travel through the swamp
 much easier. Swamp animals may still harass you, but you will avoid random
 attacks by crocodilians.
 
-See also: BUILDING
+See also: BUILDING, SWAMP ENGINEERING
 #
 SWAMPHUT "SWAMP HUT"
 
@@ -801,7 +813,7 @@ Citizens:  2
 
 A swamp hut is a good-sized home supported on stilts above the swamp.
 
-See also: DESIGNATE
+See also: DESIGNATE, SWAMP ENGINEERING
 #
 SWAMPMANOR "SWAMP MANOR"
 
@@ -813,7 +825,7 @@ Citizens:  4
 The swamp manor is a grand house that is built only in the swamp. It is fire-
 proof and comparable to a large house.
 
-See also: DESIGNATE
+See also: DESIGNATE, SWAMP ENGINEERING
 #
 SWAMPCOMPLEX "SWAMP COMPLEX"
 
@@ -826,7 +838,7 @@ Chameleon: &c~~~~&0
 A swamp complex is a well-hidden, large home that can only be built in the
 swamp. It is designed to be difficult to see from a distance.
 
-See also: DESIGNATE
+See also: DESIGNATE, SWAMP ENGINEERING
 #
 SWAMPPLATFORM "SWAMP PLATFORM"
 
@@ -836,6 +848,8 @@ By building a sturdy platform on top of swampland, you can effectively build
 "plains-only" buildings in the swamp. Once complete, the platform becomes an
 ordinary plains. If you don't build on it soon, though, the swamp will re-claim
 it.
+
+See also: SWAMP ENGINEERING
 #
 TAILOR
 
@@ -853,7 +867,7 @@ See also: STORAGE, WEAVE
 #
 TANNERY
 
-{TT}  Tannery  (no skill required)
+{TT}  Tannery  (Basic Buildings)
 
 Stored here:  skins, furs, and leathers
 Command:  tan
@@ -1046,13 +1060,16 @@ See also: DESIGNATE
 #
 UTILITYSHED "UTILITY SHED" TOOLSHED "TOOL SHED"
 
-{UU}  Utility Shed  (no skill required)
+{UU}  Utility Shed  (Basic Buildings)
 
 Stored here:  tools
 
 Each utility shed stores tools and miscellaneous items for the empire. Like all
 storage facilities, your NPCs move tools between yards so that you can
 retrieve it from any such location.
+
+Only basic tools can be stored in the utility shed (items that scale in level
+cannot be stored here).
 
 See also: STORAGE
 #
@@ -1070,7 +1087,7 @@ See also: CIRCLE, GATEHOUSE, GREAT WALLS, RITUAL OF DEFENSE
 #
 WELL
 
-(&c~~&0)  Well  (no skill required)
+(&c~~&0)  Well  (Basic Buildings)
 
 Wells provide water for your little settlement.
 

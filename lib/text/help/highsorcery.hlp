@@ -15,6 +15,21 @@ See also: STUDY, SORCERY TOWER, RITUAL, STAFFMAKING, FORESIGHT, MANASHIELD,
     DEVASTATION RITUAL, ENCHANT, ENERVATE, SIPHON, SLOW, SUNSHOCK, MIRRORIMAGE,
     ARCANE POWER, DISPEL, COLLAPSE
 #
+ABLATE ABLATION
+
+Ablate
+Class ability:  Battlemage
+
+Usage:  ablate [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+Debuff type:  High Sorcery
+
+Ablate deals damage to your victim and will cause bits of his armor to burn
+off, leaving him less resistant to physical damage.
+
+See also: BATTLEMAGE CLASS
+#
 "ARCANE POWER"
 
 Arcane Power (High Sorcery ability)
@@ -24,6 +39,35 @@ those without. Your total mana increases by this amount, including any bonuses
 from equipment and other abilities.
 
 Gains experience passively over time.
+#
+ARCLIGHT "ARC LIGHT"
+
+Arclight
+Class ability:  Archmage
+
+Usage:  arclight [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+
+Arclight is the Archmage's best magical attack. It deals direct damage to the
+target.
+
+See also: ARCHMAGE CLASS
+#
+CHRONOBLAST
+
+Chronoblast
+Class ability:  Artificer
+
+Usage:  chronoblast [victim]
+Cooldown:  6 seconds
+Cost:  based on damage
+Debuff type:  High Sorcery
+
+Chronoblast uses the artificer's knowledge of clocks to slow down the enemy,
+and the transition into a slower time frame deals serious magical damage.
+
+See also: ARTIFICER CLASS
 #
 "CITY TELEPORTATION"
 
@@ -109,7 +153,7 @@ Gain experience by casting this spell.
 
 See also: CLEANSE
 #
-ENCHANT "ENCHANT WEAPONS" "ENCHANT ARMOR" "ENCHANT TOOLS"
+ENCHANT ENCHANTED "ENCHANT WEAPONS" "ENCHANT ARMOR" "ENCHANT TOOLS"
 
 Enchant Weapons, Enchant Armor, Enchant Tools (High Sorcery abilities)
 
@@ -158,6 +202,7 @@ Enchant Armor:
 
 Enchant Tools:
   embiggening (pack) - capacity  (1 of each of the 4 gems)
+  this ability also lets you enchant the crystal seed world drop
 
 See also: CRAFTING LEVEL, GREATER ENCHANTMENTS, RECIPES, SHARE
 #
@@ -228,16 +273,21 @@ Mirrorimage (High Sorcery ability)
 
 Usage:  mirrorimage
 Cooldown:  5 minutes
-Cost:  40 mana
+Cost:  20% of max mana
 
-This spell creates an identical duplicate of the caster (with reduced health).
-It's good enough to fool at least one of the people hitting you.
+This spell creates an identical duplicate of the caster that deals no damage.
+It's good enough to fool at least one of the people hitting you (they will
+switch targets to the mirror image), and none of the people attacking you will
+see the message that you split in two.
 
-The mirror image counts as a familiar.
+Mirror images are charmed, so they take orders. They can't be healed and will
+only rescue you in combat one time. Once combat ends, they can't start combat
+on their own, so they can't be re-used and are only useful when summoned in
+combat. You can dismiss the mirror image and summon a new one.
 
-Gain experience by summoning it.
+Gain experience by summoning a mirror image.
 
-See also: FAMILIAR, DISMISS, ORDER
+See also: ORDER
 #
 "PHOENIX RITE"
 
@@ -349,9 +399,11 @@ Usage:  ritual senselife
 Cost:  15 mana
 
 This spell works similar to the "search ability" and can find people hidden
-in the room with you, using simple magic.
+in the room with you, using simple magic. It also allows you to sense
+earthmelded people.
 
-Gains experience when you complete the ritual, whether or not you find anything.
+Gains experience when you complete the ritual, whether or not you find
+anything.
 
 See also: RITUAL
 #
@@ -371,6 +423,37 @@ This ability gains experience any time you teleport (using this ability or City
 Teleportation).
 
 See also: CITY TELEPORTATION, RITUAL
+#
+SCOUR
+
+Scour
+Class ability:  Exarch
+
+Usage:  scour [victim]
+Cooldown:  6 seconds
+Cost:  based on damage
+Debuff type:  High Sorcery
+
+Scour will scrub away at your opponent, damaging them magically over time (in
+addition to damage with the initial hit). This DoT stacks up to 5 times.
+
+See also: DOT, EXARCH CLASS
+#
+SHADOWLASH "SHADOW LASH"
+
+Shadowlash
+Class ability:  Occultist
+
+Usage:  shadowlash [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+Debuff type:  High Sorcery
+
+Shadowlash calls forth a tentacle of pure shadow, which wraps itself around
+your victim's head for both instantaneous and lasting damage. It also blinds
+your victim briefly. The DoT effect stacks up to 3 times.
+
+See also: DOT, OCCULTIST CLASS
 #
 "SIEGE RITUAL"
 
@@ -425,6 +508,21 @@ duration increases.
 
 Gain experience by casting this spell.
 #
+SOULCHAIN "SOUL CHAIN"
+
+Soulchain
+Class ability:  Lich
+
+Usage:  soulchain [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+Debuff type:  High Sorcery
+
+Soulchain wraps the victim in a painful spiritual binding, sapping his
+intelligence as well as dealing magical damage.
+
+See also: LICH CLASS
+#
 STAFFMAKING "STAFF MAKING" STAFF STAVES "POWERFUL STAVES"
 
 Staffmaking, Powerful Staves (High Sorcery abilities)
@@ -456,9 +554,9 @@ attacks will deal 50% more damage.
 
 Gains experience when it increases your damage.
 #
-STUDY
+"STUDY SORCERY"
 
-Usage:  study
+Usage:  study sorcery
 
 By sitting down to study High Sorcery, you can begin to unlock its secrets.
 You must do this on the top floor of a Tower of Sorcery. You can only gain
@@ -474,8 +572,11 @@ Usage:  summon materials [number] <keywords>
 Cost:  2 mana / item
 
 This ability actually allows the sorcerer to open a tiny portal to the empire's
-storage buildings, and pull out the materials he needs. There is no range on
-this ability, and it may be used to grab as many items as the sorcerer wishes.
+storage buildings, and pull out the materials he needs. This ability may be used
+to grab as many items as the sorcerer wishes.
+
+Your distance from the storage buildings does not matter, but this ability can
+only retrieve items stored on your current island.
 
 You cannot summon items out of the vault (or other secure locations), and you
 must have the "storage" empire privilege to use this ability at all.
@@ -511,14 +612,15 @@ Sunshock (High Sorcery ability)
 
 Usage:  sunshock [victim]
 Cooldown:  9 seconds
-Cost:  25 mana
+Cost:  based on damage
 Debuff type:  High Sorcery
 
 Sunshock blasts your target with the pure light of the sun. This deals a small
-amount of damage (scaled by your level in High Sorcery), and causes a very
+amount of damage (scaled by your level, role, and traits), and causes a very
 short blinding effect.
 
-Sunshock does 2x damage to vampires.
+Sunshock does 1.5x damage to vampires, but this damage bonus does not change
+the cost.
 
 If you are in combat and specify no target, Sunshock hits your current
 opponent.
@@ -526,6 +628,22 @@ opponent.
 Gains experience by casting this spell.
 
 See also: BLIND
+#
+THORNLASH "THORN LASH"
+
+Thornlash
+Class ability:  Theurge
+
+Usage:  thornlash [victim]
+Cooldown:  9 seconds
+Cost:  based on damage
+Debuff type:  High Sorcery
+
+Thornlash wraps a coil of thorny vines around your victim. The vines cause
+immediate pain, while the thorns dig in and deal poison damage over time. This
+DoT effect stacks up to 3 times.
+
+See also: DOT, THEURGE CLASS
 #
 VIGOR
 

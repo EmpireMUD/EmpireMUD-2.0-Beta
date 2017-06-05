@@ -1,0 +1,705 @@
+#18200
+Join the Guild of Adventurers~
+   If you want to join the Guild of Adventurers, you must first demonstrate
+commitment by commissioning a guildhall in one of your cities. You receive a
+guild charter; take it home and 'build guildhall <direction>' to set it up.
+Once the new guildhall is complete and guild officials have moved in, speak to
+the Superintendant in your guildhall.
+~
+   You have demonstrated your eagerness to join the Guild of Adventurers by
+building a guildhall. The Superintendant grants you membership and you may now
+take on guild quests. Look around the guildhall for tasks you can perform to
+ingratiate yourself with the guild.
+~
+5 0 0 0 -1
+A
+1 18212
+P
+6 18201 0 1 a
+P
+17 18200 0 5 a
+R
+7 18200 20
+T 18217
+W
+17 18200 0 5 a
+W
+7 18216 0 1 a
+Z
+1 18219
+S
+#18201
+Here to Sign Up~
+   The superintendant looks up at you, stands up from his desk, and claps you
+on the shoulders with both hands. 'Here to sign up? ' he asks, jovially. 'All
+members of the empire are welcome here, whether you're a ratcatcher or a... 
+Dragoncatcher, I suppose!'
+~
+You sign your name to the guild roster.
+~
+6 f 0 0 -1
+A
+1 18219
+P
+6 18200 0 1 a
+P
+17 18200 0 5 a
+R
+7 18200 20
+W
+17 18200 0 5 a
+W
+7 18216 0 1 a
+Z
+1 18219
+S
+#18221
+My Very Own Egg~
+   You have acquired an atlasian egg -- a truly rare treasure indeed! You can
+feel the embryonic tortoise's heartbeat within the shell. You need to find some
+clear desert or plains and 'plant' the egg to help it grow and hatch.
+~
+The egg is settled into its nest... but it still needs care in order to hatch.
+~
+7 0 0 0 0
+A
+2 18221
+R
+6 18222 1
+W
+7 18221 0 1
+Z
+0 18221
+S
+#18222
+Tending the Egg~
+   The egg doesn't seem to be warm enough. You're no expert on the care and
+rearing of atlasian tortoises, but it doesn't seem like any ordinary covering
+is going to help. Fortunately, you've heard of a salve made from burnt zephyr
+cattails. If only you could find some...
+~
+   You spread the burnt zephyr salve on the egg, and can hear a soft cooing
+sound coming from inside. The egg twitches a little... It seems happy, but
+there's more work to do before it can hatch.
+~
+5 d 0 0 0
+A
+5 18221
+P
+0 18221 0 1
+R
+6 18223 1
+T 18222
+W
+2 11016 0 4
+Z
+0 18221
+S
+#18223
+Bonfire of the Tortoises~
+   Now that the egg has begun to grow, you realize zephyr salve alone won't be
+enough to hatch it. You recall hearing someone at the Tipsy Tortoise Tavern
+recall the story of hatching a giant egg. And as you recall, he did it by
+building a huge fire from magewood, and lighting it with powerful magical
+artifacts. You jot down a quick list: magewood, wild fire, violet gems,
+skystones, and the essence of a molten fiend.
+~
+   You stack the magewood, sprinkle it with skystones and violet gems, and
+light the whole thing ablaze with wild fire and molten essence! Now to wait for
+it to hatch...
+~
+6 d 0 0 0
+A
+5 18222
+P
+0 18222 0 1
+T 18223
+W
+2 604 0 12 a
+W
+2 10001 0 4 a
+W
+2 10254 0 3 a
+W
+2 10037 0 2 a
+W
+2 18097 0 1 a
+Z
+0 18222
+S
+#18256
+The Grove: Capture a Wildling~
+   The Guild of Adventurers needs more information on the Magiterranean. Find a
+portal into The Grove somewhere in the forest, make your way inside, and find a
+wildling. Be warned! The wildlings like to spring out from the forest without
+warning. Take this trusty net and type 'net wildling' once you find one. Bring
+the captured wildling back here for further study.
+~
+   You drop the net with your captured wildling. You can now perform daily
+quests in The Grove for the Guild of Adventurers.
+~
+4 d 0 0 -1
+A
+1 18217
+A
+1 18209
+P
+16 18200 0 6
+R
+7 18200 1
+R
+2 18209 1
+T 18257
+W
+2 18257 0 1
+Z
+1 18217
+Z
+1 18209
+S
+#18258
+Monsoon Rift: Investigate the Rift~
+   The Magiterranean is a dangerous place, but many adventurers get their start
+exploring its strange wilderness. The Guild needs more information about the
+rifts in the desert. Seek one out -- be careful of the cacti guarding it -- and
+venture inside. Speak to the head druid to learn more about the rifts. But
+whatever he tells you, you must also find a way to collapse the rift. Return
+when you've accomplished this. (Type 'speak' when you find the druid.)
+~
+   The guild is satisfied that you closed the rift, and takes the druid's
+propaganda for further study. You can now perform daily quests in the Monsoon
+Rift for the Guild of Adventurers.
+~
+9 d 0 0 -1
+A
+1 18217
+A
+1 18209
+P
+16 18200 0 6
+R
+7 18200 1
+R
+2 18209 1
+W
+11 0 0 1
+W
+2 18258 0 1 a
+Z
+1 18217
+Z
+1 18209
+S
+#18260
+Goblin Outpost: Pay Off Dryleef~
+   From time to time, you may find goblins setting up shop in your cities'
+sewers. Find a goblin outpost somewhere in your sewers, and pay off the
+goblins' leader, Dryleef, to ensure the goblins don't cause any trouble. Of
+course, you can't be seen bribing the goblins, so just ask Dryleef if you can
+buy a ticket to the "Goblin Gala". Type 'buy ticket' when you find Dryleef.
+~
+   You hand over your ticket to the Goblin Gala, but the guild leader just
+laughs. 'At least now we shouldn't have to worry about the goblins stealing
+from the city,' he says.
+~
+5 d 0 0 -1
+A
+1 18219
+A
+1 18211
+P
+16 18200 0 6
+R
+7 18200 1
+R
+2 18209 1
+T 18261
+W
+2 18261 0 1
+Z
+1 18219
+Z
+1 18211
+S
+#18262
+Permafrost: Cold Cold Cuts~
+   The Guild of Adventurers has heard of icy winds coming from strange portals
+around the river. Rumor has it that these portals lead into the Permafrost, a
+particularly inhospitable corner of the Magiterranean. Seek out such a portal
+and head into the Permafrost, and see what awaits you there. If you can,
+butcher some of the wildlife and help us prepare a plate of cold cuts for
+Nostrazak. (If you don't have Butcher, try bringing the Permafrost animal
+corpses to a player who does.)
+~
+   Ah, these cold cuts are perfect. And it seems you have survived the
+Permafrost. You can now perform Guild daily quests in the Permafrost.
+~
+5 d 0 0 -1
+A
+1 18219
+A
+1 18210
+P
+16 18200 0 6
+R
+7 18200 1
+R
+2 18209 1
+W
+0 10563 0 1 a
+W
+2 10597 0 4 a
+Z
+1 18219
+Z
+1 18210
+S
+#18263
+Thieves: Locate the Hideout~
+   The Guild has heard that some thieves have taken up residence in some old
+ruins. Thieves are not necessarily enemies of the Guild of Adventurers, but it
+is still a good idea to keep tabs on them. Locate the correct ruins and find
+the thieves' den inside, and report back to the Guild.
+~
+   Your report on the thieves and their hideout in the ruins has helped the
+Guild, and you can now perform daily quests in that adventure.
+~
+3 0 0 0 -1
+A
+1 18218
+A
+1 18208
+P
+16 18200 0 6
+R
+7 18200 1
+R
+2 18209 1
+W
+13 10110 0 1
+Z
+1 18208
+Z
+1 18218
+S
+#18264
+Ratskins: A Totem of our Friendship~
+   A former member of the Guild of Adventurers has moved into the sewers. They
+call him Ratskins, and you can probably guess why. He's no longer with the
+guild, but Nostrazak wants to keep a line of communication open with him. Kill
+15 sewer rats and take their skins to Ratskins, and type 'trade'. He will give
+you a small totem made from some of those skins as a reward. Return with the
+totem so that we can analyze its mana source.
+~
+   You hand over the ratskin totem. You can now perform daily quests for the
+Guild of Adventurers in Ratskins's sewer.
+~
+3 d 0 0 -1
+A
+1 18218
+A
+1 18208
+P
+16 18200 0 6
+R
+7 18200 1
+R
+2 18209 1
+W
+2 10015 0 1
+Z
+1 18218
+Z
+1 18208
+S
+#18265
+The Grove: A Sample of Wild Fire~
+   The Guild is working on a new mana potion, based on a Magiterranean
+substance called 'wild fire'. Unfortunately, we've run out of samples to work
+with. Travel into the Magiterranean's mysterious Grove, and return with some of
+the wild fire.
+~
+You hand over the wild fire.
+~
+7 de 0 0 -1
+A
+1 18217
+A
+1 18209
+D 18265
+P
+0 18256 0 1 a
+P
+17 18200 0 6 a
+R
+7 18200 1
+R
+1 -1 50
+W
+2 10001 0 1
+Z
+1 18217
+Z
+1 18209
+S
+#18266
+The Grove: Wild Population~
+   The Guild has been dealing with an infestation of wildlings from the
+Magiterranean. It's time for a show of force. You must invade the Grove and put
+an end to the infestation.
+~
+The Guild thanks you for helping to control the wildling population.
+~
+8 e 0 0 -1
+A
+1 18211
+A
+1 18219
+D 18265
+P
+0 18256 0 1 a
+P
+17 18200 0 6 a
+R
+7 18200 1
+R
+1 -1 50
+W
+3 10000 0 4
+Z
+1 18211
+Z
+1 18219
+S
+#18267
+Monsoon Rift: Cull the Cacti~
+   Another rift has opened from the Magiterranean, and its magic has been
+animating cacti from around the desert. We need to keep their population in
+check, or they could overrun our entire realm. Find the rift and prune the
+invaders at their stems.
+~
+The Guild thanks you for your help in controlling the Magiterranean invaders.
+~
+8 e 0 0 -1
+A
+1 18211
+A
+1 18219
+D 18267
+P
+0 18258 0 1 a
+P
+17 18200 0 6 a
+R
+7 18200 1
+R
+1 -1 50
+W
+3 10140 0 1 a
+W
+3 10141 0 1 a
+W
+3 10142 0 1 a
+Z
+1 18211
+Z
+1 18219
+S
+#18268
+Monsoon Rift: Close Another Rift~
+   Another Monsoon Rift has opened in the desert. These Magiterranean invaders
+have become too much for the locals, and the Guild has offered to help.
+Venture into the rift and find a good way to close it. You'll receive a share
+of what the Guild is paid for this service.
+~
+The Guild thanks you for closing the rift and helping to protect the locals.
+~
+5 e 0 0 -1
+A
+1 18217
+A
+1 18209
+D 18267
+P
+0 18258 0 1 a
+P
+17 18200 0 6 a
+R
+7 18200 1
+R
+1 -1 50
+W
+11 0 0 1
+Z
+1 18217
+Z
+1 18209
+S
+#18269
+Permafrost: Grandma's Rhubarb Pie~
+   Ever since we discovered rhubarb growing outside of the Permafrost portals,
+tavern patrons haven't been able to get enough of it. In fact, the Guild has
+run out of pies again. Collect some rhubarb and back four pies for the guild.
+If you don't have any rhubarb fields, try foraging outside one of the portals.
+~
+   Four rhubarb pies! The tavernkeep will be elated. Here's your share of the
+proceeds.
+~
+8 de 0 0 -1
+A
+1 18208
+A
+1 18218
+D 18269
+P
+0 18262 0 1 a
+P
+17 18200 0 6 a
+R
+7 18200 1
+R
+1 -1 50
+W
+2 10553 0 4
+Z
+1 18208
+Z
+1 18218
+S
+#18270
+Permafrost: More Frost~
+   The guild's tinker has been working on a new Frost Cannon, but is running
+dangerously low on frost. It would be hazardous to try to steal frost from the
+Polar Baron himself, but his apprentices are easier targets. Venture into the
+Permafrost and 'use siphon <target>' on his Cryomancer and his Rime Mage, then
+return the siphoned frost power to the guild.
+~
+You hand over the siphon and the frosty power it contains.
+~
+13 e 0 0 -1
+A
+1 18210
+A
+1 18217
+D 18269
+P
+0 18262 0 1 a
+P
+17 18200 0 6 a
+R
+7 18200 1
+R
+1 -1 50
+T 18261
+W
+11 0 0 1
+Z
+1 18210
+Z
+1 18217
+S
+#18271
+Thieves: Dues Unpaid~
+   The Adventurers have a somewhat strained relationship with the thieves
+guild. They do a job for us, we pay them. We do a job for them, they pay us.
+Except sometimes they forget that last part, and now we must send a clear
+message about what happens when they decide to steal from us instead. Track
+down a group of thieves and make sure they get the message.
+~
+It's messy work, but the Guild thanks you for doing it.
+~
+15 e 0 0 -1
+A
+1 18211
+A
+1 18219
+D 18271
+P
+0 18263 0 1 a
+P
+17 18200 0 6 a
+R
+7 18200 1
+R
+1 -1 50
+W
+3 10110 0 1
+W
+3 10111 0 1
+W
+3 10114 0 1 a
+W
+3 10111 0 1 a
+Z
+1 18211
+Z
+1 18219
+S
+#18272
+Thieves: Lighten the Load~
+   The Guild of Adventurers does, from time to time, employ thieves to help
+acquire particularly rare items, especially from dragons. However, this comes
+at a price, and we have fallen behind on payment. If you could, pickpocket a
+bauble from a city sorcerer and deliver it to the thieves; this is our price.
+To aid you in this, we have placed an enchantment on you to prevent the
+sorcerer from noticing you lift the bauble from his pocket.
+~
+You set the bauble down on the ground and slowly back away...
+~
+17 de 0 0 -1
+A
+1 18217
+A
+1 18209
+D 18271
+P
+0 18263 0 1 a
+P
+17 18200 0 6 a
+R
+7 18200 1
+R
+1 -1 50
+T 18261
+W
+2 18210 0 1
+Z
+3 10110
+S
+#18273
+Ratskins: Vermin Control~
+   Rats from the sewers have been causing trouble around the guildhall. It's
+time for a little good old-fashioned population control. Head into the nearest
+sewer and deal with the vermin problem at its root.
+~
+   That won't be the last we hear -- or smell -- of the rats. But it should be
+enough to keep them out of the guildhall.
+~
+9 e 0 0 -1
+A
+1 18208
+A
+1 18218
+D 18273
+P
+0 18264 0 1 a
+P
+17 18200 0 6 a
+R
+7 18200 1
+R
+1 -1 50
+W
+3 10011 0 10
+W
+3 10012 0 10
+W
+3 10011 0 5 a
+W
+3 10012 0 5 a
+Z
+1 18208
+Z
+1 18218
+S
+#18274
+Ratskins: Cleaning Up the City~
+   The sewers have become a problem -- not only are they filled with rats, but
+they have attracted all manner of unsavory creatures that chase after those
+rats. Explore the nearest sewer. Kill a handful of sewer rats, and be on the
+lookout for whoever -- or whatever -- is hunting the rats, and exterminate
+those too.
+~
+   This certainly won't be our last infestation but at least, for now, it's
+under control.
+~
+10 e 0 0 -1
+A
+1 18211
+A
+1 18219
+D 18273
+P
+0 18264 0 1 a
+P
+17 18200 0 6 a
+R
+7 18200 1
+R
+1 -1 50
+W
+3 10018 0 1 a
+W
+3 10011 0 5 a
+W
+3 10019 0 1 b
+W
+3 10011 0 5 b
+W
+3 10020 0 1 c
+W
+3 10011 0 5 c
+Z
+1 18211
+Z
+1 18219
+S
+#18275
+Goblin Outpost: Hides for the Hideout~
+   We have a contract to supply Dryleef's men with the hide they'll need to
+craft their tiny goblin armor. Unfortunately, we're out of hides at the moment
+and we have a shipment due. Find 5 large skins and take them to Wargreyn in the
+nearest Goblin Outpost.
+~
+The blacksmith says, 'Wargreyn hope you got very bloody hunting these skins!'
+~
+13 de 0 0 -1
+A
+1 18219
+A
+1 18208
+D 18275
+P
+0 18260 0 1 a
+P
+17 18200 0 6 a
+R
+7 18200 1
+R
+1 -1 50
+W
+1 24 32 5
+Z
+1 10454
+S
+#18276
+Goblin Outpost: The Green-Eyed Shaman~
+   We have a contract to supply Dryleef's men with the resources they need to
+reinforce their position. Unfortunately, we're running short on spare gems and
+the shaman, Pimmin, needs some. The best place to get the glowing seashell gems
+is by fishing, but goblins are notoriously afraid of water and terrible at
+catching fish. See if you can get her five of the seashells by the end of the
+day.
+~
+The shaman says, 'Pimmin hopes you didn't get too wet finding seashells.'
+~
+13 de 0 0 -1
+A
+1 18219
+A
+1 18211
+D 18275
+P
+0 18260 0 1 a
+P
+17 18200 0 6 a
+R
+7 18200 1
+R
+1 -1 50
+W
+2 1300 0 5
+Z
+1 10452
+S
+$

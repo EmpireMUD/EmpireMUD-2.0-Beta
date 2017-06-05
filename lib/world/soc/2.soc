@@ -1,0 +1,720 @@
+#200
+tackle~
+tackle~
+0 8 5
+M0
+You tackle the air. It stands not a chance.~
+M1
+$n starts running around $mself in a desperate attempt to tackle the air.~
+M2
+You ruthlessly tackle $M to the ground.~
+M3
+$n ruthlessly tackles $N, pinning $M to the ground.~
+M4
+$n suddenly lunges at you and tackles you to the ground!~
+M5
+That person isn't here. Lucky for them, it would seem...~
+M6
+Tackle yourself? Yeah, right...~
+M7
+$n makes a dextrous move and kicks $s left leg away with $s right.~
+S
+#201
+tango~
+tango~
+0 8 8
+M0
+With whom would you like to tango?~
+M1
+$n puts a rose between $s teeth, but takes out it since no one joins $m.~
+M2
+You put a rose between your teeth and tango with $M seductively.~
+M3
+$n puts a rose between $s teeth and tangos with $N seductively.~
+M4
+$n puts a rose between $s teeth and tangos with you seductively.~
+M5
+That person isn't around. Better sit this one out.~
+M6
+Feels rather stupid, doesn't it?~
+M7
+$n puts a rose between $s teeth and tries to tango with $mself.~
+S
+#202
+taunt~
+taunt~
+0 5 0
+M0
+You taunt the nothing in front of you.~
+M1
+$n taunts something that seems to be right in front of $m.~
+M2
+You taunt $M, to your own delight.~
+M3
+$n taunts $N rather insultingly. $n seems to enjoy it tremendously.~
+M4
+$n taunts you. It really hurts your feelings.~
+M5
+Hmm... Nope, no one by that name here.~
+M6
+You taunt yourself, almost making you cry...~
+M7
+$n taunts $mself to tears.~
+S
+#203
+thank~
+thank~
+0 5 5
+M0
+Thank you too.~
+M2
+You thank $N heartily.~
+M3
+$n thanks $N heartily.~
+M4
+$n thanks you heartily.~
+M5
+No one answers to that name here.~
+M6
+You thank yourself since nobody else wants to!~
+M7
+$n thanks $mself since you won't.~
+S
+#204
+think~
+think~
+b 5 0
+M0
+You think about life, the universe and everything.~
+M1
+$n sinks deeply into thought about the meaning of life.~
+M2
+You think about what purpose $E has in relation to your part of life.~
+M3
+$n stops and thinks about $N, completely lost in thought.~
+M4
+Your ears burn as $n thinks about you... you wonder what about.~
+M5
+You'd better think harder, if you hope to make contact!~
+M6
+You think about yourself (for once).~
+M7
+$n thinks about $mself for a change... (?)~
+S
+#205
+tickle~
+tickle~
+0 5 0
+M0
+Whom do you want to tickle??~
+M2
+You tickle $N.~
+M3
+$n tickles $N.~
+M4
+$n tickles you - hee hee hee.~
+M5
+Who is that??~
+M6
+You tickle yourself, how funny!~
+M7
+$n tickles $mself.~
+S
+#206
+twiddle~
+twiddle~
+b 5 0
+M0
+You patiently twiddle your thumbs.~
+M1
+$n patiently twiddles $s thumbs.~
+S
+#207
+wave~
+wave~
+b 5 0
+M0
+You wave.~
+M1
+$n waves happily.~
+M2
+You wave goodbye to $N.~
+M3
+$n waves goodbye to $N.~
+M4
+$n waves goodbye to you. Have a good journey.~
+M5
+They didn't wait for you to wave goodbye.~
+M6
+Are you going on adventures as well??~
+M7
+$n waves goodbye to $mself.~
+S
+#208
+whine~
+whine~
+0 5 0
+M0
+You whine pitifully.~
+M1
+$n whines pitifully about the whole situation.~
+S
+#209
+whistle~
+whistle~
+0 5 0
+M0
+You whistle appreciatively.~
+M1
+$n whistles appreciatively.~
+S
+#210
+wiggle~
+wiggle~
+b 5 0
+M0
+You wiggle your bottom.~
+M1
+$n wiggles $s bottom.~
+S
+#211
+wink~
+wink~
+b 5 5
+M0
+Have you got something in your eye?~
+M1
+$n winks suggestively.~
+M2
+You wink suggestively at $N.~
+M3
+$n winks at $N.~
+M4
+$n winks suggestively at you.~
+M5
+No one with that name is present.~
+M6
+You wink at yourself?? What are you up to?~
+M7
+$n winks at $mself. Something strange is going on...~
+S
+#212
+worship~
+worship~
+b 5 5
+M0
+You find yourself head-down in the dirt, worshipping.~
+M1
+$n starts worshipping nothing at all.~
+M2
+You fall to your knees and worship $M deeply.~
+M3
+$n falls to $s knees, worshipping $N with uncanny dedication.~
+M4
+$n kneels before you in solemn worship.~
+M5
+Uh... whom? They're not here, pal.~
+M6
+You seem sure to have found a true deity...~
+M7
+$n falls to $s knees and humbly worships $mself.~
+S
+#213
+yawn~
+yawn~
+b 5 0
+M0
+You yawn, this crowd bores you.~
+M1
+$n yawns.~
+M2
+You yawn at $M. Is $E boring you?~
+M3
+$n yawns at $N. $E must be boring $m.~
+M4
+$n yawns at you. You must be boring $m.~
+M5
+They must have been bored too; they left.~
+S
+#214
+yodel~
+yodel~
+0 5 0
+M0
+You start yodelling loudly and rather beautifully in your own ears.~
+M1
+$n starts a yodelling session that goes right to the bone.~
+S
+#215
+beam~
+beam~
+b 5 0
+M0
+You beam proudly.~
+M1
+$n beams proudly.~
+M2
+You beam at $M.~
+M3
+$n beams at $N.~
+M4
+$n beams at you, $e must be proud of something.~
+M5
+Whom?~
+M6
+You beam over your own accomplishments.~
+M7
+$n beams over $s own accomplishments.~
+S
+#216
+hop~
+hop~
+0 8 0
+M0
+You hop around like a rabbit.~
+M1
+$n hops around the room.~
+S
+#217
+hmm~
+hmm~
+0 5 0
+M0
+You hmmmm... out loud.~
+M1
+$n hmmmms... out loud.~
+S
+#218
+sob~
+sob~
+b 5 0
+M0
+You sob miserably.~
+M1
+$n sobs miserably.~
+S
+#219
+bark~
+bark~
+0 5 0
+M0
+You get down on all fours and bark like a dog.~
+M1
+$n gets down on all fours and barks like a dog.~
+M2
+You bark at $N.~
+M3
+$n barks loudly at $N.~
+M4
+$n barks loudly at you.~
+M5
+Hmm... They don't seem to be here.~
+S
+#220
+meow~
+meow~
+0 5 0
+M0
+You meow like a small cat.~
+M1
+$n meows like a small cat.~
+M2
+You meow at $M.~
+M3
+$n meows at $N.~
+M4
+$n meows at you.~
+M5
+Whom?~
+S
+#221
+moo~
+moo~
+0 5 0
+M0
+You say, 'Mooooooooooooo!'~
+M1
+$n says, 'Mooooooooooooo!'~
+M2
+You moo at $M.~
+M3
+$n moos at $N.~
+M4
+$n moos at you.~
+M5
+Whom?~
+S
+#222
+blonde~
+blonde~
+0 5 0
+M0
+You declare, 'Life's a blonde and then you dye.'~
+M1
+$n declares, 'Life's a blonde and then you dye.'~
+M2
+You accuse $N of being a blonde.~
+M3
+$n calls $N a blonde, how insulting!~
+M4
+$n calls you a blonde. You feel insulted.~
+M5
+No one by that name here.~
+M6
+You stand up and admit that your natural hair color is blonde.~
+M7
+$n stands up and admits that $s natural hair color is blonde.~
+S
+#223
+eyebrow~
+eyebrow~
+b 5 0
+M0
+You raise an eyebrow.~
+M1
+$n raises an eyebrow.~
+M2
+You raise an eyebrow at $M.~
+M4
+$n raises an eyebrow at you.~
+M5
+Hmm... Whom?~
+S
+#224
+addict~
+addict~
+0 5 0
+M0
+Who is an addict now?~
+M2
+You tell $M that $E is addicted to MUD.~
+M3
+$n tells $N that $E is addicted to MUD.~
+M4
+$n forces you to admit that you are addicted to MUD.~
+M5
+Who is an addict now?~
+M6
+You stand up and say, 'Hello, I'm addicted to MUD.'~
+M7
+$n stands up and says, 'Hello, my name is $n and I'm addicted to MUD.'~
+S
+#225
+caress~
+caress~
+0 5 0
+M0
+Who do you want to caress?~
+M2
+You caress $S skin gently.~
+M3
+$n caresses $N gently.~
+M4
+$n caresses your skin gently.~
+M5
+Ooops, just missed 'em.~
+M6
+You have trouble finding dates, don't you?~
+S
+#226
+ballet~
+ballet~
+b 8 0
+M0
+You stand on tip-toe and twirl a few times.~
+M1
+$n twirls across the floor in a peculiar ballet.~
+S
+#227
+macarena~
+macarena~
+b 8 0
+M0
+You stand up and begin doing the Macarena, to everyone's dismay.~
+M1
+Much to your dismay, $n begins to dance the Macarena.~
+M2
+You force $M to dance the Macarena with you.~
+M3
+$n grabs $N and forces $M to dance the Macarena!~
+M4
+$n forces you to dance the Macarena with $m. What a way to go.~
+M5
+Knowing your intention to Macarena, they've left.~
+M6
+You dance the Macarena all by yourself.~
+M7
+$n dances the Macarena all by $mself. $e looks lonely.~
+S
+#228
+tap~
+tap~
+b 5 0
+M0
+You tap your foot.~
+M1
+$n taps $s foot impatiently.~
+S
+#229
+shriek~
+shriek~
+0 5 0
+M0
+You SHRIEK!~
+M1
+$n SHRIEKS!~
+S
+#230
+shudder~
+shudder~
+b 5 0
+M0
+You shudder at the thought.~
+M1
+$n shudders suddenly.~
+M2
+You look at $N and shudder.~
+M3
+$n looks at $N and shudders.~
+M4
+$n looks at you and shudders.~
+M5
+They don't seem to be here.~
+M6
+You shudder at your innermost thoughts.~
+M7
+$n shudders at an unseen force.~
+S
+#231
+pet~
+pet~
+0 5 0
+M0
+Whom do you want to pet?~
+M2
+You pet $S head.~
+M3
+$n pets $N's head.~
+M4
+$n pets your head.~
+M5
+Whom do you want to pet?~
+S
+#232
+bop~
+bop~
+0 5 0
+M0
+Whom did you want to bop?~
+M2
+You bop $M with a rubber mallet.~
+M3
+$n bops $N with a rubber mallet.~
+M4
+$n bops you with a rubber mallet.~
+M5
+Bop whom?~
+M6
+You bop yourself; what an idiot!~
+M7
+$n bops $mself; what an idiot!~
+S
+#233
+bonk~
+bonk~
+0 5 0
+M0
+You look around for someone to bonk.~
+M1
+$n looks around for someone to bonk.~
+M2
+You bonk $N over the head, resulting in a hollow echo.~
+M3
+$n bonks $N over the head, resulting in a hollow echo.~
+M4
+$n bonks you over the head. You hear a hollow echo.~
+M5
+Who were you going to bonk, again?~
+M6
+You bonk yourself over the head, resulting in a hollow echo.~
+M7
+$n bonks $mself over the head, resulting in a hollow echo.~
+S
+#234
+bodyslam~
+bodyslam~
+0 8 0
+M0
+Who do you want to bodyslam?~
+M2
+You bodyslam $N roughly.~
+M3
+$n bodyslams $N roughly.~
+M4
+$n bodyslams you roughly.~
+M5
+Who do you want to bodyslam?~
+S
+#235
+whip~
+whip~
+0 8 0
+M0
+You grap your whip but can't find someone to hit with it.~
+M1
+$n looks around for a target for $s new whip.~
+M2
+You crack your whip across $S back.~
+M3
+$n cracks $s whip across $N's back.~
+M4
+$n cracks $s whip across your back.~
+M5
+Whip whom?~
+M6
+*WHIP-CH*~
+M7
+$n whips $mself... odd.~
+S
+#236
+confuse~
+confuse~
+b 5 0
+M0
+You feel confused.~
+M1
+$n gives a confused look.~
+S
+#237
+boast~
+boast~
+b 5 0
+M0
+You boast about your abilities.~
+M1
+$n boasts about $s abilities.~
+S
+#238
+brag~
+brag~
+0 5 0
+M0
+You brag about how much better you are than anyone else.~
+M1
+$n brags about how much better $e is than anyone else.~
+M2
+You brag to $m.~
+M4
+$n brags to you.~
+M5
+Brag to whom?~
+S
+#239
+flex~
+flex~
+b 5 0
+M0
+You flex your [bulging] muscles.~
+M1
+$n flexes proudly. You can't help but laugh.~
+S
+#240
+fubar~
+fubar~
+0 5 0
+M0
+You declare the situation to be f*'d up beyond all recognition.~
+M1
+$n declares the situation to be f*'d up beyond all recognition.~
+M2
+You tell $M that $E has things f*'d up beyond all recognition.~
+M3
+$n tells $N that $E has things f*'d up beyond all recognition.~
+M4
+$n tells you that you have things f*'d up beyond all recognition.~
+M5
+Who is fubared now?~
+M6
+You admit that you have things f*'d up beyond all recognition. Oops.~
+M7
+$n admits that $e has things f*'d up beyond all recognition. Oops.~
+S
+#241
+wtf~
+wtf~
+0 5 0
+M0
+You shout, 'WHAT THE F***?!?'~
+M1
+$n shouts, 'WHAT THE F***?!?'~
+M2
+You get in $S face and shout, 'WHAT THE F***?!?'~
+M3
+$n gets in $N's face and shouts, 'WHAT THE F***?!?'~
+M4
+$n gets in your face and shouts, 'WHAT THE F***?!?'~
+M5
+You're the one who's f*'d up.~
+M6
+You look in a mirror and shout, 'WHAT THE F***?!?'~
+M7
+$n looks in a mirror and shouts, 'WHAT THE F***?!?'~
+S
+#242
+pinch~
+pinch~
+0 5 0
+M0
+You look around for someone to pinch.~
+M1
+$n looks as though $e may pinch somebody.~
+M2
+You wait until they aren't looking and pinch them quickly.~
+M3
+$n quickly pinches $N, resulting in a small 'Eep.'~
+M4
+$n pinches you playfully.~
+M5
+Who do you want to pinch?~
+M6
+Thinking you're dreaming, you pinch yourself. Ouch.~
+M7
+$n pinches $mself. Maybe $e thinks $e's dreaming.~
+S
+#243
+cheer~
+cheer~
+0 5 0
+M0
+You cheer enthusiastically!~
+M1
+$n cheers enthusiastically!~
+M2
+You cheer for $N!~
+M3
+$n cheers for $N!~
+M4
+$n cheers you on!~
+M5
+Cheer for whom?~
+S
+#244
+High Five~
+highfive~
+0 5 5
+M0
+You were arrested for illegal longbow use and only have 4 fingers.~
+M2
+You raise your hand and high-five $N triumphantly.~
+M3
+$n raises $s hand and high-fives $N triumphantly.~
+M4
+$n raises $s hand and high-fives you triumphantly.~
+M5
+They left you hanging.~
+M6
+You high-five yourself smugly.~
+M7
+$n high-fives $mself, looking smug.~
+S
+$

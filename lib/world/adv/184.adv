@@ -1,0 +1,45 @@
+#18450
+That Dammed River~
+Yvain~
+   Beavers have built a dam here and the rising river is causing floods!
+Killing their leader or destroying the lodge should drive them away, stopping
+the flooding. You can use Chant of Nature to restore flooded tiles and Siege
+Ritual to demolish dam tiles, but they will eventually return to normal on
+their own.
+~
+18450 18459 25-75
+5 0 dg 0
+L
+4 0
+18450 18450 18450
+-1 f bdeln
+L
+5 0
+10080 -1 -1
+-1 0 0
+L
+6 0
+75 -1 -1
+-1 0 0
+T 18452
+S
+#18460
+Unstable Portal~
+Paul Clarke and Owen Morris~
+   The city's sorcerers have managed to open a portal to a strange land. What
+lies on the other side? Climb into the portal and find out. Many unusual places
+await. But be warned! The portal is unstable and you shouldn't venture too far
+from it.  
+~
+18460 18499 0-0
+5 30 0 0
+L
+5 0
+1440 -1 -1
+-1 0 0
+L
+3 a
+5511 18460 18461
+-1 0 0
+S
+$

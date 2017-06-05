@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.survival.c                                  EmpireMUD 2.0b4 *
+*   File: act.survival.c                                  EmpireMUD 2.0b5 *
 *  Usage: code related to the Survival skill and its abilities            *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -25,14 +25,18 @@
 /**
 * Contents:
 *   Helpers
+*   Mount Commands
 *   Commands
 */
 
 // external vars
 
 // external funcs
-extern room_data *dir_to_room(room_data *room, int dir);
+extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 void scale_item_to_level(obj_data *obj, int level);
+
+// local protos
+ACMD(do_dismount);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -135,6 +139,360 @@ obj_data *find_best_saddle(char_data *ch) {
 }
 
 
+/**
+* Determines if a room qualifies for No Trace (outdoors/wilderness).
+*
+* @param room_data *room Where to check.
+* @return bool TRUE if No Trace works here.
+*/
+bool valid_no_trace(room_data *room) {
+	if (IS_ADVENTURE_ROOM(room)) {
+		return FALSE;	// adventures do not trigger this ability
+	}
+	if (!IS_OUTDOOR_TILE(room) || IS_ROAD(room) || IS_ANY_BUILDING(room)) {
+		return FALSE;	// not outdoors
+	}
+	
+	// all other cases?
+	return TRUE;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MOUNT COMMANDS //////////////////////////////////////////////////////////
+
+// mount your current mount
+void do_mount_current(char_data *ch) {
+	obj_data *saddle;
+	char_data *mob;
+	
+	if (IS_RIDING(ch)) {
+		msg_to_char(ch, "You're already mounted.\r\n");
+	}
+	else if (GET_MOUNT_VNUM(ch) == NOTHING || !mob_proto(GET_MOUNT_VNUM(ch))) {
+		msg_to_char(ch, "You don't have a current mount set.\r\n");
+	}
+	else if (IS_MORPHED(ch)) {
+		msg_to_char(ch, "You can't ride anything in this form.\r\n");
+	}
+	else if (AFF_FLAGGED(ch, AFF_FLY)) {
+		msg_to_char(ch, "You can't mount while flying.\r\n");
+	}
+	else if (AFF_FLAGGED(ch, AFF_SNEAK)) {
+		msg_to_char(ch, "You can't mount while sneaking.\r\n");
+	}
+	else if (IS_COMPLETE(IN_ROOM(ch)) && !BLD_ALLOWS_MOUNTS(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't mount here.\r\n");
+	}
+	else if (GET_SITTING_ON(ch)) {
+		msg_to_char(ch, "You're already sitting %s something.\r\n", IN_OR_ON(GET_SITTING_ON(ch)));
+	}
+	else if (MOUNT_FLAGGED(ch, MOUNT_FLYING) && !CAN_RIDE_FLYING_MOUNT(ch)) {
+		msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
+	}
+	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_RIDE)) {
+		return;
+	}
+	else {
+		// attempt to use a saddle
+		if (!(saddle = GET_EQ(ch, WEAR_SADDLE))) {
+			saddle = find_best_saddle(ch);
+			if (saddle) {
+				equip_char(ch, saddle, WEAR_SADDLE);
+				determine_gear_level(ch);
+			}
+		}
+		
+		// load a copy of the mount mob, for messaging
+		mob = read_mobile(GET_MOUNT_VNUM(ch), TRUE);
+		char_to_room(mob, IN_ROOM(ch));
+		
+		// messaging
+		if (saddle) {
+			// prevents mounting "someone" in the dark
+			sprintf(buf, "You throw on $p and clamber onto %s.", PERS(mob, mob, FALSE));
+			act(buf, FALSE, ch, saddle, mob, TO_CHAR);
+			
+			act("$n throws on $p and clambers onto $N.", TRUE, ch, saddle, mob, TO_NOTVICT);
+		}
+		else {
+			// prevents mounting "someone" in the dark
+			sprintf(buf, "You clamber onto %s.", PERS(mob, mob, FALSE));
+			act(buf, FALSE, ch, saddle, mob, TO_CHAR);
+			
+			act("$n clambers onto $N's back.", TRUE, ch, saddle, mob, TO_NOTVICT);
+		}
+		
+		// clear any stale mob flags
+		GET_MOUNT_FLAGS(ch) = 0;
+		
+		// hard work! this will un-load the mob
+		perform_mount(ch, mob);
+		command_lag(ch, WAIT_OTHER);
+	}
+}
+
+
+// list/search mounts
+void do_mount_list(char_data *ch, char *argument) {
+	extern const char *mount_flags[];
+	
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
+	struct mount_data *mount, *next_mount;
+	bool any = FALSE, cur;
+	char_data *proto;
+	size_t size = 0;
+	int count = 0;
+	
+	if (!GET_MOUNT_LIST(ch)) {
+		msg_to_char(ch, "You have no mounts.\r\n");
+		return;
+	}
+	
+	// header
+	if (!*argument) {
+		size = snprintf(buf, sizeof(buf), "Your mounts:\r\n");
+	}
+	else {
+		size = snprintf(buf, sizeof(buf), "Your mounts matching '%s':\r\n", argument);
+	}
+	
+	HASH_ITER(hh, GET_MOUNT_LIST(ch), mount, next_mount) {
+		if (size >= sizeof(buf)) {	// overflow
+			break;
+		}
+		if (!(proto = mob_proto(mount->vnum))) {
+			continue;
+		}
+		if (*argument && !multi_isname(argument, GET_PC_NAME(proto))) {
+			continue;
+		}
+		
+		// build line
+		cur = (GET_MOUNT_VNUM(ch) == mount->vnum);
+		if (mount->flags) {
+			prettier_sprintbit(mount->flags, mount_flags, temp);
+			snprintf(part, sizeof(part), "%s (%s)%s", skip_filler(GET_SHORT_DESC(proto)), temp, (cur && PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " [current]" : ""));
+		}
+		else {
+			snprintf(part, sizeof(part), "%s%s", skip_filler(GET_SHORT_DESC(proto)), (cur && PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " [current]" : ""));
+		}
+		
+		size += snprintf(buf + size, sizeof(buf) - size, " %s%-38s%s%s", (cur ? "&l" : ""), part, (cur ? "&0" : ""), PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : (!(++count % 2) ? "\r\n" : " "));
+		any = TRUE;
+	}
+	
+	if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && !(++count % 2)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+	}
+	
+	if (!any) {
+		size += snprintf(buf + size, sizeof(buf) - size, " no matches\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+// attempt to add a mount
+void do_mount_new(char_data *ch, char *argument) {
+	struct mount_data *mount;
+	char_data *mob, *proto;
+	bool only;
+	
+	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to mount anything here!\r\n");
+	}
+	else if (!*argument) {
+		msg_to_char(ch, "What did you want to mount?\r\n");
+	}
+	else if (!(mob = get_char_vis(ch, argument, FIND_CHAR_ROOM))) {
+		// special case: mount/ride a vehicle
+		if (get_vehicle_in_room_vis(ch, arg)) {
+			void do_sit_on_vehicle(char_data *ch, char *argument);
+			do_sit_on_vehicle(ch, arg);
+		}
+		else {
+			send_config_msg(ch, "no_person");
+		}
+	}
+	else if (ch == mob) {
+		msg_to_char(ch, "You can't mount yourself.\r\n");
+	}
+	else if (!IS_NPC(mob)) {
+		msg_to_char(ch, "You can't ride on other players.\r\n");
+	}
+	else if (find_mount_data(ch, GET_MOB_VNUM(mob))) {
+		act("You already have $N in your stable.", FALSE, ch, NULL, mob, TO_CHAR);
+	}
+	else if (!MOB_FLAGGED(mob, MOB_MOUNTABLE) && !IS_IMMORTAL(ch)) {
+		act("You can't ride $N!", FALSE, ch, 0, mob, TO_CHAR);
+	}
+	else if (AFF_FLAGGED(mob, AFF_FLY) && !CAN_RIDE_FLYING_MOUNT(ch)) {
+		act("You don't have the correct ability to ride $N! (see HELP RIDE)", FALSE, ch, 0, mob, TO_CHAR);
+	}
+	else if (mob->desc || (GET_PC_NAME(mob) && (proto = mob_proto(GET_MOB_VNUM(mob))) && GET_PC_NAME(mob) != GET_PC_NAME(proto))) {
+		act("You can't ride $N!", FALSE, ch, 0, mob, TO_CHAR);
+	}
+	else if (GET_LED_BY(mob)) {
+		msg_to_char(ch, "You can't ride someone who's being led around.\r\n");
+	}
+	else if (GET_POS(mob) < POS_STANDING) {
+		act("You can't mount $N right now.", FALSE, ch, NULL, mob, TO_CHAR);
+	}
+	else if (ABILITY_TRIGGERS(ch, mob, NULL, ABIL_RIDE)) {
+		return;
+	}
+	else {
+		// will immediately attempt to ride if they have no current mount
+		only = (GET_MOUNT_VNUM(ch) == NOTHING);
+		
+		// add mob to pool
+		add_mount(ch, GET_MOB_VNUM(mob), get_mount_flags_by_mob(mob));
+		
+		if (only && (mount = find_mount_data(ch, GET_MOB_VNUM(mob)))) {
+			// NOTE: this deliberately has no carriage return (will get another message from do_mount_current)
+			msg_to_char(ch, "You gain %s as a mount and attempt to ride %s: ", PERS(mob, mob, FALSE), HMHR(mob));
+			act("$n gains $N as a mount.", FALSE, ch, NULL, mob, TO_NOTVICT);
+			
+			GET_MOUNT_VNUM(ch) = mount->vnum;
+			GET_MOUNT_FLAGS(ch) = mount->flags;
+			do_mount_current(ch);
+		}
+		else {	// has other mobs
+			act("You gain $N as a mount and send $M back to your stable.", FALSE, ch, NULL, mob, TO_CHAR);
+			act("$n gains $N as a mount and sends $M back to $s stable.", FALSE, ch, NULL, mob, TO_NOTVICT);
+		}
+		
+		// remove mob
+		extract_char(mob);
+	}
+}
+
+
+// release your current mount
+void do_mount_release(char_data *ch, char *argument) {
+	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
+	
+	struct mount_data *mount;
+	char_data *mob;
+	
+	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to release mounts here (you wouldn't be able to re-mount it)!\r\n");
+	}
+	else if (!has_ability(ch, ABIL_STABLEMASTER)) {
+		msg_to_char(ch, "You need the Stablemaster ability to release a mount.\r\n");
+	}
+	else if (*argument) {
+		msg_to_char(ch, "You can only release your active mount (you get this error if you type a name).\r\n");
+	}
+	else if (GET_MOUNT_VNUM(ch) == NOTHING || !mob_proto(GET_MOUNT_VNUM(ch))) {
+		msg_to_char(ch, "You have no active mount to release.\r\n");
+	}
+	else {
+		if (IS_RIDING(ch)) {
+			do_dismount(ch, "", 0, 0);
+		}
+		
+		mob = read_mobile(GET_MOUNT_VNUM(ch), TRUE);
+		char_to_room(mob, IN_ROOM(ch));
+		setup_generic_npc(mob, GET_LOYALTY(ch), NOTHING, NOTHING);
+		
+		act("You drop $N's lead and release $M.", FALSE, ch, NULL, mob, TO_CHAR);
+		act("$n drops $N's lead and releases $M.", TRUE, ch, NULL, mob, TO_NOTVICT);
+		
+		// remove data
+		if ((mount = find_mount_data(ch, GET_MOB_VNUM(mob)))) {
+			HASH_DEL(GET_MOUNT_LIST(ch), mount);
+			free(mount);
+		}
+		
+		// unset current-mount
+		GET_MOUNT_VNUM(ch) = NOTHING;
+		GET_MOUNT_FLAGS(ch) = NOBITS;
+		SAVE_CHAR(ch);	// prevent mob duplication
+		
+		load_mtrigger(mob);
+	}
+}
+
+
+// change to a stabled mount
+void do_mount_swap(char_data *ch, char *argument) {
+	struct mount_data *mount, *iter, *next_iter;
+	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
+	bool was_mounted = FALSE;
+	char_data *proto;
+	int number;
+	
+	if (!has_ability(ch, ABIL_STABLEMASTER) && (!HAS_FUNCTION(IN_ROOM(ch), FNC_STABLE) || !IS_COMPLETE(IN_ROOM(ch)))) {
+		msg_to_char(ch, "You can only swap mounts in a stable unless you have the Stablemaster ability.\r\n");
+		return;
+	}
+	if (!has_ability(ch, ABIL_STABLEMASTER) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This building must be in a city to swap mounts here.\r\n");
+		return;
+	}
+	if (!has_ability(ch, ABIL_STABLEMASTER) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You don't have permission to mount anything here!\r\n");
+		return;
+	}
+	if (!*argument) {
+		msg_to_char(ch, "Swap to which mount?\r\n");
+		return;
+	}
+	
+	// look up mount by argument
+	mount = NULL;
+	strcpy(tmp, argument);
+	number = get_number(&tmp);
+	HASH_ITER(hh, GET_MOUNT_LIST(ch), iter, next_iter) {
+		if (!(proto = mob_proto(iter->vnum))) {
+			continue;
+		}
+		if (!multi_isname(tmp, GET_PC_NAME(proto))) {
+			continue;
+		}
+		
+		// match (barring #.x)
+		if (--number != 0) {
+			continue;
+		}
+		
+		// match!
+		mount = iter;
+		break;
+	}
+	
+	// did we find one?
+	if (!mount) {
+		msg_to_char(ch, "You don't seem to have a mount called '%s'.\r\n", argument);
+		return;
+	}
+	if (mount->vnum == GET_MOUNT_VNUM(ch)) {
+		msg_to_char(ch, "You're already using that mount.\r\n");
+		return;
+	}
+	
+	// Ok go:
+	if (IS_RIDING(ch)) {
+		do_dismount(ch, "", 0, 0);
+		was_mounted = TRUE;
+	}
+	
+	// change current mount to that
+	GET_MOUNT_VNUM(ch) = mount->vnum;
+	GET_MOUNT_FLAGS(ch) = mount->flags;
+	msg_to_char(ch, "You change your active mount to %s.\r\n", get_mob_name_by_proto(mount->vnum));
+	
+	if (was_mounted) {
+		do_mount_current(ch);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
@@ -223,7 +581,10 @@ ACMD(do_dismount) {
 
 
 ACMD(do_fish) {
+	extern const char *dirs[];
+	
 	room_data *room = IN_ROOM(ch);
+	char buf[MAX_STRING_LENGTH];
 	int dir = NO_DIR;
 	
 	any_one_arg(argument, arg);
@@ -231,21 +592,27 @@ ACMD(do_fish) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't fish.\r\n");
 	}
-	else if (GET_ACTION(ch) == ACT_FISHING) {
+	else if (GET_ACTION(ch) == ACT_FISHING && !*arg) {
 		msg_to_char(ch, "You stop fishing.\r\n");
 		act("$n stops fishing.", TRUE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
+	else if (FIGHTING(ch) && GET_POS(ch) == POS_FIGHTING) {
+		msg_to_char(ch, "You can't do that now!\r\n");
+	}
 	else if (!can_use_ability(ch, ABIL_FISH, NOTHING, 0, NOTHING)) {
 		// own messages
 	}
-	else if (GET_ACTION(ch)) {
+	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != ACT_FISHING) {
 		msg_to_char(ch, "You're really too busy to do that.\r\n");
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to fish for anything here.\r\n");
 	}
 	else if (*arg && (dir = parse_direction(ch, arg)) == NO_DIR) {
 		msg_to_char(ch, "Fish in what direction?\r\n");
 	}
-	else if (dir != NO_DIR && !(room = dir_to_room(IN_ROOM(ch), dir))) {
+	else if (dir != NO_DIR && !(room = dir_to_room(IN_ROOM(ch), dir, FALSE))) {
 		msg_to_char(ch, "You can't fish in that direction.\r\n");
 	}
 	else if (!CAN_INTERACT_ROOM(room, INTERACT_FISH)) {
@@ -261,11 +628,18 @@ ACMD(do_fish) {
 		return;
 	}
 	else {
+		if (dir != NO_DIR) {
+			sprintf(buf, " to the %s", dirs[get_direction_for_char(ch, dir)]);
+		}
+		else {
+			*buf = '\0';
+		}
+		
+		msg_to_char(ch, "You begin looking for fish%s...\r\n", buf);
+		act("$n begins looking for fish.", TRUE, ch, NULL, NULL, TO_ROOM);
+		
 		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (skill_check(ch, ABIL_FISH, DIFF_EASY) ? 2 : 1));
 		GET_ACTION_VNUM(ch, 0) = dir;
-		
-		msg_to_char(ch, "You begin looking for fish...\r\n");
-		act("$n begins looking for fish.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 
@@ -276,6 +650,11 @@ ACMD(do_forage) {
 	int short_depletion = config_get_int("short_depletion");
 	
 	if (!can_use_ability(ch, ABIL_FORAGE, MOVE, cost, NOTHING)) {
+		return;
+	}
+	
+	if (GET_ACTION(ch) != ACT_NONE) {
+		msg_to_char(ch, "You're too busy to forage right now.\r\n");
 		return;
 	}
 	
@@ -291,6 +670,11 @@ ACMD(do_forage) {
 
 	if (get_depletion(IN_ROOM(ch), DPLTN_FORAGE) >= short_depletion) {
 		msg_to_char(ch, "You can't seem to find anything to forage for.\r\n");
+		return;
+	}
+	
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to forage for anything here.\r\n");
 		return;
 	}
 	
@@ -310,130 +694,40 @@ ACMD(do_forage) {
 
 
 ACMD(do_mount) {
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
+	char arg[MAX_INPUT_LENGTH];
 	
-	char_data *mob = NULL, *temp, *proto;
-	obj_data *saddle = NULL;
-
-	one_argument(argument, arg);
-
-	if (IS_NPC(ch))
+	argument = one_argument(argument, arg);
+	skip_spaces(&argument);
+	
+	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't ride anything!\r\n");
+	}
 	else if (!can_use_ability(ch, ABIL_RIDE, NOTHING, 0, NOTHING)) {
 		// sends own msgs
 	}
-	else if (IS_MORPHED(ch)) {
-		msg_to_char(ch, "You can't ride anything in this form.\r\n");
+	
+	// list requires no position
+	else if (!str_cmp(arg, "list") || !str_cmp(arg, "search")) {
+		do_mount_list(ch, argument);
 	}
-	else if (AFF_FLAGGED(ch, AFF_FLY)) {
-		msg_to_char(ch, "You can't mount while flying.\r\n");
+	
+	else if (GET_POS(ch) < POS_STANDING) {
+		msg_to_char(ch, "You can't do that right now.\r\n");
 	}
-	else if (IS_RIDING(ch)) {
-		msg_to_char(ch, "You're already mounted.\r\n");
+	
+	// other sub-commands require standing
+	else if (!*arg) {
+		do_mount_current(ch);
 	}
-	else if (!*arg && (GET_MOUNT_VNUM(ch) == NOTHING || !mob_proto(GET_MOUNT_VNUM(ch)))) {
-		msg_to_char(ch, "What did you want to mount?\r\n");
+	else if (!str_cmp(arg, "swap") || !str_cmp(arg, "change")) {
+		do_mount_swap(ch, argument);
 	}
-	else if (*arg && !(mob = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
-		// special case: mount/ride a vehicle
-		if (get_vehicle_in_room_vis(ch, arg)) {
-			void do_sit_on_vehicle(char_data *ch, char *argument);
-			do_sit_on_vehicle(ch, arg);
-		}
-		else {
-			send_config_msg(ch, "no_person");
-		}
-	}
-	else if (AFF_FLAGGED(ch, AFF_SNEAK)) {
-		msg_to_char(ch, "You can't mount while sneaking.\r\n");
-	}
-	else if (!mob && IS_COMPLETE(IN_ROOM(ch)) && !BLD_ALLOWS_MOUNTS(IN_ROOM(ch))) {
-		// only check this if they didn't target a mob -- still need to be able to pick up new mounts indoors
-		msg_to_char(ch, "You can't mount here.\r\n");
-	}
-	else if (GET_SITTING_ON(ch)) {
-		msg_to_char(ch, "You're already sitting %s something.\r\n", IN_OR_ON(GET_SITTING_ON(ch)));
-	}
-	else if (mob && ch == mob) {
-		msg_to_char(ch, "You can't mount yourself.\r\n");
-	}
-	else if (mob && !IS_NPC(mob)) {
-		msg_to_char(ch, "You can't ride on other players.\r\n");
-	}
-	else if (mob && !MOB_FLAGGED(mob, MOB_MOUNTABLE) && !IS_IMMORTAL(ch)) {
-		act("You can't ride $N!", FALSE, ch, 0, mob, TO_CHAR);
-	}
-	else if (((mob && AFF_FLAGGED(mob, AFF_FLY)) || (!mob && MOUNT_FLAGGED(ch, MOUNT_FLYING))) && !CAN_RIDE_FLYING_MOUNT(ch)) {
-		if (mob) {
-			act("You don't have the correct ability to ride $N! (see HELP RIDE)", FALSE, ch, 0, mob, TO_CHAR);
-		}
-		else {
-			msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
-		}
-	}
-	else if (mob && (mob->desc || (GET_PC_NAME(mob) && (proto = mob_proto(GET_MOB_VNUM(mob))) && GET_PC_NAME(mob) != GET_PC_NAME(proto)))) {
-		act("You can't ride $N!", FALSE, ch, 0, mob, TO_CHAR);
-	}
-	else if (mob && GET_LED_BY(mob)) {
-		msg_to_char(ch, "You can't ride someone's who's being led around.\r\n");
-	}
-	else if (mob && GET_POS(mob) < POS_STANDING) {
-		act("You can't mount $N right now.", FALSE, ch, NULL, mob, TO_CHAR);
-	}
-	else if (ABILITY_TRIGGERS(ch, mob, NULL, ABIL_RIDE)) {
-		return;
+	else if (!str_cmp(arg, "release")) {
+		do_mount_release(ch, argument);
 	}
 	else {
-		// attempt to use a saddle
-		if (!(saddle = GET_EQ(ch, WEAR_SADDLE))) {
-			saddle = find_best_saddle(ch);
-			if (saddle) {
-				equip_char(ch, saddle, WEAR_SADDLE);
-				determine_gear_level(ch);
-			}
-		}
-		
-		// check for abandoning old mount
-		if (mob && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
-			temp = read_mobile(GET_MOUNT_VNUM(ch), TRUE);
-			char_to_room(temp, IN_ROOM(ch));
-			setup_generic_npc(temp, GET_LOYALTY(ch), NOTHING, NOTHING);
-			
-			act("You drop $N's lead.", FALSE, ch, NULL, temp, TO_CHAR);
-			act("$n drops $N's lead.", TRUE, ch, NULL, temp, TO_ROOM);
-			
-			GET_MOUNT_VNUM(ch) = NOTHING;
-			load_mtrigger(temp);
-		}
-
-		// load a copy of the mount mob, if there wasn't one (i.e. re-mounting the stored mount)
-		if (!mob) {
-			mob = read_mobile(GET_MOUNT_VNUM(ch), TRUE);
-			char_to_room(mob, IN_ROOM(ch));
-		}
-
-		// messaging
-		if (saddle) {
-			// prevents mounting "someone" in the dark
-			sprintf(buf, "You throw on $p and clamber onto %s's back.", PERS(mob, mob, FALSE));
-			act(buf, FALSE, ch, saddle, mob, TO_CHAR);
-			
-			act("$n throws on $p and clambers onto $N's back.", TRUE, ch, saddle, mob, TO_ROOM);
-		}
-		else {
-			// prevents mounting "someone" in the dark
-			sprintf(buf, "You clamber onto %s's back.", PERS(mob, mob, FALSE));
-			act(buf, FALSE, ch, saddle, mob, TO_CHAR);
-			
-			act("$n clambers onto $N's back.", TRUE, ch, saddle, mob, TO_ROOM);
-		}
-		
-		// clear any stale mob flags
-		GET_MOUNT_FLAGS(ch) = 0;
-		
-		// hard work! this will un-load the mob
-		perform_mount(ch, mob);
-		command_lag(ch, WAIT_OTHER);
+		// arg provided
+		do_mount_new(ch, arg);
 	}
 }
 
@@ -444,7 +738,7 @@ ACMD(do_nightsight) {
 	if (affected_by_spell(ch, ATYPE_NIGHTSIGHT)) {
 		msg_to_char(ch, "You end your nightsight.\r\n");
 		act("The glow in $n's eyes fades.", TRUE, ch, NULL, NULL, TO_ROOM);
-		affect_from_char(ch, ATYPE_NIGHTSIGHT);
+		affect_from_char(ch, ATYPE_NIGHTSIGHT, FALSE);
 	}
 	else if (!can_use_ability(ch, ABIL_NIGHTSIGHT, NOTHING, 0, NOTHING)) {
 		return;
@@ -474,6 +768,10 @@ ACMD(do_track) {
 	one_argument(argument, arg);
 	
 	if (!can_use_ability(ch, ABIL_TRACK, NOTHING, 0, NOTHING)) {
+		return;
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to track for anything here.\r\n");
 		return;
 	}
 	else if (!*arg) {

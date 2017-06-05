@@ -161,7 +161,7 @@ body {
 // city overlays
 foreach ($cityList as $city) {
 	?>
-	<div class="city" style="top: <?= (($height - $city['y'] - $city['radius']) * $scale) - 1.5 ?>px; left: <?= (($city['x'] - $city['radius']) * $scale) - 0.75 ?>px; width: <?= $city['radius'] * 2 * $scale ?>px; height: <?= $city['radius'] * 2 * $scale ?>px; border-radius: <?= $city['radius'] * $scale ?>px;" title="<?= ($city['radius'] >= $minRadiusToName) ? ($city['city'] . ' (' . $city['empire'] . ')') : 'Outpost' ?>">&nbsp;</div>
+	<div class="city" style="top: <?= $height - (($city['y'] + $city['radius']) * $scale) - 1.5 ?>px; left: <?= (($city['x'] - $city['radius']) * $scale) - 0.75 ?>px; width: <?= $city['radius'] * 2 * $scale ?>px; height: <?= $city['radius'] * 2 * $scale ?>px; border-radius: <?= $city['radius'] * $scale ?>px;" title="<?= ($city['radius'] >= $minRadiusToName) ? ($city['city'] . ' (' . $city['empire'] . ')') : 'Outpost' ?>">&nbsp;</div>
 	<?php
 }
 
@@ -194,10 +194,10 @@ function checkgrid() {
 }
 function checkmap() {
 	if ($("#pol").prop("checked")) {
-		$(".wld").attr("src", "map-political.png");
+		$(".wld").attr("src", "<?= $politicalMap ?>");
 	}
 	else {
-		$(".wld").attr("src", "map.png");
+		$(".wld").attr("src", "<?= $normalMap ?>");
 	}
 }
 function checkcities() {

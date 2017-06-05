@@ -2,7 +2,7 @@
 Hag Swamp Hut~
 A Crude Ladder~
 &c~&0()&c~~
-10 0 R 0
+128 0 R 0
 0 0 0 -1
 D
    You find yourself beneath a hut that stands on tall stilts above the swamp.
@@ -10,5 +10,31 @@ The stilts are made from solid logs and have been etched to resemble the legs
 of a bird. The construction is simple, even crude, and you wonder who would
 live in such a place.
 ~
+S
+#10140
+Monsoon Rift~
+A Strange Rift~
+&J\()/~
+1000 0 bd 0
+0 0 0 -1
+A
+j
+C
+enter rift~
+S
+#10190
+Volcano Caldera~
+The Caldera of a Raging Volcano~
+&w/&R\/&w\~
+1000 0 d 0
+0 0 0 -1
+A
+k
+E
+volcano caldera lava~
+   The mountain has opened up into a raging caldera, spewing lava down the
+mountainside. Above the caldera, the air is hot enough to blister your skin.
+~
+T 10196
 S
 $

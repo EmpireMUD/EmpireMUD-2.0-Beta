@@ -1,0 +1,162 @@
+#10900
+dragon red colossal collosal collossal colosal~
+a colossal red dragon~
+A colossal red dragon looms over you!
+~
+250 300 bdgxyzAB cmE
+2 0 2 10
+I 0 10907 75.00 2  # BUTCHER: a raw dragon steak
+I 0 10907 75.00 2  # BUTCHER: a raw dragon steak
+I 0 10907 75.00 2  # BUTCHER: a raw dragon steak
+I 0 10907 75.00 2  # BUTCHER: a raw dragon steak
+I 0 10903 25.00 4 b  # BUTCHER: a colossal dragon bone
+I 0 10903 25.00 3 b  # BUTCHER: a colossal dragon bone
+I 0 10903 25.00 2 b  # BUTCHER: a colossal dragon bone
+I 0 10903 25.00 1 b  # BUTCHER: a colossal dragon bone
+I 1 10902 25.00 4 s  # SKIN: a red dragon hide
+I 1 10902 25.00 3 s  # SKIN: a red dragon hide
+I 1 10902 25.00 2 s  # SKIN: a red dragon hide
+I 1 10902 25.00 1 s  # SKIN: a red dragon hide
+I 1 10006 25.00 2 t  # SKIN: a dragon scale
+I 1 10006 75.00 1 t  # SKIN: a dragon scale
+I 4 10944 100.00 1  # LOOT: a shining red dragon stone
+I 4 10904 4.00 1 e  # LOOT: a crimson serpent egg
+I 4 10905 2.00 1 e  # LOOT: a crimson dragon egg
+I 4 10906 2.00 1 e  # LOOT: a sea dragon egg
+I 4 10910 7.69 1 g  # LOOT: a dragonsteel warhammer
+I 4 10911 7.69 1 g  # LOOT: a dragonsteel claymore
+I 4 10912 7.69 1 g  # LOOT: a dragonbone mace
+I 4 10913 7.69 1 g  # LOOT: a flaming draconic wand
+I 4 10914 7.69 1 g  # LOOT: a flaming dragonbone staff
+I 4 10915 7.69 1 g  # LOOT: a dragonbone wristblade
+I 4 10916 7.69 1 g  # LOOT: a dragonbone tower shield
+I 4 10917 7.69 1 g  # LOOT: a flaming red dragon charm
+I 4 10918 7.69 1 g  # LOOT: the tome of dragonkind
+I 4 10919 7.69 1 g  # LOOT: a crimson dragon girdle
+I 4 10920 7.70 1 g  # LOOT: a burning dragonsteel waistband
+I 4 10921 7.70 1 g  # LOOT: a flaming draconic cincture
+I 4 10922 7.70 1 g  # LOOT: a burning dragoncloth sash
+M
+0
+$n coils around her hoard.~
+M
+0
+Wisps of smoke trail from $n's nostrils.~
+M
+0
+$n picks a scorched tower shield out of her teeth.~
+M
+0
+The cave shakes as $n grumbles something that sounds like 'vivor'.~
+T 10905
+T 10906
+T 10908
+T 10915
+T 10919
+T 10909
+S
+#10901
+Sir Vivor~
+Sir Vivor~
+Sir Vivor is glancing around nervously.
+~
+250 300 bdkvxyzAB cE
+1 0 0 1
+I 4 10907 75.00 2  # LOOT: a raw dragon steak
+I 4 10907 75.00 2  # LOOT: a raw dragon steak
+I 4 10907 75.00 2  # LOOT: a raw dragon steak
+I 4 10907 75.00 2  # LOOT: a raw dragon steak
+I 4 10944 100.00 1  # LOOT: a shining red dragon stone
+I 4 10903 25.00 1 b  # LOOT: a colossal dragon bone
+I 4 10903 25.00 2 b  # LOOT: a colossal dragon bone
+I 4 10903 25.00 3 b  # LOOT: a colossal dragon bone
+I 4 10903 25.00 4 b  # LOOT: a colossal dragon bone
+I 4 10904 4.00 1 e  # LOOT: a crimson serpent egg
+I 4 10905 2.00 1 e  # LOOT: a crimson dragon egg
+I 4 10906 2.00 1 e  # LOOT: a sea dragon egg
+I 4 10910 7.69 1 g  # LOOT: a dragonsteel warhammer
+I 4 10911 7.69 1 g  # LOOT: a dragonsteel claymore
+I 4 10912 7.69 1 g  # LOOT: a dragonbone mace
+I 4 10913 7.69 1 g  # LOOT: a flaming draconic wand
+I 4 10914 7.69 1 g  # LOOT: a flaming dragonbone staff
+I 4 10915 7.69 1 g  # LOOT: a dragonbone wristblade
+I 4 10916 7.69 1 g  # LOOT: a dragonbone tower shield
+I 4 10917 7.69 1 g  # LOOT: a flaming red dragon charm
+I 4 10918 7.69 1 g  # LOOT: the tome of dragonkind
+I 4 10919 7.69 1 g  # LOOT: a crimson dragon girdle
+I 4 10920 7.70 1 g  # LOOT: a burning dragonsteel waistband
+I 4 10921 7.70 1 g  # LOOT: a flaming draconic cincture
+I 4 10922 7.70 1 g  # LOOT: a burning dragoncloth sash
+I 4 10902 25.00 1 s  # LOOT: a red dragon hide
+I 4 10902 25.00 2 s  # LOOT: a red dragon hide
+I 4 10902 25.00 3 s  # LOOT: a red dragon hide
+I 4 10902 25.00 4 s  # LOOT: a red dragon hide
+I 4 10006 75.00 1 t  # LOOT: a dragon scale
+I 4 10006 25.00 2 t  # LOOT: a dragon scale
+M
+1
+Mama said there'd be dragons like this...~
+M
+0
+$n mumbles, 'I just don't think I was cut out to do the fighting part.'~
+M
+0
+$n polishes some tokens with an oil cloth.~
+M
+0
+$n proudly shows you a list of dragons whose deaths he has been partially responsible for.~
+T 10910
+T 10908
+T 10911
+T 10909
+S
+#10902
+Bangles thief nervous~
+Bangles the thief~
+A nervous thief is hiding in the shadows.
+~
+250 300 dkv nD
+1 0 0 15
+T 10902
+T 10903
+T 10913
+S
+#10903
+vendor token~
+the token vendor~
+The token vendor is peddling his wares (list).
+~
+250 300 bdov nD
+1 0 0 15
+T 10916
+T 10917
+T 10914
+S
+#10904
+serpent crimson coiled~
+a crimson serpent~
+A crimson serpent is coiled here.
+~
+100 125 dej 0
+0 0 5 10
+I 0 10907 100.00 2  # BUTCHER: a raw dragon steak
+S
+#10905
+dragon crimson small~
+the crimson dragon~
+A small crimson dragon is circling.
+~
+100 125 de m
+0 0 2 10
+I 0 10907 100.00 2  # BUTCHER: a raw dragon steak
+S
+#10906
+dragon sea crimson~
+a crimson sea dragon~
+A crimson sea dragon splashes around.
+~
+100 125 del 0
+0 0 6 9
+I 0 10907 100.00 2  # BUTCHER: a raw dragon steak
+S
+$

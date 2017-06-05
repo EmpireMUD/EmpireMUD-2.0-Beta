@@ -346,9 +346,11 @@ gold bracelets~
 A pair of gold bracelets is lying here.~
 These gold bracelets look amazing with your shoes.
 ~
-2 0 aj 1
+2 0 aj 2
 -1 -1 -1
 4 0
+A
+4 1 0
 R
 5617 0
 S
@@ -372,11 +374,13 @@ a spear~
 A long spear is protruding from the ground.~
 Spears can be used for fishing or fighting.
 ~
-1 ehl an 1
+1 ehl an 2
 0 2 3
 1 0
 A
 2 1 0
+C
+1 1
 S
 #2130
 backpack leather~

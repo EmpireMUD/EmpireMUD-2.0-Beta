@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: modify.c                                        EmpireMUD 2.0b4 *
+*   File: modify.c                                        EmpireMUD 2.0b5 *
 *  Usage: Run-time modification of game variables                         *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -99,15 +99,22 @@ void smash_tilde(char *str) {
 * @param char *prompt The thing being edited ("name", "description for Mobname").
 * @param char **writeto The place where the string will be stored.
 * @param size_t max_len The maximum string length.
+* @param bool allow_null If TRUE, empty strings will be freed and left null.
 */
-void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_t max_len) {
+void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_t max_len, bool allow_null) {
 	if (d->str) {
 		log("SYSERR: start_string_editor called for player already using string editor (len:%d)", (int)max_len);
 		return;
 	}
 	
+	if (max_len > MAX_STRING_LENGTH) {
+		log("SYSERR: start_string_editor called with max length %zu (cap is %d)", max_len, MAX_STRING_LENGTH);
+		max_len = MAX_STRING_LENGTH;
+	}
+	
 	d->str = writeto;
 	d->max_str = max_len;
+	d->str_on_abort = NULL;
 
 	if (*writeto) {
 		d->backstr = str_dup(*writeto);
@@ -119,7 +126,9 @@ void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_
 	d->straight_to_editor = TRUE;
 	d->mail_to = 0;
 	d->notes_id = 0;
+	d->save_empire = NOTHING;
 	d->file_storage = NULL;
+	d->allow_null = allow_null;
 	
 	if (STATE(d) == CON_PLAYING && !d->straight_to_editor) {
 		msg_to_desc(d, "&cEdit %s: (, to add; ,/s to save; ,/h for help)&0\r\n", prompt);
@@ -198,19 +207,34 @@ void string_add(descriptor_data *d, char *str) {
 			// only if not mailing/board-writing
 			if ((d->mail_to <= 0) && STATE(d) == CON_PLAYING) {
 				free(*d->str);
-				*d->str = d->backstr;
+				if (d->str_on_abort) {
+					*d->str = d->str_on_abort;
+					if (d->backstr) {
+						free(d->backstr);
+					}
+				}
+				else {
+					*d->str = d->backstr;
+				}
 				d->backstr = NULL;
 				d->str = NULL;
+				d->str_on_abort = NULL;
 			}
 			break;
 		case STRINGADD_SAVE:
 			if (d->str && *d->str && **d->str == '\0') {
 				free(*d->str);
-				*d->str = str_dup("Nothing.\r\n");
+				if (d->allow_null) {
+					*d->str = NULL;
+				}
+				else {
+					*d->str = str_dup("Nothing.\r\n");
+				}
 			}
 			if (d->backstr)
 				free(d->backstr);
 			d->backstr = NULL;
+			d->str_on_abort = NULL;
 			break;
 	}
 
@@ -245,10 +269,24 @@ void string_add(descriptor_data *d, char *str) {
 			free(d->str);
 			d->str = NULL;
 		}
+		else if (STATE(d) == CON_PLAYING && d->save_empire != NOTHING && action == STRINGADD_SAVE) {
+			empire_data *emp = real_empire(d->save_empire);
+			if (emp) {
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				
+				if (emp != GET_LOYALTY(d->character)) {
+					syslog(SYS_GC, GET_INVIS_LEV(d->character), TRUE, "ABUSE: %s has edited text for %s", GET_NAME(d->character), EMPIRE_NAME(emp));
+				}
+			}
+		}
 		else if (STATE(d) == CON_PLAYING && d->mail_to >= BOARD_MAGIC) {
 			Board_save_board(d->mail_to - BOARD_MAGIC);
-			if (action == STRINGADD_ABORT)
+			if (action == STRINGADD_ABORT) {
 				SEND_TO_Q("Post not aborted, use REMOVE <post #>.\r\n", d);
+			}
+			else {
+				SEND_TO_Q("Post complete.\r\n", d);
+			}
 		}
 		else if (d->notes_id > 0) {
 			if (action != STRINGADD_ABORT) {
@@ -300,12 +338,13 @@ void string_add(descriptor_data *d, char *str) {
 		d->mail_to = 0;
 		d->notes_id = 0;
 		d->max_str = 0;
+		d->save_empire = NOTHING;
 		if (d->file_storage) {
 			free(d->file_storage);
 		}
 		d->file_storage = NULL;
 		if (d->character && !IS_NPC(d->character)) {
-			REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
+			REMOVE_BIT(PLR_FLAGS(d->character), PLR_MAILING);
 		}
 	}
 	else if (strlen(*d->str) <= (d->max_str-3))
@@ -420,13 +459,18 @@ void paginate_string(char *str, descriptor_data *d) {
 
 /* The call that gets the paging ball rolling... */
 void page_string(descriptor_data *d, char *str, int keep_internal) {
+	int length;
+	
 	if (!d)
 		return;
 
 	if (!str || !*str)
 		return;
 
-	if (d->character && PRF_FLAGGED(d->character, PRF_SCROLLING) && strlen(str) < MAX_STRING_LENGTH) {
+	// determine if it will be too long after parsing color codes
+	length = strlen(str) + (color_code_length(str) * 3);
+
+	if (d->character && PRF_FLAGGED(d->character, PRF_SCROLLING) && length < MAX_STRING_LENGTH) {
 		send_to_char(str, d->character);
 		return;
 	}
@@ -617,7 +661,8 @@ void parse_action(int command, char *string, descriptor_data *d) {
 	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
 	extern int format_script(descriptor_data *d);
 	extern int replace_str(char **string, char *pattern, char *replacement, int rep_all, unsigned int max_size);
-
+	
+	char buf[MAX_STRING_LENGTH * 3];	// should be big enough
 	int indent = 0, rep_all = 0, flags = 0, replaced, i, line_low, line_high, j = 0;
 	unsigned int total_len;
 	char *s, *t, temp;
@@ -801,14 +846,17 @@ void parse_action(int command, char *string, descriptor_data *d) {
 					total_len++;
 					s++;
 				}
-			if (s) {
-				temp = *s;
-				*s = '\0';
-				strcat(buf, t);
-				*s = temp;
+			if (strlen(buf) + strlen(t) < sizeof(buf)) {
+				if (s) {
+					temp = *s;
+					*s = '\0';
+					strcat(buf, t);
+					*s = temp;
+				}
+				else {
+					strcat(buf, t);
+				}
 			}
-			else
-				strcat(buf, t);
 			sprintf(buf + strlen(buf), "\r\n%d line%sshown.\r\n", total_len, total_len != 1 ? "s " : " ");
 			page_string(d, (command == PARSE_LIST_COLOR) ? buf : show_color_codes(buf), TRUE);
 			break;
@@ -859,19 +907,26 @@ void parse_action(int command, char *string, descriptor_data *d) {
 					s++;
 					temp = *s;
 					*s = '\0';
-					sprintf(buf, "%s%4d:\r\n", buf, (i-1));
-					strcat(buf, t);
+					if (strlen(buf) + 7 < sizeof(buf)) {
+						sprintf(buf + strlen(buf), "%4d:\r\n", (i-1));
+					}
+					if (strlen(buf) + strlen(t) < sizeof(buf)) {
+						strcat(buf, t);
+					}
 					*s = temp;
 					t = s;
 				}
-			if (s && t) {
-				temp = *s;
-				*s = '\0';
-				strcat(buf, t);
-				*s = temp;
+			if (strlen(buf) + strlen(t) < sizeof(buf)) {
+				if (s && t) {
+					temp = *s;
+					*s = '\0';
+					strcat(buf, t);
+					*s = temp;
+				}
+				else if (t) {
+					strcat(buf, t);
+				}
 			}
-			else if (t)
-				strcat(buf, t);
 
 			page_string(d, show_color_codes(buf), TRUE);
 			break;
@@ -1076,7 +1131,7 @@ int format_script(struct descriptor_data *d) {
 
 
 void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen) {
-	int line_chars, startlen, cap_next = TRUE, cap_next_next = FALSE;
+	int line_chars, startlen, len, cap_next = TRUE, cap_next_next = FALSE;
 	char *flow, *start = NULL, temp;
 	char formatted[MAX_STRING_LENGTH];
 
@@ -1152,7 +1207,14 @@ void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int m
 			}
 		}
 	}
-
+	
+	// prevent trailing double-crlf by removing all trailing space
+	len = strlen(formatted);
+	while (len > 0 && strchr("\n\r\f\t\v ", formatted[len-1])) {
+		formatted[--len] = '\0';
+	}
+	
+	// re-add a crlf
 	strcat(formatted, "\r\n");
 
 	if (strlen(formatted) + 1 > maxlen)

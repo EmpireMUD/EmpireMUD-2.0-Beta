@@ -16,13 +16,17 @@ Upper immortals can control the olc permissions of builders with the OLC
 CONTROLS.
 
 Available types are:
- .b - buildings
- .c - crafts
- .crop - crops
- .m - mobiles
- .o - objects
- .map - map tiles, rooms, and interiors
- .sect - map sectors
+ .abil - abilities               .adv - adventures
+ .aug - augments                 .arch - archetypes
+ .b - buildings                  .book - books
+ .c - crafts                     .class - classes
+ .crop - crops                   .f - factions
+ .g - globals                    .m - mobiles
+ .map - map tiles/interiors      .morph - morphs
+ .o - objects                    .q - quests
+ .r - room templates             .sect - map sectors
+ .skill - skills                 .soc - socials
+ .t - scripts/triggers           .v - vehicles
 
 Basic commands:
  . - typing '.' by itself shows your current editor
@@ -40,30 +44,35 @@ Examples:
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
  
-See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC GLOBALS,
-   OLC MOBILES, OLC OBJECTS, OLC SECTORS, MAP OLC
+See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC FACTIONS,
+   OLC GLOBALS, OLC MOBILES, OLC OBJECTS, OLC SECTORS, MAP OLC
 See also: OLC ABORT, OLC AUDIT, OLC COPY, OLC DELETE, OLC EDIT, OLC FREE, 
    OLC LIST, OLC SAVE, OLC SEARCH, OLC LICENSE, TEXT EDITOR, VNUM
 #d
-"OLC ABBREVIATIONS" "OLC ABBREVS" ADV BLD BDG CFT CRP MOB OBJ RMT SCT TRG
+"OLC ABBREVIATIONS" "OLC ABBREVS" ADV BLD BDG CFT CRP MOB OBJ QST RMT SCT SOC TRG
 
 Sometimes abbreviations are used for core "thing" types, like mobs. Here are
 some common ones:
 
 abil - ability
 adv - adventure
+aug - augment
+arch - archetypes
 bld (or bdg) - building (these include designated rooms)
 cft - craft
 cls - class
 crp - crop
+fct - factions
 glb - global
 mob - mobile/npc
 mph - morph
 npc - non-player character (mob)
 obj - object
+qst - quest
 rmt - room template
 sct - sector/terrain
 skl - skill
+soc - social
 trg - trigger
 veh - vehicle
 #d
@@ -107,9 +116,12 @@ Adventures (ADVEDIT):
 - Adventure scripts will ONLY run if they are 'Adventure Cleanup' scripts.
 
 Archetypes (ARCHEDIT):
-- Archetypes should have a total of 11 attribute points (3 2 2 2 1 1).
-- Archetypes should have a total of 30 skill points.
-- Archetypes should provide gear for: head, clothes, legs, feet, wield, hold.
+- Each set of archetypes has its own rules.
+- If your EmpireMUD wants to add races, cultures, or other groupings, you
+  can use new archetype types.
+- 'Origins' should have a total of 11 attribute points (3 2 2 2 1 1).
+- 'Origins' should have a total of 30 skill points; 'Hobbies' should have 5.
+- 'Origins' should provide gear for: head, clothes, legs, feet, wield, hold.
 - The hold slot is always a long-lasting light, like the newbie torch (2104).
 - You should only set the BASIC flag on very simple archetypes. Most archetypes
   should only appear in the extended list.
@@ -124,6 +136,9 @@ Augments (AUGEDIT):
   a re-usable augment.
 - Unlike crafts, it is safe to use SCALABLE items as resources and requires-
   objects, because augments are instant and non-refundable.
+- CUMULATIVE-PRC and CHOOSE-LAST are not compatible. If you want a 100% last-
+  choice for a cumulative set, give it 100% non-cumulative and the choose-last
+  flag. If no cumulative choice is picked, it will be chosen.
 
 Buildings (BEDIT):
 - Designated rooms are also built in the building editor, using the ROOM flag.
@@ -154,8 +169,8 @@ Crafts (CEDIT):
   craft's requiresobject field. The player will only be able to see and use
   the craft if they have the item in their inventory. You can still also choose
   to require an Ability, for example an armor pattern that requires Armor-
-  smithing. You should consider listing the ingredients on the recipe item's
-  lookdescription.
+  smithing. You should mention the recipe by name in the item's look
+  description.
 - To make an item that can be combined with another item, for example a spear-
   head that can be crafted into a spear, create a craft and set its requires-
   object to the spearhead (just like a recipe item, above). Then, also set the
@@ -177,8 +192,24 @@ Crops (CROPEDIT):
 - The map region only matters if the crop grows in the wild (no !WILD flag).
 - Crops should have a FORAGE interaction for a small single food item.
 - Crops should have a HARVEST interaction for a plantable large item.
+- The HARVEST interaction on orchards actually uses the pick command. You
+  should usually use a 1x item for this interaction.
 - Orchard crops need a CHOP interaction if they will give trees. Orchards are
   still choppable without this, though.
+
+Factions (FEDIT):
+- The REP-FROM-KILLS flag causes you to lose reputation if you kill a mob who
+  belongs to this faction or its allies (SHARED-GAINS relationship), and gain
+  repationship if you kill a mob from an enemy faction (INVERSE-GAINS). It
+  doesn't matter if that other faction has the REP-FROM-KILLS flag or not.
+- Two related factions don't have to have identical relationship flags, but
+  there aren't very many good reasons not to.
+- Reputation levels go Despised, Hated, ... Venerated, Revered. The Despised/
+  Revered endcaps are good for min/max limits on factions. However, when
+  checking faction reputation in quests and scripts, you should use the
+  Hated/Venerated. Despised/Revered don't have ranges, and players can 'bump
+  out' of those ranges by gaining/losing even 1 reputation point.
+- See HELP FACTION SCRIPTING for tips on writing scripts.
 
 Globals (GEDIT):
 - All global tables must be approved by the head builder, because they apply
@@ -281,6 +312,32 @@ Quests (QEDIT):
   reward items, as the scale level may go up.
 - If you use the QUEST-CHAIN reward type, put it last. It will look better
   at the end.
+- If you set REPEAT-PER-INSTANCE, you should almost always also set the
+  EXPIRES-AFTER-INSTANCE flag. This way, the player will always have a version
+  from their current instance.
+- When you use REPEAT-PER-INSTANCE, the COMPLETED-QUEST and NOT-COMPLETED tasks
+  will only count quests that were/not completed in the same instance. This
+  allows you to create complex chains or mutually-exclusive quests that reset
+  with each new instance.
+- The REPEAT-PER-INSTANCE feature can be somewhat muddled if players start a
+  new instance without finishing the previous one, as the game is not designed
+  for this scenario and they player may end up with a mixture of quests from
+  the two instances. If you have a good solution for this problem, suggest it
+  to Paul (paul@empiremud.net). The current advice is to not worry about it and
+  hope players don't get themselves into these confusing situations.
+- Daily quests automatically repeat once per 'daily cycle' if their 'repeat' is
+  set to never/immediately. You can also set longer repeat timers on them; they
+  will still count toward the daily limit but respect the long repeat time.
+- Empire-only quests will also match "not in an empire" if the mob/room and
+  player are both in no empire.
+- Empire-only quests have no effect if the start/end point is an object.
+- If multiple DAILY quests share the same 'daily cycle', only one of them is
+  available per day. Any unique integer can be a daily cycle, but for the sake
+  of cleanliness, you should pick the vnum of one of the quests on the cycle.
+- For tasks and prerequisites, any requirements you add are "OR" by default
+  (any matching requirement from the list lets the character pass the check).
+  If you want them to be "AND" requirements, you need to set a group letter on
+  them.
 
 Room Templates (REDIT):
 - Don't confuse room templates with the designated rooms that players can add
@@ -323,6 +380,12 @@ Skills (SKILLEDIT):
   but you CANNOT assign an ability to both a class and a skill -- it would
   count toward purchased abilities in that skill tree.
 
+Socials (SOCEDIT):
+- Players must meet all the requirements for a social to use it.
+- If a player types a social that has multiple versions, they get the one that
+  has the most requirements. If they qualify for more than one same-named
+  social with the same number of requirements, one is chosen at random.
+
 Triggers and Scripts (TRIGEDIT):
 - Scripts must be formatted with /f -- this will also ensure your if/end and
   while/done tags all match.
@@ -341,8 +404,13 @@ Triggers and Scripts (TRIGEDIT):
   room template. It only works for room templates in the same adventure zone.
 - If a script loads an object or mob, and it's not in a level-locked adventure
   zone, the script may also need to scale the obj's/mob's level itself.
+- Do not put a "%quest% finish" in a trigger that's attached to an object
+  that requires that quest. The object will be extracted during the "finish"
+  and it will interrupt the execution of your trigger.
 
 Vehicles (VEDIT):
+- Keywords should always have the most significant word first (the noun). This
+  keyword is preserved when the vehicle is renamed.
 - Only set an icon on a vehicle if it should be visible on the map; in most
   cases you should leave this blank.
 - Vehicles only have an interior (are boardable) if the "interior room"
@@ -452,6 +520,22 @@ give credit to the original builder.
 
 See also: OLC ADVENTURES
 #d
+"ADVEDIT CASCADE" "ADVEDIT UNCASCADE" CASCADE UNCASCADE
+
+Usage:  .adv cascade <adventure vnum>
+        .adv uncascade <adventure vnum>
+
+The cascade command will apply the adventure's min/max levels to all the mobs
+and objects in the adventure that don't already have their own min/max. This
+command will ignore any mob/item that already has either a min or max level.
+
+The uncascade command removes the min/max level from all mobs and objects whose
+min/max are identical to the adventure's own settings.
+
+Both commands ignore objects that don't have the SCALABLE flag.
+
+See also: OLC ADVENTURES
+#d
 "ADVEDIT DESCRIPTION"
 
 Usage:  .description
@@ -491,6 +575,7 @@ The following adventure flags are available:
  !NEWBIE - Will not spawn on newbie islands.
  NEWBIE-ONLY - Only spawns on newbie islands.
  NO-MOB-CLEANUP - Won't despawn mobs that got out of the instance on cleanup.
+ EMPTY-RESET-ONLY - Won't reset while players are inside.
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
@@ -530,9 +615,10 @@ cases, you must also specify the type(s) of terrain it must be built facing.
 Both of these are the same as the "buildon" and "buildfacing" flags from the
 craft and sector editors; see &yHELP SECTEDIT BUILDFLAGS&0.
 
-CAUTION: this will NOT work well with "open"-style buildings, such as
-fountains, because they can't have normal exits. If you want to connect an
-adventure to an open building, use PORTAL-BDG-NEW instead.
+CAUTION: If you use this with an "open" building such as a fountain, there will
+be no entrance to the interior templated rooms. This is usually undesirable
+(use PORTAL-BDG-NEW instead), but it can also be used to create map-only
+adventures.
 
 CAUTION: You must not use designated rooms (or any "building" with the ROOM
 flag) for this, because they can't be built on the map.
@@ -652,7 +738,7 @@ the same object). Existing buildings may also be interior rooms, but new
 building rules require a normal map building (one without the ROOM flag).
 
 For types requiring build-on or build-facing, you should include the set of
-build flags in quotes ("plains forest") if you use more than one. For the full
+build flags in quotes ("plains desert") if you use more than one. For the full
 list of build flags, see HELP SECTEDIT BUILDFLAGS.
 
 See also: OLC ADVENTURES, SECTEDIT BUILDFLAGS, VNUM
@@ -670,7 +756,10 @@ Adventures whose minimum level is over 25 will not spawn on newbie islands.
 
 The OLC LEVELS help file has additional notes on how to choose levels.
 
-See also: OLC ADVENTURES, OLC LEVELS
+You can use the 'cascade' editor command to copy levels from the adventure to
+its mobs and objects.
+
+See also: OLC ADVENTURES, OLC LEVELS, ADVEDIT CASCADE
 #d
 "ADVEDIT NAME"
 
@@ -744,6 +833,8 @@ The following affect flags are available:
  !STEALTH - Immune to the Stealth debuffs.
  !VAMPIRE - Immune to Vampire debuffs.
  !STUN - Immune to stun effects.
+ !DRINK-BLOOD - Can't be bitten/sired by vampires.
+ DISTRACTED - Cannot perform timed actions.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
@@ -774,12 +865,16 @@ See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 Usage:  .attribute <type> <number>
         .attribute <copy> <archetype vnum>
 
-This allows you to set the starting level of each attribute. By design, the
+Each of a player's archetypes adds to their attributes. By design, the
 starting attributes should be low. Players will earn higher attributes using
 gear and abilities.
 
-All of the stock archetypes have starting attributes totalling 11 (one at 3,
-two at 1, and the rest at 2).
+An attribute can be positive, negative, or zero. Players will get the sum of
+the attributes from all their archetypes (with guaranteed minimum levels, if
+they end up too low).
+
+All of the stock Origin archetypes have starting attributes totalling 11 (one
+at 3, two at 1, and the rest at 2).
 
 See also: OLC ARCHETYPES
 #d
@@ -877,6 +972,20 @@ points to all skills.
 
 All of the stock archetypes have a total of 30 skill points, usually split
 between two skills as 20/10.
+
+See also: OLC ARCHETYPES
+#d
+"ARCHEDIT TYPE"
+
+Usage:  .type <type>
+
+Archetype types sort them into categories. During creation, a player picks one
+from each category. EmpireMUDs may add or remove archetype types, for example
+to add races or cultures.
+
+Available types:
+ ORIGIN - A character's background and upbringing.
+ HOBBY - Some bonus skill points.
 
 See also: OLC ARCHETYPES
 #d
@@ -1028,13 +1137,26 @@ Each building (or room template) type may have a default set of room affect
 flags. These are added to the building tile when built, or are present on a
 room that is instantiated from a room template.
 
-Available affects (do not set affects with *):
+Available affects:
  DARK - magically dark and the map tile shows as blank
  SILENT - magically quiet
  CHAMELEON - at distance, appears as the tile it was built upon
  !EVOLVE - will not grow trees or process other evolutions
  !FLY - flying characters cannot enter, like an enchanted wall
+ !WEATHER - suppress weather messages and command
  !DISREPAIR - never falls into disrepair (caution: this prevents empire decay)
+ !TELEPORT - cannot teleport here
+
+Some affects are managed by live data and commands (do not set affects with *):
+ *HAS-INSTANCE - an adventure is linked here
+ *TEMPORARY - will be removed when instance is cleaned up
+ *UNCLAIMABLE - cannot be claimed
+ *PUBLIC - can be used by empires other than the owner
+ *DISMANTLING - someone started dismantling it
+ *IN-VEHICLE - room is part of the interior of a vehicle
+ *!WORK - workforce ignores the room
+ *!DISMANTLE - cannot be dismantled until nodismantle is toggled
+ *INCOMPLETE - building is unfinished
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
@@ -1181,8 +1303,10 @@ Available flags:
  HERD - mobs can be herded into this building
  DEDICATE - can be dedicated to a patron god or player, which adds "of Name"
     to the room title
+ !RUINS - building leaves no ruins when it decays
  !NPC - mobs won't enter this building
  BARRIER - can only go back the way you came, unless flying
+ IN-CITY-ONLY - can only be used if in an established city
  LARGE-CITY-RADIUS - counts as in-city much further away than normal
  ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
  BURNABLE - will catch fire if a fire is placed inside by a hostile empire
@@ -1202,12 +1326,12 @@ Available flags:
 
 See also: BEDIT FUNCTIONS, INTERLINK, OLC BUILDINGS
 #d
-"BEDIT FUNCTIONS" "FUNCTION FLAGS"
+"BEDIT FUNCTIONS" "REDIT FUNCTIONS" "FUNCTION FLAGS"
 
 Usage:  .flags [add | remove] <flags>
 
 The function flags determine what chores, actions, and other tasks happen at
-that building.
+that building or room template.
 
 Available functions:
  ALCHEMIST - can brew and mix here
@@ -1244,19 +1368,30 @@ Available functions:
  DRINK-WATER - can get water here, like a well
  COOKING-FIRE - can cook, brew, and other tasks that require a fire
 
-See also: OLC BUILDINGS
+See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
-"BEDIT HITPOINTS"
+"BEDIT HITPOINTS" "BEDIT HEALTH"
 
 Usage:  .hitpoints <value>
 
 This number is how much damage a building can take from a catapult or siege
-ritual before it is destroyed.
+ritual before it is destroyed. Buildings with the ROOM flag do not need this.
 
 Catapults deal 8 damage per 100 levels, per shot. Siege rituals deal
-Intelligence + 1 damage.
+Intelligence + 1 damage. You can determine how many hitpoints to give a
+building based on this.
 
-See also: FIRE, OLC BUILDINGS, SIEGE RITUAL
+If a building takes more than 10% of its hitpoints in damage from an attack,
+it will also need its yearly maintenance resources to be fixed.
+
+Common hitpoint levels:
+ house: 8-24
+ wall: 32
+ castle: 64
+ mountain building: 128
+ adventure: 1000 (to discourage sieging)
+
+See also: BEDIT YEARLY MAINTENANCE, FIRE, OLC BUILDINGS, SIEGE RITUAL
 #d
 "BEDIT ICON"
 
@@ -1307,6 +1442,35 @@ You should choose a name that's as short as possible. For example, if your
 room title is "A Foul-Smelling Outhouse", the name should be "Outhouse".
 
 See also: BEDIT TITLE, OLC BUILDINGS, TERRITORY, VNUM
+#d
+"BEDIT RESOURCES" "BEDIT YEARLY MAINTENANCE"
+
+Usage:  .resource add <type> <amount> <vnum/name> [flags, for components only]
+        .resource change <number> <quantity | vnum | name | flags> <value>
+        .resource remove <number | all>
+        .resource move <number> <up | down>
+
+This command adds materials to the building's "yearly maintenance" list. These
+are resources needed to maintain the building each year. If you don't set any,
+then the building does not require maintenance.
+
+This uses the ".resource" command to be consistent with other editors, but
+these are not the resources needed to build the vehicle in the first place --
+only to repair it.
+
+If a building takes damage from any source, and that damage is more than 10% of
+its hitpoints, it will also add the yearly-maintenance resources to the repair
+cost.
+
+Buildings with only 1 hitpoint will never get their yearly maintenance cost, as
+even 1 year of decay will destroy them.
+
+Note: Interior rooms do not normally require any yearly maintenance and don't
+take damage.
+
+See HELP OLC RESOURCES for more information.
+
+See also: BEDIT HITPOINTS, OLC BUILDINGS, MAINTAIN, RESOURCE ACTIONS
 #d
 "BEDIT ROOMS" "BEDIT ROOMS" "BEDIT EXTRA ROOMS"
 
@@ -1378,7 +1542,7 @@ Examples:
 
 See also: OLC BUILDINGS
 #d
-"BEDIT UGPRADESTO" "BEDIT UPGRADES TO"
+"BEDIT UPGRADESTO" "BEDIT UPGRADES TO"
 
 Usage:  .upgradesto <building vnum>
         .upgradesto none
@@ -1411,7 +1575,7 @@ The following flags are available:
  water - any ocean or river tile
  plains - a plains or a road that was built on plains
  mountain - a mountain or mountain path
- forest - an overgrown forest (^^^^)
+ full forest - an overgrown forest (^^^^) or other full forest
  desert - a desert or a road that was built on desert
  river - a river tile
  jungle - any jungle tile
@@ -1446,7 +1610,7 @@ The following flags are available:
  water - any ocean or river tile
  plains - a plains or a road that was built on plains
  mountain - a mountain or mountain path
- forest - an overgrown forest (^^^^)
+ full forest - an overgrown forest (^^^^) or other full forest
  desert - a desert or a road that was built on desert
  river - a river tile
  jungle - any jungle tile
@@ -1601,7 +1765,7 @@ of the used resources, rounded down.
 
 See HELP OLC RESOURCES for more information.
 
-See also: OLC CRAFTS
+See also: OLC CRAFTS, RESOURCE ACTIONS
 #d
 "CEDIT TIME"
 
@@ -1823,6 +1987,9 @@ Crop flags determine some various properties about crops.
 Available flags:
  REQUIRES-WATER - Can only be planted within 4 tiles of fresh water
  ORCHARD - Uses 'pick' instead of 'harvest', shows the orchard commands list, can be chopped down
+ !WILD - Won't spawn in the wild
+ NEWBIE-ONLY - Only spawns on newbie islands (can be planted anywhere)
+ !NEWBIE - Does not spawn on newbie islands
 
 See also: OLC CROPS
 #d
@@ -1891,6 +2058,152 @@ covered by the crops.
 
 See also: OLC CROPS
 #d
+"FACTION SCRIPTING" "SCRIPTING FACTIONS"
+
+Writing scripts using faction gives you the ability to control access to
+content using the faction system. You should usually prefer to use the Hated
+and Venerated levels, rather than the endcap Despised and Revered levels,
+because gaining/losing even 1 reputation point can bump a player out of the
+endcaps.
+
+Testing reputation against the mob's faction:
+eval test %%actor.has_reputation(%self.allegiance%,Liked)%%
+if %!test%
+  %send% %actor% You must be Liked by %self.faction_name%!
+  return 0
+end
+
+You can also cause players to gain/lose reputation with:
+nop %actor.gain_reputation(1234,-1)%
+
+You can change the faction of a mob with:
+nop %mob.allegiance(1234)%
+
+See also: OLC FACTIONS
+#d
+FEDIT FACTIONEDIT "OLC FACTIONS" "FACTION EDITOR"
+
+Usage:  .f <command>
+        .command
+
+The .olc faction editor allows you to configure the data for factions, which
+are groups that NPCs can belong to. Players gain and lose reputation with
+factions, and these reputation levels can be used to control access to quests
+and adventure content.
+
+All commands in the editor arg highlighted in yellow and placed inside <angle
+braces>. You can get help on these commands by typing &yHELP FEDIT <COMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+> .f edit 123
+> .name Tree Elves
+> .flag REP-FROM-KILLS
+> .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"FEDIT NAME"
+
+Usage:  .name <name>
+
+A faction's name should be capitalized and short, and should never be a
+complete sentence. A leading article like "A" or "The" is optional.
+
+Examples:
+> The Elves of West Treeville
+> The Goblins of Nachotriste
+> MacDdraig, the Whale Dragon
+
+See also: OLC FACTIONS
+#d
+"FEDIT DESCRIPTION"
+
+Usage:  .description
+
+Faction descriptions can be any length (up to 4000 characters), and should
+include basic information about the faction. If it isn't immediately obvious
+where to find your faction or how to gain/lose reputation with them, you
+should also include this information.
+
+Players only see faction descriptions if they use the 'faction' command.
+
+See also: FACTION, OLC FACTIONS, STRING EDITOR
+#d
+"FEDIT FLAGS" "FACTION FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The following faction flags are available:
+ IN-DEVELOPMENT - The faction can't be seen by players, and won't gain rep.
+ REP-FROM-KILLS - Players can gain/lose rep by killing faction mobs.
+
+See also: OLC FACTIONS, OLC REMOVEINDEV, RELATIONSHIP FLAGS
+#d
+"FEDIT MATCHRELATIONS" "FEDIT MAXRELATIONSHIPS" "FEDIT MATCH RELATIONS" "FEDIT MATCH RELATIONSHIPS"
+
+Usage:  .matchrelations
+
+This will synchronize relationships between this faction and other factions,
+and will add any relations that are missing. It will not, however, remove any
+relationships that are on this faction but don't exist on the other faction.
+
+Usually, the relation flags should be the same on both factions, and
+matchrelations makes this easier. However, there may also be reasons to have
+different relationship flags on each side.
+
+See also: FEDIT RELATION, OLC FACTIONS
+#d
+"FEDIT MAXREPUTATION" "FEDIT MAX REPUTATION" "FEDIT MINREPUTATION" "FEDIT MIN REPUTATION"
+
+Usage:  .maxreputation <reputation>
+        .minreputation <reputation>
+
+These settings determine the highest and lowest reputations a player can
+possibly have with this faction. Players can never move outside this range,
+no matter how much reputation they gain or lose. They will still gain/lose
+rep with related factions when at these limits.
+
+See also: OLC FACTIONS, OLC LEVELS, REPUTATIONS
+#d
+"FEDIT RELATION" "FEDIT RELATIONS" "FEDIT RELATIONSHIPS" "RELATIONSHIP FLAGS"
+
+Usage:  .relation <name/vnum> flags [which flags]
+        .relation <name/vnum> delete
+
+Factions can have relationships with other factions. This affects how players
+gain reputation with one faction, based on their reputation with another.
+
+These flags determine the kind of relationship:
+ SHARED-GAINS - Allies: If a player gains rep with that faction, they also gain
+   this one, and vice versa.
+ INVERSE-GAINS - Enemies: If a player gains rep with that faction, they lose
+   rep with this one, and vice versa.
+ MUTUALLY-EXCLUSIVE - If a player has a positive reputation with that faction,
+   they cannot gain rep with this faction at all.
+ UNLISTED - This relationship will not show to players on the faction info.
+
+Note: If a reputation gain/loss is from killing a mob, it will only affect
+  related factions with REP-FROM-KILLS flags, whether the original faction
+  had this flag or not.
+
+See also: FEDIT MATCH RELATIONS, OLC FACTIONS
+#d
+"FEDIT STARTINGREPUTATION" "FEDIT STARTING REPUTATION"
+
+Usage:  .startingreputation <reputation>
+
+This is the reputation level a player starts at when they first meet the
+faction. Usually players start at neutral, but there are reasons to start
+higher or lower. For example, perhaps you start out Despised by a faction
+and must work your way up into their good graces. Or, start out Revered by
+a faction but lose reputation over time.
+
+See also: OLC FACTIONS, OLC LEVELS, REPUTATIONS
+#d
 "GEDIT FLAGS"
 
 Usage:  .flags [add | remove] <flags>
@@ -1901,6 +2214,9 @@ Available flags:
  IN-DEVELOPMENT - Will not be used live.
  ADVENTURE-ONLY - This global table will only apply to the adventure it's in.
  CUMULATIVE-PRC - Percent check will be cumulative.
+ CHOOSE-LAST - The first choose-last global that passes the percent check will
+    be saved for later, and only used if no other global succeeds. This can
+    be used to create 100% "choose if nothing else passes" final cases.
 
 See also: GEDIT PERCENT, OLC GLOBALS
 #d
@@ -2094,9 +2410,9 @@ See also: BUILDING GUIDE, OLC GLOBALS
 #d
 IN-DEVELOPMENT "IN DEVELOPMENT" IN-DEV
 
-The IN-DEVELOPMENT flag prevents an augment, craft, or global from being
-available to players. Generally immortals can still use them (although they
-won't appear in craft lists).
+The IN-DEVELOPMENT flag prevents an augment, craft, global, or other type from
+being available to players. Generally immortals can still use them (although
+they won't appear in craft lists).
 
 You can quickly remove the IN-DEV flag using the .removeindev command. The OLC
 auditors will warn about items that still have IN-DEV flags.
@@ -2159,14 +2475,19 @@ map editor commands make instant changes to the map where you're standing.
 You can get help on any of the mapeditor commands with &yHELP MAPEDIT <COMMAND>&0.
 The following commands are available:
  complete - Finishes the building you're standing in.
+ decay - Performs 1 year of decay (building, trench, mine data) on the tile.
  decustomize - Removes custom icon, name, and description.
  deleteexit - Removes an exit (careful about cutting off building interiors).
  deleteroom - Deletes the room you're standing in (interior rooms only).
  description - Customize the description on an interior room.
  exit - Add a new exit between two interior rooms (similar to interlink).
  icon - Customize the map icon.
+ maintain - Repairs and maintains a building.
  name - Customize the room title.
+ naturalize - Returns this tile to its 'natural terrain'.
  passwalls - Able to move on the map unblocked by walls, interiors, etc.
+ populate - Forces a building/room to populate an npc, if possible.
+ remember - Stores the current terrain as the 'natural terrain'.
  roomtype - Change the type of an interior room.
  ruin - Turn a building to ruins.
  terrain - Change the tile you're standing on.
@@ -2295,6 +2616,21 @@ Important notes:
 
 See also: MAP OLC
 #d
+"MAPEDIT NATURALIZE"
+
+Usage:  .map naturalize [island | world]
+
+This command will restore the sector for the map tile you're in, the whole
+island you're on, or the entire world. The tiles return to the state they
+were in when the map was first generated.
+
+When used on an island/world, claimed tiles are ignored. So are tiles that are
+unclaimable or which have adventures.
+
+You can change a tile/island's natural state with: .map remember [island]
+
+See also: MAP OLC, MAPEDIT REMEMBER
+#d
 "MAPEDIT PASSWALLS"
 
 Usage:  .map passwalls
@@ -2305,6 +2641,21 @@ the interior (designated) rooms of a building; they will instead move to the
 next map tile in the direction that they were walking.
 
 See also: MAP OLC
+#d
+"MAPEDIT REMEMBER"
+
+Usage:  .map remember [island]
+
+This command will store the current sector of the map tile you're in (or the
+entire island you're on) as the "natural" sector. This can be used to change
+how a newbie island will be restored at the end of the year, for example.
+
+Building and adventure tiles are ignored during this command.
+
+The opposite command is .map naturalize, which restores a room/island/world
+to its original state.
+
+See also: MAP OLC, MAPEDIT NATURALIZE
 #d
 "MAPEDIT ROOMTYPE" "MAPEDIT ROOM TYPE"
 
@@ -2361,6 +2712,15 @@ always active on the mob, as if a spell had been cast on them.
 
 See also: AFFECT FLAGS, OLC MOBILES
 #d
+"MEDIT ALLEGIANCE"
+
+Usage:  .allegiance <none | vnum | name>
+
+This sets a mob to be a member of a faction. For some factions, this will cause
+reputation gain if a player kills the mob.
+
+See also: FACTION, OLC FACTIONS, OLC MOBILES
+#d
 "MEDIT ATTACK" "ATTACK TYPES"
 
 Usage:  .attack <type>
@@ -2403,6 +2763,29 @@ The following attack types are available:
 
 See also: OLC MOBILES
 #d
+"MEDIT CUSTOM"
+
+Usage:  .custom add <type> <message>
+        .custom change <number> <type | message> <value>
+        .custom remove <number | all>
+
+You can set custom messages on mobs, which are shown at different times
+depending upon the type of message.
+
+Some messages may use the tokens $n/$e/$s/$m for name/he/his/him for the mob.
+
+If you set more than one message of the same type, one will be chosen at
+random each time.
+
+Message types:
+ &cecho&0 - The message is shown to the room periodically (may use $ tokens).
+ &csay&0 - The message is said aloud by the mob periodically.
+
+Note: The 'echo' and 'say' types share the same random interval, and the mob
+will only do one or the other each time.
+
+See also: OLC MOBILES, DOLLAR SIGN CODES
+#d
 "MEDIT FLAGS"
 
 Usage:  .flags <type>
@@ -2431,7 +2814,7 @@ Available mob flags:
  CHAMPION - Will rescue its master in combat.
  EMPIRE - Will not be saved through reboots.
  FAMILIAR - Will not be saved through reboots; players may only have one familiar follower at a time.
- PICKPOCKETED - Has already been pickpocketed; cannot be pickpocketed again.
+ *PICKPOCKETED - Has already been pickpocketed; cannot be pickpocketed again.
  CITYGUARD - Will assist allies from the same empire. This will only work if it is spawned by the empire system.
  PURSUE - Will purse players who flee in combat.
  HUMAN - Counts as a human for various commands.
@@ -2445,6 +2828,10 @@ Available mob flags:
  !LOOT - Will not drop any loot.
  !TELEPORT - Cannot teleport to this mob.
  !EXP - Players get no experience from using abilities against this mob.
+ !RESCALE - Mob will not rescale after its initial scaling, e.g. if you set
+    specific attributes on it after it loaded. Note that it will still scale
+    the first time, so ensure that it is scaled before changing attributes.
+ SILENT - Mob will not display custom strings while this flag is on.
 
 See also: OLC MOBILES
 #d
@@ -2644,6 +3031,21 @@ Examples:
 
 See also: MEDIT LONG DESCRIPTION
 #d
+MINIPET MINI-PET "MINI PET" "PET WHISTLE"
+
+Mini-pets are a common cosmetic reward from adventure zones. They are summoned
+from a reusable item, and the player may get that item from a loot drop or a
+shop.
+
+To create a pet whistle (or other summoner item), attach script 9900 (Mini-pet
+Use) to an object and set its <value0> to the mini-pet mob's vnum.
+
+Mini-pet mobs should have the following traits:
+ - Flags: SENTINEL SPAWNED !LOOT (and ISNPC)
+ - Affects: !ATTACK
+ - Scripts: 9901 (Dismissable), 9902 (Lonely Despawn)
+ - Adorable custom messages (optional)
+#d
 MORPHEDIT "OLC MORPHS" "MORPH EDITOR"
 
 Usage:  .morph <command>
@@ -2724,6 +3126,7 @@ The following morph flags are available:
  !SLEEP - Cannot sleep in this form.
  GENDER-NEUTRAL - Shows as "it" instead of he/she/him/her.
  CONSUME-OBJ - Will use up the requiresobj to morph.
+ !FASTMORPH - This morph won't work with 'fastmorph'.
 
 See also: OLC MORPHS
 #d
@@ -2822,6 +3225,21 @@ Examples:
 
 See also: MORPHEDIT LONG DESCRIPTION, OLC MORPHS
 #d
+"MOUNT WHISTLE" WHISTLE "MOUNT REWARD"
+
+Mount whistles (or other similar items) are used to reward players with mounts
+using the loot drop table of an NPC. Players seem to prefer receiving their
+new mount as an item, because it's easier to get it out of the adventure if
+they can't mount it right away.
+
+If you load a mount directly into the room in an adventure, players will often
+kill it without realizing what it is. Another problem is that if the player
+leads a mount out of the adventure, the mount may despawn when the adventure
+despawns.
+
+To create a mount whistle, attach script 10263 (Mount whistle use) to an
+object, and set the object's <value0> field to the vnum of the mount.
+#d
 "OEDIT AFFECTS"
 
 Usage:  .affects [add | remove] <flags>
@@ -2842,7 +3260,8 @@ Applies are bonuses (or penalties) that an item gives to the player who is
 using it. The following applies are available.
 
 Apply types (optional) let you specify which applies come from enchantments or
-other sources (the default is "natural").
+other sources (the default is "natural"). The superior and *-drop apply types
+will only appear on the item if it has matching flags.
 
 Most applies are self-explanatory:
  STRENGTH - characters can't use an item that would reduce them below 1
@@ -2853,7 +3272,7 @@ Most applies are self-explanatory:
  MOVE-REGEN - rate of move regen (per 5 second tick)
  MANA-REGEN - rate of mana regen (per 5 second tick)
  INTELLIGENCE - characters can't use an item that would reduce them below 1
- WITS - combat speed
+ WITS - combat speed and damage
  AGE - this actually raises/lowers the player's age, which has no effect
  MAX-MOVE - move pool
  RESIST-PHYSICAL - physical damage reduction
@@ -2865,8 +3284,8 @@ Most applies are self-explanatory:
  DODGE - chance to dodge (%)
  INVENTORY - this adds to inventory capacity
  MAX-BLOOD - blood pool size
- BONUS-PHYSICAL - added to strength-based damage
- BONUS-MAGICAL - added to magical damage
+ BONUS-PHYSICAL - added to strength-based damage and weapon dps
+ BONUS-MAGICAL - added to magical damage and weapon dps
  BONUS-HEALING - added to damage healed (by abilities this player uses)
  RESIST-MAGICAL - magical damage reduction
  CRAFTING - bonus to craft level (unscaled)
@@ -2915,14 +3334,17 @@ This allows a wealth item to be automatically minted into coins by Workforce.
 
 See also: OLC OBJECTS
 #d
-"OEDIT BOOK"
+"OEDIT TEXT" "OEDIT BOOK"
 
-Usage:  .book <book id>
+Usage:  .text <book vnum>
 
 You can create book objects to place in your adventure zones. Like ordinary
 books, their name will be overridden by the name set in the book editor. You
 can see the book id of any book you've written by typing "bookedit list" (it's
-the number in the [brackets]).
+the number in the [brackets]), or via "vnum book".
+
+(This field was formerly called ".book" but was changed because it conflicts
+with the book editor.)
 
 See also: BOOKEDIT, OLC OBJECTS
 #d
@@ -2976,7 +3398,7 @@ to add modifiers to your component type.
 Available components (common flags listed in parentheses):
  &cadhesive&0 - not currently used
  &cbone&0 - not currently used
- &cblock&0 - builing materials like bricks or blocks
+ &cblock&0 - building materials like bricks or blocks
  &cclay&0 - moldable clay
  &cdye&0 - any kind of dye
  &cfeathers&0 - not currently used
@@ -3039,6 +3461,7 @@ Available flags:
  &ctropical&0 - Comes from tropical areas (especially foods)
  &ccommon&0 - Opposite of rare
  &caquatic&0 - Comes from the water
+ &cbasic&0 - A tier 1, minimum-level resource.
 
 See also: OEDIT COMPONENT
 #d
@@ -3064,6 +3487,18 @@ world. If you want an item to start out empty, set its contents to 0. If you
 want it to start out full, set it to the same amount as the capacity.
 
 See also: OEDIT CAPACITY, OLC OBJECTS
+#d
+"OEDIT CORPSEOF" "OEDIT CORPSE OF"
+
+Usage:  .corpseof <mob vnum>
+
+This allows you to set whose corpse an item is. You can leave real corpses in
+your adventure zone, by creating corpse items and setting this value to one
+of your mobs.
+
+All corpse items must be the corpse of something (for skin/butcher data).
+
+See also: VNUM
 #d
 "OEDIT CUSTOM" "CUSTOM MESSAGES"
 
@@ -3091,8 +3526,11 @@ Message types:
  &cwear-to-room&0 - Shown to the room when the person wears an item ($p for item).
  &cremove-to-char&0 - Shown to the person when they remove an item ($p for item).
  &cremove-to-room&0 - Shown to the room when the person removes an item ($p for item).
+ &clongdesc&0 - Object gives the player a custom long description when worn.
+ &clongdesc-female&0 - Same as longdesc but only for females.
+ &clongdesc-male&0 - Same as longdesc but only for males.
 
-See also: OLC OBJECTS
+See also: OLC OBJECTS, DOLLAR SIGN CODES
 #d
 "OEDIT DAMAGE"
 
@@ -3149,7 +3587,7 @@ Object flags allow additional properties to be set on objects, with various
 effects. Never set a flag marked with an * (asterisk).
 
 Available flags:
- * - do not set
+ UNIQUE - can only equip 1 at a time
  PLANTABLE - can be planted as a crop (see OEDIT PLANTS)
  LIGHT - lights up the room at night
  SUPERIOR - crafted by a master craftsman, adds the (superior) tag
@@ -3195,6 +3633,38 @@ Foods should also have a decay timer set. Traditionally, more-prepared foods
 take longer to decay, rather than basic it strictly on realism.
 
 See also: OEDIT DECAY, OLC OBJECTS
+#d
+"OEDIT FULLSEARCH"
+
+Usage:  .o fullsearch -<field> <argument> <...>
+
+This command allows you to search for objects matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the object's keywords and short/long/look descriptions.
+
+Fields:
+  &c-affects&0 - see HELP AFFECT FLAGS
+  &c-apply&0 - see HELP OEDIT APPLY
+  &c-cflagged&0, &cnotcflagged&0 - see HELP COMPONENT FLAGS
+  &c-component&0 - see HELP OEDIT COMPONENT
+  &c-custom&0 - has a specific type, see HELP OEDIT CUSTOM
+  &c-flagged&0, &cnotflagged&0 - see HELP OEDIT FLAGS
+  &c-interaction&0 - has a specific type, see HELP OEDIT INTERACTION
+  &c-level&0 - matches anything where this level is within the range
+     (note: will not account for objects whose levels are inherited from mobs
+     or adventures, see ADVEDIT CASCADE for help)
+  &c-material&0 - see OEDIT MATERIAL
+  &c-type&0 - see HELP OEDIT TYPE
+  &c-wear&0 - see HELP OEDIT WEAR
+
+Examples:
+ > .o fullsearch -type WEAPON -wear HOLD
+ > .o fullsearch -flagged LARGE -flagged TOOL-SHOVEL
+ > .o fullsearch -level 50 sword
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find all objects with the "Mini-pet Use"
+trigger, use ".t search 9900".
 #d
 "OEDIT KEYWORDS"
 
@@ -3244,6 +3714,8 @@ Available liquids are:
   red wine
   white wine
   grog
+  mead
+  stout
 
 See also: OLC OBJECTS
 #d
@@ -3291,6 +3763,14 @@ spends.
 Choose the material that best fits your object. If there isn't one that fits
 at all, contact the programmer to discuss adding a new one. But remember, the
 material doesn't need to be exact. It just needs to be close enough.
+
+Available mat
+  WOOD     ROCK      IRON
+  SILVER   GOLD      FLINT
+  CLAY     FLESH     GLASS
+  WAX      MAGIC     CLOTH
+  GEM      COPPER    BONE
+  HAIR
 
 See also: OLC OBJECTS
 #d
@@ -3508,7 +3988,7 @@ Available types:
  * - unused
  PORTAL - transports a player to another place (never set .wear TAKE)
  *BOARD - a message board
- *CORPSE - a corpse
+ CORPSE - a corpse
  COINS - a pile of coins
  *MAIL - a letter
  WEALTH - adds to empire wealth when stored
@@ -3530,23 +4010,21 @@ You can get specific help on each of these via HELP <type> ITEM
 
 See also: OEDIT WEAR, OLC OBJECTS
 #d
-"OEDIT VALUE1" "OEDIT VALUE2" "OEDIT VALUE3"
+"OEDIT VALUE0" "OEDIT VALUE1" "OEDIT VALUE2"
 
-Usage:  .value1 <number>
+Usage:  .value0 <number>
+        .value1 <number>
         .value2 <number>
-        .value3 <number>
 
-For item type OTHER, you can manually set the three object values. For all
-other item types, these values are used for things like damage, fullness,
-and capacity.
+For item type OTHER, you can manually set the three object values. They have
+no inherent meaning, but you can use them for scripting with variables like
+%obj.val0%. For regular item types, these values are used for things such as
+damage, fullness, and capacity.
 
-If you set your OTHER object with the PLANTABLE flag, value2 is replaced by
+If you set your OTHER object with the PLANTABLE flag, value1 is replaced by
 the 'plants' property. If you can't see the plants property in the editor,
-it means your value2 is invalid for planting and you should set your value2
+it means your value1 is invalid for planting and you should set your value1
 back to 0.
-
-Some special procedures may use the object values of an OTHER object; the
-significance of these values would depend on the special procedure.
 
 See also: OEDIT PLANTS, OLC OBJECTS
 #d
@@ -3612,9 +4090,18 @@ concurrently.
 
 Only items set TAKE can be picked up off the ground.
 
-Weapons can often by set WIELD and HOLD and used in both positions.
+Weapons can often be set WIELD and HOLD and used in both positions.
 
-Missile weapons and instruments must be set HOLD.
+Missile weapons must be set RANGED and instruments must be set HOLD.
+
+Wear flags:
+   TAKE        FINGER        NECK
+   CLOTHES     HEAD          LEGS
+   FEET        HANDS         ARMS
+   WRISTS      ABOUT         WAIST
+   EARS        WIELD         HOLD
+   RANGED      ARMOR         PACK
+   SADDLE
 
 See also: OLC OBJECTS
 #d
@@ -3718,7 +4205,7 @@ Available flags:
  - !MOBILE -- Cannot edit mobiles
  - !OBJECT -- Cannot edit objects
  - !BUILDING -- Cannot edit buildings
- - SECTORS -- CAN edit map sectors
+ - !SECTORS -- Cannot edit map sectors
  - !CROP -- Cannot edit crops
  - !TRIGGER -- Cannot edit triggers
  - !ADVENTURE -- Cannot edit adventures
@@ -3731,6 +4218,8 @@ Available flags:
  - SKILLS -- CAN edit skills
  - !VEHICLES -- Cannot edit vehicles
  - !MORPHS -- Cannot edit morphs
+ - !QUESTS -- Cannot edit quests
+ - !SOCIALS -- Cannot edit socials
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 #d
@@ -3858,6 +4347,13 @@ of the olc 'list' command.
 
 See also: OLC LIST, VNUM
 #d
+"OLC FULLSEARCH"
+
+Usage:  .<type> fullsearch <arguments>
+
+See the individual help files such as OEDIT FULLSEARCH. This command is only
+implemented for types that have such a help file.
+#d
 "OLC LIST" OLIST MLIST RLIST
 
 Usage:  .<type> list <from vnum> [to vnum] [-d]
@@ -3954,6 +4450,7 @@ The following types will have IN-DEVELOPMENT flags removed in the vnum range:
 - crafts
 - globals
 - skills
+- socials
 
 See also: OLC CONTROLS, OLC ADVENTURES, ADVEDIT FLAGS, CEDIT FLAGS
 #d
@@ -3974,10 +4471,11 @@ Specific syntaxes for adding:
   .resource add liquid <number of units> <liquid name>
   .resource add coins <amount>
   .resource add pool <number of points> <pool type>
+  .resource add action <amount> <type>
 
 Valid pools are: health, mana, move, blood.
 
-See also: COMPONENTS, COMPONENT FLAGS, OEDIT LIQUID
+See also: COMPONENTS, COMPONENT FLAGS, OEDIT LIQUID, RESOURCE ACTIONS
 See also: AUGEDIT RESOURCES, CEDIT RESOURCES, VEDIT RESOURCES
 #d
 "OLC ROOM TEMPLATES" "OLC ROOMTEMPLATES" "OLC ROOMS" REDIT
@@ -4030,7 +4528,7 @@ Examples:
  > .o search 1413
  > .t search 12
 #d
-"OLC SECTORS" SECTEDIT SECTOREDIT "SECTORS OLC" "SECTOR OLC" SECTEDIT
+"OLC SECTORS" SECTEDIT SECTOREDIT "SECTORS OLC" "SECTOR OLC"
 
 Usage:  .sect <command>
         .<command>
@@ -4080,7 +4578,7 @@ For notes on the mud's building rules, see HELP BUILDING GUIDE.
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 See also: TRIGEDIT-TYPES
 #d
-"OLC VEHICLES" VEDIT
+"OLC VEHICLES" VEDIT "VEHICLE EDITOR" "VEHICLE OLC"
 
 Usage:  .v <command>
         .<command>
@@ -4117,6 +4615,16 @@ with indent inside the string editor if it's longer than one line (80 chars).
 
 See also: OLC QUESTS, STRING EDITOR
 #d
+"QEDIT DAILYCYCLE" "QEDIT DAILY CYCLE" "DAILY CYCLE"
+
+Usage:  .dailycycle <number>
+
+When two or more daily quests have the same 'dailycycle' value, only one of
+those quests will be available per day, at random. For the sake of cleanliness,
+you should pick the vnum of 1 of those quests as the cycle id.
+
+See also: OLC QUESTS, SHOW DAILYCYCLE
+#d
 "QEDIT DESCRIPTION"
 
 Usage:  .description
@@ -4138,8 +4646,12 @@ The following quest flags are available:
  REPEAT-PER-INSTANCE - Clears completion when the instance closes.
  EXPIRES-AFTER-INSTANCE - Fails the quest when the instance closes.
  EXTRACT-TASK-OBJECTS - Items and components required for tasks will be lost.
+ DAILY - Quest counts as a daily.
+ EMPIRE-ONLY - Can only start/finish with mob/room of matching empire (or
+    matching not-in-empire).
+ NO-GUESTS - Checks actual ownership on the room when you start/finish a quest.
 
-See also: OLC QUESTS
+See also: OLC QUESTS, DAILY QUEST
 #d
 "QEDIT MAXLEVEL" "QEDIT MAX LEVEL"
 
@@ -4202,6 +4714,7 @@ Available reward types:
  SKILL-LEVELS - Raise the player's skill level, if possible.
  QUEST-CHAIN - Starts a player on another quest, if they meet the pre-reqs and
     are not already on it.
+ REPUTATION - Gain/lose faction reputation.
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.
@@ -4232,40 +4745,6 @@ this indicates that you will use the %quest% command to give or complete the
 quest in that trigger.
 
 See also: %QUEST%, OLC QUESTS
-#d
-"QEDIT TASKS" "QEDIT PREREQS" "QEDIT PREREQUISITES" "QEDIT PRE-REQS" "QEDIT PRE-REQUISITES"
-
-Usage:  .<prereqs/tasks> add <type> <vnum>
-        .<prereqs/tasks> change <number> vnum <value>
-        .<prereqs/tasks> copy <from type> <from vnum> [tasks/prereqs]
-        .<prereqs/tasks> remove <number | all>
-
-You can set certain requirements for a task to be obtained or completed. The
-prereqs are things required before the player can obtain the quest. The tasks
-are requirements to complete the quest and turn it in. All requirements must
-be met.
-
-Available tasks:
- COMPLETED-QUEST - Must complete a certain quest.
- GET-COMPONENT - Must have components.
- GET-OBJECT - Must have items.
- KILL-MOB &r*&0 - Must kill a certain mob.
- KILL-MOB-FLAGGED &r*&0 - Must kill mobs with certain flags.
- NOT-COMPLETED-QUEST - Has not completed a certain quest.
- NOT-ON-QUEST - Is not currently on a certain quest.
- OWN-BUILDING - Empire has a certain building.
- OWN-VEHICLE - Empire has a certain vehicle.
- SKILL-LEVEL-OVER - Player has a certain skill at least this high.
- SKILL-LEVEL-UNDER - Player has a certain skill no higher than this.
- TRIGGERED &r*&0 - Activated by a %quest% command in a trigger.
- VISIT-BUILDING &r*&0 - Player must go to a certain building/room.
- VISIT-ROOM-TEMPLATE &r*&0 - Player must go to a certain room template.
- VISIT-SECTOR &r*&0 - Player must go to a certain terrain.
- HAVE-ABILITY - Player must have a certain ability.
-
-&r*&0 Some types cannot be used as prereqs, only as tasks.
-
-See also: COMPONENT FLAGS, MEDIT FLAG, %QUEST%, OLC QUESTS
 #d
 "REDIT DESCRIPTION"
 
@@ -4318,8 +4797,6 @@ The following room template flags are available:
  !TELEPORT - Cannot teleport in or out.
  LOOK-OUT - can see the map using "look out"
  !LOCATION - no location shown; disables "where"
- PIGEON-POST - can send mail here
- COOKING-FIRE - can cook here
 
 See also: OLC ROOM TEMPLATES
 #d
@@ -4370,6 +4847,53 @@ This is different from the spawn data set on crops, sectors, and buildings.
 
 See also: OLC ROOM TEMPLATES, ADVEDIT RESET TIME, VNUM
 #d
+REQUIREMENTS "QEDIT TASKS" "QEDIT PREREQS" "QEDIT PREREQUISITES" "SOCEDIT REQUIREMENTS"
+
+Usage:  .<field> add <type> <vnum> [group]
+        .<field> change <number> <amount | group | vnum> <value>
+        .<field> copy <from type> <from vnum> [tasks/prereqs]
+        .<field> remove <number | all>
+
+Requirement lists are used to determine if a character is eligible for some-
+thing, or if they have completed it. Examples include quest prerequisites and
+tasks.
+
+A player only needs to meet 1 requirement from the list. However, you can
+create requirement groups where all conditions on a group must be met. If
+there is more than one group, the player only needs to meet all conditions from
+any 1 group. Group names are always a single case-sensitive letter.
+
+Available tasks:
+ &cCOMPLETED-QUEST&0 - Must complete a certain quest.
+ &cGET-COMPONENT&0 - Must have components.
+   Note: If you use multiple component flags, they must be in quotes:
+         .requirement add get-component 3 skin "large basic"
+         If you want to add a [group], you MUST provide flags even if empty:
+         .requirement add get-component 3 skin "" a
+ &cGET-OBJECT&0 - Must have items.
+ &cKILL-MOB &r*&0&0 - Must kill a certain mob.
+ &cKILL-MOB-FLAGGED &r*&0&0 - Must kill mobs with certain flags.
+ &cNOT-COMPLETED-QUEST&0 - Has not completed a certain quest.
+ &cNOT-ON-QUEST&0 - Is not currently on a certain quest.
+ &cOWN-BUILDING&0 - Empire has a certain building.
+ &cOWN-VEHICLE&0 - Empire has a certain vehicle.
+ &cSKILL-LEVEL-OVER&0 - Player has a certain skill at least this high.
+ &cSKILL-LEVEL-UNDER&0 - Player has a certain skill no higher than this.
+ &cTRIGGERED &r*&0&0 - Activated by a %quest% command in a trigger.
+ &cVISIT-BUILDING &r*&0&0 - Player must go to a certain building/room.
+ &cVISIT-ROOM-TEMPLATE &r*&0&0 - Player must go to a certain room template.
+ &cVISIT-SECTOR &r*&0&0 - Player must go to a certain terrain.
+ &cHAVE-ABILITY&0 - Player must have a certain ability.
+ &cREP-OVER&0 - Player must have at least this faction reputation.
+ &cREP-UNDER&0 - Player must be at or below this faction reputation.
+ &cWEARING&0 - Player has the item equipped
+ &cWEARING-OR-HAS&0 - Player has the item either equipped or in inventory
+    Note: item will not be extracted even if EXTRACT-TASK-OBJECTS is on
+
+&r*&0 Some types require a trackable quest, and cannot be used as prereqs.
+
+See also: COMPONENT FLAGS, MEDIT FLAG, %QUEST%
+#d
 "SECTEDIT BUILDFLAGS"
 
 Usage:  .buildflags [add | remove] <flags>
@@ -4383,7 +4907,7 @@ Available flags:
  water - any type of water tile
  plains - a flat, temperate sector like plains
  mountain - a rough tile like a mountain
- forest - a temperate forest of various types
+ full forest - a temperate forest of various types
  desert - a flat, arid sector
  river - a fresh-water sector
  jungle - any jungle tile
@@ -4395,6 +4919,10 @@ Available flags:
  swamp - a swamp-type tile
  any forest - a broader category of forests usually used for 'buildfacing'
  open building - does not apply to buildflags -- do not use
+
+Note: When adding these flags to adventure linking rules, they all have to
+be added in one line, so you can't type multiple words. Try abbreviating them
+to one word, such as: "plains full desert" (the full stands for 'full forest').
 
 See also: CEDIT BUILDON, CEDIT BUILDFACING, OLC SECTORS
 #d
@@ -4495,6 +5023,7 @@ See also: OLC SECTORS
 "SECTEDIT ICONS" "CROPEDIT ICONS"
 
 Usage:  .icons add <type> <color code> <icon>
+        .icons copy <from type> <from vnum>
         .icons change <number> <type | color | icon> <value>
         .icons remove <number | all>
 
@@ -4631,6 +5160,28 @@ Available flags:
 
 See also: OLC SKILLS, OLC REMOVEINDEV
 #d
+"SKILLEDIT MAXLEVEL" "SKILLEDIT MAX LEVEL"
+
+Usage:  .maxlevel <level>
+
+This is the maximum level the skill can go up to. Normally, it is set to 100.
+However, you can also limit skills to 50 or 75, to create "minor skill trees".
+
+You can choose numbers other than 50 or 75, but setting the maximum to 80
+would still require the player to specialize past 75.
+
+See also: OLC SKILLS
+#d
+"SKILLEDIT MINDROP" "SKILLEDIT MIN DROP" "SKILLEDIT MIN DROP LEVEL"
+
+Usage:  .mindrop <level>
+
+This is the lowest a player can voluntarily "skill drop" the skill to. For
+example, the Vampire skill has a min-drop of 1 because the player can't get
+rid of his vampire status this way.
+
+See also: OLC SKILLS
+#d
 "SKILLEDIT NAME"
 
 Usage:  .name <name>
@@ -4673,7 +5224,103 @@ The following special codes may be used in icons:
 
 The following special colors may be used in icons:
  &&? - The tile color of the base terrain.
- &&V - Wall color (walls are colored by enchantments).
+ &&# - Wall color (walls are colored by enchantments).
+#d
+SOCEDIT "OLC SOCIALS" "SOCIAL OLC" "SOCIAL EDITOR"
+
+Usage:  .soc <command>
+        .<command>
+
+The .olc social editor is a tool for creating and editing social commands
+(which are like pre-set emotes). It provides a simple in-game menu with
+contextual choices to design all types of socials.
+
+All commands in the editor are highlighted in yellow and placed inside <angle
+braces>. You can get help on these by typing &yHELP SOCEDIT <COMMMAND>&0.
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .soc edit 10199
+ > .name smile (with mask)
+ > .command smile
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"SOCEDIT COMMAND"
+
+Usage:  .command <word>
+
+This is the command which is typed to use the social. It must be one single
+word (usually a verb), as any additional words would be interpreted as a
+target.
+
+Social commands never override regular game commands.
+
+If more than one social has the same command, the one with the most matched
+requirements will be used. If a player qualifies for two copies of a social
+that have the same number of requirements, one is chosen at random.
+
+See also: OLC SOCIALS
+#d
+"SOCEDIT FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+Social flags are properties that affect how the social behaves.
+
+Available flags:
+ IN-DEV - Cannot be used by mortals.
+ HIDE-IF-INVIS - No messages are shown to the room if the actor is not visible.
+   (this is normally used for socials that are visual but silent, like 'smile')
+
+See also: OLC SOCIALS
+#d
+"SOCEDIT MESSAGES" "SOCEDIT N2CHARACTER" "SOCEDIT N2OTHERS" "SOCEDIT S2CHARACTER" "SOCEDIT S2OTHERS" "SOCEDIT T2CHARACTER" "SOCEDIT T2VICTIM" "SOCEDIT T2OTHERS" "SOCEDIT TNOTFOUND"
+
+Usage:  .n2char <message | none>
+        .<type> <message | none>
+
+These messages are the ones shown when the player uses the social. Some
+messages are optional and may be left blank.
+
+Messages when a social is typed without an argument ("grin"):
+  No-arg to character <&yn2char&0>
+  No-arg to others <&yn2other&0>  - leave blank if n2char is an error message
+    about needing a target
+
+Messages when a social is typed with an argument ("grin Gaia"):
+  Targeted to character <&yt2char&0>  - this whole section may be blank
+  Targeted to others <&yt2other&0>
+  Targeted to victim <&yt2vict&0>
+  Target not found <&ytnotfound&0>  - sent to the actor when target is invalid
+
+Messages when the actor targets himself ("grin self"):
+  Target-self to character <&ys2char&0>  - may be blank
+  Target-self to others <&ys2other&0>  - may be blank (s2char must be blank)
+
+See &cHELP DOLLAR SIGN CODES&0 for a list of codes that can be used in socials:
+  $n, $m, $e, $s - used for the actor
+  $N, $M, $E, $s - used for the target (targeted strings only)
+
+See also: OLC SOCIALS
+#d
+"SOCEDIT NAME"
+
+Usage:  .name <name>
+
+The social name is text used internally, to distinguish between different
+socials that share the same command. Players don't see the names of socials.
+
+Examples:
+ - Smile
+ - Smile with Mask
+ - Fangy Vampire Smile
+
+See also: OLC SOCIALS
 #d
 "STRING EDITOR" "TEXT EDITOR" "STRING EDITING" ,
 
@@ -4731,6 +5378,23 @@ well as check it to help make sure it will run safely.
 
 See also: MTRIG COMMANDS, OTRIG COMMANDS, RTRIG COMMANDS, VTRIG COMMANDS
 See also: SCRIPT COMMANDS, OLC TRIGGERS, TEXT EDITOR
+#d
+"TRIGEDIT FULLSEARCH"
+
+Usage:  .t fullsearch -<field> <argument> <...>
+
+This command allows you to search for triggers matching certain criteria. You
+can specify multiple fields if you want. Any leftover arguments are matched to
+the trigger's name and command text.
+
+Fields:
+  &c-attaches&0 - see HELP TRIGEDIT ATTACHES
+  &c-type&0 - see HELP MTRIG TYPES, etc.
+
+Examples:
+ > .t fullsearch -type Random -type Global
+ > .t fullsearch i11234
+ > .t fullsearch %force%
 #d
 "TRIGEDIT NAME"
 
@@ -4953,6 +5617,26 @@ If you do set your potion as scalable, you only need to set the potionscale to
 
 Potions can only be used once, and then are lost.
 #d
+"RESOURCE ACTIONS" "RESOURCE ACTION TYPES"
+
+Resource lists (like buildings and vehicles) can include "actions", which add
+flavor to construction and take time, but don't cost anything. These will only
+be visible for things that build over time (like buildings, maintenance,
+vehicles, and repair) -- not things that take resources instantly (like forge).
+
+Available resource actions are:
+  dig
+  clear terrain
+  tidy up
+  repair
+  scout area
+  block water
+  engrave
+  magic words
+  organize
+
+See also: BEDIT RESOURCE, CEDIT RESOURCES, VEDIT RESOURCE
+#d
 "SHIELD ITEM" "SHIELD OBJECT"
 
 The SHIELD item type always needs the HOLD wear location, and in most cases it
@@ -5061,6 +5745,7 @@ Available flags:
  SIEGE-WEAPONS - can fire on buildings and vehicles
  ON-FIRE - currently burning (via the "light" command)
  !LOAD-ONTO-VEHICLE - cannot be loaded onto another vehicle
+ VISIBLE-IN-DARK - can be seen at night without a light
 
 ** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
 the vehicle. If it has more than one of these, each command will work. Usually
@@ -5070,7 +5755,7 @@ commands.
 
 See also: OLC VEHICLES
 #d
-"VEDIT HITPOINTS"
+"VEDIT HITPOINTS" "VEDIT HEALTH"
 
 Usage:  .hitpoints <value>
 
@@ -5078,11 +5763,20 @@ This number is how much damage a vehicle can take from a catapult or other
 sources, before it is destroyed.
 
 Vehicles like catapults deal 8 damage per 100 levels, per shot. Siege rituals
-deal Intelligence + 1 damage.
+deal Intelligence + 1 damage. You can determine how many hitpoints to give a
+building based on this.
 
 Any damage over 10% of a vehicle's health will also add "1 year" of required
 maintenance to the vehicle (or nails, if the vehicle requires no yearly work).
 The repair command can be used to restore hitpoints.
+
+Common hitpoint levels:
+ furniture: 1 (if it requires no maintenance)
+ small cart: 5
+ large cart: 25
+ small ship: 32
+ medium ship: 96
+ large ship: 128
 
 See also: VEDIT YEARLY MAINTENANCE, FIRE, OLC VEHICLES, REPAIR, SIEGE RITUAL
 #d
@@ -5133,7 +5827,8 @@ This command updates the keywords on a vehicle. The keywords are a list of
 single words that can be used to target it. It should include any words from
 the short or long description that identify the vehicle.
 
-Usually the most significant keyword should be first.
+Usually the most significant keyword should be first. This keyword is retained
+when the vehicle is renamed by players.
 
 Example:
  name: a cart
@@ -5234,7 +5929,7 @@ even 1 year of decay will destroy them.
 
 See HELP OLC RESOURCES for more information.
 
-See also: VEDIT HITPOINTS, OLC VEHICLES, REPAIR
+See also: VEDIT HITPOINTS, OLC VEHICLES, REPAIR, RESOURCE ACTIONS
 #d
 "VEDIT SHORTDESCRIPTION" "VEDIT SHORT DESCRIPTION"
 

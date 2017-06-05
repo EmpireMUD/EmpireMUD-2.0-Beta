@@ -8,7 +8,7 @@ This looks like it could be used to grind bone!
 0 2 5
 1 0
 A
-20 1
+20 1 0
 S
 #10101
 stench foul hag's hags~
@@ -20,9 +20,9 @@ It just seems to be a lingering stench, but you're getting used to it.
 0 0 0
 10 0
 A
-18 1
+18 1 0
 A
-15 1
+15 1 0
 S
 #10102
 stench foul hag's hags~
@@ -34,9 +34,9 @@ It just seems to be a lingering stench, but you're getting used to it.
 0 0 0
 10 0
 A
-17 1
+17 1 0
 A
-9 1
+9 1 0
 S
 #10103
 stench foul hag's hags~
@@ -48,9 +48,9 @@ It just seems to be a lingering stench, but you're getting used to it.
 0 0 0
 10 0
 A
-16 1
+16 1 0
 A
-8 1
+8 1 0
 S
 #10104
 feathers fistful firebird glowing~
@@ -72,11 +72,11 @@ This sleek set of armor is designed to make the wearer stealthier.
 1 0 0
 7 0
 A
-4 1
+4 1 0
 A
-17 1
+17 1 0
 A
-2 2
+2 2 0
 S
 #10106
 aklys spiked~
@@ -88,7 +88,7 @@ This spiked club is attached to a string, allowing it to be used at short range.
 0 1 5
 0 0
 A
-18 2
+18 2 0
 S
 #10107
 rations dry pack~
@@ -110,7 +110,7 @@ This looks like it's meant to protect the neck from sharp weapons.
 2 0 0
 0 0
 A
-18 1
+18 1 0
 S
 #10109
 ring bloodletters bloodletter's red~
@@ -122,9 +122,9 @@ This ring has razors on the outside!
 -1 -1 -1
 13 0
 A
-1 1
+1 1 0
 A
-17 2
+17 2 0
 S
 #10110
 egg unusual~
@@ -147,9 +147,9 @@ It's a rather handsome bauble.
 -1 -1 -1
 4 0
 A
-4 2
+4 2 0
 A
-11 1
+11 1 0
 S
 #10112
 beads wooden~
@@ -161,9 +161,9 @@ It seems like a simple beaded necklace.
 -1 -1 -1
 0 0
 A
-17 1
+17 1 0
 A
-9 2
+9 2 0
 S
 #10113
 chain shifters shifter's strange~
@@ -175,20 +175,22 @@ The necklace seems to shift around as your eyes fail to follow it.
 -1 -1 -1
 13 0
 A
-15 1
+15 1 0
 A
-18 2
+18 2 0
 S
 #10114
 shiv talismanic glowing~
 a talismanic shiv~
 A glowing shiv is lying on the ground.~
+   This shiv is inscribed with arcane symbols like none you've ever seen
+before. Some powerful shadow sorcerer must have used it as a talisman.
 ~
-1 imo ano 3
+1 imo ano 4
 0 3 4
 0 0
 A
-2 1
+2 1 0
 S
 #10115
 spawner thieves~
@@ -222,22 +224,22 @@ For something sewn of spidersilk, it's surprisingly strong.
 0 0 0
 7 0
 A
-16 2
+16 2 0
 A
-7 1
+7 1 0
 S
 #10118
 wand makeshift~
 a makeshift wand~
 A makeshift wand was dropped here.~
    On closer inspection, this is actually a twig with a lightningstone taped to
-it. How quaint.  
+it. How quaint.
 ~
 1 mo an 2
 0 3 22
 0 0
 A
-2 1
+2 1 0
 S
 #10119
 star morning old~
@@ -249,7 +251,7 @@ It's a bit rusted at the edges, but that might just be dry blood.
 0 3 5
 2 0
 A
-2 1
+2 1 0
 S
 #10120
 pants roguish roguesh rogueish~
@@ -261,24 +263,24 @@ These pants would look handsome on you, you rogue.
 0 0 0
 7 0
 A
-17 2
+17 2 0
 A
-2 1
+2 1 0
 S
 #10121
 pants darkfiber~
 darkfiber pants~
 Some darkfiber pants have been left behind.~
    The pants are hard to see, although you could see yourself in them if you
-were tanking. Or clubbing.  
+were tanking. Or clubbing.
 ~
 2 mo af 2
 0 0 0
 7 0
 A
-18 2
+18 2 0
 A
-2 1
+2 1 0
 S
 #10122
 pants shadowcraft~
@@ -290,54 +292,54 @@ These pants might be crafted from pure shadow by a powerful mage.
 0 0 0
 7 0
 A
-23 2
+23 2 0
 A
-8 1
+8 1 0
 S
 #10123
 wristcuff cuff brawlers brawler's~
 a brawler's wristcuff~
 A brawler's wristcuff is sitting on the ground.~
    This looks like it's a former slave cuff, long broken. Wearing it makes you
-feel uplifted.  
+feel uplifted.
 ~
 2 mo aj 4
 0 0 0
 2 0
 A
-1 2
+1 2 0
 A
-19 1
+19 1 0
 S
 #10124
 wristcuff cuff freethinkers freethinker's~
 a freethinker's wristcuff~
 A freethinker's wristcuff is sitting on the ground.~
    This looks like it's a former slave cuff, long broken. Wearing it makes you
-feel uplifted.  
+feel uplifted.
 ~
 2 mo aj 5
 0 0 0
 2 0
 A
-8 2
+8 2 0
 A
-19 1
+19 1 0
 S
 #10125
 wristcuff cuff adulterers adulterer's~
 an adulterer's wristcuff~
 An adulterer's wristcuff is sitting on the ground.~
    This looks like it's a former slave cuff, long broken. Wearing it makes you
-feel uplifted.  
+feel uplifted.
 ~
 2 mo aj 6
 0 0 0
 2 0
 A
-4 2
+4 2 0
 A
-19 1
+19 1 0
 S
 #10126
 aura tenebrous~
@@ -349,6 +351,673 @@ The aura is dark, shadowy, and certainly mysterious.
 0 0 0
 10 0
 A
-5 1
+5 1 0
+S
+#10140
+rift monsoon~
+the rift~
+Monsoon rains blow through a strange rift in the world!~
+   Strong winds and huge droplets of rain come whipping out of the rift, making
+it hard to approach. It's difficult to see what's on the other side.
+~
+8 0 0 1
+-1 0 0
+10 0
+S
+#10141
+rift~
+the rift~
+There's a giant rift torn in the fabric of reality.~
+   The rift looks like a giant tear, hovering in the air before you. It seems
+to create a razor-thin portal between this hypercolor desert and the desert
+outside in what you consider the real world.
+~
+8 0 0 2
+-1 0 0
+10 0
+S
+#10142
+notes rift monsoon~
+notes on the monsoon rift~
+Some notes on the monsoon rift are lying here.~
+   You drew a crude sketch of the monsoon rift, and took notes on its shape and
+the mana that holds it open. Hopefully you can find the right spell to seal the
+rift, but you'll have to find a Tower of Sorcery to look for it.
+~
+3 0 a 2
+0 0 0
+0 0
+Q 10144
+T 10160
+S
+#10143
+totem monsoon~
+the monsoon totem~
+A monsoon totem has fallen on the ground.~
+   This small totem is carved from heavy ironwood, in the shape of a toad. The
+dark brown color of the wood seems to suck up all the light that touches it,
+like a storm cloud. To use the totem, find a desert location and type 'chant
+monsoon' to call on the storms.
+~
+3 0 a 3
+0 0 0
+0 0
+Q 10147
+T 10145
+S
+#10144
+stormcloud cloud monsoon~
+a stormcloud~
+A stormcloud hangs low in the sky, pouring monsoon rains over the desert.~
+   The monsoon cloud is tall and dark, but it doesn't block out the sun.
+Still, it seems to be dumping an entire lake over the thirsty desert. Below the
+cloud, every plant seems to have come to life, bulging to store enough water to
+survive the rest of the year.
+~
+3 0 0 6
+10800 0 0
+10 144
+T 10144
+T 10165
+T 10164
+S
+#10145
+fire mesquite fragrant~
+a mesquite fire~
+A fragrant mesquite fire is burning here!~
+The mesquite fire has a strong desert scent, perfect for cooking meat.
+~
+3 c 0 2
+0 0 0
+0 48
+S
+#10146
+basket fruits saguaro red bright~
+a basket of saguaro fruit~
+Bright red saguaro fruits are strewn around on the ground.~
+   These red fruits are spiny, and have already started to split open. A ripe
+fruit aroma wafts up from the basket, so they won't keep long before rotting.
+~
+6 b a 7
+24 10146 0
+7 168
+O
+9 bc
+R
+5114 0
+S
+#10147
+fruit spiny red~
+a spiny red fruit~
+A spiny red fruit is lying on the ground.~
+This strange, spiny fruit has a sweet, earthy flavor.
+~
+6 0 a 5
+6 0 0
+7 48
+O
+9 cn
+S
+#10148
+ribs pile saguaro~
+a pile of saguaro ribs~
+A pile of saguaro ribs is stacked here.~
+   These long, sturdy wooden ribs once held up a gigantic saguaro cactus. When
+dried, they are both strong and flexible, and well-suited to building.
+~
+3 e a 5
+0 0 0
+0 0
+I 11 1002 100.00 1  # LIGHT: a roaring fire
+M
+0
+You position some saguaro ribs and tie them in place.~
+M
+1
+$n positions some saguaro ribs and ties them in place.~
+M
+6
+You put some saguaro ribs in place and tie them down.~
+M
+7
+$n puts some saguaro ribs in place and ties them down.~
+O
+16 c
+R
+5118 0
+S
+#10149
+saguarocactus cactus saguaro fallen~
+a fallen saguaro cactus~
+A fallen saguaro cactus is lying here.~
+   This massive cactus has been chopped off at the base. Its fleshy exterior
+has already started to rot, but it looks like the inside is intact and you
+could saw out the ribs.
+~
+3 e a 6
+0 0 0
+0 0
+I 17 10148 100.00 1  # SAW: a pile of saguaro ribs
+R
+5118 0
+S
+#10150
+lumber mesquite~
+some mesquite lumber~
+Some mesquite lumber is stacked here.~
+The mesquite lumber is small, but plentiful.
+~
+3 e a 7
+0 0 0
+0 0
+I 11 10145 100.00 1  # LIGHT: a mesquite fire
+M
+0
+You hoist some mesquite lumber into position.~
+M
+1
+$n hoists some mesquite lumber into position.~
+M
+6
+You hoist some mesquite lumber onto $V.~
+M
+7
+$n hoists some mesquite lumber onto $V.~
+O
+16 c
+R
+5118 0
+S
+#10151
+tree mesquite scraggly~
+a mesquite tree~
+A scraggly mesquite tree is lying on the ground.~
+   This rough, twisted wood has long spines on its branches. The wood has a
+fresh desert scent, and would be good for cooking meat.
+~
+3 e a 8
+0 0 0
+0 0
+I 11 10145 100.00 1  # LIGHT: a mesquite fire
+I 17 10150 100.00 1  # SAW: some mesquite lumber
+I 17 121 20.00 1 s  # SAW: a stick
+I 17 121 20.00 2 s  # SAW: a stick
+I 17 121 20.00 3 s  # SAW: a stick
+I 17 121 20.00 4 s  # SAW: a stick
+I 17 121 20.00 5 s  # SAW: a stick
+R
+5118 0
+S
+#10152
+pods mesquite handful~
+a handful of mesquite pods~
+A handful of mesquite pods is scattered on the ground.~
+   The mesquite pods are long, and filled with rock-hard beans. The pods have a
+sweet taste, but aren't very filling.
+~
+3 b a 2
+0 10150 0
+0 0
+O
+23 0
+R
+5116 0
+S
+#10153
+basket pears alligator~
+a basket of alligator pears~
+A basket of alligator pears is sitting here.~
+   The alligator pears are the size and shape of ordinary pears, but with a
+dark, bumpy, rigid skin. The inside of the fruit is bright green, with a giant
+seed. They aren't sweet, but have a creamy texture.
+~
+6 b a 7
+24 10153 0
+7 168
+I 15 10154 100.00 4 x  # SEPARATE: a ripe alligator pear
+O
+27 bc
+R
+5619 0
+S
+#10154
+pear ripe alligator~
+a ripe alligator pear~
+An alligator pear is lying on the ground.~
+   The alligator pear has a bumpy, black skin. But the inside is bright green
+and creamy.
+~
+6 0 a 5
+6 0 0
+7 48
+I 14 10153 100.00 4 x  # COMBINE: a basket of alligator pears
+O
+27 cn
+S
+#10155
+limes basket~
+a basket of limes~
+Someone has dropped a basket of limes on the ground.~
+The limes are small, but bright green. You can eat limes, or plant them.
+~
+6 b a 7
+24 10155 0
+7 168
+I 15 10156 100.00 4 e  # SEPARATE: a single ripe lime
+M
+4
+You wince as you eat $p.~
+M
+5
+$n winces as $e eats $p.~
+O
+9 bc
+R
+5114 0
+S
+#10156
+lime single ripe~
+a single ripe lime~
+A single ripe lime has been forgotten.~
+This is just a single ripe lime that might provide a little substance.
+~
+6 0 a 5
+6 0 0
+7 48
+I 14 10155 100.00 4 e  # COMBINE: a basket of limes
+M
+4
+You wince as you eat $p.~
+M
+5
+$n winces as $e eats $p.~
+O
+9 c
+S
+#10157
+melon firemelon maroon~
+a maroon firemelon~
+A maroon firemelon is rolling around on the ground.~
+   This firemelon has a deep maroon hue, striped by brighter red. The melon is
+warm to the touch, and smells like cinnamon.
+~
+6 bem a 10
+24 10157 0
+7 336
+A
+21 1 0
+C
+100 100
+M
+4
+You eat the firemelon and feel a burning in your stomach.~
+O
+9 cfn
+R
+5114 0
+S
+#10158
+melon firemelon crimson~
+a crimson firemelon~
+A crimson firemelon is rolling around on the ground.~
+   This firemelon has a bright crimson hue, striped by darker red. The melon is
+warm to the touch, and smells like cinnamon.
+~
+6 bem a 11
+24 10157 0
+7 336
+A
+22 1 0
+C
+100 100
+M
+4
+You eat the firemelon and feel a burning in your stomach.~
+O
+9 cfn
+R
+5114 0
+S
+#10159
+branch cactus teddybear~
+a teddybear cactus branch~
+A teddybear cactus branch is growing here.~
+   This small branch is covered in sharp, barbed spines. You're not actually
+carrying it, it's just embedded in your pack. The spines are so dense that the
+entire cactus looks fluffy like a bear, and they're known to leave you with a
+bleed-over-time effect. Type 'use branch' to summon your teddybear cactus
+noncombat pet.
+~
+3 p a 4
+10159 0 0
+2 0
+T 9900
+S
+#10160
+totem armadillo giant~
+a giant armadillo totem~
+A giant armadillo totem was dropped here.~
+   This totem is made from dark, heavy ironwood and carved in the shape of a
+giant armadillo. The totem itself is quite small. Type 'use totem' to summon
+this mount.
+~
+3 ep a 8
+10160 0 0
+2 0
+T 10263
+S
+#10161
+totem bat~
+a bat totem~
+A bat totem is lying on the ground.~
+   This ironwood totem is carved in the shape of a bat. Strange glyphs are
+carved into the totem, apparently depicting the sun, moon, fangs, and blood.
+~
+3 0 a 3
+0 0 0
+0 0
+Q 10156
+T 10176
+S
+#10162
+totem sphinx moth giant~
+a giant sphinx moth totem~
+A giant sphinx moth totem was dropped here.~
+   This totem is carved from dark, heavy ironwood, although it's small enough
+to fit in your pocket. Type 'use totem' to summon this flying mount.
+~
+3 ep a 12
+10162 0 0
+2 0
+T 10263
+S
+#10163
+totem saguaro~
+a saguaro totem~
+A saguaro totem is lying on the ground.~
+   This small totem is carved from dark ironwood, in the shape of a giant
+saguaro cactus. The totem is roughly carved, almost leaving splinters in your
+hands as you touch it. In a dark enough place, you can see green sparks of mana
+falling from the totem's edges. You can type 'morph saguaro' to use the totem
+to become a cactus, in the desert only.
+~
+3 p a 2
+0 0 0
+0 0
+S
+#10164
+sack flour mesquite~
+a sack of mesquite flour~
+A sack of mesquite flour is sitting here.~
+   Mesquite flour is slightly sweet. It is made from the ground up bean pods of
+the mesquite tree, which grows in the driest deserts.
+~
+3 0 a 3
+0 0 0
+7 168
+O
+8 c
+R
+5109 0
+S
+#10165
+totem mule~
+a mule totem~
+A mule totem is lying on the ground.~
+   This totem is carved from dark, heavy ironwood, in the shape of a mule.
+Carved in tiny letters on the side are instructions for using this totem to
+build and animate a clockwork mule, which can be used for trekking your goods
+and materials over rough terrain.
+
+Craft (Exquisite Woodworking): clockwork mule
+~
+3 j a 3
+0 0 0
+0 0
+M
+6
+You read the inscription from $p and animate $V!~
+M
+7
+$n reads the inscription from $p and animates $V!~
+S
+#10166
+ring signet ironwood wood~
+an ironwood signet ring~
+An ironwood signet ring has been dropped here.~
+   This oversized ring is made from dark, rich ironwood. It's surprisingly
+heavy. The top of the ring is carved with a raptor clutching a snake in its
+talons.
+~
+2 ep ab 1
+0 0 0
+0 0
+A
+5 1 0
+C
+75 100
+S
+#10167
+ring spiny burdens~
+the spiny ring of burdens~
+A spiny ring is sticking up from the ground.~
+   This ring is made from the long, barbed spines of a cactus. The spines have
+been woven together such that they almost never poke you or get stuck in your
+skin.
+~
+2 mp ab 3
+0 0 0
+0 0
+A
+19 1 0
+C
+75 100
+S
+#10168
+winds monsoon~
+monsoon winds~
+Monsoon winds are blowing you around.~
+   The monsoon winds are strong, and threaten to knock you over at any second.
+As you look closer, you find they contain an ironwood totem. As a result, you
+can take the monsoon winds and use them to your own benefit.
+~
+2 mp ak 3
+0 0 0
+10 0
+A
+6 1 0
+C
+75 100
+M
+8
+You use the monsoon wind totem and feel yourself buffeted by powerful gusts of moist air!~
+M
+9
+$n uses a monsoon wind totem and strikes a heroic pose as the wind blows through $s hair!~
+S
+#10169
+giftbox box ironwood~
+an ironwood giftbox~
+An ironwood giftbox is sitting on the ground.~
+This giftbox contains a reward from the Magiterranean.
+~
+3 p a 2
+0 0 0
+0 0
+C
+75 100
+T 10169
+S
+#10170
+skeleton cactus piece~
+a cactus skeleton~
+A piece of cactus skeleton is lying on the ground.~
+   This veiny piece of wood is a cactus skeleton, the part that supported the
+cactus in life. Unlike most plants, dead cacti appear to have skeletons because
+their succulent, fleshy green skin is thick and often has a different shape
+than the underlying structure.
+~
+3 e a 2
+0 0 0
+0 0
+I 11 1002 100.00 1  # LIGHT: a roaring fire
+O
+25 c
+R
+5118 0
+S
+#10171
+cactus saguaro huge~
+a saguaro cactus~
+A huge saguaro cactus looms over you at the top of the hill.~
+   This cactus is easily over 30 feet tall, and swollen with water from the
+monsoon rains. Three massive arms make it almost look like a person -- no
+wonder local natives believe these cacti are their ancestors. At the top of the
+saguaro, you can see both white flowers and bright red fruits.
+~
+3 0 0 1
+0 0 0
+0 0
+S
+#10172
+spawner merchant wandering~
+the wandering merchant spawner~
+A wandering merchant spawner is here.~
+   This item spawns a wandering merchant if needed. This item does not despawn,
+preventing a second merchant from spawning. This is done because of how the
+merchant leaves the adventure.
+~
+3 0 0 2
+0 0 0
+0 0
+T 10172
+S
+#10173
+totem bat~
+a bat totem~
+A bat totem is lying on the ground.~
+   This ironwood totem is carved in the shape of a bat, and has taken on an
+eerie red glow since you infused it at the oasis. Glyphs depicting the sun,
+moon, fangs, and blood are carved into the totem, and stained red with blood.
+~
+3 j a 5
+0 0 0
+0 0
+Q 10157
+T 10177
+S
+#10174
+list supply herbicide~
+the herbicide supply list~
+An herbicide supply list is lying here.~
+   The supply list tells you that you will need bileberries, daggerbite, and
+glowing green seashells. Once you've brewed the herbicide at an alchemist, you
+need to let it age for several minutes before bringing it back to the merchant.
+You need 3 vials of herbicide in total. Use 'brew info herbicide' to see the
+exact requirements.
+~
+3 0 a 3
+0 0 0
+0 0
+Q 10153
+S
+#10175
+scroll rift ritual~
+the rift ritual scroll~
+A scroll with the rift ritual is lying here.~
+   This scroll has your notes from the Tower of Sorcery, concerning the sealing
+of a Magiterranean rift. You can cast the ritual using the command 'ritual
+rift'.
+~
+3 0 a 3
+0 0 0
+0 0
+Q 10145
+T 10180
+S
+#10176
+herbicide un-aged~
+some un-aged herbicide~
+Some un-aged herbicide has been left here.~
+   The herbicide mixture is pungent, but your supply list says the herbicide
+won't be ready until it turns a bright red. Hold onto the herbicide for a few
+minutes while it ages.
+~
+3 0 a 2
+0 0 0
+8 4
+Q 10153
+T 10179
+S
+#10177
+vial pungent red herbicide~
+a vial of pungent red herbicide~
+A vial of pungent red herbicide is lying here.~
+   It looks like the herbicide has aged nicely and turned the bright red shade
+described in the recipe. The smell is too noxious for you to stand, so the vial
+is securely corked.
+~
+3 0 a 2
+0 0 0
+8 0
+Q 10153
+S
+#10178
+laundry druid's druids dirty~
+the druid's dirty laundry~
+The druid's dirty laundry is lying here.~
+   Aha! You've found the head druid's dirty laundry, and this robe clearly
+belongs to the High Order of Sorcery -- city wizards! They're no allies of the
+druids, and if the head druid is actually an imperial sorcerer in disguise,
+this is valuable information indeed.
+~
+3 0 a 1
+0 0 0
+11 0
+Q 10150
+S
+#10190
+volcanoportal volcano portal~
+a volcano portal~
+A volcano portal is here.~
+~
+8 0 0 1
+-1 0 0
+1 0
+S
+#10192
+lava flow burning bright red air hot~
+the burning lava~
+The hot air waves above the bright red lava flow.~
+   The lava flow is fresh enough that it is still moving, although the top is
+starting to crust over. It burns you even to stand this close, and your skin is
+starting to blister.
+~
+3 c 0 6
+3600 0 0
+1 48
+C
+150 150
+T 10192
+T 10193
+T 10165
+T 10194
+S
+#10193
+lava cooling veins~
+the cooling lava~
+The veins of lava have begun to cool and harden.~
+   The lava flow has cooled enough that it is no longer moving, and is only
+warm to the touch. It looks like the whole mountain has taken on a fresh, black
+coat of volcanic rock.
+~
+3 0 0 4
+7200 0 0
+1 96
+C
+150 150
+T 10192
+T 10193
+T 10165
 S
 $

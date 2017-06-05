@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: archetypes.c                                    EmpireMUD 2.0b4 *
+*   File: archetypes.c                                    EmpireMUD 2.0b5 *
 *  Usage: DB and OLC for character creation archetype                     *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -45,6 +45,8 @@ void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
 
 // external consts
 extern const char *archetype_flags[];
+extern struct archetype_menu_type archetype_menu[];
+extern const char *archetype_types[];
 extern int attribute_display_order[NUM_ATTRIBUTES];
 extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
@@ -62,28 +64,36 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 * @param char_data *ch The person to give lore to.
 */
 void add_archetype_lore(char_data *ch) {
-	archetype_data *arch = archetype_proto(CREATION_ARCHETYPE(ch));
 	char temp[MAX_STRING_LENGTH];
+	archetype_data *arch;
 	char *str;
+	int iter;
 	
-	if (arch && GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) {
+	for (iter = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
+		if (!(arch = archetype_proto(CREATION_ARCHETYPE(ch, iter)))) {
+			continue;
+		}
+		if (!GET_ARCH_LORE(arch) || !*GET_ARCH_LORE(arch)) {
+			continue;
+		}
+		
 		strcpy(temp, GET_ARCH_LORE(arch));
 		
 		// he/she
 		if (strstr(temp, "$e")) {
-			str = str_replace("$e", HSSH(ch), temp);
+			str = str_replace("$e", REAL_HSSH(ch), temp);
 			strcpy(temp, str);
 			free(str);
 		}
 		// his/her
 		if (strstr(temp, "$s")) {
-			str = str_replace("$s", HSHR(ch), temp);
+			str = str_replace("$s", REAL_HSHR(ch), temp);
 			strcpy(temp, str);
 			free(str);
 		}
 		// him/her
 		if (strstr(temp, "$m")) {
-			str = str_replace("$m", HMHR(ch), temp);
+			str = str_replace("$m", REAL_HMHR(ch), temp);
 			strcpy(temp, str);
 			free(str);
 		}
@@ -92,6 +102,23 @@ void add_archetype_lore(char_data *ch) {
 		
 		add_lore(ch, LORE_CREATED, temp);
 	}
+}
+
+
+/**
+* @param int type Any ARCHT_ const.
+* @return bool TRUE if there's at least one live archetype of that type; otherwise FALSE.
+*/
+bool archetype_exists(int type) {
+	archetype_data *arch, *next_arch;
+	
+	HASH_ITER(hh, archetype_table, arch, next_arch) {
+		if (GET_ARCH_TYPE(arch) == type && !ARCHETYPE_FLAGGED(arch, ARCH_IN_DEVELOPMENT)) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;
 }
 
 
@@ -125,13 +152,14 @@ void check_archetypes(void) {
 /**
 * Look up an active archetype by name, preferring exact matches.
 *
+* @param int type Which ARCHT_ to search.
 * @param char *name The archetype name to look up.
 */
-archetype_data *find_archetype_by_name(char *name) {
+archetype_data *find_archetype_by_name(int type, char *name) {
 	archetype_data *arch, *next_arch, *partial = NULL;
 	
 	HASH_ITER(sorted_hh, sorted_archetypes, arch, next_arch) {
-		if (ARCHETYPE_FLAGGED(arch, ARCH_IN_DEVELOPMENT)) {
+		if (type != GET_ARCH_TYPE(arch) || ARCHETYPE_FLAGGED(arch, ARCH_IN_DEVELOPMENT)) {
 			continue;
 		}
 		
@@ -603,10 +631,10 @@ char *list_one_archetype(archetype_data *arch, bool detail) {
 		}
 		strcat(buf, ")");
 		
-		snprintf(output, sizeof(output), "[%5d] %s%s [%d/%d]", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch), GET_ARCH_SKILLS(arch) ? buf : "", atts, skills);
+		snprintf(output, sizeof(output), "[%5d] %s: %s%s [%d/%d]", GET_ARCH_VNUM(arch), archetype_types[GET_ARCH_TYPE(arch)], GET_ARCH_NAME(arch), GET_ARCH_SKILLS(arch) ? buf : "", atts, skills);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+		snprintf(output, sizeof(output), "[%5d] %s: %s", GET_ARCH_VNUM(arch), archetype_types[GET_ARCH_TYPE(arch)], GET_ARCH_NAME(arch));
 	}
 		
 	return output;
@@ -729,7 +757,7 @@ void clear_archetype(archetype_data *arch) {
 	
 	// default attributes to 1
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-		GET_ARCH_ATTRIBUTE(arch, iter) = 1;
+		GET_ARCH_ATTRIBUTE(arch, iter) = 0;
 	}
 }
 
@@ -924,13 +952,24 @@ void parse_archetype(FILE *fl, any_vnum vnum) {
 	GET_ARCH_MALE_RANK(arch) = fread_string(fl, error);
 	GET_ARCH_FEMALE_RANK(arch) = fread_string(fl, error);
 	
-	// line 6: flags
-	if (!get_line(fl, line) || sscanf(line, "%s", str_in) != 1) {
+	// line 6: type flags 
+	// NOTE: prior to b4.33 this line was only 'flags'
+	if (!get_line(fl, line)) {
+		log("SYSERR: Format error: missing line 5 of %s", error);
+		exit(1);
+	}
+	else if (sscanf(line, "%d %s", &int_in[0], str_in) == 2) {
+		GET_ARCH_TYPE(arch) = int_in[0];
+		GET_ARCH_FLAGS(arch) = asciiflag_conv(str_in);
+	}
+	else if (sscanf(line, "%s", str_in) == 1) {
+		GET_ARCH_TYPE(arch) = ARCHT_ORIGIN;
+		GET_ARCH_FLAGS(arch) = asciiflag_conv(str_in);
+	}
+	else {
 		log("SYSERR: Format error in line 5 of %s", error);
 		exit(1);
 	}
-	
-	GET_ARCH_FLAGS(arch) = asciiflag_conv(str_in);
 		
 	// optionals
 	for (;;) {
@@ -1050,11 +1089,11 @@ void write_archetype_to_file(FILE *fl, archetype_data *arch) {
 	fprintf(fl, "%s~\n", NULLSAFE(GET_ARCH_FEMALE_RANK(arch)));
 	
 	// 6. flags
-	fprintf(fl, "%s\n", bitv_to_alpha(GET_ARCH_FLAGS(arch)));
+	fprintf(fl, "%d %s\n", GET_ARCH_TYPE(arch), bitv_to_alpha(GET_ARCH_FLAGS(arch)));
 	
 	// 'A': attributes
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-		if (GET_ARCH_ATTRIBUTE(arch, iter) != 1) {
+		if (GET_ARCH_ATTRIBUTE(arch, iter) != 0) {
 			fprintf(fl, "A\n%d %d\n", iter, GET_ARCH_ATTRIBUTE(arch, iter));
 		}
 	}
@@ -1084,19 +1123,40 @@ void write_archetype_to_file(FILE *fl, archetype_data *arch) {
 void display_archetype_info(descriptor_data *desc, archetype_data *arch) {
 	struct archetype_skill *sk;
 	skill_data *skill;
+	bool show;
 	int iter;
 	
 	msg_to_desc(desc, "[\tc%s\t0] - %s\r\n", GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
 	
-	msg_to_desc(desc, "\tyAttributes\t0:\r\n");
+	// check for attributes to show
+	show = FALSE;
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
-		msg_to_desc(desc, " %s: %s%d\t0 (%s)\r\n", attributes[iter].name, HAPPY_COLOR(GET_ARCH_ATTRIBUTE(arch, iter), 2), GET_ARCH_ATTRIBUTE(arch, iter), attributes[iter].creation_description);
+		if (GET_ARCH_ATTRIBUTE(arch, iter) != 0) {
+			show = TRUE;
+			break;
+		}
+	}
+	if (show) {
+		msg_to_desc(desc, "\tyAttributes\t0:\r\n");
+		for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+			msg_to_desc(desc, " %s: %s%d\t0 (%s)\r\n", attributes[iter].name, HAPPY_COLOR(GET_ARCH_ATTRIBUTE(arch, iter), 2), GET_ARCH_ATTRIBUTE(arch, iter), attributes[iter].creation_description);
+		}
 	}
 	
-	msg_to_desc(desc, "\tySkills\t0:\r\n");
+	// check for skills to show
+	show = FALSE;
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
-		if ((skill = find_skill_by_vnum(sk->skill))) {
-			msg_to_desc(desc, " %s: \tg%d\t0 (%s)\r\n", SKILL_NAME(skill), sk->level, SKILL_DESC(skill));
+		if (sk->level != 0) {
+			show = TRUE;
+			break;
+		}
+	}
+	if (show) {
+		msg_to_desc(desc, "\tySkills\t0:\r\n");
+		for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
+			if ((skill = find_skill_by_vnum(sk->skill))) {
+				msg_to_desc(desc, " %s: \tg%d\t0 (%s)\r\n", SKILL_NAME(skill), sk->level, SKILL_DESC(skill));
+			}
 		}
 	}
 }
@@ -1106,9 +1166,10 @@ void display_archetype_info(descriptor_data *desc, archetype_data *arch) {
 * List archetypes, or search.
 *
 * @param descriptor_data *desc The user to send it to.
+* @param int type Which ARCH_ to display.
 * @param char *argument All, basic, or search string.
 */
-void display_archetype_list(descriptor_data *desc, char *argument) {
+void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[256];
 	archetype_data *arch, *next_arch;
 	bool basic = FALSE, all = FALSE;
@@ -1131,6 +1192,9 @@ void display_archetype_list(descriptor_data *desc, char *argument) {
 	*buf = '\0';
 	
 	HASH_ITER(sorted_hh, sorted_archetypes, arch, next_arch) {
+		if (GET_ARCH_TYPE(arch) != type) {
+			continue;
+		}
 		if (basic && !ARCHETYPE_FLAGGED(arch, ARCH_BASIC)) {
 			continue;
 		}
@@ -1167,13 +1231,15 @@ void display_archetype_list(descriptor_data *desc, char *argument) {
 * Prompt character for an archetype.
 *
 * @param descriptor_data *desc The user to send it to.
+* @param int type_pos A position in the archetype_menu[] array.
 */
-void display_archetype_menu(descriptor_data *desc) {
-	msg_to_desc(desc, "\ty[ HINT: These are only your starting traits; you can still learn any skill ]\t0\r\n");
-	msg_to_desc(desc, "Choose your background (type its name), 'info <name>' for more information,\r\n");
-	msg_to_desc(desc, "or type 'list' for more options:\r\n");
+void display_archetype_menu(descriptor_data *desc, int type_pos) {
+	msg_to_desc(desc, "\tcChoose your \%s\t0:\r\n%s", archetype_menu[type_pos].name, archetype_menu[type_pos].description);
+	msg_to_desc(desc, "[ HINT: These are only your starting traits; you can still learn any skill ]\r\n");
+	// msg_to_desc(desc, "Choose your %s (type its name), 'info <name>' for more information,\r\n", archetype_menu[type_pos].name);
+	// msg_to_desc(desc, "or type 'list' for more options:\r\n");
 	
-	display_archetype_list(desc, "basic");
+	display_archetype_list(desc, archetype_menu[type_pos].type, "basic");
 }
 
 
@@ -1188,7 +1254,22 @@ void parse_archetype_menu(descriptor_data *desc, char *argument) {
 
 	char arg1[MAX_INPUT_LENGTH], *arg2;
 	archetype_data *arch;
+	int pos;	// which submenu
 	
+	// setup/safety: which ARCHT_ we're on
+	pos = SUBMENU(desc);
+	if (pos > NUM_ARCHETYPE_TYPES || archetype_menu[pos].type == NOTHING) {
+		// done!
+		next_creation_step(desc);
+		return;
+	}
+	else if (!archetype_exists(archetype_menu[pos].type)) {
+		++SUBMENU(desc);
+		parse_archetype_menu(desc, "");
+		return;
+	}
+	
+	// prepare to parse
 	skip_spaces(&argument);
 	arg2 = any_one_arg(argument, arg1);
 	skip_spaces(&arg2);
@@ -1196,37 +1277,41 @@ void parse_archetype_menu(descriptor_data *desc, char *argument) {
 	msg_to_desc(desc, "\r\n");
 	
 	if (!*arg1) {
-		display_archetype_menu(desc);
+		display_archetype_menu(desc, pos);
 	}
 	else if (is_abbrev(arg1, "info")) {
 		if (!*arg2) {
 			msg_to_desc(desc, "Usage: info <archetype name>\r\n");
 		}
-		else if (!(arch = find_archetype_by_name(arg2))) {
-			msg_to_desc(desc, "Unknown archetype '%s'.\r\n", argument);
+		else if (!(arch = find_archetype_by_name(archetype_menu[pos].type, arg2))) {
+			msg_to_desc(desc, "Unknown %s '%s'.\r\n", archetype_menu[pos].name, argument);
 		}
 		else {
 			display_archetype_info(desc, arch);
 		}
 	}
 	else if (is_abbrev(arg1, "list")) {
-		display_archetype_list(desc, arg2);
+		display_archetype_list(desc, archetype_menu[pos].type, arg2);
 	}
 	else {	// picking one
-		if (!(arch = find_archetype_by_name(argument))) {
-			msg_to_desc(desc, "Unknown archetype '%s'. Try 'list' for more options.\r\n", argument);
+		if (!(arch = find_archetype_by_name(archetype_menu[pos].type, argument))) {
+			msg_to_desc(desc, "Unknown %s '%s'. Try 'list' for more options.\r\n", archetype_menu[pos].name, argument);
 		}
 		else {
 			// success!
-			CREATION_ARCHETYPE(desc->character) = GET_ARCH_VNUM(arch);
+			CREATION_ARCHETYPE(desc->character, archetype_menu[pos].type) = GET_ARCH_VNUM(arch);
 			SET_BIT(PLR_FLAGS(desc->character), PLR_NEEDS_NEWBIE_SETUP);
-			next_creation_step(desc);
+			
+			// on to the next archetype
+			++SUBMENU(desc);
+			parse_archetype_menu(desc, "");
+			return;
 		}
 	}
 	
 	// still here? add a prompt
 	if (STATE(desc) == CON_Q_ARCHETYPE) {
-		msg_to_desc(desc, "\r\nType \tcinfo\t0, \tclist\t0, or an archetype name > ");
+		msg_to_desc(desc, "\r\nType \tcinfo\t0, \tclist\t0, or %s %s name > ", AN(archetype_menu[pos].name), archetype_menu[pos].name);
 	}
 }
 
@@ -1428,10 +1513,11 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0, Ranks: [\ta%s\t0/\tp%s\t0]\r\n", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch), GET_ARCH_MALE_RANK(arch), GET_ARCH_FEMALE_RANK(arch));
+	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Type: \ty%s\t0, Name: \tc%s\t0\r\n", GET_ARCH_VNUM(arch), archetype_types[GET_ARCH_TYPE(arch)], GET_ARCH_NAME(arch));
+	size += snprintf(buf + size, sizeof(buf) - size, "Ranks: [\ta%s\t0/\tp%s\t0]\r\n", GET_ARCH_MALE_RANK(arch), GET_ARCH_FEMALE_RANK(arch));
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "Description: %s\r\n", GET_ARCH_DESC(arch));
-
+	
 	if (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Lore: \tc%s\t0 [on Month Day, Year.]\r\n", GET_ARCH_LORE(arch));
 	}
@@ -1514,6 +1600,7 @@ void olc_show_archetype(char_data *ch) {
 	*buf = '\0';
 	
 	sprintf(buf + strlen(buf), "[\tc%d\t0] \tc%s\t0\r\n", GET_OLC_VNUM(ch->desc), !archetype_proto(GET_ARCH_VNUM(arch)) ? "new archetype" : GET_ARCH_NAME(archetype_proto(GET_ARCH_VNUM(arch))));
+	sprintf(buf + strlen(buf), "<\tytype\t0> %s\r\n", archetype_types[GET_ARCH_TYPE(arch)]);
 	sprintf(buf + strlen(buf), "<\tyname\t0> %s\r\n", NULLSAFE(GET_ARCH_NAME(arch)));
 	sprintf(buf + strlen(buf), "<\tydescription\t0> %s\r\n", NULLSAFE(GET_ARCH_DESC(arch)));
 	sprintf(buf + strlen(buf), "<\tylore\t0> %s [on Month Day, Year.]\r\n", (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) ? GET_ARCH_LORE(arch) : "none");
@@ -1595,7 +1682,7 @@ OLC_MODULE(archedit_attribute) {
 	argument = any_one_arg(argument, att_arg);
 	argument = any_one_arg(argument, num_arg);
 	
-	if (!*att_arg || !*num_arg || !isdigit(*num_arg)) {
+	if (!*att_arg || !*num_arg || !is_number(num_arg)) {
 		msg_to_char(ch, "Usage: attribute <type> <number>\r\n");
 		msg_to_char(ch, "       attribute <copy> <archetype vnum>\r\n");
 	}
@@ -1615,8 +1702,8 @@ OLC_MODULE(archedit_attribute) {
 	else if ((att = get_attribute_by_name(att_arg)) == -1) {
 		msg_to_char(ch, "Unknown attribute '%s'.\r\n", att_arg);
 	}
-	else if ((num = atoi(num_arg)) < 0 || num > config_get_int("max_player_attribute")) {
-		msg_to_char(ch, "You must choose a number between 0 and %d.\r\n", config_get_int("max_player_attribute"));
+	else if ((num = atoi(num_arg)) < (-1 * config_get_int("max_player_attribute")) || num > config_get_int("max_player_attribute")) {
+		msg_to_char(ch, "You must choose a number between -%d and %d.\r\n", config_get_int("max_player_attribute"), config_get_int("max_player_attribute"));
 	}
 	else {
 		GET_ARCH_ATTRIBUTE(arch, att) = num;
@@ -1793,4 +1880,10 @@ OLC_MODULE(archedit_skill) {
 	else {
 		msg_to_char(ch, "Valid commands are: add, change, remove.\r\n");
 	}
+}
+
+
+OLC_MODULE(archedit_type) {
+	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
+	GET_ARCH_TYPE(arch) = olc_process_type(ch, argument, "type", "type", archetype_types, GET_ARCH_TYPE(arch));
 }

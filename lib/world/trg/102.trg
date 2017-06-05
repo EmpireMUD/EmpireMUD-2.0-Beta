@@ -223,6 +223,46 @@ if (!%found%)
   end
 end/f
 ~
+#10218
+Filks and Walts respawn~
+2 b 100
+~
+set filks_present 0
+set walts_present 0
+set fighting 0
+eval person %room.people%
+while %person%
+  if %person.vnum% == 10202
+    if %person.fighting%
+      set fighting 1
+    end
+    set filks_present 1
+  elseif %person.vnum% == 10203
+    if %person.fighting%
+      set fighting 1
+    end
+    set walts_present 1
+  end
+  eval person %person.next_in_room%
+done
+if %filks_present% && !%walts_present% && !%fighting%
+  * Respawn Walts
+  %load% mob 10203
+  eval new_mob %room.people%
+  if %new_mob.vnum% == 10203
+    %echo% %new_mob.name% respawns.
+    nop %new_mob.add_mob_flag(!LOOT)%
+  end
+elseif %walts_present% && !%filks_present% && !%fighting%
+  * Respawn Filks
+  %load% mob 10202
+  eval new_mob %room.people%
+  if %new_mob.vnum% == 10202
+    %echo% %new_mob.name% respawns.
+    nop %new_mob.add_mob_flag(!LOOT)%
+  end
+end
+~
 #10225
 Druid greeting~
 0 g 100
@@ -290,8 +330,8 @@ end
 Tumbleweed mount spawn~
 1 c 2
 use~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
   return 0
   halt
 end
@@ -301,11 +341,16 @@ if (%actor.position% != Standing)
 end
 %load% m 10227
 %echo% The enchanted tumbleweed comes to life!
+eval room_var %self.room%
+eval mob %room_var.people%
+if (%mob% && %mob.vnum% == 10227)
+  nop %mob.unlink_instance%
+end
 %purge% %self%
 ~
 #10233
 Gardener passive~
-0 b 15
+0 bw 15
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos%
@@ -341,18 +386,21 @@ if %actor.position% != Standing
   halt
 end
 if !(tokens /= %arg%)
-  %send% %actor% You can't combine that.
+  return 0
   halt
 end
-if !(%actor.has_item(10234)%)
+eval copper_token %actor.inventory(10234)%
+if !%copper_token
   %send% %actor% You require a copper grain token to combine.
   halt
-elseif !(%actor.has_item(10233)%)
+end
+eval wooden_token %actor.inventory(10233)%
+if !%wooden_token%
   %send% %actor% You require a wooden fruit token to combine.
   halt
 end
-nop %actor.add_resources(10233,-1)%
-nop %actor.add_resources(10234,-1)%
+%purge% %wooden_token%
+%purge% %copper_token%
 %send% %actor% You magically combine all three tokens into a gnarled wooden token!
 %echoaround% %actor% %actor.name% magically combines three strange tokens into a gnarled wooden token!
 %load% obj 10236 %actor% inv
@@ -402,6 +450,13 @@ wait 1 sec
 say Just watch out for the huge, primitive dragons that walk these parts. They aren't friendly.
 wait 3 sec
 say Oh, and watch out for Archsorcerer Malfernes. I think the chroniportation has done something to his brain!
+~
+#10251
+Block chop, give error~
+2 c 0
+chop~
+%send% %actor% A tangle of sharp vines too thick to pass stops you from getting close enough to the trees.
+return 1
 ~
 #10252
 King of the Dracosaurs grievous bite~
@@ -507,7 +562,7 @@ wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
 end
-mkill %actor%
+%aggro% %actor%
 ~
 #10262
 Primeval must-fight~
@@ -523,8 +578,8 @@ return 0
 Mount whistle use~
 1 c 2
 use~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
   return 0
   halt
 end
@@ -533,8 +588,13 @@ if (%actor.position% != Standing)
   halt
 end
 %load% m %self.val0%
-%send% %actor% You use %self.shortdesc% and a new mount appears!
-%echoaround% %actor% %actor.name% uses %self.shortdesc% and a new mount appears!
+eval room_var %self.room%
+eval mob %room_var.people%
+%send% %actor% You use %self.shortdesc% and %mob.name% appears!
+%echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
+if (%mob% && %mob.vnum% == %self.val0%)
+  nop %mob.unlink_instance%
+end
 %purge% %self%
 ~
 #10264
@@ -559,7 +619,7 @@ Primeval no-flee~
 0 c 0
 flee~
 %send% %actor% There's nowhere to flee!
-return 0
+return 1
 ~
 #10266
 Hint to 10252~
@@ -744,7 +804,7 @@ if (%self.fighting% || %self.disabled%)
   halt
 end
 %echo% %self.name% swipes %self.hisher% massive tail, and a tree goes flying!
-%load% obj 120
+%load% obj 120 room
 wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
@@ -754,7 +814,7 @@ wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
 end
-mkill %actor%
+%aggro% %actor%
 ~
 #10271
 Terrosaur greet/aggro~
@@ -785,7 +845,7 @@ wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
 end
-mkill %actor%
+%aggro% %actor%
 ~
 #10272
 Primeval salesman list~
@@ -855,7 +915,7 @@ nop %actor.charge_coins(1000)%
 ~
 #10274
 Primeval environment~
-2 b 5
+2 bw 5
 ~
 switch %random.4%
   case 1

@@ -1,0 +1,82 @@
+#10900
+Mountain Cave~
+A Dark Cave in the Mountainside~
+&y/()\~
+1000 0 bejR 0
+0 0 0 -1
+D
+   Though it's easy to miss at a distance, the entrance to this cave is truly
+massive. The cave is dark and you can't see any light coming from the inside,
+although the passage is large enough that you could sail a galleon through it.
+~
+S
+#10923
+Butcher Tent~
+The Butcher Tent~
+&r{BB}~
+48 1 bR 0
+0 0 0 -1
+C
+(functions as a stable with a cooking fire)~
+D
+   The tent is made from red dragon hides, but it could as easily be red from
+the blood of animals slaughtered here. There's a pen for fresh animals that's
+half in the tent, and half outside. The center of the tent has a roasting pit
+and a cooking fire.
+~
+F
+wG
+R
+3 1 5 0
+S
+#10924
+Dragon Cave~
+A Dragon Cave~
+/&r()&?\~
+128 1 R adeim
+10 4 0 -1
+A
+d
+D
+   Though it's easy to miss at a distance, the entrance to this cave is quite
+large. Someone has built a door just inside, and the landing is decorated like
+a front porch. It looks like someone has made this cave into a house. Colossal
+claw marks just beyond the porch suggest a dragon once called this cave home.
+~
+R
+2 1 5 0
+S
+#10925
+Dragonslayer Statue~
+A Dragonslayer Statue~
+&w~}{~~
+48 5 dh 0
+0 0 0 -1
+C
+dedicate~
+R
+1 1 5 0
+T 10925
+S
+#10926
+Dragon Library~
+A Dragonstone Library~
+&o[^^]~
+48 15 R 0
+0 0 0 -1
+C
+library, bookedit~
+D
+   This magnificent library is build from red-stained stones, and fabulously
+decorated with images of dragons and knights. Sturdy masonry shelves hold
+countless books and artifacts, but the centerpiece is a massive dragonquill pen
+posed as if writing in a stone book. The back room appears to be an alchemy
+laboratory.
+~
+F
+l
+R
+2 1 5 0
+T 10926
+S
+$

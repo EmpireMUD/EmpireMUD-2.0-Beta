@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: db.h                                            EmpireMUD 2.0b4 *
+*   File: db.h                                            EmpireMUD 2.0b5 *
 *  Usage: header file for database handling                               *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -34,7 +34,9 @@
 #define DB_BOOT_VEH  20
 #define DB_BOOT_MORPH  21
 #define DB_BOOT_QST  22
-#define NUM_DB_BOOT_TYPES  23	// total
+#define DB_BOOT_SOC  23
+#define DB_BOOT_FCT  24
+#define NUM_DB_BOOT_TYPES  25	// total
 
 
 // library sub-dirs
@@ -76,6 +78,7 @@
 #define CLASS_PREFIX  LIB_WORLD"class/"	// player classes
 #define CRAFT_PREFIX  LIB_WORLD"craft/"	// craft recipes
 #define CROP_PREFIX  LIB_WORLD"crop/"	// crop definitions
+#define FCT_PREFIX  LIB_WORLD"fct/"	// factions
 #define GLB_PREFIX  LIB_WORLD"glb/"	// global templates
 #define WLD_PREFIX  LIB_WORLD"wld/"	// room definitions
 #define MOB_PREFIX  LIB_WORLD"mob/"	// monster prototypes
@@ -86,6 +89,7 @@
 #define RMT_PREFIX  LIB_WORLD"rmt/"	// room templates
 #define SECTOR_PREFIX  LIB_WORLD"sect/"	// sect definitions
 #define SKILL_PREFIX  LIB_WORLD"skill/"	// player skills
+#define SOC_PREFIX  LIB_WORLD"soc/"	// socials
 #define TRG_PREFIX  LIB_WORLD"trg/"	// trigger files
 #define VEH_PREFIX  LIB_WORLD"veh/"	// vehicle files
 #define HLP_PREFIX  LIB_TEXT"help/"	// for HELP <keyword>
@@ -105,6 +109,7 @@
 #define CRAFT_SUFFIX  ".craft"	// craft file suffix
 #define CROP_SUFFIX  ".crop"	// crop file suffix
 #define EMPIRE_SUFFIX  ".empire"	// empire file suffix
+#define FCT_SUFFIX  ".fct"	// factions
 #define GLB_SUFFIX  ".glb"	// global suffix
 #define MOB_SUFFIX  ".mob"	// mob suffix for file saves
 #define MORPH_SUFFIX  ".morph"	// morph file suffix
@@ -113,6 +118,7 @@
 #define RMT_SUFFIX  ".rmt"	// room template suffix
 #define SECTOR_SUFFIX  ".sect"	// sector file suffix
 #define SKILL_SUFFIX  ".skill"	// player skills
+#define SOC_SUFFIX  ".soc"	// social file suffix
 #define TRG_SUFFIX  ".trg"	// trigger file suffix
 #define VEH_SUFFIX  ".veh"	// vehicle file suffix
 #define WLD_SUFFIX  ".wld"	// suffix for rooms
@@ -131,18 +137,17 @@
 
 // misc files (user-modifiable libs)
 #define CONFIG_FILE  LIB_MISC"game_configs"  // config.c system
+#define DATA_FILE  LIB_MISC"game_data"	// data.c system
 #define IDEA_FILE  LIB_MISC"ideas"	// for the 'idea'-command
 #define TYPO_FILE  LIB_MISC"typos"	//         'typo'
 #define BUG_FILE  LIB_MISC"bugs"	//         'bug'
 #define MESS_FILE  LIB_MISC"messages"	// damage messages
-#define SOCMESS_FILE  LIB_MISC"socials"	// messgs for social acts
 #define TIPS_OF_THE_DAY_FILE  LIB_MISC"tips"	// one-line tips shown on login
 #define XNAME_FILE  LIB_MISC"xnames"	// invalid name substrings
 
 // etc files (non-user-modifiable libs)
 #define BAN_FILE  LIB_ETC"badsites"	// for the siteban system
-#define TIME_FILE  LIB_ETC"time"	// for recording the big bang
-#define EXP_FILE  LIB_ETC"exp_cycle"	// for experience cycling
+#define DAILY_QUEST_FILE  LIB_ETC"daily_quests"	// which quests are on/off
 #define INSTANCE_FILE  LIB_ETC"instances"	// instanced adventures
 #define ISLAND_FILE  LIB_ETC"islands"	// island info
 #define TRADING_POST_FILE  LIB_ETC"trading_post"	// for global trade
@@ -166,10 +171,45 @@
 #define READ_SIZE 256
 
 
+// DATA_x: stored data system
+#define DATA_DAILY_CYCLE  0	// timestamp of last day-reset (bonus exp, etc)
+#define DATA_LAST_NEW_YEAR  1	// timestamp of last annual world update
+#define DATA_WORLD_START  2	// timestamp of when the mud first started up
+#define DATA_MAX_PLAYERS_TODAY  3	// players logged in today
+#define NUM_DATAS  4
+
+
+// DATYPE_x: types of stored data
+#define DATYPE_INT  0
+#define DATYPE_LONG  1
+#define DATYPE_DOUBLE  2
+
+
 // for DB_BOOT_ configs
 struct db_boot_info_type {
 	char *prefix;
 	char *suffix;
+};
+
+
+// for DATA_ configuration
+struct stored_data_type {
+	char *name;	// how it's stored in the file
+	int type;	// DATYPE_ const
+};
+
+
+// for storing data between reboots
+struct stored_data {
+	int key;	// DATA_ const
+	int keytype;	// DATYPE_ const
+	union {
+		int int_val;
+		long long_val;
+		double double_val;
+	} value;
+	
+	UT_hash_handle hh;
 };
 
 
@@ -256,6 +296,16 @@ extern crop_data *crop_table;
 void free_crop(crop_data *cp);
 extern crop_data *crop_proto(crop_vnum vnum);
 
+// data system getters
+extern double data_get_double(int key);
+extern int data_get_int(int key);
+extern long data_get_long(int key);
+
+// data system setters
+extern double data_set_double(int key, double value);
+extern int data_set_int(int key, int value);
+extern long data_set_long(int key, long value);
+
 // descriptors
 extern descriptor_data *descriptor_list;
 
@@ -267,7 +317,7 @@ extern struct empire_island *get_empire_island(empire_data *emp, int island_id);
 extern empire_data *get_or_create_empire(char_data *ch);
 void free_empire(empire_data *emp);
 void read_empire_members(empire_data *only_empire, bool read_techs);
-void read_empire_territory(empire_data *emp);
+void read_empire_territory(empire_data *emp, bool check_tech);
 extern empire_data *real_empire(empire_vnum vnum);
 void reread_empire_tech(empire_data *emp);
 void save_empire(empire_data *e);
@@ -275,6 +325,16 @@ void save_all_empires();
 
 // extra descs
 void free_extra_descs(struct extra_descr_data **list);
+
+// factions
+extern faction_data *faction_table;
+extern int MAX_REPUTATION;
+extern int MIN_REPUTATION;
+extern faction_data *sorted_factions;
+extern faction_data *find_faction(char *argument);
+extern faction_data *find_faction_by_name(char *name);
+extern faction_data *find_faction_by_vnum(any_vnum vnum);
+void free_faction(faction_data *fct);
 
 // globals
 extern struct global_data *globals_table;
@@ -285,7 +345,8 @@ extern struct global_data *global_proto(any_vnum vnum);
 extern struct island_info *island_table;
 extern struct island_info *get_island(int island_id, bool create_if_missing);
 extern struct island_info *get_island_by_coords(char *coords);
-extern struct island_info *get_island_by_name(char *name);
+extern struct island_info *get_island_by_name(char_data *ch, char *name);
+extern char *get_island_name_for(int island_id, char_data *for_ch);
 
 // mobiles/chars
 extern account_data *account_table;
@@ -301,6 +362,7 @@ void init_player(char_data *ch);
 extern char_data *read_mobile(mob_vnum nr, bool with_triggers);
 extern char_data *mob_proto(mob_vnum vnum);
 void clear_char(char_data *ch);
+void init_player_specials(char_data *ch);
 void reset_char(char_data *ch);
 void free_char(char_data *ch);
 void set_title(char_data *ch, char *title);
@@ -330,6 +392,7 @@ obj_data *read_object(obj_vnum nr, bool with_triggers);
 
 // players
 extern struct group_data *group_list;
+extern char_data *find_player_in_room_by_id(room_data *room, int id);
 extern char_data *is_at_menu(int id);
 extern char_data *is_playing(int id);
 
@@ -345,7 +408,11 @@ extern room_template *room_template_proto(rmt_vnum vnum);
 
 // sectors
 extern sector_data *sector_table;
+extern struct sector_index_type *sector_index;
+extern struct sector_index_type *find_sector_index(sector_vnum vnum);
 void free_sector(struct sector_data *st);
+void perform_change_base_sect(room_data *loc, struct map_data *map, sector_data *sect);
+void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect);
 extern sector_data *sector_proto(sector_vnum vnum);
 
 // skills
@@ -358,9 +425,16 @@ void free_skill(skill_data *skill);
 extern char *get_skill_abbrev_by_vnum(any_vnum vnum);
 extern char *get_skill_name_by_vnum(any_vnum vnum);
 
+// socials
+extern social_data *social_table;
+extern social_data *sorted_socials;
+extern social_data *social_proto(any_vnum vnum);
+void free_social(social_data *soc);
+
 // triggers
 extern trig_data *trigger_table;
 extern trig_data *trigger_list;
+extern trig_data *random_triggers;
 
 // vehicles
 extern vehicle_data *vehicle_list;

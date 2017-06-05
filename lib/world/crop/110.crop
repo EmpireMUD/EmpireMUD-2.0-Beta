@@ -1,0 +1,183 @@
+#11008
+zephyr cattails~
+A Patch of Zephyr Cattails~
+25 1 ac
+0 100 0 100
+D0
+@w&?i&t!@e~
+&g~
+D0
+@w&t!&?i@e~
+&g~
+I 6 11010 100.00 1  # FORAGE: a handful of purple seeds
+I 8 11009 20.00 2 H  # HARVEST: a bundle of zephyr cattails
+I 8 11009 20.00 3 H  # HARVEST: a bundle of zephyr cattails
+I 8 11009 20.00 4 H  # HARVEST: a bundle of zephyr cattails
+I 8 11009 20.00 5 H  # HARVEST: a bundle of zephyr cattails
+I 8 11009 20.00 6 H  # HARVEST: a bundle of zephyr cattails
+M
+9134 5.00 bdh
+M
+9037 5.00 dh
+M
+9038 5.00 dh
+M
+9036 5.00 dh
+M
+9120 15.00 adg
+M
+9039 5.00 dg
+M
+9035 5.00 dg
+M
+9033 5.00 dg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9153 10.00 d
+M
+9024 5.00 d
+M
+9023 10.00 d
+M
+9034 5.00 d
+M
+9133 10.00 ad
+M
+9116 5.00 ad
+M
+9022 20.00 ad
+M
+9032 10.00 bd
+M
+9031 10.00 bd
+M
+9030 10.00 bd
+M
+9029 10.00 bd
+M
+9025 5.00 bd
+M
+9011 10.00 bd
+M
+9021 10.00 bd
+M
+9020 5.00 bd
+M
+9154 5.00 bd
+M
+9152 5.00 bd
+M
+9009 10.00 bd
+M
+9012 10.00 bd
+M
+9010 10.00 bd
+M
+9004 10.00 bd
+M
+11008 100.00 d
+M
+11007 100.00 d
+S
+#11011
+eggplants~
+A Bed of Eggplants~
+28 1 c
+0 100 0 100
+D0
+w&vO&?ww~
+&g~
+D0
+ww&vO&?w~
+&g~
+I 6 11012 100.00 1  # FORAGE: a tiny eggplant
+I 8 11011 20.00 2 H  # HARVEST: an eggplant
+I 8 11011 20.00 3 H  # HARVEST: an eggplant
+I 8 11011 20.00 4 H  # HARVEST: an eggplant
+I 8 11011 20.00 5 H  # HARVEST: an eggplant
+I 8 11011 20.00 6 H  # HARVEST: an eggplant
+M
+9145 5.00 adh
+M
+9037 5.00 dh
+M
+9038 5.00 dh
+M
+9036 5.00 dh
+M
+9141 5.00 dg
+M
+9144 5.00 adg
+M
+9039 5.00 dg
+M
+9035 5.00 dg
+M
+9033 5.00 dg
+M
+250 0.10 ad
+M
+248 1.00 bd
+M
+247 0.10 d
+M
+246 0.30 ad
+M
+9153 10.00 d
+M
+9021 10.00 d
+M
+9024 5.00 d
+M
+9034 5.00 d
+M
+9011 10.00 d
+M
+9010 10.00 d
+M
+9154 5.00 bd
+M
+9152 5.00 bd
+M
+9009 10.00 d
+M
+9004 10.00 d
+M
+9012 10.00 d
+M
+9150 5.00 d
+M
+9149 5.00 d
+M
+9148 5.00 d
+M
+9023 5.00 d
+M
+9008 5.00 d
+M
+9133 5.00 ad
+M
+9116 5.00 ad
+M
+9022 5.00 ad
+M
+9032 5.00 bd
+M
+9031 5.00 bd
+M
+9030 5.00 bd
+M
+9029 5.00 bd
+M
+9025 5.00 bd
+M
+9020 5.00 bd
+S
+$

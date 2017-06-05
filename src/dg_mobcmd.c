@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_mobcmd.c                                     EmpireMUD 2.0b4 *
+*   File: dg_mobcmd.c                                     EmpireMUD 2.0b5 *
 *  Usage: Script-related commands for mobs                                *
 *                                                                         *
 *  DG Scripts code came with the attributions in the next two blocks      *
@@ -54,8 +54,10 @@
 #include "vnums.h"
 
 // external vars
+extern const char *alt_dirs[];
 extern const char *damage_types[];
 extern const char *dirs[];
+extern struct instance_data *quest_instance_global;
 
 // external funcs
 void die(char_data *ch, char_data *killer);
@@ -63,7 +65,8 @@ extern struct instance_data *get_instance_by_mob(char_data *mob);
 extern room_data *get_room(room_data *ref, char *name);
 extern vehicle_data *get_vehicle(char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
-extern struct instance_data *real_instance(any_vnum instance_id);
+extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
+extern room_data *obj_room(obj_data *obj);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
@@ -133,8 +136,98 @@ ACMD(do_madventurecomplete) {
 		return;
 	}
 	
-	if ((inst = get_instance_by_mob(ch))) {
+	if ((inst = quest_instance_global) || (inst = get_instance_by_mob(ch))) {
 		mark_instance_completed(inst);
+	}
+}
+
+
+// attempts to aggro the player, his party, or any PC present (in order)
+ACMD(do_maggro) {
+	char_data *iter, *next_iter, *victim = NULL;
+	char arg[MAX_INPUT_LENGTH];
+
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	
+	// argument is optional (preferred target)
+	one_argument(argument, arg);
+	if (*arg) {
+		if (*arg == UID_CHAR) {
+			if (!(victim = get_char(arg))) {
+				mob_log(ch, "maggro: victim (%s) not found", arg);
+				return;
+			}
+		}
+		else if (!(victim = get_char_room_vis(ch, arg))) {
+			mob_log(ch, "maggro: victim (%s) not found",arg);
+			return;
+		}
+	
+		if (victim == ch) {
+			mob_log(ch, "maggro: victim is self");
+			return;
+		}
+		if (IN_ROOM(victim) != IN_ROOM(ch)) {
+			mob_log(ch, "maggro: victim is in wrong room");
+			return;
+		}
+		if (!valid_dg_target(victim, DG_ALLOW_GODS)) {
+			mob_log(ch, "maggro: target is invalid");
+			return;
+		}
+	}
+	
+	// stand if needed
+	if (GET_POS(ch) < POS_FIGHTING) {
+		GET_POS(ch) = POS_STANDING;
+	}
+	
+	// attempt victim first
+	if (victim && can_fight(ch, victim)) {
+		hit(ch, victim, GET_EQ(ch, WEAR_WIELD), TRUE);
+		
+		// ensure hitting the right person (in this case only)
+		if (victim && !EXTRACTED(victim) && !IS_DEAD(victim) && FIGHTING(ch) && FIGHTING(ch) != victim) {
+			FIGHTING(ch) = victim;
+		}
+		return;
+	}
+	
+	// if we got here, we missed the victim -- look for his allies
+	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
+		if (iter == ch || is_fight_ally(ch, iter)) {
+			continue;
+		}
+		if (victim && !is_fight_ally(victim, iter)) {
+			continue;	// only looking for allies
+		}
+		if (IS_NPC(iter) && victim) {
+			continue;	// not hitting mobs here (unless they are allies)
+		}
+		if (!can_fight(ch, iter)) {
+			continue;
+		}
+		
+		// success!
+		hit(ch, iter, GET_EQ(ch, WEAR_WIELD), TRUE);
+		return;
+	}
+	
+	// okay, look for a broader target
+	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
+		if (iter == ch || is_fight_ally(ch, iter)) {
+			continue;
+		}
+		if (!can_fight(ch, iter)) {
+			continue;
+		}
+		
+		// success!
+		hit(ch, iter, GET_EQ(ch, WEAR_WIELD), TRUE);
+		return;
 	}
 }
 
@@ -220,7 +313,7 @@ ACMD(do_mkill) {
 	}
 
 	// start fight!
-	hit(ch, victim, GET_EQ(ch, WEAR_WIELD), FALSE);
+	hit(ch, victim, GET_EQ(ch, WEAR_WIELD), TRUE);
 	
 	// ensure hitting the right person
 	if (victim && !EXTRACTED(victim) && !IS_DEAD(victim) && FIGHTING(ch) && FIGHTING(ch) != victim) {
@@ -509,7 +602,10 @@ ACMD(do_mregionecho) {
 		
 		if (center) {			
 			for (desc = descriptor_list; desc; desc = desc->next) {
-				if (STATE(desc) != CON_PLAYING || !(targ = desc->character) || PLR_FLAGGED(targ, PLR_WRITING)) {
+				if (STATE(desc) != CON_PLAYING || !(targ = desc->character)) {
+					continue;
+				}
+				if (RMT_FLAGGED(IN_ROOM(targ), RMT_NO_LOCATION)) {
 					continue;
 				}
 				if (compute_distance(center, IN_ROOM(targ)) > radius) {
@@ -557,6 +653,7 @@ ACMD(do_mload) {
 	struct instance_data *inst = get_instance_by_mob(ch);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	int number = 0;
+	room_data *in_room;
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
 	vehicle_data *veh;
@@ -591,6 +688,9 @@ ACMD(do_mload) {
 		}
 		mob = read_mobile(number, TRUE);
 		MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
+		if (MOB_INSTANCE_ID(mob) != NOTHING) {
+			add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
+		}
 		char_to_room(mob, IN_ROOM(ch));
 		setup_generic_npc(mob, GET_LOYALTY(ch), NOTHING, NOTHING);
 		
@@ -602,12 +702,16 @@ ACMD(do_mload) {
 		}
 		
 		if (*target && isdigit(*target)) {
-			// scale to requested level
+			// scale to requested level and lock it there
 			scale_mob_to_level(mob, atoi(target));
+			SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);
 		}
 		else if (GET_CURRENT_SCALE_LEVEL(ch) > 0) {
 			// only scale mob if self is scaled
 			scale_mob_to_level(mob, GET_CURRENT_SCALE_LEVEL(ch));
+			if (MOB_FLAGGED(ch, MOB_NO_RESCALE)) {
+				SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);
+			}
 		}
 		
 		load_mtrigger(mob);
@@ -646,6 +750,22 @@ ACMD(do_mload) {
 		target = two_arguments(target, arg1, arg2); /* recycling ... */
 		skip_spaces(&target);
 		
+		// if they're picking a room, move arg2 down a slot to "target" level
+		in_room = NULL;
+		if (!str_cmp(arg1, "room")) {
+			in_room = IN_ROOM(ch);
+			target = arg2;
+		}
+		else if (*arg1 == UID_CHAR) {
+			if ((in_room = get_room(IN_ROOM(ch), arg1))) {
+				target = arg2;
+			}
+		}
+		else {	// not targeting a room
+			in_room = NULL;
+		}
+		
+		// scale based on remaining "target" arg
 		if (*target && isdigit(*target)) {
 			scale_item_to_level(object, atoi(target));
 		}
@@ -653,8 +773,14 @@ ACMD(do_mload) {
 			scale_item_to_level(object, GET_CURRENT_SCALE_LEVEL(ch));
 		}
 		
+		if (in_room) {	// load in the room
+			obj_to_room(object, in_room);
+			load_otrigger(object);
+			return;
+		}
+		
 		tch = (*arg1 == UID_CHAR) ? get_char(arg1) : get_char_room_vis(ch, arg1);
-		if (tch) {
+		if (tch) {	// load on char
 			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && can_wear_on_pos(object, pos)) {
 				equip_char(tch, object, pos);
 				load_otrigger(object);
@@ -664,8 +790,9 @@ ACMD(do_mload) {
 			load_otrigger(object);
 			return;
 		}
+		
 		cnt = (*arg1 == UID_CHAR) ? get_obj(arg1) : get_obj_vis(ch, arg1);
-		if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER) {
+		if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER) {	// load in container
 			obj_to_obj(object, cnt);
 			load_otrigger(object);
 			return;
@@ -775,7 +902,8 @@ ACMD(do_mpurge) {
 	if (ch->desc && (GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL))
 		return;
 
-	one_argument(argument, arg);
+	argument = one_argument(argument, arg);
+	skip_spaces(&argument);
 
 	if (!*arg) {
 		/* 'purge' */
@@ -796,8 +924,17 @@ ACMD(do_mpurge) {
 		return;
 	}
 	
+	// purge all mobs/objs in an instance
+	if (!str_cmp(arg, "instance")) {
+		struct instance_data *inst = real_instance(MOB_INSTANCE_ID(ch));
+		if (!inst) {
+			mob_log(ch, "mpurge: non-instance mob using purge instance");
+			return;
+		}
+		dg_purge_instance(ch, inst, argument);
+	}
 	// purge mob
-	if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg))) {
+	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg))) {
 		if (!IS_NPC(victim)) {
 			mob_log(ch, "mpurge: purging a PC");
 			return;
@@ -807,14 +944,24 @@ ACMD(do_mpurge) {
 			dg_owner_purged = 1;
 		}
 
+		if (*argument) {
+			act(argument, TRUE, victim, NULL, NULL, TO_ROOM);
+		}
 		extract_char(victim);
 	}
 	// purge vehicle
 	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_in_room_vis(ch, arg))) {
+		if (*argument) {
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+		}
 		extract_vehicle(veh);
 	}
 	// purge obj
 	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_vis(ch, arg))) {
+		if (*argument) {
+			room_data *room = obj_room(obj);
+			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, obj, NULL, TO_CHAR | TO_ROOM);
+		}
 		extract_obj(obj);
 	}
 	// bad arg
@@ -918,6 +1065,164 @@ ACMD(do_mat) {
 	if (IN_ROOM(ch) == location) {
 		char_from_room(ch);
 		char_to_room(ch, original);
+	}
+}
+
+
+ACMD(do_mbuild) {
+	void do_dg_build(room_data *target, char *argument);
+	
+	char loc_arg[MAX_INPUT_LENGTH], bld_arg[MAX_INPUT_LENGTH], *tmp;
+	room_data *target;
+	
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+
+	tmp = any_one_word(argument, loc_arg);
+	strcpy(bld_arg, tmp);
+	
+	// usage: %build% [location] <vnum [dir] | ruin | demolish>
+	if (!*loc_arg) {
+		mob_log(ch, "mbuild: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*bld_arg) {
+		// only arg is actually bld arg
+		strcpy(bld_arg, argument);
+		target = IN_ROOM(ch);
+	}
+	else {
+		// two arguments
+		target = find_target_room(ch, loc_arg);
+	}
+	
+	if (!target) {
+		mob_log(ch, "mbuild: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't build -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+
+	// good to go
+	do_dg_build(target, bld_arg);
+}
+
+
+ACMD(do_mrestore) {
+	extern const bool aff_is_bad[];
+	extern const double apply_values[];
+	
+	struct affected_type *aff, *next_aff;
+	char arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh = NULL;
+	char_data *victim = NULL;
+	obj_data *obj = NULL;
+	room_data *room = NULL;
+	bitvector_t bitv;
+	bool done_aff;
+	int pos;
+	
+	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED) || (ch->desc && (GET_ACCESS_LEVEL(ch->desc->original) < LVL_CIMPL))) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	
+	one_argument(argument, arg);
+	
+	// find a target
+	if (!*arg) {
+		victim = ch;
+	}
+	else if (!str_cmp(arg, "room") || !str_cmp(arg, "building")) {
+		room = IN_ROOM(ch);
+	}
+	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg))) {
+		// found victim
+	}
+	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_in_room_vis(ch, arg))) {
+		// found vehicle
+		if (!VEH_IS_COMPLETE(veh)) {
+			mob_log(ch, "mrestore: used on unfinished vehicle");
+			return;
+		}
+	}
+	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_vis(ch, arg))) {
+		// found obj
+	}
+	else if ((room = find_target_room(ch, arg))) {
+		// found room
+	}
+	else {
+		// bad arg
+		mob_log(ch, "mrestore: bad argument");
+		return;
+	}
+	
+	if (room) {
+		room = HOME_ROOM(room);
+		if (!IS_COMPLETE(room)) {
+			mob_log(ch, "mrestore: used on unfinished building");
+			return;
+		}
+	}
+	
+	// perform the restoration
+	if (victim) {
+		while (victim->over_time_effects) {
+			dot_remove(victim, victim->over_time_effects);
+		}
+		LL_FOREACH_SAFE(victim->affected, aff, next_aff) {
+			// can't cleanse penalties (things cast by self)
+			if (aff->cast_by == CAST_BY_ID(victim)) {
+				continue;
+			}
+			
+			done_aff = FALSE;
+			if (aff->location != APPLY_NONE && (apply_values[(int) aff->location] == 0.0 || aff->modifier < 0)) {
+				affect_remove(victim, aff);
+				done_aff = TRUE;
+			}
+			if (!done_aff && (bitv = aff->bitvector) != NOBITS) {
+				// check each bit
+				for (pos = 0; bitv && !done_aff; ++pos, bitv >>= 1) {
+					if (IS_SET(bitv, BIT(0)) && aff_is_bad[pos]) {
+						affect_remove(victim, aff);
+						done_aff = TRUE;
+					}
+				}
+			}
+		}
+		if (GET_POS(victim) < POS_SLEEPING) {
+			GET_POS(victim) = POS_STANDING;
+		}
+		GET_HEALTH(victim) = GET_MAX_HEALTH(victim);
+		GET_MOVE(victim) = GET_MAX_MOVE(victim);
+		GET_MANA(victim) = GET_MAX_MANA(victim);
+		GET_BLOOD(victim) = GET_MAX_BLOOD(victim);
+	}
+	if (obj) {
+		// not sure what to do for objs
+	}
+	if (veh) {
+		free_resource_list(VEH_NEEDS_RESOURCES(veh));
+		VEH_NEEDS_RESOURCES(veh) = NULL;
+		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
+		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+	}
+	if (room) {
+		if (COMPLEX_DATA(room)) {
+			free_resource_list(GET_BUILDING_RESOURCES(room));
+			GET_BUILDING_RESOURCES(room) = NULL;
+			COMPLEX_DATA(room)->damage = 0;
+			COMPLEX_DATA(room)->burning = 0;
+		}
 	}
 }
 
@@ -1461,7 +1766,7 @@ ACMD(do_mremember) {
 	}
 
 	/* fill in the structure */
-	mem->id = GET_ID(victim);
+	mem->id = char_script_id(victim);
 	if (argument && *argument) {
 		mem->cmd = strdup(argument);
 	}
@@ -1506,7 +1811,7 @@ ACMD(do_mforget) {
 	mem = SCRIPT_MEM(ch);
 	prev = NULL;
 	while (mem) {
-		if (mem->id == GET_ID(victim)) {
+		if (mem->id == char_script_id(victim)) {
 			if (mem->cmd)
 				free(mem->cmd);
 			if (prev==NULL) {
@@ -1634,6 +1939,9 @@ ACMD(do_mtransform) {
 		}
 		
 		MOB_INSTANCE_ID(m) = MOB_INSTANCE_ID(ch);
+		if (MOB_INSTANCE_ID(m) != NOTHING) {
+			add_instance_mob(real_instance(MOB_INSTANCE_ID(m)), GET_MOB_VNUM(m));
+		}
 		
 		setup_generic_npc(m, GET_LOYALTY(ch), MOB_DYNAMIC_NAME(ch), MOB_DYNAMIC_SEX(ch));
 
@@ -1650,7 +1958,7 @@ ACMD(do_mtransform) {
 		char_to_room(m, IN_ROOM(ch));
 
 		memcpy(&tmpmob, m, sizeof(*m));
-		tmpmob.id = ch->id;
+		tmpmob.script_id = ch->script_id;
 		tmpmob.affected = ch->affected;
 		tmpmob.carrying = ch->carrying;
 		tmpmob.proto_script = ch->proto_script;
@@ -1726,7 +2034,7 @@ ACMD(do_mdoor) {
 		return;
 	}
 
-	if ((dir = search_block(direction, dirs, FALSE)) == NO_DIR) {
+	if ((dir = search_block(direction, dirs, FALSE)) == NO_DIR && (dir = search_block(direction, alt_dirs, FALSE)) == NO_DIR) {
 		mob_log(ch, "mdoor: invalid direction");
 		return;
 	}
@@ -1968,19 +2276,18 @@ ACMD(do_mown) {
 	}
 	else {	// attempt to find a target
 		strcpy(targ_arg, type_arg);	// there was no type
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);
 		
 		if (!*targ_arg) {
 			mob_log(ch, "mown: Too few arguments");
 			return;
 		}
-		else if (*targ_arg == UID_CHAR && !(vict = get_char(targ_arg)) && !(vtarg = get_vehicle(targ_arg)) && !(otarg = get_obj(targ_arg)) && !(rtarg = get_room(IN_ROOM(ch), targ_arg))) {
-			mob_log(ch, "mown: Unable to find target %s", targ_arg);
-			return;
+		else if (*targ_arg == UID_CHAR && ((vict = get_char(targ_arg)) || (vtarg = get_vehicle(targ_arg)) || (otarg = get_obj(targ_arg)) || (rtarg = get_room(IN_ROOM(ch), targ_arg)))) {
+			// found by uid
 		}
 		else if ((vict = get_char_room_vis(ch, targ_arg)) || (vtarg = get_vehicle_in_room_vis(ch, targ_arg)) || (otarg = get_obj_in_list_vis(ch, targ_arg, ch->carrying)) || (otarg = get_obj_in_list_vis(ch, targ_arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
-			// must have been found
-			skip_spaces(&argument);
-			strcpy(emp_arg, argument);
+			// found by name
 		}
 		else {
 			mob_log(ch, "mown: Invalid target");
@@ -2068,14 +2375,23 @@ ACMD(do_mscale) {
 		return;
 	}
 	
+	// scale adventure
+	if (!str_cmp(arg, "instance")) {
+		void scale_instance_to_level(struct instance_data *inst, int level);
+		struct instance_data *inst;
+		if (MOB_INSTANCE_ID(ch) != NOTHING && (inst = get_instance_by_mob(ch))) {
+			scale_instance_to_level(inst, level);
+		}
+	}
 	// scale char
-	if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg))) {
+	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg))) {
 		if (!IS_NPC(victim)) {
 			mob_log(ch, "mscale: unable to scale a PC");
 			return;
 		}
 
 		scale_mob_to_level(victim, level);
+		SET_BIT(MOB_FLAGS(victim), MOB_NO_RESCALE);
 	}
 	// scale evhicle
 	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_in_room_vis(ch, arg))) {

@@ -2,14 +2,30 @@
 A Precarious Ledge~
    You descend into the fissure, following a rock ledge along one wall. You are
 immediately struck by the furnace-like heat rising from the magma below, and
-your ears are constantly assaulted by a deafening roar. The ledge beneath your
-feet slopes gently downward before turning off into a cavern in the rock wall.
+your ears are constantly assaulted by a deafening roar. If you drop anything
+here, it will probably be lost forever. Light shines from an opening in the
+wall at the other end of the ledge.  
+   A stone plate lying nearby has words carved into it.
 ~
 c 0
 D14
 ~
 0 18076
+E
+plate stone~
+   The following words have been burned into the volcanic rock by some great,
+concentrated heat: "Return the relics of the fiend to the earth and receive
+their power for yourself."
+~
+E
+fissure magma down~
+   The almost unnatural heat radiating up from the magma at the bottom of the
+fissure looks like it could destroy anything but magic itself.
+~
 T 18075
+T 18082
+T 18084
+T 18085
 S
 #18076
 The Fiend's Lair~

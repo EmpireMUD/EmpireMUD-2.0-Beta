@@ -1,0 +1,298 @@
+#600
+seed crystal strange~
+a strange crystal seed~
+A strange crystal seed is lying on the ground.~
+   This unusual seed is encased in a shell of clear crystal, and it glimmers as
+it catches the light. Legend says that if a sorcerer were to enchant a seed
+like this with a prismatic crystal, it would grow into an entire enchanted
+forest. To enchant the seed, use 'enchant seed'. This requires Enchant Tools.
+~
+3 0 a 4
+0 0 0
+12 0
+R
+5164 0
+R
+5511 0
+T 600
+S
+#601
+seed prismatic~
+a prismatic seed~
+A prismatic seed is sparkling in the light.~
+   This enchanted seed sparkles with every color of the rainbow. As you stare
+into it, you can see the beautiful enchanted forest it will grow into. Now that
+the seed has been infused with magic, you need only plant it and use the chant
+of nature to bring it to life. Be sure to claim the tile you plant it on, as
+powerful necrovandals seek out unclaimed enchanted forests.
+~
+3 j a 5
+0 0 0
+12 0
+T 601
+S
+#602
+crystal prismatic~
+a prismatic crystal~
+A prismatic crystal sparkles on the ground.~
+   This small gem shimmers with every color of the rainbow, casting fanciful
+shadows all around. Magical gems like this one are used in many skilled crafts.
+~
+3 l a 2
+0 0 0
+12 0
+O
+11 gm
+R
+5164 0
+R
+5511 0
+S
+#603
+tree enchanted~
+an enchanted tree~
+An enchanted tree is lying here, leaking mana from its stump.~
+   This bright pink tree must have come from an enchanted forest. Lumber from
+these trees is used in certain advanced crafts, to bring magical properties to
+highly skilled artifacts.
+~
+3 e a 8
+0 0 0
+0 0
+I 11 617 100.00 1  # LIGHT: a magical fire
+I 17 604 100.00 2  # SAW: some stellar magewood
+R
+5118 0
+S
+#604
+magewood wood stellar pile~
+some stellar magewood~
+A pile of magewood is lying here.~
+   This bright pink lumber must have come from an enchanted forest. Mana seeps
+from its ends, forming a cool mist on the ground. Magewood is used in some
+highly skilled crafts.
+~
+3 el a 8
+0 0 0
+0 0
+I 11 617 100.00 1  # LIGHT: a magical fire
+M
+0
+You place $p in midair, where it seems to float.~
+M
+1
+$n places $p in midair, where it seems to float.~
+M
+6
+You attach $p in midair, where it seems to float.~
+M
+7
+$n attaches $p in midair, where it seems to float.~
+O
+16 g
+R
+5118 0
+S
+#605
+wood dead pile~
+a pile of dead wood~
+A pile of dead wood is lying here.~
+   This half-rotten pile of lumber looks like it was from a tree that was dead
+before it was even chopped down.
+~
+3 ek a 2
+0 0 0
+0 0
+S
+#606
+elderberries berries berry handful~
+a handful of elderberries~
+Some elderberries are scattered on the ground.~
+   These elderberries look fresh. They also have a faint pink glow, perhaps
+because of the forest they grew in.
+~
+6 0 a 5
+6 0 0
+7 48
+A
+10 20 0
+M
+4
+You eat $p and feel... elder.~
+O
+9 gn
+S
+#607
+hide shimmering~
+a shimmering hide~
+The shimmering hide of a magical beast is lying here.~
+   Light breaks apart into rainbows as it passes near this magical skin, making
+it hard to tell what color it really is.
+~
+3 0 a 3
+0 0 0
+7 0
+I 18 608 100.00 1 t  # TAN: a piece of shimmering leather
+O
+24 f
+R
+5120 0
+S
+#608
+leather shimmering piece~
+a piece of shimmering leather~
+A large piece of shimmering leather is lying here.~
+   This large piece of leather tanned from the skin of a magical beast glows
+softly with iridescent light. While pretty, it's mostly only useful for the
+same things as ordinary leather.
+~
+3 0 a 4
+0 0 0
+7 0
+O
+15 f
+R
+5120 0
+S
+#609
+moonstoneore moonstone ore chunk majestic~
+some moonstone ore~
+A majestic chunk of moonstone ore is lying here.~
+   Moonstone has the shimmering look of silver, with the iridescence of pearl.
+On its own, it is too soft to make tools or weapons. But if smelted with other
+rare metals, it creates the incredible alloys called argentine and eventide.
+~
+3 l a 5
+0 0 0
+1 0
+R
+5115 0
+S
+#610
+argentineingot argentine ingot~
+an argentine ingot~
+An argentine ingot is stacked here.~
+   The ingot is almost pure white, perhaps more silver than silver itself.
+Argentine ingots are used to create incredibly powerful weapons and armors.
+This metal is notoriously difficult to work with, and requires great skill.
+~
+3 l a 4
+0 0 0
+2 0
+O
+18 ek
+R
+5115 0
+S
+#611
+eventideingot ingot eventide~
+an eventide ingot~
+An eventide ingot is stacked here.~
+   This ingot is blue-black like the sky at midnight, and what little light
+touches it seems to swirl and scatter like twinkling stars. Eventide ingots are
+used to forge powerful magical weapons, and the metal is sometimes spun into
+thread to stitch robes for the greatest sorcerers. Eventide is unusually
+difficult to forge, and requires incredible skill.
+~
+3 l a 4
+0 0 0
+2 0
+O
+18 ek
+R
+5115 0
+S
+#612
+cloth sparkfiber bolt~
+a bolt of sparkfiber cloth~
+A bolt of sparkfiber cloth has been left here.~
+   The sparkfiber has a white-green color and an even, smooth texture. As it
+brushes against your hand, tiny red sparks fly off of it and fall to the ground
+as embers. Sparkfiber is used to sew powerful mage armor, by the most skilled
+craftsmen.
+~
+3 l a 5
+0 0 0
+11 0
+O
+26 g
+R
+5137 0
+S
+#613
+cloth bolt manasilk silk~
+a bolt of manasilk cloth~
+A bolt of manasilk cloth has been left here.~
+   Manasilk is so soft that you can barely feel it, and so smooth that even
+your rough hands don't catch on it. This magical cloth is used to make armor
+and clothing for the greatest healers, by highly skilled craftsmen.
+~
+3 l a 6
+0 0 0
+11 0
+O
+26 g
+R
+5137 0
+S
+#614
+briarhide hide briar pile~
+some briar hide~
+A pile of briar hide is precariously stacked here.~
+   Briar hide is leather that has been magically treated with redthorn until
+the outside becomes spiny and sharp. This type of leather is used to make great
+armors, by the most skilled craftsmen.
+~
+3 l a 3
+0 0 0
+7 0
+O
+15 g
+R
+5120 0
+S
+#615
+absinthianleather leather absinthian pile~
+absinthian leather~
+A pile of absinthian leather seethes on the ground.~
+   Absinthian leather is an exotic hide, treated with bileberries until its
+mere presence gives onlookers a bitter taste. This fine leather is used to make
+vitriolic weapons and armor, by skilled craftsmen.
+~
+3 l a 4
+0 0 0
+7 0
+O
+15 g
+R
+5120 0
+S
+#616
+handle elegant~
+an elegant handle~
+An elegant handle is lying on the ground.~
+   This wooden handle has taken on a deep magenta color, and there is a faint
+mist of mana flowing from its exotic leather grip.
+~
+1 0 ano 4
+0 3 5
+0 0
+C
+1 1
+O
+13 g
+R
+5121 0
+S
+#617
+fire magical magenta~
+a magical fire~
+A magical magenta fire is roaring here!~
+   A pile of bright pink wood is burning, releasing a bright, hot magenta flame
+and a cool, smoky mist of mana.
+~
+3 c 0 1
+0 0 0
+0 48
+S
+$

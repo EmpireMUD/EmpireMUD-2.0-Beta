@@ -1,0 +1,501 @@
+#18200
+tavern tipsy tortoise building inn~
+the Tipsy Tortoise Tavern~
+The Tipsy Tortoise Tavern stands precariously on the creature's back.~
+   The tavern is a tall building and looks quite old. Large sections of the
+walls have been repaired in different types of wood, likely sourced wherever
+the tortoise happens to have roamed. The building is held to the massive
+creature by a great leather strap, made from an animal so massive that the
+strap reaches unbroken around the tortoise's shell. The tavern is loud enough
+that you can nearly make out their song from here.
+~
+8 0 0 3
+18202 0 0
+0 0
+S
+#18201
+door tavern~
+the tavern door~
+The tavern door swings freely as the tortoise shakes.~
+   The door swings back and forth as the tortoise sways, blocking little from
+the outside. Its hinges are sturdy, perhaps imperium, although they don't match
+the rest of the hardware of the rest of the building, so they must have been
+replacements.
+~
+8 0 0 2
+18201 0 0
+0 0
+T 18206
+S
+#18203
+fountain shadow pitch-black water~
+the shadow fountain~
+A fountain of pitch-black water hovers in the air.~
+   The fountain appears black as midnight, but has the soft babble and cool
+touch of water. It spins and cycles in the air, free of any container, as if
+gravity hasn't noticed it in this dark corner.
+~
+5 0 0 1
+2000 2000 0
+10 0
+S
+#18204
+cornucopia boundless food~
+a boundless cornucopia~
+A boundless cornucopia of food sits on the counter.~
+   The cornucopia sits on the counter, overflowing with breads, fruits, meats,
+and all manner of other foods. Each time you take a piece, a little more food
+falls out of the cornucopia. But if you move too far from it, the food crumbles
+and is gone.
+~
+6 m 0 2
+500 0 0
+10 0
+A
+15 1 0
+A
+6 1 0
+C
+50 50
+M
+4
+You grab a golden apple from the cornucopia -- the best apple you've ever had.~
+M
+5
+$n feasts on the bounty of the cornucopia.~
+M
+4
+You take a large steak from the cornucopia, and can remember no beef that equals it.~
+M
+4
+You eat a roll from the cornucopia, and find it was filled with butter and honey.~
+M
+4
+You eat a bunch of grapes from the cornucopia, each more delicious than the last.~
+M
+4
+You take a biscuit from the cornucopia, and are briefly transported back to your childhood.~
+M
+4
+You take a chicken drumstick from the cornucopia and find it perfectly cooked, well-seasoned, and unusually juicy.~
+M
+4
+You take a dragonfruit from the cornucopia and the world goes blurry as no other sensation matches its flavor.~
+M
+4
+You eat a sliced pineapple from the cornucopia, and feel the breeze of the islands on your skin.~
+S
+#18207
+spawner~
+the tavern patron spawner~
+The tavern patron spawner isn't working...~
+   This despawns any old patrons, spawns a common and a silly patron, and
+purges itself.
+~
+3 0 0 2
+0 0 0
+0 0
+T 18207
+S
+#18208
+pouch chelonian shell token~
+a chelonian shell token pouch~
+A chelonian shell token pouch is lying here.~
+   This pouch holds chelonian shell tokens from the Guild of Adventurers. You
+can spend these tokens at the guildmasters' shops in the Tipsy Tortoise Tavern.
+Type 'list' at any of the guildmasters there, and use 'buy' to make a purchase.
+~
+3 p a 3
+0 0 0
+7 0
+T 18208
+S
+#18209
+token shell chelonian single~
+a chelonian shell token~
+A single chelonian shell token is lying here.~
+These tokens are used in the shop aboard the Tipsy Tortoise Tavern.
+~
+3 p a 4
+0 0 0
+0 0
+T 18209
+S
+#18210
+bauble frivolous~
+a frivolous bauble~
+A frivolous bauble is floating here.~
+   You're not sure what this is, but that sorcerer seemed to think it was
+important.
+~
+3 j a 2
+0 0 0
+10 0
+A
+19 750 1
+Q 18272
+S
+#18214
+trinket tortoise~
+a tortoise trinket~
+A tortoise trinket is lying on its back.~
+   This strange trinket is carved from wood in the shape of a tortoise. It has
+been wrapped in a scaly leather and bound with cactus needles. You can 'use'
+this trinket to teleport to the nearest Tipsy Tortoise Tavern.
+~
+3 p a 1
+0 0 0
+0 0
+T 18214
+S
+#18216
+charter guild adventurers~
+a Guild of Adventurers charter~
+A guild charter is lying here.~
+   This document bears the official seal of the Guild of Adventurers. Its text
+is a difficult combination of wordiness and verbosity, but it appears to
+sanction the building of an Adventurer's Guildhall in your city.
+Use: build guildhall <direction> (city-only, single use)
+~
+3 gp a 2
+0 0 0
+0 0
+Q 18200
+S
+#18217
+charter guild adventurers~
+a Guild of Adventurers charter~
+A guild charter is lying here.~
+   This document bears the official seal of the Guild of Adventurers. Its text
+is a difficult combination of wordiness and verbosity, but it appears to
+sanction the building of an Adventurer's Guildhall in your city.
+Use: build guildhall <direction> (city-only, single use)
+~
+3 gp a 3
+0 0 0
+0 0
+S
+#18221
+egg atlasian~
+an atlasian egg~
+An atlasian egg is here.~
+   This massive, leathery egg could only have come from an atlasian tortoise.
+It's so large that you can feel its heartbeat through shell. 'Plant' the egg in
+the plains or desert and perhaps with some care, you can get it to hatch.
+Raising an atlasian tortoise is notoriously difficult, though, and you recall
+reading somewhere in the guildhall that caring for an atlasian egg requires
+many rare materials such as magewood, wild fire, violet gems, molten essence,
+skystones, and burning salve.
+~
+3 ep a 6
+0 0 0
+14 0
+T 18221
+S
+#18222
+egg atlasian nest make-shift makeshift~
+the atlasian egg~
+An atlasian egg sits in a makeshift nest.~
+   The egg is huge, and still growing! It has a soft, leathery texture that is,
+nevertheless, durable enough to protect the growing embryo inside.
+~
+3 0 0 4
+0 0 0
+7 8064
+T 18220
+S
+#18223
+egg atlasian burning shimmering violet fire~
+the burning atlasian egg~
+A shimmering violet fire burns at the base of the hatching egg!~
+   A sparkling magewood fire has been built around the base of the egg. The egg
+has grown considerably, and looks as if it is about to hatch.
+~
+3 c 0 5
+0 0 0
+7 144
+T 18225
+S
+#18225
+whistle tortoise baby~
+a baby tortoise whistle~
+A baby tortoise is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 4
+18225 0 0
+2 0
+T 9900
+S
+#18226
+whistle ninja tortoise~
+a ninja tortoise whistle~
+A ninja tortoise whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 5
+18226 0 0
+2 0
+T 9900
+S
+#18227
+whistle dragon turtle~
+a dragon turtle whistle~
+A dragon turtle whistle is lying here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 6
+18227 0 0
+2 0
+T 9900
+S
+#18228
+whistle sanguine~
+a sanguine whistle~
+A sanguine whistle is lying on the ground.~
+   This whistle appears to be made from congealed blood, and leaves your
+fingers sticky as you touch it. If you 'use' the whistle, it will summon a new
+mount.
+~
+3 ep a 7
+18228 0 0
+2 0
+T 10263
+S
+#18230
+whistle umbral~
+an umbral whistle~
+An umbral whistle is lying here.~
+   This whistle drips through your fingers as you struggle to hold it, as if it
+is made from pure shadow. You have no idea where something like this could have
+come from, but it does seem as if you could 'use' it to summon a new mount.
+~
+3 ep a 6
+18230 0 0
+2 0
+T 10263
+S
+#18232
+apparatus clockwork~
+a clockwork apparatus~
+A clockwork apparatus is lying on the floor.~
+   This apparatus is strange, with is spinning gears and whirring motor. But,
+at least, it's simple: there is one large button marked 'use'. An inscription
+on the back indicates that it summons a clockwork steed.
+~
+3 ep a 5
+18232 0 0
+2 0
+T 10263
+S
+#18234
+whistle imperium-clad clad~
+an imperium-clad whistle~
+A clockwork apparatus is lying on the floor.~
+   This whistle appears to be plated with pure imperium, and stamped with the
+sigil of the Guild of Adventurers. If you 'use' this whistle, it will summon an
+epic mount.
+~
+3 ep a 6
+18234 0 0
+2 0
+T 10263
+S
+#18236
+ring tortoiseshell shell mettle~
+the tortoiseshell ring of mettle~
+The tortoiseshell ring of mettle is lying on the ground.~
+   This ring is surprisingly heavy. Its mottled yellow and brown color gives it
+the look of a tortoise's shell, but its weight suggests it's made of something
+more. The ring has a surprisingly warm feeling to it, as if it has been
+enchanted, though you sense no enchantment. The top of the ring is emblazoned
+with the crest of the Guild of Adventurers.
+~
+2 admp ab 6
+0 0 0
+14 0
+A
+2 1 0
+A
+18 4 0
+A
+24 2 0
+A
+12 2 0
+A
+5 1 0
+C
+100 200
+S
+#18237
+ring testudinal courage~
+the testudinal ring of courage~
+The testudinal ring of courage is lying on the ground.~
+   This ring appears to be made from the foreclaw of a tortoise, although it's
+both unusually heavy and curiously warm. The seal of the Guild of Adventurers
+is stamped repeatedly around the circumference of the ring.
+~
+2 admp ab 5
+0 0 0
+14 0
+A
+1 1 0
+A
+17 4 0
+A
+9 1 0
+A
+21 3 0
+A
+5 1 0
+C
+100 200
+S
+#18238
+ring terrapin acerbity~
+the terrapin ring of acerbity~
+The terrapin ring of acerbity is lying on the ground.~
+   This ring has a mottled yellow and green color, as if it was carved from the
+shell of a terrapin. But it also has the weight of imperium and hums with the
+same dark mana as nocturnium. The ring bears the seal of the Guild of
+Adventurers on its outward-facing side.
+~
+2 admp ab 6
+0 0 0
+14 0
+A
+8 1 0
+A
+9 1 0
+A
+17 4 0
+A
+22 3 0
+A
+5 1 0
+C
+100 200
+S
+#18239
+ring chelonian extrication~
+the chelonian ring of extrication~
+The chelonian ring of extrication is lying on the ground.~
+   This ring has the soft, leathery feel of turtle skin, though at a touch you
+discern it wasn't made from an animal. You close your eyes and run your fingers
+through the warm enchantment that pervades the ring, and sense that its true
+material is simple hay. But the enchantment is powerful and you can see nothing
+but the scales on the ring, each with the tiny stamp of the seal of the Guild
+of Adventurers.
+~
+2 admp ab 7
+0 0 0
+14 0
+A
+9 1 0
+A
+23 4 0
+A
+7 3 0
+A
+5 1 0
+C
+100 200
+S
+#18256
+net wildling huge~
+a wildling net~
+Someone has left a huge net here.~
+   The holes in this net are way too big to catch fish or butterflies with.
+The net is reinforced to hold against sharp claws and strong muscles. Find a
+wildling in The Grove and 'net wildling' to capture it.
+~
+3 e a 3
+0 0 0
+0 0
+Q 18256
+T 18256
+S
+#18257
+wildling captured~
+a captured wildling~
+A captured wildling is struggling against the net.~
+   The wildling is struggling against the net so frantically that it just looks
+like a ball of dark fur. Hurry up and get this thing back to the guildhall!
+~
+3 e a 1
+0 0 0
+0 0
+Q 18256
+S
+#18258
+propaganda pamphlet magiterranean~
+some Magiterranean propaganda~
+A propaganda pamphlet is on the ground.~
+   The pamphlet is written in some strange druidic script that you aren't
+familiar with, but from the illustrations, it seems to be describing the
+wildlife of the Magiterranean. Perhaps the Guild of Adventurers would be
+interested in this.
+~
+3 0 a 4
+0 0 0
+0 0
+Q 18258
+S
+#18260
+note dryleef~
+a note for Dryleef~
+A note for Dryleef is lying on the ground.~
+   This note is actually just the logo of the Guild of Adventurers, covered in
+the symbol for gold coin. When you meet Dryleef, he'll be willing to sell you
+the ticket you need. Just type 'buy ticket' when you find him.
+~
+3 0 a 5
+0 0 0
+0 0
+Q 18260
+T 18260
+S
+#18261
+ticket goblin gala~
+a ticket to the Goblin Gala~
+A ticket to the Goblin Gala is lying here.~
+   This "ticket" is actually just a piece of parchment with a picture of a
+warthog and a smudge of blood. Bring it back to the Guild of Adventurers and
+see if they're interested in it.
+~
+3 0 a 3
+0 0 0
+0 0
+Q 18260
+S
+#18270
+siphon syphon frost~
+a frost siphon~
+A frost siphon is lying on the ground.~
+   This unusual contraption appears to be made from sparkling magewood and
+enchanted eventide. You've never seen anything like it before, but at least the
+instructions are clearly labeled: use siphon <target>
+~
+3 j a 3
+0 0 0
+10 0
+Q 18270
+T 18270
+S
+#18272
+fingers nimble~
+nimble fingers~
+Someone in the room has nimble fingers.~
+   Your fingers have been enchanted with the ability to pickpocket the bauble
+from a city sorcerer without being noticed!
+~
+3 j a 2
+0 0 0
+10 0
+Q 18272
+T 18272
+S
+$

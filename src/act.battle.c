@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.battle.c                                    EmpireMUD 2.0b4 *
+*   File: act.battle.c                                    EmpireMUD 2.0b5 *
 *  Usage: commands and functions related to the Battle skill              *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -33,6 +33,7 @@
 // external vars
 
 // external functions
+void check_combat_start(char_data *ch);
 extern bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);	// fight.c
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 
@@ -89,7 +90,7 @@ ACMD(do_bash) {
 		if (FIGHTING(ch) && IN_ROOM(ch) == IN_ROOM(FIGHTING(ch)))
 			vict = FIGHTING(ch);
 		else {
-			send_to_char("Bash who?\r\n", ch);
+			send_to_char("Bash whom?\r\n", ch);
 			return;
 		}
 	}
@@ -113,6 +114,10 @@ ACMD(do_bash) {
 	}
 	
 	charge_ability_cost(ch, MOVE, cost, COOLDOWN_BASH, 9, WAIT_COMBAT_ABILITY);
+	
+	// start meters now, to track direct damage()
+	check_combat_start(ch);
+	check_combat_start(vict);
 
 	// determine hit
 	success = IS_SPECIALTY_ABILITY(ch, ABIL_BASH) || check_hit_vs_dodge(ch, vict, FALSE);
@@ -174,7 +179,7 @@ ACMD(do_disarm) {
 	else if (!IS_NPC(victim) && !GET_EQ(victim, WEAR_WIELD)) {
 		msg_to_char(ch, "You can't disarm someone who isn't wielding a weapon.\r\n");
 	}
-	else if (IS_NPC(victim) && !GET_EQ(victim, WEAR_WIELD) && (MOB_ATTACK_TYPE(victim) == TYPE_BITE || MOB_ATTACK_TYPE(victim) == TYPE_KICK || MOB_ATTACK_TYPE(victim) == TYPE_CLAW || MOB_ATTACK_TYPE(victim) == TYPE_HIT)) {
+	else if (IS_NPC(victim) && !GET_EQ(victim, WEAR_WIELD) && !attack_hit_info[MOB_ATTACK_TYPE(victim)].disarmable) {
 		act("You can't disarm $M -- $E isn't using a weapon.", FALSE, ch, 0, victim, TO_CHAR);
 	}
 	else if (AFF_FLAGGED(victim, AFF_DISARM)) {
@@ -331,7 +336,9 @@ ACMD(do_heartstop) {
 
 		if (!skill_check(ch, ABIL_HEARTSTOP, DIFF_HARD) || AFF_FLAGGED(victim, AFF_IMMUNE_BATTLE)) {
 			msg_to_char(ch, "But nothing happens.\r\n");
-			hit(victim, ch, GET_EQ(victim, WEAR_WIELD), FALSE);
+			if (!FIGHTING(victim)) {
+				hit(victim, ch, GET_EQ(victim, WEAR_WIELD), FALSE);
+			}
 			return;
 		}
 		
@@ -344,7 +351,9 @@ ACMD(do_heartstop) {
 
 		msg_to_char(victim, "Your blood becomes inert!\r\n");
 		
-		hit(victim, ch, GET_EQ(victim, WEAR_WIELD), FALSE);
+		if (!FIGHTING(victim)) {
+			hit(victim, ch, GET_EQ(victim, WEAR_WIELD), TRUE);
+		}
 	}
 }
 
@@ -387,6 +396,10 @@ ACMD(do_kick) {
 	}
 	
 	charge_ability_cost(ch, MOVE, cost, COOLDOWN_KICK, 6, WAIT_COMBAT_ABILITY);
+	
+	// start meters now, to track direct damage()
+	check_combat_start(ch);
+	check_combat_start(vict);
 	
 	// determine hit
 	success = IS_SPECIALTY_ABILITY(ch, ABIL_KICK) || check_hit_vs_dodge(ch, vict, FALSE);

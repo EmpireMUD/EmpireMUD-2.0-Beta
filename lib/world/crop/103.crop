@@ -22,7 +22,11 @@ D0
 .&Roo&?.~
 &y~
 I 6 10302 100.00 1  # FORAGE: some firefruit seeds
-I 8 10303 100.00 1  # HARVEST: a seething firefruit
+I 8 10303 20.00 2 H  # HARVEST: a seething firefruit
+I 8 10303 20.00 3 H  # HARVEST: a seething firefruit
+I 8 10303 20.00 4 H  # HARVEST: a seething firefruit
+I 8 10303 20.00 5 H  # HARVEST: a seething firefruit
+I 8 10303 20.00 6 H  # HARVEST: a seething firefruit
 M
 250 0.10 ad
 M
@@ -96,7 +100,11 @@ D0
 &Ro&?u&Ro&?u~
 &G~
 I 6 10338 100.00 1  # FORAGE: a scaly dragonfruit
-I 8 10339 100.00 1  # HARVEST: a basket of dragonfruit
+I 8 10339 20.00 2 H  # HARVEST: a basket of dragonfruit
+I 8 10339 20.00 3 H  # HARVEST: a basket of dragonfruit
+I 8 10339 20.00 4 H  # HARVEST: a basket of dragonfruit
+I 8 10339 20.00 5 H  # HARVEST: a basket of dragonfruit
+I 8 10339 20.00 6 H  # HARVEST: a basket of dragonfruit
 M
 250 0.10 ad
 M

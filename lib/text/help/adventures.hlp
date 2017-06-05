@@ -1,0 +1,115 @@
+"LIST OF ADVENTURES THAT DON'T HAVE HELP FILES"
+[   50] Tutorial: Royal Planning Office
+[   51] Tutorial: Museum of Early Man
+[   52] Tutorial Quests
+[  100] Magiterranean: The Grove
+[  101] Magiterranean: The Hidden Garden
+[  102] Magiterranean: Interdimensional Whirlwind
+[  103] Magiterranean: Monsoon Rift
+[  120] Mountain Cave: Red Dragon
+[  121] The Swamp Hag
+[  122] Ruins: Three Banditos
+[  123] Ruins: Thieves
+[  125] Ruins: The Goblin Challenge
+[  126] Mountain Cave: Flame Dragon
+[  127] Abandoned Dragon Nest
+[  128] Colossal Red Dragon
+[  129] A Gigantic Nest
+[  130] Volcano
+[  140] The Sewer: Ratskins
+[  141] The Sewer: Goblin Outpost
+[  160] The Tower Skycleave
+[  161] Portal to the Primeval
+[  170] Hamlet of the Undead
+[  180] Misplaced Mother Goose
+[  181] Goblin Mines
+[  190] Winter Wonderland
+[  200] Burrow Canyons
+[  201] The Cursed Chalice of Mill Manor
+[  281] Mountain Valley: Molten Fiend
+[  282] Goblin Logging Camp
+#
+"COLOSSAL RED DRAGON" "MYTHIC FORGE" "LEGENDARY STITCHING" "LORE CRAFTS" "FABLED HIDES" "DRAGON TOKENS"
+
+Colossal Red Dragon (level 250-300 adventure)
+
+The Colossal Red Dragon adventure includes new crafting patterns for equipment
+that scales up to level 325. Complete any part of the adventure and the pattern
+vendor will appear. These patterns are for weapons, off-hand items, and belts
+for each class role.
+
+Resources:
+  red dragon hide (skinned)
+  colossal dragon bone (butchered)
+  bolt of dragon cloth (woven from hide)
+  tough dragon leather (tanned from hide)
+  dragonsteel ingot (smelted from bone)
+
+Each type of pattern requires a tradesman from a specific class:
+  Mythic Forge (forge): Steelsmith, Guildsman
+  Legendary Stitching (sew): Artificer, Smuggler
+  Lore Crafts (craft): Artificer, Tinker
+  Fabled Hides (sew): Antiquarian, Alchemist
+
+Crafting patterns by role:
+  Caster: flaming dragonbone staff, tome of dragonkind, burning dragoncloth
+     sash
+  Healer: flaming draconic wand, flaming red dragon charm, flaming draconic
+     cincture
+  Melee: dragonsteel warhammer (1-hand), dragonsteel claymore (2-hand), 
+     dragonbone wristblade, crimson dragon girdle
+  Tank: dragonbone mace, dragonbone tower shield, burning dragonsteel waistband
+  Empire: magnificent dragon bracelets (Greatness wrist)
+
+Dragon buildings:
+  butchertent (dragonsflame butcher block): A stable where you can cook.
+  dragoncave (dragonstone hearth): A mountain home which can include a crypt.
+  dragonstatue (dragonseye ruby): A new type of statue (Dragonslayer).
+  dragonlibrary (dragonquill pen): A library with an alchemy lab inside.
+#
+"GIGANTIC NEST" "A GIGANTIC NEST" "GOLDEN TALONS" "CORRUPTED TALONS"
+
+A Gigantic Nest (level 100-125 solo adventure)
+
+The Gigantic Nest adventure includes new crafting patterns for gear that scales
+up to level 150. There are two different currencies in this adventure: golden
+talons for completing the helpful quests, and corrupted talons for completing
+the harmful quests. You can only complete 1 quest per instance, but you are
+free to choose a different quest each time you find a nest. Completing a quest
+will spawn the vendor who trades in golden or corrupted talons.
+
+Crafting patterns by role:
+  Caster: roc feather sleeves, wondrous feather gloves
+  Healer: downy white sleeves, roc quill finger caps
+  Melee: swift feathered arm guards, razor feather gauntlets
+  Tank: stonefeather arm plates, feathered imperium gauntlets
+  Empire: earrings of the roc
+  Trade: magnificent feathered headdress
+
+Other:
+  Building: The Dome (huge dome capstone)
+  Gear: downy rucksack, feathered saddle
+  Minipet: baby ostrich
+  Mounts: lithe ostrich, trumpeter swan, tawny roc
+  Vehicle: Clockwork Roc (roc-stone gear)
+#
+PERMAFROST "MAGITERRANEAN: PERMAFROST" "MAGITERRANEAN PERMAFROST"
+
+Magiterranean: Permafrost (level 75-125 adventure)
+
+This adventure delves into the Permafrost, the frozen pole of the hidden realm
+of mages. Players can choose their own difficulty, so this adventure supports
+one to four players. Each difficulty drops the same equipment, but it will be
+more powerful on higher difficulties.
+
+Permafrost features a series of attunement quests. Once you finish these, four
+daily quests appear. You can only complete one of the dailies per instance.
+
+Craft patterns sold by the vendor outside the portal:
+  Ship: the Polar Wind (similar to a carrack)
+  Tank weapon: whipping winds of the North
+  Melee weapon: frozen pykrete sword
+  Healer weapon: icy star of winter
+  Caster weapon: glacial staff of the Maelstrom pattern
+#
+$

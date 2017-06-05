@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.map.c                                       EmpireMUD 2.0b4 *
+*   File: olc.map.c                                       EmpireMUD 2.0b5 *
 *  Usage: OLC for the map and map-building rooms                          *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -20,6 +20,7 @@
 #include "comm.h"
 #include "olc.h"
 #include "vnums.h"
+#include "dg_scripts.h"
 
 /**
 * Contents:
@@ -27,8 +28,13 @@
 *   Edit Modules
 */
 
+// external vars
+extern bool world_map_needs_save;
+
 // external funcs
 void complete_building(room_data *room);
+void deactivate_workforce_room(empire_data *emp, room_data *room);
+extern crop_data *get_potential_crop_for_location(room_data *location);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -95,10 +101,21 @@ OLC_MODULE(mapedit_build) {
 		msg_to_char(ch, "You create %s %s!\r\n", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
 		sprintf(buf, "$n creates %s %s!", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
-		
-		if (ROOM_OWNER(IN_ROOM(ch))) {
-			read_empire_territory(ROOM_OWNER(IN_ROOM(ch)));
-		}
+	}
+}
+
+
+OLC_MODULE(mapedit_decay) {
+	void annual_update_map_tile(room_data *room);	// db.world.c
+	
+	room_data *room = HOME_ROOM(IN_ROOM(ch));
+	
+	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
+		msg_to_char(ch, "You can only decay map tiles.\r\n");
+	}
+	else {
+		msg_to_char(ch, "Ok.\r\n");
+		annual_update_map_tile(room);
 	}
 }
 
@@ -152,6 +169,9 @@ OLC_MODULE(mapedit_terrain) {
 		if (sect) {
 			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
 			msg_to_char(ch, "This room is now %s %s.\r\n", AN(GET_SECT_NAME(sect)), GET_SECT_NAME(sect));
+			if (ROOM_OWNER(IN_ROOM(ch))) {
+				deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
+			}
 		}
 		else if (cp) {
 			if (!(sect = find_first_matching_sector(SECTF_CROP, NOBITS))) {
@@ -162,16 +182,15 @@ OLC_MODULE(mapedit_terrain) {
 				change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
 				set_crop_type(IN_ROOM(ch), cp);
 				msg_to_char(ch, "This room is now %s.\r\n", GET_CROP_NAME(cp));
+				if (ROOM_OWNER(IN_ROOM(ch))) {
+					deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
+				}
 			}
 		}
 				
 		// preserve old original sect for roads -- TODO this is a special-case
 		if (IS_ROAD(IN_ROOM(ch))) {
 			change_base_sector(IN_ROOM(ch), old_sect);
-		}
-
-		if (emp) {
-			read_empire_territory(emp);
 		}
 	}
 }
@@ -182,9 +201,26 @@ OLC_MODULE(mapedit_complete_room) {
 		msg_to_char(ch, "Use '.map terrain' instead.\r\n");
 		return;
 	}
-
+	if (!IS_INCOMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "It is already complete.\r\n");
+		return;
+	}
+	
 	complete_building(IN_ROOM(ch));
 	msg_to_char(ch, "Complete.\r\n");
+}
+
+
+OLC_MODULE(mapedit_maintain) {
+	void finish_maintenance(char_data *ch, room_data *room);
+	
+	if (IS_DISMANTLING(IN_ROOM(ch)) || !IS_COMPLETE(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can only maintain completed buildings.\r\n");
+		return;
+	}
+	
+	finish_maintenance(ch, IN_ROOM(ch));
+	msg_to_char(ch, "Done.\r\n");
 }
 
 
@@ -319,9 +355,11 @@ OLC_MODULE(mapedit_delete_room) {
 		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = next_c) {
 			next_c = c->next_in_room;
 			char_to_room(c, home ? home : find_load_room(c));
+			act("$n appears in front of you.", TRUE, c, NULL, NULL, TO_ROOM);
 			if (c != ch) {
 				msg_to_char(c, "Room deleted.\r\n");
 			}
+			look_at_room(c);
 		}
 		
 		delete_room(in_room, TRUE);
@@ -347,7 +385,7 @@ OLC_MODULE(mapedit_room_description) {
 			msg_to_char(ch, "You are already editing a string.\r\n");
 		}
 		else {
-			start_string_editor(ch->desc, "room description", &(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))), MAX_ROOM_DESCRIPTION);
+			start_string_editor(ch->desc, "room description", &(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))), MAX_ROOM_DESCRIPTION, TRUE);
 		}
 	}
 	else
@@ -407,6 +445,7 @@ OLC_MODULE(mapedit_exits) {
 			to_room = create_room();
 			attach_building_to_room(building_proto(config_get_int("default_interior")), to_room, TRUE);
 			
+			// TODO this is done in several different things that add rooms, and could be moved to a function -paul 7/14/2016
 			if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
 				++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(IN_ROOM(ch)));
 				COMPLEX_DATA(to_room)->vehicle = GET_ROOM_VEHICLE(IN_ROOM(ch));
@@ -415,7 +454,11 @@ OLC_MODULE(mapedit_exits) {
 			COMPLEX_DATA(HOME_ROOM(IN_ROOM(ch)))->inside_rooms++;
 			
 			COMPLEX_DATA(to_room)->home_room = HOME_ROOM(IN_ROOM(ch));
-			ROOM_OWNER(to_room) = ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)));
+			
+			if (ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)))) {
+				perform_claim_room(to_room, ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))));
+			}
+			complete_wtrigger(to_room);
 		}
 
 		create_exit(IN_ROOM(ch), to_room, dir, TRUE);
@@ -452,6 +495,194 @@ OLC_MODULE(mapedit_delete_exit) {
 }
 
 
+OLC_MODULE(mapedit_naturalize) {
+	bool island = FALSE, world = FALSE;
+	int count, island_id = NO_ISLAND;
+	struct island_info *isle;
+	struct map_data *map;
+	room_data *room;
+	
+	bool do_unclaim = config_get_bool("naturalize_unclaimable");
+	
+	// parse argument
+	skip_spaces(&argument);
+	if (*argument && is_abbrev(argument, "island")) {
+		island = TRUE;
+	}
+	else if (*argument && !str_cmp(argument, "world")) {
+		world = TRUE;
+	}
+	else if (*argument) {
+		msg_to_char(ch, "Usage: .map naturalize [island | world]\r\n");
+		return;
+	}
+	
+	if (!island && !world && (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch)) || GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE)) {
+		msg_to_char(ch, "Leave the building or area first.\r\n");
+	}
+	else if (island && (island_id = GET_ISLAND_ID(IN_ROOM(ch))) == NO_ISLAND) {
+		msg_to_char(ch, "You can't do that while not on any island.\r\n");
+	}
+	else if (island || world) {	// normal processing for whole island/world
+		count = 0;
+		
+		// check all land tiles
+		LL_FOREACH(land_map, map) {
+			room = real_real_room(map->vnum);	// may or may not exist
+			
+			if (island && map->island != island_id) {
+				continue;
+			}
+			if (room && ROOM_OWNER(room)) {
+				continue;
+			}
+			if (room && ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
+				continue;
+			}
+			if (room && ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE) && !do_unclaim) {
+				continue;
+			}
+			if (map->sector_type == map->natural_sector) {
+				continue;	// already same
+			}
+			
+			// looks good: naturalize it
+			if (room) {
+				change_terrain(room, GET_SECT_VNUM(map->natural_sector));
+				if (ROOM_PEOPLE(room)) {
+					act("The area is naturalized!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+				}
+				if (ROOM_OWNER(room)) {
+					deactivate_workforce_room(ROOM_OWNER(room), room);
+				}
+			}
+			else {
+				perform_change_sect(NULL, map, map->natural_sector);
+				perform_change_base_sect(NULL, map, map->natural_sector);
+				
+				if (SECT_FLAGGED(map->natural_sector, SECTF_HAS_CROP_DATA)) {
+					room = real_room(map->vnum);	// need it loaded after all
+					set_crop_type(room, get_potential_crop_for_location(room));
+				}
+				else {
+					map->crop_type = NULL;
+				}
+			}
+			++count;
+		}
+		
+		if (count > 0) {
+			world_map_needs_save = TRUE;
+			
+			if (island) {
+				isle = get_island(island_id, TRUE);
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has naturalized %d tile%s on island %d %s", GET_NAME(ch), count, PLURAL(count), island_id, isle->name);
+			}
+			else if (world) {
+				syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has naturalized %d tile%s for the whole world!", GET_NAME(ch), count, PLURAL(count));
+			}
+		}
+		msg_to_char(ch, "You have naturalized the sectors for %d tile%s%s.\r\n", count, PLURAL(count), island ? " on this island" : "");
+	}
+	else {	// normal processing for 1 room
+		map = &(world_map[FLAT_X_COORD(IN_ROOM(ch))][FLAT_Y_COORD(IN_ROOM(ch))]);
+		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(map->natural_sector));
+		if (ROOM_OWNER(IN_ROOM(ch))) {
+			deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
+		}
+		
+		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has set naturalized the sector at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
+		msg_to_char(ch, "You have naturalized the sector for this tile.\r\n");
+		act("$n has naturalized the area!", FALSE, ch, NULL, NULL, TO_ROOM);
+		world_map_needs_save = TRUE;
+	}
+}
+
+
+OLC_MODULE(mapedit_populate) {
+	void populate_npc(room_data *room, struct empire_territory_data *ter);
+	char_data *current = ROOM_PEOPLE(IN_ROOM(ch));
+	
+	if (!GET_BUILDING(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can only populate buildings.\r\n");
+	}
+	else if (!ROOM_OWNER(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can only populate owned buildings.\r\n");
+	}
+	else {
+		// should send an "arrives" message if successful
+		populate_npc(IN_ROOM(ch), NULL);
+		
+		if (current == ROOM_PEOPLE(IN_ROOM(ch))) {
+			msg_to_char(ch, "Okay. But there didn't seem to be anything to populate.\r\n");
+		}
+	}
+}
+
+
+OLC_MODULE(mapedit_remember) {
+	int count, island_id = NO_ISLAND;
+	struct island_info *isle;
+	struct map_data *map;
+	bool island = FALSE;
+	
+	// parse argument
+	skip_spaces(&argument);
+	if (*argument && is_abbrev(argument, "island")) {
+		island = TRUE;
+	}
+	else if (*argument) {
+		msg_to_char(ch, "Usage: .map remember [island]\r\n");
+		return;
+	}
+	
+	if (!island && (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch)) || GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE)) {
+		msg_to_char(ch, "Leave the building or area first.\r\n");
+	}
+	else if (island && (island_id = GET_ISLAND_ID(IN_ROOM(ch))) == NO_ISLAND) {
+		msg_to_char(ch, "You can't do that while not on any island.\r\n");
+	}
+	else if (!island && ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE)) {
+		msg_to_char(ch, "You can't make it remember a sector which requires extra data like this one.\r\n");
+	}
+	else if (island) {	// normal processing for whole island
+		count = 0;
+		
+		// check all land tiles
+		LL_FOREACH(land_map, map) {
+			if (map->island != island_id) {
+				continue;
+			}
+			if (SECT_FLAGGED(map->sector_type, SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE)) {
+				continue;
+			}
+			if (map->natural_sector == map->sector_type) {
+				continue;	// already same
+			}
+			
+			// looks good
+			map->natural_sector = map->sector_type;
+			++count;
+		}
+		
+		if (count > 0) {
+			isle = get_island(island_id, TRUE);
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has set 'remember' for %d tile%s on island %d %s", GET_NAME(ch), count, PLURAL(count), island_id, isle->name);
+			world_map_needs_save = TRUE;
+		}
+		msg_to_char(ch, "You have set the map to remember sectors for %d tile%s on this island.\r\n", count, PLURAL(count));
+	}
+	else {	// normal processing for 1 room
+		map = &(world_map[FLAT_X_COORD(IN_ROOM(ch))][FLAT_Y_COORD(IN_ROOM(ch))]);
+		map->natural_sector = map->sector_type;
+		
+		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has set 'remember' for %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
+		msg_to_char(ch, "You have set the map to remember the sector for this tile.\r\n");
+		world_map_needs_save = TRUE;
+	}
+}
+
+
 OLC_MODULE(mapedit_roomtype) {
 	extern bld_data *get_building_by_name(char *name, bool room_only);
 	
@@ -463,7 +694,10 @@ OLC_MODULE(mapedit_roomtype) {
 		msg_to_char(ch, "What type of room would you like to set (use 'vnum b <name>' to search)?\r\n");
 	}
 	else {
+		dismantle_wtrigger(IN_ROOM(ch), ch, FALSE);
+		detach_building_from_room(IN_ROOM(ch));
 		attach_building_to_room(id, IN_ROOM(ch), TRUE);
 		msg_to_char(ch, "This room is now %s %s.\r\n", AN(GET_BLD_NAME(id)), GET_BLD_NAME(id));
+		complete_wtrigger(IN_ROOM(ch));
 	}
 }

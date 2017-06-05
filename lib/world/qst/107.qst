@@ -1,7 +1,28 @@
+#10700
+Cookie Crunch Time~
+   Santa's elves have completely run out of Christmas cookies! They offer you a
+gift from the few spare gifts that are left un-wrapped, if you can bake them a
+few more.
+(If you don't have the recipe for Christmas cookies, try opening more gifts.)
+~
+   You hand over the freshly baked Christmas cookies, and the elf gives you a
+left-over gift.
+~
+3 de 0 0 -1
+A
+1 10702
+R
+2 10727 1
+T 10700
+W
+2 10716 0 20
+Z
+1 10702
+S
 #10730
 Hey Diddle Diddle~
    Hey diddle diddle, it seems the cat has lost its fiddle. Find the fiddle and
-return it to the musical cat in exchange for a starry cloak.  
+return it to the musical cat in exchange for a starry cloak.
 ~
    You give the cat his fiddle. He seems so grateful that he immediately plays
 you a little tune:

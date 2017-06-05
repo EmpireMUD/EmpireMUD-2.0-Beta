@@ -1,0 +1,258 @@
+#10550
+Pacify the Permafrost~
+   Now that you are attuned to the Permafrost, you need not battle some of its
+hostile denizens. Take this wand of polar power and use it to 'freeze' the
+caribou, orcas, and ermines that plague your journey up the glacier. When
+you've completed this quest, take the wand to any stone henge, where it can be
+consecrated and buried.
+~
+   You have pacified the hostile mage-spawns of the Permafrost! You whisper a
+short chant of consecration, and bury the wand beneath the henge.
+~
+18 be 75 125 -1
+A
+3 10550
+P
+0 10565 0 1 a
+P
+6 10556 0 1 a
+P
+5 10556 0 1 a
+P
+6 10551 0 1 a
+P
+5 10551 0 1 a
+P
+6 10555 0 1 a
+P
+5 10555 0 1 a
+P
+9 3 0 50 a
+R
+2 10557 2
+R
+0 0 2
+R
+4 3 50
+T 10595
+W
+11 0 0 1
+Z
+0 5142
+S
+#10551
+A Rare Item Indeed~
+   You have found a rare, frozen gemstone in the pocket of one of the nature
+mages. Being keenly aware that city sorcerers prize these gems, you immediately
+decide to take it to the nearest Tower of Sorcery. Surely someone there will
+pay a nice price for it, if it doesn't melt first.
+~
+'Ah,' says the high sorcerer, 'This is a very rare gemstone indeed!'
+He places the gemstone in a dish of ice, and hands you your reward.
+~
+17 bde 75 125 -1
+A
+3 10561
+P
+0 10565 0 1 a
+P
+6 10556 0 1 a
+P
+5 10556 0 1 a
+P
+6 10550 0 1 a
+P
+5 10550 0 1 a
+P
+6 10555 0 1 a
+P
+5 10555 0 1 a
+P
+2 10598 0 1 a
+R
+2 10557 2
+R
+1 0 250
+R
+4 4 50
+W
+2 10598 0 1
+Z
+1 228
+S
+#10555
+Icy Veins of Permafrost~
+   Ah, you seem to have stumbled back into the Permafrost. Since your last
+visit here, you have been hearing rumors that the dead can be silenced using
+frozen vampire blood. But freezing such blood is no easy task. It will take the
+True Cold of the Permafrost to accomplish this. Kill the Polar Baron and mix
+his icy blood with your own on the altar (type 'consecrate' after killing him;
+this will cost 50 blood). Then, take the vial of frostblood to a crypt to
+complete this quest.
+~
+   As you approach the crypt, the wails of the recently deceased begin to
+overpower you. You clap one hand over your ear as you pour the vial of
+frostblood over the unquiet remains in the crypt. The blood bubbles, as if
+boiling, but the bones seem to freeze and the wailing stops. You aren't sure if
+you've done this correctly, but you do gain some experience for trying.
+~
+18 bde 75 125 -1
+A
+3 10550
+P
+0 10565 0 1 a
+P
+6 10550 0 1 a
+P
+5 10550 0 1 a
+P
+6 10551 0 1 a
+P
+5 10551 0 1 a
+P
+6 10556 0 1 a
+P
+5 10556 0 1 a
+P
+9 7 0 50 a
+R
+2 10557 2
+R
+0 0 2
+R
+4 7 50
+W
+3 10550 0 1 a
+W
+2 10599 0 1 a
+Z
+0 5620
+S
+#10556
+Exotic Meats of the Permafrost~
+   You recall seeing a sign back in the tavern that said something about exotic
+meats. Perhaps if you collect some meat from the Permafrost, you can make some
+money back home. Butcher some of the strange animals here in the Permafrost,
+and 'cook' some cold cuts. Deliver them at any tavern for your reward.
+~
+You deliver the cold cuts at the bar.
+~
+17 bde 75 125 -1
+A
+3 10550
+P
+0 10565 0 1 a
+P
+6 10550 0 1 a
+P
+5 10550 0 1 a
+P
+6 10551 0 1 a
+P
+5 10551 0 1 a
+P
+6 10555 0 1 a
+P
+5 10555 0 1 a
+P
+9 6 0 50 a
+R
+2 10557 2
+R
+1 0 250
+R
+4 6 50
+W
+2 10597 0 2
+Z
+1 220
+S
+#10563
+Surviving the Permafrost~
+   You have stumbled through a portal into the Permafrost, a frozen outpost in
+the Magiterranean. The bitter wind chaps your skin and the deep snow numbs your
+toes. You might be able to attune yourself to this glacial realm's magic, but
+first you must prove you can stand up to this harsh environment. Survive combat
+with enough of the Permafrost's denizens, then prepare yourself at the altar
+atop the glacier.
+~
+   You have survived against all odds in the Permafrost and, in doing so, have
+begun to adjust. The wind feels a little less bitter; the sun somehow feels
+warmer.
+~
+3 0 75 125 -1
+A
+3 10550
+R
+0 0 3
+R
+6 10564 1
+W
+3 10553 0 2 a
+W
+3 10554 0 2 a
+W
+3 10555 0 2 a
+Z
+3 10561
+S
+#10564
+Restoring the Altar~
+   No longer blinded by the glare of the sun on the snow and ice, you notice
+the altar has notches that would hold gemstones, but each notch is empty.
+Perhaps if you brought back enough gems to repair the altar, you could use it
+to attune yourself to the magic energies of the Permafrost.
+~
+   You place each of the gemstones into the corresponding notch in the altar.
+They stick so securely into place that you can't remove them again, and it
+freezes your fingers just to try.
+~
+6 d 75 125 -1
+A
+3 10561
+P
+0 10563 0 1
+R
+0 0 3
+R
+6 10565 1
+W
+2 1206 0 5 a
+W
+2 103 0 5 a
+W
+2 104 0 5 a
+W
+2 1300 0 5 a
+Z
+3 10561
+S
+#10565
+Where the Frost Fern Grows~
+   The altar flashes in all the colors of the gemstones, and then, one by one,
+they each fade to white and fall to the ground. On the altar, a snow-white
+seedling grows, twisting and curling up into the shape of a small fern. As the
+wind blows across its fractal leaves, there appears a voice like a singing
+harp: 'To prove your worth to the Permafrost, you must seek out the rare frost
+fern, cultivate it, and bring its bounty back to the altar.'
+   If you're having trouble finding ferns, try foraging on the ice outside the
+frosty portal.
+~
+   You place the frost ferns on the altar, where they instantly combust into a
+violet flame. As you breathe in the minty smoke, and feel it sear the inside of
+your cold lungs, you feel a deeper connection to the Permafrost. You have
+unlocked Permafrost quests that can be completed in future portals.
+~
+6 d 75 125 -1
+A
+3 10561
+P
+0 10564 0 1
+R
+0 0 3
+W
+2 10561 0 20
+Z
+3 10561
+S
+$

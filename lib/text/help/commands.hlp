@@ -133,10 +133,11 @@ The special variable $* represents the entire input line after an alias:
 
 See also: !, ^, SUGGESTED ALIASES
 #
-ALT ALTERNATE
+ALT ALTERNATE "ALT LIST" ALTS
 
 Usage:  alt <name>
         alt list
+        alt import <name> <field | all>
 
 This command lets you switch from one alt to another. An "alt" is a character
 you own, on your account. You can only use this command to switch between
@@ -156,7 +157,23 @@ instead, but this will leave your character vulnerable.
 You should read the multiplaying/alts rules on the POLICY command for more
 information on these rules.
 
-See also: QUIT
+See also: QUIT, ALT IMPORT
+#
+"ALT IMPORT" "ALTERNATE IMPORT" "IMPORT FROM ALTS"
+
+Usage:  alt import <name> <field | all>
+
+You can use the alt command to import some preferences and features from your
+other characters. In most cases, these will be merged with the ones you already
+have. For example, if you have an alias named "foo" and you import aliases, it
+won't overwrite the "foo" you already have with one from an alt.
+
+You can import: aliases, prompt, fprompt, preferences, fightmessages, recolors,
+slash-channels, and ignores.
+
+"Preferences" will import some toggles, as well as mapsize.
+
+See also: ALT
 #
 ANSI COLOR COLORS MAPCOLOR "MAP COLOR" MAP-COLOR &&
 
@@ -231,11 +248,13 @@ See also: DISEMBARK, SAIL, MANUFACTURE, LOAD, SHIPS
 #
 BOTHER NOBOTHER
 
+Usage: toggle bother
+
 When enabled, this toggle protects you from having your character affected by
 various other commands - you cannot be sired, you cannot be purified of
 vampirism, and vampires can't bite you unless you're restrained or unconscious.
 
-See also: BITE, PURIFY, SIRE
+See also: BITE, CEDE, PURIFY, SIRE, TOGGLE
 #
 BRIEF
 
@@ -293,6 +312,16 @@ on the map. It can't be used on walls, or buildings that are flanked on two
 sides by walls. You can circle up to three closed buildings in a row.
 
 You cannot circle onto water tiles or rough terrain.
+#
+CLEARMETERS "CLEAR METERS" "TOGGLE CLEARMETERS"
+
+Usage:  clearmeters
+        toggle clearmeters
+
+This command clears your combat meters so you can get fresh data. Or, you can
+use the toggle to automatically clear meters whenever you start a new fight.
+
+See also: METERS, TOGGLE
 #
 CLS
 
@@ -373,6 +402,7 @@ customize its things.
 
 Valid types:
 - building (requires the Customize Building ability)
+- island
 - vehicle
 
 Valid fields:
@@ -380,7 +410,29 @@ Valid fields:
 - longdesc: the text shown in the room (doesn't work on buildings)
 - description: will open a text editor
 
-See also: CUSTOMIZE BUILDING, TEXT EDITOR
+Note: On vehicles, changing the name will also put the new name at the end of
+the longdesc, unless (or until) you also change the longdesc.
+
+See also: CUSTOMIZE BUILDING, CUSTOMIZE ISLAND, TEXT EDITOR
+#
+"CUSTOMIZE ISLAND"
+
+Usage:  customize island name <name | none>
+
+This command allows your empire to name an island. You can only name islands
+where you have an established city. Each empire can have its own name for an
+island, in addition to its global (default) name.
+
+You cannot remove the global name from an island, even if you set its name to
+'none'.
+
+There are three ways an island name can become that island's global name:
+Discovery (the first empire to name an unexplored island sets its global name)
+Sole ownership (if yours is the only empire with a city on the island)
+Consensus (if all empires with cities on the island use the same name for it)
+
+Only discovery changes an island's global name immediately; all other changes
+only happen at the beginning of a new MUD year.
 #
 DIAGNOSE
 
@@ -451,7 +503,7 @@ If your empire has a workforce, the fire brigade can also put out fires for
 you. They will always succeed if left alone. However, they do so very slowly
 and are easy targets for enemy players at war.
 
-See also: WORKFORCE
+See also: COOKING FIRE, LIGHT, WORKFORCE
 #
 DRAG
 
@@ -502,6 +554,11 @@ Usage:  eat <item>
 If you're hungry or thirsty, these commands are for you! You can drink from
 wells, fountains, and the edge of nearby rivers, too.
 
+Being hungry or thirsty causes you to regenerate health, moves, and mana more
+slowly. It will also slow down any action you take, such as chopping or
+sailing. If you can no longer regenerate moves due to hunger, try sleeping.
+
+Examples:
   > eat bread
   > taste bread
   > drink from cup
@@ -536,6 +593,16 @@ If you also want to see empty slots, use the -a flag.
 
 See also: INVENTORY, REMOVE, WEAR, WIELD, HOLD, SHEATH, DRAW, SWAP
 #
+ESTATS ESTATISTICS
+
+Usage:  estats [empire]
+
+This command gets quick info on your empire (or another). It is a short version
+of the longer info shown with the "empire" command, and it defaults to your
+empire if you give no argument.
+
+See also: EMPIRE
+#
 EXECUTE
 
 Usage:  execute <victim>
@@ -553,6 +620,38 @@ Usage:  exits
 
 Gives you a list of the obvious exits from your location. This command is
 only useful indoors, because on the world map all directions are exits.
+#
+FACTION FACTIONS REPUTATIONS REP "FACTION REP"
+
+Usage:  factions [name]
+
+Factions are groups of NPCs and adventures with whom players can gain or lose
+reputation. The consequences of higher or lower reputation depend on the
+specific adventures where you find them.
+
+You can see information about any faction by using its name with this command.
+
+Reputation levels and values:
+  &RDespised&0  -100
+  &rHated&0  -99 to -75
+  &oLoathed&0  -74 to -30
+  &yDisliked&0  -29 to -10
+  &tNeutral&0  -9 to 9
+  &cLiked&0  10 to 29
+  &aEsteemed&0  30 to 74
+  &gVenerated&0  75 to 99
+  &gRevered&0  100
+#
+FIGHTMESSAGES "FIGHT MESSAGES" FMESSAGES "FIGHT SPAM" "COMBAT SPAM" "COMBAT MESSAGES"
+
+Usage:  fightmessages [type]
+        fmessages all <on | off>
+
+This command lets you toggle which fight messages you do or don't see. This can
+make combat less spammy and easier to understand. You can use multi-word
+abbreviations for these toggles, like "miss ag me" for "misses against me".
+
+See also: TOGGLE
 #
 FILL
 
@@ -705,10 +804,11 @@ See also: COMMANDS, HELPSEARCH, SOCIALS
 #
 HELPSEARCH "HELP SEARCH" "SEARCH HELP"
 
-Usage:  helpsearch <term>
+Usage:  helpsearch <term(s)>
 
 This command lets you search the body of help files, instead of just their
-keywords.
+keywords. You can search for multiple words at a time. If a single search
+term has multiple word, put it "in quotes".
 
 See also: HELP
 #
@@ -720,6 +820,8 @@ This command provides detailed information about an item or vehicle.
 
 Tip: When trying to identify an item in your inventory that has the same name
 as something you are wearing, try using "1.name".
+
+See also: EIDENTIFY
 #
 INFORMATIVE "TOGGLE INFORMATIVE"
 
@@ -729,8 +831,8 @@ Informative map mode shows you details about your buildings.
 
   &C[--]&0  being dismantled
   &c(--)&0  not done building
-  &m(BB)&0  needs maintenance
-  &r(GG)&0  extreme disrepair
+  &m(BB)&0  damaged/needs maintenance
+  &r(GG)&0  high damage/extreme disrepair
   &g/[]\&0  mine with ore
   &r/[]\&0  depleted mine
   &y^()^&0  chameleon building (immortal only)
@@ -751,10 +853,10 @@ Typing "ignore" with no argument will list who you're ignoring. You can't
 choose to ignore an immortal player, and immortals cannot use the ignore
 feature at all.
 #
-INFO POLICY VERSION
+INFO POLICY VERSION RULES CREDITS
 
-These commands show you important information about EmpireMUD. It is a good
-idea to read them every once in a while.
+Type these commands to see you important information about EmpireMUD. It is a
+good idea to read them every once in a while.
 
    info     - quickstart information for new players
    policy   - policies and rules
@@ -764,10 +866,22 @@ idea to read them every once in a while.
 INVENTORY
 
 Usage:  inventory
+        inventory [-i | -k | -n] <keywords>
+        inventory -c <component type>
+        inventory -w <wear location> [keywords]
+        inventory -t <type> [keywords]
 
 If you're uncertain about what you're carrying, or simply want to check that
 no thieves have got to your backpack. When in a storage building, this also
 checks the stored items there.
+
+You can also search your inventory by keyword, or use the following flags:
+  &c-i&0 - Identify items (e.g. levels).
+  &c-k&0 - Only show items marked (keep).
+  &c-n&0 - Omit items marked (keep).
+  &c-c&0 - Show items of component type (e.g. 'lumber', 'large, single block').
+  &c-w&0 - Show items which can be worn in a given slot (e.g. 'finger').
+  &c-t&0 - Show items of a given type (e.g. 'weapon').
 
 Items marked (large) take up two slots instead of one. If you equip an item
 to your "pack" slot, you can carry more items.
@@ -835,7 +949,8 @@ build things facing roads, and can usually build right over a road -- but the
 road underneath will be lost. Roads count as in-city territory as far away as
 3x a city's normal radius.
 
-Gain experience when you lay a road, but not on mountains.
+Gain experience when you lay a road (but not on mountains) or put down a
+road sign.
 
 See also: CHANT OF ILLUSIONS, EMPIRE, PATHFINDING, ROADSIGN
 #
@@ -888,9 +1003,15 @@ in each direction; a mapsize of 15 (standard) shows 7 in each direction.
 If you set your mapsize to 'auto', the game will attempt to detect the size of
 your client window.
 
+When you move very fast on the map, your mapsize will start to shrink as it
+becomes more difficult for your character to pay attention to all his/her
+surroundings (and saves the game time rendering large views repeatedly). You
+can restore your original mapsize if you stop and type 'look', or wait a few
+seconds.
+
 See also: TOGGLE
 #
-MAIL CHECK RECEIVE SEND
+MAIL CHECK RECEIVE SEND "PIGEON MAIL"
 
 Usage:  mail check
         mail send <person>
@@ -922,6 +1043,16 @@ distance to it. This can help with city planning and measuring distances for
 Workforce.
 
 See also: WORKFORCE
+#
+METERS "COMBAT METERS"
+
+Usage:  meters
+
+This shows your combat meters from your recent fights. If you turn on the
+"clearmeters" toggle, your meters will clear before every new fight. You can
+also type "clearmeters" to clear them at any time.
+
+See also: CLEARMETERS
 #
 MORTLOG
 
@@ -960,7 +1091,7 @@ a slow connection or if it just annoys you.
 
 See also: TOGGLE
 #
-NOTELL "NO TELL"
+NOTELL "NO TELL" "TOGGLE TELL"
 
 Usage:  toggle tell
 
@@ -968,7 +1099,7 @@ Use this toggle if you wish to prevent other players from using "tell" to
 communicate with you. (notell) will appear after your name in the WHO list if
 you have notell on.
 
-See also: IGNORE, TELL, WHO
+See also: IGNORE, TELL, TOGGLE, WHO
 #
 OPEN CLOSE
 
@@ -995,6 +1126,8 @@ Examples:
   > order cityguard sleep
 #
 PLAY INSTRUMENTS MUSIC
+
+Speed boosts:  haste
 
 You can play musical instruments with the "play" command. You must first "hold"
 the instrument. Different instruments will give different messages, but music
@@ -1122,6 +1255,7 @@ Here are the prompt codes and what they do:
   %c  conditions abbreviated (afk, hunger, thirst, etc)
   %C  conditions as words
   %s  bonus skill exp left today
+  %q  daily quests left today
 
 For immortals:
   %r  Sector/building/room number
@@ -1208,6 +1342,7 @@ See also: GRAB, HOLD, WEAR, WIELD, SHEATH, DRAW, SWAP
 REPAIR
 
 Usage:  repair <vehicle>
+Speed boosts:  Faster Chores bonus, haste
 
 This command allows you to repair vehicles that have decayed or been damaged.
 Like building, repair happens one item at a time using materials in your
@@ -1237,6 +1372,7 @@ Someone tells you, 'I am your secret admirer.'
 You tell someone, 'Who are you?'
 
 See also: IGNORE, TELL, NOTELL
+Immortals see also: BREAKREPLY
 #
 ROADSIGN "ROAD SIGN" SIGN "BLANK SIGN"
 
@@ -1251,6 +1387,8 @@ The message on the sign can be no longer than 70 characters, and you can only
 set up a sign on a road, bridge, swamp walk, or mountain path. If the road is
 removed, the sign will be lost. Each road tile can only have one sign at a
 time, and using this ability again will replace the old sign.
+
+Gain Roads experience when you place a road sign.
 
 See also: ROADS, WOODWORKING
 #
@@ -1330,14 +1468,14 @@ You can use ' as a shorthand for say, and " for oocsay, as in:
 
   > 'hello there.
 
-See also: GSAY, IGNORE, NOREPEAT, NOTELL, REPLY, SLASH CHANNELS
+See also: CHANNELS, GSAY, IGNORE, NOREPEAT, NOTELL, REPLY, SLASH CHANNELS
 #
 SAYHISTORY
 
 Usage:  sayhistory
 
 This command shows you the last 20 messages you saw from players in the room
-with you. It includes says, emotes, and socials.
+with you. It includes says, emotes, and socials, as well as group messages.
 
 See also: TELLHISTORY
 #
@@ -1658,7 +1796,7 @@ Handy time-conversion chart:
  - 1 regeneration tick in-game = 5 seconds
  - 1 hour in-game = 75 seconds
  - 1 day in-game = 30 minutes
- - 1 year in-game = 7 days
+ - 1 year in-game = 7.5 days
 #
 TITLE
 
@@ -1676,7 +1814,8 @@ TOGGLE TOGGLES
 Usage:  toggle [type]
 
 This command is the master switchboard for various preference toggles. You can
-use it to see your current preferences, or to switch them on and off.
+use it to see your current preferences, or to switch them on and off. Some
+toggles have their own help files under 'HELP TOGGLE <option>'.
 
 Toggles:
   tell - the tell channel
@@ -1699,6 +1838,9 @@ Toggles:
   channel-joins - blocks slash-channel join messages
   autorecall - if you're logged out over an hour, automatically sends you home
   stealthable - if off, you will be prevented from accidentally stealing
+  autodismount - will dismount you while moving, if necessary
+  no-empire - will not create a new empire when you try to claim or build
+  clearmeters - automatically clears your meters between combats
 
 Immortal toggles:
   wiznet - shuts off the immortal channel
@@ -1708,6 +1850,17 @@ Immortal toggles:
   idle-out - if off, the immortal will not disconnect from idling
   incognito - if on, the immortal does not appear on 'who' to mortals
   wizhide - if on, the immortal can't be seen in rooms but is not invisible
+  autonotes - automatically show notes on accounts when players log in
+
+See also: FIGHT MESSAGES, TOGGLE <type>
+#
+"TOGGLE NO-EMPIRE" "TOGGLE NOEMPIRE" NOEMPIRE NO-EMPIRE
+
+Usage:  toggle no-empire
+
+This toggle is for players who do not wish to be in any empire. The game will
+no longer create a new empire for you when you try to do things like claim
+or build.
 #
 UNLOAD UNLOADVEHICLE BOATUNLOAD
 

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: plrconv-20b2-to-20b3.c                          EmpireMUD 2.0b4 *
+*   File: plrconv-20b2-to-20b3.c                          EmpireMUD 2.0b5 *
 *  Usage: convert player file structures without wiping                   *
 *                                                                         *
 *  This converter updates playerfiles which were running 2.0b2 to the     *
@@ -259,7 +259,7 @@ struct b2_over_time_effect_type {
 };
 
 struct b2_cooldown_data {
-	sh_int type;	// any COOLDOWN_x const
+	sh_int type;	// any COOLDOWN_ const
 	time_t expire_time;	// time at which the cooldown has expired
 	
 	struct b2_cooldown_data *next;	// linked list
@@ -506,7 +506,7 @@ struct b3_over_time_effect_type {
 };
 
 struct b3_cooldown_data {
-	sh_int type;	// any COOLDOWN_x const
+	sh_int type;	// any COOLDOWN_ const
 	time_t expire_time;	// time at which the cooldown has expired
 	
 	struct b3_cooldown_data *next;	// linked list
@@ -826,7 +826,7 @@ int main(int argc, char *argv[]) {
 		// log progress to screen
 		if (stNew.access_level >= LVL_START_IMM)
 			printf("*");
-		else if (stNew.access_level >= LVL_APPROVED)
+		else if (stNew.access_level >= LVL_MORTAL)
 			printf("-");
 		else
 			printf(".");

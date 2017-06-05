@@ -26,8 +26,8 @@ Huge Stone Block (resource)
 Clay bricks (resource)
 
 The Block component is the building block of most buildings, and consists of
-stone blocks and clay bricks. Any recipes that call for (large block) allow
-the use of either, while some buildings require a specific one:
+stone blocks and clay bricks. Any recipes that call for (block) allow the use
+of either, while some buildings require a specific one:
 
 bunch:  clay bricks
 single:  stone block
@@ -88,6 +88,52 @@ dig up more clay. It can be stored at the Potter.
 
 See also: CLAY PIT, COMPONENT, POTTER
 #
+"COMPONENT TYPES" "COMPONENT TYPE LIST" "COMPONENT LIST" "RESOURCE TYPES" "RESOURCE LIST" "RESOURCE TYPE LIST"
+
+Available generic components:
+ &cadhesive&0 - not currently used
+ &cbone&0 - not currently used
+ &cblock&0 - building materials like bricks or blocks
+ &cclay&0 - moldable clay
+ &cdye&0 - any kind of dye
+ &cfeathers&0 - not currently used
+ &cfibers&0 - cotton, straw, etc.
+ &cflour&0 - ground up grains
+ &cfruit&0 - for cooking
+ &cfur&0 - animal furs for crafting
+ &cgem&0 - precious stones
+ &cgrain&0 - wheat, etc.
+ &chandle&0 - used for tools and weapons
+ &cherb&0 - used in potions and cooking
+ &cleather&0 - for armor and crafts
+ &clumber&0 - a core building material
+ &cmeat&0 - raw meat for cooking
+ &cmetal&0 - various useful or precious metals
+ &cnails&0 - a core building material
+ &coil&0 - for cooking or maintaining machinery
+ &cpillar&0 - for construction, like a log
+ &crock&0 - common stones dug up from the ground
+ &cseeds&0 - for planting or cooking
+ &cskin&0 - unprocessed animal skin or rawhide
+ &cstick&0 - a common building and crafting material
+ &ctextile&0 - cloth or fabric for crafting
+ &cvegetable&0 - for cooking
+ &crope&0 - for construction and harnessing animals
+
+See also: COMPONENT
+#
+CONVEYANCE "TRINKET OF CONVEYANCE"
+
+A trinket of conveyance can be used to teleport you back to a starting location
+(such as a Tower of Souls) from anywhere in the world. This item is single-use,
+so be sure to craft a few of them.
+
+You can't teleport out of certain locations, such as hostile territory or
+certain adventures. If you find yourself in one of these places, find a way
+out before using your trinket.
+
+See also: POTTERY, HESTIAN TRINKET
+#
 "CRAFTER ITEMS" "CRAFTING ITEMS" "CRAFT ITEMS" "CRAFTING LEVEL" "CRAFTER LEVEL" "CRAFT LEVEL"
 
 A character's crafts (forge, sew, craft, etc.) are scaled up to the character's
@@ -146,9 +192,10 @@ FIBERS "FIBERS COMPONENT" "FIBER COMPONENT"
 
 Fibers (component)
 
-Used for:  nothing (yet)
+Used for:  weaving, adventure crafts
 
-Fibers are a component type.
+Fibers are a component type usually used to make cloth. Typical examples are
+cotton and wool.
 
 See also: COMPONENT
 #
@@ -179,6 +226,19 @@ or split).
 
 See also: COMPONENT, COOK, CROPS
 #
+FURNITURE FURNISHINGS
+
+Characters with the Trade skill can craft furniture such as chairs and thrones,
+which you can sit on. In game terms, furniture is a special type of vehicle,
+and all commands that work on vehicles will also work on furniture.
+
+You can move furniture around by dragging it, including dragging it through
+portals.
+
+Furniture is cosmetic and provides no particular game function.
+
+See also: DRAG, WOODWORKING
+#
 FURS "FUR COMPONENT"
 
 Fur (component)
@@ -186,6 +246,9 @@ Fur (component)
 Used for:  sewing
 
 Fur is a component type primarily used for clothing and mage armor.
+
+small:  fox fur
+large:  big cat pelt
 
 See also: COMPONENT, SEW, SKIN COMMAND
 #
@@ -196,11 +259,16 @@ Gem (component)
 Used for:  crafting, enchanting
 Stored in:  Tower of Sorcery
 
-Gems are a component type encompassing the four magical gems: red bloodstones,
-yellow lightning stones, iridescent blue irises, and glowing green seashells.
+Gems are a component type encompassing the magical gems. The basic examples are
+red bloodstones, yellow lightning stones, iridescent blue irises, and glowing
+green seashells.
+
 Most recipes require a specific one of these, but a few accept any of them.
 
-See also: COMPONENT
+magic, basic:  iris, bloodstone, seashell, lightning stone
+magic, refined:  prismatic crystals
+
+See also: COMPONENT, PRISMATIC CRYSTAL
 #
 "GLOWING GREEN SEASHELL" "GLOWING SEASHELL" "GREEN SEASHELL" SEASHELL
 
@@ -232,7 +300,9 @@ Create a handle using the craft command.
 Handles are used in forging and crafting to provide a grasping surface to a
 tool or weapon. The most basic handles are made from sticks.
 
-See also: COMPONENT, CRAFT, FORGE
+The more advanced elegant handle can be made from magic wood.
+
+See also: COMPONENT, CRAFT, FORGE, EXQUISITE WOODWORKING
 #
 HERB HERBS "HERB COMPONENT"
 
@@ -294,7 +364,7 @@ Leather (component)
 
 Leather is a component type used in many sewing recipes.
 
-See also: COMPONENT, TAN, SKIN
+See also: COMPONENT, TAN, SKIN, VERDANT LEATHERS
 #
 "LIGHTNING STONE" "YELLOW LIGHTNING STONE" "YELLOW STONE"
 
@@ -314,7 +384,27 @@ Lumber is a component type created by sawing logs or trees at a lumber yard. It
 is used for many buildings. If a recipe calls for lumber, any type of lumber is
 usually fine.
 
-See also: COMPONENT, CHOP, SAW
+Not all types of trees can be sawed into lumber.
+
+See also: COMPONENT, CHOP, MAGEWOOD, SAW
+#
+MAGEWOOD "MAGE WOOD" "ENCHANTED TREE" "ENCHANTED FOREST" "ENCHANTED WOODS" "ENCHANTED COPSE" "CRYSTAL SEED" "PRISMATIC SEED" "STRANGE CRYSTAL SEED"
+
+Magewood is a type of lumber sawn from the trees of the enchanted forest. This
+type of forest is extremely rare. To grow it, you must find the strange crystal
+seed, enchant it (Enchant Tools), plant it, then use the chant of nature to
+grow it.
+
+Enchanted Forests are protected from over-chopping because they will grow back
+even from stumps. Be sure to claim the forest, though, as necrovandal cultists
+will quickly detect and destroy any unclaimed enchanted forest tiles.
+
+The only way to remove the forest tiles is to abandon them and let the necro-
+vandals destroy them.
+
+This wood is generally used in crafts in the 200-300 level range.
+
+See also: ABANDON, CHOP, CLAIM, ENCHANT TOOLS, SAW
 #
 METALS INGOTS BARS "METAL COMPONENT"
 
@@ -348,7 +438,11 @@ Meat (component)
 Used for:  cooking
 
 Meat is a component type mostly used in cooking. It is obtained by butchering
-animal corpses or fishing.
+animal corpses or fishing. Only raw meats count as a meat component, and are
+cooked when used in a recipe.
+
+raw:  meat fillets, poultry, pork
+raw, aquatic:  fish
 
 See also: COMPONENT, BUTCHER, COOK, FISH
 #
@@ -369,13 +463,15 @@ Nexus Crystal (resource)
 Nexus crystals are made from magical gems (such as the bloodstone). They are
 stored in Towers of Sorcery, and are used to build certain buildings.
 
-See also: EXARCH CRAFTS, PORTAL
+See also: EXARCH CRAFTS, PORTAL, PORTAL MAGIC
 #
 OIL "OIL COMPONENT"
 
 Oil (component)
 
-Used for:  cooking
+Used for:  cooking, vehicle repair
+
+The most common oil is olive oil. You can get olive oil by pressing olives.
 
 See also: COMPONENT, COOK, PRESS
 #
@@ -494,14 +590,14 @@ Usage:  store <item>
 
 It is recommended that you keep most of your extra resources stored. Items left
 on the ground in claimed territory will eventually be stored by the empire's
-citizens.
+citizens. Drink containers are usually emptied out when you store them.
 
 If you don't have the "storage" empire privilege, you can store items, but
 can't retrieve them.
 
-Unique, enchanted, superior, or otherwise-modified items can't be stored in
-regular storage buildings, but you can store them with the "warehouse" command
-in a warehouse or vault.
+Unique, enchanted, superior, leveled, or otherwise-modified items can't be
+stored in regular storage buildings, but you can store them with the
+"warehouse" command in a warehouse or vault. 
 
 If you're visiting another empire, you can store and retrieve your own items
 on credit from their public (or allied) buildings, IF you have a trade pact.
@@ -538,12 +634,13 @@ Bolt of cloth (resource)
 Used for:  sewing, crafting, building, vehicles
 Stored in:  Tailor, Carpenter
 
-You can weave cotton or wool into cloth. It will go faster if you're at a Tailor.
+You can weave cotton or wool into cloth. It will go faster if you're at a
+Tailor.
 
-You can use any type of cloth if a recipe calls for a (textile), but some recipes
-may need a specific type.
+You can use any type of cloth if a recipe calls for a (textile), but some
+recipes may need a specific type.
 
-See also: COMPONENT, CLOTH, WEAVE, COTTON, WOOL, TAILOR
+See also: COMPONENT, CLOTH, COTTON, HERBCLOTH WEAVING, TAILOR, WEAVE, WOOL
 #
 "TRADE COMMAND"
 
@@ -657,6 +754,12 @@ You'll receive 9 coins (95% of the sale price) plus your original 4 back, for
 a total of 13 coins.
 
 See also: TRADE COMMAND, TRADE BUY, TRADE CHECK, TRADE COLLECT
+#
+UNIQUE "UNIQUE ITEM" "UNIQUE OBJECT" (UNIQUE)
+
+The (unique) flag means you can only use one copy of an item at a time.
+
+See also: IDENTIFY
 #
 VAULT
 

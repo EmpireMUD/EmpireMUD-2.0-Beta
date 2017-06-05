@@ -334,7 +334,7 @@ a vial of sewage~
 A grimy vial is lying here.~
 You wouldn't quaff this vial on purpose, if you knew where it came from.
 ~
-25 0 a 1
+25 m a 2
 8 0 0
 8 8064
 S
@@ -364,8 +364,8 @@ S
 armor dragonwing wings dragon's piece~
 dragonwing armor~
 A piece of armor made from dragon's wings is folded on the ground.~
-   This armor looks like it was stitched together from baby dragon wings. 
-Scaly, creepy baby dragon wings.  
+   This armor looks like it was stitched together from baby dragon wings.
+Scaly, creepy baby dragon wings.
 ~
 27 mo aq 2
 2 0 0
@@ -483,7 +483,7 @@ a skycleaver belt~
 A skycleaver belt is lying in the dust.~
 This belt is sewn from fine silk.
 ~
-2 mo al 4
+2 jmo al 5
 -1 -1 -1
 11 0
 A
@@ -635,13 +635,16 @@ a goblin's vest~
 A goblin has left its vest here, perhaps.~
 This vest is small, and slightly too snug.
 ~
-2 mo ad 1
+2 mo ad 2
 -1 -1 -1
 11 0
 A
 9 1 0
 A
 5 -1 0
+M
+12
+$n is standing here, squeezed into a very small vest.~
 S
 #10050
 skull goblin~
@@ -649,9 +652,9 @@ a goblin skull~
 You see what appears to be a goblin skull.~
 This appears to be the skull of a goblin.
 ~
-3 mo ao 1
+3 mo ao 2
 0 0 0
-0 0
+14 0
 A
 17 1 0
 A
@@ -727,11 +730,14 @@ a glimmering doublet~
 A glimmering doublet is lying on the ground.~
 It shines in every color, all at once.
 ~
-2 eo ad 1
+2 eo ad 2
 -1 -1 -1
 10 0
 A
 5 1 0
+M
+12
+$n glimmers in the light.~
 S
 #10057
 wand bone long thin~
@@ -1040,5 +1046,16 @@ A
 12 1 1
 A
 1 -3 0
+S
+#10079
+trinket skycleaver~
+a skycleaver trinket~
+A skycleaver trinket is lying here.~
+You can 'use' this to teleport to the foyer of the tower Skycleave.
+~
+3 p a 3
+0 0 0
+12 0
+T 10079
 S
 $

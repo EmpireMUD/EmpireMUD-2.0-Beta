@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: comm.h                                          EmpireMUD 2.0b4 *
+*   File: comm.h                                          EmpireMUD 2.0b5 *
 *  Usage: header file: prototypes of public communication functions       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -23,10 +23,10 @@ void msg_to_vehicle(vehicle_data *veh, bool awake_only, const char *messg, ...) 
 void olc_audit_msg(char_data *ch, any_vnum vnum, const char *messg, ...);
 void send_to_group(char_data *ch, struct group_data *group, const char * msg, ...) __attribute__ ((format (printf, 3, 4)));
 void send_to_room(const char *messg, room_data *room);
-void send_to_outdoor(const char *messg, ...) __attribute__((format(printf, 1, 2)));
+void send_to_outdoor(bool weather, const char *messg, ...) __attribute__((format(printf, 2, 3)));
 void perform_to_all(const char *messg, char_data *ch);
 void close_socket(descriptor_data *d);
-void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, int type);
+void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, bitvector_t act_flags);
 
 
 // background color codes - not available to players so you have to sprintf/strcpy them in
@@ -51,6 +51,8 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 #define TO_IGNORE_BAD_CODE  BIT(12)	// ignores bad $ codes
 #define DG_NO_TRIG  BIT(13)	// don't check act trigger
 #define ACT_VEHICLE_OBJ  BIT(14)  // the middle/obj param is a vehicle
+#define TO_COMBAT_HIT  BIT(15)	// is a hit (fightmessages) -- REQUIRES vict_obj is a char
+#define TO_COMBAT_MISS  BIT(16)	// is a miss (fightmessages) -- REQUIRES vict_obj is a char
 
 /* I/O functions */
 int write_to_descriptor(socket_t desc, const char *txt);
@@ -58,7 +60,7 @@ void write_to_q(const char *txt, struct txt_q *queue, int aliased, bool add_to_h
 void write_to_output(const char *txt, descriptor_data *d);
 void page_string(descriptor_data *d, char *str, int keep_internal);
 void string_add(descriptor_data *d, char *str);
-void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_t max_len);
+void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_t max_len, bool allow_null);
 
 #define SEND_TO_Q(messg, desc)  write_to_output((messg), desc)
 

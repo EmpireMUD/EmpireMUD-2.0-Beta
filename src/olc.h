@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: olc.h                                           EmpireMUD 2.0b4 *
+*   File: olc.h                                           EmpireMUD 2.0b5 *
 *  Usage: On-Line Creation header file                                    *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -47,7 +47,9 @@
 #define OLC_VEHICLE  BIT(17)
 #define OLC_MORPH  BIT(18)
 #define OLC_QUEST  BIT(19)
-#define NUM_OLC_TYPES  20
+#define OLC_SOCIAL  BIT(20)
+#define OLC_FACTION  BIT(21)
+#define NUM_OLC_TYPES  22
 
 
 // olc command flags
@@ -64,7 +66,7 @@
 #define OLC_FLAG_NO_MOBILE  BIT(4)	// cannot edit mobs
 #define OLC_FLAG_NO_OBJECT  BIT(5)	// cannot edit objects
 #define OLC_FLAG_NO_BUILDING  BIT(6)	// cannot edit buildings
-#define OLC_FLAG_SECTORS  BIT(7)	// can edit sectors
+#define OLC_FLAG_NO_SECTORS  BIT(7)	// cannot edit sectors
 #define OLC_FLAG_NO_CROP  BIT(8)	// cannot edit crops
 #define OLC_FLAG_NO_TRIGGER  BIT(9)	// cannot edit triggers
 #define OLC_FLAG_NO_ADVENTURE  BIT(10)	// cannot edit adventures
@@ -78,6 +80,8 @@
 #define OLC_FLAG_NO_VEHICLES  BIT(18)	// cannot edit vehicles
 #define OLC_FLAG_NO_MORPHS  BIT(19)	// cannot edit morphs
 #define OLC_FLAG_NO_QUESTS  BIT(19)	// cannot edit quests
+#define OLC_FLAG_NO_SOCIALS  BIT(20)	// cannot edit socials
+#define OLC_FLAG_NO_FACTIONS  BIT(21)	// cannot edit factionss
 
 
 // for trigger editing
@@ -106,7 +110,7 @@ extern bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
 extern double olc_process_double(char_data *ch, char *argument, char *name, char *command, double min, double max, double old_value);
 extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
 extern int olc_process_number(char_data *ch, char *argument, char *name, char *command, int min, int max, int old_value);
-void olc_process_string(char_data *ch, char *argument, char *name, char **save_point);
+void olc_process_string(char_data *ch, char *argument, const char *name, char **save_point);
 extern int olc_process_type(char_data *ch, char *argument, char *name, char *command, const char **type_names, int old_value);
 void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_data **list);
 void olc_process_icons(char_data *ch, char *argument, struct icon_data **list);

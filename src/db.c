@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: db.c                                            EmpireMUD 2.0b4 *
+*   File: db.c                                            EmpireMUD 2.0b5 *
 *  Usage: Loading/saving chars, booting/resetting world, internal funcs   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -61,7 +61,7 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
 int file_to_string_alloc(const char *name, char **buf);
 void get_one_line(FILE *fl, char *buf);
 void index_boot_help();
-void save_daily_cycle();
+void reset_time();
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -101,12 +101,17 @@ empire_data *empire_table = NULL;	// hash table of empires
 double empire_score_average[NUM_SCORES];
 struct trading_post_data *trading_list = NULL;	// global LL of trading post stuff
 
+// factions
+faction_data *faction_table = NULL;	// main hash (hh)
+faction_data *sorted_factions = NULL;	// alpha hash (sorted_hh)
+int MAX_REPUTATION = 0;	// highest possible rep value, auto-detected at startup
+int MIN_REPUTATION = 0;	// lowest possible rep value, auto-detected at startup
+
 // fight system
 struct message_list fight_messages[MAX_MESSAGES];	// fighting messages
 
 // game config
 time_t boot_time = 0;	// time of mud boot
-int daily_cycle = 0;	// this is a timestamp for the last time skills/exp reset
 int Global_ignore_dark = 0;	// For use in public channels
 int no_auto_deletes = 0;	// skip player deletes on boot?
 struct time_info_data time_info;	// the infomation about the time
@@ -158,10 +163,18 @@ room_template *room_template_table = NULL;	// hash table of room templates
 
 // sectors
 sector_data *sector_table = NULL;	// sector hash table
+struct sector_index_type *sector_index = NULL;	// index lists
+struct map_data *last_evo_tile = NULL;	// for resuming map evolutions
+sector_data *last_evo_sect = NULL;	// for resuming map evolutions
+int evos_per_hour = 1;	// how many map tiles evolve per hour (for load-balancing)
 
 // skills
 skill_data *skill_table = NULL;	// main skills hash (hh)
 skill_data *sorted_skills = NULL;	// alpha hash (sorted_hh)
+
+// socials
+social_data *social_table = NULL;	// master social hash table (hh)
+social_data *sorted_socials = NULL;	// alphabetic version (sorted_hh)
 
 // strings
 char *credits = NULL;	// game credits
@@ -184,6 +197,7 @@ int tips_of_the_day_size = 0;	// size of tip array
 // triggers
 trig_data *trigger_table = NULL;	// trigger prototype hash
 trig_data *trigger_list = NULL;	// LL of all attached triggers
+trig_data *random_triggers = NULL;	// DLL of live random triggers (next_in_random_triggers, prev_in_random_triggers)
 int max_mob_id = MOB_ID_BASE;	// for unique mob ids
 int max_obj_id = OBJ_ID_BASE;	// for unique obj ids
 int max_vehicle_id = VEHICLE_ID_BASE;	// for unique vehicle ids
@@ -233,6 +247,8 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 	{ VEH_PREFIX, VEH_SUFFIX },	// DB_BOOT_SKILL
 	{ MORPH_PREFIX, MORPH_SUFFIX },	// DB_BOOT_MORPH
 	{ QST_PREFIX, QST_SUFFIX },	// DB_BOOT_QST
+	{ SOC_PREFIX, SOC_SUFFIX },	// DB_BOOT_SOC
+	{ FCT_PREFIX, FCT_SUFFIX },	// DB_BOOT_FCT
 };
 
 
@@ -245,7 +261,6 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 */
 void boot_db(void) {
 	void Read_Invalid_List();
-	void boot_social_messages();
 	void boot_world();
 	void build_all_quest_lookups();
 	void build_player_index();
@@ -253,16 +268,17 @@ void boot_db(void) {
 	void check_version();
 	void delete_old_players();
 	void delete_orphaned_rooms();
+	void detect_evos_per_hour();
 	void init_config_system();
 	void link_and_check_vehicles();
 	void load_banned();
-	void load_daily_cycle();
+	void load_data_table();
 	void load_intro_screens();
 	void load_fight_messages();
 	void load_tips_of_the_day();
 	void load_trading_post();
-	void reset_time();
 	int run_convert_vehicle_list();
+	void run_reboot_triggers();
 	void sort_commands();
 	void startup_room_reset();
 	void verify_sectors();
@@ -271,7 +287,10 @@ void boot_db(void) {
 	
 	log("Loading game config system.");
 	init_config_system();
-
+	
+	log("Loading game data system.");
+	load_data_table();
+	
 	log("Resetting the game time:");
 	reset_time();
 
@@ -300,17 +319,11 @@ void boot_db(void) {
 	log("Generating player index.");
 	build_player_index();
 	
-	log(" Calculating territory and members...");
-	reread_empire_tech(NULL);
-	
 	log(" Checking for ruined cities...");
 	check_ruined_cities();
 
 	log("Loading fight messages.");
 	load_fight_messages();
-
-	log("Loading social messages.");
-	boot_social_messages();
 	
 	log("Loading trading post.");
 	load_trading_post();
@@ -333,9 +346,6 @@ void boot_db(void) {
 	log("Resetting all rooms.");
 	startup_room_reset();
 
-	load_daily_cycle();
-	log("Beginning skill reset cycle at %d.", daily_cycle);
-	
 	// NOTE: check_version() updates many things that change from version to
 	// version. See the function itself for a list of one-time updates it runs
 	// on the game. This should run as late in boot_db() as possible.
@@ -360,6 +370,16 @@ void boot_db(void) {
 	log("Building quest lookup hints.");
 	build_all_quest_lookups();
 	
+	// figure out how often to evolve what (do this late)
+	detect_evos_per_hour();
+	
+	// final things...
+	log("Running reboot triggers.");
+	run_reboot_triggers();
+	
+	log(" Calculating territory and members.");
+	reread_empire_tech(NULL);
+	
 	// END
 	log("Boot db -- DONE.");
 	boot_time = time(0);
@@ -375,6 +395,7 @@ void boot_world(void) {
 	void build_land_map();
 	void build_world_map();
 	void check_abilities();
+	void check_and_link_faction_relations();
 	void check_archetypes();
 	void check_classes();
 	void check_skills();
@@ -384,6 +405,8 @@ void boot_world(void) {
 	void check_triggers();
 	void clean_empire_logs();
 	void index_boot_world();
+	void init_reputation();
+	void load_daily_quest_file();
 	void load_empire_storage();
 	void load_instances();
 	void load_islands();
@@ -398,6 +421,7 @@ void boot_world(void) {
 	extern int sort_classes_by_data(class_data *a, class_data *b);
 	extern int sort_crafts_by_data(craft_data *a, craft_data *b);
 	extern int sort_skills_by_data(skill_data *a, skill_data *b);
+	extern int sort_socials_by_data(social_data *a, social_data *b);
 
 	// DB_BOOT_x search: boot new types in this function
 	
@@ -430,6 +454,10 @@ void boot_world(void) {
 	
 	log("Loading vehicles.");
 	index_boot(DB_BOOT_VEH);
+	
+	log("Loading factions.");
+	index_boot(DB_BOOT_FCT);
+	init_reputation();
 	
 	// requires sectors, buildings, and room templates -- order matters here
 	log("Loading the world.");
@@ -484,15 +512,22 @@ void boot_world(void) {
 	log("Loading morphs.");
 	index_boot(DB_BOOT_MORPH);
 	
+	log("Loading socials.");
+	index_boot(DB_BOOT_SOC);
+	
 	log("Loading instances.");
 	load_instances();
 	
 	log("Loading empire storage.");
 	load_empire_storage();
 	
+	log("Loading daily quest cycles.");
+	load_daily_quest_file();
+	
 	// check for bad data
 	log("Verifying data.");
 	check_abilities();
+	check_and_link_faction_relations();
 	check_archetypes();
 	check_classes();
 	check_skills();
@@ -508,9 +543,13 @@ void boot_world(void) {
 	HASH_SRT(sorted_hh, sorted_classes, sort_classes_by_data);
 	HASH_SRT(sorted_hh, sorted_crafts, sort_crafts_by_data);
 	HASH_SRT(sorted_hh, sorted_skills, sort_skills_by_data);
+	HASH_SRT(sorted_hh, sorted_socials, sort_socials_by_data);
 	
 	log("Checking newbie islands.");
 	check_newbie_islands();
+	
+	log("Assigning dummy mob traits.");
+	dummy_mob.rank = 1;	// prevents random crashes when IS_NPC isn't checked correctly in new code
 }
 
 
@@ -785,11 +824,7 @@ void verify_sectors(void) {
 	HASH_ITER(hh, world_table, room, next_room) {
 		if (!SECT(room)) {
 			// can't use change_terrain() here
-			SECT(room) = use_sect;
-			if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-				world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].sector_type = use_sect;
-				world_map_needs_save = TRUE;
-			}
+			perform_change_sect(room, NULL, use_sect);
 		}
 		if (!BASE_SECT(room)) {
 			change_base_sector(room, use_sect);
@@ -992,6 +1027,26 @@ int file_to_string_alloc(const char *name, char **buf) {
 }
 
 
+// reads in one action line
+char *fread_action(FILE * fl, int nr) {
+	char buf[MAX_STRING_LENGTH], *rslt;
+
+	fgets(buf, MAX_STRING_LENGTH, fl);
+	if (feof(fl)) {
+		log("SYSERR: fread_action - unexpected EOF near action #%d", nr+1);
+		exit(1);
+		}
+	if (*buf == '#')
+		return (NULL);
+	else {
+		*(buf + strlen(buf) - 1) = '\0';
+		CREATE(rslt, char, strlen(buf) + 1);
+		strcpy(rslt, buf);
+		return (rslt);
+	}
+}
+
+
 /* read and allocate space for a '~'-terminated string from a given file */
 char *fread_string(FILE * fl, char *error) {
 	char buf[MAX_STRING_LENGTH], tmp[MAX_INPUT_LENGTH], *rslt;
@@ -1114,8 +1169,8 @@ void load_help(FILE *fl) {
 					el.level = LVL_GOD;
 					break;
 				}
-				case 'f': {
-					el.level = LVL_APPROVED;
+				case 'f': {	// everyone can see this anyway
+					el.level = LVL_MORTAL;
 					break;
 				}
 			}
@@ -1511,6 +1566,48 @@ void clear_char(char_data *ch) {
 
 
 /**
+* This is called during creation, and before loading a player from file. It
+* initializes things that should be -1/NOTHINGs.
+*
+* @param char_data *ch A player.
+*/
+void init_player_specials(char_data *ch) {
+	int iter;
+	
+	if (IS_NPC(ch)) {
+		syslog(SYS_ERROR, 0, TRUE, "SYSERR: init_player_specials called on an NPC");
+		return;
+	}
+	
+	// ensures they have unique player_specials
+	if (!(ch->player_specials) || ch->player_specials == &dummy_mob) {
+		CREATE(ch->player_specials, struct player_special_data, 1);
+	}
+	
+	GET_LAST_ROOM(ch) = NOWHERE;
+	GET_LOADROOM(ch) = NOWHERE;
+	GET_LOAD_ROOM_CHECK(ch) = NOWHERE;
+	GET_MARK_LOCATION(ch) = NOWHERE;
+	GET_MOUNT_VNUM(ch) = NOTHING;
+	GET_PLEDGE(ch) = NOTHING;
+	GET_TOMB_ROOM(ch) = NOWHERE;
+	GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
+	GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
+	GET_LAST_TELL(ch) = NOBODY;
+	GET_TEMPORARY_ACCOUNT_ID(ch) = NOTHING;
+	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
+	
+	for (iter = 0; iter < MAX_REWARDS_PER_DAY; ++iter) {
+		GET_REWARDED_TODAY(ch, iter) = -1;
+	}
+	
+	for (iter = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
+		CREATION_ARCHETYPE(ch, iter) = NOTHING;
+	}
+}
+
+
+/**
 * Create a new mobile from a prototype. You should almost always call this with
 * with_triggers = TRUE.
 *
@@ -1554,11 +1651,9 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 
 	// GET_MAX_BLOOD is a function
 	GET_BLOOD(mob) = GET_MAX_BLOOD(mob);
-
-	GET_ID(mob) = max_mob_id++;
-	/* find_char helper */
-	add_to_lookup_table(GET_ID(mob), (void *)mob);
-
+	
+	mob->script_id = 0;	// will detect when needed
+	
 	if (with_triggers) {
 		mob->proto_script = copy_trig_protos(proto->proto_script);
 		assign_triggers(mob, MOB_TRIGGER);
@@ -1566,6 +1661,9 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 	else {
 		mob->proto_script = NULL;
 	}
+	
+	// note this may lead to slight over-spawning after reboots -pc 5/20/16
+	MOB_SPAWN_TIME(mob) = time(0);
 
 	return (mob);
 }
@@ -1586,6 +1684,7 @@ void clear_object(obj_data *obj) {
 	
 	obj->last_owner_id = NOBODY;
 	obj->last_empire_id = NOTHING;
+	obj->stolen_from = NOTHING;
 }
 
 
@@ -1604,11 +1703,9 @@ obj_data *create_obj(void) {
 	
 	// ensure it doesn't decay unless asked
 	GET_OBJ_TIMER(obj) = UNLIMITED;
-
-	GET_ID(obj) = max_obj_id++;
-	/* find_obj helper */
-	add_to_lookup_table(GET_ID(obj), (void *)obj);
-
+	
+	obj->script_id = 0;	// will detect when needed
+	
 	return (obj);
 }
 
@@ -1642,9 +1739,7 @@ obj_data *read_object(obj_vnum nr, bool with_triggers) {
 	if (obj->obj_flags.timer == 0)
 		obj->obj_flags.timer = UNLIMITED;
 	
-	GET_ID(obj) = max_obj_id++;
-	/* find_obj helper */
-	add_to_lookup_table(GET_ID(obj), (void *)obj);
+	obj->script_id = 0;	// will detect when needed
 	
 	if (with_triggers) {
 		obj->proto_script = copy_trig_protos(proto->proto_script);
@@ -1678,6 +1773,15 @@ const char *versions_list[] = {
 	"b3.12",
 	"b3.15",
 	"b3.17",
+	"b4.1",
+	"b4.2",
+	"b4.4",
+	"b4.15",
+	"b4.19",
+	"b4.32",
+	"b4.36",
+	"b4.38",
+	"b4.39",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2049,10 +2153,218 @@ void b3_17_road_update(void) {
 }
 
 
+// adds approval
+PLAYER_UPDATE_FUNC(b4_1_approve_players) {
+	player_index_data *index;
+	
+	// fix some level glitches caused by this patch
+	if (GET_IMMORTAL_LEVEL(ch) == -1) {
+		GET_ACCESS_LEVEL(ch) = MIN(LVL_MORTAL, GET_ACCESS_LEVEL(ch));
+	}
+	else {
+		GET_ACCESS_LEVEL(ch) = LVL_TOP - GET_IMMORTAL_LEVEL(ch);
+		GET_ACCESS_LEVEL(ch) = MAX(GET_ACCESS_LEVEL(ch), LVL_GOD);
+	}
+	if (GET_ACCESS_LEVEL(ch) == LVL_GOD) {
+		GET_ACCESS_LEVEL(ch) = LVL_START_IMM;
+	}
+	
+	// if we should approve them (approve all imms now)
+	if (IS_IMMORTAL(ch) || (GET_ACCESS_LEVEL(ch) >= LVL_MORTAL && config_get_bool("auto_approve"))) {
+		if (config_get_bool("approve_per_character")) {
+			SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
+		}
+		else {	// per-account (default)
+			SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_APPROVED);
+			SAVE_ACCOUNT(GET_ACCOUNT(ch));
+		}
+	}
+	
+	// update the index in case any of this changed
+	if ((index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
+		update_player_index(index, ch);
+	}
+}
+
+
+// adds current mount to mounts list
+PLAYER_UPDATE_FUNC(b4_2_mount_update) {
+	void check_delayed_load(char_data *ch);
+	
+	check_delayed_load(ch);
+	
+	if (GET_MOUNT_VNUM(ch)) {
+		add_mount(ch, GET_MOUNT_VNUM(ch), GET_MOUNT_FLAGS(ch) & ~MOUNT_RIDING);
+	}
+}
+
+
+// sets default fight message flags
+PLAYER_UPDATE_FUNC(b4_4_fight_messages) {
+	SET_BIT(GET_FIGHT_MESSAGES(ch), DEFAULT_FIGHT_MESSAGES);
+}
+
+
+// convert data on unfinished buildings and disrepair
+void b4_15_building_update(void) {
+	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
+	extern struct resource_data *copy_resource_list(struct resource_data *input);
+	
+	struct resource_data *res, *disrepair_res;
+	room_data *room, *next_room;
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		// add INCOMPLETE aff
+		if (BUILDING_RESOURCES(room) && !IS_DISMANTLING(room)) {
+			SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_INCOMPLETE);
+			SET_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_INCOMPLETE);
+		}
+		
+		// convert maintenance
+		if (COMPLEX_DATA(room) && GET_BUILDING(room) && COMPLEX_DATA(room)->disrepair > 0) {
+			// add maintenance
+			if (GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room))) {
+				// basic stuff
+				disrepair_res = copy_resource_list(GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)));
+				
+				// multiply by years of disrepair
+				LL_FOREACH(disrepair_res, res) {
+					res->amount *= COMPLEX_DATA(room)->disrepair;
+				}
+				
+				// combine into existing resources
+				if (BUILDING_RESOURCES(room)) {
+					res = BUILDING_RESOURCES(room);
+					GET_BUILDING_RESOURCES(room) = combine_resources(res, disrepair_res);
+					free_resource_list(res);
+				}
+				else {
+					GET_BUILDING_RESOURCES(room) = disrepair_res;
+				}
+			}
+			
+			// add damage (10% per year of disrepair)
+			COMPLEX_DATA(room)->damage += COMPLEX_DATA(room)->disrepair * GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) / 10;
+		}
+		
+		// clear this
+		if (COMPLEX_DATA(room)) {
+			COMPLEX_DATA(room)->disrepair = 0;
+		}
+	}
+	
+	save_whole_world();
+}
+
+
+// 4.19 removes the vampire flag
+PLAYER_UPDATE_FUNC(b4_19_update_players) {
+	bitvector_t PLR_VAMPIRE = BIT(14);
+	REMOVE_BIT(PLR_FLAGS(ch), PLR_VAMPIRE);
+}
+
+
+// 4.32 moves 2 rmt flags to fnc flags
+void b4_32_convert_rmts(void) {
+	bitvector_t RMT_PIGEON_POST = BIT(9);	// j. can use mail here
+	bitvector_t RMT_COOKING_FIRE = BIT(10);	// k. can cook here
+
+	room_template *rmt, *next_rmt;
+	
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		if (IS_SET(GET_RMT_FLAGS(rmt), RMT_PIGEON_POST)) {
+			REMOVE_BIT(GET_RMT_FLAGS(rmt), RMT_PIGEON_POST);
+			SET_BIT(GET_RMT_FUNCTIONS(rmt), FNC_MAIL);
+			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
+			log("- updated rmt %d: PIGEON-POST", GET_RMT_VNUM(rmt));
+		}
+		if (IS_SET(GET_RMT_FLAGS(rmt), RMT_COOKING_FIRE)) {
+			REMOVE_BIT(GET_RMT_FLAGS(rmt), RMT_COOKING_FIRE);
+			SET_BIT(GET_RMT_FUNCTIONS(rmt), FNC_COOKING_FIRE);
+			save_library_file_for_vnum(DB_BOOT_RMT, GET_RMT_VNUM(rmt));
+			log("- updated rmt %d: COOKING-FIRE", GET_RMT_VNUM(rmt));
+		}
+	}
+}
+
+
+// 4.36 needs triggers attached to studies
+void b4_36_study_triggers(void) {
+	const any_vnum bld_study = 5608, attach_trigger = 5609;
+	struct trig_proto_list *tpl;
+	room_data *room;
+	
+	LL_FOREACH2(interior_room_list, room, next_interior) {
+		if (!GET_BUILDING(room) || GET_BLD_VNUM(GET_BUILDING(room)) != bld_study) {
+			continue;
+		}
+		
+		CREATE(tpl, struct trig_proto_list, 1);
+		tpl->vnum = attach_trigger;
+		LL_CONCAT(room->proto_script, tpl);
+		
+		assign_triggers(room, WLD_TRIGGER);
+	}
+}
+
+
+// 4.38 needs triggers attached to towers
+void b4_38_tower_triggers(void) {
+	const any_vnum bld_tower = 5511, attach_trigger = 5511;
+	struct trig_proto_list *tpl;
+	room_data *room;
+	
+	LL_FOREACH2(interior_room_list, room, next_interior) {
+		if (!GET_BUILDING(room) || GET_BLD_VNUM(GET_BUILDING(room)) != bld_tower) {
+			continue;
+		}
+		
+		CREATE(tpl, struct trig_proto_list, 1);
+		tpl->vnum = attach_trigger;
+		LL_CONCAT(room->proto_script, tpl);
+		
+		assign_triggers(room, WLD_TRIGGER);
+	}
+}
+
+
+// b4.39 convert stored data from old files
+void b4_39_data_conversion(void) {
+	const char *EXP_FILE = LIB_ETC"exp_cycle";	// used prior to this patch
+	const char *TIME_FILE = LIB_ETC"time";
+	
+	long l_in;
+	int i_in;
+	FILE *fl;
+	
+	// exp cycle file
+	if ((fl = fopen(EXP_FILE, "r"))) {
+		fscanf(fl, "%d\n", &i_in);
+		data_set_long(DATA_DAILY_CYCLE, i_in);
+		log(" - imported daily cycle %ld", data_get_long(DATA_DAILY_CYCLE));
+		fclose(fl);
+		unlink(EXP_FILE);
+	}
+	
+	// time file
+	if ((fl = fopen(TIME_FILE, "r"))) {
+		fscanf(fl, "%ld\n", &l_in);
+		data_set_long(DATA_WORLD_START, l_in);
+		log(" - imported start time %ld", data_get_long(DATA_WORLD_START));
+		fclose(fl);
+		unlink(TIME_FILE);
+		
+		reset_time();
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
-void check_version(void) {	
+void check_version(void) {
+	void resort_empires(bool force);
+	
 	int last, iter, current = NOTHING;
 	
 	#define MATCH_VERSION(name)  (!str_cmp(versions_list[iter], name))
@@ -2077,7 +2389,7 @@ void check_version(void) {
 			HASH_ITER(hh, empire_table, emp, next_emp) {
 				// auto-balance was removed and the same id was used for dismantle-mines
 				set_workforce_limit_all(emp, CHORE_DISMANTLE_MINES, 0);
-				save_empire(emp);
+				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			}
 		}
 		if (MATCH_VERSION("b2.8")) {
@@ -2219,6 +2531,44 @@ void check_version(void) {
 			log("Adding b3.17 road data...");
 			b3_17_road_update();
 		}
+		if (MATCH_VERSION("b4.1")) {
+			log("Adding b4.1 approval data...");
+			update_all_players(NULL, b4_1_approve_players);
+			reread_empire_tech(NULL);
+			resort_empires(TRUE);
+		}
+		if (MATCH_VERSION("b4.2")) {
+			log("Adding b4.2 mount data...");
+			update_all_players(NULL, b4_2_mount_update);
+		}
+		if (MATCH_VERSION("b4.4")) {
+			log("Adding b4.4 fight messages...");
+			update_all_players(NULL, b4_4_fight_messages);
+		}
+		if (MATCH_VERSION("b4.15")) {
+			log("Converting b4.15 building data...");
+			b4_15_building_update();
+		}
+		if (MATCH_VERSION("b4.19")) {
+			log("Applying b4.19 update to players...");
+			update_all_players(NULL, b4_19_update_players);
+		}
+		if (MATCH_VERSION("b4.32")) {
+			log("Applying b4.32 update to rmts...");
+			b4_32_convert_rmts();
+		}
+		if (MATCH_VERSION("b4.36")) {
+			log("Applying b4.36 update to studies...");
+			b4_36_study_triggers();
+		}
+		if (MATCH_VERSION("b4.38")) {
+			log("Applying b4.38 update to towers...");
+			b4_38_tower_triggers();
+		}
+		if (MATCH_VERSION("b4.39")) {
+			log("Converting datat to b4.39 format...");
+			b4_39_data_conversion();
+		}
 	}
 	
 	write_last_boot_version(current);
@@ -2268,9 +2618,13 @@ void assign_old_workforce_chore(empire_data *emp, int chore) {
 
 /* reset the time in the game from file */
 void reset_time(void) {
-	long load_time();	// db.c
-
-	long beginning_of_time = load_time();
+	long beginning_of_time = data_get_long(DATA_WORLD_START);
+	
+	// a whole new world!
+	if (!beginning_of_time) {
+		beginning_of_time = time(0);
+		data_set_long(DATA_WORLD_START, beginning_of_time);
+	}
 
 	time_info = *mud_time_passed(time(0), beginning_of_time);
 
@@ -2343,29 +2697,10 @@ void setup_start_locations(void) {
 //// MISCELLANEOUS LOADERS ///////////////////////////////////////////////////
 
 /**
-* Loads the timestamp for the daily skill gain cycle.
-*/
-void load_daily_cycle(void) {
-	FILE *fl;
-
-	if (!(fl = fopen(EXP_FILE, "r"))) {
-		daily_cycle = time(0);
-		save_daily_cycle();	// save now so we get a reset in 24 hours
-		return;
-	}
-
-	fscanf(fl, "%d\n", &daily_cycle);
-	fclose(fl);
-}
-
-
-/**
 * Loads the "messages" file, which contains damage messages for various attack
 * types.
 */
 void load_fight_messages(void) {
-	extern char *fread_action(FILE * fl, int nr);
-	
 	FILE *fl;
 	int i, type;
 	struct message_type *messages;
@@ -2473,29 +2808,6 @@ void load_intro_screens(void) {
 	}
 	
 	log("Loaded %d intro screens.", num_intros);
-}
-
-
-/**
-* Loads (and sometimes creates) the timestamp file that we use to compute
-* when the game "began".
-*/
-long load_time(void) {
-	long t;
-	FILE *fp;
-
-	if (!(fp = fopen(TIME_FILE, "r"))) {
-		if (!(fp = fopen(TIME_FILE, "w"))) {
-			log("SYSERR: Unable to create a beginning_of_time file!");
-			return 650336715;
-		}
-		fprintf(fp, "%ld\n", time(0));
-		fclose(fp);
-		return time(0);
-	}
-	fscanf(fp, "%ld\n", &t);
-	fclose(fp);
-	return t;
 }
 
 
@@ -2637,24 +2949,6 @@ void load_trading_post(void) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS SAVERS ////////////////////////////////////////////////////
-
-/**
-* Saves the timestamp file for the daily skill cycle.
-*/
-void save_daily_cycle(void) {
-	FILE *fl;
-
-	if (!(fl = fopen(EXP_FILE TEMP_SUFFIX, "w"))) {
-		log("Error opening daily cycle file!");
-		return;
-	}
-
-	fprintf(fl, "%d\n", daily_cycle);
-	fclose(fl);
-	
-	rename(EXP_FILE TEMP_SUFFIX, EXP_FILE);
-}
-
 
 /**
 * Save the trading post file (done after any changes).

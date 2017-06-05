@@ -1,6 +1,6 @@
 #11100
 Hermit Greeting~
-0 bg 25
+0 bgw 25
 ~
 wait 1 sec
 say Are you going to eat that?
@@ -165,18 +165,12 @@ end
 Rock Obstacle 11120~
 2 g 100
 ~
-context %room.vnum%
 if %actor.is_pc%
   eval lean_left 0
   remote lean_left %actor.id%
   eval lean_right 0
   remote lean_right %actor.id%
 end
-if (%rock_obstacle_running% && %rock_obstacle_running% + 60 > %timestamp%)
-  halt
-end
-eval rock_obstacle_running %timestamp%
-global rock_obstacle_running
 wait 1 sec
 eval rock_left (%random.2% == 2)
 global rock_left
@@ -191,7 +185,21 @@ eval fail 0
 eval ch %room.people%
 while %ch%
   if %ch.is_pc% && !%ch.nohassle%
-    if (%rock_left% && %ch.varexists(lean_right)% && %ch.lean_right%) || (!%rock_left% && %ch.varexists(lean_left)% && %ch.lean_left%)
+    set this_loop_correct 0
+    if %rock_left%
+      if %ch.varexists(lean_right)%
+        if %ch.lean_right%
+          set this_loop_correct 1
+        end
+      end
+    else
+      if %ch.varexists(lean_left)%
+        if %ch.lean_left%
+          set this_loop_correct 1
+        end
+      end
+    end
+    if %this_loop_correct%
       eval correct %correct% + 1
     else
       eval fail %fail% + 1
@@ -199,9 +207,6 @@ while %ch%
   end
   eval ch %ch.next_in_room%
 done
-eval rock_obstacle_running 0
-global rock_obstacle_running
-unset rock_obstacle_running
 if %correct% > %fail%
   %echo% The boat leans away from the huge rock!
   %teleport% all i11121
@@ -221,16 +226,10 @@ end
 Tree Branch 11121~
 2 g 100
 ~
-context %room.vnum%
 if %actor.is_pc%
   eval has_ducked 0
   remote has_ducked %actor.id%
 end
-if (%tree_branch_running% && %tree_branch_running% + 60 > %timestamp%)
-  halt
-end
-eval tree_branch_running %timestamp%
-global tree_branch_running
 wait 1 sec
 %echo% &RThe boat is coming up on a low-hanging tree branch!&0
 wait 8 sec
@@ -239,7 +238,13 @@ eval wins 0
 while %ch%
   eval next_ch %ch.next_in_room%
   if %ch.is_pc%
-    if !(%ch.varexists(has_ducked)% && %ch.has_ducked%)
+    set ducked 0
+    if %ch.varexists(has_ducked)%
+      if %ch.has_ducked%
+        set ducked 1
+      end
+    end
+    if !%ducked%
       %send% %actor% You smack into the tree branch and are knocked from the boat!
       %echoaround% %actor% %actor.name% smacks into the tree branch and is knocked from the boat!
       %teleport% %ch% i11123
@@ -251,9 +256,6 @@ while %ch%
   end
   eval ch %next_ch%
 done
-eval tree_branch_running 0
-global tree_branch_running
-unset tree_branch_running
 * send npcs to fail room if no players won
 if !(%wins%)
   %teleport% all i11123
@@ -265,18 +267,12 @@ end
 Narrow Opening 11122~
 2 g 100
 ~
-context %room.vnum%
 if %actor.is_pc%
   eval lean_left 0
   remote lean_left %actor.id%
   eval lean_right 0
   remote lean_right %actor.id%
 end
-if (%narrow_opening_running% && %narrow_opening_running% + 60 > %timestamp%)
-  halt
-end
-eval narrow_opening_running %timestamp%
-global narrow_opening_running
 wait 1 sec
 eval opening_left (%random.2% == 2)
 global opening_left
@@ -291,7 +287,21 @@ eval fail 0
 eval ch %room.people%
 while %ch%
   if %ch.is_pc% && !%ch.nohassle%
-    if (%opening_left% && %ch.varexists(lean_left)% && %ch.lean_left%) || (!%opening_left% && %ch.varexists(lean_right)% && %ch.lean_right%)
+    set this_loop_correct 0
+    if %opening_left%
+      if %ch.varexists(lean_left)%
+        if %ch.lean_left%
+          set this_loop_correct 1
+        end
+      end
+    else
+      if %ch.varexists(lean_right)%
+        if %ch.lean_right%
+          set this_loop_correct 1
+        end
+      end
+    end
+    if %this_loop_correct%
       eval correct %correct% + 1
     else
       eval fail %fail% + 1
@@ -299,9 +309,6 @@ while %ch%
   end
   eval ch %ch.next_in_room%
 done
-eval narrow_opening_running 0
-global narrow_opening_running
-unset narrow_opening_running
 if %correct% > %fail%
   %echo% The boat leans into the narrow opening!
   %teleport% all i11113
@@ -320,7 +327,7 @@ end
 ~
 #11113
 Raptor greet/aggro~
-0 g 100
+0 gw 100
 ~
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%) || !%actor.is_pc%)
   halt
@@ -347,11 +354,11 @@ wait 3 sec
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
   halt
 end
-mkill %actor%
+%aggro% %actor%
 ~
 #11114
 Loch colossus greet/aggro~
-0 g 100
+0 gw 100
 ~
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%) || !%actor.is_pc%)
   halt
@@ -378,7 +385,7 @@ wait 3 sec
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
   halt
 end
-mkill %actor%
+%aggro% %actor%
 ~
 #11115
 Vehicle Coupon Summon~
@@ -591,7 +598,7 @@ global sarcophagus_running
 %load% mob 11138
 %load% obj 11140
 makeuid snake mob titanaconda
-%force% %snake% mkill %actor%
+%force% %snake% %aggro% %actor%
 %purge% %self%
 eval sarcophagus_running 0
 global sarcophagus_running
@@ -652,7 +659,7 @@ if %random.4% == 4
   %load% mob 11137
   makeuid dragonfly mob dragonfly
   if %self.carried_by%
-    %force% %dragonfly% mkill %self.carried_by%
+    %force% %dragonfly% %aggro% %self.carried_by%
   else
     %force% %dragonfly% outrage
   end
@@ -689,21 +696,21 @@ dg_affect %target% STUNNED on 15
 dg_affect %self% STUNNED on 15
 %damage% %target% 50
 wait 5 sec
-if !%target% || !self || !%self.fighting%
+if !%target% || !%self% || !%self.fighting%
   halt
 end
 %send% %target% %self.name% constricts and crushes you!
 %echoaround% %target% %self.name% constricts and crushes %target.name%!
 %damage% %target% 50
 wait 5 sec
-if !%target% || !self || !%self.fighting%
+if !%target% || !%self% || !%self.fighting%
   halt
 end
 %send% %target% %self.name% constricts and crushes you!
 %echoaround% %target% %self.name% constricts and crushes %target.name%!
 %damage% %target% 50
 wait 5 sec
-if !%target% || !self || !%self.fighting%
+if !%target% || !%self% || !%self.fighting%
   halt
 end
 %send% %target% %self.name% releases you!

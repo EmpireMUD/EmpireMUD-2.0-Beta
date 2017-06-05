@@ -148,13 +148,13 @@ Spawn portal home on death~
 ~
 #10407
 Blockade environmental~
-1 b 3
+1 bw 3
 ~
 %echo% The makeshift blockade crackles in the fire.
 ~
 #10408
 Hamlet of the Undead env~
-2 b 3
+2 bw 3
 ~
 switch %random.4%
   case 1
@@ -294,7 +294,7 @@ end
 ~
 #10416
 Fleeing Citizen env~
-0 b 10
+0 bw 10
 ~
 switch %random.4%
   case 1
@@ -313,7 +313,7 @@ end
 ~
 #10417
 Shambling Zombie env~
-0 b 10
+0 bw 10
 ~
 switch %random.4%
   case 1
@@ -334,8 +334,8 @@ end
 Mount summon use~
 1 c 2
 use~
-eval test %%self.is_name(%arg%)%%
-if !%test%
+eval test %%actor.obj_target(%arg%)%%
+if %test% != %self%
   return 0
   halt
 end
@@ -346,6 +346,11 @@ end
 %load% m %self.val0%
 %send% %actor% You use %self.shortdesc% and a new mount appears!
 %echoaround% %actor% %actor.name% uses %self.shortdesc% and a new mount appears!
+eval room_var %self.room%
+eval mob %room_var.people%
+if (%mob% && %mob.vnum% == %self.val0%)
+  nop %mob.unlink_instance%
+end
 %purge% %self%
 ~
 #10450
@@ -362,7 +367,7 @@ climb~
 ~
 #10452
 Sewer Environment~
-2 b 5
+2 bw 5
 ~
 switch %random.4%
   case 1
@@ -426,6 +431,10 @@ elseif lab tent /= %arg%
 elseif dolmen stone /= %arg%
   eval vnum 10482
   set named a goblin dolmen stone
+elseif ticket /= %arg% && %actor.has_item(18260)%
+  * Fall through to adventurer guild quest command trigger
+  return 0
+  halt
 else
   %send% %actor% They don't seem to sell '%arg%' here.
   halt

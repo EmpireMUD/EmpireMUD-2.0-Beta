@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_comm.c                                       EmpireMUD 2.0b4 *
+*   File: dg_comm.c                                       EmpireMUD 2.0b5 *
 *  Usage: string and messaging functions for DG Scripts                   *
 *                                                                         *
 *  DG Scripts code had no header info in this file                        *
@@ -48,7 +48,7 @@ char *any_one_name(char *argument, char *first_arg) {
 
 void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type[]) {
 	char sb[MAX_STRING_LENGTH];
-	int i;
+	int i, iter;
 
 	strcpy(sb, "");
 
@@ -117,7 +117,20 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 
 	strcat(sb,tokens[i]);
 	strcat(sb, "&0\r\n");
-	sb[0] = toupper(sb[0]);
+	
+	// find the first non-color-code and cap it
+	for (iter = 0; iter < strlen(sb); ++iter) {
+		if (sb[iter] == '&') {
+			// skip
+			++iter;
+		}
+		else {
+			// found one!
+			sb[iter] = UPPER(sb[iter]);
+			break;
+		}
+	}
+	
 	send_to_char(sb, ch);
 }
 

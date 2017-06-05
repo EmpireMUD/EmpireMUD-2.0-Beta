@@ -4,9 +4,12 @@ goblin clothing~
 A set of goblin clothing is rotting on the ground.~
 The goblin clothing is in poor condition.
 ~
-2 oy ad 1
+2 oy ad 2
 0 0 0
 11 0
+M
+12
+$n is standing here in tiny, ill-fitting clothes.~
 S
 #10201
 pants goblin pair~
@@ -610,10 +613,10 @@ a huge dracosaur bone~
 A huge dracosaur bone is sticking up out of the ground.~
    This bone looks like it came from something gigantic, although it is
 surprisingly light-weight. Although it might be difficult to craft anything
-useful from it, it looks like you woul be able to make some items using
+useful from it, it looks like you would be able to make some items using
 patterns purchased from the Portal to the Primeval adventure.
 ~
-3 e a 2
+3 e a 3
 0 0 0
 14 0
 R

@@ -37,9 +37,13 @@ a honey-cured ham~
 A large ham is lying in the dirt.~
 The ham is mouth-watering.
 ~
-6 0 a 2
+6 m a 3
 72 0 0
 7 336
+A
+3 1 0
+C
+50 50
 R
 5619 0
 S
@@ -59,9 +63,13 @@ a fruitcake~
 A fruitcake is lying on the ground.~
 This fruitcake looks like it might have been re-gifted.
 ~
-6 0 a 4
+6 m a 5
 72 0 0
 7 336
+A
+6 1 0
+C
+50 50
 M
 4
 As you eat the fruitcake, you feel warm deep down inside.~
@@ -84,9 +92,13 @@ roast goose~
 A roast goose is lying here.~
 This plump roast goose is perfect for Christmas dinner.
 ~
-6 0 a 3
+6 m a 4
 72 0 0
 7 336
+A
+19 1 0
+C
+50 50
 R
 5619 0
 S
@@ -196,9 +208,13 @@ a plate of christmas cookies~
 A plate of cookies is lying here.~
 A variety of delicious cookies are spread across the plate.
 ~
-6 0 a 5
+6 m a 6
 72 0 0
 7 336
+A
+7 1 0
+C
+50 50
 M
 4
 You're filled with holiday cheer!~
@@ -224,6 +240,148 @@ You can craft (Advanced Woodworking): sleigh
 3 p a 2
 0 0 0
 0 0
+S
+#10719
+statuette christmas~
+a Christmas statuette~
+A small Christmas statuette is standing here.~
+   This delicate marble statuette of a reindeer, an elf and a snowman grants
+you minor shapeshifting abilities!
+'morph reindeer' (requires Animal Forms): Temperate disguise morph.
+'morph large snowman' (no ability): Immobile disguise morph.
+'morph christmas elf' (no ability): Cosmetic morph.
+~
+3 p a 2
+0 0 0
+1 0
+S
+#10720
+basket chestnuts sweet~
+a basket of chestnuts~
+A basket of sweet chestnuts is lying here.~
+   The pale yellow insides of these smooth, brown nuts can be roasted and
+eaten, if you can remove them from their prickly green cases.
+~
+6 b a 4
+24 10700 0
+7 336
+I 15 10721 100.00 4  # SEPARATE: a handful of chestnuts
+M
+4
+You peel open $p and eat them.~
+M
+5
+$n peels open $p and eats them.~
+R
+5606 0
+R
+5610 0
+S
+#10721
+chestnuts handful~
+a handful of chestnuts~
+A handful of chestnuts are lying here.~
+   The insides of these smooth brown nuts can be eaten. Or you could roast
+them, if you can find some more.
+~
+6 0 a 3
+0 0 0
+7 48
+I 14 10720 100.00 4  # COMBINE: a basket of chestnuts
+M
+4
+You peel open $p and eat them.~
+M
+5
+$n peels open $p and eats them.~
+S
+#10722
+chestnuts roast bowl~
+a bowl of roast chestnuts~
+A bowl of roast chestnuts is sitting here.~
+   The insides of these chestnuts have turned a golden brown, and they smell
+delicious.
+~
+6 m a 3
+18 0 0
+7 336
+A
+9 1 0
+C
+50 50
+R
+5606 0
+S
+#10723
+whistle Christmas tree~
+a Christmas tree whistle~
+Someone has left their Christmas tree whistle here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 2
+10723 0 0
+2 0
+T 9900
+S
+#10724
+whistle reindeer fawn~
+a reindeer fawn whistle~
+Someone has left their reindeer fawn whistle here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 3
+10724 0 0
+2 0
+T 9900
+S
+#10725
+whistle snowman small animated~
+an animated snowman whistle~
+Someone has left their animated snowman whistle here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 4
+10725 0 0
+2 0
+T 9900
+S
+#10726
+whistle toy soldier~
+a toy soldier whistle~
+Someone has left their toy soldier whistle here.~
+This whistle can summon a noncombat pet!
+Type 'use whistle' to summon it.
+~
+3 p a 5
+10726 0 0
+2 0
+T 9900
+S
+#10727
+whistle mini-pet pet random~
+a random mini-pet whistle~
+A random mini-pet whistle should have replaced this. Oops.~
+This item purges itself and spawns an actual quest reward.
+~
+3 0 a 4
+0 0 0
+10 0
+T 10727
+S
+#10728
+coal lumps magical pile~
+a pile of magical coal lumps~
+A pile of magical coal lumps is lying here, twinkling slightly.~
+   This pile of enchanted coal lumps can be used to build snowmen even in the
+middle of summer! Just 'use coal' to get started.
+~
+3 p a 3
+0 0 0
+7 0
+T 10728
 S
 #10730
 fiddle~
@@ -452,7 +610,7 @@ Some warm fleece is lying here.~
    This warm fleece is white as snow. It looks like it would protect you, a
 little bit.
 ~
-2 mp ad 6
+2 mp ad 7
 0 0 0
 11 0
 A
@@ -461,6 +619,9 @@ A
 12 2 0
 C
 25 25
+M
+12
+$n is standing here; $s fleece is white as snow.~
 S
 #10744
 bell ribbon blue~
@@ -647,9 +808,12 @@ a spidersilk gown~
 A silk gown is draped on the ground.~
 This fine gown looks like it was actually woven by a spider.
 ~
-2 o ad 1
+2 o ad 2
 0 0 0
 11 0
+M
+12
+$n stands here, draped in spidersilk.~
 S
 #10761
 pouch silk spidersilk~
@@ -748,5 +912,29 @@ It seems you have completed the adventure.
 0 0 0
 10 4
 T 10769
+S
+#10770
+coffin goblin~
+a goblin coffin~
+A goblin coffin is lying here.~
+   You can use this to 'build coffin', and then set it as your tomb in order to
+have a nearby respawn point when you die.
+~
+3 g a 5
+0 0 0
+0 0
+T 10770
+S
+#10771
+coffin goblin decaying~
+a goblin coffin~
+A decaying coffin is sticking up from the gravesite.~
+   The coffin looks small and cramped, but you might be able to fit a human in
+it. It's in poor condition and doesn't look like it will last very long
+~
+3 0 0 6
+0 0 0
+0 288
+T 10771
 S
 $

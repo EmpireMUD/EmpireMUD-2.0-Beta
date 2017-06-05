@@ -1,0 +1,32 @@
+#18200
+The Guild of Adventurers~
+Paul Clarke and Owen Morris~
+   The atlasian tortoise roams across the countryside, chewing a steady diet of
+treetops and adventure. Bolted to its back is a huge platform, upon which
+someone has built a grand tavern. You have heard rumors that the Guild of
+Adventurers uses a tortoise like this one as its base of operations. What else
+might await inside the tavern?
+
+Notes for implementors:
+- This adventure uses fixed-location instances.
+- You should pick large, open areas as spawn points.
+- One spawn point per continent is usually enough.
+- This adventure was designed to spawn next to ocean, on a plains or desert.
+- Create a spawn location:
+ .map build 18200
+ .map unclaimable
+- Edit this adventure and set its limit to the number of spawn points you added.
+- Remove the IN-DEV flag from the adventure.
+~
+18200 18299 0-0
+1 60 d 0
+L
+0 0
+18200 -1 -1
+14 0 0
+L
+5 0
+43200 -1 -1
+-1 0 0
+S
+$

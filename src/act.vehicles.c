@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: act.vehicles.c                                  EmpireMUD 2.0b4 *
+*   File: act.vehicles.c                                  EmpireMUD 2.0b5 *
 *  Usage: commands related to vehicles and vehicle movement               *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -41,7 +41,7 @@ extern const int rev_dir[];
 
 // external funcs
 extern int count_harnessed_animals(vehicle_data *veh);
-extern room_data *dir_to_room(room_data *room, int dir);
+extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
 extern room_data *get_vehicle_interior(vehicle_data *veh);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
@@ -143,7 +143,7 @@ vehicle_data *find_ship_to_dispatch(char_data *ch, char *arg) {
 		}
 		
 		// ensure in docks if we're finding it remotely
-		if (!IN_ROOM(veh) || !HAS_FUNCTION(IN_ROOM(veh), FNC_DOCKS) || !IS_COMPLETE(IN_ROOM(veh))) {
+		if (!IN_ROOM(veh) || !room_has_function_and_city_ok(IN_ROOM(veh), FNC_DOCKS)) {
 			continue;
 		}
 		if (GET_ISLAND_ID(IN_ROOM(veh)) != island) {
@@ -193,7 +193,7 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 	
 	// direction targeting
 	if ((find_dir = parse_direction(ch, arg)) != NO_DIR) {
-		if (!is_flat_dir[find_dir] || !(room = dir_to_room(from_room, find_dir)) || room == from_room) {
+		if (!is_flat_dir[find_dir] || !(room = dir_to_room(from_room, find_dir, TRUE)) || room == from_room) {
 			msg_to_char(ch, "You can't shoot that direction.\r\n");
 		}
 		else if (!validate_siege_target_room(ch, veh, room)) {
@@ -235,6 +235,8 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 * @return bool TRUE if it moved, FALSE if it was blocked.
 */
 bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
+	void msdp_update_room(char_data *ch);
+	
 	room_data *to_room = NULL, *was_in;
 	struct follow_type *fol, *next_fol;
 	struct vehicle_room_list *vrl;
@@ -252,7 +254,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	}
 
 	// targeting
-	if (!(to_room = dir_to_room(IN_ROOM(veh), dir))) {
+	if (!(to_room = dir_to_room(IN_ROOM(veh), dir, FALSE))) {
 		if (ch) {
 			snprintf(buf, sizeof(buf), "$V can't %s any further %s.", drive_data[subcmd].command, dirs[get_direction_for_char(ch, dir)]);
 			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
@@ -263,7 +265,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		// sends own message
 		return FALSE;
 	}
-	if (!IS_COMPLETE(to_room)) {
+	if (!IS_COMPLETE(to_room) && (!WATER_SECT(to_room) || !VEH_FLAGGED(veh, VEH_SAILING | VEH_FLYING))) {
 		if (ch) {
 			msg_to_char(ch, "You can't %s in there until it's complete.\r\n", drive_data[subcmd].command);
 		}
@@ -321,6 +323,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 			snprintf(buf, sizeof(buf), "You %s $V %s.", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)]);
 		}
 		act(buf, FALSE, VEH_DRIVER(veh), NULL, veh, TO_CHAR);
+		msdp_update_room(VEH_DRIVER(veh));
 	}
 	
 	// move sitter
@@ -366,6 +369,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 						snprintf(buf, sizeof(buf), "$V %s %s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)]);
 					}
 					act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR | TO_SPAMMY);
+					msdp_update_room(ch_iter);
 				}
 			}
 		}
@@ -424,6 +428,8 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 * @return bool TRUE if successful, FALSE if not.
 */
 bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh) {
+	char_data *mort;
+	
 	if (!drop_otrigger(obj, ch)) {	// also takes care of obj purging self
 		return FALSE;
 	}
@@ -436,6 +442,19 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 	obj_to_vehicle(obj, veh);
 	act("$n puts $p in $V.", TRUE, ch, obj, veh, TO_ROOM);
 	act("You put $p in $V.", FALSE, ch, obj, veh, TO_CHAR);
+	
+	if (IS_IMMORTAL(ch)) {
+		if (VEH_OWNER(veh) && !EMPIRE_IMM_ONLY(VEH_OWNER(veh))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a vehicle owned by mortal empire (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(VEH_OWNER(veh)), room_log_identifier(IN_ROOM(veh)));
+		}
+		else if (ROOM_OWNER(IN_ROOM(veh)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(veh)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a vehicle in mortal empire (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(veh)));
+		}
+		else if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s puts %s into a vehicle with mortal present (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_NAME(mort), room_log_identifier(IN_ROOM(ch)));
+		}
+	}
+	
 	return TRUE;
 }
 
@@ -547,8 +566,14 @@ void perform_unload_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont
 * @param char_data *ch The character doing the driving.
 */
 void process_driving(char_data *ch) {
+	extern int get_north_for_char(char_data *ch);
+	extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
+	
 	int dir = GET_ACTION_VNUM(ch, 0), subcmd = GET_ACTION_VNUM(ch, 2);
 	vehicle_data *veh;
+	
+	// translate 'dir' from the way the character THINKS he's going, to the actual way
+	dir = confused_dirs[get_north_for_char(ch)][0][dir];
 	
 	// not got a vehicle?
 	if ((!(veh = GET_SITTING_ON(ch)) && !(veh = GET_ROOM_VEHICLE(IN_ROOM(ch)))) || !VEH_FLAGGED(veh, drive_data[subcmd].flag)) {
@@ -607,7 +632,7 @@ void process_driving(char_data *ch) {
 * @param char *argument The argument.
 */
 void do_customize_vehicle(char_data *ch, char *argument) {
-	char tar_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];
+	char tar_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	vehicle_data *veh, *proto;
 	
 	argument = two_arguments(argument, tar_arg, type_arg);
@@ -617,7 +642,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else if (!*tar_arg || !*type_arg || !*argument) {
-		msg_to_char(ch, "Usage: customize vehicle <target> <name | longdesc | description> <value>\r\n");
+		msg_to_char(ch, "Usage: customize vehicle <target> <name | longdesc | description> <value | set | none>\r\n");
 	}
 	// vehicle validation
 	else if (!(veh = get_vehicle_in_room_vis(ch, tar_arg)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(tar_arg, VEH_KEYWORDS(veh)))) {
@@ -638,13 +663,17 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 		else if (!str_cmp(argument, "none")) {
 			proto = vehicle_proto(VEH_VNUM(veh));
 			
-			if (!proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto)) {
+			if (proto && VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto)) {
 				free(VEH_SHORT_DESC(veh));
 				VEH_SHORT_DESC(veh) = VEH_SHORT_DESC(proto);
 			}
-			if (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto)) {
+			if (proto && VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto)) {
 				free(VEH_KEYWORDS(veh));
 				VEH_KEYWORDS(veh) = VEH_KEYWORDS(proto);
+			}
+			if (proto && VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto) && strstr(VEH_LONG_DESC(veh), VEH_LONG_DESC(proto))) {
+				free(VEH_LONG_DESC(veh));
+				VEH_LONG_DESC(veh) = VEH_LONG_DESC(proto);
 			}
 			
 			msg_to_char(ch, "The vehicle no longer has a custom name.\r\n");
@@ -658,15 +687,27 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 		else {
 			proto = vehicle_proto(VEH_VNUM(veh));
 			
+			// change short desc
 			if (!proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto)) {
 				free(VEH_SHORT_DESC(veh));
 			}
+			VEH_SHORT_DESC(veh) = str_dup(argument);
+			
+			// change keywords
+			sprintf(buf, "%s %s", fname(VEH_KEYWORDS(veh)), skip_filler(argument));
 			if (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto)) {
 				free(VEH_KEYWORDS(veh));
 			}
+			VEH_KEYWORDS(veh) = str_dup(buf);
 			
-			VEH_SHORT_DESC(veh) = str_dup(argument);
-			VEH_KEYWORDS(veh) = str_dup(skip_filler(argument));
+			// optionally, change the longdesc too
+			if (proto && (VEH_LONG_DESC(veh) == VEH_LONG_DESC(proto) || strstr(VEH_LONG_DESC(veh), VEH_LONG_DESC(proto)))) {
+				if (VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto)) {
+					free(VEH_LONG_DESC(veh));
+				}
+				sprintf(buf, "%s (%s)", VEH_LONG_DESC(proto), VEH_SHORT_DESC(veh));
+				VEH_LONG_DESC(veh) = str_dup(buf);
+			}
 			
 			msg_to_char(ch, "It is now called \"%s\".\r\n", argument);
 		}
@@ -715,7 +756,9 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			proto = vehicle_proto(VEH_VNUM(veh));
 			
 			if (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto)) {
-				free(VEH_LOOK_DESC(veh));
+				if (VEH_LOOK_DESC(veh)) {
+					free(VEH_LOOK_DESC(veh));
+				}
 				VEH_LOOK_DESC(veh) = VEH_LOOK_DESC(proto);
 			}
 			msg_to_char(ch, "It no longer has a custom description.\r\n");
@@ -725,12 +768,13 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			
 			if (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto)) {
 				// differs from proto
-				start_string_editor(ch->desc, "vehicle description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION);
+				start_string_editor(ch->desc, "vehicle description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
 			}
 			else {
 				// has proto's desc
-				VEH_LOOK_DESC(veh) = str_dup(VEH_LOOK_DESC(proto));
-				start_string_editor(ch->desc, "vehicle description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION);
+				VEH_LOOK_DESC(veh) = VEH_LOOK_DESC(proto) ? str_dup(VEH_LOOK_DESC(proto)) : NULL;
+				start_string_editor(ch->desc, "vehicle description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
+				ch->desc->str_on_abort = VEH_LOOK_DESC(proto);
 			}
 			
 			act("$n begins editing a vehicle description.", TRUE, ch, 0, 0, TO_ROOM);
@@ -880,7 +924,10 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 	
 	skip_spaces(&argument);	// usually done ahead of time, but in case
 	
-	if (GET_POS(ch) == POS_FIGHTING) {
+	if (!IS_APPROVED(ch) && config_get_bool("travel_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (GET_POS(ch) == POS_FIGHTING) {
 		msg_to_char(ch, "You can't really do that right now!\r\n");
 	}
 	else if (GET_POS(ch) < POS_STANDING || GET_SITTING_ON(ch)) {
@@ -909,6 +956,9 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 	}
 	else if (VEH_DRIVER(veh)) {
 		msg_to_char(ch, "You can't lead it while someone else is controlling it.\r\n");
+	}
+	else if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
+		msg_to_char(ch, "You don't have permission to sit %s that.\r\n", IN_OR_ON(veh));
 	}
 	else if (GET_LEADING_VEHICLE(ch) || GET_LEADING_MOB(ch)) {
 		msg_to_char(ch, "You can't sit %s it while you're leading something.\r\n", IN_OR_ON(veh));
@@ -1040,6 +1090,9 @@ ACMD(do_board) {
 
 	if (IS_NPC(ch) && AFF_FLAGGED(ch, AFF_ORDERED)) {
 		return;
+	}
+	else if (!IS_APPROVED(ch) && config_get_bool("travel_approval")) {
+		send_config_msg(ch, "need_approval_string");
 	}
 	else if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
 		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
@@ -1183,7 +1236,10 @@ ACMD(do_disembark) {
 	room_data *was_in = IN_ROOM(ch), *to_room;
 	struct follow_type *k;
 
-	if (!veh || !(to_room = IN_ROOM(veh))) {
+	if (!IS_APPROVED(ch) && config_get_bool("travel_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!veh || !(to_room = IN_ROOM(veh))) {
 		msg_to_char(ch, "You can't disembark from here!\r\n");
 	}
 	else if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
@@ -1340,7 +1396,7 @@ ACMD(do_dispatch) {
 	else if (GET_ISLAND_ID(IN_ROOM(veh)) == NO_ISLAND) {
 		msg_to_char(ch, "You can't automatically dispatch ships that are out at sea.\r\n");
 	}
-	else if (!(to_isle = get_island_by_name(argument)) && !(to_isle = get_island_by_coords(argument))) {
+	else if (!(to_isle = get_island_by_name(ch, argument)) && !(to_isle = get_island_by_coords(argument))) {
 		msg_to_char(ch, "Unknown target island \"%s\".\r\n", argument);
 	}
 	else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(veh)) && HAS_FUNCTION(IN_ROOM(veh), FNC_DOCKS)) {
@@ -1413,7 +1469,7 @@ void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
 	else if (!VEH_FLAGGED(veh, VEH_CAN_PORTAL)) {
 		act("$V can't be dragged through portals.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
-	else if (IS_WATER_SECT(SECT(to_room))) {
+	else if (WATER_SECT(to_room)) {
 		msg_to_char(ch, "You can't drag it through there because it can't be dragged into water.\r\n");
 	}
 	else if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !VEH_FLAGGED(veh, VEH_ALLOW_ROUGH)) {
@@ -1459,7 +1515,7 @@ ACMD(do_drag) {
 	else if (GET_SITTING_ON(ch)) {
 		msg_to_char(ch, "You can't drag anything while you're sitting on something.\r\n");
 	}
-	else if (IS_WATER_SECT(SECT(IN_ROOM(ch)))) {
+	else if (WATER_SECT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't drag anything in the water.\r\n");
 	}
 	else if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && IN_ROOM(ch) == IN_ROOM(ch->master)) {
@@ -1495,10 +1551,10 @@ ACMD(do_drag) {
 	else if ((dir = parse_direction(ch, where)) == NO_DIR) {
 		do_drag_portal(ch, veh, where);
 	}
-	else if (!(to_room = dir_to_room(IN_ROOM(ch), dir))) {
+	else if (!(to_room = dir_to_room(IN_ROOM(ch), dir, FALSE))) {
 		msg_to_char(ch, "You can't drag anything in that direction.\r\n");
 	}
-	else if (IS_WATER_SECT(SECT(to_room))) {
+	else if (WATER_SECT(to_room)) {
 		msg_to_char(ch, "You can't drag anything into the water.\r\n");
 	}
 	else if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !VEH_FLAGGED(veh, VEH_ALLOW_ROUGH)) {
@@ -1550,6 +1606,9 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 	else if (!VEH_FLAGGED(veh, VEH_CAN_PORTAL)) {
 		act("$V can't go through portals.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
+	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+		act("You don't have permission to use $V.", FALSE, ch, NULL, veh, TO_CHAR);
+	}
 	else if (IN_ROOM(veh) != IN_ROOM(portal)) {
 		snprintf(buf, sizeof(buf), "You can't %s through $p because it's not in the same room as $V.", drive_data[subcmd].command);
 		act(buf, FALSE, ch, portal, veh, TO_CHAR);
@@ -1600,6 +1659,7 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 }
 
 
+// do_sail, do_pilot (search hints)
 ACMD(do_drive) {
 	char dir_arg[MAX_INPUT_LENGTH], dist_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct vehicle_room_list *vrl;
@@ -1640,7 +1700,7 @@ ACMD(do_drive) {
 	else if (veh == GET_ROOM_VEHICLE(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT)) {
 		msg_to_char(ch, "You can't %s here because you can't see outside.\r\n", drive_data[subcmd].command);
 	}
-	else if (veh == GET_ROOM_VEHICLE(IN_ROOM(ch)) && !can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to %s this.\r\n", drive_data[subcmd].command);
 	}
 	else if (VEH_DRIVER(veh) && VEH_DRIVER(veh) != ch) {
@@ -1665,10 +1725,10 @@ ACMD(do_drive) {
 			do_drive_through_portal(ch, veh, portal, subcmd);
 		}
 		else {
-			msg_to_char(ch, "You can't %s that direction.\r\n", drive_data[subcmd].command);
+			msg_to_char(ch, "'%s' isn't a direction you can %s.\r\n", dir_arg, drive_data[subcmd].command);
 		}
 	}
-	else if (dir == DIR_RANDOM || !dir_to_room(IN_ROOM(veh), dir) || (subcmd != SCMD_PILOT && !is_flat_dir[dir])) {
+	else if (dir == DIR_RANDOM || !dir_to_room(IN_ROOM(veh), dir, FALSE) || (subcmd != SCMD_PILOT && !is_flat_dir[dir])) {
 		msg_to_char(ch, "You can't %s that direction.\r\n", drive_data[subcmd].command);
 	}
 	else if (GET_ACTION(ch) == drive_data[subcmd].action && GET_ACTION_VNUM(ch, 0) == dir && !*dist_arg) {
@@ -1680,11 +1740,13 @@ ACMD(do_drive) {
 		send_to_char(buf, ch);
 	}
 	else {
+		// 'dir' is the way we are ACTUALLY going, but we store the direction the character thinks it is
+		
 		was_driving = (GET_ACTION(ch) == drive_data[subcmd].action);
-		same_dir = (was_driving && (dir == GET_ACTION_VNUM(ch, 0)));
+		same_dir = (was_driving && (get_direction_for_char(ch, dir) == GET_ACTION_VNUM(ch, 0)));
 		GET_ACTION(ch) = ACT_NONE;	// prevents a stops-moving message
 		start_action(ch, drive_data[subcmd].action, 0);
-		GET_ACTION_VNUM(ch, 0) = dir;
+		GET_ACTION_VNUM(ch, 0) = get_direction_for_char(ch, dir);
 		GET_ACTION_VNUM(ch, 1) = dist;	// may be -1 for continuous
 		GET_ACTION_VNUM(ch, 2) = subcmd;
 		
@@ -1749,7 +1811,7 @@ ACMD(do_fire) {
 	
 	// find what to fire with
 	else if (!(veh = get_vehicle_in_room_vis(ch, veh_arg)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(veh_arg, VEH_KEYWORDS(veh)))) {
-		msg_to_char(ch, "You don't see %s %s here to fire.\r\n", AN(arg), arg);
+		msg_to_char(ch, "You don't see %s %s here to fire.\r\n", AN(veh_arg), veh_arg);
 	}
 	else if (!VEH_FLAGGED(veh, VEH_SIEGE_WEAPONS)) {
 		act("$V has no siege weapons.", FALSE, ch, NULL, veh, TO_CHAR);
@@ -1931,6 +1993,9 @@ ACMD(do_lead) {
 		else if (GET_LOYALTY(mob) && GET_LOYALTY(mob) != GET_LOYALTY(ch)) {
 			msg_to_char(ch, "You can't lead animals owned by other empires.\r\n");
 		}
+		else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+			msg_to_char(ch, "You can't lead animals out of other people's territory.\r\n");
+		}
 		else {
 			act("You begin to lead $N.", FALSE, ch, NULL, mob, TO_CHAR);
 			act("$n begins to lead $N.", TRUE, ch, NULL, mob, TO_ROOM);
@@ -2081,7 +2146,7 @@ ACMD(do_load_vehicle) {
 		}
 		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
 			snprintf(buf, sizeof(buf), "You can't load $v %sto anything.", IN_OR_ON(cont));
-			act(buf, FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
+			act(buf, FALSE, ch, veh, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
 		}
 		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
 			msg_to_char(ch, "You can't load that %sto vehicles.\r\n", IN_OR_ON(cont));
@@ -2145,11 +2210,14 @@ ACMD(do_repair) {
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "You can't repair it while it's on fire!\r\n");
 	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to repair anything here.\r\n");
+	}
 	else {
 		start_action(ch, ACT_REPAIRING, -1);
-		GET_ACTION_VNUM(ch, 0) = GET_ID(veh);
+		GET_ACTION_VNUM(ch, 0) = veh_script_id(veh);
 		act("You begin to repair $V.", FALSE, ch, NULL, veh, TO_CHAR);
-		act("$n beings to repair $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		act("$n begins to repair $V.", FALSE, ch, NULL, veh, TO_ROOM);
 	}
 }
 

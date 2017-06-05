@@ -28,10 +28,12 @@ a bunch of carrots~
 There are a bunch of carrots scattered across the ground.~
 You can eat carrots, or plant them.
 ~
-6 bl a 2
+6 bl a 4
 24 11100 0
 7 168
 I 15 11103 100.00 4 x  # SEPARATE: a carrot
+O
+27 bq
 R
 5606 0
 S
@@ -41,10 +43,12 @@ a carrot~
 Someone dropped a large carrot here.~
 This is just one carrot, so it's not enough to plant, but it tastes good.
 ~
-6 0 a 2
+6 0 a 4
 6 0 0
 7 48
 I 14 11102 100.00 4 x  # COMBINE: a bunch of carrots
+O
+27 cn
 S
 #11104
 blackberries bunch berries~
@@ -52,10 +56,12 @@ a bunch of blackberries~
 There are a bunch of blackberries scattered across the ground.~
 You can eat blackberries, or plant them.
 ~
-6 bl a 2
+6 bl a 4
 24 11101 0
 7 168
 I 15 11105 100.00 4 x  # SEPARATE: a few blackberries
+O
+9 bq
 R
 5114 0
 S
@@ -65,10 +71,12 @@ a few blackberries~
 There are a few loose blackberries here.~
 This is just a few blackberries, so they're not enough to plant, but they taste good.
 ~
-6 0 a 2
+6 0 a 4
 6 0 0
 7 48
 I 14 11104 100.00 4 x  # COMBINE: a bunch of blackberries
+O
+9 nq
 S
 #11106
 pears juicy~
@@ -76,10 +84,12 @@ some juicy pears~
 There are some juicy pears scattered across the ground.~
 You can eat pears, or plant them.
 ~
-6 bl a 2
+6 bl a 4
 24 11102 0
 7 168
 I 15 11107 100.00 4 x  # SEPARATE: a juicy pear
+O
+9 bq
 R
 5114 0
 S
@@ -89,10 +99,12 @@ a juicy pear~
 Someone has dropped a juicy pear nearby.~
 This is just one pear, so it's not enough to plant, but it tastes good.
 ~
-6 0 a 2
+6 0 a 4
 6 0 0
 7 48
 I 14 11106 100.00 4 x  # COMBINE: some juicy pears
+O
+9 nq
 S
 #11108
 scarlet-feathered feathered scarlet hood~
@@ -302,7 +314,7 @@ A colossal bone staff is lying here.~
    This massive staff is made from one of the smaller bones of a loch colossus.
 It's still REALLY big.
 ~
-1 ehmp an 2
+1 ehmpq an 3
 0 3 20
 14 0
 A
@@ -333,7 +345,7 @@ pages covered with tiny handwriting and detailed illustrations. Leafing through
 the pages, the sheets slip by fluidly before parting naturally at a crease in
 the binding.
 ~
-28 j a 1
+28 j a 3
 24 0 0
 7 0
 E
@@ -480,7 +492,7 @@ A branch, the length of a walking staff, is lying nearby.~
 the limb: an undulating length of pale sunrise yellow, streaked with ocher
 veins. It feels oddly warm to the touch.
 ~
-1 emp an 2
+1 empq an 3
 0 1 16
 0 0
 A
@@ -567,13 +579,13 @@ S
 scales titanaconda's titanacondas~
 the titanaconda's scales~
 A length of titanaconda's scales float nearby.~
-   A tough, flexible strip of the titanaconta's scales would make good
+   A tough, flexible strip of the titanaconda's scales would make good
 protection.
 
 Sew (Imperial Armors): titanaconda scale coat
 Sew (Imperial Armors): titanaconda scale trousers
 ~
-3 e a 3
+3 e a 4
 0 0 0
 7 0
 R
@@ -590,7 +602,7 @@ A coat made from titanaconda scales hangs nearby.~
    The long coat, sewn from the scales of a titanaconda, is strong but
 flexible, and its hues of deep green reflect wetly in the light.
 ~
-27 mo aq 1
+27 mo aq 2
 2 0 0
 7 0
 A
@@ -598,7 +610,7 @@ A
 A
 18 1 0
 A
-15 1 0
+12 1 0
 C
 100 150
 S
@@ -640,11 +652,11 @@ C
 S
 #11149
 mace dorsal spine spiked~
-dorsal spine mace~
+a dorsal spine mace~
 A mace spiked with dorsal spines rests nearby.~
 The head of the mace is studded with dorsal spines from a mammoth catfish.
 ~
-1 emo an 1
+1 emo an 2
 0 1 5
 14 0
 A

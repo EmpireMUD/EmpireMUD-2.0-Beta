@@ -80,11 +80,11 @@ while %i% < %logs%
   eval i %i% + 1
   %load% obj %loot%
 done
-if !%instance%
+if !%instance.start%
   halt
 end
 * Load the goblin retreat timer item
-%at% i18100 %load% obj 18106
+%at% %instance.start% %load% obj 18106
 ~
 #18102
 Goblin lumberjack combat~
@@ -104,7 +104,7 @@ done
 ~
 #18103
 Goblin lumberjack environmental~
-0 b 50
+0 bw 50
 ~
 * This mob is only flagged SENTINEL when it's chopping
 if (%self.mob_flagged(SENTINEL)% && !%self.fighting%)

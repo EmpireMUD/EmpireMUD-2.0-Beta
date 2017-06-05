@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: comm.c                                          EmpireMUD 2.0b4 *
+*   File: comm.c                                          EmpireMUD 2.0b5 *
 *  Usage: Communication, socket handling, main(), central game loop       *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -49,6 +49,7 @@
 
 // external vars
 extern struct ban_list_element *ban_list;
+extern bool data_table_needs_save;
 extern int num_invalid;
 extern char **intros;
 extern int num_intros;
@@ -68,6 +69,7 @@ void mobile_activity(void);
 void show_string(descriptor_data *d, char *input);
 int isbanned(char *hostname);
 void save_whole_world();
+extern bool is_fight_ally(char_data *ch, char_data *frenemy);
 
 // local functions
 RETSIGTYPE checkpointing(int sig);
@@ -98,7 +100,7 @@ void heartbeat(int heart_pulse);
 void init_descriptor(descriptor_data *newd, int desc);
 void init_game(ush_int port);
 void nonblock(socket_t s);
-void perform_act(const char *orig, char_data *ch, const void *obj, const void *vict_obj, const char_data *to, bool ignore_bad_act_codes, bool obj_is_vehicle);
+void perform_act(const char *orig, char_data *ch, const void *obj, const void *vict_obj, const char_data *to, bitvector_t act_flags);
 void reboot_recover(void);
 void setup_log(const char *filename, int fd);
 void signal_setup(void);
@@ -130,6 +132,11 @@ unsigned long pulse = 0;	/* number of pulses since game start */
 static bool reboot_recovery = FALSE;
 int mother_desc;
 ush_int port;
+
+// vars to prevent running multiple cycles during a missed-pulse catch-up cycle
+bool catch_up_combat = FALSE;	// frequent_combat()
+bool catch_up_actions = FALSE;	// update_actions()
+bool catch_up_mobs = FALSE;	// mobile_activity()
 
 /* Reboot data (default to a normal reboot once per week) */
 struct reboot_control_data reboot_control = { SCMD_REBOOT, 7.5 * (24 * 60), SHUTDOWN_NORMAL, FALSE };
@@ -209,9 +216,9 @@ void msdp_update_room(char_data *ch) {
 	char buf[MAX_STRING_LENGTH], area_name[128], exits[256];
 	struct empire_city_data *city;
 	struct instance_data *inst;
-	struct island_info *isle;
 	size_t buf_size, ex_size;
 	descriptor_data *desc;
+	int isle_id;
 	
 	// no work
 	if (!ch || !(desc = ch->desc)) {
@@ -225,8 +232,8 @@ void msdp_update_room(char_data *ch) {
 	else if ((city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
 		snprintf(area_name, sizeof(area_name), "%s", city->name);
 	}
-	else if ((isle = get_island(GET_ISLAND_ID(IN_ROOM(ch)), TRUE))) {
-		snprintf(area_name, sizeof(area_name), "%s", isle->name);
+	else if ((isle_id = GET_ISLAND_ID(IN_ROOM(ch))) != NO_ISLAND) {
+		snprintf(area_name, sizeof(area_name), "%s", get_island_name_for(isle_id, ch));
 	}
 	else {
 		snprintf(area_name, sizeof(area_name), "Unknown");
@@ -234,12 +241,12 @@ void msdp_update_room(char_data *ch) {
 	MSDPSetString(desc, eMSDP_AREA_NAME, area_name);
 	
 	// room var: table
-	buf_size = snprintf(buf, sizeof(buf), "%cVNUM%c%d", (char)MSDP_VAR, (char)MSDP_VAL, GET_ROOM_VNUM(IN_ROOM(ch)));
+	buf_size = snprintf(buf, sizeof(buf), "%cVNUM%c%d", (char)MSDP_VAR, (char)MSDP_VAL, IS_IMMORTAL(ch) ? GET_ROOM_VNUM(IN_ROOM(ch)) : 0);
 	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cNAME%c%s", (char)MSDP_VAR, (char)MSDP_VAL, get_room_name(IN_ROOM(ch), FALSE));
 	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cAREA%c%s", (char)MSDP_VAR, (char)MSDP_VAL, area_name);
 	
 	buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cCOORDS%c%c", (char)MSDP_VAR, (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
-	if (has_ability(ch, ABIL_NAVIGATION)) {
+	if (has_ability(ch, ABIL_NAVIGATION) && !RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
 		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cX%c%d", (char)MSDP_VAR, (char)MSDP_VAL, X_COORD(IN_ROOM(ch)));
 		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cY%c%d", (char)MSDP_VAR, (char)MSDP_VAL, Y_COORD(IN_ROOM(ch)));
 	}
@@ -257,7 +264,7 @@ void msdp_update_room(char_data *ch) {
 		struct room_direction_data *ex;
 		for (ex = COMPLEX_DATA(IN_ROOM(ch))->exits; ex; ex = ex->next) {
 			if (ex->room_ptr && !EXIT_FLAGGED(ex, EX_CLOSED)) {
-				ex_size += snprintf(exits + ex_size, sizeof(exits) - ex_size, "%c%s%c%d", (char)MSDP_VAR, alt_dirs[ex->dir], (char)MSDP_VAL, GET_ROOM_VNUM(ex->room_ptr));
+				ex_size += snprintf(exits + ex_size, sizeof(exits) - ex_size, "%c%s%c%d", (char)MSDP_VAR, alt_dirs[ex->dir], (char)MSDP_VAL, IS_IMMORTAL(ch) ? GET_ROOM_VNUM(ex->room_ptr) : 0);
 			}
 		}
 	}
@@ -265,7 +272,7 @@ void msdp_update_room(char_data *ch) {
 	MSDPSetTable(desc, eMSDP_ROOM, buf);
 	
 	// simple room data
-	MSDPSetNumber(desc, eMSDP_ROOM_VNUM, GET_ROOM_VNUM(IN_ROOM(ch)));
+	MSDPSetNumber(desc, eMSDP_ROOM_VNUM, IS_IMMORTAL(ch) ? GET_ROOM_VNUM(IN_ROOM(ch)) : 0);
 	MSDPSetString(desc, eMSDP_ROOM_NAME, get_room_name(IN_ROOM(ch), FALSE));
 	MSDPSetTable(desc, eMSDP_ROOM_EXITS, exits);
 }
@@ -296,7 +303,8 @@ static void msdp_update(void) {
 	struct over_time_effect_type *dot;
 	char buf[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
-	char_data *ch, *pOpponent;
+	char_data *ch, *pOpponent, *focus;
+	bool is_ally;
 	struct affected_type *aff;
 	descriptor_data *d;
 	int hit_points, PlayerCount = 0;
@@ -444,11 +452,25 @@ static void msdp_update(void) {
 				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH_MAX, 100);
 				MSDPSetNumber(d, eMSDP_OPPONENT_LEVEL, get_approximate_level(pOpponent));
 				MSDPSetString(d, eMSDP_OPPONENT_NAME, PERS(pOpponent, ch, FALSE));
+				if ((focus = FIGHTING(pOpponent))) {
+					is_ally = is_fight_ally(ch, focus);
+					hit_points = is_ally ? GET_HEALTH(focus) : (GET_HEALTH(focus) * 100) / MAX(1,GET_MAX_HEALTH(focus));
+					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, hit_points);
+					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, is_ally ? GET_MAX_HEALTH(focus) : 100);
+					MSDPSetString(d, eMSDP_OPPONENT_FOCUS_NAME, PERS(focus, ch, FALSE));
+				} else {
+					MSDPSetString(d, eMSDP_OPPONENT_FOCUS_NAME, "");
+					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, 0);
+					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 0);
+				}
 			}
 			else { // Clear the values
 				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH, 0);
 				MSDPSetNumber(d, eMSDP_OPPONENT_LEVEL, 0);
 				MSDPSetString(d, eMSDP_OPPONENT_NAME, "");
+				MSDPSetString(d, eMSDP_OPPONENT_FOCUS_NAME, "");
+				MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, 0);
+				MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 0);
 			}
 			
 			MSDPSetNumber(d, eMSDP_WORLD_TIME, time_info.hours);
@@ -558,6 +580,47 @@ void sanity_check(void) {
 #if 0
 	log("Statistics: buf=%d buf1=%d buf2=%d arg=%d", strlen(buf), strlen(buf1), strlen(buf2), strlen(arg));
 #endif
+}
+
+
+/**
+* Removes any side-protocol telnet junk, e.g. for snooping.
+*
+* @param const char *str The string to strip.
+* @return char* The resulting stripped string.
+*/
+char *strip_telnet_codes(const char *str) {
+	static char output[MAX_STRING_LENGTH];
+	size_t space_left;
+	const char *iter;
+	char *pos;
+	int off;
+	
+	pos = output;
+	space_left = MAX_STRING_LENGTH - 1;
+	off = 0;
+	
+	for (iter = str; *iter && space_left > 0; ++iter) {
+		if (*iter == (char)IAC && *(iter+1) == (char)SB) {
+			++off;	// stop copying
+			++iter;
+			continue;
+		}
+		else if (*iter == (char)IAC && *(iter+1) == (char)SE) {
+			--off;	// start copying
+			++iter;
+			continue;
+		}
+		
+		// copy?
+		if (off <= 0) {
+			*(pos++) = *iter;
+			--space_left;
+		}
+	}
+	*pos = '\0';	// terminate here
+	
+	return output;
 }
 
 
@@ -819,6 +882,7 @@ void heartbeat(int heart_pulse) {
 	void check_newbie_islands();
 	void check_wars();
 	void chore_update();
+	void detect_evos_per_hour();
 	void extract_pending_chars();
 	void frequent_combat(int pulse);
 	void generate_adventure_instances();
@@ -832,7 +896,10 @@ void heartbeat(int heart_pulse) {
 	void reduce_stale_empires();
 	void reset_instances();
 	void run_map_evolutions();
+	void run_mob_echoes();
 	void sanity_check();
+	void save_data_table(bool force);
+	void save_marked_empires();
 	void update_actions();
 	void update_empire_npc_data();
 	void update_guard_towers();
@@ -883,6 +950,8 @@ void heartbeat(int heart_pulse) {
 		if (debug_log && HEARTBEAT(15)) { log("debug  7:\t%lld", microtime()); }
 		check_death_respawn();
 		if (debug_log && HEARTBEAT(15)) { log("debug  7.5:\t%lld", microtime()); }
+		run_mob_echoes();
+		if (debug_log && HEARTBEAT(15)) { log("debug  7.6:\t%lld", microtime()); }
 	}
 
 	if (HEARTBEAT(30)) {
@@ -964,6 +1033,8 @@ void heartbeat(int heart_pulse) {
 	if (HEARTBEAT(SECS_PER_REAL_HOUR)) {
 		reduce_stale_empires();
 		if (debug_log && HEARTBEAT(15)) { log("debug 21:\t%lld", microtime()); }
+		detect_evos_per_hour();
+		if (debug_log && HEARTBEAT(15)) { log("debug 21.5:\t%lld", microtime()); }
 	}
 	
 	if (HEARTBEAT(30 * SECS_PER_REAL_MIN)) {
@@ -988,12 +1059,18 @@ void heartbeat(int heart_pulse) {
 			process_imports();
 			if (debug_log && HEARTBEAT(15)) { log("debug 25:\t%lld", microtime()); }
 		}
-	}
-	
-	// just over 7.5 minutes -- to avoid putting it right on the same cycle as hours
-	if (HEARTBEAT(455)) {
+		// evos happen every hour
 		run_map_evolutions();
 		if (debug_log && HEARTBEAT(15)) { log("debug 26:\t%lld", microtime()); }
+	}
+	
+	if (HEARTBEAT(1)) {
+		if (data_table_needs_save) {
+			save_data_table(FALSE);
+			if (debug_log && HEARTBEAT(15)) { log("debug 26:\t%lld", microtime()); }
+		}
+		save_marked_empires();
+		if (debug_log && HEARTBEAT(15)) { log("debug 27:\t%lld", microtime()); }
 	}
 	
 	// this goes roughly last -- update MSDP users
@@ -1017,7 +1094,7 @@ void heartbeat(int heart_pulse) {
  //////////////////////////////////////////////////////////////////////////////
 //// MESSAGING ///////////////////////////////////////////////////////////////
 
-void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, int type) {
+void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, bitvector_t act_flags) {
 	extern bool is_ignoring(char_data *ch, char_data *victim);
 
 	char_data *to = NULL;
@@ -1028,38 +1105,38 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 	}
 	
 	/* If the bit is set, unset dg_act_check, thus the ! below */
-	dg_act_check = !IS_SET(type, DG_NO_TRIG);
+	dg_act_check = !IS_SET(act_flags, DG_NO_TRIG);
 
-	if (IS_SET(type, TO_SLEEP)) {
+	if (IS_SET(act_flags, TO_SLEEP)) {
 		to_sleeping = TRUE;
 	}
 	
-	if (IS_SET(type, TO_SPAMMY)) {
+	if (IS_SET(act_flags, TO_SPAMMY)) {
 		is_spammy = TRUE;
 	}
 
-	if (IS_SET(type, TO_NODARK)) {
+	if (IS_SET(act_flags, TO_NODARK)) {
 		Global_ignore_dark = no_dark = TRUE;
 	}
 
 	/* To the character */
-	if (IS_SET(type, TO_CHAR) && ch && SENDOK(ch)) {
-		perform_act(str, ch, obj, vict_obj, ch, IS_SET(type, TO_IGNORE_BAD_CODE) != 0, IS_SET(type, ACT_VEHICLE_OBJ) != 0);
+	if (IS_SET(act_flags, TO_CHAR) && ch && SENDOK(ch)) {
+		perform_act(str, ch, obj, vict_obj, ch, act_flags);
 	}
 
 	/* To the victim */
-	if (IS_SET(type, TO_VICT) && (to = (char_data*) vict_obj) != NULL && SENDOK(to) && (!IS_SET(type, TO_NOT_IGNORING) || !is_ignoring(to, ch))) {
-		perform_act(str, ch, obj, vict_obj, to, IS_SET(type, TO_IGNORE_BAD_CODE) != 0, IS_SET(type, ACT_VEHICLE_OBJ) != 0);
+	if (IS_SET(act_flags, TO_VICT) && (to = (char_data*) vict_obj) != NULL && SENDOK(to) && (!IS_SET(act_flags, TO_NOT_IGNORING) || !is_ignoring(to, ch))) {
+		perform_act(str, ch, obj, vict_obj, to, act_flags);
 	}
 
-	if (IS_SET(type, TO_NOTVICT | TO_ROOM)) {
+	if (IS_SET(act_flags, TO_NOTVICT | TO_ROOM)) {
 		if (ch && IN_ROOM(ch)) {
 			to = ROOM_PEOPLE(IN_ROOM(ch));
 		}
-		else if (!IS_SET(type, ACT_VEHICLE_OBJ) && obj && IN_ROOM((obj_data*)obj)) {
+		else if (!IS_SET(act_flags, ACT_VEHICLE_OBJ) && obj && IN_ROOM((obj_data*)obj)) {
 			to = ROOM_PEOPLE(IN_ROOM((obj_data*)obj));
 		}
-		else if (IS_SET(type, ACT_VEHICLE_OBJ) && obj && IN_ROOM((vehicle_data*)obj)) {
+		else if (IS_SET(act_flags, ACT_VEHICLE_OBJ) && obj && IN_ROOM((vehicle_data*)obj)) {
 			to = ROOM_PEOPLE(IN_ROOM((vehicle_data*)obj));
 		}
 		
@@ -1067,17 +1144,17 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 			for (; to; to = to->next_in_room) {
 				if (!SENDOK(to) || (to == ch))
 					continue;
-				if (IS_SET(type, TO_NOT_IGNORING) && is_ignoring(to, ch)) {
+				if (IS_SET(act_flags, TO_NOT_IGNORING) && is_ignoring(to, ch)) {
 					continue;
 				}
 				if (hide_invisible && ch && !CAN_SEE(to, ch))
 					continue;
-				if (IS_SET(type, TO_NOTVICT) && to == vict_obj)
+				if (IS_SET(act_flags, TO_NOTVICT) && to == vict_obj)
 					continue;
 				if (ch && !WIZHIDE_OK(to, ch)) {
 					continue;
 				}
-				perform_act(str, ch, obj, vict_obj, to, IS_SET(type, TO_IGNORE_BAD_CODE) != 0, IS_SET(type, ACT_VEHICLE_OBJ) != 0);
+				perform_act(str, ch, obj, vict_obj, to, act_flags);
 			}
 		}
 	}
@@ -1211,56 +1288,131 @@ void send_to_all(const char *messg, ...) {
 
 
 /* higher-level communication: the act() function */
-void perform_act(const char *orig, char_data *ch, const void *obj, const void *vict_obj, const char_data *to, bool ignore_bad_act_codes, bool obj_is_vehicle) {
+void perform_act(const char *orig, char_data *ch, const void *obj, const void *vict_obj, const char_data *to, bitvector_t act_flags) {
 	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
+	extern bool is_fight_ally(char_data *ch, char_data *frenemy);
 	
 	const char *i = NULL;
 	char *buf, lbuf[MAX_STRING_LENGTH], *dg_arg = NULL;
+	bool real_ch = FALSE, real_vict = FALSE;
 	char_data *dg_victim = NULL;
 	obj_data *dg_target = NULL;
+	bool show, any;
 	int iter;
 
 	const char *ACTNULL = "<NULL>";
 	#define CHECK_NULL(pointer, expression)  if ((pointer) == NULL) i = ACTNULL; else i = (expression);
-
+	
+	// check fight messages (may exit early)
+	if (!IS_NPC(to) && ch != vict_obj && IS_SET(act_flags, TO_COMBAT_HIT | TO_COMBAT_MISS)) {
+		show = any = FALSE;
+		// hits
+		if (IS_SET(act_flags, TO_COMBAT_HIT)) {
+			if (!show && to == ch) {
+				any = TRUE;
+				show |= SHOW_FIGHT_MESSAGES(to, FM_MY_HITS);
+			}
+			if (!show && to == vict_obj) {
+				any = TRUE;
+				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_ME);
+			}
+			if (!show && to != ch && is_fight_ally((char_data*)to, (char_data*)ch)) {
+				any = TRUE;
+				show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_HITS);
+			}
+			if (!show && to != ch && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+				any = TRUE;
+				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_ALLIES);
+			}
+			if (!show && to != ch && FIGHTING(to) == vict_obj) {
+				any = TRUE;
+				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_TARGET);
+			}
+			if (!show && to != ch && FIGHTING(to) && FIGHTING(FIGHTING(to)) == vict_obj) {
+				any = TRUE;
+				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_TANK);
+			}
+			if (!show && !any) {
+				show |= SHOW_FIGHT_MESSAGES(to, FM_OTHER_HITS);
+			}
+		}
+		// misses
+		if (IS_SET(act_flags, TO_COMBAT_MISS)) {
+			if (!show && to == ch) {
+				any = TRUE;
+				show |= SHOW_FIGHT_MESSAGES(to, FM_MY_MISSES);
+			}
+			if (!show && to == vict_obj) {
+				any = TRUE;
+				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_ME);
+			}
+			if (!show && to != ch && is_fight_ally((char_data*)to, (char_data*)ch)) {
+				any = TRUE;
+				show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_MISSES);
+			}
+			if (!show && to != ch && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+				any = TRUE;
+				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_ALLIES);
+			}
+			if (!show && to != ch && FIGHTING(to) == vict_obj) {
+				any = TRUE;
+				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_TARGET);
+			}
+			if (!show && to != ch && FIGHTING(to) && FIGHTING(FIGHTING(to)) == vict_obj) {
+				any = TRUE;
+				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_TANK);
+			}
+			if (!show && !any) {
+				show |= SHOW_FIGHT_MESSAGES(to, FM_OTHER_MISSES);
+			}
+		}
+		
+		// are we supposed to show it?
+		if (!show) {
+			return;
+		}
+	}
+	
+	// prepare the message
 	buf = lbuf;
-
 	for (;;) {
 		if (*orig == '$') {
 			switch (*(++orig)) {
 				case 'n':
-					i = PERS(ch, (char_data*)to, 0);
+					i = PERS(ch, (char_data*)to, FALSE);
 					break;
 				case 'N':
-					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj,(char_data*)to, 0));
+					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj,(char_data*)to, FALSE));
 					dg_victim = (char_data*) vict_obj;
 					break;
 				case 'o':
-					i = PERS(ch, (char_data*)to, 1);
+					i = PERS(ch, (char_data*)to, TRUE);
+					real_ch = TRUE;
 					break;
 				case 'O':
-					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj, (char_data*)to, 1));
+					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj, (char_data*)to, TRUE));
 					dg_victim = (char_data*) vict_obj;
+					real_vict = TRUE;
 					break;
 				case 'm':
-					i = HMHR(ch);
+					i = real_ch ? REAL_HMHR(ch) : HMHR(ch);
 					break;
 				case 'M':
-					CHECK_NULL(vict_obj, HMHR((char_data*) vict_obj));
+					CHECK_NULL(vict_obj, (real_vict ? REAL_HMHR((char_data*) vict_obj) : HMHR((char_data*) vict_obj)));
 					dg_victim = (char_data*) vict_obj;
 					break;
 				case 's':
-					i = HSHR(ch);
+					i = real_ch ? REAL_HSHR(ch) : HSHR(ch);
 					break;
 				case 'S':
-					CHECK_NULL(vict_obj, HSHR((char_data*) vict_obj));
+					CHECK_NULL(vict_obj, (real_vict ? REAL_HSHR((char_data*) vict_obj) : HSHR((char_data*) vict_obj)));
 					dg_victim = (char_data*) vict_obj;
 					break;
 				case 'e':
-					i = HSSH(ch);
+					i = real_ch ? REAL_HSSH(ch) : HSSH(ch);
 					break;
 				case 'E':
-					CHECK_NULL(vict_obj, HSSH((char_data*) vict_obj));
+					CHECK_NULL(vict_obj, (real_vict ? REAL_HSSH((char_data*) vict_obj) : HSSH((char_data*) vict_obj)));
 					dg_victim = (char_data*) vict_obj;
 					break;
 				case 'p':
@@ -1299,7 +1451,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 					i = "$";
 					break;
 				default: {
-					if (!ignore_bad_act_codes) {
+					if (!IS_SET(act_flags, TO_IGNORE_BAD_CODE)) {
 						log("SYSERR: Illegal $-code to act(): %c", *orig);
 						log("SYSERR: %s", orig);
 						i = "";
@@ -1344,7 +1496,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 	}
 
 	if ((IS_NPC(to) && dg_act_check) && (to != ch)) {
-		act_mtrigger(to, lbuf, ch, dg_victim, obj_is_vehicle ? NULL : (obj_data*)obj, dg_target, dg_arg);
+		act_mtrigger(to, lbuf, ch, dg_victim, IS_SET(act_flags, ACT_VEHICLE_OBJ) ? NULL : (obj_data*)obj, dg_target, dg_arg);
 	}
 }
 
@@ -1391,7 +1543,13 @@ void send_to_group(char_data *ch, struct group_data *group, const char *msg, ...
 }
 
 
-void send_to_outdoor(const char *messg, ...) {
+/**
+* Sends a message to all outdoor players.
+*
+* @param bool weather If TRUE, ignores players in !WEATHER rooms.
+* @param const char *messg... The string to send.
+*/
+void send_to_outdoor(bool weather, const char *messg, ...) {
 	descriptor_data *i;
 	va_list tArgList;
 	char output[MAX_STRING_LENGTH];
@@ -1405,8 +1563,11 @@ void send_to_outdoor(const char *messg, ...) {
 	for (i = descriptor_list; i; i = i->next) {
 		if (STATE(i) != CON_PLAYING || i->character == NULL)
 			continue;
-		if (!AWAKE(i->character) || !IS_OUTDOORS(i->character) || IS_WRITING(i->character))
+		if (!AWAKE(i->character) || !IS_OUTDOORS(i->character))
 			continue;
+		if (weather && ROOM_AFF_FLAGGED(IN_ROOM(i->character), ROOM_AFF_NO_WEATHER)) {
+			continue;
+		}
 		SEND_TO_Q(output, i);
 	}
 	va_end(tArgList);
@@ -1430,9 +1591,7 @@ void send_to_room(const char *messg, room_data *room) {
 
 
 void close_socket(descriptor_data *d) {
-	struct channel_history_data *hist;
 	descriptor_data *temp;
-	int iter;
 
 	REMOVE_FROM_LIST(d, descriptor_list, next);
 	CLOSE_SOCKET(d->descriptor);
@@ -1498,6 +1657,7 @@ void close_socket(descriptor_data *d) {
 	if (d->backstr) {
 		free(d->backstr);
 	}
+	// do NOT free d->str_on_abort (is a pointer to something else)
 	
 	// other strings
 	if (d->host) {
@@ -1508,17 +1668,6 @@ void close_socket(descriptor_data *d) {
 	}
 	if (d->file_storage) {
 		free(d->file_storage);
-	}
-	
-	// free channel histories
-	for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
-		while ((hist = d->channel_history[iter])) {
-			d->channel_history[iter] = hist->next;
-			if (hist->message) {
-				free(hist->message);
-			}
-			free(hist);
-		}
 	}
 	
 	ProtocolDestroy(d->pProtocol);
@@ -1560,6 +1709,9 @@ void close_socket(descriptor_data *d) {
 	if (d->olc_crop) {
 		free_crop(d->olc_crop);
 	}
+	if (d->olc_faction) {
+		free_faction(d->olc_faction);
+	}
 	if (d->olc_global) {
 		free_global(d->olc_global);
 	}
@@ -1571,6 +1723,9 @@ void close_socket(descriptor_data *d) {
 	}
 	if (d->olc_sector) {
 		free_sector(d->olc_sector);
+	}
+	if (d->olc_social) {
+		free_social(d->olc_social);
 	}
 	if (d->olc_trigger) {
 		free_trigger(d->olc_trigger);
@@ -1732,6 +1887,8 @@ void init_descriptor(descriptor_data *newd, int desc) {
 	*newd->output = '\0';
 	newd->bufptr = 0;
 	newd->has_prompt = 0;
+	
+	newd->save_empire = NOTHING;
 
 	CREATE(newd->history, char *, HISTORY_SIZE);
 	newd->pProtocol = ProtocolCreate();
@@ -2175,9 +2332,36 @@ int process_input(descriptor_data *t) {
 	space_left = MAX_RAW_INPUT_LENGTH - buf_length - 1;
 
 	do {
-		if (space_left <= 0) {
+		if (strlen(t->inbuf) > MAX_INPUT_LENGTH || (space_left <= 0 && strlen(t->inbuf) > 0)) {
+			char buffer[MAX_STRING_LENGTH];
+			
+			// truncate to input length
+			if (strlen(t->inbuf) >= MAX_INPUT_LENGTH) {
+				t->inbuf[MAX_INPUT_LENGTH-2] = '\0';
+			}
+			
+			snprintf(buffer, sizeof(buffer), "Line too long. Truncated to:\r\n%s\r\n", t->inbuf);
+			if (write_to_descriptor(t->descriptor, buffer) < 0) {
+				return (-1);
+			}
+			
+			nl_pos = read_point;	// need to infer a newline
+			
+			// flush the rest of the input
+			do {
+				bytes_read = perform_socket_read(t->descriptor, read_buf, MAX_PROTOCOL_BUFFER);
+				if (bytes_read < 0) {
+					return -1;
+				}
+			} while (bytes_read > 0);
+			
+			// exit the do-while now
+			break;
+			
+			/* formerly:
 			log("WARNING: process_input: about to close connection: input overflow");
 			return (-1);
+			*/
 		}
 
 		bytes_read = perform_socket_read(t->descriptor, read_buf, MAX_PROTOCOL_BUFFER);
@@ -2187,7 +2371,7 @@ int process_input(descriptor_data *t) {
 		}
 		else if (bytes_read >= 0) {
 			read_buf[bytes_read] = '\0';
-			ProtocolInput(t, read_buf, bytes_read, read_point);
+			ProtocolInput(t, read_buf, bytes_read, read_point, space_left+1);
 			bytes_read = strlen(read_point);
 		}
 
@@ -2261,23 +2445,25 @@ int process_input(descriptor_data *t) {
 		}
 
 		*write_point = '\0';
-
-		if ((space_left <= 0) && (ptr < nl_pos)) {
+		
+		if ((space_left <= 1) && (ptr < nl_pos)) {
 			char buffer[MAX_INPUT_LENGTH + 64];
 
 			sprintf(buffer, "Line too long. Truncated to:\r\n%s\r\n", tmp);
 			if (write_to_descriptor(t->descriptor, buffer) < 0)
 				return (-1);
 		}
-		if (t->snoop_by) {
+		if (t->snoop_by && *input) {
 			SEND_TO_Q("% ", t->snoop_by);
 			SEND_TO_Q(input, t->snoop_by);
 			SEND_TO_Q("\r\n", t->snoop_by);
 		}
 		do_not_add = 0;
 
-		if (*input == '!' && !(*(input + 1)))	/* Redo last command. */
-			strcpy(input, t->last_input);
+		if (*input == '!' && !(*(input + 1))) {	/* Redo last command. */
+			strncpy(input, t->last_input, MAX_INPUT_LENGTH-1);
+			input[MAX_INPUT_LENGTH-1] = '\0';
+		}
 		else if (*input == '!' && *(input + 1)) {
 			char *commandln = (input + 1);
 			int starting_pos = t->history_pos, cnt = (t->history_pos == 0 ? HISTORY_SIZE - 1 : t->history_pos - 1);
@@ -2286,7 +2472,8 @@ int process_input(descriptor_data *t) {
 			for (; cnt != starting_pos; cnt--) {
 				if (t->history[cnt] && is_abbrev(commandln, t->history[cnt])) {
 					strcpy(input, t->history[cnt]);
-					strcpy(t->last_input, input);
+					strncpy(t->last_input, input, sizeof(t->last_input)-1);
+					t->last_input[sizeof(t->last_input)-1] = '\0';
 					SEND_TO_Q(input, t);
 					SEND_TO_Q("\r\n", t);
 					break;
@@ -2296,8 +2483,10 @@ int process_input(descriptor_data *t) {
 			}
 		}
 		else if (*input == '^') {
-			if (!(do_not_add = perform_subst(t, t->last_input, input)))
-				strcpy(t->last_input, input);
+			if (!(do_not_add = perform_subst(t, t->last_input, input))) {
+				strncpy(t->last_input, input, sizeof(t->last_input)-1);
+				t->last_input[sizeof(t->last_input)-1] = '\0';
+			}
 		}
 		else if (*input == '+') {	// add to head of queue
 			add_to_head = TRUE;
@@ -2309,7 +2498,9 @@ int process_input(descriptor_data *t) {
 			do_not_add = 1;
 		}
 		else {
-			strcpy(t->last_input, input);
+			strncpy(t->last_input, input, sizeof(t->last_input)-1);
+			t->last_input[sizeof(t->last_input)-1] = '\0';
+			
 			if (t->history[t->history_pos])
 				free(t->history[t->history_pos]);	/* Clear the old line. */
 			t->history[t->history_pos] = str_dup(input);	/* Save the new. */
@@ -2319,6 +2510,7 @@ int process_input(descriptor_data *t) {
 
 		if (!do_not_add) {
 			write_to_q(input, &t->input, 0, add_to_head);
+			add_to_head = FALSE;
 		}
 
 		/* find the end of this line */
@@ -2363,7 +2555,7 @@ static int process_output(descriptor_data *t) {
 		strcat(osb, "**OVERFLOW**\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
 
 	/* add the extra CRLF if the person isn't in compact mode */
-	if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT) && !t->pProtocol->WriteOOB)
+	if (STATE(t) == CON_PLAYING && t->character && !REAL_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT) && !t->pProtocol->WriteOOB)
 		strcat(osb, "\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
 
 	// add prompt
@@ -2403,11 +2595,19 @@ static int process_output(descriptor_data *t) {
 		return (0);
 
 	/* Handle snooping: prepend "% " and send to snooper. */
-	if (t->snoop_by) {
-		write_to_output("% ", t->snoop_by);
-		write_to_output(t->output, t->snoop_by);
-		write_to_output("%%", t->snoop_by);
+	if (t->snoop_by && *t->output) {
+		char stripped[MAX_STRING_LENGTH];
+		
+		strncpy(stripped, strip_telnet_codes(t->output), MAX_STRING_LENGTH);
+		stripped[MAX_STRING_LENGTH-1] = '\0';
+		
+		if (*stripped) {
+			write_to_output("% ", t->snoop_by);
+			write_to_output(stripped, t->snoop_by);
+			write_to_output("%%", t->snoop_by);
+		}
 	}
+	
 	/* The common case: all saved output was handed off to the kernel buffer. */
 	if (result >= t->bufptr) {
 		/* If we were using a large buffer, put the large buffer on the buffer pool
@@ -3007,6 +3207,15 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				}
+				case 'q': {	// daily quests left
+					int amt = 0;
+					if (!IS_NPC(ch)) {
+						amt = config_get_int("dailies_per_day") - GET_DAILY_QUESTS(ch);
+					}
+					sprintf(i, "%d", MAX(0, amt));
+					tmp = i;
+					break;
+				}
 				case 'r': {	// room template/building
 					if (IS_IMMORTAL(ch)) {
 						if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
@@ -3193,7 +3402,8 @@ void game_loop(socket_t mother_desc) {
 	/* The Main Loop.  The Big Cheese.  The Top Dog.  The Head Honcho.  The.. */
 	while (!empire_shutdown) {
 
-		/* Sleep if we don't have any connections */
+		/** Sleep if we don't have any connections
+		// This is OFF because it blocks map evolutions and workforce
 		if (descriptor_list == NULL) {
 			log("No connections. Going to sleep.");
 			FD_ZERO(&input_set);
@@ -3210,6 +3420,8 @@ void game_loop(socket_t mother_desc) {
 			}
 			gettimeofday(&last_time, (struct timezone *) 0);
 		}
+		*/
+		
 		/* Set up the input, output, and exception sets for select(). */
 		FD_ZERO(&input_set);
 		FD_ZERO(&output_set);
@@ -3396,6 +3608,9 @@ void game_loop(socket_t mother_desc) {
 		}
 
 		/* Now execute the heartbeat functions */
+		catch_up_combat = TRUE;
+		catch_up_actions = TRUE;
+		catch_up_mobs = TRUE;
 		while (missed_pulses--) {
 			heartbeat(++pulse);
 		}
@@ -3677,7 +3892,7 @@ void reboot_recover(void) {
 				
 		d->character = load_player(name, TRUE);
 		if (d->character) {
-			REMOVE_BIT(PLR_FLAGS(d->character), PLR_WRITING | PLR_MAILING);
+			REMOVE_BIT(PLR_FLAGS(d->character), PLR_MAILING);
 			d->character->desc = d;
 		}
 		else {

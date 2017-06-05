@@ -7,4 +7,65 @@ An Interdimensional Whirlwind~
 A
 j
 S
+#10550
+Frozen River Portal~
+A Frozen River~
+&W~&C()&W~~
+1000 0 bd 0
+0 0 0 -1
+I 6 10562 95.00 1 F  # FORAGE: a handful of red and green seeds
+I 6 10563 5.00 1 F  # FORAGE: a seed of pure ice
+M
+9172 5.00 g
+M
+9173 5.00 ag
+M
+9177 5.00 g
+M
+9178 0.03 g
+M
+9179 15.00 g
+M
+9182 5.00 g
+M
+9186 5.00 0
+M
+9171 5.00 0
+M
+9185 5.00 h
+M
+10556 5.00 0
+M
+10557 5.00 0
+M
+10558 5.00 0
+S
+#10561
+Aboard the Polar Wind~
+Aboard the Polar Wind~
+~
+0 0 aHR 0
+0 1 0 -1
+C
+disembark, sail~
+D
+You're standing on the deck of the Polar Wind, looking out.
+~
+M
+255 20.00 c
+S
+#10562
+Helm of the Polar Wind~
+The Helm of the Polar Wind~
+~
+0 0 aHR 0
+0 0 0 -1
+C
+disembark, sail~
+D
+You are standing at the helm of the majestic Polar Wind.
+~
+M
+255 20.00 c
+S
 $

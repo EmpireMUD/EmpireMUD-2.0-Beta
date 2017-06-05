@@ -1,0 +1,43 @@
+#18472
+schooner prairie wagon~
+a prairie schooner~
+A prairie schooner is being led by a team of stout oxen.~
+   This old wagon has seen better days. The wheels are mismatched and the axle
+is stressed almost to the point of breaking. It's such a rough ride that your
+entire family is walking alongside, rather than sitting in the wagon.
+~
+~
+u 19 24 0 2
+S
+#18491
+chariot silver strange delorean~
+a strange silver chariot~
+There is a strange silver chariot with doors like the wings of gulls.~
+   This chariot is unlike anything you have ever seen. It is short, wide, and
+flattened, and its wheels are made of a dark material like none you have ever
+seen. The doors raise vertically, held aloft like gulls' wings, revealing a
+plush and extravagant interior.
+~
+&w/==>~
+u 19 1000 0 0
+C
+3 3
+D
+18491 0 0
+S
+#18492
+box blue tall~
+the blue box~
+A tall blue box has appeared here, seemingly from nowhere.~
+   The box is taller than a man, and has a door on the front. Words in a
+strange script appear to spell out 'Police Box'. The box is painted a deep
+shade of blue and though it has windows, you can't see in.
+~
+@.&B[]&?@.~
+u 2 1000 0 0
+C
+900 900
+D
+18492 0 0
+S
+$

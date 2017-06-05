@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: dg_wldcmd.c                                     EmpireMUD 2.0b4 *
+*   File: dg_wldcmd.c                                     EmpireMUD 2.0b5 *
 *  Usage: contains the command_interpreter for rooms, room commands.      *
 *                                                                         *
 *  DG Scripts code by galion, 1996/08/05 03:27:07, revision 3.12          *
@@ -29,6 +29,7 @@
 extern const char *damage_types[];
 extern const char *alt_dirs[];
 extern const char *dirs[];
+extern struct instance_data *quest_instance_global;
 
 // external functions
 void send_char_pos(char_data *ch, int dam);
@@ -42,6 +43,7 @@ char_data *get_char_in_room(room_data *room, char *name);
 obj_data *get_obj_in_room(room_data *room, char *name);
 extern vehicle_data *get_vehicle(char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
+extern room_data *obj_room(obj_data *obj);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
@@ -127,8 +129,15 @@ void act_to_room(char *str, room_data *room) {
 WCMD(do_wadventurecomplete) {
 	void mark_instance_completed(struct instance_data *inst);
 	
-	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
-		mark_instance_completed(COMPLEX_DATA(room)->instance);
+	struct instance_data *inst;
+	
+	inst = quest_instance_global;
+	if (!inst) {
+		inst = find_instance_by_room(room, FALSE);
+	}
+	
+	if (inst) {
+		mark_instance_completed(inst);
 	}
 }
 
@@ -166,6 +175,47 @@ WCMD(do_wasound) {
 			}
 		}
 	}
+}
+
+
+WCMD(do_wbuild) {
+	void do_dg_build(room_data *target, char *argument);
+
+	char loc_arg[MAX_INPUT_LENGTH], bld_arg[MAX_INPUT_LENGTH], *tmp;
+	room_data *target;
+	
+	tmp = any_one_word(argument, loc_arg);
+	strcpy(bld_arg, tmp);
+	
+	// usage: %build% [location] <vnum [dir] | ruin | demolish>
+	if (!*loc_arg) {
+		wld_log(room, "obuild: bad syntax");
+		return;
+	}
+	
+	// check number of args
+	if (!*bld_arg) {
+		// only arg is actually building arg
+		strcpy(bld_arg, argument);
+		target = room;
+	}
+	else {
+		// two arguments
+		target = get_room(room, loc_arg);
+	}
+	
+	if (!target) {
+		wld_log(room, "obuild: target is an invalid room");
+		return;
+	}
+	
+	// places you just can't build -- fail silently (currently)
+	if (IS_INSIDE(target) || IS_ADVENTURE_ROOM(target) || IS_CITY_CENTER(target)) {
+		return;
+	}
+
+	// good to go
+	do_dg_build(target, bld_arg);
 }
 
 
@@ -296,7 +346,10 @@ WCMD(do_wregionecho) {
 		
 		if (center) {			
 			for (desc = descriptor_list; desc; desc = desc->next) {
-				if (STATE(desc) != CON_PLAYING || !(targ = desc->character) || PLR_FLAGGED(targ, PLR_WRITING)) {
+				if (STATE(desc) != CON_PLAYING || !(targ = desc->character)) {
+					continue;
+				}
+				if (RMT_FLAGGED(IN_ROOM(targ), RMT_NO_LOCATION)) {
 					continue;
 				}
 				if (compute_distance(center, IN_ROOM(targ)) > radius) {
@@ -362,7 +415,7 @@ WCMD(do_wdoor) {
 		return;
 	}
 
-	if ((dir = search_block(direction, dirs, FALSE)) == NOTHING) {
+	if ((dir = search_block(direction, dirs, FALSE)) == NO_DIR && (dir = search_block(direction, alt_dirs, FALSE)) == NO_DIR) {
 		wld_log(room, "wdoor: invalid direction");
 		return;
 	}
@@ -411,7 +464,7 @@ WCMD(do_wdoor) {
 				strcpy(newexit->keyword, value);
 				break;
 			case 3:  /* room        */
-				if ((to_room = real_room(atoi(value)))) {
+				if ((to_room = get_room(room, value))) {
 					if (!newexit) {
 						newexit = create_exit(rm, to_room, dir, FALSE);
 					}
@@ -450,7 +503,7 @@ WCMD(do_wdoor) {
 WCMD(do_wsiege) {
 	void besiege_room(room_data *to_room, int damage);
 	extern bool besiege_vehicle(vehicle_data *veh, int damage, int siege_type);
-	extern room_data *dir_to_room(room_data *room, int dir);
+	extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
 	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
 	
@@ -480,7 +533,7 @@ WCMD(do_wsiege) {
 	}
 	if (!veh_targ && !room_targ) {
 		if ((dir = search_block(tar_arg, dirs, FALSE)) != NOTHING || (dir = search_block(tar_arg, alt_dirs, FALSE)) != NOTHING) {
-			room_targ = dir_to_room(room, dir);
+			room_targ = dir_to_room(room, dir, FALSE);
 		}
 	}
 	if (!veh_targ && !room_targ) {
@@ -820,19 +873,18 @@ WCMD(do_wown) {
 	}
 	else {	// attempt to find a target
 		strcpy(targ_arg, type_arg);	// there was no type
+		skip_spaces(&argument);
+		strcpy(emp_arg, argument);
 		
 		if (!*targ_arg) {
 			wld_log(room, "wown: Too few arguments");
 			return;
 		}
-		else if (*targ_arg == UID_CHAR && !(vict = get_char(targ_arg)) && !(vtarg = get_vehicle(targ_arg)) && !(otarg = get_obj(targ_arg)) && !(rtarg = get_room(room, targ_arg))) {
-			wld_log(room, "wown: Unable to find target %s", targ_arg);
-			return;
+		else if (*targ_arg == UID_CHAR && ((vict = get_char(targ_arg)) || (vtarg = get_vehicle(targ_arg)) || (otarg = get_obj(targ_arg)) || (rtarg = get_room(room, targ_arg)))) {
+			// found by uid
 		}
 		else if ((vict = get_char_by_room(room, targ_arg)) || (vtarg = get_vehicle_room(room, targ_arg)) || (otarg = get_obj_by_room(room, targ_arg))) {
-			// must have been found
-			skip_spaces(&argument);
-			strcpy(emp_arg, argument);
+			// found by name
 		}
 		else {
 			wld_log(room, "wown: Invalid target");
@@ -886,7 +938,8 @@ WCMD(do_wpurge) {
 	obj_data *obj, *next_obj;
 	vehicle_data *veh;
 
-	one_argument(argument, arg);
+	argument = one_argument(argument, arg);
+	skip_spaces(&argument);
 
 	if (!*arg) {
 		/* purge all */
@@ -904,21 +957,40 @@ WCMD(do_wpurge) {
 		return;
 	}
 	
+	// purge all mobs/objs in an instance
+	if (!str_cmp(arg, "instance")) {
+		struct instance_data *inst = ROOM_INSTANCE(room);
+		if (!inst) {
+			wld_log(room, "wpurge: room using purge instance outside an instance");
+			return;
+		}
+		dg_purge_instance(room, inst, argument);
+	}
 	// purge char
-	if ((*arg == UID_CHAR && (ch = get_char(arg))) || (ch = get_char_in_room(room, arg))) {
+	else if ((*arg == UID_CHAR && (ch = get_char(arg))) || (ch = get_char_in_room(room, arg))) {
 		if (!IS_NPC(ch)) {
 			wld_log(room, "wpurge: purging a PC");
 			return;
 		}
-
+		
+		if (*argument) {
+			act(argument, TRUE, ch, NULL, NULL, TO_ROOM);
+		}
 		extract_char(ch);
 	}
 	// purge vehicle
 	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_room(room, arg))) {
+		if (*argument) {
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+		}
 		extract_vehicle(veh);
 	}
 	// purge obj
 	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_in_room(room, arg))) {
+		if (*argument) {
+			room_data *room = obj_room(obj);
+			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, obj, NULL, TO_CHAR | TO_ROOM);
+		}
 		extract_obj(obj);
 	}
 	else {
@@ -943,6 +1015,7 @@ WCMD(do_wload) {
 	int number = 0;
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
+	room_data *in_room;
 	vehicle_data *veh;
 	char *target;
 	int pos;
@@ -965,10 +1038,14 @@ WCMD(do_wload) {
 		// store instance id
 		if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
 			MOB_INSTANCE_ID(mob) = COMPLEX_DATA(room)->instance->id;
+			if (MOB_INSTANCE_ID(mob) != NOTHING) {
+				add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
+			}
 		}
 		
 		if (*target && isdigit(*target)) {
 			scale_mob_to_level(mob, atoi(target));
+			SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);
 		}
 		else if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance && COMPLEX_DATA(room)->instance->level > 0) {
 			// instance level-locked
@@ -1006,6 +1083,21 @@ WCMD(do_wload) {
 		target = two_arguments(target, arg1, arg2); /* recycling ... */
 		skip_spaces(&target);
 		
+		// if they're picking a room, move arg2 down a slot to "target" level
+		in_room = NULL;
+		if (!str_cmp(arg1, "room")) {
+			in_room = room;
+			target = arg2;
+		}
+		else if (*arg1 == UID_CHAR) {
+			if ((in_room = get_room(room, arg1))) {
+				target = arg2;
+			}
+		}
+		else {	// not targeting a room
+			in_room = NULL;
+		}
+		
 		// scaling on request
 		if (*target && isdigit(*target)) {
 			scale_item_to_level(object, atoi(target));
@@ -1013,6 +1105,12 @@ WCMD(do_wload) {
 		else if ((inst = find_instance_by_room(room, FALSE)) && inst->level > 0) {
 			// scaling by locked adventure
 			scale_item_to_level(object, inst->level);
+		}
+		
+		if (in_room) {	// load in room
+			obj_to_room(object, in_room); 
+			load_otrigger(object);
+			return;
 		}
 		
 		tch = get_char_in_room(room, arg1);
@@ -1175,7 +1273,7 @@ WCMD(do_wdot) {
 	argument = one_argument(argument, stackarg);	// optional, defualt: 1
 
 	if (!*name || !*modarg || !*durarg) {
-		wld_log(room, "dot: bad syntax");
+		wld_log(room, "wdot: bad syntax");
 		return;
 	}
 
@@ -1186,14 +1284,14 @@ WCMD(do_wdot) {
 	ch = get_char_by_room(room, name);
 
 	if (!ch) {
-		wld_log(room, "dot: target not found");      
+		wld_log(room, "wdot: target not found");      
 		return;
 	}
 	
 	if (*typearg) {
 		type = search_block(typearg, damage_types, FALSE);
 		if (type == NOTHING) {
-			wld_log(room, "wdamage: invalid type argument, using physical damage");
+			wld_log(room, "wdot: invalid type argument, using physical damage");
 			type = DAM_PHYSICAL;
 		}
 	}
@@ -1226,9 +1324,116 @@ WCMD(do_wat) {
 }
 
 
+WCMD(do_wrestore) {
+	extern const bool aff_is_bad[];
+	extern const double apply_values[];
+	
+	struct affected_type *aff, *next_aff;
+	char arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh = NULL;
+	char_data *victim = NULL;
+	obj_data *obj = NULL;
+	room_data *rtarg = NULL;
+	bitvector_t bitv;
+	bool done_aff;
+	int pos;
+		
+	one_argument(argument, arg);
+	
+	// find a target
+	if (!*arg) {
+		rtarg = room;
+	}
+	else if (!str_cmp(arg, "room") || !str_cmp(arg, "building")) {
+		rtarg = room;
+	}
+	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_in_room(room, arg))) {
+		// found victim
+	}
+	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_room(room, arg))) {
+		// found vehicle
+		if (!VEH_IS_COMPLETE(veh)) {
+			wld_log(room, "wrestore: used on unfinished vehicle");
+			return;
+		}
+	}
+	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_in_room(room, arg))) {
+		// found obj
+	}
+	else if ((rtarg = get_room(room, arg))) {
+		// found room
+	}
+	else {
+		// bad arg
+		wld_log(room, "wrestore: bad argument");
+		return;
+	}
+	
+	if (rtarg) {
+		rtarg = HOME_ROOM(rtarg);
+		if (!IS_COMPLETE(rtarg)) {
+			wld_log(room, "wrestore: used on unfinished building");
+			return;
+		}
+	}
+	
+	// perform the restoration
+	if (victim) {
+		while (victim->over_time_effects) {
+			dot_remove(victim, victim->over_time_effects);
+		}
+		LL_FOREACH_SAFE(victim->affected, aff, next_aff) {
+			// can't cleanse penalties (things cast by self)
+			if (aff->cast_by == CAST_BY_ID(victim)) {
+				continue;
+			}
+			
+			done_aff = FALSE;
+			if (aff->location != APPLY_NONE && (apply_values[(int) aff->location] == 0.0 || aff->modifier < 0)) {
+				affect_remove(victim, aff);
+				done_aff = TRUE;
+			}
+			if (!done_aff && (bitv = aff->bitvector) != NOBITS) {
+				// check each bit
+				for (pos = 0; bitv && !done_aff; ++pos, bitv >>= 1) {
+					if (IS_SET(bitv, BIT(0)) && aff_is_bad[pos]) {
+						affect_remove(victim, aff);
+						done_aff = TRUE;
+					}
+				}
+			}
+		}
+		if (GET_POS(victim) < POS_SLEEPING) {
+			GET_POS(victim) = POS_STANDING;
+		}
+		GET_HEALTH(victim) = GET_MAX_HEALTH(victim);
+		GET_MOVE(victim) = GET_MAX_MOVE(victim);
+		GET_MANA(victim) = GET_MAX_MANA(victim);
+		GET_BLOOD(victim) = GET_MAX_BLOOD(victim);
+	}
+	if (obj) {
+		// not sure what to do for objs
+	}
+	if (veh) {
+		free_resource_list(VEH_NEEDS_RESOURCES(veh));
+		VEH_NEEDS_RESOURCES(veh) = NULL;
+		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
+		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+	}
+	if (rtarg) {
+		if (COMPLEX_DATA(rtarg)) {
+			free_resource_list(GET_BUILDING_RESOURCES(rtarg));
+			GET_BUILDING_RESOURCES(rtarg) = NULL;
+			COMPLEX_DATA(rtarg)->damage = 0;
+			COMPLEX_DATA(rtarg)->burning = 0;
+		}
+	}
+}
+
+
 WCMD(do_wscale) {
 	char arg[MAX_INPUT_LENGTH], lvl_arg[MAX_INPUT_LENGTH];
-	struct instance_data *inst;
+	struct instance_data *inst = NULL;
 	char_data *victim;
 	obj_data *obj, *fresh, *proto;
 	vehicle_data *veh;
@@ -1260,14 +1465,22 @@ WCMD(do_wscale) {
 		return;
 	}
 	
+	// scale adventure
+	if (!str_cmp(arg, "instance")) {
+		void scale_instance_to_level(struct instance_data *inst, int level);
+		if (inst || (inst = find_instance_by_room(room, FALSE))) {
+			scale_instance_to_level(inst, level);
+		}
+	}
 	// scale char
-	if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_in_room(room, arg))) {
+	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_in_room(room, arg))) {
 		if (!IS_NPC(victim)) {
 			wld_log(room, "wscale: unable to scale a PC");
 			return;
 		}
 
 		scale_mob_to_level(victim, level);
+		SET_BIT(MOB_FLAGS(victim), MOB_NO_RESCALE);
 	}
 	// scale vehicle
 	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_room(room, arg))) {
@@ -1300,6 +1513,7 @@ const struct wld_command_info wld_cmd_info[] = {
 
 	{ "wadventurecomplete", do_wadventurecomplete, NO_SCMD },
 	{ "wasound", do_wasound, NO_SCMD },
+	{ "wbuild", do_wbuild, NO_SCMD },
 	{ "wdoor", do_wdoor, NO_SCMD },
 	{ "wecho", do_wecho, NO_SCMD },
 	{ "wechoaround", do_wsend, SCMD_WECHOAROUND },
@@ -1309,6 +1523,7 @@ const struct wld_command_info wld_cmd_info[] = {
 	{ "wmorph", do_wmorph, NO_SCMD },
 	{ "wpurge", do_wpurge, NO_SCMD },
 	{ "wquest", do_wquest, NO_SCMD },
+	{ "wrestore", do_wrestore, NO_SCMD },
 	{ "wscale", do_wscale, NO_SCMD },
 	{ "wsend", do_wsend, SCMD_WSEND },
 	{ "wsiege", do_wsiege, NO_SCMD },

@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: structs.h                                       EmpireMUD 2.0b4 *
+*   File: structs.h                                       EmpireMUD 2.0b5 *
 *  Usage: header file for central structures and contstants               *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -26,12 +26,14 @@
 *     Craft Defines
 *     Crop Defines
 *     Empire Defines
+*     Faction Defines
 *     Game Defines
 *     Mobile Defines
 *     Object Defines
 *     Player Defines
 *     Quest Defines
 *     Sector Defines
+*     Social Defines
 *     Vehicle Defines
 *     Weather and Season Defines
 *     World Defines
@@ -51,11 +53,13 @@
 *     Crop Structs
 *     Data Structs
 *     Empire Structs
+*     Faction Structs
 *     Fight Structs
 *     Game Structs
 *     Object Structs
 *     Quest Structs
 *     Sector Structs
+*     Social Structs
 *     Trigger Structs
 *     Vehicle Structs
 *     Weather and Season Structs
@@ -173,7 +177,7 @@
 
 
 // basic types
-typedef char byte;
+typedef signed char byte;
 typedef signed char sbyte;
 typedef unsigned char ubyte;
 typedef signed short int sh_int;
@@ -218,6 +222,7 @@ typedef struct craft_data craft_data;
 typedef struct crop_data crop_data;
 typedef struct descriptor_data descriptor_data;
 typedef struct empire_data empire_data;
+typedef struct faction_data faction_data;
 typedef struct index_data index_data;
 typedef struct morph_data morph_data;
 typedef struct obj_data obj_data;
@@ -226,6 +231,7 @@ typedef struct quest_data quest_data;
 typedef struct room_data room_data;
 typedef struct room_template room_template;
 typedef struct sector_data sector_data;
+typedef struct social_data social_data;
 typedef struct skill_data skill_data;
 typedef struct trig_data trig_data;
 typedef struct vehicle_data vehicle_data;
@@ -289,6 +295,7 @@ typedef struct vehicle_data vehicle_data;
 #define GLB_FLAG_IN_DEVELOPMENT  BIT(0)	// not live
 #define GLB_FLAG_ADVENTURE_ONLY  BIT(1)	// does not apply outside same-adventure
 #define GLB_FLAG_CUMULATIVE_PERCENT  BIT(2)	// accumulates percent with other valid globals instead of its own percent
+#define GLB_FLAG_CHOOSE_LAST  BIT(3)	// the first choose-last global that passes is saved for later, if nothing else is chosen
 
 
 // Group Defines
@@ -328,6 +335,36 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_BAG_ROWS	5
 
 
+// REQ_x: requirement types (used for things like quest conditions and pre-reqs)
+#define REQ_COMPLETED_QUEST  0
+#define REQ_GET_COMPONENT  1
+#define REQ_GET_OBJECT  2
+#define REQ_KILL_MOB  3
+#define REQ_KILL_MOB_FLAGGED  4
+#define REQ_NOT_COMPLETED_QUEST  5
+#define REQ_NOT_ON_QUEST  6
+#define REQ_OWN_BUILDING  7
+#define REQ_OWN_VEHICLE  8
+#define REQ_SKILL_LEVEL_OVER  9
+#define REQ_SKILL_LEVEL_UNDER  10
+#define REQ_TRIGGERED  11	// completed by a script
+#define REQ_VISIT_BUILDING  12
+#define REQ_VISIT_ROOM_TEMPLATE  13
+#define REQ_VISIT_SECTOR  14
+#define REQ_HAVE_ABILITY  15
+#define REQ_REP_OVER  16
+#define REQ_REP_UNDER  17
+#define REQ_WEARING  18
+#define REQ_WEARING_OR_HAS  19
+
+
+// REQ_AMT_x: How numbers displayed for different REQ_ types
+#define REQ_AMT_NONE  0	// show as "completed"
+#define REQ_AMT_NUMBER  1  // show as x/X
+#define REQ_AMT_THRESHOLD  2	// needs a numeric arg but shows as a threshold
+#define REQ_AMT_REPUTATION  3	// uses a faction reputation
+
+
 // for the shipping system
 #define SHIPPING_QUEUED  0	// waiting for a ship
 #define SHIPPING_EN_ROUTE  1	// waiting to deliver
@@ -362,7 +399,7 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// ADVENTURE DEFINES ///////////////////////////////////////////////////////
 
-// adventure flags
+// ADV_x: adventure flags
 #define ADV_IN_DEVELOPMENT  BIT(0)	// will not generate instances
 #define ADV_LOCK_LEVEL_ON_ENTER  BIT(1)	// lock levels on entry
 #define ADV_LOCK_LEVEL_ON_COMBAT  BIT(2)	// lock levels when combat starts
@@ -372,6 +409,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_NO_NEWBIE  BIT(6)	// prevents spawning on newbie islands
 #define ADV_NEWBIE_ONLY  BIT(7)	// only spawns on newbie islands
 #define ADV_NO_MOB_CLEANUP  BIT(8)	// won't despawn mobs that escaped the instance
+#define ADV_EMPTY_RESET_ONLY  BIT(9)	// won't reset while players are inside
 
 
 // adventure link rule types
@@ -410,12 +448,18 @@ typedef struct vehicle_data vehicle_data;
 #define RMT_NO_TELEPORT  BIT(6)	// g. cannot teleport in/out
 #define RMT_LOOK_OUT  BIT(7)	// h. can see the map using "look out"
 #define RMT_NO_LOCATION  BIT(8)	// i. don't show a location, disables where
-#define RMT_PIGEON_POST  BIT(9)	// j. can use mail here
-#define RMT_COOKING_FIRE  BIT(10)	// k. can cook here
+	#define RMT_UNUSED1  BIT(9)
+	#define RMT_UNUSED2  BIT(10)
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// ARCHETYPE DEFINES ///////////////////////////////////////////////////////
+
+// ARCHT_x: archetype types
+#define ARCHT_ORIGIN  0
+#define ARCHT_HOBBY  1
+#define NUM_ARCHETYPE_TYPES  2	// must be total number
+
 
 // ARCH_x: archetype flags
 #define ARCH_IN_DEVELOPMENT  BIT(0)	// a. not available to players
@@ -465,10 +509,10 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_INTERLINK  BIT(5)	// can be interlinked
 #define BLD_HERD  BIT(6)	// can herd
 #define BLD_DEDICATE  BIT(7)	// can be dedicated to a player
-// #define BLD_UNUSED1  BIT(8)
+#define BLD_NO_RUINS  BIT(8)	// building leaves no corpse
 #define BLD_NO_NPC  BIT(9)	// mobs won't walk in
 #define BLD_BARRIER  BIT(10)	// can only go back the direction you came
-// #define BLD_UNUSED2  BIT(11)
+#define BLD_IN_CITY_ONLY  BIT(11)	// can only be used in-city
 #define BLD_LARGE_CITY_RADIUS  BIT(12)	// counts as in-city further than normal
 // #define BLD_UNUSED3  BIT(13)
 #define BLD_ATTACH_ROAD  BIT(14)	// building connects to roads on the map
@@ -629,7 +673,7 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_EXTRA_ATTRIBUTES  13
 
 
-/* Affect bits */
+// AFF_x: Affect bits
 /* WARNING: In the world files, NEVER set the bits marked "R" ("Reserved") */
 #define AFF_BLIND  BIT(0)	// a. (R) Char is blind
 #define AFF_MAJESTY  BIT(1)	// b. majesty
@@ -663,6 +707,8 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_IMMUNE_VAMPIRE  BIT(29)	// D. Immune to vampire debuffs
 #define AFF_IMMUNE_STUN  BIT(30)	// E. Cannot be hit by stun effects
 #define AFF_ORDERED  BIT(31)	// F. Has been issued an order from a player
+#define AFF_NO_DRINK_BLOOD  BIT(32)	// G. Vampires can't bite or sire
+#define AFF_DISTRACTED  BIT(33)	// H. Player cannot perform timed actions
 
 
 // Injury flags -- IS_INJURED
@@ -745,6 +791,8 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_SHIPYARD  BIT(14)	// requires a shipyard
 #define CRAFT_BLD_UPGRADED  BIT(15)	// requires a building with the upgraded flag
 
+// list of above craft flags that require a building in some way
+#define CRAFT_FLAGS_REQUIRING_BUILDINGS  (CRAFT_GLASSBLOWER | CRAFT_CARPENTER | CRAFT_ALCHEMY | CRAFT_SHIPYARD)
 
 // For find_building_list_entry
 #define FIND_BUILD_NORMAL  0
@@ -754,10 +802,12 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// CROP DEFINES ////////////////////////////////////////////////////////////
 
-// crop flags
+// CROPF_x: crop flags
 #define CROPF_REQUIRES_WATER  BIT(0)	// only plants near water
 #define CROPF_IS_ORCHARD  BIT(1)	// follows orchard rules
 #define CROPF_NOT_WILD  BIT(2)	// crop will never spawn in the wild
+#define CROPF_NEWBIE_ONLY  BIT(3)	// only spawns on newbie islands
+#define CROPF_NO_NEWBIE  BIT(4)	// never spawns on newbie islands
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -897,6 +947,34 @@ typedef struct vehicle_data vehicle_data;
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// FACTION DEFINES /////////////////////////////////////////////////////////
+
+// FCT_x: Faction flags
+#define FCT_IN_DEVELOPMENT  BIT(0)	// a. not live
+#define FCT_REP_FROM_KILLS  BIT(1)	// b. killing mobs affects faction rating
+
+
+// FCTR_x: Relationship flags
+#define FCTR_SHARED_GAINS  BIT(0)	// a. also gains rep when that one gains rep
+#define FCTR_INVERSE_GAINS  BIT(1)	// b. loses rep when that one gains rep
+#define FCTR_MUTUALLY_EXCLUSIVE  BIT(2)	// c. cannot gain if that one is positive
+#define FCTR_UNLISTED  BIT(3)  // d. mortals won't see this relationship
+
+
+// REP_x: Faction reputation levels
+#define REP_NONE  0	// base / un-set
+#define REP_NEUTRAL  1	// no opinion
+#define REP_DESPISED  2	// lower cap
+#define REP_HATED  3	// worst
+#define REP_LOATHED  4	// bad
+#define REP_DISLIKED  5	// not good
+#define REP_LIKED  6	// decent
+#define REP_ESTEEMED  7	// good
+#define REP_VENERATED  8	// great!
+#define REP_REVERED  9	// upper cap
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// GAME DEFINES ////////////////////////////////////////////////////////////
 
 /* Access Level constants *****************************************************
@@ -906,7 +984,7 @@ typedef struct vehicle_data vehicle_data;
  *  - Make sure that the levels for commands in interpreter.c are okay
  *  - Unless you have more than three immortal levels, the mud will auto-
  *    magically set the command levels for you.
- *  - Make sure LVL_TOP is no less than 4!
+ *  - Make sure LVL_TOP is no less than 3!
  *  - If you want more levels than those listed in the chart, you'll have to
  *    make necessary adjustments yourself:
  *    = Add a clause in db.player.c, Autowiz section: level_params[]
@@ -918,21 +996,21 @@ typedef struct vehicle_data vehicle_data;
  * Quick Reference:
  *  Levels    You'll Have
  *  ------    -----------
- *    4           Unapproved, Approved, God, Implementor
- *    5           Unapproved, Approved, God, Immortal, Implementor
- *    6           Unapproved, Approved, God, Immortal, Assistant, Implementor
- *    7           Unapproved, Approved, God, Immortal, Assistant, Co-Implementor, Implementor
+ *    3           Mortal, God, Implementor
+ *    4           Mortal, God, Immortal, Implementor
+ *    5           Mortal, God, Immortal, Assistant, Implementor
+ *    6           Mortal, God, Immortal, Assistant, Co-Implementor, Implementor
  */
 
-#define LVL_TOP  7	// Highest possible access level
-#define LVL_APPROVED  2	// Level when players can use commands -- don't set less than 2
+#define LVL_TOP  6	// Highest possible access level
+#define LVL_MORTAL  1	// Level when players can use commands -- don't set less than 1
 
 // admin levels
 #define LVL_IMPL  LVL_TOP
 #define LVL_CIMPL  (LVL_ASST < LVL_TOP ? LVL_ASST + 1 : LVL_ASST)
 #define LVL_ASST  (LVL_START_IMM < LVL_TOP ? LVL_START_IMM + 1 : LVL_START_IMM)
 #define LVL_START_IMM  (LVL_GOD+1)
-#define LVL_GOD  (LVL_APPROVED+1)
+#define LVL_GOD  (LVL_MORTAL+1)
 
 
 // Player killing options (config.c)
@@ -972,11 +1050,12 @@ typedef struct vehicle_data vehicle_data;
 #define OPT_USEC  100000	// 10 passes per second
 #define PASSES_PER_SEC  (1000000 / OPT_USEC)
 #define RL_SEC  * PASSES_PER_SEC
+#define SEC_MICRO  *1000000	// convert seconds to microseconds for microtime()
 
 
 // Variables for the output buffering system
 #define MAX_SOCK_BUF  (24 * 1024)	// Size of kernel's sock buf
-#define MAX_PROMPT_LENGTH  256	// Max length of rendered prompt
+#define MAX_PROMPT_LENGTH  275	// Max length of rendered prompt
 #define GARBAGE_SPACE  32	// Space for **OVERFLOW** etc
 #define SMALL_BUFSIZE  8192	// Static output buffer size
 // Max amount of output that can be buffered
@@ -1025,6 +1104,13 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_NO_LOOT  BIT(29)	// D. do not drop loot
 #define MOB_NO_TELEPORT  BIT(30)  // E. cannot teleport to this mob
 #define MOB_NO_EXPERIENCE  BIT(31)	// F. players get no exp against this mob
+#define MOB_NO_RESCALE  BIT(32)	// G. mob won't rescale (after the first time), e.g. if specific traits were set
+#define MOB_SILENT  BIT(33)	// H. will not set off custom strings
+
+
+// MOB_CUSTOM_x: custom message types
+#define MOB_CUSTOM_ECHO  0
+#define MOB_CUSTOM_SAY  1
 
 
 // MOB_MOVE_x: mob/vehicle movement types
@@ -1061,6 +1147,9 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_MOVE_DRIFTS  30
 #define MOB_MOVE_BOUNCES  31
 #define MOB_MOVE_FLOWS  32
+#define MOB_MOVE_LEAVES  33
+#define MOB_MOVE_SHUFFLES  34
+#define MOB_MOVE_MARCHES  35
 
 
 // name sets: add matching files in lib/text/names/
@@ -1077,6 +1166,10 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_TYPE_NATURAL  0	// built-in trait
 #define APPLY_TYPE_ENCHANTMENT  1	// caused by enchant
 #define APPLY_TYPE_HONED  2	// Trade ability
+#define APPLY_TYPE_SUPERIOR  3	// only applies if the item is SUPERIOR when scaled
+#define APPLY_TYPE_HARD_DROP  4	// only applies if the item is HARD-DROP when scaled
+#define APPLY_TYPE_GROUP_DROP  5	// only applies if the item is GROUP-DROP when scaled
+#define APPLY_TYPE_BOSS_DROP  6	// only applies if the item is GROUP- and HARD-DROP both when scaled
 
 
 // CMP_x: component types
@@ -1132,6 +1225,7 @@ typedef struct vehicle_data vehicle_data;
 #define CMPF_TROPICAL  BIT(17)
 #define CMPF_COMMON  BIT(18)
 #define CMPF_AQUATIC  BIT(19)
+#define CMPF_BASIC  BIT(20)
 
 
 // Container flags -- limited to 31 because of int type in obj value
@@ -1214,7 +1308,9 @@ typedef struct vehicle_data vehicle_data;
 #define LIQ_RED_WINE  11
 #define LIQ_WHITE_WINE  12
 #define LIQ_GROG  13
-#define NUM_LIQUIDS  14	// total
+#define LIQ_MEAD  14
+#define LIQ_STOUT  15
+#define NUM_LIQUIDS  16	// total
 
 
 // Item materials
@@ -1238,7 +1334,7 @@ typedef struct vehicle_data vehicle_data;
 
 
 // Extra object flags -- OBJ_FLAGGED(obj, f)
-	#define OBJ_UNUSED  BIT(0)	// formerly "chair"
+#define OBJ_UNIQUE  BIT(0)	// a. can only use 1 at a time
 #define OBJ_PLANTABLE  BIT(1)	// b. Uses val 2 to set a crop type
 #define OBJ_LIGHT  BIT(2)	// c. Lights until timer pops
 #define OBJ_SUPERIOR  BIT(3)	// d. Item is of superior quality
@@ -1280,6 +1376,9 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_CUSTOM_WEAR_TO_ROOM  9
 #define OBJ_CUSTOM_REMOVE_TO_CHAR  10
 #define OBJ_CUSTOM_REMOVE_TO_ROOM  11
+#define OBJ_CUSTOM_LONGDESC  12
+#define OBJ_CUSTOM_LONGDESC_FEMALE  13
+#define OBJ_CUSTOM_LONGDESC_MALE  14
 
 
 // RES_x: resource requirement types
@@ -1288,6 +1387,7 @@ typedef struct vehicle_data vehicle_data;
 #define RES_LIQUID  2	// a volume of a given liquid (vnum= LIQ_ type)
 #define RES_COINS  3	// an amount of coins (vnum= empire id of coins)
 #define RES_POOL  4	// health, mana, etc (vnum= HEALTH, etc)
+#define RES_ACTION  5	// flavorful action strings (take time but not resources)
 
 
 // storage flags (for obj storage locations)
@@ -1338,6 +1438,8 @@ typedef struct vehicle_data vehicle_data;
 #define ACCT_NOTITLE  BIT(3)	// d. cannot change own title
 #define ACCT_MULTI_IP  BIT(4)	// e. can log in at the same time as other accounts on the same IP
 #define ACCT_MULTI_CHAR  BIT(5)	// f. can log in more than one character on this account
+#define ACCT_APPROVED  BIT(6)	// g. approved for full gameplay
+#define ACCT_NOCUSTOMIZE  BIT(7)	// h. cannot use 'customize'
 
 
 // ACT_x: Periodic actions -- WARNING: changing the order of these will have tragic consequences with saved players
@@ -1352,7 +1454,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_MINING			8
 #define ACT_MINTING			9
 #define ACT_FISHING			10
-	#define ACT_UNUSED1  11
+#define ACT_START_FILLIN	11
 #define ACT_REPAIRING		12
 #define ACT_CHIPPING		13
 #define ACT_PANNING			14
@@ -1368,7 +1470,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_FILLING_IN		24
 #define ACT_RECLAIMING		25
 #define ACT_ESCAPING		26
-#define ACT_STUDYING		27
+	#define ACT_UNUSED		27
 #define ACT_RITUAL			28
 #define ACT_SAWING			29
 #define ACT_QUARRYING		30
@@ -1379,6 +1481,8 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_GEN_CRAFT		35
 #define ACT_SAILING			36
 #define ACT_PILOTING		37
+#define ACT_SWAP_SKILL_SETS	38
+#define ACT_MAINTENANCE		39
 
 // act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -1468,6 +1572,26 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_CONDS  3
 
 
+// FM_x: combat messages
+#define FM_MY_HITS  BIT(0)	// player's own hits
+#define FM_MY_MISSES  BIT(1)	// player's misses
+#define FM_HITS_AGAINST_ME  BIT(2)	// player is hit
+#define FM_MISSES_AGAINST_ME  BIT(3)	// player is missed
+#define FM_ALLY_HITS  BIT(4)	// any allied character hits
+#define FM_ALLY_MISSES  BIT(5)	// any allied player misses
+#define FM_HITS_AGAINST_ALLIES  BIT(6)	// any ally is hit
+#define FM_MISSES_AGAINST_ALLIES  BIT(7)	// any ally is missed
+#define FM_HITS_AGAINST_TARGET  BIT(8)	// anybody hits your target
+#define FM_MISSES_AGAINST_TARGET  BIT(9)	// anybody misses your target
+#define FM_HITS_AGAINST_TANK  BIT(10)	// anybody hits tank (target's focus)
+#define FM_MISSES_AGAINST_TANK  BIT(11)	// anybody misses tank (target's focus)
+#define FM_OTHER_HITS  BIT(12)	// hits not covered by other rules
+#define FM_OTHER_MISSES  BIT(13)	// misses not covered by other rules
+#define FM_AUTO_DIAGNOSE  BIT(14)	// does a diagnose after each hit
+
+#define DEFAULT_FIGHT_MESSAGES  (FM_MY_HITS | FM_MY_MISSES | FM_HITS_AGAINST_ME | FM_MISSES_AGAINST_ME | FM_ALLY_HITS | FM_ALLY_MISSES | FM_HITS_AGAINST_ALLIES | FM_MISSES_AGAINST_ALLIES | FM_HITS_AGAINST_TARGET | FM_MISSES_AGAINST_TARGET |FM_HITS_AGAINST_TANK | FM_MISSES_AGAINST_TANK | FM_OTHER_HITS | FM_OTHER_MISSES | FM_AUTO_DIAGNOSE)
+
+
 // GRANT_X: Grant flags allow players to use abilities below the required access level
 #define GRANT_ADVANCE  BIT(0)
 #define GRANT_BAN  BIT(1)
@@ -1500,7 +1624,7 @@ typedef struct vehicle_data vehicle_data;
 #define GRANT_USERS  BIT(28)
 #define GRANT_WIZLOCK  BIT(29)
 #define GRANT_RESCALE  BIT(30)
-#define GRANT_AUTHORIZE  BIT(31)
+#define GRANT_APPROVE  BIT(31)
 #define GRANT_FORGIVE  BIT(32)
 #define GRANT_HOSTILE  BIT(33)
 #define GRANT_SLAY  BIT(34)
@@ -1538,9 +1662,10 @@ typedef struct vehicle_data vehicle_data;
 #define MORPHF_NO_SLEEP  BIT(8)	// i. cannot sleep in this form
 #define MORPHF_GENDER_NEUTRAL  BIT(9)	// j. causes an "it" instead of him/her
 #define MORPHF_CONSUME_OBJ  BIT(10)	// k. uses up the requiresobj
+#define MORPHF_NO_FASTMORPH  BIT(11)	// l. cannot fastmorph into this form
 
 
-// mount flags -- MOUNT_FLAGGED(ch, flag)
+// MOUNT_x: mount flags -- MOUNT_FLAGGED(ch, flag)
 #define MOUNT_RIDING  BIT(0)	// player is currently mounted
 #define MOUNT_AQUATIC  BIT(1)	// mount can swim
 #define MOUNT_FLYING  BIT(2)	// mount can fly
@@ -1553,8 +1678,8 @@ typedef struct vehicle_data vehicle_data;
 
 
 // PLR_x: Player flags: used by char_data.char_specials.act
-	#define PLR_UNUSED1		BIT(0)
-#define PLR_WRITING		BIT(1)	/* Player writing (board/mail)			*/
+#define PLR_APPROVED	BIT(0)	// player is approved to play the full game
+	#define PLR_UNUSED1		BIT(1)
 #define PLR_MAILING		BIT(2)	/* Player is writing mail				*/
 #define PLR_DONTSET		BIT(3)	/* Don't EVER set (ISNPC bit)			*/
 	#define PLR_UNUSED2		BIT(4)
@@ -1567,7 +1692,7 @@ typedef struct vehicle_data vehicle_data;
 #define PLR_INVSTART	BIT(11)	/* Player should enter game wizinvis	*/
 #define PLR_IPMASK		BIT(12)	/* Player is IP-masked					*/
 #define PLR_DISGUISED	BIT(13)	// Player is using a disguise
-#define PLR_VAMPIRE		BIT(14)	/* Player is a vampire					*/
+	#define PLR_UNUSEDV		BIT(14)
 	#define PLR_UNUSED6		BIT(15)
 #define PLR_NEEDS_NEWBIE_SETUP  BIT(16)  // player is created but needs gear and setup
 #define PLR_UNRESTRICT	BIT(17)	/* !walls, !buildings					*/
@@ -1576,7 +1701,7 @@ typedef struct vehicle_data vehicle_data;
 #define PLR_ADVENTURE_SUMMONED  BIT(20)	// marks the player for return to whence they came
 
 
-// Preference flags
+// PRF_x: Preference flags
 #define PRF_AFK  BIT(0)	// player is marked away
 #define PRF_COMPACT  BIT(1)	// No extra CRLF pair before prompts
 #define PRF_DEAF  BIT(2)	// Can't hear shouts
@@ -1605,6 +1730,10 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_SCREEN_READER  BIT(25)	// player is visually impaired and using a screen reader that can't read the map
 #define PRF_STEALTHABLE  BIT(26)	// player can steal (rather than be prevented from accidentally stealing)
 #define PRF_WIZHIDE  BIT(27)	// player can't be seen in the room
+#define PRF_AUTONOTES  BIT(28)	// Player login syslogs automatically show notes
+#define PRF_AUTODISMOUNT  BIT(29)	// will dismount while moving instead of seeing an error
+#define PRF_NOEMPIRE  BIT(30)	// the game will not automatically create an empire
+#define PRF_CLEARMETERS  BIT(31)	// automatically clears the damage meters before a new fight
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -1645,6 +1774,9 @@ typedef struct vehicle_data vehicle_data;
 #define QST_REPEAT_PER_INSTANCE  BIT(1)	// clears completion when instance closes
 #define QST_EXPIRES_AFTER_INSTANCE  BIT(2)	// fails if instance closes
 #define QST_EXTRACT_TASK_OBJECTS  BIT(3)	// takes away items required by the task
+#define QST_DAILY  BIT(4)	// counts toward dailies; repeats each "day"
+#define QST_EMPIRE_ONLY  BIT(5)	// only available if quest giver and player are in the same empire
+#define QST_NO_GUESTS  BIT(6)	// quest start/finish use MEMBERS_ONLY
 
 
 // QG_x: quest giver types
@@ -1652,7 +1784,8 @@ typedef struct vehicle_data vehicle_data;
 #define QG_MOBILE  1
 #define QG_OBJECT  2
 #define QG_ROOM_TEMPLATE  3
-#define QG_TRIGGER  4
+#define QG_TRIGGER  4	// just to help lookups
+#define QG_QUEST  5	// (e.g. as chain reward) just to help lookups
 
 
 // QR_x: quest reward types
@@ -1663,31 +1796,7 @@ typedef struct vehicle_data vehicle_data;
 #define QR_SKILL_EXP  4
 #define QR_SKILL_LEVELS  5
 #define QR_QUEST_CHAIN  6
-
-
-// QT_x: quest tracker types (conditions and pre-reqs)
-#define QT_COMPLETED_QUEST  0
-#define QT_GET_COMPONENT  1
-#define QT_GET_OBJECT  2
-#define QT_KILL_MOB  3
-#define QT_KILL_MOB_FLAGGED  4
-#define QT_NOT_COMPLETED_QUEST  5
-#define QT_NOT_ON_QUEST  6
-#define QT_OWN_BUILDING  7
-#define QT_OWN_VEHICLE  8
-#define QT_SKILL_LEVEL_OVER  9
-#define QT_SKILL_LEVEL_UNDER  10
-#define QT_TRIGGERED  11	// completed by a script
-#define QT_VISIT_BUILDING  12
-#define QT_VISIT_ROOM_TEMPLATE  13
-#define QT_VISIT_SECTOR  14
-#define QT_HAVE_ABILITY  15
-
-
-// QT_AMT_x: How quest trackers are displayed for different QT_ types
-#define QT_AMT_NONE  0	// show as "completed"
-#define QT_AMT_NUMBER  1  // show as x/X
-#define QT_AMT_THRESHOLD  2	// needs a numeric arg but shows as a threshold
+#define QR_REPUTATION  7
 
 
 // indicates empire (rather than misc) coins for a reward
@@ -1724,6 +1833,26 @@ typedef struct vehicle_data vehicle_data;
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// SOCIAL DEFINES //////////////////////////////////////////////////////////
+
+// SOC_x: Social flags
+#define SOC_IN_DEVELOPMENT  BIT(0)	// a. can't be used by players
+#define SOC_HIDE_IF_INVIS  BIT(1)	// b. no "Someone" if player can't be seen
+
+
+// SOCM_x: social message string
+#define SOCM_NO_ARG_TO_CHAR  0
+#define SOCM_NO_ARG_TO_OTHERS  1
+#define SOCM_TARGETED_TO_CHAR  2
+#define SOCM_TARGETED_TO_OTHERS  3
+#define SOCM_TARGETED_TO_VICTIM  4
+#define SOCM_TARGETED_NOT_FOUND  5
+#define SOCM_SELF_TO_CHAR  6
+#define SOCM_SELF_TO_OTHERS  7
+#define NUM_SOCM_MESSAGES  8	// total
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// VEHICLE DEFINES //////////////////////////////////////////////////////////
 
 // VEH_x: vehicle flags
@@ -1747,6 +1876,12 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_SIEGE_WEAPONS  BIT(17)	// r. can be used to besiege
 #define VEH_ON_FIRE  BIT(18)	// s. currently on fire
 #define VEH_NO_LOAD_ONTO_VEHICLE  BIT(19)	// t. cannot be loaded onto a vehicle
+#define VEH_VISIBLE_IN_DARK  BIT(20)	// u. can be seen at night
+
+// The following vehicle flags are saved to file rather than read from the
+// prototype. Flags which are NOT included in this list can be altered with
+// OLC and affect live copies.
+#define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1851,9 +1986,10 @@ typedef struct vehicle_data vehicle_data;
 // Island flags -- ISLE_x
 #define ISLE_NEWBIE  BIT(0)	// a. Island follows newbie rules
 #define ISLE_NO_AGGRO  BIT(1)	// b. Island will not fire aggro mobs or guard towers
+#define ISLE_NO_CUSTOMIZE  BIT(2)	// c. cannot be renamed
 
 
-// Room affects -- these are similar to room flags, but if you want to set them
+// ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them
 // in a "permanent" way, set the room's base_affects as well as its current
 // affects.
 // TODO this system could be cleaned up by adding an affect_total_room that
@@ -1868,17 +2004,20 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_AFF_PUBLIC  BIT(7)	// h. Empire allows public use
 #define ROOM_AFF_DISMANTLING  BIT(8)	// i. Being dismantled
 #define ROOM_AFF_NO_FLY  BIT(9)	// j. Can't fly there
-	#define ROOM_AFF_UNUSED1  BIT(10)
+#define ROOM_AFF_NO_WEATHER  BIT(10)	// k. Blocks normal weather messages
 #define ROOM_AFF_IN_VEHICLE  BIT(11)	// l. Part of a vehicle
 #define ROOM_AFF_NO_WORK  BIT(12)	// m. workforce ignores this room
 #define ROOM_AFF_NO_DISREPAIR  BIT(13)	// n. will not fall into disrepair
-#define ROOM_AFF_NO_DISMANTLE  BIT(14)
+#define ROOM_AFF_NO_DISMANTLE  BIT(14)	// o. blocks normal dismantle until turned off
+#define ROOM_AFF_INCOMPLETE  BIT(15)	// p. building is incomplete
+#define ROOM_AFF_NO_TELEPORT  BIT(16)	// q. cannot teleport
+// NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
-// For various misc numbers attached to rooms
+// ROOM_EXTRA_x: For various misc numbers attached to rooms
 // WARNING: Make sure you have a place these are set, a place they are read,
 // and *especially* a place they are removed. -pc
-	#define ROOM_EXTRA_UNUSED  0	// was MINE_TYPE prior to b3.1
+#define ROOM_EXTRA_PROSPECT_EMPIRE  0
 #define ROOM_EXTRA_MINE_AMOUNT  1
 	#define ROOM_EXTRA_UNUSED2  2
 #define ROOM_EXTRA_SEED_TIME  3
@@ -1911,12 +2050,13 @@ typedef struct vehicle_data vehicle_data;
 #define COLREDUC_SIZE  80	// how many characters long a color_reducer string can be
 #define MAX_ADMIN_NOTES_LENGTH  2400
 #define MAX_AFFECT  32
-#define MAX_CMD_LENGTH  16384	// 16k -- for trigger lengths
+#define MAX_CMD_LENGTH  (MAX_STRING_LENGTH-80)	// can't go bigger than this, altho DG Scripts wanted 16k
 #define MAX_COIN  2140000000	// 2.14b (< MAX_INT)
 #define MAX_COIN_TYPES  10	// don't store more than this many different coin types
 #define MAX_CONDITION  750	// FULL, etc
 #define MAX_COOLDOWNS  32
 #define MAX_EMPIRE_DESCRIPTION  2000
+#define MAX_FACTION_DESCRIPTION  4000
 #define MAX_GROUP_SIZE  4	// how many members a group allows
 #define MAX_IGNORES  15	// total number of players you can ignore
 #define MAX_INPUT_LENGTH  1024	// Max length per *line* of input
@@ -1937,7 +2077,7 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_RANKS  20	// Max levels in an empire
 #define MAX_RANK_LENGTH  20	// length limit
 #define MAX_RAW_INPUT_LENGTH  1536  // Max size of *raw* input
-#define MAX_REFERRED_BY_LENGTH  32
+#define MAX_REFERRED_BY_LENGTH  80
 #define MAX_RESOURCES_REQUIRED  10	// how many resources a recipe can need
 #define MAX_REWARDS_PER_DAY  5	//  number of times a player can be rewarded
 #define MAX_ROOM_DESCRIPTION  4000
@@ -1950,6 +2090,8 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_ACTION_VNUMS  3	// action vnums 0, 1, 2
 #define NUM_OBJ_VAL_POSITIONS  3	// GET_OBJ_VAL(obj, X) -- caution: changing this will require you to change the .obj file format
 #define NUM_GLB_VAL_POSITIONS  3	// GET_GLOBAL_VAL(glb, X) -- caution: changing this will require you to change the .glb file format
+#define NUM_SKILL_SETS  2	// number of different sets a player has
+#define TRACK_MOVE_TIMES  20	// player's last X move timestamps
 
 
 /*
@@ -2196,6 +2338,20 @@ struct promo_code_list {
 };
 
 
+// a pre-requisite or requirement for a quest
+struct req_data {
+	int type;	// REQ_ type
+	any_vnum vnum;
+	bitvector_t misc;	// stores flags for some types
+	char group;	// for "AND" grouping
+	
+	int needed;	// how many the player needs
+	int current;	// how many the player has (for places where this data is tracked
+	
+	struct req_data *next;
+};
+
+
 // for act.highsorcery.c ritual strings
 struct ritual_strings {
 	char *to_char;
@@ -2226,6 +2382,8 @@ struct skill_data {
 	char *desc;
 	
 	bitvector_t flags;	// SKILLF_ flags
+	int max_level;	// skill's maximum level (default 100)
+	int min_drop_level;	// how low the skill can be dropped manually (default 0)
 	struct skill_ability *abilities;	// assigned abilities
 	
 	UT_hash_handle hh;	// skill_table hash handle
@@ -2247,6 +2405,7 @@ struct skill_ability {
 struct slash_channel {
 	int id;
 	char *name;
+	char *lc_name;	// lowercase name (for speed)
 	char color;
 	struct slash_channel *next;
 };
@@ -2314,7 +2473,7 @@ struct adventure_data {
 	int min_level, max_level;	// level range
 	int max_instances;	// total number possible in world
 	int reset_time;	// how often to reset things (minutes)
-	bitvector_t flags;	// ADV_x
+	bitvector_t flags;	// ADV_ flags
 	int player_limit;	// maximum number of players at a time (if over 0)
 	
 	// lists
@@ -2360,6 +2519,9 @@ struct exit_template {
 	sh_int exit_info;	// EX_x
 	rmt_vnum target_room;	// room template to link to
 	
+	// unsaved:
+	bool done;	// used while instantiating rooms
+	
 	struct exit_template *next;
 };
 
@@ -2379,8 +2541,17 @@ struct instance_data {
 	// unstored data
 	int size;	// size of room arrays
 	room_data **room;	// array of rooms (some == NULL)
+	struct instance_mob *mob_counts;	// hash table (hh)
 	
 	struct instance_data *next;
+};
+
+
+// tracks the mobs in an instance
+struct instance_mob {
+	mob_vnum vnum;
+	int count;
+	UT_hash_handle hh;	// instance->mob_counts
 };
 
 
@@ -2393,8 +2564,9 @@ struct room_template {
 	char *description;
 	
 	// numeric data
-	bitvector_t flags;	// RMT_x
-	bitvector_t base_affects;	// ROOM_AFF_x
+	bitvector_t flags;	// RMT_
+	bitvector_t base_affects;	// ROOM_AFF_
+	bitvector_t functions;	// FNC_
 	
 	// lists
 	struct adventure_spawn *spawns;	// list of objs/mobs
@@ -2419,7 +2591,8 @@ struct archetype_data {
 	char *name;
 	char *description;
 	char *lore;	// optional lore entry
-	bitvector_t flags;	// ARCH_x
+	int type;	// ARCHT_
+	bitvector_t flags;	// ARCH_
 	
 	// default starting ranks
 	char *male_rank;
@@ -2446,6 +2619,14 @@ struct archetype_gear {
 	int wear;	// WEAR_x, -1 == inventory
 	obj_vnum vnum;
 	struct archetype_gear *next;
+};
+
+
+// used in character creation
+struct archetype_menu_type {
+	int type;
+	char *name;
+	char *description;
 };
 
 
@@ -2476,7 +2657,7 @@ struct augment_type_data {
 	int apply_type;	// APPLY_TYPE_x
 	bitvector_t default_flags;	// AUG_x always applied
 	int greater_abil;	// ABIL_x that boosts the scale points, or NO_ABIL
-	bitvector_t use_obj_flag;	// OBJ_x: optional; used by enchants
+	bitvector_t use_obj_flag;	// OBJ_: optional; used by enchants
 };
 
 
@@ -2547,7 +2728,7 @@ struct bld_data {
 	
 	int extra_rooms;	// how many rooms it can have
 	bitvector_t designate_flags;	// DES_x
-	bitvector_t base_affects;	// ROOM_AFF_x
+	bitvector_t base_affects;	// ROOM_AFF_
 	
 	int citizens;	// how many people live here
 	int military;	// how much it adds to the military pool
@@ -2557,6 +2738,7 @@ struct bld_data {
 	struct spawn_info *spawns;	// linked list of spawn data
 	struct interaction_item *interactions;	// interaction items
 	struct trig_proto_list *proto_script;	// list of default triggers
+	struct resource_data *yearly_maintenance;	// needed each year
 	
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;
@@ -2611,14 +2793,16 @@ struct mob_special_data {
 	int max_scale_level;	// maximum level this mob may be scaled to
 	
 	int name_set;	// NAMES_x
-
+	struct custom_message *custom_msgs;	// any custom messages
+	faction_data *faction;	// if any
+	
 	int to_hit;	// Mob's attack % bonus
 	int to_dodge;	// Mob's dodge % bonus
 	int damage;	// Raw damage
 	int	attack_type;	// weapon type
-
+	
 	byte move_type;	// how the mob moves
-
+	
 	struct pursuit_data *pursuit;	// mob pursuit
 	room_vnum pursuit_leash_loc;	// where to return to
 	struct mob_tag *tagged_by;	// mob tagged by
@@ -2629,6 +2813,15 @@ struct mob_special_data {
 	// for #n-named mobs
 	int dynamic_sex;
 	int dynamic_name;
+};
+
+
+// for mobs/objs custom action messages
+struct custom_message {
+	int type;	// OBJ_CUSTOM_ or MOB_CUSTOM_
+	char *msg;
+	
+	struct custom_message *next;
 };
 
 
@@ -2657,7 +2850,7 @@ struct account_data {
 	int id;	// corresponds to player_index_data account_id and player's saved account id
 	struct account_player *players;	// linked list of players
 	time_t last_logon;	// timestamp of the last login on the account
-	bitvector_t flags;	// ACCT_x
+	bitvector_t flags;	// ACCT_
 	char *notes;	// account notes
 	
 	UT_hash_handle hh;	// account_table
@@ -2676,6 +2869,7 @@ struct account_player {
 // used in descriptor for personal channel histories -- act.comm.c
 struct channel_history_data {
 	char *message;
+	long timestamp;
 	struct channel_history_data *next;
 };
 
@@ -2702,7 +2896,7 @@ struct player_index_data {
 	time_t birth;	// creation time
 	int played;	// time played
 	int access_level;	// player's access level
-	bitvector_t plr_flags;	// PLR_x: a copy of the last-saved player flags
+	bitvector_t plr_flags;	// PLR_: a copy of the last-saved player flags
 	empire_data *loyalty;	// empire, if any
 	int rank;	// empire rank
 	char *last_host;	// last known host
@@ -2749,6 +2943,7 @@ struct descriptor_data {
 	byte bad_pws;	// number of bad pw attemps this login
 	byte idle_tics;	// tics idle at password prompt
 	int connected;	// STATE()
+	int submenu;	// SUBMENU() -- use varies by menu
 	int desc_num;	// unique num assigned to desc
 	time_t login_time;	// when the person connected
 
@@ -2759,14 +2954,18 @@ struct descriptor_data {
 	
 	protocol_t *pProtocol; // see protocol.c
 	struct color_reducer color;
+	bool no_nanny;	// skips interpreting player input if only a telnet negotiation sequence was sent
 	
 	char **str;	// for the modify-str system
 	char *backstr;	// for the modify-str aborts
+	char *str_on_abort;	// a pointer to restore if the player aborts the editor
 	char *file_storage;	// name of where to save a file
 	bool straight_to_editor;	// if true, commands go straight to the string editor
 	size_t max_str;	// max length of editor
 	int mail_to;	// name for mail system
 	int notes_id;	// idnum of player for notes-editing
+	any_vnum save_empire;	// for the text editor to know which empire to save
+	bool allow_null;	// string editor can be empty/null
 	
 	int has_prompt;	// is the user at a prompt?
 	char inbuf[MAX_RAW_INPUT_LENGTH];	// buffer for raw input
@@ -2788,7 +2987,6 @@ struct descriptor_data {
 	descriptor_data *snoop_by;	// And who is snooping this char
 
 	char *last_act_message;	// stores the last thing act() sent to this desc
-	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// histories
 	
 	// olc
 	int olc_type;	// OLC_OBJECT, etc -- only when an editor is open
@@ -2808,16 +3006,29 @@ struct descriptor_data {
 	craft_data *olc_craft;	// craft recipe being edited
 	bld_data *olc_building;	// building being edited
 	crop_data *olc_crop;	// crop being edited
+	faction_data *olc_faction;	// faction being edited
 	struct global_data *olc_global;	// global being edited
 	quest_data *olc_quest;	// quest being edited
 	room_template *olc_room_template;	// rmt being edited
 	struct sector_data *olc_sector;	// sector being edited
+	social_data *olc_social;	// social being edited
 	skill_data *olc_skill;	// skill being edited
 	struct trig_data *olc_trigger;	// trigger being edited
 	vehicle_data *olc_vehicle;	// vehicle being edited
 	
 	// linked list
 	descriptor_data *next;
+};
+
+
+// used in player specials to track combat
+struct combat_meters {
+	int hits, misses;	// my hit %
+	int hits_taken, dodges, blocks;	// my dodge %
+	int damage_dealt, damage_taken, pet_damage;
+	int heals_dealt, heals_taken;
+	time_t start, end;	// times
+	bool over;
 };
 
 
@@ -2838,10 +3049,19 @@ struct mail_data {
 };
 
 
+// for player mount collections
+struct mount_data {
+	mob_vnum vnum;	// mob that's mounted, for name
+	bitvector_t flags;	// stored MOUNT_ flags
+	
+	UT_hash_handle hh;	// hash handle for GET_MOUNT_LIST(ch)
+};
+
+
 // used in player_special_data
 struct player_ability_data {
 	any_vnum vnum;	// ABIL_ or ability vnum
-	bool purchased;	// whether or not the player bought it
+	bool purchased[NUM_SKILL_SETS];	// whether or not the player bought it
 	byte levels_gained;	// tracks for the cap on how many times one ability grants skillups
 	ability_data *ptr;	// live abil pointer
 
@@ -2865,8 +3085,15 @@ struct player_skill_data {
 // channels a player is on
 struct player_slash_channel {
 	int id;
-	struct channel_history_data *history;
 	struct player_slash_channel *next;
+};
+
+
+// channel histories
+struct player_slash_history {
+	char *channel;	// lowercase channel name
+	struct channel_history_data *history;
+	UT_hash_handle hh;	// hashed by channe;
 };
 
 
@@ -2887,7 +3114,8 @@ struct player_special_data {
 	byte immortal_level;	// stored so that if level numbers are changed, imms stay at the correct level
 	bitvector_t grants;	// grant imm abilities
 	bitvector_t syslogs;	// which syslogs people want to see
-	bitvector_t bonus_traits;	// BONUS_x
+	bitvector_t bonus_traits;	// BONUS_
+	bitvector_t fight_messages;	// FM_ flags
 	ubyte bad_pws;	// number of bad password attemps
 	struct mail_data *mail_pending;	// uncollected letters
 	int create_alt_id;	// used in CON_Q_ALT_NAME and CON_Q_ALT_PASSWORD
@@ -2927,12 +3155,16 @@ struct player_special_data {
 	struct alias_data *aliases;	// Character's aliases
 	struct offer_data *offers;	// various offers for do_accept/reject
 	struct player_slash_channel *slash_channels;	// channels the player is on
+	struct player_slash_history *slash_history;	// slash-channel histories
 	struct slash_channel *load_slash_channels;	// temporary storage between load and join
+	struct player_faction_data *factions;	// hash table of factions
+	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// histories
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered
 	ubyte daily_bonus_experience;	// boosted skill gain points
 	int rewarded_today[MAX_REWARDS_PER_DAY];	// idnums, for ABIL_REWARD
+	int daily_quests;	// number of daily quests completed today
 
 	// action info
 	int action;	// ACT_
@@ -2961,9 +3193,10 @@ struct player_special_data {
 	bitvector_t olc_flags;	// olc permissions
 	
 	// skill/ability data
-	any_vnum creation_archetype;	// this is now stored permanently so later decisions can be made based on it
+	any_vnum creation_archetype[NUM_ARCHETYPE_TYPES];	// array of creation choices
 	struct player_skill_data *skill_hash;
 	struct player_ability_data *ability_hash;
+	int current_skill_set;	// which skill set a player is currently in
 	bool can_gain_new_skills;	// not required to keep skills at zero
 	bool can_get_bonus_skills;	// can buy extra 75's
 	sh_int skill_level;  // levels computed based on class skills
@@ -2977,9 +3210,15 @@ struct player_special_data {
 	byte confused_dir;  // people without Navigation think this dir is north
 	char *disguised_name;	// verbatim copy of name -- grabs custom mob names and empire names
 	byte disguised_sex;	// sex of the mob you're disguised as
-	bitvector_t mount_flags;	// flags for the stored mount
-	mob_vnum mount_vnum;	// stored mount
 	byte using_poison;	// poison preference for Stealth
+
+	// mount info
+	struct mount_data *mount_list;	// list of stored mounts
+	mob_vnum mount_vnum;	// current mount vnum
+	bitvector_t mount_flags;	// current mount flags
+	
+	// other
+	int largest_inventory;	// highest inventory size a player has ever had
 	
 	// UNSAVED PORTION //
 	
@@ -2987,6 +3226,9 @@ struct player_special_data {
 	byte reboot_conf;	// Reboot confirmation
 	byte create_points;	// Used in character creation
 	int group_invite_by;	// idnum of the last player to invite this one
+	time_t move_time[TRACK_MOVE_TIMES];	// timestamp of last X moves
+	
+	struct combat_meters meters;	// combat meter data
 	
 	bool needs_delayed_load;	// whether or not the player still needs delayed data
 	bool restore_on_login;	// mark the player to trigger a free reset when they enter the game
@@ -3037,6 +3279,8 @@ struct fight_data {
 	char_data *victim;	// Actual victim
 	byte mode;	// Fight mode, FMODE_x
 	byte wait;	// Time to intercept
+	unsigned long long last_swing_mainhand;	// last attack time (microseconds)
+	unsigned long long last_swing_offhand;	// last attack time (microseconds)
 };
 
 
@@ -3102,7 +3346,7 @@ struct char_data {
 	obj_data *carrying;	// head of list
 	descriptor_data *desc;	// NULL for mobiles
 
-	int id;	// used by DG triggers - unique id
+	int script_id;	// used by DG triggers - unique id
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct script_data *script;	// script info for the object
 	struct script_memory *memory;	// for mob memory triggers
@@ -3127,7 +3371,7 @@ struct char_data {
 
 // cooldown info
 struct cooldown_data {
-	sh_int type;	// any COOLDOWN_x const
+	sh_int type;	// any COOLDOWN_ const
 	time_t expire_time;	// time at which the cooldown has expired
 	
 	struct cooldown_data *next;	// linked list
@@ -3250,6 +3494,7 @@ struct action_data_struct {
 struct attribute_data_type {
 	char *name;
 	char *creation_description;	// shown if players need help during creation
+	char *low_error;	// You are "too weak" to use that item.
 };
 
 
@@ -3320,7 +3565,7 @@ struct tavern_data_type {
 struct toggle_data_type {
 	char *name;	// toggle display and subcommand
 	int type;	// TOG_ONOFF, TOG_OFFON
-	bitvector_t bit;	// PRF_x
+	bitvector_t bit;	// PRF_
 	int level;	// required level to see/use toggle
 	void (*callback_func)(char_data *ch);	// optional function to alert changes
 };
@@ -3337,6 +3582,7 @@ struct wear_data_type {
 	char *already_wearing;	// error message when slot is full
 	char *wear_msg_to_room;	// msg act()'d to room on wear
 	char *wear_msg_to_char;	// msg act()'d to char on wear
+	bool allow_custom_msgs;	// some slots don't
 };
 
 
@@ -3364,10 +3610,13 @@ struct empire_island {
 	
 	// saved portion
 	int workforce_limit[NUM_CHORES];	// workforce settings
+	char *name;	// empire's local name for the island
 	
 	// unsaved portion
 	int tech[NUM_TECHS];	// TECH_ present on that island
 	int population;	// citizens
+	int city_terr;	// total territory IN cities on the island
+	int outside_terr;	// total territory OUTSIDE cities on the island
 	
 	UT_hash_handle hh;	// EMPIRE_ISLANDS(emp) hash handle
 };
@@ -3435,7 +3684,7 @@ struct empire_trade_data {
 	int type;	// TRADE_x
 	obj_vnum vnum;	// item type
 	int limit;	// min (export), max (import)
-	int cost;	// min (export), max (import)
+	double cost;	// min (export), max (import)
 	
 	struct empire_trade_data *next;
 };
@@ -3488,7 +3737,7 @@ struct empire_data {
 	char *rank[MAX_RANKS];	// Name of each rank
 	
 	bitvector_t frontier_traits;	// ETRAIT_x
-	int coins;	// total coins (always in local currency)
+	double coins;	// total coins (always in local currency)
 
 	byte priv[NUM_PRIVILEGES];	// The rank at which you can use a command
 
@@ -3526,8 +3775,60 @@ struct empire_data {
 	int sort_value;	// for score ties
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	int top_shipping_id;	// shipping system quick id for the empire
+	bool banner_has_underline;	// helper
+	
+	bool needs_save;	// for things that delay-save
 	
 	UT_hash_handle hh;	// empire_table hash handle
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// FACTION STRUCTS /////////////////////////////////////////////////////////
+
+struct faction_data {
+	any_vnum vnum;
+	
+	char *name;	// basic name
+	char *description;	// full text desc
+	
+	bitvector_t flags;	// FCT_ flags
+	int max_rep;	// REP_ they cap at, positive
+	int min_rep;	// REP_ they cap at, negative
+	int starting_rep;	// REP_ initial reputation for players
+	struct faction_relation *relations;	// hash table
+	
+	// lists
+	UT_hash_handle hh;	// faction_table hash handle
+	UT_hash_handle sorted_hh;	// sorted_factions hash handle
+};
+
+
+// how factions view each other
+struct faction_relation {
+	any_vnum vnum;	// who it's with
+	bitvector_t flags;	// FCTR_ flags
+	faction_data *ptr;	// quick reference
+	
+	UT_hash_handle hh;	// fct->relations hash handle
+};
+
+
+// used to determine the order and value of reputations
+struct faction_reputation_type {
+	int type;	// REP_ type
+	char *name;
+	char *color;	// & or \t color code
+	int value;	// points total a player must be at for this
+};
+
+
+// for hash table of player faction levels
+struct player_faction_data {
+	any_vnum vnum;	// faction vnum
+	int value;	// reputation points
+	int rep;	// REP_ const
+	UT_hash_handle hh;	// GET_FACTIONS(ch) hash
 };
 
 
@@ -3620,7 +3921,7 @@ struct obj_data {
 	char *short_description;	// sentence-building; when worn/carry/in cont.
 	char *action_description;	// What to write when looked at
 	struct extra_descr_data *ex_description;	// extra descriptions
-	struct obj_custom_message *custom_msgs;	// any custom messages
+	struct custom_message *custom_msgs;	// any custom messages
 	vehicle_data *in_vehicle;	// in vehicle or NULL
 	char_data *carried_by;	// Carried by NULL in room/container
 	char_data *worn_by;	// Worn by?
@@ -3629,6 +3930,7 @@ struct obj_data {
 	empire_vnum last_empire_id;	// id of the last empire to have this
 	int last_owner_id;	// last person to have the item
 	time_t stolen_timer;	// when the object was last stolen
+	empire_vnum stolen_from;	// empire who owned it
 	
 	struct interaction_item *interactions;	// interaction items
 	struct obj_storage_type *storage;	// linked list of where an obj can be stored
@@ -3639,7 +3941,7 @@ struct obj_data {
 	obj_data *in_obj;	// In what object NULL when none
 	obj_data *contains;	// Contains objects
 
-	int id;	// used by DG triggers - unique id
+	int script_id;	// used by DG triggers - unique id
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct script_data *script;	// script info for the object
 
@@ -3648,17 +3950,9 @@ struct obj_data {
 	
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;
+	bool search_mark;
 	
 	UT_hash_handle hh;	// object_table hash
-};
-
-
-// for object custom action messages
-struct obj_custom_message {
-	int type;	// OBJ_CUSTOM_x
-	char *msg;
-	
-	struct obj_custom_message *next;
 };
 
 
@@ -3685,14 +3979,18 @@ struct quest_data {
 	bitvector_t flags;	// QST_ flags
 	struct quest_giver *starts_at;	// people/things that start the quest
 	struct quest_giver *ends_at;	// people/things where you can turn it in
-	struct quest_task *tasks;	// list of objectives
+	struct req_data *tasks;	// list of objectives
 	struct quest_reward *rewards;	// linked list
 	
 	// constraints
 	int min_level;	// or 0 for no min
 	int max_level;	// or 0 for no max
-	struct quest_task *prereqs;	// linked list of prerequisites
+	struct req_data *prereqs;	// linked list of prerequisites
 	int repeatable_after;	// minutes to repeat; NOT_REPEATABLE for none
+	int daily_cycle;	// for dailies that rotate with others
+	
+	// misc data
+	bool daily_active;	// if FALSE, quest is not available today
 	
 	struct trig_proto_list *proto_script;	// quest triggers
 	
@@ -3726,19 +4024,6 @@ struct quest_reward {
 };
 
 
-// a pre-requisite or requirement for a quest
-struct quest_task {
-	int type;	// QT_ type
-	any_vnum vnum;
-	bitvector_t misc;	// stores flags for some types
-	
-	int needed;	// how many the player needs
-	int current;	// how many the player has
-	
-	struct quest_task *next;
-};
-
-
 // used for building a linked list of available quests
 struct quest_temp_list {
 	quest_data *quest;
@@ -3765,7 +4050,7 @@ struct player_quest {
 	ush_int version;	// for auto-updating
 	time_t start_time;	// when started
 	
-	struct quest_task *tracker;	// quest tasks to track
+	struct req_data *tracker;	// quest tasks to track
 	
 	any_vnum instance_id;	// where it was acquired (if anywhere)
 	any_vnum adventure;	// which adventure it was acquired in
@@ -3813,6 +4098,41 @@ struct evolution_data {
 };
 
 
+// for iteration of map locations by sector
+struct sector_index_type {
+	sector_vnum vnum;	// which sect
+	
+	struct map_data *sect_rooms;	// LL of rooms
+	int sect_count;	// how many rooms in the list
+	
+	struct map_data *base_rooms;	// LL of rooms
+	int base_count;	// number of rooms with it as the base sect
+	
+	UT_hash_handle hh;	// sector_index hash handle
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SOCIAL STRUCTS //////////////////////////////////////////////////////////
+
+struct social_data {
+	any_vnum vnum;
+	
+	char *name;	// for internal labeling
+	char *command;	// as seen/typed by the player
+	
+	bitvector_t flags;	// AUG_x flags
+	int min_char_position;	// POS_ of the character
+	int min_victim_position;	// POS_ of victim
+	struct req_data *requirements;	// linked list of requirements
+	
+	char *message[NUM_SOCM_MESSAGES];	// strings
+	
+	UT_hash_handle hh;	// social_table hash
+	UT_hash_handle sorted_hh;	// sorted_socials hash
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// TRIGGER STRUCTS /////////////////////////////////////////////////////////
 
@@ -3841,7 +4161,7 @@ struct vehicle_data {
 	// instance data
 	empire_data *owner;	// which empire owns it, if any
 	int scale_level;	// determines amount of damage, etc
-	int health;	// current health
+	double health;	// current health
 	obj_data *contains;	// contains objects
 	int carrying_n;	// size of contents
 	struct vehicle_attached_mob *animals;	// linked list of mobs attached
@@ -3858,7 +4178,7 @@ struct vehicle_data {
 	char_data *driver;	// person driving it
 	
 	// scripting
-	int id;	// used by DG triggers - unique id
+	int script_id;	// used by DG triggers - unique id
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct script_data *script;	// script info for the object
 	
@@ -3945,8 +4265,8 @@ struct room_data {
 	char *icon;  // same with map icon
 
 	struct affected_type *af;  // room affects
-	sh_int affects;  // affect bitvector (modified)
-	sh_int base_affects;  // base affects
+	unsigned int affects;  // affect bitvector (modified)
+	unsigned int base_affects;  // base affects
 	
 	struct track_data *tracks;	// for tracking
 	
@@ -3984,7 +4304,7 @@ struct complex_room_data {
 	byte inside_rooms;  // count of designated rooms inside
 	room_data *home_room;  // for interior rooms (and boats and instances), means this is actually part of another room; is saved as vnum to file but is room_data* in real life
 	
-	int disrepair;	// decay over time
+	int disrepair;	// UNUSED: as of b4.15 this is 0 for all buildings and not used (but is saved to file and coule be repurposed)
 	
 	vehicle_data *vehicle;  // the associated vehicle (usually only on the home room)
 	struct instance_data *instance;	// if part of an instantiated adventure
@@ -3992,7 +4312,7 @@ struct complex_room_data {
 	int private_owner;	// for privately-owned houses
 	
 	byte burning;  // if burning, the burn value
-	byte damage;  // for catapulting
+	double damage;  // for catapulting
 };
 
 
@@ -4008,8 +4328,8 @@ struct depletion_data {
 // data for the island_table
 struct island_info {
 	any_vnum id;	// game-assigned, permanent id
-	char *name;	// player-designated island naming
-	bitvector_t flags;	// ISLE_x flags
+	char *name;	// global name for the island
+	bitvector_t flags;	// ISLE_ flags
 	
 	// computed data
 	int tile_size;
@@ -4081,5 +4401,8 @@ struct map_data {
 	
 	crop_data *crop_type;	// possible crop type
 	
+	// lists
+	struct map_data *next_in_sect;	// LL of all map locations of a given sect
+	struct map_data *next_in_base_sect;	// LL for base sect
 	struct map_data *next;	// linked list of non-ocean tiles, for iterating
 };

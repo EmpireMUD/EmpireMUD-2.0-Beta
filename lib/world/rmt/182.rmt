@@ -1,0 +1,310 @@
+#18200
+Turtle Spawn Room~
+You shouldn't be in here.
+~
+g 0 0
+M 0 18200 100.00 1
+S
+#18201
+Aboard a Great Tortoise~
+   The massive tortoise has a tiered boardwalk haphazardly nailed to its shell,
+with steps leading up to a building. The colossal chelonian beneath your feet
+plods so slowly across the land that its shell has overgrown with moss and
+shrubs. Still, you can see most of the countryside from here.
+Commands: &cdisembark, enter tavern, look out&0
+~
+cgi 0 0
+M 1 18200 100.00 1
+T 18204
+T 18205
+S
+#18202
+Inside the Tavern~
+   The walls of the Tipsy Tortoise are heavily patched and worn, but are
+decorated with trophies of all manner of animals, as well as several unusual
+portraits. The tavern shakes back and forth as the tortoise walks, but the sway
+of the building actually makes for a more comfortable ride than on the shell.
+Commands: &cexit&0
+~
+cgi 0 0
+D10
+~
+0 18203
+D12
+~
+0 18204
+D8
+~
+0 18206
+D11
+~
+0 18205
+E
+walls mahogany~
+   The walls appear to have been made of rich, red, straight-grained mahogany.
+But the tortoise's powerful footsteps, which shake the walls even as you
+examine them, have forced many repairs with many types of wood, probably
+locally sourced from wherever the tavern happened to be. You can find parts of
+the walls patched with everything from oak and maple, to ebony and magi-nolia.
+~
+E
+trophies trophy heads animals~
+   The wall is lined with the heads of strange beasts, most of them held up
+only by a ring of iron nails. Several of the trophies are damaged, probably
+from being jostled off their mounts. Each beast has its name painted above and
+below it, in different languages. The labels read Griffin, Chimera, Minotaur,
+Unicorn, Medusa, Giant Scorpion, Phoenix, and Dracosaur.
+~
+E
+griffin~
+   The griffin's head looks like it's been knocked off the wall a few times,
+and the beak has come loose to reveal that this is actually a lion.
+~
+E
+chimera~
+   Where there were once three plaques with the chimera's heads, only a large
+goat head remains.
+~
+E
+minotaur~
+Upon closer inspection, this is a bull's head.
+~
+E
+unicorn~
+   This unicorn, while certainly majestic, actually appears to be a horse with
+a narwhal horn attached to its forehead -- which, when you think about it, is
+still fairly impressive.
+~
+E
+medusa~
+   The 'Medusa' label is over an opaque screen, with only the shadow of a
+nebulous figure cast upon it by a flickering candle. You can see how it might
+be the shadow of a head with snakes coming out of it. Or perhaps a small bush.
+~
+E
+scorpion giant~
+   You approach the alcove labeled 'Giant Scorpion' but find there's a plate of
+curved glass in front of it that, upon closer inspection, is magnifying a
+perfectly ordinary scorpion.
+~
+E
+phoenix~
+It's too badly damaged to figure out what it is.
+~
+E
+dracosaur~
+Upon closer inspection, this is just a regular dragon.
+~
+M 1 18201 100.00 1
+M 1 18207 100.00 1
+S
+#18203
+The Viewing Platform~
+   A wooden ramp slopes gently up from the inside of the tavern to this
+platform, built out over the head of the tortoise, which provides a beautiful
+view of the surrounding land as, down below, the tortoise moves.
+Commands: &clook out&0
+~
+acgi 0 0
+D13
+~
+0 18202
+T 18205
+S
+#18204
+The Back Room~
+   This appears to have been someone's office at one time, but the bookshelves
+are empty and there is no sign of a desk. Instead, a wrestling mat covers much
+of the room and people are placing bets in the corner.
+~
+cgi 0 0
+D11
+~
+0 18202
+E
+furniture mat bookshelf bookshelves~
+   All of the furniture has been cleared out of the back room, except the
+bookshelves, which are attached. The floor is padded with a wrestling mat,
+which makes this one of the least-nauseating places in the tavern. Closer
+inspection of the bookshelves reveals the names of various champions carved
+into the dried old mahogany.
+~
+M 0 18203 100.00 4
+M 0 18203 100.00 4
+M 0 18203 100.00 4
+M 0 18203 100.00 4
+T 18211
+S
+#18205
+The Tipsy Tortoise Giftshop~
+   The giftshop is little more than an alcove behind a table and some
+barstools, but there are some interesting items on the shelf. However, a sign
+on the wall clearly says 'Adventurers Only'.
+~
+cgi 0 0
+D12
+~
+0 18202
+E
+sign~
+"Adventurers Only"
+~
+E
+items shelves shelf interesting~
+   You see several species of pet turtles on the shelf, as well as a rolled up
+parchment and an oversized egg.
+~
+M 0 18213 100.00 1
+S
+#18206
+A Spiral Staircase~
+   A narrow staircase in the corner of the Tipsy Tortoise leads you up to a
+small second-floor landing, with a door leading toward the back of the
+tortoise. A large golden plaque declares this the headquarters of the Guild of
+Adventurers.
+~
+cgi 0 0
+D9
+~
+0 18202
+D13
+~
+0 18207
+E
+plaque golden large~
+ +-------------------------------------------------+
+ |     T H E   M O S T   N O B L E   G U I L D     ||
+ |                       O F                       ||
+ |              A D V E N T U R E R S              ||
+ |                                                 ||
+ |                     est. 902                    ||
+ +-------------------------------------------------+|
+  +-------------------------------------------------+
+~
+M 0 18212 100.00 1
+S
+#18207
+The Guild of Adventurers~
+   The lobby of the guildhall is surprisingly well-kept compared to the rustic
+Tipsy Tortoise downstairs. The walls are made of fine stained cherry wood, and
+are covered in exotic trophies of all types. Overstuffed chairs encircle a
+strange firepit in the center of the room.
+~
+cgi 0 0
+D10
+~
+0 18206
+D12
+~
+0 18208
+D11
+~
+0 18209
+D8
+~
+0 18210
+E
+overstuffed chairs firepit pit~
+   The firepit contains a lively white flame which seems to neither crackle nor
+smoke. The room is not vented, but it also isn't overly warm. The chairs are
+arranged around it in a way that makes you want to sit and tell a great story.
+~
+E
+trophies trophy walls heads~
+   The walls are covered in rich cherry wood, and trimmed in dark ironwood that
+has been carved to depict tiny adventure scenes. The walls are adorned with
+trophies including a selection of exotic horns, a manticore's tail, a row of
+giant scorpions, a griffin's pelt, and a dracosaur tail.
+~
+E
+exotic horns~
+   This wall is covered in the horns of various animals, each on a plaque with
+the animal's name and who defeated it. The horns include a dragon, a unicorn, a
+dracosaur, and a demon-goat.
+~
+E
+manticore's tail~
+The three-pronged tail of a manticore has been mounted over the door.
+~
+E
+giant scorpions~
+   The giant scorpions range in size from the size of your hand to the size of
+your arm!
+~
+E
+griffin's pelt~
+The griffin's pelt is huge, and covers most of one wall.
+~
+E
+dracosaur tail~
+   The long tail of a massive dracosaur is mounted on one wall, and on part of
+the wall next to it.
+~
+M 0 18211 100.00 1
+M 1 18204 100.00 1
+T 18213
+S
+#18208
+The Alchemy Alcove~
+   Tucked into an alcove off of the guildhall's lobby you find a full
+alchemist's workbench and study. A shelf of books, indexed by herb, takes up
+much of the space in the alcove. Locked display cases show a variety of potions
+in various shades of red.
+~
+cgi 0 0
+D11
+~
+0 18207
+E
+shelf books~
+   You pick a book from the shelf, but are dismayed to find you aren't familiar
+with the language it was written in.
+~
+E
+workbench study~
+This area is well-stocked for alchemy.
+~
+E
+display cases potions~
+   All of the potions are some shade of red, and a few of the bottles appear to
+be bleeding.
+~
+M 0 18208 100.00 1
+S
+#18209
+A Shadowy Corner~
+   The shadows nearly obscure this alcove off of the lobby. As you approach it,
+a plush sofa and a strange fountain appear, as well as walls covered in arcane
+tomes. A black carpet across the floor seems to undulate in a nonexistent
+breeze.
+~
+cgi 0 0
+D12
+~
+0 18207
+E
+walls arcane tomes~
+You pick up a tome from the shelf, but find you cannot read its text.
+~
+E
+carpet floor breeze black~
+   The carpet is pitch black and, on closer inspection, appears to be made of
+tiny shadow tentacles. You adjust your boots and step off of the carpet.
+~
+M 0 18209 100.00 1
+M 1 18203 100.00 1
+S
+#18210
+A Noisy Loft~
+   You climb up into the loft, which has been converted into a mechanical
+workshop. Clockwork arms, legs, wings, and other parts you can't identify are
+strewn about the cramped corners. Exotic weapons sit on several workbenches, as
+well as strange, oversized rings.
+~
+cgi 0 0
+D9
+~
+0 18207
+M 0 18210 100.00 1
+S
+$

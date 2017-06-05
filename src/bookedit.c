@@ -1,5 +1,5 @@
 /* ************************************************************************
-*   File: bookedit.c                                      EmpireMUD 2.0b4 *
+*   File: bookedit.c                                      EmpireMUD 2.0b5 *
 *  Usage: the book editor functionality                                   *
 *                                                                         *
 *  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
@@ -530,7 +530,7 @@ OLC_MODULE(booked_item_description) {
 		msg_to_char(ch, "You are already editing a string.\r\n");
 	}
 	else {
-		start_string_editor(ch->desc, "book item description", &(book->item_description), MAX_ITEM_DESCRIPTION);
+		start_string_editor(ch->desc, "book item description", &(book->item_description), MAX_ITEM_DESCRIPTION, TRUE);
 	}
 }
 
@@ -544,7 +544,7 @@ OLC_MODULE(booked_item_name) {
 	else if (strchrstr(argument, "%()[]\\")) {
 		msg_to_char(ch, "Book item names may not contain the following characters: %%()[]\\\r\n");
 	}
-	else if (strlen(argument) > MAX_BOOK_ITEM_NAME) {
+	else if (!IS_IMMORTAL(ch) && strlen(argument) > MAX_BOOK_ITEM_NAME) {
 		msg_to_char(ch, "Book item names may not be more than %d characters long.\r\n", MAX_BOOK_ITEM_NAME);
 	}
 	else if (!IS_IMMORTAL(ch) && !has_keyword(argument, book_name_list, TRUE)) {
@@ -562,7 +562,7 @@ OLC_MODULE(booked_license) {
 
 
 OLC_MODULE(booked_paragraphs) {
-	char arg1[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	book_data *book = GET_OLC_BOOK(ch->desc);
 	struct paragraph_data *para, *new, *last, *temp;
 	size_t size;
@@ -592,7 +592,16 @@ OLC_MODULE(booked_paragraphs) {
 		
 		for (para = book->paragraphs, count = 1; para; para = para->next, ++count) {
 			if ((from == -1 || from <= count) && (to == -1 || to >= count)) {
-				size += snprintf(buf + size, sizeof(buf) - size, "\r\n\tcParagraph %d\t0\r\n%s", count, NULLSAFE(para->text));
+				snprintf(line, sizeof(line), "\r\n\tcParagraph %d\t0\r\n%s", count, NULLSAFE(para->text));
+				
+				if (size + strlen(line) < sizeof(buf)) {
+					size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+				}
+				else {
+					// too long!
+					size += snprintf(buf + size, sizeof(buf) - size, "\r\n...string too long!\r\n");
+					break;
+				}
 			}
 		}
 		
@@ -616,7 +625,7 @@ OLC_MODULE(booked_paragraphs) {
 				if (--num == 0) {
 					found = TRUE;
 					msg_to_char(ch, "NOTE: Each paragraph should be no more than 4 or 5 lines, formatted with /fi\r\n");
-					start_string_editor(ch->desc, "paragraph", &(para->text), MAX_BOOK_PARAGRAPH);
+					start_string_editor(ch->desc, "paragraph", &(para->text), MAX_BOOK_PARAGRAPH, FALSE);
 					break;
 				}
 			}
@@ -675,7 +684,7 @@ OLC_MODULE(booked_paragraphs) {
 		
 		if (found) {
 			msg_to_char(ch, "NOTE: Each paragraph should be no more than 4 or 5 lines, formatted with /fi\r\n");
-			start_string_editor(ch->desc, "new paragraph", &(new->text), MAX_BOOK_PARAGRAPH);
+			start_string_editor(ch->desc, "new paragraph", &(new->text), MAX_BOOK_PARAGRAPH, FALSE);
 		}
 		else {
 			msg_to_char(ch, "Invalid paragraph position.\r\n");

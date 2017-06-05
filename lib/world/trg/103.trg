@@ -19,7 +19,7 @@ elseif (%room.sector% == Desert Crop || %room.sector% == Sandy Field)
 elseif (%room.sector% == Desert)
   %echo% %self.name% scorches the desert!
   %terraform% %room% 10305
-elseif (%room.sector% ~= Forest || %room.sector% ~= Jungle)
+elseif ((%room.sector% ~= Forest || %room.sector% ~= Jungle) && %room.sector% != Enchanted Forest)
   %echo% %self.name% scorches the trees!
   %terraform% %room% 10300
 elseif (%room.sector% == Grove)
@@ -63,8 +63,9 @@ end
 ~
 #10304
 Flame Dragon environmental~
-0 b 5
+0 bw 5
 ~
+* This script is no longer used. It was replaced by custom strings.
 if (%self.fighting% || %self.disabled%)
   halt
 end
@@ -113,7 +114,7 @@ eval vnum 10330 + %random.4% - 1
 ~
 #10334
 Abandoned Dragon animation~
-0 b 5
+0 bw 5
 ~
 if (%self.fighting% || %self.disabled%)
   halt
@@ -170,12 +171,13 @@ eval mob %room_var.people%
 if (%mob% && %mob.vnum% == %self.val0%)
   %send% %actor% You use %self.shortdesc% and %mob.name% appears!
   %echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
+  nop %mob.unlink_instance%
 end
 %purge% %self%
 ~
 #10337
 Fire Ox animation~
-0 b 5
+0 bw 5
 ~
 if (%self.fighting% || %self.disabled%)
   halt
@@ -194,7 +196,7 @@ end
 ~
 #10338
 Dragonguard animation~
-0 b 5
+0 bw 5
 ~
 if (%self.fighting% || %self.disabled%)
   halt
@@ -234,7 +236,7 @@ end
 eval room_var %self.room%
 eval mob %room_var.people%
 if (%mob% && %mob.vnum% == %self.val0%)
-%own% %mob% %actor.empire%
+  %own% %mob% %actor.empire%
   %send% %actor% You use %self.shortdesc% and %mob.name% appears!
   %echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
 end

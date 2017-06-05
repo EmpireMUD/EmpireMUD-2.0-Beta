@@ -4,9 +4,13 @@ a fried meat pie~
 A fried meat pie beckons you from the ground.~
 The pie looks delicious.
 ~
-6 0 a 1
-48 0 0
+6 m a 6
+24 0 0
 7 336
+A
+1 1 0
+C
+1 1
 R
 5619 0
 S
@@ -16,9 +20,13 @@ an apple pie~
 A warm apple pie is sitting out to cool.~
 The pie looks delicious!
 ~
-6 0 a 1
-48 0 0
+6 m a 2
+24 0 0
 7 336
+A
+4 1 0
+C
+1 1
 R
 5606 0
 S
@@ -28,9 +36,13 @@ a peach pie~
 A glistening peach pie is sitting here.~
 The pie looks delicious!
 ~
-6 0 a 1
-48 0 0
+6 m a 2
+24 0 0
 7 336
+A
+4 1 0
+C
+1 1
 R
 5606 0
 S
@@ -40,9 +52,13 @@ a cherry pie~
 A rich cherry pie is cooling here.~
 The pie looks delicious!
 ~
-6 0 a 2
-48 0 0
+6 m a 3
+24 0 0
 7 336
+A
+4 1 0
+C
+1 1
 R
 5606 0
 S
@@ -64,9 +80,13 @@ a steaming casserole~
 A casserole is steaming on the ground.~
 The casserole looks delicious.
 ~
-6 0 a 1
-48 0 0
+6 m a 2
+24 0 0
 7 336
+A
+19 1 0
+C
+1 1
 R
 5619 0
 S
@@ -76,9 +96,13 @@ a pouch of jerky~
 Someone has left a pouch of jerky here.~
 The jerky looks delicious.
 ~
-6 0 a 1
-48 0 0
+6 m a 2
+24 0 0
 7 336
+A
+21 1 0
+C
+1 1
 R
 5619 0
 S
@@ -116,9 +140,13 @@ a burrito~
 A burrito is lying on the ground.~
 The burrito looks muy delicioso.
 ~
-6 0 a 1
-48 0 0
+6 m a 2
+24 0 0
 7 336
+A
+12 1 0
+C
+1 1
 R
 5619 0
 S
@@ -140,11 +168,11 @@ a jar of olive oil~
 A jar of olive oil is sitting on the ground.~
 The olive oil looks rich.
 ~
-3 l a 3
+3 l a 4
 0 0 0
 6 168
 O
-20 0
+20 u
 R
 5134 0
 R
@@ -174,9 +202,15 @@ a loaf of bread~
 A loaf of bread has been dropped on the ground.~
 Bread is a good portable food.
 ~
-6 l a 1
-48 0 0
+6 lm a 3
+24 0 0
 7 336
+A
+6 1 0
+A
+2 1 0
+C
+1 1
 R
 5606 0
 S
@@ -230,9 +264,13 @@ There is a full meal of chicken and vegetables just laying here.~
 with a sprig of parsley. The smell wafting up from this plate is delicious and
 the chicken is nice and crispy.
 ~
-6 0 a 3
-96 0 0
+6 m a 4
+24 0 0
 7 336
+A
+15 1 0
+C
+1 1
 M
 4
 You scoop up some vegetables and shovel them into your mouth.~
@@ -257,9 +295,13 @@ dress it properly, but it is still delicious looking. A good thick slab of
 honey cooked ham with some cheese slipped in between two crusty pieces of
 bread.
 ~
-6 0 a 1
+6 m a 2
 24 0 0
 7 336
+A
+6 1 0
+C
+1 1
 M
 4
 You take a bite out of $p.~
@@ -336,9 +378,13 @@ A couple of hefty sausages are linked together.~
    A pair of sausages, well made and looking savory. Are they spicy? Who knows
 until the first bite.
 ~
-6 0 a 1
-48 0 0
+6 m a 2
+24 0 0
 7 336
+A
+17 1 0
+C
+1 1
 M
 5
 $n gasps and almost chokes as $e takes a bite off $p.~
@@ -357,9 +403,13 @@ most importantly strips of meat. All these things have been fixed in the dough
 at the time of cooking. This biscuit will keep for quite a while I'm sure, as
 it has been dried out and well stored.
 ~
-6 0 a 1
+6 m a 2
 24 0 0
 7 500
+A
+13 1 0
+C
+1 1
 M
 4
 You worry $p between your teeth, hoping for nourishment.~
@@ -377,9 +427,13 @@ A fried mushroom plate topped with chicken and rice is sitting here.~
 probably clog your arteries but if Furl could see it, he'd just die with envy.
 
 ~
-6 0 a 1
-96 0 0
+6 m a 2
+24 0 0
 7 336
+A
+24 1 0
+C
+1 1
 M
 4
 You pop a bit of mushroom in your mouth and enjoy the flavor.~
@@ -395,9 +449,13 @@ a pumpkin pie~
 A rich pumpkin pie is cooling here.~
 The pie looks delicious!
 ~
-6 0 a 2
-48 0 0
+6 m a 3
+24 0 0
 7 336
+A
+4 1 0
+C
+1 1
 R
 5606 0
 S
@@ -427,9 +485,13 @@ A piece of flatbread has been left here.~
    Threaded through this inocuous piece of flatbread are nuts, squash and a
 distinct glaze from honey.
 ~
-6 0 a 1
-48 0 0
+6 m a 2
+24 0 0
 7 336
+A
+18 1 0
+C
+1 1
 M
 4
 You roll up $p and take a good sized bite out of it.~
@@ -446,9 +508,13 @@ A hot plate of roast and vegetables has been left here.~
    A thick slab of finely cooked meat surrounded by sliced vegetables. Steamed
 to perfection, the sliced carrots and squash let off a surprising aroma.
 ~
-6 0 a 1
-72 0 0
+6 m a 2
+24 0 0
 7 336
+A
+12 1 0
+C
+1 1
 M
 4
 You cut off a bite of roast and add some vegetables to it, before savoring the flavor.~
@@ -466,9 +532,13 @@ A plate of fish and vegetables has been left here.~
 delicately poached with a hint of lemon and the vegetables have been arranged
 quite artisticly.
 ~
-6 0 a 1
-72 0 0
+6 m a 2
+24 0 0
 7 336
+A
+9 1 0
+C
+1 1
 M
 4
 You enjoy the lemon flavor as you take a bite of $p.~
@@ -485,9 +555,13 @@ A plate with fried catfish and hushpuppies has been left here.~
    Deep fried catfish with a hint of lemon takes up the majority of this plate.
 Alongside the fish are golden brown hushpuppies.
 ~
-6 0 a 1
-72 0 0
+6 m a 2
+24 0 0
 7 336
+A
+8 1 0
+C
+1 1
 M
 4
 You cut a piece of catfish and pop it and a hush puppy into your mouth.~
@@ -516,9 +590,13 @@ a banana pie~
 A warm banana pie is sitting out to cool.~
 It looks delicious!
 ~
-6 0 a 2
-48 0 0
+6 m a 3
+24 0 0
 7 336
+A
+4 1 0
+C
+1 1
 R
 5606 0
 S
@@ -528,9 +606,13 @@ a loaf of banana bread~
 A loaf of banana bread has been dropped on the ground.~
 Banana bread is a good portable food.
 ~
-6 0 a 5
-60 0 0
+6 m a 6
+24 0 0
 7 336
+A
+11 1 0
+C
+1 1
 R
 5606 0
 S
@@ -556,9 +638,13 @@ a pouch of spicy jerky~
 Someone has left a pouch of spicy jerky here.~
 This is a pouch of jerky with a picture of a pepper printed on the front.
 ~
-6 0 a 5
-48 0 0
+6 m a 6
+24 0 0
 7 336
+A
+22 1 0
+C
+1 1
 R
 5619 0
 S
@@ -583,9 +669,13 @@ a pouch of prunes~
 A pouch of prunes has been left here.~
 This pouch of dried prunes is a must-have for the avid traveler.
 ~
-6 0 a 5
+6 m a 6
 24 0 0
 7 336
+A
+10 1 0
+C
+1 1
 R
 5619 0
 R
@@ -609,9 +699,13 @@ a strawberry pie~
 A warm strawberry pie is sitting out to cool.~
 The pie looks delicious!
 ~
-6 0 a 2
-48 0 0
+6 m a 3
+24 0 0
 7 336
+A
+4 1 0
+C
+1 1
 R
 5606 0
 S
@@ -621,9 +715,13 @@ a jar of strawberry jam~
 A jar of strawberry jam has been dropped here.~
 This glass jar has been filled with delicious strawberry jam.
 ~
-6 0 a 5
-12 0 0
+6 m a 6
+24 0 0
 7 336
+A
+7 1 0
+C
+1 1
 R
 5606 0
 R
@@ -647,9 +745,13 @@ a blueberry pie~
 A warm blueberry pie is sitting out to cool.~
 The pie looks delicious!
 ~
-6 0 a 2
-48 0 0
+6 m a 3
+24 0 0
 7 336
+A
+4 1 0
+C
+1 1
 R
 5606 0
 S
@@ -659,9 +761,13 @@ a jar of blueberry jam~
 A jar of blueberry jam has been dropped on the ground.~
 A glass jar filled with delicious blueberry jam.
 ~
-6 0 a 4
-12 0 0
+6 m a 5
+24 0 0
 7 336
+A
+16 1 0
+C
+1 1
 R
 5619 0
 R
@@ -685,9 +791,13 @@ a flat oat cake~
 A flat oat cake is on the ground.~
 This flat oat cake looks like it would keep you well nourished.
 ~
-6 0 a 3
-25 0 0
+6 m a 4
+24 0 0
 7 336
+A
+23 1 0
+C
+1 1
 R
 5606 0
 S
@@ -1000,5 +1110,49 @@ A
 M
 4
 You fill yourself on fancy desserts.~
+S
+#3362
+jar oil lettuce seed~
+a jar of lettuce seed oil~
+There is a jar of lettuce seed oil here.~
+   The jar has a sacred seal on top, as the oil inside is primarily used in
+ceremonies. It is made from the pressed seeds of the lettuce plant.  
+~
+3 l a 6
+0 0 0
+6 168
+O
+20 u
+R
+5134 0
+R
+5192 0
+R
+5148 0
+R
+5150 0
+S
+#3363
+salad fresh~
+a fresh salad~
+Someone has left a fresh salad on the ground.~
+   The salad is made from fresh, crisp lettuce and chopped vegetables. It has
+been dressed with oil and lightly seasoned.  
+~
+6 m a 5
+24 0 0
+7 336
+A
+18 1 0
+C
+1 1
+M
+4
+You crunch on a fresh salad.~
+M
+5
+$n crunches on a fresh salad.~
+R
+5606 0
 S
 $
