@@ -1,0 +1,49 @@
+#221
+Stealth: Bribe the Guildmaster~
+The stealth guildmaster demands 100 coins before you can join the guild.
+~
+You hand over the 100 coins.
+~
+1 a 1 0 0
+A
+1 221
+A
+1 10016
+P
+10 4 0 0
+R
+5 4 1
+W
+10 4 0 0
+Z
+1 221
+Z
+1 10016
+S
+#257
+Brick Tutorial~
+   It looks like you've found some clay. There are a lot of things you can make
+with clay, but the first one you should learn is the brick. To make a pile of
+bricks:
+ 1. You need the Basic Crafts ability (skill buy Basic Crafts).
+    (If you don't have Trade 1, do some other tutorials first.)
+ 2. You need a fire to harden the clay. If you already have a flint set and an
+ axe, chop down a tree and light it on fire.
+ 3. Type 'craft bricks'.
+ Tip: You can make clay items faster by building a potter.
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+   Bricks are a common building material. Try typing 'recipe bricks' to see
+what you can make.
+~
+1 h 0 15 -1
+A
+2 101
+R
+0 0 1
+W
+2 257 0 1
+Z
+2 257
+S
+$

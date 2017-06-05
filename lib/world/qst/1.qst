@@ -1,0 +1,301 @@
+#100
+Rock Tutorial~
+   You found a rock! You can dig up rocks like this all over, and their main
+use is laying roads. But there's another use for rocks like this: you can make
+tools from them. Instructions:
+ 1. Dig up a second rock.
+ 2. Wield one of the rocks (wield rock).
+ 3. Chip the other rock (chip rock).
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+   Chipped rocks aren't very useful on their own, but you can make them into
+other tools.
+~
+4 h 0 15 -1
+A
+2 100
+R
+0 0 1
+R
+6 180 1
+W
+2 180 0 1
+Z
+2 180
+S
+#102
+Flint Tutorial~
+   You have found a piece of flint! These are useful for starting fires, but
+first you'll need to make it into a flint set:
+ 1. Dig up a regular rock too (dig).
+ 2. Put them together (craft flint set).
+ Tip: Type 'craft info flint set' to see more information about the craft.
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+   Congratulations! You can now light sticks, trees, and other items. Now get
+out there and set the world on fire!
+~
+3 h 0 15 -1
+A
+2 102
+R
+0 0 1
+R
+6 183 1
+W
+2 183 0 1
+Z
+2 183
+S
+#121
+Handle Tutorial~
+   You can turn this stick into a handle that could be made into a tool or
+weapon. Here are the instructions:
+ 1. Wield a sharp weapon like a sword or dagger.
+ 2. Type 'craft handle'.
+ Tip: You can type 'craft info handle' to see more info about the craft.
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+This handle can be used for lots of other crafts.
+~
+2 h 0 15 -1
+A
+2 121
+R
+0 0 1
+R
+6 919 1
+W
+2 919 0 1
+Z
+2 919
+S
+#124
+Scrape Tutorial~
+   Now that you have a tree, there's a couple of things you can do with it. 
+One of them is scrape it to make a log (a type of pillar component). Here's
+how:
+ 1. Wield a sharp tool like a dagger or sword.
+ 2. Type 'scrape tree'.
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+You seem to have mastered the scrape command.
+~
+3 h 0 15 -1
+A
+2 120
+R
+0 0 1
+R
+6 5107 1
+W
+2 124 0 1
+Z
+2 124
+S
+#125
+Saw Tutorial~
+   Now that you know how to get trees, it's time to learn to saw them into
+lumber. Here's what to do:
+ 1. Find a lumberyard (or type 'build lumberyard' to make one).
+ 2. With your large tree, type 'saw tree' at the lumberyard.
+ Tip: You can also 'store' your trees and lumber there.
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+Lumber can be used for all kinds of buildings and crafts.
+~
+1 h 0 15 -1
+A
+2 120
+R
+0 0 1
+W
+2 125 0 1
+Z
+2 125
+S
+#126
+Rough Wood Tutorial~
+   You have found some rough wood, which comes from the desert. It is just as
+versatile as other types of wood, but requires some additional work. For
+starters, you can saw it into boards. Here's how:
+ 1. Find a lumberyard (or type 'build lumberyard' to make one).
+ 2. With your rough wood, type 'saw wood' at the lumberyard.
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+Rough boards can be used as lumber or for crafting.
+~
+2 h 0 15 -1
+A
+2 122
+R
+0 0 1
+R
+6 127 1
+W
+2 126 0 1
+Z
+2 126
+S
+#127
+Bound Wooden Column Tutorial~
+   In order to make pillars out of rough wood, you'll need to craft bound
+wooden columns. Here's how:
+ 1. Gather 6 sticks.
+ 2. Type 'craft bound wooden column'.
+ Tip: Type 'craft info bound wooden column' to see more information about it.
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+You can use the column to build all kinds of things.
+~
+2 h 0 15 -1
+A
+2 126
+R
+0 0 1
+R
+6 5107 1
+W
+2 127 0 1
+Z
+2 127
+S
+#160
+Mining Tutorial~
+Now that you have a mine, it's time to learn to get some ore.
+ 1. If you don't have a pick, try digging up a rock and chipping a
+    handaxe for yourself. Then wield it.
+ 2. Type 'mine' and wait until you find some ore.
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+   You can get a lot of ore out of each mine, but be sure to dismantle it when
+you're done. Mountains are refreshed each year (7. 5 real days) if their mines
+have been dismantled.
+~
+1 h 0 15 -1
+A
+0 5107
+R
+0 0 1
+W
+2 160 0 1
+W
+2 165 0 1
+Z
+2 160
+Z
+2 165
+S
+#175
+Iron Tutorial~
+   You found some iron ore! You're well on your way to arming an empire. But
+one step at a time. First, you need to learn to smelt it.
+ 1. Build a forge or a foundry.
+ 2. Type 'smelt iron ingot'.
+ 3. Tip: Give a number like 'smelt 10 iron ingot' to make more than 1.
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+Iron ingots can also be stored in the foundry.
+~
+1 h 0 15 -1
+A
+2 160
+R
+0 0 1
+W
+2 175 0 1
+Z
+2 175
+S
+#179
+Wealth Tutorial~
+   It looks like you found some copper. It isn't as common as iron and can be
+used to make some handy items. But you can also smelt it into bars to gain
+wealth. Here's how:
+ 1. Build a forge or a foundry.
+ 2. Type 'smelt 2 copper ingot' (you'll need 4 ore).
+ 3. Then type 'smelt copper bar'.
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+   You can store the copper bar in a vault (or foundry) to add wealth to your
+empire.
+~
+1 h 0 15 -1
+A
+2 165
+R
+0 0 1
+W
+2 179 0 1
+Z
+2 179
+S
+#180
+Chipped Rock Tutorial~
+   You've chipped a rock! Chip the rock again to turn it into a better tool.
+Don't forget to wield a rock to chip it with.
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+Chipping rocks is a good way to make primitive tools.
+~
+3 h 0 15 -1
+A
+2 180
+R
+0 0 1
+W
+2 181 0 1
+Z
+2 181
+S
+#183
+Torch Tutorial~
+   Now that you have a flint set, it's time to use it. Here's how to make a
+torch:
+ 1. Find a stick (gather).
+ 2. Light it on fire (light stick).
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+   Now that you have a torch, you'll be able to find your way around in the
+dark! Torches don't last long though, so keep your flint set handy.
+~
+4 h 0 15 -1
+A
+2 183
+P
+5 184 0 1 a
+P
+6 184 0 1 a
+R
+0 0 1
+W
+2 184 0 1
+Z
+2 184
+S
+#184
+Torch Tutorial~
+   You've found a stick! These could be used to light up the night, but only if
+you get a flint set. Here's how to make your torch:
+ 1. Get a flint set ('dig rock' until you get a flint, and follow its quest).
+ 2. Use the flint set (light stick).
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+   Now that you have a torch, you'll be able to find your way around in the
+dark! Torches don't last long though, so keep your flint set handy.
+~
+3 h 0 15 -1
+A
+2 121
+P
+5 183 0 1 a
+P
+6 183 0 1 a
+R
+0 0 1
+W
+2 184 0 1
+Z
+2 184
+S
+$

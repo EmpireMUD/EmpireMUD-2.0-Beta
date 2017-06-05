@@ -78,7 +78,7 @@ if (%room.template% == 10500 || %dist% > 3 || %room.building% == Fence || %room.
   %echo% %self.name% vanishes in a swirl of leaf-green mana!
   mgoto %instance.location%
   %echo% %self.name% appears in a swirl of leaf-green mana!
-  * Flag for despawn if distance was too far
+  halt
 elseif (%room.empire_id% || (%room.sector% != Plains && %room.sector% != Crop && %room.sector% != Seeded Field && %room.sector% != Jungle Crop && %room.sector% != Jungle Field && !(%room.sector% ~= Forest) && !(%room.sector% ~= Jungle)))
   * No Work
   set no_work 1

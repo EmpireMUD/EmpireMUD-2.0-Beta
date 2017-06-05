@@ -487,6 +487,29 @@ switch %random.4%
   break
 done
 ~
+#514
+Shadow Wolf Familiars: Hide with Master~
+0 ct 0
+hide~
+* never block command
+return 0
+* master only
+eval master %self.master%
+if !%master%
+  halt
+end
+if %actor% != %master%
+  halt
+end
+if %self.fighting% || %master.fighting%
+  halt
+end
+* master is hiding; hide
+if !%master.ability(Hide)%
+  halt
+end
+dg_affect %self% HIDE on -1
+~
 #515
 Banshee Familiar Debuffs~
 0 kt 100
@@ -542,5 +565,16 @@ while %ch%
   eval ch %ch.next_in_room%
 done
 wait 25 sec
+~
+#516
+Stealth Familiar: check hide~
+0 btw 10
+~
+if !%master.aff_flagged(HIDE)% || %self.fighting%
+  visible
+  detach 516 %self.id%
+elseif !%self.aff_flagged(HIDE)%
+  detach 516 %self.id%
+end
 ~
 $

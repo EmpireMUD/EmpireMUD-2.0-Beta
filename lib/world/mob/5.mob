@@ -89,6 +89,8 @@ Something is casting the shadow of a scorpion on the ground!
 100 0 dnoG cfmG
 0 0 9 10
 T 510
+T 514
+T 516
 S
 #511
 shadow owl familiar~
@@ -98,6 +100,8 @@ Something is casting the shadow of an owl on the ground!
 100 0 dnoG cfmG
 0 0 9 10
 T 511
+T 514
+T 516
 S
 #512
 basilisk familiar~

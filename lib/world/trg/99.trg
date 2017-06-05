@@ -96,4 +96,23 @@ if %count% < 1
   %purge% %self%
 end
 ~
+#9926
+Heisenbug!~
+0 btw 25
+~
+eval master %self.master%
+if !%master%
+  %purge% %self%
+  halt
+end
+if %self.aff_flagged(!SEE)%
+  dg_affect %self% !SEE off 1
+  dg_affect %self% SNEAK off 1
+  %echo% %self.name% appears out of nowhere and starts following %master.name%.
+else
+  %echo% %self.name% vanishes into thin air.
+  dg_affect %self% !SEE on -1
+  dg_affect %self% SNEAK on -1
+end
+~
 $

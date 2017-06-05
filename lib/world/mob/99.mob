@@ -243,13 +243,22 @@ M
 $n emits four short flashes, then a brief pause, then two more short flashes.~
 M
 0
-$n flies in a circle around you, glowing brightly~
+$n flies in a circle around you, glowing brightly.~
 M
 0
 $n gives off a complex series of long and short flashes.~
 M
 0
 $n flashes brightly.~
+M
+0
+$n flashes brightly.~
+M
+0
+$n glows softly.~
+M
+0
+$n glows softly.~
 T 9901
 T 9902
 S
@@ -374,12 +383,6 @@ A lost spirit is wandering aimlessly here.
 0 0 2 21
 M
 0
-$n floats in a slow circle around you.~
-M
-0
-$n glows faintly, emitting an aura of confusion.~
-M
-0
 You wonder if $n would feel like a pillow if you could touch it.~
 M
 0
@@ -387,6 +390,24 @@ You wonder if $n tastes like a marshmallow.~
 M
 0
 $n dances aimlessly in the sky.~
+M
+0
+$n dances aimlessly in the sky.~
+M
+0
+$n floats in a slow circle around you.~
+M
+0
+$n floats in a slow circle around you.~
+M
+0
+$n floats in a slow circle around you.~
+M
+0
+$n glows faintly, emitting an aura of confusion.~
+M
+0
+$n glows faintly, emitting an aura of confusion.~
 T 9901
 T 9902
 S
@@ -397,6 +418,21 @@ A little lizard is scuttling around here.
 ~
 1 1 bdoD n
 0 0 7 9
+M
+0
+$n stands still for a moment and starts doing push-ups.~
+M
+0
+$n stares intently at you.~
+M
+0
+$n flicks its tail to and fro.~
+M
+0
+$n flicks its tail and hisses.~
+M
+0
+$n hisses quietly.~
 T 9901
 T 9902
 S
@@ -435,6 +471,15 @@ You have found a cute bug.
 ~
 1 1 bdoD mn
 0 0 8 9
+M
+0
+$n starts flying around, then suddenly crashes.~
+M
+0
+$n suddenly disappears and reappears nearby.~
+M
+0
+$n walks right through your leg and appears on the other side.~
 T 9901
 T 9902
 S
@@ -450,16 +495,25 @@ M
 You stare hard at $n, trying to figure out if it's moving.~
 M
 0
-$n lies, inert, on the ground.~
+$n stares lovingly at its master.~
+M
+0
+You almost trip over $n.~
+M
+0
+$n sits on the ground, unmoving.~
+M
+0
+$n sits on the ground, unmoving.~
+M
+0
+$n hops in a little circle.~
 M
 0
 $n shifts slightly.~
 M
 0
-$n stares lovingly at its master.~
-M
-0
-You almost trip over $n.~
+$n shifts slightly.~
 T 9901
 T 9902
 S
@@ -482,6 +536,12 @@ $n rotates on the spot, as if looking around.~
 M
 0
 $n pokes you in the shin.~
+M
+0
+The cute little shrub blows innocently in the wind.~
+M
+0
+The cute little shrub blows innocently in the wind.~
 T 9901
 T 9902
 S
@@ -517,6 +577,21 @@ A prehistoric bug has been unearthed.
 ~
 1 1 bdoD mn
 0 0 2 15
+M
+0
+$n starts flying around...~
+M
+0
+$n starts flying around...~
+M
+0
+$n starts flying around...~
+M
+0
+$n starts flying around... and crashes!~
+M
+0
+You wonder how long $n has been around.~
 T 9901
 T 9902
 S
@@ -529,7 +604,10 @@ A bald beagle hops along the ground, trying to take flight.
 0 0 15 9
 M
 0
-$n tries to screech like an eagle, but it comes out as a high whine.~
+$n tries to screech like an eagle, but it comes out as a high wine.~
+M
+0
+$n walks up to you and begs, clearly hunting for a tasty threat.~
 T 9901
 T 9902
 S
@@ -538,12 +616,35 @@ snark great white~
 a great white snark~
 A great white snark drags itself slowly along the ground.
 ~
-0 0 bdoD n
+1 1 bdoD n
 0 0 17 9
 M
 1
-Land sharks, the wizard said... What a great idea, he said...~
+Land sharks, the wizard said... What a grate idea, he said...~
+M
+0
+$n circlets below you!~
+M
+0
+$n circlets below you!~
+M
+0
+$n circlets below you!~
+M
+0
+$n seams to be having trouble breathing in the air.~
 T 9901
 T 9902
+S
+#9926
+Heisenbug notorious~
+the notorious Heisenbug~
+You have discovered the notorious Heisenbug!
+~
+1 1 bdoD mn
+0 0 8 9
+T 9901
+T 9902
+T 9926
 S
 $
