@@ -8,6 +8,7 @@ CONTENTS:
   B. Configuration
   C. Adventures
   D. Staff
+  E. Adding Content
 
 
 =================
@@ -110,3 +111,22 @@ give access to a single command, but type 'help grants' for more information.
 
 OLC: If your staff members will be building content, you can control their
 access to this system. More information is available on 'help olc controls'.
+
+
+===================
+ E. ADDING CONTENT
+-------------------
+
+EmpireMUD 2.0 includes a full suite of OLC (OnLine Creation) editors that allow
+you to edit all facets of the game. You should familiarize yourself with the
+following commands and help files:
+
+  . (olc) - The . command controls all the OLC functions.
+  vnum - Look up an item/mob/etc by name.
+  vstat - Get stats on something by vnum (virtual number).
+  BUILDING GUIDE - A help file with general tips on all the editors.
+  instance - Control instances of adventures.
+
+If you plan to add new content, you should pick vnums starting at 100000 or
+higher, to avoid conflicting with any new stock content that might appear in
+future updates.

@@ -2,7 +2,7 @@ EmpireMUD 2.0 beta Change Log
 
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-== 2.0 b5 (May 30, 2017) ==
+== 2.0 b5 (June 5, 2017) ==
 
 Abilities:
 - Ablate: New Battlemage spell with direct damage and a resist-physical debuff.

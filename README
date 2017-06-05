@@ -219,6 +219,9 @@ Futher steps once you are logged into EmpireMUD:
 Other Documentation
 -------------------
 
+There is additional documentation in the 'doc' directory including help getting
+started and help with crash recovery.
+
 The EmpireMUD documentation project is not complete.  If you need help you
 may e-mail me or see if the CircleMUD documentation will help.  I've left
 in-tact all CircleMUD documentation except that which would give you mis-
