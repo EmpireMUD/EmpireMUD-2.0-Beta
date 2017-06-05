@@ -566,15 +566,4 @@ while %ch%
 done
 wait 25 sec
 ~
-#516
-Stealth Familiar: check hide~
-0 btw 10
-~
-if !%master.aff_flagged(HIDE)% || %self.fighting%
-  visible
-  detach 516 %self.id%
-elseif !%self.aff_flagged(HIDE)%
-  detach 516 %self.id%
-end
-~
 $
