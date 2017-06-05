@@ -891,8 +891,8 @@ void do_instance_list_all(char_data *ch) {
 			break;
 		}
 		
-		// skip adventures with no count
-		if (!(count = count_instances(adv))) {
+		// skip in-dev adventures with no count
+		if (ADVENTURE_FLAGGED(adv, ADV_IN_DEVELOPMENT) && !(count = count_instances(adv))) {
 			continue;
 		}
 		
