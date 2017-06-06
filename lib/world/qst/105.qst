@@ -9,7 +9,7 @@ consecrated and buried.
    You have pacified the hostile mage-spawns of the Permafrost! You whisper a
 short chant of consecration, and bury the wand beneath the henge.
 ~
-18 be 75 125 -1
+19 be 75 125 -1
 A
 3 10550
 P
@@ -29,11 +29,11 @@ P
 P
 9 3 0 50 a
 R
-2 10557 2
-R
 0 0 2
 R
 4 3 50
+R
+8 10550 2
 T 10595
 W
 11 0 0 1
@@ -50,7 +50,7 @@ pay a nice price for it, if it doesn't melt first.
 'Ah,' says the high sorcerer, 'This is a very rare gemstone indeed!'
 He places the gemstone in a dish of ice, and hands you your reward.
 ~
-17 bde 75 125 -1
+18 bde 75 125 -1
 A
 3 10561
 P
@@ -70,11 +70,11 @@ P
 P
 2 10598 0 1 a
 R
-2 10557 2
-R
 1 0 250
 R
 4 4 50
+R
+8 10550 2
 W
 2 10598 0 1
 Z
@@ -96,7 +96,7 @@ frostblood over the unquiet remains in the crypt. The blood bubbles, as if
 boiling, but the bones seem to freeze and the wailing stops. You aren't sure if
 you've done this correctly, but you do gain some experience for trying.
 ~
-18 bde 75 125 -1
+19 bde 75 125 -1
 A
 3 10550
 P
@@ -116,11 +116,11 @@ P
 P
 9 7 0 50 a
 R
-2 10557 2
-R
 0 0 2
 R
 4 7 50
+R
+8 10550 2
 W
 3 10550 0 1 a
 W
@@ -137,7 +137,7 @@ and 'cook' some cold cuts. Deliver them at any tavern for your reward.
 ~
 You deliver the cold cuts at the bar.
 ~
-17 bde 75 125 -1
+18 bde 75 125 -1
 A
 3 10550
 P
@@ -157,11 +157,11 @@ P
 P
 9 6 0 50 a
 R
-2 10557 2
-R
 1 0 250
 R
 4 6 50
+R
+8 10550 2
 W
 2 10597 0 2
 Z

@@ -32,7 +32,7 @@ S
 Here to Sign Up~
    The superintendant looks up at you, stands up from his desk, and claps you
 on the shoulders with both hands. 'Here to sign up? ' he asks, jovially. 'All
-members of the empire are welcome here, whether you're a ratcatcher or a... 
+members of the empire are welcome here, whether you're a ratcatcher or a...
 Dragoncatcher, I suppose!'
 ~
 You sign your name to the guild roster.
@@ -138,7 +138,7 @@ the captured wildling back here for further study.
    You drop the net with your captured wildling. You can now perform daily
 quests in The Grove for the Guild of Adventurers.
 ~
-4 d 0 0 -1
+5 d 0 0 -1
 A
 1 18217
 A
@@ -148,7 +148,7 @@ P
 R
 7 18200 1
 R
-2 18209 1
+8 18200 1
 T 18257
 W
 2 18257 0 1
@@ -170,7 +170,7 @@ when you've accomplished this. (Type 'speak' when you find the druid.)
 propaganda for further study. You can now perform daily quests in the Monsoon
 Rift for the Guild of Adventurers.
 ~
-9 d 0 0 -1
+10 d 0 0 -1
 A
 1 18217
 A
@@ -180,7 +180,7 @@ P
 R
 7 18200 1
 R
-2 18209 1
+8 18200 1
 W
 11 0 0 1
 W
@@ -202,7 +202,7 @@ buy a ticket to the "Goblin Gala". Type 'buy ticket' when you find Dryleef.
 laughs. 'At least now we shouldn't have to worry about the goblins stealing
 from the city,' he says.
 ~
-5 d 0 0 -1
+6 d 0 0 -1
 A
 1 18219
 A
@@ -212,7 +212,7 @@ P
 R
 7 18200 1
 R
-2 18209 1
+8 18200 1
 T 18261
 W
 2 18261 0 1
@@ -234,7 +234,7 @@ corpses to a player who does.)
    Ah, these cold cuts are perfect. And it seems you have survived the
 Permafrost. You can now perform Guild daily quests in the Permafrost.
 ~
-5 d 0 0 -1
+6 d 0 0 -1
 A
 1 18219
 A
@@ -244,7 +244,7 @@ P
 R
 7 18200 1
 R
-2 18209 1
+8 18200 1
 W
 0 10563 0 1 a
 W
@@ -264,7 +264,7 @@ the thieves' den inside, and report back to the Guild.
    Your report on the thieves and their hideout in the ruins has helped the
 Guild, and you can now perform daily quests in that adventure.
 ~
-3 0 0 0 -1
+4 0 0 0 -1
 A
 1 18218
 A
@@ -274,7 +274,7 @@ P
 R
 7 18200 1
 R
-2 18209 1
+8 18200 1
 W
 13 10110 0 1
 Z
@@ -294,7 +294,7 @@ totem so that we can analyze its mana source.
    You hand over the ratskin totem. You can now perform daily quests for the
 Guild of Adventurers in Ratskins's sewer.
 ~
-3 d 0 0 -1
+4 d 0 0 -1
 A
 1 18218
 A
@@ -304,7 +304,7 @@ P
 R
 7 18200 1
 R
-2 18209 1
+8 18200 1
 W
 2 10015 0 1
 Z
